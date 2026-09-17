@@ -15,7 +15,7 @@ import type { ForumPostMetadata } from '../types/index.js';
  * 게시글 생명주기 상태 (Core 기준, 확장 금지)
  *
  * Core는 "승인/공개 관점"까지만 책임진다.
- * App/Extension 고유 상태(예: GlycoPharm ForumStatus)는 각 서비스에서 별도 정의한다.
+ * App/Extension 고유 상태(예: 서비스별 ForumStatus)는 각 서비스에서 별도 정의한다.
  *
  * @remarks 값을 추가·삭제하려면 반드시 Phase 승인이 필요하다.
  */
@@ -36,7 +36,7 @@ export enum PostStatus {
  * 게시글 콘텐츠 성격 분류 (Core 기준, 확장 금지)
  *
  * App에서 추가 유형이 필요한 경우 자체 매핑으로 처리한다.
- * (예: GlycoPharm 'normal'|'notice' → App-level PostType)
+ * (예: 'normal'|'notice' → App-level PostType)
  *
  * @remarks 값을 추가·삭제하려면 반드시 Phase 승인이 필요하다.
  */

@@ -81,7 +81,7 @@ AI 태그는 `product_ai_tags` 에 이미 보존되므로, **object 형태인 ma
 - 4개 POST write × {자기 master PASS / 타 공급자 master 403 / offer 없는 master 403}
 - `DELETE` 동일 2축
 - `PENDING` 공급자 → 403 (`WRITE_REQUIRES_ACTIVE_SUPPLIER`)
-- 비소유 6역할(`kpa-society:admin|operator`, `cosmetics:admin|operator`, `glycopharm:admin`, 일반 인증 사용자) × {manual 403 / regenerate 403 / GET 403}
+- 비소유 6역할(`kpa-society:admin|operator`, `cosmetics:admin|operator`, 일반 인증 사용자) × {manual 403 / regenerate 403 / GET 403}
 - `platform:super_admin` — 타 공급자 master 포함 PASS
 - 미인증 401 / 없는 master 404 `PRODUCT_MASTER_NOT_FOUND` / 비 UUID 403
 - `syncMasterTags` §6 비파괴 3건 (object → update 미호출, array → 정상 update, null → update)

@@ -62,7 +62,7 @@ WO 의 원칙은 "**먼저 운영 DB의 `glucoseview` 사용 row를 read-only로
 | 확인 | 결과 |
 |---|---|
 | `platform_services` | `glucoseview \| GlucoseView \| status=active \| type=tool \| featured=false \| entry=https://glucoseview.co.kr \| approval_required=true` |
-| `platform_services` 전체 code | `glycopharm, kpa-society, k-cosmetics, neture, kpa, cosmetics, kpa-groupbuy, **glucoseview**, pharmacy-hub` |
+| `platform_services` 전체 code | — |
 | `roles` (service_key='glucoseview') | 4행 — `glucoseview:admin` `glucoseview:operator` `glucoseview:pharmacist` `glucoseview:user`, 전부 `is_active=true` |
 | **`role_assignments` 중 role 이 `glucose*`** | **0 (active 0)** — 실제로 이 역할을 보유한 사용자 없음 |
 | `service_memberships` | **0** |
@@ -122,7 +122,7 @@ WO 의 원칙은 "**먼저 운영 DB의 `glucoseview` 사용 row를 read-only로
 | `apps/api-server/src/routes/cms-content/cms-content-slot.handler.ts` | 42 | `SCOPE_TO_CMS_KEYS` 의 `glucoseview: ['glucoseview']` | cms 관련 row 0 |
 | `apps/api-server/src/routes/kpa/controllers/supplier-campaign-request.controller.ts` | 36 | `ALLOWED_SERVICES` 에 `'glucoseview'` | 캠페인 요청 허용 서비스 |
 | `apps/api-server/src/modules/neture/services/offer.service.ts` | 1028 | `filter(k => k !== 'neture' && k !== 'glucoseview')` | **방어 필터** — 제거 시 승인 정책이 완화되는 방향이라 신중 |
-| `apps/api-server/src/modules/partner/entities/PartnerApplication.ts` | 21 | `ServiceInterest = 'GlycoPharm' \| 'K-Cosmetics' \| 'GlucoseView'` | union 축소는 파트너 신청 데이터 확인 선행 필요 |
+| `apps/api-server/src/modules/partner/entities/PartnerApplication.ts` | 21 | — | 'K-Cosmetics' \ | 'GlucoseView'` | union 축소는 파트너 신청 데이터 확인 선행 필요 |
 | `apps/api-server/src/database/entities.ts` | 168-170 | 내용 없는 `// GLUCOSEVIEW ENTITIES` 배너 주석 | **완전 dead** — 가장 안전한 제거 후보 |
 
 ### 4-C. 디버그·테스트 (별도 판단)
@@ -141,11 +141,9 @@ WO 의 원칙은 "**먼저 운영 DB의 `glucoseview` 사용 row를 read-only로
 
 | 항목 | 이유 |
 |---|---|
-| `apps/api-server/src/routes/glycopharm/controllers/public.controller.ts:58` · `services/web-glycopharm/src/api/public.ts:76` 의 `supplier: 'GlucoseView'` | **fallback mock 데이터의 공급자 표시 문자열**. service key 가 아니다 |
 | `packages/security-core/src/service-scope-guard.ts:32` 등 다수 | JSDoc **예시 주석**. 실행 코드 아님 |
 | `apps/api-server/src/database/migrations/**` (약 30 파일) | **실행 이력**. WO 제외 범위 — 삭제 금지 |
 | `apps/api-server/src/utils/operator-alert.utils.ts` | 주석의 origin WO 표기 |
-| GlycoPharm CGM 제품 기능 · `pharmacy-ai-insight` · 일반 health check | WO 제외 범위 |
 | `docs/**` (약 60 파일) | 감사·CHECK **기록 문서**. 이력 보존 |
 
 ### 4-E. 이미 정리 완료 (선행 WO)
@@ -154,7 +152,7 @@ WO 의 원칙은 "**먼저 운영 DB의 `glucoseview` 사용 row를 read-only로
 `WO-O4O-API-SERVER-AUTH-GLUCOSEVIEW-RESIDUE-CLEANUP-V1` / `WO-O4O-GLUCOSEVIEW-POST-DROP-CLEANUP-V1` /
 `WO-NETURE-EXCLUDE-GLUCOSEVIEW-FROM-PRODUCT-SERVICE-SELECTION-V1` 로
 CMS 필터·채널·슬롯 옵션, service-applications union, 공유 패키지 badge/option, store 정책 entity,
-auth allowed origin, glycopharm 디버그 endpoint 등은 **이미 제거**되었고 자리마다 사유 주석만 남아 있다.
+auth allowed origin 디버그 endpoint 등은 **이미 제거**되었고 자리마다 사유 주석만 남아 있다.
 `apps/api-server/src/constants/service-keys.ts` 의 canonical `SERVICE_KEYS` 에도 `glucoseview` 는 **없다**.
 
 ---
@@ -266,7 +264,7 @@ WO 의 중지 조건 "`offer.service.ts` 필터 제거가 실제 승인 범위�
 |---|---|---|
 | 방어 필터 | `offer.service.ts` | §8-4 — 의도적 유지 |
 | 문서 주석(유효값 나열) | `OperatorNotificationSettings.ts:23`, `ServiceMembership.ts:46`, `PartnerContent.ts:32`, `PartnerEvent.ts:30`, `PartnerTarget.ts:30`, `operator-alert.utils.ts:21`, `packages/cms-core/src/entities/CmsContent.entity.ts:48` | 실행 코드 아님. 다만 stale — 후속 `WO-O4O-GLUCOSEVIEW-FULL-LEGACY-REMOVAL-V1` 대상 |
-| mock 공급자명 `supplier: 'GlucoseView'` | `routes/glycopharm/controllers/public.controller.ts:58`, `services/web-glycopharm/src/api/public.ts:76` | 본 WO 범위 밖(문자열 일치일 뿐 service key 아님). 실제 의미 재확인은 후속 WO 지시사항 |
+| mock 공급자명 `supplier: 'GlucoseView'` | — | 본 WO 범위 밖(문자열 일치일 뿐 service key 아님). 실제 의미 재확인은 후속 WO 지시사항 |
 | migration 이력 / 과거 CHECK·감사 문서 | 다수 | WO 명시 제외 |
 | `packages/ai-common-core/dist/prompts/glucoseview/` | 빌드 산출물 | git 미추적(`dist/`), src 는 이미 제거됨 |
 

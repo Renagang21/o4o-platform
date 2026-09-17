@@ -2,7 +2,7 @@
 
 > **유형:** WO 실행 결과 (CHECK)
 > **WO:** WO-O4O-FORUM-WRITE-NETURE-FORM-COMMONIZATION-V1
-> **선행:** WO-O4O-FORUM-WRITE-FORM-COMMONIZATION-V1 (KPA/GP/KCos 완료)
+> **선행:** WO-O4O-FORUM-WRITE-FORM-COMMONIZATION-V1 (KPA/KCos 완료)
 > **작성:** 2026-06-13
 > **판정:** **PASS** (create-only, edit 미변경)
 
@@ -23,7 +23,7 @@ Neture forum **create** 경로를 공통 `ForumWriteForm` 으로 전환하고, *
 
 - **추가 prop: 1개** — `renderContentMeta?: (state: { html: string; textLength: number }) => ReactNode`
   - 에디터 바로 아래 렌더. 폼 내부 `editorHtml` 을 인자로 live 호출 → Neture charCount/최소길이 안내 재현용.
-  - **optional, default 미지정 → 미노출.** 기존 소비처(KPA/GP/KCos)는 미전달 → **렌더/동작 무변화**(web-glycopharm tsc PASS 로 확인).
+  - **optional, default 미지정 → 미노출.** 기존 소비처(KPA/KCos)는 미전달 → **렌더/동작 무변화**.
 - contactSection 은 **기존 `renderExtra` 슬롯**으로 주입(신규 prop 불필요).
 - min-length **validation** 은 wrapper `handleCreateSubmit` 에서 처리(폼에 validation prop 추가하지 않음).
 - `index.ts` export 변경 **불필요** — `ForumWriteForm`/`ForumWriteFormProps`/`ForumWriteFormPayload` 이미 export 됨. 신규 prop 은 `ForumWriteFormProps` 에 포함되어 자동 노출.
@@ -48,12 +48,11 @@ Neture forum **create** 경로를 공통 `ForumWriteForm` 으로 전환하고, *
 
 ✅ edit branch(`isEditMode`)는 기존 inline form + 기존 `handleSubmit`/`updateForumPost` 그대로. `?edit=` param 처리, `loadPostForEdit`, edit redirect 모두 미변경. edit route parity 작업 미수행(범위 외).
 
-## 7. KPA / GP / KCos 무회귀 확인
+## 7. KPA / KCos 무회귀 확인
 
 ✅ 무회귀.
-- 변경 파일에 KPA/GP/KCos write page **없음**(git diff 로 확인 — 내 변경은 `ForumWriteForm.tsx` + Neture `ForumWritePage.tsx` 2개뿐).
+- 변경 파일에 KPA/KCos write page **없음**(git diff 로 확인 — 내 변경은 `ForumWriteForm.tsx` + Neture `ForumWritePage.tsx` 2개뿐).
 - `ForumWriteForm` 신규 prop 은 optional·default-off → 기존 3서비스 미영향.
-- web-glycopharm tsc **PASS**(ForumWriteForm 을 source 로 컴파일하며 0 error).
 
 ## 8. TypeScript 검증 결과
 
@@ -61,7 +60,6 @@ Neture forum **create** 경로를 공통 `ForumWriteForm` 으로 전환하고, *
 |--------|------|
 | shared-space-ui (ForumWriteForm) | ✅ forum 관련 error 0 |
 | web-neture | ✅ PASS (0 error) |
-| web-glycopharm | ✅ PASS (0 error) |
 | web-kpa-society | ⚠️ forum error 0 — 단, `packages/store-ui-core/.../b2b-catalog/B2BCatalogHub.tsx` 의 **미빌드 @o4o/* dist** 환경 error 만 존재(아래 주) |
 | web-k-cosmetics | ⚠️ 동일 (b2b-catalog 환경 error 만) |
 
@@ -101,8 +99,8 @@ Neture forum **create** 경로를 공통 `ForumWriteForm` 으로 전환하고, *
 | contactSection | ✅ renderExtra 유지 |
 | min-length/notice | ✅ 유지 |
 | basePath/categorySlug | ✅ 유지 |
-| KPA/GP/KCos 무회귀 | ✅ |
+| KPA/KCos 무회귀 | ✅ |
 | backend/API/DB/route/menu | 무변경 |
-| TypeScript | web-neture/GP/shared PASS, KPA/KCos 는 무관한 b2b-catalog 환경 error 만 |
+| TypeScript | web-neture/shared PASS, KPA/KCos 는 무관한 b2b-catalog 환경 error 만 |
 | browser smoke | ✅ 폼 렌더 확인(제출 없음) |
 | 다른 세션 WIP | LMS 4파일 미포함 |

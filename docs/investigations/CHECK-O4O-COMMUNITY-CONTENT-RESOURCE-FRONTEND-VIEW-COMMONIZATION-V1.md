@@ -2,7 +2,7 @@
 
 - **WO**: `WO-O4O-COMMUNITY-CONTENT-RESOURCE-FRONTEND-VIEW-COMMONIZATION-V1`
 - **축**: 커뮤니티 **콘텐츠·자료실 frontend / View** 공통화 (backend 축 아님)
-- **대상 서비스**: KPA-Society · K-Cosmetics · GlycoPharm · **PharmacyHub** · Neture
+- **대상 서비스**: KPA-Society · K-Cosmetics · **PharmacyHub** · Neture
 - **작성일**: 2026-08-18
 - **착수 commit**: `09b0e3b14` (census 기준) / 작업 시점 HEAD `910431dcc`
 - **판정**: PASS — VIEW_DUPLICATED 4 → 0
@@ -51,9 +51,9 @@ route prefix: `/content`, `/resources` · API base `/api/v1` · backend `content
 
 | # | feature | route | page·component | API client | shared UI | 판정 | 중복 상대 | 근거 |
 |---|---------|-------|----------------|-----------|-----------|------|-----------|------|
-| 1 | 콘텐츠 목록 | `/content` | `pages/contents/ContentListPage.tsx` (63L) | `api/content.ts` → `/cosmetics/contents` | `CommunityContentListTemplate` | FULLY_COMMON | (해소) GP | 본 WO 로 공통 Template 이관. 이전 146L 은 GP 와 주석 1줄 차이 |
+| 1 | 콘텐츠 목록 | `/content` | `pages/contents/ContentListPage.tsx` (63L) | `api/content.ts` → `/cosmetics/contents` | `CommunityContentListTemplate` | FULLY_COMMON | — | 본 WO 로 공통 Template 이관. |
 | 2 | 자료실 목록 | `/resources` | `pages/resources/ResourcesPage.tsx` (54L) | `api/content.ts` | `ResourcesHubTemplate` | FULLY_COMMON | — | 선행 WO 에서 이미 공통 |
-| 3 | 콘텐츠 상세 | `/content/:id` | `pages/contents/ContentDetailPage.tsx` (89L) | `contentApi.detail/trackView` | `CommunityContentDetailTemplate` + `CommunityContentDetailView` | FULLY_COMMON | (해소) GP | 조회·조회수·상태 전이까지 공통 이관 |
+| 3 | 콘텐츠 상세 | `/content:id` | `pages/contents/ContentDetailPage.tsx` (89L) | `contentApi.detail/trackView` | `CommunityContentDetailTemplate` + `CommunityContentDetailView` | FULLY_COMMON | (해소) 조회·조회수·상태 전이까지 공통 이관 |
 | 4 | 자료 상세 | — | — | — | — | NOT_IMPLEMENTED | — | `resources/:id` route 없음. 목록에서 링크/다운로드로 종결 |
 | 5 | 검색 | `/content`,`/resources` | (Template 내장) | 서버 `search` | 공통 Template | FULLY_COMMON | — | 300ms 디바운스 + page 1 리셋 공통화 |
 | 6 | 필터 | — | — | — | — | NOT_IMPLEMENTED | — | 콘텐츠 목록에 필터 UI 없음 |
@@ -74,18 +74,6 @@ route prefix: `/content`, `/resources` · API base `/api/v1` · backend `content
 | 21 | API client | — | `api/content.ts` | `/cosmetics/contents` | — | SERVICE_SPECIFIC | — | adapter 는 설계상 서비스 소유 |
 
 합계: FULLY_COMMON 14 / NOT_IMPLEMENTED 4 / SERVICE_SPECIFIC 3.
-
-### 3-2. GlycoPharm
-
-route prefix 동일 · API `/glycopharm/contents`
-
-21개 cell 이 **K-Cosmetics 와 동일 판정 분포**(FULLY_COMMON 14 / NOT_IMPLEMENTED 4 / SERVICE_SPECIFIC 3). 차이점만 기록한다.
-
-| # | 차이점 | 내용 |
-|---|--------|------|
-| 1·3 | `pages/contents/ContentListPage.tsx` (63L) / `ContentDetailPage.tsx` (89L) | 착수 시점 KCos 와 **주석 1~2줄 외 완전 동일** → `VIEW_DUPLICATED` 였고 본 WO 로 해소 |
-| 21 | `api/content.ts` → `/glycopharm/contents` | API URL 계약이 서비스별로 다름 — 회귀 테스트로 고정 |
-| — | `/hub/content/:id` `HubContentDetailPage` | 매장 HUB 축 → `OUT_OF_SCOPE` (§4 표) |
 
 ### 3-3. KPA-Society
 
@@ -160,7 +148,7 @@ route + 소비자 기준 분리:
 - `services/web-pharmacy-hub/src/App.tsx` 에 커뮤니티 `/content` · `/resources` route **없음**
 - `content` / `library` / `library/resources` 는 모두 **`/store-owner` 하위** (App.tsx 292–294)
 - 커뮤니티 콘텐츠 API client 파일 **없음** (`api/content.ts` 부재)
-- `/resources` 링크가 전 소스에서 **0건** (KPA·KCos·GP·Neture 는 홈/모바일 nav 에 존재)
+- `/resources` 링크가 전 소스에서 **0건** (KPA·KCos·Neture 는 홈/모바일 nav 에 존재)
 
 → 21개 feature 전부 **`NOT_IMPLEMENTED`**.
 
@@ -176,12 +164,12 @@ route + 소비자 기준 분리:
 |---|----|------|-----------|
 | 1 | 매장 HUB — KPA | `/store-hub/content` `HubContentLibraryPage` | 매장 실행자산 소비축 |
 | 2 | 매장 HUB — K-Cosmetics | `/store-hub/content` `HubContentPage` | 동일 |
-| 3 | 매장 HUB — GlycoPharm | `/store-hub/content` `HubContentListPage`, `/hub/content/:id` | 동일 |
-| 4 | 운영자 콘텐츠 콘솔 (KPA·KCos·GP) | `OperatorContentPage`·`OperatorResourcesPage`·`OperatorGuideContentsPage` | 운영자 CMS 축(§5) |
+| 3 | — | `/store-hub/content` `HubContentListPage`, `/hub/content/:id` | 동일 |
+| 4 | 운영자 콘텐츠 콘솔 (KPA·KCos) | `OperatorContentPage`·`OperatorResourcesPage`·`OperatorGuideContentsPage` | 운영자 CMS 축(§5) |
 | 5 | 운영자 콘텐츠 — Neture | `/operator/guide-contents` | 동일 |
 | 6 | 파트너 콘텐츠 mock — Neture | `/account/partner/contents` `PartnerContentsPage`(247L) | **API client·fetch 0건 — 정적 mock**. 공통화 대상 아님, dead flow 후보로 별도 보고 |
 | 7 | store-owner 실행자산 — PharmacyHub | `/store-owner/content`·`/library`·`/library/resources` | 매장 실행자산 축(§3-5) |
-| 8 | 사이니지 콘텐츠 (KPA·KCos·GP) | `signage/content`·`signage/library`·`forced-content` | 사이니지 축 |
+| 8 | 사이니지 콘텐츠 (KPA·KCos) | `signage/content`·`signage/library`·`forced-content` | 사이니지 축 |
 
 ---
 
@@ -212,17 +200,17 @@ router 결합은 `renderLink` 주입, 조회는 `config.fetchItems` / `config.fe
 
 | 항목 | 전 | 후 |
 |------|----|----|
-| `VIEW_DUPLICATED` cell | 4 (KCos·GP × 목록·상세) | **0** |
+| `VIEW_DUPLICATED` cell | 4 (KCos × 목록·상세) | **0** |
 | KCos `ContentListPage.tsx` | 146L | 63L |
-| GP `ContentListPage.tsx` | 146L | 63L |
+ `ContentListPage.tsx` | 146L | 63L |
 | KCos `ContentDetailPage.tsx` | 130L | 89L |
-| GP `ContentDetailPage.tsx` | 130L | 89L |
+ `ContentDetailPage.tsx` | 130L | 89L |
 | wrapper 합계 | 552L | 304L (**-248L**) |
 | 신규 shared 파일 | 0 | 4 |
 | 삭제한 dead file | — | 0 (기능 삭제 없음 — 이관만) |
 | 남은 wrapper 수 | 4 | 4 (config·adapter 전용으로 축소) |
 
-부수 효과: KCos·GP 목록의 **조회 실패 삼킴**(catch → 빈 배열) 제거 → O4O Load-Error 계약 충족(실패 = 오류상태 + 재시도, 정상 0건만 empty).
+부수 효과: KCos 목록의 **조회 실패 삼킴**(catch → 빈 배열) 제거 → O4O Load-Error 계약 충족(실패 = 오류상태 + 재시도, 정상 0건만 empty).
 
 ---
 
@@ -236,7 +224,7 @@ router 결합은 `renderLink` 주입, 조회는 `config.fetchItems` / `config.fe
 | `— 검색 / 더보기 / config` | 검색 표시·미표시, 더 보기 누적 순서, **오류 시 더 보기 미표시**, title·description·accent·headerActionSlot, 선택 메타, 추천/첨부 토글, `renderLink` router 주입 |
 | `standardContentAdapters` | 목록·상세 정규화, published 배지 정책, 깨진 날짜 → `-` |
 | `공통 View 순수성` | 금지 토큰 0건 + index export |
-| `KCos / GP wrapper` | Template 채택, 중복 JSX 토큰 제거, throw-not-swallow, **API URL 계약**(`/cosmetics/contents` · `/glycopharm/contents`) |
+| `KCos wrapper` | Template 채택, 중복 JSX 토큰 제거, throw-not-swallow, **API URL 계약**(`/cosmetics/contents`) |
 | `KPA` | 서비스 고유 View 유지(BaseTable·AppreciationPanel) |
 | `자료실 축` | 3서비스 `ResourcesHubTemplate` + serviceKey 계약 유지 |
 | `Pharmacy-Hub` | 커뮤니티 route 부재 · store-owner 축 사실 고정 |
@@ -248,7 +236,6 @@ router 결합은 `renderLink` 주입, 조회는 `config.fetchItems` / `config.fe
 | `packages/shared-space-ui` typecheck | PASS |
 | `services/web-kpa-society` typecheck | PASS |
 | `services/web-k-cosmetics` typecheck / vite build | PASS / PASS |
-| `services/web-glycopharm` typecheck / vite build | PASS / PASS |
 | `services/web-pharmacy-hub` typecheck | PASS |
 | `services/web-neture` typecheck | PASS |
 | migration | **0건** |
@@ -260,18 +247,18 @@ router 결합은 `renderLink` 주입, 조회는 `config.fetchItems` / `config.fe
 ## 8-A. Production browser smoke (§16)
 
 - 배포: `Deploy Web Services (Cloud Run)` run 32114059127 — 6개 web 서비스 전부 success (commit `38cc33ff2`)
-- 대상: `k-cosmetics-web` / `glycopharm-web` · desktop 1440×900 + mobile 390×844
+- 대상: `k-cosmetics-web` / desktop 1440×900 + mobile 390×844
 
 | 화면 | 만족 | console error | HTTP≥400 | 가로 overflow |
 |------|------|---------------|----------|----------------|
 | KCos `/content` (desktop·mobile) | 렌더 OK — empty state | 0 | 0 | 0px |
 | KCos `/resources` (desktop·mobile) | 렌더 OK | 0 | 0 | 0px |
-| GP `/content` (desktop·mobile) | 렌더 OK — empty state | 0 | 0 | 0px |
-| GP `/resources` (desktop·mobile) | 렌더 OK | 0 | 0 | 0px |
-| KCos·GP `/content/{존재하지-않는-id}` (desktop·mobile) | 오류 상태 + `다시 시도` + `← 목록으로` | 1 (의도된 404 로그) | 조회 대상 404 외 0 | 0px |
+ `/content` (desktop·mobile) | 렌더 OK — empty state | 0 | 0 | 0px |
+ `/resources` (desktop·mobile) | 렌더 OK | 0 | 0 | 0px |
+| KCos `/content/{존재하지-않는-id}` (desktop·mobile) | 오류 상태 + `다시 시도` + `← 목록으로` | 1 (의도된 404 로그) | 조회 대상 404 외 0 | 0px |
 
 - 흰 화면 0 / JS exception 0 / 신규 404·500 0 / cross-service 데이터 혼입 0 / mobile 가로 overflow 0
-- **empty state 가 오류 삼킴이 아님을 확인**: `GET /api/v1/cosmetics/contents` · `GET /api/v1/glycopharm/contents` → `{"success":true,...,"total":0}` (200 정상 0건)
+- **empty state 가 오류 삼킴이 아님을 확인**: `GET /api/v1/cosmetics/contents`
 - **한계**: 두 서비스 프로덕션에 콘텐츠가 0건이라 **카드 목록·더 보기·상세 정상경로는 브라우저로 재현하지 못했다.** 해당 경로는 37건 회귀 테스트(서버 렌더링)로만 고정돼 있다.
 
 ---
@@ -281,7 +268,7 @@ router 결합은 `renderLink` 주입, 조회는 `config.fetchItems` / `config.fe
 1. **K-Cosmetics `ResourcesPage` adapter** — 헤더 주석은 `sub_type=resource` 를 명시하나 실제 호출은 `/cosmetics/contents` 에 해당 파라미터를 넘기지 않는다. 자료실 목록 모집단 정의 문제로 별도 WO 후보.
 2. **Neture `/account/partner/contents`** — 정적 mock, API client 0건. dead flow 후보.
 3. **KPA 콘텐츠 상세 컨테이너** — visibility/recommendation 정책 때문에 `CommunityContentDetailTemplate` 미이관. 정책을 공통 View 가 결정하면 안 되므로(§8) 현행 유지가 정답이며, 이관하려면 정책 주입 설계가 선행돼야 한다.
-4. **필터·정렬 UI 부재** — KCos/GP/Neture 콘텐츠 목록에 필터가 없고 정렬은 서버 고정. 기능 추가는 본 WO 범위 밖(§13).
+4. **필터·정렬 UI 부재** — KCos/Neture 콘텐츠 목록에 필터가 없고 정렬은 서버 고정. 기능 추가는 본 WO 범위 밖(§13).
 
 ## 10. 문서 정합
 

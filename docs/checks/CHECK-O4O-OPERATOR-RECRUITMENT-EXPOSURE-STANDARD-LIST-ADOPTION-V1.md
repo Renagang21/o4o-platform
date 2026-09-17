@@ -13,8 +13,8 @@
 
 ## 1. 적용 route/component
 
-- 3앱 `RecruitmentExposureApprovalPage`(KPA/GP/KCos, operator) → 공통 `RecruitmentExposureConsole`(operator-ux-core).
-- proxy `GET /api/v1/{service}/operator/recruitment-exposure`(serviceKey 고정, `cosmetics:operator`/`kpa:operator`/`glycopharm:operator`).
+- 2앱 `RecruitmentExposureApprovalPage`(KPA/KCos, operator) → 공통 `RecruitmentExposureConsole`(operator-ux-core).
+- proxy `GET /api/v1/{service}/operator/recruitment-exposure`(serviceKey 고정, `cosmetics:operator`/`kpa:operator`).
 
 ## 2. 사전 조사 결과
 
@@ -27,7 +27,7 @@
 | 파일 | 변경 |
 |------|------|
 | `operator-ux-core/.../RecruitmentExposureConsole.tsx` | `filterStatus`/`filterOptions`/`onFilterChange` prop(opt-in) + StandardListToolbar filter slot(상태 select) + `총 n건` summary. 카드/승인·반려 UI 무변경 |
-| KPA/GP/KCos `operator/RecruitmentExposureApprovalPage.tsx` | filterStatus state(기본 'pending') + URL sync(`recruitmentExposure_status`) + fetch 에 `?exposureStatus=` 전달 + 필터 prop 연결 |
+| KPA/KCos `operator/RecruitmentExposureApprovalPage.tsx` | filterStatus state(기본 'pending') + URL sync(`recruitmentExposure_status`) + fetch 에 `?exposureStatus=` 전달 + 필터 prop 연결 |
 
 > 다른 세션 WIP(web-neture platform roles 이관 파일들) 미접촉.
 
@@ -65,7 +65,7 @@
 
 ## 11. 검증
 
-- **isolated tsc**: operator-ux-core **EXIT 0**. **web-kpa-society 전체 tsc EXIT 0**(통합). GP/KCos 동일 최소 편집(parity).
+- **isolated tsc**: operator-ux-core **EXIT 0**. **web-kpa-society 전체 tsc EXIT 0**(통합). KCos 동일 최소 편집(parity).
 - **backend/package/lock 변경 없음**: staged diff 에 apps/api-server·package.json·pnpm-lock.yaml 없음.
 - **DataTable/Pagination breaking 0**(미사용), **카드 UX 재설계 0**, **승인/반려 로직 0**.
 - **browser smoke 미수행** — 배포 후 권장: 3앱 `/operator/recruitment-exposure` 진입 → 기본 '노출 대기'만 표시 / 필터 변경→목록·URL 반영 / 새로고침 복원 / 승인·반려 후 reload·필터 유지 / 빈 결과 crash 0.

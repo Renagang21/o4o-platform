@@ -3,13 +3,13 @@
  *
  * WO-O4O-STORE-HUB-PRODUCT-APPLICATION-AND-CART-COMMONIZATION-V1
  *
- * KPA-Society / K-Cosmetics / GlycoPharm 의 `StoreCartPage` 3벌이 동일하게 갖고 있던
+ * KPA-Society / K-Cosmetics 의 `StoreCartPage` 2벌이 동일하게 갖고 있던
  * 상태 기계만 담는다.
  *   공급자별 묶음 조회 · 수량 변경 · 항목 삭제 · 비우기 · 주문 확정 ·
  *   loading/busy/confirming · 합계(상품/배송비/총액/개수)
  *
  * 담지 않는 것:
- *   - 화면(디자인 시스템 · accent · 빈 상태 문구) — KPA 는 자체 뷰, KCos/GP 는 공통 `StoreCartView`.
+ *   - 화면(디자인 시스템 · accent · 빈 상태 문구) — KPA 는 자체 뷰, KCos 는 공통 `StoreCartView`.
  *   - http client — `api` adapter 로 주입한다 (서비스별 coreApiClient / authClient.api).
  *
  * 계약 보존:

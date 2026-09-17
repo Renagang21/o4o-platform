@@ -47,7 +47,6 @@
 **교차 서비스(KPA 범위 외, 그러나 컴포넌트 삭제 불가 근거):**
 - Neture `web-neture/App.tsx:921` — `/store/my-products` + guideSlot
 - K-Cosmetics `web-k-cosmetics/App.tsx:789` — title "O4O 주문 가능 상품"
-- GlycoPharm `web-glycopharm/App.tsx:994` — title "O4O 주문 가능 상품"
 → `StoreProductsManagerPage`는 **4서비스 공유 컴포넌트**. handled-products는 KPA 전용 로컬 페이지.
 
 ---
@@ -135,7 +134,7 @@
 §12 기준 대조:
 - 다른 업무 목적: ✅ (listing 상세 운영 vs 경영활용·콘텐츠)
 - 별도 사용자 진입 필요: ✅ (태블렛 등록·관리 진입 2건 활성)
-- handled-products에 합치면 복잡도 증가: ✅ — my-products는 **공유 4서비스 컴포넌트**로 가격/활성/채널/이미지 write를 담당. KPA 전용 handled-products로 이 기능을 이식하면 (a) 공유 로직 KPA 전용 중복, (b) GP/KCos/Neture와의 cross-service parity 붕괴.
+- handled-products에 합치면 복잡도 증가: ✅ — my-products는 **공유 3서비스 컴포넌트**로 가격/활성/채널/이미지 write를 담당. KPA 전용 handled-products로 이 기능을 이식하면 (a) 공유 로직 KPA 전용 중복, (b) KCos/Neture와의 cross-service parity 붕괴.
 - A 제외(회귀 발생), B 제외(은퇴 종착 = 회귀), D 제외(외부 계약·딥링크 의존 없음).
 
 ---
@@ -155,7 +154,7 @@
 **`WO-O4O-KPA-STORE-HANDLED-VS-MYPRODUCTS-ROLE-CLARIFICATION-V1`**
 
 - 목적: 두 화면을 **은퇴가 아닌 역할 명시**로 정리. (a) handled-products 행 액션/상세에서 **가격·채널·상태·이미지 관리가 필요하면 my-products("취급 중인 O4O 제품")로 진입**하도록 명시 링크 추가(태블렛 패턴 재사용), (b) 등록 진입 이원화(AddO4oStandardProductModal vs RegisterModal, 동일 엔드포인트) 통합 여부 별도 판단.
-- 경계: 공유 `@o4o/store-products-ui` 무변경(또는 변경 시 Shared Module Protocol + GP/KCos/Neture 전 소비처 검증), route 삭제 0, OPL/API/DB 무변경, KPA StoreHandledProductsPage 링크 추가 수준.
+- 경계: 공유 `@o4o/store-products-ui` 무변경(또는 변경 시 Shared Module Protocol + KCos/Neture 전 소비처 검증), route 삭제 0, OPL/API/DB 무변경, KPA StoreHandledProductsPage 링크 추가 수준.
 - 중지 조건: 가격/활성 OPL 편집이 `PharmacySellPage(/commerce/products/b2c)` 등에서 완전 대체 가능함이 확인되면 → 본 IR을 **B로 재판정**하는 별도 조사 선행.
 
 ---

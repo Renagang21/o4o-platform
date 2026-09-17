@@ -24,7 +24,7 @@ services/web-kpa-society/src/App.tsx                            | 6 +++---
 .../pages/pharmacy/StoreHandledProductsPage.tsx                 | 16 ++++++++--------
 ```
 - `handled-products` route/key 유지, API/DB 변경 없음 확인.
-- GP/KCos 사용자 문구 변경 없음(메뉴 config 의 KPA 항목만 수정).
+- KCos 사용자 문구 변경 없음(메뉴 config 의 KPA 항목만 수정).
 
 ## 3. 구용어 잔존 검사 (사용자 노출 0건)
 
@@ -47,7 +47,7 @@ services/web-kpa-society/src/App.tsx                            | 6 +++---
 | Workflow | Deploy Web Services (Cloud Run) |
 | Run | `28288367671` — headSha `43aa0ce1e`, conclusion **success** |
 | `deploy-kpa-society` job | ✅ **success** (skip 아님) |
-| 동반 배포 | neture/k-cosmetics/glycopharm 도 success — `store-ui-core` 공유 변경으로 4개 서비스 배포(예상된 동작, 불필요 수동 재배포 없음) |
+| 동반 배포 | neture/k-cosmetics 도 success — `store-ui-core` 공유 변경으로 3개 서비스 배포(예상된 동작, 불필요 수동 재배포 없음) |
 | 수동 재배포 | 불필요 (자동 배포 정상 트리거·성공) |
 
 ## 6. 운영 검증 (배포 아티팩트 전수 스캔 — 로그인 불필요)

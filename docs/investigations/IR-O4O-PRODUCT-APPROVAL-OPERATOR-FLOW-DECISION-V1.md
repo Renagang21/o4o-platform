@@ -1,7 +1,7 @@
 # IR-O4O-PRODUCT-APPROVAL-OPERATOR-FLOW-DECISION-V1
 
 > **유형:** Read-only Decision IR (코드/DB/route/UI/API 변경 없음, 문서 1개만 생성)
-> **목적:** Supply Catalog 신청 승인 운영 흐름의 canonical 정책 결정 — ① GP/KCos operator 승인 surface 부여 여부, ② 승인 시 OPL active 정책, ③ approve 구현 canonical.
+> **목적:** Supply Catalog 신청 승인 운영 흐름의 canonical 정책 결정 — ① KCos operator 승인 surface 부여 여부, ② 승인 시 OPL active 정책, ③ approve 구현 canonical.
 > **작성일:** 2026-06-13 · 기준 HEAD `2f2122559`
 > **선행:** `IR-O4O-PRODUCT-APPROVAL-OPERATOR-SURFACE-AUDIT-V1`(승인 surface KPA-only, KPA approve=직접 SQL OPL active=true, V2 internal=active=false)
 
@@ -11,7 +11,7 @@
 
 | 결정 | 선택 | 한줄 근거 |
 |------|:---:|-----------|
-| **D1. GP/KCos operator 승인 surface** | **A — 3서비스 모두 부여** | 신청(PENDING)만 만들고 승인 UI 없으면 운영 흐름 단절. KPA 패턴 재사용 가능(approve SQL 이미 serviceKey-generic). |
+| **D1. KCos operator 승인 surface** | **A — 2서비스 모두 부여** | 신청(PENDING)만 만들고 승인 UI 없으면 운영 흐름 단절. KPA 패턴 재사용 가능(approve SQL 이미 serviceKey-generic). |
 | **D2. 승인 시 OPL active 정책** | **A — active=true (단, storefront 진열과 분리)** | active=true=내 매장 O4O **주문 가능 상품 편입 자격**. 소비자 storefront 노출은 OPC+channel APPROVED 별도 gate. |
 | **D3. approve 구현 canonical** | **B — `ProductApprovalV2Service` 중심 통일** | KPA 직접 SQL 흡수, V2 서비스에 `activateListing` 옵션 + (필요 시)offer listings 일괄활성 parity 추가. |
 | **KPA 승인 화면 메뉴 노출** | **yes** | route/기능 존재(데드링크 아님) → 사이드바 `approvals` 그룹 노출. |
@@ -22,27 +22,27 @@
 
 ## 1. 목적
 
-선행 IR 이 드러낸 두 갈림길(GP/KCos 승인 surface 부재, KPA direct-SQL active=true vs V2 internal active=false)을 **구현 전에 정책으로 확정**한다. read-only — 결정·재사용성 분석만, 코드 무변경.
+선행 IR 이 드러낸 두 갈림길(KCos 승인 surface 부재, KPA direct-SQL active=true vs V2 internal active=false)을 **구현 전에 정책으로 확정**한다. read-only — 결정·재사용성 분석만, 코드 무변경.
 
 ## 2. 선행 사실
 
-- **승인 surface:** KPA 만 `/operator/product-applications`(`kpa:operator`). GP/KCos 부재(internal X-Admin-Secret 외 승인 불가).
+- **승인 surface:** KPA 만 `/operator/product-applications`(`kpa:operator`). KCos 부재(internal X-Admin-Secret 외 승인 불가).
 - **승인 구현 분기:** KPA operator = 직접 SQL(OPL upsert active=true + offer listings 일괄활성). V2 internal = `approveServiceProduct()`(OPL active=false, 일괄활성 없음).
-- **store/my-products:** operator listings(GET)는 is_active 무관 반환. **소비자 storefront(GP 4-gate)는 OPL.is_active=true + OPC is_active + channel APPROVED 요구.** (선행 IR 확인)
+- **store/my-products:** operator listings(GET)는 is_active 무관 반환.
 
 ## 3. 결정 항목
 
-D1 GP/KCos 승인 surface(A 모두/B KPA만/C 제한/D 중앙통합) · D2 OPL active(A true/B false+별도/C dist별/D service별) · D3 구현 canonical(A KPA복제/B V2중심/C 신규공통서비스/D 현상유지) · KPA 메뉴 노출.
+D1 KCos 승인 surface(A 모두/B KPA만/C 제한/D 중앙통합) · D2 OPL active(A true/B false+별도/C dist별/D service별) · D3 구현 canonical(A KPA복제/B V2중심/C 신규공통서비스/D 현상유지) · KPA 메뉴 노출.
 
 ---
 
 ## 4. Phase 1 — KPA approval surface 재사용성
 
-| 항목 | 현재 KPA 구현 | GP/KCos 재사용성 | 보정 필요 |
+| 항목 | 현재 KPA 구현 | KCos 재사용성 | 보정 필요 |
 |------|---------------|------------------|-----------|
 | backend 컨트롤러 factory | `createOperatorProductApplicationsController(ds, requireAuth, requireScope, log)` (controller:33) | **높음** — factory 가 이미 requireScope 주입식 | scope 리터럴 `'kpa:operator'`(controller:43) → `'{service}:operator'` 파라미터화 |
 | approve SQL serviceKey | `serviceKey = approval.service_key \|\| 'kpa-society'`, listings 일괄활성 `WHERE service_key=$2` | **높음** — approve 로직이 approval row 의 service_key 로 동작(서비스 비특정) | `\|\| 'kpa-society'` fallback 제거/일반화 |
-| route mount | `kpa.routes.ts:246` `/operator/product-applications` (KPA only) | 패턴 복제 | glycopharm.routes/cosmetics.routes 에 동일 mount + 서비스 scope |
+| route mount | `kpa.routes.ts:246` `/operator/product-applications` (KPA only) | 패턴 복제 | — |
 | frontend page | `ProductApplicationManagementPage.tsx` (KPA `apiClient`, `/operator/product-applications/*`) | **공통 추출 후보** | operator-core-ui 모듈로 추출(members/forum 콘솔 패턴) + 서비스별 apiClient/serviceKey 주입 |
 | list/stats/approve/reject/batch/delete | 전부 구현 | 그대로 재사용 | 라벨/serviceKey 만 |
 
@@ -71,7 +71,7 @@ D1 GP/KCos 승인 surface(A 모두/B KPA만/C 제한/D 중앙통합) · D2 OPL a
 | 정책 | 장점 | 위험 | 판정 |
 |------|------|------|:---:|
 | A active=true | 승인 즉시 "내 매장 주문 가능 상품" 편입 — 운영자 UX 직관적 | storefront 즉시 노출 오해 가능 → **OPL active ⊥ 채널 진열 분리로 해소** | **✅ 채택** |
-| B active=false+별도 활성화 | 명시적 2단계 | 승인 후 또 활성화 단계 = 운영 부담, GP/KCos UI 미비 시 단절 | 비채택 |
+| B active=false+별도 활성화 | 명시적 2단계 | 승인 후 또 활성화 단계 = 운영 부담, KCos UI 미비 시 단절 | 비채택 |
 | C dist별 | 세밀 | 복잡·근거 약함 | 비채택 |
 | D service별 | — | 현 drift 고착 | 비채택 |
 
@@ -88,7 +88,6 @@ D1 GP/KCos 승인 surface(A 모두/B KPA만/C 제한/D 중앙통합) · D2 OPL a
 | 서비스 | route(권장) | 메뉴명(권장) | 그룹 위치 | 판정 |
 |--------|-------------|--------------|-----------|:---:|
 | KPA | `/operator/product-applications`(기존) | **공급 상품 신청 승인** | `approvals` 그룹 | 메뉴 노출(B→A) |
-| GlycoPharm | `/operator/product-applications`(신규 mount) | 공급 상품 신청 승인 | `approvals` 그룹(매장 승인·이벤트오퍼 옆) | 신규 |
 | K-Cosmetics | `/operator/product-applications`(신규 mount) | 공급 상품 신청 승인 | `approvals` 그룹(신청·이벤트오퍼 옆) | 신규 |
 
 - 메뉴명 회피: "판매자 모집"/"B2B 승인"/"상품 판매 승인"(B2C·모집 혼동). 채택: **"공급 상품 신청 승인"**(또는 "공급 승인 요청").
@@ -100,7 +99,7 @@ D1 GP/KCos 승인 surface(A 모두/B KPA만/C 제한/D 중앙통합) · D2 OPL a
 
 | 결정 항목 | 선택 | 이유 | 후속 WO |
 |-----------|:---:|------|---------|
-| GP/KCos operator 승인 surface | **A** | 신청-승인 단절 해소, KPA 패턴 재사용성 높음(§4) | `WO-...-OPERATOR-SURFACE-ENABLE-GP-KCOS-V1` |
+| KCos operator 승인 surface | **A** | 신청-승인 단절 해소, KPA 패턴 재사용성 높음(§4) | `WO-...-OPERATOR-SURFACE-ENABLE-GP-KCOS-V1` |
 | OPL active 정책 | **A (true)** | 승인=주문 가능 자격, storefront 진열 분리(§6) | (활성/진열 정책 IR 후속) |
 | approve implementation canonical | **B (V2 중심)** | KPA 직접 SQL 흡수, active 옵션화·일괄활성 sub-decision(§5) | `WO-...-APPROVE-IMPL-UNIFY-V1` |
 | KPA menu exposure | **yes** | route/기능 존재(데드링크 아님) | `WO-O4O-KPA-PRODUCT-APPLICATIONS-MENU-EXPOSURE-V1` |
@@ -110,22 +109,21 @@ D1 GP/KCos 승인 surface(A 모두/B KPA만/C 제한/D 중앙통합) · D2 OPL a
 ## 9. 후속 WO (권장 순서)
 
 1. **`WO-O4O-PRODUCT-APPROVAL-APPROVE-IMPL-UNIFY-V1`** (C/D) — `ProductApprovalV2Service.approveServiceProduct` 에 `activateListing` 옵션 추가(+ offer listings 일괄활성 sub-decision 확정) → KPA 컨트롤러를 V2 호출로 전환, 직접 SQL 폐기. **선행**(surface enable 전에 구현 통일).
-2. **`WO-O4O-PRODUCT-APPROVAL-OPERATOR-SURFACE-ENABLE-GP-KCOS-V1`** (D) — KPA 컨트롤러 scope 파라미터화 + glycopharm/cosmetics route mount + `ProductApplicationManagementPage` 공통 추출(operator-core-ui)·GP/KCos thin wrapper.
-3. **`WO-O4O-KPA-PRODUCT-APPLICATIONS-MENU-EXPOSURE-V1`** (B) — KPA + (2 적용 후)GP/KCos `approvals` 그룹에 "공급 상품 신청 승인" 노출.
+2. **`WO-O4O-PRODUCT-APPROVAL-OPERATOR-SURFACE-ENABLE-GP-KCOS-V1`** (D) — KPA 컨트롤러 scope 파라미터화 + cosmetics route mount + `ProductApplicationManagementPage` 공통 추출(operator-core-ui)·KCos thin wrapper.
+3. **`WO-O4O-KPA-PRODUCT-APPLICATIONS-MENU-EXPOSURE-V1`** (B) — KPA + (2 적용 후)KCos `approvals` 그룹에 "공급 상품 신청 승인" 노출.
 4. **`IR-O4O-STORE-ORDERABLE-PRODUCT-ACTIVATION-POLICY-V1`** (C) — OPL active ⊥ 채널 진열 분리 정책 문서화.
 5. **`WO-O4O-SUPPLY-CATALOG-APPROVAL-FLOW-DOCUMENTATION-V1`** — 신청→승인→active→진열→주문가능 운영자 가이드.
 
-> 순서 근거: **구현 통일(1)이 surface enable(2)보다 선행** — 통일 안 된 채 GP/KCos 에 KPA 직접 SQL 을 복제하면 drift 가 3서비스로 확산된다.
+> 순서 근거: **구현 통일(1)이 surface enable(2)보다 선행** — 통일 안 된 채 KCos 에 KPA 직접 SQL 을 복제하면 drift 가 2서비스로 확산된다.
 
 ---
 
 ## 10. 결론
 
-- **D1=A:** GP/KCos 에도 operator 승인 surface 부여. KPA approve SQL 이 이미 serviceKey-generic(approval.service_key 기반)이라 재사용성 높음 — scope 파라미터화 + route mount + frontend 공통 추출로 실현.
+- **D1=A:** KCos 에도 operator 승인 surface 부여. KPA approve SQL 이 이미 serviceKey-generic(approval.service_key 기반)이라 재사용성 높음 — scope 파라미터화 + route mount + frontend 공통 추출로 실현.
 - **D2=A:** 승인 시 OPL `is_active=true`(주문 가능 상품 편입 자격). 단 **소비자 storefront 진열은 OPC+channel APPROVED 별도 gate** 로 분리.
 - **D3=B:** `ProductApprovalV2Service` 를 canonical 로, `activateListing` 옵션 추가 + KPA 직접 SQL 폐기. offer listings 일괄활성 동작은 impl WO 의 sub-decision.
 - **KPA 메뉴 노출=yes**, 메뉴명 "공급 상품 신청 승인".
-- **권장 착수 순서: ①구현 통일 → ②GP/KCos surface enable → ③메뉴 노출 → ④활성/진열 정책 문서.** 통일을 먼저 해야 drift 확산을 막는다.
 
 ---
 

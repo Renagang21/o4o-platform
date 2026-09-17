@@ -96,8 +96,6 @@ REVOKED/REJECTED는 자동 차단.
 Hub KPI 및 Catalog 쿼리는 v1/v2 병행 JOIN을 사용한다:
 
 ```sql
--- v1 경로 (product_id IS NULL): glycopharm_products
-LEFT JOIN glycopharm_products gp ON gp.id::text = opl.external_product_id AND opl.product_id IS NULL
 
 -- v2 경로 (product_id IS NOT NULL): neture_supplier_products
 LEFT JOIN neture_supplier_products nsp ON nsp.id = opl.product_id

@@ -2,7 +2,7 @@
 
 **작성 일자**: 2026-06-04
 **작업 성격**: read-only audit IR — 코드 / UI / API / DB / migration / route / menu 수정 일절 없음
-**조사 도구**: 5 병렬 Explore agent — KPA / GlycoPharm / K-Cosmetics / Neture My Page 영역 + 공통 layout & API contract
+**조사 도구**: 5 병렬 Explore agent — KPA / K-Cosmetics / Neture My Page 영역 + 공통 layout & API contract
 **조사 기준 commit**: `d8c40e78c` (main, working tree clean)
 
 ---
@@ -15,7 +15,7 @@
 > 2. **Role boundary 완벽 분리** — `/mypage` 와 `/admin/operator/store/supplier/partner` workspace 가 4 서비스 모두 명확 분리. operator/admin action 노출 0. cross-workspace leakage 0.
 > 3. **민감정보 보안 OK** — 비밀번호 변경 `serviceKey` 스코핑 (4 서비스 모두), store_owner 비즈니스 정보는 `/store/info` 별도 격리 (KPA 만 부분적으로 `/mypage/profile` 직역 탭에 표시 — 본인 정보 only).
 > 4. **Neture 의 workspace 경계 가장 모범적** — `/mypage` 는 personal account 전용, `/supplier/*` / `/partner/*` / `/account/{supplier,partner}/*` 4 workspace 완전 분리.
-> 5. **잔재 5종 정비 후보 (Tier 1)** — KPA settings withdrawRequest mock / GP settings 2FA·알림설정·계정삭제 stub / KPA `/event-offers/history` dead link / KPA `MyCompletionsPage` 레거시 / KPA `/mypage/groupbuys` backend 미구현.
+> 5. **잔재 5종 정비 후보 (Tier 1)** — KPA settings withdrawRequest mock settings 2FA·알림설정·계정삭제 stub / KPA `/event-offers/history` dead link / KPA `MyCompletionsPage` 레거시 / KPA `/mypage/groupbuys` backend 미구현.
 > 6. **Backend API 정비 후보 (Tier 2)** — KPA `/mypage/{settings,activities,summary}` placeholder 실 데이터 wiring / Neture `mypage` controller 부재 (의도적인지 결정 필요).
 > 7. **KPA-only 풍부 페이지는 도메인 차이로 유지 (H)** — `/mypage/qualifications` / `/mypage/my-forums` / `/mypage/credits` 거래 내역 등.
 
@@ -27,7 +27,7 @@
 
 ### 1.1 목적
 
-4 서비스 (KPA-Society / GlycoPharm / K-Cosmetics / Neture) 의 My Page 영역 공통화 상태를 read-only 재점검하고 **잔재 / drift / 정합 미달 / 위험** 4 축으로 분류.
+3 서비스 (KPA-Society / K-Cosmetics / Neture) 의 My Page 영역 공통화 상태를 read-only 재점검하고 **잔재 / drift / 정합 미달 / 위험** 4 축으로 분류.
 
 ### 1.2 범위
 
@@ -63,7 +63,6 @@
 | 서비스 | URL | 주요 사용자 | 비고 |
 |--------|-----|------------|------|
 | KPA-Society | `kpa-society.co.kr/mypage*` | 약사 / 약국 경영자 / 학생 | 가장 풍부 (qualifications, my-forums, credits 거래) |
-| GlycoPharm | `glycopharm.co.kr/mypage*` | 약사 / 약국 경영자 | LMS + 매장 신청 통합 inbox |
 | K-Cosmetics | `k-cosmetics.site/mypage*` | 판매자 / 소비자 / 파트너 | 매장 입점 + LMS |
 | Neture | `neture.co.kr/mypage*` | 공급자 / 파트너 / 구매자 | personal account 전용 — workspace 와 완전 분리 |
 
@@ -73,21 +72,21 @@
 
 ### 4.1 4 서비스 횡단
 
-| 영역 | KPA | GlycoPharm | K-Cosmetics | Neture | 분류 |
-|------|:---:|:----------:|:-----------:|:------:|:----:|
-| `/mypage` (Hub/Dashboard) | ✅ MyDashboardPage | ✅ MyPageHub | ✅ MyPageHub | ✅ MyPageHub | A |
-| `/mypage/profile` | ✅ (기본+직역 탭) | ✅ (이름/닉네임/연락처) | ✅ | ✅ (이름만) | B (KPA 풍부) |
-| `/mypage/settings` | ✅ | ✅ | ✅ | ✅ | A |
-| `/mypage/my-requests` | ✅ (4 type 통합) | ✅ (membership + 매장) | ✅ (매장 + LMS) | ❌ | C / H |
-| `/mypage/enrollments` | ✅ | ✅ | ✅ | ❌ | H (Neture LMS 없음) |
-| `/mypage/certificates` | ✅ | ✅ | ✅ | ❌ | H |
-| `/mypage/credits` | ✅ (거래 풍부) | ✅ | ✅ | ❌ | C / H |
-| `/mypage/qualifications` | ✅ (KPA only) | ❌ | ❌ | ❌ | H (약사회 도메인) |
-| `/mypage/my-forums` | ✅ (KPA only) | ❌ | ❌ | ❌ | H (커뮤니티 도메인) |
-| `/mypage/my-forums/:id/members` | ✅ (KPA only) | ❌ | ❌ | ❌ | H |
-| `/mypage/business-profile` | (별도 /pharmacy) | (별도 /store/info) | (별도 /store/info) | ✅ (supplier wrapper) | H |
-| `/mypage/completions` (legacy) | ⚠️ redirect → certificates | ❌ | ❌ | ❌ | E (잔재) |
-| `/mypage/groupbuys` | ⚠️ backend 정의만 | ❌ | ❌ | ❌ | E / F |
+| 영역 | KPA | K-Cosmetics | Neture | 분류 |
+| ------ | :---: | :-----------: | :------: | :----: |
+| `/mypage` (Hub/Dashboard) | ✅ MyDashboardPage | ✅ MyPageHub | ✅ MyPageHub | A |
+| `/mypage/profile` | ✅ (기본+직역 탭) | ✅ | ✅ (이름만) | B (KPA 풍부) |
+| `/mypage/settings` | ✅ | ✅ | ✅ | A |
+| `/mypage/my-requests` | ✅ (4 type 통합) | ✅ (매장 + LMS) | ❌ | C / H |
+| `/mypage/enrollments` | ✅ | ✅ | ❌ | H (Neture LMS 없음) |
+| `/mypage/certificates` | ✅ | ✅ | ❌ | H |
+| `/mypage/credits` | ✅ (거래 풍부) | ✅ | ❌ | C / H |
+| `/mypage/qualifications` | ✅ (KPA only) | ❌ | ❌ | H (약사회 도메인) |
+| `/mypage/my-forums` | ✅ (KPA only) | ❌ | ❌ | H (커뮤니티 도메인) |
+| `/mypage/my-forums/:id/members` | ✅ (KPA only) | ❌ | ❌ | H |
+| `/mypage/business-profile` | (별도 /pharmacy) | (별도 /store/info) | ✅ (supplier wrapper) | H |
+| `/mypage/completions` (legacy) | ⚠️ redirect → certificates | ❌ | ❌ | E (잔재) |
+| `/mypage/groupbuys` | ⚠️ backend 정의만 | ❌ | ❌ | E / F |
 
 ### 4.2 Dead route / 미정의 link
 
@@ -123,18 +122,18 @@
 
 ### 5.2 4 서비스 사용 매트릭스
 
-| 컴포넌트 | KPA | GlycoPharm | K-Cosmetics | Neture |
-|---------|:---:|:----------:|:-----------:|:------:|
-| `MyPageLayout` | ✅ wrapper | ✅ | ✅ | ✅ |
-| `ProfileCard` | ❌ 자체 렌더 | ✅ | ✅ | ✅ |
-| `ProfileInfoField` | (자체) | ✅ | ✅ | ✅ |
-| `MyPageNavigation` | ✅ (KPA_MYPAGE_NAV_ITEMS) | ✅ | ✅ (KCOS_NAV_ITEMS) | (NetureLayout 사용) |
-| `MyPageHubCard` | (자체) | ✅ | ✅ | ✅ |
-| `MyRequestsInbox` | ✅ | ✅ | ✅ | ❌ |
-| `MyPageLoadingState/EmptyState` | ✅ | ✅ | ✅ | ✅ |
-| `PasswordChangeModal` | ✅ | ✅ | ✅ | ✅ |
-| `SettingsSection` | (자체) | ✅ | ✅ | ✅ |
-| `RoleBadge` | ✅ | ✅ | ✅ | ✅ |
+| 컴포넌트 | KPA | K-Cosmetics | Neture |
+| --------- | :---: | :-----------: | :------: |
+| `MyPageLayout` | ✅ wrapper | ✅ | ✅ |
+| `ProfileCard` | ❌ 자체 렌더 | ✅ | ✅ |
+| `ProfileInfoField` | (자체) | ✅ | ✅ |
+| `MyPageNavigation` | ✅ (KPA_MYPAGE_NAV_ITEMS) | ✅ (KCOS_NAV_ITEMS) | (NetureLayout 사용) |
+| `MyPageHubCard` | (자체) | ✅ | ✅ |
+| `MyRequestsInbox` | ✅ | ✅ | ❌ |
+| `MyPageLoadingState/EmptyState` | ✅ | ✅ | ✅ |
+| `PasswordChangeModal` | ✅ | ✅ | ✅ |
+| `SettingsSection` | (자체) | ✅ | ✅ |
+| `RoleBadge` | ✅ | ✅ | ✅ |
 
 **판정**: 공통화 골격 거의 완료. **KPA 만 ProfileCard 미사용** (자체 avatar+info 렌더, 분류 B) — 도메인 차이가 아닌 구현 편차.
 
@@ -186,49 +185,6 @@
 
 ---
 
-## 7. GlycoPharm My Page 조사 결과
-
-### 7.1 Route 인벤토리 (7 routes)
-
-`/mypage` / `/profile` / `/settings` / `/enrollments` / `/certificates` / `/credits` / `/my-requests`. 모두 `SoftGuard feature="mypage"` (allowedRoles 없음 — 인증만).
-
-### 7.2 Profile / Account 영역
-
-- 이름 / 닉네임 / 연락처 / 이메일 (편집 가능: 이름/연락처/닉네임)
-- 비밀번호 변경: `/users/password` PUT + serviceKey='glycopharm' 스코핑
-- 모든 기기 로그아웃 functional
-- 사업자 정보는 `/store/info` (PharmacyInfoPage, store_owner only) 에 격리
-
-### 7.3 API 인벤토리
-
-| Endpoint | 동작 | mock |
-|----------|------|:----:|
-| `PUT /users/profile` | 프로필 수정 | ✅ |
-| `PUT /users/password` | 비밀번호 변경 (serviceKey scoped) | ✅ |
-| `GET /glycopharm/mypage/my-requests` | 통합 (membership + 매장 신청) | ✅ |
-| `GET/PATCH /glycopharm/mypage/business-info` | 사업자 정보 (pharmacy_owner only) | ✅ |
-| `GET /lms/enrollments/me` | LMS 수강 | ✅ |
-| `GET /lms/certificates/me` | 수료증 | ✅ |
-| `GET /credits/me` + `/transactions` | 크레딧 | ✅ |
-| `GET /appreciation/my-received` / `my-sent` | 감사 활동 | ✅ |
-
-### 7.4 mock / TODO / no-op
-
-- `MySettingsPage` 의 stub 3건:
-  - 2FA 버튼 (비활성화 표시만, 핸들러 없음)
-  - 알림 설정 링크 (no handler)
-  - 계정 삭제 버튼 (no handler, red 스타일링)
-
-→ UI 표시만 + functionality 없음. **Tier 1 정비 후보**.
-
-### 7.5 GlycoPharm 특수 사항
-
-- `WO-O4O-GLYCOPHARM-MYPAGE-SPLIT-V1`: monolithic → 3-split architecture (hub + profile + settings)
-- `WO-O4O-MYPAGE-MY-REQUESTS-INBOX-GLYCO-KCOS-ROUTE-V1`: K-Cos 와 통합 inbox 정합
-- 사업자 정보는 `/store/info` 별도 (`/mypage` 와 분리 — 모범)
-
----
-
 ## 8. K-Cosmetics My Page 조사 결과
 
 ### 8.1 Route 인벤토리 (7 routes)
@@ -256,8 +212,6 @@
 ### 8.4 mock / TODO / no-op
 
 - `MySettingsPage`: 알림 설정 / 계정 삭제 등 미구현 (비밀번호 + 모든기기로그아웃만)
-
-→ GP 와 유사 stub 패턴, 정도는 다소 작음.
 
 ### 8.5 K-Cos 특수 사항
 
@@ -309,7 +263,6 @@
 | 서비스 | ProfileCard 사용 | 자체 렌더 | 표시 필드 |
 |--------|:---------------:|:--------:|----------|
 | KPA | ❌ | ✅ avatar + 직역/약국 정보 + edit | 가장 풍부 (탭 분리) |
-| GlycoPharm | ✅ | — | 표준 |
 | K-Cosmetics | ✅ | — | 표준 |
 | Neture | ✅ | — | 최소 (이름만 편집) |
 
@@ -322,11 +275,10 @@
 | 서비스 | endpoint | 통합 type | 컴포넌트 |
 |--------|----------|----------|----------|
 | KPA | `/mypage/my-requests` | 4 (forum / course / instructor / membership) | `MyRequestsInbox` (account-ui) |
-| GlycoPharm | `/glycopharm/mypage/my-requests` | 2 (membership + service_application) | `MyRequestsInbox` |
 | K-Cosmetics | (frontend aggregation 2 source) | 2 (매장 입점 + LMS 수강) | `MyRequestsInbox` |
 | Neture | ❌ 없음 | — | (supplier workspace 별도) |
 
-→ KPA / GP / K-Cos 통합 inbox 정합 ✅. **Neture 만 부재** — 의도된 차이 (supplier 신청은 supplier workspace 에).
+→ KPA / K-Cos 통합 inbox 정합 ✅. **Neture 만 부재** — 의도된 차이 (supplier 신청은 supplier workspace 에).
 
 ---
 
@@ -335,7 +287,6 @@
 | 서비스 | My Page 노출 | 별도 위치 |
 |--------|:------------:|----------|
 | KPA | ❌ (credits 거래만) | (개인 구매 없음) |
-| GlycoPharm | ❌ | `/store/commerce/orders` (store_owner) |
 | K-Cosmetics | ❌ | `/store/commerce/orders` (store_owner) |
 | Neture | ❌ | `/account/supplier/orders`, `/store/orders` 별도 |
 
@@ -348,7 +299,6 @@
 | 서비스 | 알림 페이지 | 메시지 페이지 | 활동 로그 |
 |--------|:----------:|:-----------:|----------|
 | KPA | ❌ (`/mypage/settings` 안 토글만) | ❌ | `/mypage` Dashboard "최근 활동" 카드 (실 데이터, placeholder 일부) |
-| GlycoPharm | ❌ (stub) | ❌ | Hub "감사 활동" 카드만 |
 | K-Cosmetics | ❌ | ❌ | Hub "감사 활동" 카드만 |
 | Neture | ❌ | ❌ | Hub "최근 활동" `MyPageEmptyState` (의도) |
 
@@ -363,7 +313,6 @@
 | 서비스 | `/mypage` 진입 | operator/admin action 노출 | workspace 분리 |
 |--------|:------------:|:------------------------:|:--------------:|
 | KPA | MyPageGuard (인증만) | ❌ | ✅ `/operator/*` `/admin/*` 별도 |
-| GlycoPharm | SoftGuard feature="mypage" | ❌ | ✅ |
 | K-Cosmetics | ProtectedRoute | ❌ | ✅ |
 | Neture | 인증만 | ❌ | ✅ (4 workspace 완전 분리) |
 
@@ -401,7 +350,6 @@
 | 서비스 | controller 위치 | 상태 |
 |--------|----------------|------|
 | KPA | `apps/api-server/src/routes/kpa/controllers/mypage.controller.ts` | ⚠️ summary/activities/settings placeholder |
-| GlycoPharm | `apps/api-server/src/routes/glycopharm/controllers/mypage.controller.ts` | ✅ |
 | K-Cosmetics | `apps/api-server/src/routes/cosmetics/controllers/cosmetics-mypage.controller.ts` | ✅ |
 | Neture | ❌ 없음 | `/users/profile`, `/users/password` 일반 endpoint 사용 |
 
@@ -416,7 +364,7 @@
 
 - 표준 profile 응답: name / email / phone / nickname / role / status
 - KPA 추가: licenseNumber / pharmacy 정보 (CEO / 사업자번호 / 주소 / 세금 이메일)
-- GP / K-Cos: business-info 별도 endpoint (store_owner only)
+- K-Cos: business-info 별도 endpoint (store_owner only)
 - 응답 자체 PII 노출은 본인 계정 한정 — **위험 낮음**
 
 ---
@@ -430,9 +378,9 @@
 | 3 | KPA `MyCompletionsPage.tsx` | 레거시 파일 (redirect only) | E |
 | 4 | KPA backend `/mypage/groupbuys` | 정의만, 구현 부재 | E / F |
 | 5 | KPA backend `/mypage/{summary,activities,settings}` | placeholder | F |
-| 6 | GP `MySettingsPage` 2FA 버튼 | UI stub, 핸들러 없음 | E |
-| 7 | GP `MySettingsPage` 알림 설정 링크 | stub | E |
-| 8 | GP `MySettingsPage` 계정 삭제 버튼 | stub | E |
+| 6 `MySettingsPage` 2FA 버튼 | UI stub, 핸들러 없음 | E |
+| 7 `MySettingsPage` 알림 설정 링크 | stub | E |
+| 8 `MySettingsPage` 계정 삭제 버튼 | stub | E |
 | 9 | K-Cos `MySettingsPage` 알림 설정 / 계정 삭제 | 미구현 | E |
 | 10 | Neture backend `mypage` controller | 부재 | F (의도 vs 누락 결정 필요) |
 
@@ -457,7 +405,7 @@
 | 위치 | 노출 | 위험도 | 비고 |
 |------|------|:------:|------|
 | KPA `/mypage/profile` 직역 탭 | licenseNumber, pharmacy 정보, CEO명, 세금 이메일 | 중 | 본인 only, role-gated (pharmacy_owner) |
-| GP / K-Cos `/store/info` | 사업자 정보 | 중 | store_owner only, `/mypage` 와 분리 |
+| K-Cos `/store/info` | 사업자 정보 | 중 | store_owner only, `/mypage` 와 분리 |
 | 4 서비스 비밀번호 변경 | password (POST body) | 낮 | serviceKey 스코핑, HTTPS, response 평문 0 |
 | Notification API | serviceKey + organizationId 필터 | 낮 | boundary 명확 |
 | User entity `businessInfo` JSONB | 공유 구조 | 중 | 서비스별 prefix 없음 — 관례 의존 |
@@ -491,7 +439,7 @@
 | WO-O4O-KPA-MYPAGE-SETTINGS-WITHDRAW-MOCK-CLEANUP-V1 | `MySettingsPage` TODO mock alert 정리 (hide 또는 메시지 명시) | 작음 |
 | WO-O4O-KPA-MYPAGE-EVENT-OFFERS-HISTORY-DEAD-LINK-CLEANUP-V1 | `MyDashboardPage` line 198 dead link 제거 또는 route 추가 | 작음 |
 | WO-O4O-KPA-MYPAGE-COMPLETIONS-LEGACY-FILE-REMOVAL-V1 | `MyCompletionsPage.tsx` 파일 제거 (redirect 유지) | 매우 작음 |
-| WO-O4O-GLYCOPHARM-MYPAGE-SETTINGS-STUB-CLEANUP-V1 | 2FA / 알림설정 / 계정삭제 stub 3건 정리 (hide 또는 "준비 중" 명시) | 작음 |
+|  | 2FA / 알림설정 / 계정삭제 stub 3건 정리 (hide 또는 "준비 중" 명시) | 작음 |
 | WO-O4O-KCOSMETICS-MYPAGE-SETTINGS-STUB-CLEANUP-V1 | 알림설정 / 계정삭제 stub 정리 | 작음 |
 
 → 총 5 small WO 후보. 모두 fail-closed (drift 정비). 각각 ~2-5 lines.
@@ -561,7 +509,7 @@ backend 작업 필요. 결정 후 진행.
 | 수정 파일 | 없음 ✅ (read-only IR) |
 | 생성 IR 문서 경로 | `docs/investigations/IR-O4O-MYPAGE-CROSSSERVICE-COMMONIZATION-RECHECK-V1.md` |
 | 조사 기준 commit | `d8c40e78c` |
-| 4 서비스 route 요약 | KPA 12 / GP 7 / K-Cos 7 / Neture 4 routes |
+| 3 서비스 route 요약 | KPA 12 7 / K-Cos 7 / Neture 4 routes |
 | 공통 layout 사용 | `MyPageLayout` 4/4 / `ProfileCard` 3/4 (KPA 미사용) / `MyPageNavigation` 3/4 (Neture 미사용) / `MyRequestsInbox` 3/4 (Neture 미사용) |
 | ProfileCard parity | 3/4 정합. KPA 만 자체 렌더 (분류 B) |
 | 신청/자격 내역 parity | 3/4 통합 inbox / Neture 부재 (의도) |

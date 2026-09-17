@@ -342,7 +342,6 @@ Payout schedule: ❌ 없음
 | Neture | `neture_settlements` | ✅ 전용 테이블 |
 | KPA | 없음 | ❌ 정산 자체 없음 |
 | Cosmetics | 없음 | ❌ 정산 자체 없음 |
-| GlycoPharm | 없음 | ❌ 정산 자체 없음 |
 | Dropshipping | `settlement_batches` (Entity만) | ⚠️ 미구현 |
 | Pharma | `PharmaSettlementBatch` (Entity만) | ⚠️ 미구현 |
 | Partner | `partner_settlements` | ⚠️ 테이블만 존재 |
@@ -451,7 +450,6 @@ Customer ──→ Toss Payment ──→ Platform 수취
                                   ▼
                              Supplier 수령
 
-
 ┌─────────────────────────────────────────────────────────────────┐
 │               PARTNER COMMISSION FLOW (미완성)                   │
 └─────────────────────────────────────────────────────────────────┘
@@ -475,7 +473,6 @@ Customer ──→ QR/Link Click ──→ Partner Tracking
                                    │
                                    ▼
                              Partner 수령
-
 
 ┌─────────────────────────────────────────────────────────────────┐
 │                CHECKOUT MONEY FLOW (정산 없음)                   │

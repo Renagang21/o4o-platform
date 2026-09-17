@@ -13,7 +13,6 @@
 |---|--------|------|
 | 1 | Neture | `services/web-neture/` |
 | 2 | KPA Society | `services/web-kpa-society/` |
-| 3 | GlycoPharm | `services/web-glycopharm/` |
 | 4 | K-Cosmetics | `services/web-k-cosmetics/` |
 | 5 | GlucoseView | `services/web-glucoseview/` |
 | 6 | Admin Dashboard | `apps/admin-dashboard/` |
@@ -36,8 +35,7 @@
 | 서비스 | 중복 LOC | 중복 비율 | 비고 |
 |--------|---------|----------|------|
 | GlucoseView | ~1,500 | ~75% | 코드베이스 최소, 중복 비율 최대 |
-| K-Cosmetics | ~1,900 | ~70% | GlycoPharm 미러 구조 |
-| GlycoPharm | ~2,200 | ~65% | 중복 LOC 최대 |
+| K-Cosmetics | ~1,900 | ~70% | — |
 | KPA Society | ~2,100 | ~60% | 고유 API 18+ 모듈 보유 |
 | Neture | ~1,600 | ~55% | 고유 레이아웃 다수 |
 | Admin Dashboard | ~500 | ~20% | 가장 독립적 |
@@ -50,30 +48,30 @@
 
 | 컴포넌트 | 서비스 | 줄수 | 분류 |
 |----------|--------|------|------|
-| **AuthContext.tsx** | kpa, glyco, cosmetics, glucose, neture | 191~477 | SIMILAR (95%+) |
-| **RoleGuard.tsx** | kpa, glyco, cosmetics, glucose, neture | ~40 | IDENTICAL (99%) |
-| **LoginModal.tsx** | kpa, glyco, cosmetics, glucose | 80~120 | PATTERN (85%+) |
-| **AiPreviewModal.tsx** | kpa, glyco, cosmetics, glucose, neture | ~100 | IDENTICAL (98%+) |
-| **AiSummaryButton.tsx** | kpa, glyco, cosmetics, glucose, neture | ~80 | IDENTICAL (98%+) |
-| **AiSummaryModal.tsx** | kpa, glyco, cosmetics, glucose, neture | ~100 | SIMILAR (95%+) |
+| **AuthContext.tsx** | — | 191~477 | SIMILAR (95%+) |
+| **RoleGuard.tsx** | — | ~40 | IDENTICAL (99%) |
+| **LoginModal.tsx** | — | 80~120 | PATTERN (85%+) |
+| **AiPreviewModal.tsx** | — | ~100 | IDENTICAL (98%+) |
+| **AiSummaryButton.tsx** | — | ~80 | IDENTICAL (98%+) |
+| **AiSummaryModal.tsx** | — | ~100 | SIMILAR (95%+) |
 
 ### Tier 2: HIGH (3~4개 서비스)
 
 | 컴포넌트 | 서비스 | 줄수 | 분류 |
 |----------|--------|------|------|
-| **ai/icons.tsx** | glyco, cosmetics, kpa | 141 | IDENTICAL (100%) |
+| **ai/icons.tsx** | — | 141 | IDENTICAL (100%) |
 | **TestGuideLayout.tsx** | 5개 전부 | 59~130 | SIMILAR (80%+) |
-| **LoginModalContext.tsx** | glyco, cosmetics, neture, glucose | 60~66 | SIMILAR (90%+) |
-| **Header.tsx** | kpa, glyco, cosmetics | 50~100 | PATTERN (75%+) |
-| **Footer.tsx** | kpa, glyco, cosmetics | 50~155 | PATTERN (70%+) |
+| **LoginModalContext.tsx** | — | 60~66 | SIMILAR (90%+) |
+| **Header.tsx** | — | 50~100 | PATTERN (75%+) |
+| **Footer.tsx** | — | 50~155 | PATTERN (70%+) |
 
 ### Tier 3: MEDIUM (2~3개 서비스)
 
 | 컴포넌트 | 서비스 | 줄수 | 분류 |
 |----------|--------|------|------|
-| **PartnerLayout.tsx** | glyco, cosmetics, glucose | 162~237 | SIMILAR (75%+) |
-| **DashboardLayout.tsx** | glyco, cosmetics | 393~443 | SIMILAR (80%+) |
-| **MainLayout.tsx** | glyco, cosmetics, neture | 15~101 | PATTERN (70%+) |
+| **PartnerLayout.tsx** | — | 162~237 | SIMILAR (75%+) |
+| **DashboardLayout.tsx** | — | 393~443 | SIMILAR (80%+) |
+| **MainLayout.tsx** | — | 15~101 | PATTERN (70%+) |
 
 ---
 
@@ -83,23 +81,22 @@
 
 | API 모듈 | 서비스 | 줄수 | 차이점 |
 |----------|--------|------|--------|
-| **health.ts** | kpa, glyco, cosmetics, neture | 34 | 없음 |
-| **cms.ts** | glyco, cosmetics | 121 | serviceKey 2줄만 다름 |
-| **signageV2.ts** | glyco, cosmetics, kpa, neture | 40+ | type import만 다름 |
+| **health.ts** | — | 34 | 없음 |
+| **cms.ts** | — | 121 | serviceKey 2줄만 다름 |
+| **signageV2.ts** | — | 40 | type import만 다름 |
 
 ### SIMILAR (구조 유사)
 
 | API 모듈 | 서비스 | 비고 |
 |----------|--------|------|
-| **assetSnapshot.ts** | glyco (50줄), kpa (239줄) | KPA가 확장 버전 |
-| **pharmacyProducts.ts** | glyco, kpa | 동일 엔드포인트, 네이밍 차이 |
+| **assetSnapshot.ts** | — | KPA가 확장 버전 |
+| **pharmacyProducts.ts** | — | 동일 엔드포인트, 네이밍 차이 |
 
 ### 서비스별 고유 API (중복 아님)
 
 | 서비스 | 고유 API 수 | 주요 모듈 |
 |--------|------------|----------|
 | KPA Society | 18+ | forum, groupbuy, lms, admin, blog, tablet, operator 등 |
-| GlycoPharm | 6 | glycopharm, store, pharmacy, public |
 | Neture | 3 | products, trial |
 | K-Cosmetics | 3 | cosmetics-specific |
 | GlucoseView | 2 | glucoseview-specific |
@@ -127,8 +124,8 @@
 
 | 파일 | 서비스 | 줄수 | 분류 |
 |------|--------|------|------|
-| **auth-utils.ts** | glyco (23줄), kpa (19줄) | 동일 | IDENTICAL (95%) — SSOT role mapping |
-| **signageV2.ts** | glyco, cosmetics, kpa, neture | 40+ | SIMILAR (90%) — type import만 다름 |
+| **auth-utils.ts** | — | 동일 | IDENTICAL (95%) — SSOT role mapping |
+| **signageV2.ts** | — | 40 | SIMILAR (90%) — type import만 다름 |
 
 **판정**: Utils 중복은 auth-utils와 signage API에 집중. formatDate, slugify 등 일반 유틸리티 중복은 미발견.
 
@@ -154,7 +151,6 @@
 | 서비스 | 줄수 | 포함 기능 |
 |--------|------|----------|
 | KPA Society | 477 | 가장 완전 (Service User, 역할 매핑, 게스트 auth) |
-| GlycoPharm | ~350 | Service User, 역할 매핑 |
 | K-Cosmetics | ~300 | 표준 인증 |
 | GlucoseView | 191 | 최소 구현 |
 | Neture | ~250 | 표준 인증 |
@@ -189,17 +185,17 @@ function RoleGuard({ allowedRoles, children }) {
 | Layout | 서비스 | 줄수 | 분류 |
 |--------|--------|------|------|
 | TestGuideLayout | 5개 전부 | 59~130 | SIMILAR (80%) |
-| PartnerLayout | glyco, cosmetics, glucose | 162~237 | SIMILAR (75%) |
-| DashboardLayout | glyco, cosmetics | 393~443 | SIMILAR (80%) |
-| MainLayout | glyco, cosmetics, neture | 15~101 | PATTERN (70%) |
+| PartnerLayout | — | 162~237 | SIMILAR (75%) |
+| DashboardLayout | — | 393~443 | SIMILAR (80%) |
+| MainLayout | — | 15~101 | PATTERN (70%) |
 
 ### 고유 레이아웃 (중복 아님)
 
 | Layout | 서비스 | 줄수 |
 |--------|--------|------|
-| StoreLayout | glyco | 329 |
-| TabletLayout | glyco | 439 |
-| KioskLayout | glyco | 245 |
+| StoreLayout | — | 329 |
+| TabletLayout | — | 439 |
+| KioskLayout | — | 245 |
 | OperatorLayout | glucose | 107 |
 | AdminVaultLayout | neture | 117 |
 | SupplierOpsLayout | neture | 148 |
@@ -241,7 +237,7 @@ function RoleGuard({ allowedRoles, children }) {
 |--------|------|--------|
 | `@o4o/auth-client` | API 인증 클라이언트 | 전체 |
 | `@o4o/types/*` | 공유 타입 | 전체 |
-| `@o4o/store-ui-core` | Store 대시보드 UI | kpa, glyco, cosmetics, glucose |
+| `@o4o/store-ui-core` | Store 대시보드 UI | — |
 
 **관찰**: `@o4o/auth-client`가 이미 존재하지만, 각 서비스의 **AuthContext (React Context)** 는 공유되지 않고 복사되어 있음.
 

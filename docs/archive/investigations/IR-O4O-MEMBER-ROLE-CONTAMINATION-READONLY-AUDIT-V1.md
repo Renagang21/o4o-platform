@@ -23,14 +23,12 @@
 ```
  service_key |   role   | status | count
 -------------+----------+--------+-------
- glycopharm  | admin    | active |     1
- glycopharm  | operator | active |     3
  k-cosmetics | admin    | active |     1
  k-cosmetics | operator | active |     1
  kpa-society | admin    | active |     1
  neture      | operator | active |     2
 ```
-**합계 9 rows.** 서비스별: GlycoPharm 4 · Neture 2 · K-Cosmetics 2 · KPA-Society 1. 모두 bare·active.
+Neture 2 · K-Cosmetics 2 · KPA-Society 1. 모두 bare·active.
 
 ---
 
@@ -38,12 +36,9 @@
 
 | email | service_key | membership.role | status | 보유 role_assignments (canonical 운영 권한) | canonical active? |
 |---|---|---|---|---|---|
-| glyco-operator@o4o.com | glycopharm | operator | active | glycopharm:operator | **f (inactive)** |
 | kcos-admin@o4o.com | k-cosmetics | admin | active | cosmetics:admin | **f** |
 | kcos-operator@o4o.com | k-cosmetics | operator | active | cosmetics:operator | **f** |
-| ksm***@gmail.com | glycopharm | admin | active | glycopharm:admin | **t** ✅ |
-| mmg***@gmail.com | glycopharm | operator | active | glycopharm:operator | **t** ✅ |
-| sohae2100@gmail.com | glycopharm / kpa-society / neture (3 rows) | operator/admin/operator | active | platform:super_admin + 전 서비스 admin/operator (전부 active) | **t** ✅ |
+| sohae2100@gmail.com | kpa-society / neture (3 rows) | operator/admin/operator | active | platform:super_admin + 전 서비스 admin/operator (전부 active) | **t** ✅ |
 | sohae21@naver.com | neture | operator | active | neture:operator (active) **+ supplier(active)** + kpa:store_owner | **t** ✅ |
 
 > 9 rows = sohae2100(3 rows) + 나머지 6 계정(각 1 row).
@@ -54,7 +49,7 @@
 
 - **실사용자 계정(ksm***, mmg***, sohae2100, sohae21)**: 모두 해당 서비스의 **active namespaced canonical
   role_assignment 보유** → membership.role 운영 권한 값은 redundant. 보정 시 운영 권한 손실 없음.
-- **@o4o.com 테스트 계정 3개(glyco-operator, kcos-admin, kcos-operator)**: canonical role_assignment 이
+- **@o4o.com 테스트 계정 3개**: canonical role_assignment 이
   **is_active=f (비활성)**. 즉 deactivate 진행 흔적. [[project_test_account_cleanup_policy]] 기준 xxxx@o4o.com
   임시계정은 **삭제 상태가 정상** → 이들 오염은 테스트 계정 cleanup 트랙에서 함께 처리.
 - **참여 유형 복원 근거**:
@@ -81,7 +76,6 @@ bare `operator`/`admin` 은 role_assignments 에 **없음**(0). bare `super_admi
 
 | 서비스 | 오염 membership row | 비고 |
 |---|---|---|
-| **GlycoPharm** | 4 (admin 1 + operator 3) | ksm***(admin)·mmg***(operator)·sohae2100·glyco-operator@o4o(test) |
 | **Neture** | 2 (operator) | sohae2100 · sohae21(참여유형 supplier 복원 가능) |
 | **K-Cosmetics** | 2 (admin 1 + operator 1) | kcos-admin@o4o·kcos-operator@o4o (둘 다 test, canonical inactive) |
 | **KPA-Society** | 1 (admin) | sohae2100 |

@@ -41,7 +41,7 @@ import {
 /**
  * 공통 shell 의 reusablePolicy 는 'organization' tier 를 포함하지만 PH domain 은
  * restricted | platform 만 지원한다. 알 수 없는 값이 오면 재사용 범위를 넓히지 않도록
- * 가장 좁은 'restricted' 로 보수적으로 대응한다(GlycoPharm 과 같은 처리).
+ * 가장 좁은 'restricted' 로 보수적으로 대응한다.
  */
 const toPhReusablePolicy = (p: InstructorCourseFormValues['reusablePolicy']): CourseReusablePolicy =>
   p === 'platform' ? 'platform' : 'restricted';

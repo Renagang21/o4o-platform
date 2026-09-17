@@ -1,7 +1,6 @@
 /**
  * EventHub Payment Publisher
  *
- * WO-O4O-PAYMENT-CORE-GLYCOPHARM-PILOT-V1
  *
  * PaymentEventPublisher 인터페이스 구현.
  * 기존 PaymentEventHub singleton을 래핑하여

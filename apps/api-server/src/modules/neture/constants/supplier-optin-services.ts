@@ -8,7 +8,6 @@
  * 플랫폼에는 공급자가 자기 Offer 를 특정 서비스에 연결하는 축이 **두 가지** 있다.
  *
  *   1. 운영자 승인 축 — `APPROVAL_ELIGIBLE_SERVICE_KEYS`
- *      (glycopharm · kpa-society · k-cosmetics)
  *      공급자가 신청하면 `offer_service_approvals` 가 생기고, 해당 서비스 운영자가
  *      승인해야 매장에 노출된다.
  *

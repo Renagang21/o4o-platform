@@ -179,10 +179,6 @@ core-operators  → /operators    "Service Operators"
 
 현재 구조에서 한 사용자가 다음 역할을 가질 때:
 
-```
-user X: [platform:admin, kpa:operator, neture:admin, glycopharm:operator]
-```
-
 | 화면 | 보이는 모습 |
 |------|-------------|
 | `/users` (All 탭) | 1 row, `role` 컬럼에 `platform:admin` chip 1개 (fallback gray, 나머지 3개는 안 보임) |
@@ -231,7 +227,6 @@ user X: [platform:admin, kpa:operator, neture:admin, glycopharm:operator]
 [search box: "KPA Operator sohae" 같은 자유 검색]
 
 [facet — multi-select chips]
-Service:  [Platform] [KPA] [Neture] [GlycoPharm] [K-Cosmetics] [GlucoseView]
 Role:     [admin] [operator] [super_admin] [...]
 Status:   [active] [inactive]
 Scope:    [global] [organization]
@@ -256,7 +251,6 @@ Scope:    [global] [organization]
 | KPA | Admin | A |
 | KPA | Operator | B |
 | Neture | Supplier | C |
-| GlycoPharm | Operator | D |
 
 → 정확히 §3.2 의 assignment-row 모델과 1:1 매칭. canonical 방향이 사용자 요구와 일치한다.
 
@@ -280,7 +274,7 @@ Scope:    [global] [organization]
 [/users (canonical)]
 ┌────────────────────────────────────────────────────────────────────┐
 │ Search: [_______________________]                                  │
-│ Service: [Platform] [KPA] [Neture] [GlycoPharm] [Cosmetics] [...]  │
+│ Service: [Platform] [KPA] [Neture] [Cosmetics] [...]               │
 │ Role:    [admin] [operator] [super_admin] [supplier] [...]         │
 │ Status:  [active] [inactive]                                       │
 ├────────────────────────────────────────────────────────────────────┤
@@ -290,7 +284,7 @@ Scope:    [global] [organization]
 │ KPA         Admin       A             …                 global     │
 │ KPA         Operator    B             …                 global     │
 │ Neture      Supplier    C             …                 global     │
-│ GlycoPharm  Operator    D             …                 global     │
+│ Operator    D             …                 global                 │
 └────────────────────────────────────────────────────────────────────┘
 ```
 

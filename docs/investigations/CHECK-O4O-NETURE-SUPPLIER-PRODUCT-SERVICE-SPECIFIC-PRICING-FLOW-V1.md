@@ -10,7 +10,7 @@
 ## 0. 구현 중 확인 (사용자 지시 §)
 
 - **service_code 어휘 = offer.service_keys와 정합**: `seller.service.resolveServiceKey`가 `service_code || 'kpa-society'`(full form) 반환, `auto-listing.utils`가 `ose.service_code = ANY(offer serviceKeys[kpa-society…])` 매칭 성공 → **매핑 함수 불필요.**
-- **B2B restock checkout은 `serviceKey='neture'` 하드 제한**(P2a, `neture-b2b-cart-checkout:112`). → kpa/glyco/kcos 서비스별 가격의 **실효 경로는 listing 주문**(event-offer COALESCE, `opl.service_key`). B2B 결합은 **forward-compat**(neture 키 미설정 → price_general). 두 경로 모두 우선순위 공식대로 결합(설계 일치).
+- **B2B restock checkout은 `serviceKey='neture'` 하드 제한**(P2a, `neture-b2b-cart-checkout:112`). B2B 결합은 **forward-compat**(neture 키 미설정 → price_general). 두 경로 모두 우선순위 공식대로 결합(설계 일치).
 
 ## 1. 변경 파일 (backend 8 + CHECK)
 
@@ -47,7 +47,7 @@
 ## 4. CRUD 계약
 
 `GET /api/v1/neture/supplier/products/:id/service-prices` → `{ success, data: { priceGeneral, prices: [{serviceKey, unitPrice}] } }`
-`PUT /api/v1/neture/supplier/products/:id/service-prices` body `{ prices: [{serviceKey, unitPrice}] }` (replace) — eligible 키(kpa-society/glycopharm/k-cosmetics)만, unitPrice 정수>0, 소유권 검증(NOT_OWNED 403).
+`PUT /api/v1/neture/supplier/products/:id/service-prices` body `{ prices: [{serviceKey, unitPrice}] }` (replace) — eligible 키만, unitPrice 정수>0, 소유권 검증(NOT_OWNED 403).
 
 ## 5. 검증 (Phase 1)
 
@@ -72,7 +72,7 @@
 변경 파일(2): `lib/api/supplier.ts`(getServicePrices/setServicePrices) · `pages/supplier/ProductDetailDrawer.tsx`.
 
 - **drawer 공급 방식 섹션**: serviceKey별 **공급가 표시**(설정값 / "기본가 적용") + **[설정]** 버튼.
-- **서비스별 공급가 설정 모달**: offer의 serviceKey별(KPA/GlycoPharm/K-Cosmetics) 가격 input(빈 값=기본가 적용, placeholder=기본 ₩priceGeneral) → 정수>0 검증 → `PUT /service-prices`(replace) → GET 재로드 + onSaved.
+- **서비스별 공급가 설정 모달**: offer의 serviceKey별 가격 input(빈 값=기본가 적용, placeholder=기본 ₩priceGeneral) → 정수>0 검증 → `PUT /service-prices`(replace) → GET 재로드 + onSaved.
 - drawer open 시 `GET /service-prices` 로드. web-neture tsc 0.
 
 ### Phase 2 배포 후 실브라우저 smoke (비파괴·원복)

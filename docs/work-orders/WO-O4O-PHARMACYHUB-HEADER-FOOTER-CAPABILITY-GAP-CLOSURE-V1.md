@@ -248,7 +248,6 @@ PharmacyHub 특성 때문에 별도 구현이 타당함
 
 ```text
 KPA에 있으니 PharmacyHub에도 추가
-GP에 있으니 PharmacyHub에도 추가
 KCos에 있으니 PharmacyHub에도 추가
 ```
 
@@ -557,8 +556,6 @@ role/permission 정책 변경
 새 notification 시스템
 새 cart 시스템
 다른 서비스 Header/Footer 수정
-GlycoPharm privacy API 수정
-GlycoPharm copyright 수정
 Neture AdminVault 정책 결정
 MobileBottomNav 서비스 전체 framework화
 dead component 삭제

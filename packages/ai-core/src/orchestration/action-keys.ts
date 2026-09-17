@@ -32,7 +32,6 @@ export const ACTION_KEYS = {
   // NETURE_MANAGE_PARTNERSHIP — 은퇴 (WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1)
   NETURE_AUDIT_REVIEW: 'neture.trigger.audit_review',
 
-  // GlycoPharm Care Operations — REMOVED (WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1)
 
   // Platform Hub Operations (WO-PLATFORM-GLOBAL-HUB-V1)
   PLATFORM_CROSS_SERVICE_TRIGGER: 'platform.trigger.execute_cross_service',

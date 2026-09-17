@@ -131,7 +131,6 @@ router.get('/', async (req: Request, res: Response) => {
   const service = (req.query.service as string) || null;
 
   // 서비스 필터 네비게이션
-  const filters = ['전체', 'neture', 'glycopharm', 'kpa-society', ...]
     .map(s => s === '전체'
       ? `<a href="?" class="btn">전체</a>`
       : `<a href="?service=${s}" class="btn">${s}</a>`

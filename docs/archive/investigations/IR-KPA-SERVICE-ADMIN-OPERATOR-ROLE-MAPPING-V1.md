@@ -50,7 +50,6 @@ KPA_SCOPE_CONFIG = {
   allowedRoles: ['kpa:admin', 'kpa:operator', 'kpa:district_admin',
                  'kpa:branch_admin', 'kpa:branch_operator'],
   platformBypass: false,   // ⚠️ platform:super_admin도 KPA 리소스 접근 불가
-  blockedServicePrefixes: ['platform', 'neture', 'glycopharm', 'cosmetics', 'glucoseview'],
 };
 ```
 

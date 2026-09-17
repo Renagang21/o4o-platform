@@ -1,5 +1,5 @@
 /**
- * StandardHomeTemplate — KPA / GlycoPharm / K-Cosmetics 공통 Home 레이아웃
+ * StandardHomeTemplate — KPA / K-Cosmetics 공통 Home 레이아웃
  *
  * WO-O4O-STANDARD-HOME-TEMPLATE-V1
  *
@@ -9,7 +9,7 @@
  *   - 2-column 공지 flex 구조 공통화
  *
  * 서비스 콘텐츠 (각 서비스 파일에 유지):
- *   - heroSlot: HeroBannerSection(KPA/KCOS) 또는 StatusHeroBlock(Glyco)
+ *   - heroSlot: HeroBannerSection(KPA/KCOS) 또는 StatusHeroBlock
  *   - noticesRightSlot: 서비스별 외부 뉴스 placeholder
  *   - appEntryCards: 서비스별 카드 목록
  *   - cta / help: 서비스별 문구·링크
@@ -57,7 +57,7 @@ export interface StandardHomeTemplateProps {
   /** 공지 우측 컬럼 — 서비스별 외부 뉴스 placeholder */
   noticesRightSlot: ReactNode;
 
-  /** 2-column gap. KPA/Glyco: 'gap-4', K-Cosmetics: 'gap-5' */
+  /** 2-column gap. KPA: 'gap-4', K-Cosmetics: 'gap-5' */
   noticesGap?: 'gap-4' | 'gap-5';
 
   /** 최신 활동 섹션 — 공지 아래, 서비스 바로가기 위 (WO-O4O-KPA-HOME-LATEST-ACTIVITY-SECTION-V1) */

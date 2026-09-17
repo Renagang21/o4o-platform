@@ -3,15 +3,15 @@
  *
  * WO-O4O-FRONTEND-AUTH-CONTEXT-AND-ROUTE-GUARD-COMMONIZATION-FULL-CLOSE-V1
  *
- * Neture(`switchRole`) · K-Cosmetics(`switchRole`) · GlycoPharm(`selectRole`) 이
+ * Neture(`switchRole`) · K-Cosmetics(`switchRole`) 이
  * 글자 단위로 동일한 구현을 각자 들고 있었다. 판정·갱신 규칙이 같으므로 Core 로 올린다.
  *
- * 규칙(기존 3서비스 동작 그대로):
+ * 규칙(기존 2서비스 동작 그대로):
  *   - 미로그인이거나 허용 목록에 없는 역할이면 **아무것도 하지 않는다**(무음 무시).
  *   - 선택한 역할을 `roles[0]` 으로 올리고 나머지 순서는 보존한다(역할 집합은 불변).
  *   - `hasMultipleRoles` 는 허용 목록 길이 > 1.
  *
- * 허용 목록 기본값은 `user.roles` 다. GlycoPharm 처럼 인증 시점의 `availableRoles` 를
+ * 허용 목록 기본값은 `user.roles` 다. 인증 시점의 `availableRoles` 를
  * 별도 보관하는 서비스는 `options.availableRoles` 로 그 축을 명시 주입한다.
  * **이 파일에 서비스명 조건문을 두지 않는다.**
  */

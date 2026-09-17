@@ -84,7 +84,7 @@ KPA forum 신청(포럼 카테고리 생성 요청) 관련 API 가 중복 경로
 1. `routes/kpa/controllers/forum-request.controller.ts` — 파일 헤더에 `@deprecated WO-O4O-FORUM-REQUEST-API-DEDUP-V1` JSDoc 추가. canonical 경로(통합 user/operator)와 저장 테이블 차이, "신규 호출자 추가 금지", "라우트 retirement 은 후속 WO" 명시.
 2. `routes/kpa/kpa.routes.ts:212` 마운트 지점 — deprecation 주석 추가(canonical 지시 + back-compat 유지 사유).
 
-> 라우트/컨트롤러 **삭제는 미수행**(WO 규칙: public route 삭제 금지, 후속 WO 분리). GP 는 이미 동등 컨트롤러를 제거(WO-O4O-FORUM-CATEGORY-DEAD-CODE-REMOVAL-V1)한 선례가 있어, KPA 도 후속 retire WO 후보로 분류.
+> 라우트/컨트롤러 **삭제는 미수행**(WO 규칙: public route 삭제 금지, 후속 WO 분리).
 
 ---
 
@@ -130,7 +130,7 @@ KPA forum 신청(포럼 카테고리 생성 요청) 관련 API 가 중복 경로
 
 ## 11. 후속 작업
 
-1. **`WO-O4O-FORUM-REQUEST-LEGACY-ROUTE-RETIRE-V1`(후보)** — `/kpa/forum-requests/*`·`/kpa/branches/.../forum-requests/*` 8개 라우트 + KPA-local ForumRequestService 제거(GP 선례 동형). 단, **분회(branch)-범위 승인 능력**이 통합에 필요한지 먼저 결정(불필요 시 제거, 필요 시 통합 operator 에 흡수).
+1. 단, **분회(branch)-범위 승인 능력**이 통합에 필요한지 먼저 결정(불필요 시 제거, 필요 시 통합 operator 에 흡수).
 2. **membership `/join` vs `/join-requests` 경로 정합** — frontend requestJoin 경로와 통합 forum.routes 서빙 경로 불일치 runtime 확인 후 정렬(별도 WO).
 3. **`WO-O4O-FORUM-SERVICEKEY-EXTRACTION-AUDIT-V1`** — 통합 신청/operator 의 serviceCode body/query 추출 정렬(IR §16 S5) + search organizationId 가드(S4).
 

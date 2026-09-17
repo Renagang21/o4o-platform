@@ -14,7 +14,7 @@
 | `services/web-kpa-society/src/App.tsx` | route `/store/online-sales/orders` 추가 (lazy) |
 | `services/web-kpa-society/src/pages/pharmacy/StoreOrdersPage.tsx` | 제목 '구매/발주 내역' → '발주 내역', 설명 정비(기능 무변경) |
 
-- backend/DB/migration **무변경**. checkout 생성/결제 로직 무변경. GP/KCos 무변경.
+- backend/DB/migration **무변경**. checkout 생성/결제 로직 무변경. KCos 무변경.
 
 ## 2. 최종 메뉴 구조 (KPA)
 
@@ -72,9 +72,9 @@
 - `/store/commerce/orders`(발주 내역) route·기능·`getBuyerOrders` 무변경(라벨/문구만).
 - `/store/online-sales/settings`·`/products`·`/store/channels` redirect 무변경.
 
-## 10. GP/KCos 무변경
+## 10. KCos 무변경
 
-- 신규 화면은 KPA 전용 파일. 공통 `storeMenuConfig.ts`는 **KPA 블록만** 수정(GP/KCos 블록의 주문/채널 항목 그대로).
+- 신규 화면은 KPA 전용 파일. 공통 `storeMenuConfig.ts`는 **KPA 블록만** 수정(KCos 블록의 주문/채널 항목 그대로).
 
 ## 11. 테스트/빌드/smoke 결과
 
@@ -98,4 +98,4 @@
 
 ## 결론
 
-온라인 판매 주문 관리(seller) 화면을 기존 백엔드 재사용으로 신설하고, 기존 구매 주문을 '발주 내역'으로 라벨 분리해 "주문" 용어의 구매/판매 혼동을 해소. backend/DB/결제/GP/KCos 무영향, tsc·배포 통과. 브라우저 시각 smoke만 로컬 프로필 점유로 보류.
+온라인 판매 주문 관리(seller) 화면을 기존 백엔드 재사용으로 신설하고, 기존 구매 주문을 '발주 내역'으로 라벨 분리해 "주문" 용어의 구매/판매 혼동을 해소. backend/DB/결제/KCos 무영향, tsc·배포 통과. 브라우저 시각 smoke만 로컬 프로필 점유로 보류.

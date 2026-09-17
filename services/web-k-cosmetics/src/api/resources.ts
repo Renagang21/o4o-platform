@@ -4,7 +4,7 @@
  * WO-O4O-OPERATOR-RESOURCES-CANONICAL-COMMONIZATION-V1
  *
  * cosmetics_contents 기반 자료실 API 래핑.
- * GP glycoResourcesApi (canonical mirror) 패턴.
+ * canonical mirror 패턴.
  * 선행: WO-O4O-KCOS-RESOURCES-BACKEND-V1 (backend 도입).
  *
  * Public:

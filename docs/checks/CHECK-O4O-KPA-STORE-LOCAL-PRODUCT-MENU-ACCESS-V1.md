@@ -7,7 +7,7 @@
 
 ## 1. 작업 배경 / 선행 IR 요약
 
-- 선행 IR: KPA 자체 제품 **생성 API·화면은 이미 정상**(`/store/commerce/local-products`, `StoreLocalProductsPage`)이나, **KPA 사이드바에 접근 메뉴가 없어** 사용자가 도달 불가(GP/KCos 는 '자체 상품' 메뉴 보유). 타블렛 picker/내 매장 제품 링크는 listings 로만 연결.
+- 선행 IR: KPA 자체 제품 **생성 API·화면은 이미 정상**(`/store/commerce/local-products`, `StoreLocalProductsPage`)이나, **KPA 사이드바에 접근 메뉴가 없어** 사용자가 도달 불가(KCos 는 '자체 상품' 메뉴 보유). 타블렛 picker/내 매장 제품 링크는 listings 로만 연결.
 - 본 작업: **기존 화면을 KPA 메뉴·타블렛 흐름에서 접근 가능하게** 동선만 추가. 신규 API/DB 없음.
 
 ## 2. 변경 파일
@@ -41,10 +41,10 @@
 - `타블렛 구성`의 '매장 자체 제품' 탭이 비어 있을 때 안내 + **'매장 자체 제품 등록'** 버튼 → `/store/commerce/local-products` 이동. (공급 상품 탭의 '내 매장 제품 등록' 과 동일 패턴)
 - 생성한 자체 제품은 `is_active=true` 기본 → 타블렛 product-pool('매장 자체 제품')에 노출 → 진열 추가 가능(선행 IR §8).
 
-## 6. GP/KCos 비영향
+## 6. KCos 비영향
 
-- 메뉴 변경은 **KPA 블록 한정**. GP/KCos 의 '자체 상품'(`/commerce/local-products`) 메뉴·route 무변경(`storeMenuConfig.ts` 별도 블록).
-- 문구 변경은 **KPA 전용 `StoreLocalProductsPage`**(services/web-kpa-society) — 공유 `StoreLocalProductsManager` 미변경 → GP/KCos 화면 동일. KCos tsc exit 0.
+- 메뉴 변경은 **KPA 블록 한정**. KCos 의 '자체 상품'(`/commerce/local-products`) 메뉴·route 무변경(`storeMenuConfig.ts` 별도 블록).
+- 문구 변경은 **KPA 전용 `StoreLocalProductsPage`**(services/web-kpa-society) — 공유 `StoreLocalProductsManager` 미변경 → KCos 화면 동일. KCos tsc exit 0.
 
 ## 7. 온라인 판매 비영향
 
@@ -57,7 +57,7 @@
 | `web-kpa-society` tsc (본 변경 파일) | ✅ error 0 (잔여 1건은 동시 세션 `ContentPdfExportModal.tsx`, 본 WO 무관) |
 | `web-k-cosmetics` tsc | ✅ error 0 |
 | 배포 (Web Cloud Run, 797eb3937) | ✅ success |
-| 9.6 GP/KCos 비영향 | ✅ (KPA 블록/KPA 파일 한정) |
+| 9.6 KCos 비영향 | ✅ (KPA 블록/KPA 파일 한정) |
 | 9.7 온라인 판매 비영향 | ✅ (git diff) |
 | 9.1 메뉴 노출/이동 | ✅ PASS — '타블렛' 그룹 `내 매장 제품 / 매장 자체 제품 / 타블렛 구성`, '매장 자체 제품' → `/store/commerce/local-products` 이동 |
 | 9.2 화면 진입 | ✅ PASS — 제목 '매장 자체 제품 (n)' + 새 설명(O4O 무관·타블렛 활용). 404/권한오류 없음 |
@@ -81,4 +81,4 @@
 
 ## 결론
 
-기존 `/store/commerce/local-products` 화면을 KPA '타블렛' 그룹 메뉴 + 타블렛 구성 빈 상태 링크로 노출하고, KPA 전용 페이지 제목을 '매장 자체 제품'으로 정합. 신규 API/DB 없음, GP/KCos·온라인 판매 무영향, tsc·배포 통과. **브라우저 smoke 9.1~9.5 PASS**(메뉴/진입/생성/타블렛 pool/회귀). 단, **공개 타블렛 뷰어가 자체 제품을 표시하지 못하는 별도 기존 버그(§9-A: KPA `fetchTabletProducts` 의 `localProducts` 드롭)** 를 발견 — 자동 넘김 시각 smoke 는 이 버그 해소(후속 1줄 WO) 후 가능.
+기존 `/store/commerce/local-products` 화면을 KPA '타블렛' 그룹 메뉴 + 타블렛 구성 빈 상태 링크로 노출하고, KPA 전용 페이지 제목을 '매장 자체 제품'으로 정합. 신규 API/DB 없음, KCos·온라인 판매 무영향, tsc·배포 통과. **브라우저 smoke 9.1~9.5 PASS**(메뉴/진입/생성/타블렛 pool/회귀). 단, **공개 타블렛 뷰어가 자체 제품을 표시하지 못하는 별도 기존 버그(§9-A: KPA `fetchTabletProducts` 의 `localProducts` 드롭)** 를 발견 — 자동 넘김 시각 smoke 는 이 버그 해소(후속 1줄 WO) 후 가능.

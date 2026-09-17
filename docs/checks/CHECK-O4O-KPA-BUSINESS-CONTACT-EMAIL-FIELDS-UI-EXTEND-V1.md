@@ -3,7 +3,7 @@
 > **작업명:** WO-O4O-KPA-BUSINESS-CONTACT-EMAIL-FIELDS-UI-EXTEND-V1
 > **유형:** KPA 개설약사 가입/약국 정보수정 — 사업자 연락처 **이메일 2종**(businessEmail/contactEmail) 추가. **businessPhone 제외**(pharmacyPhone 재사용). backend 포함.
 > **결과: PASS — pharmacy-info 컨트롤러 GET/PUT 에 2종(org.metadata SSOT) + pharmacyInfo.ts 타입 + PharmacyInfoPage(조회/수정) + RegisterModal(개설약사 가입) 추가. DB migration 0. web-kpa-society tsc 통과. api-server tsc 내 변경 신규 에러 0(기존 무관 1건 제외).**
-> 선행: IR-O4O-KPA-BUSINESS-CONTACT-FIELDS-MAPPING-AUDIT-V1 · WO-O4O-CROSSSERVICE-BUSINESS-CONTACT-FIELDS-BACKEND-SUPPORT-V1 · WO-O4O-GLYCOPHARM-… · WO-O4O-KCOSMETICS-BUSINESS-CONTACT-FIELDS-UI-EXTEND-V1
+> 선행: IR-O4O-KPA-BUSINESS-CONTACT-FIELDS-MAPPING-AUDIT-V1 · WO-O4O-CROSSSERVICE-BUSINESS-CONTACT-FIELDS-BACKEND-SUPPORT-V1 · … · WO-O4O-KCOSMETICS-BUSINESS-CONTACT-FIELDS-UI-EXTEND-V1
 
 ---
 
@@ -66,7 +66,7 @@
 
 ## 6. 비범위
 
-- businessPhone 신규 / pharmacyPhone 이름 변경 / ownerPhone·phone·managerPhone 의미 변경 / operator UI 표시(KpaEditUserModal businessEmail/contactEmail/managerPhone gap — 별도 WO) / users.businessInfo 로 KPA SSOT 변경 / pharmacy_request 승인 org.metadata 동기화 / DB migration / GP·KCos·Neture 변경 / 주소 정렬 — 전부 비범위.
+- businessPhone 신규 / pharmacyPhone 이름 변경 / ownerPhone·phone·managerPhone 의미 변경 / operator UI 표시(KpaEditUserModal businessEmail/contactEmail/managerPhone gap — 별도 WO) / users.businessInfo 로 KPA SSOT 변경 / pharmacy_request 승인 org.metadata 동기화 / DB migration / KCos·Neture 변경 / 주소 정렬 — 전부 비범위.
 
 ---
 

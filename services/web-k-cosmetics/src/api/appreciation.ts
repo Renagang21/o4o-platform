@@ -1,6 +1,5 @@
 /**
  * Appreciation API — K-Cosmetics
- * WO-O4O-APPRECIATION-FRONTEND-BOOTSTRAP-GLYCO-KCOS-V1
  *
  * Backend: /api/v1/appreciation/* (공용 — serviceKey 불필요)
  */
@@ -42,7 +41,6 @@ export const appreciationApi = {
     api.get<any>(`/appreciation/${targetType}/${targetId}/recent`),
 };
 
-// WO-O4O-APPRECIATION-GLYCO-KCOS-MIGRATION-V1
 // @o4o/shared-space-ui AppreciationPanel 의 AppreciationApi 인터페이스에 맞춘 adapter.
 // 기존 appreciationApi 의 raw axios response 를 정규화된 데이터로 변환.
 import type {

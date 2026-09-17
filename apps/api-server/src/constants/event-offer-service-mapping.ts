@@ -2,7 +2,6 @@
  * Event Offer Service Key Mapping
  *
  * WO-O4O-EVENT-OFFER-MULTI-SERVICE-PROPOSAL-V1
- * WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1: GlycoPharm 대상 제거 (서비스 삭제)
  *
  * Frontend(공급자가 제안할 대상 서비스 선택)는 "platform target service key"를 사용한다.
  * Backend(OPL row)는 "event offer service key"를 사용한다.

@@ -4,7 +4,6 @@
  * WO-KCOS-KPA-HOME-PORT-V1: KPA prefetchAll 패턴으로 단순화
  *   notices (CMS) + heroAds (community) 2개 병렬 호출
  *
- * WO-O4O-GLYCOPHARM-KCOS-HOME-LATEST-UI-ALIGNMENT-V1:
  *   /api/v1/cosmetics/home/latest 통합 최신 활동 피드 호출
  *
  * 참조 패턴: web-kpa-society/src/api/home.ts

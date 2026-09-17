@@ -2,7 +2,7 @@
  * LMS Service Scope — WO-O4O-LMS-PUBLIC-COURSE-LIST-SERVICE-SCOPE-V1
  *
  * 공개 강의 목록(`GET /lms/courses`)에는 service boundary 가 없어 모든 서비스가
- * 동일한 전체 강의 목록을 보고 있었다 (K-Cosmetics / GlycoPharm 화면에 KPA 강의 노출).
+ * 동일한 전체 강의 목록을 보고 있었다 (K-Cosmetics 화면에 KPA 강의 노출).
  * 본 모듈은 Forum 의 `forumContextMiddleware → resolveCanonicalServiceKey → service_code`
  * 선례와 동일한 계약을 LMS 에 적용한다.
  *
@@ -10,7 +10,7 @@
  *   1) service-prefix route context — `/api/v1/kpa/lms/*` 처럼 서비스 prefix 아래 mount 된
  *      라우터가 `lmsContextMiddleware({ serviceCode })` 로 주입한 값.
  *   2) 명시적 `serviceKey` canonical 계약 — generic `/api/v1/lms/*` 를 쓰는 서비스
- *      (K-Cosmetics / GlycoPharm) 가 쿼리 파라미터로 전달.
+ *      (K-Cosmetics) 가 쿼리 파라미터로 전달.
  *   3) 둘 다 없으면 무필터 — admin / platform 카탈로그 용도.
  *      Forum 의 `if (!canonical) return;` (generic/admin route 무필터) 와 동일한 판단이다.
  *

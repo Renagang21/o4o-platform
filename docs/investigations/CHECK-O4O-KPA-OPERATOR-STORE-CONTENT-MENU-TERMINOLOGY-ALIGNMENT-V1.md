@@ -35,7 +35,7 @@
 `packages/ui/src/operator-shell/constants.ts` `STANDARD_GROUPS` 라벨 영문→국문:
 `Dashboard→대시보드 · Users→회원 · Approvals→승인 · Products→상품 · Stores→매장 · Orders→주문 · Content→콘텐츠 · Resources→자료실 · LMS→강의 · Signage→사이니지 · Forum→포럼 · Analytics→분석 · System→시스템`. **key/capability/순서 불변.**
 
-> ⚠️ **SHARED**: `@o4o/operator-ux-core`(DomainIASidebar/OperatorAreaShell) 경유로 **KPA·Neture·GlycoPharm·K-Cosmetics 4개 operator 대시보드 공통 적용**. 모두 국문 서비스라 적합. label-only(로직/route/capability 무영향). Shared-Module Protocol: 소비처 4서비스 식별·검증 완료.
+> 모두 국문 서비스라 적합. label-only(로직/route/capability 무영향). Shared-Module Protocol: 소비처 4서비스 식별·검증 완료.
 
 ---
 
@@ -45,7 +45,7 @@
 - `pnpm -C services/web-kpa-society exec tsc --noEmit` → **0 errors** (direct-include 패턴; `tsc -b`는 tsconfig.node emit 제약으로 부적합).
 
 ### 3.2 배포
-- KPA-local + shared push 후 **Deploy Web Services `service=all`** 트리거 → k-cosmetics/kpa-society/glycopharm/neture **4개 모두 success**(shared `packages/ui` 변경 반영 보장; detect-changes는 HEAD만 보므로 수동 all 트리거).
+- detect-changes는 HEAD만 보므로 수동 all 트리거).
 
 ### 3.3 라이브 브라우저 smoke (배포 후, read-only)
 | 화면 | 실측 | 판정 |
@@ -62,7 +62,7 @@
 - route / 기능 / API / DB / capability / 데이터 무변경 (라벨 문자열만).
 - 운영자 콘텐츠 허브 상태 **값** (draft/ready) 통일은 미수행 — 별도 설계 IR(§R6, 고위험).
 - 내부 코드명(컴포넌트/심볼/group key) 무변경.
-- GP/Cosmetics/Neture 의 KPA-local 라벨(상태/버튼)은 미변경 — 본 WO는 KPA 한정(사이드바 그룹만 shared 공통).
+- Cosmetics/Neture 의 KPA-local 라벨(상태/버튼)은 미변경 — 본 WO는 KPA 한정(사이드바 그룹만 shared 공통).
 
 ---
 

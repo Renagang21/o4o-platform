@@ -36,7 +36,7 @@ export function createQualificationController(
   dataSource: DataSource,
   requireAuth: AuthMiddleware,
   requireScope: ScopeMiddleware,
-  /** WO-O4O-GLYCOPHARM-LMS-QUALIFICATION-BACKEND-FOUNDATION-V1: 서비스 격리 키 */
+  /** 서비스 격리 키 */
   serviceKey: string,
 ): Router {
   const router = Router();

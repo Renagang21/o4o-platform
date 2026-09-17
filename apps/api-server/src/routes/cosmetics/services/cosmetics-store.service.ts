@@ -254,7 +254,7 @@ export class CosmeticsStoreService {
     //
     // WO-O4O-CROSS-SERVICE-STORE-ORPHAN-SLUG-INTEGRITY-CLEANUP-V1 §6
     //   `platform_store_slugs.store_id` 의 canonical 축은 **organizations.id** 다
-    //   (kpa / glycopharm / pharmacy-hub 전부 조직 id 로 예약한다).
+    //   (kpa / pharmacy-hub 전부 조직 id 로 예약한다).
     //   여기만 `cosmetics.cosmetics_stores.id` 를 넣고 있었다. 그 결과
     //     (1) 공개 조회(resolvePublicStore)가 organizations 를 찾으므로 항상 404 이고,
     //     (2) 조직 삭제 시 slug 잔재 정리(OrganizationService.deleteOrganization)가

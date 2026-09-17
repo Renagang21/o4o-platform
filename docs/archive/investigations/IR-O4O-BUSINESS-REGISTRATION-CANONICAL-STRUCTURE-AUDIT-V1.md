@@ -10,7 +10,7 @@
 - Activation logic (store_owner / pharmacy_owner) + organization ensure
 - Baseline / canonical / governance docs
 - Cross-cutting fields (address / tax invoice email / 담당자 / postcode / 대표자명)
-- 서비스 비교 (KPA / GlycoPharm / K-Cosmetics / Neture)
+- 서비스 비교 (KPA / K-Cosmetics / Neture)
 
 **선행 IR / 관련**:
 - `IR-O4O-STORE-OWNER-AUTO-CAPABILITY-AUDIT-V1` (auto-activation 흐름)
@@ -43,7 +43,7 @@
 7. **`pharmacy_owner` role layer 모호** — USER-STRUCTURE-V1 은 sub-role 이라고, O4O-ORGANIZATION-ROLE-STANDARD-V1 은 Layer A 예시로, RBAC-ROLE-CATALOG-V1 에는 미등록. 실제 코드는 `role_assignments(role='kpa:store_owner')` 사용 — service-prefix 형식.
 8. **Neture supplier 통합 미실행** — `WO-O4O-NETURE-ORG-DATA-MODEL-V1` 가 `neture_suppliers` → `organizations` 통합을 design 했으나 코드 미변경. 향후 정비 시 별도 phase.
 9. **Admin 사업자 form 미존재** — admin-dashboard 에 `OrganizationForm`/`BusinessForm` 자체가 없음. operator-only 흐름.
-10. **GlycoPharm/K-Cosmetics 자체 RegisterPage** — KPA RegisterModal 과 별도 흐름. 서비스별 signup form drift 확인 필요 (본 IR 에서 핵심만 매핑, 상세는 후속).
+10. 서비스별 signup form drift 확인 필요 (본 IR 에서 핵심만 매핑, 상세는 후속).
 
 ### SSOT 후보 판단 (요약)
 
@@ -82,7 +82,7 @@
 | 11 | operator MemberManagement 수정 | ✅ | §2-3, §6 |
 | 12 | admin 사업자 정보 입력 | ⚠️ 부재 확인 | §2-3, §6 (form 미존재) |
 | 13 | Neture supplier/business registration | ✅ | §2-1, §8 |
-| 14 | K-Cosmetics / GlycoPharm 재사용 | ⚠️ 부분 | §8 (entity-level 매핑 + 자체 RegisterPage 존재 확인) |
+| 14 | K-Cosmetics 재사용 | ⚠️ 부분 | §8 (entity-level 매핑 + 자체 RegisterPage 존재 확인) |
 
 ### 1-2. 방법론
 
@@ -104,7 +104,6 @@
 | 2 | `OrganizationStore` | `organizations` | [organization-store.entity.ts](apps/api-server/src/modules/store-core/entities/organization-store.entity.ts) | Business entity SSOT (design). `business_number`/`address`/`address_detail`/`phone`/`metadata` 보유 | ALIVE (Frozen design) |
 | 3 | `KpaMember` | `kpa_members` | [kpa-member.entity.ts](apps/api-server/src/routes/kpa/entities/kpa-member.entity.ts) | KPA 약사 회원. `pharmacy_name`/`pharmacy_address` (varchar denormalized) 보유 | ALIVE |
 | 4 | `KpaPharmacyRequest` | `kpa_pharmacy_requests` | [kpa-pharmacy-request.entity.ts](apps/api-server/src/routes/kpa/entities/kpa-pharmacy-request.entity.ts) | 약국 운영 신청. `pharmacy_name`/`business_number`/`pharmacy_phone`/`owner_phone`/`tax_invoice_email` 보유 | ALIVE (manual path) |
-| 5 | `GlycopharmPharmacy` | `glycopharm_pharmacies` | [glycopharm-pharmacy.entity.ts](apps/api-server/src/routes/glycopharm/entities/glycopharm-pharmacy.entity.ts) | GlycoPharm 약국. `business_number`/`owner_name`/`address`/`address_detail`/`phone`/`email` 보유 | ALIVE |
 | 6 | `CosmeticsStore` | `cosmetics_stores` | [cosmetics-store.entity.ts](apps/api-server/src/routes/cosmetics/entities/cosmetics-store.entity.ts) | Cosmetics 매장. `business_number`/`owner_name`/`address`/`address_detail`/`contact_phone` 보유 (**email 컬럼 없음**) | ALIVE |
 | 7 | `NetureSupplier` | `neture_suppliers` | [NetureSupplier.entity.ts](apps/api-server/src/modules/neture/entities/NetureSupplier.entity.ts) | Neture dropship 공급자. `representative_name`/`manager_name`/`manager_phone`/`tax_email`/`business_type` + contact_* visibility 컬럼 (**address 컬럼 없음**) | ALIVE |
 | 8 | `NeturePartner` | `neture_partners` | [neture-partner.entity.ts](apps/api-server/src/routes/neture/entities/neture-partner.entity.ts) | Neture generic partner. `business_number`/`address` (jsonb)/`contact` (jsonb name/email/phone/position) | ALIVE |
@@ -155,7 +154,7 @@ export interface StoreAddress {
 }
 ```
 
-저장처: `organizations.address_detail` (jsonb) / `glycopharm_pharmacies.address_detail` / `cosmetics_stores.address_detail` — migration `20260318200000-AddStructuredAddress` 로 추가 + legacy `address` → `address_detail.baseAddress` backfill.
+저장처: `organizations.address_detail` (jsonb) / `cosmetics_stores.address_detail` — migration `20260318200000-AddStructuredAddress` 로 추가 + legacy `address` → `address_detail.baseAddress` backfill.
 
 **미적용 entity**: `users.businessInfo` (type 에는 storeAddress 있으나 실제 사용 미확인) / `kpa_members.pharmacy_address` (여전히 varchar) / `neture_partners.address` (자체 jsonb 구조 — zipCode/address1/address2/city/province/country) / `neture_suppliers` (address 컬럼 자체 없음).
 
@@ -168,7 +167,6 @@ export interface StoreAddress {
 | F3 | EditUserModal (KPA operator 회원 수정) | [EditUserModal.tsx](services/web-kpa-society/src/pages/operator/EditUserModal.tsx) | `/operator/members/:id` | ALIVE |
 | F4 | PharmacyApprovalGatePage (KPA 약국 신청) | [PharmacyApprovalGatePage.tsx](services/web-kpa-society/src/pages/pharmacy/PharmacyApprovalGatePage.tsx) | `/pharmacy` | ALIVE (manual fallback) |
 | F5 | PharmacyInfoPage (KPA 약국 정보 조회/수정) | [PharmacyInfoPage.tsx](services/web-kpa-society/src/pages/pharmacy/PharmacyInfoPage.tsx) | `/store/info` 등 | ALIVE |
-| F6 | GlycoPharm RegisterPage | [RegisterPage.tsx](services/web-glycopharm/src/pages/auth/RegisterPage.tsx) | GlycoPharm `/register` | ALIVE (별도 흐름) |
 | F7 | K-Cosmetics RegisterPage | [RegisterPage.tsx](services/web-k-cosmetics/src/pages/auth/RegisterPage.tsx) | K-Cosmetics `/register` | ALIVE (별도 흐름) |
 | F? | Admin 사업자 정보 form | (없음) | — | **부재 확인** |
 | F? | Neture supplier 등록 frontend | (admin 측 supplier-management 일부) | — | 부분 확인 (`SupplierForm` stub) |
@@ -250,8 +248,8 @@ Auto-activation (운영자 회원 승인)
 | 대표자명 | `BusinessInfo.ceoName` | `users.businessInfo.representativeName` (free field) + `metadata.representativeName` | **type 위반 + 이중 표기** |
 | 세금계산서 이메일 | (canonical 미정의) | 5 곳 분산 — businessInfo.email overwrite / metadata.taxEmail / kpa_pharmacy_requests.tax_invoice_email / organizations.metadata.taxInvoiceEmail / neture_suppliers.tax_email | **silent silent silent drift** |
 | 담당자명/전화 | (canonical 미정의) | Neture 만 (managerName/managerPhone), 다른 곳 부재 | service-local schema |
-| 주소 구조 | `StoreAddress` (4-field) | organizations/glycopharm/cosmetics 는 address_detail (jsonb) ✅, kpa_members 는 varchar denormalized ❌, neture_partners 는 자체 6-field jsonb ❌ | **mixed adoption** |
-| 약국 식별 | organizations(type='pharmacy') | 추가 entity 3 종 (kpa_members.organization_id + glycopharm_pharmacies + kpa_organizations legacy) | dual+ organization 시스템 |
+| 주소 구조 | `StoreAddress` (4-field) | — | **mixed adoption** |
+| 약국 식별 | organizations(type='pharmacy') | 추가 entity 3 종 | dual+ organization 시스템 |
 
 ---
 
@@ -264,7 +262,7 @@ Auto-activation (운영자 회원 승인)
 - Auto-activation 이 `organizations` 를 ensure 함 — `code=kpa-pharm-{bizno}` 기준 dedup
 - `WO-O4O-NETURE-ORG-DATA-MODEL-V1` 도 organizations 를 통합 target 으로 설정 (실행 전)
 - `address_detail` (jsonb StoreAddress) 가 organizations 에 표준 적용됨
-- `glycopharm_pharmacies` / `cosmetics_stores` 가 `organization_id` FK 로 organizations 와 연결 (각각 migration `20260215300002`, `20260311200000`)
+- `cosmetics_stores` 가 `organization_id` FK 로 organizations 와 연결 (각각 migration `20260215300002`, `20260311200000`)
 - CLAUDE.md §3 Core 동결 정책: organization-core frozen
 
 **현실 보완 사항**:
@@ -318,7 +316,6 @@ Auto-activation (운영자 회원 승인)
 | `users.businessInfo.businessNumber` | RegisterModal / EditUserModal / Auto-activation read | string (digits + dashes) | ALIVE (form cache) |
 | `organizations.business_number` | Auto-activation ensure (code 생성에 사용) | varchar(20) | ALIVE (canonical) |
 | `kpa_pharmacy_requests.business_number` | PharmacyApprovalGate 신청 | varchar | ALIVE (manual path) |
-| `glycopharm_pharmacies.business_number` | GlycoPharm | varchar(20), unique, indexed | ALIVE |
 | `cosmetics_stores.business_number` | Cosmetics | varchar(100), unique | ALIVE |
 | `neture_suppliers.business_number` | Neture supplier | varchar(50), nullable, indexed | ALIVE |
 | `neture_partners.business_number` | Neture partner | varchar(50), nullable, indexed | ALIVE |
@@ -336,7 +333,6 @@ Auto-activation (운영자 회원 승인)
 | `users.businessInfo.address` (+`address2`) | legacy varchar | ❌ | 레거시 |
 | `organizations.address` | legacy varchar | ❌ | 레거시 (backfill source) |
 | `organizations.address_detail` | jsonb StoreAddress | ✅ | **표준** (migration 적용) |
-| `glycopharm_pharmacies.address_detail` | jsonb StoreAddress | ✅ | 표준 |
 | `cosmetics_stores.address_detail` | jsonb StoreAddress | ✅ | 표준 |
 | `kpa_members.pharmacy_address` | varchar(300) | ❌ denormalized | **drift** |
 | `neture_partners.address` | jsonb (zipCode/address1/address2/city/province/country) | ❌ 자체 구조 | drift (글로벌 호환 의도?) |
@@ -417,7 +413,6 @@ KPA pharmacy 흐름 (PharmacyApprovalGate / PharmacyInfo) 은 `ownerPhone` (개�
 | **F3 EditUserModal** (PUT /operator/members/{id}) | 3-part `zipCode`/`address1`/`address2` (AddressSearch) | `taxEmail` (optional) | **none** | `phone` (사용자 개인) | `businessNumber` (optional) | **none** |
 | **F4 PharmacyApprovalGatePage** (POST /pharmacy-requests) | **수집 안 함** ⚠️ | `taxInvoiceEmail` (**required**) | **none** | `ownerPhone` + `pharmacyPhone` (both required) | `businessRegistrationNumber` (required) | **none** |
 | **F5 PharmacyInfoPage** (PUT /pharmacy/info) | 3-part `zipCode`/`baseAddress`/`detailAddress` (`addressDetail` 객체) | `taxInvoiceEmail` (optional) | **none** | `ownerPhone` + `phone` (both optional) | read-only | **none** |
-| **F6 GlycoPharm RegisterPage** | (미상세 — 후속 IR) | (미상세) | (미상세) | (미상세) | (미상세) | (미상세) |
 | **F7 K-Cosmetics RegisterPage** | (미상세 — 후속 IR) | (미상세) | (미상세) | (미상세) | (미상세) | (미상세) |
 | **F? Admin business form** | **부재** | — | — | — | — | — |
 
@@ -507,22 +502,21 @@ Auto-activation (운영자 회원 승인 시):
 
 ## 8. Service-level 비교
 
-| 영역 | KPA | GlycoPharm | K-Cosmetics | Neture |
-|---|---|---|---|---|
-| Signup form | RegisterModal (modal) | RegisterPage (별도) | RegisterPage (별도) | (operator-측 supplier-management) |
-| Business entity | `organizations` (type='pharmacy', via kpa_organizations sync) + `kpa_members.pharmacy_*` | `glycopharm_pharmacies` (organization_id FK) | `cosmetics_stores` (organization_id FK) | `neture_suppliers` + `neture_partners` (organization 미연결) |
-| Address 표준 | ⚠️ kpa_members.pharmacy_address 는 varchar / organizations.address_detail 는 jsonb | ✅ address_detail jsonb | ✅ address_detail jsonb | ❌ neture_partners 자체 6-field jsonb / neture_suppliers 부재 |
-| Business number | `kpa_pharmacy_requests.business_number` + `users.businessInfo.businessNumber` + `organizations.business_number` | `glycopharm_pharmacies.business_number` (unique) | `cosmetics_stores.business_number` (unique) | `neture_suppliers.business_number` + `neture_partners.business_number` |
-| Owner / contact | `organization_members(role='owner')` | `glycopharm_pharmacies.owner_name` | `cosmetics_stores.owner_name` | `neture_suppliers.representative_name` |
-| Tax invoice | `kpa_pharmacy_requests.tax_invoice_email` + `organizations.metadata.taxInvoiceEmail` + `users.businessInfo.email` overwrite | (미확인 — 후속) | (미확인 — 후속) | `neture_suppliers.tax_email` |
-| Manager info | (부재) | (부재) | (부재) | `neture_suppliers.manager_name` + `manager_phone` |
-| Activation path | Auto + Manual (member.controller + pharmacy-request.controller) | (자체 approval — 후속 조사) | (자체 approval — 후속 조사) | Supplier status (PENDING/ACTIVE/REJECTED) — operator-측 처리 |
-| User-Org 연결 | `organization_members` (Layer B) | `organization_members` (Layer B) + glycopharm.owner_name | `organization_members` (Layer B) + cosmetics.owner_name | `neture_partners.user_id` (non-enforced) — Layer B 미연결 |
-| **alive / dead** | ALIVE — 이중 흐름 (auto + manual) | ALIVE | ALIVE | ALIVE — 단 organizations 통합 미실행 |
+| 영역 | KPA | K-Cosmetics | Neture |
+|---|---|---|---|
+| Signup form | RegisterModal (modal) | RegisterPage (별도) | (operator-측 supplier-management) |
+| Business entity | `organizations` (type='pharmacy', via kpa_organizations sync) + `kpa_members.pharmacy_*` | `cosmetics_stores` (organization_id FK) | `neture_suppliers` + `neture_partners` (organization 미연결) |
+| Address 표준 | ⚠️ kpa_members.pharmacy_address 는 varchar / organizations.address_detail 는 jsonb | ✅ address_detail jsonb | ❌ neture_partners 자체 6-field jsonb / neture_suppliers 부재 |
+| Business number | `kpa_pharmacy_requests.business_number` + `users.businessInfo.businessNumber` + `organizations.business_number` | `cosmetics_stores.business_number` (unique) | `neture_suppliers.business_number` + `neture_partners.business_number` |
+| Owner / contact | `organization_members(role='owner')` | `cosmetics_stores.owner_name` | `neture_suppliers.representative_name` |
+| Tax invoice | `kpa_pharmacy_requests.tax_invoice_email` + `organizations.metadata.taxInvoiceEmail` + `users.businessInfo.email` overwrite | (미확인 — 후속) | `neture_suppliers.tax_email` |
+| Manager info | (부재) | (부재) | `neture_suppliers.manager_name` + `manager_phone` |
+| Activation path | Auto + Manual (member.controller + pharmacy-request.controller) | (자체 approval — 후속 조사) | Supplier status (PENDING/ACTIVE/REJECTED) — operator-측 처리 |
+| User-Org 연결 | `organization_members` (Layer B) | `organization_members` (Layer B) + cosmetics.owner_name | `neture_partners.user_id` (non-enforced) — Layer B 미연결 |
+| **alive / dead** | ALIVE — 이중 흐름 (auto + manual) | ALIVE | ALIVE — 단 organizations 통합 미실행 |
 
 **서비스별 drift 핵심**:
 - **KPA**: `kpa_pharmacy_requests` 와 `users.businessInfo` 와 `organizations.metadata` 가 동일 데이터를 다른 곳에 저장
-- **GlycoPharm / K-Cosmetics**: `organizations` 통합 일부 적용 (organization_id FK) — 본 IR 정비의 모범 사례
 - **Neture**: 가장 큰 transitional — `WO-O4O-NETURE-ORG-DATA-MODEL-V1` 미실행으로 `organizations` 와 별도 system
 
 ---
@@ -542,7 +536,7 @@ Auto-activation (운영자 회원 승인 시):
 | 9 | `kpa_organizations` legacy 잔존 | KPA 약사회 hierarchical org | 🟡 LOW | `organizations` 로 sync 중. 완전 제거 전까지 dual maintenance |
 | 10 | `BusinessInfo` type 중복 정의 (user.ts + auth.ts) | type 변경 시 | 🟡 LOW | 한쪽만 수정 시 silent drift |
 | 11 | Admin 사업자 form 미존재 | 운영 절차 | 🟡 LOW | EditUserModal 만으로 처리 → operator 가 모든 사업자 등록 사후 보완. 관리 부담 |
-| 12 | GlycoPharm/K-Cosmetics signup 미상세 조사 | 본 IR 범위 외 | 🟡 LOW | 별도 IR 후속 필요 |
+| 12 | K-Cosmetics signup 미상세 조사 | 본 IR 범위 외 | 🟡 LOW | 별도 IR 후속 필요 |
 
 ---
 
@@ -553,7 +547,7 @@ Auto-activation (운영자 회원 승인 시):
 **Canonical 선언**:
 - **SSOT = `organizations`**
 - `users.businessInfo` = personal-side input cache (write 시 organizations 로 sync 필수)
-- `glycopharm_pharmacies` / `cosmetics_stores` = service-specific extension (organization_id FK 통해 organizations 와 연결, 중복 컬럼 deprecate)
+- `cosmetics_stores` = service-specific extension (organization_id FK 통해 organizations 와 연결, 중복 컬럼 deprecate)
 - `kpa_members.pharmacy_*` = denormalized cache, organizations.* 가 진실
 - `neture_suppliers` = `WO-O4O-NETURE-ORG-DATA-MODEL-V1` 실행 후 organization_id 통합
 
@@ -582,7 +576,7 @@ Auto-activation (운영자 회원 승인 시):
 **Canonical 선언 제안**:
 - **`organizations.manager_name` + `organizations.manager_phone` 컬럼 신설** (varchar 100/50)
 - Neture supplier 의 `manager_name`/`manager_phone` 을 organizations 로 sync
-- KPA pharmacy / GlycoPharm / Cosmetics 의 frontend 입력 흐름에도 담당자 필드 추가
+- KPA pharmacy / Cosmetics 의 frontend 입력 흐름에도 담당자 필드 추가
 
 ### 10-5. 대표자명 (Representative)
 
@@ -650,8 +644,6 @@ Auto-activation (운영자 회원 승인 시):
     - PharmacyInfoPage: 담당자 입력 영역 추가
     - MyProfilePage: 사업자 정보 편집 모드 추가 (또는 read-only 유지 정책 결정)
 
-  WO-6: GlycoPharm / K-Cosmetics RegisterPage 정렬 (별도 IR 후 결정)
-
 [Phase 4] legacy 정리
   WO-7: kpa_members.pharmacy_address (varchar) deprecate
     - organizations.address_detail 로 통일, kpa_members 의 컬럼은 read-only 유지 후 차후 제거
@@ -675,10 +667,9 @@ Auto-activation (운영자 회원 승인 시):
 
 ## 12. 본 IR 범위 외 (후속 별도 IR 권장)
 
-1. **GlycoPharm RegisterPage 상세** — 입력 필드 / submit endpoint / business entity 매핑
 2. **K-Cosmetics RegisterPage 상세** — 동일
 3. **Neture supplier signup frontend 흐름** — supplier-management 외 사용자가 직접 신청하는 흐름이 있는지
-4. **GlycoPharm/K-Cosmetics 의 storefront_config jsonb 구조 정렬** — 3 가지 (KPA 1 field / GlycoPharm 3 fields / generic 미상) 통일
+4. **K-Cosmetics 의 storefront_config jsonb 구조 정렬** — 3 가지 (KPA 1 field 3 fields / generic 미상) 통일
 5. **`activity_type` (직역) 과 `role_assignments` 의 표기 정합성** — pharmacy_owner / kpa:store_owner / employed_pharmacist / pharmacy_employee 등 매핑표
 6. **Admin business form 신설 필요성 판단** — 현재 EditUserModal 만으로 처리 시 운영 비용 vs 신설 비용
 7. **`organizations.metadata` jsonb 구조 표준화** — 현재 taxInvoiceEmail / ownerPhone / serviceKey / cosmeticsStoreId 등 service-별 free key
@@ -693,7 +684,6 @@ Auto-activation (운영자 회원 승인 시):
 - [organization-store.entity.ts](apps/api-server/src/modules/store-core/entities/organization-store.entity.ts) — `organizations` table (canonical)
 - [kpa-member.entity.ts](apps/api-server/src/routes/kpa/entities/kpa-member.entity.ts) — `kpa_members`
 - [kpa-pharmacy-request.entity.ts](apps/api-server/src/routes/kpa/entities/kpa-pharmacy-request.entity.ts) — `kpa_pharmacy_requests`
-- [glycopharm-pharmacy.entity.ts](apps/api-server/src/routes/glycopharm/entities/glycopharm-pharmacy.entity.ts) — `glycopharm_pharmacies`
 - [cosmetics-store.entity.ts](apps/api-server/src/routes/cosmetics/entities/cosmetics-store.entity.ts) — `cosmetics_stores`
 - [NetureSupplier.entity.ts](apps/api-server/src/modules/neture/entities/NetureSupplier.entity.ts) — `neture_suppliers`
 - [neture-partner.entity.ts](apps/api-server/src/routes/neture/entities/neture-partner.entity.ts) — `neture_partners`
@@ -719,7 +709,6 @@ Auto-activation (운영자 회원 승인 시):
 - [PharmacyInfoPage.tsx](services/web-kpa-society/src/pages/pharmacy/PharmacyInfoPage.tsx)
 
 ### Frontend Flows (Other services)
-- [GlycoPharm RegisterPage.tsx](services/web-glycopharm/src/pages/auth/RegisterPage.tsx)
 - [K-Cosmetics RegisterPage.tsx](services/web-k-cosmetics/src/pages/auth/RegisterPage.tsx)
 
 ### Migrations (key)
@@ -729,7 +718,7 @@ Auto-activation (운영자 회원 승인 시):
 - `20260224100000-CreateRoleAssignmentsTable` — RBAC SSOT
 - `1771200000010-CreateServiceMemberships` — Service Membership SSOT
 - `1771200000019-AddSupplierBusinessProfileFields` — `neture_suppliers` business profile 필드
-- `20260318200000-AddStructuredAddress` — `address_detail` jsonb (organizations/glycopharm/cosmetics)
+- `20260318200000-AddStructuredAddress` — `address_detail` jsonb
 - `20260411100000-BackfillKpaOrgsToOrganizations` — kpa_organizations → organizations sync
 - `20261002000000-BackfillServiceMembershipsActiveFromKpaMembers` — sm.status drift fix
 

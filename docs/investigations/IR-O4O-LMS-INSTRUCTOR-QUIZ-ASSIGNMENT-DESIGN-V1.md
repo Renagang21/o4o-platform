@@ -15,21 +15,21 @@
 
 | 기능 | 구현 서비스 수 | 수렴 대상 | 결합 위험 | 판정 |
 |------|:---:|:---:|:---:|:---:|
-| QuizBuilder | **KPA 1개** | 없음(GP placeholder, KCos 무) | 채점/통과기준 | **C — KEEP(reference)** |
+| QuizBuilder | **KPA 1개** | — | 채점/통과기준 | **C — KEEP(reference)** |
 | 과제 editor | **KPA 1개** | 없음 | 채점/완료 | **C — KEEP(reference)** |
 | 과제 제출/채점/피드백 | **KPA 1개** | 없음(learner AI 피드백 별개) | 완료/credit | **C — KEEP(reference)** |
-| CourseStructureAiModal / AI 구조 생성 | **KPA 1개** | 없음(GP 명시 제외) | **AI 비용/권한/노출 정책** | **D — 정책 IR 선행** |
+| CourseStructureAiModal / AI 구조 생성 | **KPA 1개** | — | **AI 비용/권한/노출 정책** | **D — 정책 IR 선행** |
 | credit/reward 결합 | 강사 UI=**view-only** | — | 지급조건/budget | **D — 별도 작업선** |
 
-**핵심 판단:** 퀴즈/과제/채점/AI 는 **각각 KPA 단일 구현**이다. 공통화(form·lesson manager)가 성립했던 이유는 **KPA·GP 2개 구현을 수렴**할 수 있었기 때문인데, 이 영역은 **수렴할 두 번째 구현이 없다.** 단일 샘플 위에 manager 를 만드는 것은 **조기 추상화**다. 게다가 이미 `renderEditor` slot 으로 LessonModal 이 분리되어 있어 **추가 결합이 없다.** → **퀴즈/과제/채점은 KPA reference 로 유지**, GP/KCos 에 실제 제품 요구가 생기면 그때 slot 안에서 shell 추출(저비용). **AI 구조 생성은 비용/권한/노출 정책 IR 선행**, **credit/reward 는 별도 작업선**.
+**핵심 판단:** 퀴즈/과제/채점/AI 는 **각각 KPA 단일 구현**이다. 공통화(form·lesson manager)가 성립했던 이유는 **KPA 2개 구현을 수렴**할 수 있었기 때문인데, 이 영역은 **수렴할 두 번째 구현이 없다.** 단일 샘플 위에 manager 를 만드는 것은 **조기 추상화**다. 게다가 이미 `renderEditor` slot 으로 LessonModal 이 분리되어 있어 **추가 결합이 없다.** → **퀴즈/과제/채점은 KPA reference 로 유지**, KCos 에 실제 제품 요구가 생기면 그때 slot 안에서 shell 추출(저비용). **AI 구조 생성은 비용/권한/노출 정책 IR 선행**, **credit/reward 는 별도 작업선**.
 
 ## 3. 현재 editor 공통화 완료 상태
 
 | 축 | 결과 | 경계 |
 |----|------|------|
-| 강사 목록 | `InstructorCoursesManager` (KPA/GP/KCos) | config-driven |
-| 강의 기본정보 form | `InstructorCourseFormShell` (KPA create / GP edit) | 순수 UI, onSubmit 주입 |
-| 레슨 목록/순서 | `InstructorLessonListManager` (KPA/GP) | API 주입, **LessonModal=renderEditor slot** |
+| 강사 목록 | `InstructorCoursesManager` (KPA/KCos) | config-driven |
+| 강의 기본정보 form | `InstructorCourseFormShell` (KPA create edit) | 순수 UI, onSubmit 주입 |
+| 레슨 목록/순서 | `InstructorLessonListManager` (KPA) | API 주입, **LessonModal=renderEditor slot** |
 | **LessonModal/editor** | **서비스 wrapper 소유(slot)** | quiz/assignment/AI 는 이 slot **내부** |
 
 → 본 IR 대상(퀴즈/과제/AI)은 전부 **slot 내부**에 있어 공통 shell 과 이미 분리됨.
@@ -57,11 +57,11 @@
 - 파일: `CourseStructureAiModal.tsx`(423줄). **레슨 생성 보조**(강의 생성 아님) — 주제/URL 로 **레슨 후보 5–8개** 생성 후 일괄 생성.
 - **2단계:** ① `POST /api/ai/course-structure` `{ input, type: 'topic'|'url' }` → `GeneratedLesson[]`(title, summary). ② 선택 항목별 순차 `POST /api/ai/lesson-body` → `GeneratedLessonWithBody`(html, bodyFallback). 실패 시 title+summary fallback HTML. 결과는 `handleAddCourseStructureLessons` 로 **article 타입 일괄 createLesson**.
 - **인증/비용:** `getAccessToken()` Bearer 주입(:74,144), rate-limit 회피로 본문 생성 **순차** 호출(:178). **client-side 할당량/비용/권한 게이팅 없음**(429/quota 매핑 없이 generic error만 :224).
-- **노출:** GP 는 `InstructorCourseEditPage` 헤더 주석에 **"KPA 전용 제외: CourseStructureAiModal"** 명시(:1-11). KCos 무.
+- KCos 무.
 
-## 7. GP / KCos 미구현 상태
+## 7. KCos 미구현 상태
 
-- **GP:** LessonModal(video/article) 존재. quiz/assignment 타입은 **placeholder** — `InstructorCourseEditPage.tsx:273`/`:277` "전용 편집기는 별도 구현 예정 … 강의 편집 화면에서 계속 진행". **QuizBuilder/AssignmentEditor/제출·채점/CourseStructureAi 전무.**
+- quiz/assignment 타입은 **placeholder** — `InstructorCourseEditPage.tsx:273`/`:277` "전용 편집기는 별도 구현 예정 … 강의 편집 화면에서 계속 진행". **QuizBuilder/AssignmentEditor/제출·채점/CourseStructureAi 전무.**
 - **KCos:** 강사 editor 자체 없음. `pages/instructor/` = Dashboard + read-only 목록 wrapper 뿐. **InstructorCourseEditPage/LessonModal/Quiz/Assignment/AI 전무**(Phase 1-B 미구축).
 
 ## 8. credit / reward 결합 지점
@@ -72,13 +72,13 @@
 
 ## 9. API / client 사용 현황
 
-- 백엔드 endpoint 는 service-neutral(`/lms/quizzes`·`/lms/assignments`·`/lms/instructor/.../submissions`·`/api/ai/*`) — KCos 백엔드도 존재하나 frontend 미소비. **퀴즈/과제 client 래핑은 KPA 만**(GP/KCos 미사용). → 공통화하더라도 frontend-only, 단 **소비처가 KPA 1곳**뿐.
+- 백엔드 endpoint 는 service-neutral(`/lms/quizzes`·`/lms/assignments`·`/lms/instructor/.../submissions`·`/api/ai/*`) — KCos 백엔드도 존재하나 frontend 미소비. **퀴즈/과제 client 래핑은 KPA 만**(KCos 미사용). → 공통화하더라도 frontend-only, 단 **소비처가 KPA 1곳**뿐.
 
 ## 10. 공통화 후보 A~E (분류)
 
 - **A (공통 shell 가능):** 퀴즈/과제 섹션 layout·empty·add/edit/delete trigger·list shell·status badge. → **단, 소비처 1개라 지금 추출 이득 < 조기 추상화 비용.** 보류.
 - **B (slot 공통화 가능):** QuizBuilder/AssignmentEditor wrapper·grading panel shell·AI 결과 삽입 shell. → **이미 `renderEditor` slot 으로 분리됨.** 추가 wrapper 불필요(중복 경계).
-- **C (KPA-only 유지):** **QuizBuilder · 과제 editor · 제출/채점(GradingModal)** — 단일 구현 + KPA 정책/copy 결합 + GP/KCos 제품 요구 부재. **KEEP reference.**
+- **C (KPA-only 유지):** **QuizBuilder · 과제 editor · 제출/채점(GradingModal)** — 단일 구현 + KPA 정책/copy 결합 + KCos 제품 요구 부재. **KEEP reference.**
 - **D (별도 product decision):** **AI 구조 생성**(비용/권한/quota/서비스 노출 — client 게이팅 0), **credit/reward 지급 조건·budget**, 수료증/이수 정책. → 정책 IR 선행.
 - **E (제외):** Neture(LMS 대상 아님), 결제/checkout/payment, YouTube/LIVE 재도입.
 
@@ -86,17 +86,17 @@
 
 | # | 위험 | 대응 |
 |---|------|------|
-| R1 | 단일 구현(KPA) 위에 manager 추출 → 조기 추상화, GP/KCos 가 안 맞으면 재작업 | **KEEP reference**, 2번째 구현 생길 때 slot 안에서 추출 |
+| R1 | 단일 구현(KPA) 위에 manager 추출 → 조기 추상화, KCos 가 안 맞으면 재작업 | **KEEP reference**, 2번째 구현 생길 때 slot 안에서 추출 |
 | R2 | AI 구조 생성을 기능으로만 보고 공통화 → **비용/권한/quota 정책 누락** | 정책 IR 선행(§12-2) |
 | R3 | 퀴즈/과제 shell 에 credit/reward 혼입 | frontend 결합 0 확인(§8) — 넣지 않음, D 분리 |
 | R4 | RichText/Ai 를 "신규 공통화"로 오인 | 이미 `@o4o/content-editor` 공유 — 재작업 0 |
-| R5 | GP placeholder 를 "곧 동일 구현" 으로 가정 | GP 제품 요구 확정 전 추측 추출 금지 |
+| R5 placeholder 를 "곧 동일 구현" 으로 가정 제품 요구 확정 전 추측 추출 금지 |
 | R6 | KCos 에 editor 신규 구축을 본 IR 에 끌어옴 | 범위 밖(Phase 1-B 별도 WO) |
 
 ## 12. 권장 후속 (1순위 = KEEP)
 
-1. **`KEEP-O4O-LMS-KPA-QUIZ-ASSIGNMENT-AS-REFERENCE-V1` (1순위)** — QuizBuilder · 과제 editor · 제출/채점을 **현재 KPA-only reference 로 유지**. 근거: 단일 구현(수렴 대상 없음) + `renderEditor` slot 으로 이미 분리 + GP/KCos 제품 요구 부재. **GP 가 quiz/assignment 를 실제 구축할 때(placeholder 해소) slot 안에서 shell 추출**(저비용, form/lesson 패턴 동일). 무리한 manager 묶음 금지.
-2. **`IR-O4O-LMS-AI-COURSE-STRUCTURE-POLICY-V1` (2순위)** — AI 강의 구조 생성을 공통화하기 전에 **비용/quota/권한(role)/서비스 노출 정책**을 먼저 조사. 현재 client-side 게이팅 0(`/api/ai/*` Bearer 만) → GP/KCos 노출 시 비용·권한 정책 필수.
+1. **`KEEP-O4O-LMS-KPA-QUIZ-ASSIGNMENT-AS-REFERENCE-V1` (1순위)** — QuizBuilder · 과제 editor · 제출/채점을 **현재 KPA-only reference 로 유지**. 무리한 manager 묶음 금지.
+2. **`IR-O4O-LMS-AI-COURSE-STRUCTURE-POLICY-V1` (2순위)** — AI 강의 구조 생성을 공통화하기 전에 **비용/quota/권한(role)/서비스 노출 정책**을 먼저 조사. 현재 client-side 게이팅 0(`/api/ai/*` Bearer 만) → KCos 노출 시 비용·권한 정책 필수.
 3. **`IR-O4O-REWARD-BUDGET-FLOW-PLATFORM-SERVICE-INSTRUCTOR-V1` (3순위)** — credit/reward 지급 조건·budget/wallet/ledger 는 별도 작업선. 강사 UI 가 view-only 인 현 구조의 지급 주체(backend/operator)·정책을 먼저 정의.
 4. **(후속) `WO-O4O-LMS-KCOS-INSTRUCTOR-EDITOR-PHASE1B-V1`** — KCos editor 를 form shell + lesson manager 위에 신규 구축(퀴즈/과제는 KEEP 결정에 따름).
 
@@ -108,7 +108,7 @@
 
 - [x] 문서 1개만 생성(`docs/investigations/IR-O4O-LMS-INSTRUCTOR-QUIZ-ASSIGNMENT-DESIGN-V1.md`)
 - [x] 코드/package.json/pnpm-lock/Dockerfile/backend/DB/migration 변경 없음(read-only)
-- [x] KPA Quiz(§4)/과제·채점(§5)/AI(§6) 구조 + GP/KCos 미구현(§7) + credit 결합(§8) + API(§9)
+- [x] KPA Quiz(§4)/과제·채점(§5)/AI(§6) 구조 + KCos 미구현(§7) + credit 결합(§8) + API(§9)
 - [x] 분류 A~E(§10) / 위험(§11) / 권장(§12, **1순위 KEEP**) / Neture 제외(§13)
 - [x] "공통화하지 않는 것이 맞는 영역"(C/KEEP) 명시
 

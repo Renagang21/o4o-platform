@@ -8,7 +8,6 @@ GlucoseView 환자 서비스 분리 가능성 조사 보고서
 
 **판정: B — 일부 수정 후 분리 가능**
 
-glycopharm의 환자 모듈은 약사 모듈과 **완전히 독립**되어 있다.
 코드 결합도가 매우 낮아, 환자 페이지 + API 클라이언트를 glucoseview로 복사하고
 인증 어댑터만 수정하면 분리가 가능하다.
 
@@ -16,7 +15,7 @@ glycopharm의 환자 모듈은 약사 모듈과 **완전히 독립**되어 있�
 
 ---
 
-## 1. 환자 페이지 목록 (glycopharm)
+## 1. 환자 페이지 목록 
 
 | # | 파일 | 경로 | 설명 | WO |
 |---|------|------|------|-----|
@@ -36,7 +35,6 @@ glycopharm의 환자 모듈은 약사 모듈과 **완전히 독립**되어 있�
 ## 2. 환자 API 목록 (patientApi)
 
 Base URL: `import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr'`
-인증: `Bearer ${glycopharm_access_token}` (localStorage)
 
 | # | Method | HTTP | Endpoint | 용도 |
 |---|--------|------|----------|------|
@@ -83,15 +81,13 @@ Base URL: `import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr'`
 
 ## 4. 인증 구조 비교
 
-| 항목 | glycopharm (현재) | glucoseview (대상) |
-|------|-------------------|-------------------|
-| 토큰 저장 | localStorage (`glycopharm_access_token`) | httpOnly Cookie |
-| 세션 확인 | `GET /api/v1/auth/me` + Bearer | `GET /api/v1/auth/me` + credentials:include |
-| 로그인 | `POST /api/v1/auth/login` → tokens JSON | `POST /api/v1/auth/login` → credentials:include |
-| API 호출 | Bearer token header | Cookie 기반 |
-| 역할 매핑 | `{customer,user,seller} → 'pharmacy'` | `{customer,user,seller,pharmacist} → 'pharmacist'` |
-
-**핵심 차이**: glycopharm patientApi는 `Bearer token`을 사용하고, glucoseview는 `httpOnly cookie`를 사용한다.
+| 항목 | glucoseview (대상) |
+| ------ | ------------------- |
+| 토큰 저장 | httpOnly Cookie |
+| 세션 확인 | `GET /api/v1/auth/me` + credentials:include |
+| 로그인 | `POST /api/v1/auth/login` → credentials:include |
+| API 호출 | Cookie 기반 |
+| 역할 매핑 | `{customer,user,seller,pharmacist} → 'pharmacist'` |
 
 **분리 시 필요한 작업**: patientApi의 `getAccessToken()` 호출을 glucoseview의 cookie 기반 인증으로 교체.
 
@@ -129,30 +125,13 @@ Base URL: `import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr'`
 
 ## 6. 의존성 비교
 
-### glycopharm 환자 페이지가 사용하는 의존성
-
-```
-react, react-dom, react-router-dom  ← glucoseview에 있음
-lucide-react                         ← glucoseview에 있음
-@/api/patient.ts                     ← 복사 필요
-@/contexts/AuthContext.tsx            ← glucoseview 것 사용 (어댑터 필요)
-tailwindcss                          ← glucoseview에 있음
-```
-
-**추가 패키지 불필요**. 환자 페이지는 core 패키지(`@o4o/types`, `@o4o/ui` 등)를 사용하지 않는다.
-
----
-
 ## 7. 분리 방법 추천
 
 ### 방법: 페이지 복사 + API 어댑터
 
 ```
-Step 1: glycopharm/src/pages/patient/* → glucoseview/src/pages/patient/
-        glycopharm/src/pages/PatientPlaceholderPage.tsx → glucoseview/src/pages/patient/
         (8 파일 복사)
 
-Step 2: glycopharm/src/api/patient.ts → glucoseview/src/api/patient.ts
         (1 파일 복사 + 인증 방식 수정)
 
 Step 3: glucoseview/src/App.tsx에 환자 라우트 8개 추가
@@ -187,7 +166,6 @@ Step 6: 환자 라우트에 role guard 적용 (allowedRoles: ['patient'])
 | 토큰 키 충돌 | 두 서비스 동시 사용 시 혼동 | 서비스별 토큰 키 분리 (이미 분리됨) |
 | 환자 역할 미정의 | 접근 제어 부재 | glucoseview AuthContext에 'patient' role 매핑 |
 | API 경로 동일 | 없음 | 모두 동일 백엔드 사용 (`api.neture.co.kr`) |
-| glycopharm에서 환자 코드 제거 | 약사 → 환자 코칭 링크 깨짐 | 분리 후 glycopharm에서 환자 라우트 유지 또는 리다이렉트 |
 
 ---
 
@@ -195,7 +173,6 @@ Step 6: 환자 라우트에 role guard 적용 (allowedRoles: ['patient'])
 
 ```
 현재:
-  glycopharm.co.kr
     ├── /patient/*    ← 환자 기능 (8 라우트)
     ├── /pharmacist/* ← 약사 기능 (6 라우트)
     └── /care/*       ← 약사 Care (8 라우트)
@@ -204,7 +181,6 @@ Step 6: 환자 라우트에 role guard 적용 (allowedRoles: ['patient'])
   glucoseview.co.kr   ← 환자 PWA
     └── /patient/*    ← 환자 기능 (8 라우트)
 
-  glycopharm.co.kr    ← 약사 서비스
     ├── /pharmacist/* ← 약사 기능 (유지)
     └── /care/*       ← 약사 Care (유지)
 ```

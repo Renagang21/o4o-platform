@@ -45,22 +45,22 @@ KPA QR 제작 화면에서 **QR 문구를 AI로 생성하는 페이지 진입점
 ## 5. 검증 기타
 - `web-kpa-society` tsc --noEmit 오류 0(StoreQRPage 0). Web Cloud Run 배포 success(backend 무변경 → api 배포 불필요).
 
-## 6. GP/KCos 영향
+## 6. KCos 영향
 - 본 WO는 `services/web-kpa-society/src/pages/pharmacy/StoreQRPage.tsx` 단일 변경.
-- GP/KCos의 QR/POP 화면(`services/web-glycopharm/*`, `services/web-k-cosmetics/*`)은 **별도 파일 → 무변경**. 공통 컴포넌트(AiContentModal) 미변경.
-- → **KPA QR만 AI 진입점 제거, GP/KCos 무영향.**
+- KCos의 QR/POP 화면은 **별도 파일 → 무변경**. 공통 컴포넌트(AiContentModal) 미변경.
+- → **KPA QR만 AI 진입점 제거, KCos 무영향.**
 
 ## 7. 범위/안전
 - AiContentModal/api·ai-prompts/Toolbar AI 삭제 0. QR target·데이터·migration 0. POP/콘텐츠제작/블로그/강의 AI는 본 WO 미포함.
 
 ## 8. 후속
 - **`WO-O4O-KPA-CONTENT-CREATE-AI-STEP-REMOVE-V1`**(다음 후보 — 콘텐츠 제작 모달 "자료 선택→AI 본문 생성", 새 정책과 가장 직접 충돌).
-- 이후 POP-AI / BLOG-AI / 강의 / 사이니지 AI → GP/KCos parity → 외부 LLM 안내(IR §G 순).
+- 이후 POP-AI / BLOG-AI / 강의 / 사이니지 AI → KCos parity → 외부 LLM 안내(IR §G 순).
 
 ---
 
 ## 9. 최종 판정
 
-> KPA `/store/marketing/qr`의 QR 만들기 흐름에서 "AI 문구 생성/보조" 진입점이 제거되고, QR 생성은 수동 입력 기반으로 정상 동작한다. AiContentModal/`/api/ai/content`/편집기 Toolbar AI는 보존되며, 기존 QR 공개 URL·목록·삭제·inline QR이 회귀하지 않는다. GP/KCos 무영향.
+> KPA `/store/marketing/qr`의 QR 만들기 흐름에서 "AI 문구 생성/보조" 진입점이 제거되고, QR 생성은 수동 입력 기반으로 정상 동작한다. AiContentModal/`/api/ai/content`/편집기 Toolbar AI는 보존되며, 기존 QR 공개 URL·목록·삭제·inline QR이 회귀하지 않는다. KCos 무영향.
 
 → **충족.**

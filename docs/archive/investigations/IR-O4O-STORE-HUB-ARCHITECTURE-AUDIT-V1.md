@@ -11,21 +11,20 @@
 ## Executive Summary
 
 O4O 플랫폼의 **Store HUB가 서비스 간 일관된 Core Pattern을 형성하는지** 전수 조사하였다.
-KPA, GlycoPharm, K-Cosmetics, Neture 4개 서비스의 Store 진입 구조, Controller/API 구조, 상품 구조, 채널 구조, KPI 구조, service_key 사용 현황을 비교 분석한다.
+KPA, K-Cosmetics, Neture 3개 서비스의 Store 진입 구조, Controller/API 구조, 상품 구조, 채널 구조, KPI 구조, service_key 사용 현황을 비교 분석한다.
 
 ### 핵심 판정
 
 > **Store HUB는 이미 80% Core Pattern을 형성하고 있다.**
-> **나머지 20%는 GlycoPharm의 service_key 하드코딩 + Cosmetics 독립 스키마 문제이다.**
 
 | 영역 | Core Pattern 준수 | 비고 |
 |------|:------------------:|------|
 | Slug 기반 Public 진입 | **Unified** | `unified-store-public.routes.ts` (서비스 무관) |
 | 상품 가시성 게이트 | **Unified** | 4-tier Visibility Gate 공유 |
 | 채널 모델 | **Unified** | B2C/KIOSK/TABLET/SIGNAGE 공통 |
-| service_key 파라미터화 | **Partial** | GlycoPharm에 `'kpa'` 하드코딩 3건 |
+| service_key 파라미터화 | **Partial** | — |
 | KPI 집계 | **Unified** | Store HUB에서 service_key 무관 집계 |
-| 상품 스키마 | **Split** | Cosmetics 독립 (`cosmetics_*`), KPA/GlycoPharm 공유 |
+| 상품 스키마 | **Split** | Cosmetics 독립 (`cosmetics_*`), KPA 공유 |
 | 프론트엔드 대시보드 | **Unified** | `@o4o/store-ui-core` 공통 레이아웃 |
 
 ---
@@ -86,62 +85,6 @@ KPI:
 
 ---
 
-### A-2. GlycoPharm
-
-```
-진입 경로:
-  Operator Dashboard → Store → /store/*
-  Public Storefront  → /stores/:slug/* (unified)
-  Legacy Storefront  → /store/* (glycopharm 전용)
-
-Backend 라우트:
-  /api/v1/o4o-store/hub/*          → store-hub.controller.ts (공유, 인증)
-  /api/v1/o4o-store/products/*     → pharmacy-products.controller.ts (공유, 인증)
-  /api/v1/stores/:slug/*           → unified-store-public.routes.ts (공유, 공개)
-  /api/v1/glycopharm/store/*       → store.controller.ts (독립, 인증)  ← 문제
-
-상품 소스:
-  organization_product_listings (service_key='kpa' ← 하드코딩!)
-    → 동일 KPA 파이프라인 사용
-
-채널 구조:
-  KPA와 동일한 organization_channels/product_channels 사용
-
-KPI:
-  공유 Store HUB KPI + 독자 GlycoPharm Cockpit
-  useStoreHub Hook: AI Summary, Today Actions, Care, Signage, Products 5개 병렬 fetch
-
-특이사항:
-  ⚠️ service_key='kpa' 하드코딩 (store.controller.ts 3곳)
-  → GlycoPharm 전용 상품 구분 불가
-  → Unified Store와 동작이 다름 (Unified는 파라미터화)
-```
-
-**service_key 하드코딩 상세:**
-
-| 위치 | 라인 | SQL 컨텍스트 |
-|------|------|-------------|
-| `queryVisibleProducts()` COUNT | L116 | `AND opl.service_key = 'kpa'` |
-| `queryVisibleProducts()` DATA | L153 | `AND opl.service_key = 'kpa'` |
-| Categories 쿼리 | L271 | `AND opl.service_key = 'kpa'` |
-
-**파일:** `apps/api-server/src/routes/glycopharm/controllers/store.controller.ts`
-
-**프론트엔드 페이지:**
-
-| 페이지 | 파일 | 역할 |
-|--------|------|------|
-| StoreFront | `store/StoreFront.tsx` | 공개 매장 (API-driven) |
-| StoreOverviewPage | `store/StoreOverviewPage.tsx` | 운영자 대시보드 |
-| StoreProducts | `store/StoreProducts.tsx` | 상품 목록 |
-| StoreProductDetail | `store/StoreProductDetail.tsx` | 상품 상세 |
-| StoreCart | `store/StoreCart.tsx` | 장바구니 |
-| StoreBillingPage | `pharmacy/StoreBillingPage.tsx` | 결제 설정 |
-| StoreEntryPage | `store/StoreEntryPage.tsx` | 매장 진입 |
-| StoreAssetsPage | `store/StoreAssetsPage.tsx` | 에셋 관리 |
-
----
-
 ### A-3. K-Cosmetics
 
 ```
@@ -173,7 +116,6 @@ KPI:
   - 완전 독립 스키마 (cosmetics_* prefix)
   - Organization 기반이 아닌 Scope 기반 접근 제어
   - Unified Store Public API는 slug 해석까지만 공유
-  - 상품 가시성 게이트가 KPA/GlycoPharm과 다름
   - 사이니지 연동 (WO-KCOS-STORES-PHASE4-SIGNAGE-INTEGRATION-V1) 별도 구현
 ```
 
@@ -226,21 +168,21 @@ KPI:
 
 ### B-1. Store HUB 구조 비교
 
-| 항목 | KPA | GlycoPharm | K-Cosmetics | Neture |
-|------|:---:|:----------:|:-----------:|:------:|
-| **Unified Public API** | ✅ | ✅ | ✅ (slug만) | ✅ |
-| **Store HUB Controller** | ✅ | ✅ | ❌ | ❌ |
-| **Pharmacy Products** | ✅ | ✅ | ❌ | ❌ |
-| **org_product_listings** | ✅ | ✅ | ❌ | ✅ (공급) |
-| **org_product_channels** | ✅ | ✅ | ❌ | ❌ |
-| **organization_channels** | ✅ | ✅ | ❌ | ❌ |
-| **4-tier Visibility Gate** | ✅ | ✅ | ❌ | ❌ |
-| **service_key 파라미터화** | ✅ | ⚠️ 하드코딩 | N/A | ✅ |
-| **store-ui-core 사용** | ✅ | ✅ | ✅ | ❌ |
-| **Checkout 연동** | ✅ | ✅ | ✅ | ❌ (B2B) |
-| **Block Engine** | ✅ | ❌ (API-driven) | ❌ | ❌ |
-| **StoreLocalProduct** | ✅ | ✅ | ❌ | ❌ |
-| **독자 store controller** | ❌ | ✅ (`store.controller.ts`) | ✅ (`cosmetics-store.controller.ts`) | ❌ |
+| 항목 | KPA | K-Cosmetics | Neture |
+| ------ | :---: | :-----------: | :------: |
+| **Unified Public API** | ✅ | ✅ (slug만) | ✅ |
+| **Store HUB Controller** | ✅ | ❌ | ❌ |
+| **Pharmacy Products** | ✅ | ❌ | ❌ |
+| **org_product_listings** | ✅ | ❌ | ✅ (공급) |
+| **org_product_channels** | ✅ | ❌ | ❌ |
+| **organization_channels** | ✅ | ❌ | ❌ |
+| **4-tier Visibility Gate** | ✅ | ❌ | ❌ |
+| **service_key 파라미터화** | ✅ | N/A | ✅ |
+| **store-ui-core 사용** | ✅ | ✅ | ❌ |
+| **Checkout 연동** | ✅ | ✅ | ❌ (B2B) |
+| **Block Engine** | ✅ | ❌ | ❌ |
+| **StoreLocalProduct** | ✅ | ❌ | ❌ |
+| **독자 store controller** | ❌ | ✅ (`cosmetics-store.controller.ts`) | ❌ |
 
 ### B-2. service_key 사용 현황
 
@@ -250,16 +192,14 @@ KPI:
 | `unified-store-public.routes.ts` | `resolvePublicStore()` → slug 해석 | 동적 (slug 기반) | **Safe** |
 | `auto-listing.utils.ts` | `organization_service_enrollments.service_code` | 동적 (enrollment 기반) | **Safe** |
 | `store-hub.controller.ts` | service_key 미필터링 | 전체 집계 | **Safe** |
-| `glycopharm/store.controller.ts` | **하드코딩** | `'kpa'` 3곳 | **Critical** |
 | `organization-product-listing.entity.ts` | Entity default | `'kpa'` (DDL default) | **Info** |
-| `constants/service-keys.ts` | 상수 정의 | kpa, kpa-groupbuy, cosmetics, glycopharm | **Ref** |
+| `constants/service-keys.ts` | 상수 정의 | kpa, kpa-groupbuy, cosmetics | **Ref** |
 
 ### B-3. 프론트엔드 Store 메뉴 구성
 
 | 서비스 | 메뉴 수 | 활성 메뉴 |
 |--------|:-------:|----------|
 | KPA Society | 커스텀 | Operation/Marketing/Commerce/Analytics 그룹 |
-| GlycoPharm | 8 | dashboard, products, channels, orders, content, signage, billing, settings |
 | K-Cosmetics | 6 | dashboard, products, orders, billing, content, settings |
 | GlucoseView | 2 | dashboard, settings |
 
@@ -288,7 +228,6 @@ KPI:
 |---------|----------|------------------|
 | `store-hub.controller.ts` | `o4o-store/controllers/` | ✅ 이미 공유 위치, 리네임만 필요 |
 | `pharmacy-products.controller.ts` | `o4o-store/controllers/` | ✅ 이미 공유 위치 |
-| GlycoPharm `store.controller.ts` | `glycopharm/controllers/` | ⚠️ service_key 파라미터화 후 unified로 흡수 가능 |
 
 ### C-3. Core 외부 유지 (서비스 고유)
 
@@ -296,50 +235,23 @@ KPI:
 |---------|-------|------|
 | `cosmetics-store.controller.ts` | K-Cosmetics | 독립 스키마 (`cosmetics_*`), Scope 기반 접근 |
 | Neture Supplier/Partner routes | Neture | B2B 구조, Store HUB 직접 소비자 아님 |
-| GlycoPharm Cockpit (`useStoreHub`) | GlycoPharm | 서비스 고유 대시보드 집계 |
 
 ---
 
 ## D. 핵심 발견사항
 
-### D-1. GlycoPharm service_key 하드코딩 (Critical)
-
-**문제:**
-`glycopharm/controllers/store.controller.ts`의 `queryVisibleProducts()` 함수가 `service_key = 'kpa'`를 하드코딩하고 있다.
-
-```sql
--- store.controller.ts L116, L153, L271
-AND opl.service_key = 'kpa'   -- ← 하드코딩
-```
-
-**영향:**
-1. GlycoPharm 매장에서 `service_key='glycopharm'` 상품을 볼 수 없음
-2. GlycoPharm 전용 상품/카테고리 구분 불가
-3. Unified Store Public API와 동작 불일치 (unified는 파라미터화)
-
-**권장 수정:**
-```sql
--- Before (하드코딩)
-AND opl.service_key = 'kpa'
-
--- After (파라미터화)
-AND opl.service_key = $N   -- pharmacy의 service enrollment에서 resolve
-```
-
-또는 `unified-store-public.routes.ts`의 `queryVisibleProducts()`를 재사용하여 중복 제거.
-
 ### D-2. Cosmetics 독립 스키마 (Design Decision)
 
 **현황:** Cosmetics는 `cosmetics_*` prefix 독립 스키마를 사용하며, `organization_product_listings`를 공유하지 않는다.
 
-**이유:** `COSMETICS-DOMAIN-RULES.md`에 의한 의도적 설계. Cosmetics는 brand/line/variant 기반 상품 구조를 가지며, KPA/GlycoPharm의 supplier_product_offers 기반 구조와 다르다.
+**이유:** `COSMETICS-DOMAIN-RULES.md`에 의한 의도적 설계.
 
 **판정:** 이는 **의도적 아키텍처 결정**이며, 무리한 통합은 오히려 복잡성을 증가시킨다. Slug 기반 Public 진입과 Checkout만 공유하는 현재 구조가 적절하다.
 
 ### D-3. Store HUB Controller의 서비스 무관 집계 (Good Pattern)
 
 `store-hub.controller.ts`의 KPI 및 채널 메트릭 쿼리는 service_key로 필터링하지 않는다. 이는 **의도적 설계**이다:
-- 약국(Organization)은 여러 service에 동시 가입 가능 (KPA + GlycoPharm)
+- 약국(Organization)은 여러 service에 동시 가입 가능 (KPA)
 - Store HUB는 모든 서비스의 상품/채널을 통합 표시
 - KPI는 서비스 구분 없이 매장 전체 성과를 보여줌
 
@@ -364,15 +276,13 @@ AND opl.service_key = $N   -- pharmacy의 service enrollment에서 resolve
 
 ### 질문 1: Store HUB가 서비스 간 일관된 Core Pattern인가?
 
-**답: Yes (80%).** Unified Public API, Slug System, Channel Model, auto-listing, store-ui-core가 이미 서비스 무관하게 동작한다. GlycoPharm의 하드코딩 3건만 수정하면 95%까지 올라간다.
+**답: Yes (80%).** Unified Public API, Slug System, Channel Model, auto-listing, store-ui-core가 이미 서비스 무관하게 동작한다.
 
 ### 질문 2: 서비스별 차이점은 무엇인가?
 
 | 차이점 | 범위 | 해결 방법 |
 |--------|------|----------|
-| GlycoPharm service_key 하드코딩 | Controller 3곳 | 파라미터화 (WO 1건) |
 | Cosmetics 독립 스키마 | 의도적 설계 | 유지 (통합 불필요) |
-| GlycoPharm 독자 store.controller | Legacy 매장 페이지 | Unified 흡수 가능 (WO 1건) |
 | Block Engine vs API-driven 매장 | 프론트엔드 | 점진적 Block Engine 확산 |
 
 ### 질문 3: Core + Extension 경계는 어디인가?
@@ -409,7 +319,7 @@ AND opl.service_key = $N   -- pharmacy의 service enrollment에서 resolve
 │  SERVICE EXTENSIONS (서비스 고유)                                 │
 │                                                                 │
 │  KPA:        Block Engine StorefrontHomePage                    │
-│  GlycoPharm: Cockpit useStoreHub, AI Summary, Today Actions    │
+│  Cockpit useStoreHub, AI Summary, Today Actions                │
 │  Cosmetics:  독립 cosmetics_* 스키마, Scope 기반 접근            │
 │  Neture:     B2B Supplier/Partner 구조, 유통 엔진               │
 │  GlucoseView: 최소 대시보드 (dashboard + settings only)          │
@@ -422,8 +332,6 @@ AND opl.service_key = $N   -- pharmacy의 service enrollment에서 resolve
 
 이미 대부분 Core 위치(`routes/platform/`, `routes/o4o-store/`, `packages/store-ui-core/`)에 존재한다. 신규 추출보다는:
 
-1. **GlycoPharm 하드코딩 제거** (WO 1건, 영향 최소)
-2. **GlycoPharm store.controller.ts → Unified 흡수** (WO 1건)
 3. **Freeze 선언** (Store Core 경계 확정)
 
 이 3건으로 "새 서비스 → Store HUB 자동 사용" 패턴이 완성된다.
@@ -451,29 +359,6 @@ AND opl.service_key = $N   -- pharmacy의 service enrollment에서 resolve
 
 ## G. 후속 WO 제안
 
-### WO-1: GlycoPharm service_key 파라미터화 (Priority: High)
-
-```
-대상: apps/api-server/src/routes/glycopharm/controllers/store.controller.ts
-작업:
-  1. queryVisibleProducts()의 'kpa' → 파라미터 변수로 변경
-  2. 또는 unified-store-public.routes.ts의 queryVisibleProducts() 재사용
-예상 영향: 최소 (같은 'kpa' 값이 파라미터로 전달될 뿐)
-위험도: Low
-```
-
-### WO-2: GlycoPharm Legacy Store Controller 통합 (Priority: Medium)
-
-```
-대상: glycopharm/controllers/store.controller.ts → unified 흡수
-작업:
-  1. GlycoPharm 전용 매장 페이지를 unified 기반으로 전환
-  2. store.controller.ts의 고유 기능(categories 등) unified로 이관
-  3. 레거시 라우트 deprecation
-예상 영향: GlycoPharm 매장 프론트엔드 수정 필요
-위험도: Medium
-```
-
 ### WO-3: Store Core Freeze 선언 (Priority: High)
 
 ```
@@ -490,8 +375,6 @@ AND opl.service_key = $N   -- pharmacy의 service enrollment에서 resolve
 ## H. 결론
 
 1. **Store HUB는 이미 사실상 Core이다.** 별도 "추출" 작업 없이 정비만으로 Core 완성도 95%+ 달성 가능.
-
-2. **GlycoPharm service_key 하드코딩이 유일한 Critical 이슈.** 3곳 파라미터화로 해결.
 
 3. **Cosmetics 독립 스키마는 의도적 설계.** 무리한 통합은 복잡성만 증가시킨다. Slug + Checkout 수준의 공유가 적절.
 

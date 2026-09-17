@@ -57,7 +57,7 @@ listing/local/UUID 미노출.
 공개 응답에 `selectedContentId/Title/Html` attach. kiosk(tablet-kiosk-core, 공유) 상세 뷰에서
 선택 콘텐츠가 있으면 **제목+본문**을 기존 `ContentRenderer`(DOMPurify sanitize) 로 표시, 없으면 기존 description/summary.
 콘텐츠 삭제(content_id SET NULL) / 연결 해제(링크 join 실패) 시 **자동 폴백**.
-공유 패키지 변경 additive — GP/KCos 는 `selectedContent` 미주입 → 동일 동작.
+공유 패키지 변경 additive — KCos 는 `selectedContent` 미주입 → 동일 동작.
 
 ## 7. 비범위 확인 (WO §10)
 
@@ -69,7 +69,6 @@ listing/local/UUID 미노출.
 |---|---|
 | api-server | **PASS** |
 | web-kpa-society | **PASS** |
-| web-glycopharm | **PASS** |
 | web-k-cosmetics | **PASS** |
 
 ## 9. API smoke — lifecycle **ALL PASS** (2026-06-27, prod, renagang21)
@@ -105,7 +104,7 @@ listing/local/UUID 미노출.
 
 ## 상태
 
-- 구현 / typecheck(api-server + web-kpa/glyco/kcos): **완료**
+- 구현 / typecheck: **완료**
 - 배포: `ce204d9e2`/`b670b6ba1`/`aa1dda2ec` → API/Web success, migration(content_id) 적용
 - API smoke: **lifecycle ALL PASS** (공개 positive attach = 코드 RCA, 실 데이터 보호로 라이브 보류)
 - 데이터 정리: **완료** (임시 tablet/product/content 삭제)

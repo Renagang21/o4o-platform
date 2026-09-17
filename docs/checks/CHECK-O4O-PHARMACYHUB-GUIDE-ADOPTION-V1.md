@@ -83,7 +83,7 @@ PharmacyHub 전용 Guide framework 는 만들지 않는다.
 - **금지 사항 준수**
   - `GuideServiceIntroPage` 내부 `serviceKey` 분기 **0** (View 무수정)
   - PharmacyHub 전용 shared View 복제 **0**
-  - KPA · KCos · GP 문구 복사 후 의미만 바꾸기 **0** — 문구는 실제 PharmacyHub route·메뉴·화면 라벨
+  - KPA · KCos 문구 복사 후 의미만 바꾸기 **0** — 문구는 실제 PharmacyHub route·메뉴·화면 라벨
     (`PHARMACY_HUB_STORE_CONFIG` · 각 페이지 UI 텍스트)에 근거해 새로 작성
 
 ---
@@ -143,7 +143,6 @@ PharmacyHub 전용 Guide framework 는 만들지 않는다.
 |--------|------|:-----:|
 | KPA-Society | 없음 | PASS (18.67s) |
 | K-Cosmetics | 없음 | PASS (32.40s) |
-| GlycoPharm | 없음 | PASS (32.29s) |
 | Neture | 없음 (`/guide` shared shell 구조 무변경) | PASS (16.55s) |
 | PharmacyHub | 도입 | PASS (41.14s) |
 

@@ -83,7 +83,6 @@ Commerce 엔티티 참조 없음.
 | `20260224400000-AddStoreLocalProductContentFields.ts` | 콘텐츠 확장 | SAFE |
 | `checkout.controller.ts` | Guard 주석만 | SAFE |
 | `cosmetics-order.controller.ts` | Guard 주석만 | SAFE |
-| `glycopharm-store-data.adapter.ts` | Guard 주석만 | SAFE |
 | `cosmetics-store-summary.service.ts` | Guard 주석만 | SAFE |
 | `store-hub.controller.ts` | Guard 주석만 | SAFE |
 | `STORE-LOCAL-PRODUCT-BOUNDARY-POLICY-V1.md` | 정책 문서 | SAFE |
@@ -95,13 +94,6 @@ Commerce 엔티티 참조 없음.
 ## 2. Checkout Isolation 검증
 
 **판정: PASS**
-
-### GlycoPharm Checkout (`checkout.controller.ts`)
-
-- **Product 조회 대상**: `GlycopharmProduct` 엔티티 (`glycopharm_products` 테이블) 전용
-- **Guard**: WO-STORE-LOCAL-PRODUCT-HARDENING-V1 마커 존재 (line 319-324)
-- **차단 메커니즘**: `store_local_products` UUID는 `glycopharm_products`에 존재 불가 → `PRODUCT_NOT_FOUND`로 구조적 거부
-- **Indirect 경로**: 없음
 
 ### Cosmetics Checkout (`cosmetics-order.controller.ts`)
 
@@ -131,7 +123,6 @@ Commerce 엔티티 참조 없음.
 
 **Supplier Query** (line 794-801):
 ```
-glycopharm_products
   INNER JOIN organization_product_listings
   INNER JOIN organization_product_channels
   INNER JOIN organization_channels
@@ -154,12 +145,6 @@ store_local_products WHERE organization_id = $1 AND is_active = true
 ## 4. KPI Isolation 검증
 
 **판정: PASS**
-
-### GlycoPharm `getTopProducts()` (`glycopharm-store-data.adapter.ts`)
-
-- **집계 대상**: `ecommerce_order_items JOIN ecommerce_orders`
-- **store_local_products 참조**: 없음
-- **WO 마커**: KPI 오염 방지 주석 존재 (line 73-79)
 
 ### Cosmetics `getTopProducts()` (`cosmetics-store-summary.service.ts`)
 

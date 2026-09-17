@@ -3,7 +3,7 @@
  *
  * WO-O4O-STORE-PROFILE-UNIFICATION-V1:
  *   한국 주소 표준 기반 4필드 구조.
- *   organizations, glycopharm_pharmacies, cosmetics_stores 테이블의
+ *   organizations, cosmetics_stores 테이블의
  *   address_detail (jsonb) 컬럼에 저장.
  */
 export interface StoreAddress {

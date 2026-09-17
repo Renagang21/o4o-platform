@@ -34,7 +34,7 @@
  *     utils/store-owner.utils.ts 의 isStoreOwner() 는 organization_members 를
  *     ORDER BY 없이 LIMIT 1 로 읽으므로 다중 조직 계정에서 **비결정적**이며,
  *     서비스 스코프도 걸지 않는다(프로덕션 실측: PH store_owner 3계정 중 1계정이
- *     타 서비스 조직 3개 보유). 공통 해석기 정비는 KPA/GlycoPharm/K-Cosmetics 까지
+ *     타 서비스 조직 3개 보유). 공통 해석기 정비는 KPA/K-Cosmetics 까지
  *     영향을 주는 별도 작업이므로 **본 WO 는 공통 해석기를 변경하지 않고**
  *     Pharmacy-Hub 전용 읽기 경로에서만 enrollment 스코프를 적용한다.
  *

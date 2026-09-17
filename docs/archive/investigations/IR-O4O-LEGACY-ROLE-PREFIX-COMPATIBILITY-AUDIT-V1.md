@@ -20,8 +20,6 @@ role_assignments 역할 분포 (15명 기준)
    4  kpa:store_owner      ← 서비스 접두사 ✅
    1  kpa:admin            ← 서비스 접두사 ✅
    1  kpa:operator         ← 서비스 접두사 ✅
-   1  glycopharm:admin     ← 서비스 접두사 ✅
-   1  glycopharm:operator  ← 서비스 접두사 ✅
    1  cosmetics:admin      ← 서비스 접두사 ✅
    1  cosmetics:operator   ← 서비스 접두사 ✅
    1  cosmetics:store_owner← 서비스 접두사 ✅
@@ -120,22 +118,16 @@ if (!scope.isPlatformAdmin && scope.serviceKeys.length === 0) {
 
 ```
 sohae2100@gmail.com 역할:
-  role_assignments: ['super_admin', 'kpa:admin', 'glycopharm:admin', 'cosmetics:admin', 'neture:admin', ...]
 
 extractServiceScope() 처리:
   isPlatformAdmin(['super_admin', ...]) → FALSE (platform: 없음)
   kpa:admin       → serviceKey: 'kpa-society'
-  glycopharm:admin → serviceKey: 'glycopharm'
   cosmetics:admin  → serviceKey: 'k-cosmetics'
   neture:admin     → serviceKey: 'neture'
-  Result: { isPlatformAdmin: false, serviceKeys: ['kpa-society','glycopharm','k-cosmetics','neture'] }
 
 deleteMember(mode='hard') 결과:
-  DELETE service_memberships WHERE service_key = ANY(['kpa-society','glycopharm','k-cosmetics','neture'])
   → 4개 서비스 membership 모두 삭제 (의도: KPA만 삭제)
 ```
-
-→ **실제 발생**: CHECK 중 glycopharm membership이 함께 삭제됨.
 
 ### Scenario B — 순수 super_admin 계정 (platform: 없음, 서비스 역할 없음)
 

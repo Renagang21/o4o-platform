@@ -77,7 +77,6 @@ Market Trial 기능 로직 / API / DB / 엔티티 / 라우트명 / 결제·정�
 |--------|:---:|
 | shared-space-ui | ✅ exit 0 |
 | web-neture | ✅ exit 0 |
-| web-glycopharm | ✅ exit 0 |
 | web-k-cosmetics | ✅ exit 0 |
 | web-kpa-society | ✅ exit 0 |
 
@@ -88,7 +87,7 @@ Market Trial 기능 로직 / API / DB / 엔티티 / 라우트명 / 결제·정�
 
 ## 11. Shared Module 영향 (변경한 공통 모듈)
 
-- `GuideFeatureManualPage` / `types` 변경은 **추가된 필드가 전부 optional** — 기존 소비처(neture/glycopharm/k-cosmetics/kpa 의 `GuideFeature*Page` 다수)는 `index`/`section.id` 미지정 시 **기존 레이아웃 그대로**. 5개 패키지 tsc PASS 로 무영향 확인.
+- `GuideFeatureManualPage` / `types` 변경은 **추가된 필드가 전부 optional** — 기존 소비처는 `index`/`section.id` 미지정 시 **기존 레이아웃 그대로**. 5개 패키지 tsc PASS 로 무영향 확인.
 - 동작 변경은 `index`/`id` 를 채운 Neture market-trial copy 에만 적용.
 
 ## 12. 내부 `Market Trial` 식별자 유지

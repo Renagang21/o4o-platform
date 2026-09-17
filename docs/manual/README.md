@@ -12,7 +12,6 @@ manual/
     admin/            관리자 매뉴얼
     pharmacist/       약사 매뉴얼
     assets/           스크린샷
-  glycopharm/         GlycoPharm
     operator/         운영자 매뉴얼
     assets/           스크린샷
   k-cosmetics/        K-Cosmetics

@@ -4,7 +4,7 @@
  * WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §6
  *
  * 검증 대상:
- *   1. 기존 3서비스(KPA/GP/KCos) + Neture 의 공통 CMS write 정책 **변화 0**
+ *   1. 기존 2서비스(KPA/KCos) + Neture 의 공통 CMS write 정책 **변화 0**
  *   2. PH 회원 저작이 멤버십 축으로만 열린다 (role 승격 없음)
  *   3. 회원 self-transition 이 서버 정본 전이표의 **부분집합** (불가능한 전이 미노출)
  *   4. 작성자 본인 경계 (타인 콘텐츠 수정·전이 불가)

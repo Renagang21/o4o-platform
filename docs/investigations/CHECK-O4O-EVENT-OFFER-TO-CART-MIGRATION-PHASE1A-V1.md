@@ -10,7 +10,7 @@
 
 ## 1. 범위 (Phase 1a)
 
-- KPA 이벤트오퍼 **상세 화면**(`EventOfferDetailPage`)만 대상. (목록/일괄주문·Glyco·KCos 는 후속)
+- KPA 이벤트오퍼 **상세 화면**(`EventOfferDetailPage`)만 대상.
 - 이벤트오퍼 상품을 `StoreCartItem(sourceType='event_offer')` 로 담는다.
 - checkout 확정·N분할 createOrder·수량 차감 이전·participate 제거는 **하지 않음**.
 
@@ -113,7 +113,6 @@
   sellerOrganizationId resolve.
 - **Phase 1a 후속(소)**: KPA 이벤트오퍼 **목록 일괄주문**(`KpaEventOfferPage`)도 cart 담기 전환,
   store-hub 사이드바에 "내 장바구니" 진입점 노출.
-- **Phase 1c** `WO-O4O-EVENT-OFFER-TO-CART-CROSSSERVICE-V2`: Glyco/KCos 동일 패턴(공통화 세션 정리 후).
 
 ---
 

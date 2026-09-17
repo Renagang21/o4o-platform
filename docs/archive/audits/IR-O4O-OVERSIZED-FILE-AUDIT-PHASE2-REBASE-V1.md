@@ -16,7 +16,6 @@
 | Frontend | admin-dashboard | 104 | 25 | 5 |
 | Frontend | main-site | 12 | 2 | 2 |
 | Services | web-neture | 32 | 14 | 2 |
-| Services | web-glycopharm | 28 | 9 | 1 |
 | Services | web-glucoseview | 8 | 3 | 1 |
 | Services | web-k-cosmetics | 10 | 4 | 0 |
 | Services | web-kpa-society | 46 | 18 | 4 |
@@ -144,12 +143,10 @@
 | # | 서비스 | 파일 | 줄 수 |
 |---|--------|------|------:|
 | 1 | web-neture | `partner/PartnerOverviewPage.tsx` | 1,166 |
-| 2 | web-glycopharm | `api/pharmacy.ts` | 1,097 |
 | 3 | web-kpa-society | `mypage/AnnualReportFormPage.tsx` | 1,093 |
 | 4 | web-kpa-society | `pharmacy/PharmacyStorePage.tsx` | 1,075 |
 | 5 | web-glucoseview | `PatientsPage.tsx` | 1,054 |
 | 6 | web-neture | `forum/ForumPostPage.tsx` | 1,035 |
-| 7 | web-glycopharm | `pharmacy/StoreSignagePage.tsx` | 1,028 |
 | 8 | web-kpa-society | `DashboardPage.tsx` | 1,004 |
 
 ### Packages P1 (900줄+)
@@ -187,10 +184,10 @@
 | 줄 수 범위 | 파일 수 | 대표 영역 |
 |-----------|------:|---------|
 | 1200+ | 5 | neture, signage, main, auth |
-| 800-1199 | 23 | signage, glycopharm, cosmetics, kpa, operator |
+| 800-1199 | 23 | signage, cosmetics, kpa, operator |
 | 500-799 | 79 | 전 도메인 분산 |
 
-**최대 밀집 영역:** signage (service 1,337 + controller 1,231 + repository 1,040 + extensions), glycopharm controllers (6개 500줄+), cosmetics controllers (4개 500줄+)
+**최대 밀집 영역:** signage (service 1,337 + controller 1,231 + repository 1,040 + extensions) controllers (6개 500줄+), cosmetics controllers (4개 500줄+)
 
 ### Admin-dashboard — 104파일 500줄+
 
@@ -208,7 +205,6 @@
 |--------|------:|------:|------|
 | web-kpa-society | 46 | 18 | 가장 많음. pharmacy, admin, branch 페이지 집중 |
 | web-neture | 32 | 14 | partner, supplier, admin, forum 페이지 |
-| web-glycopharm | 28 | 9 | pharmacy, operator, care 페이지 |
 | web-k-cosmetics | 10 | 4 | store, operator 페이지 |
 | web-glucoseview | 8 | 3 | patients, operator 페이지 |
 | signage-player-web | 3 | 0 | 엔진 코드 |
@@ -237,7 +233,7 @@
 | 9 | services | `web-neture/.../PartnerOverviewPage.tsx` | 1,166 | P1 |
 | 10 | admin | `pages/lms-yaksa/credits/index.tsx` | 1,141 | P1 |
 | 11 | admin | `components/editor/blocks/ShortcodeBlock.tsx` | 1,129 | P1 |
-| 12 | services | `web-glycopharm/api/pharmacy.ts` | 1,097 | P1 |
+| 12 | services | — | 1,097 | P1 |
 | 13 | services | `web-kpa-society/.../AnnualReportFormPage.tsx` | 1,093 | P1 |
 | 14 | backend | `database/connection.ts` | 1,081 | SKIP (설정) |
 | 15 | services | `web-kpa-society/.../PharmacyStorePage.tsx` | 1,075 | P1 |
@@ -345,7 +341,7 @@ web-kpa-society가 46개로 가장 많음. 대부분 자기 완결적 페이지 
 
 ### O3. 복제 패턴 발견 (services/ 간)
 
-`operator/UserDetailPage.tsx` (782-786줄), `operator/UsersPage.tsx` (588-595줄), `operator/RoleManagementPage.tsx` (502-507줄) 등이 web-glycopharm/web-glucoseview/web-k-cosmetics/web-kpa-society에 거의 동일한 크기로 존재. 공통화 가능성 있으나 별도 조사 필요.
+공통화 가능성 있으나 별도 조사 필요.
 
 ### O4. neture sub-service 중 대형 파일 존재
 

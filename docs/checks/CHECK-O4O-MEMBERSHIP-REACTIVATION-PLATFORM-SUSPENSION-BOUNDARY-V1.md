@@ -143,7 +143,7 @@ FakeQueryRunner 가 `UPDATE users` 의 **WHERE 조건을 실제로 평가**해 "
 | WO 요구 검증 항목 | 케이스 | 결과 |
 |---|---|---|
 | 정상 사용자의 Membership 승인 | 승인 경로 무변경 + 기존 14 케이스 통과 | ✅ |
-| 해당 서비스 Membership 재활성화 | 운영자: `m-glyco` → `active` | ✅ |
+| 해당 서비스 Membership 재활성화 | — | ✅ |
 | 다른 서비스 Membership·Role 불변 | 운영자: `m-kpa`(kpa-society) → `suspended` 유지 | ✅ |
 | 플랫폼 정지 계정은 계속 정지 | 운영자 재활성화 후 `users.status='suspended'` 유지, `isActive=false` | ✅ |
 | 서비스 운영자가 플랫폼 정지를 해제하지 못함 | 해제 후보 파라미터 `['deleted']` 단언 | ✅ |
@@ -168,7 +168,7 @@ node scripts/lint-ratchet.mjs                → ESLint 102 errors (baseline 102
 ### 7-1. 서비스 운영자의 `users.password` 변경 🔴 다음 우선순위
 
 `MembershipConsoleController:932` — `PUT /operator/members/:userId { password }`.
-라이브 UI 3곳(`web-glycopharm` operator/admin, 공통 `OperatorMembersConsolePage`)에서 도달.
+라이브 UI 3곳에서 도달.
 방향은 확정됨(제거 후 본인 재설정 안내로 대체) — 대체 경로 확인 후 일괄 제거 필요.
 
 ### 7-2. `deleteMember(mode='soft')` 자체가 서비스 운영자의 users 전역 write

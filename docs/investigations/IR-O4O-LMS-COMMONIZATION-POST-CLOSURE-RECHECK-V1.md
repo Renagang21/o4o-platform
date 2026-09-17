@@ -2,7 +2,7 @@
 
 > **유형**: closure 이후 재점검 Investigation (read-only) — 코드/backend/DB/package/lock/Dockerfile **무변경**. 문서 1개만 생성.
 > **목적**: 종료 고정된 LMS 공통화 Cycle 1(`CHECK-...-CLOSURE-V2`) 판정이 현재 repository 기준으로도 유효한지 재검증. "다시 공통화"가 아니라 **종료 판정 유지 여부 안전 점검**.
-> **결론(요약)**: **STILL CLOSED** — 4서비스 `tsc -b` 0/0/0/0 유지, GP reusablePolicy fix 유지, 공통 manager 3서비스 적용 유지, Neture LMS 흔적 0, KPA-only advanced KPA 단독 유지. closure 이후 새 drift·회귀·혼입 없음.
+> **결론(요약)**: **STILL CLOSED** — 3서비스 `tsc -b` 0/0/0/0 유지 reusablePolicy fix 유지, 공통 manager 3서비스 적용 유지, Neture LMS 흔적 0, KPA-only advanced KPA 단독 유지. closure 이후 새 drift·회귀·혼입 없음.
 > **작성일**: 2026-06-15 · HEAD `dd28a492f`(main 동기화)
 
 ---
@@ -11,8 +11,7 @@
 이미 종료 고정된 LMS/강의 공통화 Cycle 1 상태가 현재 코드 기준으로도 유효한지 재점검한다. read-only — 코드 무변경, 문서만 생성. 새 공통화 시작이 아니라 종료 판정 유지 확인.
 
 ## 2. 선행 closure 요약
-- `IR-O4O-LMS-COMMONIZATION-QUALITY-AUDIT-V1`: PASS with Follow-up(구조 완료, GP TS2322 1건이 차단 요인).
-- `WO-O4O-LMS-GP-REUSABLE-POLICY-TYPE-ALIGNMENT-V1`(`2e7cb1fa8`): GP 로컬 mapper 로 차단 요인 해소.
+- `IR-O4O-LMS-COMMONIZATION-QUALITY-AUDIT-V1`: PASS with Follow-up(구조 완료 TS2322 1건이 차단 요인).
 - `CHECK-O4O-LMS-COMMONIZATION-CYCLE1-CLOSURE-V2`(`36fafa48f`): **CLOSED**(3서비스 green, KPA-only KEEP, Neture 제외, reward/AI 경계 정합).
 - (참조) `CHECK-O4O-CROSS-SERVICE-COMMONIZATION-CYCLE1-CLOSURE-V1`: 전체 공통화 CLOSED 의 일부로 LMS 포함.
 
@@ -23,7 +22,6 @@
 | 서비스 | `tsc -b` | closure V2 대비 |
 |--------|:--------:|:--------:|
 | web-kpa-society | ✅ **0** | 동일(유지) |
-| web-glycopharm | ✅ **0** | 동일(유지) |
 | web-k-cosmetics | ✅ **0** | 동일(유지) |
 | web-neture | ✅ **0** | 동일(유지) |
 > 로컬 TS(`node services/web-<svc>/node_modules/typescript/bin/tsc -b`)로 재실행. **전부 0 — closure V2 의 green 상태 유지.**
@@ -31,15 +29,15 @@
 ## 5. 핵심 질문 12개 재확인
 | # | 질문 | 결과 |
 |---|------|------|
-| 1 | KPA/GP/KCos typecheck 0? | ✅ 0/0/0 (+Neture 0) |
+| 1 | KPA/KCos typecheck 0? | ✅ 0/0/0 (+Neture 0) |
 | 2 | Neture LMS import/route/menu 새로 생겼나? | ✅ 없음(`rg lms-ui/LmsHubTemplate/… services/web-neture` = 0) |
 | 3 | `LmsHubTemplate` 적용 유지? | ✅ 3서비스 허브 thin wrapper 유지 |
 | 4 | `OperatorLmsCoursesManager` 3서비스 thin 유지? | ✅ 소비 서비스 3개 확인 |
-| 5 | `InstructorCoursesManager`/`FormShell`/`LessonListManager` 유지? | ✅ `InstructorCoursesManager` 3서비스 소비. KPA/GP form shell+lesson manager 유지 |
-| 6 | GP reusablePolicy fix 유지? | ✅ `toGpReusablePolicy`(L38) + 적용(L383) 잔존 |
+| 5 | `InstructorCoursesManager`/`FormShell`/`LessonListManager` 유지? | ✅ `InstructorCoursesManager` 2서비스 소비. KPA form shell+lesson manager 유지 |
+| 6 reusablePolicy fix 유지? | ✅ `toGpReusablePolicy`(L38) + 적용(L383) 잔존 |
 | 7 | KCos 강사 편집기 부재 의도적? | ✅ Phase 1-B(read-only) 유지 — InstructorCourseEditPage 부재 |
 | 8 | LessonPlayerShell dormant=비차단? | ✅ export 보유·미소비, closure 비차단(변동 없음) |
-| 9 | KPA quiz/assignment/grading/CourseStructureAi KEEP? | ✅ KPA 단독(GP/KCos import 0 — GP 매치는 주석뿐) |
+| 9 | KPA quiz/assignment/grading/CourseStructureAi KEEP? | — |
 | 10 | reward/payment/AI provider 혼입? | ✅ 없음(lms-ui purity 유지, 신규 import 0) |
 | 11 | 새 copy/empty-state drift? | ✅ closure V2 대비 신규 drift 없음(기존 B 항목 동일) |
 | 12 | CLOSURE-V2 CLOSED 판정 유지 가능? | ✅ 유지 가능 |
@@ -54,12 +52,12 @@
 - `OperatorLmsCoursesManager`(@o4o/operator-core-ui) **3서비스 소비 확인**. thin wrapper(27L) + api 어댑터/`detailLinkLabel` 차이만. 승인/관리 flow 유지.
 
 ### 6.3 강사 영역 — A.STILL CLOSED
-- `InstructorCoursesManager` **3서비스 소비**(KCos read-only Phase 1-B). KPA/GP `InstructorCourseFormShell`+`InstructorLessonListManager`(renderEditor) 유지.
-- **GP reusablePolicy fix 유지**: 공통 shell `CourseFormReusablePolicy`('organization' 포함) → GP `CourseReusablePolicy`로 narrow 하는 `toGpReusablePolicy` 잔존. 공통 shell 계약 무변경.
+- `InstructorCoursesManager` **2서비스 소비**(KCos read-only Phase 1-B). KPA `InstructorCourseFormShell`+`InstructorLessonListManager`(renderEditor) 유지.
+- 공통 shell 계약 무변경.
 - LessonModal render-prop 경계 유지(편집 UI=서비스 소유).
 
 ### 6.4 KPA-only advanced — C.INTENTIONAL (KEEP 유지)
-- QuizBuilder·AssignmentEditor·CourseStructureAiModal·LessonSubmissionsPage(grading) = **KPA 단독**. GP/KCos 실제 import 0(GP `InstructorCourseEditPage` 매치는 line 9 JSDoc 주석 "CourseStructureAiModal 제외" 뿐). 공통화 대상으로 잘못 확장되지 않음.
+- QuizBuilder·AssignmentEditor·CourseStructureAiModal·LessonSubmissionsPage(grading) = **KPA 단독**. 공통화 대상으로 잘못 확장되지 않음.
 
 ### 6.5 제외/경계 — 유지
 - **Neture LMS 제외**: `services/web-neture` 내 lms-ui/LmsHubTemplate/Instructor*/Operator LMS/CourseStructureAi/LessonPlayer **0건**.
@@ -69,7 +67,7 @@
 | 영역 | 분류 |
 |------|------|
 | 사용자 허브/운영자/강사 manager 공통화 | **A.STILL CLOSED** |
-| GP reusablePolicy fix | **A.STILL CLOSED**(유지) |
+ reusablePolicy fix | **A.STILL CLOSED**(유지) |
 | copy/empty-state(reward/감사/NoPaymentNotice 하드카피) | **B.MINOR DRIFT**(closure V2 동일, 신규 없음) |
 | dormant `LessonPlayerShell` + 상세/플레이어 thick 병렬 | **B/C**(비차단, 변동 없음) |
 | KPA-only advanced | **C.INTENTIONAL**(KEEP) |
@@ -92,7 +90,6 @@
 판정: STILL CLOSED
 
 - 4서비스 typecheck 0/0/0/0 (재실측) ✅
-- GP reusablePolicy fix 유지 ✅
 - 공통 manager(Operator/Instructor) 3서비스 적용 유지 ✅
 - Neture LMS 흔적 0 ✅
 - KPA-only advanced KPA 단독 유지(KEEP) ✅
@@ -114,4 +111,4 @@
 
 ---
 
-*Date: 2026-06-15 · read-only post-closure recheck · 코드 무변경 · 4서비스 tsc -b 0/0/0/0 · GP fix 유지 · 공통 manager 3서비스 적용 유지 · Neture LMS 흔적 0 · KPA-only KEEP 유지 · 신규 drift 0 → STILL CLOSED(CLOSURE-V2 유효).*
+*Date: 2026-06-15 · read-only post-closure recheck · 코드 무변경 · 3서비스 tsc -b 0/0/0/0 fix 유지 · 공통 manager 3서비스 적용 유지 · Neture LMS 흔적 0 · KPA-only KEEP 유지 · 신규 drift 0 → STILL CLOSED(CLOSURE-V2 유효).*

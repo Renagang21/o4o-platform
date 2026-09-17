@@ -28,8 +28,8 @@
 
 - 신규 모델 목록 API: **`GET /partner/recruitments` — public(no auth), serviceKey 필터 없음, status 필터만 옵션**(`getPartnerRecruitments`). → **모집 생성 즉시 전역 노출**(운영자 승인 게이트 없음).
 - 신규 모델 신청 API: `POST /partner/applications`(requireAuth) → `createPartnerApplication` = status RECRUITING 만 검증.
-- 신규 모델 browse+apply UI: **`PartnershipRequestListPage`(web-neture `/partners/requests`)** 한 곳. `getRecruitments()`(status 무필터 → CLOSED 포함 전체) + client-side search. **serviceKey 스코프 없음**(현재 모든 서비스 모집이 전역 노출). KPA/GP/KCos 매장 앱엔 아직 browse 화면 없음(applications/mine 상태뷰만 노출됨).
-- ⚠️ 구분: **레거시 `recruiting-products`**(`/partner/recruiting-products`, GlycopharmRepository `is_partner_recruiting` 플래그 — RecruitingProductsOverviewPage[operator]/RecruitingProductsPage[partner] 소비)는 **별개 모델**(glycopharm affiliate). 본 IR 대상은 NeturePartnerRecruitment.
+- 신규 모델 browse+apply UI: **`PartnershipRequestListPage`(web-neture `/partners/requests`)** 한 곳. `getRecruitments`(status 무필터 → CLOSED 포함 전체) + client-side search. **serviceKey 스코프 없음**(현재 모든 서비스 모집이 전역 노출). KPA/KCos 매장 앱엔 아직 browse 화면 없음(applications/mine 상태뷰만 노출됨).
+- ⚠️ 구분: **레거시 `recruiting-products`**는 **별개 모델**. 본 IR 대상은 NeturePartnerRecruitment.
 - **gate 삽입 후보:** (a) `getPartnerRecruitments` browse 경로 — exposureStatus=APPROVED + serviceKey 스코프 필터, (b) `createPartnerApplication` — 방어적 재검증(미승인 모집 신청 차단). operator console 은 전체(PENDING 포함) 조회 별도 경로 필요.
 
 ## 3. ProductApproval / OfferServiceApproval 재사용성 (조사 3차)

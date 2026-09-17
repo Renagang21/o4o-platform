@@ -94,7 +94,7 @@
 | 6 | 독자 StoreHub 레이아웃 복제 없음 | ✅ 신규 파일 1개(config만) |
 | 7 | KPA Store Hub 회귀 | ✅ `packages/**` · `services/web-kpa-society/**` 변경 0 |
 | 8 | K-Cosmetics Store Hub 회귀 | ✅ `services/web-k-cosmetics/**` 변경 0 |
-| 9 | GlycoPharm 공통 패키지 build/typecheck 회귀 | ✅ 공통 패키지 수정 0 → 회귀 대상 없음 |
+| 9 | — | ✅ 공통 패키지 수정 0 → 회귀 대상 없음 |
 | 10 | backend / DB / migration 변경 | ✅ 0건 |
 
 **빌드·타입체크**

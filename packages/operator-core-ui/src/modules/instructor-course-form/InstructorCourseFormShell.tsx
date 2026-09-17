@@ -13,7 +13,7 @@
  * - 레슨 / 퀴즈 / 과제 / AI / 발행·검수 flow / reward 는 범위 밖. 검수·발행 등 부가 액션은
  *   `extraActions` 슬롯으로 wrapper 가 주입(shell 은 review flow 를 알지 못함).
  *
- * 소비: KPA CourseNewPage(create), GlycoPharm InstructorCourseEditPage(edit 기본정보).
+ * 소비: KPA CourseNewPage(create) · InstructorCourseEditPage(edit 기본정보).
  *       K-Cosmetics 는 editor 미구축(Phase 1-B) — 미적용.
  */
 
@@ -38,7 +38,7 @@ export interface InstructorCourseFormConfig {
   submitLabel?: string;
   /** 제출 중 라벨 (기본 '생성 중...') */
   submittingLabel?: string;
-  /** 저장 성공 시 액션 행에 잠깐 표시할 메시지 (예: GP '저장되었습니다.') — 미지정 시 미표시 */
+  /** 저장 성공 시 액션 행에 잠깐 표시할 메시지 (예: '저장되었습니다.') — 미지정 시 미표시 */
   successMessage?: string;
   /** 설명 필수 여부 (KPA create: true). 기본 false */
   requireDescription?: boolean;
@@ -61,7 +61,7 @@ export interface InstructorCourseFormShellProps {
   onSubmit: (values: InstructorCourseFormValues) => Promise<void> | void;
   /** 취소 버튼 노출(있을 때만). */
   onCancel?: () => void;
-  /** 액션 행에 추가로 렌더할 노드(예: GP 승인요청/강의종료). shell 은 내용을 알지 못함. */
+  /** 액션 행에 추가로 렌더할 노드(예: 승인요청/강의종료). shell 은 내용을 알지 못함. */
   extraActions?: React.ReactNode;
   /** 폼 전체 비활성화. */
   disabled?: boolean;

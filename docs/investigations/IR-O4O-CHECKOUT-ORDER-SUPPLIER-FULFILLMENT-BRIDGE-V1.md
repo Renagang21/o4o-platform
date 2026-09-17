@@ -10,9 +10,6 @@
 
 ## 1. 요약 판정
 
-- **현재 GAP**: KPA/Glyco/KCos event_offer cart + KPA B2C 주문은 `checkout_orders` 로 생성되나, 공급자
-  fulfillment(배송 처리/송장/배송완료) 자산은 `neture_orders` 중심. checkout_orders 는 supplier unified
-  view 에서 **읽기전용**(`canFulfill=false`)으로만 보이고 **배송 처리 불가**.
 - **권장 = 후보 B (checkout_order → neture_order fulfillment bridge)** — 단 **정산 자동 편입을 막는 가드가
   bridge 구현의 비협상 전제조건**. 기존 supplier workspace/neture_shipments/status 전이를 재사용.
 - **결정적 위험 (검증완료)**: 정산 쿼리는 `neture_orders.status='delivered'` 를 **source/결제상태 필터

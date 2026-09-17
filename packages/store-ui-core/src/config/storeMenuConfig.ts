@@ -24,13 +24,11 @@
  *     디지털 사이니지   플레이리스트 · 동영상 · 스케줄 · TV 재생   (변경 없음 — 제품 파생 아님)
  *     채널/마케팅     채널 관리 · [태블릿 · 상담요청 · 퍼널 · 콘텐츠 가져오기]
  *     분석           마케팅 분석 · [매출 요약]
- *     [경영(GP)]      약국 경영 · 정산
  *     설정           매장(약국) 정보 · 설정
  *   용어 구분: "상품" = 거래·주문 대상(상품·거래 그룹), "제품" = 활성화 자료 제작 기준 데이터(활성화 그룹).
  *   원칙: 데드링크 생성 0 / 실기능 메뉴 은폐 0. 라우트 없는 항목(거래 신청·상품 성과·노출 설정 등)은
  *        해당 서비스에서 미추가. 실기능 메뉴(퍼널/경영/정산/태블릿/상담요청)는 가까운 그룹에 보존.
  *   라벨: KPA = "약국 상품·거래/약국 활성화/약국 자료함", K-Cosmetics = "매장 상품·거래/매장 활성화/내 자료함".
- *   정리된 데드링크: GP /products(미마운트), GP /market-trial(미마운트) 제거.
  */
 
 export type StoreMenuKey =
@@ -169,7 +167,7 @@ export const COSMETICS_STORE_CONFIG: StoreDashboardConfig = {
  * Pharmacy-Hub 는 신규 서비스라 매장 기능이 B2B 거래(공급 상품 · 장바구니 · 주문)만 구현돼 있다.
  * canonical tree(O4O-STORE-MENU-CANONICAL-TREE-V1) 의 "약국 상품·거래" 축만 채우고,
  * 미구현 영역(활성화 · 자료함 · 사이니지 · 채널 · 분석 · 설정)은 **메뉴를 만들지 않는다** —
- * 데드링크 0 / "준비 중" 메뉴 0 원칙 (KPA/GP/KCos 와 동일).
+ * 데드링크 0 / "준비 중" 메뉴 0 원칙 (KPA/KCos 와 동일).
  *
  * basePath 가 `/store-owner` 인 유일한 config 다. 기존 3서비스의 `/store` 로 강제 이동시키지 않는다:
  *   - 결제 callback(`/store-owner/payment/success|fail`) 이 PG 등록 URL 이라 변경 시 계약 파손.
@@ -196,7 +194,7 @@ export const PHARMACY_HUB_STORE_CONFIG: StoreDashboardConfig = {
       { key: 'cart',             label: '장바구니',  subPath: '/cart' },
       { key: 'purchase-orders',  label: '주문 내역', subPath: '/orders' },
       // WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §7:
-      //   KPA/GP/KCos 와 같은 service-neutral 계약(/neture/seller-recruitment/applications/mine) 채택.
+      //   KPA/KCos 와 같은 service-neutral 계약(/neture/seller-recruitment/applications/mine) 채택.
       //   '판매자 모집' 탐색은 backend proxy 가 kpa-society 고정이라 PH 에 없다(§7 판정 기록).
       { key: 'recruitment-applications', label: '신청·승인 현황', subPath: '/recruitment-applications' },
     ]},
@@ -259,9 +257,9 @@ export const PHARMACY_HUB_STORE_CONFIG: StoreDashboardConfig = {
     //   매장 정보 = organizations(조직) / 내 계정 = users(사용자) — 서로 다른 축이라 항목을 분리한다.
     //   KPA 전용 계정·자격·면허·분회 메뉴는 가져오지 않는다.
     // WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §7:
-    //   KPA/GP/KCos 와 동일한 공통 controller·View 채택 (store_qr_scan_events 집계).
+    //   KPA/KCos 와 동일한 공통 controller·View 채택 (store_qr_scan_events 집계).
     // WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §8 (#79):
-    //   외국인 여행객 판매지원 — KPA/GP/KCos 와 동일한 '판매 채널 확장' 그룹·라벨.
+    //   외국인 여행객 판매지원 — KPA/KCos 와 동일한 '판매 채널 확장' 그룹·라벨.
     //   backend 는 공통 /foreign-visitor + /store-entitlements 이며 serviceKey allowlist 만 확장했다.
     //   유료 이용권 게이트라 미보유 상태에도 진입 화면(잠금 안내·결제)이 있어 데드링크가 아니다.
     { label: '판매 채널 확장', items: [
@@ -277,7 +275,6 @@ export const PHARMACY_HUB_STORE_CONFIG: StoreDashboardConfig = {
   ],
 };
 
-// GLYCOPHARM_STORE_CONFIG — REMOVED (WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1)
 
 /**
  * KPA-Society Store Config (canonical reference)
@@ -288,7 +285,7 @@ export const PHARMACY_HUB_STORE_CONFIG: StoreDashboardConfig = {
  *   태블릿/상담 요청은 실기능이라 채널 그룹 보존. 사이니지/분석/설정 유지. subPath 불변.
  * WO-O4O-KPA-STORE-MENU-ACTIVATION-RELABEL-AND-MY-PRODUCTS-MOVE-V1:
  *   "약국 활성화" → "약국 경영지원" 라벨 변경 + "내 약국 제품"을 "약국 상품·거래" 그룹으로 이동(route 무변경).
- *   KPA 섹션 한정 — GP/KCos 무변경.
+ *   KPA 섹션 한정 — KCos 무변경.
  */
 export const KPA_SOCIETY_STORE_CONFIG: StoreDashboardConfig = {
   serviceKey: 'kpa-society',
@@ -304,7 +301,7 @@ export const KPA_SOCIETY_STORE_CONFIG: StoreDashboardConfig = {
       // 거래 신청 전용 라우트는 KPA에 없음 → 별도 항목 미추가(데드링크 방지).
       // WO-O4O-KPA-STORE-MENU-PRODUCTS-RELABEL-TO-O4O-PRODUCTS-V1:
       //   라벨만 '상품' → 'O4O 제품'(플랫폼 제공·신청·주문 가능 제품). '내 약국 제품'(자체 취급)과 구분.
-      //   key/subPath/route/권한/기능 무변경. KPA 블록 한정(GP/KCos 무영향).
+      //   key/subPath/route/권한/기능 무변경. KPA 블록 한정(KCos 무영향).
       { key: 'products', label: 'O4O 제품', subPath: '/commerce/products' },
       // WO-O4O-KPA-STORE-HANDLED-PRODUCTS-UNIFIED-VIEW-V1:
       //   매장 경영활용 제품 = O4O 취급 제품(organization_product_listings) + 매장 자체 제품(store_local_products)
@@ -329,7 +326,7 @@ export const KPA_SOCIETY_STORE_CONFIG: StoreDashboardConfig = {
       //   고객에게 판매한 주문(seller)은 '온라인 판매 > 주문 관리'(/online-sales/orders)로 분리.
       { key: 'orders',   label: '발주 내역', subPath: '/commerce/orders' },
       // WO-O4O-KPA-SELLER-RECRUITMENT-STORE-CONSUMER-BROWSE-UI-V1: 승인된 판매자 모집 조회·참여(유통 기능).
-      //   KPA 블록 한정 — backend proxy(/kpa/store/seller-recruitments)가 kpa-society 고정. GP/KCos 미추가.
+      //   KPA 블록 한정 — backend proxy(/kpa/store/seller-recruitments)가 kpa-society 고정. KCos 미추가.
       { key: 'seller-recruitments', label: '판매자 모집', subPath: '/commerce/seller-recruitments' },
       // WO-O4O-CROSSSERVICE-STORE-SELLER-RECRUITMENT-APPLICATION-STATUS-VIEW-V1: 판매자 모집 신청 현황(조회)
       { key: 'recruitment-applications', label: '신청·승인 현황', subPath: '/commerce/recruitment-applications' },
@@ -351,7 +348,7 @@ export const KPA_SOCIETY_STORE_CONFIG: StoreDashboardConfig = {
       // WO-O4O-KPA-TABLET-SCREEN-MAKER-MENU-ENTRY-V1 (KPA 블록 한정):
       //   진입점은 이미 존재하나 '타블렛 구성'이 '화면 제작' 진입으로 읽히지 않음 →
       //   라벨만 '태블릿 화면 제작'으로 정비(코너별 화면·대기화면 제작·적용). key/subPath/route/기능 무변경.
-      //   신규 메뉴 추가 아님(같은 route 중복 방지). GP/KCos 무영향.
+      //   신규 메뉴 추가 아님(같은 route 중복 방지). KCos 무영향.
       { key: 'tablet-displays', label: '태블릿 화면 제작', subPath: '/commerce/tablet-displays' },
     ]},
     // WO-O4O-STORE-EXECUTION-HOME-TABLET-QR-V1 (KPA 블록):
@@ -365,7 +362,7 @@ export const KPA_SOCIETY_STORE_CONFIG: StoreDashboardConfig = {
     // WO-O4O-KPA-QR-POP-RESULT-SCOPE-V1: KPA 사이드바에서 "매장 제작 자료" 메뉴 숨김.
     //   POP/제작 결과물은 콘텐츠 목록(QR·POP 바로 만들기) + 결과물 메뉴 중심으로 안내한다.
     //   route(/store/library/production-materials, /new, /:id/edit)는 App.tsx 에 유지 — 딥링크/저장 후 redirect/legacy 접근 보호.
-    //   GP/KCos 는 자체 '제작 자료' 메뉴 유지(미변경).
+    //   KCos 는 자체 '제작 자료' 메뉴 유지(미변경).
     { label: '약국 자료함', items: [
       { key: 'library-contents',              label: '콘텐츠',       subPath: '/library/contents' },
       { key: 'library-resources',             label: '자료',         subPath: '/library/resources' },
@@ -412,7 +409,7 @@ export const KPA_SOCIETY_STORE_CONFIG: StoreDashboardConfig = {
       { key: 'pharmacy-info',  label: '약국 정보', subPath: '/info' },
       // WO-O4O-KPA-STORE-SETTINGS-NAME-ALIGNMENT-V1: /settings 는 일반 설정이 아니라
       //   공개 매장 홈(storefront) 레이아웃/디자인 편집기 → 라벨을 '매장 홈 디자인' 으로 정합.
-      //   URL(/settings)·기능은 불변. (KPA 전용 config — GP/KCos 무영향)
+      //   URL(/settings)·기능은 불변. (KPA 전용 config — KCos 무영향)
       { key: 'store-settings', label: '매장 홈 디자인', subPath: '/settings' },
     ]},
   ],

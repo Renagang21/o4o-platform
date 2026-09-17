@@ -2,7 +2,7 @@
 
 > **Type:** IR (read-only — 내 매장 공통화 핵심 선행 조사)
 > **Date:** 2026-06-11
-> **대표:** KPA-society / **참조:** Neture(공급자 모델) / **제외:** GP·KCos
+> **대표:** KPA-society / **참조:** Neture(공급자 모델) / **제외:** KCos
 > **수정 파일:** 없음 (read-only) · **조사 기준 commit:** `512104c9d`
 
 ---
@@ -34,7 +34,7 @@ KPA 기준으로 **매장 취급 상품** vs **O4O 주문 가능 상품**을 DB/
 
 ## 4. 조사 범위
 
-KPA-society 대표. Neture 공급자 모델 참조. GP/KCos 제외(적용 가능성만 후속). 코드 무수정.
+KPA-society 대표. Neture 공급자 모델 참조. KCos 제외(적용 가능성만 후속). 코드 무수정.
 
 ---
 
@@ -185,7 +185,7 @@ KPA-society 대표. Neture 공급자 모델 참조. GP/KCos 제외(적용 가능
 - **표면(용어/탭)에 혼선(B)**: "자체 상품"↔"내 매장 상품"↔포괄 용어 혼용, `/store/commerce/products` 도메인 탭 event 혼재. → 소형 용어/탭 정리 WO 권고.
 - **미확정(D)**: 판매자 모집 mechanism, 펀딩 정의 — 내 매장 공통화의 **필수 차단 요인은 아님**(별도 섹션/상태로 처리 가능), 병행 추가 IR.
 - 따라서 **내 매장 공통화 WO 는 §10 기준 모델로 안전하게 진행 가능**하며, 용어 정렬(소형 WO)을 선행/병행하면 혼선 위험이 제거된다.
-- GP/KCos: KPA 의 6-entity 모델이 service-neutral(serviceKey 기반)이라 동일 적용 가능성 높음 — KPA 기준 확정 후 판단.
+- KCos: KPA 의 6-entity 모델이 service-neutral(serviceKey 기반)이라 동일 적용 가능성 높음 — KPA 기준 확정 후 판단.
 
 > **조사 한계:** 판매자 모집 mechanism·펀딩 정의는 본 IR 에서도 단정하지 않고 D 로 분리. 정적 코드 조사 기반, live 미수행. 일부 경로(applyBySupplyProductId 의 PUBLIC 즉시 listing)는 controller 분기로 확인됨.
 

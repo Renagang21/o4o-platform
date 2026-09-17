@@ -12,7 +12,6 @@
  * 서비스별 현행 accent:
  *   KPA-Society  blue
  *   K-Cosmetics  pink
- *   GlycoPharm   blue   (Store HUB 화면 기준. SupplyCatalogHub 만 teal 을 쓴다)
  *   PharmacyHub  blue
  */
 

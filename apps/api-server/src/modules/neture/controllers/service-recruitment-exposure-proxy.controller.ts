@@ -3,7 +3,7 @@
  *
  * WO-O4O-SELLER-RECRUITMENT-EXPOSURE-OPERATOR-UI-V1
  *
- * KPA / GlycoPharm / K-Cosmetics 운영자가 자기 서비스의 판매자 모집 노출 승인을
+ * KPA / K-Cosmetics 운영자가 자기 서비스의 판매자 모집 노출 승인을
  * 수행하기 위한 per-service proxy. neture:operator 권한 없이 자기 서비스 operator
  * scope 로 접근한다(권한 우회가 아니라 권한 경계 보강).
  *

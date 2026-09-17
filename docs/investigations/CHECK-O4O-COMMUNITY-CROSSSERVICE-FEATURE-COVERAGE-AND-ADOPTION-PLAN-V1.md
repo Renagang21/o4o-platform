@@ -17,30 +17,30 @@
 
 | 자산 | path | 역할 | 채택 서비스 | 추가 adoption 가능 | config 필요 |
 |---|---|---|---|---|---|
-| `ForumHubTemplate` | `packages/shared-space-ui/src/ForumHubTemplate.tsx` | 포럼 허브(카테고리+최신글) | KPA·KCos·GP·PH·NET (5/5) | — | `ForumHubConfig` |
-| `ForumListTemplate` | `packages/shared-space-ui/src/ForumListTemplate.tsx` | 글 목록 | KCos·GP·PH·NET (4/5, KPA 는 자체 목록) | KPA | theme |
+| `ForumHubTemplate` | `packages/shared-space-ui/src/ForumHubTemplate.tsx` | 포럼 허브(카테고리+최신글) | KPA·KCos·PH·NET (5/5) | — | `ForumHubConfig` |
+| `ForumListTemplate` | `packages/shared-space-ui/src/ForumListTemplate.tsx` | 글 목록 | KCos·PH·NET (4/5, KPA 는 자체 목록) | KPA | theme |
 | `ForumWriteForm` | `packages/shared-space-ui/src/ForumWriteForm.tsx` | 작성/수정 폼 | 5/5 | — | `renderExtra` |
 | `ForumPostContent` / `ForumPostHeader` | `packages/shared-space-ui/src/` | 상세 본문·헤더 | 5/5 | — | — |
 | `ForumCommentList` / `ForumCommentForm` | `packages/shared-space-ui/src/` | 댓글 | 5/5 | — | — |
 | `ForumLikeButton` | `packages/shared-space-ui/src/` | 좋아요 | 5/5 | — | — |
 | `ForumListToolbar` / `ForumListInfoBar` | `packages/shared-space-ui/src/` | 목록 검색·정렬 툴바 | KPA·NET | **PH**(검색 UI 없음) | — |
-| `ForumRequestForm` | `packages/shared-space-ui/src/` | 게시판 개설 요청 | KPA·KCos·GP·NET | PH | theme |
-| `forum-owner/*` | `packages/shared-space-ui/src/forum-owner/` | 소유자 콘솔·멤버 관리 | KPA·KCos·GP | NET·PH | — |
-| backend `createServiceForumRouter` | `apps/api-server/src/routes/forum/service-forum.routes.ts` | 서비스 스코프 forum API 일괄 mount | KCos·NET·PH (KPA·GP 는 동일 계약 자체 remount) | — | `ForumContext` + `writeGuards` |
+| `ForumRequestForm` | `packages/shared-space-ui/src/` | 게시판 개설 요청 | KPA·KCos·NET | PH | theme |
+| `forum-owner/*` | `packages/shared-space-ui/src/forum-owner/` | 소유자 콘솔·멤버 관리 | KPA·KCos·NET·PH | — |
+| backend `createServiceForumRouter` | `apps/api-server/src/routes/forum/service-forum.routes.ts` | 서비스 스코프 forum API 일괄 mount | KCos·NET·PH (KPA 는 동일 계약 자체 remount) | — | `ForumContext` + `writeGuards` |
 
 ### 1-2. LMS / 교육
 
 | 자산 | path | 역할 | 채택 서비스 | 추가 adoption 가능 | config |
 |---|---|---|---|---|---|
-| `LmsHubTemplate` | `packages/shared-space-ui/src/LmsHubTemplate.tsx` | 교육 허브 | KPA·KCos·GP | **PH·NET** | `LmsHubConfig` (fetch 주입) |
-| `CourseListView` | `packages/lms-ui/src/views/CourseListView.tsx` | 강의 목록 | KPA | KCos·GP·**PH·NET** | filter option |
-| `CourseDetailView` | `packages/lms-ui/src/views/CourseDetailView.tsx` | 강의 상세 | KPA·KCos·GP | **PH·NET** | slot |
-| `LessonPlayerView` | `packages/lms-ui/src/views/LessonPlayerView.tsx` | 레슨 재생 | KPA·KCos·GP | **PH·NET** | — |
+| `LmsHubTemplate` | `packages/shared-space-ui/src/LmsHubTemplate.tsx` | 교육 허브 | KPA·KCos·**PH·NET** | `LmsHubConfig` (fetch 주입) |
+| `CourseListView` | `packages/lms-ui/src/views/CourseListView.tsx` | 강의 목록 | KPA | KCos·**PH·NET** | filter option |
+| `CourseDetailView` | `packages/lms-ui/src/views/CourseDetailView.tsx` | 강의 상세 | KPA·KCos·**PH·NET** | slot |
+| `LessonPlayerView` | `packages/lms-ui/src/views/LessonPlayerView.tsx` | 레슨 재생 | KPA·KCos·**PH·NET** | — |
 | `CourseCard` / `CourseList` / `LessonList` | `packages/lms-ui/src/components/` | 부품 | KPA | 전 서비스 | — |
 | `EnrollmentButton` / `CourseProgressBar` / `CourseVisibilityBadge` | `packages/lms-ui/src/components/` | 수강·진도 부품 | **소비 0** | 전 서비스 | — |
-| `createLmsLearnerClient` | `packages/lms-client/src/index.ts` | 학습자 API 클라이언트 | KPA·KCos·GP | PH·NET | `LmsClientOptions` |
+| `createLmsLearnerClient` | `packages/lms-client/src/index.ts` | 학습자 API 클라이언트 | KPA·KCos·PH·NET | `LmsClientOptions` |
 | backend LMS 모듈 | `apps/api-server/src/modules/lms/` | Course·Lesson·Enrollment·Progress·Certificate·Completion·Instructor·Quiz·Assignment 전 계층 | 전 서비스 공용 | — | — |
-| **LMS service scope** | `apps/api-server/src/modules/lms/utils/lms-service-scope.ts` | `serviceKey` 경계 (SSOT=`resolveCanonicalServiceKey`) | KPA(prefix) · KCos·GP(query) | **PH·NET 이미 허용 목록에 포함** | `serviceKey` 파라미터만 |
+| **LMS service scope** | `apps/api-server/src/modules/lms/utils/lms-service-scope.ts` | `serviceKey` 경계 (SSOT=`resolveCanonicalServiceKey`) | KPA(prefix) · KCos·**PH·NET 이미 허용 목록에 포함** | `serviceKey` 파라미터만 |
 
 > **핵심**: `courses.serviceKey` 컬럼과 `LMS_SCOPED_SERVICE_KEYS` 에 `pharmacy-hub` · `neture` 가 **이미 들어 있다.**
 > PH/NET 교육 도입은 **schema 변경 없이** 프론트 배선 + `serviceKey` 전달만으로 가능하다.
@@ -49,14 +49,14 @@
 
 | 자산 | path | 역할 | 채택 서비스 | 추가 adoption 가능 | config |
 |---|---|---|---|---|---|
-| `CommunityContentListTemplate` / `CommunityContentListView` | `packages/shared-space-ui/src/community/CommunityContentListView.tsx` | 콘텐츠 목록 | KCos·GP | KPA·**PH**·NET | adapter |
-| `CommunityContentDetailTemplate` | `packages/shared-space-ui/src/community/` | 콘텐츠 상세 | KCos·GP | KPA·**PH**·NET | adapter |
-| `CommunityContentWriteShell` | `packages/shared-space-ui/src/community/` | 콘텐츠 작성 | KPA·KCos·GP | **PH**·NET | adapter |
-| `CommunityContentSearchBar` | `packages/shared-space-ui/src/community/` | 콘텐츠 검색 | KPA | KCos·GP·PH·NET | — |
-| `standardContentAdapters` | `packages/shared-space-ui/src/community/` | 서비스별 API 어댑터 | KPA·KCos·GP | PH·NET | 서비스별 1개 |
-| `ContentHubTemplate` | `packages/shared-space-ui/src/ContentHubTemplate.tsx` | 콘텐츠 허브 | KPA·KCos·GP·NET | **PH** | config |
-| `ResourcesHubTemplate` | `packages/shared-space-ui/src/ResourcesHubTemplate.tsx` | 자료실 허브 | KPA·KCos·GP·NET | **PH** | `ResourcesHubConfig` |
-| backend **content-resource Core** | `apps/api-server/src/routes/common/content-resource/content-resource-core.ts` | 콘텐츠·자료실 CRUD 공통 Core (config 주입) | KPA(`kpa_contents`) · KCos(`cosmetics_contents`) · GP(`glycopharm_contents`) | **PH·NET (원장 테이블 신설 필요)** | `ContentResourceConfig` |
+| `CommunityContentListTemplate` / `CommunityContentListView` | `packages/shared-space-ui/src/community/CommunityContentListView.tsx` | 콘텐츠 목록 | KCos·KPA·**PH**·NET | adapter |
+| `CommunityContentDetailTemplate` | `packages/shared-space-ui/src/community/` | 콘텐츠 상세 | KCos·KPA·**PH**·NET | adapter |
+| `CommunityContentWriteShell` | `packages/shared-space-ui/src/community/` | 콘텐츠 작성 | KPA·KCos·**PH**·NET | adapter |
+| `CommunityContentSearchBar` | `packages/shared-space-ui/src/community/` | 콘텐츠 검색 | KPA | KCos·PH·NET | — |
+| `standardContentAdapters` | `packages/shared-space-ui/src/community/` | 서비스별 API 어댑터 | KPA·KCos·PH·NET | 서비스별 1개 |
+| `ContentHubTemplate` | `packages/shared-space-ui/src/ContentHubTemplate.tsx` | 콘텐츠 허브 | KPA·KCos·NET | **PH** | config |
+| `ResourcesHubTemplate` | `packages/shared-space-ui/src/ResourcesHubTemplate.tsx` | 자료실 허브 | KPA·KCos·NET | **PH** | `ResourcesHubConfig` |
+| backend **content-resource Core** | `apps/api-server/src/routes/common/content-resource/content-resource-core.ts` | 콘텐츠·자료실 CRUD 공통 Core (config 주입) | KPA(`kpa_contents`) · KCos(`cosmetics_contents`) · **PH·NET (원장 테이블 신설 필요)** | `ContentResourceConfig` |
 
 > **경계 주의**: 이 Core 의 서비스 격리는 **물리 테이블 분리 그 자체**다 (`service_key`/`organization_id` 컬럼 없음).
 > 따라서 PH/NET 도입은 config 만으로 끝나지 않고 **원장 테이블 1개 신설**이 전제다 (→ §10 `PRODUCT_BUILD`).
@@ -65,17 +65,17 @@
 
 | 자산 | path | 역할 | 채택 서비스 | 추가 adoption 가능 |
 |---|---|---|---|---|
-| `StandardHomeTemplate` | `packages/shared-space-ui/src/StandardHomeTemplate.tsx` | 커뮤니티 홈 골격 | KPA(`CommunityHomePage`) · KCos(`HomePage`) · GP(`CommunityMainPage`) · NET(`CommunityPage`) | **PH** (자체 HomePage, 공통 부품 0) |
-| `LatestActivitySection` | `packages/shared-space-ui/src/` | 최신 활동 피드 | KPA·KCos·GP | **NET**(동등 기능 자체 구현) · **PH** |
-| `AppEntrySection` / `CtaGuidanceSection` / `O4OHelpSection` / `NewsNoticesSection` | `packages/shared-space-ui/src/` | 홈 섹션 부품 | KPA·KCos·GP·NET | PH |
+| `StandardHomeTemplate` | `packages/shared-space-ui/src/StandardHomeTemplate.tsx` | 커뮤니티 홈 골격 | KPA(`CommunityHomePage`) · KCos(`HomePage`) · NET(`CommunityPage`) | **PH** (자체 HomePage, 공통 부품 0) |
+| `LatestActivitySection` | `packages/shared-space-ui/src/` | 최신 활동 피드 | KPA·KCos·**NET**(동등 기능 자체 구현) · **PH** |
+| `AppEntrySection` / `CtaGuidanceSection` / `O4OHelpSection` / `NewsNoticesSection` | `packages/shared-space-ui/src/` | 홈 섹션 부품 | KPA·KCos·NET | PH |
 | `HubPagination` / `GuideBlock` / `AppreciationPanel` | `packages/shared-space-ui/src/` | 공통 보조 | 4~5 서비스 | — |
 
 ### 1-5. My / Membership / Access
 
 | 자산 | path | 역할 | 채택 서비스 | 비고 |
 |---|---|---|---|---|
-| mypage 골격(`navItems.ts` + `MyPageHub`) | 각 서비스 `src/pages/mypage/` | 마이페이지 허브 | KPA·KCos·GP·NET | 동일 패턴, 공통 package 아님 |
-| forum membership API | `service-forum.routes.ts` (`join-requests`·`members`) | 폐쇄형 포럼 가입·승인 | 5/5 (backend) | 프론트는 KPA·KCos·GP 만 |
+| mypage 골격(`navItems.ts` + `MyPageHub`) | 각 서비스 `src/pages/mypage/` | 마이페이지 허브 | KPA·KCos·NET | 동일 패턴, 공통 package 아님 |
+| forum membership API | `service-forum.routes.ts` (`join-requests`·`members`) | 폐쇄형 포럼 가입·승인 | 5/5 (backend) | 프론트는 KPA·KCos 만 |
 | service membership gate | `requireActiveServiceMembership` 등 | 서비스 접근 게이트 | 5/5 | PH `membershipGate.ts` |
 | **내 글 / 내 댓글** | — | — | **0/5** | backend `listPosts` 에 author 필터 파라미터 없음 |
 
@@ -85,7 +85,7 @@
 
 표기: `●` 있음 / `◐` 부분(자체 구현·공통 부품 미채택) / `○` 없음
 
-| # | 기능축 | KPA | KCos | GP | PH | NET |
+| # | 기능축 | KPA | KCos | PH | NET |
 |---|---|:--:|:--:|:--:|:--:|:--:|
 | A | Forum (허브·목록·상세) | ● | ● | ● | ● | ● |
 | B | Forum Interaction (댓글·좋아요·고정) | ● | ● | ● | ● | ● |
@@ -118,7 +118,7 @@
 
 MUST = `MUST_ADOPT` · N/A = `NOT_APPLICABLE` · SS = `SERVICE_SPECIFIC`
 
-| # | 기능축 | KPA | KCos | GP | PH | NET |
+| # | 기능축 | KPA | KCos | PH | NET |
 |---|---|:--:|:--:|:--:|:--:|:--:|
 | A | Forum | MUST | MUST | MUST | MUST | MUST |
 | B | Forum Interaction | MUST | MUST | MUST | MUST | MUST |
@@ -163,7 +163,6 @@ SERVICE_SPECIFIC: 10
 |---|--:|--:|--:|--:|
 | KPA-Society | 20 | 2 | 0 | 2 |
 | K-Cosmetics | 15 | 7 | 0 | 2 |
-| GlycoPharm | 15 | 7 | 0 | 2 |
 | PharmacyHub | 13 | 6 | 3 | 2 |
 | Neture | 10 | 9 | 3 | 2 |
 
@@ -179,7 +178,7 @@ SERVICE_SPECIFIC: 10
 |---|:--:|:--:|:--:|---|---|
 | KPA | Y | Y | Y | MUST (충족) | 약사 대상 전문 콘텐츠·공지가 forum 토론과 분리돼야 함 |
 | KCos | Y | Y | Y | MUST (충족) | `cosmetics_contents` 회원 작성형 + 운영자 발행 |
-| GP | Y | Y | Y | MUST (충족) | `glycopharm_contents` 동일 |
+| Y | Y | Y | MUST (충족) | — |
 | **PH** | Y | Y | Y | **MUST (미충족)** | 약국 대상 운영 공지·제품/업무 전문 콘텐츠는 B2B 허브의 기본 소통 수단. 현재 `/store-owner/content` 는 **매장 실행 자산**(Store Menu Canonical Tree 축)이며 커뮤니티 콘텐츠가 아니다 |
 | NET | Y | Y | Y | MUST (충족, 읽기전용) | `/content` = CMS 발행 콘텐츠 읽기. 공급자·파트너 작성형까지는 OPTIONAL |
 
@@ -190,7 +189,7 @@ SERVICE_SPECIFIC: 10
 
 ## 5. 자료실 상세 판정
 
-| 필요 자료 | KPA | KCos | GP | PH | NET |
+| 필요 자료 | KPA | KCos | PH | NET |
 |---|:--:|:--:|:--:|:--:|:--:|
 | 문서 / PDF | Y | Y | Y | **Y** | Y |
 | 교육자료 | Y | Y | Y | **Y** | 조건부 |
@@ -206,7 +205,7 @@ PH 는 공급자가 제공하는 제품 자료·약국 업무 자료를 매장�
 
 ## 6. LMS / 교육 단계별 판정
 
-| 단계 | KPA | KCos | GP | PH | NET |
+| 단계 | KPA | KCos | PH | NET |
 |---|:--:|:--:|:--:|:--:|:--:|
 | Education Hub | MUST | MUST | MUST | **MUST** | OPTIONAL |
 | Course List | MUST | MUST | MUST | **MUST** | OPTIONAL |
@@ -221,7 +220,7 @@ PH 는 공급자가 제공하는 제품 자료·약국 업무 자료를 매장�
 근거
 
 - **KPA**: 연수교육 성격 — 학점·수료증·강사까지 전 단계 필수.
-- **KCos / GP**: 제품·질환 교육. 시청 자체가 가치이며 수료증은 마케팅 옵션.
+- **KCos**: 제품·질환 교육. 시청 자체가 가치이며 수료증은 마케팅 옵션.
 - **PH**: 약국 대상 **제품·업무 교육은 필요**하지만 자격 발급 주체가 아니므로 **수료증·강사·퀴즈는 N/A**. 시청 이력(enrollment/progress)은 공급자 리포팅이 필요할 때만 OPTIONAL.
 - **NET**: 공급자/파트너 온보딩 교육은 현재 `/guide` 문서 체계로 대체 중 → **도입 여부는 제품 결정**(§15 D-3).
 
@@ -278,17 +277,14 @@ PH 는 공급자가 제공하는 제품 자료·약국 업무 자료를 매장�
 
 ---
 
-## 9. KPA / KCos / GP baseline 분석
+## 9. KPA / KCos baseline 분석
 
 | 관찰 | 내용 |
 |---|---|
 | 3서비스 공통 채택 패턴 | Forum 5부품 · `StandardHomeTemplate`+`LatestActivitySection` · content-resource Core(원장만 다름) · `LmsHubTemplate`+`CourseDetailView`+`LessonPlayerView` · mypage(`navItems`+`MyPageHub`) |
-| KCos ↔ GP 사실상 동형 | 라우트·페이지 구성이 거의 1:1 (`forum/*`, `content/*`, `library/*`, `lms/*`, `mypage/*`) → **이 둘의 교집합이 곧 실효 baseline** |
 | KPA 고유(복제 금지) | 연수교육 학점(`/mypage/credits`)·자격(`/mypage/qualifications`)·연차보고·분회 축 — 약사회 법정 업무 |
 | KPA 가 baseline 인 부분 | Forum 소유자 콘솔·폐쇄형 포럼·콘텐츠 검색(`CommunityContentSearchBar` 유일 소비) |
 | 3서비스 공통 결손 | **My Posts / My Comments 가 3서비스 모두 없음** → 서비스 문제가 아니라 **플랫폼 공통 결손** |
-
-→ PH·NET adoption 기준은 **KCos ∩ GP** 로 잡고, KPA 고유 축은 이식하지 않는다.
 
 ---
 
@@ -307,7 +303,7 @@ Community Baseline
 - Community Search
 ```
 
-9개 축. 현재 충족: KPA 8/9 · KCos 8/9 · GP 8/9 · NET 8/9 · **PH 3/9**.
+9개 축. 현재 충족: KPA 8/9 · KCos 8/9 8/9 · NET 8/9 · **PH 3/9**.
 
 ---
 
@@ -341,7 +337,7 @@ My Activity Extension          (My Comments · 활동 대시보드)
 | 11 | NET | My Posts | BACKEND_ADOPTION | LOW | 없음 |
 | 12 | KPA | My Posts | BACKEND_ADOPTION | LOW | 없음 |
 | 13 | KCos | My Posts | BACKEND_ADOPTION | LOW | 없음 |
-| 14 | GP | My Posts | BACKEND_ADOPTION | LOW | 없음 |
+| 14 | My Posts | BACKEND_ADOPTION | LOW | 없음 |
 
 ```
 SIMPLE_ADOPTION  : 3
@@ -397,7 +393,7 @@ PRODUCT_BUILD    : 2
 | D-2 | PH 교육 도입 **단계 범위** | (a) Hub~Lesson 까지만 (b) + Enrollment/Progress | Bundle C 범위. 수료증·강사·퀴즈는 N/A 로 판정 |
 | D-3 | Neture 공급자/파트너 **교육 도입 여부** | (a) `/guide` 문서 체계 유지 (b) LMS 도입 | Bundle C 확장 여부 |
 | D-4 | **폐쇄형 커뮤니티** 확대 | PH·NET 에 공급자/약국 전용 게시판이 필요한가 | Closed Community Extension |
-| D-5 | KCos · GP · PH 의 **게시판 0건** 상태 | 초기 게시판 세트를 누가 언제 개설하는가 | 코드 아님. 운영 데이터 결정 (선행 CHECK 관측) |
+| D-5 | KCos · PH 의 **게시판 0건** 상태 | 초기 게시판 세트를 누가 언제 개설하는가 | 코드 아님. 운영 데이터 결정 (선행 CHECK 관측) |
 | D-6 | My Comments / 활동 대시보드 | 도입 여부 | My Activity Extension |
 
 ---

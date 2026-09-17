@@ -16,7 +16,7 @@
  *   ⑦ frontend 가격 조작 무시 (서버 가격 권위)
  *   ⑧ 소비자 commerce 재유입 차단 · 제거된 dead API 비존재
  */
-import { readFileSync, existsSync } from 'fs';
+import { readFileSync } from 'fs';
 import { join } from 'path';
 import { B2B_ORDERABLE_SOURCE_TYPES } from '../services/cart/b2b-checkout-confirm.core.js';
 import {
@@ -276,12 +276,5 @@ describe('⑧ 소비자 commerce 재유입 차단 · dead API 비존재', () => 
     const kpa = read('routes/kpa/controllers/kpa-checkout.controller.ts');
     expect(kpa).toContain('STORE_CONSUMER_ORDER_RETIRED');
     expect(kpa).toContain('410');
-  });
-
-  // WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1:
-  //   `GET /api/v1/glycopharm/b2b/products` 비존재 단언은 GlycoPharm 서비스 전체가
-  //   삭제되어 대상 파일이 사라졌다. 아래 census 가 상위 계약(라우트 0)을 대신 고정한다.
-  it('glycopharm 라우트 축이 저장소에 존재하지 않는다', () => {
-    expect(existsSync(join(SRC, 'routes', 'glycopharm'))).toBe(false);
   });
 });

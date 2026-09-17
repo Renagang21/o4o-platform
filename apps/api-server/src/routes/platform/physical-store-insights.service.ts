@@ -78,8 +78,8 @@ export function generatePhysicalStoreInsights(ctx: StoreInsightContext): StoreIn
   }
 
   // ---- Rule 2: 겸업 시너지 분석 ----
-  //   WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1: 서비스명을 문구에 고정하지 않는다
-  //   (기존에는 K-Cosmetics × GlycoPharm 쌍을 전제했다). 시너지 판정은 서비스 수 기준 generic 이다.
+  //   서비스명을 문구에 고정하지 않는다
+  //   시너지 판정은 서비스 수 기준 generic 이다.
   const synergyScore = computeSynergyScore(ctx);
   if (synergyScore !== null) {
     const growths = ctx.current.services

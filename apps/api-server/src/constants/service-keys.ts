@@ -42,5 +42,3 @@ export const SERVICE_KEYS = {
 
 export type ServiceKey = typeof SERVICE_KEYS[keyof typeof SERVICE_KEYS];
 
-// GLYCOPHARM_OPL_SERVICE_KEYS — REMOVED (WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1)
-//   GlycoPharm 서비스 삭제로 소비처 0. glycopharm / glycopharm-event-offer 키도 함께 제거했다.

@@ -45,7 +45,7 @@
 
 ## 5. 범위 밖(무접촉)
 
-- 공용 `OperatorMembersConsolePage` 무수정. GP/Cosmetics/Neture 회원 화면 무접촉(GP/Cos 는 `/operator/users` 별도 route).
+- 공용 `OperatorMembersConsolePage` 무수정. Cosmetics/Neture 회원 화면 무접촉(Cos 는 `/operator/users` 별도 route).
 - 회원 API·상태 정책·DB migration·AQ 집계 SQL 무변경.
 
 ## 6. 커밋 SHA

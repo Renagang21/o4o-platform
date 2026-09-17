@@ -4,7 +4,7 @@
  * WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §4 (#97)
  *
  * 화면 본체는 @o4o/operator-core-ui 의 공통 Surveys module 이다
- * (KPA-Society · GlycoPharm · K-Cosmetics 가 이미 같은 화면을 쓴다).
+ * (KPA-Society · K-Cosmetics 가 이미 같은 화면을 쓴다).
  * 여기서는 client(=PH api client, serviceKey 주입) 와 accent 만 넘긴다.
  * 공통 화면에 서비스 분기를 추가하지 않았고, PH 전용 콘솔 사본도 만들지 않는다.
  *

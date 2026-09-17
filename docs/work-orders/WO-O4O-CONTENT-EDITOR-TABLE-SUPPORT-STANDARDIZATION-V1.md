@@ -37,7 +37,7 @@ WO-O4O-CONTENT-EDITOR-TABLE-SUPPORT-STANDARDIZATION-V1
 
 **필요 패키지** — `@tiptap/extension-table`, `@tiptap/extension-table-row`, `@tiptap/extension-table-header`, `@tiptap/extension-table-cell` (TipTap 표준 4종)
 
-**서비스** — Neture / KPA / GlycoPharm / K-Cosmetics (별도 서비스 코드 변경 없이 공통 패키지 도입으로 전 서비스 적용)
+**서비스** — Neture / KPA / K-Cosmetics (별도 서비스 코드 변경 없이 공통 패키지 도입으로 전 서비스 적용)
 
 ---
 
@@ -128,7 +128,7 @@ HTML → Editor → Save → Reload → 구조 유지를 실측한다.
 
 ## 12. 검증
 
-Neture / KPA / GlycoPharm / K-Cosmetics 모든 RichTextEditor 소비 화면에서:
+Neture / KPA / K-Cosmetics 모든 RichTextEditor 소비 화면에서:
 
 - 표 생성 / 수정 / 저장 / 재로드 정상 동작
 - **Round-trip 유지** (편집 후 저장·재로드 시 구조 보존)

@@ -111,7 +111,7 @@ DB migration — 없음
 schema drop (*_fulfillments / *_shipping_addresses) — 없음 (P3)
 DTO/API 계약 대규모 정리 — 없음 (P2)
 참여 신청·콘텐츠 작성·게시 승인·참여자 목록 — 유지
-KPA/GP/KCos store 연결 작업 — 없음 (이미 clean)
+KPA/KCos store 연결 작업 — 없음 (이미 clean)
 page JSX/문구 정정 — 없음 (P1)
 package/lock/Dockerfile — 무변경
 ```

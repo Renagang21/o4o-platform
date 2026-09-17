@@ -31,7 +31,6 @@ interface KpaContextualNavItem extends GlobalHeaderNavItem {
   visibleWhen: 'pharmacyRelated' | 'storeOwner' | 'operator' | 'admin';
 }
 
-// GlycoPharm / K-Cosmetics / Neture — 동일 패턴
 interface XxxContextualNavItem extends GlobalHeaderNavItem {
   visibleWhen: '...' | '...';
 }
@@ -46,11 +45,10 @@ interface XxxContextualNavItem extends GlobalHeaderNavItem {
 | 서비스 | public nav 항목 | 비고 |
 |--------|----------------|------|
 | **KPA-Society** | 커뮤니티(`/`) | 1개만, 나머지 contextual |
-| **GlycoPharm** | 홈(`/`) · 포럼(`/forum`) · 강의(`/lms`) | 3개 고정 |
-| **K-Cosmetics** | 홈(`/`) · 포럼(`/forum`) · 강의(`/lms`) | GlycoPharm과 동일 구조 |
+| **K-Cosmetics** | 홈(`/`) · 포럼(`/forum`) · 강의(`/lms`) | — |
 | **Neture** | Home(`/`) · 유통참여형펀딩 · Supplier · Partner · Contact · O4O소개 · 이용가이드 | 7개, B2B 중심 |
 
-**관찰**: KPA-Society는 public nav가 `커뮤니티` 1개뿐이고 나머지를 role-based contextual로 처리. GlycoPharm/K-Cosmetics는 공통 3개 + contextual 패턴.
+**관찰**: KPA-Society는 public nav가 `커뮤니티` 1개뿐이고 나머지를 role-based contextual로 처리. K-Cosmetics는 공통 3개 + contextual 패턴.
 
 ---
 
@@ -59,7 +57,6 @@ interface XxxContextualNavItem extends GlobalHeaderNavItem {
 | 서비스 | contextual nav | visibleWhen 조건 |
 |--------|---------------|----------------|
 | **KPA-Society** | 내 매장(`/store`) · 매장 HUB(`/store-hub`) | storeOwner / pharmacyRelated |
-| **GlycoPharm** | 매장 HUB(`/store-hub`) · 내 매장(`/store`) | pharmacyRelated / storeOwner |
 | **K-Cosmetics** | 매장 HUB · 내 매장 · 파트너(`/partner`) | storeManager / partner |
 | **Neture** | contextual 없음 (빈 배열) | — |
 
@@ -89,21 +86,6 @@ interface XxxContextualNavItem extends GlobalHeaderNavItem {
 **블로그 (동적)**:
 - `/store/content/blog` — 블로그 목록
 - `/store/content/blog/:id` — 게시물 상세 (최고 SEO 우선순위)
-
----
-
-### 2-2. GlycoPharm
-
-| nav label | path | SEO identity |
-|-----------|------|-------------|
-| 홈 | `/` | service-home |
-| 포럼 | `/forum` | forum-hub |
-| 강의 | `/lms` | lms-hub |
-| (contextual) | `/store` | store-dashboard |
-| (contextual) | `/store-hub` | pharmacy-hub |
-
-동적 SEO 대상:
-- `/store/:slug/blog/:postSlug` — 가장 높은 외부 검색 노출 가능성
 
 ---
 
@@ -286,7 +268,6 @@ export type SeoRegistry = Record<string, PageSeoConfig>;
 
 ```
 services/web-kpa-society/src/config/seoRegistry.ts
-services/web-glycopharm/src/config/seoRegistry.ts
 services/web-k-cosmetics/src/config/seoRegistry.ts
 services/web-neture/src/config/seoRegistry.ts
 ```
@@ -328,7 +309,7 @@ export function usePageSeo(registry: SeoRegistry, pathname: string) {
 | `/` (홈) | 서비스별 identity 완전히 다름 |
 | `/store`, `/store-hub` | 서비스별 용어 다름, noIndex 정책 다를 수 있음 |
 | 블로그 게시물 | 동적 — registry 아닌 API 기반 처리 필요 |
-| Neture 전용 (`/market-trial`, `/supplier`, `/guide`) | KPA/Glyco에 없음 |
+| Neture 전용 (`/market-trial`, `/supplier`, `/guide`) | — |
 
 ### noIndex 권장 대상
 

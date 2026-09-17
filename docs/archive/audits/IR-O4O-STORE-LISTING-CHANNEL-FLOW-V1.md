@@ -21,7 +21,7 @@ O4O 플랫폼의 **매장 상품 운영 루프**(Supplier → Store → Channel 
 ### CRITICAL FINDING
 
 **KPA 매장은 `platform_store_slugs` 테이블에 slug이 등록되지 않는다.**
-- BackfillPlatformStoreSlugs 마이그레이션은 glycopharm/cosmetics만 처리
+- BackfillPlatformStoreSlugs 마이그레이션은 cosmetics만 처리
 - KPA 서비스에는 `reserveSlug()` 호출 코드 부재
 - **결과**: `/api/v1/stores/:slug/products` 공개 Storefront API에서 KPA 매장 접근 불가
 - **영향**: B2C 채널을 통한 일반 소비자 상품 노출이 동작하지 않음
@@ -244,14 +244,13 @@ slug → storeId + serviceKey 변환. 불일치 시 301 redirect (old slug histo
 
 | 서비스 | platform_store_slugs 등록 | 방법 |
 |--------|:------------------------:|------|
-| glycopharm | ✅ | BackfillPlatformStoreSlugs 마이그레이션 |
 | cosmetics | ✅ | BackfillPlatformStoreSlugs 마이그레이션 |
 | glucoseview | ✅ | application.controller.ts:559 |
 | **KPA** | **❌** | **등록 코드 부재** |
 
 ### 4.2 원인 분석
 
-1. `BackfillPlatformStoreSlugs` 마이그레이션은 glycopharm/cosmetics만 처리
+1. `BackfillPlatformStoreSlugs` 마이그레이션은 cosmetics만 처리
 2. KPA 서비스(`routes/kpa/`)에는 `reserveSlug()` 호출 코드 없음
 3. KPA organization 생성 시 `platform_store_slugs`에 slug 등록하는 로직 없음
 4. `organization_service_enrollments`에 `service_code = 'kpa-society'`로 등록되지만 slug 미생성

@@ -12,7 +12,7 @@
 
 ## 1. 개요
 
-O4O 플랫폼은 여러 독립 서비스(KPA-Society, GlycoPharm, Neture 등)로 구성되어 있으나,
+O4O 플랫폼은 여러 독립 서비스(KPA-Society, Neture 등)로 구성되어 있으나,
 핵심 기능 영역(Forum, LMS, Signage)은 **서비스별로 재구현하지 않고 공통 구조를 공유**한다.
 
 | 구분 | 설명 |
@@ -28,7 +28,7 @@ O4O 플랫폼은 여러 독립 서비스(KPA-Society, GlycoPharm, Neture 등)로
 
 | 항목 | 공통 구조 | 서비스별 내용 |
 |------|-----------|--------------|
-| 게시판 목록 | 카테고리 목록 UI, 페이지네이션, 검색 | 카테고리 데이터 (KPA 약사포럼, GlycoPharm 게시판 등) |
+| 게시판 목록 | 카테고리 목록 UI, 페이지네이션, 검색 | 카테고리 데이터 (KPA 약사포럼 등) |
 | 게시글 상세 | 본문 렌더링, 댓글, 좋아요, 파일 첨부 | 실제 게시글 내용 |
 | 권한 처리 | 읽기/쓰기/관리자 분기 구조 | 서비스별 멤버십/역할 기준 |
 | API 계약 | `/api/v1/{service}/forum/*` 경로 구조 | serviceKey 기반 데이터 격리 |
@@ -76,7 +76,7 @@ O4O 플랫폼은 여러 독립 서비스(KPA-Society, GlycoPharm, Neture 등)로
 ```
 ❌ 서비스별로 Forum/LMS/Signage를 별도 재구현
 ❌ 서비스별 UI 분기 (if (service === 'kpa') { ... })
-❌ 서비스별 독립 테이블 생성 (kpa_forum_posts, glycopharm_posts)
+❌ 서비스별 독립 테이블 생성 (kpa_forum_posts 등)
 ❌ 공통 구조 컴포넌트의 서비스별 복사
 ```
 

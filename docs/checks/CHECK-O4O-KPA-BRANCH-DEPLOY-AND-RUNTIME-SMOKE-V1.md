@@ -117,7 +117,7 @@ tenant 는 URL slug(또는 Host)에서만 해석되고 controller 는 항상 `re
 |---|---|
 | deploy-web-services run | `deploy-kpa-branch` 만 실행, 나머지 5개 skipped |
 | Cloud Run 리비전 | 기존 web service 리비전 변동 없음 (`kpa-branch-web` 만 신규 00001) |
-| 기존 서비스 접속 | neture 200 / kpa-society 200 / glycopharm 200 |
+| 기존 서비스 접속 | neture 200 / kpa-society 200 200 |
 | api-server | `o4o-core-api-03305-cdb` Ready · 기존 서비스 CORS·API 정상 |
 
 ## 10. smoke fixture 현황 (정리 승인 대기)

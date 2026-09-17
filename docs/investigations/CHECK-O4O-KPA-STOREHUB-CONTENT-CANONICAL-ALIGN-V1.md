@@ -1,7 +1,7 @@
 # CHECK-O4O-KPA-STOREHUB-CONTENT-CANONICAL-ALIGN-V1
 
 > **작업명:** WO-O4O-KPA-STOREHUB-CONTENT-CANONICAL-ALIGN-V1
-> **유형:** KPA `/store-hub/content` 콘텐츠 자료실을 GlycoPharm·K-Cosmetics canonical 로 정렬. **frontend config-only**, additive/정렬.
+> **유형:** KPA `/store-hub/content` 콘텐츠 자료실을 K-Cosmetics canonical 로 정렬. **frontend config-only**, additive/정렬.
 > **결과: PASS (typecheck) — heroTitle/heroDesc·6-필터·용어(내 약국) canonical 정렬. 컴포넌트·API client·copy 로직·route·링크 대상 무변경. web-kpa-society `tsc -b` exit 0.**
 > 선행: IR-O4O-STORE-CONTENT-SURFACE-AUDIT-V1 (§10 후속 WO #1) — 2026-06-17
 
@@ -17,7 +17,7 @@ IR 은 KPA 를 "독자 `HubContentLibraryPage`" 로 기술했으나, 실제로�
 |------|------|
 | `services/web-kpa-society/src/pages/pharmacy/HubContentLibraryPage.tsx` | config 정렬(프레이밍·필터·용어·display remap 단순화) |
 
-> backend/route/page 라우팅/copy API/import 로직/`o4o_asset_snapshots`/GP·KCos/package·lock **변경 0**.
+> backend/route/page 라우팅/copy API/import 로직/`o4o_asset_snapshots`/KCos/package·lock **변경 0**.
 
 ## 3. 변경 내역 (config-only)
 
@@ -34,7 +34,7 @@ IR 은 KPA 를 "독자 `HubContentLibraryPage`" 로 기술했으나, 실제로�
 | pageLimit | 20 | 12 |
 
 - **display remap 단순화:** 복합 탭(notice+news → 공지/소식, promo+event → 혜택/이벤트) 제거. 필터 key = CMS DB type 직매핑. `DISPLAY_LABEL_MAP`/배지색을 canonical 라벨(공지/뉴스/가이드/지식/프로모션)로 갱신.
-- **'event' legacy 데이터:** 전용 탭 제거되나 **'전체' 탭에서 계속 노출**(배지 라벨 '혜택/이벤트' 유지) → 데이터 은폐 0. (GP·KCos 도 event 탭 없음 — 동일 정책)
+- **'event' legacy 데이터:** 전용 탭 제거되나 **'전체' 탭에서 계속 노출**(배지 라벨 '혜택/이벤트' 유지) → 데이터 은폐 0. (KCos 도 event 탭 없음 — 동일 정책)
 
 ## 4. 명시적 무변경 (WO §5 준수)
 
@@ -48,7 +48,7 @@ IR 은 KPA 를 "독자 `HubContentLibraryPage`" 로 기술했으나, 실제로�
 
 1. `/store-hub/content` 라우트 → `HubContentLibraryPage` (App.tsx:699) ✓
 2. KPA CMS fetch = `cmsApi.getContents({serviceKey:'kpa'})` (유지) ✓
-3. GP·KCos = `ContentHubTemplate` config adapter (동형 확인) ✓
+3. KCos = `ContentHubTemplate` config adapter (동형 확인) ✓
 4. KPA 에 template 적용 안전 — 이미 사용 중 ✓
 5. config-only 정렬 가능 — 수행 ✓
 6. 필터 값 ↔ backend CMS type: filter key(notice/guide/knowledge/promo/news) = `cmsApi` `type` 인자 직대응 ✓
@@ -58,15 +58,15 @@ IR 은 KPA 를 "독자 `HubContentLibraryPage`" 로 기술했으나, 실제로�
 ## 6. 검증
 
 - **typecheck PASS:** `services/web-kpa-society` `tsc -b` exit 0.
-- 정적: filters 6개·key=DB type, 복합 remap 제거 후 단일 fetch 경로, 용어 '내 약국' 일관, 링크 대상 실재(`/store/content`). GP·KCos 파일 미수정(무회귀).
-- **배포 PASS:** main 푸시(`6418988ee`) → CI `Deploy Web Services` `deploy-kpa-society → success` (deploy-neture/glycopharm/k-cosmetics → skipped, 정상). KPA 단독 배포 확인.
+- 정적: filters 6개·key=DB type, 복합 remap 제거 후 단일 fetch 경로, 용어 '내 약국' 일관, 링크 대상 실재(`/store/content`). KCos 파일 미수정(무회귀).
+- **배포 PASS:** main 푸시(`6418988ee`) → CI `Deploy Web Services` `deploy-kpa-society → success` KPA 단독 배포 확인.
 - **browser smoke 미수행 → 별도 SMOKE 로 분리.** 사유: 본 WO 는 **config-only 변경 + `tsc -b` PASS**, backend/route/API/DB·타서비스 무변경으로 회귀 위험 낮음 + 로컬 Playwright persistent 프로필이 실행 중 Chrome 세션에 잠겨 자동 실행 불가(사용자 브라우저 종료 부담 회피). 운영 화면 확인은 후속 `SMOKE-O4O-KPA-STOREHUB-CONTENT-CANONICAL-ALIGN-POST-DEPLOY-V1` 로 분리.
-  - smoke 체크리스트(후속): `/store-hub/content` 제목 "약국에서 바로 쓰는 콘텐츠" / 설명 "KPA-Society 약국을 위한 콘텐츠 자료실" / 6-필터(전체·공지·가이드·지식·프로모션·뉴스) / 복사 버튼·안내문구 '내 약국' / `/store-hub/{blog,pop,qr,signage}` 무영향 / console error 0 / GP·KCos `/store-hub/content` 무변경.
+  - smoke 체크리스트(후속): `/store-hub/content` 제목 "약국에서 바로 쓰는 콘텐츠" / 설명 "KPA-Society 약국을 위한 콘텐츠 자료실" / 6-필터(전체·공지·가이드·지식·프로모션·뉴스) / 복사 버튼·안내문구 '내 약국' / `/store-hub/{blog,pop,qr,signage}` 무영향 / console error 0 / KCos `/store-hub/content` 무변경.
 
 ## 7. 완료 판정
 
-**PASS (typecheck + 배포).** KPA `/store-hub/content` 프레이밍·6-필터·용어를 GP·KCos canonical 로 정렬. POP/QR/블로그/사이니지 탭 미추가, backend/route/copy/링크대상/타서비스/package 무변경. KPA 단독 배포 success. **browser smoke 는 별도 SMOKE 로 분리**(config-only·tsc PASS 근거로 본 WO 는 종료).
+**PASS (typecheck + 배포).** KPA `/store-hub/content` 프레이밍·6-필터·용어를 KCos canonical 로 정렬. POP/QR/블로그/사이니지 탭 미추가, backend/route/copy/링크대상/타서비스/package 무변경. KPA 단독 배포 success. **browser smoke 는 별도 SMOKE 로 분리**(config-only·tsc PASS 근거로 본 WO 는 종료).
 
 ---
 
-*Date: 2026-06-17 · KPA store-hub content canonical 정렬 · config-only(HubContentLibraryPage) · heroTitle "약국에서 바로 쓰는 콘텐츠" + 6-필터(전체/공지/가이드/지식/프로모션/뉴스) + '내 약국' 용어 · 컴포넌트/cmsApi/copy/route/링크대상 무변경 · legacy event 는 전체 탭 노출 유지 · web-kpa-society tsc -b exit 0 · GP·KCos·backend·DB 무변경.*
+*Date: 2026-06-17 · KPA store-hub content canonical 정렬 · config-only(HubContentLibraryPage) · heroTitle "약국에서 바로 쓰는 콘텐츠" + 6-필터(전체/공지/가이드/지식/프로모션/뉴스) + '내 약국' 용어 · 컴포넌트/cmsApi/copy/route/링크대상 무변경 · legacy event 는 전체 탭 노출 유지 · web-kpa-society tsc -b exit 0 · KCos·backend·DB 무변경.*

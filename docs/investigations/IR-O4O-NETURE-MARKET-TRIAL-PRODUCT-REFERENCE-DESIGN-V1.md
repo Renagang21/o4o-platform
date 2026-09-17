@@ -82,7 +82,7 @@
 | 항목 | 이벤트 오퍼 | 유통참여형 펀딩 |
 |---|---|---|
 | 참조 단위 | **SPO(offer)** — `ProposableOffer.id`(offer)/`masterId` 로 자동 선택 (BINDING-V2) | 캠페인 — 현재 미참조 |
-| 대상 | **서비스별 제안**(kpa-society/glycopharm/k-cosmetics), 운영자 승인 | 공급자 주도 캠페인, 참여자(seller) 모집 |
+| 대상 | **서비스별 제안**, 운영자 승인 | 공급자 주도 캠페인, 참여자(seller) 모집 |
 | 가격 | eventPrice ≤ 일반 공급가 검증, **원본 가격 불변** | trialUnitPrice/targetAmount(캠페인 자체값), **원본 미참조** |
 | 주문 연결 | OPL/주문과 연계(서비스 노출) | 참여/정산(별도), 주문 직접 아님 |
 

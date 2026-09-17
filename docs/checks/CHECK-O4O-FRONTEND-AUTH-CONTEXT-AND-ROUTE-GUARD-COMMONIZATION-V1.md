@@ -11,9 +11,8 @@
 
 | 항목 | 범위 | 상태 |
 |---|---|---|
-| 1단계 — AuthContext 5개 서비스 수렴 (`useServiceAuth`) | KPA / K-Cos / Glyco / Neture / PH | ✅ 완료 (`bcdb1cf9b`) |
-| 2단계 — 일반 RoleGuard 4개 서비스 수렴 (`createRouteGuard`) | KPA / K-Cos / Glyco / Neture | ✅ 완료 (본 커밋) |
-| KPA 전용 Guard 5종 · Glyco 전용 Guard 2종 · PH `MembershipGate` | — | ✅ **무변경** (의미 보존, 통합하지 않음) |
+| 1단계 — AuthContext 5개 서비스 수렴 (`useServiceAuth`) | — | ✅ 완료 (`bcdb1cf9b`) |
+| 2단계 — 일반 RoleGuard 4개 서비스 수렴 (`createRouteGuard`) | — | ✅ 완료 (본 커밋) |
 | Core 계약 확장 — `isAllowed` 술어 주입 | `@o4o/auth-react` | ✅ 추가 (서비스명 조건문 0) |
 | 정적 검증 (5개 서비스 tsc + lint ratchet) | 전 서비스 | ✅ GREEN |
 | 컴포넌트 검증 (vitest 36 tests) | Core | ✅ 36/36 PASS |
@@ -41,7 +40,6 @@ Guard 판정 로직을 Core 로 옮기면서 **4개 서비스의 화면 동작�
 | 대상 | 이유 |
 |---|---|
 | KPA 전용 Guard — `AdminAuthGuard` / `HubGuard` / `PharmacyGuard` / `PharmacyOwnerOnlyGuard` / `PharmacistOnlyGuard` | `USER-OPERATOR-FREEZE-V1 §8.4` — "KPA-a 구조를 일반 서비스 구조로 단순화 금지" |
-| GlycoPharm 전용 Guard — `GlycoHubGuard` / `PharmacyStoreGuard` | 서비스 고유 정책 |
 | PharmacyHub `MembershipGate` (단독 게이트, RoleGuard 없음) | 통합 대상 아님 |
 | 4개 서비스 `MembershipGate` 컴포넌트 | 주입만 하고 구현은 그대로 |
 | 백엔드 인증 · `auth-login.service.ts` · credential 계약 | Identity V2 별도 WO |
@@ -61,7 +59,6 @@ roleOk = (allowedRoles ? hasAnyRole(roles, allowedRoles) : true)
       && (isAllowed    ? isAllowed(roles)                : true)
 ```
 
-**왜 필요했나.** GlycoPharm `OperatorRoute` 는 `isOperatorOrAbove(roles,'glycopharm')`,
 K-Cosmetics `OperatorRoute` 는 `isAdminOrAbove(roles,'k-cosmetics') || 'k-cosmetics:operator' || 'cosmetics:operator'`
 로 판정한다. 둘 다 **배열 상수로 펼치면 canonical 화 규칙이 서비스 코드에 복제**된다.
 술어를 그대로 주입하게 해서 Core 안에 서비스명 조건문이 생기지 않도록 했다.
@@ -72,7 +69,6 @@ K-Cosmetics `OperatorRoute` 는 `isAdminOrAbove(roles,'k-cosmetics') || 'k-cosme
 |---|---|---|---|
 | KPA | `components/auth/RoleGuard.tsx` | 127 → 100 | `createRouteGuard` + `renderDenied`(AccessDeniedCard) 주입 |
 | K-Cosmetics | 동 | 103 → 91 | `createRouteGuard` + **`useGuardAuth` 어댑터**(§3-3) + `isAllowed` |
-| GlycoPharm | 동 | 87 → 57 | `createRouteGuard` + `isAllowed` |
 | Neture | 동 | 198 → 174 | `createRouteGuard` 를 `BaseGuard` 로 두고 5개 래퍼 유지 |
 
 **export 표면 무변경.** 호출부(각 `App.tsx`, KPA `OperatorRoutes.tsx`) 수정 0건.
@@ -98,7 +94,6 @@ K-Cosmetics `OperatorRoute` 는 `isAdminOrAbove(roles,'k-cosmetics') || 'k-cosme
 | KPA `accessDeniedMessage` 있음 | AccessDeniedCard | `renderDenied({message})` → 카드 | 동일 |
 | KPA `accessDeniedMessage` 없음 | `Navigate('/')` | `renderDenied` 가 `null` → `deniedRedirect='/'` | 동일 |
 | KPA 로딩 문구 | "권한을 확인하는 중..." | `renderLoading` 주입 | 동일 |
-| K-Cos / Glyco 로딩 스피너 | 서비스별 색상 | `renderLoading` 주입 | 동일 |
 | Neture 로딩 스피너 `min-h-[400px]` | 동 | `renderLoading` 주입 | 동일 |
 | Neture `requireMembership` 지정 | `<MembershipGate serviceKey=...>` | `enforceMembership={!!requireMembership}` + `membershipServiceKey` | 동일 |
 | Neture `PlatformRoute` (membership 미요구) | membership 검사 없음 | `enforceMembership=false` | 동일 |
@@ -125,7 +120,6 @@ Core 는 `deps.useAuth()` 를 렌더 중에 호출하므로 어댑터 내부 훅
 
 ### 3-4. 도달 불가 분기 정리
 
-기존 K-Cos/Glyco/Neture 는 `!isAuthenticated` 검사 후 `!user` 를 따로 다뤘다.
 `useServiceAuth` 는 `isAuthenticated: !!user` 이므로(`useServiceAuth.ts:148`) 두 조건은 동치이며,
 Core 의 `!isAuthenticated || !user` 는 기존 분기를 모두 포함한다. 도달 가능한 동작 차이 없음.
 
@@ -158,7 +152,6 @@ Core 의 `!isAuthenticated || !user` 는 기존 분기를 모두 포함한다. �
 
 ```
 pnpm run type-check:frontend      → OK (services 8개 전체)
-  web-kpa-society / web-k-cosmetics / web-glycopharm / web-neture / web-pharmacy-hub 포함
 node scripts/lint-ratchet.mjs     → ESLint: 102 errors, 2369 warnings (error baseline 102)
 ```
 
@@ -174,7 +167,7 @@ npx vitest run --config packages/auth-react/vitest.config.mjs
   → 36 passed (36)
 ```
 
-커버 범위: 판정 순서 · fallback + `state.from` · KPA 안내카드 2분기 · `isAllowed` 술어(Glyco/K-Cos 동치식) ·
+커버 범위: 판정 순서 · fallback + `state.from` · KPA 안내카드 2분기 · `isAllowed` 술어
 `allowedRoles` ∧ `isAllowed` · `redirectMap` 선행성 · `enforceMembership` on/off · `membershipServiceKey` 전달 ·
 세션 복구 4종 · login 반환 계약 · 오류 코드 4종 · 토큰 정리 이벤트 · logout 3종.
 
@@ -190,21 +183,20 @@ npx vitest run --config packages/auth-react/vitest.config.mjs
   `/auth/me` 만 fixture 응답, 나머지 API 는 무해한 빈 성공 응답 → `/operator` 진입 → URL·본문 텍스트 수집
 - **실 API 는 한 번도 타지 않는다.** 따라서 이 결과는 로그인 성공의 근거가 아니다.
 
-| 시나리오 | 준비 | KPA | K-Cos | Glyco | Neture |
-|---|---|---|---|---|---|
-| B1 미인증 | 토큰 없음 | `/login` 로그인 화면 | `/login` | `/` + 로그인 모달 | `/` + 로그인 모달 |
-| B2 무효 토큰 | 토큰 + `/auth/me` 401 | `/login` | `/login` | `/` + 로그인 모달 | `/` + 로그인 모달 |
-| B3 허용역할 + active | operator + active | `/operator` 운영자 IA | `/operator` | `/operator` | `/operator` |
-| B4 금지 역할 | member + active | `/operator` **접근 안내 카드** | `/` 홈 | `/` 홈 | `/` 홈 |
-| B5 membership 없음 | operator + `[]` | "서비스 가입이 필요합니다" | 동 | 동 | 동 |
-| B6 membership pending | operator + pending | "가입 승인 대기 중" | 동 | 동 | 동 |
+| 시나리오 | 준비 | KPA | K-Cos | Neture |
+| --- | --- | --- | --- | --- |
+| B1 미인증 | 토큰 없음 | `/login` 로그인 화면 | `/login` | `/` + 로그인 모달 |
+| B2 무효 토큰 | 토큰 + `/auth/me` 401 | `/login` | `/login` | `/` + 로그인 모달 |
+| B3 허용역할 + active | operator + active | `/operator` 운영자 IA | `/operator` | `/operator` |
+| B4 금지 역할 | member + active | `/operator` **접근 안내 카드** | `/` 홈 | `/` 홈 |
+| B5 membership 없음 | operator + `[]` | "서비스 가입이 필요합니다" | 동 | 동 |
+| B6 membership pending | operator + pending | "가입 승인 대기 중" | 동 | 동 |
 
 **BEFORE vs AFTER 비교 결과 (4서비스 × 6시나리오 = 24건)**
 
 ```
 kpa    → url+text 완전 동일 (6/6)
 kcos   → url+text 완전 동일 (6/6)
-glyco  → url+text 완전 동일 (6/6)
 neture → url+text 완전 동일 (6/6)
 ```
 
@@ -227,7 +219,6 @@ B2 의 401 은 내가 넣은 mock 응답이고, KPA B3 의 `Unexpected token '<'
 |---|---|---|---|
 | `services/web-kpa-society` | `@o4o/auth-react` (`createRouteGuard`) | RoleGuard 내부 구현만 | tsc ✅ / 브라우저 6/6 동일 ✅ |
 | `services/web-k-cosmetics` | 동 | RoleGuard + OperatorRoute | tsc ✅ / 브라우저 6/6 동일 ✅ |
-| `services/web-glycopharm` | 동 | RoleGuard + OperatorRoute | tsc ✅ / 브라우저 6/6 동일 ✅ |
 | `services/web-neture` | 동 | RouteGuard + 래퍼 5종 | tsc ✅ / 브라우저 6/6 동일 ✅ |
 | `services/web-pharmacy-hub` | `@o4o/auth-react` (`useServiceAuth` 만) | Guard 없음 — 무영향 | tsc ✅ |
 | `apps/admin-dashboard` | 없음 (`@o4o/auth-context` 사용) | 무영향 | 무변경 |
@@ -254,7 +245,7 @@ Guard export 표면이 그대로라 호출부 수정도 0건이다.
 - 백엔드 인증 코드(`auth-login.service.ts` 등)를 **접촉하지 않았다.**
 - 프런트에서 `serviceKey` 를 빼거나 `users.password` 로 fallback 하는 우회를 **하지 않았다.**
   serviceKey 검증은 의도된 보안 경계이므로 우회는 회귀가 아니라 취약점이 된다.
-- 영향 서비스: KPA / K-Cosmetics / GlycoPharm / Neture / PharmacyHub **전부**.
+- 영향 서비스: KPA / K-Cosmetics / Neture / PharmacyHub **전부**.
 - 후속: `WO-O4O-IDENTITY-V2-SERVICE-CREDENTIAL-PASSWORD-HASH-DRIFT-AUDIT-AND-FIX-V1` 로 분리.
 
 ### 재검증 조건
@@ -301,7 +292,7 @@ Identity V2 수정 후 실제 계정으로 5개 서비스 로그인 E2E 를 수�
 |---|---|---|
 | 1 | Identity V2 credential hash drift 진단·수정 | 별도 WO (§6) |
 | 2 | `packages/auth-react` 테스트를 CI 파이프라인에 배선 | CI 인프라 변경 = 중지 조건. 현재는 로컬 실행 전용 |
-| 3 | KPA 전용 Guard 5종 / Glyco 전용 2종 정리 | F11 §8.4 — 구조 보존이 원칙 |
+| 3 | — | F11 §8.4 — 구조 보존이 원칙 |
 | 4 | KPA 자체 fetch `ApiClient`(158L, api 77파일 중 35파일) ↔ `authClient` 이중 운영 해소 | 범위가 커 별도 WO |
 | 5 | `USER-OPERATOR-FREEZE-V1 §8.3` 문서 정합 — 존재하지 않는 Guard 3종(`BranchAdminAuthGuard`·`BranchOperatorAuthGuard`·`IntranetAuthGuard`) 기재, 실재하는 `HubGuard`·`PharmacyOwnerOnlyGuard` 누락 | Frozen 문서 변경은 별도 WO |
 | 6 | `services/web-neture/tailwind.config.js` 가 `shared-space-ui`(56파일 import)·`operator-core-ui`·`store-ui-core`·`store-products-ui` 를 content 에 미포함 | 본 WO 범위 밖 (Guard 무관). 렌더 실측 동반 필요 |

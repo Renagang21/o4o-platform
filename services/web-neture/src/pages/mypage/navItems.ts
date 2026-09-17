@@ -6,7 +6,7 @@
  * 결함: Neture 는 /mypage 하위 4개 라우트를 갖고 있으면서 navItems 를 주지 않아
  *       공통 기본 3개만 렌더됐고, /mypage/business-profile 에서는 활성 tab 이
  *       없었다(해당 화면으로 이동할 tab 자체가 없음).
- * 교정: KPA / K-Cosmetics / GlycoPharm 과 같은 축으로 nav config 를 명시한다.
+ * 교정: KPA / K-Cosmetics 과 같은 축으로 nav config 를 명시한다.
  *
  * 역할 판정은 **신설하지 않는다** (WO §11).
  * Neture 의 기존 SSOT `lib/role-constants.ts` 의 `SUPPLIER_ONLY_ROLES` 를 그대로

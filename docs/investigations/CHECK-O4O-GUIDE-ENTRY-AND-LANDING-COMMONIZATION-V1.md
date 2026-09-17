@@ -5,7 +5,7 @@
 > **작성일**: 2026-08-20
 > **시작 commit**: `176ce49f9`
 > **선행 문서**: [`CHECK-O4O-GUIDE-CROSS-SERVICE-CENSUS-V1`](CHECK-O4O-GUIDE-CROSS-SERVICE-CENSUS-V1.md) · [`CHECK-O4O-GUIDE-STALE-ROUTE-AND-COPY-CONTRACT-CLEANUP-V1`](CHECK-O4O-GUIDE-STALE-ROUTE-AND-COPY-CONTRACT-CLEANUP-V1.md)
-> **대상 서비스**: KPA-Society / K-Cosmetics / GlycoPharm / Neture / PharmacyHub
+> **대상 서비스**: KPA-Society / K-Cosmetics / Neture / PharmacyHub
 
 ---
 
@@ -20,10 +20,10 @@ SERVICE_GUIDE_LINKED: 3
 미조사: 0
 ```
 
-- **조사 Guide entry 42** = KPA 11 + K-Cosmetics 4 + GlycoPharm 4 + Neture 22 + PharmacyHub 1(부재 확인).
-- **공통 landing adoption 4** = 신규 공통 View `GuideServiceIntroPage` 채택 3(KPA · K-Cosmetics · GlycoPharm) + 기존 shared guide shell 유지 1(Neture `/guide` = `GuideFeaturesPage`).
-- **VIEW_DUPLICATED_FIXED 2** = census 의 `VIEW_DUPLICATED` 2 cell (K-Cosmetics ↔ GlycoPharm `ServiceGuidePage`). 실제 수렴 파일은 KPA 포함 3개.
-- **DEAD_ENTRY_FIXED 3** = KPA · K-Cosmetics · GlycoPharm 의 `/guide` (route 없음 → not-found) 를 canonical 진입점으로 연결.
+- **조사 Guide entry 42** = KPA 11 + K-Cosmetics 4 4 + Neture 22 + PharmacyHub 1(부재 확인).
+- **공통 landing adoption 4** = 신규 공통 View `GuideServiceIntroPage` 채택 3(KPA · K-Cosmetics) + 기존 shared guide shell 유지 1(Neture `/guide` = `GuideFeaturesPage`).
+- **VIEW_DUPLICATED_FIXED 2** = census 의 `VIEW_DUPLICATED` 2 cell 실제 수렴 파일은 KPA 포함 3개.
+- **DEAD_ENTRY_FIXED 3** = KPA · K-Cosmetics 의 `/guide` (route 없음 → not-found) 를 canonical 진입점으로 연결.
 - **SERVICE_GUIDE_LINKED 3** = 위 3 서비스에서 `/service-guide` ↔ `/guide/*` 양방향 연결.
 
 ---
@@ -44,7 +44,7 @@ SERVICE_GUIDE_LINKED: 3
 
 1. 두 축의 **inbound link 출처가 다르다.** `/service-guide` 는 공개 헤더·푸터에서만 들어오고, `/guide/*` 는 로그인 후 기능 화면(POP · QR · 사이니지 · 블로그)의 `GuideBackLink` 에서 들어온다.
 2. `/guide/features/*` 는 실제 route·권한·조작 절차를 설명하는 **매뉴얼**이고, `/service-guide` 는 route 를 나열하지 않는 **공개 소개**다. KPA `/service-guide` 는 주석에서 명시적으로 "경영지원 세부 기능을 공개 안내에 나열하지 않는다"고 정하고 있어 두 문서의 상세도 기준이 다르다.
-3. Neture 는 `/guide` 만, KPA/K-Cosmetics/GlycoPharm 은 `/service-guide` 만 헤더에 노출한다. 한쪽으로 redirect 통합하면 **한쪽 서비스의 헤더 진입 의미가 사라진다.**
+3. Neture 는 `/guide` 만, KPA/K-Cosmetics 은 `/service-guide` 만 헤더에 노출한다. 한쪽으로 redirect 통합하면 **한쪽 서비스의 헤더 진입 의미가 사라진다.**
 
 → 따라서 **redirect 로 합치지 않고**, 두 화면을 서로 링크해 고립 상태만 해소했다 (WO §9).
 
@@ -83,17 +83,6 @@ operator guide entry: KPA `/operator/guide-contents` 는 **Guide 콘텐츠 편�
 
 **discoverability 문제 확인** — `/guide/intro` · `/guide/usage` · `/guide/features` 로 가는 **inbound link 가 앱 전체에 0건**이었다. 사이니지 화면 1곳만 deep-link 를 갖고 있어, 가이드 11 페이지가 사실상 URL 을 알아야만 도달 가능했다. → `/service-guide` 하단 "기능 사용 가이드" 블록으로 3개 진입을 노출해 해소.
 
-### 3-3. GlycoPharm (4)
-
-| # | entry source | label | target route | landing page | deep-link | shared View | 판정 |
-|:-:|---|---|---|---|:-:|:-:|:-:|
-| 1 | 헤더 nav (`config/navigation.ts:21`) | 서비스 안내 | `/service-guide` | ServiceGuidePage | N | **YES (신규)** | LINKED |
-| 2 | `components/common/Footer.tsx:59` | 서비스 안내 | `/service-guide` | ServiceGuidePage | N | YES (신규) | LINKED |
-| 3 | `StoreSignageMainPage.tsx:636` | 디지털사이니지 운영 방법 | `/guide/features/signage` | GuideFeatureManualPage | Y | YES (기존) | KEEP |
-| 4 | 직접 URL 입력 | — | `/guide` | (route 없음 → not-found) | Y | — | **FIXED** |
-
-K-Cosmetics 와 동일한 discoverability 문제. 동일 방식으로 해소.
-
 ### 3-4. Neture (22)
 
 | # | entry source | label | target route | landing page | deep-link | shared View | 판정 |
@@ -121,7 +110,7 @@ Neture 는 `/service-guide` route 가 **없다.** `/guide` 자체가 이미 서�
 
 `packages/shared-space-ui/src/guide/` 를 그대로 canonical 기반으로 사용했다. **새 Guide design system 을 만들지 않았다.**
 
-- 기존 8 page template · `styles.ts` · `types.ts` · `copy/{kpa,k-cosmetics,glycopharm,neture}.ts` 유지.
+- 기존 8 page template · `styles.ts` · `types.ts`
 - 서비스별 문구는 **기존 copy 파일을 확장**했다 (신규 copy 파일 0).
 - `lucide-react` 는 이미 `@o4o/shared-space-ui` 의 dependency 이고, 4 서비스 tailwind `content` 에 `packages/shared-space-ui/src/**` glob 이 이미 있어 **package.json · lockfile · tailwind config 변경 0**.
 
@@ -145,7 +134,7 @@ Neture 는 `/service-guide` route 가 **없다.** `/guide` 자체가 이미 서�
 `GuideIconComponent` · `GuideServiceIntroCard` · `GuideServiceIntroAction` · `GuideServiceIntroCardSection` · `GuideServiceIntroStep` · `GuideServiceIntroPageProps`.
 
 서비스별 config(각 109 lines, 기존 copy 파일에 추가):
-`kpaServiceIntroProps` · `kCosmeticsServiceIntroProps` · `glycopharmServiceIntroProps`.
+`kpaServiceIntroProps` · `kCosmeticsServiceIntroProps`.
 
 `GuideIntroPageProps.bottomNav` 에 **선택 필드** `serviceGuide?: GuideNavLink` 를 추가(additive · 기존 호출부 무영향)해 `/guide/intro` 하단에서 `/service-guide` 로 돌아갈 수 있게 했다.
 
@@ -157,7 +146,6 @@ Neture 는 `/service-guide` route 가 **없다.** `/guide` 자체가 이미 서�
 |---|---|---|
 | KPA | `pages/service-guide/ServiceGuidePage.tsx` 219 lines (자체 JSX + 자체 데이터) | 13 lines wrapper → shared `GuideServiceIntroPage` + `kpaServiceIntroProps` |
 | K-Cosmetics | `pages/ServiceGuidePage.tsx` 222 lines | 13 lines wrapper + `kCosmeticsServiceIntroProps` |
-| GlycoPharm | `pages/ServiceGuidePage.tsx` 221 lines | 13 lines wrapper + `glycopharmServiceIntroProps` |
 | Neture | `pages/guide/GuideHomePage.tsx` 189 lines (이미 shared `GuideFeaturesPage` config wrapper) | **변경 없음** |
 | PharmacyHub | 없음 | 없음 (구조만 채택 가능 — §7) |
 
@@ -168,7 +156,6 @@ Neture 는 `/service-guide` route 가 **없다.** `/guide` 자체가 이미 서�
 ## 6. 중복 감소 수치 (WO §18 필수)
 
 ```
-공통화 전 ServiceGuide/Landing page 수 : 3 (KPA 219 / K-Cosmetics 222 / GlycoPharm 221)
 공통화 전 총 lines                      : 662
 공통화 후 wrapper lines                 : 39 (13 × 3)
 신규·재사용 shared lines                : 278  (View 187 + types 71 + barrel 14 + GuideIntroPage 6)
@@ -200,7 +187,7 @@ VIEW_DUPLICATED 잔존                    : 0
 | `/guide/usage` | 200 | 200 |
 | `/guide/features` (+하위 7~11) | 200 | 200 |
 | `/service-guide` | 200 | 200 (하단 "기능 사용 가이드" 블록 추가) |
-| `/guide` (KPA · KCos · GP) | not-found | **302 성격의 `<Navigate replace>` → `/guide/intro`** |
+| `/guide` (KPA · KCos) | not-found | **302 성격의 `<Navigate replace>` → `/guide/intro`** |
 | `/guide` (Neture) | 200 | 200 (변경 없음) |
 
 redirect loop 없음: `/guide` → `/guide/intro` 는 단방향이며 `/guide/intro` 는 자체 route 가 있다.
@@ -243,7 +230,6 @@ npx vitest run --config packages/shared-space-ui/vitest.config.mjs packages/shar
 | `@o4o/shared-space-ui` typecheck (`tsc -b`) | PASS |
 | `@o4o/web-kpa-society` build | PASS |
 | `@o4o/web-k-cosmetics` build | PASS |
-| `glycopharm-web` build | PASS |
 | `@o4o/web-neture` build | PASS |
 | `@o4o/web-pharmacy-hub` build | PASS |
 | backend (api-server) | 변경 0 → 검증 불필요 |
@@ -292,12 +278,6 @@ desktop(1440×900) · mobile(390×844) 2 viewport 로 실제 브라우저 접속
 | K-Cosmetics | `/guide/usage` | 200 | `/guide/usage` | 서비스 활용 방법 | PASS |
 | K-Cosmetics | `/guide/features` | 200 | `/guide/features` | 기능별 이용 방법 | PASS |
 | K-Cosmetics | `/guide/features/signage` | 200 | 동일 | 디지털 사이니지 이용 방법 | PASS |
-| GlycoPharm | `/service-guide` | 200 | `/service-guide` | 약국 운영을 위한 O4O 서비스 안내 | PASS |
-| GlycoPharm | `/guide` | 200 | **`/guide/intro`** | O4O 개요 | PASS (신규 alias) |
-| GlycoPharm | `/guide/intro` | 200 | `/guide/intro` | O4O 개요 | PASS |
-| GlycoPharm | `/guide/usage` | 200 | `/guide/usage` | 서비스 활용 방법 | PASS |
-| GlycoPharm | `/guide/features` | 200 | `/guide/features` | 기능별 이용 방법 | PASS |
-| GlycoPharm | `/guide/features/signage` | 200 | 동일 | 디지털 사이니지 이용 방법 | PASS |
 | Neture | `/guide` | 200 | **`/guide`** (redirect 없음) | O4O 플랫폼 이용 안내 | PASS (회귀 없음) |
 | Neture | `/guide/o4o-overview` | 200 | 동일 | O4O 개요 | PASS |
 
@@ -307,7 +287,6 @@ desktop(1440×900) · mobile(390×844) 2 viewport 로 실제 브라우저 접속
 |---|:-:|:-:|:-:|:-:|
 | KPA | OK | OK | OK | OK |
 | K-Cosmetics | OK | OK | OK | OK |
-| GlycoPharm | OK | OK | OK | OK |
 
 공통화 전 이 6개 링크는 **전부 0건**이었다 (§3-2 · §3-3 discoverability 문제).
 

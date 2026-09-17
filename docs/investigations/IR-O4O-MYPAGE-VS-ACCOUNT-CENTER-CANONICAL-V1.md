@@ -77,7 +77,6 @@
 |---|---|:---:|
 | **KPA Society** | MyDashboard, MyCredits, MyCertificates, MyEnrollments, MyCompletions, MyForumDashboard, MyRequests, MyQualifications, AnnualReportForm, PersonalStatusReport, ForumMemberManagement | L3 Membership + 서비스 도메인 (LMS, Forum, Reports, Pharmacy 자격) |
 | **K-Cosmetics** | MyCredits, MyCertificates, MyEnrollments | L3 + LMS 도메인 |
-| **GlycoPharm** | (3 공통 만) | — |
 | **Neture** | (3 공통 만) | — |
 
 ### 2.3 Identity V2 4-Layer 매핑
@@ -323,12 +322,10 @@ C (혼합형): "이름은 web-account 에서, 비밀번호는 mypage 에서" —
 
 ```bash
 # 1. 4 service MyPage 파일 목록
-find services/web-{glycopharm,kpa-society,k-cosmetics,neture}/src/pages/mypage \
   -name '*.tsx' -o -name '*.ts' | sort
 
 # 2. MyPage 의 backend API 호출 패턴
 grep -rn "/auth/me\|/users/password\|/users/profile\|/auth/change-password" \
-  services/web-{glycopharm,kpa-society,k-cosmetics,neture}/src/pages/mypage
 
 # 3. 비밀번호 변경의 serviceKey 명시 확인
 grep -rn "serviceKey:.*'" services/web-*/src/pages/mypage/MySettingsPage.tsx

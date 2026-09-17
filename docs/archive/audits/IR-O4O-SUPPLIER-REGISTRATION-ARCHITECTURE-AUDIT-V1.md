@@ -112,7 +112,6 @@ main.ts:1069-1099
 // types/roles.ts
 'neture:supplier'   // Neture 공급자
 'neture:partner'    // Neture 파트너
-'glycopharm:supplier' // GlycoPharm 공급자
 'cosmetics:supplier'  // K-Cosmetics 공급자
 ```
 

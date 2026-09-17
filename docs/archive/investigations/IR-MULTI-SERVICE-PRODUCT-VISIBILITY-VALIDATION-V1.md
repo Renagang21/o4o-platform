@@ -46,7 +46,6 @@ O4O는 서비스별 **독립 제품 테이블**을 사용한다:
 
 | 서비스 | 테이블 | 스키마 | 가시성 컬럼 |
 |--------|--------|--------|-----------|
-| GlycoPharm | `glycopharm_products` | public | `status` (active/draft/inactive/discontinued) |
 | Cosmetics | `cosmetics_products` | cosmetics | `status` (visible/hidden/draft/sold_out) |
 | Neture | `neture_supplier_products` | neture | `is_active` + `distribution_type` |
 | StoreLocal | `store_local_products` | public | `is_active` (Display Domain only) |
@@ -93,7 +92,6 @@ Storefront (소비자 노출)
 | `kpa` | KPA 약국 제품 |
 | `kpa-groupbuy` | 공동구매 |
 | `cosmetics` | K-Cosmetics |
-| `glycopharm` | GlycoPharm |
 
 **동일 제품을 여러 service_key로 독립 리스팅 가능.**
 각 리스팅은 독립된 `is_active`, 가격, 채널 매핑을 가진다.
@@ -104,7 +102,7 @@ Storefront (소비자 노출)
 
 **판정: PASS WITH NOTES**
 
-### 2.1 GlycoPharm/KPA 서비스 (4-Gate Pattern)
+### 2.1 KPA 서비스 (4-Gate Pattern)
 
 #### B2C Storefront (`store.controller.ts`)
 
@@ -175,8 +173,6 @@ Gate 4 (Approval): 없음
 
 | 엔드포인트 | 서비스 | Gate 수 | service_key | distribution_type | 판정 |
 |-----------|--------|:------:|:-----------:|:-----------------:|:----:|
-| GET /stores/:slug/products (B2C) | glycopharm | 4 | YES (kpa) | NO | PASS |
-| GET /stores/:slug/tablet/products | glycopharm | 4 | YES (param) | NO | PASS |
 | GET /api/v1/stores/:slug/products | unified | 4 | YES (array) | NO | PASS |
 | GET /api/v1/stores/:slug/tablet/products | unified | 4 | YES (param) | NO | PASS |
 | GET /cosmetics/products | cosmetics | 1 | NO | NO | NOTE |
@@ -214,13 +210,6 @@ Gate 4 (Approval): 없음
 
 **판정: PASS WITH NOTES**
 
-### 4.1 GlycoPharm Checkout (`checkout.controller.ts`)
-
-- **Product 조회**: `glycopharm_products` 테이블 전용 (line 327-329)
-- **service_key**: metadata에 `'glycopharm'` 하드코딩 (line 515)
-- **Distribution 검증**: YES — PRIVATE 제품에 대해 `allowed_seller_ids` 확인 (line 368-393)
-- **교차 서비스 주문**: 불가능 — `glycopharm_products` UUID만 수용
-
 ### 4.2 Cosmetics Checkout (`cosmetics-order.controller.ts`)
 
 - **Product 조회**: `cosmetics.cosmetics_products` + `cosmetics.cosmetics_store_listings` 전용 (line 474-511)
@@ -232,8 +221,6 @@ Gate 4 (Approval): 없음
 
 | 시나리오 | 결과 |
 |---------|------|
-| Cosmetics UUID → GlycoPharm checkout | `PRODUCT_NOT_FOUND` (glycopharm_products에 없음) |
-| GlycoPharm UUID → Cosmetics checkout | `PRODUCT_NOT_AVAILABLE` (cosmetics 스키마에 없음) |
 | StoreLocalProduct UUID → 어느 checkout이든 | 구조적 거부 (별도 테이블) |
 
 **교차 서비스 제품 주문은 구조적으로 불가능하다.**
@@ -255,19 +242,17 @@ Gate 4 (Approval): 없음
 
 | 서비스 | KPI 파일 | 필터 | serviceKey 필터 | orderType 필터 |
 |--------|---------|------|:---------------:|:--------------:|
-| GlycoPharm | `glycopharm-store-data.adapter.ts` | `store_id = $1` | **NO** | **NO** |
 | Cosmetics | `cosmetics-store-summary.service.ts` | `store_id = $1` | **NO** | **NO** |
 | Store Hub | `store-hub.controller.ts` | graceful degradation (0) | N/A | N/A |
 
 ### 5.2 문제 분석
 
 `ecommerce_orders` 테이블은 **모든 서비스의 주문을 공유**한다.
-각 주문에는 `metadata.serviceKey` (glycopharm/cosmetics)와 `orderType`이 기록된다.
+각 주문에는 `metadata.serviceKey` (cosmetics)와 `orderType`이 기록된다.
 
 그러나 KPI 집계 쿼리는 `store_id`만으로 필터링한다:
 
 ```sql
--- glycopharm-store-data.adapter.ts:39
 SELECT COUNT(*) FROM ecommerce_orders WHERE store_id = $1
 
 -- cosmetics-store-summary.service.ts:51
@@ -276,22 +261,16 @@ SELECT COUNT(*) FROM ecommerce_orders WHERE store_id = $1
 
 ### 5.3 교차 집계 시나리오
 
-**조건**: 매장 X가 GlycoPharm과 Cosmetics 모두에서 주문을 받는 경우
-
-- GlycoPharm KPI: `WHERE store_id = X` → Cosmetics 주문도 집계됨
-- Cosmetics KPI: `WHERE store_id = X` → GlycoPharm 주문도 집계됨
-
 **누락된 필터**:
 ```sql
 -- 필요한 필터 (현재 없음)
-AND metadata->>'serviceKey' = 'glycopharm'
 ```
 
 ### 5.4 현재 위험 수준
 
 | 조건 | 현재 상태 | 위험 |
 |------|----------|------|
-| 동일 매장이 멀티서비스 운영 | 현재 GlycoPharm 위주 | 낮음 (현시점) |
+| 동일 매장이 멀티서비스 운영 | — | 낮음 (현시점) |
 | Cosmetics 주문 활성화 시 | 교차 집계 발생 가능 | **중간** (향후) |
 | store_id = organization_id? | 동일 값 사용 시 교차 | 확인 필요 |
 
@@ -303,7 +282,6 @@ WHERE store_id IN (SELECT id FROM cosmetics.cosmetics_stores)
 ```
 
 Cosmetics 매장 ID 기반 필터링이지만, `metadata.serviceKey` 미확인.
-GlycoPharm 주문이 동일 store_id로 생성되면 Cosmetics KPI에 포함될 수 있다.
 
 ---
 
@@ -318,8 +296,8 @@ GlycoPharm 주문이 동일 store_id로 생성되면 Cosmetics KPI에 포함될 
 
 경로:
 1. `GET /pharmacy-products/catalog`: `distribution_type = 'PUBLIC'` → 조회 가능
-2. 약국이 Apply → `organization_product_applications` (service_key='glycopharm') → 승인
-3. Listing 생성: `organization_product_listings` (service_key='glycopharm', is_active=true)
+2. 약국이 Apply → `organization_product_applications` → 승인
+3. Listing 생성: `organization_product_listings`
 4. Channel 매핑: `organization_product_channels` (is_active=true)
 5. `GET /stores/:slug/products`: 4중 Gate 통과 → **노출**
 
@@ -333,7 +311,6 @@ GlycoPharm 주문이 동일 store_id로 생성되면 Cosmetics KPI에 포함될 
 ### Scenario 2: SELECTED Supply 상품
 
 > Product B: distribution_type = PRIVATE, allowed_seller_ids = [pharmacy_1]
-> → pharmacy_1의 GlycoPharm HUB에만 노출
 > → 다른 매장, 다른 서비스에서는 절대 노출 금지
 
 **검증 결과: PASS**
@@ -348,27 +325,23 @@ GlycoPharm 주문이 동일 store_id로 생성되면 Cosmetics KPI에 포함될 
    - 미포함 시 `DISTRIBUTION_RESTRICTED` 에러
 3. 다른 매장(pharmacy_2): `allowed_seller_ids`에 없으므로 거부
 
-**service_key 격리**: pharmacy_1이 GlycoPharm에만 리스팅 → Cosmetics에는 리스팅 자체가 없음
-
 **구조적으로 보장된다.** Listing + Distribution 이중 격리.
 
 ### Scenario 3: Multi-Service Selected 상품
 
 > Product C: distribution_type = PUBLIC (모든 운영자 가능)
-> pharmacy_1이 cosmetics와 glycopharm 모두에 리스팅
 
 **검증 결과: PASS**
 
 경로:
 1. pharmacy_1이 두 번 Apply:
    - `organization_product_applications` (service_key='cosmetics')
-   - `organization_product_applications` (service_key='glycopharm')
+   - `organization_product_applications`
 2. 승인 후 두 개의 독립 리스팅 생성:
    - `organization_product_listings` (service_key='cosmetics', is_active=true)
-   - `organization_product_listings` (service_key='glycopharm', is_active=true)
+   - `organization_product_listings`
 3. 각 리스팅에 독립 채널 매핑
 4. B2C 조회 시:
-   - GlycoPharm slug 접근: `service_key = 'glycopharm'` → glycopharm 리스팅만 노출
    - Cosmetics slug 접근: `service_key = 'cosmetics'` → cosmetics 리스팅만 노출
 5. 다른 서비스(tourism 등): 리스팅 자체 없음 → 노출 없음
 
@@ -382,8 +355,8 @@ GlycoPharm 주문이 동일 store_id로 생성되면 Cosmetics KPI에 포함될 
 
 | # | 위치 | 문제 | 영향 | 등급 |
 |---|------|------|------|:----:|
-| I-1 | `glycopharm-store-data.adapter.ts` 전체 | 모든 KPI 쿼리가 `store_id`만 필터. `metadata->>'serviceKey'` 미사용 | 멀티서비스 매장에서 Cosmetics 주문이 GlycoPharm KPI에 포함 | **MEDIUM** |
-| I-2 | `cosmetics-store-summary.service.ts` 전체 | 동일 — `store_id`만 필터 | 멀티서비스 매장에서 GlycoPharm 주문이 Cosmetics KPI에 포함 | **MEDIUM** |
+| I-1 | — | 모든 KPI 쿼리가 `store_id`만 필터. `metadata->>'serviceKey'` 미사용 | — | **MEDIUM** |
+| I-2 | `cosmetics-store-summary.service.ts` 전체 | 동일 — `store_id`만 필터 | — | **MEDIUM** |
 
 ### NOTE (설계 의도 확인 필요)
 
@@ -395,7 +368,6 @@ GlycoPharm 주문이 동일 store_id로 생성되면 Cosmetics KPI에 포함될 
 
 ### SAFE (정상)
 
-- GlycoPharm 4중 Gate: 모든 B2C/Tablet 엔드포인트에서 적용
 - Unified Store 4중 Gate: service_key 파라미터화 완전
 - 서비스별 독립 제품 테이블: UUID 교차 불가
 - Checkout 서비스 격리: 구조적 거부
@@ -409,11 +381,6 @@ GlycoPharm 주문이 동일 store_id로 생성되면 Cosmetics KPI에 포함될 
 ### R-1: KPI 서비스 키 필터 추가 (Priority: HIGH)
 
 모든 KPI 집계 쿼리에 `metadata->>'serviceKey'` 조건 추가:
-
-**glycopharm-store-data.adapter.ts** — 모든 쿼리에:
-```sql
-AND metadata->>'serviceKey' = 'glycopharm'
-```
 
 **cosmetics-store-summary.service.ts** — 모든 쿼리에:
 ```sql
@@ -448,7 +415,7 @@ O4O Marketplace의 제품 가시성은 **3-Layer Gate**로 제어된다:
 
 ### Storefront (B2C/Tablet)
 
-**4중 Visibility Gate**가 모든 GlycoPharm/KPA 엔드포인트에서 일관 적용:
+**4중 Visibility Gate**가 모든 KPA 엔드포인트에서 일관 적용:
 1. Product status = active
 2. Listing is_active = true + service_key 일치
 3. Channel mapping is_active = true

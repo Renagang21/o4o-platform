@@ -3,7 +3,7 @@
 **작성일**: 2026-05-17
 **상태**: Investigation (조사 전용 — 코드/DB 수정 없음)
 **대상**: `@o4o/shared-space-ui` 의 Signage 관련 template 실제 사용처 mini-audit
-**범위**: KPA-Society 중심. GlycoPharm / K-Cosmetics 는 사용처 grep 만 (cleanup 결정 prerequisite 차원).
+**범위**: KPA-Society 중심. K-Cosmetics 는 사용처 grep 만 (cleanup 결정 prerequisite 차원).
 
 **선행 IR**:
 - `IR-O4O-STORE-WRAPPER-CANONICAL-INTERNAL-AUDIT-V1` (§10-3: SignageManagerTemplate 사용처 식별 필요)
@@ -19,8 +19,8 @@
 
 | Template | 정의 위치 | KPA 사용 | 타 서비스 사용 | raw `<table>` | 판단 |
 |---|---|:---:|:---:|:---:|---|
-| **`SignageManagerTemplate`** | `packages/shared-space-ui/src/SignageManagerTemplate.tsx` | ✅ 1 건 (`/signage` Community) | K-Cosmetics + GlycoPharm 각 1 건 | **2 (L307 video, L444 playlist)** | **KEEP + 정비 후보 (multi-service 영향)** |
-| **`SignageHubTemplate`** | `packages/shared-space-ui/src/SignageHubTemplate.tsx` | **0 건** | GlycoPharm 1 건 | (직접 검증 안 함 — KPA 정비 scope 외) | **OBSERVE** (multi-service 의존, KPA 정비 시점 cleanup 부적합) |
+| **`SignageManagerTemplate`** | `packages/shared-space-ui/src/SignageManagerTemplate.tsx` | ✅ 1 건 (`/signage` Community) | K-Cosmetics 각 1 건 | **2 (L307 video, L444 playlist)** | **KEEP + 정비 후보 (multi-service 영향)** |
+| **`SignageHubTemplate`** | `packages/shared-space-ui/src/SignageHubTemplate.tsx` | **0 건** | — | (직접 검증 안 함 — KPA 정비 scope 외) | **OBSERVE** (multi-service 의존, KPA 정비 시점 cleanup 부적합) |
 | **`SignagePreviewSection`** | `packages/shared-space-ui/src/SignagePreviewSection.tsx` | **0 건** | **0 건** | N/A | **CLEANUP candidate** (외부 사용처 0건, dead export) |
 
 ### KPA signage 페이지 canonical 상태
@@ -33,8 +33,8 @@
 
 ### 즉시 결정 사항
 
-1. **`SignageManagerTemplate` 정비는 multi-service 영향**: KPA + K-Cosmetics + GlycoPharm 3 개 서비스 동시 영향. 본 KPA 마무리 단계 scope 외 — 별도 WO + 3 개 서비스 회귀 검증 필요.
-2. **`SignageHubTemplate`**: KPA 미사용이나 GlycoPharm 의존성으로 cleanup 불가. KPA 정비 시점에 손 대지 않음.
+1. **`SignageManagerTemplate` 정비는 multi-service 영향**: KPA + K-Cosmetics 2 개 서비스 동시 영향. 본 KPA 마무리 단계 scope 외 — 별도 WO + 3 개 서비스 회귀 검증 필요.
+2. KPA 정비 시점에 손 대지 않음.
 3. **`SignagePreviewSection`**: 외부 사용처 0 건 — cleanup 가능하나 정비 효과 미미 (export 한 줄 + 파일 1 개). 별도 dead-export 정리 WO 권장.
 
 ---
@@ -49,7 +49,6 @@
 | Export | [packages/shared-space-ui/src/index.ts#L57-58](packages/shared-space-ui/src/index.ts#L57) (named + types) |
 | **KPA 사용** | [services/web-kpa-society/src/pages/signage/ContentHubPage.tsx#L17,L369](services/web-kpa-society/src/pages/signage/ContentHubPage.tsx#L17) — `import { SignageManagerTemplate }` + `<SignageManagerTemplate config={{...}} />` |
 | K-Cosmetics 사용 | `services/web-k-cosmetics/src/pages/signage/ContentHubPage.tsx` |
-| GlycoPharm 사용 | `services/web-glycopharm/src/pages/store-management/signage/ContentHubPage.tsx` |
 | **KPA 라우트** | `/signage` (Community signage, App.tsx L778) |
 
 **KPA ContentHubPage 헤더 주석** ([L1-13](services/web-kpa-society/src/pages/signage/ContentHubPage.tsx#L1)):
@@ -65,9 +64,8 @@
 | 정의 | [packages/shared-space-ui/src/SignageHubTemplate.tsx](packages/shared-space-ui/src/SignageHubTemplate.tsx) |
 | Export | [packages/shared-space-ui/src/index.ts#L54-55](packages/shared-space-ui/src/index.ts#L54) (named + types) |
 | **KPA 사용** | **0 건** |
-| GlycoPharm 사용 | `services/web-glycopharm/src/pages/store-management/signage/ContentLibraryPage.tsx` (1 건) |
 
-→ KPA 측에서는 명시적 dead. GlycoPharm 의존성으로 인해 cleanup 불가.
+→ KPA 측에서는 명시적 dead.
 
 ### 1-3. `SignagePreviewSection`
 
@@ -128,7 +126,7 @@
 
 | 위치 | 상태 |
 |---|---|
-| `SignageManagerTemplate.tsx` L307 (video) | ⚠️ raw `<table>` — KPA / K-Cosmetics / GlycoPharm 3 서비스 노출 |
+| `SignageManagerTemplate.tsx` L307 (video) | ⚠️ raw `<table>` — KPA / K-Cosmetics 2 서비스 노출 |
 | `SignageManagerTemplate.tsx` L444 (playlist) | ⚠️ 동일 |
 | `SignageHubTemplate.tsx` | 본 IR 미검증 (KPA 미사용 — scope 외) |
 | `SignagePreviewSection.tsx` | N/A (table 컴포넌트 아님 — preview UI) |
@@ -143,7 +141,7 @@
 | 항목 | 분류 | 사유 |
 |---|---|---|
 | **`SignagePreviewSection`** | **dead export** | KPA 0건 + 타 서비스 0건. 단 정비 효과 미미 (export 1줄 + 파일 1개) |
-| `SignageHubTemplate` | **KPA 미사용 / 외부 의존** | KPA 0건, GlycoPharm 1건 — KPA 정비 scope 에서 손 대지 않음 |
+| `SignageHubTemplate` | **KPA 미사용 / 외부 의존** | KPA 0건 1건 — KPA 정비 scope 에서 손 대지 않음 |
 
 ---
 
@@ -156,14 +154,14 @@
 
 | 후보 | 사유 |
 |---|---|
-| **`SignageManagerTemplate` raw `<table>` × 2 → BaseTable** | KPA + K-Cosmetics + GlycoPharm 3 서비스 동시 영향. `assetColumns.tsx` 패턴 (`67eddf9a0` commit) 재사용 가능하나 multi-service 회귀 검증 필요 |
-| **`SignagePreviewSection` dead export cleanup** | 외부 사용처 0건. 단 GlycoPharm/K-Cosmetics 의 향후 사용 계획 확인 후 결정 |
+| **`SignageManagerTemplate` raw `<table>` × 2 → BaseTable** | KPA + K-Cosmetics 2 서비스 동시 영향. `assetColumns.tsx` 패턴 (`67eddf9a0` commit) 재사용 가능하나 multi-service 회귀 검증 필요 |
+| **`SignagePreviewSection` dead export cleanup** | 외부 사용처 0건. 단 K-Cosmetics 의 향후 사용 계획 확인 후 결정 |
 
 ### 명시적 손대지 않음 (이번 KPA 마무리에서)
 
 | 항목 | 사유 |
 |---|---|
-| `SignageHubTemplate` | GlycoPharm 의존성 — KPA 정비 시점 cleanup 부적합 |
+| `SignageHubTemplate` | — |
 | KPA Operator signage 4 페이지 | 이미 TRUE CANONICAL (`WO-KPA-SIGNAGE-UI-RESTRUCTURE-V1`) |
 | KPA Store signage 3 페이지 + Hub | 이미 TRUE CANONICAL (선행 IR 검증) |
 | KPA Community detail/editor/player 페이지 5건 | list 아님 (분류 외) |
@@ -176,7 +174,7 @@
 |---|---|---|
 | 1 | **`SignageManagerTemplate` 의 multi-service 영향** | 3 서비스 동시 사용 — 정비 시 회귀 검증 부담. 그러나 같은 raw `<table>` 가 3 서비스에 동시 노출 중 — 정비 가치 큼 |
 | 2 | **`SignagePreviewSection` 의 향후 사용 계획** | 현재 dead 이나 export 된 상태 — 의도된 미래 사용 후보일 수 있음. cleanup 결정 전 git blame / WO history 확인 권장 |
-| 3 | **`SignageHubTemplate` GlycoPharm 단독 사용** | KPA / K-Cosmetics 가 비슷한 hub 패턴 필요 시 재사용 가치 — 즉시 cleanup 부적합 |
+| 3 | — | KPA / K-Cosmetics 가 비슷한 hub 패턴 필요 시 재사용 가치 — 즉시 cleanup 부적합 |
 | 4 | **KPA Community signage 의 list 페이지 1 개 의존** | 정비 시 ContentHubPage 회귀 영향 직접 — 가장 careful 한 detail-test 필요 |
 | 5 | **`assetColumns.tsx` 패턴 (`67eddf9a0`) 재사용 가능성** | SignageManagerTemplate 의 video / playlist 각각 `getSignageVideoColumns()` / `getSignagePlaylistColumns()` 분리 적용 가능 — 정비 비용 낮춤 |
 
@@ -188,7 +186,6 @@
 |---|---|---|
 | **`WO-O4O-SIGNAGE-MANAGER-TEMPLATE-CANONICAL-V1`** (raw `<table>` × 2 → BaseTable, 3 서비스 영향) | medium-high | 작성 금지 (본 IR scope) — 별도 multi-service WO 결정 필요 |
 | `WO-O4O-SHARED-SPACE-UI-DEAD-EXPORT-CLEANUP-V1` (SignagePreviewSection 제거 결정 포함) | low | 작성 금지 |
-| `WO-O4O-SIGNAGE-HUB-TEMPLATE-INTERNAL-AUDIT-V1` (KPA 미사용이나 GlycoPharm 사용 — multi-service audit) | low (OBSERVE 단계) | 작성 금지 |
 
 → **본 KPA 마무리 단계에서는 후속 WO 작성·실행 모두 금지**. mini-audit 결과만 기록.
 
@@ -196,9 +193,8 @@
 
 ## 8. 본 IR 범위 외 (후속)
 
-- `SignageHubTemplate` 내부 직접 검증 (GlycoPharm 사용처 audit)
+- `SignageHubTemplate` 내부 직접 검증
 - `SignagePreviewSection` git blame / 원래 의도 확인 (cleanup 결정 prerequisite)
-- GlycoPharm signage 페이지 multi-service audit
 - K-Cosmetics signage ContentHubPage 의 SignageManagerTemplate 사용 패턴 검증
 
 ---
@@ -219,8 +215,6 @@
 
 ### 타 서비스 사용처 (사용처 grep 차원만)
 - `services/web-k-cosmetics/src/pages/signage/ContentHubPage.tsx` — `SignageManagerTemplate`
-- `services/web-glycopharm/src/pages/store-management/signage/ContentHubPage.tsx` — `SignageManagerTemplate`
-- `services/web-glycopharm/src/pages/store-management/signage/ContentLibraryPage.tsx` — `SignageHubTemplate`
 
 ### 연관 IR
 - `IR-O4O-STORE-WRAPPER-CANONICAL-INTERNAL-AUDIT-V1` (raw `<table>` × 2 식별)
@@ -232,4 +226,4 @@
 
 ---
 
-*조사 전용 — 코드/DB 수정 없음. 본 IR 단계에서 후속 WO 작성 금지. 특히 `SignageManagerTemplate` 정비는 KPA / K-Cosmetics / GlycoPharm 3 서비스 동시 영향이므로 별도 multi-service WO 로 처리. KPA 마무리 단계 scope 외.*
+*조사 전용 — 코드/DB 수정 없음. 본 IR 단계에서 후속 WO 작성 금지. 특히 `SignageManagerTemplate` 정비는 KPA / K-Cosmetics 2 서비스 동시 영향이므로 별도 multi-service WO 로 처리. KPA 마무리 단계 scope 외.*

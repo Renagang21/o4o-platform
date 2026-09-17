@@ -11,7 +11,7 @@
  *   (A-6) 가져오기 직후 사본 확인 경로 배너
  * WO-O4O-SUPPLIER-CONTENT-PRODUCER-UI-CLEANUP-V1: producer 필터에서 'supplier' 제거
  * WO-O4O-STORE-HUB-COMMON-VIEW-AND-SHELL-UNIFICATION-V1:
- *   K-Cosmetics·GlycoPharm 과 동일했던 652L 사본을 공통 `useSignageLibrary` + `SignageLibraryView`
+ *   K-Cosmetics 과 동일했던 652L 사본을 공통 `useSignageLibrary` + `SignageLibraryView`
  *   로 대체. 위 A-3 / A-5 / A-6 결정은 config(sortable / guideText / importedTargets)로 보존한다.
  *
  * ── 사이니지 구조 원칙 (WO-O4O-SIGNAGE-STRUCTURE-CONSOLIDATION-V1) ──

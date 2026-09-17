@@ -3,7 +3,7 @@
 - **WO**: WO-O4O-GUIDE-CROSSSERVICE-FINAL-CLOSURE-AUDIT-V1
 - **성격**: 최종 census · closure 감사 (읽기 전용 · 신규 Guide 제작 없음)
 - **기준 커밋**: `2ea6cd81f` (origin/main, 2026-08-21)
-- **대상**: KPA-Society · K-Cosmetics · GlycoPharm · PharmacyHub · Neture (5 서비스)
+- **대상**: KPA-Society · K-Cosmetics · PharmacyHub · Neture (4 서비스)
 - **선행 CHECK**: CENSUS-V1 · STALE-ROUTE-AND-COPY-CONTRACT-CLEANUP-V1 · ENTRY-AND-LANDING-COMMONIZATION-V1 · PHARMACYHUB-GUIDE-ADOPTION-V1 · CROSSSERVICE-COVERAGE-GAP-CLOSURE-V1
 
 ---
@@ -35,7 +35,7 @@ GUIDE_COMMONIZATION = NOT_COMPLETE
 ```
 
 > **NOT_COMPLETE 사유**: 외국인 여행객 판매지원(`/store/sales-channels/foreign-visitor`) 은
-> KPA · K-Cosmetics · GlycoPharm 3 서비스 매장 사이드바에 상시 노출되는 실기능(월 이용권 구독 →
+> KPA · K-Cosmetics 2 서비스 매장 사이드바에 상시 노출되는 실기능(월 이용권 구독 →
 > 파트너 등록 → 파트너별 QR 발급 → 공개 랜딩 → 유입 확인) 인데 Guide 언급이 **0** 이다.
 > A형 coverage gap 3 → §24 필수 조건(A형 = 0 · MUST_FIX = 0) 미충족.
 
@@ -80,7 +80,7 @@ Guide 한 페이지 안의 step 은 분해하지 않았고, Guide 전체를 한 
 
 범례: **FC** FULLY_COMMON · **CO** CORE_ONLY · **VD** VIEW_DUPLICATED · **SS** SERVICE_SPECIFIC · **NI** NOT_IMPLEMENTED · **OOS** OUT_OF_SCOPE
 
-| # | 기능 단위 | KPA | KCos | GP | PH | Neture |
+| # | 기능 단위 | KPA | KCos | PH | Neture |
 |---|---|:--:|:--:|:--:|:--:|:--:|
 | U1 | 서비스 소개 | FC | FC | FC | FC | OOS |
 | U2 | `/guide` 진입 | FC | FC | FC | FC | FC |
@@ -112,7 +112,6 @@ Guide 한 페이지 안의 step 은 분해하지 않았고, Guide 전체를 한 
 |---|:--:|:--:|:--:|:--:|:--:|:--:|:--:|
 | KPA-Society | 19 | 0 | 0 | 0 | 1 | 3 | 23 |
 | K-Cosmetics | 17 | 0 | 0 | 0 | 3 | 3 | 23 |
-| GlycoPharm | 16 | 0 | 0 | 0 | 4 | 3 | 23 |
 | PharmacyHub | 17 | 0 | 0 | 0 | 2 | 4 | 23 |
 | Neture | 16 | 0 | 0 | 2 | 2 | 3 | 23 |
 | **계** | **85** | **0** | **0** | **2** | **12** | **16** | **115** |
@@ -127,7 +126,7 @@ Guide 한 페이지 안의 step 은 분해하지 않았고, Guide 전체를 한 
 | D. 자료 · 자료함 | 5 | 5 | PH 는 콘텐츠·자료함 통합 매뉴얼 |
 | E. LMS · 교육 | 5 | 4 | Neture 기능 없음 |
 | F. 매장 운영 | 5 | 5 | PH 는 공급 주문 + 매장 제품 2 매뉴얼 |
-| G. QR · 태블릿 · 사이니지 · POP · 제작자료 · 블로그 | 30 | 23 | GP 태블릿 NI · Neture 6 OOS |
+| G. QR · 태블릿 · 사이니지 · POP · 제작자료 · 블로그 | 30 | 23 태블릿 NI · Neture 6 OOS |
 | H. 설문 · 역할별 · 서비스 고유 · 외국인 여행객 | 25 | 4 | A형 3 포함 |
 
 ---
@@ -138,7 +137,7 @@ canonical 체계 `packages/shared-space-ui/src/guide/` — View 9 · copy 5 · t
 
 | shared View | 소비 서비스 |
 |---|---|
-| `GuideServiceIntroPage` | KPA · KCos · GP · PH (4) |
+| `GuideServiceIntroPage` | KPA · KCos · PH (4) |
 | `GuideIntroPage` | 5 |
 | `GuideIntroStructurePage` · `GuideIntroKpaPage` · `GuideIntroOperationPage` · `GuideIntroConceptPage` | 5 |
 | `GuideUsagePage` | 5 |
@@ -150,7 +149,7 @@ wrapper 규모 — 서비스 Guide 페이지는 전부 route + config/copy 수�
 | 서비스 | wrapper 형태 | 크기 |
 |---|---|---|
 | KPA | `pages/guide/*.tsx` 21 개 (shared View + copy + `GuideEditableSection` renderText 주입) | 19~24 L |
-| KCos · GP | App.tsx 라우트에서 shared View 직접 렌더 + `ServiceGuidePage` 13 L | 13 L |
+| KCos · App.tsx 라우트에서 shared View 직접 렌더 + `ServiceGuidePage` 13 L | 13 L |
 | PH | App.tsx 라우트에서 shared View 직접 렌더 | 별도 wrapper 파일 없음 |
 | Neture | `pages/guide/*.tsx` 32 개 shared wrapper | 18~23 L |
 
@@ -160,9 +159,8 @@ shared View 내부의 `if (service === ...)` 분기 **0**.
 
 ## 5. VIEW_DUPLICATED 최종 감사 (§7) — 0
 
-과거 census 의 VIEW_DUPLICATED 2 건(KCos ↔ GP `ServiceGuidePage`) 은
 ENTRY-AND-LANDING-COMMONIZATION-V1 에서 shared `GuideServiceIntroPage` 로 수렴됐다.
-현재 KPA · KCos · GP `ServiceGuidePage` 는 3 개 모두 **13 L 동일 구조 wrapper**
+현재 KPA · KCos `ServiceGuidePage` 는 3 개 모두 **13 L 동일 구조 wrapper**
 (`<GuideServiceIntroPage {...{service}ServiceIntroProps} />`) 이며 JSX 복제가 없다.
 
 Neture 의 5 개 대형 로컬 JSX 페이지(`GuideBusinessPharmacyCoopPage` 275 L ·
@@ -192,7 +190,7 @@ KPA 의 `renderText` 주입과 Neture 의 `index`/`serviceShowcase` 는 shared `
 |---|---|---|---|---|
 | KPA | 외국인 여행객 판매지원 | `/store/sales-channels/foreign-visitor` (+ `/partners`, `/partners/:partnerId/qr-codes`, 구독 결제) | 매장 사이드바 "판매 채널 확장 > 외국인 여행객 판매지원" | 없음 (copy 언급 0) |
 | KCos | 동일 | 동일 | 동일 | 없음 |
-| GP | 동일 | 동일 | 동일 | 없음 |
+| 동일 | 동일 | 동일 | 없음 |
 
 - 게이트 확인: `StoreSidebar` 에 조건부 숨김 로직 없음 → 메뉴는 상시 노출된다.
 - 화면은 소개 + 월 이용권 구독(Toss) 패널이지만, 구독 후 **파트너 등록 → 파트너별 QR 발급 →
@@ -206,7 +204,7 @@ KPA 의 `renderText` 주입과 Neture 의 `index`/`serviceShowcase` 는 shared `
 | 항목 | 근거 |
 |---|---|
 | KCos 설문 | 매장·회원 대상 설문 기능 없음. `operator/surveys`(운영자 콘솔) 만 존재 |
-| GP 설문 | 동일 |
+ 설문 | 동일 |
 | PH 설문 | survey route 0 |
 | Neture 설문 | survey route 0 |
 | Neture LMS | lms route 0 |
@@ -215,24 +213,12 @@ KPA 의 `renderText` 주입과 Neture 의 `index`/`serviceShowcase` 는 shared `
 
 | 항목 | 근거 |
 |---|---|
-| GP 태블릿 | `/store/commerce/tablet-displays` route 는 있으나 `GLYCOPHARM_STORE_CONFIG` 에 태블릿 메뉴 항목 없음(KCos·PH·KPA 만 보유) → 진입 동선 없는 기능을 정상 동선처럼 안내하지 않는다. 제품 결정 없이 A형 전환하지 않음(§10) |
+ 태블릿 | 제품 결정 없이 A형 전환하지 않음(§10) |
 | KCos 역할별 guide | 역할별 Value Guide IA 미채택(KPA·Neture 만 보유) |
-| GP 역할별 guide | 동일 |
+ 역할별 guide | 동일 |
 | PH 역할별 guide | 동일 |
 | PH 설정(`/store-owner/account`) | 계정 폼 수준 — PH Guide 는 영역별 매뉴얼 구조이며 별도 안내 단위 아님 |
 | Neture `/service-guide` | `/guide` 허브가 그 역할을 겸함(선행 WO 판정 유지) · dead link 0 |
-
----
-
-## 8. GlycoPharm 최종 확인 (§10)
-
-| route | copy export | shared View | 기능 index 진입 | 프로덕션 |
-|---|---|---|---|---|
-| `/guide/features/lms` | `glycopharmGuideFeatureLmsProps` | `GuideFeatureManualPage` | 그룹 "강의" | 200 · h1 "강의(LMS) 이용 방법" |
-| `/guide/features/store` | `glycopharmGuideFeatureStoreProps` | 동일 | 그룹 "매장 운영" | 200 · h1 "약국 매장 운영 이용 방법" |
-| `/guide/features/qr` | `glycopharmGuideFeatureQrProps` | 동일 | 그룹 "QR" | 200 · h1 "QR 코드 이용 방법" |
-
-GP 태블릿은 **C형 유지** — 코드 상태(route 존재 · 메뉴 없음)가 감사 시점에도 동일하다.
 
 ---
 
@@ -287,7 +273,6 @@ Guide copy 5 개 + 서비스 `pages/guide/**`(`.ts`/`.tsx`) 전체에서 링크 
 |---|:--:|:--:|:--:|
 | KPA | 284 | 62 | **0** |
 | K-Cosmetics | 185 | 39 | **0** |
-| GlycoPharm | 242 | 42 | **0** |
 | Neture | 291 | 55 | **0** |
 | PharmacyHub | 71 | 38 | **0** |
 
@@ -322,7 +307,6 @@ guideServiceIntro.test.tsx      31 tests   PASS
 | brace-expanded unresolved route | 0 |
 | param route 오인 | 0 |
 | orphan Guide route | 0 |
-| stale canonical route(GP b2c · KCos legacy alias · KPA B2C 표현) | 0 |
 
 테스트는 서비스 `.tsx` 의 `<Route>` 트리를 정적 파싱한 **실제 route 집합**과 Guide copy 를 대조한다(런타임 import 없음).
 
@@ -334,7 +318,7 @@ guideServiceIntro.test.tsx      31 tests   PASS
 |---|---|---|---|
 | KPA | 서비스 소개(공개) | `/guide/intro` 리다이렉트 | 소개 → `/guide/intro`·`/guide/usage`·`/guide/features` · Guide copy → `/service-guide` 1 건 |
 | KCos | 동일 | 동일 | 동일 |
-| GP | 동일 | 동일 | 동일 |
+| 동일 | 동일 | 동일 |
 | PH | 동일 | 동일 | 동일 |
 | Neture | 미도입(OOS) | `GuideHomePage` 허브 | `/service-guide` 참조 0 → 끊긴 링크 없음 |
 
@@ -349,7 +333,7 @@ guideServiceIntro.test.tsx      31 tests   PASS
 |---|---|
 | KPA | header `서비스 안내`(/service-guide) · footer `이용 가이드`(/guide/intro) + `서비스 안내` · 커뮤니티 홈 |
 | KCos | header `서비스 안내` · footer `서비스 안내` |
-| GP | header `서비스 안내` · footer `서비스 안내` |
+| header `서비스 안내` · footer `서비스 안내` |
 | PH | header `이용 안내` 3 항목(서비스 소개 · 이용 가이드 · 기능별 이용 방법) · store-owner shell 동일 3 항목 |
 | Neture | header `이용 안내`(/guide) · `/guide` 허브 |
 
@@ -370,7 +354,7 @@ URL 로만 도달 가능한 Guide **0**. 모든 메뉴가 Guide 진입점을 가
 | 미조사 | 0 | 0 | 유지 |
 
 - PharmacyHub adoption: 0 → **Guide route 17 · shared View 100% · orphan 0**
-- 신규 Guide route(직전 WO): GP 3 · KCos 2
+- KCos 2
 - stale route: cleanup 이후 재발 **0**
 - A형 gap: 직전 WO 5 → 0 → 본 감사에서 **신규 발견 3**(외국인 여행객 판매지원)
 
@@ -386,14 +370,13 @@ URL 로만 도달 가능한 Guide **0**. 모든 메뉴가 Guide 진입점을 가
 |---|---|---|
 | 1 | 외국인 여행객 판매지원 Guide 부재(A형) | KPA |
 | 2 | 동일 | K-Cosmetics |
-| 3 | 동일 | GlycoPharm |
 
 ### ACCEPTED_RESIDUAL — 15
 
 | # | 항목 | 근거 |
 |---|---|---|
 | 1~5 | B형 5(설문 4 · Neture LMS) | 기능 자체가 없음 |
-| 6~11 | C형 6(GP 태블릿 · 역할별 3 · PH 내 계정 · Neture `/service-guide`) | IA 미채택 또는 안내 단위 아님 |
+| 6~11 | 역할별 3 · PH 내 계정 · Neture `/service-guide`) | IA 미채택 또는 안내 단위 아님 |
 | 12 | KPA copy 의 `/store/my-products` 안내 | 화면 실재 · dead link 아님 · 역할 분리 판정 이력 |
 | 13 | KPA 판매자 모집 · 신청·승인 현황 copy 미언급 | 매장 운영 매뉴얼 내 문구 보강 수준 |
 | 14 | KPA 매장 자체 상품 copy 미언급 | 동일 |
@@ -404,8 +387,8 @@ URL 로만 도달 가능한 Guide **0**. 모든 메뉴가 Guide 진입점을 가
 | # | 항목 | 근거 |
 |---|---|---|
 | 1 | KPA `online-sales/*` 3 항목(판매 설정 · 판매 상품 · 주문 관리) | 자체 storefront 폐기 트랙(네이버·쿠팡 대체) — 제품 결정 |
-| 2 | KCos·GP 설문 사용자 대면 도입 여부 | 제품 결정 |
-| 3 | GP 태블릿 메뉴 노출 여부 | IA/제품 결정 |
+| 2 | KCos 설문 사용자 대면 도입 여부 | 제품 결정 |
+| 3 태블릿 메뉴 노출 여부 | IA/제품 결정 |
 
 ---
 
@@ -427,7 +410,7 @@ viewport: desktop 1440×900 / mobile 390×844.
 |---|---|
 | KPA | `/service-guide` · `/guide/intro` · `/guide/features` · `/guide/features/forum` · `/guide/features/store` |
 | KCos | `/service-guide` · `/guide/intro` · `/guide/features` · `/guide/features/store` · `/guide/features/qr` |
-| GP | `/service-guide` · `/guide/intro` · `/guide/features` · `/guide/features/lms` · `/guide/features/store` · `/guide/features/qr` |
+| `/service-guide` · `/guide/intro` · `/guide/features` · `/guide/features/lms` · `/guide/features/store` · `/guide/features/qr` |
 | PH | `/service-guide` · `/guide` · `/guide/features` · `/guide/features/qr` · `/guide/features/manuals` · `/guide/features/tablet` |
 | Neture | `/guide` · `/guide/features` · `/guide/for-seller` · `/guide/business/pharmacy-coop` · `/guide/foreign-customer-support` |
 
@@ -439,7 +422,7 @@ blocker 를 잘게 쪼개지 않고 **1 개 묶음**으로 제안한다.
 
 **WO-O4O-GUIDE-FOREIGN-VISITOR-SALES-SUPPORT-COVERAGE-V1 (제안)**
 
-- 범위: KPA · KCos · GP 3 서비스에 외국인 여행객 판매지원 Guide 추가
+- 범위: KPA · KCos 2 서비스에 외국인 여행객 판매지원 Guide 추가
   (shared `GuideFeatureManualPage` + 서비스 copy · 신규 View 0),
   기능별 이용 방법 index 진입 링크 추가, coverage contract test 확장.
 - 함께 처리: ACCEPTED_RESIDUAL 12~14(KPA 매장 운영 매뉴얼 copy 보강 — 매장 자체 상품 ·

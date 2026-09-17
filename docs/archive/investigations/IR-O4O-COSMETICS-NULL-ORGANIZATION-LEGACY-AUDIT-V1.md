@@ -162,7 +162,7 @@ CREATE INDEX IDX_organizations_business_number
 
 - **NULLABLE** (UNIQUE 제약 없음)
 - Partial index 존재 (NOT NULL 조건)
-- 채우는 경로: GlycoPharm / Neture / Cosmetics 도메인 모두 자기 매장의 business_number 를 organization 에 복사
+- 채우는 경로: Neture / Cosmetics 도메인 모두 자기 매장의 business_number 를 organization 에 복사
 
 ### 3.3 정규화 일관성
 
@@ -174,13 +174,13 @@ export function normalizeBusinessNumber(raw: string): string {
 }
 ```
 
-→ K-Cosmetics 는 application 단계에서 normalize 후 저장. GlycoPharm도 동일 함수 사용. **정규화 일관성 확보**.
+→ K-Cosmetics 는 application 단계에서 normalize 후 저장. **정규화 일관성 확보**.
 
 ### 3.4 Repair 매핑 분류
 
 | 케이스 | 의미 | 처리 |
 |--------|------|------|
-| **A** business_number 일치 organization 1건 | 같은 사업자가 다른 서비스 가입 (GlycoPharm 등) — bridge 가능 | ✅ 자동 repair 후보 |
+| **A** business_number 일치 organization 1건 | 같은 사업자가 다른 서비스 가입 — bridge 가능 | ✅ 자동 repair 후보 |
 | **B** business_number 일치 organization 0건 | 같은 사업자번호 organization 없음 — 새 organization 생성 필요 | ⚠️ 수동 결정 (orphan) |
 | **C** business_number NULL | cosmetics_stores 는 NOT NULL 제약이라 발생 불가 | ❌ N/A |
 | **D** business_number 일치 organization 복수 | 다른 흐름으로 중복 생성된 drift | ⚠️ canonical organization 선택 필요 |
@@ -233,7 +233,7 @@ cosmetics_stores (organization_id NULL)
 | 항목 | 판정 |
 |------|------|
 | organization SSOT 위반 | ✅ **위반** (organization 없음) |
-| 다중 서비스 구조 충돌 | ⚠️ 잠재 — 같은 사업자가 GlycoPharm 등 다른 서비스 가입 시 K-Cosmetics 만 어디에도 묶이지 않음 |
+| 다중 서비스 구조 충돌 | — |
 | business_number canonical 유지 | ✅ 유지 (cosmetics_stores.business_number NOT NULL 보장) |
 | 현재 철학과의 충돌 | ⚠️ status=approved 인 NULL row 는 사용자 노출 가능 운영 데이터 → 즉시 정렬 필요 |
 
@@ -277,7 +277,7 @@ cosmetics_stores (organization_id NULL)
 **조건**: §9.3 결과 — `matching_org_count >= 2`
 
 **처리**:
-1. 매칭 organization 들 중 canonical 선택 (예: 가장 오래된 것, GlycoPharm enrollment 보유 등 기준)
+1. 매칭 organization 들 중 canonical 선택 (예: 가장 오래된 것 enrollment 보유 등 기준)
 2. 다른 organization 들의 처리 결정 (merge 또는 archive)
 
 **위험도**: 높음 (data merge / canonical 결정 필요) — 별도 IR 필요
@@ -289,7 +289,7 @@ cosmetics_stores (organization_id NULL)
 | 기준 | 판정 |
 |------|------|
 | **organization SSOT 위반** | ✅ NULL row 는 organization 없이 존재 → SSOT 위반 |
-| **다중 서비스 구조 충돌** | ⚠️ NULL row 가 GlycoPharm 등 다른 서비스 organization 과 분리됨 → 다중 서비스 통합 시 불일치 |
+| **다중 서비스 구조 충돌** | — |
 | **business_number canonical 유지** | ✅ cosmetics_stores 자체는 canonical 보장 (NOT NULL + UNIQUE) |
 | **legacy row의 현재 철학 충돌** | ⚠️ **이중 분류**: <br>- `status='approved'` NULL → 사용자 노출 가능 + canonical 위반 → 즉시 정렬<br>- `status≠'approved'` NULL → 사용자 미노출 + 정상 코드 경로 외 흔적 → 운영 검토 후 cleanup 또는 reset |
 
@@ -383,7 +383,6 @@ ORDER BY cs.created_at;
 - `matching_org_count = 1` → Option A (자동 repair)
 - `matching_org_count = 0` → Option B (orphan, 신규 생성 필요)
 - `matching_org_count >= 2` → Option D (drift, canonical 선택)
-- `matching_service_keys` 에 `glycopharm` 보이면 → 같은 사업자가 GlycoPharm 가입한 상태
 
 ### 9.4 code 기반 매칭 (마이그레이션 백필과 동일 로직)
 

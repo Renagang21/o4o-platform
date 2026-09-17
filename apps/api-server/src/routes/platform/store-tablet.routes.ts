@@ -236,7 +236,7 @@ async function validateDisplayItems(
  * 붙는다 — 로직을 복제하거나 라우트를 다시 쓸 필요가 없다.
  *
  * 기본값(옵션 미지정)은 기존 동작 그대로다. `/api/v1/store` 마운트는 무변경이며
- * KPA·GlycoPharm·K-Cosmetics 의 응답·경계가 달라지지 않는다.
+ * KPA·K-Cosmetics 의 응답·경계가 달라지지 않는다.
  */
 export interface StoreTabletRoutesOptions {
   /**

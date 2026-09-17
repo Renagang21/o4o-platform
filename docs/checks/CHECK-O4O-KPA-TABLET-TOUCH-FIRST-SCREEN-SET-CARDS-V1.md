@@ -73,7 +73,7 @@ services/web-kpa-society/src/pages/pharmacy/TabletScreenSetManager.tsx  (UI only
 - Screen Set/Block API·계약·template_key 종류·public `/tablet/screen`·kiosk-core·content_list 편집기(ContentListEditor/picker)·삭제/해제 정책 — **코드 미접촉**. migration 0.
 
 ## 10. typecheck / 배포
-- web-kpa-society `tsc --noEmit`: **TabletScreenSetManager 에러 0**(KPA 전용 → GP/KCos 무관).
+- web-kpa-society `tsc --noEmit`: **TabletScreenSetManager 에러 0**(KPA 전용 → KCos 무관).
 - web deploy(3612f210b) **success**.
 
 ## 11. 브라우저 smoke — Deferred (§13.4)

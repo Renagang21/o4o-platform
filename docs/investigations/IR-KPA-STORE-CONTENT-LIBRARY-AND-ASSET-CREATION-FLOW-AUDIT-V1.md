@@ -129,7 +129,7 @@ product_ai_contents        # 상품별 AI 문구(pop_short/pop_long 등)
 
 **관찰:** "콘텐츠 원본"과 "파생 결과물"을 **하나로 묶는 상위 모델이 없다.** `kpa_store_contents`가 logical canonical "Store Production Material"이지만, POP PDF/QR/블로그/사이니지 결과는 **각자 다른 테이블**에 적재되며 `kpa_store_contents`와의 parent/derived 관계 컬럼이 없다. 유일한 재사용 링크는 `store_playlist_items.snapshot_id`(사이니지)와 `store_qr_codes.libraryItemId`(QR source 참조)뿐이다.
 
-> Canonical 문서(`O4O-STORE-PRODUCTION-MATERIAL-CANONICAL-V1`): `kpa_store_contents`는 legacy physical name이며 3서비스(KPA/Glyco/Cosmetics) 공통. logical 개념은 service-neutral **Store Production Material**. 성급한 rename 금지. → 본 IR도 rename을 제안하지 않는다.
+> Canonical 문서(`O4O-STORE-PRODUCTION-MATERIAL-CANONICAL-V1`): `kpa_store_contents`는 legacy physical name이며 3서비스 공통. logical 개념은 service-neutral **Store Production Material**. 성급한 rename 금지. → 본 IR도 rename을 제안하지 않는다.
 
 ---
 
@@ -222,11 +222,6 @@ if (libraryItems.length === 0) {
 - **파생 관계 컬럼**: 결과물(POP/QR/블로그)에 `source_content_id`(또는 origin metadata) 부여 → 역추적/재사용.
 - **QR·블로그의 내 자료함 통합 노출**(읽기 통합 뷰 또는 asset-type 필터).
 
-### Phase 3 — 공통화 확장 (KPA → Glyco/KCos)
-- `kpa_store_contents`는 이미 3서비스 공통(canonical). Phase 1·2에서 정리된 흐름을 GlycoPharm/K-Cosmetics로 확장 검토. **단, canonical 문서 기준 rename 금지·`organization_id` 격리 유지.**
-
----
-
 ## 13. 단계별 WO 제안
 
 1. **WO-KPA-STORE-CONTENT-LIBRARY-CROSS-CREATE-CTA-V1** (Phase 1)
@@ -236,7 +231,7 @@ if (libraryItems.length === 0) {
 3. **WO-KPA-STORE-ASSET-DERIVED-LINK-AND-UNIFIED-VIEW-V1** (Phase 2-B)
    결과물 `source_content_id` 도입 + QR/블로그 내 자료함 통합 노출.
 4. **WO-O4O-STORE-CONTENT-LIBRARY-COMMONIZATION-V1** (Phase 3)
-   KPA 정리분의 Glyco/KCos 확장. *(canonical/격리 가드 준수)*
+   *(canonical/격리 가드 준수)*
 
 > 우선순위: 1 → 2 → 3 → 4. Phase 1은 즉시 가능(저위험), Phase 2는 모델/계약 변경 동반이므로 별도 승인.
 

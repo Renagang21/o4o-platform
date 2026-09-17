@@ -116,9 +116,9 @@ GET /neture/operator/suppliers
 |------|:-----------:|:-----------------:|------|:---------------:|------|
 | `test@test.com` | active | active | supplier | **PENDING** | step1 완료 · step2 대기 (화면 상태와 일치) |
 | `aop80@naver.com` | active | active | supplier | **PENDING** | step1 완료 · step2 대기 |
-| `renagang21@gmail.com` | active | active (+ kpa/glycopharm/cosmetics) | supplier 외 | ACTIVE | 4서비스 회원 · 공급자 ACTIVE (공유 계정) |
+| `renagang21@gmail.com` | active | active | supplier 외 | ACTIVE | 4서비스 회원 · 공급자 ACTIVE (공유 계정) |
 
-`renagang21`은 다중 서비스 공유 계정(KPA 약국 / Glycopharm 약국 / K-cosmetics store_owner / Neture supplier)이며 **운영 권한(operator/admin) 없음**.
+`renagang21`은 다중 서비스 공유 계정(KPA 약국 / K-cosmetics store_owner / Neture supplier)이며 **운영 권한(operator/admin) 없음**.
 
 ---
 

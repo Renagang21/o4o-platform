@@ -51,8 +51,8 @@ type StatusFilter = 'all' | 'draft' | 'published' | 'archived';
 
 // WO-O4O-KPA-OPERATOR-STORE-CONTENT-MENU-TERMINOLOGY-ALIGNMENT-V1: 상태 라벨 통일(초안/발행/보관)
 // WO-O4O-MY-STORE-REMAINING-VIEW-DUPLICATION-ZERO-CLEANUP-V1:
-//   ⚠️ 공통화 대상이 아니다. KCos/GP 는 '임시저장/발행됨' 을 쓰므로 공통 상수로 치환하면
-//   KPA 또는 KCos/GP 중 한쪽 문구가 조용히 바뀐다. 색상만 동일하고 라벨은 서비스 계약이 다르다.
+//   ⚠️ 공통화 대상이 아니다. KCos 는 '임시저장/발행됨' 을 쓰므로 공통 상수로 치환하면
+//   KPA 또는 KCos 중 한쪽 문구가 조용히 바뀐다. 색상만 동일하고 라벨은 서비스 계약이 다르다.
 const STATUS_LABELS: Record<string, { label: string; color: string; bg: string }> = {
   draft: { label: '초안', color: '#64748b', bg: '#f1f5f9' },
   published: { label: '발행', color: '#16a34a', bg: '#f0fdf4' },
@@ -417,7 +417,7 @@ export function PharmacyBlogPage({ service }: { service?: string }) {
 
   // Editor view
   // WO-O4O-MY-STORE-REMAINING-VIEW-DUPLICATION-ZERO-CLEANUP-V1:
-  //   editor 화면 본체를 공통 StoreBlogEditorPanel 로 이관(KCos/GP 와 동일 Core).
+  //   editor 화면 본체를 공통 StoreBlogEditorPanel 로 이관(KCos 와 동일 Core).
   //   KPA 고유 요소(템플릿 배지 · 외부 AI 안내 · 이미지 업로드)는 slot 으로 그대로 보존한다.
   if (mode === 'editor') {
     return (
@@ -471,7 +471,7 @@ export function PharmacyBlogPage({ service }: { service?: string }) {
 
   // Settings view (WO-O4O-KPA-STORE-BLOG-META-V1)
   // WO-O4O-MY-STORE-REMAINING-VIEW-DUPLICATION-ZERO-CLEANUP-V1:
-  //   settings 화면 본체를 공통 StoreBlogSettingsPanel 로 이관(KCos/GP 와 동일 Core).
+  //   settings 화면 본체를 공통 StoreBlogSettingsPanel 로 이관(KCos 와 동일 Core).
   //   KPA 고유 요소(대표 이미지 업로드 버튼)는 slot 으로 그대로 보존한다.
   if (mode === 'settings') {
     return (
@@ -736,7 +736,7 @@ export function PharmacyBlogPage({ service }: { service?: string }) {
 }
 
 // WO-O4O-MY-STORE-REMAINING-VIEW-DUPLICATION-ZERO-CLEANUP-V1:
-//   btnStyle / smallBtn 은 KCos·GP 사본과 값이 동일했다 → 공통 style 을 소비한다(로컬 사본 제거).
+//   btnStyle / smallBtn 은 KCos 사본과 값이 동일했다 → 공통 style 을 소비한다(로컬 사본 제거).
 const btnStyle = storeBlogBtnStyle;
 const smallBtn = storeBlogSmallBtnStyle;
 

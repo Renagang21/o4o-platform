@@ -38,7 +38,6 @@
 | web-neture | `src/lib/api/{admin,dashboard,operatorDashboard,partner,product,seller,serviceApproval,supplier}.ts`, `src/services/forumApi.ts`, `src/api/trial.ts`, `src/lib/cart.ts` |
 | web-kpa-society | `src/api/{participation,platform-services,signageTemplate,token-refresh,dashboard,...}.ts` |
 | web-k-cosmetics | `src/services/{forumApi,storeApi,operatorApi}.ts` |
-| web-glycopharm | `src/services/api.ts` (`apiClient` 공통 계약), `src/api/glycopharm.ts` |
 | web-pharmacy-hub | `src/api/**` (HARD 해당 없음 — 알림 배지 KEEP 1건만) |
 
 ---
@@ -102,12 +101,11 @@ MIXED 로 제외된 7건 (다음 batch 후보):
 | web-neture | `supplierApi.getOrderById` | 1/2 (SupplierOrderDetailPage) |
 | web-neture | `operatorCategoryApi.updateCategory` | 1/2 — mutation, 실패 보존 계약이라 KEEP 성격 |
 | web-kpa-society | `tryRefreshToken` | 12/13 — 토큰 재발급, KEEP_INTENTIONAL_OPTIONAL |
-| web-glycopharm | `fetchOperatorDashboard` | 2/4 |
 | web-k-cosmetics | `fetchForumPosts` | 2/4 (ForumHubPage · OperatorForumPage) |
 
 KEEP_INTENTIONAL_OPTIONAL 14건 (의도된 fail-open — 수정하지 않음):
 
-- `notificationsApi.getUnreadCount` × 5 (neture/kpa/glycopharm/k-cosmetics/pharmacy-hub) — 실패 시 배지 0
+- `notificationsApi.getUnreadCount` × 5 — 실패 시 배지 0
 - `tryRefreshToken` · `clearAllTokens` (kpa `token-refresh.ts`)
 - `loadAndClearDraft` · `looksLikeFirstmallAdmin` · `pickLargestSrcset` — localStorage/parser (API 아님)
 - `downloadDocument` · `downloadRegulatedEvidence` · `downloadEvidence` 등 4건 — 액션 경로(로드 계약 아님)
@@ -123,7 +121,6 @@ KEEP_INTENTIONAL_OPTIONAL 14건 (의도된 fail-open — 수정하지 않음):
 | `web-neture/src/lib/api/operatorCategory.ts` `createCategory` | 동일 (mutation 실패 보존 계약) |
 | `web-neture/src/api/trial.ts` `getParticipation` | 이미 `404 → null / 그 외 throw` 로 올바름 |
 | `web-neture/src/lib/api/supplier.ts` `getInventoryItem` · `getSettlementDetail` | 이미 `isNotFound() → null / 그 외 throw` 로 올바름 |
-| `web-glycopharm/src/services/api.ts` `forumAnalyticsApi.getTrend/getActivity` | 소비처가 공통 패키지 `@o4o/operator-core-ui` 의 `OperatorForumAnalyticsPage.loadAll()` — try/catch·error 상태 없음 → throw 시 무한 스피너. **HOLD** |
 
 ---
 
@@ -131,8 +128,8 @@ KEEP_INTENTIONAL_OPTIONAL 14건 (의도된 fail-open — 수정하지 않음):
 
 | # | 대상 | 라벨 | 이유 | 다음 수정 방법 |
 |---|---|---|---|---|
-| H1 | `web-glycopharm/src/services/api.ts` `ApiClient.request` | HOLD_COMPLEX_CALLER | 실패를 `{ error }` 로 **정상 반환**하는 공통 계약. 소비처 13개 파일. throw 전환 시 13곳 동시 수정 필요 | 직전 배치에서 주요 read 화면 3곳은 `if (response.error)` 판정을 이미 추가함. 나머지 10곳 정리 후 계약 전환 |
-| H2 | `web-glycopharm` `forumAnalyticsApi.getTrend/getActivity` | HOLD_COMPLEX_CALLER | 소비처가 공통 패키지 `@o4o/operator-core-ui/modules/forum-analytics` — 4서비스 공유, error 상태 없음 | 공통 모듈에 4상태 계약을 먼저 도입(별도 WO — 공통 모듈 변경) |
+| H1 | — | HOLD_COMPLEX_CALLER | 실패를 `{ error }` 로 **정상 반환**하는 공통 계약. 소비처 13개 파일. throw 전환 시 13곳 동시 수정 필요 | 직전 배치에서 주요 read 화면 3곳은 `if (response.error)` 판정을 이미 추가함. 나머지 10곳 정리 후 계약 전환 |
+| H2 | — | HOLD_COMPLEX_CALLER | 소비처가 공통 패키지 `@o4o/operator-core-ui/modules/forum-analytics` — 4서비스 공유, error 상태 없음 | 공통 모듈에 4상태 계약을 먼저 도입(별도 WO — 공통 모듈 변경) |
 | H3 | `web-k-cosmetics/src/services/storeApi.ts` `fetchWithAuth` · `mutateWithAuth` | HOLD_COMPLEX_CALLER | 파일 내 거의 모든 export 가 경유하는 범용 헬퍼. 소비처 blast radius 과대 | 화면 단위로 4상태 계약을 먼저 갖춘 뒤 헬퍼 전환 |
 | H4 | `web-k-cosmetics/src/services/operatorApi.ts` `fetchWithAuth` | HOLD_COMPLEX_CALLER | 동일 | 동일 |
 
@@ -166,7 +163,6 @@ KEEP_INTENTIONAL_OPTIONAL 14건 (의도된 fail-open — 수정하지 않음):
 | web-neture | PASS | PASS | PASS (run 31459781698) |
 | web-k-cosmetics | PASS | PASS | PASS (run 31459781698) |
 | web-kpa-society | PASS | PASS | PASS (run 31459781698) |
-| web-glycopharm | 변경 없음 | — | 배포 대상 아님 |
 | web-pharmacy-hub | 변경 없음 | — | 배포 대상 아님 |
 
 API 서버 변경 0 · 배포 0.
@@ -185,7 +181,7 @@ API 서버 변경 0 · 배포 0.
 ## 10. push 결과
 
 - `c2be1f693..278eadf0f  main -> main` push 완료
-- GitHub Actions `Deploy Web Services (Cloud Run)` run **31459781698** — `detect-changes` / `deploy-neture` / `deploy-k-cosmetics` / `deploy-kpa-society` **success**, `deploy-glycopharm` · `deploy-pharmacy-hub` **skipped**(변경 없음)
+- GitHub Actions `Deploy Web Services (Cloud Run)` run **31459781698** — `detect-changes` / `deploy-neture` / `deploy-k-cosmetics` / `deploy-kpa-society` **success**, `deploy-pharmacy-hub` **skipped**(변경 없음)
 - API 서버 배포 없음
 
 ---

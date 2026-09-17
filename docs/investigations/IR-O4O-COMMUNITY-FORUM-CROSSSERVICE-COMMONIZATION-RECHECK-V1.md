@@ -2,7 +2,7 @@
 
 > **작업명:** IR-O4O-COMMUNITY-FORUM-CROSSSERVICE-COMMONIZATION-RECHECK-V1
 > **유형:** Read-only 조사 (코드/UI/API/DB/route/menu 수정 없음)
-> **목표:** KPA-Society, GlycoPharm, K-Cosmetics, Neture 4개 서비스의 사용자-facing community/forum 공통화가 실제로 완료 상태인지 전체 재점검
+> **목표:** KPA-Society, K-Cosmetics, Neture 3개 서비스의 사용자-facing community/forum 공통화가 실제로 완료 상태인지 전체 재점검
 > **작성일:** 2026-06-12
 
 ---
@@ -40,7 +40,6 @@
 | 서비스 | 사용자 frontend (현행) | community/forum backend |
 |--------|------------------------|--------------------------|
 | KPA-Society (reference) | `services/web-kpa-society` | `routes/forum/*` + `routes/kpa/controllers/*` |
-| GlycoPharm | `services/web-glycopharm` | `routes/forum/*` + `routes/glycopharm/controllers/*` |
 | K-Cosmetics | `services/web-k-cosmetics` | `routes/forum/*` + `routes/cosmetics/controllers/*` |
 | Neture | `services/web-neture` | `routes/forum/*` + `routes/neture/controllers/*` |
 
@@ -52,30 +51,30 @@
 
 ### 4.1 사용자-facing forum route (services/web-*/src/App.tsx)
 
-| route | KPA | Neture | GlycoPharm | K-Cosmetics |
-|-------|-----|--------|-----------|------------|
-| `/forum` (hub/home) | ✅ ForumHomePage | ✅ ForumHubPage | ✅ ForumHubPage | ✅ ForumHubPage |
-| post list | ✅ `/forum/all` ForumListPage | ✅ `/forum/posts` ForumPage | ✅ `/forum/posts` ForumPage | ✅ `/forum/posts` ForumPage |
-| post detail | ✅ `/forum/post/:id` | ✅ `/forum/post/:slug` | ✅ `/forum/posts/:id` | ✅ `/forum/post/:postId` |
-| write | ✅ `/forum/write`, `/forum/:slug/write` | ✅ `/forum/write` | ✅ `/forum/write` | ✅ `/forum/write` (protected) |
-| edit | ✅ `/forum/edit/:id` | ⚠️ 미라우팅 | ⚠️ 미라우팅 | ⚠️ 미라우팅 |
-| 동적 forum feed | ✅ `/forum/:slug` ForumFeedPage | (board props) | — | — |
-| 포럼 생성 신청 | ✅ `/forum/request` | ❌ 없음 | ✅ `/forum/request-category` | ✅ `/forum/request-category` |
-| 내 신청 현황 | ✅ (mypage) MyRequestsPage | ❌ 없음 | ✅ `/forum/my-requests` | ⚠️ 폼만, 목록 미라우팅 |
-| 내 포럼 대시보드 | ✅ (mypage) | ❌ 없음 | ✅ `/forum/my-dashboard` | ✅ `/forum/my-dashboard` |
-| 멤버 관리(폐쇄형) | ✅ (mypage) | ❌ 없음 | ✅ `/forum/my-dashboard/:forumId/members` | ✅ 동일 |
-| feedback | ❌ | ❌ | ✅ `/forum/feedback` ForumFeedbackPage | ❌ |
+| route | KPA | Neture | K-Cosmetics |
+| ------- | ----- | -------- | ------------ |
+| `/forum` (hub/home) | ✅ ForumHomePage | ✅ ForumHubPage | ✅ ForumHubPage |
+| post list | ✅ `/forum/all` ForumListPage | ✅ `/forum/posts` ForumPage | ✅ `/forum/posts` ForumPage |
+| post detail | ✅ `/forum/post/:id` | ✅ `/forum/post/:slug` | ✅ `/forum/post/:postId` |
+| write | ✅ `/forum/write`, `/forum/:slug/write` | ✅ `/forum/write` | ✅ `/forum/write` (protected) |
+| edit | ✅ `/forum/edit/:id` | ⚠️ 미라우팅 | ⚠️ 미라우팅 |
+| 동적 forum feed | ✅ `/forum/:slug` ForumFeedPage | (board props) | — |
+| 포럼 생성 신청 | ✅ `/forum/request` | ❌ 없음 | ✅ `/forum/request-category` |
+| 내 신청 현황 | ✅ (mypage) MyRequestsPage | ❌ 없음 | ⚠️ 폼만, 목록 미라우팅 |
+| 내 포럼 대시보드 | ✅ (mypage) | ❌ 없음 | ✅ `/forum/my-dashboard` |
+| 멤버 관리(폐쇄형) | ✅ (mypage) | ❌ 없음 | ✅ 동일 |
+| feedback | ❌ | ❌ | ❌ |
 
-**route 파일:** web-kpa-society App.tsx:585–594 · web-neture App.tsx:670–673 · web-glycopharm App.tsx:549–559 · web-k-cosmetics App.tsx:409–445
+**route 파일:** web-kpa-society App.tsx:585–594 · web-neture App.tsx:670–673 · web-k-cosmetics App.tsx:409–445
 
 ### 4.2 menu/nav
 
-**4개 서비스 모두 상단 header nav 에 forum/community 직접 항목 없음.** 진입은 community home(`/`) 카드 또는 직접 URL. (navigation.ts: kpa 18–45 / neture 19–39 / glyco 18–36 / kcos 17–33). 이는 의도된 UX 선택으로 판단되며 dead link 는 아니다.
+**4개 서비스 모두 상단 header nav 에 forum/community 직접 항목 없음.** 진입은 community home(`/`) 카드 또는 직접 URL. 이는 의도된 UX 선택으로 판단되며 dead link 는 아니다.
 
 ### 4.3 route/menu 불일치 (요약)
 
-- **edit route 비대칭** — KPA 만 `/forum/edit/:id` 라우팅, Neture/GP/KCos 는 미라우팅(편집 진입점 불명확). → 분류 D
-- **My Page 위치 불일치** — KPA 는 내 포럼/신청을 mypage 하위에, GP/KCos 는 `/forum/*` 하위에 둠. → 분류 D (§11 참조)
+- **edit route 비대칭** — KPA 만 `/forum/edit:id` 라우팅, Neture/KCos 는 미라우팅(편집 진입점 불명확). → 분류 D
+- **My Page 위치 불일치** — KPA 는 내 포럼/신청을 mypage 하위에, KCos 는 `/forum/*` 하위에 둠. → 분류 D (§11 참조)
 - **K-Cos my-requests 목록 미라우팅** — RequestCategoryPage(폼)만 있고 신청 현황 목록 route 없음. → 분류 D
 - **dead link 0** — 위는 "있어야 할 화면이 없음"이지 깨진 링크는 아님.
 
@@ -88,7 +87,7 @@ KPA 가 forum 기능 최다 보유(편집 route, ForumSearchBar, ClosedForumAcce
 **KPA 고유(약사·약대생 커뮤니티 성격 — 유지 대상, 분류 H):**
 - 분회/지부(organizationId/branchId) 스코프 포럼 신청·승인 (`routes/kpa/controllers/forum-request.controller.ts`)
 - 폐쇄형 포럼 멤버십 가입·승인 (`forum-membership.controller.ts`) + ClosedForumAccessBlocker UI
-- community hub 의 **quick-links** (KPA 만 보유, GP/KCos/Neture 없음)
+- community hub 의 **quick-links** (KPA 만 보유, KCos/Neture 없음)
 - ForumSearchBar / ForumActivitySection 등 커뮤니티 활동 중심 UI
 
 **공통 community 기능(타 서비스 공유 대상):** 포럼 목록/상세/작성, 댓글, 좋아요/AppreciationPanel, 카테고리, pagination, empty/loading/error.
@@ -97,22 +96,10 @@ KPA 가 forum 기능 최다 보유(편집 route, ForumSearchBar, ClosedForumAcce
 
 ---
 
-## 6. GlycoPharm community/forum 조사 결과
-
-`services/web-glycopharm/src/pages/forum/` **9종**으로 사용자-facing 화면이 4서비스 중 가장 풍부: ForumHubPage, ForumPage, ForumPostDetailPage, ForumWritePage, **ForumFeedbackPage(GP 고유)**, ForumMemberManagementPage, MyForumDashboardPage, MyRequestsPage, RequestCategoryPage.
-
-- 포럼 신청·내 신청 현황·내 대시보드·멤버 관리까지 KPA 와 거의 동등(분류 B — UI 포크).
-- **GP 고유:** ForumFeedbackPage(moderation/피드백 폼) — 타 서비스 없음(분류 D 또는 H 판단 필요).
-- backend: `glycopharm-community-hub.controller.ts` (ads/sponsors, 테이블 부재 시 빈 배열 graceful degrade). operator forum/delete-request 콘솔 보유.
-- 이전 조사(Agent)가 "GP 사용자 forum 0" 이라 한 것은 **레거시 apps/admin-dashboard 오인** 결과이며, 실제로는 사용자-facing 풍부.
-
----
-
 ## 7. K-Cosmetics community/forum 조사 결과
 
 `services/web-k-cosmetics/src/pages/forum/` **7종**: ForumHubPage, ForumPage, PostDetailPage, ForumWritePage, ForumMemberManagementPage, MyForumDashboardPage, RequestCategoryPage.
 
-- 포럼 hub/목록/상세/작성/내 대시보드/멤버관리/신청 보유 — GP 와 거의 동급.
 - **편차:** post detail param 이 `:postId`(타 서비스 `:id`/`:slug`), my-requests 목록 route 부재(폼만).
 - `packages/forum-cosmetics` 에 화장품 도메인 메타(skinType/concerns) 백엔드 존재하나, **카테고리/skinType/concerns 가 하드코딩 enum**(CosmeticsForumController.ts:219–302) — 분류 E. 단 이는 도메인 reference 데이터 성격이라 즉시 위험은 아님.
 - backend: `cosmetics-community-hub.controller.ts` (ads/sponsors, quick-links 없음).
@@ -135,7 +122,7 @@ KPA 가 forum 기능 최다 보유(편집 route, ForumSearchBar, ClosedForumAcce
 
 ## 9. 사용자-facing forum 기능 parity
 
-| 기능 | KPA | Neture | GP | KCos | 분류 |
+| 기능 | KPA | Neture | KCos | 분류 |
 |------|----|-------|----|----|------|
 | 포럼 hub/home | ✅ | ✅ | ✅ | ✅ | A (ForumHubTemplate 공유) |
 | 게시글 목록 | ✅ | ✅ | ✅ | ✅ | A/B |
@@ -153,7 +140,7 @@ KPA 가 forum 기능 최다 보유(편집 route, ForumSearchBar, ClosedForumAcce
 | 포럼 생성 신청 | ✅ | ❌(supplier 경로) | ✅ | ✅ | C |
 | 내 신청 현황 | ✅ | ❌ | ✅ | ⚠️ | D |
 | 멤버 관리(폐쇄형) | ✅ | ❌ | ✅ | ✅ | B |
-| feedback | ❌ | ❌ | ✅ | ❌ | D (GP 고유) |
+| feedback | ❌ | ❌ | ✅ | ❌ | — |
 | empty/loading/error | ✅ | ✅ | ✅ | ✅ | A |
 
 **공통화 정도:** hub/카테고리/댓글/좋아요/pagination/상태표현은 공통(A/B). 목록·상세·작성 **page JSX 는 서비스별 포크**(inline style vs Tailwind) — 공통 page 라이브러리 부재가 가장 큰 잔여 편차.
@@ -170,7 +157,7 @@ KPA 가 forum 기능 최다 보유(편집 route, ForumSearchBar, ClosedForumAcce
 
 ## 11. My Page와 forum 경계 확인
 
-- KPA 는 "내 포럼 대시보드 / 내 신청 현황 / 멤버 관리"를 **mypage 하위**에 둔다. GP/KCos 는 동일 기능을 **`/forum/my-*` 하위**에 둔다.
+- KPA 는 "내 포럼 대시보드 / 내 신청 현황 / 멤버 관리"를 **mypage 하위**에 둔다. KCos 는 동일 기능을 **`/forum/my-*` 하위**에 둔다.
 - 두 위치가 공존하나 충돌(중복 라우트)은 아님 — 같은 기능의 IA 배치 차이.
 - My Page 공통화 축(완료 고정)과의 정합 관점에서, forum 내 활동(내 글/내 포럼)의 canonical 위치를 mypage 로 통일할지 여부는 후속 판단 대상. KPA `/mypage/my-forums` 가 My Page 영역과 구조적으로 충돌하지는 않음.
 
@@ -185,7 +172,7 @@ KPA 가 forum 기능 최다 보유(편집 route, ForumSearchBar, ClosedForumAcce
 
 **확인된 contract 편차/이슈:**
 1. **KPA 신청 API 이중화** — 레거시 `/api/v1/kpa/.../forum-requests/*`(kpa.routes.ts:212) 와 통합 `/api/v1/forum/category-requests/*`(forum.routes.ts:177) 공존. 혼선/중복 정리 후보. (분류 F/정리)
-2. **GP delete-request 스코프 비표준** — operator-forum-delete-request.controller.ts:36,69 가 통합 콘솔의 `serviceCode` 가 아닌 하드코딩 `organizationId = FORUM_ORGS.GLYCOPHARM` 로 필터. boundary 모델 불일치(Boundary Policy 상 Broadcast=serviceKey vs Store Ops=organizationId 혼재).
+2. boundary 모델 불일치(Boundary Policy 상 Broadcast=serviceKey vs Store Ops=organizationId 혼재).
 3. **serviceCode 추출 위치** — `/forum/category-requests/*` 및 operator 라우트가 serviceCode 를 **body/query** 에서 추출(forum-category-request.routes.ts:33,60,85,117; operator-forum.routes.ts:65). operator 라우트는 `requireServiceOperator` 화이트리스트 검증이 있어 완화되나, 플랫폼 원칙(URL path 추출)과는 거리가 있음. read-only 단계 플래그.
 4. **search organizationId 파라미터** — search.controller.ts 가 organizationId 를 query 로 수용. cross-org 검색 가능성 — 후속 검증 필요.
 5. **apps/forum-api = mock/sandbox** (mockThreads/mockReplies 하드코딩) — production 미사용. **apps/forum-web** 별도 SPA, 현 서비스 frontend 아님.
@@ -201,8 +188,8 @@ KPA 가 forum 기능 최다 보유(편집 route, ForumSearchBar, ClosedForumAcce
 - `@o4o/forum-core/public-ui` → CommentSection, ForumBlockRenderer (단 public-ui 실 컴포넌트는 2종뿐)
 
 **포크(공통화 미완):**
-- 목록/상세/작성 page 가 서비스별 자체 JSX. 스타일 체계 불일치 — Neture/GP inline style, KCos Tailwind, KPA BaseTable+inline. status/category badge 도 서비스별 하드코딩.
-- mobile 반응형 편차(KCos Tailwind 반응형 / Neture·GP 비반응형).
+- 목록/상세/작성 page 가 서비스별 자체 JSX. 스타일 체계 불일치 — Neture inline style, KCos Tailwind, KPA BaseTable+inline. status/category badge 도 서비스별 하드코딩.
+- mobile 반응형 편차(KCos Tailwind 반응형 / Neture 비반응형).
 
 → **page-level 공통 라이브러리 부재** 가 forum 공통화의 핵심 잔여 과제.
 
@@ -256,9 +243,9 @@ KPA 가 forum 기능 최다 보유(편집 route, ForumSearchBar, ClosedForumAcce
 | A | 공통화 완료 | hub(ForumHubTemplate), 카테고리, 댓글, Appreciation, pagination, empty/loading/error |
 | B | 기능 동등·UI 편차 | 목록/상세/작성 page, 멤버 관리, 좋아요 |
 | C | KPA 보유·타 서비스 thin | Neture 포럼 신청(일반 사용자 경로), quick-links |
-| D | route/menu 불일치 | edit route(KPA만), 검색 UI(KPA만), my-* 위치 차, KCos my-requests 목록, GP feedback |
+| D | route/menu 불일치 | edit route(KPA만), 검색 UI(KPA만), my-* 위치 차, KCos my-requests 목록 feedback |
 | E | mock/dead | apps/forum-api, apps/main-site forum, 북마크, 신고 UI, KCos 하드코딩 enum |
-| F | backend/API 정리 필요 | KPA 신청 이중 API, GP delete-request org 스코프, serviceCode 추출 위치 |
+| F | backend/API 정리 필요 | KPA 신청 이중 API delete-request org 스코프, serviceCode 추출 위치 |
 | G | operator/사용자 혼합 | 발견 없음(경계 양호) |
 | H | 도메인 차이로 유지 | KPA 분회/약사 멤버십, Neture supplier-scoped community 축소 |
 | I | 개인정보/보안 | §16 S1–S5 |
@@ -269,14 +256,14 @@ KPA 가 forum 기능 최다 보유(편집 route, ForumSearchBar, ClosedForumAcce
 ## 18. 즉시 WO 가능한 후보
 
 1. **WO-O4O-FORUM-USER-PAGE-COMMONIZATION-V1** — 목록/상세/작성 page 를 공통 page 컴포넌트(@o4o/shared-space-ui 또는 forum-core public-ui)로 추출, 서비스는 config/adapter 만. (분류 B 해소, 1인 유지보수성 ↑)
-2. **WO-O4O-FORUM-EDIT-ROUTE-PARITY-V1** — Neture/GP/KCos 에 게시글 수정 route/진입점 정합(작성자 본인). (분류 D)
+2. **WO-O4O-FORUM-EDIT-ROUTE-PARITY-V1** — Neture/KCos 에 게시글 수정 route/진입점 정합(작성자 본인). (분류 D)
 3. **WO-O4O-FORUM-SEARCH-UI-PARITY-V1** — KPA ForumSearchBar 패턴을 공통화하여 타 서비스 검색 UI 제공(backend search API 이미 공통). (분류 D)
 4. **레거시 dead surface 제거 WO** — apps/main-site/src/pages/forum, apps/admin-dashboard/src/pages/forum, apps/forum-api 정리(별도 dead-code 축과 조율). (분류 E)
 
 ## 19. backend/API 선행 후보
 
 1. **WO-O4O-FORUM-REQUEST-API-DEDUP-V1** — KPA 레거시 `/kpa/.../forum-requests/*` 를 통합 `/forum/category-requests/*` 로 일원화. (분류 F)
-2. **WO-O4O-FORUM-GP-DELETE-REQUEST-BOUNDARY-V1** — GP delete-request 의 하드코딩 organizationId 스코프를 통합 serviceCode 모델로 정렬. (분류 F)
+2. (분류 F)
 3. **WO-O4O-FORUM-SERVICEKEY-EXTRACTION-AUDIT-V1** — serviceCode body/query 추출을 plathform 원칙(경로/검증)으로 정렬 + search organizationId 가드. (분류 F/I)
 4. **WO-O4O-FORUM-AUTHOR-PII-GUARD-V1** — sanitizeUser email/phone 포함, author select 컬럼 점검, edit/delete RBAC util 전환, 폐쇄형 cross-service bypass 검증. (분류 I, S1–S3,S5)
 
@@ -295,7 +282,7 @@ KPA 가 forum 기능 최다 보유(편집 route, ForumSearchBar, ClosedForumAcce
 | 2 | WO-O4O-FORUM-REQUEST-API-DEDUP-V1 (§19-1) | 이중 API 혼선 제거, 후속 공통화 선행 |
 | 3 | WO-O4O-FORUM-USER-PAGE-COMMONIZATION-V1 (§18-1) | 잔여 편차 최대(page 포크) 해소, 유지보수성 |
 | 4 | WO-O4O-FORUM-EDIT-ROUTE-PARITY-V1 / SEARCH-UI-PARITY-V1 (§18-2,3) | 사용자 기능 parity |
-| 5 | GP delete-request boundary / serviceKey audit (§19-2,3) | contract 정합 |
+| 5 delete-request boundary / serviceKey audit (§19-2,3) | contract 정합 |
 | 6 | 레거시 dead surface 제거 (§18-4) | 위험 낮음, cleanup 축 합동 |
 
 ---
@@ -306,10 +293,10 @@ KPA 가 forum 기능 최다 보유(편집 route, ForumSearchBar, ClosedForumAcce
 |------|------|
 | community/forum 이 사용자 참여 공간으로 작동하는가 | ✅ 4서비스 모두 사용자-facing 포럼 hub/목록/상세/작성/댓글 작동 |
 | KPA 약사·약대생 커뮤니티 성격 유지 | ✅ 분회/멤버십/활동 UI 유지(분류 H) |
-| GP/KCos/Neture 에 KPA 고유 기능 강제하지 않았는가 | ✅ quick-links/분회 등 미강제, 공통 기능만 공유 |
+| KCos/Neture 에 KPA 고유 기능 강제하지 않았는가 | ✅ quick-links/분회 등 미강제, 공통 기능만 공유 |
 | 사용자 forum 과 operator/admin 관리 혼합 | ✅ route prefix 분리, 혼합 없음(분류 G 없음) |
 | 신청/승인/삭제요청 책임 경계 | ✅ 사용자=제출 / operator=검토·승인 명확. 단 KPA 신청 API 이중화 정리 필요 |
-| My Page 와 forum 활동 경계 | ⚠️ KPA(mypage) vs GP/KCos(/forum) 위치 차 — canonical 위치 통일 후보 |
+| My Page 와 forum 활동 경계 | ⚠️ KPA(mypage) vs KCos(/forum) 위치 차 — canonical 위치 통일 후보 |
 | mock 없이 정직한 기능/empty state | ✅ 사용자 화면 mock 없음. mock 은 DEAD 레거시에 국한 |
 | 공통화가 1인 유지보수성 향상 방향인가 | ⚠️ hub/유틸은 공유되나 page JSX 포크로 4중 유지보수 부담 → §18-1 권장 |
 | 개인정보/권한 경계 안전한가 | ⚠️ §16 S1–S5 플래그 — 보안 WO 선행 권장 |
@@ -327,7 +314,7 @@ KPA 가 forum 기능 최다 보유(편집 route, ForumSearchBar, ClosedForumAcce
 - **KPA reference 적합성:** ✅ 적합 — 기능 최다·구조 기준선. 단 KPA 고유(분회/멤버십/quick-links)는 무이식.
 - **사용자 forum parity:** 핵심 기능 공통(A/B), page JSX 포크가 최대 편차
 - **operator/admin 경계:** ✅ 양호(혼합 없음, 분류 J 충돌 없음)
-- **API/backend contract:** 공통 골격 양호, KPA 신청 이중 API·GP delete-request org 스코프·serviceCode 추출 위치 정리 필요
+- **API/backend contract:** 공통 골격 양호, KPA 신청 이중 API delete-request org 스코프·serviceCode 추출 위치 정리 필요
 - **mock/dead surface:** apps/forum-api(mock), apps/main-site forum(dead), apps/admin-dashboard forum(orphaned), 북마크/신고 UI 부재, KCos 하드코딩 enum
 - **개인정보/보안:** S1(email/phone sanitize 누락) · S2(하드코딩 role) · S3(폐쇄형 cross-service bypass) · S4(search org) · S5(serviceCode 추출) — 보안 WO 선행 권장
 - **우선순위:** 보안 PII 가드 → 신청 API 일원화 → page 공통화 → route parity → contract 정렬 → dead 제거

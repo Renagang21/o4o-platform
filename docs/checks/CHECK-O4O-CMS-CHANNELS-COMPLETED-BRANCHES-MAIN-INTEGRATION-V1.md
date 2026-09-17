@@ -58,7 +58,7 @@ commit 의 변경을 대상으로 하므로 같은 결론이다. 따라서 A 는
 | A 의 의미 | 6개 CMS 화면이 각자 복제하던 서비스 목록을 `pages/cms/cmsServiceCatalog.ts` 한 벌로 모으고, KPA 항목을 role prefix(`kpa`) → canonical(`kpa-society`) 로 교정. 화면별로 다른 "전체" 문구만 `cmsServiceOptionsWithAll(label)` 로 주입. |
 | B 의 의미 | channel 화면이 서버로 보내는 `value` 는 canonical ledger key 여야 한다(`kpa-society`). 화면 내 배열의 KPA 값만 교정. |
 | 최종 선택 | **A 의 카탈로그 SSOT 호출** 채택 — `cmsServiceOptionsWithAll('Global (All Services)')`(FormModal) / `cmsServiceOptionsWithAll('All Services')`(List). 그 위에 두 WO 를 함께 명시하는 주석을 남겼다. |
-| 두 계약이 모두 보존되는 이유 | 카탈로그의 값 집합과 순서가 B 의 배열과 **완전히 동일**(`glycopharm`, `kpa-society`, `neture`, `k-cosmetics`)하고, 화면별 "전체" label 도 각각 그대로다. 즉 B 의 canonical-value 계약은 값 그대로 살아 있고, A 의 "화면별 복제 금지" 계약도 살아 있다. B 의 배열을 그대로 두면 A 의 SSOT(§12)가 깨지고, A 만 두고 B 를 "버렸다"고 기록하면 B 의 의도가 사라진다 — 실제로는 둘 다 만족하는 상위 집합이 존재했다. PharmacyHub 는 추가하지 않았다(§7: 카탈로그 4항목 유지). frontend 로컬 canonicalization/alias mapping 도 추가하지 않았다(§8). |
+| 두 계약이 모두 보존되는 이유 | 카탈로그의 값 집합과 순서가 B 의 배열과 **완전히 동일**(`kpa-society`, `neture`, `k-cosmetics`)하고, 화면별 "전체" label 도 각각 그대로다. 즉 B 의 canonical-value 계약은 값 그대로 살아 있고, A 의 "화면별 복제 금지" 계약도 살아 있다. B 의 배열을 그대로 두면 A 의 SSOT(§12)가 깨지고, A 만 두고 B 를 "버렸다"고 기록하면 B 의 의도가 사라진다 — 실제로는 둘 다 만족하는 상위 집합이 존재했다. PharmacyHub 는 추가하지 않았다(§7: 카탈로그 4항목 유지). frontend 로컬 canonicalization/alias mapping 도 추가하지 않았다(§8). |
 
 ### 4-3. `apps/api-server/src/__tests__/channels-servicekey-canonical-scope.spec.ts` (충돌 파생 조정)
 
@@ -143,11 +143,11 @@ A/B 가 건드린 **모든 파일**에 대해 통합 HEAD 와 원본 브랜치 t
 | 질의 | 결과 | 의미 |
 |---|---|---|
 | `select count(*) from channels` | **0** | channels 는 여전히 0행 → 이번 변경으로 어긋날 운영 행 없음 |
-| `cms_content_slots` serviceKey 분포 | `kpa-society` 28 / `kpa` 1 / `glycopharm` 1 | legacy alias slot 이 실제로 1행 존재 |
+| `cms_content_slots` serviceKey 분포 | `kpa-society` 28 / `kpa` 1 1 | legacy alias slot 이 실제로 1행 존재 |
 | `slotKey='intranet-hero'` 분포 | `kpa` 1행 (canonical 0행) | 문제의 legacy slot |
 | 구 semantics 재현 `slotKey='intranet-hero' AND "serviceKey"='kpa-society'` | **0 rows** | canonical channel 이 legacy slot 을 놓쳤다(고립) |
 | 신 semantics 재현 `slotKey='intranet-hero' AND ("serviceKey" IN ('kpa-society','kpa') OR "serviceKey" IS NULL)` | **1 row** | 통합된 계약이 같은 서비스를 하나로 인식 |
-| `cms_contents` serviceKey 분포 | `glycopharm` 66 / `kpa-society` 53 / `neture` 6 / `kpa` 1 / `pharmacy-hub` 1 | alias 집합 read 가 필요한 근거(legacy `kpa` 1행) |
+| `cms_contents` serviceKey 분포 | — | alias 집합 read 가 필요한 근거(legacy `kpa` 1행) |
 
 ### 9-2. HTTP (`https://api.neture.co.kr`, GET only)
 
@@ -157,7 +157,6 @@ A/B 가 건드린 **모든 파일**에 대해 통합 HEAD 와 원본 브랜치 t
 | `GET /api/v1/cms/contents?serviceKey=kpa-society&limit=1` | **200**, 첫 행 `e0000000-…-021` | 일치 |
 | `GET /api/v1/cms/contents?serviceKey=kpa&limit=1` (alias) | **200**, **동일한 첫 행** | alias/canonical 동일 모집단 확인 |
 | `GET /api/v1/cms/contents/e0000000-…-021?serviceKey=kpa-society` | **200** | 일치 |
-| `GET /api/v1/cms/contents/e0000000-…-021?serviceKey=glycopharm` | **404 `NOT_FOUND`** | 타 서비스 격리 확인 |
 | `GET /api/v1/channels` | **500 `No metadata for "Channel" was found.`** | ⚠ 아래 9-3 |
 | `GET /api/v1/channels?serviceKey=kpa` | 동일 500 | ⚠ 아래 9-3 |
 | `GET /api/v1/channels?serviceKey=kpa-society` | 동일 500 | ⚠ 아래 9-3 |

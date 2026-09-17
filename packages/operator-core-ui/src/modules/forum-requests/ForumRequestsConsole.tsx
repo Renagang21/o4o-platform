@@ -3,7 +3,7 @@
  *
  * WO-O4O-OPERATOR-FORUM-REQUESTS-CONSOLE-COMMONIZATION-V1
  *
- * GlycoPharm / K-Cosmetics 의 ForumRequestsPage (95%+ 동일) 통합.
+ * K-Cosmetics 의 ForumRequestsPage (95%+ 동일) 통합.
  * IR: docs/investigations/IR-O4O-OPERATOR-FORUM-REQUEST-CONSOLE-WRAPPER-FEASIBILITY-V1.md
  * 선행: WO-O4O-OPERATOR-FORUM-DELETE-REQUESTS-CONSOLE-COMMONIZATION-V1 (동일 패턴).
  *
@@ -18,7 +18,7 @@
  *
  * 보완(revision) 정책 (canonical):
  *   - 의견 입력이 필요하므로 bulk action 에서 제외 (ActionBar 는 승인/거절만 노출).
- *   - 단건 drawer 에서만 처리하며, 의견 미입력 시 차단 (GP 기존 정책 계승, K-Cos 에도 동일 적용).
+ *   - 단건 drawer 에서만 처리하며, 의견 미입력 시 차단 (K-Cos 등 모든 소비처 동일 적용).
  *
  * backend / API contract 변경 없음 — 응답 shape 차이는 client adapter 가 정규화.
  */
@@ -222,7 +222,7 @@ export function OperatorForumRequestsConsolePage({
     });
     if (targetIds.length === 0) return;
     // WO-O4O-OPERATOR-FORUM-CONSOLE-BATCH-CLIENT-OPTION-V1:
-    //   batch endpoint 제공 시(예: Neture) 1회 호출, 미제공 시(GP/K-Cos) 기존 per-id fan-out.
+    //   batch endpoint 제공 시(예: Neture) 1회 호출, 미제공 시(K-Cos) 기존 per-id fan-out.
     //   보완(revision)은 여기(approve/reject)에 포함되지 않음 — bulk 제외 정책 유지.
     const result = await batch.executeBatch(async (ids) => {
       if (client.batchReview) {

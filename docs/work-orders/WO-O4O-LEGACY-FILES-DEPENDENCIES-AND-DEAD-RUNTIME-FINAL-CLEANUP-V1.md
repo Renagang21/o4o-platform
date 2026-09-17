@@ -590,7 +590,6 @@ Vitest만 돌리고 완료 판정하지 않는다.
 
 ```text
 KPA
-GlycoPharm
 K-Cosmetics
 Neture
 PharmacyHub

@@ -11,9 +11,9 @@
 
 `ResourcesHubTemplate` (`packages/shared-space-ui`) 의 `loadData` 가 `fetchItems` 실패를 `catch → setItems([])` 로 삼켜, 조회 장애가 "등록된 자료가 없습니다" 라는 **정상 빈 상태**로 표시되던 문제를 조사·정비했다.
 
-- **소비처 전수 4개**(KPA / GlycoPharm / K-Cosmetics / Neture) 를 모두 확인했다. 4개 모두 같은 자료실 계약(`{items,total,totalPages}`)을 쓰며, **의도된 fail-open 은 0건** — 4개 전부 조회 실패를 빈 목록으로 표시하는 동일 anti-pattern 이었다(2개는 템플릿이 삼킴, 2개는 어댑터가 먼저 삼킴).
+- **소비처 전수 4개**(KPA / K-Cosmetics / Neture) 를 모두 확인했다. 4개 모두 같은 자료실 계약(`{items,total,totalPages}`)을 쓰며, **의도된 fail-open 은 0건** — 4개 전부 조회 실패를 빈 목록으로 표시하는 동일 anti-pattern 이었다(2개는 템플릿이 삼킴, 2개는 어댑터가 먼저 삼킴).
 - 공통 템플릿에 **오류 상태 + 재시도**를 추가했다. 이는 **additive·후방호환** 변경이다: `fetchItems` 가 throw 할 때만 오류 UI 가 발동하고, 여전히 삼키는 어댑터가 있으면 종전과 동일하게 동작한다(회귀 0).
-- 어댑터 레벨에서 삼키던 GlycoPharm·K-Cosmetics 의 `try/catch → 빈 목록`을 제거해 throw 를 전파하도록 정렬했다(K-Cosmetics 의 "서버 미구현" 주석은 stale — 엔드포인트 실재 확인). Neture·KPA 는 이미 throw 를 전파하므로 어댑터 변경 없이 템플릿 정비만으로 정상화된다.
+- 어댑터 레벨에서 삼키던 K-Cosmetics 의 `try/catch → 빈 목록`을 제거해 throw 를 전파하도록 정렬했다(K-Cosmetics 의 "서버 미구현" 주석은 stale — 엔드포인트 실재 확인). Neture·KPA 는 이미 throw 를 전파하므로 어댑터 변경 없이 템플릿 정비만으로 정상화된다.
 - backend/DB/migration/공통 도메인 API 계약 변경 0.
 
 ---
@@ -27,7 +27,6 @@
 | 서비스 | 파일 | Route | API |
 |--------|------|-------|-----|
 | KPA | `services/web-kpa-society/src/pages/resources/ResourcesHubPage.tsx` | `/resources` | `resourcesApi.list` → `/contents?sub_type=resource` |
-| GlycoPharm | `services/web-glycopharm/src/pages/resources/ResourcesPage.tsx` | `/resources` | `glycoResourcesApi.list` → `/glycopharm/contents?sub_type=resource` |
 | K-Cosmetics | `services/web-k-cosmetics/src/pages/resources/ResourcesPage.tsx` | `/resources` | `api.get('/cosmetics/contents')` |
 | Neture | `services/web-neture/src/pages/resources/NetureResourcesPage.tsx` | `/resources` | `cmsApi.getContents({type:'resource'})` → `/neture/content` |
 
@@ -52,7 +51,6 @@ catch { setItems([]); setTotal(0); setTotalPages(1); }   // ← 오류를 정상
 |--------|:---:|:---:|:---:|------|
 | **Neture** | throw (묶음3에서 `cmsApi.getContents` 고정코드 throw) | try/catch 없음 | **throw 전파** | 정비 필요 — throw 가 템플릿에서 삼켜짐 (원 결함) |
 | **KPA** | throw (`apiClient.get` 4xx/5xx throw) | try/catch 없음 (+usage_type 매핑) | **throw 전파** | 정비 필요 — throw 가 템플릿에서 삼켜짐 |
-| **GlycoPharm** | throw (`api.get`) | **try/catch → 빈 목록** | 어댑터가 삼킴 | 결함 (문서화 안 됨) — 어댑터 먼저 삼킴 |
 | **K-Cosmetics** | throw (`api.get`) | **try/catch → 빈 목록** ("서버 미구현" 주석) | 어댑터가 삼킴 | 결함 (주석 stale) — 엔드포인트 실재 확인 |
 
 **의도된 fail-open = 0건.** K-Cosmetics 의 "서버 미구현 시 빈 목록" 주석은 검증 결과 stale 이다 — `apps/api-server/src/routes/cosmetics/cosmetics.routes.ts:265` 에서 `createCosmeticsContentsRouter` 가 마운트되어 `GET /api/v1/cosmetics/contents` 는 `{success:true,data:{items,total,page,limit,totalPages}}`(정상) / `500 {success:false}`(오류) 를 반환한다(`controllers/resources.controller.ts:64-149`). 따라서 4개 소비처 모두 조회 실패를 표면화해야 하며 fail-open 예외는 없다.
@@ -74,7 +72,6 @@ catch { setItems([]); setTotal(0); setTotalPages(1); }   // ← 오류를 정상
 - Result count: `loadError && items.length===0` 일 때 stale 카운트 숨김 → **오류와 빈 상태 동시 렌더 0**.
 
 **어댑터 변경:**
-- GlycoPharm: `fetchItems`/`fetchDetail` 의 `try/catch → 빈 목록/null` 제거 → throw 전파.
 - K-Cosmetics: `fetchItems` 의 `try/catch → 빈 목록` 제거 → throw 전파. stale 주석 정정.
 - Neture·KPA: 변경 없음(이미 전파) — 템플릿 정비만으로 정상화.
 
@@ -117,7 +114,6 @@ catch { setItems([]); setTotal(0); setTotalPages(1); }   // ← 오류를 정상
 | 앱 | typecheck | build |
 |----|:---:|:---:|
 | @o4o/web-neture | EXIT 0 | EXIT 0 (13.07s) |
-| glycopharm-web | EXIT 0 | EXIT 0 (23.58s) |
 | @o4o/web-k-cosmetics | EXIT 0 | EXIT 0 (14.55s) |
 | @o4o/web-kpa-society | EXIT 0 | EXIT 0 (18.21s) |
 
@@ -138,7 +134,6 @@ catch { setItems([]); setTotal(0); setTotalPages(1); }   // ← 오류를 정상
 | 파일 | 변경 |
 |------|------|
 | `packages/shared-space-ui/src/ResourcesHubTemplate.tsx` | loadError 상태 + 오류 패널/스트립 + 재시도, catch 삼킴 제거 |
-| `services/web-glycopharm/src/pages/resources/ResourcesPage.tsx` | 어댑터 try/catch 삼킴 제거 → throw 전파 |
 | `services/web-k-cosmetics/src/pages/resources/ResourcesPage.tsx` | 어댑터 try/catch 삼킴 제거 → throw 전파, stale 주석 정정 |
 
 CHECK: `docs/checks/CHECK-O4O-RESOURCES-HUB-TEMPLATE-LOAD-ERROR-CONTRACT-V1.md`

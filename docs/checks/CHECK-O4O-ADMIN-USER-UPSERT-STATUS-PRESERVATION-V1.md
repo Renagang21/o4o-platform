@@ -161,7 +161,6 @@ DB 없이 repository/트랜잭션 stub 으로 계약을 고정한다.
 
 ```text
 kpa-society    -> BLOCKED ACCOUNT_NOT_ACTIVE
-glycopharm     -> BLOCKED ACCOUNT_NOT_ACTIVE
 pharmacy-hub   -> BLOCKED ACCOUNT_NOT_ACTIVE
 k-cosmetics    -> BLOCKED ACCOUNT_NOT_ACTIVE
 ```

@@ -2,7 +2,7 @@
  * GuideContentsConsolePage — Operator 가이드 콘텐츠 관리 페이지 wrapper.
  *
  * WO-O4O-OPERATOR-COPY-PASTE-WRAPPER-CONSOLIDATION-V1:
- *   4 service (KPA / Neture / GlycoPharm / K-Cosmetics) 의 OperatorGuideContentsPage 가
+ *   3 service (KPA / Neture / K-Cosmetics) 의 OperatorGuideContentsPage 가
  *   100% 동일한 config (lms.lesson.editor + 5 sections) 를 24-line 파일에 각각 복사
  *   보관하던 상태를 단일 wrapper 로 통합. service 측은 serviceKey + client 만 주입.
  *

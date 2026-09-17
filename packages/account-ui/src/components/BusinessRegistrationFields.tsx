@@ -3,7 +3,7 @@
  *
  * WO-O4O-BUSINESS-REGISTRATION-COMMON-UI-COMPONENT-V1 (P3)
  *
- * O4O 4 service (KPA / GlycoPharm / K-Cosmetics / Neture) 가입 폼에서
+ * O4O 3 service (KPA / K-Cosmetics / Neture) 가입 폼에서
  * 반복 구현된 사업자등록증 4 canonical 필드 입력 UI 를 공통화한 컴포넌트.
  *
  * 4 필드:

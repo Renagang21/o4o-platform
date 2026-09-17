@@ -30,7 +30,6 @@ HUB에서 노출되는 콘텐츠(CMS, Signage)를 **제작 주체(Producer) + �
 
 **CMS 스코프 로직:**
 - `platform`: `organizationId=null, serviceKey=null` → 전 서비스 노출
-- `service`: `organizationId=null, serviceKey='glycopharm'` → 해당 서비스만
 - `organization`: `organizationId='uuid'` → 해당 조직만
 
 **CMS 기본값:**

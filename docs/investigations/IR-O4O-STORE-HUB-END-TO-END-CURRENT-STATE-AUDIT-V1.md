@@ -14,17 +14,17 @@
 | **목록 노출 계약** (serviceKey / status / source) | **대체로 PASS** | `HubContentQueryService` 7개 도메인 전부 serviceKey + status + author_role 3중 게이트, Raw SQL parameter binding 준수 |
 | **가져오기 게이트** (콘텐츠 계열) | **PASS** | blog / pop / qr / video / screen-set 전용 import 엔드포인트가 목록과 **동일 조건**을 서버에서 재검증 |
 | **가져오기 게이트** (상품 계열) | **FAIL (P0)** | `POST /pharmacy/products/apply` 가 목록의 서비스 승인 게이트를 재검증하지 않음. PRIVATE 의 `allowed_seller_ids` 미검사 |
-| **서비스 격리** (GP / K-Cosmetics 자료함) | **FAIL (P0)** | GP·KCos 가 **KPA 전용 컨트롤러**를 자기 경로에 마운트 — 권한·리졸버·조직 해석이 전부 `kpa` 고정 |
+| **서비스 격리** (K-Cosmetics 자료함) | **FAIL (P0)** | KCos 가 **KPA 전용 컨트롤러**를 자기 경로에 마운트 — 권한·리졸버·조직 해석이 전부 `kpa` 고정 |
 | **원본·사본 독립성** | **PASS (FULL_COPY)** | 전 자원 값 복사. QR 은 `content_hub` 원본 참조를 매장 사본으로 치환하는 가드까지 존재 |
 | **매장 간 격리** | **PASS** | `author_role='store'` / `source='store'` 자원은 HUB 노출·재복사 경로에서 전부 배제 |
-| **검색·필터·페이지네이션** | **부분 FAIL (P1)** | GP·KCos 콘텐츠 HUB 검색어가 서버에서 **무시됨**. mixed 모드 `total` 부정확 |
-| **cross-service parity** | **부분 FAIL (P1)** | GP·KCos 에 동영상 / 태블렛 화면 HUB 부재 |
+| **검색·필터·페이지네이션** | **부분 FAIL (P1)** | KCos 콘텐츠 HUB 검색어가 서버에서 **무시됨**. mixed 모드 `total` 부정확 |
+| **cross-service parity** | **부분 FAIL (P1)** | KCos 에 동영상 / 태블렛 화면 HUB 부재 |
 
-**한 줄 결론:** 콘텐츠 계열(blog·pop·qr·video·screen-set)의 HUB→매장 사본 계약은 **잘 설계돼 있고 게이트가 일관**하다. 결함은 (a) **상품 계열의 신청 경로**, (b) **GP/KCos 자료함의 KPA 하드와이어링**, (c) **cross-service parity·검색** 세 축에 집중된다.
+**한 줄 결론:** 콘텐츠 계열(blog·pop·qr·video·screen-set)의 HUB→매장 사본 계약은 **잘 설계돼 있고 게이트가 일관**하다. 결함은 (a) **상품 계열의 신청 경로**, (b) **KCos 자료함의 KPA 하드와이어링**, (c) **cross-service parity·검색** 세 축에 집중된다.
 
 ### 1.2 조사 규모
 
-- 서비스 4 (KPA-Society / GlycoPharm / K-Cosmetics / Neture 경계 확인)
+- 서비스 4 (KPA-Society / K-Cosmetics / Neture 경계 확인)
 - 자원 10 (상품 / 일반 콘텐츠 / CMS 콘텐츠 / POP / QR / 동영상 / 사이니지 미디어 / 사이니지 플레이리스트 / 태블렛 화면 세트 / 다국어 상품 콘텐츠)
 - 발견사항 **19건** — P0 4 / P1 6 / P2 9
 
@@ -32,11 +32,11 @@
 
 | # | ID | 요지 |
 |:-:|----|------|
-| 1 | **HUB-P0-03** | `/glycopharm/assets`·`/cosmetics/assets`·`/{gp,cos}/store-assets` 가 KPA 전용 `createAssetSnapshotController` / `store-asset-control.controller` 를 마운트. `allowedRoles=['kpa:*']`, `KpaAssetResolver`, `resolveOrgId=isStoreOwner(...,'kpa')`, `sourceService:'kpa'` — GP/KCos 콘텐츠 가져오기가 구조적으로 성립하지 않고, 두 역할을 겸한 사용자는 **KPA 조직으로 복사**된다 |
+| 1 | **HUB-P0-03** | `allowedRoles=['kpa:*']`, `KpaAssetResolver`, `resolveOrgId=isStoreOwner(...,'kpa')`, `sourceService:'kpa'` — KCos 콘텐츠 가져오기가 구조적으로 성립하지 않고, 두 역할을 겸한 사용자는 **KPA 조직으로 복사**된다 |
 | 2 | **HUB-P0-01** | `POST /pharmacy/products/apply` 가 `offer_service_approvals` 재검증 없이 offer id 만으로 신청 생성 — 목록에 보이지 않는 offer 를 ID 직접 지정으로 가져올 수 있음 |
 | 3 | **HUB-P0-02** | PRIVATE offer 가 `allowed_seller_ids` 검사 없이 HUB 카탈로그에 노출·신청 가능. 차단은 **checkout 단에서만** 존재 |
 | 4 | **HUB-P0-04** | `/apply`·`/applications` 의 `service_key` 가 클라이언트 body/query 입력 (`resolveServiceKeyFromBody`) — Boundary Policy Guard Rule 4 (serviceKey 스푸핑 금지) 이탈 |
-| 5 | **HUB-P1-01** | GP·KCos HUB 콘텐츠 검색창이 `search=` 를 서버로 보내지만 `/api/v1/hub/contents` 컨트롤러가 파라미터를 읽지 않음 → 검색해도 전체 목록이 그대로 표시 |
+| 5 | **HUB-P1-01** | KCos HUB 콘텐츠 검색창이 `search=` 를 서버로 보내지만 `/api/v1/hub/contents` 컨트롤러가 파라미터를 읽지 않음 → 검색해도 전체 목록이 그대로 표시 |
 
 ---
 
@@ -64,7 +64,6 @@
 | 서비스 | HUB route | Layout | Guard |
 |--------|-----------|--------|-------|
 | KPA-Society | `/store-hub` | `PharmacyHubLayout` | `HubGuard` |
-| GlycoPharm | `/store-hub` | `GlycoPharmHubLayout` | `GlycoHubGuard` |
 | K-Cosmetics | `/store-hub` | `KCosmeticsHubLayout` | `RoleGuard(cosmetics:store_owner\|operator\|admin\|platform:super_admin)` |
 | Neture | — | — | 매장 HUB 없음. 공급자/유통 도메인 전용 |
 
@@ -72,12 +71,12 @@
 
 ### 3.2 serviceKey 값 (실측)
 
-| 용도 | KPA | GlycoPharm | K-Cosmetics |
-|------|-----|------------|-------------|
-| store 콘텐츠 계열 (blog/pop/qr/video/cms) | `kpa` | `glycopharm` | `k-cosmetics` |
-| signage / tablet 계열 | `kpa-society` | `glycopharm` | `k-cosmetics` |
-| offer 승인 키 (`offer_service_approvals`) | `kpa-society` | `glycopharm` | `k-cosmetics` |
-| 라우터 팩토리 주입 키 | `kpa` | `glycopharm` | `cosmetics` |
+| 용도 | KPA | K-Cosmetics |
+| ------ | ----- | ------------- |
+| store 콘텐츠 계열 (blog/pop/qr/video/cms) | `kpa` | `k-cosmetics` |
+| signage / tablet 계열 | `kpa-society` | `k-cosmetics` |
+| offer 승인 키 (`offer_service_approvals`) | `kpa-society` | `k-cosmetics` |
+| 라우터 팩토리 주입 키 | `kpa` | `cosmetics` |
 
 > KPA 는 **의도된 이축 구조**다 — [store-tablet.routes.ts:66-71](apps/api-server/src/routes/platform/store-tablet.routes.ts#L66-L71) 이 `'kpa'` 와 `'kpa-society'` 혼용 금지를 명문화. 다만 프론트에 두 값이 흩어져 있어 드리프트 위험이 남는다 (HUB-P1-02).
 
@@ -107,7 +106,7 @@
 - ⚠️ route 있고 메뉴 없는 항목: **1건** — `multilingual-product-contents` (HUB-P2-03). `StoreLocalProductsPage` 의 `onNavigateHub` 로만 도달 가능
 - ✅ 중복 메뉴: 0건. legacy `/hub/*` → `/store-hub` redirect, `/event-offers` → `/store-hub/event-offers` redirect 정상
 
-### 4.2 GP / K-Cosmetics (사이드바 9 항목 / route 8)
+### 4.2 K-Cosmetics (사이드바 9 항목 / route 8)
 
 `홈 · 상품 카탈로그 · 사이니지 · 콘텐츠 · 블로그 · POP · QR · 이벤트 · 장바구니`
 
@@ -148,7 +147,7 @@
 
 ### 4소비처 일치 검증
 
-| 소비처 | KPA | GP/KCos | 판정 |
+| 소비처 | KPA | KCos | 판정 |
 |--------|-----|---------|:----:|
 | HUB 홈 미리보기 | pop/qr/video(`kpa`) + signage-media(`kpa-society`) + cms + content hub | 정적 카드 (5-block 기본) | `DIFFERENT_BUT_INTENDED` |
 | HUB 전체 목록 | 동일 API·동일 조건 | 동일 | PASS |
@@ -191,11 +190,9 @@ AND ( spo.distribution_type = 'PUBLIC'
 - ❌ PRIVATE 이 `allowed_seller_ids` 없이 노출 → HUB-P0-02
 - ❌ `POST /apply` 가 위 게이트를 재검증하지 않음 → HUB-P0-01
 
-### 7.3 GP / K-Cosmetics 자료함 — FAIL
+### 7.3 K-Cosmetics 자료함 — FAIL
 
 ```
-glycopharm.routes.ts:388  router.use('/assets',       createAssetSnapshotController(dataSource, coreRequireAuth))
-glycopharm.routes.ts:391  router.use('/store-assets', createStoreAssetControlController(dataSource, coreRequireAuth))
 cosmetics.routes.ts:155   router.use('/assets',       createAssetSnapshotController(dataSource, coreRequireAuth))
 cosmetics.routes.ts:158   router.use('/store-assets', createStoreAssetControlController(dataSource, coreRequireAuth))
 ```
@@ -259,16 +256,16 @@ cosmetics.routes.ts:158   router.use('/store-assets', createStoreAssetControlCon
 
 ## 10. 권한 · 소유권 (9단계)
 
-| 검사 | KPA | GlycoPharm | K-Cosmetics | 판정 |
-|------|-----|------------|-------------|:----:|
-| HUB 목록 조회 인증 | ❌ 무인증 (`/api/v1/hub/contents`) | ❌ | ❌ | P1 (HUB-P1-05) |
-| import 인증 | `requireAuth` | 동일 | 동일 | PASS |
-| 매장 소유권 | `kpaStoreOwnerOwnsStore` (role_assignments SSOT) | `created_by_user_id` | `created_by_user_id` | PASS |
-| 다른 매장 사본 조회/수정/삭제 | `organizationId` 필수 스코프 | 동일 | 동일 | PASS |
-| 상품 카탈로그 | `requireAuth` + `createRequireStoreOwner(serviceKey)` | 동일 | 동일 | PASS |
-| 자료함 copy/list 역할 | `kpa:*` | **`kpa:*` (오류)** | **`kpa:*` (오류)** | **FAIL** |
-| 공개 QR 랜딩 | 무인증 + `qr.is_active` 라이브 검사 | 동일 | 동일 | PASS |
-| Screen Set 원본 미리보기 | `withStoreAuth` (인증 매장만) | — | — | PASS |
+| 검사 | KPA | K-Cosmetics | 판정 |
+| ------ | ----- | ------------- | :----: |
+| HUB 목록 조회 인증 | ❌ 무인증 (`/api/v1/hub/contents`) | ❌ | P1 (HUB-P1-05) |
+| import 인증 | `requireAuth` | 동일 | PASS |
+| 매장 소유권 | `kpaStoreOwnerOwnsStore` (role_assignments SSOT) | `created_by_user_id` | PASS |
+| 다른 매장 사본 조회/수정/삭제 | `organizationId` 필수 스코프 | 동일 | PASS |
+| 상품 카탈로그 | `requireAuth` + `createRequireStoreOwner(serviceKey)` | 동일 | PASS |
+| 자료함 copy/list 역할 | `kpa:*` | **`kpa:*` (오류)** | **FAIL** |
+| 공개 QR 랜딩 | 무인증 + `qr.is_active` 라이브 검사 | 동일 | PASS |
+| Screen Set 원본 미리보기 | `withStoreAuth` (인증 매장만) | — | PASS |
 
 `AssetCopyService.updateById` / `deleteById` 는 `{ id, organizationId }` 복합 조건으로 조회 — **UUID 단독 조회 금지 (Guard Rule 1) 준수**.
 
@@ -283,7 +280,7 @@ cosmetics.routes.ts:158   router.use('/store-assets', createStoreAssetControlCon
 | KPA HUB 콘텐츠 | ✅ 서버 | 소스 탭 (서버 분기) | ✅ | ✅ | ✅ |
 | KPA HUB 태블렛 화면 | ✅ 서버 (`q`) | ✅ 서버 (`templateKey`) | — 페이지네이션 없음 (`LIMIT 200`) | ❌ total 없음 | ✅ |
 | KPA HUB B2B | ❌ | ✅ 서버 (distributionType) | ✅ | ✅ | ✅ |
-| **GP/KCos HUB 콘텐츠** | ⚠️ **UI 있음 / 서버 무시** | — | ✅ | ✅ | ✅ |
+| **KCos HUB 콘텐츠** | ⚠️ **UI 있음 / 서버 무시** | — | ✅ | ✅ | ✅ |
 | mixed 모드 (`sourceDomain` 미지정) | — | — | — | ❌ 도메인당 100 cap 후 in-memory 합산 | ✅ |
 
 ---
@@ -301,7 +298,7 @@ cosmetics.routes.ts:158   router.use('/store-assets', createStoreAssetControlCon
   - [pharmacy-products.controller.ts:273-276](apps/api-server/src/routes/o4o-store/controllers/pharmacy-products.controller.ts#L273-L276) — offer 조회 SQL
   - [product-approval-v2.service.ts:43-98](apps/api-server/src/modules/product-policy-v2/product-approval-v2.service.ts#L43) `createServiceApproval` — distributionType / isActive / supplier ACTIVE / 중복만 검사
   - [product-approval-v2.service.ts:243-298](apps/api-server/src/modules/product-policy-v2/product-approval-v2.service.ts#L243) `createPrivateApproval` — 동일
-- **영향 서비스** KPA / GlycoPharm / K-Cosmetics 전부
+- **영향 서비스** KPA / K-Cosmetics 전부
 - **영향 자원** 상품
 - **재현 조건** 자기 서비스에서 승인되지 않은(따라서 카탈로그에 보이지 않는) offer 의 UUID 를 알고 `POST /pharmacy/products/apply { supplyProductId }` 호출
 - **위험도** **높음** — IR §8 의 FAIL 정의("목록에 보이지 않는 상태를 ID로 직접 지정하여 가져올 수 있으면 FAIL")에 정확히 해당. 타 서비스 전용 상품이 다른 서비스 매장의 취급 목록에 편입
@@ -316,7 +313,6 @@ cosmetics.routes.ts:158   router.use('/store-assets', createStoreAssetControlCon
 - **근거**
   - 노출: [pharmacy-products.controller.ts:179](apps/api-server/src/routes/o4o-store/controllers/pharmacy-products.controller.ts#L179)
   - 신청: [product-approval-v2.service.ts:243-298](apps/api-server/src/modules/product-policy-v2/product-approval-v2.service.ts#L243)
-  - **대조군 — 차단이 존재하는 곳**: [kpa-checkout.controller.ts:347](apps/api-server/src/routes/kpa/controllers/kpa-checkout.controller.ts#L347), [glycopharm/checkout.controller.ts:378](apps/api-server/src/routes/glycopharm/controllers/checkout.controller.ts#L378), [neture-b2b-cart-checkout.service.ts:221](apps/api-server/src/services/cart/neture-b2b-cart-checkout.service.ts#L221) — 모두 `allowed_seller_ids.includes(orgId)` 강제
 - **영향 서비스** 전 서비스 / **영향 자원** 상품
 - **재현 조건** `allowed_seller_ids` 에 포함되지 않은 매장이 자기 서비스에서 승인된 PRIVATE offer 를 HUB 카탈로그에서 열람 → "내 매장에 추가"
 - **위험도** **높음** — 비공개 공급 관계·가격이 비대상 매장에 노출. 실패는 checkout 시점까지 지연되어 사용자 혼선까지 유발
@@ -325,33 +321,31 @@ cosmetics.routes.ts:158   router.use('/store-assets', createStoreAssetControlCon
 
 ---
 
-#### HUB-P0-03 · GP / K-Cosmetics 자료함이 KPA 전용 컨트롤러에 마운트됨
+#### HUB-P0-03 · K-Cosmetics 자료함이 KPA 전용 컨트롤러에 마운트됨
 
-- **현상** GlycoPharm·K-Cosmetics 가 `/assets`(가져오기·목록)·`/store-assets`(사본 관리) 를 자기 라우터에 마운트하면서 **serviceKey 파라미터가 없는 KPA 고정 컨트롤러**를 그대로 사용한다.
+- **현상** K-Cosmetics 가 `/assets`(가져오기·목록)·`/store-assets`(사본 관리) 를 자기 라우터에 마운트하면서 **serviceKey 파라미터가 없는 KPA 고정 컨트롤러**를 그대로 사용한다.
 
   `createAssetSnapshotController` 의 고정 설정 ([asset-snapshot.controller.ts:57-96](apps/api-server/src/routes/o4o-store/controllers/asset-snapshot.controller.ts#L57-L96)):
 
-  | 설정 | 고정값 | GP/KCos 에서의 결과 |
+  | 설정 | 고정값 | KCos 에서의 결과 |
   |------|--------|---------------------|
-  | `allowedRoles` | `['kpa:admin','kpa:operator','kpa:pharmacist','kpa:store_owner']` | `glycopharm:store_owner` / `cosmetics:store_owner` → **403 FORBIDDEN** |
-  | `resolver` | `KpaAssetResolver` | `resolveCms` 가 `serviceKey IN ('kpa','kpa-society')` → GP/KCos CMS 는 **404 SOURCE_NOT_FOUND** |
-  | | | `resolveSignage` 가 `serviceKey='kpa-society'` → GP/KCos 사이니지 **404** |
-  | `resolveOrgId` | `isStoreOwner(ds, userId, 'kpa')` → `KpaMember` fallback | KPA 역할을 겸한 사용자는 GP HUB 자원을 **자신의 KPA 조직으로 복사** |
-  | `sourceService` | `'kpa'` | GP/KCos 사본에 `source_service='kpa'` 로 기록 |
+  | `allowedRoles` | `['kpa:admin','kpa:operator','kpa:pharmacist','kpa:store_owner']` | `cosmetics:store_owner` → **403 FORBIDDEN** |
+  | `resolver` | `KpaAssetResolver` | `resolveCms` 가 `serviceKey IN ('kpa','kpa-society')` → KCos CMS 는 **404 SOURCE_NOT_FOUND** |
+  | | | `resolveSignage` 가 `serviceKey='kpa-society'` → KCos 사이니지 **404** |
+  | `resolveOrgId` | `isStoreOwner(ds, userId, 'kpa')` → `KpaMember` fallback | — |
+  | `sourceService` | `'kpa'` | KCos 사본에 `source_service='kpa'` 로 기록 |
 
   `store-asset-control.controller.ts` 도 동일하게 `isStoreOwner(dataSource, userId, 'kpa')` 로 조직을 해석하고 `kpa_store_asset_controls` 를 사용한다.
 
 - **근거**
-  - [glycopharm.routes.ts:388, 391](apps/api-server/src/routes/glycopharm/glycopharm.routes.ts#L388)
   - [cosmetics.routes.ts:155, 158](apps/api-server/src/routes/cosmetics/cosmetics.routes.ts#L155)
   - [asset-snapshot.controller.ts:57-96](apps/api-server/src/routes/o4o-store/controllers/asset-snapshot.controller.ts#L57-L96)
   - [kpa-asset.resolver.ts:91-93, 205](apps/api-server/src/modules/asset-snapshot/resolvers/kpa-asset.resolver.ts#L91-L93)
   - [store-asset-control.controller.ts:38](apps/api-server/src/routes/o4o-store/controllers/store-asset-control.controller.ts#L38)
-  - 호출 지점: [web-glycopharm/src/api/assetSnapshot.ts:58](services/web-glycopharm/src/api/assetSnapshot.ts#L58) `POST /glycopharm/assets/copy`, [HubContentListPage.tsx:95](services/web-glycopharm/src/pages/hub/HubContentListPage.tsx#L95)
-- **영향 서비스** GlycoPharm, K-Cosmetics / **영향 자원** CMS 콘텐츠, 사이니지 미디어, 사본 관리 전반
-- **재현 조건** GP/KCos 매장 경영자가 `/store-hub/content` 에서 "내 약국에 복사" 클릭
-- **위험도** **높음** — 두 축 모두 문제. ① **기능 단절**: GP/KCos 콘텐츠 가져오기가 성립하지 않음 ② **서비스 격리 훼손**: 다중 역할 사용자에게 cross-service 조직 write 가 발생
-- **수정 방향** `createAssetSnapshotController` / `createStoreAssetControlController` 를 `serviceKey` 인자를 받는 팩토리로 전환하고, 서비스별 `AssetResolver`(GlycopharmAssetResolver / CosmeticsAssetResolver) 와 `allowedRoles`·`resolveOrgId` 를 주입. QR/POP/Blog staff controller 가 이미 쓰는 팩토리 패턴과 동일하게 정렬
+- **영향 서비스** K-Cosmetics / **영향 자원** CMS 콘텐츠, 사이니지 미디어, 사본 관리 전반
+- **재현 조건** KCos 매장 경영자가 `/store-hub/content` 에서 "내 약국에 복사" 클릭
+- **위험도** **높음** — 두 축 모두 문제. ① **기능 단절**: KCos 콘텐츠 가져오기가 성립하지 않음 ② **서비스 격리 훼손**: 다중 역할 사용자에게 cross-service 조직 write 가 발생
+- **수정 방향** `createAssetSnapshotController` / `createStoreAssetControlController` 를 `serviceKey` 인자를 받는 팩토리로 전환하고, 서비스별 `AssetResolver` 와 `allowedRoles`·`resolveOrgId` 를 주입. QR/POP/Blog staff controller 가 이미 쓰는 팩토리 패턴과 동일하게 정렬
 - **참고** CLAUDE.md §"Shared Module / Core+Extension Change Rule" 대상 — 소비처 전수 식별 후 공통 정책으로 해결할 것 (KPA-only 임시 예외 금지)
 - **권장 후속 WO** `WO-O4O-ASSET-SNAPSHOT-CONTROLLER-SERVICE-AWARE-FACTORY-V1`
 
@@ -362,7 +356,6 @@ cosmetics.routes.ts:158   router.use('/store-assets', createStoreAssetControlCon
 - **현상** `resolveServiceKeyFromBody(req.body)` / `resolveServiceKeyFromQuery(req.query)` 가 클라이언트 제공 `service_key` 를 받아 `SERVICE_KEYS` 목록에 있으면 그대로 통과시킨다(미지정 시 `kpa-society` 기본). 마운트 `serviceKey` 와의 일치 검증이 없다. 이 값이 `product_approvals.service_key` / `organization_product_listings.service_key` 에 **그대로 기록**된다.
 - **근거** [pharmacy-products.controller.ts:32-44](apps/api-server/src/routes/o4o-store/controllers/pharmacy-products.controller.ts#L32-L44), 사용처 L258 / L316, 기록 지점 `createPublicListing` [product-approval-v2.service.ts:558-563](apps/api-server/src/modules/product-policy-v2/product-approval-v2.service.ts#L558)
 - **영향 서비스** 전 서비스 / **영향 자원** 상품
-- **재현 조건** KPA 매장 경영자가 `POST /api/v1/kpa/pharmacy/products/apply { supplyProductId, service_key: 'glycopharm' }` 호출
 - **위험도** **높음** — CLAUDE.md §7 Guard Rule 4 "serviceKey 스푸핑 금지 — URL 경로 파라미터에서만 추출" 정면 이탈. 다른 서비스 경계의 listing/approval row 생성으로 이어질 수 있음
 - **수정 방향** body/query 의 `service_key` 수용을 제거하고 마운트 주입 `serviceKey` 만 사용. 하위호환이 필요하면 불일치 시 400 으로 거부
 - **권장 후속 WO** `WO-O4O-STORE-HUB-PRODUCT-SERVICEKEY-SPOOFING-GUARD-V1`
@@ -373,11 +366,11 @@ cosmetics.routes.ts:158   router.use('/store-assets', createStoreAssetControlCon
 
 ---
 
-#### HUB-P1-01 · GP / K-Cosmetics HUB 콘텐츠 검색이 서버에서 무시됨
+#### HUB-P1-01 · K-Cosmetics HUB 콘텐츠 검색이 서버에서 무시됨
 
-- **현상** GP·KCos 의 `hubContentApi.list` 는 `search` / `type` 쿼리 파라미터를 전송하지만, `/api/v1/hub/contents` 컨트롤러는 `serviceKey · producer · sourceDomain · page · limit` 만 읽는다. 검색어를 입력해도 결과가 필터되지 않고 전체 목록이 그대로 표시된다.
-- **근거** [web-glycopharm/src/api/hubContent.ts:29-30](services/web-glycopharm/src/api/hubContent.ts#L29-L30), [web-k-cosmetics/src/lib/api/hubContent.ts](services/web-k-cosmetics/src/lib/api/hubContent.ts) vs [hub-content.controller.ts:47](apps/api-server/src/modules/hub-content/hub-content.controller.ts#L47). 검색창 렌더: [ContentHubTemplate.tsx:292-299](packages/shared-space-ui/src/ContentHubTemplate.tsx#L292)
-- **영향 서비스** GlycoPharm, K-Cosmetics / **영향 자원** CMS 콘텐츠
+- **현상** KCos 의 `hubContentApi.list` 는 `search` / `type` 쿼리 파라미터를 전송하지만, `/api/v1/hub/contents` 컨트롤러는 `serviceKey · producer · sourceDomain · page · limit` 만 읽는다. 검색어를 입력해도 결과가 필터되지 않고 전체 목록이 그대로 표시된다.
+- 검색창 렌더: [ContentHubTemplate.tsx:292-299](packages/shared-space-ui/src/ContentHubTemplate.tsx#L292)
+- **영향 서비스** K-Cosmetics / **영향 자원** CMS 콘텐츠
 - **위험도** 중 — 사용자는 "검색했는데 관련 없는 결과가 나온다"로 인식. 조용한 실패
 - **수정 방향** `HubContentQueryService` 에 `search`(title/summary ILIKE) 및 `type` 파라미터 추가, 또는 검색 미지원이면 UI 에서 검색창 제거. KPA 는 이미 소스별 서버 검색을 사용하므로 백엔드 지원 방향을 권장
 - **권장 후속 WO** `WO-O4O-HUB-CONTENT-QUERY-SEARCH-PARAM-SUPPORT-V1`
@@ -402,10 +395,10 @@ cosmetics.routes.ts:158   router.use('/store-assets', createStoreAssetControlCon
 
 ---
 
-#### HUB-P1-03 · GP / K-Cosmetics HUB 에 동영상 · 태블렛 화면 자원 부재
+#### HUB-P1-03 · K-Cosmetics HUB 에 동영상 · 태블렛 화면 자원 부재
 
 - **현상** 백엔드는 서비스 중립적이나(`store_videos` / `store_tablet_screen_sets` 모두 `service_key` 보유), 프론트 route·메뉴·API 클라이언트가 KPA 에만 존재. `createStoreVideoStaffController` 도 `kpa.routes.ts` 에만 등록.
-- **근거** [kpa.routes.ts:479](apps/api-server/src/routes/kpa/kpa.routes.ts#L479) vs `glycopharm.routes.ts` / `cosmetics.routes.ts` 미등록. 메뉴: `GlycoPharmHubLayout` / `KCosmeticsHubLayout` 9항목 vs `PharmacyHubLayout` 11항목
+- **근거** [kpa.routes.ts:479](apps/api-server/src/routes/kpa/kpa.routes.ts#L479) vs `cosmetics.routes.ts` 미등록. 메뉴: `KCosmeticsHubLayout` 9항목 vs `PharmacyHubLayout` 11항목
 - **위험도** 중 — 기능 부재이지 결함은 아니나, "매장 HUB" 라는 동일 개념의 서비스 간 경험이 불균등
 - **수정 방향** POP/QR 이 이미 밟은 port 경로(`WO-O4O-KCOS-STORE-HUB-POP-QR-PORT-V1`) 재사용
 - **권장 후속 WO** `WO-O4O-STORE-HUB-VIDEO-SCREENSET-GP-KCOS-PORT-V1`
@@ -416,7 +409,7 @@ cosmetics.routes.ts:158   router.use('/store-assets', createStoreAssetControlCon
 
 - **현상** `sourceDomain` 미지정 시 `queryMixed` 가 도메인별 최대 100건(`MAX_FETCH_PER_DOMAIN`)만 가져와 in-memory 병합 후 `total = items.length` 로 응답한다. 실제 전체 건수가 아니며, 어느 도메인이 100건에서 잘렸는지도 알리지 않는다. 또한 `queryMixed` 의 `Promise.allSettled` 배열에 `queryScreenSet` 이 **누락**돼 통합 목록에 태블렛 화면 세트가 나타나지 않는다.
 - **근거** [hub-content.service.ts:215-252](apps/api-server/src/modules/hub-content/hub-content.service.ts#L215-L252)
-- **위험도** 중 — 현재 KPA/GP/KCos 프론트는 전부 `sourceDomain` 을 지정해 호출하므로 **실사용 영향은 낮다**. 다만 무인증 공개 엔드포인트로서 잘못된 total 을 반환
+- **위험도** 중 — 현재 KPA/KCos 프론트는 전부 `sourceDomain` 을 지정해 호출하므로 **실사용 영향은 낮다**. 다만 무인증 공개 엔드포인트로서 잘못된 total 을 반환
 - **수정 방향** mixed 모드에 도메인별 `COUNT` 합산 도입, 또는 mixed 모드를 명시적으로 미지원 처리. `screen-set` 포함 여부를 정책으로 확정
 - **권장 후속 WO** `WO-O4O-HUB-CONTENT-MIXED-MODE-TOTAL-AND-DOMAIN-COVERAGE-V1`
 
@@ -485,7 +478,7 @@ cosmetics.routes.ts:158   router.use('/store-assets', createStoreAssetControlCon
 | **[코드] 확인** | 본 문서의 모든 발견사항 19건. 프론트 route/메뉴 → API client → controller → service → SQL 전 경로 추적 |
 | **[문서] 확인** | serviceKey 이축 구조의 의도성(`store-tablet.routes.ts` 주석), `store` 출처 배제 정책(`WO-O4O-REMOVE-STORE-TO-COMMUNITY-SHARE-FLOW-V1` 흔적), F4 supplier Legacy 예외 |
 | **[실증] 확인** | **없음.** 프로덕션 DB 조회·브라우저 검증·API 호출 전부 미수행 |
-| **[미확인]** | ① 각 테이블의 실제 `service_key` 값 분포 (HUB-P1-02 실위험) ② PUBLIC 의약품 offer 존재 여부 (HUB-P1-06 실위험) ③ PRIVATE offer 의 실제 운용 건수 (HUB-P0-02 실위험) ④ GP/KCos 사용자의 실제 role 조합 — `kpa:*` 겸직자 존재 여부 (HUB-P0-03 실위험) ⑤ 각 화면의 실제 렌더 결과 |
+| **[미확인]** | ① 각 테이블의 실제 `service_key` 값 분포 (HUB-P1-02 실위험) ② PUBLIC 의약품 offer 존재 여부 (HUB-P1-06 실위험) ③ PRIVATE offer 의 실제 운용 건수 (HUB-P0-02 실위험) ④ KCos 사용자의 실제 role 조합 — `kpa:*` 겸직자 존재 여부 (HUB-P0-03 실위험) ⑤ 각 화면의 실제 렌더 결과 |
 
 **따라서 §1.1 의 PASS 는 "코드상 게이트가 존재한다"는 의미이며, 프로덕션 무결성을 단정하지 않는다.** 위 4개 미확인 항목은 각 후속 WO 의 1단계 read-only 확인 과제로 이월한다.
 

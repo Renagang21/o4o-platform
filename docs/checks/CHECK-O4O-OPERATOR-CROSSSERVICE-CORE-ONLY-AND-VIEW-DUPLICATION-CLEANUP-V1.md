@@ -76,7 +76,7 @@ OUT_OF_SCOPE   : 12
 
 | 모듈 | LOC | 소비처 |
 |---|---:|---|
-| `modules/recruitment-exposure` | 141 | KPA · KCos (GlycoPharm 미적용 — §7) |
+| `modules/recruitment-exposure` | 141 | KPA · KCos |
 | `modules/store-channels` | 466 | KPA · KCos |
 | `modules/store-detail` | 553 | KPA · KCos |
 | `modules/hub-content-write` | 342 | KPA·KCos × 블로그·POP |
@@ -137,18 +137,10 @@ git diff --stat (기존 파일): 30 files changed, 678 insertions(+), 5891 delet
 
 ---
 
-## 7. 범위 밖 3번째 소비처 (GlycoPharm) — 손대지 않음
+## 7. 범위 밖 3번째 소비처 — 손대지 않음
 
 본 WO 대상은 KPA / K-Cosmetics / Neture / Pharmacy-Hub 4서비스다.
 아래는 같은 중복의 **3번째 소비처**이나 범위 밖이라 수정하지 않았다. 공통 모듈은 이미 준비돼 있어 1줄 어댑터로 편입 가능하다.
-
-| 파일 | LOC | 대응 공통 모듈 |
-|---|---:|---|
-| `web-glycopharm/…/RecruitmentExposureApprovalPage.tsx` | 91 | `modules/recruitment-exposure` (KCos 와 바이트 동일) |
-| `web-glycopharm/…/store-channels/OperatorStoreChannelsPage.tsx` | 408 | `modules/store-channels` |
-| `web-glycopharm/…/operator/StoreDetailPage.tsx` | — | `modules/store-detail` |
-
-GlycoPharm 은 공유 모듈 소비처이므로 **회귀 검증만 수행**했다: `tsc --noEmit` EXIT=0.
 
 ---
 
@@ -162,7 +154,6 @@ GlycoPharm 은 공유 모듈 소비처이므로 **회귀 검증만 수행**했�
 | KPA `tsc --noEmit` | EXIT=0 |
 | K-Cosmetics `tsc --noEmit` | EXIT=0 |
 | Neture `tsc --noEmit` | EXIT=0 |
-| **GlycoPharm `tsc --noEmit`** (공유 모듈 소비처 회귀) | EXIT=0 |
 | Pharmacy-Hub `tsc -b` | EXIT=0 |
 | `vite build` × 4 서비스 | 전부 성공 |
 
@@ -276,7 +267,6 @@ main 병합: 없음
 추가 제안(범위 밖 발견):
 
 5. `WO-…-KCOSMETICS-OPERATOR-BLOG-BACKEND-ROUTE-V1` — §8-5 의 404
-6. GlycoPharm 3화면의 신설 공통 모듈 편입 (§7)
 
 ---
 

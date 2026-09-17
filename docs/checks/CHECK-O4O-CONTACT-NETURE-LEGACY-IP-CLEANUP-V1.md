@@ -44,8 +44,8 @@
 ## 10. email/autoreply/in-app 회귀
 - 신규 submit 정상 접수. 알림 경로 미변경(이번 작업 backend migration only). 회귀 없음.
 
-## 11. KPA/GP/KCos 미수정
-- 커밋 파일: WO 문서 + migration 1개. `services/web-*` 0건. KPA/GP/KCos 미수정.
+## 11. KPA/KCos 미수정
+- 커밋 파일: WO 문서 + migration 1개. `services/web-*` 0건. KPA/KCos 미수정.
 
 ## 12. ContactInquiry 미사용
 - Neture 기존 `neture_contact_messages` 유지. ContactInquiry 미이관.

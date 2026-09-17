@@ -73,7 +73,6 @@ Operator 공통화는 최신 main 통합·배포까지 완료됐다(merge `fa62c
 - Operator 공통화 구조 재변경 (병합·공통화 자체는 완료)
 - production DB write (read-only 검증만)
 - 본 3건과 무관한 lint/typecheck 부채
-- GlycoPharm 기능 확장 (공통 모듈 회귀 확인만)
 
 ---
 

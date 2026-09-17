@@ -126,7 +126,6 @@ Gate 4: organization_product_channels 활성 + B2C 채널 APPROVED
 | KPA-a (대한약사회) | `kpa` | **PASS** | `/o4o/pharmacy/products/catalog` API 정상 동작. PUBLIC + SERVICE 제품 표시. |
 | KPA-b (서울시약사회) | `kpa` | **PASS** | KPA-a와 동일 API, organization_id만 다름 |
 | KPA-c (종로구약사회) | `kpa` | **PASS** | KPA-a와 동일 API, organization_id만 다름 |
-| GlycoPharm | `glycopharm` | **CONDITIONAL** | service_key 하드코딩 이슈 있음 (아래 상세) |
 | K-Cosmetics | `cosmetics` | **SEPARATE** | 독립 상품 시스템 사용 (아래 상세) |
 
 ---
@@ -152,32 +151,6 @@ organization_id별 필터링으로 KPA-a/b/c 모두 동일 구조로 동작.
 
 ---
 
-### GlycoPharm (CONDITIONAL)
-
-**API**: `GET /api/v1/glycopharm/stores/:slug/products`
-**파일**: `apps/api-server/src/routes/glycopharm/controllers/store.controller.ts`
-
-**발견된 이슈:**
-
-```sql
-INNER JOIN organization_product_listings opl
-  ON opl.offer_id = spo.id
-  AND opl.organization_id = $1
-  AND opl.service_key = 'kpa'   ← 하드코딩!
-  AND opl.is_active = true
-```
-
-`service_key`가 `'kpa'`로 하드코딩되어 있음.
-
-**영향:**
-- `service_key = 'kpa'`로 등록된 listing만 조회됨
-- `autoExpandPublicProduct()`는 `organization_service_enrollments.service_code`를 사용하므로, GlycoPharm 조직의 enrollment가 `'kpa'`가 아닌 `'glycopharm'`이면 listing 자체가 생성되지 않을 수 있음
-- 또는 listing이 `service_key = 'glycopharm'`으로 생성되면 이 쿼리에서 조회 불가
-
-**판정**: 실제 동작은 `organization_service_enrollments`의 `service_code` 값과 `autoExpandPublicProduct`의 listing 생성 시 `service_key` 값에 따라 다름. 코드 경로상 **불일치 가능성** 있음.
-
----
-
 ### K-Cosmetics (SEPARATE)
 
 **API**: `GET /api/v1/cosmetics/stores/:storeId/listings`
@@ -193,16 +166,6 @@ INNER JOIN organization_product_listings opl
 ---
 
 ## 4. 누락/예외 서비스
-
-### 예외 1: GlycoPharm service_key 하드코딩
-
-| 항목 | 값 |
-|------|------|
-| **파일** | `apps/api-server/src/routes/glycopharm/controllers/store.controller.ts` |
-| **위치** | `queryVisibleProducts` 함수 내 SQL |
-| **현상** | `opl.service_key = 'kpa'` 하드코딩 |
-| **영향** | GlycoPharm 전용 listing이 있어도 조회 안 될 수 있음 |
-| **심각도** | 중 — 현재 GlycoPharm이 KPA 제품을 재활용하는 설계라면 의도적일 수 있음 |
 
 ### 예외 2: K-Cosmetics 독립 시스템
 
@@ -266,8 +229,8 @@ INNER JOIN organization_product_listings opl
 
 | # | 항목 | 설명 |
 |---|------|------|
-| 1 | GlycoPharm service_key 하드코딩 | `store.controller.ts`의 `'kpa'` 하드코딩이 의도적인지 확인. GlycoPharm 조직의 `organization_service_enrollments.service_code` 값과 `autoExpandPublicProduct`의 listing 생성 시 `service_key` 값을 교차 검증해야 함. |
-| 2 | autoExpandPublicProduct의 service_code 출처 | `organization_service_enrollments.service_code`가 실제 어떤 값인지 확인. KPA 조직은 `'kpa'`, GlycoPharm 조직은 `'glycopharm'`인지 `'kpa'`인지. |
+| 1 | — | `store.controller.ts`의 `'kpa'` 하드코딩이 의도적인지 확인. |
+| 2 | autoExpandPublicProduct의 service_code 출처 | `organization_service_enrollments.service_code`가 실제 어떤 값인지 확인. |
 
 ### 후속 검증 단계
 
@@ -293,7 +256,6 @@ INNER JOIN organization_product_listings opl
 | 승인 UI | `apps/admin-dashboard/src/pages/neture/ProductApprovalQueuePage.tsx` |
 | Auto-expand | `apps/api-server/src/utils/auto-listing.utils.ts` (autoExpandPublicProduct) |
 | KPA 카탈로그 | `apps/api-server/src/routes/o4o-store/controllers/pharmacy-products.controller.ts` |
-| GlycoPharm 제품 | `apps/api-server/src/routes/glycopharm/controllers/store.controller.ts` |
 | K-Cosmetics 제품 | `apps/api-server/src/routes/cosmetics/controllers/cosmetics-store.controller.ts` |
 | 통합 Public API | `apps/api-server/src/routes/platform/unified-store-public.routes.ts` |
 | V2 정책 승인 | `apps/api-server/src/modules/product-policy-v2/product-policy-v2.internal.routes.ts` |

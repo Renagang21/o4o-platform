@@ -35,7 +35,7 @@ IR-O4O-CONTENT-PLATFORM-ARCHITECTURE-V1 P0 — TipTap 기반 표준 편집기의
 | content-editor build (tsup) | **EXIT 0** |
 | content-editor typecheck | **EXIT 0** |
 | KPA 소비처 typecheck | **EXIT 0** |
-| Cloud Run 4서비스 배포 | **✓ success** (neture/kpa/glycopharm/k-cosmetics) |
+| Cloud Run 4서비스 배포 | **✓ success** |
 
 ## 5. 프로덕션 브라우저 smoke — Round-trip PASS
 

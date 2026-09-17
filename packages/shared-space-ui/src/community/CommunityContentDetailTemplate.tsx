@@ -5,7 +5,7 @@
  *
  * 표시부는 이미 공통 `CommunityContentDetailView` 로 추출돼 있었으나,
  * 그 앞단(조회 · 조회수 기록 · loading/error/not-found · 목록으로 · 액션바 배치)이
- * K-Cosmetics / GlycoPharm 에서 주석만 다른 채 통째로 중복돼 있었다. 그 층을 공통화한다.
+ * K-Cosmetics 에서 주석만 다른 채 통째로 중복돼 있었다. 그 층을 공통화한다.
  *
  * 구조: service API adapter(fetchContent) → toDetailData(정규화) → 공통 View
  *

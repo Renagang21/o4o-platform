@@ -3,7 +3,6 @@
  * WO-NETURE-OPERATOR-DASHBOARD-IMPLEMENTATION-V1
  *
  * API: GET /api/v1/neture/operator/orders (Phase 2에서 생성)
- * 참조: GlycoPharm OrdersPage.tsx
  */
 
 import { useState, useEffect, useCallback } from 'react';

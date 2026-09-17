@@ -4,7 +4,7 @@
  * WO-O4O-LMS-COMMON-UI-EXTRACTION-V1
  *
  * presentational 컴포넌트가 받는 view model 타입. 서비스별 API 응답 원본 타입
- * (KPA/GP/KCos 의 Course/Lesson/Enrollment)에 직접 묶지 않는다 — 서비스 wrapper 가
+ * (KPA/KCos 의 Course/Lesson/Enrollment)에 직접 묶지 않는다 — 서비스 wrapper 가
  * 자신의 응답을 이 view model 로 매핑해 주입한다(adapter 책임은 서비스에).
  */
 
@@ -29,7 +29,7 @@ export type EnrollmentState =
   | 'expired'
   | 'archived';
 
-/** 서비스 accent(테마) — KPA blue / GP green / KCos pink 등 */
+/** 서비스 accent(테마) — KPA blue / KCos pink 등 */
 export interface LmsUiTheme {
   /** primary accent color (CSS color). 미지정 시 기본값 사용. */
   accent?: string;

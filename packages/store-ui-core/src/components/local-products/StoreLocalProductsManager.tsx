@@ -2,13 +2,13 @@
  * StoreLocalProductsManager — 매장 취급 상품(StoreLocalProduct) CRUD 공통 화면.
  *
  * WO-O4O-MY-STORE-LOCAL-PRODUCTS-COMMON-COMPONENT-EXTRACTION-V2:
- *   GlycoPharm / K-Cosmetics 의 99% 동일한 StoreLocalProductsPage 를 통합.
+ *   K-Cosmetics 의 99% 동일한 StoreLocalProductsPage 를 통합.
  *   service 별 api client + 문맥 라벨만 props 로 주입, UI/CRUD/모달 동작은 보존.
  *
  * WO-O4O-MY-STORE-LOCAL-PRODUCTS-CROSSSERVICE-COMMONIZATION-V1:
  *   KPA 도 본 manager 로 수렴. KPA 고유(BaseTable 렌더 · 다국어 컬럼 · 리치 등록 폼)는
  *   `tableVariant='base'` / `extraColumns` / `renderFormModal` 슬롯으로 유지한다.
- *   기존 소비처(GlycoPharm · K-Cosmetics · Pharmacy-Hub)는 prop 미지정 시 동작 불변.
+ *   기존 소비처는 prop 미지정 시 동작 불변.
  *
  * 도메인 주의: Local Products 는 Commerce Object 가 아니다 — Checkout/Order/Cart 연결 금지.
  */
@@ -62,7 +62,7 @@ export interface StoreLocalProductInput {
 }
 
 /**
- * service 별 local-products API client (GP/KCos/PH 동일 시그니처).
+ * service 별 local-products API client (KCos/PH 동일 시그니처).
  * 서비스가 필드를 더 갖는 경우(KPA: barcode·detail_html)는 T/I 로 확장한다 — API 계약 변경 아님.
  */
 export interface StoreLocalProductsApi<
@@ -95,7 +95,7 @@ export interface StoreLocalProductsManagerLabels {
 /**
  * 후속 화면 진입 액션 (WO-PHARMACY-HUB-STORE-HANDLED-PRODUCTS-V1).
  *
- * 기존 소비처(GlycoPharm·K-Cosmetics)는 이 prop 을 주지 않으므로 종전 `/store/*`
+ * 기존 소비처는 이 prop 을 주지 않으므로 종전 `/store/*`
  * 경로로 그대로 이동한다 — 동작 불변. 그 경로가 없는 서비스(Pharmacy-Hub)는
  * 각 키를 `null` 로 주어 **dead link 대신 버튼을 숨긴다** ("준비 중 메뉴 0").
  *

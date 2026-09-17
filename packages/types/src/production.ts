@@ -3,7 +3,7 @@
  *
  * WO-O4O-STORE-PRODUCTION-TYPES-COMMONIZATION-PHASE2-F-V1 (2026-05-26)
  *
- * Phase 2-E 까지 KPA / GlycoPharm / K-Cosmetics 가 동일 구조의 production router
+ * Phase 2-E 까지 KPA / K-Cosmetics 가 동일 구조의 production router
  * state 타입을 각자 로컬에 중복 정의해 왔다. 본 모듈이 4 개 타입의 canonical 출처.
  *
  * Phase 2-F 범위 (본 모듈):
@@ -15,7 +15,7 @@
  *   - SelectContentsForProductionModal / StartProductionModal / AiContentModal 공통화
  *
  * Phase 2-F 동작 보존:
- *   - 기존 사용처는 KPA productionTargets.tsx / GlycoPharm types/production.ts /
+ *   - 기존 사용처는 KPA productionTargets.tsx · types/production.ts /
  *     K-Cosmetics types/production.ts 에서 본 모듈을 re-export 하므로 import 경로 변경 0.
  *   - 런타임 동작 / router state shape 0 변경.
  */

@@ -62,7 +62,6 @@ TemplatePreset
 
 | 항목 | 값 |
 |------|------|
-| Key | `glycopharm` |
 | Category | `dashboard` |
 | 용도 | 의료/건강 관리형 서비스 |
 
@@ -120,16 +119,16 @@ TemplatePreset
 
 ## Token 비교표
 
-| Token | KPA | GlycoPharm | K-Cosmetics | Premium SaaS |
-|-------|-----|------------|-------------|-------------|
-| hero.bg | `bg-bg-secondary` | `bg-primary-50` | `bg-primary-50` | gradient |
-| hero.border | `border` | `border-b` | `border` | none |
-| hero.padding | `py-16` | `py-10` | `py-20` | `py-24` |
-| card.radius | `rounded-md` | `rounded-lg` | `rounded-xl` | `rounded-2xl` |
-| card.shadow | `none` | `sm` | `md` | `lg` |
-| section.spacing | `mb-16` | `mb-12` | `mb-20` | `mb-24` |
-| button.radius | `rounded-md` | `rounded-lg` | `rounded-full` | `rounded-full` |
-| icon.wrapper | none | `lg 36px` | `full 44px` | `full 48px` |
+| Token | KPA | K-Cosmetics | Premium SaaS |
+| ------- | ----- | ------------- | ------------- |
+| hero.bg | `bg-bg-secondary` | `bg-primary-50` | gradient |
+| hero.border | `border` | `border` | none |
+| hero.padding | `py-16` | `py-20` | `py-24` |
+| card.radius | `rounded-md` | `rounded-xl` | `rounded-2xl` |
+| card.shadow | `none` | `md` | `lg` |
+| section.spacing | `mb-16` | `mb-20` | `mb-24` |
+| button.radius | `rounded-md` | `rounded-full` | `rounded-full` |
+| icon.wrapper | none | `full 44px` | `full 48px` |
 
 ---
 

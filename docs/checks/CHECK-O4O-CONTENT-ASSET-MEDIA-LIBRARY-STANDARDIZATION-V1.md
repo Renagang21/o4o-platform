@@ -11,7 +11,7 @@ WO: `WO-O4O-CONTENT-ASSET-MEDIA-LIBRARY-STANDARDIZATION-V1`
 
 IR-O4O-STANDARD-CONTENT-EDITOR-PLATFORM-EVALUATION-V1 P0 Gap "미디어 라이브러리 표준화"를 구현. 45개 RichTextEditor 소비 화면 중 3개(Neture)만 미디어 라이브러리 연동이던 구조를, 공용 컴포넌트 + Media Type 인지형 계약 + 전 서비스 배선으로 표준화.
 
-**사용자 지시 순서 준수**: §7.1 접근성 선행 확인 → Neture 기준 구현 → 검증 → KPA/GP/KCos 확장. Shared Module Change Protocol 준수(소비처 전수 식별 후 동시 마이그레이션).
+**사용자 지시 순서 준수**: §7.1 접근성 선행 확인 → Neture 기준 구현 → 검증 → KPA/KCos 확장. Shared Module Change Protocol 준수(소비처 전수 식별 후 동시 마이그레이션).
 
 ---
 
@@ -23,7 +23,6 @@ IR-O4O-STANDARD-CONTENT-EDITOR-PLATFORM-EVALUATION-V1 P0 Gap "미디어 라이�
 |---|---|---|
 | KPA | 기존 `src/api/media.ts` | 접근 가능 |
 | Neture | 기존 `src/lib/api/media.ts` | 접근 가능 |
-| GlycoPharm | 신규 추가 | 접근 가능(엔드포인트 도달) |
 | K-Cosmetics | 신규 추가 | 접근 가능(엔드포인트 도달) |
 
 → **접근 불가 서비스 없음. API 접근 표준화 WO 분리 불필요.**
@@ -46,7 +45,6 @@ IR-O4O-STANDARD-CONTENT-EDITOR-PLATFORM-EVALUATION-V1 P0 Gap "미디어 라이�
   - `Toolbar.tsx`: `insertMediaIntoEditor` — image=insertImg, **video=기존 YouTube 경로(`setYoutubeVideo`)만**. mp4/O4O Storage/External은 WO-3(미구현).
 - **Neture 소비처 3화면 동시 마이그레이션**: `SupplierProductImportPage`·`SupplierProductCreatePage`·`ProductDetailDrawer`(9개 onMediaLibraryPick 인스턴스 + state 타입 + picker onSelect→`{type:'image',url,title}`).
 - **`ProductionMaterialEditorShell`**(공용 셸): `onMediaLibraryPick`/`onImageUpload` prop 추가(구조적 `InjectedMediaInsert`=content-editor MediaInsert 동일), 편집기에 forward. additive·하위호환.
-- **GlycoPharm/K-Cosmetics**(신규 커버리지): media API client + 공용 picker wrapper 신설 + `ProductionMaterialEditorPage`에 미디어 라이브러리(이미지 삽입/업로드) 배선.
 - 커밋 `c29e4e846` (13 files, 424 ins / 44 del) + `86b31b4e5` (neture Dockerfile fix)
 
 ---
@@ -57,12 +55,10 @@ IR-O4O-STANDARD-CONTENT-EDITOR-PLATFORM-EVALUATION-V1 P0 Gap "미디어 라이�
 |---|---|
 | Neture typecheck | **EXIT 0** |
 | KPA typecheck | **EXIT 0** |
-| GlycoPharm typecheck | **EXIT 0** |
 | K-Cosmetics typecheck | **EXIT 0** |
 | content-editor build (tsup) | **EXIT 0** |
 | Cloud Run 배포 — deploy-neture | **✓ success** (Dockerfile fix 후) |
 | Cloud Run 배포 — deploy-kpa-society | **✓ success** |
-| Cloud Run 배포 — deploy-glycopharm | **✓ success** |
 | Cloud Run 배포 — deploy-k-cosmetics | **✓ success** |
 | 4개 web 서비스 HTTP 200 | **✓** |
 
@@ -78,10 +74,10 @@ IR-O4O-STANDARD-CONTENT-EDITOR-PLATFORM-EVALUATION-V1 P0 Gap "미디어 라이�
 
 → store-ui-core 공용 picker가 KPA wrapper(주입 mediaApi+isOperator) 경유로 프로덕션에서 정상 동작. 기존 소비처(StoreLocalProductsPage) 회귀 없음.
 
-**Unit B (편집기 onMediaLibraryPick 배선) — 코드/배포 검증(해당 DOM 미클릭).** 미디어-연동 편집기 화면(Neture 공급자 상품등록/ProductDetailDrawer, GP/KCos 제작편집)은 테스트 계정 게이트로 브라우저 도달 실패: (a) 작동하는 Neture 공급자 계정(sohae21@naver.com)은 **공급자 활성화 미완료**로 상품등록 게이트 차단, (b) 트라이얼/store-owner 계정(renagang21@gmail.com)은 **401(스테일 자격증명)**. typecheck EXIT 0 + 배포 성공 + 동일 계약(Neture 3화면=기존 연동, GP/KCos=셸 경유)으로 검증. 후속: 계정 활성화/자격증명 갱신 후 편집기 툴바 이미지→라이브러리 삽입 DOM 확인.
+**Unit B (편집기 onMediaLibraryPick 배선) — 코드/배포 검증(해당 DOM 미클릭).** 미디어-연동 편집기 화면(Neture 공급자 상품등록/ProductDetailDrawer, KCos 제작편집)은 테스트 계정 게이트로 브라우저 도달 실패: (a) 작동하는 Neture 공급자 계정(sohae21@naver.com)은 **공급자 활성화 미완료**로 상품등록 게이트 차단, (b) 트라이얼/store-owner 계정(renagang21@gmail.com)은 **401(스테일 자격증명)**. typecheck EXIT 0 + 배포 성공 + 동일 계약(Neture 3화면=기존 연동, KCos=셸 경유)으로 검증. 후속: 계정 활성화/자격증명 갱신 후 편집기 툴바 이미지→라이브러리 삽입 DOM 확인.
 
 ### 6.2 커버리지 범위 (범위 미확대 — WO §caution 준수)
-이번 WO는 **표준 인프라(공용 picker·Media Type 계약·셸 prop) + 기준 배선**을 확립. 편집기 미디어 라이브러리 실제 배선은 **Neture 공급자 3화면 + GP/KCos 제작편집(셸 경로)**. KPA 및 GP/KCos의 개별 콘텐츠 화면(블로그·상품설명·QR 등 다수)의 화면별 배선은 회귀 위험 관리를 위해 **후속 커버리지 WO**로 분리(한 번에 40+ 화면 배선 지양).
+이번 WO는 **표준 인프라(공용 picker·Media Type 계약·셸 prop) + 기준 배선**을 확립. 편집기 미디어 라이브러리 실제 배선은 **Neture 공급자 3화면 + KCos 제작편집(셸 경로)**. KPA 및 KCos의 개별 콘텐츠 화면(블로그·상품설명·QR 등 다수)의 화면별 배선은 회귀 위험 관리를 위해 **후속 커버리지 WO**로 분리(한 번에 40+ 화면 배선 지양).
 
 ### 6.3 video 범위
 WO-1 명시대로 mp4/O4O Storage/External video **미구현**. 동영상은 기존 YouTube 경로만 유지. Media Type 계약은 WO-3가 시그니처 변경 없이 확장 가능하도록 설계.
@@ -93,7 +89,6 @@ WO-1 명시대로 mp4/O4O Storage/External video **미구현**. 동영상은 기
 **공용 패키지**: `store-ui-core`(MediaPickerModal 신설·index export·ProductionMaterialEditorShell), `content-editor`(types·index·Toolbar)
 **Neture**: MediaPickerModal wrapper·package.json·Dockerfile·supplier 3화면
 **KPA**: MediaPickerModal wrapper
-**GlycoPharm/K-Cosmetics**: media.ts·MediaPickerModal wrapper·ProductionMaterialEditorPage
 
 ## 8. 완료 기준 대비 (WO §14)
 

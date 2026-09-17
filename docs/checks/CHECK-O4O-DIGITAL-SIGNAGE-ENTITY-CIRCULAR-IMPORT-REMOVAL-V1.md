@@ -194,7 +194,7 @@ digital-signage 관련 타입 오류는 0건이다.
 | `apps/api-server/src/routes/dashboard/dashboard-assets.copy-handlers.ts` | `Signage*` 사용 — 관련 spec 25/25 PASS |
 | `packages/digital-signage-core` 내부 서비스 (`MediaListService`, `MediaListItemService`, `DisplaySlotService`) | 엔티티 클래스를 repository 토큰으로 value import — 순환 아님, 그대로 동작. `MediaListService:39` 의 `relations: ['items', 'items.mediaSource']` 경로는 metadata 실측에서 `MediaList.items` · `MediaListItem.mediaSource` 존재 확인 |
 | `packages/store-asset-policy-core` | `SignageMedia` 계열만 참조 |
-| KPA-Society / K-Cosmetics / GlycoPharm / Pharmacy-Hub frontend | 백엔드 엔티티를 직접 import 하지 않음 (API 경유) — 영향 없음 |
+| KPA-Society / K-Cosmetics / Pharmacy-Hub frontend | 백엔드 엔티티를 직접 import 하지 않음 (API 경유) — 영향 없음 |
 | `apps/admin-dashboard` digital-signage 화면 | API 계약 사용, 엔티티 미참조 |
 
 Digital Signage CRUD 계약(라우트·DTO·서비스 시그니처) 변경 0.

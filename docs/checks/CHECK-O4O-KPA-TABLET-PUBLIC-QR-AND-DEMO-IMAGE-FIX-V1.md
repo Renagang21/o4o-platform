@@ -13,7 +13,7 @@
 ## 1. 태블릿 QR UI (kiosk-core)
 
 `TabletKioskPage.tsx`:
-- **코너명 전용 헤더 밴드 제거** — screen-set 소비자(KPA, `qrGuide.url` 있음)에서만. 제목은 코너 설명 섹션이 담당. legacy(GP/KCos, `qrGuide` 없음)는 기존 헤더 유지 → **무영향**.
+- **코너명 전용 헤더 밴드 제거** — screen-set 소비자(KPA, `qrGuide.url` 있음)에서만. 제목은 코너 설명 섹션이 담당. legacy(KCos, `qrGuide` 없음)는 기존 헤더 유지 → **무영향**.
 - **큰 QR 카드 + 상시 QR 이미지 제거** → 우상단 작은 **`▣ 휴대전화로 보기` 버튼**(`floatingQrBtn`, position:absolute).
 - 버튼 클릭 → **QR 모달**(`qrModalOpen`) — QR 이미지(`QrImage size=200`)는 **모달에서만**.
 - `idle_touch` 는 상단 hero 의 QR chip 유지 → 별도 버튼 없이 헤더만 숨김.

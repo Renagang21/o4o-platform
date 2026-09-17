@@ -24,7 +24,7 @@
 - `OfferServiceApproval`(table `offer_service_approvals`, entity 21-54) — **offer × service_key 1행**. 승인 SSOT.
 - `ProductApproval`(`apps/api-server/src/entities/ProductApproval.ts:33-88`, table `product_approvals`) — organization × service_key × approval_type(SERVICE/PRIVATE). KPA 2차 심사 브리지.
 
-**흐름:** `submitForApproval`(offer.service.ts:411-510) → `filterApprovalEligibleServiceKeys`(glycopharm/kpa-society/k-cosmetics만) → `createPendingApprovals`(offer_service_approvals pending) → 운영자 승인(offer-service-approval.service.ts:438) → `syncOfferFromServiceApprovals`(324-432): **1개라도 approved → offer.approvalStatus=APPROVED + isActive=true**, PUBLIC→`autoExpandPublicProduct`, SERVICE→`autoExpandServiceProduct`, kpa-society→`product_approvals` 생성. REJECT 시 OPL/`product_approvals` 캐스케이드 해제.
+**흐름:** `submitForApproval`(offer.service.ts:411-510) → `filterApprovalEligibleServiceKeys` → `createPendingApprovals`(offer_service_approvals pending) → 운영자 승인(offer-service-approval.service.ts:438) → `syncOfferFromServiceApprovals`(324-432): **1개라도 approved → offer.approvalStatus=APPROVED + isActive=true**, PUBLIC→`autoExpandPublicProduct`, SERVICE→`autoExpandServiceProduct`, kpa-society→`product_approvals` 생성. REJECT 시 OPL/`product_approvals` 캐스케이드 해제.
 - **서비스별 승인**(offer-wide 아님). registration-type 구분은 distributionType 으로 표현.
 
 ## 3. OrganizationProductListing(OPL) 연결

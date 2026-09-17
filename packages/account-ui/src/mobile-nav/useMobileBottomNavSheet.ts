@@ -9,7 +9,7 @@
  *   - 열렸을 때 배경 스크롤 잠금(이전 overflow 복원)
  *   - 라우트 이동 시 자동 닫힘
  *
- * 알림만 쓰는 서비스(GlycoPharm / K-Cosmetics)는 'profile' 을 쓰지 않을 뿐,
+ * 알림만 쓰는 서비스는 'profile' 을 쓰지 않을 뿐,
  * 동작은 동일하다. router 에 의존하지 않도록 pathname 을 인자로 받는다.
  */
 

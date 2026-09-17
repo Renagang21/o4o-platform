@@ -9,7 +9,7 @@
 
 ## 1. 목적
 
-O4O의 강의 기능은 Neture가 아니라 **서비스 영역(KPA-Society / GlycoPharm / K-Cosmetics)**에 존재한다. KPA-Society 강의가 비교적 잘 구현된 것으로 보이나, 공통화를 시작하기 전 잘못된 구조가 GlycoPharm/K-Cosmetics로 전파되지 않도록 **KPA 기준선을 먼저 검증**한다. 본 IR은 read-only 조사이며 코드/DB/UI/route/API를 변경하지 않는다.
+O4O의 강의 기능은 Neture가 아니라 **서비스 영역(KPA-Society / K-Cosmetics)**에 존재한다. KPA-Society 강의가 비교적 잘 구현된 것으로 보이나, 공통화를 시작하기 전 잘못된 구조가 K-Cosmetics로 전파되지 않도록 **KPA 기준선을 먼저 검증**한다. 본 IR은 read-only 조사이며 코드/DB/UI/route/API를 변경하지 않는다.
 
 조사 기준: **main · HEAD `cb0277c5e`** (origin 동기화, 본 IR 신규 문서 1건만 생성).
 
@@ -187,7 +187,7 @@ O4O의 강의 기능은 Neture가 아니라 **서비스 영역(KPA-Society / Gly
 ## 14. Neture 제외 확인
 
 - 본 조사 범위에 Neture 강의 수강 기능은 포함하지 않으며, **Neture에는 강의 메뉴/수강 기능을 두지 않는다**(공급자·파트너·운영 기반 서비스).
-- Neture 공급자가 강의 **원천 자료 제공자**가 될 수는 있으나(제품 교육 자료), **수강 기능 자체는 서비스(KPA/GP/KCos) 측 기능**이다.
+- Neture 공급자가 강의 **원천 자료 제공자**가 될 수는 있으나(제품 교육 자료), **수강 기능 자체는 서비스(KPA/KCos) 측 기능**이다.
 - 공통화 시 **Neture는 LMS 공통화 대상에서 제외**한다(메뉴·라우트·컴포넌트 적용 금지). 후속 공통화 WO의 명시적 가드 항목으로 둔다.
 
 ---
@@ -211,12 +211,12 @@ O4O의 강의 기능은 Neture가 아니라 **서비스 영역(KPA-Society / Gly
   - 공개/회원제 표현 정리, 유료 결제 오해 UI 점검(안내문구만 유지), 오프라인 수강료 안내 정돈
   - progress 자동 갱신 일원화(R2) + course-complete 판정 명시화(R3)
   - dormant payment 표기 유지(R1), LIVE 잔존 주석 1건 정리(§12)
-  - **금지:** Neture 강의 추가 / GP·KCos 동시 수정 / 공통 패키지 추출 / DB·enum 삭제 / 결제 기능 추가
+  - **금지:** Neture 강의 추가 / KCos 동시 수정 / 공통 패키지 추출 / DB·enum 삭제 / 결제 기능 추가
 
 - **WO-2 `WO-O4O-LMS-COMMONIZATION-BOUNDARY-IR/EXTRACTION`** (LMS 공통 UI/Core 추출 가능성 정리)
   - §13 후보의 추출 경계 확정, 서비스별 유지 항목 분리, `@o4o/lms-client` 정렬
 
-- **WO-3 `WO-O4O-LMS-SERVICE-EXTENSION-APPLY`** (GlycoPharm/K-Cosmetics 적용)
+- **WO-3 `WO-O4O-LMS-SERVICE-EXTENSION-APPLY`** (K-Cosmetics 적용)
   - KPA 정비 완료 후 적용, 서비스별 카테고리·역할·문구·리워드 정책 주입, **Neture 제외 가드 검증(CHECK)**
 
 ---
@@ -233,5 +233,5 @@ O4O의 강의 기능은 Neture가 아니라 **서비스 영역(KPA-Society / Gly
 - **강사/운영자:** OK — 신청→승인→상태머신, 본인 강의 한정, 운영자 승인·반려·수강자·채점·포인트 이력 (리워드 정책 관리 UI는 부분)
 - **LIVE/YouTube:** F(완전 제거) — API/필드/enum 0건, 주석 1건 잔존
 - **공통화:** 9개 컴포넌트 후보 / 서비스별 유지 항목 분리 / **Neture 제외**
-- **후속 WO:** WO-1 KPA 기준선 정비 → WO-2 공통 추출 경계 → WO-3 GP·KCos 적용(Neture 제외 CHECK)
+- **후속 WO:** WO-1 KPA 기준선 정비 → WO-2 공통 추출 경계 → WO-3 KCos 적용(Neture 제외 CHECK)
 - **git status:** read-only IR, 다른 세션 WIP 미접촉

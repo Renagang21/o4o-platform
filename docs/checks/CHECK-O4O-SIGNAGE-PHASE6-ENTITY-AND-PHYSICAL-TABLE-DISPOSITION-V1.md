@@ -146,11 +146,9 @@ frontend / test 어디에도 없다.
 
 | 문자열 | 실체 | 판정 |
 |---|---|---|
-| `services/web-glycopharm/src/types/signage.ts` 의 `interface MediaSource` | glycopharm 프론트 **로컬 타입 정의** (entity 아님) | 무관 — 이번 WO 범위 밖 |
 | `Display` / `Schedule` 다수 매칭 | 블록 설명문·주석·`BackupService` 등 일반 영어 단어 | 오탐 |
 | `apps/admin-dashboard` 의 `digital-signage-core` | **appId 문자열** (AppStore 카탈로그) | entity 무관 — 보존 |
 
-> 참고(범위 밖 보고): `services/web-glycopharm/src/types/signage.ts` 의 로컬 타입 파일은
 > 현재 importer 가 0 이다(소비처는 전부 `@o4o/types/signage`). 이번 WO 범위가 아니므로
 > **손대지 않았다.** 별도 판단 대상으로 보고만 한다.
 

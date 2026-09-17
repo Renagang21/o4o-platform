@@ -55,7 +55,7 @@ POST /api/v1/neture/b2b/payment/confirm
 ### 1-3. 이벤트 → 주문 전이
 
 `services/payment/PaymentEventHub.ts` — `payment.completed` / `payment.failed` 에 `serviceKey` 필드.
-서비스별 핸들러가 **자기 serviceKey 만 구독**한다 (kpa / glycopharm / k-cosmetics / neture / **neture-b2b** / lms).
+서비스별 핸들러가 **자기 serviceKey 만 구독**한다 (kpa / k-cosmetics / neture / **neture-b2b** / lms).
 
 `NetureB2bCheckoutPaymentEventHandler`:
 - `serviceKey='neture-b2b'` 구독 (legacy `'neture'` 핸들러와 분리 → 충돌 없음)

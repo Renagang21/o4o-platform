@@ -153,8 +153,6 @@ const allSuccess = hasResults && failedCount === 0 && skippedCount === 0;
 
 ## 8. 비수정 대상
 
-DB 마이그레이션, `neture_suppliers` schema, ACTIVE 전환 조건, 사업자등록증/통장사본 PDF 업로드 구조, 정산 계좌 구조, 통신판매업 신고 정책, 품목군별 증빙 정책, 서비스 멤버십 구조, role assignment 구조, `/operator/suppliers` 정책, KPA/GlycoPharm/K-Cosmetics 가입 흐름.
-
 ---
 
 ## 9. 테스트 시나리오
@@ -181,7 +179,7 @@ DB 마이그레이션, `neture_suppliers` schema, ACTIVE 전환 조건, 사업�
 |------------|------|
 | Neture supplier | 신규 필수 검증 적용 |
 | Neture partner / store_owner | 기존 기준 유지 |
-| KPA / GlycoPharm / K-Cosmetics 가입 | 영향 없음 |
+| KPA / K-Cosmetics 가입 | 영향 없음 |
 
 ### 9.4 운영자 결과 모달
 | 케이스 | 기대 |
@@ -200,7 +198,6 @@ DB 마이그레이션, `neture_suppliers` schema, ACTIVE 전환 조건, 사업�
 3. 프론트 가입모달에서 동일 기준으로 버튼 활성/비활성이 동작한다.
 4. 누락 항목 안내가 사용자에게 표시된다.
 5. 사업자등록번호·세금계산서·정산·증빙 항목은 가입신청 필수로 올라가지 않는다.
-6. KPA/GlycoPharm/K-Cosmetics 가입 흐름에 영향이 없다.
 7. `BulkResultModal`이 빈 results를 성공으로 표시하지 않는다.
 8. 타입체크/빌드 검증 통과.
 9. 변경 범위가 본 WO 대상 파일로 제한된다.

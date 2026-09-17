@@ -26,10 +26,10 @@ const allowedServiceRoles = [`${serviceKey}:admin`, `${serviceKey}:operator`];
 
 | 축 | 값 (KPA) | 값 (K-Cosmetics) | 자기사상 서비스 |
 |---|---|---|---|
-| role scope prefix | `kpa` | `cosmetics` | `glycopharm` / `pharmacy-hub` / `neture` / `platform` |
+| role scope prefix | `kpa` | `cosmetics` | `pharmacy-hub` / `neture` / `platform` |
 | canonical ledger service key | `kpa-society` | `k-cosmetics` | (동일) |
 
-`${serviceKey}:operator` 는 **두 축이 같다는 가정**에서만 성립한다. 자기사상 서비스(PH·GP·neture)는
+`${serviceKey}:operator` 는 **두 축이 같다는 가정**에서만 성립한다. 자기사상 서비스(PH·neture)는
 우연히 성립했고, 축이 갈라지는 KPA·KCos 두 서비스에서만 깨졌다. 즉 이것은 KPA 개별 버그가 아니라
 **축 접합 버그**이며, PH 가 과거 겪은 allowlist 실패와 같은 계열이다.
 
@@ -39,7 +39,6 @@ const allowedServiceRoles = [`${serviceKey}:admin`, `${serviceKey}:operator`];
 
 | serviceKey | rows |
 |---|---|
-| `glycopharm` | 66 |
 | `kpa-society` | 53 |
 | `neture` | 6 |
 | `kpa` (legacy alias) | 1 |
@@ -133,7 +132,7 @@ KPA canonical row / KPA legacy row / 타서비스 row 에 대해 각각 테스�
 |---|---|---|
 | `routes/cms-content/cms-content-mutation.handler.ts` | 접합 버그 (원인) | **수정** |
 | `routes/kpa/kpa.routes.ts` (`/api/v1/kpa/news*`) | guard=`requireKpaScope('kpa:operator')`(role 축), write=`KPA_SERVICE_KEY='kpa-society'`(원장 축) — 이미 분리 | 무변경 |
-| `routes/o4o-store/controllers/news.controller.ts` | `(ledgerServiceKey, operatorRole)` 파라미터로 분리 수신. mount: `('k-cosmetics','cosmetics:operator')`, `('glycopharm','glycopharm:operator')` | 무변경 |
+| `routes/o4o-store/controllers/news.controller.ts` | `(ledgerServiceKey, operatorRole)` 파라미터로 분리 수신. mount: `('k-cosmetics','cosmetics:operator')` | 무변경 |
 
 slot mutation (`cms-content-slot.handler.ts`): `requireSlotAccess` + `extractAllowedCmsKeys` 가
 `resolveCmsServiceKeys(prefix)` 로 alias 집합을 만든다 — 이미 alias 정합. 무변경.

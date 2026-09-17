@@ -27,7 +27,6 @@
 |------|---:|---:|---:|---:|
 | `web-neture` | 107 | 289 | 47 | 6 |
 | `web-kpa-society` | 125 | 282 | 123 | 6 |
-| `web-glycopharm` | 89 | 203 | 66 | 1 |
 | `web-k-cosmetics` | 78 | 160 | 39 | 3 |
 | `web-pharmacy-hub` | 18 | 36 | 7 | 0 |
 
@@ -59,15 +58,6 @@
 
 > `/admin` · `/operator` · `/tablet` 은 **정적 매처의 오탐**이다. 매처를 느슨하게 고치지 않고 route 를 직접 확인해 판정했다.
 
-### 3-3. web-glycopharm (미매치 1건 — 3개소 수정)
-
-| 링크 | 위치 | 판정 | 처리 |
-|------|------|------|------|
-| `/education` | `pages/service/ServiceDashboardPage.tsx:158` (`/service` · `/service/dashboard`) | **DEAD_LINK_CLICKABLE** | `/lms` 로 교체 |
-| `/education` | `pages/store-management/PharmacyManagement.tsx:247,259` (매장관리 `management`) | **DEAD_LINK_CLICKABLE** | `/lms` 로 교체 |
-
-교체 근거: 두 링크의 라벨은 "교육" · "강좌" 이고, 해당 화면의 canonical route 는 `<Route path="lms" element={<EducationPage />} />` (App.tsx:607) 다. **새 route 를 만들지 않고 이미 존재하는 route 로만 교체**했다.
-
 ### 3-4. web-k-cosmetics (미매치 3건 — 1개소 수정)
 
 | 링크 | 위치 | 판정 | 처리 |
@@ -88,8 +78,6 @@
 
 | 서비스 | 파일 | 변경 |
 |------|------|------|
-| glycopharm | `pages/service/ServiceDashboardPage.tsx` | `/education` → `/lms` |
-| glycopharm | `pages/store-management/PharmacyManagement.tsx` | `/education` → `/lms` (2개소) |
 | k-cosmetics | `pages/HomePage.tsx` | `/community` → `/forum` |
 | neture | `pages/PartnerInfoPage.tsx` | `/channel/structure` · `/platform/principles` 링크 제거 (2개소) |
 | neture | `pages/admin-vault/VaultOverviewPage.tsx` | `/channel/structure` 카드 제거 + unused import 정리 |
@@ -135,16 +123,6 @@ route 신설 0건 · redirect 신설 0건 · 기존 route 삭제 0건.
 | `/forum` 렌더 | "K-Cosmetics 포럼" — 포럼 목록 · 인기글 · 최근글 정상 ✅ |
 | 홈 회귀 | 공지 / 트렌드 / 최신글 / 서비스 바로가기 전부 정상 ✅ |
 
-### 7-2. glycopharm (https://glycopharm.co.kr)
-
-| 확인 | 결과 |
-|------|:---:|
-| `/lms` 렌더 | "강의" — 강의 목록 3건 정상 ✅ |
-| `/education` (이전 링크 대상) | 404 화면 — dead 였음이 재확인됨 ✅ |
-| 기존 catch-all 유지 | ✅ (직전 WO 결과 회귀 없음) |
-
-> `/service` · 매장관리 화면은 인증·역할 guard 뒤에 있어 링크 자체는 소스·빌드로 검증하고, **링크 대상인 `/lms` 가 실제로 렌더되는지**를 실브라우저로 확인했다. 숨기지 않고 기록한다.
-
 ### 7-3. neture (https://neture.co.kr)
 
 | 요청 경로 | 도착 주소 | 결과 |
@@ -171,7 +149,6 @@ route 신설 0건 · redirect 신설 0건 · 기존 route 삭제 0건.
 | 서비스 | typecheck (`npx tsc --noEmit -p tsconfig.json`) | build (`pnpm run build`) | deploy |
 |------|:---:|:---:|:---:|
 | `web-neture` | ✅ PASS | ✅ 14.79s | ✅ `deploy-neture: success` |
-| `web-glycopharm` | ✅ PASS | ✅ 16.79s | ✅ `deploy-glycopharm: success` |
 | `web-k-cosmetics` | ✅ PASS | ✅ 17.31s | ✅ `deploy-k-cosmetics: success` |
 
 - 워크플로 `Deploy Web Services (Cloud Run)` run **31451634294** — 전체 success.

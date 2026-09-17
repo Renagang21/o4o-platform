@@ -3,7 +3,7 @@
  *
  * WO-O4O-FORUM-LIST-SHARED-PRIMITIVES-V1
  *
- * 4서비스(KPA / GlycoPharm / K-Cosmetics / Neture) 포럼 목록 페이지가 각자 동일하게
+ * 3서비스(KPA / K-Cosmetics / Neture) 포럼 목록 페이지가 각자 동일하게
  * 재정의하던 `formatDate` 를 단일 유틸로 통일한다. 동작은 기존과 동일:
  *   - 7일 초과: `toLocaleDateString('ko-KR')` (절대 날짜)
  *   - 1~7일: `N일 전`

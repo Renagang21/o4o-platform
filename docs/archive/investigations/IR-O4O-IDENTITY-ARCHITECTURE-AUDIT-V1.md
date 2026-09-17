@@ -3,7 +3,7 @@
 > **O4O 플랫폼 사용자 인증 및 Identity 구조 전체 감사**
 > 작성일: 2026-03-04
 > 상태: READ-ONLY 조사 완료
-> 범위: api-server + 전체 프론트엔드 서비스 (KPA, Neture, GlycoPharm, GlucoseView, Cosmetics, Admin Dashboard)
+> 범위: api-server + 전체 프론트엔드 서비스 (KPA, Neture, GlucoseView, Cosmetics, Admin Dashboard)
 
 ---
 
@@ -24,7 +24,7 @@ O4O 플랫폼은 **Identity 공유 + Session 공유 + 서비스 격리(Role Pref
           ┌──────────┬───────────┼───────────┬──────────┐
           ▼          ▼           ▼           ▼          ▼
        ┌─────┐  ┌────────┐  ┌───────┐  ┌────────┐  ┌──────────┐
-       │ KPA │  │ Neture │  │Glyco- │  │Glucose-│  │Cosmetics │
+       │ KPA │  │ Neture │  │       │  │Glucose-│  │Cosmetics │
        │     │  │        │  │Pharm  │  │View    │  │          │
        └─────┘  └────────┘  └───────┘  └────────┘  └──────────┘
        격리       bypass      bypass     bypass      bypass
@@ -51,7 +51,6 @@ O4O 플랫폼은 **Identity 공유 + Session 공유 + 서비스 격리(Role Pref
 |--------|:----------------:|:-----------------:|
 | KPA Society | ❌ 없음 | ✅ API 서버 경유 |
 | Neture | ❌ 없음 | ✅ API 서버 경유 |
-| GlycoPharm | ❌ 없음 | ✅ API 서버 경유 |
 | GlucoseView | ❌ 없음 | ✅ API 서버 경유 |
 | K-Cosmetics | ❌ 없음 | ✅ API 서버 경유 |
 | Admin Dashboard | ❌ 없음 | ✅ API 서버 경유 |
@@ -106,7 +105,6 @@ createdAt, updatedAt
 | `platform:` | 플랫폼 전체 | `super_admin`, `admin`, `operator` |
 | `kpa:` | KPA 약사회 | `admin`, `operator`, `pharmacist`, `district_admin`, `branch_admin`, `branch_operator` |
 | `neture:` | 네처 | `admin`, `operator`, `products:read/write`, `orders:read/manage`, `partners:read/manage` |
-| `glycopharm:` | 글라이코팜 | `admin`, `operator`, `products:read/write`, `forum:read/write/manage` |
 | `glucoseview:` | 글루코스뷰 | `admin`, `operator`, `customer:read/write/manage`, `pharmacist:read/manage` |
 | `cosmetics:` | 코스메틱스 | `admin`, `operator`, `products:read/write`, `partners:manage` |
 | (무프리픽스) | 레거시 | `admin`, `super_admin`, `operator`, `supplier`, `seller`, `partner`, `user` |
@@ -117,7 +115,6 @@ createdAt, updatedAt
 |------|----------|:----:|
 | `kpa-society` | `/api/v1/kpa` | active |
 | `neture` | `/api/v1/neture` | active |
-| `glycopharm` | `/api/v1/glycopharm` | active |
 | `glucoseview` | `/api/v1/glucoseview` | active |
 | `cosmetics` | `/api/v1/cosmetics` | active |
 
@@ -208,7 +205,6 @@ Response: { user: { id, email, roles, scopes, ... }, tokens?: { ... } }
 | 상황 | 쿠키 | Body 토큰 |
 |------|:----:|:---------:|
 | 같은 도메인 (admin.neture.co.kr → api.neture.co.kr) | ✅ 설정 | ❌ 미포함 |
-| 크로스 도메인 (glycopharm.co.kr → api.neture.co.kr) | ✅ 설정 | ✅ 포함 |
 
 ---
 
@@ -236,7 +232,6 @@ Response: { user: { id, email, roles, scopes, ... }, tokens?: { ... } }
 /api/v1/kpa/*      → KPA_SCOPE_CONFIG 가드 적용
 /api/v1/neture/*   → NETURE_SCOPE_CONFIG 가드 적용
 /api/v1/cosmetics/* → 인라인 Cosmetics 가드 적용
-/api/v1/glycopharm/* → GLYCOPHARM_SCOPE_CONFIG 가드 적용
 ```
 
 **Scope Guard 로직 (3단계):**
@@ -249,13 +244,12 @@ Response: { user: { id, email, roles, scopes, ... }, tokens?: { ... } }
 
 ### 5.3 크로스 서비스 접근 매트릭스
 
-| 사용자 역할 → 서비스 | KPA | Neture | GlycoPharm | Cosmetics | GlucoseView |
-|---------------------|:---:|:------:|:----------:|:---------:|:-----------:|
-| `kpa:admin` | ✅ | ❌ | ❌ | ❌ | ❌ |
-| `neture:admin` | ❌ | ✅ | ❌ | ❌ | ❌ |
-| `glycopharm:admin` | ❌ | ❌ | ✅ | ❌ | ❌ |
-| `cosmetics:admin` | ❌ | ❌ | ❌ | ✅ | ❌ |
-| `platform:super_admin` | **❌** | ✅ | ✅ | ✅ | ✅ |
+| 사용자 역할 → 서비스 | KPA | Neture | Cosmetics | GlucoseView |
+| --------------------- | :---: | :------: | :---------: | :-----------: |
+| `kpa:admin` | ✅ | ❌ | ❌ | ❌ |
+| `neture:admin` | ❌ | ✅ | ❌ | ❌ |
+| `cosmetics:admin` | ❌ | ❌ | ✅ | ❌ |
+| `platform:super_admin` | **❌** | ✅ | ✅ | ✅ |
 
 **KPA만 `platformBypass: false`** — platform:super_admin도 KPA에 접근 불가 (조직 격리).
 
@@ -265,7 +259,6 @@ Response: { user: { id, email, roles, scopes, ... }, tokens?: { ... } }
 |-----------|-------------|----------|
 | web-kpa-society | `{VITE_API_BASE_URL}/api/v1/kpa` | Bearer 토큰 (localStorage) |
 | web-neture | `{VITE_API_BASE_URL}/api/v1/neture` | Bearer 토큰 |
-| web-glycopharm | `{VITE_API_BASE_URL}/api/v1/glycopharm` | authFetch |
 | admin-dashboard | `{VITE_API_BASE_URL}/api/v1` | Cookie (auth-context) |
 
 **공통:** `VITE_API_BASE_URL = https://api.neture.co.kr`
@@ -284,7 +277,7 @@ Response: { user: { id, email, roles, scopes, ... }, tokens?: { ... } }
 | # | 질문 | 답변 |
 |---|------|------|
 | 1 | **users 테이블이 어디에 있는가?** | `o4o-core-api` (api-server) 단일 DB. 모든 서비스가 공유. |
-| 2 | **모든 서비스가 같은 users를 사용하는가?** | **YES.** KPA, Neture, GlycoPharm, Cosmetics, GlucoseView 모두 동일 API 서버의 users 테이블 사용. |
+| 2 | **모든 서비스가 같은 users를 사용하는가?** | **YES.** KPA, Neture, Cosmetics, GlucoseView 모두 동일 API 서버의 users 테이블 사용. |
 | 3 | **role_assignments 위치?** | **Global.** 단일 테이블, 역할 프리픽스(`kpa:`, `neture:` 등)로 서비스 구분. |
 | 4 | **로그인 API?** | `POST /api/v1/auth/login` **하나.** 서비스별 분리 로그인 없음. |
 | 5 | **JWT 구조?** | `{ userId, roles: ["kpa:admin"], tokenType: "user", iss, aud }` — service 필드 없음, 역할 프리픽스로 서비스 구분. |
@@ -304,7 +297,6 @@ O4O Identity Core
 서비스 격리
 ├── KPA          → platformBypass: false (완전 격리)
 ├── Neture       → platformBypass: true
-├── GlycoPharm   → platformBypass: true
 ├── Cosmetics    → platformBypass: true
 └── GlucoseView  → platformBypass: true
 ```
@@ -333,7 +325,7 @@ O4O Identity Core
 
 ### Service Scope Guard
 - `packages/security-core/src/service-scope-guard.ts` — 스코프 가드 팩토리
-- `packages/security-core/src/service-configs.ts` — 서비스별 설정 (KPA, Neture, GlycoPharm 등)
+- `packages/security-core/src/service-configs.ts` — 서비스별 설정 (KPA, Neture 등)
 
 ### Auth Controller
 - `apps/api-server/src/modules/auth/controllers/auth.controller.ts` — login/me/status/refresh

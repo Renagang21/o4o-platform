@@ -2,7 +2,7 @@
 
 - **WO**: WO-O4O-STORE-OWNER-SERVICE-SCOPED-ORGANIZATION-RESOLUTION-V1
 - **일자**: 2026-08-14
-- **범위**: `apps/api-server` — store_owner 접근의 organization 해석 (KPA / K-Cosmetics / GlycoPharm / Pharmacy-Hub)
+- **범위**: `apps/api-server` — store_owner 접근의 organization 해석 (KPA / K-Cosmetics / Pharmacy-Hub)
 - **판정**: **PASS** (DB write 0 · migration 0)
 
 ---
@@ -23,8 +23,6 @@
 **정상으로 판정해 손대지 않은 것** (조직이 이미 인자로 고정된 **검사형** 쿼리 — 선택이 아님):
 `routes/o4o-store/utils/kpa-store-owner.util.ts` · `routes/o4o-store/controllers/store-settings.controller.ts` ·
 `utils/dashboard-access.guard.ts` · `middleware/signage-role.middleware.ts` ·
-`routes/glycopharm/pharmacy-context.middleware.ts` · `modules/glycopharm/resolve-pharmacy.ts`
-(GlycoPharm 은 이미 enrollment 확인 + `ORDER BY is_primary` 로 결정적)
 `routes/kpa/controllers/kpa-checkout.controller.ts`(알림 수신자 LIMIT 20) ·
 `controllers/market-trial/marketTrialOperatorController.ts`(운영자 목록 표시용 서브쿼리) — 접근 판정 아님.
 
@@ -34,7 +32,7 @@
 
 새 테이블·컬럼·backfill 없이 **이미 운영 중인 두 계약의 합집합**을 사용한다.
 
-- (a) `organization_service_enrollments(service_code, status='active')` — K-Cosmetics / Pharmacy-Hub / GlycoPharm / Neture 프로비저닝이 기록
+- (a) `organization_service_enrollments(service_code, status='active')` — K-Cosmetics / Pharmacy-Hub / Neture 프로비저닝이 기록
 - (b) `platform_store_slugs(service_key, is_active = true)` — **KPA 약국 매장 주소 발급 경로가 기록** (KPA 는 enrollment row 를 만들지 않는다)
 
 프로덕션 read-only 실측으로 확인: (a) 만 쓰면 **KPA store_owner 5명 전원 후보 0** 이 되어 전부 403 이 된다.
@@ -45,7 +43,6 @@
 | serviceKey | enrollmentCodes | slugKeys |
 |---|---|---|
 | `kpa` | kpa-society, kpa | kpa |
-| `glycopharm` | glycopharm | glycopharm |
 | `cosmetics` | k-cosmetics, cosmetics | k-cosmetics, cosmetics |
 | `pharmacy-hub` | pharmacy-hub | pharmacy-hub |
 
@@ -65,7 +62,7 @@ role prefix → `service_memberships.service_key` 매핑은 로컬 중복 맵을
 - `auth/auth-context.middleware.ts` — `requireStoreAuth` ambiguous 차단
 - `controllers/pharmacy-hub/store-organization.resolver.ts` · `services/pharmacy-hub/PharmacyHubStoreProvisioningService.ts` — `STORE_MEMBER_ROLES` 공통 SSOT 사용
 - `routes/o4o-store/controllers/store-playlist.controller.ts` — factory 4번째 인자로 `storeOwnerServiceKey` 주입, `resolveStoreAccess()` 호출 **10곳** 전부 스코프
-- `routes/kpa/kpa.routes.ts`(`'kpa'`) · `routes/cosmetics/cosmetics.routes.ts`(`'cosmetics'`) · `routes/glycopharm/glycopharm.routes.ts`(`'glycopharm'`) — mount 시 serviceKey 명시
+- `routes/kpa/kpa.routes.ts`(`'kpa'`) · `routes/cosmetics/cosmetics.routes.ts`(`'cosmetics'`)
 - `routes/kpa/services/event-offer.service.ts` — `resolveStoreAccess(..., 'kpa')`
 - `routes/kpa/helpers/event-offer-organization.helper.ts` · `modules/store-ai/utils/product-access.utils.ts` · `modules/auth/controllers/auth-helpers.ts` — 허용 집합 불변, 정렬만 결정적으로 (`is_primary DESC NULLS LAST → joined_at ASC → organization_id ASC`)
 
@@ -81,9 +78,8 @@ Neture mount 는 store_owner role 이 registry 에 없어 의도적으로 스코
 - serviceKey 미지정(back-compat, `/api/v1/store/*` 서비스 중립 mount): API 계약 변경이 금지되어 **허용 집합은 그대로 두고 선택만 결정적**으로 고정, 후보 2+ 이면 경고 로그.
 
 **프로덕션 read-only 예측 (write 0)**: ambiguous **0건**.
-KPA 5/5 결정적 해석(기존에 Neture 공급자 조직으로 해석될 수 있던 계정 1건 교정), cosmetics 2/3, glycopharm 0/2, pharmacy-hub 1/3.
+KPA 5/5 결정적 해석(기존에 Neture 공급자 조직으로 해석될 수 있던 계정 1건 교정), cosmetics 2/3 0/2, pharmacy-hub 1/3.
 새로 차단되는 (user × service) 5건은 전부 다중 서비스 **테스트 계정 2개**(`3f5582bc`, `6967ebe0`)이며, 모두 WO 가 금지한 교차 서비스 조직 노출에 해당한다.
-GlycoPharm 자체 SSOT(`resolveGlycopharmPharmacyId`)는 해당 계정을 이미 차단하고 있었다 — 공통 가드 쪽이 예외였다.
 
 ---
 

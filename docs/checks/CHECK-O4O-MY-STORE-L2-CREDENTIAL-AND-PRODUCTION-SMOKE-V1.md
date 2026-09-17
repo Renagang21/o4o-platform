@@ -31,7 +31,7 @@ serviceKey 없음                   → V1 fallback
 
 | 계정 | membership | service_credentials | store_owner role | 매장 org | L2 로그인 가능 |
 |---|---|---|---|---|:---:|
-| `renagang21@gmail.com` | kpa-society·glycopharm·k-cosmetics·pharmacy-hub·neture·platform (전부 active) | **5건 전부 존재 · L1과 상이** | kpa·cosmetics·glycopharm·pharmacy-hub **4종** | 테스트 약국 / 테스트 뷰티샵 / 네뚜레 공급자 | ❌ (비밀번호 불명) |
+| `renagang21@gmail.com` | kpa-society·k-cosmetics·pharmacy-hub·neture·platform (전부 active) | **5건 전부 존재 · L1과 상이** | kpa·cosmetics·pharmacy-hub **4종** | 테스트 약국 / 테스트 뷰티샵 / 네뚜레 공급자 | ❌ (비밀번호 불명) |
 | `sohae2100@gmail.com` | 6개 active | 4건 존재 · L1과 상이 | kpa 만 | Sohae 약국 | ❌ |
 | `sohae21@naver.com` | — | 2건 | — | — | ❌ (users.status=`deleted`) |
 | `renariver21@gmail.com` | platform 만 | **0건** | 없음 | 없음 | ✅ (credential 부재 → L1 fallback) |
@@ -71,7 +71,6 @@ credential isolation 확인 · 종료 후 삭제보다 비활성화.*
 |---|---|---|---|
 | 1 | `kpa:store_owner` | `kpa-society` | `credentialPolicy=CREATED` |
 | 2 | `cosmetics:store_owner` | `k-cosmetics` | `credentialPolicy=CREATED` |
-| 3 | `glycopharm:store_owner` | `glycopharm` | `credentialPolicy=CREATED` |
 | 4 | `pharmacy-hub:store_owner` | `pharmacy-hub` | `credentialPolicy=CREATED` |
 | 5 | `cosmetics:store_owner` (계정 B) | `k-cosmetics` | `credentialPolicy=CREATED` |
 
@@ -117,7 +116,6 @@ WHERE user_id = $1 AND role IN ('owner','admin','manager') AND left_at IS NULL L
 |---|---|:---:|:---:|:---:|:---:|:---:|
 | **KPA-Society** | 계정A / `kpa-society` L2 | ✅ 200 | ✅ 9~14 call/화면 | 5/5 | 0 | **PASS** |
 | **K-Cosmetics** | 계정B / `k-cosmetics` L2 | ✅ 200 | ✅ 5~7 call/화면 | 9/9 | 0 | **PASS** |
-| **GlycoPharm** | 계정A / `glycopharm` L2 | ✅ 200 | ✅ 5~8 call/화면 | 8/9 | 1화면 | **PASS**(1 BLOCKED) |
 | **PharmacyHub** | 계정A / `pharmacy-hub` L2 | ✅ 200 | ✅ 2~3 call/화면 | 4/4 | 0 | **PASS** |
 | **Neture** | — | — | — | — | — | **해당 없음**(§3-2) |
 
@@ -139,15 +137,15 @@ WHERE user_id = $1 AND role IN ('owner','admin','manager') AND left_at IS NULL L
 | KCos | **QR 콘솔** ★ | `/store/marketing/qr` | PASS |
 | KCos | 상품 상세설명 ★ | `/store/library/product-descriptions` | PASS |
 | KCos | **블로그 관리** ★ | `/store/content/blog` | PASS |
-| GP | 홈 | `/store` | **BLOCKED** (§4) |
-| GP | 매장 자체 상품 | `/store/commerce/local-products` | PASS |
-| GP | POP | `/store/marketing/pop` | PASS |
-| GP | 자료함 | `/store/library/resources` | PASS |
-| GP | 태블릿 | `/store/commerce/tablet-displays` | PASS |
-| GP | **채널 콘솔** ★ | `/store/channels` | PASS |
-| GP | **QR 콘솔** ★ | `/store/marketing/qr` | PASS |
-| GP | 상품 상세설명 ★ | `/store/library/product-descriptions` | PASS |
-| GP | **블로그 관리** ★ | `/store/content/blog` | PASS |
+| 홈 | `/store` | **BLOCKED** (§4) |
+| 매장 자체 상품 | `/store/commerce/local-products` | PASS |
+| POP | `/store/marketing/pop` | PASS |
+| 자료함 | `/store/library/resources` | PASS |
+| 태블릿 | `/store/commerce/tablet-displays` | PASS |
+| **채널 콘솔** ★ | `/store/channels` | PASS |
+| **QR 콘솔** ★ | `/store/marketing/qr` | PASS |
+| 상품 상세설명 ★ | `/store/library/product-descriptions` | PASS |
+| **블로그 관리** ★ | `/store/content/blog` | PASS |
 | PH | 홈 | `/store-owner` | PASS |
 | PH | 매장 경영활용 제품 | `/store-owner/handled-products` | PASS |
 | PH | 매장 자체 상품 | `/store-owner/local-products` | PASS |
@@ -163,35 +161,19 @@ WHERE user_id = $1 AND role IN ('owner','admin','manager') AND left_at IS NULL L
 
 ---
 
-## 4. BLOCKED 1건 — GlycoPharm 홈
-
-| 항목 | 내용 |
-|---|---|
-| 화면 | GlycoPharm `/store` (StoreOverviewPage) |
-| 증상 | `404 /glycopharm/pharmacy/cockpit/ai-summary` · `403 /glycopharm/pharmacy/products` → 콘솔 오류 |
-| **원인 (API 직접 실측)** | `404 {"code":"PHARMACY_NOT_FOUND"}` · `403 {"code":"GLYCOPHARM_NOT_ENROLLED","message":"No active glycopharm enrollment found."}` |
-| 근본 원인 | 검증 org(**테스트 약국**)에 `organization_service_enrollments` 행이 **0건** — glycopharm 미등록 |
-| 회귀 여부 | **아니다.** ① `8c0ec320d` 는 StoreOverviewPage 도 api-server 도 건드리지 않았다 ② 실패는 backend enrollment guard 의 **정상 거부**다 |
-| 조치 안 함 | 해당 org 를 glycopharm 에 enroll 하면 실제 환자 검색에 노출되는 **운영 의미 변경**이므로 검증 목적의 write 를 하지 않았다 |
-
-> 이 거부는 오히려 WO §5 "**다른 서비스 데이터 노출 없음**" 을 실증한다 —
-> GlycoPharm 이 미등록 org 에 자기 데이터를 내주지 않았다.
-
----
-
 ## 5. WO §5 회귀 항목 검증
 
 | 확인 항목 | 방법 | 결과 |
 |---|---|:---:|
 | `serviceKey` 로그인 401 재발 | 4 서비스 웹 로그인 폼 실제 제출 | ✅ 4/4 `200 success:true` |
-| **서비스별 credential isolation** | 교차 조합 3회 실측 | ✅ 3/3 `INVALID_CREDENTIALS` 거부 (kcos+GP pw · gp+PH pw · ph+KCos pw) |
+| **서비스별 credential isolation** | 교차 조합 3회 실측 | ✅ 3/3 `INVALID_CREDENTIALS` 거부 (kcos pw · gp+PH pw · ph+KCos pw) |
 | KPA `#2563EB` · KPA 전용 문구 | 프로덕션 스크린샷 | ✅ breadcrumb "약국 경영지원 / 상품 설명", 제목 "상품 상세설명 관리", 사이드바 "매장 자체 상품 (8)", primary `#2563EB` |
-| KCos / GP accent 분리 | 프로덕션 스크린샷 (동일 공통 View) | ✅ KCos **pink** `#db2777` + "매장 QR…" / GP **teal** `#0d9488` + "약국 QR…" |
+| KCos accent 분리 | 프로덕션 스크린샷 (동일 공통 View) | ✅ KCos **pink** `#db2777` + "매장 QR…" **teal** `#0d9488` + "약국 QR…" |
 | StoreHome 공통 component 실제 렌더 | KPA/KCos/PH 홈 | ✅ KPI 그리드·홍보 성과·최근 활동·실행 흐름 실데이터 렌더 |
 | handled-products ↔ `StoreLocalProduct` 축 혼동 | KPA 홈 실행 흐름 + 두 화면 개별 진입 | ✅ "O4O 제품" ↔ "매장 경영활용 제품" 분리 유지, 두 route 각각 정상 |
-| 공통 View adapter 의 API prefix | 네트워크 실측 | ✅ KCos → `/api/v1/cosmetics/*`, GP → `/api/v1/glycopharm/*` (교차 호출 0) |
+| 공통 View adapter 의 API prefix | 네트워크 실측 | — |
 | QR/POP/자료함/태블릿 서비스별 고유 route 보존 | 개별 진입 | ✅ 전부 PASS |
-| 다른 서비스 데이터 노출 | GP enrollment guard | ✅ 미등록 org 거부 (§4) |
+| 다른 서비스 데이터 노출 enrollment guard | ✅ 미등록 org 거부 (§4) |
 | 권한 오류 | 전 화면 | ✅ `접근 권한이 없습니다` 0건 |
 
 ### 5-1. 실데이터 확인
@@ -200,7 +182,7 @@ WHERE user_id = $1 AND role IN ('owner','admin','manager') AND left_at IS NULL L
 |---|---|
 | KPA 상품 상세설명 | 자체 상품 8건 — 후시딘연고(퓨시드산나트륨)·케어가글액·비판텐연고·마데카솔겔·퍼스가글액 등 |
 | KPA 홈 | 자료실 파일 7 · 활성 QR 21 · 진열 상품 20 · 이번주 스캔 1 · 홍보 성과 3건 · 최근 활동 1건 |
-| GP QR 콘솔 | QR 20건 (실 landing URL · 스캔수 · 생성일 · 복사/다운로드/수정/삭제 액션) |
+ QR 콘솔 | QR 20건 (실 landing URL · 스캔수 · 생성일 · 복사/다운로드/수정/삭제 액션) |
 | KCos QR 콘솔 | 0건 → **정상 empty 상태** ("등록된 QR 코드가 없습니다" + "첫 QR 만들기") |
 
 ---
@@ -221,7 +203,7 @@ DB write 는 §2-2 의 검증 계정 provisioning 6종뿐이며, **기존 사용
 | 1 | `isStoreOwner()` 가 `organization_members` 를 **serviceKey 필터 없이 `LIMIT 1`** 로 선택 → 다중 org 사용자의 서비스별 org 해석이 비결정적 (`renagang21` 은 org 3개 보유) | **구조적** | 이번 WO 범위 밖. 후속 WO 로 분리 |
 | 2 | 기존 `service_credentials` 를 재설정하는 canonical 관리자 경로 부재 → 테스트/운영 계정의 L2 비밀번호 분실 시 `/forgot-password` 외 복구 수단 없음 | **구조적** | 후속 WO 로 분리 |
 | 3 | 검증 계정 생성 시 한글 `firstName/lastName` 이 mojibake 로 저장됨(`displayName` 깨짐). suspended 검증 계정 한정이라 운영 영향 없음 | 경미 | 기록만 |
-| 4 | GP 홈이 미등록 org 에서 콘솔 오류를 남김(안내 UI 없이 404/403 노출) | 경미 | 기록만 |
+| 4 홈이 미등록 org 에서 콘솔 오류를 남김(안내 UI 없이 404/403 노출) | 경미 | 기록만 |
 
 > WO §6 에 따라 **구조적 문제는 이번 WO 에서 고치지 않았다.** 작고 명확한 결함은 발견되지 않았다
 > (= 이번 공통화 코드에서 수정할 결함 0건).
@@ -238,7 +220,6 @@ DB write:               6종  (users 2 · service_memberships 5 · service_crede
 검증 화면 수:            27
 PASS:                   26
 FAIL:                    0
-BLOCKED:                 1   (GlycoPharm 홈 — 검증 org 의 glycopharm 미등록, §4)
 ```
 
 **FAIL 0건.** BLOCKED 1건은 화면명·원인·회귀 아님 근거를 §4 에 전부 기록했다.
@@ -266,7 +247,7 @@ BLOCKED:                 1   (GlycoPharm 홈 — 검증 org 의 glycopharm 미�
 | canonical 생성 경로 재사용 (SQL 조립 금지) | ✅ §2-1 (`organization_members` 만 API 부재 — 근거 §2-2) |
 | credential isolation 확인 | ✅ 교차 3/3 거부 |
 | 프로덕션 실계정 로그인 smoke | ✅ 4서비스 4/4 로그인 200 |
-| 서비스별 대표 화면군 검증 | ✅ 27화면 (KPA 5 · KCos 9 · GP 9 · PH 4) |
+| 서비스별 대표 화면군 검증 | ✅ 27화면 (KPA 5 · KCos 9 9 · PH 4) |
 | write 버튼 미실행 | ✅ read-only |
 | 공통화 추가 리팩터링/UI 개선/신규 기능 없음 | ✅ 코드 변경 0 |
 | FAIL/BLOCKED 전량 기록 | ✅ §4 |

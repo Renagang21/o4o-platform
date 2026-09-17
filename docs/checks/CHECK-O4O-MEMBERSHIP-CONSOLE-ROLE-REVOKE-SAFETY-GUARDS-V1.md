@@ -23,9 +23,9 @@
 |---|---|
 | Route | `DELETE /api/v1/operator/members/:userId/roles/:role` |
 | 등록 | `apps/api-server/src/routes/operator/membership.routes.ts:50` |
-| Guard | `authenticate` + `requireRole([platform:super_admin, {neture,glycopharm,cosmetics,kpa}:{admin,operator}])` + `injectServiceScope` |
+| Guard | `authenticate` + `requireRole` + `injectServiceScope` |
 | 프런트 소비처 | `packages/ui/src/operator-user-detail/UserDetailPage.tsx:460` (`handleRemoveRole`) — **유일** |
-| 노출 화면 | web-glycopharm / web-k-cosmetics / web-kpa-society / web-neture 의 운영자 `UserDetailPage` + `packages/operator-core-ui` `OperatorMembersConsolePage` |
+| 노출 화면 | — |
 
 ### 2-2. 확정된 우회 (핵심)
 

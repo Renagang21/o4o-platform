@@ -3,12 +3,11 @@
  * WO-O4O-MY-STORE-REMAINING-VIEW-DUPLICATION-ZERO-CLEANUP-V1
  *
  * 원본 계약 유지:
- *   WO-O4O-GLYCOPHARM-QR-STORE-EXECUTION-V1 (GP QR 콘솔 본체)
  *   WO-O4O-KCOS-STORE-EXECUTION-CANONICAL-ALIGNMENT-V1 (KCos 채택)
- *   WO-O4O-QR-EDITOR-GP-KCOS-PARITY-V1 (편집 모드 = editingId, PUT/POST 분기)
+ *   편집 모드 = editingId, PUT/POST 분기
  *
- * K-Cosmetics / GlycoPharm 사본의 실제 차이는 다음 4가지뿐이었다(diff 실측):
- *   1) API prefix — `/api/v1/cosmetics` vs `/api/v1/glycopharm`  → api adapter 주입
+ * K-Cosmetics 사본의 실제 차이는 다음 4가지뿐이었다(diff 실측):
+ *   1) API prefix — `/api/v1/cosmetics` vs `/api/v1/kpa`         → api adapter 주입
  *   2) accent 색   — `#db2777`/`#fdf2f8` vs `#0d9488`/`#f0fdfa` → theme 주입
  *   3) 명사        — '매장' vs '약국'                            → labels 주입
  *   4) template registry (findTemplate) 경로                     → findTemplate 주입
@@ -67,7 +66,7 @@ export interface StoreQrCreateInput {
 
 /**
  * 서비스별 QR API adapter.
- * 서비스는 자신의 API prefix(cosmetics / glycopharm)와 인증 토큰 획득을 여기서만 책임진다.
+ * 서비스는 자신의 API prefix(cosmetics)와 인증 토큰 획득을 여기서만 책임진다.
  */
 export interface StoreQrConsoleApi {
   list: () => Promise<StoreQrItem[]>;

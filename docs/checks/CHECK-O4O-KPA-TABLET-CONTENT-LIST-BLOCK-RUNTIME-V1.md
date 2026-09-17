@@ -67,13 +67,12 @@ thumbnailUrl (있으면 상단 이미지; Phase 1 서버는 null)
 - `product_focus`: content_list 는 browse 공통 경로에서 렌더되며 별도 분기 없음 → 있어도 깨지지 않음. **product_focus 리팩터/템플릿 whitelist/신규 templateKey 변경 없음.**
 
 ## 8. 공유 패키지 안전
-- `TabletContentCard` additive. `fetchScreen` 은 **KPA 만 주입** → GP/KCos 는 `screen=null` → `contentCards=[]` → content 섹션 미표시. **동작 변경 없음.**
+- `TabletContentCard` additive. `fetchScreen` 은 **KPA 만 주입** → KCos 는 `screen=null` → `contentCards=[]` → content 섹션 미표시. **동작 변경 없음.**
 
 ## 9. 테스트 / 검증
 
 ### 9.1 typecheck / build
 - `@o4o/tablet-kiosk-core` `tsc --noEmit`: **0**.
-- 소비처 `web-kpa-society` / `web-glycopharm` / `web-k-cosmetics` `tsc --noEmit`: **전부 0**.
 - 패키지에 **React 테스트 하니스 없음**(jest/vitest·테스트 파일·testing-library 전무) → 단위 테스트 대신 **Playwright fixture 렌더 검증**(§9.2, WO §9.1 "가능하면"·§10 "로컬 fixture" 허용).
 
 ### 9.2 fixture 주입 render smoke (배포 후, 운영 데이터 무변경)
@@ -121,4 +120,4 @@ DB write 0 · API/서버 resolve/migration 무변경 · 운영 샘플/block 무�
 
 ---
 
-*content_list viewer runtime · "코너 콘텐츠" 카드 섹션(product_list 분리) + 상세 모달(ContentRenderer/DOMPurify) · product 0+content 시 empty-state 미표시 · TabletContentCard additive, GP/KCos 무영향 · typecheck 0(패키지+3소비처) · 배포 success · 기존 샘플 non-regression(코너 콘텐츠 미표시) · fixture 주입 render smoke PASS(카드 2종+상세 모달 h3/p/li) · 운영 write 0 · seed 재개 조건 충족.*
+*content_list viewer runtime · "코너 콘텐츠" 카드 섹션(product_list 분리) + 상세 모달(ContentRenderer/DOMPurify) · product 0+content 시 empty-state 미표시 · TabletContentCard additive, KCos 무영향 · typecheck 0(패키지+3소비처) · 배포 success · 기존 샘플 non-regression(코너 콘텐츠 미표시) · fixture 주입 render smoke PASS(카드 2종+상세 모달 h3/p/li) · 운영 write 0 · seed 재개 조건 충족.*

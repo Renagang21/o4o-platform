@@ -11,7 +11,7 @@
 
 선행 IR/CHECK 에서 "frontend `requestJoin` 이 `/forum/categories/:id/join` 호출, 통합 backend 는 `/join-requests` 제공" 으로 보여 **잠재 live 404** 가 기록되었다. 본 IR 은 4서비스의 join client base·경로·backend 마운트를 실측 대조한다.
 
-**핵심 결론(선행 우려 정정):** **live 404 는 없다.** 경로 차이는 버그가 아니라 **서비스별 apiClient base + 백엔드 라우트 표기 규약의 짝맞춤** 때문이며, 두 membership 라우트 표면은 **동일한 backend 서비스(`ForumMembershipService`)와 동일한 canonical 테이블(`forum_join_requests`/`forum_category_members`)** 위에서 동작한다(데이터 분기 없음). 실제 잔여 이슈는 ① REST 표기 이중화(정리 후보) ② GP/KCos 사용자 가입 신청 UI 미연결(기능 공백) 두 가지다.
+**핵심 결론(선행 우려 정정):** **live 404 는 없다.** 경로 차이는 버그가 아니라 **서비스별 apiClient base + 백엔드 라우트 표기 규약의 짝맞춤** 때문이며, 두 membership 라우트 표면은 **동일한 backend 서비스(`ForumMembershipService`)와 동일한 canonical 테이블(`forum_join_requests`/`forum_category_members`)** 위에서 동작한다(데이터 분기 없음). 실제 잔여 이슈는 ① REST 표기 이중화(정리 후보) ② KCos 사용자 가입 신청 UI 미연결(기능 공백) 두 가지다.
 
 ---
 
@@ -24,7 +24,7 @@
 | origin/main ahead/behind | `0 / 0` |
 | 조사 기준 commit | `47e913959` |
 
-**다른 세션 WIP(활발 — 본 IR 미접촉):** MarketTrial* 삭제(web-kpa/glyco/kcos), web-* 다수 수정(StoreSidebar, public.ts, HomePage, ServiceBanner, CommunityHomePage 등), untracked IR/png. 본 IR 은 신규 문서 1건만 생성.
+**다른 세션 WIP(활발 — 본 IR 미접촉):** MarketTrial* 삭제, web-* 다수 수정(StoreSidebar, public.ts, HomePage, ServiceBanner, CommunityHomePage 등), untracked IR/png. 본 IR 은 신규 문서 1건만 생성.
 
 ---
 
@@ -33,7 +33,6 @@
 | 서비스 | frontend join client | apiClient base | backend membership mount |
 |--------|----------------------|----------------|--------------------------|
 | KPA | `web-kpa-society/src/api/forum.ts` (forumMembershipApi) | `…/api/v1/kpa` (client.ts:18) | `/api/v1/kpa/forum` → `forum-membership.controller.ts` |
-| GlycoPharm | `web-glycopharm/src/services/forumApi.ts` | `…/api/v1` (lib/apiClient.ts) | 통합 `/api/v1/forum` → `ForumMembershipController` |
 | K-Cosmetics | `web-k-cosmetics/src/services/forumApi.ts` | `…/api/v1` | 통합 `/api/v1/forum` |
 | Neture | — (forumMembershipApi 없음) | `…/api/v1` | — (membership 미사용) |
 
@@ -48,13 +47,13 @@
 | KPA | requestJoin (forum.ts:160) | `/forum/categories/:id/join` | /api/v1/kpa | `/api/v1/kpa/forum/categories/:id/join` | ✅ LIVE (ClosedForumAccessBlocker.tsx:55) |
 | KPA | getMembershipStatus (forum.ts:165) | `…/membership-status` | /api/v1/kpa | `/api/v1/kpa/forum/categories/:id/membership-status` | ✅ LIVE |
 | KPA | approveJoin (forum.ts:138) | `…/members/:rid/approve` | /api/v1/kpa | `/api/v1/kpa/forum/categories/:id/members/:rid/approve` | ✅ LIVE (ForumMemberManagementPage) |
-| GP | requestJoin (forumApi.ts:219) | `/forum/categories/:id/join-requests` | /api/v1 | `/api/v1/forum/categories/:id/join-requests` | ⚠️ 정의만 — **호출 0건** |
-| GP | getJoinRequests/approveJoin/members | `…/join-requests`·`…/join-requests/:rid/approve`·`…/members` | /api/v1 | `/api/v1/forum/…` | ✅ LIVE (owner: ForumMemberManagementPage) |
+| requestJoin (forumApi.ts:219) | `/forum/categories:id/join-requests` | api/v1 | `/api/v1/forum/categories:id/join-requests` | ⚠️ 정의만 — **호출 0건** |
+| getJoinRequests/approveJoin/members | `…/join-requests`·`…/join-requests:rid/approve`·`…/members` | api/v1 | `/api/v1/forum/…` | ✅ LIVE (owner: ForumMemberManagementPage) |
 | KCos | requestJoin (forumApi.ts:445) | `/forum/categories/:id/join-requests` | /api/v1 | `/api/v1/forum/categories/:id/join-requests` | ⚠️ 정의만 — **호출 0건** |
 | KCos | getJoinRequests/approveJoin/members | `…/join-requests`·`…/members` | /api/v1 | `/api/v1/forum/…` | ✅ LIVE (owner) |
 | Neture | — | — | — | — | ❌ 기능 없음(mock forum) |
 
-> 주의: KPA frontend 의 requestJoin path 는 `/join`, GP/KCos 는 `/join-requests` — **frontend 끼리도 path 규약이 다르다**(별도 api client 사본). 그러나 각자의 base+backend 와 정합한다.
+> 주의: KPA frontend 의 requestJoin path 는 `/join`, KCos 는 `/join-requests` — **frontend 끼리도 path 규약이 다르다**(별도 api client 사본). 그러나 각자의 base+backend 와 정합한다.
 
 ---
 
@@ -92,7 +91,7 @@
 
 ## 8. 서비스별 route contract 매트릭스
 
-| 항목 | KPA | GP | KCos | Neture |
+| 항목 | KPA | KCos | Neture |
 |------|-----|----|----|--------|
 | apiClient base | /api/v1/**kpa** | /api/v1 | /api/v1 | /api/v1 |
 | join path(코드) | `/join` | `/join-requests` | `/join-requests` | — |
@@ -108,7 +107,7 @@
 ## 9. runtime 404 가능성 판단
 
 - **KPA**: `/api/v1/kpa/forum/categories/:id/join` → KPA 컨트롤러가 `/join` 서빙 → **정합, 404 없음.**
-- **GP/KCos**: `/api/v1/forum/categories/:id/join-requests` → 통합 forum.routes 가 `/join-requests` 서빙 → **정합, 404 없음.** (단 user requestJoin 미호출이라 실행 자체가 발생 안 함.)
+- **KCos**: `/api/v1/forum/categories:id/join-requests` → 통합 forum.routes 가 `/join-requests` 서빙 → **정합, 404 없음.** (단 user requestJoin 미호출이라 실행 자체가 발생 안 함.)
 - **Neture**: 기능 없음 → 404 발생 경로 없음.
 - **선행 우려(`/join` vs `/join-requests` live 404)는 false alarm** — KPA 의 apiClient base 가 core(/api/v1)가 아닌 service-scoped(/api/v1/kpa)라서 `/join` 이 KPA 컨트롤러로 정확히 라우팅됨.
 
@@ -126,7 +125,7 @@
 ## 11. closed forum 접근/가입 신청 flow
 
 - **KPA**: closed forum 진입 → `ClosedForumAccessBlocker` 가 `getMembershipStatus` 로 상태 확인 → 비회원이면 "가입 신청" → `requestJoin` → `forum_join_requests` pending → owner 가 ForumMemberManagementPage 에서 approve/reject. pending/approved/rejected 상태 표현 존재. **완결.**
-- **GP/KCos**: owner 측(가입 요청 목록·승인/거절·멤버 목록)은 연결되어 있으나, **비회원 user 의 가입 신청 진입 UI(ClosedForumAccessBlocker 류) 부재** → closed forum 을 만들어도 일반 사용자가 가입 신청을 시작할 화면이 없음. (선행 community IR §9 의 "북마크/신고 UI 부재"와 유사한 thin 영역.)
+- **KCos**: owner 측(가입 요청 목록·승인/거절·멤버 목록)은 연결되어 있으나, **비회원 user 의 가입 신청 진입 UI(ClosedForumAccessBlocker 류) 부재** → closed forum 을 만들어도 일반 사용자가 가입 신청을 시작할 화면이 없음. (선행 community IR §9 의 "북마크/신고 UI 부재"와 유사한 thin 영역.)
 - **Neture**: closed forum membership 개념 자체 미도입(공급자 정체성 + mock forum) — 의도된 축소(H).
 
 ---
@@ -149,7 +148,7 @@
 
 | 분류 | 의미 | 해당 |
 |------|------|------|
-| A | 경로 정합, 문제 없음 | KPA join 전체, GP/KCos owner 멤버 관리 |
+| A | 경로 정합, 문제 없음 | KPA join 전체, KCos owner 멤버 관리 |
 | B | frontend 호출만 수정하면 되는 mismatch | 없음(현 호출은 모두 정합) |
 | C | backend alias 필요 compat | 없음(각 base 가 자기 backend 와 정합 — alias 불요) |
 | D | 평행 구현(표기) 정책 결정 | `/join`(KPA-scoped) vs `/join-requests`(통합) REST 표기 이중 — 서비스·테이블은 단일 |
@@ -157,17 +156,17 @@
 | F | write 라 smoke 제한, 정적 판단 | requestJoin/approve(write) — 정적 정합 확인 |
 | G | serviceKey/org boundary 위험 | forum_join_requests join 의 service 재대조 부재(저, §12) |
 | H | 도메인 차이로 유지 | Neture membership 미도입(공급자 정체성) |
-| — | 기능 공백 | GP/KCos 사용자 가입 신청 UI 미연결(requestJoin 정의·미호출) |
+| — | 기능 공백 | KCos 사용자 가입 신청 UI 미연결(requestJoin 정의·미호출) |
 
 ---
 
 ## 15. 즉시 WO 가능한 후보
 
-1. **GP/KCos 사용자 가입 신청 UI 연결** — KPA `ClosedForumAccessBlocker` 패턴을 GP/KCos 에 적용해 비회원 closed-forum 진입 시 `requestJoin` 호출 버튼 노출. backend(통합 `/join-requests`)·client(`requestJoin`) 이미 존재 → frontend-only 소규모 WO. (단 GP/KCos 가 실제 closed forum 을 운영할 계획일 때만 가치 — 정책 확인 §16-1.)
+1. **KCos 사용자 가입 신청 UI 연결** — KPA `ClosedForumAccessBlocker` 패턴을 KCos 에 적용해 비회원 closed-forum 진입 시 `requestJoin` 호출 버튼 노출. backend(통합 `/join-requests`)·client(`requestJoin`) 이미 존재 → frontend-only 소규모 WO. (단 KCos 가 실제 closed forum 을 운영할 계획일 때만 가치 — 정책 확인 §16-1.)
 
 ## 16. 정책 결정 필요 후보
 
-1. **GP/KCos closed-forum 운영 여부** — 사용자 가입 신청 UI 를 채울지(15-1) vs closed forum 자체를 KPA 전용으로 둘지. 서비스 정체성 결정.
+1. **KCos closed-forum 운영 여부** — 사용자 가입 신청 UI 를 채울지(15-1) vs closed forum 자체를 KPA 전용으로 둘지. 서비스 정체성 결정.
 2. **membership REST 표기 canonical 단일화** — `/join` vs `/join-requests` 중 하나로 수렴할지. 서비스·테이블이 이미 단일이므로 frontend 정렬 + 한쪽 라우트 deprecated 로 가능하나, KPA-scoped vs core base 차이까지 함께 정리해야 함(저위험·후순위).
 
 ## 17. backend/API 선행 후보
@@ -179,8 +178,8 @@
 
 | 순위 | 항목 | 근거 |
 |:---:|------|------|
-| 1 | §16-1 GP/KCos closed-forum 정책 결정 | UI 공백 처리 방향 선결 |
-| 2 | §15-1 GP/KCos 가입 신청 UI 연결(정책=운영 시) | frontend-only 경량, parity |
+| 1 | §16-1 KCos closed-forum 정책 결정 | UI 공백 처리 방향 선결 |
+| 2 | §15-1 KCos 가입 신청 UI 연결(정책=운영 시) | frontend-only 경량, parity |
 | 3 | §16-2 membership REST 표기 단일화 | 저위험·후순위 정리 |
 | 4 | §12 boundary 관찰 → serviceKey audit 합류 | 저위험 |
 
@@ -192,13 +191,13 @@
 |------|------|
 | 가입 신청이 사용자 책임과 operator/owner 승인 책임 분리 | ✅ user=신청(forum_join_requests pending) / owner=승인. 분리 명확 |
 | KPA 약사·분회 membership 특수성 보존 | ✅ 본 join(forum membership)은 분회 membership(organization-join, kpa_approval_requests)과 별개로 공존 |
-| GP/KCos/Neture 에 KPA 고유 모델 강제 안 함 | ✅ 강제 없음. GP/KCos 는 동일 통합 서비스 사용, Neture 는 미도입(H) |
+| KCos/Neture 에 KPA 고유 모델 강제 안 함 | ✅ 강제 없음. KCos 는 동일 통합 서비스 사용, Neture 는 미도입(H) |
 | 사용자 forum 과 operator/owner 승인 콘솔 혼합 | ✅ ClosedForumAccessBlocker(user) vs ForumMemberManagementPage(owner) 분리 |
 | serviceKey/serviceCode 경계 안전 | ⚠️ join 서비스 forumId service 재대조 부재(저, §12) — 승인 owner-gated 라 영향 제한 |
-| 없는 route 를 정상 기능처럼 보임 | ✅ 아님 — 각 frontend 호출이 실재 backend 와 정합. GP/KCos requestJoin 은 버튼 미노출(허위 기능 표시 없음) |
+| 없는 route 를 정상 기능처럼 보임 | ✅ 아님 — 각 frontend 호출이 실재 backend 와 정합. KCos requestJoin 은 버튼 미노출(허위 기능 표시 없음) |
 | 공통화가 1인 유지보수성 향상 방향 | ⚠️ 표기 이중(`/join`·`/join-requests`)은 약한 drift — §16-2 단일화 시 개선(후순위) |
 
-**종합:** 폐쇄형 포럼 가입 경로는 **실 버그(404)가 아니며**, 동일 서비스·테이블 위의 **이중 REST 표기 + GP/KCos 사용자 UI 공백**이 잔여다. 우선순위는 GP/KCos closed-forum 정책 결정(운영 시 가입 UI 연결) → 표기 단일화 순이며, 모두 저위험이다.
+**종합:** 폐쇄형 포럼 가입 경로는 **실 버그(404)가 아니며**, 동일 서비스·테이블 위의 **이중 REST 표기 + KCos 사용자 UI 공백**이 잔여다. 우선순위는 KCos closed-forum 정책 결정(운영 시 가입 UI 연결) → 표기 단일화 순이며, 모두 저위험이다.
 
 ---
 
@@ -207,11 +206,11 @@
 - **수정 파일 없음** (신규 IR 문서 1건만 생성)
 - **생성 IR 문서:** `docs/investigations/IR-O4O-FORUM-MEMBERSHIP-JOIN-ROUTE-CONTRACT-AUDIT-V1.md`
 - **조사 기준 commit:** `47e913959` (main, origin 동기화)
-- **frontend join 호출 경로:** KPA `/api/v1/kpa/forum/.../join`(LIVE) · GP/KCos `/api/v1/forum/.../join-requests`(owner LIVE, user 미연결) · Neture 없음
+- **frontend join 호출 경로:** KPA `/api/v1/kpa/forum/.../join`(LIVE) · KCos `/api/v1/forum/.../join-requests`(owner LIVE, user 미연결) · Neture 없음
 - **backend join route:** 통합 `/api/v1/forum/.../join-requests` + KPA-scoped `/api/v1/kpa/forum/.../join` — **동일 `ForumMembershipService` + 동일 canonical 테이블(forum_join_requests/forum_category_members)**
 - **runtime 404 가능성:** **없음** (선행 우려는 KPA service-scoped base 오인에서 비롯된 false alarm)
 - **smoke 결과:** NOT TESTED(write 금지) — 정적 라우트 정합으로 404 부재 확정
-- **즉시 WO 후보:** GP/KCos 사용자 가입 신청 UI 연결(frontend-only, 정책 선결)
-- **정책 결정 후보:** GP/KCos closed-forum 운영 여부 / membership REST 표기 단일화
+- **즉시 WO 후보:** KCos 사용자 가입 신청 UI 연결(frontend-only, 정책 선결)
+- **정책 결정 후보:** KCos closed-forum 운영 여부 / membership REST 표기 단일화
 - **우선순위:** 정책 결정 → 가입 UI 연결 → 표기 단일화 → boundary audit 합류
 - **git status:** 사전 상태와 동일, 다른 세션 WIP 미접촉, 미커밋(read-only IR)

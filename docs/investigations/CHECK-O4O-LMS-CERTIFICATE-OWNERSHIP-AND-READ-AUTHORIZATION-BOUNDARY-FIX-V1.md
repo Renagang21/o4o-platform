@@ -19,7 +19,7 @@
 | 1 | `GET /api/v1/lms/certificates/:id` | KPA `lms.ts`, 직접 호출 | PRIVATE_USER_READ | O (`guardLoadedCourseScope`) | **X** | course join | R | **결함 — 같은 서비스 타인 수료증 read 가능** |
 | 2 | `GET /api/v1/lms/certificates/number/:certificateNumber` | 직접 호출 | PRIVATE_USER_READ | O | **X** | course join | R | **결함 — 번호만 알면 타인 수료증 read** |
 | 3 | `GET /api/v1/lms/certificates/:id/pdf` | KPA (dead link 포함) | PRIVATE_USER_READ | O | △ (403 방식, 존재 노출) | course join | R | **결함 — 비공개 계약 불일치(403) + helper 미사용** |
-| 4 | `GET /api/v1/lms/certificates` | KPA / GlycoPharm / K-Cosmetics "내 수료증" | PRIVATE_USER_READ | O | **X** (client `userId` 그대로 전달) | course scope | R | **결함 — 목록 leak** |
+| 4 | `GET /api/v1/lms/certificates` | KPA / K-Cosmetics "내 수료증" | PRIVATE_USER_READ | O | **X** (client `userId` 그대로 전달) | course scope | R | **결함 — 목록 leak** |
 | 5 | `GET /api/v1/lms/certificates/me` | 공통 | PRIVATE_USER_READ | O | O (본인 강제) | course scope | R | 정상 — 미수정 |
 | 6 | `GET /api/v1/kpa/lms/certificates/:id` | KPA remount (#1 재사용) | PRIVATE_USER_READ | O | **X** | course join | R | **결함 — #1 과 동일 controller** |
 | 7 | `GET /api/v1/kpa/lms/certificates` | KPA remount (#4/#5 재사용) | PRIVATE_USER_READ | O | 상동 | course scope | R | #4 와 동일 |
@@ -32,7 +32,6 @@
 
 - **PRIVATE_USER_READ 7 / PUBLIC_VERIFY 2 / MANAGEMENT 4 / 총 13 / 미조사 0**
 - eligibility(수료 자격) 전용 endpoint 는 존재하지 않는다. 수료 여부는 `GET /lms/completions/me` (본인 범위 고정)가 담당하며 certificate 계약과 분리돼 있다.
-- courseId 기반 certificate 조회 endpoint 는 **백엔드에 없다** (GlycoPharm `getMyCertificate(courseId)` 는 존재하지 않는 `/lms/certificates/course/{id}` 를 호출하는 프런트 잔재 — §7 잔존 사항).
 
 ## 2. canonical 판정 순서 (§4)
 
@@ -163,7 +162,6 @@ certificate 가 0건이라 "본인 200 / 타인 404 / cross-service 404" 를 프
 | KPA 강의 상세 | 200 · 실패 응답 6건은 **전부 기존 `kpa/appreciation/lms_course/*/summary\|recent` 404** (이번 변경과 무관, §14 제외 항목) |
 | KPA 공개 수료증 검증 페이지 `/certificate/verify/{id}` | 200 · 실패 응답 0 · console error 0 · 무효 수료증 안내 정상 렌더 |
 | K-Cosmetics `/lms` | 200 · n=0 빈 상태 정상 · console error 0 |
-| GlycoPharm `/lms` | 200 · n=0 빈 상태 정상 · console error 0 (최초 관측된 module MIME 에러 7건은 stale chunk 캐시 artifact — cache-bust 재측정 시 **0건**) |
 | 신규 404/500 | **0건** |
 | 백지 화면 / JS 예외 | 0건 |
 | enrollment / progress 회귀 | LMS boundary spec 89건 + 전체 jest 2266건 PASS 로 확인 |
@@ -171,7 +169,7 @@ certificate 가 0건이라 "본인 200 / 타인 404 / cross-service 404" 를 프
 ## 10. 잔존 위험
 
 1. **`DATA_FIXTURE_BLOCKED`** — certificate 0건이라 ownership 차단의 프로덕션 실데이터 재현은 미실시. 최초 발급 이후 재확인 권장.
-2. GlycoPharm `getMyCertificate(courseId)` → `/lms/certificates/course/{id}` 는 **백엔드에 없는 경로**(항상 404). 프런트 잔재이며 본 WO 범위 밖.
+2. 프런트 잔재이며 본 WO 범위 밖.
 3. KPA `lms.ts` 의 certificate `/download` 호출 경로는 실제 라우트(`/pdf`)와 다르다. dead link, 범위 밖.
 4. `sanitizeUserFields` 는 email/name 을 유지한다. 본 WO 는 노출 경로를 닫았을 뿐 sanitize 정책 자체는 건드리지 않았다.
 5. certificate 발급/폐기 정책 통일, 수료증 디자인 공통화는 §14 제외 항목으로 유지.
@@ -180,4 +178,4 @@ certificate 가 0건이라 "본인 200 / 타인 404 / cross-service 404" 를 프
 
 발견 0건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 2건
 
-- 별도 WO 제안: (1) GlycoPharm·KPA certificate 프런트 dead 경로 정리, (2) 최초 certificate 발급 후 ownership 프로덕션 재확인.
+- 별도 WO 제안: (1) KPA certificate 프런트 dead 경로 정리, (2) 최초 certificate 발급 후 ownership 프로덕션 재확인.

@@ -35,7 +35,7 @@
 | 본 WO commit | `f4a9a0bfa` |
 | Push 시각 | 2026-05-24 (UTC, push 직후) |
 | Deploy workflow | Run `26349414339` ✓ Complete |
-| 신규 revisions | glycopharm-web-00709-gp6 / kpa-society-web-01127-l2d / k-cosmetics-web-00512-58b |
+| 신규 revisions | — |
 | 배포 시각 | 2026-05-24T02:17Z UTC |
 
 ---
@@ -44,9 +44,9 @@
 
 | # | 파일 | 변경 | 정렬 위치 |
 |---|---|---|---|
-| 1 | `web-glycopharm/src/pages/operator/ProductsPage.tsx` | +4 | `fetchProducts` 의 URLSearchParams 객체 인자에 `serviceKey: 'glycopharm'` |
+| 1 | — | 4 | — |
 | 2 | `web-k-cosmetics/src/pages/operator/ProductsPage.tsx` | +4 | 동일 패턴, `serviceKey: 'k-cosmetics'` |
-| 3 | `web-glycopharm/src/pages/operator/StoresPage.tsx` | +4 | `glycoStoresApi.listStores` 의 qs.set + `serviceKey=glycopharm` |
+| 3 | — | 4 | — |
 | 4 | `web-kpa-society/src/pages/operator/OperatorStoresPage.tsx` | +4 | `kpaStoresApi.listStores` 의 qs.set + `serviceKey=kpa-society` |
 | 5 | `web-k-cosmetics/src/pages/operator/StoresPage.tsx` | +4 | `fetchStores` 의 URLSearchParams 객체 인자에 `serviceKey: 'k-cosmetics'` |
 | 6 | `web-kpa-society/src/pages/operator/KpaOperatorDashboard.tsx` | +2/-1 | line 64 의 `/operator/stores?limit=1` URL 에 `&serviceKey=kpa-society` 추가 |
@@ -60,9 +60,9 @@
 
 | Endpoint | Service | 위치 |
 |---|---|---|
-| `/operator/products` | GP | `ProductsPage.tsx:88` URLSearchParams 객체 인자 |
+| `/operator/products` | `ProductsPage.tsx:88` URLSearchParams 객체 인자 |
 | `/operator/products` | K-Cos | `ProductsPage.tsx:78` 동일 |
-| `/operator/stores` | GP | `StoresPage.tsx:45` `glycoStoresApi.listStores` |
+| `/operator/stores` | `StoresPage.tsx:45`
 | `/operator/stores` | KPA | `OperatorStoresPage.tsx:47` `kpaStoresApi.listStores` |
 | `/operator/stores` | K-Cos | `StoresPage.tsx:93` URLSearchParams 객체 인자 |
 | `/operator/stores?limit=1` (dashboard stats) | KPA | `KpaOperatorDashboard.tsx:65` URL string |
@@ -94,17 +94,14 @@ platformApi.get('/operator/analytics/summary', { serviceKey: SERVICE_KEY, days }
 
 ## 5. 항목별 검증 결과
 
-### A. Products (GP / K-Cos) — ⏳ Rena 1 회 확인
+### A. Products (K-Cos) — ⏳ Rena 1 회 확인
 
 **예상 동작:**
-- platform admin 접속 시 `?page=1&limit=20&sortBy=createdAt&sortOrder=DESC&serviceKey={glycopharm|k-cosmetics}` 으로 호출
 - 200 OK (이전 400 해소)
 
 **확인 방법:** 각 서비스 operator products 화면 진입 + DevTools Network 에서 serviceKey 확인.
 
-### B. Stores (GP / KPA / K-Cos) — ⏳ Rena 1 회 확인
-
-**예상:** 동일 패턴, `serviceKey={glycopharm|kpa-society|k-cosmetics}` 포함, 200 OK.
+### B. Stores (KPA / K-Cos) — ⏳ Rena 1 회 확인
 
 ### C. KPA OperatorDashboard stores stats — ⏳ Rena 1 회 확인
 
@@ -155,9 +152,9 @@ Rena `platform:super_admin` 계정으로 각 화면 접속 + DevTools Network �
 
 | # | 화면 | 확인 호출 URL |
 |---|---|---|
-| 1 | GlycoPharm /operator/products | `?serviceKey=glycopharm` 포함 + 200 |
+| 1 | operator/products | — |
 | 2 | K-Cosmetics /operator/products | `?serviceKey=k-cosmetics` 포함 + 200 |
-| 3 | GlycoPharm /operator/stores | `?serviceKey=glycopharm` 포함 + 200 |
+| 3 | operator/stores | — |
 | 4 | KPA /operator/stores (or 동등) | `?serviceKey=kpa-society` 포함 + 200 |
 | 5 | K-Cosmetics /operator/stores | `?serviceKey=k-cosmetics` 포함 + 200 |
 | 6 | KPA OperatorDashboard | stores stats 호출에 `&serviceKey=kpa-society` 포함 + 200 |
@@ -195,9 +192,7 @@ Rena `platform:super_admin` 계정으로 각 화면 접속 + DevTools Network �
 
 | 항목 | 필수 | 결과 |
 |---|:---:|:---:|
-| A. GP Products browser 검증 | ★ | ⏳ Rena |
 | B. K-Cos Products browser 검증 | ★ | ⏳ Rena |
-| C. GP Stores browser 검증 | ★ | ⏳ Rena |
 | D. KPA Stores browser 검증 | ★ | ⏳ Rena |
 | E. K-Cos Stores browser 검증 | ★ | ⏳ Rena |
 | F. KPA Dashboard stores stats 검증 | ★ | ⏳ Rena |
@@ -226,7 +221,6 @@ Rena `platform:super_admin` 계정으로 각 화면 접속 + DevTools Network �
 
 ```bash
 # Cloud Run revisions 배포 확인
-for SVC in glycopharm-web kpa-society-web k-cosmetics-web; do
   echo "=== $SVC ==="
   gcloud run revisions list --service $SVC \
     --region asia-northeast3 --project netureyoutube \
@@ -237,8 +231,6 @@ done
 git show --stat f4a9a0bfa
 
 # (Rena) Browser DevTools 에서 호출 URL 확인 (예시)
-# https://glycopharm.co.kr/operator/products → Network 탭 → /operator/products 요청에
-#   ?page=1&limit=20&sortBy=createdAt&sortOrder=DESC&serviceKey=glycopharm 포함 확인
 ```
 
 ---

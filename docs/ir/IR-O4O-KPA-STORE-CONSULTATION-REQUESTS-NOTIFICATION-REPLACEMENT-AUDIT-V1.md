@@ -2,7 +2,7 @@
 
 > 조사 대상: KPA 매장 `상담 요청` (`/store/requests`)의 실제 용도 및 알림 대체 가능성
 > 유형: **READ-ONLY 조사 (코드 변경 없음, 수정은 별도 WO)**
-> 조사일: 2026-06-25 / 범위: KPA 우선 (GP/KCos parity 포함)
+> 조사일: 2026-06-25 / 범위: KPA 우선 (KCos parity 포함)
 
 ---
 
@@ -70,7 +70,7 @@ flowchart TD
 - **중복 메뉴**: 채널 그룹에 `태블릿` + `상담 요청` 공존. 상담 요청은 태블릿 요청의 처리 큐로, 기능적으로 태블릿 운영의 일부.
 - **알림 누락**: 요청 생성/상태 변경 시 알림이 전혀 없음 → 직원은 화면 polling 의존. (알림 인프라는 존재하나 미연결)
 - **요청 상태 처리 동선 부재**: 확인/완료/취소가 `/store/requests` 외 어디에도 없음. 알림 클릭 → 처리로 가는 동선도 미완성(프론트 navigate 미구현).
-- **QR/태블릿 source 불일치**: KPA `tablet_interest_requests` 에 source 구분 컬럼이 없어 QR발 요청과 태블릿발 요청을 구분 못함. (참고: GP `glycopharm_customer_requests` 는 `source_type`(qr/tablet/web/signage/print) + `purpose` 보유 — 더 일반적 모델)
+- **QR/태블릿 source 불일치**: KPA `tablet_interest_requests` 에 source 구분 컬럼이 없어 QR발 요청과 태블릿발 요청을 구분 못함.
 - **QR page 상담 동선 단절**: page 콘텐츠 본문 하단에 상담 CTA가 없어, 콘텐츠를 본 고객이 상담으로 이어지지 못함. (현재는 별도 landingType=tablet QR만 상담 가능)
 - **legacy/dead 의심**: `tablet_service_requests` 는 키워드상 등장하나 본 조사에서 KPA live 참조는 `tablet_interest_requests` 로 확인됨. `tablet_service_requests` 실참조 여부는 **수정 WO 전 별도 grep 확인 권장**(현 조사 범위에서는 live 경로 미확인).
 - **삭제 시 깨질 지점**: `/store/requests` 메뉴 제거 시 `StoreChannelsPage`(2개 링크) + `StoreHomePage`(바로가기) 가 dead link 가 됨. route 자체도 동시 정리 필요.
@@ -105,19 +105,16 @@ flowchart TD
 1. **HTML 직접 삽입 금지**: 같은 콘텐츠가 자료실/태블릿/POP/블로그/QR로 재사용되므로 본문 HTML 에 버튼을 박지 않는다.
 2. **설정값 도입**: `store_qr_codes` 에 `consultation_cta_enabled` / `consultation_cta_label` / `consultation_cta_placement` 컬럼 추가 → `GET /qr/public/:slug` 응답 포함 → `QrLandingPage` 의 page 렌더 **하단에 조건부 버튼** 렌더.
 3. **공통 상담 요청 API**: 버튼 클릭 시 공통 생성 API 호출. `source='qr'`, `targetType='content|page|video|product'`, `targetId` 저장.
-4. **source 구분 도입 검토**: KPA `tablet_interest_requests` 에 `source` 컬럼 추가 또는 GP의 `customer_requests`(sourceType+purpose) 모델로의 통합을 별도 IR에서 판단. 태블릿/QR 상담 API 통합 권장.
+4. 태블릿/QR 상담 API 통합 권장.
 
 ---
 
-## 7. GP/KCos parity (참고)
+## 7. KCos parity (참고)
 
 | 서비스 | route | 페이지 | 메뉴 등록 | 테이블 |
 |---|---|---|---|---|
 | KPA | `/store/requests` | `TabletRequestsPage` | ✅ 채널 그룹 | `tablet_interest_requests` (source 없음) |
-| GlycoPharm | `/store/requests` | `CustomerRequestsPage` | ❌ 메뉴 미등록(숨은 route) | `glycopharm_customer_requests` (source_type+purpose, action_logs) |
 | K-Cosmetics | `/store/interest-requests` | `InterestRequestsPage` | ❌ 메뉴 미등록 | (별도 확인 필요) |
-
-→ 메뉴 노출은 **KPA 만 활성.** GP/KCos 는 route 만 존재(숨김). 메뉴 정리는 KPA 한정으로 진행 가능하나, **요청 모델 통합(source/purpose) 방향은 GP의 `customer_requests` 가 참고 모델**이다.
 
 ---
 

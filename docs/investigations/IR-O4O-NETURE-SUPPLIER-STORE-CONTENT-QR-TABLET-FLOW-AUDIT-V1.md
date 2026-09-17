@@ -246,7 +246,7 @@ D1은 확정. D2~D4(특히 D3) 확정 후 첫 WO를 뽑는 것을 권장한다.
 ### E-1. 가져오기=복사 흐름 **이미 존재**(HUB 콘텐츠 대상)
 
 - 진입 UI: `HubContentLibraryPage.tsx`("내 약국에 복사"). 복사 액션 = `assetSnapshotApi.copy(...)` → `POST /copy`(`create-asset-copy-controller.ts:68`).
-- 3개 매장 서비스(KPA/GlycoPharm/K-Cosmetics)에 동일 존재.
+- 3개 매장 서비스에 동일 존재.
 
 ### E-2. 복사 의미론 — **COPY(매장 소유 사본), 참조 아님**
 

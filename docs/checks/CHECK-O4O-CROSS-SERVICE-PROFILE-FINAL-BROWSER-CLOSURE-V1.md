@@ -137,7 +137,6 @@ DB schema / migration / Identity 재설계 / membership 구조 변경 / 신규 �
 | `@o4o/auth-utils` build (`tsc --build`) | PASS |
 | `web-k-cosmetics` typecheck | OK |
 | `web-neture` typecheck | OK |
-| `web-glycopharm` typecheck | OK |
 | `web-pharmacy-hub` typecheck | OK |
 | `web-account` typecheck | OK |
 | `web-kpa-branch` typecheck | OK |
@@ -145,7 +144,7 @@ DB schema / migration / Identity 재설계 / membership 구조 변경 / 신규 �
 | `auth-account.businessInfoWrite.test.ts` + `self-profile-write-contract.spec.ts` | PASS — 2 suites / **33 tests** |
 | CI / Deploy | Web `32113478149` success · API `32114440439` success |
 
-공통 패키지(`@o4o/auth-utils`) 변경이므로 GP · PH · account · kpa-branch 포함 6 소비처 전부 typecheck 회귀를 확인했다.
+공통 패키지(`@o4o/auth-utils`) 변경이므로 PH · account · kpa-branch 포함 6 소비처 전부 typecheck 회귀를 확인했다.
 
 ---
 

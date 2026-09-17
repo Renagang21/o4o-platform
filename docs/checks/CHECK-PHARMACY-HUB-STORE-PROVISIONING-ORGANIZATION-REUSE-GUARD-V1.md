@@ -250,5 +250,5 @@ renagang21 수동 연결 · `organization_members` 수동 보정 · service-neut
 `organization_product_listings` 와 `store_tablet_screen_sets` 는 **`service_key` 컬럼을 갖고도
 조회에서 쓰지 않아** 실효적으로 org-scoped 다. 이번 가드는 이를 "neutral" 로 취급해 안전을 확보했지만,
 근본적으로는 두 조회 경로가 `service_key` 를 필터에 넣는 편이 맞다.
-다만 이는 KPA·GlycoPharm·K-Cosmetics 의 기존 목록 결과를 바꿀 수 있는 변경이라 별도 판단이 필요하다.
+다만 이는 KPA·K-Cosmetics 의 기존 목록 결과를 바꿀 수 있는 변경이라 별도 판단이 필요하다.
 → 후속 관찰: `WO-O4O-STORE-ASSET-SERVICE-KEY-FILTER-ALIGNMENT-V1` (제안)

@@ -11,9 +11,9 @@
 | 커밋 | 내용 |
 |------|------|
 | `de364ef9f` | `IR-O4O-OPERATOR-MEMBERS-LIST-COMMONIZATION-DESIGN-V1` — Option C 확정 |
-| `a8becbadd` | **`WO-O4O-OPERATOR-MEMBERS-LIST-COMMONIZATION-V1`** — Neture/GP/K-Cos 3 service thin wrapper |
+| `a8becbadd` | **`WO-O4O-OPERATOR-MEMBERS-LIST-COMMONIZATION-V1`** — Neture/K-Cos 2 service thin wrapper |
 | `3c8ab8f93` | `WO-O4O-MEMBER-MANAGEMENT-HARD-DELETE-FLOW-COMMONIZATION-V1` — admin 완전삭제 공통화 |
-| `6f9471173` | `WO-O4O-OPERATOR-MEMBERS-DELETE-FLOW-COMMONIZATION-V1` — GP/K-Cos admin Delete Flow 공통화 |
+| `6f9471173` | `WO-O4O-OPERATOR-MEMBERS-DELETE-FLOW-COMMONIZATION-V1` — K-Cos admin Delete Flow 공통화 |
 
 ---
 
@@ -53,25 +53,6 @@
 | renderDeleteFlow | ✅ `NetureDeleteFlow` (soft delete only) | hard delete는 admin 전용 |
 | extraBulkActions | ✅ 정지/복원/탈퇴 3종 | |
 | 원래 크기 → thin wrapper | 917줄 → 346줄 | **-63%** |
-
-### GlycoPharm — `UsersPage.tsx` (367줄)
-
-| 항목 | 상태 | 내용 |
-|------|------|------|
-| OperatorMembersConsolePage 사용 | ✅ | import 및 렌더 |
-| 자체 DataTable/ActionBar 로직 | ❌ 없음 | wrapper에 위임 |
-| serviceKey | ✅ `'glycopharm'` | |
-| client adapter | ✅ `gpMembersClient` | list/stats/updateStatus/batchUpdateStatus/updatePassword |
-| roleTabs | ✅ 약사/약국 경영자 2종 | |
-| statusTabs | ✅ 승인/반려/정지/탈퇴 4종 | |
-| getPrimaryRole | ✅ GP 참여 유형 도출 | |
-| roleDisplayMap | ✅ `GP_ROLE_DISPLAY` (약사/약국 경영자/공급자 등) | |
-| extraColumns | ✅ 운영권한 1컬럼 | |
-| renderEditModal | ✅ `EditUserModal` | |
-| renderDeleteFlow | ✅ `GpDeleteRiskFlow` (soft delete + 리스크 조회) | hard delete는 admin 전용 |
-| extraRowActions | ✅ 정지/복원 단건 | |
-| extraBulkActions | ✅ 정지/복원/탈퇴 3종 | |
-| 원래 크기 → thin wrapper | 957줄 → 367줄 | **-62%** |
 
 ### K-Cosmetics — `UsersPage.tsx` (310줄)
 
@@ -128,7 +109,6 @@ KPA는 KpaMember entity / activity_type / capabilities 등 본질적 차이가 �
 | 항목 | 상태 |
 |------|------|
 | Neture `EditUserModal` | ✅ `renderEditModal` slot으로 주입 |
-| GlycoPharm `EditUserModal` | ✅ `renderEditModal` slot으로 주입 |
 | K-Cosmetics `EditUserModal` | ✅ `renderEditModal` slot으로 주입 |
 | `CommonUserDetailPage` (Hybrid Canonical) | 영향 없음 — slot 구조 외부 |
 
@@ -157,4 +137,3 @@ KPA는 KpaMember entity / activity_type / capabilities 등 본질적 차이가 �
 | EditUserModal 통합 여부 조사 | IR | 낮음 (3서비스 EditModal 구조 유사, 공통화 검토 가능) |
 | API client 통일 여부 조사 | IR | 낮음 (각 서비스 `MembersConsoleClient` impl, 패턴은 동일) |
 | Operator Members smoke check | CHECK | 낮음 (계정 있을 때 live 검증) |
-| GlycoPharm `searchPlaceholder` 커스텀 적용 | WO 후보 | 낮음 (prop 이미 노출됨) |

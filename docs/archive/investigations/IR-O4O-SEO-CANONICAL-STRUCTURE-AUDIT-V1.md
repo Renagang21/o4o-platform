@@ -15,11 +15,10 @@
 | 서비스 | `<title>` | `<meta name="description">` | og:* | canonical |
 |--------|-----------|----------------------------|------|-----------|
 | **KPA-Society** | `KPA Society - O4O Platform` | **없음** | **없음** | **없음** |
-| **GlycoPharm** | `GlycoPharm - 혈당관리 전문 플랫폼` | `약사를 위한 혈당관리 전문 플랫폼` | **없음** | **없음** |
 | **K-Cosmetics** | `K-Cosmetics - O4O Platform` | **없음** | **없음** | **없음** |
 | **Neture** | `Neture - O4O Platform` | **없음** | **없음** | **없음** |
 
-**결론**: GlycoPharm만 description 1개 보유. 나머지 서비스는 title 외 모든 SEO 메타 누락.
+나머지 서비스는 title 외 모든 SEO 메타 누락.
 
 ### 1-2. KPA-Society 배포 페이지 실측 (CSR 한계)
 
@@ -46,7 +45,7 @@ CSR SPA이므로 크롤러가 수신하는 HTML = index.html 정적 파일 (JS �
 ISSUE: react-helmet / react-helmet-async 어디에도 설치되지 않음.
 ```
 
-- `package.json` (web-kpa-society, web-glycopharm, web-k-cosmetics): helmet 의존성 없음
+- `package.json` helmet 의존성 없음
 - `packages/*`: 공통 패키지 어디에도 없음
 
 ### 2-2. 현재 사용 중인 패턴
@@ -217,7 +216,6 @@ RECOMMEND (현실적): Phase 1 즉시 적용 → Phase 2는 서비스 성숙도 
 | 서비스 | SEO 중요도 | 이유 |
 |--------|-----------|------|
 | **KPA-Society** | 중 | 약사 커뮤니티 — 폐쇄적 성격, 외부 검색 유입보다 내부 사용 중심 |
-| **GlycoPharm** | 높음 | 혈당 관리 — 일반인 검색 유입 가능성 있음 |
 | **K-Cosmetics** | 높음 | B2B/B2C 제품 노출 — 검색 유입 직결 |
 | **Neture** | 중 | 파트너 플랫폼 — 일반 검색보다 파트너 직접 접근 중심 |
 
@@ -228,8 +226,6 @@ RECOMMEND (현실적): Phase 1 즉시 적용 → Phase 2는 서비스 성숙도 
 ### PASS
 
 없음. 전 서비스 SEO 구조 미구축 상태.
-
-(GlycoPharm의 `<meta name="description">` 1개는 최소 조치이나, 나머지 전부 누락이므로 PASS 판정 불가)
 
 ### ISSUE
 
@@ -257,7 +253,7 @@ RECOMMEND (현실적): Phase 1 즉시 적용 → Phase 2는 서비스 성숙도 
 | SEO-R05 | 블로그 게시물 JSON-LD Article 추가 | 단기 | `StoreBlogPostPage` |
 | SEO-R06 | `navigation.ts` → pageTitle/description 필드 추가 | 중기 | 메뉴 구조 정비 후 |
 | SEO-R07 | Vite SSG(빌드타임 prerender) 도입 검토 | 중기 | 블로그 SEO 중요 시 |
-| SEO-R08 | GlycoPharm, K-Cosmetics 즉시 SEO-R01~R03 적용 | 즉시 | 검색 유입 중요도 높음 |
+| SEO-R08 | K-Cosmetics 즉시 SEO-R01~R03 적용 | 즉시 | 검색 유입 중요도 높음 |
 
 ---
 
@@ -267,7 +263,6 @@ RECOMMEND (현실적): Phase 1 즉시 적용 → Phase 2는 서비스 성숙도 
 |------|------|------|
 | `packages/shared-space-ui/src/blog/useBlogSeo.ts` | 동적 메타 설정 훅 | 블로그 2개 페이지만 사용 |
 | `services/web-kpa-society/index.html` | 정적 초기 메타 | title만 존재 |
-| `services/web-glycopharm/index.html` | 정적 초기 메타 | title + description |
 | `services/web-k-cosmetics/index.html` | 정적 초기 메타 | title만 존재 |
 | `services/web-neture/index.html` | 정적 초기 메타 | title만 존재 |
 | `services/web-kpa-society/src/config/navigation.ts` | 메뉴 구조 | SEO 연결 필드 없음 |

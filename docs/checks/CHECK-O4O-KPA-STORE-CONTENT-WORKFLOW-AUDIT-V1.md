@@ -232,7 +232,7 @@ Screen Set 저작 진입점은 **`/store/commerce/tablet-displays` 페이지의 
 > 5. 코너 미적용 세트의 공개 QR 상품 fallback 금지 (M-5)
 > 6. 표기 통일 및 진입점 보강 (C-1 · C-2 · C-4 · H-2) · dead `HubSubNav.tsx` 삭제 (H-3) · 거짓 전제 주석 정정 (D-1)
 >
-> **제외**: 제작/기기 IA 분리 · legacy `고급 설정` 은퇴 · HUB 게시 데이터 생성 · GlycoPharm · K-Cosmetics
+> **제외**: 제작/기기 IA 분리 · legacy `고급 설정` 은퇴 · HUB 게시 데이터 생성 · K-Cosmetics
 > **검증**: 보관→QR 만료→복원→QR 재개방 왕복 · 미적용 세트 QR 공개 화면 상품 0건 · 편집기 QR 탭 = 공개 `/qr/{slug}` parity · KPI 수치 일치
 > **중지 조건**: 코너 QR slug 계약(`publicQrSlug` 불변) 변경이 필요해질 때
 

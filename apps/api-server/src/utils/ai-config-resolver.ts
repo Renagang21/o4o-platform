@@ -12,7 +12,6 @@
 
 import type { DataSource } from 'typeorm';
 import type { AIProviderConfig } from '@o4o/ai-core';
-// AiModelSetting removed — WO-O4O-GLYCOPHARM-CARE-REMOVAL-V1
 import { resolveAiApiKey } from './ai-key.util.js';
 import { GEMINI_CANONICAL_MODEL } from '../types/ai-proxy.types.js';
 

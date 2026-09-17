@@ -41,7 +41,6 @@
 | api-server | ✅ PASS |
 | web-kpa-society | ✅ PASS |
 | web-k-cosmetics (공유 패키지 소비처) | ✅ PASS |
-| web-glycopharm (공유 패키지 소비처) | ✅ PASS |
 
 ### 6.2 API/브라우저 E2E (2026-07-03, 네뚜레-약국 · 약국 경영자 체험 계정)
 
@@ -71,4 +70,4 @@
 재사용 가능한 forced-content/operator-video 백엔드 구조 없음(사이니지 UI 페이지만 존재). 신규 DB/권한/운영 UI 필요 → **이번 V1 미구현, 후속 WO로 분리**.
 
 ## 8. 미착수(범위 밖)
-device pairing/비밀키·per-tablet 고유 URL(raw tabletId query만), QR Core, 소비자 관리, 상담/주문/결제, 앱/글래스, O4O 자체 인코딩/스트리밍, YouTube/Vimeo API, 사이니지 통합, GP/KCos 확장, 신규 마이그레이션, `idleTimeoutSeconds` 설정화, 다중 YouTube 순차(단일 loop 우선).
+device pairing/비밀키·per-tablet 고유 URL(raw tabletId query만), QR Core, 소비자 관리, 상담/주문/결제, 앱/글래스, O4O 자체 인코딩/스트리밍, YouTube/Vimeo API, 사이니지 통합, KCos 확장, 신규 마이그레이션, `idleTimeoutSeconds` 설정화, 다중 YouTube 순차(단일 loop 우선).

@@ -13,7 +13,7 @@
  *   - checkout preview (공급자별 draft order 형상 — 실제 주문/결제는 생성하지 않음)
  *
  * V1 비범위 (의도적으로 하지 않음):
- *   - 기존 cart(KPA localStorage / Glyco·Neture) 대체
+ *   - 기존 cart(KPA localStorage / Neture) 대체
  *   - event-offer participate 제거 / 수량 차감 이전
  *   - checkoutService.createOrder 호출 (orchestrator 는 형상 skeleton 만 제공)
  *   - 결제 / 정산 변경

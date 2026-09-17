@@ -55,7 +55,7 @@ Neture 사용자-facing 화면/가이드에서 "Market Trial / 마켓 트라이�
 operator 2개 파일, 사용자-facing 문구 4건만 "Trial" → "유통참여형 펀딩" 정렬. 그 외 무변경.
 
 ## 10. 제외/무변경 항목
-- Store 서비스(KPA/GP/KCos) — 무변경.
+- Store 서비스(KPA/KCos) — 무변경.
 - api-server route/API/entity/table/class/function — 무변경.
 - DB/migration — 없음.
 - 내부 코드명/주석의 "Market Trial / Trial" — 유지(내부명).

@@ -5,13 +5,13 @@
  * 배경
  * ---------------------------------------------------------------
  *   `scripts/ci-build-app.sh` 가 build 도중 **비-frozen `pnpm install`** 을 실행했다.
- *   lockfile 이 워크스페이스와 어긋나 있으면(삭제된 `services/web-glycopharm` 의
+ *   lockfile 이 워크스페이스와 어긋나 있으면(삭제된 워크스페이스의
  *   stale importer) pnpm 이 전면 재해석을 수행해 추적 파일 `pnpm-lock.yaml` 을
  *   말없이 고쳐 썼다. CI 는 커밋하지 않으므로 보이지 않고, 로컬에서는 이번 변경과
  *   무관한 diff 로 남아 작업 범위를 오염시킨다.
  *
  *   재현(pnpm 10.25.0, 2/2회):
- *     - `services/web-glycopharm` importer 139줄 제거
+ *     - 삭제된 워크스페이스의 stale importer 139줄 제거
  *     - `ts-jest` optional peer 스냅샷에 `(esbuild@0.27.0)` 추가
  *   두 번째 변화는 importer 를 먼저 정리해 두면 발생하지 않는다(고정점 2개).
  *   따라서 필수 정규화가 아니며, 원인이 확정된 첫 번째만 정리했다.

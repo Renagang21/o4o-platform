@@ -134,7 +134,6 @@ describe('WO-O4O-ECOMMERCE-CORE-AND-COMMERCE-RESIDUE-FINAL-CENSUS-AND-RETIREMENT
   describe('판정 2: dead payment event handler 제거', () => {
     const REMOVED = [
       'src/services/cosmetics/KCosmeticsPaymentEventHandler.ts',
-      'src/services/glycopharm/GlycopharmPaymentEventHandler.ts',
       'src/services/kpa/KpaPaymentEventHandler.ts',
       'src/services/neture/NeturePaymentEventHandler.ts',
       'src/modules/lms/services/LmsPaymentEventHandler.ts',
@@ -147,7 +146,6 @@ describe('WO-O4O-ECOMMERCE-CORE-AND-COMMERCE-RESIDUE-FINAL-CENSUS-AND-RETIREMENT
 
     it.each([
       'KCosmeticsPaymentEventHandler',
-      'GlycopharmPaymentEventHandler',
       'KpaPaymentEventHandler',
       'NeturePaymentEventHandler',
       'LmsPaymentEventHandler',

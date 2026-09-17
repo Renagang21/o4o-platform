@@ -114,8 +114,6 @@ Route 순서 검증:
 
 - Facade: 모든 import가 사용됨 (3 entity + 4 handler factory)
 - Utils: 모든 export가 handler에서 import됨 (6/6 사용)
-- Home handler: `GlycopharmPharmacyExtension` import → `GET /:slug`에서 사용
-- Home handler: `GlycopharmProduct` import → `Repository<GlycopharmProduct>` deps 타입에 사용
 - Product handler: `SERVICE_KEYS`, `cacheAside`, `hashCacheKey`, `READ_CACHE_TTL` → featured + categories에서 사용
 - Content handler: `LessThanOrEqual`, `StoreBlogPost`, `StoreBlogPostStatus` → blog 조회에 사용
 - Tablet handler: `TabletInterestRequest`, `InterestRequestStatus`, `ProductMaster` → interest/request에서 사용

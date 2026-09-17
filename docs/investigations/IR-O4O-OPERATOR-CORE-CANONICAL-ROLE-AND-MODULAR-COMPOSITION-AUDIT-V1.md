@@ -30,8 +30,6 @@
 
 ### 1.2 범위 밖
 
-GlycoPharm 은 조사·비교·적용 검토 대상이 아니다. 본 IR 이 GlycoPharm 을 언급하는 경우는 **기존 코드에 실재하는 참조를 사실로 기록**할 때뿐이며, 그 기재는 요구사항의 근거로 사용하지 않는다(`historical out-of-scope`).
-
 보호 파일 `apps/api-server/src/routes/service-admin.routes.ts` 는 열람·수정하지 않았다. 조사 시점 작업 트리는 clean 이었다.
 
 ---
@@ -78,7 +76,7 @@ GlycoPharm 은 조사·비교·적용 검토 대상이 아니다. 본 IR 이 Gly
 |--------|------|
 | `bd48832f0` | `operator-core` 패키지 추출 + KPA 대시보드 리팩터 (**최초 생성**) |
 | `d52721607` | Neture 대시보드를 operator-core 로 전환 |
-| `9ea35ad02` | React 19 통일 + GlycoPharm / K-Cosmetics 를 operator-core 로 전환 |
+| `9ea35ad02` | React 19 통일 + K-Cosmetics 를 operator-core 로 전환 |
 | `4f11055d6` | Signal 엔진을 shared core 로 추출 (`WO-OPERATOR-SIGNAL-CORE-V1`) |
 | `a409ebcd2` | Signal threshold config 추가 |
 | `1a5580924` | AI Action Layer 추가 |
@@ -91,7 +89,7 @@ GlycoPharm 은 조사·비교·적용 검토 대상이 아니다. 본 IR 이 Gly
 | commit | 내용 |
 |--------|------|
 | `f5de08c36` | Neture 대시보드 → 5-Block |
-| `b19ff8809` | GlycoPharm → 5-Block *(historical)* |
+| `b19ff8809` | — |
 | `3f321489a` | K-Cosmetics → 5-Block |
 | `bf41b174f` | KPA-a → 5-Block |
 | `7beb12e91` | KPA-b → 5-Block |
@@ -143,7 +141,6 @@ dynamic import(`import(`) · `require(` 형태의 참조도 0.
 | web-kpa-society | `:24` | `:29` | `:69` | `:6` |
 | web-k-cosmetics | `:23` | `:26` | `:58` | `:6` |
 | web-neture | `:22` | `:30` | `:63` | `:6` |
-| web-glycopharm *(historical)* | `:23` | `:27` | `:61` | `:6` |
 
 추가로 `pnpm-lock.yaml` 에 workspace link 5곳.
 
@@ -271,7 +268,7 @@ archive 감사 문서는 이미 다음과 같이 판정한 바 있다(`:208–21
 **`MembersConsoleClient` 6 메서드** — `list` · `listAll` · `stats` · `updateStatus` · `batchUpdateStatus` · `updatePassword`
 **선택** — `statusTabs` · `getPrimaryRole` · `extraColumns` · `drawerExtraSections` · `renderDeleteFlow` · `extraRowActions` · `extraBulkActions` · `serverSort` · `syncUrl`
 
-확장 흡수력은 충분히 검증돼 있다(Neture 의 registration approve/reject 를 `updateStatus` 내부 endpoint 라우팅으로 흡수, GP/K-Cos/Neture 의 서로 다른 삭제 UX 를 `renderDeleteFlow` 로 흡수).
+확장 흡수력은 충분히 검증돼 있다(Neture 의 registration approve/reject 를 `updateStatus` 내부 endpoint 라우팅으로 흡수, K-Cos/Neture 의 서로 다른 삭제 UX 를 `renderDeleteFlow` 로 흡수).
 
 ### 8.2 PharmacyHub 현재 구현
 
@@ -450,10 +447,9 @@ Optional Operator Modules      (= 현재 operator-core-ui 19 모듈)
 |:-:|------|--------|------|
 | 1 | `OPERATOR-CORE-DESIGN-V1` | 문서 전체가 `@o4o/operator-core-ui` 설계 기준인데 **제목·본문에서 `operator-core` 와 이름이 1글자 차이**로 혼동 가능. 두 패키지의 세대 관계가 어디에도 없음 | §14 — 상단에 세대 관계 note 추가 |
 | 2 | `OPERATOR-CORE-DESIGN-V1` §2.3 | 기재된 `package.json` 이 실제와 다름 (`version 1.0.0` / `main: ./dist/index.js` / `operator-ux-core` 가 peerDependencies) — 실제는 `0.1.0` · `./src/index.ts` · dependencies + **14개 subpath exports** | §14 — 실제 상태 note 추가 (설계 원문은 보존) |
-| 3 | `OPERATOR-INTEGRATION-STATE-V1` | 대상이 **KPA / GlycoPharm / K-Cosmetics 3서비스**로 고정. 현재 공식 4서비스와 어긋남. Neture·PharmacyHub 부재 | §14 — 스코프 note 추가 |
+| 3 | `OPERATOR-INTEGRATION-STATE-V1` | 현재 공식 4서비스와 어긋남. Neture·PharmacyHub 부재 | §14 — 스코프 note 추가 |
 | 4 | `OPERATOR-INTEGRATION-STATE-V1` §1.3 | "Core Layer 구조(목표 형태)"에 module registry / runtime context / extension 등록 계약이 없음 → **선택형 모듈 구조가 명시되지 않음** | §14 — 본 IR 링크 + 공백 명시 |
 | 5 | `O4O-COMMONIZATION-STANDARD` §10 축 C | `@o4o/operator-core` 를 "legacy · seam 정비" 대상으로만 나열 → **"legacy 제거 대상"으로 오해될 여지** | §14 — superseded 판정과 "재정의는 별개 판단"을 명시 |
-| 6 | `operator-ux-core` `ServiceKey` | `'kpa-society' \| 'glycopharm' \| 'k-cosmetics'` — **Neture·PharmacyHub 부재**. 코드 사실이며 본 WO 범위 밖(코드 변경 금지) | 후속 WO 로 이관 (§15) |
 
 ---
 
@@ -496,4 +492,4 @@ Optional Operator Modules      (= 현재 operator-core-ui 19 모듈)
 
 ---
 
-*Date: 2026-08-03 · read-only 조사 + docs-only 개정 · 코드 0 · package 0 · route 0 · DB 0 · 배포 0 · GlycoPharm 무접촉 · `service-admin.routes.ts` 무접촉*
+*Date: 2026-08-03 · read-only 조사 + docs-only 개정 · 코드 0 · package 0 · route 0 · DB 0 · 배포 0 무접촉 · `service-admin.routes.ts` 무접촉*

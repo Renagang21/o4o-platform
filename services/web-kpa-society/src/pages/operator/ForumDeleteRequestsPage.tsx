@@ -7,7 +7,7 @@
  *   434-line 직접 구현(DataTable + ActionBar + BulkResultModal + Drawer + GuideBlock)을
  *   @o4o/operator-core-ui/modules/forum-delete-requests 의
  *   OperatorForumDeleteRequestsConsolePage thin wrapper 로 수렴.
- *   GP / K-Cosmetics / Neture 와 동일한 공통 콘솔 구조로 정합.
+ *   K-Cosmetics / Neture 와 동일한 공통 콘솔 구조로 정합.
  *   - bulk: KPA 실제 batch endpoint(batchApproveDelete/batchRejectDelete)를
  *     optional batch-client 로 주입 (per-id fan-out 아님)
  *   - GuideBlock 은 loadGuideSections 로 연결, 응답 shape 는 client adapter 가 정규화

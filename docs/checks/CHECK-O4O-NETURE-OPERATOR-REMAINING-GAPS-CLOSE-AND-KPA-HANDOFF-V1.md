@@ -34,7 +34,6 @@
   **실질적으로 플랫폼 관리자 전용.**
 - **판정:** 데이터가 서비스 범위이므로 개념상 자연 소유자는 `neture:admin`. **그러나 지금 개방하지 않는다:**
   1. 컨트롤러가 `serviceCode` 를 query/body 에서 우선 취하고 **호출자 스코프와 대상 serviceCode 일치 검사가 없음**
-     → `neture:admin` 개방 시 `?serviceCode=glycopharm` 로 **교차 서비스 알림 이메일 열람/수정 가능**(경계 위반).
      안전 개방에는 serviceCode 스코프 일치 가드(백엔드 로직) 추가 필요.
   2. 선행 WO(`...ADMIN-RBAC-LEGACY-...-CONSOLIDATED-V1`)가 이 결정을 전용 정책 WO
      (`WO-…-OPERATOR-NOTIFICATION-SERVICE-SCOPE-POLICY-V1`)로 **명시적으로 이월**.

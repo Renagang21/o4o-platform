@@ -2,7 +2,7 @@
  * POP Staff API Client — Authenticated (K-Cosmetics)
  *
  * WO-O4O-KCOS-STORE-HUB-POP-QR-PORT-V1
- * GlycoPharm popStaff (KPA canonical) mirror — service param defaults to 'cosmetics'.
+ * KPA canonical mirror — service param defaults to 'cosmetics'.
  *
  * 매장 owner 가 운영자 발행 POP 을 자기 매장 store_pops 사본(author_role='store')으로 가져오는 staff-only API.
  * Backend: o4o-store pop.controller — /api/v1/cosmetics/stores/:slug/pop/staff/import (serviceKey='cosmetics').

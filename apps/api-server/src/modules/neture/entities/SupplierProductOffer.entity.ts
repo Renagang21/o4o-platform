@@ -142,7 +142,7 @@ export class SupplierProductOffer {
 
   // ==================== Service Keys (WO-NETURE-PRODUCT-REGISTRATION-REFACTOR-AND-AI-TAGGING-V1) ====================
 
-  /** 공급자가 선택한 서비스 (neture, glycopharm 등) */
+  /** 공급자가 선택한 서비스 (neture 등) */
   @Column({ name: 'service_keys', type: 'text', array: true, default: '{}' })
   serviceKeys: string[];
 

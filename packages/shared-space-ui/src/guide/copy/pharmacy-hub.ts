@@ -7,7 +7,7 @@
  * 이 파일은 **데이터만** 제공하며 View 를 복제하지 않는다.
  *
  * 문구 기준 (§5 · §8):
- *   - KPA / K-Cosmetics / GlycoPharm 문구를 그대로 복사하지 않는다.
+ *   - KPA / K-Cosmetics 문구를 그대로 복사하지 않는다.
  *   - 실제 PharmacyHub route · 메뉴(PHARMACY_HUB_STORE_CONFIG) · 화면 동작에 근거해 작성한다.
  *   - 구현되지 않은 기능은 안내하지 않는다.
  *

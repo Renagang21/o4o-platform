@@ -1,7 +1,6 @@
 /**
  * GuideUsagePage — 서비스 활용 방법 (공통)
  *
- * WO-O4O-GUIDE-COMMON-AND-GLYCOPHARM-HOME-V1
  */
 
 import { Link } from 'react-router-dom';

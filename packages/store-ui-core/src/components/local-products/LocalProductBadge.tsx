@@ -10,7 +10,7 @@ export interface LocalProductBadgeOption {
 /**
  * 매장 취급 상품(StoreLocalProduct) badge_type 공통 옵션.
  * WO-O4O-MY-STORE-LOCAL-PRODUCTS-COMMON-COMPONENT-EXTRACTION-V1:
- *   KPA/GP/KCos 의 동일한 로컬 BADGE_OPTIONS 중복을 통합. 폼 옵션 + 목록 배지 양쪽에서 사용.
+ *   KPA/KCos 의 동일한 로컬 BADGE_OPTIONS 중복을 통합. 폼 옵션 + 목록 배지 양쪽에서 사용.
  */
 export const LOCAL_PRODUCT_BADGE_OPTIONS: LocalProductBadgeOption[] = [
   { value: 'none', label: '없음', color: 'bg-slate-100 text-slate-600' },

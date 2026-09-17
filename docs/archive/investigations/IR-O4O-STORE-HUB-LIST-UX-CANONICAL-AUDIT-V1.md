@@ -3,7 +3,7 @@
 **작성일**: 2026-05-17
 **상태**: Investigation (조사 전용 — 코드/DB 수정 없음)
 **대상**: KPA-Society **Store HUB (매장 HUB) 영역 리스트 화면** 전수 분류
-**범위**: KPA-Society 만. GlycoPharm / K-Cosmetics / Neture 는 후속 IR.
+**범위**: KPA-Society 만. K-Cosmetics / Neture 는 후속 IR.
 
 **선행 IR**:
 - `IR-O4O-KPA-OPERATOR-LIST-CANONICAL-COVERAGE-AUDIT-V1` (operator)
@@ -339,7 +339,7 @@ Store HUB 사용자는 매장 데스크탑 + 태블릿 + 모바일 혼용:
 
 ## 17. 본 IR 범위 외 (후속)
 
-- GlycoPharm / K-Cosmetics / Neture 의 Store HUB 영역 audit
+- K-Cosmetics / Neture 의 Store HUB 영역 audit
 - 외부 wrapper 컴포넌트 (`@o4o/store-products-ui`, `@o4o/store-asset-policy-core`, `StoreHubTemplate`, `ContentHubTemplate`) 의 내부 canonical 준수 audit
 - detail / form / wizard / builder 페이지의 sub-list audit
 - 후속 WO 작성 (`WO-O4O-STORE-LOCAL-PRODUCTS-CANONICAL-V1`, `WO-O4O-STORE-SUPPLIER-LIST-CLEANUP-V1` 등) — 본 IR 단계 외

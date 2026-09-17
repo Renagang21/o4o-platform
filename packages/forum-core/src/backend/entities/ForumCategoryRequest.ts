@@ -68,7 +68,7 @@ export class ForumCategoryRequest {
   })
   status!: CategoryRequestStatus;
 
-  // 서비스 코드 (neture, glycopharm, kpa-society 등)
+  // 서비스 코드 (neture, kpa-society 등)
   @Column({ name: 'service_code', type: 'varchar', length: 50 })
   serviceCode!: string;
 

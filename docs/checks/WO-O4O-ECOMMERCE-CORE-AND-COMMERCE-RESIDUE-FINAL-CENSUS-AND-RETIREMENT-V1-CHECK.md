@@ -32,7 +32,6 @@ census 는 **파일명 검색이 아니라 import/export/call graph** 로 수행
 |---|---|---|
 | `packages/ecommerce-core` (26 파일) | `LEGACY_STORE_COMMERCE` | 자칭 "판매 원장(Source of Truth)" 이지만 canonical 원장은 `checkout_orders`. frontend import 0, package dependent 1(api-server) 뿐. ModuleLoader 은퇴(선행 WO) 이후 `createRoutes`/controllers/lifecycle runtime mount 0. 마지막 런타임 소비처는 dormant LMS 핸들러였다. |
 | `KCosmeticsPaymentEventHandler` | `DEAD` | `serviceKey='cosmetics'` payment.completed producer 0건 (cosmetics checkout/payment controller 전부 410) |
-| `GlycopharmPaymentEventHandler` | `DEAD` | `serviceKey='glycopharm'` producer 0건 (동일) |
 | `KpaPaymentEventHandler` | `DEAD` | `serviceKey='kpa'` producer 0건. KPA B2B 발주는 O4O 결제 경로를 쓰지 않는다 |
 | `LmsPaymentEventHandler` | `DEAD` | `serviceKey='lms'` 가 핸들러 자기 자신 외 저장소 전체 0건 (v1 Freeze · dormant) |
 | `NeturePaymentEventHandler` + `routes/neture/controllers/payment.controller.ts` | `DEAD` | 핸들러가 register 되지 않았고 `createPaymentController` 참조 0건 |
@@ -71,7 +70,7 @@ census 는 **파일명 검색이 아니라 import/export/call graph** 로 수행
 
 `store-entitlement.routes.ts` 의 `STORE_SUBSCRIPTION_SOURCE_SERVICE` 가
 `'store-service-subscription'` 이라는 사실을 리터럴까지 추적해 확인했다.
-이 값이 `'kpa'`/`'glycopharm'`/`'cosmetics'` 였다면 위 핸들러 3종은 live
+이 값이 `'kpa'`/`'cosmetics'` 였다면 위 핸들러 3종은 live
 producer 를 가진 것이 되어 제거 대상이 아니었다. **충돌 없음**.
 
 ---
@@ -117,7 +116,7 @@ module data builder 분기, `template-parts-converter.ts` 의 `o4o/cart-icon`
 ### D-1. `ecommerce_orders` raw SQL reader 클러스터
 `action-queue.controller.ts`, `routes/common/order/operatorOrderQuery.ts`,
 `cosmetics-store-summary.service.ts`, `operator-dashboard.controller.ts`,
-`cockpit.controller.ts`, `glycopharm-store-data.adapter.ts`,
+`cockpit.controller.ts`
 `event-offer.service.ts`, `physical-store.service.ts`,
 `store-network.service.ts`, `order-metrics-fallback.ts` 등이 `ecommerce_orders`
 를 **raw SQL 로만** 읽는다 (TypeORM repository 사용 0건 — 그래서 entity 등록
@@ -150,7 +149,7 @@ DROP 0건, 컬럼 DROP 0건.**
 | 대상 | 처리 | 이유 |
 |---|---|---|
 | `ecommerce_orders` / `_order_items` / `_payments` | `RETAINED_SCHEMA_LEGACY` | production 에 테이블 자체가 없다(CREATE migration 부재). 지울 schema 가 없고, 관련 ALTER migration 2종은 **역사적 기록**이라 삭제하지 않는다 |
-| `organization_channels.channel_type = 'B2C'` | `RETAINED_SCHEMA_LEGACY` | 신규 생성은 이미 차단(410 `STORE_B2C_CHANNEL_RETIRED`)됐지만, GlycoPharm `store.controller` 의 "소비자 Storefront 상품 노출 이중 게이트" 가 **결제 없는 정보 제공/진열 용도로** 이 컬럼을 계속 읽는다. 소비자 결제 축이 아니므로 금지선 대상이 아니다 |
+| `organization_channels.channel_type = 'B2C'` | `RETAINED_SCHEMA_LEGACY` | 신규 생성은 이미 차단(410 `STORE_B2C_CHANNEL_RETIRED`)됐지만 `store.controller` 의 "소비자 Storefront 상품 노출 이중 게이트" 가 **결제 없는 정보 제공/진열 용도로** 이 컬럼을 계속 읽는다. 소비자 결제 축이 아니므로 금지선 대상이 아니다 |
 | `neture_orders`, `paid_at` 등 legacy 결제 흔적 컬럼 | 유지 | 정산 readiness 판정이 여전히 참조한다 (`neture-settlement.service.ts`) |
 
 ---
@@ -227,11 +226,9 @@ GET  /api/health                            → 200
 
 # 은퇴 계약 유지 (410 producer endpoint)
 POST /api/v1/kpa/checkout                   → 410 STORE_CONSUMER_ORDER_RETIRED
-POST /api/v1/glycopharm/checkout            → 410 STORE_CONSUMER_ORDER_RETIRED
 
 # 계약이 존재한 적 없는 경로 (404 — §4 판정대로)
 GET  /api/v1/kpa/checkout/store-orders        → 404 Cannot GET
-GET  /api/v1/glycopharm/checkout/store-orders → 404 Cannot GET
 GET  /api/v1/cosmetics/checkout/store-orders  → 404 Cannot GET
 
 # B2B 보호 축 — 라우트 생존 + 인증 가드 (write 0)

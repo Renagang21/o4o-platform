@@ -83,9 +83,9 @@ V2 는 다음 5개 철학 원칙을 baseline 으로 채택한다:
 | # | 원칙 | 의미 |
 |---|------|------|
 | 1 | **1 Email = 1 Identity** | 같은 이메일은 플랫폼 전체에서 같은 사람이다 (Identity 통합) |
-| 2 | **서비스는 독립 사업자** | KPA / GlycoPharm / K-Cosmetics / Neture / GlucoseView 는 각각 독립 사업체 — 회원·권한·프로필·삭제가 독립 |
+| 2 | **서비스는 독립 사업자** | KPA / K-Cosmetics / Neture / GlucoseView 는 각각 독립 사업체 — 회원·권한·프로필·삭제가 독립 |
 | 3 | **회원은 서비스 범위에서 독립** | 같은 사람이 여러 서비스에 가입할 수 있으나, 각 서비스의 회원은 서로 독립적 (탈퇴/정지/승인 별도) |
-| 4 | **Credential 은 서비스 범위에서 독립** | KPA password ≠ GlycoPharm password 가 **정상** — 같아도 무방하나 강제되지 않는다 |
+| 4 | **Credential 은 서비스 범위에서 독립** | 서비스 A password ≠ 서비스 B password 가 **정상** — 같아도 무방하나 강제되지 않는다 |
 | 5 | **Role · 권한은 서비스 범위에서 독립** | role_assignments 의 `{serviceKey}:{role}` 패턴은 이미 정합 — V2 에서 그대로 유지 |
 
 → **차이의 핵심은 원칙 4 (Credential 독립)** 다. 1·2·3·5 는 이미 V1 코드와 구조적으로 정합한다.
@@ -167,10 +167,8 @@ L1 Identity (users)
 | 시나리오 | 영향받는 Layer |
 |----------|---------------|
 | 사용자가 KPA 비밀번호만 변경 | L2 (해당 서비스 credential 만) |
-| 사용자가 GlycoPharm 에서 탈퇴 | L3 (membership.status='withdrawn') · L4 (해당 role 무효화) · L2 (credential 삭제 OR 비활성화) |
 | 운영자가 사용자 정지 | L3 (membership.status='suspended') — L1/L2 무관 |
 | 사용자가 이메일 변경 | L1 만 — L2/L3/L4 자동 따라감 |
-| 사용자가 GlycoPharm 에 새로 가입 | L3 새 row · L2 새 credential — L1 그대로 |
 | 사용자 계정 완전 삭제 | L1·L2·L3·L4 모두 (CASCADE) |
 
 ---
@@ -223,10 +221,7 @@ V1 §9 의 "제거 사유" 는 V1 시점의 모델 (공통 password) 안에서�
 
 | 검증 | 결과 |
 |---|---|
-| GlycoPharm 비밀번호 변경 | 성공 |
-| GlycoPharm 새 비밀번호 로그인 | 성공 |
 | KPA 기존 비밀번호 로그인 | 성공 (영향 없음) |
-| GlycoPharm 새 비밀번호로 KPA 로그인 | **실패** (독립성 성립) |
 | `users.password` | 무변경 |
 
 ---

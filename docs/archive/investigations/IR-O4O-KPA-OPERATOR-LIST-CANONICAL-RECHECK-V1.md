@@ -12,7 +12,7 @@
   - `apps/api-server/src/routes/kpa/controllers/member.controller.ts` (member API + scope)
   - `packages/operator-ux-core/src/**` (canonical 컴포넌트)
 - 범위 제약
-  - **KPA-Society 만 1차 정리**. GlycoPharm / Neture / K-Cosmetics 공통화는 후속.
+  - **KPA-Society 만 1차 정리**. Neture / K-Cosmetics 공통화는 후속.
   - 실제 리팩토링·schema migration·auth rewrite 모두 **본 IR 범위 외**.
 
 ---
@@ -360,14 +360,14 @@ user?: { name, email }, organization?: { name }
 
 ## 9. 이후 공통화(Phase 3) 가능 영역 — 사전 평가
 
-> KPA-Society 기준으로 정리되면 다른 서비스(GlycoPharm/Neture/K-Cosmetics) 공통화 검토 시 활용할 단서.
+> KPA-Society 기준으로 정리되면 다른 서비스 공통화 검토 시 활용할 단서.
 
 | 영역 | 공통화 가능성 | 근거 |
 |---|---|---|
 | `useBatchAction` hook | **이미 공통화됨** | `@o4o/operator-ux-core` 에 이미 11개 화면이 사용 |
 | DataTable / RowActionMenu / BaseDetailDrawer | **이미 공통화됨** | `@o4o/operator-ux-core` + `@o4o/ui` 에 이미 정착 |
 | activity_type 컬럼 표시 패턴 | KPA 한정 (다른 서비스는 다른 profile 분류) | `@o4o/operator-ux-core` 에 generic `ProfileBadge` 컴포넌트 도입 시 공통화 가능 |
-| capability 컬럼 표시 패턴 | **공통화 가능** | role_assignments 가 4개 서비스 공통 사용. service prefix(`kpa:` / `glyco:`) 만 다름 |
+| capability 컬럼 표시 패턴 | **공통화 가능** | role_assignments 가 3개 서비스 공통 사용. service prefix(`kpa:`) 만 다름 |
 | delete-risk preview 패턴 | **공통화 가능** | KPA 만 구현 — 다른 서비스도 같은 패턴 도입 권장 |
 | MemberManagementPage 컬럼 구조 | KPA 한정 | membership_type 등은 도메인 종속 |
 

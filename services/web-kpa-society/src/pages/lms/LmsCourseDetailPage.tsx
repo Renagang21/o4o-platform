@@ -31,7 +31,7 @@ export function LmsCourseDetailPage() {
   const { user } = useAuth();
 
   // WO-O4O-KPA-APPRECIATION-LMS-CONTENT-EXPANSION-V1: AppreciationPanel onError 핸들러
-  // KPA apiClient err.message 패턴 (Glyco/K-Cos 의 err.response.data.error 와 다름)
+  // KPA apiClient err.message 패턴 (K-Cos 의 err.response.data.error 와 다름)
   const handleAppreciationError = (err: any) => {
     const msg = err?.message || '';
     if (msg.includes('INSUFFICIENT_BALANCE') || msg.includes('부족')) toast.error('포인트가 부족합니다');

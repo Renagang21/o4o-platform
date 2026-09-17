@@ -67,7 +67,7 @@ F-2 화장품 : mode=selected n=6
 
 `TabletsPage.tsx`: **+87 / −77** (순 +10). 순증인 이유는 교체 다이얼로그 연결·kiosk URL·
 태블릿 관리 접이식 블록이 추가됐기 때문이며, **코너 목록 렌더링 자체는 전량 Core 로 이동**했다.
-공통 Core 신규 439L(`TabletCornerBoard` 269 + `TabletScreenSetSwapDialog` 170)은 이후 KCos/GP 채택 시
+공통 Core 신규 439L(`TabletCornerBoard` 269 + `TabletScreenSetSwapDialog` 170)은 이후 KCos 채택 시
 추가 비용 없이 재사용된다.
 
 ### 3-2. PH adapter 에 남은 것
@@ -176,7 +176,7 @@ KPA 의 교체 모달은 `store_tablet_corner_contents`(3세대 코너 콘텐츠
 |---|---|
 | `@o4o/api-server` type-check | PASS |
 | `type-check:frontend` (6서비스) | **OK** |
-| build — PH · KPA · K-Cosmetics · GlycoPharm | **4/4 OK** |
+| build — PH · KPA · K-Cosmetics | **4/4 OK** |
 | 신규 `pharmacy-hub-tablet-canonical-adoption.spec` | **17/17 PASS** |
 | tablet 회귀 7스위트 | **89/89 PASS** |
 | ESLint | 0 error |
@@ -213,7 +213,7 @@ console error 0 · white screen 0 · dead link 0 · not-found shell 0.
 | 1 | PH kiosk 에 신규 schema/migration 필요 | 미해당 — **migration 0** |
 | 2 | 기존 KPA public contract breaking | 미해당 — KPA URL·응답 불변(additive 만) |
 | 3 | `corner_legacy_all=0` 이 공개 중인 PH consumer 를 깨뜨림 | 미해당 — §2-1 실측상 영향 0 |
-| 4 | 공통 Core 변경이 KCos/GP legacy runtime 을 깨뜨림 | 미해당 — `store-ui-core` 무변경 · 2서비스 build OK |
+| 4 | 공통 Core 변경이 KCos legacy runtime 을 깨뜨림 | 미해당 — `store-ui-core` 무변경 · 1서비스 build OK |
 | 5 | product-linked 검증에 운영 화면 변경 필수 | **부분 해당** → 쓰기 0 실증으로 대체, UI 실증만 BLOCKED (§7) |
 | 6 | 서비스별 Tablet business model 이 달라야 한다는 근거 | **발견 없음** — 차이는 전부 MISSING_ADOPTION |
 | 7 | 병렬 세션 파일 충돌 | 미해당 |
@@ -222,7 +222,7 @@ console error 0 · white screen 0 · dead link 0 · not-found shell 0.
 
 ## 11. 범위 밖 (미착수 확인)
 
-QR 전체 console 공통화 · QR placement · ESL · KCos/GP canonical 전환 ·
+QR 전체 console 공통화 · QR placement · ESL · KCos canonical 전환
 `product_content` DB CHECK 축소 · `first_active` 제거 · `store_tablet_displays` 제거 · 신규 Content 원장.
 
 ---
@@ -247,7 +247,7 @@ QR 전체 console 공통화 · QR placement · ESL · KCos/GP canonical 전환 �
 | PRODUCT_LIST DRIFT | **0** |
 | CORNER_LEGACY_ALL IMPLICIT FALLBACK | **RETIRED** (production 영향 0) |
 | KPA REGRESSION | **PASS** |
-| KCOS / GP LEGACY CORE REGRESSION | **PASS** |
+| KCOS LEGACY CORE REGRESSION | **PASS** |
 
 → `WO-O4O-PHARMACYHUB-TABLET-CANONICAL-ADOPTION-AND-PUBLIC-KIOSK-CLOSURE-V1` = **CLOSED**
 

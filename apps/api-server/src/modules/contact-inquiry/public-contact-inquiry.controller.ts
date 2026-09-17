@@ -6,7 +6,7 @@
  * Mount: /api/v1/public/services
  *   POST /:serviceKey/contact-inquiries — 공개 문의 접수 + 운영자 in-app 알림
  *
- * 범위: GlycoPharm / K-Cosmetics (기존 contact 백엔드 없던 서비스).
+ * 범위: K-Cosmetics (기존 contact 백엔드 없던 서비스).
  *   Neture(/neture/contact) / KPA(/kpa/contact-requests) 는 기존 경로 유지 — 본 컨트롤러 미사용.
  *
  * 정책:
@@ -193,7 +193,7 @@ export function createPublicContactInquiryController(dataSource: DataSource): Ro
                 //   수신자는 `{prefix}:operator` + `{prefix}:admin` 인데 이전 target
                 //   `/admin/contact-inquiries` 는 admin 전용 guard(ProtectedRoute allowedRoles=
                 //   admin/super_admin) 라 operator 수신자가 열 수 없었다(ROLE_MISMATCH).
-                //   문의 관리 canonical 화면은 GlycoPharm/K-Cosmetics 모두 operator 로 이관된
+                //   문의 관리 canonical 화면은 operator 로 이관된
                 //   `/operator/contacts`(OperatorRoute = operator+admin+super_admin) 다.
                 metadata: { contactInquiryId: entity.id, inquiryType: type, targetUrl: '/operator/contacts' },
                 }),

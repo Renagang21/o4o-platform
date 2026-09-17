@@ -3,12 +3,12 @@
  * WO-O4O-MY-STORE-CROSSSERVICE-FINAL-COMMONIZATION-AUDIT-AND-CLEANUP-V1
  *
  * 원본: WO-O4O-KCOSMETICS-SIGNAGE-PLAYER-V1 / WO-KPA-STORE-SIGNAGE-IA-RESTRUCTURE-V2.
- * KCos·GP 사본의 차이는 accent Tailwind class 뿐이었다(동작·route·API 동일).
+ * KCos 사본을 그대로 옮겼다(동작·route·API 동일).
  * Tailwind 는 동적 class 조합을 purge 하므로 accent 는 완성된 class 문자열로 주입받는다.
  *
  * WO-O4O-MY-STORE-REMAINING-FEATURE-VIEW-COMMONIZATION-V1 §5-B:
  *   KPA 사본이 유일하게 더 갖고 있던 두 가지(활성 스케줄 배너 · 행 선택)를 slot/optional prop 으로
- *   열어 KPA 도 같은 View 를 쓰게 한다. 미주입 서비스(KCos·GP)의 렌더 결과는 이전과 동일하다.
+ *   열어 KPA 도 같은 View 를 쓰게 한다. 미주입 서비스(KCos)의 렌더 결과는 이전과 동일하다.
  */
 
 import { useState, useEffect, useMemo, useCallback, type ReactNode } from 'react';
@@ -42,7 +42,7 @@ export interface SignagePlayerSelectViewProps {
   };
   /**
    * WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §8:
-   *   재생 route 의 basePath 가 서비스마다 다르다(KPA·GP·KCos `/store` / PharmacyHub `/store-owner`).
+   *   재생 route 의 basePath 가 서비스마다 다르다(KPA·KCos `/store` / PharmacyHub `/store-owner`).
    *   기존 하드코딩 경로를 **기본값으로 그대로 둔 optional prop** 으로 열어 serviceKey 분기를 만들지 않는다.
    *   미주입 서비스의 동작은 이전과 완전히 동일하다.
    */
@@ -51,7 +51,7 @@ export interface SignagePlayerSelectViewProps {
 
 const DEFAULT_PLAY_BTN =
   'inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-pink-600 text-white hover:bg-pink-700 transition-colors';
-/** 기존 3개 서비스(KPA·GP·KCos)가 쓰던 재생 경로 — 기본값으로 보존한다. */
+/** 기존 2개 서비스(KPA·KCos)가 쓰던 재생 경로 — 기본값으로 보존한다. */
 const DEFAULT_PLAY_PATH_PREFIX = '/store/marketing/signage/play';
 const DEFAULT_SEARCH_INPUT =
   'w-full pl-9 pr-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent';

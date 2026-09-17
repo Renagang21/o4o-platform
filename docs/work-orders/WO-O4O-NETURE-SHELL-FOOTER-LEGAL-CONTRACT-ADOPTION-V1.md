@@ -351,7 +351,6 @@ service switch
 MobileBottomNav
 PharmacyHub Header/Footer
 KPA Footer
-GlycoPharm Footer
 공개 Footer 디자인 재정렬
 법정문서 schema/API
 법정문서 내용 자체

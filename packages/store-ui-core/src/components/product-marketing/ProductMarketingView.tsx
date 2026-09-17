@@ -3,12 +3,12 @@
  * WO-O4O-MY-STORE-CROSSSERVICE-FINAL-COMMONIZATION-AUDIT-AND-CLEANUP-V1
  *
  * 원본: WO-O4O-PRODUCT-MARKETING-GRAPH-V1 / WO-O4O-PRODUCT-MARKETING-POP-BUILDER-EXTRACTION-V1.
- * KCos·GP 사본은 헤더 주석과 타입 추론 표기만 달랐다 — API adapter 만 주입받고 본체는 원본 그대로다.
+ * KCos 사본을 기준으로 한다 — API adapter 만 주입받고 본체는 원본 그대로다.
  *
  * WO-O4O-MY-STORE-REMAINING-FEATURE-VIEW-COMMONIZATION-V1 §5-A/§7:
  *   KPA 사본만 적용돼 있던 load-error 계약(WO-O4O-KPA-STORE-SILENT-ERROR-UX-STANDARDIZATION-V1)
  *   — 조회 실패와 "자산 없음" 분리 · 재조회 실패 시 기존 내용 유지 · 연결 해제 실패 안내 —
- *   을 이 공통 View 로 올려 KPA 가 채택할 수 있게 했다. KCos/GP 는 기존 silent catch 가
+ *   을 이 공통 View 로 올려 KPA 가 채택할 수 있게 했다. KCos 는 기존 silent catch 가
  *   플랫폼 load-error 계약 위반이었으므로 함께 정렬된다(성공 경로 동작·문구 변경 없음).
  */
 

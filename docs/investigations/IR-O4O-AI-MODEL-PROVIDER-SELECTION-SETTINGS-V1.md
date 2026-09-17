@@ -35,7 +35,7 @@
 | **AiEnginesPage** | `web-neture/src/pages/admin/ai/AiEnginesPage.tsx` | 엔진 활성화 | `PUT /api/ai/admin/engines/:id/activate` |
 | AiPolicyPage | `web-neture/.../AiPolicyPage.tsx` | 쿼터/aiEnabled. model read-only 표시 | `PUT /api/ai/admin/policy` |
 | AiQuerySettings | `apps/admin-dashboard/src/pages/settings/AiQuerySettings.tsx` | defaultModel 드롭다운(Gemini 계열) | `PUT /ai/policy` |
-| AiUsageDashboard/AiBillingPage | `web-glycopharm/src/pages/operator/*` | 사용량/빌링 조회(편집 아님) | `/api/ai/admin/analytics\|billing` |
+| AiUsageDashboard/AiBillingPage | — | 사용량/빌링 조회(편집 아님) | `/api/ai/admin/analytics\ | billing` |
 
 **admin AI 라우트 전체(`ai-admin.routes.ts`):** dashboard / engines(list·activate) / policy(get·put) / usage / ops(summary·errors) / analytics(summary·by-scope·by-model·recent) / quotas(CRUD·status) / billing(list·generate·adjustment·confirm·paid·export).
 

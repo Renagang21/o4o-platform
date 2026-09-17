@@ -3,7 +3,7 @@
 **작성일**: 2026-05-17
 **상태**: Investigation (조사 전용 — 코드/DB 수정 없음)
 **대상**: KPA-Society `pages/intranet/**` + `pages/feedback/**` 의 **legacy removal 가능성 및 영향 범위**
-**범위**: KPA-Society 만. GlycoPharm / K-Cosmetics / Neture 는 후속 IR.
+**범위**: KPA-Society 만. K-Cosmetics / Neture 는 후속 IR.
 
 **선행 IR**:
 - `IR-O4O-COMMUNITY-LIST-UX-CANONICAL-AUDIT-V1` — intranet/feedback 5 페이지가 mock data placeholder 임을 식별
@@ -260,7 +260,7 @@ OperatorRoutes.tsx L28 import path 갱신.
 
 - `useOrganization` hook 의 intranet 외부 사용 여부 audit (Phase 3 진행 전 확인 권장)
 - backend CMS `intranet-hero` slot 의 모든 consumer 확인 (slot 보존 여부 결정)
-- GlycoPharm / K-Cosmetics / Neture 에 동일 패턴 (intranet residue) 존재 여부 audit
+- K-Cosmetics / Neture 에 동일 패턴 (intranet residue) 존재 여부 audit
 - 후속 WO 작성 (`WO-O4O-KPA-INTRANET-LEGACY-CLEANUP-V1` 등) — 본 IR 단계 외
 
 ---

@@ -2,19 +2,19 @@
 
 > **작업명:** WO-O4O-LMS-KPA-FULLER-ADOPTION-V1
 > **유형:** KPA-Society 사용자 LMS 화면의 `@o4o/lms-ui` 소비 확대 (reference impl, frontend-only)
-> **결과: PASS** — KPA 가 `LessonList`(rowClickMode='row') + `CourseProgressBar` 추가 소비 시작. 레슨 사이드바(`LmsLessonPage`)와 강의 상세(`LmsCourseDetailPage`) 의 레슨 목록·진도 블록을 공통 컴포넌트로 수렴. accent `#2563EB`(KPA blue). 기존 기능·route·API·결제없음·reward 정책 유지. web-kpa-society typecheck 0. GP/KCos/Neture/backend/package.json/lock 무변경.
-> **선행:** `WO-O4O-LMS-COMMON-UI-EXTRACTION-V1`(`7020e2c4c`) · GP/KCos adoption · `CHECK-O4O-LMS-NETURE-EXCLUSION-GUARD-V1` · `WO-O4O-LMS-LESSONLIST-ROWCLICK-OPTION-V1`(`e042b4eb2`)
+> **결과: PASS** — KPA 가 `LessonList`(rowClickMode='row') + `CourseProgressBar` 추가 소비 시작. 레슨 사이드바(`LmsLessonPage`)와 강의 상세(`LmsCourseDetailPage`) 의 레슨 목록·진도 블록을 공통 컴포넌트로 수렴. accent `#2563EB`(KPA blue). 기존 기능·route·API·결제없음·reward 정책 유지. web-kpa-society typecheck 0. KCos/Neture/backend/package.json/lock 무변경.
+> **선행:** `WO-O4O-LMS-COMMON-UI-EXTRACTION-V1`(`7020e2c4c`) · KCos adoption · `CHECK-O4O-LMS-NETURE-EXCLUSION-GUARD-V1` · `WO-O4O-LMS-LESSONLIST-ROWCLICK-OPTION-V1`(`e042b4eb2`)
 > **작성일:** 2026-06-13 · 기준 HEAD `ea1dbaa53`
 
 ---
 
 ## 1. 작업 목적
 
-KPA(LMS 공통화 reference impl)에서 아직 미소비하던 `@o4o/lms-ui` 컴포넌트 활용을 확대한다. `WO-O4O-LMS-LESSONLIST-ROWCLICK-OPTION-V1` 로 `LessonList` row-click 차단점이 해소되어, KPA 레슨 사이드바부터 공통 `LessonList` 로 수렴할 수 있게 됨. KPA 에서 reference pattern(특히 `LessonList rowClickMode='row'`)을 먼저 확정해 GP/KCos fuller adoption 의 기준을 만든다.
+KPA(LMS 공통화 reference impl)에서 아직 미소비하던 `@o4o/lms-ui` 컴포넌트 활용을 확대한다. `WO-O4O-LMS-LESSONLIST-ROWCLICK-OPTION-V1` 로 `LessonList` row-click 차단점이 해소되어, KPA 레슨 사이드바부터 공통 `LessonList` 로 수렴할 수 있게 됨. KPA 에서 reference pattern(특히 `LessonList rowClickMode='row'`)을 먼저 확정해 KCos fuller adoption 의 기준을 만든다.
 
 ## 2. 선행 작업 요약
 
-- `@o4o/lms-ui` 9 컴포넌트 추출, 3서비스 소비 시작(KPA=VisibilityBadge/NoPaymentNotice, GP/KCos=ProgressBar).
+- `@o4o/lms-ui` 9 컴포넌트 추출, 2서비스 소비 시작(KPA=VisibilityBadge/NoPaymentNotice, KCos=ProgressBar).
 - `LessonList` 에 `rowClickMode='row'`(href→`<a>`, onLessonClick→`<button>`, locked 비클릭, current 강조) 추가됨 → 본 WO 가 KPA 에 적용.
 
 ## 3. 변경 파일
@@ -25,7 +25,7 @@ KPA(LMS 공통화 reference impl)에서 아직 미소비하던 `@o4o/lms-ui` 컴
 | `services/web-kpa-society/src/pages/lms/LmsCourseDetailPage.tsx` | "순서 목록" 레슨 목록 → `LessonList rowClickMode='row'`(isPreview/locked 매핑). 수강 중 진도 블록 → `CourseProgressBar`. (기존 `CourseVisibilityBadge`/`NoPaymentNotice` 소비 유지) |
 | `docs/checks/CHECK-O4O-LMS-KPA-FULLER-ADOPTION-V1.md` | 본 문서 |
 
-**무변경:** `@o4o/lms-ui`(이번 WO 패키지 수정 0), package.json/pnpm-lock(KPA 가 이미 lms-ui dep 보유), backend, DB, GP/KCos, Neture.
+**무변경:** `@o4o/lms-ui`(이번 WO 패키지 수정 0), package.json/pnpm-lock(KPA 가 이미 lms-ui dep 보유), backend, DB, KCos, Neture.
 
 ## 4. 추가 적용한 `@o4o/lms-ui` 컴포넌트
 
@@ -69,22 +69,21 @@ KPA(LMS 공통화 reference impl)에서 아직 미소비하던 `@o4o/lms-ui` 컴
 - completion/progress 계산 로직 변경 0(CourseProgressBar 는 기존 percent/count 를 표시만).
 - API 호출 로직 변경 0(route 는 hrefFor 주입, 기존 경로 동일).
 
-## 9. Neture / GP / KCos 미수정 확인
+## 9. Neture / KCos 미수정 확인
 
 - `services/web-neture` 파일 0, package.json 0, route/menu/import 0 — Neture 제외 경계 불변.
-- GlycoPharm / K-Cosmetics 소스 미변경(각 직전 adoption 에서 처리).
+- K-Cosmetics 소스 미변경(각 직전 adoption 에서 처리).
 - 본 WO 변경 = KPA lms 페이지 2개 + CHECK 문서. 타 세션 forum WIP 미접촉.
 
 ## 10. 검증 결과
 
 - **TypeScript:** `web-kpa-society` `tsc --noEmit` **0 errors**(편집 2파일·lms-ui 해상 포함 전체 clean). 미사용 심볼 경고 0(Link·LESSON_TYPE_ICON 등 잔여 사용처 유지).
 - **grep:** KPA lms 페이지 `@o4o/lms-ui` 소비 — LessonList(rowClickMode='row') 2곳, CourseProgressBar 2곳. youtube/iframe/checkout/payment(=NoPaymentNotice 외)/`+10/+20/+50`/rewardPolicy reintro 0.
-- **무변경:** `@o4o/lms-ui` 패키지, package.json/pnpm-lock, backend, GP/KCos, Neture.
+- **무변경:** `@o4o/lms-ui` 패키지, package.json/pnpm-lock, backend, KCos, Neture.
 - **browser smoke:** 미수행 — 렌더/네비게이션 변경 중심. 배포 후 KPA `/lms/course/:id`·`/lms/course/:courseId/lesson/:lessonId` 에서 레슨 행 전체 클릭 네비게이션·현재 레슨 강조·완료 표시·진도 렌더·결제없음 안내 확인 권장.
 
 ## 11. 남은 후속 작업
 
-1. **`WO-O4O-LMS-GLYCOPHARM-FULLER-ADOPTION-V1`** — GP 레슨 사이드바(`LmsLessonPage`)에 본 WO 의 KPA reference pattern(`LessonList rowClickMode='row'` + hrefFor) 적용.
 2. **`WO-O4O-LMS-KCOSMETICS-FULLER-ADOPTION-V1`** — KCos 동일 적용.
 3. **`WO-O4O-LMS-COMMON-COURSE-HUB-CARD-ALIGNMENT-V1`** — CourseCard/List ↔ `LmsHubTemplate` 관계 정리(목록 공통화).
 4. **`IR-O4O-REWARD-BUDGET-FLOW-PLATFORM-SERVICE-INSTRUCTOR-V1`** — 별도 작업선(강사 reward 지갑/충전/배정/ledger).
@@ -92,4 +91,4 @@ KPA(LMS 공통화 reference impl)에서 아직 미소비하던 `@o4o/lms-ui` 컴
 
 ## 12. 완료 판정
 
-**PASS.** KPA 가 `LessonList`(rowClickMode='row') + `CourseProgressBar` 를 레슨 사이드바·상세에서 소비 시작 — `@o4o/lms-ui` 소비 2 → 4 컴포넌트로 확대, **레슨 사이드바 row-click reference pattern 확정**. 기존 기능·route·API·결제없음·reward 정책 보존, EnrollmentButton/CourseCard/LessonPlayerShell 은 사유와 함께 보류(§7). web-kpa-society typecheck 0, GP/KCos/Neture/backend/package 무변경. GP/KCos fuller adoption 이 본 패턴을 그대로 따를 수 있다.
+**PASS.** KPA 가 `LessonList`(rowClickMode='row') + `CourseProgressBar` 를 레슨 사이드바·상세에서 소비 시작 — `@o4o/lms-ui` 소비 2 → 4 컴포넌트로 확대, **레슨 사이드바 row-click reference pattern 확정**. 기존 기능·route·API·결제없음·reward 정책 보존, EnrollmentButton/CourseCard/LessonPlayerShell 은 사유와 함께 보류(§7). web-kpa-society typecheck 0, KCos/Neture/backend/package 무변경. KCos fuller adoption 이 본 패턴을 그대로 따를 수 있다.

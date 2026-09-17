@@ -1,7 +1,6 @@
 /**
  * Toss Payments Provider Adapter
  *
- * WO-O4O-PAYMENT-CORE-GLYCOPHARM-PILOT-V1
  *
  * PaymentProviderAdapter 인터페이스 구현.
  * Toss Payments API를 래핑.

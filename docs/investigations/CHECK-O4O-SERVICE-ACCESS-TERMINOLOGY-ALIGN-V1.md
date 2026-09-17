@@ -18,9 +18,9 @@
 |---|---|
 | `apps/**` (backend) | **0건** — 결제 `SERVICE_ACCESS` 미존재 |
 | `packages/**` | **0건** |
-| `services/**` (frontend) | 2건 — **`SERVICE_ACCESS_TOKEN_KEY`** (`web-glycopharm`/`web-kpa-society` AuthContext) |
+| `services/**` (frontend) | 2건 — **`SERVICE_ACCESS_TOKEN_KEY` |
 
-- 프론트 2건은 `glycopharm_service_access_token` / `kpa_pharmacy_service_access_token` **localStorage 키**(service-user **인증 토큰**, `WO-AUTH-SERVICE-IDENTITY-PHASE2`). **결제 타입 `SERVICE_ACCESS` 와 완전 무관**한 substring 오탐.
+- 프론트 2건은 `kpa_pharmacy_service_access_token` **localStorage 키**(service-user **인증 토큰**, `WO-AUTH-SERVICE-IDENTITY-PHASE2`). **결제 타입 `SERVICE_ACCESS` 와 완전 무관**한 substring 오탐.
 - → **결제 의미의 `SERVICE_ACCESS` 는 코드 0건** 재확인. 중단 기준 #1(코드 enum/route/API 발견) **미해당**. 순수 문서 정렬로 진행.
 
 > 주의: `SERVICE_ACCESS_TOKEN_KEY`(auth)는 본 WO 와 무관 — **건드리지 않는다.**
@@ -77,7 +77,6 @@ paymentType = 'STORE_SERVICE_SUBSCRIPTION' | 'B2B_ORDER'
 | FOREIGN_VISITOR_SALES_SUPPORT = 구독 플랜(고객 결제 아님) 고정 | ✅ |
 | paid-feature entitlement 삭제 없음 | ✅ |
 | PaymentCore/o4o_payments 스키마 변경 없음 | ✅ |
-| KPA/Glyco/KCos 고객 checkout cleanup 미수행(분리) | ✅ |
 | 코드/DB/API/UI 변경 없음 | ✅ |
 
 ## 6. 중단 기준 점검 (§11)
@@ -95,7 +94,6 @@ paymentType = 'STORE_SERVICE_SUBSCRIPTION' | 'B2B_ORDER'
 ## 8. 후속 WO 연결
 
 ```text
-1. WO-O4O-STORE-SALE-PAYMENT-EXCLUSION-CLEANUP-V1     ← KPA/Glyco/KCos 고객 checkout→O4O Toss 정리(선조사)
 2. WO-O4O-STORE-SERVICE-SUBSCRIPTION-TOSS-PAYMENT-V1  ← FOREIGN_VISITOR_SALES_SUPPORT 구독 결제 + entitlement ACTIVE
 3. WO-O4O-B2B-ORDER-PURPOSE-V1                        ← STORE_STOCK / STORE_CUSTOMER_FULFILLMENT / MARKETPLACE_FULFILLMENT_RESERVED
 ```

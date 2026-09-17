@@ -124,7 +124,7 @@ App.tsx L972-1016 (OperatorLayoutWrapper 하위) 와 §2 operator-노출 항목 
 - **adminOnly**: operator wrapper 가 `isAdmin=false` 고정 → adminOnly 항목 전부 operator sidebar 에서 제외 (admin 영역은 `getAdminMenu()` + AdminLayoutWrapper 별도). 이행 시 **false 보존 필수**.
 - operator 노출 결과 group별 item 수: dashboard 2 / users 2 / approvals 3 / products 1 / stores 1 / orders 1 / content 2 / signage 1 / forum 3 / analytics 6 / system 1. → single-item group(products/stores/orders/signage/system)은 DomainIASidebar 에서 direct link 렌더, multi-item 은 collapsible.
 
-> 참고: multi-item group 의 collapsible 헤더 라벨은 STANDARD_GROUPS 의 **영문 라벨**(Users/Approvals/Content/Forum/Analytics) — KPA/Glyco/KCos 와 동일한 기존 동작. domain 헤딩(국문)과 group 헤더(영문) 혼재는 pre-existing, 본 IR 범위 외.
+> domain 헤딩(국문)과 group 헤더(영문) 혼재는 pre-existing, 본 IR 범위 외.
 
 ---
 
@@ -230,10 +230,9 @@ export interface OperatorDomainIAConfig {
   topPinnedGroups: OperatorGroupKey[];
 }
 // DomainIASidebarProps 에 optional domainIA?: OperatorDomainIAConfig 추가.
-// 미지정 시 기존 operatorDomainIA(KPA 모델) default → KPA/Glyco/KCos 무변화.
 ```
 
-- **기존 3 서비스(KPA/Glyco/KCos)**: prop 미전달 → default operatorDomainIA → **완전 무변화** (재빌드/smoke 로 검증).
+- **기존 3 서비스**: prop 미전달 → default operatorDomainIA → **완전 무변화** (재빌드/smoke 로 검증).
 - **OperatorAreaShell** 도 `domainIA` 를 선택 prop 으로 받아 DomainIASidebar 에 pass-through (또는 Neture wrapper 가 DomainIASidebar 직접 사용 고려 — 단 OperatorAreaShell 경유가 layout 정합).
 - Operator OS Freeze: operator-ux-core 변경이나 **순수 additive·default 보존** → DomainIASidebar/OperatorAreaShell 추출과 동일 안전 분류.
 
@@ -272,7 +271,7 @@ export const NETURE_OPERATOR_DOMAIN_IA = { /* 위 5개를 config 객체로 조�
 ## 11. footer 유지/제거 판단
 
 - 현재 Neture operator 는 OperatorShell **기본 footer**(`© 2026 Neture. 플랫폼 운영` + `메인으로`) 렌더 중.
-- OperatorAreaShell 은 footer 미보유. KPA/Glyco/KCos operator 영역도 **footer 없음**.
+- OperatorAreaShell 은 footer 미보유.
 - **권장: 제거** (cross-service 정합). "메인으로" 는 GlobalHeader(브랜드 로고/네비)로 대체 가능, 카피라이트는 operator 내부 영역에 필수 아님.
 - 리스크 낮음. 단 **smoke 로 footer 부재 확인** + 필요 시 OperatorAreaShell 에 optional footer slot 추가는 별도 판단(현 시점 불필요).
 
@@ -280,7 +279,7 @@ export const NETURE_OPERATOR_DOMAIN_IA = { /* 위 5개를 config 객체로 조�
 
 ## 12. Neture 전용 smoke 필요 범위
 
-- smoke2.mjs 는 glyco/kcos 만 — **Neture 미커버**. 신규 smoke(또는 smoke2 확장) 필요:
+- 신규 smoke(또는 smoke2 확장) 필요:
   - origin: neture.co.kr `/operator`
   - **domain 헤딩 4개 노출**: 공급·유통 운영 / 커머스·정산 운영 / 커뮤니티·콘텐츠 운영 / 운영 공통
   - 대시보드 top-pin + Action Queue

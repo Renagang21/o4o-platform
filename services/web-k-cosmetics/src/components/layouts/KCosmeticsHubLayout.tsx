@@ -3,7 +3,7 @@
  *
  * WO-O4O-STOREHUB-STRUCTURE-ALIGNMENT-V1: wrapper 최초 추가
  * WO-O4O-STORE-HUB-COMMON-VIEW-AND-SHELL-UNIFICATION-V1:
- *   KPA·GlycoPharm 과 동일했던 사이드바/드로어 마크업을 공통 `StoreHubShell` 로 이관.
+ *   KPA 과 동일했던 사이드바/드로어 마크업을 공통 `StoreHubShell` 로 이관.
  *   이 파일은 이제 **메뉴 config + accent + label + 서비스 푸터** 만 소유한다.
  *   메뉴 항목 / 라우트 / 권한 무변경.
  */
@@ -62,7 +62,7 @@ const HUB_MENU: StoreHubNavGroup[] = [
         to: '/store-hub/blog',
       },
       {
-        // WO-O4O-KCOS-STORE-HUB-POP-QR-PORT-V1: 준비 중 → 실제 페이지 연결 (KPA/GlycoPharm canonical)
+        // WO-O4O-KCOS-STORE-HUB-POP-QR-PORT-V1: 준비 중 → 실제 페이지 연결 (KPA canonical)
         key: 'pop',
         label: 'POP',
         description: '운영자 POP 자료를 탐색하고 내 매장에 가져갑니다',

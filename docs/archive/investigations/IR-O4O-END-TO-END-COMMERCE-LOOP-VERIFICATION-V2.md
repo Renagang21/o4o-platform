@@ -22,7 +22,7 @@
 | 9 | QR 코드 랜딩 | **PASS** | `GET /qr/public/:slug` → scan tracking + store redirect |
 | 10 | QR 전단지 인쇄 | **PASS** | `POST /pharmacy/qr/print` → A4 8-cell PDF (pdfkit) |
 | 11 | 장바구니 (Cart) | **PASS (제한적)** | Client-side localStorage만. KPA 전용 cart 없음 |
-| 12 | 주문 생성 | **FAIL (KPA)** | GlycoPharm/Cosmetics ✅. **KPA checkout endpoint 없음** |
+| 12 | 주문 생성 | **FAIL (KPA)** | Cosmetics ✅. **KPA checkout endpoint 없음** |
 | 13 | 결제 처리 | **FAIL (KPA)** | Toss Payments 연동 존재. **KPA → 결제 경로 없음** |
 
 **총 결과: 10 PASS / 3 FAIL (KPA 기준)**
@@ -212,7 +212,6 @@ WO-O4O-STOREFRONT-PRODUCT-DETAIL-PAGE-V1:
 ### 존재하는 구현
 | 서비스 | Endpoint | Entity | 상태 |
 |--------|----------|--------|------|
-| GlycoPharm | `POST /api/v1/glycopharm/checkout` | EcommerceOrder | ✅ 정상 |
 | Cosmetics | `POST /api/v1/cosmetics/orders` | EcommerceOrder | ✅ 정상 |
 | Generic | `POST /api/checkout/initiate` | CheckoutOrder (legacy) | ⚠️ Phase N-2 |
 
@@ -222,7 +221,7 @@ WO-O4O-STOREFRONT-PRODUCT-DETAIL-PAGE-V1:
 - **checkoutService.createOrder() 호출 경로 없음**
 
 ### Dual Order 시스템 현황
-- `EcommerceOrder` (Core): GlycoPharm/Cosmetics 사용 ✅
+- `EcommerceOrder` (Core): Cosmetics 사용 ✅
 - `CheckoutOrder` (Legacy): Generic checkout 사용 ⚠️ (E-commerce Core 계약 위반)
 
 ---
@@ -319,7 +318,7 @@ WO-O4O-STOREFRONT-PRODUCT-DETAIL-PAGE-V1:
 
 1. **WO-O4O-STOREFRONT-PRODUCT-DETAIL-PAGE-V1** — StorefrontProductDetailPage 컴포넌트 생성 + App.tsx 라우트 등록 (QR→상품 흐름 복구)
 2. **WO-O4O-KPA-CHECKOUT-INTEGRATION-V1** — KPA checkout endpoint + EcommerceOrder 통합 (Cart → Order → Payment 전체 루프)
-3. **IR-O4O-COMMERCE-DATA-INTEGRITY-AUDIT** — Order/Settlement/Commission 데이터 정합성 (GlycoPharm/Cosmetics 대상)
+3. **IR-O4O-COMMERCE-DATA-INTEGRITY-AUDIT** — Order/Settlement/Commission 데이터 정합성 (Cosmetics 대상)
 
 ---
 

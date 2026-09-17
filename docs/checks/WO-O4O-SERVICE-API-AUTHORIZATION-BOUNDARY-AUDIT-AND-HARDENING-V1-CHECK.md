@@ -164,7 +164,7 @@ mount 지점(`register-routes.ts`), controller/service 계층, DB schema **미�
 | `GET /service/templates/recommend/:sg` | CONSUMER_ZERO |
 | `GET /service/stats` | CONSUMER_ZERO |
 
-admin-dashboard 외 서비스(KPA / PharmacyHub / K-Cosmetics / GlycoPharm / Neture) 프론트에서
+admin-dashboard 외 서비스(KPA / PharmacyHub / K-Cosmetics / Neture) 프론트에서
 `/api/v1/service/*` 호출 **0건**.
 
 ### 판정
@@ -236,7 +236,7 @@ admin-dashboard 외 서비스(KPA / PharmacyHub / K-Cosmetics / GlycoPharm / Net
 - `/health` **200**, `/health/database` **healthy** (pingMs 4)
 - super_admin read 회귀 없음: `/api/v1/appstore` 200, `/api/v1/apps/availability` 200(6 apps),
   `/api/v1/service-admin/templates` 200
-- KPA / PharmacyHub / K-Cosmetics / GlycoPharm / Neture 프론트에서 `/api/v1/service/*` 호출 0건이므로
+- KPA / PharmacyHub / K-Cosmetics / Neture 프론트에서 `/api/v1/service/*` 호출 0건이므로
   서비스별 교차 회귀 대상 없음(대조군 확인 결과 소비처는 admin-dashboard 단일).
 - 배포 후 15분 Cloud Run **신규 ERROR 0 / Service API 관련 신규 5xx 0**.
 

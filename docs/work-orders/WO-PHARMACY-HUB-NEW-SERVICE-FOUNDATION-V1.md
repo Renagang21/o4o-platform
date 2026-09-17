@@ -71,7 +71,6 @@ Pharmacy-Hub는 공급자와 약국 경영자를 직접 연결하는 O4O 약국 
 1. 기존 서비스 앱 구성
 
    * KPA Society
-   * GlycoPharm
    * K-Cosmetics
    * Neture
    * 공통 서비스 등록 및 배포 구조
@@ -162,7 +161,7 @@ Pharmacy-Hub에서 일반 상품은:
 
 * Pharmacy-Hub 대상 매핑 가능 구조를 준비한다.
 * 신규 서비스에서 공급자 이벤트 오퍼 자동승인이 단순한 서비스별 정책 분기로 가능하면 후속 작업에서 자동승인한다.
-* 기존 KPA·GlycoPharm·K-Cosmetics의 운영자 승인 흐름은 변경하지 않는다.
+* 기존 KPA·K-Cosmetics의 운영자 승인 흐름은 변경하지 않는다.
 * 이번 Foundation에서 자동승인까지 무리하게 구현하지 않아도 된다.
 * 단, 이벤트 오퍼 키와 확장 지점은 조사·정리한다.
 
@@ -208,7 +207,7 @@ Pharmacy-Hub에서 일반 상품은:
 
 다음 중 하나라도 해당하면 임의 구현하지 말고 조사 결과를 보고한 뒤 중지한다.
 
-1. Pharmacy-Hub 추가를 위해 기존 KPA·GlycoPharm·K-Cosmetics의 회원·주문 의미를 변경해야 하는 경우
+1. Pharmacy-Hub 추가를 위해 기존 KPA·K-Cosmetics의 회원·주문 의미를 변경해야 하는 경우
 2. ProductMaster·SupplierProductOffer·주문 원장을 복제해야만 구현 가능한 경우
 3. 현재 서비스 membership 구조로 서비스별 가입·승인 분리가 불가능한 경우
 4. 기존 인증 또는 쿠키 구조가 단일 도메인에 강하게 고정되어 대규모 인증 재설계가 필요한 경우
@@ -254,7 +253,7 @@ Pharmacy-Hub에서 일반 상품은:
 3. 기본 라우트가 렌더됨
 4. 서비스 표시명이 정상 노출됨
 5. 기존 서비스 키와 충돌하지 않음
-6. 기존 KPA·GlycoPharm·K-Cosmetics·Neture 빌드에 회귀가 없음
+6. 기존 KPA·K-Cosmetics·Neture 빌드에 회귀가 없음
 7. Pharmacy-Hub에 Market Trial 연결 흔적이 없음
 8. 신규 앱이 공통 사용자·조직·상품·주문 원장을 재사용하도록 설계됨
 9. 회원·권한 분리의 후속 구현 지점이 명확함

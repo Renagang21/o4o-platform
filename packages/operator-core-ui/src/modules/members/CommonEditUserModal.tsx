@@ -6,7 +6,7 @@
  * users.id 기반의 Operator Membership Console 공통 편집 모달.
  * 서비스별 차이(API 경로·역할 옵션·라벨·프로필 분류)는 EditUserModalConfig 로 주입한다.
  *
- * 지원 서비스: Neture / GlycoPharm / K-Cosmetics
+ * 지원 서비스: Neture / K-Cosmetics
  *
  * KPA 제외 사유:
  *   - ID 기준: kpa_members.id (users.id 와 다름)
@@ -29,7 +29,6 @@ import {
 } from 'lucide-react';
 import { AddressSearch } from '@o4o/ui';
 
-// WO-O4O-GLYCOPHARM-OPERATOR-MEMBER-EDIT-INVALID-USERID-GUARD-V1:
 // userId prop 가 undefined / null / 빈 문자열 / 잘못된 UUID 형식일 때
 // `/operator/members/undefined` 같은 요청을 발생시켜 백엔드 500 을 유발하지 않도록 차단한다.
 const USER_ID_UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -71,7 +70,7 @@ export type ApiRequestFn = (
 /**
  * CommonEditUserModal 에 주입하는 서비스별 설정 객체.
  *
- * 각 서비스(Neture / GlycoPharm / K-Cosmetics)의 thin wrapper 파일에서
+ * 각 서비스(Neture / K-Cosmetics)의 thin wrapper 파일에서
  * 정적 상수로 정의하여 컴포넌트에 전달한다.
  * UI · API · 페이로드 구조는 이 config 로만 달라지며, 컴포넌트 로직은 공통이다.
  */
@@ -79,7 +78,7 @@ export interface EditUserModalConfig {
   /**
    * 서비스 canonical 키.
    * service_memberships 조회 및 역할 변경 API 경로에 사용된다.
-   * e.g. 'neture' | 'glycopharm' | 'k-cosmetics'
+   * e.g. 'neture' | 'k-cosmetics'
    */
   serviceKey: string;
   /**
@@ -91,7 +90,7 @@ export interface EditUserModalConfig {
   /**
    * service_memberships.role 드롭다운 옵션.
    * 서비스마다 허용 역할이 다르므로 wrapper 에서 정의한다.
-   * e.g. Neture: [supplier] / GP: [pharmacy, supplier] / K-Cos: [seller, consumer, ...]
+   * e.g. Neture: [supplier] / K-Cos: [seller, consumer, ...]
    */
   membershipRoleOptions: EditUserModalOption[];
   /**
@@ -105,12 +104,12 @@ export interface EditUserModalConfig {
   adminRoleOptions: EditUserModalOption[];
   /**
    * 사업자/매장 정보 섹션 헤더 레이블.
-   * Default: "사업자 정보" (GP 는 "약국 정보" 로 오버라이드)
+   * Default: "사업자 정보" (약국형 서비스는 "약국 정보" 로 오버라이드)
    */
   businessInfoLabel?: string;
   /**
    * 사업자명 필드 레이블.
-   * Default: "사업자명" (GP 는 "약국명" 으로 오버라이드)
+   * Default: "사업자명" (약국형 서비스는 "약국명" 으로 오버라이드)
    */
   businessNameLabel?: string;
   /**
@@ -126,7 +125,7 @@ export interface EditUserModalConfig {
    *   일부 계정은 운영 권한이 bare 'operator'/'admin' 또는 membership.role 에 들어 있어,
    *   기존 namespaced-only 매칭으로는 "일반 회원"으로 잘못 표시된다(대시보드 접근은 운영자 표시).
    *   opt-in 서비스에 한해 표시 초기값을 대시보드 기준과 일치시킨다(저장 로직은 불변).
-   * Default: false (GlycoPharm/K-Cosmetics 무영향).
+   * Default: false.
    */
   normalizeAdminRoleDisplay?: boolean;
 }
@@ -183,7 +182,6 @@ export function CommonEditUserModal({ userId, config, onClose, onSuccess }: Comm
   });
 
   useEffect(() => {
-    // WO-O4O-GLYCOPHARM-OPERATOR-MEMBER-EDIT-INVALID-USERID-GUARD-V1:
     // 잘못된 userId 로 fetch 시도 시 `/operator/members/undefined` → 백엔드 500.
     // fetch 자체를 차단하고 안내 메시지 표시.
     if (!userId || !USER_ID_UUID_REGEX.test(userId)) {

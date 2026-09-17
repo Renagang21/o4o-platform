@@ -99,7 +99,6 @@ constraint:
 | `store_library_items` | [store-library-item.entity.ts](apps/api-server/src/routes/platform/entities/store-library-item.entity.ts) | ✅ | description | htmlContent | ❌ | fileUrl | mimeType/fileSize | url | description |
 | `store_execution_assets` | [store-execution-asset.entity.ts](apps/api-server/src/routes/platform/entities/store-execution-asset.entity.ts) | ✅ | description | htmlContent | ❌ | fileUrl | mimeType/usageType | url | htmlContent |
 | `store_qr_codes` | [store-qr-code.entity.ts](apps/api-server/src/routes/platform/entities/store-qr-code.entity.ts) | ✅ | description | ❌ | ❌ | ❌ | ❌ | landingTargetId | ❌ |
-| `staff_blog_posts` (KPA) / `store_blog_posts` (Glyco) | [store-blog-post.entity.ts](apps/api-server/src/routes/glycopharm/entities/store-blog-post.entity.ts) | ✅ | content | content (raw HTML) | ❌ | ❌ | ❌ | ❌ | content |
 | `product_ai_contents` | [product-ai-content.entity.ts](apps/api-server/src/modules/store-ai/entities/product-ai-content.entity.ts) | ❌ | content | ❌ | ❌ | ❌ | model | ❌ | content (core) |
 
 → **jsonb 보유 entity 2종 (`o4o_asset_snapshots`, `kpa_store_contents`) 만이 *모든 payload 종류* 를 흡수 가능**.
@@ -511,7 +510,6 @@ POP 결과물은 현재 휘발성 PDF (`POST /pharmacy/pop/generate` 가 즉시 
 - [apps/api-server/src/routes/platform/entities/store-library-item.entity.ts](apps/api-server/src/routes/platform/entities/store-library-item.entity.ts) — `store_library_items`
 - [apps/api-server/src/routes/platform/entities/store-execution-asset.entity.ts](apps/api-server/src/routes/platform/entities/store-execution-asset.entity.ts) — `store_execution_assets`
 - [apps/api-server/src/routes/platform/entities/store-qr-code.entity.ts](apps/api-server/src/routes/platform/entities/store-qr-code.entity.ts) — `store_qr_codes`
-- [apps/api-server/src/routes/glycopharm/entities/store-blog-post.entity.ts](apps/api-server/src/routes/glycopharm/entities/store-blog-post.entity.ts) — `store_blog_posts` (Glyco) / `staff_blog_posts` (KPA)
 - [apps/api-server/src/modules/store-ai/entities/product-ai-content.entity.ts](apps/api-server/src/modules/store-ai/entities/product-ai-content.entity.ts) — `product_ai_contents`
 
 ### API Controller

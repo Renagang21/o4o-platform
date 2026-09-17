@@ -9,8 +9,6 @@
  *   - cosmetics:store_owner role 과 본 sub_role 은 서로 다른 layer.
  *   - role 은 권한 (무엇을 할 수 있는가), sub_role 은 "어떤 사람인가".
  *
- * 패턴: GlycopharmMember entity (apps/api-server/src/routes/glycopharm/entities/glycopharm-member.entity.ts) mirror.
- *
  * 매장 내 직급 (CosmeticsStoreMember.role: owner / manager / staff) 과는 별개 layer:
  *   - CosmeticsStoreMember = 특정 매장 내에서의 역할 (N:M 관계)
  *   - CosmeticsMember.sub_role = 사용자 자신의 프로필 분류 (어떤 사람인가)

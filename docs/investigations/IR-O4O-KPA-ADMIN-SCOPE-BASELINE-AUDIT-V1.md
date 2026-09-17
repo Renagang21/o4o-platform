@@ -15,7 +15,7 @@
 >
 > 1. **중요 환경 변화**: 선행 IR(`...SETTINGS-MANAGEMENT-AUDIT-V1`) 작성 이후, **cross-service `service_legal_profiles` + `service_policy_documents` 가 이미 구현됨**(entity+public+admin controller). 선행 IR 의 "법정정보 entity/API 부재" 결론은 **갱신**한다.
 > 2. **KPA Footer 는 이미 `service_legal_profiles` 를 동적 소비**(`/api/v1/public/services/kpa-society/footer-legal`, 값 없으면 비표시 — placeholder 없음). 하드코딩 아님.
-> 3. **그러나 KPA admin 에 `service_legal_profiles` 편집 UI 가 없음.** GP/KCos/Neture 는 `pages/admin/ServiceLegalSettingsPage.tsx`(공유 모듈 `operator-core-ui/service-legal`) 보유 — **KPA 만 미도입.** → KPA 운영자는 자기 서비스 footer 법정정보를 채울 수 없음(현재 빈 표시). **primary gap.**
+> 3. **그러나 KPA admin 에 `service_legal_profiles` 편집 UI 가 없음.** KCos/Neture 는 `pages/admin/ServiceLegalSettingsPage.tsx`(공유 모듈 `operator-core-ui/service-legal`) 보유 — **KPA 만 미도입.** → KPA 운영자는 자기 서비스 footer 법정정보를 채울 수 없음(현재 빈 표시). **primary gap.**
 > 4. **정책문서 이중 트랙**: KPA 공개 `/policy`·`/privacy` 는 **legacy `kpa_legal_documents`** 를 읽음(편집 = `/operator/legal` LegalManagementPage, kpa:admin). cross-service `service_policy_documents` 는 KPA 미연결. → 공유 ServiceLegalSettingsPage 도입 시 정책문서가 **두 시스템 공존** 위험 → 결정 필요.
 > 5. **admin/operator 경계는 대체로 정상**: 회원(admin=hard-delete / operator=soft) 분리 ✓, 문의(admin=문의 설정 / operator=문의 처리) 분리 ✓.
 > 6. **정책 점검 항목**: `/operator/roles`(adminOnly, kpa:admin 이 kpa:operator/kpa:admin 부여) — WO 정책상 "운영자 지정=O4O 전체 관리자 영역" 과의 정합 결정 필요(즉시 제거 단정 금지 — KPA `platformBypass:false` 로 super_admin cross 불가하므로 service admin 의 within-service 부여가 필요할 수 있음).
@@ -57,7 +57,7 @@
 |---|---|:--:|---|---|
 | **Footer 법정정보** | `service_legal_profiles` (cross-service) | ✅ READ | ❌ **없음** | Footer.tsx → `PublicLegalFooterInfo serviceKey="kpa-society"` → `GET /api/v1/public/services/kpa-society/footer-legal` (값 없으면 비표시) |
 | **정책 문서(약관/개인정보)** | `kpa_legal_documents` (KPA legacy) | ✅ READ+WRITE | `/operator/legal` LegalManagementPage (kpa:admin) | `/policy`·`/privacy` → `LegalDocumentView` → `GET /kpa/legal/documents/published/:type` |
-| **정책 문서(cross-service)** | `service_policy_documents` | ❌ 미연결 | (GP/KCos/Neture 는 ServiceLegalSettingsPage 로 사용) | — |
+| **정책 문서(cross-service)** | `service_policy_documents` | ❌ 미연결 | (KCos/Neture 는 ServiceLegalSettingsPage 로 사용) | — |
 
 - cross-service entity 위치: `apps/api-server/src/modules/service-legal/entities/{ServiceLegalProfile,ServicePolicyDocument}.entity.ts`. public controller: `public-service-legal.controller.ts`(`/:serviceKey/legal-profile`·`/footer-legal`·`/policies/:type`). admin controller: `admin-service-legal.controller.ts`(`PUT /:serviceKey/legal-profile` 등, `requireServiceLegalScope('admin')`).
 - 공유 admin UI: `packages/operator-core-ui/src/modules/service-legal/ServiceLegalSettingsPage.tsx`.
@@ -68,7 +68,7 @@
 - 법정 링크: `<Link to="/policy">이용약관</Link>`, `<Link to="/privacy">개인정보처리방침</Link>` — **둘 다 실재 route(App.tsx:898-899), 데드링크 아님.**
 - copyright: `Copyright © 2026 약사회. All Rights Reserved.` (하드코딩, 법정정보 아님)
 - 법정정보 블록: `<PublicLegalFooterInfo serviceKey="kpa-society" loadProfile={loadFooterLegal} />` → `service_legal_profiles` 동적 조회, **값 없으면 비표시(placeholder 없음)**.
-- → KPA footer 는 placeholder 위험 없음(GP/KCos 와 달리 이미 동적). 단 **service_legal_profiles 가 비어 있으면 footer 법정정보가 영구 공백** — 채울 admin UI 가 없는 것이 문제.
+- → KPA footer 는 placeholder 위험 없음(KCos 와 달리 이미 동적). 단 **service_legal_profiles 가 비어 있으면 footer 법정정보가 영구 공백** — 채울 admin UI 가 없는 것이 문제.
 
 ## 5. /policy · /privacy 공개 문서 흐름
 
@@ -104,7 +104,7 @@
 
 | # | gap | 현황 | 보강 방향 |
 |:-:|---|---|---|
-| G1 | **서비스 법정정보(service_legal_profiles) 편집 UI** | KPA 만 `ServiceLegalSettingsPage` 미도입(GP/KCos/Neture 보유) | 공유 모듈 `operator-core-ui/service-legal` 의 `ServiceLegalSettingsPage` 를 KPA admin 에 wire (serviceKey="kpa-society") |
+| G1 | **서비스 법정정보(service_legal_profiles) 편집 UI** | KPA 만 `ServiceLegalSettingsPage` 미도입(KCos/Neture 보유) | 공유 모듈 `operator-core-ui/service-legal` 의 `ServiceLegalSettingsPage` 를 KPA admin 에 wire (serviceKey="kpa-society") |
 | G2 | **정책문서 트랙 결정** | 공개 정책 = legacy `kpa_legal_documents`; cross-service `service_policy_documents` 미사용 | (A) legacy 유지 + 공유 UI 는 법정정보만 / (B) service_policy_documents 이관 + `/policy`·`/privacy` 소스 교체 + kpa_legal_documents 마이그레이션 — **결정 필요** |
 | G3 | **공개 상태(readiness) 점검 화면** | 없음 | 법정정보 입력/약관 게시/개인정보 게시/문의 설정/footer 표시 상태를 admin 홈·설정에서 점검 |
 
@@ -120,7 +120,7 @@
 
 | WO(가칭) | 목표 | 비고 |
 |---|---|---|
-| **WO-O4O-KPA-ADMIN-SERVICE-LEGAL-SETTINGS-WIRING-V1** | KPA admin 에 공유 `ServiceLegalSettingsPage` 도입 → footer 법정정보(service_legal_profiles) 편집 가능. (WO §8.1 구체화) | **primary**, 저위험(공유 모듈 재사용, GP/KCos/Neture 선례). 정책문서 탭은 G2 결정에 따름 |
+| **WO-O4O-KPA-ADMIN-SERVICE-LEGAL-SETTINGS-WIRING-V1** | KPA admin 에 공유 `ServiceLegalSettingsPage` 도입 → footer 법정정보(service_legal_profiles) 편집 가능. (WO §8.1 구체화) | **primary**, 저위험(공유 모듈 재사용, KCos/Neture 선례). 정책문서 탭은 G2 결정에 따름 |
 | **IR/WO-O4O-KPA-POLICY-DOCUMENT-TRACK-DECISION-V1** | `kpa_legal_documents`(legacy) vs `service_policy_documents`(cross-service) 단일화 결정 + (이관 시) `/policy`·`/privacy` 소스 교체·데이터 마이그레이션 | **선행 결정 필요**. 이중 표시·중복 편집 방지 |
 | WO-O4O-KPA-ADMIN-PUBLIC-READINESS-CHECK-V1 | 법정정보/약관/개인정보/문의설정/footer 게시 상태 점검 화면 | WO §8.4 |
 | (정책) WO-O4O-KPA-ROLE-ASSIGNMENT-SCOPE-DECISION-V1 | `/operator/roles` 의 소속(service admin vs 전체관리자) 확정 | platformBypass 정책 고려 |
@@ -132,7 +132,7 @@
 
 - ⚠️ **정책문서 이중 트랙(G2) 미결정 상태에서 공유 ServiceLegalSettingsPage 의 정책문서 탭을 KPA 에 켜면, `/policy`·`/privacy`(kpa_legal_documents) 와 service_policy_documents 가 동시 존재** → 운영자 혼란·이중 게시 위험. wiring WO 는 **법정정보(service_legal_profiles) 먼저**, 정책문서는 G2 결정 후.
 - ⚠️ KPA `platformBypass:false` — cross-service admin guard(`requireServiceLegalScope('admin')`)가 KPA 에서 `kpa:admin` 으로 해석되는지(super_admin 우회 불가) 도입 전 확인 필요.
-- ⚠️ KPA footer 는 이미 동적(placeholder 없음) — GP/KCos 의 0단계 placeholder 제거 대상 아님(정상).
+- ⚠️ KPA footer 는 이미 동적(placeholder 없음) — KCos 의 0단계 placeholder 제거 대상 아님(정상).
 - 본 IR 은 read-only 조사이며 확정 법률 자문 아님. role 소속·정책 트랙은 정책 결정 동반.
 
 ---
@@ -158,4 +158,4 @@
 `pages/operator/{LegalManagementPage,RoleManagementPage}.tsx` · `pages/legal/{PolicyPage,PrivacyPage}.tsx` · `components/Footer.tsx` · `lib/footerLegal.ts` ·
 `apps/api-server/src/routes/kpa/controllers/{legal-documents,contact-request,member}.controller.ts` (+ `kpa.routes.ts`) ·
 `apps/api-server/src/modules/service-legal/{entities,public-service-legal.controller,admin-service-legal.controller}.ts` ·
-`packages/operator-core-ui/src/modules/service-legal/ServiceLegalSettingsPage.tsx` · `services/web-{glycopharm,k-cosmetics,neture}/src/pages/admin/ServiceLegalSettingsPage.tsx` (선례)
+`packages/operator-core-ui/src/modules/service-legal/ServiceLegalSettingsPage.tsx`

@@ -1,10 +1,9 @@
 /**
  * ContentDetailPage — K-Cosmetics 콘텐츠 상세
  *
- * WO-O4O-APPRECIATION-CONTENT-DETAIL-UI-GLYCO-KCOS-V1
- * WO-O4O-APPRECIATION-GLYCO-KCOS-MIGRATION-V1: AppreciationPanel 공통 컴포넌트로 정렬
+ * AppreciationPanel 공통 컴포넌트로 정렬
  * WO-O4O-STORE-HUB-COMMON-VIEW-AND-SHELL-UNIFICATION-V1:
- *   GlycoPharm `/hub/content/:id` 와 동일한 화면이라 공통 `HubContentDetailView` 로 이관.
+ *   공통 `HubContentDetailView` 로 이관.
  *   이 파일은 accent(pink) · 추천 배지 · 감사 패널 config 만 소유한다.
  *   inline style 제거(디자인 동일). 데이터 출처 · 라우트 무변경.
  *
@@ -41,7 +40,7 @@ export default function ContentDetailPage() {
       showPinnedBadge
       onBack={() => navigate(-1)}
       appreciation={
-        /* WO-O4O-APPRECIATION-GLYCO-KCOS-MIGRATION-V1: 공통 AppreciationPanel (panel variant) */
+        /* 공통 AppreciationPanel (panel variant) */
         <AppreciationPanel
           targetType="content"
           targetId={id ?? ''}

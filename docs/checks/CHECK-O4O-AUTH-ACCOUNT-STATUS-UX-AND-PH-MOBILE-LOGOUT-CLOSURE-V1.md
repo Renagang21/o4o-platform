@@ -68,7 +68,6 @@
 |---|:--:|:--:|:--:|:--:|:--:|:--:|:--:|
 | KPA-Society | ✅ `/login` | ✅ | ✅ `/mypage` 복원 | ✅ | ✅ 토큰 삭제 | ✅ `/login` | 0 |
 | Neture | ✅ 로그인 화면 | ✅ | ⚠️ `/` 랜딩(기존 동작) | ✅ | ✅ | ✅ | 0 |
-| GlycoPharm | ✅ 로그인 화면 | ✅ | ⚠️ `/` 랜딩(기존 동작 · §6 제외 범위) | ✅ | ✅ | ✅ | 0 |
 | K-Cosmetics | ✅ `/login` | ✅ | ✅ `/operator` | ✅ | ✅ | ✅ `/login` | 0 |
 | Pharmacy-Hub | ✅ `/login` | ✅ | ✅ `/store-owner` | ✅ | ✅ | ✅ `/login` | 0 |
 
@@ -82,7 +81,7 @@
 | 항목 | 결과 |
 |---|---|
 | `@o4o/api-server` type-check | ✅ |
-| web 5종 build | ✅ (kpa-society · neture · k-cosmetics · glycopharm · pharmacy-hub) |
+| web 5종 build | ✅ (kpa-society · neture · k-cosmetics · pharmacy-hub) |
 | auth-utils 단위 테스트 | ✅ 4/4 |
 | api-server security 스위트 | ✅ **400/400** (17 suites) — 신규 `login-account-status-exposure.spec.ts` 9건 포함 |
 | Deploy API Server / Web Services / Admin | ✅ success (`70697c11f`) |

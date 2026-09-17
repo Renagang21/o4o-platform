@@ -16,7 +16,7 @@
 |---|---|
 | `matched_identifier_id` 값 보유 행 | **0건** (전체 394,491) |
 | `confidence_score` 값 보유 행 | **0건** |
-| 코드·엔티티·API·프론트 참조 | **0** (엔티티엔 주석만; `confidenceScore` grep 잔여는 diabetes-core/glycopharm/supplier 등 **무관 도메인**) |
+| 코드·엔티티·API·프론트 참조 | **0** (엔티티엔 주석만) |
 | 관련 FK | `product_candidates_matched_identifier_id_fkey` → product_identifiers ON DELETE SET NULL (존재) |
 | 관련 index | `idx_pc_matched_identifier_id` on (matched_identifier_id) (존재). `confidence_score`는 FK/index 없음 |
 | 프로덕션 리비전 = 사전매칭 제거 반영 | 마지막 성공 API 배포 = `46841a1cc`(제거 커밋 `f1bce3172`를 조상으로 포함, 엔티티에 두 필드 없음) |

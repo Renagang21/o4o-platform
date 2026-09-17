@@ -3,7 +3,7 @@
  *
  * WO-O4O-FORUM-LIST-PAGE-TEMPLATE-V1
  *
- * GP / K-Cosmetics / Neture 사용자-facing forum list 의 반복 table/loading/empty/error +
+ * K-Cosmetics / Neture 사용자-facing forum list 의 반복 table/loading/empty/error +
  * pagination JSX 를 단일 presentational 컴포넌트로 공통화한다.
  *
  * - 순수 presentational: fetch/filter/sort/route 계산을 하지 않는다. `posts: ForumListItem[]`
@@ -42,11 +42,11 @@ export interface ForumListTemplateProps {
    *   My Posts 는 전부 본인 글이므로 작성자 컬럼을 숨긴다.
    */
   showAuthor?: boolean;
-  /** 유형 배지 컬럼 표시 (K-Cosmetics·Neture true / GlycoPharm false) */
+  /** 유형 배지 컬럼 표시 (K-Cosmetics true · Neture false) */
   showPostType?: boolean;
   /** 유형 배지 렌더(서비스별 라벨/색 — slot). showPostType=true 일 때 사용 */
   renderTypeBadge?: (post: ForumListItem) => ReactNode;
-  /** 제목 앞 배지 렌더(GP HOT 등). 미전달 시 isPinned 면 pinnedLabel 배지. */
+  /** 제목 앞 배지 렌더(HOT 등). 미전달 시 isPinned 면 pinnedLabel 배지. */
   renderTitleBadge?: (post: ForumListItem) => ReactNode;
 
   showLikeCount?: boolean;

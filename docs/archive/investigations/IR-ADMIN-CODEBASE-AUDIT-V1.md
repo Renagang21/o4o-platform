@@ -41,7 +41,7 @@
 
 모든 주요 섹션이 lazy-loaded 라우트로 정상 등록:
 - Admin Core (15 routes), Users (8), CMS V2 (20), Commerce (15)
-- Services: Yaksa, Glycopharm, GlucoseView, Cosmetics (35+)
+- Services: Yaksa, GlucoseView, Cosmetics (35+)
 - Editor (6), Appearance/Theme (12), Forums (8), Signage (15)
 - Dashboards (8), Test/Debug (25)
 

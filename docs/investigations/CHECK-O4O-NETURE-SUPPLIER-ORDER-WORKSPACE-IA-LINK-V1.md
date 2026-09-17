@@ -69,7 +69,7 @@
 
 ## 6. 후속 과제 기록 (§8, §10-10)
 
-> **주문 테이블 경계 결정이 다음 선행 과제.** workspace=`neture_orders`, 이벤트 오퍼/KPA·GP·K-Cos=`checkout_orders`로 분리되어 있어, **이벤트 오퍼 주문 포함**과 **배송비 계산 V2**는 경계 결정에 종속.
+> **주문 테이블 경계 결정이 다음 선행 과제.** workspace=`neture_orders`, 이벤트 오퍼/KPA·K-Cos=`checkout_orders`로 분리되어 있어, **이벤트 오퍼 주문 포함**과 **배송비 계산 V2**는 경계 결정에 종속.
 
 | WO/IR | 목적 |
 |---|---|

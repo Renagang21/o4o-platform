@@ -116,7 +116,7 @@ await api.post('/auth/register', {
 
 ### 2-A. 호출 endpoint
 
-**전역 공용** (KPA / GlycoPharm / K-Cosmetics / Neture 모두 동일):
+**전역 공용** (KPA / K-Cosmetics / Neture 모두 동일):
 - `POST /api/v1/auth/register` (또는 alias `/api/v1/auth/signup`)
 - 마운트: [apps/api-server/src/modules/auth/routes/auth.routes.ts:49-61](../../apps/api-server/src/modules/auth/routes/auth.routes.ts#L49-L61)
 - Controller: [apps/api-server/src/modules/auth/controllers/auth-register.controller.ts](../../apps/api-server/src/modules/auth/controllers/auth-register.controller.ts)
@@ -369,7 +369,7 @@ const rawRole = data.membershipType === 'student'
 
 ### 9-D. 후보 4 — 다른 서비스 가입 시 backend 가 동일 controller 사용
 
-- 동일 `/auth/register` 가 KPA / GlycoPharm / K-Cosmetics 도 사용. service='neture' 미전송 + role 미전송이면 Neture 가입으로 처리되어 'customer' fallback
+- 동일 `/auth/register` 가 KPA / K-Cosmetics 도 사용. service='neture' 미전송 + role 미전송이면 Neture 가입으로 처리되어 'customer' fallback
 
 ### 9-E. 후보 5 — `EditUserModal` 의 customer 옵션 (정렬 전)
 
@@ -388,7 +388,7 @@ const rawRole = data.membershipType === 'student'
 | G4 | "확정된 역할에 따라 해당 대시보드 접근 권한이 부여된다" | role_assignments 는 승인 시 생성됨 ✅ + MembershipGate ✅ | **충족** | Info |
 | G5 | 기본 정보와 역할 선택의 분리 | Step 1=기본정보, Step 2=역할+추가입력 (분리됨) | **충족** | Info |
 | G6 | Backend default fallback `'customer'` (auth-register.controller:59) | data.role 미전송 시 'customer' 저장 | **위반** — Neture default 는 'user' 가 되어야 함 | **High** |
-| G7 | VALID_ROLES 에 `customer`, `vendor`, `seller`, `pharmacy` 잔존 | legacy 호환을 위해 유지 | 다른 서비스(KPA/GlycoPharm/K-Cos) 호환 필요 — Neture 분리 호출은 별도 검증 | Low |
+| G7 | VALID_ROLES 에 `customer`, `vendor`, `seller`, `pharmacy` 잔존 | legacy 호환을 위해 유지 | 다른 서비스 호환 필요 — Neture 분리 호출은 별도 검증 | Low |
 | G8 | RegistrationRequestsPage 의 seller/pharmacist 라벨 잔존 | legacy data 표시 호환 위해 유지 | 의도적 — **GAP 아님** | Info |
 | G9 | partner 승인 시 partner-specific entity 자동 생성 흐름 미확정 | operator-registration.service.ts 에 partner 자동 생성 로직 부재 | 추가 조사 필요 (별도 partner_application 절차 존재 여부) | Medium |
 | G10 | supplier 2-step activation (가입 승인 ≠ 공급 승인) | neture_suppliers.status='PENDING' → 별도 공급 승인 필요 | 의도된 설계 (WO-NETURE-SUPPLIER-APPROVAL-TWO-STEP-ACTIVATION-V1) | Info |
@@ -406,7 +406,7 @@ const rawRole = data.membershipType === 'student'
 |------|----------|------|
 | [services/web-neture/src/components/RegisterModal.tsx](../../services/web-neture/src/components/RegisterModal.tsx) | `roleOptions` 에서 `user` 제거 (또는 의미 재정의 — "광고/소식 받기"용 free user 라면 유지하되 별도 group 으로 분리) | 가입 화면 UX 변경 |
 | [services/web-neture/src/components/RegisterModal.tsx](../../services/web-neture/src/components/RegisterModal.tsx) | `SignupRole` type 에서 `'user'` 제거 (또는 유지) | type-level |
-| [apps/api-server/src/modules/auth/controllers/auth-register.controller.ts](../../apps/api-server/src/modules/auth/controllers/auth-register.controller.ts) | L59: `(data.role \|\| 'customer')` → service 별 default 분기. Neture 의 경우 `'user'` 또는 명시적 에러 발생 | backend 호환성 영향 — KPA/GlycoPharm/K-Cos 와 분기 필요 |
+| [apps/api-server/src/modules/auth/controllers/auth-register.controller.ts](../../apps/api-server/src/modules/auth/controllers/auth-register.controller.ts) | L59: `(data.role \ | \ | 'customer')` → service 별 default 분기. Neture 의 경우 `'user'` 또는 명시적 에러 발생 | — |
 
 ### 11-B. **Medium Priority** (G3, G9, G11)
 

@@ -2,7 +2,7 @@
 
 > **작업명:** WO-O4O-KPA-OPERATOR-ORDER-VIEW-FRONTEND-WIRING-V1
 > **유형:** KPA operator '주문 현황' frontend wiring (route/menu/page). backend/operator-core-ui 무변경.
-> **판정: PASS (배포 후 운영 smoke 포함)** — KPA '주문 현황' 도입 완료. **KPA parity(상품 현황 + 주문 현황) 완성.** 프로덕션 배포 후 KPA/GP/KCos 3서비스 브라우저 smoke PASS(§12).
+> **판정: PASS (배포 후 운영 smoke 포함)** — KPA '주문 현황' 도입 완료. **KPA parity(상품 현황 + 주문 현황) 완성.** 프로덕션 배포 후 KPA/KCos 2서비스 브라우저 smoke PASS(§12).
 > 선행: `WO-O4O-OPERATOR-PRODUCT-ORDER-VIEW-COMMONIZE-V1`, `WO-O4O-KPA-OPERATOR-PRODUCT-ORDER-VIEW-INTRODUCE-V1`, `WO-O4O-KPA-OPERATOR-ORDER-VIEW-BACKEND-ENABLE-V1`
 > 작성일: 2026-06-16
 
@@ -16,7 +16,7 @@
 - `services/web-kpa-society/src/config/operatorMenuGroups.ts` — `orders` 그룹 `주문 현황` 추가(UNIFIED_MENU)
 - `docs/investigations/CHECK-O4O-KPA-OPERATOR-ORDER-VIEW-FRONTEND-WIRING-V1.md`
 
-> backend / operator-core-ui / GP / KCos / Neture / store측 라우트 **미접촉**. path-specific staging, `git add .` 미사용.
+> backend / operator-core-ui / KCos / Neture / store측 라우트 **미접촉**. path-specific staging, `git add .` 미사용.
 
 ## 2. KPA OrdersPage wrapper 구조
 
@@ -33,7 +33,7 @@
 
 ## 4. menu 추가 내용
 
-- `operatorMenuGroups.ts` UNIFIED_MENU 에 `orders: [{ label: '주문 현황', path: '/operator/orders' }]` 추가(products 그룹 다음). GP/KCos 와 동일 group key `orders` → 공유 domain IA 매핑 재사용으로 노출.
+- `operatorMenuGroups.ts` UNIFIED_MENU 에 `orders: [{ label: '주문 현황', path: '/operator/orders' }]` 추가(products 그룹 다음). KCos 와 동일 group key `orders` → 공유 domain IA 매핑 재사용으로 노출.
 - capability: 기존 `STORE_MANAGEMENT`(ENABLED) 사용 — **신규 capability 없음**.
 
 ## 5. endpoint / base path 확인
@@ -60,9 +60,9 @@
 
 - KPA `/store/commerce/orders`(StoreOrdersPage, 단일 매장 scope) 및 store 블록 redirect **미접촉**.
 
-## 9. GP/KCos/Neture 미변경 확인
+## 9. KCos/Neture 미변경 확인
 
-- 이번 WO 는 KPA frontend 파일만 수정. operator-core-ui/GP/KCos/Neture 파일 **0 변경** → 무영향.
+- 이번 WO 는 KPA frontend 파일만 수정. operator-core-ui/KCos/Neture 파일 **0 변경** → 무영향.
 
 ## 10. TypeScript 결과
 
@@ -79,11 +79,11 @@
 |---|---|
 | `web-kpa-society` (`vite build`) | ✅ built in 14.12s |
 
-> GP/KCos 는 미변경 → 재빌드 불요(무영향). operator-core-ui 소스 소비.
+> KCos 는 미변경 → 재빌드 불요(무영향). operator-core-ui 소스 소비.
 
 ## 12. smoke 결과 (배포 후 프로덕션 검증 — PASS)
 
-**검증일:** 2026-06-16 (main 배포 후) · **환경:** 프로덕션(kpa-society.co.kr / glycopharm.co.kr / k-cosmetics.site) · **계정:** operator(Bearer) 로그인 · Playwright, read-only 탐색.
+**검증일:** 2026-06-16 (main 배포 후) · **환경:** 프로덕션(kpa-society.co.kr / k-cosmetics.site) · **계정:** operator(Bearer) 로그인 · Playwright, read-only 탐색.
 
 ### KPA-Society — PASS
 | 항목 | 결과 |
@@ -98,14 +98,6 @@
 | `GET /operator/products?serviceKey=kpa-society` | ✅ **200** |
 | `GET /kpa/operator/orders?page=1&limit=20` | ✅ **200** (신규 backend 라이브 동작) |
 | console error / pageerror / 4xx | ✅ **0** |
-
-### GlycoPharm — 회귀 PASS
-| 항목 | 결과 |
-|---|---|
-| `/operator/products` (상품 현황) | ✅ 정상(공통 컴포넌트, 라벨 "상품 현황") |
-| `/operator/orders` (주문 현황) | ✅ 정상 + "주문 조회 전용" 배너 |
-| `GET /glycopharm/operator/orders` | ✅ **200** (헬퍼 serviceKey 배열 변경 무영향) |
-| console error | ✅ **0** |
 
 ### K-Cosmetics — 회귀 PASS
 | 항목 | 결과 |
@@ -122,11 +114,11 @@
 
 ## 13. KPA 상품 현황 + 주문 현황 parity 완료 여부
 
-- ✅ **완성 (배포 후 운영 smoke 확정).** KPA operator 도 GP/KCos 와 동일하게:
+- ✅ **완성 (배포 후 운영 smoke 확정).** KPA operator 도 KCos 와 동일하게:
   - **상품 현황** (`/operator/products`, view-only) — INTRODUCE WO
   - **주문 현황** (`/operator/orders`, view-only) — 본 WO
   - 승인 업무는 Approvals 에서 처리(불변).
-- **최종 판정:** KPA / GlycoPharm / K-Cosmetics operator 상품·주문 **현황** 축 — 배포 전 정적 검증(typecheck/build) + 배포 후 운영 smoke(§12) **모두 PASS**. operator 는 주문 처리자가 아니라 **서비스 전역 현황 모니터링 주체**로 유지(view-only 불변). **상품 현황 / 주문 현황 parity 완료 고정.**
+- **최종 판정:** KPA / K-Cosmetics operator 상품·주문 **현황** 축 — 배포 전 정적 검증(typecheck/build) + 배포 후 운영 smoke(§12) **모두 PASS**. operator 는 주문 처리자가 아니라 **서비스 전역 현황 모니터링 주체**로 유지(view-only 불변). **상품 현황 / 주문 현황 parity 완료 고정.**
 
 ---
 
@@ -140,8 +132,8 @@
 | menu | `orders` 그룹 `주문 현황` 추가 |
 | endpoint | `GET /api/v1/kpa/operator/orders` (apiClient base /api/v1/kpa) |
 | view-only | 유지(액션 0) |
-| store/GP/KCos/Neture | 미변경 |
+| store/KCos/Neture | 미변경 |
 | TypeScript / build | 제 파일 0 / KPA vite build PASS |
 | KPA parity | **완성**(상품 현황 + 주문 현황) |
 
-*Date: 2026-06-16 · KPA operator '주문 현황' frontend wiring(OperatorOrderStatusPage + apiClient `/operator/orders` → /api/v1/kpa/operator/orders) · view-only · backend/operator-core-ui/GP/KCos 무변경 · KPA parity(상품·주문 현황) 완성 · KPA tsc 의 store-ui-core TS6133 은 타 세션 기존 오류(범위 밖, vite build 무영향).*
+*Date: 2026-06-16 · KPA operator '주문 현황' frontend wiring(OperatorOrderStatusPage + apiClient `/operator/orders` → /api/v1/kpa/operator/orders) · view-only · backend/operator-core-ui/KCos 무변경 · KPA parity(상품·주문 현황) 완성 · KPA tsc 의 store-ui-core TS6133 은 타 세션 기존 오류(범위 밖, vite build 무영향).*

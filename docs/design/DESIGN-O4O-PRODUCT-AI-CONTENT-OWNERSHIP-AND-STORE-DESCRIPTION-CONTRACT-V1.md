@@ -97,7 +97,7 @@ WO §3.3 은 이 테이블을 "`StoreProductDescriptionsPage` 가 표준 상품�
    ([product-candidate.service.ts:463](../../apps/api-server/src/modules/neture/services/product-candidate.service.ts#L463) · [store-tablet.routes.ts:995](../../apps/api-server/src/routes/platform/store-tablet.routes.ts#L995)).
 
 3. **제품 정책이 이미 "매장은 표준 상품 설명을 쓰지 않는다"고 화면에서 안내한다.**
-   [StoreProductDescriptionsPage.tsx:191-192](../../services/web-glycopharm/src/pages/store-management/StoreProductDescriptionsPage.tsx#L191-L192) 안내문:
+   [StoreProductDescriptionsPage.tsx](../../services/web-kpa-society/src/pages/pharmacy/StoreProductDescriptionsPage.tsx) 안내문:
    > 상품설명은 **O4O 공용 상품 DB 기준**으로 관리됩니다. … 약국 특화 홍보문·이벤트 문구·POP/블로그용 문구가 필요하면 **콘텐츠 만들기**에서 별도 콘텐츠로 제작하세요.
 
 **확정 역할:** `store_product_profiles` = 표시명(`display_name`) override + legacy description fallback.
@@ -154,7 +154,7 @@ masterId   : sourceType==='listing' 일 때만 존재 (product_masters.id)
 
 | API | 현재 ID | 현재 저장소 | 실제 소비자 | 새 역할 | 판정 |
 |-----|--------|------------|------------|--------|------|
-| `GET /products/:productId/ai-contents` | local id 수신 → master 해석 | `product_ai_contents` | KPA·GP·KCos 설명/POP 화면 | 전역 초안 조회 (운영자/공급자/내부) | **전환** — 매장 화면 분리 + 가드 정렬 |
+| `GET /products/:productId/ai-contents` | local id 수신 → master 해석 | `product_ai_contents` | KPA·KCos 설명/POP 화면 | 전역 초안 조회 (운영자/공급자/내부) | **전환** — 매장 화면 분리 + 가드 정렬 |
 | `GET /products/:productId/ai-contents/:type` | 〃 | 〃 | (프론트 호출 0) | 〃 | 유지 + 가드 정렬 |
 | `PUT /products/:productId/ai-contents/:type` | 〃 | 〃 | 설명 저장 · POP 저장 (3서비스) | 전역 초안 쓰기 | **전환** — 매장 쓰기 제거 |
 | `POST /products/:productId/ai-contents/generate` | 〃 | 〃 | (프론트 호출 0) · 임포트 내부 | 전역 생성 | 유지 + 가드 정렬 |
@@ -170,7 +170,6 @@ masterId   : sourceType==='listing' 일 때만 존재 (product_masters.id)
 
 ```text
 KPA   services/web-kpa-society/src/api/productAiContent.ts
-GP    services/web-glycopharm/src/api/productAiContent.ts
 KCos  services/web-k-cosmetics/src/api/productAiContent.ts
       → 세 파일 모두 coreApiClient.get(`/products/${productId}/ai-contents`) 동일
 ```
@@ -179,9 +178,9 @@ KCos  services/web-k-cosmetics/src/api/productAiContent.ts
 
 ## 5. 3서비스 화면 전환안
 
-세 서비스의 두 화면은 **동일 코드 패턴**이다 (GP 파일 헤더: "KPA-Society StoreProductDescriptionsPage canonical 패턴 이식"). 따라서 전환도 3서비스 동시 적용한다.
+두 서비스의 두 화면은 **동일 코드 패턴**이다 (KPA-Society StoreProductDescriptionsPage canonical 패턴 이식). 따라서 전환도 2서비스 동시 적용한다.
 
-### 5.1 `StoreProductDescriptionsPage` (KPA `pages/pharmacy` · GP `pages/store-management` · KCos `pages/store`)
+### 5.1 `StoreProductDescriptionsPage` (KPA `pages/pharmacy` · KCos `pages/store`)
 
 | 항목 | 현재 | 전환 후 |
 |------|------|--------|
@@ -425,7 +424,7 @@ API 변경    0
 | R1 | POP 저장 위치 P2(자료함) 의 실제 스키마 정합 — 매장 자료함 자산 타입에 POP 문구 2필드를 담는 방식 미검증 | WO-2 착수 시 |
 | R2 | `detail_html` vs `description` 필드 역할 분리 시 `StoreLocalProductsPage` 모달의 사용자 혼동 | WO-2 UX 검토 |
 | R3 | 공급자 소유 판정(G3) 은 `supplier_product_offers` 0행이라 프로덕션 실데이터 검증 불가 — 테스트 데이터 필요 | WO-1 테스트 |
-| R4 | K-Cosmetics·GlycoPharm 의 `localProducts` API 경로가 KPA 와 동일 백엔드인지 (KCos 는 `@/services/localProductApi`) | WO-2 착수 시 |
+| R4 | K-Cosmetics 의 `localProducts` API 경로가 KPA 와 동일 백엔드인지 (KCos 는 `@/services/localProductApi`) | WO-2 착수 시 |
 
 ---
 

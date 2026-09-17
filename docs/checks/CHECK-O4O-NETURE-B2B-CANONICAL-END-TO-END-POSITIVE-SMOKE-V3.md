@@ -7,7 +7,7 @@
 ---
 
 ## 0. 실행 정보
-- 계정: `renagang21@gmail.com`(userId `6967ebe0-...`, GlycoPharm 행 비번) — production API Bearer(/auth/login → Set-Cookie accessToken).
+- 계정: `renagang21@gmail.com`(userId `6967ebe0-...` 비번) — production API Bearer(/auth/login → Set-Cookie accessToken).
 - API: `https://o4o-core-api-...run.app/api/v1`(production). 코드 변경 없음. write 는 prepare(기존 pg 재사용, 신규 주문/결제 미생성).
 - 재사용 자원: paymentGroupId `pg_690147fb-84e2-4dc3-bd5e-f32bbf0ae737`(V2), checkout_order `945f1f81...`(ORD-20260612-9471), amount 27000.
 

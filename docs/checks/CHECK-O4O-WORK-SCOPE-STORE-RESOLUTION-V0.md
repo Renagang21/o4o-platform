@@ -24,7 +24,6 @@
 | ambiguous | `logger.warn` 후 **임의 선택 없이** 종료 |
 | membership 검증 | **없음** — 이 resolver 는 조직만 본다. membership 은 호출 측 책임 |
 
-⚠️ `StoreOwnerServiceKey = 'kpa' | 'glycopharm' | 'cosmetics' | 'pharmacy-hub' | 'cafe24-b2b'` 는
 **role prefix 공간**이며 `neture` 가 없다.
 
 ⚠️ 같은 파일의 `findAnyServiceStoreOrganizationCandidates()` (서비스 조건 없는 후보)는
@@ -51,7 +50,6 @@
 
 ```text
 kpa          enrollment: ['kpa-society','kpa']        slug: ['kpa']
-glycopharm   enrollment: ['glycopharm']               slug: ['glycopharm']
 cosmetics    enrollment: ['k-cosmetics','cosmetics']  slug: ['k-cosmetics','cosmetics']
 pharmacy-hub enrollment: ['pharmacy-hub']             slug: ['pharmacy-hub']
 cafe24-b2b   enrollment: ['cafe24-b2b']               slug: ['cafe24-b2b']
@@ -59,7 +57,7 @@ neture       ─ 매핑 없음 (매장 축 자체가 없음)
 ```
 
 - **Neture 는 매장 축이 없다.** `O4O-ORGANIZATION-ROLE-STANDARD-V1 §4.4` 가 이미 "유일하게 organization 미통합 서비스"로 기록 중이며, 이번 조사도 같은 결론이다.
-- GlycoPharm 은 최신 main 에서 **여전히 살아 있다**(linkage 등재 + `services/web-glycopharm` 존재). 제거/은퇴 트랙이 아니므로 제외하지 않았다.
+- 제거/은퇴 트랙이 아니므로 제외하지 않았다.
 - 두 근거 테이블의 키 체계가 서로 다르다(enrollment=platform-level, slug=product-level). 그래서 후보값을 배열로 둔다 — 이번 WO 에서 새 값을 만들지 않았다.
 
 ---
@@ -141,7 +139,7 @@ WORKSPACE_NOT_STORE_SCOPED    store 의미가 없는 workspace
 
 | serviceKey | 결과 |
 |---|---|
-| `kpa-society` / `k-cosmetics` / `glycopharm` / `pharmacy-hub` / `cafe24-b2b` | 정상 해석 (0/1/2+ → none/resolved/ambiguous) |
+| `kpa-society` / `k-cosmetics` / `pharmacy-hub` / `cafe24-b2b` | 정상 해석 (0/1/2+ → none/resolved/ambiguous) |
 | `neture` | 항상 `none` · `STORE_IDENTITY_NOT_SUPPORTED` |
 | 알 수 없는 값 | `none` · `NO_SERVICE_MEMBERSHIP` (fail-closed) |
 
@@ -296,13 +294,12 @@ web-neture 에는 넣지 않았다(§22).
 | `serviceKey=neture&workspace=store` | `none` · `STORE_IDENTITY_NOT_SUPPORTED` | ✅ |
 | `serviceKey=kpa-society&workspace=home` | `none` · `WORKSPACE_NOT_STORE_SCOPED` | ✅ |
 | `serviceKey=k-cosmetics&workspace=store` | `none` · `NO_ACCESSIBLE_STORE` | ✅ |
-| `serviceKey=glycopharm&workspace=store` | `none` · `NO_ACCESSIBLE_STORE` | ✅ |
 | `serviceKey=pharmacy-hub&workspace=store` | `none` · `NO_ACCESSIBLE_STORE` | ✅ |
 | `serviceKey=not-a-real-service&workspace=store` | `none` · `NO_SERVICE_MEMBERSHIP` (fail-closed) | ✅ |
 | 미인증 (헤더 없음) | HTTP 401 `AUTH_REQUIRED` | ✅ |
 
 **cross-service leakage 0 이 프로덕션 실데이터로 입증됐다.** 같은 사용자가
-kpa-society 에서는 매장이 `resolved` 인데, k-cosmetics · glycopharm · pharmacy-hub
+kpa-society 에서는 매장이 `resolved` 인데, k-cosmetics · pharmacy-hub
 (모두 membership 보유 서비스)에서는 `NO_ACCESSIBLE_STORE` 로 **KPA 매장이 새어나오지 않았다**.
 서비스 조건 없는 후보 함수를 썼다면 세 서비스 모두 KPA 매장을 돌려줬을 것이다.
 
@@ -316,7 +313,7 @@ kpa-society 에서는 매장이 `resolved` 인데, k-cosmetics · glycopharm · 
    선택 결과는 실행 컨텍스트이므로 DB 영구 저장이 아니라 요청 단위 전달로 설계할 것.
 2. **중앙 AI 입력 활성화 → WorkScope 주입** — `useWorkScope()` 가 연결점. `isResolvingStore` 가 true 인 동안 storeId 를 쓰지 않도록 주의.
 3. **Neture organization 연결** — 연결되기 전까지 web-neture 의 storeId 는 계속 비어 있다. `O4O-ORGANIZATION-ROLE-STANDARD-V1 §4.4` 의 유일한 미준수 항목.
-4. **Work Scope 공통화** — 현재 web-neture thin 구현. KPA/GlycoPharm/K-Cosmetics/PharmacyHub 로 넓힐 때 `@o4o/auth-react` 승격 후보(Shared Module Change Protocol 대상). 이들 서비스는 매장 축이 있어 실제로 `resolved` 가 나온다.
+4. **Work Scope 공통화** — 현재 web-neture thin 구현. 이들 서비스는 매장 축이 있어 실제로 `resolved` 가 나온다.
 5. **프런트 테스트 러너 부재** — web 서비스 5개 모두 테스트 러너가 없다. 도입은 devDependency 변경이라 별도 WO 필요. 도입되면 위 프런트 하네스를 정식 테스트로 승격하고 18-15/16 도 고정할 것.
 6. **`kpa/me-context` 와의 중복** — 같은 매장 해석을 서로 다른 두 경로가 노출한다. 장기적으로 `me-context` 가 이 endpoint 를 재사용하도록 수렴 검토(이번 범위 밖 — 기존 응답 계약을 건드리게 된다).
 

@@ -23,7 +23,7 @@
 | 항목 | 결과 |
 |------|------|
 | `/admin/users` (platform:super_admin) — Neture-only 표시 | **PASS** |
-| KPA / GlycoPharm / K-Cosmetics 단독 회원 노출 | **PASS** (0건) |
+| KPA / K-Cosmetics 단독 회원 노출 | **PASS** (0건) |
 | 탭 카운트 — Neture 기준 distinct user 수 | **PASS** |
 | `/operator/users` 기존 동작 유지 (구조 검증) | **PASS** (동일 API + scope 자동 적용) |
 | Backend `getStats` `serviceKey` query 수용 | **PASS** |
@@ -62,12 +62,10 @@ sample[0]: neture-operator@o4o.com
   memberships: ["neture:active"]
 
 sample[mid]: sohae2100@gmail.com
-  memberships: ["k-cosmetics:active","glycopharm:active","neture:active","kpa-society:active"]
 ```
 
 **판정**
 
-- 반환된 2명 모두 Neture membership 보유 → **KPA / GlycoPharm / K-Cosmetics 단독 회원 0건**. ✅
 - `sohae2100@gmail.com` 은 Neture 멤버십이 *포함된* 다중 서비스 사용자이므로 정상 노출 (IR §4.1 의 "Neture + 타 서비스 다중 멤버십" 정책 일치). ✅
 - pagination.total = 2 — 17명 → 2명으로 축소 = leak 해소.
 
@@ -78,8 +76,6 @@ users.length: 17
 pagination: {"page":1,"limit":100,"total":17,"totalPages":1}
 has_neture: 2 / no_neture: 15
 
-per-key user count: {"glycopharm":4,"kpa-society":6,"platform":5,"k-cosmetics":4,"neture":2}
-
 sample[last]: super-admin@o4o.com
   memberships: []
 ```
@@ -87,7 +83,7 @@ sample[last]: super-admin@o4o.com
 **판정**
 
 - 호출자가 동일 platform:super_admin 임에도 17명 반환 → backend platform admin 분기에서 명시적 `serviceKey` 없으면 필터 미적용이라는 IR §2.3 의 분석 정확히 확인. ✅
-- 15명은 Neture 멤버십 없음 (KPA/GlycoPharm/Cosmetics/platform 사용자) — 이전 화면에서 보이던 cross-service 사용자들의 정체.
+- 15명은 Neture 멤버십 없음 — 이전 화면에서 보이던 cross-service 사용자들의 정체.
 - `super-admin@o4o.com` 은 memberships=[] (멤버십 0개) — `users` 테이블 전체 스캔이 발생함을 입증.
 
 → Fix 의 효과: **frontend 가 항상 `serviceKey=neture` 전달** = S1 결과. **미전달 = S2 (leak)**.
@@ -138,7 +134,6 @@ sample[last]: super-admin@o4o.com
 | WO §4 검증 항목 | 결과 | 근거 |
 |----------------|------|------|
 | `/admin/users` 접속 시 Neture 회원만 표시 | **PASS** | S1 — has_neture=2, no_neture=0 |
-| KPA/GlycoPharm/K-Cosmetics 단독 회원 비노출 | **PASS** | S1 sample 검사, 멤버십 배열 분석 |
 | `/operator/users` 기존 동작 유지 | **PASS (구조)** | 동일 컴포넌트(`UsersManagementPage`) + 동일 API + 동일 query. neture:operator caller 는 `scope.serviceKeys=['neture']` 자동 적용 → S1 과 동일 결과 도출 |
 | 전체/공급자/파트너/셀러/가입 신청 탭 카운트 Neture 기준 | **PASS** | S3 stats 응답 — Neture-scoped distinct user count |
 | platform:super_admin 으로도 Neture 범위만 표시 | **PASS** | S1 — 본 검증 계정이 platform:super_admin (S2 와 동일 caller, 파라미터만 차이) |

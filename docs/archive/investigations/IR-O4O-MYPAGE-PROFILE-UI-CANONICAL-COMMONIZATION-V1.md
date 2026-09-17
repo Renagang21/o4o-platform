@@ -2,7 +2,7 @@
 
 > **Status:** Investigation Report (조사 전용) — 구현 금지
 > **Date:** 2026-05-28
-> **Scope:** KPA-Society / GlycoPharm / K-Cosmetics / Neture 4개 서비스의 MyPage·Profile UI-UX 공통화 방향 수립
+> **Scope:** KPA-Society / K-Cosmetics / Neture 3개 서비스의 MyPage·Profile UI-UX 공통화 방향 수립
 > **Constitution:** CLAUDE.md (§13-A APP 표준화, §11 Operator Dashboard 표준 등)
 
 ---
@@ -11,14 +11,11 @@
 
 ### 1-1. 핵심 질문에 대한 답
 
-> 사용자가 프로필/마이페이지에 들어갔을 때, KPA-Society / GlycoPharm / K-Cosmetics가 같은 서비스 계열처럼 보이는가?
+> 사용자가 프로필/마이페이지에 들어갔을 때, KPA-Society / K-Cosmetics가 같은 서비스 계열처럼 보이는가?
 
 **부분적으로 그렇다.** 4개 서비스 모두 `@o4o/account-ui` 의 `MyPageLayout` · `ProfileCard` · `ProfileInfoField` · `QuickActionsSection` · `SettingsSection` · `PasswordChangeModal` · `MyPageNavigation` 을 공통으로 재사용하고 있어 **시각적 shell 은 이미 정렬되어 있다**. 다만 다음 영역에서 의도된/비의도된 drift 존재:
 
-- **Route 구성**: KPA 10개 / Glyco·K-Cos 6개 / Neture 4개 (+ Account dashboards 별도)
 - **Hub card 구성**: 5개 vs 5개 vs 5개 vs 4개 — 카드 종류가 서비스별로 다름
-- **Forum/Request 통합 여부**: KPA 만 `/mypage/my-forums`, `/mypage/my-requests` 통합 — Glyco/K-Cos 는 `/forum/*` 로 분리
-- **Profile field 깊이**: KPA 가 가장 풍부 (2-tab + business info), Glyco 다음, K-Cos 얕음, Neture 가장 얕음 (name 만)
 - **Role badge 표시 방식**: 4개 서비스 모두 다른 패턴
 
 > Neture도 최소한 같은 UI 톤으로 보이는가?
@@ -31,7 +28,6 @@
 - **남은 정렬 작업은 "어떤 카드/route 를 어떤 서비스가 노출할지" 정책 결정** 영역이다.
 - **즉시 작업 가능한 항목 3개** (낮은 risk, 명확한 drift):
   1. K-Cos `MyPageNavigation` 에 LMS 탭 노출 (현재 hidden)
-  2. Glyco/K-Cos 의 `/mypage/my-requests` 통합 entry — 신청 내역 SSOT 정렬
   3. Role badge 표시 방식 canonical 화 (4개 서비스 → 1개 컴포넌트)
 
 ---
@@ -60,31 +56,7 @@
 
 **특징:**
 - Profile edit 가 가장 정교 — 2-tab + business info (10 canonical fields for pharmacy_owner)
-- `MyRequestsPage` 가 **통합 inbox** 역할 — Glyco/K-Cos 에는 부재
 - Appreciation Phase 1 UI 적용됨 (`MyDashboardPage` lines 47-277)
-
-### 2-2. GlycoPharm
-
-**Layout:** `@o4o/account-ui/MyPageLayout` 직접 사용 (로컬 wrapper 없음)
-
-**Hub:** [services/web-glycopharm/src/pages/mypage/MyPageHub.tsx](../../services/web-glycopharm/src/pages/mypage/MyPageHub.tsx) — gradient header + role/status badge + 2-col + 1-col cards
-
-**MyPage 구성:**
-| Route | Component |
-|---|---|
-| `/mypage` | MyPageHub |
-| `/mypage/profile` | MyProfilePage (lastName/firstName/nickname/phone) |
-| `/mypage/settings` | MySettingsPage |
-| `/mypage/enrollments` | MyEnrollmentsPage |
-| `/mypage/certificates` | MyCertificatesPage |
-| `/mypage/credits` | MyCreditsPage |
-
-**특징:**
-- LMS 3종은 KPA 와 동일 구조 (canonical 정렬됨)
-- **Forum/Request 가 MyPage 외부** — `/forum/my-requests`, `/forum/my-dashboard`, `/apply/my-applications` 모두 별도 route
-- Role badge: `user.memberships.find(serviceKey='glycopharm').role` 기반 (membership-first)
-- 약사/약국 경영자 store entry 는 **GlycoGlobalHeader 의 contextual nav** 에만 존재 — MyPage 카드로 노출되지 않음
-- **당뇨인/Care/GlucoseView 잔재**: MyPage 영역 0건 (`api/public.ts` mock, `FeatureIntroPage.tsx` 등 외부 파일에는 잔존)
 
 ### 2-3. K-Cosmetics
 
@@ -134,42 +106,41 @@
 
 ## 3. Route Matrix
 
-| Route | KPA | Glyco | K-Cos | Neture |
-|---|:---:|:---:|:---:|:---:|
-| `/mypage` (Hub) | ✅ | ✅ | ✅ | ✅ |
-| `/mypage/profile` | ✅ | ✅ | ✅ | ✅ |
-| `/mypage/settings` | ✅ | ✅ | ✅ | ✅ |
-| `/mypage/password` | (inline in profile) | (modal in settings) | (modal in settings) | (modal in settings) |
-| `/mypage/requests` | ✅ `/my-requests` | ❌ (외부 `/forum/my-requests`, `/apply/my-applications`) | ❌ | ❌ |
-| `/mypage/enrollments` | ✅ | ✅ | ✅ | ❌ (LMS 없음) |
-| `/mypage/certificates` | ✅ | ✅ | ✅ | ❌ |
-| `/mypage/credits` | ✅ | ✅ | ✅ | ❌ |
-| `/mypage/my-forums` | ✅ | ❌ (외부 `/forum/my-dashboard`) | ❌ (외부 `/forum/my-dashboard`) | ❌ |
-| `/mypage/qualifications` | ✅ | ❌ | ❌ | ❌ |
-| `/mypage/business-profile` | (inline business info) | ❌ | ❌ | ✅ (supplier only) |
-| `/mypage/store` (내 매장) | ❌ | ❌ (header nav only) | ❌ (header nav only) | ❌ (별도 `/account/supplier`) |
+| Route | KPA | K-Cos | Neture |
+| --- | :---: | :---: | :---: |
+| `/mypage` (Hub) | ✅ | ✅ | ✅ |
+| `/mypage/profile` | ✅ | ✅ | ✅ |
+| `/mypage/settings` | ✅ | ✅ | ✅ |
+| `/mypage/password` | (inline in profile) | (modal in settings) | (modal in settings) |
+| `/mypage/requests` | ✅ `/my-requests` | ❌ | ❌ |
+| `/mypage/enrollments` | ✅ | ✅ | ❌ (LMS 없음) |
+| `/mypage/certificates` | ✅ | ✅ | ❌ |
+| `/mypage/credits` | ✅ | ✅ | ❌ |
+| `/mypage/my-forums` | ✅ | ❌ (외부 `/forum/my-dashboard`) | ❌ |
+| `/mypage/qualifications` | ✅ | ❌ | ❌ |
+| `/mypage/business-profile` | (inline business info) | ❌ | ✅ (supplier only) |
+| `/mypage/store` (내 매장) | ❌ | ❌ (header nav only) | ❌ (별도 `/account/supplier`) |
 
 **Drift hot spots:**
-- **신청 inbox 통합** — KPA 만 통합. Glyco/K-Cos 는 forum/apply 가 분리되어 사용자가 어디서 자기 신청 상태를 확인할지 불명확
-- **포럼 운영자 dashboard** — KPA 는 MyPage 진입 / Glyco/K-Cos 는 `/forum/my-dashboard` 외부 진입
+- **신청 inbox 통합** — KPA 만 통합.
 
 ---
 
 ## 4. UI Component Matrix
 
-| Component | Source | KPA | Glyco | K-Cos | Neture |
-|---|---|:---:|:---:|:---:|:---:|
-| `MyPageLayout` | `@o4o/account-ui` | ✅ (local wrapper 경유) | ✅ | ✅ | ✅ |
-| `MyPageNavigation` | `@o4o/account-ui` | ✅ (custom items) | ✅ (DEFAULT) | ✅ (DEFAULT — LMS 숨김) | ✅ (DEFAULT) |
-| `ProfileCard` | `@o4o/account-ui` | (사용 가능, 미사용) | ✅ | (간단 카드 inline) | ✅ |
-| `ProfileInfoField` | `@o4o/account-ui` | ❌ (inline) | ✅ | ❌ (inline) | ✅ |
-| `QuickActionsSection` | `@o4o/account-ui` | ✅ (5 items inline) | ✅ (logout only) | ✅ (dashboard + logout) | ✅ |
-| `SettingsSection` | `@o4o/account-ui` | ❌ (local custom) | ✅ (3 sections) | ✅ (2 sections) | ✅ |
-| `PasswordChangeModal` | `@o4o/account-ui` | ❌ (inline accordion) | ✅ | ✅ | ✅ |
-| `PageHeader` | local `common/` | ✅ | ❌ | ❌ | ❌ |
-| `LoadingSpinner` | local `common/` | ✅ | ❌ (inline "불러오는 중...") | ❌ (inline) | ❌ (inline) |
-| `EmptyState` | local `common/` | ✅ | ❌ (inline) | ❌ (inline) | ❌ (inline) |
-| `RoleBadge` | (없음) | inline span | inline span | inline span | inline span (dual) |
+| Component | Source | KPA | K-Cos | Neture |
+| --- | --- | :---: | :---: | :---: |
+| `MyPageLayout` | `@o4o/account-ui` | ✅ (local wrapper 경유) | ✅ | ✅ |
+| `MyPageNavigation` | `@o4o/account-ui` | ✅ (custom items) | ✅ (DEFAULT — LMS 숨김) | ✅ (DEFAULT) |
+| `ProfileCard` | `@o4o/account-ui` | (사용 가능, 미사용) | (간단 카드 inline) | ✅ |
+| `ProfileInfoField` | `@o4o/account-ui` | ❌ (inline) | ❌ (inline) | ✅ |
+| `QuickActionsSection` | `@o4o/account-ui` | ✅ (5 items inline) | ✅ (dashboard + logout) | ✅ |
+| `SettingsSection` | `@o4o/account-ui` | ❌ (local custom) | ✅ (2 sections) | ✅ |
+| `PasswordChangeModal` | `@o4o/account-ui` | ❌ (inline accordion) | ✅ | ✅ |
+| `PageHeader` | local `common/` | ✅ | ❌ | ❌ |
+| `LoadingSpinner` | local `common/` | ✅ | ❌ (inline) | ❌ (inline) |
+| `EmptyState` | local `common/` | ✅ | ❌ (inline) | ❌ (inline) |
+| `RoleBadge` | (없음) | inline span | inline span | inline span (dual) |
 
 **관찰:**
 - **`@o4o/account-ui` 가 사실상 SSOT** — 4개 서비스 모두 이 패키지를 채택. 추가 추출 불필요.
@@ -181,51 +152,48 @@
 
 ## 5. Profile Field Matrix
 
-| Field | KPA | Glyco | K-Cos | Neture |
-|---|:---:|:---:|:---:|:---:|
-| name (lastName/firstName) | ✅ (2-field) | ✅ (2-field) | ✅ (single) | ✅ (single) |
-| nickname | ✅ | ✅ | ✅ | ❌ |
-| email (read-only) | ✅ | ✅ | ✅ | ✅ |
-| phone | ✅ | ✅ | ✅ | ❌ |
-| role badge (read-only) | ✅ ACTIVITY_TYPE_LABELS | ✅ pharmacist/store_owner | ✅ ROLE_LABELS[roles[0]] | ✅ dual badge |
-| activity_type | ✅ (role tab) | ❌ | ❌ | ❌ |
-| university / workplace | ✅ (role tab) | ❌ | ❌ | ❌ |
-| business info — pharmacy_owner cache | ✅ (10 canonical fields) | (별도 `/store/identity`) | (별도 `/store`) | (별도 `/mypage/business-profile`) |
-| supplier business registration | ❌ | ❌ | ❌ | ✅ |
-| organizations list | ✅ (org.name + role pill) | ❌ | ❌ | ❌ |
-| store owner capability status | ✅ (card section) | ❌ | ❌ | ❌ |
+| Field | KPA | K-Cos | Neture |
+| --- | :---: | :---: | :---: |
+| name (lastName/firstName) | ✅ (2-field) | ✅ (single) | ✅ (single) |
+| nickname | ✅ | ✅ | ❌ |
+| email (read-only) | ✅ | ✅ | ✅ |
+| phone | ✅ | ✅ | ❌ |
+| role badge (read-only) | ✅ ACTIVITY_TYPE_LABELS | ✅ ROLE_LABELS[roles[0]] | ✅ dual badge |
+| activity_type | ✅ (role tab) | ❌ | ❌ |
+| university / workplace | ✅ (role tab) | ❌ | ❌ |
+| business info — pharmacy_owner cache | ✅ (10 canonical fields) | (별도 `/store`) | (별도 `/mypage/business-profile`) |
+| supplier business registration | ❌ | ❌ | ✅ |
+| organizations list | ✅ (org.name + role pill) | ❌ | ❌ |
+| store owner capability status | ✅ (card section) | ❌ | ❌ |
 
 **관찰:**
 - KPA Profile 이 압도적으로 풍부 — 2-tab 구조 + business info inline + organizations + capability status
-- Glyco/K-Cos 는 basic 4-field (name/nickname/email/phone) 에 그침
 - Neture 는 basic name 만 + 별도 supplier business profile page
-- **drift signal**: Glyco 가 pharmacy owner 의 business info 를 `/store/identity` 로 분리. KPA 는 MyPage 내부 inline. 어느 쪽이 canonical 인지 정책 결정 필요.
+- KPA 는 MyPage 내부 inline. 어느 쪽이 canonical 인지 정책 결정 필요.
 
 ---
 
 ## 6. MyPage Hub Card Matrix
 
-| Card / Section | KPA | Glyco | K-Cos | Neture |
-|---|:---:|:---:|:---:|:---:|
-| Profile summary header | ✅ avatar + name + email + badges | ✅ gradient + role/status | ✅ avatar + name + role | ✅ avatar + name + role + dual badge |
-| 프로필 편집 진입 | (별도 nav 탭) | ✅ card | ✅ card | ✅ icon button |
-| 설정 진입 | (별도 nav 탭) | ✅ card | ✅ card | ✅ icon button |
-| 내 강의 / 수강 | ✅ count card | ✅ card | ✅ card | ❌ |
-| 수료증 | ✅ count card | ✅ card | ✅ card | ❌ |
-| 크레딧 / 포인트 | ✅ (별도 route 연결) | ✅ card | ✅ card | ❌ |
-| 작성 글 / my-forums | ✅ count card | ❌ | ❌ | ❌ |
-| 포럼 진입 | (header) | (header) | (header) | ✅ icon button |
-| 이벤트 / 신청 | ✅ link | ❌ | ❌ | ❌ |
-| Appreciation activity | ✅ section (받은/보낸) | ✅ section | ✅ section | ❌ |
-| Dashboard quick link | (별도 nav) | ❌ | ✅ getKCosmeticsDashboardRoute | ✅ getNetureDashboardRoute |
-| Logout button | ✅ | ✅ | ✅ | ✅ |
-| 비즈니스 프로필 (supplier) | (inline in profile) | ❌ | ❌ | ✅ (supplier only) |
+| Card / Section | KPA | K-Cos | Neture |
+| --- | :---: | :---: | :---: |
+| Profile summary header | ✅ avatar + name + email + badges | ✅ avatar + name + role | ✅ avatar + name + role + dual badge |
+| 프로필 편집 진입 | (별도 nav 탭) | ✅ card | ✅ icon button |
+| 설정 진입 | (별도 nav 탭) | ✅ card | ✅ icon button |
+| 내 강의 / 수강 | ✅ count card | ✅ card | ❌ |
+| 수료증 | ✅ count card | ✅ card | ❌ |
+| 크레딧 / 포인트 | ✅ (별도 route 연결) | ✅ card | ❌ |
+| 작성 글 / my-forums | ✅ count card | ❌ | ❌ |
+| 포럼 진입 | (header) | (header) | ✅ icon button |
+| 이벤트 / 신청 | ✅ link | ❌ | ❌ |
+| Appreciation activity | ✅ section (받은/보낸) | ✅ section | ❌ |
+| Dashboard quick link | (별도 nav) | ✅ getKCosmeticsDashboardRoute | ✅ getNetureDashboardRoute |
+| Logout button | ✅ | ✅ | ✅ |
+| 비즈니스 프로필 (supplier) | (inline in profile) | ❌ | ✅ (supplier only) |
 
 **관찰:**
-- KPA + Glyco + K-Cos 셋 다 LMS 3종 (강의/수료증/크레딧) Hub card 보유 — 가장 정렬된 axis
 - KPA 만 "작성 글" + "이벤트" 카드 — 사용자 활동 visibility 차원에서 가치 있음
-- Appreciation activity: KPA/Glyco/K-Cos 3개 정렬, Neture 미적용 — Neture 도 Phase 2 에서 적용 가능
-- Neture 의 "비즈니스 프로필" 은 supplier-only — 다른 서비스는 동등 개념 부재 (Glyco 의 약국 경영자 정보가 가장 가까움)
+- Neture 의 "비즈니스 프로필" 은 supplier-only — 다른 서비스는 동등 개념 부재
 
 ---
 
@@ -271,17 +239,12 @@
 | Drift 항목 | 분류 | 해결 비용 |
 |---|---|---|
 | K-Cos `MyPageNavigation` 가 LMS 탭 숨김 | C. route/menu 정렬 | 낮음 (config 1개) |
-| Glyco/K-Cos `/mypage/my-requests` 부재 | C. route/menu 정렬 + H. backend 보강 | 중간 |
-| Glyco `/forum/my-dashboard` 외부 진입 | F. 서비스별 유지 가능 (또는 통합 결정) | 낮음~중간 |
 | KPA 의 `MyRequestsPage` 통합 inbox 패턴 | E. 공통 component 추출 가치 | 중간 (3 서비스 적용 시) |
 | Role badge 4개 서비스 inline 다른 패턴 | E. 공통 component 추출 (`RoleBadge`) | 낮음 |
 | KPA local `LoadingSpinner` / `EmptyState` vs 타 서비스 inline | E. 공통 component 추출 → `@o4o/account-ui` 이동 | 낮음 |
 | Profile field 깊이 차이 (KPA 풍부 vs Neture name only) | I. 정책 결정 필요 (each service 가 어디까지 보일지) | 정책 의존 |
-| Glyco store owner business info 가 `/store/identity` | I. 정책 결정 — MyPage 내 inline vs 별도 page canonical 결정 | 정책 의존 |
 | KPA `PasswordChangeModal` 미사용 (inline accordion) | B. UI layout 정렬 | 낮음 |
-| Glyco/K-Cos Appreciation Hub 카드 + KPA 통합 | A. 이미 정렬됨 | — |
 | Neture Appreciation 미적용 | F. 서비스별 유지 가능 (또는 Phase 2) | 선택 |
-| Glyco `당뇨인/Care/GlucoseView` MyPage 잔재 | A. 이미 정렬됨 (MyPage 외부 mock 만 잔존) | — |
 | K-Cos seller/consumer 라벨 fallback 없음 | D. profile field 정책 | 낮음 |
 | Neture Partner dashboard mock data | H. backend 보강 필요 | 중간 |
 | Neture `/mypage/business-profile` supplier only | F. 서비스별 유지 | — |
@@ -296,14 +259,14 @@
 ## 9. 추천 공통화 옵션
 
 ### Option A — KPA MyPageLayout 을 기준으로 3개 서비스에 맞춤
-- **이미 달성됨** (`@o4o/account-ui` 가 KPA + Glyco + K-Cos + Neture 공통 사용)
+- **이미 달성됨**
 - 남은 작업: KPA 의 local PageHeader / LoadingSpinner / EmptyState 를 `@o4o/account-ui` 로 이동
 
 ### Option B — shared MyPageShell / ProfileShell 공통 컴포넌트 추출 ⭐ **권장**
 - 이미 `@o4o/account-ui` 가 그 역할 수행 중. **확장**으로 충분:
   - `RoleBadge` 신규 추가 (4 서비스 inline → 1 컴포넌트)
   - `MyPageStatusCard` (Empty/Loading/Error 공통) 신규 추가
-  - `MyRequestsInbox` 추출 (KPA 의 통합 inbox → Glyco/K-Cos 채택 가능)
+  - `MyRequestsInbox` 추출
 - 장기 안정성 + 점진적 적용 가능
 
 ### Option C — 우선 UI 만 local mirror 로 맞춤
@@ -341,7 +304,6 @@
 - **부수 효과**: 모든 MyPage 페이지의 empty/loading/error UX 통일
 
 ### WO-4: **WO-O4O-MYPAGE-MY-REQUESTS-INBOX-CROSSSERVICE-V1**
-- **목표**: KPA 의 `MyRequestsPage` (통합 inbox 패턴) 을 Glyco/K-Cos 에도 적용
 - **범위**: 백엔드 통합 API 확인 + 3 서비스 `/mypage/my-requests` route 추가
 - **risk**: 중간 (backend 확장 필요 가능성)
 - **사용자 가치**: 큼 — 신청 상태 SSOT
@@ -372,8 +334,7 @@
 4. **WO-5** Hub card visual alignment
 
 ### Phase 3 — 중기 (정책 결정 필요)
-5. **WO-4** `MyRequestsInbox` cross-service 적용 — backend 확장 + 정책 결정 (Glyco/K-Cos 의 forum/apply 통합 여부)
-6. **Profile field depth 정책 결정** — Glyco 의 store identity 가 MyPage inline 인지 별도 page 인지 canonical 결정
+5. **WO-4** `MyRequestsInbox` cross-service 적용 — backend 확장 + 정책 결정
 7. (선택) **WO-6** Neture Appreciation Phase 2
 
 ### Phase 4 — 장기 (확장 영역)
@@ -392,7 +353,7 @@
 
 ## 부록 B — 관련 최근 commits
 
-- `032d36880` WO-O4O-APPRECIATION-CULTURE-UI-PHASE1-V1 (KPA/Glyco/K-Cos appreciation)
+- `032d36880` WO-O4O-APPRECIATION-CULTURE-UI-PHASE1-V1
 - `4fcb60cd9` WO-O4O-KPA-MYPAGE-FORUM-MOBILE-POLISH-V1
 - `9529ac4cd` WO-O4O-MYPAGE-FORM-MOBILE-V1
 - `adbdd1b69` WO-O4O-KPA-MYPAGE-RESPONSIVE-LAYOUT-CANONICALIZATION-V1
@@ -412,6 +373,5 @@
 - ✅ Backend 수정 없음
 - ✅ DB migration 없음
 - ✅ route/menu 수정 없음
-- ✅ KPA/Glyco/K-Cos/Neture 코드 수정 없음
 
 다음 단계 시작 전 사용자 승인 필요.

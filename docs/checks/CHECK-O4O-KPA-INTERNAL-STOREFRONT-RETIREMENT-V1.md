@@ -34,10 +34,10 @@ KPA 자체 운영 B2C storefront(자체몰)를 종료한다. 온라인 판매는
 | REMOVE | 신규 B2C 채널 생성 | 백엔드 차단 (`410 STORE_B2C_CHANNEL_RETIRED`, **kpa serviceKey 한정**) |
 | **REPURPOSE** | `StorefrontProductDetailPage` | 구매 CTA·수량·장바구니·checkout 이동·자체몰 홈 복귀 제거 → 제품 정보 + owner 설명 수정만 |
 | REPURPOSE | `GET /:slug/products/:id` | QR 제품 랜딩(`landingType='product'`) 착지 API 로 의미 축소 |
-| **KEEP** | `GET /:slug` (KPA·GlycoPharm·K-Cosmetics 블로그 공개층 공통) | 미변경 |
+| **KEEP** | `GET:slug` (KPA·K-Cosmetics 블로그 공개층 공통) | 미변경 |
 | KEEP | blog (`/blog` · `/blog/settings` · `/blog/:postSlug`) · tablet 6 endpoint | 미변경 |
 | KEEP | `platform_store_slugs` · `checkout_orders` · `organization_channels` · `organization_product_channels` **데이터** | 미변경 (기존 B2C row 는 역사 데이터로 보존) |
-| KEEP | GlycoPharm `/api/v1/glycopharm/stores/*` · K-Cosmetics `/api/v1/cosmetics/stores/*` | 미변경 |
+| KEEP | K-Cosmetics `/api/v1/cosmetics/stores/*` | 미변경 |
 | KEEP | 3서비스 공용 `store-settings.controller.ts` · `layout.controller.ts` | 미변경 (프런트만 은퇴) |
 
 ---
@@ -64,7 +64,7 @@ KPA 자체 운영 B2C storefront(자체몰)를 종료한다. 온라인 판매는
 
 | 파일 | 조치 |
 |---|---|
-| `packages/shared-space-ui/src/blog/BlogPublicHeader.tsx` | `storeHomePath?: string \| null` prop 신설. **기본값은 기존 동작(`/store/{slug}`) 유지** → GlycoPharm·K-Cosmetics 무영향. KPA 만 `null` 로 링크 숨김 |
+| `packages/shared-space-ui/src/blog/BlogPublicHeader.tsx` | `storeHomePath?: string \ | null` prop 신설. KPA 만 `null` 로 링크 숨김 |
 
 > **Shared Module Change Rule 준수**: 공용 컴포넌트를 KPA 전용으로 바꾸지 않고 **opt-in prop** 으로 분기했다. 3개 소비 서비스 전부 typecheck 통과.
 
@@ -87,7 +87,7 @@ KPA 자체 운영 B2C storefront(자체몰)를 종료한다. 온라인 판매는
 | `platform_store_slugs` | 미변경. slug 는 QR(`/qr/:slug`) · 태블릿(`/tablet/:slug`) · 블로그(`/store/:slug/blog`) 공용 식별자이므로 편집 UI 도 존치 |
 | `organization_product_channels` | 미변경 (B2C·TABLET 공용 구조) |
 | `checkout_orders` | 미변경 |
-| GlycoPharm / K-Cosmetics | 코드·경로 미변경, typecheck 통과 |
+| K-Cosmetics | 코드·경로 미변경, typecheck 통과 |
 | QR 트랙 | `QrLandingPage` · `StoreQRPage` · `store-qr.service.ts` · `QrPrintTemplateModal` 미변경. `landingType='product'` 착지 경로 유지 |
 | 다른 세션 파일 (`kpa-branch/**` 등) | 미접촉 |
 
@@ -99,7 +99,6 @@ KPA 자체 운영 B2C storefront(자체몰)를 종료한다. 온라인 판매는
 |---|---|
 | `tsc --noEmit` web-kpa-society | PASS |
 | `tsc --noEmit` shared-space-ui | PASS |
-| `tsc --noEmit` web-glycopharm | PASS |
 | `tsc --noEmit` web-k-cosmetics | PASS |
 | `pnpm --filter @o4o/web-kpa-society build` | PASS |
 | `pnpm --filter @o4o/api-server build` | PASS |
@@ -111,7 +110,7 @@ KPA 자체 운영 B2C storefront(자체몰)를 종료한다. 온라인 판매는
 
 | # | 내용 |
 |---|---|
-| 1 | **GlycoPharm 자체 storefront** 가 `/cart` · `/orders` · `/orders/:id/cancel` 를 여전히 노출하는데 결제는 `410` — 별도 WO |
+| 1 | `/orders` · `/orders/:id/cancel` 를 여전히 노출하는데 결제는 `410` — 별도 WO |
 | 2 | `store-public-utils.ts` 의 `generateDefaultBlocks` · `deriveChannels` 가 이번 제거로 소비처 0 (동명 함수가 `layout.controller.ts` 에 별도 존재). 삭제는 별도 정리 WO |
 | 3 | `QrLandingPage` 의 `landingType='promotion'` → `/store/:slug/events/:id` 는 **원래부터 route 없음**(선행 dead-end, 이번 변경과 무관) |
 | 4 | 네이버 연동 조사·파일럿 → 쿠팡 연동 → 공통 Online Sales 모듈 추출 (후속 트랙) |

@@ -114,7 +114,7 @@
 
 **데이터 표시도 정상**이다.
 
-- 매장 네트워크: `Total Stores 3`, 서비스별 분해(K-Cosmetics 2 stores, Glyco…) 렌더
+- 매장 네트워크: `Total Stores 3`, 서비스별 분해 렌더
 - 오프라인 매장: 정상 빈 상태 안내 — `No physical stores linked / Click "Sync Stores" to link stores by business number.`
 - 플랫폼 HUB: `Global Risk Overview`, `승인율 100% / 대기 0건`, `약국 1개 활성` 등 실 지표 렌더
 

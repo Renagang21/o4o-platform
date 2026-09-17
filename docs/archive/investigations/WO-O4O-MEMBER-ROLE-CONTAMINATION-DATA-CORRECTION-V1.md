@@ -16,7 +16,7 @@
 
 ## 2. 사전 SELECT (보정 직전 재확인)
 
-Q1 집계 9 rows 동일(GP 4 · Neture 2 · KCos 2 · KPA 1, 전부 bare·active). 대상 row(보정 실행분) 사전 확인:
+Neture 2 · KCos 2 · KPA 1, 전부 bare·active). 대상 row(보정 실행분) 사전 확인:
 ```
  user_id=52a4c1e6-... | service_key=neture | role=operator | status=active   (1 row)
 ```
@@ -26,12 +26,8 @@ Q1 집계 9 rows 동일(GP 4 · Neture 2 · KCos 2 · KPA 1, 전부 bare·active
 | email | service_key | 현재 role | canonical role_assignment | 참여유형 근거 | 보정 | 처리 |
 |---|---|---|---|---|---|---|
 | sohae21@naver.com | neture | operator | `neture:operator`(active) | **`supplier`(active)** | operator→**supplier** | **실행됨** |
-| ksmgamil@gmail.com | glycopharm | admin | `glycopharm:admin`(a) | 없음 | — | 보류 |
-| mmgi71537@gmail.com | glycopharm | operator | `glycopharm:operator`(a) | 없음 | — | 보류 |
-| sohae2100@gmail.com | glycopharm | operator | super_admin 전체(a) | 없음 | — | 보류 |
 | sohae2100@gmail.com | kpa-society | admin | super_admin 전체(a) | 없음 | — | 보류 |
 | sohae2100@gmail.com | neture | operator | super_admin 전체(a) | 없음 | — | 보류 |
-| glyco-operator@o4o.com | glycopharm | operator | `glycopharm:operator`**(inactive)** | — | — | 테스트 별도 트랙 |
 | kcos-admin@o4o.com | k-cosmetics | admin | `cosmetics:admin`**(inactive)** | — | — | 테스트 별도 트랙 |
 | kcos-operator@o4o.com | k-cosmetics | operator | `cosmetics:operator`**(inactive)** | — | — | 테스트 별도 트랙 |
 
@@ -73,7 +69,6 @@ WHERE user_id = '52a4c1e6-6fba-4a41-a020-a47637e8ca3a'
 | 서비스 | 보정 전 오염 | 보정 후 오염 |
 |---|---|---|
 | Neture | 2 | **1** (sohae21 정리, sohae2100 보류) |
-| GlycoPharm | 4 | 4 (전부 보류/테스트) |
 | K-Cosmetics | 2 | 2 (테스트 별도 트랙) |
 | KPA-Society | 1 | 1 (sohae2100 보류) |
 

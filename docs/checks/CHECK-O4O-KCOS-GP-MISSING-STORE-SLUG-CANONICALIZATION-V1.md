@@ -8,7 +8,7 @@
 
 ---
 
-## 1. §3 수정 전 census — KCos / GP organization ↔ enrollment ↔ slug
+## 1. §3 수정 전 census — KCos organization ↔ enrollment ↔ slug
 
 모집단 정의: `organization_service_enrollments.status='active'` × `organizations."isActive"=true`.
 서비스 매핑은 **두 축이 다르다** (§6 참조).
@@ -16,12 +16,10 @@
 | 서비스 | enrollment `service_code` | slug `service_key` |
 |---|---|---|
 | K-Cosmetics | `k-cosmetics` (canonical) · `cosmetics` (legacy 잔존) | `cosmetics` |
-| GlycoPharm | `glycopharm` | `glycopharm` |
 
 ### 1-1. 전체 enrollment 모집단 (참고)
 
 ```
-cosmetics|active|1   glycopharm|active|2   k-cosmetics|active|2
 kpa-society|active|7  neture|active|3      pharmacy-hub|active|6
 ```
 
@@ -31,20 +29,17 @@ kpa-society|active|7  neture|active|3      pharmacy-hub|active|6
 |---|---|---|---|:---:|---|---|:---:|:---:|
 | KCos | `31e926a0` | 테스트 K-Cosmetics 매장 | store | true | `cosmetics` + `k-cosmetics` | **없음** | 1 | 1 |
 | KCos | `83ff96c7` | 테스트 뷰티샵 | store | true | `k-cosmetics` | **없음** | 2 | 1 |
-| GP | `c92b857f` | 테스트 약국 | pharmacy | true | `kpa-society` + `glycopharm` | **없음** (단 동일 org 에 `kpa` slug `테스트-약국` 보유) | 0 | 1 |
-| GP | `13c08a86` | [E2E_TEST] 글라이코팜 검증 약국 | pharmacy | true | `glycopharm` | **없음** | 1 | 1 |
+| `c92b857f` | 테스트 약국 | pharmacy | true | `kpa-society` | **없음** (단 동일 org 에 `kpa` slug `테스트-약국` 보유) | 0 | 1 |
 
 ### 1-3. 최종 숫자 (수정 전)
 
 ```
 KCos 정상 org: 2 (slug 보유 0 / slug 누락 2 / 중복 slug 0 / 동일 org 다중 active slug 0)
-GP   정상 org: 2 (slug 보유 0 / slug 누락 2 / 중복 slug 0 / 동일 org 다중 active slug 0)
 전체 platform_store_slugs: 13행 (orphan 0 / 중복 0 / 동일 org 다중 active 0)
 미조사: 0
 ```
 
 부속 데이터: `cosmetics.cosmetics_stores` 2행 (`62011f36` slug=`test-kcos-store-owner` / `bac64424` slug=**NULL**),
-`glycopharm_pharmacy_extensions` **0행**, `glycopharm_members` 1행(`approved`/`pharmacy_owner`),
 4개 조직 모두 `role_assignments` org-scoped 0행 · local_products 0 · kpa_store_contents 0 · store_playlists 0.
 
 ---
@@ -52,10 +47,8 @@ GP   정상 org: 2 (slug 보유 0 / slug 누락 2 / 중복 slug 0 / 동일 org �
 ## 2. §6 serviceKey 계약 확인 (확정만, 정규화는 하지 않음)
 
 - slug 축(`platform_store_slugs.service_key`) 의 허용값은 타입으로 고정돼 있다 —
-  `StoreSlugServiceKey = 'glycopharm' | 'cosmetics' | 'kpa' | 'neture' | 'pharmacy-hub'`
   (`packages/platform-core/src/store-identity/entities/platform-store-slug.entity.ts`).
-- membership/enrollment 축은 별개다 — `k-cosmetics`, `kpa-society`, `glycopharm`, `pharmacy-hub`, `neture` (+legacy `cosmetics`).
-- **확정**: KCos slug canonical key = `cosmetics`, GP slug canonical key = `glycopharm`.
+- membership/enrollment 축은 별개다 — `k-cosmetics`, `kpa-society`, `pharmacy-hub`, `neture` (+legacy `cosmetics`).
 - `31e926a0` 의 enrollment `cosmetics` + `k-cosmetics` 이중 등록은 **이번 WO 범위 밖**(§10) —
   건드리지 않고 그대로 둔다. enrollment `service_code` 정규화는 별도 WO.
 
@@ -63,15 +56,15 @@ GP   정상 org: 2 (slug 보유 0 / slug 누락 2 / 중복 slug 0 / 동일 org �
 
 ## 3. §5 WRITE path 전수감사 — 실제 누락 원인
 
-`reserveSlug()` 호출부 전수(수정 전 7곳) 중 KCos·GP provisioning 경로를 역추적한 결과,
+`reserveSlug` 호출부 전수(수정 전 7곳) 중 KCos provisioning 경로를 역추적한 결과
 **축 오류가 아니라 slug 예약 단계 자체가 없는 경로**가 원인이었다.
 
 | 조직 | 생성 주체 | organization | enrollment | slug 예약 | 성격 |
 |---|---|:---:|:---:|:---:|---|
 | `31e926a0` | migration `20260501100000-SeedKCosmeticsStoreOwnerTestAccount` | 생성 | 생성 | **없음** (`platform_store_slug_history` 에만 insert — registry 누락) | 1회성 seed, 실행 완료 |
 | `83ff96c7` | migration `20261031000001-BackfillKCosmeticsSellerStoreContext` (`90a046f1a`) | 생성 | 생성 | **의도적 생략** (주석: "slug 는 NULL … 공개 slug 라우팅만 보류") | 1회성 backfill, 실행 완료 |
-| `13c08a86` | `GlycopharmMemberService.approveMember()` 신규 org 분기 | 생성 | 생성 | **없음** | **살아있는 write path** |
-| `c92b857f` | `GlycopharmMemberService.approveMember()` 기존 org 분기 (`enrollService` + `setOwner`) | 재사용 | 생성 | **없음** | **살아있는 write path** |
+| `13c08a86` | — | 생성 | 생성 | **없음** | **살아있는 write path** |
+| `c92b857f` | — | 재사용 | 생성 | **없음** | **살아있는 write path** |
 
 추가로 KCos 쪽에도 같은 형태의 갭이 있다.
 
@@ -79,11 +72,10 @@ GP   정상 org: 2 (slug 보유 0 / slug 누락 2 / 중복 slug 0 / 동일 org �
 |---|:---:|---|
 | `CosmeticsStoreService.createStoreWithOrg()` (신규 매장) | 있음 | `reviewApplication` · `ensureStoreContextForOwner`(신규 분기) 공유 |
 | `CosmeticsStoreService.linkOwnerToStore()` (동일 사업자번호 기존 매장 연결) | **없음** | org member + enrollment 만 보강 → legacy 매장은 owner 가 붙어도 계속 slug 없음 |
-| GP `glycopharm.service.ts` / `admin.controller.ts` / `store-applications.controller.ts` | 있음 | 3경로 모두 정상 (단 `glycopharm_pharmacy_extensions` 0행 = 프로덕션에서 실사용된 적 없음) |
+ `admin.controller.ts` / `store-applications.controller.ts` | 있음 | 3경로 모두 정상 |
 | KPA `kpa-store-organization.provisioning.ts` · Pharmacy-Hub `PharmacyHubStoreProvisioningService` | 있음 | **canonical 참조 패턴** — `findByStoreId` 선조회 → 없을 때만 예약, 실패 비차단 |
 
 **원인 확정**: `organization 생성 → enrollment 생성 → slug 예약` 3단계 중 **3단계(slug 예약)** 가
-GP 승인 경로 2분기와 KCos 기존 매장 연결 경로에서 빠져 있었다.
 
 ---
 
@@ -94,7 +86,6 @@ GP 승인 경로 2분기와 KCos 기존 매장 연결 경로에서 빠져 있었
 
 | 파일 | 변경 |
 |---|---|
-| `apps/api-server/src/routes/glycopharm/services/glycopharm-member.service.ts` | `ensureGlycopharmStoreSlug(organizationId, fallbackName?)` private helper 추가. `approveMember()` 의 `pharmacy_owner` **두 분기 모두**에서 호출 |
 | `apps/api-server/src/routes/cosmetics/services/cosmetics-store.service.ts` | `ensureCosmeticsStoreSlug(organizationId, storeSlug, storeName)` private helper 추가. `linkOwnerToStore()` 에서 호출 |
 | `apps/api-server/src/__tests__/store-slug-store-id-axis.spec.ts` | 호출부 census 7→8곳 갱신 + 두 경로의 slug 보강 회귀 테스트 2건 추가 |
 
@@ -115,8 +106,7 @@ DB schema · migration · route contract · frontend 변경 **0건**.
 |---|---|---|
 | `31e926a0` 테스트 K-Cosmetics 매장 | **SAFE_TO_BACKFILL** | 정상 active store 조직, owner 2명, listing 1건. 대응 `cosmetics_stores.slug='test-kcos-store-owner'` 가 이미 있고 registry 에서 미사용 → 같은 문자열로 registry 정합 |
 | `83ff96c7` 테스트 뷰티샵 | **SAFE_TO_BACKFILL** | 정상 active store 조직, owner 1명, listing 1건. `cosmetics_stores.slug` 는 NULL → 이름 기반 `generateUniqueSlug('테스트 뷰티샵')` = `테스트-뷰티샵` (미사용) |
-| `c92b857f` 테스트 약국 | **DUPLICATE_OR_CONFLICT** | 동일 organization 이 이미 `kpa` slug `테스트-약국` 을 보유하고 **공개 조회가 200 으로 동작**한다(`resolvePublicStore` 는 lookup 시 serviceKey 를 따지지 않는다). `platform_store_slugs.slug` 는 전역 UNIQUE 라 glycopharm slug 를 추가하면 `테스트-약국-1` 같은 파생 문자열이 되고, §3 census 가 이상치로 세는 "동일 org 다중 active slug" 를 새로 만든다 → **생성하지 않음** |
-| `13c08a86` [E2E_TEST] 글라이코팜 검증 약국 | **LEGACY_NO_PUBLIC_STORE_REQUIRED** | ① 이름·데이터 모두 E2E 검증용 조직(공개 매장 대상 아님). ② 기존 채번 규칙으로 유효 slug 를 만들 수 없다 — `generateSlugFromName('[E2E_TEST] 글라이코팜 검증 약국')` = `e2e_test-글라이코팜-검증-약국` 이고 `_` 가 `SLUG_CONSTRAINTS.PATTERN` 위반이라 `-1`~`-100` 접미사까지 전부 invalid. §7 "임의 slug 하드코딩 금지" 이므로 **생성하지 않음** |
+| `c92b857f` 테스트 약국 | **DUPLICATE_OR_CONFLICT** | 동일 organization 이 이미 `kpa` slug `테스트-약국` 을 보유하고 **공개 조회가 200 으로 동작**한다(`resolvePublicStore` 는 lookup 시 serviceKey 를 따지지 않는다). |
 
 `SAFE_TO_BACKFILL` 2건만 생성했다.
 
@@ -177,7 +167,6 @@ WHERE id IN ('8d189fd8-f89c-4ea8-9d13-ad1abbda95b1','1d83121d-8388-46e5-a5bf-7d1
 
 ```
 KCos 정상 org: 2 (slug 보유 2 / slug 누락 0)
-GP   정상 org: 2 (slug 보유 0 / slug 누락 2 — 판정에 따라 의도적 미생성)
 전체 platform_store_slugs: 15행
 orphan 0 / 중복 slug 0 / 동일 org 다중 active slug 0
 ```
@@ -217,7 +206,7 @@ GET /api/v1/stores/테스트-뷰티샵
 | 항목 | 결과 |
 |---|---|
 | `apps/api-server` `tsc --noEmit` | **PASS** (오류 0) |
-| 관련 Jest (cosmetics · glycopharm · pharmacy-hub · kpa provisioning · slug) | **PASS** 11 suites / 127 tests |
+| 관련 Jest (cosmetics · pharmacy-hub · kpa provisioning · slug) | **PASS** 11 suites / 127 tests |
 | 전체 `apps/api-server` Jest | **PASS** 138 suites / 2180 tests |
 | production pre/post census | 위 §1 · §7-1 |
 | insert row count | expected 2 == actual 2 |
@@ -234,8 +223,6 @@ DB schema · migration · seed 변경 **없음**. 변경은 `platform_store_slug
 2. **`generateSlugFromName()` 이 invalid slug 를 만들 수 있다** — `\w` 를 허용해 `_` 가 남는데
    `validateSlug()` 는 `_` 를 거부한다. 이름에 `_` 가 들어간 매장은 provisioning 이 100회 재시도 후 예외로 끝난다
    (`13c08a86` 이 정확히 이 케이스). → 별도 WO (채번 규칙 정합).
-3. **`c92b857f` 의 kpa slug 로 GP 매장이 노출된다** — `resolvePublicStore` 가 lookup 시 serviceKey 를 보지 않아,
-   한 조직이 여러 서비스에 걸쳐 있으면 어느 서비스 slug 로도 공개된다. 설계 의도인지 판정 필요. → 별도 WO.
 4. **enrollment `service_code` 의 `cosmetics` / `k-cosmetics` 혼재** — `31e926a0` 이 둘 다 보유.
    §10 에 따라 이번에 손대지 않았다. → 별도 WO (선행 WO 잔존 위험과 동일 항목).
 5. **`platform_store_slugs.store_id` 에 FK 가 없다** — 선행 WO 에서 `deleteOrganization()` 트랜잭션 정리로 보완했으나

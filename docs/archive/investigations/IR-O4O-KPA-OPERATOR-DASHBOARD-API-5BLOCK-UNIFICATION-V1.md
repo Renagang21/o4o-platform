@@ -25,7 +25,7 @@
 
 ## 1. Executive Summary
 
-| 측면 | 현재 KPA | Neture/GlycoPharm/K-Cos (baseline) | gap |
+| 측면 | 현재 KPA || gap |
 |------|---------|-----------------------------------|-----|
 | Frontend OperatorDashboardLayout 사용 | ✅ | ✅ | 동일 |
 | Backend 단일 `/operator/dashboard` endpoint | ❌ (`/operator/summary` + 6 보조) | ✅ | KPA 만 미정합 |
@@ -34,7 +34,7 @@
 | KPI Grid source | frontend assemble (summary + 5 별도 fetch) | backend assemble | 위치 차이 |
 | Activity Log source | backend `summary.recentActivity/recentItems` | backend response | 동일 |
 | Quick Actions | frontend hardcoded + role-based | backend hardcoded | 위치 차이 |
-| AxisNavigationSection | KPA 2축 (buildKpaAxes) | GlycoPharm/K-Cos 도 axis 사용, Neture 미사용 | KPA 특수성 보존 가능 |
+| AxisNavigationSection | KPA 2축 (buildKpaAxes) | K-Cos 도 axis 사용, Neture 미사용 | KPA 특수성 보존 가능 |
 | Role-aware (isAdmin) 분기 | ✅ (KPA 만) | 미사용 | KPA 특수성 |
 | OperatorRoleGuideCard | ✅ (KPA 만) | 미사용 | KPA 특수성 |
 
@@ -156,14 +156,13 @@
 
 ---
 
-## 5. Neture / GlycoPharm / K-Cosmetics 5-Block 구조 비교
+## 5. Neture / K-Cosmetics 5-Block 구조 비교
 
 ### 5.1 공통 endpoint 패턴
 
 | 서비스 | endpoint | controller |
 |--------|----------|-----------|
 | Neture | `/api/v1/neture/operator/dashboard` | `modules/neture/controllers/operator-dashboard.controller.ts` |
-| GlycoPharm | `/api/v1/glycopharm/operator/dashboard` | `routes/glycopharm/services/operator-dashboard.service.ts` |
 | K-Cosmetics | `/api/v1/cosmetics/operator/dashboard` | `routes/cosmetics/controllers/operator-dashboard.controller.ts` |
 | **KPA (제안)** | `/api/v1/kpa/operator/dashboard` | (신규) |
 
@@ -174,19 +173,18 @@
 
 ### 5.3 Block 별 비교
 
-| Block | Neture | GlycoPharm | K-Cosmetics | KPA 현재 |
-|-------|--------|-----------|------------|---------|
-| KPI Grid | 8개 | 3개 (1 STUB) | 5개 | 6 + Admin 2 (frontend 조립) |
-| AI Summary | backend rule-based | backend rule-based | backend rule-based | **frontend rule-based** |
-| Action Queue | 4개 (backend) | 1개 (backend) | 3개 (backend) | **frontend dynamic** |
-| Activity Log | 5 source UNION | audit-based | recent orders | **summary recentActivity (backend, frontend sort)** |
-| Quick Actions | 7개 (backend hardcoded) | 3개 (backend) | 4개 (backend) | **frontend hardcoded + isAdmin** |
-| Operator Alerts | ❌ | ✅ (computeOperatorAlerts) | ❌ | ❌ |
+| Block | Neture | K-Cosmetics | KPA 현재 |
+| ------- | -------- | ------------ | --------- |
+| KPI Grid | 8개 | 5개 | 6 + Admin 2 (frontend 조립) |
+| AI Summary | backend rule-based | backend rule-based | **frontend rule-based** |
+| Action Queue | 4개 (backend) | 3개 (backend) | **frontend dynamic** |
+| Activity Log | 5 source UNION | recent orders | **summary recentActivity (backend, frontend sort)** |
+| Quick Actions | 7개 (backend hardcoded) | 4개 (backend) | **frontend hardcoded + isAdmin** |
+| Operator Alerts | ❌ | ❌ | ❌ |
 
 ### 5.4 Frontend pass-through builder 패턴
 
 - Neture: `buildNetureOperatorConfig(data)` — backend response 그대로
-- GlycoPharm: `buildGlycoPharmOperatorConfig(data)` — backend response 그대로 + OperatorAlerts 추가
 - K-Cosmetics: `buildKCosmeticsOperatorConfig(result.config)` — backend response 그대로 + AxisNavigation
 - **KPA (현재)**: `buildKpaOperatorConfig(extData, isAdmin)` — **summary 만 받아 frontend 가 5-Block 조립** ← 가장 큰 차이
 
@@ -308,7 +306,6 @@
 ### 단, 즉시 진행 보다 **Tier 4 정책 결정 사이클의 일부로 처리** 권장
 
 본 IR 작성 시점에 다음이 동시 트랙으로 진행 중:
-- I2 GlycoPharm Event Offer approval scope
 - I3 4 서비스 AxisNavigation 정합
 - Iα K-Cos operator menu admin entry mix
 - 외부 세션: ecommerce_orders vs checkout_orders schema diff IR + safe-fallback 작업 (commit `8ccb79f55`)

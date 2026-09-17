@@ -46,8 +46,6 @@ Pharmacy-Hub 만 계층이 없어, 서비스 관리 책임자와 일상 운영 �
 
 ## 4. 제외 범위
 
-- **GlycoPharm 의 `scopeRoleMapping` 부재** — admin/operator 계층이 fallback 동작에 의존한다.
-  본 WO 에 섞지 않고 별도 정비 대상으로 남긴다.
 - Admin 전용 관리 화면 신설, 기존 operator 기능의 admin 이관.
 - `packages/security-core` 구조 변경 (F1 Freeze).
 - Store Owner · Supplier 권한을 Admin 이 대신하는 구성.

@@ -2,13 +2,13 @@
 
 > **조사 보고서 (Investigation Report) — 조사 전용 / 코드·UI·route·wrapper·migration 변경 없음.**
 >
-> KPA-Society / GlycoPharm / K-Cosmetics / Neture 의 operator 회원 관리 화면이 **운영자가 같은 프로세스로 회원을 관리할 수 있는 수준** 으로 공통화되어 있는지 5 기준 (표준 리스트 / 컬럼 / 작업 UX / Backend API / Route+Menu) 으로 전수 audit.
+> KPA-Society / K-Cosmetics / Neture 의 operator 회원 관리 화면이 **운영자가 같은 프로세스로 회원을 관리할 수 있는 수준** 으로 공통화되어 있는지 5 기준 (표준 리스트 / 컬럼 / 작업 UX / Backend API / Route+Menu) 으로 전수 audit.
 
 - **작성일:** 2026-05-24
 - **분류:** Investigation (read-only)
 - **선행 산출물:**
   - [IR-O4O-OPERATOR-MEMBERS-DETAIL-SURFACE-DECISION-V1](IR-O4O-OPERATOR-MEMBERS-DETAIL-SURFACE-DECISION-V1.md) (Hybrid Canonical 결정)
-  - [IR-O4O-OPERATOR-MEMBERS-LIST-COMMONIZATION-DESIGN-V1](IR-O4O-OPERATOR-MEMBERS-LIST-COMMONIZATION-DESIGN-V1.md) (Option C — KPA 별도 유지 + Neture/GP/K-Cos 단일 wrapper, commit `de364ef9f`)
+  - [IR-O4O-OPERATOR-MEMBERS-LIST-COMMONIZATION-DESIGN-V1](IR-O4O-OPERATOR-MEMBERS-LIST-COMMONIZATION-DESIGN-V1.md) (Option C — KPA 별도 유지 + Neture/K-Cos 단일 wrapper, commit `de364ef9f`)
   - `WO-O4O-USER-DETAIL-PAGE-COMMONIZATION-V1` (CommonUserDetailPage 완료)
   - `WO-O4O-OPERATOR-MEMBERS-DETAIL-SURFACE-CANONICALIZATION-V1` (Hybrid 적용)
 - **참조 SSOT:**
@@ -22,7 +22,7 @@
 
 ## 1. Executive Summary
 
-> **공통 wrapper `OperatorMembersConsolePage` (949 lines) 는 robust 한 설계로 GP / K-Cos / Neture **3 service 채택 완료**. 단 KPA 만 1427 lines 독립 페이지 (`MemberManagementPage.tsx`) 유지. Route / Menu / Backend API / Admin-Operator hard delete 정책 모두 canonical 정렬 완료. 표준 리스트 / 컬럼 / 작업 UX 의 핵심 drift = **KPA wrapper 미적용** 단일 항목 + KPA Drawer footer 의 status change UX 가 canonical (ActionBar + row menu) 과 다름.
+> **공통 wrapper `OperatorMembersConsolePage` (949 lines) 는 robust 한 설계로 K-Cos / Neture **2 service 채택 완료**. 단 KPA 만 1427 lines 독립 페이지 (`MemberManagementPage.tsx`) 유지. Route / Menu / Backend API / Admin-Operator hard delete 정책 모두 canonical 정렬 완료. 표준 리스트 / 컬럼 / 작업 UX 의 핵심 drift = **KPA wrapper 미적용 단일 항목 + KPA Drawer footer 의 status change UX 가 canonical (ActionBar + row menu) 과 다름.
 
 ### 1.1 정렬 분포
 
@@ -34,7 +34,7 @@
 
 ### 1.2 한 줄 권고
 
-> **KPA 공통화 1건이 핵심.** GP/K-Cos/Neture 의 wrapper 적용은 이미 완료된 reference. KPA 의 1427 → ~30 lines thin wrapper 전환이 **운영 일관성 회복 + 유지보수 비용 절감 70%** 의 단일 가치.
+> **KPA 공통화 1건이 핵심.** K-Cos/Neture 의 wrapper 적용은 이미 완료된 reference. KPA 의 1427 → ~30 lines thin wrapper 전환이 **운영 일관성 회복 + 유지보수 비용 절감 70%** 의 단일 가치.
 
 ---
 
@@ -78,7 +78,7 @@
 
 ### 4.1 페이지 전수
 
-| 항목 | KPA | GP | K-Cos | Neture |
+| 항목 | KPA | K-Cos | Neture |
 |---|:---:|:---:|:---:|:---:|
 | 파일 경로 | `pages/operator/MemberManagementPage.tsx` | `pages/operator/UsersPage.tsx` | `pages/operator/UsersPage.tsx` | `pages/operator/UsersManagementPage.tsx` |
 | **라인 수** | **1427** | **297** | **232** | **305** |
@@ -102,7 +102,7 @@
 | Service | Admin 페이지 | Hard delete UI |
 |---|---|---|
 | KPA | `AdminMemberManagementPage` | `MemberDeleteRiskModal` (KPA 특화 — DeleteRisk 사전 평가) |
-| GP | `GlycoPharmAdminMembersPage` | `MemberHardDeleteConfirmModal` |
+| — | `MemberHardDeleteConfirmModal` |
 | K-Cos | `KCosmeticsAdminMembersPage` | `MemberHardDeleteConfirmModal` |
 | Neture | `AdminMemberManagementPage` | custom modal |
 
@@ -112,7 +112,7 @@
 
 ## 5. 표준 리스트 Matrix
 
-| 항목 | KPA | GP | K-Cos | Neture | 판정 |
+| 항목 | KPA | K-Cos | Neture | 판정 |
 |---|:---:|:---:|:---:|:---:|---|
 | DataTable / BaseTable | ✅ 독자 | ✅ wrapper | ✅ wrapper | ✅ wrapper | ✅ 표준 사용 (KPA 만 독립 구현) |
 | checkbox selection | ✅ | ✅ | ✅ | ✅ | ✅ |
@@ -131,7 +131,7 @@
 
 ## 6. 컬럼 Matrix
 
-| 컬럼 | KPA | GP | K-Cos | Neture | 공통화 필요 |
+| 컬럼 | KPA | K-Cos | Neture | 공통화 필요 |
 |---|:---:|:---:|:---:|:---:|:---:|
 | 선택 checkbox | ✅ | ✅ | ✅ | ✅ | ✅ 완료 |
 | 회원명 (클릭 가능) | ✅ Drawer | ✅ Drawer | ✅ Drawer | ✅ Drawer | ✅ 완료 |
@@ -151,7 +151,7 @@
 
 ## 7. 작업 UI-UX Matrix
 
-| 작업 | KPA | GP | K-Cos | Neture | Canonical | Gap |
+| 작업 | KPA | K-Cos | Neture | Canonical | Gap |
 |---|---|---|---|---|---|:---:|
 | 이름 클릭 → 상세 | Drawer | Drawer | Drawer | Drawer | Drawer | ✅ |
 | row action menu | ✅ | ✅ | ✅ | ✅ | RowActionMenu | ✅ |
@@ -187,7 +187,7 @@
 | `PATCH /:userId/status` | ✅ 모두 | pending / active / rejected / suspended / withdrawn | 동일 |
 | `PUT /:userId` (with password) | ✅ 모두 | profile + password 갱신 | `MembershipConsoleController.updateMember` |
 | `POST /batch-status` | ✅ 모두 | ids[] + status | 동일 |
-| `GET /:userId/delete-risk` | ✅ 모두 | soft/hard 사전 평가 | GP/K-Cos active, KPA/Neture 미사용 (가용) |
+| `GET:userId/delete-risk` | ✅ 모두 | soft/hard 사전 평가 | K-Cos active, KPA/Neture 미사용 (가용) |
 | `DELETE /:userId?mode=soft\|hard` | ✅ 모두 | mode 파라미터 | operator soft only / admin hard |
 | **Service scope guard** | ✅ 모두 | `resolveOperatorScope()` — serviceKey 검증 | F6 Boundary Policy 정합 |
 | **Hard delete admin-only guard** | ✅ 모두 | `requireRole` check — admin role only | 위반 시 403 |
@@ -198,7 +198,7 @@
 
 ## 9. Route / Menu Matrix
 
-| 항목 | KPA | GP | K-Cos | Neture | Canonical |
+| 항목 | KPA | K-Cos | Neture | Canonical |
 |---|:---:|:---:|:---:|:---:|:---:|
 | Operator 회원 관리 route | `/operator/members` | `/operator/members` | `/operator/members` | `/operator/members` | ✅ 완전 통일 |
 | Admin 회원 관리 route | `/admin/members` | `/admin/members` | `/admin/members` | `/admin/members` | ✅ 완전 통일 |
@@ -213,12 +213,12 @@
 
 ## 10. Admin / Operator Delete Policy
 
-| 정책 | KPA | GP | K-Cos | Neture | Status |
+| 정책 | KPA | K-Cos | Neture | Status |
 |---|:---:|:---:|:---:|:---:|:---:|
 | Operator hard delete UI 노출 | ❌ (/admin 분리) | ❌ (soft only) | ❌ (soft only) | ❌ (soft only) | ✅ 통일 |
 | Operator hard delete API 호출 시 backend 거부 | ✅ 403 | ✅ 403 | ✅ 403 | ✅ 403 | ✅ 통일 |
 | Admin hard delete UI | ✅ MemberDeleteRiskModal | ✅ MemberHardDeleteConfirmModal | ✅ MemberHardDeleteConfirmModal | ✅ custom | ✅ 정책화 |
-| Admin hard delete 사전 risk 평가 | ✅ `/delete-risk` 활용 | ✅ | ✅ | △ | ⚪ KPA/GP/K-Cos 완료, Neture 자체 패턴 |
+| Admin hard delete 사전 risk 평가 | ✅ `/delete-risk` 활용 | ✅ | ✅ | △ | ⚪ KPA/K-Cos 완료, Neture 자체 패턴 |
 | Soft delete (탈퇴 처리) operator + admin | ✅ | ✅ | ✅ | ✅ | ✅ 통일 |
 
 → **Hard delete admin-only 정책 = A.** Operator UI 노출 0건 + backend 403 guard 일관.
@@ -346,7 +346,6 @@ grep -n "interface\|export type\|render.*Modal\|extra.*Action\|extra.*Column" \
   packages/operator-core-ui/src/modules/members/OperatorMembersConsolePage.tsx | head -40
 
 # 2. 4 service 페이지 라인 수
-for SVC in kpa-society neture glycopharm k-cosmetics; do
   echo "=== $SVC ==="
   for FILE in MemberManagementPage UsersPage UsersManagementPage; do
     F="services/web-$SVC/src/pages/operator/$FILE.tsx"
@@ -355,13 +354,11 @@ for SVC in kpa-society neture glycopharm k-cosmetics; do
 done
 
 # 3. wrapper 사용 여부
-for SVC in kpa-society neture glycopharm k-cosmetics; do
   echo "=== $SVC ==="
   grep -ln "OperatorMembersConsolePage" services/web-$SVC/src/pages/operator/*.tsx
 done
 
 # 4. canonical route
-for SVC in kpa-society neture glycopharm k-cosmetics; do
   echo "=== $SVC ==="
   grep -n "operator/members\|operator/users" services/web-$SVC/src/App.tsx | head -5
 done
@@ -372,7 +369,6 @@ grep -n "router.get\|router.post\|router.patch\|router.delete\|router.put" \
   apps/api-server/src/routes/operator/membership.routes.ts | head -15
 
 # 6. admin hard delete UI
-for SVC in kpa-society neture glycopharm k-cosmetics; do
   grep -ln "MemberHardDeleteConfirmModal\|MemberDeleteRiskModal\|hard.*delete\|hardDelete" \
     services/web-$SVC/src/pages/admin/*.tsx 2>/dev/null
 done

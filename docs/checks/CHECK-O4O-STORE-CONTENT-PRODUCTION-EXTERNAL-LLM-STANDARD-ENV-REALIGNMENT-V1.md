@@ -49,7 +49,7 @@
 | `docs/checks/CHECK-O4O-STORE-CONTENT-PRODUCTION-EXTERNAL-LLM-STANDARD-ENV-REALIGNMENT-V1.md` | 본 문서 |
 | `docs/baseline/O4O-AI-USAGE-FLOW-BASELINE-V1.md` | 정합(상단 요지 · §1 · §4.1 · §10 · §15) — Home AI 계약(§11~§14) 무변경 |
 | `docs/CANONICAL-INDEX.md` | §2 행 1 추가 · §6 행 1 추가 + 기존 행 설명 보강 |
-| `packages/store-ui-core/src/components/StartProductionModal.tsx` | 주석만(GlycoPharm 삭제 반영 · `onAiAction` DORMANT 사실 · 원칙 문서 링크) |
+| `packages/store-ui-core/src/components/StartProductionModal.tsx` | 주석만(`onAiAction` DORMANT 사실 · 원칙 문서 링크) |
 
 ## 4. 검증
 
@@ -68,4 +68,4 @@
 
 ## 6. 문서 정합
 
-발견 3건(AI-USAGE-FLOW stale `PopCreatePage` 행 · CONTENT-PRODUCTION-FLOW 색인 누락 · `StartProductionModal.tsx` GlycoPharm/onAiAction stale 주석) / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 8건(필수 1 · 선택 7). CANONICAL-INDEX 행 추가 및 baseline 신규 작성은 사용자 WO 지시로 허용.
+발견 3건(AI-USAGE-FLOW stale `PopCreatePage` 행 · CONTENT-PRODUCTION-FLOW 색인 누락 · `StartProductionModal.tsx` onAiAction stale 주석) / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 8건(필수 1 · 선택 7). CANONICAL-INDEX 행 추가 및 baseline 신규 작성은 사용자 WO 지시로 허용.

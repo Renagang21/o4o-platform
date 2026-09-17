@@ -182,7 +182,7 @@ operator 응답은 admin 전용 `전체 회원`, `역할 관리`, `감사 로그
 | API·권한·route·DB | 변경 없음 |
 | CHECK 문서 | 신규 작성 |
 
-공통 순서 변경은 KPA뿐 아니라 GlycoPharm/K-Cosmetics 등 `OperatorDashboardLayout` 소비처에 영향을 줄 수 있다. KPA에서 layout을 우회해 별도 순서를 만들면 5-Block 공통 골격 회귀가 되므로 적용하지 않았다.
+공통 순서 변경은 KPA뿐 아니라 K-Cosmetics 등 `OperatorDashboardLayout` 소비처에 영향을 줄 수 있다. KPA에서 layout을 우회해 별도 순서를 만들면 5-Block 공통 골격 회귀가 되므로 적용하지 않았다.
 
 ## 8. 검증·배포
 
@@ -213,4 +213,3 @@ operator 응답은 admin 전용 `전체 회원`, `역할 관리`, `감사 로그
 - `.codex/`
 - `apps/api-server/_msm.mjs`
 - `apps/api-server/_msmx.mjs`
-

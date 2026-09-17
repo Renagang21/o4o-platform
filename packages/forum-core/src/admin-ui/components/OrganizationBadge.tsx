@@ -8,7 +8,6 @@ import { FC } from 'react';
  */
 
 // WO-O4O-FORUM-ORGS-INVALID-UUID-HOTFIX-V1: invalid UUID 'forum00000001' → valid hex.
-// WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1: GlycoPharm 포럼 조직 배지 제거 (서비스 삭제).
 
 interface OrganizationBadgeProps {
   organizationId?: string | null;

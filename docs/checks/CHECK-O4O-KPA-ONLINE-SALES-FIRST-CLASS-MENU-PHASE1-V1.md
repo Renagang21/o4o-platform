@@ -25,7 +25,7 @@
 | `services/web-kpa-society/src/App.tsx` | `/online-sales/settings·products` 라우트 추가, `/channels`→설정 redirect |
 | `services/web-kpa-society/src/pages/pharmacy/StoreChannelsPage.tsx` | `section`('settings'|'products') prop 재사용 — B2C 전용(탭 바/KIOSK 숨김), settings/products 화면 분리 |
 
-- backend/DB/migration **무변경**. `channel_type='B2C'` enum 불변. `/store/settings`·구매 주문 화면 무변경. GP/KCos 블록·페이지 무변경.
+- backend/DB/migration **무변경**. `channel_type='B2C'` enum 불변. `/store/settings`·구매 주문 화면 무변경. KCos 블록·페이지 무변경.
 
 ## 3. 신규 라우트
 
@@ -54,9 +54,9 @@
 
 - `고객 응대` 그룹 펼침 → 태블릿(`/store/commerce/tablet-displays`) + 상담 요청(`/store/requests`) 정상 노출(브라우저 확인). 두 라우트 동작 유지.
 
-## 9. GP/KCos 무변경 확인
+## 9. KCos 무변경 확인
 
-- `StoreChannelsPage`는 서비스별 개별 파일 — KPA만 수정. 공통 `storeMenuConfig.ts`는 **KPA 블록만** 변경(GP/KCos 블록의 '채널 관리'/태블릿 등 그대로). glycopharm tsc exit 0.
+- `StoreChannelsPage`는 서비스별 개별 파일 — KPA만 수정. 공통 `storeMenuConfig.ts`는 **KPA 블록만** 변경(KCos 블록의 '채널 관리'/태블릿 등 그대로).
 
 ## 10. 테스트/빌드/smoke 결과 (배포본 3d88b9e82, store-owner)
 
@@ -69,7 +69,7 @@
 | 8 | `/store/channels` → `/online-sales/settings` redirect | ✅ |
 | 9 | `채널 관리` 항목 사라짐 / `고객 응대` 그룹 노출 | ✅ |
 | 10·11 | 태블릿 / 상담 요청 라우트 유지 | ✅ |
-| 13 | tsc (web-kpa-society / glycopharm) exit 0 | ✅ |
+| 13 | tsc (web-kpa-society) exit 0 | ✅ |
 | 4·7 | 활성 매장 상태/URL/상품 진열 **시각** | ⚠️ 보류 — 데모 매장 B2C_COMMERCE capability 미활성 → 채널 생성 403 → 채널 없는 상태만 노출. section gating·B2C 로직은 코드+tsc로 보존 확인(이전 WO와 동일 한계) |
 
 ## 11. 후속 작업 후보
@@ -83,4 +83,4 @@
 
 ## 결론
 
-B안 1차(온라인 판매 1급 분리 + 판매 설정/상품 이관) 구현·배포·검증 완료. `채널 관리` 사용자 노출 제거, 태블릿/상담은 `고객 응대`로 정리. 온라인 스토어 실기능·주문 연결 보존, backend/DB/GP/KCos 무영향.
+B안 1차(온라인 판매 1급 분리 + 판매 설정/상품 이관) 구현·배포·검증 완료. `채널 관리` 사용자 노출 제거, 태블릿/상담은 `고객 응대`로 정리. 온라인 스토어 실기능·주문 연결 보존, backend/DB/KCos 무영향.

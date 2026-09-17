@@ -3,14 +3,13 @@
  *
  * WO-O4O-CROSS-SERVICE-MYPAGE-NOTIFICATIONS-COMMONIZATION-V1
  *
- * 이전 상태(중복 5벌):
+ * 이전 상태(중복 4벌):
  *   - KPA        lib/notificationRouting.ts        (내부 경로 가드 있음 + store.* fallback)
  *   - Neture     lib/notificationRouting.ts        (가드 없음)
- *   - GlycoPharm GlycoGlobalHeader 인라인          (가드 없음)
  *   - KCos       KCosGlobalHeader 인라인           (가드 없음)
  *   - PH         PharmacyHubGlobalHeader 인라인    (가드 없음)
  *
- * 본 함수는 그 5벌을 하나로 수렴한다. 서비스별 규칙(예: KPA 의 store.* fallback)은
+ * 본 함수는 그 4벌을 하나로 수렴한다. 서비스별 규칙(예: KPA 의 store.* fallback)은
  * `options.fallback` 으로 주입한다 — 이 파일 안에 서비스 route 나 serviceKey 분기를
  * 두지 않는다 (WO §9 · §12).
  *

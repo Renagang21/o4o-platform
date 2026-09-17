@@ -3,7 +3,7 @@
 - **작성일**: 2026-08-14
 - **선행 회차**: [1회차 CHECK](WO-O4O-OPERATOR-CROSSSERVICE-PRODUCTION-INTEGRATION-AND-REAL-USAGE-E2E-V1-CHECK.md) — Neture·PharmacyHub 를 **CONDITIONAL** 로 남기고 종료했다.
   본 R2 는 그 잔여(write E2E 미수행 2서비스)를 닫고 전 서비스를 재검증한 기록이다.
-- **대상**: KPA-Society / K-Cosmetics / Neture / PharmacyHub (공식 4서비스) · GlycoPharm(공유 모듈 회귀만)
+- **대상**: KPA-Society / K-Cosmetics / Neture / PharmacyHub (공식 3서비스)
 - **검증 방식**: 프로덕션 도메인 · Playwright chromium
   - desktop 1440×900 · mobile 390×844
   - 표시 메뉴는 **사이드바 접이식 그룹을 하나씩 펼쳐 DOM 에서 수집**한 뒤 전수 방문
@@ -56,7 +56,6 @@ WO 는 "각 서비스에서 **실제 계정 로그인부터**" 를 요구한다.
 | **K-Cosmetics** | 우회(§2) | PASS | **30 / 30** (mobile 30/30) | PASS | **PASS** | PASS | 1건 → **수정 후 0** | 0 / 0 | **PASS** |
 | **Neture** | 우회(§2) | PASS | **19 / 19** (mobile 20/20) | PASS | **PASS** | 수정 후 PASS | 7건 → **수정 후 0** | 0 / 0 | **PASS** |
 | **PharmacyHub** | ✅ 실제 200 | PASS | **2 / 2** (mobile 2/2) | PASS | **PASS** | PASS | **0** | 0 / 0 | **PASS** |
-| GlycoPharm(회귀만) | 우회(§2) | PASS | 36 / 36 (mobile 36/36) | 기존 403 2건 외 이상 없음 | — | PASS | — | 0 / 0 | **회귀 없음** |
 
 **메뉴 정의 대조** — `operatorMenuGroups.ts` 의 항목과 DOM 표시 항목을 기계 대조했다.
 
@@ -190,7 +189,7 @@ D1 배포 후 재측정에서 `scrollWidth` **414 > 390** 이 남아 있었다. 
 | 1 | **KPA·K-Cosmetics·Neture 실제 폼 로그인** | 해당 서비스의 **L2 service credential 비밀번호** | Identity V2 계약상 credential 이 있으면 `users.password` 로 fallback 하지 않는다. 해소 절차는 각 서비스 `/forgot-password` **메일 재설정**(계정 소유자만 가능). 추측·대입 금지 규칙이 있어 시도하지 않았다 |
 | 2 | **`/operator/ai-report` "분석 데이터 준비 중"** | Context Asset 노출 분석 **backend**(수집·저장·집계) | api-server 에 관련 엔티티·라우트 0건. 신규 테이블·API 는 CLAUDE.md 중지 조건(DB schema 변경) → 별도 WO |
 | 3 | **Neture `/operator/ai/asset-quality` 가 여전히 Mock 데이터** | 위 2번과 같은 backend + 개선요청 저장소 | 화면의 서비스 요약·개선 요청 목록이 전부 `mockServiceSummaries` / `mockImprovementRequests` 다. dead link·중복 헤더·overflow 는 고쳤으나 **데이터 원천은 없다.** 은퇴할지 구현할지는 제품 판단 |
-| 4 | **GlycoPharm `/operator/ai-report` 도 동일한 Mock** | 위와 동일 | GlycoPharm 은 본 WO 의 적용 대상이 아니라 회귀 확인만 하도록 지정돼 수정하지 않았다 |
+| 4 | — | 위와 동일 | — |
 | 5 | **CI Pipeline green run** | 다른 세션 push 가 없는 구간 | 타 세션 연속 push 로 계속 cancelled |
 | 6 | **PharmacyHub 테스트 계정 2건 잔여** | 정리 승인 | `e2e.test.ph.20260814.approve@example.com`(active) · `…reject@example.com`(rejected). 비밀번호는 무작위 생성 후 어디에도 기록하지 않아 로그인 불가. 기존 `e2e.test.ph.w9.owner@example.com` 과 동일 성격 |
 
@@ -199,28 +198,15 @@ D1 배포 후 재측정에서 `scrollWidth` **414 > 390** 이 남아 있었다. 
 | 항목 | 상태 | 판단 |
 |------|------|------|
 | KPA `/operator` 에 `platform:super_admin` 진입 허용 vs backend 403 | frontend `KPA_ROLES` 는 super_admin 허용, backend `KPA_SCOPE_CONFIG.platformBypass=false` 는 차단 | 화면은 오류 안내로 graceful 하지만 **frontend·backend 계약 불일치**다. 권한 정책 변경은 중지 조건 → 별도 WO |
-| GlycoPharm `/api/ai/admin/**` 403 2건 | `requireAdmin`(=`platform:super_admin` 단독) | 1회차와 동일. GlycoPharm 은 적용 대상 아님 |
-| GlycoPharm `/operator/settings` · `/operator/community` · `/operator/analytics` "준비 중" | GlycoPharm 고유 화면 | 공통화 회귀 아님(기존 상태). 적용 대상 아님 |
 | KPA `/admin` 약관·개인정보 404 2쌍 | `legal/documents/published/{terms,privacy}` 미게시 | 코드 결함 아닌 **콘텐츠 미등록**. 화면은 정상 폴백 |
 | `/operator/lms` "준비중" | 강의 **상태 필터 라벨** | placeholder 오탐 (1회차와 동일 판정) |
-
----
-
-## 8. GlycoPharm 공유 모듈 회귀
-
-| 확인 | 결과 |
-|------|------|
-| 표시 메뉴 전수 (desktop 36 / mobile 36) | JS exception **0** · white screen **0** |
-| 4xx/5xx | **2건** — `/api/ai/admin/billing` · `/api/ai/admin/quotas/status` 403 (기존 정책, 1회차 기록과 동일) |
-| 모바일 가로 스크롤 | **0건** — 1회차에서 넣은 `MemberListLayout` 탭 줄 수정이 유지되고 있다 |
-| 이번 변경(공통 `AiReportPage` empty 분기) 영향 | GlycoPharm 은 `mode:'full'` 이라 empty 분기를 타지 않는다. `headerActions` 미주입 → 렌더 변화 없음 |
 
 ---
 
 ## 9. 별도 WO 제안
 
 1. **Context Asset 분석 backend 부재** — `/operator/ai-report`(4서비스) · Neture `/operator/ai/asset-quality` 의
-   데이터 원천 신설 또는 화면 은퇴 결정. Mock 잔존(GlycoPharm ai-report, Neture asset-quality) 처리 포함.
+   데이터 원천 신설 또는 화면 은퇴 결정. Mock 잔존 처리 포함.
 2. **Neture `/admin/ai-admin/**` 계열 7개 파일의 `/operator/ai-admin/**` dead link** — admin 표면 전수 정리.
 3. **KPA frontend RoleGuard(super_admin 허용) ↔ backend `platformBypass=false` 불일치** 정합.
 4. **1회차에서 넘어온 것** — `/operator/ai-card-report` · `/operator/ai-operations` 메뉴 진입점 부재 처리(은퇴 vs admin 승격).

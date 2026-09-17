@@ -142,7 +142,7 @@ export async function toggleForumPostLike(
 
 // ============================================================================
 // Comment write (WO-O4O-COMMUNITY-CROSSSERVICE-FINAL-RECENSUS-AND-RESIDUAL-COMMONIZATION-AUDIT-V1 §7-C)
-//   공통 backend(service-forum.routes.ts / glycopharm forum router) 의 댓글 쓰기 경로를
+//   공통 backend(service-forum.routes.ts forum router) 의 댓글 쓰기 경로를
 //   그대로 소비한다. 권한 판정은 서버가 하고, 클라이언트는 401/403 을 안내로만 바꾼다.
 // ============================================================================
 

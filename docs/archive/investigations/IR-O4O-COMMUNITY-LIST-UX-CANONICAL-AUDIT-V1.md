@@ -3,7 +3,7 @@
 **작성일**: 2026-05-17
 **상태**: Investigation (조사 전용 — 코드/DB 수정 없음)
 **대상**: KPA-Society **사용자 영역(non-operator/non-admin) 리스트 화면** 전수 분류
-**범위**: KPA-Society 만. GlycoPharm / K-Cosmetics / Neture 는 후속 IR.
+**범위**: KPA-Society 만. K-Cosmetics / Neture 는 후속 IR.
 
 **선행 기준 문서**:
 - `docs/architecture/O4O-OPERATOR-TABLE-CANONICAL-V1.md` (operator 표준 — 참조용)
@@ -318,7 +318,7 @@ KPA-Society community 영역에 명백한 high drift 없음.
 
 ## 14. 본 IR 범위 외
 
-- GlycoPharm / K-Cosmetics / Neture 의 사용자 영역 community 분류 — 후속 IR
+- K-Cosmetics / Neture 의 사용자 영역 community 분류 — 후속 IR
 - 외부 wrapper template (`ForumHubTemplate`, `ResourcesHubTemplate`, `SignageManagerTemplate`) 의 내부 구조 audit — 별도 IR 권장
 - `@o4o/forum-core`, `@o4o/lms-core` 등 패키지 컴포넌트 canonical audit
 - 디테일/상세 페이지 내부 하위 리스트 (e.g. forum post comments, course curriculum)

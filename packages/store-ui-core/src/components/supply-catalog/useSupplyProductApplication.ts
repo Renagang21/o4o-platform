@@ -3,7 +3,7 @@
  *
  * WO-O4O-STORE-HUB-PRODUCT-APPLICATION-AND-CART-COMMONIZATION-V1
  *
- * KPA-Society `HubB2BCatalogPage` 와 공통 `SupplyCatalogHub`(K-Cosmetics · GlycoPharm) 가
+ * KPA-Society `HubB2BCatalogPage` 와 공통 `SupplyCatalogHub`(K-Cosmetics) 가
  * 각자 갖고 있던 신청 액션 상태 기계를 하나로 모은다.
  *   단건 신청 · 단건 제외 · 선택 일괄 신청(단건 API fan-out) ·
  *   진행 중 id · DUPLICATE_APPLICATION 처리 · 성공 항목 로컬 반영(isAdded)

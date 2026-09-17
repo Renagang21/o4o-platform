@@ -33,7 +33,7 @@
 | `packages/operator-ux-core/src/sidebar/DomainIASidebar.tsx` | `renderNav()` 추출, 모바일 가로 탭 → 햄버거 drawer, `Menu`/`X` import, `mobileOpen` state, `flatGroupsForMobile` 제거 |
 | `packages/operator-ux-core/src/layout/OperatorAreaShell.tsx` | 컨테이너 flex `flex-col md:flex-row md:gap-6` (모바일 stacking) |
 
-> 서비스 wrapper(KPA/Glyco/KCos/Neture) **미수정** — 공통 컴포넌트만으로 4서비스 + Neture Admin 일괄 적용.
+> 서비스 wrapper **미수정** — 공통 컴포넌트만으로 4서비스 + Neture Admin 일괄 적용.
 
 ---
 
@@ -59,15 +59,13 @@ services/web-neture         npx tsc --noEmit   # exit 0 (consumer 회귀 없음,
 
 ## 6. desktop/mobile smoke 결과 — **PASS (배포 후 라이브 검증 완료, 2026-06-04)**
 
-Playwright(operator 계정) 라이브 검증. 공통 컴포넌트이므로 GlycoPharm `/operator` 전 흐름 + Neture `/admin`(AdminLayoutWrapper 경로) 교차 검증.
+Playwright(operator 계정) 라이브 검증.
 
-**GlycoPharm `/operator` (390px mobile):**
 - ✅ 가로 스크롤 탭 **제거 확인** — "☰ 운영자 메뉴" 햄버거 바만 노출, 본문 밀림/가로 스크롤 없음
 - ✅ 햄버거 클릭 → drawer slide-in. 도메인 헤딩(커뮤니티 운영 / 매장 HUB 운영 / 운영 공통) + 그룹 + lucide 아이콘 + 대시보드 active 강조
 - ✅ **하위 항목 전체 접근 (핵심 결함 해소)** — Forum 그룹 펼침 → 포럼 신청 / 포럼 삭제 요청 / 커뮤니티 관리 / **포럼 분석** 4개 노출. 기존 가로 탭은 `items[0]`(포럼 신청)만 링크했음
 - ✅ 하위 항목(포럼 분석) 클릭 → `/operator/forum-analytics` 라우팅 + **drawer 자동 닫힘**(`onNavigate=closeMobile`)
 
-**GlycoPharm `/operator` (1280px desktop):**
 - ✅ 좌측 세로 sidebar 동일 유지(회귀 없음), 햄버거 없음, 그룹 collapsible + active(포럼 분석 blue) 정상
 
 **Neture `/admin` (390px mobile, AdminLayoutWrapper → DomainIASidebar):**

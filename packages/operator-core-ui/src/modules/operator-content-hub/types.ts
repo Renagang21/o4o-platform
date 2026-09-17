@@ -3,7 +3,7 @@
  *
  * WO-O4O-COMMUNITY-OPERATOR-CONSOLE-VIEW-CONVERGENCE-V1
  *
- * KPA / GlycoPharm 운영자 "콘텐츠 허브" 목록·등록·수정·삭제 콘솔 공통 View.
+ * KPA 운영자 "콘텐츠 허브" 목록·등록·수정·삭제 콘솔 공통 View.
  * 서비스 차이(status enum · 카테고리 옵션 · 본문 편집기 · 상세 이동)는
  * client adapter + config + slot 으로만 주입한다.
  *
@@ -18,7 +18,7 @@ export interface ContentHubItem {
   summary: string | null;
   category: string | null;
   tags: string[];
-  /** 서비스별 status enum (KPA: draft|ready · GlycoPharm: draft|published|private) */
+  /** 서비스별 status enum (KPA: draft|ready · 기타: draft|published|private) */
   status: string;
   source_type: string;
   created_at: string;
@@ -93,7 +93,7 @@ export interface OperatorContentHubConsoleProps {
   statusOptions: ContentHubStatusOption[];
   /** 신규 등록 기본 status */
   defaultStatus: string;
-  /** status 필터 '전체' 값 (KPA='all' · GlycoPharm='') */
+  /** status 필터 '전체' 값 (KPA='all' · 기타='') */
   allStatusValue?: string;
   allStatusLabel?: string;
   /** 현재 페이지 기준 통계 카드 (전체 카드는 항상 표시) */

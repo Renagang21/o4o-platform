@@ -81,7 +81,7 @@ WO §13 이 요구한 최소 키워드로 검색했다:
 
 | # | 문서 | 충돌 내용 |
 |---|---|---|
-| K1 | `docs/platform/architecture/O4O-RETAIL-STABLE-V1.md` (**FROZEN**, CLAUDE.md §9 참조) | `Hub → Storefront → Checkout → Payment → Event → Order` **closed loop** 을 "구조적으로 검증 완료"로 선언. Visibility Gate 가 `organization_channels.status='APPROVED' (channel_type='B2C')` 이며, 코드 실측(`routes/glycopharm/controllers/checkout.controller.ts:315-325`)상 **약국 organization 의 B2C 채널을 상대로 소비자가 결제**하는 경로다 → 새 문서 §2 · §12 의 "소비자가 O4O 안에서 매장을 상대로 결제하는 주문인가? YES" 에 해당 |
+| K1 | `docs/platform/architecture/O4O-RETAIL-STABLE-V1.md` (**FROZEN**, CLAUDE.md §9 참조) | `Hub → Storefront → Checkout → Payment → Event → Order` **closed loop** 을 "구조적으로 검증 완료"로 선언. Visibility Gate 가 `organization_channels.status='APPROVED' (channel_type='B2C')` 이며, 코드 실측상 **약국 organization 의 B2C 채널을 상대로 소비자가 결제**하는 경로다 → 새 문서 §2 · §12 의 "소비자가 O4O 안에서 매장을 상대로 결제하는 주문인가? YES" 에 해당 |
 | K2 | `docs/baseline/CHECKOUT-STABLE-DECLARATION-V1.md` | 같은 loop 의 "Storefront 4중 게이트 / Checkout 7중 검증" 을 Stable 로 선언하고 **WO 없이 수정 불가** 영역으로 보호. K1 과 동일한 충돌 |
 
 ### 3-3. 충돌 아님 — 이미 같은 방향으로 정리된 선례 (역사 기록, 수정하지 않음)
@@ -89,7 +89,7 @@ WO §13 이 요구한 최소 키워드로 검색했다:
 | 문서 / WO | 내용 |
 |---|---|
 | `docs/checks/CHECK-O4O-KPA-INTERNAL-STOREFRONT-RETIREMENT-V1.md` | KPA 자체 B2C storefront 철거. 장바구니 `cartService.ts` 삭제, checkout·payment 페이지 삭제, 신규 B2C 채널 생성 `410 STORE_B2C_CHANNEL_RETIRED` 차단(**kpa serviceKey 한정**). B2C 주문·진열 데이터 실측 **0건** |
-| `WO-O4O-STORE-SALE-CHECKOUT-ROUTE-DEPRECATION-V1` (코드 주석) | 소비자→매장 결제를 `410 STORE_SALE_PAYMENT_DEPRECATED` 로 차단 — glycopharm · cosmetics · kpa 3개 payment controller + `store-hub.controller.ts` |
+| `WO-O4O-STORE-SALE-CHECKOUT-ROUTE-DEPRECATION-V1` (코드 주석) | 소비자→매장 결제를 `410 STORE_SALE_PAYMENT_DEPRECATED` 로 차단 — cosmetics · kpa 3개 payment controller + `store-hub.controller.ts` |
 | `docs/checks/CHECK-O4O-KPA-NAVER-ONLINE-SALES-CONNECTION-AND-PILOT-CLOSEOUT-V1.md` | 외부 판매채널(네이버) 연동 파일럿. 자격정보 미발급으로 5단계에서 중지 |
 
 **이 선례들이 새 문서의 실질적 근거다.** 사업 경계는 이미 그 방향으로 실행되고 있었으나
@@ -175,12 +175,12 @@ frontend 기능 수정  : 0
 
 | # | 영역 | 대표 위치 | 현재 표기 |
 |---|---|---|---|
-| L1 | **GlycoPharm 매장 B2C checkout loop** | `routes/glycopharm/controllers/checkout.controller.ts` (`channel_type='B2C'` + 약국 organization) · `store.controller.ts` · `organization_product_listings` / `organization_product_channels` | `UNKNOWN` — 결제 leg 은 `410`, 주문 생성 leg 의 현행성 미확인 |
+| L1 | — | `store.controller.ts` · `organization_product_listings` / `organization_product_channels` | `UNKNOWN` — 결제 leg 은 `410`, 주문 생성 leg 의 현행성 미확인 |
 | L2 | **K-Cosmetics 매장 판매 경로** | `routes/cosmetics/controllers/cosmetics-store.controller.ts` · `cosmetics-payment.controller.ts` | `UNKNOWN` — payment 는 `410` |
 | L3 | **KPA 매장 주문 상태 변경(취소/환불)** | `routes/kpa/controllers/kpa-checkout.controller.ts` — `PATCH /store-orders/:orderId/status` | `UNKNOWN` — 새 문서 §7 의 `STORE_OWNER_REFUND` 축에 해당 |
 | L4 | **Pharmacy-Hub store-owner 취소·결제그룹 취소** | `routes/pharmacy-hub/pharmacy-hub.routes.ts` store-owner cancel 계열 | `UNKNOWN` — 매장이 **구매자**인 B2B 거래일 가능성이 높아 §12 `NO` 로 정리될 수 있음. 확인 필요 |
 | L5 | **플랫폼 자체 판매 경로** | `controllers/checkout/checkoutController.ts` (`PHASE_N1_CONFIG.PLATFORM_SELLER_ID='platform-seller'`) · `POST /api/checkout/refund` · `/api/admin/orders/**` | `UNKNOWN` — 새 문서 §13. **사업 계약 존재 여부 확인이 선행** |
-| L6 | **`410` 로 막힌 사망 경로들의 최종 처분** | glycopharm · cosmetics · kpa `*-payment.controller.ts` · `store-hub.controller.ts` | `DEAD` 후보 — 유지/제거/archive 결정 필요 |
+| L6 | **`410` 로 막힌 사망 경로들의 최종 처분** | cosmetics · kpa `*-payment.controller.ts` · `store-hub.controller.ts` | `DEAD` 후보 — 유지/제거/archive 결정 필요 |
 | L7 | **외부 판매채널 연동** | `modules/external-sales/entities/external-channel-product-link.entity.ts` · `routes/o4o-store/controllers/store-external-sales.controller.ts` · migration `20270306000000` | `EXTERNAL_CHANNEL_SUPPORT` 유력 — 새 문서 §5·§6 기준으로 허용 범위 확인 |
 | L8 | **`packages/ecommerce-core` NestJS payment/refund 컨트롤러** | `packages/ecommerce-core/src/controllers/payment.controller.ts` | `DEAD` — Express api-server 에 mount 없음 (선행 WO 에서 확인) |
 | L9 | **K1 · K2 문서 최종 처분** | `O4O-RETAIL-STABLE-V1` · `CHECKOUT-STABLE-DECLARATION-V1` | L1 판정 후 SUPERSEDED / 범위 축소 / 유지 중 결정 |

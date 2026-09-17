@@ -1,7 +1,7 @@
 # CHECK-O4O-OPERATOR-FORUM-BULK-PARITY-SMOKE-V1
 
 **날짜**: 2026-06-01  
-**목적**: GP/K-Cosmetics Operator Forum 요청/삭제요청 bulk parity 배포 환경 동작 확인  
+**목적**: K-Cosmetics Operator Forum 요청/삭제요청 bulk parity 배포 환경 동작 확인  
 **검증 방식**: Playwright 브라우저 자동화 (배포된 Cloud Run 서비스)  
 **범위**: read-only smoke — 코드/UI/API/DB 수정 없음
 
@@ -15,8 +15,6 @@
 
 | 화면 | 페이지 렌더 | checkbox 헤더 | empty state | console error |
 |------|:---:|:---:|:---:|:---:|
-| GlycoPharm ForumRequests | ✅ | ✅ | ✅ | 없음 |
-| GlycoPharm ForumDeleteRequests | ✅ | ✅ | ✅ | 없음 |
 | K-Cosmetics ForumDeleteRequests | ✅ | ✅ | ✅ | 없음 |
 | K-Cosmetics ForumRequests | ✅ | ✅ | ✅ | 없음 |
 
@@ -26,48 +24,11 @@
 
 | 서비스 | revision | 배포 시각 |
 |--------|---------|---------|
-| glycopharm-web | `00843-wtd` | 2026-06-01 06:20 KST |
 | k-cosmetics-web | `00613-bhp` | 2026-06-01 06:19 KST |
 
 검증 대상 commit:
-- `16a76fb6e` WO-O4O-GLYCOPHARM-KCOS-FORUM-DELETE-REQUEST-BULK-PARITY-V1
-- `bb52b6819` WO-O4O-GLYCOPHARM-KCOS-FORUM-REQUEST-BULK-PARITY-V1
-
----
-
-## 2. GlycoPharm ForumRequestsPage
-
-**URL**: `/operator/forum-requests`
-
-| 항목 | 결과 |
-|------|------|
-| 페이지 렌더 | ✅ "포럼 신청 관리" |
-| 검색 input | ✅ "포럼명 또는 신청자 검색..." |
-| status filter | ✅ 모든 상태/대기 중/보완 요청/승인됨/거절됨 |
-| **DataTable checkbox 헤더 컬럼** | ✅ `columnheader > checkbox` 표시 (selectable 반영) |
-| 컬럼 | 포럼명/신청자/신청일/상태 |
-| empty state | ✅ "검색 조건에 맞는 신청이 없습니다" |
-| 단건 Drawer (dialog) | ✅ 유지 |
-| console error | 없음 |
-
-> 첫 navigate 시 SPA 라우팅 타이밍으로 빈 스냅샷 → 재navigate 후 정상 렌더 확인.
-
----
-
-## 3. GlycoPharm ForumDeleteRequestsPage
-
-**URL**: `/operator/forum-delete-requests`
-
-| 항목 | 결과 |
-|------|------|
-| 페이지 렌더 | ✅ "포럼 삭제 요청 관리" |
-| GuideBlock | ✅ 4단계 안내 |
-| status tabs | ✅ 대기 중/승인됨/반려됨/전체 |
-| **DataTable checkbox 헤더 컬럼** | ✅ `columnheader > checkbox` 표시 (selectable 반영) |
-| 컬럼 | 포럼명/생성자/게시글/요청일/상태 |
-| empty state | ✅ "해당 상태의 삭제 요청이 없습니다" |
-| 단건 Drawer (dialog) | ✅ 유지 |
-| console error | 없음 |
+- `16a76fb6e` 
+- `bb52b6819` 
 
 ---
 
@@ -141,7 +102,7 @@
 **구조 smoke PASS** ✅
 
 ```
-GP/K-Cos ForumRequests + ForumDeleteRequests
+K-Cos ForumRequests + ForumDeleteRequests
 → selectable checkbox 헤더 4개 화면 모두 배포 반영 확인
 → DataTable / filter / Drawer / empty state 정상
 → console error / API 5xx 없음

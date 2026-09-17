@@ -27,26 +27,26 @@
 
 ### 매트릭스
 
-| slotKey | Neture | GlycoPharm | KPA Society | K-Cosmetics | Phase 1 |
-|---------|:------:|:----------:|:-----------:|:-----------:|:-------:|
-| `home-hero` | **CMS** | — | STATIC | STATIC **P1** | K-Cos 전환 |
-| `home-ads` | **CMS** | — | — | — | — |
-| `home-logos` | **CMS** | — | — | STATIC **P1** | K-Cos 전환 |
-| `home-featured` | **CMS** (API) | — | — | — | — |
-| `home-cta` | STATIC | — | STATIC | STATIC | — |
-| `home-running` | — | — | — | STATIC | Phase 2 |
-| `home-notices` | — | — | — | STATIC | Phase 2 |
-| `community-hero` | — | **API** | **API** | **API** | 병행 유지 |
-| `community-ads` | — | **API** | **API** | **API** | 병행 유지 |
-| `community-sponsors` | — | **API** | **API** | **API** | 병행 유지 |
-| `dashboard-banner` | — | PLACEHOLDER **P1** | — | — | GP 활성화 |
-| `dashboard-promo` | — | — | — | — | Phase 2 |
-| `intranet-hero` | — | — | **DATA** | — | Phase 2 |
-| `intranet-promo` | — | — | **DATA** | — | Phase 2 |
-| `intranet-partners` | — | — | **DATA** | — | Phase 2 |
-| `page-top-banner` | — | — | — | — | Phase 2+ |
-| `page-mid-promo` | — | — | — | — | Phase 2+ |
-| `page-bottom-cta` | — | — | — | — | Phase 2+ |
+| slotKey | Neture | KPA Society | K-Cosmetics | Phase 1 |
+| --------- | :------: | :-----------: | :-----------: | :-------: |
+| `home-hero` | **CMS** | STATIC | STATIC **P1** | K-Cos 전환 |
+| `home-ads` | **CMS** | — | — | — |
+| `home-logos` | **CMS** | — | STATIC **P1** | K-Cos 전환 |
+| `home-featured` | **CMS** (API) | — | — | — |
+| `home-cta` | STATIC | STATIC | STATIC | — |
+| `home-running` | — | — | STATIC | Phase 2 |
+| `home-notices` | — | — | STATIC | Phase 2 |
+| `community-hero` | — | **API** | **API** | 병행 유지 |
+| `community-ads` | — | **API** | **API** | 병행 유지 |
+| `community-sponsors` | — | **API** | **API** | 병행 유지 |
+| `dashboard-banner` | — | — | — | Phase 2 |
+| `dashboard-promo` | — | — | — | Phase 2 |
+| `intranet-hero` | — | **DATA** | — | Phase 2 |
+| `intranet-promo` | — | **DATA** | — | Phase 2 |
+| `intranet-partners` | — | **DATA** | — | Phase 2 |
+| `page-top-banner` | — | — | — | Phase 2+ |
+| `page-mid-promo` | — | — | — | Phase 2+ |
+| `page-bottom-cta` | — | — | — | Phase 2+ |
 
 ---
 
@@ -70,27 +70,7 @@
 - Logos: [PartnerLogoCarousel.tsx](../../../services/web-neture/src/components/home/PartnerLogoCarousel.tsx)
 - API: [content.ts](services/web-neture/src/lib/api/content.ts) (`homepageCmsApi`)
 
-### 3.2 GlycoPharm
-
-| 항목 | 상태 |
-|------|------|
-| **Home** | 서비스 Home 없음 (로그인 후 바로 대시보드/약국) |
-| **Community Hero** | `community_ads` (type=hero) API 기반 — `HeroBannerSection` |
-| **Community Ads** | `community_ads` (type=page) API 기반 — `AdSection` |
-| **Community Sponsors** | `community_sponsors` API 기반 — `SponsorBar` |
-| **Dashboard Banner** | PLACEHOLDER 존재 — "광고 배너 영역" |
-| **Store Hero** | Store Template 전용 `HeroManagerTab` — Core 대상 아님 |
-| **Operator 관리 UI** | `CommunityManagementPage` (ads/sponsors CRUD) |
-| **전환 필요** | Dashboard Banner 슬롯 활성화 (Phase 1) |
-
-**코드 위치:**
-- Community Hero: [HeroBannerSection.tsx](services/web-glycopharm/src/components/community/HeroBannerSection.tsx)
-- Community Ads: [AdSection.tsx](services/web-glycopharm/src/components/community/AdSection.tsx)
-- Sponsors: [SponsorBar.tsx](services/web-glycopharm/src/components/community/SponsorBar.tsx)
-- Dashboard Banner: [BannerSection.tsx](services/web-glycopharm/src/components/dashboard/BannerSection.tsx)
-- Store Hero: [HeroManagerTab.tsx](services/web-glycopharm/src/pages/operator/store-template/tabs/HeroManagerTab.tsx)
-
-### 3.3 KPA Society
+### 3.2 KPA Society
 
 | 항목 | 상태 |
 |------|------|
@@ -110,7 +90,7 @@
 - 타입 정의: [mainpage.ts](services/web-kpa-society/src/types/mainpage.ts)
 - Community: [HeroBannerSection.tsx](services/web-kpa-society/src/components/community/HeroBannerSection.tsx)
 
-### 3.4 K-Cosmetics
+### 3.3 K-Cosmetics
 
 | 항목 | 상태 |
 |------|------|
@@ -135,9 +115,8 @@
 |:----:|------|------|
 | **1** | K-Cosmetics `home-hero` | 100% 하드코딩 → CMS 전환 효과 최대 |
 | **2** | K-Cosmetics `home-logos` | Partners 텍스트 → 로고 캐러셀 전환 |
-| **3** | GlycoPharm `dashboard-banner` | PLACEHOLDER → 슬롯 연결만으로 즉시 활성화 |
-| **4** | KPA `home-hero` (Platform) | 정적 → CMS 전환 |
-| **5** | 공통 `useSlotContent` 훅 | 위 전환을 지탱하는 공통 인프라 |
+| **3** | KPA `home-hero` (Platform) | 정적 → CMS 전환 |
+| **4** | 공통 `useSlotContent` 훅 | 위 전환을 지탱하는 공통 인프라 |
 
 ---
 

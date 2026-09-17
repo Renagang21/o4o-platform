@@ -23,7 +23,6 @@ operator `/operator/signage/forced-content` 페이지는 정상 렌더되나, �
 ## 2. 근본 원인 (확정)
 
 - **프론트**: `ForcedContentPage` 가 `SERVICE_KEY = 'k-cosmetics'` 로 호출 → `/api/signage/k-cosmetics/...` ([ForcedContentPage.tsx:17-18](../../services/web-k-cosmetics/src/pages/operator/signage/ForcedContentPage.tsx#L17)).
-- **백엔드**: signage 미들웨어 `validServiceKeys = ['pharmacy','cosmetics','tourism','common','kpa-society','neture','glycopharm']` 에 **`k-cosmetics` 부재 / `cosmetics` 존재** → 400 ([signage-role.middleware.ts:641-648](../../apps/api-server/src/middleware/signage-role.middleware.ts#L641)).
 - ⇒ **serviceKey 표준 불일치**: K-Cosmetics 는 login/membership 에서 `k-cosmetics` 를 쓰지만, **signage 도메인 + role prefix 는 `cosmetics`**. forced-content 프론트가 signage 표준(`cosmetics`) 대신 membership 키(`k-cosmetics`)를 사용.
 
 ## 3. 수정 방향 (택1, 착수 시 결정)
@@ -34,7 +33,7 @@ operator `/operator/signage/forced-content` 페이지는 정상 렌더되나, �
 
 ## 4. 검증 (착수 후)
 - operator(`sohae2100` 등)로 `/operator/signage/forced-content` → 200 목록(빈 목록 포함), 400 소멸.
-- KPA/GlycoPharm forced-content 회귀 없음 (각 서비스 키 유지).
+- KPA forced-content 회귀 없음 (각 서비스 키 유지).
 - serviceKey 격리 유지(타 서비스 데이터 비노출).
 
 ## 5. 범위 / 금지

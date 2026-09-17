@@ -117,7 +117,7 @@ export default function KCosmeticsOperatorDashboard() {
   }
 
   // WO-O4O-OPERATOR-DASHBOARD-AUX-SECTION-P1-ALIGNMENT-V1:
-  //   notice 를 부가 섹션(alert/notice 역할)으로 명시 — GP OperatorAlerts 와 동일 역할군.
+  //   notice 를 부가 섹션(alert/notice 역할)으로 명시.
   //   부가 섹션 순서 컨벤션 정렬: [Alert/Notice] → [Axis] → [5-block].
   // WO-O4O-STORE-DASHBOARD-ORDER-METRICS-SAFE-FALLBACK-V1:
   //   주문/매출 지표 미준비 (백엔드 meta.featureStatus='not_ready') 상태 안내.

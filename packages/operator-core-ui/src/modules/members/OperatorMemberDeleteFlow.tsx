@@ -3,8 +3,7 @@
  *
  * WO-O4O-OPERATOR-MEMBERS-DELETE-FLOW-COMMONIZATION-V1
  *
- * GlycoPharm / K-Cosmetics admin 페이지의 동일한 인라인 Delete Flow(GpAdminDeleteFlow /
- * KCosAdminDeleteFlow)를 단일 추출. soft delete + hard delete 선택 → 확인 → 실행.
+ * K-Cosmetics admin 페이지의 인라인 Delete Flow(KCosAdminDeleteFlow)를 단일 추출. soft delete + hard delete 선택 → 확인 → 실행.
  *
  * 책임 분리:
  *   - 본 컴포넌트: 위험도 표시, 삭제 모드 선택, 확인 UI, 실행 호출
@@ -15,7 +14,6 @@
  *   - Neture: AdminMemberDeleteModal (thin wrapper) → 유지
  *
  * 이번 WO 대상 (soft+hard):
- *   - GlycoPharm: GpAdminDeleteFlow (inline) → 본 컴포넌트로 교체
  *   - K-Cosmetics: KCosAdminDeleteFlow (inline) → 본 컴포넌트로 교체
  */
 
@@ -47,7 +45,7 @@ export interface NormalizedDeleteRisk {
 
 export interface OperatorMemberDeleteFlowProps {
   user: UserData;
-  /** 서비스 표시명 (예: 'GlycoPharm', 'K-Cosmetics') */
+  /** 서비스 표시명 (예: 'K-Cosmetics') */
   serviceLabel: string;
   /**
    * 소프트 삭제 옵션 표시 여부. default: true.

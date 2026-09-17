@@ -8,7 +8,7 @@
  * 종이 렌더되지 않기 때문이다 — 모바일 알림 진입은 하단 nav 가 담당한다.
  *
  * 이전 상태: KPA MobileBottomNav 와 Neture NetureBottomNav 가 거의 동일한
- * 시트 마크업을 각각 들고 있었고(브랜드 색만 상이), GlycoPharm·K-Cosmetics 는
+ * 시트 마크업을 각각 들고 있었고(브랜드 색만 상이)·K-Cosmetics 는
  * 알림 탭이 `/mypage` 로 가는 dead link 였다. 본 컴포넌트가 4서비스의 정본이다.
  *
  * 계약:

@@ -200,21 +200,6 @@ POST /api/v1/store-hub/ai/snapshot
 
 ## 6차 검증: UI 확인 (코드 분석)
 
-### GlycoPharm StoreMainPage
-
-**파일**: `services/web-glycopharm/src/pages/pharmacy/StoreMainPage.tsx`
-
-| 항목 | 구현 | 판정 |
-|------|------|------|
-| LLM 요약 조회 | `GET /api/v1/store-hub/ai/summary` (병렬, 비차단) | **PASS** |
-| LLM 표시 필드 | summary + issues + actions | **PASS** |
-| AI 배지 | `AI` 라벨 (llmSummary 있을 때) | **PASS** |
-| Issues 색상 | high=red, medium=amber, low=blue | **PASS** |
-| Actions 스타일 | high=primary, other=slate | **PASS** |
-| 모델/시각 표시 | model + createdAt | **PASS** |
-| "AI 분석 요청" 버튼 | POST /snapshot → GET /summary 체인 | **PASS** |
-| 로딩 상태 | Spinner (Loader2) | **PASS** |
-
 ### Graceful Degradation
 
 | 상태 | 동작 | 판정 |
@@ -288,7 +273,7 @@ POST /api/v1/store-hub/ai/snapshot
 | DB 테이블 존재 | **PASS** | 마이그레이션 정상 실행 (health에서 count 쿼리 성공) |
 | AI 생성 (snapshot) | **PENDING** | 인증된 매장 소유자 접근 필요 |
 | AI 생성 (insight) | **PENDING** | 스냅샷 생성 후 자동 트리거 |
-| UI 실제 표시 | **PENDING** | GlycoPharm 로그인 후 확인 필요 |
+| UI 실제 표시 | **PENDING** | — |
 
 ---
 
@@ -310,12 +295,6 @@ POST /api/v1/store-hub/ai/snapshot
 ## 다음 단계: 수동 검증 절차
 
 대표님이 직접 확인해야 할 항목:
-
-### Step 1: GlycoPharm 로그인
-```
-https://glycopharm.co.kr
-→ 약국(매장 소유자) 계정으로 로그인
-```
 
 ### Step 2: Store 메인 이동
 ```
@@ -359,4 +338,3 @@ GET https://api.neture.co.kr/api/v1/store-hub/ai/health
 *Generated: 2026-03-09*
 *Updated: 2026-03-09T03:04Z (마이그레이션 배포 완료)*
 *Status: READY — 첫 AI 실행 대기*
-*Next Action: GlycoPharm에서 매장 소유자 로그인 → AI 분석 요청 → AI 요약 확인*

@@ -98,7 +98,7 @@ export class Course {
   rejectionReason?: string | null;
 
   // WO-O4O-LMS-COURSE-SERVICEKEY-V1: Service ownership — cross-service operator access control.
-  // Values: canonical service keys (e.g. 'kpa-society', 'k-cosmetics', 'glycopharm').
+  // Values: canonical service keys (e.g. 'kpa-society', 'k-cosmetics').
   // null = legacy / platform-wide course (accessible to all operators).
   @Column({ name: 'service_key', type: 'varchar', length: 100, nullable: true })
   serviceKey?: string | null;

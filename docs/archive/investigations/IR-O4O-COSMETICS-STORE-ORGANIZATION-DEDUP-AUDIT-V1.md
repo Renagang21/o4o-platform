@@ -57,17 +57,17 @@ Application 승인 시:
 
 ### 2-3. organization_service_enrollments 연결
 
-K-Cosmetics 승인 흐름에서 `organizationOpsService.enrollService()`를 **호출하지 않는다** — GlycoPharm과 달리, 서비스 enrollment가 생략되어 있다. 대신 `organizations.metadata.serviceKey = 'cosmetics'`로 처리한다.
+대신 `organizations.metadata.serviceKey = 'cosmetics'`로 처리한다.
 
 ### 2-4. 다른 서비스와의 비교
 
-| 항목 | K-Cosmetics | GlycoPharm | Neture |
-|------|-------------|-----------|--------|
-| Organization 재사용 검색 | **없음** (항상 신규) | created_by_user_id 기준 재사용 | **없음** (항상 신규) |
-| business_number로 기존 org 조회 | **안 함** | 안 함 | 안 함 |
-| 서비스 확장 테이블 | 없음 (cosmetics_stores 자체) | glycopharm_pharmacy_extensions | neture_suppliers |
-| business_number UNIQUE (서비스 테이블) | cosmetics_stores ✅ | glycopharm_pharmacies (legacy) ✅ | neture_suppliers ❌ |
-| organization_service_enrollments 등록 | **안 함** | enrollService() 호출 ✅ | 안 함 |
+| 항목 | K-Cosmetics | Neture |
+| ------ | ------------- | -------- |
+| Organization 재사용 검색 | **없음** (항상 신규) | **없음** (항상 신규) |
+| business_number로 기존 org 조회 | **안 함** | 안 함 |
+| 서비스 확장 테이블 | 없음 (cosmetics_stores 자체) | neture_suppliers |
+| business_number UNIQUE (서비스 테이블) | cosmetics_stores ✅ | neture_suppliers ❌ |
+| organization_service_enrollments 등록 | **안 함** | 안 함 |
 
 ---
 
@@ -81,7 +81,6 @@ K-Cosmetics 승인 흐름에서 `organizationOpsService.enrollService()`를 **�
 예시:
   business_number = "1234567890"
   → organizations row 1: K-Cosmetics 매장 (type='store')
-  → organizations row 2: GlycoPharm 약국 (type='pharmacy')
   → organizations row 3: Neture 공급자 (via neture_suppliers)
 
 이 경우 organizations.business_number 중복 = O4O 다중 서비스 이용 = 정상
@@ -117,11 +116,10 @@ K-Cosmetics 승인 흐름에서 `organizationOpsService.enrollService()`를 **�
 
 ### Gap 1: K-Cosmetics 승인 시 organization 재사용 없음 [P1]
 
-**현상:** 동일 사업자가 GlycoPharm + K-Cosmetics 두 서비스를 이용할 때, 각 승인 시마다 별도의 `organizations` 행이 생성된다.
+**현상:** 동일 사업자가 K-Cosmetics 서비스를 이용할 때, 각 승인 시마다 별도의 `organizations` 행이 생성된다.
 
 ```
 사업자 A (business_number = "1234567890")
-  → GlycoPharm 승인 → organizations.id = UUID-A
   → K-Cosmetics 승인 → organizations.id = UUID-B  ← 별도 생성
 ```
 
@@ -131,21 +129,17 @@ K-Cosmetics 승인 흐름에서 `organizationOpsService.enrollService()`를 **�
 ```
 사업자 A (business_number = "1234567890")
   → organizations.id = UUID-A (1개, SSOT)
-  → organization_service_enrollments: UUID-A + 'glycopharm' (active)
   → organization_service_enrollments: UUID-A + 'k-cosmetics' (active)
-  → glycopharm_pharmacy_extensions: organization_id = UUID-A
   → cosmetics_stores: organization_id = UUID-A
 ```
 
 ### Gap 2: K-Cosmetics에서 organization_service_enrollments 미등록 [P1]
 
-**현상:** GlycoPharm은 `organizationOpsService.enrollService('glycopharm')`를 호출하지만, K-Cosmetics 승인 flow는 `organization_service_enrollments`에 등록하지 않는다.
-
 **결과:** K-Cosmetics 매장이 플랫폼 서비스 enrollment 조회에서 누락된다. `organizations` 조회 시 cosmetics enrollment 여부를 확인하는 로직이 동작하지 않는다.
 
 ### Gap 3: cosmetics_stores에 organizationOpsService 일부 기능 누락 [P2]
 
-**현상:** 현재 K-Cosmetics 승인 flow의 organization 생성은 raw SQL INSERT로 직접 처리한다. GlycoPharm은 `organizationOpsService`의 중앙화된 서비스를 사용한다. 패턴 불일치.
+**현상:** 현재 K-Cosmetics 승인 flow의 organization 생성은 raw SQL INSERT로 직접 처리한다. 패턴 불일치.
 
 ---
 
@@ -214,7 +208,6 @@ organization 재사용 없이 동작하는 점이 Gap이다.
 현재 가능한 상태:
   business_number "1234567890"
   → organizations row A: K-Cosmetics 매장 (metadata.serviceKey='cosmetics')
-  → organizations row B: GlycoPharm 약국 (type='pharmacy')
 
 이는 버그가 아님 — 다중 서비스 이용 = 의도된 구조
 ```
@@ -231,8 +224,6 @@ business_number "1234567890"
 
 ```
 business_number "1234567890"
-사업자가 GlycoPharm + K-Cosmetics 동시 이용 시:
-→ organizations row A (GlycoPharm, UUID-A) ← 별도 생성
 → organizations row B (K-Cosmetics, UUID-B) ← 별도 생성 = SSOT 분산
 ```
 

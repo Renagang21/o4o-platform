@@ -24,7 +24,7 @@ import logger from '../../../utils/logger.js';
 //
 // 검토 화면 현황:
 //   - neture : /operator/product-candidates (ProductCandidateReviewPage — sourceType 'store_web' 포함) ✅
-//   - kpa / glycopharm / cosmetics : 서비스 web 에 검토 화면 없음. 유일한 검토 콘솔은
+//   - kpa / cosmetics : 서비스 web 에 검토 화면 없음. 유일한 검토 콘솔은
 //     admin-dashboard `/admin/o4o-product-db/store-requests` 이며 **다른 origin(admin.neture.co.kr)** 이라
 //     서비스 web 알림의 내부 경로 target 으로 표현할 수 없다 → targetUrl 미지정(이동 없음).
 //     새 서비스측 검토 route 신설은 본 WO 범위 밖(§26) → FOLLOWUP.

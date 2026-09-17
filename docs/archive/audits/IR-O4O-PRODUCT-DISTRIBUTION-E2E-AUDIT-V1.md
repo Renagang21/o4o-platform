@@ -54,7 +54,7 @@ STEP 2: Admin 승인                                                ▼
 STEP 3: Service 노출                                              ▼
 ┌──────────────────────┐    ┌───────────────────────┐    ┌─────────────────┐
 │ KPA B2B Catalog      │    │ organization_product  │    │ B2B Catalog     │
-│ GlycoPharm Catalog   │───→│ _listings             │───→│ 서비스별 노출    │
+│            Catalog   │───→│ _listings             │───→│ 서비스별 노출    │
 │ (서비스별 카탈로그)    │    │ (auto-created)        │    │                 │
 └──────────────────────┘    └───────────────────────┘    └────────┬────────┘
                                                                   │
@@ -133,7 +133,6 @@ STEP 5: Store 활용                                                ▼
 | 서비스 | 파일 | 상태 |
 |--------|------|------|
 | KPA Society | `web-kpa-society/src/pages/branch/BranchProductCatalog.tsx` | ✅ |
-| GlycoPharm | `web-glucoseview/src/pages/ProductCatalogPage.tsx` | ✅ |
 | Cosmetics | 별도 도메인 (`cosmetics_` prefix) | ✅ (설계상 분리) |
 
 **auto-listing 흐름** (`auto-listing.utils.ts`):
@@ -272,7 +271,7 @@ SERVICE 유통타입을 위한 별도 승인 체계가 존재한다.
 | `apps/api-server/src/utils/auto-listing.utils.ts` | autoExpandPublicProduct() / autoListPublicProductsForOrg() |
 | `apps/api-server/src/modules/product-policy-v2/product-approval-v2.service.ts` | SERVICE 승인 |
 | `services/web-kpa-society/src/pages/branch/BranchProductCatalog.tsx` | KPA B2B 카탈로그 |
-| `services/web-glucoseview/src/pages/ProductCatalogPage.tsx` | GlycoPharm B2B 카탈로그 |
+| `services/web-glucoseview/src/pages/ProductCatalogPage.tsx` | — |
 
 ### Store HUB (STEP 4)
 

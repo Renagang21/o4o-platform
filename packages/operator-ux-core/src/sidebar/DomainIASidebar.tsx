@@ -4,7 +4,7 @@
  * WO-O4O-CROSSSERVICE-OPERATOR-SIDEBAR-COMMON-COMPONENT-V1
  *
  * 목적:
- *   KPA-Society / GlycoPharm / K-Cosmetics 가 각각 보유하던 *OperatorSidebar.tsx
+ *   KPA-Society / K-Cosmetics 가 각각 보유하던 *OperatorSidebar.tsx
  *   (동일 렌더링 로직, 컴포넌트명·props 명만 상이) 를 단일 공통 컴포넌트로 추출.
  *   기능 변경 없음 — 직전 3개 서비스 sidebar 의 동작을 그대로 보존하는 중복 제거 리팩토링.
  *

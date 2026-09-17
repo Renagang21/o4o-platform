@@ -15,7 +15,6 @@
 
 | 항목 | 초기 판정 | 2차 검증 정정 |
 |------|----------|--------------|
-| GlycoPharm 데이터 엔진 | Core 직접 CRUD (3개 엔진) | `store_playlists` 스냅샷 (KPA와 동일, 2개 엔진) |
 | K-Cosmetics 통합 가능성 | `store_*`로 병합 가능 | COSMETICS-DOMAIN-RULES §1.1-1.2 위반 — **통합 불가** |
 | 전체 판정 | FAIL | **PARTIAL** |
 
@@ -23,7 +22,7 @@
 
 > **문제는 "구조 문제"가 아니라 "구현/정렬 문제"이다.**
 
-- 데이터 엔진은 **이미 수렴됨** (KPA + GlycoPharm = `store_playlists` 스냅샷)
+- 데이터 엔진은 **이미 수렴됨** (KPA = `store_playlists` 스냅샷)
 - K-Cosmetics 격리는 **규칙 필수** (변경 불가)
 - 대규모 데이터 마이그레이션 **불필요**
 - 실제 문제: **UI 완성도 격차** + **HUB/Store 경계 혼재** + **Schedule 불일치**
@@ -45,7 +44,7 @@
 |------|------|
 | KPA Store Signage 현대화 | raw SQL 제거, Entity 통일, 2-tab→3-tab 전환 |
 | HUB/Store 역할 경계 확립 | 탐색(browse)은 HUB, 운영(manage)은 Store |
-| Schedule 정책 확정 | GlycoPharm 기준으로 플랫폼 표준 or Out of Scope |
+| Schedule 정책 확정 | — |
 | Player 표준화 | 재생 데이터 소스를 `store_playlists` 기반으로 통일 |
 | Design Core 적용 | 모든 서비스 사이니지 화면에 Design Core v1.0 적용 |
 
@@ -78,7 +77,7 @@
 |------|:---------:|------|
 | 내 동영상 (My Assets) | **필수** | 매장 소유 미디어 관리 |
 | 내 플레이리스트 (My Playlists) | **필수** | 매장 재생 목록 구성 |
-| 스케줄 (Schedule) | **TBD** | GlycoPharm만 구현, 표준 승격 여부 결정 필요 |
+| 스케줄 (Schedule) | **TBD** | — |
 | 가져올 콘텐츠 (Explore) | **금지** (Store 내) | HUB/ContentHub에서만 제공 |
 | 재생 (Player) | **필수** | `store_playlists` 기반 fullscreen 재생 |
 | 강제 콘텐츠 표시 | **필수** | HQ forced content 뱃지 표시 |
@@ -90,8 +89,6 @@
 ---
 
 ### Phase 1. KPA Store Signage 현대화
-
-> **목표**: KPA를 GlycoPharm 수준의 완성도로 끌어올림
 
 #### 1.1 raw SQL → Repository 전환
 
@@ -115,7 +112,6 @@
 
 **작업 내역:**
 - `StoreSignagePage.tsx`의 legacy Asset 탭 제거
-- GlycoPharm `StoreSignageMainPage.tsx` Tab 2~4 구조를 참조하여 재구성
 - Explore(탐색) 탭은 **포함하지 않음** — HUB로 이동
 - Schedule 탭은 MVP 합의에 따라 포함/제외
 
@@ -167,18 +163,6 @@
 - Operator 관리 경로는 기존 `HQMediaPage` / `HQPlaylistsPage`로 통합
 - `ContentHubPage`를 순수 커뮤니티 탐색 + "가져오기" 전용으로 단순화
 
-#### 2.3 GlycoPharm Explore 탭 정책
-
-| 현재 | 변경 |
-|------|------|
-| Tab 1 "가져올 콘텐츠" (Explore) — Store 화면 내 탐색 | Store 화면에서 제거 |
-| ContentLibraryPage 별도 존재 | ContentLibraryPage를 HUB 영역으로 재배치 |
-
-**작업 내역:**
-- `StoreSignageMainPage` 4-tab → 3-tab (Explore 탭 제거)
-- ContentLibraryPage 접근 경로를 HUB 영역으로 이동
-- Store→HUB 연결: "콘텐츠 추가" 버튼 → HUB 페이지로 네비게이션
-
 #### 2.4 "가져오기" 위치 통일
 
 **표준**: HUB/ContentHub 화면에서만 `assetSnapshotApi.copy()` 호출
@@ -186,7 +170,6 @@
 | 서비스 | 현재 "가져오기" 위치 | 변경 |
 |--------|---------------------|------|
 | KPA | ContentHubPage "가져가기" 버튼 | 유지 (이미 HUB 영역) |
-| GlycoPharm | Explore 탭 → URL param 전달 | HUB/Library로 이동 |
 | Neture | 없음 (browse-only) | HUB에서 제공 (필요 시) |
 | K-Cosmetics | Hub 링크 | 유지 |
 
@@ -210,20 +193,17 @@
 |------|------|------|
 | A. 플랫폼 표준 승격 | 모든 서비스에 Schedule 탭 필수 | KPA/K-Cosmetics에 Schedule UI 추가 |
 | B. 서비스 선택 기능 | 사용 여부를 서비스가 결정 | 문서화만 필요 |
-| C. GlycoPharm 전용 유지 | 현행 유지 | 변경 없음, Out of Scope 명시 |
 
 **권장**: 옵션 A (플랫폼 표준) — Schedule API/테이블이 이미 Core에 존재하므로 UI만 추가
 
 #### 3.2 Schedule 대상 변경
 
 ```
-기존: signage_playlists (Core) — GlycoPharm 현재 사용
 변경: store_playlists (Store 엔진) — 스냅샷 기반으로 통일
 ```
 
 **작업 내역:**
 - `signage_schedules.playlistId` FK 대상을 `store_playlists`로 변경
-- GlycoPharm Schedule API 수정 (이미 store_playlists 사용 중이면 변경 불필요)
 - KPA/K-Cosmetics에 Schedule UI 추가 (옵션 A 채택 시)
 
 #### 3.3 Player 데이터 소스 통일
@@ -231,7 +211,6 @@
 | 서비스 | 현재 Player 데이터 소스 | 변경 |
 |--------|------------------------|------|
 | KPA | `store_playlists` (PublicSignagePage) | 유지 (표준) |
-| GlycoPharm | `signage_playlists` (SignagePlaybackPage) | `store_playlists` 기반으로 변경 |
 | Neture | 없음 | N/A |
 | K-Cosmetics | `cosmetics_store_playlists` | 유지 (격리 규칙) |
 
@@ -263,7 +242,6 @@
 |--------|------|-----------|------|
 | KPA | StoreSignagePage | Custom table | Design Core DataTable |
 | KPA | ContentHubPage | Custom table | Design Core DataTable |
-| GlycoPharm | StoreSignageMainPage | Custom table + KPI cards | Design Core 표준 |
 | Neture | SignageContentHubPage | Card grid | Design Core 표준 |
 | K-Cosmetics | StoreSignagePage | Custom table | Design Core DataTable |
 

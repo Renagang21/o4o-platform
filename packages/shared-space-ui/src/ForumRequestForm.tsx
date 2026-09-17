@@ -3,8 +3,8 @@
  *
  * WO-O4O-FORUM-USER-REQUEST-FORM-COMMONIZATION-V1
  *
- * 4서비스(KPA / GlycoPharm / K-Cosmetics / Neture) 의 포럼 개설 신청 폼을 단일
- * 컴포넌트로 공통화한다. 직전 WO-O4O-FORUM-REQUEST-TAG-INPUT-PARITY-V1 로 GP/KCos/Neture
+ * 3서비스(KPA / K-Cosmetics / Neture) 의 포럼 개설 신청 폼을 단일
+ * 컴포넌트로 공통화한다. 직전 WO-O4O-FORUM-REQUEST-TAG-INPUT-PARITY-V1 로 KCos/Neture
  * 신청 폼이 ~95% 동일해졌고, KPA 는 forumType(open/closed) 선택만 추가 → `showForumType`
  * opt-in 으로 흡수한다.
  *

@@ -51,17 +51,17 @@ Neture `ForumWritePage` 의 create/edit 두 분기를 **단일 공통 `ForumWrit
 - min-length validation: `handleUpdateSubmit`/`handleCreateSubmit` 에서 stripped-text < `MIN_CONTENT_LENGTH(5)` 면 중단.
 - browser smoke 에서 edit 진입 시 "내용 (최소 5자)"·notice 렌더 확인.
 
-## 8. KPA / GP / KCos 미수정 확인
+## 8. KPA / KCos 미수정 확인
 
-✅ 미수정. git diff 결과 변경 파일에 `web-kpa-society/.../forum/*`·`web-glycopharm/.../forum/*`·`web-k-cosmetics/.../forum/*`·`shared-space-ui/.../ForumWriteForm.tsx` **없음**. 내 변경 = `services/web-neture/src/pages/forum/ForumWritePage.tsx` 1파일.
+✅ 미수정. 내 변경 = `services/web-neture/src/pages/forum/ForumWritePage.tsx` 1파일.
 
-> KPA 는 IR 기준 이미 `ForumWriteForm` 사용(추가 작업 불필요), GP/KCos 는 의도된 create-only(edit 미보유) — 본 WO 범위 밖이므로 무변경.
+> KPA 는 IR 기준 이미 `ForumWriteForm` 사용(추가 작업 불필요), KCos 는 의도된 create-only(edit 미보유) — 본 WO 범위 밖이므로 무변경.
 
 ## 9. backend / API / DB / migration / route / menu 변경 없음 확인
 
 ✅ 변경 없음. 내 변경 = 프론트 1파일. `updateForumPost`/route/menu/postType/backend/DB 무변경. contact 영속화 backend 확장 미수행(§6).
 
-> **커밋 격리:** 작업 중 다른 세션이 다수 파일(`apps/api-server/.../contact*`, `kpa contact-request.controller`, `web-glycopharm/web-k-cosmetics education·mypage`, `web-neture App.tsx·operatorMenuGroups.ts·web-kpa AdminRoutes` 등)을 동시 수정 중이었다. 모두 다른 세션 WIP 이므로 **건드리지 않고 커밋에서 제외**(path-specific commit, ForumWritePage.tsx + 본 CHECK 만).
+> **커밋 격리:** 작업 중 다른 세션이 다수 파일을 동시 수정 중이었다. 모두 다른 세션 WIP 이므로 **건드리지 않고 커밋에서 제외**(path-specific commit, ForumWritePage.tsx + 본 CHECK 만).
 
 ## 10. TypeScript 검증 결과
 
@@ -69,7 +69,6 @@ Neture `ForumWritePage` 의 create/edit 두 분기를 **단일 공통 `ForumWrit
 |--------|------|
 | web-neture | ✅ PASS (0 error) |
 | shared-space-ui (ForumWriteForm) | ✅ 무수정 (변경 없음) |
-| web-kpa-society / web-glycopharm / web-k-cosmetics | **미수정 확인**(forum/shared 미변경). 워킹트리에 다른 세션 WIP 다수 존재하여 전체 tsc 는 무관한 노이즈 → 변경 격리(diff)로 무회귀 확인 |
 
 ## 11. browser smoke 여부
 
@@ -84,7 +83,7 @@ Neture `ForumWritePage` 의 create/edit 두 분기를 **단일 공통 `ForumWrit
 |--------|------|
 | `WO-O4O-FORUM-NETURE-EDIT-CONTACT-PERSIST-V1` | edit update payload 에 showContactOnPost 포함(영속화) + 백엔드 수용 |
 | `WO-O4O-FORUM-EDIT-ROUTE-PARITY-V1` | edit 진입 방식 통일(KPA param ↔ Neture query) — 장기 |
-| `WO-O4O-FORUM-GP-KCOS-EDIT-ENABLE-V1` | GP/KCos edit route+update API+detail CTA 신설(정책) |
+| `WO-O4O-FORUM-GP-KCOS-EDIT-ENABLE-V1` | KCos edit route+update API+detail CTA 신설(정책) |
 | (다음 축) forum detail shared parts 공통화 |
 
 ---
@@ -100,8 +99,8 @@ Neture `ForumWritePage` 의 create/edit 두 분기를 **단일 공통 `ForumWrit
 | contactSection 유지 | ✅ (renderExtra) |
 | contact edit 영속화 한계 | ⚠️ 기존 한계 유지(별도 WO) |
 | min-length/notice 유지 | ✅ |
-| KPA/GP/KCos 미수정 | ✅ |
+| KPA/KCos 미수정 | ✅ |
 | backend/API/DB/route/menu | 무변경 |
-| TypeScript | web-neture PASS, shared/KPA/GP/KCos 미변경 |
+| TypeScript | web-neture PASS, shared/KPA/KCos 미변경 |
 | browser smoke | ✅ create+edit 렌더·초기값 로드 확인(제출 없음) |
 | 다른 세션 WIP | 미포함(path-specific) |

@@ -1,6 +1,6 @@
 # CHECK-O4O-MY-STORE-PRODUCT-HEADING-3SERVICES-SMOKE-V1
 
-> 배포 후 3서비스(KPA / GlycoPharm / K-Cosmetics) `my-products` / `local-products` heading · IA browser smoke.
+> 배포 후 2서비스(KPA / K-Cosmetics) `my-products` / `local-products` heading · IA browser smoke.
 > **결과: PASS** — 6개 화면 모두 의도한 heading 렌더 확인 (redirect 0 / pageError 0).
 > 선행: `WO-O4O-MY-STORE-CANONICAL-MENU-LABEL-ALIGNMENT-3SERVICES-V1`(PASS, commit `d8c40e78c`) — 2026-06-11
 
@@ -25,11 +25,10 @@
 |---|---|---|
 | detect-changes | success | 11:48:57 |
 | deploy-k-cosmetics | success | 11:49:09–11:51:11 |
-| deploy-glycopharm | success | 11:49:09–11:51:12 |
 | deploy-kpa-society | skipped (이번 커밋 KPA 무변경 — 선행 커밋에서 배포 반영) |
 | deploy-neture | skipped |
 
-→ GP/KCos 신규 배포 반영, KPA 선행 배포 반영 → 3서비스 모두 정렬 heading live.
+→ KCos 신규 배포 반영, KPA 선행 배포 반영 → 2서비스 모두 정렬 heading live.
 
 ---
 
@@ -37,7 +36,7 @@
 
 - Playwright (chromium, headless) — gitignored SSOT(`docs/local/TEST-ACCOUNTS.local.md`)에서 자격증명 직접 파싱(명령/로그 비노출).
 - 각 서비스 `/login` 로그인 → 대상 route hard-navigation → `h1/h2/h3` 텍스트 추출 + screenshot + console/pageerror/4xx-5xx 수집.
-- 계정: KPA/GP = `renagang21@gmail.com`(약국 경영자/약국 = store_owner), KCos = `sohae2100@gmail.com`(admin — store_owner 전용 계정 SSOT 부재).
+- 계정: KPA = `renagang21@gmail.com`(약국 경영자/약국 = store_owner), KCos = `sohae2100@gmail.com`(admin — store_owner 전용 계정 SSOT 부재).
 - 산출물(로컬, 비커밋): `c:\tmp\smoke-heading-result.json`, `c:\tmp\smoke-*.png`.
 
 ---
@@ -48,8 +47,6 @@
 |---|---|---|---|---|---|---|
 | KPA | /store/my-products | 없음 | `O4O 주문 가능 상품` | ✅ | 0 | 0 |
 | KPA | /store/commerce/local-products | 없음 | `매장 취급 상품 (0)` | ✅ | 0 | 0 |
-| GlycoPharm | /store/my-products | 없음 | `O4O 주문 가능 상품` | ✅ | 0 | 0 |
-| GlycoPharm | /store/commerce/local-products | 없음 | `매장 취급 상품 (0)` | ✅ | 0 | 0 |
 | K-Cosmetics | /store/my-products | 없음 | `O4O 주문 가능 상품` | ✅ | 0 | 403¹ |
 | K-Cosmetics | /store/commerce/local-products | 없음 | `매장 취급 상품 (0)` | ✅ | 0 | 403¹ |
 

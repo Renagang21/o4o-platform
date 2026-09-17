@@ -1,7 +1,7 @@
 # IR-O4O-KPA-ONLINE-SALES-FIRST-CLASS-MENU-DESIGN-V1
 
 > 조사 대상: KPA 매장 `채널 관리 > 온라인 스토어(B2C)` 기능을 별도 1급 메뉴(`온라인 판매`)로 분리할 수 있는가 + IA 정비안
-> 유형: **READ-ONLY 조사 (코드 변경 없음)** / 조사일: 2026-06-25 / 범위: KPA 우선 (GP/KCos parity 포함)
+> 유형: **READ-ONLY 조사 (코드 변경 없음)** / 조사일: 2026-06-25 / 범위: KPA 우선 (KCos parity 포함)
 > 선행: IR-O4O-KPA-STORE-CHANNEL-MENU-PURPOSE-AUDIT-V1, WO-O4O-KPA-STORE-CHANNEL-MENU-COPY-AND-TABLET-DEDUP-V1(완료)
 
 ---
@@ -116,7 +116,7 @@ KPA 매장 사이드바(`storeMenuConfig.ts:252-311`):
 
 - 현재 고객 접점 요청은 `상담 요청`(tablet_interest_requests, 태블릿/매장 내) 1종. 온라인 주문 CS는 없음.
 - 선행 IR(IR-O4O-KPA-STORE-CONSULTATION-REQUESTS-NOTIFICATION-REPLACEMENT-AUDIT-V1): 상담 요청은 알림 미연결 + 처리 화면이 거기뿐 → **즉시 삭제 불가, 알림 보완 후 정리**가 목표.
-- **경계 권장:** 온라인 판매 "고객 문의"(주문 관련 CS)와 매장 내 "상담 요청"(태블릿/QR 관심)은 **성격이 달라 당장 합치지 말 것**. 상담 요청은 `고객 응대`(태블릿/상담) 축에 유지. 온라인 판매 고객 문의는 신규(있다면)로 분리하되, 두 경로의 source 통합 모델(GP `customer_requests`의 source_type+purpose)을 별도 IR에서 판단.
+- **경계 권장:** 온라인 판매 "고객 문의"(주문 관련 CS)와 매장 내 "상담 요청"(태블릿/QR 관심)은 **성격이 달라 당장 합치지 말 것**. 상담 요청은 `고객 응대`(태블릿/상담) 축에 유지.
 
 ---
 
@@ -128,7 +128,7 @@ KPA 매장 사이드바(`storeMenuConfig.ts:252-311`):
 
 ---
 
-## 8. `채널` 상위 메뉴의 향후 역할 + KPA-only / GP·KCos 영향
+## 8. `채널` 상위 메뉴의 향후 역할 + KPA-only / KCos 영향
 
 **채널 상위 메뉴 재편(권장 C안 도달 시):**
 ```
@@ -140,9 +140,9 @@ KPA 매장 사이드바(`storeMenuConfig.ts:252-311`):
 ```
 
 **크로스서비스:**
-- `StoreChannelsPage`는 **서비스별 개별 파일**(KPA/GP/KCos), GP/KCos는 **SIGNAGE 탭 포함(4탭)** 으로 KPA(현 2탭)와 다름.
-- `storeMenuConfig.ts`는 **공통 모듈**이나 서비스별 블록(KPA_SOCIETY_STORE_CONFIG 등)이 분리돼 있어 **KPA 블록만 수정 가능**(GP/KCos 블록 불변 → 무영향). Shared Module Protocol상 "config 파일 공통이나 블록 단위 KPA 한정 수정"임을 명시.
-- → **KPA-only 분리 가능.** GP/KCos는 B2C 분리/네이밍 정비를 각 서비스 별도 WO로(구조·탭 차이 때문에 일괄 적용 부적합).
+- `StoreChannelsPage`는 **서비스별 개별 파일**(KPA/KCos), KCos는 **SIGNAGE 탭 포함(4탭)** 으로 KPA(현 2탭)와 다름.
+- `storeMenuConfig.ts`는 **공통 모듈**이나 서비스별 블록(KPA_SOCIETY_STORE_CONFIG 등)이 분리돼 있어 **KPA 블록만 수정 가능**(KCos 블록 불변 → 무영향). Shared Module Protocol상 "config 파일 공통이나 블록 단위 KPA 한정 수정"임을 명시.
+- → **KPA-only 분리 가능.** KCos는 B2C 분리/네이밍 정비를 각 서비스 별도 WO로(구조·탭 차이 때문에 일괄 적용 부적합).
 
 ---
 
@@ -171,7 +171,7 @@ KPA 매장 사이드바(`storeMenuConfig.ts:252-311`):
 3. **(주문 관리 신규 — C 1단계)** seller `checkout_orders` 조회 화면 신설(`getStoreOrders/kpi-summary` 연결). 기존 buyer "주문 관리"는 `발주 내역`으로 라벨 분리(명칭 충돌 해소).
 4. **(매출 KPI)** 홈/분석에 판매 KPI 노출(현 QR 전용 분석 확장 또는 온라인 판매 대시보드).
 5. **(고객 문의/상담 통합 판단)** 온라인 주문 CS 신설 여부 + 상담요청 알림 보완(선행 IR Phase1)과 함께 source 통합 모델 별도 IR.
-6. 각 단계 KPA-only, 공통 config는 KPA 블록만 수정. GP/KCos는 구조 차이로 별도 WO.
+6. 각 단계 KPA-only, 공통 config는 KPA 블록만 수정. KCos는 구조 차이로 별도 WO.
 
 ---
 

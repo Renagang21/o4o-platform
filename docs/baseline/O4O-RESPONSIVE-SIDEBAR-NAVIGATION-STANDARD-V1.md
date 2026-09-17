@@ -22,7 +22,6 @@
 
 ```
 - operator (/operator/*)        — 전 서비스
-- service admin (/admin/*)      — Neture / GlycoPharm / K-Cosmetics / KPA
 - platform admin (/admin/platform/*)
 - store / 내 매장 / 내 약국 (/store/*)
 - store-hub / 매장 허브 (/store-hub/*)
@@ -95,7 +94,7 @@
     <div class="flex-1 min-w-0">             // content, margin 불필요
 - 본문 margin 불필요 → 폭 자동, 겹침 구조적으로 불가
 ```
-> 검증된 예: OperatorAreaShell(operator/admin 공통), GP/KCos admin DashboardLayout(fixed+margin → flex sibling 전환), store-hub.
+> 검증된 예: OperatorAreaShell(operator/admin 공통), KCos admin DashboardLayout(fixed+margin → flex sibling 전환), store-hub.
 
 **원칙**: 신규/리팩터 구현은 **B(flex sibling)** 우선. 이미 안전 검증된 A(fixed+lg margin) 구조는 유지 가능.
 
@@ -121,7 +120,6 @@
 active background = service primary 계열의 -50 shade 를 기본으로 한다.
   - blue-50   (operator/admin 공통 DomainIASidebar)
   - indigo-50 (KPA admin)
-  - teal-50   (store / GlycoPharm store-hub)
   - pink-50   (K-Cosmetics)
 ```
 
@@ -147,10 +145,10 @@ active background = service primary 계열의 -50 shade 를 기본으로 한다.
 | # | 사이드바 | 영역 | 정렬 내용 | 패턴 |
 |---|----------|------|-----------|------|
 | **#1** | `DomainIASidebar` + `OperatorAreaShell` | operator/admin 공통(5 surface) | md→lg + 메뉴 토큰(group 600, child 13px/pl-14) + ESC | B (flex sibling, sticky) |
-| **#2** | GP/KCos admin `DashboardLayout` | GP·KCos admin | fixed+`lg:ml-64` 제거 → flex sibling | A→**B** 전환 |
+| **#2** | KCos admin `DashboardLayout` | KCos admin | fixed+`lg:ml-64` 제거 → flex sibling | A→**B** 전환 |
 | **#3** | KPA admin `AdminSidebar`/`AdminLayout` | KPA admin | md→lg + 최소 토큰. **라이브 smoke PASS** | A (fixed + `lg:ml-[260px]`) |
 | **#4** | `StoreSidebar` (store-ui-core) | store(3서비스) | 메뉴 토큰 정렬, active `bg-teal-100`→`bg-teal-50` + group height | (drawer는 StoreDashboardLayout, 이미 lg) |
-| **#5** | GP/KCos `*HubLayout` | store-hub | P0 mobile drawer 신규(lg, hamburger+overlay+ESC) | B |
+| **#5** | KCos `*HubLayout` | store-hub | P0 mobile drawer 신규(lg, hamburger+overlay+ESC) | B |
 | **#6** | Neture `SupplierSpaceLayout` | supplier | P0 mobile drawer + 모바일 중첩 메뉴 도달 | B |
 
 **검증**: 누적 post-deploy smoke(#1/#2/#5/#6) + KPA admin(#3) 라이브 smoke — 전 구간 horizontal scroll 0 · 겹침 0 · 1023↔1024 경계 정상 · console error 0.
@@ -178,7 +176,7 @@ active background = service primary 계열의 -50 shade 를 기본으로 한다.
 ## 11. Known Limitations
 
 ```
-- ESC close 미적용 영역: GP/KCos/KPA admin layout(DashboardLayout/AdminSidebar).
+- ESC close 미적용 영역: KCos/KPA admin layout(DashboardLayout/AdminSidebar).
   → admin layout 간 일관성 유지(overlay+X+메뉴선택 close 동작). 후속 공통화 시 ESC 정합 일괄 판단.
 - fixed+lg:margin(A) 구조는 KPA admin 에 유지(검증됨). 신규는 flex sibling(B) 권장.
 - child(13px/pl-14) 토큰은 해당 계층이 없는 사이드바(StoreSidebar 등)엔 미적용.

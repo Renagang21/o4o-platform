@@ -84,7 +84,7 @@ WO-STORE-SIDEBAR-4CATEGORY-RESTRUCTURE-V1 / WO-STORE-HOME-CARDS-REALIGN-V1 진�
 
 #### Q2. 실제 핵심 행동
 - **탭 1: 판매 등록 신청 (ApplicationsTab)**
-  - Supply 상품을 `externalProductId` + `service_key`(kpa/kpa-groupbuy/cosmetics/glycopharm)로 신청
+  - Supply 상품을 `externalProductId` + `service_key`(kpa/kpa-groupbuy/cosmetics)로 신청
   - `applyProduct` API 호출 → Operator 승인 대기
   - 신청 내역/상태(PENDING/APPROVED/REJECTED) 열람
 - **탭 2: 내 매장 진열 상품 (ListingsTab)**

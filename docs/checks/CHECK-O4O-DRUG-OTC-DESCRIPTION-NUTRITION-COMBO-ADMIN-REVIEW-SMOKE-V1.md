@@ -18,7 +18,7 @@
 | 목록 API | `GET /api/v1/admin/product-candidate-description-drafts` (`listForAdmin`) |
 | 상세 API | `GET /api/v1/admin/product-candidate-description-drafts/:id` (`getByIdForAdmin`) |
 | Admin 화면 | `apps/admin-dashboard/src/pages/o4o-product-db/DrugDescriptionDraftsPage.tsx` (기본 `sourceLabel=MFDS_DRUG_OTC`) |
-| 권한 | platform/neture/glycopharm/cosmetics/kpa-society의 admin·operator (read-only 컨트롤러, mutation 없음) |
+| 권한 | — |
 
 재현 필터 = 컨트롤러 목록 쿼리와 동일: `source_label='MFDS_DRUG_OTC' AND seed_json->>'applyRunId'='otc-nutrition-combo-draft-v1' AND review_status='needs_review'`.
 

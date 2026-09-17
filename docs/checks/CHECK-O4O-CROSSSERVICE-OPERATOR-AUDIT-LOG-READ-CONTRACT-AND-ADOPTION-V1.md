@@ -1,6 +1,6 @@
 # CHECK — WO-O4O-CROSSSERVICE-OPERATOR-AUDIT-LOG-READ-CONTRACT-AND-ADOPTION-V1
 
-> **상태**: CLOSED · **작성일**: 2026-08-26 · **대상**: KPA-Society · K-Cosmetics · Neture · PharmacyHub · GlycoPharm(회귀)
+> **상태**: CLOSED · **작성일**: 2026-08-26 · **대상**: KPA-Society · K-Cosmetics · Neture · PharmacyHub
 > **선행 조건**: `OPERATOR_COMMONIZATION = CLOSED` (WO-O4O-NETURE-OPERATOR-AI-GUARD-AND-MENU-VISIBILITY-FINAL-CLOSURE-V1, 2026-08-25 확정) 충족 후 착수.
 > **성격**: 운영자 공통화 재개가 아니라, 이미 분리해 둔 후속 운영 품질 작업.
 
@@ -17,7 +17,7 @@
 | 3 | KPA 감사 로그 | `services/web-kpa-society/src/pages/operator/AuditLogPage.tsx` ↔ `apps/api-server/src/routes/kpa/kpa.routes.ts:1531` | `kpa_operator_audit_logs` | KPA 전용 |
 | 4 | Neture 상품마스터 감사 로그 | `apps/api-server/src/entities/AuditLog.ts` · `product-master-audit-log.controller.ts` | `audit_logs` | 도메인(상품마스터) 전용 |
 | 5 | Neture workspace hub "감사 로그" 카드 | `services/web-neture/src/pages/hub/HubPage.tsx:117` | 없음 (`href: '/admin'`) | 레거시 placeholder |
-| 6 | 서비스별 어댑터 5종 | `services/web-{kpa-society,k-cosmetics,neture,pharmacy-hub,glycopharm}/src/pages/operator/AnalyticsPage.tsx` | 1·2 래핑 | 채택 완료 |
+| 6 | 서비스별 어댑터 5종 | — | 1·2 래핑 | 채택 완료 |
 
 **UNJUDGED = 0** (6/6 판정).
 
@@ -75,12 +75,11 @@ production 실측 payload:
 | K-Cosmetics | 채택 | 없음 | **ADOPT** | 공통 콘솔로 충분, 전용 감사 요구 없음 |
 | Neture | 채택 | 없음(상품마스터 전용 로그는 별개 도메인) | **ADOPT** | 아래 3-1 |
 | PharmacyHub | 채택 | 없음 | **ADOPT** | 27건 실데이터로 운영 중 |
-| GlycoPharm | 채택 | 없음 | **ADOPT**(회귀 대상) | 공유 모듈 회귀만 수행 |
 | Neture hub "감사 로그" 카드 | — | — | **DEAD_OR_LEGACY** | 아래 3-2 |
 | Neture 상품마스터 `audit_logs` | — | — | **SERVICE_SPECIFIC** | 상품마스터 상세 화면 전용, 운영자 콘솔 아님 |
 
 §3 원칙("KPA 에 있으니 모두 추가" 금지)에 따라 **KPA 전용 감사 로그 메뉴를 다른 서비스에 복제하지 않았다.**
-K-Cosmetics · Neture · PharmacyHub · GlycoPharm 운영자에게는 `action_logs` 기반 공통 콘솔이 실제 필요 범위이며,
+K-Cosmetics · Neture · PharmacyHub 운영자에게는 `action_logs` 기반 공통 콘솔이 실제 필요 범위이며
 `kpa_operator_audit_logs` 에 대응하는 데이터 자체가 존재하지 않는다.
 
 ### 3-1. Neture — Action Queue / AI 운영 로그와 혼동하지 않음 (§3 확인)
@@ -131,7 +130,7 @@ production 실측 (운영자 토큰, `sohae2100@gmail.com`):
 | `serviceKey=kpa-society` | 200 · `{kpa-society:3}` |
 | `serviceKey=neture` | 200 · `{neture:30}` |
 | `serviceKey=platform` (미보유) | 200 · **0건** ← 확대 없음 |
-| `all=true` / `serviceKey=all` / 쿼리 없음 | 200 · 동일 결과 `{k-cosmetics, pharmacy-hub, neture, glycopharm}` ← **`all=true` 로 넓어지지 않음** |
+| `all=true` / `serviceKey=all` / 쿼리 없음 | 200 |
 | 미인증 | 401 |
 | `platform:super_admin` → `/kpa/operator/audit-logs` | 403 `MEMBERSHIP_NOT_FOUND` (serviceKey 로 우회 불가) |
 
@@ -173,7 +172,6 @@ action producer 대규모 변경 / 민감 데이터 저장 확대)에 해당하�
 | K-Cosmetics | ✅ | ✅ `운영 분석` | ✅ | ✅ | `k-cosmetics` | 2 | 0 | 0 |
 | Neture | ✅ | ✅ `운영 분석` | ✅ | ✅ | `neture` | 20 | 0 | 0 |
 | PharmacyHub | ✅ | ✅ `운영 분석` | ✅ | ✅ | `pharmacy-hub` | 20 | 0 | 0 |
-| GlycoPharm(회귀) | ✅ | ✅ `운영 분석` | ✅ | ✅ | `glycopharm` | 20 | 0 | 0 |
 
 - 모바일(390×844)에서도 5/5 서비스 모두 드로어(`운영자 메뉴`) → 그룹 확장 → `운영 분석` 클릭으로 실제 라우팅됨을 확인.
 - KPA 모바일은 `감사 로그` 클릭 → `/operator/audit-logs` 진입 + 20행 렌더까지 확인.
@@ -213,7 +211,7 @@ WO §6 의 "가능하면 실제 안전한 operator action 을 1건 수행하고 
 ## 7. cross-service 검증
 
 - 5/5 서비스 콘솔이 **자기 serviceKey 만** 쿼리에 실어 보냄 (§6-1 실측).
-- 서비스별 렌더 결과가 서로 겹치지 않음: KPA 2건 / K-Cosmetics 2건 / Neture 6건 / PharmacyHub 27건 / GlycoPharm 116건
+- 서비스별 렌더 결과가 서로 겹치지 않음: KPA 2건 / K-Cosmetics 2건 / Neture 6건 / PharmacyHub 27건 116건
   (30일 기준, 모두 상이).
 - 보유하지 않은 `serviceKey=platform` 요청 → **0건** (확대 실패 확인).
 - `all=true` 로 비 platform-admin 권한이 넓어지지 않음.

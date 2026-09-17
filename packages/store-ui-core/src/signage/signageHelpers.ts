@@ -2,7 +2,7 @@
  * signageHelpers — 매장 사이니지 화면 공통 로직 (순수 함수)
  *
  * WO-O4O-MY-STORE-REMAINING-FEATURE-VIEW-COMMONIZATION-V1 §5-B:
- *   KPA StoreSignagePage 와 GlycoPharm StoreSignageMainPage 가 12개 helper 를
+ *   KPA StoreSignagePage 등이 12개 helper 를
  *   본문까지 완전히 동일하게 복제하고 있었다(공백 제거 후 md5 일치 12/12).
  *   서비스별 entity 타입에 묶이지 않도록 구조적 타입으로만 받는다.
  *

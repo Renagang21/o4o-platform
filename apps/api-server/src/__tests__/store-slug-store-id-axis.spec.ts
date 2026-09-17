@@ -119,7 +119,6 @@ describe('§6 platform_store_slugs.store_id 축 census', () => {
    * 프로덕션에서 slug 없는 정상 조직 4곳이 생긴 실제 원인은 축 오류가 아니라
    * **승인 경로에 slug 예약 단계 자체가 없었던 것**이다.
    *   - KCos `linkOwnerToStore`  : org member + enrollment 만 보강
-   *   - GP   `approveMember`     : organization + owner + enrollment 만 생성
    * 두 경로가 다시 slug 없이 조직을 확정하지 않도록 고정한다.
    */
   it('KCos 기존 매장 연결 경로가 slug 를 보강한다', () => {

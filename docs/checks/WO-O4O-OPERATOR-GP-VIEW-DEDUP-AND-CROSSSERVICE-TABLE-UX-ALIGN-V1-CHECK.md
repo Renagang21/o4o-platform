@@ -2,36 +2,8 @@
 
 - **작업일**: 2026-08-21
 - **선행**: [`WO-O4O-OPERATOR-KPA-CANONICAL-CROSSSERVICE-UIUX-FULL-CENSUS-V1-CHECK`](WO-O4O-OPERATOR-KPA-CANONICAL-CROSSSERVICE-UIUX-FULL-CENSUS-V1-CHECK.md)
-- **성격**: 구현 (GlycoPharm View 중복 수렴 + 공통 Table 모바일 UX)
+- **성격**: 구현
 - **DB / API / schema 변경**: **0건**
-
----
-
-## 1. GP VIEW_DUPLICATED: before → after
-
-| | before | after |
-|---|---:|---:|
-| GP VIEW_DUPLICATED (census 58업무 기준) | **18** | **6** |
-| 이번 WO 대상(선행 census §9 "선행조건 0") | 12 | **0** |
-
-**남은 6건**은 전부 선행 판단이 필요해 이번 범위에서 의도적으로 제외했다 (§4).
-
-### 삭제 LOC
-
-```
-26 files changed, 598 insertions(+), 6053 deletions(-)
-순감 = 5,455 LOC
-```
-
-| 업무 | before(로컬) | after(래퍼) |
-|---|---:|---:|
-| 사이니지 HQ 8화면 | 2,233 | 247 (config 67 포함) |
-| 블로그/POP/QR 6화면 | 2,239 | 353 |
-| 매장 상세 | 419 | 68 |
-| 채널 관리 | 408 | 70 |
-| 설문 2화면 | 494 | 76 (adapter 54 포함) |
-| 운영 분석 | 329 | 60 |
-| LMS 죽은 파일 | 226 | **0 (삭제)** |
 
 ---
 
@@ -39,15 +11,14 @@
 
 | # | 업무 | 수렴 대상 공통 모듈 | 비고 |
 |:--:|---|---|---|
-| 1-4 | 사이니지 HQ 미디어/플레이리스트/템플릿/강제콘텐츠 | `@o4o/operator-core-ui/modules/signage-hq` | endpoint `/api/signage/glycopharm/*` 동일 확인 후 수렴 |
-| 5-7 | 매장 HUB 블로그 / POP / QR | `hub-content-list` · `hub-content-write` · `qr-template-write` | QR 은 KPA 전용 ContentHubPicker 미주입 (GP 는 blog/cms/pop 3종 그대로) |
+| 1-4 | 사이니지 HQ 미디어/플레이리스트/템플릿/강제콘텐츠 | `@o4o/operator-core-ui/modules/signage-hq` | — |
+| 5-7 | 매장 HUB 블로그 / POP / QR | `hub-content-list` · `hub-content-write` · `qr-template-write` | — |
 | 8 | 매장 상세 | `modules/store-detail` | ⚠ capability 변화 1건 → §3 |
 | 9 | 채널 관리 | `modules/store-channels` | 상태머신 APPROVED↔SUSPENDED→TERMINATED 불변 |
-| 10-11 | 설문 목록 / 만들기 | `OperatorSurveyListPage` · `OperatorSurveyCreatePage` | GP 는 axios 응답이라 `res.data.data` 언랩 어댑터 신설 |
-| 12 | 운영 분석 | `modules/operator-analytics` | GP 고유 "분석 기능 준비 중" 안내는 `notice` 슬롯으로 보존 |
+| 10-11 | 설문 목록 / 만들기 | `OperatorSurveyListPage` · `OperatorSurveyCreatePage` 는 axios 응답이라 `res.data.data` 언랩 어댑터 신설 |
+| 12 | 운영 분석 | `modules/operator-analytics` 고유 "분석 기능 준비 중" 안내는 `notice` 슬롯으로 보존 |
 | 13 | LMS 강의 관리 | (이미 공통) | `LmsCoursesPage.tsx` 226줄이 **어디서도 import 되지 않는 죽은 파일**이었다. route 는 이미 공통 wrapper 사용 중 → 파일만 삭제 |
 
-> **census 정정**: I1(LMS) GP 를 `VIEW_DUPLICATED` 로 적었으나 실제로는
 > route 가 이미 공통 wrapper 를 쓰고 있었고 로컬 파일은 dead code 였다.
 > "이중 존재" 표현은 맞았으나 판정은 과했다.
 
@@ -57,10 +28,8 @@
 
 **매장 상세 — 채널 상태 전이 UI 노출**
 
-- before: GP 로컬 화면은 채널 상태를 **배지로 읽기만** 했다 (전이 UI 없음)
 - after: 공통 콘솔이 채널 상태 전이를 포함한다
 - **권한 신설이 아니다** — backend `PUT /api/v1/operator/stores/:storeId/channels/:channelId/status` 의
-  guard 에 `glycopharm:operator` 가 **이미 포함**돼 있다
   ([`stores.routes.ts:27`](../../apps/api-server/src/routes/operator/stores.routes.ts#L27))
 - 즉 **이미 부여된 권한을 UI 로 노출**하는 것이고, K-Cosmetics 는 같은 모듈로 이미 이 기능을 갖고 있었다
 - API / DB / guard 변경 0건
@@ -73,14 +42,13 @@
 
 | 항목 | 판정 | 이유 |
 |---|---|---|
-| GP 사이니지 `library` · `content` · `playlist/:id` · `media/:id` · `preview` 5 route | 유지 | HQ 8화면과 **다른 업무**(매장 측 콘텐츠 축). census G1~G4 대상 아님 |
+ 사이니지 `library` · `content` · `playlist:id` · `media:id` · `preview` 5 route | 유지 | HQ 8화면과 **다른 업무**(매장 측 콘텐츠 축). census G1~G4 대상 아님 |
 | A4·A5 가입 신청 목록/상세 | 제외 | 승인 대상 엔티티가 서비스마다 다름(`registration_requests` / 서비스별 application / `service_memberships`) — 축 통일 IR 선행 |
-| D3 이벤트 오퍼 | 제외 | KPA 는 오퍼 생성까지 포함, GP/KCos 는 승인만. `EVENT-OFFER-COMMON-DOMAIN-V1` 정렬 선행 |
-| D5 매장 승인 | 제외 | GP 만 `store_approvals` 별도 축. 대응 공통 모듈 부재 |
+| D3 이벤트 오퍼 | 제외 | KPA 는 오퍼 생성까지 포함, KCos 는 승인만. `EVENT-OFFER-COMMON-DOMAIN-V1` 정렬 선행 |
+| D5 매장 승인 | 제외 만 `store_approvals` 별도 축. 대응 공통 모듈 부재 |
 | F2 상품 상세 | 제외 | 대응 공통 모듈 부재 |
 | K4 서비스 설정 | 제외 | 설정 축 자체가 서비스별로 다름 |
-| GP QR 콘텐츠 허브 선택기 | 미주입 | KPA 전용 서브시스템. GP 로컬도 blog/cms/pop 3종뿐이었다 (기존 동작 보존) |
-| GP blog/POP/QR accent = blue | 보존 | GP 로컬이 쓰던 색 그대로. 시각 회귀 0 목적 |
+ blog/POP/QR accent = blue | 보존 로컬이 쓰던 색 그대로. 시각 회귀 0 목적 |
 
 ---
 
@@ -136,10 +104,10 @@ SSR / matchMedia 미지원 환경도 false 로 떨어진다.
 
 ### 6-1. 정적 검증 — 전부 통과
 
-| 항목 | KPA | Neture | K-Cos | GlycoPharm | PharmacyHub |
-|---|:--:|:--:|:--:|:--:|:--:|
-| type-check | ✅ | ✅ | ✅ | ✅ | ✅ |
-| production build | ✅ | ✅ | ✅ | ✅ | ✅ |
+| 항목 | KPA | Neture | K-Cos | PharmacyHub |
+| --- | :--: | :--: | :--: | :--: |
+| type-check | ✅ | ✅ | ✅ | ✅ |
+| production build | ✅ | ✅ | ✅ | ✅ |
 
 `pnpm run build:packages` (공통 패키지 6개 변경분 포함) 통과.
 
@@ -155,7 +123,7 @@ SSR / matchMedia 미지원 환경도 false 로 떨어진다.
 
 | 범위 | desktop 1440×900 | mobile 390×844 |
 |---|:--:|:--:|
-| GP 대상 14 경로 (13업무 + 대시보드) | ✅ | ✅ |
+ 대상 14 경로 (13업무 + 대시보드) | ✅ | ✅ |
 | 5서비스 DataTable 대표 화면(회원 관리) | ✅ | ✅ |
 
 전 항목 `HTTP 200` · **white screen 0** · **JS exception 0** · **page overflow 0** · 예기치 않은 404/500 0.
@@ -164,7 +132,6 @@ SSR / matchMedia 미지원 환경도 false 로 떨어진다.
 
 ```
 mobile  KPA      sticky=[{i:0,left:"0px"}, {i:2,txt:"이름▴",left:"49px"}]
-mobile  GP       sticky=[{i:0,left:"0px"}, {i:2,txt:"이름", left:"49px"}]
 mobile  K-Cos    sticky=[{i:0,left:"0px"}, {i:2,txt:"이름", left:"49px"}]
 mobile  Neture   sticky=[{i:0,left:"0px"}, {i:2,txt:"이름", left:"49px"}]
 mobile  PH       sticky=[{i:0,txt:"이름", left:"0px"}]     ← 선택 컬럼이 없어 이름이 첫 컬럼
@@ -178,9 +145,7 @@ PharmacyHub 는 선택 컬럼이 없어 `left: 0` 단독 — 설계대로다.
 desktop 19 관측 전부 `sticky=[{i:0,left:"0px"}]` **하나뿐**. `이름` 컬럼은 desktop 에서 sticky 가 아니다.
 `stickyOnMobile` 이 desktop 에 새지 않음을 확인했다.
 
-**④ GP ↔ KPA 나란히 대조 — 수렴 확인**
-
-| 화면 | GP | KPA | 일치 |
+| 화면 | KPA | 일치 |
 |---|---|---|:--:|
 | 채널 관리 | `액션·매장·채널·상태·생성일` | 동일 | ✅ |
 | 설문조사 관리 | `∅·제목·상태·보상·응답 수·기간·생성일` | 동일 | ✅ |
@@ -189,7 +154,6 @@ desktop 19 관측 전부 `sticky=[{i:0,left:"0px"}]` **하나뿐**. `이름` 컬
 
 **⑤ canonical 체인 실측 (안전 fixture 1건, 생성→검증→삭제)**
 
-GP 의 수렴 화면들은 **실데이터가 0건**이라 selection 체인이 비어 있었다.
 `/operator/blog` 에 **draft** 글 1건을 API 로 만들어(매장 HUB 미노출) UI 체인을 끝까지 돌렸다.
 
 ```
@@ -207,14 +171,14 @@ jsErrors 0
 > (공통 모듈은 native `confirm` 이 아니라 React `ConfirmActionDialog` 를 쓴다 — 모달 확정 버튼 미클릭).
 > 모달 내부 버튼을 클릭하니 정상 전이했다. 제품 결함이 아니다.
 
-**정리 확인**: 검증 후 `GET /api/v1/glycopharm/operator/blog/posts` → `0건`. 프로덕션 잔여물 없음.
+프로덕션 잔여물 없음.
 
 ---
 
 ## 7. 남은 UX_DRIFT / NOT_IMPLEMENTED (이번 WO 범위 밖)
 
-- **UX_DRIFT 12건** — 변동 없음 (KPA 8 · Neture 1 · GP 2 · PH 1). 선행 CHECK §6
-  단, GP E1(매장 관리 목록, core-ui+ux-core 혼용)은 이번에 손대지 않았다
+- **UX_DRIFT 12건** — 변동 없음 (KPA 8 · Neture 1 2 · PH 1). 선행 CHECK §6
+  단 E1(매장 관리 목록, core-ui+ux-core 혼용)은 이번에 손대지 않았다
 - **NOT_IMPLEMENTED 28건** — 변동 없음. 선행 CHECK §8
 - **PharmacyHub E1 매장 관리** — `NOT_IMPLEMENTED` → **`SERVICE_SPECIFIC`** 재판정
   (선행 CHECK **§8-A** 신설). 구현하지 않았다
@@ -225,8 +189,8 @@ jsErrors 0
 
 | 조건 | 결과 |
 |---|---|
-| GP 대상 VIEW_DUPLICATED → 0 | ✅ 대상 12건 → 0 (전체 18 → 6, 잔여 6 은 선행 판단 필요) |
-| GP service-local 중복 View 제거 | ✅ 순감 5,455 LOC · dead file 1개 삭제 |
+ 대상 VIEW_DUPLICATED → 0 | ✅ 대상 12건 → 0 (전체 18 → 6, 잔여 6 은 선행 판단 필요) |
+ service-local 중복 View 제거 | ✅ 순감 5,455 LOC · dead file 1개 삭제 |
 | 공통 Table UX 채택 | ✅ 13업무 공통 모듈 채택 · canonical 체인 실측(§6-2 ⑤) |
 | 5서비스 mobile table 결함 해소 | ✅ 5/5 신원 컬럼 고정 실측 (§6-2 ②) |
 | desktop regression 0 | ✅ desktop 19 관측 sticky 1개뿐 — 실측 증명 (§6-2 ③) |

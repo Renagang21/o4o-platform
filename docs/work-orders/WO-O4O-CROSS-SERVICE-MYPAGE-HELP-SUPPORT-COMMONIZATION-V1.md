@@ -38,7 +38,6 @@ My Page의 마지막 개별 기능 후보인 **Help / 문의 / 지원**을 5서�
 
 ```text
 KPA-Society
-GlycoPharm
 K-Cosmetics
 Neture
 Pharmacy-Hub
@@ -482,12 +481,6 @@ backend 계약 없음
 회원/직역 문의
 ```
 
-### GlycoPharm
-
-```text
-교육/서비스 이용 문의
-```
-
 ### K-Cosmetics
 
 ```text
@@ -591,7 +584,6 @@ dead link
 
 ```text
 KPA
-GP
 KCos
 Neture
 PH
@@ -723,7 +715,6 @@ Identity/membership 변경
 @o4o/account-ui build
 
 KPA typecheck/build
-GP typecheck/build
 KCos typecheck/build
 Neture typecheck/build
 PH typecheck/build
@@ -927,7 +918,7 @@ origin/main 반영 확인
 
 | 경로 | 인증 | 성격 |
 |---|---|---|
-| `POST /api/v1/public/services/:serviceKey/contact-inquiries` | **없음(no auth)** | GP · KCos 공개 문의 접수 |
+| `POST /api/v1/public/services:serviceKey/contact-inquiries` | **없음(no auth)** | KCos 공개 문의 접수 |
 | `POST /api/v1/kpa/contact-requests` | **없음** | KPA 공개 문의 접수 |
 | `GET /api/v1/kpa/operator/contact-requests` | `requireAuth` + `requireKpaScope('kpa:operator')` | **운영자 콘솔** |
 | `PATCH /api/v1/kpa/operator/contact-requests/:id/status` | 동일 | **운영자 콘솔** |
@@ -937,7 +928,6 @@ origin/main 반영 확인
 ```
 Mount: /api/v1/public/services
   POST /:serviceKey/contact-inquiries — 공개 문의 접수 + 운영자 in-app 알림
-범위: GlycoPharm / K-Cosmetics (기존 contact 백엔드 없던 서비스).
   Neture(/neture/contact) / KPA(/kpa/contact-requests) 는 기존 경로 유지 — 본 컨트롤러 미사용.
 정책:
   - 인증 없음. validation + 개인정보 동의 필수 + honeypot spam guard.
@@ -954,7 +944,6 @@ Mount: /api/v1/public/services
 | 서비스 | 파일 | 줄수 | route |
 |---|---|---:|---|
 | KPA | `services/web-kpa-society/src/pages/contact/ContactPage.tsx` | 239 | `/contact` (App.tsx:918) |
-| GlycoPharm | `services/web-glycopharm/src/pages/ContactPage.tsx` | 138 | `contact` (App.tsx:669) |
 | K-Cosmetics | `services/web-k-cosmetics/src/pages/ContactPage.tsx` | 112 | `contact` (App.tsx:443) |
 | Neture | `services/web-neture/src/pages/ContactPage.tsx` | 356 | `/contact` (App.tsx:747) |
 | Pharmacy-Hub | — | — | **없음** |
@@ -970,7 +959,7 @@ Mount: /api/v1/public/services
 
 ### D. `/service-guide` — 도움말 성격의 인접 자산
 
-KPA · GP · KCos 3서비스에 `ServiceGuidePage` 가 있고 route 등록도 되어 있다(각 App.tsx:920 / 674 / 448). 한글 키워드("도움말"·"서비스 안내") 검색에 걸린다.
+KPA · KCos 2서비스에 `ServiceGuidePage` 가 있고 route 등록도 되어 있다(각 App.tsx:920 / 674 / 448). 한글 키워드("도움말"·"서비스 안내") 검색에 걸린다.
 
 이것이 §14 가 말한 "단순 외부/정적 도움말 링크도 정상적인 `SERVICE_SPECIFIC`" 에 해당하는지, 아니면 FAQ 성격의 실기능인지 **내용을 열어보고 판정**할 것. 서비스 소개 마케팅 페이지라면 Help 가 아니라 `OUT_OF_SCOPE` 다.
 
@@ -1014,7 +1003,7 @@ other              → 기타 문의
 
 이것은 **문의 유형(category)** 이지 **처리 상태(status)** 가 아니다. §11 이 예시로 든 `pending/answered/closed` 와 혼동하지 말 것. 실제 status 컬럼은 `ContactInquiry.entity.ts` 와 KPA `contact-requests` 쪽에서 각각 확인해야 하며, **두 서비스군의 status 값이 다를 수 있다.**
 
-또한 `SERVICE_ROLE_PREFIX` 는 `glycopharm` · `k-cosmetics` 2개뿐이고 KCos 의 role prefix 는 `cosmetics` 다(serviceKey ≠ role prefix). 알려진 함정 `service_key kpa ≠ kpa-society` 와 같은 계열이다.
+또한 `SERVICE_ROLE_PREFIX` 는 `k-cosmetics` 2개뿐이고 KCos 의 role prefix 는 `cosmetics` 다(serviceKey ≠ role prefix). 알려진 함정 `service_key kpa ≠ kpa-society` 와 같은 계열이다.
 
 ### I. §17 경계 — 운영자 콘솔은 이미 살아 있다
 
@@ -1039,7 +1028,7 @@ KPA `GET/PATCH /operator/contact-requests` 는 실제 운영자 화면 계약이
 ### L. 프론트 진입점 참고
 
 * KPA `services/web-kpa-society/src/components/platform/JoinInquiryForm.tsx` — 가입 문의 폼. §6 의 "서비스 가입 문의" 로 **일반 지원 문의와 분리해서 판정**할 것
-* Footer 3서비스(`PlatformFooter.tsx` · GP/KCos `Footer.tsx`)에 문의/고객센터 문자열 존재 → §22 의 "Header/Footer 진입" 조사 대상
+* Footer 2서비스(`PlatformFooter.tsx` · KCos `Footer.tsx`)에 문의/고객센터 문자열 존재 → §22 의 "Header/Footer 진입" 조사 대상
 * `services/web-neture/src/config/seoRegistry.ts` 에도 문의 관련 문자열 — SEO 메타이므로 기능 아님, 모집단에서 제외 판단 근거로 기록
 
 ### M. 검증 계정 · 도메인

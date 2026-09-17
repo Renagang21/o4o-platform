@@ -239,7 +239,7 @@ DB 전체에서 이 컬럼을 가진 테이블은 `app_instances` · `app_usage_
 | `services/app-system-keys.service.ts` | `DEAD_UI` | `getInstance` 실패 → 4개 메서드 전부 항상 `undefined` / `false` |
 | `components/ai/SimpleAIModal.tsx` | `DEAD_UI` (부분) | `isGeminiInstalled()` 가 **항상 false** → API 키/모델 자동 채움이 **한 번도 동작한 적 없음** |
 | `pages/settings/AppServices.tsx` (`/settings/app-services`) | `ACTIVE_UI` — **단 mock 전용** | 라우팅되어 있으나 `appSystemApi` 를 **import 조차 하지 않는다**. `handleSave` = `setTimeout(1000)`, 통계 = 하드코딩 `mockUsageStats` |
-| 그 외 web (kpa / glycopharm / k-cosmetics / neture / pharmacy-hub) | `NO_CONSUMER` | 참조 0 |
+| 그 외 web (kpa / k-cosmetics / neture / pharmacy-hub) | `NO_CONSUMER` | 참조 0 |
 
 **app_instances 를 실제로 읽거나 쓰는 UI 는 0개다.**
 

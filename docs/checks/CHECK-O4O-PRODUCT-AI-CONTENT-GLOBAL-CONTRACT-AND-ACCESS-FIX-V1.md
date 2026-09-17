@@ -192,7 +192,7 @@ deleteTag(tagId, productId)  → tagRepo.delete({ id: tagId, productId })
 
 [`product-ai-global-access.spec.ts`](../../apps/api-server/src/__tests__/security/product-ai-global-access.spec.ts) — **26 tests, 26 passed**.
 
-제거된 개념: `kpa:operator → KPA master 허용` / `kpa:operator → GlycoPharm master 차단`
+제거된 개념: `kpa:operator → KPA master 허용`
 (§1 정책상 존재하지 않는 분류이므로 테스트 자체를 폐기)
 
 | 케이스 | 결과 |
@@ -239,7 +239,7 @@ deleteTag(tagId, productId)  → tagRepo.delete({ id: tagId, productId })
 | 소비 영역 | 영향 |
 |-----------|------|
 | KPA-Society (`/store/*`, `/store-hub/*`) | 상품 설명 화면 403 **유지** — §1 정책상 의도된 상태 (후속 WO-2) |
-| GlycoPharm / K-Cosmetics | 없음 (동일 라우터, 동일 정책) |
+| K-Cosmetics | 없음 (동일 라우터, 동일 정책) |
 | Neture 공급자 콘솔 (`ProductDetailDrawer.tsx` — ai-tags 유일 소비처) | **개선** — 기존 dead JOIN 으로 전원 403 → 자기 offer master 접근 가능 |
 | Admin / Operator 콘솔 | `platform:super_admin` 만 전역 쓰기. `{service}:operator/admin` 은 역할만으로 불가 (신규 제약, 단 기존에도 실질 0명 통과였으므로 회귀 아님) |
 | POP PDF | 무가드 → `render_read` 가드 신설. active OPL 매장은 계속 사용 가능 |

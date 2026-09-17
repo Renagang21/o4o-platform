@@ -74,4 +74,4 @@ store 모달과 동일 CSS(`.ccg-*`, `<style>` 1회 주입). `width: min(720px, 
 
 ## 후속
 
-- GP/K-Cosmetics operator docs parity는 별도(공통 모달이라 mode 재사용 가능).
+- K-Cosmetics operator docs parity는 별도(공통 모달이라 mode 재사용 가능).

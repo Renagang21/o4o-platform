@@ -16,7 +16,7 @@ O4O 플랫폼은 **이중 조직 체계 + 중앙 슬러그 레지스트리 + 서
 |------|------|
 | Organization | 🟡 이중 체계 (범용 + KPA 전용) |
 | Storefront slug | 🟢 범용 (`platform_store_slugs`) |
-| Storefront config | 🟡 이중 저장 (glycopharm + kpa) |
+| Storefront config | 🟡 이중 저장 (kpa) |
 | URL 라우팅 | 🟢 범용 (`/store/:slug`) |
 | Multi-service Organization | 🔴 직접 지원 안 됨 (PK 공유로 우회) |
 | Product 다중 서비스 | 🟢 service_key 컬럼으로 지원 |
@@ -75,36 +75,10 @@ O4O 플랫폼은 **이중 조직 체계 + 중앙 슬러그 레지스트리 + 서
 ```
 [서비스별 Organization 분리]
 구조: kpa_organizations (KPA 전용) + organizations (범용) 이중 체계
-      glycopharm_organization은 존재하지 않음
 판정: 🟡 부분 종속
 리스크: KPA 전용 조직 테이블이 독립적이어서 organization-core와 동기화 불가
 필요 시 수정 방향: 장기적으로 organization-core 통합 검토
 ```
-
-### 2-D. GlycoPharm ↔ KPA Organization 관계
-
-```
-glycopharm_pharmacies.id == kpa_organizations.id (PK 공유)
-FK: glycopharm_pharmacies.id → kpa_organizations.id ON DELETE CASCADE
-```
-
-| 항목 | 값 |
-|------|-----|
-| 관계 유형 | OneToOne (PK 공유) |
-| 방향 | glycopharm → kpa (KPA가 원본) |
-| CASCADE | DELETE 시 양쪽 삭제 |
-| 목적 | 하나의 물리 약국이 두 서비스에 걸침 |
-
-```
-[GlycoPharm-KPA 조직 연결]
-구조: PK 공유 방식으로 1:1 연결, 별도 junction table 없음
-판정: 🟡 부분 종속
-리스크: 반드시 kpa_organizations에 먼저 행이 존재해야 glycopharm_pharmacies 생성 가능
-         KPA 없이 GlycoPharm 단독 운영 불가
-필요 시 수정 방향: organization-core 기반 통합 FK로 전환
-```
-
----
 
 ## 3. Storefront 구조 판정
 
@@ -117,7 +91,7 @@ FK: glycopharm_pharmacies.id → kpa_organizations.id ON DELETE CASCADE
 | id | UUID PK | |
 | **slug** | varchar(120) | **UNIQUE — 플랫폼 전역 유일** |
 | store_id | UUID | 서비스별 store PK |
-| service_key | varchar(50) | 'glycopharm', 'cosmetics', 'kpa' 등 |
+| service_key | varchar(50) | — |
 | is_active | boolean | |
 
 **`platform_store_slug_history` 테이블** (변경 이력):
@@ -142,18 +116,13 @@ FK: glycopharm_pharmacies.id → kpa_organizations.id ON DELETE CASCADE
 
 | 위치 | 테이블 | 컬럼 | 내용 |
 |------|--------|------|------|
-| GlycoPharm | `glycopharm_pharmacies` | `storefront_config` (JSONB) | 테마/설정 |
-| GlycoPharm | `glycopharm_pharmacies` | `template_profile` (varchar) | BASIC/COMMERCE_FOCUS/... |
-| GlycoPharm | `glycopharm_pharmacies` | `storefront_blocks` (JSONB) | 블록 레이아웃 |
 | KPA | `kpa_organizations` | `storefront_config` (JSONB) | 매장 설정 |
 
 ```
 [Storefront Config 저장]
-구조: glycopharm_pharmacies와 kpa_organizations에 각각 storefront_config JSONB 존재
       동일 약국(PK 공유)의 설정이 두 곳에 분산 저장
 판정: 🟡 부분 종속
 리스크: ⚠️ 두 config 간 동기화 정책 없음
-         KPA에서 설정 변경 시 GlycoPharm에 미반영, 역방향도 동일
 필요 시 수정 방향: storefront_config를 하나의 테이블로 통합하거나
                    한쪽을 Source of Truth로 지정
 ```
@@ -211,7 +180,6 @@ POST /store/:slug/tablet/requests    — 태블릿 주문
 
 | code | name | type | 승인 필요 |
 |------|------|------|----------|
-| glycopharm | GlycoPharm | tool | Yes |
 | glucoseview | GlucoseView | tool | Yes |
 | neture | Neture | community | No |
 | kpa-society | KPA Society | community | Yes |
@@ -243,7 +211,6 @@ POST /store/:slug/tablet/requests    — 태블릿 주문
 [조직 다중 서비스]
 구조: organization ↔ service junction table 없음
       서비스 소속은 서비스별 전용 테이블로 암묵적 결정
-      (kpa_organizations → KPA, glycopharm_pharmacies → GlycoPharm)
 판정: 🔴 서비스 종속
 리스크: ⚠️ 조직이 새 서비스에 가입하려면 해당 서비스 전용 테이블에 행 생성 필요
          범용 organization-service enrollment 체계 없음
@@ -279,7 +246,7 @@ POST /store/:slug/tablet/requests    — 태블릿 주문
 
 - `organizations` 테이블에 service_key 컬럼 없음
 - 서비스 소속은 서비스별 전용 테이블 존재 여부로 결정
-- 단, PK 공유(`glycopharm_pharmacies.id = kpa_organizations.id`)로 **동일 물리 조직이 두 서비스에 걸칠 수 있음**
+- 단, PK 공유로 **동일 물리 조직이 서비스에 걸칠 수 있음**
 - 상품 레벨에서는 `service_key`로 다중 서비스 지원
 
 ### Q2. Storefront slug는 organization 단위로 유일한가?
@@ -295,7 +262,6 @@ POST /store/:slug/tablet/requests    — 태블릿 주문
 
 | 서비스 | 저장 위치 |
 |--------|----------|
-| GlycoPharm | `glycopharm_pharmacies.storefront_config` + `template_profile` + `storefront_blocks` |
 | KPA | `kpa_organizations.storefront_config` |
 
 - 동일 약국(PK 공유)이라도 config가 두 곳에 분산
@@ -308,29 +274,13 @@ POST /store/:slug/tablet/requests    — 태블릿 주문
 - slug → `platform_store_slugs` → service_key 자동 판별
 - 레거시 경로 `/kpa/store/:slug` → `/store/:slug` 301 리다이렉트 존재
 
-### Q5. 향후 GlycoPharm에서 동일 storefront를 그대로 사용할 수 있는가?
-
-**부분적 YES, 조건부**
-
-| 항목 | 사용 가능 | 조건 |
-|------|----------|------|
-| Slug | ✅ | platform_store_slugs에 등록만 하면 됨 |
-| 공개 URL | ✅ | /store/:slug 그대로 사용 |
-| 상품 진열 | ✅ | organization_product_listings.service_key로 구분 |
-| 채널(B2C/태블릿) | ✅ | organization_channels는 서비스 무관 |
-| **Storefront config** | ⚠️ | glycopharm_pharmacies.storefront_config 사용해야 함 |
-| **Template/Blocks** | ⚠️ | glycopharm_pharmacies에만 존재 (kpa에는 없음) |
-| **KPA 없이 단독** | ❌ | FK 제약: kpa_organizations에 먼저 행 필요 |
-
----
-
 ## 6. 구조 다이어그램
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │                    PLATFORM LEVEL                                │
 │                                                                  │
-│  platform_services ─┬─ glycopharm                               │
+│  platform_services ─┬─                                          │
 │                     ├─ glucoseview                               │
 │                     ├─ neture                                    │
 │                     ├─ kpa-society                               │
@@ -346,7 +296,7 @@ POST /store/:slug/tablet/requests    — 태블릿 주문
 ┌─────────────────────────────────────────────────────────────────┐
 │                  SERVICE-SPECIFIC LEVEL                           │
 │                                                                  │
-│  kpa_organizations ←──── PK 공유 ────→ glycopharm_pharmacies    │
+│  kpa_organizations ←──── PK 공유 ────→                          │
 │  ├─ storefront_config    │              ├─ storefront_config     │
 │  ├─ parent_id (계층)     │              ├─ template_profile      │
 │  └─ type, address...     │              ├─ storefront_blocks     │
@@ -375,11 +325,11 @@ POST /store/:slug/tablet/requests    — 태블릿 주문
 
 | # | 항목 | 레벨 | 설명 |
 |---|------|------|------|
-| R1 | Storefront config 이중 저장 | 🟡 중 | glycopharm + kpa 양쪽에 config 존재, 동기화 없음 |
-| R2 | KPA 종속 FK | 🟡 중 | glycopharm_pharmacies 생성 시 kpa_organizations 선행 필수 |
+| R1 | Storefront config 이중 저장 | 🟡 중 | kpa 양쪽에 config 존재, 동기화 없음 |
+| R2 | KPA 종속 FK | 🟡 중 | — |
 | R3 | Organization multi-service 미지원 | 🔴 고 | 조직-서비스 junction table 없음, PK 공유로 우회 |
-| R4 | Template/Blocks KPA 미존재 | 🟡 중 | template_profile, storefront_blocks가 glycopharm에만 존재 |
-| R5 | Legacy slug 이중 관리 | 🟢 저 | glycopharm_pharmacies.slug(legacy) + platform_store_slugs 병존 |
+| R4 | Template/Blocks KPA 미존재 | 🟡 중 | — |
+| R5 | Legacy slug 이중 관리 | 🟢 저 | — |
 
 ---
 
@@ -391,23 +341,6 @@ POST /store/:slug/tablet/requests    — 태블릿 주문
 | M2 | Organization-service enrollment | Medium | junction table 도입 검토 |
 | M3 | KPA FK 의존성 완화 | Medium | organization-core 기반 통합 FK 전환 |
 | M4 | Template/Blocks 범용화 | Low | platform-core로 이동 검토 |
-| M5 | Legacy slug 정리 | Low | glycopharm_pharmacies.slug 컬럼 제거 가능 |
+| M5 | Legacy slug 정리 | Low | — |
 
 ---
-
-## 9. GlycoPharm 노출 가능 여부 1차 판정
-
-| 항목 | 판정 | 근거 |
-|------|------|------|
-| 매장 URL 접근 | ✅ 가능 | platform_store_slugs 기반, 서비스 무관 |
-| 상품 진열 | ✅ 가능 | service_key 기반 다중 서비스 지원 |
-| 채널 관리 | ✅ 가능 | organization_channels는 서비스 무관 |
-| 매장 설정/디자인 | ⚠️ 조건부 | glycopharm_pharmacies에 설정 있으나 KPA FK 필수 |
-| 단독 운영 | ❌ 불가 | kpa_organizations 선행 레코드 필요 |
-
-**종합 판정**: GlycoPharm 약국이 O4O Storefront를 사용할 수 있으나,
-**kpa_organizations 의존성 제거가 선행되어야 완전한 범용 구조**가 된다.
-
----
-
-*Phase 2 예고: Product 구조 조사 (glycopharm_products, 상품 등록 흐름, 가격 체계)*

@@ -203,7 +203,7 @@ localhost origin 은 CORS 허용 대상이 아니어서 로그인 검증을 위�
 
 ### 13-B. 그 외 손대지 않은 항목
 
-Neture Header · supplier/partner shell 통합 · navigation · role/permission · 인증 · service switch · `NetureBottomNav`(MobileBottomNav) · PharmacyHub Header/Footer · KPA Footer · GlycoPharm Footer · 공개 Footer 디자인 · 법정문서 schema/API · 법정문서 내용.
+Neture Header · supplier/partner shell 통합 · navigation · role/permission · 인증 · service switch · `NetureBottomNav`(MobileBottomNav) · PharmacyHub Header/Footer · KPA Footer Footer · 공개 Footer 디자인 · 법정문서 schema/API · 법정문서 내용.
 dead component 는 발견해도 삭제하지 않았다.
 
 ---

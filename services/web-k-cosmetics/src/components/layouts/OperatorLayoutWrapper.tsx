@@ -6,7 +6,7 @@
  * WO-O4O-GLOBAL-LAYOUT-UNIFICATION-V1: GlobalHeader 추가, OperatorShell 헤더 제거
  * WO-O4O-KCOS-OPERATOR-MENU-ALIGN-WITH-KPA-V1:
  *   OperatorShell 우회 — K-Cosmetics-only KCosOperatorSidebar + 자체 layout 으로
- *   KPA-Society / GlycoPharm 와 동일한 domain IA (커뮤니티 운영 / 매장 HUB 운영 / 운영 공통) 적용.
+ *   KPA-Society 와 동일한 domain IA (커뮤니티 운영 / 매장 HUB 운영 / 운영 공통) 적용.
  *   KCosGlobalHeader(Layer A) + KCosOperatorSidebar(Layer C) 구조.
  *   logout 은 KCosGlobalHeader 가 자체 처리 — wrapper 에서는 호출하지 않음.
  * WO-O4O-SERVICE-OPERATOR-WORKSPACE-REALIGNMENT-V1:

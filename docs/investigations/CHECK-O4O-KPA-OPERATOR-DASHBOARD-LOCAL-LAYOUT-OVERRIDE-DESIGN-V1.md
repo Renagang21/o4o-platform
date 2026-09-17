@@ -71,7 +71,6 @@ KPA가 내부 파일 경로나 비공개 API에 의존할 필요가 없다. 신�
 공통 `OperatorDashboardLayout` 직접 소비처:
 
 - KPA Society
-- GlycoPharm
 - K-Cosmetics
 - Neture
 
@@ -186,7 +185,6 @@ block 내부 markup, grid, typography, icon, link 동작은 수정하지 않는�
 - `packages/operator-ux-core/src/index.ts`
 - backend dashboard service
 - route/guard/menu
-- GlycoPharm/K-Cosmetics/Neture dashboard
 
 ## 7. 타 서비스 영향
 
@@ -195,7 +193,6 @@ block 내부 markup, grid, typography, icon, link 동작은 수정하지 않는�
 | 서비스 | 영향 |
 |---|---|
 | KPA | local composer opt-in |
-| GlycoPharm | 기존 공통 layout 유지 |
 | K-Cosmetics | 기존 공통 layout 유지 |
 | Neture | 기존 공통 layout 유지 |
 
@@ -265,4 +262,3 @@ backend/API/권한/route/DB 0 files
 ## 12. 기존 작업공간 상태 보존
 
 기존 `docs/investigations/CHECK-CODEX-ENV-SETUP-V1.md`, `.codex/`, `apps/api-server/_msm.mjs`, `apps/api-server/_msmx.mjs` 및 Neture 작업 파일은 다른 세션 소유 상태로 보존했다.
-

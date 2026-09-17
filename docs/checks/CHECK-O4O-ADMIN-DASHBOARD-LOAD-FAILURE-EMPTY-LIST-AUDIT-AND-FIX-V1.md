@@ -46,7 +46,6 @@
 ### PASS (지속 오류 배너가 이미 렌더됨 — 무수정)
 
 `cosmetics-products/ProductListPage` · `cosmetics-products/BrandListPage` ·
-`glycopharm/products/ProductListPage` · `glycopharm/pharmacies/PharmacyListPage` ·
 `admin/settlements/AdminSettlementsPage` (재시도 버튼까지 보유) · `pages/PageList` ·
 `o4o-product-db/StoreProductRequestsPage` · `o4o-product-db/ProductMastersPage` ·
 `o4o-product-db/ProductCandidatesPage` · `o4o-product-db/ImageQualityPage` ·
@@ -145,7 +144,7 @@ docs/checks/CHECK-O4O-ADMIN-DASHBOARD-LOAD-FAILURE-EMPTY-LIST-AUDIT-AND-FIX-V1.m
 | push | `01fb9123f..7b48b8987 main -> main` |
 | Deploy Admin Dashboard (Cloud Run) | run `31358740808` **success** (전 단계 ✓, Verify deployment 포함) |
 | 검증 URL | `https://admin.neture.co.kr` |
-| 검증 계정 | `sohae2100@gmail.com` (roles: kpa/neture/glycopharm/cosmetics admin·operator, `platform:super_admin` **없음**) |
+| 검증 계정 | `sohae2100@gmail.com` |
 
 ### 9-1. 실패 주입 방법
 

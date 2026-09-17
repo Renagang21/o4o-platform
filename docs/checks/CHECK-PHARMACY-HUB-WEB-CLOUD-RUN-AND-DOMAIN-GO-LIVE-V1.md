@@ -51,7 +51,7 @@ WO 의 "변경하지 말고 보고한다" 에 따라 **GCP 인프라를 일절 �
 NEG 생성 0 · backend-service 생성 0 · url-map 수정 0 · 인증서 발급 0 · 도메인 매핑 0
 ```
 
-공유 LB(`o4o-global-lb`)는 neture · kpa-society · glycopharm · k-cosmetics · api 를 함께
+공유 LB(`o4o-global-lb`)는 neture · kpa-society · k-cosmetics · api 를 함께
 서빙한다. DNS 가 없으면 어차피 검증이 불가능하므로, 검증 없이 공유 프로덕션 LB 를 건드리지 않았다.
 
 ## 3. 도메인·LB·인증서 구조 (조사 결과 — 변경 없음)

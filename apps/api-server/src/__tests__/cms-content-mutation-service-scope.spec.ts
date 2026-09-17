@@ -50,7 +50,7 @@ import { createCmsContentMutationRoutes } from '../routes/cms-content/cms-conten
 const BASE_ROWS = [
   { id: 'kpa-canon', serviceKey: 'kpa-society', type: 'notice', title: 'KPA' },
   { id: 'kpa-legacy', serviceKey: 'kpa', type: 'notice', title: 'KPA legacy' },
-  { id: 'gp', serviceKey: 'pharmacy-hub', type: 'notice', title: 'GP' },
+  { id: 'ph2', serviceKey: 'pharmacy-hub', type: 'notice', title: 'PH 2' },
   { id: 'ph', serviceKey: 'pharmacy-hub', type: 'notice', title: 'PH' },
   { id: 'kcos-canon', serviceKey: 'k-cosmetics', type: 'notice', title: 'KCos' },
   { id: 'kcos-legacy', serviceKey: 'cosmetics', type: 'notice', title: 'KCos legacy' },
@@ -88,7 +88,6 @@ function makeApp() {
 
 const KPA_OP = 'kpa:operator';
 const KPA_ADMIN = 'kpa:admin';
-const GP_OP = 'pharmacy-hub:operator';
 const KCOS_OP = 'cosmetics:operator';
 const PH_OP = 'pharmacy-hub:operator';
 const PLATFORM_ADMIN = 'platform:super_admin';
@@ -139,7 +138,7 @@ describe('KPA operator — role scope(kpa) 와 CMS service key(kpa-society) 는 
 
 describe('KPA operator — 타 서비스 콘텐츠는 계속 차단된다', () => {
   it.each([
-    ['pharmacy-hub', 'gp'],
+    ['pharmacy-hub', 'ph2'],
     ['pharmacy-hub', 'ph'],
     ['k-cosmetics', 'kcos-canon'],
     ['cosmetics(legacy)', 'kcos-legacy'],
@@ -147,8 +146,8 @@ describe('KPA operator — 타 서비스 콘텐츠는 계속 차단된다', () =
     expect((await put(id, KPA_OP)).status).toBe(403);
   });
 
-  it('PATCH status: GP row → 403 (lifecycle 도 같은 경계)', async () => {
-    expect((await patchStatus('gp', KPA_OP)).status).toBe(403);
+  it('PATCH status: PH row → 403 (lifecycle 도 같은 경계)', async () => {
+    expect((await patchStatus('ph2', KPA_OP)).status).toBe(403);
     expect(transitioned).toBeNull();
   });
 
@@ -184,8 +183,8 @@ describe('§10 create 계약 — 신규 row 는 canonical service key 로 저장
     expect(saved.serviceKey).toBe('k-cosmetics');
   });
 
-  it('self-map 서비스(GP/PH)는 그대로 저장된다 (회귀 0)', async () => {
-    expect((await post(GP_OP, { serviceKey: 'pharmacy-hub', type: 'notice', title: 't' })).status).toBe(201);
+  it('self-map 서비스(PH)는 그대로 저장된다 (회귀 0)', async () => {
+    expect((await post(PH_OP, { serviceKey: 'pharmacy-hub', type: 'notice', title: 't' })).status).toBe(201);
     expect(saved.serviceKey).toBe('pharmacy-hub');
     expect((await post(PH_OP, { serviceKey: 'pharmacy-hub', type: 'knowledge', title: 't' })).status).toBe(201);
     expect(saved.serviceKey).toBe('pharmacy-hub');
@@ -237,7 +236,7 @@ describe('§11 service ownership 이전', () => {
 });
 
 describe('§13 platform admin 계약 유지', () => {
-  it.each(['kpa-canon', 'kpa-legacy', 'gp', 'kcos-canon', 'global'])(
+  it.each(['kpa-canon', 'kpa-legacy', 'ph2', 'kcos-canon', 'global'])(
     'cross-service PUT %s → 200',
     async (id) => {
       expect((await put(id, PLATFORM_ADMIN)).status).toBe(200);
@@ -245,11 +244,11 @@ describe('§13 platform admin 계약 유지', () => {
   );
 
   it('cross-service lifecycle → 200', async () => {
-    expect((await patchStatus('gp', PLATFORM_ADMIN)).status).toBe(200);
+    expect((await patchStatus('ph2', PLATFORM_ADMIN)).status).toBe(200);
   });
 
   it('platform admin 은 serviceKey 를 타 서비스로 이전할 수 있다 (canonical 저장)', async () => {
-    const res = await put('gp', PLATFORM_ADMIN, { title: 't', serviceKey: 'kpa' });
+    const res = await put('ph2', PLATFORM_ADMIN, { title: 't', serviceKey: 'kpa' });
     expect(res.status).toBe(200);
     expect(saved.serviceKey).toBe('kpa-society');
   });

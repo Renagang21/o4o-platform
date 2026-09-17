@@ -124,9 +124,6 @@ DataTable과 동일하게 body checkbox 자동 생성.
 
 | 파일 | selectedKeys | ActionBar | 비고 |
 |------|-------------|-----------|------|
-| `services/web-glycopharm/src/pages/operator/OrdersPage.tsx` | ✅ | ✅ | DataTable |
-| `services/web-glycopharm/src/pages/operator/PharmaciesPage.tsx` | ✅ | ✅ | DataTable |
-| `services/web-glycopharm/src/pages/operator/UsersPage.tsx` | ✅ | ✅ | DataTable |
 | `services/web-k-cosmetics/src/pages/operator/ProductsPage.tsx` | ✅ | ✅ | DataTable |
 | `services/web-kpa-society/src/pages/operator/ContentManagementPage.tsx` | ✅ | ✅ | DataTable |
 | `services/web-kpa-society/src/pages/operator/ForumDeleteRequestsPage.tsx` | ✅ | ✅ | DataTable |

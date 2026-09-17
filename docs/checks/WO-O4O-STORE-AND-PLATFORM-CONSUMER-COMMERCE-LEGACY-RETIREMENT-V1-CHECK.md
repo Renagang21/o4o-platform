@@ -44,7 +44,7 @@ commit `c98d95644`
 
 | # | 대상 | WO 사전 라벨 | **census 판정** | 근거 |
 |---|---|---|---|---|
-| L1 | GlycoPharm 매장 B2C checkout | LEGACY 후보 | **LEGACY_COMMERCE** | `checkout.controller.ts` 가 `organization_channels.channel_type='B2C'` (약국 조직) 게이트 → 소비자→매장 |
+| L1 | — | LEGACY 후보 | **LEGACY_COMMERCE** | `checkout.controller.ts` 가 `organization_channels.channel_type='B2C'` (약국 조직) 게이트 → 소비자→매장 |
 | L2 | K-Cosmetics 매장 판매 | LEGACY 후보 | **LEGACY_COMMERCE** | `cosmetics-order.controller.ts` header: `OrderType = RETAIL + serviceKey='cosmetics'`, 채널 `local`/`travel` = 소비자 축 |
 | L3 | KPA store-owner 판매·주문 관리 | LEGACY 후보 | **LEGACY_COMMERCE** | `kpa-checkout.controller.ts` header: `WO-O4O-KPA-CUSTOMER-COMMERCE-LOOP-V1`; `/checkout/store-orders*` 는 `sellerOrganizationId` 기준 = 매장이 판매자 |
 | L4 | Pharmacy-Hub store-owner 취소 | LEGACY 후보 | **⚠️ ACTIVE_CANONICAL (판정 반전)** | `PharmacyHub{Cart,Order,Payment}Controller` 전부 `WO-PHARMACY-HUB-B2B-*` — 매장이 **구매자**, 공급자가 판매자. 소비자 결제 아님 |
@@ -69,8 +69,7 @@ commit `c98d95644`
 
 ### 2-3. 이미 죽어 있던 코드 (404 호출)
 
-`services/web-glycopharm/src/api/store.ts` 의 Cart API 5종 · 소비자 Order API 4종은
-`/glycopharm/stores/:slug/cart`, `/glycopharm/stores/:slug/orders*` 를 호출하지만
+소비자 Order API 4종은
 백엔드 `store.controller.ts` 에는 **해당 라우트가 존재하지 않는다** (등록 엔드포인트 11개 전수 확인 — cart/orders 없음).
 → 호출 즉시 404. `DEAD`.
 
@@ -84,7 +83,6 @@ commit `c98d95644`
 
 | 경로 | 조치 | 파일 |
 |---|---|---|
-| `POST /api/v1/glycopharm/checkout` | **410** + 본문 전체 제거 | `routes/glycopharm/controllers/checkout.controller.ts` |
 | `POST /api/v1/cosmetics/orders` | **410** + 본문 전체 제거 | `routes/cosmetics/controllers/cosmetics-order.controller.ts` |
 | `POST /api/v1/kpa/checkout` | **410** + 본문 전체 제거 | `routes/kpa/controllers/kpa-checkout.controller.ts` |
 
@@ -130,7 +128,6 @@ PaymentCore/Toss 로직을 `// eslint-disable-next-line no-unreachable` 로 통�
 
 | 파일 | 이전 | 이후 |
 |---|---|---|
-| `glycopharm-payment.controller.ts` | 344 줄 | 51 줄 |
 | `cosmetics-payment.controller.ts` | 350 줄 | 51 줄 |
 | `kpa-payment.controller.ts` | 329 줄 | 51 줄 |
 
@@ -160,18 +157,6 @@ services/web-neture/src/lib/api/netureB2bPayments.ts:38         POST /neture/b2b
 
 ## 4. 단계 4 — 프론트엔드 UI / API / route 제거
 
-### 4-1. GlycoPharm (`services/web-glycopharm`)
-
-| 대상 | 조치 |
-|---|---|
-| `src/pages/store/StoreCart.tsx` | **삭제** |
-| `App.tsx` `store/:pharmacyId/cart` · `/kiosk/cart` · `/tablet/cart` | 라우트 3개 제거 |
-| `src/api/store.ts` Cart API 5종 · 소비자 Order API 4종 | 제거 (백엔드 부재 → 이미 404 DEAD, §2-3) |
-| `StoreProductDetail.tsx` 장바구니/바로구매 버튼 | 제거 → "구매는 매장에서 안내받으실 수 있습니다." |
-| `KioskLayout` · `StoreLayout` · `TabletLayout` 장바구니 NavLink | 제거 |
-
-**보존**: `StoreCartPage` (B2B 이벤트 오퍼 장바구니) — 매장이 구매자.
-
 ### 4-2. KPA (`services/web-kpa-society`)
 
 | 대상 | 조치 |
@@ -196,7 +181,7 @@ services/web-neture/src/lib/api/netureB2bPayments.ts:38         POST /neture/b2b
 
 | 축 | 확인 |
 |---|---|
-| `buyerId` 기준 주문 조회·취소 (KPA·Cosmetics·GlycoPharm) | 코드·라우트 무변경 |
+| `buyerId` 기준 주문 조회·취소 (KPA·Cosmetics) | 코드·라우트 무변경 |
 | `store_cart` + `EventOfferCartCheckoutService` (B2B 장바구니) | 무변경 |
 | Pharmacy-Hub store-owner cart/orders/payments (L4) | 무변경 |
 | Neture B2B payment | 무변경 |
@@ -211,11 +196,9 @@ services/web-neture/src/lib/api/netureB2bPayments.ts:38         POST /neture/b2b
 |---|---|
 | `tsc --noEmit` api-server | **통과** (0 error) |
 | `tsc --noEmit` web-kpa-society | **통과** |
-| `tsc --noEmit` web-glycopharm | **통과** |
 | `eslint` 변경 파일 전수 | **통과** (0 error, 0 warning) |
 | `pnpm --filter @o4o/api-server build` | **성공** |
 | `pnpm --filter @o4o/web-kpa-society build` | **성공** |
-| `pnpm --filter glycopharm-web build` | **성공** |
 | api-server jest 전수 | **3097/3098 passed** — 유일한 실패 2건은 `cwd` 의존 테스트(`content-guard`)이며 `apps/api-server` 에서 재실행 시 **170/170 통과**. 본 WO 무관 |
 
 ### 6-1. 테스트 수정
@@ -299,7 +282,7 @@ services/web-neture/src/lib/api/netureB2bPayments.ts:38         POST /neture/b2b
 | `online-sales-orders` (KPA) | `/online-sales/orders` | `checkout_orders` 를 `sellerOrganizationId` 로 조회 = **매장이 소비자에게 판매한 주문** | `LEGACY_STORE_COMMERCE` | **제거** |
 | `orders` (ALL_STORE_MENUS) | `/orders` | 매장 = 구매자 | `B2B_ACTIVE_CANONICAL` | 유지 |
 | `orders` (K-Cosmetics) | `/commerce/orders` | 매장 = 구매자 | `B2B_ACTIVE_CANONICAL` | 유지 |
-| `orders` (GlycoPharm) | `/commerce/orders` | 매장 = 구매자 | `B2B_ACTIVE_CANONICAL` | 유지 |
+| `orders` | `/commerce/orders` | 매장 = 구매자 | `B2B_ACTIVE_CANONICAL` | 유지 |
 | `orders` (KPA, '발주 내역') | `/commerce/orders` | 매장 = 구매자 | `B2B_ACTIVE_CANONICAL` | 유지 (라벨만 정비 완료) |
 
 제거 근거: 해당 행의 원본 주석 자체가 "판매(seller) 주문 관리" 라고 적고 있었고,
@@ -310,7 +293,7 @@ services/web-neture/src/lib/api/netureB2bPayments.ts:38         POST /neture/b2b
 `주문 관리 → /store/commerce/order-worktable — 주문 상태·배송` 안내는 작업대의 주문 실행 leg 은퇴 이후
 사실과 달랐다 → `발주 내역 → /store/commerce/orders` 로 정정.
 
-검증: `@o4o/web-kpa-society` · `@o4o/web-k-cosmetics` · `glycopharm-web` · `pharmacy-hub-web`
+검증: `@o4o/web-kpa-society` · `@o4o/web-k-cosmetics` · `pharmacy-hub-web`
 4개 서비스 build(tsc + vite) PASS, eslint PASS.
 
 ### 10-4. 배포
@@ -323,7 +306,7 @@ services/web-neture/src/lib/api/netureB2bPayments.ts:38         POST /neture/b2b
 | workflow | run | 결과 | revision |
 |---|---|---|---|
 | Deploy API Server (Cloud Run) | `32915904018` | success (7m47s) | `o4o-core-api-03463-bc4` |
-| Deploy Web Services (Cloud Run) | `32915904054` | success (3m33s) | `kpa-society-web-01890-d65` · `glycopharm-web-01318-rph` · `k-cosmetics-web-01062-q79` · `pharmacy-hub-web-00146-knf` · `neture-web-01515-8p8` · `kpa-branch-web-00062-tcr` |
+| Deploy Web Services (Cloud Run) | `32915904054` | success (3m33s) | `kpa-society-web-01890-d65` · `k-cosmetics-web-01062-q79` · `pharmacy-hub-web-00146-knf` · `neture-web-01515-8p8` · `kpa-branch-web-00062-tcr` |
 | Deploy Admin Dashboard (Cloud Run) | `32915904002` | success (3m13s) | — |
 | CodeQL Security Analysis | `32915904040` | success (3m56s) | — |
 
@@ -336,10 +319,8 @@ services/web-neture/src/lib/api/netureB2bPayments.ts:38         POST /neture/b2b
 **은퇴 경로 — 410 (실측)**
 
 ```text
-POST /api/v1/glycopharm/checkout          410  STORE_CONSUMER_ORDER_RETIRED
 POST /api/v1/cosmetics/orders             410  STORE_CONSUMER_ORDER_RETIRED
 POST /api/v1/kpa/checkout                 410  STORE_CONSUMER_ORDER_RETIRED
-POST /api/v1/glycopharm/payments/prepare  410  STORE_SALE_PAYMENT_DEPRECATED
 POST /api/v1/cosmetics/payments/prepare   410  STORE_SALE_PAYMENT_DEPRECATED
 POST /api/v1/kpa/payments/prepare         410  STORE_SALE_PAYMENT_DEPRECATED
 ```
@@ -378,7 +359,6 @@ PharmacyHub 의 `store-owner/cart · orders · payments/prepare · payments/conf
 https://kpa-society.co.kr/                          200
 https://kpa-society.co.kr/store/online-sales/orders 200  (은퇴 안내 화면)
 https://kpa-society.co.kr/store/commerce/orders     200  (canonical 발주 내역)
-https://glycopharm.co.kr/                           200
 https://k-cosmetics.site/                           200
 https://pharmacyhub.co.kr/                          200
 ```
@@ -402,4 +382,3 @@ https://pharmacyhub.co.kr/                          200
 - `O4O-STORE-COMMERCE-BOUNDARY-V1` §2 (매장 경영자는 소비자에게 판매하지 않는다 / 매장 판매·결제는 POS / 외부 판매채널이 실제 판매 주체) — 본 종료 결과와 **일치**. 수정 불필요.
 - `O4O-RETAIL-STABLE-V1` · `CHECKOUT-STABLE-DECLARATION-V1` — FROZEN 문서의 역사적 기술 계약은 **수정하지 않았다.**
 - 실제로 사실과 어긋나 고친 문서는 `shared-space-ui/guide/copy/kpa.ts` 안내 문구 1건뿐이다 (§10-3).
-

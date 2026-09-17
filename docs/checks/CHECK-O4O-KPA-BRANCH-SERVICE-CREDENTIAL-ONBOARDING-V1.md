@@ -49,13 +49,13 @@ kpa-branch 는 pharmacy-hub 선례와 동일한 **thin per-service join wrapper*
 | # | 항목 | 결과 | 근거 |
 |:--:|---|:--:|---|
 | ① | `serviceKey:'kpa-branch'` 정상 로그인 | **PASS** | `POST /kpa-branch/join` 201(`existingAccount:true`,`pendingApproval:true`) → membership `9e685362…` status `pending` role `kpa-branch:member` + credential 생성. 서비스 비밀번호 로그인 **200**, 플랫폼 비밀번호 로그인 **401** (credential 경로 확정, fallback 아님) |
-| ② | 동일 사용자의 다른 서비스 로그인 회귀 없음 | **PASS** | kpa-society / neture / glycopharm / pharmacy-hub 기존 비밀번호 **200** |
+| ② | 동일 사용자의 다른 서비스 로그인 회귀 없음 | **PASS** | kpa-society / neture / pharmacy-hub 기존 비밀번호 **200** |
 | ③ | kpa-branch 비밀번호 변경 후 타 서비스 불변 | **PASS** | `PUT /users/password` (`serviceKey:'kpa-branch'`) 200 → 새 비밀번호 200 / 직전 branch 비밀번호 401, 동시에 타 서비스 4종(renagang21) + 4종(sohae2100) 모두 **200**. 해당 사용자 다른 credential 5건 미변경 |
 | ④ | service membership 없는 사용자 차단 | **PASS** | `sohae2100@gmail.com`(활성·유효 비밀번호·platform 권한 보유) kpa-branch 로그인 **401 `SERVICE_NOT_MEMBER`**, 동일 계정 kpa-society **200**. platform 권한도 로그인 게이트를 우회하지 않음 |
 | ⑤ | branch membership 만 있고 service membership 없음 → 서비스 접근 불가 | **PASS (구조)** | 로그인 게이트는 `service_memberships` 만 조회하며 `BranchMembershipService.join` 은 `branch_memberships` 만 write 한다. ④ 가 게이트 실동작을 실증. 전용 fixture 는 만들지 않음(운영 DB write 최소화) |
 | ⑥ | service membership 만 있고 branch membership 없음 | **PASS** | 로그인 200 · `GET /me/branch` → `200 {data:null}` · `GET /branches/namgu/operator/site` → **403** |
-| ⑦ | branch operator 비밀번호 변경 권한이 자기 서비스로 닫힘 | **PASS** | `GET /api/v1/operator/members` → **403 `ROLE_REQUIRED`**. allow-list(`platform:super_admin`,`neture:*`,`glycopharm:*`,`cosmetics:*`,`kpa:*`)에 `kpa-branch:*` 없음 |
-| ⑧ | KPA Society / Neture / GlycoPharm / K-Cosmetics 회귀 없음 | **PASS** | 비밀번호 변경 전·후 및 fixture 정리 후 로그인 매트릭스 전부 200 |
+| ⑦ | branch operator 비밀번호 변경 권한이 자기 서비스로 닫힘 | **PASS** | `GET /api/v1/operator/members` → **403 `ROLE_REQUIRED`**. allow-list(`platform:super_admin`,`neture:*`,`cosmetics:*`,`kpa:*`)에 `kpa-branch:*` 없음 |
+| ⑧ | KPA Society / Neture / K-Cosmetics 회귀 없음 | **PASS** | 비밀번호 변경 전·후 및 fixture 정리 후 로그인 매트릭스 전부 200 |
 
 **미실행 1건**: `/admin/service-members` 승인 PATCH 의 런타임 확인. 현재 `kpa-branch:admin` 보유 계정이 없고, `platform:super_admin` 계정(`renariver21@gmail.com`, `super-admin@o4o.com`)의 비밀번호가 `docs/local/TEST-ACCOUNTS.local.md` 에 없다. 승인 로직은 기존 `MembershipApprovalService` 를 그대로 위임하므로 신규 로직이 아니며, 첫 실운영 분회 운영자 지정 시 확인한다.
 
@@ -69,7 +69,7 @@ kpa-branch 는 pharmacy-hub 선례와 동일한 **thin per-service join wrapper*
 ### 6-2. 본 검증 fixture (삭제 완료)
 
 삭제 전: `service_memberships` `9e685362-b921-419f-b6c0-4a4012e1aab6`(user `6967ebe0…`, `pending`, `kpa-branch:member`) 1건, `service_credentials(kpa-branch)` 1건, `branch_memberships` 0, `role_assignments LIKE 'kpa-branch%'` 0.
-`DELETE 1 / 1` → COMMIT. 삭제 후: kpa-branch membership 0 · credential 0. 해당 사용자의 다른 credential 5건(glycopharm·k-cosmetics·kpa-society·neture·pharmacy-hub) 및 `users.status='active'` 무변경.
+`DELETE 1 / 1` → COMMIT. 삭제 후: kpa-branch membership 0 · credential 0. 해당 사용자의 다른 credential 5건(k-cosmetics·kpa-society·neture·pharmacy-hub) 및 `users.status='active'` 무변경.
 정리 후 재확인: kpa-branch 로그인 401 `SERVICE_NOT_MEMBER`, 타 서비스 4종 200.
 
 ## 7. 축 분리 확인

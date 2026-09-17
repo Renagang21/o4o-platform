@@ -16,7 +16,7 @@
 > **PASS 근거 5종**:
 > 1. **4 서비스 `MyPageLayout` 골격 완료** — `@o4o/account-ui` 12+ 공통 컴포넌트 도입.
 > 2. **4 서비스 role boundary 양호** — `/mypage` 와 `/admin/operator/store/supplier/partner` workspace 완전 분리. operator/admin action 노출 0.
-> 3. **Tier 1 dead/stub/mock 정리 완료** — KPA withdrawRequest mock + `/event-offers/history` dead link + `MyCompletionsPage` legacy + GP settings stub 3건 정리 (`2c2698dd2`).
+> 3. **Tier 1 dead/stub/mock 정리 완료** — KPA withdrawRequest mock + `/event-offers/history` dead link + `MyCompletionsPage` legacy settings stub 3건 정리 (`2c2698dd2`).
 > 4. **Neture backend controller 신설 불필요 확정** — Option A 권고 (`34adbe145`). 공통 endpoint 100% cover + workspace 경계 모범 보존.
 > 5. **개인정보 / 보안 위험 낮음** — serviceKey 스코핑 + role gating + 본인 한정.
 >
@@ -56,7 +56,7 @@
 | Commit | 종류 | 영역 | 변경량 |
 |--------|------|------|--------|
 | `d13979475` | docs (IR) | 재점검 — 4 서비스 read-only audit + 잔재 10건 식별 + 분류표 | +581 |
-| `2c2698dd2` | feat | Tier 1 cleanup — KPA 4 파일 + GP 1 파일 (5 cleanup) | +36 / -357 (net -321) |
+| `2c2698dd2` | feat | Tier 1 cleanup — KPA 4 파일 1 파일 (5 cleanup) | 36 / -357 (net -321) |
 | `34adbe145` | docs (IR) | Neture mypage backend 결정 — Option A 확정 | +296 |
 
 → 총 3 commit, +913 / -357 (net 정직 정리 + 정책 문서화).
@@ -69,18 +69,18 @@
 
 **선행 IR §5.2 매트릭스 재확인**:
 
-| 컴포넌트 | KPA | GlycoPharm | K-Cosmetics | Neture | 정합 |
-|---------|:---:|:----------:|:-----------:|:------:|:----:|
-| `MyPageLayout` | ✅ | ✅ | ✅ | ✅ | A |
-| `ProfileCard` | ❌ (자체) | ✅ | ✅ | ✅ | B (KPA 편차) |
-| `ProfileInfoField` | (자체) | ✅ | ✅ | ✅ | A |
-| `MyPageNavigation` | ✅ | ✅ | ✅ | (NetureLayout) | A |
-| `MyPageHubCard` | (자체) | ✅ | ✅ | ✅ | A |
-| `MyRequestsInbox` | ✅ | ✅ | ✅ | ❌ (의도) | A (Neture 의도) |
-| `MyPageLoadingState/EmptyState` | ✅ | ✅ | ✅ | ✅ | A |
-| `PasswordChangeModal` | ✅ | ✅ | ✅ | ✅ | A |
-| `SettingsSection` | (자체) | ✅ | ✅ | ✅ | A |
-| `RoleBadge` | ✅ | ✅ | ✅ | ✅ | A |
+| 컴포넌트 | KPA | K-Cosmetics | Neture | 정합 |
+| --------- | :---: | :-----------: | :------: | :----: |
+| `MyPageLayout` | ✅ | ✅ | ✅ | A |
+| `ProfileCard` | ❌ (자체) | ✅ | ✅ | B (KPA 편차) |
+| `ProfileInfoField` | (자체) | ✅ | ✅ | A |
+| `MyPageNavigation` | ✅ | ✅ | (NetureLayout) | A |
+| `MyPageHubCard` | (자체) | ✅ | ✅ | A |
+| `MyRequestsInbox` | ✅ | ✅ | ❌ (의도) | A (Neture 의도) |
+| `MyPageLoadingState/EmptyState` | ✅ | ✅ | ✅ | A |
+| `PasswordChangeModal` | ✅ | ✅ | ✅ | A |
+| `SettingsSection` | (자체) | ✅ | ✅ | A |
+| `RoleBadge` | ✅ | ✅ | ✅ | A |
 
 → `@o4o/account-ui` 의 12+ 공통 컴포넌트 4 서비스 도입. KPA 의 `ProfileCard` 미사용은 UI 편차 (B 분류).
 
@@ -89,7 +89,7 @@
 | 서비스 | `/mypage` 진입 | operator/admin action 노출 | workspace 분리 |
 |--------|:-------------:|:----------------------:|:--------------:|
 | KPA | MyPageGuard (인증만) | ❌ | ✅ `/operator/*` `/admin/*` 별도 |
-| GP | SoftGuard feature="mypage" | ❌ | ✅ |
+| SoftGuard feature="mypage" | ❌ | ✅ |
 | K-Cos | ProtectedRoute | ❌ | ✅ |
 | Neture | 인증만 | ❌ | ✅ 4 workspace 완전 분리 (`/supplier`, `/partner`, `/account/{supplier,partner}`) |
 
@@ -104,7 +104,7 @@
 | 1 | KPA `MySettingsPage` withdrawRequest mock (모달 + handler + state + styles 8종) 제거 | 위험 fail-open mock 제거 (-138 라인) |
 | 2 | KPA `MyDashboardPage` `/event-offers/history` Link 제거 (Card 유지) | dead link 정리, 의미 손실 0 |
 | 3 | KPA `MyCompletionsPage.tsx` legacy 파일 삭제 + barrel export 제거 | -185 라인 (redirect 보존) |
-| 4 | GP `MySettingsPage` 2FA "준비 중" 정직 표시 + 알림설정 섹션 제거 + 계정 탈퇴 button 제거 | UI stub 3건 fail-closed |
+| 4 `MySettingsPage` 2FA "준비 중" 정직 표시 + 알림설정 섹션 제거 + 계정 탈퇴 button 제거 | UI stub 3건 fail-closed |
 | 5 | K-Cos `MySettingsPage` 점검 (이미 stub 0, 변경 없음) | IR 보고 정정 |
 
 → **5/5 정직 정리 완료**. fail-closed 원칙 + backend API 신설 0.
@@ -215,10 +215,6 @@
 |------|------|-------------------|
 | `apps/api-server/src/entities/cart/StoreCartItem.entity.ts` | Store Cart entity | ✅ 격리 (영역 외) |
 | `apps/api-server/src/services/cart/store-cart.service.ts` | Store Cart service | ✅ 격리 |
-| `services/web-{glycopharm,k-cosmetics,kpa-society}/src/api/storeCart.ts` | Store Cart API client (3 서비스) | ✅ 격리 |
-| `services/web-{glycopharm,k-cosmetics}/src/components/common/Footer.tsx` | Footer (2 서비스) | ✅ 격리 |
-| `services/web-glycopharm/src/pages/ContactPage.tsx` | Contact 페이지 | ✅ 격리 |
-| `services/web-{glycopharm,kpa-society}/src/pages/pharmacy/HubB2BCatalogPage.tsx` | Hub B2B Catalog (2 서비스) | ✅ 격리 |
 | `services/web-k-cosmetics/src/pages/hub/HubB2BPage.tsx` | K-Cos Hub B2B | ✅ 격리 |
 
 → 모두 Store Hub / Cart / Footer / B2B 트랙 — **본 My Page 공통화 축과 영역 완전 분리**. path-restricted commit 으로 정확 격리 가능.

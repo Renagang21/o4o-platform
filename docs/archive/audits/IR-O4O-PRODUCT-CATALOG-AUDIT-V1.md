@@ -61,7 +61,6 @@ Barcode 정책, CSV Import, Approval Flow가 정상 동작하는 것을 확인�
 | 도메인 | 테이블 | barcode 컬럼 | 타입 | UNIQUE | ProductMaster 연결 |
 |--------|--------|-------------|------|--------|-------------------|
 | **Core SSOT** | `product_masters` | `barcode` | VARCHAR(14) | **YES** | - (자기 자신) |
-| Glycopharm | `glycopharm_products` | `barcodes` | JSONB[] | NO | **NO** |
 | Cosmetics | `cosmetics_products` | `barcodes` | JSONB[] | NO | **NO** |
 | Neture | `neture_products` | `barcodes` | JSONB[] | NO | **NO** |
 | Store Local | `store_local_products` | (없음) | - | - | **NO** |
@@ -291,8 +290,6 @@ ON CONFLICT (master_id, supplier_id) DO UPDATE SET
 
 ### 7.2 Checkout Flow
 
-**파일**: `apps/api-server/src/routes/glycopharm/controllers/checkout.controller.ts`
-
 ```typescript
 // 입력: productId (UUID)
 interface CheckoutItemDto {
@@ -309,8 +306,6 @@ const products = await productRepo.find({
 
 ### 7.3 상품 검색
 
-**파일**: `apps/api-server/src/routes/glycopharm/repositories/glycopharm.repository.ts`
-
 ```
 검색 대상: name, sku, description (ILIKE)
 barcode 검색: 미포함
@@ -323,7 +318,6 @@ barcode 검색: 미포함
 - barcode 스캔 없음
 
 **평가**: POS barcode lookup은 향후 구현 필요.
-`glycopharm_products.barcodes` 필드는 예약됨 (WO-PRODUCT-IMAGES-AND-BARCODE-UNBLOCK-V1).
 ProductMaster 기반 barcode lookup 엔드포인트 추가 필요.
 
 ---
@@ -416,7 +410,6 @@ PRIVATE 승인:
                        └──────────────┘ └──────────────────┘
 
   별도 도메인 (ProductMaster 미연결):
-    glycopharm_products   — 약국 자체 카탈로그
     cosmetics_products    — 화장품 카탈로그
     neture_products       — 네처 카탈로그
     store_local_products  — 매장 전시용 (Display Domain Only)
@@ -446,7 +439,7 @@ ProductMaster → SupplierProductOffer → OrganizationProductListing 경로로 
 
 ### RISK-3: 도메인별 상품 테이블 미통합 (INFO)
 
-`glycopharm_products`, `cosmetics_products`, `neture_products`는 각각 독립 테이블로,
+`cosmetics_products`, `neture_products`는 각각 독립 테이블로
 `product_masters`와 연결되어 있지 않음.
 
 **현재 영향**: 없음 — 이 테이블들은 레거시/도메인별 독립 카탈로그.
@@ -499,7 +492,6 @@ Display Domain으로 명확히 격리됨. Commerce 연결 없음.
 ### Domain Products
 | 파일 | 테이블 |
 |------|--------|
-| `apps/api-server/src/routes/glycopharm/entities/glycopharm-product.entity.ts` | glycopharm_products |
 | `apps/api-server/src/routes/cosmetics/entities/cosmetics-product.entity.ts` | cosmetics_products |
 | `apps/api-server/src/routes/neture/entities/neture-product.entity.ts` | neture_products |
 | `apps/api-server/src/routes/platform/entities/store-local-product.entity.ts` | store_local_products |
@@ -517,7 +509,6 @@ Display Domain으로 명확히 격리됨. Commerce 연결 없음.
 |------|------|
 | `apps/api-server/src/modules/neture/neture.routes.ts` | CSV Import 라우트 |
 | `apps/api-server/src/routes/kpa/controllers/operator-product-applications.controller.ts` | 승인 관리 |
-| `apps/api-server/src/routes/glycopharm/controllers/checkout.controller.ts` | Checkout |
 | `apps/api-server/src/routes/o4o-store/controllers/pharmacy-products.controller.ts` | 약국 상품 |
 | `apps/api-server/src/routes/o4o-store/controllers/store-channel-products.controller.ts` | 채널 상품 |
 | `apps/api-server/src/routes/o4o-store/controllers/tablet.controller.ts` | 태블릿 채널 |

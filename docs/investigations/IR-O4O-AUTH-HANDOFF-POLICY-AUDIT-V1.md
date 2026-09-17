@@ -23,7 +23,7 @@
 **핵심 발견 3 가지:**
 
 1. ❌ **Handoff 의 generateHandoff / exchangeHandoff 는 "target service active membership" 을 검증하지 않는다.** Identity V2 §7.2 해석 A 의 전제 "단, 대상 서비스의 active membership 이 확인되어야 한다 (이미 그렇게 동작)" 는 **사실과 다름** — 코드는 그렇게 동작하지 않는다.
-2. ⚠️ **Handoff 의 outbound 발급 호출처는 web-account/DashboardPage 1 곳뿐.** 4 user-facing service (KPA / GP / K-Cosmetics / Neture) 어느 곳에서도 outbound `/auth/handoff` 발급 호출 없음. 그러나 **inbound `/handoff` 페이지 (HandoffPage)** 는 5 service 모두 구현·라우트 등재.
+2. ⚠️ **Handoff 의 outbound 발급 호출처는 web-account/DashboardPage 1 곳뿐.** 4 user-facing service (KPA / K-Cosmetics / Neture) 어느 곳에서도 outbound `/auth/handoff` 발급 호출 없음. 그러나 **inbound `/handoff` 페이지 (HandoffPage)** 는 4 service 모구현·라우트 등재.
 3. ✅ **Handoff 자체가 V2 와 본질적으로 충돌하지는 않는다.** V2 §7.3 의 잠정 입장 (해석 A — Identity reuse, credential reuse 아님) 은 유효 — 단, 위 ① 의 갭만 채우면 정합.
 
 → **즉, 삭제 대상이 아니라 "정책 보존 + 안전판 추가" 가 정답.** Service Join API 가 instant active 우회를 pending 정책으로 정렬한 것과 동일한 V2 정합 작업이 Handoff 에도 필요.
@@ -43,7 +43,7 @@
 |---|---|
 | 조사일 | 2026-05-23 |
 | Repo 시점 | origin/main 와 일치 |
-| 조사 범위 | apps/api-server + services/web-{account,kpa-society,glycopharm,k-cosmetics,neture} + packages |
+| 조사 범위 | apps/api-server + services/web-{account,kpa-society,k-cosmetics,neture} + packages |
 | 도구 | Grep / Read (정적 분석) + Identity V2 doc 교차참조 |
 | **수정 행위** | **없음** (조사 전용) |
 
@@ -112,7 +112,7 @@ POST /api/v1/auth/handoff/exchange → HandoffController.exchangeHandoff   (publ
 |---|---|
 | `services/web-account/src/pages/DashboardPage.tsx:65` | `fetch('/api/v1/auth/handoff', { method: 'POST', body: { targetServiceKey }})` — "열기" 버튼 |
 
-→ **4 user-facing service (KPA / GP / K-Cosmetics / Neture) 어느 곳에서도 outbound handoff 발급 호출 없음.**
+→ **4 user-facing service (KPA / K-Cosmetics / Neture) 어느 곳에서도 outbound handoff 발급 호출 없음.**
 
 ### 3.2 Inbound (POST /auth/handoff/exchange)
 
@@ -122,7 +122,6 @@ POST /api/v1/auth/handoff/exchange → HandoffController.exchangeHandoff   (publ
 |---|---|---|
 | web-account | `services/web-account/src/pages/HandoffPage.tsx:33` | cookie (credentials: include) |
 | web-kpa-society | `services/web-kpa-society/src/pages/HandoffPage.tsx:37` | **localStorage** (`o4o_accessToken/refreshToken`) |
-| web-glycopharm | `services/web-glycopharm/src/pages/HandoffPage.tsx:35` | **localStorage** (`glycopharm_access_token` / `glycopharm_refresh_token`) |
 | web-k-cosmetics | `services/web-k-cosmetics/src/pages/HandoffPage.tsx:32` | **localStorage** (`o4o_accessToken/refreshToken`) |
 | web-neture | `services/web-neture/src/pages/HandoffPage.tsx:32` | cookie (api client default) |
 
@@ -141,7 +140,6 @@ POST /api/v1/auth/handoff/exchange → HandoffController.exchangeHandoff   (publ
 |---|:---:|---|
 | `services/web-account/src/App.tsx` | 10, 17 | direct import → `<Route path="/handoff" element={<HandoffPage />} />` |
 | `services/web-kpa-society/src/App.tsx` | 24, 652 | **lazy** import → `<Route path="/handoff" element={<HandoffPage />} />` |
-| `services/web-glycopharm/src/App.tsx` | 32, 406 | direct import → `<Route path="handoff" element={<HandoffPage />} />` (nested) |
 | `services/web-k-cosmetics/src/App.tsx` | 36, 269 | direct import → `<Route path="handoff" element={<HandoffPage />} />` (nested) |
 | `services/web-neture/src/App.tsx` | 50, 609 | direct import → `<Route path="/handoff" element={<HandoffPage />} />` |
 
@@ -282,7 +280,7 @@ POST /api/v1/auth/handoff/exchange → HandoffController.exchangeHandoff   (publ
 ### 8.3 동시 보강 권고 (옵션)
 
 - **outbound `/auth/handoff` 호출은 web-account/DashboardPage 1 곳만** 이라는 사실을 운영 가시성 차원에서 명시 (audit log 또는 metric).
-- HandoffPage 의 localStorage strategy 가 service 별로 상이 (KPA/GP/KCos: localStorage / Neture/Account: cookie) — 본 IR 의 영역은 아니지만 별도 LOWER PRIORITY 정합 정리 항목.
+- HandoffPage 의 localStorage strategy 가 service 별로 상이 (KPA/KCos: localStorage / Neture/Account: cookie) — 본 IR 의 영역은 아니지만 별도 LOWER PRIORITY 정합 정리 항목.
 
 ---
 

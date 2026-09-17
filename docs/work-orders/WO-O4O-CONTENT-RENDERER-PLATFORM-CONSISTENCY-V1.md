@@ -18,7 +18,7 @@ WO-O4O-CONTENT-RENDERER-PLATFORM-CONSISTENCY-V1
 - **YouTube iframe 제거** — LMS 강의·상품상세·공지·자료실(기본 variant 사용처)에서 편집기의 YouTube가 통째로 사라짐
 - **Table CSS 미적용** — 렌더러 어디에도 표 CSS 없음
 - **표면별 서로 다른 sanitize 정책**
-- **독립 Renderer 사용** — signage-player·glycopharm `CourseDetailPage`·main-site forum
+- **독립 Renderer 사용** — signage-player `CourseDetailPage`·main-site forum
 
 이는 **"O4O 콘텐츠는 어디에서 보더라도 동일하게 보인다"** 는 플랫폼 원칙(IR §1)을 위반한다.
 
@@ -77,7 +77,6 @@ WO-O4O-CONTENT-RENDERER-PLATFORM-CONSISTENCY-V1
 | 표면 | 현 상태 | 방침 |
 |---|---|---|
 | **signage-player** | 자체 `ContentRenderer`(별도 패키지, html 타입 sandboxed iframe, rich_text만 sanitizeHtml) | 재생 모델이 특수(sandbox)하므로 **공통 렌더러 강제 통합은 신중**. 최소한 **동일 렌더링 계약**(YouTube 허용·이미지 CSS) 만족하도록 정렬. 완전 통합은 별도 판단 |
-| **glycopharm `CourseDetailPage`** | raw `sanitizeHtml` 직접 호출 → 이미지 CSS·YouTube 둘 다 누락 | **`ContentRenderer` 로 이관** (단순 마이그레이션) |
 | **main-site forum** | 자체 로컬 `ContentRenderer`(블록 배열 전용, @o4o와 무관) | 블록 렌더 모델 차이 확인 후 계약 정렬 또는 범위 외 명시 |
 
 ---

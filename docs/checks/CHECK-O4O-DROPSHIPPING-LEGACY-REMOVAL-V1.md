@@ -112,7 +112,6 @@
 
 | 대상 | 사유 |
 |------|------|
-| GlycoPharm `serviceType: 'dropshipping'` (`glycopharm/controllers/{admin,application,store-applications}.controller.ts`, `glycopharm-application.entity.ts`, `auth-register.controller.ts:982`, `services/web-glycopharm/**`) | **LIVE 도메인 값**. 매장 신청 유형 enum 이며 프로덕션 데이터 존재. 삭제 패키지와 무관 |
 | `OrderType.DROPSHIPPING` (`packages/ecommerce-core`) | E-commerce Core 주문 유형. CLAUDE.md §4 에 명시된 현행 계약 |
 | `User.ts` 의 `supplier?/seller?/partner?` · `getDropshippingRoles()` | 소비처 0 이나 **F10 O4O Core Freeze (Auth)** 대상. 별도 WO 필요 |
 | 마이그레이션 23건 | 감사 §5-4 `RETAIN`. `typeorm_migrations` 이력 대조 근거 |
@@ -159,7 +158,6 @@
 | `pnpm install --frozen-lockfile` | **EXIT 0** |
 | api-server `tsc --noEmit` | **삭제 관련 오류 0** (잔존 오류는 전부 병렬 세션의 `src/scripts/hff-*` · `otc-*`, 본 WO 미접촉 파일) |
 | admin-dashboard `tsc --noEmit` | **EXIT 0** |
-| services `web-neture` / `web-glycopharm` / `signage-player-web` / `web-kpa-society` typecheck | **EXIT 0** |
 | api-server `jest` | **EXIT 0** — 73 suites / 1339 tests PASS |
 | admin-dashboard `vitest` | **EXIT 0** — 14 files / 239 tests PASS |
 | `pnpm run build:packages` | **EXIT 0** |

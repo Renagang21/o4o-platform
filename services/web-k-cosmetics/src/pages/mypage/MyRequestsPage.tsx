@@ -1,7 +1,6 @@
 /**
  * MyRequestsPage — 내 신청 내역 (K-Cosmetics)
  *
- * WO-O4O-MYPAGE-MY-REQUESTS-INBOX-GLYCO-KCOS-ROUTE-V1
  *
  * Frontend aggregation:
  *   1) GET /cosmetics/stores/application/me — 매장 입점 신청 (store_application)

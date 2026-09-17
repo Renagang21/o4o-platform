@@ -3,7 +3,7 @@
 > **O4O 운영자 회원관리 표준 정의를 위한 현황 조사 보고서**
 >
 > 조사일: 2026-03-18
-> 대상: 4개 서비스 (neture, glycopharm, kpa-society, k-cosmetics) + glucoseview + account
+> 대상: 3개 서비스 (neture, kpa-society, k-cosmetics) + glucoseview + account
 
 ---
 
@@ -22,8 +22,7 @@ O4O 플랫폼의 운영자 회원관리는 **3-Layer 아키텍처**로 구성:
 | 서비스 | Frontend | Backend | Detail Page | Role Mgmt | Business Info | 상태 |
 |--------|----------|---------|-------------|-----------|---------------|------|
 | **K-Cosmetics** | UsersPage + UserDetailPage | MembershipConsole | ✅ 완전 | ✅ CRUD | ✅ 표시 | **가장 완성도 높음** |
-| **GlycoPharm** | UsersPage + UserDetailPage | MembershipConsole | ✅ 기본 | ❌ 없음 | ❌ 없음 | 기능 일부 누락 |
-| **GlucoseView** | UsersPage + UserDetailPage | MembershipConsole | ✅ 기본 | ❌ 없음 | ❌ 없음 | GlycoPharm과 동일 |
+| **GlucoseView** | UsersPage + UserDetailPage | MembershipConsole | ✅ 기본 | ❌ 없음 | ❌ 없음 | — |
 | **Neture** | UsersManagementPage | MembershipConsole + 자체 | ❌ 없음 | ❌ 없음 | ❌ 없음 | 목록만, 상세 없음 |
 | **KPA Society** | MembersPage (mock) | 자체 member.controller | ❌ 목업 | ❌ 없음 | N/A | **API 미연동** |
 
@@ -156,7 +155,7 @@ COMMIT
 |------|------|------|
 | `id` | UUID PK | |
 | `userId` | UUID FK→users | |
-| `serviceKey` | VARCHAR(100) | 서비스 키: neture/glycopharm/glucoseview/kpa-society/k-cosmetics |
+| `serviceKey` | VARCHAR(100) | — |
 | `status` | VARCHAR(50) | pending/active/suspended/rejected |
 | `role` | VARCHAR(50) | 서비스 내 역할 (default: 'customer') |
 | `approvedBy` | UUID | 승인자 |
@@ -258,25 +257,11 @@ DELETE /api/v1/operator/members/{userId}/roles/{role}
 DELETE /api/v1/operator/members/{userId}
 ```
 
-### 4.2 GlycoPharm
-
-**라우트:**
-- `/operator/users` → [UsersPage.tsx](services/web-glycopharm/src/pages/operator/UsersPage.tsx)
-- `/operator/users/:id` → [UserDetailPage.tsx](services/web-glycopharm/src/pages/operator/UserDetailPage.tsx)
-
-**K-Cosmetics 대비 차이점:**
-- ❌ 역할 관리 섹션 없음
-- ❌ 사업자 정보 표시 없음
-- 상태 변경 로직 단순 (membershipId 기반 대신 userId 기반)
-- 나머지 기본 구조 동일
-
 ### 4.3 GlucoseView
 
 **라우트:**
 - `/operator/users` → [UsersPage.tsx](services/web-glucoseview/src/pages/operator/UsersPage.tsx)
 - `/operator/users/:id` → [UserDetailPage.tsx](services/web-glucoseview/src/pages/operator/UserDetailPage.tsx)
-
-**GlycoPharm과 거의 동일** (동일 패턴 복사)
 
 ### 4.4 Neture
 
@@ -309,39 +294,39 @@ DELETE /api/v1/operator/members/{userId}
 
 ### 5.1 Frontend 기능
 
-| 기능 | K-Cosmetics | GlycoPharm | GlucoseView | Neture | KPA |
-|------|:-----------:|:----------:|:-----------:|:------:|:---:|
-| 회원 목록 | ✅ | ✅ | ✅ | ✅ | ⚠️ 목업 |
-| 검색 (이름/이메일) | ✅ | ✅ | ✅ | ✅ | ⚠️ 목업 |
-| 상태 필터 | ✅ | ✅ | ✅ | ✅ | ⚠️ 목업 |
-| 통계 대시보드 | ✅ | ✅ | ✅ | ✅ | ⚠️ 목업 |
-| 탭 (전체/대기) | ✅ | ✅ | ✅ | ✅ | ❌ |
-| 페이지네이션 | ✅ | ✅ | ✅ | ✅ | ❌ |
-| **상세 페이지** | ✅ | ✅ | ✅ | ❌ | ❌ |
-| 인라인 승인/거절 | ✅ | ✅ | ✅ | ✅ | ❌ |
-| 인라인 정지/활성화 | ✅ | ✅ | ✅ | ✅ | ❌ |
-| 비밀번호 변경 | ✅ | ✅ | ✅ | ✅ | ❌ |
-| 프로필 편집 | ✅ | ✅ | ✅ | ❌ | ❌ |
-| **사업자 정보 표시** | ✅ | ❌ | ❌ | ❌ | N/A |
-| **역할 관리 (CRUD)** | ✅ | ❌ | ❌ | ❌ | ❌ |
-| **멤버십 승인/거절** | ✅ | ✅ | ✅ | ⚠️ 자체 | ❌ |
-| 삭제 | ✅ | ✅ | ✅ | ✅ | ❌ |
-| 새로고침 | ✅ | ✅ | ✅ | ✅ | ❌ |
+| 기능 | K-Cosmetics | GlucoseView | Neture | KPA |
+| ------ | :-----------: | :-----------: | :------: | :---: |
+| 회원 목록 | ✅ | ✅ | ✅ | ⚠️ 목업 |
+| 검색 (이름/이메일) | ✅ | ✅ | ✅ | ⚠️ 목업 |
+| 상태 필터 | ✅ | ✅ | ✅ | ⚠️ 목업 |
+| 통계 대시보드 | ✅ | ✅ | ✅ | ⚠️ 목업 |
+| 탭 (전체/대기) | ✅ | ✅ | ✅ | ❌ |
+| 페이지네이션 | ✅ | ✅ | ✅ | ❌ |
+| **상세 페이지** | ✅ | ✅ | ❌ | ❌ |
+| 인라인 승인/거절 | ✅ | ✅ | ✅ | ❌ |
+| 인라인 정지/활성화 | ✅ | ✅ | ✅ | ❌ |
+| 비밀번호 변경 | ✅ | ✅ | ✅ | ❌ |
+| 프로필 편집 | ✅ | ✅ | ❌ | ❌ |
+| **사업자 정보 표시** | ✅ | ❌ | ❌ | N/A |
+| **역할 관리 (CRUD)** | ✅ | ❌ | ❌ | ❌ |
+| **멤버십 승인/거절** | ✅ | ✅ | ⚠️ 자체 | ❌ |
+| 삭제 | ✅ | ✅ | ✅ | ❌ |
+| 새로고침 | ✅ | ✅ | ✅ | ❌ |
 
 ### 5.2 Backend API Coverage
 
-| 엔드포인트 | K-Cosmetics | GlycoPharm | GlucoseView | Neture | KPA |
-|-----------|:-----------:|:----------:|:-----------:|:------:|:---:|
-| GET /operator/members | ✅ | ✅ | ✅ | ✅ | ❌ (자체) |
-| GET /operator/members/stats | ✅ | ✅ | ✅ | ✅ | ❌ |
-| GET /operator/members/:userId | ✅ | ✅ | ✅ | ❌ | ❌ |
-| PUT /operator/members/:userId | ✅ | ✅ | ✅ | ❌ | ❌ |
-| PATCH /operator/members/:userId/status | ✅ | ✅ | ✅ | ⚠️ 부분 | ❌ |
-| PATCH /operator/members/:id/approve | ✅ | ✅ | ✅ | ⚠️ 자체 | ❌ |
-| PATCH /operator/members/:id/reject | ✅ | ✅ | ✅ | ⚠️ 자체 | ❌ |
-| POST /operator/members/:userId/roles | ✅ | ❌ | ❌ | ❌ | ❌ |
-| DELETE /operator/members/:userId/roles/:role | ✅ | ❌ | ❌ | ❌ | ❌ |
-| DELETE /operator/members/:userId | ✅ | ✅ | ✅ | ✅ | ❌ |
+| 엔드포인트 | K-Cosmetics | GlucoseView | Neture | KPA |
+| ----------- | :-----------: | :-----------: | :------: | :---: |
+| GET /operator/members | ✅ | ✅ | ✅ | ❌ (자체) |
+| GET /operator/members/stats | ✅ | ✅ | ✅ | ❌ |
+| GET /operator/members/:userId | ✅ | ✅ | ❌ | ❌ |
+| PUT /operator/members/:userId | ✅ | ✅ | ❌ | ❌ |
+| PATCH /operator/members/:userId/status | ✅ | ✅ | ⚠️ 부분 | ❌ |
+| PATCH /operator/members/:id/approve | ✅ | ✅ | ⚠️ 자체 | ❌ |
+| PATCH /operator/members/:id/reject | ✅ | ✅ | ⚠️ 자체 | ❌ |
+| POST /operator/members/:userId/roles | ✅ | ❌ | ❌ | ❌ |
+| DELETE /operator/members/:userId/roles/:role | ✅ | ❌ | ❌ | ❌ |
+| DELETE /operator/members/:userId | ✅ | ✅ | ✅ | ❌ |
 
 ---
 
@@ -364,11 +349,9 @@ DELETE /api/v1/operator/members/{userId}
       "phone": "010-1234-5678",
       "status": "active",
       "isActive": true,
-      "roles": ["glycopharm:operator"],
       "memberships": [
         {
           "id": "uuid",
-          "serviceKey": "glycopharm",
           "status": "active",
           "role": "operator",
           "approvedBy": "admin-uuid",
@@ -414,7 +397,6 @@ DELETE /api/v1/operator/members/{userId}
     "roles": [
       {
         "id": "uuid",
-        "role": "glycopharm:operator",
         "isActive": true,
         "scopeType": "global",
         "scopeId": null,
@@ -424,7 +406,6 @@ DELETE /api/v1/operator/members/{userId}
     "memberships": [
       {
         "id": "uuid",
-        "serviceKey": "glycopharm",
         "status": "active",
         "role": "operator",
         "approvedBy": "admin-uuid",
@@ -456,7 +437,7 @@ KPA는 MembershipConsole과 다른 응답 구조 사용:
 | `requireRole(roles[])` | 역할 확인 | roleAssignmentService.hasAnyRole() |
 | `requireAdmin` | 관리자 확인 | platform:admin, platform:super_admin, admin, super_admin |
 | `injectServiceScope` | 서비스 범위 주입 | role prefix에서 serviceKeys 추출 |
-| `require{Service}Scope(role)` | 서비스 역할 확인 | 예: requireGlycopharmScope('glycopharm:operator') |
+| `require{Service}Scope(role)` | 서비스 역할 확인 | — |
 
 ### 7.2 Frontend Guard 패턴
 
@@ -469,31 +450,12 @@ KPA는 MembershipConsole과 다른 응답 구조 사용:
 **MembershipConsole의 서비스 격리:**
 - Platform admin: 모든 서비스 접근 (선택적 serviceKey 필터)
 - Service operator: 자신의 서비스 멤버만 조회 가능
-- 역할 할당 시 prefix 경계 체크: `neture:operator`는 `glycopharm:admin` 할당 불가
 
 ---
 
 ## 8. Data Flow 분석
-
-### 8.1 일반 회원 관리 플로우 (K-Cosmetics/GlycoPharm/GlucoseView)
-
-```
-[Frontend]                    [Backend]                    [Database]
-UsersPage                     MembershipConsoleController
     │                              │
-    ├─GET /operator/members────────┤
-    │                              ├─ Raw SQL + scope filter──── service_memberships
-    │                              │                             + users JOIN
-    │◄─────── users[] + pagination─┤
     │                              │
-    ├─PATCH /:userId/status────────┤
-    │   {status: 'approved'}       ├─ MembershipApprovalService
-    │                              │   STEP0: SELECT FOR UPDATE── service_memberships
-    │                              │   STEP1: UPDATE ──────────── service_memberships
-    │                              │   STEP2: UPDATE ──────────── users
-    │                              │   STEP3: INSERT/UPDATE ───── role_assignments
-    │◄─────── success ─────────────┤
-```
 
 ### 8.2 Neture 승인 플로우 (자체 엔드포인트)
 
@@ -540,7 +502,6 @@ const displayName = (user.lastName && user.firstName)
 ```
 
 - K-Cosmetics: ✅ 적용
-- GlycoPharm: ✅ 적용
 - GlucoseView: ✅ 적용
 - Neture: ✅ 적용
 - KPA: ❌ 미적용 (목업 데이터)
@@ -549,28 +510,13 @@ const displayName = (user.lastName && user.firstName)
 
 ## 10. UI 패턴 일관성
 
-### 10.1 공통 패턴 (K-Cosmetics/GlycoPharm/GlucoseView)
-
-| 요소 | 패턴 |
-|------|------|
-| 헤더 | 제목 + 부제목 + 새로고침 버튼 |
-| 통계 | 4컬럼 그리드, 아이콘 + 숫자 + 라벨 |
-| 탭 | border-b-2 언더라인 스타일 |
-| 테이블 | bg-slate-50 헤더, hover:bg-slate-50 행 |
-| 배지 | inline-flex, rounded-full, px-2 py-0.5 |
-| 모달 | fixed overlay, max-w-sm/lg, rounded-xl |
-| 로딩 | Loader2 animate-spin + 텍스트 |
-| 에러 | bg-red-50, AlertCircle 아이콘 |
-| 빈 상태 | Users w-12 아이콘 + 메시지 |
-| 아이콘 | Lucide React 전체 일관 |
-
 ### 10.2 비일관 패턴
 
-| 항목 | K-Cosmetics | GlycoPharm | Neture | KPA |
-|------|-------------|------------|--------|-----|
-| 검색 트리거 | Enter + 버튼 | Enter | Enter + 버튼 | N/A |
-| 스타일링 | Tailwind | Tailwind | Tailwind | **인라인 스타일** |
-| 상세 네비게이션 | 행 클릭 | 행 클릭 | ❌ 없음 | ❌ 없음 |
+| 항목 | K-Cosmetics | Neture | KPA |
+| ------ | ------------- | -------- | ----- |
+| 검색 트리거 | Enter + 버튼 | Enter + 버튼 | N/A |
+| 스타일링 | Tailwind | Tailwind | **인라인 스타일** |
+| 상세 네비게이션 | 행 클릭 | ❌ 없음 | ❌ 없음 |
 
 ---
 
@@ -678,8 +624,8 @@ KPA는 추가로 자체 엔드포인트 유지 (면허, 분회 등 고유 로직
 |---------|------|------|
 | **P0** | KPA MembersPage API 연동 | web-kpa-society |
 | **P1** | Neture UserDetailPage 추가 | web-neture |
-| **P1** | GlycoPharm/GlucoseView 역할 관리 섹션 추가 | web-glycopharm, web-glucoseview |
-| **P2** | GlycoPharm/GlucoseView/Neture businessInfo 표시 | 3개 서비스 |
+| **P1** | GlucoseView 역할 관리 섹션 추가 | — |
+| **P2** | — | 3개 서비스 |
 | **P2** | Neture 승인 플로우 MembershipConsole 통합 검토 | web-neture + API |
 | **P3** | ASSIGNABLE_ROLES Backend API 추가 | API server |
 | **P3** | Frontend 액션별 권한 체크 추가 | 전체 서비스 |

@@ -2,7 +2,7 @@
 
 > **Type:** IR (read-only 선행 조사 — 내 매장 공통화 전)
 > **Date:** 2026-06-11
-> **대표 서비스:** KPA-society / **참조:** Neture(공급자 측) / **제외:** GlycoPharm·K-Cosmetics
+> **대표 서비스:** KPA-society / **참조:** Neture(공급자 측) / **제외:** K-Cosmetics
 > **수정 파일:** 없음 (read-only)
 > **조사 기준 commit:** `c56ab39de`
 
@@ -16,7 +16,7 @@ KPA-society 기준으로 **공급자 등록 → 운영자 승인/노출 조건 �
 
 ## 2. 범위
 
-- 대표: KPA-society. 참조: Neture(공급자 등록·오퍼·주문 수신 화면 범위만). 제외: GP/KCos(영향 가능성만 후속 기록).
+- 대표: KPA-society. 참조: Neture(공급자 등록·오퍼·주문 수신 화면 범위만). 제외: KCos(영향 가능성만 후속 기록).
 - 코드/UI/API/DB 무수정. 발견 단절은 후속 후보로 분리(즉시 수정 금지).
 
 ---
@@ -177,7 +177,7 @@ KPA-society 기준으로 **공급자 등록 → 운영자 승인/노출 조건 �
 - **즉시 보정 가능(C)**: 공급자 unified 리스트의 pending checkout 가시성(§11 D1).
 - **추가 IR 필요(D)**: 판매자 모집 mechanism, 펀딩 정의, O4O 주문 가능 상품 vs 매장 취급 상품 모델 — 이 3건은 **내 매장 공통화 WO 전에 반드시 확정**해야 한다.
 - 따라서 **내 매장 공통화 WO 는 본 IR 직후 바로 작성하지 않는다.** 순서: 본 IR → §11 소형 보정 → §12 추가 IR(특히 store-orderable-vs-carried 모델) → KPA 기준 확정 → `WO-O4O-MY-STORE-COMMONIZATION-PHASE5-KPA-BASELINE-V1`.
-- GP/KCos 확장은 KPA 기준 확정 후 별도 판단.
+- KCos 확장은 KPA 기준 확정 후 별도 판단.
 
 > **조사 한계:** 일부 항목(이벤트 오퍼 저장 모델, 판매자 모집 mechanism)은 코드 경로가 엇갈려 본 IR 에서 단정하지 않고 D(추가 IR)로 분리했다. 정적 코드 조사 기반이며 live 데이터/실행 검증은 미수행.
 

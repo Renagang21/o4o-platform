@@ -8,7 +8,7 @@
 ---
 
 ## 1. 목적
-유통참여형 펀딩(Market Trial)의 과거 SPO→OPL 전환 데이터가 production DB 에 실제 존재하는지, 존재 시 KPA/GP/KCos 매장 org 에 연결되어 Store 노출 위험이 있는지 read-only 로 실측한다.
+유통참여형 펀딩(Market Trial)의 과거 SPO→OPL 전환 데이터가 production DB 에 실제 존재하는지, 존재 시 KPA/KCos 매장 org 에 연결되어 Store 노출 위험이 있는지 read-only 로 실측한다.
 
 ## 2. 선행 기준
 `WO-...-CONVERSION-DISABLE-V1` 에서 신규 전환은 차단됨. 남은 문제는 **기존 데이터**. 본 CHECK 는 SELECT only — UPDATE/DELETE/INSERT/migration 금지, count/group 결과만 기록(PII 미기록).
@@ -38,7 +38,7 @@ IR §7 의 read-only SELECT 5종(market_trials / market_trial_participants / org
 ## 6. 판정
 **A — mt_listings = 0 → 기존 cleanup 불필요.**
 - `source_type='market_trial'` OPL 0건 → Store org 에 주입된 전환 listing **없음**. (IR §7 판정기준 A)
-- 따라서 Q4(org/service enrollment) 0 rows → KPA/GP/KCos 매장 노출 위험 **실데이터상 없음**.
+- 따라서 Q4(org/service enrollment) 0 rows → KPA/KCos 매장 노출 위험 **실데이터상 없음**.
 - participant first_order 0 → checkout 역연결로 생성된 이력도 없음.
 - 결론: `WO-...-CONVERTED-LISTING-DATA-CLEANUP-V1` **불필요**. 비활성화(WO-CONVERSION-DISABLE-V1)만으로 경계 정합 충족.
 

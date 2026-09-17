@@ -77,7 +77,6 @@ export function KCosGlobalHeader() {
     ? { displayName: getUserDisplayName(user), email: user.email }
     : null;
 
-  // WO-O4O-GLYCOPHARM-K-COSMETICS-NOTIFICATION-BELL-ACTIVATION-V1
   const notif = useNotifications(notificationsApi, {
     enabled: !!user,
     serviceKey: 'k-cosmetics',

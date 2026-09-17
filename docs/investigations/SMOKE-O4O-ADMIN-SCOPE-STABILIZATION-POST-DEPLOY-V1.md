@@ -1,7 +1,7 @@
 # SMOKE-O4O-ADMIN-SCOPE-STABILIZATION-POST-DEPLOY-V1
 
 > **성격**: 배포 후 browser smoke 검증 (Playwright, 운영 환경). 코드/메뉴/route/backend/DB 수정 0.
-> **대상**: GlycoPharm / K-Cosmetics / KPA-Society / Neture 운영 사이트.
+> **대상**: K-Cosmetics / KPA-Society / Neture 운영 사이트.
 > **선행**: `CHECK-O4O-ADMIN-SCOPE-STABILIZATION-CLOSURE-V1` (5f2f54ff9)
 > **검증 일시**: 2026-06-16
 > **도구**: Playwright 1.57.0 (headless chromium), curl
@@ -14,8 +14,7 @@
 
 | 서비스 | 로그인 | admin route | operator route | 결과 |
 |---|:--:|:--:|:--:|:--:|
-| GlycoPharm | ✅ | `/admin` 정상 (제거 진입점 미노출) | `/operator/contacts`·`/operator/stores` 정상 | ✅ PASS |
-| K-Cosmetics | ✅ | `/admin` 정상 | `/operator/contacts` 정상 (+GP 무회귀) | ✅ PASS |
+| K-Cosmetics | ✅ | `/admin` 정상 | `/operator/contacts` 정상 ( 무회귀) | ✅ PASS |
 | KPA-Society | ✅ | `/admin`(공개 상태 점검 카드) · `/admin/settings/legal`(3탭) · `/operator/legal`(deprecated) | — | ✅ PASS |
 | Neture | ✅ | `/admin`·service-audience·operators·roles ("(플랫폼)" 라벨·배너) | — | ✅ PASS |
 
@@ -28,21 +27,11 @@
 
 | 항목 | 결과 |
 |---|---|
-| 운영 사이트 reachability | glycopharm.co.kr / k-cosmetics.site / kpa-society.co.kr / neture.co.kr → **HTTP 200** |
+| 운영 사이트 reachability | k-cosmetics.site / kpa-society.co.kr / neture.co.kr → **HTTP 200** |
 | 4개 서비스 로그인(통합 운영자 계정) | **성공** — 로그인 후 `/admin`(또는 `/admin/kpa-dashboard`) 진입 |
 | 기준 main commit | `11a89dbb3` (정비 종료 고정 시점) |
 
 > 정확한 배포 commit pin 은 미수집(프론트 SPA). 화면 동작이 정비 결과와 일치하여 배포 반영 확인.
-
-## 2. GlycoPharm
-
-| route | finalUrl | redirect/403 | console err | 4xx/5xx | 관찰 |
-|---|---|:--:|:--:|:--:|---|
-| `/admin` | `/admin` | 없음 | 0 | 0 | 회원 데이터(관리) 라벨 present. **문의 관리 / 역할 관리 / 약국 네트워크 admin 진입점 미노출** |
-| `/operator/contacts` | `/operator/contacts` | 없음 | 0 | 0 | 문의 관리 화면 접근 정상(operator 이관 확인) |
-| `/operator/stores` | `/operator/stores` | 없음 | 0 | 0 | 약국 운영 canonical 접근 정상 |
-
-→ admin scope 축소 + 문의 operator 이관 **배포 반영 확인**. ✅
 
 ## 3. K-Cosmetics
 
@@ -50,8 +39,6 @@
 |---|---|:--:|:--:|:--:|---|
 | `/admin` | `/admin` | 없음 | 0 | 0 | 회원 데이터(관리) 라벨 present. **문의 관리 / 역할 관리 / 매장 네트워크 admin 진입점 미노출** |
 | `/operator/contacts` | `/operator/contacts` | 없음 | 0 | 0 | 문의 관리 접근 정상(operator 이관 + guard 조정 확인) |
-
-→ **GP 무회귀 확인**: GlycoPharm `/operator/contacts` 도 동일 정상(§2) — KCos 문의 guard 조정의 공통 controller 영향 회귀 없음. ✅
 
 ## 4. KPA-Society
 
@@ -103,7 +90,6 @@
 | operator 이관 문의 관리 접근 정상 | ✅ |
 | KPA public `/policy`·`/privacy` 오류 없음(graceful empty) | ✅ |
 | Neture platform-admin 라벨/배너 표시 | ✅ |
-| 권한 403 회귀 없음(GP 무회귀 포함) | ✅ |
 
 **판정: ✅ PASS** — O4O 4개 서비스 admin scope 정비가 운영 환경에 정상 반영. 코드·문서·배포 검증까지 완료.
 

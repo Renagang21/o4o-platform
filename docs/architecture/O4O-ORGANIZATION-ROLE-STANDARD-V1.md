@@ -54,7 +54,7 @@ users (Identity SSOT) [FROZEN - F10, F11]
 
 | Layer | 테이블 | 역할 | 예시 |
 |-------|--------|------|------|
-| **Layer A** | `role_assignments` | 서비스 접근 권한 | `neture:supplier`, `glycopharm:pharmacy` |
+| **Layer A** | `role_assignments` | 서비스 접근 권한 | `neture:supplier` |
 | **Layer B** | `organization_members.role` | 조직 내 비즈니스 역할 | `owner`, `manager`, `staff` |
 
 **Layer A와 B 혼합 금지.** Layer A는 "무엇을 할 수 있는가", Layer B는 "조직 안에서 어떤 역할인가".
@@ -83,21 +83,6 @@ organization_service_enrollments (
 ---
 
 ## 4. 서비스별 현재 상태 및 적용 기준
-
-### 4.1 GlycoPharm — 표준 준수 (변경 없음)
-
-| 항목 | 상태 |
-|------|------|
-| Organization | `organizations` 테이블 (PK shared with `glycopharm_pharmacies`) |
-| 확장 데이터 | `glycopharm_pharmacy_extensions` (organization_id FK) |
-| 서비스 등록 | `organization_service_enrollments` (service_code='glycopharm') |
-| 멤버십 | `organization_members` (role: owner/member) |
-| Layer A Role | `glycopharm:admin`, `glycopharm:operator`, `glycopharm:pharmacy` |
-| Layer B Role | `organization_members.role` = owner/member |
-| 사업자 정보 | `organizations.business_number` + `organizations.address` |
-| 약국 해결 | `createPharmacyContextMiddleware` → org 소유권 조회 |
-
-**판정**: 표준 구조. `glycopharm:pharmacy`는 순수 사용자 유형 role.
 
 ### 4.2 KPA — 표준 준수 (레거시 동기화 유지)
 
@@ -160,14 +145,14 @@ neture_suppliers → neture_supplier_extensions (organization_id FK)
 
 | 항목 | 상태 |
 |------|------|
-| Organization | `organizations` (GlycoPharm pharmacy와 공유) |
+| Organization | `organizations` |
 | 약사 데이터 | `glucoseview_pharmacists` (면허, 승인 워크플로우) |
 | 환자 데이터 | `glucoseview_customers` + `patient_health_profiles` |
 | Layer A Role | `glucoseview:admin`, `glucoseview:operator`, `glucoseview:pharmacist`, `glucoseview:user` |
 | 약국 해결 | Care middleware → `organizations` + `organization_members` |
-| 사업자 정보 | `organizations` (GlycoPharm pharmacy 경유) |
+| 사업자 정보 | `organizations` |
 
-**판정**: 표준 구조. 약국은 GlycoPharm organization을 공유.
+**판정**: 표준 구조.
 
 ---
 
@@ -184,8 +169,8 @@ neture_suppliers → neture_supplier_extensions (organization_id FK)
 | 유형 | 의미 | 예시 |
 |------|------|------|
 | `admin` | 서비스 관리자 (구조/정책/금융) | `neture:admin` |
-| `operator` | 서비스 운영자 (콘텐츠/모니터링) | `glycopharm:operator` |
-| `pharmacy` | 약국 운영자 (사용자 유형) | `glycopharm:pharmacy` |
+| `operator` | 서비스 운영자 (콘텐츠/모니터링) | `kpa:operator` |
+| `pharmacy` | 약국 운영자 (사용자 유형) | (은퇴 서비스 전용 — 현행 예시 없음) |
 | `supplier` | 공급자 (사용자 유형) | `neture:supplier` |
 | `partner` | 파트너 (사용자 유형) | `neture:partner` |
 
@@ -217,7 +202,6 @@ neture_suppliers → neture_supplier_extensions (organization_id FK)
 
 | 서비스 | 확장 테이블 | 확장 필드 |
 |--------|------------|----------|
-| GlycoPharm | `glycopharm_pharmacy_extensions` | enabled_services, hero_image, logo, sort_order |
 | K-Cosmetics | `cosmetics_stores` (자체 필드) | region, status, slug, logo, hero_image |
 | KPA | `kpa_organizations` (레거시) | description |
 | Neture | **없음** (후속 WO에서 생성) | — |
@@ -244,10 +228,9 @@ neture_suppliers → neture_supplier_extensions (organization_id FK)
 
 | 서비스 | 상태 | 비고 |
 |--------|------|------|
-| GlycoPharm | **준수** | 완전 통합 |
 | KPA | **준수** | kpa_members ↔ organization_members 이중화는 허용 |
 | K-Cosmetics | **준수** | Bridge 완료 |
-| GlucoseView | **준수** | GlycoPharm org 공유 |
+| GlucoseView | **준수** | `organizations` 직접 사용 |
 
 ### 8.2 미준수 서비스 (1/5)
 

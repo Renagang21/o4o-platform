@@ -65,7 +65,7 @@ dirty 상태였고, 그 WIP 가 바로 커뮤니티 `children` 블록에 `/resou
 ### 2-2. producer — **PharmacyHub 1개 서비스 (변동 없음)**
 
 5서비스 `src/config/navigation.ts` 전수 검색 결과 `children:` 은 PH 3곳뿐.
-KPA / GlycoPharm / K-Cosmetics / Neture = **0**.
+KPA / K-Cosmetics / Neture = **0**.
 
 > ⚠️ **선행 조사 대비 변동 1건**: 커뮤니티 parent 의 children 이 **6 → 7** 로 늘어 있었다.
 > `{ label: '자료실', href: '/resources' }` 가 `WO-O4O-PHARMACYHUB-COMMUNITY-CONTENT-RESOURCE-TABLE-AND-ADOPTION-V1 §12`
@@ -214,13 +214,11 @@ WO §10 이 지목한 `GlobalHeader.tsx` 의 소문자 참조는 **1차 시도(`
 | `services/web-neture/src/config/navigation.ts:5` | `global-header-standard-v1.md` | `GLOBAL-HEADER-STANDARD-V1.md` |
 | `services/web-kpa-society/src/config/navigation.ts:5` | 동일 | 동일 정정 |
 | `services/web-k-cosmetics/src/config/navigation.ts:5` | 동일 | 동일 정정 |
-| `services/web-glycopharm/src/config/navigation.ts:5` | 동일 | 동일 정정 |
 | `packages/ui/src/layout/GlobalHeader.tsx:5` | 1차에서 정정 완료 | 변경 없음 |
 | `services/web-pharmacy-hub/src/config/navigation.ts:5` | 이미 정확 | 변경 없음 |
 
 WO §10 의 목표는 "실제 파일명과 정확히 일치" 이므로 **drift 가 실재하는 4곳을 정정**했다.
 파일당 **주석 1줄**이며 런타임·타입 영향 0.
-WO §14 의 "KPA/Glyco/KCos/Neture 코드 수정 없음" 기대값에서 벗어나는 **유일한 항목**이라 여기 명시한다 —
 `children` 이나 nav 항목을 건드린 것이 아니므로 §13 이 금지한 "다른 서비스 navigation 재구성" 이 아니다.
 
 ---
@@ -241,7 +239,6 @@ WO §14 의 "KPA/Glyco/KCos/Neture 코드 수정 없음" 기대값에서 벗어�
 |--------|-----------|:---:|---|
 | PharmacyHub | `navigation.ts` children 3블록 제거 | 0 | 변화 없음 (children 은 원래 렌더 안 됨) |
 | KPA Society | 주석 1줄(문서 경로) | 0 | 변화 없음 |
-| GlycoPharm | 주석 1줄 | 0 | 변화 없음 |
 | K-Cosmetics | 주석 1줄 | 0 | 변화 없음 |
 | Neture | 주석 1줄 | 0 | 변화 없음 |
 
@@ -258,7 +255,6 @@ workspace 이름을 먼저 확인해 `No projects matched` 위양성을 배제�
 | 공통 UI | `@o4o/ui` | `pnpm --filter @o4o/ui run build` (`tsc --build`) | **PASS** (exit 0) |
 | PharmacyHub | `pharmacy-hub-web` | `run build` = `tsc -b && vite build` | **PASS** (exit 0, 1m 3s) |
 | KPA Society | `@o4o/web-kpa-society` | `run build` = `tsc && vite build` | **PASS** (exit 0, 1m 11s) |
-| GlycoPharm | `glycopharm-web` | `run build` = `tsc -b && vite build` | **PASS** (exit 0, 48.49s) |
 | K-Cosmetics | `@o4o/web-k-cosmetics` | `run build` = `tsc && vite build` | **PASS** (exit 0, 44.01s) |
 | Neture | `@o4o/web-neture` | `run build` = `tsc && vite build` | **PASS** (exit 0, 1m 5s) |
 
@@ -297,7 +293,6 @@ Desktop **1440×900** / Mobile **390×844**, Playwright 1.57.0.
 | 서비스 | header | nav | 아코디언 | overflow | app error | net error(CORS) |
 |--------|:---:|---|:---:|:---:|:---:|:---:|
 | KPA | OK | 커뮤니티 \| 서비스 안내 \| About \| Contact | 0 | 0px | **0** | 2 |
-| GlycoPharm | OK | 커뮤니티 \| 서비스 안내 \| Contact | 0 | 0px | **0** | 6 |
 | K-Cosmetics | OK | 커뮤니티 \| 서비스 안내 \| Contact | 0 | 0px | **0** | 8 |
 | Neture | OK | Home \| 이용 안내 \| Contact Us | 0 | 0px | **0** | 4 |
 
@@ -315,7 +310,6 @@ desktop·mobile 양쪽 동일 결과. net error 는 13-1 과 같은 CORS artifac
 
 ```
 packages/ui/src/layout/GlobalHeader.tsx            |  7 ++-
-services/web-glycopharm/src/config/navigation.ts   |  2 +-
 services/web-k-cosmetics/src/config/navigation.ts  |  2 +-
 services/web-kpa-society/src/config/navigation.ts  |  2 +-
 services/web-neture/src/config/navigation.ts       |  2 +-

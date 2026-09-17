@@ -3,7 +3,7 @@
  *
  * WO-O4O-STORE-HUB-COMMON-VIEW-AND-SHELL-UNIFICATION-V1
  *
- * KPA-Society(390L) · K-Cosmetics(233L) · GlycoPharm(234L) 의 HUB layout 이
+ * KPA-Society(390L) · K-Cosmetics(233L) 의 HUB layout 이
  * "좌측 사이드바(제목/부제 + 메뉴 + 하단 안내) + 우측 Outlet + mobile drawer" 로 동일했다.
  * 그 골격을 여기로 모으고, 서비스는 아래 config 만 소유한다.
  *
@@ -14,11 +14,11 @@
  *
  * 정규화 (CHECK 기록 대상):
  *   - drawer 분기점을 `lg` 로 통일한다 (KPA 는 `md` 였다).
- *   - 본문 폭을 `max-w-7xl` 로 통일한다 (KPA 1400px / KCos·GP `max-w-5xl` 였다).
+ *   - 본문 폭을 `max-w-7xl` 로 통일한다 (KPA 1400px / KCos `max-w-5xl` 였다).
  *   - KPA 의 inline style 사이드바를 Tailwind 마크업으로 옮긴다. 메뉴·라우트·권한 무변경.
  *
  * 유지 (서비스 정상 업무 차이):
- *   - 그룹 헤더가 있는 메뉴(KPA)와 평면 메뉴(KCos/GP) 를 같은 config 로 표현한다.
+ *   - 그룹 헤더가 있는 메뉴(KPA)와 평면 메뉴(KCos) 를 같은 config 로 표현한다.
  *   - 항목 강조(highlight) · 수치 배지(countBadge) · 준비중 표기(disabledBadge) 는 항목 config.
  */
 

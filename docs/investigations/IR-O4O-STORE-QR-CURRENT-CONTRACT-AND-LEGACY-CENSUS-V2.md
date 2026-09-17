@@ -22,7 +22,6 @@ V1 census 이후 실제로 바뀐 것 2가지 — 본 V2 는 최신 `origin/main
 
 | 변화 | 근거 | 본 문서 반영 |
 |---|---|---|
-| **GlycoPharm 서비스 전면 삭제** | `86bf574ae` `WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1` | `services/web-glycopharm/**` QR 파일 전부 소멸. `@o4o/store-ui-core` QR/Tablet View 의 소비처가 **K-Cosmetics 단독**으로 축소 (§17) |
 | **Tablet 축 CLOSED** | `7971407f0` · `e47a5e8ba` · `73c21813b` · `b97a4dcc6` · `f75dc8a34` · `be5eb5fa7` · `cb3d23af9` | §10 Tablet QR 판정을 "미해소"가 아니라 "**연결할 상대가 이미 정본**"으로 취급 |
 
 ---
@@ -91,8 +90,6 @@ created_at · updated_at · consultation_cta_enabled · consultation_cta_label
 | 공통 | `packages/operator-core-ui/.../OperatorQrTemplateWritePage.tsx` | 439 | 운영자 템플릿 |
 | Neture | `pages/store/QrLandingPage.tsx` · `pages/SellerQRGuidePage.tsx` | 133 / 629 | |
 | KPA·PH | `ForeignVisitorPartnerQrCodesPage.tsx` | 354 / 354 | 제3 축 |
-
-**GlycoPharm QR 파일 = 0** (서비스 삭제됨).
 
 ---
 
@@ -313,11 +310,7 @@ device 분포 (device_type)
 
 ---
 
-## §16. K-Cosmetics / GlycoPharm 판정
-
-| 서비스 | 상태 |
-|---|---|
-| **GlycoPharm** | **존재하지 않는다.** `WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1`(`86bf574ae`) 로 서비스 전체 삭제. QR 파일 0건. 판정 대상에서 제외. 참조: `docs/baseline/legacy/GLYCOPHARM-LEGACY-POSTMORTEM.md` |
+## §16. K-Cosmetics 판정
 
 **K-Cosmetics QR 기능별 판정:**
 
@@ -335,7 +328,7 @@ device 분포 (device_type)
 
 | 경계 후보 | 현재 자산 | 상태 |
 |---|---|---|
-| **COMMON QR OPERATION** (목록·생성·수정·lifecycle) | `packages/store-ui-core/.../StoreQrConsoleView.tsx` (598L) | **1세대**. `StoreQrLandingType = link\|product\|promotion\|page` — `screen_set` 없음, content picker 없음, analytics 없음. **소비처 = K-Cosmetics 1곳** (GP 삭제로 축소). 지금 이 View 로 KPA·PH 를 흡수하면 구세대가 굳는다 |
+| **COMMON QR OPERATION** (목록·생성·수정·lifecycle) | `packages/store-ui-core/.../StoreQrConsoleView.tsx` (598L) | **1세대**. `StoreQrLandingType = link\ | product\ | promotion\ | page` — `screen_set` 없음, content picker 없음, analytics 없음. 지금 이 View 로 KPA·PH 를 흡수하면 구세대가 굳는다 |
 | **COMMON CONTENT SELECTOR** | `StoreAssetSelectorModal.tsx` (KPA 전용, 5 source) | **추출 후보 1순위**. 이미 최신 세대 |
 | **SERVICE ADAPTER** | `service-catalog.ts` (domain) · `createRequireStoreOwner` vs PH 조직 재해석 · serviceKey 매핑(`SVC_TO_CATALOG`) | 계약이 이미 존재. 정리만 필요 |
 | **PUBLIC RENDERER** | `store-qr.service.ts` `resolvePublicQrLanding` + 서비스별 `QrLandingPage.tsx` 4벌 (KPA 622L / PH 120L / Neture 133L / KCos 없음) | 백엔드는 **공통 완료**, 프론트만 4벌 |

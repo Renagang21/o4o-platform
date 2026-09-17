@@ -16,7 +16,7 @@
 | merge 전 main | `fa3c533c7` |
 | merge commit | **`4f7d095d9`** |
 | merge 방식 | `git merge --no-ff` (저장소 현행 관행) |
-| conflict | **0건** (양쪽이 함께 건드린 3파일 `glycopharm.routes.ts` · `kpa.routes.ts` · `web-neture/tailwind.config.js` 모두 자동 병합) |
+| conflict | **0건** (양쪽이 함께 건드린 3파일 `kpa.routes.ts` · `web-neture/tailwind.config.js` 모두 자동 병합) |
 | conflict marker 잔존 | **0** (tracked 전수 `git grep`) |
 | source 누락 커밋 | **0** (`git rev-list --count HEAD..origin/work/commonization-community` = 0) |
 | cherry-pick 사용 | 없음 (누적 21커밋 전량 통합) |
@@ -46,7 +46,6 @@ canonical 경로 = **main push → GitHub Actions 자동 배포** (`deploy-api.y
 | api-server (`o4o-core-api`) | Deploy API Server (Cloud Run) | **DEPLOYED** (revision `o4o-core-api-03337-kgp`) |
 | KPA-Society | deploy-kpa-society | **DEPLOYED** |
 | K-Cosmetics | deploy-k-cosmetics | **DEPLOYED** |
-| GlycoPharm | deploy-glycopharm | **DEPLOYED** |
 | Neture | deploy-neture | **DEPLOYED** |
 | PharmacyHub | deploy-pharmacy-hub | **DEPLOYED** |
 | KPA-Branch | deploy-kpa-branch | **DEPLOYED** |
@@ -62,7 +61,6 @@ canonical 경로 = **main push → GitHub Actions 자동 배포** (`deploy-api.y
 
 | 엔드포인트 | 결과 |
 |---|---|
-| `GET /api/v1/glycopharm/contents` (limit/page/search/sub_type) | **200 x 4**, shape `{success,data:{items,total,page,limit,totalPages}}` 정상. 데이터 0건 |
 | `GET /api/v1/cosmetics/contents` (limit/usage_type) | **200 x 2**, shape 정상. 데이터 0건 |
 | `GET /api/v1/kpa/contents` | **200**, 실데이터 total=5 |
 | `GET /api/v1/kpa/contents?status=all` | **200**, total=5 (기본과 동일 — `status=all` 이 필터 값이 아닌 모드 지시자로 동작함을 실증) |
@@ -70,8 +68,6 @@ canonical 경로 = **main push → GitHub Actions 자동 배포** (`deploy-api.y
 | `GET /api/v1/kpa/contents?search=해양` | **200**, total=4 |
 | `GET /api/v1/kpa/contents/:id` | **200** (상세 정상) |
 | `GET /api/v1/kpa/contents/<없는 uuid>` | **404** `{"code":"NOT_FOUND"}` — 계약대로 |
-| `GET /api/v1/{kpa,glycopharm,cosmetics}/operator/resources` (미인증) | **401 x 3** `AUTH_REQUIRED` — 가드 정상 |
-| `GET /api/v1/{kpa,glycopharm,cosmetics}/operator/resources` (운영자 인증) | **200 x 3**, KPA 실데이터 반환 |
 
 **mutation 은 일절 수행하지 않았다** (create/update/status/delete/view 증가 전부 미실행). 운영 데이터 안전 원칙 준수.
 
@@ -80,18 +76,7 @@ canonical 경로 = **main push → GitHub Actions 자동 배포** (`deploy-api.y
 운영자 자료실 목록은 `status` 를 항상 실제 필터로 적용하므로 `status=all` 은 `c.status='all'` 이 되어 0건이 된다.
 **merge-base(`2a05bf980`) 원본 handler 와 동일 동작**이며, 프론트는 이 엔드포인트에 `status=all` 을 보내지 않는다(전수 grep). → **회귀 아님 / 수정 대상 아님.**
 
-### 3-2. GlycoPharm forum
-
-| 엔드포인트 | 결과 |
-|---|---|
-| `GET /api/v1/glycopharm/forum/categories/popular` | **200** `{"success":true,"data":[]}` — 선행 404 해소 |
-| `GET /api/v1/glycopharm/forum/categories` | **200** |
-
-GP 프론트는 generic `/api/v1/forum/*` 이 아니라 service route `/api/v1/glycopharm/forum/*` 를 소비함을 브라우저 네트워크 관측으로 확인했다.
-
 ### 3-3. Cross-service 확인
-
-KPA 세션으로 GP operator resources 조회 → 200 이나 반환 데이터는 `glycopharm_contents` 기준 0건. **KPA 데이터가 GP 응답에 섞이지 않았다** (동일 계정이 `glycopharm:operator` 역할을 함께 보유하므로 200 자체는 정상).
 
 ---
 
@@ -103,7 +88,6 @@ KPA 세션으로 GP operator resources 조회 → 200 이나 반환 데이터는
 |---|---|---|
 | KPA-Society | `/` 홈 최신활동 → `/forum` → **포럼 상세**(`/forum/post/ee5414c6…`) → `/lms` → **강의 상세**(`/lms/course/0405b089…`) → **lesson player**(`/lesson/6bbee793…`) → `/contents` · `/content/resources` | 전부 200 렌더 |
 | K-Cosmetics | `/` → `/forum` → `/forum/posts` → `/lms` → **강의 상세 → lesson player** → `/content/documents` | 전부 200 렌더 |
-| GlycoPharm | `/` → `/forum` → `/forum/posts` → `/forum/write` → `/lms` → `/content` | 전부 200 렌더 |
 | Neture | `/forum` → `/forum/posts` | 200 렌더 |
 | PharmacyHub | `/forum` → `/forum/posts` → `/forum/write` | 200 렌더 (운영자 계정 기준 작성 진입 허용) |
 
@@ -112,7 +96,7 @@ KPA 세션으로 GP operator resources 조회 → 200 이나 반환 데이터는
 | white screen | **0** |
 | JS exception (`pageerror`) | **0** (5개 서비스 전부) |
 | 예기치 않은 404/500 | 아래 §5 PRE_EXISTING 1건 외 **0** |
-| dead link (header/nav 전수 이동) | **0** (GP 3 / KCos 3 / KPA 7 링크) |
+| dead link (header/nav 전수 이동) | — |
 | mobile 가로 스크롤 | **0** (전 측정 경로) |
 | 서비스 데이터 혼입 (콘텐츠/자료실·포럼) | **0** |
 
@@ -123,8 +107,8 @@ KPA 세션으로 GP operator resources 조회 → 200 이나 반환 데이터는
 | # | 항목 | 판정 | 근거 |
 |---|---|:---:|---|
 | E1 | 프로덕션 API 의 비허용 `Origin` 500 | **NOT_APPLICABLE** | production 도메인에서 검증하므로 무관. 다만 비허용 Origin 에 403 이 아닌 **500** 을 반환하는 동작은 여전함(no-origin 200 / `127.0.0.1` 500 / `kpa-society.co.kr` 200) — 별도 WO 대상 |
-| E2 | content-resource Core 런타임 미검증 | **PASS** | GP/KCos/KPA 목록·필터·검색·pagination·상세·404·운영자 목록·가드 전부 production 실응답 확인 |
-| E3 | `/glycopharm/forum/categories/popular` 404 | **PASS** | 배포 후 **200** |
+| E2 | content-resource Core 런타임 미검증 | **PASS** | KCos/KPA 목록·필터·검색·pagination·상세·404·운영자 목록·가드 전부 production 실응답 확인 |
+| E3 | — | **PASS** | 배포 후 **200** |
 | E4 | forum owner 화면 smoke | **STILL_BLOCKED** | 4개 서비스 `forum/my-dashboard` 전부 빈 상태, `forum/categories/mine` = `[]`. 테스트 계정이 소유 forum 없음 |
 | E5 | KPA LMS 실데이터 smoke | **PASS** | 강의 목록 → 상세 → **lesson player** 까지 실제 이동·렌더 |
 
@@ -137,14 +121,14 @@ KPA 세션으로 GP operator resources 조회 → 200 이나 반환 데이터는
 | **BRANCH_REGRESSION** | **0** | — |
 | **DEPLOYMENT** | **0** | 8개 배포 job 전부 success |
 | **PRE_EXISTING** | **2** | (1) **LMS 공개 강의 목록의 service 경계 누락** (아래) (2) KPA `/legal/documents/published/{terms,privacy}` 404 (약관 미시딩, legal 축) |
-| **DATA_FIXTURE** | **2** | GP/KCos `contents` 0건 · 소유 forum 없는 테스트 계정(E4) |
+| **DATA_FIXTURE** | **2** | KCos `contents` 0건 · 소유 forum 없는 테스트 계정(E4) |
 | **ENVIRONMENT** | **1** | 비허용 Origin 에 500 응답 (E1) |
-| **OUT_OF_SCOPE** | **2** | 검증자 probe 경로 오류 — GP `/community`(admin layout 전용) · GP `/lms/courses`(공개 route 아님, legacy `lms/:id` redirect 로 흡수) |
+| **OUT_OF_SCOPE** | **2** | — |
 
 ### PRE_EXISTING (1) — LMS 공개 강의 목록 service 경계 누락
 
 `GET /api/v1/lms/courses` 는 요청 서비스와 무관하게 **`serviceKey='kpa-society'` 강의를 그대로 반환**한다.
-그 결과 k-cosmetics.site · glycopharm.co.kr 의 `/lms` 에 KPA 강의가 노출되고 상세/lesson 까지 열린다.
+그 결과 k-cosmetics.site 의 `/lms` 에 KPA 강의가 노출되고 상세/lesson 까지 열린다.
 
 - 원인: `apps/api-server/src/modules/lms/routes/lms.routes.ts:68` `router.get('/courses', optionalAuth, listCourses)` 에 serviceKey 필터가 없다. `WO-O4O-LMS-COURSE-SERVICEKEY-V1` 의 scope 검사는 **운영자 write 액션에만** 적용돼 있다.
 - **이번 브랜치·병합과 무관**: 브랜치는 LMS 백엔드 파일을 **0건** 변경했고, 병합 전 main(`fa3c533c7`)의 해당 라인이 동일하다. 도입 시점은 2026-05-01 (`481c3d324`).
@@ -163,7 +147,7 @@ KPA 세션으로 GP operator resources 조회 → 200 이나 반환 데이터는
 ## 8. 미실측 / 잔존 위험
 
 - forum owner 대시보드·회원관리 실화면 (E4, 소유 forum 데이터 없음)
-- GP/KCos 콘텐츠·자료실의 **데이터 있는 상태** 목록/상세 (현재 0건이라 shape 만 검증)
+- KCos 콘텐츠·자료실의 **데이터 있는 상태** 목록/상세 (현재 0건이라 shape 만 검증)
 - content/resource **write 경로**(등록·수정·상태변경·삭제) — 운영 데이터 보호를 위해 의도적으로 미실행
 - PRE_EXISTING (1) 로 인한 서비스 간 강의 노출 (후속 WO 전까지 잔존)
 

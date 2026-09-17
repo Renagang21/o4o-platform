@@ -13,12 +13,11 @@
  * 본 패키지의 비범위 (의도적으로 제외):
  *   - 학습자 메서드(getCourses, getLessons, enrollCourse 등) — 서비스별 응답 형태/메서드명이
  *     서로 달라 정렬 작업이 선행되어야 한다.
- *   - GlycoPharm 의 unwrap 패턴(`.data.data.course`) 정렬
  *   - 페이지 호출부 변경
  *
  * 본 패키지는 axios/fetch 를 직접 import 하지 않는다. 서비스가 자체 http adapter 를
  * 주입(`createLmsInstructorClient(http)`)하여 사용한다. 이로써 KPA 의 fetch 래퍼와
- * GlycoPharm/K-Cosmetics 의 axios 인스턴스를 모두 수용한다.
+ * K-Cosmetics 의 axios 인스턴스를 모두 수용한다.
  */
 
 // ─── Base Types ─────────────────────────────────────────────────────────────
@@ -89,12 +88,12 @@ export type LmsInstructorCourseBase = LmsCourseBase;
 
 /**
  * 백엔드 `/lms/courses` 페이지네이션 응답.
- * KPA `PaginatedResponse<T>`, GlycoPharm `LmsCoursesResult`, K-Cos `PaginatedResponse<T>` 와 호환.
+ * KPA `PaginatedResponse<T>` · K-Cos `PaginatedResponse<T>` 와 호환.
  */
 export interface LmsPaginatedResponse<T> {
   data: T[];
   pagination?: { page: number; limit: number; total: number; totalPages: number };
-  /** 일부 서비스(GlycoPharm)는 `meta` 키를 사용. 타입은 호환만 보장. */
+  /** 일부 서비스는 `meta` 키를 사용. 타입은 호환만 보장. */
   meta?: { page: number; limit: number; total: number; totalPages: number };
   /** 일부 호출은 `totalPages` 만 노출 — backward compat */
   totalPages?: number;
@@ -128,7 +127,7 @@ export interface LmsHttpClient {
  * 본 factory 는 axios/fetch 를 직접 사용하지 않으며, LmsHttpClient 인터페이스로 추상화한다.
  *
  * 제외 항목 (의도적):
- *   - getLesson — GlycoPharm backend 미구현. Phase 5 에서 추가.
+ *   - getLesson — Phase 5 에서 추가.
  *   - 강사용 write API (createCourse, publishCourse 등) — KPA `lms-instructor.ts` 전용.
  *   - 운영자용 API (`operator*`) — KPA 전용.
  *   - 과제/라이브 (assignment, live) — Phase 5+ 에서 검토.
@@ -136,7 +135,7 @@ export interface LmsHttpClient {
 /**
  * WO-O4O-LMS-PUBLIC-COURSE-LIST-SERVICE-SCOPE-V1
  *
- * generic `/api/v1/lms/*` 를 사용하는 서비스(K-Cosmetics / GlycoPharm)가 자신의
+ * generic `/api/v1/lms/*` 를 사용하는 서비스(K-Cosmetics)가 자신의
  * service boundary 를 백엔드에 알리기 위한 옵션. 전달하면 read 요청에 canonical
  * `serviceKey` 가 자동 첨부된다 — 페이지별 URL 수정이 아니라 client 계층에서 처리한다.
  *
@@ -147,7 +146,7 @@ export interface LmsHttpClient {
  *    응답을 프론트에서 걸러내는 용도가 아니다.
  */
 export interface LmsClientOptions {
-  /** canonical service key ('k-cosmetics' | 'glycopharm' | ...) */
+  /** canonical service key ('k-cosmetics' | ...) */
   serviceKey?: string;
 }
 
@@ -229,7 +228,7 @@ export function createLmsLearnerClient(http: LmsHttpClient, options: LmsClientOp
     /**
      * 진도 업데이트.
      * `POST /lms/enrollments/:courseId/progress` body: `{ lessonId, completed, ...metrics? }`
-     * 반환: `{ success, data: { enrollment: T } }` — GlycoPharm 은 페이지에서 무시(void 반환).
+     * 반환: `{ success, data: { enrollment: T } }`
      *
      * WO-O4O-LMS-LESSON-TYPE-COMPLETION-RULES-V1: lesson type별 완료 메트릭(선택).
      *   - video: `watchedSeconds` 또는 `progressRatio` (백엔드 70% 임계)

@@ -8,7 +8,7 @@
 
 전수 조사 결과 판매자 모집 노출 승인은 **모델·백엔드·운영자 페이지·공유 UI·공급자 제출·승인만-노출
 소비 쿼리가 전부 실재·연결**되어 있었다. 직전 정비(342f7cef1)의 "backend 부재 placeholder" 판단이
-오진이었고, KPA `approvals` 그룹에서 메뉴 한 줄만 삭제된 상태였다(GP·KCos는 계속 노출 중). **메뉴 복원 +
+오진이었고, KPA `approvals` 그룹에서 메뉴 한 줄만 삭제된 상태였다(KCos는 계속 노출 중). 메뉴 복원
 오진 주석 정정**으로 완결. 백엔드·모델·migration·소비 쿼리 무변경.
 
 ## 1. 기존 구현 범위 (유형 C 근거)
@@ -26,7 +26,7 @@
 
 `operatorMenuGroups.ts` `UNIFIED_MENU.approvals` 에서 `{ '판매자 모집 노출 승인', /operator/recruitment-exposure }`
 한 줄이 삭제되고 "backend 부재 준비중" 주석으로 대체됨. **라우트·페이지·백엔드는 그대로 살아있어** 직접 URL로는
-접근 가능했고, 사이드바 진입점만 사라진 상태. GP(`operatorMenuGroups.ts:44`)·KCos(`:39`)는 동일 메뉴 유지 → KPA 단독 회귀.
+접근 가능했고, 사이드바 진입점만 사라진 상태. KCos(`:39`)는 동일 메뉴 유지 → KPA 단독 회귀.
 
 ## 3. 재사용/변경
 
@@ -40,7 +40,7 @@
 | # | 조건 | 판정 |
 |---|---|---|
 | 1 | 모델이 다른 의미 기능과 공용 | ❌ serviceKey(service_id) scoped, per-service proxy 격리 |
-| 2 | 이미 다른 운영자 화면에서 승인 중 | ❌ KPA proxy serviceKey 고정 — KPA 모집만. GP/KCos 각자 독립 |
+| 2 | 이미 다른 운영자 화면에서 승인 중 | ❌ KPA proxy serviceKey 고정 — KPA 모집만. KCos 각자 독립 |
 | 3 | 승인 후 소비처 전무 | ❌ browse API 완비+APPROVED 강제(소비 "화면" 별도는 후속) |
 | 4 | 기존 active 전환 시 운영 중단 | ❌ 데이터 0건 |
 | 5 | KPA 외 공통 영향 | ❌ operatorMenuGroups는 kpa-society 전용, 백엔드 무변경 |
@@ -76,7 +76,7 @@
 ## 7. 콘텐츠 무승인 정책 무영향 / KPA 외 영향
 
 - 공급자 일반 콘텐츠·태블렛·사이니지·QR/POP/동영상 무승인 게시 흐름 **무접촉**(이번 변경=메뉴 1줄).
-- GP·K-Cosmetics·Neture 메뉴 무변경. 백엔드 무변경.
+- K-Cosmetics·Neture 메뉴 무변경. 백엔드 무변경.
 
 ## 8. 후속(비차단) — WO §11 조건부 권장
 

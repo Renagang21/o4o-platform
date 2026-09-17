@@ -17,7 +17,7 @@
  *   수정**할 수 있다. 공통 해석기 변경은 본 WO 의 변경 금지 항목이므로,
  *   **조직 결정만** Pharmacy-Hub 기준(resolvePharmacyHubStoreOrganization)으로 하고
  *   조회·해제·활성 전환 로직은 공통 service(store-handled-products.service.ts)를 호출한다.
- *   → SQL·검증 계약 복제 0, 기존 KPA·GlycoPharm·K-Cosmetics 동작 불변.
+ *   → SQL·검증 계약 복제 0, 기존 KPA·K-Cosmetics 동작 불변.
  *
  * 조직 계약 (StoreInfo/Dashboard 와 동일 — 서비스 내 해석이 갈라지지 않게 한다)
  *   0개      : status='not_connected'  (GET 200 안내 / write 409 STORE_NOT_CONNECTED)
@@ -97,7 +97,7 @@ export class PharmacyHubHandledProductController {
    * GET /store-owner/handled-products
    * query: page, limit, search, source('all'|'listing'|'local'), includeInactive('false' 시 활성만)
    *
-   * 활성 상태 관리 화면이므로 **비활성 제품도 기본 포함**한다. 공통 소비처(KPA/GP/KCos)는
+   * 활성 상태 관리 화면이므로 **비활성 제품도 기본 포함**한다. 공통 소비처(KPA/KCos)는
    * 기존대로 활성만 보므로 service 기본값은 건드리지 않고 여기서 옵션으로만 켠다.
    */
   static async list(req: Request, res: Response): Promise<any> {

@@ -31,7 +31,7 @@
 - 완료 WO: STORE-SERVICE-SUBSCRIPTION-TOSS-PAYMENT / PLAN-CATALOG / ENDSAT-EXPOSURE / SMOKE(11/12).
 
 ### 3.4 소비자→매장 결제 차단 — **PASS**
-- `kpa|glycopharm|cosmetics-payment.controller.ts` prepare/confirm → **410 `STORE_SALE_PAYMENT_DEPRECATED`**(PaymentCore 도달 전). KPA storefront checkout → POS 안내. 라이브 smoke PASS(`CHECK-O4O-STORE-SALE-PAYMENT-EXCLUSION-DEPLOY-SMOKE-V1`).
+- KPA storefront checkout → POS 안내. 라이브 smoke PASS(`CHECK-O4O-STORE-SALE-PAYMENT-EXCLUSION-DEPLOY-SMOKE-V1`).
 
 ### 3.5 entitlement 상태 표시 — **PASS**
 - 라이브 `GET /store-entitlements/me/check` keys = `active, status, featureCode, startsAt, endsAt, planCode, serviceKey` ✅. 프론트(Panel/Page)는 endsAt 표시 구현(`ENDSAT-EXPOSURE` 라이브 PASS). 매장 경영자가 활성/만료일 확인 가능.

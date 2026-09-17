@@ -27,9 +27,9 @@ O4O Platform의 Store 도메인 entity는 **8개 이상 디렉토리**에 분산
 
 | Entity | 위치 | 테이블 | 사용 서비스 | 분류 |
 |--------|------|--------|------------|------|
-| `OrganizationStore` | `routes/kpa/entities/` | `organizations` | KPA, GlycoPharm, O4O-Store, Neture | **CORE (4 services)** |
+| `OrganizationStore` | `routes/kpa/entities/` | `organizations` | KPA, O4O-Store, Neture | **CORE (4 services)** |
 | `OrganizationChannel` | `routes/kpa/entities/` | `organization_channels` | KPA, O4O-Store | **CORE (2 services)** |
-| `OrganizationProductListing` | `routes/kpa/entities/` | `organization_product_listings` | KPA, GlycoPharm, O4O-Store, Neture, Platform, Product-Policy-V2 | **CORE (6+ consumers)** |
+| `OrganizationProductListing` | `routes/kpa/entities/` | `organization_product_listings` | KPA, O4O-Store, Neture, Platform, Product-Policy-V2 | **CORE (6+ consumers)** |
 | `OrganizationProductChannel` | `routes/kpa/entities/` | `organization_product_channels` | KPA, O4O-Store | **CORE (2 services)** |
 | `ServiceProduct` | `routes/kpa/entities/` | `service_products` | KPA, Neture, Product-Policy-V2 | **CORE (3 consumers)** |
 
@@ -49,8 +49,6 @@ O4O Platform의 Store 도메인 entity는 **8개 이상 디렉토리**에 분산
 |--------|------|--------|------|
 | `CosmeticsStore` | `routes/cosmetics/entities/` | `cosmetics` | K-Cosmetics 매장 |
 | `CosmeticsStoreListing` | `routes/cosmetics/entities/` | `cosmetics` | Cosmetics 상품 진열 |
-| `GlycopharmApplication` | `routes/glycopharm/entities/` | `public` | GlycoPharm 입점 |
-| `GlycopharmPharmacyExtension` | `routes/glycopharm/entities/` | `public` | GlycoPharm 확장 |
 
 ### 1.4 Platform Foundation Entities — 전역 store identity
 
@@ -65,29 +63,6 @@ O4O Platform의 Store 도메인 entity는 **8개 이상 디렉토리**에 분산
 ---
 
 ## 2. Cross-Boundary Violation 분석
-
-### 2.1 GlycoPharm → KPA Entities (16 controllers + 2 services)
-
-GlycoPharm의 **18개 파일**이 `routes/kpa/entities/OrganizationStore`를 직접 import:
-
-| 파일 | Import 대상 |
-|------|------------|
-| `routes/glycopharm/controllers/admin.controller.ts` | OrganizationStore |
-| `routes/glycopharm/controllers/application.controller.ts` | OrganizationStore |
-| `routes/glycopharm/controllers/checkout.controller.ts` | OrganizationStore |
-| `routes/glycopharm/controllers/cockpit.controller.ts` | OrganizationStore |
-| `routes/glycopharm/controllers/customer-request.controller.ts` | OrganizationStore |
-| `routes/glycopharm/controllers/display.controller.ts` | OrganizationStore |
-| `routes/glycopharm/controllers/event.controller.ts` | OrganizationStore |
-| `routes/glycopharm/controllers/funnel.controller.ts` | OrganizationStore |
-| `routes/glycopharm/controllers/operator.controller.ts` | OrganizationStore |
-| `routes/glycopharm/controllers/signage.controller.ts` | OrganizationStore |
-| `routes/glycopharm/controllers/store.controller.ts` | OrganizationStore |
-| `routes/glycopharm/repositories/glycopharm.repository.ts` | OrganizationStore |
-| `routes/glycopharm/services/event-promotion.service.ts` | OrganizationStore |
-| + 3개 추가 controllers | OrganizationStore |
-
-**위반 사유**: `OrganizationStore`는 service-agnostic entity이나, KPA route의 private directory에 위치.
 
 ### 2.2 O4O-Store → KPA Entities (8 controllers)
 
@@ -111,7 +86,6 @@ modules/product-policy-v2/product-approval-v2.service.ts
 
 | 위반 유형 | 파일 수 | 심각도 |
 |----------|---------|--------|
-| GlycoPharm → KPA entities | 18 | CRITICAL |
 | O4O-Store → KPA entities | 8 | CRITICAL |
 | Module → Route entities | 2 | CRITICAL |
 | **합계** | **28** | |
@@ -243,7 +217,6 @@ platform-core ✅
     → BUT missing: core product-store entities ❌
 
 services:
-    glycopharm → imports from routes/kpa ❌ (VIOLATION)
     cosmetics ✅ (isolated schema)
     kpa ✅ (owner, but should extract core)
 ```
@@ -269,7 +242,6 @@ routes/{service}/controllers/
 ACTUAL VIOLATIONS:
 routes/kpa/entities/ ← Core entities 위치
     ↑ WRONG — 18 files
-routes/glycopharm/controllers/
     ↑ WRONG — 8 files
 routes/o4o-store/controllers/
     ↑ WRONG — 2 files
@@ -285,7 +257,7 @@ modules/product-policy-v2/
 - **현재 위치**: `routes/kpa/entities/organization-store.entity.ts`
 - **테이블**: `organizations` (organization-core 확장)
 - **Phase A 확장 필드**: storefront_config, template_profile, business fields
-- **4개 서비스**가 사용 (KPA, GlycoPharm, O4O-Store, Neture)
+- **3개 서비스**가 사용 (KPA, O4O-Store, Neture)
 - **WO**: WO-O4O-ORG-SERVICE-MODEL-NORMALIZATION-V1
 
 ### 10.2 OrganizationProductListing
@@ -328,7 +300,7 @@ modules/product-policy-v2/
 | 5 | Package entity export | ✅ OK | 현행 packages는 entity 미포함 (정상) |
 | 6 | Module → Route import | ❌ CRITICAL | 2개 파일 layer 역방향 |
 | 7 | F3 Store Layer 준수 | ❌ VIOLATED | Core entity 미추출 |
-| 8 | Extension entity 위치 | ✅ OK | Cosmetics, GlycoPharm 정상 |
+| 8 | Extension entity 위치 | ✅ OK | Cosmetics 정상 |
 | 9 | Platform entity 위치 | ✅ OK | PhysicalStore 등 정상 |
 | 10 | Schema 분리 | ⚠️ PARTIAL | Cosmetics만 분리, Store Core는 public schema |
 
@@ -351,7 +323,7 @@ modules/product-policy-v2/
 │                                    ↑  ↑  ↑               │
 │                     ┌──────────────┘  │  └──────┐        │
 │                     │                 │         │        │
-│  routes/glycopharm/ │  routes/o4o-store/  modules/       │
+│  routes           / │  routes/o4o-store/  modules/       │
 │  (18 files)         │  (8 files)      product-policy-v2  │
 │                     │                 (2 files)          │
 └──────────────────────────────────────────────────────────┘
@@ -368,7 +340,7 @@ modules/product-policy-v2/
 │  │ ServiceProduct                             │          │
 │  └────────────────────────────────────────────┘          │
 │            ↑           ↑           ↑                     │
-│  routes/kpa/  routes/glycopharm/  routes/o4o-store/      │
+│  routes/kpa/  routes/  routes/o4o-store/                 │
 │  (owner)      (consumer)          (consumer)             │
 └──────────────────────────────────────────────────────────┘
 ```

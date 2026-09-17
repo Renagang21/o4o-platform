@@ -5,7 +5,7 @@
  *
  * ForumWriteForm(폼 본문)은 이미 공통이나, 그 폼을 감싸는 화면 셸
  * (page/container · heading · 작성자 표시 · 로그인 게이트 · 로딩 · 게시판 selector)이
- * K-Cosmetics / GlycoPharm 에 그대로 복제돼 있었다. 그 셸만 여기로 승격한다.
+ * K-Cosmetics 에 그대로 복제돼 있었다. 그 셸만 여기로 승격한다.
  *
  * 규칙:
  * - fetch / axios / 서비스 API import 없음. router 의존 없음.

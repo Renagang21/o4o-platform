@@ -16,7 +16,7 @@
 | `services/web-neture/src/pages/store/StoreOrderDetailPage.tsx` | reorder → `storeCart.addItem` |
 | `services/web-neture/src/pages/store/StoreOrdersPage.tsx` | reorder → `storeCart.addItem` |
 
-> backend(P2a/b/c·group payment·bridge)·KPA/Glyco/KCos·정산 **무변경**. `lib/cart.ts`(localStorage) 파일 보존(미사용 — 완전 제거는 후속). `/neture/seller/orders` route·`storeApi.createOrder` 메서드 정의 보존(buyer 호출 0).
+> `lib/cart.ts`(localStorage) 파일 보존(미사용 — 완전 제거는 후속). `/neture/seller/orders` route·`storeApi.createOrder` 메서드 정의 보존(buyer 호출 0).
 
 ## 2. 흐름 (canonical)
 ```
@@ -48,7 +48,7 @@
 - **positive end-to-end — DEFERRED**: 인증 매장 계정 + 유효 SPO(공급 상품) + Toss 테스트결제 필요. 운영 데이터 mutation·실결제 지양 → 코드/parity 검증으로 갈음. cart add→confirm-b2b→paymentGroupId→결제→paid→bridge→공급자 노출 실측은 테스트 계정/시드/sandbox 확보 시 별도 positive CHECK.
 
 ## 7. 회귀 무영향
-- KPA/Glyco/KCos cart·payment 무변경. backend group payment/bridge/정산 무변경. `/neture/seller/orders` route 유지(buyer 미호출). payment widget(P2d-1) route 무회귀.
+- backend group payment/bridge/정산 무변경. `/neture/seller/orders` route 유지(buyer 미호출). payment widget(P2d-1) route 무회귀.
 - supplier workspace: paid 주문만 bridge→노출(기존 guard/visibility 필터 유지).
 
 ## 8. Live smoke (neture-web 배포 신리비전)

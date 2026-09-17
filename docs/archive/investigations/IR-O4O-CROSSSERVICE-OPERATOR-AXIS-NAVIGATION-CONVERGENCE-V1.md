@@ -5,44 +5,44 @@
 **상위 IR**: [IR-O4O-CROSSSERVICE-OPERATOR-ADMIN-DASHBOARD-CANONICAL-AUDIT-V1](IR-O4O-CROSSSERVICE-OPERATOR-ADMIN-DASHBOARD-CANONICAL-AUDIT-V1.md) §12 I3
 **선행 종결**:
 - [IR-O4O-KPA-OPERATOR-DASHBOARD-API-5BLOCK-UNIFICATION-V1](IR-O4O-KPA-OPERATOR-DASHBOARD-API-5BLOCK-UNIFICATION-V1.md) (I1 — Option B 권장)
-- [CHECK-O4O-GLYCOPHARM-EVENT-OFFER-APPROVAL-SCOPE-SMOKE-V1](CHECK-O4O-GLYCOPHARM-EVENT-OFFER-APPROVAL-SCOPE-SMOKE-V1.md) (I2 + G2 + G1 PASS)
+- (I2 + G2 + G1 PASS)
 - [IR-O4O-NETURE-OPERATOR-DOMAIN-IA-DESIGN-V1](IR-O4O-NETURE-OPERATOR-DOMAIN-IA-DESIGN-V1.md) (Neture 4-domain 확정)
 - [IR-O4O-NETURE-OPERATOR-SIDEBAR-LAYOUT-MIGRATION-AUDIT-V1](IR-O4O-NETURE-OPERATOR-SIDEBAR-LAYOUT-MIGRATION-AUDIT-V1.md) (sidebar 이행 audit)
 
-**조사 도구**: 5개 병렬 Explore agent — KPA / GlycoPharm / K-Cosmetics axis 구조 + Neture 미사용 분석 + 공통 패키지 / type 분석
+**조사 도구**: 5개 병렬 Explore agent — KPA / K-Cosmetics axis 구조 + Neture 미사용 분석 + 공통 패키지 / type 분석
 
 ---
 
 ## 0. 핵심 결론 (TL;DR)
 
-> ✅ **권장: Option B — AxisNavigation 은 optional block 으로 유지. KPA / GlycoPharm / K-Cosmetics 사용 유지, Neture 미사용 유지 (별도 DomainIA sidebar 트랙으로 진행 중)**
+> ✅ 권장: Option B — AxisNavigation 은 optional block 으로 유지.
 >
 > 1. **AxisNavigation 은 이미 공통화 완료** — `packages/operator-core-ui/src/dashboard/AxisNavigationSection.tsx` (commit `23304abfa`, WO-O4O-OPERATOR-DASHBOARD-AXIS-NAVIGATION-COMMONIZATION-V1). 공통 type `OperatorAxisGroup` + 5 tone (blue/emerald/purple/amber/slate) + metrics 확장 지원.
 > 2. **OperatorDashboardConfig type 에 axes 필드 없음** — axes 는 frontend 에서 `<AxisNavigationSection axes={...} />` 로 별도 렌더. **이미 design 상 optional**.
 > 3. **Neture 의도적 미사용 + 별도 트랙 진행 중** — Neture 는 `DomainIASidebar` 의 4-domain IA (공급·유통 / 커머스·정산 / 커뮤니티·콘텐츠 / 운영 공통) 로 축 안내 역할 수행 예정. AxisNavigation 강제 도입 시 sidebar IA 와 중복 + Neture 4-domain 의미 왜곡.
-> 4. **K-Cos 만 라벨 divergence 잔존** — KPA / GlycoPharm 은 (community / hub) 2축, K-Cos 는 (store-hub / content) 2축. K-Cos 에 "커뮤니티 운영" 축 없고 "콘텐츠 운영" 별도 축. 비판단 사항 — K-Cos 사업 성격 (curation 중심) 상 자연스러울 수 있음. 별도 소규모 cosmetics axis 정합 IR 또는 small WO 후보.
-> 5. **3 서비스 의 axis 데이터 source 차이** — KPA dynamic (buildKpaAxes — extData metrics), GlycoPharm/K-Cos static. KPA 패턴이 정보량 더 높으나 backend dependency 가 큼.
+> 4. **K-Cos 만 라벨 divergence 잔존** — KPA 은 (community / hub) 2축, K-Cos 는 (store-hub / content) 2축. K-Cos 에 "커뮤니티 운영" 축 없고 "콘텐츠 운영" 별도 축. 비판단 사항 — K-Cos 사업 성격 (curation 중심) 상 자연스러울 수 있음. 별도 소규모 cosmetics axis 정합 IR 또는 small WO 후보.
+> 5. **2 서비스 의 axis 데이터 source 차이** — KPA dynamic (buildKpaAxes — extData metrics), K-Cos static. KPA 패턴이 정보량 더 높으나 backend dependency 가 큼.
 > 6. **현 시점 즉시 진행 필요 없음** — AxisNavigation 자체는 공통화 완료, Neture 4-domain 은 sidebar 트랙으로 진행 중. 본 IR 의 역할은 정책 confirm.
 
-권고 단계: ① 본 IR 로 Option B 정책 확정 → ② Neture sidebar 이행 트랙 (외부 세션 진행 중) 별도 진행 → ③ (선택) K-Cos axis 라벨 정합 IR / small WO → ④ (선택) GlycoPharm / K-Cos axis metrics 도입 (KPA 패턴 따라가기) — 우선순위 낮음
+권고 단계: ① 본 IR 로 Option B 정책 확정 → ② Neture sidebar 이행 트랙 (외부 세션 진행 중) 별도 진행 → ③ (선택) K-Cos axis 라벨 정합 IR / small WO → ④ (선택) K-Cos axis metrics 도입 (KPA 패턴 따라가기) — 우선순위 낮음
 
 ---
 
 ## 1. Executive Summary
 
-| 측면 | KPA | GlycoPharm | K-Cosmetics | Neture |
-|------|:---:|:----------:|:-----------:|:------:|
-| AxisNavigationSection 사용 | ✅ | ✅ | ✅ | ❌ (의도적) |
-| 축 개수 | 2 | 2 | 2 | (4-domain via sidebar) |
-| 데이터 source | dynamic (buildKpaAxes) | static (GP_AXES) | static (KCOS_AXES) | — |
-| axis 라벨 1 | 커뮤니티 운영 | 커뮤니티 운영 | **매장 HUB 운영** ⚠️ | (공급·유통 운영 — sidebar) |
-| axis 라벨 2 | 매장 HUB 운영 | 약국 HUB 운영 | **콘텐츠 운영** ⚠️ | (커머스·정산 / 커뮤니티·콘텐츠 / 운영 공통 — sidebar) |
-| 5-Block layout 사용 | ✅ (OperatorDashboardLayout) | ✅ | ✅ | ✅ |
-| 5-Block 과 axis 위치 | 상단 별도 section (조건부) | 상단 별도 section (무조건) | 상단 별도 section (무조건) | 미해당 |
-| OperatorDashboardConfig.axes 필드 | ❌ (없음) | ❌ | ❌ | ❌ |
-| Backend dashboard 응답에 axes 포함 | ❌ (KPA summary 미통합) | ❌ | ❌ | ❌ |
-| 대체 축 안내 컴포넌트 | OperatorRoleGuideCard (KPA 만) | — | — | DomainIASidebar (4-domain, 진행 중) |
-| 사업 성격 | 커뮤니티 (약사회) + 매장 HUB | 커뮤니티 (당뇨) + 약국 HUB | 매장 HUB + 콘텐츠 (curation) | 공급자 + 파트너 + B2B + Market Trial |
+| 측면 | KPA | K-Cosmetics | Neture |
+| ------ | :---: | :-----------: | :------: |
+| AxisNavigationSection 사용 | ✅ | ✅ | ❌ (의도적) |
+| 축 개수 | 2 | 2 | (4-domain via sidebar) |
+| 데이터 source | dynamic (buildKpaAxes) | static (KCOS_AXES) | — |
+| axis 라벨 1 | 커뮤니티 운영 | **매장 HUB 운영** ⚠️ | (공급·유통 운영 — sidebar) |
+| axis 라벨 2 | 매장 HUB 운영 | **콘텐츠 운영** ⚠️ | (커머스·정산 / 커뮤니티·콘텐츠 / 운영 공통 — sidebar) |
+| 5-Block layout 사용 | ✅ (OperatorDashboardLayout) | ✅ | ✅ |
+| 5-Block 과 axis 위치 | 상단 별도 section (조건부) | 상단 별도 section (무조건) | 미해당 |
+| OperatorDashboardConfig.axes 필드 | ❌ (없음) | ❌ | ❌ |
+| Backend dashboard 응답에 axes 포함 | ❌ (KPA summary 미통합) | ❌ | ❌ |
+| 대체 축 안내 컴포넌트 | OperatorRoleGuideCard (KPA 만) | — | DomainIASidebar (4-domain, 진행 중) |
+| 사업 성격 | 커뮤니티 (약사회) + 매장 HUB | 매장 HUB + 콘텐츠 (curation) | 공급자 + 파트너 + B2B + Market Trial |
 
 ### 권장: ✅ **Option B — Optional block 유지 + 서비스별 정체성 보존**
 
@@ -106,7 +106,7 @@ interface AxisMetric { label: string; value: number; href: string; warn?: boolea
 - **axes 필드 없음**
 
 **Backend** ([`apps/api-server/src/types/operator-dashboard.types.ts`](../../apps/api-server/src/types/operator-dashboard.types.ts)):
-- 동일 5-Block + `operatorAlerts?` (GlycoPharm 만 사용)
+- 동일 5-Block + `operatorAlerts?`
 - **axes 필드 없음**
 
 → **AxisNavigation 은 이미 design 상 optional**. 공통 type 에 포함되지 않고, frontend 서비스 컴포넌트에서 별도 렌더.
@@ -160,36 +160,6 @@ interface AxisMetric { label: string; value: number; href: string; warn?: boolea
 
 ---
 
-## 5. GlycoPharm AxisNavigation 구조
-
-### 5.1 사용 위치
-
-[`services/web-glycopharm/src/pages/operator/GlycoPharmOperatorDashboard.tsx`](../../services/web-glycopharm/src/pages/operator/GlycoPharmOperatorDashboard.tsx)
-
-- Import: `import { AxisNavigationSection, type OperatorAxisGroup } from '@o4o/operator-core-ui';` (line 22)
-- 렌더: `<AxisNavigationSection axes={GP_AXES} />` (line 143) — **무조건**
-- 위치: header 아래, `<OperatorDashboardLayout />` 위
-- Definition: `const GP_AXES: OperatorAxisGroup[]` (line 40-65, **static**)
-
-### 5.2 Axis 구성
-
-| key | title | description | icon | tone | metrics | links (3개) |
-|-----|-------|-------------|------|------|:-------:|-------------|
-| `community` | 커뮤니티 운영 | 포럼 · 회원 · 콘텐츠 · LMS | 💬 | blue | ❌ | forum / members / lms |
-| `pharmacy-hub` | 약국 HUB 운영 | 매장 · 채널 · 설문 | 🏥 | emerald | ❌ | stores / channels / surveys |
-
-### 5.3 KPA 와의 정합성
-
-- **축 개수**: 동일 (2축)
-- **community 라벨**: 동일 (`커뮤니티 운영`)
-- **HUB 라벨**: GlycoPharm "약국 HUB 운영" vs KPA "매장 HUB 운영" — 서비스 특화 표현 (약사 vs 약국 경영자 도메인 정합)
-- **데이터 source**: GlycoPharm static (metrics 미사용) vs KPA dynamic (metrics 사용)
-- **icon**: 🏥 (병원/약국) vs 🏪 (가게)
-- **tone**: blue / emerald 동일
-- **links 차이**: GlycoPharm 은 stores/channels/surveys, KPA 는 stores/event-offers/signage (서비스 기능 차이 반영)
-
----
-
 ## 6. K-Cosmetics AxisNavigation 구조
 
 ### 6.1 사용 위치
@@ -201,7 +171,7 @@ interface AxisMetric { label: string; value: number; href: string; warn?: boolea
 - 위치: 최상단 (OrderMetricsReady alert 보다 먼저)
 - Definition: `const KCOS_AXES: OperatorAxisGroup[]` (line 16-43, **static**)
 
-### 6.2 Axis 구성 — KPA / GlycoPharm 와 다른 패턴
+### 6.2 Axis 구성 — KPA 와 다른 패턴
 
 | key | title | description | icon | tone | links (4개) |
 |-----|-------|-------------|------|------|-------------|
@@ -276,7 +246,7 @@ interface AxisMetric { label: string; value: number; href: string; warn?: boolea
 | AxisNavigation = OperatorDashboardConfig 의 일부? | ❌ 아님 (별도 컴포넌트) | △ 가능하나 design 분리가 더 깔끔 | **별도 유지** |
 | OperatorDashboardLayout 이 axes 렌더? | ❌ 아님 (외부 렌더) | △ 가능하나 강제 도입 시 Neture / 비-axis 서비스 강제 | **외부 렌더 유지** |
 | Backend response 에 axes 포함? | ❌ (3 서비스 모두 frontend 정의) | △ 가능 — KPA buildKpaAxes 패턴이 backend 화 가능. 단 KPA 5-Block backend 도입 (I1 Option B) 후 검토 가능 | **현재 frontend, I1 진행 후 검토** |
-| frontend builder 에서 조립? | ✅ (KPA buildKpaAxes dynamic / GP+K-Cos static) | — | **유지** |
+| frontend builder 에서 조립? | ✅ (KPA buildKpaAxes dynamic / K-Cos static) | — | **유지** |
 
 ### 8.2 I1 (KPA 5-Block backend endpoint 도입) 과의 관계
 
@@ -289,7 +259,6 @@ interface AxisMetric { label: string; value: number; href: string; warn?: boolea
 
 ### 8.3 정합 권고
 
-- **Frontend 정의 유지** — buildKpaAxes (dynamic) + GP_AXES (static) + KCOS_AXES (static)
 - **Backend 응답에는 axes 포함 안 함** — 현재 design 유지
 - **OperatorDashboardConfig type 에 axes 추가 안 함** — 별도 컴포넌트 design 유지
 - **OperatorDashboardLayout 에 axes 렌더 통합 안 함** — 외부 렌더 패턴 유지
@@ -303,7 +272,7 @@ interface AxisMetric { label: string; value: number; href: string; warn?: boolea
 | 측면 | 평가 |
 |------|------|
 | 장점 | 4 서비스 시각 일관성 극대화. operator dashboard 의 운영 영역 안내가 dashboard 상단 통일된 위치에 표시. cross-service learnability 증가. |
-| 단점 | (1) Neture B2B 정체성 훼손 — KPA 2축 또는 Neture 4-domain 강제 시 다른 서비스 도메인 왜곡. (2) Neture 의 sidebar DomainIA 트랙과 중복 (이미 진행 중). (3) 모든 서비스 axes 가 4 가지 표준 (공급·유통 / 커머스 / 커뮤니티 / 운영 공통) 따라가야 함 — KPA / GP / K-Cos 의 기존 2축 구조 재설계 필요. (4) operator-ux-core / operator-core-ui type 통합 + dashboard / sidebar 이중화 정리 필요. |
+| 단점 | (1) Neture B2B 정체성 훼손 — KPA 2축 또는 Neture 4-domain 강제 시 다른 서비스 도메인 왜곡. (2) Neture 의 sidebar DomainIA 트랙과 중복 (이미 진행 중). (3) 모든 서비스 axes 가 4 가지 표준 (공급·유통 / 커머스 / 커뮤니티 / 운영 공통) 따라가야 함 — KPA / K-Cos 의 기존 2축 구조 재설계 필요. (4) operator-ux-core / operator-core-ui type 통합 + dashboard / sidebar 이중화 정리 필요. |
 | 리스크 | 매우 높음 |
 | 권장 | ❌ |
 
@@ -311,7 +280,7 @@ interface AxisMetric { label: string; value: number; href: string; warn?: boolea
 
 | 측면 | 평가 |
 |------|------|
-| 장점 | (1) 이미 design 정합 — `OperatorDashboardConfig.axes` 필드 없음, 별도 컴포넌트. 변경 0. (2) KPA / GP / K-Cos 3 서비스의 기존 axis 보존 — 운영자 체감 영향 0. (3) Neture 사업 정체성 보존 — sidebar DomainIA 트랙으로 자연스럽게 진행. (4) 1인 개발 부담 0 — 본 IR 의 정책 confirm 만으로 종결. (5) cross-service 정합은 5-Block + Layout 컴포넌트 + sidebar IA + tone 색상 매핑 등 다른 layer 에서 이미 확보. |
+| 장점 | (1) 이미 design 정합 — `OperatorDashboardConfig.axes` 필드 없음, 별도 컴포넌트. 변경 0. (2) KPA / K-Cos 2 서비스의 기존 axis 보존 — 운영자 체감 영향 0. (3) Neture 사업 정체성 보존 — sidebar DomainIA 트랙으로 자연스럽게 진행. (4) 1인 개발 부담 0 — 본 IR 의 정책 confirm 만으로 종결. (5) cross-service 정합은 5-Block + Layout 컴포넌트 + sidebar IA + tone 색상 매핑 등 다른 layer 에서 이미 확보. |
 | 단점 | K-Cos 라벨 divergence (community 축 부재) 잔존 — 별도 소규모 IR / WO 로 검토 가능. |
 | 리스크 | 매우 낮음 |
 | 권장 | ✅ **권장** |
@@ -320,7 +289,7 @@ interface AxisMetric { label: string; value: number; href: string; warn?: boolea
 
 | 측면 | 평가 |
 |------|------|
-| 장점 | Neture 4-domain 을 dashboard 상단에 명시. KPA / GP / K-Cos 와 위치 정합. |
+| 장점 | Neture 4-domain 을 dashboard 상단에 명시. KPA / K-Cos 와 위치 정합. |
 | 단점 | (1) 이미 Neture 에 sidebar DomainIA 트랙 진행 중 — dashboard 상단 추가 시 sidebar 와 중복. (2) AxisNavigationSection vs DomainNavigationSection 별도 컴포넌트 유지 부담. (3) Neture 4-domain 의 sidebar 안내가 이미 충분 — dashboard 추가 정보 노출 의미 약함. (4) "공급자·정산·B2B 강조" 가 dashboard KPI 8개 + Action Queue 4개 + Quick Actions 7개 로도 이미 표현됨. |
 | 리스크 | 중간 (중복 정보) |
 | 권장 | △ — Neture sidebar 이행 완료 후 사용자 피드백 보고 결정. 현 시점 도입 권장 안 함. |
@@ -330,7 +299,7 @@ interface AxisMetric { label: string; value: number; href: string; warn?: boolea
 | 측면 | 평가 |
 |------|------|
 | 장점 | dashboard 단순화. 정보 밀도 감소. |
-| 단점 | (1) KPA / GP / K-Cos 의 운영 영역 안내 사라짐 — 운영자 cognitive load 증가. (2) KPA `buildKpaAxes` 의 dynamic metrics (회원 승인 / 상품 신청 / 포럼 요청 등) 의 시각화 손실. (3) operator-core-ui 의 공통 컴포넌트 폐기 비용. (4) KPA / GP / K-Cos 운영자 워크플로 회귀. |
+| 단점 | (1) KPA / K-Cos 의 운영 영역 안내 사라짐 — 운영자 cognitive load 증가. (2) KPA `buildKpaAxes` 의 dynamic metrics (회원 승인 / 상품 신청 / 포럼 요청 등) 의 시각화 손실. (3) operator-core-ui 의 공통 컴포넌트 폐기 비용. (4) KPA / K-Cos 운영자 워크플로 회귀. |
 | 리스크 | 높음 |
 | 권장 | ❌ |
 
@@ -343,15 +312,15 @@ interface AxisMetric { label: string; value: number; href: string; warn?: boolea
 **근거**:
 
 1. **이미 design 정합** — AxisNavigation 이 design 상 optional. `OperatorDashboardConfig` type 에 axes 필드 없음, OperatorDashboardLayout 외부 렌더. **본 IR 의 역할은 정책 confirm 만**.
-2. **3 서비스 (KPA/GP/K-Cos) 기존 axis 보존** — 사용자 체감 영향 0. 운영자 워크플로 회귀 없음.
+2. **2 서비스 (KPA/K-Cos) 기존 axis 보존** — 사용자 체감 영향 0. 운영자 워크플로 회귀 없음.
 3. **Neture 4-domain 트랙 분리** — sidebar `DomainIASidebar` 이행으로 Neture 의 축 안내 책임 sidebar 에 위임. dashboard 단에 AxisNavigation 강제 도입 시 sidebar 와 중복 + Neture B2B 정체성 훼손.
 4. **OperatorDashboardStandard 정합** — 본 IR 의 권고는 `OPERATOR-DASHBOARD-STANDARD-V1` 의 "5-Block 필수 + Operator Alerts optional" 구조에 `AxisNavigation optional` 추가 가능. 단 standard 문서 update 자체는 별도 작업 (본 IR 권고 사항).
 5. **1인 개발 속도** — 즉시 코드 작업 0. 정책 결정만으로 종결.
 
 ### 단, 추가 사항 (선택)
 
-- **K-Cos 라벨 divergence**: KPA / GP 는 "커뮤니티 운영" 축 있고 K-Cos 는 "콘텐츠 운영" 축. K-Cos 사업 정체성 (curation 중심) 상 자연스러우나, KPA canonical 정합 관점에서 별도 소규모 IR / WO 후보. 본 IR scope 외, 우선순위 낮음.
-- **GlycoPharm / K-Cos axis metrics 도입 검토**: KPA `buildKpaAxes` 패턴 (dynamic metrics) 을 GP / K-Cos 에도 도입하면 정보 밀도 동등화. 단 backend dependency 필요. 우선순위 낮음.
+- **K-Cos 라벨 divergence**: KPA 는 "커뮤니티 운영" 축 있고 K-Cos 는 "콘텐츠 운영" 축. K-Cos 사업 정체성 (curation 중심) 상 자연스러우나, KPA canonical 정합 관점에서 별도 소규모 IR / WO 후보. 본 IR scope 외, 우선순위 낮음.
+- 단 backend dependency 필요. 우선순위 낮음.
 - **Neture sidebar 이행 완료 후 dashboard 단 4-domain 안내 도입 검토**: Option C 의 변형. Neture sidebar 이행 완료 후 사용자 피드백 본 뒤 결정. 우선순위 낮음.
 
 ### 즉시 진행 권장 없음
@@ -368,7 +337,6 @@ interface AxisMetric { label: string; value: number; href: string; warn?: boolea
 
 | ID (가칭) | 범위 | 우선 |
 |-----------|------|:----:|
-| WO-O4O-GLYCOPHARM-OPERATOR-AXIS-METRICS-ALIGN-WITH-KPA-V1 | GlycoPharm GP_AXES 에 KPA 패턴 metrics 도입 (extData 기반 dynamic). 사용자 정보 밀도 향상. backend 변경 필요 시 별도 IR 선행. | 낮음 |
 | WO-O4O-KCOSMETICS-OPERATOR-AXIS-METRICS-ALIGN-WITH-KPA-V1 | K-Cos KCOS_AXES 에 동일 metrics 도입 | 낮음 |
 | IR-O4O-KCOSMETICS-OPERATOR-AXIS-LABEL-CONVERGENCE-V1 (선택) | K-Cos 의 (store-hub / content) 2축을 KPA 정합 (community / store-hub) 으로 변경할지 정책 결정 | 낮음 |
 | IR-O4O-OPERATOR-DASHBOARD-OPTIONAL-BLOCK-STANDARD-V1 (선택) | OPERATOR-DASHBOARD-STANDARD-V1 에 AxisNavigation / OperatorAlerts / OperatorRoleGuideCard 의 optional block 표준 명시 | 중간 |
@@ -390,7 +358,7 @@ interface AxisMetric { label: string; value: number; href: string; warn?: boolea
 
 | WO | 리스크 |
 |----|:------:|
-| GlycoPharm/K-Cos axis metrics 도입 | 중간 — backend dependency / extData shape 변경 필요 |
+| K-Cos axis metrics 도입 | 중간 — backend dependency / extData shape 변경 필요 |
 | K-Cos axis 라벨 정합 | 중간 — 사용자 시각 변화 / 사업 정체성 재정렬 |
 | Operator dashboard optional block standard 문서화 | 낮음 — 문서만 |
 | Neture sidebar 이행 (외부 트랙) | 별도 영역 |
@@ -409,7 +377,7 @@ interface AxisMetric { label: string; value: number; href: string; warn?: boolea
 |------|:--------------:|:--------------:|:--------------:|:--------------:|
 | §3 참여 주체 (Operator) | ✅ | ✅ | ✅ | △ |
 | §3.2 operator 정의 (운영 영역 안내 + 매장 실행 자산 제작) | ⚠️ Neture B2B 영역 왜곡 가능 | ✅ 서비스별 정체성 보존 | ✅ | ❌ axis 제거 시 운영 영역 안내 손실 |
-| §5 HUB 철학 (매장 HUB) | △ Neture B2B 와 충돌 | ✅ KPA/GP/K-Cos 의 매장 HUB 축 보존 + Neture sidebar 4-domain | ✅ | △ |
+| §5 HUB 철학 (매장 HUB) | △ Neture B2B 와 충돌 | ✅ KPA/K-Cos 의 매장 HUB 축 보존 + Neture sidebar 4-domain | ✅ | △ |
 | §7 Drift 방지 (도메인 어휘 격리) | ❌ KPA 식 라벨 강제 시 도메인 어휘 왜곡 | ✅ 서비스별 도메인 어휘 보존 | ✅ | ✅ |
 | 3-Role Flow §2 책임 매트릭스 | △ | ✅ | ✅ | △ |
 | 공통화 + 운영 흐름 정합 §2 | △ 강제 시 over-fitting | ✅ "공통 컴포넌트 + 서비스별 선택" 패턴 | △ Neture 별도 컴포넌트 부담 | △ |
@@ -441,11 +409,11 @@ interface AxisMetric { label: string; value: number; href: string; warn?: boolea
 | 항목 | 값 |
 |------|------|
 | 작성 문서 | `docs/investigations/IR-O4O-CROSSSERVICE-OPERATOR-AXIS-NAVIGATION-CONVERGENCE-V1.md` |
-| 서비스별 AxisNavigation 현황 요약 | KPA 사용 (dynamic, 2축 community/store-hub) / GlycoPharm 사용 (static, 2축 community/pharmacy-hub) / K-Cosmetics 사용 (static, 2축 store-hub/content — KPA 라벨 divergence) / Neture **미사용** (의도적, sidebar DomainIA 트랙으로 4-domain 안내) |
+| 서비스별 AxisNavigation 현황 요약 | KPA 사용 (dynamic, 2축 community/store-hub) 사용 (static, 2축 community/pharmacy-hub) / K-Cosmetics 사용 (static, 2축 store-hub/content — KPA 라벨 divergence) / Neture **미사용** (의도적, sidebar DomainIA 트랙으로 4-domain 안내) |
 | Neture 미사용 판정 | ✅ 의도적 미사용 — sidebar 의 4-domain (공급·유통 / 커머스·정산 / 커뮤니티·콘텐츠 / 운영 공통) 으로 안내 책임 위임. KPA 식 2축 강제 도입 시 B2B / supplier / partner / Market Trial / 정산 영역 왜곡 |
-| 권장 옵션 | **Option B** — AxisNavigation 은 optional block 유지. KPA / GP / K-Cos 사용 유지, Neture 미사용 유지 (sidebar 트랙으로 별도 진행) |
+| 권장 옵션 | **Option B** — AxisNavigation 은 optional block 유지. KPA / K-Cos 사용 유지, Neture 미사용 유지 (sidebar 트랙으로 별도 진행) |
 | 즉시 WO 필요 여부 | ❌ 즉시 진행 필요 없음. 본 IR 은 정책 confirm. 후속 WO 후보 모두 우선순위 낮음 |
-| 보류 항목 | (1) K-Cos axis 라벨 정합 검토 (별도 IR), (2) GlycoPharm / K-Cos axis metrics 도입 (별도 WO), (3) Operator dashboard optional block standard 문서화 (별도 WO), (4) Neture sidebar 이행 완료 후 dashboard 단 4-domain 도입 검토 (Option C 변형, 별도 IR) |
+| 보류 항목 | (1) K-Cos axis 라벨 정합 검토 (별도 IR), (2) K-Cos axis metrics 도입 (별도 WO), (3) Operator dashboard optional block standard 문서화 (별도 WO), (4) Neture sidebar 이행 완료 후 dashboard 단 4-domain 도입 검토 (Option C 변형, 별도 IR) |
 | 코드 / DB / migration / route / API / frontend / menu / dashboard / component 수정 | **없음** ✅ |
 | 다른 세션 WIP 미포함 | ✅ 본 IR 진행 시점 working tree clean. Neture sidebar 이행 외부 세션 트랙은 별도 영역 |
 | Commit 여부 | **사용자 승인 대기** — 본 IR 문서 1개만 path-restricted commit 예정 |

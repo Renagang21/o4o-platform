@@ -148,7 +148,6 @@ WO §6.1 은 법정 3개만 명시하지만 §9 코드 검증은 "PlatformFooter
 
 - Neture Footer, MobileBottomNav 공통화, PharmacyHub Header/Footer — **미수정, 후속 과제로 남김**.
 - `PlatformHeader` 의 `href="#services"` / `href="#about"` — 같은 파일이 아니고 anchor 로서 유효(`PlatformFooter` 에 `id="about"` 존재). 이번 범위 밖.
-- GlycoPharm `© 2025` stale — 선행 CHECK 지적 사항이나 이번 범위 밖.
 - dead component 삭제, KPA layout 리팩터링, 법정문서 DB/schema, route 체계 변경 — 수행하지 않음.
 
 **(c) 완료 선언 범위**

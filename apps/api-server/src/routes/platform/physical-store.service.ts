@@ -81,7 +81,6 @@ export class PhysicalStoreService {
     let linked = 0;
 
     // 1. Fetch all stores with business_number
-    //    WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1: glycopharm 링크 소스 제거 (서비스 삭제).
     const cosmeticsRows = await this.dataSource.query(
       `SELECT id, business_number, name, region
        FROM cosmetics.cosmetics_stores
@@ -167,7 +166,6 @@ export class PhysicalStoreService {
     // WO-O4O-STORE-KPI-DASHBOARD-CHECKOUT-ORDERS-ALIGNMENT-V1:
     // checkout_orders.sellerOrganizationId 와 physical_store_links.service_store_id 간
     // bridge: cosmetics 인 경우 cosmetics_stores.organization_id.
-    // WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1: glycopharm 분기 제거.
     const rows = await this.dataSource.query(
       `SELECT
          ps.id as "physicalStoreId",

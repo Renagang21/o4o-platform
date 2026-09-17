@@ -1,7 +1,7 @@
 # IR-O4O-AI-CONTENT-GENERATION-ENTRYPOINT-AUDIT-V1
 
 > 유형: 조사 (read-only) / 상태: 분류 완료, 후속 WO 결정 대기
-> 작성일: 2026-06-26 / 범위: O4O 전 서비스(KPA / GlycoPharm / K-Cosmetics / Neture) + 공통 패키지
+> 작성일: 2026-06-26 / 범위: O4O 전 서비스(KPA / K-Cosmetics / Neture) + 공통 패키지
 > 정책: **O4O는 초안을 생성하지 않는다. 사용자가 외부 LLM(ChatGPT/Claude/Gemini)에서 작성한 초안을 편집기에 붙여 활용한다. 단, 편집기 내부 AI 보조(기존 본문 다듬기)는 유지한다.**
 
 ---
@@ -14,7 +14,7 @@
    - **편집기 Toolbar "AI 정리" 버튼**이 `editor`를 넘기고 "에디터에서 가져오기"로 기존 본문을 잡으면 → **편집 보조**(유지 대상).
    - ⚠️ **따라서 제거는 `AiContentModal` 컴포넌트 자체가 아니라 "페이지 진입점(버튼/모달 open)"을 대상으로 해야 한다.** 모달을 통째로 없애면 Toolbar 편집 보조까지 사라진다.
 3. **제거 대상 진입점은 전부 store/instructor/operator 페이지의 "AI 생성" 버튼 + 전용 모달**(AiContentModal page-entry, CreateContentFromResourcesModal AI 생성, CourseStructureAiModal, signage AiContentGenerationModal). **공통 패키지(@o4o/content-editor) Toolbar AI는 유지.**
-4. **서비스 공유**: store POP/블로그/상품설명/콘텐츠 제작 화면은 KPA/GP/KCos가 **거의 동일 미러**. 제거 시 3 서비스 동시 영향 — serviceKey 분기보다 **공통 정책 제거** 또는 서비스별 동일 WO 병행. **Neture는 AiContentModal 미사용**(RichTextEditor 편집 보조만) → 영향 작음.
+4. **서비스 공유**: store POP/블로그/상품설명/콘텐츠 제작 화면은 KPA/KCos가 **거의 동일 미러**. 제거 시 2 서비스 동시 영향 — serviceKey 분기보다 **공통 정책 제거** 또는 서비스별 동일 WO 병행. **Neture는 AiContentModal 미사용**(RichTextEditor 편집 보조만) → 영향 작음.
 
 ---
 
@@ -53,7 +53,6 @@
 | 강의 목차 | KPA | instructor course | `CourseStructureAiModal.tsx` | 강의 목차 AI 생성 | /api/ai/course-structure | (레슨배열) | **A 제거** |
 | 사이니지 | KPA | operator signage | `operator/signage/AiContentGenerationModal.tsx:421` | "초안 생성하기"/"다시 생성" | (signage 생성 API) | — | **A 제거** |
 | 운영자 콘텐츠 | KPA | /operator/content-hub | `OperatorContentHubPage.tsx:576` | placeholder "AI 생성 또는 직접 입력"(활성 버튼 없음) | — | — | **D 판단**(활성 진입점 미발견) |
-| 매장 POP/블로그/상품설명/콘텐츠/강의 | **GP** | 동일 미러 | StorePopPage:549 / PharmacyBlogPage:508 / StoreLibraryContentsPage:175 / StoreProductDescriptionsPage:385 / InstructorCourseEditPage:299 / OperatorResourcesPage:24 | 동일 | /api/ai/content | pop/flexible 등 | **A 제거(서비스 병행)** |
 | 매장 POP/블로그/상품설명/콘텐츠 | **KCos** | 동일 미러 | StorePopPage:505 / StoreBlogManagePage:483 / StoreLibraryContentsPage:175 / StoreProductDescriptionsPage:385 | 동일 | /api/ai/content | pop/flexible 등 | **A 제거(서비스 병행)** |
 | 상품 등록 등 | **Neture** | supplier 화면 | RichTextEditor만(AiContentModal 미사용) | Toolbar AI만 | /api/ai/content | flexible | **B 유지** |
 | Q&A | admin | 대시보드 | `FloatingAiButton.tsx` | 플로팅 질문 | /api/ai/query | — | 범위 외 |
@@ -76,15 +75,15 @@
 | 우선 | 서비스 | 화면 | 진입점 | 제거 방식 | 영향 | 후속 WO |
 |---|---|---|---|---|---|---|
 | 1 | KPA | /store/marketing/qr | StoreQRPage AiContentModal "AI 작성" | 버튼+모달 open 제거(QR 생성은 콘텐츠 선택 기반 유지) | KPA 단독, 위험 낮음 | QR-AI-STEP-REMOVE |
-| 2 | KPA | /store/marketing/pop | StorePopPage AiContentModal(initialMode='pop') "AI 문구 생성" | AI 문구 단계 제거(콘텐츠 본문 기반 POP 유지) | KPA(GP/KCos 미러) | POP-AI-STEP-REMOVE |
+| 2 | KPA | store/marketing/pop | StorePopPage AiContentModal(initialMode='pop') "AI 문구 생성" | AI 문구 단계 제거(콘텐츠 본문 기반 POP 유지) | KPA(KCos 미러) | POP-AI-STEP-REMOVE |
 | 3 | KPA | /store/library/contents 제작 모달 | CreateContentFromResourcesModal "AI 콘텐츠 생성" | compose의 AI 생성 섹션 제거(빈 편집기 직접 작성 유지) | KPA 단독 | CONTENT-CREATE-AI-STEP-REMOVE |
-| 4 | KPA | 블로그 | PharmacyBlogPage 페이지 AI(모달 진입) | 페이지 진입 AI 제거(Toolbar AI 유지) | KPA(GP/KCos 미러) | BLOG-AI-STEP-REMOVE |
-| 5 | KPA | 상품 상세설명 | StoreProductDescriptionsPage AI 보조 버튼 | 버튼 제거 | KPA(GP/KCos 미러) | PRODUCT-DESC-AI-REMOVE |
-| 6 | KPA | 제작 자료/콘텐츠 제작 시작 | StoreProductionMaterialsPage / StoreLibraryContentsPage AI 초안 | AI 초안 진입 제거 | KPA(GP/KCos 미러) | (3과 통합 가능) |
+| 4 | KPA | 블로그 | PharmacyBlogPage 페이지 AI(모달 진입) | 페이지 진입 AI 제거(Toolbar AI 유지) | KPA(KCos 미러) | BLOG-AI-STEP-REMOVE |
+| 5 | KPA | 상품 상세설명 | StoreProductDescriptionsPage AI 보조 버튼 | 버튼 제거 | KPA(KCos 미러) | PRODUCT-DESC-AI-REMOVE |
+| 6 | KPA | 제작 자료/콘텐츠 제작 시작 | StoreProductionMaterialsPage / StoreLibraryContentsPage AI 초안 | AI 초안 진입 제거 | KPA(KCos 미러) | (3과 통합 가능) |
 | 7 | KPA | 자료실/자료 작성 | ResourceWritePage / ResourceWriteModal AI | AI 초안 진입 제거 | KPA | RESOURCE-AI-REMOVE |
-| 8 | KPA | 강의(본문/목차) | CourseEditPage AI + CourseStructureAiModal | 강의 본문/목차 AI 제거 | KPA(GP 미러) | COURSE-LECTURE-AI-REMOVE |
+| 8 | KPA | 강의(본문/목차) | CourseEditPage AI + CourseStructureAiModal | 강의 본문/목차 AI 제거 | — | COURSE-LECTURE-AI-REMOVE |
 | 9 | KPA | operator signage | AiContentGenerationModal "초안 생성" | 사이니지 AI 생성 제거 | KPA operator | OPERATOR-SIGNAGE-AI-REMOVE |
-| 10 | GP/KCos | store/instructor 미러 | 위와 동일 컴포넌트 | KPA와 동일 WO 병행 or 공통 제거 | 서비스 동시 | 서비스별 분리 |
+| 10 | KCos | store/instructor 미러 | 위와 동일 컴포넌트 | KPA와 동일 WO 병행 or 공통 제거 | 서비스 동시 | 서비스별 분리 |
 
 ---
 
@@ -105,12 +104,12 @@
 
 | endpoint | caller(진입점) | 서비스 | UI 제거 후 dead 여부 | 비고 |
 |---|---|---|---|---|
-| /api/ai/content (pop) | StorePopPage | KPA/GP/KCos | POP AI 제거 시 pop outputType 호출 0 가능 | outputType별 후속 정리 |
-| /api/ai/content (store_qr) | StoreQRPage | KPA/GP/KCos | QR AI 제거 시 store_qr 호출 0 가능 | |
-| /api/ai/content (product_detail) | CreateContentFromResources / ProductDescriptions | KPA/GP/KCos | 제거 시 호출 0 가능 | |
+| api/ai/content (pop) | StorePopPage | KPA/KCos | POP AI 제거 시 pop outputType 호출 0 가능 | outputType별 후속 정리 |
+| api/ai/content (store_qr) | StoreQRPage | KPA/KCos | QR AI 제거 시 store_qr 호출 0 가능 | |
+| api/ai/content (product_detail) | CreateContentFromResources / ProductDescriptions | KPA/KCos | 제거 시 호출 0 가능 | |
 | /api/ai/content (flexible) | Toolbar(유지) + 페이지(제거) | 전 서비스 | **Toolbar 유지로 flexible은 잔존** | 삭제 불가 |
 | /api/ai/url-to-blocks | AiContentModal URL 탭 | 전 서비스 | Toolbar URL 탭 유지 시 잔존 | |
-| /api/ai/course-structure, /lesson-body | Course 화면 | KPA/GP | 강의 AI 제거 시 0 가능 | |
+| api/ai/course-structure, /lesson-body | Course 화면 | KPA/강의 AI 제거 시 0 가능 | |
 | /api/ai/query, /generate, /vision | admin/내부 | — | 범위 외 | 유지 |
 
 > **즉시 삭제 금지.** flexible/url-to-blocks는 Toolbar(편집 보조) 유지로 살아남으므로 절대 삭제하면 안 됨. pop/store_qr/product_detail/course-* 만 UI 제거 후 호출 0 확인 시 후속 cleanup 후보.
@@ -122,7 +121,7 @@
 | 서비스 | 제거 대상(초안생성) | 유지(편집보조) | 판단필요 | 공통 컴포넌트 영향 | 비고 |
 |---|---:|---:|---:|---|---|
 | KPA | 9 화면군 | Toolbar AI | operator content-hub | @o4o/content-editor Toolbar 유지 | 주 대상 |
-| GP | 6 화면(미러) | Toolbar AI | operator resources | 동일 | KPA와 병행 |
+| 6 화면(미러) | Toolbar AI | operator resources | 동일 | KPA와 병행 |
 | KCos | 4 화면(미러) | Toolbar AI | — | 동일 | KPA와 병행 |
 | Neture | 0 | Toolbar AI(RichTextEditor) | — | AiContentModal 미사용 | 영향 작음 |
 | 공통 패키지 | (직접 제거 0) | Toolbar "AI 정리" 유지 | url-to-blocks/flexible | **모달 통째 제거 금지** | 진입점 측 제거 |
@@ -134,13 +133,12 @@
 ```
 1. WO-O4O-KPA-QR-AI-STEP-REMOVE-V1            (KPA 단독, 위험 낮음 — 첫 후보)
 2. WO-O4O-KPA-CONTENT-CREATE-AI-STEP-REMOVE-V1 (KPA 콘텐츠 제작 모달 AI 생성)
-3. WO-O4O-KPA-POP-AI-STEP-REMOVE-V1           (POP — GP/KCos 미러 영향 확인)
+3. WO-O4O-KPA-POP-AI-STEP-REMOVE-V1 (POP — KCos 미러 영향 확인)
 4. WO-O4O-KPA-BLOG-AI-STEP-REMOVE-V1          (블로그 페이지 AI — Toolbar AI 보존 주의)
 5. WO-O4O-KPA-PRODUCT-DESC-AI-REMOVE-V1       (상품설명)
 6. WO-O4O-KPA-RESOURCE-AI-REMOVE-V1           (자료실)
 7. WO-O4O-COURSE-LECTURE-AI-GENERATION-REMOVE-V1 (강의 본문/목차 — LMS 공통 영향 검토)
 8. WO-O4O-OPERATOR-SIGNAGE-AI-GENERATION-REMOVE-V1 (사이니지 AI 생성)
-9. WO-O4O-GLYCOPHARM-KCOS-AI-STEP-REMOVE-PARITY-V1 (GP/KCos 미러 일괄 — KPA 검증 후)
 10. WO-O4O-CONTENT-EXTERNAL-LLM-GUIDE-V1      (제거 자리 외부 LLM 안내 문구 — 마지막)
 ```
 
@@ -149,7 +147,7 @@
 2. 기존 저장 데이터(생성된 콘텐츠/제작자료) 유지.
 3. backend endpoint/outputType은 즉시 삭제하지 않고, UI 제거 후 호출 0 확인된 것만(pop/store_qr/product_detail/course-*) 후속 dead-code WO에서 정리. **flexible/url-to-blocks는 Toolbar 유지로 삭제 금지.**
 4. 제거 자리에 외부 LLM 안내 문구(별도 WO).
-5. GP/KCos는 동일 컴포넌트 미러 → KPA 선검증 후 parity WO.
+5. KCos는 동일 컴포넌트 미러 → KPA 선검증 후 parity WO.
 
 ---
 
@@ -170,7 +168,7 @@
 - [x] 전 서비스 AI 진입점 표로 정리(A) — read-only
 - [x] 제거/유지/판단 분류(B/C/D) — **편집기 Toolbar AI = 유지로 별도 정리**
 - [x] backend endpoint·outputType 사용처(E) — 즉시 삭제 금지 명시
-- [x] 서비스별 영향(F) — KPA 주 대상, GP/KCos 미러, Neture 영향 작음
+- [x] 서비스별 영향(F) — KPA 주 대상, KCos 미러, Neture 영향 작음
 - [x] 후속 WO 위험도 순(G) — QR 제거 첫 후보
 - [x] 코드/DB 무변경 (조사만)
 
@@ -181,6 +179,6 @@
 | AI 엔진 | `apps/api-server/src/routes/ai-proxy.routes.ts`, `apps/api-server/src/services/ai-prompts/*`, `@o4o/ai-prompts` |
 | 편집기 보조(유지) | `packages/content-editor/src/components/Toolbar.tsx:573`(AI 정리), `AiContentModal.tsx` |
 | KPA 초안생성 진입 | StorePopPage:680 / StoreQRPage:1169 / CreateContentFromResourcesModal:577 / StoreProductDescriptionsPage:425 / StoreLibraryContentsPage:197 / StoreProductionMaterialsPage:783 / PharmacyBlogPage:547 / ResourceWritePage:572 / CourseEditPage:474 / CourseStructureAiModal / operator/signage/AiContentGenerationModal:421 |
-| GP 미러 | services/web-glycopharm/src/pages/{store-management,instructor,operator}/* |
+ 미러 | — |
 | KCos 미러 | services/web-k-cosmetics/src/pages/store/* |
 | Neture | AiContentModal 미사용(RichTextEditor 편집보조만) |

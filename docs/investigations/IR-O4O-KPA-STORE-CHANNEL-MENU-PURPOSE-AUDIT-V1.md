@@ -1,7 +1,7 @@
 # IR-O4O-KPA-STORE-CHANNEL-MENU-PURPOSE-AUDIT-V1
 
 > 조사 대상: KPA 내 매장 `채널 > 채널 관리`(`/store/channels`)의 실제 용도·연결 범위
-> 조사일: 2026-06-25 / 범위: KPA 우선 (GP/KCos 영향 표시) / **read-only — 코드·DB·메뉴 변경 없음**
+> 조사일: 2026-06-25 / 범위: KPA 우선 (KCos 영향 표시) / **read-only — 코드·DB·메뉴 변경 없음**
 
 ---
 
@@ -35,7 +35,7 @@
 ```
 
 - 라우트(`web-kpa-society/src/App.tsx`): `channels`(1022), `channels/tablet`→`/store/requests` redirect(1023), `sales-channels/foreign-visitor*`(1013~).
-- **`storeMenuConfig.ts`는 공통 모듈** — KPA/GP/KCos 3블록이 한 파일에 존재. 메뉴 변경은 **공통 모듈 변경**(Shared Module Protocol 대상, §8).
+- **`storeMenuConfig.ts`는 공통 모듈** — KPA/KCos 3블록이 한 파일에 존재. 메뉴 변경은 **공통 모듈 변경**(Shared Module Protocol 대상, §8).
 
 ### 1-2. 라우트 ↔ 페이지 ↔ 데이터
 
@@ -116,9 +116,9 @@ UI 라벨은 사용자에게 "온라인 스토어/키오스크/태블릿"으로 
 
 ## 8. 크로스서비스 영향 (필수 표시)
 
-- **`StoreChannelsPage`는 공통 컴포넌트 아님** — KPA/GP/KCos **서비스별 개별 파일**(동일 API 재사용). 탭 구성 차이: KPA=B2C/KIOSK/TABLET, **GP/KCos=B2C/KIOSK/TABLET/SIGNAGE**.
-- **`storeMenuConfig.ts`는 공통 모듈** — 메뉴 그룹/항목이 KPA/GP/KCos 한 파일에 존재. 메뉴명·구조 변경은 **공통 모듈 변경**으로, GP(그룹명 "마케팅·채널", funnel/content 포함)·KCos(채널 관리·태블릿)에 전파 가능 → Shared Module Change Protocol 적용 필요.
-- → KPA만 먼저 정비하려면 메뉴 config의 **KPA 블록만 수정**하고 GP/KCos 블록 불변을 보장해야 함(공통 정책 vs KPA-only 판단 선행).
+- **`StoreChannelsPage`는 공통 컴포넌트 아님** — KPA/KCos **서비스별 개별 파일**(동일 API 재사용). 탭 구성 차이: KPA=B2C/KIOSK/TABLET, **KCos=B2C/KIOSK/TABLET/SIGNAGE**.
+- **`storeMenuConfig.ts`는 공통 모듈** — 메뉴 그룹/항목이 KPA/KCos 한 파일에 존재. 메뉴명·구조 변경은 **공통 모듈 변경**으로, KCos(채널 관리·태블릿)에 전파 가능 → Shared Module Change Protocol 적용 필요.
+- → KPA만 먼저 정비하려면 메뉴 config의 **KPA 블록만 수정**하고 KCos 블록 불변을 보장해야 함(공통 정책 vs KPA-only 판단 선행).
 
 ---
 
@@ -162,9 +162,9 @@ UI 라벨은 사용자에게 "온라인 스토어/키오스크/태블릿"으로 
 ## 10. 권장 진행 순서
 
 1. 본 IR 확인 → `채널 관리` = **실기능(주문/결제 연결)** 확정. "숨김/삭제" 폐기.
-2. **A안 우선 WO**: (a) 잔존 "B2C/채널 만들기" 카피 정정, (b) TABLET 탭 중복 제거(태블릿 단독 메뉴 일원화). — KPA `storeMenuConfig` 블록 + KPA `StoreChannelsPage`만, GP/KCos 불변.
+2. **A안 우선 WO**: (a) 잔존 "B2C/채널 만들기" 카피 정정, (b) TABLET 탭 중복 제거(태블릿 단독 메뉴 일원화). — KPA `storeMenuConfig` 블록 + KPA `StoreChannelsPage`만, KCos 불변.
 3. 온라인 판매 1급 분리(C안)는 별도 IR/WO로 — `StoreChannelsPage` 해체 + 주문 관리 화면 + slug/자산채널맵 재배치 설계 필요(규모 큼).
-4. 메뉴 변경은 공통 `storeMenuConfig.ts` 영향 → GP/KCos 회귀 검증 동반.
+4. 메뉴 변경은 공통 `storeMenuConfig.ts` 영향 → KCos 회귀 검증 동반.
 
 ---
 
@@ -173,7 +173,7 @@ UI 라벨은 사용자에게 "온라인 스토어/키오스크/태블릿"으로 
 | 항목 | 위치 |
 |---|---|
 | KPA 채널 메뉴 | `packages/store-ui-core/src/config/storeMenuConfig.ts:292-295` |
-| 채널 페이지(서비스별) | `services/web-kpa-society/src/pages/pharmacy/StoreChannelsPage.tsx` / GP·KCos `.../store/StoreChannelsPage.tsx` |
+| 채널 페이지(서비스별) | `services/web-kpa-society/src/pages/pharmacy/StoreChannelsPage.tsx` / KCos `.../store/StoreChannelsPage.tsx` |
 | 채널 탭 정의(라벨) | `StoreChannelsPage.tsx:96-100` (B2C='온라인 스토어') |
 | 채널 생성 API | `apps/api-server/src/routes/o4o-store/controllers/store-hub.controller.ts:316-397` |
 | 채널 엔티티/제약 | `modules/store-core/entities/organization-channel.entity.ts` (UNIQUE org+type) |

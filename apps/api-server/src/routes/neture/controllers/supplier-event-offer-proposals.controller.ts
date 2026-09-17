@@ -236,7 +236,6 @@ export function createSupplierEventOfferProposalsController(
         return;
       }
 
-      // WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1: GlycoPharm event-offer 키 제거
       const targetKeys = [
         SERVICE_KEYS.KPA_GROUPBUY,
         SERVICE_KEYS.K_COSMETICS_EVENT_OFFER,

@@ -130,7 +130,6 @@ roleAssignmentService.getActiveRoles(userId)
 - 또는 Entity B에 명시적 `name` 매핑 추가
 
 ### 권고 3: Admin 테스트 계정 역할 설정
-- 프로덕션에 `platform:admin` 또는 `glycopharm:admin` 역할을 가진 계정 필요
 - seed 또는 admin API로 역할 할당
 
 ---

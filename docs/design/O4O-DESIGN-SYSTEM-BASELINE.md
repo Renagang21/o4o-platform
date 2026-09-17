@@ -11,7 +11,7 @@
 
 ## 1. 개요
 
-O4O 디자인 시스템은 3개 서비스(KPA Society / GlycoPharm / K-Cosmetics)가
+O4O 디자인 시스템은 2개 서비스(KPA Society / K-Cosmetics)가
 **동일한 구조** 위에서 **서로 다른 느낌**을 표현하도록 설계되었다.
 
 핵심 원칙:
@@ -131,7 +131,6 @@ Theme은 CSS 변수로 정의된다. 각 서비스의 `src/index.css`에 위치�
 | 서비스 | `--color-primary` | 계열 |
 |--------|-------------------|------|
 | KPA Society | `#2563EB` | Blue |
-| GlycoPharm | `#16A34A` | Green |
 | K-Cosmetics | `#E11D48` | Rose |
 
 Neutral, Spacing, Typography, Shadow, Radius는 모든 서비스에서 동일하다.
@@ -424,31 +423,30 @@ primary: "bg-primary text-white shadow-md hover:bg-primary-700 hover:shadow-lg t
 ```
 
 - **base 클래스** (`flex items-center justify-center shrink-0`): 모든 서비스 공통.
-- **wrapper**: 서비스별 배경/곡률/크기 (KPA: 없음, GlycoPharm: soft bg, K-Cosmetics: pill bg).
+- **wrapper**: 서비스별 배경/곡률/크기 (KPA: 없음, K-Cosmetics: pill bg).
 - **icon**: 아이콘 색상 (모든 서비스 `text-primary`).
 
 ---
 
 ## 7. 서비스별 Template 차이
 
-| 토큰 | KPA Society | GlycoPharm | K-Cosmetics |
-|------|-------------|------------|-------------|
-| **hero.bg** | `bg-bg-secondary` | `bg-primary-50` | `bg-primary-50` |
-| **hero.border** | `border border-border` | `border-b border-border` | `border border-primary-100` |
-| **hero.padding** | `py-16` | `py-10` | `py-20` |
-| **card.radius** | `rounded-md` | `rounded-lg` | `rounded-xl` |
-| **card.shadow** | `shadow-none` | `shadow-sm` | `shadow-md` |
-| **section.spacing** | `mb-16` | `mb-12` | `mb-20` |
-| **button.radius** | `rounded-md` | `rounded-lg` | `rounded-full` |
-| **icon.wrapper** | *(없음)* | `bg-primary-50 rounded-lg w-9 h-9` | `bg-primary-50 rounded-full w-11 h-11` |
-| **icon.icon** | `text-primary` | `text-primary` | `text-primary` |
+| 토큰 | KPA Society | K-Cosmetics |
+| ------ | ------------- | ------------- |
+| **hero.bg** | `bg-bg-secondary` | `bg-primary-50` |
+| **hero.border** | `border border-border` | `border border-primary-100` |
+| **hero.padding** | `py-16` | `py-20` |
+| **card.radius** | `rounded-md` | `rounded-xl` |
+| **card.shadow** | `shadow-none` | `shadow-md` |
+| **section.spacing** | `mb-16` | `mb-20` |
+| **button.radius** | `rounded-md` | `rounded-full` |
+| **icon.wrapper** | *(없음)* | `bg-primary-50 rounded-full w-11 h-11` |
+| **icon.icon** | `text-primary` | `text-primary` |
 
 ### 디자인 성격
 
 | 서비스 | 성격 | 특징 |
 |--------|------|------|
 | **KPA** | 전문적 / 절제 | 곡률 작음, 그림자 없음, 아이콘 최소 |
-| **GlycoPharm** | 데이터 / 관리 | 중간 곡률, 약간의 그림자, 부드러운 아이콘 배경 |
 | **K-Cosmetics** | 브랜드 / 감성 | 큰 곡률, 뚜렷한 그림자, 원형 아이콘 배경 |
 
 ---

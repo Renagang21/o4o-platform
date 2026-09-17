@@ -36,7 +36,6 @@
 |--------|:---:|:---:|:---:|:---:|:---:|:---:|
 | KPA-Society | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | Neture | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| GlycoPharm | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | K-Cosmetics | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | admin-dashboard | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
 
@@ -48,7 +47,6 @@
 |--------|:---:|:---:|:---:|:---:|:---:|
 | KPA-Society | ✅ `favicon.png` | ❌ | ❌ | ❌ | ⚠️ PNG만 |
 | Neture | ✅ `favicon.png` + `favicon.svg` | ❌ | ❌ | ❌ | ⚠️ PNG/SVG |
-| GlycoPharm | ✅ `favicon.svg` | ❌ | ❌ | ❌ | ✅ SVG |
 | K-Cosmetics | ✅ `favicon.svg` | ❌ | ❌ | ❌ | ✅ SVG |
 | admin-dashboard | ✅ `favicon.ico` + `favicon.svg` | ❌ | ❌ | ❌ | ✅ ICO+SVG |
 
@@ -60,7 +58,6 @@
 |--------|:---:|:---:|:---:|:---:|:---:|:---:|
 | KPA-Society | ✅ | ❌ | ❌ | ❌ | ❌ | ✅ (4개) |
 | Neture | ✅ | ❌ | ❌ | ❌ | ❌ | ✅ (4개) |
-| GlycoPharm | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | K-Cosmetics | ✅ | ✅ `#E11D48` | ❌ | ❌ | ❌ | ❌ |
 | admin-dashboard | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
 
@@ -74,7 +71,7 @@
 ```
 
 **K-Cosmetics** — 유일하게 `<meta name="theme-color" content="#E11D48">` 보유. 부분 적용.  
-**GlycoPharm** — `viewport-fit=cover` 없음. OG 태그 없음.
+OG 태그 없음.
 
 ### 1-4. Service Worker
 
@@ -82,7 +79,6 @@
 |--------|:---:|:---:|:---:|------|
 | KPA-Society | ❌ | ❌ | ❌ | — |
 | Neture | ❌ | ❌ | ❌ | — |
-| GlycoPharm | ❌ | ❌ | ❌ | — |
 | K-Cosmetics | ❌ | ❌ | ❌ | — |
 | admin-dashboard | ⚠️ `mockServiceWorker.js` | ❌ | ❌ | MSW 테스트용, PWA 아님 |
 
@@ -104,7 +100,7 @@ standalone 모드 UX(상단바 숨김, splash screen)가 보장되지 않는다.
 
 ### 3-1. 공통 구조 — @o4o/auth-client 패키지
 
-전 서비스(KPA-Society, Neture, GlycoPharm, K-Cosmetics)가 동일한 패키지를 사용한다.
+전 서비스(KPA-Society, Neture, K-Cosmetics)가 동일한 패키지를 사용한다.
 
 ```typescript
 // 각 서비스 apiClient.ts
@@ -155,7 +151,6 @@ Safari는 standalone(홈화면 추가) 앱에서 **브라우저 탭과 별도 lo
 |--------|:---:|:---:|---------|
 | KPA-Society | ✅ | ❌ | MobileBottomNav bottom만 |
 | Neture | ❌ | ❌ | 미적용 |
-| GlycoPharm | ❌ | ❌ | 미적용 |
 | K-Cosmetics | ❌ | ❌ | 미적용 |
 | admin-dashboard | ❌ | ❌ | 미적용 |
 
@@ -187,12 +182,10 @@ standalone에서만 적용해야 하는 UX(뒤로가기 버튼 표시, pull-to-r
 |--------|:---:|------|
 | KPA-Society | ✅ | `MobileBottomNav.tsx` (md:hidden) |
 | Neture | ❌ | 없음 |
-| GlycoPharm | ❌ | 없음 |
 | K-Cosmetics | ❌ | 없음 |
 | admin-dashboard | ❌ | 없음 (데스크탑 전용) |
 
 KPA-Society만 모바일 Bottom Nav 구현. 나머지 서비스는 데스크탑형 Header Nav 단독.  
-standalone 설치 시 Neture/GlycoPharm/K-Cosmetics에서 내비게이션이 불편할 가능성.
 
 ### 4-4. fixed header 문제
 
@@ -230,7 +223,6 @@ iOS Safari에서 pull-to-refresh 제스처 충돌 가능성 있음.
 |--------|--------------|------|
 | KPA-Society | `#2563EB` (blue-600) | kpaConfig.primaryColor, HeroBannerSection |
 | Neture | `#16a34a` (green-600) | RegisterModal, RegisterPendingPage 버튼 |
-| GlycoPharm | 미확인 (조사 필요) | — |
 | K-Cosmetics | `#E11D48` (rose-600) | index.html theme-color ✅ |
 
 ### 5-3. index.html 공통 추가 항목
@@ -288,7 +280,6 @@ Expo + React Native 기반 모바일 앱이 존재함.
 |--------|:---:|:---:|:---:|:---:|:---:|:---:|------|
 | KPA-Society | ❌ | ❌ | ⚠️ | ❌ | ✅ | ⚠️ | **2/10** |
 | Neture | ❌ | ❌ | ⚠️ | ❌ | ✅ | ❌ | **2/10** |
-| GlycoPharm | ❌ | ❌ | ❌ | ❌ | ✅ | ❌ | **1/10** |
 | K-Cosmetics | ❌ | ❌ | ⚠️ | ❌ | ✅ | ❌ | **2/10** |
 | admin-dashboard | ❌ | ❌ | ❌ | ❌ | ✅ | ❌ | **1/10** |
 
@@ -306,10 +297,10 @@ Expo + React Native 기반 모바일 앱이 존재함.
 | PWA-04 | apple-touch-icon 미존재 | 전체 | 높음 | iOS 홈화면 아이콘 없음 |
 | PWA-05 | viewport-fit=cover 미존재 | 전체 | 중 | notch 기기 safe-area 무효 |
 | PWA-06 | KPA safe-area viewport-fit 불일치 | KPA-Society | 중 | viewport-fit없이 env() 사용 |
-| PWA-07 | theme-color 미정의 | KPA/Neture/Glyco/Admin | 중 | 브라우저 UI 컬러 미적용 |
+| PWA-07 | theme-color 미정의 | — | 중 | 브라우저 UI 컬러 미적용 |
 | PWA-08 | Service Worker 미존재 | 전체 | 낮음 (조사 범위 외) | 캐싱/오프라인 불가 |
 | PWA-09 | standalone 모드 감지 없음 | 전체 | 낮음 | 설치 후 UX 분기 불가 |
-| PWA-10 | Neture/Glyco/K-COS 모바일 Nav 없음 | 3개 서비스 | 중 | standalone 설치 시 내비게이션 불편 |
+| PWA-10 | — | 3개 서비스 | 중 | standalone 설치 시 내비게이션 불편 |
 
 ---
 
@@ -331,13 +322,12 @@ Expo + React Native 기반 모바일 앱이 존재함.
 
 **결과**: Chrome/Edge 설치 프롬프트 발생 가능 + iOS Safari 홈화면 추가 UX 개선
 
-**우선 적용 서비스 제안**: KPA-Society → Neture → GlycoPharm → K-Cosmetics 순서.  
 (KPA는 모바일 Nav 존재, 설치형 UX에 가장 준비됨)
 
 ### Phase 2 — 단기 (standalone UX 개선)
 
 5. `viewport-fit=cover` 적용 후 KPA-Society `safe-area-inset` 효과 확인
-6. Neture / GlycoPharm / K-Cosmetics에 모바일 기본 Bottom Nav 또는 Hamburger 메뉴 추가
+6. Neture / K-Cosmetics에 모바일 기본 Bottom Nav 또는 Hamburger 메뉴 추가
 7. standalone 감지 로직 추가 — 설치 앱에서만 보이는 UI 분기 가능
 
 ### Phase 3 — 중기 (구조적 개선)
@@ -354,7 +344,7 @@ Expo + React Native 기반 모바일 앱이 존재함.
 |---------|---------|---------|------|
 | 즉시 | `WO-O4O-KPA-INSTALLABLE-WEB-PHASE1-V1` | KPA-Society manifest + icons + meta 추가 | 파일 추가만. 최소 작업 |
 | 단기 | `WO-O4O-NETURE-INSTALLABLE-WEB-PHASE1-V1` | Neture manifest + icons + meta 추가 | 파일 추가만 |
-| 단기 | `WO-O4O-GLYCO-KCOS-INSTALLABLE-WEB-PHASE1-V1` | GlycoPharm + K-Cosmetics 동시 적용 | 파일 추가만 |
+| 단기 | — | K-Cosmetics 동시 적용 | 파일 추가만 |
 | 단기 | `WO-O4O-VIEWPORT-FIT-COVER-V1` | 전 서비스 viewport-fit=cover + safe-area 정합 | index.html 1줄 수정 |
 | 중기 | `WO-O4O-NETURE-MOBILE-NAV-V1` | Neture 모바일 Bottom Nav 또는 Drawer | Neture standalone 설치 대비 |
 | 중기 | `WO-O4O-PWA-VITE-PLUGIN-V1` | vite-plugin-pwa 도입 + SW 자동 생성 | 조사 범위 외 캐싱 포함 |

@@ -37,7 +37,7 @@
 
 ### 문서 ↔ 코드 차이
 
-- `services/web-glycopharm/src/pages/operator/GlycoPharmOperatorDashboard.tsx:58` 에 `key: 'pharmacy-hub'` 가 존재하나, 이는 **UI 카드 그룹 키**("약국 HUB 운영")로 서비스 키 축과 무관하다. 충돌 아님.
+- 충돌 아님.
 
 ---
 
@@ -140,8 +140,8 @@
 | 3 | 신규 앱 빌드 | `pnpm --filter pharmacy-hub-web build` (`tsc -b && vite build`) | PASS — 164 modules / JS 277.36 kB · CSS 8.09 kB |
 | 4 | 기본 라우트 렌더 | headless chromium, `vite preview` 5개 경로 | PASS — **콘솔 에러 0** |
 | 5 | 표시명 노출 | `/` 렌더 확인 | `Pharmacy-Hub` / `파머시 허브` / `pharmacyhub.co.kr` 표시 |
-| 6 | 키 충돌 없음 | 전 저장소 `'pharmacy-hub'` grep | 충돌 0 (GlycoPharm 1건은 UI 카드 키) |
-| 7 | 기존 4서비스 회귀 없음 | `web-glycopharm` / `web-kpa-society` / `web-k-cosmetics` / `web-neture` `tsc -b` | 전부 EXIT=0 |
+| 6 | 키 충돌 없음 | 전 저장소 `'pharmacy-hub'` grep | 충돌 0 |
+| 7 | 기존 4서비스 회귀 없음 | — | 전부 EXIT=0 |
 | 8 | Market Trial 흔적 없음 | grep | 0건 |
 | 9 | 공통 원장 재사용 | 설계 검토 (§4) | 신규 테이블·복제 0 |
 

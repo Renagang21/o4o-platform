@@ -2,9 +2,9 @@
 
 > **작업명:** WO-O4O-KPA-STOREFRONT-DESCRIPTION-LINK-V1
 > **유형:** KPA storefront 상품 상세 output path 최소 수정 — canonical 공용 설명 fallback 연결.
-> **결과: PASS — KPA storefront(통합 store-public) `queryVisibleProducts` 에 `shared_product_descriptions` canonical LEFT JOIN + COALESCE fallback. product_ai_contents 미노출, 매장별 override 신규 미도입, GP 경로 무회귀. api-server typecheck 0.**
+> **결과: PASS — KPA storefront(통합 store-public) `queryVisibleProducts` 에 `shared_product_descriptions` canonical LEFT JOIN + COALESCE fallback. product_ai_contents 미노출, 매장별 override 신규 미도입 경로 무회귀. api-server typecheck 0.**
 > **⚠️ 선행 이슈:** KPA 통합 핸들러에 **기존 `store_product_profiles.description` per-store override**(편집 UI 존재)가 canonical 보다 우선. 비회귀 위해 보존 — "공용 자산(매장 override 미사용)" 정책 완전 정렬은 후속 결정(§6).
-> 선행: CANONICAL-OUTPUT-LINK(GP) · SHARED-CANDIDATE-STORAGE — 2026-06-16
+> 선행: CANONICAL-OUTPUT-LINK · SHARED-CANDIDATE-STORAGE — 2026-06-16
 
 ---
 
@@ -22,10 +22,10 @@
 | 항목 | 결과 |
 |------|------|
 | 프론트 | `StorefrontProductDetailPage` → `GET ${VITE_API_BASE_URL}/api/v1/stores/:slug/products/:id` (`getApiBase`) |
-| 렌더 | `<ContentRenderer html={product.description} variant="product-detail" />` → **HTML 렌더**(GP plain-text 와 다름) |
+| 렌더 | — |
 | 백엔드 | `/api/v1/stores` → `createUnifiedStorePublicRoutes` → `store-public-product.handler` → **공유 헬퍼 `queryVisibleProducts`**(store-public-utils) |
 | 경로 공유 | featured(L46)·list(L80)·detail(L105) **모두 `queryVisibleProducts`** → 단일 수정으로 3경로 해소 |
-| GP 와의 관계 | GP 는 **별도** `glycopharm/store.controller` 의 자체 `queryVisibleProducts` 사용 → 본 변경과 무관(무회귀) |
+ 와의 관계 | — |
 
 ## 3. fallback 구현
 
@@ -48,14 +48,14 @@ COALESCE(spd.summary, spo.consumer_short_description, '') AS short_description
 
 ## 4. HTML/plain 처리
 
-- KPA storefront 는 `ContentRenderer`(HTML 리치 렌더). 기존 코드도 `sp.description`/`consumer_detail`(Tiptap HTML)을 **strip 없이** 반환 → canonical `content`(HTML)도 **태그 보존**(consistent). GP(plain-text 렌더)에서 strip 한 것과 의도적으로 다름 — 프론트 렌더 방식에 맞춤.
+- KPA storefront 는 `ContentRenderer`(HTML 리치 렌더). 기존 코드도 `sp.description`/`consumer_detail`(Tiptap HTML)을 **strip 없이** 반환 → canonical `content`(HTML)도 **태그 보존**(consistent).
 
 ## 5. 안정성 (§8)
 
 - **중복 row 없음:** canonical 1개/master(partial unique `WHERE status='canonical' AND deleted_at IS NULL`) + LEFT JOIN 조건 동일 + 기존 `DISTINCT ON (spo.id)`. offer 당 spd ≤1.
 - **count 무영향:** count 쿼리(spd 미참여) 변경 없음 → pagination total 정합.
 - **fallback 안정:** canonical 없으면 override/supplier/`''` 로 graceful. LEFT JOIN → 상품 row 안 사라짐.
-- **서비스 영향:** 통합 store-public 는 service-agnostic 이나 **활성 consumer = KPA storefront**. GP=별도 컨트롤러(무회귀), KCos=storefront 부재, tablet=별도 함수(미변경).
+- **서비스 영향:** 통합 store-public 는 service-agnostic 이나 **활성 consumer = KPA storefront**.
 
 ## 6. ⚠️ 기존 store override 선행 이슈 (후속 결정 필요)
 
@@ -69,7 +69,7 @@ COALESCE(spd.summary, spo.consumer_short_description, '') AS short_description
 - `product_ai_contents` 직접 노출 **없음**.
 - 매장별 override 저장소/selection **신규 미도입**(기존 store_product_profiles 는 보존, 추가 아님).
 - StoreLocalProduct off-catalog **미연결**.
-- GP 경로/관리자 UI/seed/HTML 렌더 정책 **미변경**. frontend 변경 **0**.
+- frontend 변경 **0**.
 
 ## 8. 검증
 
@@ -86,14 +86,13 @@ COALESCE(spd.summary, spo.consumer_short_description, '') AS short_description
 
 ## 9. 완료 판정
 
-**PASS.** KPA storefront(통합 store-public `queryVisibleProducts`)에 canonical fallback 연결, supplier fallback 유지, product_ai_contents 미노출, 매장 override 신규 미도입, GP 무회귀, HTML 렌더에 맞춘 태그 보존, typecheck 통과. 기존 store_product_profiles override precedence 는 §6 후속 결정 사항으로 명시.
+**PASS.** KPA storefront(통합 store-public `queryVisibleProducts`)에 canonical fallback 연결, supplier fallback 유지, product_ai_contents 미노출, 매장 override 신규 미도입 무회귀, HTML 렌더에 맞춘 태그 보존, typecheck 통과. 기존 store_product_profiles override precedence 는 §6 후속 결정 사항으로 명시.
 
 ## 10. 후속 WO
 
 1. `WO-O4O-PRODUCT-DESCRIPTION-STORE-PROFILE-OVERRIDE-DECISION-V1`(권장) — KPA store_product_profiles.description override 와 canonical 우선순위/폐지 결정(정책 완전 정렬).
-2. `WO-O4O-PRODUCT-DESCRIPTION-HTML-RENDERING-POLICY-V1` — content HTML sanitize/리치 렌더 정책(GP plain strip ↔ KPA HTML 통일).
 3. (선택) tablet(`queryTabletVisibleProducts`)에도 canonical 연결.
 
 ---
 
-*Date: 2026-06-16 · KPA storefront canonical description link · PASS · 통합 store-public queryVisibleProducts 에 shared_product_descriptions canonical LEFT JOIN + COALESCE(sp.description→spd.content→consumer_detail→'') · KPA HTML 렌더라 태그 보존 · product_ai_contents 미노출, 매장 override 신규 미도입, GP 무회귀 · 기존 store_product_profiles override precedence 후속 결정(§6) · tablet 미변경 · typecheck 0.*
+*Date: 2026-06-16 · KPA storefront canonical description link · PASS · 통합 store-public queryVisibleProducts 에 shared_product_descriptions canonical LEFT JOIN + COALESCE(sp.description→spd.content→consumer_detail→'') · KPA HTML 렌더라 태그 보존 · product_ai_contents 미노출, 매장 override 신규 미도입 무회귀 · 기존 store_product_profiles override precedence 후속 결정(§6) · tablet 미변경 · typecheck 0.*

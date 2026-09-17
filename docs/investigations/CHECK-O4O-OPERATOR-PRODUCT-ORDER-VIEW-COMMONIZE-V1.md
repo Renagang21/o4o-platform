@@ -1,8 +1,8 @@
 # CHECK-O4O-OPERATOR-PRODUCT-ORDER-VIEW-COMMONIZE-V1
 
 > **작업명:** WO-O4O-OPERATOR-PRODUCT-ORDER-VIEW-COMMONIZE-V1
-> **유형:** 공통화(operator-core-ui 모듈 신설 + GP/KCos thin wrapper 축소). view-only 불변.
-> **판정: PASS** — 공통 컴포넌트 추출 완료, GP/KCos typecheck + build 통과, KPA/Neture 미변경.
+> **유형:** 공통화(operator-core-ui 모듈 신설 + KCos thin wrapper 축소). view-only 불변.
+> **판정: PASS** — 공통 컴포넌트 추출 완료, KCos typecheck + build 통과, KPA/Neture 미변경.
 > 선행: `IR-O4O-KPA-OPERATOR-PRODUCT-ORDER-MENU-PARITY-DECISION-V1`, `WO-O4O-OPERATOR-PRODUCT-ORDER-VIEW-LABEL-CLARIFY-GP-KCOS-V1`
 > 작성일: 2026-06-16
 
@@ -10,7 +10,7 @@
 
 ## 0. 정책 고정
 
-KPA / GlycoPharm / K-Cosmetics operator 서비스 화면은 공통화한다. 단 operator 상품·주문 화면은 **처리 화면이 아니라 서비스 전역 view-only 모니터링("상품 현황 / 주문 현황")** 으로 고정한다. 주문 처리·결제·배송·취소·환불·정산 개입 기능은 추가하지 않는다.
+KPA / K-Cosmetics operator 서비스 화면은 공통화한다. 단 operator 상품·주문 화면은 **처리 화면이 아니라 서비스 전역 view-only 모니터링("상품 현황 / 주문 현황")** 으로 고정한다. 주문 처리·결제·배송·취소·환불·정산 개입 기능은 추가하지 않는다.
 
 ---
 
@@ -26,15 +26,13 @@ KPA / GlycoPharm / K-Cosmetics operator 서비스 화면은 공통화한다. 단
 - `packages/operator-core-ui/src/index.ts` — 신규 모듈 re-export(additive)
 
 ### 수정 (thin wrapper 축소)
-- `services/web-glycopharm/src/pages/operator/ProductsPage.tsx` (336L → ~58L)
-- `services/web-glycopharm/src/pages/operator/OrdersPage.tsx` (370L → ~52L)
 - `services/web-k-cosmetics/src/pages/operator/ProductsPage.tsx` (334L → ~57L)
 - `services/web-k-cosmetics/src/pages/operator/OrdersPage.tsx` (382L → ~52L)
 
 ### 추가 (문서)
 - `docs/investigations/CHECK-O4O-OPERATOR-PRODUCT-ORDER-VIEW-COMMONIZE-V1.md` (본 문서)
 
-> **동시 세션 WIP 미접촉:** Neture supplier-recruitment 작업 파일(`partner-recruitment.controller.ts`, `neture.service.ts`, `partner-contract.service.ts`, `supplier.ts`, `SupplierRecruitmentDetailPage.tsx`)과 GP `store-management/PharmacyB2BProducts.tsx`(다른 세션 수정 중)는 **본 커밋에 포함하지 않음**. path-specific staging 사용, `git add .` 미사용.
+> path-specific staging 사용, `git add` 미사용.
 
 ---
 
@@ -53,11 +51,6 @@ KPA / GlycoPharm / K-Cosmetics operator 서비스 화면은 공통화한다. 단
 > **accent 를 prop 으로 주입하는 이유:** 서비스 tailwind `content` 글롭에 operator-core-ui 가 **없음**(operator-core 만 포함). 따라서 서비스 primary/pink 계열 accent 클래스는 반드시 wrapper(서비스 src)에 literal 로 두어야 purge 되지 않는다. (기존 product-applications 모듈과 동일 패턴.) semantic 색(green/blue/amber/indigo/slate/red)은 서비스 전반에서 쓰여 survive.
 
 ---
-
-## 3. GP wrapper 구조
-
-- `ProductsPage.tsx`: `OperatorProductStatusPage` 에 `fetchProducts`(`api.get('/operator/products?...serviceKey=glycopharm')`) + accent(primary/blue) + tableId `glycopharm-operator-products` 주입. 기존 외곽 `p-6` 래퍼 유지(PageHeader 제거, 공통 헤더 사용).
-- `OrdersPage.tsx`: `OperatorOrderStatusPage` 에 `fetchOrders`(`glycopharmApi.getOperatorOrders`) + accent(primary/blue) + description "약국 B2B 주문 현황 (조회 전용)" 주입.
 
 ## 4. KCos wrapper 구조
 
@@ -102,7 +95,6 @@ KPA / GlycoPharm / K-Cosmetics operator 서비스 화면은 공통화한다. 단
 | 대상 | 결과 |
 |---|---|
 | `packages/operator-core-ui` | product-order-view error **0** (유일 오류는 무관한 `packages/error-handling` 기존 ImportMeta.env) |
-| `services/web-glycopharm` | error **0** |
 | `services/web-k-cosmetics` | error **0** |
 | `services/web-kpa-society` | error **0** (무영향 확인) |
 
@@ -110,15 +102,14 @@ KPA / GlycoPharm / K-Cosmetics operator 서비스 화면은 공통화한다. 단
 
 | 대상 | 결과 |
 |---|---|
-| `web-glycopharm` (`vite build`) | ✅ built in 17.55s |
 | `web-k-cosmetics` (`vite build`) | ✅ built in 13.39s |
 
 > operator-core-ui 는 소스 소비 패키지로 별도 build 단계 없음(서비스 build 에 포함).
 
 ## 12. smoke 결과 / 보류 사유
 
-- 브라우저 smoke(GP/KCos `/operator/products`·`/operator/orders` 렌더·검색·새로고침·처리 버튼 부재·console error 0)는 **프로덕션 배포 후** 확인 권장(로컬은 프로덕션 DB/Cloud Run 의존). typecheck + production build 통과로 정적 정합성 확보. 요청 시 배포 후 Playwright 로 검증.
-- 시각적 참고: 공통화로 GP/KCos 화면이 단일 canonical 프레젠테이션으로 수렴(헤더/페이지네이션/상태 뱃지 통일), 서비스 accent(primary vs pink)만 유지. 기능·컬럼·필터·API 는 기존과 동일.
+- 브라우저 smoke(KCos `/operator/products`·`/operator/orders` 렌더·검색·새로고침·처리 버튼 부재·console error 0)는 **프로덕션 배포 후** 확인 권장(로컬은 프로덕션 DB/Cloud Run 의존). typecheck + production build 통과로 정적 정합성 확보. 요청 시 배포 후 Playwright 로 검증.
+- 시각적 참고: 공통화로 KCos 화면이 단일 canonical 프레젠테이션으로 수렴(헤더/페이지네이션/상태 뱃지 통일), 서비스 accent(primary vs pink)만 유지. 기능·컬럼·필터·API 는 기존과 동일.
 
 ## 13. 후속 WO 가능 여부
 
@@ -128,9 +119,9 @@ KPA / GlycoPharm / K-Cosmetics operator 서비스 화면은 공통화한다. 단
 
 ## Shared Module Protocol 확인
 
-- 변경 공통 모듈: `@o4o/operator-core-ui`(신규 모듈 추가 + index export). 소비처: GlycoPharm/K-Cosmetics(본 WO 직접 전환), KPA-Society(무영향, 미연결), Neture(미사용).
+- 변경 공통 모듈: `@o4o/operator-core-ui`(신규 모듈 추가 + index export). 소비처: K-Cosmetics(본 WO 직접 전환), KPA-Society(무영향, 미연결), Neture(미사용).
 - route/role/capability/feature flag/visibility 필터 변경 없음 — 라벨/페이지 컴포넌트 내부 구조만.
-- 회귀 위험: 낮음 — additive export + GP/KCos typecheck·build 통과, KPA typecheck 통과.
+- 회귀 위험: 낮음 — additive export + KCos typecheck·build 통과, KPA typecheck 통과.
 
 ## Out of Scope / 무변경 확인
 
@@ -140,4 +131,4 @@ KPA / GlycoPharm / K-Cosmetics operator 서비스 화면은 공통화한다. 단
 
 ---
 
-*Date: 2026-06-16 · operator 상품/주문 현황 view-only 공통화 · operator-core-ui product-order-view 모듈 신설 · GP/KCos thin wrapper 축소(≈1422L → ≈220L) · typecheck(pkg/GP/KCos/KPA) + build(GP/KCos) PASS · view-only 불변 · KPA/Neture 미변경 · 후속 KPA INTRODUCE 가능.*
+*Date: 2026-06-16 · operator 상품/주문 현황 view-only 공통화 · operator-core-ui product-order-view 모듈 신설 · KCos thin wrapper 축소(≈1422L → ≈220L) · typecheck(pkg/KCos/KPA) + build(KCos) PASS · view-only 불변 · KPA/Neture 미변경 · 후속 KPA INTRODUCE 가능.*

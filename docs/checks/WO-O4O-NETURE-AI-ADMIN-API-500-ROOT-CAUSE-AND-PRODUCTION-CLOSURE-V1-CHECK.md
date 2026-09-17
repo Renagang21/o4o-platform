@@ -37,22 +37,22 @@
 | 6 | GET /usage | neture `AiAdminDashboardPage` | platform:super_admin | **500** | 재현 | A+C | FIXED |
 | 7 | GET /ops/summary | 없음 | platform:super_admin | 200 | 미재현 | — | KEEP(비소비, 계약 정상) |
 | 8 | GET /ops/errors | 없음 | platform:super_admin | 200 | 미재현 | — | KEEP(비소비, 계약 정상) |
-| 9 | GET /analytics/summary | glycopharm `AiUsageDashboardPage`, neture `AiCostPage` | platform:super_admin | 200 | 미재현 | — | KEEP |
+| 9 | GET /analytics/summary | — | platform:super_admin | 200 | 미재현 | — | KEEP |
 | 10 | GET /analytics/by-scope | 동상 | platform:super_admin | 200 (`data: []`) | 미재현 | — | KEEP |
 | 11 | GET /analytics/by-model | 동상 | platform:super_admin | 200 (`data: []`) | 미재현 | — | KEEP |
-| 12 | GET /analytics/recent | glycopharm `AiUsageDashboardPage` | platform:super_admin | 200 | 미재현 | — | KEEP |
+| 12 | GET /analytics/recent | — | platform:super_admin | 200 | 미재현 | — | KEEP |
 | 13 | GET /quotas | 없음 | platform:super_admin | 200 | 미재현 | — | KEEP(쓰기/관리 API) |
-| 14 | GET /quotas/status | glycopharm `AiUsageDashboardPage` | platform:super_admin | 200 | 미재현 | — | KEEP |
+| 14 | GET /quotas/status | — | platform:super_admin | 200 | 미재현 | — | KEEP |
 | 15 | POST /quotas | 없음 | platform:super_admin | 201/400/409 계약 | 미재현 | — | KEEP(쓰기 API) |
 | 16 | PUT /quotas/:id | 없음 | platform:super_admin | 200/400 계약 | 미재현 | — | KEEP |
 | 17 | DELETE /quotas/:id | 없음 | platform:super_admin | 200/400 계약 | 미재현 | — | KEEP |
-| 18 | GET /billing | glycopharm `AiBillingPage` | platform:super_admin | 200 (`[]`) | 미재현 | — | KEEP |
+| 18 | GET /billing | — | platform:super_admin | 200 (`[]`) | 미재현 | — | KEEP |
 | 19 | GET /billing/:id | 없음(목록/CSV 로 대체) | platform:super_admin | 200/404 계약 | 미재현 | — | KEEP |
-| 20 | POST /billing/generate | glycopharm `AiBillingPage` | platform:super_admin | 계약 정상 | 미재현 | — | KEEP |
-| 21 | PUT /billing/:id/adjustment | glycopharm `AiBillingPage` | platform:super_admin | 계약 정상 | 미재현 | — | KEEP |
-| 22 | PUT /billing/:id/confirm | glycopharm `AiBillingPage` | platform:super_admin | 계약 정상 | 미재현 | — | KEEP |
-| 23 | PUT /billing/:id/paid | glycopharm `AiBillingPage` | platform:super_admin | 계약 정상 | 미재현 | — | KEEP |
-| 24 | GET /billing/:id/export.csv | glycopharm `AiBillingPage` | platform:super_admin | 계약 정상 | 미재현 | — | KEEP |
+| 20 | POST /billing/generate | — | platform:super_admin | 계약 정상 | 미재현 | — | KEEP |
+| 21 | PUT /billing/:id/adjustment | — | platform:super_admin | 계약 정상 | 미재현 | — | KEEP |
+| 22 | PUT /billing/:id/confirm | — | platform:super_admin | 계약 정상 | 미재현 | — | KEEP |
+| 23 | PUT /billing/:id/paid | — | platform:super_admin | 계약 정상 | 미재현 | — | KEEP |
+| 24 | GET /billing/:id/export.csv | — | platform:super_admin | 계약 정상 | 미재현 | — | KEEP |
 
 ### 비소비 endpoint 판정 근거 (dead 아님)
 
@@ -145,9 +145,8 @@ schema/migration 없음, AI 기능 재설계 없음, Neture 외 서비스 의미
 | 권한 negative | spec: `requireAdmin` 불충족 시 `/dashboard`,`/engines`,`/policy`,`/usage` 전부 403 (200 아님) |
 | 정적 guard | `router.<verb>(` 개수 == `authenticate, requireAdmin` 개수 (24 == 24) |
 
-공통 코드 회귀(KPA / K-Cosmetics / PharmacyHub / GlycoPharm): 변경된 공통 파일은 `entities.ts` 하나이며
+공통 코드 회귀(KPA / K-Cosmetics / PharmacyHub): 변경된 공통 파일은 `entities.ts` 하나이며
 **추가 등록만** 했다(기존 항목 변경/삭제 없음). api-server 전체 스위트에 각 서비스 계약 spec 이 포함되어 있고 전부 PASS.
-GlycoPharm 은 `/api/ai/admin/{analytics,quotas,billing}` 를 실제로 쓰므로 배포 후 §7 에서 재확인한다.
 
 ---
 
@@ -227,13 +226,11 @@ GlycoPharm 은 `/api/ai/admin/{analytics,quotas,billing}` 를 실제로 쓰므�
 | 주체 | 결과 |
 |---|---|
 | 미인증 | `/dashboard,/engines,/policy,/usage,/quotas,/billing` **전부 401** |
-| `sohae2100@gmail.com` (`neture:admin`,`neture:operator`,`glycopharm:admin/operator`,`cosmetics:admin/operator`,`kpa:admin/operator`,`pharmacy-hub:admin/operator`,`kpa-branch:operator`,`kpa:store_owner`) | 위 4개 + `/ops/*`,`/analytics/*`,`/quotas*`,`/billing` **전부 403** |
+| `sohae2100@gmail.com` (`neture:admin`,`neture:operator`,`cosmetics:admin/operator`,`kpa:admin/operator`,`pharmacy-hub:admin/operator`,`kpa-branch:operator`,`kpa:store_owner`) | 위 4개 + `/ops/*`,`/analytics/*`,`/quotas*`,`/billing` **전부 403** |
 | `platform:super_admin` | 200 |
 
 **cross-service leak = 0.** 타 서비스 admin/operator 를 다수 보유한 계정도 200 을 받지 못한다. 권한을 넓히지 않았다(§4 준수).
 
-> 파생 사실(범위 밖, 보고만): GlycoPharm 운영자 화면 `AiBillingPage` / `AiUsageDashboardPage` 는
-> `/api/ai/admin/*` 를 호출하는데 `glycopharm:admin/operator` 는 `requireAdmin` 을 통과하지 못해 403 이다.
 > 즉 두 화면은 현재 `platform:super_admin` 만 실사용 가능하다. 권한 모델 변경은 본 WO 금지사항이므로 기록만 한다.
 
 ### production browser E2E (www.neture.co.kr, `platform:super_admin`)
@@ -260,11 +257,7 @@ desktop **1440×900** / mobile **390×844** 각각에서 7개 경로를 최초 �
 
 1. **`scripts/check-typeorm-entities.mjs` 무력화** — 실행 시 `entities 배열 파싱 실패` 로 **exit 2**,
    게다가 `.github/workflows/` 어디에도 **연결되어 있지 않다**(grep 0건). 이번 결함이 오래 남은 직접적 이유.
-2. **CI Pipeline 실패는 선행 상태** — `services/web-glycopharm/src/pages/store-management/b2b-order/B2BOrderPage.tsx:467`
-   `TS1109: Expression expected` (커밋 `2bb1a3e65`, 타 세션 작업). `2d375cde1` 부터 연속 실패이며 본 커밋과 무관하다.
-   타 세션 변경 불가침 원칙에 따라 만지지 않았다.
 3. **api-server jest 1건 실패** — `encryption-key-canonical-rollout.spec.ts` (ENCRYPTION_KEY 환경 의존), 본 diff 무관.
-4. **GlycoPharm AI 운영 화면의 권한 축 불일치** (위 권한 회귀 절 참조).
 
 ---
 

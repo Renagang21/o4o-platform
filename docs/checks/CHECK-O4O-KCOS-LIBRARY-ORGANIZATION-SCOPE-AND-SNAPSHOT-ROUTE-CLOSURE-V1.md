@@ -66,7 +66,7 @@ KCos request → cosmetics:store_owner → isStoreOwner(…,'cosmetics') → KCo
 | 항목 | 결과 |
 |---|---|
 | `cosmetics-asset-snapshot-scope.spec.ts` | **14 / 14 PASS** — 라우트 마운트 교체 · KPA 심볼 0 · org 해석에 `'kpa'` 호출 0 · `kpa_members` 경로 0 · resolver 키 집합 · `sourceService='cosmetics'` · KPA 컨트롤러/`kpa.routes.ts` 무변경 |
-| `apps/api-server` `tsc --noEmit` | **PASS** (로컬 `@o4o/ai-core` dist 가 stale 해 `glycopharm` 오류가 났으나 rebuild 후 0 — 본 변경과 무관, CI 는 green) |
+| `apps/api-server` `tsc --noEmit` | **PASS** |
 | `lint-ratchet` | **PASS** — 45 errors ≤ baseline 51 (스크립트가 baseline 45 로 낮추라고 제안 — 공용 스크립트 수정이라 이번 범위 밖, 보고만) |
 
 ### 3-2. 프로덕션 E2E (배포 `cefec2e2d` 후 · 동일 계정 `renagang21` · 동일 세션)

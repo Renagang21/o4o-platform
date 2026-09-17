@@ -11,9 +11,8 @@
 
 **공통화 가치가 낮다 — 현재 service-local client 유지 권장.**
 
-- GlycoPharm과 K-Cosmetics의 `MembersConsoleClient` 5개 메서드 모두 `serviceKey` 값만 다르고 구조는 100% 동일
 - Neture만 `updateStatus` / `batchUpdateStatus` 에서 승인 전용 endpoint를 사용하여 분기
-- 공통화 시 절약 코드량: GP/K-Cos 각 ~25줄 — 추상화 비용 대비 실익이 낮음
+- 공통화 시 절약 코드량: K-Cos 각 ~25줄 — 추상화 비용 대비 실익이 낮음
 - 현재 `OperatorMembersConsolePage`의 `client` prop injection 구조가 이미 올바른 격리 경계
 
 **판정: C — 현재 service-local API client 유지 권장**
@@ -39,26 +38,24 @@ interface MembersConsoleClient {
 
 ### `list` / `listAll` / `stats`
 
-| 메서드 | Neture | GlycoPharm | K-Cosmetics | 동일 여부 |
-|--------|--------|-----------|-------------|---------|
-| `list` | `GET /operator/members?serviceKey=neture&…` | `GET /operator/members?serviceKey=glycopharm&…` | `GET /operator/members?serviceKey=k-cosmetics&…` | ✅ serviceKey만 다름 |
-| `listAll` | `GET /operator/members?limit=1000&serviceKey=neture` | `GET /operator/members?limit=1000&serviceKey=glycopharm` | `GET /operator/members?limit=1000&serviceKey=k-cosmetics` | ✅ serviceKey만 다름 |
-| `stats` | `GET /operator/members/stats?serviceKey=neture` | `GET /operator/members/stats?serviceKey=glycopharm` | `GET /operator/members/stats?serviceKey=k-cosmetics` | ✅ serviceKey만 다름 |
-| `updatePassword` | `PUT /operator/members/:id` `{ password }` | 동일 | 동일 | ✅ 완전 동일 |
+| 메서드 | Neture | K-Cosmetics | 동일 여부 |
+| -------- | -------- | ------------- | --------- |
+| `list` | `GET /operator/members?serviceKey=neture&…` | `GET /operator/members?serviceKey=k-cosmetics&…` | ✅ serviceKey만 다름 |
+| `listAll` | `GET /operator/members?limit=1000&serviceKey=neture` | `GET /operator/members?limit=1000&serviceKey=k-cosmetics` | ✅ serviceKey만 다름 |
+| `stats` | `GET /operator/members/stats?serviceKey=neture` | `GET /operator/members/stats?serviceKey=k-cosmetics` | ✅ serviceKey만 다름 |
+| `updatePassword` | `PUT /operator/members/:id` `{ password }` | 동일 | ✅ 완전 동일 |
 
 ### `updateStatus` — 유일한 diverge 지점
 
 | 서비스 | 구현 | 비고 |
 |--------|------|------|
-| **GlycoPharm** | `PATCH /operator/members/:userId/status` `{ status }` | 단순 |
-| **K-Cosmetics** | `PATCH /operator/members/:userId/status` `{ status }` | 단순, GP와 동일 |
+| **K-Cosmetics** | `PATCH /operator/members/:userId/status` `{ status }` | — |
 | **Neture** | `pending→approved`: `POST /neture/operator/registrations/:id/approve`<br>`rejected`: `POST /neture/operator/registrations/:id/reject`<br>`suspended/active`: `PATCH /operator/members/:membershipId/reject|approve` | Neture 승인 전용 endpoint 존재 |
 
 ### `batchUpdateStatus`
 
 | 서비스 | endpoint | payload |
 |--------|---------|---------|
-| **GlycoPharm** | `POST /operator/members/batch-status` | `{ ids, status }` |
 | **K-Cosmetics** | `POST /operator/members/batch-status` | `{ ids, status }` |
 | **Neture** | `POST /neture/operator/registrations/batch` | `{ ids, action: 'approve'|'reject', reason? }` |
 
@@ -70,7 +67,7 @@ interface MembersConsoleClient {
 |------|:---:|
 | list pagination shape | ✅ `{ users: UserData[], pagination: { page, limit, total } }` |
 | listAll shape | ✅ `{ users: UserData[] }` |
-| updateStatus payload | ✅ GP/K-Cos 동일, Neture만 다름 |
+| updateStatus payload | ✅ K-Cos 동일, Neture만 다름 |
 | updatePassword payload | ✅ `{ password }` |
 | 삭제 endpoint (renderDeleteFlow) | ✅ `DELETE /operator/members/:id?mode=soft` (공통) |
 
@@ -83,7 +80,6 @@ interface MembersConsoleClient {
 | 서비스 | operator 삭제 정책 | 실제 endpoint |
 |--------|----------------|-------------|
 | Neture | soft delete only | `DELETE /operator/members/:id?mode=soft` |
-| GlycoPharm | soft delete only (delete-risk 조회 후) | `DELETE /operator/members/:id?mode=soft` |
 | K-Cosmetics | soft delete only | `DELETE /operator/members/:id?mode=soft` |
 
 삭제 endpoint 자체는 모두 동일. 차이는 UX 흐름(risk check 유무)뿐.
@@ -93,8 +89,6 @@ interface MembersConsoleClient {
 ## 5. 공통화 가능성 분석
 
 ### 옵션 A — `createStandardMembersClient(serviceKey)` 팩토리
-
-GlycoPharm과 K-Cosmetics는 완전히 동일하므로 팩토리 함수로 추출 가능:
 
 ```typescript
 // packages/operator-core-ui/src/modules/members/createMembersClient.ts
@@ -117,7 +111,7 @@ export function createStandardMembersClient(serviceKey: string, api: ApiInstance
 }
 ```
 
-**예상 절약**: GP/K-Cos 각 ~25줄 (현재 ~50줄 → 팩토리 1줄 + import)
+**예상 절약**: K-Cos 각 ~25줄 (현재 ~50줄 → 팩토리 1줄 + import)
 **Neture**: 4개 메서드 재사용, `updateStatus` / `batchUpdateStatus` override
 
 **단점**:
@@ -151,11 +145,11 @@ export function createStandardMembersClient(serviceKey: string, api: ApiInstance
 | `listAll` | ✅ serviceKey config만 다름 | 팩토리 후보 |
 | `stats` | ✅ serviceKey config만 다름 | 팩토리 후보 |
 | `updatePassword` | ✅ 완전 동일 | 팩토리 후보 |
-| `batchUpdateStatus` | ⚠️ Neture만 다름 | GP/K-Cos 공통, Neture override |
+| `batchUpdateStatus` | ⚠️ Neture만 다름 | K-Cos 공통, Neture override |
 | `updateStatus` | ❌ Neture 별도 흐름 | 서비스별 유지 |
 
 **단, 현 단계에서 팩토리 추출 실익이 작다**:
-- GP/K-Cos 절약: ~25줄씩 (총 ~50줄)
+- K-Cos 절약: ~25줄씩 (총 ~50줄)
 - 추상화 복잡도 증가, Neture override 패턴 추가
 - 현재 코드가 이미 명확하고 유지보수 가능한 규모
 

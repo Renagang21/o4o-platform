@@ -4,7 +4,6 @@
 
 - **작성일**: 2026-06-04
 - **작업 유형**: Investigation (IR)
-- **조사 범위**: `services/web-{kpa-society,glycopharm,k-cosmetics,neture}`, `packages/shared-space-ui/src/*`
 - **조사 방식**: read-only 병렬 코드 조사(Explore agents) + 핵심 라인 직접 확인
 
 ---
@@ -28,7 +27,6 @@
 | 서비스 | `/` 컴포넌트 | 파일 | Hero |
 |--------|------------|------|------|
 | KPA-Society | `CommunityHomePage` | `services/web-kpa-society/src/pages/CommunityHomePage.tsx` (App.tsx:559) | `HeroBannerSection`(carousel) |
-| GlycoPharm | `CommunityMainPage` | `services/web-glycopharm/src/pages/community/CommunityMainPage.tsx` (App.tsx:539) | **`StatusHeroBlock`**(custom data hero) |
 | K-Cosmetics | `HomePage` | `services/web-k-cosmetics/src/pages/HomePage.tsx` (App.tsx index) | `HeroBannerSection`(carousel) |
 | Neture | `CommunityPage` | `services/web-neture/src/pages/CommunityPage.tsx` (App.tsx:52) | **`NetureHero`**(custom gradient + 3 CTA) |
 
@@ -47,7 +45,6 @@
 | 서비스 | heroSlot | latestSlot | valueGuideSlot | placement | appEntry | cta |
 |--------|----------|:----------:|:--------------:|-----------|:--------:|-----|
 | KPA | HeroBannerSection | ✅ | ✅ "내 역할로 시작하기"(3 역할) | **after-help** | 5 | Market Trial(`🧪`) |
-| GlycoPharm | StatusHeroBlock | ✅ | ❌ | — | 5 | 사이니지 CTA(emoji 0) |
 | K-Cosmetics | HeroBannerSection | ✅ | ❌ | — | 5 | Market Trial(`🧪`) |
 | Neture | NetureHero | ❌ | ✅ "내 역할로 시작하기"(공급자/MT/파트너) | **before-app-entry**(기본) | 4 | Market Trial(`FlaskConical`) |
 
@@ -59,13 +56,11 @@
 
 ```text
 KPA:   Hero → 공지/약사공론 → 최신글 → AppEntry(5) → Market Trial CTA → 이용가이드 → [내 역할로 시작하기]   (역할카드 맨 아래)
-Glyco: Hero(status) → 공지/약업신문 → 최신글 → AppEntry(5) → 사이니지 CTA → 이용가이드                    (역할카드 없음)
 KCos:  Hero → 공지/K-뷰티트렌드 → 최신글 → AppEntry(5) → Market Trial CTA → 이용가이드                     (역할카드 없음)
 Neture: Hero(3CTA) → 공지/포럼최신글 → [내 역할로 시작하기] → AppEntry(4) → Market Trial CTA → 이용가이드   (역할카드 위쪽)
 ```
 
 - **공통화 가능/완료**: 8-블록 골격, 2-col 공지, AppEntry, CTA, Help — 이미 템플릿이 담당.
-- **서비스 정체성상 유지**: Glyco StatusHeroBlock(데이터형 hero), Neture NetureHero(3 CTA), valueGuide 유무(KPA/Neture만 역할 온보딩), notices-right(약사공론/약업신문/K-뷰티/포럼) — **의도된 차이, 유지**.
 - **불일치(아래 §5)**: valueGuide 배치, Home Market Trial CTA 아이콘.
 
 ---
@@ -76,7 +71,6 @@ Neture: Hero(3CTA) → 공지/포럼최신글 → [내 역할로 시작하기] �
 
 - **KPA**: `valueGuidePlacement="after-help"` → "내 역할로 시작하기"가 **이용 가이드 아래**. (최근 `1f68218a5` WO-O4O-KPA-HOME-VALUE-CARDS-AFTER-GUIDE-V1 로 이동됨 — 역할카드를 "역할별 이용 안내" 성격으로 가이드 뒤에 배치.)
 - **Neture**: `valueGuidePlacement` 미지정 → 기본 `before-app-entry` → 역할 카드가 **공지 직후, 가이드 위**. (설계 의도: Hero → 역할 카드 → AppEntry.)
-- **Glyco/KCos**: 역할 카드 없음(서비스 성격상 역할 온보딩 미사용).
 
 → **KPA(아래) vs Neture(위)가 정반대.** 이전에 사용자가 제기했던 "역할 카드 ↔ 가이드 분리 인지" 흐름이 두 서비스에서 다른 결론으로 구현됨. **cross-service 표준 결정 필요**(또는 의도적 차이로 명문화).
 
@@ -87,7 +81,6 @@ Neture: Hero(3CTA) → 공지/포럼최신글 → [내 역할로 시작하기] �
 | 서비스 | 결과 |
 |--------|------|
 | KPA | ✅ 약사회/약국/커뮤니티/LMS/포럼 유지. Neture Market Trial은 **의도된 cross-service 진입**(외부 링크, WO-MARKET-TRIAL-CROSS-SERVICE-ENTRY-ONLY) — 누수 아님 |
-| GlycoPharm | ✅ 내 약국/약국 경영자/혈당관리 유지. 외부 누수 0. "당뇨인" 회원유형 재도입 없음 |
 | K-Cosmetics | ✅ 내 매장/화장품/상품 탐색 유지. 약국 표현 0. `/supplier`는 RoleNotAvailable로 차단 |
 | Neture | ✅ 공급자/파트너/Market Trial 유지. 내 매장/Store Blog/매장 실행 문맥 **추가 없음** |
 
@@ -96,7 +89,7 @@ Neture: Hero(3CTA) → 공지/포럼최신글 → [내 역할로 시작하기] �
 ## 7. 아이콘 정비 결과와 Home 정합성
 
 - **잔존 emoji (Home CTA)**: KPA `CommunityHomePage.tsx` CTA `icon: <span>🧪</span>`, K-Cosmetics `HomePage.tsx:241` `icon: <span>🧪</span>`. **Neture 만 `FlaskConical`(Phase 4)로 정렬됨.**
-  → Home Market Trial CTA 아이콘이 **3서비스 불일치**(KPA·KCos emoji / Neture lucide / Glyco는 Market Trial CTA 없음). **Neture Phase 4 가 Home CTA 를 Neture 만 다뤘기 때문**(KPA Phase1/KCos Phase3 는 Store Hub·Channels 범위였고 Home CTA 미포함).
+  → Home Market Trial CTA 아이콘이 **3서비스 불일치**. **Neture Phase 4 가 Home CTA 를 Neture 만 다뤘기 때문**(KPA Phase1/KCos Phase3 는 Store Hub·Channels 범위였고 Home CTA 미포함).
 - **HomeAppIcons custom SVG**(ForumIcon/EducationIcon/ContentIcon/SignageIcon/ResourcesIcon): AppEntry 카드에 중앙화 사용 — 적절한 lucide 예외(유지).
 - 역할/공급자/파트너 아이콘 의미: Neture lucide(Layers/TrendingUp/Users) 정상.
 - **Home 템플릿 파일군은 emoji-clean**(StandardHomeTemplate/AppEntrySection/NewsNoticesSection/CtaGuidanceSection/O4OHelpSection/HeroBannerSection 모두 0). 단 **비-Home 허브 템플릿**에 fallback emoji 잔존(§ 참고).
@@ -137,9 +130,7 @@ Neture: Hero(3CTA) → 공지/포럼최신글 → [내 역할로 시작하기] �
 ## 11. 서비스별 유지해야 할 차이 (공통화 금지)
 
 ```text
-- Glyco StatusHeroBlock (데이터/관리형 hero) — 혈당관리 정체성
 - Neture NetureHero (3 CTA gradient) + valueGuideSlot(공급자/파트너/MT)
-- valueGuide 유무: KPA/Neture 만 역할 온보딩 (Glyco/KCos 미사용 — 강제 도입 금지)
 - notices-right: 약사공론/약업신문/K-뷰티트렌드/포럼최신글 (서비스별)
 - appEntry 카드 구성/개수 (서비스 정체성)
 - Neture 도메인 가드: 내 매장/Store Blog/매장 실행 추가 금지
@@ -162,7 +153,6 @@ Neture: Hero(3CTA) → 공지/포럼최신글 → [내 역할로 시작하기] �
 
 ### 부록. 핵심 파일 인덱스
 - 공통 템플릿: `packages/shared-space-ui/src/StandardHomeTemplate.tsx`(슬롯/순서), `AppEntrySection.tsx`, `HomeAppIcons.tsx`, `NewsNoticesSection.tsx`, `CtaGuidanceSection.tsx`, `O4OHelpSection.tsx`, `HeroBannerSection.tsx`(do-not-touch)
-- Home 컴포넌트: `web-kpa-society/.../CommunityHomePage.tsx`, `web-glycopharm/.../community/CommunityMainPage.tsx`, `web-k-cosmetics/.../HomePage.tsx`(:241 `🧪`), `web-neture/.../CommunityPage.tsx`(:210 FlaskConical)
 - 관련 최근 커밋: `1f68218a5`(KPA value cards after-help)
 
 *코드/문구/라우트/CSS 변경 없음. 본 IR 은 조사 기록으로 commit 한다.*

@@ -107,7 +107,7 @@ export default function OperatorDashboardPage() {
     try {
       // serviceKey 를 반드시 명시한다. platform admin / 다중 서비스 역할 보유자는
       // resolveOperatorScope 가 cross-service 로 해석해 타 서비스 action_logs 가 섞인다
-      // (프로덕션 검증에서 glycopharm.* 액션 유입 확인).
+      // (프로덕션 검증에서 타 서비스 액션 유입 확인).
       const res = await api.get('/operator/analytics/actions', {
         params: { limit: 8, serviceKey: SERVICE_KEY },
       });

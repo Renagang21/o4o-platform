@@ -76,7 +76,6 @@
 ## 6. 타 서비스 영향
 - KPA(store tablet) · K-Cosmetics(store tablet): 공통 런타임 소비 → 텍스트 버튼형 동일 적용. 로컬 타입 additive.
 - Neture: `tablet-kiosk-core` 소스 import 없음(dep만) → 영향 없음.
-- GlycoPharm: `IdlePlaylistEditor`만 사용, 상품 런타임 미사용 → 영향 없음.
 
 ---
 

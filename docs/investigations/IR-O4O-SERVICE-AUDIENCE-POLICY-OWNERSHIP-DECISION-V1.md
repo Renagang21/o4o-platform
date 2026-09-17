@@ -10,7 +10,7 @@
 ## 0. 결론 요약 (TL;DR)
 
 - **서비스 대상 정책 = platform 거버넌스 성격이 강하다(역할 관리보다 더).** `isPharmacyTargetService` 가 단순 표시가 아니라 **offer 생성/리스팅·partner-contract 에서 drug-service 연결 가능 여부를 gate**(WO-O4O-DRUG-SERVICE-CONNECTION-GATE) → **여러 서비스의 실제 비즈니스 동작에 영향**.
-- serviceKey 범위 = O4O 전 카탈로그(neture/glycopharm/glucoseview/kpa-society/k-cosmetics), pharmacy 기본=`['glycopharm','kpa-society']`. **명백한 cross-service.**
+- **명백한 cross-service.**
 - **guard 불일치 현존**: backend `requireNetureScope('neture:admin')`(neture:admin 만) vs frontend `AdminRoute`(neture:admin + platform:super_admin) → **platform:super_admin 단독은 현재 backend 저장 403**.
 - **권장 B**: `/admin/platform/service-audience` 이동 + backend guard platform 정합(역할 관리 이동과 동일 패턴) → cross-service 게이트 소유권을 platform-admin 으로 정리 + 기존 불일치 해소.
 - 단 **소유권 확정(누가 drug 연결 게이트를 바꾸는가)** 은 정책 결정 → 본 IR 은 권장, 실행은 후속 WO.
@@ -26,7 +26,7 @@
 | backend route | `GET /` · `PUT /:serviceKey` (`/api/v1/neture/admin/service-audience-policies`) |
 | backend guard | **`requireAuth` + `requireNetureScope('neture:admin')`** (neture:admin 만) |
 | 데이터 | `service_audience_policies`(serviceKey, isPharmacyTargetService, note) |
-| serviceKey 범위 | O4O 전 카탈로그 + DB row(`ServiceAudienceService.list`) — pharmacy 기본 `['glycopharm','kpa-society']` |
+| serviceKey 범위 | — |
 | mutation | `PUT` upsert(isPharmacyTargetService/note) |
 
 ## 2. 실사용처 (핵심 — platform 성격 근거)
@@ -61,7 +61,6 @@
 
 ## 6. 핵심 질문 답변 (§7 Q1~Q10)
 
-1. 다루는 serviceKey → **O4O 전 카탈로그**(neture/glycopharm/glucoseview/kpa-society/k-cosmetics), pharmacy 기본 glycopharm/kpa-society.
 2. 사용처 → `offer.service`·`partner-contract.service` 의 **drug-service 연결 audience gate**.
 3. 사용자-facing 영향 → **있음**(offer/partner-contract 의 drug 연결 가능 여부 제어).
 4. backend guard → `requireAuth + requireNetureScope('neture:admin')`.

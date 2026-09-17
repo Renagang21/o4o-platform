@@ -4,7 +4,7 @@
 - **일자**: 2026-08-20
 - **시작 commit**: `685508ec1`
 - **선행 CHECK**: `CHECK-O4O-COMMUNITY-CROSSSERVICE-FINAL-CENSUS-AND-COMMONIZATION-CLOSURE-AUDIT-V1.md` · `CHECK-O4O-COMMUNITY-OPERATOR-CONSOLE-VIEW-CONVERGENCE-V1.md`
-- **범위**: 커뮤니티 최종 census 의 마지막 `VIEW_DUPLICATED` blocker — **B8 Forum Write Shell (K-Cosmetics ↔ GlycoPharm 2 cell)**. 커뮤니티 전체 재감사는 하지 않는다.
+- **범위**: 커뮤니티 최종 census 의 마지막 `VIEW_DUPLICATED` blocker — **B8 Forum Write Shell **. 커뮤니티 전체 재감사는 하지 않는다.
 
 ---
 
@@ -15,7 +15,6 @@
 | service | route | page/component | lines | create/edit | API client | shared primitive | service-specific difference | 재측정 판정 |
 |---|---|---|---:|---|---|---|---|---|
 | K-Cosmetics | `/forum/write` · `/forum/edit/:postId` | `src/pages/forum/ForumWritePage.tsx` | 329 | 통합(같은 페이지, `postId` 유무) | `src/services/forumApi` (`createForumPost` · `fetchForumPostById` · `updateForumPost` · `fetchWritableForums`) | `@o4o/shared-space-ui` `ForumWriteForm` · `forumContentToHtml` | 영문 라벨 · 상세 route `/forum/post/:id` · theme `pink` · `fetchForumPostById` · 에러 메시지에 서버 error 노출 | `VIEW_DUPLICATED` |
-| GlycoPharm | `/forum/write` · `/forum/edit/:postId` | `src/pages/forum/ForumWritePage.tsx` | 322 | 통합(같은 페이지, `postId` 유무) | `src/services/forumApi` (`createForumPost` · `fetchForumPost` · `updateForumPost` · `fetchWritableForums`) | 동일 | 한글 라벨 · 상세 route `/forum/posts/:id` · theme `emerald` · `fetchForumPost` · create 응답 `data.id` fallback | `VIEW_DUPLICATED` |
 
 미조사: **0**
 
@@ -23,7 +22,6 @@
 
 | 화면 | 판정 | 근거 |
 |---|---|---|
-| GlycoPharm `src/pages/business/BusinessForumWritePage.tsx` (87L) | 대상 외 | 일반 포럼 write 가 아닌 **사업 논의 전용 진입/준비 안내 페이지**. 폼·mutation 없음(`WO-O4O-GLYCOPHARM-BUSINESS-DISCUSSION-BOARD-SEPARATION-V1`). B8 2 cell 에 포함되지 않는다. |
 | KPA · Neture write 화면 | 대상 외 | 최종 census `ACCEPTED_CORE_ONLY`(상호 유사도 0.20) + 본 WO §17 제외 범위. |
 
 ---
@@ -32,17 +30,17 @@
 
 라인 단위로 비교한 결과, **차이는 라벨/route/theme/API 심볼명뿐**이고 화면 골격은 동일했다.
 
-| 축 | K-Cosmetics | GlycoPharm | 처리 |
-|---|---|---|---|
-| page/container/heading 스타일 | 동일 | 동일 | 공통 셸로 승격 |
-| 로그인 게이트 | 동일 구조(영문) | 동일 구조(한글) | 공통 셸 + `labels` |
-| edit 초기값 로딩 화면 | `Loading...` | `불러오는 중...` | 공통 셸 + `labels` |
-| 작성자 표시명 블록 | 동일 구조 | 동일 구조 | 공통 셸 + `labels` |
-| 게시판 selector | 동일(로딩/빈 목록/안내 문구까지 동일 분기) | 동일 | 공통 셸 + `labels` + `selectId` |
-| 폼 본문 | `ForumWriteForm` | `ForumWriteForm` | **이미 공통** — 변경 없음 |
-| 로컬 `styles` 객체 | 130L | 121L | 공통 셸로 이관 + dead entry 제거 |
-| 상세 route | `/forum/post/:id` | `/forum/posts/:id` | wrapper 유지(§11) |
-| theme | `pink` | `emerald` | `ForumWriteForm` prop 유지 |
+| 축 | K-Cosmetics | 처리 |
+|---|---|---|
+| page/container/heading 스타일 | 동일 | 공통 셸로 승격 |
+| 로그인 게이트 | 동일 구조(영문) | 공통 셸 + `labels` |
+| edit 초기값 로딩 화면 | `Loading...` | 공통 셸 + `labels` |
+| 작성자 표시명 블록 | 동일 구조 | 공통 셸 + `labels` |
+| 게시판 selector | 동일(로딩/빈 목록/안내 문구까지 동일 분기) | 공통 셸 + `labels` + `selectId` |
+| 폼 본문 | `ForumWriteForm` | **이미 공통** — 변경 없음 |
+| 로컬 `styles` 객체 | 130L | 공통 셸로 이관 + dead entry 제거 |
+| 상세 route | `/forum/post/:id` | wrapper 유지(§11) |
+| theme | `pink` | `ForumWriteForm` prop 유지 |
 
 → 업무 흐름·정보 구조·상태 계약이 동일하므로 §18 중지 조건(업무 상이 · backend 변경 필요 · 조건문 대량 · 에디터 상이)에 해당하지 않는다.
 
@@ -115,7 +113,6 @@ children  ← 폼 본문(ForumWriteForm)
 | 파일 | 전 | 후 | 차이 |
 |---|---:|---:|---:|
 | K-Cosmetics `pages/forum/ForumWritePage.tsx` | 329 | 170 | −159 |
-| GlycoPharm `pages/forum/ForumWritePage.tsx` | 322 | 166 | −156 |
 | **wrapper 합계** | **651** | **336** | **−315** |
 | 신규 shared `ForumWritePageShell.tsx` | — | 233 | +233 |
 | **제품 코드 합계** | **651** | **569** | **−82** |
@@ -145,9 +142,9 @@ children  ← 폼 본문(ForumWriteForm)
 |---|---:|---|
 | `__tests__/ForumWritePageShell.test.tsx` | 12 | create/edit heading · selector 노출 규칙 · 로딩 · 비로그인 게이트 · 작성자 블록 유무 · option 렌더/변경 callback · 로딩 중 비활성 · 빈 목록 안내 · labels config 전면 대체 · `showForumSelect` override · `selectId` |
 | `__tests__/ForumWriteComposition.test.tsx` | 6 | 셸+폼 결합: create submit payload · edit 초기값 채움 · title/content validation · submitting 중 버튼 비활성/라벨 · cancel callback |
-| `__tests__/forum-write-shell-adoption.test.ts` | 9 | KCos/GP wrapper 의 공통 셸 소비 · 로컬 중복 셸 부재(`const styles`/`CSSProperties`/`<select`/`loginPrompt`) · 서비스 API·forum context·selectId 유지 · 상세 route 분리 유지 · 셸 service-neutral · index export |
+| `__tests__/forum-write-shell-adoption.test.ts` | 9 | KCos wrapper 의 공통 셸 소비 · 로컬 중복 셸 부재(`const styles`/`CSSProperties`/`<select`/`loginPrompt`) · 서비스 API·forum context·selectId 유지 · 상세 route 분리 유지 · 셸 service-neutral · index export |
 
-**Forum boundary 회귀(§15)**: `apps/api-server` jest — `community-forum-interaction-and-write-boundary-commonization` · `community-forum-orphan-write-guard` · `glycopharm-forum-service-boundary` · `community-forum-content-server-normalization` → **4 suites / 52 tests PASS**.
+**Forum boundary 회귀(§15)**: `apps/api-server` jest — `community-forum-interaction-and-write-boundary-commonization` · `community-forum-orphan-write-guard` · `community-forum-content-server-normalization` → **4 suites / 52 tests PASS**.
 
 ---
 
@@ -157,7 +154,6 @@ children  ← 폼 본문(ForumWriteForm)
 |---|---|
 | `@o4o/shared-space-ui` typecheck | PASS |
 | `@o4o/web-k-cosmetics` build (`tsc && vite build`) | PASS (14.92s) |
-| `glycopharm-web` build (`tsc -b && vite build`) | PASS (15.17s) |
 | 전이 소비처 typecheck — `@o4o/web-kpa-society` · `@o4o/web-neture` · `pharmacy-hub-web` · `@o4o/operator-core-ui` | PASS |
 | api-server 전체 build | 미수행 — backend 변경 0 (§15 허용) |
 
@@ -171,9 +167,9 @@ children  ← 폼 본문(ForumWriteForm)
 ## 10-2. 프로덕션 배포 · 브라우저 스모크 (§16)
 
 **배포** — commit `009051388` · workflow run `32326205830` "Deploy Web Services (Cloud Run)" **success**
-(`deploy-k-cosmetics: success` · `deploy-glycopharm: success` · 전체 job success). 백엔드/마이그레이션 변경 없음.
+(`deploy-k-cosmetics: success` · 전체 job success). 백엔드/마이그레이션 변경 없음.
 
-**계정** — `docs/local/TEST-ACCOUNTS.local.md` 의 K-Cosmetics / GlycoPharm 운영자 계정. 자격증명은 문서/코드에 기록하지 않는다.
+**계정** — `docs/local/TEST-ACCOUNTS.local.md` 의 K-Cosmetics 운영자 계정. 자격증명은 문서/코드에 기록하지 않는다.
 **원칙** — 운영 데이터 write 0건. 게시글 생성/수정 submit 은 수행하지 않고 렌더 · selector · validation · cancel 만 확인했다.
 
 | # | service | viewport | 대상 | 결과 |
@@ -185,15 +181,9 @@ children  ← 폼 본문(ForumWriteForm)
 | 5 | K-Cosmetics | desktop 1440 | `Cancel` | `navigate(-1)` 로 직전 화면 복귀 (기존 동작 동일) |
 | 6 | K-Cosmetics | desktop 1440 | `/forum/edit/:postId` | `Edit Post` heading · **게시판 selector 미노출** · submit label `Update` — edit 계약대로 |
 | 7 | K-Cosmetics | mobile 390 | `/forum/write` | `Write a Post` 렌더 · `scrollWidth 375 ≤ innerWidth 390` → 가로 overflow 0 |
-| 8 | GlycoPharm | desktop 1440 | `/forum/write` (비로그인) | **공통 셸 로그인 게이트** `로그인이 필요합니다` / `게시글을 작성하려면 로그인해주세요.` 정상 렌더 |
-| 9 | GlycoPharm | desktop 1440 | `/forum/write` (로그인) | `글쓰기` heading · `작성자 표시명: Rena` + hint · `게시판` selector · 글 유형/제목/내용/취소/등록 정상 |
-| 10 | GlycoPharm | desktop 1440 | 제목 미입력 submit | toast `제목을 입력해주세요.` — API 호출 없음 |
-| 11 | GlycoPharm | desktop 1440 | 내용 미입력 submit | toast `내용을 입력해주세요.` — API 호출 없음 |
-| 12 | GlycoPharm | desktop 1440 | `/forum/edit/:postId` | `글 수정` heading · `#gp-forum-select` 미존재 · submit label `수정하기` |
-| 13 | GlycoPharm | mobile 390 | `/forum/write` | `글쓰기` 렌더 · `scrollWidth 382 ≤ innerWidth 390` → 가로 overflow 0 |
 
 **게시판 selector 빈 상태** — 두 서비스 모두 `게시판 없음` / `No forum available` (disabled + 안내문) 로 표시됐다.
-이는 프로덕션 데이터 조건이다: `GET /api/v1/cosmetics/forum/categories` · `GET /api/v1/glycopharm/forum/categories` 모두 `count: 0`,
+이는 프로덕션 데이터 조건이다: `GET /api/v1/cosmetics/forum/categories`
 `GET .../forum/posts` 도 `total: 0`. `fetchWritableForums` 는 본 WO 에서 변경하지 않았으므로 회귀가 아니다.
 동시에 **다른 서비스 forum option 혼입 0건** 이 자명하게 성립한다.
 
@@ -217,7 +207,6 @@ mobile 가로 overflow: 0
 | # | 영역 | service | route | 이전 | 최종 |
 |---|---|---|---|---|---|
 | 1 | B8 | K-Cosmetics | `/forum/write` · `/forum/edit/:postId` | `VIEW_DUPLICATED` | **`FULLY_COMMON`** |
-| 2 | B8 | GlycoPharm | `/forum/write` · `/forum/edit/:postId` | `VIEW_DUPLICATED` | **`FULLY_COMMON`** |
 
 ```
 조사 대상 cell: 2

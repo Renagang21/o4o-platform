@@ -4,8 +4,7 @@
  * WO-O4O-COMMUNITY-FORUM-OWNER-AREA-COMMONIZATION-V1
  * 선행 census: IR-O4O-COMMUNITY-CROSSSERVICE-FULL-CENSUS-V1 (F31 · F34 = VIEW_DUPLICATED)
  *
- * census 기준 이 축은 4서비스에 3,103줄로 복제돼 있었고(GlycoPharm 926줄은
- * WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1 에서 서비스와 함께 삭제) K-Cosmetics 는
+ * census 기준 이 축은 여러 서비스에 복제돼 있었고 K-Cosmetics 는
  * 실질 차이가 accent 색과 이모지 placeholder 1줄뿐이었다. 공통 View 로 수렴한 뒤
  * **다시 복제로 돌아가지 못하게** 정적으로 고정한다.
  *

@@ -5,7 +5,7 @@
 > **작성일**: 2026-06-16
 > **조사 기준 commit**: `cc756f1a7` (main, working tree clean)
 > **조사 도구**: 2 병렬 Explore agent (admin/operator route·menu·platform surface · backend guard·role·service API) + 직접 검증(OperatorsPage / RoleManagementPage / ServiceAudiencePolicyPage / UsersManagementPage / adminOperatorApi)
-> **선행 정비 모델**: GP/KCos admin cleanup · KPA admin 보강(service_legal_profiles / service_policy_documents / 공개 상태 점검)
+> **선행 정비 모델**: KCos admin cleanup · KPA admin 보강(service_legal_profiles / service_policy_documents / 공개 상태 점검)
 
 ---
 
@@ -13,7 +13,7 @@
 
 > ⚠️ **Neture frontend admin 은 사실상 전부 Neture-서비스-scope(`requireNetureScope('neture:admin')`) 이다. platform-admin frontend 표면은 소비처가 없음.** 단 **cross-service/RBAC 성격 3종**이 neture admin 가드 아래 섞여 있어 platform-admin 분리/정책 결정이 필요.
 >
-> 1. **Neture admin 대부분 = Neture 서비스 admin** — 회원 완전삭제 / 법정정보·약관 / 문의 설정 / 이메일 설정 / 카탈로그·브랜드·카테고리·마스터 거버넌스 / AI 관리 / 공급자 승인 / 정산·커미션 등 전부 `/neture/admin/*` 또는 `/admin/services/neture/*`(neture-scoped). GP/KCos/KPA 대비 admin 기능이 **풍부**(과소 아님).
+> 1. **Neture admin 대부분 = Neture 서비스 admin** — 회원 완전삭제 / 법정정보·약관 / 문의 설정 / 이메일 설정 / 카탈로그·브랜드·카테고리·마스터 거버넌스 / AI 관리 / 공급자 승인 / 정산·커미션 등 전부 `/neture/admin/*` 또는 `/admin/services/neture/*`(neture-scoped). KCos/KPA 대비 admin 기능이 **풍부**(과소 아님).
 > 2. **platform-admin frontend 표면 부재** — Neture UI 에 서비스 목록·플랫폼 계정·cross-service 운영자 지정 화면 **없음**. 백엔드에 platform API(`/admin/platform-accounts`·`/admin/platform-services`·global `/admin/users`, `requireRole(platform:admin|super_admin)`)는 존재하나 **Neture frontend 미소비**(별도 platform-admin 앱 영역).
 > 3. **cross-service 성격 1종 (B 강력 후보)** — `약국 대상 서비스 설정`(`/admin/settings/service-audience`, ServiceAudiencePolicyPage)은 `/neture/admin/service-audience-policies` 로 **여러 serviceKey 의 정책을 동시 편집**(neture-admin 가드, 데이터는 cross-service). → platform-admin 분리 후보.
 > 4. **RBAC/운영자 지정 2종 (E 정책 결정)** — `운영자 관리`(`/admin/operators` → `/neture/admin/operators`, neture:admin 이 neture:operator/admin 부여) + `역할 관리`(`/admin/roles`, 공유 `@o4o/ui` RoleManagementPage). 정비 정책("운영자 지정 = platform admin 영역")과 충돌 가능 — 단 Neture 가 O4O 허브라 within-service 부여 유지 여지. **결정 필요**(즉시 이동/삭제 금지).
@@ -134,7 +134,7 @@
 | WO-O4O-NETURE-ADMIN-SCOPE-CLEANUP-V1 (선택·소폭) | admin 메뉴에서 operator-page 통로 정리, 라벨 정합 | 3(낮음) |
 | WO-O4O-NETURE-OPERATOR-WORKFLOW-MIGRATION-V1 | (대상 적음 — 현재 operator 분리 양호, 필요 시) | 보류 |
 
-> GP/KCos(축소)·KPA(보강) 와 달리 Neture 는 **"분리(서비스 admin vs platform admin)"** 가 핵심. 삭제/이관보다 소속 명확화 + cross-service/RBAC 항목 결정이 우선.
+> KCos(축소)·KPA(보강) 와 달리 Neture 는 **"분리(서비스 admin vs platform admin)"** 가 핵심. 삭제/이관보다 소속 명확화 + cross-service/RBAC 항목 결정이 우선.
 
 ---
 

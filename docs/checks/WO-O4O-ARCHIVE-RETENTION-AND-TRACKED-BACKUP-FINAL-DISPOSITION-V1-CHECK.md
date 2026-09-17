@@ -14,7 +14,6 @@
 |---|---:|---|---|
 | 저장소 루트 `archive/**` (5 묶음 + README) | 53 | **DELETE_TRACKED_BACKUP** | 삭제 (505,091 bytes) |
 | `docs/archive/**` (audits · checks · investigations · obsolete · reports · work-orders) | 540 | **KEEP_HISTORICAL_EVIDENCE** | 보존 · 본문 무변경 |
-| `docs/baseline/legacy/GLYCOPHARM-LEGACY-POSTMORTEM.md` | 1 | **KEEP_BUSINESS_DECISION** (CLAUDE.md 색인) | 보존 |
 | 설정 잔재 (`admin tsconfig` · `eslint.config.js` · `api-server tsconfig.build.json`) | 3 | 삭제 경로 제외 목록 | 정리 |
 | 추적 `tmp/**` (범위 밖 발견) | 169 · 43.6 MB | 전역 census 인계 (§11) | 무변경 |
 
@@ -30,7 +29,7 @@
 | `docs/archive/**` | 540 |
 | `**/backup/**` · `**/backups/**` · `**/*-backup/**` · `**/*_backup/**` | 0 (root archive 안의 `media-library-backup-20250912` · `theme-backup-20250912` 만 해당 → 위 53 에 포함) |
 | `**/*.bak` · `*.old` · `*.orig` · `*.deprecated.*` | 0 (`archive/2025-01-06-fix/*.before-reorder` · `pages-test/*.tsx.fix` 는 위 53 에 포함) |
-| `**/legacy/**` | 1 (`docs/baseline/legacy/GLYCOPHARM-LEGACY-POSTMORTEM.md`) |
+| `**/legacy/**` | 1 |
 | `theme-backup` · `old-post-components` · `duplicate-cleanup` · `media-library-backup` 문자열 | 코드 0 · 활성 문서 0 · 기록물(`docs/checks` 1 · `docs/investigations` 1) 만 언급 |
 
 별도 범주(`docs/checks` · `docs/investigations` · `docs/work-orders` · `migrations` · `fixtures` · `test-data`) 는 자동 삭제 대상에서 제외하고 보존만 확인했다.

@@ -5,7 +5,7 @@
  *
  * KPA-Society 의 Forum 운영 hub 를 공통 모듈로 추출.
  * - KPA: 게시글 edit/delete/bulk 액션 포함 (platform-admin override 경로로 동작).
- * - GlycoPharm / K-Cosmetics: read-only (삭제/일괄삭제 미노출) — 서비스 operator 는 community
+ * - K-Cosmetics: read-only (삭제/일괄삭제 미노출) — 서비스 operator 는 community
  *   post 삭제 권한이 없으므로(IR-...-FORUM-HUB-API-FEASIBILITY-VERIFY-V1) enablePostActions=false.
  */
 
@@ -53,7 +53,7 @@ export interface ForumHubAccent {
  * 없는 shortcut(예: community)은 미주입 시 렌더하지 않음.
  */
 export interface ForumHubNav {
-  /** 포럼 관리 / 개설 요청 — KPA: /operator/forum-management, GP/KCos: /operator/forum-requests */
+  /** 포럼 관리 / 개설 요청 — KPA: /operator/forum-management, KCos: /operator/forum-requests */
   requests: string;
   /** 포럼 목록 관리 (forum-categories) — route 가 있는 서비스에서만 주입 (미주입 시 shortcut 미렌더) */
   categories?: string;
@@ -73,7 +73,7 @@ export interface OperatorForumHubPageProps {
   client: ForumHubClient;
   accent: ForumHubAccent;
   nav: ForumHubNav;
-  /** 게시글 edit/delete/bulk 액션 + 선택 노출 (KPA true, GP/KCos false). 기본 false. */
+  /** 게시글 edit/delete/bulk 액션 + 선택 노출 (KPA true, KCos false). 기본 false. */
   enablePostActions?: boolean;
   /** DataTable tableId (서비스별 고유) */
   tableId?: string;

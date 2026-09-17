@@ -258,7 +258,6 @@ fetchGuidePageContent('kpa-society', 'content.document.editor')
 ### 데이터 분리 키
 
 ```
-serviceKey  : 서비스 구분 ('kpa-society', 'glycopharm', 'k-cosmetics', 'neture')
 pageKey     : 화면 구분 ('lms.course.editor', 'content.document.editor', ...)
 sectionKey  : 섹션 구분 ('page-help', 또는 lms.lesson.editor에서는 lessonType)
 ```
@@ -268,20 +267,6 @@ sectionKey  : 섹션 구분 ('page-help', 또는 lms.lesson.editor에서는 less
 ---
 
 ## 6. 2차 적용 기준
-
-### GlycoPharm (`glycopharm`)
-
-| pageKey 후보 | 화면 | 우선순위 |
-|---|---|---|
-| `content.document.editor` | 약국 공지/가이드라인 작성 | 높음 |
-| `content.resource.editor` | 자료 등록 | 높음 |
-| `store.product.management` | 제품 관리 | 중간 |
-| `store.channel.editor` | 채널 관리 | 중간 |
-| `forum.request.management` | 포럼 요청 관리 | 중간 |
-
-serviceKey: `glycopharm`
-
----
 
 ### K-Cosmetics (`k-cosmetics`)
 

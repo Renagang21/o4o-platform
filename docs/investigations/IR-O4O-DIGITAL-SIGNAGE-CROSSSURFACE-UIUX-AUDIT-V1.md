@@ -11,7 +11,7 @@
 
 > 당초 전제 "Neture 는 디지털사이니지 없음 → N/A" 는 **사실과 달랐다**. 조사 결과 Neture 에 signage surface(operator/admin 콘솔 + supplier + community + seller)가 실제로 존재했다.
 >
-> **후속 결정(사용자):** Neture 디지털사이니지는 **삭제 대상**으로 전환. KPA/GP/KCos signage 는 유지·공통화. shared signage core/backend 는 유지.
+> **후속 결정(사용자):** Neture 디지털사이니지는 **삭제 대상**으로 전환. KPA/KCos signage 는 유지·공통화. shared signage core/backend 는 유지.
 > → 본 IR 의 "Neture 포함 공통화" 권고는 **`WO-O4O-NETURE-DIGITAL-SIGNAGE-REMOVAL-V1` 로 대체**되었다. (제거 결과: `CHECK-O4O-NETURE-DIGITAL-SIGNAGE-REMOVAL-V1.md`)
 
 ## 1. 조사 개요
@@ -23,13 +23,12 @@
 | 서비스 | 당초 분류 | 실제 결과 |
 |--------|:--:|------|
 | KPA Society | 포함(기준) | ✅ 4 surface LIVE (가장 풍부, baseline frozen) |
-| GlycoPharm | 포함 | ✅ 4 surface LIVE |
 | K-Cosmetics | 포함 | ✅ 3 surface LIVE (커뮤니티 없음) |
 | Neture | 제외/N/A | ⚠️ operator/supplier/community/seller signage 존재 → **삭제 결정** |
 
 ## 3. route / surface 매트릭스
 
-| surface | KPA | GP | KCos | Neture(삭제 전) |
+| surface | KPA | KCos | Neture(삭제 전) |
 |---------|:--:|:--:|:--:|:--:|
 | 커뮤니티 | ✅ `/signage` 풍부 | ✅ 링크만 | ❌ 없음 | ✅ CommunitySignagePage(미라우팅) |
 | 매장 허브 | ✅ `/store-hub/signage` | ✅ | ✅ | — (supplier 대체) |
@@ -39,14 +38,14 @@
 
 ## 4. 컴포넌트 / 공통화 현황
 
-- **shared:** `@o4o/shared-space-ui` → `SignageManagerTemplate`(GP/KCos/KPA 커뮤니티), `SignageHubTemplate`(GP), `SignageIcon`. `@o4o/types/signage`(전 서비스). `@o4o-apps/digital-signage-core`(백엔드).
-- **local copy(공통화 안 됨):** 매장 허브 페이지 3개(KPA/GP/KCos 거의 동일), operator HQ 콘솔 4서비스 거의 동일, 내 매장 StoreSignagePage 구조 분기(3/2/1탭).
+- **shared:** `@o4o/shared-space-ui` → `SignageManagerTemplate`(KCos/KPA 커뮤니티), `SignageHubTemplate`, `SignageIcon`. `@o4o/types/signage`(전 서비스). `@o4o-apps/digital-signage-core`(백엔드).
+- **local copy(공통화 안 됨):** 매장 허브 페이지 3개(KPA/KCos 거의 동일), operator HQ 콘솔 3서비스 거의 동일, 내 매장 StoreSignagePage 구조 분기(3/2/1탭).
 
 ## 5. UI-UX / 용어 drift
 
 - **내 매장 탭 수 3/2/1 불일치** (KPA 최완성, KCos 최간소) — 최대 구조 drift.
-- **화면명**: "사이니지 운영"(KPA·GP) vs "사이니지 플레이리스트"(KCos), 기능명 "디지털 사이니지"/"사이니지" 흔들림.
-- **CTA**: "내 약국에 추가"(GP) vs "내 매장에 추가"(KPA·KCos) — 도메인 문구(정책성).
+- **화면명**: "사이니지 운영"(KPA) vs "사이니지 플레이리스트"(KCos), 기능명 "디지털 사이니지"/"사이니지" 흔들림.
+- **CTA**: "내 약국에 추가" vs "내 매장에 추가"(KPA·KCos) — 도메인 문구(정책성).
 - **KCos 깨진 route** `/partner/signage/content` — cleanup 후보.
 - **강제 송출 vs 강제노출** 표기 흔들림.
 
@@ -58,8 +57,8 @@
 
 0. **`WO-O4O-NETURE-DIGITAL-SIGNAGE-REMOVAL-V1`** — Neture signage surface 제거 (선행, 완료).
 1. **`WO-O4O-KPA-DIGITAL-SIGNAGE-UIUX-BASELINE-V1`** — KPA 기준 UI-UX 정비(커뮤니티 inline 정규화, 화면명/용어 통일).
-2. **`WO-O4O-DIGITAL-SIGNAGE-CROSSSERVICE-APPLY-V1`** — GP/KCos 확산(허브 SignageHubTemplate 흡수 + 용어 정렬 + KCos cleanup).
-3. (선택) operator 콘솔 공통 추출(KPA/GP/KCos — **Neture 제거 후 3서비스**).
+2. **`WO-O4O-DIGITAL-SIGNAGE-CROSSSERVICE-APPLY-V1`** — KCos 확산(허브 SignageHubTemplate 흡수 + 용어 정렬 + KCos cleanup).
+3. (선택) operator 콘솔 공통 추출(KPA/KCos — **Neture 제거 후 2서비스**).
 4. **`CHECK-O4O-DIGITAL-SIGNAGE-CROSSSERVICE-UIUX-FINAL-V1`**.
 
 ## 8. 분류표
@@ -85,7 +84,7 @@
 | 수정 파일 | 없음 (read-only IR) |
 | 조사 기준 commit | `f6c35c3a5` (최초 조사 시점) |
 | KPA 내부 drift | 경미(커뮤니티 inline, 화면명) — baseline frozen |
-| GP/KCos 확산 | 높음(허브·operator 동형, 테마/문구만 주입) |
+| KCos 확산 | 높음(허브·operator 동형, 테마/문구만 주입) |
 | Neture | **N/A 아님 — signage 존재 → 삭제 결정(REMOVAL WO)** |
 | 데이터 흐름 | 단일 backend core, serviceKey 경계 — 일관, 변경 불요 |
 | 1차 WO | `WO-O4O-NETURE-DIGITAL-SIGNAGE-REMOVAL-V1`(선행) → `WO-O4O-KPA-DIGITAL-SIGNAGE-UIUX-BASELINE-V1` |

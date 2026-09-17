@@ -8,7 +8,7 @@
 |------|------|
 | 작성일 | 2026-05-11 |
 | 선행 IR | `IR-O4O-STORE-PRODUCTION-ASSET-RESTRUCTURE-V1.md` |
-| 대상 서비스 | KPA-Society + (검증 참조) GlycoPharm |
+| 대상 서비스 | — |
 | 핵심 컴포넌트 | `packages/content-editor/src/components/AiContentModal.tsx` |
 | 백엔드 라우트 | `apps/api-server/src/routes/ai-proxy.routes.ts` |
 | AI 프롬프트 카탈로그 | `apps/api-server/src/services/ai-prompts/index.ts` |
@@ -72,7 +72,6 @@
 | Forum 작성 | [services/web-kpa-society/src/pages/forum/ForumWritePage.tsx](services/web-kpa-society/src/pages/forum/ForumWritePage.tsx) | `RichTextEditor` 툴바 내장 모달. `showStoreSave` 가 `kpa:store_owner` role 에만 활성 |
 | **LMS 강좌/레슨** | [services/web-kpa-society/src/pages/instructor/courses/CourseEditPage.tsx](services/web-kpa-society/src/pages/instructor/courses/CourseEditPage.tsx) | `showCommunitySave=true`, `headerLabel="AI 레슨 초안 만들기"`, `initialSourceTab='url'`, YouTube URL placeholder |
 | **약국 블로그** | [services/web-kpa-society/src/pages/pharmacy/PharmacyBlogPage.tsx](services/web-kpa-society/src/pages/pharmacy/PharmacyBlogPage.tsx) | `headerLabel="AI 칼럼 보조"`, `urlPlaceholder="...article 또는 YouTube..."` |
-| (참조) GlycoPharm 블로그 | [services/web-glycopharm/src/pages/store-management/PharmacyBlogPage.tsx](services/web-glycopharm/src/pages/store-management/PharmacyBlogPage.tsx) | 동일 패턴 — canonical 검증됨 |
 
 > **즉, 매장 제작 자료에서 4유형을 통합한다 해도, 이 컴포넌트의 5번째 사용처가 하나 더 늘어나는 것일 뿐이다.**
 

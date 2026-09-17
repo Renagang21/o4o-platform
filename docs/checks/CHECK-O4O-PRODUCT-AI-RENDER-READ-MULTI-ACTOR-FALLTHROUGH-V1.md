@@ -54,7 +54,7 @@
 
 **변경 없음 (WO §8 · §12):**
 - `product-pop-pdf.controller.ts` / `product-ai-content.controller.ts` / `product-ai-tag.controller.ts` — 컨트롤러·route 무변경. 가드 판정 결과만 달라진다.
-- 프론트엔드 4개 서비스 (`web-kpa-society` / `web-neture` / `web-glycopharm` / `web-k-cosmetics`) — 변경 0
+- 프론트엔드 4개 서비스 — 변경 0
 - **DB migration 0 / DB write 0**
 
 ### 3.1 핵심 diff
@@ -156,7 +156,7 @@ inactive OPL 403 / `supplier_product_offers` 경유 미사용 / 미인증 403 /
 
 `resolveGlobalProductResourceAccess()` 는 `apps/api-server/src/modules/store-ai` 내부 전용이며
 소비처는 위 3개 컨트롤러(13 엔드포인트) 뿐이다.
-KPA / Neture / GlycoPharm / K-Cosmetics 어느 프론트도 본 함수를 직접 호출하지 않고,
+KPA / Neture / K-Cosmetics 어느 프론트도 본 함수를 직접 호출하지 않고
 서비스별 예외 분기를 추가하지 않았다 (전 서비스 공통 계약 유지).
 
 ---

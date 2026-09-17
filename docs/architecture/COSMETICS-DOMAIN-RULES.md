@@ -184,7 +184,6 @@ CORE_API_URL=https://api.neture.co.kr
 
 - 📄 E-commerce 계약: `docs/baseline/E-COMMERCE-ORDER-CONTRACT.md`
 - 📄 O4O Store 규칙: `docs/architecture/O4O-STORE-RULES.md`
-- 📄 GlycoPharm Legacy: `docs/baseline/legacy/GLYCOPHARM-LEGACY-POSTMORTEM.md`
 
 ---
 

@@ -2,7 +2,6 @@
  * StoreSignagePage — 사이니지 플레이리스트 관리
  *
  * WO-O4O-SIGNAGE-STORE-ACTION-EXPANSION-V1
- * Adapted from GlycoPharm StoreSignagePage for K-Cosmetics.
  *
  * /store/signage: 플레이리스트 CRUD + item 관리
  * 전이 패턴: Hub → assetSnapshotApi.copy → o4o_asset_snapshots → Playlist에 추가

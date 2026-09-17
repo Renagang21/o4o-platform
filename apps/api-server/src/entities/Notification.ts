@@ -96,7 +96,7 @@ export class Notification {
   user!: User;
 
   // O4O Boundary Policy fields (WO-O4O-NOTIFICATION-CORE-BASELINE-V1)
-  // serviceKey: which O4O service this notification belongs to (kpa, glycopharm, neture, k-cosmetics, ...)
+  // serviceKey: which O4O service this notification belongs to (kpa, neture, k-cosmetics, ...)
   @Column({ type: 'varchar', length: 100, nullable: true })
   serviceKey?: string;
 

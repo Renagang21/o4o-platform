@@ -51,7 +51,7 @@
 | `UserDetailPasswordModal.test.tsx` (vitest) | **7/7 PASS** (신규 3건 포함) |
 | `apps/api-server` `tsc --noEmit` | PASS |
 | `packages/ui` type-check · build | PASS |
-| 4개 서비스(KPA-Society · GlycoPharm · K-Cosmetics · Neture) typecheck | PASS |
+| 3개 서비스(KPA-Society · K-Cosmetics · Neture) typecheck | PASS |
 
 신규 테스트 — 세 경로에 같은 최소 길이가 적용됨을 고정한다.
 

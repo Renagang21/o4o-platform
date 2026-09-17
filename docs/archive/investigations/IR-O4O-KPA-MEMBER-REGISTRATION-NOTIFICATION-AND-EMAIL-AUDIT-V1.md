@@ -232,7 +232,6 @@ AppDataSource.transaction(async (manager) => {
   // L: User 생성
   // M: ServiceMembership(status='pending') 생성
   // N: createKpaRecords(manager, userId, data) — kpa_members + kpa_member_services + (개설약사 시) users.businessInfo merge
-  // P: createGlycopharmApplication(manager, ...) — glycopharm 케이스
 })
 
 // 트랜잭션 commit 완료

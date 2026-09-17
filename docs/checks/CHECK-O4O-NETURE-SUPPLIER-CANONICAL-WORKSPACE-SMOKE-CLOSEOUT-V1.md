@@ -55,7 +55,6 @@ Neture 웹 로그인 폼은 `serviceKey: 'neture'` 를 보낸다
 채널   POST /api/v1/auth/login  (serviceKey 없음, includeLegacyTokens:true) → 200
        accessToken/refreshToken 을 o4o_accessToken / o4o_refreshToken 에 주입
 roles  kpa:store_owner · cosmetics:store_owner · lms:instructor · pharmacy ·
-       glycopharm:store_owner · **supplier** · pharmacy-hub:store_owner
 ```
 
 `supplier` 역할 보유로 `SupplierRoute` 를 통과해 **모든 공급자 화면의 실제 렌더·API 호출을 관측**했다.

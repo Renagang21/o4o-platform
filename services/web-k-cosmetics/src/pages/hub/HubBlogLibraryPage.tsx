@@ -2,7 +2,7 @@
  * HubBlogLibraryPage — K-Cosmetics 매장 HUB 블로그 진열 + 매장으로 가져오기
  *
  * WO-O4O-STORE-HUB-COMMON-VIEW-AND-SHELL-UNIFICATION-V1:
- *   KPA·K-Cosmetics·GlycoPharm 의 블로그/POP/QR 진열 화면 9개가 문구·아이콘·경로·accent 를 빼면
+ *   KPA·K-Cosmetics 의 블로그/POP/QR 진열 화면 9개가 문구·아이콘·경로·accent 를 빼면
  *   동일한 마크업이었다. 화면은 공통 `HubImportLibraryView`, 상태는 공통 `useHubImportLibrary`
  *   (@o4o/store-ui-core) 로 이관하고 이 파일은 **API adapter + 서비스 config** 만 소유한다.
  *   backend · API 계약 무변경.

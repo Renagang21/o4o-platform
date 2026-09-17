@@ -35,7 +35,6 @@
 `OPERATOR-INTEGRATION-STATE-V1` 가 결론지은 분류:
 - 🟢 **Core (이미 공통)**: 5-Block Dashboard, Forum Delete Requests / Analytics / Community Management, Signage HQ Console
 - 🟡 **Core UI + Service Logic (실제 추출 핵심)**: Stores, Users, Products, Orders, AI Report, Applications 등
-- 🔴 **Extension (서비스 전용)**: KPA Legal/Audit/Content, Glyco Guidelines, K-Cos Event Offers/StoreCockpit 등
 
 🟡 카테고리는 UI 패턴은 같지만 도메인 로직이 서비스별로 다르다. 이를 처리하기 위해 신규 페이지 수준 모듈 컬렉션이 필요하다.
 
@@ -50,7 +49,7 @@
 
 ### 1.3 패키지 분리 근거
 
-- **점진적 마이그레이션**: 한 서비스씩 채택 가능 (KPA → Glyco → K-Cos)
+- **점진적 마이그레이션**: 한 서비스씩 채택 가능 (KPA → K-Cos)
 - **책임 분리**: 원시(ux-core) ↔ 모듈(core-ui) 명확 구분
 - **Extension 보호**: 서비스 전용 영역(StoreCockpitPage 등) 이 Core 에 흡수되지 않음
 
@@ -172,7 +171,7 @@ modules/stores/
 ```ts
 // modules/stores/types.ts
 
-/** 공통 store 기본 필드 (3 서비스 공통) */
+/** 공통 store 기본 필드 (서비스 공통) */
 export interface OperatorStoreBase {
   id: string;
   name: string;
@@ -220,7 +219,6 @@ export interface StoresApi<T extends OperatorStoreBase = OperatorStoreBase> {
 
 /** 표현 제어 — 서비스별 terminology + 색상 */
 export interface StoresConfig {
-  serviceKey: 'kpa-society' | 'glycopharm' | 'k-cosmetics';
   terminology: {
     storeLabel: string;        // "약국" / "매장"
     storeHubLabel: string;     // "약국 운영 허브" / "매장 운영 허브"
@@ -269,9 +267,9 @@ export interface OperatorStoresListProps<T extends OperatorStoreBase = OperatorS
 
 ### 5.1 Adapter 패턴 — API 호출
 
-3 서비스 모두 `/api/v1/operator/stores` 공통 endpoint 사용. 차이는 baseURL prefix 와 auth 처리 방식:
+2 서비스 모두 `/api/v1/operator/stores` 공통 endpoint 사용. 차이는 baseURL prefix 와 auth 처리 방식:
 - KPA: `apiClient` (baseURL `/api/v1/kpa`, fetch wrapper)
-- Glyco / K-Cos: `api` (baseURL `/api/v1`, axios)
+- K-Cos: `api` (baseURL `/api/v1`, axios)
 
 → 각 서비스가 `StoresApi` 인터페이스를 구현한 어댑터 생성:
 
@@ -303,7 +301,7 @@ export const kpaStoresConfig: StoresConfig = {
 };
 ```
 
-기존 `@o4o/operator-ux-core/config/services` 의 `kpaConfig` / `glycopharmConfig` / `kcosmeticsConfig` 와 동일 컨셉.
+기존 `@o4o/operator-ux-core/config/services` 의 `kpaConfig` / `kcosmeticsConfig` 와 동일 컨셉.
 
 ### 5.3 Slot 패턴 — Extension 진입점
 
@@ -350,14 +348,11 @@ const kpaStoresConfig: StoresConfig = {
 | **Step 0** | 패키지 신설 | `packages/operator-core-ui/` 생성, modules/stores/ 작성 | 0 (신규) | +500 |
 | **Step 1** | KPA `OperatorStoresPage` | StoresApi adapter 작성 + thin wrapper 변환 | 낮음 (이미 ux-core DataTable 사용) | -120 / +30 |
 | **(soak 1주)** | KPA 안정성 검증 | smoke + log + 사용자 사용 흔적 | — | — |
-| **Step 2** | Glyco `StoresPage` | `@o4o/ui` Column → ListColumnDef 변환 + adapter + thin wrapper. PageHeader/StatusBadge 는 `headerExtras` slot 으로 보존 | 낮음 | -150 / +40 |
-| **(soak 1주)** | Glyco 안정성 검증 | smoke + log | — | — |
-| **Step 3** | K-Cos `StoresPage` | **수동 HTML → DataTable 컴포넌트화** (가장 큼). `colorScheme: 'pink'` prop 으로 K-Cos 색상 보존 | 중간 (시각적 미세 차이 가능) | -200 / +50 |
+| **Step 2** | K-Cos `StoresPage` | **수동 HTML → DataTable 컴포넌트화** (가장 큼). `colorScheme: 'pink'` prop 으로 K-Cos 색상 보존 | 중간 (시각적 미세 차이 가능) | -200 / +50 |
 
-### 6.2 마이그레이션 순서 근거 (KPA → Glyco → K-Cos)
+### 6.2 마이그레이션 순서 근거 (KPA → K-Cos)
 
 - KPA: 이미 `@o4o/operator-ux-core` `DataTable` + `useBatchAction` + `defineActionPolicy` 사용 — 가장 가까운 형태. **adapter + config 만 작성하면 thin wrapper 변환 가능.**
-- Glyco: `@o4o/ui` `DataTable` 사용 — column 타입 변환 + pagination 외부 결합 필요. 중간 작업량.
 - K-Cos: 수동 HTML 테이블 — DataTable 컴포넌트화 자체가 큰 작업. 가장 마지막 + soak 충분히.
 
 ### 6.3 Soak 전략
@@ -375,14 +370,14 @@ LMS V2 Step 1 → Step 2 의 1주 soak 패턴과 동일.
 
 ### 7.1 `package.json` 변경
 
-3 서비스 모두 dependency 추가:
+2 서비스 모두 dependency 추가:
 ```json
 "@o4o/operator-core-ui": "workspace:*"
 ```
 
 ### 7.2 Dockerfile 변경 (file-by-file COPY 패턴)
 
-3 서비스 Dockerfile 에 다음 라인 추가:
+2 서비스 Dockerfile 에 다음 라인 추가:
 
 ```dockerfile
 # package.json copy block (early)
@@ -395,7 +390,7 @@ COPY packages/operator-core-ui/ ./packages/operator-core-ui/
 RUN pnpm --filter @o4o/operator-core-ui build
 ```
 
-CLAUDE.md 메모리 노트(file-by-file COPY 패턴 — 4 서비스 중 KPA/Glyco/K-Cos 해당) 준수.
+CLAUDE.md 메모리 노트(file-by-file COPY 패턴 — KPA/K-Cos 해당) 준수.
 
 ### 7.3 `pnpm-lock.yaml`
 
@@ -415,7 +410,7 @@ const OperatorStoresPage = lazy(() => import('./pages/operator/OperatorStoresPag
 
 - 한 서비스씩 적용 가능
 - 마이그레이션되지 않은 서비스도 영향 없음 (core-ui 사용 안 함 = 변경 안 됨)
-- Step 1 KPA 만 적용된 상태에서도 Glyco/K-Cos 정상 동작
+- Step 1 KPA 만 적용된 상태에서도 K-Cos 정상 동작
 
 ---
 
@@ -423,8 +418,7 @@ const OperatorStoresPage = lazy(() => import('./pages/operator/OperatorStoresPag
 
 | 리스크 | 심각도 | 완화 |
 |---|---|---|
-| **Glyco DataTable 변환 시 일관성 문제** | 중 | Step 2 진행 전 Glyco StoresPage 의 컬럼 정의 정렬 (Column → ListColumnDef 사전 매핑 검증) |
-| **K-Cos 시각적 회귀** (색상 / 레이아웃 미세 차이) | 중 | `colorScheme: 'pink'` prop + Step 3 전 시각 회귀 테스트 |
+| **K-Cos 시각적 회귀** (색상 / 레이아웃 미세 차이) | 중 | `colorScheme: 'pink'` prop + Step 2 전 시각 회귀 테스트 |
 | **OperatorStoreChannelsPage / StoreCockpitPage 가 Core 범위 침범** | 낮음 | 명시적 분리: 본 문서 §3.1 "Core 가 Extension 영역 흡수 금지" 정책. slot 으로만 진입 |
 | **기존 페이지 회귀** | 중 | 각 Step 후 e2e smoke (행 클릭, 검색, 페이지네이션, 선택) |
 | **DataTable 정책 위반** (Operator 페이지에서 @o4o/ui 직접 사용) | 낮음 | core-ui 가 ux-core DataTable 사용으로 강제 — 페이지는 core-ui 만 import |
@@ -441,16 +435,14 @@ const OperatorStoresPage = lazy(() => import('./pages/operator/OperatorStoresPag
 
 ```text
 목표:
-@o4o/operator-core-ui 패키지 신설 + Stores 모듈 추출 + 3 서비스 마이그레이션.
+@o4o/operator-core-ui 패키지 신설 + Stores 모듈 추출 + 2 서비스 마이그레이션.
 
 범위:
 1. packages/operator-core-ui/ 신규 생성 (modules/stores/ + types + composables)
-2. 3 서비스 package.json + Dockerfile 업데이트
+2. 2 서비스 package.json + Dockerfile 업데이트
 3. KPA OperatorStoresPage thin wrapper 변환 (Step 1)
 4. (1주 soak)
-5. Glyco StoresPage thin wrapper 변환 (Step 2)
-6. (1주 soak)
-7. K-Cos StoresPage thin wrapper 변환 (Step 3)
+5. K-Cos StoresPage thin wrapper 변환 (Step 2)
 8. pnpm-lock.yaml 재생성
 
 제외:
@@ -461,7 +453,7 @@ const OperatorStoresPage = lazy(() => import('./pages/operator/OperatorStoresPag
 
 검증:
 - @o4o/operator-core-ui 빌드
-- 3 서비스 typecheck
+- 2 서비스 typecheck
 - 3 서비스 컬럼 렌더링 / 페이지네이션 / 검색 / 행 클릭 / 선택 동일성
 - Cloud Run 로그 ERROR 0
 - 각 Step 후 1주 soak smoke
@@ -480,7 +472,7 @@ const OperatorStoresPage = lazy(() => import('./pages/operator/OperatorStoresPag
 본 문서 발행 이후 명시적 IR/WO 없이 다음 금지:
 
 - ❌ 본 문서의 인터페이스 (StoresApi, StoresConfig, OperatorStoresListProps 등) 즉흥 변경
-- ❌ Step 순서 변경 (KPA → Glyco → K-Cos 외 다른 순서)
+- ❌ Step 순서 변경 (KPA → K-Cos 외 다른 순서)
 - ❌ Step 사이 soak 생략
 - ❌ Extension 영역(`OperatorStoreChannelsPage`, `StoreCockpitPage`) 을 core-ui 모듈로 흡수 시도
 - ❌ Operator 페이지에서 `@o4o/ui` `DataTable` 직접 사용 (`OPERATOR-DATATABLE-POLICY-V1` 위반)
@@ -490,7 +482,7 @@ const OperatorStoresPage = lazy(() => import('./pages/operator/OperatorStoresPag
 
 ## 11. 결론
 
-> **`@o4o/operator-core-ui` 는 Operator 영역의 페이지 수준 모듈을 모은 신규 패키지이며, `@o4o/operator-ux-core` (공유 UI 원시) 위에 구축된다. 첫 추출 모듈은 Stores Management 이고, KPA → Glyco → K-Cos 순으로 점진적 마이그레이션한다.**
+> **`@o4o/operator-core-ui` 는 Operator 영역의 페이지 수준 모듈을 모은 신규 패키지이며, `@o4o/operator-ux-core` (공유 UI 원시) 위에 구축된다. 첫 추출 모듈은 Stores Management 이고, KPA → K-Cos 순으로 점진적 마이그레이션한다.**
 
 본 문서가 Operator Core 공통화의 **시작 기준점**이다. 이후 모든 Operator Core 관련 WO 는 본 문서의 인터페이스·단계·금지 사항을 기준으로 검토한다.
 
@@ -508,6 +500,5 @@ const OperatorStoresPage = lazy(() => import('./pages/operator/OperatorStoresPag
   - 기반: [`packages/operator-ux-core/`](../../packages/operator-ux-core/)
 - 서비스별 Stores 페이지 (마이그레이션 대상):
   - [services/web-kpa-society/src/pages/operator/OperatorStoresPage.tsx](../../services/web-kpa-society/src/pages/operator/OperatorStoresPage.tsx)
-  - [services/web-glycopharm/src/pages/operator/StoresPage.tsx](../../services/web-glycopharm/src/pages/operator/StoresPage.tsx)
   - [services/web-k-cosmetics/src/pages/operator/StoresPage.tsx](../../services/web-k-cosmetics/src/pages/operator/StoresPage.tsx)
 - 다음 단계: `WO-O4O-OPERATOR-STORES-CORE-EXTRACTION-V1`

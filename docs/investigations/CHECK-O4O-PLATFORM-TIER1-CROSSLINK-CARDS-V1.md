@@ -42,7 +42,7 @@
 
 ## 5. 불변 확인 (§7)
 
-- Tier 1 route 이동 / AdminRoute·PlatformRoute / backend guard / 운영자·역할·정책 기능 / API / DB / Neture admin sidebar / GP·KCos·KPA / platform users·accounts·services **변경 0**.
+- Tier 1 route 이동 / AdminRoute·PlatformRoute / backend guard / 운영자·역할·정책 기능 / API / DB / Neture admin sidebar / KCos·KPA / platform users·accounts·services **변경 0**.
 
 ## 6. 완료 판정
 

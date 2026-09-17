@@ -19,7 +19,7 @@
 | C. migration 있으나 prod 미적용 | ✅ (A의 메커니즘 — orphaned 디렉터리) |
 | D. entity/table naming drift | ❌ (entity 정확) / **디렉터리 drift 는 있음** |
 
-> **추가 중대 발견**: PaymentCore 결제는 **KPA/Glyco/KCos/Neture B2B 4 서비스 공통** 경로다 → o4o_payments 부재는 **모든 서비스의 PaymentCore prepare/confirm 에 영향**. Neture B2B 가 처음 드러냈을 뿐, 이전엔 어느 서비스도 positive 결제 smoke 가 성공한 적이 없어 잠재화돼 있었다.
+> Neture B2B 가 처음 드러냈을 뿐, 이전엔 어느 서비스도 positive 결제 smoke 가 성공한 적이 없어 잠재화돼 있었다.
 
 ---
 
@@ -30,7 +30,6 @@
   - `PaymentCoreService`(packages/payment-core) → repository → PlatformPayment.
 - **공유 소비처**(모두 `new PaymentCoreService(new TypeORMPaymentRepository(...), ...)`):
   - `routes/kpa/controllers/kpa-payment.controller.ts`
-  - `routes/glycopharm/controllers/glycopharm-payment.controller.ts`
   - `routes/cosmetics/controllers/cosmetics-payment.controller.ts`
   - `routes/neture/controllers/neture-b2b-payment.controller.ts`
   → **4 서비스 결제가 동일하게 o4o_payments 의존.**
@@ -59,7 +58,7 @@
 - → 둘은 **역할이 다름**. o4o_payments 를 checkout_payments 로 "대체"하면 안 됨(후보 B/단순 rename 비채택). 누락된 것은 o4o_payments.
 
 ## 6. 핵심 질문 답변
-1. canonical payment table? **o4o_payments**. 2. PaymentCore 가 o4o_payments 참조? **예**(PlatformPayment). 3. entity 존재? **예**. 4. 생성 migration 존재? **예, 단 orphaned dir**. 5. prod 부재가 미적용 때문? **예 — 스캔 안 되는 dir**. 6. checkout_payments 와 역할 차이? **PaymentCore 원장 vs checkout_order 결제요약**. 7. KPA/Glyco/KCos 도 동일 위험? **예(공통 의존)**. 8. Neture B2B 만의 문제? **아니오 — payment-core 전체**. 9. 수정 방향? **테이블 생성(migration 을 스캔 dir 로 이전) — 참조 수정 아님**. 10. 새 migration vs 적용? **기존 migration 을 `src/database/migrations/` 로 이전(또는 재작성)하여 CI/CD 적용**.
+1. canonical payment table? **o4o_payments**. 2. PaymentCore 가 o4o_payments 참조? **예**(PlatformPayment). 3. entity 존재? **예**. 4. 생성 migration 존재? **예, 단 orphaned dir**. 5. prod 부재가 미적용 때문? **예 — 스캔 안 되는 dir**. 6. checkout_payments 와 역할 차이? **PaymentCore 원장 vs checkout_order 결제요약**. 7. **예(공통 의존)**. 8. Neture B2B 만의 문제? **아니오 — payment-core 전체**. 9. 수정 방향? **테이블 생성(migration 을 스캔 dir 로 이전) — 참조 수정 아님**. 10. 새 migration vs 적용? **기존 migration 을 `src/database/migrations/` 로 이전(또는 재작성)하여 CI/CD 적용**.
 
 ## 7. 후속 WO (제안)
 1. **`WO-O4O-PAYMENTCORE-O4O-PAYMENTS-MIGRATION-RELOCATE-V1`**(권장) — `src/migrations/1771027200000-CreateO4oPaymentsTable.ts` + `1771027200001-AddPaymentKeyUniqueAndStatusIndex.ts` 를 **스캔 디렉터리 `src/database/migrations/`** 로 이전(class name/timestamp 정합) → main 배포 시 CI/CD 자동 적용. `CREATE TABLE IF NOT EXISTS` 라 재적용 안전. 적용 후 `gcloud sql`/로그로 o4o_payments 존재 + typeorm_migrations 등록 확인.
@@ -77,7 +76,7 @@
 ```
 
 ## 10. 최종 기준 문장
-`o4o_payments` 는 PaymentCore 의 canonical 결제 원장이며 entity 참조는 정확하다. 오류의 근본 원인은 **생성 migration 이 migration 러너가 스캔하지 않는 `src/migrations/` 디렉터리에 있어 production 에 적용된 적이 없다**는 것이다(스캔 dir 은 `src/database/migrations/`). 이는 Neture B2B 만이 아니라 KPA/Glyco/KCos 를 포함한 **모든 서비스의 PaymentCore 결제**에 영향한다. 수정은 테이블명 변경이 아니라 **migration 을 스캔 디렉터리로 이전하여 CI/CD 가 o4o_payments 를 생성**하는 것이며, orphaned `src/migrations/` 40개 파일 전반에 대한 별도 audit 이 필요하다.
+`o4o_payments` 는 PaymentCore 의 canonical 결제 원장이며 entity 참조는 정확하다. 오류의 근본 원인은 **생성 migration 이 migration 러너가 스캔하지 않는 `src/migrations/` 디렉터리에 있어 production 에 적용된 적이 없다**는 것이다(스캔 dir 은 `src/database/migrations/`). 수정은 테이블명 변경이 아니라 **migration 을 스캔 디렉터리로 이전하여 CI/CD 가 o4o_payments 를 생성**하는 것이며, orphaned `src/migrations/` 40개 파일 전반에 대한 별도 audit 이 필요하다.
 
 ---
 

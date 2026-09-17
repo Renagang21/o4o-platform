@@ -9,7 +9,7 @@
 
 ## 1. 최종 점검 개요
 
-forum 사용자-facing 공통화는 4서비스(KPA-Society / GlycoPharm / K-Cosmetics / Neture) 의 게시판 사용자 화면을 `@o4o/shared-space-ui` 의 공통 컴포넌트·primitive 기준으로 정렬하는 일련의 소규모 IR/WO 로 진행되었다.
+forum 사용자-facing 공통화는 3서비스(KPA-Society / K-Cosmetics / Neture) 의 게시판 사용자 화면을 `@o4o/shared-space-ui` 의 공통 컴포넌트·primitive 기준으로 정렬하는 일련의 소규모 IR/WO 로 진행되었다.
 
 원칙:
 - **display/structure 공통화** 만 수행. comment 작성/수정/삭제·like·edit/delete action·contactSection·closed-forum·route/basePath·backend/API/DB/menu 는 건드리지 않음.
@@ -30,7 +30,7 @@ forum 사용자-facing 공통화는 4서비스(KPA-Society / GlycoPharm / K-Cosm
 | 조사 기준 commit | `3638aa1e5` |
 
 forum 공통화 관련 직전 커밋(history 반영 확인):
-- `36c30e92d` feat(forum): extract ForumCommentList (comment display-only) across KPA/GP/KCos
+- `36c30e92d` feat(forum): extract ForumCommentList (comment display-only) across KPA/KCos
 - `ea1dbaa53` feat(forum): extract ForumPostHeader + detail loading/error/not-found primitives
 - (선행) ForumPostContent / forumContentToHtml / ForumWriteForm / ForumListTemplate / ForumRequestForm 추출 커밋
 
@@ -51,7 +51,7 @@ forum 공통화 관련 직전 커밋(history 반영 확인):
 | 항목 | 상태 | 비고 |
 |------|:--:|------|
 | `ForumRequestForm` shared 적용 | ✅ | 포럼 개설 신청 공통 폼 |
-| KPA / GP / KCos / Neture 신청 화면 정렬 | ✅ | 4서비스 정렬 |
+| KPA / KCos / Neture 신청 화면 정렬 | ✅ | 3서비스 정렬 |
 | tags required contract ↔ UI 정합 | ✅ | tags 필수 계약과 UI 일치 |
 | 사용자-facing "카테고리" 표현 제거 | ✅ | terminology boundary 반영 |
 
@@ -63,7 +63,7 @@ forum 공통화 관련 직전 커밋(history 반영 확인):
 | `HubPagination` shared 사용 | ✅ | 페이지네이션 공통 |
 | `ForumListItem` shape 사용 | ✅ | 목록 데이터 표시 타입 정규화 |
 | `ForumListTemplate` 적용 | ✅ | 목록 공통 presentational |
-| GP / KCos / Neture list template 적용 | ✅ | 3서비스 template 정렬 |
+| KCos / Neture list template 적용 | ✅ | 2서비스 template 정렬 |
 | KPA list = BaseTable 고유 | **의도적 제외** | KPA 고유 BaseTable 구조 보존(공통화 강제 안 함) |
 
 ## 6. 완료된 write / create / edit 축
@@ -74,7 +74,7 @@ forum 공통화 관련 직전 커밋(history 반영 확인):
 | content normalize 가능 포맷 정렬 | ✅ | backend `normalizeContent()` HTML↔Block[] 활용 |
 | `ForumWriteForm` 적용 (create) | ✅ | 4서비스 create 공통 폼 |
 | KPA / Neture edit 보유 서비스 ForumWriteForm 기준 정렬 | ✅ | edit 보유 서비스 정렬 |
-| GP / KCos = create-only | **의도된 정책** | 기능 누락 아님, 현재 정책으로 기록 |
+| KCos = create-only | **의도된 정책** | 기능 누락 아님, 현재 정책으로 기록 |
 | postType optional 정책 | ✅ | optional 로 유지 |
 | Neture contactSection 유지 | ✅ | Neture 고유 보존 |
 
@@ -82,15 +82,15 @@ forum 공통화 관련 직전 커밋(history 반영 확인):
 
 | 항목 | 상태 | 적용 범위 |
 |------|:--:|----------|
-| `ForumPostContent` 적용 | ✅ | KPA·KCos(`content`), GP·Neture(`html`) |
-| `forumContentToHtml` 적용 | ✅ | forum-core-free 변환기(GP/KCos Docker 빌드 안전) |
-| `ForumPostHeader` 적용 | ✅ | KPA·GP·KCos (slot 기반 badge/meta/action) |
-| `ForumDetailStates`(Loading/Error/NotFound) 적용 | ✅ | KPA·GP·KCos |
-| `ForumCommentList` 적용 | ✅ | KPA(+삭제 slot)·GP(read-only)·KCos(html renderContent) |
+| `ForumPostContent` 적용 | ✅ | KPA·KCos(`content`), Neture(`html`) |
+| `forumContentToHtml` 적용 | ✅ | forum-core-free 변환기(KCos Docker 빌드 안전) |
+| `ForumPostHeader` 적용 | ✅ | KPA·KCos (slot 기반 badge/meta/action) |
+| `ForumDetailStates`(Loading/Error/NotFound) 적용 | ✅ | KPA·KCos |
+| `ForumCommentList` 적용 | ✅ | KPA(+삭제 slot)·KCos(html renderContent) |
 | Neture full CRUD comment | **의도적 보류** | inline edit CommentItem — display-only 래퍼 부적합 |
 | KPA closed-forum / tags / appreciation 유지 | ✅ | KPA 고유 보존 |
 | Neture contactSection / basePath / rich skeleton·header 유지 | ✅ | Neture 고유 보존 |
-| GP / KCos read-only detail 유지 | ✅ | 작성/수정/삭제 미추가 |
+| KCos read-only detail 유지 | ✅ | 작성/수정/삭제 미추가 |
 
 ## 8. 의도적 제외 / 보존 영역
 
@@ -109,7 +109,7 @@ forum 공통화 관련 직전 커밋(history 반영 확인):
 - rich skeleton loading + 반응형 header(mobile ⋮ action menu)
 - inline comment CRUD(CommentItem: create/update/delete + inline edit)
 
-### GP / KCos 정책 (기능 누락 아님)
+### KCos 정책 (기능 누락 아님)
 - read-only detail (댓글 작성/수정/삭제 없음)
 - create-only write (edit route 미보유)
 - 현재 정책으로 **기록** — 향후 기능 확장은 별도 정책 WO
@@ -129,9 +129,9 @@ forum 공통화 관련 직전 커밋(history 반영 확인):
 ### 정책 backlog (제품/정책 결정 필요)
 | 후보 | 결정 사항 |
 |------|----------|
-| GP/KCos edit 기능 신설 여부 | 현재 create-only |
-| GP/KCos comment 작성 기능 부여 여부 | 현재 read-only |
-| GP postType list 표시 여부 | 현재 미표시 |
+| KCos edit 기능 신설 여부 | 현재 create-only |
+| KCos comment 작성 기능 부여 여부 | 현재 read-only |
+ postType list 표시 여부 | 현재 미표시 |
 | edit route 통일 여부 | 서비스별 상이 |
 | 전면 ForumDetailTemplate 도입 여부 | 현재 primitives-first |
 
@@ -144,14 +144,14 @@ forum 공통화 관련 직전 커밋(history 반영 확인):
 | 1 | 4서비스 공통 핵심 사용자-facing 흐름이 shared component/primitive 기준 정리 | ✅ |
 | 2 | KPA 고유 기능 억지 공통화 없이 보존 | ✅ |
 | 3 | Neture basePath / contactSection 보존 | ✅ |
-| 4 | GP/KCos create-only / read-only 가 기능 누락 아닌 정책으로 기록 | ✅ |
+| 4 | KCos create-only / read-only 가 기능 누락 아닌 정책으로 기록 | ✅ |
 | 5 | backend/API/DB/migration/route/menu 추가 변경 불요 | ✅ |
 | 6 | 남은 항목 모두 선택적 backlog 또는 정책 WO 로 분리 | ✅ |
 
 ## 11. 최종 판정
 
 > **Forum 사용자-facing 공통화는 현재 기준 PASS 로 완료 고정한다.**
-> 남은 항목은 Neture/KPA 고유 기능 보존 또는 GP/KCos 기능 확장 정책에 해당하며, 공통화 완료를 막는 blocker 가 아니다.
+> 남은 항목은 Neture/KPA 고유 기능 보존 또는 KCos 기능 확장 정책에 해당하며, 공통화 완료를 막는 blocker 가 아니다.
 
 ## 12. 후속 권장 순서
 

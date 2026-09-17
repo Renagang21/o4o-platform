@@ -7,7 +7,7 @@
  * seam 을 재사용해 서비스 축으로 스코프한다 — 새 resolver 를 만들지 않는다.
  *
  * 축 B(노출 사유 계약) — backend 가 붙여 주는 `tabletVisible/tabletVisibilityReason`,
- * `tabletChannel` 을 KCos/GP 가 공유하는 `@o4o/store-ui-core` 태블릿 화면이
+ * `tabletChannel` 을 KCos 가 쓰는 `@o4o/store-ui-core` 태블릿 화면이
  * 실제로 표시하는지(문구는 `@o4o/tablet-screen-set-editor` 와 동일).
  *
  * DB 는 붙이지 않는다 — DataSource.query stub + raw-source 단언.
@@ -56,7 +56,7 @@ beforeEach(() => {
   CURRENT_MEMBERSHIPS = [...ACTIVE_MEMBERSHIPS];
 });
 
-describe('축 A — KCos / GP 태블릿 라우트의 서비스 스코프 조직 해석', () => {
+describe('축 A — KCos 태블릿 라우트의 서비스 스코프 조직 해석', () => {
   it('A. serviceKey 없는 서비스 중립 mount 는 Neture 조직을 고른다 (회귀 대상 현상)', async () => {
     const { dataSource, poolOrgParams } = makeDataSource();
     const res = await request(makeApp(dataSource)).get('/store/product-pool');

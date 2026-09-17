@@ -296,17 +296,17 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
     logger.info('✅ Service Legal routes registered at /api/v1/public/services and /api/v1/admin/services');
 
     // 8.2. Public Contact Inquiry (WO-O4O-CONTACT-DELIVERY-AND-NOTIFICATION-V1)
-    //   GP/KCos 공개 문의 접수 + 운영자 in-app 알림. Neture/KPA 는 자체 경로 유지(미사용).
+    //   KCos 공개 문의 접수 + 운영자 in-app 알림. Neture/KPA 는 자체 경로 유지(미사용).
     const { createPublicContactInquiryController } = await import('../modules/contact-inquiry/public-contact-inquiry.controller.js');
     app.use('/api/v1/public/services', createPublicContactInquiryController(dataSource));
     logger.info('✅ Contact Inquiry public route registered at /api/v1/public/services/:serviceKey/contact-inquiries');
 
-    // 8.3. Admin Contact Inquiry (WO-O4O-CONTACT-INQUIRY-ADMIN-MANAGEMENT-V1) — GP/KCos 문의 조회·처리
+    // 8.3. Admin Contact Inquiry (WO-O4O-CONTACT-INQUIRY-ADMIN-MANAGEMENT-V1) — KCos 문의 조회·처리
     const { createAdminContactInquiryController } = await import('../modules/contact-inquiry/admin-contact-inquiry.controller.js');
     app.use('/api/v1/admin/services', createAdminContactInquiryController(dataSource));
     logger.info('✅ Contact Inquiry admin route registered at /api/v1/admin/services/:serviceKey/contact-inquiries');
 
-    // 8.4. Admin Service Contact Settings (WO-O4O-SERVICE-CONTACT-SETTINGS-ADMIN-V1) — GP/KCos 문의 수신·알림 설정
+    // 8.4. Admin Service Contact Settings (WO-O4O-SERVICE-CONTACT-SETTINGS-ADMIN-V1) — KCos 문의 수신·알림 설정
     const { createAdminServiceContactSettingsController } = await import('../modules/contact-inquiry/admin-service-contact-settings.controller.js');
     app.use('/api/v1/admin/services', createAdminServiceContactSettingsController(dataSource));
     logger.info('✅ Contact Settings admin route registered at /api/v1/admin/services/:serviceKey/contact-settings');
@@ -674,9 +674,6 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
     //   확정되어(WO-O4O-LEGACY-YAKSA-API-ROUTE-USAGE-AND-DISPOSITION-AUDIT-V1) mount 를 제거했다.
     //   DB 테이블(yaksa_posts / yaksa_categories / yaksa_post_logs)은 보존한다.
 
-    // 27. Glycopharm routes — REMOVED (WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1)
-    //   GlycoPharm 서비스 전체를 플랫폼에서 삭제했다. `/api/v1/glycopharm/*` 는 더 이상 존재하지 않는다.
-
     // 27b. Register Pharmacy-Hub routes (WO-PHARMACY-HUB-NEW-SERVICE-FOUNDATION-V1)
     //      Foundation 범위: service-info / me-access / 역할별 scope ping 만.
     try {
@@ -704,12 +701,6 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
     } catch (kpaBranchError) {
       logger.error('Failed to register KPA Branch routes:', kpaBranchError);
     }
-
-    // 28g. Store AI routes (`/api/v1/store-hub/ai`) — REMOVED
-    //   WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1: 이 라우터의 store_owner 가드는
-    //   serviceKey='glycopharm' 고정이었고 유일한 소비처가 services/web-glycopharm 이었다.
-    //   GlycoPharm 삭제로 소비처 0 — 라우터를 제거한다.
-    //   (modules/store-ai 의 product-ai-* 계열은 Neture 상품 DB 가 사용하므로 유지한다.)
 
     // 28f. Register Product AI Recommendation routes (WO-O4O-AI-PRODUCT-RECOMMENDATION-V1)
     try {
@@ -755,10 +746,6 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
     } catch (productPopPdfError) {
       logger.error('Failed to register Product POP PDF routes:', productPopPdfError);
     }
-
-    // 28-d. Home Preview — REMOVED (WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1)
-    //   `/api/v1/home/preview` 는 glycopharm 조직 해석 + glycopharm_products 집계를 전제로 한
-    //   GlycoPharm 종속 API 였고 프런트 소비처가 0 이었다. GlycoPharm 삭제와 함께 제거한다.
 
     // 28b. Register Store Paid Feature Entitlement routes (WO-O4O-STORE-PAID-FEATURE-ENTITLEMENT-V1)
     try {
@@ -1100,7 +1087,7 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
     }
 
     // (제거됨) /__debug__/pharmacy — WO-O4O-PHARMACY-DEBUG-ROUTE-FINAL-LIFECYCLE-CLEANUP-V1
-    // POST /deactivate 가 사유·감사·재활성화 없이 organizations.isActive 와 glycopharm
+    // POST /deactivate 가 사유·감사·재활성화 없이 organizations.isActive 와 서비스
     // enrollment 를 함께 껐다. 읽기 3종(/ · /lookup · /appointment-trace)도 일회성 실측
     // 목적이 종료됐고 소비처 0 이라 router 째 제거했다. 비활성화 업무가 다시 필요하면
     // 정식 기능으로 별도 설계한다(임시 debug route 재도입 금지).

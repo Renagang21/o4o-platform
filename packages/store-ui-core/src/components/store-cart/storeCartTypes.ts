@@ -3,7 +3,7 @@
  *
  * WO-O4O-STORE-HUB-PRODUCT-APPLICATION-AND-CART-COMMONIZATION-V1
  *
- * KPA-Society / K-Cosmetics / GlycoPharm 의 `src/api/storeCart.ts` 3벌에 글자 그대로
+ * KPA-Society / K-Cosmetics 의 `src/api/storeCart.ts` 2벌에 글자 그대로
  * 중복돼 있던 타입 정의를 여기로 모은다. **API 계약 자체는 변경하지 않는다** —
  * endpoint · payload · 응답 shape 은 backend 가 정본이고 이 파일은 그 표현일 뿐이다.
  * 각 서비스는 자기 http client(coreApiClient / authClient.api)로 구현한 storeCartApi 를

@@ -181,7 +181,7 @@ WO 경계 준수: "`yaksa` 라는 이름만으로 legacy 로 판정하지 않는
 
 ## 8. Vite alias 전체 목록과 대상 경로
 
-11개 vite config (`apps/{admin-dashboard,forum-web,main-site,page-generator}`, `services/{signage-player-web,web-account,web-glycopharm,web-k-cosmetics,web-kpa-society,web-neture,web-pharmacy-hub}`, `vite.config.shared.ts`) 전수에서 `packages/` 를 가리키는 alias 의 대상 경로 존재 여부를 검사했다.
+11개 vite config 전수에서 `packages/` 를 가리키는 alias 의 대상 경로 존재 여부를 검사했다.
 
 - **삭제된 경로를 가리키는 alias: 0건** — 약사회 legacy 제거로 사라진 `membership-yaksa` / `lms-yaksa` / `reporting-yaksa` / `annualfee-yaksa` / `yaksa-scheduler` / `yaksa-accounting` / `yaksa-admin` / `member-yaksa` 를 가리키는 alias 는 어디에도 남아 있지 않다.
 - **`yaksa` 를 포함하는 alias: 1건** — `apps/admin-dashboard/vite.config.ts:43`

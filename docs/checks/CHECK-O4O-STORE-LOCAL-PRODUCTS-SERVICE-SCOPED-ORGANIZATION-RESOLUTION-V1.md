@@ -31,10 +31,9 @@ serviceKey 가 없으면 `resolveStoreOrganization()` 의 back-compat 경로가 
 | `95aad740…` 네뚜레 공급자 테스트 | enrollment `neture` | 0 | **1순위** (`is_primary=true`, 최초 가입) |
 | `9c87f46b…` KPA 약국 | slug `kpa` | **8** | 2순위 |
 | `83ff96c7…` K-Cosmetics 매장 | enrollment `k-cosmetics` | 0 | 3순위 |
-| `13c08a86…` GlycoPharm 매장 | enrollment `glycopharm` | 0 | 4순위 |
 
 서비스 스코프 해석(`STORE_SERVICE_ORG_LINKAGE`)을 적용하면 서비스별 후보가 **정확히 1개**다.
-`kpa → 9c87f46b…` / `cosmetics → 83ff96c7…` / `glycopharm → 13c08a86…` (ambiguous 없음).
+`kpa → 9c87f46b…` / `cosmetics → 83ff96c7…`.
 
 ---
 
@@ -44,7 +43,6 @@ serviceKey 가 없으면 `resolveStoreOrganization()` 의 back-compat 경로가 
 |---|---|---|---|
 | `/api/v1/store/local-products*` | `services/web-kpa-society/src/api/localProducts.ts` | KPA | 없음 → `kpa` (경로 `/api/v1/kpa/store/...`) |
 | `/api/v1/store/local-products*` | `services/web-k-cosmetics/src/services/localProductApi.ts` | K-Cosmetics | 없음 → `cosmetics` |
-| `/api/v1/store/local-products*` | `services/web-glycopharm/src/api/localProducts.ts` | GlycoPharm | 없음 → `glycopharm` |
 | `/api/v1/pharmacy-hub/store/local-products*` | Pharmacy-Hub | PH | PH 전용 해석기 사용 — **변경 없음** |
 | `/api/v1/store/handled-products*` | KPA 취급제품 | KPA | 이미 `'kpa'` 고정 (기준선) |
 
@@ -63,10 +61,8 @@ serviceKey 가 없으면 `resolveStoreOrganization()` 의 back-compat 경로가 
 | `apps/api-server/src/routes/platform/store-local-product.routes.ts` | `createStoreLocalProductRoutes(dataSource, serviceKey?)` — 조직 해석에 명시적 service context 전달 |
 | `apps/api-server/src/routes/kpa/kpa.routes.ts` | `router.use('/store', createStoreLocalProductRoutes(dataSource, 'kpa'))` |
 | `apps/api-server/src/routes/cosmetics/cosmetics.routes.ts` | 동일 (`'cosmetics'`) |
-| `apps/api-server/src/routes/glycopharm/glycopharm.routes.ts` | 동일 (`'glycopharm'`) |
 | `services/web-kpa-society/src/api/localProducts.ts` | BASE `/api/v1/store` → `/api/v1/kpa/store` |
 | `services/web-k-cosmetics/src/services/localProductApi.ts` | BASE `/store` → `/cosmetics/store` |
-| `services/web-glycopharm/src/api/localProducts.ts` | 경로 8곳 `/store/...` → `/glycopharm/store/...` |
 | `services/web-kpa-society/src/pages/pharmacy/StoreProductDescriptionsPage.tsx` | 주석의 경로 표기 정정(동작 변경 없음) |
 
 - `bootstrap/register-routes.ts` 의 `app.use('/api/v1/store', createStoreLocalProductRoutes(dataSource))`
@@ -93,12 +89,12 @@ serviceKey 가 없으면 `resolveStoreOrganization()` 의 back-compat 경로가 
 | A | serviceKey 없는 mount 는 타 서비스 조직을 골라 0건 (회귀 대상 현상 고정) |
 | B | `serviceKey='kpa'` mount → KPA 약국 조직 → 8건 |
 | C | **`handled-products` org == `local-products` org** (WO 핵심 완료 기준) |
-| D | KCos / GP mount 가 각자 서비스 조직 선택 (타 서비스 fallback 0) |
+| D | KCos mount 가 각자 서비스 조직 선택 (타 서비스 fallback 0) |
 | E | 타 서비스 조직만 보유 → 후보 0 → 쓰기 403, 조직 SQL 유출 0 |
 | F | store_owner role 비활성 → 조직 해석 자체를 수행하지 않음 |
 | G | 같은 서비스 후보 2개 → 임의 선택 없이 차단 (ambiguity 계약 유지) |
 | H | pharmacy-hub 는 공통 linkage 로 후보 0 (자체 해석기 사용) |
-| I | kpa / cosmetics / glycopharm 라우터가 serviceKey 를 명시해 mount |
+| I | kpa / cosmetics 라우터가 serviceKey 를 명시해 mount |
 | J | 서비스 중립 mount 가 back-compat 로 유지됨 |
 
 `store-owner-backcompat-servicekey.spec.ts` 의 허용 목록에서
@@ -126,7 +122,6 @@ serviceKey 가 없으면 `resolveStoreOrganization()` 의 back-compat 경로가 
 | `GET /api/v1/store/handled-products` | 200 · 29건 중 local 출처 **8**건 |
 | `GET /api/v1/store/local-products` (중립 back-compat) | 200 · total **0** (기존 동작 그대로) |
 | `GET /api/v1/cosmetics/store/local-products` | 200 · total 0 (K-Cosmetics 조직 — KPA 데이터 유출 0) |
-| `GET /api/v1/glycopharm/store/local-products` | 200 · total 0 (GlycoPharm 조직 — 유출 0) |
 
 **핵심 판정**: 서비스 스코프 local-products 의 8개 id 와 handled-products 의 local 출처 8개 id 가
 **완전히 동일**하다(`099eee4f / 0a5340af / 1fcce2f6 / 5e7344c5 / 868341a6 / 9048863d / 91cfdb0d / cd3a2b29`).

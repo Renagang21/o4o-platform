@@ -1,6 +1,6 @@
 # IR-O4O-OPERATOR-STORES-LIST-CANONICALIZATION-DESIGN-V1
 
-**조사 목적:** KPA / GlycoPharm / K-Cosmetics / Neture의 Operator Stores list 구조를 조사하여 공통 wrapper 가능 여부와 Canonical UI/UX 설계 방식을 결정한다.  
+**조사 목적:** KPA / K-Cosmetics / Neture의 Operator Stores list 구조를 조사하여 공통 wrapper 가능 여부와 Canonical UI/UX 설계 방식을 결정한다.  
 **상태:** 조사 완료  
 **날짜:** 2026-05-26
 
@@ -8,22 +8,22 @@
 
 ## 1. 현재 구조 비교표
 
-| 항목 | KPA | GlycoPharm | K-Cosmetics | Neture | 판정 |
-|------|-----|------------|-------------|--------|------|
-| **페이지 파일** | `OperatorStoresPage.tsx` | `StoresPage.tsx` | `StoresPage.tsx` | `StoreManagementPage.tsx` | - |
-| **라인 수** | **82줄** | **193줄** | **372줄** | **340줄** | K-Cos/Neture 과잉 |
-| **OperatorStoresList 사용** | ✅ 사용 | ✅ 사용 | ❌ 미사용 | ❌ 미사용 | 2서비스 drift |
-| **Table 컴포넌트** | DataTable (shared) | DataTable (shared) | 커스텀 DataTable | Raw HTML `<table>` | Neture 최하위 |
-| **Route** | `/operator/stores` | `/operator/stores` | `/operator/stores` + `/admin/stores` | `/operator/stores` + `/admin/stores` | K-Cos/Neture 이중 |
-| **API serviceKey** | `kpa-society` | `glycopharm` | `k-cosmetics` | `neture` | 동일 패턴 ✅ |
-| **컬러 스킴** | slate | primary | pink | primary | 정상 차이 |
-| **slug 컬럼** | ❌ | ✅ (override) | ✅ (custom) | ✅ (raw) | 3서비스 공통 |
-| **Row click → 상세** | ✅ | ✅ | ✅ | ❌ | Neture 누락 |
-| **정렬** | ✅ | ✅ | 부분 (createdAt만) | ❌ | Neture 미구현 |
-| **Row selection** | ✅ | ✅ | ❌ | ❌ | K-Cos/Neture 누락 |
-| **Stats cards** | ✅ | ✅ | ✅ | ✅ | 전원 보유 |
-| **검색** | ✅ | ✅ | ✅ | ✅ | 전원 보유 |
-| **페이지네이션** | ✅ | ✅ | ✅ (커스텀) | ✅ (커스텀) | 전원 보유 |
+| 항목 | KPA | K-Cosmetics | Neture | 판정 |
+| ------ | ----- | ------------- | -------- | ------ |
+| **페이지 파일** | `OperatorStoresPage.tsx` | `StoresPage.tsx` | `StoreManagementPage.tsx` | - |
+| **라인 수** | **82줄** | **372줄** | **340줄** | K-Cos/Neture 과잉 |
+| **OperatorStoresList 사용** | ✅ 사용 | ❌ 미사용 | ❌ 미사용 | 2서비스 drift |
+| **Table 컴포넌트** | DataTable (shared) | 커스텀 DataTable | Raw HTML `<table>` | Neture 최하위 |
+| **Route** | `/operator/stores` | `/operator/stores` + `/admin/stores` | `/operator/stores` + `/admin/stores` | K-Cos/Neture 이중 |
+| **API serviceKey** | `kpa-society` | `k-cosmetics` | `neture` | 동일 패턴 ✅ |
+| **컬러 스킴** | slate | pink | primary | 정상 차이 |
+| **slug 컬럼** | ❌ | ✅ (custom) | ✅ (raw) | 3서비스 공통 |
+| **Row click → 상세** | ✅ | ✅ | ❌ | Neture 누락 |
+| **정렬** | ✅ | 부분 (createdAt만) | ❌ | Neture 미구현 |
+| **Row selection** | ✅ | ❌ | ❌ | K-Cos/Neture 누락 |
+| **Stats cards** | ✅ | ✅ | ✅ | 전원 보유 |
+| **검색** | ✅ | ✅ | ✅ | 전원 보유 |
+| **페이지네이션** | ✅ | ✅ (커스텀) | ✅ (커스텀) | 전원 보유 |
 
 ---
 
@@ -55,7 +55,6 @@ interface OperatorStoreBase {
 | 서비스 | 추가 필드 | 비고 |
 |--------|-----------|------|
 | KPA | 없음 | 표준 그대로 |
-| GlycoPharm | 없음 | slug column override만 |
 | K-Cosmetics | 없음 | 컬럼 스타일만 다름 |
 | Neture | `addressDetail { zipCode?, baseAddress, detailAddress?, region? }` | 구조화 주소 extension |
 
@@ -81,19 +80,19 @@ interface OperatorStoreBase {
 
 ### 3-1. 컬럼 구성
 
-| 컬럼 | KPA | GlycoPharm | K-Cosmetics | Neture |
-|------|-----|------------|-------------|--------|
-| 매장명 (type sub) | ✅ | ✅ | ✅ | ✅ |
-| 코드 | ✅ | ✅ | ✅ | ✅ |
-| Slug | ❌ | ✅ (추가) | ✅ | ✅ |
-| 운영자 (email sub) | ✅ | ✅ | ✅ | ✅ |
-| 채널 수 | ✅ | ✅ | ✅ | ✅ |
-| 상품 수 | ✅ | ✅ | ✅ | ✅ |
-| 상태 | ✅ | ✅ | ✅ | ✅ |
-| 생성일 | ✅ | ✅ | ✅ | ✅ |
-| 네비 (_nav) | ✅ | ✅ | ✅ | ❌ |
+| 컬럼 | KPA | K-Cosmetics | Neture |
+| ------ | ----- | ------------- | -------- |
+| 매장명 (type sub) | ✅ | ✅ | ✅ |
+| 코드 | ✅ | ✅ | ✅ |
+| Slug | ❌ | ✅ | ✅ |
+| 운영자 (email sub) | ✅ | ✅ | ✅ |
+| 채널 수 | ✅ | ✅ | ✅ |
+| 상품 수 | ✅ | ✅ | ✅ |
+| 상태 | ✅ | ✅ | ✅ |
+| 생성일 | ✅ | ✅ | ✅ |
+| 네비 (_nav) | ✅ | ✅ | ❌ |
 
-**핵심 관찰:** KPA를 제외한 3개 서비스가 slug 컬럼을 표시한다. GlycoPharm은 `OperatorStoresList` column override 패턴으로 추가했다.
+**핵심 관찰:** KPA를 제외한 3개 서비스가 slug 컬럼을 표시한다.
 
 ### 3-2. Store 유형 레이블
 
@@ -107,7 +106,6 @@ interface OperatorStoreBase {
 | 서비스 | Row click | 상세 Route | Detail Page 존재 |
 |--------|-----------|------------|-----------------|
 | KPA | ✅ navigate | `/operator/stores/:storeId` | ✅ |
-| GlycoPharm | ✅ navigate | `/operator/stores/:storeId` | ✅ |
 | K-Cosmetics | ✅ navigate | `/operator/stores/:storeId` | ✅ |
 | Neture | ❌ 없음 | `/operator/stores/:storeId` (route 존재) | 확인 필요 |
 
@@ -138,15 +136,15 @@ interface OperatorStoreBase {
 
 ### 4-3. Capability Matrix
 
-| Capability | KPA | GlycoPharm | K-Cosmetics | Neture |
-|-----------|-----|------------|-------------|--------|
-| 매장 목록 조회 | ✅ | ✅ | ✅ | ✅ |
-| 매장 상세 | ✅ | ✅ | ✅ | △ |
-| 매장 상태 변경 | API 있음 | API 있음 | API 있음 | API 있음 |
-| 매장 검색 | ✅ | ✅ | ✅ | ✅ |
-| 매장 정렬 | ✅ | ✅ | 부분 | ❌ |
-| Row selection | ✅ | ✅ | ❌ | ❌ |
-| Bulk action | API 있음 | API 있음 | - | - |
+| Capability | KPA | K-Cosmetics | Neture |
+| ----------- | ----- | ------------- | -------- |
+| 매장 목록 조회 | ✅ | ✅ | ✅ |
+| 매장 상세 | ✅ | ✅ | △ |
+| 매장 상태 변경 | API 있음 | API 있음 | API 있음 |
+| 매장 검색 | ✅ | ✅ | ✅ |
+| 매장 정렬 | ✅ | 부분 | ❌ |
+| Row selection | ✅ | ❌ | ❌ |
+| Bulk action | API 있음 | - | - |
 
 ---
 
@@ -173,8 +171,6 @@ API 동일성과 Entity 동일성을 근거로, Neture는 Store Capability 공�
 
 ### Option A: `OperatorStoresList` 단일 wrapper (현행 확장)
 
-현재 KPA/GlycoPharm이 이미 사용 중인 `OperatorStoresList`에 K-Cosmetics/Neture를 편입.
-
 ```
 packages/operator-core-ui/src/modules/stores/OperatorStoresList.tsx
   ↑ 이미 존재 (395줄)
@@ -182,7 +178,7 @@ packages/operator-core-ui/src/modules/stores/OperatorStoresList.tsx
   ↑ DataTable + useStoresQuery + pagination + stats 내장
 ```
 
-**K-Cosmetics wrapper 예시 (GlycoPharm 패턴 참조):**
+**K-Cosmetics wrapper 예시**
 ```typescript
 // services/web-k-cosmetics/src/pages/operator/StoresPage.tsx (목표: ~100줄)
 const KCOSMETICS_CONFIG: StoresConfig = {
@@ -206,8 +202,7 @@ const NETURE_CONFIG: StoresConfig = {
 // slug + addressDetail 컬럼 override 추가
 ```
 
-**장점:** 최소 변경, 기존 GlycoPharm 패턴 그대로 복제  
-**단점:** `OperatorStoresList`에 slug/addressDetail column override 패턴이 추가될 수 있음 (이미 GlycoPharm이 선례)
+**단점:** `OperatorStoresList`에 slug/addressDetail column override 패턴이 추가될 수 있음
 
 ### Option B: StoresApi adapter + 서비스별 adapter 분리
 
@@ -245,11 +240,10 @@ packages/operator-core-ui/src/modules/stores/
 services/web-kpa-society/src/pages/operator/
   OperatorStoresPage.tsx    ← 이미 완료 (82줄) — 변경 없음
 
-services/web-glycopharm/src/pages/operator/
   StoresPage.tsx            ← 이미 완료 (193줄, slug override) — 변경 없음
 
 services/web-k-cosmetics/src/pages/operator/
-  StoresPage.tsx            ← 372줄 → ~100줄 (KPA/GP 패턴 적용)
+  StoresPage.tsx ← 372줄 → ~100줄 (KPA 패턴 적용)
 
 services/web-neture/src/pages/operator/
   StoreManagementPage.tsx   ← 340줄 → ~120줄 (slug + addressDetail override)
@@ -259,7 +253,7 @@ services/web-neture/src/pages/operator/
 
 | 기능 | 현재 지원 | K-Cos 필요 | Neture 필요 |
 |------|----------|-----------|------------|
-| slug 컬럼 override | ✅ (GP 선례) | ✅ 동일 | ✅ 동일 |
+| slug 컬럼 override | — | ✅ 동일 | ✅ 동일 |
 | addressDetail 컬럼 | ❌ 없음 | ❌ 불필요 | △ 선택적 추가 |
 | Row click 커스텀 | ✅ | ✅ | ✅ (현재 없음) |
 | color scheme (pink) | ✅ | ✅ | - |
@@ -271,7 +265,7 @@ Neture의 `addressDetail`은 wrapper에서 optional 추가 컬럼으로 처리.
 ### 7-3. Detail Surface 결정
 
 Members의 Hybrid Canonical 적용 가능 여부:
-- Row click → Drawer: KPA/GP/K-Cos 이미 구현 (route navigate 방식)
+- Row click → Drawer: KPA/K-Cos 이미 구현 (route navigate 방식)
 - Neture: row click 없음 → wrapper 전환 시 자동 해결
 
 **Drawer 방식 vs Route navigate 방식:**  
@@ -291,12 +285,12 @@ Members의 Hybrid Canonical 적용 가능 여부:
 |------|------|------|
 | K-Cosmetics StoresPage 교체 | `web-k-cosmetics/src/pages/operator/StoresPage.tsx` | 372줄 → `OperatorStoresList` wrapper (~100줄) |
 | Neture StoreManagementPage 교체 | `web-neture/src/pages/operator/StoreManagementPage.tsx` | 340줄 → `OperatorStoresList` wrapper (~120줄) |
-| slug column override | 두 파일 모두 | GlycoPharm 패턴 동일 적용 |
+| slug column override | 두 파일 모두 | — |
 
 **금지:**
 - `OperatorStoresList` 코어 로직 변경 금지
 - Backend API 변경 금지
-- KPA/GlycoPharm 수정 금지 (이미 완료)
+- KPA 수정 금지 (이미 완료)
 - Store detail page 수정 금지 (별도 WO)
 
 **예상 효과:**
@@ -314,7 +308,6 @@ Members의 Hybrid Canonical 적용 가능 여부:
 | 서비스 | 현재 상태 | 판정 | 작업 규모 |
 |--------|----------|------|----------|
 | KPA | ✅ 완료 | 변경 없음 | - |
-| GlycoPharm | ✅ 완료 | 변경 없음 | - |
 | K-Cosmetics | ❌ 커스텀 DataTable (372줄) | **포함, WO 필요** | 소 |
 | Neture | ❌ raw HTML table (340줄) | **포함, WO 필요** | 소 |
 

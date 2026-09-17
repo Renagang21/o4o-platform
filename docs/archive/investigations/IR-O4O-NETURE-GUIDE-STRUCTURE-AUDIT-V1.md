@@ -26,7 +26,7 @@
 4. **공개 Guide 가능 범위는 분명히 갈린다**:
    - ✅ Public-safe: 플랫폼 소개(O4O), 회원/역할 구조, Forum/Notice, 공급자 가입 안내, Event Offer/Market Trial 개념, AI 운영자/공급자 분석
    - ⚠️ 제한 공개: 공급자 상품 등록 상세, Distribution Tier 정책, Partner Commission
-   - ❌ 비공개(미구현/미정): Partner 자동 정산, Trial↔Event Offer 연계, GlycoPharm Event Offer, AiContentModal Neture 통합
+   - ❌ 비공개(미구현/미정): Partner 자동 정산, Trial↔Event Offer 연계 Event Offer, AiContentModal Neture 통합
 5. **dead/legacy 정리는 이미 끝남** — `/manual/*` → `/o4o/*` redirect, ProductCuration 완전 제거, Blog public route 제거 등이 명시적 WO 로 처리됨. Guide 작성 시점에 별도 정리 필요 없음.
 6. **다음 작업 우선순위**: Phase 1 (copy/neture.ts + wrapper 페이지) → Phase 2 (공급자 가입 UI 보강) → Phase 3 (Event Offer/Trial 가이드 통합).
 
@@ -192,7 +192,7 @@ Legacy 역할(`supplier`, `partner`, `seller` — prefix 없음)도 SUPPLIER_ROL
 | barcode (GTIN) | ProductMaster auto-resolve key | 동일 barcode → 동일 master, master:offer = 1:N |
 | name, brandName, categoryId | 기본 정보 | |
 | distributionType | `PUBLIC` / `SERVICE` / `PRIVATE` | NETURE-DISTRIBUTION-ENGINE-FREEZE-V1 |
-| serviceKeys[] | 공급 대상 서비스 | neture, glycopharm 등 |
+| serviceKeys[] | 공급 대상 서비스 | neture 등 |
 | priceGeneral / priceGold / pricePlatinum | 가격 등급 | 등급별 차등 |
 | consumerShortDescription, consumerDetailDescription | B2C 설명 (HTML) | RichTextEditor |
 | businessShortDescription, businessDetailDescription | B2B 설명 (HTML) | 별도 Drawer (WO-NETURE-B2B-CONTENT-MANAGEMENT-V1) |
@@ -398,7 +398,6 @@ runtime status (resolveEventStatus):
 | KPA Society | `kpa-groupbuy` | SERVICE_KEYS.KPA | ✅ Production (참여→매장 상품 등록 자동 연결) |
 | K-Cosmetics | `k-cosmetics-event-offer` | SERVICE_KEYS.K_COSMETICS | ✅ Production |
 | Neture | `neture-event-offer` | 미연결 (의도적 — Neture 는 허브) | ✅ Production (지원 허브 only) |
-| GlycoPharm | (미정의) | - | ❌ 미구현 |
 
 **Neture Event Offer 라우트** (전체 인증 required):
 - `GET /api/v1/neture/event-offers` / `/enriched` / `/:id`
@@ -436,7 +435,6 @@ DRAFT → SUBMITTED → RECRUITING → (FULFILLED | CLOSED)
 | 서비스별 적용 차이 (KPA vs K-Cos vs Neture) | ✅ Public-safe | EVENT-OFFER-NETURE-ROLE-CLARIFICATION-V1 |
 | 공급자 다중 서비스 제안 경로 | ✅ Public-safe | UX 안내 중심 |
 | Market Trial 참여 모델 + 정산 선택 | ✅ Public-safe | 사용자 관점 안내 |
-| GlycoPharm Event Offer | ❌ 비공개 | 미구현 |
 | Event Offer ↔ Blog 추천 연결 | ❌ 비공개 | 미구현 |
 | SELECT FOR UPDATE 동시성 처리 | ❌ 비공개 | 내부 구현 |
 | Trial 정산 계산 알고리즘 | ⚠️ 제한 공개 | Phase2 진행 중, 변경 가능성 |
@@ -495,7 +493,7 @@ DRAFT → SUBMITTED → RECRUITING → (FULFILLED | CLOSED)
 | ✅ **공개 Guide 가능** | (a) O4O 플랫폼 소개 (목적/구조/철학/타겟/채널), (b) 회원/역할 구조, (c) Forum/Notice/Content/Resources 사용법, (d) 공급자 가입 경로 안내, (e) 공급자 상품 등록 (barcode/master/유통정책/가격등급), (f) 공급자 B2B 콘텐츠 작성, (g) 공급자 자료실, (h) 파트너 가입 경로(3종), (i) 파트너 콘텐츠/Referral Link 사용법, (j) Event Offer 개념과 매장 실행 흐름, (k) Market Trial 참여형 펀딩 구조, (l) 공급자 다중 서비스 제안, (m) Copilot Dashboard 활용, (n) Seller QR 가이드 |
 | ⚠️ **제한적 Guide 가능** | (1) Distribution Tier 3단계 정책(공급자 입장 설명 가능, 운영 정책은 내부), (2) Partner Commission 조회(자동 정산 미구현 명시 필요), (3) Market Trial 정산 계산(Phase2 진행 중 명시), (4) Import Assistant URL 파싱(LLM 미사용 명시), (5) Event Offer 다중 서비스 제안 UX(진행 중 명시), (6) Trial 의 salesScenarioContent 작성법 |
 | 🔒 **내부용** | (1) Operator/Admin Dashboard 상세, (2) Admin Vault, (3) SQL/DB 구조, (4) SELECT FOR UPDATE 동시성, (5) Service Key 매핑 내부 로직, (6) Operator AI 액션 추천 알고리즘 |
-| ❌ **미구현/비공개** | (1) GlycoPharm Event Offer, (2) Neture 자동 정산 (Payout), (3) Trial ↔ Event Offer 연계, (4) Event Offer ↔ Blog Article 추천, (5) AiContentModal Neture 통합, (6) 공급자 가입 폼 UI (현재 API only), (7) PartnerEvent UI (placeholder) |
+| ❌ **미구현/비공개** | — |
 
 ### 8-2. dead/legacy 정리 필요 영역 — **없음**
 

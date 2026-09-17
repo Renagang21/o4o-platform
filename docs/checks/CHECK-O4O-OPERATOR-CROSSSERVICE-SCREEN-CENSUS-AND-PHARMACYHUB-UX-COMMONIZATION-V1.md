@@ -147,7 +147,7 @@ Pharmacy-Hub 백엔드 운영자 endpoint 는 4개(`GET` 목록 / `GET :id` / `P
 |---|---|
 | 회원 콘솔 3건 (KPA 660 / KCos 317 / Neture 466) | 공통 `OperatorMembersConsolePage` 를 쓰지만 서비스 확장 셸이 크다. KPA 는 자격/약국 축, Neture 는 자체 목록 셸. |
 | 매장 목록 2건 (KCos 187 / Neture 184) | `OperatorStoresList` 소비. KPA 는 81 LOC 로 이미 얇음 → KCos/Neture 를 KPA 형태로 줄이는 것이 남은 작업. |
-| 모집 노출 승인 2건 (KPA 110 / KCos 91) | 공통 `RecruitmentExposureConsole` + 서비스별 fetch/에러 셸 중복. 3번째 소비처 `web-glycopharm` 은 본 WO 4개 서비스 밖이라 손대지 않았다. |
+| 모집 노출 승인 2건 (KPA 110 / KCos 91) | 공통 `RecruitmentExposureConsole` + 서비스별 fetch/에러 셸 중복. |
 | Neture `members` legacy alias | 동일 컴포넌트 재노출. |
 | Neture `forum-analytics` (212) | KPA/KCos 는 30 LOC 공통 wrapper. Neture 만 자체 구현 — 다음 우선순위 1순위. |
 
@@ -189,7 +189,6 @@ Pharmacy-Hub 백엔드 운영자 endpoint 는 4개(`GET` 목록 / `GET :id` / `P
 ---
 
 ## 9. 부록 — 전수 census 표
-
 
 #### KPA
 

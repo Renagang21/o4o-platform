@@ -48,7 +48,7 @@
 | 축 | 결과 |
 |---|---|
 | GCLB backend service | **0** — `o4o-main-site` 를 가리키는 backend 없음 |
-| serverless NEG | **0** — NEG 8개 전수 확인. 대상 = glucoseview / glycopharm / k-cosmetics / kpa-society / neture / admin-dashboard / core-api / pharmacy-hub |
+| serverless NEG | **0** — NEG 8개 전수 확인. 대상 = glucoseview / k-cosmetics / kpa-society / neture / admin-dashboard / core-api / pharmacy-hub |
 | Cloud Run domain mapping | **0** — asia-northeast3 / asia-northeast1 / us-central1 / europe-west1 전 리전 0건 |
 | custom domain | **0** |
 | scheduler / job / webhook | **0** |
@@ -103,7 +103,7 @@ OPTIONS https://api.neture.co.kr/api/v1/auth/services
 | `/` · `/org/:orgId` | DashboardPage | `LEGACY_ONLY` | 각 서비스가 자체 홈 보유 |
 | `/forum` · `/forum/post/:slug` | 포럼 | `DUPLICATED_ELSEWHERE` | forum 은 CLAUDE.md §13 공통 구조, 4서비스 구현 |
 | `/forum/write` | — | **`DEAD_ROUTE`** | 본문이 `글쓰기 페이지 준비 중...` 스텁 |
-| `/lms` · `/lms/courses` · `/lms/course/*` | LMS | `DUPLICATED_ELSEWHERE` | glycopharm · k-cosmetics · kpa-society 등에 동일 route |
+| `/lms` · `/lms/courses` · `/lms/course/*` | LMS | `DUPLICATED_ELSEWHERE` | k-cosmetics · kpa-society 등에 동일 route |
 | `/lms/bundle/:bundleId` | BundleViewer | **`ACTIVE_UNIQUE`** (코드) | `BundleViewerPage` 는 main-site 에만 존재 |
 | `/marketing/product/:id` | ProductContentViewer | **`ACTIVE_UNIQUE`** (코드) | `ProductContentViewerPage` main-site 전용 |
 | `/marketing/quiz/:id` | QuizCampaignViewer | **`ACTIVE_UNIQUE`** (코드) | `QuizCampaignViewerPage` main-site 전용 |
@@ -132,7 +132,7 @@ OPTIONS https://api.neture.co.kr/api/v1/auth/services
 |---|---|
 | `o4o-main-site` 문자열 | workflow 2 · `SETUP.md` · `scripts/README.md` · `.github/workflows/README.md` · docs 기록물 8 — **runtime 코드 0** |
 | run.app URL(`o4o-main-site-3e3aws7zqa` 등) | **저장소 전체 0건** |
-| service catalog | `service-catalog.ts` 6키(neture · glycopharm · kpa-society · k-cosmetics · pharmacy-hub · kpa-branch) — **main-site 없음** |
+| service catalog | `service-catalog.ts` 6키(neture · kpa-society · k-cosmetics · pharmacy-hub · kpa-branch) — **main-site 없음** |
 | auth callback / redirect / handoff / logout redirect | **0** — `o4o-core-api` env 전수 확인, main-site 를 가리키는 URL 0건 |
 | 이메일 링크 / QR | **0** |
 | CORS allowlist | **미포함** (§5) |
@@ -250,7 +250,6 @@ ab5570573 chore(yaksa): 레거시 약사회 기능 전면 제거
 | `https://api.neture.co.kr/health` | 200 |
 | `https://kpa-society.co.kr/` | 200 |
 | `https://k-cosmetics.site/` | 200 |
-| `https://glycopharm.co.kr/` | 200 |
 | `https://pharmacyhub.co.kr/` | 200 |
 | `/health/database` | `healthy` · pingMs 4 · activeConnections 10 · longRunningQueries 0 |
 | Cloud Run Ready | **11/11 True** |

@@ -72,7 +72,7 @@
 
 WO §6 목표 트리(대시보드 / 회원·커뮤니티 / 상품·거래 / 매장 운영 / 매장 HUB 자료 / 디지털 사이니지 / 운영 현황 / 시스템 관리)와 현재 공통 IA(커뮤니티 운영 / 매장 HUB 운영 / 운영 공통 3도메인 + 13 공통 그룹)의 차이:
 
-- **매장 운영 vs 매장 HUB 자료 를 별도 섹션으로 분리** → 현재 두 성격이 동일 `stores` 공통 그룹(라벨 '매장')에 공존. 분리하려면 신규 공통 `OperatorGroupKey`(+`STANDARD_GROUPS`+`GROUP_TO_DOMAIN`) 필요 → **Neture/GlycoPharm/K-Cosmetics 3서비스 공통 영향 → 중지조건 §10.1 → 보고**.
+- **매장 운영 vs 매장 HUB 자료 를 별도 섹션으로 분리** → 현재 두 성격이 동일 `stores` 공통 그룹(라벨 '매장')에 공존.
 - **사이드바 도메인 4축(회원·커뮤니티 / 상품·거래 / 매장·HUB / 운영 현황)** → 공통 `DEFAULT_OPERATOR_DOMAIN_IA` 변경 또는 `OperatorAreaShell` 의 `domainIAConfig` 주입 배선 필요 → 공통 컴포넌트 계약 변경 → **중지조건 §10.1 → 보고**.
 
 → 본 WO(1차 안전)에서는 **공통 IA 미변경**. 항목 순서/명칭/노출/링크 정합만 KPA 전용 파일에서 수행.
@@ -95,7 +95,7 @@ WO §6 목표 트리(대시보드 / 회원·커뮤니티 / 상품·거래 / 매�
 
 | 항목 | 중지조건 | 사유 |
 |---|---|---|
-| 매장 운영 / 매장 HUB 자료 **사이드바 섹션 분리** | §10.1 | 신규 공통 `OperatorGroupKey`+`STANDARD_GROUPS`+`GROUP_TO_DOMAIN` = Neture/GP/KCos 공통 영향 |
+| 매장 운영 / 매장 HUB 자료 **사이드바 섹션 분리** | §10.1 | 신규 공통 `OperatorGroupKey`+`STANDARD_GROUPS`+`GROUP_TO_DOMAIN` = Neture/KCos 공통 영향 |
 | 사이드바 **도메인 4축 재정렬** | §10.1 | 공통 `DEFAULT_OPERATOR_DOMAIN_IA` / `OperatorAreaShell` domainIAConfig 배선 = 공통 계약 변경 |
 | `service-apps` KPI → `/operator/organization-requests` **데드링크** | §10.5 / §10.7 | operator route 부재 · admin 화면 전용 개념 · admin/operator 경계 및 실 데이터 연결 판단 필요 |
 | `/operator/legal`·`recruitment-exposure` page **완전 제거** | §10.3 | route/page 보존이 안전 · 별도 cleanup WO 후보 |

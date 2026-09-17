@@ -32,8 +32,8 @@ submit handler·`contactApi.submitContactMessage`·payload 무변경. (제거는
 ## 8. 개인정보 동의 유지
 동의 체크박스(`privacyConsent`)·검증 무변경.
 
-## 9. GP/KCos/KPA 미수정
-커밋 파일 = ContactPage 1개(+WO/CHECK 문서). `services/web-{glycopharm,k-cosmetics,kpa-society}` 0건.
+## 9. KCos/KPA 미수정
+커밋 파일 = ContactPage 1개(+WO/CHECK 문서).
 
 ## 10. backend/API/DB 미수정
 `apps/api-server` 0. migration 0. `service_legal_profiles` 미변경.
@@ -54,7 +54,7 @@ submit handler·`contactApi.submitContactMessage`·payload 무변경. (제거는
 |------|------|
 | Deploy Web Services (run 27457747156) | ✅ success |
 | deploy-neture | ✅ success |
-| GP/KCos/KPA | skipped (무수정) |
+| KCos/KPA | skipped (무수정) |
 | API Server | 미변경 → 대상 아님 |
 
 ## 15. Commit
@@ -62,7 +62,7 @@ submit handler·`contactApi.submitContactMessage`·payload 무변경. (제거는
 
 ## 16. 후속
 1. `WO-O4O-PUBLIC-FOOTER-LEGAL-LOADER-CONSOLIDATION-V1` — `loadFooterLegal` 공통화 + Neture footer 3중 정리
-2. `WO-O4O-PUBLIC-FOOTER-CORE-GP-KCOS-V1` — GP/KCos 한정 FooterCore
+2. `WO-O4O-PUBLIC-FOOTER-CORE-GP-KCOS-V1` — KCos 한정 FooterCore
 
 > **기준 고정:** 공개 화면에서 사업자 법정정보가 나오는 곳은 Footer 하나뿐.
 

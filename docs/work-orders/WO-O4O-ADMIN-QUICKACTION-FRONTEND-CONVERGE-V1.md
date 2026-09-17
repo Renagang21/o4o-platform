@@ -12,7 +12,7 @@
 
 ## 0. 목적
 
-> KPA admin / GlycoPharm admin 화면에 남아 있는 **프론트 하드코딩 emoji Quick Actions** 를 lucide 기반 경로로 수렴하여 Phase A/B 의 ActionIcon vocabulary 와 일관된 시각 정합을 확보한다.
+> KPA admin admin 화면에 남아 있는 **프론트 하드코딩 emoji Quick Actions** 를 lucide 기반 경로로 수렴하여 Phase A/B 의 ActionIcon vocabulary 와 일관된 시각 정합을 확보한다.
 >
 > Phase A/B 에서 정리한 ActionIcon vocabulary (16종) 와 충돌 없이 admin Quick Actions 표현을 정리한다.
 
@@ -34,24 +34,6 @@ const STRUCTURE_ACTIONS: StructureAction[] = [
 - 사용 컴포넌트: `AdminDashboardLayout` → `StructureActionBlock` (admin-ux-core) → `ActionIcon`
 - 현재 동작: Phase A 의 ActionIcon emoji fallback (`span.text-lg`) 로 렌더 → 시각적 정상 / 단 lucide 정합은 미달
 
-### 1.2 GlycoPharm Admin Dashboard (6 emoji)
-
-[`services/web-glycopharm/src/pages/admin/GlycoPharmAdminDashboard.tsx`](../../services/web-glycopharm/src/pages/admin/GlycoPharmAdminDashboard.tsx) line 121-128:
-
-```ts
-const ADMIN_QUICK_ACTIONS: StructureAction[] = [
-  { id: 'users',       label: '회원 관리',     link: '/admin/members',     icon: '👤',  description: '회원 조회·탈퇴·완전삭제 관리' },
-  { id: 'pharmacies',  label: '약국 네트워크', link: '/admin/pharmacies',  icon: '🏥',  description: '약국 승인·네트워크 관리' },
-  { id: 'settlements', label: '정산 관리',    link: '/admin/settlements', icon: '💰',  description: '정산 처리·내역 조회' },
-  { id: 'invoices',    label: '인보이스',     link: '/admin/invoices',    icon: '📄',  description: '인보이스 발행·관리' },
-  { id: 'roles',       label: '역할 관리',    link: '/admin/roles',       icon: '🛡️', description: '역할·권한 구조 관리' },
-  { id: 'settings',    label: '설정',         link: '/admin/settings',    icon: '⚙️', description: '시스템 설정' },
-];
-```
-
-- 사용 컴포넌트: `AdminDashboardLayout` → `StructureActionBlock` → `ActionIcon`
-- Phase 2 의 `FINANCE_LINKS` / `GOVERNANCE_LINKS` / `NETWORK_LINKS` (`AdminBlockLink[]` 타입) 는 **이미 lucide ReactNode 직접 주입 패턴** 사용 중 — 모범 패턴.
-
 ### 1.3 admin-ux-core 인프라
 
 | 영역 | 정의 |
@@ -64,32 +46,32 @@ const ADMIN_QUICK_ACTIONS: StructureAction[] = [
 
 ## 2. emoji → lucide 매핑 (Phase A/B vocabulary 와의 정합)
 
-### 2.1 KPA + GlycoPharm admin 의 8 emoji 매핑
+### 2.1 KPA admin 의 8 emoji 매핑
 
 | 위치 | id | label | emoji | 매핑 lucide-name | vocab 16종 안 |
 |------|----|-------|:----:|:----------------:|:-------------:|
 | KPA admin | members | 회원 관리 | 👤 | `users` | ✅ |
 | KPA admin | operator | 운영 대시보드 | 📊 | `bar-chart-3` | ❌ **신규 필요** |
-| GP admin | users | 회원 관리 | 👤 | `users` | ✅ |
-| GP admin | pharmacies | 약국 네트워크 | 🏥 | `building-2` | ❌ **신규 필요** |
-| GP admin | settlements | 정산 관리 | 💰 | `dollar-sign` | ✅ |
-| GP admin | invoices | 인보이스 | 📄 | `file-text` | ✅ |
-| GP admin | roles | 역할 관리 | 🛡️ | `shield` | ✅ |
-| GP admin | settings | 설정 | ⚙️ | `settings` | ❌ **신규 필요** |
+ admin | users | 회원 관리 | 👤 | `users` | ✅ |
+ admin | pharmacies | 약국 네트워크 | 🏥 | `building-2` | ❌ **신규 필요** |
+ admin | settlements | 정산 관리 | 💰 | `dollar-sign` | ✅ |
+ admin | invoices | 인보이스 | 📄 | `file-text` | ✅ |
+ admin | roles | 역할 관리 | 🛡️ | `shield` | ✅ |
+ admin | settings | 설정 | ⚙️ | `settings` | ❌ **신규 필요** |
 
 ### 2.2 vocabulary 16종 안에 없는 신규 lucide 3종
 
 | lucide-name | lucide Component | 의미 |
 |-------------|------------------|------|
 | `bar-chart-3` | BarChart3 | 운영 대시보드 / 통계 |
-| `building-2` | Building2 | 약국 네트워크 / 건물 (이미 GP `NETWORK_LINKS` 에서 lucide ReactNode 형태로 사용 중) |
+| `building-2` | Building2 | — |
 | `settings` | Settings | 설정 / 환경 |
 
 → Phase A 9 + Phase B 7 + **Phase C 3** = **vocabulary 19종**
 
 ### 2.3 vocab 16종 안 매핑 5개 (재사용)
 
-| lucide-name | KPA admin | GP admin | 비고 |
+| lucide-name | KPA admin admin | 비고 |
 |-------------|:---------:|:--------:|------|
 | `users` | members | users | 동일 매핑 (회원 관리) |
 | `dollar-sign` | — | settlements | Phase A 정의 |
@@ -107,7 +89,6 @@ const ADMIN_QUICK_ACTIONS: StructureAction[] = [
 - `packages/operator-ux-core/src/blocks/ActionIcon.tsx` 의 ICON_NAME_MAP 에 3종 추가
 - `packages/admin-ux-core/src/blocks/ActionIcon.tsx` 동일 3종 추가 (양쪽 일치)
 - `KpaAdminDashboardPage.tsx` STRUCTURE_ACTIONS 의 2 emoji → lucide-name string 교체
-- `GlycoPharmAdminDashboard.tsx` ADMIN_QUICK_ACTIONS 의 6 emoji → lucide-name string 교체
 
 **장점**:
 - Phase A/B 의 일관된 정책 유지 — string-based ICON_NAME_MAP 확장
@@ -125,8 +106,8 @@ const ADMIN_QUICK_ACTIONS: StructureAction[] = [
 **범위**:
 - `packages/admin-ux-core/src/types.ts` 의 `StructureAction.icon` type `string` → `ReactNode`
 - `StructureActionBlock.tsx` 의 `ActionIcon` 호출 → 직접 ReactNode 렌더
-- KPA admin / GP admin 의 emoji string → lucide 컴포넌트 직접 주입 (AdminBlockLink 와 동일 패턴)
-- 백엔드 quickActions (operator 영역, KPA/GP/K-Cos/Neture) 호환 break — backend response 의 icon string 처리 별도 경로 필요
+- KPA admin admin 의 emoji string → lucide 컴포넌트 직접 주입 (AdminBlockLink 와 동일 패턴)
+- 백엔드 quickActions (operator 영역, KPA/K-Cos/Neture) 호환 break — backend response 의 icon string 처리 별도 경로 필요
 
 **장점**:
 - AdminBlockLink 와 동일 패턴 — 일관성
@@ -142,12 +123,11 @@ const ADMIN_QUICK_ACTIONS: StructureAction[] = [
 ### Option C — `STRUCTURE_ACTIONS` 를 `AdminLinkBlock` 으로 전환
 
 **범위**:
-- KPA admin / GP admin 의 `ADMIN_QUICK_ACTIONS` (`StructureAction[]`) → `AdminBlockLink[]` 으로 전환
+- KPA admin admin 의 `ADMIN_QUICK_ACTIONS` (`StructureAction[]`) → `AdminBlockLink[]` 으로 전환
 - `AdminDashboardLayout` 의 4-Block 구조 (D Structure Actions) 변경 또는 우회
 - StructureActionBlock 호출 제거 → AdminLinkBlock 사용
 
 **장점**:
-- GP Phase 2 의 FINANCE/GOVERNANCE/NETWORK 패턴 정합
 
 **단점**:
 - AdminDashboardLayout 4-Block 표준 깨짐
@@ -184,7 +164,6 @@ Phase A/B 와 동일 정책 (string-based ICON_NAME_MAP 확장) 유지. 신규 3
 | `packages/operator-ux-core/src/blocks/ActionIcon.tsx` | ICON_NAME_MAP 에 신규 3종 (`bar-chart-3`, `building-2`, `settings`) 추가 + lucide import 3개 |
 | `packages/admin-ux-core/src/blocks/ActionIcon.tsx` | 동일 3종 추가 (양쪽 일치) |
 | `services/web-kpa-society/src/pages/admin/KpaAdminDashboardPage.tsx` | STRUCTURE_ACTIONS 2 icon emoji → lucide-name (`users`, `bar-chart-3`) |
-| `services/web-glycopharm/src/pages/admin/GlycoPharmAdminDashboard.tsx` | ADMIN_QUICK_ACTIONS 6 icon emoji → lucide-name (`users`, `building-2`, `dollar-sign`, `file-text`, `shield`, `settings`) |
 
 ### 4.2 변경하지 않을 항목
 
@@ -192,7 +171,6 @@ Phase A/B 와 동일 정책 (string-based ICON_NAME_MAP 확장) 유지. 신규 3
 - ✅ ActionIcon 의 emoji fallback / NAME_LIKE skip 동작 — Phase A 그대로 보존
 - ✅ StructureAction.icon type — string 유지 (Option B 변경 거부)
 - ✅ AdminDashboardLayout 4-Block 구조 — Phase 2 유지
-- ✅ KPA admin / GP admin 의 `AdminLinkBlock` 사용 (GP Phase 2 의 FINANCE/GOVERNANCE/NETWORK) — 이미 lucide ReactNode 직접 패턴, 변경 0
 - ✅ KPA admin 헤더 ShieldCheck / ExternalLink / AlertTriangle 등 직접 lucide import — 변경 0
 - ✅ DomainIASidebar / OperatorAreaShell — 변경 0
 - ✅ HeroBannerSection.tsx — 변경 0
@@ -223,7 +201,6 @@ Phase A/B 와 동일 정책 (string-based ICON_NAME_MAP 확장) 유지. 신규 3
 - `packages/operator-ux-core` — `npx tsc --noEmit` → 0 errors
 - `packages/admin-ux-core` — `npx tsc --noEmit` → 0 errors
 - `services/web-kpa-society` — `npx tsc --noEmit` → 0 errors (또는 pre-existing 변화 없음)
-- `services/web-glycopharm` — `npx tsc -b --noEmit` (project refs) → pre-existing 22 errors 변화 없음
 - `services/web-k-cosmetics` / `services/web-neture` — 회귀 0 확인
 
 → 본 WO 변경이 admin 프론트 4 파일 한정 + vocab 확장 (additive) 이므로 typecheck 회귀 매우 낮음.
@@ -234,7 +211,7 @@ Phase A/B 와 동일 정책 (string-based ICON_NAME_MAP 확장) 유지. 신규 3
 
 ### 6.1 정적 검증
 
-- KPA admin / GP admin 의 8 emoji 가 lucide-name string 으로 정렬되었는지 확인 (grep)
+- KPA admin admin 의 8 emoji 가 lucide-name string 으로 정렬되었는지 확인 (grep)
 - vocab 16 → 19 확장 확인 (양쪽 ActionIcon)
 - 신규 3 lucide import (BarChart3, Building2, Settings) 양쪽 동일 추가
 - ActionIcon 의 Phase A emoji fallback 동작 보존 (코드 diff 검증)
@@ -246,7 +223,6 @@ Phase A/B 와 동일 정책 (string-based ICON_NAME_MAP 확장) 유지. 신규 3
 - AdminDashboardLayout 의 Block D (Structure Actions) 시각 정합
 - desktop 1280px / mobile 360px 양쪽 정상 렌더
 
-**GlycoPharm admin Dashboard** (`/admin`):
 - `ADMIN_QUICK_ACTIONS` 6개 lucide 렌더 — Users / Building2 / DollarSign / FileText / Shield / Settings
 - 기존 Phase 2 의 FINANCE/GOVERNANCE/NETWORK_LINKS 와 시각 통일
 - desktop / mobile 양쪽 정상
@@ -254,7 +230,6 @@ Phase A/B 와 동일 정책 (string-based ICON_NAME_MAP 확장) 유지. 신규 3
 ### 6.3 회귀 확인
 
 - KPA operator Dashboard (`/operator`) — Phase B 의 12 lucide-name 렌더 변화 없음
-- GP operator Dashboard (`/operator`) — Phase A 의 3 lucide-name 렌더 변화 없음
 - K-Cos / Neture operator — emoji + lucide 렌더 변화 없음 (회귀 0)
 - 콘솔 / 4xx-5xx 없음
 
@@ -268,9 +243,9 @@ Phase A/B 와 동일 정책 (string-based ICON_NAME_MAP 확장) 유지. 신규 3
 1. 검증 대상 commit + 변경 파일
 2. 8 emoji → lucide-name 매핑 정합 (grep 검증 결과)
 3. vocab 16 → 19 확장 정합 (양쪽 ActionIcon 동일 vocab)
-4. KPA admin / GP admin 8 icon 모두 vocab 19종 안 (8/8)
+4. KPA admin admin 8 icon 모두 vocab 19종 안 (8/8)
 5. K-Cos / Neture admin 점검 결과 (read-only — 변경 0, 발견 항목 별도 기록)
-6. Cross-service (KPA operator / GP operator / K-Cos / Neture) 회귀 0
+6. Cross-service (KPA operator operator / K-Cos / Neture) 회귀 0
 7. TypeScript 결과 (api-server / operator-ux-core / admin-ux-core / 4 web)
 8. brower smoke 결과 (선택 / 별도 시점)
 9. Working tree 격리 정합 (path-restricted commit)
@@ -313,7 +288,7 @@ Phase A/B 와 동일 정책 (string-based ICON_NAME_MAP 확장) 유지. 신규 3
 | 항목 | 값 |
 |------|------|
 | **본 단계** | WO 문서 작성 + commit/push 만 |
-| **다음 단계** | 사용자 별도 trigger 시 코드 작업 (정확히 4 파일 — ActionIcon × 2 + KPA admin + GP admin) |
+| **다음 단계** | 사용자 별도 trigger 시 코드 작업 (정확히 4 파일 — ActionIcon × 2 + KPA admin admin) |
 | **권장 옵션** | Option A — ActionIcon vocabulary 확장 (16 → 19) |
 | **신규 lucide 3종** | bar-chart-3 / building-2 / settings |
 | **백엔드 영향** | 0 (admin 프론트 한정) |
@@ -322,4 +297,4 @@ Phase A/B 와 동일 정책 (string-based ICON_NAME_MAP 확장) 유지. 신규 3
 
 ---
 
-> **상태**: Phase C WO 문서 작성 완료. 권장 옵션 A — ActionIcon vocabulary 16 → 19 확장 + KPA admin (2 emoji) + GP admin (6 emoji) lucide-name 정렬. 코드 작업은 별도 trigger 시점. 본 WO 문서 1개만 path-restricted commit + push 예정.
+> **상태**: Phase C WO 문서 작성 완료. 권장 옵션 A — ActionIcon vocabulary 16 → 19 확장 + KPA admin (2 emoji) admin (6 emoji) lucide-name 정렬. 코드 작업은 별도 trigger 시점. 본 WO 문서 1개만 path-restricted commit + push 예정.

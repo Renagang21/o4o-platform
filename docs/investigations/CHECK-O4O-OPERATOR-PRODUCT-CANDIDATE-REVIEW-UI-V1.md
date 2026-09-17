@@ -158,7 +158,7 @@ Phase 3 Product Candidate Review Queue + Phase 4 Mobile Draft → Candidate 흐�
 | F2 | 수동매칭 ProductMaster 검색 UI | 현재 UUID 직접 입력 — 검색 picker 는 후속 WO |
 | F3 | matched Master 요약 표시 | 현재 master id 만 표시 — 상세 요약(이름/바코드) 조인 표시는 후속 |
 | F4 | candidate → Store/Pharmacy 활용 연결 | 다음 단계(WO 로드맵 2번) |
-| F5 | cross-service 화면 확장 | 필요 시 glycopharm/k-cosmetics operator 에도 동형 추가(공통화는 parity 후) |
+| F5 | cross-service 화면 확장 | 필요 시 k-cosmetics operator 에도 동형 추가(공통화는 parity 후) |
 
 ---
 

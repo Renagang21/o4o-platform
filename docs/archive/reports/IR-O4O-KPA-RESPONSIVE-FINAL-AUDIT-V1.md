@@ -144,7 +144,7 @@ WO-O4O-KPA-MYPAGE-FORUM-MOBILE-POLISH-V1 (선택적)
 ```
 
 단, 이 작업은 **긴급하지 않으며**, KPA canonical을 기준으로
-다른 서비스(GlycoPharm, K-Cosmetics 등) 반응형 확장 작업을
+다른 서비스(K-Cosmetics 등) 반응형 확장 작업을
 먼저 진행한 뒤 일괄 처리해도 무방하다.
 
 ---

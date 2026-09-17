@@ -122,7 +122,7 @@ WO-O4O-GUIDE-CONTENT-RESEED-GUIDEBLOCK-V1 조사 결과 (2026-05-06):
 | # | WO | 내용 | 결과 |
 |---|----|------|------|
 | 1 | WO-O4O-GUIDE-BLOCK-KPA-INITIAL-V1 | KPA-Society 1차 적용 | PASS |
-| 2 | WO-O4O-GUIDE-BLOCK-GLYCOPHARM-V1 | GlycoPharm 적용 | PASS |
+| 2 |  | — | PASS |
 | 3 | WO-O4O-GUIDE-BLOCK-K-COSMETICS-V1 | K-Cosmetics 적용 | PASS |
 | 4 | WO-O4O-GUIDE-BLOCK-NETURE-V1 | Neture 1차 적용 | PASS |
 | 5 | WO-O4O-GUIDE-BLOCK-1ST-WAVE-REPORT-V1 | 1차 적용 보고서 작성 | PASS |
@@ -153,16 +153,6 @@ WO-O4O-GUIDE-CONTENT-RESEED-GUIDEBLOCK-V1 조사 결과 (2026-05-06):
 | `signage.playlist.manager` | (HQ Playlist) | `guideblock-page-help` |
 | `user.application.status` | MyApplicationsPage.tsx | `guideblock-page-help` |
 
-### GlycoPharm (5개)
-
-| pageKey | 파일 | sectionKey |
-|---------|------|-----------|
-| `store.channel.editor` | StoreChannelsPage.tsx | `guideblock-page-help` |
-| `forum.request.management` | ForumDeleteRequestsPage.tsx | `guideblock-page-help` |
-| `store.product.management` | PharmacyProducts.tsx | `guideblock-page-help` |
-| `signage.playlist.manager` | HqPlaylistDetailPage.tsx | `guideblock-page-help` |
-| `user.application.status` | apply/MyApplicationsPage.tsx | `guideblock-page-help` |
-
 ### K-Cosmetics (4개)
 
 | pageKey | 파일 | sectionKey |
@@ -190,7 +180,6 @@ WO-O4O-GUIDE-CONTENT-RESEED-GUIDEBLOCK-V1 조사 결과 (2026-05-06):
 | 서비스 | pageKey 수 |
 |--------|-----------|
 | KPA-Society | 8 |
-| GlycoPharm | 5 |
 | K-Cosmetics | 4 |
 | Neture | 8 |
 | **합계** | **25** |

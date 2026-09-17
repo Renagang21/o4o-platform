@@ -59,7 +59,7 @@ export class PlatformStoreSlug {
 
   /**
    * The canonical store axis is **organizations.id** (all services reserve with the
-   * organization id — kpa / glycopharm / cosmetics / pharmacy-hub).
+   * organization id — kpa / cosmetics / pharmacy-hub).
    *
    * WO-O4O-CROSS-SERVICE-STORE-ORPHAN-SLUG-INTEGRITY-CLEANUP-V1 §6 에서 축을 고정했다.
    * 서비스 전용 매장 테이블 PK(예: cosmetics_stores.id)를 넣으면 공개 조회가 영구 404 이고

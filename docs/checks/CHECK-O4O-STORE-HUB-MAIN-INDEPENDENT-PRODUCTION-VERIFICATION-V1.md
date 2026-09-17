@@ -3,7 +3,7 @@
 - **WO**: `WO-O4O-STORE-HUB-MAIN-INDEPENDENT-PRODUCTION-VERIFICATION-V1`
 - **수행**: Agent A (독립 재검증)
 - **일자**: 2026-08-18
-- **대상**: KPA-Society / K-Cosmetics / GlycoPharm / Pharmacy-Hub (+ Neture = 공급자→매장 backend 계약 회귀 한정)
+- **대상**: KPA-Society / K-Cosmetics / Pharmacy-Hub (+ Neture = 공급자→매장 backend 계약 회귀 한정)
 - **성격**: 이전 Agent D 의 CHECK/완료 보고를 **근거로 쓰지 않고**, main 코드 · route · production 을 다시 확인했다.
 
 ---
@@ -26,23 +26,23 @@
 
 판정값: `FULLY_COMMON` / `CORE_ONLY` / `VIEW_DUPLICATED` / `SERVICE_SPECIFIC` / `NOT_IMPLEMENTED` / `OUT_OF_SCOPE`
 
-| # | 축 | KPA | K-Cos | GlycoPharm | Pharmacy-Hub |
-|---|---|---|---|---|---|
-| 1 | Store Hub 랜딩(진입 카드) | FULLY_COMMON | FULLY_COMMON | FULLY_COMMON | FULLY_COMMON |
-| 2 | B2B 공급 카탈로그 탐색 | FULLY_COMMON | FULLY_COMMON | FULLY_COMMON | FULLY_COMMON |
-| 3 | 상품 상세 · 신청/담기 | FULLY_COMMON | FULLY_COMMON | FULLY_COMMON | SERVICE_SPECIFIC |
-| 4 | 장바구니 | FULLY_COMMON | FULLY_COMMON | FULLY_COMMON | SERVICE_SPECIFIC |
-| 5 | 주문(buyer ledger) 목록 | FULLY_COMMON | FULLY_COMMON | FULLY_COMMON | SERVICE_SPECIFIC |
-| 6 | 주문 상세 | CORE_ONLY | CORE_ONLY | CORE_ONLY | SERVICE_SPECIFIC |
-| 7 | 결제 전 주문 취소 | FULLY_COMMON | FULLY_COMMON | FULLY_COMMON | SERVICE_SPECIFIC |
-| 8 | 이벤트 오퍼(HUB) | FULLY_COMMON | FULLY_COMMON | FULLY_COMMON | NOT_IMPLEMENTED |
-| 9 | HUB 콘텐츠(설명서) 라이브러리 | FULLY_COMMON | FULLY_COMMON | FULLY_COMMON | SERVICE_SPECIFIC |
-| 10 | HUB 블로그 라이브러리 | FULLY_COMMON | FULLY_COMMON | FULLY_COMMON | SERVICE_SPECIFIC |
-| 11 | HUB POP 라이브러리 | FULLY_COMMON | FULLY_COMMON | FULLY_COMMON | SERVICE_SPECIFIC |
-| 12 | HUB QR 라이브러리 | FULLY_COMMON | FULLY_COMMON | FULLY_COMMON | SERVICE_SPECIFIC |
-| 13 | HUB 사이니지 라이브러리 | FULLY_COMMON | FULLY_COMMON | FULLY_COMMON | SERVICE_SPECIFIC |
-| 14 | 매장 legal/footer 노출 | FULLY_COMMON | FULLY_COMMON | FULLY_COMMON | CORE_ONLY |
-| 15 | HUB 확장 자산(영상 · Screen Set · 다국어) | SERVICE_SPECIFIC | NOT_IMPLEMENTED | NOT_IMPLEMENTED | NOT_IMPLEMENTED |
+| # | 축 | KPA | K-Cos | Pharmacy-Hub |
+|---|---|---|---|---|
+| 1 | Store Hub 랜딩(진입 카드) | FULLY_COMMON | FULLY_COMMON | FULLY_COMMON |
+| 2 | B2B 공급 카탈로그 탐색 | FULLY_COMMON | FULLY_COMMON | FULLY_COMMON |
+| 3 | 상품 상세 · 신청/담기 | FULLY_COMMON | FULLY_COMMON | SERVICE_SPECIFIC |
+| 4 | 장바구니 | FULLY_COMMON | FULLY_COMMON | SERVICE_SPECIFIC |
+| 5 | 주문(buyer ledger) 목록 | FULLY_COMMON | FULLY_COMMON | SERVICE_SPECIFIC |
+| 6 | 주문 상세 | CORE_ONLY | CORE_ONLY | SERVICE_SPECIFIC |
+| 7 | 결제 전 주문 취소 | FULLY_COMMON | FULLY_COMMON | SERVICE_SPECIFIC |
+| 8 | 이벤트 오퍼(HUB) | FULLY_COMMON | FULLY_COMMON | NOT_IMPLEMENTED |
+| 9 | HUB 콘텐츠(설명서) 라이브러리 | FULLY_COMMON | FULLY_COMMON | SERVICE_SPECIFIC |
+| 10 | HUB 블로그 라이브러리 | FULLY_COMMON | FULLY_COMMON | SERVICE_SPECIFIC |
+| 11 | HUB POP 라이브러리 | FULLY_COMMON | FULLY_COMMON | SERVICE_SPECIFIC |
+| 12 | HUB QR 라이브러리 | FULLY_COMMON | FULLY_COMMON | SERVICE_SPECIFIC |
+| 13 | HUB 사이니지 라이브러리 | FULLY_COMMON | FULLY_COMMON | SERVICE_SPECIFIC |
+| 14 | 매장 legal/footer 노출 | FULLY_COMMON | FULLY_COMMON | CORE_ONLY |
+| 15 | HUB 확장 자산(영상 · Screen Set · 다국어) | SERVICE_SPECIFIC | NOT_IMPLEMENTED | NOT_IMPLEMENTED |
 
 **전체 모집단: 60** (15 축 × 4 서비스)
 **미조사: 0**
@@ -53,9 +53,9 @@
   근거 컴포넌트: `StoreHubTemplate`(shared-space-ui), `SupplyCatalogHub` · `StoreCartView` ·
   `BuyerOrderLedgerView` · `EventOfferHubView` / `EventOffersHubList` · `HubImportLibraryView` ·
   `SignageLibraryView` · `ContentHubTemplate` · `StoreFacingFooter`.
-  예: KCos/GP 이벤트 오퍼 페이지 33L, HUB 블로그/POP/QR 각 100L 전후 = 전부 config 파일이다.
+  예: KCos 이벤트 오퍼 페이지 33L, HUB 블로그/POP/QR 각 100L 전후 = 전부 config 파일이다.
 - **CORE_ONLY** — 계약(API·훅)은 공통인데 표현은 서비스가 소유한다. 6번(주문 상세)은 목록 본문이
-  `renderList` slot 이라 KPA 표/GP 확장 카드/KCos 표+패널로 형태가 다르다. 14번 PH 는 legal 값 계약
+  `renderList` slot 이라 KPA 표 확장 카드/KCos 표+패널로 형태가 다르다. 14번 PH 는 legal 값 계약
   (`PublicLegalFooterInfo`)만 공통이고 푸터 마크업은 PH 자체다(다른 서비스 inline style 사본을 만들지 않음).
 - **SERVICE_SPECIFIC (PH 3~13)** — PH 는 **결제 우선(paymentGroup)** 계약이다. 결제 전 주문을
   "접수됨"으로 표현하지 않는 고유 규칙이 있어 buyer ledger 와 합치지 않는다(`BuyerOrderLedgerView` 주석에 명문화).
@@ -69,7 +69,7 @@
 15 축 전수에서 해당 사례를 찾지 못했다. 확인 방식:
 
 - 각 서비스 hub 페이지 파일 전수 확인 → 전부 공통 View import + config (KPA `HubB2BCatalogPage` 94L,
-  KCos `HubContentPage` 124L, GP `HubContentListPage` 125L, KCos/GP `HubSignage*` 108L 동일 구조 등).
+  KCos `HubContentPage` 124L `HubContentListPage` 125L, KCos `HubSignage*` 108L 동일 구조 등).
 - 남은 대형 파일 3개(KPA `HubVideoLibraryPage` 368L, `HubScreenSetLibraryPage` 519L,
   `KpaEventOfferPage` 546L)를 개별 확인 — 앞 2개는 counterpart 없는 KPA 전용 축이고,
   `KpaEventOfferPage` 는 이미 `EventOfferHubView` 를 쓰고 KPA 고유 업무(4탭 · 공급업체 묶음 담기 ·
@@ -93,12 +93,12 @@
 
 | ID | 결함 | 영향 서비스 | 분류 | 처리 |
 |---|---|---|---|---|
-| F-A | 결제 전 주문 취소 **UI 부재** (백엔드 계약은 존재) | KPA · KCos · GP | MUST_FIX | 공통 훅·버튼 추가 후 3 서비스 연결 |
+| F-A | 결제 전 주문 취소 **UI 부재** (백엔드 계약은 존재) | KPA · KCos · MUST_FIX | 공통 훅·버튼 추가 후 2 서비스 연결 |
 | F-B | 주문 **상세 진입 경로 부재** | KPA | MUST_FIX | `getBuyerOrderDetail` + 행 펼침 상세 |
 | F-C | 장바구니 공급자 표기가 **UUID** | 공통(`StoreCartView`) | MUST_FIX | `organizations.name` 을 서버가 내려줌 |
-| F-D | 금액이 `11900.00원` 으로 표기 | GP | MUST_FIX | numeric 문자열 → `Number()` 정규화 |
+| F-D | 금액이 `11900.00원` 으로 표기 | MUST_FIX | numeric 문자열 → `Number` 정규화 |
 | F-E | orphan seller drawer 파일 잔존 | KPA | 정리 | 삭제(참조 0) |
-| F-F | 모바일 **가로 오버플로** (KCos 68px · GP 57px) | 공통(`StoreHubTemplate`) | MUST_FIX | `repeat(2, minmax(0, 1fr))` |
+| F-F | 모바일 **가로 오버플로** (KCos 68px 57px) | 공통(`StoreHubTemplate`) | MUST_FIX | `repeat(2, minmax(0, 1fr))` |
 
 §9 중지 기준(DB schema · migration · 결제 정책 · auth/membership 재설계 · Agent C 대형 변경 ·
 업무 모델 변경)에 걸린 항목은 **없었다**. migration 0 · schema 변경 0 · 권한/role 변경 0.
@@ -117,7 +117,6 @@
 |---|---|---|---|---|---|---|---|
 | KPA | `ORD-20260818-9295` | PASS | PASS | PASS | PASS | PASS | PASS |
 | K-Cosmetics | `ORD-20260818-6551` | PASS | PASS | PASS | PASS | PASS(`releasedListings`) | PASS |
-| GlycoPharm | `ORD-20260818-5706` | PASS | PASS | PASS | PASS | PASS(`releasedListings`) | PASS |
 | Pharmacy-Hub | `ORD-20260818-3575` | PASS | PASS | PASS | PASS(화면 버튼) | 해당 없음(이벤트 오퍼 미구현) | PASS |
 
 ## 7. legal / footer 회귀 (§6)
@@ -133,8 +132,7 @@
 `390×844` 실브라우저로 4 서비스 20 route 를 sweep 했다(build 성공으로 대체하지 않았다).
 
 - console error 0 · HTTP ≥400 0 · not-found 0 · "준비 중" 0
-- 가로 오버플로: **F-F 1건** (KCos 68px · GP 57px, Store Hub 랜딩) → 공통 `StoreHubTemplate` 원인 · 수정 완료
-
+- 가로 오버플로: **F-F 1건** (KCos 68px 57px, Store Hub 랜딩) → 공통 `StoreHubTemplate` 원인 · 수정 완료
 
 ---
 
@@ -147,14 +145,12 @@
 |---|---|---|
 | F-A 결제 전 취소 버튼 | KPA | PASS — `ORD-20260818-1818` 생성 → 목록 `주문 생성` + `주문 취소` 버튼 노출 → 취소 → `주문 취소` 전이 · 버튼 소멸 |
 | F-A | K-Cosmetics | PASS — `ORD-20260818-0385` 생성 → `관리` 열 취소 버튼 → 취소 후 `—` 로 전환 |
-| F-A | GlycoPharm | PASS — `ORD-20260818-1939` 생성 → 취소 → `주문 취소` · 이번 달 주문액 집계에서 제외 |
 | F-A 게이팅 | 3 서비스 | PASS — 이미 취소된 주문에는 버튼이 렌더되지 않는다(`isBuyerOrderCancellable`) |
 | F-B 주문 상세 | KPA | PASS — `상세 보기` 토글 → 주문번호 · 주문일시 · 품목(1개 · 9,900원) · 상품 합계 9,900원 / 배송비 3,000원 / 결제 금액 12,900원 |
-| F-C 장바구니 공급자 | KPA · KCos · GP | PASS — UUID 가 아니라 `(주)네뚜레 공급자 테스트` (= `organizations.name`) 로 렌더 |
-| F-D 금액 표기 | GlycoPharm | PASS — `11900.00원` → `11,900원` |
-| F-F 모바일 오버플로 | KCos · GP | PASS — Store Hub 랜딩 390×844 오버플로 KCos `+68 → -13` · GP `+57 → -8` |
-| 재고 복원 | GP 이벤트 오퍼 | PASS — 취소 후 `잔여 100개` 로 복원 |
-| 모바일 재확인 | 4 화면 | PASS — KPA `/store-hub` -15 · KPA 주문 -15 · KCos 주문 -15 · GP 주문 -8 (모두 오버플로 없음) |
+| F-C 장바구니 공급자 | KPA · KCos · PASS — UUID 가 아니라 `(주)네뚜레 공급자 테스트` (= `organizations.name`) 로 렌더 |
+| F-F 모바일 오버플로 | KCos · PASS — Store Hub 랜딩 390×844 오버플로 KCos `+68 → -13` `+57 → -8` |
+| 재고 복원 이벤트 오퍼 | PASS — 취소 후 `잔여 100개` 로 복원 |
+| 모바일 재확인 | 4 화면 | PASS — KPA `/store-hub` -15 · KPA 주문 -15 · KCos 주문 -15 주문 -8 (모두 오버플로 없음) |
 
 흐름 전체(로그인 → Store Hub 진입 → 상품/이벤트 탐색 → 담기 → 장바구니 → 주문 확정 → 주문 목록 →
 상세 → 결제 전 취소)에서 dead link 0 · "준비 중" 0 · white screen 0 · JS exception 0 ·
@@ -195,7 +191,7 @@ Pharmacy-Hub 는 WO 범위대로 주문 생성 → payment 화면 진입까지�
 - 수정 커밋: `114f7d0d4` — 변경 파일만 path-specific stage (15 경로), `git add .` 사용하지 않음
 - 다른 세션의 staged/WIP 파일 접촉 0
 - 본 CHECK 문서: 별도 커밋으로 추가
-- 타입 검증: KPA / K-Cosmetics / GlycoPharm / api-server 4개 모두 PASS
+- 타입 검증: KPA / K-Cosmetics / api-server 4개 모두 PASS
 - 배포: Deploy Web Services · Deploy API Server · Deploy Admin Dashboard 전부 success (`114f7d0d4`)
 
 ---

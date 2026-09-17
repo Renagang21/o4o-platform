@@ -61,7 +61,7 @@ users (global identity; email unique; status; isActive)
   └─ service_memberships (userId, serviceKey, status, role) — 서비스별 가입
 ```
 - platform account ↔ 일반 user: 동일 `users` 테이블, role 로만 구분
-- hard delete / 개인정보 파기 책임: **service admin** 레이어(`/operator/members` DELETE mode=hard) — 본 정비 사이클(GP/KCos)에서 "회원 데이터 관리"로 이미 귀속
+- hard delete / 개인정보 파기 책임: **service admin** 레이어(`/operator/members` DELETE mode=hard) — 본 정비 사이클(KCos)에서 "회원 데이터 관리"로 이미 귀속
 
 ---
 
@@ -70,7 +70,6 @@ users (global identity; email unique; status; isActive)
 - platform section: `web-neture/src/pages/admin/platform/` = Landing / Accounts / Services / SectionLayout **4개뿐**. `/admin/platform/users` 페이지·라우트 **없음** (App.tsx platform Route 블록에 미존재).
 - `PlatformAdminLandingPage` "Global 사용자 관리" 카드: `to: null`, `api: 'GET /api/v1/admin/users'`, "연결 예정" 배지 — 정확히 본 IR 이 결정할 지점.
 - 전체 사용자를 한 화면에서 보는 UI 는 현재 **없음**. 사용자 관리는 서비스별 분산:
-  - neture/glycopharm/k-cosmetics → `/operator/members?serviceKey=…`
   - kpa-society → `/admin/members`(면허번호 특화)
 - 중복 위험: global read-only list 는 "조회"만 하므로 서비스별 **관리(삭제·이용중지) 화면과 기능 중복 없음**. 단 라벨/진입 동선에서 "관리"로 오인되지 않게 read-only 임을 명시해야 함.
 

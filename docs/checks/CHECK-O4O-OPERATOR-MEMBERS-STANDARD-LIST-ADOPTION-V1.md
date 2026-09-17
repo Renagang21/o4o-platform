@@ -2,7 +2,7 @@
 
 > **작업명:** WO-O4O-OPERATOR-MEMBERS-STANDARD-LIST-ADOPTION-V1 (Targeted scope — 사용자 승인)
 > **유형:** `/operator/members` 공통 콘솔에 서버 정렬 + URL sync + page=1 reset 추가(opt-in). frontend only, backend/DB/package/lock 무변경.
-> **결과: PASS — `OperatorMembersConsolePage`에 `serverSort`/`syncUrl` **opt-in prop** 추가. operator 3앱(neture/glyco/kcos)만 opt-in → DataTable manualSort(email/createdAt 서버 정렬) + URL query sync(`members_*`) + 검색/탭/정렬 변경 시 page=1 reset. **admin `/admin/members`(동일 콘솔 공유)는 prop 미전달 → 무변경.** MemberListLayout/탭/drawer/batch/stats 유지. operator-core-ui·web-neture tsc 0.**
+> **결과: PASS — `OperatorMembersConsolePage`에 `serverSort`/`syncUrl` **opt-in prop** 추가. operator 3앱만 opt-in → DataTable manualSort(email/createdAt 서버 정렬) + URL query sync(`members_*`) + 검색/탭/정렬 변경 시 page=1 reset. **admin `/admin/members`(동일 콘솔 공유)는 prop 미전달 → 무변경.** MemberListLayout/탭/drawer/batch/stats 유지. operator-core-ui·web-neture tsc 0.**
 > 선행: STANDARD-LIST-CORE(62dc177f5) · STORES-ADOPTION(203353832) · DATATABLE-ONSORT(ed962cc59) — 2026-06-17
 
 ---
@@ -12,9 +12,8 @@
 - 공통 콘솔: `packages/operator-core-ui/src/modules/members/OperatorMembersConsolePage.tsx` (Shared — operator+admin 공유).
 - **opt-in 적용(operator만, serverSort+syncUrl 전달):**
   - neture `pages/operator/UsersManagementPage.tsx`
-  - glycopharm `pages/operator/UsersPage.tsx`
   - k-cosmetics `pages/operator/UsersPage.tsx`
-- **무변경(prop 미전달):** `/admin/members`(Glyco/KCos AdminMembersPage, 동일 콘솔), KPA `MemberManagementPage`(자체 KpaMember 페이지, outlier).
+- **무변경(prop 미전달):** `/admin/members`, KPA `MemberManagementPage`(자체 KpaMember 페이지, outlier).
 
 ## 2. 기존 구현 상태 요약 (조사)
 
@@ -28,7 +27,6 @@
 |------|------|
 | `operator-core-ui/.../members/types.ts` | `MembersConsoleListParams`+sortBy/sortOrder, `OperatorMembersConsolePageProps`+serverSort/syncUrl |
 | `operator-core-ui/.../members/OperatorMembersConsolePage.tsx` | page state화 + sort state + URL sync(gated) + manualSort 연결 + page=1 reset |
-| neture/glyco/kcos `operator/UsersManagementPage|UsersPage.tsx` | `serverSort syncUrl` prop + client.list 의 sortBy/sortOrder forward |
 
 ## 4. query parameter 매핑표
 
@@ -72,10 +70,10 @@
 
 ## 11. 검증
 
-- **isolated tsc**: operator-core-ui — members 파일 **에러 0** (유일 에러 `error-handling import.meta.env` = origin/main 기존). **web-neture 전체 tsc EXIT=0**(통합 검증). glyco/kcos 동일 최소 편집(parity).
+- **isolated tsc**: operator-core-ui — members 파일 **에러 0** (유일 에러 `error-handling import.meta.env` = origin/main 기존). **web-neture 전체 tsc EXIT=0**(통합 검증).
 - **backend/package/lock 변경 없음**: staged diff 에 apps/api-server·package.json·pnpm-lock.yaml 없음. @o4o/ui dist 미변경(manualSort 는 ed962cc59 에서 빌드됨).
 - **DataTable/Pagination breaking change 0**, **admin `/admin/members` 무변경**(opt-in), **다른 세션 WIP(HubContentLibraryPage 등) 미접촉**.
-- **browser smoke 미수행** — 배포 후 권장: `/operator/members`(neture/glyco/kcos) 검색→URL·page=1 / 컬럼(email/createdAt) 클릭→서버 정렬·URL·page=1·토글 / 탭 전환→page=1 / 페이지 이동 정렬·검색 유지 / 새로고침 복원 / drawer·batch·stats 무회귀 / admin members 무변경.
+- **browser smoke 미수행** — 배포 후 권장: `/operator/members` 검색→URL·page=1 / 컬럼(email/createdAt) 클릭→서버 정렬·URL·page=1·토글 / 탭 전환→page=1 / 페이지 이동 정렬·검색 유지 / 새로고침 복원 / drawer·batch·stats 무회귀 / admin members 무변경.
 
 ## 12. 후속 확산 후보
 

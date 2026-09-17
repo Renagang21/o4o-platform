@@ -54,42 +54,12 @@ gcloud run jobs executions list \
 
 ---
 
-### Method 2: Manual (Admin API) — **FOR URGENT FIXES**
+### Method 2: Manual (Admin API) — **RETIRED**
 
-Use when migrations need to run outside of deployment cycle.
-
-**Steps:**
-
-1. **Login as admin** to any service (e.g., https://glycopharm.neture.co.kr)
-2. **Open browser console** (F12)
-3. **Execute migration endpoint:**
-
-```javascript
-await fetch('https://api.neture.co.kr/api/v1/glycopharm/admin/migrate/add-product-fields', {
-  method: 'POST',
-  credentials: 'include'
-}).then(r => r.json()).then(console.log);
-```
-
-4. **Verify in Cloud Run logs:**
-
-```bash
-gcloud logs read \
-  --project=netureyoutube \
-  --resource-type=cloud_run_revision \
-  --log-filter='resource.labels.service_name="o4o-core-api"' \
-  --limit=50
-```
-
-**Current Admin Endpoints:**
-- POST `/api/v1/glycopharm/admin/migrate/add-product-fields` — Add missing product columns
-- POST `/api/v1/glycopharm/admin/products/activate-all` — Set all products to active
-
-**Why this works:**
-- Runs inside Cloud Run (has DB access)
-- Requires admin authentication
-- Logged in Cloud Run audit trail
-- No firewall issues
+과거에는 서비스별 admin migrate endpoint 를 브라우저 콘솔에서 호출하는 방식이 있었으나,
+해당 endpoint 는 모두 제거되었고 현재 저장소에 `admin/migrate/*` 라우트는 없다.
+긴급 수정도 Method 1(CI/CD) 또는 승인된 채널의 수동 적용(CLAUDE.md DB · 보안 경계)만 사용한다.
+진단 · repair 성격 HTTP route 는 CLAUDE.md §8 규칙에 따라 만들지 않는다.
 
 ---
 

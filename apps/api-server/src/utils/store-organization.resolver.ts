@@ -32,7 +32,7 @@
  *   새 테이블·새 컬럼·backfill 을 만들지 않는다 (본 WO 는 DB write 0).
  *
  *     (a) organization_service_enrollments(service_code, status='active')
- *         — K-Cosmetics / Pharmacy-Hub / Neture / GlycoPharm 프로비저닝 경로가 기록
+ *         — K-Cosmetics / Pharmacy-Hub / Neture 프로비저닝 경로가 기록
  *     (b) platform_store_slugs(service_key, is_active = true)
  *         — KPA 약국 매장 주소 발급 경로가 기록 (KPA 는 enrollment row 를 만들지 않는다)
  *

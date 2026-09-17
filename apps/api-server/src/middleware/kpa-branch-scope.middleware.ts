@@ -7,7 +7,7 @@
  *
  *   1) requireKpaBranchScope — **서비스 축**.
  *      service_memberships('kpa-branch').status='active' + prefixed role 검사.
- *      기존 서비스(glycopharm / pharmacy-hub)와 동일한 구조이며, 분회 식별자는 모른다.
+ *      기존 서비스와 동일한 구조이며, 분회 식별자는 모른다.
  *
  *   2) resolveBranch / requireBranchOperator — **분회 축**.
  *      slug 또는 Host 로 분회 tenant 를 확정하고, 운영자 mutation 에 대해

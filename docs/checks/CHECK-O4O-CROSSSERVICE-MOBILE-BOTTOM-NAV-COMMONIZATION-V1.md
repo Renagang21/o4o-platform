@@ -12,7 +12,6 @@
 | 서비스 | 파일 | 비고 |
 |---|---|---|
 | KPA-Society | `services/web-kpa-society/src/components/MobileBottomNav.tsx` | 소비 shell 5 (App/Layout/Admin/Instructor/KpaOperator) |
-| GlycoPharm | `services/web-glycopharm/src/components/MobileBottomNav.tsx` | 소비 shell 1 |
 | K-Cosmetics | `services/web-k-cosmetics/src/components/MobileBottomNav.tsx` | 소비 shell 1 |
 | Neture | `services/web-neture/src/components/NetureBottomNav.tsx` | 소비 shell 6 (Main/Neture/Admin/Operator/Partner/SupplierSpace) · **primary 탭바 아님 = 인증 사용자 전용 utility nav** |
 
@@ -56,8 +55,7 @@
 | 서비스 | 잔존 내용 |
 |---|---|
 | KPA | `ACTIVE_COLOR=#2563eb` · `BADGE_STYLE={top:-6,fontWeight:600}` · `isPharmacyActive`(slug whitelist 정규식 원문 유지) · `isCommunityActive`(4조건) · 서비스 로컬 `notificationRouting` · 게스트 2탭(커뮤니티+로그인 emphasis) · 프로필 시트(KpaUserMenuItems + 역할 라벨) |
-| GlycoPharm | `ACTIVE_COLOR=#059669` · `Z_INDEX_CLASS='z-50'` · `isPharmacyActive`(`/^\d/` 제외) · `isCommunityActive`(5조건, `/content` 포함) · 공통 `resolveNotificationTarget` · 내정보=`/mypage` Link |
-| K-Cosmetics | `ACTIVE_COLOR=#db2777` · `Z_INDEX_CLASS='z-50'` · `isStoreActive`(`/mobile/store`) · 라벨 `매장 경영` · 나머지 GP 와 동형 |
+| K-Cosmetics | `ACTIVE_COLOR=#db2777` · `Z_INDEX_CLASS='z-50'` · `isStoreActive`(`/mobile/store`) · 라벨 `매장 경영` |
 | Neture | `ACTIVE_COLOR=#059669` · `BADGE_STYLE={top:-6,fontWeight:600}` · **비인증 시 `null`**(hook 뒤에서 분기) · `MobileBottomNavSpacer` · 3탭(홈/알림/내정보) · 로컬 `resolveNetureNotificationTarget` |
 
 ---
@@ -85,7 +83,7 @@
 ## 5. active 판정 보존 결과 (§8)
 
 - 서비스별 predicate(`isPharmacyActive` / `isStoreActive` / `isCommunityActive`)는 **원문 그대로 서비스 파일에 잔존**. Core 로 옮기지 않았다 — 옮기면 공통 계층이 업무 route 를 알게 된다.
-- KPA 의 `/store/:slug` whitelist 정규식, GP·KCos 의 `/^\d/` 소비자 경로 제외, community predicate 의 `/content` 포함 여부 차이 모두 **정규화하지 않고 그대로 유지**.
+- KPA 의 `/store:slug` whitelist 정규식, KCos 의 `/^\d/` 소비자 경로 제외, community predicate 의 `/content` 포함 여부 차이 모두 **정규화하지 않고 그대로 유지**.
 - 브라우저 검증(§7)에서 route 별 active 색 전환을 실측 확인.
 
 ---
@@ -99,7 +97,6 @@
 | `pnpm run build:packages` | **PASS** (18 packages) |
 | `pnpm --filter @o4o/account-ui build` | **PASS** |
 | web-kpa-society `pnpm run build` (`tsc` 포함) | **PASS** (4,326 modules, 37.12s) |
-| web-glycopharm `pnpm run build` | **PASS** (4,078 modules, 1m18s) |
 | web-k-cosmetics `pnpm run build` | **PASS** (4,032 modules, 33.41s) |
 | web-neture `pnpm run build` | **PASS** (4,100 modules, 56.77s) |
 
@@ -112,41 +109,39 @@
 **환경 메모**: MCP Playwright(persistent Chrome profile `C:\Users\home\.playwright-o4o-profile`)는 프로필 잠금으로 기동 실패(`exitCode=0`, "이미 다른 세션에서 열려 있습니다"). 대안으로 저장소에 설치된 Playwright chromium 을 headless·모바일 emulation(390×844, isMobile, hasTouch)으로 직접 구동해 실측했다.
 **CORS 제약**: API(`api.neture.co.kr`)가 `http://localhost:3000` origin 만 허용 → 4개 dev 서버를 **포트 3000 에서 순차 기동**해 검증했다.
 
-| 검사 항목 | KPA | GlycoPharm | K-Cosmetics | Neture |
-|---|:--:|:--:|:--:|:--:|
-| 비로그인 nav | 2탭(커뮤니티/로그인) | 2탭 | 2탭 | **렌더 없음(정상 — utility nav)** |
-| 로그인 nav 항목 수·라벨 | 4 (커뮤니티/약국 경영/알림/내정보) | 4 (…) | 4 (커뮤니티/**매장 경영**/알림/내정보) | 3 (홈/알림/내정보) |
-| 브랜드 active 색 | `rgb(37,99,235)` | `rgb(5,150,105)` | `rgb(219,39,119)` | `rgb(5,150,105)` |
-| z-index | 40 | 50 | 50 | 40 |
-| 고정 위치·높이 | top 793 / h 51 (innerH 844) | 동일 | 동일 | 동일 |
-| 탭 클릭 라우팅 | `/mobile/pharmacy` OK | OK | `/mobile/store` OK | — |
-| 중첩 route active | OK | OK | OK | OK |
-| 알림 시트 + 배지 | OK | OK (배지 1) | OK | OK (배지 5) |
-| body scroll lock → ESC 복원 | `hidden` → `''` | 동일 | 동일 | 동일 |
-| 프로필 시트 | OK (`내 정보 메뉴`) | 해당 없음(Link) | 해당 없음(Link) | OK |
-| flow spacer | 해당 없음 | 해당 없음 | 해당 없음 | OK (렌더 확인) |
-| 데스크톱 1280px 비표시 | OK (0개) | OK | OK | OK |
-| console error | 0 | 0 | 0 | 0 |
-| 4xx/5xx | 0 | 2 (아래 참고) | 0 | 0 |
+| 검사 항목 | KPA | K-Cosmetics | Neture |
+| --- | :--: | :--: | :--: |
+| 비로그인 nav | 2탭(커뮤니티/로그인) | 2탭 | **렌더 없음(정상 — utility nav)** |
+| 로그인 nav 항목 수·라벨 | 4 (커뮤니티/약국 경영/알림/내정보) | 4 (커뮤니티/**매장 경영**/알림/내정보) | 3 (홈/알림/내정보) |
+| 브랜드 active 색 | `rgb(37,99,235)` | `rgb(219,39,119)` | `rgb(5,150,105)` |
+| z-index | 40 | 50 | 40 |
+| 고정 위치·높이 | top 793 / h 51 (innerH 844) | 동일 | 동일 |
+| 탭 클릭 라우팅 | `/mobile/pharmacy` OK | `/mobile/store` OK | — |
+| 중첩 route active | OK | OK | OK |
+| 알림 시트 + 배지 | OK | OK | OK (배지 5) |
+| body scroll lock → ESC 복원 | `hidden` → `''` | 동일 | 동일 |
+| 프로필 시트 | OK (`내 정보 메뉴`) | 해당 없음(Link) | OK |
+| flow spacer | 해당 없음 | 해당 없음 | OK (렌더 확인) |
+| 데스크톱 1280px 비표시 | OK (0개) | OK | OK |
+| console error | 0 | 0 | 0 |
+| 4xx/5xx | 0 | 0 | 0 |
 
-- GlycoPharm 의 404 2건은 `/privacy` 진입 시 `GET /api/v1/public/services/glycopharm/policies/privacy` — 하단 nav 와 무관한 **기존 결함**(WO §13 범위 밖, 보고만 함).
-- Neture·GP 는 계정 역할에 따라 `/` 가 각각 `/supplier/dashboard`, `/admin` 으로 리다이렉트되어 홈 탭이 비활성으로 관측되는데, 이는 **기존 라우팅 동작**이며 active 로직 정상(게스트 `/` 에서 홈/커뮤니티 탭 active 확인).
+- Neture 는 계정 역할에 따라 `/` 가 각각 `/supplier/dashboard`, `/admin` 으로 리다이렉트되어 홈 탭이 비활성으로 관측되는데, 이는 **기존 라우팅 동작**이며 active 로직 정상(게스트 `/` 에서 홈/커뮤니티 탭 active 확인).
 
-검증 계정: `docs/local/TEST-ACCOUNTS.local.md` (KPA `sohae2100@…`, GP/KCos/Neture `renagang21@…`).
+검증 계정: `docs/local/TEST-ACCOUNTS.local.md` (KPA `sohae2100@…`, KCos/Neture `renagang21@…`).
 
 ---
 
 ## 8. 회귀 위험 및 미조치 항목
 
 - **소비 shell**: KPA 5 · Neture 6 곳에서 각각 렌더되지만 컴포넌트 export 시그니처(props 없음)를 바꾸지 않아 shell 측 변경 0건.
-- 알림 라우팅 SSOT 이 KPA·Neture(서비스 로컬) / GP·KCos(공통 account-ui) 로 갈린 상태는 **WO 범위 밖** → 통합하지 않고 주입만 했다.
+- 알림 라우팅 SSOT 이 KPA·Neture(서비스 로컬) / KCos(공통 account-ui) 로 갈린 상태는 **WO 범위 밖** → 통합하지 않고 주입만 했다.
 - Neture 를 나머지 3개와 같은 primary 탭바 형태로 맞추지 않았다(WO §12).
 
 ---
 
 ## 9. 범위 밖 발견 (보고만)
 
-1. GlycoPharm `/privacy` 정책 API 404 (위 §7).
 2. 알림 라우팅 헬퍼 SSOT 2원화(서비스 로컬 vs `@o4o/account-ui`).
 3. 서비스 간 z-index(40/50)·배지 오프셋(−4/−6) 드리프트 — 이번에는 **의도적으로 보존**(디자인 재설계 금지 §9/§10). 통일 필요 시 별도 WO.
 

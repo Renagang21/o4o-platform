@@ -20,7 +20,7 @@
 
 ### 1-A. 코드 범위
 
-- `services/*` 전체 (web-kpa-society, web-glycopharm, web-k-cosmetics, web-neture, web-glucoseview, web-account, web-siteguide, signage-player-web, mobile-app, api-siteguide)
+- `services/*` 전체
 - `packages/*` 전체 (70+ 패키지)
 - `apps/api-server/` 백엔드 라우트·컨트롤러·서비스·엔티티
 - `apps/admin-dashboard/`, `apps/main-site/` UI
@@ -55,13 +55,11 @@ Your branch is up to date with 'origin/main'.
 nothing to commit, working tree clean
 ```
 
-- 세션 시작 시점에는 `services/web-glycopharm/src/api/appreciation.ts` · `services/web-k-cosmetics/src/api/appreciation.ts` 두 파일이 unstaged 였으나, 직전 커밋 `41c0c21a (feat(appreciation): WO-O4O-APPRECIATION-GLYCO-KCOS-MIGRATION-V1)` 에 포함되어 정리됨.
 - IR 작성 시점에는 unstaged 파일 없음.
 
 ### 2-A. 직전 커밋 컨텍스트
 
 ```
-41c0c21a feat(appreciation): WO-O4O-APPRECIATION-GLYCO-KCOS-MIGRATION-V1 — 6 page → AppreciationPanel 정렬
 f5a5d63c feat(cosmetics): WO-O4O-COSMETICS-ORG-REUSE-AND-ENROLLMENT-V1 — organization 재사용 + service enrollment 정렬
 d5ca30b6 feat(shared-space-ui): WO-O4O-APPRECIATION-PANEL-COMPONENT-EXTRACTION-V1 — 감사 포인트 공통 컴포넌트
 247a2f0b fix(neture): WO-O4O-NETURE-SELLER-UI-LABEL-ALIGNMENT-V1
@@ -76,13 +74,12 @@ d5ca30b6 feat(shared-space-ui): WO-O4O-APPRECIATION-PANEL-COMPONENT-EXTRACTION-V
 | 항목 | 값 |
 |------|------|
 | Unique 변경 파일 수 | 1,864 |
-| 가장 활발한 영역 | web-kpa-society / web-glycopharm / web-k-cosmetics / web-neture / api-server kpa routes |
+| 가장 활발한 영역 | — |
 | 활동 0 인 영역 | services/web-glucoseview · packages/cgm-glucoseview · admin-dashboard/src/pages/groupbuy · main-site/src/pages/groupbuy · packages/groupbuy-yaksa |
 
 ### 3-B. 활성 WO 테마 (최근 30 commits)
 
-1. **APPRECIATION** — GlycoPharm + K-Cosmetics 6 page → AppreciationPanel 통일 (`shared-space-ui`)
-2. **LMS PHASE 3** — GlycoPharm instructor parity
+1. **APPRECIATION** — K-Cosmetics 6 page → AppreciationPanel 통일 (`shared-space-ui`)
 3. **COSMETICS ORG REUSE / ENROLLMENT** — Store organization 중복 제거
 4. **STORE PRODUCTION TYPES COMMONIZATION** — `@o4o/types` canonical
 5. **NETURE UI / REGISTRATION 정렬** — Seller UI 라벨, business info
@@ -102,13 +99,11 @@ d5ca30b6 feat(shared-space-ui): WO-O4O-APPRECIATION-PANEL-COMPONENT-EXTRACTION-V
 | `apps/api-server/src/utils/cookie.utils.ts` (glucoseview 항목) | 0 (해당 라인 기준) | 매우 낮음 |
 | `apps/api-server/src/modules/partner/guards/partner-context.guard.ts` (line 59) | 0 (해당 라인 기준) | 매우 낮음 |
 | `services/web-kpa-society/src/api/mypage.ts` (groupbuy 항목) | 파일 자체는 touch (LMS 흐름) → 그러나 groupbuy 라인은 안전 | **낮음 — 라인 단위 작업 필요** |
-| `services/web-{glycopharm,k-cosmetics}/src/api/appreciation.ts` | **방금 커밋됨** | **HIGH (Hold)** |
 
 ### 3-D. 충돌 주의 대상 (요청서에서 지정)
 
 | 파일 | 상태 |
 |------|------|
-| `services/web-glycopharm/src/api/appreciation.ts` | 41c0c21a 에 커밋 완료. dead code 후보 아님. 단, **active WO 라인 — Hold** |
 | `services/web-k-cosmetics/src/api/appreciation.ts` | 41c0c21a 에 커밋 완료. dead code 후보 아님. 단, **active WO 라인 — Hold** |
 
 ---
@@ -151,7 +146,7 @@ d5ca30b6 feat(shared-space-ui): WO-O4O-APPRECIATION-PANEL-COMPONENT-EXTRACTION-V
 40+ 위치에서 동일 컴포넌트가 serviceKey 분기로 다르게 동작.
 
 대표 위치:
-- `apps/api-server/src/services/*PaymentEventHandler` — Neture / Glycopharm / KCosmetics / Lms (serviceKey 일치 시만 실행)
+- `apps/api-server/src/services/*PaymentEventHandler` — Neture / KCosmetics / Lms (serviceKey 일치 시만 실행)
 - `apps/api-server/src/services/event-offer-organization.helper.ts`
 - `packages/operator-core-ui/.../OperatorMembersConsolePage` — `memberships.find(m => m.serviceKey === serviceKey)`
 - `services/web-neture/.../UsersManagementPage`
@@ -210,7 +205,6 @@ d5ca30b6 feat(shared-space-ui): WO-O4O-APPRECIATION-PANEL-COMPONENT-EXTRACTION-V
 ### 4-J. Top 10 — naive grep 으로 가장 오탐 위험 높은 영역
 
 1. **Block Renderer type string lookups** (`blockRegistry.get('paragraph')`) — 50+ block 컴포넌트
-2. **ServiceKey-scoped payment event handlers** — Neture/Glyco/KCos/LMS
 3. **CMS View Registry lazy resolution** — 100+ view
 4. **Lazy route components** — 137+ in web-k-cosmetics 단독
 5. **Data-driven navigation configs**
@@ -268,7 +262,7 @@ d5ca30b6 feat(shared-space-ui): WO-O4O-APPRECIATION-PANEL-COMPONENT-EXTRACTION-V
 | # | 항목 | 검증 | 분류 |
 |---|------|------|------|
 | 11 | `services/web-kpa-society/src/pages/auth/RegisterPendingPage.tsx` | App.tsx / AdminRoutes / OperatorRoutes 어디에도 import 없음, barrel export 만 | Delete-likely |
-| 12 | `services/web-glycopharm/src/pages/forum/ForumFeedbackPage.tsx` | 라우트 등록 없음 | Delete-likely |
+| 12 | — | 라우트 등록 없음 | Delete-likely |
 | 13 | `services/web-neture/src/pages/PlatformPrinciplesPage.tsx` | 라우트 등록 없음 (대체: `/o4o/intro`) | Delete-likely |
 
 > 단, Frontend Audit 에이전트의 grep 범위가 lazy import 패턴을 모두 커버했는지 cleanup WO 시점에 재확인 필요.
@@ -313,8 +307,6 @@ d5ca30b6 feat(shared-space-ui): WO-O4O-APPRECIATION-PANEL-COMPONENT-EXTRACTION-V
 | 항목 | 사유 |
 |------|------|
 | `services/web-kpa-society/src/pages/pharmacy/LayoutBuilderPage.tsx` | StoreDashboardLayout 대체 여부 확정 필요 |
-| `services/web-glycopharm/src/pages/apply/PharmacistApplyPage.tsx` | PharmacyApplyPage 와 병행 — 역할 분기인지 legacy 인지 |
-| `services/web-glycopharm/src/api/storeHub.ts` 의 `/glycopharm/store-hub/*` 호출 | 백엔드 등록 미확인 |
 | `services/web-kpa-society/src/api/token-refresh.ts` | `@o4o/auth-client` 표준에서 벗어난 custom 구현 — 통일 필요성 검토 |
 | `o4o-ai-components` 패키지 | 3 컴포넌트 export, 0 consumer — 단, AI feature 후속 작업 예정 가능성 |
 | `cgm-pharmacist-app` | 5 reference (config/vite/admin-dashboard 경로만) — runtime 사용 여부 미확정 |
@@ -341,7 +333,6 @@ d5ca30b6 feat(shared-space-ui): WO-O4O-APPRECIATION-PANEL-COMPONENT-EXTRACTION-V
 
 - Phase R2 disabled 5 종 (§4-I) — `annualfee-yaksa`, `cosmetics-seller-extension`, `cosmetics-sample-display-extension`, `cosmetics-supplier-extension`, `reporting-yaksa`
 - yaksa-scheduler / membership-yaksa — 활성 KPA fee subsystem
-- `services/web-{glycopharm,k-cosmetics}/src/api/appreciation.ts` — 방금 커밋된 active WO 라인
 
 ---
 

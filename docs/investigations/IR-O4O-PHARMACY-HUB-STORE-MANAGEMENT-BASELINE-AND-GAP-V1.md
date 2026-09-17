@@ -156,7 +156,7 @@ KPA 는 `@o4o/` 패키지 **23개** 사용. Pharmacy-Hub 는 **2개**.
 
 | 기존 판정 | 근거 | 본 IR 재판정 | 사유 |
 |---|---|---|---|
-| store-owner 전용 대시보드 0 | 화면 없음 | **MISSING_BASE_FUNCTION** | O4O 매장 경영자에게 대시보드는 선택이 아니라 기본. KPA·GP·K-Cos 3서비스 모두 보유. `RoleEntryPage` 는 "후속 WO 예정"을 나열한 골격일 뿐이다. |
+| store-owner 전용 대시보드 0 | 화면 없음 | **MISSING_BASE_FUNCTION** | O4O 매장 경영자에게 대시보드는 선택이 아니라 기본. KPA·K-Cos 2서비스 모두 보유. `RoleEntryPage` 는 "후속 WO 예정"을 나열한 골격일 뿐이다. |
 | account 화면 0 | 화면 없음 | **MISSING_BASE_FUNCTION** | 내 정보·비밀번호 변경·알림은 로그인 사용자 기본 기능. `@o4o/account-ui` 에 `ProfileCard` / `SecuritySection` / `PasswordChangeModal` / `NotificationBell` / `MyPageLayout` 실재. |
 | `store-ui-core` NOT_APPLICABLE | 대응 화면 없음 | **REUSABLE_COMMON_CORE + NEEDS_ADAPTER** | 화면 부재가 곧 불필요는 아니다. `StoreDashboardLayout` 은 config 주입만으로 동작하며 3서비스가 이미 소비 중. `PHARMACY_HUB_STORE_CONFIG` 신설이 유일한 추가 작업. |
 | `account-ui` NOT_APPLICABLE | 대응 화면 없음 | **REUSABLE_COMMON_CORE** | 위와 동일. 화면 신설 시 그대로 소비 가능. |
@@ -229,13 +229,13 @@ service_memberships(active) + users + role_assignments(멱등 upsert)
 
 | # | 지점 | 현재 | 필요 작업 | 성격 |
 |---:|---|---|---|---|
-| A1 | [store-owner.utils.ts:37-56](apps/api-server/src/utils/store-owner.utils.ts#L37-L56) | `STORE_OWNER_ROLES_BY_SERVICE` = `{kpa, glycopharm, cosmetics}` · `STORE_OWNER_SCOPE_TO_MEMBERSHIP_KEY` 동일 3키 · `ALL_STORE_OWNER_ROLES` 도 3서비스 합집합 | `pharmacy-hub: ['pharmacy-hub:store_owner']` + membership key `'pharmacy-hub'` 추가 | **공용 모듈 변경 — Shared Module Change Protocol 적용 대상** |
+| A1 | [store-owner.utils.ts:37-56](apps/api-server/src/utils/store-owner.utils.ts#L37-L56) | `STORE_OWNER_SCOPE_TO_MEMBERSHIP_KEY` 동일 3키 · `ALL_STORE_OWNER_ROLES` 도 3서비스 합집합 | `pharmacy-hub: ['pharmacy-hub:store_owner']` + membership key `'pharmacy-hub'` 추가 | **공용 모듈 변경 — Shared Module Change Protocol 적용 대상** |
 | A2 | [StoreOwnerGuard.tsx:50-72](packages/store-ui-core/src/auth/StoreOwnerGuard.tsx#L50-L72) | `SERVICE_ROLES` = 3키. `StoreOwnerServiceKey` 타입도 3값 | `'pharmacy-hub'` 엔트리 추가 | 공용 패키지 |
 | A3 | [storeMenuConfig.ts](packages/store-ui-core/src/config/storeMenuConfig.ts) | 3개 서비스 config | `PHARMACY_HUB_STORE_CONFIG` 신설 (basePath `/store-owner` 또는 `/store` 확정 필요) | 신규 추가(기존 무영향) |
 | A4 | 매장 셸 wrapper | 없음 | `PharmacyHubStoreLayoutWrapper` (KPA `KpaStoreLayoutWrapper` / K-Cos `StoreLayoutWrapper` 패턴) | 서비스 코드 |
 | A5 | Capability | KPA `useStoreCapabilities` + `resolveStoreMenu` | Pharmacy-Hub capability 소스 정의 또는 필터 미적용 결정 | 정책 결정 필요 |
 
-> **A1·A2 경고:** 두 파일은 KPA / GlycoPharm / K-Cosmetics 3서비스가 공유하는 **공통 가드 SSOT** 다. 수정 시 `docs/baseline/O4O-SHARED-MODULE-CHANGE-PROTOCOL-V1.md` 절차(전체 소비처 식별 → 4서비스 영향 확인)를 반드시 선행해야 하며, Pharmacy-Hub-only 임시 분기로 해결해서는 안 된다.
+> **A1·A2 경고:** 두 파일은 KPA / K-Cosmetics 2서비스가 공유하는 **공통 가드 SSOT** 다. 수정 시 `docs/baseline/O4O-SHARED-MODULE-CHANGE-PROTOCOL-V1.md` 절차(전체 소비처 식별 → 4서비스 영향 확인)를 반드시 선행해야 하며, Pharmacy-Hub-only 임시 분기로 해결해서는 안 된다.
 
 ---
 

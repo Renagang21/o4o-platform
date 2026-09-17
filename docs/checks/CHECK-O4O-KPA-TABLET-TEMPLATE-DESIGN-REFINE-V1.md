@@ -28,7 +28,7 @@
 
 - 제품 템플릿: 헤더 → **제품** → 콘텐츠 → 하단 QR.
 - 그 외: 콘텐츠 → 제품 (기존과 동일 — 회귀 없음).
-- JSX 이동 없음 → 회귀 위험 최소. template-layout 분기는 screen set 소비(KPA)에서만 활성 → k-cosmetics/glycopharm 무영향.
+- JSX 이동 없음 → 회귀 위험 최소. template-layout 분기는 screen set 소비(KPA)에서만 활성 → k-cosmetics 무영향.
 
 **실측**: product_focus·product_grid_qr 모두 `제품 top(0) < 콘텐츠 top(456)` → 제품이 먼저. tsc 0 / build 0 / 배포 success.
 

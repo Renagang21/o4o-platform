@@ -70,7 +70,7 @@ POP / QR / 블로그 / 상품설명 / 사이니지 / 고객 안내문의 신규 
 
 ## 3. 공통 제작 골격 (현재 구현 — 준수 대상)
 
-3개 서비스(KPA reference · GlycoPharm · K-Cosmetics)가 공유하는 골격이며, 신규 대상은 이 골격을 재사용한다.
+2개 서비스(KPA reference · K-Cosmetics)가 공유하는 골격이며, 신규 대상은 이 골격을 재사용한다.
 
 | 골격 | 위치 | 역할 | 단계 |
 |------|------|------|:--:|
@@ -78,7 +78,7 @@ POP / QR / 블로그 / 상품설명 / 사이니지 / 고객 안내문의 신규 
 | Router state 표준 | `@o4o/types/production.ts` (`ProductionRouterState{ source, target, selectedTemplateId }`) | "자료함 → 제작 시작 → 대상" 라우팅 | ①② |
 | 공통 편집기/AI | `packages/content-editor/src/components/AiContentModal.tsx` | initialMode = pop/blog/store_qr/title_suggest | ③ |
 | RichTextEditor | `@o4o/content-editor` | manual 편집 | ③ |
-| 템플릿 레지스트리 | `productionTemplates.ts`(KPA) / `@o4o/types/production-template`(GP·KCos) | seed 템플릿 + systemPromptOverride/starterHtml/forcedOptions | ⑤ |
+| 템플릿 레지스트리 | `productionTemplates.ts`(KPA) / `@o4o/types/production-template`(KCos) | seed 템플릿 + systemPromptOverride/starterHtml/forcedOptions | ⑤ |
 | 산출물 테이블 | `store-execution-asset.entity.ts` | generated/uploaded 결과물(재편집 대상 아님) | ⑥ |
 
 ---
@@ -134,7 +134,7 @@ templateId          = 산출물 메타에만 저장 가능
 |------|------|------|
 | **POP** | ● Canonical 정합 | 모범 사례(§5) |
 | **블로그** | ● 대체로 정합 | 콘텐츠=게시물 이중 역할(허용). 템플릿은 렌더 시 적용 |
-| **QR** | ◐ 저장 구조 정합 | AI(qr_description)·통계 GP/KCos parity 후속. 단일 엔티티(콘텐츠+설정)는 자연스러움 |
+| **QR** | ◐ 저장 구조 정합 | AI(qr_description)·통계 KCos parity 후속. 단일 엔티티(콘텐츠+설정)는 자연스러움 |
 | **상품설명** | ◐ 콘텐츠 저장 O / 산출물 X | ⑥ 상품 상세 노출 경로 미정의. 신규 진입점 자료함 경유만(블로그와 비대칭) |
 | **사이니지** | ◐ 별도 패러다임 | 제작 골격 미편입, 편집기/AI/제작 템플릿 부재. canonical 편입 여부 후속 결정 |
 | **고객 안내문** | ✗ 부재 | 3서비스 메뉴·페이지·저장·산출물 없음. 구현/보류 결정 필요 (operator `/operator/guide-contents`는 LMS 교육용으로 별개) |
@@ -154,14 +154,14 @@ templateId          = 산출물 메타에만 저장 가능
 4. 재사용 가능한 용도별 콘텐츠로 저장되는가? (④ 대상별 재편집 테이블)
 5. 템플릿은 언제 적용되는가?               (⑤ 산출물 생성 시점이어야 함)
 6. 실사용 산출물은 어디에 저장되는가?       (⑥ store_execution_assets 또는 대상별 출력)
-7. 서비스 간 parity는 맞는가?              (KPA/GP/KCos)
+7. 서비스 간 parity는 맞는가? (KPA/KCos)
 ```
 
 **Drift 신호:**
 - 산출물만 저장하고 재사용 콘텐츠가 없다 → §2.1 위반 (C 경향).
 - 템플릿이 재사용 콘텐츠에 영구 결합된다 → §2.3 위반.
 - 대상마다 저장 모델이 제각각이다 → D(기능별 drift).
-- KPA만 있고 GP/KCos에 없다 → E(서비스 drift).
+- KPA만 있고 KCos에 없다 → E(서비스 drift).
 
 ---
 
@@ -172,7 +172,7 @@ templateId          = 산출물 메타에만 저장 가능
 | P2 | `WO-O4O-PRODUCT-DESCRIPTION-PRODUCTION-FLOW-AUDIT-V1` | 상품설명 ⑥ 산출물 경로 확정 + 신규 진입점 + derivation parity |
 | P2 | `WO-O4O-EDITOR-TO-TARGET-CONTENT-SAVE-STANDARD-V1` | "용도별 콘텐츠 저장" 공통 계약 표준화 (D 해소) |
 | P3 | `WO-O4O-SIGNAGE-AND-NOTICE-PRODUCTION-FLOW-AUDIT-V1` | 사이니지 canonical 편입 여부 + 고객 안내문 구현/보류 결정 |
-| P3 | `WO-O4O-QR-FLOW-ALIGNMENT-TO-CANONICAL-V1` | QR AI·통계 GP/KCos parity, 템플릿 레지스트리 경로 통일 (E 잔여) |
+| P3 | `WO-O4O-QR-FLOW-ALIGNMENT-TO-CANONICAL-V1` | QR AI·통계 KCos parity, 템플릿 레지스트리 경로 통일 (E 잔여) |
 
 > POP/블로그는 이미 정합 → 별도 alignment WO 불요(모범 사례로 인용).
 

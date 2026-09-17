@@ -25,7 +25,7 @@
  *   해석하므로 두 API 가 서로 다른 매장을 보게 된다(취급제품 local 8건 vs 자체상품 0건).
  *
  * API Namespace
- *   서비스 스코프 : /api/v1/{kpa|cosmetics|glycopharm}/store/local-products  (canonical)
+ *   서비스 스코프 : /api/v1/{kpa|cosmetics}/store/local-products  (canonical)
  *   서비스 중립   : /api/v1/store/local-products                             (back-compat)
  *
  * ┌──────────────────────────────────────────────────────┐

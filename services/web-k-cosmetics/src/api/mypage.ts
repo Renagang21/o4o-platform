@@ -1,7 +1,6 @@
 /**
  * K-Cosmetics MyPage API — 내 신청 내역 + 매장/사업자 정보
  *
- * WO-O4O-MYPAGE-MY-REQUESTS-INBOX-GLYCO-KCOS-ROUTE-V1
  * WO-O4O-KCOSMETICS-STORE-PROFILE-EDIT-PAGE-V1
  *
  * Sources:

@@ -2,22 +2,20 @@
 
 > **Type:** Investigation (read-only). 코드/Guide/route 무변경.
 > **Date:** 2026-06-09
-> **Scope:** KPA Society · GlycoPharm · K-Cosmetics 매장 제작물 흐름(QR/POP/블로그/사이니지/타블렛/제작자료)의 Guide 반영 위치 조사
+> **Scope:** KPA Society · K-Cosmetics 매장 제작물 흐름(QR/POP/블로그/사이니지/타블렛/제작자료)의 Guide 반영 위치 조사
 > **기준 IR:** `docs/investigations/IR-O4O-STORE-GUIDE-REAL-WORKFLOW-AUDIT-V1.md`
 
 ---
 
 ## 1. 조사 목적
 
-실제 매장 제작 기능을 가진 3개 서비스(KPA / GlycoPharm / K-Cosmetics)에서, 매장 경영자가
+실제 매장 제작 기능을 가진 2개 서비스(KPA / K-Cosmetics)에서, 매장 경영자가
 QR · POP · 블로그 · 사이니지 · 타블렛 · 제작자료를 실제 업무 흐름으로 어떻게 쓰는지 확인하고,
 그 흐름을 **Guide 어디에 어떻게 반영해야 하는지** 위치와 방식을 제안한다. 조사 전용 — 코드/문안
 수정 없음. Neture 는 기준 서비스가 아니며, 실제 제작 기능을 가진 위 3개가 기준이다.
 
 ## 2. 조사 범위
 
-- `services/web-kpa-society/src`, `services/web-glycopharm/src`, `services/web-k-cosmetics/src`
-- 각 서비스의 Guide copy: `packages/shared-space-ui/src/guide/copy/{kpa,glycopharm,k-cosmetics}.ts`
 - 제작 화면(QR/POP/블로그/사이니지/타블렛/제작자료) 존재·route·메뉴·API·FE 완성도
 - Guide 구조(Home/Features/역할 Guide), Workspace→Guide 백링크, 문안 A~E 분류
 
@@ -66,39 +64,6 @@ QR · POP · 블로그 · 사이니지 · 타블렛 · 제작자료를 실제 �
 
 - **Workspace → Guide 백링크: 부재**(GuideBackLink 컴포넌트 미발견).
 
-## 6. GlycoPharm 기능 현황
-
-| 항목 | 화면 | route | API | FE |
-|------|------|-------|:---:|:--:|
-| QR | `pages/store/StoreQrPage.tsx` (625L) | `/store/marketing/qr` | ✅ (`/glycopharm/pharmacy/qr` CRUD+image) | **완성(미완 아님, 확정)** |
-| POP | `pages/store-management/StorePopPage.tsx` (588L) | `/store/marketing/pop` | ✅ (supplier-items·AI·generate) | 완성(3-step, A4/A5·템플릿4) |
-| 블로그 | `StoreBlogPage`(공개)·`PharmacyBlogPage`(`/store/content/blog`) | `/store/:slug/blog`, `/store/content/blog` | ✅ | 완성 |
-| 사이니지 | `store-management/signage/StoreSignageMainPage.tsx` | `/store/marketing/signage/{playlist,videos,schedules,play,player}` | ✅ (Playlist CRUD·snapshot) | 완성(편성/재생 분리) |
-| 타블렛 | `store-management/StoreTabletDisplaysPage.tsx` | `/store/commerce/tablet-displays` | ✅ (displays·idle playlist) | 완성 |
-| 제작자료 | `store-management/StoreProductionMaterialsPage.tsx` | `/store/library/production-materials` | ✅ (`getStoreExecutionAssets`·DerivationViewer) | 완성 |
-
-- **QR FE 미완 여부 최종 판정: 완성됨(미완 아님).** CRUD+이미지 다운로드+상태관리+route+메뉴 모두 구현,
-  TODO/WIP 주석 없음. → Guide 에서 완료 기능으로 기술 **안전**.
-- cross-link: QR/POP/사이니지 각 연결은 있으나 **단계형 통합 흐름은 미설명**.
-
-## 7. GlycoPharm Guide 현황
-
-- Guide 구조: `/guide/intro` · `/guide/usage`(7 step) · `/guide/features`(6 카테고리) + `/guide/features/signage`.
-  **역할 Guide(store-owner) 없음** — KPA 와 달리 usage 기반.
-
-| 매체 | Guide 위치 | 분류 |
-|------|-----------|:----:|
-| QR | `/guide/usage` step 03 + `/guide/features` step 06(QR·Tablet) | **A** |
-| 사이니지 | `/guide/features/signage` + usage step 07 | **A** |
-| 타블렛 | usage step 04(고객 요청) + features step 06 | **A** |
-| POP | 없음(완성 기능인데 Guide 전무) | **D** |
-| 블로그 | 없음(콘텐츠에만 섞임) | **D** |
-| 제작자료 | 없음 | **D** |
-| 단계형 제작 흐름 | 없음 | **D** |
-
-- Workspace → Guide 백링크: **부재**.
-- 정직성 위반(E): **없음**(미구현을 완료로 기술하는 사례 없음).
-
 ## 8. K-Cosmetics 기능 현황
 
 | 항목 | 화면 | route | API | FE |
@@ -138,19 +103,19 @@ QR · POP · 블로그 · 사이니지 · 타블렛 · 제작자료를 실제 �
 
 ## 10. QR 제작 흐름 반영 위치
 
-- KPA: `/guide/features/qr`(A) — **기준 템플릿**. GlycoPharm: usage/features(A) 양호.
+- KPA: `/guide/features/qr`(A) — **기준 템플릿**.
 - K-Cosmetics: usage step 03(B) — 유형(Link/Product/Promotion/Page) 미명시. **상세화 필요**.
 - **반영안**: 3사 공통 "QR 생성 → 대상 선택 → 출력·부착 → 스캔 분석" 흐름. KCos 만 문안 상세화(코드 아님, copy).
 
 ## 11. POP 제작 흐름 반영 위치
 
-- **3사 모두 POP 기능 완성**이나 Guide 공백: KPA(B, 1줄) · GlycoPharm(D, 전무) · KCos(B, 간단).
+- **3사 모두 POP 기능 완성**이나 Guide 공백: KPA(B, 1줄) · KCos(B, 간단).
 - **반영안**: 신규 feature Guide `/guide/features/pop`(자료 선택 → AI 문구 → 템플릿/레이아웃 → QR 연결 → PDF 출력)을
-  3사에 동일 구조로 추가. **GlycoPharm 이 가장 시급**(완성 기능인데 Guide 0).
+  3사에 동일 구조로 추가.
 
 ## 12. 블로그 제작 흐름 반영 위치
 
-- 공백: KPA(B, 작성 경로 모호) · GlycoPharm(D) · KCos(D, 작성 UI는 가장 명확 `StoreBlogManagePage`).
+- 공백: KPA(B, 작성 경로 모호) · KCos(D, 작성 UI는 가장 명확 `StoreBlogManagePage`).
 - **반영안**: `/guide/features/blog`(작성 → 발행/보관 → 공개 URL → QR/사이니지 연결)을 KCos 작성 UI 기준으로 표준화.
   KPA 는 매장 블로그 **작성 화면 위치 확정(코드 확인)** 선행 필요.
 
@@ -161,13 +126,12 @@ QR · POP · 블로그 · 사이니지 · 타블렛 · 제작자료를 실제 �
 
 ## 14. 타블렛/태블릿 활용 흐름 반영 위치
 
-- **중요 구분**: Neture 는 타블렛이 "활용 개념 안내"였으나, **KPA/GlycoPharm/KCos 는 실기능**(고객 화면 + 진열 설정 + 관심/상담 요청).
-- KPA(A)·GlycoPharm(A) 양호. **KCos(D)** 공백 — 기능 있는데 Guide 0.
+- KPA(A) 양호. **KCos(D)** 공백 — 기능 있는데 Guide 0.
 - **반영안**: KCos 에 타블렛 Guide(진열 구성 → 고객 관심 신청 → 직원 처리) 추가. 문구는 "실기능"으로 기술(개념 안내 아님).
 
 ## 15. 제작자료 재사용 흐름 반영 위치
 
-- **3사 모두 제작자료 화면 완성**이나 Guide 공백: KPA(B) · GlycoPharm(D) · KCos(D).
+- **3사 모두 제작자료 화면 완성**이나 Guide 공백: KPA(B) · KCos(D).
 - **반영안**: `/guide/features/production-materials`(결과 조회 → 원본↔파생 추적 → 재사용/재제작 → 삭제).
   KPA `StoreProductionMaterialsPage`(direct+generated+qr+blog 통합 + CROSS_CREATE)가 기준 모델.
 
@@ -176,7 +140,6 @@ QR · POP · 블로그 · 사이니지 · 타블렛 · 제작자료를 실제 �
 | 서비스 | cross-link 실재 | Guide 설명 |
 |--------|----------------|-----------|
 | KPA | 부분(제작자료 CROSS_CREATE + derivation 추적) | 없음(D) |
-| GlycoPharm | 부분(개별 연결만, 통합 흐름 없음) | 없음(D) |
 | K-Cosmetics | 부분(Hub Library 경유 + state prefill) | 없음(D) |
 
 - **반영안**: 역할 Guide(store-owner)에 "제작 흐름 한눈보기"(원천 → 제작자료 → POP/QR/블로그/사이니지 → 고객 노출)
@@ -202,7 +165,7 @@ QR · POP · 블로그 · 사이니지 · 타블렛 · 제작자료를 실제 �
 2. `/guide/features/blog` 신규(3사).
 3. `/guide/features/production-materials` 신규(3사).
 4. K-Cosmetics `/guide/features/tablet` 신규(타블렛 D 해소).
-5. GlycoPharm/K-Cosmetics 역할 Guide `/guide/for/store-owner` 신설(KPA 패턴 이식) — 제작 흐름 통합 진입.
+5. K-Cosmetics 역할 Guide `/guide/for/store-owner` 신설(KPA 패턴 이식) — 제작 흐름 통합 진입.
 6. 공통 `GuideBackLink` 컴포넌트(@o4o/store-ui-core) + 3사 제작 화면 주입.
 7. (선행 조사) KPA **매장 블로그 작성 화면 위치/완성도 확정** — 작성 UI 경로 모호.
 
@@ -211,24 +174,24 @@ QR · POP · 블로그 · 사이니지 · 타블렛 · 제작자료를 실제 �
 | 우선 | WO 후보 | 내용 | 유형 |
 |:---:|---------|------|------|
 | P0 | `WO-O4O-KCOS-GUIDE-COMMERCE-HONESTY-FIX-V1` | KCos commerce 미완 문안 정정 | copy-only |
-| P1 | `WO-O4O-STORE-GUIDE-POP-FLOW-V1` (KPA 우선 → GP/KCos) | POP feature Guide 신설 | code(copy+route) |
+| P1 | `WO-O4O-STORE-GUIDE-POP-FLOW-V1` (KPA 우선 → KCos) | POP feature Guide 신설 | code(copy+route) |
 | P1 | `WO-O4O-STORE-GUIDE-PRODUCTION-MATERIALS-FLOW-V1` (KPA 우선) | 제작자료 Guide + cross-link 흐름 | code |
 | P2 | `WO-O4O-STORE-GUIDE-BLOG-FLOW-V1` | 블로그 작성 Guide(KCos UI 기준), KPA 작성 화면 확정 선행 | code |
 | P2 | `WO-O4O-STORE-GUIDE-BACKLINK-V1` | 공통 GuideBackLink(3사) — Shared Module Protocol | code(공통모듈) |
-| P3 | `WO-O4O-GLYCO-KCOS-STORE-OWNER-ROLE-GUIDE-V1` | store-owner 역할 Guide 이식(KPA 패턴) | code |
+| P3 | — | store-owner 역할 Guide 이식(KPA 패턴) | code |
 | P3 | `WO-O4O-KCOS-GUIDE-TABLET-FLOW-V1` | KCos 타블렛 Guide 신설 | code |
 
 > **KPA 우선 원칙**(CLAUDE.md §13 reference implementation): 모든 제작 흐름 Guide 는 KPA 에서 먼저
-> 표준을 확정한 뒤 GlycoPharm/K-Cosmetics 로 이식한다.
+> 표준을 확정한 뒤 K-Cosmetics 로 이식한다.
 
 ## 21. 최종 판정
 
-1. **제작 기능 자체는 3사 모두 충실**(QR/POP/블로그/사이니지/타블렛/제작자료 FE 완성). GlycoPharm **QR FE 완성 확정**.
+1. **제작 기능 자체는 3사 모두 충실**(QR/POP/블로그/사이니지/타블렛/제작자료 FE 완성).
 2. **공통 Guide 공백**: POP · 블로그 · 제작자료 전용 Guide 부재, 제작물 **cross-link 통합 흐름** 미설명,
    **Workspace→Guide 백링크 3사 전무**.
 3. **정직성 리스크**: K-Cosmetics commerce 미구현인데 Guide 가 완료처럼 기술(**E**) → **P0 즉시 정정**.
 4. **반영 방식**: 매체별 feature Guide(`/guide/features/{pop,blog,production-materials,tablet}`)를 신설하되
-   **KPA 에서 표준 확정 후 3사 이식**. 역할 Guide(store-owner)는 KPA 만 보유 → GP/KCos 이식은 P3.
+   **KPA 에서 표준 확정 후 3사 이식**. 역할 Guide(store-owner)는 KPA 만 보유 → KCos 이식은 P3.
 5. **타블렛은 3사에서 실기능**이므로 Neture 식 "활용 개념 안내"가 아닌 실기능 기술로 작성.
 6. 실제 Guide 보강 착수는 **KPA 기준 우선**이 가장 안전.
 

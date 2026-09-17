@@ -97,20 +97,6 @@ user.roles.some(r => allowedRoles.includes(r))
 
 ## 4. Backend API 보호 구조
 
-### GlycoPharm Store API (`/api/v1/glycopharm/stores`)
-
-| 유형 | 보호 수준 |
-|------|---------|
-| 상품 조회 (GET) | Public (4-gate visibility) |
-| 스토어 설정 변경 (PUT) | `authenticate` + `created_by_user_id === userId` |
-| 관리 기능 | `requireGlycopharmScope` |
-
-### GlycoPharm Pharmacy API (`/api/v1/glycopharm/pharmacy`)
-
-| 유형 | 보호 수준 |
-|------|---------|
-| 상품/주문/고객 조회 | `requireAuth` + `created_by_user_id` 기반 필터 |
-
 ### 소유권 검증 패턴
 
 ```typescript

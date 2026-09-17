@@ -91,7 +91,7 @@
 - `success: true`
 - `data.user.id`: `cfd2a5e7-db28-4842-bd5c-4814cba49ca5`
 - `data.user.email`: `sohae2100@gmail.com`
-- `data.user.roles`: 10 role (`kpa:store_owner`, `platform:super_admin`, `cosmetics:admin/operator`, `glycopharm:admin/operator`, **`kpa:admin`**, **`kpa:operator`**, `neture:admin/operator`)
+- `data.user.roles`: 10 role (`kpa:store_owner`, `platform:super_admin`, `cosmetics:admin/operator`, **`kpa:admin`**, **`kpa:operator`**, `neture:admin/operator`)
 - `Set-Cookie: accessToken=...` (HttpOnly, Secure, SameSite=None, Max-Age=900)
 - `Set-Cookie: refreshToken=...` (Max-Age=604800, tokenFamily 포함)
 - `Set-Cookie: sessionId=...`
@@ -273,7 +273,6 @@ backend response 에 `operatorRoleGuideCard` / `roleGuideCard` 키 없음. **I1 
 ### 9.1 사용 계정
 
 - email: sohae2100@gmail.com
-- roles: `['kpa:store_owner', 'platform:super_admin', 'cosmetics:admin', 'cosmetics:operator', 'glycopharm:admin', 'glycopharm:operator', 'kpa:admin', 'kpa:operator', 'neture:admin', 'neture:operator']`
 - 본 검증 관련 role: **`kpa:admin`** + **`platform:super_admin`** 보유 → backend `isAdmin = true` 분기 트리거
 
 ### 9.2 isAdmin 분기 결과
@@ -334,7 +333,7 @@ frontend `operatorApi.getSummary()` export 유지 → home/news/forum router 등
 | KPA operator menu 링크 (정적 코드) | ✅ 변경 0 (operatorMenuGroups.ts 미수정) |
 | Signage hq-media 링크 | ✅ Quick Actions / Axis links 모두 `/operator/signage/hq-media` 정합 |
 | Member / content / forum / signage Quick Action 링크 | ✅ 12개 모두 정상 path (deployed response 확인) |
-| Neture / GlycoPharm / K-Cosmetics source 변경 | ✅ 본 CHECK 범위 외 (외부 세션 트랙은 별도 영역) |
+| Neture / K-Cosmetics source 변경 | ✅ 본 CHECK 범위 외 (외부 세션 트랙은 별도 영역) |
 | Care / GlucoseView 재오염 | ✅ 없음 |
 | KPA route / menu 변경 | ✅ 없음 |
 | DB / migration | ✅ 0 |
@@ -360,8 +359,8 @@ frontend `operatorApi.getSummary()` export 유지 → home/news/forum router 등
 ### 13.3 외부 세션 트랙 정합
 
 본 CHECK 시점 외부 세션 작업 (최근):
-- `2b9f64adb` fix(glycopharm): checkout+storefront OPL serviceKey legacy 'kpa-society' literal → Option β
-- `f81ba03e0` / `39847309a` / `b4f56fc1b` / `4cf89b90d` (GlycoPharm /business + store-hub b2b 트랙)
+- `2b9f64adb` fix: checkout+storefront OPL serviceKey legacy 'kpa-society' literal → Option β
+- `f81ba03e0` / `39847309a` / `b4f56fc1b` / `4cf89b90d` (business + store-hub b2b 트랙)
 
 → 모두 KPA 5-Block 영역 외 별도 트랙. 본 CHECK 와 영역 분리.
 
@@ -441,7 +440,7 @@ frontend `operatorApi.getSummary()` export 유지 → home/news/forum router 등
 | **콘솔 / 네트워크 오류 결과** | 검증 범위 내 4xx/5xx 0. 화면 콘솔 / pageerror 는 사용자 manual smoke 권장 (선택) |
 | **Write action 없음 확인** | ✅ (read-only — login + GET 3개만 호출) |
 | **Source file 수정 없음 확인** | ✅ |
-| **다른 세션 WIP 미포함 확인** | ✅ working tree clean (외부 세션 GlycoPharm 트랙 main merge 완료) |
+| **다른 세션 WIP 미포함 확인** | ✅ working tree clean |
 | **CHECK 문서 commit 여부** | **사용자 승인 대기** — 본 CHECK 문서 1개만 path-restricted commit 예정 |
 
 ---

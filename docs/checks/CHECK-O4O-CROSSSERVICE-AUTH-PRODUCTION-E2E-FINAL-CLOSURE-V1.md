@@ -2,9 +2,8 @@
 
 - **작업일**: 2026-08-14
 - **기준**: `origin/main` (착수 `f004f5df2` → 수정 커밋 `4e62945ad`)
-- **성격**: production E2E 마감 + GlycoPharm return URL 결함 최소 수정
-- **핵심 결론**: 공식 4서비스 + GlycoPharm 의 **정상 로그인 · return URL · 세션 복구 10/10 PASS**.
-  선행 WO 에서 미확정이던 **GlycoPharm return URL 결함의 원인을 실증 확정하고 수정·배포·production 재검증까지 완료**했다.
+- **성격**: production E2E 마감 return URL 결함 최소 수정
+- **핵심 결론**: 공식 3서비스 의 **정상 로그인 · return URL · 세션 복구 10/10 PASS**.
   UI 로그아웃 9/10(PH 모바일 1건 미확정). 신규 발견 1건(**rejected 계정 상태 오표기**)은 backend 계약 변경이 필요해 분리한다.
 
 ---
@@ -33,7 +32,7 @@
 
 | 시도 | 결과 |
 |---|---|
-| MAIN × `neture` / `kpa-society` / `k-cosmetics` / `glycopharm` / `pharmacy-hub` | **200 × 5** · `accountAccess=normal` · 토큰 발급 |
+| MAIN × `neture` / `kpa-society` / `k-cosmetics` / `pharmacy-hub` | **200 × 5** · `accountAccess=normal` · 토큰 발급 |
 | MAIN neture 비밀번호 × `kpa-society` (교차) | **401 `INVALID_CREDENTIALS`** — 토큰 없음 |
 | NOTMEMBER × `kpa-society` (membership 없음) | **401 `SERVICE_NOT_MEMBER`** |
 | PENDING × `neture` | **200** · `accountAccess=restricted` (제한 로그인) |
@@ -52,7 +51,6 @@
 | KPA-Society | `/mypage` | ✅✅ | ✅✅ | ✅✅ | ✅✅ menu | ✅✅ | 0 |
 | K-Cosmetics | `/mypage` | ✅✅ | ✅✅ | ✅✅ | ✅✅ direct | ✅✅ | 0 |
 | PharmacyHub | `/store-owner` | ✅✅ | ✅✅ | ✅✅ | ✅ / ⚠️ | ✅✅ | 0 |
-| GlycoPharm | `/mypage` | ✅✅ | ✅✅ | ✅✅ | ✅✅ direct | ✅✅ | 0 |
 
 (각 칸 = desktop / mobile)
 
@@ -62,56 +60,11 @@
 - ⚠️ **PharmacyHub 모바일 로그아웃 1건 미확정** — 로그아웃 버튼이 DOM 에는 있으나 클릭 도달에 실패했다
   (모바일에서 사이드바가 접혀 화면 밖에 있는 것으로 추정). **결함으로 단정하지 않는다** — §6-2.
 
-### 3-1. Neture · GlycoPharm 의 보호 화면 동작 (정상)
+### 3-1. Neture 의 보호 화면 동작 (정상)
 
 두 서비스의 `/mypage` 는 `/login` 으로 **바운스하지 않고** 같은 URL 에서 "로그인이 필요합니다" 안내 +
 로그인 진입 버튼을 렌더한다. 버튼을 눌러 모달로 로그인하면 그 자리에 머문다 → **return URL 요건 충족**.
 초기 측정에서 실패로 보인 것은 하네스가 이 UX 를 따라가지 못한 것이었고, 제품 결함이 아니다.
-
----
-
-## 4. GlycoPharm return URL 결함 — 원인 확정 · 수정 · 배포 · 재검증 (WO §4)
-
-### 4-1. 선행 WO 상태
-
-"`/store-hub` → 로그인 → `/store` 착지"라는 **사실**만 확인되고 원인은 추정으로 남아 있었다.
-
-### 4-2. 원인 확정 (계측)
-
-```text
-/store-hub → GlycoHubGuard (state.from 보존) → /login
-           → LoginGate: sessionStorage['glycopharm_login_return_url'] = "/store-hub"   ← 저장 정상
-           → / + 로그인 모달
-로그인 성공 → sessionStorage 값이 **null 로 비워짐** = LoginModal 이 소비하고 navigate("/store-hub") 수행
-           → 그런데 최종 URL 은 "/store"
-```
-
-키가 소비됐다는 것이 결정적 증거다 — **모달은 제 일을 했고, 그 뒤에 다른 네비게이터가 덮었다.**
-
-`PostLoginRedirect` 와 `LoginModal` 이 **같은 auth 상태 변화에 함께 반응하는 레이스**다.
-`PostLoginRedirect` 는 "`/` 또는 `/login` 에서만 redirect" 로 가드하지만, 모달의 `navigate` 보다
-먼저 실행되면 pathname 이 아직 `/` 라 가드를 통과해 역할 대시보드로 보내 버린다.
-
-### 4-3. 최소 수정
-
-| 파일 | 변경 |
-|---|---|
-| `services/web-glycopharm/src/components/common/LoginModal.tsx` | returnUrl 로 명시 이동할 때 `sessionStorage[LOGIN_EXPLICIT_NAV_KEY]='1'` 표시 |
-| `services/web-glycopharm/src/App.tsx` | `PostLoginRedirect` 가 그 플래그를 보면 **1회 건너뛰고** 플래그 제거 |
-
-- 기존 pathname 가드는 **그대로 두었다**(제거하지 않음).
-- 상수는 `LOGIN_RETURN_URL_KEY` 와 동일한 **로컬 상수 패턴**을 따랐다 — App 이 LoginModal 을 import 하므로 역방향 import 는 순환이 된다.
-- 다른 서비스 코드 무변경. 커밋 `4e62945ad`.
-
-### 4-4. 배포 후 production 재검증 — **PASS**
-
-```text
-bounce: /            sessionStorage: "/store-hub"
-로그인 후 URL: /store-hub   sessionStorage 잔존: null
-returnUrl 복원: true
-```
-
-`Deploy Web Services (Cloud Run)` `4e62945ad` **completed / success** 후 실측. 회귀 확인용 전체 E2E 재실행에서도 10/10 유지.
 
 ---
 
@@ -159,8 +112,6 @@ desktop 은 정상 동작한다. **결함으로 확정하지 않는다** — 햄
 
 | 대상 | 명령 | rc |
 |---|---|:---:|
-| `web-glycopharm` | `tsc -b` | **0** (error 0) |
-| `glycopharm-web` | `pnpm build` | **0** |
 | `web-kpa-society` | `pnpm build` | **0** |
 | `web-k-cosmetics` | `pnpm build` | **0** |
 | `pharmacy-hub-web` | `pnpm build` | **0** |
@@ -194,7 +145,6 @@ desktop 은 정상 동작한다. **결함으로 확정하지 않는다** — 햄
 | return URL | **PASS** (10/10) |
 | `SERVICE_NOT_MEMBER` · pending | **PASS** |
 | rejected | **결함 발견** (§6-1 — backend 계약 변경 필요) |
-| GlycoPharm return URL 회귀 해소 | **PASS** (원인 확정 · 수정 · 배포 · 재검증) |
 | 서비스 간 credential 영향 0 | **PASS** |
 | dead link · white screen · 무한 redirect · JS exception 0 | **PASS** |
 | 테스트 계정 정리 | **PASS** (4/4 suspended) |

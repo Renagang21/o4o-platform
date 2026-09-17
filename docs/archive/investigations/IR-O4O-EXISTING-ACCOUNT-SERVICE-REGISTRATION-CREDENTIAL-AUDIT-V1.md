@@ -28,7 +28,7 @@ Identity V2에서는 `service_credentials` 테이블로 서비스별 독립 Cred
 - 신규 가입 시 service_credentials 생성 ✅
 - 로그인 시 service_credentials 우선, users.password fallback ✅
 - password reset / change 시 service_credentials 갱신 ✅
-- KPA + GlycoPharm 서비스별 비밀번호 독립 동작 확인 ✅
+- KPA 서비스별 비밀번호 독립 동작 확인 ✅
 
 ---
 
@@ -67,12 +67,10 @@ password: string    // 하나의 필드 — 기존 계정 확인 + 새 서비스
 
 | 서비스 | check-email 호출 | existingAccountMode | 비밀번호 필드 (기존 계정 시) | 새 서비스 비밀번호 필드 |
 |--------|:---:|:---:|:---:|:---:|
-| **GlycoPharm** | ✅ | ✅ | 1개 ("기존 비밀번호") | ❌ 없음 |
 | **K-Cosmetics** | ✅ | ✅ | 1개 ("기존 비밀번호") | ❌ 없음 |
 | **Neture** | ✅ | ✅ | 1개 ("기존 비밀번호") | ❌ 없음 |
 | **KPA-Society** | ❌ 없음 | ❌ 없음 | 항상 2개 (강도 체크) | — |
 
-**GlycoPharm / K-Cosmetics / Neture 공통 패턴:**
 - 이메일 blur → `check-email` API → `exists=true, alreadyJoined=false`이면 `existingAccountMode=true`
 - 라벨: `"비밀번호"` → `"기존 비밀번호"`
 - 비밀번호 강도 체크 숨김
@@ -128,7 +126,7 @@ V2 원칙 완성을 위해서는 분리가 필요하다.
 장기적으로는:
 - O4O 각 서비스는 독립 사업자 성격 → 서비스별 비밀번호 독립성이 정책 원칙
 - 사용자에게 "다른 서비스니까 비밀번호를 다르게 설정하실 수 있습니다"를 명확히 해야 함
-- 특히 KPA-Society (의약사 전용) vs GlycoPharm (일반 약국) 간 계정 보안 독립성 중요
+- 특히 KPA-Society (의약사 전용) 간 계정 보안 독립성 중요
 
 ### Q5: service_credentials가 이미 분리된 상태에서 가입 UX만 V1에 남아 있는가?
 
@@ -264,7 +262,7 @@ hashPassword(data.servicePassword)                            // 새 Credential 
 
 ## 8. Frontend 변경 범위 (Option B 기준)
 
-### 공통 패턴 변경 (GlycoPharm, K-Cosmetics, Neture)
+### 공통 패턴 변경 (K-Cosmetics, Neture)
 
 각 `RegisterPage.tsx` / `RegisterModal.tsx` 에서:
 
@@ -318,7 +316,7 @@ hashPassword(data.servicePassword)                            // 새 Credential 
 
 | 원칙 | 현재 상태 | 판정 |
 |------|-----------|------|
-| 각 서비스는 독립 사업자 성격 | KPA/GlycoPharm/Cosmetics/Neture 각각 독립 | ✅ |
+| 각 서비스는 독립 사업자 성격 | — | ✅ |
 | 서비스별 Credential 독립성 | `service_credentials` 분리됨, **그러나 가입 시 기존 비밀번호 복제** | ⚠️ 부분 충돌 |
 | 기존 계정 확인과 새 서비스 가입 권한 분리 | 현재 같은 `password` 필드 겸용 | ❌ 미분리 |
 | 서비스별 password 독립 설정 가능성 | 가입 이후 change-password로 가능, **가입 시점은 불가** | ⚠️ 제한적 |
@@ -350,19 +348,15 @@ hashPassword(data.servicePassword)                            // 새 Credential 
 **범위:**
 1. `register.dto.ts` — `currentPassword`, `servicePassword` 필드 추가 (기존 `password` 유지)
 2. `auth-register.controller.ts` — 기존 사용자 분기: `currentPassword`로 확인, `servicePassword`를 Credential에 저장
-3. GlycoPharm / K-Cosmetics / Neture `RegisterPage.tsx` / `RegisterModal.tsx` — existingAccountMode UI 확장
+3. K-Cosmetics / Neture `RegisterPage.tsx` / `RegisterModal.tsx` — existingAccountMode UI 확장
 4. KPA-Society `RegisterModal.tsx` — existingAccount 감지 추가 또는 별도 처리 설계
 
 **검증 시나리오:**
 ```
-KPA 계정 (email=A, KPA_password=P1)으로 GlycoPharm 추가 가입:
   currentPassword = P1 → 본인 확인 성공
-  servicePassword = P2 → GlycoPharm service_credentials에 P2 hash 저장
 
 로그인 검증:
   KPA + P1 → 성공 ✅
-  GlycoPharm + P2 → 성공 ✅
-  GlycoPharm + P1 → 실패 ✅  (service_credentials에 P2만 있음)
   KPA + P2 → 실패 ✅
 ```
 

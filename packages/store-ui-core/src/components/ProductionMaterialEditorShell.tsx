@@ -3,7 +3,7 @@
  *
  * WO-O4O-PRODUCTION-MATERIAL-EDITOR-SHELL-COMMONIZATION-V1
  *
- * GlycoPharm / K-Cosmetics 의 ProductionMaterialEditorPage (로직/JSX 동일, diff=cosmetic)를
+ * K-Cosmetics 의 ProductionMaterialEditorPage (로직/JSX 동일, diff=cosmetic)를
  * 공통 컴포넌트로 추출. KPA editor 는 본 WO 범위 외.
  *
  * 제로-의존 원칙(store-ui-core, StartProductionModal 과 동일):
@@ -18,7 +18,7 @@ import { useState, useCallback, type CSSProperties, type ComponentType } from 'r
 import { useNavigate, useLocation } from 'react-router-dom';
 import { ArrowLeft, Save, FileText, Megaphone, QrCode } from 'lucide-react';
 
-// ─── 제작 유형 (POP/QR — GP/KCos 동일) ───────────────────────────────────────
+// ─── 제작 유형 (POP/QR) ──────────────────────────────────────────
 
 type ProductionType = 'pop' | 'qr';
 

@@ -36,7 +36,7 @@
 
 - backend mine API: `getApplicationsForPartner` — status 원문 통과(cancelled 자동 흐름), participationTerminated 파생 유지.
 - 공통 `StoreRecruitmentApplicationsView`(store-ui-core): `onCancelApplication?`+`cancellingId?` props 추가, `status==='pending' && onCancelApplication` 시 "신청 취소" 버튼, resolveState 에 `cancelled`→'신청 취소' 추가.
-- 3 store thin page(KPA coreApiClient / GP·KCos authClient.api): `load()` 추출 + confirm→`POST .../cancel`→reload, `onCancelApplication`/`cancellingId` 주입.
+- 3 store thin page(KPA coreApiClient / KCos authClient.api): `load` 추출 + confirm→`POST .../cancel`→reload, `onCancelApplication`/`cancellingId` 주입.
 - Neture `PartnerRecruitmentApplicationsPage`(자체 JSX): `partnerRecruitmentApi.cancelMine` 추가, cancelled 상태 + pending 취소 버튼.
 
 ## 6. 공통 view 반영
@@ -58,12 +58,12 @@
 
 ## 10. 제외 범위 (WO 준수)
 
-approved/rejected/terminated 취소 불가 · 참여해지/계약/RBAC/allowedSellerIds/OPL/C bridge/가격/모집 생성·마감·재개/승인·반려 정책 · 이메일·SMS·새 알림 · 모집 entity 확장 · package.json/lock. **모두 미수행.** 다른 세션 WIP(web-glycopharm App.tsx·operator 파일) 미접촉(GP는 page 파일만 수정).
+approved/rejected/terminated 취소 불가 · 참여해지/계약/RBAC/allowedSellerIds/OPL/C bridge/가격/모집 생성·마감·재개/승인·반려 정책 · 이메일·SMS·새 알림 · 모집 entity 확장 · package.json/lock.
 
 ## 11. 검증
 
 - **api-server `type-check`(tsc --noEmit): PASS (exit 0).**
-- **builds: `@o4o/web-neture` ✅ · `@o4o/web-kpa-society` ✅ · `glycopharm-web` ✅ · `@o4o/web-k-cosmetics` ✅** (GP는 타 세션 WIP 포함 상태에서도 통과 — 본 변경 무영향).
+- builds: `@o4o/web-neture` ✅ · `@o4o/web-kpa-society` ✅
 - **정적**: cancel route requireAuth+소유권+pending 가드, idempotent. 공통 view prop 옵셔널(기존 소비처 회귀 0). 공급자 상세 cancelled badge + 승인/반려 자동 숨김.
 - **migration**: CI/CD(main 배포) 자동 실행. ADD VALUE IF NOT EXISTS 멱등.
 - **배포 후 권장 smoke**: pending 신청 생성 → 4서비스 현황에서 취소 버튼 → 취소 → '신청 취소' 표시 → 공급자 상세 '신청 취소' + 승인/반려 숨김 → approved/rejected/참여해지 신청엔 취소 버튼 없음 → 타 사용자 신청 취소 403.
@@ -77,4 +77,4 @@ approved/rejected/terminated 취소 불가 · 참여해지/계약/RBAC/allowedSe
 
 ---
 
-*Date: 2026-06-16 · PASS · ApplicationStatus DB enum → 'cancelled' migration(사용자 승인) + POST /partner/applications/:id/cancel(requireAuth, 소유권+pending, idempotent) + 공통 StoreRecruitmentApplicationsView onCancelApplication + Neture/KPA/GP/KCos 취소 버튼 + 공급자 상세 상태표시(승인·반려 숨김). 알림 미추가. type-check + 4 build PASS.*
+*Date: 2026-06-16 · PASS · ApplicationStatus DB enum → 'cancelled' migration(사용자 승인) + POST /partner/applications:id/cancel(requireAuth, 소유권+pending, idempotent) + 공통 StoreRecruitmentApplicationsView onCancelApplication + Neture/KPA/KCos 취소 버튼 + 공급자 상세 상태표시(승인·반려 숨김). 알림 미추가. type-check + 4 build PASS.*

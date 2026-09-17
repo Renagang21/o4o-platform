@@ -29,10 +29,9 @@
 | o4o-api | main-site / admin-dashboard-dev / neture-web | 34 | 2025-12 | 2026-08 |
 | gcr.io | kpa-society-web | 1,933 | 2025-12-20 | 2026-08-18 |
 | gcr.io | neture-web | 1,486 | 2025-12-20 | 2026-08-18 |
-| gcr.io | glycopharm-web | 1,281 | 2025-12-20 | 2026-08-18 |
 | gcr.io | k-cosmetics-web | 1,033 | 2025-12-20 | 2026-08-18 |
 | gcr.io | glucoseview-web / pharmacy-hub-web / kpa-branch-web / neture-api / siteguide-web / github.com~ | 328 | 2025-12 | 2026-08 |
-| cloud-run-source-deploy | 12 package (glucoseview-web 69 · glycopharm-web 42 · o4o-core-api 27 · 기타) | 198 | 2025-12-31 | 2026-01 |
+| cloud-run-source-deploy | 12 package (glucoseview-web 69 42 · o4o-core-api 27 · 기타) | 198 | 2025-12-31 | 2026-01 |
 | siteguide | siteguide-core | 3 | 2026-01-19 | 2026-01-19 |
 
 전체 tagged 10,294 / untagged 703. mediaType: `manifest.v2` 10,317 · `oci.manifest` 528 · **`oci.image.index` 152**.
@@ -40,7 +39,7 @@
 ### 1-3. Cloud Run
 
 - 서비스 **12개** (전부 `asia-northeast3`, 다른 리전 0)
-- revision **6,658개** (glycopharm-web 1,074 · neture-web 1,072 · o4o-core-api 1,070 · o4o-admin-dashboard 1,043 · kpa-society-web 1,043 · k-cosmetics-web 1,019 · 기타)
+- revision **6,658개** (neture-web 1,072 · o4o-core-api 1,070 · o4o-admin-dashboard 1,043 · kpa-society-web 1,043 · k-cosmetics-web 1,019 · 기타)
 - revision 이 참조하는 unique digest **6,654** → 정규화 후 **6,652 가 Registry 에 존재**, 외부 2건만 미존재
   - `gcr.io/cloudrun/hello@sha256:52c53c…` — Google 샘플 이미지 (`account-center-web` placeholder)
   - `glucoseview-web` — digest 미해석 구형 revision 1건
@@ -66,7 +65,7 @@
 
 | service | package | package 내 순위 | 이미지 나이 |
 |---|---|---:|---:|
-| glycopharm-web / k-cosmetics-web / kpa-branch-web / kpa-society-web / neture-web / o4o-admin-dashboard / pharmacy-hub-web | 각 package | **1** | 0일 |
+| k-cosmetics-web / kpa-branch-web / kpa-society-web / neture-web / o4o-admin-dashboard / pharmacy-hub-web | 각 package | **1** | 0일 |
 | o4o-main-site | main-site | **1** | 6일 |
 | glucoseview-web | glucoseview-web | **1** | 126일 |
 | o4o-admin-dashboard-dev | admin-dashboard-dev | **1** | 220일 |
@@ -163,7 +162,7 @@ TOTAL                         508.39       508.67
 
 | service | 현재 이미지 |
 |---|---|
-| neture-web · kpa-society-web · glycopharm-web · k-cosmetics-web · glucoseview-web · pharmacy-hub-web · kpa-branch-web | `gcr.io/netureyoutube/{service}:{commit}` |
+| neture-web · kpa-society-web · k-cosmetics-web · glucoseview-web · pharmacy-hub-web · kpa-branch-web | `gcr.io/netureyoutube/{service}:{commit}` |
 
 → **소비처 0 아님. 저장소 삭제·마이그레이션 금지.** 동일 보존 기준(최신 50 + 30일)으로만 정리했다.
 
@@ -177,7 +176,7 @@ Artifact Registry host/리전 통일(`us-docker.pkg.dev` → `asia-northeast3`)�
 |---|---|
 | Cloud Run 12개 서비스 Ready | **12/12 True** ✅ |
 | 전 서비스 run.app 응답 | 11개 200 / `o4o-core-api` 는 `/` 404 (기존 동작, 진입점은 `api.neture.co.kr`) |
-| 공개 도메인 cold start | neture.co.kr · www.kpa-society.co.kr · glycopharm.co.kr · k-cosmetics.co.kr · glucoseview.com 전부 200 |
+| 공개 도메인 cold start | neture.co.kr · www.kpa-society.co.kr · k-cosmetics.co.kr · glucoseview.com 전부 200 |
 | `GET /health` | **200** `{"status":"alive","version":"0.5.0"}` |
 | `GET /health/database` | **200** `{"status":"healthy","pingMs":4,"activeConnections":10}` |
 | Cloud Run `severity>=ERROR` (2026-08-19T00:00Z~) | **0건** ✅ |

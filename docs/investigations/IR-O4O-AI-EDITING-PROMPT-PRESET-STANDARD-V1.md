@@ -16,7 +16,7 @@
 1. **preset 메커니즘은 이미 견고하다(신규 아님).** backend `/api/ai/content` 가 **outputType별 rich base prompt**(`buildSystemPrompt` 디스패처 + 타입별 builder) + **공유 tone/length/audience 빌더(`common.ts`)** 를 갖고, `ProductionTemplate.systemPromptOverride` 가 그 위에 customPrompt 로 stack 된다. → "표준이 없다" 가 아니라 **"표준이 store 에만 연결됨"** 이 문제.
 2. **격차는 두 축:**
    - **(B) registry 커버리지:** preset registry(`ProductionTemplate`)는 **store 4-target(pop/blog/qr/product-description)만** — LMS 레슨/resources 는 **template 0**(generic 호출).
-   - **(D) adoption 정렬:** LMS 레슨·resources 는 `AiContentModal` 을 **template 없이 generic** 사용. GP/KCos POP 은 일부 **인라인 fetch**(모달 미경유, 1단계 audit).
+   - **(D) adoption 정렬:** LMS 레슨·resources 는 `AiContentModal` 을 **template 없이 generic** 사용. KCos POP 은 일부 **인라인 fetch**(모달 미경유, 1단계 audit).
 3. **경계 주의:** `ProductionTarget`(`packages/types/src/production.ts`)은 **store-domain 타입**("KPA 전용 카탈로그 — 이동 금지"). LMS/resources 를 `ProductionTarget` 에 끼우면 경계 위반 → **AiContentModal 의 generic prop(`templateSystemPrompt`/`templateForcedOptions`, store 미결합)** 을 쓰는 **별도 surface-agnostic preset** 이 안전.
 4. **2단계/별도 파이프라인은 분리(C):** LMS `CourseStructureAiModal`(2단계, 고정 프롬프트, AiContentModal 비경유), Signage AI(별도), admin-builder.
 
@@ -63,12 +63,12 @@
 | 제품설명(KPA) | ✅ | ✅(desc-*) | `/content` product_detail | template-driven |
 | 제작자료 editor | (starterHtml용) | ✅(starterHtml) | — | template-driven |
 | 라이브러리 진입 | ✅ | ❌(generic) | `/content` | **generic** |
-| **LMS 레슨 본문**(KPA/GP) | ✅ | ❌(initialMode/url) | `/content` 또는 `/lesson-body` | **generic(B)** |
+| **LMS 레슨 본문**(KPA) | ✅ | ❌(initialMode/url) | `/content` 또는 `/lesson-body` | **generic(B)** |
 | **resources 글쓰기**(KPA) | ✅ | ❌(generic) | `/content` | **generic(B)** |
-| GP/KCos POP | (일부 인라인 fetch) | — | `/content-to-store-use` | **adoption 격차(D)** |
+| KCos POP | (일부 인라인 fetch) | — | `/content-to-store-use` | **adoption 격차(D)** |
 | LMS 강의구조 | ❌(CourseStructureAiModal) | — | `/course-structure`(2단계) | **별도(C)** |
 
-→ **store 4-surface = template-driven(표준 적용).** LMS 레슨·resources·라이브러리 진입 = **generic(preset 미연결).** GP/KCos POP = 인라인 fetch(모달 미채택). 강의구조 = 별도 파이프라인.
+→ **store 4-surface = template-driven(표준 적용).** LMS 레슨·resources·라이브러리 진입 = **generic(preset 미연결).** KCos POP = 인라인 fetch(모달 미채택). 강의구조 = 별도 파이프라인.
 
 ## 8. surface별 prompt 차이 (preset 축 정리)
 
@@ -93,7 +93,7 @@
 - **A (즉시 표준화):** store 4-surface 는 이미 template-driven. **라이브러리 진입·resources** 는 AiContentModal 을 이미 쓰므로 **generic default preset(tone/length) 주입**만으로 정렬 가능(저비용).
 - **B (registry 확장):** **LMS 레슨 본문·resources** 를 surface-agnostic `EditingPreset` 으로 편입(systemPromptOverride/forcedOptions/outputConstraints). store 외 target 확장.
 - **C (별도 설계):** `CourseStructureAiModal`(2단계·고정), Signage AI(별도 파이프라인), admin-builder(편집 AI 성격 상이).
-- **D (후속 WO):** GP/KCos POP 인라인 fetch → `AiContentModal` 채택, QR/제품설명/제작자료 preset 서비스 간 정렬.
+- **D (후속 WO):** KCos POP 인라인 fetch → `AiContentModal` 채택, QR/제품설명/제작자료 preset 서비스 간 정렬.
 - **E (제외):** 모델/provider 선택, 중국계 거버넌스, reward/결제, LMS closure 재논의.
 
 ## 12. 위험 요소
@@ -105,14 +105,14 @@
 | R3 | preset 표준화에 backend 프롬프트 재작성 혼입 | backend outputType 빌더는 SSOT — 무변경, 프론트 전달만 |
 | R4 | tone enum 이 surface군별로 달라 단일화 무리 | 표준 tone 집합 + surface별 allowed 매핑 |
 | R5 | 강의구조/Signage 를 일반 preset 에 흡수 시도 | C 분리(2단계·asset 파이프라인) |
-| R6 | GP/KCos POP 인라인을 preset 표준으로 직접 해결 | 모달 채택(D)이 선행 — preset 은 그 위에 |
+| R6 | KCos POP 인라인을 preset 표준으로 직접 해결 | 모달 채택(D)이 선행 — preset 은 그 위에 |
 | R7 | 모델/provider 작업 혼입 | 본 IR 모델 트랙과 직교 |
 
 ## 13. 권장 후속
 
 1. **`WO-O4O-AI-PRODUCTION-TEMPLATE-SURFACE-PRESET-EXTEND-V1`** — store `ProductionTemplate` 을 surface-agnostic **`EditingPreset`** 로 일반화(옵션 A). store 는 하위집합 유지, LMS 레슨·resources surface 추가. `AiContentModal` generic prop 소비.
-2. **`WO-O4O-AI-EDITING-MODAL-ADOPTION-ALIGNMENT-V1`** — GP/KCos POP 등 인라인 fetch AI 를 `AiContentModal` 로 정렬(D). preset 적용의 전제.
-3. **`WO-O4O-AI-QR-PRODUCT-DESCRIPTION-PRESET-ALIGNMENT-V1`** — QR/제품설명/제작자료 preset 을 서비스(KPA/GP/KCos) 간 정렬.
+2. **`WO-O4O-AI-EDITING-MODAL-ADOPTION-ALIGNMENT-V1`** — KCos POP 등 인라인 fetch AI 를 `AiContentModal` 로 정렬(D). preset 적용의 전제.
+3. **`WO-O4O-AI-QR-PRODUCT-DESCRIPTION-PRESET-ALIGNMENT-V1`** — QR/제품설명/제작자료 preset 을 서비스(KPA/KCos) 간 정렬.
 4. **`IR-O4O-AI-COURSE-STRUCTURE-PRESET-DESIGN-V1`** — LMS 강의구조(2단계·고정 프롬프트)는 별도 설계(C).
 
 ## 14. 검증 (이 IR 자체)

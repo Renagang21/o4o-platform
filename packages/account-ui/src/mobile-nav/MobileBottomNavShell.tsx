@@ -19,7 +19,7 @@ export interface MobileBottomNavShellProps {
   children: ReactNode;
   /**
    * z-index Tailwind class. 서비스별 기존 값을 그대로 유지한다
-   * (KPA·Neture `z-40`, GlycoPharm·K-Cosmetics `z-50`).
+   * (KPA·Neture `z-40`·K-Cosmetics `z-50`).
    */
   zIndexClassName?: string;
   /** 추가 class (기본 계약을 덮어쓰지 않는 범위에서). */

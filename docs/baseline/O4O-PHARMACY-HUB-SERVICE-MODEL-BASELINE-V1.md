@@ -56,7 +56,7 @@ Neture supplier
 
 | 축 | 서비스 | 게이트 | 코드 SSOT |
 |---|---|---|---|
-| ① 운영자 승인 축 | `glycopharm` · `kpa-society` · `k-cosmetics` | 공급자 신청 → `offer_service_approvals` → 서비스 운영자 승인 | `modules/neture/constants/approval-service-keys.ts` |
+| ① 운영자 승인 축 | `kpa-society` · `k-cosmetics` | 공급자 신청 → `offer_service_approvals` → 서비스 운영자 승인 | `modules/neture/constants/approval-service-keys.ts` |
 | ② **공급자 직접 opt-in 축** | **`pharmacy-hub`** | 없음. `spo.service_keys` 포함 + 공급자 ACTIVE + 상품 ACTIVE 뿐 | `modules/neture/constants/supplier-optin-services.ts` |
 
 한 서비스 키가 두 목록에 동시에 들어가면 같은 키를 두 계약이 다르게 해석한다.

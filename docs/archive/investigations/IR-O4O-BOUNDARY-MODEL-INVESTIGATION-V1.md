@@ -59,7 +59,7 @@ O4O 플랫폼에서 `serviceKey`와 `organization_id` 중 실제 경계(Source o
 | `signage_playlist_shares` | required | 재생목록 공유 |
 | `signage_layout_presets` | nullable | 레이아웃 프리셋 |
 | `signage_media_tags` | required | 미디어 태그 |
-| `billing_invoices` | YES | GlycoPharm 청구 |
+| `billing_invoices` | YES | — |
 | `store_blog_posts` | YES | 매장 블로그 |
 
 #### Class C — organizationId만 존재
@@ -113,7 +113,6 @@ O4O 플랫폼에서 `serviceKey`와 `organization_id` 중 실제 경계(Source o
 | **ForumQueryService** | organizationId | — | **NO** | YES (IS NULL or = value) |
 | **operator-summary** | serviceKey | — | YES (hardcoded) | NO (forum만 orgId) |
 | **StoreHubController** | organizationId | — | **NO** | YES (from auth) |
-| **GlycopharmStoreDataAdapter** | storeId | — | **NO** | **NO** |
 | **CosmeticsStoreDataAdapter** | storeId | — | **NO** | **NO** |
 
 ### 핵심 발견
@@ -146,7 +145,7 @@ E-commerce     → storeId가 Primary (제3 식별자)
 |---|------|------|------|
 | W-1 | `store-hub.controller.ts:173` | `cms_contents` 조직 콘텐츠 카운트에 serviceKey 필터 없음 | 교차 서비스 KPI 부풀림 |
 | W-2 | `neture.routes.ts:1287` | CMS ID 조회에 serviceKey 가드 없음 | 타 서비스 CMS 메타데이터 노출 |
-| W-3 | `neture.routes.ts:1392` | `service_key IN ('neture', 'glycopharm') OR service_key IS NULL` — 의도적 교차 쿼리 | 설계 의도이나 문서화 필요 |
+| W-3 | `neture.routes.ts:1392` | `service_key IN OR service_key IS NULL` — 의도적 교차 쿼리 | 설계 의도이나 문서화 필요 |
 | W-4 | `dashboard-assets.routes.ts:316` | CMS viewCount 조회에 serviceKey 없음 | 비민감 지표만 노출 |
 | W-5 | `sellerops/OrderIntegrationService.ts:196` | 주문 ID만으로 조회, 판매자 소유권 검증 없음 | orderType/paymentStatus 노출 |
 | W-6 | `signage-public.routes.ts:255` | playlist items 서브쿼리에서 media serviceKey 미검증 | 부모 playlist 검증에 의존 |

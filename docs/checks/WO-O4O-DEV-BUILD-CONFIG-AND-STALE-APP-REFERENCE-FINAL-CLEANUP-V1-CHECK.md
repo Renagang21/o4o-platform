@@ -114,7 +114,6 @@
 | 파일 | composite | declaration | outDir |
 |---|:---:|:---:|:---:|
 | `apps/main-site` · `apps/forum-web` · `apps/page-generator` · `services/web-kpa-society` · `services/web-neture` · `services/web-k-cosmetics` | ✅ | ❌ | ❌ |
-| `services/web-pharmacy-hub` · `web-account` · `web-glycopharm` · `web-kpa-branch` · `signage-player-web` | ❌(`noEmit`) | ❌ | ❌ (`tsBuildInfoFile: ./node_modules/.tmp/...`) |
 | **`apps/admin-dashboard` (변경 전)** | ✅ | ✅ | **`./dist-node`** |
 
 `declaration` + `dist-node` 는 **admin 단독 이상치**였다.

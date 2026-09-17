@@ -32,7 +32,7 @@ const LEGACY_MENU: Menu = {
   analytics: [{ label: '통계', path: '/operator/analytics', sectionLabel: '분석' }],
 };
 
-/** platformOnly 를 쓰는 메뉴 = GlycoPharm AI 운영 화면 형태 */
+/** platformOnly 를 쓰는 메뉴 = AI 운영 화면 형태 */
 const PLATFORM_MENU: Menu = {
   analytics: [
     { label: 'AI 리포트', path: '/operator/ai-report' },

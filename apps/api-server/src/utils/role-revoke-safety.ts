@@ -12,7 +12,7 @@
  *
  * 판정 기준(서비스 admin):
  *   role 이름이 `{serviceKey}:admin` 형태이고 serviceKey 가 'platform' 이 아닐 때.
- *   - 포함: kpa:admin · neture:admin · glycopharm:admin · cosmetics:admin ·
+ *   - 포함: kpa:admin · neture:admin · cosmetics:admin ·
  *           pharmacy-hub:admin · glucoseview:admin (roles.role_key = 'admin')
  *   - 제외: kpa:district_admin · kpa:branch_admin — `is_admin_role=true` 이지만
  *           서비스 단위 관리자가 아니다. `_admin` 접미사는 `:admin` 과 다르므로

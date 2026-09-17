@@ -12,7 +12,7 @@
 
 ## 1. 배경
 
-SiteGuide 는 O4O 핵심 서비스(KPA / GlycoPharm / K-Cosmetics / Neture)와 성격이
+SiteGuide 는 O4O 핵심 서비스(KPA / K-Cosmetics / Neture)와 성격이
 다른 별도 제품이다. O4O 저장소 안에 코드·DB 가 남아 있으면 "미완성 서비스" 잔재가
 되어 배포·도메인·검증 기준만 복잡해진다. 따라서 이전/보존이 아니라 **삭제**한다.
 
@@ -38,12 +38,6 @@ SiteGuide 는 O4O 핵심 서비스(KPA / GlycoPharm / K-Cosmetics / Neture)와 �
 
 → 플랫폼 공통 문의 시스템이며, `InquiryType` 의 `'siteguide'` 는 enum 값 하나일 뿐이다.
 SiteGuide 서비스 코드가 아니므로 유지한다.
-
-### GlycoPharm 서빙 원인
-
-`services/web-glycopharm` 내부에 siteguide 참조는 **0건**. www.glycopharm.co.kr 이
-SiteGuide 를 서빙한 적이 있다면 그것은 **Cloud Run 도메인 매핑/DNS 설정** 문제이지
-저장소 코드 문제가 아니다. (본 WO 의 코드 삭제 범위 밖 — 인프라에서 별도 확인 필요)
 
 ## 3. DB 처리
 

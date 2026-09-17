@@ -13,10 +13,9 @@
 | # | backend service | proto | 생성 | host rule | NEG | Cloud Run | 30d 요청 | **판정** |
 |:--:|---|:--:|---|---|---|---|--:|:--|
 | 1 | `backend-neture-web-http` | HTTPS | 2025-12-27 | `neture.co.kr`, `www.neture.co.kr` **+ URL map defaultService** | `neg-neture-web` | `neture-web` | 232,231 | **ACTIVE_SHARED** |
-| 2 | `backend-o4o-core-api` | HTTP | 2026-01-03 | `api.neture` · `api.glycopharm` · `api.glucoseview` · `api.kpa-society` · `api.k-cosmetics` (5) | `neg-o4o-core-api` | `o4o-core-api` | 249,958 | **ACTIVE_SHARED** |
+| 2 | `backend-o4o-core-api` | HTTP | 2026-01-03 | `api.neture` · `api.glucoseview` · `api.kpa-society` · `api.k-cosmetics` (5) | `neg-o4o-core-api` | `o4o-core-api` | 249,958 | **ACTIVE_SHARED** |
 | 3 | `backend-kpa-society-web` | HTTP | 2026-01-02 | `kpa-society.co.kr`, `www.` | `neg-kpa-society-web` | `kpa-society-web` | 31,166 | **ACTIVE_REQUIRED** |
 | 4 | `backend-k-cosmetics-web` | HTTPS | 2026-01-02 | `k-cosmetics.site`, `www.` | `neg-k-cosmetics-web` | `k-cosmetics-web` | 34,239 | **ACTIVE_REQUIRED** |
-| 5 | `backend-glycopharm-web` | HTTPS | 2025-12-31 | `glycopharm.co.kr`, `www.` | `neg-glycopharm-web` | `glycopharm-web` | 27,519 | **ACTIVE_REQUIRED** |
 | 6 | `backend-glucoseview-web-advanced` | HTTPS | 2025-12-31 | `glucoseview.co.kr`, `www.` | `neg-glucoseview-web` | `glucoseview-web` | 17,516 | **ACTIVE_REQUIRED** |
 | 7 | `o4o-admin-dashboard-backend-http` | HTTP | 2026-01-02 | `admin.neture.co.kr` | `neg-o4o-admin-dashboard` | `o4o-admin-dashboard` | 13,606 | **ACTIVE_REQUIRED** |
 | 8 | `backend-pharmacy-hub-web` | HTTPS | 2026-08-02 | `pharmacyhub.co.kr`, `www.` | `neg-pharmacy-hub-web` | `pharmacy-hub-web` | 3,025 | **ACTIVE_REQUIRED** |
@@ -46,7 +45,6 @@
 | `backend-o4o-core-api` | EXTERNAL_MANAGED | 30s | off | 없음 | disabled | 없음 |
 | `backend-kpa-society-web` | EXTERNAL_MANAGED | 30s | off | 없음 | **enabled** (sampleRate 1) | 없음 |
 | `backend-k-cosmetics-web` | EXTERNAL_MANAGED | 30s | on | `default-security-policy-for-backend-k-cosmetics-web` | disabled | 없음 |
-| `backend-glycopharm-web` | EXTERNAL_MANAGED | 30s | on | `default-security-policy-for-backend-glycopharm-web` | disabled | 없음 |
 | `backend-glucoseview-web-advanced` | EXTERNAL_MANAGED | 30s | on | `default-security-policy-for-backend-glucoseview-web-advanced` | disabled | 없음 |
 | `o4o-admin-dashboard-backend-http` | EXTERNAL_MANAGED | 30s | off | 없음 | **enabled** (sampleRate 1) | 없음 |
 | `backend-pharmacy-hub-web` | EXTERNAL_MANAGED | 30s | off | 없음 | 미설정 | 없음 |
@@ -68,11 +66,9 @@ URL map `o4o-global-lb` 의 host rule 11그룹 / pathMatcher 11개를 전수 전
        └─ o4o-global-lb-target-proxy-2 (HTTPS, certificateMap=o4o-main-cert-map)
             └─ URL map: o4o-global-lb        [defaultService = backend-neture-web-http]
                  ├─ neture.co.kr / www.neture.co.kr      → path-matcher-neture       → backend-neture-web-http          → neg-neture-web           → neture-web
-                 ├─ api.neture / api.glycopharm / api.glucoseview / api.kpa-society / api.k-cosmetics
                  │                                        → path-matcher-api          → backend-o4o-core-api             → neg-o4o-core-api         → o4o-core-api
                  ├─ kpa-society.co.kr / www.             → path-matcher-kpa-society   → backend-kpa-society-web          → neg-kpa-society-web      → kpa-society-web
                  ├─ k-cosmetics.site / www.              → path-matcher-k-cosmetics   → backend-k-cosmetics-web          → neg-k-cosmetics-web      → k-cosmetics-web
-                 ├─ glycopharm.co.kr / www.              → path-matcher-glycopharm    → backend-glycopharm-web           → neg-glycopharm-web       → glycopharm-web
                  ├─ glucoseview.co.kr / www.             → path-matcher-glucoseview   → backend-glucoseview-web-advanced → neg-glucoseview-web      → glucoseview-web
                  ├─ admin.neture.co.kr                   → path-matcher-admin         → o4o-admin-dashboard-backend-http → neg-o4o-admin-dashboard  → o4o-admin-dashboard
                  ├─ pharmacyhub.co.kr / www.             → path-matcher-pharmacy-hub  → backend-pharmacy-hub-web         → neg-pharmacy-hub-web     → pharmacy-hub-web
@@ -97,7 +93,6 @@ Monitoring MQL `loadbalancing.googleapis.com/https/request_count` 를 `resource.
 | `backend-neture-web-http` | 223,373 | 1,728 | 7,106 | 8 | **232,231** |
 | `backend-k-cosmetics-web` | 34,046 | 169 | 16 | 0 | **34,239** |
 | `backend-kpa-society-web` | 29,835 | 168 | 1,131 | 0 | **31,166** |
-| `backend-glycopharm-web` | 27,383 | 104 | 32 | 0 | **27,519** |
 | `backend-glucoseview-web-advanced` | 17,500 | 16 | 0 | 0 | **17,516** |
 | `o4o-admin-dashboard-backend-http` | 12,660 | 32 | 914 | 0 | **13,606** |
 | `backend-pharmacy-hub-web` | 2,065 | 952 | 8 | 0 | **3,025** |
@@ -112,7 +107,6 @@ Monitoring MQL `loadbalancing.googleapis.com/https/request_count` 를 `resource.
 | `backend-o4o-core-api` | 249,958 | 282,102 | 328,530 |
 | `backend-kpa-society-web` | 31,166 | 41,870 | 56,437 |
 | `backend-k-cosmetics-web` | 34,239 | 41,676 | 52,317 |
-| `backend-glycopharm-web` | 27,519 | 34,063 | 44,679 |
 | `backend-glucoseview-web-advanced` | 17,516 | 23,986 | 31,334 |
 | `o4o-admin-dashboard-backend-http` | 13,606 | 19,201 | 24,451 |
 | `backend-pharmacy-hub-web` | 3,025 | 3,025 | 3,025 |
@@ -122,7 +116,7 @@ Monitoring MQL `loadbalancing.googleapis.com/https/request_count` 를 `resource.
 
 ### Cloud Run 요청량과의 대응 (30d)
 
-`o4o-core-api` 269,665 · `neture-web` 249,037 · `k-cosmetics-web` 35,069 · `kpa-society-web` 33,721 · `glycopharm-web` 26,298 · `glucoseview-web` 18,351 · `o4o-admin-dashboard` 17,409 · `pharmacy-hub-web` 4,429 — **LB backend 집계와 서비스별로 정합**한다 (Cloud Run 쪽이 소폭 큰 것은 run.app 직접 호출·헬스체크 포함).
+`o4o-core-api` 269,665 · `neture-web` 249,037 · `k-cosmetics-web` 35,069 · `kpa-society-web` 33,721 26,298 · `glucoseview-web` 18,351 · `o4o-admin-dashboard` 17,409 · `pharmacy-hub-web` 4,429 — **LB backend 집계와 서비스별로 정합**한다 (Cloud Run 쪽이 소폭 큰 것은 run.app 직접 호출·헬스체크 포함).
 
 LB 를 통하지 않는 Cloud Run: `kpa-branch-web` 27 · `o4o-main-site` 11 · `o4o-admin-dashboard-dev` 3 · `account-center-web` 1 — 전부 run.app 직접 접근 수준이다.
 
@@ -168,7 +162,7 @@ LB 를 통하지 않는 Cloud Run: `kpa-branch-web` 27 · `o4o-main-site` 11 · 
 | 실제 응답 | HTML `<title>` = **"Neture — O4O 유통·협업 플랫폼"** — SiteGuide 가 아니라 **Neture 사이트가 그대로 서빙**됨 |
 | TLS | Certificate Manager `cm-cert-siteguide` (SAN: siteguide.co.kr, www) 로 정상 handshake |
 | Cloud Run 서비스 존재 여부 | **없음** — siteguide 전용 Cloud Run 서비스 0건 |
-| 과거/legacy 흔적 | `docs/archive/checks/CHECK-O4O-SITEGUIDE-RESIDUAL-AUDIT-V1.md` · `CHECK-O4O-GLYCOPHARM-DOMAIN-MAPPING-SITEGUIDE-REMOVAL-V1.md` |
+| 과거/legacy 흔적 | `docs/archive/checks/CHECK-O4O-SITEGUIDE-RESIDUAL-AUDIT-V1.md` |
 | 실제 운영 서비스인지 | **부분적으로 살아있다** — API 서버에 `siteguide` 독립 스키마(`siteguide_businesses` · `siteguide_api_keys` · `siteguide_usage_summaries` · `siteguide_execution_logs`)와 문의 채널(`platformInquiryController.ts`)이 존재. 즉 백엔드 도메인은 실재하나 **웹 프론트가 없어 도메인이 Neture 로 흘러든다** |
 
 **판정: DEFAULT_FALLTHROUGH (도메인 계약 미정의).** backend service 자체의 orphan 문제는 아니다 — `backend-neture-web-http` 는 어차피 ACTIVE 다.
@@ -202,7 +196,6 @@ serverless NEG 9건, 전부 `asia-northeast3` · `SERVERLESS`. backend ↔ NEG *
 | `neg-o4o-core-api` | `backend-o4o-core-api` | `o4o-core-api` | **ACTIVE** |
 | `neg-kpa-society-web` | `backend-kpa-society-web` | `kpa-society-web` | **ACTIVE** |
 | `neg-k-cosmetics-web` | `backend-k-cosmetics-web` | `k-cosmetics-web` | **ACTIVE** |
-| `neg-glycopharm-web` | `backend-glycopharm-web` | `glycopharm-web` | **ACTIVE** |
 | `neg-glucoseview-web` | `backend-glucoseview-web-advanced` | `glucoseview-web` | **ACTIVE** |
 | `neg-o4o-admin-dashboard` | `o4o-admin-dashboard-backend-http` | `o4o-admin-dashboard` | **ACTIVE** |
 | `neg-pharmacy-hub-web` | `backend-pharmacy-hub-web` | `pharmacy-hub-web` | **ACTIVE** |

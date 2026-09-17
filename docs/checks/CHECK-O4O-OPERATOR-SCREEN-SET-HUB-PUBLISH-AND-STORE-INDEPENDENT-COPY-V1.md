@@ -87,7 +87,7 @@ AND service_key = <현재 서비스> AND deleted_at IS NULL
 **11. 보호 샘플·회귀**
 - 검증 전후 활성 세트 **12건 동일**, 보호 샘플 코너 적용 불변(구강관리 코너→구강관리 기본 코너 안내형 / 피부관리 코너→피부관리 기본 화면 세트) ✅
 - 공개 타블렛 content_list **5카드 불변** ✅
-- HUB 격리: 타 service_key(glycopharm) **0건**, `producer=supplier` **0건** ✅
+- HUB 격리: 타 service_key **0건**, `producer=supplier` **0건** ✅
 - 정리 후 운영자 원본 0 · HUB 0 · 매장 세트 12(원상복구). provenance 3행은 **의도적으로 보존**(추적 이력, 사본 삭제와 무관·FK 없음) ✅
 
 ### 브라우저 검증에서 발견·수정한 버그 2건

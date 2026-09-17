@@ -21,7 +21,6 @@ O4O 플랫폼에 모바일 앱 루트가 2개 존재한다.
 
 핵심 결론:
 
-1. **케어/혈당/복약/건강관리 잔재는 두 모바일 루트 어디에도 없다.** `glucose|혈당|복약|건강관리|케어` 검색 결과는 전부 GlycoPharm 의 정상 사업 화면(BloodCare 등)이며 모바일 앱과 무관하다.
 2. `apps/mobile-app` 는 CI/CD·Dockerfile·scripts·turbo·앱 코드 어디에서도 참조되지 않는다. 외부 참조는 (a) `pnpm-lock.yaml` workspace importer 블록, (b) 문서 2건의 수동 언급뿐이다.
 3. `apps/mobile-app/README.md` 가 가리키는 참고 문서(`docs/dev/mobile/mobile_app_investigation_report.md`, `mobile_app_appstore_preparation.md`)는 **이미 삭제됨**("Full documentation cleanup" 커밋). 즉 README 가 dead link 만 남긴 abandoned 산출물이다.
 4. 두 패키지 모두 package name 이 **`@o4o/mobile-app`** 로 동일 → workspace name 충돌. `apps/mobile-app` 삭제로 해소된다.
@@ -124,7 +123,7 @@ backend(`MobileProductDraft` 엔티티/서비스/컨트롤러, `/api/v1/mobile/p
 
 ## 4. 케어/건강관리 잔재 검색 결과
 
-`glucose|GlucoseView|혈당|복약|건강관리|케어` 검색 → 50+ hit, **전부 GlycoPharm 정상 사업 영역** (예: `BloodCareBusinessStatusPage.tsx`, guide copy, 당뇨 관련 카피). **`apps/mobile-app` / `services/mobile-app` 내부 hit 0건.**
+`glucose|GlucoseView|혈당|복약|건강관리|케어` 검색 → 50+ hit. **`apps/mobile-app` / `services/mobile-app` 내부 hit 0건.**
 
 → 과거 케어 기능의 모바일 잔재는 **존재하지 않음.** apps/mobile-app 삭제 근거는 "케어 잔재"가 아니라 "**중단된 구 공식앱(Capacitor WebView 래퍼) 잔재 + package name 충돌**"이다.
 

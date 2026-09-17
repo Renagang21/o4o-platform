@@ -14,7 +14,7 @@
 
 ## 1. 배경
 
-`ProductPopBuilderPage` (KPA / GlycoPharm / K-Cosmetics 3종) 는 URL 의 `:productId` 를
+`ProductPopBuilderPage` (KPA / K-Cosmetics 3종) 는 URL 의 `:productId` 를
 **`store_local_products.id`** 로 받는다. 진입 경로:
 
 - `StoreLocalProductsPage.tsx` → `navigate('/store/commerce/products/{product.id}/pop')`

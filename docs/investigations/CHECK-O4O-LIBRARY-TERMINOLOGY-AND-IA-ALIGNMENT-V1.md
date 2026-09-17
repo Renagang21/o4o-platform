@@ -19,7 +19,7 @@
 | branch | `main` |
 | 작업 시작 HEAD | `6f69a5602` → IR 보존 commit `53a1e91fa` 후 진행 |
 | origin ahead/behind | 0 / 0 |
-| 다른 세션 WIP | lms-ui / operator-core-ui(product-applications) / GP·KCos App.tsx·operatorMenuGroups / pnpm-lock 등 다수 — **전부 미접촉** (내 편집과 미겹침) |
+| 다른 세션 WIP | lms-ui / operator-core-ui(product-applications) / KCos App.tsx·operatorMenuGroups / pnpm-lock 등 다수 — **전부 미접촉** (내 편집과 미겹침) |
 | staged | 없음 |
 
 ## 3. IR 보존
@@ -29,7 +29,7 @@
 ## 4. 용어 정렬 결과
 
 ### 4.1 점검 결과 — 자료실 핵심 surface 는 이미 정렬됨
-| surface | KPA | GP | KCos | 상태 |
+| surface | KPA | KCos | 상태 |
 |---------|-----|-----|------|:--:|
 | 커뮤니티 자료실 `/resources` | "자료실" | "자료실" | "자료실" | ✅ 이미 정합 |
 | 내 매장 `/store/library/*` | "내 자료함"(콘텐츠/자료/제작 자료) | 동일 | 동일 | ✅ 동일 컴포넌트 |
@@ -43,12 +43,12 @@
 |------|------|
 | KCos `pages/library/ContentLibraryPage.tsx` | heroTitle "콘텐츠 라이브러리" → **"콘텐츠 자료실"** (`/library/content` IA 결정 §5) |
 | KCos `pages/hub/HubContentPage.tsx` | heroDesc "…콘텐츠 라이브러리" → "…콘텐츠 자료실" |
-| GP `pages/hub/HubContentListPage.tsx` | heroDesc "…콘텐츠 라이브러리" → "…콘텐츠 자료실" |
+ `pages/hub/HubContentListPage.tsx` | heroDesc "…콘텐츠 라이브러리" → "…콘텐츠 자료실" |
 | KCos `pages/mobile/MobileStorePage.tsx` | 설명 prose "콘텐츠 라이브러리" → "콘텐츠 자료실" |
-| GP `pages/mobile/MobilePharmacyPage.tsx` | 설명 prose "콘텐츠 라이브러리" → "콘텐츠 자료실" |
+ `pages/mobile/MobilePharmacyPage.tsx` | 설명 prose "콘텐츠 라이브러리" → "콘텐츠 자료실" |
 
 ### 4.3 의도적 미변경
-- **GP `operatorMenuGroups.ts` "콘텐츠 라이브러리" → `/operator/signage/library`** (2건): **signage 운영자 메뉴**(signage 도메인). 본 WO(자료실) 범위 외 + signage 는 별도 baseline 완료. **유지**. (signage 후속에서 검토 가능. 또한 작업 시점 다른 세션이 operatorMenuGroups 편집 중 → 미접촉.)
+- 본 WO(자료실) 범위 외 + signage 는 별도 baseline 완료. **유지**. (signage 후속에서 검토 가능. 또한 작업 시점 다른 세션이 operatorMenuGroups 편집 중 → 미접촉.)
 - 코드 주석/JSDoc "콘텐츠 라이브러리" 3건: 비-user-facing, 유지.
 - KPA store-hub content "플랫폼 콘텐츠": 이미 비-라이브러리 Korean → 유지.
 
@@ -62,11 +62,11 @@
 
 ## 6. `/store/library/*` 구조 유지 확인
 
-✅ KPA/GP/KCos 3서비스 `/store/library/{contents,resources,production-materials}` 3단 구조·동일 컴포넌트(StoreLibraryContentsPage / StoreLibraryResourcesPage / StoreProductionMaterialsPage) **무변경**. 콘텐츠/자료/제작 자료 의미 구분 유지. POP/QR/블로그/디지털사이니지 연결 표현 무변경.
+✅ KPA/KCos 2서비스 `/store/library/{contents,resources,production-materials}` 3단 구조·동일 컴포넌트(StoreLibraryContentsPage / StoreLibraryResourcesPage / StoreProductionMaterialsPage) **무변경**. 콘텐츠/자료/제작 자료 의미 구분 유지. POP/QR/블로그/디지털사이니지 연결 표현 무변경.
 
 ## 7. operator resources 차이
 
-✅ GP operator AI 생성 slot vs KCos 부재 = **의도된 정책 차이로 보존**(IR 기록). 공통 컴포넌트 신규 추출 없음, AI slot 강제 정렬 없음. operator "자료 관리" 제목은 이미 정합 → 변경 없음.
+공통 컴포넌트 신규 추출 없음, AI slot 강제 정렬 없음. operator "자료 관리" 제목은 이미 정합 → 변경 없음.
 
 ## 8. Neture 제외 확인
 
@@ -83,21 +83,19 @@
 | 신규 공통 컴포넌트 추출 | ✅ 없음 |
 | Neture | ✅ 미수정 |
 | KPA | 변경 없음(이미 정합) |
-| 변경 = GP 2 + KCos 3 (user-facing copy only) | 5파일 |
 
 ## 10. TypeScript 검증
 
 | 패키지 | 결과 |
 |--------|------|
-| web-glycopharm (`npx tsc --noEmit`) | ✅ PASS (exit 0) |
 | web-k-cosmetics (`npx tsc --noEmit`) | ✅ PASS (exit 0) |
 | web-kpa-society | 변경 없음 → 영향 없음 |
 | user-facing "콘텐츠 라이브러리" 잔존 | signage operator 메뉴 2(범위 외) + 주석 3 만. 타깃 surface 0 |
 
 ## 11. browser smoke
 
-⚠️ **라이브 미수행(보류).** 변경은 hero/desc/prose 문자열 5건(로직·route·컴포넌트 무변경), GP·KCos tsc PASS. 회귀 위험 낮아 정적 검증 갈음.
-- 권장 후속(사람 확인): KCos `/library/content` 제목 "콘텐츠 자료실", GP/KCos `/store-hub/content` heroDesc, mobile 진입 설명 육안 확인.
+⚠️ **라이브 미수행(보류).** 변경은 hero/desc/prose 문자열 5건(로직·route·컴포넌트 무변경), KCos tsc PASS. 회귀 위험 낮아 정적 검증 갈음.
+- 권장 후속(사람 확인): KCos `/library/content` 제목 "콘텐츠 자료실", KCos `/store-hub/content` heroDesc, mobile 진입 설명 육안 확인.
 
 ## 12. 후속 backlog (보류, blocker 아님)
 
@@ -105,8 +103,8 @@
 |------|------|
 | `WO-O4O-STORE-LIBRARY-STYLING-NORMALIZATION-V1` | 내 매장 StoreLibrary* inline style → shared/Tailwind |
 | `IR-O4O-SUPPLIER-LIBRARY-POLICY-V1` | Neture 공급자 자료실 별도 설계 |
-| `IR-O4O-LIBRARY-OPERATOR-AI-SLOT-POLICY-V1` | GP/KCos operator AI 생성 정책 정렬 |
-| store-hub content 제목 정합 | KPA "플랫폼 콘텐츠" vs GP/KCos "매장에서 바로 쓰는 콘텐츠" — 콘텐츠 축(자료실 아님), 선택 정렬 |
+| `IR-O4O-LIBRARY-OPERATOR-AI-SLOT-POLICY-V1` | KCos operator AI 생성 정책 정렬 |
+| store-hub content 제목 정합 | KPA "플랫폼 콘텐츠" vs KCos "매장에서 바로 쓰는 콘텐츠" — 콘텐츠 축(자료실 아님), 선택 정렬 |
 | signage operator 메뉴 "콘텐츠 라이브러리" 라벨 | signage 후속에서 검토 |
 
 ---
@@ -116,12 +114,12 @@
 | 항목 | 결과 |
 |------|------|
 | IR 보존 | `53a1e91fa` (push 완료) |
-| 수정 파일 | GP 2 + KCos 3 = 5 (user-facing copy) |
+| 수정 파일 2 + KCos 3 = 5 (user-facing copy) |
 | 용어 정렬 | "콘텐츠 라이브러리" → "콘텐츠 자료실"(타깃 surface 0 잔존). 자료실 핵심 용어는 이미 정합 |
 | KCos `/library/content` | **Option B** — route 유지, "콘텐츠 자료실" 라벨 |
 | `/store/library/*` 구조 | 3서비스 동일 유지 |
 | Neture | 미수정(제외) |
 | backend/API/DB/migration | 무변경 |
-| TypeScript | GP·KCos PASS |
+| TypeScript | KCos PASS |
 | browser smoke | tsc+grep 정적 갈음(라이브 보류) |
 | 다른 세션 WIP | 미포함(path-specific) |

@@ -42,7 +42,7 @@ backend · DB · migration · 정적 메뉴 트리 **무변경**.
 | `import-export` | 0 | — |
 | `yaksa-tools` | 0 | — |
 | `database` | 26 | 아이콘 맵(`useAdminMenu`/`useDynamicCPTMenu`), 모니터링 탭 값, 타입 union — **menuId 용례 0** |
-| `integrations` | 6 | 브레드크럼 라벨 맵, GlycoPharm 설정 탭, settings section 타입 — **menuId 용례 0** |
+| `integrations` | 6 | 브레드크럼 라벨 맵 설정 탭, settings section 타입 — **menuId 용례 0** |
 | `tools` | 5 | cpt-engine route path, 가이드 카피, **디버그 페이지 1건**(§2) |
 
 `menuId: 'database'` / `id: 'database'` 형태의 실제 menu 정의는 **0건**으로 확인했다.

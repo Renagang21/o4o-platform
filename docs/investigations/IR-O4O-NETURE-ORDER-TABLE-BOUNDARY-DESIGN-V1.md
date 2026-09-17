@@ -44,7 +44,7 @@
 ## 3. checkout_orders 구조
 
 - 엔티티: `apps/api-server/src/entities/checkout/CheckoutOrder.entity.ts` (+ `CheckoutPayment`, `OrderLog`). **item 전용 테이블 없음 — `items` jsonb 배열**.
-- **주문 원장 성격**: e-commerce 결제/주문 원장(Toss). KPA/GlycoPharm/K-Cosmetics 서비스 주문 + **이벤트 오퍼 주문**.
+- **주문 원장 성격**: e-commerce 결제/주문 원장(Toss).
 - 주요 컬럼: id, order_number, buyerId, sellerId, **supplierId(order-level, varchar)**, **sellerOrganizationId(매장 단위 추적)**, partnerId, subtotal, **shippingFee(decimal, 기본 0)**, discount, totalAmount, **status**(CREATED/PENDING_PAYMENT/PAID/REFUNDED/CANCELLED), **paymentStatus**(PENDING/PAID/FAILED/REFUNDED), shippingAddress(jsonb), **items(jsonb: productId/name/qty/unitPrice/subtotal — shippingFee·supplierId 없음)**, metadata(serviceKey 등), paidAt/refundedAt/cancelledAt.
 - **생성**: `checkout.service.createOrder()` — **`const shippingFee = 0;`(하드코딩, line~121)**, order_type/service_key는 호출자 metadata로. → 배송비 계산 **부재**.
 - **결제**: `checkout_payments`(Toss paymentKey). `checkout_order_logs` 상태 감사.
@@ -58,7 +58,7 @@
 
 - `event-offer.service.participate()` (`routes/kpa/services/event-offer.service.ts:546-755`):
   1. 리스팅/공급자 상품 검증 → 2. 수량 게이트(per_order/per_store/total, SELECT FOR UPDATE) → 3. **`checkoutService.createOrder({ buyerId, sellerId=org_id, supplierId=product.supplier_id, items:[{productId=offer_id, unitPrice=eventPrice ?? price_general, ...}], metadata:{serviceKey, productListingId, ...} })`** → 4. 실패 시 수량 보상 → 5. 매장 진열 자동 링크.
-- 대상 서비스: KPA(`kpa`)·K-Cosmetics(`k-cosmetics-event-offer`)·GlycoPharm(`glycopharm-event-offer`). **Neture 자체 미적용**.
+- 대상 서비스: KPA(`kpa`)·K-Cosmetics(`k-cosmetics-event-offer`). **Neture 자체 미적용**.
 - 가격 snapshot: items.unitPrice에 event price 또는 price_general 저장(별도 snapshot 컬럼 없음).
 - **공급자 workspace 노출**: ❌ 현재 불가(workspace는 neture_orders만 읽음). 단 checkout_orders에 **order-level supplierId 존재** → aggregator 조회는 가능.
 - **neture_orders로 전환/동기화**: 현재 없음.
@@ -89,7 +89,7 @@
 
 ## 7. 정산/상태/송장 영향
 
-- **정산 기준**: `neture_settlement` = neture_orders(`delivered`). checkout_orders는 `checkout_payments`(Toss 결제)만 — **정산 집계 미연결**(GlycoPharm billing_invoice는 별도). → 이벤트 오퍼 주문 정산은 현재 **공백(GAP)**.
+- **정산 기준**: `neture_settlement` = neture_orders(`delivered`). checkout_orders는 `checkout_payments`(Toss 결제)만 — **정산 집계 미연결**. → 이벤트 오퍼 주문 정산은 현재 **공백(GAP)**.
 - **상태/송장**: 상태전이·`neture_shipments` 모두 neture_orders 전용. checkout_orders는 payment status 중심, 배송 상태/송장 **없음**.
 - **함의**: 이벤트 오퍼 주문에 "배송준비/송장/배송완료/정산"을 주려면 checkout_orders만으로는 불가 → fulfillment record(neture_orders 계열) 필요(B) 또는 checkout_orders에 fulfillment 필드 신설(A의 일부).
 

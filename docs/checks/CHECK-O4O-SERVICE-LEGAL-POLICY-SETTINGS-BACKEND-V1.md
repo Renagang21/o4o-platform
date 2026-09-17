@@ -71,7 +71,6 @@
 
 ## 8. 권한 검증 방식
 - `requireServiceLegalScope(level)` — `:serviceKey` path param → security-core scope config 적용.
-  - neture/glycopharm/k-cosmetics: `platformBypass=true` (platform:super_admin 통과)
   - **kpa-society: `platformBypass=false` 그대로 사용 → platform:super_admin 도 차단(KPA 격리 자동 준수).**
   - `createMembershipScopeGuard` 재사용 → active membership + `${prefix}:${level}` scope 검사.
     service admin 은 자기 서비스 role/membership 만 보유하므로 cross-service 수정 불가.
@@ -100,7 +99,7 @@
 
 ## 13. frontend 미수정 확인
 - `services/web-*` 파일 **0건 수정**. staged 파일은 `apps/api-server/**` + CHECK 문서뿐(§15 가드 통과).
-- GP/KCos/KPA/Neture 푸터 UI 무변경. `/terms`·`/privacy` route 미변경.
+- KCos/KPA/Neture 푸터 UI 무변경. `/terms`·`/privacy` route 미변경.
 
 ## 14. 검증 결과
 - **tsc api-server: 0 errors** ✅

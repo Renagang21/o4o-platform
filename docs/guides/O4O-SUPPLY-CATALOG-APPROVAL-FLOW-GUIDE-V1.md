@@ -8,7 +8,7 @@
 
 매장 경영자가 공급 상품 카탈로그에서 신청한 상품을 운영자가 검토·승인하는 흐름과,
 **승인이 곧 소비자 노출(판매)을 의미하지 않는다**는 점을 운영자 기준으로 설명한다.
-KPA / GlycoPharm / K-Cosmetics 운영자가 동일 기준으로 이해하도록 한다.
+KPA / K-Cosmetics 운영자가 동일 기준으로 이해하도록 한다.
 
 ## 2. 핵심 용어
 
@@ -71,8 +71,7 @@ organization_channels APPROVED (매장 채널 승인)
 
 | 서비스 | 승인→편입 | 소비자 노출 gate |
 |--------|:---:|------|
-| **GlycoPharm** | ✅ | ✅ 4-gate(offer active + OPL active + OPC + 채널 APPROVED [+공급계약]) checkout 강제 |
-| **KPA** | ✅ | ✅ checkout(공급계약 + 채널 APPROVED + OPL/offer active). B2C 채널 성숙도는 GP 대비 부분 |
+| **KPA** | ✅ | ✅ checkout(공급계약 + 채널 APPROVED + OPL/offer active). B2C 채널 성숙도는 부분 |
 | **K-Cosmetics** | ✅ | ⚠️ 주문이 local/travel 채널 모델 — B2C 4-gate 와 구조가 다름(별도 정책 IR 예정) |
 
 승인·편입(OPL active)은 **3서비스 공통**, 소비자 노출 gate 는 **서비스별 성숙도 차이**가 있다.
@@ -95,7 +94,7 @@ A. O4O 주문 가능 상품 편입 자격을 얻습니다. 실제 주문 가능 
 **Q. 왜 offer 전체를 한 번에 활성화하지 않나요?**
 A. 각 매장의 신청·승인을 기준으로 **per-store 단건** 활성화합니다. offer-wide 일괄 활성화는 승인 의미를 과도하게 확장하므로 사용하지 않습니다.
 
-**Q. KPA / GlycoPharm / K-Cosmetics 가 다 같나요?**
+**Q. KPA / K-Cosmetics 가 다 같나요?**
 A. 신청→승인→편입은 동일합니다. 소비자 노출(진열) 단계는 서비스별 성숙도가 다릅니다(§8).
 
 ## 11. 후속 정책 문서

@@ -31,16 +31,15 @@
 |---|---|---|---|---|---|
 | KPA | `@o4o/store-ui-core` + `@o4o/tablet-screen-set-editor` | 서비스 client | `/api/v1/kpa/store/tablets/*` | `createStoreTabletRoutes(ds,{storeOwnerServiceKey:'kpa'})` | KPA 축 (정상) |
 | K-Cosmetics | `@o4o/store-ui-core` 공통 화면 | `services/tabletDisplayApi.ts` | **`/api/v1/store/tablets/*` (서비스 중립)** | 없음 (중립 mount 만) | **서비스 무관 fallback → 타 서비스 조직 선택 가능 (BUG)** |
-| GlycoPharm | `@o4o/store-ui-core` 공통 화면 | `api/tabletDisplays.ts`, `api/tabletInterest.ts` | **`/api/v1/store/tablets/*`, `/api/v1/store/interest/*`** | 없음 (중립 mount 만) | **동일 BUG** |
 | PharmacyHub | 자체 화면 + 편집기 | PH client | `/api/v1/pharmacy-hub/store-owner/*` | PH 전용 라우터 | `resolveOrganizationId` 주입 adapter (409 계약 자체 소유) |
 
 ### 1-2. 조직 resolver seam
 
-- `apps/api-server/src/utils/store-organization.resolver.ts` — `StoreOwnerServiceKey = 'kpa' | 'glycopharm' | 'cosmetics' | 'pharmacy-hub'`, membership canonical key 매핑(`kpa→kpa-society`, `cosmetics→k-cosmetics`).
+- `apps/api-server/src/utils/store-organization.resolver.ts` — membership canonical key 매핑(`kpa→kpa-society`, `cosmetics→k-cosmetics`).
 - `store-tablet.routes.ts` 는 **두 개의 seam** 을 이미 제공한다:
   1. `storeOwnerServiceKey` — 공통 resolver 를 서비스 축으로 스코프 (KPA 선례).
   2. `resolveOrganizationId` 주입 — PH 가 자기 409 계약(`STORE_NOT_CONNECTED` / `AMBIGUOUS_STORE_CONNECTION`)을 유지.
-- **새 generic resolver 를 만들지 않았다** (§6-3). KCos/GP 는 1번 seam 을 재사용했고, 이는 `createStoreLocalProductRoutes(dataSource, serviceKey)` 의 기존 선례와 같은 축이다.
+- **새 generic resolver 를 만들지 않았다** (§6-3). KCos 는 1번 seam 을 재사용했고, 이는 `createStoreLocalProductRoutes(dataSource, serviceKey)` 의 기존 선례와 같은 축이다.
 
 ### 1-3. Screen Set
 
@@ -50,7 +49,6 @@
 | Neture | 9 |
 | PharmacyHub | 2 |
 | K-Cosmetics | **0** |
-| GlycoPharm | **0** |
 
 ### 1-4. Password Recovery (§14 — census only)
 
@@ -58,7 +56,6 @@
 |---|---|
 | KPA | `AccountRecoveryPage`, `ResetPasswordPage` |
 | K-Cosmetics | `AccountRecoveryPage`, `ResetPasswordPage`, `LoginPage`, `LoginModal` |
-| GlycoPharm | `AccountRecoveryPage`, `ResetPasswordPage`, `LoginPage`, `LoginModal` |
 | PharmacyHub | `ForgotPasswordPage`, `ResetPasswordPage`, `LoginPage` |
 
 → 화면 명칭·구성이 서비스마다 다르고 backend 계약은 이미 공통이다. 공통화 이득 불명확 → **NO_ACTION**.
@@ -69,32 +66,32 @@
 
 ## 2. Cross-service 계약 매트릭스 (§17 — 미조사 0)
 
-| 축 | KPA | K-Cosmetics | GlycoPharm | PharmacyHub | 판정 |
-|---|---|---|---|---|---|
-| **A. 조직 resolver 스코프** | 서비스 스코프 mount | **없음 → BUG** | **없음 → BUG** | 자체 resolver 주입 | KCos·GP `BUG` → 수정 / PH `NO_ACTION` |
-| **B. TABLET 노출 사유 계약 (backend)** | 있음 | 있음(공유 라우터가 부여) | 있음 | 있음 | `FULLY_COMMON` — 변경 없음 |
-| **B. 노출 사유 표시 (frontend)** | 편집기에서 표시 | **표시 안 함 → BUG** | **표시 안 함 → BUG** | 편집기에서 표시 | `COMMON_CORE_WITH_ADAPTER` → `@o4o/store-ui-core` 에 구현 |
-| **C. isStoreOwner (frontend)** | `StoreOwnerGuard` + `isStoreOwnerDual` stale 회복 | `StoreOwnerGuard` | `StoreOwnerGuard` (membership role `pharmacy`) | `StoreOwnerGuard` | `FULLY_COMMON` (서비스 config = adapter) — 변경 없음 |
-| **C. isStoreOwner (backend)** | `isStoreOwner(ds,uid,'kpa')` | 동일 SSOT | 동일 SSOT | PH 자체 resolver | `FULLY_COMMON` + PH `SERVICE_SPECIFIC` — 변경 없음 |
-| **C. 계정 전역 자격 (`auth-helpers`)** | serviceKey 없이 계정 전역 | 동일 | 동일 | 동일 | 의도된 계정 축 → `NO_ACTION` |
-| **D. Screen Set 편집기↔런타임** | 상위집합 | 코드 0 | 코드 0 | 축소 집합 | `SERVICE_SPECIFIC` → `NO_ACTION` (§9-3 KPA 상위집합 축소 금지) |
-| **E. QR/상품 canonical landing** | `createStoreQrLandingController(...,'kpa')` | `...,'cosmetics'` | `...,'glycopharm'` | `PharmacyHubStoreQrController.publicLanding` (`opl.master_id` 조인) | 3서비스 `FULLY_COMMON` + PH `SERVICE_SPECIFIC` → 검증만, 변경 0 |
+| 축 | KPA | K-Cosmetics | PharmacyHub | 판정 |
+| --- | --- | --- | --- | --- |
+| **A. 조직 resolver 스코프** | 서비스 스코프 mount | **없음 → BUG** | 자체 resolver 주입 | KCos `BUG` → 수정 / PH `NO_ACTION` |
+| **B. TABLET 노출 사유 계약 (backend)** | 있음 | 있음(공유 라우터가 부여) | 있음 | `FULLY_COMMON` — 변경 없음 |
+| **B. 노출 사유 표시 (frontend)** | 편집기에서 표시 | **표시 안 함 → BUG** | 편집기에서 표시 | `COMMON_CORE_WITH_ADAPTER` → `@o4o/store-ui-core` 에 구현 |
+| **C. isStoreOwner (frontend)** | `StoreOwnerGuard` + `isStoreOwnerDual` stale 회복 | `StoreOwnerGuard` | `StoreOwnerGuard` | `FULLY_COMMON` (서비스 config = adapter) — 변경 없음 |
+| **C. isStoreOwner (backend)** | `isStoreOwner(ds,uid,'kpa')` | 동일 SSOT | PH 자체 resolver | `FULLY_COMMON` + PH `SERVICE_SPECIFIC` — 변경 없음 |
+| **C. 계정 전역 자격 (`auth-helpers`)** | serviceKey 없이 계정 전역 | 동일 | 동일 | 의도된 계정 축 → `NO_ACTION` |
+| **D. Screen Set 편집기↔런타임** | 상위집합 | 코드 0 | 축소 집합 | `SERVICE_SPECIFIC` → `NO_ACTION` (§9-3 KPA 상위집합 축소 금지) |
+| **E. QR/상품 canonical landing** | `createStoreQrLandingController(...,'kpa')` | `...,'cosmetics'` | `PharmacyHubStoreQrController.publicLanding` (`opl.master_id` 조인) | 3서비스 `FULLY_COMMON` + PH `SERVICE_SPECIFIC` → 검증만, 변경 0 |
 
 ---
 
 ## 3. BUG 근거
 
-### BUG-1 (P1) — KCos / GP 태블릿 화면의 조직 해석이 서비스 축이 아니다
+### BUG-1 (P1) — KCos 태블릿 화면의 조직 해석이 서비스 축이 아니다
 
 - 두 서비스의 태블릿 client 가 서비스 중립 `/api/v1/store/tablets/*` 를 호출했다.
 - 중립 mount 는 `storeOwnerServiceKey` 없이 동작하므로 `organization_members` 기준 결정적 정렬(`is_primary` → 최초 가입)로 조직을 고른다.
-- 다중 조직 사용자(예: Neture 공급자 조직이 primary)의 경우 **KCos/GP 화면이 타 서비스 조직의 상품 풀**을 본다.
+- 다중 조직 사용자(예: Neture 공급자 조직이 primary)의 경우 **KCos 화면이 타 서비스 조직의 상품 풀**을 본다.
 - 회귀 테스트 A 가 이 현상 자체를 고정하고(`poolOrgParams[0] === 'org-neture'`), B/C 가 수정 후 계약을 고정한다.
 
 ### BUG-2 (P1) — 공통 태블릿 화면이 노출 판정을 버린다
 
 - backend 는 모든 mount 에서 `tabletVisible` / `tabletVisibilityReason` / `tabletChannel` 을 붙여 준다.
-- `@o4o/tablet-screen-set-editor`(KPA/PH/Neture)만 이를 표시했고, KCos/GP 가 공유하는 `@o4o/store-ui-core` 태블릿 화면은 필드를 버렸다.
+- `@o4o/tablet-screen-set-editor`(KPA/PH/Neture)만 이를 표시했고, KCos 가 공유하는 `@o4o/store-ui-core` 태블릿 화면은 필드를 버렸다.
 - 결과: 매장 경영자가 상품을 진열에 넣어도 공개 태블릿에 나오지 않는 **무증상 실패**.
 
 ---
@@ -105,7 +102,7 @@
 공통 core                                    서비스 adapter
 ─────────────────────────────────────────    ─────────────────────────────────────────
 store-tablet.routes.ts (라우트·응답 계약)     mount 시 storeOwnerServiceKey / qrServiceKey /
-annotateTabletVisibility (노출 판정)            operatorTemplateServiceKey (KPA·KCos·GP)
+annotateTabletVisibility (노출 판정) operatorTemplateServiceKey (KPA·KCos)
 resolveStoreTabletChannelState               resolveOrganizationId 주입 (PharmacyHub — 409 계약)
 store-owner.utils.isStoreOwner (SSOT)        SERVICE_ROLES config (role prefix/membership key/role)
 @o4o/store-ui-core 태블릿 화면 · 사유 문구     서비스 API client 의 BASE 경로
@@ -122,10 +119,7 @@ StoreOwnerGuard (판정 흐름)                   labels / accent / renderDenied
 | 파일 | 축 | 내용 |
 |---|---|---|
 | `apps/api-server/src/routes/cosmetics/cosmetics.routes.ts` | A | `createStoreTabletRoutes` 를 `storeOwnerServiceKey:'cosmetics'` 로 mount (local-products 와 같은 조직 축) |
-| `apps/api-server/src/routes/glycopharm/glycopharm.routes.ts` | A | 동일 (`'glycopharm'`) |
 | `services/web-k-cosmetics/src/services/tabletDisplayApi.ts` | A·B | `BASE='/cosmetics/store'`, 노출 필드 타입 추가 |
-| `services/web-glycopharm/src/api/tabletDisplays.ts` | A·B | `BASE='/glycopharm/store'`, 노출 필드 타입 추가 |
-| `services/web-glycopharm/src/api/tabletInterest.ts` | A | `/glycopharm/store/interest/*` |
 | `packages/store-ui-core/src/components/tablet/types.ts` | B | `TabletVisibilityReason` · `TABLET_VISIBILITY_NOTICE` · `StoreTabletChannelState` + additive optional 필드 |
 | `packages/store-ui-core/src/components/tablet/tabletHelpers.ts` | B | 후보에 `tabletVisible` / `visibilityNotice` 전달 |
 | `packages/store-ui-core/src/components/tablet/TabletProductPoolPanel.tsx` | B | 행별 "노출 불가 — 사유" 표시 (**선택은 막지 않는다**) |
@@ -145,7 +139,6 @@ StoreOwnerGuard (판정 흐름)                   labels / accent / renderDenied
 | 관련 Jest 4 suite (44건) | PASS |
 | `node scripts/lint-ratchet.mjs` | exit 0 — ESLint 55 errors / 1391 warnings (**error baseline 55 유지**) |
 | `apps/api-server` `tsc --noEmit` | **0 errors** (workspace 패키지 빌드 후) |
-| typecheck: web-k-cosmetics / web-glycopharm / web-kpa-society / web-pharmacy-hub | 4/4 PASS |
 | vite build: 위 4서비스 | 4/4 PASS (15.65s / 17.60s / 19.43s / 15.36s) |
 | api-server 전체 Jest | **228 suites / 3,812 tests 전량 PASS** (exit 0, 139s) — 실패 0 |
 
@@ -158,7 +151,6 @@ StoreOwnerGuard (판정 흐름)                   labels / accent / renderDenied
 | `new_duplicated_lines_density` | **14.6%** | 3% |
 
 파일별(신규 라인 중 중복 비율): `cross-service-...spec.ts` 27.8% / `kpa-my-store-tablet-runtime-contract.spec.ts` 30.1% /
-`web-k-cosmetics/.../tabletDisplayApi.ts` 75.0% / `web-glycopharm/src/api/tabletDisplays.ts` 52.6% — 나머지 전 파일 0.0%.
 
 **게이트 우회·임계 완화·`NOSONAR` 를 쓰지 않고, 실제 중복을 제거했다.** 새 공통화 기능을 추가한 것이 아니라
 이미 이번 PR 안에 들어 있던 **같은 선언의 중복을 하나로 모은 것**이다.
@@ -166,9 +158,9 @@ StoreOwnerGuard (판정 흐름)                   labels / accent / renderDenied
 | 중복 | 조치 |
 |---|---|
 | 두 spec 의 stub DataSource · MEMBERSHIPS · makeApp | `src/__tests__/helpers/store-tablet-org-stub.ts` 로 추출. **판정 로직은 stub 에 넣지 않는다** — SQL 분기별 고정 응답만 두고, 시나리오 차이(채널 상태·slug·service_key·조직 목록)는 인자로 받는다 |
-| KCos / GP client 의 `PoolSupplierProduct` · `ProductPool.tabletChannel` 동일 선언 | `@o4o/store-ui-core` 에 `StoreTabletPoolSupplierProductRow` 를 추가하고 두 client 는 이를 import (채널 상태는 기존 `StoreTabletChannelState` 재사용) |
+| KCos client 의 `PoolSupplierProduct` · `ProductPool.tabletChannel` 동일 선언 | `@o4o/store-ui-core` 에 `StoreTabletPoolSupplierProductRow` 를 추가하고 두 client 는 이를 import (채널 상태는 기존 `StoreTabletChannelState` 재사용) |
 
-재검증: 두 spec **21건 PASS** · KCos/GP `tsc --noEmit` 0 errors · api-server 전체 Jest 재실행 결과는 아래 표와 동일.
+재검증: 두 spec **21건 PASS** · KCos `tsc --noEmit` 0 errors · api-server 전체 Jest 재실행 결과는 아래 표와 동일.
 
 #### 6-1-1. 2차 — 14.6% → 4.0% → 2.7%
 
@@ -195,9 +187,9 @@ export type PoolSupplierProduct = StoreTabletPoolSupplierProductRow;
 export type ProductPool = StoreTabletProductPoolResponse<LocalProduct>;
 ```
 
-`const BASE = '/cosmetics/store'` · `'/glycopharm/store'` 는 그대로다 (raw-source spec H 계약).
+`const BASE = '/cosmetics/store'`
 
-재검증: 두 spec **21건 PASS** · KCos `tsc --noEmit` 0 · GP `tsc --noEmit` 0.
+재검증: 두 spec **21건 PASS** · KCos `tsc --noEmit` 0 `tsc --noEmit` 0.
 예상 중복도 = 28줄 / 신규 라인 ≈ **2.7%** (임계 3% 이하). 여기서도 임계 완화·`NOSONAR` 는 쓰지 않았다.
 
 **기존 결함(본 WO 원인 아님)**: `packages/financial-core` 빌드가 tsup "No input files" 로 실패한다 → 워크스페이스 빌드는 `--no-bail` 로 수행했다.
@@ -210,7 +202,6 @@ export type ProductPool = StoreTabletProductPoolResponse<LocalProduct>;
 |---|---|
 | KPA | KPA WO 범위에서 수행 · 배포 후 프로덕션 E2E 는 `KPA_POST_DEPLOY_E2E_PENDING` |
 | K-Cosmetics | **`E2E_BLOCKED_AUTH`** — `docs/local/TEST-ACCOUNTS.local.md` 에 KCos store_owner 프로덕션 credential 없음. 우회 credential 생성하지 않았다. |
-| GlycoPharm | **`E2E_BLOCKED_AUTH`** — 동일 사유 |
 | PharmacyHub | 코드 변경 0 (계약 보존 확인만) |
 
 → 변경된 두 서비스는 라우트·조직 해석·응답 계약을 **스텁 DataSource 기반 회귀 테스트 10건**으로 고정했고, 실 브라우저 E2E 는 credential 확보 시점으로 미룬다. 이를 PASS 로 위장하지 않는다.
@@ -222,9 +213,9 @@ export type ProductPool = StoreTabletProductPoolResponse<LocalProduct>;
 | 항목 | 판정 |
 |---|---|
 | PH 조직 해석 409 계약 | `SERVICE_SPECIFIC` — 유지 |
-| Screen Set (KCos/GP 코드 0) | `SERVICE_SPECIFIC` — KPA 상위집합 축소 금지(§9-3) |
+| Screen Set (KCos 코드 0) | `SERVICE_SPECIFIC` — KPA 상위집합 축소 금지(§9-3) |
 | `auth-helpers` 계정 전역 자격 | `NO_ACTION` |
 | Password Recovery | `NO_ACTION` (census only) |
-| KCos/GP 프로덕션 store-owner E2E | **미완 — credential 확보 후 후속** |
+| KCos 프로덕션 store-owner E2E | **미완 — credential 확보 후 후속** |
 | KPA 배포 후 프로덕션 E2E | **미완 — `KPA_POST_DEPLOY_E2E_PENDING`** |
 | `packages/financial-core` 빌드 실패 | 본 WO 범위 밖 · 별도 WO 필요 |

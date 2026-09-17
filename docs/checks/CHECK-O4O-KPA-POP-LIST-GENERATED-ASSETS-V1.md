@@ -43,7 +43,7 @@
 
 ## 7. 범위/안전
 - store_execution_assets → store_pops migration·신규 테이블 0. 데이터 이동/삭제(운영) 0. production-materials route 유지(미삭제). 기존 QR target·콘텐츠 feed 조건 무변경 → POP 콘텐츠 목록 중복 노출 0.
-- **KPA 전용** → GP/KCos 무영향. 기존 POP 생성 흐름(StorePopPage 다단계 생성기) 무변경.
+- **KPA 전용** → KCos 무영향. 기존 POP 생성 흐름(StorePopPage 다단계 생성기) 무변경.
 
 ## 8. 미해결/후속
 - production-materials route 직접 URL 접근 시 POP 결과 노출 가능(legacy route 유지) → `WO-O4O-KPA-PRODUCTION-MATERIALS-LEGACY-ROUTE-CLEANUP-V1` 후보.

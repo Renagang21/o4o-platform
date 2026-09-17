@@ -22,8 +22,6 @@
 |---|---|
 | `POST /api/v1/kpa/payments/prepare` | **410** `STORE_SALE_PAYMENT_DEPRECATED` |
 | `POST /api/v1/kpa/payments/confirm` | **410** `STORE_SALE_PAYMENT_DEPRECATED` |
-| `POST /api/v1/glycopharm/payments/prepare` | **410** `STORE_SALE_PAYMENT_DEPRECATED` |
-| `POST /api/v1/glycopharm/payments/confirm` | **410** `STORE_SALE_PAYMENT_DEPRECATED` |
 | `POST /api/v1/cosmetics/payments/prepare` | **410** `STORE_SALE_PAYMENT_DEPRECATED` |
 | `POST /api/v1/cosmetics/payments/confirm` | **410** `STORE_SALE_PAYMENT_DEPRECATED` |
 

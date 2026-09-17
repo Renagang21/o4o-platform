@@ -44,16 +44,6 @@
 - `config/homeStaticData.ts` — 홈 슬라이드/카드 title
 - `components/common/MarketTrialNetureRedirect.tsx` — 리다이렉트 안내 제목
 
-### web-glycopharm (8)
-- `pages/business/BusinessProductsPage.tsx` — 사업 소개 본문 5곳
-- `pages/business/BusinessPreparationPage.tsx` — 준비 항목 본문 2곳
-- `pages/business/BusinessHubPage.tsx` — 사업 카드/Hero 본문 3곳
-- `pages/business/BusinessForumPage.tsx` — 포럼 주제/제목 prefix 태그/안내 본문
-- `pages/business/BloodCareBusinessStatusPage.tsx` — 사업 카드 title/checks
-- `api/public.ts` — 공지 mock 제목
-- `pages/store-management/StoreMainPage.tsx` — 매장 메뉴 라벨
-- `components/common/MarketTrialNetureRedirect.tsx` — 리다이렉트 안내 제목
-
 ### web-kpa-society (4)
 - `components/ServiceBanner.tsx` — 배너 제목
 - `pages/CommunityHomePage.tsx` — 커뮤니티 홈 CTA 제목
@@ -93,7 +83,6 @@
 | 패키지 | `tsc --noEmit` |
 |--------|:---:|
 | web-neture | ✅ exit 0 |
-| web-glycopharm | ✅ exit 0 |
 | web-k-cosmetics | ✅ exit 0 |
 | web-kpa-society | ✅ exit 0 |
 | shared-space-ui | ✅ exit 0 |

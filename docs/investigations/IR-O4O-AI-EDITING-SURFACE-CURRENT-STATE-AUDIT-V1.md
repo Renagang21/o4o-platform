@@ -28,25 +28,25 @@
 
 | # | Surface | 서비스 | 목적 | 컴포넌트 | endpoint |
 |---|---------|--------|------|----------|----------|
-| 1 | StorePopPage | KPA/GP/KCos | POP 문구(제목/포인트/본문) | KPA=AiContentModal / GP·KCos=인라인 fetch | `/api/ai/content-to-store-use` · `/api/v1/{svc}/pharmacy/pop/generate` |
-| 2 | PharmacyBlogPage / StoreBlogManagePage | KPA/GP/KCos | 블로그/칼럼 글 | **3서비스 AiContentModal**(template-aware) | `/api/ai/content` |
-| 3 | StoreProductDescriptionsPage | KPA/GP (**KCos 없음**) | 제품 설명 | AiContentModal + RichTextEditor | `/api/ai/content` |
-| 4 | StoreQRPage | **KPA만 AI** (GP/KCos AI 없음) | QR 제목/설명 | KPA=AiContentModal / GP·KCos=form only | `/api/ai/content` |
-| 5 | StoreProductionMaterialsPage / ProductionMaterialEditorPage | KPA/GP (**KCos 없음**) | 제작 자료 초안 | AiContentModal | `/api/ai/content` → `/api/v1/{svc}/store/assets` |
-| 6 | StoreLibraryContentsPage(StartProductionModal) | KPA/GP/KCos | 제작 진입(초안 생성) | AiContentModal | 동상 |
+| 1 | StorePopPage | KPA/KCos | POP 문구(제목/포인트/본문) | KPA=AiContentModal / KCos=인라인 fetch | `/api/ai/content-to-store-use` · `/api/v1/{svc}/pharmacy/pop/generate` |
+| 2 | PharmacyBlogPage / StoreBlogManagePage | KPA/KCos | 블로그/칼럼 글 | **2서비스 AiContentModal**(template-aware) | `/api/ai/content` |
+| 3 | StoreProductDescriptionsPage | KPA/제품 설명 | AiContentModal + RichTextEditor | `/api/ai/content` |
+| 4 | StoreQRPage | **KPA만 AI** (KCos AI 없음) | QR 제목/설명 | KPA=AiContentModal / KCos=form only | `/api/ai/content` |
+| 5 | StoreProductionMaterialsPage / ProductionMaterialEditorPage | KPA/제작 자료 초안 | AiContentModal | `/api/ai/content` → `/api/v1/{svc}/store/assets` |
+| 6 | StoreLibraryContentsPage(StartProductionModal) | KPA/KCos | 제작 진입(초안 생성) | AiContentModal | 동상 |
 | 7 | LMS CourseStructureAiModal | **KPA only** | 강의 구조(레슨 후보) 2단계 생성 | bespoke modal | `/api/ai/course-structure` → `/api/ai/lesson-body` |
-| 8 | LMS 강사 LessonModal 콘텐츠 AI | KPA/GP | 레슨 본문 article/video | AiContentModal | `/api/ai/content` |
+| 8 | LMS 강사 LessonModal 콘텐츠 AI | KPA/레슨 본문 article/video | AiContentModal | `/api/ai/content` |
 | 9 | LMS learner 피드백 | KPA/KCos | 퀴즈/과제 AI 피드백 | `aiApi`(learner) | `/api/ai/analyze`(type=quiz/assignment) |
 | 10 | resources ResourceWritePage/Modal | KPA | 자료 글 작성("AI로 만들기") | AiContentModal(**template 미연결**, generic) | `/api/ai/content` |
 | 11 | Signage AI | KPA(+admin signageV2) | 사이니지 콘텐츠 생성 | `signageAi.ts`(별도) | **`/api/signage/{svc}/ai/generate`**(별도 파이프라인) |
 | 12 | admin-dashboard AI generators | admin builder | block/page/section/code/대화형 생성 | `services/ai/*`(SimpleAI/Block/Page/Section/Conversational/BlockCode) | `/api/ai/generate` 프록시 |
 | 13 | admin AI 거버넌스 | web-neture admin | 엔진/정책/쿼터 설정 | AiEnginesPage/AiPolicyPage | `/api/ai/admin/engines\|policy` |
-| 14 | operator AI 대시보드 | GP operator(KPA/KCos 없음) | 사용량/빌링 **조회** | AiUsageDashboard/AiBillingPage | `/api/ai/admin/analytics\|billing` |
+| 14 | operator AI 대시보드 operator(KPA/KCos 없음) | 사용량/빌링 **조회** | AiUsageDashboard/AiBillingPage | `/api/ai/admin/analytics\ | billing` |
 
 ## 5. 서비스별 AI 사용 현황
 
 - **KPA-Society:** 가장 풍부. store 편집 AI(POP/QR/제품설명/블로그/제작자료) + LMS 강의구조(전용) + resources + signage. AiContentModal 채택률 높음(POP 포함).
-- **GlycoPharm:** store 편집 AI 대부분 보유하나 **POP 는 인라인 fetch(모달 미사용)**, **QR AI 없음**. operator AI 대시보드(사용량/빌링) 보유. LMS 강의구조 없음(KPA 전용 제외 명시).
+- operator AI 대시보드(사용량/빌링) 보유. LMS 강의구조 없음(KPA 전용 제외 명시).
 - **K-Cosmetics:** 블로그/라이브러리는 공통 모달. **POP 인라인, QR AI 없음, 제품설명·제작자료 surface 부재.** LMS editor 미구축.
 - **Neture:** **LMS/store 편집 AI 소비 안 함.** 단 **admin(web-neture)이 AI 엔진/정책/쿼터/빌링 control plane** 을 보유 → 플랫폼 AI 설정 주체(LMS 제외와 별개 축).
 
@@ -59,11 +59,11 @@
 - **preset SSOT `ProductionTemplate`(`packages/types/src/production-template.ts`):** `{ id, target('pop'|'blog'|'qr'|'product-description'), systemPromptOverride, forcedOptions{length,tone}, outputConstraints{maxBodyLength,allowedLengths,requiredFields,layout}, starterHtml, layout }`. 10 seed(POP3/Blog3/QR3/Desc2). `getTemplatesForTarget`/`findTemplate`/`getDefaultTemplate`(KPA `pharmacy/productionTemplates.ts`).
   - **흐름:** StartProductionModal 이 template picker → caller 가 templateId/systemPrompt/forcedOptions 추출 → AiContentModal 주입 → 결과에 templateId metadata 저장.
   - **갭:** preset 표준은 **store 제작물 4 target 에 한정**. LMS(강의구조/레슨본문)·resources·signage 는 preset 미연결(generic 또는 별도 prompt).
-- **인라인/별도 prompt:** GP/KCos POP 는 fetch body 에 `tone` 하드코딩(모달·template 미경유). Signage 는 `signageAi.ts` 의 `AiGenerateRequest{prompt,templateType,style,...}` 별도 구조.
+- **인라인/별도 prompt:** KCos POP 는 fetch body 에 `tone` 하드코딩(모달·template 미경유). Signage 는 `signageAi.ts` 의 `AiGenerateRequest{prompt,templateType,style,...}` 별도 구조.
 
 ## 7. 공통 editor AI 후보 vs 특수 AI 후보
 
-- **공통(AiContentModal 정렬):** POP(GP/KCos 인라인 → 모달 통일), QR(GP/KCos AI 추가), 제품설명(KCos surface 추가) → **모달은 이미 공통, 미적용/누락처만 채택**. 블로그/라이브러리/제작자료(KPA·GP)는 이미 정렬.
+- **공통(AiContentModal 정렬):** POP(KCos 인라인 → 모달 통일), QR(KCos AI 추가), 제품설명(KCos surface 추가) → **모달은 이미 공통, 미적용/누락처만 채택**. 블로그/라이브러리/제작자료(KPA)는 이미 정렬.
 - **특수(별도 설계):** CourseStructureAiModal(2단계·KPA-only), Signage AI(별도 파이프라인·asset 연결), admin-dashboard 빌더 generators(block/page/section — admin 도메인), product-description(입력 데이터·outputConstraints 큰 편).
 
 ## 8. admin AI model/provider 설정 현황
@@ -73,7 +73,7 @@
 | **AiEnginesPage** | `web-neture/src/pages/admin/ai/AiEnginesPage.tsx` | **엔진(provider+model) 활성화 선택** | `PUT /api/ai/admin/engines/{id}/activate`(DB-backed) |
 | AiQuerySettings | `apps/admin-dashboard/src/pages/settings/AiQuerySettings.tsx` | defaultModel 드롭다운(**Gemini 계열만**) | `PUT /ai/policy` |
 | AiPolicyPage | `web-neture/.../AiPolicyPage.tsx` | 쿼터(free/paid/global)·warning·aiEnabled 토글. **model 은 read-only 표시** | `PUT /api/ai/admin/policy` |
-| AiUsageDashboard/AiBillingPage | `web-glycopharm/src/pages/operator/*` | 사용량/비용 **조회·빌링 조정**(편집 아님) | `/api/ai/admin/analytics\|billing` |
+| AiUsageDashboard/AiBillingPage | — | 사용량/비용 **조회·빌링 조정**(편집 아님) | `/api/ai/admin/analytics\ | billing` |
 
 → **모델/엔진을 고를 수 있는 곳은 AiEnginesPage(엔진 활성화) + AiQuerySettings(default model)**. 그러나 §9 처럼 **생성 endpoint 가 이 값을 읽지 않는다.**
 
@@ -83,11 +83,11 @@
 - **provider 추상화 부분 존재하나 우회:** `AIProvider='openai'|'gemini'|'claude'` + `MODEL_WHITELIST` + `ai-proxy.service.callProvider` switch 가 있으나 **대부분 endpoint 가 직접 Gemini `generateContent?key=` 호출로 우회**.
 - **DB 설정 존재하나 미사용:** `AiSettings.defaultModel`·`ai_model_settings`·엔진 활성화 값이 있으나 **런타임 생성 경로가 하드코딩 문자열 사용**. = "admin 에서 골라도 실제 모델 안 바뀜" 갭.
 - **사용량/빌링은 기록됨:** `AIUsageLog`(provider/model/tokens/cost/status) + `AiUsageQuota`/`AiBillingSummary`, `ai-proxy.service` 에서 success/error 로깅.
-- **엔드포인트는 service-neutral**(KPA/GP/KCos 공유, `authenticate` 만). Signage AI 만 `/api/signage/{serviceKey}/ai/generate` 로 분리.
+- **엔드포인트는 service-neutral**(KPA/KCos 공유, `authenticate` 만). Signage AI 만 `/api/signage/{serviceKey}/ai/generate` 로 분리.
 
 ## 10. 공통화 후보 분류 A~E
 
-- **A (즉시 정렬 — 모달 이미 공통):** GP/KCos POP 인라인 fetch → `AiContentModal` 통일. 블로그/라이브러리/제작자료(KPA·GP)는 이미 A 완료.
+- **A (즉시 정렬 — 모달 이미 공통):** KCos POP 인라인 fetch → `AiContentModal` 통일. 블로그/라이브러리/제작자료(KPA)는 이미 A 완료.
 - **B (config 주입 — preset 표준 확장):** `ProductionTemplate` preset(tone/length/systemPrompt/output)을 **LMS·resources·QR·제품설명** 등으로 확장 주입. surface 별 차이를 template registry 로 흡수.
 - **C (별도 설계):** CourseStructureAiModal(2단계), Signage AI(asset flow), admin-dashboard 빌더 generators, product-description(입력/제약 큼).
 - **D (모델 설정 작업선):** gemini-2.5-flash 하드코딩 해소 + AiEnginesPage 선택값을 생성 경로에 **배선** + provider 추상화 완성 + 모델 후보 비교.
@@ -109,7 +109,7 @@
 
 1. **`IR-O4O-AI-MODEL-PROVIDER-SELECTION-SETTINGS-V1`** — admin 엔진/모델 선택(AiEnginesPage·AiQuerySettings·AiPolicy)과 **하드코딩 생성 endpoint 간 배선 갭** + provider 추상화 완성도 조사(D 선결). 핵심 질문: "엔진을 바꾸면 실제 생성 모델이 바뀌는가?" = 현재 **아니오**.
 2. **`IR-O4O-AI-EDITING-PROMPT-PRESET-STANDARD-V1`** — `ProductionTemplate` preset(tone/length/systemPrompt/output)을 **surface-agnostic** 표준으로 확장(store→LMS/resources/QR/제품설명). AiContentModal prop 계약(§6) 기준.
-3. **`WO-O4O-AI-EDITING-ASSISTANT-SHELL-V1`** — 공통 AI editing 진입(버튼+모달) **채택 정렬**: GP/KCos POP 인라인→AiContentModal, QR/제품설명 미적용처 채택. (신규 추출 아님 — 미적용/divergent surface 수렴.)
+3. **`WO-O4O-AI-EDITING-ASSISTANT-SHELL-V1`** — 공통 AI editing 진입(버튼+모달) **채택 정렬**: KCos POP 인라인→AiContentModal, QR/제품설명 미적용처 채택. (신규 추출 아님 — 미적용/divergent surface 수렴.)
 4. **`IR-O4O-AI-MODEL-CANDIDATE-COMPARISON-V1`** — Gemini(상위/신규) + DeepSeek + Qwen/Alibaba Model Studio + Kimi/Moonshot 2~4개 **공식 가격/성능/한국어 품질/속도/API 호환/운영 리스크** 비교. (본 IR 미확정.)
 
 ## 13. Neture 제외 확인 (LMS) + AI 거버넌스 구분

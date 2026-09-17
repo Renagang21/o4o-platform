@@ -30,8 +30,8 @@
  *   POST  /neture/supplier/services/:serviceKey/orders/:orderId/accept
  *   POST  /neture/supplier/services/:serviceKey/orders/:orderId/ship
  *
- * `:serviceKey` 는 `SUPPLIER_OPTIN_SERVICE_KEYS` 로 검증한다. 승인 축 서비스
- * (glycopharm · kpa-society · k-cosmetics)는 여기로 들어올 수 없다 — 그 서비스들은
+ * `:serviceKey` 는 `SUPPLIER_OPTIN_SERVICE_KEYS` 로 검증한다. 승인 축 서비스는
+ * 여기로 들어올 수 없다 — 그 서비스들은
  * `offer_service_approvals` 운영자 승인 흐름이 계약이며, 이 경로가 그 게이트를 우회하면
  * 안 된다.
  *

@@ -22,10 +22,8 @@ operator/admin 사이드바 도메인 헤딩이 lucide line icon 으로 정상 �
 
 ```text
 배포: commit 3c9ec5b30, GitHub Actions "Deploy Web Services (Cloud Run)" success
-계정: sohae2100@gmail.com (neture/glyco operator+admin, platform super_admin)
 viewport: 390 × 844 (mobile drawer 경로)
 대상 URL:
-  - https://glycopharm.co.kr/operator  (DEFAULT_OPERATOR_DOMAIN_IA — KPA 계열 3 서비스 대표)
   - https://neture.co.kr/admin          (NETURE_OPERATOR_DOMAIN_IA — operator/admin 공통)
 ```
 
@@ -33,7 +31,7 @@ viewport: 390 × 844 (mobile drawer 경로)
 
 ## 3. 도메인 헤딩 아이콘 검증 (DOM lucide 클래스 실측)
 
-### GlycoPharm /operator (config 소스 A — KPA 계열)
+### operator (config 소스 A — KPA 계열)
 
 | 도메인 라벨 | 기존 emoji | 렌더된 svg class | emoji 잔존 |
 |---|:---:|---|:---:|
@@ -79,8 +77,8 @@ viewport: 390 × 844 (mobile drawer 경로)
 
 ## 6. 커버리지 메모
 
-- **두 config 소스 모두 실측**: 소스 A(`DEFAULT_OPERATOR_DOMAIN_IA`)는 GlycoPharm /operator 로, 소스 B(`NETURE_OPERATOR_DOMAIN_IA`)는 Neture /admin 으로 확인.
-- KPA / K-Cosmetics /operator 는 소스 A 동일 config + 동일 단일 `renderNav()` 경로 → GlycoPharm operator 와 **렌더 동등**(추가 실측 생략). Neture /operator 는 소스 B 동일 → Neture /admin 과 동등.
+- **두 config 소스 모두 실측**: 소스 A(`DEFAULT_OPERATOR_DOMAIN_IA`)는 operator 로, 소스 B(`NETURE_OPERATOR_DOMAIN_IA`)는 Neture /admin 으로 확인.
+- Neture /operator 는 소스 B 동일 → Neture /admin 과 동등.
 - 6종 고유 아이콘 + 양쪽 config 소스 + desktop/drawer 단일 경로가 모두 커버됨.
 
 ---

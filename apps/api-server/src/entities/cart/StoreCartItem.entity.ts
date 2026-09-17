@@ -50,7 +50,7 @@ export class StoreCartItem {
   @Column({ name: 'organization_id', type: 'uuid', nullable: true })
   organizationId?: string | null;
 
-  /** 매장이 속한 서비스 (kpa / glycopharm / k-cosmetics / neture …) */
+  /** 매장이 속한 서비스 (kpa / k-cosmetics / neture …) */
   @Column({ name: 'service_key', type: 'varchar', length: 50 })
   serviceKey!: string;
 

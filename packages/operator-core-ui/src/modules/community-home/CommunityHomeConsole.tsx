@@ -4,7 +4,7 @@
  * WO-O4O-COMMUNITY-OPERATOR-CONSOLE-VIEW-CONVERGENCE-V1
  *
  * KPA `pages/operator/CommunityManagementPage` 구현을 canonical 로 승격.
- * GlycoPharm / Neture 의 동일 화면(VIEW_DUPLICATED)이 이 View 를 소비한다.
+ * Neture 의 동일 화면(VIEW_DUPLICATED)이 이 View 를 소비한다.
  *
  * 계약:
  *   - 이 View 는 fetch/axios 를 직접 호출하지 않는다 (client adapter 주입).

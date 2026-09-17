@@ -235,7 +235,7 @@ WO 단위 묶음 — 한 번에 다 전환하지 않고 단계화:
 | 라우트 변경 | URL 보존 |
 | API 신설 / 변경 | bulk action backend 신설은 별도 WO |
 | ContentHubTemplate 자체 변경 | `@o4o/shared-space-ui` 패키지 영역 — 본 IR 범위 외 |
-| GlycoPharm / K-Cosmetics 동일 페이지 | KPA 기준 정렬 후 별도 WO 이식 |
+| K-Cosmetics 동일 페이지 | KPA 기준 정렬 후 별도 WO 이식 |
 | Neture | 매장 기능 없음 |
 | 자체 checkbox/bulk 로직 (B 등급 3개) 의 backend 변경 | 기존 흐름 보존, UI 만 표준화 |
 | 운영자 영역 17개 표준 페이지 추가 표준화 | 이미 A 등급 — 미세 정합은 별도 WO |

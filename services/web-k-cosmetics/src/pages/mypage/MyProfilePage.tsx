@@ -99,7 +99,7 @@ export default function MyProfilePage() {
     /*
      * WO-O4O-CROSS-SERVICE-MYPAGE-FINAL-AUDIT-AND-CLOSURE-V1:
      *   leaf 화면인데 허브 제목("마이페이지")을 그대로 써서, KCos 만 어느 화면에
-     *   있는지 제목으로 알 수 없었다. KPA/GP/Neture/PH 와 동일하게 화면 이름을 쓴다.
+     *   있는지 제목으로 알 수 없었다. KPA/Neture/PH 와 동일하게 화면 이름을 쓴다.
      */
     <MyPageLayout
       title="프로필"

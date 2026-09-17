@@ -297,7 +297,6 @@ M services/web-k-cosmetics/src/config/operatorMenuGroups.ts
 | ID | 범위 | 분류 |
 |----|------|:----:|
 | W4 — `WO-O4O-KCOSMETICS-OPERATOR-VOCABULARY-PHARMACY-CLEANUP-V1` | StoresPage typeLabels `pharmacy:'약국'`, UsersPage KCOS_ROLE_DISPLAY `pharmacist`/`supplier` → cosmetics 도메인 어휘. **선행 SQL** (§9 K-Cos role 데이터 확인) 권장 | H |
-| W5 — `WO-O4O-GLYCOPHARM-OPERATOR-DASHBOARD-CARE-VOCABULARY-CLEANUP-V1` | Admin KPI `total-patients`/`high-risk-patients`/`open-care-alerts` 제거 또는 옵셔널 + capabilities.CARE 선언 정리 | H |
 | W6 — `WO-O4O-NETURE-OPERATOR-PAGES-RESIDUAL-PHARMACY-LABEL-CLEANUP-V1` | RecruitingProductsOverviewPage placeholder "약국명 검색" / column header "약국/공급자" → "조직/공급사" 어휘 | H |
 
 ### Tier 4 — 정책 결정 IR (3건)
@@ -305,7 +304,6 @@ M services/web-k-cosmetics/src/config/operatorMenuGroups.ts
 | ID | 결정 사항 |
 |----|----------|
 | I1 — `IR-O4O-KPA-OPERATOR-DASHBOARD-API-5BLOCK-UNIFICATION-V1` | KPA backend `/operator/dashboard` 5-block unified 응답 도입 여부 |
-| I2 — `IR-O4O-GLYCOPHARM-EVENT-OFFER-APPROVAL-SCOPE-AUDIT-V1` | GlycoPharm Event Offers Approval 권한 (operator vs admin) |
 | I3 — `IR-O4O-CROSSSERVICE-OPERATOR-AXIS-NAVIGATION-CONVERGENCE-V1` | 4개 서비스 AxisNavigationSection 정합 (Neture axis 도입 vs 다른 3개 메뉴 그룹 통합) |
 
 ### Tier 4 (추가 후보) — W3 finding 정정으로 파생
@@ -318,7 +316,7 @@ M services/web-k-cosmetics/src/config/operatorMenuGroups.ts
 
 | ID | 범위 |
 |----|------|
-| `CHECK-O4O-CROSSSERVICE-DASHBOARD-PENDING-COUNT-DATA-AUDIT-V1` | IR §9 SQL 후보 5건 실행 (KPA signage pending count 실제 row, GlycoPharm orders STUB 검증, Cosmetics active-orders status filter, K-Cos pharmacy/약사 role 실제 데이터, Neture 약국 placeholder legacy 여부) |
+| `CHECK-O4O-CROSSSERVICE-DASHBOARD-PENDING-COUNT-DATA-AUDIT-V1` | IR §9 SQL 후보 5건 실행 (KPA signage pending count 실제 row orders STUB 검증, Cosmetics active-orders status filter, K-Cos pharmacy/약사 role 실제 데이터, Neture 약국 placeholder legacy 여부) |
 
 ---
 

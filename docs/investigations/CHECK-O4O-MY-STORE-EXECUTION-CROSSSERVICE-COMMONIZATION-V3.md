@@ -1,7 +1,7 @@
 # CHECK-O4O-MY-STORE-EXECUTION-CROSSSERVICE-COMMONIZATION-V3
 
 > **목적:** 최근 product-description 이식, K-Cosmetics 주문 관리, K-Cosmetics 매출 요약 완료 이후  
-> KPA-Society / GlycoPharm / K-Cosmetics 내 매장·내 약국 실행 영역 cross-service 공통화 1차 최종 확인.
+> KPA-Society / K-Cosmetics 내 매장·내 약국 실행 영역 cross-service 공통화 1차 최종 확인.
 
 ---
 
@@ -49,25 +49,25 @@ product-description · 주문 관리 · 매출 요약이 모두 연결되었고,
 - **PARTIAL**: 기본 진입 가능하나 일부 기능 미완성
 - **LONG_TERM**: 의도적 장기 보류 (현재 단계 구현 대상 아님)
 
-| 영역 | KPA | GlycoPharm | K-Cosmetics | 비고 |
-|------|:---:|:----------:|:-----------:|------|
-| **대시보드** | FULL | FULL | FULL | |
-| **내 자료함 / 콘텐츠** | FULL | FULL | FULL | |
-| **내 자료함 / 자료** | FULL | FULL | FULL | |
-| **매장 제작 자료** | FULL (`매장 제작 자료`) | FUNCTIONAL (`제작 자료`) | FULL (`매장 제작 자료`) | GlycoPharm 라벨 낮은 우선순위 |
-| **POP** | FULL | FULL | FULL | |
-| **QR** | FULL | FULL | FULL | |
-| **블로그** | FULL | FUNCTIONAL | FULL | GlycoPharm `content/blog` 경로 소폭 차이 |
-| **상품 설명** | FULL | **FUNCTIONAL** ✅ | **FUNCTIONAL** ✅ | 사이드바 미노출은 3서비스 공통 의도 설계 |
-| **디지털 사이니지** | FULL | FULL | FUNCTIONAL | K-Cosmetics TV재생 메뉴 미노출 (route 있음) |
-| **내 매장 상품** | FULL | FULL | FULL | |
-| **자체 상품** | FULL | FULL | FULL | |
-| **주문 관리** | FULL | FULL | **FUNCTIONAL** ✅ NEW | |
-| **매출 요약** | — | — | **FUNCTIONAL** ✅ NEW | 참고용, 면책 배너 포함 |
-| **실제 정산/인보이스** | — | PARTIAL (Mock) | **LONG_TERM** | IR-O4O-SETTLEMENT-INVOICE 설계 대기 |
-| **태블릿 디스플레이** | FULL | FULL | FULL | |
-| **채널 관리** | FULL | FULL | FULL | |
-| **설정** | FULL | FULL | FULL | |
+| 영역 | KPA | K-Cosmetics | 비고 |
+| ------ | :---: | :-----------: | ------ |
+| **대시보드** | FULL | FULL | |
+| **내 자료함 / 콘텐츠** | FULL | FULL | |
+| **내 자료함 / 자료** | FULL | FULL | |
+| **매장 제작 자료** | FULL (`매장 제작 자료`) | FULL (`매장 제작 자료`) | — |
+| **POP** | FULL | FULL | |
+| **QR** | FULL | FULL | |
+| **블로그** | FULL | FULL | — |
+| **상품 설명** | FULL | **FUNCTIONAL** ✅ | 사이드바 미노출은 3서비스 공통 의도 설계 |
+| **디지털 사이니지** | FULL | FUNCTIONAL | K-Cosmetics TV재생 메뉴 미노출 (route 있음) |
+| **내 매장 상품** | FULL | FULL | |
+| **자체 상품** | FULL | FULL | |
+| **주문 관리** | FULL | **FUNCTIONAL** ✅ NEW | |
+| **매출 요약** | — | **FUNCTIONAL** ✅ NEW | 참고용, 면책 배너 포함 |
+| **실제 정산/인보이스** | — | **LONG_TERM** | IR-O4O-SETTLEMENT-INVOICE 설계 대기 |
+| **태블릿 디스플레이** | FULL | FULL | |
+| **채널 관리** | FULL | FULL | |
+| **설정** | FULL | FULL | |
 
 ---
 
@@ -75,13 +75,13 @@ product-description · 주문 관리 · 매출 요약이 모두 연결되었고,
 
 3개 서비스 모두 page · route · Core API client · productionTemplates 갖춤.
 
-| 항목 | KPA | GlycoPharm | K-Cosmetics |
-|------|:---:|:----------:|:-----------:|
-| page | ✅ | ✅ | ✅ |
-| route | `marketing/product-descriptions` | `library/product-descriptions` | `library/product-descriptions` |
-| Core API | `/products/:id/ai-contents` | 동일 | 동일 |
-| template | — | `glyco-product-desc-*` 2개 | `kcos-product-desc-*` 2개 |
-| 사이드바 메뉴 | 없음 (의도적) | 없음 (의도적) | 없음 (의도적) |
+| 항목 | KPA | K-Cosmetics |
+| ------ | :---: | :-----------: |
+| page | ✅ | ✅ |
+| route | `marketing/product-descriptions` | `library/product-descriptions` |
+| Core API | `/products/:id/ai-contents` | 동일 |
+| template | — | `kcos-product-desc-*` 2개 |
+| 사이드바 메뉴 | 없음 (의도적) | 없음 (의도적) |
 
 사이드바 미노출은 3개 서비스 공통 의도적 설계 확인 (`CHECK-V2 §4-A`).
 
@@ -126,7 +126,6 @@ product-description · 주문 관리 · 매출 요약이 모두 연결되었고,
 
 현황:
 - K-Cosmetics backend billing/settlement API 없음 (확인)
-- GlycoPharm billing-invoice도 mock 수준 (확인)
 - K-Cosmetics 화면에 "정산 완료", "지급 완료" 표현 없음 (확인)
 - 면책 배너로 오해 방지 (확인)
 ```
@@ -137,7 +136,6 @@ product-description · 주문 관리 · 매출 요약이 모두 연결되었고,
 상태: 낮은 우선순위 drift — 운영 장애 없음
 
 현황:
-- route: marketing/signage/player (KPA/GlycoPharm에 있으나 K-Cosmetics menuSections에 없음)
 - 메뉴 미노출이나 route 자체는 존재
 - 사이니지 사용에 직접적 장애 없음
 ```
@@ -146,17 +144,16 @@ product-description · 주문 관리 · 매출 요약이 모두 연결되었고,
 
 ## 8. 사용자-facing 문구 검증
 
-| 항목 | GlycoPharm | K-Cosmetics |
-|------|:----------:|:-----------:|
-| "내 약국" 사용 | ✅ | — |
-| "약국 상품 설명" 사용 | ✅ | — |
-| "내 매장" 사용 | — | ✅ |
-| "매장 주문 관리" 사용 | — | ✅ |
-| "매출 요약" 사용 | — | ✅ |
-| GlycoPharm에 "내 매장" 오염 | CLEAN ✅ | — |
-| K-Cosmetics에 "내 약국" 오염 | — | CLEAN ✅ |
-| 정산 확정 표현 (K-Cosmetics) | — | CLEAN ✅ |
-| dashboardCopyApi 재도입 | CLEAN ✅ | CLEAN ✅ |
+| 항목 | K-Cosmetics |
+| ------ | :-----------: |
+| "내 약국" 사용 | — |
+| "약국 상품 설명" 사용 | — |
+| "내 매장" 사용 | ✅ |
+| "매장 주문 관리" 사용 | ✅ |
+| "매출 요약" 사용 | ✅ |
+| K-Cosmetics에 "내 약국" 오염 | CLEAN ✅ |
+| 정산 확정 표현 (K-Cosmetics) | CLEAN ✅ |
+| dashboardCopyApi 재도입 | CLEAN ✅ |
 
 ---
 
@@ -173,22 +170,10 @@ product-description · 주문 관리 · 매출 요약이 모두 연결되었고,
 - `commerce/orders` → StoreOrdersPage ✅
 - `commerce/billing` → StoreRevenueSummaryPage ✅
 
-### GlycoPharm 기존 route 모두 유지
-
-- `marketing/pop` ✅ / `marketing/qr` ✅ / `content/blog` ✅
-- `marketing/signage/*` ✅
-- `library/contents` ✅ / `library/resources` ✅
-- `library/production-materials` ✅
-- `library/product-descriptions` ✅
-- `commerce/local-products` ✅ / `commerce/tablet-displays` ✅
-
----
-
 ## 10. TypeScript 검증
 
 | 서비스 | 결과 |
 |--------|------|
-| services/web-glycopharm | ✅ PASS (오류 없음) |
 | services/web-k-cosmetics | ✅ PASS (오류 없음) |
 
 ---
@@ -209,7 +194,7 @@ product-description · 주문 관리 · 매출 요약이 모두 연결되었고,
 | # | 항목 | 상태 | 영향도 | 비고 |
 |---|------|------|--------|------|
 | D1 | product-description route 경로 차이 | `marketing/` vs `library/` | 낮음 | 기능 동일, 추가 WO 불필요 |
-| D2 | GlycoPharm 내 자료함 제작 자료 라벨 | `제작 자료` (KPA: `매장 제작 자료`) | 낮음 | 선택적 WO |
+| D2 | — | `제작 자료` (KPA: `매장 제작 자료`) | 낮음 | 선택적 WO |
 | D3 | K-Cosmetics 사이니지 TV재생 메뉴 미노출 | route 있음, 메뉴 없음 | 낮음 | 선택적 WO |
 | D5 → LONG_TERM | K-Cosmetics 실제 정산/인보이스 | 장기 설계 과제 | — | IR-O4O-SETTLEMENT-INVOICE |
 
@@ -226,7 +211,7 @@ product-description · 주문 관리 · 매출 요약이 모두 연결되었고,
 
 | WO 후보 | 우선순위 | 비고 |
 |---------|---------|------|
-| WO-O4O-GLYCOPHARM-STORE-MENU-PRODUCTION-MATERIALS-LABEL-V1 | 낮음 | "제작 자료" → "매장 제작 자료" 1줄 |
+|  | 낮음 | "제작 자료" → "매장 제작 자료" 1줄 |
 | WO-O4O-KCOSMETICS-SIGNAGE-TV-PLAY-MENU-V1 | 낮음 (보류 가능) | TV재생 메뉴 추가 |
 | IR-O4O-SETTLEMENT-INVOICE-DATA-MODEL-DESIGN-V1 | 장기 | 실제 정산 entity/정책 설계 |
 
@@ -245,14 +230,11 @@ product-description · 주문 관리 · 매출 요약이 모두 연결되었고,
   K-Cosmetics 정산/인보이스  장기 과제로 명확 분리 ✅
 
 3서비스 핵심 실행 영역 정렬:
-  product-description: KPA FULL / GlycoPharm FUNCTIONAL / K-Cosmetics FUNCTIONAL
   POP/QR/Blog/Signage: 3서비스 FULL
-  주문 관리: KPA/GlycoPharm FULL / K-Cosmetics FUNCTIONAL
   매출 요약: K-Cosmetics FUNCTIONAL (참고용, 면책 배너)
   실제 정산: LONG_TERM 분리
 
 TypeScript: 양 서비스 PASS
-문구 drift: 없음 (GlycoPharm "내 약국" / K-Cosmetics "내 매장" 기준 유지)
 API 계약: 신규 backend 없음
 회귀: 없음
 ```

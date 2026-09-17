@@ -59,7 +59,6 @@ WO §9 "Home API 가 href 를 생성하고 있다면 → API 에서 canonical hr
 | 서비스 | 강의 href | 비고 |
 |--------|-----------|------|
 | KPA (`kpa.routes.ts`) | `/lms/courses/{id}` → **`/lms/course/{id}` 로 수정** | 본 WO |
-| GlycoPharm ([glycopharm.routes.ts:648](../../apps/api-server/src/routes/glycopharm/glycopharm.routes.ts#L648)) | `/lms/course/{id}` | 이미 canonical — 무변경 |
 | K-Cosmetics ([cosmetics.routes.ts:353](../../apps/api-server/src/routes/cosmetics/cosmetics.routes.ts#L353)) | `/lms/course/{id}` | 이미 canonical — 무변경 |
 
 → **KPA 만 예외였고, 형제 서비스가 이미 쓰던 형태로 정렬**한 것이다.
@@ -104,7 +103,6 @@ WO §9 "Home API 가 href 를 생성하고 있다면 → API 에서 canonical hr
 | KPA `/home/latest` | 본 WO 에서 사용 | 의도된 소비 |
 | KPA operator dashboard ([operator-dashboard.service.ts:137](../../apps/api-server/src/routes/kpa/services/operator-dashboard.service.ts#L137)) | 목록/카운트 | 없음 |
 | KPA operator summary ([operator-summary.controller.ts:102](../../apps/api-server/src/routes/kpa/controllers/operator-summary.controller.ts#L102)) | 목록/카운트 | 없음 |
-| GlycoPharm `/home/latest` ([glycopharm.routes.ts:700](../../apps/api-server/src/routes/glycopharm/glycopharm.routes.ts#L700)) | pass-through | 없음 |
 | K-Cosmetics `/home/latest` ([cosmetics.routes.ts:405](../../apps/api-server/src/routes/cosmetics/cosmetics.routes.ts#L405)) | pass-through | 없음 |
 | Neture `/home/signage` + 집계 ([neture.controller.ts:219,460](../../apps/api-server/src/routes/neture/controllers/neture.controller.ts#L219)) | pass-through | 없음 |
 
@@ -185,7 +183,7 @@ prod KPA 에 **published 강의 0건, signage_media 0건**이다. 따라서 두 
 |------------------|:----:|------|
 | `cms_contents` 표시 기존 상세 화면 없음 | ✅ **해당** | WO §7.1 지정 대안(비링크)으로 처리 — 범위 확대 없이 완료 |
 | 사이니지 latest ID ≠ media detail ID | ❌ | 동일 엔티티 확인(§4-1). 단 가시성 조건 차이는 조건부 링크로 처리(§4-2·4-3) |
-| 강의 href 변경이 타 서비스 경로 파손 | ❌ | GP/KCos 는 별도 라우트 파일 + 이미 canonical |
+| 강의 href 변경이 타 서비스 경로 파손 | ❌ | KCos 는 별도 라우트 파일 + 이미 canonical |
 | 신규 API/데이터 모델 필요 | ❌ | |
 | 다른 세션 WIP 충돌 | ❌ | 파일 중복 없음, path-specific 스테이징 |
 

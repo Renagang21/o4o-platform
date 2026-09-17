@@ -17,8 +17,6 @@
 
 두 수정 후 전체 5개 서비스 + api-server TypeScript **0 errors**.
 
-GlycoPharm 서비스는 `tsconfig.json`에 `"files": []` + references 구조가 있어 `pnpm exec tsc --noEmit` 시 실제 type-checking이 수행되지 않는 구조적 특이점이 있다. `tsconfig.app.json` 직접 검사 시 GlycoPharm 전용 pre-existing 오류(LMS/Hub 관련, 회원 관리 무관) 8개가 존재하며, `@o4o/types` / `BusinessRegistrationFields` 오류는 이미 해소되었다.
-
 **Delete Flow 공통화 진행 가능** — TypeScript 기준선 확보됨.
 
 ---
@@ -27,7 +25,6 @@ GlycoPharm 서비스는 `tsconfig.json`에 `"files": []` + references 구조가 
 
 ```
 ?? admin-suppliers-recheck.png
-?? glycopharm-members-page.png  (+ 기타 PNG)
 ```
 
 staged 없음. 다른 세션 WIP 없음. clean 상태에서 시작.
@@ -38,8 +35,6 @@ staged 없음. 다른 세션 WIP 없음. clean 상태에서 시작.
 
 | 서비스 | 오류 수 | 대표 오류 | 분류 |
 |--------|:------:|---------|:---:|
-| web-glycopharm | 0 (가짜) | `tsconfig.json files:[]` — 실제 검사 없음 | — |
-| web-glycopharm (app.json) | 10 | `@o4o/types` ×2, LMS/Hub 오류 ×8 | B (회원 관리 무관) |
 | web-k-cosmetics | 6 | `@o4o/types` ×2, `BusinessRegistrationFields` ×4 | A (dist stale) |
 | web-neture | 6 | `@o4o/types` ×2, `BusinessRegistrationFields` ×4 | A (dist stale) |
 | web-kpa-society | 3 | `@o4o/types` ×2, `BusinessRegistrationFields` ×1 (via src path) | A (dist stale) |
@@ -103,23 +98,7 @@ cd packages/account-ui && pnpm build
 | web-kpa-society (`tsc --noEmit`) | **0** | ✅ |
 | web-k-cosmetics (`tsc --noEmit`) | **0** | ✅ |
 | web-neture (`tsc --noEmit`) | **0** | ✅ |
-| web-glycopharm (`tsc --noEmit`, tsconfig.json) | **0** (구조적) | ⚠️ |
-| web-glycopharm (`tsc --noEmit -p tsconfig.app.json`) | **8** | ⚠️ B분류 |
 | api-server (`tsc --noEmit`) | **0** | ✅ |
-
-### GlycoPharm tsconfig.app.json 잔존 오류 8개 (회원 관리 무관)
-
-| 파일 | 오류 | 분류 |
-|------|------|:---:|
-| `src/pages/education/LmsLessonPage.tsx:334,335` | type overlap (quiz/assignment vs video/article) | B |
-| `src/pages/hub/HubBlogLibraryPage.tsx:62` | serviceKey not in HubContentListParams | B |
-| `src/pages/hub/HubContentListPage.tsx:29,30` | publishedAt not on HubContentItemResponse | B |
-| `src/pages/instructor/InstructorDashboardPage.tsx:183,187` | divide/truncate not in CSS Properties | B |
-| `src/pages/resources/ResourcesPage.tsx:31` | implicit any | B |
-
-**모두 LMS/Hub 관련 오류** — 회원 관리 Delete Flow 공통화와 무관.
-
----
 
 ## 6. 회원 관리 관련 타입 정합 확인
 
@@ -145,23 +124,16 @@ cd packages/account-ui && pnpm build
 |-----------|:----:|------|
 | 4개 서비스 TypeScript 클린 | ✅ | kpa/kcos/neture/api-server 0 errors |
 | Delete 관련 타입 stale | ❌ 없음 | `MemberHardDeleteConfirmModal` 등 정상 |
-| admin page 타입 오류 | ❌ 없음 | GP/KCOS admin 0 errors |
+| admin page 타입 오류 | ❌ 없음 | KCOS admin 0 errors |
 | hard/soft delete mode 타입 | ✅ 동일 | 4서비스 모두 `'soft' | 'hard'` 패턴 |
 | Delete API response 타입 | ✅ 단일 endpoint | `/operator/members/:id?mode=` |
-| GlycoPharm tsconfig 구조 특이점 | ⚠️ | `files:[]` 로 실제 검사 없음 — Delete Flow WO에서 주의 필요 |
-
-### GlycoPharm tsconfig 특이점 주의사항
-
-Delete Flow WO에서 GlycoPharm 변경 후 TypeScript 검증 시 **반드시 `tsc --noEmit -p tsconfig.app.json`** 으로 실제 검사를 수행해야 한다. `tsc --noEmit` 단독으로는 GlycoPharm 오류를 놓칠 수 있다.
-
----
 
 ## 8. 오류 분류 A/B/C/D
 
 | 분류 | 설명 | 건수 | 항목 |
 |:---:|------|:---:|------|
 | **A** | dist stale / symlink — 비코드 수단으로 해소됨 | 0 | (해소됨) |
-| **B** | 실제 오류지만 회원 관리 무관 | 8 | GlycoPharm LMS/Hub 오류 |
+| **B** | 실제 오류지만 회원 관리 무관 | 8 | — |
 | **C** | 회원 관리 Delete Flow에 직접 영향 | 0 | 없음 |
 | **D** | 다른 세션 WIP | 0 | 없음 |
 
@@ -172,8 +144,6 @@ Delete Flow WO에서 GlycoPharm 변경 후 TypeScript 검증 시 **반드시 `ts
 ## 9. 권장 다음 단계
 
 1. **WO-O4O-OPERATOR-MEMBERS-DELETE-FLOW-COMMONIZATION-V1** 진행 가능
-2. Delete Flow WO에서 GlycoPharm 검증 시 `tsc --noEmit -p tsconfig.app.json` 사용 필요
-3. GlycoPharm LMS/Hub 오류 8개는 Delete Flow WO 이후 별도 WO 대상
 
 ---
 

@@ -119,7 +119,7 @@ WO §8 이 "조사 후 결정"으로 남긴 항목이다. 조사 결과:
 | ID | 내용 | 근거 |
 |----|------|------|
 | **N-1** | 공통 HUB 목록 API `GET /hub/contents` 에 **검색 파라미터가 아예 없다** (`q`/`search` 없음, ILIKE 없음) | [hub-content.controller.ts:45-83](../../apps/api-server/src/modules/hub-content/hub-content.controller.ts#L45-L83) — 허용 쿼리 = `serviceKey`/`producer`/`sourceDomain`/`page`/`limit` |
-| **N-2** | `/hub/contents` 소비처가 **KPA·GlycoPharm·K-Cosmetics·Neture·admin-dashboard 5개** | grep 23개 파일 |
+| **N-2** | — | grep 23개 파일 |
 | **N-3** | signage 출처 필터 = 현재 페이지 클라이언트 필터 (§2.3) | 코드 주석에 자인 |
 | **N-4** | blog 만 표준 `Pagination` 미적용 — pop/qr/video/signage 는 이미 이관됨(`WO-…-STANDARD-TABLE-AND-SIGNAGE-MENU-IA-V1`) | blog 에 수제 버튼 잔존 |
 | **N-5** | 다국어 가져오기 모달의 "O4O 주문 가능 상품" 목록이 `getListings({service_key:'kpa'})` + `p.product_name` 사용 → 프로덕션에서 **항상 0건**(실데이터 전량 `neture`)이고 이름도 `undefined` | [HubMultilingualContentLibraryPage.tsx:87-88](../../services/web-kpa-society/src/pages/pharmacy/HubMultilingualContentLibraryPage.tsx#L87-L88) |
@@ -176,7 +176,7 @@ A-7 근거: §3.1. 다국어를 홈에서 빼는 것은 "홈은 요약이며 모
 **A-1 ~ A-7 만 이번 WO 에서 구현**하고, B-1 ~ B-5 는 각각 별도 WO 로 분리한다.
 B-2 는 사용자 판단에 따라 A 군에 포함할 수 있다.
 
-이 범위면 **backend 무변경 · GP/KCos 무변경 · 데이터 계약 무변경**이 유지되고,
+이 범위면 **backend 무변경 · KCos 무변경 · 데이터 계약 무변경**이 유지되고
 WO §16 완료 기준 중 다음이 충족된다.
 
 ```text
@@ -256,7 +256,7 @@ WO 는 문구를 2종으로 상정했으나, backend 를 확인하니 **3갈래*
 | KPA `tsc --noEmit` | **PASS** (exit 0) |
 | `npm run build` | **PASS** (exit 0, built in 21.88s) |
 | 배포 workflow | `deploy-web-services.yml` run `30275476358` — **success** |
-| detect-changes | `deploy-kpa-society` 만 선택 / glycopharm·k-cosmetics·neture **skipped** |
+| detect-changes | `deploy-kpa-society` 만 선택 / k-cosmetics·neture **skipped** |
 | 리비전 | `kpa-society-web-01728-f65` |
 
 > 로컬 메모리 여유가 0.2GB 까지 떨어져 `tsc`/`vite` 가 기동 단계에서 OOM 으로 죽는 일이 있었다.
@@ -343,7 +343,7 @@ B-2 태블렛 화면 서버 페이지네이션 — 미착수 (후속 WO)
 B-3 사이니지 출처 필터 서버 이관  — 미착수
 B-4 이미 가져온 항목 표시        — 미착수
 B-5 F2 / F3 / N-5               — 미착수 (기록만)
-GP/KCos                         — 무변경 (코드·배포 모두)
+KCos — 무변경 (코드·배포 모두)
 backend / DB / migration        — 무변경
 데이터 계약                      — 무변경
 ```

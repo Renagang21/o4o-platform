@@ -2,7 +2,7 @@
 
 > **유형**: Investigation (read-only) — 유통참여형 펀딩(Market Trial) backend 의 Neture-only 경계 조사.
 > **성격**: 코드/DB/migration/UI **무변경**. 조사 문서만.
-> **정책 기준**: 유통참여형 펀딩 = **Neture 전용**. KPA/GP/KCos 운영자·매장 허브·내 매장·주문 가능 상품·참여 이력과 연결하지 않는다.
+> **정책 기준**: 유통참여형 펀딩 = **Neture 전용**. KPA/KCos 운영자·매장 허브·내 매장·주문 가능 상품·참여 이력과 연결하지 않는다.
 > **선행**: `IR-O4O-MARKET-TRIAL-NETURE-ONLY-BOUNDARY-CORRECTION-V1`(경계 확정) · `WO-O4O-MARKET-TRIAL-STORE-REDIRECT-AND-CARD-REMOVAL-V1`(frontend 흔적 제거 완료).
 > **작성일**: 2026-06-11
 

@@ -12,7 +12,6 @@
 | 서비스 | 고객 checkout→O4O Toss | 등급 | 근거 |
 |---|---|:--:|---|
 | **KPA** | **실제 도달 가능** | **C** | 공개 storefront `/store/:slug/checkout` → CheckoutPage → createOrder → prepare → `loadTossPayments`/`requestPayment` → 위젯 → success/fail. **단 프로덕션 로그 72h 무활동(실사용 흔적 없음)** |
-| **GlycoPharm** | API만, UI 미노출 | **A** | payment 컨트롤러 mount(`/payments`)되나 **고객 checkout/Toss 프론트 consumer 0건** |
 | **K-Cosmetics** | API만, UI 미노출 | **A** | 동일 — payment 컨트롤러 mount, 프론트 consumer 0건 |
 | **Neture B2B** | B2B_ORDER (무관) | **E** | `neture-b2b-payment`(metadata.source='neture_b2b_checkout') — cleanup 대상 아님, 유지 |
 | 데이터 | 최근 운영 결제 | **D 비활성** | KPA payment 로그 72h 0건. 테이블 직접 count 미수행(방화벽) → cleanup WO 에서 gcloud sql 선확인 권장 |
@@ -27,7 +26,6 @@
 | 서비스 | 컨트롤러 | mount | 결제 대상 | 식별 |
 |---|---|---|---|---|
 | KPA | `routes/kpa/controllers/kpa-payment.controller.ts` (`WO-O4O-KPA-CUSTOMER-COMMERCE-LOOP-V1`) | `/api/v1/kpa/payments` (kpa.routes:2462) | `CheckoutOrder`(buyerId=고객) | sourceService='kpa', paymentType/metadata.source 없음 |
-| GlycoPharm | `glycopharm-payment.controller.ts` | `/api/v1/glycopharm/payments` (glyco.routes:178) | `CheckoutOrder` | sourceService='glycopharm' |
 | K-Cosmetics | `cosmetics-payment.controller.ts` | `/api/v1/cosmetics/payments` (cosmetics.routes:118) | `CheckoutOrder` | sourceService='cosmetics' |
 | Neture B2B | `neture-b2b-payment.controller.ts` | `/api/v1/neture/...` | B2B checkout_order(metadata.source='neture_b2b_checkout') | **B2B_ORDER — 무관** |
 
@@ -43,9 +41,9 @@
 - `CheckoutPage.tsx`: cart(`cartService.getCart(slug)`) → `POST /api/v1/kpa/checkout`(createOrder) → `POST /api/v1/kpa/payments/prepare` → `import('@tosspayments/payment-sdk')` `loadTossPayments(clientKey)` → `requestPayment('카드', {amount, orderId, successUrl, failUrl})`. **결제 버튼 "N원 결제하기"(로그인 시 활성)**.
 - → **소비자가 매장 storefront 에서 상품→장바구니→checkout→Toss 결제까지 완전 도달 가능.**
 
-### 3.2 GlycoPharm / K-Cosmetics (등급 A — UI 미노출)
+### 3.2 K-Cosmetics (등급 A — UI 미노출)
 - payment 컨트롤러는 mount 되어 있으나, **storefront CheckoutPage / Toss 위젯 / payments/prepare 호출 프론트 = 0건.**
-- App.tsx 에 `/checkout`·`/payment/success|fail` 고객 라우트 부재(GlycoPharm 은 주석상 consumer storefront `/store/:pharmacyId` 언급만, checkout 라우트 없음).
+- App.tsx 에 `/checkout`·`/payment/success|fail` 고객 라우트 부재.
 - → API 는 존재하나 **고객이 도달할 UI 진입점 없음.**
 
 ## 4. 운영 데이터 / 사용 흔적
@@ -62,7 +60,6 @@
 | 서비스 | 등급 | 권장 방식 | 비고 |
 |---|:--:|---|---|
 | **KPA** | C | **8.1 UI 진입점 제거 우선** — `/store/:slug/checkout`·`/payment/success`·`/fail` 라우트 + CheckoutPage + cart→checkout 진입 비활성화/제거 + "매장 현장(POS) 결제 안내" 처리. 이후 **8.2 API deprecation**(`/kpa/payments/prepare|confirm` 410/403) | 로그 무활동 → 운영 영향 낮음. 단 데이터 보존(§4) 선확인 |
-| **GlycoPharm** | A | **8.2 API deprecation** — `/glycopharm/payments/prepare|confirm` 410/403. UI 제거 불요(부재) | |
 | **K-Cosmetics** | A | **8.2 API deprecation** — `/cosmetics/payments/prepare|confirm` 410/403 | |
 | Neture B2B | E | 변경 없음 | |
 
@@ -71,7 +68,6 @@
 ## 7. 판정 등급 종합 (§7)
 
 ```text
-A. route/API만 남고 UI 미노출  → GlycoPharm, K-Cosmetics
 B. UI 있으나 결제 미도달        → 해당 없음
 C. 실제 결제 도달 가능          → KPA
 D. 실제 운영 데이터 존재        → 미확정(로그 72h 0건; 테이블 count 미수행) → cleanup 전 gcloud sql 확인
@@ -82,7 +78,6 @@ E. Neture B2B 무관             → neture-b2b-payment (유지)
 
 ```text
 1. WO-O4O-STORE-SALE-CHECKOUT-UI-ENTRY-REMOVAL-V1   (KPA 등급 C — storefront checkout UI/route 제거·안내)
-2. WO-O4O-STORE-SALE-CHECKOUT-ROUTE-DEPRECATION-V1  (KPA/Glyco/KCos payments prepare/confirm 410·403)
 3. WO-O4O-STORE-SALE-PAYMENT-DATA-RETENTION-POLICY-V1 (gcloud sql count → 데이터 존재 시 보존 정책)
    - 데이터 없음 확인되면 생략 가능
 → 이후 WO-O4O-STORE-SERVICE-SUBSCRIPTION-TOSS-PAYMENT-V1
@@ -94,7 +89,6 @@ E. Neture B2B 무관             → neture-b2b-payment (유지)
 
 | 기준 | 결과 |
 |---|---|
-| KPA/Glyco/KCos 고객 checkout 노출·사용 확인 | ✅ KPA=도달가능(로그 무활동) / Glyco·KCos=UI 미노출 |
 | 프론트 UI 진입점 존재 여부 | ✅ KPA만 storefront checkout 존재 |
 | prepare/confirm 호출 여부 | ✅ KPA CheckoutPage 만 호출 |
 | Toss widget 도달 여부 | ✅ KPA만 loadTossPayments/requestPayment |
@@ -110,4 +104,4 @@ E. Neture B2B 무관             → neture-b2b-payment (유지)
 
 ---
 
-*Date: 2026-06-21 · read-only audit · 코드/데이터 무변경 · KPA=등급 C(공개 storefront checkout→Toss 도달가능, 로그 72h 무활동) · Glyco/KCos=등급 A(payment API mount, UI 미노출) · Neture B2B=등급 E(무관) · 데이터=로그 무활동·table count 미수행(cleanup 전 gcloud sql 확인) · 권장: KPA UI 제거 → 3서비스 API deprecation, 즉시삭제·데이터삭제 금지.*
+*Date: 2026-06-21 · read-only audit · 코드/데이터 무변경 · KPA=등급 C(공개 storefront checkout→Toss 도달가능, 로그 72h 무활동) · Neture B2B=등급 E(무관) · 데이터=로그 무활동·table count 미수행(cleanup 전 gcloud sql 확인) · 권장: KPA UI 제거 → 3서비스 API deprecation, 즉시삭제·데이터삭제 금지.*

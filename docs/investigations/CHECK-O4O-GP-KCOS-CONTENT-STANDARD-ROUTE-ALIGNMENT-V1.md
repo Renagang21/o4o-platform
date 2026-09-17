@@ -8,11 +8,11 @@
 
 ## 결론
 
-KPA `/content` 회원 작성 콘텐츠 표준을 GlycoPharm / K-Cosmetics 에 백엔드→프론트 순으로 미러링 완료(documents-only). prod live UI smoke 까지 PASS.
+KPA `/content` 회원 작성 콘텐츠 표준을 K-Cosmetics 에 백엔드→프론트 순으로 미러링 완료(documents-only). prod live UI smoke 까지 PASS.
 
 ```
 KPA  /content        = 기준형 (무변경)
-GP   /content        = 기준형 적용 완료
+content = 기준형 적용 완료
 KCos /content        = 기준형 적용 완료
 /store-hub/content   = 운영자 발행 browse 유지 (영향 없음)
 /resources           = 자료실 유지
@@ -22,8 +22,8 @@ KCos /content        = 기준형 적용 완료
 
 | 단계 | 커밋 | 내용 |
 |------|------|------|
-| Phase A | `867671c7f` | `body TEXT` 마이그레이션 + GP/KCos 회원 contents CRUD(`POST/GET:id/PATCH/DELETE/POST:id/view`) |
-| Phase B | `c6b738e42` | GP/KCos `api/content.ts` + `pages/contents/`(List/Write/Detail) + App.tsx 라우트 |
+| Phase A | `867671c7f` | `body TEXT` 마이그레이션 + KCos 회원 contents CRUD(`POST/GET:id/PATCH/DELETE/POST:id/view`) |
+| Phase B | `c6b738e42` | KCos `api/content.ts` + `pages/contents/`(List/Write/Detail) + App.tsx 라우트 |
 | Phase B fix | `2f163471f` | contentApi 가 axios `res.data` envelope unwrap (UI smoke 에서 발견) |
 
 ## 검증
@@ -32,10 +32,10 @@ KCos /content        = 기준형 적용 완료
 - API/Web deploy 전부 green. `typeorm_migrations` 에 `AddBodyToGpKcosContents20261112000000`(id 545) 적용 확인.
 
 ### Phase A API smoke (renagang21, prod)
-- GP/KCos 모두 생성/조회/수정/조회수/목록(`my`)/삭제 PASS, `body` 영속 확인.
+- KCos 모두 생성/조회/수정/조회수/목록(`my`)/삭제 PASS, `body` 영속 확인.
 
 ### Phase B live UI smoke (Playwright, prod)
-| 항목 | GP | KCos |
+| 항목 | KCos |
 |------|:--:|:--:|
 | `/content` 목록 렌더(공통 SearchBar, 비로그인 작성버튼 숨김) | ✅ | ✅ |
 | 로그인 후 `새 글 작성` 노출 | ✅ | ✅ |
@@ -45,7 +45,7 @@ KCos /content        = 기준형 적용 완료
 | `/store-hub/content` browse 유지 | ✅ | ✅ |
 
 ### smoke 데이터 정리
-- 생성한 테스트 콘텐츠(GP 3 / KCos 1) 전부 soft-delete. 회원 콘텐츠 목록 `total=0` 확인.
+- 회원 콘텐츠 목록 `total=0` 확인.
 
 ## smoke 중 발견·수정한 결함
 

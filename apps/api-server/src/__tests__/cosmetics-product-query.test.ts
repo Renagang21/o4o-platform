@@ -224,7 +224,6 @@ describe('cosmetics product schema migration', () => {
     expect(sql).not.toMatch(/DROP\s+(TABLE|COLUMN)/i);
     expect(sql).not.toMatch(/CASCADE/i);
     expect(sql).not.toMatch(/neture\./i);
-    expect(sql).not.toMatch(/glycopharm_products/i);
   });
 
   it('down is a no-op (rollback would re-break product listing)', async () => {

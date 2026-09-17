@@ -5,8 +5,7 @@
  * 선행: WO-O4O-FORUM-MEMBER-MANAGEMENT-EXPANSION-FRONTEND-V1
  *
  * census(IR-O4O-COMMUNITY-CROSSSERVICE-FULL-CENSUS-V1 F34) 기준 KPA 381 /
- * GlycoPharm 354 / K-Cosmetics 354 줄로 복제돼 있었고, GP ↔ KCos 실질 차이는
- * accent 색 4곳뿐이었다.
+ * K-Cosmetics 354 줄로 복제돼 있었고, 실질 차이는 accent 색 4곳뿐이었다.
  *
  * 소유자(owner)가 가입 신청을 승인/거절하고 회원 목록을 관리한다.
  * 권한 판정은 백엔드(ForumMembershipService owner 검증)가 하고, 이 화면은 403 을 안내한다.

@@ -224,7 +224,6 @@ POST /api/v1/points/admin/spend
 ### 5-5. 운영자 다중 조직 스코프 가드 부재 (보안)
 
 - `/api/v1/points/admin/*`은 `requireAdmin`만 가드
-- KPA 운영자가 GlycoPharm 사용자의 포인트를 차감할 수 있는 구조적 위험
 - `operatorOrgId` 스코프 필터 미적용
 
 ### 5-6. 보상액 고정 (운영 유연성 없음)
@@ -266,7 +265,6 @@ POST /api/v1/points/admin/spend
 CREATE TABLE operator_budgets (
   id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   operatorId   UUID NOT NULL,      -- 서비스 운영자 userId
-  serviceKey   VARCHAR(50) NOT NULL, -- 'kpa-society', 'glycopharm' 등
   totalBudget  INTEGER NOT NULL DEFAULT 0,  -- 운영자가 배정받은 전체 예산
   usedBudget   INTEGER NOT NULL DEFAULT 0,  -- 지금까지 지급한 합계
   periodStart  TIMESTAMP,

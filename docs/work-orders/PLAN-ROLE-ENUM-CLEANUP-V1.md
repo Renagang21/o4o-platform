@@ -63,7 +63,6 @@ export enum UserRole {
 - `controllers/admin/adminApprovalController.ts` (5개 위치)
 - `controllers/approvalController.ts` (1개 위치)
 - `routes/cosmetics/cosmetics.routes.ts:56` — legacyRoles에 포함
-- `routes/glycopharm/controllers/*.ts` — legacyRoles에 포함
 
 **분석**: `administrator`는 DB role_assignments에 존재하지 않는 값.
 BackfillMigration 대상도 아님. 레거시 방어 코드에서만 사용.

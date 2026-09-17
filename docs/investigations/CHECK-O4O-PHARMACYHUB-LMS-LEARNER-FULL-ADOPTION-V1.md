@@ -83,7 +83,7 @@ learner-facing 여부를 재확인한 결과 **KPA 에서도 learner 동선이 �
 
 WO 가 요구한 재검증 결과 **실제 user-facing capability** 이며 PH 에서 성립한다.
 
-- KPA(`/mypage/credits`) · K-Cosmetics · GlycoPharm 모두 사용자 화면으로 노출 중이다.
+- KPA(`/mypage/credits`) · K-Cosmetics 모두 사용자 화면으로 노출 중이다.
 - 원장 API `/api/v1/credits/me`, `/me/transactions` 는 `requireAuth` 만 걸린 **service-neutral 사용자 원장**이다
   (`modules/credit` 전체에 serviceKey 컬럼/필터 없음 — 플랫폼 전역 잔액).
 - 적립 경로 `RewardPolicyService.grantRewardWithOutcome → PointService.grantPoint({serviceKey}) → CreditService.earnCredit`
@@ -112,7 +112,7 @@ WO 가 요구한 재검증 결과 **실제 user-facing capability** 이며 PH �
 - 강의 생성(`POST /lms/courses`)은 `lms:instructor` 로 정상 동작하며 `serviceKey='pharmacy-hub'` 로 저장된다(실측).
 - 그러나 게시는 `PUBLISH_REQUIRES_APPROVAL` 로 **운영자 승인**을 요구하고,
   승인 가드 `requireLmsOperator`(`modules/lms/routes/lms.routes.ts:32`)의 허용 목록은
-  `admin · super_admin · platform:super_admin · cosmetics:* · glycopharm:*` 뿐이라
+  `admin · super_admin · platform:super_admin · cosmetics:*
   **`pharmacy-hub:operator` / `pharmacy-hub:admin` 이 없다.**
 - 즉 PH 강좌는 PH 자신의 운영자가 게시할 수 없다 → PH 에 공개 강좌가 존재할 수 없다.
 
@@ -144,7 +144,7 @@ WO 가 요구한 재검증 결과 **실제 user-facing capability** 이며 PH �
 
 | 파일 | 변경 | 파급 |
 |---|---|---|
-| `packages/lms-client/src/index.ts` | enrollment · quiz read 에 `withScope()` 부착, `getAssignmentForLesson` · `getMyAssignmentSubmission` · `getMyCertificates` · `getCertificate` · `submitAssignment` 추가 | **K-Cosmetics · GlycoPharm 도 해당 read 에 serviceKey 를 함께 보낸다** — scope 를 *넓히는* 변경이 아니라 *좁히는* 변경이므로 안전. 두 서비스 typecheck 통과 확인 |
+| `packages/lms-client/src/index.ts` | enrollment · quiz read 에 `withScope()` 부착, `getAssignmentForLesson` · `getMyAssignmentSubmission` · `getMyCertificates` · `getCertificate` · `submitAssignment` 추가 | K-Cosmetics · 두 서비스 typecheck 통과 확인 |
 | `packages/account-ui/src/components/CertificateVerifyView.tsx` (신규) | KPA `CertificateVerifyPage` 본문을 공통 View 로 추출 | KPA 화면은 **18줄 wrapper 로 축소**(동작 동일). PH 가 같은 View 를 소비 |
 
 ### 3-3. Backend (§21 허용 범위 — 누락된 serviceKey 매핑)
@@ -170,7 +170,7 @@ WO 가 요구한 재검증 결과 **실제 user-facing capability** 이며 PH �
 | `@o4o/account-ui` build | PASS |
 | PharmacyHub `type-check` | PASS |
 | PharmacyHub `build` (vite) | PASS (3800 modules) |
-| KPA-Society · K-Cosmetics · GlycoPharm `tsc --noEmit` | PASS (공통 client 변경 파급 확인) |
+| KPA-Society · K-Cosmetics `tsc --noEmit` | PASS (공통 client 변경 파급 확인) |
 | `apps/api-server` 전체 `tsc --noEmit` | **차단 — 본 WO 무관** (§4-1) |
 
 ### 4-1. 본 WO 와 무관한 선행 실패
@@ -236,7 +236,7 @@ PH 화면에 KPA 수강 이력이 섞이지 않음을 프로덕션에서 직접 
 또한 `CertificateController.listCertificates` 는 client 가 보낸 `userId`·`serviceKey` 를 신뢰하지 않고
 요청자 본인 + canonical scope 로 덮어쓴다(코드 확인).
 
-- PH client 는 `/kpa/lms` · `/cosmetics/lms` · `/glycopharm/lms` 를 호출하지 않는다 (spec 고정).
+- PH client 는 `/kpa/lms` · `/cosmetics/lms`
 - 모든 learner read 는 `serviceKey=pharmacy-hub` 를 동반한다 (`withScope`).
 - enrollment / certificate 소유권은 기존 `lms-enrollment-owner-guard` · `lms-certificate-owner-guard` 를 **변경 없이** 소비한다
   (존재 → course service scope → owner → 비노출 404).

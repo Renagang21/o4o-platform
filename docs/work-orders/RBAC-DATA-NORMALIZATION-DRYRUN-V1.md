@@ -78,7 +78,6 @@ AND NOT EXISTS (
 | `kpa:admin` | 2 | 2 | 0 |
 | `supplier` | 1 | 1 | 0 |
 | `glucoseview:admin` | 1 | 1 | 0 |
-| `glycopharm:admin` | 1 | 1 | 0 |
 | `partner` | 1 | 1 | 0 |
 | `neture:admin` | 1 | 1 | 0 |
 | `platform:super_admin` | 1 | 1 | 0 |

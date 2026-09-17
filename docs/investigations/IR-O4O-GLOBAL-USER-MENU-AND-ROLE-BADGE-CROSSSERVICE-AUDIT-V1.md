@@ -54,7 +54,6 @@ O4O 각 서비스에서 다음 두 가지 UI 정책이 일관되게 적용되는
 | 서비스 | admin 대시보드 역할 배지 | 성격 |
 |---|---|---|
 | **KPA** | `kpa:admin` (하드코딩) | 장식 · guard 무관 · **유일한 raw 코드 배지** |
-| **GlycoPharm** | 없음 | `GlycoPharmAdminDashboard` = AdminDashboardLayout, 헤더 role 배지 없음 |
 | **K-Cosmetics** | 없음 | `KCosmeticsAdminDashboard` 동일하게 없음 |
 | **Neture** | 없음 (한글 문구만) | `AdminDashboardPage:39` — "O4O 플랫폼 관리" 등 한글 라벨만 |
 
@@ -71,9 +70,9 @@ O4O 각 서비스에서 다음 두 가지 UI 정책이 일관되게 적용되는
 
 | 자산 | 위치 | 커버리지 |
 |---|---|---|
-| **`RoleBadge` / `ROLE_STYLES`** (가장 유력한 재사용 대상) | [`packages/operator-ux-core/src/member-list/MemberBadges.tsx:30-67`](../../packages/operator-ux-core/src/member-list/MemberBadges.tsx#L30-L67) | 콜론코드→한글+색상. `kpa:admin→관리자`, `kpa:operator→운영자`, glyco/neture/kcos/`platform:super_admin→슈퍼관리자` 등. 미등록 코드는 raw fallback. |
+| **`RoleBadge` / `ROLE_STYLES`** (가장 유력한 재사용 대상) | [`packages/operator-ux-core/src/member-list/MemberBadges.tsx:30-67`](../../packages/operator-ux-core/src/member-list/MemberBadges.tsx#L30-L67) | 콜론코드→한글+색상. 미등록 코드는 raw fallback. |
 | `ROLE_LABELS` / `getRoleLabel(role, locale)` | [`packages/types/src/auth/roles.ts:174`](../../packages/types/src/auth/roles.ts#L174) | 플랫폼 SSOT급이나 **bare 역할(`admin`,`operator`,`supplier`…)만** 매핑. 콜론-prefix 미커버 → 미매치 시 raw 반환. |
-| 서비스별 로컬 매핑(중복 다수) | `web-account/UserProfileCard.tsx:11-24`(가장 포괄), neture `PlatformUsersPage`/`OperatorsPage`, glyco/kcos `*AdminMembersPage`, 각 operator `UsersPage`/`EditUserModal` 등 | 각자 콜론코드→한글 재정의 |
+| 서비스별 로컬 매핑(중복 다수) | — | 각자 콜론코드→한글 재정의 |
 
 → **핵심**: `KpaAdminDashboardPage` 의 하드코딩 배지와 `AdminAccountsSettings` 의 raw map 렌더만 이 표준을 우회한다. 나머지 서비스 대시보드/헤더/프로필은 모두 한글 라벨 변환을 거친다.
 
@@ -95,12 +94,10 @@ O4O 각 서비스에서 다음 두 가지 UI 정책이 일관되게 적용되는
 | 서비스 | 데스크톱 `userMenuItems` | `mobileUserMenuItems` | 모바일 실제 결과 | 판정 |
 |---|---|---|---|---|
 | **KPA** | 강의(instructor)/**관리자**/**운영**/**내 매장** + 마이페이지/설정 | **마이페이지/설정만 주입** | 역할 대시보드·내 매장 **누락** | **불일치 (의도적)** |
-| **GlycoPharm** | 강의/관리자/운영 + 마이페이지/설정 | 미주입 → fallback | 데스크톱과 **동일** | 일치 |
 | **K-Cosmetics** | 강의/관리자/운영(또는 일반 대시보드) + 마이페이지/설정 | 미주입 → fallback | **동일** | 일치 |
 | **Neture** | 관리자/운영/공급자/파트너 + 마이페이지/설정 | 미주입 → fallback | **동일** | 일치 |
 
 - KPA 근거: [`KpaGlobalHeader.tsx:193-243`](../../services/web-kpa-society/src/components/KpaGlobalHeader.tsx#L193-L243) — `userMenuItems`(역할 메뉴 포함)와 `mobileUserMenuItems`(마이페이지/설정만)를 별도 주입.
-- Glyco/KCos/Neture 근거: 각 `*GlobalHeader.tsx` 에 `mobileUserMenuItems` prop **부재** → GlobalHeader fallback 경로 사용.
 
 → **데스크톱≠모바일 편차는 KPA 헤더에만 존재.** 나머지 3개 서비스는 화면 폭과 무관하게 동일 메뉴.
 

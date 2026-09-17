@@ -116,7 +116,7 @@ backend 는 여전히 `store_owner` scope 를 요구하므로 admin 이 매장 A
 | 5 | Operator 계정 → `GET /pharmacy-hub/admin/ping` | 프로덕션 API | **PASS 403** `Required scope: pharmacy-hub:admin` |
 | 5-b | Operator 계정 → `GET /pharmacy-hub/operator/ping` | 프로덕션 API | **PASS 200** `{scope:"pharmacy-hub:operator"}` (회귀 없음) |
 | 6 | `pharmacy-hub:store_owner` 계정 → operator · admin route | 프로덕션 API | **PASS 403 / 403** |
-| 7 | 타 서비스 역할만 보유(`kpa:store_owner`·`glycopharm:store_owner`·`cosmetics:store_owner`) → pharmacy-hub scope | 프로덕션 API | **PASS 403** |
+| 7 | 타 서비스 역할만 보유(`kpa:store_owner`·`cosmetics:store_owner`) → pharmacy-hub scope | 프로덕션 API | **PASS 403** |
 | 9 | Operator 계정 → `pharmacyhub.co.kr/operator` 진입 (`satisfiesRole` 교체 후 회귀) | 실브라우저 | **PASS** — "이 역할 진입 권한이 확인되었습니다", console error **0건** |
 | 9-b | `/admin` 프런트 route | 실브라우저 | **없음 → 홈 리다이렉트** (의도대로 — 새 관리 화면을 만들지 않았다) |
 | 8 | 타 서비스 membership · credential 불변 | — | **PASS (자명)** — 이번 smoke 에서 프로덕션 write 를 한 건도 수행하지 않았다 |
@@ -140,10 +140,10 @@ backend 는 여전히 `store_owner` scope 를 요구하므로 admin 이 매장 A
 | 10 | 콘솔 오류 · 실패 API | 실브라우저 | **PASS** — console error **0건**, 4xx/5xx API **0건** |
 
 > **8번을 자동 테스트로 판정한 이유**: `pharmacy-hub:admin` 을 부여받은 계정은
-> `kpa:admin` · `neture:admin` · `glycopharm:admin` · `cosmetics:admin` 을 **원래부터** 보유한다.
+> `kpa:admin` · `neture:admin` · `cosmetics:admin` 을 **원래부터** 보유한다.
 > 따라서 "pharmacy-hub:admin 이 타 서비스를 열지 않는다" 는 이 계정으로 격리 관측이 **불가능**하다
 > (타 서비스 route 200 은 pharmacy-hub 역할이 아니라 자기 서비스 역할로 통과한 것이다).
-> 이 방향은 `pharmacy-hub-scope-guard.spec.ts` 가 KPA · Neture · GlycoPharm · K-Cosmetics 4개 config 를
+> 이 방향은 `pharmacy-hub-scope-guard.spec.ts` 가 KPA · Neture · K-Cosmetics 4개 config 를
 > 직접 불러 `pharmacy-hub:admin` 단독 보유 시 admin · operator scope 8건이 모두 403 임을 고정한다.
 > 역방향(타 서비스 admin → pharmacy-hub scope 403)은 §6-1 #7 로 실측했다.
 
@@ -180,5 +180,3 @@ backend 는 여전히 `store_owner` scope 를 요구하므로 admin 이 매장 A
 발견 1건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 1건
 
 - `docs/rbac/RBAC-ROLE-CATALOG-V1.md` 에 Pharmacy-Hub 접두어가 누락돼 있었다 → 본 WO 범위 내에서 등재했다.
-- **별도 WO 제안**: GlycoPharm 은 `scopeRoleMapping` 이 없어 admin/operator 가 fallback(allowedRoles 전체 허용)
-  으로 평가된다. 본 WO 에 섞지 않고 별도 정비 대상으로 남긴다.

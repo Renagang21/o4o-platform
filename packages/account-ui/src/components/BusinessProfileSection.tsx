@@ -3,7 +3,7 @@
  *
  * WO-O4O-CROSS-SERVICE-PROFILE-COMMONIZATION-V1
  *
- * GlycoPharm `PharmacyInfoPage` (488줄) 와 K-Cosmetics `StoreInfoPage` (475줄) 는
+ * 약국형 정보 화면과 K-Cosmetics `StoreInfoPage` 는
  * 엔티티 명칭(약국/매장) · accent 색 · 면허 행 유무만 다른 복제본이었다.
  * 그 차이를 props 로 받고 나머지 전부를 이 컴포넌트로 수렴한다.
  *
@@ -48,7 +48,7 @@ export interface BusinessProfileSectionProps {
   /** `{entityLabel} 대표 이메일` 대신 쓸 라벨 (K-Cosmetics: '회사 대표 이메일'). */
   businessEmailLabel?: string;
   accent?: BusinessProfileAccent;
-  /** 자격(면허) 읽기 전용 행. GlycoPharm 전용. */
+  /** 자격(면허) 읽기 전용 행. 약국형 서비스 전용. */
   licenseField?: { label: string; hint: string };
   load: () => Promise<BusinessProfileData>;
   save: (patch: BusinessProfilePatch) => Promise<BusinessProfileData>;

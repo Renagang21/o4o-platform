@@ -115,13 +115,13 @@ ID 를 ProductMaster 로 바꿔도 증상은 해소되지 않는다.
 **(a) 관리자 우회 목록이 RBAC SSOT 와 어긋난다 — 실질 무효항.**
 `PLATFORM_ADMIN_ROLES = ['admin','operator']` 는 **접두어 없는** 문자열 정확 일치다.
 프로덕션 `role_assignments` 활성 역할 18 종 중 무접두 `admin`/`operator` 는 **0 건**이다 (§9 Q6).
-반면 실제 운영자는 `kpa:operator`(1) · `neture:operator`(1) · `glycopharm:operator`(2) · `cosmetics:operator`(1),
+반면 실제 운영자는 `kpa:operator`(1) · `neture:operator`(1) · `cosmetics:operator`(1)
 관리자는 `platform:super_admin`(2) · `kpa:admin`(1) 등 **전부 prefix 형**이다.
 → 의도한 "관리자·운영자 우회"가 **한 번도 발동하지 않는다.**
 
 **(b) 가드 역전 가능성 — 존재한다.**
 만약 누군가에게 무접두 `admin` 또는 `operator` 를 부여하면,
-이 가드는 **service_key 를 보지 않으므로** 해당 사용자가 KPA·GlycoPharm·K-Cosmetics·Neture **전 서비스의 모든 상품 AI 콘텐츠에 무제한 접근**하게 된다.
+이 가드는 **service_key 를 보지 않으므로** 해당 사용자가 KPA·K-Cosmetics·Neture **전 서비스의 모든 상품 AI 콘텐츠에 무제한 접근**하게 된다.
 즉 현재 상태는 "전원 차단", 완화 시도 시 한 번에 "전원 개방"으로 넘어가는 **이분법 가드**다.
 CLAUDE.md §7 Guard Rule 3(Domain Primary Boundary 필터 필수)·§11(서비스 스코프 가드) 기준에서 **정렬 필요 항목**이다.
 
@@ -147,7 +147,7 @@ CLAUDE.md §7 Guard Rule 3(Domain Primary Boundary 필터 필수)·§11(서비�
 | 5 | 상품 임포트 시 AI 생성 | [product-import-common.service.ts:20-50](../../apps/api-server/src/modules/neture/services/product-import-common.service.ts#L20-L50) | ProductMaster.id | 정상 계약 |
 | 6 | KPA 상품 상세설명 화면 | [StoreProductDescriptionsPage.tsx:88·157](../../services/web-kpa-society/src/pages/pharmacy/StoreProductDescriptionsPage.tsx#L88) | **store_local_products.id** | 403 |
 | 7 | KPA POP 빌더 | [ProductPopBuilderPage.tsx:81·140-141](../../services/web-kpa-society/src/pages/pharmacy/ProductPopBuilderPage.tsx#L81) | **store_local_products.id** (StoreLocalProductsPage → `/store/commerce/products/{local.id}/pop`) | 403 |
-| 8 | GlycoPharm 동일 2 화면 | `services/web-glycopharm/src/pages/store-management/{StoreProductDescriptionsPage,ProductPopBuilderPage}.tsx` | 동일 (`fetchLocalProducts`) | 동일 결함 |
+| 8 | — | — | 동일 (`fetchLocalProducts`) | 동일 결함 |
 | 9 | K-Cosmetics 동일 2 화면 | `services/web-k-cosmetics/src/pages/store/{StoreProductDescriptionsPage,ProductPopBuilderPage}.tsx` | 동일 | 동일 결함 |
 
 > **KPA 단독 문제가 아니다.** 동일 코드 형태가 3 개 서비스에 복제되어 있다 (CLAUDE.md §1 Shared Module Change Rule 대상).
@@ -216,7 +216,7 @@ CLAUDE.md §7 Guard Rule 3(Domain Primary Boundary 필터 필수)·§11(서비�
 부가 판정:
 - **legacy endpoint 아님** — [register-routes.ts:684-691](../../apps/api-server/src/bootstrap/register-routes.ts#L684-L691) 에 현재 활성 등록.
 - **특정 데이터 문제 아님** — 403 은 데이터 무관하게 결정적이다.
-- **KPA 한정 아님** — GP/K-Cos 동일 구조 (§7 #8·#9).
+- **KPA 한정 아님** — K-Cos 동일 구조 (§7 #8·#9).
 
 ---
 
@@ -231,7 +231,7 @@ CLAUDE.md §7 Guard Rule 3(Domain Primary Boundary 필터 필수)·§11(서비�
 2. 관리자 우회 역할 목록을 RBAC 카탈로그(prefix 형)와 정렬하고 **service_key 경계를 함께 검사** — §6(b) 가드 역전 차단.
 3. `productId` 의 정체를 계약으로 명문화 (ProductMaster 고정 + 프론트가 local product → master 를 해석해 전달, 또는 Store Ops 도메인 ID 를 1급으로 승격 — 택1). CLAUDE.md §7 Boundary Policy 및 F12 Product Resource Architecture 와 정합해야 한다.
 4. `product_ai_contents.product_id` 무결성 보강 및 고아 3 행 처리 방침.
-5. KPA / GlycoPharm / K-Cosmetics **3 서비스 동시 정렬** (Shared Module Change Protocol).
+5. KPA / K-Cosmetics **2 서비스 동시 정렬** (Shared Module Change Protocol).
 6. 403 조회 실패를 화면에서 **삼키지 않도록** 오류 계약 정비 (§7-1).
 
 > **왜 1 건인가:** 가드만 고치면 ID 불일치로 고아 데이터가 계속 쌓이고, ID 만 고치면 여전히 403 이다. 두 변경은 같은 배포에서 함께 검증되어야 한다.

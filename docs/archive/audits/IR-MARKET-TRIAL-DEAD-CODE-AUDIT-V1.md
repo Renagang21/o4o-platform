@@ -22,7 +22,7 @@
 
 WO-CLEANUP-1에서 `MarketTrialServiceApproval` 엔티티/라우트/컨트롤러를 완전 제거하여 2차 승인 인프라의 주요 dead code는 이미 정리되었다. 그러나 `TrialStatus.APPROVED` 열거값과 관련 UI 필터 탭이 backend/frontend 양쪽에 잔존하며, 현재의 단일 승인 흐름(1차 승인 = 최종 승인)에서는 더 이상 유효한 상태가 아니다.
 
-게이트웨이 서비스(KPA-Society, GlycoPharm, K-Cosmetics)의 리다이렉트 코드와 WO-MONITOR-1에서 신설된 모니터링 코드는 모두 정상적으로 사용 중이다.
+게이트웨이 서비스(KPA-Society, K-Cosmetics)의 리다이렉트 코드와 WO-MONITOR-1에서 신설된 모니터링 코드는 모두 정상적으로 사용 중이다.
 
 ---
 
@@ -53,7 +53,7 @@ WO-CLEANUP-2에서 `/admin/market-trial` → `/operator/market-trial` 리다이�
 
 ### C. 게이트웨이 서비스
 
-KPA-Society, GlycoPharm, K-Cosmetics의 Market Trial 진입점은 모두 Neture로 리다이렉트하는 정상 코드다. **KEEP**.
+KPA-Society, K-Cosmetics의 Market Trial 진입점은 모두 Neture로 리다이렉트하는 정상 코드다. **KEEP**.
 
 ### D. 포럼 모니터링
 
@@ -76,7 +76,7 @@ WO-MONITOR-1/UI-1에서 신설된 코드. 정상 사용 중. **KEEP**.
 | 5 | `services/web-neture/src/pages/operator/MarketTrialApprovalsPage.tsx` | STATUS_CONFIG `approved` 항목 | Config entry | LOW | FILTER_TABS #3과 연동 | KEEP (항목 #3 삭제 시 함께 정리) |
 | 6 | `apps/api-server/src/controllers/market-trial/marketTrialOperatorController.ts` | CSV export의 `'approved'` 레이블 | String literal | LOW | CSV 다운로드에서 사용 | KEEP (backward compat) |
 | 7 | `services/web-neture/src/pages/kpa/market-trial/*` | Neture 리다이렉트 게이트웨이 | Gateway redirect | — | 정상 사용 | KEEP |
-| 8 | `services/web-neture/src/pages/glycopharm/market-trial/*` | Neture 리다이렉트 게이트웨이 | Gateway redirect | — | 정상 사용 | KEEP |
+| 8 | — | Neture 리다이렉트 게이트웨이 | Gateway redirect | — | 정상 사용 | KEEP |
 | 9 | `services/web-neture/src/App.tsx` | `/admin/market-trial` 리다이렉트 | URL alias | — | 정상 backward compat | KEEP |
 | 10 | `apps/api-server/src/extensions/trial-forum-monitor/` | ForumSyncFailure 모니터링 | 신설 기능 | — | 정상 사용 | KEEP |
 

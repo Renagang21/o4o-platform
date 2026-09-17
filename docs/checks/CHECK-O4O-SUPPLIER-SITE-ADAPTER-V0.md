@@ -169,7 +169,7 @@ real supplier production smoke    = PENDING (site 미지정 · 페어링 부재)
 | census 잠금 갱신: `automation-execution-layer.spec`(05·06 browser_dom 집합) · `ai-capability-tool-routing.spec`(non-readOnly 목록) | PASS |
 | 관련 api-server jest 9 스위트 | **242 PASS** |
 | agent node:test 3 파일 (미변경 · 회귀) | **59 PASS** |
-| tsc(api-server) | WO 파일 오류 0 · 저장소 baseline(`insight-rules.ts` glycopharm 등) 무관 |
+| tsc(api-server) | WO 파일 오류 0 · 저장소 baseline 무관 |
 | eslint(변경 8 파일) | 0 |
 | CI 배선 | api-server jest 는 CI 가 전 스위트를 돌린다 — 추가 배선 없음. fixture HTML 은 CI 가 실행하지 않는다(local smoke 전용) |
 | CI | `8f286151e` Deploy API success · CI/CodeQL 은 후속 push 에 의해 cancelled → `fc3b339cc`(본 commit 포함) CI Pipeline success(`supplier-site-adapter.spec.ts` PASS · api-server 4293 PASS · agent node:test) · CodeQL success · Deploy API success(`o4o-core-api-03626-k95`) |

@@ -26,7 +26,6 @@ My Page 축(§6 "로그인 사용자가 My Page 에서 도움말을 찾거나 �
 | 서비스 | My Page route | nav 정의 파일 | nav 항목 수 | Help/Support 항목 |
 |---|---|---|---|:---:|
 | KPA-Society | `/mypage` | `services/web-kpa-society/src/pages/mypage/navItems.ts` | 9 | **0** |
-| GlycoPharm | `/mypage` | `services/web-glycopharm/src/pages/mypage/navItems.ts` | 7 | **0** |
 | K-Cosmetics | `/mypage` | `services/web-k-cosmetics/src/pages/mypage/navItems.ts` | 7 | **0** |
 | Neture | `/mypage` | `services/web-neture/src/pages/mypage/navItems.ts` | 4 (role 파생) | **0** |
 | Pharmacy-Hub | **`/account`** (`/mypage` 없음) | `services/web-pharmacy-hub/src/pages/account/navItems.ts` | 2 | **0** |
@@ -40,7 +39,6 @@ My Page 축(§6 "로그인 사용자가 My Page 에서 도움말을 찾거나 �
 | 서비스 | 진입 라벨 | destination | 상태 |
 |---|---|---|---|
 | KPA-Society | 협업 문의 | `/contact` | LIVE |
-| GlycoPharm | 문의하기 (고객지원 그룹) · 제휴/파트너 문의 | `/contact` | LIVE |
 | K-Cosmetics | 문의하기 (고객지원 그룹) · 제휴/파트너 문의 | `/contact` | LIVE |
 | Neture | Contact Us | `/contact` | LIVE |
 | Pharmacy-Hub | **없음** | — | 의도적 부재 (dead link 0) |
@@ -58,7 +56,7 @@ My Page 축(§6 "로그인 사용자가 My Page 에서 도움말을 찾거나 �
 | 1 | Help/Support 기능 존재 | — | — | — | — | — | — | — | — | **NOT_IMPLEMENTED** (5/5) |
 | 2 | Help/FAQ 목록 | — | — | — | — | — | — | — | — | **NOT_IMPLEMENTED** (FAQ backend 전무) |
 | 3 | FAQ 상세 | — | — | — | — | — | — | — | — | **NOT_IMPLEMENTED** |
-| 4 | 문의 작성 | `/contact` (public) | GP·KCos `PublicContactForm`(shared-space-ui) / KPA `ContactModal` / Neture 자체 form | `POST /public/services/:serviceKey/contact-inquiries`, `POST /kpa/contact-requests`, `POST /neture/contact` | `contact_inquiries` · `contact_requests` · `neture_contact_messages` | **W** | **인증 없음** | 양쪽 OK | GP·KCos 만 공통 | **OUT_OF_SCOPE** (My Page 축 아님 · §6) |
+| 4 | 문의 작성 | `/contact` (public) | KCos `PublicContactForm`(shared-space-ui) / KPA `ContactModal` / Neture 자체 form | `POST /public/services:serviceKey/contact-inquiries`, `POST /kpa/contact-requests`, `POST /neture/contact` | `contact_inquiries` · `contact_requests` · `neture_contact_messages` | **W** | **인증 없음** | 양쪽 OK | KCos 만 공통 | **OUT_OF_SCOPE** (My Page 축 아님 · §6) |
 | 5 | 내 문의 목록 | — | — | **없음** | — | — | — | — | — | **NOT_IMPLEMENTED** (계약 부재) |
 | 6 | 문의 상세 | — | — | **없음** | — | — | — | — | — | **NOT_IMPLEMENTED** (계약 부재) |
 | 7 | 답변 상태 표시 | — | — | **없음** | — | — | — | — | — | **NOT_IMPLEMENTED** (계약 부재) |
@@ -66,7 +64,7 @@ My Page 축(§6 "로그인 사용자가 My Page 에서 도움말을 찾거나 �
 | 9 | 문의 수정 | — | — | **없음** | — | — | — | — | — | **NOT_IMPLEMENTED** |
 | 10 | 문의 취소/삭제 | — | — | **없음** (delete API 부재) | — | — | — | — | — | **NOT_IMPLEMENTED** |
 | 11 | 연락처/지원 채널 표시 | `/contact`, footer | 서비스별 `ContactPage` · `Footer` | 없음 (하드코딩) | 소스 상수 | R | 없음 | 양쪽 OK | 미사용 | **SERVICE_SPECIFIC** |
-| 12 | 운영시간/지원 안내 | footer | GP·KCos Footer "평일 09:00 - 18:00" | 없음 (하드코딩) | 소스 상수 | R | 없음 | 양쪽 OK | 미사용 | **SERVICE_SPECIFIC** (KPA·Neture·PH 부재) |
+| 12 | 운영시간/지원 안내 | footer | KCos Footer "평일 09:00 - 18:00" | 없음 (하드코딩) | 소스 상수 | R | 없음 | 양쪽 OK | 미사용 | **SERVICE_SPECIFIC** (KPA·Neture·PH 부재) |
 | 13 | Home/Nav 진입 | My Page nav / entry card | — | — | — | — | — | — | — | **NOT_IMPLEMENTED** (footer 경유만 존재 → §2 표) |
 | 14 | empty/loading/error | — | — | — | — | — | — | — | `MyPageEmptyState`·`MyPageLoadingState` 존재하나 Help 소비처 없음 | **NOT_IMPLEMENTED** |
 | 15 | mobile UX | `/mypage`·`/account` | `MyPageShell`(account-ui) | — | — | — | — | 390×844 실측 PASS | **`MyPageShell` 공통** | **FULLY_COMMON** (골격만) |
@@ -96,7 +94,7 @@ My Page 축(§6 "로그인 사용자가 My Page 에서 도움말을 찾거나 �
 
 | entity | table | 소유자 컬럼 | 사용자 read 가능성 |
 |---|---|---|---|
-| `ContactInquiry.entity.ts` | `contact_inquiries` (GP·KCos) | **없음** | **구조적으로 불가** |
+| `ContactInquiry.entity.ts` | `contact_inquiries` (KCos) | **없음** | **구조적으로 불가** |
 | `NetureContactMessage.entity.ts` | `neture_contact_messages` | **없음** | **구조적으로 불가** |
 | `ContactRequest.ts` | `contact_requests` (KPA) | **`user_id` uuid nullable 존재** | 구조는 가능하나 **소비 endpoint 0** |
 
@@ -133,7 +131,7 @@ FAQ entity·route·content source **전무**. 유일한 흔적은 `apps/admin-da
 | `MyPageEmptyState` / `MyPageLoadingState` | `packages/account-ui` | Help 소비처 없음 |
 | `RequestStatusBadge` | `packages/account-ui` | §11 상태 라벨/톤 공통화와 직접 중첩. **추가 확장 불필요** (문의 상태를 표시할 사용자 화면이 없음) |
 | `MyRequestsInbox` | `packages/account-ui` | **승인 신청**용. §17 경계에 따라 문의 목록과 개념 병합하지 않음 |
-| `PublicContactForm` | `packages/shared-space-ui/src/legal/` | 공개 축 문의 폼. GP·KCos 소비 중 |
+| `PublicContactForm` | `packages/shared-space-ui/src/legal/` | 공개 축 문의 폼. KCos 소비 중 |
 | `O4OHelpSection` | `packages/shared-space-ui/` | 공개 홈 안내 섹션 |
 
 → §8 의 7-component 트리 신설은 불필요. 기존 자산으로 충분하며, 주입할 기능 자체가 없다.
@@ -145,7 +143,7 @@ FAQ entity·route·content source **전무**. 유일한 흔적은 `apps/admin-da
 **생성하지 않음.** 근거:
 - 수렴 대상 중복 UI 가 My Page 축에 0건 (VIEW_DUPLICATED = 0).
 - 공통 View 를 만들면 §21 이 금지한 "빈 Help 페이지"가 된다.
-- `/contact` 4서비스 중복은 **공개 축**이며 이미 GP·KCos 가 `shared-space-ui/PublicContactForm` 으로 수렴돼 있다. KPA·Neture 를 추가 수렴하는 것은 `@o4o/account-ui` 가 아니라 `@o4o/shared-space-ui` 계층 작업이므로 이번 WO 범위 밖 → §20 followup.
+- `/contact` 3서비스 중복은 **공개 축**이며 이미 KCos 가 `shared-space-ui/PublicContactForm` 으로 수렴돼 있다. KPA·Neture 를 추가 수렴하는 것은 `@o4o/account-ui` 가 아니라 `@o4o/shared-space-ui` 계층 작업이므로 이번 WO 범위 밖 → §20 followup.
 
 ---
 
@@ -164,7 +162,7 @@ FAQ entity·route·content source **전무**. 유일한 흔적은 `apps/admin-da
 
 | backend | status enum | default |
 |---|---|---|
-| `contact_inquiries` (GP·KCos) | `received · in_review · answered · closed · spam` | `received` |
+| `contact_inquiries` (KCos) | `received · in_review · answered · closed · spam` | `received` |
 | `contact_requests` (KPA) | `pending · reviewing · done` | — |
 | `neture_contact_messages` | `new · in_progress · resolved` | — |
 
@@ -177,7 +175,7 @@ FAQ entity·route·content source **전무**. 유일한 흔적은 `apps/admin-da
 ## 10. FAQ / Help
 
 **존재하지 않음** (§4 참조). §14·§21 에 따라 아무것도 만들지 않았다.
-`ServiceGuidePage` (KPA·GP·KCos `/service-guide`) 는 공개 마케팅 "서비스 안내" 페이지이고 CTA 가 `/contact` 를 가리킨다 — My Page Help 기능이 아니다.
+`ServiceGuidePage` (KPA·KCos `/service-guide`) 는 공개 마케팅 "서비스 안내" 페이지이고 CTA 가 `/contact` 를 가리킨다 — My Page Help 기능이 아니다.
 
 ---
 
@@ -188,7 +186,6 @@ FAQ entity·route·content source **전무**. 유일한 흔적은 `apps/admin-da
 | 서비스 | 위치 | 채널 |
 |---|---|---|
 | K-Cosmetics | `ContactPage.tsx:67-90` · Footer | `info@` · `partner@` · `tour@k-cosmetics.site`, `1577-2779` |
-| GlycoPharm | `ContactPage.tsx:66-103` · Footer | `support@` · `partner@` · `pharmacy@glycopharm.co.kr` |
 | Neture | `ContactPage.tsx:333,344` | `partners@neture.co.kr`, `tel:1577-2779` |
 | KPA-Society | — | 하드코딩 없음 (폼 전용) |
 | Pharmacy-Hub | — | 없음 |
@@ -220,7 +217,6 @@ Help/Support 화면이 없어 해당 상태 정의 대상이 없다.
 | Neture | `/terms` | `/public/services/neture/policies/terms` | **404** | "현재 공개된 문서가 없습니다." |
 | Neture | `/privacy` | `/public/services/neture/policies/privacy` | 404 | 동일 |
 | Pharmacy-Hub | `/terms` | `/public/services/pharmacy-hub/policies/terms` | 404 | 동일 |
-| GlycoPharm | `/terms` | `/public/services/glycopharm/policies/terms` | 404 | 동일 |
 | KPA-Society | `/policy` | `/public/services/kpa-society/policies/terms` + `/kpa/legal/documents/published/terms` | 404 | 동일 |
 
 → **부기 K 판정: case 1(정상 empty) 에 준함.** 404 는 이 계약에서 "미게시" 신호이며 프론트가 이를 정확한 empty 문구로 렌더한다. 401/403·5xx 삼킴(case 2) 아님.
@@ -233,7 +229,6 @@ Help/Support 화면이 없어 해당 상태 정의 대상이 없다.
 | 서비스 | My Page 축 | Help/Support | 지원 진입(footer) | adoption 판정 |
 |---|---|---|---|---|
 | KPA-Society | `/mypage` | NOT_IMPLEMENTED | LIVE (`/contact`) | **NO_CHANGE_REQUIRED** |
-| GlycoPharm | `/mypage` | NOT_IMPLEMENTED | LIVE (`/contact`) | **NO_CHANGE_REQUIRED** |
 | K-Cosmetics | `/mypage` | NOT_IMPLEMENTED | LIVE (`/contact`) | **NO_CHANGE_REQUIRED** |
 | Neture | `/mypage` | NOT_IMPLEMENTED | LIVE (`/contact`) | **NO_CHANGE_REQUIRED** |
 | Pharmacy-Hub | `/account` | NOT_IMPLEMENTED | 없음 (의도적) | **NO_CHANGE_REQUIRED** |
@@ -247,7 +242,6 @@ adoption 대상 공통 자산이 생성되지 않았으므로 5서비스 모두 
 | 서비스 | desktop 1440×900 | mobile 390×844 | 결과 |
 |---|:---:|:---:|---|
 | KPA-Society `/mypage` | PASS | PASS | nav 9 · Help 0 · footer 협업 문의 LIVE · 모바일 하단 메뉴에도 Help 없음 |
-| GlycoPharm `/mypage` | PASS | PASS | nav 7 · Help 0 · footer 고객지원 그룹 LIVE |
 | K-Cosmetics `/mypage` | PASS | PASS | nav 7 · Help 0 · footer 고객지원 그룹 LIVE |
 | Neture `/mypage` | PASS | PASS | nav 3 · entry card 3(프로필·포럼·설정) · Help 0 · footer Contact Us LIVE |
 | Pharmacy-Hub `/account` | PASS | PASS | nav 2 · Help 0 · footer 지원 링크 없음 (dead link 0) |
@@ -258,8 +252,8 @@ adoption 대상 공통 자산이 생성되지 않았으므로 5서비스 모두 
 
 ## 17. production browser
 
-전부 프로덕션 실측 (`kpa-society.co.kr` · `www.glycopharm.co.kr` · `www.k-cosmetics.site` · `neture.co.kr` · `pharmacyhub.co.kr`).
-로그인 계정은 §15 SSOT (`docs/local/TEST-ACCOUNTS.local.md`) 기준. KPA·GP·KCos·Neture = 관리자/운영자 계정, PH = 약국 경영자 계정(승인됨).
+전부 프로덕션 실측 (`kpa-society.co.kr` · `www.k-cosmetics.site` · `neture.co.kr` · `pharmacyhub.co.kr`).
+로그인 계정은 §15 SSOT (`docs/local/TEST-ACCOUNTS.local.md`) 기준. KPA·KCos·Neture = 관리자/운영자 계정, PH = 약국 경영자 계정(승인됨).
 
 ### 실측 중 정정된 사전 가설
 
@@ -308,7 +302,7 @@ adoption 대상 공통 자산이 생성되지 않았으므로 5서비스 모두 
 | F2 | KPA `contact_requests.user_id` 는 존재하나 소비 endpoint 0 | 계약 갭 | 별도 WO (F1 과 함께 판단) |
 | F3 | 문의 status enum 3-way 불일치 (`received/in_review/answered/closed/spam` vs `pending/reviewing/done` vs `new/in_progress/resolved`) | 계약 정합 | 별도 WO (backend enum 재설계 필요) |
 | F4 | 문의 type enum 3-way 불일치 | 계약 정합 | F3 과 동일 WO |
-| F5 | `/contact` 4서비스 중복 — GP·KCos 만 `PublicContactForm` 수렴, KPA·Neture 는 자체 폼 | 공개 축 공통화 | 별도 WO (`@o4o/shared-space-ui` 계층) |
+| F5 | `/contact` 3서비스 중복 — KCos 만 `PublicContactForm` 수렴, KPA·Neture 는 자체 폼 | 공개 축 공통화 | 별도 WO (`@o4o/shared-space-ui` 계층) |
 | F6 | 지원 채널(이메일·전화·운영시간) 3서비스 하드코딩 | SSOT 부재 | 별도 WO (`service_legal_profiles` 유사 메타 계약) |
 | F7 | FAQ 기능 전무 (backend·content source 0) | 제품 결정 | 별도 WO |
 | F8 | **5서비스 전부 법정문서 미게시** — `/terms`·`/privacy`·`/policy` 가 모두 "현재 공개된 문서가 없습니다." | 콘텐츠 공백 (법률) | 별도 WO (§29 법률 판단) |

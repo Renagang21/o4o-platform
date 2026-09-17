@@ -15,7 +15,6 @@
 - `services/web-kpa-society/src/pages/operator/` — KPA Society 운영자 페이지
 - `services/web-neture/src/pages/operator/` — Neture 운영자 페이지
 - `services/web-k-cosmetics/src/pages/operator/` — K-Cosmetics 운영자 페이지
-- `services/web-glycopharm/src/pages/operator/` — GlycoPharm 운영자 페이지
 
 ---
 
@@ -33,9 +32,6 @@ packages/operator-core-ui/src/modules/stores/OperatorStoresList.tsx
 packages/ui/src/ag-components/DataTable.tsx         (독립 구현, BaseTable과 무관)
     ↑ exported as DataTable from @o4o/ui
     ↑ used by
-services/web-glycopharm/src/pages/operator/UsersPage.tsx
-services/web-glycopharm/src/pages/operator/PharmaciesPage.tsx
-services/web-glycopharm/src/pages/operator/StoreApprovalsPage.tsx
 services/web-k-cosmetics/src/pages/operator/ApplicationsPage.tsx
 services/web-k-cosmetics/src/pages/operator/UsersPage.tsx
 ```
@@ -147,16 +143,6 @@ BaseTable
 | StoresPage | 미확인 | — | — | 조사 필요 |
 | OrdersPage | 미확인 | — | — | 조사 필요 |
 
-### 4.4 GlycoPharm (`services/web-glycopharm/src/pages/operator/`)
-
-| 파일 | 테이블 컴포넌트 | checkbox | ActionBar | 판정 |
-|------|----------------|---------|-----------|------|
-| UsersPage | ag-components DataTable | ✅ (`rowSelection.selectedRowKeys`) | ✅ | **VARIANT** (DataTable + ActionBar 조합, BaseTable과 API 불일치) |
-| PharmaciesPage | ag-components DataTable | — | ✅ | **VARIANT** (ActionBar 있으나 selection 없음) |
-| StoreApprovalsPage | ag-components DataTable | — | — | **LEGACY** |
-| LmsCoursesPage | BaseTable 미사용 | — | — | 조사 필요 |
-| ForumRequestsPage | 미확인 | — | — | 조사 필요 |
-
 ### 4.5 Admin Dashboard (`apps/admin-dashboard/src/pages/`)
 
 | 파일 | 테이블 컴포넌트 | checkbox | ActionBar | 판정 |
@@ -211,10 +197,9 @@ BaseTable
 - `Promise.all()` 개별 API 호출
 - ActionBar/BulkResultModal UX 일관성 없음
 
-**Gap 3: ag-components DataTable + ActionBar (VARIANT — GlycoPharm 패턴)**
+**Gap 3: ag-components DataTable + ActionBar **
 - API 불일치: `rowSelection.selectedRowKeys: string[]` vs BaseTable `Set<string>`
 - `BulkResultModal` 미사용
-- GlycoPharm UsersPage에서만 ActionBar 연결, 나머지는 미연결
 
 **Gap 4: Raw HTML 테이블 (k-cosmetics EventOfferApprovalsPage)**
 - BaseTable 미사용
@@ -245,7 +230,6 @@ BaseTable
 | KPA OperatorResourcesPage | 없음 | `Promise.all()` 개별 호출 (WO 주석 명시) |
 | Dropshipping Products | 없음 | `Promise.all()` 개별 호출 |
 | Dropshipping Partners/Sellers/Suppliers | 없음 | `Promise.all()` 개별 호출 |
-| GlycoPharm UsersPage | `/admin/users/{id}` 개별 | `Promise.all()` 개별 호출 |
 | KPA ContentManagementPage | 개별 API 반복 | `Promise.all()` 개별 호출 |
 
 > **요약**: bulk 전용 API는 Neture 도메인에만 존재. 나머지는 모두 개별 API 반복 호출 패턴.
@@ -270,7 +254,6 @@ BaseTable
 | 서비스 | 공통화 가능 컬럼 | 서비스 고유 컬럼 |
 |--------|----------------|----------------|
 | KPA | 이름, 이메일, 상태, 등록일, 액션 | 약사면허번호, 분회정보, 자격증상태 |
-| GlycoPharm | 이름, 이메일, 상태, 등록일, 액션 | 약국명, 사업자번호 |
 | K-Cosmetics | 이름, 이메일, 상태, 등록일, 액션 | 공급사, 브랜드 |
 | Neture | 이름, 상태, 승인상태, 등록일, 액션 | supplier정보, DistributionType |
 
@@ -284,7 +267,7 @@ BaseTable
 
 ### 7.4 공통화 불가 항목
 
-- 각 서비스의 role guard (KPA: `kpa-society:operator`, Glycopharm: `glycopharm:operator`)
+- 각 서비스의 role guard
 - 서비스별 bulk action 의미 (KPA: 승인/거부, Dropshipping: 삭제, Neture: batch-approve)
 - 서비스별 pagination API 형태 차이
 
@@ -341,7 +324,7 @@ BaseTable 외부에서 Pagination 컴포넌트 사용 (operator-ux-core 또는 @
 ### 9.1 API 불일치 (높음)
 
 BaseTable: `Set<string>` / ag-components DataTable: `string[]`  
-→ GlycoPharm, K-Cosmetics 일부 페이지를 BaseTable 패턴으로 전환 시 state 타입 변경 필요.
+→ K-Cosmetics 일부 페이지를 BaseTable 패턴으로 전환 시 state 타입 변경 필요.
 
 ### 9.2 Drawer/Detail Panel 충돌 (중간)
 
@@ -393,8 +376,6 @@ Bulk API: 기존 개별 API `Promise.all()` 패턴으로 충분.
 **대상**: ag-components DataTable 또는 Raw HTML 사용 페이지
 
 - `services/web-k-cosmetics/src/pages/operator/EventOfferApprovalsPage.tsx` (Raw HTML → BaseTable)
-- `services/web-glycopharm/src/pages/operator/UsersPage.tsx` (DataTable → BaseTable)
-- `services/web-glycopharm/src/pages/operator/PharmaciesPage.tsx` (DataTable → BaseTable)
 - `services/web-neture/src/pages/operator/AllRegisteredProductsPage.tsx` (커스텀 checkbox → BaseTable selectable)
 
 작업: 컴포넌트 교체 + column 재정의 + state 타입 변경.
@@ -432,7 +413,7 @@ Bulk API: 기존 개별 API `Promise.all()` 패턴으로 충분.
 | **공통화 불가** | Role guard, 서비스별 bulk action semantics, 서비스별 API endpoint |
 | **Bulk API 존재** | Neture (batch-approve, batch-reject). 나머지는 Promise.all 개별 호출 |
 | **Phase 1 우선 대상** | ProductApprovalQueuePage, ContentApprovalsPage, HubContentsPage, HubNoticeListPage |
-| **Phase 3 고위험** | EventOfferApprovalsPage (Raw HTML), GlycoPharm UsersPage/PharmaciesPage (DataTable API 불일치) |
+| **Phase 3 고위험** | EventOfferApprovalsPage (Raw HTML) UsersPage/PharmaciesPage (DataTable API 불일치) |
 
 ---
 

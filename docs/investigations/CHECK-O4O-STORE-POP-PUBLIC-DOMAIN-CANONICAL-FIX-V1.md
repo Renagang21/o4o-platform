@@ -17,7 +17,7 @@
 ## 2. 수정
 
 - `storePublicOrigin(serviceKey)` 신설 — service-catalog(SSOT) 기반 서비스별 origin
-  (`kpa→kpa-society.co.kr`, `glycopharm→glycopharm.co.kr`, `cosmetics→k-cosmetics.site`),
+  (`kpa→kpa-society.co.kr`, `cosmetics→k-cosmetics.site`)
   카탈로그 누락 시 `kpa-society.co.kr` 폴백. `o4o.kr` 전역 fallback 제거.
   - store-qr-landing 의 `qrPublicOrigin` 과 동일 정책. 도메인 출처는 service-catalog 단일.
 - `popItems[].qrUrl` 생성부(line 328)만 교체. POP UI/스키마/데이터/생성 로직 변경 없음.

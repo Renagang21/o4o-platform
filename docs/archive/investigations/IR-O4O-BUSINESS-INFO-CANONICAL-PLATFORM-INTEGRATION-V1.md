@@ -14,7 +14,7 @@
 사업자 정보의 SSOT(Source of Truth)를 어디에 둘 것인가?
 ```
 
-O4O 플랫폼 5개 서비스(Neture, KPA, GlycoPharm, K-Cosmetics, GlucoseView)에 걸쳐 사업자 정보가 어떻게 저장되고 이동하는지를 코드 기준으로 확인하고, Canonical SSOT 구조를 확정한다.
+O4O 플랫폼 4개 서비스(Neture, KPA, K-Cosmetics, GlucoseView)에 걸쳐 사업자 정보가 어떻게 저장되고 이동하는지를 코드 기준으로 확인하고, Canonical SSOT 구조를 확정한다.
 
 ---
 
@@ -78,7 +78,6 @@ metadata        JSONB           — 확장 정보 (taxInvoiceEmail 등 일부 �
 **서비스별 사용:**
 - Neture: `neture_suppliers.organization_id` → organizations (Phase 5-B: business_number, address → org only)
 - KPA: `kpa_members.organization_id` → organizations (계층형, type='branch'/'pharmacy')
-- GlycoPharm: 승인 시 organization_store 생성 (type='pharmacy')
 - K-Cosmetics: `cosmetics_stores.organization_id` → organizations
 
 ---
@@ -98,7 +97,7 @@ store_name      VARCHAR(255)         — 매장명
 region          VARCHAR(100)         — 지역
 ```
 
-**특징:** 상세 사업자 정보(대표자명, 세금계산서 이메일 등) 미저장. cosmetics_stores, glycopharm_pharmacies를 `business_number` 기준으로 cross-service 연결하는 브릿지 역할.
+**특징:** 상세 사업자 정보(대표자명, 세금계산서 이메일 등) 미저장.
 
 ---
 
@@ -145,7 +144,6 @@ neture_suppliers에 WRITE: representative_name, tax_invoice_email, business_type
 | **Neture 공급자** | users.businessInfo | neture_suppliers (1회 복사) + organizations (생성) | organizations (business_number, address) + neture_suppliers (대표자, 세금계산서) | Phase 5-B 완료 |
 | **KPA 약사** | users.businessInfo + kpa_members (자동) | kpa_members 활성화 | kpa_pharmacist_profiles (SSOT) + users.businessInfo (merge) | 2-track SSOT |
 | **KPA 약국 (개설약사)** | users.businessInfo + kpa_pharmacy_requests | organizations (type='pharmacy') 생성 | organizations (SSOT) | organizations 완전 위임 |
-| **GlycoPharm** | users.businessInfo + glycopharm_applications.metadata | organizations + glycopharm_pharmacy_extension | organizations (SSOT) | **org 링크 누락 이슈** |
 | **K-Cosmetics** | users.businessInfo + cosmetics_store_applications | organizations + cosmetics_stores | organizations (SSOT) + cosmetics_stores (이중화) | **business_number 이중화 이슈** |
 
 ---
@@ -158,13 +156,10 @@ neture_suppliers에 WRITE: representative_name, tax_invoice_email, business_type
 |---|---|---|
 | organizations | `business_number` | **SSOT** (Neture, KPA, Cosmetics) |
 | neture_suppliers | `business_number` | org 위임 후 직접 쓰기 금지 |
-| glycopharm_pharmacies | `business_number` | **독립 저장** (org 미링크) |
 | cosmetics_stores | `businessNumber` | org 링크 있으나 **자체 unique 제약도 유지** |
 | physical_stores | `business_number` | cross-service 매핑 key (정규화됨) |
 | kpa_pharmacy_requests | `business_number` | 신청 단계 임시 저장 |
 | users.businessInfo | `businessNumber` | 가입 스냅샷 |
-
-**문제:** glycopharm_pharmacies는 organizations와 별도로 business_number 관리 → 일관성 위험
 
 ### 3.2 representativeName (심각도: 🟡)
 
@@ -192,7 +187,6 @@ neture_suppliers에 WRITE: representative_name, tax_invoice_email, business_type
 |---|---|---|
 | organizations | `address` + `address_detail` | **SSOT** |
 | neture_suppliers | `business_address` | 읽기 폴백용 — org 쓰기 우선 |
-| glycopharm_pharmacies | `address` | 자체 저장 (org 미링크) |
 | cosmetics_stores | `address` | 자체 저장 (이중화) |
 | users.businessInfo | `businessAddress` | 가입 스냅샷 |
 
@@ -253,28 +247,6 @@ users.businessInfo ← UPDATE (merge)
 SSOT: kpa_pharmacist_profiles (직역) + organizations (약국 정보)
 ```
 
-### 4.3 GlycoPharm
-
-```
-[가입]
-PharmacyOwnerModal
-  ↓ POST /auth/register
-users.businessInfo ← 저장
-glycopharm_applications ← AUTO (metadata: ceoName, address, taxInvoiceEmail...)
-
-[승인]
-admin → PATCH /glycopharm/applications/{id}
-  ↓
-organization_store ← INSERT (name=organizationName, business_number)
-glycopharm_pharmacy_extension ← INSERT
-organization_service_enrollments ← INSERT
-organization_members ← INSERT (owner)
-[상품 자동 진열]
-
-SSOT 확정: organizations (but glycopharm_pharmacies도 독립 존재 → drift)
-users.businessInfo ← NO SYNC
-```
-
 ### 4.4 K-Cosmetics
 
 ```
@@ -301,8 +273,6 @@ SSOT: organizations 우선, cosmetics_stores 이중화 현존
 | neture_suppliers → users.businessInfo | **없음** | — | 의도된 설계 |
 | users.businessInfo → kpa_members | 단방향 → | 프로필 수정 시 | pharmacy_name/address만 |
 | kpa_pharmacist_profiles ↔ kpa_members | 쓰기 → sync | 프로필 수정 | profiles=SSOT, members=denorm |
-| users.businessInfo → glycopharm_applications.metadata | 단방향 → | 가입 시 1회 | 임시 스냅샷 |
-| glycopharm_applications → organizations | 단방향 → | 승인 시 1회 | |
 
 **핵심 패턴:** users.businessInfo는 항상 단방향 출발점. 역동기화 없음 = **의도된 설계**.
 
@@ -339,7 +309,6 @@ kpa_pharmacist_profiles
   ├─ activity_type          ← KPA SSOT
   └─ license_number
 
-glycopharm_pharmacies       ← GlycoPharm 고유 정보
 cosmetics_stores            ← K-Cosmetics 고유 정보
 
 [cross-service 연계]
@@ -363,7 +332,7 @@ physical_stores
 
 | 항목 | 현재 구조 | 충돌 여부 |
 |---|---|---|
-| 책임 중복 | glycopharm_pharmacies ↔ organizations, cosmetics_stores ↔ organizations | 🔴 중복 있음 |
+| 책임 중복 | — | 🔴 중복 있음 |
 | 매장 중심 구조 | organizations가 Canonical, physical_stores가 cross-service 연계 | ✅ 정합 |
 | 1인 운영 유지 | users.businessInfo → 단일 진입점 → 서비스별 확장 | ✅ 정합 |
 | 서비스별 확장 | neture_suppliers, kpa_pharmacist_profiles로 확장 분리 | ✅ 정합 |
@@ -372,11 +341,6 @@ physical_stores
 ---
 
 ## 8. 즉시 수정 필요 항목
-
-### [P0] GlycoPharm organizations 미링크
-- `glycopharm_pharmacies`에 `organization_id` FK 없음
-- business_number가 organizations와 독립적으로 관리됨
-- **위험:** cross-service lookup 불가, 일관성 위험
 
 ### [P1] K-Cosmetics business_number 이중화
 - `cosmetics_stores.businessNumber` + `organizations.business_number` 동시 유지
@@ -390,10 +354,6 @@ physical_stores
 ---
 
 ## 9. 후속 WO 제안
-
-### WO-1 (단기): `WO-O4O-GLYCOPHARM-ORG-BRIDGE-V1`
-- glycopharm_pharmacies에 organization_id FK 추가
-- 승인 시 기존 생성 org와 연결
 
 ### WO-2 (단기): `WO-O4O-COSMETICS-STORE-BUSINESS-NUMBER-DEDUP-V1`
 - cosmetics_stores.businessNumber를 read-only 또는 제거
@@ -419,7 +379,7 @@ physical_stores
 | Canonical SSOT | **organizations** (name, business_number, address) |
 | 서비스 확장 SSOT | **neture_suppliers** (Neture), **kpa_pharmacist_profiles** (KPA) |
 | cross-service 연계 | **physical_stores** (business_number 기반 브릿지) |
-| 즉시 해결 필요 | GlycoPharm organizations 미링크 (P0) |
+| 즉시 해결 필요 | — |
 | 권장 Option | **D — Organization 중심 + 서비스 확장 Entity** |
 
 **최종 권고 구조:**
@@ -430,5 +390,4 @@ organizations          → 사업자 공통 SSOT (name, business_number, address
 neture_suppliers       → Neture 운영 확장 (대표자, 세금계산서, 담당자, B2B)
 kpa_pharmacist_profiles→ KPA 직역 SSOT
 physical_stores        → cross-service 브릿지 (business_number key)
-glycopharm/cosmetics   → organizations 완전 위임 (WO 후속)
 ```

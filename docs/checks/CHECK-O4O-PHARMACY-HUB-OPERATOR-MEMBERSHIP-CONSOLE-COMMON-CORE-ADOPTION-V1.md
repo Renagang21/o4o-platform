@@ -37,7 +37,6 @@ WO §7 에 따라 **PharmacyHub 전용 복제 대신 공통 Core 를 최소 확�
 | `fullDetailHref?: (user) => string \| null` | Drawer 의 "전체 상세 페이지" 링크. `null` 이면 링크 자체를 렌더하지 않음 | `/operator/users/{id}` (기존 하드코딩과 동일) |
 | tab count / emptyMessage | `stats` 미제공 서비스는 count 생략(“전체 0” 모순 표시 제거), approval 모드 전용 빈 메시지 | 기존 소비처 영향 없음 |
 
-**모든 기본값이 기존 동작을 그대로 보존**하므로 기존 소비처 6곳(GlycoPharm admin/operator,
 K-Cosmetics admin/operator, KPA `MemberManagementPage`, Neture `UsersManagementPage`)은 무수정이다.
 
 ## 3. PharmacyHub 측 변경
@@ -59,7 +58,7 @@ K-Cosmetics admin/operator, KPA `MemberManagementPage`, Neture `UsersManagementP
 |---|---|
 | web-pharmacy-hub `type-check` | **PASS** |
 | web-pharmacy-hub `build` | **PASS** |
-| 회귀 build — glycopharm / k-cosmetics / neture / kpa-society | **PASS** (4/4) |
+| 회귀 build — k-cosmetics / neture / kpa-society | **PASS** (4/4) |
 | 브라우저 smoke — 로그인 → `/operator` Shell·Sidebar | **PASS** |
 | 목록 · 검색(`renagang21`) · 상태 탭(전체/승인 완료/반려/가입 신청) | **PASS** (서버 필터 동작) |
 | 행 클릭 Drawer · 회원관리 액션 비노출 | **PASS** (수정/비밀번호/삭제/일괄/통계 전부 없음) |

@@ -90,11 +90,11 @@ page target 분해: via_library_item 3 / via_kpa_store_contents 4 / via_kpa_cont
 
 ---
 
-## 5. GP / K-Cosmetics / 공통 모듈
+## 5. K-Cosmetics / 공통 모듈
 
-- asset-copy / store-execution-assets / QR·POP staff 컨트롤러는 **3서비스 공통**(serviceKey 격리): `kpa.routes.ts:411`, `glycopharm.routes.ts:394`, `cosmetics.routes.ts:161` 등. 가져오기=사본 흐름 동일 적용.
-- **store-library-feed(콘텐츠 피드)는 KPA 전용** — GP/KCos 미mount. 원본 참조 잔재가 아니라 **미구현**(GP/KCos는 자료함 통합 피드 없음).
-- 원본 테이블은 서비스별 분리(kpa_contents / glycopharm_contents / cosmetics_contents). 공통 asset-copy-core factory 변경은 3서비스 동시 영향.
+- asset-copy / store-execution-assets / QR·POP staff 컨트롤러는 **2서비스 공통**(serviceKey 격리): `kpa.routes.ts:411`, `cosmetics.routes.ts:161` 등. 가져오기=사본 흐름 동일 적용.
+- **store-library-feed(콘텐츠 피드)는 KPA 전용** — KCos 미mount. 원본 참조 잔재가 아니라 **미구현**(KCos는 자료함 통합 피드 없음).
+- 원본 테이블은 서비스별 분리. 공통 asset-copy-core factory 변경은 3서비스 동시 영향.
 
 ---
 

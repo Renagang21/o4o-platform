@@ -13,7 +13,7 @@
  *   - 업무 자체가 다른 것(예: Neture 는 폐쇄형 회원 관리 동선이 없다)은 기능을 만들지 않고
  *     해당 config 를 비워 노출을 끈다.
  *   - 실패 전달은 adapter 가 정규화한다. 서비스마다 다른 응답 형태
- *     (KPA: throw / GP·KCos·Neture: `{ success, error }` axios)를 template 이 알 필요가 없다.
+ *     (KPA: throw / KCos·Neture: `{ success, error }` axios)를 template 이 알 필요가 없다.
  */
 
 // ─────────────────────────────────────────────────────────────────────────────

@@ -4,7 +4,7 @@
 
 **조사일**: 2026-03-14
 **조사 대상**: O4O Platform Store Capability 시스템 전체
-**비교 대상**: Backend (api-server) / Frontend (KPA, K-Cosmetics, GlycoPharm) / Shared Packages
+**비교 대상**: Backend (api-server) / Frontend (KPA, K-Cosmetics) / Shared Packages
 
 ---
 
@@ -20,11 +20,11 @@ Capability 시스템은 **Backend 1곳(정적 상수)에서 정의되어 정상 
 | DB 스키마 | **SAFE** | UNIQUE, FK, INDEX 완비 |
 | Frontend (KPA) | **ACTIVE** | Read-only + Operator Toggle 구현 |
 | Frontend (K-Cosmetics) | **ACTIVE** | Operator Toggle 구현 |
-| Frontend (GlycoPharm) | **NOT IMPLEMENTED** | Capability UI 전무 |
+| Frontend | **NOT IMPLEMENTED** | Capability UI 전무 |
 | 서비스별 정책 | **NOT IMPLEMENTED** | 전 서비스 동일 10개, 차별화 없음 |
 | Frontend 라벨 | **PARTIAL** | 하드코딩 2곳 중복 |
 
-**결론**: Capability 시스템이 정상 운영 중이나, **서비스별 정책 부재 + Frontend 라벨 하드코딩 + GlycoPharm UI 미구현** 3가지 구조적 개선 여지 존재. Full DB Registry는 불필요하며 **Lightweight Registry (Shared 상수 통합)** 권고.
+Full DB Registry는 불필요하며 **Lightweight Registry (Shared 상수 통합)** 권고.
 
 ---
 
@@ -56,7 +56,6 @@ Capability 시스템은 **Backend 1곳(정적 상수)에서 정의되어 정상 
 | Backend `store-capabilities.ts` | Key enum + Channel map + Defaults | 정적 (SSOT) |
 | Frontend KPA `CAPABILITY_LABELS` | 한국어 라벨 (하드코딩) | 정적 |
 | Frontend K-Cosmetics `CAPABILITY_LABELS` | 한국어 라벨 (하드코딩, KPA와 동일) | 정적 |
-| Frontend GlycoPharm | (없음) | - |
 | Database `store_capabilities` | `capability_key VARCHAR(50)` — Enum 제약 없음 | 동적 |
 | Shared packages | `requiredCapabilities?: string[]` (dashboard widget) | 참조만 |
 
@@ -199,22 +198,15 @@ POST /store-hub/channels { channelType: 'TABLET' }
 - 표시: 10개 Capability Toggle switch (핑크 ON / 회색 OFF)
 - API: KPA와 동일 엔드포인트
 
-### 4.3 GlycoPharm
-
-```
-Capability UI: 없음
-Channel UI: 없음
-```
-
 ### 4.4 Frontend 비교
 
-| 기능 | KPA Society | K-Cosmetics | GlycoPharm |
-|------|:----------:|:----------:|:----------:|
-| Capability 표시 (Owner) | **YES** (Read-only) | NO | NO |
-| Capability Toggle (Operator) | **YES** (초록) | **YES** (핑크) | **NO** |
-| CAPABILITY_LABELS 하드코딩 | YES | YES (동일) | - |
-| Channel 관리 UI | YES | YES | NO |
-| 10개 전부 표시 | YES | YES | - |
+| 기능 | KPA Society | K-Cosmetics |
+| ------ | :----------: | :----------: |
+| Capability 표시 (Owner) | **YES** (Read-only) | NO |
+| Capability Toggle (Operator) | **YES** (초록) | **YES** (핑크) |
+| CAPABILITY_LABELS 하드코딩 | YES | YES (동일) |
+| Channel 관리 UI | YES | YES |
+| 10개 전부 표시 | YES | YES |
 
 ### 4.5 Frontend 라벨 (하드코딩, KPA/K-Cosmetics 동일)
 
@@ -315,7 +307,7 @@ store_capabilities 테이블에 service_key 컬럼 없음
 
 ### 6.2 Frontend — UI 차이만 존재
 
-| Capability | KPA UI | K-Cosmetics UI | GlycoPharm UI |
+| Capability | KPA UI | K-Cosmetics UI ||
 |------------|:------:|:--------------:|:-------------:|
 | B2C_COMMERCE | 표시 | 표시 | 없음 |
 | TABLET | 표시 | 표시 | 없음 |
@@ -335,7 +327,6 @@ store_capabilities 테이블에 service_key 컬럼 없음
 | 서비스 | 메뉴 | Capability 연동 |
 |--------|------|:--------------:|
 | Cosmetics | dashboard, products, channels, orders, billing, content, settings | **NO** |
-| GlycoPharm | dashboard, products, channels, orders, content, signage, billing, settings | **NO** |
 
 **메뉴 시스템은 Capability와 분리**됨. 서비스별 정적 config.
 
@@ -408,7 +399,7 @@ GET /stores/:slug/tablet/products
 | # | GAP | 현재 상태 | 심각도 |
 |---|-----|----------|:------:|
 | G1 | **서비스별 Capability 정책 부재** | 전 서비스 동일 10개, 차별화 없음 | MEDIUM |
-| G2 | **GlycoPharm Capability UI 미구현** | API 직접 호출로만 관리 가능 | MEDIUM |
+| G2 | — | API 직접 호출로만 관리 가능 | MEDIUM |
 | G3 | **Frontend 라벨 하드코딩** | KPA, K-Cosmetics에 동일 라벨 중복 | LOW |
 | G4 | **DB capability_key Enum 제약 없음** | VARCHAR(50) free-text, 잘못된 key 삽입 가능 | LOW |
 | G5 | **B2C_COMMERCE → B2C → web 이름 불일치** | 3단계 매핑 필요 | LOW |
@@ -465,7 +456,6 @@ Lightweight Registry (Shared 상수 통합):   권고
    (key, label, channelType, category, icon)
 
 2. 서비스별 available capabilities 설정
-   { kpa: [...], cosmetics: [...], glycopharm: [...] }
 
 3. API 응답에 label/metadata 포함
    GET /capabilities → [{ key, label, enabled, channelType }]
@@ -508,7 +498,6 @@ Capability Registry = NOT IMPLEMENTED (중앙 레지스트리 없음)
 3. Frontend 하드코딩 라벨 제거
 
 **Phase 2: UI 보완**
-1. GlycoPharm Operator 페이지에 Capability UI 추가
 2. API 응답에 label 포함
 
 ### 주의 사항

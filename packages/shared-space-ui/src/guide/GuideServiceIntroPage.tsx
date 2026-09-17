@@ -3,7 +3,7 @@
  *
  * WO-O4O-GUIDE-ENTRY-AND-LANDING-COMMONIZATION-V1 §6 · §12 · §13
  *
- * KPA / K-Cosmetics / GlycoPharm 이 각각 들고 있던 ServiceGuidePage 3개(219~222 lines)가
+ * KPA / K-Cosmetics 가 각각 들고 있던 ServiceGuidePage 2개(219~222 lines)가
  * 같은 레이아웃이었다. 문구·아이콘·경로만 다르므로 View 를 여기로 수렴시키고
  * 서비스별 데이터는 copy 파일에서 주입한다.
  *

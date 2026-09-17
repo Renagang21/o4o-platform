@@ -126,14 +126,6 @@
 | AI Insight | `/pharmacy-ai-insight` | operator/store | OPERATOR | active | **MOVE** | 약사용 AI 도구 — admin이 쓸 일 없음 → KPA Operator 또는 Pharmacist Workspace로 |
 | CGM Patient Care | `/cgm-pharmacist` | operator/store | STORE | **experimental** | **MOVE** | `@o4o/cgm-pharmacist-app` Phase 1 dev. 약사 환자관리 도구. |
 
-### 1-10. SERVICES — Glycopharm
-
-| Menu | Route | Actual Owner | Workspace | Status | Action | 비고 |
-|------|-------|--------------|-----------|--------|--------|------|
-| Pharmacies | `/glycopharm/pharmacies` | admin | ADMIN | active | KEEP | — |
-| Products | `/glycopharm/products` | admin | ADMIN | active | KEEP | — |
-| Applications | `/admin/service-applications/glycopharm` | admin | ADMIN | active | KEEP | — |
-
 ### 1-11. SERVICES — GlucoseView
 
 | Menu | Route | Actual Owner | Workspace | Status | Action | 비고 |
@@ -292,13 +284,13 @@
 
 ## 4. 서비스 전환 성격 메뉴 — 분석
 
-사용자가 세 번째로 우선시한 카테고리: "Yaksa, Glycopharm, K-Cosmetics, Neture가 진짜 admin 메뉴인가, workspace switcher인가?"
+사용자가 세 번째로 우선시한 카테고리: "Yaksa, K-Cosmetics, Neture가 진짜 admin 메뉴인가, workspace switcher인가?"
 
 **현재 상태:**
-- 5개 서비스(Yaksa, Glycopharm, GlucoseView, K-Cosmetics, Neture, Digital Signage)는 단순 메뉴 그룹으로 존재.
+- 4개 서비스(Yaksa, GlucoseView, K-Cosmetics, Neture, Digital Signage)는 단순 메뉴 그룹으로 존재.
 - 정적 메뉴 안에 인라인 정의 — 동적 service switcher 컴포넌트 없음.
 - 각 서비스 내부 항목은 **혼합 성격**:
-  - Glycopharm, GlucoseView, Neture → 거의 순수 ADMIN 영역 (admin이 해당 서비스를 운영/감독)
+  - GlucoseView, Neture → 거의 순수 ADMIN 영역 (admin이 해당 서비스를 운영/감독)
   - Yaksa(KPA) → 일부 ADMIN(`yaksa-hub`) + 일부 PHARMACIST(AI Insight, CGM)가 섞임
   - K-Cosmetics → 거의 PARTNER 영역(role에 'partner' 포함된 점이 결정적 단서)
 
@@ -316,7 +308,7 @@
 
 | 그룹 (총 25개) | 가시 role | 메모 |
 |--------------|-----------|------|
-| Overview, Core, Content, Participation, Learning, CMS, AppStore, Forum, Yaksa, Glycopharm, GlucoseView, Neture, Digital Signage, 모든 Insights | `['admin', 'super_admin']` | 표준 admin 메뉴 |
+| Overview, Core, Content, Participation, Learning, CMS, AppStore, Forum, Yaksa, GlucoseView, Neture, Digital Signage, 모든 Insights | `['admin', 'super_admin']` | 표준 admin 메뉴 |
 | K-Cosmetics | `['admin', 'super_admin', 'partner']` | ⚠️ partner 추가 — partner도 admin 사이드바를 본다는 뜻 |
 | 공급자 대시보드 | `['supplier', 'admin', 'super_admin']` | ⚠️ supplier 추가 — 동일 문제 |
 | Content Manager | `['admin', 'super_admin', 'platform_admin']` | platform_admin 추가 |
@@ -379,7 +371,6 @@
 
 ### Phase 3 — 구조 재정의 (고위험)
 6. `WO-O4O-SERVICE-SWITCHER-DESIGN-V1`
-   - Yaksa/Glycopharm/GlucoseView/Neture 그룹의 admin hub 패턴을 정식 정의
    - 약사/Pharmacist 도구(yaksa-ai-insight, yaksa-cgm)는 별도 워크스페이스로 분리
 
 ---

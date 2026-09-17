@@ -24,7 +24,7 @@ KPA `/store/my-products` 는 `OrganizationProductListing` 기반 **기본 O4O �
 `"내 매장 상품"` 은 KPA baseline(Phase 5)에서 분리된 여러 상품군(매장 취급 상품 / 기본 O4O 주문 가능 상품 /
 이벤트형 O4O 주문 가능 상품)을 포괄해 버리는 라벨이라, 이 화면이 실제로 무엇을 다루는지 모호했다.
 
-KPA-only 임시 수정은 GP/KCos 영향 또는 JSX 복제 위험이 있어, 공유 컴포넌트에 prop 을 추가하고
+KPA-only 임시 수정은 KCos 영향 또는 JSX 복제 위험이 있어, 공유 컴포넌트에 prop 을 추가하고
 KPA wrapper 에서 의미를 주입하는 방식으로 정렬했다.
 
 ---
@@ -36,7 +36,6 @@ KPA wrapper 에서 의미를 주입하는 방식으로 정렬했다.
 | KPA | `/store/my-products` | `<PharmacyOwnerOnlyGuard><StoreProductsManagerPage /></...>` | 기본 "내 매장 상품" | 의미 모호 | **title/description 주입** |
 | Neture | `/store/my-products` | `<StoreProductsManagerPage guideSlot={...} />` | 기본 "내 매장 상품" | 없음 | 기본값 유지 (선택 A) |
 | K-Cosmetics | `/store/my-products` | `<StoreProductsManagerPage />` | 기본 "내 매장 상품" | 없음 | 기본값 유지 (선택 A) |
-| GlycoPharm | `/store/my-products` | `<RoleGuard><StoreProductsManagerPage /></RoleGuard>` | 기본 "내 매장 상품" | 없음 | 기본값 유지 (선택 A) |
 
 - `headerSlot` 을 사용하는 소비처는 **없음** (모두 default header 경로).
 - Neture 는 `guideSlot` 만 주입 — `headerSlot` 미사용이므로 default header title/description prop 적용 대상.
@@ -78,7 +77,7 @@ description?: string;   // 기본값 '진열 상품을 관리하고 채널별 �
 
 ### 5.3 미변경
 
-- GP / KCos / Neture wrapper — 기본값 유지 (선택 A). 문구 자체 변경은 canonical 라벨 정렬 WO 로 분리.
+- KCos / Neture wrapper — 기본값 유지 (선택 A). 문구 자체 변경은 canonical 라벨 정렬 WO 로 분리.
 - `storeMenuConfig.ts` — 변경 없음.
 - DB / migration / API response / ProductApproval / OrganizationProductListing / StoreLocalProduct / 주문·결제·장바구니 로직 — 변경 없음.
 
@@ -91,7 +90,6 @@ description?: string;   // 기본값 '진열 상품을 관리하고 채널별 �
 | KPA | **O4O 주문 가능 상품** + 설명 주입 | 없음 (typecheck PASS) |
 | Neture | 내 매장 상품 (기본값 유지) | 없음 |
 | K-Cosmetics | 내 매장 상품 (기본값 유지) | 없음 |
-| GlycoPharm | 내 매장 상품 (기본값 유지) | 없음 |
 
 ---
 
@@ -125,12 +123,11 @@ description?: string;   // 기본값 '진열 상품을 관리하고 채널별 �
 | web-kpa-society | `tsc --noEmit` | PASS |
 | web-k-cosmetics | `tsc --noEmit` | PASS |
 | web-neture | `tsc --noEmit` | PASS |
-| web-glycopharm | `tsc --noEmit -p tsconfig.app.json` | PASS |
 
 ### Smoke 검증
 
 - 배포 전 단계 — typecheck + 정적 검증으로 대체. prop 추가는 순수 additive 이며 기본값이 기존 동작을
-  보존하므로 미전달 소비처(GP/KCos/Neture)의 런타임 회귀 위험 없음. KPA 는 default header 경로에서
+  보존하므로 미전달 소비처(KCos/Neture)의 런타임 회귀 위험 없음. KPA 는 default header 경로에서
   title/subtitle 만 치환되어 레이아웃 변동 없음.
 
 ---
@@ -138,7 +135,7 @@ description?: string;   // 기본값 '진열 상품을 관리하고 채널별 �
 ## 9. 제외 / 후속 작업
 
 - **제외**: 액션 버튼 라벨("내 매장 상품 등록"), info 배너, empty state 문구 — 이번 WO 범위는 heading prop.
-- **제외**: GP/KCos/Neture 문구 체계 변경 — canonical 라벨 정렬 WO 로 분리.
+- **제외**: KCos/Neture 문구 체계 변경 — canonical 라벨 정렬 WO 로 분리.
 - **후속**: `WO-O4O-MY-STORE-CANONICAL-MENU-LABEL-ALIGNMENT-3SERVICES-V1`
   - 메뉴 라벨은 사용자가 직접 보는 IA — "제품=제작 기준 데이터 앵커" 유지 vs "O4O 주문 가능 상품" 재정의를
     3서비스 기준으로 판단 후 진행.
@@ -153,7 +150,7 @@ description?: string;   // 기본값 '진열 상품을 관리하고 채널별 �
 | prop 미전달 시 기존 화면 보존 | ✅ |
 | KPA 에서 OrganizationProductListing 기반 반복 주문 상품 의미 명확화 | ✅ |
 | KPA 화면 "내 매장 상품" 포괄 heading 의존 제거 | ✅ |
-| GP/KCos 회귀 없이 기존 동작 유지 | ✅ |
+| KCos 회귀 없이 기존 동작 유지 | ✅ |
 | 이벤트 오퍼 기준과 충돌 없음 | ✅ |
 | `storeMenuConfig.ts` 미변경 | ✅ |
 | DB/API/주문/결제 로직 미변경 | ✅ |

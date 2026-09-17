@@ -70,7 +70,6 @@ export {
   kpaGuideForMemberProps,
 } from './copy/kpa.js';
 
-// GlycoPharm guide copy — REMOVED (WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1)
 
 // WO-O4O-NETURE-GUIDE-IA-AND-WRAPPER-PAGES-V1
 export {

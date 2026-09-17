@@ -47,12 +47,11 @@ global/regional 전체 forwarding rule 은 위 **2건이 전부**였다 (regiona
 
 | certificate | 생성 | 만료 | 도메인(SAN) | HTTPS proxy 참조 | 판정 |
 |---|---|---|---|:---:|:---:|
-| `cert-final-neture-v3` | 2026-01-08 | 2026-04-08 | neture/glycopharm/glucoseview/kpa-society/k-cosmetics + api·www (16) | **1** (`o4o-global-lb-target-proxy-2`) | **KEEP** |
+| `cert-final-neture-v3` | 2026-01-08 | 2026-04-08 | — | **1** (`o4o-global-lb-target-proxy-2`) | **KEEP** |
 | `cert-admin` | 2025-12-27 | — | admin.neture.co.kr, www.admin.neture.co.kr | 0 | 삭제 |
 | `cert-final-neture` | 2025-12-27 | 2026-03-28 | 5서비스 apex/www (11) | 0 | 삭제 |
 | `cert-final-neture-v2` | 2026-01-03 | 2026-04-03 | 5서비스 + api.neture (12) | 0 | 삭제 |
 | `cert-glucoseview` | 2025-12-27 | 2026-03-27 | glucoseview.co.kr, www | 0 | 삭제 |
-| `cert-glycopharm` | 2025-12-27 | 2026-03-27 | glycopharm.co.kr, www | 0 | 삭제 |
 | `cert-kcosmetics` | 2025-12-27 | 2026-03-27 | k-cosmetics.site, www | 0 | 삭제 |
 | `cert-kpa` | 2025-12-27 | 2026-03-27 | kpa-society.co.kr, www | 0 | 삭제 |
 | `cert-neture-web` | 2025-12-27 | 2026-03-27 | neture.co.kr, www | 0 | 삭제 |
@@ -142,8 +141,6 @@ WO §7 순서를 그대로 따랐다.
 | `www.neture.co.kr` | 136.110.132.35 | 301 | → https | 200 | 동일 | ✅ |
 | `kpa-society.co.kr` | 136.110.132.35 | 301 | → https | 200 | 동일 | ✅ |
 | `www.kpa-society.co.kr` | 136.110.132.35 | 301 | → https | 200 | 동일 | ✅ |
-| `glycopharm.co.kr` | 136.110.132.35 | 301 | → https | 200 | 동일 | ✅ |
-| `www.glycopharm.co.kr` | 136.110.132.35 | 301 | → https | 200 | 동일 | ✅ |
 | `k-cosmetics.site` | 136.110.132.35 | 301 | → https | 200 | 동일 | ✅ |
 | `www.k-cosmetics.site` | 136.110.132.35 | 301 | → https | 200 | 동일 | ✅ |
 | `glucoseview.co.kr` | 136.110.132.35 | 301 | → https | 200 | 동일 | ✅ |
@@ -163,7 +160,7 @@ WO §7 순서를 그대로 따랐다.
 
 | 항목 | 결과 |
 |---|---|
-| Cloud Run Ready | **12/12 True** (account-center-web · glucoseview-web · glycopharm-web · k-cosmetics-web · kpa-branch-web · kpa-society-web · neture-web · o4o-admin-dashboard · o4o-admin-dashboard-dev · o4o-core-api · o4o-main-site · pharmacy-hub-web) |
+| Cloud Run Ready | **12/12 True** (account-center-web · glucoseview-web · k-cosmetics-web · kpa-branch-web · kpa-society-web · neture-web · o4o-admin-dashboard · o4o-admin-dashboard-dev · o4o-core-api · o4o-main-site · pharmacy-hub-web) |
 | `o4o-core-api` | Ready True |
 | `GET /health` | **200** — `status: alive`, env production, version 0.5.0 |
 | `GET /health/database` | **200** — `status: healthy`, pingMs 4, activeConnections 10, longRunningQueries 0 |

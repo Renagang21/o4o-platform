@@ -633,7 +633,7 @@ function buildConfig(
   // Block 5: Quick Actions
   // WO-O4O-DASHBOARD-ACTION-ICON-VOCAB-STANDARDIZE-V1 (Phase B):
   //   emoji icon → lucide-name 정렬. ActionIcon vocabulary 16종 안에서 매핑.
-  //   ActionIcon 의 Phase A fallback 은 유지되므로 GlycoPharm/K-Cos/Neture 의
+  //   ActionIcon 의 Phase A fallback 은 유지되므로 K-Cos/Neture 의
   //   기존 emoji 또는 미매핑 lucide-name 은 회귀 0.
   const quickActions: QuickActionItem[] = [
     { id: 'qa-content', label: '콘텐츠 관리', link: '/operator/content', icon: 'file-text' },

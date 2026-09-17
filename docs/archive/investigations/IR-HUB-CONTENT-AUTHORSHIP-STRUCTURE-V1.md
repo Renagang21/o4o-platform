@@ -15,7 +15,7 @@
 |------|------|-----------|------|
 | `id` | UUID | YES | PK |
 | `createdBy` | UUID | YES | 생성자 User ID (감사용) |
-| `serviceKey` | VARCHAR(50) | YES | 서비스 스코프 ('glycopharm', 'kpa', 'cosmetics' 등) |
+| `serviceKey` | VARCHAR(50) | YES | 서비스 스코프 |
 | `organizationId` | UUID | YES | 조직 스코프 (null = 플랫폼 전체) |
 | `type` | VARCHAR(50) | YES | 콘텐츠 타입 ('hero', 'notice', 'news', 'featured', 'promo', 'event') |
 | `status` | VARCHAR(20) | YES | 생명주기 ('draft' → 'published' → 'archived') |
@@ -96,7 +96,7 @@ if (!['hero', 'notice'].includes(type)) {
 
 - JWT role 기반: `requireAdmin` → `platform:admin` 또는 `platform:super_admin`
 - scope 기반: 콘텐츠 자체의 `serviceKey` / `organizationId`로 스코프 분리
-- 서비스별 role guard: **없음** (예: `glycopharm:operator`로 콘텐츠 생성 불가)
+- 서비스별 role guard: **없음**
 
 ---
 
@@ -107,7 +107,6 @@ if (!['hero', 'notice'].includes(type)) {
 | 서비스 | 위치 | 작성 UI | 타입 | 역할 | 비고 |
 |--------|------|---------|------|------|------|
 | **Admin Dashboard** | `/cms/contents/` | **YES** | Full CMS (Hero, Notice) | Admin | 유일한 중앙 CMS 작성 UI |
-| **GlycoPharm** | `/partner/ContentPage.tsx` | YES (별도 시스템) | Text/Image/Link | Supplier | partnerApi (CMS와 별개) |
 | **K-Cosmetics** | `/partner/ContentPage.tsx` | YES (별도 시스템) | Text/Image/Link | Supplier | partnerApi (CMS와 별개) |
 | **GlucoseView** | `/partner/ContentPage.tsx` | YES (별도 시스템) | Text/Image/Link | Supplier | partnerApi (CMS와 별개) |
 | **KPA Society** | `/dashboard/MyContentPage.tsx` | NO (복사 관리만) | - | Operator | Hub에서 복사 후 관리 |
@@ -122,7 +121,6 @@ Admin Dashboard (작성)
 cms_contents 테이블
     ↓ GET /api/v1/cms/contents (serviceKey 필터)
     ↓ GET /api/v1/cms/slots/:slotKey
-HUB 페이지 (KPA, GlycoPharm, K-Cosmetics)
     ↓ "내 매장 복사" (KPA만)
 MyContentPage (복사본 관리)
 ```
@@ -133,7 +131,7 @@ MyContentPage (복사본 관리)
 2. **Partner Content 페이지는 CMS와 별도 시스템** (partnerApi, 별도 테이블)
 3. **Operator에게 콘텐츠 작성 UI 없음**
 4. **Supplier CMS 콘텐츠 직접 등록 경로 없음** (Partner Content ≠ CMS Content)
-5. **KPA만 "복사" 기능 존재** (GlycoPharm, K-Cosmetics는 복사 기능 없음)
+5. **KPA만 "복사" 기능 존재** (K-Cosmetics는 복사 기능 없음)
 
 ---
 
@@ -156,7 +154,6 @@ MyContentPage (복사본 관리)
 ### 한계 3: 서비스별 독립 등록 경로 부재
 
 - `requireAdmin` Guard만 존재 — 서비스 운영자용 Guard 없음
-- 예: `glycopharm:operator`가 GlycoPharm 전용 콘텐츠를 등록할 API 없음
 - 서비스별 콘텐츠 등록은 Admin에게 요청해야 함
 
 ### 한계 4: Supplier → CMS 연결 부재
@@ -267,7 +264,7 @@ MyContentPage (복사본 관리)
 | Auth Middleware | `apps/api-server/src/common/middleware/auth.middleware.ts` |
 | ContentQueryService | `apps/api-server/src/modules/content/content-query.service.ts` |
 | Admin CMS UI | `apps/admin-dashboard/src/pages/cms/contents/` |
-| Partner Content (GlycoPharm) | `services/web-glycopharm/src/pages/partner/ContentPage.tsx` |
+| Partner Content | — |
 | Partner Content (K-Cosmetics) | `services/web-k-cosmetics/src/pages/partner/ContentPage.tsx` |
 | KPA MyContent Dashboard | `services/web-kpa-society/src/pages/dashboard/MyContentPage.tsx` |
 | Neture Content Browse | `services/web-neture/src/pages/content/` |

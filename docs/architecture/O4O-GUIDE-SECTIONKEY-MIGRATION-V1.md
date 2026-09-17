@@ -30,15 +30,6 @@
 | `web-kpa-society/src/pages/pharmacy/StoreChannelsPage.tsx` | `store.channel.editor` |
 | `web-kpa-society/src/pages/operator/ForumDeleteRequestsPage.tsx` | `forum.request.management` |
 
-### GlycoPharm (4개)
-
-| 파일 | pageKey |
-|------|---------|
-| `web-glycopharm/src/pages/store/StoreChannelsPage.tsx` | `store.channel.editor` |
-| `web-glycopharm/src/pages/operator/ForumDeleteRequestsPage.tsx` | `forum.request.management` |
-| `web-glycopharm/src/pages/store-management/PharmacyProducts.tsx` | `store.product.management` |
-| `web-glycopharm/src/pages/operator/signage/HqPlaylistDetailPage.tsx` | `signage.playlist.manager` |
-
 ### K-Cosmetics (4개)
 
 | 파일 | pageKey |

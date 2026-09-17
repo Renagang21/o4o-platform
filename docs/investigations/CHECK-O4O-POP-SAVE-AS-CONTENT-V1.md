@@ -16,9 +16,7 @@
 | 파일 | 변경 |
 |------|------|
 | `apps/api-server/.../o4o-store/controllers/pop.controller.ts` | **신규 `POST /stores/:slug/pop/staff`** — 직접 작성 store_pops INSERT(author_role='store', storeId, serviceKey, status='draft', title/content/excerpt, slug=title slugify+충돌 timestamp). verifyOwner. **DB 컬럼 추가 없음**(기존 컬럼만) |
-| `web-{kpa,glycopharm,k-cosmetics}/src/api/popStaff.ts` | `createStaffPopPost(slug, {title,content,excerpt}, service?)` 추가 |
 | `web-kpa/.../StorePopPage.tsx` | "POP 콘텐츠로 저장" 버튼(AI 패널) + handleSaveAsContent + getStoreSlug(pharmacyInfo)/createStaffPopPost import |
-| `web-glycopharm/.../StorePopPage.tsx` | 동(getStoreSlug/createStaffPopPost from @/api/*, 용어 "내 약국") |
 | `web-k-cosmetics/.../StorePopPage.tsx` | 동(용어 "내 매장") |
 
 - 저장 데이터: `popAiContent` → title / content(shortText+bullets+longText 를 HTML 조합) / excerpt(shortText). **templateId 미저장**(store_pops 컬럼 부재 — §8 PARTIAL, DB 변경 회피).
@@ -34,7 +32,7 @@ StorePopPage(POP 제작) → "POP 콘텐츠로 저장" → POST /stores/:slug/po
 
 ## 4. 검증
 
-- **TypeScript 0 errors:** `api-server` · `web-kpa-society` · `web-glycopharm` · `web-k-cosmetics`.
+- **TypeScript 0 errors:** `api-server` · `web-kpa-society` · `web-k-cosmetics`.
 - **정적:**
   - 신규 POST staff = store_pops INSERT(author_role='store'), 기존 GET/import/PUT/DELETE 와 동일 verifyOwner/slug 패턴. **migration 0, store_pops 컬럼 추가 0.**
   - createStaffPopPost 3서비스 추가(authFetch, service prefix). StorePopPage "POP 콘텐츠로 저장" 3서비스.
@@ -56,7 +54,7 @@ POP 제작이 **PDF 출력 + 재편집 가능한 POP 콘텐츠 저장**까지 �
 1. (배포 후) 3서비스 "POP 콘텐츠로 저장" → 사본 관리 → 재제작 smoke.
 2. (선택) templateId 보존 — store_pops 컬럼 추가(DB migration) 또는 content/메타 embed.
 3. (선택) `WO-O4O-POP-EDITOR-INLINE-EDIT-V1`(인라인 편집) / `IR-O4O-POP-DATA-ROLE-CLARIFICATION-V1`(역할 정리).
-4. (선택) KPA/GP/KCos StorePopPage·StorePopStaffPage dup 공통 컴포넌트 추출.
+4. (선택) KPA/KCos StorePopPage·StorePopStaffPage dup 공통 컴포넌트 추출.
 
 ---
 

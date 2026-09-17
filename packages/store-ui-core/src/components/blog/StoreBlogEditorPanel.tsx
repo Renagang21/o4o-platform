@@ -2,7 +2,7 @@
  * StoreBlogEditorPanel — 매장 블로그 게시글 편집 화면 (공통)
  * WO-O4O-MY-STORE-REMAINING-VIEW-DUPLICATION-ZERO-CLEANUP-V1
  *
- * KCos / GP / KPA 3서비스의 editor view 는 본문 편집기 주입 지점을 제외하면 동일했다.
+ * KCos / KPA 2서비스의 editor view 는 본문 편집기 주입 지점을 제외하면 동일했다.
  * 서비스별 추가 요소(KPA template badge · AI 안내문)는 slot 으로만 받는다 —
  * 없는 서비스에 새 요소를 추가하지 않는다(기능 개수 동일화 금지).
  */

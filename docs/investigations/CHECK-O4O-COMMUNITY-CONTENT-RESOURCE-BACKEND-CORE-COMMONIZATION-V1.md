@@ -1,6 +1,6 @@
 # CHECK-O4O-COMMUNITY-CONTENT-RESOURCE-BACKEND-CORE-COMMONIZATION-V1
 
-**콘텐츠·자료실 backend Core 공통화 — GP/K-Cosmetics 완료, KPA 미완료**
+**콘텐츠·자료실 backend Core 공통화 — K-Cosmetics 완료, KPA 미완료**
 
 - 근거 WO: `WO-O4O-COMMUNITY-CONTENT-RESOURCE-BACKEND-CORE-COMMONIZATION-V1`
 - 선행 감사: `IR-O4O-COMMUNITY-CONTENT-RESOURCE-BACKEND-CANONICALIZATION-AUDIT-V1` (판정 B)
@@ -8,7 +8,6 @@
 
 > ## ⚠️ 완료 범위 고지
 >
-> **GP ↔ K-Cosmetics 수렴(WO §5)과 공통 Core·안전 규칙(§3·§4)·안전 테스트(§12)는 완료했다.**
 > **KPA adoption(WO §6)은 완료하지 못했다.** config 파일까지 준비했으나 `kpa.routes.ts` 배선은
 > 적용하지 않았고, 착수한 편집은 되돌렸다. 사유와 남은 작업은 §7 에 적는다.
 > 이 문서는 완료 보고가 아니라 **부분 완료 기록**이다.
@@ -19,21 +18,8 @@
 
 | 파일 | LOC | 내용 |
 |---|---:|---|
-| `routes/glycopharm/controllers/resources.controller.ts` | 557 | 회원 6 handler + 운영자 4 handler |
 | `routes/cosmetics/controllers/resources.controller.ts` | 557 | 동일 |
 | `routes/kpa/kpa.routes.ts` 인라인 (L1519~L2233) | 약 700 | 회원 10 handler(추천·AI 3종 포함) + 운영자 3 handler |
-
-## 2. GP ↔ K-Cosmetics 동일성 재확인
-
-서비스 토큰 정규화 후 기계 diff:
-
-```text
-557줄 / 557줄 · diff 26줄
-  주석 3처 + console.error 접두어 10처
-  SQL · 권한 · DTO · 검증 차이 0
-```
-
-선행 감사 판정 재확인. 두 파일은 로그 문자열 외 100% 동일했다.
 
 ## 3. 추출한 Core
 
@@ -42,8 +28,8 @@
 | export | 대상 handler 그룹 |
 |---|---|
 | `createContentResourceCore` | G1 list · G2 detail · G5 delete · G6 view · G11 operator list · G13 operator status · G14 operator delete |
-| `createMemberWriteHandlers` | G3 create · G4 update (**GP/KCos 전용** — KPA 는 `content_type` 때문에 DATA_MODEL_DIFFERENT) |
-| `createOperatorResourceCreateHandler` | G12 operator create (**GP/KCos 전용** — 감사 UNIQUE 판정) |
+| `createMemberWriteHandlers` | G3 create · G4 update (**KCos 전용** — KPA 는 `content_type` 때문에 DATA_MODEL_DIFFERENT) |
+| `createOperatorResourceCreateHandler` | G12 operator create (**KCos 전용** — 감사 UNIQUE 판정) |
 | `assertSafeTableName` · `defaultListVisibility` · `deriveUsageType` · `sanitizeContentTags` | 공통 유틸 |
 
 Core 는 서비스명을 알지 않는다. 서비스 분기(`if (service === ...)`) 0.
@@ -78,7 +64,6 @@ DB 컬럼명을 바꾸지 않고 config 로 흡수했다.
 
 | 서비스 | 회원 목록 필터 | 운영자 목록 필터 | select 특이 |
 |---|---|---|---|
-| GlycoPharm | `sub_type` · `usage_type` · `source_type` | `source_type` · `usage_type` | — |
 | K-Cosmetics | 동일 | 동일 | — |
 | KPA (config 준비만) | **`content_type` · `sub_type`** | `source_type` · `usage_type` | `c.content_type` 포함 |
 
@@ -92,7 +77,7 @@ DB 컬럼명을 바꾸지 않고 config 로 흡수했다.
 ```text
 status=all + 운영자   → visibility='none',            applyExplicitStatus=false
 status=all + 일반회원 → visibility='published-or-own', applyExplicitStatus=false
-그 외                → 기존 GP/KCos 규칙
+그 외 → 기존 KCos 규칙
 ```
 
 `status=all` 은 필터 값이 아니라 모드 지시자이므로 `c.status = 'all'` 조건이 생기지 않는다.
@@ -104,23 +89,23 @@ Core 는 이 분기를 알지 못하고 `resolveKpaListVisibility` 훅에만 존
 
 ### 4-4. audit hook
 
-optional `AuditHook` 으로 주입한다. GP/KCos 는 미주입 → 호출 0(기존과 동일).
+optional `AuditHook` 으로 주입한다. KCos 는 미주입 → 호출 0(기존과 동일).
 KPA config 는 `writeAuditLog` 를 주입하도록 준비했고, 감사 meta 도 원본과 동일하게 맞췄다
 (`RESOURCE_STATUS_CHANGED` → `{ title, from, to }`).
 
 ## 5. Core 로 옮긴 handler / 서비스 고유로 남긴 handler
 
-| 그룹 | GP | KCos | KPA |
+| 그룹 | KCos | KPA |
 |---|:--:|:--:|:--:|
 | G1 list | **Core** | **Core** | config 준비(미배선) |
 | G2 detail | **Core** | **Core** | **서비스 유지** — 아래 §5-1 |
-| G3 create | Core factory(GP/KCos 전용) | 동일 | 서비스 유지 (DATA_MODEL_DIFFERENT) |
-| G4 update | Core factory(GP/KCos 전용) | 동일 | 서비스 유지 (DATA_MODEL_DIFFERENT) |
+| G3 create | Core factory(KCos 전용) | 동일 | 서비스 유지 (DATA_MODEL_DIFFERENT) |
+| G4 update | Core factory(KCos 전용) | 동일 | 서비스 유지 (DATA_MODEL_DIFFERENT) |
 | G5 delete | **Core** | **Core** | config 준비(미배선) |
 | G6 view | **Core** | **Core** | config 준비(미배선) |
 | G7~G10 추천·AI | 없음 | 없음 | 서비스 유지 (UNIQUE) |
 | G11 operator list | **Core** | **Core** | config 준비(미배선) |
-| G12 operator create | Core factory(GP/KCos 전용) | 동일 | 없음 — KPA 로 확산시키지 않음 |
+| G12 operator create | Core factory(KCos 전용) | 동일 | 없음 — KPA 로 확산시키지 않음 |
 | G13 operator status | **Core** | **Core** | config 준비(미배선) |
 | G14 operator delete | **Core** | **Core** | config 준비(미배선) |
 
@@ -129,7 +114,7 @@ KPA config 는 `writeAuditLog` 를 주입하도록 준비했고, 감사 meta 도
 감사에서 G2 를 `IDENTICAL` 로 판정했으나, KPA 구현을 라인 단위로 보니 다르다.
 (감사 §11 에 "KPA 는 라인 단위 diff 를 하지 않았다"고 적어 둔 불확실성이 실제로 드러난 것이다.)
 
-KPA `GET /contents/:id` 는 GP/KCos 의 단순 `SELECT *` 와 달리 다음을 갖는다.
+KPA `GET /contents:id` 는 KCos 의 단순 `SELECT *` 와 달리 다음을 갖는다.
 
 - 접근 정책: 비로그인 `published` 만 / 로그인 `published`·`ready`·본인 / 운영자 전체
   (`WO-O4O-KPA-CONTENT-ACCESS-AND-COPY-POLICY-FINAL-ALIGNMENT-V1`)
@@ -152,7 +137,6 @@ fake DataSource 로 Core 가 만든 **실제 SQL 문자열**을 가로채 접근
 
 | 검증 | 결과 |
 |---|:--:|
-| GP config → `glycopharm_contents` 만 (7 handler 전부) | PASS |
 | KCos config → `cosmetics_contents` 만 | PASS |
 | KPA config → `kpa_contents` 만 | PASS |
 | 타 서비스 테이블 fallback 0 | PASS |
@@ -199,7 +183,7 @@ WO §17 의 명시된 중지 조건에 해당하지는 않는다 — 기술적 �
 
 | 파일 | 전 | 후 | 증감 |
 |---|---:|---:|---:|
-| GP `resources.controller.ts` | 557 | **101** | −456 |
+ `resources.controller.ts` | 557 | **101** | −456 |
 | KCos `resources.controller.ts` | 557 | **101** | −456 |
 | KPA 인라인 | 약 700 | 약 700 | 0 (미착수) |
 | 공통 Core (신규) | — | 706 | +706 |
@@ -207,8 +191,8 @@ WO §17 의 명시된 중지 조건에 해당하지는 않는다 — 기술적 �
 | 안전 테스트 (신규) | — | 264 | +264 |
 
 ```text
-GP/KCos 중복 본체   1,114 → 202      (−912, −81.9%)
-구현체 수(GP/KCos)  2벌   → 1벌
+KCos 중복 본체 1,114 → 202 (−912, −81.9%)
+구현체 수(KCos) 1벌 → 1벌
 실제 회수(순 코드)  1,114 → 908 (Core 706 + wrapper 202)  = −206
 KPA 포함 시 예상    미착수 — 감사 추정 1,100~1,250 중 약 900 미회수
 ```
@@ -235,7 +219,7 @@ KPA 포함 시 예상    미착수 — 감사 추정 1,100~1,250 중 약 900 미
 | 변경/신규 파일 typecheck (`tsc` 파일 한정) | **오류 0** |
 | api-server 전체 `tsc --noEmit` | **미실측** |
 | api-server 전체 jest | **미실측** |
-| GP/KCos/KPA frontend typecheck | **미실측** |
+| KCos/KPA frontend typecheck | **미실측** |
 | 런타임/DB 실측 | **미실측** |
 
 ### 10-1. 미실측 사유
@@ -252,7 +236,7 @@ KPA 포함 시 예상    미착수 — 감사 추정 1,100~1,250 중 약 900 미
    Core 로 옮기면 **draft/private 콘텐츠가 ID 만 알면 조회되는 회귀**가 발생한다. 절대 옮기지 말 것.
 3. **Core 의 config 표면이 넓다** — `listColumns` 를 문자열로 받으므로 오타가 런타임 SQL 오류가 된다.
    현재는 3서비스 config 가 테스트로 고정돼 있어 방어되지만, 새 서비스 추가 시 주의.
-4. **GP/KCos 런타임 미검증** — 정적 검증만 했다. 배포 전 목록/상세/작성/수정/삭제/운영자 목록의
+4. **KCos 런타임 미검증** — 정적 검증만 했다. 배포 전 목록/상세/작성/수정/삭제/운영자 목록의
    실제 응답 비교가 필요하다.
-5. **`operatorListFilters` 신설** — GP/KCos 운영자 목록은 기존과 동일하게 `source_type`·`usage_type`
+5. **`operatorListFilters` 신설** — KCos 운영자 목록은 기존과 동일하게 `source_type`·`usage_type`
    만 읽도록 맞췄으나, 원본과 1:1 대조는 코드 리뷰 수준이며 런타임 실측은 하지 않았다.

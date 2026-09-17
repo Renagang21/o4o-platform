@@ -4,7 +4,7 @@
  * WO-KCOS-KPA-HOME-PORT-V1: KPA CommunityHomePage 4블록 구조 이식
  * WO-O4O-KCOS-HOME-DESIGN-APPLY-V1: 브랜드/감성 테마 적용
  * WO-O4O-STANDARD-HOME-TEMPLATE-V1: StandardHomeTemplate 적용
- * WO-O4O-GLYCOPHARM-KCOS-HOME-LATEST-UI-ALIGNMENT-V1: 최신 활동 섹션 추가
+ * 최신 활동 섹션 추가
  *
  * 섹션 구조 (KPA canonical):
  * ├─ HeroBannerSection        — 동적 광고 캐러셀 / 브랜드 Hero (기본)
@@ -47,7 +47,7 @@ const TrendIcon = () => (
   </svg>
 );
 
-// ─── 최신 활동 섹션 (WO-O4O-GLYCOPHARM-KCOS-HOME-LATEST-UI-ALIGNMENT-V1) ──
+// ─── 최신 활동 섹션 ──
 // WO-O4O-COMMUNITY-HOME-LATEST-ACTIVITY-SECTION-COMMONIZATION-V1:
 //   3서비스 인라인 복제를 공통 View(@o4o/shared-space-ui `LatestActivitySection`) 로 이관.
 //   K-Cosmetics 정책(콘텐츠/사이니지 공간 경로 · pink accent)만 여기에 남는다.
@@ -66,7 +66,6 @@ export function HomePage() {
   const { openLoginModal } = useLoginModal();
   const [data, setData] = useState<HomePageData | null>(null);
   const [loading, setLoading] = useState(true);
-  // WO-O4O-GLYCOPHARM-KCOS-HOME-LATEST-UI-ALIGNMENT-V1
   const [latestItems, setLatestItems] = useState<LatestItem[]>([]);
   const [latestTab, setLatestTab] = useState('all');
   const [latestLoading, setLatestLoading] = useState(true);
@@ -82,7 +81,6 @@ export function HomePage() {
       .finally(() => setLoading(false));
   }, []);
 
-  // WO-O4O-GLYCOPHARM-KCOS-HOME-LATEST-UI-ALIGNMENT-V1
   useEffect(() => {
     setLatestLoading(true);
     setLatestError(false);

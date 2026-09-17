@@ -35,8 +35,6 @@ requireAuth
 createRequireStoreOwner(dataSource, serviceKey)
 ```
 
-즉 KPA/GlycoPharm/KCosmetics 각각 service-aware store_owner guard를 주입해서 사용할 수 있다.
-
 ---
 
 ## 3. 제공 endpoint 설계
@@ -176,7 +174,6 @@ connection.ts가 과대해진 상태에서 신규 entity registration을 위해 
 import { createMultilingualProductContentController } from '../o4o-store/controllers/multilingual-product-content.controller.js';
 
 router.use('/', createMultilingualProductContentController(dataSource, coreRequireAuth as any, 'kpa'));
-router.use('/', createMultilingualProductContentController(dataSource, coreRequireAuth as any, 'glycopharm'));
 router.use('/', createMultilingualProductContentController(dataSource, coreRequireAuth as any, 'cosmetics'));
 ```
 
@@ -184,7 +181,6 @@ router.use('/', createMultilingualProductContentController(dataSource, coreRequi
 
 ```text
 apps/api-server/src/routes/kpa/kpa.routes.ts
-apps/api-server/src/routes/glycopharm/glycopharm.routes.ts
 apps/api-server/src/routes/cosmetics/cosmetics.routes.ts
 ```
 

@@ -58,7 +58,6 @@
 - **브라우저/DB sanity 미수행** — `shared_product_descriptions` migration 은 배포 시 CI/CD 자동. 배포 후 권장(§9 흐름):
   1. 상품 행 "설명 정비" → 모달 → "후보 가져오기"(seed) → supplier/ai/drug_extension 후보 표시
   2. 후보 "대표로 지정" → 확인 → canonical 반영, 기존 canonical 자동 강등
-  3. GP 상품 상세 description = 새 canonical(태그 제거) 반환(output-link WO)
   4. 매장 경영자 권한 → API 403
   ```sql
   SELECT master_id, COUNT(*) FROM shared_product_descriptions

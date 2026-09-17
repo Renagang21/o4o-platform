@@ -38,14 +38,13 @@ platform_store_slugs(service_key='kpa', is_active=true) 행: 9
 | # | org_id | 이름 | type | slug | members | kpa:store_owner | 기존 enrollment |
 |---|---|---|---|---|---:|---:|---|
 | 1 | `9c87f46b…ce96` | 테스트 약국 | pharmacy | 네뚜레-약국 | 2 | 2 | (없음) |
-| 2 | `c92b857f…55fd` | 테스트 약국 | pharmacy | 테스트-약국 | 0 | 0 | `glycopharm:active` |
+| 2 | `c92b857f…55fd` | 테스트 약국 | pharmacy | 테스트-약국 | 0 | 0 | — |
 | 3 | `c5982508…9711` | 피앤디 약국 | pharmacy | 피앤디-약국 | 1 | 1 | (없음) |
 | 4 | `8712bff0…f0c4` | 중앙약국 | pharmacy | 중앙약국 | 1 | 1 | (없음) |
 | 5 | `ec596c46…e099` | 테스트 약국 (E2E) | **association** | e2e | 0 | 0 | (없음) |
 | 6 | `aed9eda9…5ec` | Renagang 약국 | pharmacy | renagang-약국 | 0 | 0 | (없음) |
 | 7 | `c9beb4a2…c048` | Sohae 약국 | pharmacy | sohae-약국 | 1 | 1 | (없음) |
 
-- #2 는 `glycopharm` enrollment 를 이미 보유 — `kpa-society` 추가는 **다른 service_code 이므로 additive**, 기존 행 무수정.
 - #5 는 `type='association'` (다른 6건은 `pharmacy`). KPA slug 를 가진 E2E 조직이며 선행 CHECK 의 7 집합과 동일하다.
   운영자 콘솔 노출에는 영향이 있다(§6).
 
@@ -95,7 +94,6 @@ COMMIT
 | service_code | BEFORE | AFTER |
 |---|---:|---:|
 | cosmetics | 1 | 1 |
-| glycopharm | 2 | 2 |
 | k-cosmetics | 2 | 2 |
 | neture | 3 | 3 |
 | pharmacy-hub | 5 | 5 |
@@ -119,7 +117,7 @@ service_key drift: 0   ('kpa' / 'kpa-society' 혼재 신규 발생 없음)
 
 **근거 — enrollment 삽입은 auto-listing 을 트리거하지 않는다.**
 `autoExpandPublicProduct` / `autoExpandServiceProduct` 는 **offer 승인 시점**(`offer-service-approval.service.ts`)에,
-`autoListPublicProductsForOrg` / `autoListServiceProductsForOrg` 는 **org 생성 시점**(glycopharm 전용)에만 호출된다.
+`autoListPublicProductsForOrg` / `autoListServiceProductsForOrg` 는 **org 생성 시점**에만 호출된다.
 
 **미래 확산 규모 (실측)**
 
@@ -150,8 +148,6 @@ ambiguous:                 0
 공급자/타 서비스 조직 누출: 0
 ```
 
-- `renagang21` 은 organization 4개(약국·뷰티샵·공급자·GP검증약국) 소속이지만 **KPA 축 후보는 1개**로 확정된다.
-  과거 잘못된 조직으로 새던 계정이 canonical KPA 조직으로 유지됨을 확인했다.
 - **신규 ambiguous 0 근거**: enrollment 조직집합 ⊆ slug 조직집합 (대칭차 `enroll_only=0`, `slug_only=2`=orphan).
   즉 후보 집합이 backfill 전후 **동일**하다.
 - **접근 회귀 0 (실측)**: 검증 계정으로 backfill 후 KPA 내 매장 5화면 프로덕션 재smoke → **5/5 PASS**,
@@ -178,7 +174,6 @@ ambiguous:                 0
 | serviceKey | 매장 수 | BEFORE 대비 |
 |---|---:|---|
 | kpa-society | 6 | 0 → 6 (교정) |
-| glycopharm | 2 | 불변 |
 | k-cosmetics | 2 | 불변 |
 | pharmacy-hub | 5 | 불변 |
 | neture | 0 | 불변 |

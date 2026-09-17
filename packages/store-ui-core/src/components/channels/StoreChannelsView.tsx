@@ -3,7 +3,7 @@
  * WO-O4O-MY-STORE-REMAINING-VIEW-DUPLICATION-ZERO-CLEANUP-V1
  *
  * 원본 계약 유지:
- *   WO-O4O-GLYCOPHARM-STORE-HUB-ADOPTION-V1 / WO-O4O-COSMETICS-STORE-HUB-ADOPTION-V1
+ *   WO-O4O-COSMETICS-STORE-HUB-ADOPTION-V1
  *   WO-O4O-CHANNEL-UX-STEP1-GUIDE-V1 (채널 선택 가이드)
  *   WO-O4O-CHANNEL-UX-STEP2-STATE-DRIVEN-V1 (상태 기반 행동 유도)
  *
@@ -14,10 +14,10 @@
  *  [D] 채널 제품 목록 (B2C/KIOSK만) + 제품 추가 모달 + 순서 변경
  *  [E] 노출 자산 리스트
  *
- * K-Cosmetics / GlycoPharm 사본의 실제 차이(diff 실측 67줄):
+ * K-Cosmetics 사본의 실제 차이(diff 실측 67줄):
  *   1) accent — pink-* vs blue-* Tailwind 클래스   → theme(완성된 class 문자열) 주입
  *   2) 대시보드 route/라벨 — `/store` "대시보드로 이동" vs `/store/hub` "매장 HUB으로 이동"
- *   3) GP 전용 SIGNAGE Quick Action(디지털사이니지 운영) → renderExtraQuickActions slot
+ *   3) 서비스 전용 SIGNAGE Quick Action(디지털사이니지 운영) → renderExtraQuickActions slot
  *   4) 명사 2곳 (매장/약국 코드, 콘텐츠 empty 힌트) → labels
  *   5) guide serviceKey / GuideBlock / GuideEditableSection 주입 경로
  * 업무 규칙·API 계약·route 의미는 바꾸지 않는다.
@@ -161,7 +161,7 @@ export interface StoreChannelsTheme {
 }
 
 export interface StoreChannelsRoutes {
-  /** 대시보드 back-link 목적지 — KCos '/store', GP '/store/hub' */
+  /** 대시보드 back-link 목적지 — KCos '/store' 등 */
   dashboard: string;
   /** HUB B2B 상품 목록 */
   hubB2b: string;
@@ -174,7 +174,7 @@ export interface StoreChannelsRoutes {
 }
 
 export interface StoreChannelsLabels {
-  /** 대시보드 Quick Action 라벨 — KCos '대시보드로 이동', GP '매장 HUB으로 이동' */
+  /** 대시보드 Quick Action 라벨 — KCos '대시보드로 이동' 등 */
   dashboardAction: string;
   /** 공개 주소 미설정 안내 — '매장 설정에서 {매장|약국} 코드를 등록하면 공개 URL이 생성됩니다.' */
   missingOrgCodeHint: string;
@@ -200,7 +200,7 @@ export interface StoreChannelsViewProps {
   }) => ReactNode;
   /** hero 설명 slot — GuideEditableSection(서비스 컴포넌트) 주입 */
   renderHeroDescription?: (ctx: { defaultContent: string }) => ReactNode;
-  /** 서비스 전용 Quick Action slot (GP: SIGNAGE 탭 '디지털사이니지 운영') */
+  /** 서비스 전용 Quick Action slot (예: SIGNAGE 탭 '디지털사이니지 운영') */
   renderExtraQuickActions?: (ctx: { activeTab: StoreChannelType }) => ReactNode;
 }
 

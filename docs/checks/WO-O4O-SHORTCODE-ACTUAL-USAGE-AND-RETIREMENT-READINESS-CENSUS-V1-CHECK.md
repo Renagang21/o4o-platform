@@ -66,7 +66,7 @@ hit 가 0이므로 §5 분류(REAL / LEGACY / DEMO / SEED / FIXTURE / TEST / SAM
 | `store_multilingual_product_content_pages` | 12 |
 | `store_tablet_corner_contents` | 10 |
 | `forum_post` | 8 |
-| `glycopharm_contents` / `cosmetics_contents` / `store_blog_posts` | 4 / 2 / 3 |
+| `cosmetics_contents` / `store_blog_posts` | 4 / 2 / 3 |
 | `pages` · `content_templates` · `branch_posts` · `yaksa_posts` | 0 |
 | `custom_posts` · `cms_pages` · `templates` · `template_parts` · `block_patterns` · `reusable_blocks` · `post_revisions` | **테이블 자체가 production 에 없음** |
 
@@ -88,12 +88,11 @@ runtime 등록 5종 외 실사용 shortcode도 **0**, `seller_*` 6종도 **0**, 
 | 서비스 | Stored usage | Editor | Renderer | 최근 사용 | 판정 |
 |---|--:|---|---|---|---|
 | KPA (`kpa-society` 53 · `kpa` 1) | **0** | 공통 admin editor 노출 | 소비처 0 | 없음 | `AVAILABLE_BUT_UNUSED` |
-| GlycoPharm (66) | **0** | 동일 | 소비처 0 | 없음 | `AVAILABLE_BUT_UNUSED` |
 | PharmacyHub (3) | **0** | 동일 | 소비처 0 | 없음 | `AVAILABLE_BUT_UNUSED` |
 | K-Cosmetics | **0** | 동일 | 소비처 0 | 없음 | `AVAILABLE_BUT_UNUSED` |
 | Neture (6) | **0** | 동일 | 소비처 0 | 없음 | `AVAILABLE_BUT_UNUSED` |
 
-(`cms_contents` 최근 갱신: pharmacy-hub 2026-08-26 · glycopharm/neture 2026-07-30 — **콘텐츠 자체는 살아 있으나 shortcode 는 쓰지 않는다**.)
+(`cms_contents` 최근 갱신: pharmacy-hub 2026-08-26 · neture 2026-07-30 — **콘텐츠 자체는 살아 있으나 shortcode 는 쓰지 않는다**.)
 admin editor 는 서비스별 분기 없이 하나이며, **렌더 축은 서비스 전부 0** 이다.
 
 ## 7. Editor 노출 (§7)
@@ -114,7 +113,7 @@ admin editor 는 서비스별 분기 없이 하나이며, **렌더 축은 서비
 |---|---|
 | `CODE_REACHABLE` | YES — `packages/block-renderer/src/renderers/index.ts` 가 `core/shortcode`·`o4o/shortcode` → `ShortcodeBlock` 매핑 |
 | `PRODUCTION_ROUTE_REACHABLE` | **admin 미리보기 1곳뿐** — `apps/admin-dashboard/src/pages/preview/PostPreview.tsx` 가 `@o4o/block-renderer` 의 유일한 앱 소비처 |
-| 서비스 web 앱 | `services/web-{neture,glycopharm,k-cosmetics,kpa-society,kpa-branch,pharmacy-hub,account}` 의 `@o4o/block-renderer` import **0**. `shortcode` 문자열 hit 는 전부 QR 제휴 `shortCode`(무관) |
+| 서비스 web 앱 | `shortcode` 문자열 hit 는 전부 QR 제휴 `shortCode`(무관) |
 | `packages/content-editor` `ContentRenderer` | shortcode 처리 없음 (HTML 렌더) |
 | `packages/forum-core` `ForumBlockRenderer` | 자체 renderer 6종 + unknown fallback, shortcode 처리 없음 |
 | api-server SSR / render endpoint | `apps/api-server/src/routes` 내 shortcode 참조 **0** |

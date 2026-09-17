@@ -2,7 +2,7 @@
 
 **WO:** `WO-O4O-STORE-SALE-CHECKOUT-ROUTE-DEPRECATION-V1`
 **일자:** 2026-06-21
-**성격:** backend — KPA/GlycoPharm/K-Cosmetics 소비자 결제 `prepare`/`confirm` 신규 생성 차단(410). 데이터/조회/PaymentCore/Neture B2B/구독 축 무변경.
+데이터/조회/PaymentCore/Neture B2B/구독 축 무변경.
 **상위:** `IR-O4O-TOSS-PAYMENT-SCOPE-REVISION-STORE-SUBSCRIPTION-AND-B2B-V1` · `CHECK-O4O-STORE-SALE-PAYMENT-EXCLUSION-CLEANUP-AUDIT-V1` · `CHECK-O4O-STORE-SALE-CHECKOUT-UI-ENTRY-REMOVAL-V1`(선행 frontend)
 **검증:** api-server `tsc --noEmit` — 본 변경 신규 에러 0 (전체 1건은 무관 pre-existing marketTrial)
 
@@ -18,7 +18,6 @@
 | 파일 | 변경 |
 |---|---|
 | `routes/kpa/controllers/kpa-payment.controller.ts` | `POST /prepare` + `POST /confirm` 진입부에 **410 조기 return** 삽입 |
-| `routes/glycopharm/controllers/glycopharm-payment.controller.ts` | 동일 |
 | `routes/cosmetics/controllers/cosmetics-payment.controller.ts` | 동일 |
 
 - 삽입 위치: `async (req,res) => {` 직후, `try`/`handleValidationErrors`/`PaymentCoreService.prepare|confirm` **이전**. → PaymentCore/Toss/DB 도달 전 차단.
@@ -38,7 +37,6 @@ HTTP 410 Gone
 | 차단 endpoint | 서비스 |
 |---|---|
 | `POST /api/v1/kpa/payments/prepare` · `/confirm` | KPA |
-| `POST /api/v1/glycopharm/payments/prepare` · `/confirm` | GlycoPharm |
 | `POST /api/v1/cosmetics/payments/prepare` · `/confirm` | K-Cosmetics |
 
 ## 4. 보존 (미차단·미변경)
@@ -67,8 +65,6 @@ HTTP 410 Gone
 
 배포 후 read-only 확인 권장(실제 결제 생성 금지):
 ```text
-POST /api/v1/{kpa|glycopharm|cosmetics}/payments/prepare  → 410 STORE_SALE_PAYMENT_DEPRECATED
-POST /api/v1/{kpa|glycopharm|cosmetics}/payments/confirm  → 410 STORE_SALE_PAYMENT_DEPRECATED
 GET  /api/v1/{...}/payments/order/:orderId                → 보존(미차단)
 Neture B2B payment route                                  → 변경 없음
 ```
@@ -78,7 +74,6 @@ Neture B2B payment route                                  → 변경 없음
 
 | 기준 | 결과 |
 |---|---|
-| KPA/Glyco/KCos prepare·confirm 신규 생성 차단 | ✅ (410, 6 endpoint) |
 | 차단 응답 일관(410) | ✅ STORE_SALE_PAYMENT_DEPRECATED |
 | PaymentCore.prepare/confirm 미호출 | ✅ (410 이 앞단) |
 | 조회성 route·데이터 보존 | ✅ (GET /order 미차단, 테이블 무변경) |

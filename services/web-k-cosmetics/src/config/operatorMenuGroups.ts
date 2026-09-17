@@ -4,7 +4,7 @@
  * WO-O4O-OPERATOR-UI-STANDARDIZATION-V1
  * WO-O4O-AUTH-RBAC-CLEANUP-V1: UNIFIED_MENU + filterMenuByRole 도입
  * WO-O4O-KCOS-OPERATOR-MENU-ALIGN-WITH-KPA-V1:
- *   KPA-Society / GlycoPharm 와 동일한 도메인 IA (커뮤니티 운영 / 매장 HUB 운영 / 운영 공통)
+ *   KPA-Society 와 동일한 도메인 IA (커뮤니티 운영 / 매장 HUB 운영 / 운영 공통)
  *   로 UNIFIED_MENU 재배치 + Domain IA 메타데이터 추가 (그 IA 는 은퇴).
  *   - content 의 안내 문구 관리 → lms 그룹 (KPA 정합)
  *   - content 의 자료실 관리 → 신규 resources 그룹 (KPA 정합)
@@ -22,14 +22,14 @@ import type { OperatorGroupKey, UnifiedMenuItem } from '@o4o/ui';
 
 export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> = {
   dashboard: [{ label: '대시보드', path: '/operator', exact: true }],
-  // WO-O4O-K-COSMETICS-OPERATOR-ROUTE-CANONICALIZATION-V1: /operator/members (KPA/GlycoPharm canonical)
+  // WO-O4O-K-COSMETICS-OPERATOR-ROUTE-CANONICALIZATION-V1: /operator/members (KPA canonical)
   users: [{ label: '회원 관리', path: '/operator/members' }],
   // WO-O4O-SERVICE-OPERATOR-WORKSPACE-REALIGNMENT-V1: approvals 는 업무가 섞인 그룹이라 항목 단위로 나눈다.
   //   그룹 기본 = 사업 운영(상품 신청 · 이벤트 오퍼 · 판매자 모집 노출 승인). 매장 가입 신청 = 가맹점(회원) 관리 → 서비스 운영.
   approvals: [
     // WO-O4O-CROSSSERVICE-OPERATOR-APPROVAL-GROUP-LABEL-ALIGN-V1:
     //   '신청 관리' → '매장 가입 신청 관리' (ApplicationsPage = 매장 가입신청 관리 의미 명확화).
-    //   공통 항목(공급 상품 신청 승인 → 이벤트 오퍼 승인) 순서를 KPA/GP 와 정합.
+    //   공통 항목(공급 상품 신청 승인 → 이벤트 오퍼 승인) 순서를 KPA 와 정합.
     { label: '매장 가입 신청 관리', path: '/operator/applications', domain: 'service_operation' },
     // WO-O4O-PRODUCT-APPROVAL-OPERATOR-SURFACE-ENABLE-GP-KCOS-V1
     { label: '공급 상품 신청 승인', path: '/operator/product-applications' },
@@ -57,7 +57,7 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
   // WO-O4O-KCOS-OPERATOR-MENU-ALIGN-WITH-KPA-V1:
   //   content 그룹에서 안내 문구 관리 → lms, 자료실 관리 → resources 로 분리.
   // WO-O4O-CROSSSERVICE-OPERATOR-CONTENT-MENU-PARITY-V1:
-  //   canonical Content 라벨 정합 — '공지/뉴스 관리' → '공지사항/뉴스' (KPA/GP 와 동일 라벨).
+  //   canonical Content 라벨 정합 — '공지/뉴스 관리' → '공지사항/뉴스' (KPA 와 동일 라벨).
   // WO-O4O-OPERATOR-CROSSSERVICE-CAPABILITY-ADOPTION-FINAL-AUDIT-AND-GAP-CLOSURE-V1:
   //   Home 편집(/operator/community) — 위 주석이 예고한 "후속 별도 WO" 를 본 WO 에서 종료.
   //   backend(`/cosmetics/community/manage/*`) · client(communityManageApi) 는 이미 존재했고
@@ -90,7 +90,7 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
   ],
   // WO-O4O-CROSSSERVICE-OPERATOR-SIGNAGE-MENU-PARITY-V1:
   //   Content 성격 메뉴('사이니지 콘텐츠' /signage/content)를 Signage 하위에서 제거 —
-  //   GlycoPharm 과 동일한 canonical 4-항목 구조 정합. route/page 는 보존(orphan 허용,
+  //   canonical 4-항목 구조 정합. route/page 는 보존(orphan 허용,
   //   StoreCockpitPage 내부 링크로 도달 가능). Signage 는 디지털 사이니지 운영 메뉴.
   signage: [
     { label: 'HQ 미디어', path: '/operator/signage/hq-media' },
@@ -111,7 +111,7 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
     { label: '포럼 분석', path: '/operator/forum-analytics' },
   ],
   // WO-O4O-OPERATOR-CROSSSERVICE-CAPABILITY-ADOPTION-FINAL-AUDIT-AND-GAP-CLOSURE-V1:
-  //   운영 분석 — KPA/GP/Neture/PharmacyHub 4 서비스가 이미 소비 중인 공통 콘솔.
+  //   운영 분석 — KPA/Neture/PharmacyHub 3 서비스가 이미 소비 중인 공통 콘솔.
   //   K-Cosmetics 만 route·page·menu 가 모두 없었다(REQUIRED_BUT_MISSING).
   analytics: [
     { label: 'AI 리포트', path: '/operator/ai-report' },

@@ -166,7 +166,7 @@
 
 **영향 범위**:
 - KPA `HubContentLibraryPage` (`/store-hub/content`) — renderItems override 제공 시 default 미사용 (확인 필요)
-- 다른 서비스 (GlycoPharm / K-Cosmetics) 가 override 제공 안 하면 raw `<table>` 노출
+- 다른 서비스 (K-Cosmetics) 가 override 제공 안 하면 raw `<table>` 노출
 
 **drift 분류**: LEGACY-CUSTOM (default 렌더러), HYBRID (override pattern 자체는 정상).
 
@@ -314,7 +314,7 @@
 | # | 항목 | 비고 |
 |---|---|---|
 | 1 | **페이지 IR 의 "WRAPPER" 분류가 hidden drift 를 가린다** | 페이지 layer 만 보면 "low drift" 처럼 보이는데 실제는 wrapper 내부 raw HTML — IR 작성 표준에 wrapper 내부 mini-audit 포함 권장 |
-| 2 | **`StoreAssetsPanel` raw `<table>` 영향 범위 확인** | KPA 외 GlycoPharm / K-Cosmetics 도 사용 여부 확인 — cleanup 시 multi-service 영향 |
+| 2 | **`StoreAssetsPanel` raw `<table>` 영향 범위 확인** | KPA 외 K-Cosmetics 도 사용 여부 확인 — cleanup 시 multi-service 영향 |
 | 3 | **`SignageManagerTemplate` 사용처 정확 식별 필요** | store-owner vs operator manager 어느 컨텍스트에서 사용되는지 — wrapper 재설계 결정 prerequisite |
 | 4 | **`ContentHubTemplate` 의 KPA override 검증 미수행** | KPA `HubContentLibraryPage` 가 `renderItems` 제공하는지 확인 필요 (제공 시 raw `<table>` 미노출) |
 | 5 | **`SignageHubTemplate` 직접 검증 미수행** | 본 IR 에서 ContentHub 유사 패턴으로 추정만 — 별도 mini-audit 권장 |
@@ -327,7 +327,7 @@
 - `ContentHubTemplate` 의 KPA override 검증 (`HubContentLibraryPage` 의 renderItems 제공 여부)
 - `SignageHubTemplate` 내부 직접 검증
 - `SignageManagerTemplate` 의 실제 사용처 정확 식별 (operator vs store)
-- GlycoPharm / K-Cosmetics 의 wrapper 사용 패턴 (multi-service 영향 확인)
+- K-Cosmetics 의 wrapper 사용 패턴 (multi-service 영향 확인)
 - 후속 WO 작성:
   - `WO-O4O-STORE-ASSETS-PANEL-BASETABLE-MIGRATION-V1`
   - `WO-O4O-SIGNAGE-MANAGER-TEMPLATE-REFACTOR-V1`

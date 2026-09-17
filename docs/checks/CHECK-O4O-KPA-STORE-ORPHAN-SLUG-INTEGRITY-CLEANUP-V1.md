@@ -23,7 +23,7 @@
 | slug | store_id(8) | is_active | org 존재 | org 이름 | org type | org isActive | enrollment | member | 생성일 |
 |---|---|:--:|:--:|---|---|:--:|---|:--:|---|
 | 네뚜레-약국 | `9c87f46b` | t | ✅ | 테스트 약국 | pharmacy | true | kpa-society:active | 2 | 2026-05-19 |
-| 테스트-약국 | `c92b857f` | t | ✅ | 테스트 약국 | pharmacy | true | kpa-society:active, glycopharm:active | 0 | 2026-05-19 |
+| 테스트-약국 | `c92b857f` | t | ✅ | 테스트 약국 | pharmacy | true | kpa-society:active:active | 0 | 2026-05-19 |
 | 피앤디-약국 | `c5982508` | t | ✅ | 피앤디 약국 | pharmacy | true | kpa-society:active | 1 | 2026-07-09 |
 | 중앙약국 | `8712bff0` | t | ✅ | 중앙약국 | pharmacy | true | kpa-society:active | 1 | 2026-05-21 |
 | e2e | `ec596c46` | t | ✅ | 테스트 약국(E2E) | association | true | kpa-society:active | 0 | 2026-05-15 |
@@ -54,8 +54,6 @@ INACTIVE/LEGACY: 0           (is_active=false 인 KPA slug 없음)
 | service_key | slug | store_id(8) | 생성일 |
 |---|---|---|---|
 | cosmetics | k-1 | `9434f2f1` | 2026-04-29 |
-| glycopharm | e2e-test-pharmacy-20260414 | `c7c0af9e` | 2026-04-14 |
-| glycopharm | glycopharm-test-pharmacy | `d43804b0` | 2026-03-07 |
 
 ---
 
@@ -67,7 +65,6 @@ INACTIVE/LEGACY: 0           (is_active=false 인 KPA slug 없음)
 ### 3-1. `organizations` → slug (표시용)
 
 `StoreConsoleController`(운영자 매장 콘솔), pharmacy-hub `store-organization.resolver`,
-glycopharm `cockpit.controller`, `pharmacy-info.controller`, `store-hub.controller`,
 `store-qr.service`, `PharmacyHubStoreProvisioningService` 등.
 
 이미 존재하는 organization 에서 출발해 slug 를 붙이는 형태(`SELECT slug ... WHERE store_id = $1`)라
@@ -76,7 +73,7 @@ orphan slug 는 결과에 **등장하지 않는다.** → **무영향**
 ### 3-2. slug → `organizations` (공개·소유자 경로)
 
 `resolvePublicStore`(unified store public: 홈·상품·콘텐츠·태블릿 전체), blog / pop / qr / video /
-layout / template / store-settings controller, glycopharm store controller·repository.
+layout / template / store-settings controller store controller·repository.
 
 모두 `findBySlug` 직후 **organization 실재(+`isActive`)를 다시 조회**하고 없으면 404 로 끝난다.
 → **404** (잘못된 store 노출·잘못된 organization 후보 생성 없음)
@@ -111,9 +108,6 @@ organization 이 없으면 후보 자체가 만들어지지 않는다. → **무
 | `routes/kpa/services/kpa-store-organization.provisioning.ts:126` | org 저장 → member → role → enrollment → **slug(비차단)** | 없음 |
 | `routes/kpa/controllers/organization.controller.ts:180` | `orgRepo.save()` 커밋 후 slug | 없음 |
 | `routes/cosmetics/services/cosmetics-store.service.ts:250` | org 생성 후 | 없음 |
-| `routes/glycopharm/services/glycopharm.service.ts:149` | org 생성 후 | 없음 |
-| `routes/glycopharm/controllers/admin.controller.ts:347` | org 생성 후 | 없음 |
-| `routes/glycopharm/controllers/store-applications.controller.ts:651` | org 생성 후 | 없음 |
 | `services/pharmacy-hub/PharmacyHubStoreProvisioningService.ts:398` | org 생성 후(멱등) | 없음 |
 
 모두 **organization 을 먼저 커밋한 뒤** slug 를 예약한다. slug 실패는 비차단이므로
@@ -150,7 +144,7 @@ organization 을 hard delete 하는 코드는 3가지뿐이다.
 |---|---|:--:|
 | `packages/organization-core/src/services/OrganizationService.ts:deleteOrganization()` | **api-server 어디에도 mount 되지 않음** (`OrganizationController` 미등록) | ❌ 없었음 |
 | `packages/organization-core/src/lifecycle/uninstall.ts` | 패키지 uninstall 전용 (`DELETE FROM organizations` 전량) | 범위 외 |
-| 일부 one-off migration | 2026-04-16 **이후** organizations 를 지우는 migration 은 `RepairForumGlycopharmOrganization`(FORUM_GLYCOPHARM 한정) 뿐 | 해당 없음 |
+| 일부 one-off migration | — | 해당 없음 |
 
 즉 두 organization 은 **런타임 코드가 아닌 경로**(수동 SQL / 콘솔 테스트 데이터 정리)로 삭제됐고,
 FK 부재 때문에 slug 만 남았다. `phase0-테스트약국`(`8596a54f`) 이 삭제된 E2E 테스트 조직이라는 사실은
@@ -280,7 +274,7 @@ KPA 는 **organization 7 ↔ enrollment 7 ↔ slug 7 완전 1:1** 이 됐다.
 | `GET /api/v1/stores/sohae-약국` | 200 |
 | `GET /api/v1/stores/neture-3lifezone` | 404 `STORE_NOT_FOUND` (정리 전과 동일) |
 
-403 / 409 / white screen 회귀 **0**. 타 서비스(glycopharm·cosmetics·pharmacy-hub) slug 는 미변경.
+403 / 409 / white screen 회귀 **0**. 타 서비스(cosmetics·pharmacy-hub) slug 는 미변경.
 
 ---
 
@@ -296,7 +290,7 @@ WO §8 에 따라 실행하지 않고 **별도 WO 로 제안**한다.
 
 ### 8-2. 타 서비스 orphan slug 3건
 
-`cosmetics/k-1`, `glycopharm/e2e-test-pharmacy-20260414`, `glycopharm/glycopharm-test-pharmacy`.
+`cosmetics/k-1`, `e2e-test-pharmacy-20260414`.
 본 WO §8 이 타 서비스 cleanup 을 금지하므로 **보고만** 한다. 동일 절차로 별도 WO 처리 권장.
 
 ### 8-3. `store-policy.routes.ts` 의 404/403 (§3-4)

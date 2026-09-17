@@ -48,8 +48,7 @@
 
 판정 근거:
 
-- KPA 전용 컴포넌트이며 GP/K-Cos 는 **각자 자체 동명 파일**을 사용한다
-  (`services/web-glycopharm/src/pages/store-management/StoreProductionMaterialsPage.tsx`,
+- KPA 전용 컴포넌트이며 K-Cos 는 **각자 자체 동명 파일**을 사용한다
    `services/web-k-cosmetics/src/pages/store/StoreProductionMaterialsPage.tsx`).
   → 타 서비스가 KPA 파일을 import 하지 않음(중지 조건 해당 없음).
 - 그러나 이 페이지는 `SelectContentsForProductionModal`(KPA 내 **유일 소비처**)를 사용한다.
@@ -94,8 +93,7 @@
 | 대상 | 변경 | 비고 |
 |---|:--:|---|
 | `packages/store-ui-core` (`storeMenuConfig.ts`, `ProductionMaterialEditorShell`, `StoreProductionMaterialsView`, `StoreAssetDerivationViewer`) | **0** | WO §6.7 · §12 준수. KPA 블록에 production-materials 메뉴가 이미 없음을 **확인만** 함 |
-| `ProductionMaterialEditorShell.savedPath` 기본값(`/store/library/production-materials`) | **0** | KPA 는 이 shell 을 쓰지 않고 자체 `ProductionMaterialEditorPage` 사용 → GP/KCos 영향 0 |
-| `services/web-glycopharm` | **0** | `App.tsx` L1066~1067 production-materials route 그대로. `git status` 무변경 |
+| `ProductionMaterialEditorShell.savedPath` 기본값(`/store/library/production-materials`) | **0** | KPA 는 이 shell 을 쓰지 않고 자체 `ProductionMaterialEditorPage` 사용 → KCos 영향 0 |
 | `services/web-k-cosmetics` | **0** | `App.tsx` L843~844 그대로. `git status` 무변경 |
 | `packages/shared-space-ui/src/guide/copy/kpa.ts` | **0** | 가이드 문구가 `/store/library/production-materials` 를 "내 자료함 열기" 로 안내하는 링크 4~5곳 보유. **공통 package 변경 금지(§7·§12)** 이므로 미수정 — replace redirect 로 1홉 흡수되어 데드링크 0. 문구 정합은 후속 WO 대상 |
 
@@ -135,13 +133,13 @@ services/web-kpa-society $ npx vite build     → PASS (✓ built in 20.44s)
 | 11.4 | 사이드바에 production-materials 메뉴 없음 | **PASS** — 약국 자료함 = 콘텐츠 / 자료 2개만 |
 
 - 저장(write) 검증은 운영 데이터 변경 우려로 **조회·진입·취소까지만** 수행 (WO §11.3 허용 범위).
-- GP/K-Cos 브라우저 회귀는 route/config 코드 무변경(§8, `git status` 기준)으로 대체 기록.
+- K-Cos 브라우저 회귀는 route/config 코드 무변경(§8, `git status` 기준)으로 대체 기록.
 
 ---
 
 ## 12. 금지 사항 준수
 
-`:id/edit` redirect·제거 0 / 저장 구조 변경 0 / execution asset 데이터 이동 0 / 자료함 contents 목록 구조 변경 0 / QR·블로그·POP 화면 변경 0 / production-materials 메뉴 복원 0 / `store-ui-core` 변경 0 / 공통 editor package 변경 0 / GP·KCos route 변경 0 / API 변경 0 / DB migration 0 / 운영 데이터 일괄 처리 0.
+`:id/edit` redirect·제거 0 / 저장 구조 변경 0 / execution asset 데이터 이동 0 / 자료함 contents 목록 구조 변경 0 / QR·블로그·POP 화면 변경 0 / production-materials 메뉴 복원 0 / `store-ui-core` 변경 0 / 공통 editor package 변경 0 / KCos route 변경 0 / API 변경 0 / DB migration 0 / 운영 데이터 일괄 처리 0.
 
 ---
 

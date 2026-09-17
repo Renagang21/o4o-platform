@@ -36,8 +36,6 @@
 
 위치: [register.dto.ts](apps/api-server/src/modules/auth/dto/register.dto.ts)
 
-**핵심 발견**: GlycoPharm 가입 흐름에는 사업자 정보(`businessName/businessNumber/representativeName/zipCode/address1/address2/businessCategory`) 가 이미 DTO에 정의·연결되어 있으나 **KPA 흐름의 `createKpaRecords` 는 이 필드들을 무시한다** ([auth-register.controller.ts:351-414](apps/api-server/src/modules/auth/controllers/auth-register.controller.ts#L351-L414)).
-
 부재 키: `activityType`, `pharmacyName`(KPA), `pharmacyAddress`, `businessRegistration`(파일/URL).
 
 ### 1.3 kpa_members 컬럼 (이미 존재)

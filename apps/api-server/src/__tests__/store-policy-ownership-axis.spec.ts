@@ -102,9 +102,6 @@ describe('store-policy ownership — canonical axis', () => {
     }
   });
 
-  // G. glycopharm legacy(조직 생성자) 허용 범위 — REMOVED
-  //    WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1: 해당 분기가 서비스와 함께 제거되었다.
-
   it('H. 매장 소유 축이 없는 서비스(neture)는 판정 대상이 아니다', async () => {
     const { dataSource, calls } = makeDataSource({ hasRole: true, candidateOrgIds: [ORG_ID] });
     await expect(isStoreOwner(dataSource, ORG_ID, 'neture', 'user-1')).resolves.toBe(false);

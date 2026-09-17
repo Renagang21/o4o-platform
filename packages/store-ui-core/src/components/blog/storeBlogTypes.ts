@@ -1,5 +1,5 @@
 /**
- * Store Blog 공통 타입·스타일 — 3서비스(KCos / GP / KPA) 공용
+ * Store Blog 공통 타입·스타일 — 2서비스(KCos / KPA) 공용
  * WO-O4O-MY-STORE-REMAINING-VIEW-DUPLICATION-ZERO-CLEANUP-V1
  *
  * 서비스 `api/blogStaff` 응답의 **구조적 부분집합**만 선언한다.
@@ -45,10 +45,10 @@ export interface StoreBlogSettingsInput {
 }
 
 /**
- * 상태 뱃지 — K-Cosmetics / GlycoPharm 원문.
+ * 상태 뱃지 — K-Cosmetics 원문.
  *
  * ⚠️ 라벨은 서비스마다 다르다. **공통 기본값으로 치환하지 않는다.**
- *   - KCos / GP : 임시저장 / 발행됨 / 보관 (아래 값)
+ *   - KCos : 임시저장 / 발행됨 / 보관 (아래 값)
  *   - KPA       : 초안 / 발행 / 보관 — WO-O4O-KPA-OPERATOR-STORE-CONTENT-MENU-TERMINOLOGY-ALIGNMENT-V1
  *     로 별도 통일된 용어이므로 KPA 는 자기 map 을 유지한다.
  * 색상(color/bg)만 3서비스가 동일하다.

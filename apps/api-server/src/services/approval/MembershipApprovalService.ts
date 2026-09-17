@@ -192,7 +192,7 @@ function resolveGrantedRole(serviceKey: string, role: string | null | undefined)
  * 접두어 없는 admin tier 역할 판정 (WO-O4O-CROSSSERVICE-LEGACY-BARE-ROLE-CENSUS-AND-CLEANUP-V1 §9)
  *
  * `service_memberships.role` 에는 legacy 표기로 prefix 없는 `admin` · `operator` · `super_admin`
- * 이 실재한다(2026-08-24 프로덕션 census: kpa-society/admin 1 · glycopharm/operator 1 ·
+ * 이 실재한다(2026-08-24 프로덕션 census: kpa-society/admin 1/operator 1 ·
  * platform/super_admin 2). 승인·재활성화 STEP3 은 이 값을 그대로 부여하므로 그대로 두면
  *
  *   ① 서비스 축이 없는 **전역** admin tier 역할이 새로 생기고
@@ -743,7 +743,7 @@ export class MembershipApprovalService {
       //   role_assignments 단독 row 이기 때문 (IR-O4O-KPA-STORE-PERMISSION-ADDRESS-DRIFT-AUDIT-V1 §3-2 F1).
       //
       // WO-O4O-CROSSSERVICE-MEMBERSHIP-SUSPENSION-ROLE-LIFECYCLE-CONTRACT-V1 §6·§9:
-      //   이 단계가 kpa-society 에만 걸려 있어 glycopharm / k-cosmetics / pharmacy-hub 는
+      //   이 단계가 kpa-society 에만 걸려 있어 k-cosmetics / pharmacy-hub 는
       //   정지해도 `{prefix}:store_owner` 가 활성으로 남았다 (5개 서비스 lifecycle INCONSISTENT).
       //   정지된 membership 의 서비스마다 대칭으로 회수한다. 정지한 서비스의 역할만 건드리며
       //   (cross-service fan-out 0), prefix 는 @o4o/security-core SSOT 에서 도출한다.

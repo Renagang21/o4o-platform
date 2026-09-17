@@ -16,7 +16,7 @@
 
 ## 4. 범위
 포함: 공개 query 재조사, first active tablet 기준 정합, supplier(4중 gate 유지 + display rows 필터), local(active/org gate 유지 + display rows 필터), 순서=display sort_order, selected content/다국어 정책 유지, fallback 유지, 편성 화면 안내, CHECK.
-제외: QR Core, 소비자 관리/로그인/CRM, 상담 복구, 주문/결제, 앱/글래스, device pairing/per-tablet URL, 사이니지 통합, 신규 마이그레이션, 상품/콘텐츠/번역 생성, GP/KCos 확장.
+제외: QR Core, 소비자 관리/로그인/CRM, 상담 복구, 주문/결제, 앱/글래스, device pairing/per-tablet URL, 사이니지 통합, 신규 마이그레이션, 상품/콘텐츠/번역 생성, KCos 확장.
 
 ## 5. 구현 요지
 - `resolveTabletDisplaySource(org)` → `{ tabletId, configured }` (first active tablet + visible row 존재).

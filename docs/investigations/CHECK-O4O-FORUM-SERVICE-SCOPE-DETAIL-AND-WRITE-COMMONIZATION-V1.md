@@ -18,7 +18,7 @@
   → applyContextFilter() / applyServiceScope()
 ```
 
-- `kpa → kpa-society`, `cosmetics → k-cosmetics`, `pharmacy-hub` · `neture` · `glycopharm` 은 self-map.
+- `kpa → kpa-society`, `cosmetics → k-cosmetics`, `pharmacy-hub` · `neture` 은 self-map.
 - **forum 전용 매핑 테이블을 신설하지 않았다.** 변환은 `resolveCanonicalServiceKey()` 단일 경로만 사용한다.
   (근거: RBAC prefix ↔ canonical key 축 변환은 플랫폼 전역 문제이며, 로컬 사본을 두면 두 축이 어긋날 때
   forum 만 조용히 다른 값을 쓰게 된다.)
@@ -62,7 +62,6 @@
 | 서비스 | 경로 | context | 조치 |
 |---|---|---|---|
 | KPA | `/api/v1/kpa/forum/*` | `serviceCode:'kpa', scope:'community'` | 기존 mount 유지 (무변경 · 회귀 확인만) |
-| GlycoPharm | `/api/v1/glycopharm/forum/*` | `serviceCode:'glycopharm', organizationId` | 기존 mount 유지 (무변경) |
 | PharmacyHub | `/api/v1/pharmacy-hub/forum/*` | `serviceCode:'pharmacy-hub', scope:'community'` | **신규** + active membership write gate |
 | Neture | `/api/v1/neture/forum/*` | `serviceCode:'neture', scope:'community'` | **신규** (write guard 없음 — 기존 쓰기 권한 불변) |
 | K-Cosmetics | `/api/v1/cosmetics/forum/*` | `serviceCode:'cosmetics', scope:'community'` | **신규** (write guard 없음 — 동일) |
@@ -183,7 +182,6 @@ base 상수 도입만으로 끝났다. WO 의 "분리 후 사유 기록" 조항�
 | `@o4o/web-kpa-society` build | **PASS** |
 | `@o4o/web-k-cosmetics` build | **PASS** |
 | `@o4o/web-neture` build | **PASS** |
-| `glycopharm-web` build | **PASS** |
 | jest `market-trial-neture-forum-sync.spec` + `admin-api-guard-inventory.spec` | **PASS** (14 tests) |
 
 ### 프로덕션 DB 실측 (read-only · SELECT 만)
@@ -196,9 +194,9 @@ forum_post              :  총 4건 — 전부 kpa-society 게시판 소속
 
 이 실측으로 확인된 사실:
 
-1. **GlycoPharm · K-Cosmetics · PharmacyHub 는 forum 원장 행이 0건**이다.
+1. K-Cosmetics · PharmacyHub 는 forum 원장 행이 0건이다.
    따라서 서비스 격리 도입으로 "기존에 보이던 글이 사라지는" 회귀는 **구조적으로 발생할 수 없다**
-   (애초에 표시할 글이 없다). GP 무회귀 요건은 이 근거로 충족된다.
+   (애초에 표시할 글이 없다).
 2. **`forum_id IS NULL` 게시글 0건** — 사전에 우려했던 "서비스 컨텍스트에서 영구히 보이지 않는 글"
    잠재 리스크는 현재 데이터에 존재하지 않는다.
 3. KPA 게시글 4건 모두 `organization_id IS NULL` → `scope:'community'` 조건과 정합하며,
@@ -214,7 +212,6 @@ forum_post              :  총 4건 — 전부 kpa-society 게시판 소속
 - PharmacyHub: list/detail/write 정상 · 타서비스 postId/slug/forumId 읽기 차단 ·
   타서비스 forumId/forumSlug write 차단 · 비회원/pending/rejected write 차단
 - K-Cosmetics · Neture: 기존 list/detail/write 정상 · cross-service 차단 · operator/admin forum 무회귀
-- GlycoPharm: 무회귀
 
 교차 서비스 차단 시나리오는 현재 프로덕션 데이터로는 재현 자체가 불가능하다
 (타서비스 게시글 0건). 배포 후 PharmacyHub 게시판 생성 → KPA postId 로 접근하는 순서로 확인한다.

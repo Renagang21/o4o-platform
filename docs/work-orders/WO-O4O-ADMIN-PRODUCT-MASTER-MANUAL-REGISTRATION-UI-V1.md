@@ -38,7 +38,7 @@
 
 [apps/api-server/src/bootstrap/register-routes.ts:495-545](../../apps/api-server/src/bootstrap/register-routes.ts#L495-L545): notes/audit-log/usage-links/qr-summary 컨트롤러가 모두 `/api/v1/admin/o4o-product-db/masters`에 마운트.
 
-[apps/api-server/src/modules/neture/controllers/product-master-note.controller.ts:22-46](../../apps/api-server/src/modules/neture/controllers/product-master-note.controller.ts#L22-L46): `createXController(dataSource): Router` + `authenticate` + `requireRole(ADMIN_ROLES)` 패턴. `ADMIN_ROLES` = platform/neture/glycopharm/cosmetics/kpa admin·operator 셋. → **동일 패턴으로 create 컨트롤러 추가.**
+[apps/api-server/src/modules/neture/controllers/product-master-note.controller.ts:22-46](../../apps/api-server/src/modules/neture/controllers/product-master-note.controller.ts#L22-L46): `createXController(dataSource): Router` + `authenticate` + `requireRole(ADMIN_ROLES)` 패턴. → **동일 패턴으로 create 컨트롤러 추가.**
 
 ### 1-D. 등록 서비스 (준비됨)
 

@@ -10,7 +10,6 @@
 ## 1. Summary
 
 ### 조사 범위
-- **Frontend 서비스 4종**: web-kpa-society / web-glycopharm / web-k-cosmetics / web-neture
 - **공통 UI 패키지**: packages/ui (BaseTable·DataTable·RowActionMenu·FilterBar·ActionBar·EmptyState·Pagination 계열) / operator-ux-core / operator-core-ui / store-ui-core / account-ui / shared-space-ui
 - **Backend**: apps/api-server 주요 리스트 조회 endpoint pagination contract
 
@@ -20,8 +19,8 @@
 3. **Backend pagination contract는 미표준화**. 동일 개념을 5가지 response shape(`pagination` / `meta` / top-level flat / `items` / `data+total`만)으로 반환하고, `totalPages` vs `pages` 등 필드명 불일치, max limit 검증 유무 혼재. Forum Posts는 중복 pagination 필드까지 존재.
 
 ### 가장 큰 리스크
-- **전체 로딩(client-side) 핵심 업무 화면** — Neture `AdminProductApprovalPage`/`BrandManagementPage`/`OperatorsPage`, KCos `ApplicationsPage`/`EventOfferApprovalsPage`, GP `PharmacyOrders`, KPA `StoreOrdersPage`. 데이터 증가 시 P0 성능 붕괴 + 모바일 사용 불가.
-- **Store(매장) 영역 비표준 + responsive 취약** — KCos `StoreOrdersPage`/`StoreLocalProductsPage`(CSSinJS), GP `CustomerRequestsPage`/`StoreLocalProductsPage`, Neture `StoreOrdersPage`(inline style). 매장 담당자 일일 화면인데 모바일 깨짐 위험.
+- **전체 로딩(client-side) 핵심 업무 화면** — Neture `AdminProductApprovalPage`/`BrandManagementPage`/`OperatorsPage`, KCos `ApplicationsPage`/`EventOfferApprovalsPage` `PharmacyOrders`, KPA `StoreOrdersPage`. 데이터 증가 시 P0 성능 붕괴 + 모바일 사용 불가.
+- **Store(매장) 영역 비표준 + responsive 취약** — KCos `StoreOrdersPage`/`StoreLocalProductsPage`(CSSinJS) `CustomerRequestsPage`/`StoreLocalProductsPage`, Neture `StoreOrdersPage`(inline style). 매장 담당자 일일 화면인데 모바일 깨짐 위험.
 - **공통 컴포넌트 레벨 구조적 미흡** — RowActionMenu 드롭다운이 `overflow-x-auto` 내부에 갇힘(Portal 미사용), SearchBar `max-w-md` 고정, Pagination 계열 모바일 stack 미지원.
 
 ### 후속 WO 필요 여부
@@ -130,26 +129,6 @@
 **Pagination 완전 누락**: 없음(전체 로드는 데이터 소량 화면 한정 — StoreOrders/CourseList).
 **Responsive 위험**: AuditLogPage, QualificationRequests Drawer, Operator(Blog/POP/QR) RowActionMenu, HqPlaylists/HqMedia, HubB2BCatalog.
 
-### 4.2 GlycoPharm (`services/web-glycopharm`)
-
-operator 영역은 DataTable 표준 양호. **store-management(매장) 영역의 커스텀 리스트가 리스크 집중**.
-
-| Area | Route/Page 파일 | Component | List Type | Pagination | Responsive Risk | 분류 | Priority | Notes |
-|---|---|---|---|---|---|---|---|---|
-| 운영자 주문/약국/상품/매장/회원/신청 | `pages/operator/*Page.tsx` | DataTable@ux-core / core-ui wrapper | 표준 | server/10~20 | 양호 | A | P1 | stats/필터/count 표준 |
-| 자격신청/LMS강의/블로그/설문/채널 | `pages/operator/*` | DataTable + RowActionMenu/bulk | 표준 | server/20 | 양호 | A/B | P2~P3 | |
-| Hub 라이브러리(B2B/Blog/Signage/POP/QR) | `pages/hub/Hub*Page.tsx` | DataTable | 표준 | offset/20 | 양호 | A/B | P2~P3 | offset 기반 |
-| 스토어 승인 | `pages/operator/StoreApprovalsPage.tsx` | DataTable | 표준 | server | 미확인 | B | P1 | 전체 코드 재검토 필요 |
-| **약국 주문 내역** | `pages/store-management/PharmacyOrders.tsx` | 커스텀 카드 | card/custom | **client (limit:100 전체)** | expandable, 모바일 중 | E | **P2→P0(증가시)** | 대량 약국 성능 위험 |
-| **고객 요청 처리** | `pages/store-management/CustomerRequestsPage.tsx` | 커스텀 카드 | card/custom | server(미확인) | ⚠️ tab wrap, card 모바일 | D | P2 | responsive 점검 필요 |
-| 매장 로컬상품 | `pages/store-management/StoreLocalProductsPage.tsx` | 커스텀 list+modal | 자체 | server/20 | ⚠️ modal 모바일 | D | P3 | |
-| B2B 상품(검증용) | `pages/store-management/PharmacyB2BProducts.tsx` | 구형 @o4o/ui DataTable | 자체 | client(검증) | 위험 | E | P3 | 신규 DataTable 마이그레이션 후보 |
-| 포럼 게시글 | `pages/forum/*` | HubPagination | 표준 | server/20 | 양호 | A | P2 | |
-
-**가장 큰 리스크 3**: ① PharmacyOrders 전체 로드(limit:100) ② CustomerRequestsPage responsive 미확인 ③ StoreLocalProducts modal 모바일.
-**Pagination 완전 누락**: PharmacyOrders(전체 로드), PharmacyB2BProducts(검증용).
-**Responsive 위험**: CustomerRequestsPage, PharmacyB2BProducts, PharmacyOrders(expandable), StoreLocalProductsPage(modal).
-
 ### 4.3 K-Cosmetics (`services/web-k-cosmetics`)
 
 operator/hub는 표준 양호. **Store 영역 CSSinJS + client-side 전체 로드 다수 → 리스크 가장 집중된 서비스 중 하나**.
@@ -205,8 +184,8 @@ admin/operator 화면이 가장 많음. **표준 DataTable과 자체 table/inlin
 | Service/Domain | Endpoint | Query Params | Server Pagination | Response Shape | Max Limit | 기본 limit | 파일 |
 |---|---|---|---|---|---|---|---|
 | KPA Checkout | `GET /checkout/orders`, `/checkout/store-orders` | page,limit,status | ✅ take/skip | `{data, pagination{page,limit,total,totalPages}}` | 100 | 20 | `routes/kpa/controllers/kpa-checkout.controller.ts` |
-| GP Checkout | `GET /checkout/orders` | page,limit | ✅ take/skip | `{data, pagination{...}}` | 100 | 20 | `routes/glycopharm/controllers/checkout.controller.ts` |
-| GP Operator | `GET /operator/orders`, `/operator/pharmacies` | page,limit,status,paymentStatus | ✅(orders 위임) / stub(pharmacies) | `{data, pagination{...}}` | varies | 20/10 | `routes/glycopharm/controllers/operator.controller.ts` |
+ Checkout | `GET /checkout/orders` | page,limit | ✅ take/skip | `{data, pagination{...}}` | 100 | 20 | — |
+ Operator | `GET /operator/orders`, `/operator/pharmacies` | page,limit,status,paymentStatus | ✅(orders 위임) / stub(pharmacies) | `{data, pagination{...}}` | varies | 20/10 | — |
 | Forum Posts | `GET /forum/posts` | page,limit,forumId,search,tag,status,sortBy | ✅ getManyAndCount | ⚠️ **중복**: `{data,total,page,limit,totalPages, pagination{...}, totalCount}` | 50 | 20 | `controllers/forum/ForumPostController.ts` |
 | Forum Comments | `GET /forum/posts/:id/comments` | page,limit | ✅ findAndCount | `{data, pagination{page,limit,totalPages}, totalCount}` | — | 20 | `controllers/forum/ForumCommentController.ts` |
 | LMS Courses | `GET /courses` | page,limit,filters | ✅ getManyAndCount | BaseController.okPaginated 위임 | filter dependent | 20 | `modules/lms/controllers/CourseController.ts` |
@@ -236,24 +215,22 @@ admin/operator 화면이 가장 많음. **표준 DataTable과 자체 table/inlin
 ### 6.1 Pagination Missing (전체 로드 / pagination 미구현)
 - **Neture**: AdminProductApprovalPage, BrandManagementPage, OperatorsPage, SupplierLibraryPage, SupplierProductsListPage **(P0 다수)**
 - **K-Cosmetics**: ApplicationsPage(limit:100), EventOfferApprovalsPage(limit:50), ForcedContentPage, SignagePlayerSelectPage
-- **GlycoPharm**: PharmacyOrders(limit:100), PharmacyB2BProducts(검증용)
 - **KPA**: 없음(전체 로드는 데이터 소량 화면 한정 — StoreOrders/CourseList)
 
 ### 6.2 Client-side Pagination Only (server 데이터인데 client slice/filter)
-- KCos StoreLocalProductsPage(search client debounce 재로드), KPA StoreOrdersPage·CourseListPage, GP PharmacyOrders, Neture 상품승인/브랜드/운영자.
+- KCos StoreLocalProductsPage(search client debounce 재로드), KPA StoreOrdersPage·CourseListPage PharmacyOrders, Neture 상품승인/브랜드/운영자.
 
 ### 6.3 Server-side Pagination Inconsistent (offset vs page, meta shape 차이)
-- offset 기반: KPA/GP/KCos Hub B2B·Library 계열. page 기반과 혼재.
+- offset 기반: KPA/KCos Hub B2B·Library 계열. page 기반과 혼재.
 - backend response shape 5종 혼재(§5).
 
 ### 6.4 Responsive Wrapper Missing (자체 table / inline / CSSinJS)
 - Neture AdminProductApproval(raw table·모바일 전무), Admin Settlements/Commissions·OrdersManagement·SupplierProductsList·StoreOrders(inline).
 - KCos StoreOrdersPage·StoreLocalProductsPage(CSSinJS).
-- GP store-management 커스텀 리스트.
 - 표준 BaseTable 경유 화면은 overflow-x-auto 내장으로 비교적 안전.
 
 ### 6.5 Mobile Filter/Search Risk
-- 공통 SearchBar `max-w-md` 고정. 매장 화면 상태탭 grid 미적용(KCos StoreOrders), 커스텀 tab wrap(GP CustomerRequests).
+- 공통 SearchBar `max-w-md` 고정.
 
 ### 6.6 Row Action Risk
 - **공통 구조 문제**: RowActionMenu 드롭다운이 `overflow-x-auto` 컨테이너 내부에 갇혀 우측 셀에서 잘림(Portal 미사용) — 전 서비스 공통.
@@ -273,7 +250,6 @@ admin/operator 화면이 가장 많음. **표준 DataTable과 자체 table/inlin
 - KPA: CourseListPage(강사 강의 ~10건), 데이터 소량 store/instructor 화면.
 - Neture: SupplierLibraryPage(자료 소량 시 G), dashboard summary card류.
 - 각 서비스 **설정/옵션성 local list**(상태 옵션, 카테고리 static 등).
-- **주의**: "현재 데이터가 적다"는 운영 성장에 따라 변할 수 있으므로, 예외 인정 화면도 **데이터 증가 모니터링 대상**으로 표시(특히 GP PharmacyOrders, KPA StoreOrders는 현재 소량이나 매장 주문이라 증가 가능 → 예외 아님, 개선 대상).
 
 ---
 
@@ -288,7 +264,7 @@ admin/operator 화면이 가장 많음. **표준 DataTable과 자체 table/inlin
    - 우선순위: **P0~P1**
 
 3. **WO-O4O-STORE-LIST-RESPONSIVE-PAGINATION-V1** — 매장/약국 경영자 리스트
-   - KCos **StoreOrdersPage(CSSinJS→Tailwind)** / StoreLocalProductsPage(modal 반응형), GP PharmacyOrders(server pagination)/CustomerRequests(responsive)/StoreLocalProducts, Neture StoreOrders(inline 정리).
+   - KCos **StoreOrdersPage(CSSinJS→Tailwind)** / StoreLocalProductsPage(modal 반응형) PharmacyOrders(server pagination)/CustomerRequests(responsive)/StoreLocalProducts, Neture StoreOrders(inline 정리).
    - 우선순위: **P1~P2**
 
 4. **WO-O4O-SUPPLIER-LIST-PAGINATION-V1** — 공급자 리스트
@@ -311,7 +287,7 @@ admin/operator 화면이 가장 많음. **표준 DataTable과 자체 table/inlin
 
 ### 후속 분리 대상 (P1~P2)
 - 공통 primitive 보강(RowActionMenu Portal·SearchBar·Pagination 모바일) — **모든 서비스 선행 수혜**.
-- 매장 영역 CSSinJS/inline → 표준 DataTable + Tailwind responsive(KCos·GP·Neture Store 화면).
+- 매장 영역 CSSinJS/inline → 표준 DataTable + Tailwind responsive(KCos·Neture Store 화면).
 - backend pagination contract 표준화(FE 작업 전제).
 
 ### 보류 가능 대상 (P3 / EX)

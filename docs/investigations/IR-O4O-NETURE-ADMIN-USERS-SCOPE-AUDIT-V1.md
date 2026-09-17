@@ -4,7 +4,7 @@
 >
 > 코드 수정 없음 / UI 수정 없음 / 데이터 수정 없음
 >
-> Neture 관리자 회원관리 화면(`/admin/users`)에 Neture 회원이 아닌 사용자(platform, KPA, GlycoPharm, K-Cosmetics)가 함께 표시되는 문제를 조사한 보고서이다. 본 IR 은 **현재 동작을 코드 경로로 확정**하고, 정식 조회 범위를 정의하기 위한 1차 분석 자료이다.
+> Neture 관리자 회원관리 화면(`/admin/users`)에 Neture 회원이 아닌 사용자(platform, KPA, K-Cosmetics)가 함께 표시되는 문제를 조사한 보고서이다. 본 IR 은 **현재 동작을 코드 경로로 확정**하고, 정식 조회 범위를 정의하기 위한 1차 분석 자료이다.
 
 - **작성일:** 2026-05-23
 - **분류:** Investigation Report (Read Only — 코드 미수정)
@@ -24,7 +24,7 @@
 
 ## 0. 조사 목적
 
-Neture 관리자 회원관리(`/admin/users`)에 다른 서비스(platform / KPA / GlycoPharm / K-Cosmetics) 사용자까지 함께 표시되는 현상의 **원인 경로를 코드 레벨로 확정**한다.
+Neture 관리자 회원관리(`/admin/users`)에 다른 서비스(platform / KPA / K-Cosmetics) 사용자까지 함께 표시되는 현상의 **원인 경로를 코드 레벨로 확정**한다.
 
 본 조사는:
 
@@ -156,7 +156,6 @@ export function extractServiceScope(userRoles: string[]): ServiceScope {
 router.use(requireRole([
   'platform:admin', 'platform:super_admin',
   'neture:admin', 'neture:operator',
-  'glycopharm:admin', 'glycopharm:operator',
   'cosmetics:admin', 'cosmetics:operator',
   'kpa-society:admin', 'kpa-society:operator',
 ]));
@@ -251,7 +250,7 @@ const total = rows.reduce((sum, r) => sum + (r.count || 0), 0);
 
 | 탭 | 소스 | Scope (platform admin 케이스) |
 |----|------|------------------------------|
-| **전체** | `/operator/members/stats` → `service_memberships` 전체 row 수 합산 | **전 서비스 멤버십 row 합산** (neture + kpa + glycopharm + cosmetics) |
+| **전체** | `/operator/members/stats` → `service_memberships` 전체 row 수 합산 | **전 서비스 멤버십 row 합산** (neture + kpa + cosmetics) |
 | **활성/대기/거부** | 동일 stats API | 동일 — **전 서비스** |
 | **공급자/파트너/셀러** | `/operator/members?limit=1000` 후 클라이언트 사이드에서 `getPrimaryRole(u)` 일치 필터 | 최대 1000명 cross-service 사용자 대상으로 primary role 매칭 |
 | **가입 신청** | `getCount('pending')` (stats API) | **전 서비스** pending 멤버십 row 수 |
@@ -268,7 +267,7 @@ function getPrimaryRole(u: UserData): string {
 ```
 
 - Neture 멤버십이 있으면 그 role 사용 → tab 매칭은 Neture 기준으로 동작
-- Neture 멤버십이 없으면 `u.roles[0]` 으로 fallback → KPA / GlycoPharm 등의 prefix role 이 들어올 수 있음 → **tab 카운트가 cross-service 사용자도 일부 포함**
+- Neture 멤버십이 없으면 `u.roles[0]` 으로 fallback → KPA 등의 prefix role 이 들어올 수 있음 → **tab 카운트가 cross-service 사용자도 일부 포함**
 
 **판정**
 
@@ -298,7 +297,7 @@ LIMIT 20 OFFSET 0
 
 **추정 결과**
 
-- platform 가입자, KPA-society 가입자, GlycoPharm 가입자, K-Cosmetics 가입자, Neture 가입자 — **모두 등장 가능**
+- platform 가입자, KPA-society 가입자 가입자, K-Cosmetics 가입자, Neture 가입자 — **모두 등장 가능**
 - 17명 = 현재 `users` 테이블 첫 페이지 20명 한도 내의 row (status 등 필터에 따라 그 이하).
 
 **검증 필요**
@@ -347,7 +346,7 @@ LIMIT 17;
 **Neture 관리자 회원관리(`/admin/users`)는 페이지 의도(Neture 회원 관리)와 실제 동작 사이에 불일치가 있다.**
 
 - 의도: Neture 서비스 회원 관리
-- 실제: 호출자가 `platform:super_admin` 일 때 **모든 서비스의 사용자**(neture + kpa + glycopharm + cosmetics + platform-only)를 cross-service 로 표시.
+- 실제: 호출자가 `platform:super_admin` 일 때 **모든 서비스의 사용자**(neture + kpa + cosmetics + platform-only)를 cross-service 로 표시.
 
 ### 3.2 직접 원인
 
@@ -360,7 +359,7 @@ LIMIT 17;
 ### 3.3 부수 문제
 
 - "전체" 카운트가 **사용자 수가 아니라 service_memberships row 수**다 (§2.6). neture-only 환경에서는 1:1 이지만, cross-service 케이스에서는 사용자 1명이 N 개 멤버십으로 가중 계산됨.
-- "공급자/파트너/셀러" 카운트는 클라이언트 사이드 1000건 fetch + primary role 매칭 → API leak 영향 그대로 받음 + `u.roles[0]` fallback 으로 KPA/GlycoPharm 의 unprefixed 역할(`supplier` 등)과 충돌 가능.
+- "공급자/파트너/셀러" 카운트는 클라이언트 사이드 1000건 fetch + primary role 매칭 → API leak 영향 그대로 받음 + `u.roles[0]` fallback 으로 KPA 의 unprefixed 역할(`supplier` 등)과 충돌 가능.
 - `/admin/users` 와 `/operator/users` 가 동일 컴포넌트인 점은 *나쁜 것은 아니지만*, 두 화면의 의미적 정체성을 명확히 분리할지 통합할지 결정이 필요.
 
 ### 3.4 정책 위반 여부
@@ -383,7 +382,7 @@ LIMIT 17;
 |------|------|
 | **목록 조회 기준** | `service_memberships.service_key = 'neture'` 보유 사용자만 |
 | **상태 기준** | `service_memberships.status` (sm SSOT) — `users.status` 아님 |
-| **타 서비스 단독 회원** | KPA / GlycoPharm / K-Cosmetics 단독 회원은 **제외** |
+| **타 서비스 단독 회원** | KPA / K-Cosmetics 단독 회원은 **제외** |
 | **platform 단독 계정** | 별도 화면(예: `/admin/platform-accounts`)에서 관리. Neture 회원 목록에는 섞지 않음 |
 | **Neture + 타 서비스 다중 멤버십** | Neture 멤버십이 있으면 표시. 다른 서비스 멤버십은 "서비스" 컬럼에 부가 정보로 표시 (현재 동작 유지) |
 

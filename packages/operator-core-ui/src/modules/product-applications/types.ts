@@ -101,7 +101,7 @@ export interface ProductApplicationsConfig {
   description?: string;
   /** 신청 주체(매장) 라벨. 기본 '약국' (KCos='매장'). 컬럼/드로어/모달 문구에 사용. */
   orgLabel?: string;
-  /** 활성 필터 버튼 강조색. 기본 'blue' (GP='teal', KCos='pink'). */
+  /** 활성 필터 버튼 강조색. 기본 'blue' (KCos='pink'). */
   accent?: ProductApplicationsAccent;
   /** DataTable id. 기본 'product-applications'. */
   tableId?: string;

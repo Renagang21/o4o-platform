@@ -38,13 +38,13 @@ constraint:
 
 ## 0. 결론 요약 (TL;DR)
 
-> **QR 백엔드는 *이미 multi-service 공통* 으로 동작하고 있다 — `createStoreQrLandingController` 가 KPA / GlycoPharm / Cosmetics 세 서비스 라우터에 동일하게 mount 되며 `serviceKey` 인자로만 분기. POP 와 동등한 공통화 수준을 이미 달성했다. 그러나 결과물 entity (`store_qr_codes`) 는 `library_item_id` 단일 reference 만 보유하여 *입력 source 측 자료함 전체* 를 수용하지 못한다. 구체적으로 — POP 는 `library / snapshot / direct` 3 origin 을 모두 수용하지만 QR 은 *`library` 만 수용* 한다 (`StoreQRPage.tsx:150` 의 `find((it) => it.origin === 'library')` 가 단일 분기). 이 비대칭이 QR 을 "매장 제작 자료" canonical 흐름에 연결하지 못하게 막는 단 하나의 구조적 게이트다. 또한 admin-dashboard 에 *별도의 QR Create/List UI* (`/store/qr/create`, `/store/qr`) 가 lms-marketing.routes.tsx 에 등록되어 있으나, 사용하는 API 경로(`/api/v1/pharmacy/qr`) 는 백엔드에 mount 되어 있지 않다 — 실 운영 서비스에서는 dead code 일 가능성이 매우 높다.**
+> **QR 백엔드는 *이미 multi-service 공통* 으로 동작하고 있다 — `createStoreQrLandingController` 가 KPA / Cosmetics 두 서비스 라우터에 동일하게 mount 되며 `serviceKey` 인자로만 분기. POP 와 동등한 공통화 수준을 이미 달성했다. 그러나 결과물 entity (`store_qr_codes`) 는 `library_item_id` 단일 reference 만 보유하여 *입력 source 측 자료함 전체* 를 수용하지 못한다. 구체적으로 — POP 는 `library / snapshot / direct` 3 origin 을 모두 수용하지만 QR 은 *`library` 만 수용* 한다 (`StoreQRPage.tsx:150` 의 `find((it) => it.origin === 'library')` 가 단일 분기). 이 비대칭이 QR 을 "매장 제작 자료" canonical 흐름에 연결하지 못하게 막는 단 하나의 구조적 게이트다. 또한 admin-dashboard 에 *별도의 QR Create/List UI* (`/store/qr/create`, `/store/qr`) 가 lms-marketing.routes.tsx 에 등록되어 있으나, 사용하는 API 경로(`/api/v1/pharmacy/qr`) 는 백엔드에 mount 되어 있지 않다 — 실 운영 서비스에서는 dead code 일 가능성이 매우 높다.**
 
 > **권장 방향: ① QR 결과물 entity 의 source reference 를 polymorphic 화 (library + production-material 두 origin 수용) — `IR-O4O-STORE-EXECUTION-CONTENT-ASSET-POLICY-V1` Phase 1 #2,#3 의 일부로 진행 ② admin-dashboard 의 parallel QR UI 의 실 가동 여부 검증 후 dead 면 제거 ③ kpa-society UI 에 잔존하는 `landingType: 'tablet'` 등 stale wording 정리 ④ ProductMarketingPage 진입의 단건 prefill 패턴 (`selectedLibraryItem`) 은 transitional — canonical items[] 시그니처로 *흡수 가능* 하나 즉시 제거는 product-context 정보 손실 (자매 IR `LEGACY-SINGLE-ITEM-PATH-AUDIT-V1` 결론).**
 
 ### 핵심 발견 10가지
 
-1. **백엔드 multi-service 공통 mount** — `createStoreQrLandingController(ds, auth, serviceKey)` 가 KPA / GlycoPharm / Cosmetics 세 서비스 라우터에 mount. 이미 공통 capability ([§2.2](#22-controller--route)).
+1. **백엔드 multi-service 공통 mount** — `createStoreQrLandingController(ds, auth, serviceKey)` 가 KPA / Cosmetics 두 서비스 라우터에 mount. 이미 공통 capability ([§2.2](#22-controller--route)).
 2. **결과물 entity 는 library 단일 reference** — `store_qr_codes.library_item_id UUID` 만 보유. snapshot / direct 콘텐츠 reference 부재 ([§4.1](#41-store_qr_codes-entity-필드)).
 3. **canonical entry는 자료함 → StartProductionModal 로 정렬됨** — 자매 IR `IR-O4O-KPA-QR-PRODUCTION-FLOW-STATE-AUDIT-V1` 결론과 일치. "신규 제작 시작" 버튼은 [StoreQRPage.tsx:372-374](services/web-kpa-society/src/pages/pharmacy/StoreQRPage.tsx#L372) 에서 명시 제거 처리됨.
 4. **POP vs QR origin 수용 비대칭** — POP (`StorePopPage.tsx:50-54, 109-153`): `library + snapshot + direct` 3종. QR (`StoreQRPage.tsx:150`): `library` **단일**. **QR 만 production material 흐름에서 막힌다.**
@@ -143,7 +143,6 @@ QR canonical 흐름 (자매 IR `IR-O4O-KPA-QR-PRODUCTION-FLOW-STATE-AUDIT-V1` §
 | Service | mount | 라인 |
 |---------|:-----:|:----:|
 | KPA | `/api/v1/kpa/{qr/public/*, pharmacy/qr/*}` | [kpa.routes.ts:79, 389](apps/api-server/src/routes/kpa/kpa.routes.ts#L389) |
-| GlycoPharm | `/api/v1/glycopharm/{qr/public/*, pharmacy/qr/*}` | [glycopharm.routes.ts:35, 373](apps/api-server/src/routes/glycopharm/glycopharm.routes.ts#L373) |
 | Cosmetics | `/api/v1/cosmetics/{qr/public/*, pharmacy/qr/*}` | [cosmetics.routes.ts:30, 128](apps/api-server/src/routes/cosmetics/cosmetics.routes.ts#L128) |
 
 > 이미 **multi-service 공통 capability** — 자매 IR (`IR-O4O-STORE-PRODUCTION-MATERIALS-COMMON-ENTITY-RENAME-AUDIT-V1`) 의 `kpa_store_contents` 와 동일한 구조. 분류: **active canonical**.
@@ -184,13 +183,12 @@ QR canonical 흐름 (자매 IR `IR-O4O-KPA-QR-PRODUCTION-FLOW-STATE-AUDIT-V1` §
 | [api/qr.api.ts](apps/admin-dashboard/src/api/qr.api.ts) | API client — **`/api/v1/pharmacy/qr` 호출 (서비스 prefix 없음)** | **dead 의심** |
 | [pages/storefront/QrLandingPage.tsx](apps/admin-dashboard/src/pages/storefront/QrLandingPage.tsx) | (별도 — 확인 필요) | 별도 |
 
-**핵심 의심 근거**: `qr.api.ts` 의 호출 경로 `/api/v1/pharmacy/qr` 는 [§2.2](#22-controller--route) 의 mount 표 어디에도 없음. backend 는 `/api/v1/{kpa|glycopharm|cosmetics}/pharmacy/qr` 만 mount — admin-dashboard 가 무인증 호출 시도 시 404. 별도 검증 필요. → [§5.3](#53-admin-dashboard-parallel-qr-ui-dead-의심) 참고.
+**핵심 의심 근거**: `qr.api.ts` 의 호출 경로 `/api/v1/pharmacy/qr` 는 [§2.2](#22-controller--route) 의 mount 표 어디에도 없음. 별도 검증 필요. → [§5.3](#53-admin-dashboard-parallel-qr-ui-dead-의심) 참고.
 
 ### 2.5 Other Service QR 랜딩 페이지 (다중 deploy)
 
 | 파일 | 서비스 | 역할 |
 |------|-------|------|
-| [services/web-glycopharm/src/pages/qr/QrLandingPage.tsx](services/web-glycopharm/src/pages/qr/QrLandingPage.tsx) | GlycoPharm | 공개 QR 랜딩 |
 | [services/web-neture/src/pages/store/QrLandingPage.tsx](services/web-neture/src/pages/store/QrLandingPage.tsx) | Neture | 공개 QR 랜딩 |
 | [services/web-kpa-society/src/pages/qr/QrLandingPage.tsx](services/web-kpa-society/src/pages/qr/QrLandingPage.tsx) | KPA | 공개 QR 랜딩 |
 
@@ -364,7 +362,6 @@ authClient.api.get('/api/v1/pharmacy/qr/${id}/flyer?...')
 
 ```
 KPA        : /api/v1/kpa/{qr/public, pharmacy/qr/*}        ✓ mounted
-GlycoPharm : /api/v1/glycopharm/{qr/public, pharmacy/qr/*} ✓ mounted
 Cosmetics  : /api/v1/cosmetics/{qr/public, pharmacy/qr/*}  ✓ mounted
 
 /api/v1/pharmacy/qr (서비스 prefix 없음) → ❌ 미mount
@@ -564,7 +561,7 @@ navigate('/store/qr/create', {
 | 백엔드 entity | `StoreQrCode`, `StoreQrScanEvent` |
 | 백엔드 endpoint | `POST/GET/PUT/DELETE /pharmacy/qr` 등 10개 |
 | 백엔드 service | `qr-print`, `qr-flyer` |
-| 프런트 페이지 | `StoreQRPage` (kpa-society), `QrLandingPage` (kpa-society / glycopharm / neture) |
+| 프런트 페이지 | `StoreQRPage` (kpa-society), `QrLandingPage` (kpa-society / neture) |
 | 프런트 통합 진입 | `StartProductionModal` (4-target) |
 | 프런트 출력 모달 | `QrPrintTemplateModal` |
 | 프런트 API client | `services/web-kpa-society/src/api/storeQr.ts` |
@@ -706,7 +703,7 @@ navigate('/store/qr/create', {
 |------|------|
 | `services/qr-print.service.ts`, `services/qr-flyer.service.ts` | URL → QR 이미지 변환 로직만 — source 추적 무관 |
 | `services/ai-prompts/storeQr.ts` | AI prompt 템플릿 — source 추적 무관 |
-| 타 서비스 `QrLandingPage.tsx` (kpa-society / glycopharm / neture) | public 랜딩만 표시 — source 추적 무관 |
+| 타 서비스 `QrLandingPage.tsx` (kpa-society / neture) | public 랜딩만 표시 — source 추적 무관 |
 
 ---
 

@@ -25,7 +25,7 @@ import logger from '../../../utils/logger.js';
 const requireKpaAdmin = createMembershipScopeGuard(KPA_SCOPE_CONFIG)('kpa:admin');
 
 // WO-O4O-LMS-GLOBAL-OPERATOR-ROUTES-V1: Global LMS operator guard.
-// Accepts platform-level admins + non-KPA service operators (cosmetics, glycopharm).
+// Accepts platform-level admins + non-KPA service operators (cosmetics).
 // KPA operators use /api/v1/kpa/lms/operator/* (KPA-specific scope guard).
 // This natural separation enforces kpa:operator cannot approve via the global route.
 // Cross-service isolation between non-KPA operators requires Course.serviceKey — WO-O4O-LMS-COURSE-SERVICEKEY-V1.
@@ -299,7 +299,7 @@ router.post('/instructor/submissions/:submissionId/grade', requireAuth, requireI
 
 // ========================================
 // OPERATOR COURSE ACTION ROUTES (WO-O4O-LMS-GLOBAL-OPERATOR-ROUTES-V1)
-// Global operator endpoints for K-Cosmetics, GlycoPharm, and platform admins.
+// Global operator endpoints for K-Cosmetics, and platform admins.
 // KPA operators use /api/v1/kpa/lms/operator/* with requireKpaScope — not duplicated here.
 // ========================================
 

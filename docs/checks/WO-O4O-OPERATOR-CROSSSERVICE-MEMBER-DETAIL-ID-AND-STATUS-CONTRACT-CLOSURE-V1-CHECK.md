@@ -1,7 +1,7 @@
 # CHECK — WO-O4O-OPERATOR-CROSSSERVICE-MEMBER-DETAIL-ID-AND-STATUS-CONTRACT-CLOSURE-V1
 
 - 작성일: 2026-08-21
-- 대상: KPA-Society / K-Cosmetics / Neture / PharmacyHub (GlycoPharm = 공유 모듈 회귀만)
+- 대상: KPA-Society / K-Cosmetics / Neture / PharmacyHub
 - 커밋: `7387109bf` (D1~D3) · `b89115e0a` + `82e54ff21` (D4) · 본 CHECK 커밋은 §9
 - 상태: (E2E 결과는 §5~§6)
 
@@ -39,7 +39,7 @@ canonical 계약은 직전 WO 커밋 `b0bfdd254` 에서 이미 확정되어 프�
 
 - write 축: `resolveWriteScope(req, scope)` 가 명시 `serviceKey` 로 좁힌다 → 상태 변경은 해당 serviceKey membership 에만 적용.
 - 재활성화: `MembershipApprovalService.ts:828-845` — `liftableUserStatuses` 는 platform admin 일 때만 `['suspended','deleted']`, 서비스 운영자는 `['deleted']`. 즉 **서비스 운영자의 재활성화가 플랫폼 정지를 해제하지 않는다.**
-- 실측(§5 Neture E2E): 5개 서비스 membership 을 모두 가진 fixture 를 Neture 에서 정지시켰을 때 neture 만 `suspended`, pharmacy-hub / glycopharm / k-cosmetics / kpa-society 는 `active` 유지. **서비스 간 침범 0건.**
+- 실측(§5 Neture E2E): 4개 서비스 membership 을 모두 가진 fixture 를 Neture 에서 정지시켰을 때 neture 만 `suspended`, pharmacy-hub / k-cosmetics / kpa-society 는 `active` 유지. **서비스 간 침범 0건.**
 - `users.status` 는 정지·복구 전후로 변경되지 않았다 (수정일 포함 동일). **불필요 변경 0건.**
 
 ## 5. 이번 WO 에서 발견·수정한 결함 4건
@@ -75,12 +75,11 @@ K-Cos E2E 의 복구 단계에서 발견. k-cosmetics membership 의 `role` 컬�
 |---|---|
 | api-server typecheck | PASS (격리 worktree `/c/tmp/wo-idc` 기준 — main worktree 는 타 세션의 `@o4o/action-log-core` 삭제로 기존 실패) |
 | `packages/ui` typecheck | PASS |
-| 4서비스 + GlycoPharm typecheck | PASS (5/5) |
+| 3서비스 typecheck | PASS (5/5) |
 | web-k-cosmetics build 대상 typecheck 재확인 | PASS |
 | membership/approval jest | D1~D3 시점 9 suites / 125 tests PASS · D4 시점 12 suites / 160 tests PASS |
 
 > api-server 전체 jest 병렬 실행에서 3 suite / 14 test 가 실패로 보고됐으나, 3 suite 를 각각 단독 실행하면 8 / 17 / 65 tests 전부 PASS 다. 본 WO 변경과 무관한 **병렬 실행 타임아웃 flakiness** 로 판정한다.
-
 
 ### 6-2. 프로덕션 브라우저 write E2E
 
@@ -169,6 +168,5 @@ fixture `E2E AuthMain` (`44fa7733-…`, 5개 서비스 membership 보유 · `use
 | 브랜치 | `main` (직접 작업) |
 | 배포 | Deploy API Server (Cloud Run) · Deploy Web Services (Cloud Run) 모두 success |
 | API·DB·schema 변경 | **없음** — migration 0 · 테이블/컬럼 변경 0 · API 계약 변경 0 |
-| GlycoPharm 공유모듈 회귀 | typecheck·build PASS (코드 변경 없음) |
 
 **문서 정합**: 발견 0건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 2건 (legacy bare role row 정리 · 정지 시 역할 비활성화 범위 통일)

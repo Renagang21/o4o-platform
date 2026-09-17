@@ -20,7 +20,6 @@ packages/store-core/             ← 공유 Data Engine (Types + KPI + Insights)
   ├─ summary.engine.ts
   └─ insights.engine.ts
 
-services/web-glycopharm/         ← 서비스별 페이지 (서비스 내부 유지)
   └─ pages/store/*, pharmacy/*
 
 services/web-kpa-society/
@@ -42,7 +41,6 @@ services/web-k-cosmetics/
 | `storeMenuConfig` | 8개 고정 메뉴 키 + 서비스별 활성화 설정 |
 | `StorePlaceholderPage` | 미구현 메뉴용 플레이스홀더 |
 | `COSMETICS_STORE_CONFIG` | K-Cosmetics 메뉴 설정 |
-| `GLYCOPHARM_STORE_CONFIG` | GlycoPharm 메뉴 설정 |
 | `GLUCOSEVIEW_STORE_CONFIG` | GlucoseView 메뉴 설정 |
 | `KPA_SOCIETY_STORE_CONFIG` | KPA Society 메뉴 설정 |
 
@@ -75,16 +73,16 @@ type StoreMenuKey =
 
 ## 4. 서비스별 활성화 매트릭스
 
-| 메뉴 | K-Cosmetics | GlycoPharm | GlucoseView | KPA Society |
-|------|:-----------:|:----------:|:-----------:|:-----------:|
-| dashboard | O | O | O | O |
-| products | O | O | - | O |
-| channels | - | - | - | O |
-| orders | O | O | - | - |
-| content | O | O | - | O |
-| signage | - | O | - | - |
-| billing | O | - | - | - |
-| settings | O | O | O | O |
+| 메뉴 | K-Cosmetics | GlucoseView | KPA Society |
+| ------ | :-----------: | :-----------: | :-----------: |
+| dashboard | O | O | O |
+| products | O | - | O |
+| channels | - | - | O |
+| orders | O | - | - |
+| content | O | - | O |
+| signage | - | - | - |
+| billing | O | - | - |
+| settings | O | O | O |
 
 ---
 

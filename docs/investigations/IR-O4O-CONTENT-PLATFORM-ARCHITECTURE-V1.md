@@ -127,7 +127,7 @@
 | **이미지** | ✅ **완전 일치** — `IMAGE_DISPLAY_STYLES` 단일 소스를 편집기·렌더러 양쪽 주입(폭/정렬 동일) |
 | **YouTube/iframe** | ⚠ **불일치** — `ContentRenderer` 기본/`product-detail` variant는 `sanitizeHtml`(iframe **제거**). `guide` variant만 `sanitizeRichHtml`로 보존. → **LMS 강의·상품상세·공지·자료실에서 편집기의 YouTube가 통째로 사라짐** |
 | **표(Table)** | ⚠ **CSS 부재** — 렌더러 어디에도 표 CSS 없음(WO-2 §5.5 의존) |
-| **이탈 표면 3곳** | signage-player(자체 ContentRenderer) · glycopharm `CourseDetailPage`(raw `sanitizeHtml` → 이미지 CSS·YouTube 둘 다 누락) · main-site forum(블록 렌더) |
+| **이탈 표면 3곳** | signage-player(자체 ContentRenderer) `CourseDetailPage`(raw `sanitizeHtml` → 이미지 CSS·YouTube 둘 다 누락) · main-site forum(블록 렌더) |
 
 ### 8.1 결함의 의미 — WO-3 범위에 직결
 
@@ -170,7 +170,7 @@ WO-3(Video)가 편집기에 동영상을 넣어도, **소비 표면(default vari
 | **P0** | **렌더링 정합 — 소비 표면 YouTube 드롭** | §8: default variant `sanitizeHtml` iframe 제거 → LMS/상품상세/공지/자료실에서 YouTube 소실 | **WO-3에 포함** 또는 별도 렌더링 정합 WO |
 | **P1** | Video(mp4) 표준화 | 편집기 YT/Vimeo만 | **WO-3** (확정) |
 | **P1** | QR content_hub 복사 vs broadcast 결정 | §7 미결 예외 | 정책 결정 WO |
-| **P1** | 렌더링 이탈 3표면 수렴 | §8: signage-player·glycopharm course·forum | 정합 WO |
+| **P1** | 렌더링 이탈 3표면 수렴 | §8: signage-player course·forum | 정합 WO |
 | **P2** | 본문 포맷 통일(HTML vs block) | §5: 5개 저장소 필드 이질 | 설계 WO |
 | **P2** | HTML Snippet / Template 확대 | §3 미구현·단독사용 | 확장 WO |
 

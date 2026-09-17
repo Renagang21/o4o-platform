@@ -217,7 +217,7 @@ GROUP BY product.productId, order.supplierId
 
 | 컨트롤러 | 공동구매 참조 | 설명 |
 |----------|:-----------:|------|
-| `store-hub.controller.ts` | **X** | Products: Glycopharm/Cosmetics만 집계 |
+| `store-hub.controller.ts` | **X** | Products: Cosmetics만 집계 |
 | `store-events.controller.ts` | **X** | 프로모션/배너만 |
 | `product-marketing.controller.ts` | **X** | QR/POP/Library/Signage만 |
 | `store-channel-products.controller.ts` | **X** | B2C/KIOSK 채널만 |
@@ -477,7 +477,7 @@ KPA 공동구매는 O4O Commerce 위에 올라간 서비스인가?
 
 ### G-2: Store HUB KPI에 공동구매 미포함
 
-- `store-hub.controller.ts` Overview에 Glycopharm/Cosmetics만 집계
+- `store-hub.controller.ts` Overview에 Cosmetics만 집계
 - 공동구매 주문/수량은 Store HUB에 반영되지 않음
 - **영향:** 약국 소유자가 Store HUB에서 공동구매 현황을 볼 수 없음
 

@@ -15,7 +15,7 @@
 | `apps/api-server/src/routes/platform/store-public/store-public-utils.ts` | `queryTabletVisibleProducts` 데이터 SELECT: description/short COALESCE 에 canonical 우선 삽입 + `shared_product_descriptions` LEFT JOIN |
 | `docs/investigations/CHECK-O4O-KPA-TABLET-DESCRIPTION-CANONICAL-LINK-V1.md` | 본 CHECK |
 
-> JOIN/COALESCE 2곳 + 주석. 데이터/컬럼/migration/UI/frontend/count 쿼리 변경 0. storefront(`queryVisibleProducts`)·GP·KCos·Neture·local-product 경로 미접촉.
+> JOIN/COALESCE 1곳 + 주석. 데이터/컬럼/migration/UI/frontend/count 쿼리 변경 0. storefront(`queryVisibleProducts`)·KCos·Neture·local-product 경로 미접촉.
 
 ## 2. 사용자 강조 4점 검증
 
@@ -56,7 +56,7 @@ COALESCE(spd.summary, spo.consumer_short_description, '') AS short_description
 
 - `store_product_profiles.description` **삭제 안 함**(legacy fallback 보존), 편집 UI 미제거, migration 0.
 - `product_ai_contents` 직접 노출 **없음**.
-- 매장별 override/selection **신규 미도입**. local product 경로/storefront/GP/KCos/Neture admin/tablet frontend **미변경**.
+- 매장별 override/selection **신규 미도입**. local product 경로/storefront/KCos/Neture admin/tablet frontend **미변경**.
 - HTML 렌더 정책 **미변경**.
 
 ## 6. 검증
@@ -79,7 +79,6 @@ COALESCE(spd.summary, spo.consumer_short_description, '') AS short_description
 
 ## 8. 후속 WO
 
-1. `WO-O4O-PRODUCT-DESCRIPTION-HTML-RENDERING-POLICY-V1` — GP plain / KPA·tablet HTML 렌더 정책 통일.
 2. `WO-O4O-PRODUCT-DESCRIPTION-STORE-PROFILE-OVERRIDE-DEPRECATION-V1` — DB 사용량 확인 후 override 편집 UI 축소/폐지.
 3. (선택) `WO-O4O-PRODUCT-DESCRIPTION-TABLET-FRONTEND-RENDER-V1` — tablet 화면 description 표시 보정(필요 시).
 

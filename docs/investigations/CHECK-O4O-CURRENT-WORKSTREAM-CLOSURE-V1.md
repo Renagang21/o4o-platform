@@ -26,9 +26,9 @@
 | 항목 | 문서/commit |
 |------|-----------|
 | 6영역 1차 정렬 완료 | `CHECK-O4O-CROSSSERVICE-STORE-HUB-CANONICAL-ALIGNMENT-CYCLE1-V1` (`a2cce0ffc`) |
-| 사이니지 canonical | `WO-...GLYCOPHARM-STORE-HUB-SIGNAGE-CANONICAL-ALIGNMENT-V1` (`6f7c91842`), `WO-...KCOSMETICS-...SIGNAGE...` (`034a70b0a`) |
-| 콘텐츠 copy API canonical | `WO-...KCOS-STORE-HUB-CONTENT...` (`28623211c`), `WO-...GLYCOPHARM-STORE-HUB-CONTENT-COPY-API-FIX-V1` (`bd355bf05`) |
-| 레이블 잔재 정책 | `CHECK-O4O-GLYCOPHARM-STORE-HUB-CONTENT-LABEL-RESIDUE-V1` (`9468ab0fe`) |
+| 사이니지 canonical | `WO-...KCOSMETICS-...SIGNAGE...` (`034a70b0a`) |
+| 콘텐츠 copy API canonical | `WO-...KCOS-STORE-HUB-CONTENT...` (`28623211c`) |
+| 레이블 잔재 정책 | — |
 
 **상태**: L2 Landing(StoreHubTemplate) + L3 Sections(DataTable/ActionBar) + copy API + 사용자 표현 통일 완료.
 
@@ -39,7 +39,7 @@
 | L1/L2/L3 계층 분해 조사 | `IR-O4O-STORE-HUB-UI-UX-STANDARDIZATION-AUDIT-V1` (`3334a72e9`) |
 | 공통화 보류 결정 | `IR-O4O-CROSSSERVICE-STORE-HUB-PAGE-COMMONIZATION-V1` (`c88ac4e5f`) |
 
-**상태**: L1 Hub Layout(GP/K-Cos 복제)만 잔여 — 우선순위 낮음으로 보류.
+**상태**: L1 Hub Layout(K-Cos 복제)만 잔여 — 우선순위 낮음으로 보류.
 
 ### 축 3 — Operator Members 공통화
 
@@ -57,20 +57,11 @@
 | 항목 | 문서/commit |
 |------|-----------|
 | Forum 리스트 2패턴 혼재 조사 | `IR-O4O-OPERATOR-FORUM-LIST-COMMONIZATION-AUDIT-V1` (`6341f531a`) |
-| 삭제요청 bulk parity | `WO-O4O-GLYCOPHARM-KCOS-FORUM-DELETE-REQUEST-BULK-PARITY-V1` (`16a76fb6e`) |
-| 신청 bulk parity | `WO-O4O-GLYCOPHARM-KCOS-FORUM-REQUEST-BULK-PARITY-V1` (`bb52b6819`) |
+| 삭제요청 bulk parity | — |
+| 신청 bulk parity | — |
 | 구조 smoke PASS | `CHECK-O4O-OPERATOR-FORUM-BULK-PARITY-SMOKE-V1` (`f2c772945`) |
 
-**상태**: GP/K-Cos ForumDeleteRequests + ForumRequests에 selectable+ActionBar+bulk 보강 완료. 구조 smoke PASS. ForumManagement 공통화는 도메인 차이로 보류.
-
-### 축 5 — GlycoPharm OPL / checkout / storefront 안정화
-
-| 항목 | 문서/commit |
-|------|-----------|
-| OPL serviceKey 상수화 | `WO-O4O-OPL-SERVICEKEY-CANONICAL-CONSTANTS-V1` |
-| 운영 안정화 smoke | `CHECK-O4O-GLYCOPHARM-STOREFRONT-CHECKOUT-POST-OPL-CONSTANTS-V2` |
-
-**상태**: GLYCOPHARM_OPL_SERVICE_KEYS 상수화 + storefront/checkout/cockpit/payment smoke PASS.
+**상태**: K-Cos ForumDeleteRequests + ForumRequests에 selectable+ActionBar+bulk 보강 완료. 구조 smoke PASS. ForumManagement 공통화는 도메인 차이로 보류.
 
 ### 축 6 — OPL serviceKey cross-service canonicalization audit
 
@@ -95,7 +86,7 @@
 
 | 항목 | 우선순위 |
 |------|:---:|
-| Store HUB L1 Layout 공통화 (GP/K-Cos ~99% 복제) | 낮음 |
+| Store HUB L1 Layout 공통화 (K-Cos ~99% 복제) | 낮음 |
 | Store HUB 이벤트/특가 라벨 정렬 | 매우 낮음 |
 | KPA checkout single literal → param binding | 매우 낮음 (선택) |
 | ForumManagement 공통 wrapper | 보류 (도메인 차이) |
@@ -121,8 +112,8 @@
 | 순위 | 후보 | 성격 | 충돌 위험 |
 |:---:|------|------|:---:|
 | 🥇 | **Operator 콘텐츠 관리(CmsContentManager) 적용 범위 조사** | read-only IR — KPA 완전, 기타 선택적 (CROSSAREA IR §10-2 지적) | 낮음 |
-| 🥈 | **Operator Stores 리스트 정합 조사** | read-only IR — GP PharmaciesPage 등 (단, Admin 채팅방 경계 확인 필요) | 중간 |
-| 🥉 | **Store HUB L1 Layout 공통화** | WO — GP/K-Cos HubLayout 복제 해소 | 낮음 |
+| 🥈 | **Operator Stores 리스트 정합 조사** | — | 중간 |
+| 🥉 | **Store HUB L1 Layout 공통화** | WO — K-Cos HubLayout 복제 해소 | 낮음 |
 
 **권고**: 1순위 CmsContentManager 적용 범위 조사가 operator 영역 연속성 + 충돌 회피에 가장 안전. 단, 새 축을 여는 대신 이 채팅방을 여기서 종료하는 것도 합리적.
 
@@ -136,7 +127,6 @@
 2. Store HUB UI-UX 표준화 IR           ✅
 3. Operator Members 공통화             ✅
 4. Operator Forum bulk parity          ✅
-5. GlycoPharm OPL/checkout/storefront  ✅
 6. OPL serviceKey cross-service audit  ✅
 
 제외 (다른 세션): Admin Dashboard, My Store/Store Library

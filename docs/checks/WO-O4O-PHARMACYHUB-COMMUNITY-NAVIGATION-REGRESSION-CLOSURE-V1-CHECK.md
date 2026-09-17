@@ -88,7 +88,7 @@ FAIL src/__tests__/pharmacy-hub-community-capability-adoption.spec.ts
 | navigation entry | header **없음** / **ForumHubPage `infoLinks[1]`** · **ForumMemberManagementPage `backHref`** · **RequestForumPage `backTo`/`onSuccess` navigate** |
 | deep link | 가능 |
 | 인증 | `MembershipGate` 뒤 |
-| 소속 | 공통 forum owner 영역의 PH 인스턴스 (GlycoPharm·K-Cosmetics 동일 route 명) |
+| 소속 | 공통 forum owner 영역의 PH 인스턴스 (K-Cosmetics 동일 route 명) |
 | **판정** | **`ACTIVE_ROUTE`** |
 
 **둘 다 살아 있으나, 둘의 진입 표면은 서로 다르다** — request 는 dashboard 에서도 들어가지만 dashboard 는 request 에서 들어가지 않는다(단방향). 그래서 ForumHub `infoLinks` 가 dashboard 의 **1차 진입점**이다.
@@ -226,12 +226,11 @@ it('진입 표면인 ForumHub 자체가 공개 navigation 에서 도달 가능�
 | 서비스 | children producer | 코드 영향 |
 |---|:---:|---|
 | KPA Society | 0 | 주석 1줄(문서 경로 대소문자) — 런타임 0 |
-| GlycoPharm | 0 | 동일 |
 | K-Cosmetics | 0 | 동일 |
 | Neture | 0 | 동일 |
 
 **타 서비스 navigation 회귀 0.**
-`/forum/request`·`/forum/my-dashboard` 는 KPA·Neture·GlycoPharm·K-Cosmetics 도 각자 route 를 갖고 있으며 **모두 header 가 아니라 ForumHub/ForumHome 화면에서 진입**한다 → PH 는 이번 정리로 **자매 서비스와 오히려 정합**해졌다.
+`/forum/request`·`/forum/my-dashboard` 는 KPA·Neture·K-Cosmetics 도 각자 route 를 갖고 있으며 **모두 header 가 아니라 ForumHub/ForumHome 화면에서 진입**한다 → PH 는 이번 정리로 **자매 서비스와 오히려 정합**해졌다.
 
 ---
 

@@ -1,9 +1,9 @@
 /**
- * StoreCartView — 매장 장바구니 공통 View (K-Cosmetics · GlycoPharm · KPA-Society)
+ * StoreCartView — 매장 장바구니 공통 View (K-Cosmetics · KPA-Society)
  *
  * WO-O4O-STORE-HUB-PRODUCT-APPLICATION-AND-CART-COMMONIZATION-V1
  *
- * K-Cosmetics(282줄) / GlycoPharm(283줄) `StoreCartPage` 는 accent 색(pink/teal)과
+ * K-Cosmetics(282줄) `StoreCartPage` 는 accent 색과
  * 결과 헤더 아이콘(lucide vs emoji)만 다른 near-identical 화면이었다. 그 구조를 그대로 옮기고
  * 서비스 차이는 props 로 주입한다.
  *

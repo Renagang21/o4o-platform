@@ -2,7 +2,7 @@
 
 - 작업일: 2026-08-13
 - 브랜치: `work/commonization-my-store` → remote `work/commonization-my-store-shell-parts` (main 병합 없음)
-- 범위: K-Cosmetics / GlycoPharm `StoreTabletDisplaysPage` + 태블릿 진열 관리 흐름
+- 범위: K-Cosmetics `StoreTabletDisplaysPage` + 태블릿 진열 관리 흐름
 
 ---
 
@@ -10,18 +10,18 @@
 
 `diff -u` 로 두 서비스 페이지·API client 를 직접 대조했다.
 
-### 페이지 (KCos 536L vs GP 600L)
+### 페이지 (KCos 536L 600L)
 
 차이는 **단 2가지**였다.
 
 | 차이 | 내용 | 판정 |
 |---|---|---|
 | import 경로 | `@/services/tabletDisplayApi` vs `@/api/tabletDisplays` | config |
-| GP 전용 Idle 미디어 라이브러리 | `fetchIdleLibraryAssets` (store_library_items + o4o_asset_snapshots 병합) → `IdlePlaylistEditor fetchLibraryAssets` | **업무 기능 차이 → 서비스에 유지** |
+ 전용 Idle 미디어 라이브러리 | `fetchIdleLibraryAssets` (store_library_items + o4o_asset_snapshots 병합) → `IdlePlaylistEditor fetchLibraryAssets` | **업무 기능 차이 → 서비스에 유지** |
 
 그 외 마크업·상태·정렬 로직·문구·accent(teal)·뒤로가기 목적지(`/store/commerce/local-products`)는 **문자 단위로 동일**했다.
 
-### API client (KCos 115L vs GP 99L)
+### API client (KCos 115L 99L)
 
 - endpoint 가 둘 다 **service prefix 없는 platform-level `/store/tablets/*`** 로 동일하다.
 - 타입(`Tablet`, `DisplayItem`, `ProductPool`)·요청·응답 모두 동일하고, 차이는 제네릭 타입 인자를 쓰느냐(`api.get<T>`) 와 `res.data.data` vs `res.data?.data` 표기뿐이다.
@@ -65,12 +65,12 @@ error 블록과 "등록된 태블릿이 없습니다" 블록은 원본대로 **�
 
 ## 3. 서비스 adapter 차이 (유지한 것)
 
-| 항목 | K-Cosmetics | GlycoPharm |
-|---|---|---|
-| API client | `@/services/tabletDisplayApi` | `@/api/tabletDisplays` |
-| Idle 편집기 | `IdlePlaylistEditor` 기본 | + `fetchLibraryAssets`(자료함 미디어 병합, GP 전용) |
-| accent | teal (기본값) | teal (기본값) |
-| 문구 · backTo | 동일(기본값) | 동일(기본값) |
+| 항목 | K-Cosmetics |
+|---|---|
+| API client | `@/services/tabletDisplayApi` |
+| Idle 편집기 | `IdlePlaylistEditor` 기본 |
+| accent | teal (기본값) |
+| 문구 · backTo | 동일(기본값) |
 
 `labels` · `accent` · `headerActions` slot 은 열어 두었으나 두 서비스 모두 기존값이 같아 주입하지 않았다 — 문구·테마를 하나로 **강제**하지 않되 없는 차이를 만들지도 않았다.
 
@@ -93,14 +93,13 @@ error 블록과 "등록된 태블릿이 없습니다" 블록은 원본대로 **�
 |---|---|
 | `store-ui-core` `tsc --build` | PASS |
 | web-k-cosmetics typecheck / vite build | PASS / PASS (24.22s) |
-| web-glycopharm typecheck / vite build | PASS / PASS (22.28s) |
 | web-kpa-society 회귀 typecheck / build | PASS / PASS (21.36s) |
 | web-pharmacy-hub 회귀 typecheck / build | PASS / PASS (14.07s) |
 | loading / 태블릿 없음 / error / toast | 원본 마크업 그대로 이관, 정적 등가 확인(`git show HEAD:<file>` 대조) |
 | display 목록 · 순서 이동 · 제거 | `moveEntry`/`removeEntryAt` 가 원본과 동일하게 index 재부여 |
 | 상태/tone (공급 blue / 자체 amber) | 동일 |
 | 액션 목적지 | 뒤로가기 `/store/commerce/local-products` 2서비스 동일 유지 |
-| editor 진입 | `IdlePlaylistEditor` 를 서비스가 주입 — props(`items`/`onChange`/`disabled`/GP `fetchLibraryAssets`) 동일 |
+| editor 진입 | `IdlePlaylistEditor` 를 서비스가 주입 — props(`items`/`onChange`/`disabled` `fetchLibraryAssets`) 동일 |
 | preview 진입 / screen-set 전달값 | **해당 없음** — 두 서비스 화면에 존재하지 않는 기능 |
 | API endpoint · payload · response | 동일 (`/store/tablets/*`, 저장 payload `{productType, productId, sortOrder, isVisible}`) |
 | 검색·필터·pagination | **해당 없음** — 원본에 없었고 추가하지 않음 |
@@ -121,7 +120,6 @@ error 블록과 "등록된 태블릿이 없습니다" 블록은 원본대로 **�
 | | before | after |
 |---|--:|--:|
 | KCos `StoreTabletDisplaysPage` | 536L | 43L |
-| GP `StoreTabletDisplaysPage` | 600L | 110L (GP 전용 idle 미디어 로직 64L 포함) |
 | 합계 | **1,136L** | **153L (−983L)** |
 | 신규 Core | — | 997L (11 파일) |
 

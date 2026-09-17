@@ -4,8 +4,8 @@
  * WO-O4O-EVENT-OFFER-TO-CART-MIGRATION-V1 (Phase 1a)
  * WO-O4O-STORE-HUB-PRODUCT-APPLICATION-AND-CART-COMMONIZATION-V1: 상태 기계 `useStoreCart` 공유
  * WO-O4O-STORE-HUB-COMMON-VIEW-AND-SHELL-UNIFICATION-V1:
- *   화면(공급자 묶음 · 수량 stepper · 배송비 미리보기 · 합계 · 주문 확정)이 K-Cosmetics /
- *   GlycoPharm 과 동일해 공통 `StoreCartView` 로 편입. 이 파일은 **accent + header/empty slot** 만
+ *   화면(공급자 묶음 · 수량 stepper · 배송비 미리보기 · 합계 · 주문 확정)이 K-Cosmetics 와
+ *   동일해 공통 `StoreCartView` 로 편입. 이 파일은 **accent + header/empty slot** 만
  *   소유한다. API endpoint · payload · 주문 확정 계약 무변경.
  *   inline style(283줄) 제거 — 금액 표기는 공통 View 기준(₩ prefix)으로 정규화.
  *

@@ -23,7 +23,7 @@
 |--------|------------------|-------------|----------------|--------|--------------|------|
 | `o4o-core-api` | `o4o-core-api-02972-pwz` | 2026-07-27T08:18:36Z | `deploy-api.yml` | `30248989718` | `3302d79e6` (=HEAD) | success |
 | `kpa-society-web` | `kpa-society-web-01720-s27` | 2026-07-27T07:18:48Z | `deploy-web-services.yml` | `30245522946` | `6a392804e` | success (`deploy-kpa-society`) |
-| `glycopharm-web` / `k-cosmetics-web` | (최신) | 2026-07-27T05:21Z | `deploy-web-services.yml` | `30239416872` | `d4278b519` | success |
+| `k-cosmetics-web` | (최신) | 2026-07-27T05:21Z | `deploy-web-services.yml` | `30239416872` | `d4278b519` | success |
 
 **포함 검증 (ancestry):**
 
@@ -33,7 +33,7 @@ afad94fb9 ⊂ 3302d79e6 (core-api 배포본)      → YES
 3843dca9d ⊂ 6a392804e (kpa web 배포본)       → YES
 afad94fb9 ⊂ 6a392804e (kpa web 배포본)       → YES
 0cbc3952f ⊂ 6a392804e (kpa web 배포본)       → YES
-3843dca9d ⊂ d4278b519 (GP/KCos web 배포본)   → YES
+3843dca9d ⊂ d4278b519 (KCos web 배포본) → YES
 ```
 
 **잔여 격차 확인:** `6a392804e..HEAD` 의 변경 중 `services/web-kpa-society/**` · `packages/**` 는 **0건**
@@ -71,7 +71,7 @@ GET /applications · /approved — read axis from mount    3/3
 | 대상 | `https://kpa-society.co.kr` (프로덕션) |
 | 계정 | 약국 경영자 `renagang21@gmail.com` (자격증명은 env 주입, 문서·로그·커밋 미기록) |
 | 조직 | `테스트 약국 매장` · organizationId `9c87f46b-57a1-4afe-80bd-60782c49ce96` |
-| 범위 | KPA 화면 전용. GP/KCos 화면 미사용·미수정 |
+| 범위 | KPA 화면 전용. KCos 화면 미사용·미수정 |
 | 아티팩트 | 스크린샷 8매 + `smoke-report.json` + `smoke-pass2.json` (scratchpad, 비커밋) |
 
 로그인: `POST /api/v1/auth/login` **200**, 랜딩 `/store`.
@@ -304,7 +304,7 @@ Boundary Policy·HUB-P0-04 게이트와 충돌하지 않는다 (controller 주�
 ### F3 — service_key 배지 미표시 (관측)
 
 `SERVICE_KEY_LABELS` ([PharmacySellPage.tsx:31-36](services/web-kpa-society/src/pages/pharmacy/PharmacySellPage.tsx#L31-L36)) 는
-`kpa` / `kpa-groupbuy` / `cosmetics` / `glycopharm` 만 정의한다.
+`kpa` / `kpa-groupbuy` / `cosmetics` 만 정의한다.
 실데이터 값 `neture` 가 없어 배지가 표시되지 않는다. 기능 영향 없음, F2 수정 시 함께 정리 권장.
 
 ---
@@ -319,7 +319,7 @@ Boundary Policy·HUB-P0-04 게이트와 충돌하지 않는다 (controller 주�
 | 행 수 | 20 → 20 |
 | DB 쓰기 쿼리 | 없음 (SELECT · information_schema 조회만) |
 | 기존 PRIVATE 데이터 변경 | 없음 (데이터 자체가 0행) |
-| GP/KCos 접촉 | 없음 |
+| KCos 접촉 | 없음 |
 
 ---
 

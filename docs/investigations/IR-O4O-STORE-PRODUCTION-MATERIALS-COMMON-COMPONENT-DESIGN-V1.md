@@ -1,6 +1,6 @@
 # IR-O4O-STORE-PRODUCTION-MATERIALS-COMMON-COMPONENT-DESIGN-V1
 
-> **목적**: KPA에서 안정화된 `StoreProductionMaterialsPage`의 derivation("원본 보기") 기능을 GlycoPharm/K-Cosmetics에 **복붙하지 않고**, 공통 컴포넌트/contract로 추출할 범위와 단계를 설계한다.
+> **목적**: KPA에서 안정화된 `StoreProductionMaterialsPage`의 derivation("원본 보기") 기능을 K-Cosmetics에 **복붙하지 않고**, 공통 컴포넌트/contract로 추출할 범위와 단계를 설계한다.
 > **성격**: read-only 설계 조사 (코드/API/DB/migration 변경 없음).
 > **작성일**: 2026-06-06
 > **선행**: `IR-O4O-STORE-ASSET-DERIVATION-CROSSSERVICE-COMMONIZATION-V1`(백엔드 service-neutral 확인), `WO-KPA-STORE-ASSET-DERIVATION-VIEWER-QR-BLOG-EXTEND-V1`(KPA 완료)
@@ -12,7 +12,7 @@
 
 **KPA→타서비스 복붙을 중단**한다. KPA가 앞으로도 계속 고도화되므로, 복붙은 매 업그레이드마다 3중 수정·드리프트를 강제한다.
 
-대신 **가장 작고 효과 큰 단위부터 공통 컴포넌트로 추출**하고, **KPA에 먼저 재적용해 회귀 0을 확인한 뒤** GlycoPharm/K-Cosmetics에 단계적으로 붙인다.
+대신 **가장 작고 효과 큰 단위부터 공통 컴포넌트로 추출**하고, **KPA에 먼저 재적용해 회귀 0을 확인한 뒤** K-Cosmetics에 단계적으로 붙인다.
 
 **1차 추출 대상 = `StoreAssetDerivationViewer`** (원본 보기 모달). 백엔드는 이미 service-neutral 하므로 추출은 **프론트 전용**이며, 컴포넌트는 endpoint를 모르고 서비스가 fetcher를 주입한다.
 
@@ -47,10 +47,8 @@
 ### 3.2 서비스별로 남길 것 (주입)
 | 요소 | 이유 |
 |---|---|
-| **API base prefix** (`/kpa` vs `/glycopharm` vs `/cosmetics`) + client 컨벤션(KPA fetch-scoped vs glyco/kcos axios `res.data`) | 서비스별 apiClient 상이 → viewer는 **fetcher 주입**으로 흡수 |
-| **source 목록 fetcher** (execution assets / QR / blog / direct contents) | 서비스별 소스 구성·진척도 상이(KPA 4종, glyco/kcos 1종) |
+| **source 목록 fetcher** (execution assets / QR / blog / direct contents) | 서비스별 소스 구성·진척도 상이 |
 | **route** (POP/QR/블로그/사이니지 만들기 경로) | 서비스별 route 상이 |
-| **사용자 문구** (KPA/Glyco: "내 약국" 문맥 / KCos: "내 매장" 문맥) | 도메인 용어 차이 |
 
 ### 3.3 핵심 설계 원칙
 - **viewer는 endpoint를 모른다.** 서비스가 `fetchDerivations` 함수를 주입 → API base 차이를 컴포넌트 밖으로 격리.
@@ -116,12 +114,11 @@ export interface StoreAssetDerivationViewerProps {
 |---|---|---|---|---|
 | `@o4o/store-ui-core` (패키지) | 본 컴포넌트 신규 | **추가 only**(기존 export 불변) | — | 패키지 typecheck/build |
 | web-kpa-society | viewer 인라인 보유 | **인라인 → 공통 컴포넌트 교체** | route/role 불변 | KPA 화면 무변화 + POP/QR/블로그 원본 보기 회귀 0 smoke |
-| web-glycopharm | 미사용 | **1차 영향 없음**(2차에서 적용) | — | (2차) |
 | web-k-cosmetics | 미사용 | **1차 영향 없음**(3차에서 적용) | — | (3차) |
 | web-neture | 화면 없음 | 없음 | — | — |
 | admin/operator/forum/store-hub/mypage | 미사용 | 없음 | — | — |
 
-**판정**: 1차는 `@o4o/store-ui-core`에 **신규 export 추가 + KPA만 내부 교체**이므로, 공통 모듈의 기존 계약을 깨지 않는다. 단 store-ui-core는 공통 패키지이므로 Protocol에 따라 **추가 시점에 본 매트릭스를 갱신**하고, 최소 KPA smoke(기준 서비스) 필수. Glyco/KCos는 각 적용 차수에서 smoke.
+**판정**: 1차는 `@o4o/store-ui-core`에 **신규 export 추가 + KPA만 내부 교체**이므로, 공통 모듈의 기존 계약을 깨지 않는다. 단 store-ui-core는 공통 패키지이므로 Protocol에 따라 **추가 시점에 본 매트릭스를 갱신**하고, 최소 KPA smoke(기준 서비스) 필수.
 
 ---
 
@@ -132,8 +129,6 @@ export interface StoreAssetDerivationViewerProps {
 2. WO-O4O-STORE-ASSET-DERIVATION-VIEWER-COMPONENT-EXTRACT-V1
    - @o4o/store-ui-core 에 StoreAssetDerivationViewer + 타입 + resultKindToDerivedKind 추가
    - KPA 페이지를 공통 컴포넌트로 교체 (인라인 모달 제거) → KPA 회귀 0 검증 (기준 서비스 우선)
-3. WO-O4O-GLYCOPHARM-STORE-ASSET-DERIVATION-VIEWER-ADOPT-V1
-   - glyco: storeAssetDerivations fetcher(axios) 주입 + 기존 execution-asset 행(POP)에 viewer 적용
 4. WO-O4O-KCOSMETICS-STORE-ASSET-DERIVATION-VIEWER-ADOPT-V1
    - kcos 동형 적용
 5. (이후) ResultKind 모델 + 다중소스 통합목록 공통화 검토 — QR/blog 실엔티티 병합은 이 단계
@@ -150,8 +145,8 @@ export interface StoreAssetDerivationViewerProps {
 
 ## 7. 미해결/주의
 
-- **QR/blog 다중소스**: glyco/kcos의 QR(store_qr_codes)·blog(store_blog_posts)는 현재 제작자료 페이지에 미병합. 이는 viewer 추출과 **분리된** 후속 단계(5번). 1차 viewer는 POP(execution_asset.id=derivedId 일치)부터 안전.
-- **client 컨벤션 차이**: KPA는 fetch 기반 `/kpa` pre-scoped, glyco/kcos는 axios `/{service}` + `res.data`. fetcher 주입으로 흡수 — viewer 내부에 fetch 로직 두지 않음.
+- 이는 viewer 추출과 **분리된** 후속 단계(5번). 1차 viewer는 POP(execution_asset.id=derivedId 일치)부터 안전.
+- fetcher 주입으로 흡수 — viewer 내부에 fetch 로직 두지 않음.
 - **store-ui-core vs shared-space-ui**: 둘 다 3서비스 의존. store-ui-core 권장(스토어 UI 코어). 최종 홈은 추출 WO에서 확정.
 
 ---
@@ -159,7 +154,7 @@ export interface StoreAssetDerivationViewerProps {
 ## 8. 변경하지 않은 것 / 금지 준수
 
 - 코드/API/DB/migration/커밋(코드) 변경 없음 — read-only 설계.
-- KPA/Glyco/KCos 코드 복붙·수정 없음. 백엔드 무변경.
+- 백엔드 무변경.
 - 다른 세션 untracked 파일(`vite.config.*`, 보류 IR) 미접촉.
 - 본 산출물 = 문서 1건.
 
@@ -168,6 +163,5 @@ export interface StoreAssetDerivationViewerProps {
 ## 9. Follow-ups (제안 WO)
 
 1. `WO-O4O-STORE-ASSET-DERIVATION-VIEWER-COMPONENT-EXTRACT-V1` — store-ui-core 컴포넌트 추출 + **KPA 우선 적용·회귀검증**.
-2. `WO-O4O-GLYCOPHARM-STORE-ASSET-DERIVATION-VIEWER-ADOPT-V1`
 3. `WO-O4O-KCOSMETICS-STORE-ASSET-DERIVATION-VIEWER-ADOPT-V1`
 4. (이후) ResultKind/다중소스 통합목록 공통화 + 활용하기 공통화.

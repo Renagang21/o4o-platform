@@ -70,14 +70,6 @@ O4O 플랫폼에서 사용할 **프로모션 슬롯 키(slotKey)의 공식 카�
 | `home-running` | Now Running (진행 중 프로그램) | **다중** (최대 4) | metadata에 type/deadline |
 | `home-notices` | Home 운영 공지 | **다중** | metadata에 isPinned |
 
-### 4.4 GlycoPharm 전용
-
-| slotKey | 설명 | 다중/단일 | 비고 |
-|---------|------|:---------:|------|
-| (없음 — Store Hero는 Store Template 전용으로 Core 슬롯 대상 아님) | | | |
-
----
-
 ## 5. 페이지 내부 슬롯 (향후 확장)
 
 Phase 1에서는 정의만 하고 구현 보류.

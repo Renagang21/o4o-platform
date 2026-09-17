@@ -2,7 +2,7 @@
  * OperatorResourcesConsolePage — 운영자 자료실 관리 wrapper.
  *
  * WO-O4O-OPERATOR-RESOURCES-CANONICAL-COMMONIZATION-V1
- *   KPA / GlycoPharm / K-Cosmetics 3 service 의 OperatorResourcesPage 통합.
+ *   KPA / K-Cosmetics 2 service 의 OperatorResourcesPage 통합.
  *
  * WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §3
  *   원장별 lifecycle 차이(상태 집합 · 허용 전이 · 삭제 지원 · 등록/편집 지원)를
@@ -98,7 +98,7 @@ function formatDate(iso: string): string {
 }
 
 function unwrapList(res: any): { items: ResourcesConsoleItem[]; total: number } {
-  // GP 의 axios wrapper 와 KPA 의 apiClient wrapper 의 응답 shape 변형 모두 흡수.
+  // 서비스별 axios wrapper 와 KPA 의 apiClient wrapper 의 응답 shape 변형 모두 흡수.
   const d = res?.data?.data ?? res?.data ?? res;
   return {
     items: d?.items ?? [],

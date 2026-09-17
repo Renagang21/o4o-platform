@@ -23,7 +23,6 @@
 | 서비스 | Settings/Security 화면 | route |
 |---|---|---|
 | KPA-Society | `services/web-kpa-society/src/pages/mypage/MySettingsPage.tsx` · `MyProfilePage.tsx` | `/mypage/settings` · `/mypage/profile` |
-| GlycoPharm | `services/web-glycopharm/src/pages/mypage/MySettingsPage.tsx` | `/mypage/settings` |
 | K-Cosmetics | `services/web-k-cosmetics/src/pages/mypage/MySettingsPage.tsx` | `/mypage/settings` |
 | Neture | `services/web-neture/src/pages/mypage/MySettingsPage.tsx` | `/mypage/settings` |
 | Pharmacy-Hub | `services/web-pharmacy-hub/src/pages/account/MyProfilePage.tsx` | `/account` (+ `/store-owner/account` 호환) |
@@ -36,7 +35,7 @@ Pharmacy-Hub 는 `/mypage` 축이 없다. §13 계약대로 `/account` 를 유�
 
 ## 3. 16기능 census (현재 main 실측)
 
-| # | 기능 | KPA | GP | KCos | Neture | PH | 판정 |
+| # | 기능 | KPA | KCos | Neture | PH | 판정 |
 |:--:|---|---|---|---|---|---|---|
 | 1 | 설정 Home/Section | ✅ | ✅ | ✅ | ✅ | ✅(/account) | FULLY_COMMON (`SettingsSection`) |
 | 2 | 비밀번호 변경 | ✅ | ✅ | ✅ | ✅ | ✅ | FULLY_COMMON (`AccountSecuritySettings`+`PasswordChangeModal`) |
@@ -67,7 +66,7 @@ Pharmacy-Hub 는 `/mypage` 축이 없다. §13 계약대로 `/account` 를 유�
 - KPA `/mypage/settings` — `모든 기기 로그아웃` 을 로컬 `window.confirm` + 자체 danger Card 로 재구현 (**VIEW_DUPLICATED / CORE_ONLY**). 비밀번호 변경 진입은 `/mypage/profile` 에 별도 존재(IA 분기).
 - KPA `/mypage/profile` — `SecuritySection` + `PasswordChangeModal` 직접 조립 + KPA 전용 오류 문구 (**CORE_ONLY**).
 - Pharmacy-Hub `/account` — `SecuritySection` + 수제 세션 Card + `PasswordChangeModal` 직접 조립 (**CORE_ONLY**).
-- GP / KCos / Neture — 이미 `AccountSecuritySettings` (**FULLY_COMMON**).
+- KCos / Neture — 이미 `AccountSecuritySettings` (**FULLY_COMMON**).
 
 **After**
 
@@ -106,7 +105,7 @@ Pharmacy-Hub 는 `/mypage` 축이 없다. §13 계약대로 `/account` 를 유�
 
 - 계약: `PUT /api/v1/users/password` (+ `serviceKey`) — `apps/api-server/src/modules/user/controllers/user.controller.ts`.
   `serviceKey` 있으면 `service_memberships` 확인 후 `service_credentials` upsert, 없으면 V1 fallback(`users.password`).
-- 5 서비스 전부 serviceKey 를 보낸다: `kpa-society`(mypageApi 주입) · `glycopharm` · `k-cosmetics` · `neture` · `pharmacy-hub`(`pharmacyHubAccount.changeAccountPassword`).
+- 4 서비스 전부 serviceKey 를 보낸다: `kpa-society`(mypageApi 주입) · `k-cosmetics` · `neture` · `pharmacy-hub`(`pharmacyHubAccount.changeAccountPassword`).
 - Identity V2 write 정책 · serviceKey 처리 · operator password contract **변경 0** (§10).
 - 비밀번호 값은 공통 모달 밖으로 나가지 않는다(호출자 화면에 저장/로깅 없음).
 
@@ -163,7 +162,6 @@ KPA 의 과거 "계정 탈퇴" mock 은 `WO-O4O-MYPAGE-TIER1-DEAD-STUB-CLEANUP-V
 | 서비스 | 확장 | 처리 |
 |---|---|---|
 | KPA | 알림 수신 설정 toggle 3종 | SERVICE_SPECIFIC 으로 화면에 잔존 (알림 backend/model 공통화는 §14 대로 착수하지 않음) |
-| GlycoPharm | 2단계 인증 "준비 중" | 기존 `showTwoFactorNotice` prop |
 | KCos / Neture | 설명 문구 | prop |
 | PH | Profile 과 동일 화면 | `/mypage` 축 부재 (계약 유지) |
 
@@ -174,7 +172,6 @@ KPA 의 과거 "계정 탈퇴" mock 은 `WO-O4O-MYPAGE-TIER1-DEAD-STUB-CLEANUP-V
 | 서비스 | Before | After |
 |---|---|---|
 | KPA-Society | VIEW_DUPLICATED + CORE_ONLY | **FULLY_COMMON** (+ KPA 고유 알림 확장) |
-| GlycoPharm | FULLY_COMMON | FULLY_COMMON (변경 없음) |
 | K-Cosmetics | FULLY_COMMON | FULLY_COMMON (변경 없음) |
 | Neture | FULLY_COMMON | FULLY_COMMON (변경 없음) |
 | Pharmacy-Hub | CORE_ONLY | **FULLY_COMMON** |
@@ -189,7 +186,6 @@ KPA 의 과거 "계정 탈퇴" mock 은 `WO-O4O-MYPAGE-TIER1-DEAD-STUB-CLEANUP-V
 |---|:--:|:--:|---|
 | KPA `/mypage/settings` | PASS | PASS | 없음 (375/390) |
 | KPA `/mypage/profile` | PASS (링크 행 정상) | PASS | 없음 |
-| GlycoPharm `/mypage/settings` | PASS | PASS | 없음 (382/390) |
 | K-Cosmetics `/mypage/settings` | PASS | PASS | 없음 (375/390) |
 | Neture `/mypage/settings` | PASS | PASS | 없음 (390/390) |
 | PH `/account` | PASS | PASS | 없음 (375/390) |

@@ -34,7 +34,7 @@ KPA-Society admin 에서 footer 법정정보(`service_legal_profiles`, serviceKe
 
 - 공유 `@o4o/operator-core-ui/modules/service-legal` `ServiceLegalSettingsPage` 재사용.
 - WO §5.3 우선순위 적용: 공유 컴포넌트에 **탭 제어 prop(`enabledTabs`)** 을 추가(option 2 실현). KPA wrapper 는 `enabledTabs={['profile']}` 로 **법정정보 탭만** 노출 → service_policy_documents 편집(정책 문서 탭)·공개상태 탭 숨김.
-- `enabledTabs` 는 optional(미지정 시 전체 3탭) → GP/KCos/Neture 무영향(backward-compatible, 4 서비스 tsc 검증).
+- `enabledTabs` 는 optional(미지정 시 전체 3탭) → KCos/Neture 무영향(backward-compatible, 3 서비스 tsc 검증).
 - 숨긴 탭은 `service_policy_documents` 조회 자체를 skip(loadPolicies 가드).
 - KPA wrapper 상단에 안내문구: "이 화면은 footer 법정정보를 관리합니다. 약관·개인정보처리방침 문서는 운영자 → 법률 관리에서 관리됩니다." (WO §6.2)
 
@@ -57,14 +57,13 @@ KPA-Society admin 에서 footer 법정정보(`service_legal_profiles`, serviceKe
 ## 9. 보존 확인 (회귀 없음)
 
 - `/policy`·`/privacy`·`/operator/legal`·문의 설정(`/admin/settings/contact`)·회원 관리(`/admin/members`) 코드 미변경.
-- GP/KCos/Neture 소스 미수정(공유 모듈 optional prop 만 추가) — 4 서비스 tsc PASS 로 backward-compat 확인.
+- KCos/Neture 소스 미수정(공유 모듈 optional prop 만 추가) — 3 서비스 tsc PASS 로 backward-compat 확인.
 
 ## 10. typecheck 결과
 
 | 대상 | 명령 | 결과 |
 |---|---|---|
 | web-kpa-society (신규 wiring) | `tsc --noEmit` | PASS (EXIT 0) |
-| web-glycopharm (공유 모듈 소비처) | `tsc -b --noEmit` | PASS |
 | web-k-cosmetics (소비처) | `tsc --noEmit` | PASS |
 | web-neture (소비처) | `tsc --noEmit` | PASS |
 | web-kpa-society build | `vite build` | PASS (✓ built) |

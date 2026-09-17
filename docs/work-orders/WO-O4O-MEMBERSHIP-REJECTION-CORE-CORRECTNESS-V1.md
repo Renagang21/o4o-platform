@@ -9,7 +9,6 @@
 ```text
 Neture
 KPA Society
-GlycoPharm
 K-Cosmetics
 Pharmacy-Hub
 ```
@@ -85,7 +84,6 @@ QueryResult
 ```text
 Neture
 KPA Society
-GlycoPharm
 K-Cosmetics
 Pharmacy-Hub
 admin/operator 공통 membership API
@@ -346,7 +344,6 @@ ActionLog 식별자 정상
 ```text
 Neture
 KPA Society
-GlycoPharm
 K-Cosmetics
 Pharmacy-Hub
 ```

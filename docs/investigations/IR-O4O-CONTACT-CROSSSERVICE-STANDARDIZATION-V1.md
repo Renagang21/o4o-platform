@@ -1,7 +1,7 @@
 # IR-O4O-CONTACT-CROSSSERVICE-STANDARDIZATION-V1
 
 > **유형:** Read-only 조사 (코드/DB/route 변경 없음, 문서 1개만 생성)
-> **목적:** O4O 4개 서비스(GlycoPharm / K-Cosmetics / KPA Society / Neture)의 Contact Us / 문의 접수 구조를 비교 조사하고, Neture/KPA를 신규 `ContactInquiry` 공통 구조로 표준화할지 여부를 결정하기 위한 기준선과 권고안을 제시한다.
+> **목적:** O4O 3개 서비스(K-Cosmetics / KPA Society / Neture)의 Contact Us / 문의 접수 구조를 비교 조사하고, Neture/KPA를 신규 `ContactInquiry` 공통 구조로 표준화할지 여부를 결정하기 위한 기준선과 권고안을 제시한다.
 > **작성일:** 2026-06-13
 > **선행 WO:** `WO-O4O-CONTACT-DELIVERY-AND-NOTIFICATION-V1`, `WO-O4O-CONTACT-INQUIRY-ADMIN-MANAGEMENT-V1`, `WO-O4O-SERVICE-CONTACT-SETTINGS-ADMIN-V1`, `WO-O4O-CONTACT-EMAIL-NOTIFICATION-V1`, `WO-O4O-CONTACT-AUTO-REPLY-V1`, `WO-O4O-PUBLIC-INFO-LEGAL-CONTACT-STRUCTURE-MILESTONE-V1`
 
@@ -21,14 +21,14 @@
 
 ---
 
-## 1. GP/KCos 신규 구조 기준선 (Baseline Reference)
+## 1. KCos 신규 구조 기준선 (Baseline Reference)
 
-GlycoPharm·K-Cosmetics가 사용하는 신규 공통 Contact 구조. 모든 비교의 기준선이다.
+K-Cosmetics가 사용하는 신규 공통 Contact 구조. 모든 비교의 기준선이다.
 
 ### 1.1 저장 — `ContactInquiry` / `contact_inquiries`
 
 - **Entity:** [apps/api-server/src/modules/contact-inquiry/entities/ContactInquiry.entity.ts](../../apps/api-server/src/modules/contact-inquiry/entities/ContactInquiry.entity.ts)
-- **주요 컬럼:** `service_key`(glycopharm|k-cosmetics), `inquiry_type`(5종), `name`/`email`/`phone`/`organization_name`/`subject`/`message`, `privacy_consent`(필수 true), `status`(received|in_review|answered|closed|spam), `source_path`, `user_agent`, **`ip_hash`(SHA256, 원문 미저장)**, **`notification_status`**(`inapp:<x>;email:<y>;autoreply:<z>`), `handled_at`/`handled_by`/`internal_note`
+- **주요 컬럼:** `service_key`(k-cosmetics), `inquiry_type`(5종), `name`/`email`/`phone`/`organization_name`/`subject`/`message`, `privacy_consent`(필수 true), `status`(received|in_review|answered|closed|spam), `source_path`, `user_agent`, **`ip_hash`(SHA256, 원문 미저장)**, **`notification_status`**(`inapp:<x>;email:<y>;autoreply:<z>`), `handled_at`/`handled_by`/`internal_note`
 - **Migration:** `20261105000000-CreateContactInquiries.ts`
 
 ### 1.2 설정 — `ServiceContactSettings` / `service_contact_settings`
@@ -40,7 +40,7 @@ GlycoPharm·K-Cosmetics가 사용하는 신규 공통 Contact 구조. 모든 비
 ### 1.3 공개 submit — `POST /api/v1/public/services/:serviceKey/contact-inquiries`
 
 - **Controller:** [public-contact-inquiry.controller.ts](../../apps/api-server/src/modules/contact-inquiry/public-contact-inquiry.controller.ts)
-- **방어:** honeypot(`company_website`) / `privacyConsent===true` 강제 / email regex / message 10~5000자 / IP SHA256 hash / HTML escape(`esc()`) / serviceKey 화이트리스트(glycopharm·k-cosmetics) → 미일치 404
+- **방어:** honeypot(`company_website`) / `privacyConsent===true` 강제 / email regex / message 10~5000자 / IP SHA256 hash / HTML escape(`esc`) / serviceKey 화이트리스트(k-cosmetics) → 미일치 404
 - **알림(접수와 분리, best-effort):** ① in-app(`role_assignments`의 `{prefix}:operator`+`{prefix}:admin`, type `contact.new`) ② operator email(`recipient_emails`) ③ 문의자 자동회신 — 결과를 `notification_status = inapp:<x>;email:<y>;autoreply:<z>`로 기록. **알림 실패해도 접수(201) 성공**
 
 ### 1.4 Admin 관리 API
@@ -52,10 +52,10 @@ GlycoPharm·K-Cosmetics가 사용하는 신규 공통 Contact 구조. 모든 비
 
 ### 1.5 Frontend (공통 컴포넌트)
 
-- **공개 폼:** `PublicContactForm` @ [packages/shared-space-ui/src/legal/PublicContactForm.tsx](../../packages/shared-space-ui/src/legal/PublicContactForm.tsx) — GP/KCos 공유
+- **공개 폼:** `PublicContactForm` @ [packages/shared-space-ui/src/legal/PublicContactForm.tsx](../../packages/shared-space-ui/src/legal/PublicContactForm.tsx) — KCos 공유
 - **Admin 문의 관리:** `ContactInquiryAdminPage` @ `@o4o/operator-core-ui/modules/contact-inquiry` → `/admin/contact-inquiries`
 - **Admin 설정:** `ServiceContactSettingsPage` @ `@o4o/operator-core-ui/modules/service-contact-settings` → `/admin/settings/contact`
-- GP/KCos는 얇은 wrapper(API adapter + serviceKey)만 보유, 본체는 전부 공통 패키지
+- KCos는 얇은 wrapper(API adapter + serviceKey)만 보유, 본체는 전부 공통 패키지
 
 ---
 
@@ -112,28 +112,28 @@ GlycoPharm·K-Cosmetics가 사용하는 신규 공통 Contact 구조. 모든 비
 
 ## 4. 4서비스 비교표
 
-| 항목 | GlycoPharm | K-Cosmetics | KPA Society | Neture |
-|------|:---:|:---:|:---:|:---:|
-| Public Contact route | `/contact` | `/contact` | `/contact`(모달) | `/contact` |
-| 공개 폼 컴포넌트 | 공통 `PublicContactForm` | 공통 동일 | 커스텀 모달 | 커스텀 페이지 |
-| Submit API | `/public/services/glycopharm/contact-inquiries` | `.../k-cosmetics/...` | `/api/v1/kpa/contact-requests` | `/neture/contact` |
-| 저장 entity/table | `ContactInquiry`/`contact_inquiries` | 동일 | `ContactRequest`/`contact_requests` | `NetureContactMessage`/`neture_contact_messages` |
-| serviceKey 보유 | ✅ `service_key` | ✅ | ✅ `service_key` | ⚠️ 컬럼 없음(전용 테이블) |
-| 데이터 저장 | ✅ DB | ✅ DB | ✅ DB | ✅ DB |
-| status enum | received/in_review/answered/closed/spam | 동일 | pending/reviewing/done | new/in_progress/resolved |
-| inquiry type | 5종 | 5종 | partner/education(2) | supplier/partner/service/other(4) |
-| in-app 알림 | ✅ `contact.new` | ✅ | ✅ `contact.new` | ✅ `contact.new` |
-| 운영자 email 알림 | ✅ (설정) | ✅ | ❌ | ❌ |
-| 문의자 자동회신 | ✅ (설정) | ✅ | ❌ | ❌ |
-| Admin 문의 관리 | ✅ `/admin/contact-inquiries`(공통) | ✅ (공통) | ❌ (operator만) | ✅ `/admin/contact-messages`(커스텀) |
-| Operator 문의 관리 | — | — | ✅ `/operator/collaboration-requests` | ✅ `/operator/contact-messages` |
-| Contact 설정 Admin | ✅ `/admin/settings/contact`(공통) | ✅ (공통) | ❌ | ❌ |
-| 개인정보 동의 | ✅ `privacy_consent` 필수 | ✅ | ❌ | ❌ |
-| IP 처리 | SHA256 hash | 동일 | 미저장 | ⚠️ **원문 저장** |
-| spam/honeypot | honeypot+consent+길이 | 동일 | 길이/형식 | 형식 |
+| 항목 | K-Cosmetics | KPA Society | Neture |
+|------|:---:|:---:|:---:|
+| Public Contact route | `/contact` | `/contact`(모달) | `/contact` |
+| 공개 폼 컴포넌트 | 공통 동일 | 커스텀 모달 | 커스텀 페이지 |
+| Submit API | `.../k-cosmetics/...` | `/api/v1/kpa/contact-requests` | `/neture/contact` |
+| 저장 entity/table | 동일 | `ContactRequest`/`contact_requests` | `NetureContactMessage`/`neture_contact_messages` |
+| serviceKey 보유 | ✅ | ✅ `service_key` | ⚠️ 컬럼 없음(전용 테이블) |
+| 데이터 저장 | ✅ DB | ✅ DB | ✅ DB |
+| status enum | 동일 | pending/reviewing/done | new/in_progress/resolved |
+| inquiry type | 5종 | partner/education(2) | supplier/partner/service/other(4) |
+| in-app 알림 | ✅ | ✅ `contact.new` | ✅ `contact.new` |
+| 운영자 email 알림 | ✅ | ❌ | ❌ |
+| 문의자 자동회신 | ✅ | ❌ | ❌ |
+| Admin 문의 관리 | ✅ (공통) | ❌ (operator만) | ✅ `/admin/contact-messages`(커스텀) |
+| Operator 문의 관리 | — | ✅ `/operator/collaboration-requests` | ✅ `/operator/contact-messages` |
+| Contact 설정 Admin | ✅ (공통) | ❌ | ❌ |
+| 개인정보 동의 | ✅ | ❌ | ❌ |
+| IP 처리 | 동일 | 미저장 | ⚠️ **원문 저장** |
+| spam/honeypot | 동일 | 길이/형식 | 형식 |
 | 권한 guard | `requireServiceLegalScope('admin')` | 동일 | `requireKpaScope('operator')` | `requireNetureScope('admin'\|'operator')` |
-| `notification_status` 기록 | ✅ | ✅ | ❌ | ❌ |
-| 통합 위험 | (기준선) | (기준선) | 중 (route/enum/UI 재정렬) | 중 (route/enum/UI + IP 정책) |
+| `notification_status` 기록 | ✅ | ❌ | ❌ |
+| 통합 위험 | (기준선) | 중 (route/enum/UI 재정렬) | 중 (route/enum/UI + IP 정책) |
 
 ---
 
@@ -152,7 +152,7 @@ Neture/KPA를 `ContactInquiry`로 옮길 경우 회귀가 발생할 수 있는 �
 | B7 | IP 정책 변경 — Neture는 IP 원문 저장 중 → 표준은 SHA256 hash. 기존 row의 ipAddress 처리 정책 필요 | ✅ | — |
 | B8 | KPA `kpa:operator` 스코프 ↔ 표준 `requireServiceLegalScope('admin')` 권한 모델 정렬 (KPA는 admin 스코프 부재) | — | ✅ |
 | B9 | 기존 데이터 이관 — `neture_contact_messages`, `contact_requests` → `contact_inquiries` (단, **§12 disposable 정책상 재시드 가능**) | ✅ | ✅ |
-| B10 | serviceKey 화이트리스트 확장 (`['glycopharm','k-cosmetics']`에 `neture`,`kpa-society` 추가) — 신규 운영자 email 대상 role prefix 정렬 | ✅ | ✅ |
+| B10 | serviceKey 화이트리스트 확장 — 신규 운영자 email 대상 role prefix 정렬 | ✅ | ✅ |
 
 > **완화 요인:** 메모리 기준 O4O 운영 DB 데이터는 현재 disposable(서비스 전 단계)이므로 **B9(데이터 이관)의 비용은 낮다** — backfill 대신 재시드로 처리 가능. 가장 비싼 항목은 B4/B5(프론트 폼·운영 UI 교체)다.
 
@@ -162,12 +162,12 @@ Neture/KPA를 `ContactInquiry`로 옮길 경우 회귀가 발생할 수 있는 �
 
 | 서비스 | 문의 관리 위치 | 권한 guard | 비고 |
 |--------|------|------|------|
-| GP/KCos | **Admin** (`/admin/contact-inquiries`, `/admin/settings/contact`) | `requireServiceLegalScope('admin')` | 표준. 설정은 Admin, 처리도 Admin |
+| KCos | **Admin** (`/admin/contact-inquiries`, `/admin/settings/contact`) | `requireServiceLegalScope('admin')` | 표준. 설정은 Admin, 처리도 Admin |
 | Neture | **Admin + Operator 병존** (`/admin/contact-messages` 처리, `/operator/contact-messages` 읽기) | `requireNetureScope('admin'\|'operator')` | operator는 PII 제외·preview만. **이중 IA** |
 | KPA | **Operator 전용** (`/operator/collaboration-requests`) | `requireKpaScope('operator')` | admin 스코프 부재. "협업 문의"는 운영자 업무 흐름 |
 
 **원칙 대비:**
-- (1) 설정은 Admin 영역 — GP/KCos만 충족. Neture/KPA는 설정 화면 자체가 없음
+- (1) 설정은 Admin 영역 — KCos만 충족. Neture/KPA는 설정 화면 자체가 없음
 - (2) 조회/처리는 권한자만 — 4서비스 모두 충족(공개 submit 외 전부 scope guard)
 - (3) 일반 사용자 접근 불가 — 충족
 - (4) 개인정보 경계 — Neture operator는 PII 마스킹·preview로 분리, **KPA는 operator가 전체 필드 열람**(분리 약함)
@@ -177,7 +177,7 @@ Neture/KPA를 `ContactInquiry`로 옮길 경우 회귀가 발생할 수 있는 �
 
 ## 7. 개인정보 / 보안 조사 결과
 
-| 항목 | GP/KCos | Neture | KPA |
+| 항목 | KCos | Neture | KPA |
 |------|:---:|:---:|:---:|
 | 개인정보 동의 문구/체크박스 | ✅ `privacy_consent` 필수 | ❌ | ❌ |
 | 이름/이메일/전화 저장 | ✅ | ✅ | ✅ |
@@ -196,7 +196,7 @@ Neture/KPA를 `ContactInquiry`로 옮길 경우 회귀가 발생할 수 있는 �
 
 | 옵션 | 내용 | 회귀 위험 | 표준화 수준 | DB 변경 | 데이터 이관 |
 |:---:|------|:---:|:---:|:---:|:---:|
-| **A** | 현행 유지 (GP/KCos만 신규) | 없음 | 낮음 | 없음 | 없음 |
+| **A** | 현행 유지 (KCos만 신규) | 없음 | 낮음 | 없음 | 없음 |
 | **B** | Neture/KPA를 `ContactInquiry`로 단계적 이관 | 중 | 최고 | 큼 | 필요(재시드 가능) |
 | **C** | 기존 저장 유지 + 공통 Admin UI를 adapter로 연결 | 낮음 | 중 | 작음 | 없음 |
 | **D** | 기존 저장 유지 + `ServiceContactSettings` 기반 설정/알림(email·자동회신)만 표준화 | 낮음 | 중상 | 작음(설정 테이블 재사용/확장) | 없음 |
@@ -281,7 +281,7 @@ Neture/KPA의 기존 저장(`neture_contact_messages`, `contact_requests`)·공�
 - [x] 코드/DB/migration/route/frontend 변경 없음 (read-only)
 - [x] Neture Contact 구조 조사 (§2) — DB 저장 + in-app 알림, `NetureContactMessage`
 - [x] KPA Contact 구조 조사 (§3) — DB 저장 + in-app 알림, `ContactRequest`
-- [x] GP/KCos 신규 구조 기준선 정리 (§1)
+- [x] KCos 신규 구조 기준선 정리 (§1)
 - [x] 4서비스 비교표 (§4)
 - [x] 저장소/API/Admin/알림/설정 차이 정리 (§4~§7)
 - [x] 통합 옵션 A~E 비교 (§8)

@@ -178,7 +178,7 @@
 ### 4.3 후보 3: 사용자가 다른 진입처에서 보고 있음 (★ 가능성 낮음)
 
 **근거**:
-- `AiContentModal` 진입처는 6곳: [CourseEditPage](services/web-kpa-society/src/pages/instructor/courses/CourseEditPage.tsx) / [ResourceWritePage](services/web-kpa-society/src/pages/resources/ResourceWritePage.tsx) / [ContentWritePage](services/web-kpa-society/src/pages/contents/ContentWritePage.tsx) / [PharmacyBlogPage (KPA)](services/web-kpa-society/src/pages/pharmacy/PharmacyBlogPage.tsx) / [PharmacyBlogPage (glycopharm)](services/web-glycopharm/src/pages/store-management/PharmacyBlogPage.tsx) / [Toolbar.tsx](packages/content-editor/src/components/Toolbar.tsx).
+- `AiContentModal` 진입처는 6곳: [CourseEditPage](services/web-kpa-society/src/pages/instructor/courses/CourseEditPage.tsx) / [ResourceWritePage](services/web-kpa-society/src/pages/resources/ResourceWritePage.tsx) / [ContentWritePage](services/web-kpa-society/src/pages/contents/ContentWritePage.tsx) / [PharmacyBlogPage (KPA)](services/web-kpa-society/src/pages/pharmacy/PharmacyBlogPage.tsx) / [PharmacyBlogPage ] / [Toolbar.tsx](packages/content-editor/src/components/Toolbar.tsx).
 - 이 중 `CourseEditPage`만 `initialSourceTab="url"` 명시. 나머지 5곳은 default 'text'.
 - 사용자가 "AI 레슨 초안 만들기"라는 LMS 진입처 어휘를 사용했으므로 다른 진입처와 혼동 가능성은 낮음.
 - 그러나 어휘만으로는 확실하지 않으므로 사용자에게 어떤 페이지에서 버튼을 눌렀는지 재확인 필요.
@@ -289,7 +289,7 @@ useEffect(() => {
 | ResourceWritePage | (미전달) → 'text' | close 후 reopen 시 'text'로 reset (기존 동작과 동일) |
 | ContentWritePage | (미전달) → 'text' | 동일 |
 | PharmacyBlogPage (KPA) | (미전달) → 'text' | 동일 |
-| PharmacyBlogPage (glycopharm) | (미전달) → 'text' | 동일 |
+| PharmacyBlogPage | (미전달) → 'text' | 동일 |
 | Toolbar.tsx | (미전달) → 'text' | 동일 |
 
 → **모든 진입처에서 회귀 없음**. LMS만 의도된 reset, 나머지는 'text' default로 reset이지만 어차피 close되면 입력도 지워지므로 사용자 영향 동일.

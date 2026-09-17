@@ -17,7 +17,7 @@
 
 ## 4. 범위
 포함: IdlePlaylistItem에 youtube/vimeo(additive), 편집기 입력/판별/미리보기, IdleOverlay iframe 재생(무음/loop/playsinline), idle·products optional tabletId, TabletStorePage query 전달, 편성 화면 코너별 공개 URL 복사, 자동 복귀 검증, 저장 API 검증.
-제외: QR Core, 소비자/CRM/상담/주문/결제, 앱/글래스/네이티브 kiosk, 완전한 device pairing/비밀키, O4O 자체 인코딩/스트리밍, YouTube/Vimeo API 연동, 사이니지 runtime 통합, GP/KCos 확장, 신규 마이그레이션.
+제외: QR Core, 소비자/CRM/상담/주문/결제, 앱/글래스/네이티브 kiosk, 완전한 device pairing/비밀키, O4O 자체 인코딩/스트리밍, YouTube/Vimeo API 연동, 사이니지 runtime 통합, KCos 확장, 신규 마이그레이션.
 
 ## 5. 구현 요지
 - kiosk-core `idleMedia.ts`: `detectIdleMediaType`(image/video/youtube/vimeo), `toIdleEmbedUrl`(autoplay/mute/loop/playsinline/controls=0). videoEmbed(services)를 역참조하지 않도록 패키지 내부에 둠.

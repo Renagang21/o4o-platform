@@ -15,8 +15,6 @@
 | `apps/api-server/src/services/cart/store-cart.service.ts` | `SupplierGroup` 에 `shipping`(shippingFee/freeShippingApplied/freeShippingThreshold/remainingForFreeShipping/policyConfigured) + `displayTotal` 추가. `loadShippingPolicies`(neture_suppliers batch, uuid only, 실패/미설정→0원 fallback) + `buildGroupShipping`(calculateSupplierShippingFee 사용). groupBySupplier·buildCheckoutPreview 보강. preview 에 displayItemsSubtotal/displayShippingTotal/displayGrandTotal(=상품+배송) |
 | `services/web-kpa-society/src/api/storeCart.ts` | `SupplierGroupShipping` + SupplierGroup.shipping/displayTotal 타입 |
 | `services/web-kpa-society/src/pages/store-cart/StoreCartPage.tsx` | 공급자별 상품금액/배송비/공급자 합계 + 무료배송 안내 + 요약(상품/배송비/총액) |
-| `services/web-glycopharm/src/api/storeCart.ts` | 동일 타입 |
-| `services/web-glycopharm/src/pages/store-cart/StoreCartPage.tsx` | 동일(Tailwind, teal) |
 | `services/web-k-cosmetics/src/api/storeCart.ts` | 동일 타입 |
 | `services/web-k-cosmetics/src/pages/store-cart/StoreCartPage.tsx` | 동일(Tailwind, pink) |
 
@@ -33,7 +31,7 @@
 ## 3. 검증
 
 ### 3.1 TypeScript
-- api-server 0 · web-kpa-society 0 · web-glycopharm 0 · web-k-cosmetics 0 ✅
+- api-server 0 · web-kpa-society 0 · web-k-cosmetics 0 ✅
 
 ### 3.2 API smoke (production `o4o-core-api-02077`, serviceKey kpa-society)
 | 항목 | 결과 |
@@ -51,7 +49,7 @@
 - 주문 확정 / 장바구니 비우기 버튼 기존 동작 유지 ✅
 
 ## 4. 미실증 (graceful)
-- **비-zero 배송비 / 무료배송 충족 math**: 프로덕션 supplier 3건 모두 base_shipping_fee 미설정 → 라이브로 fee>0 / freeShippingApplied=true 경로 실증 불가. 계산식(`calculateSupplierShippingFee`)은 production createOrder 가 쓰는 동일 순수함수로 검증됨. 공급자가 정책 설정 시 자동 활성. (Glyco/KCos 브라우저는 동일 코드·동일 backend라 KPA 로 대표 검증.)
+- **비-zero 배송비 / 무료배송 충족 math**: 프로덕션 supplier 3건 모두 base_shipping_fee 미설정 → 라이브로 fee>0 / freeShippingApplied=true 경로 실증 불가. 계산식(`calculateSupplierShippingFee`)은 production createOrder 가 쓰는 동일 순수함수로 검증됨. 공급자가 정책 설정 시 자동 활성.
 
 ## 5. 회귀 무영향
 - cart add/update/remove/clear, checkout-confirm, participate, createOrder/정산/결제 **무변경**.

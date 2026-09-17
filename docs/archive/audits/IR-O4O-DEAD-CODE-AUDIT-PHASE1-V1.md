@@ -1,7 +1,6 @@
 # IR-O4O-DEAD-CODE-AUDIT-PHASE1-V1
 
 **날짜:** 2026-03-20
-**범위:** api-server, web-neture, web-glycopharm, web-glucoseview, web-k-cosmetics, web-kpa-society, packages
 **유형:** 조사 전용 (수정 없음)
 
 ---
@@ -12,7 +11,6 @@
 |--------|:-----------:|:----:|:------------:|:----:|
 | **api-server** | 17 | 1 | 5 | 23 |
 | **web-neture** | 3 | 1 | 0 | 4 |
-| **web-glycopharm** | 2 | 1 | 0 | 3 |
 | **web-glucoseview** | 1 | 0 | 0 | 1 |
 | **web-k-cosmetics** | 5 | 1 | 0 | 6 |
 | **web-kpa-society** | 3 | 0 | 0 | 3 |
@@ -61,7 +59,7 @@
 | B16 | `controllers/ThemeController.ts` | controller | SAFE REMOVE | 소비자: theme.routes.ts만 (미등록). import 0건 | 없음 |
 | B17 | `controllers/adminController.ts` | controller | SAFE REMOVE | 어떤 라우트에서도 import 안 됨. `approveUser`/`rejectUser` 등 named export가 라우트에서 직접 import 안 됨 (users.routes.ts는 별도 UserManagementController 사용) | 없음 |
 | B18 | `controllers/formController.ts` | controller | SAFE REMOVE | 자기 참조만 존재. 라우트 import 0건 | 없음 |
-| B19 | `controllers/autoRecoveryController.ts` | controller | NEEDS REVIEW | 라우트 import 0건이나 glycopharm 관련 잠재적 동적 import 가능성 확인 필요 | 낮음 |
+| B19 | `controllers/autoRecoveryController.ts` | controller | NEEDS REVIEW | — | 낮음 |
 
 #### 2.1.3 Dead 서비스
 
@@ -89,16 +87,6 @@
 | N4 | `pages/partner/ReferralLinkModal.tsx` | component | HOLD | import 0건이나 WO-O4O-PARTNER-LINK-CREATION-UX-V1 미완성 기능 가능성 | — | 낮음 |
 
 > **삭제 시 index.ts 정리 필요**: `pages/supplier/product/index.ts`, `pages/dashboard/index.ts`
-
----
-
-### 2.3 Frontend — web-glycopharm
-
-| # | 파일 경로 | 코드 유형 | 상태 | 근거 | 대체 파일 | 영향 |
-|---|----------|----------|------|------|----------|------|
-| G1 | `pages/HomeLivePage.tsx` | page | SAFE REMOVE | App.tsx 라우트 0건, import 0건 | LandingPage/CareDashboardPage | 없음 |
-| G2 | `pages/community/CommunityHubPage.tsx` | page | SAFE REMOVE | App.tsx 라우트 0건, CommunityMainPage로 대체됨 | CommunityMainPage | 없음 |
-| G3 | `pages/care/patient-tabs/SummaryTab.tsx` | component | HOLD | index.ts에서 export되나 PatientDetailPage에서 미사용 | — | 낮음 |
 
 ---
 
@@ -183,7 +171,6 @@
 
 **Frontend (14건)**:
 - N1~N3: web-neture 3건
-- G1~G2: web-glycopharm 2건
 - V1: web-glucoseview 1건
 - C1~C5: web-k-cosmetics 5건
 - K1~K3: web-kpa-society 3건
@@ -197,7 +184,6 @@
 
 - B5: `routes/v1/customizer.routes.ts` — 프론트엔드 `/api/v1/customizer/*` 호출 여부
 - B8: `routes/v1/preview.routes.ts` — 프론트엔드 iframe preview 프록시 호출 여부
-- B19: `controllers/autoRecoveryController.ts` — glycopharm 동적 import 가능성
 - B23: `routes/v2/query.routes.ts` — 모듈 로더 동적 import 가능성
 
 ### P2: Legacy 의심이나 추가 조사 필요
@@ -283,8 +269,6 @@ pages/operator/SupportPage.tsx
 web-neture: pages/partners/PartnersApplyPage.tsx
 web-neture: pages/supplier/product/SupplierProductSettingsPage.tsx
 web-neture: pages/dashboard/PartnerDashboardPage.tsx
-web-glycopharm: pages/HomeLivePage.tsx
-web-glycopharm: pages/community/CommunityHubPage.tsx
 web-glucoseview: services/health.ts
 web-kpa-society: pages/pharmacy/PharmacyDashboardPage.tsx
 web-kpa-society: pages/pharmacy/StoreOverviewPage.tsx

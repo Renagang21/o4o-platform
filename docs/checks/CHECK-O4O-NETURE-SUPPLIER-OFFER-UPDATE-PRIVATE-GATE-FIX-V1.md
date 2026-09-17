@@ -47,7 +47,6 @@ if (offer.distributionType === PRIVATE && (offer.allowedSellerIds?.length ?? 0) 
 |---|---|
 | 매장 HUB 상품 (`pharmacy-products.controller.ts`) | `buildPrivateSellerScopeSql` — `distribution_type <> 'PRIVATE' OR $x = ANY(allowed_seller_ids)` |
 | KPA checkout (`kpa-checkout.controller.ts:347`) | 동일 |
-| GlycoPharm checkout (`glycopharm/checkout.controller.ts:378`) | 동일 |
 | Neture B2B 장바구니 (`neture-b2b-cart-checkout.service.ts:221`) | 동일 |
 | 파트너 조달 목록 (`seller.service.ts:78`) | 동일 |
 
@@ -186,7 +185,6 @@ FROM supplier_product_offers WHERE deleted_at IS NULL;
 ## 11. push 결과
 
 `f05cb81c0..6d79a93fd  main -> main` — `HEAD == origin/main` 확인
-
 
 ---
 

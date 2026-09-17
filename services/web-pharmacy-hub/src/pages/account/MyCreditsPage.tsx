@@ -2,7 +2,7 @@
  * MyCreditsPage — 내 크레딧 (Pharmacy-Hub wrapper)
  *
  * WO-O4O-PHARMACYHUB-LMS-LEARNER-FULL-ADOPTION-V1 §15
- * "이수 학점(credits)" 은 KPA / K-Cosmetics / GlycoPharm 에서 실제 사용자 대상
+ * "이수 학점(credits)" 은 KPA / K-Cosmetics 에서 실제 사용자 대상
  * capability 다(학습 활동 리워드 적립 — lesson_complete / quiz_pass / course_complete).
  * 지급 경로(RewardPolicyService → PointService → CreditService)는 service-neutral 이며
  * 원장(`/api/v1/credits/*`)도 사용자 단위 플랫폼 공통이다 → PH 도 같은 화면을 채택한다.

@@ -6,7 +6,7 @@
  * Platform-wide canonical types for storefront_config (JSONB),
  * block layout, channel config, and template.
  *
- * All services (KPA, GlycoPharm, K-Cosmetics) share these types.
+ * All services (KPA, K-Cosmetics) share these types.
  */
 
 // ── Templates ────────────────────────────────────────────────────────────────

@@ -15,7 +15,7 @@
 
 ## 1. 배경 (Background)
 
-O4O Platform 은 5개 독립 서비스 (Neture / GlycoPharm / GlucoseView / KPA Society / K-Cosmetics) + Account Center 로 구성된다. 각 서비스는 **독립 사업자 + 독립 회원 + 독립 권한** 의 성격을 가진다.
+O4O Platform 은 5개 독립 서비스 (Neture / GlucoseView / KPA Society / K-Cosmetics) + Account Center 로 구성된다. 각 서비스는 **독립 사업자 + 독립 회원 + 독립 권한** 의 성격을 가진다.
 
 2026-03-13 작성된 Identity Architecture V1 은 "공통 password 모델" 을 baseline 으로 채택했다. 즉:
 
@@ -40,7 +40,7 @@ O4O 의 5개 철학 원칙은 다음과 같다:
 | 1 | 1 Email = 1 Identity (전역 통합) | ✅ 일치 |
 | 2 | 서비스는 독립 사업자 | ⚪ 부분 (membership/role 만 독립, credential 공유) |
 | 3 | 회원은 서비스 범위에서 독립 | ✅ 일치 |
-| 4 | **Credential 은 서비스 범위에서 독립** (KPA password ≠ GlycoPharm password 가능) | ❌ **충돌** |
+| 4 | **Credential 은 서비스 범위에서 독립** | ❌ **충돌** |
 | 5 | Role 은 서비스 범위에서 독립 | ✅ 일치 |
 
 V1 모델의 **password owner = User (전역)** 라는 전제가 **원칙 4 (Credential 의 서비스 범위 독립)** 와 정면 충돌함이 2026-05-23 의 [IR-O4O-SERVICE-SPECIFIC-PASSWORD-CREDENTIAL-ARCHITECTURE-AUDIT-V1](../investigations/IR-O4O-SERVICE-SPECIFIC-PASSWORD-CREDENTIAL-ARCHITECTURE-AUDIT-V1.md) §H 에서 확인되었다.
@@ -49,7 +49,7 @@ V1 모델의 **password owner = User (전역)** 라는 전제가 **원칙 4 (Cre
 
 | 한계 | 설명 |
 |------|------|
-| **단일 password 의 다중 서비스 공유** | 사용자가 KPA 에서 password 를 변경하면 GlycoPharm 에서도 같은 password 가 적용된다 — "독립 사업자" 와 위배 |
+| **단일 password 의 다중 서비스 공유** | — |
 | **회원가입 본인 확인의 불완전성** | 기존 사용자가 새 서비스에 가입할 때 "기존 password" 를 재사용해 본인 확인 — 다른 서비스의 password 가 새 서비스 운영자에게 노출되는 셈 |
 | **Service Handoff 의 의미 과부담** | "한 번 로그인하면 다른 서비스로 password 없이 이동" 이 공통 password 모델 위에서만 의미가 통한다 — 서비스 독립성과 양립하지 않음 |
 | **운영 사고 가능성** | "구조적으로 불가능" 이라는 V1 의 논리적 기반은 다른 모델 가능성을 차단해 사고 대응 폭을 좁힌다 |

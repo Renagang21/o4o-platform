@@ -24,7 +24,7 @@ Header 축은 이미 **공통화가 대부분 끝나 있다**. `@o4o/ui` `Global
 
 ## A. 모집단 (WO §5)
 
-`services/web-{kpa-society,k-cosmetics,glycopharm,pharmacy-hub,neture}` 및 이들이 소비하는 `packages/**` 의 Header · Footer · Layout · Shell · Nav 자산 전수.
+Footer · Layout · Shell · Nav 자산 전수.
 
 범례 — 분류: FC=FULLY_COMMON, CO=CORE_ONLY, VD=VIEW_DUPLICATED, SS=SERVICE_SPECIFIC, NI=NOT_IMPLEMENTED, OOS=OUT_OF_SCOPE
 
@@ -39,11 +39,11 @@ Header 축은 이미 **공통화가 대부분 끝나 있다**. `@o4o/ui` `Global
 | P5 | `packages/ui/src/layout/AGStorefrontLayout.tsx` | active | `apps/admin-dashboard` | 5서비스 0 | OOS |
 | P6 | `packages/ui/src/layout/AGPageHeader.tsx` | active | `apps/admin-dashboard` | 5서비스 0 | OOS |
 | P7 | `packages/shared-space-ui/src/legal/PublicLegalFooterInfo.tsx` (122) | active | 5/5 서비스 footer | 5/5 | FC |
-| P8 | `packages/shared-space-ui/src/legal/StoreFacingFooter.tsx` (74) | active | KPA/KCos/Glyco `App.tsx` | 3/5 | FC |
+| P8 | `packages/shared-space-ui/src/legal/StoreFacingFooter.tsx` (74) | active | — | 3/5 | FC |
 | P9 | `packages/shared-space-ui` `BlogPublicHeader` | active | 매장 블로그 공개 | 3 | FC |
 | P10 | `packages/shared-space-ui` `ForumPostHeader` | active | 포럼 본문 | 5 | OOS (본문 요소) |
-| P11 | `packages/store-ui-core` `StoreHubShell` | active | `/store-hub` | KPA/KCos/Glyco | FC |
-| P12 | `packages/store-ui-core` `MyStoreShell` | active | 매장 경영 | KPA/KCos/Glyco/PH | FC |
+| P11 | `packages/store-ui-core` `StoreHubShell` | active | `/store-hub` | — | FC |
+| P12 | `packages/store-ui-core` `MyStoreShell` | active | 매장 경영 | — | FC |
 | P13 | `packages/store-ui-core` `StoreDashboardLayout` | active | `MyStoreShell` 내부 | 4 | FC |
 | P14 | `packages/store-ui-core` `StoreTopBar` | active | 위 내부 | 4 | FC |
 | P15 | `packages/store-ui-core` `StoreHomeShell` | active | 본문 | — | OOS |
@@ -90,23 +90,6 @@ Header 축은 이미 **공통화가 대부분 끝나 있다**. `@o4o/ui` `Global
 | C6 | `components/layouts/OperatorLayoutWrapper.tsx` | 41 | active | `/operator/*` | FC |
 | C7 | `components/MobileBottomNav.tsx` | 254 | active | `/mobile/*` | **VD** |
 | C8 | `App.tsx` StoreLayoutWrapper (inline) | — | active | `/store/*` | FC |
-
-### A-4. GlycoPharm (12)
-
-| # | 파일 | LOC | 활성 | route | 분류 |
-|---|---|---|---|---|---|
-| G1 | `components/GlycoGlobalHeader.tsx` | 168 | active | 전 영역 | CO |
-| G2 | `components/common/Footer.tsx` | 133 | active | 공개 | CO |
-| G3 | `components/common/PageHeader.tsx` | — | active | 본문 | VD |
-| G4 | `components/layouts/MainLayout.tsx` | — | active | 공개 | FC |
-| G5 | `components/layouts/DashboardLayout.tsx` | — | active | 대시보드 | CO |
-| G6 | `components/layouts/GlycoPharmHubLayout.tsx` | — | active | `/hub/*` | FC |
-| G7 | `components/layouts/OperatorLayoutWrapper.tsx` | 41 | active | `/operator/*` | FC |
-| G8 | `components/layouts/StoreLayout.tsx` | — | active | `store/:pharmacyId` (App.tsx:959) | **SS** (매장 사업자 법정정보) |
-| G9 | `components/layouts/TabletLayout.tsx` | — | active | `store/:id/tablet` (975) | OOS (기기 UI) |
-| G10 | `components/layouts/KioskLayout.tsx` | — | active | `store/:id/kiosk` (967) | OOS (기기 UI) |
-| G11 | `components/MobileBottomNav.tsx` | 256 | active | `/mobile/*` | **VD** |
-| G12 | `App.tsx` StoreLayoutWrapper (inline) | — | active | `/store/*` | FC |
 
 ### A-5. Pharmacy-Hub (10)
 
@@ -164,7 +147,6 @@ Header 축은 이미 **공통화가 대부분 끝나 있다**. `@o4o/ui` `Global
 | 공통 패키지 | 12 | 0 | 0 | 0 | 0 | 10 | 22 |
 | KPA | 6 | 4 | 6 | 1 | 0 | 1 | 18 |
 | K-Cosmetics | 4 | 3 | 1 | 0 | 0 | 0 | 8 |
-| GlycoPharm | 4 | 3 | 2 | 1 | 0 | 2 | 12 |
 | Pharmacy-Hub | 3 | 2 | 0 | 0 | 5 | 0 | 10 |
 | Neture | 2 | 2 | 6 | 1 | 0 | 1 | 12 |
 
@@ -181,14 +163,14 @@ Header 축은 이미 **공통화가 대부분 끝나 있다**. `@o4o/ui` `Global
 
 | 그룹 | 파일 수 | 총 LOC | 서비스 | 실차이 | 제거가능 LOC(추정) |
 |---|---:|---:|---|---|---:|
-| **GROUP-H1 MobileBottomNav** | 4 | **1,030** | KPA 303 / KCos 254 / Glyco 256 / Neture 217 | 색상·라벨·active path·탭 수 | **~700** |
+| **GROUP-H1 MobileBottomNav** | 4 | **1,030** | — | 색상·라벨·active path·탭 수 | **~700** |
 | GROUP-F1 Neture inline footer | 5 | ~120 | Neture N3~N7 | 법정정보 유무, 링크 세트 | ~80 |
-| GROUP-F2 서비스 공개 Footer | 4 | 576 | KPA 151 / KCos 225 / Glyco 133 / PH 67 | 섹션 구성·SNS·법정정보 소스 | ~250 |
-| GROUP-H2 OperatorLayoutWrapper | 3 | 123 | KCos 41 / Glyco 41 / PH 83 | 헤더 주입·`isAdminOrAbove` scope 문자열 | ~40 (가치 낮음) |
-| GROUP-H3 PageHeader | 2 | — | KPA / Glyco | inline style ↔ Tailwind, breadcrumb ↔ icon+actions | 소 |
+| GROUP-F2 서비스 공개 Footer | 4 | 576 | — | 섹션 구성·SNS·법정정보 소스 | ~250 |
+| GROUP-H2 OperatorLayoutWrapper | 3 | 123 | — | 헤더 주입·`isAdminOrAbove` scope 문자열 | ~40 (가치 낮음) |
+| GROUP-H3 PageHeader | 2 | — | — | inline style ↔ Tailwind, breadcrumb ↔ icon+actions | 소 |
 | GROUP-H4 KPA Platform 셸 | 3 | ~250 | KPA K5~K7 | 공통 셸 미채택 drift | ~200 |
 
-**GROUP-H1 근거**: KCos↔Glyco `diff` 는 문서 주석 WO id, 라벨 텍스트, active 판정 헬퍼 이름/경로, 색상값만 달랐다. KCos↔KPA 215줄, KCos↔Neture 239줄 차이이며 Neture 는 홈/알림/내정보 2~3탭 유틸 변형(`useNotifications` + `NotificationSheet` 재사용)이다.
+KCos↔KPA 215줄, KCos↔Neture 239줄 차이이며 Neture 는 홈/알림/내정보 2~3탭 유틸 변형(`useNotifications` + `NotificationSheet` 재사용)이다.
 
 ---
 
@@ -201,7 +183,6 @@ Header 축은 이미 **공통화가 대부분 끝나 있다**. `@o4o/ui` `Global
 | `OperatorAreaShell` header slot | STRUCTURAL_DIFFERENCE(의도됨) | 브랜드·알림 차이를 slot 으로 흡수. 현 설계가 정답 |
 | PH `OperatorHeader`/`SupplierHeader` | FEATURE_DIFFERENCE | 다른 4서비스 대비 알림·프로필 드롭다운 없음 → 기능 격차(NI) |
 | PH `SupplierShell` | STRUCTURAL_DIFFERENCE | 공통 Supplier Shell 이 **존재하지 않음**. 파일 주석이 `OperatorAreaShell`/`StoreDashboardLayout` 재사용 불가 사유를 이미 기록(운영자 capability 어휘 결합, `StoreSidebar` 하드코딩, F3 Store Layer 경계) |
-| Glyco `StoreLayout` footer | STRUCTURAL_DIFFERENCE | **법정 주체가 매장 사업자**(사업자번호·통신판매번호·약사명)라 플랫폼 legal profile 로 대체 불가 → SERVICE_SPECIFIC 정당 |
 | Neture `AdminVaultLayout` | FEATURE_DIFFERENCE | 접근제한 금고 영역 전용 셸 |
 | MobileBottomNav 4종 | STYLE_DIFFERENCE + CONFIG_DIFFERENCE | 색·라벨·경로뿐 → SERVICE_SPECIFIC 사유 아님 |
 
@@ -215,7 +196,6 @@ Header 축은 이미 **공통화가 대부분 끝나 있다**. `@o4o/ui` `Global
 |---|---|---|---|---|---|---|
 | KPA | `/policy` | `/privacy` | `/contact` | App.tsx 925·926·920 ✅ (`/terms` 없음, footer 도 `/policy` 사용) | `PublicLegalFooterInfo serviceKey="kpa-society"` | 없음 |
 | K-Cosmetics | `/terms` | `/privacy` | `/contact` | 447·448·445 ✅ | `serviceKey="k-cosmetics"` | 없음 |
-| GlycoPharm | `/terms` | `/privacy` | `/contact` | 674·675·672 ✅ | `serviceKey="glycopharm"` | 없음 |
 | Pharmacy-Hub | `/terms` | `/privacy` | — | 211·212 ✅ (`/contact` route 없어 **의도적으로 메뉴 제외**) | `serviceKey={SERVICE_KEY}` | 없음 |
 | Neture | `/terms` | `/privacy` | `/contact` | 752·753·747 ✅ | `serviceKey="neture"` | 없음 |
 
@@ -227,8 +207,8 @@ Header 축은 이미 **공통화가 대부분 끝나 있다**. `@o4o/ui` `Global
 |---|---|---|---|
 | **R1** | `services/web-kpa-society/src/components/platform/PlatformFooter.tsx` | 이용약관(29)·개인정보처리방침(30)·문의하기(31) 포함 **전 링크가 `href="#"`**. `PublicLegalFooterInfo` **미사용**. `InfoPageLayout` 을 통해 `/services/pharmacy`·`/services/forum`·`/services/lms`·`/join/pharmacy` **4개 활성 route** 에 렌더됨. 같은 셸의 `PlatformHeader` 도 `KpaGlobalHeader` 를 우회한 수작업 `<a>` 헤더 | **최고** |
 | **R2** | Neture `SupplierSpaceLayout:365` / `SupplierOpsLayout:211` / `PartnerSpaceLayout:231` | 인라인 footer 에 `© 2026 Neture` + Contact/포럼 링크만. **법정정보·약관·개인정보 링크 전무** — 사업 상대(공급자·파트너) 화면인데 공통 legal 계약 우회 | 높음 |
-| **R3** | PH `StoreOwnerShell` | `MyStoreShell` 에 `header`/`footer` prop 을 주지 않음(KPA/KCos/Glyco 는 둘 다 주입) → 매장 경영 화면에 서비스 footer·법정정보 없음 | 중 |
-| **R4** | Glyco `StoreLayout` footer | `© 2025 GlycoPharm` 연도 하드코딩(stale). 약관/개인정보 링크 없음. 단, 법정 주체는 매장 사업자로 별개 | 중 |
+| **R3** | PH `StoreOwnerShell` | `MyStoreShell` 에 `header`/`footer` prop 을 주지 않음 → 매장 경영 화면에 서비스 footer·법정정보 없음 | 중 |
+| **R4** | — | 약관/개인정보 링크 없음. 단, 법정 주체는 매장 사업자로 별개 | 중 |
 | **R5** | Neture `MainLayout`/`NetureLayout` | `© 2026` 하드코딩. `StoreFacingFooter` 미채택 | 낮음 |
 
 > serviceKey 하드코딩은 **문제 없음** — 전부 각 서비스의 고정 상수이며 PH 는 `SERVICE_KEY` config 를 사용한다. terms/privacy URL 하드코딩도 route 와 일치한다. 우회는 위 R1·R2 두 곳이 본질이다.
@@ -286,7 +266,7 @@ WO §9 의 결정 기준은 "**코드 복잡도가 커지면 공통화하지 않
 |---|---|
 | dead 컴포넌트 5건 | K17 `StoreUserDropdown`(183, 코드 소비 0 — 참조는 문서 6건뿐), P3 `AGHeader`, P4 `AGAppLayout`, P21 `AccountPageLayout`, P22 `operator-core/OperatorLayout` |
 | `@o4o/operator-core` | 서비스 소비 0인데 dependency 잔존(MEMORY 기록과 일치) |
-| stale 연도 | Glyco `StoreLayout` `© 2025`, Neture `© 2026` 하드코딩 |
+| stale 연도 | — |
 | 문서 drift | `docs/architecture/ui/GLOBAL-HEADER-STANDARD-V1.md` 의 문제 진술이 현재 코드보다 오래되었고 Pharmacy-Hub 가 누락됨 |
 
 **위 전부 삭제·수정하지 않았다.** 기록만 한다.

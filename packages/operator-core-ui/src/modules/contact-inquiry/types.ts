@@ -3,7 +3,7 @@
  *
  * WO-O4O-CONTACT-INQUIRY-ADMIN-MANAGEMENT-V1
  *
- * GP/KCos 공통 "문의 관리" Admin UI 의 데이터/어댑터 타입.
+ * KCos 공통 "문의 관리" Admin UI 의 데이터/어댑터 타입.
  * 서버 endpoint 가 serviceKey-scoped + admin 인증이라, HTTP 호출은 service 측 authClient 로 구현해 주입한다.
  * backend: WO-O4O-CONTACT-INQUIRY-ADMIN-MANAGEMENT-V1 (/api/v1/admin/services/:serviceKey/contact-inquiries).
  */

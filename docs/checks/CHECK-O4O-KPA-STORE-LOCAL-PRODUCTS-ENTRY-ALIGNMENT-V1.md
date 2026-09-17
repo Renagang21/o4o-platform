@@ -4,7 +4,7 @@
 > WO: `WO-O4O-KPA-STORE-LOCAL-PRODUCTS-ENTRY-ALIGNMENT-V1`
 > 선행 IR: [IR-O4O-KPA-STORE-HIDDEN-MANAGEMENT-ENTRY-POLICY-AUDIT-V1](../investigations/IR-O4O-KPA-STORE-HIDDEN-MANAGEMENT-ENTRY-POLICY-AUDIT-V1.md)
 > 채택안: **A1 (진입점 복원)** — A2(전면 은퇴) 기각
-> 일자: 2026-07-29 · 범위: KPA 블록 한정 (GlycoPharm / K-Cosmetics 무변경)
+> 일자: 2026-07-29 · 범위: KPA 블록 한정 (K-Cosmetics 무변경)
 
 ---
 
@@ -130,7 +130,6 @@
 
 | 확인 항목 | 결과 |
 |---|---|
-| GlycoPharm 블록 (L197 `local-products`) | **무변경** — 기존 `자체 상품` / `/commerce/local-products` 유지 |
 | K-Cosmetics 블록 (L119 `local-products`) | **무변경** |
 | 공통 flat 정의 (L79) | **무변경** |
 | `StoreMenuKey` 유니온 | **무변경** (`local-products` 기존 존재) |
@@ -173,7 +172,6 @@ rg "정책 폐기" services/web-kpa-society/src
 |---|---|---|
 | web-kpa-society | `npx tsc --noEmit` | **PASS** (출력 없음) |
 | web-kpa-society | `npx vite build` | **PASS** (✓ built in 18.13s) |
-| web-glycopharm | `npx tsc --noEmit` | **PASS** (exit 0) |
 | web-k-cosmetics | `npx tsc --noEmit` | **PASS** (exit 0) |
 
 `@o4o/store-ui-core` 는 source-only 패키지(빌드 스크립트 없음) → 소비 서비스 3종 타입체크로 대체 검증.
@@ -212,14 +210,6 @@ Playwright(headless Chromium) 실브라우저 · 프로덕션 · 약국 경영�
 `StoreLocalProductsPage.tsx` — `h1` · 빈 상태 문구 · 등록/수정 모달 제목 → `매장 자체 상품`
 (라벨 전용. route/API/DB/필드 무변경. `WO-O4O-KPA-STORE-HANDLED-PRODUCTS-TERM-CLARIFICATION-V1` 주석은 이력 보존)
 
-### 7.3 GlycoPharm 회귀 (`https://glycopharm.co.kr`) — 무변경 확인
-
-| 검증 | 결과 |
-|---|---|
-| `자체 상품 :: /store/commerce/local-products` | **PASS** — 라벨·경로 그대로 |
-| `제작 자료 :: /store/library/production-materials` | **PASS** — 그대로 |
-| 그룹 구조 / 항목 수 | **PASS** — 변화 없음 |
-
 ### 7.4 K-Cosmetics
 
 매장주 테스트 계정이 `TEST-ACCOUNTS.local.md` 에 없어 브라우저 smoke 미수행.
@@ -248,7 +238,7 @@ Playwright(headless Chromium) 실브라우저 · 프로덕션 · 약국 경영�
 | DB migration | ✅ 0 |
 | 홈 CTA 추가 | ✅ 안 함 |
 | production-materials 변경 | ✅ 0 |
-| GP / KCos 블록 변경 | ✅ 0 |
+| KCos 블록 변경 | ✅ 0 |
 
 ---
 

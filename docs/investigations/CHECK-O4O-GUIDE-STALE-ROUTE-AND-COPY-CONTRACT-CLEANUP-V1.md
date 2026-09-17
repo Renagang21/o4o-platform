@@ -19,7 +19,6 @@ DEFERRED_TO_LANDING: 2
 미조사: 0
 ```
 
-> `FIXED_ROUTE` / `FIXED_COPY` / `REMOVED_OBSOLETE_GUIDE` 합이 7을 넘는 것은 항목 #1(GP B2C)이
 > **CTA 1건 제거 + 인접 설명 문구 1건 교정**으로 두 조치를 동시에 받았기 때문이다.
 
 ---
@@ -29,21 +28,6 @@ DEFERRED_TO_LANDING: 2
 WO §2 지시대로 **과거 CHECK 문자열을 그대로 쓰지 않고 현재 main 에서 route definition · consumer 를 다시 확인**했다.
 route 표는 각 서비스 `src/**/*.tsx` 의 `<Route>` 트리를 중첩 포함해 정적 파싱해 만들었다
 (KPA `/operator/*` 는 `services/web-kpa-society/src/routes/OperatorRoutes.tsx` 로 위임되므로 별도 확장).
-
-### #1 GlycoPharm — `B2C 가격 설정` → `/store/commerce/products/b2c`
-
-| 항목 | 값 |
-|---|---|
-| service | GlycoPharm |
-| guide source | `copy/glycopharm.ts` L526 (features item, 실제 `<Link>`) · L338-341 (usage step 01 detail) |
-| 현재 표시 문구 | `B2C 가격 설정` / `B2C 탭(/store/commerce/products/b2c)에서 소매가를 입력하고 노출 토글을 켭니다.` |
-| 현재 target route | `/store/commerce/products/b2c` |
-| canonical feature·route | **없음.** GP 에는 소매가/B2C 진열 화면이 존재하지 않는다. 진열 canonical = `/store/channels` (`StoreChannelsPage` — "채널 중심 진열 실행 콘솔") |
-| 실제 consumer | 0건. GP `src` 전체에서 `b2c` 는 operator 측 channel_type 라벨(`B2C: '온라인 스토어'`)뿐 |
-| production 재현 | 재현됨. literal route 는 없으나 **`/store/:pharmacyId/products/:productId` 에 param 흡수**되어 오류 화면(ErrorBoundary "문제가 발생했습니다")으로 떨어진다 → 404 가 아니라 깨진 화면이라 census 단계에서 dead link 로 관측됐다 |
-| 조치 | **REMOVED_OBSOLETE_GUIDE** — features CTA item 삭제 (형제 item `채널 진열 /store/channels` 가 GP canonical 업무를 이미 커버). 추가로 usage step 01 의 `소매가 설정 및 활성화` item 을 `채널 노출 활성화 (/store/channels)` 로 교정하고 step description 의 "소매가를 설정하고" 문구도 함께 정정 (**FIXED_COPY**) |
-
-WO §3 3분기 중 **"기능 자체 제거됨 → Guide 해당 CTA/문구 제거"** 적용. route alias 신규 생성 없음.
 
 ### #2 K-Cosmetics — signage CTA `/store/signage/playlist`
 
@@ -69,19 +53,7 @@ WO §3 3분기 중 **"기능 자체 제거됨 → Guide 해당 CTA/문구 제거
 | production 재현 | 표기 전용 badge 라 클릭 불가 → 화면 오류는 발생하지 않으나 안내한 경로로 가면 아무 화면도 없다 |
 | 조치 | **FIXED_ROUTE** — `/store/interest-requests` 로 교정. **기능 자체는 존재하며 Guide 본문 설명(확인/완료/취소 3액션 · 5초 자동 갱신)은 실제 화면과 정확히 일치**하므로 문구 · step 은 보존 |
 
-> 참고: GlycoPharm 은 `/store/requests` 가 실재한다 (`App.tsx:1074` `CustomerRequestsPage`). 같은 문자열이라도 서비스마다 판정이 다르다.
-
-### #4 GlycoPharm — `/tablet/:slug` 표기
-
-| 항목 | 값 |
-|---|---|
-| service | GlycoPharm |
-| guide source | `copy/glycopharm.ts` L389 `routeLabel` · L550 features item `route` |
-| 현재 target route | `/tablet/:slug` |
-| canonical feature·route | **`/store/:pharmacyId/tablet`** (`App.tsx:967` `TabletLayout`) |
-| 실제 consumer | GP 에 `/tablet/:slug` route 없음 (**MISSING**). KPA · KCos 에는 실재하므로 서비스별 판정이 갈린다 |
-| production 재현 | features item 은 `:` 포함 route 라 렌더러가 `group.linkTo`(`/store/marketing/qr`)로 fallback 한다 (`GuideFeaturesPage.tsx:124`) → **링크는 정상, 표시 문자열만 잘못됨** |
-| 조치 | **FIXED_ROUTE** ×2 — 표시 문자열을 canonical `/store/:pharmacyId/tablet` 으로 교정. 링크 동작은 기존과 동일(변경 없음) |
+> 같은 문자열이라도 서비스마다 판정이 다르다.
 
 ### #5 KPA-Society — `B2C 판매` stale feature copy
 
@@ -117,11 +89,11 @@ WO §3 3분기 중 **"기능 자체 제거됨 → Guide 해당 CTA/문구 제거
 
 | # | 파일 | 전 | 후 | 분류 |
 |---|---|---|---|---|
-| 1 | `copy/glycopharm.ts` | `{ label: 'B2C 가격 설정', route: '/store/commerce/products/b2c' }` | (item 삭제) | REMOVED_OBSOLETE_GUIDE |
-| 1 | `copy/glycopharm.ts` | `소매가 설정 및 활성화` / `B2C 탭(/store/commerce/products/b2c)에서 소매가를 입력하고 노출 토글을 켭니다.` | `채널 노출 활성화` / `채널 진열(/store/channels)에서 노출할 채널을 고르고 진열을 활성화합니다.` | FIXED_COPY |
+| 1 | — | `{ label: 'B2C 가격 설정', route: '/store/commerce/products/b2c' }` | (item 삭제) | REMOVED_OBSOLETE_GUIDE |
+| 1 | — | `소매가 설정 및 활성화` / `B2C 탭(/store/commerce/products/b2c)에서 소매가를 입력하고 노출 토글을 켭니다.` | `채널 노출 활성화` / `채널 진열(/store/channels)에서 노출할 채널을 고르고 진열을 활성화합니다.` | FIXED_COPY |
 | 2 | `copy/k-cosmetics.ts` | `/store/signage/playlist` ×4 (+ detail, 헤더 주석) | `/store/marketing/signage/playlist` | FIXED_ROUTE |
 | 3 | `copy/k-cosmetics.ts` | `routeLabel: '/store/requests'` | `routeLabel: '/store/interest-requests'` | FIXED_ROUTE |
-| 4 | `copy/glycopharm.ts` | `/tablet/:slug` ×2 | `/store/:pharmacyId/tablet` | FIXED_ROUTE |
+| 4 | — | `/tablet/:slug` ×2 | `/store/:pharmacyId/tablet` | FIXED_ROUTE |
 | 5 | `copy/kpa.ts` | `B2B 발주 · B2C 판매` | `B2B 발주 · 매장 진열` | FIXED_COPY |
 | 6 | `copy/k-cosmetics.ts` | `routeLabel: '/store/qr'` | `routeLabel: '/store/marketing/qr'` | FIXED_ROUTE |
 | 7 | `copy/kpa.ts` | `/operator/content-hub — …` | `/operator/docs — …` | FIXED_ROUTE |
@@ -140,7 +112,6 @@ WO §3 3분기 중 **"기능 자체 제거됨 → Guide 해당 CTA/문구 제거
 |---|---:|---:|---:|---:|
 | KPA-Society | 283 (+ operator sub-router) | 108 | 2 (`/operator/content-hub`, `B2C 판매` 용어) | 0 |
 | K-Cosmetics | 182 | 33 | 3 (`/store/requests`, `/store/signage/playlist`, `/store/qr`) | 0 |
-| GlycoPharm | 238 | 37 | 3 (`/store/commerce/products/b2c`, `/tablet/:slug` ×2 위치) | 0 |
 | Neture | 291 | 49 | 0 | 0 |
 | Guide 공통 컴포넌트 `packages/shared-space-ui/src/guide/*.tsx` | — | 0 (하드코딩 경로 없음) | 0 | 0 |
 | Neture Guide 래퍼 페이지 | — | 34 | 0 | 0 |
@@ -156,15 +127,15 @@ WO §3 3분기 중 **"기능 자체 제거됨 → Guide 해당 CTA/문구 제거
 
 | 항목 | 결과 |
 |---|---|
-| `/service-guide` 목적 | **공개 마케팅형 "서비스 안내"** 단일 진입 페이지. 이용 대상(매장 경영자 / 운영 담당자 / 공급·제휴 사업자) 소개 + `/contact` 문의 연결. KPA `pages/service-guide/ServiceGuidePage.tsx`, KCos · GP `pages/ServiceGuidePage.tsx` |
+| `/service-guide` 목적 | **공개 마케팅형 "서비스 안내"** 단일 진입 페이지. 이용 대상(매장 경영자 / 운영 담당자 / 공급·제휴 사업자) 소개 + `/contact` 문의 연결. KPA `pages/service-guide/ServiceGuidePage.tsx`, KCos `pages/ServiceGuidePage.tsx` |
 | `/guide` 목적 | **기능 사용 설명서**(intro 5면 / usage / features index / feature 상세). `@o4o/shared-space-ui` Guide 템플릿 소비 |
 | 중복 여부 | **중복 아님.** 목적 · 대상 · 정보 밀도가 다르다 |
 | redirect 여부 | **없음.** 어느 쪽에서도 서로를 redirect 하지 않는다 |
-| navigation 연결 | `/service-guide` — KPA · KCos · GP 모두 **글로벌 헤더 nav + Footer** 연결 (`config/navigation.ts`, `Footer.tsx`).<br>`/guide` — **bare `/guide` route 는 Neture 에만 존재** (`GuideHomePage`, nav "이용 안내"). KPA 는 Footer 에서 `/guide/intro` 로만 진입. **KCos · GP 는 `/guide/*` 로 가는 navigation 진입점이 0건 — Guide 전면이 orphan 상태**. `/service-guide` 페이지에서 `/guide/*` 로 나가는 링크도 3서비스 모두 0건 |
+| navigation 연결 | `/service-guide` — KPA · KCos 모두 **글로벌 헤더 nav + Footer** 연결 (`config/navigation.ts`, `Footer.tsx`).<br>`/guide` — **bare `/guide` route 는 Neture 에만 존재** (`GuideHomePage`, nav "이용 안내"). KPA 는 Footer 에서 `/guide/intro` 로만 진입. **KCos 는 `/guide/*` 로 가는 navigation 진입점이 0건 — Guide 전면이 orphan 상태**. `/service-guide` 페이지에서 `/guide/*` 로 나가는 링크도 2서비스 모두 0건 |
 
 **DEFERRED_TO_LANDING: 2**
 
-1. KCos · GP `/guide` 랜딩 부재 + navigation 진입점 0 (KPA 는 `/guide/intro` 부분 연결) — 3서비스 진입 경로 통일 필요
+1. KCos `/guide` 랜딩 부재 + navigation 진입점 0 (KPA 는 `/guide/intro` 부분 연결) — 2서비스 진입 경로 통일 필요
 2. `/service-guide` ↔ `/guide` 상호 연결 부재 — 공개 안내에서 사용 설명서로 넘어가는 동선 없음
 
 → 후속 `Guide 진입 · 랜딩 공통화` WO 입력으로 넘긴다.
@@ -176,9 +147,9 @@ WO §3 3분기 중 **"기능 자체 제거됨 → Guide 해당 CTA/문구 제거
 신규: `packages/shared-space-ui/src/guide/__tests__/guideRouteContract.test.ts` — **Guide route contract spec 1개로 고정**.
 
 - 서비스 `src/**/*.tsx` 의 `<Route>` 트리를 중첩 포함해 정적 파싱 (`element={<X />}` 속성 때문에 `>` 단순 검색이 깨지므로 중괄호 깊이 기반 tag 종료 탐지). KPA `/operator/*` 는 `OperatorRoutes.tsx` 를 prefix 확장해 합류
-- **param 흡수를 "존재"로 인정하지 않는다** — param 위치가 서로 같을 때만 매칭. GP `/store/commerce/products/b2c` 가 `/store/:pharmacyId/products/:productId` 에 삼켜지는 회귀를 정확히 잡는다
+- **param 흡수를 "존재"로 인정하지 않는다** — param 위치가 서로 같을 때만 매칭.
 - 주석(파일 경로 · 폐기 메모)은 사용자 노출 대상이 아니므로 참조 추출에서 제외
-- 케이스: 4서비스 참조 전수 매칭 / GP dead `/store/commerce/products/b2c` 참조 0 / GP `/tablet/:slug` 0 + canonical 존재 / KCos legacy alias(`'/store/signage/playlist'` · `'/store/qr'`) · `/store/requests` 참조 0 + canonical 3종 존재 / KPA `B2C 판매` 0
+- 케이스: 3서비스 참조 전수 매칭 dead `/store/commerce/products/b2c` 참조 0 `/tablet:slug` 0 + canonical 존재 / KCos legacy alias(`'/store/signage/playlist'` · `'/store/qr'`) · `/store/requests` 참조 0 + canonical 3종 존재 / KPA `B2C 판매` 0
 
 ```
 npx vitest run --config packages/shared-space-ui/vitest.config.mjs
@@ -194,8 +165,7 @@ npx vitest run --config packages/shared-space-ui/vitest.config.mjs
 | `@o4o/shared-space-ui` `tsc --noEmit` | PASS |
 | `@o4o/web-kpa-society` `tsc -b` | PASS |
 | `@o4o/web-k-cosmetics` `tsc -b` | PASS |
-| `glycopharm-web` `type-check` (`tsc -b`) | PASS |
-| build (KPA · K-Cosmetics · GlycoPharm) | PASS |
+| build (KPA · K-Cosmetics) | PASS |
 
 backend 변경 없음 → api-server 전체 검증 미실시 (WO §11 명시). **migration 0.**
 
@@ -207,8 +177,6 @@ backend 변경 없음 → api-server 전체 검증 미실시 (WO §11 명시). *
 
 | 대상 (desktop 1440×900 · mobile 390×844) | 확인 항목 | 결과 |
 |---|---|---|
-| GlycoPharm `/guide/features` | `B2C 가격 설정` CTA 제거 · `/store/commerce/products/b2c` · `/tablet/:slug` 노출 0 · `/store/channels` · `/store/:pharmacyId/tablet` 노출 | PASS (desktop · mobile) |
-| GlycoPharm `/guide/usage` | `소매가 설정 및 활성화` 제거 → `채널 노출 활성화` · `/store/:pharmacyId/tablet` 표기 · GP `/store/requests` 유지(실재 route) | PASS (desktop · mobile) |
 | K-Cosmetics `/guide/features/signage` | `/store/signage/playlist` 노출 0 · `/store/marketing/signage/playlist` 노출 | PASS (desktop · mobile) |
 | K-Cosmetics `/guide/features` | legacy `/store/signage/playlist` 노출 0 | PASS (desktop · mobile) |
 | K-Cosmetics `/guide/usage` | `/store/requests` · `/store/qr` 노출 0 · `/store/interest-requests` · `/store/marketing/qr` · `/store/marketing/signage/playlist` 노출 | PASS (desktop · mobile) |

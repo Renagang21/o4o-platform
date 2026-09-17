@@ -17,7 +17,7 @@
 
 - backend/DB/마이그레이션 **변경 없음** (`channel_type='B2C'` enum 불변 — 내부 식별자).
 - 공통 `storeMenuConfig.ts` **변경 없음** (KPA `채널` 그룹: 채널 관리/태블릿/상담 요청 유지).
-- GP/KCos 파일·메뉴 **변경 없음**.
+- KCos 파일·메뉴 **변경 없음**.
 
 ## 문구 변경 전 → 후
 
@@ -48,7 +48,7 @@
 | 4 | 기존 온라인 스토어 진열/slug/URL 유지 | ✅(코드) | B2C 제품관리/slug/자산채널맵/주문 연결 코드 영역 미변경. 데모 매장 채널 부재로 시각 확인은 동일 capability gate로 차단 |
 | 5 | 태블릿 단독 메뉴 정상 | ✅ PASS | `/store/commerce/tablet-displays` "태블릿 진열 관리" 로드 + "태블릿 추가" 동작 |
 | 6 | 상담 요청 메뉴 유지 | ✅ PASS | 사이드바 `채널` 그룹: 채널 관리 / 태블릿 / 상담 요청 |
-| 7 | GP/KCos 무변경 | ✅ | GP/KCos 파일·공통 메뉴 config 미변경(StoreChannelsPage는 서비스별 개별 파일) |
+| 7 | KCos 무변경 | ✅ | KCos 파일·공통 메뉴 config 미변경(StoreChannelsPage는 서비스별 개별 파일) |
 | 8 | TypeScript | ✅ PASS | `web-kpa-society` tsc --noEmit exit 0 |
 
 > 판정 2·4의 **시각** 확인은 데모 매장(Sohae 약국)의 B2C_COMMERCE capability 미활성으로 채널 생성이 403 차단되어 탭 바가 노출되지 않는 데이터 상태 때문에 보류됨 — 본 코드 변경과 무관하며, 코드(탭 정의)·타입체크·배포(신 문구 라이브)로 확인. capability 활성 매장에서 탭 바 시각 확인은 후속 가능.
@@ -57,13 +57,13 @@
 
 - 제품 진열 관리(추가/순서/활성/삭제/벌크), slug/공개 URL, 자산 채널맵/게시, 주문/결제 연결 코드 경로 모두 **미변경**(B2C/KIOSK 렌더 분기·핸들러 보존). KIOSK 보류 안내 유지.
 
-## GP/KCos 영향 여부
+## KCos 영향 여부
 
 없음. `StoreChannelsPage`는 서비스별 개별 구현이며 KPA 파일만 수정. 공통 `storeMenuConfig.ts` 미변경.
 
 ## 결론
 
-A안(문구 정비 + TABLET 탭 중복 제거) 구현·배포 완료. 사용자 화면에서 "B2C/채널 만들기" 기술 용어 제거, 태블릿은 단독 메뉴로 일원화. 온라인 스토어 실기능·주문 연결·KIOSK 보류 모두 보존, GP/KCos 무영향.
+A안(문구 정비 + TABLET 탭 중복 제거) 구현·배포 완료. 사용자 화면에서 "B2C/채널 만들기" 기술 용어 제거, 태블릿은 단독 메뉴로 일원화. 온라인 스토어 실기능·주문 연결·KIOSK 보류 모두 보존, KCos 무영향.
 
 ### 후속 후보
 - 탭 바 시각 회귀 확인은 B2C_COMMERCE capability 활성 매장에서 1회 수행 권장.

@@ -22,7 +22,7 @@
 
 1. ✅ **WO 의 web-account 코드 변경 (DashboardPage / ServiceCard) 은 V2 철학상 타당**하며, 잔존 기능 (active 서비스 목록 + "열기") 은 정상 유지됨.
 2. ⚠️ **web-account 는 현재 프로덕션 미배포 상태** — Cloud Run 서비스 `account-center-web` 는 2026-03-13 placeholder revision 1 건뿐, 이후 어떤 코드 변경도 배포되지 않음. 따라서 WO 변경의 프로덕션 회귀 가능성 0.
-3. ⚠️ **각 서비스 → web-account 진입 링크 0 건** — 4 서비스 (KPA / GP / K-Cosmetics / Neture) 어느 곳에서도 `account.neture.co.kr` 로 가는 링크가 존재하지 않음. 현재 사용자의 "계정 관리" 진입은 각 서비스의 `/mypage` + `/mypage/settings` 로 분산.
+3. ⚠️ **각 서비스 → web-account 진입 링크 0 건** — 3 서비스 (KPA / K-Cosmetics / Neture) 어느 곳에서도 `account.neture.co.kr` 로 가는 링크가 존재하지 않음. 현재 사용자의 "계정 관리" 진입은 각 서비스의 `/mypage` + `/mypage/settings` 로 분산.
 
 | 차원 | 결과 |
 |---|---|
@@ -85,7 +85,6 @@
 $ gcloud run services list --region asia-northeast3 --project netureyoutube
 NAME                     URL
 account-center-web       https://account-center-web-3e3aws7zqa-du.a.run.app   ← 존재
-glycopharm-web           https://glycopharm-web-...
 k-cosmetics-web          https://k-cosmetics-web-...
 kpa-society-web          https://kpa-society-web-...
 neture-web               https://neture-web-...
@@ -122,7 +121,6 @@ on:
       - 'services/web-neture/**'
       - 'services/web-k-cosmetics/**'
       - 'services/web-kpa-society/**'
-      - 'services/web-glycopharm/**'
 ```
 
 → **trigger path 4 개만 등재**. `services/web-account/**` 가 포함되지 않음. Dockerfile 빌드/푸시/`gcloud run deploy` 스텝도 위 4 서비스용만 존재.
@@ -168,7 +166,6 @@ curl: (35) ...
 | 서비스 | 외부 account.neture.co.kr 링크 | 내부 계정 라우트 | User dropdown 메뉴 |
 |---|:---:|---|---|
 | **web-kpa-society** | ❌ 0 건 | `/mypage`, `/mypage/settings`, `/mypage/credits`, `/admin`, `/operator`, `/store` | 마이페이지 / 설정 / (역할별 콘솔) / 로그아웃 |
-| **web-glycopharm** | ❌ 0 건 | `/mypage`, `/mypage/profile`, `/mypage/settings`, `/operator`, `/admin`, `/store` | 강의/운영 대시보드 / 마이페이지 / 설정 / 로그아웃 |
 | **web-k-cosmetics** | ❌ 0 건 | `/mypage`, `/mypage/profile`, `/mypage/settings`, `/mypage/credits/enrollments/certificates`, `/admin`, `/operator`, `/store` | 강의/운영 대시보드 / 마이페이지 / 설정 / 로그아웃 |
 | **web-neture** | ❌ 0 건 | `/mypage`, `/mypage/settings`, `/account/supplier/*`, `/account/partner/*`, `/supplier/dashboard`, `/partner/dashboard` | 운영/공급자/파트너 대시보드 / 마이페이지 / 설정 / 로그아웃 |
 
@@ -195,7 +192,6 @@ curl: (35) ...
 
 export const O4O_SERVICES: O4OService[] = [
   { key: 'neture',     ... },
-  { key: 'glycopharm', ... },
   { key: 'kpa-society',... },
   { key: 'k-cosmetics',... },
 ];

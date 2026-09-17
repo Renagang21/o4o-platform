@@ -40,7 +40,7 @@ DB/API/migration: **없음.**
 
 - 선행 WO 운영 smoke PASS(`50b51d9c3`)로 알림→처리 동선이 실증됨 → 사이드바 상시 메뉴 불필요.
 - IR-O4O-KPA-STORE-CONSULTATION-REQUESTS-NOTIFICATION-REPLACEMENT-AUDIT-V1 의 목표 상태(B안: 알림 보완 후 메뉴 정리)에 도달.
-- `KPA_SOCIETY_STORE_CONFIG` 블록만 수정 — `COSMETICS_STORE_CONFIG`/`GLYCOPHARM_STORE_CONFIG` 무변경(GP/KCos 는 애초 메뉴 미등록, route only).
+- `KPA_SOCIETY_STORE_CONFIG` 블록만 수정 — `COSMETICS_STORE_CONFIG` 무변경(KCos 는 애초 메뉴 미등록, route only).
 
 ---
 
@@ -61,7 +61,7 @@ DB/API/migration: **없음.**
 |---|---|
 | store-ui-core typecheck | ✅ PASS (error 0) |
 | web-kpa-society typecheck (storeMenuConfig/App/TabletRequestsPage) | ✅ PASS (error 0) |
-| 편집 블록 KPA 한정 (`KPA_SOCIETY_STORE_CONFIG`) | ✅ (Cosmetics/GlycoPharm config 무변경) |
+| 편집 블록 KPA 한정 (`KPA_SOCIETY_STORE_CONFIG`) | ✅ (Cosmetics config 무변경) |
 | `고객 응대` 그룹 빈 그룹화 여부 | ✅ 아님 (`태블릿` 단독 유지) |
 | route 유지 | ✅ |
 | 브라우저 smoke (메뉴 미노출 / 알림→이동 / 처리 / URL 직접) | ✅ **PASS** (§6-1) |
@@ -93,14 +93,14 @@ DB/API/migration: **없음.**
 
 - `/store/requests` route 삭제 / `TabletRequestsPage` 삭제
 - `tablet_interest_requests` 삭제 / 요청 생성 API 변경 / 알림 생성 로직 / `NotificationType` 변경
-- QR page 상담 CTA / `source` 컬럼 / GP·KCos 메뉴 정리 / 주문·온라인 판매 메뉴 정리
+- QR page 상담 CTA / `source` 컬럼 / KCos 메뉴 정리 / 주문·온라인 판매 메뉴 정리
 - `StoreSidebar.tsx` 의 `'requests': Users` 아이콘 맵 엔트리 — 공통 컴포넌트라 미수정(미사용 lookup 잔존이나 무해, 데드링크 아님)
 
 ---
 
 ## 8. 후속 과제
 
-1. GP/KCos 상담 요청 메뉴/알림 parity (서비스 구조 차이로 별도 WO)
+1. KCos 상담 요청 메뉴/알림 parity (서비스 구조 차이로 별도 WO)
 2. QR page 콘텐츠 하단 상담 CTA 옵션
 3. `tablet_interest_requests` source 구분 / 공통 `customer_requests` 모델 통합 IR
 4. `StoreSidebar` 아이콘 맵 미사용 키 정리(공통 모듈 점검 시)

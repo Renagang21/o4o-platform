@@ -3,7 +3,7 @@
  *
  * WO-O4O-STORE-PRODUCTION-MATERIALS-PAGE-COMPONENT-EXTRACTION-V1
  *
- * GP/KCos `/store/library/production-materials` near-identical 페이지 UI 추출.
+ * KCos `/store/library/production-materials` 페이지 UI 추출.
  * - UI/레이아웃/액션만 담당. fetch/병합은 서비스 wrapper 가 수행 후 items 주입.
  * - 서비스별 차이(derivations API 경로)는 fetchDerivations prop 으로 주입.
  * - CTA 교차 진입 route(/store/marketing/*, /store/content/blog)는 3서비스 공통 → 내부 보유.

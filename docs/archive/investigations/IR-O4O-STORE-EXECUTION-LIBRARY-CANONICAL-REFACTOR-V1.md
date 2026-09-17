@@ -46,7 +46,6 @@ KPA_SOCIETY_STORE_CONFIG 현재 구조:
 → **사이드바 그룹명과 내부 breadcrumb 불일치**: 그룹은 "마케팅 자료함", 내부는 "내 자료함"
 
 **다른 서비스 현황**:
-- GlycoPharm: "마케팅·콘텐츠" 그룹 (library 항목 없음, 구조 다름)
 - K-Cosmetics: library 그룹 없음 (사이니지만 존재)
 
 ---

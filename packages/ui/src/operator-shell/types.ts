@@ -38,14 +38,13 @@ export interface OperatorMenuItem {
  * 통합 메뉴 항목 — adminOnly 플래그 포함.
  *
  * WO-O4O-OPERATOR-MENU-ROLE-FILTER-COMMONIZATION-G3A-V1:
- *   4 서비스(KPA-Society / GlycoPharm / K-Cosmetics / Neture) 의 config 에 각각
+ *   3 서비스(KPA-Society / K-Cosmetics / Neture) 의 config 에 각각
  *   중복 선언돼 있던 동일 타입. filterMenuByRole 의 입력 타입이다.
  */
 export interface UnifiedMenuItem extends OperatorMenuItem {
   /** true = admin 역할에게만 표시 */
   adminOnly?: boolean;
   /**
-   * WO-O4O-GLYCOPHARM-AI-ADMIN-ROLE-GUARD-CONTRACT-AUDIT-AND-CLOSURE-V1:
    * true = `platform:super_admin` 에게만 표시. 서비스 admin(`{service}:admin`) 도 제외한다.
    *
    * backend guard 가 `requireAdmin`(= platform:super_admin 단독) 인 **플랫폼 전역 화면**을

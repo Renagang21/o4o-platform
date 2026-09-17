@@ -157,7 +157,7 @@ DELETE FROM o4o_asset_snapshots s
 
 ## 10. 타 서비스 영향
 
-- `signage_media`·`media.repository`·`SignageMediaUsageService` 는 GlycoPharm / K-Cosmetics / Neture 포함 **전 서비스 공용**. 이번 변경은 **additive·global 가드**(삭제 차단 조건 추가 + orphan-only snapshot 삭제)로 기존 정상 삭제 흐름을 넓히지 않고 좁힘.
+- `signage_media`·`media.repository`·`SignageMediaUsageService` 는 K-Cosmetics / Neture 포함 **전 서비스 공용**. 이번 변경은 **additive·global 가드**(삭제 차단 조건 추가 + orphan-only snapshot 삭제)로 기존 정상 삭제 흐름을 넓히지 않고 좁힘.
 - serviceKey/organizationId scope 는 기존과 동일하게 유지 → cross-service 노출 없음.
 - 사용 중이지 않은 미디어의 삭제 동작은 이전과 동일(회귀 없음). 사용 중 미디어만 새로 차단.
 - Shared Module Change Protocol: 소비처 = signage(HQ/community) + kpa supplier 3 경로 전수 반영 확인.

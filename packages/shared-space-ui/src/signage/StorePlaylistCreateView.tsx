@@ -2,7 +2,7 @@
  * StorePlaylistCreateView — 내 매장 플레이리스트 등록 화면(뒤로가기 + 제목 + 부제 + 생성 폼)
  *
  * WO-O4O-MY-STORE-REMAINING-FEATURE-VIEW-COMMONIZATION-V1 §5-A:
- *   KPA / K-Cosmetics / GlycoPharm 의 StorePlaylistCreatePage 3벌이 동일한 껍데기(뒤로가기 링크·
+ *   KPA / K-Cosmetics 의 StorePlaylistCreatePage 2벌이 동일한 껍데기(뒤로가기 링크·
  *   h1·부제·SignagePlaylistCreateShell 배치)를 JSX 만 복제하고 있었다. 서비스별로 다른 것은
  *   accent 색 · 저장 API · 목록 경로 · 태그/설명 노출 여부뿐이므로 이를 props 로 받는다.
  *

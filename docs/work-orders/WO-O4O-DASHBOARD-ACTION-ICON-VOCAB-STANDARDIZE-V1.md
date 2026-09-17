@@ -36,7 +36,6 @@ KPA emoji 12개를 lucide-name 으로 바꾸면, **Phase A 매핑 9종에 없는
 ### 3.1 백엔드 (icon 값 정렬)
 ```text
 apps/api-server/src/routes/kpa/services/operator-dashboard.service.ts   (emoji → lucide-name) ← 주 대상
-apps/api-server/src/routes/glycopharm/services/operator-dashboard.service.ts   (기존 lucide-name 어휘 점검)
 apps/api-server/src/routes/cosmetics/controllers/operator-dashboard.controller.ts  (점검)
 apps/api-server/src/modules/neture/controllers/admin-dashboard.controller.ts  (점검)
 ```
@@ -91,7 +90,6 @@ clipboard-list · megaphone · message-square · monitor-play · badge-percent �
 ## 6. 제외 범위
 
 ```text
-- 프론트 하드코딩 admin Quick Actions(GlycoPharm/KPA admin emoji) 정리 — Phase C
 - QuickActionBlock / StructureActionBlock 렌더 로직 — 변경 금지 (Phase A 완료, ActionIcon 매핑만 확장)
 - DomainIASidebar / OperatorAreaShell (operator drawer) — 수정 금지
 - HeroBannerSection.tsx — 미접촉
@@ -107,7 +105,6 @@ clipboard-list · megaphone · message-square · monitor-play · badge-percent �
 ```text
 1. ActionIcon ICON_NAME_MAP 에 §5 신규 7종 추가 (operator-ux-core + admin-ux-core 둘 다).
 2. KPA operator-dashboard.service 의 quickActions icon emoji → §4 lucide-name 으로 교체.
-3. Glyco/KCos/Neture 백엔드 icon-name 이 §5 표준 어휘에 포함되는지 점검 (벗어나면 표준 이름으로 정렬, 최소 변경).
 4. (선택) 공유 vocabulary 카탈로그 상수/문서로 단일화 — drift 방지. Phase B 필수는 아님.
 5. 백엔드 응답 구조/라벨/링크/순서 불변. icon 값만 변경.
 ```
@@ -122,9 +119,7 @@ clipboard-list · megaphone · message-square · monitor-play · badge-percent �
 - packages/operator-ux-core, admin-ux-core tsc
 - KPA operator dashboard API 응답 quickActions[].icon 이 emoji 아닌 lucide-name 인지 확인 (응답 검사)
 - §4 의 모든 KPA icon-name 이 ActionIcon ICON_NAME_MAP 에 존재해 렌더 가능한지 확인 (누락 0)
-- Neture/Glyco/KCos 응답 회귀 없음
 - 화면 smoke: KPA /operator Quick Actions 가 lucide 아이콘으로 표시(emoji 아님) — 단 KPA operator 접근 권한 가드(test account) 이슈 시, 응답 검사 + 코드 정합으로 대체 검증
-- Neture admin / Glyco·KCos operator 회귀 없음
 ```
 
 ---
@@ -147,7 +142,6 @@ clipboard-list · megaphone · message-square · monitor-play · badge-percent �
 ```text
 docs/investigations/CHECK-O4O-DASHBOARD-ACTION-ICON-VOCAB-STANDARDIZE-V1.md
 ```
-포함: 1 최종 판정 / 2 수정 파일(백엔드+ActionIcon) / 3 KPA emoji→lucide-name 매핑 결과 / 4 표준 vocabulary(16종) / 5 변경하지 않은 항목(렌더 로직/admin 프론트/drawer) / 6 TS·build / 7 KPA 응답 검사 + 화면 smoke / 8 Neture/Glyco/KCos 회귀 / 9 staged 검증 / 10 후속(Phase C).
 
 ---
 
@@ -156,7 +150,6 @@ docs/investigations/CHECK-O4O-DASHBOARD-ACTION-ICON-VOCAB-STANDARDIZE-V1.md
 ```text
 - KPA operator quickActions icon emoji → lucide-name 정렬
 - ActionIcon ICON_NAME_MAP 이 표준 16종(§5) 전부 커버 (KPA 아이콘 누락 0)
-- Glyco/KCos/Neture 어휘 표준 정합 확인(회귀 없음)
 - 렌더 로직/admin 프론트/drawer 미접촉
 - 라벨/링크/순서/권한/API 구조 불변
 - api-server + 2 패키지 tsc/build PASS
@@ -170,7 +163,6 @@ docs/investigations/CHECK-O4O-DASHBOARD-ACTION-ICON-VOCAB-STANDARDIZE-V1.md
 ## 12. 후속 (Phase C)
 
 ```text
-WO-O4O-ADMIN-QUICKACTION-FRONTEND-CONVERGE-V1 — GlycoPharm/KPA admin 프론트 하드코딩 emoji Quick Actions 를
 공통 블록(StructureActionBlock/AdminLinkBlock) + lucide 매핑 경로로 수렴.
 ```
 

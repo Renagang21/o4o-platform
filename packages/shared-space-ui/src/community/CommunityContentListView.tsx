@@ -4,7 +4,7 @@
  *
  * WO-O4O-COMMUNITY-CONTENT-RESOURCE-FRONTEND-VIEW-COMMONIZATION-V1
  *
- * K-Cosmetics / GlycoPharm 의 `/content` 목록이 주석 한 줄만 다른 완전 중복이었다.
+ * K-Cosmetics 의 `/content` 목록이 주석 한 줄만 다른 완전 중복이었다.
  * 표시 구조를 service-neutral View 로 추출하고, 서비스는 fetch adapter + config 만 준다.
  *
  * 구조: service API adapter → CommunityContentListItem(정규화) → 공통 View

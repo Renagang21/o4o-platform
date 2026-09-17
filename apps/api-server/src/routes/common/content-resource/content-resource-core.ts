@@ -4,9 +4,9 @@
  * WO-O4O-COMMUNITY-CONTENT-RESOURCE-BACKEND-CORE-COMMONIZATION-V1
  * 선행 감사: IR-O4O-COMMUNITY-CONTENT-RESOURCE-BACKEND-CANONICALIZATION-AUDIT-V1 (판정 B)
  *
- * KPA / GlycoPharm / K-Cosmetics 의 회원 콘텐츠·자료실 backend 는 서로 다른 물리 테이블
- * (`kpa_contents` / `glycopharm_contents` / `cosmetics_contents`)을 쓰지만 handler 로직은
- * 사실상 동일하다. GP ↔ KCos 는 로그 접두어·주석을 빼면 557줄이 100% 같았다.
+ * KPA / K-Cosmetics 의 회원 콘텐츠·자료실 backend 는 서로 다른 물리 테이블
+ * (`kpa_contents` / `cosmetics_contents`)을 쓰지만 handler 로직은
+ * 사실상 동일하다.
  *
  * 본 Core 는 그 공통 로직만 갖고, 서비스 정책은 일절 알지 않는다.
  * 서비스는 {@link ContentResourceConfig} 를 주입한다.
@@ -129,7 +129,7 @@ export interface ListVisibilityDecision {
 export interface ContentResourceConfig {
   /** 물리 테이블명. **기본값 없음 — 반드시 주입** (WO §4-A) */
   tableName: string;
-  /** console.error 접두어 (예: 'GlycoPharm') */
+  /** console.error 접두어 (예: 'K-Cosmetics') */
   logPrefix: string;
   /** operator/admin 판정에 쓰는 role 목록 (예: ['cosmetics:operator', ...]) */
   operatorRoles: string[];
@@ -147,7 +147,7 @@ export interface ContentResourceConfig {
   operatorListFilters: Array<{ param: string; column: string }>;
   /**
    * 목록 가시성 결정 훅.
-   * 미지정이면 {@link defaultListVisibility} (GP/KCos 기존 동작)를 쓴다.
+   * 미지정이면 {@link defaultListVisibility} (KCos 기존 동작)를 쓴다.
    * KPA 만 `status=all` 운영자 분기를 위해 주입한다.
    */
   resolveListVisibility?: (ctx: ListStatusContext) => ListVisibilityDecision;
@@ -164,7 +164,7 @@ export interface ContentResourceConfig {
 // ─────────────────────────────────────────────────────────────────────────────
 
 /**
- * GP / K-Cosmetics 기존 동작과 동일한 기본 가시성 규칙.
+ * K-Cosmetics 기존 동작과 동일한 기본 가시성 규칙.
  *
  *   my=true + 로그인 → 내 것만
  *   비로그인          → 공개만
@@ -505,11 +505,10 @@ export function createContentResourceCore(
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// GP / K-Cosmetics 전용 write handler (G3 create · G4 update)
+// K-Cosmetics 전용 write handler (G3 create · G4 update)
 //
 // KPA 는 `content_type` 컬럼(NOT NULL)을 갖고 KPA 전용 검증이 붙어 감사에서
 // DATA_MODEL_DIFFERENT 로 판정됐다 → KPA 는 이 factory 를 쓰지 않고 자기 구현을 유지한다.
-// GP ↔ KCos 는 100% 동일하므로 여기로 수렴한다.
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function createMemberWriteHandlers(dataSource: DataSource, config: ContentResourceConfig) {
@@ -648,7 +647,7 @@ export function createMemberWriteHandlers(dataSource: DataSource, config: Conten
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// 운영자 자료 직접 등록 (G12) — GP / K-Cosmetics 전용
+// 운영자 자료 직접 등록 (G12) — K-Cosmetics 전용
 //
 // 감사에서 UNIQUE 판정. KPA 에는 의도적으로 없으므로 KPA 로 확산시키지 않는다.
 // ─────────────────────────────────────────────────────────────────────────────

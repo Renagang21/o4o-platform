@@ -62,5 +62,5 @@
 - `a48d82153` — store_execution_assets QR 공개 랜딩 본문 렌더 (backend)
 
 ### 후속 후보
-- GP/KCos 공통화 — KPA 안정화 후 별도 IR/WO (DIRECT-CREATE 진입점은 KPA 전용 페이지, GP/KCos 는 공통 `StoreProductionMaterialsView` 사용).
+- KCos 공통화 — KPA 안정화 후 별도 IR/WO (DIRECT-CREATE 진입점은 KPA 전용 페이지, KCos 는 공통 `StoreProductionMaterialsView` 사용).
 - 공개 랜딩 응답에서 `libraryItemHtml` 은 `pageContent.body` 와 중복 노출(매장 자체 공개 콘텐츠라 무해) — 정리 시 제거 가능.

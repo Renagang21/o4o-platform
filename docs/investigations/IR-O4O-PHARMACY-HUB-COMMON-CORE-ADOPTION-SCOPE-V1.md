@@ -63,12 +63,10 @@ apps/api-server/src/config/service-catalog.ts (pharmacy-hub 엔트리)
 
 | 대상 | 사유 |
 |------|------|
-| **GlycoPharm 전 영역** | `O4O-COMMONIZATION-STANDARD` §3.4 `historical out-of-scope`. 기능 비교·route parity·판정 근거 사용 **모두 하지 않음** |
-| `apps/api-server/src/routes/glycopharm/**`, `routes/signage/extensions/pharmacy/**`, `routes/o4o-store/controllers/pharmacy-*.ts`, `routes/kpa/entities/kpa-pharmacy-request.entity.ts` | 파일명에 `pharmacy` 가 들어가지만 **GlycoPharm / KPA / Signage 도메인**이며 PharmacyHub 서비스와 무관. 인벤토리에서 제외 |
 | 병렬 세션 WIP 파일 | §1 |
 | `@o4o/operator-core` 은퇴 | 축 C — 본 IR(축 B)과 분리(`O4O-COMMONIZATION-STANDARD` §0.4) |
 
-> **명명 함정 (신규 기록)**: `apps/api-server/src/**` 에서 `*pharmacy*` 로 검색하면 **58 파일**이 잡히지만, 그중 PharmacyHub 서비스에 속하는 것은 **17 파일**뿐이다. 나머지는 GlycoPharm 약국 도메인 · KPA 약국 요청 · Signage 약국 extension · o4o-store 약국 정보다. 후속 WO 가 `grep pharmacy` 로 범위를 잡으면 **out-of-scope 를 침범한다.**
+> **명명 함정 (신규 기록)**: `apps/api-server/src/**` 에서 `*pharmacy*` 로 검색하면 **58 파일**이 잡히지만, 그중 PharmacyHub 서비스에 속하는 것은 **17 파일**뿐이다. KPA 약국 요청 · Signage 약국 extension · o4o-store 약국 정보다. 후속 WO 가 `grep pharmacy` 로 범위를 잡으면 **out-of-scope 를 침범한다.
 
 ---
 
@@ -435,19 +433,18 @@ PharmacyHub 에 `/admin` 영역이 **존재하지 않는다**(route 0 · 화면 
 
 ### 10.4 `ServiceKey` union — **차단 요인 아님 (선행 판정 정밀화)**
 
-`IR-...-OPERATOR-CORE-...-AUDIT-V1 §13-6` 은 `operator-ux-core` 의 `ServiceKey = 'kpa-society' | 'glycopharm' | 'k-cosmetics'` 에 Neture·PharmacyHub 가 없음을 부정합으로 기록했다. 본 IR 의 adoption 관점 실측:
+본 IR 의 adoption 관점 실측:
 
 ```
 packages/operator-ux-core/src/config/serviceConfig.ts:11
-  export type ServiceKey = 'kpa-society' | 'glycopharm' | 'k-cosmetics';
 
 grep -rn "ServiceConfig|serviceConfig|getServiceConfig" services/web-neture/src
   → 0 matches
 ```
 
-**Neture 는 `operator-ux-core` 를 53 import 소비하면서 `ServiceKey`/`ServiceConfig` 는 단 한 번도 쓰지 않는다.** `ServiceKey` 는 `kpaConfig`/`glycopharmConfig`/`kcosmeticsConfig` 표현 config 축에만 묶여 있고, `OperatorAreaShell` · `DomainIASidebar` · `DataTable` · `Pagination` · `FormField` 는 이 타입을 요구하지 않는다.
+**Neture 는 `operator-ux-core` 를 53 import 소비하면서 `ServiceKey`/`ServiceConfig` 는 단 한 번도 쓰지 않는다.** `ServiceKey` 는 `kpaConfig`/`kcosmeticsConfig` 표현 config 축에만 묶여 있고, `OperatorAreaShell` · `DomainIASidebar` · `DataTable` · `Pagination` · `FormField` 는 이 타입을 요구하지 않는다.
 
-또한 `operator-core-ui` `OperatorMembersConsolePageProps.serviceKey` 는 **`string`** 이다(union 아님) — 주석 "Canonical service key (neture / glycopharm / k-cosmetics)" 는 설명일 뿐 타입 제약이 아니다.
+또한 `operator-core-ui` `OperatorMembersConsolePageProps.serviceKey` 는 **`string`** 이다(union 아님) — 주석 "Canonical service key (neture / k-cosmetics)" 는 설명일 뿐 타입 제약이 아니다.
 
 > **판정**: `WO-O4O-OPERATOR-UX-CORE-SERVICEKEY-REALIGNMENT-V1`(선행 IR §15-5)은 **PharmacyHub adoption 의 선행 조건이 아니다.** 위생 개선 과제로 남기되, B4/B5 를 막지 않는다. 이 판정 없이는 후속 WO 가 불필요한 공유 패키지 타입 변경을 선행 조건으로 잡을 위험이 있었다.
 
@@ -622,7 +619,7 @@ PharmacyHub 주문·결제 → KEEP_BESPOKE / DO_NOT_UNIFY
 | 공급자 UI primitive 공통성 | **ADOPT_PRIMITIVE** — 테이블·페이지네이션·검색·인라인 입력은 `@o4o/ui` + `operator-ux-core` list primitive 로 대응 |
 | supplier layout 공통성 | **NOT_APPLICABLE** — 공급자 셸/대시보드가 없다 |
 | 상품/offer 데이터 계약 공통성 | **INSUFFICIENT_EVIDENCE** — `supplier_product_offers`/`offer_service_prices` 는 Neture canonical 이나 프론트 공통 컴포넌트 대응은 미확인 |
-| 거래 정책의 서비스 고유성 | **SERVICE_EXTENSION_REQUIRED** — `serviceKeys` opt-in 축은 Pharmacy-Hub↔Neture 계약. 3키(glycopharm/kpa-society/k-cosmetics)만 승인 큐를 갖는 기존 정책과도 다르다 |
+| 거래 정책의 서비스 고유성 | **SERVICE_EXTENSION_REQUIRED** — `serviceKeys` opt-in 축은 Pharmacy-Hub↔Neture 계약. 3키만 승인 큐를 갖는 기존 정책과도 다르다 |
 | 승인 흐름 유무 | **NOT_APPLICABLE** — 승인 개념 부재가 설계 |
 
 > **WO §15 주의사항 준수**: Neture 공급자 구조를 참조하되 강제 적용하지 않았다. Neture 공급자는 **상품 원장 주체**이고 PharmacyHub 공급자는 **제공 대상 선택 주체**다 — 후자는 전자 위에 얹힌 얇은 opt-in 레이어이며, 이 분리가 이미 코드로 표현되어 있다(등록·수정 없음).
@@ -829,7 +826,7 @@ B3(공유 계약 변경)를 **가장 나중에** 두는 이유는, 그 전까지
 | R-3 | Dockerfile COPY / tailwind glob 누락으로 빌드 실패 | 중 | 패키지 추가 시 **package.json COPY + source COPY + build + tailwind content 4곳** 동시 반영 (§3.4) |
 | R-4 | 공통 컴포넌트가 금액을 클라이언트 재계산 | **높음** | `pharmacyHubOrders.ts:9-12` 계약 — 서버 응답 그대로 표시. WS-1/WS-7 필수 제약 (§15.2) |
 | R-5 | `store-ui-core`/`store-products-ui` 를 이름 유사성으로 강제 채택 | 중 | §12·§14.2 — 약국 경영자는 **구매자**. 판정은 `NOT_APPLICABLE`/`INSUFFICIENT_EVIDENCE` |
-| R-6 | `pharmacy` 문자열 검색으로 GlycoPharm/KPA/Signage 침범 | **높음** | §2.2 — in-scope 17 파일 목록 고정. 경로 기준으로만 범위 설정 |
+| R-6 | — | **높음** | §2.2 — in-scope 17 파일 목록 고정. 경로 기준으로만 범위 설정 |
 | R-7 | 축 B(adoption)와 축 C(legacy)의 혼합 | 중 | §20 — 어느 WS 도 `operator-core`/`auth-context` 를 포함하지 않음 |
 
 ### 21.2 중지 조건 대조 (WO §23)
@@ -887,11 +884,10 @@ B3(공유 계약 변경)를 **가장 나중에** 두는 이유는, 그 전까지
 | DB 조회 / write | **0** — 프로덕션·로컬 DB 접속 없음 |
 | migration | **0** |
 | 배포 | **0** |
-| **GlycoPharm 접촉** | **0** — 조사·비교·수정 없음. 판정 근거로도 미사용 (§2.2) |
 | **다른 세션 WIP 접촉** | **0** — `otc-zh-batch01-verify.ga.json` 무접촉 (§1) |
 | `pnpm install` / 전체 build | **미실행** |
 | 기준 문서 수정 | **0** — 조사 결과 기준 문서의 PharmacyHub 기재에 **명백한 오류는 없었고**, 정밀화 사항은 본 IR §18.1 에 기록하는 방식으로 처리했다(WO §21.2 의 "명백히 부족하거나 잘못된 경우에만" 조건 미충족) |
 
 ---
 
-*Date: 2026-08-03 · read-only adoption scope audit · 조사 기준 HEAD `9efba8fca` (커밋 시점 `dd792c64e`, 범위 무침범) · frontend 26파일 3,745L + backend 17파일 3,293L 전수 · 화면 21건 × 화면군 10 × 판정값 14 · 공통 패키지 14종 대응 매트릭스 · 코드/package/route/DB/배포 변경 0 · GlycoPharm 무접촉 · 병렬 세션 WIP 무접촉.*
+*Date: 2026-08-03 · read-only adoption scope audit · 조사 기준 HEAD `9efba8fca` (커밋 시점 `dd792c64e`, 범위 무침범) · frontend 26파일 3,745L + backend 17파일 3,293L 전수 · 화면 21건 × 화면군 10 × 판정값 14 · 공통 패키지 14종 대응 매트릭스 · 코드/package/route/DB/배포 변경 0 무접촉 · 병렬 세션 WIP 무접촉.*

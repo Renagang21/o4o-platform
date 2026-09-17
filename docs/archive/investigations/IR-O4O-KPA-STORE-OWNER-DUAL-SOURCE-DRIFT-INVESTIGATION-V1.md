@@ -218,7 +218,7 @@ frontend 가 store_owner 판정에 사용하는 server-side 값 두 가지:
 | 입력 | endpoint | 정의 | source |
 |---|---|---|---|
 | `user.roles` | `/auth/me` | `roleAssignmentService.getRoleNames(userId)` (60s 캐시 + invalidate 즉시 무효화) | **`role_assignments WHERE is_active=true`** |
-| `user.isStoreOwner` | `/kpa/me-context` | `EXISTS(SELECT 1 FROM role_assignments WHERE role IN ('kpa:store_owner','glycopharm:store_owner','cosmetics:store_owner') AND is_active=true)` | **role_assignments 단일** |
+| `user.isStoreOwner` | `/kpa/me-context` | `EXISTS(SELECT 1 FROM role_assignments WHERE role IN AND is_active=true)` | **role_assignments 단일** |
 
 세부 코드: [auth-account.controller.ts:28-44](../../apps/api-server/src/modules/auth/controllers/auth-account.controller.ts#L28-L44), [me-context.controller.ts:43-65](../../apps/api-server/src/routes/kpa/controllers/me-context.controller.ts#L43-L65).
 
@@ -263,7 +263,6 @@ export function isStoreOwnerDual(roles, storeOwnerRole, contextFlag) {
 | PharmacyApprovalGatePage | `PharmacyApprovalGatePage.tsx` | 114 (+ 119 activity_type metadata 분기) | 동일 + activity_type 분기 | ✅ (activity_type 은 display only) |
 | Post-login redirect | `config/dashboard.ts` | 59 | `user.isStoreOwner` 직접 | ✅ (단일 source 단순 우선) |
 | 모바일 하단 nav | `MobileBottomNav.tsx` | 89-96 | (gating 없음 — 항상 표시. /mobile/pharmacy 경로에서 PharmacyGuard 차단) | ✅ |
-| Cross-service (Glyco) | `GlycoGlobalHeader.tsx` | 68 | `isStoreOwnerDual(user?.roles ?? [], 'glycopharm:store_owner')` | ✅ |
 | Cross-service (Cosmetics) | `KCosGlobalHeader.tsx` | 63 | `isStoreOwnerDual(user?.roles ?? [], 'cosmetics:store_owner')` | ✅ |
 
 ### 4-3. 사용자 가설 "Header 가 단일 user.roles check" — **반증**

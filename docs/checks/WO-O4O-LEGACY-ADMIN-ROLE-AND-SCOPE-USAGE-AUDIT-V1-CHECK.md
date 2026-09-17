@@ -112,7 +112,7 @@ WO 의 중지 조건("작업 트리가 clean 이 아니면 기존 변경을 수�
 | 분류 | 건수 | 예시 |
 |------|:---:|------|
 | migration (역사적 기록) | 19 | `20260205070000-Phase4...`, `20260228000001-CleanupLegacyRoles`, `20261027000000-MigrateLegacyRoles...` |
-| JSDoc · 주석 · 에러 메시지 문자열 | 12 | `roles.ts:168,183`, `scope-assignment.utils.ts:10,38`, `glycopharm/admin.controller.ts:44`, `neture.controller.ts:390`, `security-core/types.ts:28` |
+| JSDoc · 주석 · 에러 메시지 문자열 | 12 | — |
 | 테스트 (오히려 **거부**를 단언) | 4 | `scope-guard.spec.ts:97,219,269` — *"platform:admin → denied (only super_admin bypasses)"* |
 | `ROLE_REGISTRY` 정의 자체 | 2 | `roles.ts:244-245` |
 | 프론트 — `expandRequiredRoles` 가 보완 | 1 | `dashboard.routes.tsx:72` (§4-3) |
@@ -127,7 +127,7 @@ WO 의 중지 조건("작업 트리가 clean 이 아니면 기존 변경을 수�
 | # | 기능군 | `platform:admin` 허용 | `platform:super_admin` 허용 | 서비스 admin·operator 허용 | 독립 용도 존재 | 제거 영향 |
 |---|--------|:---:|:---:|:---:|:---:|------|
 | 1 | 서비스 scope bypass (`extractServiceScope` → `injectServiceScope` → 운영자 콘솔 전체: Membership / Product / Store / Role) | ✅ | ✅ | ❌ (자기 서비스만) | **없음** — `isPlatformAdmin()` 이 두 역할을 동일 취급 | 없음 (보유자 0) |
-| 2 | security-core scope guard `platformBypass` (neture / glycopharm / cosmetics 등) | **❌ 거부** | ✅ | ✅ (해당 서비스 접두 role) | **없음** | 없음 |
+| 2 | security-core scope guard `platformBypass` (neture / cosmetics 등) | **❌ 거부** | ✅ | ✅ (해당 서비스 접두 role) | **없음** | 없음 |
 | 3 | Membership 관리자 subtree (`MEMBERSHIP_ADMIN_ROLES`) | ✅ | ✅ | ❌ | 없음 | 없음 |
 | 4 | Admin Users API 역할 회수 (`ADMIN_ROLES`, `routes/admin/users.routes.ts:32`) | ✅ | ✅ | ❌ | 없음 | 없음 |
 | 5 | 역할 카탈로그 CUD (`RoleController`, `scope.isPlatformAdmin`) | ✅ | ✅ | ❌ | 없음 | 없음 |
@@ -187,7 +187,7 @@ Yaksa 는 membership guard 를 **사용하지 않는다.** 이름이 같다는 �
 
 ### 5-4. `yaksa:*` 역할 보유 현황
 
-`role_assignments` 에 `yaksa` 접두 자체가 없다(선행 census `94a407e8a`). `SERVICE_SCOPES`(`config/service-scopes.ts`) 키는 `glycopharm` · `neture` · `kpa-society` · `cosmetics` **4개뿐**이며 `yaksa` 가 없다 → `yaksa:admin` scope 는 **어떤 경로로도 발급되지 않는다.**
+`role_assignments` 에 `yaksa` 접두 자체가 없다(선행 census `94a407e8a`). `SERVICE_SCOPES`(`config/service-scopes.ts`) 키는 `neture` · `kpa-society` · `cosmetics` **4개뿐**이며 `yaksa` 가 없다 → `yaksa:admin` scope 는 **어떤 경로로도 발급되지 않는다.**
 
 따라서 9개 yaksa 관리 endpoint 를 통과할 수 있는 유일한 조건은 `platform:admin`(보유자 0) 또는 `platform:super_admin`(2명) role 이다.
 
@@ -240,9 +240,9 @@ JWT (access, 15분)
 
 | # | scope / guard | 발급 경로 | JWT 포함 | `req.user` 전달 | route·기능 | role 우회 조건 | 현재 도달 가능성 | 판정 |
 |---|------|------|:---:|:---:|------|------|------|:---:|
-| 1 | `createServiceScopeGuard` (`security-core`) 의 `user.scopes` 분기 | `SERVICE_SCOPES` (4키) | ✅ (admin 급만) | ❌ | neture·glycopharm·cosmetics·kpa 전 scope 경로 | — | **scope 분기 항상 false** | REMOVE (분기만) |
+| 1 | `createServiceScopeGuard` (`security-core`) 의 `user.scopes` 분기 | `SERVICE_SCOPES` (4키) | ✅ (admin 급만) | ❌ | neture·cosmetics·kpa 전 scope 경로 | — | **scope 분기 항상 false** | REMOVE (분기만) |
 | 2 | 동 guard 의 `user.roles` 분기 (`allowedRoles` + `platformBypass`) | `role_assignments` | ✅ | ✅ | 동일 | 서비스 접두 role 또는 `platform:super_admin` | **정상 도달** | KEEP_ACTIVE |
-| 3 | `createMembershipScopeGuard` 의 `user.memberships` 선행 검사 | `service_memberships` | ✅ | ✅ | cosmetics · glycopharm · neture · service-legal | — | **정상 도달** | KEEP_ACTIVE |
+| 3 | `createMembershipScopeGuard` 의 `user.memberships` 선행 검사 | `service_memberships` | ✅ | ✅ | cosmetics · neture · service-legal | — | **정상 도달** | KEEP_ACTIVE |
 | 4 | `requireYaksaScope` 의 `yaksa:admin` scope 분기 | **없음** (`SERVICE_SCOPES` 에 `yaksa` 키 부재) | ❌ | ❌ | `/api/v1/yaksa/admin/*` 9개 | — | **도달 불가** | REMOVE |
 | 5 | `requireYaksaScope` 의 `platform:admin` role 분기 | `role_assignments` | ✅ | ✅ | 동일 | 보유자 **0명** | **도달 불가(계정 부재)** | REMOVE |
 | 6 | `requireYaksaScope` 의 `platform:super_admin` role 분기 | `role_assignments` | ✅ | ✅ | 동일 | 2명 | **도달 가능** | REPLACE |
@@ -301,7 +301,7 @@ JWT (access, 15분)
 |------|------|
 | `kpa` | `kpa-society` |
 | `cosmetics` | `k-cosmetics` |
-| `neture` · `glycopharm` · `pharmacy-hub` | 자기 자신 |
+| `neture` · `pharmacy-hub` | 자기 자신 |
 | **`yaksa`** | **매핑 없음** — `SERVICE_SCOPES` 에도 키 없음 |
 
 `member.controller.ts:1545` 는 `m.serviceKey === 'kpa-society' || m.serviceKey === 'kpa'` 로 양쪽을 모두 받아 방어한다.

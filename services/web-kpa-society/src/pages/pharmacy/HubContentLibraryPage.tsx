@@ -7,7 +7,7 @@
  * KPA 전용 API(cmsApi, assetSnapshotApi), 복사 로직은 kpaContentHubConfig에만 위치한다.
  *
  * WO-O4O-KPA-STOREHUB-CONTENT-CANONICAL-ALIGN-V1:
- *   GP·KCos canonical 정렬 — heroTitle/heroDesc("약국에서 바로 쓰는 콘텐츠"/"콘텐츠 자료실"),
+ *   KCos canonical 정렬 — heroTitle/heroDesc("약국에서 바로 쓰는 콘텐츠"/"콘텐츠 자료실"),
  *   6-필터(전체/공지/가이드/지식/프로모션/뉴스, key=CMS DB type), 용어 '내 약국'.
  *   복합 탭 display remap(notice+news / promo+event) 제거 — 단일 type 직매핑.
  *   backend/route/copy-API/링크 대상(/store/content) 무변경. legacy 'event' 콘텐츠는 '전체' 탭 노출 유지.
@@ -18,7 +18,7 @@
  * WO-O4O-KPA-STORE-HUB-CONTENT-SOURCE-TABS-V1:
  *   두 소스를 한 목록으로 병합하지 않고 '소스 탭'으로 구분한다 — 콘텐츠 허브(kpa_contents ready) / 운영 자료(cms published).
  *   전체 탭 없음, 기본 탭 = 콘텐츠 허브. 탭별 빈 상태 문구(filterEmptyMessages). 검색은 현재 탭 소스 안에서만.
- *   복사(가져오기=복사) 및 출처별 assetType 분기(cms/content)는 유지. backend/DB 무변경. GP/KCos 무영향(KPA config 한정).
+ *   복사(가져오기=복사) 및 출처별 assetType 분기(cms/content)는 유지. backend/DB 무변경. KCos 무영향(KPA config 한정).
  */
 
 import { useMemo, useRef } from 'react';
@@ -33,7 +33,7 @@ import { useAuth } from '../../contexts/AuthContext';
 
 // ─── Display Remap ────────────────────────────────────────────────────────────
 // WO-O4O-KPA-STOREHUB-CONTENT-CANONICAL-ALIGN-V1:
-//   GP·KCos canonical 6-필터(전체/공지/가이드/지식/프로모션/뉴스)로 정렬.
+//   KCos canonical 6-필터(전체/공지/가이드/지식/프로모션/뉴스)로 정렬.
 //   필터 key = CMS DB type (notice/guide/knowledge/promo/news) — 복합 탭(notice+news, promo+event)
 //   remap 제거. legacy 'event' type 콘텐츠는 '전체' 탭에서 계속 노출되며, 배지 라벨만 유지.
 

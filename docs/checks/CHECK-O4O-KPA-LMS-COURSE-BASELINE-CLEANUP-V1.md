@@ -10,7 +10,7 @@
 
 ## 1. 작업 범위
 
-KPA-Society 강의/LMS 기준선을 공통화 전에 정비. **KPA-Society 한정** — GlycoPharm / K-Cosmetics / Neture 미적용. 특히 **Neture 강의 기능·메뉴·라우트·공통 소비처 연결 금지**.
+KPA-Society 강의/LMS 기준선을 공통화 전에 정비. **KPA-Society 한정** — K-Cosmetics / Neture 미적용. 특히 **Neture 강의 기능·메뉴·라우트·공통 소비처 연결 금지**.
 
 선행 IR 위험(R1 dormant payment / R2 progress 갱신 / R3 course-complete 판정 / R6 Neture 오염) 중 **안전하게 코드로 정리 가능한 항목만** 본 WO에서 수정하고, **reward 동작 변경을 수반하는 항목은 문제 확정 + 후속 분리**.
 
@@ -98,7 +98,7 @@ KPA-Society 강의/LMS 기준선을 공통화 전에 정비. **KPA-Society 한�
 - **Neture에는 LMS/강의 수강 기능이 없으며, 본 WO는 Neture 파일을 일절 수정하지 않았다.**
 - Neture에 강의 메뉴/라우트/공통 소비처 추가 금지. Neture는 공급자/파트너/운영 기반 서비스.
 - Neture 공급자는 강의 **콘텐츠 원천 제공자**가 될 수 있으나 **수강 서비스 주체가 아니다.**
-- LMS 공통화 대상 = **KPA-Society / GlycoPharm / K-Cosmetics**. Neture는 공통 UI/Core 소비처에서 제외.
+- Neture는 공통 UI/Core 소비처에서 제외.
 - 공통화 단계에서 Neture 비오염을 별도 CHECK(§16-4)로 최종 검증.
 
 ## 11. 검증 결과
@@ -108,7 +108,7 @@ KPA-Society 강의/LMS 기준선을 공통화 전에 정비. **KPA-Society 한�
   - LMS 결제 오해 문구 1건 정정, 결제 버튼 0(LMS), dormant 인프라 보존 확인.
   - KPA `'live'` lesson-type 잔재 0(union·아이콘 제거, `=== 'live'` 비교 부재 확인). 주석 정리.
   - reward referenceKey/금액/정책 무변경. backend·route·DB·migration·enum 무변경.
-  - Neture·GP·KCos 파일 미수정(git status). 다른 세션 WIP(contact-inquiry/operator-core-ui 등) 미접촉.
+  - Neture·KCos 파일 미수정(git status). 다른 세션 WIP(contact-inquiry/operator-core-ui 등) 미접촉.
 - **browser smoke:** 미수행 — 인증 guard·실데이터 write 회피(WO 원칙). UI 텍스트/dead-type 제거는 tsc + 정적으로 검증. 유료 강의 안내 문구·LIVE 미노출은 배포 후 렌더 확인 권장.
 - **backend typecheck:** 백엔드 무변경이므로 미실행(divergence는 문서화만).
 
@@ -127,21 +127,20 @@ KPA-Society 강의/LMS 기준선을 공통화 전에 정비. **KPA-Society 한�
 1. **`WO-O4O-LMS-COMPLETION-REWARD-UNIFY-V1`** (선결, 정책 합의 필요) — D1·D2 해소. 단일 완료 경로(또는 공통 `LessonCompletionService`)로 progress 저장소·lesson_complete/course_complete reward 발급을 통합. `IR-O4O-MARKETING-CONTENT-REWARD-POLICY-V1` 기준 video/article·assignment 완료의 credit 지급 여부를 **명시 합의 후** 구현. referenceKey dedup·금액 불변.
 2. **`IR-O4O-LMS-SERVICE-COMMONIZATION-BOUNDARY-V1`** — KPA 정비 결과 기준 LMS 공통화 경계 확정.
 3. **`WO-O4O-LMS-COMMON-UI-EXTRACTION-V1`** — CourseCard/CourseList/CourseDetail/LessonPlayer/QuizPanel 등 공통 UI 후보 추출.
-4. **`WO-O4O-LMS-GLYCOPHARM-KCOSMETICS-ADOPTION-V1`** — GP/KCos 적용(공통 기준).
 5. **`CHECK-O4O-LMS-NETURE-EXCLUSION-GUARD-V1`** — Neture LMS 메뉴/라우트/소비처 부재 최종 확인.
 
-> 권장 순서: **1(완료/리워드 통합) → 2(경계 IR) → 3(공통 UI) → 4(적용) → 5(Neture 가드)**. D1·D2를 공통화 전에 정리해야 잘못된 reward 구조가 GP/KCos로 전파되지 않는다.
+> 권장 순서: **1(완료/리워드 통합) → 2(경계 IR) → 3(공통 UI) → 4(적용) → 5(Neture 가드)**. D1·D2를 공통화 전에 정리해야 잘못된 reward 구조가 KCos로 전파되지 않는다.
 
 ## 14. 완료 판정
 
-**PASS (조건부).** KPA 강의 기준선의 안전 정비(payment 오해 문구·LIVE dead 잔재) 완료, typecheck 0 errors, Neture/GP/KCos·backend 무변경. **핵심 reward·완료 divergence(D1·D2)를 실증·확정하여 공통화 선행 정책 WO로 분리** — 이로써 "강의 결제 오해 제거 / Neture 제외 고정 / 위험 명문화"는 달성, "reward·completion 흐름 통합"은 정책 합의 후속으로 안전하게 이관.
+**PASS (조건부).** KPA 강의 기준선의 안전 정비(payment 오해 문구·LIVE dead 잔재) 완료, typecheck 0 errors, Neture/KCos·backend 무변경. **핵심 reward·완료 divergence(D1·D2)를 실증·확정하여 공통화 선행 정책 WO로 분리** — 이로써 "강의 결제 오해 제거 / Neture 제외 고정 / 위험 명문화"는 달성, "reward·completion 흐름 통합"은 정책 합의 후속으로 안전하게 이관.
 
 ---
 
 ## 최종 보고 요약
 
 - **WO:** WO-O4O-KPA-LMS-COURSE-BASELINE-CLEANUP-V1 (KPA-Society 한정 강의 기준선 정비)
-- **변경 파일:** KPA frontend 4 + CHECK 문서 1 (backend/DB/route/enum/Neture/GP/KCos 무변경)
+- **변경 파일:** KPA frontend 4 + CHECK 문서 1 (backend/DB/route/enum/Neture/KCos 무변경)
 - **payment(4.1):** LMS 결제 오해 문구 1건 정정(외부 수납 안내), dormant 인프라 보존
 - **LIVE(4.5):** KPA `'live'` lesson-type dead 잔재 제거(union·아이콘·주석), YouTube(Signage) 미접촉
 - **progress/quiz(4.2/4.3):** UI는 백엔드 응답 신뢰 OK, quiz_pass+lesson_complete 합산은 의도된 구조(referenceKey 분리)로 명시
@@ -149,5 +148,5 @@ KPA-Society 강의/LMS 기준선을 공통화 전에 정비. **KPA-Society 한�
 - **reward 중복방지:** referenceKey UNIQUE + dedup 확인(무변경)
 - **Neture 제외:** 명문화, 파일 미수정
 - **검증:** KPA tsc 0 errors, 정적 PASS, 다른 세션 WIP 미접촉
-- **후속:** WO-LMS-COMPLETION-REWARD-UNIFY-V1(선결) → 경계 IR → 공통 UI → GP/KCos 적용 → Neture 가드 CHECK
+- **후속:** WO-LMS-COMPLETION-REWARD-UNIFY-V1(선결) → 경계 IR → 공통 UI → KCos 적용 → Neture 가드 CHECK
 - **커밋:** `feat(kpa-lms): stabilize course baseline before commonization`

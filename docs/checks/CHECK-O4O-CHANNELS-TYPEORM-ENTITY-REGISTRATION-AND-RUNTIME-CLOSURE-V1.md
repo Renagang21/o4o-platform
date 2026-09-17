@@ -163,7 +163,7 @@ import 가능 여부만 보는 약한 테스트가 아니라 네 축을 본다.
 ## 10. serviceKey canonical / slot 연결 (§19/§20)
 
 - 기존 `channels-servicekey-canonical-scope.spec.ts` 가 전체 회귀에 포함되어 통과.
-- production read-only 확인: `cms_content_slots` = `kpa-society` 28 / `kpa` 1 / `glycopharm` 1.
+- production read-only 확인: `cms_content_slots` = `kpa-society` 28 / `kpa` 1 1.
   KPA 채널의 조회 조건(`serviceKey IN ('kpa-society','kpa') OR IS NULL`, `isActive`)으로
   legacy `kpa` slot(`intranet-hero`)이 canonical 결과와 **함께** 잡히는 것을 확인했다.
   fixture 생성 0.

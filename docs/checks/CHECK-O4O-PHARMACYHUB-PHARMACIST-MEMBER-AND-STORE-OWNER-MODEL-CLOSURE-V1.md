@@ -78,7 +78,7 @@ backend 는 `requirePharmacyHubScope('pharmacy-hub:store_owner')`.
 | 항목 | 결과 |
 |---|---|
 | 대상 | user `44fa7733…` (마스킹) · membership `pharmacy-hub` / `member` / `active` |
-| 생성 | 2026-08-13 — glycopharm · k-cosmetics · kpa-society · neture · pharmacy-hub 5건이 **같은 타임스탬프**로 생성된 시드/QA 계정 |
+| 생성 | 2026-08-13 — k-cosmetics · kpa-society · neture · pharmacy-hub 5건이 **같은 타임스탬프**로 생성된 시드/QA 계정 |
 | role_assignments | 12건 (이미 `pharmacy-hub:store_owner` 포함) |
 | users.status | `suspended` |
 | 약사 profile | 없음 |

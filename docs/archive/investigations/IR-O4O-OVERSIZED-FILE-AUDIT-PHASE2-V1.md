@@ -93,15 +93,15 @@
 | 10 | `services/tenant-consolidation.service.ts` | 921 | Service | Merge/split engine + job queue. Clear boundaries but large |
 | 11 | `routes/kpa/controllers/branch-admin-dashboard.controller.ts` | 905 | Controller | 7+ route handlers. Inline business logic |
 | 12 | `services/forum/ForumRecommendationService.ts` | 891 | Service | Recommendation engine. Clean but approaching limit |
-| 13 | `routes/glycopharm/controllers/store-applications.controller.ts` | 876 | Controller | App state mgmt + validation + email + auto-listing 혼합 |
+| 13 | — | 876 | Controller | App state mgmt + validation + email + auto-listing 혼합 |
 | 14 | `services/template-switch.service.ts` | 875 | Service | Template migration engine. Well-organized but large |
 | 15 | `routes/cosmetics/controllers/cosmetics-store.controller.ts` | 861 | Controller | Store CRUD + member + playlist + insights. Mostly delegation |
 | 16 | `services/PerformanceOptimizationService.ts` | 854 | Service | Monitoring + caching + query optimization + auto-tuning |
-| 17 | `routes/glycopharm/controllers/cockpit.controller.ts` | 852 | Controller | 6+ dashboard data builders inline |
+| 17 | — | 852 | Controller | 6+ dashboard data builders inline |
 | 18 | `services/ai-proxy.service.ts` | 821 | Service | LLM proxy. Well-structured but large |
 | 19 | `routes/cosmetics/controllers/cosmetics-order.controller.ts` | 818 | Controller | Order CRUD + metadata parsing + channel filtering |
 | 20 | `controllers/operator/MembershipConsoleController.ts` | 817 | Controller | Inline SQL + boundary checks |
-| 21 | `routes/glycopharm/controllers/checkout.controller.ts` | 812 | Controller | Checkout validation + sales limit + cleanup 혼합 |
+| 21 | — | 812 | Controller | Checkout validation + sales limit + cleanup 혼합 |
 | 22 | `routes/kpa/kpa.routes.ts` | 808 | Routes | 30+ sub-router mount. Service composition layer |
 
 ### 4.2 admin-dashboard (8 files)
@@ -188,7 +188,6 @@
 | **Signage** | 0 | 3 | 3,608 | service + controller + repository triple |
 | **Neture** | 3 | 0 | 2,713 | partner.controller + admin.controller + legacy service |
 | **Auth** | 1 | 2 | 3,343 | authentication.service + auth.controller + auth.middleware |
-| **Glycopharm** | 0 | 4 | 3,416 | store-apps + cockpit + checkout + glycopharm controllers |
 | **Cosmetics** | 0 | 2 | 1,679 | store + order controllers |
 | **KPA** | 0 | 2 | 1,713 | branch-admin-dashboard + kpa.routes |
 | **CMS/Content** | 1 | 1 | 2,075 | cms-content.routes + dashboard-assets.routes |

@@ -19,7 +19,7 @@
 ## 2. 수정 (서비스별 canonical 도메인)
 
 - `qrPublicOrigin(serviceKey)` 신설 — service-catalog(SSOT) 기반:
-  - `kpa → kpa-society.co.kr`, `glycopharm → glycopharm.co.kr`, `cosmetics → k-cosmetics.site`
+  - `kpa → kpa-society.co.kr`, `cosmetics → k-cosmetics.site`
   - 매핑: `QR_SERVICE_TO_CATALOG_KEY`(StoreOwnerServiceKey → catalog key, store-owner.utils 와 동일 의미).
   - 카탈로그 누락/서비스 미상 시 `kpa-society.co.kr` 안전 폴백. `o4o.kr` 전역 fallback 제거.
 - image/export/print/flyer 4곳 모두 `${qrPublicOrigin(serviceKey)}/qr/${slug}` 로 교체.

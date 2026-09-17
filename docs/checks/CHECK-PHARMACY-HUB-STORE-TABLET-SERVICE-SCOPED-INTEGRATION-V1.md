@@ -45,7 +45,7 @@ export interface StoreTabletRoutesOptions {
 }
 ```
 
-- `/api/v1/store` 마운트는 **인자 무변경** → KPA·GlycoPharm·K-Cosmetics 동작 불변
+- `/api/v1/store` 마운트는 **인자 무변경** → KPA·K-Cosmetics 동작 불변
 - 모듈 상수(`TABLET_QR_SERVICE_KEY` · `OPERATOR_TEMPLATE_SERVICE_KEY`)를 기본값으로 유지
 - 주입 경로는 인증을 하지 않는다 — 호출 측 라우터가 이미 `requireAuth` + scope guard 를 걸었다
 
@@ -89,7 +89,6 @@ QR 은 `pharmacyhub.co.kr` 로 발급되고, 운영자 HUB 는 PH 원본이 없�
 |---|---|
 | `api-server` tsc --noEmit | ✅ clean |
 | `pharmacy-hub-web` type-check + build | ✅ PASS |
-| `web-kpa-society` / `web-glycopharm` / `web-k-cosmetics` typecheck | ✅ 전부 clean |
 
 ### 3-2. 배포
 
@@ -178,7 +177,7 @@ W9 §8-① 은 `/api/v1/store/tablets` 의 조직 해석이 serviceKey 없이 �
 | **Pharmacy-Hub** | ✅ **해소** — PH 는 enrollment 기준 해석기만 사용한다 |
 | `/api/v1/store` 기본 마운트 | ⚠️ **미해소** — 여전히 `createRequireStoreOwner(dataSource)`(serviceKey 미지정) |
 
-기본 마운트를 service-aware 로 바꾸는 것은 KPA·GlycoPharm·K-Cosmetics 3서비스의 조직 해석을
+기본 마운트를 service-aware 로 바꾸는 것은 KPA·K-Cosmetics 2서비스의 조직 해석을
 동시에 바꾸는 변경이라 이번 범위 밖이다. **seam 은 이미 열려 있으므로** 각 서비스가
 자기 해석기를 주입하는 방식으로 후속 처리할 수 있다.
 → 후속 WO 권장: `WO-O4O-STORE-TABLET-DEFAULT-MOUNT-SERVICE-SCOPED-V1`

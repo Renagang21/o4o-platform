@@ -4,7 +4,7 @@
  * WO-O4O-STORE-HUB-MAIN-INDEPENDENT-PRODUCTION-VERIFICATION-V1 §9
  *
  * 배경: `WO-O4O-STORE-HUB-EVENT-OFFER-ORDER-VISIBILITY-AND-CANCELLATION-V1` 에서
- *   결제 전 취소 계약(`POST .../cancel`)은 KPA · GlycoPharm · K-Cosmetics 백엔드에
+ *   결제 전 취소 계약(`POST .../cancel`)은 KPA · K-Cosmetics 백엔드에
  *   모두 추가됐지만 **매장 화면에는 노출되지 않았다**. Pharmacy-Hub 만 UI 버튼을 가진
  *   상태여서, 매장이 스스로 되돌릴 수 없는 흐름 단절이 남아 있었다.
  *

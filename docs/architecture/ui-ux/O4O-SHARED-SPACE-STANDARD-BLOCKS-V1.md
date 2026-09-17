@@ -336,7 +336,6 @@ Signage는 중요한 파트이지만 모든 공동 공간의 필수 요소는 �
 예:
 
 * KPA는 News / Content 비중 강화
-* GlycoPharm은 Guidance / Recommendation 비중 강화
 * Neture는 CTA / App Entry 비중 강화
 
 ---

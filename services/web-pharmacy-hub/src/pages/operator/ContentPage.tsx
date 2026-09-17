@@ -3,7 +3,7 @@
  *
  * WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §4
  *
- * KPA / GlycoPharm / K-Cosmetics 가 이미 소비 중인 **공통 모듈**
+ * KPA / K-Cosmetics 가 이미 소비 중인 **공통 모듈**
  * `@o4o/operator-core-ui/modules/cms-content` 를 그대로 채택한다 (PH 전용 사본 0).
  *
  * API (공통 news controller · serviceKey='pharmacy-hub' · 원장 cms_contents):

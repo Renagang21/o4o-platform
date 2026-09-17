@@ -2,7 +2,7 @@
  * createGuideClient — O4O 공통 guide_contents API 클라이언트
  * WO-O4O-GUIDE-CLIENT-EXTRACTION-V1
  *
- * 4개 서비스(KPA-Society / GlycoPharm / K-Cosmetics / Neture)가 동일한 구조로
+ * 3개 서비스(KPA-Society / K-Cosmetics / Neture)가 동일한 구조로
  * /api/v1/guide/contents 엔드포인트에 접근하기 위한 factory.
  *
  * 각 서비스 차이점은 (a) accessToken 획득 방식, (b) base URL 정도뿐 —

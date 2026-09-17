@@ -16,7 +16,7 @@ KPA-Society 강의 LMS 의 레슨 완료·퀴즈 완료·강의 수료 흐름을
 - **학습 상태 layer**: reward 여부와 무관하게 항상 canonical 하게 기록(enrollment / lesson progress / quiz attempt / pass·fail / course progress / completion / certificate).
 - **reward policy layer**: lesson_complete / quiz_pass / course_complete 는 **강사·운영자가 강의/레슨/퀴즈 단위로 설정한 경우에만** 지급. 설정 없으면 완료는 정상 기록되되 credit 미지급(오류 아님).
 
-KPA-Society 한정. GP/KCos/Neture 미적용. Neture 는 LMS 대상 아님(메뉴/라우트/소비처 연결 금지).
+KPA-Society 한정. KCos/Neture 미적용. Neture 는 LMS 대상 아님(메뉴/라우트/소비처 연결 금지).
 
 ## 2. 정책 정정 (반영)
 
@@ -47,7 +47,7 @@ KPA-Society 한정. GP/KCos/Neture 미적용. Neture 는 LMS 대상 아님(메�
 | `services/web-kpa-society/src/pages/lms/LmsLessonPage.tsx` | 수료 모달 하드코딩 "+50 크레딧 적립" 문구 제거(reward 기본 지급 오해) |
 | `docs/checks/CHECK-O4O-LMS-COMPLETION-REWARD-POLICY-SEPARATION-V1.md` | 본 문서(신규) |
 
-**무변경:** DB/migration/schema, credit-constants 금액, referenceKey 규칙, OrderType.LMS/price/isPaid, payment/checkout, certificate 신규기능, GP/KCos/Neture, 공통 패키지.
+**무변경:** DB/migration/schema, credit-constants 금액, referenceKey 규칙, OrderType.LMS/price/isPaid, payment/checkout, certificate 신규기능, KCos/Neture, 공통 패키지.
 
 ## 5. reward policy 조회 경로 (RewardPolicyService)
 
@@ -106,7 +106,7 @@ KPA-Society 한정. GP/KCos/Neture 미적용. Neture 는 LMS 대상 아님(메�
 
 - **Neture 파일 미수정**(git status 확인 — untracked PNG 스크린샷만, 비-LMS·사전 존재).
 - Neture LMS 메뉴/라우트/공통 소비처 없음. Neture 는 공급자/파트너/운영 기반 — 강의 수강 대상 아님.
-- LMS 공통화 대상 = KPA-Society / GlycoPharm / K-Cosmetics. Neture 제외.
+- LMS 공통화 대상 = KPA-Society / K-Cosmetics. Neture 제외.
 
 ## 14. 검증 결과
 
@@ -116,7 +116,7 @@ KPA-Society 한정. GP/KCos/Neture 미적용. Neture 는 LMS 대상 아님(메�
   - video/article 완료 → `recordLessonProgressCompletion`(Progress 기록) 경로 연결 확인.
   - course_complete 가 quiz/assignment/video·article 모두에서 gated 호출.
   - referenceKey 규칙·dedup·금액 무변경. backend·route·DB·migration·enum 무변경.
-  - Neture/GP/KCos 미수정. 다른 세션 WIP(contact-inquiry/operator-core-ui/store-ui-core 등) 미접촉.
+  - Neture/KCos 미수정. 다른 세션 WIP(contact-inquiry/operator-core-ui/store-ui-core 등) 미접촉.
 - **browser smoke:** 미수행 — 인증 guard·실데이터 write 회피(WO 원칙). completion/reward 엔진 변경은 tsc + 정적(기존 quiz/assignment Progress 패턴과 동형)으로 검증. **배포 후 dev/staging 에서 video/article 완료→진도 반영, quiz 통과→진도, 수료→인증서, rewardPolicy 미설정 강의에서 credit 미지급·완료 정상을 확인 권장.**
 
 ## 15. 남은 한계·이슈
@@ -132,12 +132,11 @@ KPA-Society 한정. GP/KCos/Neture 미적용. Neture 는 LMS 대상 아님(메�
 1. **`IR-O4O-LMS-REWARD-POLICY-UI-AUDIT-V1`** — 강사/운영자 reward 설정 UI ↔ `metadata.rewardPolicy` backend 계약 일치 조사·설계(L1).
 2. **`IR-O4O-LMS-SERVICE-COMMONIZATION-BOUNDARY-V1`** — KPA completion/reward 정렬 이후 공통화 경계 확정.
 3. **`WO-O4O-LMS-COMMON-UI-EXTRACTION-V1`** — CourseCard/CourseList/CourseDetail/LessonPlayer/QuizPanel 공통 UI 추출.
-4. **`WO-O4O-LMS-GLYCOPHARM-KCOSMETICS-ADOPTION-V1`** — GP/KCos 적용.
 5. **`CHECK-O4O-LMS-NETURE-EXCLUSION-GUARD-V1`** — Neture 제외 최종 확인.
 
 ## 17. 완료 판정
 
-**PASS.** completion/progress layer(canonical = lms_progress, 3경로 단일화) 와 reward policy layer(설정 시에만 지급) 를 분리·정렬 완료. D1(course_complete 경로 독립)·D2(완료 저장소 단일화) 해소. 하드코딩 무조건 지급 제거 → reward 는 강사/운영자 설정 기반. 금액·referenceKey·dedup·DB 무변경, Neture/GP/KCos 무변경, typecheck(2) 통과. reward 설정 UI 부재(L1)는 후속 IR 로 분리.
+**PASS.** completion/progress layer(canonical = lms_progress, 3경로 단일화) 와 reward policy layer(설정 시에만 지급) 를 분리·정렬 완료. D1(course_complete 경로 독립)·D2(완료 저장소 단일화) 해소. 하드코딩 무조건 지급 제거 → reward 는 강사/운영자 설정 기반. 금액·referenceKey·dedup·DB 무변경, Neture/KCos 무변경, typecheck(2) 통과. reward 설정 UI 부재(L1)는 후속 IR 로 분리.
 
 ---
 

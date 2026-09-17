@@ -29,7 +29,7 @@ export type ForumPostStatus = 'draft' | 'publish' | 'pending' | 'rejected' | 'ar
 /**
  * 게시글 콘텐츠 성격 분류
  *
- * App 고유 유형(예: GlycoPharm 'normal'|'notice')은 이 타입에 포함하지 않는다.
+ * App 고유 유형(예: 'normal'|'notice')은 이 타입에 포함하지 않는다.
  * 서비스별 매핑은 각 App에서 처리한다.
  */
 export type ForumPostType = 'discussion' | 'question' | 'announcement' | 'poll' | 'guide';

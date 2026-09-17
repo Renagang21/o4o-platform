@@ -1,6 +1,5 @@
 /**
  * App - K-Cosmetics
- * Based on GlycoPharm App structure
  */
 
 import { lazy, Suspense, useRef, useEffect } from 'react';
@@ -68,7 +67,6 @@ const MySettingsPage = lazy(() => import('@/pages/mypage/MySettingsPage'));
 const MyCreditsPage = lazy(() => import('@/pages/mypage/MyCreditsPage'));
 const MyEnrollmentsPage = lazy(() => import('@/pages/mypage/MyEnrollmentsPage'));
 const MyCertificatesPage = lazy(() => import('@/pages/mypage/MyCertificatesPage'));
-// WO-O4O-MYPAGE-MY-REQUESTS-INBOX-GLYCO-KCOS-ROUTE-V1
 const KcosMyRequestsPage = lazy(() => import('@/pages/mypage/MyRequestsPage'));
 
 // WO-O4O-PARTNER-APPLICATION-ENTITY-TABLE-CONTRACT-ROOT-CAUSE-AND-PRODUCTION-CLOSURE-V1:
@@ -355,14 +353,13 @@ const ProtectedRoute = RoleGuard;
  * StoreOwnerRoute — K-Cosmetics /store 진입 가드
  * WO-O4O-MY-STORE-CROSSSERVICE-CANONICAL-GUARD-ALIGNMENT-V1:
  *   기존 inline ProtectedRoute(allowedRoles=[...role-only...]) → 공통 StoreOwnerGuard.
- *   GlycoPharm canonical 의 3-way OR (role / membership / operator-or-above) 흡수.
+ *   canonical 의 3-way OR (role / membership / operator-or-above) 흡수.
  *   K-Cosmetics 는 membership-based store_owner SSOT 미보유 — 통과 판정은 role/operator 분기로만 이뤄지며,
  *   향후 cosmetics 도 membership SSOT 도입 시 StoreOwnerGuard 의 cfg.membershipStoreOwnerRole 만 활성화하면 됨.
  *
  * WO-O4O-CROSSSERVICE-MEMBERSHIP-SUSPENSION-ROLE-LIFECYCLE-CONTRACT-V1:
  *   membershipGate 를 주입한다. 이전에는 이 마운트만 gate 없이 role 로 통과해서,
  *   membership 이 정지돼도 role 이 살아 있으면 매장 UI 가 열렸다
- *   (glycopharm PharmacyStoreGuard · kpa PharmacyGuard 는 이미 주입 중).
  */
 function StoreOwnerRoute({ children }: { children: React.ReactNode }) {
   const { user, isAuthenticated, isLoading } = useAuth();
@@ -676,7 +673,6 @@ function AppRoutes() {
             </ProtectedRoute>
           }
         />
-        {/* WO-O4O-MYPAGE-MY-REQUESTS-INBOX-GLYCO-KCOS-ROUTE-V1 */}
         <Route
           path="mypage/my-requests"
           element={
@@ -714,7 +710,7 @@ function AppRoutes() {
           <Route path="signage" element={<HubSignagePage />} />
           {/* WO-O4O-STORE-HUB-CROSS-SERVICE-COMMONIZATION-PHASE1-V1: 블로그 탭 추가 */}
           <Route path="blog" element={<HubBlogLibraryPage />} />
-          {/* WO-O4O-KCOS-STORE-HUB-POP-QR-PORT-V1: POP/QR 가져가기 (KPA/GlycoPharm canonical) */}
+          {/* WO-O4O-KCOS-STORE-HUB-POP-QR-PORT-V1: POP/QR 가져가기 (KPA canonical) */}
           <Route path="pop" element={<HubPopLibraryPage />} />
           <Route path="qr" element={<HubQrLibraryPage />} />
           <Route path="event-offers" element={<HubEventOffersPage />} />
@@ -910,7 +906,7 @@ function AppRoutes() {
         {/* WO-O4O-KCOSMETICS-STORE-PATH-NESTED-MIGRATION-V1:
               KPA canonical 정합 — nested canonical routes (commerce/* · marketing/*) 가 실제 page 를 렌더한다.
               flat path 는 본 블록 하단의 redirect alias 그룹에서 nested canonical 으로 redirect.
-            WO-O4O-MY-STORE-SIGNAGE-SUBMENU-ALIGNMENT-V1: KPA/GP 기준 서브메뉴 정렬 (player 미구현 제외) */}
+            WO-O4O-MY-STORE-SIGNAGE-SUBMENU-ALIGNMENT-V1: KPA 기준 서브메뉴 정렬 (player 미구현 제외) */}
         {/* WO-O4O-KCOSMETICS-STORE-COMMERCE-PRODUCT-PAGE-INTRODUCE-V1: 내 매장 상품·거래 > 상품 */}
         <Route path="commerce/products" element={<StoreCommerceProductsPage />} />
         <Route path="commerce/local-products" element={<StoreLocalProductsPage />} />

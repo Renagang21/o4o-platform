@@ -69,7 +69,7 @@
 |------|-----|
 | 대상 commit | `cc1df4f54` (feat(neture): reorganize supplier sidebar IA) |
 | GitHub Actions | `Deploy Web Services (Cloud Run)` — headSha `cc1df4f54`, conclusion **success** |
-| job 상세 | `detect-changes` success / `deploy-neture` **success** (k-cosmetics·glycopharm·kpa-society는 skipped — 정상) |
+| job 상세 | `detect-changes` success / `deploy-neture` **success** (k-cosmetics·kpa-society는 skipped — 정상) |
 | Cloud Run revision | `neture-web-01308-kxk` (traffic 100%, createdAt 2026-07-25T06:10:26Z, commit push 06:05:49Z 이후) |
 
 → `cc1df4f54` 프로덕션 반영 확인 완료.

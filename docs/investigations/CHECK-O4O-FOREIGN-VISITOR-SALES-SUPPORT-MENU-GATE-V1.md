@@ -10,7 +10,7 @@
 
 ## 1. 목표
 
-매장 측 `/store` 에 "외국인 여행객 판매지원" 진입점을 추가하고, 이용권(entitlement) 보유 여부에 따라 잠금/이용중 화면을 분기한다. KPA / GlycoPharm / K-Cosmetics 3서비스 공통.
+매장 측 `/store` 에 "외국인 여행객 판매지원" 진입점을 추가하고, 이용권(entitlement) 보유 여부에 따라 잠금/이용중 화면을 분기한다. KPA / K-Cosmetics 2서비스 공통.
 
 ---
 
@@ -28,12 +28,11 @@
 WO 는 "frontend only / 기존 check API 소비" 였으나, 프론트가 organizationId 를 갖지 않아 `check?organizationId=...` 호출이 불가능했다. 지시문 예시 URL(`check?planCode=...`, org 없음)의 의도대로 **self-scoped read 엔드포인트**를 1개 추가했다 (read-only, **DB/migration 없음**):
 
 ```
-GET /api/v1/store-entitlements/me/check?serviceKey=<kpa|glycopharm|cosmetics>&planCode=<plan>
 → auth 로 organizationId 해석(isStoreOwner) 후 활성 보유 여부 반환
 → { success:true, data:{ serviceKey, planCode, active } }
 ```
 
-`serviceKey` 축 = store_owner role-prefix(`kpa|glycopharm|cosmetics`, `StoreOwnerServiceKey`). 향후 발급(write) WO 도 동일 축 사용.
+`serviceKey` 축 = store_owner role-prefix. 향후 발급(write) WO 도 동일 축 사용.
 
 ---
 
@@ -54,7 +53,6 @@ GET /api/v1/store-entitlements/me/check?serviceKey=<kpa|glycopharm|cosmetics>&pl
 | 서비스 | page | serviceKey | api client | App.tsx route |
 |---|---|---|---|---|
 | K-Cosmetics | `pages/store/ForeignVisitorSalesSupportPage.tsx` | `cosmetics` | `@/lib/apiClient` `api` | `sales-channels/foreign-visitor` |
-| GlycoPharm | `pages/store/ForeignVisitorSalesSupportPage.tsx` | `glycopharm` | `@/lib/apiClient` `api` | `sales-channels/foreign-visitor` |
 | KPA-Society | `pages/pharmacy/ForeignVisitorSalesSupportPage.tsx` | `kpa` | `coreApiClient`(`/api/v1`, kpa 네임스페이스 밖) | `sales-channels/foreign-visitor` |
 
 전체 경로: `/store/sales-channels/foreign-visitor` (각 서비스 store route group 내, StoreOwnerGuard 하위).
@@ -72,7 +70,6 @@ GET /api/v1/store-entitlements/me/check?serviceKey=<kpa|glycopharm|cosmetics>&pl
 ## 6. 검증
 
 - api-server `type-check` PASS
-- web-k-cosmetics / web-glycopharm / web-kpa-society `tsc --noEmit` PASS
 - 현재 운영 데이터 기준 이용권 0건 → 모든 매장 `active:false` → **잠금 안내 표시**가 정상.
 - 운영 smoke 기준: 3서비스 매장 메뉴에 진입점 노출 + `/store/sales-channels/foreign-visitor` 로드 + `me/check` 200 + 잠금 안내 표시 + 결제 버튼 disabled.
 
@@ -87,7 +84,6 @@ push `b03f2c136` → Deploy API Server / Deploy Web Services / Deploy Admin Dash
 | 호출 | 결과 |
 |---|---|
 | `?serviceKey=kpa&planCode=FOREIGN_VISITOR_SALES_SUPPORT` | 200 `active:false` |
-| `?serviceKey=glycopharm&...` | 200 `active:false` |
 | `?serviceKey=cosmetics&...` | 200 `active:false` |
 | `?serviceKey=neture&...` | 400 `UNKNOWN_SERVICE_KEY` |
 | `?serviceKey=kpa&planCode=NOPE` | 400 `UNKNOWN_PLAN_CODE` |
@@ -99,7 +95,6 @@ push `b03f2c136` → Deploy API Server / Deploy Web Services / Deploy Admin Dash
 |---|---|---|---|---|---|---|---|
 | KPA-Society | renagang21 (kpa:store_owner) | ✅ 판매 채널 확장 > 외국인 여행객 판매지원 | ✅ | 200 | ✅ | disabled + "결제 기능은 준비 중입니다." | 로그인 전 auth 부트스트랩 401(무관) |
 | K-Cosmetics | sohae2100 (operator-or-above) | ✅ | ✅ | 200 | ✅ | disabled | 기존 `/cosmetics/store-hub/capabilities` 403(무관) |
-| GlycoPharm | renagang21 (glycopharm:store_owner) | ✅ | ✅ | 200 | ✅ | disabled | **0 errors** |
 
 운영에 `FOREIGN_VISITOR_SALES_SUPPORT` 활성 이용권이 없으므로 전 서비스 `active:false` → 잠금 안내 기준으로 수행했다. `active=true` 분기는 코드상 구현되어 있으나 운영 데이터 생성 없이 검증하지 않았다(후속 발급 WO 에서 실데이터 검증).
 

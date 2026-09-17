@@ -39,7 +39,6 @@ gcloud run services describe o4o-core-api --region=asia-northeast3 --project=net
 |---|---|
 | Pharmacy-Hub | `https://pharmacyhub.co.kr` |
 | KPA Society | `https://kpa-society.co.kr` |
-| GlycoPharm | `https://glycopharm.co.kr` |
 | K-Cosmetics | `https://k-cosmetics.site` |
 
 > `k-cosmetics.co.kr` 은 parked 도메인이고 `cosmetics.neture.co.kr` 은 앱으로 해석되지 않는다.
@@ -111,7 +110,6 @@ gcloud run services describe o4o-core-api --region=asia-northeast3 --project=net
 | 서비스 | 라우트 | 뷰포트 | 결과 |
 |---|---|---|---|
 | KPA Society | `/`, `/forum`, `/content`, `/resources`, `/operator`, `/operator/lms`, `/operator/content`, `/operator/resources` | 1440 / 390 | 16/16 PASS · PAGEERR 0 · overflow 0 |
-| GlycoPharm | `/`, `/operator`, `/operator/lms`, `/operator/content`, `/operator/resources` | 1440 / 390 | 10/10 PASS · PAGEERR 0 · overflow 0 |
 | K-Cosmetics | `/`, `/operator`, `/operator/lms`, `/operator/resources` | 1440 / 390 | 8/8 PASS · PAGEERR 0 · overflow 0 · HTTP≥400 0 |
 
 K-Cosmetics `/operator/content` 는 **해당 서비스에 존재하지 않는 라우트**다.
@@ -234,7 +232,7 @@ production smoke 중 실제 결함 2건을 발견했고, 별도 WO 로 분리하
 
 모든 sweep 을 `1440×900` 과 `390×844` 양쪽에서 동일하게 수행했다.
 
-- mobile overflow(`scrollWidth > clientWidth`) 검출 **0건** (PH 40 · KPA 8 · GP 5 · KCos 4 라우트).
+- mobile overflow(`scrollWidth > clientWidth`) 검출 **0건** (PH 40 · KPA 8 5 · KCos 4 라우트).
 - mobile 전용 흰 화면 · 레이아웃 붕괴 0건.
 - 수료증 공개 검증 페이지는 비로그인 mobile 에서도 정상 렌더.
 
@@ -265,7 +263,6 @@ authorization defect: 0
 | PH 회원 설문 라우트 재확인 | 2 |
 | PH 홈 nav CTA sweep (href 20건, dead 0) | 1 |
 | KPA operator regression | 16 |
-| GlycoPharm operator regression | 10 |
 | K-Cosmetics operator regression (`k-cosmetics.site`) | 8 |
 | LMS learner flow | 10 |
 | LMS instructor flow | 6 |

@@ -8,7 +8,7 @@
  *   updateProgress, submitQuiz) factory 위임.
  * WO-O4O-LMS-V2-COMMONIZATION-CLEANUP-V1: 학습자 read 메서드 6개도 factory 위임 전환
  *   (getCourses, getCourse, getLessons, getMyEnrollments, getEnrollmentByCourse, getQuizForLesson).
- *   getLesson 은 GlycoPharm backend 미구현(Phase 5)으로 local 유지.
+ *   getLesson 은 공통 client 미구현(Phase 5)으로 local 유지.
  *   operator/instructor/certificate/completion 메서드는 KPA 전용으로 local 유지.
  */
 
@@ -67,7 +67,7 @@ export const lmsApi = {
     learnerClient.getLessons<Lesson>(courseId) as Promise<ApiResponse<Lesson[]>>,
 
   // WO-O4O-LMS-ROUTING-INTEGRATION-FIX-V1: use /lms/lessons/:id (not course sub-path)
-  // factory 미포함(GlycoPharm backend 미구현으로 Phase 5 보류). KPA 단독으로 local 유지.
+  // factory 미포함. KPA 단독으로 local 유지.
   getLesson: (_courseId: string, lessonId: string) =>
     apiClient.get<ApiResponse<{ lesson: Lesson }>>(`/lms/lessons/${lessonId}`),
 

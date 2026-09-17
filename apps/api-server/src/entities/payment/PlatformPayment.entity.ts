@@ -1,7 +1,6 @@
 /**
  * PlatformPayment Entity
  *
- * WO-O4O-PAYMENT-CORE-GLYCOPHARM-PILOT-V1
  *
  * PaymentProps 인터페이스를 구현하는 TypeORM Entity.
  * 테이블: o4o_payments

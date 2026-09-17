@@ -53,7 +53,7 @@ AFTER   UNIQUE (user_id, role) WHERE is_active     -- 부분 유니크 인덱스
 
 | 형태 | role (활성/비활성) |
 |---|---|
-| 접두형 | `kpa:store_owner`(4/0) · `platform:super_admin`(2/3) · `pharmacy-hub:store_owner`(2/0) · `cosmetics:admin` `cosmetics:operator` `cosmetics:store_owner` `glycopharm:admin` `glycopharm:operator` `glycopharm:store_owner` `kpa:admin` `kpa:operator` `lms:instructor` `neture:admin` `neture:operator` `pharmacy-hub:admin` `pharmacy-hub:operator` (각 1/0) |
+| 접두형 | `kpa:store_owner`(4/0) · `platform:super_admin`(2/3) · `pharmacy-hub:store_owner`(2/0) |
 | **접두 없음** | `customer`(7/1) · `supplier`(6/0) · `pharmacy`(2/0) · `store_owner`(1/0) · `user`(1/0) · `super_admin`(0/1) — **합 19행** |
 
 - 활성+비활성 쌍둥이 **(user, role) 1쌍** — `platform:super_admin`
@@ -69,10 +69,10 @@ membership 실측과 카탈로그가 서로 다른 서비스를 가리키거나,
 
 | role | 행수 | 카탈로그 판정 | 실제 membership 실측 | 판정 |
 |---|---:|---|---|---|
-| `supplier` | 6 | `service_key='glycopharm'` | 2명은 `neture/supplier`, 4명은 membership 없음 | **모순** — 카탈로그(glycopharm) vs 실데이터(neture) |
-| `customer` | 8 | `service_key='glycopharm'` | 5명이 `platform/customer`, 3명 없음 | **모순** — 카탈로그 vs 실데이터(platform). `platform:customer` 는 카탈로그에 없음 |
-| `pharmacy` | 2 | `service_key='glycopharm'` | 1명 `glycopharm/pharmacy`, 1명 없음 | **변환 대상 부재** — `glycopharm:pharmacy` 가 카탈로그에 없음 |
-| `store_owner` | 1 | 카탈로그에 없음 | membership 없음 | **후보 4개**(kpa/cosmetics/glycopharm/pharmacy-hub) |
+| `supplier` | 6 | — | 2명은 `neture/supplier`, 4명은 membership 없음 | **모순** — 카탈로그 vs 실데이터(neture) |
+| `customer` | 8 | — | 5명이 `platform/customer`, 3명 없음 | **모순** — 카탈로그 vs 실데이터(platform). `platform:customer` 는 카탈로그에 없음 |
+| `pharmacy` | 2 | — | — | — |
+| `store_owner` | 1 | 카탈로그에 없음 | membership 없음 | **후보 4개** |
 | `user` | 1 | 카탈로그에 없음 (`neture:user` 만 존재) | membership 없음 | 추정 불가 |
 | `super_admin` | 1 (비활성) | 카탈로그에 없음 | membership 없음 | `platform:super_admin` 추정이나 근거 부족 |
 
@@ -215,12 +215,12 @@ role_assignments 잔여 제약: PK · chk_org_scope · FK 2개  (unique_active_r
 
 | # | 대상 | 필요한 결정 |
 |---:|---|---|
-| 1 | `supplier` 6행 | 카탈로그(glycopharm) 와 실데이터(neture) 중 어느 쪽이 정본인가 |
-| 2 | `customer` 8행 | `platform/customer` 멤버십에 대응하는 정본 역할명이 카탈로그에 없다 (신설 vs glycopharm 귀속) |
-| 3 | `pharmacy` 2행 | `glycopharm:pharmacy` 카탈로그 신설 여부 |
+| 1 | `supplier` 6행 | 카탈로그 와 실데이터(neture) 중 어느 쪽이 정본인가 |
+| 2 | `customer` 8행 | `platform/customer` 멤버십에 대응하는 정본 역할명이 카탈로그에 없다 (신설 귀속) |
+| 3 | `pharmacy` 2행 | — |
 | 4 | `store_owner` 1행 · `user` 1행 · `super_admin` 1행(비활성) | 소유 서비스 확정 불가 — 계정 단위 확인 필요 |
 | 5 | `scripts/create-manager-user.ts` 의 `'admin'` | 어느 서비스의 admin 인가 (`platform:admin` 은 is_assignable=false) |
-| 6 | `service_memberships` 의 접두/무접두 혼재 | `glycopharm/operator` · `kpa-society/admin` 등은 본 WO 범위 밖(은퇴 API 잔재 아님) |
+| 6 | `service_memberships` 의 접두/무접두 혼재 | `kpa-society/admin` 등은 본 WO 범위 밖(은퇴 API 잔재 아님) |
 | 7 | `roles` 카탈로그의 무접두 6행 (`consumer` `customer` `partner` `pharmacist` `pharmacy` `supplier`) | 카탈로그에서 은퇴시킬지 |
 
 ---

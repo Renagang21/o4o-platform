@@ -2,7 +2,7 @@
  * AnalyticsPage — 운영 액션 분석 (K-Cosmetics)
  *
  * WO-O4O-OPERATOR-CROSSSERVICE-CAPABILITY-ADOPTION-FINAL-AUDIT-AND-GAP-CLOSURE-V1:
- *   KPA / GlycoPharm / Neture / PharmacyHub 4 서비스가 이미 소비 중인 공통
+ *   KPA / Neture / PharmacyHub 3 서비스가 이미 소비 중인 공통
  *   @o4o/operator-core-ui/modules/operator-analytics 를 K-Cosmetics 에도 채택한다.
  *   (K-Cosmetics 만 route·page·menu 가 모두 부재한 REQUIRED_BUT_MISSING 이었다.)
  *

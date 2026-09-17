@@ -3,7 +3,7 @@
 > **작업명:** WO-O4O-KCOSMETICS-BUSINESS-CONTACT-FIELDS-UI-EXTEND-V1
 > **유형:** K-Cosmetics frontend UI — 판매자 가입/매장 정보수정 화면에 사업자 연락처 3종(businessPhone/businessEmail/contactEmail) 정렬.
 > **결과: PASS — 가입(RegisterPage) 판매자 분기에 3종 입력 추가 + 매장 정보수정(StoreInfoPage) 에 businessEmail/contactEmail 추가(businessPhone 기존 유지). 모두 `users.businessInfo` 경로(register + cosmetics-mypage controller 기수용). frontend 3파일. backend/migration 0. web-k-cosmetics `tsc --noEmit` 통과.**
-> 선행: IR-O4O-CROSSSERVICE-BUSINESS-CONTACT-FIELDS-AUDIT-V1 · WO-O4O-CROSSSERVICE-BUSINESS-CONTACT-FIELDS-BACKEND-SUPPORT-V1 · WO-O4O-GLYCOPHARM-BUSINESS-CONTACT-FIELDS-UI-EXTEND-V1
+> 선행: IR-O4O-CROSSSERVICE-BUSINESS-CONTACT-FIELDS-AUDIT-V1 · WO-O4O-CROSSSERVICE-BUSINESS-CONTACT-FIELDS-BACKEND-SUPPORT-V1
 
 ---
 
@@ -15,7 +15,7 @@
 | **정보수정** StoreInfoPage | `GET/PATCH /cosmetics/mypage/business-info` | cosmetics-mypage 컨트롤러 `projectBusinessInfo`(line 67-69) + PATCH white-list·email 검증(line 179-189) 에 3종 기존재 | **불요** |
 
 - 3종 모두 `users.businessInfo` JSONB(schema-less) 경로 — **선행 backend WO 가 이미 수용·검증**. 본 WO 는 frontend UI/타입만 연결.
-- DTO `register.dto.ts` 의 businessEmail/contactEmail 은 `@IsEmail` → **빈 문자열 거절** → 가입 payload 는 **비어있지 않을 때만 조건부 전송**(기존 businessItem 패턴, GlycoPharm WO 와 동일).
+- DTO `register.dto.ts` 의 businessEmail/contactEmail 은 `@IsEmail` → **빈 문자열 거절** → 가입 payload 는 **비어있지 않을 때만 조건부 전송**(기존 businessItem 패턴 WO 와 동일).
 
 ## 2. 변경 (3파일, frontend-only)
 
@@ -61,7 +61,7 @@
 
 ## 6. 비범위
 
-- backend 변경 / DB migration / operator UI 표시 / 주소 AddressSearch 정렬 / GlycoPharm·KPA·Neture 변경 / 기존 phone·taxInvoiceEmail·contactPhone 의미 변경 / seller·store_owner 권한 정책 변경 — 전부 비범위.
+- backend 변경 / DB migration / operator UI 표시 / 주소 AddressSearch 정렬 / KPA·Neture 변경 / 기존 phone·taxInvoiceEmail·contactPhone 의미 변경 / seller·store_owner 권한 정책 변경 — 전부 비범위.
 - 후속: KPA(pharmacyPhone/ownerPhone 의미 충돌 — businessPhone 신규 부착 vs 기존 약국 전화 정렬 선판단 필요, 신중) → Neture supplier profile surfacing(별도 entity 충돌, 후순위).
 
 ---

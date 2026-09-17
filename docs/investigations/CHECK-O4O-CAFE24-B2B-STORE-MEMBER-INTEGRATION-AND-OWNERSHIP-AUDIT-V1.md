@@ -143,7 +143,7 @@ scope 는 [개발자 어드민 > 앱 기본정보 등록 > 권한관리] 에 등
 
 - SSOT 고정: 매장정보=`organizations` / 소유=`organization_members` / 가입=`service_memberships` /
   역할=`role_assignments` / 공개주소=`platform_store_slugs` — **서비스 전용 조직 테이블을 만들지 않는다.**
-- 결정적 code (`ph-pharm-{userId 12hex}`, GlycoPharm 은 `gp-pharm-…`, KPA 는 `kpa-pharm-{사업자번호}`)
+- 결정적 code (`ph-pharm-{userId 12hex}` 은 `gp-pharm-…`, KPA 는 `kpa-pharm-{사업자번호}`)
   → `ON CONFLICT (code)` 로 **멱등**.
 - 추측 생성 금지: 후보 모호 시 HOLD(`AMBIGUOUS_ORGANIZATION` 등), 승인은 롤백하지 않는다.
 

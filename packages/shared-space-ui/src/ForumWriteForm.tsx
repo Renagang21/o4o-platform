@@ -3,13 +3,13 @@
  *
  * WO-O4O-FORUM-WRITE-FORM-COMMONIZATION-V1
  *
- * 4서비스(KPA / GlycoPharm / K-Cosmetics / Neture) forum write CREATE 화면 공통화 기반.
+ * 3서비스(KPA / K-Cosmetics / Neture) forum write CREATE 화면 공통화 기반.
  * - 제목 input + RichTextEditor + (선택) postType select + (선택) 확장 슬롯 + 액션 버튼
  * - 자체 상태 소유: title / editorHtml / postType / submitting
  * - submit 시 raw editorHtml(HTML string) 을 payload 로 전달. content 변환은 하지 않는다.
  *   백엔드 ForumPostController.create/update 가 normalizeContent(content) 로 HTML→Block[] 정규화하므로
  *   프론트엔드 변환(htmlToBlocks)은 불필요하며, forum-core 의존을 도입하지 않는다.
- *   (GP/KCos Dockerfile 은 packages/forum-core 를 COPY 하지 않아 transitive 의존 시 빌드 실패 — 회피)
+ *   (KCos Dockerfile 은 packages/forum-core 를 COPY 하지 않아 transitive 의존 시 빌드 실패 — 회피)
  * - API client / router / 백엔드 route / 서비스별 role helper / forum-core 미 import (순수 표현 컴포넌트)
  *
  * 범위: create-only 공통화. edit route parity / detail / postType 정책 변경은 범위 밖.
@@ -70,7 +70,7 @@ export interface ForumWriteFormProps {
   renderExtra?: ReactNode;
   /**
    * 에디터 하단 메타 슬롯 (예: Neture live charCount / 최소 길이 안내).
-   * 폼 내부 editorHtml 을 인자로 받아 라이브 렌더한다. 미지정 시 미노출 — 기존 소비처(KPA/GP/KCos) 무영향.
+   * 폼 내부 editorHtml 을 인자로 받아 라이브 렌더한다. 미지정 시 미노출 — 기존 소비처(KPA/KCos) 무영향.
    * WO-O4O-FORUM-WRITE-NETURE-FORM-COMMONIZATION-V1
    */
   renderContentMeta?: (state: { html: string; textLength: number }) => ReactNode;

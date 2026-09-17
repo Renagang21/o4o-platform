@@ -10,7 +10,7 @@
  *   npx vitest run --config services/web-kpa-society/vitest.config.mjs
  *
  * 루트에 이미 설치된 vitest 를 그대로 쓴다 — 이 서비스에 테스트 의존성을 추가하지 않는다
- * (package.json · lockfile 무변경). `services/web-glycopharm/vitest.config.mjs` 와 동일한 방식이다.
+ * (package.json · lockfile 무변경). `services/web-vitest.config.mjs` 와 동일한 방식이다.
  */
 import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vitest/config';

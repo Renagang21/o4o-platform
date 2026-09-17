@@ -115,7 +115,7 @@ pnpm check:typeorm-entities
 | 분류 | 예시 |
 |------|------|
 | Alias import (CMSView/CMSPage로 등록됨) | View, Page |
-| 의도적 제거 | GlycopharmPharmacy |
+| 의도적 제거 | — |
 | Signage extension 준비 단계 | CosmeticsBrandContent 등 11개 |
 | KPA/Platform 준비 단계 | KpaCourseRequest, StoreEvent 등 |
 | 연관 엔티티 추가 감사 예정 | NetureOrderItem, NetureProduct, NetureProductLog |

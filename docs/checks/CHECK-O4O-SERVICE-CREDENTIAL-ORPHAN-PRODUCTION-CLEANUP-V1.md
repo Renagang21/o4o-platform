@@ -42,7 +42,6 @@ pair 기준 28 = user 기준 28 → "다른 서비스 membership 은 있는데 �
 |---|---:|
 | pharmacy-hub | 7 |
 | kpa-society | 7 |
-| glycopharm | 6 |
 | neture | 6 |
 | k-cosmetics | 2 |
 
@@ -52,12 +51,6 @@ pair 기준 28 = user 기준 28 → "다른 서비스 membership 은 있는데 �
 
 | user_id | service_key | credential created_at (UTC) |
 |---|---|---|
-| 8eefe5a4-9346-45b5-94df-8516dddd4f80 | glycopharm | 2026-05-23 03:22 |
-| f0ba48fa-8ada-41d4-ba5b-f64f4c50f51f | glycopharm | 2026-05-23 03:49 |
-| c12c1f59-1708-4346-a341-2657e0f45e6e | glycopharm | 2026-05-23 05:54 |
-| c94fab79-2dbe-4fb9-8f7a-a1e22e24b995 | glycopharm | 2026-05-28 05:17 |
-| 044d2328-6a4a-490d-8c8e-3815cbb03c68 | glycopharm | 2026-05-28 12:05 |
-| 4a3902c5-7f2f-4e63-9891-921c952041a8 | glycopharm | 2026-05-28 12:15 |
 | 982a5c4a-df4d-4eed-9648-d0df03a5393d | k-cosmetics | 2026-05-27 03:14 |
 | 5196c1f8-23e1-40ea-a9cb-40762951ce73 | k-cosmetics | 2026-06-11 05:05 |
 | 8eefe5a4-9346-45b5-94df-8516dddd4f80 | kpa-society | 2026-05-23 03:22 |
@@ -144,7 +137,6 @@ COMMIT;
 | neture | 7 | 7 |
 | k-cosmetics | 5 | 5 |
 | kpa-society | 5 | 5 |
-| glycopharm | 4 | 4 |
 
 (pharmacy-hub 1행은 membership 이 존재하되 상태가 `active` 가 아닌 정상 케이스 — 삭제 대상 아님.)
 
@@ -156,7 +148,6 @@ COMMIT;
 |---|---|---|
 | kpa-society | 운영자 계정 | 200 SUCCESS |
 | kpa-society | 약국 경영자 계정 | 200 SUCCESS |
-| glycopharm | 운영자 계정 | 200 SUCCESS |
 | k-cosmetics | 운영자 계정 | 200 SUCCESS |
 | neture | 운영자 계정 | 200 SUCCESS |
 | pharmacy-hub | 운영자 계정 | 200 SUCCESS |

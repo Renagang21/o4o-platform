@@ -65,7 +65,7 @@ if (!getService(serviceCode)) {
   return;
 }
 ```
-- whitelist 소스 = `config/service-catalog.ts`(플랫폼 service key SSOT: neture/glycopharm/kpa-society/k-cosmetics). 신규 const 정의 없이 기존 SSOT 재사용(중복 0).
+- whitelist 소스 = `config/service-catalog.ts`. 신규 const 정의 없이 기존 SSOT 재사용(중복 0).
 - **route path/response shape 무변경**, 기존 frontend 는 모두 자기 서비스의 유효 코드를 하드코딩 전송하므로 **무회귀**.
 - **membership 바인딩(사용자가 해당 서비스 소속인지)은 의도적으로 제외** — 폐쇄형 포럼/태그 정책 영역이라 별도 판단(§10-1).
 

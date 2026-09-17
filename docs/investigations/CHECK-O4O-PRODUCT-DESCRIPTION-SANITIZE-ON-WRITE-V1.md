@@ -4,7 +4,7 @@
 > **유형:** backend write-path sanitize (defense-in-depth) — 조사 후 **HOLD**.
 > **판정: HOLD — backend-safe HTML sanitizer 부재.** `@o4o/content-editor` sanitizeHtml 은 **브라우저 DOM 의존(`dompurify`)** 라 Node 런타임 안전하지 않고 api-server 미의존. api-server 에 `jsdom`은 있으나 **`dompurify` 미보유** → backend DOMPurify 구성하려면 **신규 dependency 필요**(§14 금지). regex sanitizer 도 금지(§9/§14). → **임의 구현하지 않고 보고**(§11 HOLD).
 > **현재 노출 안전:** 모든 소비자 surface 가 `ContentRenderer`(DOMPurify) sanitize 렌더 → **활성 XSS 노출 없음**. sanitize-on-write 는 추가 방어선(미달성).
-> 선행: HTML-RENDERING-POLICY · GLYCOPHARM-RICH-RENDER — 2026-06-16
+> 선행: HTML-RENDERING-POLICY
 
 ---
 
@@ -42,7 +42,7 @@
 
 ## 4. 현재 안전성 평가 (긴급도 낮음)
 
-- 모든 소비자-facing 노출(KPA storefront / KPA·KCos·GP tablet / GP storefront)이 **`ContentRenderer`(DOMPurify) 렌더 sanitize** → **활성 XSS 노출 없음**(HTML-RENDERING-POLICY IR 확인).
+- 모든 소비자-facing 노출(KPA storefront / KPA·KCos tablet storefront)이 **`ContentRenderer`(DOMPurify) 렌더 sanitize** → **활성 XSS 노출 없음**(HTML-RENDERING-POLICY IR 확인).
 - admin 정비 모달 preview 는 `toPlainText`(태그 제거).
 - 따라서 sanitize-on-write 는 **2겹 방어선(defense-in-depth)의 추가 레이어**이며, 부재가 즉시 위험을 만들지 않음 → HOLD 안전.
 

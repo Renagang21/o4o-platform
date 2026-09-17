@@ -166,7 +166,7 @@
 - 장점:
   - `O4O-STORE-PRODUCTION-MATERIAL-CANONICAL-V1` 의 SSOT 모델 정합
   - `author_role` / `workspace_status` 가 이미 존재
-  - 3 service (KPA / GP / Cosmetics) 공통 — 향후 이식 비용 낮음
+  - 2 service (KPA / Cosmetics) 공통 — 향후 이식 비용 낮음
 - 단점:
   - HUB query 흐름 신설 시 sub_type 또는 별도 분류 필요
   - canonical 문서가 "POP 의 결과물도 여기 보관" 명시했는지 추가 확인 필요
@@ -278,7 +278,7 @@ WO-O4O-STORE-HUB-POP-CONTENT-IMPORT-V1         (Phase 4)
 | 차원 | 평가 | 충돌 |
 |---|:---:|:---:|
 | 공통 Core (operator-ux-core / @o4o/ui) | ✅ 인프라 충실 — POP entity 신설 시 Blog 패턴 그대로 활용 가능 | 없음 |
-| 서비스별 독립 도메인 | ✅ Option B 채택 시 kpa_store_contents 공통 사용, GP/K-Cos 이식 가능 | 없음 |
+| 서비스별 독립 도메인 | ✅ Option B 채택 시 kpa_store_contents 공통 사용, K-Cos 이식 가능 | 없음 |
 | Canonical SSOT (Store Production Material) | △ Option C 채택 시 SSOT 분리 위험 / Option B 가 정합 | **약함 (Option C 시)** |
 | 운영자 = 게시·진열 주체 (제작 도구 아님) | ✅ 사용자 WO 명시 — POP 도 RichTextEditor 기반 게시 | 없음 |
 | 공급자 = Producer 아님 | ✅ supplier POP 흐름 신설 금지 (본 IR 결정) | 없음 |
@@ -295,7 +295,7 @@ WO-O4O-STORE-HUB-POP-CONTENT-IMPORT-V1         (Phase 4)
 - `kpa_store_contents` 가 POP 의 운영자 원본 보관에 적합한가의 canonical 재해석
 - 후속 WO 의 실제 실행 시점
 - QR 트랙 (별도 IR 권고)
-- GP / K-Cosmetics 이식 (별건)
+- K-Cosmetics 이식 (별건)
 - POP 디자인 엔진 / 캔버스 편집기 신설 (사용자 명시 금지)
 
 ---

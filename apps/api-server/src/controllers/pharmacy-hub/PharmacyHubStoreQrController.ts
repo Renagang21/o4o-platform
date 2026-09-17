@@ -14,7 +14,7 @@
  * ─────────────────────────────────────────────────────────────────────────────
  * 이 컨트롤러가 하는 일은 **조직 결정 + 연결 대상 검증 + 상태코드 매핑**뿐이다.
  * QR 저장·검증 계약은 공통 services/store/store-qr.service.ts 를 호출한다
- * (KPA·GlycoPharm·K-Cosmetics 가 쓰는 것과 같은 함수 — 로직 복제 0).
+ * (KPA·K-Cosmetics 가 쓰는 것과 같은 함수 — 로직 복제 0).
  * QR 이미지·PDF 는 공통 services/qr-print.service.ts 를 그대로 사용한다 (새 QR 엔진 0).
  *
  * 왜 공통 라우트(/pharmacy/qr)를 그대로 마운트하지 않는가

@@ -24,8 +24,7 @@
 | P1-5 | **공통 `SlotAdGrid` 컴포넌트** | 광고/프로모션 그리드 공통 렌더러 |
 | P1-6 | **공통 `SlotLogoCarousel` 컴포넌트** | 로고 캐러셀 공통 렌더러 |
 | P1-7 | **KPA Platform Home Hero CMS 전환** | 정적 Hero → `home-hero` 슬롯 |
-| P1-8 | **GlycoPharm Dashboard Banner 활성화** | placeholder → `dashboard-banner` 슬롯 연결 |
-| P1-9 | **초기 시드 데이터** | 각 서비스 슬롯에 현재 하드코딩된 데이터를 CmsContent로 이관하는 마이그레이션 |
+| P1-8 | **초기 시드 데이터** | 각 서비스 슬롯에 현재 하드코딩된 데이터를 CmsContent로 이관하는 마이그레이션 |
 
 ### 제외
 
@@ -38,7 +37,6 @@
 | X5 | 슬롯 노출 통계 (viewCount, clickCount) | Core 확장 필요 | 2 |
 | X6 | 공통 운영자 슬롯 관리 UI | 기존 서비스별 관리 UI 사용 | 2 |
 | X7 | 공통 패키지 추출 (`@o4o/promotion-ui`) | 각 서비스 내 배치 후 검증 | 2 |
-| X8 | GlycoPharm Store Hero 통합 | Store Template 종속, 별도 도메인 | — |
 
 ---
 
@@ -98,20 +96,6 @@
 **선행 조건:** Step 2
 **리스크:** 낮음 — 단일 Hero 전환
 
-### Step 5: GlycoPharm Dashboard Banner 활성화
-
-**WO 후보: WO-GP-DASHBOARD-BANNER-ACTIVATION-V1**
-
-| 작업 | 파일 | 설명 |
-|------|------|------|
-| 시드 마이그레이션 (선택적) | `database/migrations/` | 초기 배너 콘텐츠 삽입 + `dashboard-banner` 슬롯 |
-| BannerSection 수정 | `services/web-glycopharm/src/components/dashboard/BannerSection.tsx` | placeholder → `useSlotContent` + `SlotPromoBanner` |
-
-**선행 조건:** Step 2
-**리스크:** 낮음 — 기존 placeholder 교체
-
----
-
 ## 4. 우선순위 근거
 
 | 순위 | 대상 | 근거 |
@@ -119,8 +103,7 @@
 | 1 | K-Cosmetics Home | **효과 최대** — 4개 정적 섹션 중 2개를 CMS로 전환. 서비스 운영자가 즉시 콘텐츠 변경 가능 |
 | 2 | 공통 훅/컴포넌트 | **재사용 기반** — K-Cos에서 먼저 만들고 다른 서비스에 적용 |
 | 3 | KPA Platform Home | **빠른 적용** — 단일 Hero만 전환. 공통 컴포넌트 재사용 |
-| 4 | GlycoPharm Dashboard | **최소 노력** — placeholder 교체만으로 즉시 활용 |
-| 5 | Slot API operator 권한 | **인프라** — 나머지 모든 작업의 선행 조건 |
+| 4 | Slot API operator 권한 | **인프라** — 나머지 모든 작업의 선행 조건 |
 
 ---
 
@@ -149,7 +132,6 @@
 | `services/web-k-cosmetics/src/components/promotion/SlotLogoCarousel.tsx` | 신규 |
 | `services/web-k-cosmetics/src/pages/HomePage.tsx` | 수정 (CMS 전환) |
 | `services/web-kpa-society/src/components/platform/HeroSection.tsx` | 수정 (CMS 전환) |
-| `services/web-glycopharm/src/components/dashboard/BannerSection.tsx` | 수정 (슬롯 연결) |
 
 ### 문서
 

@@ -16,7 +16,6 @@
 | Service | Dashboard Component | Route Path | Layout |
 |---------|-------------------|------------|--------|
 | Neture | `NetureOperatorDashboard.tsx` | `/workspace/operator` | `OperatorLayout` |
-| GlycoPharm | `GlycoPharmOperatorDashboard.tsx` | `/operator` | `DashboardLayout` |
 | KPA Society | `KpaOperatorDashboard.tsx` | `/operator` | Route module 방식 |
 | K-Cosmetics | `KCosmeticsOperatorDashboard.tsx` | `/operator` | `DashboardLayout` |
 | GlucoseView | `DashboardPage.tsx` | `/operator` | `OperatorLayout` |
@@ -27,7 +26,6 @@
 | Service | Block 수 | 패턴 | WO 근거 |
 |---------|:-------:|------|---------|
 | Neture | 9-Block | Copilot Dashboard (구형) | WO-O4O-OPERATOR-COPILOT-DASHBOARD-V1 |
-| GlycoPharm | 5-Block | 통합 Dashboard (신형) | WO-O4O-OPERATOR-UX-GLYCOPHARM-PILOT-V1 |
 | KPA Society | 5-Block | Role 분기 (Admin/Operator) | WO-O4O-KPA-A-ADMIN-ROLE-SPLIT-V1 |
 | K-Cosmetics | 5-Block | 통합 Dashboard (신형) | WO-O4O-OPERATOR-UX-K-COSMETICS-PILOT-V1 |
 | GlucoseView | 5-Block | 기본 Dashboard | — |
@@ -53,7 +51,7 @@
 ```
 
 **적용 현황**:
-- GlycoPharm, K-Cosmetics, KPA Society, GlucoseView → 5-Block 표준
+- K-Cosmetics, KPA Society, GlucoseView → 5-Block 표준
 - Neture → 9-Block (구형 Copilot 패턴, 미전환)
 
 ---
@@ -77,30 +75,6 @@
 | `/workspace/operator/ai-operations` | AiOperationsPage | AI 운영 |
 | `/workspace/operator/ai/asset-quality` | AssetQualityPage | 에셋 품질 |
 | `/workspace/operator/settings/notifications` | EmailNotificationSettingsPage | 알림 설정 |
-
-### 2-2. GlycoPharm (`/operator/*`)
-
-| 경로 | Page | 기능 |
-|------|------|------|
-| `/operator` | Dashboard | 5-Block 통합 |
-| `/operator/applications` | ApplicationsPage | 약국 신청 |
-| `/operator/products` | ProductsPage | 상품 관리 |
-| `/operator/stores` | OperatorStoresPage | 매장 관리 |
-| `/operator/orders` | OrdersPage | 주문 관리 |
-| `/operator/settlements` | SettlementsPage | 정산 |
-| `/operator/reports` | ReportsPage | 리포트 |
-| `/operator/billing-preview` | BillingPreviewPage | 청구 미리보기 |
-| `/operator/invoices` | InvoicesPage | 인보이스 |
-| `/operator/forum-requests` | ForumRequestsPage | 포럼 요청 |
-| `/operator/forum-management` | OperatorForumManagementPage | 포럼 관리 |
-| `/operator/community` | CommunityManagementPage | 커뮤니티 관리 |
-| `/operator/store-approvals` | StoreApprovalsPage | 매장 승인 |
-| `/operator/store-template` | StoreTemplateManagerPage | 매장 템플릿 |
-| `/operator/users` | UsersPage | 사용자 관리 |
-| `/operator/ai-report` | AiReportPage | AI 리포트 |
-| `/operator/signage/*` | Signage 모듈 | 사이니지 |
-
-별도 Admin 경로: `/admin` → `GlycoPharmAdminDashboard`
 
 ### 2-3. KPA Society (`/operator/*`)
 
@@ -159,7 +133,6 @@
 | Service | Operator API Base | Admin API Base |
 |---------|------------------|----------------|
 | Neture | `/api/v1/operator/copilot/*` | `/api/v1/neture/admin/*` |
-| GlycoPharm | `/api/v1/glycopharm/operator/*` | `/api/v1/glycopharm/operator/*` (동일) |
 | KPA Society | `/api/v1/kpa/operator/*` | — |
 | K-Cosmetics | `/api/v1/cosmetics/admin/dashboard/*` | `/api/v1/cosmetics/admin/*` (동일) |
 | GlucoseView | — (별도 API 없음) | — |
@@ -175,7 +148,6 @@
 | API Endpoint | Service | 비고 |
 |-------------|---------|------|
 | `/api/v1/operator/copilot/kpi` | Platform (Neture 사용) | Cross-service |
-| `/api/v1/glycopharm/operator/dashboard` | GlycoPharm | Service-scoped |
 | `/api/v1/kpa/operator/summary` | KPA | Service-scoped |
 | `/api/v1/cosmetics/admin/dashboard/summary` | K-Cosmetics | Service-scoped |
 | `/api/v1/admin/dashboard/sales-summary` | Platform Admin | Cross-service |
@@ -207,7 +179,6 @@
 | Service | Primary Tables | Data Domain |
 |---------|---------------|-------------|
 | **Operator Copilot** | `organizations`, `organization_service_enrollments`, `neture_suppliers`, `supplier_product_offers`, `neture_orders` | Cross-service + Neture |
-| **GlycoPharm** | `organizations`, `organization_service_enrollments`, `glycopharm_applications`, `glycopharm_products`, `cms_contents` | GlycoPharm only |
 | **KPA** | `cms_contents`, `signage_media`, `signage_playlists`, `forum_post`, `kpa_approval_requests`, `kpa_members`, `kpa_applications`, `kpa_organization_join_requests`, `kpa_store_asset_controls` | KPA only |
 | **K-Cosmetics** | `cosmetics_stores`, `ecommerce_orders`, `ecommerce_order_items`, `cosmetics_brands` | K-Cosmetics only |
 | **Admin Dashboard** | `neture_orders`, `users`, `neture_partners`, `cosmetics_products`, `cosmetics_brands` | Cross-service |
@@ -218,7 +189,7 @@
 |------|-----------|------|
 | **Cross-Service** | Operator Copilot | organizations 전체 + Neture 전용 데이터 혼재 |
 | **Cross-Service** | Admin Dashboard | Neture orders + Users + Cosmetics catalog 혼재 |
-| **Service-Scoped** | GlycoPharm Operator | `service_code = 'glycopharm'` 필터 |
+| **Service-Scoped** | — | — |
 | **Service-Scoped** | KPA Operator | `serviceKey IN ('kpa-society', 'kpa')` 필터 |
 | **Service-Scoped** | K-Cosmetics Operator | `serviceKey = 'cosmetics'` 필터 |
 
@@ -226,9 +197,9 @@
 
 | Table | Accessed By |
 |-------|------------|
-| `organizations` | Copilot, GlycoPharm, KPA district-summary |
-| `organization_service_enrollments` | Copilot, GlycoPharm |
-| `cms_contents` | GlycoPharm, KPA |
+| `organizations` | Copilot, KPA district-summary |
+| `organization_service_enrollments` | Copilot |
+| `cms_contents` | KPA |
 | `neture_orders` | Copilot, Admin Dashboard |
 | `neture_suppliers` | Copilot, Admin Dashboard |
 | `ecommerce_orders` | K-Cosmetics |
@@ -242,7 +213,6 @@
 | Endpoint Group | Middleware | 허용 역할 | Scope 유형 |
 |----------------|-----------|----------|-----------|
 | `operator/copilot/*` | `authenticate` → `requireAdmin` → `injectServiceScope` | `platform:admin`, `platform:super_admin`, legacy `admin`/`super_admin`/`operator` | Platform |
-| `glycopharm/operator/*` | `requireAuth` → `isOperatorOrAdmin()` | `glycopharm:admin`, `glycopharm:operator`, `platform:admin`, `platform:super_admin` | Service |
 | `kpa/operator/*` | `authenticate` → `requireKpaScope('kpa:operator')` | `kpa:operator`, `kpa:admin`, `platform:super_admin` | Service (Membership) |
 | `cosmetics/admin/dashboard/*` | `requireAuth` → `requireScope('cosmetics:admin')` | `cosmetics:admin`, `platform:super_admin` | Service |
 | `admin/dashboard/*` | `authenticate` → `requireAdmin` | `platform:admin`, `platform:super_admin`, legacy `admin`/`super_admin`/`operator` | Platform |
@@ -255,8 +225,6 @@
 | `platform:admin` | Platform | Copilot + Admin Dashboard |
 | `neture:admin` | Neture | Neture Dashboard (via Copilot) |
 | `neture:operator` | Neture | Neture Dashboard (via Copilot) |
-| `glycopharm:admin` | GlycoPharm | GlycoPharm Operator Dashboard |
-| `glycopharm:operator` | GlycoPharm | GlycoPharm Operator Dashboard |
 | `kpa:admin` | KPA | KPA Operator Dashboard |
 | `kpa:operator` | KPA | KPA Operator Dashboard |
 | `cosmetics:admin` | K-Cosmetics | K-Cosmetics Dashboard |
@@ -269,7 +237,6 @@
 | 패턴 | 사용 위치 | 비고 |
 |------|----------|------|
 | `authenticate` + `requireAdmin` | Copilot, Admin Dashboard | Platform-level guard |
-| `requireAuth` + 컨트롤러 내부 체크 | GlycoPharm | `isOperatorOrAdmin()` 함수 |
 | `authenticate` + `requireKpaScope()` | KPA | Membership-based guard |
 | `requireAuth` + `requireScope()` | K-Cosmetics | Service-scope guard |
 
@@ -296,8 +263,8 @@
 │ Service Level (service-specific guards)                      │
 │                                                              │
 │  ┌──────────┐ ┌──────────┐ ┌────────┐ ┌──────────┐         │
-│  │ Neture   │ │GlycoPharm│ │  KPA   │ │Cosmetics │         │
-│  │ Copilot  │ │/glyco/op │ │/kpa/op │ │/cosm/adm │         │
+│  │ Neture   │ │          │ │  KPA   │ │Cosmetics │         │
+│  │ Copilot  │ │          │ │/kpa/op │ │/cosm/adm │         │
 │  │ reuse    │ │ internal │ │ scope  │ │ scope    │         │
 │  │ ⚠️ 혼재  │ │ check    │ │ guard  │ │ guard    │         │
 │  └──────────┘ └──────────┘ └────────┘ └──────────┘         │
@@ -332,7 +299,7 @@ Admin Dashboard의 `sales-summary`, `order-status`, `partners` 엔드포인트�
 
 | 문제 | 상세 |
 |------|------|
-| **Base Path 불통일** | Neture: `/operator/copilot`, GlycoPharm: `/glycopharm/operator`, KPA: `/kpa/operator`, Cosmetics: `/cosmetics/admin/dashboard` |
+| **Base Path 불통일** | Neture: `/operator/copilot`: `/operator`, KPA: `/kpa/operator`, Cosmetics: `/cosmetics/admin/dashboard` |
 | **URL 네이밍 불일치** | `operator` vs `admin/dashboard` — K-Cosmetics는 `admin` 사용 |
 | **API 버전 불일치** | 대부분 `/api/v1/` 사용, Signage만 `/api/signage/` 사용 |
 
@@ -341,25 +308,24 @@ Admin Dashboard의 `sales-summary`, `order-status`, `partners` 엔드포인트�
 | 문제 | 상세 |
 |------|------|
 | **4가지 서로 다른 guard 패턴** | requireAdmin, isOperatorOrAdmin, requireKpaScope, requireScope |
-| **Role 체크 위치 불일치** | 미들웨어 레벨 vs 컨트롤러 내부 (GlycoPharm) |
+| **Role 체크 위치 불일치** | 미들웨어 레벨 vs 컨트롤러 내부 |
 | **Platform vs Service 경계 불명확** | Copilot이 requireAdmin을 사용하지만 service data를 반환 |
 
 ### 7-3. Dashboard 기능 중복
 
 | 기능 | 중복 위치 |
 |------|----------|
-| **매장 통계** | Copilot `/kpi` + GlycoPharm `/dashboard` + KPA `/summary` + Cosmetics `/summary` |
+| **매장 통계** | Copilot `/kpi` `/dashboard` + KPA `/summary` + Cosmetics `/summary` |
 | **승인 대기** | Copilot `/products` + KPA `/summary` (approval section) |
 | **AI 리포트** | 5개 서비스 모두 `/ai-report` 페이지 존재 |
-| **포럼 관리** | Neture, GlycoPharm, KPA 모두 forum-management 페이지 |
-| **사이니지** | Neture, GlycoPharm, K-Cosmetics 모두 signage 모듈 |
+| **포럼 관리** | Neture, KPA 모두 forum-management 페이지 |
+| **사이니지** | Neture, K-Cosmetics 모두 signage 모듈 |
 
 ### 7-4. Dashboard Block 표준 미전환
 
 | 서비스 | 현재 | 표준 |
 |--------|------|------|
 | Neture | 9-Block Copilot (구형) | 5-Block 미전환 |
-| GlycoPharm | 5-Block | 표준 ✅ |
 | KPA Society | 5-Block | 표준 ✅ |
 | K-Cosmetics | 5-Block | 표준 ✅ |
 | GlucoseView | 5-Block | 표준 ✅ |
@@ -377,7 +343,6 @@ Admin Dashboard의 `sales-summary`, `order-status`, `partners` 엔드포인트�
 | Service | Operator Route | 비고 |
 |---------|---------------|------|
 | Neture | `/workspace/operator/*` | `workspace` prefix 사용 |
-| GlycoPharm | `/operator/*` | 표준 |
 | KPA Society | `/operator/*` | 표준 |
 | K-Cosmetics | `/operator/*` | 표준 |
 | GlucoseView | `/operator/*` | 표준 |

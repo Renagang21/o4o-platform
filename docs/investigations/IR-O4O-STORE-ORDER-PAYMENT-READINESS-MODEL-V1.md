@@ -12,7 +12,7 @@
 
 | 질문 | 판정 |
 |------|------|
-| online 결제 주문의 payment readiness 기준이 있는가 | **있음** — `checkout_orders.paymentStatus='paid'` (+ `status='paid'`, `paidAt` not null). KPA handler fix 이후 KPA/Glyco/KCos 3 서비스 모두 신뢰 가능 |
+| online 결제 주문의 payment readiness 기준이 있는가 | **있음** — `checkout_orders.paymentStatus='paid'` (+ `status='paid'`, `paidAt` not null). |
 | offline/operator collection readiness 모델이 있는가 | **없음 (GAP)** — `collectionStatus` 컬럼/개념 부재. neture_orders 도 별도 paymentStatus 컬럼 없음 |
 | checkout-confirm(event_offer) 주문은 paid 인가 | **아니오 — `CREATED` + `paymentStatus=PENDING`** (결제 단계 미경유). **fulfillment/settlement 로 넘기면 미결제 주문이 처리됨 — CRITICAL** |
 | fulfillment 시작에 payment gate 가 있는가 | **없음 — CRITICAL.** `supplier-order.service` 의 전이표가 `created→preparing` 과 `paid→preparing` 둘 다 허용 |
@@ -86,12 +86,11 @@ sourceType / pricingSource 는 상품 출처·가격 근거 metadata 일 뿐,
 
 | 핸들러 | serviceKey | paid 전이 직전 sales_limit recheck |
 |--------|:---------:|:---:|
-| `GlycopharmPaymentEventHandler` | `glycopharm` | **있음** (`checkSalesLimitBeforePaid`, 초과 시 `status=CANCELLED/paymentStatus=FAILED`) |
 | `KCosmeticsPaymentEventHandler` | `cosmetics` | 없음 |
 | `KpaPaymentEventHandler` (신규) | `kpa` | 없음 (V1 제외 — 환불 함의) |
 | `NeturePaymentEventHandler` | `neture` | — (NetureOrder 대상, CheckoutOrder 아님) |
 
-> **판정**: `payment.completed` → `paymentStatus='paid'` 전이는 **online 결제 readiness 의 공통 기준으로 사용 가능**. 핸들러 패턴이 3 서비스 동일하고, serviceKey 라우팅이 결정적이다. (Glyco 만 recheck 추가 — readiness 기준 자체는 동일, 한도 hardening 의 유무 차이일 뿐.)
+> **판정**: `payment.completed` → `paymentStatus='paid'` 전이는 **online 결제 readiness 의 공통 기준으로 사용 가능**. 핸들러 패턴이 3 서비스 동일하고, serviceKey 라우팅이 결정적이다.
 
 ---
 
@@ -105,18 +104,6 @@ sourceType / pricingSource 는 상품 출처·가격 근거 metadata 일 뿐,
 > **판정 (CRITICAL 전제)**: **checkout-confirm 주문은 "주문 record"이지 "결제 완료 주문"이 아니다.**
 > 이 주문을 그대로 supplier fulfillment 로 넘기면 **미결제 주문이 배송/정산**된다.
 > → fulfillment bridge V1 은 **반드시 `paymentStatus='paid'`(또는 collection confirmed) 주문만** 대상으로 해야 한다. pending checkout-confirm 주문은 bridge 금지.
-
----
-
-## 6. KPA / Glyco / KCos online payment readiness
-
-**KPA B2C** (`routes/kpa/controllers/kpa-checkout.controller.ts`, `kpa-payment.controller.ts`):
-- `POST /checkout` → `createCheckoutOrder` → `status=CREATED, paymentStatus=PENDING`. 배송비 **고정 3000(delivery)/0(pickup)**. 주문 생성 시점 sales_limit `FOR UPDATE` 검증(`status='paid'` + `serviceKey IN ('kpa-society','kpa')` 누적).
-- `prepare(sourceService='kpa')` → Toss → `confirm` → `payment.completed(serviceKey='kpa')` → `KpaPaymentEventHandler` → `paid`.
-
-**Glyco / KCos**: 동일 패턴(CheckoutOrder + 서비스 핸들러로 paid 전이). Glyco 만 paid 직전 recheck.
-
-> **판정**: KPA/Glyco/KCos online 결제 주문은 **`paymentStatus='paid'` 를 동일 readiness 기준으로 적용 가능**. (KPA fix 로 3 서비스 정합.)
 
 ---
 
@@ -278,7 +265,7 @@ bridge 구현 전 **반드시** 충족:
 | 3 | `WO-O4O-SUPPLIER-SETTLEMENT-READINESS-GUARD-V1` | bridge 주문 자동 정산 방지, readiness 없는 delivered 제외 |
 | 4 | `WO-O4O-CHECKOUT-ORDER-TO-NETURE-FULFILLMENT-BRIDGE-V1` | paid/confirmed 주문만 bridge (pending 금지) |
 | 5 | `IR/WO-O4O-ORDER-COLLECTION-STATUS-MODEL-V1` | collectionStatus 컬럼 도입, neture_orders legacy 수렴 |
-| (병행) | `WO-O4O-KPA-PAID-TRANSITION-SALES-LIMIT-HARDENING-V1` | Glyco recheck 패턴(취소·환불 정책 동반) |
+| (병행) | `WO-O4O-KPA-PAID-TRANSITION-SALES-LIMIT-HARDENING-V1` | — |
 
 **guard 가 bridge 보다 먼저** (Phase 2·3 → Phase 4).
 

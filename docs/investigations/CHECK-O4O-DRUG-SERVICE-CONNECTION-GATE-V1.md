@@ -9,10 +9,9 @@
 
 ## 1. 기존 하드코딩 상수 조사 결과
 
-- 위치: `offer.service.ts:67` `const PHARMACY_ALLOWED_SERVICE_KEYS = ['glycopharm','kpa-society']`.
 - **주석(61-65)이 명시**: "admin 운영자가 약국 전용 서비스를 지정하는 설정 소스가 아직 없음 … 추후 admin 설정 소스가 도입되면 이 상수 대신 그것을 우선 사용." → 본 WO 가 정확히 그 후속.
 - 사용처: `assertPharmacyOnlyServiceKeys(isRegulated, serviceKeys)`(105-116) **단 1 함수**, 호출은 `createSupplierOffer:816` **단 1곳**.
-- → DB helper 로 **순수 교체 가능**. seed 값(kpa-society/glycopharm=true)이 상수와 동일하므로 day-1 동작 동일, 회귀 0.
+- → DB helper 로 **순수 교체 가능**. seed 값(kpa-society=true)이 상수와 동일하므로 day-1 동작 동일, 회귀 0.
 
 ## 2. 적용 endpoint/service 조사 결과
 
@@ -32,7 +31,7 @@
 
 ## 4. service audience helper 사용 방식
 
-- 신규 `ServiceAudienceService.getPharmacyAudienceResolver()` — 전 정책 1회 조회 → 동기 resolver `(serviceKey) => boolean`. row 부재 serviceKey 는 레거시 기본값(`['glycopharm','kpa-society']`) fallback.
+- 신규 `ServiceAudienceService.getPharmacyAudienceResolver` — 전 정책 1회 조회 → 동기 resolver `(serviceKey) => boolean`. row 부재 serviceKey 는 레거시 기본값 fallback.
 - `assertPharmacyOnlyServiceKeys(isPharmacyAudience, isRegulated, serviceKeys)` 로 시그니처 변경(상수 → resolver 주입). 로직(규제 && 위반 serviceKey 존재 → 거부) 동일.
 
 ## 5. 차단 reason code / 문구
@@ -60,7 +59,7 @@
 - **api-server:** `tsc --noEmit` **0 errors** ✅
 - **web-neture:** `build ✓ (~12s)` ✅
 - **정적:** `PHARMACY_ALLOWED_SERVICE_KEYS` 상수 본체 제거(grep 잔존=주석만). resolver fallback=기존 상수 → seed 일치 시 동작 동일. 품목군 gate·serviceKey 필터·createPendingApprovals 불변.
-- **gate 매트릭스(설계상):** 의약품+kpa-society/glycopharm=통과 · 의약품+k-cosmetics/neture=차단 · 비의약품(비규제)=무영향 · admin 에서 정책 변경 시 resolver 결과 즉시 반영(매 호출 DB 조회).
+- **gate 매트릭스(설계상):** 의약품+kpa-society=통과 · 의약품+k-cosmetics/neture=차단 · 비의약품(비규제)=무영향 · admin 에서 정책 변경 시 resolver 결과 즉시 반영(매 호출 DB 조회).
 - **browser/DB smoke:** 미수행 — dev·인증 guard. **배포 후 권장:** 의약품 offer 를 비약국 서비스로 생성/승인요청 시 차단 + toast, 약국 서비스는 통과, admin 토글 변경 반영, 기존 품목군 gate 유지.
 
 ## 10. 변경 파일 (4)

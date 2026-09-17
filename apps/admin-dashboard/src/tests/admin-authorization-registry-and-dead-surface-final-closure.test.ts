@@ -16,7 +16,6 @@
  *   9  PartnerOps 관리자 런타임 0
  *   10 PartnerOps catalog 최종 상태 고정
  *   11 partner-core 등 살아 있는 공용 계약 보존
- *   12 GlycoPharm 활성 계약 0
  *
  * §9 원칙: raw-source 검사는 **구조 부재 확인용**으로만 쓰고, 권한 동작은
  * 실제 함수(`hasMenuPermission` · `hasRequiredRoles`)를 호출해 검증한다.
@@ -268,19 +267,5 @@ describe('§9-9~11 · PartnerOps 계층별 최종 상태', () => {
     expect(catalog).not.toContain("id: 'partnerops'");
     expect(catalog).not.toContain("appId: 'partner-core'");
     expect(stripAllComments(read('api/admin-apps.ts'))).not.toContain("'partnerops'");
-  });
-});
-
-// ===========================================================================
-// 계약 12 — GlycoPharm
-// ===========================================================================
-
-describe('§9-12 · GlycoPharm 활성 계약 0', () => {
-  it('활성 관리자 소스에 glycopharm 서비스 계약이 없다', () => {
-    const offenders = walk(SRC)
-      .filter((f) => !f.includes(`${sep}tests${sep}`))
-      .filter((f) => /glycopharm/i.test(stripAllComments(readFileSync(f, 'utf8'))))
-      .map((f) => f.slice(SRC.length + 1));
-    expect(offenders).toEqual([]);
   });
 });

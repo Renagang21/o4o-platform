@@ -21,7 +21,7 @@
 | 화면 | 정상 렌더 (목록·등록 폼·GuideBlock) |
 | Backend | `apps/api-server/src/modules/neture/neture-library.routes.ts` — `GET /library/public`(무인증), `GET/POST /library`(requireAuth + requireLinkedSupplier / requireActiveSupplier). 정상 mount |
 | 진입점 | **0건** — 공급자 사이드바(`SupplierSpaceLayout`), 대시보드 Quick Link, 어떤 화면의 CTA 에도 링크 없음 |
-| 공개 API 의 UI 소비자 | **0건** — `/neture/library/public/:id` 를 참조하는 코드는 `web-glycopharm/src/api/storeLibrary.ts`, `web-kpa-society/src/api/storeExecutionAssets.ts`, `web-kpa-society/src/api/storeLibrary.ts` 3개의 **API 클라이언트 함수뿐**이며, 이를 호출하는 화면 코드는 없다(KPA 쪽은 `@deprecated` 표기) |
+| 공개 API 의 UI 소비자 | — |
 | 프로덕션 데이터 | `GET https://api.neture.co.kr/api/v1/neture/library/public?limit=5` → `{"success":true,"data":{"items":[],"total":0}}` — **서비스 공개 자료 0건** |
 | 백엔드 자체 선언 | 파일 헤더 주석 "독립 도메인 — HUB/Signage/CMS 연동 없음" |
 
@@ -41,7 +41,7 @@
 **RETIRE 하지 않은 이유**
 - route 를 제거하면 비공개로 보관된 기존 자료에 접근 경로가 사라진다.
 - §4 가 schema/migration 을 금지하므로 데이터는 남는다 → 화면만 없애면 유령 데이터가 된다.
-- `/library/public` 을 glycopharm·kpa API 클라이언트가 아직 참조하므로 backend 은퇴는 별도 lockstep WO 가 필요하다.
+- `/library/public` 을 kpa API 클라이언트가 아직 참조하므로 backend 은퇴는 별도 lockstep WO 가 필요하다.
 
 **KEEP_HIDDEN 계약**
 - 사이드바·대시보드·어떤 화면에도 **진입점을 추가하지 않는다**.
@@ -99,7 +99,7 @@
 2. **동일 (master, KO) hidden 행 4중 중복** — 운영자 교체로 강등된 과거 버전이 그대로 조회된다(문서화된 조건). 목록 노이즈이며 데이터 오류는 아니다.
 3. **태블릿 보관 세트 2건** — 검증용 임시 세트("HUB흐름 검증 세트(임시)" 등)가 운영 계정에 남아 있다. 정리는 계정 소유자 판단 사항.
 4. **공급자 프로필 미완료 배너** — 담당자명·연락처 미입력 상태 안내. 실계정 데이터 이슈.
-5. **`/library/public` 타 서비스 API 클라이언트 잔존** — glycopharm 1 · kpa 2(deprecated). backend 은퇴 시 lockstep 필요.
+5. kpa 2(deprecated). backend 은퇴 시 lockstep 필요.
 
 ## 10. 공급자 영역 CLOSED 가능 여부 — **CLOSED_READY**
 

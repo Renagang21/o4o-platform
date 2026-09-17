@@ -20,7 +20,6 @@ IR-AUDIT-V1 시점에 회원 관리 공통화의 마지막 drift 는 **KPA-Socie
 
 | 서비스 | OperatorMembersConsolePage | 비고 |
 |---|---|---|
-| GlycoPharm | ✅ thin wrapper | [services/web-glycopharm/src/pages/operator/UsersPage.tsx](../../services/web-glycopharm/src/pages/operator/UsersPage.tsx) |
 | K-Cosmetics | ✅ thin wrapper | [services/web-k-cosmetics/src/pages/operator/UsersPage.tsx](../../services/web-k-cosmetics/src/pages/operator/UsersPage.tsx) |
 | Neture | ✅ thin wrapper | wrapper 사용 — 이전 WO 들에서 정렬 완료 |
 | KPA-Society | ✅ thin wrapper (Hybrid) | [services/web-kpa-society/src/pages/operator/MemberManagementPage.tsx](../../services/web-kpa-society/src/pages/operator/MemberManagementPage.tsx) — 회원 관리 영역 wrapper + ApplicationsTab 외부 렌더 |
@@ -106,11 +105,11 @@ IR-AUDIT-V1 시점에 회원 관리 공통화의 마지막 drift 는 **KPA-Socie
 - KPA prop 전달 위치: [MemberManagementPage.tsx:325-505](../../services/web-kpa-society/src/pages/operator/MemberManagementPage.tsx#L325-L505) — `renderDeleteFlow` 키 부재 확인
 - Hard delete 진입점은 `/admin/members` (admin 전용) — KPA 기존 정책 유지
 
-### 3.13 GP / K-Cos / Neture 회귀 없음
+### 3.13 K-Cos / Neture 회귀 없음
 
 ✅ 본 WO 는 KPA 페이지 단일 파일만 수정.
 - 변경 파일: `services/web-kpa-society/src/pages/operator/MemberManagementPage.tsx` (commit `7ada5bc4d`, 1 file changed)
-- 미수정 확정: `packages/operator-core-ui/src/modules/members/OperatorMembersConsolePage.tsx`, `packages/operator-core-ui/src/modules/members/types.ts`, GP/K-Cos/Neture 의 wrapper 호출 사이트
+- 미수정 확정: `packages/operator-core-ui/src/modules/members/OperatorMembersConsolePage.tsx`, `packages/operator-core-ui/src/modules/members/types.ts`, K-Cos/Neture 의 wrapper 호출 사이트
 - 회귀 가능성 0 (props 인터페이스 / wrapper 내부 미변경)
 
 ---

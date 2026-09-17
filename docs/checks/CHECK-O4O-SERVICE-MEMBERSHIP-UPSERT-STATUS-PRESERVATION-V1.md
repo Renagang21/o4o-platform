@@ -68,7 +68,7 @@ if (!existing) {
 | 8 | `handoff.controller` (351) | 명시적 `pending` 전환 | ✅ 정상 |
 | 9 | `supplier.service` (140·201·371·458) | 공급자 **승인/반려/정지/재활성** 플로우 | ✅ 정상 (명시적 승인 의미) |
 | 10 | `partner-contract.service` (760) | 파트너 **계약 승인** 플로우 | ✅ 정상 (명시적 승인 의미) |
-| 11 | `glycopharm-member.service` (236) | 명시적 반려 | ✅ 정상 |
+| 11 | — | 명시적 반려 | ✅ 정상 |
 | 12 | `BranchJoinController` · `PharmacyHubJoinController` | 서비스 가입 신청 생성 | ✅ 정상 |
 
 > #9·#10 도 기존 membership 을 `active` 로 바꾸지만, **관리자가 공급자·파트너를 승인하는 명시적 플로우**이므로
@@ -260,7 +260,7 @@ typecheck + Jest                                          ✅ (1941 tests)
 | # | 경로 | 분류 | 판정 |
 |---|---|---|---|
 | 13 | `routes/kpa/controllers/member.controller.ts:669` | APPROVE (`WHERE status='pending'` 멱등 가드) | ✅ 정상 |
-| 14 | `routes/glycopharm/controllers/admin.controller.ts:421` | APPROVE (application 승인 UPSERT) | ✅ 정상 — 관리자 승인 액션 |
+| 14 | — | APPROVE (application 승인 UPSERT) | ✅ 정상 — 관리자 승인 액션 |
 | 15 | `modules/neture/services/operator-registration.service.ts:122` | APPROVE (`status IN ('pending','rejected')`) | ✅ 정상 |
 | 16 | 〃 `:277` | REJECT (`WHERE status='pending'`) | ✅ 정상 |
 | 17 | 〃 `:300` | OTHER — `operator_notes` 만, status 미변경 | ✅ 정상 |
@@ -276,13 +276,13 @@ typecheck + Jest                                          ✅ (1941 tests)
 | 1 | serviceKey 로그인 | `auth-login.service.ts:169` | membership **존재만** 확인 (status 미판정) | **의도적 예외 — 근거 있음** |
 | 2 | 계정 상태 게이트 | `common/auth/account-access.policy.ts` | `users.status` → normal/restricted/blocked | ✅ (membership 축과 별개) |
 | 3 | backend membership guard | `common/middleware/membership-guard.middleware.ts:107` | `status !== 'active'` → 403 `MEMBERSHIP_NOT_ACTIVE` | ✅ |
-| 4 | 서비스 scope guard 전량 | kpa · neture · glycopharm · cosmetics · pharmacy-hub · kpa-branch · lms · service-legal | 전부 `createMembershipScopeGuard` 경유 (raw `createServiceScopeGuard` 직접 사용 **0건**) | ✅ |
+| 4 | 서비스 scope guard 전량 | kpa · neture · cosmetics · pharmacy-hub · kpa-branch · lms · service-legal | 전부 `createMembershipScopeGuard` 경유 (raw `createServiceScopeGuard` 직접 사용 **0건**) | ✅ |
 | 5 | 커뮤니티 진입 | `routes/forum/service-forum.routes.ts:63` | `status !== 'active'` → 403 | ✅ |
 | 6 | 매장 진입 (serviceKey 지정) | `utils/store-owner.utils.ts:168` | `status !== 'active'` → 403 | ✅ |
 | 7 | **매장 진입 (back-compat · serviceKey 미지정)** | 〃 | **membership 검증을 건너뜀** | **❌ 결함 → 수정** |
 | 8 | handoff 토큰 | `handoff.controller.ts:62·191` | 생성·교환 **양쪽** active 재검증 | ✅ |
 | 9 | JWT memberships 생산 | `auth-context.helper.freshenUserContext` · `refresh-token.service:135` | 매 토큰 발급 시 DB 재조회 | ✅ |
-| 10 | frontend gate (KPA/Neture/GlycoPharm/K-Cos/PH) | `packages/auth-utils/src/membershipGate.ts` | `active` 만 허용, 알 수 없는 값은 `'none'` fallback(차단측) | ✅ |
+| 10 | frontend gate | `packages/auth-utils/src/membershipGate.ts` | `active` 만 허용, 알 수 없는 값은 `'none'` fallback(차단측) | ✅ |
 | 11 | Pharmacy-Hub 매장 provisioning/대시보드 | `PharmacyHubStoreProvisioningService:232` · `PharmacyHubStoreDashboardController:152` | `status !== 'active'` → 거부 / 상태 표기 | ✅ |
 | 12 | 서비스 카탈로그 목록 | `routes/platform-services/*` | status 를 **표시**만 (진입 판정 아님) | ✅ |
 
@@ -380,7 +380,7 @@ WO §8 의 "안전한 테스트 계정 smoke" 는 수행하지 않았다. 프로
 |---|---|---|
 | 1 | JWT `memberships` 는 access token 발급 시점 스냅샷이다 (TTL **15분**). 승인 취소·정지 직후 최대 15분간 기존 토큰이 통과할 수 있다. refresh 시 DB 재조회로 해소된다 | 설계상 허용 — 즉시 무효화가 필요하면 별도 WO |
 | 2 | back-compat 매장 경로 6곳은 여전히 "서비스 중립" 판정이다. 한 서비스만 active 인 사용자가 서비스 중립 store 라우트에 진입할 수 있다 (조직 해석이 서비스 중립이라 현 구조에서 정밀 판정 불가) | 점진 마이그레이션 대상 |
-| 3 | `glycopharm/admin.controller:421` 의 승인 UPSERT 는 suspended/withdrawn 도 active 로 되살린다 (관리자 승인 액션이라 허용) | 정책 확인 완료 |
+| 3 | — | 정책 확인 완료 |
 | 4 | `withdrawn` 재가입 정책은 canonical 근거가 없어 판단하지 않았다 (WO §7 준수 — 보존만) | 미결 |
 
 ## I. 완료 기준 대조 (WO §9)

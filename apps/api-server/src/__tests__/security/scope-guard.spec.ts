@@ -212,4 +212,3 @@ describe('Neture Scope Guard', () => {
   });
 });
 
-// GlycoPharm Scope Guard — REMOVED (WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1)

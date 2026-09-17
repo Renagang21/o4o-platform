@@ -174,7 +174,7 @@ function formatDate(dateStr: string): string {
  *   copy/view → writeClipboard(본문 텍스트)           → '내용 복사'
  *
  * 서비스별 분기는 두지 않는다 — 모든 소비처가 같은 handleTakeAction 을 쓰므로
- * 동작 기준 계산만으로 4개 서비스(KPA/GlycoPharm/K-Cosmetics/Neture) 라벨이 정합된다.
+ * 동작 기준 계산만으로 3개 서비스(KPA/K-Cosmetics/Neture) 라벨이 정합된다.
  */
 function getTakeLabel(at: 'view' | 'download' | 'external' | 'copy'): string {
   if (at === 'external') return '링크 열기';

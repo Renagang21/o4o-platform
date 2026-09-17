@@ -10,7 +10,7 @@
 ## 1. 목표
 
 선행 WO 의 `PASS_WITH_UNVERIFIED` 3건과 KPA menu drift 를 닫아,
-공식 5서비스(KPA-Society / K-Cosmetics / Neture / GlycoPharm / Pharmacy-Hub)의
+공식 4서비스(KPA-Society / K-Cosmetics / Neture / Pharmacy-Hub)의
 `admin` · `operator` 역할 진입 계약을 production 실측 기준으로 확정한다.
 
 ---
@@ -166,7 +166,6 @@ K-Cosmetics 가 이미 같은 정렬을 마친 형태(`KCosGlobalHeader`)와도 
 | KPA-Society | kpa-society.co.kr | 200 | ✅/✅ | 렌더(`/admin/kpa-dashboard`) | 렌더 | 0 | 0 |
 | K-Cosmetics | k-cosmetics.site | 200 | ✅/✅ | 렌더 | 렌더 | 0 | 0 |
 | Neture | neture.co.kr | 200 | ✅/✅ | 렌더 | 렌더 | 0 | 0 |
-| GlycoPharm | glycopharm.co.kr | 200 | ✅/✅ | 렌더 | 렌더 | 0 | 0 |
 | Pharmacy-Hub | pharmacyhub.co.kr | 200 | ✅/✅ | 렌더 | 렌더 | 0 | 0 |
 
 - white screen 0 · dead link 0 · deep link/새로고침 후 URL 유지 확인.

@@ -9,7 +9,7 @@
 
 ## 1. 목표 · 배경
 
-KPA-Society · GlycoPharm · K-Cosmetics · PharmacyHub · Neture 5개 서비스의 사용자 프로필/마이페이지 기능을 **전수조사**하고, 동일 기능을 `Core + Service Extension` 구조로 **실제 수렴**시킨다.
+KPA-Society · K-Cosmetics · PharmacyHub · Neture 4개 서비스의 사용자 프로필/마이페이지 기능을 **전수조사**하고, 동일 기능을 `Core + Service Extension` 구조로 **실제 수렴**시킨다.
 
 ```text
 계정 기본정보 / 서비스 회원정보 / 사업자·매장정보 / 비밀번호·계정관리 / 서비스별 전문정보
@@ -19,7 +19,7 @@ KPA-Society · GlycoPharm · K-Cosmetics · PharmacyHub · Neture 5개 서비스
 
 **배경**: 선행 CHECK 에서 데이터 정본(ownership · write path) 은 이미 깊게 조사되어 있고, **신규 통합 테이블은 불필요**하며 `users` · `service_memberships` · `service_credentials` · 서비스별 profile · `organizations` 의 기존 경계 유지가 타당하다고 판정됐다. 따라서 본 WO 는 또 하나의 조사 트랙으로 끝내지 않고, 그 결과를 근거로 **UI · API 사용 구조를 공통 Core 로 수렴**시키는 단계다.
 
-**핵심 차이 (선행 CHECK 기준, 재검증 필요)**: GP · K-Cosmetics 는 각각 `users.businessInfo` 를 수정, KPA 는 별도 KPA profile 경로 보유, PharmacyHub 는 당시 자체 profile write 없음 → 이 차이를 **Extension / adapter 로 처리**하는 것이 본 WO 의 중심이다.
+**핵심 차이 (선행 CHECK 기준, 재검증 필요)**: K-Cosmetics 는 각각 `users.businessInfo` 를 수정, KPA 는 별도 KPA profile 경로 보유, PharmacyHub 는 당시 자체 profile write 없음 → 이 차이를 **Extension / adapter 로 처리**하는 것이 본 WO 의 중심이다.
 
 ---
 
@@ -31,7 +31,6 @@ KPA-Society · GlycoPharm · K-Cosmetics · PharmacyHub · Neture 5개 서비스
 
 ```text
 KPA           services/web-kpa-society/src/pages/mypage/MyProfilePage.tsx
-GlycoPharm    services/web-glycopharm/src/pages/mypage/MyProfilePage.tsx
 K-Cosmetics   services/web-k-cosmetics/src/pages/mypage/MyProfilePage.tsx
 Neture        services/web-neture/src/pages/mypage/MyProfilePage.tsx + 사업자/공급자 프로필
 PharmacyHub   store-owner Account/Profile 계열
@@ -54,7 +53,7 @@ PharmacyHub   store-owner Account/Profile 계열
 서비스별 고유 profile
 ```
 
-이렇게 쪼개야 GP 와 K-Cosmetics 처럼 화면이 겉보기에 비슷한 경우가 **API 계약만 다른 것인지**, KPA 처럼 **실제 도메인 정보가 다른 것인지** 구분된다. 화면 개수 기준 census 는 인정하지 않는다.
+화면 개수 기준 census 는 인정하지 않는다.
 
 기능 단위 판정 라벨:
 
@@ -68,7 +67,6 @@ FULLY_COMMON / CORE_ONLY / VIEW_DUPLICATED / SERVICE_SPECIFIC / NOT_IMPLEMENTED 
 ACCOUNT_CORE       이름 · 이메일 · 전화번호 · 닉네임 · 비밀번호/계정관리
 SERVICE_PROFILE    서비스 membership · 서비스 role · service credential · 직역/면허/회원 속성
 DOMAIN_EXTENSION   약국/매장/회사 · 사업자 정보 · organizations 관계
-SERVICE_EXTENSION  KPA 약사/학생 · GlycoPharm 고유 회원정보 · Neture 공급자 · 기타 서비스 고유 필드
 ```
 
 **금지 사항**:
@@ -99,7 +97,6 @@ ProfilePage / ProfileLayout
  ├─ ServiceProfileSection
  ├─ BusinessOrStoreSection
  ├─ SecuritySection
- └─ extension { KPA / GlycoPharm / K-Cosmetics / PharmacyHub / Neture }
 ```
 
 > **공통화를 위한 추상화가 기존 중복보다 더 복잡해지면 공통화하지 않는다.**
@@ -140,7 +137,7 @@ ProfilePage / ProfileLayout
 4. **모집단 전수조사** (§2-1) → 기능 단위 판정표 작성. **미조사 0**.
 5. **프로필 경계 고정** (§2-2) → 각 기능을 4개 계층에 배치.
 6. **공통 Core 구현** (§2-3) → 우선순위 1~6 순.
-7. **5서비스 adoption** — KPA · GlycoPharm · K-Cosmetics · PharmacyHub · Neture 를 Core 로 전환. Core 만 만들고 소비처 미전환 상태로 두지 않는다.
+7. **4서비스 adoption** — KPA · K-Cosmetics · PharmacyHub · Neture 를 Core 로 전환. Core 만 만들고 소비처 미전환 상태로 두지 않는다.
 8. **검증** (§5) → **CHECK 작성** (§6) → path-specific stage → commit → push.
 
 ---
@@ -184,7 +181,7 @@ CLAUDE.md 실행 원칙의 중지 조건을 그대로 따른다. 특히 본 WO �
        → 저장 → 새로고침 → 저장값 유지
 ```
 
-대상: KPA-Society / GlycoPharm / K-Cosmetics / PharmacyHub / Neture. **가능한 서비스는 실제 브라우저로 검증**한다 (계정 SSOT: `docs/local/TEST-ACCOUNTS.local.md`).
+대상: KPA-Society / K-Cosmetics / PharmacyHub / Neture. **가능한 서비스는 실제 브라우저로 검증**한다 (계정 SSOT: `docs/local/TEST-ACCOUNTS.local.md`).
 
 ### 6-2. 확인 항목
 

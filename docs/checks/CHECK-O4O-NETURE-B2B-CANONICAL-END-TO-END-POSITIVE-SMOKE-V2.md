@@ -41,10 +41,9 @@
 
 ## 5. legacy / 무회귀
 - legacy `/neture/seller/orders` → 410 retired(P2e). canonical buyer 경로만 사용.
-- 본 smoke 는 4서비스 공통 PaymentCore(o4o_payments) 활성화도 간접 입증(prepare 성공) — KPA/Glyco/KCos 결제도 동일 경로로 이제 가능.
 
 ## 6. 자격증명 주의 (SSOT 정합)
-- `docs/local/TEST-ACCOUNTS.local.md` 의 renagang21@gmail.com "약국 경영자" 행 비밀번호로는 로그인 실패(INVALID_CREDENTIALS), "GlycoPharm 약국" 행 비밀번호로 성공. **로컬 SSOT 의 약국경영자 행이 stale** — 로컬 문서 갱신 권장(값은 본 CHECK 에 미기록). (TEST-ACCOUNTS.local.md 는 gitignore, 본 CHECK 에서 미수정.)
+- **로컬 SSOT 의 약국경영자 행이 stale** — 로컬 문서 갱신 권장(값은 본 CHECK 에 미기록). (TEST-ACCOUNTS.local.md 는 gitignore, 본 CHECK 에서 미수정.)
 
 ## 7. 생성 자원 / 정리 대상 (§17)
 | 자원 | id |

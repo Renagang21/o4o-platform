@@ -90,7 +90,7 @@ Minor cleanup 항목 5건과 주문 레이어 미완성(Structural Legacy) 1건�
 
 - **파일**: `cosmetics-payment.controller.ts:312`
 - **내용**: `process.env.TOSS_PAYMENTS_CLIENT_KEY || 'test_ck_test_key'`
-- **판단**: 클라이언트 키(공개 키)이므로 보안 위험 없음. GlycoPharm 동일 패턴.
+- **판단**: 클라이언트 키(공개 키)이므로 보안 위험 없음.
 - **권고**: 향후 config 파일 통합 시 정리
 
 #### MC-2: `getKCosmeticsPaymentHandler()` 미사용 export
@@ -153,17 +153,17 @@ Dead 결제 엔드포인트: **없음**
 
 ## 5. PaymentCore 정렬 확인
 
-| 항목 | GlycoPharm | Cosmetics | 일치 |
-|------|------------|-----------|------|
-| PaymentCoreService 사용 | ✅ | ✅ | ✅ |
-| prepare() 호출 | ✅ | ✅ | ✅ |
-| confirm() 호출 (amount 미전달) | ✅ | ✅ | ✅ |
-| TypeORMPaymentRepository | ✅ | ✅ | ✅ |
-| TossPaymentProviderAdapter | ✅ | ✅ | ✅ |
-| EventHubPaymentPublisher | ✅ | ✅ | ✅ |
-| sourceService 설정 | 'glycopharm' | 'cosmetics' | ✅ |
-| 에러 매핑 일관성 | 동일 | 동일 | ✅ |
-| paymentKey UNIQUE 방어 | ✅ | ✅ | ✅ |
+| 항목 | Cosmetics | 일치 |
+| ------ | ----------- | ------ |
+| PaymentCoreService 사용 | ✅ | ✅ |
+| prepare() 호출 | ✅ | ✅ |
+| confirm() 호출 (amount 미전달) | ✅ | ✅ |
+| TypeORMPaymentRepository | ✅ | ✅ |
+| TossPaymentProviderAdapter | ✅ | ✅ |
+| EventHubPaymentPublisher | ✅ | ✅ |
+| sourceService 설정 | 'cosmetics' | ✅ |
+| 에러 매핑 일관성 | 동일 | ✅ |
+| paymentKey UNIQUE 방어 | ✅ | ✅ |
 
 **결제 엔진 구조 완전 동일. 단일화 확인.**
 

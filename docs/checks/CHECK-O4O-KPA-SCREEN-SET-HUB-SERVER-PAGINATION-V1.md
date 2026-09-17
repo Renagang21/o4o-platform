@@ -26,7 +26,7 @@ KPA 매장 HUB 태블렛 화면 목록(운영자·공급자)의 고정 `LIMIT 20
 | `StoreHubLatestFeed.tsx:254` | `listOperatorTemplates()` (인자 없음) | 배열 → `.slice(0, PREVIEW_ROWS_DIGITAL=5)` | **무변경**(배열 계약 보존) |
 | `services/web-neture/.../supplierScreenSets.ts` | — | 주석에서 엔드포인트 경로만 언급 | 소비 아님(공급자 저작측 별도 API) |
 
-- **KPA 화면 외 소비처 = 0.** 외부 시스템·타 서비스(GP/KCos/Neture) 소비 없음.
+- **KPA 화면 외 소비처 = 0.** 외부 시스템·타 서비스(KCos/Neture) 소비 없음.
 - `StoreHubLatestFeed` 는 최신 5건만 미리보기로 쓰므로 기본 `limit=20` 첫 페이지(updated_at DESC)로 충분 → 회귀 없음.
 - 배열을 가정하는 코드(`Array.isArray` / `.map` 직접) 재검색: 두 목록 응답에 대해 위 3곳 외 없음.
 
@@ -199,7 +199,7 @@ naive DB `COUNT/OFFSET` 은 비약국 노출수와 **안전히 일치하지 않�
 | `services/web-kpa-society/src/pages/pharmacy/HubScreenSetLibraryPage.tsx` | page/total 상태 + 표준 `Pagination` + 필터/탭 변경 시 page=1 |
 | `docs/checks/CHECK-O4O-KPA-SCREEN-SET-HUB-SERVER-PAGINATION-V1.md` | 본 문서 |
 
-- **DB migration 0.** 공통 `/hub/contents` API·검색 공통화·사이니지 출처·의약품 게이트 로직·가져오기/사본 계약·F2/F3/N-5·GP/KCos **미접촉**.
+- **DB migration 0.** 공통 `/hub/contents` API·검색 공통화·사이니지 출처·의약품 게이트 로직·가져오기/사본 계약·F2/F3/N-5·KCos **미접촉**.
 
 ---
 

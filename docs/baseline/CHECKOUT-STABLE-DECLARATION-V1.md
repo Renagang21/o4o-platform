@@ -15,7 +15,6 @@
 >
 > ---
 
-
 **O4O Platform - Checkout Layer Stable Declaration (Legacy Cleanup Included)**
 
 | 항목 | 값 |
@@ -67,8 +66,6 @@ Checkout End-to-End 구조는 다음을 모두 충족하였으므로 **Stable로
 **정책**: 모든 결제 Confirm은 PaymentCore를 통해서만 수행한다.
 
 ### B. Controller 레벨 금액 검증 코드
-
-GlycoPharm: 제거 완료 (WO-O4O-PAYMENT-CORE-AMOUNT-VERIFICATION-HARDEN-V1)
 
 ### C. 중복 결제 Dedup 개선 (후순위)
 
@@ -135,10 +132,7 @@ Phase2: Redis 기반 이동 가능 (지금은 변경하지 않음)
 |------|------|
 | PaymentCore | `packages/payment-core/src/services/PaymentCoreService.ts` |
 | Storefront (통합) | `apps/api-server/src/routes/platform/unified-store-public.routes.ts` |
-| Checkout | `apps/api-server/src/routes/glycopharm/controllers/checkout.controller.ts` |
-| Payment (GlycoPharm) | `apps/api-server/src/routes/glycopharm/controllers/glycopharm-payment.controller.ts` |
 | Payment (Cosmetics, Legacy) | `apps/api-server/src/routes/cosmetics/controllers/cosmetics-payment.controller.ts` |
-| Event Handler (GlycoPharm) | `apps/api-server/src/services/glycopharm/GlycopharmPaymentEventHandler.ts` |
 | Retail Stable Spec | `docs/platform/architecture/O4O-RETAIL-STABLE-V1.md` |
 | E2E 조사 보고서 | `docs/archive/investigations/IR-O4O-CHECKOUT-END-TO-END-STRUCTURE-V1.md` |
 

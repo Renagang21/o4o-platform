@@ -9,7 +9,6 @@
 ## 종합 판정
 
 ```
-1. GlycoPharm KPI Filter: PASS
 2. Cosmetics KPI Filter:  PASS
 3. Legacy Metadata Check:  PASS (기존 코드에서 metadata.serviceKey 사용 확인)
 4. Index Status:           CREATED (Migration 20260224500000)
@@ -17,23 +16,6 @@
 
 Final Status: SAFE
 ```
-
----
-
-## 1. GlycoPharm KPI Filter 검증
-
-**파일**: `glycopharm-store-data.adapter.ts`
-
-| 메서드 | Line | 추가된 필터 | 상태 |
-|--------|:----:|-----------|:----:|
-| `getOrderStats()` | 41 | `AND metadata->>'serviceKey' = 'glycopharm'` | PASS |
-| `getChannelBreakdown()` | 61 | `AND metadata->>'serviceKey' = 'glycopharm'` | PASS |
-| `getTopProducts()` | 93 | `AND o.metadata->>'serviceKey' = 'glycopharm'` | PASS |
-| `getRecentOrders()` | 115 | `AND metadata->>'serviceKey' = 'glycopharm'` | PASS |
-| `getTotalOrderCount()` | 136 | `AND metadata->>'serviceKey' = 'glycopharm'` | PASS |
-| `getRevenueBetween()` | 149 | `AND metadata->>'serviceKey' = 'glycopharm'` | PASS |
-
-**전체 6/6 쿼리에 serviceKey 필터 적용 완료.**
 
 ---
 
@@ -70,8 +52,7 @@ Final Status: SAFE
 
 | 파일 | 사용 방식 | 값 |
 |------|----------|-----|
-| `checkout.controller.ts` | 주문 생성 시 metadata에 기록 | `'glycopharm'` |
-| `checkout.controller.ts` | 주문 조회 시 필터 | `metadata->>'serviceKey' = 'glycopharm'` |
+| `checkout.controller.ts` | 주문 조회 시 필터 | — |
 | `cosmetics-order.controller.ts` | 주문 생성 시 metadata에 기록 | `'cosmetics'` |
 | `cosmetics-order.controller.ts` | 주문 조회 시 필터 | `metadata->>'serviceKey' = 'cosmetics'` |
 | `kpa.routes.ts` | 공동구매 주문 필터 | `metadata->>'serviceKey' = 'kpa-groupbuy'` |
@@ -109,22 +90,17 @@ CREATE INDEX "IDX_ecommerce_orders_service_key"
 
 ## 5. Cross-Service Simulation
 
-### Scenario: 매장 X가 GlycoPharm + Cosmetics 동시 운영
+### Scenario: 매장 X가 Cosmetics 동시 운영
 
 **Before (수정 전)**:
 ```sql
--- GlycoPharm KPI
 SELECT COUNT(*) FROM ecommerce_orders WHERE store_id = 'X'
--- 결과: GlycoPharm 100건 + Cosmetics 50건 = 150건 (오염)
 ```
 
 **After (수정 후)**:
 ```sql
--- GlycoPharm KPI
 SELECT COUNT(*) FROM ecommerce_orders
 WHERE store_id = 'X'
-  AND metadata->>'serviceKey' = 'glycopharm'
--- 결과: GlycoPharm 100건만 (정확)
 
 -- Cosmetics KPI
 SELECT COUNT(*) FROM ecommerce_orders
@@ -141,7 +117,6 @@ WHERE store_id = 'X'
 
 | 파일 | 변경 내용 | 쿼리 수 |
 |------|----------|:------:|
-| `glycopharm-store-data.adapter.ts` | 모든 KPI 쿼리에 serviceKey 필터 추가 | 6 |
 | `cosmetics-store-summary.service.ts` | 모든 KPI + Admin 쿼리에 serviceKey 필터 추가 | 9 |
 | `20260224500000-AddEcommerceOrdersServiceKeyIndex.ts` | Expression index 생성 | 1 |
 
@@ -180,7 +155,6 @@ tsc --noEmit --project apps/api-server/tsconfig.json
 
 | 항목 | 수정 전 | 수정 후 |
 |------|--------|--------|
-| GlycoPharm KPI | store_id만 필터 | store_id + serviceKey='glycopharm' |
 | Cosmetics KPI | store_id만 필터 | store_id + serviceKey='cosmetics' |
 | Admin Summary | store_id IN cosmetics_stores | + serviceKey='cosmetics' |
 | 인덱스 | 없음 | Expression index on metadata->>'serviceKey' |

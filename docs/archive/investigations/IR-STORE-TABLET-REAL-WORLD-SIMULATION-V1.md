@@ -198,8 +198,6 @@ WO-STORE-LOCAL-PRODUCT-HARDENING-V1에 의해:
 
 ## 5. Cross-Service Isolation
 
-### 시뮬레이션: GlycoPharm 매장의 태블릿이 Cosmetics 상품을 보여주는가?
-
 ### 분석
 
 | 격리 지점 | 메커니즘 | 상태 |
@@ -213,7 +211,6 @@ WO-STORE-LOCAL-PRODUCT-HARDENING-V1에 의해:
 ### 공격 시나리오
 
 ```
-시나리오: GlycoPharm 매장 slug로 Cosmetics 상품 접근 시도
 ├─ GET /api/v1/stores/pharmacy-a-slug/tablet/products
 ├─ resolvePublicStore("pharmacy-a-slug")
 │  → storeId = 'org-uuid-123', serviceKey = 'kpa'
@@ -299,7 +296,6 @@ Mitigation: Display 저장 시 재검증으로 정리됨 (운영자가 Display �
 ```
 시나리오: 악의적 소비자가 StoreLocalProduct UUID를 Checkout에 전달
 
-POST /api/v1/glycopharm/checkout
 Body: {
   "items": [{ "productId": "{store-local-product-uuid}", "quantity": 1 }]
 }
@@ -308,20 +304,16 @@ Body: {
 **방어 경로**:
 ```
 checkout.controller.ts:
-  const product = await glycopharmProductRepo.findOne({
     where: { id: item.productId, pharmacy_id: storeId, status: 'active' }
   });
-  → store_local_products UUID로 glycopharm_products 조회 → NULL
   → 응답: "상품을 찾을 수 없습니다" (400)
 ```
 
 | 방어 레이어 | 메커니즘 | 차단 여부 |
 |-----------|---------|:--------:|
-| Checkout Product Lookup | `glycopharm_products WHERE id = $1` — 별도 테이블 | **차단** |
-| OrganizationProductListing | `external_product_id` = GlycopharmProduct.id — 일치 불가 | **차단** |
+| Checkout Product Lookup | — | **차단** |
+| OrganizationProductListing | — | **차단** |
 | Distribution Policy Guard | `neture_supplier_products` JOIN — 매칭 불가 | **차단** |
-
-**결론**: StoreLocalProduct UUID는 `glycopharm_products` 테이블에 존재하지 않으므로 Checkout 진입이 **구조적으로 불가능**하다.
 
 **판정: PASS**
 
@@ -395,7 +387,7 @@ store-tablet.routes.ts validateDisplayItems() line 117:
 │                                                                     │
 │  Layer 4: Commerce Boundary                                        │
 │  ├─ StoreLocalProduct entity: Commerce 관계 없음                    │
-│  ├─ Checkout: glycopharm_products 테이블만 참조                     │
+│  ├─ Checkout: 테이블만 참조                                         │
 │  └─ EcommerceOrderItem: StoreLocalProduct FK 없음                  │
 │                                                                     │
 │  Layer 5: Public Visibility                                        │
@@ -419,7 +411,7 @@ store-tablet.routes.ts validateDisplayItems() line 117:
 | 4 | Public Tablet Visibility | `unified-store-public.routes.ts:779-828` | **PASS** |
 | 5 | Cross-Service Isolation | `unified-store-public.routes.ts` (resolvePublicStore) | **PASS** |
 | 6 | Orphan Handling | `store-local-product.routes.ts:362`, `store-tablet.routes.ts:284` | **SAFE WITH NOTE** |
-| 7-A | Local→Checkout Injection | `checkout.controller.ts` (glycopharm_products lookup) | **PASS** |
+| 7-A | Local→Checkout Injection | `checkout.controller.ts` | **PASS** |
 | 7-B | Cross-Org Display Injection | `store-tablet.routes.ts:133-141` (validateDisplayItems) | **PASS** |
 | 7-C | productType Manipulation | `store-tablet.routes.ts:117` (ENUM guard) | **PASS** |
 

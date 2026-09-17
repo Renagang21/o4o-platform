@@ -17,7 +17,7 @@
  *   description / summary / usage_info / caution_info 는 본 화면에서 건드리지 않는다.
  *
  * WO-O4O-MY-STORE-REMAINING-VIEW-DUPLICATION-ZERO-CLEANUP-V1:
- *   화면 본체를 @o4o/store-ui-core 의 StoreProductDescriptionsView 로 이관(KCos/GP 와 동일 Core).
+ *   화면 본체를 @o4o/store-ui-core 의 StoreProductDescriptionsView 로 이관(KCos 와 동일 Core).
  *   이 파일은 API adapter + KPA 문구 원문 + KPA palette + 편집기(이미지 업로드 포함) 주입만 담는다.
  *   ⚠️ 문구·palette 는 이관 전 원문을 그대로 옮긴 것이다. 공통 기본값으로 치환하지 않는다.
  *

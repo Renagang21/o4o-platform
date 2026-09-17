@@ -37,7 +37,7 @@
 │    Gate 1: opl.is_active     │  organization_product_listings
 │    Gate 2: opc.is_active     │  organization_product_channels
 │    Gate 3: oc.status=APPROVED│  organization_channels
-│    Gate 4: p.status=active   │  glycopharm_products
+│    Gate 4: p.status=active   │  
 └──────────┬───────────────────┘
            ↓
 ┌──────────────────────────────┐
@@ -92,7 +92,7 @@ Application:  pending → approved  (→ Listing 자동 생성, is_active=false)
 | Gate 1 | `organization_product_listings` | `is_active` | `= true` | 약국 owner 판매 중지 |
 | Gate 2 | `organization_product_channels` | `is_active` | `= true` | 채널별 노출 제어 |
 | Gate 3 | `organization_channels` | `status` | `= 'APPROVED'` | 채널 승인 상태 |
-| Gate 4 | `glycopharm_products` | `status` | `= 'active'` | 상품 활성 상태 |
+| Gate 4 | — | `status` | `= 'active'` | 상품 활성 상태 |
 
 **적용 파일:**
 
@@ -114,13 +114,13 @@ Application:  pending → approved  (→ Listing 자동 생성, is_active=false)
 
 | # | 검증 | 테이블/로직 | 파일:라인 |
 |---|------|-----------|----------|
-| 1 | 약국 활성 | pharmacy exists & active | glycopharm-checkout.ts:276 |
+| 1 | 약국 활성 | pharmacy exists & active | — |
 | 2 | 공급 계약 | `neture_supplier_requests` APPROVED | checkout-guard.service.ts:37 |
-| 3 | B2C 채널 승인 | `organization_channels` status=APPROVED | glycopharm-checkout.ts:297 |
-| 4 | 상품 존재+활성 | `glycopharm_products` status='active' | glycopharm-checkout.ts:315-329 |
-| 5 | 재고 확인 | stock_quantity >= quantity | glycopharm-checkout.ts:340 |
-| 6 | 채널-상품 매핑 | `organization_product_channels` + opl | glycopharm-checkout.ts:357 |
-| 7 | Sales limit 1차 | PAID 기준 카운트 + `FOR UPDATE` lock | glycopharm-checkout.ts:434-466 |
+| 3 | B2C 채널 승인 | `organization_channels` status=APPROVED | — |
+| 4 | 상품 존재+활성 | — | — |
+| 5 | 재고 확인 | stock_quantity >= quantity | — |
+| 6 | 채널-상품 매핑 | `organization_product_channels` + opl | — |
+| 7 | Sales limit 1차 | PAID 기준 카운트 + `FOR UPDATE` lock | — |
 
 **트랜잭션:** QueryRunner 사용, 실패 시 ROLLBACK
 
@@ -128,10 +128,10 @@ Application:  pending → approved  (→ Listing 자동 생성, is_active=false)
 
 | # | 검증 | 로직 | 파일:라인 |
 |---|------|------|----------|
-| 1 | 필수 파라미터 | paymentKey, orderId, amount | glycopharm-payment.ts:162 |
-| 2 | 주문 소유권 | buyerId === userId | glycopharm-payment.ts:184 |
-| 3 | 금액 일치 | order.totalAmount === request.amount | glycopharm-payment.ts:193 |
-| 4 | 결제 가능 상태 | CREATED or PENDING_PAYMENT | glycopharm-payment.ts:114 |
+| 1 | 필수 파라미터 | paymentKey, orderId, amount | — |
+| 2 | 주문 소유권 | buyerId === userId | — |
+| 3 | 금액 일치 | order.totalAmount === request.amount | — |
+| 4 | 결제 가능 상태 | CREATED or PENDING_PAYMENT | — |
 | 5 | Atomic 전이 | transitionStatus(CREATED→CONFIRMING) | PaymentCoreService.ts:119-132 |
 | 6 | Toss PG 승인 | provider.confirm() 외부 API | PaymentCoreService.ts:141 |
 | 7 | paymentKey 유일성 | UNIQUE constraint (partial) | Migration 1771027200001 |
@@ -140,10 +140,10 @@ Application:  pending → approved  (→ Listing 자동 생성, is_active=false)
 
 | # | 검증 | 로직 | 파일:라인 |
 |---|------|------|----------|
-| 1 | 중복 처리 방지 | Set `${paymentId}:${orderId}` (1시간 TTL) | GlycopharmPaymentEventHandler.ts:76 |
-| 2 | 주문 존재 | order exists | GlycopharmPaymentEventHandler.ts:109 |
-| 3 | 결제 가능 상태 | NOT already PAID/CONFIRMED | GlycopharmPaymentEventHandler.ts:131 |
-| 4 | Sales limit 2차 | PAID 기준 재카운트 | GlycopharmPaymentEventHandler.ts:185-246 |
+| 1 | 중복 처리 방지 | Set `${paymentId}:${orderId}` (1시간 TTL) | — |
+| 2 | 주문 존재 | order exists | — |
+| 3 | 결제 가능 상태 | NOT already PAID/CONFIRMED | — |
+| 4 | Sales limit 2차 | PAID 기준 재카운트 | — |
 
 **Sales limit 2차 검증 실패 시:** order.status=CANCELLED, paymentStatus=FAILED (이미 결제된 주문도 취소)
 
@@ -161,7 +161,6 @@ Application:  pending → approved  (→ Listing 자동 생성, is_active=false)
 | `organization_product_listings` | `is_active` | bool | 진열 상태 |
 | `organization_product_channels` | `is_active`, `sales_limit` | bool, int/null | 채널별 제어 |
 | `organization_channels` | `status` | PENDING/APPROVED/REJECTED/SUSPENDED/EXPIRED/TERMINATED | 채널 승인 |
-| `glycopharm_products` | `status` | draft/active/discontinued/out_of_stock | 상품 상태 |
 | `ecommerce_orders` | `status`, `paymentStatus` | 아래 참조 | 주문 |
 | `o4o_payments` | `status` | CREATED/CONFIRMING/PAID/FAILED/CANCELLED/REFUNDED | 결제 |
 
@@ -217,7 +216,7 @@ rejected   (→ 재신청 가능: 새 application 생성)
 
 | # | 리스크 | Severity | 설명 | 현재 방어 |
 |---|--------|----------|------|----------|
-| R1 | 금액 위변조 | **Medium** | PaymentCore.confirm()이 프론트엔드 amount를 그대로 Toss에 전달 | GlycoPharm controller에서 `order.totalAmount === amount` 사전 검증으로 방어됨. 단, PaymentCore 자체에는 방어 없음 |
+| R1 | 금액 위변조 | **Medium** | PaymentCore.confirm()이 프론트엔드 amount를 그대로 Toss에 전달 | 단, PaymentCore 자체에는 방어 없음 |
 | R2 | Sales limit 초과 후 결제 취소 | **Low** | Payment delay 중 다른 주문이 limit 소진 → PAID 주문이 CANCELLED됨 | 2차 검증으로 방어하나, 이미 결제된 금액의 자동 환불 로직 부재 |
 | R3 | Supplier INACTIVE 시 기존 Listing 유지 | **Low** | 공급자 비활성화해도 기존 listing/channel 매핑은 그대로 → Storefront 노출 지속 | Gate 4 (`p.status='active'`)가 개별 상품 수준에서 방어. 공급자 레벨 일괄 차단은 수동 |
 | R4 | TTL cleanup 수동 트리거 | **Low** | CREATED 상태 15분 이상 방치 주문이 cron 없이 수동 호출 의존 | POST /checkout/cleanup-expired 존재하나 자동 스케줄 미확인 |
@@ -245,7 +244,7 @@ rejected   (→ 재신청 가능: 새 application 생성)
 | 항목 | 내용 |
 |------|------|
 | PaymentCore vs Service 레이어 금액 검증 | PaymentCore 자체에 금액 검증 없음 (service controller에서 수행) |
-| GlycoPharm vs Cosmetics 검증 수준 | GlycoPharm: Sales limit 2차 검증 있음 / Cosmetics: 없음 |
+| Cosmetics 검증 수준 | — |
 | Cosmetics Payment 경로 | Toss API 직접 호출 (PaymentCore 미사용 구간 존재) |
 
 ---
@@ -277,15 +276,14 @@ Minor gaps (R1 PaymentCore 금액 검증, R2 자동 환불)은 서비스 레이�
 | 구분 | 파일 |
 |------|------|
 | **Storefront (통합)** | `apps/api-server/src/routes/platform/unified-store-public.routes.ts` |
-| **Storefront (KPA)** | `apps/api-server/src/routes/glycopharm/controllers/store.controller.ts` |
+| **Storefront (KPA)** | — |
 | **상품 신청** | `apps/api-server/src/routes/kpa/controllers/pharmacy-products.controller.ts` |
 | **신청 승인** | `apps/api-server/src/routes/kpa/controllers/operator-product-applications.controller.ts` |
-| **Checkout** | `apps/api-server/src/routes/glycopharm/controllers/checkout.controller.ts` |
+| **Checkout** | — |
 | **Checkout Guard** | `apps/api-server/src/core/checkout/checkout-guard.service.ts` |
 | **Checkout Service** | `apps/api-server/src/services/checkout.service.ts` |
-| **Payment Controller** | `apps/api-server/src/routes/glycopharm/controllers/glycopharm-payment.controller.ts` |
+| **Payment Controller** | — |
 | **PaymentCore** | `packages/payment-core/src/services/PaymentCoreService.ts` |
-| **Event Handler (GlycoPharm)** | `apps/api-server/src/services/glycopharm/GlycopharmPaymentEventHandler.ts` |
 | **Event Handler (Cosmetics)** | `apps/api-server/src/services/cosmetics/KCosmeticsPaymentEventHandler.ts` |
 | **Order Entity** | `packages/ecommerce-core/src/entities/EcommerceOrder.entity.ts` |
 | **Payment Entity** | `apps/api-server/src/entities/payment/PlatformPayment.entity.ts` |

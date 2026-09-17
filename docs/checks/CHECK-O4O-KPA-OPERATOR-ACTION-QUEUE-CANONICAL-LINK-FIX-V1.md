@@ -31,9 +31,6 @@ KPA 운영자 Action Queue 카드 2건의 잘못된 이동 경로를 canonical �
 - **KPA 내부**: 동일 목적의 중복 actionUrl 없음. `aiRuleGenerator` 는 `content-draft`(`/operator/content?status=draft`)·
   `member-pending`(`/operator/members`, suspended 무관) 두 규칙만 보유 — forum/suspended 목적의 AI action 링크 없음.
 - **KpaOperatorDashboard.tsx:179**: 포럼 요청 KPI 는 이미 `/operator/forum-requests` 로 연결 → 이번 수정과 정합(회귀 아님, 오히려 기존 불일치를 카드 측에 정렬).
-- **타 서비스(범위 밖)**: `/operator/users?status=suspended` 문자열이 `glycopharm/action-definitions.ts:64` ·
-  `cosmetics/action-definitions.ts:79` 에도 존재하나, 이들은 **별도 서비스 프론트**(web-glycopharm / web-k-cosmetics,
-  각자 OperatorRoutes·redirect 구조 상이)라 KPA-scoped 본 WO 범위 밖. 미접촉. 필요 시 서비스별 route 검증 동반한 별도 정렬 권장.
 
 ## 4. API 응답 검증 (프로덕션)
 
@@ -85,7 +82,7 @@ Action Queue 엔드포인트 = `GET /api/v1/kpa/operator/actions`(`requireKpaSco
   URL query sync 시 param key 는 `members_tab`(값 예: `status-suspended`)이다. 따라서 `/operator/members?status=suspended`
   는 현재 **suspended 탭 자동선택을 트리거하지 않는다.**
 - 본 수정으로 **redirect 의존 제거 + canonical 직결**은 달성했으나, "suspended 탭 자동필터 적용"까지 만들려면
-  shared `OperatorMembersConsolePage`(GP/Cosmetics/Neture 공용) 변경 또는 KPA 측 `syncUrl` 활성화 + param 정렬이 필요하며,
+  shared `OperatorMembersConsolePage`(Cosmetics/Neture 공용) 변경 또는 KPA 측 `syncUrl` 활성화 + param 정렬이 필요하며
   이는 본 WO 선언 파일 범위(action-definitions.ts) 및 "redirect 구조 전면 정리 = 범위 밖" 밖이다. 별도 WO 로 분리 권장.
 
 ## 10. 결론

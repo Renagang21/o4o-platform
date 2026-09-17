@@ -208,7 +208,7 @@ retire 방식은 §12 지시대로 **404(라우트 미등록)** 를 택했다 �
 ### 회귀
 
 - 배포 후 15분 Cloud Run **신규 ERROR 0 / 신규 5xx 0**.
-  (배포 전 1시간 baseline 에는 `auth/login`·`glycopharm/*` 관련 5xx 가 존재했으며, 본 변경과 무관하고 배포 후 재현되지 않았다.)
+  (배포 전 1시간 baseline 에는 `auth/login` 관련 5xx 가 존재했으며, 본 변경과 무관하고 배포 후 재현되지 않았다.)
 - `app_registry` 6행 / `app_instances` 0행 — 배포 전후 동일. DB write 0.
 
 ---

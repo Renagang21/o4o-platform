@@ -257,7 +257,7 @@ POP만 **결과물 entity가 없음**. QR / 블로그 / 상품 상세설명은 �
 | `StoreQRCreateEntryModal` 컴포넌트 | [components/store/StoreQRCreateEntryModal.tsx](services/web-kpa-society/src/components/store/StoreQRCreateEntryModal.tsx) | `import` 0건 |
 | `StoreMarketingDashboardPage` | [pages/pharmacy/StoreMarketingDashboardPage.tsx](services/web-kpa-society/src/pages/pharmacy/StoreMarketingDashboardPage.tsx) | App.tsx route 미등록, 외부 import 0건 (index.ts export만) |
 | `ProductPopBuilderPage.selectedLibraryItem` 분기 | [ProductPopBuilderPage.tsx:36, 76](services/web-kpa-society/src/pages/pharmacy/ProductPopBuilderPage.tsx#L36) | StorePopPage에서 set하던 코드 제거 후 호출처 부재 (단, 외부 navigation에서 set 가능성 미검증) |
-| `ALL_STORE_MENUS[content]` flat 정의 | [storeMenuConfig.ts:63](packages/store-ui-core/src/config/storeMenuConfig.ts#L63) | KPA / GlycoPharm / K-Cosmetics 모두 menuSections로 전환 |
+| `ALL_STORE_MENUS[content]` flat 정의 | [storeMenuConfig.ts:63](packages/store-ui-core/src/config/storeMenuConfig.ts#L63) | KPA / K-Cosmetics 모두 menuSections로 전환 |
 
 ### B. Stale naming / UI
 

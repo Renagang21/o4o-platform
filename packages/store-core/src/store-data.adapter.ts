@@ -3,7 +3,7 @@
  *
  * WO-O4O-STORE-TEMPLATE-V1_1-EXTRACTION
  *
- * Each service (Cosmetics, GlycoPharm, etc.) implements this interface
+ * Each service (Cosmetics, etc.) implements this interface
  * to provide store order data to the shared engines.
  *
  * The adapter abstracts database access so engines remain DB-free.

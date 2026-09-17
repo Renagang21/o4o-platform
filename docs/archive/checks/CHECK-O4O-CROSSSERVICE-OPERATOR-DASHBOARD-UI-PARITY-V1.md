@@ -1,7 +1,7 @@
 # CHECK-O4O-CROSSSERVICE-OPERATOR-DASHBOARD-UI-PARITY-V1
 
 > WO-O4O-CROSSSERVICE-OPERATOR-DASHBOARD-UI-PARITY-V1
-> GlycoPharm / KPA-Society / K-Cosmetics `/operator` 첫 화면 UI parity
+> KPA-Society / K-Cosmetics `/operator` 첫 화면 UI parity
 > 작성일: 2026-06-16 · **최종 갱신: 2026-08-06** · Neture 제외
 > **상태**: COMPLETED · 판정: **PASS (코드/빌드 + 라이브 smoke — §9-2)**
 
@@ -22,13 +22,13 @@
 
 ### 남아있던 실제 차이
 
-| 차이 | KPA | GlycoPharm | K-Cosmetics | 성격 |
-|---|---|---|---|---|
-| **운영 철학 안내 카드** | ✅ 인라인 `OperatorRoleGuideCard` | ❌ 없음 | ❌ 없음 | **구조 — 본 WO 통일 대상** |
-| 축 metrics 타일 | ✅ 실시간 metrics | links-only | links-only | 별도 WO 보류 |
-| 축 구성·순서 | [커뮤니티, 매장HUB] | [커뮤니티, 약국HUB] | [매장HUB, 콘텐츠] | 서비스 정체성 (유지) |
-| 보조 알림 | 없음 | OperatorAlerts | 주문지표 notice | 데이터 — 서비스별 정당 |
-| 5-Block 내용 | backend config | backend config | backend config | 데이터 — WO 범위 외 |
+| 차이 | KPA | K-Cosmetics | 성격 |
+|---|---|---|---|
+| **운영 철학 안내 카드** | ✅ 인라인 `OperatorRoleGuideCard` | ❌ 없음 | **구조 — 본 WO 통일 대상** |
+| 축 metrics 타일 | ✅ 실시간 metrics | links-only | 별도 WO 보류 |
+| 축 구성·순서 | [커뮤니티, 매장HUB] | [매장HUB, 콘텐츠] | 서비스 정체성 (유지) |
+| 보조 알림 | 없음 | 주문지표 notice | 데이터 — 서비스별 정당 |
+| 5-Block 내용 | backend config | backend config | 데이터 — WO 범위 외 |
 
 → 사용자 합의(2026-06-16): **"안내 카드만 공통화"** 범위로 확정. 축 metrics/구성은 별도 WO.
 
@@ -56,7 +56,6 @@
 | `packages/operator-core-ui/src/dashboard/OperatorRoleGuideCard.tsx` | **신규** | KPA 인라인 카드 → 공통 컴포넌트 추출 (service-neutral, 링크 prop) |
 | `packages/operator-core-ui/src/index.ts` | 수정 | `OperatorRoleGuideCard` + 타입 export |
 | `services/web-kpa-society/src/pages/operator/KpaOperatorDashboard.tsx` | 수정 | 인라인 함수 제거 → 공통 import, `guideHref="/guide/for/operator"`, 미사용 `Link` import 제거 |
-| `services/web-glycopharm/src/pages/operator/GlycoPharmOperatorDashboard.tsx` | 수정 | 공통 카드 추가 (aboveBlocks 최상단), `guideHref="/guide/usage"` |
 | `services/web-k-cosmetics/src/pages/operator/KCosmeticsOperatorDashboard.tsx` | 수정 | 공통 카드 추가 (aboveBlocks 최상단), `guideHref="/guide/usage"` |
 
 ---
@@ -71,10 +70,10 @@
 
 ## 5. 서비스별 wrapper/config 차이 (정당한 차이)
 
-| 항목 | KPA | GlycoPharm | K-Cosmetics |
-|---|---|---|---|
-| `guideHref` | `/guide/for/operator` | `/guide/usage` | `/guide/usage` |
-| 카드 본문 | 동일 (공통) | 동일 (공통) | 동일 (공통) |
+| 항목 | KPA | K-Cosmetics |
+|---|---|---|
+| `guideHref` | `/guide/for/operator` | `/guide/usage` |
+| 카드 본문 | 동일 (공통) | 동일 (공통) |
 
 가이드 링크 route 차이는 **데드링크 방지** 목적 (3 route 모두 존재 확인). 미존재 시 링크 생략하도록 prop optional 설계.
 
@@ -102,7 +101,6 @@
 |---|---|
 | web-kpa-society (`tsc --noEmit`) | ✅ EXIT 0 |
 | web-k-cosmetics (`tsc --noEmit`) | ✅ EXIT 0 |
-| web-glycopharm (`tsc -b --noEmit`) | ✅ EXIT 0 |
 | operator-core-ui (소비처 typecheck로 간접 검증) | ✅ 오류 없음 |
 
 ## 8. build 결과
@@ -111,7 +109,6 @@
 |---|---|
 | web-kpa-society | ✅ `✓ built in 21.14s` (exit 0) |
 | web-k-cosmetics | ✅ `✓ built in 22.11s` (exit 0) |
-| web-glycopharm | ✅ `✓ built in 12.27s` (exit 0) |
 
 ## 9. browser smoke 결과
 
@@ -127,31 +124,29 @@
 ### 9-1. 라이브 smoke 결과 (2026-08-06)
 
 > **WO-O4O-CROSSSERVICE-OPERATOR-DASHBOARD-UI-PARITY-LIVE-SMOKE-AND-ARCHIVE-V1**
-> 배포 리비전: `kpa-society-web-01781-95t` · `glycopharm-web-01213-7vl` · `k-cosmetics-web-00961-c8q` (모두 2026-08-06 03:11 배포)
-> 계정: `sohae2100@gmail.com` (KPA/GlycoPharm/K-Cosmetics operator) · Chrome desktop
+> 배포 리비전: `kpa-society-web-01781-95t` · `k-cosmetics-web-00961-c8q` (모두 2026-08-06 03:11 배포)
+> 계정: `sohae2100@gmail.com` · Chrome desktop
 
-| 검증 항목 | KPA | GlycoPharm | K-Cosmetics |
-|---|:---:|:---:|:---:|
-| 안내 카드 렌더 (문구 4종 일치) | ✅ | ✅ | ✅ |
-| 카드가 `/operator` **상단**에 위치 | ❌ **최하단** | ✅ 최상단 | ✅ 최상단 |
-| 가이드 링크 `href` | `/guide/for/operator` | `/guide/usage` | `/guide/usage` |
-| 가이드 route 실제 렌더 (데드링크 없음) | ✅ | ✅ | ✅ |
-| Axis / 5-Block / sidebar / notification 회귀 | 없음 | 없음 | 없음 |
-| console error / pageerror | 0 | 0 | 0 |
-| `/operator` API 4xx·5xx | 0 (7건 모두 200) | 0 (3건 모두 200) | 0 (3건 모두 200) |
+| 검증 항목 | KPA | K-Cosmetics |
+| --- | :---: | :---: |
+| 안내 카드 렌더 (문구 4종 일치) | ✅ | ✅ |
+| 카드가 `/operator` **상단**에 위치 | ❌ **최하단** | ✅ 최상단 |
+| 가이드 링크 `href` | `/guide/for/operator` | `/guide/usage` |
+| 가이드 route 실제 렌더 (데드링크 없음) | ✅ | ✅ |
+| Axis / 5-Block / sidebar / notification 회귀 | 없음 | 없음 |
+| console error / pageerror | 0 | 0 |
+| `/operator` API 4xx·5xx | 0 (7건 모두 200) | 0 (3건 모두 200) |
 
 **카드 위치 실측** (`getBoundingClientRect().top + scrollY`, px)
 
 | 서비스 | 안내 카드 | Overview | Axis 섹션 | 판정 |
 |---|---:|---:|---:|---|
 | KPA | **1502** | 151 | 1280 | 5-Block·Axis **아래** — §2 배치도와 불일치 |
-| GlycoPharm | **172** | 482 | 카드 아래 | §2 배치도와 일치 |
 | K-Cosmetics | **172** | 482 | 카드 아래 | §2 배치도와 일치 |
 
 **원인 (코드 확인)**
 
-- GlycoPharm·K-Cosmetics: 공통 layout slot `aboveBlocks` 최상단에 `OperatorRoleGuideCard` 배치 → §2 배치도대로 렌더.
-  - `services/web-glycopharm/src/pages/operator/GlycoPharmOperatorDashboard.tsx:131-138`
+- K-Cosmetics: 공통 layout slot `aboveBlocks` 최상단에 `OperatorRoleGuideCard` 배치 → §2 배치도대로 렌더.
   - `services/web-k-cosmetics/src/pages/operator/KCosmeticsOperatorDashboard.tsx:128-135`
 - KPA: `aboveBlocks` 가 아니라 `KpaOperatorDashboardLayout` 의 `auxiliary` slot 에, 그것도 `AxisNavigationSection` **뒤에** 배치되어 페이지 최하단에 렌더된다.
   - `services/web-kpa-society/src/pages/operator/KpaOperatorDashboard.tsx:128-138`
@@ -165,25 +160,25 @@
 
 > **WO-O4O-CROSSSERVICE-OPERATOR-DASHBOARD-UI-PARITY-FINALIZE-V1**
 > 수정 커밋: `4f81fc614` (`fix(operator): align cross-service dashboard card placement`)
-> 배포 리비전: `kpa-society-web-01782-jmv` (2026-08-06 07:06 배포) · GlycoPharm·K-Cosmetics 는 무변경(detect-changes 로 재배포 없음, 회귀만 확인)
+> 배포 리비전: `kpa-society-web-01782-jmv` (2026-08-06 07:06 배포) · K-Cosmetics 는 무변경(detect-changes 로 재배포 없음, 회귀만 확인)
 > 계정: `sohae2100@gmail.com` · Chrome desktop · 캐시 무효화 쿼리(`?cb=`)로 신규 번들 확인
 
 **수정 내용** — `KpaOperatorDashboardLayout` 의 slot 을 `auxiliary`(5-Block **아래**) → `aboveBlocks`(5-Block **위**) 로 교체하고, 카드를 Axis **앞**으로 이동했다. 새 컴포넌트·상태·API 추가 없음.
 
 - `services/web-kpa-society/src/components/kpa-operator/KpaOperatorDashboardLayout.tsx` — prop 이름·렌더 위치 변경
 - `services/web-kpa-society/src/pages/operator/KpaOperatorDashboard.tsx` — `aboveBlocks={<카드/> + <Axis/>}` 순서로 전달
-- GlycoPharm·K-Cosmetics 파일은 이미 `aboveBlocks` 최상단 배치이므로 **무변경**
+- K-Cosmetics 파일은 이미 `aboveBlocks` 최상단 배치이므로 **무변경**
 
-| 검증 항목 | KPA | GlycoPharm | K-Cosmetics |
-|---|:---:|:---:|:---:|
-| 안내 카드 렌더 | ✅ | ✅ | ✅ |
-| 카드가 주요 블록 **상단**에 위치 | ✅ | ✅ | ✅ |
-| 문구 4종 일치 | ✅ | ✅ | ✅ |
-| 가이드 링크 렌더 (`href`) | ✅ `/guide/for/operator` | ✅ `/guide/usage` | ✅ `/guide/usage` |
-| Axis · 5-Block 회귀 없음 | ✅ | ✅ | ✅ |
-| sidebar · notification 정상 | ✅ | ✅ | ✅ |
-| console error / pageerror | 0 | 0 | 0 |
-| `/operator` API 4xx·5xx | 0 (7건 200) | 0 (3건 200) | 0 (3건 200) |
+| 검증 항목 | KPA | K-Cosmetics |
+| --- | :---: | :---: |
+| 안내 카드 렌더 | ✅ | ✅ |
+| 카드가 주요 블록 **상단**에 위치 | ✅ | ✅ |
+| 문구 4종 일치 | ✅ | ✅ |
+| 가이드 링크 렌더 (`href`) | ✅ `/guide/for/operator` | ✅ `/guide/usage` |
+| Axis · 5-Block 회귀 없음 | ✅ | ✅ |
+| sidebar · notification 정상 | ✅ | ✅ |
+| console error / pageerror | 0 | 0 |
+| `/operator` API 4xx·5xx | 0 (7건 200) | 0 (3건 200) |
 
 **카드 위치 실측 재측정** (`getBoundingClientRect().top + scrollY`, px)
 
@@ -191,7 +186,6 @@
 |---|---:|---:|---:|---|
 | KPA (수정 전) | 1502 | 1280 | 151 | ❌ Overview → Axis → 카드 |
 | **KPA (수정 후)** | **172** | **357** | **558** | ✅ 카드 → Axis → 5-Block |
-| GlycoPharm | 172 | 357 | 482 | ✅ 동일 |
 | K-Cosmetics | 172 | 357 | 482 | ✅ 동일 |
 
 세 서비스 모두 카드 172px 로 동일하며, §2 배치도(`[안내 카드] → [Axis] → [5-Block]`)와 일치한다.

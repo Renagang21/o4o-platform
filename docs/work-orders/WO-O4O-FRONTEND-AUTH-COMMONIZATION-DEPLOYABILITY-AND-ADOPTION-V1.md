@@ -24,7 +24,6 @@
 
 - web-kpa-society
 - web-neture
-- web-glycopharm
 - web-k-cosmetics
 - web-pharmacy-hub
 

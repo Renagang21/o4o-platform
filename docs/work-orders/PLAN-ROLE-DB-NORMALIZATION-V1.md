@@ -96,8 +96,6 @@ WHERE role NOT IN (
   'platform:super_admin', 'platform:admin', 'platform:operator',
   'platform:manager', 'platform:vendor', 'platform:member', 'platform:contributor',
   'neture:admin', 'neture:supplier', 'neture:partner', 'neture:user',
-  'glycopharm:admin', 'glycopharm:operator', 'glycopharm:pharmacy',
-  'glycopharm:supplier', 'glycopharm:partner', 'glycopharm:consumer',
   'cosmetics:admin', 'cosmetics:operator', 'cosmetics:supplier',
   'cosmetics:seller', 'cosmetics:partner',
   'glucoseview:admin', 'glucoseview:operator'
@@ -212,7 +210,6 @@ GROUP BY role;
 ### 4-2. Prefixed Role 방침 (ROLE-PHILOSOPHY-V1 §4 기준)
 
 ```
-유지: kpa:*, glycopharm:*, cosmetics:*, glucoseview:*, neture:*
 미사용: platform:* (→ 그냥 unprefixed 사용)
 ```
 

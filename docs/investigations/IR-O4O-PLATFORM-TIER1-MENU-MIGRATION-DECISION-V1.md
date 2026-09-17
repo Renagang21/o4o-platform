@@ -25,7 +25,7 @@
 | # | 기능 | route | frontend page | backend endpoint + guard(정확) | mutation 범위 | 분류 |
 |---|------|------|------|------|------|------|
 | 1 | **운영자 관리** | `/admin/operators` | `OperatorsPage.tsx` (AdminRoute) | `GET/POST/PATCH /neture/admin/operators` · **`requireNetureScope('neture:admin')`** | neture:admin/neture:operator **만** 부여·회수(role_assignments + service_memberships) | **NETURE-SCOPED** |
-| 2 | **역할 관리** | `/admin/roles` | `RoleManagementPage`(@o4o/ui 공통) (AdminRoute) | `GET/POST/PUT/DELETE /api/v1/operator/roles` · route guard 넓음, **CUD 는 `scope.isPlatformAdmin`(platform:admin/super_admin) 전용** | `roles` 카탈로그(전 서비스: platform/neture/glycopharm/cosmetics/kpa/lms) 생성·수정·비활성 | **CROSS-SERVICE** |
+| 2 | **역할 관리** | `/admin/roles` | `RoleManagementPage`(@o4o/ui 공통) (AdminRoute) | `GET/POST/PUT/DELETE /api/v1/operator/roles` · route guard 넓음, **CUD 는 `scope.isPlatformAdmin`(platform:admin/super_admin) 전용** | `roles` 카탈로그 생성·수정·비활성 | **CROSS-SERVICE** |
 | 3 | **서비스 대상 정책** | `/admin/settings/service-audience` | `ServiceAudiencePolicyPage.tsx` (AdminRoute) | `GET/PUT /neture/admin/service-audience-policies/:serviceKey` · **`requireNetureScope('neture:admin')`** | `service_audience_policies` 여러 serviceKey 의 `isPharmacyTargetService`/note | **CROSS-SERVICE** (화면 명시: "O4O 여러 서비스 대상 정책") |
 
 - frontend `AdminRoute` = `allowedRoles=['neture:admin','platform:super_admin']` + `requireMembership='neture'` (RoleGuard).
@@ -57,7 +57,7 @@
 
 1. 운영자 관리가 부여/회수하는 role → **neture:admin / neture:operator 만**.
 2. neture 전용 vs cross-service → **neture 전용(NETURE-SCOPED)**.
-3. 역할 관리 matrix → **전 서비스 role 카탈로그**(platform/neture/glycopharm/cosmetics/kpa/lms).
+3. 역할 관리 matrix → **전 서비스 role 카탈로그**.
 4. platform role 포함? → **포함**(카탈로그에 platform:* 존재).
 5. 서비스 대상 정책 수정 serviceKey → **여러 서비스**(cross-service).
 6. backend guard → 운영자/audience=`requireNetureScope('neture:admin')`, 역할관리 CUD=`isPlatformAdmin`(platform:admin/super_admin).

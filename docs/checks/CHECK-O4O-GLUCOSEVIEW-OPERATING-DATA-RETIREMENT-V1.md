@@ -171,7 +171,6 @@ DB enum·CHECK 제약·migration 이력은 **변경하지 않았다.**
 |---|---:|---:|
 | cosmetics | 7 | 7 |
 | **glucoseview** | **4** | **0** |
-| glycopharm | 7 | 7 |
 | kpa | 8 | 8 |
 | lms | 1 | 1 |
 | neture | 5 | 5 |
@@ -179,10 +178,8 @@ DB enum·CHECK 제약·migration 이력은 **변경하지 않았다.**
 | platform | 7 | 7 |
 
 `platform_services` 잔존 code:
-`cosmetics, glycopharm, k-cosmetics, kpa, kpa-groupbuy, kpa-society, neture, pharmacy-hub`
 
 `operator_notification_settings` 잔존 service_code:
-`glycopharm, k-cosmetics, kpa-society, neture`
 
 ### 4-4. enum·CHECK 미변경 확인
 
@@ -196,7 +193,7 @@ DB enum·CHECK 제약·migration 이력은 **변경하지 않았다.**
 | 확인 | 결과 |
 |---|---|
 | `GET https://api.neture.co.kr/health` | `200` · `status=alive` · `environment=production` |
-| `GET https://api.neture.co.kr/api/v1/platform-services` | `200` · **8건** · `['cosmetics','kpa-groupbuy','kpa','glycopharm','neture','k-cosmetics','kpa-society','pharmacy-hub']` — `glucoseview` 없음, 나머지 정상 |
+| `GET https://api.neture.co.kr/api/v1/platform-services` | `200` · **8건** — `glucoseview` 없음, 나머지 정상 |
 
 admin 서비스 목록의 소스인 `platform_services` 카탈로그가 정상 동작하며 다른 서비스는 그대로다.
 `role_assignments` 에 `glucoseview:*` 보유자가 0이었으므로 역할 목록 표시 회귀도 발생하지 않는다.

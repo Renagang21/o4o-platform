@@ -27,7 +27,7 @@ K-Cosmetics create/payment 구현 착수 직전, 실제 `checkout_orders` 스키
 
 | 항목 | 계약 문서(§3/§7.1) | 실제 DB (`CreateCheckoutTables` 20260414100000) | drift |
 |------|------|------|:---:|
-| `order_type` 컬럼 | `checkout_orders_order_type_enum`(GENERIC/DROPSHIPPING/GLYCOPHARM/COSMETICS/TOURISM), 기본 GENERIC | **없음** (마이그레이션 `1736950000000-AddOrderTypeToCheckoutOrders` 도 부재) | ✅ |
+| `order_type` 컬럼 | `checkout_orders_order_type_enum`, 기본 GENERIC | **없음** (마이그레이션 `1736950000000-AddOrderTypeToCheckoutOrders` 도 부재) | ✅ |
 | `supplierId` | (dropshipping 전제) | `varchar(100) NOT NULL` | ✅ (retail 불가) |
 | 엔티티 매핑 | order_type 사용 | `CheckoutOrder` 엔티티에 `orderType` 필드 없음 | ✅ |
 
@@ -47,7 +47,7 @@ indexes: orderNumber(uniq), buyerId, supplierId, partnerId, status, paymentStatu
 ## 3. 계약상 schema (목표)
 
 - canonical 주문 원장 = checkout_orders (유지).
-- 모든 주문 유형(GENERIC/DROPSHIPPING/GLYCOPHARM/COSMETICS/TOURISM)을 `order_type` 으로 분류(§3).
+- 모든 주문 유형을 `order_type` 으로 분류(§3).
 - retail(매장 직접 판매)은 공급자 없음 → supplier 비강제 가능해야 함.
 
 ## 4. 변경 필요 컬럼
@@ -63,7 +63,6 @@ indexes: orderNumber(uniq), buyerId, supplierId, partnerId, status, paymentStatu
 -- 1) order_type enum 타입 (없으면 생성)
 DO $$ BEGIN
   CREATE TYPE "checkout_orders_order_type_enum" AS ENUM
-    ('GENERIC','DROPSHIPPING','GLYCOPHARM','COSMETICS','TOURISM');
 EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 -- 2) order_type 컬럼 추가 (기존 행 default GENERIC)
@@ -98,7 +97,7 @@ ALTER TABLE "checkout_orders" ALTER COLUMN "supplierId" DROP NOT NULL;
 - **`order_type`: 주문 유형 분류 보조 + 계약 정합**(GENERIC/DROPSHIPPING/RETAIL계열). 신규 주문은 둘 다 기록(serviceKey + order_type).
 - 장기적으로 order_type 으로 스코프 일원화는 별도 표준 WO(`...STATUS-MAPPING-STANDARD`)에서 결정.
 
-## 9. K-Cosmetics, GlycoPharm, LMS 에 필요한 최소 schema 변경
+## 9. K-Cosmetics, LMS 에 필요한 최소 schema 변경
 
 - 본 2건(order_type ADD + supplierId nullable)으로 **3 서비스 retail/비-supplier 주문 모두 수용 가능**(공통).
 - 서비스별 추가 컬럼 불필요(channel/storeId/serviceKey 는 metadata 사용).
@@ -115,7 +114,6 @@ ALTER TABLE "checkout_orders" ALTER COLUMN "supplierId" DROP NOT NULL;
 - **필요(YES)** — `ALTER TABLE ADD COLUMN` + `ALTER COLUMN DROP NOT NULL` + `CREATE TYPE/INDEX`. 단 **마이그레이션 코드 작성 → CI/CD `o4o-api-migrations` job 자동 실행** 원칙(수동 DDL 금지). 본 WO 는 **설계까지만**, 실제 migration 작성/배포는 **별도 승인 후**.
 
 ## 12. 하지 않은 것
-- DB write·migration 작성·코드 수정·sentinel(`__RETAIL__`)·`supplierId=sellerId`·계약 변경·glyco/lms 수정: **전부 안 함**.
 - 산출물 = 본 문서 1건. 1차 list/detail PASS 불변.
 
 ## 13. 최종 판정: **READY FOR MIGRATION APPROVAL**

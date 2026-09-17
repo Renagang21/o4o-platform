@@ -3,7 +3,7 @@
 > **상태**: read-only 조사 완료
 > **일자**: 2026-06-30
 > **방식**: grep / 파일 읽기 / route·controller·service·entity·frontend 정적 분석 (코드·DB 무변경)
-> **대상 서비스**: KPA 중심 + GlycoPharm / K-Cosmetics 공통 구조 비교
+> **대상 서비스**: KPA 중심 + K-Cosmetics 공통 구조 비교
 
 ---
 
@@ -53,11 +53,10 @@
 | 서비스 | 등록/수정 화면 | 비고 |
 |--------|---------------|------|
 | **KPA (고급형)** | `services/web-kpa-society/src/pages/pharmacy/StoreLocalProductsPage.tsx` (`ProductFormModal` 480–879행) | RichTextEditor + MediaPickerModal + 콘텐츠 가져오기 |
-| GlycoPharm (기본형) | `services/web-glycopharm/src/pages/store-management/StoreLocalProductsPage.tsx` → 공통 위임 | textarea + URL 입력 |
 | K-Cosmetics (기본형) | `services/web-k-cosmetics/src/pages/store/StoreLocalProductsPage.tsx` → 공통 위임 | textarea + URL 입력 |
-| 공통 컴포넌트(GP/KCos) | `packages/store-ui-core/src/components/local-products/StoreLocalProductsManager.tsx` (`ProductFormModal` 465–675행) | 바코드 입력 **없음** |
-| 메뉴 정의 | `packages/store-ui-core/src/config/storeMenuConfig.ts` (KPA 262–283 / GP 197 / KCos 119) | KPA는 메뉴 숨김, `/store/handled-products`로 진입 |
-| 라우트 마운트 | KPA `App.tsx:990` / GP `App.tsx:1000` / KCos `App.tsx:800` — 모두 `/store/commerce/local-products` |
+| 공통 컴포넌트(KCos) | `packages/store-ui-core/src/components/local-products/StoreLocalProductsManager.tsx` (`ProductFormModal` 465–675행) | 바코드 입력 **없음** |
+| 메뉴 정의 | `packages/store-ui-core/src/config/storeMenuConfig.ts` (KPA 262–283 197 / KCos 119) | KPA는 메뉴 숨김, `/store/handled-products`로 진입 |
+| 라우트 마운트 | KPA `App.tsx:990` `App.tsx:1000` / KCos `App.tsx:800` — 모두 `/store/commerce/local-products` |
 
 ### 참고자료/콘텐츠 모달 (KPA 전용)
 
@@ -113,7 +112,7 @@
 
 ### 등록 폼 입력 필드 & 필수 여부
 
-| 필드 | KPA | GP/KCos | 필수? |
+| 필드 | KPA | KCos | 필수? |
 |------|:---:|:-------:|:-----:|
 | 제품명 | ✅ | ✅ | **필수** |
 | 바코드 | ✅ | ❌(필드 없음) | 선택 |
@@ -186,7 +185,7 @@ SELECT 'local'   ... FROM store_local_products lp
 
 → migration 주석상 "단순 식별 메모 필드". **조사요청서 §6.4 설계 원칙(nullable · 미확인 비오류 · 사용 비차단 · 별도 신고기능 없음)에 이미 100% 부합.** `barcode_verified`는 1차 불필요.
 
-⚠️ 단, GP/KCos 공통 컴포넌트(`StoreLocalProductsManager.tsx`)에는 **바코드 입력 UI가 없다** — 컬럼은 공통이나 입력은 KPA 전용. 표준상품 검색(바코드 키)을 GP/KCos까지 확장하려면 공통 폼 보완 필요.
+⚠️ 단, KCos 공통 컴포넌트(`StoreLocalProductsManager.tsx`)에는 **바코드 입력 UI가 없다** — 컬럼은 공통이나 입력은 KPA 전용. 표준상품 검색(바코드 키)을 KCos까지 확장하려면 공통 폼 보완 필요.
 
 ---
 
@@ -196,7 +195,7 @@ SELECT 'local'   ... FROM store_local_products lp
 |------|------|
 | 대표 이미지 / 썸네일 필드 | ✅ `thumbnailUrl` varchar(500) + `images`/`galleryImages` jsonb |
 | 이미지 없이 등록? | ✅ (전부 nullable / 기본 `[]`) |
-| 업로드 구조 | KPA: MediaPickerModal(공용 미디어, URL 반환·base64 금지) / GP·KCos: URL 직접 입력만 |
+| 업로드 구조 | KPA: MediaPickerModal(공용 미디어, URL 반환·base64 금지) / KCos: URL 직접 입력만 |
 | supplier product 이미지와 동일 구조? | ❌ 별개 (supplier=ProductImage 엔티티, local=jsonb URL 배열) |
 | 1000×1000/webp 파이프라인 | 프론트 코드엔 없음 — 백엔드 미디어 API 처리 추정(별도 확인 대상) |
 
@@ -209,7 +208,7 @@ SELECT 'local'   ... FROM store_local_products lp
 | 질문 | 현황 |
 |------|------|
 | 설명 필드 | `description`(text) + `detailHtml`(HTML) + `summary` |
-| HTML 여부 | KPA: RichTextEditor → HTML / GP·KCos: plain textarea |
+| HTML 여부 | KPA: RichTextEditor → HTML / KCos: plain textarea |
 | O4O 표준 RichTextEditor | KPA만 사용(`@o4o/content-editor`, preset=full, AI 정리 포함) |
 | QR/POP/블로그 연결 | 직접 FK 없음 — `kpa_store_content_product_links` 조인으로 매개 |
 | 공급자 B2C 설명 참고 위치 | ✅ ImportB2cDescriptionModal(복사) — 단 O4O 기반 제품(listing)에서만 |
@@ -268,7 +267,7 @@ B2C   : product_masters.b2c_description / b2c_descriptions(다국어) — 매장
 | **A (최적)** | KPA `StoreLocalProductsPage.tsx` 설명 필드 영역 704–714행 | 이미 "콘텐츠에서 가져오기" 버튼 존재 → 우측에 "참고자료 보기" 탭/버튼 추가 |
 | B | 동 파일 793–798행(domain notice 위) | "참고자료" 섹션 + 연결 콘텐츠 요약 배지 |
 | C | `StoreHandledProductsPage.tsx` 119–149행 | LinkedContentsDrawer 이미 구현 — 액션 열 활용 |
-| D (GP/KCos) | `StoreLocalProductsManager.tsx` 533–562행 | 공통 폼 description 인근 |
+| D (KCos) | `StoreLocalProductsManager.tsx` 533–562행 | 공통 폼 description 인근 |
 
 기존 자산 재사용: ImportB2cDescriptionModal(B2C 복사) + StoreContentImportModal(내 콘텐츠 복사) + LinkedContentsDrawer(연결 조회). **1차는 보기/복사/원문 열기만**, 자동 혼합·AI 재작성 없음(원칙 준수).
 
@@ -288,7 +287,7 @@ B2C   : product_masters.b2c_description / b2c_descriptions(다국어) — 매장
 
 1. **"포장단위" 엔티티 부재** — 기존엔 `ProductMaster.specification` 문자열뿐. 별도 package_unit 테이블 신설은 표준상품 전체 설계 변경 → 무겁다.
 2. **신규 표준상품 생성 흐름** — 매장 등록 중 ProductMaster를 새로 만들면 barcode unique 충돌·중복 마스터 양산 위험. 1차 제외 권장.
-3. **GP/KCos 공통 폼의 기능 격차** — 바코드 입력·RichTextEditor·MediaPicker·콘텐츠 가져오기가 KPA 전용. 표준상품 검색을 3사 공통화하려면 공통 컴포넌트 대폭 보완 필요.
+3. **KCos 공통 폼의 기능 격차** — 바코드 입력·RichTextEditor·MediaPicker·콘텐츠 가져오기가 KPA 전용. 표준상품 검색을 3사 공통화하려면 공통 컴포넌트 대폭 보완 필요.
 4. **SharedProductDescription는 master 기준 전용** — 명시적으로 StoreLocalProduct 대상 아님(엔티티 주석). 매장 제품 설명을 여기에 끌어오면 안 됨.
 
 ---
@@ -314,7 +313,7 @@ B2C   : product_masters.b2c_description / b2c_descriptions(다국어) — 매장
 - **WO 후보 1**: `store_local_products.representative_product_id` nullable FK 추가 + 등록/수정 폼 표준상품 검색(선택) 단계 (additive, KPA 우선).
 - **WO 후보 2**: 매장 제품 등록/수정 참고자료 모달(보기/복사/원문) — 위치 A.
 - **확인 대상**: 매장 이미지 1000×1000/webp 파이프라인이 백엔드 미디어 API에 실재하는지(공급자 import 경로엔 존재 — 메모리 `wo-neture-import-image-storage-bucket-alignment` 참조).
-- **공통화 검토**: GP/KCos 공통 폼에 바코드/표준상품 검색 확장 여부(Shared Module Change Protocol 적용 필요).
+- **공통화 검토**: KCos 공통 폼에 바코드/표준상품 검색 확장 여부(Shared Module Change Protocol 적용 필요).
 
 ---
 
@@ -328,7 +327,7 @@ B2C   : product_masters.b2c_description / b2c_descriptions(다국어) — 매장
 | 바코드 | **A 그대로 활용** | varchar(64) nullable, unique 없음, 비차단 — 원칙 완전 부합 |
 | 바코드 확인 상태 | **D 1차 제외** | 검증 불필요, 별도 신고기능 없음 |
 | 썸네일 | **A 그대로 활용** | nullable, 미입력 허용 |
-| 설명 | **A 그대로 활용** | KPA RichTextEditor 존재 (GP/KCos는 textarea — B 보완 여지) |
+| 설명 | **A 그대로 활용** | KPA RichTextEditor 존재 (KCos는 textarea — B 보완 여지) |
 | 매장 최종 콘텐츠 | **A 그대로 활용** | detailHtml + kpa_store_contents + execution_assets |
 | O4O 주문가능 상품 구분 | **A 그대로 활용** | 구조적 완전 분리, handled-products UNION 읽기전용 |
 | 참고자료 모달 | **C 후속 확장** | 위치·기존 자산 확보, 신규 결합 UI는 후속 WO |

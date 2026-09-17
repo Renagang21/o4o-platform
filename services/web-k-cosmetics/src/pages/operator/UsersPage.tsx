@@ -29,7 +29,6 @@ import { api } from '../../lib/apiClient';
 import EditUserModal from './EditUserModal';
 
 // ─── Role display helpers ────────────────────────────────────
-// WO-O4O-GLYCOPHARM-KCOS-MEMBER-LIST-MODAL-PERMISSION-DISPLAY-ALIGNMENT-V1:
 //   회원 유형(참여 유형)과 운영 권한을 분리 표시(Neture 패턴 재사용). 동일 token
 //   (role_assignments roles[] ∪ user.role ∪ k-cosmetics membership.role)에서 도출. 데이터 미수정.
 //   ※ K-Cosmetics 는 role prefix 가 'cosmetics:' / 'k-cosmetics:' 로 혼재되어 양쪽 모두 인식한다.

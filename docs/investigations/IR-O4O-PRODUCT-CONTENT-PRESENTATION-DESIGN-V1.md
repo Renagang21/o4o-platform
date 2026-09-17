@@ -158,7 +158,7 @@
 | 가져가기=복사 원칙 | §8 명문화 — 매장 복사=snapshot detach, HUB=게시(참조) 분리 |
 | 단순 다운로드 vs 실행 자산 vs 제품 콘텐츠 경계 | taxonomy 구분됨. 제품 콘텐츠는 "제품 연결" 차원 추가 |
 | 용도 B2B/B2C/공통 | **backing 부재 — 신규 설계 필요**(현 channel_type 에 B2B 없음) |
-| KPA 고유 강제 | 본 설계 KPA 기준, GP/KCos 확산 전 parity 확인 권장 |
+| KPA 고유 강제 | 본 설계 KPA 기준, KCos 확산 전 parity 확인 권장 |
 | 1인 유지보수성 | Phase 1 경량 우선, Phase 2 백엔드는 결정 후 — 점진적 |
 
 ---

@@ -25,7 +25,7 @@ KPA 다국어 상품 콘텐츠 파일럿으로 만든 기능(QR·태블릿·다�
 - 사용: 매장 취급 상품 / O4O 주문 가능 상품 / 다국어 상품 안내 콘텐츠 / 고객용 보기 / QR 보기 / 태블릿 보기 / Store Hub.
 - 금지(미사용): 내 매장 상품 / 소비자 결제 / 관광객 결제 / 자동 주문 / 앱 결제.
 - 운영정책 명시: 가져오기=매장 전용 사본 / 원본 수정·삭제 무영향 / 링크·QR 발급=공개 / 보관=비노출.
-- KPA 기능 코드·GP/KCos·API·DB·migration **무변경**.
+- KPA 기능 코드·KCos·API·DB·migration **무변경**.
 
 ## 5. 검증
 ### 5.1 정적
@@ -44,10 +44,10 @@ KPA 다국어 상품 콘텐츠 파일럿으로 만든 기능(QR·태블릿·다�
 
 ## 6. 성공 기준 대비
 1. /guide 카드 추가 ✅  2. 상세 페이지 렌더 ✅  3. 흐름 이해 가능 ✅
-4. KPA 언급/GP·KCos 오해 방지 ✅  5. 결제/앱 혼동 없음 ✅  6. 기존 카드 회귀 없음 ✅
+4. KPA 언급/KCos 오해 방지 ✅ 5. 결제/앱 혼동 없음 ✅ 6. 기존 카드 회귀 없음 ✅
 
 **최종 판정: CLOSED / PASS**
 
 ## 7. 후속
 KPA 파일럿 closure([[CHECK-O4O-KPA-MULTILINGUAL-PRODUCT-CONTENT-PILOT-CLOSURE-V1]]) 이후 운영 매뉴얼 연결 완료.
-다음 = Cross-service adoption IR (GP/KCos).
+다음 = Cross-service adoption IR (KCos).

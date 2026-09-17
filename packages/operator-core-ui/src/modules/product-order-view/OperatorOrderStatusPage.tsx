@@ -4,7 +4,7 @@
  * WO-O4O-OPERATOR-PRODUCT-ORDER-VIEW-COMMONIZE-V1
  *
  * Operator 서비스 전역 "주문 현황" view-only 콘솔 (checkout_orders 조회).
- * GlycoPharm / K-Cosmetics 공통. serviceKey 별 fetch + accent/copy 는 wrapper 가 주입.
+ * K-Cosmetics 공통. serviceKey 별 fetch + accent/copy 는 wrapper 가 주입.
  *
  * ⚠️ view-only 불변: 주문 상태변경/배송/취소/환불/송장/정산/bulk action/selectable 없음.
  *    조회·검색·필터·페이지네이션만 제공.

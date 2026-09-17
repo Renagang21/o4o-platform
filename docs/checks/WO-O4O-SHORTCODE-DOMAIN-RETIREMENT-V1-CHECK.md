@@ -241,8 +241,7 @@ migration **0** · DB cleanup **0** · production write **0** · DB 재조회 **
 작업 중 **다른 세션의 변경이 같은 워크트리에 존재**했다. 전부 staged 대상에서 제외했다.
 
 **foreign unstaged (10):** `routes/cosmetics/controllers/cosmetics-order.controller.ts` ·
-`routes/glycopharm/controllers/{checkout,pharmacy}.controller.ts` ·
-`routes/glycopharm/glycopharm.routes.ts` · `routes/kpa/controllers/kpa-checkout.controller.ts` ·
+`routes/kpa/controllers/kpa-checkout.controller.ts`
 `routes/o4o-store/controllers/pharmacy-products.controller.ts` ·
 `services/cart/{b2b-checkout-confirm.core,offer-exposure-strategy}.ts` ·
 `packages/store-ui-core/src/{components/store-cart/useStoreCart.ts,index.ts}`
@@ -389,4 +388,3 @@ SHORTCODE_DOMAIN_RETIRED
 1. `admin.neture.co.kr` 배포 후 편집기 진입 · Block Inserter · Slash command ·
    preview 실화면 스모크 (§26) — 로컬 origin CORS 차단으로 이번 회차 미수행
 2. Buttons inner Button 추가 · DynamicRenderer 화면 조작 (§27 이월 항목)
-

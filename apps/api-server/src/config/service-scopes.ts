@@ -42,7 +42,6 @@ export interface ServiceScopes {
  * - k-shopping (전면 제거)
  */
 export const SERVICE_SCOPES: Record<string, ServiceScopes> = {
-  // 글라이코팜 스코프 — REMOVED (WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1)
 
   /**
 

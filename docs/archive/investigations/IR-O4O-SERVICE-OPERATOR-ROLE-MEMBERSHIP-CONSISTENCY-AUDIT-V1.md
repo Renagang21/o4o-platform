@@ -28,7 +28,7 @@ related:
 |---|---|
 | 근본 원인 | `AdminUserController.ensureServiceMemberships` 가 role prefix(`kpa`)를 canonical service_key(`kpa-society`)로 정규화하지 않고 raw 값으로 `service_memberships` row 를 생성 |
 | 영향 서비스 | **KPA-Society** (`kpa` → `kpa-society`), **K-Cosmetics** (`cosmetics` → `k-cosmetics`) |
-| Neture / GlycoPharm | 영향 없음 (role prefix 와 service_key 가 동일) |
+| Neture | 영향 없음 (role prefix 와 service_key 가 동일) |
 | 정책 | role 만으로 진입 차단은 **이미 canonical 정책** (WO-O4O-BACKEND-MEMBERSHIP-GUARD-CANONICALIZATION-V1). membership active 필수. |
 | Data drift | `service_memberships.service_key` 에 `'kpa'` / `'kpa-society'` **혼재** 가능 (`marketTrialController.ts:93` 의 `IN ('kpa', 'kpa-society')` 쿼리가 이를 시사) |
 | 위험도 | **중** — UX 차단 + 일부 코드는 raw key 읽기로 우회 중이지만 frontend MembershipGate 는 canonical 만 인정 |
@@ -46,7 +46,6 @@ related:
 - Membership canonical alias: `apps/api-server/src/common/middleware/membership-guard.middleware.ts`, `apps/api-server/src/utils/serviceScope.ts`, `apps/api-server/src/utils/store-owner.utils.ts`
 - auth-register canonical mapping: `apps/api-server/src/modules/auth/controllers/auth-register.controller.ts`
 - 프론트엔드 KPA-Society guard 체인: `services/web-kpa-society/src/components/auth/RoleGuard.tsx`, `MembershipGate.tsx`, `services/web-kpa-society/src/lib/membershipGate.ts`
-- 비교 대상: `services/web-{neture,k-cosmetics,glycopharm}/src/lib/membershipGate.ts`
 
 ### 1-2. 조사 범위 외
 - DB 실제 상태 (read-only SELECT) — 본 IR 작성 시점에 `gcloud sql connect` 컨텍스트 차이로 미실행. §5-2 의 권장 SQL 로 별도 검증 필요.
@@ -155,7 +154,6 @@ function resolveMembershipKey(scopeServiceKey: string): string {
 | `kpa:` | `kpa-society` | ❌ 불일치 | `service_key='kpa'` 저장 → MembershipGate 차단 |
 | `cosmetics:` | `k-cosmetics` | ❌ 불일치 | `service_key='cosmetics'` 저장 → MembershipGate 차단 |
 | `neture:` | `neture` | ✅ | 정상 |
-| `glycopharm:` | `glycopharm` | ✅ | 정상 |
 | `glucoseview:` | `glucoseview` | ✅ (deprecated) | 정상 (서비스 폐지됨 — IR-GLUCOSEVIEW-RESIDUAL 참조) |
 | `platform:` | `platform` | ✅ | 정상 (super_admin 전역) |
 
@@ -414,7 +412,7 @@ CLAUDE.md §0 read-only 검증 정책에 따라 Claude Code 가 직접 `gcloud s
 4. Frontend MembershipGate 는 canonical key 만 인정 (의도된 설계) — backend 정합 강제.
 5. 정책 정정 불필요. **단순 버그 fix (Phase 1) + drift 데이터 cleanup (Phase 2)** 로 해결.
 6. `suspended/withdrawn` 자동 active 처리는 별도 정책 결정 사항 (Phase 4).
-7. 사용자 가시 영향은 KPA-Society / K-Cosmetics 운영자에 한정 — Neture / GlycoPharm 영향 없음.
+7. 사용자 가시 영향은 KPA-Society / K-Cosmetics 운영자에 한정 — Neture 영향 없음.
 
 ---
 

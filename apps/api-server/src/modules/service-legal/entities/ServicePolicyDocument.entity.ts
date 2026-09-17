@@ -37,7 +37,7 @@ export class ServicePolicyDocument {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  /** neture | glycopharm | kpa-society | k-cosmetics | pharmacy-hub */
+  /** neture | kpa-society | k-cosmetics | pharmacy-hub */
   @Column({ type: 'varchar', length: 50 })
   service_key!: string;
 

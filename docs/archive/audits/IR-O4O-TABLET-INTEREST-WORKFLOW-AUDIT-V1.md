@@ -213,7 +213,6 @@ GET /api/v1/store/interest/stats
 | 서비스 | Interest 관리 UI | Service Request 관리 UI |
 |--------|:----------------:|:----------------------:|
 | KPA Society | **없음** | **있음** — TabletRequestsPage |
-| GlycoPharm | **없음** | **있음** — CustomerRequestsPage |
 | K-Cosmetics | **없음** | **없음** |
 
 **3개 서비스 모두 Interest Request 전용 관리 화면이 존재하지 않는다.**
@@ -306,18 +305,6 @@ Interest Request를 생성한 후 고객이 상태를 확인할 방법이 없다
 | Service Request 직원 관리 | **완성** | TabletRequestsPage |
 | Interest Request 생성 UI | **미구현** | |
 | Interest Request 직원 관리 | **미구현** | |
-
-### 6.2 GlycoPharm
-
-| 기능 | 상태 | 비고 |
-|------|:----:|------|
-| Tablet 레이아웃 | **완성** | TabletLayout (직원 보조 모드) |
-| Service Request | **완성** | Common Request 시스템 통합 |
-| 요청 관리 | **완성** | CustomerRequestsPage (종합 요청) |
-| Interest Request 생성 UI | **미구현** | |
-| Interest Request 직원 관리 | **미구현** | |
-
-GlycoPharm의 CustomerRequestsPage는 **종합 요청 관리 시스템**(consultation, sample, order, survey_followup, info_followup)으로, Tablet Interest와는 다른 구조이다.
 
 ### 6.3 K-Cosmetics
 
@@ -413,7 +400,6 @@ Interest Request에 대한 `GET /tablet/interest/:id` 공개 엔드포인트가 
 
 ```
 KPA: Service Request 완성, Interest 미구현
-GlycoPharm: Common Request 별도 구조, Interest 미구현
 K-Cosmetics: Tablet 키오스크 자체 없음, Interest 미구현
 ```
 
@@ -556,7 +542,6 @@ apps/api-server/src/database/migrations/20260301400000-TabletInterestRequests.ts
 ### Backend — Service Request (비교용)
 
 ```
-apps/api-server/src/routes/glycopharm/entities/tablet-service-request.entity.ts
 apps/api-server/src/routes/o4o-store/controllers/tablet.controller.ts
 ```
 
@@ -565,21 +550,18 @@ apps/api-server/src/routes/o4o-store/controllers/tablet.controller.ts
 ```
 services/web-kpa-society/src/pages/tablet/TabletStorePage.tsx
 services/web-kpa-society/src/api/tablet.ts
-services/web-glycopharm/src/components/layouts/TabletLayout.tsx
 ```
 
 ### Frontend — 직원 관리 (Service Request만)
 
 ```
 services/web-kpa-society/src/pages/pharmacy/TabletRequestsPage.tsx
-services/web-glycopharm/src/pages/pharmacy/CustomerRequestsPage.tsx
 ```
 
 ### Frontend — 진열 관리
 
 ```
 services/web-kpa-society/src/pages/pharmacy/StoreTabletDisplaysPage.tsx
-services/web-glycopharm/src/pages/pharmacy/StoreTabletDisplaysPage.tsx
 services/web-k-cosmetics/src/pages/store/StoreTabletDisplaysPage.tsx
 ```
 

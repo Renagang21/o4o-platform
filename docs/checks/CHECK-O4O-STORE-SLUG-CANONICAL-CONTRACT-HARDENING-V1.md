@@ -29,7 +29,7 @@ census 중 추가 결함 2건을 더 확인했다(§8 잔존 위험 1·6번).
 | `generateUniqueSlug` | `platform-core/.../services/store-slug.service.ts` | CANONICAL | generator 결과 + `-1`…`-100` | — | — | — | — | — | 숫자 suffix, 실패 시 throw |
 | `slugBase` | `api-server/.../PharmacyHubStoreProvisioningService.ts` | SERVICE_LOCAL(중복 규칙) | `_`/공백 → `-` 자체 구현 | 우회 | `-` | 보존 | 소문자 | — | 3자 미만 → org code fallback |
 | `generateStoreSlug` / `generateUniqueStoreSlug` / `isValidSlug` | `api-server/src/utils/slug.ts` | **DEAD** (store slug 축 소비처 0) | — | — | — | — | — | — | — |
-| `generateSlugFromName` (frontend) | `services/web-glycopharm/.../StoreApprovalDetailPage.tsx` | SERVICE_LOCAL(입력 제안용, 백엔드가 재검증) | — | — | — | — | — | — | — |
+| `generateSlugFromName` (frontend) | — | SERVICE_LOCAL(입력 제안용, 백엔드가 재검증) | — | — | — | — | — | — | — |
 
 **재현(수정 전 생성기)**
 
@@ -54,7 +54,7 @@ census 중 추가 결함 2건을 더 확인했다(§8 잔존 위험 1·6번).
 | `platform_store_slugs` | **CANONICAL** | 공개 조회(`resolvePublicStore`), 매장 허브 `GET /store-hub/slug`, slug 변경(`PUT /:slug/slug`), 조직 삭제 시 정리가 전부 이 테이블을 본다 |
 | `cosmetics.cosmetics_stores.slug` | **LEGACY_MIRROR** | runtime 공개 조회 소비처 0. write 2곳(신규 생성 · slug 변경 mirror)뿐이었고 그중 slug 변경 mirror 는 **id 축이 어긋나 항상 0 row** 였다 |
 | `platform_store_slug_history` | CANONICAL(부속) | 301 redirect · 1회 변경 정책. production **0 row** |
-| glycopharm / kpa / pharmacy-hub 전용 slug 컬럼 | **없음** | registry 단독 |
+| kpa / pharmacy-hub 전용 slug 컬럼 | **없음** | registry 단독 |
 
 ---
 
@@ -63,7 +63,6 @@ census 중 추가 결함 2건을 더 확인했다(§8 잔존 위험 1·6번).
 | 경로 | slug lookup | org 확인 | serviceKey 확인 | 판정 |
 |---|---|:--:|:--:|---|
 | `GET /api/v1/stores/:slug` · `/resolve/:slug` (`resolvePublicStore`) | registry | ✅ | 해당 없음 | **service-neutral 단일 mount** — slug row 의 serviceKey 를 결과로 돌려준다. WO §6 의 "service-neutral 이면 slug row 기준" 에 부합 → 변경 없음 |
-| `/api/v1/{cosmetics\|glycopharm\|kpa}/stores/:slug/blog` | registry | ✅ | ❌ → **✅ 수정** | 서비스별 mount 인데 대조 없음 |
 | 〃 `/pop`, `/qr`, `/video` | registry | ✅ | ❌ → **✅ 수정** | 동일 |
 | `layout.controller` / `store-settings.controller` / `kpa-store-template.controller` | registry | ✅ | mount serviceKey 인자 자체가 없음 | service-neutral → **변경 없음** (신규 계약 금지: §6·§10) |
 | `store-policy.routes.ts` (`resolveAndAuthorize`) | registry | 소유권 질의 | slug row 의 serviceKey 사용 | 변경 없음 |
@@ -72,7 +71,6 @@ census 중 추가 결함 2건을 더 확인했다(§8 잔존 위험 1·6번).
 
 ```
 GET /api/v1/kpa/stores/테스트-약국/blog        200   (정상)
-GET /api/v1/glycopharm/stores/테스트-약국/blog 200   ← 결함
 GET /api/v1/cosmetics/stores/테스트-약국/blog  200   ← 결함 (cosmetics enrollment 조차 없다)
 ```
 
@@ -101,7 +99,7 @@ GET /api/v1/cosmetics/stores/테스트-약국/blog  200   ← 결함 (cosmetics 
 | 항목 | 값 |
 |---|---|
 | `platform_store_slugs` 전체 | **15** (전부 `is_active=true`) |
-| service 별 | cosmetics 2 / kpa 7 / pharmacy-hub 6 (glycopharm 0 · neture 0) |
+| service 별 | cosmetics 2 / kpa 7 / pharmacy-hub 6 (neture 0) |
 | invalid slug pattern | **0** |
 | underscore 포함 | **0** |
 | 연속 하이픈 · 양끝 하이픈 · 3자 미만 · 120자 초과 | 각 **0** |
@@ -114,7 +112,7 @@ GET /api/v1/cosmetics/stores/테스트-약국/blog  200   ← 결함 (cosmetics 
 | registry 와 불일치 | **0** |
 | local slug 만 있고 registry 없음 | **0** |
 | registry 만 있고 local NULL | 1 (`테스트-뷰티샵`) |
-| 다서비스 organization | **2** (`cosmetics,k-cosmetics` / `glycopharm,kpa-society`) |
+| 다서비스 organization | **2** |
 | 다서비스 org 의 slug | 2 (`test-kcos-store-owner`=cosmetics, `테스트-약국`=kpa) |
 
 **판정**: 기존 데이터 rewrite **불필요**. invalid slug 0 · 불일치 0 이므로 backfill/redirect 정책 없이 코드 수정만으로 계약이 닫힌다 → §9 대로 production write 0건.
@@ -130,8 +128,6 @@ GET /api/v1/cosmetics/stores/테스트-약국/blog  200   ← 결함 (cosmetics 
 | api-server 전체 Jest | **PASS** 140 suites / 2231 tests |
 | production 공개 매장 전수 smoke (`GET /api/v1/stores/{slug}`) | **15/15 → 200** (배포 전 baseline · service-neutral 경로라 이번 수정 영향 없음) |
 | production DB write | **0건** |
-
-배포 후 기대값: `GET /api/v1/glycopharm/stores/테스트-약국/blog` 및 `/cosmetics/...` → **404**, `/kpa/...` → 200 유지.
 
 ---
 

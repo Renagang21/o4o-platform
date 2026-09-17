@@ -238,9 +238,6 @@ describe('refund/cancel 경로의 소스 계약 (raw-source)', () => {
     expect(src).toContain('isPlatformAdmin');
   });
 
-  // GlycoPharm /cleanup-expired · 라우터 scope guard 단언 — REMOVED
-  //   WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1: 대상 파일이 서비스와 함께 삭제되었다.
-
   it('구매자 취소 경로는 buyerId + serviceKey 로만 주문을 특정한다 (운영자 role 요구 없음)', () => {
     const src = readFileSync(join(SRC, 'services/checkout/store-order-cancel.service.ts'), 'utf-8');
     expect(src).toContain('"buyerId" = $2::uuid');

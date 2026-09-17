@@ -48,12 +48,8 @@
 - **판정**: supplier order canonical entry 로 확장 **가능**. 현재 V1 은 `sourceType='event_offer'` 만 처리하지만 구조(supplier 그룹 + line item source metadata)는 일반/B2B/승인/모집 상품을 그대로 수용 가능. **GAP**: 일반/B2B 상품을 cart 에 담는 add 경로·재고차감 모델 미구현.
 
 ## 4. event-offer participate legacy 경로
-- `participate()` 는 이제 `loadEventOfferContext`+`reserveEventOfferListing` helper 를 쓰며 buyer UI 직접 호출 **0건**(KPA/Glyco/KCos 모두 cart 담기로 전환됨). Glyco/KCos 컨트롤러는 동일 service 를 service_key 만 바꿔 재사용.
+- `participate()` 는 이제 `loadEventOfferContext`+`reserveEventOfferListing` helper 를 쓰며 buyer UI 직접 호출 **0건**.
 - **판정**: participate 는 **외부 buyer 주문 API 로 유지 불필요**. 검증/차감 helper(`reserveEventOfferListing`)는 cart checkout-confirm 이 이미 재사용 중. → **LEGACY 격하 가능**(운영자/테스트 잔존 호출 확인 후 deprecation).
-
-## 5. KPA/Glyco/KCos event_offer cart 경로
-- 3서비스 동일 `StoreCartItem` + `buildEventOfferCartPayload`(uuid guard) + `StoreCartPage` + `/store-hub/cart`. serviceKey mapping 일관(`kpa-society→kpa-groupbuy`, `glycopharm→glycopharm-event-offer`, `k-cosmetics→k-cosmetics-event-offer`). checkout-confirm supplier+sellerOrg 병합. graceful smoke 3서비스 PASS, positive 는 active offer 부재로 deferred.
-- **판정**: cross-service 일관 **PASS**. canonical 흐름의 reference.
 
 ## 6. web-neture B2B / neture_orders 경로
 - 프론트 `services/web-neture/src/pages/store/StoreCartPage.tsx`(localStorage cart) → `storeApi.createOrder()` → `POST /neture/seller/orders` → `neture.service.createOrder()` → **neture_orders direct create**(checkoutService 미경유).

@@ -4,7 +4,7 @@
  *
  * 목적 2가지
  *   1. 공통 View 를 serviceKey 분기 없이 generic 하게 확장했는지 고정한다.
- *   2. 새 optional prop 의 **기본값이 기존 3서비스(KPA·GP·KCos) 동작을 그대로 재현**하는지 고정한다.
+ *   2. 새 optional prop 의 **기본값이 기존 2서비스(KPA·KCos) 동작을 그대로 재현**하는지 고정한다.
  *      (기존 서비스 회귀 0 — §5)
  */
 import { describe, it, expect } from 'vitest';

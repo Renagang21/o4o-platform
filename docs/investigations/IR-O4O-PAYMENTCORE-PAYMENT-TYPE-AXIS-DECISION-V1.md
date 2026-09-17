@@ -47,7 +47,7 @@ SERVICE_ACCESS / B2B_ORDER 를 어떻게 표현할 것인가?
 |---|---|---|
 | o4o_payments 스키마 | **변경 없음** | additive migration(nullable 컬럼) |
 | entities.ts / PlatformPayment | 무변경 | 수정 필요 |
-| 4 서비스 공통 코어 영향 | **없음** | 계약 검토 필요(KPA/Glyco/KCos/Neture B2B) |
+| 4 서비스 공통 코어 영향 | **없음** | 계약 검토 필요 |
 | SERVICE_ACCESS 표현 | `metadata.paymentType='SERVICE_ACCESS'` + `metadata.planCode` | `payment_type='SERVICE_ACCESS'` 컬럼 |
 | 검색/집계(운영자 결제 리포팅) | JSONB 쿼리(`metadata->>'paymentType'`) — 인덱스 추가 전엔 느림 | 컬럼 인덱스로 빠름 |
 | 도입 리스크 | **최저** | 중(공유 코어 + WIP 충돌 이력) |

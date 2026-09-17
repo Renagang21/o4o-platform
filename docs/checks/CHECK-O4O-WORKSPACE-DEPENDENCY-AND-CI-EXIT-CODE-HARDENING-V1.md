@@ -177,7 +177,6 @@ D2·D3 는 WO 본문에 없던 항목이나, D1 을 고치는 순간 표면화�
 | Frontend typecheck | `node scripts/dev.mjs type-check:frontend` | **EXIT 0** |
 | admin-dashboard typecheck | `npx tsc --noEmit` | **0 errors** |
 | web-kpa-society typecheck | `npx tsc --noEmit` | **0 errors** |
-| web-neture / web-k-cosmetics / web-glycopharm typecheck | `npx tsc --noEmit` | **각 0 errors** |
 | store-ui-core typecheck | `npx tsc --noEmit` | **0 errors** |
 | admin-dashboard test | `npx vitest run --pool=forks --poolOptions.forks.maxForks=1` | **12 files / 220 tests PASS** |
 | api-gateway test | `npx vitest run --passWithNoTests` | **1 test PASS** |

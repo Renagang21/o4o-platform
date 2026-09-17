@@ -2,7 +2,7 @@
  * MyEnrollmentsView — 내 수강 목록 공통 View
  *
  * WO-O4O-COMMUNITY-CROSSSERVICE-FINAL-RECENSUS-AND-RESIDUAL-COMMONIZATION-AUDIT-V1 §8
- * K-Cosmetics / GlycoPharm 의 동일 View 중복(차이 = 주석 · navItems)을 공통화한다.
+ * K-Cosmetics 의 동일 View 중복(차이 = 주석 · navItems)을 공통화한다.
  * 데이터 로딩(서비스별 lmsApi)과 navigation 은 서비스 wrapper 가 주입한다.
  * KPA 는 hybrid list UX(WO-O4O-KPA-MY-ENROLLMENTS-HYBRID-LIST-ALIGN-V1)로 별도 유지.
  */

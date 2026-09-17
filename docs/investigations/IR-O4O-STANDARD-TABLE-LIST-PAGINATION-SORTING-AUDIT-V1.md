@@ -16,7 +16,7 @@
 
 ## 2. 조사 범위와 기준
 
-- 범위: web-neture / web-glycopharm / web-kpa-society / web-k-cosmetics 의 operator·store·supplier·admin 관리 리스트 화면 + 대응 api-server list endpoint. (detail/dashboard/home 제외.)
+- (detail/dashboard/home 제외.)
 - 기준: 외부 벤치마크 IR 의 4 레이어(`StandardListToolbar/DataTable/Pagination + useStandardListQuery`) + 응답 `{success,data,pagination}` + page=1 reset + 정렬 opt-in.
 - 방법: rg/grep 정적 분석 + 공통 모듈 export 확인. 운영 데이터 미조회.
 
@@ -44,9 +44,9 @@
 | 공급상품 승인 | neture·admin | `/admin/product-approval` | AdminProductApprovalPage | custom cards | **없음** | 없음 | ✓ | status | **array-only** |
 | 브랜드 | neture·operator | `/operator/brands` | BrandManagementPage | DataTable | **front-slice** | 클라 | ✓(debounce) | — | array-only |
 | 회원 관리 | neture·admin | `/admin/members` | AdminMemberManagementPage | DataTable | 서버 | 클라(sortAccessor) | ✓(Enter) | status tabs | `{data.users,data.pagination}` |
-| 가입신청 | glyco·operator | `/operator/applications` | ApplicationsPage | DataTable | 서버 | 없음 | 없음 | status/type/org | **`{applications,pagination}`** |
-| 약국 목록(legacy) | glyco·operator | `/operator/pharmacies` | PharmaciesPage | DataTable | 서버 | 클라 | ✓ | region/tier/status | `{pharmacies,pagination}` (backend **stub**) |
-| 블로그/POP/QR/설문 | glyco·kcos·kpa·operator | `/operator/{blog,pop,qr,survey}` | Operator{X}ListPage | DataTable(+useBatchAction) | 서버 | 없음 | 일부 | status | **`{data,meta.total}`** |
+| 가입신청 | — | `/operator/applications` | ApplicationsPage | DataTable | 서버 | 없음 | 없음 | status/type/org | **`{applications,pagination}`** |
+| 약국 목록(legacy) | — | `/operator/pharmacies` | PharmaciesPage | DataTable | 서버 | 클라 | ✓ | region/tier/status | `{pharmacies,pagination}` (backend **stub**) |
+| 블로그/POP/QR/설문 | — | `/operator/{blog,pop,qr,survey}` | Operator{X}ListPage | DataTable(+useBatchAction) | 서버 | 없음 | 일부 | status | **`{data,meta.total}`** |
 | 콘텐츠/포럼/강의 | kpa·다영역 | `/contents`,`/forum`,`/instructor/courses` | {X}ListPage | DataTable | 서버 | 없음 | ✓ | category/status | `{data,pagination}` |
 | 공급자 상품/주문 | neture·supplier | `/account/products`,`/account/orders` | Supplier{X}ListPage | **custom `<table>`** | **front-slice** | 없음 | ✓ | category/date | array-only |
 | 모집 노출 승인 | 3서비스·operator | `/operator/recruitment-exposure` | RecruitmentExposureApprovalPage→**RecruitmentExposureConsole** | 공통(신규) | 없음(소량) | 없음 | 없음 | (serviceKey 고정) | `{data}` |
@@ -75,7 +75,6 @@
 4종 혼재:
 1. `{ data, pagination: { page, limit, total, totalPages } }` — operator stores, contact-inquiry, contents 다수 (**표준 근접**).
 2. `{ data, meta: { total } }` — blog/pop/qr/survey(operator). totalPages 클라 계산.
-3. `{ <도메인명>, pagination }` — glyco applications(`{applications,pagination}`), pharmacies(`{pharmacies,pagination}`).
 4. **array-only** — admin product-approval, brand, supplier products/orders.
 
 > 표준 `{ success, data, pagination{page,limit,total,totalPages,hasNextPage,hasPreviousPage} }` 와 1번은 거의 정합, 2·3은 어댑터로 흡수 가능, 4는 backend 선행 필요. `OfferServiceApproval.listApprovals`(status/serviceKey/search/dateFrom/dateTo/page/limit)는 이미 표준 친화.

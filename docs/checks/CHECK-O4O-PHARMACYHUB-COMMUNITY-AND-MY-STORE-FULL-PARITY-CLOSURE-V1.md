@@ -30,7 +30,7 @@
 | # | 항목 | 근거 |
 |---|---|---|
 | 41 | 강사 공개 프로필 | 강사 신청·승인 endpoint 가 `requireKpaAdmin` 이며 `/kpa/lms/*` 에만 mount 된다. PH 에 노출하면 dead navigation 이 된다 |
-| 52 | 커뮤니티 사이니지 허브 | KPA 전용 회원 대면 축. GP/KCos 도 `/operator/signage/content` 아래에만 둔다. PH `signage_media` 는 org-scoped 라 서비스 전역 허브는 매장 자산 leakage 가 된다 |
+| 52 | 커뮤니티 사이니지 허브 | KPA 전용 회원 대면 축. KCos 도 `/operator/signage/content` 아래에만 둔다. PH `signage_media` 는 org-scoped 라 서비스 전역 허브는 매장 자산 leakage 가 된다 |
 | 78 | 온라인 판매 | `O4O-STORE-COMMERCE-BOUNDARY-V1` — 매장 경영자는 O4O 로 소비자에게 판매하지 않는다 |
 | 85 | 운영자 HUB 게시·큐레이션 | `O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1` — PH baseline 에 공급자 역할이 없다 |
 | 86 | 운영자 매장 승인·지원·검수 | 동일 baseline — 매장지원 operator capability 없음 |
@@ -55,7 +55,7 @@
 - `/operator/content`, `/operator/community-contents`, `/operator/resources`, `/operator/lms`, `/operator/guide-contents`, `/operator/surveys` route + sidebar 진입점 모두 존재.
 
 ### 2-3. 기존 3서비스 회귀
-- KPA / GlycoPharm / K-Cosmetics `npx tsc -b --force` 전부 EXIT=0.
+- KPA / K-Cosmetics `npx tsc -b --force` 전부 EXIT=0.
 - status / action / delete behavior 기본값 변경 없음 (공통 모듈은 capability 기본값을 기존 동작으로 유지).
 
 ### 2-4. 회원 Content write 최종 판정
@@ -91,7 +91,6 @@
 | `packages/operator-core-ui` vitest | 4 files / 53 tests passed |
 | `services/web-pharmacy-hub` `tsc -b --force` | EXIT=0 |
 | `services/web-kpa-society` `tsc -b --force` | EXIT=0 |
-| `services/web-glycopharm` `tsc -b --force` | EXIT=0 |
 | `services/web-k-cosmetics` `tsc -b --force` | EXIT=0 |
 | dead navigation 스캔 (nav config href → route) | **0건** |
 | cross-service leakage (`serviceKey === 'pharmacy-hub'` in `packages/`) | **0건** |

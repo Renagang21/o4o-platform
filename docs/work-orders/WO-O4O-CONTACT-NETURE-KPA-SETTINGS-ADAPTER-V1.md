@@ -9,7 +9,7 @@
 
 ## 1. 목적
 
-Neture와 KPA Society의 기존 Contact 구조는 유지하되, GP/KCos의 `ServiceContactSettings` 기반 문의 알림 설정을 연결한다.
+Neture와 KPA Society의 기존 Contact 구조는 유지하되, KCos의 `ServiceContactSettings` 기반 문의 알림 설정을 연결한다.
 
 선행 IR 결과, Neture/KPA는 깨지기 쉬운 레거시 폼이 아니라 이미 다음을 갖춘 정상 작동 구조다.
 
@@ -17,7 +17,7 @@ Neture와 KPA Society의 기존 Contact 구조는 유지하되, GP/KCos의 `Serv
 - in-app `contact.new` 알림
 - 운영자 문의 관리 UI
 
-다만 GP/KCos 대비 아래 3가지가 없다.
+다만 KCos 대비 아래 3가지가 없다.
 
 1. 운영자 이메일 알림
 2. 문의자 자동 회신
@@ -53,7 +53,7 @@ Neture와 KPA Society의 기존 Contact 구조는 유지하되, GP/KCos의 `Serv
 8. Neture/KPA 기존 in-app 알림 제거
 9. 개인정보 동의 UI 추가
 10. Neture IP 원문 저장 → hash 전환
-11. GP/KCos Contact 구조 수정
+11. KCos Contact 구조 수정
 12. 법정정보/약관/푸터 수정
 
 > 개인정보 동의 + Neture IP hash 전환은 후속 `WO-O4O-CONTACT-NETURE-KPA-PRIVACY-CONSENT-V1`에서 처리.
@@ -78,7 +78,7 @@ Neture와 KPA Society의 기존 Contact 구조는 유지하되, GP/KCos의 `Serv
 
 ### 7.1 ServiceContactSettings 확장
 대상 serviceKey: `neture`, `kpa-society`
-1. 현재 `ServiceContactSettings` serviceKey whitelist가 GP/KCos로 제한되어 있는지 확인
+1. 현재 `ServiceContactSettings` serviceKey whitelist가 KCos로 제한되어 있는지 확인
 2. 제한되어 있으면 Neture/KPA 추가
 3. row 없을 때 기본값 병합 정책 그대로 사용
 4. **seed 넣지 않음**
@@ -88,7 +88,7 @@ Neture와 KPA Society의 기존 Contact 구조는 유지하되, GP/KCos의 `Serv
 
 ### 7.2 Admin 설정 화면 연결
 - 권장 route `/admin/settings/contact` · 메뉴명 "문의 설정"
-1. GP/KCos `ServiceContactSettingsPage` 재사용
+1. KCos `ServiceContactSettingsPage` 재사용
 2. Neture wrapper `serviceKey='neture'`
 3. KPA wrapper `serviceKey='kpa-society'`
 4. 메뉴는 **Admin 설정 영역**에 둠
@@ -108,7 +108,7 @@ Neture와 KPA Society의 기존 Contact 구조는 유지하되, GP/KCos의 `Serv
 
 ## 8. notification_status 처리
 
-Neture/KPA 기존 테이블에는 GP/KCos의 `notification_status`가 없다.
+Neture/KPA 기존 테이블에는 KCos의 `notification_status`가 없다.
 
 - **옵션 1 (권장):** additive migration으로 컬럼 추가 (`neture_contact_messages.notification_status`, `contact_requests.notification_status`). 운영 추적 가능, 기존 데이터 무영향.
 - 옵션 2: 로그만 — DB 변경 최소이나 운영 화면에서 상태 확인 어려움.
@@ -123,7 +123,7 @@ inapp:sent;email:norecipient;autoreply:off
 inapp:sent;email:fail;autoreply:sent
 ```
 
-## 9. 이메일 알림 기준 (GP/KCos와 동일 원칙)
+## 9. 이메일 알림 기준 (KCos와 동일 원칙)
 
 1. 수신자는 `ServiceContactSettings.recipientEmails`에서만 가져온다 (하드코딩 금지)
 2. `emailNotificationEnabled=false`이면 발송하지 않는다
@@ -134,7 +134,7 @@ inapp:sent;email:fail;autoreply:sent
 
 권장 제목: `[Neture] 새 문의가 접수되었습니다` / `[KPA Society] 새 문의가 접수되었습니다` (또는 서비스 표시명 기준)
 
-## 10. 자동 회신 기준 (GP/KCos와 동일 원칙)
+## 10. 자동 회신 기준 (KCos와 동일 원칙)
 
 1. `autoReplyEnabled=true`일 때만 발송
 2. `autoReplySubject`, `autoReplyMessage`가 있어야 함
@@ -166,7 +166,7 @@ inapp:sent;email:fail;autoreply:sent
 - Admin 설정 화면: KPA admin(또는 기존 서비스 admin) 권한 확인 후 적용
 - 기존 문의 관리(Operator `/operator/collaboration-requests`) 권한 변경하지 않음
 
-> KPA에 Admin 설정 라우트/레이아웃이 없거나 불명확하면 무리하게 만들지 말고 **CHECK에 blocker로 기록**. 기존 KPA Admin 영역이 있으면 GP/KCos 패턴에 맞춰 추가.
+> KPA에 Admin 설정 라우트/레이아웃이 없거나 불명확하면 무리하게 만들지 말고 **CHECK에 blocker로 기록**. 기존 KPA Admin 영역이 있으면 KCos 패턴에 맞춰 추가.
 
 ## 13. 검증 기준
 
@@ -182,7 +182,7 @@ inapp:sent;email:fail;autoreply:sent
 10. KPA `/api/v1/kpa/contact-requests` route 유지
 11. Neture 기존 Admin/Operator 문의 관리 UI 유지
 12. KPA 기존 Operator 문의 관리 UI 유지
-13. GP/KCos 미수정
+13. KCos 미수정
 14. ContactInquiry로 이관하지 않음
 15. backend TypeScript 검증 통과
 16. Neture/KPA web TypeScript 검증 통과
@@ -212,8 +212,6 @@ commit 전 반드시 `git diff --cached --name-only` 확인.
 
 허용 경로: `apps/api-server/**`, `services/web-neture/**`, `services/web-kpa-society/**`, `packages/**`, `docs/checks/CHECK-O4O-CONTACT-NETURE-KPA-SETTINGS-ADAPTER-V1.md`, `docs/work-orders/WO-O4O-CONTACT-NETURE-KPA-SETTINGS-ADAPTER-V1.md`
 
-**금지 경로:** `services/web-glycopharm/**`, `services/web-k-cosmetics/**` (GP/KCos는 범위 외)
-
 commit은 반드시 **명시 경로** 사용:
 ```bash
 git commit -m "feat(contact): add settings adapter for Neture and KPA" -- \
@@ -224,7 +222,7 @@ git commit -m "feat(contact): add settings adapter for Neture and KPA" -- \
 
 ## 17. CHECK 문서
 
-완료 후 `docs/checks/CHECK-O4O-CONTACT-NETURE-KPA-SETTINGS-ADAPTER-V1.md` 생성. 기록 항목: ① 목적 ② 선행 IR 반영 ③ Option D 적용 확인 ④ Neture 기존 저장소/route/UI 유지 ⑤ KPA 기존 저장소/route/UI 유지 ⑥ ServiceContactSettings 확장 ⑦ Admin 설정 화면 추가 ⑧ 운영자 이메일 알림 연결 ⑨ 문의자 자동 회신 연결 ⑩ notification_status 처리 ⑪ migration 여부 ⑫ Neture smoke ⑬ KPA smoke ⑭ 테스트 설정 복구 ⑮ 테스트 문의 처리 ⑯ GP/KCos 미수정 ⑰ 개인정보 동의/IP hash 후속 분리 ⑱ 검증 결과 ⑲ 배포 결과 ⑳ commit hash
+완료 후 `docs/checks/CHECK-O4O-CONTACT-NETURE-KPA-SETTINGS-ADAPTER-V1.md` 생성. 기록 항목: ① 목적 ② 선행 IR 반영 ③ Option D 적용 확인 ④ Neture 기존 저장소/route/UI 유지 ⑤ KPA 기존 저장소/route/UI 유지 ⑥ ServiceContactSettings 확장 ⑦ Admin 설정 화면 추가 ⑧ 운영자 이메일 알림 연결 ⑨ 문의자 자동 회신 연결 ⑩ notification_status 처리 ⑪ migration 여부 ⑫ Neture smoke ⑬ KPA smoke ⑭ 테스트 설정 복구 ⑮ 테스트 문의 처리 ⑯ KCos 미수정 ⑰ 개인정보 동의/IP hash 후속 분리 ⑱ 검증 결과 ⑲ 배포 결과 ⑳ commit hash
 
 ## 18. 후속 작업
 

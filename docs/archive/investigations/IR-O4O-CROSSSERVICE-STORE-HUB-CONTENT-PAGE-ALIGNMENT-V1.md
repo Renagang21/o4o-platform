@@ -4,7 +4,6 @@
 **작성일:** 2026-06-01  
 **상태:** 완료  
 **코드 변경:** 없음  
-**WIP 파일 (IR과 무관):** `packages/operator-core-ui/src/modules/members/index.ts`, `services/web-glycopharm/src/pages/admin/GlycoPharmAdminMembersPage.tsx` — 포함 제외
 
 ---
 
@@ -15,44 +14,42 @@
 | 서비스 | 판정 | 핵심 drift |
 |--------|------|-----------|
 | **KPA** | ✅ Canonical 기준 | cmsApi 사용은 KPA 전용 구조이므로 예외 가능 |
-| **GlycoPharm** | ⚠️ B + C | dashboardCopyApi 사용 + `/hub/content/:id` 구 경로 잔재 |
 | **K-Cosmetics** | ⚠️ C | `/store-hub/content`가 placeholder, 실구현은 `/library/content` |
 
 **권장:**
 1. K-Cosmetics: `HubContentPage`를 `ContentLibraryPage` 기반으로 교체 (route 정렬)
-2. GlycoPharm: `dashboardCopyApi` → `assetSnapshotApi.copy()` 전환 + `/hub/content/:id` 경로 제거
 3. ContentHubTemplate의 **single-action 정책(bulk 없음)**은 의도된 설계 — 변경 불필요
 
 ---
 
 ## 1. Route / Page 구조 비교
 
-| 항목 | KPA | GlycoPharm | K-Cosmetics |
-|------|-----|-----------|-------------|
-| route | `/store-hub/content` | `/store-hub/content` (+ `/library/content`, `/hub/content`) | `/store-hub/content` (placeholder) + `/library/content` (실구현) |
-| page file | `HubContentLibraryPage.tsx` (172줄) | `HubContentListPage.tsx` (214줄) | `HubContentPage.tsx` (33줄 placeholder) + `ContentLibraryPage.tsx` (별도) |
-| layout | `ContentHubTemplate` ✅ | `ContentHubTemplate` ✅ | placeholder: 없음 / ContentLibraryPage: `ContentHubTemplate` ✅ |
-| menu label | 콘텐츠/자료 | 콘텐츠 | 콘텐츠/자료 |
-| DataTable | ❌ (ContentHubTemplate 정책) | ❌ (ContentHubTemplate 정책) | ❌ |
-| renderItems | 기본 리스트 | 카드 그리드 (커스텀) | 카드 그리드 (ContentLibraryPage) |
+| 항목 | KPA | K-Cosmetics |
+| ------ | ----- | ------------- |
+| route | `/store-hub/content` | `/store-hub/content` (placeholder) + `/library/content` (실구현) |
+| page file | `HubContentLibraryPage.tsx` (172줄) | `HubContentPage.tsx` (33줄 placeholder) + `ContentLibraryPage.tsx` (별도) |
+| layout | `ContentHubTemplate` ✅ | placeholder: 없음 / ContentLibraryPage: `ContentHubTemplate` ✅ |
+| menu label | 콘텐츠/자료 | 콘텐츠/자료 |
+| DataTable | ❌ (ContentHubTemplate 정책) | ❌ |
+| renderItems | 기본 리스트 | 카드 그리드 (ContentLibraryPage) |
 
 ---
 
 ## 2. 기능 비교
 
-| 기능 | KPA | GlycoPharm | K-Cosmetics | 정렬 필요 |
-|------|-----|-----------|-------------|---------|
-| 데이터 소스 | `cmsApi` (kpa_contents 직접) | `hubContentApi(sourceDomain='cms')` | `hubContentApi` (ContentLibraryPage) | KPA 예외(§4 참조) |
-| ContentHubTemplate | ✅ | ✅ | ✅ (ContentLibraryPage) | 없음 |
-| checkbox/ActionBar/bulk | ❌ (의도적 단일 정책) | ❌ | ❌ | 없음 (정책) |
-| 단건 copy | ✅ `assetSnapshotApi.copy({ assetType:'cms' })` | ⚠️ `dashboardCopyApi.copyAsset()` | ⚠️ `dashboardCopyApi.copyAsset()` | **필요 (§5)** |
-| loadCopiedIds | ✅ `assetSnapshotApi.list({ type:'cms' })` | ⚠️ `dashboardCopyApi.getCopiedSourceIds()` | ⚠️ `dashboardCopyApi.getCopiedSourceIds()` | **필요 (§5)** |
-| 필터 탭 | 5개 (notice-news/guide/knowledge/promo-event) | 6개 (notice/guide/지식/promo/news) | (ContentLibraryPage 확인 필요) | B (레이블만) |
-| 검색 | ✅ | ✅ | ✅ | 없음 |
-| empty/loading/error | ✅ (ContentHubTemplate) | ✅ | ✅ | 없음 |
-| 내 매장 연결 afterCopy | `/store/content` | `/store-hub/content` ❌ | 미확인 | GlycoPharm fix 필요 |
-| navigate after copy | `/store/content` | `/hub/content/:id` ❌ (구 경로) | — | GlycoPharm fix 필요 |
-| hub 컨텍스트 유지 | ✅ | ✅ | ❌ (placeholder가 이탈) | K-Cosmetics fix 필요 |
+| 기능 | KPA | K-Cosmetics | 정렬 필요 |
+| ------ | ----- | ------------- | --------- |
+| 데이터 소스 | `cmsApi` (kpa_contents 직접) | `hubContentApi` (ContentLibraryPage) | KPA 예외(§4 참조) |
+| ContentHubTemplate | ✅ | ✅ (ContentLibraryPage) | 없음 |
+| checkbox/ActionBar/bulk | ❌ (의도적 단일 정책) | ❌ | 없음 (정책) |
+| 단건 copy | ✅ `assetSnapshotApi.copy({ assetType:'cms' })` | ⚠️ `dashboardCopyApi.copyAsset()` | **필요 (§5)** |
+| loadCopiedIds | ✅ `assetSnapshotApi.list({ type:'cms' })` | ⚠️ `dashboardCopyApi.getCopiedSourceIds()` | **필요 (§5)** |
+| 필터 탭 | 5개 (notice-news/guide/knowledge/promo-event) | (ContentLibraryPage 확인 필요) | B (레이블만) |
+| 검색 | ✅ | ✅ | 없음 |
+| empty/loading/error | ✅ (ContentHubTemplate) | ✅ | 없음 |
+| 내 매장 연결 afterCopy | `/store/content` | 미확인 | — |
+| navigate after copy | `/store/content` | — | — |
+| hub 컨텍스트 유지 | ✅ | ❌ (placeholder가 이탈) | K-Cosmetics fix 필요 |
 
 ---
 
@@ -84,9 +81,9 @@ ContentHubTemplate은 **의도적으로 DataTable/checkbox/ActionBar/bulk를 제
 
 **데이터 소스 차이:**
 - KPA는 `kpa_contents` 테이블 직접 접근 (`cmsApi`) — KPA만의 CMS 구조
-- GlycoPharm/K-Cosmetics는 `hubContentApi.list({ sourceDomain:'cms' })` 사용
+- K-Cosmetics는 `hubContentApi.list({ sourceDomain:'cms' })` 사용
 
-이 차이는 서비스별 데이터 경로 차이로, 공통 canonical API(`hubContentApi`)를 사용하는 GlycoPharm/K-Cosmetics 방식이 플랫폼 표준에 더 가깝다.
+이 차이는 서비스별 데이터 경로 차이로, 공통 canonical API(`hubContentApi`)를 사용하는 K-Cosmetics 방식이 플랫폼 표준에 더 가깝다.
 
 **복사 API가 진정한 canonical 기준:**
 - ✅ `assetSnapshotApi.copy({ assetType:'cms' })` → `o4o_asset_snapshots` (O4O Store Layer)
@@ -95,25 +92,6 @@ ContentHubTemplate은 **의도적으로 DataTable/checkbox/ActionBar/bulk를 제
 ---
 
 ## 5. 서비스별 drift 판정
-
-### 5.1 GlycoPharm — 판정: **B + C**
-
-```
-B: 레이블 미스매치 (필터명 한글/영문 혼용)
-C: 구조 drift 2건
-```
-
-**Drift 목록:**
-
-| 항목 | 현재 | 권장 | 우선순위 |
-|------|------|------|---------|
-| 복사 API | `dashboardCopyApi.copyAsset()` | `assetSnapshotApi.copy({ assetType:'cms' })` | 높음 |
-| loadCopiedIds | `dashboardCopyApi.getCopiedSourceIds()` | `assetSnapshotApi.list({ type:'cms' })` | 높음 |
-| afterCopy infoLinks | `/store-hub/content` (허브 루프) | `/store/content` (내 매장 목적지) | 중간 |
-| navigate after copy | `/hub/content/:id` (구 경로) | 제거 또는 `/store-hub/content/:id` | 낮음 |
-| renderItems | 커스텀 카드 그리드 | ContentHubTemplate 기본 또는 유지 | 선택 |
-
-**복사 API drift 영향:** `dashboardCopyApi`는 `/dashboard/assets/copy`로 저장한다. 이 경로가 현재 K-Cosmetics/GlycoPharm 내 매장(`/store/content`)에서 조회하는 `o4o_asset_snapshots`와 연결되지 않으면 복사 후 내 매장에서 표시 안 되는 버그 발생 가능.
 
 ### 5.2 K-Cosmetics — 판정: **C**
 
@@ -144,7 +122,7 @@ App.tsx L522:  Route path="content"          → HubContentPage (placeholder →
 | 내 매장 콘텐츠 | `/store/content` (KPA) | copy된 콘텐츠 관리 |
 | 내 자료함 | `/store/library/contents` 등 | 자료 관리 |
 
-KPA는 이 경계를 명확히 유지한다. GlycoPharm의 `infoLinks → /store-hub/content`(허브 루프)와 K-Cosmetics의 placeholder → `/library/content` 이탈은 이 경계를 약화시킨다.
+KPA는 이 경계를 명확히 유지한다.
 
 ---
 
@@ -164,30 +142,11 @@ WO-O4O-KCOS-STORE-HUB-CONTENT-PAGE-CANONICAL-ALIGNMENT-V1
 Backend: 변경 없음
 ```
 
-### 우선순위 2: GlycoPharm 복사 API 전환
-```
-WO-O4O-GLYCOPHARM-STORE-HUB-CONTENT-COPY-API-FIX-V1
-
-변경:
-- HubContentListPage.tsx
-  - dashboardCopyApi → assetSnapshotApi.copy({ assetType:'cms' })
-  - loadCopiedIds → assetSnapshotApi.list({ type:'cms' })
-  - infoLinks → /store/content (허브 루프 제거)
-  - navigate after copy: /hub/content/:id 제거
-
-선결 조건:
-- GlycoPharm /store/content (내 매장 콘텐츠) 페이지가 assetSnapshotApi 기반인지 확인
-- assetSnapshotApi.copy의 GlycoPharm serviceKey='glycopharm' 지원 여부 확인
-
-예상 우선순위: 중간 (기능은 작동 중, UX drift)
-```
-
 ### 우선순위 3 (선택): ContentHubTemplate 필터 레이블 정렬
 ```
 WO-O4O-CROSSSERVICE-STORE-HUB-CONTENT-PAGE-LABEL-ALIGNMENT-V1
 
 변경:
-- GlycoPharm: 필터 레이블 KPA와 통일 여부 검토 (서비스 차이 가능성 있음)
 - K-Cosmetics: 구현 후 레이블 결정
 
 우선순위: 낮음
@@ -200,12 +159,11 @@ WO-O4O-CROSSSERVICE-STORE-HUB-CONTENT-PAGE-LABEL-ALIGNMENT-V1
 ### ① Store HUB 콘텐츠 페이지가 탐색·가져가기 공간으로 기능하는가?
 
 - KPA: ✅ hub에서 단건 copy → 내 매장으로 연결
-- GlycoPharm: ⚠️ 기능은 동작하나 copy 후 허브 루프(/store-hub/content) — 내 매장 연결이 끊김
 - K-Cosmetics: ⚠️ placeholder → 이탈 → 실구현은 `/library/content`(비hub 경로)
 
 ### ② 콘텐츠/자료/내 자료함 경계 충돌 여부
 
-KPA는 경계가 명확하다. GlycoPharm의 infoLinks 루프와 K-Cosmetics의 경로 분리는 경계를 흐린다.
+KPA는 경계가 명확하다.
 
 ### ③ 서비스별 분기가 의미 있는 차이인가, 단순 복제 분기인가?
 
@@ -217,7 +175,7 @@ KPA는 경계가 명확하다. GlycoPharm의 infoLinks 루프와 K-Cosmetics의 
 
 ContentHubTemplate 구조는 이식 가능하다. 단, 데이터 소스는:
 - KPA의 `cmsApi`는 KPA-전용 → 다른 서비스에 직접 이식 불가
-- `hubContentApi(sourceDomain='cms')`가 플랫폼 표준 → GlycoPharm/K-Cosmetics 이미 사용 중 ✅
+- `hubContentApi(sourceDomain='cms')`가 플랫폼 표준 → K-Cosmetics 이미 사용 중 ✅
 
 복사 API 기준: `assetSnapshotApi.copy({ assetType:'cms' })` → canonical 경로.
 
@@ -230,12 +188,9 @@ ContentHubTemplate 구조는 이식 가능하다. 단, 데이터 소스는:
 ## 읽은 파일 (코드 변경 없음)
 
 - `services/web-kpa-society/src/pages/pharmacy/HubContentLibraryPage.tsx`
-- `services/web-glycopharm/src/pages/hub/HubContentListPage.tsx`
 - `services/web-k-cosmetics/src/pages/hub/HubContentPage.tsx`
 - `services/web-k-cosmetics/src/pages/library/ContentLibraryPage.tsx`
-- `services/web-glycopharm/src/api/dashboardCopy.ts`
 - `services/web-k-cosmetics/src/App.tsx` (route 구조)
-- `services/web-glycopharm/src/App.tsx` (route 구조)
 - `services/web-kpa-society/src/App.tsx` (route 구조)
 - `packages/shared-space-ui/src/ContentHubTemplate.tsx` (정책 확인)
 - `services/web-kpa-society/src/components/pharmacy/PharmacyHubLayout.tsx` (메뉴)

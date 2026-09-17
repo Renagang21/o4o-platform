@@ -16,22 +16,22 @@
 > 1. **법정정보(사업자정보) 저장·관리 구조 = 없음.** `Settings`(global key/value, 법정필드 없음) · `BusinessInfo`(per-USER 매장주, service-level 아님) · `organizations`(business_number/address/phone만, 상호·대표자·통신판매·개인정보책임자·호스팅 없음 + 편집 UI 없음). → **`ServiceLegalProfile`(serviceKey 기준) 신규 필요.**
 > 2. **약관/정책 문서 = 재사용 가능 모델 3종 존재.** ① KPA `kpa_legal_documents` + `LegalManagementPage`(draft/published, admin write·operator read, public published — **동작하는 UI까지 존재**, KPA-only) ② `cms-core` `CmsContent`(serviceKey + visibilityScope + status draft/pending/published + publishedAt/expiresAt — **요구 필드 거의 충족**) ③ Neture가 쓰는 `cms_pages`(global slug — 서비스 간 충돌 위험). → **KPA 모델을 cross-service 일반화하거나 `CmsContent` 채택. 신규 `ServicePolicyDocument` 테이블 생성 전 둘 중 재사용 우선 검토.**
 > 3. **Guide CMS(`guide_contents`) + `OperatorGuideContentsPage`는 4개 서비스 모두 존재** — per serviceKey/pageKey/sectionKey, operator 편집 UI 공통(`packages/operator-core-ui`). 단 version/published/draft 없음 → 법정문서엔 부적합, **Admin 설정 UI 패턴 참고용**으로 유용.
-> 4. **Admin 설정 UI 현황**: GP/KCos `SettingsPage` = **mock(저장 미연동)**. Neture `EmailSettingsPage`(admin) = live. KPA `LegalManagementPage`(operator) = live. → **신규 법정정보/약관 설정 UI는 KPA LegalManagementPage + Neture settings 패턴을 템플릿으로, `operator-core-ui` 공통화 권장.**
+> 4. **Admin 설정 UI 현황**: KCos `SettingsPage` = **mock(저장 미연동)**. Neture `EmailSettingsPage`(admin) = live. KPA `LegalManagementPage`(operator) = live. → **신규 법정정보/약관 설정 UI는 KPA LegalManagementPage + Neture settings 패턴을 템플릿으로, `operator-core-ui` 공통화 권장.**
 > 5. **권한**: `service-scope-guard` + `resolveOperatorScope()` 패턴 재사용 가능(service admin=자기 서비스, super_admin=`?serviceKey=`/`?all=` opt-in + audit). ⚠️ **KPA는 `platformBypass:false`** — super_admin이 기본적으로 KPA에 cross 불가. "super_admin 전체 수정" 설계 시 KPA 예외 고려 필요.
 > 6. **Audit**: 범용 `AuditLog`(`audit_logs`: entityType/action/changes JSONB/userId/reason) 재사용 — `entityType='service_legal_profile' | 'service_policy_document'`.
 > 7. **공개 렌더링**: 4개 서비스 CSR(Vite SPA), 푸터 client fetch 안전(Neture LegalPage 선례). **미설정 시 placeholder 절대 노출 금지 → 빈 표시 + operator 미설정 경고**.
 
-**권고 순서**: ① (긴급·안전) GP/KCos placeholder 법정정보 노출 차단 → ② 법정정보 실값 확정(사용자/법무) → ③ `ServiceLegalProfile` 신규 + policy 문서 모델 재사용 결정 → ④ Admin 설정 UI(공통) → ⑤ 공개 policy route + 동적 푸터.
+**권고 순서**: ① (긴급·안전) KCos placeholder 법정정보 노출 차단 → ② 법정정보 실값 확정(사용자/법무) → ③ `ServiceLegalProfile` 신규 + policy 문서 모델 재사용 결정 → ④ Admin 설정 UI(공통) → ⑤ 공개 policy route + 동적 푸터.
 
 ---
 
 ## 1. 조사 목적 / 2. 조사 범위
 
-선행 IR이 "푸터에 **무엇을** 표시해야 하는가"를 다뤘다면, 본 IR은 "그 정보를 **어디에 저장하고 Admin에서 어떻게 수정 가능하게** 할 것인가"를 조사한다. 범위: 4개 서비스(GlycoPharm/K-Cosmetics/KPA Society/Neture) frontend 푸터·정책 route·설정 UI + backend 설정/CMS/정책 entity·API + shared packages + RBAC/audit.
+선행 IR이 "푸터에 **무엇을** 표시해야 하는가"를 다뤘다면, 본 IR은 "그 정보를 **어디에 저장하고 Admin에서 어떻게 수정 가능하게** 할 것인가"를 조사한다. 범위: 4개 서비스 frontend 푸터·정책 route·설정 UI + backend 설정/CMS/정책 entity·API + shared packages + RBAC/audit.
 
 ## 3. 선행 IR 요약 (반영)
 
-GP/KCos 푸터 placeholder 법정정보 하드코딩(홍길동/000-00-00000/통신판매 placeholder) · KPA/Neture 실값(㈜쓰리라이프존 108-86-02873) · GP/KCos 약관·개인정보 route 부재 · KPA PolicyPage/PrivacyPage orphaned · Neture `/terms`·`/privacy` CMS 완비 · 통신판매중개 검토 필요 · 운영주체 불일치 · 공통 Footer 부재 · **법정정보 임의작성 금지** · 푸터 구현 전 설정 관리 구조 필요.
+KCos 푸터 placeholder 법정정보 하드코딩(홍길동/000-00-00000/통신판매 placeholder) · KPA/Neture 실값(㈜쓰리라이프존 108-86-02873) · KCos 약관·개인정보 route 부재 · KPA PolicyPage/PrivacyPage orphaned · Neture `/terms`·`/privacy` CMS 완비 · 통신판매중개 검토 필요 · 운영주체 불일치 · 공통 Footer 부재 · **법정정보 임의작성 금지** · 푸터 구현 전 설정 관리 구조 필요.
 
 ---
 
@@ -39,7 +39,6 @@ GP/KCos 푸터 placeholder 법정정보 하드코딩(홍길동/000-00-00000/통�
 
 | 서비스 | 푸터 파일 | `/terms` | `/privacy` | `/contact` | guide 진입 | Admin/Operator 설정 UI |
 |--------|----------|:---:|:---:|:---:|:---:|------|
-| GlycoPharm | `web-glycopharm/src/components/common/Footer.tsx` (placeholder) | ❌ | ❌ | ✅ | `/service-guide` | `/operator/settings` SettingsPage **(mock, 저장 미연동)** |
 | K-Cosmetics | `web-k-cosmetics/src/components/common/Footer.tsx` (placeholder) | ❌ | ❌ | ✅ | `/service-guide` | `/operator/settings` SettingsPage **(mock)** |
 | KPA Society | `web-kpa-society/src/components/Footer.tsx` (실값+placeholder) | ❌ route | ❌ route | ✅ | `/service-guide` | **`/operator/legal/documents` LegalManagementPage (live, terms/privacy)** + SettingsPage |
 | Neture | `web-neture/src/components/Footer.tsx` (실값, 최소) | ✅ CMS | ✅ CMS | ✅ | `/guide` | `/admin/settings/email` EmailSettingsPage (live, SMTP) |
@@ -76,7 +75,6 @@ GP/KCos 푸터 placeholder 법정정보 하드코딩(홍길동/000-00-00000/통�
 
 | 서비스 | 설정 페이지 | 상태 | 법정/약관 편집? |
 |--------|-----------|------|:---:|
-| GlycoPharm | `pages/operator/SettingsPage.tsx` | mock (저장 미연동, 데모 토글) | ❌ |
 | K-Cosmetics | `pages/operator/SettingsPage.tsx` | mock | ❌ |
 | Neture | `pages/admin/settings/EmailSettingsPage.tsx` | **live (SMTP)** | ❌ (인프라) |
 | KPA Society | `pages/operator/LegalManagementPage.tsx` | **live (terms/privacy)** | ✅ |
@@ -91,7 +89,7 @@ GP/KCos 푸터 placeholder 법정정보 하드코딩(홍길동/000-00-00000/통�
 
 ## 8. 서비스별 gaps
 
-| 항목 | GP | KCos | KPA | Neture |
+| 항목 | KCos | KPA | Neture |
 |---|:--:|:--:|:--:|:--:|
 | 푸터 법정정보 실값 | ❌ placeholder | ❌ placeholder | △ 일부 실값 | △ 최소 실값 |
 | `/terms`·`/privacy` route | ❌❌ | ❌❌ | ❌route(컴포넌트만) | ✅✅(CMS) |
@@ -115,7 +113,7 @@ GP/KCos 푸터 placeholder 법정정보 하드코딩(홍길동/000-00-00000/통�
 
 - **공통 컴포넌트**를 `packages/operator-core-ui`(GuideContentsConsolePage 선례)에 두고 4서비스 thin wrapper. 2개 탭: ①법정정보(ServiceLegalProfile 폼) ②정책 문서(목록+RichTextEditor, draft/published/시행일/버전).
 - KPA `LegalManagementPage`(동작 UI)를 정책 문서 탭의 베이스 템플릿으로, Neture `EmailSettingsPage`(live admin settings)를 폼 패턴 참고로.
-- GP/KCos의 mock SettingsPage에 메뉴 슬롯 연결.
+- KCos의 mock SettingsPage에 메뉴 슬롯 연결.
 
 ## 12. 공개 footer rendering 권고안
 
@@ -134,7 +132,7 @@ GP/KCos 푸터 placeholder 법정정보 하드코딩(홍길동/000-00-00000/통�
 
 | 단계 | WO(가칭) | 내용 | 선행 조건 |
 |:--:|---|---|---|
-| **0 (긴급·안전)** | `WO-O4O-GP-KCOS-FOOTER-PLACEHOLDER-LEGAL-INFO-SUPPRESSION-V1` | GP/KCos 푸터 placeholder 법정정보(홍길동/000-00-00000/통신판매 placeholder) 공개 노출 제거. **실값 임의작성 금지** — 미확인 항목은 숨김 | 없음 (즉시 가능) |
+| **0 (긴급·안전)** | `WO-O4O-GP-KCOS-FOOTER-PLACEHOLDER-LEGAL-INFO-SUPPRESSION-V1` | KCos 푸터 placeholder 법정정보(홍길동/000-00-00000/통신판매 placeholder) 공개 노출 제거. **실값 임의작성 금지** — 미확인 항목은 숨김 | 없음 (즉시 가능) |
 | 1 | `WO-O4O-SERVICE-LEGAL-POLICY-SETTINGS-BACKEND-V1` | ServiceLegalProfile 신규 + 정책문서 모델 재사용(CmsContent 우선) + public read/admin write API + AuditLog 연동 | 법정정보 실값 확정 |
 | 2 | `WO-O4O-ADMIN-SERVICE-LEGAL-POLICY-SETTINGS-UI-V1` | operator-core-ui 공통 설정 UI(법정정보+정책문서), draft/published/시행일/버전, 권한 경계 | 단계 1 |
 | 3 | `WO-O4O-CROSSSERVICE-POLICY-ROUTES-V1` | 4서비스 `/terms`·`/privacy`(필요시 `/policies/:slug`) 공개 route. KPA orphaned 정리 | 단계 1 |
@@ -160,7 +158,7 @@ GP/KCos 푸터 placeholder 법정정보 하드코딩(홍길동/000-00-00000/통�
 | 수정 파일 | 없음 (read-only IR) |
 | 생성 문서 | `docs/investigations/IR-O4O-SERVICE-LEGAL-POLICY-SETTINGS-MANAGEMENT-AUDIT-V1.md` (유일) |
 | 조사 기준 commit | `181d1892b` |
-| serviceKey (UI canonical) | `glycopharm` / `k-cosmetics` / `kpa-society` / `neture` |
+| serviceKey (UI canonical) | `k-cosmetics` / `kpa-society` / `neture` |
 | 법정정보 entity | **부재** (신규 ServiceLegalProfile 필요) |
 | 정책문서 재사용 후보 | CmsContent(cms-core) ★ / kpa_legal_documents ★ / cms_pages △ |
 | 권한 재사용 | service-scope-guard + resolveOperatorScope (KPA platformBypass=false 주의) |

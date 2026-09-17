@@ -1,7 +1,7 @@
 # IR-O4O-KPA-STORE-PRODUCT-MENU-AND-LOCAL-PRODUCT-IA-AUDIT-V1
 
 > 유형: 조사 (read-only) / 상태: 원인·구조 확정, 후속 WO 결정 대기
-> 작성일: 2026-06-26 / 범위: KPA (web-kpa-society), GP/KCos 는 영향 메모만
+> 작성일: 2026-06-26 / 범위: KPA (web-kpa-society), KCos 는 영향 메모만
 > 코드/route/DB 변경 없음
 
 ---
@@ -44,7 +44,7 @@
 판매 채널 확장 · 분석 · 설정
 ```
 
-> KPA 는 **자체 config 객체**(line 255~). GP/KCos 블록(line 93~, 195~)에도 my-products/local-products 가 있으나 **별도 블록**이라 KPA 블록 변경은 GP/KCos 무영향(Shared Module Protocol 상 안전). 단 `StoreLocalProductsPage`·`StoreProductsManagerPage`·`StoreTabletDisplaysPage` 컴포넌트/route/API 는 공유이므로 컴포넌트 수정 시 전 서비스 영향.
+> KPA 는 **자체 config 객체**(line 255~). KCos 블록(line 93~, 195~)에도 my-products/local-products 가 있으나 **별도 블록**이라 KPA 블록 변경은 KCos 무영향(Shared Module Protocol 상 안전). 단 `StoreLocalProductsPage`·`StoreProductsManagerPage`·`StoreTabletDisplaysPage` 컴포넌트/route/API 는 공유이므로 컴포넌트 수정 시 전 서비스 영향.
 
 ---
 
@@ -129,12 +129,12 @@ organization_product_listings ──┴→ product-pool(타블렛 진열 소스,
 
 | 변경 | 범위 | 위험 |
 |---|---|---|
-| 메뉴 그룹 재배치(타블렛 그룹의 제품 메뉴를 약국 상품·거래로, 타블렛 구성을 약국 경영지원으로) | `storeMenuConfig.ts` **KPA 블록만** | 낮음(라벨/위치) — route/page/API 불변, GP/KCos 무영향 |
+| 메뉴 그룹 재배치(타블렛 그룹의 제품 메뉴를 약국 상품·거래로, 타블렛 구성을 약국 경영지원으로) | `storeMenuConfig.ts` **KPA 블록만** | 낮음(라벨/위치) — route/page/API 불변, KCos 무영향 |
 | 라벨 정비("매장 취급제품" 등) | KPA 블록 | 낮음 |
 | **매장 취급제품 통합 뷰**(listings + local 합산 조회) | 신규 화면 + 조회 API | 중(두 소스 페이지네이션/정렬/노출플래그 상이) — 별도 설계 필요 |
 | 데이터 모델 물리 통합 | store-core | **높음(비권장)** — 의미·도메인(Commerce vs Display) 상이, F-레벨 영향 |
 
-**핵심 위험**: `StoreLocalProductsPage`/`StoreProductsManagerPage`/`StoreTabletDisplaysPage` 는 **공유 컴포넌트** → 컴포넌트 자체 수정은 GP/KCos 영향. **메뉴 재배치(config)는 KPA 블록 한정이라 안전.**
+**핵심 위험**: `StoreLocalProductsPage`/`StoreProductsManagerPage`/`StoreTabletDisplaysPage` 는 **공유 컴포넌트** → 컴포넌트 자체 수정은 KCos 영향. **메뉴 재배치(config)는 KPA 블록 한정이라 안전.**
 
 ---
 

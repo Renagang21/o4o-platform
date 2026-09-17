@@ -440,7 +440,7 @@ const BrandManagementPage = lazy(() =>
 );
 
 // WO-O4O-NETURE-DIGITAL-SIGNAGE-REMOVAL-V1: Neture 디지털사이니지 surface 제거
-// (signage operator console / store signage lazy imports + routes 제거). KPA/GP/KCos signage 는 유지.
+// (signage operator console / store signage lazy imports + routes 제거). KPA/KCos signage 는 유지.
 
 // Homepage CMS (WO-O4O-NETURE-HOMEPAGE-CMS-V1)
 const HomepageCmsPage = lazy(() => import('./pages/operator/HomepageCmsPage'));
@@ -551,7 +551,7 @@ function PostLoginRedirect() {
     // WO-O4O-CROSSSERVICE-PRODUCTION-RESIDUAL-404-AUTH-AND-LEGAL-CLEANUP-V1:
     //   LoginModal 이 returnUrl 로 이미 이동시켰으면 여기서 다시 보내지 않는다.
     //   아래 pathname 가드만으로는 부족하다 — 이 effect 가 modal 의 navigate 보다 먼저 돌면
-    //   pathname 이 아직 '/' 라 통과해 역할 대시보드로 덮어쓴다(GlycoPharm 4e62945ad 와 동일 레이스).
+    //   pathname 이 아직 '/' 라 통과해 역할 대시보드로 덮어쓴다.
     if (sessionStorage.getItem(LOGIN_EXPLICIT_NAV_KEY)) {
       sessionStorage.removeItem(LOGIN_EXPLICIT_NAV_KEY);
       didRedirectRef.current = true;

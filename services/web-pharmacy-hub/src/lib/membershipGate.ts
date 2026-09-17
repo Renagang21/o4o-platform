@@ -7,7 +7,7 @@
  * 이 파일은 Pharmacy-Hub SERVICE_KEY 를 바인딩해 re-export 만 한다.
  *
  * 서비스별 가입/승인 분리 원칙:
- *   다른 서비스(KPA / GlycoPharm / K-Cosmetics / Neture) 회원은 자동 편입되지 않는다.
+ *   다른 서비스(KPA / K-Cosmetics / Neture) 회원은 자동 편입되지 않는다.
  *   Pharmacy-Hub 멤버십이 없으면 status = 'none' → 접근 불가.
  */
 

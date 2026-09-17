@@ -112,7 +112,7 @@ external_channels 생성·seed → external_channel_id 컬럼 추가 → channel
 
 ### 4-1. Backend
 
-**mount**: `/api/v1/kpa/store-hub/external-sales` (KPA 한정 — GP/K-Cos 는 storefront 상태가 달라 범위 밖)
+**mount**: `/api/v1/kpa/store-hub/external-sales` (KPA 한정 — K-Cos 는 storefront 상태가 달라 범위 밖)
 
 | Method · Path | 역할 |
 |---|---|

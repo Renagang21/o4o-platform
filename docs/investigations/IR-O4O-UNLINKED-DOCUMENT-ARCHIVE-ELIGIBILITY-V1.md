@@ -73,7 +73,7 @@
 
 ## 3. 표본과 판정
 
-`docs/work-orders/README.md`(폴더 구조 문서)를 모집단에서 제외하고, 서비스·작업 유형이 편중되지 않도록 **32건**을 선정했다. (KPA·Neture·GlycoPharm·K-Cosmetics·admin·의약품/건기식 생산·태블릿·QR·포럼·회원 등)
+`docs/work-orders/README.md`(폴더 구조 문서)를 모집단에서 제외하고, 서비스·작업 유형이 편중되지 않도록 **32건**을 선정했다. (KPA·Neture·K-Cosmetics·admin·의약품/건기식 생산·태블릿·QR·포럼·회원 등)
 
 판정 분포:
 

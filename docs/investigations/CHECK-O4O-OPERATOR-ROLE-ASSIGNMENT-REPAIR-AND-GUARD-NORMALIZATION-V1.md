@@ -58,7 +58,6 @@ if (assignment) {
 | neture-operator@o4o.com | b0000000-...-000005 | `neture:operator` | 200 | true ✅ |
 | kcos-operator@o4o.com | b0000000-...-000007 | `cosmetics:operator` | 200 | true ✅ |
 | kcos-admin@o4o.com | b0000000-...-000006 | `cosmetics:admin` | 200 | true ✅ |
-| glyco-operator@o4o.com | b0000000-...-000008 | `glycopharm:operator` | 200 | true ✅ |
 
 각 응답에서 `assignment.id` 값 확인 → 기존 inactive row 와 동일 ID 가 reactivation 으로 갱신됨 (INSERT 가 아닌 UPDATE 경로 사용).
 
@@ -68,7 +67,6 @@ if (assignment) {
 neture-operator@o4o.com  → roles=["neture:operator"]      | YES
 kcos-operator@o4o.com    → roles=["cosmetics:operator"]   | YES
 kcos-admin@o4o.com       → roles=["cosmetics:admin"]      | YES
-glyco-operator@o4o.com   → roles=["glycopharm:operator"]  | YES
 ```
 
 → JWT 발급 경로 (`roleAssignmentService.getRoleNames()` → token payload) 가 RA active 상태 변화를 즉시 반영. F9 SSOT 의 Read path 정합.

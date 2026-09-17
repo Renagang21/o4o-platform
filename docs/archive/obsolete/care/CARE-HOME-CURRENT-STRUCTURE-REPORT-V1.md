@@ -2,7 +2,7 @@
 
 > **WO-CARE-HOME-CURRENT-STATE-INVESTIGATION-V1**
 > 작성일: 2026-02-20 (갱신)
-> 대상: https://glycopharm.co.kr/ (pharmacy 역할 로그인 시 홈 화면)
+> 대상: (pharmacy 역할 로그인 시 홈 화면)
 > 상태: 현 개발 상태 전수 조사 (수정 제안 없음)
 
 ---
@@ -17,7 +17,6 @@ BrowserRouter
             └── AppRoutes
                 └── MainLayout
                     ├── Header (sticky top-0)
-                    │   ├── 로고: GlycoPharm (혈당관리 전문 플랫폼)
                     │   ├── Desktop Nav: 홈 | 포럼 | 교육/자료 | 참여 신청 | 디지털 사이니지 | [약국 관리]
                     │   └── User Menu 드롭다운: 사용자명/이메일 | 마이페이지 | [약국 관리] | 로그아웃
                     │
@@ -31,7 +30,6 @@ BrowserRouter
 ### 렌더링 경로
 
 ```
-URL: https://glycopharm.co.kr/
 → App.tsx line 252: <Route index element={<RoleBasedHome />} />
   → RoleBasedHome (line 205-229)
     → user.roles[0] === 'pharmacy' → <CareDashboardPage />
@@ -40,8 +38,6 @@ URL: https://glycopharm.co.kr/
 
 - **lazy loading**: `lazy(() => import('@/pages/care').then(m => ({ default: m.CareDashboardPage })))`
 - **보호**: RoleBasedHome 내부 역할 분기 (별도 ProtectedRoute 없음)
-
-**파일**: `services/web-glycopharm/src/App.tsx` (499줄)
 
 ---
 
@@ -102,7 +98,7 @@ loadData() [useCallback, dep: debouncedSearch]
 ├── setLoading(true), setError(null)
 ├── Promise.all([
 │   ├── pharmacyApi.getCustomers({ search, pageSize: 100 })
-│   │   → GET /api/v1/glycopharm/pharmacy/customers
+│   │   → GET /api/v1/pharmacy/customers
 │   │   → StoreApiResponse<StorePaginatedResponse<PharmacyCustomer>>
 │   │
 │   └── pharmacyApi.getCareDashboardSummary().catch(() => null)
@@ -141,7 +137,7 @@ loadData() [useCallback, dep: debouncedSearch]
 }
 ```
 
-**PharmacyCustomer** (`GET /api/v1/glycopharm/pharmacy/customers`):
+**PharmacyCustomer**
 
 ```typescript
 {
@@ -307,15 +303,6 @@ div.min-h-screen.flex.flex-col.bg-slate-50
 ## 부록: 핵심 파일 목록
 
 ### 프론트엔드
-
-| 파일 | 줄수 | 역할 |
-|------|------|------|
-| `services/web-glycopharm/src/pages/care/CareDashboardPage.tsx` | 315 | Care Home 전체 |
-| `services/web-glycopharm/src/pages/care/index.ts` | 6 | Barrel export |
-| `services/web-glycopharm/src/App.tsx` | 499 | 라우트, RoleBasedHome |
-| `services/web-glycopharm/src/components/layouts/MainLayout.tsx` | 15 | 상위 Layout |
-| `services/web-glycopharm/src/components/common/Header.tsx` | 341 | 공용 Header |
-| `services/web-glycopharm/src/api/pharmacy.ts` | 526 | API 클라이언트 |
 
 ### 백엔드
 

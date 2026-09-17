@@ -138,7 +138,7 @@ IR §7의 경계 가설이 맞았다. Neture 구조는 이미 두 단계로 분�
 5. 운영자 승인 UX 문제 — §4-D, §4-E
 6. 수정 필요 여부 판단 — 필요(프론트+백엔드)
 7. 수정 WO 제안 — `WO-O4O-NETURE-SUPPLIER-SIGNUP-REQUIRED-FIELDS-GATE-V1`
-8. 영향 범위 — Neture supplier 가입만. KPA/GlycoPharm/K-Cosmetics 무관(§6.1 controller 분기)
+8. 영향 범위 — Neture supplier 가입만.
 9. 테스트 시나리오 — 후속 WO §9
 
 ---

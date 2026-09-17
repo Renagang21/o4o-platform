@@ -62,7 +62,7 @@ IR-O4O-PRODUCT-CONTENT-RESOURCE-ARCHITECTURE-V1 의 Product Content Resource 를
 | **Tablet 본문** | `kpa_store_contents` / [kpa-store-content.entity.ts:39](../../apps/api-server/src/routes/kpa/entities/kpa-store-content.entity.ts) | organization_id | 링크로 부가보존만 | workspace_status+share_status |
 | **Tablet 진열/링크** | `store_tablet_displays` / `kpa_store_content_product_links`(**master_id nullable 부가보존**) | tablet/org | 부가 | is_visible |
 | **Signage** | `signage_forced_content` (**엔티티 없음, raw SQL** [migration 20260418100000:14](../../apps/api-server/src/database/migrations/20260418100000-CreateSignageForcedContent.ts)) · 확장 `pharmacy_contents` | **service_key** / organizationId | ❌ | is_active+기간 |
-| **Blog 게시** | `store_blog_posts` / [store-blog-post.entity.ts](../../apps/api-server/src/routes/glycopharm/entities/store-blog-post.entity.ts) | store_id+service_key | ❌ | status |
+| **Blog 게시** | `store_blog_posts` / [store-blog-post.entity.ts](../../apps/api-server/src/modules/store/entities/store-blog-post.entity.ts) | store_id+service_key | ❌ | status |
 | **Blog/콘텐츠 허브** | `kpa_contents` / [kpa-content.entity.ts:39](../../apps/api-server/src/routes/kpa/entities/kpa-content.entity.ts) | created_by+reusable_policy | ❌ | status(draft/ready)+reusable_policy |
 | **Video** | `store_videos` / [store-video.entity.ts:46](../../apps/api-server/src/routes/o4o-store/entities/store-video.entity.ts) | store_id+service_key | ❌ | status. `video_url`=외부(YouTube/Vimeo), O4O 자체저장 없음 |
 | **QR 매장** | `store_qr_codes` / [store-qr-code.entity.ts:23](../../apps/api-server/src/routes/platform/entities/store-qr-code.entity.ts) | **organization_id** | ❌ (landing_target_id 참조) | is_active, slug global unique |

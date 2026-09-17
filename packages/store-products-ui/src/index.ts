@@ -6,9 +6,8 @@
  * 매장 경영자(*:store_owner)가 사용하는 매장 상품 관리 UI 패키지.
  * Backend: /api/v1/store/products (createStoreProductLibraryController)
  *
- * 본 패키지는 다음 3개의 서비스 웹앱에서 동일하게 사용된다(다음 Phase):
+ * 본 패키지는 다음 2개의 서비스 웹앱에서 동일하게 사용된다(다음 Phase):
  *  - services/web-kpa-society
- *  - services/web-glycopharm
  *  - services/web-k-cosmetics
  *
  * Phase A 산출물 — 공통화만 수행, 라우팅 적용은 후속 Phase에서.

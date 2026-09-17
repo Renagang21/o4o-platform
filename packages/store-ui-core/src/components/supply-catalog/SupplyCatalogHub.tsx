@@ -7,7 +7,7 @@
  *   값과 route(`/store-hub/b2b`)는 변경하지 않는다(legacy 식별자 유지).
  *
  * WO-O4O-STORE-HUB-B2B-CATALOG-GP-KCOS-COMMON-COMPONENT-EXTRACTION-V1 (extraction origin)
- *   GlycoPharm `HubB2BCatalogPage` / K-Cosmetics `HubB2BPage` (near-identical 370/371줄)을 통합.
+ *   K-Cosmetics `HubB2BPage` 등 near-identical 사본(370/371줄)을 통합.
  *   서비스 차이(api client · accent 색 · tableId · supplier 라벨 · 채널 관리 링크 유무)만 props 로 주입,
  *   나머지 구조(유통유형 탭 · DataTable · checkbox multi-select · ActionBar bulk 추가 · 단건 추가/제외
  *   · Pagination · empty/loading/error · 안내 박스)는 공통.
@@ -16,7 +16,6 @@
  *   - "내 매장에 추가" = 공급 상품 신청 (`api.applyBySupplyProductId` → ProductApproval(PENDING)).
  *     신청 ≠ 주문. 신청 버튼은 어떤 경우에도 주문을 만들지 않는다.
  *
- * WO-O4O-GLYCOPHARM-CANONICAL-B2B-CART-PRODUCER-UI-ADOPTION-V1:
  *   `cart` prop 이 주어진 서비스에 한해 **opt-in** 으로 canonical B2B 장바구니 producer
  *   (행 단위 · 선택 일괄)를 추가한다. prop 미지정이면 렌더 트리·액션·문구가 종전과 완전히 동일하므로
  *   KPA-Society / K-Cosmetics 화면은 영향을 받지 않는다.
@@ -77,9 +76,9 @@ export interface SupplyCatalogApi<T extends SupplyCatalogProduct> {
 export type SupplyCatalogAccent = 'teal' | 'pink' | 'blue';
 
 export interface SupplyCatalogHubLabels {
-  /** 공급자 컬럼 헤더. GP '공급자' · KCos '공급사'. 기본 '공급자'. */
+  /** 공급자 컬럼 헤더. KCos '공급사'. 기본 '공급자'. */
   supplierLabel?: string;
-  /** 채널 관리 링크 href. 있으면 안내문에 링크 렌더, 없으면 plain text. GP '/store/channels' · KCos 미지정. */
+  /** 채널 관리 링크 href. 있으면 안내문에 링크 렌더, 없으면 plain text. KCos 미지정. */
   channelManageHref?: string;
   /** 채널 관리 링크 라벨. 기본 '채널 관리' · KPA '판매 설정'. */
   channelManageLabel?: string;

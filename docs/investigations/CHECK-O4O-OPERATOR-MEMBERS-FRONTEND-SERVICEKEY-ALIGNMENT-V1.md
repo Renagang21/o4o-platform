@@ -2,13 +2,13 @@
 
 > **검증 보고서 (Verification Report)** — 프로덕션 환경 배포 + frontend code 정합 + Rena browser 검증 요청.
 >
-> `WO-O4O-OPERATOR-MEMBERS-FRONTEND-SERVICEKEY-ALIGNMENT-V1` (commit `62947e915`) 적용 후 3 service (GP / KPA / K-Cosmetics) 의 `/operator/members*` 호출에 serviceKey 가 정확히 명시되는지 검증.
+> `WO-O4O-OPERATOR-MEMBERS-FRONTEND-SERVICEKEY-ALIGNMENT-V1` (commit `62947e915`) 적용 후 2 service (KPA / K-Cosmetics) 의 `/operator/members*` 호출에 serviceKey 가 정확히 명시되는지 검증.
 
 - **검증일:** 2026-05-24
 - **분류:** Verification Result (배포 + code review + browser-side 보류)
 - **대상 환경:** Production (`https://api.neture.co.kr` + 3 service `.co.kr/site` web)
 - **검증 대상 WO:** `WO-O4O-OPERATOR-MEMBERS-FRONTEND-SERVICEKEY-ALIGNMENT-V1` (commit `62947e915`)
-- **선행 IR:** [IR-O4O-GLYCOPHARM-OPERATOR-USERS-400-AUDIT-V1](IR-O4O-GLYCOPHARM-OPERATOR-USERS-400-AUDIT-V1.md)
+- **선행 IR:** 
 
 ---
 
@@ -34,7 +34,7 @@
 | 본 WO commit | `62947e915` |
 | 배포 시각 | 2026-05-24T01:48Z UTC |
 | Deploy workflow | Run `26348849253` ✓ Complete |
-| 신규 revisions | glycopharm-web-00706-z4n / kpa-society-web-01125-b2x / k-cosmetics-web-00510-fwq |
+| 신규 revisions | — |
 
 ---
 
@@ -42,7 +42,6 @@
 
 | 파일 | 변경 라인 | 변경 위치 |
 |---|---|---|
-| `services/web-glycopharm/src/pages/operator/UsersPage.tsx` | +7 / -2 | fetchUsers + fetchStats + role count (3 곳) |
 | `services/web-kpa-society/src/pages/operator/UsersPage.tsx` | +6 / -1 | fetchUsers + fetchStats (2 곳, KPA 는 role count 호출 없음) |
 | `services/web-k-cosmetics/src/pages/operator/UsersPage.tsx` | +7 / -2 | fetchUsers + fetchStats + role count (3 곳) |
 | **합계** | **+20 / -5** | **3 파일** |
@@ -55,7 +54,6 @@
 
 | Service | serviceKey 값 | 코드 패턴 |
 |---|---|---|
-| GlycoPharm | `glycopharm` | `params.set('serviceKey', 'glycopharm')` + `?serviceKey=glycopharm` (stats / role count 직접 URL) |
 | KPA Society | `kpa-society` | `params.set('serviceKey', 'kpa-society')` + `?serviceKey=kpa-society` (stats) |
 | K-Cosmetics | `k-cosmetics` | `params.set('serviceKey', 'k-cosmetics')` + `?serviceKey=k-cosmetics` (stats / role count) |
 
@@ -65,11 +63,11 @@ Neture 의 정렬 패턴 ([services/web-neture/src/pages/operator/UsersManagemen
 
 ## 4. 호출별 정렬 여부
 
-| 호출 | GlycoPharm | KPA | K-Cosmetics |
-|---|:---:|:---:|:---:|
-| `fetchUsers()` → `GET /operator/members?page&limit&[status]&[search]` | ✅ serviceKey 추가 | ✅ serviceKey 추가 | ✅ serviceKey 추가 |
-| `fetchStats()` → `GET /operator/members/stats` | ✅ `?serviceKey=glycopharm` | ✅ `?serviceKey=kpa-society` | ✅ `?serviceKey=k-cosmetics` |
-| Role count → `GET /operator/members?limit=1000` | ✅ `&serviceKey=glycopharm` | ⏭ N/A (KPA 미존재) | ✅ `&serviceKey=k-cosmetics` |
+| 호출 | KPA | K-Cosmetics |
+|---|:---:|:---:|
+| `fetchUsers()` → `GET /operator/members?page&limit&[status]&[search]` | ✅ serviceKey 추가 | ✅ serviceKey 추가 |
+| `fetchStats()` → `GET /operator/members/stats` | ✅ `?serviceKey=kpa-society` | ✅ `?serviceKey=k-cosmetics` |
+| Role count → `GET /operator/members?limit=1000` | ⏭ N/A (KPA 미존재) | ✅ `&serviceKey=k-cosmetics` |
 
 → 3 service 모두 모든 회원 목록/통계 호출에 serviceKey 명시 완료.
 
@@ -77,14 +75,10 @@ Neture 의 정렬 패턴 ([services/web-neture/src/pages/operator/UsersManagemen
 
 ## 5. 항목별 검증 결과
 
-### A. GlycoPharm /operator/users — ⏳ Rena 1 회 확인
+### A. operator/users — ⏳ Rena 1 회 확인
 
 **예상 동작 (코드/배포 기준):**
 - platform admin 계정 (sohae2100, super_admin) 접속 → 회원 목록 200 OK (이전 400 해소)
-- 네트워크 탭에서 호출 URL 에 `serviceKey=glycopharm` 포함
-- API: `https://api.neture.co.kr/api/v1/operator/members?page=1&limit=20&serviceKey=glycopharm`
-
-**확인 방법:** `https://glycopharm.co.kr/operator/users` 접속 후 회원 목록 정상 로드 + DevTools Network 에서 `serviceKey=glycopharm` 확인.
 
 ### B. KPA Society 운영자 회원 관리 — ⏳ Rena 1 회 확인
 
@@ -142,7 +136,7 @@ Rena 가 3 service 의 `/operator/users` 화면 진입 시 400 해소 + serviceK
 같은 endpoint 그룹의 다른 operator 화면 (Products / Stores / Roles / Analytics) 의 4 service frontend 가 동일 drift 인지 일괄 audit. 본 WO 는 `/operator/members` 1 endpoint 만 처리.
 
 판단 기준 (잠재 drift):
-- KPA / GP / K-Cosmetics 의 `/operator/*` 페이지 중 `useEffect` 안에서 `apiFetch('/api/v1/operator/...')` 호출 + serviceKey 미명시 → platform admin 접속 시 400 가능
+- KPA / K-Cosmetics 의 `/operator/*` 페이지 중 `useEffect` 안에서 `apiFetch('/api/v1/operator/...')` 호출 + serviceKey 미명시 → platform admin 접속 시 400 가능
 - Neture 의 동등 페이지가 serviceKey 명시 → 비교 기준
 
 본 CHECK 의 범위 외이므로 별건 IR 진행 권고.
@@ -153,7 +147,7 @@ Rena 가 3 service 의 `/operator/users` 화면 진입 시 400 해소 + serviceK
 
 | 항목 | 필수 | 결과 |
 |---|:---:|:---:|
-| A. GlycoPharm /operator/users browser 검증 | ★ | ⏳ Rena |
+| A. operator/users browser 검증 | ★ | ⏳ Rena |
 | B. KPA Society browser 검증 | ★ | ⏳ Rena |
 | C. K-Cosmetics browser 검증 | ★ | ⏳ Rena |
 | D. Neture 회귀 | △ | ✅ 무변경 |
@@ -179,7 +173,6 @@ Rena 가 3 service 의 `/operator/users` 화면 진입 시 400 해소 + serviceK
 
 ```bash
 # Cloud Run revisions 배포 확인
-for SVC in glycopharm-web kpa-society-web k-cosmetics-web; do
   echo "=== $SVC ==="
   gcloud run revisions list --service $SVC \
     --region asia-northeast3 --project netureyoutube \
@@ -190,8 +183,6 @@ done
 git show --stat 62947e915
 
 # (Rena) Browser DevTools 에서 호출 URL 확인
-# https://glycopharm.co.kr/operator/users → Network tab → /operator/members 요청에
-#   ?page=1&limit=20&serviceKey=glycopharm 포함 확인
 ```
 
 ---

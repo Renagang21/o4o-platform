@@ -14,7 +14,7 @@
 | `apps/api-server/src/routes/neture/controllers/neture-b2b-payment.controller.ts` | prepare/confirm 에 `paymentGroupId` 분기(단일 orderId XOR group). group 검증·amount 합산·PaymentCore.prepare(orderId=paymentGroupId) |
 | `apps/api-server/src/services/neture/NetureB2bCheckoutPaymentEventHandler.ts` | `payment.completed.orderId` 를 단일/group dispatch → `transitionAndBridge` 헬퍼로 N건 paid 전이 + order별 bridge. failed 도 group 지원 |
 
-> DB/migration **무변경**(metadata 기반). PaymentCore·bridge·정산·KPA/Glyco/KCos·web-neture **무변경**.
+> DB/migration **무변경**(metadata 기반).
 
 ## 2. 흐름 (다중 공급자 1회 결제)
 ```
@@ -56,7 +56,6 @@ payment(prepare 저장): `{ paymentGroupId, checkoutOrderIds, orderCount, groupT
 - **positive group 결제 — DEFERRED**: 유효 Toss 결제 + 다중 공급자 B2B cart seed 필요(frontend/위젯 부재). P2d-1(위젯)/P2d-2(cutover) 동반 실측. 전이/bridge 로직은 P2b/P2c 와 동일 패턴(검증됨) + 핸들러 group dispatch 코드 검증.
 
 ## 8. 회귀 무영향
-- 단일 order payment(P2b)·bridge(P2c)·checkout-confirm-b2b(P2a, 응답에 group 필드 추가 — 기존 필드 보존)·KPA/Glyco/KCos·정산·web-neture 무변경.
 
 ## 9. 완료 기준 체크 (WO §16)
 1(paymentGroupId 발급) ✅. 2(order metadata.paymentGroupId) ✅. 3(응답 paymentGroupId/groupTotalAmount) ✅. 4(prepare group 조회·검증) ✅. 5(amount=Σtotal) ✅. 6(prepare orderId=paymentGroupId) ✅. 7(confirm→payment.completed handler) ✅. 8(N건 paid 전이) ✅. 9(각 order bridge) ✅. 10(collectionStatus 미사용) ✅. 11(단일 order flow 유지) ✅. 12(tsc 0) ✅. 13(graceful smoke §10) ✅(positive deferred). 14(CHECK) ✅. 15(path-specific) ✅. 16(다른 세션 무접촉) ✅.

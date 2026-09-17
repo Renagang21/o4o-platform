@@ -6,7 +6,7 @@
  *   각 서비스가 axes 배열을 구성하여 주입하는 방식으로 서비스-독립 렌더링.
  *
  * KPA: extData 기반 실시간 metrics 포함
- * GP / K-Cos: 초기에는 links-only (metrics 확장은 향후 WO)
+ * K-Cos: 초기에는 links-only (metrics 확장은 향후 WO)
  *
  * WO-O4O-SERVICE-OPERATOR-WORKSPACE-REALIGNMENT-V1:
  *   표준 Service Operator 는 3축(서비스 운영 / 사업 운영 / 운영 관리)으로 주입한다 — 축 수는 데이터가 정한다.

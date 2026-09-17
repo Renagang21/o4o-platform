@@ -28,12 +28,11 @@
 
 ### 1-3. SERVICE 승인은 정식 route 로 대체 완료
 
-`IR-O4O-PRODUCT-APPROVAL-OPERATOR-SURFACE-AUDIT-V1`(2026-06-13)은 "GP/K-Cos 의 PENDING 승인 **유일 경로**가 이 internal router" 라고 기록했다. 그러나 **바로 다음날** `WO-O4O-PRODUCT-APPROVAL-OPERATOR-SURFACE-ENABLE-GP-KCOS-V1`(2026-06-14 · `677a9e61c` → `71f280860`)로 대체됐다.
+`IR-O4O-PRODUCT-APPROVAL-OPERATOR-SURFACE-AUDIT-V1`(2026-06-13)은 "K-Cos 의 PENDING 승인 **유일 경로**가 이 internal router" 라고 기록했다. 그러나 **바로 다음날** `WO-O4O-PRODUCT-APPROVAL-OPERATOR-SURFACE-ENABLE-GP-KCOS-V1`(2026-06-14 · `677a9e61c` → `71f280860`)로 대체됐다.
 
 | 서비스 | 정식 route | 가드 |
 |--------|-----------|------|
 | KPA | `/api/v1/kpa/operator/product-applications` | `requireAuth` + `kpa:operator` + ActionLog |
-| GlycoPharm | `/api/v1/glycopharm/operator/product-applications` | `requireAuth` + `glycopharm:operator` + ActionLog |
 | K-Cosmetics | `/api/v1/cosmetics/operator/product-applications` | `requireAuth` + `cosmetics:operator` + ActionLog |
 
 셋 다 동일한 `ProductApprovalV2Service.approveServiceProduct()` 를 호출한다. **IR 은 stale 이며 본 커밋에서 SUPERSEDED 주석을 달았다.**
@@ -79,7 +78,7 @@ secret 비교는 타이밍 비교 취약점(`===`)이 있으나, 값 자체를 �
 
 `ADMIN_INTERNAL_SECRET` 을 신설했다면 새 비밀정보를 발급·배포·회전 관리해야 했고, 이는 WO 중지 조건(「별도의 비밀정보 발급·외부 조정이 필요함」)에 걸린다. **제거는 그 조건 자체를 소멸시킨다.**
 
-**유지한 것:** `ProductApprovalV2Service`(590줄) — `admin.controller` · `seller.controller` · KPA/GP/KCos operator controller · `pharmacy-products.controller` 가 실사용한다. **서비스 레이어는 손대지 않았다.**
+**유지한 것:** `ProductApprovalV1Service`(590줄) — `admin.controller` · `seller.controller` · KPA/KCos operator controller · `pharmacy-products.controller` 가 실사용한다. **서비스 레이어는 손대지 않았다.**
 
 ---
 

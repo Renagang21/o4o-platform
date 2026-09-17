@@ -52,11 +52,11 @@ export const CANONICAL_SCHEMA_BASELINE_META = {
 
   /**
    * Retired objects that MUST NOT appear in the snapshot (verified 0 at generation).
-   * user_roles · organization_units · organization_roles · glycopharm_* · cms legacy (acf/cpt/menus/…)
+   * user_roles · organization_units · organization_roles · cms legacy (acf/cpt/menus/…)
    * · custom_fields · custom_media · custom_post_types · custom_posts.
    */
   retiredObjectPatterns: [
-    /^user_roles$/, /^organization_units$/, /^organization_roles$/, /^glycopharm_/,
+    /^user_roles$/, /^organization_units$/, /^organization_roles$/,
     /^cms_acf_/, /^cms_cpt_/, /^cms_menus$/, /^cms_menu_items$/, /^cms_menu_locations$/, /^cms_settings$/,
     /^cms_templates$/, /^cms_template_parts$/, /^cms_views$/, /^cms_pages$/, /^cms_fields$/,
     /^custom_fields$/, /^custom_media$/, /^custom_post_types$/, /^custom_posts$/,

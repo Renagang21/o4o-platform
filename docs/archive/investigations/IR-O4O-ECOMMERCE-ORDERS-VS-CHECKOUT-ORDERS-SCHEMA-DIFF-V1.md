@@ -21,7 +21,7 @@
 
 ### 핵심 결론 한 줄
 
-> canonical `checkout_orders` 가 cross-service KPI 영역에서 이미 작동 중 (KPA event-offer + KPA checkout)이며, GlycoPharm / K-Cosmetics / Platform Admin 의 raw SQL 7 파일도 **`jsonb_array_elements(co.items)` 패턴 + `metadata->>'serviceKey'` 필터 + `status = 'paid'` 양성 predicate** 로 ~88% 재작성 가능. 단, `status != 'cancelled'` 단순 치환은 REFUNDED 포함 의미 변경 위험 + `store_id`/`sellerOrganizationId` 매핑 정책 결정 + 일부 item-level 정보 (sku/options) 정합 결정이 선행 필요.
+> canonical `checkout_orders` 가 cross-service KPI 영역에서 이미 작동 중 (KPA event-offer + KPA checkout)이며, K-Cosmetics / Platform Admin 의 raw SQL 7 파일도 **`jsonb_array_elements(co.items)` 패턴 + `metadata->>'serviceKey'` 필터 + `status = 'paid'` 양성 predicate** 로 ~88% 재작성 가능. 단, `status != 'cancelled'` 단순 치환은 REFUNDED 포함 의미 변경 위험 + `store_id`/`sellerOrganizationId` 매핑 정책 결정 + 일부 item-level 정보 (sku/options) 정합 결정이 선행 필요.
 
 ---
 
@@ -44,7 +44,7 @@
 |---|---|---|---|
 | `id` (UUID) | `id` (UUID) | EXACT | |
 | `"orderNumber"` (varchar) | `orderNumber` (varchar50) | EXACT | |
-| `"sellerId"` (UUID/string) | `sellerId` (varchar100) | EXACT | KPA payment hook 이 동일 매핑 사용 ([GlycopharmPaymentEventHandler.ts:229](apps/api-server/src/services/glycopharm/GlycopharmPaymentEventHandler.ts#L229)) |
+| `"sellerId"` (UUID/string) | `sellerId` (varchar100) | EXACT | — |
 | `"totalAmount"` (decimal) | `totalAmount` (decimal12,2) | EXACT | |
 | `status` (enum 10 values) | `status` (enum 5 values) | **SEMANTIC_DIFFERENT** | §4 status enum 비교 참조 |
 | (none) | `paymentStatus` (enum 4) | MISSING_IN_LEGACY | canonical 가 order.status 와 payment.status 분리 — info gain |
@@ -92,7 +92,7 @@
 | `channel` | cosmetics-store-summary.service:68, 125 | **HIGH** | `metadata->>'channel'` 로 마이그레이션 (양 모델 모두 metadata jsonb 보유) |
 | `ecommerce_order_items.sku` | 직접 query 없음 (audit 기능에 필요) | MEDIUM | KPI 영역엔 비차단. inventory 정합 작업 시 추가. |
 | `ecommerce_order_items.options` | 동일 | MEDIUM | KPI 영역 비차단 |
-| `metadata->>'serviceKey'` 일관 주입 | 모든 file | **CRITICAL** | canonical `checkout_orders` 생성 시점에 metadata.serviceKey **반드시 주입** — 본 IR 시점 KPA 영역만 보장. GlycoPharm / K-Cosmetics 의 신규 주문 생성 경로 검증 필요. |
+| `metadata->>'serviceKey'` 일관 주입 | 모든 file | **CRITICAL** | canonical `checkout_orders` 생성 시점에 metadata.serviceKey **반드시 주입** — 본 IR 시점 KPA 영역만 보장. K-Cosmetics 의 신규 주문 생성 경로 검증 필요. |
 
 ---
 
@@ -165,7 +165,6 @@ WHERE service_key = 'cosmetics' AND status IN ('pending', 'processing')
 
 ### 4-5. FOR UPDATE locking — 결제 트랜잭션 영역
 
-[glycopharm checkout.controller.ts:487-495](apps/api-server/src/routes/glycopharm/controllers/checkout.controller.ts#L487-L495) (legacy):
 ```sql
 SELECT SUM(oi.quantity)::int
 FROM ecommerce_order_items oi
@@ -211,14 +210,12 @@ FOR UPDATE OF co
 
 ### 5-1. `getTopProducts` 류 검증
 
-GlycoPharm + Cosmetics 의 `getTopProducts` ([glycopharm-store-data.adapter.ts:83-108](apps/api-server/src/routes/glycopharm/services/glycopharm-store-data.adapter.ts#L83-L108)):
 ```sql
 SELECT oi."productId", oi."productName",
        SUM(oi.quantity)::int as quantity,
        SUM(oi.subtotal)::numeric as revenue
 FROM ecommerce_order_items oi
 INNER JOIN ecommerce_orders o ON o.id = oi."orderId"
-WHERE o.store_id = $1 AND o.metadata->>'serviceKey' = 'glycopharm'
   AND o."createdAt" >= $2 AND o.status != 'cancelled'
 GROUP BY oi."productId", oi."productName"
 ORDER BY revenue DESC LIMIT $3
@@ -233,7 +230,6 @@ SELECT item->>'productId' AS "productId",
 FROM checkout_orders co
 CROSS JOIN jsonb_array_elements(co.items) AS item
 WHERE co."sellerOrganizationId" = $1
-  AND co.metadata->>'serviceKey' = 'glycopharm'
   AND co."createdAt" >= $2 AND co.status = 'paid'
 GROUP BY item->>'productId', item->>'productName'
 ORDER BY revenue DESC LIMIT $3
@@ -251,29 +247,26 @@ ORDER BY revenue DESC LIMIT $3
 
 | Service | legacy 스코프 | reference |
 |---|---|---|
-| GlycoPharm | `store_id = $1 AND metadata->>'serviceKey' = 'glycopharm'` | [glycopharm-store-data.adapter.ts:40-41](apps/api-server/src/routes/glycopharm/services/glycopharm-store-data.adapter.ts#L40-L41) |
 | K-Cosmetics | `store_id = $1 AND metadata->>'serviceKey' = 'cosmetics'` | [cosmetics-store-summary.service.ts:53-54](apps/api-server/src/routes/cosmetics/services/cosmetics-store-summary.service.ts#L53-L54) |
 | K-Cosmetics action queue | `service_key = 'cosmetics'` (별도 column?) | [action-definitions.ts:22](apps/api-server/src/routes/cosmetics/action-definitions.ts#L22) — **불일치**: `metadata->>'serviceKey'` 가 아닌 `service_key` 평문 column 가정. legacy ecommerce_orders entity 의 `service_key` column 존재 여부 미검증. |
 | Platform — cosmetics bulk | `store_id IN (SELECT id FROM cosmetics.cosmetics_stores)` | [store-network.service.ts:159-167](apps/api-server/src/routes/platform/store-network.service.ts#L159-L167) |
-| Platform — glycopharm bulk | `store_id IN (SELECT o.id FROM organizations o JOIN organization_service_enrollments ose ...)` | [store-network.service.ts:185-194](apps/api-server/src/routes/platform/store-network.service.ts#L185-L194) |
 | Platform — physical store | `INNER JOIN physical_store_links psl ON psl.service_store_id = o.store_id` | [physical-store.service.ts:192-272](apps/api-server/src/routes/platform/physical-store.service.ts#L192-L272) |
 
 ### 6-2. canonical 의 스코핑 패턴
 
 | 식별자 | 컬럼 | 사용처 | 비고 |
 |---|---|---|---|
-| service | `metadata->>'serviceKey'` (JSONB path) | KPA event-offer / KPA checkout / GlycoPharm new orders | functional index 미설치 — bulk aggregation 시 추가 권장 |
+| service | `metadata->>'serviceKey'` (JSONB path) | KPA event-offer / KPA checkout new orders | functional index 미설치 — bulk aggregation 시 추가 권장 |
 | store / organization | `sellerOrganizationId` (UUID, nullable, indexed) | KPA event-offer / KPA checkout | WO-CHECKOUT-ORG-BOUNDARY-FIX-V1 으로 추가됨 |
-| buyer | `buyerId` (UUID, indexed) | KPA / GlycoPharm 신규 주문 | |
+| buyer | `buyerId` (UUID, indexed) | KPA 신규 주문 | |
 | supplier | `supplierId` (varchar100 NOT NULL) | Neture 공급자 attribution | |
-| seller | `sellerId` (varchar100) | GlycoPharm payment hook 가 매핑 사용 | |
+| seller | `sellerId` (varchar100) | — | |
 
 ### 6-3. 서비스별 사용 매트릭스
 
 | Service | uses `checkout_orders`? | uses `ecommerce_orders`? | scoping column on checkout | translation from legacy |
 |---|:---:|:---:|---|---|
 | **KPA-Society** | ✅ (event-offer.service.ts + kpa-checkout.controller.ts) | ❌ | `metadata->>'serviceKey'` ∈ `{'kpa', 'kpa-society'}` + `sellerOrganizationId` | canonical reference baseline |
-| **GlycoPharm** | ⚠️ partial (신규 checkout 경로) | ✅ (KPI / payment hook / FOR UPDATE) | `metadata->>'serviceKey' = 'glycopharm'` + `sellerOrganizationId` | store_id (organization UUID 가정) → sellerOrganizationId 직접 매핑 가능 (검증 필요) |
 | **K-Cosmetics** | ⚠️ partial (Event Offer 영역) | ✅ (operator/dashboard + action queue) | `metadata->>'serviceKey' ∈ {'cosmetics', 'k-cosmetics-event-offer'}` | store_id (cosmetics_stores UUID) → 정책 결정 필요. 옵션 (a) cosmetics_stores.organization_id 를 sellerOrganizationId 로 보강 + (b) cosmetics_stores 자체 UUID 를 metadata.storeId 로 보존. |
 | **Neture** | ❌ (`neture_orders` 별도 스키마 사용) | ❌ | (사용 안 함) | 영향 없음 — Neture 는 자체 supplier-direct workflow 보유 |
 | **Platform Admin (network/physical)** | ❌ (legacy 만 사용) | ✅ | (canonical 전환 가능) `metadata->>'serviceKey'` IN list-based bulk aggregation | 본 IR 의 정렬 후 functional index 추가 권장 |
@@ -306,18 +299,15 @@ WHERE metadata->>'serviceKey' = 'cosmetics'
 
 | Service | File | Methods | SIMPLE_RENAME | QUERY_REWRITE | NEEDS_NEW_ITEM_MODEL | NEEDS_POLICY | DO_NOT_MIGRATE_YET |
 |---|---|:-:|:-:|:-:|:-:|:-:|:-:|
-| GlycoPharm | glycopharm-store-data.adapter.ts | 6 | 4 | — | 1 (getTopProducts → JSONB) | — | — |
 | K-Cosmetics | cosmetics-store-summary.service.ts | 7 | 5 | 1 (getAdminSummary status set) | 1 (getTopProducts → JSONB) | — | — |
 | Platform | store-network.service.ts | 6 | — | 6 (subquery / status enum) | — | — | — |
 | Platform | physical-store.service.ts | 3 | — | 3 (physical_store_links 의존) | — | — | — |
 | K-Cosmetics | action-definitions.ts | 1 | — | 1 (status set) | — | 1 (active definition) | — |
-| GlycoPharm | GlycopharmPaymentEventHandler.ts | 1 | — | — | 1 (validateSalesLimit → JSONB) | — | 1 (결제 hook) |
-| GlycoPharm | checkout.controller.ts | 1 | — | — | 1 (FOR UPDATE JSONB) | — | 1 (결제 트랜잭션) |
 | **TOTAL** | **7 파일** | **25** | **9** | **11** | **4** | **1** | **2** |
 
 ### 7-2. 비율 요약
 
-- **즉시 SIMPLE_RENAME**: 9 / 25 = **36%** (`getOrderStats`, `getRecentOrders`, `getTotalOrderCount`, `getRevenueBetween`, `getChannelBreakdown`) — GlycoPharm + Cosmetics 의 기본 SUM/COUNT/ORDER 메서드
+- **즉시 SIMPLE_RENAME**: 9 / 25 = **36%** (`getOrderStats`, `getRecentOrders`, `getTotalOrderCount`, `getRevenueBetween`, `getChannelBreakdown`) — Cosmetics 의 기본 SUM/COUNT/ORDER 메서드
 - **QUERY_REWRITE (정책 결정 후 가능)**: 11 / 25 = **44%** — Platform Admin 의 cross-service subquery + status enum 정렬 + action-queue status set 정합
 - **NEEDS_NEW_ITEM_MODEL (사실상 QUERY_REWRITE 격하 가능)**: 4 / 25 = 16% — `getTopProducts` × 2 + payment-hook + checkout FOR UPDATE. JSONB `jsonb_array_elements` 패턴 (KPA 검증) 으로 재작성 가능. 단 결제 트랜잭션 2 건은 본 WO 명시 제외.
 - **NEEDS_POLICY**: 1 / 25 = 4% — action queue active orders 정의
@@ -328,7 +318,6 @@ WHERE metadata->>'serviceKey' = 'cosmetics'
 ### 7-3. Track 별 분할 권장
 
 **Track A — 대시보드 지표 정렬 WO (안전, 단기)**
-- 대상: GlycoPharm adapter + Cosmetics service + Platform network/physical (KPI 영역)
 - 18 method (9 SIMPLE + 6 QUERY-platform + 3 item-JSONB rewrite)
 - 전제: store_id → sellerOrganizationId 매핑 정책 + status 의미 정합 사전 합의
 
@@ -395,11 +384,11 @@ KPA Event Offer 서비스가 `checkout_orders` 단일 SSOT 로 cross-service 주
 
 | 패턴 | 위치 | 재사용 대상 |
 |---|---|---|
-| `metadata->>'serviceKey'` filter | KPA 전반 | 5 raw-SQL 파일 (Glyco adapter / Cosmetics service / Platform network / Platform physical / Cosmetics action queue) |
+| `metadata->>'serviceKey'` filter | KPA 전반 | 5 raw-SQL 파일 |
 | `status = 'paid'` 양성 assertion | KPA event-offer | 모든 매출 인식 query (`status != 'cancelled'` 치환 대신) |
 | `jsonb_array_elements(co.items)` GROUP BY | KPA event-offer + KPA checkout | `getTopProducts` × 2 + `validateSalesLimit` (Track C 후) |
-| `FOR UPDATE OF co` row lock | KPA checkout | GlycoPharm `validateSalesLimit` + checkout (Track C) |
-| `sellerOrganizationId` UUID indexed 조회 | KPA checkout 생성 | GlycoPharm + Cosmetics 의 store-scope KPI |
+| `FOR UPDATE OF co` row lock | KPA checkout | — |
+| `sellerOrganizationId` UUID indexed 조회 | KPA checkout 생성 | Cosmetics 의 store-scope KPI |
 
 ---
 
@@ -409,11 +398,10 @@ KPA Event Offer 서비스가 `checkout_orders` 단일 SSOT 로 cross-service 주
 
 **`WO-O4O-STORE-KPI-DASHBOARD-CHECKOUT-ORDERS-ALIGNMENT-V1`** (가칭)
 
-- **대상**: GlycoPharm `glycopharm-store-data.adapter.ts` (6 method) + Cosmetics `cosmetics-store-summary.service.ts` (7 method) + Platform `store-network.service.ts` (6 method) + Platform `physical-store.service.ts` (3 method) — 총 **22 method**.
 - **전제**: §3-4, §4-3 의 정책 사전 결정 (store_id → sellerOrganizationId / status 의미 정합 / metadata.serviceKey 신규 주문 주입 보장).
 - **safe-fallback 보존**: 본 WO 진행 중에도 controller-layer `isMissingOrderTable` 가드 유지. 단계적 전환 시 ecommerce_orders 가 존재 안 함 → checkout_orders rewrite 후엔 fallback 분기 미진입. fallback 코드 제거는 별도 cleanup WO.
 - **PR 분할 권장**:
-  - PR-1: helper 함수 (`scopeByServiceKey`, `sellerOrgFromLegacyStoreId`) 추가 + GlycoPharm adapter 6 method
+  - PR-1: helper 함수 (`scopeByServiceKey`, `sellerOrgFromLegacyStoreId`) 추가 adapter 6 method
   - PR-2: Cosmetics service 7 method
   - PR-3: Platform network + physical 9 method + functional index migration
 
@@ -432,8 +420,6 @@ KPA Event Offer 서비스가 `checkout_orders` 단일 SSOT 로 cross-service 주
 
 ### 9-C. 보류 영역 (Track C 별도)
 
-- GlycoPharm `GlycopharmPaymentEventHandler.validateSalesLimit`
-- GlycoPharm `checkout.controller.ts` FOR UPDATE sales_limit
 - 결제 / 환불 / 정산 흐름 — 본 IR 명시 제외. KPA `kpa-checkout.controller.ts:442-450` 패턴 mirror 가 reference. 별도 결제 hardening WO 필요.
 
 ### 9-D. 문서 / 메모 정정
@@ -470,7 +456,7 @@ KPA Event Offer 서비스가 `checkout_orders` 단일 SSOT 로 cross-service 주
 
 | 단기 (Track A) | 중기 (Track B + C) |
 |---|---|
-| GlycoPharm + Cosmetics + Platform 의 KPI raw-SQL 22 method 정렬 | action queue 의미 결정 + 결제 트랜잭션 (validateSalesLimit / FOR UPDATE) 정렬 |
+| Cosmetics + Platform 의 KPI raw-SQL 22 method 정렬 | action queue 의미 결정 + 결제 트랜잭션 (validateSalesLimit / FOR UPDATE) 정렬 |
 | 결제 트랜잭션 / payment hook 정렬 미수반 | KPA `kpa-checkout.controller.ts:442-450` 패턴 mirror |
 | canonical `checkout_orders` + `sellerOrganizationId` + `metadata->>'serviceKey'` SSOT 기준 | 결제 흐름 hardening — 별도 WO |
 
@@ -501,13 +487,10 @@ b18858252 refactor(api-server): WO-O4O-API-SERVER-AUTH-GLUCOSEVIEW-RESIDUE-CLEAN
 ### Legacy raw-SQL 7 파일 (재인용)
 | # | 파일 |
 |---|---|
-| 1 | [apps/api-server/src/routes/glycopharm/services/glycopharm-store-data.adapter.ts](apps/api-server/src/routes/glycopharm/services/glycopharm-store-data.adapter.ts) |
 | 2 | [apps/api-server/src/routes/cosmetics/services/cosmetics-store-summary.service.ts](apps/api-server/src/routes/cosmetics/services/cosmetics-store-summary.service.ts) |
-| 3 | [apps/api-server/src/services/glycopharm/GlycopharmPaymentEventHandler.ts](apps/api-server/src/services/glycopharm/GlycopharmPaymentEventHandler.ts) |
 | 4 | [apps/api-server/src/routes/platform/store-network.service.ts](apps/api-server/src/routes/platform/store-network.service.ts) |
 | 5 | [apps/api-server/src/routes/platform/physical-store.service.ts](apps/api-server/src/routes/platform/physical-store.service.ts) |
 | 6 | [apps/api-server/src/routes/cosmetics/action-definitions.ts](apps/api-server/src/routes/cosmetics/action-definitions.ts) |
-| 7 | [apps/api-server/src/routes/glycopharm/controllers/checkout.controller.ts](apps/api-server/src/routes/glycopharm/controllers/checkout.controller.ts) |
 
 ### Canonical entity / migration / reference
 | 항목 | 파일 |

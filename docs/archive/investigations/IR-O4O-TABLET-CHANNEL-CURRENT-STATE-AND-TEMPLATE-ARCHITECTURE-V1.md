@@ -61,12 +61,8 @@
 | Kiosk (KPA) | [TabletStorePage.tsx](services/web-kpa-society/src/pages/tablet/TabletStorePage.tsx#L74-L530) | 무인증 | 풀스크린 kiosk, 4뷰 모드 (browse → detail → submitted → error) |
 | Kiosk (Cosmetics) | [TabletStorePage.tsx](services/web-k-cosmetics/src/pages/tablet/TabletStorePage.tsx) | 무인증 | KPA 동등 |
 | 관리 (KPA) | [StoreTabletDisplaysPage.tsx](services/web-kpa-society/src/pages/pharmacy/StoreTabletDisplaysPage.tsx#L36-L150) | requireAuth | tablet 선택 → pool/displays 편집 → transaction 저장 |
-| 관리 (GlycoPharm) | [StoreTabletDisplaysPage.tsx](services/web-glycopharm/src/pages/store-management/StoreTabletDisplaysPage.tsx#L36-L100) | requireAuth | KPA 동등 |
-| 직원보조 (GlycoPharm) | [TabletLayout.tsx](services/web-glycopharm/src/components/layouts/TabletLayout.tsx#L1-L50) | requireAuth | **하이브리드 UX** — consultation/sample/order 요청 dialog (Kiosk와 별개의 사용 패턴) |
 
 ### 1.4 Store Menu에서의 위치
-
-[storeMenuConfig.ts#L227](packages/store-ui-core/src/config/storeMenuConfig.ts#L227): `tablet-displays` 메뉴 — KPA/GlycoPharm/Cosmetics 모두 **active 상태**.
 
 ---
 
@@ -91,7 +87,7 @@
 - ⭕ Interactive 구조 — 맞음 (고객 입력 + 직원 응답)
 - ❌ Idle 상태 개념 — **거의 없음**. 2분 후 browse 복귀가 유일한 idle behavior.
 
-### 2.2 직원보조 Mode 흐름 (TabletLayout.tsx, GlycoPharm)
+### 2.2 직원보조 Mode 흐름 (TabletLayout.tsx)
 
 별개 UX. consultation/sample/order 요청 dialog 중심. Kiosk와 데이터 모델 일부 공유 가능성 있으나 흐름은 완전히 다름.
 
@@ -158,7 +154,7 @@
 |--------|------------|:--------------:|--------------------|
 | **shopping** | tablet displays + interest queue | ⭕ 즉시 가능 | (현재 구조 그대로) |
 | **promotion** | playlist (slideshow) + product spotlight | ⭕ 부분 | signage runtime 합성 + spotlight rotation 정책 |
-| **consultation** | consultation request flow + slot/queue | ⭕ 부분 | GlycoPharm TabletLayout 일부 재사용 가능. consultation entity 신규 필요 |
+| **consultation** | consultation request flow + slot/queue | ⭕ 부분 | consultation entity 신규 필요 |
 | **waiting** | queue/ticket + idle slideshow | ❌ 신규 | 대기번호/큐 entity 부재. signage idle 합성 필요 |
 | **campaign** | event_offer + time-bound visibility | ⭕ 부분 | [EVENT-OFFER-COMMON-DOMAIN-V1.md](docs/baseline/EVENT-OFFER-COMMON-DOMAIN-V1.md) baseline 존재. tablet 노출 매핑만 추가 |
 
@@ -328,7 +324,7 @@ WO/문서에서 다음 어휘를 정리해야 한다:
 | 3 | **WO-O4O-TABLET-IDLE-MODE-V1** | signage_playlists 임베드 idle runtime, idle_playlist_id 컬럼 추가 | 2 |
 | 4 | **WO-O4O-TABLET-AI-CONTENT-WIRING-V1** | TabletStorePage detail에 ProductAiContent 연결 (`product_description`/`pop_long`) | 2 |
 | 5 | **WO-O4O-TABLET-PROMOTION-TEMPLATE-V1** | promotion 템플릿 — product spotlight + event_offer 노출 | 2, [EVENT-OFFER baseline](docs/baseline/EVENT-OFFER-COMMON-DOMAIN-V1.md) |
-| 6 | **WO-O4O-TABLET-CONSULTATION-TEMPLATE-V1** | consultation 템플릿 (GlycoPharm TabletLayout 패턴 흡수) | 2 |
+| 6 | **WO-O4O-TABLET-CONSULTATION-TEMPLATE-V1** | consultation 템플릿 | 2 |
 | 7 | **WO-O4O-TABLET-WAITING-TEMPLATE-V1** | waiting 템플릿 (대기번호 entity 신규) | 2, 3 |
 | 8 | **WO-O4O-TABLET-DEVICE-PAIRING-V1** | hardware pairing 토큰 + heartbeat | Phase 2 |
 | 9 | **WO-O4O-TABLET-DEVICE-MONITOR-V1** | 직원 화면에 device 상태 모니터 노출 | 8 |
@@ -341,7 +337,6 @@ WO/문서에서 다음 어휘를 정리해야 한다:
 - **Storefront 동결 baseline 위반 금지** — Tablet은 Storefront와 별개의 출력 매체, store-public-* 핸들러 공유는 OK.
 - **Channel 개념 신규 도입 시 명시적 WO** — 현재 코드에 없으므로 도입은 별도 베이스라인 필요.
 - **OrderType 비통과 유지** — Tablet은 Display Domain으로 유지, Commerce Core 통과 금지 ([CLAUDE.md §4](CLAUDE.md), [STORE-LOCAL-PRODUCT-BOUNDARY-POLICY-V1.md](docs/baseline/STORE-LOCAL-PRODUCT-BOUNDARY-POLICY-V1.md)).
-- KPA 기준 조사이나 **GlycoPharm/Cosmetics 모두 동일 store_tablets 구조 사용** → Phase 1 결과는 3개 서비스 동시 적용 가능.
 
 ---
 
@@ -481,7 +476,6 @@ idleRef.current = setTimeout(() => { resetToDefault(); }, 120_000);
 | Mouse-idle controls hide | [SignageFullscreenPlayerPage.tsx#L285-L289](services/web-kpa-society/src/pages/signage/SignageFullscreenPlayerPage.tsx#L285-L289) | 3.5초 후 controls 숨김 — Tablet에 차용 가능 |
 | Duration 기반 자동 전환 | [SignageFullscreenPlayerPage.tsx#L274-L282](services/web-kpa-society/src/pages/signage/SignageFullscreenPlayerPage.tsx#L274-L282) | playlist autoplay 루프 |
 | Schedule 모드 | [SignagePlaybackPage.tsx#L196](services/web-kpa-society/src/pages/pharmacy/SignagePlaybackPage.tsx#L196) | `playlistId === '_schedule'` |
-| Request dialog 자동 닫음 | [TabletLayout.tsx#L86-L89](services/web-glycopharm/src/components/layouts/TabletLayout.tsx#L86-L89) | 3초 후 close — kiosk timeout 패턴 |
 
 ### 13.3 Interactive → Autoplay 전환 가능성
 

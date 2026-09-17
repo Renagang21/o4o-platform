@@ -7,7 +7,7 @@
  * 동일한 시트 마크업(헤더 이름/이메일 + 닫기 + 메뉴 + 로그아웃)의 정본이다.
  * 메뉴 항목 자체는 서비스 SSOT 이므로 children 으로 주입한다.
  *
- * GlycoPharm / K-Cosmetics 는 '내정보' 가 `/mypage` Link 라 이 시트를 쓰지 않는다.
+ * K-Cosmetics 는 '내정보' 가 `/mypage` Link 라 이 시트를 쓰지 않는다.
  */
 
 import { X, LogOut } from 'lucide-react';

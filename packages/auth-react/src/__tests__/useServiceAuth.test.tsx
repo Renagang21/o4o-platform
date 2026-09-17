@@ -299,7 +299,7 @@ describe('useServiceAuth — 토큰 정리 · 로그아웃', () => {
 
 /**
  * WO-O4O-FRONTEND-AUTH-CONTEXT-AND-ROUTE-GUARD-COMMONIZATION-FULL-CLOSE-V1
- * Neture / K-Cosmetics / GlycoPharm 이 각자 들고 있던 "서버 호출만 하고 로컬 세션은 유지"
+ * Neture / K-Cosmetics 이 각자 들고 있던 "서버 호출만 하고 로컬 세션은 유지"
  * 구현을 설정 1개로 흡수했다. 두 방향 모두 고정한다.
  */
 describe('useServiceAuth — clearSessionOnLogoutAll', () => {

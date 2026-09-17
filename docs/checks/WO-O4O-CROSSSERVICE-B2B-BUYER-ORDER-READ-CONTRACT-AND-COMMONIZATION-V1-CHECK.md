@@ -1,6 +1,5 @@
 # WO-O4O-CROSSSERVICE-B2B-BUYER-ORDER-READ-CONTRACT-AND-COMMONIZATION-V1 — CHECK
 
-- 대상 서비스: **KPA Society / GlycoPharm / K-Cosmetics** (3-service Core)
 - 종결 대상: **DF-1** (매장 주문 조회 경로 불일치) · **DF-4** (buyer 주문 조회 controller 3벌)
 - 미실행 확인: **DF-2 / DF-3** — 본 WO §20 에 따라 손대지 않았다
 - 범위: **조회(read) 전용**. 생성 · 결제 · 공급자 처리 · 배송 · 취소 경로는 변경하지 않았다 (§19)
@@ -13,25 +12,24 @@
 
 `git pull --ff-only origin main` 기준으로 다시 조사했다. 과거 CHECK 결과를 전제하지 않았다.
 
-| 축 | KPA Society | GlycoPharm | K-Cosmetics |
-|---|---|---|---|
-| 목록 | `GET /api/v1/kpa/checkout/orders` | `GET /api/v1/glycopharm/checkout/orders` | `GET /api/v1/cosmetics/orders` |
-| 상세 | `.../orders/:orderId` | `.../orders/:orderId` | `/orders/:id` (`param('id').isUUID()`) |
-| 취소(참고, 본 WO 범위 밖) | `POST .../orders/:orderId/cancel` | 동일 | `POST /orders/:id/cancel` |
-| controller | `routes/kpa/controllers/kpa-checkout.controller.ts` | `routes/glycopharm/controllers/checkout.controller.ts` | `routes/cosmetics/controllers/cosmetics-order.controller.ts` |
-| guard | `requireAuth` | `requireAuth` (`/cleanup-expired` 만 `glycopharm:operator`) | `requireAuth` |
-| serviceKey 결정 | `getBuyerOrderServiceKeys(KPA_SOCIETY)` | `…(GLYCOPHARM)` | `…(K_COSMETICS)` |
-| buyer 소유권 | `buyerId = 인증 사용자 id` | 동일 | 동일 |
-| query filter | page/limit | page/limit | page/limit + channel/status/guide/tourSession/taxRefund |
-| 오류 shape | `{error:{code,message,details}}` | 동일 | 동일 |
-| frontend 소비자 | `api/checkout.ts` → `pages/pharmacy/StoreOrdersPage.tsx` | `api/pharmacy.ts` → `pages/store-management/PharmacyOrders.tsx` | `api/storeOrders.ts` → `pages/store/StoreOrdersPage.tsx` |
+| 축 | KPA Society | K-Cosmetics |
+|---|---|---|
+| 목록 | `GET /api/v1/kpa/checkout/orders` | `GET /api/v1/cosmetics/orders` |
+| 상세 | `.../orders/:orderId` | `/orders/:id` (`param('id').isUUID()`) |
+| 취소(참고, 본 WO 범위 밖) | `POST .../orders/:orderId/cancel` | `POST /orders/:id/cancel` |
+| controller | `routes/kpa/controllers/kpa-checkout.controller.ts` | `routes/cosmetics/controllers/cosmetics-order.controller.ts` |
+| guard | `requireAuth` | `requireAuth` |
+| serviceKey 결정 | `getBuyerOrderServiceKeys(KPA_SOCIETY)` | `…(K_COSMETICS)` |
+| buyer 소유권 | `buyerId = 인증 사용자 id` | 동일 |
+| query filter | page/limit | page/limit + channel/status/guide/tourSession/taxRefund |
+| 오류 shape | `{error:{code,message,details}}` | 동일 |
+| frontend 소비자 | `api/checkout.ts` → `pages/pharmacy/StoreOrdersPage.tsx` | `api/storeOrders.ts` → `pages/store/StoreOrdersPage.tsx` |
 
 **`UNKNOWN = 0`, `UNJUDGED = 0`.**
 
 `getBuyerOrderServiceKeys()` 가 실제 SSOT 임을 현 main 에서 재확인했다 (§16). 산출 집합:
 
 - KPA `['kpa-society','kpa','kpa-groupbuy']`
-- GlycoPharm `['glycopharm','glycopharm-event-offer']`
 - K-Cosmetics `['cosmetics','k-cosmetics-event-offer']` — **`'cosmetics' ≠ 'k-cosmetics'`** (literal 재작성 금지의 실제 이유)
 
 ---
@@ -54,7 +52,7 @@
 
 DF-1 의 실체는 경로가 아니라 **금액 타입 불일치**였다.
 
-| 필드 | KPA(이전) | GP(이전) | KCos(이전) | 분류 | 현재 |
+| 필드 | KPA(이전) | KCos(이전) | 분류 | 현재 |
 |---|---|---|---|---|---|
 | `totalAmount` / `subtotal` / `shippingFee` / `discount` | **string** (TypeORM decimal, transformer 없음) | **string** | number | `COMMON_REQUIRED` | Core 가 number 로 정규화 |
 | `id` / `orderNumber` / `status` / `paymentStatus` / `createdAt` | 있음 | 있음 | 있음 | `COMMON_REQUIRED` | 유지 |
@@ -124,7 +122,7 @@ DF-1 의 실체는 경로가 아니라 **금액 타입 불일치**였다.
 
 세 API client(`checkout.ts` / `pharmacy.ts` / `storeOrders.ts`)는 이미 금액을 `number` 로 **선언**하고 있었다 — 백엔드가 string 을 보내고 있었으므로 선언이 거짓이었다. Core 정규화로 선언이 참이 됐다. 소비 코드가 전부 `Number(...)` 로 감싸고 있어 회귀는 없다.
 
-| 항목 | KPA | GP | KCos |
+| 항목 | KPA | KCos |
 |---|---|---|---|
 | 목록 / 상세 / 상태 / 품목 / 금액 | 정상 | 정상 | 정상 |
 | 빈 상태 / 오류 상태 | 정상 | 정상 | 정상 |
@@ -148,7 +146,7 @@ DF-1 의 실체는 경로가 아니라 **금액 타입 불일치**였다.
 §17 이 요구하는 `authenticated + active service membership + buyer organization ownership + service role/capability` 중, 현재 세 서비스 모두 **`requireAuth` + `buyerId` 소유권**까지만 있고 **membership / role 게이트가 없다**.
 
 수정하지 않은 이유:
-- `packages/security-core/src/service-configs.ts` 는 **F1 Frozen** 이며 KPA/GP/KCos 에 `admin` / `operator` 만 노출한다 — `store_owner` 상당 역할이 없다.
+- `packages/security-core/src/service-configs.ts` 는 **F1 Frozen** 이며 KPA/KCos 에 `admin` / `operator` 만 노출한다 — `store_owner` 상당 역할이 없다.
 - membership-only guard 가 `common/middleware/` 에 존재하지 않는다. 새로 만드는 것은 role/API contract 변경 = CLAUDE.md 중지 조건이며 §19(read-only)를 벗어난다.
 - 이미 공통화된 취소 경로(`cancelStoreOrderBeforePayment`)가 **동일한 계약**을 쓴다. read Core 가 다른 계약을 쓰면 두 경로가 갈라진다.
 
@@ -162,8 +160,7 @@ DF-1 의 실체는 경로가 아니라 **금액 타입 불일치**였다.
 |---|---|
 | consumer order / checkout / payment 신설 | **없음** — spec C 가 consumer commerce 식별자 재유입을 차단 |
 | store seller order / refund / platform seller checkout | **없음** |
-| write 경로 변경 (cart / checkout-confirm / create / payment / supplier / shipping / cancel) | **없음** — Core SQL 에 write verb 가 없음을 spec 이 검증. GP `/cleanup-expired` 의 operator-guarded `UPDATE` 도 그대로 |
-| **DF-2** (GlycoPharm `/store/b2b-order` → canonical cart) | **미실행** |
+| write 경로 변경 (cart / checkout-confirm / create / payment / supplier / shipping / cancel) | **없음** — Core SQL 에 write verb 가 없음을 spec 이 검증. |
 | **DF-3** (KPA 관심상품 작업대 → canonical cart) | **미실행** |
 | §21 dead duplicate 제거 | 3 wrapper 에서 손으로 쓴 `checkout_orders` 조회 블록(K-Cosmetics 약 50줄 포함)과 그에 딸린 `CheckoutOrder` entity import 를 제거했다. 잔여 `createQueryBuilder('co')` / 자작 `SELECT … FROM checkout_orders` 없음 — spec 이 강제 |
 
@@ -208,12 +205,11 @@ DF-1 의 실체는 경로가 아니라 **금액 타입 불일치**였다.
 | api-server `npx tsc --noEmit` | **0 errors** |
 | api-server 전체 `npx jest` | **211 suites / 3543 passed / 10 skipped, exit 0** |
 | KPA `tsc --noEmit` / `vite build` | **exit 0 / exit 0** |
-| GlycoPharm `tsc -b` / `vite build` | **exit 0 / exit 0** |
 | K-Cosmetics `tsc --noEmit` / `vite build` | **exit 0 / exit 0** |
 
 ### 타 세션 / 타 commit 실패 구분
 
-작업 초기 GlycoPharm `tsc -b` 가 `src/pages/store-management/b2b-order/B2BOrderPage.tsx(467,17): error TS1109` 로 실패했다. **본 WO 가 건드리지 않은 파일**이며, 원인은 닫히지 않은 JSX 주석이었다. origin/main 의 `9c2e8970c fix(glycopharm): 닫히지 않은 JSX 주석으로 web-glycopharm 빌드/타입체크가 깨져 있던 것 복구` 가 이미 고쳤다. 해당 파일을 **수정하지 않았고**, origin/main 으로 rebase 한 뒤 재검증하여 exit 0 을 확인했다.
+**본 WO 가 건드리지 않은 파일**이며, 원인은 닫히지 않은 JSX 주석이었다. 해당 파일을 **수정하지 않았고**, origin/main 으로 rebase 한 뒤 재검증하여 exit 0 을 확인했다.
 
 신선한 worktree 특성상 초기 `tsc --noEmit` 에서 workspace package 미빌드로 인한 `TS2307` 이 221건 나왔다. `build:packages` + 개별 core 패키지 빌드 후 **0 건**. 본 WO 가 만진 파일에서 나온 오류는 처음부터 **0 건**이었다.
 
@@ -226,7 +222,6 @@ DF-1 의 실체는 경로가 아니라 **금액 타입 불일치**였다.
 | 요청 | 결과 |
 |---|---|
 | `GET /api/v1/kpa/checkout/orders` (미인증) | `401 AUTH_REQUIRED` |
-| `GET /api/v1/glycopharm/checkout/orders` (미인증) | `401 AUTH_REQUIRED` |
 | `GET /api/v1/cosmetics/orders` (미인증) | `401 AUTH_REQUIRED` |
 | `GET /api/v1/kpa/checkout/orders/<nil-uuid>` (미인증) | `401 AUTH_REQUIRED` |
 

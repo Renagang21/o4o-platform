@@ -7,13 +7,13 @@
 
 ## 1. 목적
 
-O4O "주문 가능 상품" 활성화 정책을 3서비스(KPA / GlycoPharm / K-Cosmetics) 기준으로 문서 고정.
+O4O "주문 가능 상품" 활성화 정책을 2서비스(KPA / K-Cosmetics) 기준으로 문서 고정.
 핵심: **OPL `is_active=true` (내 매장 주문 가능 상품 편입 자격)** 과 **소비자 storefront 진열(채널 gate)** 의 분리.
 
 ## 2. 선행 기준
 
 - `WO-O4O-PRODUCT-APPROVAL-APPROVE-IMPL-UNIFY-V1` — approve canonical = `ProductApprovalV2Service.approveServiceProduct(activateListing:true)`.
-- `WO-O4O-PRODUCT-APPROVAL-OPERATOR-SURFACE-ENABLE-GP-KCOS-V1` — GP/KCos operator 승인 surface.
+- `WO-O4O-PRODUCT-APPROVAL-OPERATOR-SURFACE-ENABLE-GP-KCOS-V1` — KCos operator 승인 surface.
 - `WO-O4O-KPA-PRODUCT-APPLICATIONS-MENU-EXPOSURE-V1` — 3서비스 메뉴 정렬.
 
 ## 3. 핵심 개념
@@ -54,31 +54,29 @@ OPL `is_active` write 경로 — [product-approval-v2.service.ts](../../apps/api
 
 ## 6. Phase 3 — storefront gate
 
-소비자-facing 주문 gate (GP/KPA checkout 에서 서버 강제):
+소비자-facing 주문 gate (KPA checkout 에서 서버 강제):
 
 | gate | 출처 | 비고 |
 |------|------|------|
-| supply contract APPROVED | guardResult / `SUPPLY_CONTRACT_NOT_APPROVED` (GP [checkout.controller.ts](../../apps/api-server/src/routes/glycopharm/controllers/checkout.controller.ts) L283, KPA [kpa-checkout.controller.ts](../../apps/api-server/src/routes/kpa/controllers/kpa-checkout.controller.ts) L249) | 공급 계약 |
-| organization_channels APPROVED | GP L290-293(B2C), KPA L256-259 (`status='APPROVED'`) | 채널 승인 |
+| supply contract APPROVED | — | 공급 계약 |
+| organization_channels APPROVED L290-293(B2C), KPA L256-259 (`status='APPROVED'`) | 채널 승인 |
 | OPL active + offer active | KPA L288-312 (`spo.is_active`, inactiveProducts 거부) | 주문 가능 편입 |
 | OPC 매핑(channel status APPROVED) | [store-channel-products.controller.ts](../../apps/api-server/src/routes/o4o-store/controllers/store-channel-products.controller.ts) L72 `requireApproved` | 채널 진열 단위 |
 
 | 서비스 | storefront/주문 gate 구현 | gate |
 |--------|------|------|
-| GlycoPharm | ✅ checkout 4-gate | supply contract + organization_channels B2C APPROVED + OPL/offer active + OPC |
 | KPA | ✅ kpa-checkout | supply contract + organization_channels APPROVED + OPL/offer active |
 | K-Cosmetics | ⚠️ cosmetics-order = local/travel 채널 모델 | `organization_channels APPROVED` gate 부재(검색 0건). OPL active gate 미노출 — **다른 commerce 모델**(tourism/local) |
 
 ## 7. Phase 4 — 서비스별 성숙도
 
-| 영역 | KPA | GlycoPharm | K-Cosmetics | 판정 | 후속 |
-|------|-----|-----------|------------|------|------|
-| operator 승인 → OPL active | ✅ | ✅ | ✅ | A (3서비스 공통 컨트롤러) | — |
-| 주문 가능 편입(OPL active 관리) | ✅ | ✅ | ✅ | A | — |
-| storefront/주문 channel gate | ✅ (kpa-checkout) | ✅ (4-gate) | ⚠️ 다른 모델 | KPA **B** / GP **A** / KCos **D** | KCos gate IR |
+| 영역 | KPA | K-Cosmetics | 판정 | 후속 |
+| ------ | ----- | ------------ | ------ | ------ |
+| operator 승인 → OPL active | ✅ | ✅ | A (3서비스 공통 컨트롤러) | — |
+| 주문 가능 편입(OPL active 관리) | ✅ | ✅ | A | — |
+| storefront/주문 channel gate | ✅ (kpa-checkout) | ⚠️ 다른 모델 | KPA **B** **A** / KCos **D** | KCos gate IR |
 
-- **GlycoPharm = A**: 승인→편입→4-gate checkout 일관.
-- **KPA = B**: 승인→편입→checkout(supply contract + channel APPROVED + OPL active). B2C 채널 성숙도는 GP 대비 부분.
+- **KPA = B**: 승인→편입→checkout(supply contract + channel APPROVED + OPL active).
 - **K-Cosmetics = D(정책/구현 분리 필요)**: 승인→편입은 공통이나, 주문은 local/travel 채널 모델로 B2C 4-gate 와 구조가 다름. OPL active↔주문 gate 연결을 별도 IR 로 확정 필요.
 
 ## 8. Phase 5 — 용어 기준
@@ -97,8 +95,8 @@ OPL `is_active` write 경로 — [product-approval-v2.service.ts](../../apps/api
 |----------|------|------|
 | P1 | operator 승인 시 OPL `is_active=true` 가 canonical | approveServiceProduct(activateListing:true) L181-193 |
 | P2 | OPL `is_active=true` = 내 매장 O4O 주문 가능 상품 편입 자격 (소비자 노출 아님) | OPL 의미 + checkout gate 분리 |
-| P3 | 소비자 storefront 노출/주문 = 별도 channel(organization_channels APPROVED) + OPC + offer active gate 필요 | GP/KPA checkout 강제 |
-| P4 | GP 4-gate 패턴(supply contract + channel APPROVED + OPL/offer active + OPC)을 storefront 기준 후보로 고정 | GP checkout.controller |
+| P3 | 소비자 storefront 노출/주문 = 별도 channel(organization_channels APPROVED) + OPC + offer active gate 필요 | KPA checkout 강제 |
+| P4 4-gate 패턴(supply contract + channel APPROVED + OPL/offer active + OPC)을 storefront 기준 후보로 고정 checkout.controller |
 | P5 | KPA/KCos storefront 성숙도 차이는 backend 승인/OPL 정책과 **분리** — 승인/편입은 3서비스 공통, 노출 gate 는 서비스별 | Phase 4 |
 | P6 | offer-wide 일괄 활성(activateOfferListings)은 operator 경로에서 금지(per-store 단건만) | 선행 WO + L229 미사용 |
 
@@ -115,7 +113,6 @@ IR-O4O-KPA-STOREFRONT-ORDERABLE-PRODUCT-GATE-V1       (KPA B2C 채널 성숙도)
 
 - OPL `is_active=true` = **내 매장 O4O 주문 가능 상품 편입 자격**, canonical 부여 경로 = operator SERVICE 승인. PUBLIC apply 는 inactive listing 만 생성.
 - 소비자 storefront 노출은 **별도 4-gate**(offer active + OPL active + OPC + organization_channels APPROVED [+ supply contract]) 통과 필요 — OPL active 와 분리.
-- GP=A / KPA=B / KCos=D(다른 채널 모델) — 승인·편입은 3서비스 공통, 노출 gate 는 서비스별 성숙도 분리.
 - 정책 P1-P6 고정. 운영자 가이드 및 KCos/KPA storefront gate 는 후속.
 
 ---

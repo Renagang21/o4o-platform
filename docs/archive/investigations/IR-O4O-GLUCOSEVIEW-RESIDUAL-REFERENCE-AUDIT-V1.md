@@ -7,7 +7,7 @@ last_updated: 2026-05-15
 type: investigation
 scope:
   - 폐지된 서비스 GlucoseView 의 코드/DB/문서 잔재 전수 점검
-  - canonical 운영 서비스 4종(KPA / Neture / GlycoPharm / K-Cosmetics) 외 dead reference 분류
+  - canonical 운영 서비스 4종(KPA / Neture / K-Cosmetics) 외 dead reference 분류
   - 실행 경로(active) vs 인포메이션(legacy) 분리
   - 안전 제거 가능 vs 호환성 유지 항목 판단
 related:
@@ -53,7 +53,7 @@ related:
 ## 1. Scope & Method
 
 ### 1-1. 조사 범위
-- **Frontend**: apps/admin-dashboard, apps/main-site, services/web-* (kpa-society, neture, glycopharm, k-cosmetics, account, siteguide), packages/* (ui, operator-ux-core, shared-space-ui, content-editor, auth-client 등)
+- **Frontend**: apps/admin-dashboard, apps/main-site, services/web-* (kpa-society, neture, k-cosmetics, account, siteguide), packages/* (ui, operator-ux-core, shared-space-ui, content-editor, auth-client 등)
 - **Backend**: apps/api-server, packages/security-core, packages/asset-copy-core, packages/platform-core, packages/cms-core, packages/types, packages/auth-utils
 - **Migrations**: apps/api-server/src/database/migrations
 - **검색 패턴**: `glucoseview` / `GlucoseView` / `GLUCOSEVIEW` / `glucose-view` / `glucose_view` (case-insensitive)
@@ -88,7 +88,7 @@ related:
 | 파일 | 라인 | 분류 | 내용 |
 |---|---|---|---|
 | [apps/api-server/src/utils/cookie.utils.ts](apps/api-server/src/utils/cookie.utils.ts) | 14, 26 | Active config | `SERVICE_DOMAINS` 에 `.glucoseview.co.kr` 잔존 — 폐지된 도메인 |
-| [apps/api-server/src/modules/partner/guards/partner-context.guard.ts](apps/api-server/src/modules/partner/guards/partner-context.guard.ts) | 59 | Active guard | `allowedServices = ['glycopharm', 'k-cosmetics', 'glucoseview']` — 파트너 컨텍스트 검증 |
+| [apps/api-server/src/modules/partner/guards/partner-context.guard.ts](apps/api-server/src/modules/partner/guards/partner-context.guard.ts) | 59 | Active guard | — |
 | [apps/api-server/src/controllers/OperatorNotificationController.ts](apps/api-server/src/controllers/OperatorNotificationController.ts) | 33 | Comment example | `'glucoseview:operator'` 예시 잔존 |
 
 → partner-context.guard 의 `allowedServices` 는 polluting 항목 (실제 partner-context 가 glucoseview 를 더 이상 사용하지 않음) — 안전 제거 가능.
@@ -140,13 +140,13 @@ related:
 | `apps/admin-dashboard/src/pages/cms/channels/ChannelFormModal.tsx:28` | 동 | 동 |
 | `apps/admin-dashboard/src/pages/supplierops/pages/CampaignRequestPage.tsx:35` | 동 | 동 |
 
-→ **7개 dropdown 에서 GlucoseView 가 여전히 신규 할당 옵션으로 노출됨**. canonical service list (KPA/Neture/GlycoPharm/K-Cosmetics) 외 잔재. 제거 우선순위 높음.
+→ **7개 dropdown 에서 GlucoseView 가 여전히 신규 할당 옵션으로 노출됨**. canonical service list 외 잔재. 제거 우선순위 높음.
 
 ### 3-3. Service Application API 클라이언트
 
 | 파일 | 라인 | 내용 |
 |---|---|---|
-| [apps/admin-dashboard/src/api/service-applications.ts](apps/admin-dashboard/src/api/service-applications.ts) | 17 | `type ServiceType = 'glycopharm' \| 'glucoseview'` |
+| [apps/admin-dashboard/src/api/service-applications.ts](apps/admin-dashboard/src/api/service-applications.ts) | 17 | — | 'glucoseview'` |
 | 동 | 90–91 | `case 'glucoseview': return '/api/v1/glucoseview/applications'` |
 | 동 | 166 | `glucoseview: 'GlucoseView'` 라벨 |
 
@@ -156,7 +156,6 @@ related:
 
 | 파일 | 라인 | 분류 |
 |---|---|---|
-| `services/web-glycopharm/src/pages/auth/RegisterPage.tsx:33` | SERVICE_LABELS 에 `glucoseview: 'GlucoseView'` |
 | `services/web-k-cosmetics/src/pages/auth/RegisterPage.tsx:28` | 동 |
 | `services/web-kpa-society/src/pages/operator/UsersPage.tsx:101` | 동 |
 | `services/web-neture/src/components/RegisterModal.tsx:56` | 동 |
@@ -290,7 +289,7 @@ CLAUDE.md §0 정책상 read-only `SELECT` 는 Claude Code 가 직접 수행 가
 
 **WO-O4O-ADMIN-CMS-GLUCOSEVIEW-OPTION-REMOVE-V1**
 - 7개 CMS form dropdown 에서 `glucoseview` 옵션 제거
-- canonical service list (KPA/Neture/GlycoPharm/K-Cosmetics) 만 노출
+- canonical service list 만 노출
 - 영향: `apps/admin-dashboard/src/pages/cms/{slots,contents,channels}/*.tsx`, `pages/supplierops/pages/CampaignRequestPage.tsx`
 
 **WO-O4O-ADMIN-SERVICE-APPLICATIONS-GLUCOSEVIEW-REMOVE-V1**
