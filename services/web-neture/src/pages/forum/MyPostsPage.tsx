@@ -56,7 +56,7 @@ export default function MyPostsPage() {
           ← 커뮤니티 홈
         </button>
         <MyForumPostsTemplate
-          description="네뚜레 커뮤니티에 내가 작성한 글입니다."
+          description="O4O 공통 커뮤니티에 내가 작성한 글입니다."
           posts={posts}
           totalCount={total}
           currentPage={page}

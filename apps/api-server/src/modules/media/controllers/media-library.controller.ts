@@ -8,6 +8,7 @@ import { Router } from 'express';
 import type { Response } from 'express';
 import type { DataSource } from 'typeorm';
 import { authenticate } from '../../../middleware/auth.middleware.js';
+import { isPlatformAdmin } from '../../../utils/role.utils.js';
 import { uploadSingleMiddleware } from '../../../middleware/upload.middleware.js';
 import { MediaLibraryService } from '../services/media-library.service.js';
 import logger from '../../../utils/logger.js';
@@ -66,7 +67,7 @@ export function createMediaLibraryRouter(dataSource: DataSource): Router {
    */
   router.get('/media-library', authenticate, async (req: any, res: Response) => {
     try {
-      if ((req.query.entityType || req.query.entityId) && !req.user?.roles?.some((role:string)=>['platform:admin','platform:super_admin'].includes(role))) {
+      if ((req.query.entityType || req.query.entityId) && !isPlatformAdmin(req.user?.roles ?? [])) {
         res.status(403).json({success:false,code:'PLATFORM_ADMIN_REQUIRED'}); return;
       }
       const page = parseInt(req.query.page as string) || 1;

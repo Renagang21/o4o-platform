@@ -2,19 +2,20 @@
 import { Router } from 'express';
 import type { DataSource } from 'typeorm';
 import { authenticate } from '../../../middleware/auth.middleware.js';
+import { isPlatformAdmin } from '../../../utils/role.utils.js';
 import {
   MediaCatalogError,
   MediaCatalogService,
 } from '../services/media-catalog.service.js';
 
-/** platform 관리자 전용 guard — Media V2 관리 API 와 automation job API(동일 경계)가 공유한다. */
+/**
+ * platform 관리자 전용 guard — Media V2 관리 API 와 automation job API(동일 경계)가 공유한다.
+ * 판정은 canonical `isPlatformAdmin`(= `platform:super_admin`) 한 곳 — 은퇴한 `platform:admin`
+ * 문자열을 allow-list 에 다시 두지 않는다 (WO-O4O-FINAL-ROLE-WORKSPACE-ARCHITECTURE-CENSUS-AND-CLOSURE-V1).
+ */
 export const requireMediaPlatformAdmin = (req: Request, res: Response, next: NextFunction) => {
   const user = req.user as { roles?: string[] } | undefined;
-  if (
-    !user?.roles?.some((role) =>
-      ['platform:admin', 'platform:super_admin'].includes(role),
-    )
-  ) {
+  if (!isPlatformAdmin(user?.roles ?? [])) {
     res.status(403).json({ success: false, code: 'PLATFORM_ADMIN_REQUIRED' });
     return;
   }
