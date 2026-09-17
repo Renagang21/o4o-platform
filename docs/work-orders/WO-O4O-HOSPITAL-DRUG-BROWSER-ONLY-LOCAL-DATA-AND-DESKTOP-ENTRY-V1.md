@@ -196,6 +196,24 @@ probe 도구: `scripts/dev/probe-public-drug-api.mjs`(dev 전용·인증키는 e
   이 API 가 제품↔일반명코드 매핑 + 동일 일반명코드 제품군을 준다면 체인의 중심이 된다.
 - **동일성분 제품군 열거 = 아직 미확정.** 15021027 은 열거하지 않는다. 열거는 ① 15054445 가 일반명코드로 제품목록을 주는지(probe),
   또는 ② HIRA 약가마스터 파일(15067461 의약품주성분 · 15067462 의약품표준코드)로 제품↔주성분코드 전체표를 O4O DB 에 적재해 로컬 조회.
-- **선행 검토(중요):** O4O 는 이미 `product_drug_extensions`(주성분·`insurance_code`·`mfds_code`·`atc_code`·`active_ingredients`) +
-  약가마스터/표준상품 seed 자산을 보유한다. **동일성분 제품군 조회를 외부 API 체인 대신 O4O 자체 DB 로 완결할 수 있는지 먼저 확인**하면
-  라이브 API 의존(쿼리당 외부호출·rate limit)을 줄일 수 있다. 공공 API 는 갱신/보강용으로 두는 구조가 후보. — 사용자 판단 대기.
+### O4O 자체 DB 조사 결과 (2026-09-17) — 현 상태 동일성분 조회 불가
+
+read-only 코드 조사(Explore) 결론: **현 상태 O4O DB 만으로는 동일성분 제품군 조회 불가.** 근거:
+
+- **주성분코드(일반명코드)는 조회 승격되지 않음.** 원천 약가마스터 CSV 22컬럼에 `일반명코드(성분명코드)` 가 100% 존재하나
+  (`drug-master-row.mapper.ts:27`), 값은 `ProductCandidate.rawPayload.source` jsonb 에만 원본 보존된다. 승격 추출 대상에서 빠져 있고
+  (`drug-master-promotion-apply.db.ts:534-541`), `ProductIdentifier` 식별자 타입 union 에도 주성분코드 타입이 없다
+  (`ProductIdentifier.entity.ts:55-78` = KOREA_DRUG_CODE/INSURANCE_CODE/ATC_CODE/MFDS_CODE/GTIN 만).
+- **ProductDrugExtension 에 주성분코드 없음.** `drug_code`(표준코드)·`insurance_code`(EDI)·`mfds_code`(품목기준코드)·`atc_code` 중
+  주성분코드에 해당하는 것이 없고, 성분은 `active_ingredients`(이름 문자열)뿐이며 product 와 1:1(UNIQUE)이라 그룹핑 불가.
+  승격 엔진은 이 엔티티를 생성조차 안 함(`CHECK-O4O-DRUG-MASTER-CANDIDATE-PROMOTION-APPLY-V1.md:125`).
+- **대표상품 그룹핑 = 품목기준코드 기준**(같은 허가품목 SKU 묶음) — 동일성분(브랜드 교차) 아님
+  (`drug-master-representative-grouping.service.ts`).
+- **동일성분 조회 서비스/쿼리 없음.** 현행 `/hospital-drug` 동일성분은 `hospital-drug-composite.ts` 가 health.kr 외부 호출로 수행.
+- **약가마스터 candidate 승격 = 운영 DB 미적용**(dry-run/가드, 별도 승인 필요).
+
+→ **O4O 네이티브 경로는 "빠른 쿼리"가 아니라 빌드 프로젝트**: (1) 승격 파이프라인 성분코드 추출 (2) 식별자 타입(예 `KOREA_GENERIC_CODE`)/
+  컬럼+인덱스 신설 (3) 성분코드 GROUP BY 조회 서비스 (4) 운영 DB 적재. (2)(4) 는 스키마 변경·대량 write = 중지 조건(승인 필요).
+
+**결론(둘 다 전략):** 동일성분 열거의 near-term 소스는 **HIRA 축(15054445 probe → 15021027)** 으로 간다. O4O 네이티브 경로는
+원천 데이터(일반명코드 100% 보존)가 있어 실현 가능하나 스키마+운영적재 승인이 필요한 **별도 후속 트랙**으로 분리한다.
