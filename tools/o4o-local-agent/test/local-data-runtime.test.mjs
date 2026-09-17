@@ -471,6 +471,80 @@ test('health: handler 응답에 ready·schemaVersion·migrationStatus·integrity
   void server;
 });
 
+// ─── query (WO-O4O-HOSPITAL-DRUG-COMPOSITE §5·§7) ────────────────────────────
+
+test('search repository: 부분일치(대소문자 무시)·완전일치·limit·columns 투영 · 없는 값 0행 · 이름 규칙 밖 거절', () => {
+  boot();
+  db.applyImport(REQ);
+  // contains(기본) — 부분일치
+  const c = db.LocalDatasetRepository.search({ dataset: 'product_list', field: 'item_name', value: '게보린' });
+  assert.equal(c.length, 1);
+  assert.equal(c[0].item_name, '게보린정, 10정');
+  assert.equal(c[0].barcode, '8806400000002');
+  // exact — 완전일치만
+  assert.equal(db.LocalDatasetRepository.search({ dataset: 'product_list', field: 'barcode', value: '8806400000001', match: 'exact' }).length, 1);
+  assert.equal(db.LocalDatasetRepository.search({ dataset: 'product_list', field: 'barcode', value: '880640000000', match: 'exact' }).length, 0);
+  // contains 는 부분도 잡는다
+  assert.equal(db.LocalDatasetRepository.search({ dataset: 'product_list', field: 'barcode', value: '880640000000', match: 'contains' }).length, 3);
+  // limit
+  assert.equal(db.LocalDatasetRepository.search({ dataset: 'product_list', field: 'barcode', value: '8806', limit: 2 }).length, 2);
+  // columns 투영은 handler 가 한다 — repository 는 매핑 필드 전체를 준다
+  assert.deepEqual(Object.keys(c[0]).sort(), ['barcode', 'item_name', 'rowKey', 'unit_price']);
+  // 없는 값 → 0행(지어내지 않는다)
+  assert.equal(db.LocalDatasetRepository.search({ dataset: 'product_list', field: 'item_name', value: '존재하지않는약' }).length, 0);
+  // 이름 규칙 밖 → 던진다(파라미터 주입 불가)
+  assert.throws(() => db.LocalDatasetRepository.search({ dataset: 'Drop Table', field: 'item_name', value: 'x' }), (e) => e.code === 'LOCAL_DB_IMPORT_INVALID');
+  assert.throws(() => db.LocalDatasetRepository.search({ dataset: 'product_list', field: "a'b", value: 'x' }), (e) => e.code === 'LOCAL_DB_IMPORT_INVALID');
+});
+
+test('local.data.query handler: 성공(행·count)·columns 투영·인자 밖 거절·#appId 거절·미준비 코드', async () => {
+  boot();
+  db.applyImport(REQ);
+  // 성공 — 부분일치, count/rows
+  const ok = await handlers.runAction('local.data.query', {}, { dataset: 'product_list', field: 'item_name', value: '타이레놀' });
+  assert.equal(ok.status, 'success');
+  assert.equal(ok.data.count, 1);
+  assert.equal(ok.data.match, 'contains');
+  assert.equal(ok.data.rows[0].item_name, '타이레놀정500mg');
+  // columns 투영 — 요청한 필드만(+rowKey)
+  const proj = await handlers.runAction('local.data.query', {}, { dataset: 'product_list', field: 'barcode', value: '8806', columns: ['item_name'], limit: 1, match: 'contains' });
+  assert.equal(proj.status, 'success');
+  assert.deepEqual(Object.keys(proj.data.rows[0]).sort(), ['item_name', 'rowKey']);
+  // 인자 스키마 밖 → INVALID_ARGUMENT
+  for (const bad of [
+    undefined,
+    { dataset: 'product_list' },
+    { dataset: 'product_list', field: 'item_name' },
+    { dataset: 'product_list', field: 'item_name', value: '' },
+    { dataset: 'product_list', field: 'item_name', value: 'x', match: 'regex' },
+    { dataset: 'product_list', field: 'item_name', value: 'x', limit: 0 },
+    { dataset: 'product_list', field: 'item_name', value: 'x', limit: 9999 },
+    { dataset: 'product_list', field: 'item_name', value: 'x', columns: ['Bad Col'] },
+    { dataset: 'product_list', field: 'item_name', value: 'x', extra: 1 },
+    { dataset: 'Drop Table', field: 'item_name', value: 'x' },
+  ]) {
+    const r = await handlers.runAction('local.data.query', {}, bad);
+    assert.equal(r.status, 'denied', JSON.stringify(bad));
+    assert.equal(r.errorCode, 'LOCAL_DATA_INVALID_ARGUMENT', JSON.stringify(bad));
+  }
+  // data 축은 #appId 형태를 허용하지 않는다 → 낯선 action
+  const hashed = await handlers.runAction('local.data.query#firstmall', {}, { dataset: 'product_list', field: 'item_name', value: 'x' });
+  assert.equal(hashed.status, 'denied');
+  assert.equal(hashed.errorCode, 'DENIED_UNKNOWN_ACTION');
+  // 없는 dataset → 성공 0행(오류 아님)
+  const none = await handlers.runAction('local.data.query', {}, { dataset: 'no_such', field: 'item_name', value: 'x' });
+  assert.equal(none.status, 'success');
+  assert.equal(none.data.count, 0);
+  // 응답에 경로·홈이 없다
+  assert.ok(!JSON.stringify(ok.data).includes(home) && !JSON.stringify(ok.data).includes('local.db'));
+});
+
+test('listAllowedActions 에 local.data.query 가 있고, 그 밖의 임의 SQL/덤프 action 은 없다', () => {
+  const allowed = handlers.listAllowedActions();
+  assert.ok(allowed.includes('local.data.query'));
+  assert.ok(!allowed.some((a) => /execute_sql|raw_sql|dump|rows$/.test(a)));
+});
+
 test('경계: local-db 에 파일 읽기·네트워크 없음 · backup 모듈은 자기 backups 디렉터리만 · handlers 는 CLI 모듈을 싣지 않는다 · 민감 스키마 0', () => {
   const read = (f) => fs.readFileSync(new URL(`../src/${f}`, import.meta.url), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, '');
   const ldb = read('local-db.mjs');

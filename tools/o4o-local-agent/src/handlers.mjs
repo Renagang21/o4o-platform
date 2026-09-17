@@ -43,7 +43,7 @@ import {
   validateKeyArgs,
   validateTextArgs,
 } from './computer-use-limits.mjs';
-import { LocalMetaRepository, LocalSettingsRepository, LocalWorkRunRepository, WORK_RUN_ID_RE, WORK_RUN_STATUSES, localDbHealth, LocalDbError } from './local-db.mjs';
+import { LocalMetaRepository, LocalSettingsRepository, LocalWorkRunRepository, LocalDatasetRepository, DATASET_NAME_RE, FIELD_NAME_RE, WORK_RUN_ID_RE, WORK_RUN_STATUSES, localDbHealth, LocalDbError } from './local-db.mjs';
 import { backupSummary } from './local-db-backup.mjs';
 import { prepareTarget, resolveRegisteredTarget } from './work-target.mjs';
 import { uiaInspect, uiaSetValue, uiaInvoke, uiaKey, uiaClick } from './windows-uia.mjs';
@@ -98,6 +98,8 @@ export const ACTIONS = {
   DATA_HEALTH: 'local.data.health',
   DATA_GET_META: 'local.data.get_meta',
   DATA_SET_SETTING: 'local.data.set_setting',
+  // WO-O4O-HOSPITAL-DRUG-COMPOSITE-QUERY-ORCHESTRATION-V1 §5 — dataset 필드 하나를 값으로 찾는 좁은 조회.
+  DATA_QUERY: 'local.data.query',
   DATA_WORK_RUN_UPSERT: 'local.data.work_run_upsert',
   DATA_WORK_RUN_SET_STATUS: 'local.data.work_run_set_status',
 };
@@ -667,6 +669,30 @@ function dataSetSetting(args) {
   return { status: 'success', data: { key: saved.key, saved: true } };
 }
 
+/**
+ * `local.data.query` — dataset 의 한 필드를 값으로 찾는다(WO-O4O-HOSPITAL-DRUG-COMPOSITE §5·§7).
+ * 임의 SQL·전체 덤프가 아니라 등록된 좁은 파라미터 조회다: dataset·field 이름 규칙 + 값 파라미터 바인딩.
+ * columns 를 주면 그 필드들만 투영한다(cloud 로 나가는 데이터를 좁힌다). 파일 경로·원본은 담지 않는다(§33·§38).
+ */
+function dataQuery(args) {
+  const found = LocalDatasetRepository.search({
+    dataset: args.dataset,
+    field: args.field,
+    value: args.value,
+    match: args.match,
+    limit: args.limit,
+  });
+  const project = (row) => {
+    if (!args.columns) return row;
+    // 요청한 필드만 — 없는 필드는 지어내지 않는다(§7). rowKey 는 항상 남긴다.
+    const out = { rowKey: row.rowKey };
+    for (const c of args.columns) if (c in row) out[c] = row[c];
+    return out;
+  };
+  const rows = found.map(project);
+  return { status: 'success', data: { dataset: args.dataset, field: args.field, match: args.match ?? 'contains', count: rows.length, rows } };
+}
+
 // same-run resume 정본 원장(WEB-AUTOMATION-RESUME-V1 PHASE 1).
 const WORK_RUN_UPSERT_STATUSES = Object.freeze(['active', 'waiting_for_user']);
 const WORK_RUN_TEXT_MAX = 500;
@@ -765,8 +791,44 @@ function validateSetSettingArgs(args) {
   return { ok: true, args: { key, value } };
 }
 
+// local.data.query 인자 한계 — 서버 validateLocalDataQueryArgs 와 같은 규칙(§15 이중 방어).
+const DATA_QUERY_VALUE_MAX = 200;
+const DATA_QUERY_MATCH_VALUES = Object.freeze(['exact', 'contains']);
+const DATA_QUERY_COLUMNS_MAX = 32;
+const DATA_QUERY_LIMIT_MAX = 200;
+
 /**
- * 데이터 tool. 인자 없는 것(health)과 인자 받는 것(get_meta·set_setting)을 한 표에서
+ * query 인자 검사 — `{ dataset, field, value, match?, limit?, columns? }`.
+ * generic 이 아니다: 이름은 이름 규칙, 값은 길이 제한, match/limit/columns 는 각각 좁은 스키마다.
+ */
+function validateDataQueryArgs(args) {
+  if (!args || typeof args !== 'object' || Array.isArray(args)) return { ok: false };
+  const allowed = new Set(['dataset', 'field', 'value', 'match', 'limit', 'columns']);
+  for (const k of Object.keys(args)) if (!allowed.has(k)) return { ok: false };
+  if (typeof args.dataset !== 'string' || !DATASET_NAME_RE.test(args.dataset)) return { ok: false };
+  if (typeof args.field !== 'string' || !FIELD_NAME_RE.test(args.field)) return { ok: false };
+  if (typeof args.value !== 'string') return { ok: false };
+  const value = args.value.trim();
+  if (value.length === 0 || value.length > DATA_QUERY_VALUE_MAX) return { ok: false };
+  const out = { dataset: args.dataset, field: args.field, value };
+  if (args.match !== undefined) {
+    if (typeof args.match !== 'string' || !DATA_QUERY_MATCH_VALUES.includes(args.match)) return { ok: false };
+    out.match = args.match;
+  }
+  if (args.limit !== undefined) {
+    if (typeof args.limit !== 'number' || !Number.isInteger(args.limit) || args.limit < 1 || args.limit > DATA_QUERY_LIMIT_MAX) return { ok: false };
+    out.limit = args.limit;
+  }
+  if (args.columns !== undefined) {
+    if (!Array.isArray(args.columns) || args.columns.length === 0 || args.columns.length > DATA_QUERY_COLUMNS_MAX) return { ok: false };
+    for (const c of args.columns) if (typeof c !== 'string' || !FIELD_NAME_RE.test(c)) return { ok: false };
+    out.columns = args.columns;
+  }
+  return { ok: true, args: out };
+}
+
+/**
+ * 데이터 tool. 인자 없는 것(health)과 인자 받는 것(get_meta·set_setting·query)을 한 표에서
  * validate/run 쌍으로 다룬다. 이 표에 없는 `local.data.*` 는 존재하지 않는다.
  * 특히 `local.sqlite.execute_sql` 같은 임의 SQL tool 은 어디에도 없다(§36).
  */
@@ -774,6 +836,7 @@ const DATA_HANDLERS = {
   [ACTIONS.DATA_HEALTH]: { validate: () => ({ ok: true, args: undefined }), run: () => dataHealth() },
   [ACTIONS.DATA_GET_META]: { validate: validateGetMetaArgs, run: (args) => dataGetMeta(args) },
   [ACTIONS.DATA_SET_SETTING]: { validate: validateSetSettingArgs, run: (args) => dataSetSetting(args) },
+  [ACTIONS.DATA_QUERY]: { validate: validateDataQueryArgs, run: (args) => dataQuery(args) },
   [ACTIONS.DATA_WORK_RUN_UPSERT]: { validate: validateWorkRunUpsertArgs, run: (args) => dataWorkRunUpsert(args) },
   [ACTIONS.DATA_WORK_RUN_SET_STATUS]: { validate: validateWorkRunSetStatusArgs, run: (args) => dataWorkRunSetStatus(args) },
 };

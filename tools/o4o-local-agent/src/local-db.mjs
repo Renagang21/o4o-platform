@@ -590,6 +590,31 @@ export const LocalDatasetRepository = {
       .all(String(name), Number(limit) || 100000)
       .map((r) => ({ rowKey: r.row_key, ...JSON.parse(r.data) }));
   },
+  /**
+   * 필드 하나를 값으로 찾는다 — 좁은 파라미터 쿼리만(WO-O4O-HOSPITAL-DRUG-COMPOSITE-QUERY-ORCHESTRATION-V1 §5·§7).
+   *
+   * 임의 SQL 이 아니다: dataset·field 는 이름 규칙(소문자·숫자·_)을 통과해야 하고, 값은 파라미터로만
+   * 바인딩한다(§35). JSON 경로는 검증된 field 로만 만든다. match='contains'(대소문자 무시 부분일치·
+   * 기본) 또는 'exact'(완전일치). 되돌리는 것은 매칭된 행의 매핑 필드뿐 — 파일 경로·원본은 담지 않는다.
+   */
+  search({ dataset, field, value, match = 'contains', limit = 50 }) {
+    const ds = String(dataset ?? '');
+    const f = String(field ?? '');
+    if (!DATASET_NAME_RE.test(ds)) throw new LocalDbError(LOCAL_DB_ERROR.IMPORT_INVALID, `bad dataset: ${ds}`);
+    if (!FIELD_NAME_RE.test(f)) throw new LocalDbError(LOCAL_DB_ERROR.IMPORT_INVALID, `bad field: ${f}`);
+    const v = String(value ?? '');
+    const cap = Math.min(Math.max(Number(limit) || 50, 1), 200);
+    const jsonPath = `$.${f}`; // field 는 [a-z0-9_] 로만 이뤄져 경로 주입이 불가능하다
+    const db = openLocalDb();
+    const rows = match === 'exact'
+      ? db
+          .prepare('SELECT row_key, data FROM local_dataset_rows WHERE dataset=? AND json_extract(data, ?)=? ORDER BY rowid LIMIT ?')
+          .all(ds, jsonPath, v, cap)
+      : db
+          .prepare('SELECT row_key, data FROM local_dataset_rows WHERE dataset=? AND instr(lower(json_extract(data, ?)), lower(?))>0 ORDER BY rowid LIMIT ?')
+          .all(ds, jsonPath, v, cap);
+    return rows.map((r) => ({ rowKey: r.row_key, ...JSON.parse(r.data) }));
+  },
 };
 
 /** same-run resume 정본 원장(PHASE 1). 고정 쿼리만 — 임의 SQL 통로 없음. */
