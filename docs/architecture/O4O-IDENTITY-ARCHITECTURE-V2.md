@@ -1,5 +1,7 @@
 # O4O Platform Identity Architecture V2
 
+> **상태**: SUPERSEDED · **대체 문서**: [`docs/architecture/O4O-IDENTITY-ARCHITECTURE-V3.md`](O4O-IDENTITY-ARCHITECTURE-V3.md) (Google 단일 로그인 · 최소 개인정보 User — L2 서비스별 password 모델 폐기) · **표기일**: 2026-09-17 · 근거 WO `WO-O4O-PRIVACY-IDENTITY-TARGET-MODEL-CANONICALIZATION-V1`. 아래 본문은 역사 기록으로 불변.
+
 > **Canonical Identity Baseline.** 본 문서는 V1 의 "공통 password 모델" 을 **O4O 의 "서비스별 독립 사업자 + 서비스별 독립 회원" 철학**과 정합하는 모델로 재정의하며, **O4O Identity 의 공식 기준 문서 (Canonical)** 다.
 
 - **상태:** **CANONICAL** (Adopted) — 향후 모든 신규 Identity 관련 구조 판단은 본 문서를 기준으로 한다

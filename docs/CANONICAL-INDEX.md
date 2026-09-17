@@ -78,6 +78,7 @@
 | 문서 | 역할 | 상태 |
 |---|---|---|
 | [USER-DOMAIN-SSOT-V1](baseline/USER-DOMAIN-SSOT-V1.md) | User 도메인 SSOT | ACTIVE |
+| [O4O-IDENTITY-ARCHITECTURE-V3](architecture/O4O-IDENTITY-ARCHITECTURE-V3.md) | **Identity · 개인정보 Architecture SSOT** (2026-09-17 채택, `WO-O4O-PRIVACY-IDENTITY-TARGET-MODEL-CANONICALIZATION-V1`) — Google 단일 로그인(`sub` → `linked_accounts` → `users.id` · 이메일 자동 병합 금지) · 최소 User(필수 개인정보 없음) · Professional Credential 논리/물리(`kpa_pharmacist_profiles` 초기) · `Business ≠ Store ≠ User` 별도 row · Relationship ≠ Authorization(`role_assignments` SSOT · 접근 = Role ∧ Credential ∧ Relationship) · Claim · Public Contact ≠ Connected Channel · Consent · 사업자증빙 예외 · `refresh_tokens = DEAD_RETIRE`. [V2](architecture/O4O-IDENTITY-ARCHITECTURE-V2.md)(서비스별 password L2) · [V1](architecture/O4O-IDENTITY-ARCHITECTURE-V1.md) 은 SUPERSEDED(본문 보존) | ACTIVE |
 | [ROLE-POLICY-AND-GUARD-V1](baseline/ROLE-POLICY-AND-GUARD-V1.md) | Role 정책 · Guard baseline (`requireAuth` → `require{Service}Scope`) | ACTIVE |
 | [RBAC-CANONICAL-STATE-V1](rbac/RBAC-CANONICAL-STATE-V1.md) | RBAC 현행 canonical 상태 | ACTIVE |
 | [RBAC-ROLE-CATALOG-V1](rbac/RBAC-ROLE-CATALOG-V1.md) | 역할 카탈로그 | ACTIVE |

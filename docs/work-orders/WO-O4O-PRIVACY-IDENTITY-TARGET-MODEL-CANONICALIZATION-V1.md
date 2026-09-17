@@ -86,4 +86,4 @@ Google 로그인 구현 · email/password 로그인 제거 · `linked_accounts` 
 
 ---
 
-*작성: 2026-09-17 · 상태: **DRAFT — 핸드오프 대기** · 실행 지시 전 착수하지 않음*
+*작성: 2026-09-17 · 상태: **CLOSED — `Architecture Canonicalization: COMPLETE`** (2026-09-17) · 산출물: [`O4O-IDENTITY-ARCHITECTURE-V3`](../architecture/O4O-IDENTITY-ARCHITECTURE-V3.md)(CANONICAL · Option A 변형 = 새 Privacy/Identity 정본을 V3 로 작성, 문서 1개 추가) · [V2](../architecture/O4O-IDENTITY-ARCHITECTURE-V2.md) · [V1](../architecture/O4O-IDENTITY-ARCHITECTURE-V1.md) SUPERSEDED 한 줄 표기(본문 불변) · `CANONICAL-INDEX` §4 V3 행 등재 · 코드/DB/migration/production 0 · Phase 1 IR · Decision Closure IR 무수정 · 별도 WO 제안 1건(F10 §5-A · F11 §10 · MYPAGE · OPERATOR-DASHBOARD §3-3 · USER-DOMAIN-SSOT 의 V2/password 참조 정정 — Phase 2 실행계획 WO 에 포함 권장) · 다음 = Phase 2 Google Identity Migration 실행계획 WO*

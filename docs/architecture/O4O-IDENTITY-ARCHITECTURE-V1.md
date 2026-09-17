@@ -1,5 +1,7 @@
 # O4O Platform Identity Architecture V1
 
+> **상태**: SUPERSEDED · **대체 문서**: [`docs/architecture/O4O-IDENTITY-ARCHITECTURE-V3.md`](O4O-IDENTITY-ARCHITECTURE-V3.md) (V2 도 2026-09-17 SUPERSEDED — 아래 "V2 가 Canonical" 배너는 역사 기록) · **표기일**: 2026-09-17
+
 > **WO-O4O-AUTH-PASSWORD-SYNC-V1 완료 후 작성**
 > 플랫폼 전체 인증·인가·서비스 이동 아키텍처 문서
 
