@@ -22,7 +22,7 @@
  */
 
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
-import { HardDrive, Loader2, Send, Wifi, WifiOff } from 'lucide-react';
+import { ChevronDown, HardDrive, Loader2, MonitorSmartphone, Send, Wifi, WifiOff } from 'lucide-react';
 import { useWorkScope } from '../contexts';
 import {
   sendUnifiedRequest,
@@ -47,6 +47,27 @@ type AgentStatus =
   | { state: 'connected' }
   | { state: 'unavailable'; reason: LocalAgentUnavailableReason };
 
+/**
+ * 이 화면 전용 PWA manifest (§11). 사이트 전역 manifest 를 만들지 않는다 —
+ * 이 페이지에 있는 동안만 `<link rel="manifest">` 를 Blob 으로 끼웠다가 떠날 때 뺀다.
+ * 그래서 표시명 `원내 약품 안내`·start_url `/hospital-drug` 로 Chrome/Edge 의
+ * "앱 설치" 가 이 화면에만 뜨고, 다른 Neture 화면에는 영향이 없다.
+ * 설치를 강제하지 않는다 — 어떤 브라우저든 URL 직접 사용은 그대로 가능하다.
+ */
+const WARD_MANIFEST = {
+  name: '원내 약품 안내',
+  short_name: '원내 약품',
+  start_url: '/hospital-drug',
+  scope: '/hospital-drug',
+  display: 'standalone',
+  background_color: '#f8fafc',
+  theme_color: '#0f172a',
+  icons: [
+    { src: '/favicon.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
+    { src: '/favicon.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
+  ],
+};
+
 export default function HospitalDrugPage() {
   const { workScope, isResolvingStore } = useWorkScope();
 
@@ -60,6 +81,26 @@ export default function HospitalDrugPage() {
   /** 세션 만료(401) 전용 안내. 일반 오류와 문구·처치가 다르다(설치자 재연결). */
   const [reconnectNeeded, setReconnectNeeded] = useState(false);
   const [agent, setAgent] = useState<AgentStatus>({ state: 'checking' });
+  const [helpOpen, setHelpOpen] = useState(false);
+
+  // §11 — 이 화면에 있는 동안만 전용 manifest 를 끼운다. 떠나면 원상복구.
+  useEffect(() => {
+    let url: string;
+    let link: HTMLLinkElement;
+    try {
+      url = URL.createObjectURL(new Blob([JSON.stringify(WARD_MANIFEST)], { type: 'application/manifest+json' }));
+      link = document.createElement('link');
+      link.rel = 'manifest';
+      link.href = url;
+      document.head.appendChild(link);
+    } catch {
+      return; // Blob/manifest 미지원 브라우저 — URL 직접 사용은 그대로 가능하다(§11).
+    }
+    return () => {
+      link.remove();
+      URL.revokeObjectURL(url);
+    };
+  }, []);
 
   const refreshAgent = useCallback(async () => {
     setAgent({ state: 'checking' });
@@ -249,6 +290,36 @@ export default function HospitalDrugPage() {
               ))}
             </div>
           )}
+
+          {/* §11 — 바탕화면 추가 안내. 설치를 강제하지 않고 방법만 알려준다. */}
+          <div className="mt-8 rounded-lg border border-slate-200 bg-white">
+            <button
+              type="button"
+              onClick={() => setHelpOpen((v) => !v)}
+              aria-expanded={helpOpen}
+              data-testid="hospital-drug-help-toggle"
+              className="flex w-full items-center justify-between px-4 py-3 text-left text-sm text-slate-700"
+            >
+              <span className="flex items-center gap-2">
+                <MonitorSmartphone className="h-4 w-4 text-slate-500" />
+                이 화면을 바탕화면에 추가하기
+              </span>
+              <ChevronDown className={`h-4 w-4 text-slate-400 transition-transform ${helpOpen ? 'rotate-180' : ''}`} />
+            </button>
+            {helpOpen && (
+              <div className="border-t border-slate-100 px-4 py-3 text-xs leading-relaxed text-slate-600" data-testid="hospital-drug-help">
+                <p className="m-0">
+                  Chrome · Edge: 주소창 오른쪽의 <span className="font-medium">설치 아이콘</span> 을 누르거나, 브라우저
+                  메뉴에서 <span className="font-medium">앱 설치</span>(또는 「도구 더보기 → 바로가기 만들기」) 를 선택하면
+                  「원내 약품 안내」 아이콘이 바탕화면에 만들어집니다.
+                </p>
+                <p className="m-0 mt-2">
+                  설치 메뉴가 보이지 않는 브라우저에서는 이 주소를 즐겨찾기에 추가해 사용하세요:{' '}
+                  <span className="font-mono text-slate-800">neture.co.kr/hospital-drug</span>
+                </p>
+              </div>
+            )}
+          </div>
         </div>
       </main>
     </div>

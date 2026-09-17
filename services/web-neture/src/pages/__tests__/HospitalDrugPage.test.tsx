@@ -106,4 +106,34 @@ describe('원내 약품 안내 — 게이트1 옵션 C', () => {
       expect(screen.getByTestId('hospital-drug-agent-status').textContent).toContain('원내 자료 미연결');
     });
   });
+
+  it('바탕화면 추가 안내(§11)를 펼칠 수 있다', async () => {
+    probeLocalAgent.mockResolvedValue({ ok: true, health: { agentVersion: '0.1.0', connected: true, nonce: 'n' } });
+    render(<HospitalDrugPage />);
+
+    await userEvent.click(await screen.findByTestId('hospital-drug-help-toggle'));
+    const help = await screen.findByTestId('hospital-drug-help');
+    expect(help.textContent).toContain('neture.co.kr/hospital-drug');
+  });
+
+  it('이 화면 전용 manifest(표시명·start_url)를 head 에 끼운다(§11)', async () => {
+    probeLocalAgent.mockResolvedValue({ ok: true, health: { agentVersion: '0.1.0', connected: true, nonce: 'n' } });
+    // jsdom 은 createObjectURL 이 없다 — 실제 브라우저 동작을 흉내만 낸다.
+    const createObjectURL = vi.fn(() => 'blob:ward-manifest');
+    const revokeObjectURL = vi.fn();
+    vi.stubGlobal('URL', Object.assign(URL, { createObjectURL, revokeObjectURL }));
+
+    const { unmount } = render(<HospitalDrugPage />);
+    await screen.findByTestId('hospital-drug-input');
+
+    const link = document.head.querySelector('link[rel="manifest"]') as HTMLLinkElement | null;
+    expect(link).not.toBeNull();
+    expect(link?.href).toContain('blob:ward-manifest');
+    expect(createObjectURL).toHaveBeenCalled();
+
+    unmount();
+    // 화면을 떠나면 원상복구된다 — 사이트 전역에 남지 않는다.
+    expect(document.head.querySelector('link[rel="manifest"]')).toBeNull();
+    expect(revokeObjectURL).toHaveBeenCalled();
+  });
 });
