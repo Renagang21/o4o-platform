@@ -31,7 +31,7 @@
 |---|---|
 | 서버 | `POST /api/v1/auth/handoff` · `POST /api/v1/auth/handoff/exchange` (`handoff.controller.ts`) · `handoff-token.service.ts` · `/auth/me` · `/auth/refresh` · `/auth/logout(-all)` (`auth-session.controller.ts` · `auth-token-session.service.ts` · `auth-context.helper.ts`) · `requireAuth`/`extractToken` · `cookie.utils.ts` · CORS(`setup-middlewares.ts`) |
 | 공통 패키지 | `@o4o/auth-client` `client.ts`(storage · 401 interceptor · refresh single-flight · `clearAllTokens` · `auth:token-cleared`) · `@o4o/auth-react` `useServiceAuth` · `@o4o/auth-utils` `authEvents.ts` |
-| 서비스 | Neture(대표 홈 `O4OHomePage` · `AuthContext` · `home-entry.ts openServiceEntry`) · KPA Society · K-Cosmetics · Pharmacy-Hub · (kpa-branch · account HandoffPage 는 정적 확인만) · GlycoPharm 제외 |
+| 서비스 | Neture(대표 홈 `O4OHomePage` · `AuthContext` · `home-entry.ts openServiceEntry`) · KPA Society · K-Cosmetics · Pharmacy-Hub · (kpa-branch · account HandoffPage 는 정적 확인만) |
 | 브라우저 | Playwright MCP Chromium(격리 프로필) · 프로덕션 도메인 · KPA 체험용 약국 경영자 버튼 로그인 · handoff 생성은 각 origin 의 localStorage Bearer 로 `POST /auth/handoff` 직접 호출(앱 `openServiceEntry` 와 동일 API) → `data.targetUrl` 로 이동 |
 | 시간 기준 | 토큰 `iat/exp`(epoch 초) 와 브라우저 `Date.now()` 로 절대 시각 정렬 |
 
