@@ -18,10 +18,10 @@
 | 기존 사용자 전환 | 로그인 상태 → 계정 설정 → **password 재입력** → Google ID token → `sub` 중복 확인 → `linked_accounts` insert → 세션 유지. 연결과 password 폐기는 **분리**(P2-C ↔ P2-F) |
 | `service_credentials` | Phase 2-F 에서 연결 계정의 reader 무력화(password login 차단으로 의미 상실) · **물리 제거는 Phase 5** `users.password` 컬럼 제거와 동일 migration |
 | `users.password` NULL | P2-F — 계정별. 선행조건 = 해당 계정 Google 로그인 성공 이력 ≥1 + 모든 진입점(web 7 · admin · mobile) Google 로그인 LIVE + `password DROP NOT NULL` migration 적용 |
-| 접근 불가 사용자 복구 | 운영자 본인확인 → 1회용·단기 연결 token 발급(`linking_sessions` 신설 필요 — 운영 테이블 **부재**) → 사용자 Google 인증 → `sub ↔ 기존 users.id`. 이메일만으로 발급 금지 |
+| 접근 불가 사용자 복구 | 운영자 본인확인 → 1회용·단기 연결 token 발급(`linking_sessions` 신설 — 운영 테이블 **부재** · WO-2E 에서 생성) → 사용자 Google 인증 → `sub ↔ 기존 users.id`. 이메일만으로 발급 금지 |
 | 이메일 동일성 | UX 힌트 한 가지 용도만: Google 로그인 `sub` miss 시 "이 이메일의 기존 계정이 있습니다 → 기존 계정 로그인 후 연결" 안내(`existingAccountByEmail: boolean` 만 노출). 자동 병합 · `linked_accounts` 생성 · password 우회 · 운영자 미승인 복구 **모두 금지** |
 | 구현 WO 분할 | **8개** — 2A 선행조건 · 2B 병합 제거 · 2C 명시 연결 · 2D Google 로그인/가입(2D-web · 2D-mobile) · 2E 운영자 복구 · 2F 계정별 password 폐기 · 2G Kakao/Naver/passport 제거 · 2H 전환 검증 + 문서 정합 |
-| 사용자 결정 요청 | §8 — (a) Google 인증 방식 GIS ID token(권장) vs passport redirect · (b) 1 user : 1 Google sub(권장) · (c) 재인증 시간 창 미도입(권장 — JWT 에 `auth_time` 없음) · (d) P2-F 차단 방식 feature flag 롤아웃 |
+| 사용자 결정 (2026-09-17 확정) | §8 — (a) **Google ID-token-to-backend**(Web=GIS · Mobile=native · 서버 aud allowlist) · (b) 1 user : 1 Google sub · (c) `auth_time` 미도입 + **P2-C 재인증 = `users.password` 만**(`service_credentials` 금지) · (d) feature flag 롤아웃 · (e) `linking_sessions` 는 **WO-2E 에서 생성** · (f) Google email = optional profile · UNIQUE 충돌 시 가입 거부 + 연결 안내 |
 
 ---
 
@@ -85,7 +85,7 @@
 | `provider` | varchar(50) NOT NULL | enum `email|google|kakao|naver` | varchar 유지 · Phase 2 runtime write = `'google'` 고정. enum 선언은 entity 만 정정(DDL 불변) | P2-A(entity) |
 | `providerId` | varchar(255) NULL | nullable | = Google `sub`. Google row 는 NOT NULL 을 **runtime 검증**(DDL 은 legacy email row 호환 위해 nullable 유지) | P2-A |
 | `(provider, providerId)` unique | **없음** — non-unique `IDX_linked_accounts_provider` | `@Unique(['userId','provider','providerId'])`(운영 없음) | **`CREATE UNIQUE INDEX … ON linked_accounts(provider, "providerId") WHERE "providerId" IS NOT NULL`** — 1 sub = 1 user 의 DB 보장(race 방어) | **P2-A** |
-| 1 user 당 Google 수 | 제약 없음 | `@Unique(userId,provider,providerId)` 는 다중 허용 | **1 user : 1 Google sub** (partial unique `(userId) WHERE provider='google'`) — §8(b) 사용자 확인 | P2-A |
+| 1 user 당 Google 수 | 제약 없음 | `@Unique(userId,provider,providerId)` 는 다중 허용 | **1 user : 1 Google sub** (partial unique `(userId) WHERE provider='google'`) — §8(b) 확정. 양방향 unique 로 sub→user · user→sub 모두 봉쇄 | P2-A |
 | `email` | varchar NULL | **NOT NULL** + `@Index(['email'])`(운영 없음) | Google row 에 **저장하지 않음**(V3 §3 자동 병합 유혹 제거). entity NOT NULL → nullable 정정. 컬럼 삭제는 P5 | P2-A(entity) / P5 |
 | `displayName` · `profileImage` · `providerData` | NULL | nullable | 저장하지 않음 → P5 삭제 | P5 |
 | `accessToken` · `refreshToken` · `expiresAt` · `profile` | 운영 잉여 4컬럼(entity 없음) | — | 사용 금지 → P5 삭제 | P5 |
@@ -99,9 +99,9 @@
 **P2-A migration 최소 변경(F10 예외 승인 대상)** — incremental migration 1건:
 1. `ALTER TABLE linked_accounts ADD CONSTRAINT FK_linked_accounts_user FOREIGN KEY ("userId") REFERENCES users(id) ON DELETE CASCADE`
 2. partial unique `(provider, "providerId") WHERE "providerId" IS NOT NULL`
-3. partial unique `("userId") WHERE provider = 'google'` (§8(b) 채택 시)
+3. partial unique `("userId") WHERE provider = 'google'` (§8(b) 확정)
 4. `ALTER TABLE users ALTER COLUMN password DROP NOT NULL` · `ALTER COLUMN name DROP NOT NULL, ALTER COLUMN name DROP DEFAULT` (§6 Q5)
-5. `CREATE TABLE linking_sessions`(entity 존재 · 운영 부재) — P2-E 복구 token 저장소. P2-A 에 묶을지 P2-E 로 미룰지는 §7 WO-2E 참조
+~~5. `CREATE TABLE linking_sessions`~~ — **P2-A 에서 제외**(§8(e) 확정). 실제 복구 기능을 구현하는 WO-2E 의 migration 으로 생성한다(사용하지 않는 인증 구조를 미리 만들지 않는다)
 
 주의(메모리 `project_phase1_same_run_ci_red_migration_blocked`): incremental migration 추가 시 `expected-schema-states` · ledger spec · agent 테스트를 **같은 커밋**에 포함한다. `linked_accounts` 는 `BaselineRbacAndAccountTables` 의 assertion 대상(구조 불일치 → deploy 중지)이므로 baseline assertion 도 함께 갱신해야 한다.
 
@@ -118,13 +118,13 @@
         ↓
 [Google 계정 연결]
         ↓
-password 재입력 (users.password 또는 현재 serviceKey credential — login 과 동일 dual-read)
+password 재입력 — **users.password 만** 검증 (service_credentials 는 재인증 증거로 사용 금지 · §8-1)
         ↓
 Google Identity Services → ID token (aud = 해당 origin 의 client_id)
         ↓
 POST /api/v1/auth/google/link { idToken, password }   (requireAuth)
         ↓
-서버: ID token 검증(iss · aud · exp · email_verified 무관) → sub 추출
+서버: ID token 검증(서명 · iss · exp · **aud ∈ 서버 allowlist{web, admin, mobile client_id}** — 클라이언트가 보낸 aud 를 신뢰하지 않음) → sub 추출
         ↓
 sub 조회 — 다른 user 에 연결됨 → 409 GOOGLE_SUB_ALREADY_LINKED (병합 없음)
         ↓
@@ -139,8 +139,8 @@ account_activities(type='linked_google') 기록 → 200 { linked: true }
 
 | 항목 | 결정 | 근거 |
 |---|---|---|
-| 연결 직전 password 재입력 | **필수**(password 보유 계정). `''`/NULL 계정은 이 경로 불가 → U4 복구 | 계정 탈취 세션이 Google 을 붙여 영구화하는 것을 막는다 |
-| 최근 인증 세션을 재인증으로 인정할 시간 | **미도입** — JWT 에 `auth_time` 이 없고 refresh 로 `iat` 가 갱신되어 "최근 로그인" 판별 불가. 도입 = 토큰 계약 변경(중지 조건) → Phase 4 Claim 작업으로 이월 | §8(c) |
+| 연결 직전 password 재입력 | **필수 · `users.password` 만 인정**. `service_credentials.password_hash` 는 전환기 동안 재인증 증거로 **사용 금지**(§8-1). `users.password` 가 `''`/NULL 이거나 기억 못하면 → reset 가능 기간엔 `forgot-password`, 아니면 U4 운영자 복구 | 계정 탈취 세션이 Google 을 붙여 영구화하는 것을 막는다. 현행 register 가 이메일만으로 credential 을 만들 수 있으므로 credential 은 소유 증거가 아니다 |
+| 최근 인증 세션을 재인증으로 인정할 시간 | **미도입(확정)** — JWT 에 `auth_time` 이 없고 refresh 로 `iat` 가 갱신되어 "최근 로그인" 판별 불가. 도입 = 토큰 계약 변경(중지 조건) → Phase 4 Claim 작업으로 이월. 이 재인증 정책은 password 소멸과 함께 소멸하는 **전환기 전용 장치** | §8(c) |
 | 동일 sub 가 다른 user 에 연결 | 409 거부 · 메시지 "이 Google 계정은 이미 다른 O4O 계정에 연결되어 있습니다" · 해제는 그 계정에서만 · 감사 로그 | 자동 병합 금지 |
 | Google 인증 취소 / 팝업 닫힘 | 서버 상태 변화 0(ID token 방식은 최종 POST 전까지 stateless) · 설정 화면 복귀 | — |
 | 연결 중 브라우저 종료 | 동일 — 잔존 상태 없음 | — |
@@ -185,7 +185,7 @@ account_activities(type='linked_google') 기록 → 200 { linked: true }
 | Google callback / 팝업 실패(네트워크 · 취소) | 클라이언트 | 화면 복귀 · 서버 무상태 | 0 |
 | `sub` 중복 — 다른 user 에 이미 연결 | `linked_accounts` 조회 + unique | 409 · 병합 없음 · 감사 로그 · 안내(해당 계정에서 해제 후 재시도 또는 운영자 문의) | 0 |
 | `sub` 중복 — 같은 user 재요청 | 동일 | 멱등 200 | 0 |
-| 기존 계정 접근 불가(U4 · U5) | 사용자 신고 | **P2-E 운영자 복구**: (1) 본인확인 — 이름 · 전화 · 약사면허 정보(`kpa_pharmacist_profiles`) · 서비스 membership · 분회/사업장 관계 중 **2개 이상 대조** (2) `linking_sessions` insert(userId · provider='google' · status=pending · verificationToken 무작위 32B · expiresAt = 발급 +15분 · metadata = {issuedBy 운영자 id, reason}) (3) 사용자에게 token URL 전달(이메일만으로 발급 금지 — 전화 등 2차 채널 확인) (4) 사용자 Google 인증 → `POST /auth/google/link/recover {token, idToken}` → token single-use 소모 → insert (5) `account_activities(type='linked_google_recovered')` + action_log | `linking_sessions` 1행 · `linked_accounts` 1행 |
+| 기존 계정 접근 불가(U4 · U5) | 사용자 신고 | **P2-E 운영자 복구**: (1) 본인확인 — 이름 · 전화 · 약사면허 정보(`kpa_pharmacist_profiles`) · 서비스 membership · 분회/사업장 관계 중 **2개 이상 대조** (2) `linking_sessions` insert(WO-2E 에서 테이블 생성 · userId · provider='google' · status=pending · verificationToken 무작위 32B · expiresAt = 발급 +15분 · metadata = {issuedBy 운영자 id, reason}) (3) 사용자에게 token URL 전달(이메일만으로 발급 금지 — 전화 등 2차 채널 확인) (4) 사용자 Google 인증 → `POST /auth/google/link/recover {token, idToken}` → token single-use 소모 → insert (5) `account_activities(type='linked_google_recovered')` + action_log | `linking_sessions` 1행 · `linked_accounts` 1행 |
 | email 동일 · sub 미연결(U2) | `POST /auth/google/login` 에서 sub miss → `users.email` 존재 여부만 조회 | 404 `GOOGLE_NOT_LINKED` + `{ existingAccountByEmail: true }` → UI 힌트. 연결 · 로그인 · 토큰 발급 **없음** | 0 |
 | email 동일 · 다른 사람이 신규가입 시도 | `users.email UNIQUE` 충돌 | Phase 2: 409 `EMAIL_IN_USE` + 동일 힌트(가입 불가 · 기존 계정 소유자면 로그인 후 연결 · 아니면 운영자 문의). Phase 5 `email` 제약 완화 후 해소 | 0 |
 | 중복 users(U11) | 운영자 인지 | Phase 2 병합 없음 · 사용자가 하나를 선택해 연결 · 나머지 계정 처리는 보유기간 정책 | 0 |
@@ -220,31 +220,41 @@ account_activities(type='linked_google') 기록 → 200 { linked: true }
 
 ---
 
-## 8. 사용자 결정 요청 항목
+## 8. 사용자 결정 — 확정 (2026-09-17)
 
-| # | 항목 | 권장 | 대안 | 이유 |
+| # | 항목 | IR 권고 | **확정** | 판정 |
 |---|---|---|---|---|
-| (a) | Google 인증 방식 | **Google Identity Services(GIS) ID token** — 클라이언트가 ID token 획득 → `POST /auth/google/{login|signup|link}` 로 전달 → 서버 `google-auth-library` `verifyIdToken` | 현행 `passport-google-oauth20` redirect(callback `api.neture.co.kr/api/v1/social/google/callback` 단일) | 서비스 도메인 3축 + admin + mobile 에서 **origin 별 cookie 스코프**(`cookie.utils` 가 요청 origin 으로 도메인 결정)를 그대로 쓰려면 API 가 각 origin 의 XHR 로 호출되어야 한다. redirect 방식은 return-to state · 세션 · 도메인 간 쿠키 문제를 추가로 풀어야 하고, mobile 은 어차피 네이티브 ID token 이다. 단점: `google-auth-library` 의존성 추가(`package.json` + `package.production.json` 동기 · 중지 조건) |
-| (b) | 1 user 당 Google sub 수 | **1개** (partial unique) | N개 허용 | 단순 · 교체는 "재연결" 트랜잭션으로 충분. 필요 시 index 삭제만으로 확장 가능 |
-| (c) | 재인증 시간 창 | **미도입**(password 재입력 항상) | JWT `auth_time` claim 추가 후 10분 창 | 토큰 계약 변경 회피 · Phase 4 Claim 작업으로 이월 |
-| (d) | P2-F 차단 방식 | **feature flag 롤아웃**(운영자 코호트 → 전체) + 30일 관찰 후 NULL 배치 | 연결 즉시 차단 | 진입점 누락 락아웃을 flag off 로 즉시 원복 |
-| (e) | `linking_sessions` 생성 시점 | **WO-2A migration 에 포함**(F10 예외 1회로 묶음) | WO-2E 별도 migration | migration 예외 승인 횟수 최소화 |
-| (f) | Google 가입 시 `users.email` | Google `email` claim 을 **optional profile 로 저장**(사용자 타이핑 없음) — `UNIQUE` 충돌 시 가입 거부 + 힌트 | email 미저장(=`email NOT NULL` 완화 선행, 소비처 56곳) | Phase 2 범위 최소화. `email` 제약 완화는 P5 |
+| (a) | Google 인증 방식 | GIS ID token → 서버 검증 | **Google ID-token-to-backend** 를 정본 개념으로. Web = Google Identity Services → ID token → O4O API · Mobile = Native Google Sign-In → ID token → **같은 O4O API**. 서버는 `google-auth-library` 로 서명 · issuer · audience · expiration 검증, **aud 는 서버 설정 allowlist(Web · Admin · Mobile client ID)** 로 판정하고 클라이언트가 보낸 aud 를 신뢰하지 않는다. Identity Key = `sub` 만 (이메일 아님) | 채택 |
+| (b) | 1 user 당 Google sub | 1개 | **1개** — `(provider, providerId)` unique + `(userId) WHERE provider='google'` unique 양방향. 업무용/개인용 동시 연결 요구가 실제로 생기면 그때 완화 | 채택 |
+| (c) | 재인증 | `auth_time` 미도입 · password 재입력(users.password 또는 credential) | **`auth_time` 미도입 + P2-C 재인증은 `users.password` 재확인만 인정.** `service_credentials.password_hash` 는 재인증 증거로 사용 금지(§8-1). password 없음/분실 → reset 가능 기간엔 reset, 아니면 P2-E 운영자 복구. 전환기 전용 장치 | **수정 채택** |
+| (d) | P2-F 차단 방식 | feature flag 롤아웃 | Google 연결 → Google 로그인 실제 성공 확인 → 운영자 코호트 차단 → 관찰 → 전체 확대 → 30일 안정 → NULL. **NULL 전까지 flag OFF 로 즉시 rollback 가능** — 차단 테스트 기간 ≠ password 데이터 삭제 시점 | 채택 |
+| (e) | `linking_sessions` 생성 시점 | WO-2A migration 에 포함 | **WO-2E(Operator Recovery) 에서 migration 과 함께 생성.** 원칙: 실제 사용하지 않는 인증 구조를 미리 만들지 않는다. F10 예외 1회 추가 비용 < dead auth table 선생성 비용 | **변경** |
+| (f) | Google 가입 시 `users.email` | optional profile 저장 · UNIQUE 충돌 시 거부 + 힌트 | Google email = Identity Key ✗ · 자동병합 기준 ✗ · 계정소유 증명 ✗ / optional profile ○ · 연락/표시 ○ · 기존계정 안내 힌트 ○. UNIQUE 충돌 → `409 EMAIL_IN_USE` · 신규 user 생성 없음 · "기존 O4O 계정이 있을 수 있으므로 계정 연결 절차를 이용하십시오" 안내. `email 같음 → 기존 user 자동 선택` 절대 금지. email 완전 optional 은 Phase 5 | 채택 |
 
----
+### 8-1. 보안 메모 — legacy `service_credentials` writer 격리
+
+현행 경로(§1 #2):
+
+```text
+기존 users.email 존재 → register → 본인확인 없이 service_credentials 생성/갱신
+```
+
+- P2-B 에서 **즉시 제거하지 않는다** — 기존 사용자의 새 서비스 가입 경로가 사라진다.
+- 원칙: **이 경로가 살아 있는 동안 생성된 service credential 은 Google Identity 연결의 본인 재인증 수단으로 사용하지 않는다.** (→ §4-2 · §8(c))
+- P2-D 에서 각 서비스의 가입 신청 경로를 Google 사용자 기준으로 정리하면서 이 legacy writer 를 제거한다. 기능 공백 없이 위험을 격리한다.
 
 ## 9. 완료 보고 — 12개 질문
 
 1. **Phase 2 의 첫 코드 변경** — WO-2B: `socialAuthService.handleSocialAuth` 의 `email OR provider_id` 조회·`users.provider` 덮어쓰기와 `auth-login.service.handleOAuthLogin` 의 `existingUserByEmail → linkOAuthAccount(autoLinked)` 분기 삭제, `AccountLinkingService.mergeAccounts` 은퇴, `passportDynamic` Google strategy 의 `handleSocialAuth` 연결 해제. 두 경로 모두 현재 **호출자 0** 이므로 기존 사용자 로그인 영향 0. 단, 커밋 순서상 WO-2A(계약 migration + 의존성)가 먼저다.
 2. **자동 병합 제거 전 선행조건** — (i) 본 IR 의 "도달 불가" 판정 유지 확인(`passport.authenticate` route 0 · `login(provider≠email)` 호출자 0 을 CI grep 게이트로 고정) (ii) WO-2A read-only census: `users.provider IS NOT NULL` 분포 · `password=''` 계정 수 · `linked_accounts` 0행 재확인 (iii) 제거 후 Google 진입점이 없는 공백 기간에도 email/password 로그인이 그대로이므로 사용자 접근 단절 없음.
-3. **기존 사용자 Google 연결 흐름** — §4-1. 로그인 → `/mypage/settings` → [Google 계정 연결] → password 재입력 → GIS ID token → `POST /auth/google/link {idToken, password}` → verify → sub 중복 검사(409) → `linked_accounts` insert → 감사 로그 → 세션 유지 → `GET /auth/identity` 로 상태 표시.
+3. **기존 사용자 Google 연결 흐름** — §4-1. 로그인 → `/mypage/settings` → [Google 계정 연결] → `users.password` 재입력(credential 불인정) → Google ID token → `POST /auth/google/link {idToken, password}` → verify → sub 중복 검사(409) → `linked_accounts` insert → 감사 로그 → 세션 유지 → `GET /auth/identity` 로 상태 표시.
 4. **신규 사용자 생성 데이터** — `users(id, status='active', created_at, updated_at, email=Google claim[optional], name=Google name claim[optional])` + `linked_accounts(userId, 'google', sub, linkedAt)` + `role_assignments(user)` + 동의 3컬럼(`tos/privacy/marketing`). 사용자 타이핑 개인정보 0. 서비스 가입은 별도 — 각 서비스의 가입 신청 흐름(승인제 · password 없음).
 5. **Google-only 가입을 막는 DB 제약** — ① `users.password NOT NULL`(현행 `''` sentinel 로 우회 가능하나 V3 Target 은 NULL → `DROP NOT NULL`) ② `users.name NOT NULL DEFAULT '운영자'`(DB 기본값이 placeholder 개인정보 → `DROP NOT NULL · DROP DEFAULT`) ③ `users.email NOT NULL UNIQUE`(이메일 없는 가입 · 동일 이메일 다른 사람 가입 차단 → Phase 5, 소비처 56곳 census 후). ①②는 WO-2A F10 예외 migration.
 6. **`linked_accounts` 최소 변경** — §3: FK users + partial unique `(provider, providerId)` + partial unique `(userId) WHERE provider='google'` + entity drift 정정(userId uuid · provider varchar · email nullable · `@Unique` 제거 · createdAt 반영). 컬럼 삭제 0.
 7. **`service_credentials.password_hash` 폐기 시점** — 의미 상실 = P2-F(연결 계정 password login 차단) · reader/writer 코드 제거 = P2-G 이후 · **물리 제거 = Phase 5, `users.password` 컬럼 제거와 동일 migration**. 전환기 fallback(dual-read)은 P2-F 까지 유지.
 8. **`users.password` NULL 시점** — P2-F, 계정별. 조건 = Google row 보유 ∧ Google 로그인 성공 이력 ≥1 ∧ flag 차단 30일 무이슈 ∧ `DROP NOT NULL` 적용. 청크 배치 · snapshot 선커밋(대량 update = 사용자 승인).
 9. **password login 완전 제거 완료조건(P2-G)** — (i) 7 web + admin + mobile 전 진입점 Google 로그인 smoke PASS (ii) 최근 90일 로그인 계정의 Google row 100% 또는 잔여 Legacy 계정 전건 disposition(복구 · 휴면 통지 · 보유기간 만료) (iii) `account_activities` `login_email` 성공 0건 **연속 30일** (iv) 운영자 복구 경로 실사용 ≥1건 검증 (v) `service_credentials` reader/writer 0 · `users.password` 참조 route 0 (vi) 개인정보처리방침 버전 bump 준비 완료.
-10. **계정 접근 불가 사용자 복구** — §6 U4 행: 운영자 본인확인(2요소 이상 대조) → `linking_sessions` single-use 15분 token(발급자 · 사유 기록) → 이메일 외 채널로 전달 → 사용자 Google 인증 → `POST /auth/google/link/recover` → sub ↔ 기존 `users.id`. 이메일만으로 발급 금지 · 자동 병합 없음.
+10. **계정 접근 불가 사용자 복구** — §6 U4 행: 운영자 본인확인(2요소 이상 대조) → `linking_sessions`(WO-2E 생성) single-use 15분 token(발급자 · 사유 기록) → 이메일 외 채널로 전달 → 사용자 Google 인증 → `POST /auth/google/link/recover` → sub ↔ 기존 `users.id`. 이메일만으로 발급 금지 · 자동 병합 없음.
 11. **email 동일성 활용 범위** — `sub` miss 시 `existingAccountByEmail: boolean` 힌트 1가지뿐(§6). 자동 병합 · `linked_accounts` 생성 · password 없는 `users.id` 접근 · 운영자 미승인 복구에 **사용 금지**. 부수 발견: 현행 register 의 "기존 email → 본인확인 없이 credential 생성" 경로가 이 원칙에 반하며 P2-D 에서 자연 소멸.
 12. **Phase 2 구현 WO 수** — **8개**(§10). WO 예시의 2A~2G 에 "운영자 복구(2E)" 를 독립시키고 검증+문서 정합을 2H 로 묶었다.
 
@@ -254,20 +264,20 @@ account_activities(type='linked_google') 기록 → 200 { linked: true }
 
 | WO | 범위 | 선행 | 중지 조건 접촉 |
 |---|---|---|---|
-| **WO-2A** Google Identity prerequisites | (1) read-only census(`users.provider` 분포 · `password=''` 수 · `linked_accounts` 0행) (2) `google-auth-library` 추가(`package.json` + `package.production.json`) (3) F10 예외 migration 1건: `linked_accounts` FK + partial unique ×2 · `users.password DROP NOT NULL` · `users.name DROP NOT NULL/DEFAULT` · `linking_sessions` 생성 — expected-schema-states · ledger · baseline assertion 동반 (4) Google Cloud OAuth client(origin 별) 등록 체크리스트 (5) §8 결정 확정 | 본 IR 사용자 검토 | dependency · migration · 외부 서비스 승인 · F10 |
-| **WO-2B** Automatic email merge removal | §9-1 삭제 + `login()` email 전용 축소 + `googleIdentityService` 골격(verifyIdToken · findBySub) + CI grep 게이트 | 2A | Core(auth) 파일 수정 = F10 예외 범위 안 |
-| **WO-2C** Google explicit account linking | `POST /auth/google/link` · `DELETE /auth/google/link`(password 보유 시) · `GET /auth/identity` · 4 service `/mypage/settings` + admin 계정 설정 UI · `account_activities` 감사 · middleware linkedAccounts eager load 제거 검토 · 운영자 파일럿 연결 | 2B | route/API 계약 추가 · 공용 패키지(auth-context) 소비처 전수 |
-| **WO-2D-web** Google login / signup (web) | `POST /auth/google/login`(sub hit → 세션 · miss → 힌트) · `POST /auth/google/signup`(동의 수집 · users+linked+role) · 7 진입점 Google 버튼 · `loginWithGoogle` 공용화 · Google 사용자 서비스 가입 = 각 서비스 가입 신청 흐름의 password 의존 제거(register 기존-사용자 분기 · 서비스별 신청 route) | 2C | route · 공용 패키지 |
+| **WO-2A** Google Identity prerequisites | (1) read-only census(`users.provider` 분포 · `password=''` 수 · `linked_accounts` 0행) (2) `google-auth-library` 추가(`package.json` + `package.production.json`) (3) F10 예외 migration 1건: `linked_accounts` FK + partial unique ×2 · `users.password DROP NOT NULL` · `users.name DROP NOT NULL/DEFAULT` — **`linking_sessions` 제외** — expected-schema-states · ledger · baseline assertion 동반 (4) Google Cloud OAuth client(Web · Admin · Mobile) 등록 + 서버 aud allowlist 설정 체크리스트 | 본 IR 사용자 검토 | dependency · migration · 외부 서비스 승인 · F10 |
+| **WO-2B** Dead automatic email merge removal | §9-1 삭제 + `login()` email 전용 축소 + `googleIdentityService` 골격(verifyIdToken · aud allowlist · findBySub) + CI grep 게이트 | 2A | Core(auth) 파일 수정 = F10 예외 범위 안 |
+| **WO-2C** Existing user explicit Google link | `POST /auth/google/link`(**`users.password` 재인증만**) · `DELETE /auth/google/link`(password 보유 시) · `GET /auth/identity` · 4 service `/mypage/settings` + admin 계정 설정 UI · `account_activities` 감사 · middleware linkedAccounts eager load 제거 검토 · 운영자 파일럿 연결 | 2B | route/API 계약 추가 · 공용 패키지(auth-context) 소비처 전수 |
+| **WO-2D-web** Google login / signup (web) | `POST /auth/google/login`(sub hit → 세션 · miss → 힌트) · `POST /auth/google/signup`(동의 수집 · users+linked+role) · 7 진입점 Google 버튼 · `loginWithGoogle` 공용화 · Google 사용자 서비스 가입 = 각 서비스 가입 신청 흐름의 password 의존 제거(register 기존-사용자 분기 · 서비스별 신청 route) · **legacy `service_credentials` writer 정리(§8-1)** | 2C | route · 공용 패키지 |
 | **WO-2D-mobile** Google login (Expo) | 네이티브 Google sign-in → 동일 API · `includeLegacyTokens` 계약 유지 · 스토어 배포 | 2D-web | dependency(mobile) |
-| **WO-2E** Operator-issued recovery link | `linking_sessions` 발급 API(platform:super_admin · 사유 필수 · 15분 · single-use) · `POST /auth/google/link/recover` · 본인확인 체크리스트 · 감사 | 2C (+2A migration) | 권한 · route |
+| **WO-2E** Operator recovery | **`linking_sessions` 생성 migration(F10 예외)** · 발급 API(platform:super_admin · 사유 필수 · 15분 · single-use) · `POST /auth/google/link/recover` · 본인확인 체크리스트 · 감사 | 2C | migration · 권한 · route |
 | **WO-2F** Legacy password retirement per account | feature flag 차단(`GOOGLE_LOGIN_REQUIRED`) 운영자 코호트 → 전체 · 30일 관찰 · `users.password` NULL 청크 배치(snapshot 선커밋) · `service_credentials` dual-read 무력화 · `find-id` 은퇴 검토 | 2D-web · 2D-mobile · 2E 전부 LIVE | 대량 update(사용자 승인) |
 | **WO-2G** Kakao/Naver · passport legacy removal | `passportDynamic` · `socialAuthService` 잔여 · admin OAuthSettings · `settings.oauth_settings` · `passport*` 4 의존성 · `securityMiddleware` 예외 · `LinkedAccount` enum | 2D | dependency |
 | **WO-2H** Phase 2 transition verification + doc alignment | P2-G 완료조건(§9-9) 실측 · 문서 정합 5건(F10 §5-A · F11 §10 · MYPAGE · OPERATOR-DASHBOARD §3-3 · USER-STRUCTURE) · Phase 5 입력(REVIEW-8 잔여 = `email` 제약 · `users.password`/`service_credentials`/`provider*` 컬럼 제거 · 개인정보처리방침 버전) | 2F · 2G | Frozen 문서 본문 수정 = 별도 승인 |
 
-병합 가능: 2B+2C(같은 auth-core 파일군 · 소규모) · 2G 를 2D 직후로 당겨도 무방. 분리 필수: 2A(migration 승인) · 2F(대량 update 승인) · 2H(Frozen 문서).
+병합 가능: 2B+2C(같은 auth-core 파일군 · 소규모) · 2G 를 2D 직후로 당겨도 무방. 분리 필수: 2A(migration 승인) · 2E(migration 승인) · 2F(대량 update 승인) · 2H(Frozen 문서).
 
-**이 IR 종료 후 사용자 검토 전에는 Phase 2 코드 구현을 시작하지 않는다.**
+**사용자 승인(2026-09-17)** — §8 6개 결정으로 Phase 2 실행계획 승인. 다음 작업 = **WO-2A**(`linking_sessions` 제외). 각 WO 는 별도 문서로 범위를 확정한 뒤 착수한다.
 
 ---
 
-*작성: 2026-09-17 · 상태: COMPLETE — 실행계획 확정 · 사용자 검토 대기 · 코드 0 · migration 0 · production 조회 0 · 문서 인라인 수정 0*
+*작성: 2026-09-17 · 상태: APPROVED — 실행계획 확정 · 사용자 승인 2026-09-17(§8 수정 채택 2건: (c) users.password 만 · (e) linking_sessions → 2E) · 코드 0 · migration 0 · production 조회 0 · 문서 인라인 수정 0*
