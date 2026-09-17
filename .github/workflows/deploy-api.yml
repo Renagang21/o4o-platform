@@ -344,6 +344,11 @@ jobs:
         #   앱의 DB 연결 예산(5회 × 15s + 백오프, 최대 약 105s < startup probe 240s)이 흡수한다.
         #   GRACEFUL_STARTUP 은 프로덕션에서 무시되므로 env 에서 제거했다(dead configuration).
         # ============================================================
+        # WO-O4O-PRIVACY-DATA-RETENTION-ENFORCEMENT-V1 (Phase 2, 사용자 승인 2026-09-17)
+        #   PRIVACY_RETENTION_MODE=apply : 개인정보 보유기간 집행 job(jobs/privacy-retention.job)의 실삭제 모드.
+        #   기간의 정본은 docs/baseline/O4O-PRIVACY-DATA-RETENTION-POLICY-V1.md — 여기서는 mode 만 정한다.
+        #   kill-switch 는 코드 기본 계약(PRIVACY_RETENTION_ENABLED='false' 일 때만 skip) 그대로이며 여기 추가하지 않는다.
+        # ============================================================
 
         gcloud run deploy ${{ env.SERVICE_NAME }} \
           --image="${FULL_IMAGE}" \
@@ -382,6 +387,7 @@ jobs:
           --set-env-vars="TOSS_PAYMENTS_CLIENT_KEY=${{ secrets.TOSS_PAYMENTS_CLIENT_KEY }}" \
           --set-env-vars="TOSS_PAYMENTS_SECRET_KEY=${{ secrets.TOSS_PAYMENTS_SECRET_KEY }}" \
           --set-env-vars="CAFE24_REDIRECT_URI=https://api.neture.co.kr/api/v1/admin/cafe24/callback" \
+          --set-env-vars="PRIVACY_RETENTION_MODE=apply" \
           --clear-vpc-connector \
           --add-cloudsql-instances=netureyoutube:asia-northeast3:o4o-platform-db
 
