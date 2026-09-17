@@ -58,7 +58,7 @@ const service = (key: string, nameKo: string, domain: string): EntryService =>
 
 /**
  * WO-O4O-COMMUNITY-WORKSPACE-CATALOG-AND-ACCESS-ALIGNMENT-V1: 커뮤니티 진입은 `GET /communities` 목록에서 온다.
- * 약사(kpa-society 진입) · 화장품(k-cosmetics 진입) 두 Community 참여 가능 → 「주요 업무」 handoff 버튼 2개
+ * 약사(kpa-society 진입) · 화장품(k-cosmetics 진입) 두 Community 참여 가능 → 「내 업무 공간 › 커뮤니티」 handoff 버튼 2개
  */
 const data = {
   services: [
@@ -77,8 +77,9 @@ const data = {
 const KPA = '약사 커뮤니티';
 const PH = '화장품 커뮤니티';
 
+/** 버튼 접근성 이름 = 라벨 (+ 보조 정보 — 약사 커뮤니티는 진입 surface 가 둘이라 "KPA Society에서 참여" 가 붙는다) */
 function handoffButton(label: string) {
-  return screen.getByRole('button', { name: label }) as HTMLButtonElement;
+  return screen.getByRole('button', { name: (name) => name === label || name.startsWith(`${label} `) }) as HTMLButtonElement;
 }
 
 /** bfcache 복원 신호. jsdom 에 PageTransitionEvent 가 없을 수 있어 Event 에 persisted 를 얹는다. */

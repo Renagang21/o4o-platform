@@ -19,7 +19,7 @@
  *
  * WO-O4O-NETURE-UNIFIED-ENTRY-UI-PHASE1-V1:
  *   neture.co.kr 을 O4O 대표 진입으로 삼는다. 로그인 후에는 같은 화면 안에
- *   주요 업무 / 내가 이용하는 서비스 / 가입·이용 상태 / 가입 가능한 서비스 를 보여준다
+ *   내 업무 공간(4 카드) / 플랫폼 관리 / 내 서비스 / 가입·이용 상태 / 가입 가능한 서비스 를 보여준다
  *   (components/home/HomeEntryPanel · lib/home-entry). 로그인 전에는 서비스 안내 pill 과
  *   로그인·회원가입만 — 공개 안내 링크는 로그인 없이 그대로 열린다.
  *   다른 서비스로의 이동은 기존 세션 인계(POST /auth/handoff)를 재사용하며 정적 외부 링크로
@@ -27,7 +27,7 @@
  *
  * WO-O4O-NETURE-HOME-SERVICE-NEWS-FORUM-V1:
  *   「O4O 서비스 소식」(components/home/HomeServiceNews · lib/home-news) — 로그인 후에는
- *   HomeEntryPanel 의 newsSlot(내가 이용하는 서비스 아래 · 가입·이용 상태 위), 로그인 전에는
+ *   HomeEntryPanel 의 newsSlot(내 서비스 아래 · 가입·이용 상태 위), 로그인 전에는
  *   서비스 안내 pill 아래. 소식 포럼의 공개 글 최신 5건 + 분류 바로가기 3종. 실패해도 홈은 막히지 않는다.
  *
  * WO-O4O-AI-COMPOSER-UNIFIED-REQUEST-AND-ATTACHMENT-UX-V1:
@@ -630,7 +630,7 @@ export default function O4OHomePage() {
             {!isAuthenticated && !authLoading && (
               <div className="mt-8 flex flex-col items-center gap-3 text-center">
                 <p className="m-0 max-w-md text-sm text-slate-500">
-                  O4O 는 약국 · 화장품 매장 · 공급자 · 파트너가 한 곳에서 일하는 서비스입니다. 로그인하면 이용 중인
+                  O4O 는 약국 · 화장품 매장 · 공급자 · 서비스 운영자가 한 곳에서 일하는 서비스입니다. 로그인하면 이용 중인
                   서비스와 업무 화면을 바로 열 수 있습니다.
                 </p>
                 <div className="flex gap-2">

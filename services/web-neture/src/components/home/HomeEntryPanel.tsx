@@ -3,10 +3,16 @@
  *
  * WO-O4O-NETURE-UNIFIED-ENTRY-UI-PHASE1-V1
  *
- * 섹션: 주요 업무 / 내가 이용하는 서비스 / (newsSlot: O4O 서비스 소식) / 가입·이용 상태 / 가입 가능한 서비스.
+ * 섹션: 내 업무 공간(4 카드) / 플랫폼 관리(해당 사용자만) / 내 서비스 / (newsSlot: O4O 서비스 소식) /
+ * 가입·이용 상태 / 가입 가능한 서비스.
  * 판정 · 데이터는 전부 `lib/home-entry.ts` — 이 컴포넌트는 표시와 버튼 동작만 맡는다.
- * WO-O4O-NETURE-HOME-SERVICE-NEWS-FORUM-V1: `newsSlot` 은 주요 업무 · 서비스 진입 아래,
+ * WO-O4O-NETURE-HOME-SERVICE-NEWS-FORUM-V1: `newsSlot` 은 업무 공간 · 내 서비스 아래,
  * 가입 · 이용 상태 위에 놓인다 — 업무 진입이 소식 목록에 밀리지 않도록 한다.
+ *
+ * WO-O4O-HOME-ROLE-WORKSPACE-ENTRY-REALIGNMENT-V1: "내 업무 공간" 은 4대 Role Workspace 카드
+ * (커뮤니티 · 매장 · 공급자 · 서비스 운영) — 데스크톱 2열 · 모바일 1열. 카드 = 제목 / 짧은 설명 /
+ * 실제 사용 가능한 진입 버튼만. 색 · 아이콘 · KPI 없음. 서비스별 "매장 HUB / 내 매장" 반복 나열 없음.
+ * Platform Admin 은 카드에 섞지 않고 "플랫폼 관리" 로 분리한다.
  *
  * 상태 3종: 로딩(자리표시) · 오류(재시도 — "미가입" 으로 보이지 않게 한다) · 정상.
  * 알림 · KPI · 유료 권한 같은 만들어낸 정보는 없다.
@@ -30,7 +36,7 @@ interface HomeEntryPanelProps {
   loading: boolean;
   error: string | null;
   onReload: () => void;
-  /** 「O4O 서비스 소식」 섹션 — 내가 이용하는 서비스 아래 · 가입 · 이용 상태 위 */
+  /** 「O4O 서비스 소식」 섹션 — 내 서비스 아래 · 가입 · 이용 상태 위 */
   newsSlot?: React.ReactNode;
 }
 
@@ -48,10 +54,17 @@ function EntryButton({
   onHandoff: (item: EntryItem) => void;
 }) {
   const { action } = item;
+  // 보조 정보(서비스 이름 · 관리자)는 버튼 안의 작은 회색 글자 — 별도 목록으로 반복하지 않는다.
+  const text = (
+    <>
+      {item.label}
+      {item.note && <span className="text-xs text-slate-400">{item.note}</span>}
+    </>
+  );
   if (action.kind === 'internal') {
     return (
       <Link to={action.to} className={BTN}>
-        {item.label}
+        {text}
         <ArrowUpRight className="h-3.5 w-3.5 text-slate-400" />
       </Link>
     );
@@ -59,7 +72,7 @@ function EntryButton({
   if (action.kind === 'public') {
     return (
       <a href={action.href} target="_blank" rel="noopener noreferrer" className={BTN}>
-        {item.label}
+        {text}
         <ExternalLink className="h-3.5 w-3.5 text-slate-400" />
       </a>
     );
@@ -67,7 +80,7 @@ function EntryButton({
   const busy = busyId === item.id;
   return (
     <button type="button" className={BTN} disabled={busyId !== null} onClick={() => onHandoff(item)}>
-      {item.label}
+      {text}
       {busy ? <Loader2 className="h-3.5 w-3.5 animate-spin text-slate-400" /> : <ArrowUpRight className="h-3.5 w-3.5 text-slate-400" />}
     </button>
   );
@@ -152,8 +165,9 @@ export default function HomeEntryPanel({ user, data, loading, error, onReload, n
   }
 
   const model = buildHomeEntryModel(user, data);
+  const hasWorkspaceEntry = model.groups.some((g) => g.items.length > 0);
   const nothingToShow =
-    model.groups.length === 0 && model.myServices.length === 0 && model.statusItems.length === 0 && model.joinable.length === 0;
+    !hasWorkspaceEntry && !model.platformAdmin && model.myServices.length === 0 && model.statusItems.length === 0 && model.joinable.length === 0;
 
   return (
     <div className="mt-10 w-full max-w-2xl text-left">
@@ -163,36 +177,45 @@ export default function HomeEntryPanel({ user, data, loading, error, onReload, n
         </p>
       )}
 
-      {model.groups.length > 0 && (
-        <Section title="주요 업무">
-          <div className="flex flex-col gap-3">
-            {model.groups.map((group) => (
-              <div key={group.id}>
-                <p className="m-0 mb-1.5 text-sm text-slate-500">{group.title}</p>
-                <div className="flex flex-wrap gap-2">
+      {/* 내 업무 공간 — 4대 Role Workspace 카드. 항목이 없는 카드도 자리를 지킨다 (진입 버튼만 없다). */}
+      <Section title="내 업무 공간">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          {model.groups.map((group) => (
+            <section
+              key={group.id}
+              aria-labelledby={`home-workspace-${group.id}`}
+              data-workspace={group.id}
+              className="rounded-2xl border border-slate-200 bg-white px-4 py-3.5"
+            >
+              <h3 id={`home-workspace-${group.id}`} className="m-0 text-sm font-semibold text-slate-900">
+                {group.title}
+              </h3>
+              <p className="m-0 mt-0.5 text-xs text-slate-500">{group.description}</p>
+              {group.items.length > 0 ? (
+                <div className="mt-3 flex flex-wrap gap-2">
                   {group.items.map((item) => (
                     <EntryButton key={item.id} item={item} busyId={busyId} onHandoff={handleHandoff} />
                   ))}
                 </div>
-                {group.items.some((i) => i.note) && (
-                  <ul className="m-0 mt-1.5 list-none p-0 text-xs text-slate-400">
-                    {group.items
-                      .filter((i) => i.note)
-                      .map((i) => (
-                        <li key={i.id}>
-                          {i.label}: {i.note}
-                        </li>
-                      ))}
-                  </ul>
-                )}
-              </div>
-            ))}
+              ) : (
+                <p className="m-0 mt-3 text-xs text-slate-400">이용 중인 항목이 없습니다.</p>
+              )}
+            </section>
+          ))}
+        </div>
+      </Section>
+
+      {/* 플랫폼 관리 — Platform Admin 만. Service Operator 카드와 섞지 않는다. */}
+      {model.platformAdmin && (
+        <Section title="플랫폼 관리">
+          <div className="flex flex-wrap gap-2">
+            <EntryButton item={model.platformAdmin} busyId={busyId} onHandoff={handleHandoff} />
           </div>
         </Section>
       )}
 
       {model.myServices.length > 0 && (
-        <Section title="내가 이용하는 서비스">
+        <Section title="내 서비스">
           <div className="flex flex-wrap gap-2">
             {model.myServices.map((item) => (
               <EntryButton key={item.id} item={item} busyId={busyId} onHandoff={handleHandoff} />

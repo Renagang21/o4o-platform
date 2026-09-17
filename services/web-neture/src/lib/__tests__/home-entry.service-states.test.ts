@@ -37,7 +37,8 @@ const data = (serviceStates: Partial<NetureServiceStates>): HomeEntryData => ({
   },
 });
 
-const groupIds = (m: ReturnType<typeof buildHomeEntryModel>) => m.groups.map((g) => g.id);
+// WO-O4O-HOME-ROLE-WORKSPACE-ENTRY-REALIGNMENT-V1: 4 카드는 항상 있고 진입이 있는 카드만 "활성" 이다.
+const groupIds = (m: ReturnType<typeof buildHomeEntryModel>) => m.groups.filter((g) => g.items.length > 0).map((g) => g.id);
 const allIds = (m: ReturnType<typeof buildHomeEntryModel>) => [
   ...groupIds(m),
   ...m.groups.flatMap((g) => g.items.map((i) => i.id)),
@@ -65,7 +66,7 @@ describe('buildHomeEntryModel — 공급자 서비스 상태', () => {
     expect(groupIds(m)).not.toContain('supplier');
   });
 
-  it('공급자 active: 공급자 업무 + 내가 이용하는 서비스 · 신청 안내 없음', () => {
+  it('공급자 active: 공급자 업무 + 내 서비스 · 신청 안내 없음', () => {
     const m = buildHomeEntryModel(user(['supplier']), data({ supplier: { status: 'active', source: 'neture_suppliers' } }));
     expect(groupIds(m)).toContain('supplier');
     expect(m.myServices.map((s) => s.id)).toContain('svc:neture-supplier');
@@ -89,9 +90,15 @@ describe('buildHomeEntryModel — 공급자 서비스 상태', () => {
     expect(m.joinable.filter((j) => j.id.startsWith('join:neture-'))).toHaveLength(0);
   });
 
-  it('관리자는 서비스 상태와 무관하게 업무 진입 가능(운영 목적)', () => {
-    const m = buildHomeEntryModel(user(['neture:admin']), data({}));
+  // WO-O4O-HOME-ROLE-WORKSPACE-ENTRY-REALIGNMENT-V1 §7: 관리자 bypass 는 공급자 이용 자격이 아니다 —
+  // 대표 홈 공급자 카드는 실제 이용 상태 active 만. (서버 guard 의 운영 목적 통과는 그대로 — UI 노출만 분리)
+  it('관리자(neture:admin · platform:super_admin)라도 공급자 서비스가 active 가 아니면 공급자 업무 진입이 없다', () => {
+    expect(groupIds(buildHomeEntryModel(user(['neture:admin']), data({})))).not.toContain('supplier');
+    expect(groupIds(buildHomeEntryModel(user(['platform:super_admin']), data({})))).not.toContain('supplier');
+    // 실제 공급자이기도 한 관리자는 진입이 있다
+    const m = buildHomeEntryModel(user(['platform:super_admin']), data({ supplier: { status: 'active', source: 'neture_suppliers' } }));
     expect(groupIds(m)).toContain('supplier');
+    expect(m.platformAdmin?.action).toEqual({ kind: 'internal', to: '/admin' });
   });
 
   it('normalizeServiceStates 는 서버가 partner 를 보내도 무시한다 (응답 계약 = supplier 뿐)', () => {
@@ -100,8 +107,9 @@ describe('buildHomeEntryModel — 공급자 서비스 상태', () => {
   });
 });
 
-// WO-O4O-STORE-WORKSPACE-INTEGRATION-AND-MY-SERVICES-V1 §18 — 대표 홈 "내 매장" 진입 = Store Workspace Home
-describe('buildHomeEntryModel — 매장 진입 = Store Workspace Home', () => {
+// WO-O4O-STORE-WORKSPACE-INTEGRATION-AND-MY-SERVICES-V1 §18 — 대표 홈 매장 진입 = Store Workspace Home
+// WO-O4O-HOME-ROLE-WORKSPACE-ENTRY-REALIGNMENT-V1 §5·§6 — 매장 카드 하나 · 버튼 = 매장 이름 · 매장 HUB 최상위 진입 없음
+describe('buildHomeEntryModel — 매장 카드 = Store Workspace Home', () => {
   const svc = (key: string, nameKo: string, domain: string) => ({
     ...neture,
     key,
@@ -125,14 +133,37 @@ describe('buildHomeEntryModel — 매장 진입 = Store Workspace Home', () => {
     serviceStates: { supplier: { status: 'none', source: 'none' } },
   });
 
-  it('내 매장 returnPath = <basePath>/workspace (KPA·KCos /store, PH /store-owner) · 매장 HUB = /store-hub', () => {
+  it('1 Store : N Services — 버튼 = 매장 이름 · returnPath = <basePath>/workspace (KPA·KCos /store, PH /store-owner) · 서비스 이름은 보조 정보', () => {
     const m = buildHomeEntryModel(user(['user']), storeData());
-    const myStore = m.groups.find((g) => g.id === 'my-store')!;
-    const byKey = Object.fromEntries(myStore.items.map((i) => [i.action.kind === 'handoff' ? i.action.serviceKey : '', i.action]));
-    expect(byKey['kpa-society']).toMatchObject({ kind: 'handoff', returnPath: '/store/workspace' });
-    expect(byKey['k-cosmetics']).toMatchObject({ kind: 'handoff', returnPath: '/store/workspace' });
-    expect(byKey['pharmacy-hub']).toMatchObject({ kind: 'handoff', returnPath: '/store-owner/workspace' });
-    const hub = m.groups.find((g) => g.id === 'store-hub')!;
-    expect(hub.items.every((i) => i.action.kind === 'handoff' && i.action.returnPath === '/store-hub')).toBe(true);
+    const store = m.groups.find((g) => g.id === 'store')!;
+    expect(store.title).toBe('매장');
+    expect(store.items.map((i) => [i.label, i.note, i.action])).toEqual([
+      ['매장 A', 'KPA Society', { kind: 'handoff', serviceKey: 'kpa-society', returnPath: '/store/workspace' }],
+      ['매장 A', 'K-Cosmetics', { kind: 'handoff', serviceKey: 'k-cosmetics', returnPath: '/store/workspace' }],
+      ['매장 A', 'Pharmacy Hub', { kind: 'handoff', serviceKey: 'pharmacy-hub', returnPath: '/store-owner/workspace' }],
+    ]);
+    // 매장 HUB · 내 매장 최상위 그룹 없음 · "/store-hub" 직접 진입 없음 · "내 매장" 라벨 없음
+    expect(m.groups.map((g) => g.id)).toEqual(['community', 'store', 'supplier', 'operator']);
+    const all = m.groups.flatMap((g) => g.items);
+    expect(all.some((i) => i.action.kind === 'handoff' && i.action.returnPath === '/store-hub')).toBe(false);
+    expect(all.some((i) => /매장 HUB|내 매장/.test(i.label))).toBe(false);
+  });
+
+  it('매장 1개면 서비스 이름 보조 정보가 없다 (§6) · 이름 없는 매장은 대체 라벨', () => {
+    const d = storeData();
+    d.stores = [{ serviceKey: 'kpa-society', organizationId: 'org-a', name: '테스트 약국', memberRole: 'owner' }];
+    const m = buildHomeEntryModel(user(['user']), d);
+    expect(m.groups.find((g) => g.id === 'store')!.items).toEqual([
+      { id: 'store:org-a:kpa-society', label: '테스트 약국', action: { kind: 'handoff', serviceKey: 'kpa-society', returnPath: '/store/workspace' } },
+    ]);
+    d.stores = [{ serviceKey: 'kpa-society', organizationId: 'org-b', name: null, memberRole: 'owner' }];
+    expect(buildHomeEntryModel(user(['user']), d).groups.find((g) => g.id === 'store')!.items[0].label).toBe('이름 없는 매장');
+  });
+
+  it('active 가 아닌 서비스의 매장은 진입을 만들지 않는다', () => {
+    const d = storeData();
+    d.services = d.services.map((s) => (s.key === 'k-cosmetics' ? { ...s, membership: { status: 'suspended' } } : s)) as HomeEntryData['services'];
+    const m = buildHomeEntryModel(user(['user']), d);
+    expect(m.groups.find((g) => g.id === 'store')!.items.map((i) => i.note)).toEqual(['KPA Society', 'Pharmacy Hub']);
   });
 });

@@ -94,7 +94,7 @@ export function ServiceApplyPanel({ service }: { service: ServiceKey }) {
     return (
       <div className={box} data-testid={`service-apply-${service}-pending`}>
         {header}
-        <p className="text-sm text-gray-700">신청이 접수되어 운영자 승인을 기다리고 있습니다. 승인되면 대표 홈의 <b>내가 이용하는 서비스</b>에 나타납니다.</p>
+        <p className="text-sm text-gray-700">신청이 접수되어 운영자 승인을 기다리고 있습니다. 승인되면 대표 홈의 <b>내 서비스</b>에 나타납니다.</p>
       </div>
     );
   }

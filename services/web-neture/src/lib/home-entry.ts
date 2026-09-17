@@ -5,6 +5,15 @@
  * 기존 데이터만으로 계산한다. 새 권한 판정을 만들지 않는다 — 여기서 만든 버튼은 "안내"이고,
  * 실제 접근은 각 서비스의 서버 guard 가 최종 판정한다.
  *
+ * WO-O4O-HOME-ROLE-WORKSPACE-ENTRY-REALIGNMENT-V1 — "내 업무 공간" 은 **4대 Role Workspace 카드**
+ * (커뮤니티 · 매장 · 공급자 · 서비스 운영, `O4O-ROLE-WORKSPACE-ARCHITECTURE-V1`) 로 고정한다.
+ *   - 매장 카드: 서비스별 "매장 HUB / 내 매장" 반복 나열 없음. 버튼 = **매장 하나**(매장 이름) →
+ *     그 매장의 Store Workspace Home (`<basePath>/workspace`). Home / My Store / Store Hub / My Services
+ *     선택은 Store Workspace 안에서 한다. 서비스 이름은 매장이 여럿일 때만 보조 정보.
+ *   - 공급자 카드: 공급자 서비스 이용 상태 active 만. 관리자 bypass 로 개인 업무 공간처럼 노출하지 않는다.
+ *   - 서비스 운영 카드: `GET /work-scope/operator-services` 목록만 (platformBypass 는 목록에 없다).
+ *   - Platform Admin(`platform:super_admin`) 은 4 업무 공간과 섞지 않고 `platformAdmin`(플랫폼 관리) 로 분리한다.
+ *
  * 데이터 소스 (전부 기존 API):
  *   - `GET /auth/services`           서비스 카탈로그 + 내 가입 상태 (nameKo · basePath 는 이번 WO 에서 추가)
  *   - `GET /neture/home/entry`       내 매장(복수 나열) · 내 분회(slug)  — 이번 WO 의 홈 전용 read API
@@ -35,7 +44,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { api } from './apiClient';
-import { ADMIN_ROLES, PLATFORM_ROLES } from './role-constants';
+import { PLATFORM_ROLES } from './role-constants';
 import type { User } from '../contexts/AuthContext';
 
 // ─── API 응답 타입 ────────────────────────────────────────────────────────────
@@ -133,11 +142,25 @@ export interface EntryItem {
   action: EntryAction;
 }
 
+/** 4대 Role Workspace — 순서 · 제목 · 설명은 고정이고 항목만 사용자별로 달라진다 */
+export type WorkspaceKey = 'community' | 'store' | 'supplier' | 'operator';
+
 export interface EntryGroup {
-  id: 'community' | 'store-hub' | 'my-store' | 'supplier' | 'operator';
+  id: WorkspaceKey;
   title: string;
+  /** 카드의 짧은 설명 (한 줄) */
+  description: string;
+  /** 실제 사용 가능한 진입만. 비어 있으면 카드는 "이용 중인 항목 없음" 으로 표시한다 */
   items: EntryItem[];
 }
+
+/** 카드 메타 — 항목이 없어도 4 카드는 항상 같은 순서로 노출된다 */
+export const WORKSPACE_CARDS: ReadonlyArray<{ id: WorkspaceKey; title: string; description: string }> = [
+  { id: 'community', title: '커뮤니티', description: '정보와 경험을 나눕니다' },
+  { id: 'store', title: '매장', description: '내 매장을 운영합니다' },
+  { id: 'supplier', title: '공급자', description: '상품 · 주문 · 콘텐츠 업무' },
+  { id: 'operator', title: '서비스 운영', description: '서비스를 운영합니다' },
+];
 
 export interface StatusItem {
   id: string;
@@ -149,7 +172,10 @@ export interface StatusItem {
 }
 
 export interface HomeEntryModel {
+  /** 내 업무 공간 — 항상 4개 (WORKSPACE_CARDS 순서) */
   groups: EntryGroup[];
+  /** 플랫폼 관리 진입 — platform:super_admin 만. Service Operator 와 별개 (없으면 null) */
+  platformAdmin: EntryItem | null;
   myServices: EntryItem[];
   statusItems: StatusItem[];
   joinable: EntryItem[];
@@ -157,10 +183,10 @@ export interface HomeEntryModel {
 
 // ─── 서비스별 고정 경로 (기존 route 만 — 신규 route 없음) ────────────────────────
 
-/** 서비스별 홈(커뮤니티) · 매장 HUB · 내 매장 · 운영자 · 가입 경로. 없는 항목은 노출하지 않는다. */
+/** 서비스별 홈(커뮤니티) · Store Workspace Home · 운영자 · 가입 경로. 없는 항목은 노출하지 않는다. */
 interface ServicePaths {
   home?: string;
-  storeHub?: string;
+  /** Store Workspace Home — 대표 홈 매장 카드의 유일한 매장 진입 (Store Hub 는 그 안의 탭) */
   myStore?: string;
   operator?: string;
   admin?: string;
@@ -175,9 +201,9 @@ interface ServicePaths {
 //   경로 파생 규칙은 @o4o/store-ui-core resolveStoreWorkspacePaths 와 동일 (KPA·KCos `/store`, PH `/store-owner`).
 const SERVICE_PATHS: Record<string, ServicePaths> = {
   neture: { home: '/community', operator: '/operator', admin: '/admin', join: '/register' },
-  'kpa-society': { home: '/', storeHub: '/store-hub', myStore: '/store/workspace', operator: '/operator', admin: '/admin', join: '/register' },
-  'pharmacy-hub': { home: '/', storeHub: '/store-hub', myStore: '/store-owner/workspace', operator: '/operator', admin: '/admin', join: '/join', joinStatus: '/join/status' },
-  'k-cosmetics': { storeHub: '/store-hub', myStore: '/store/workspace', operator: '/operator', admin: '/admin', join: '/register' },
+  'kpa-society': { home: '/', myStore: '/store/workspace', operator: '/operator', admin: '/admin', join: '/register' },
+  'pharmacy-hub': { home: '/', myStore: '/store-owner/workspace', operator: '/operator', admin: '/admin', join: '/join', joinStatus: '/join/status' },
+  'k-cosmetics': { myStore: '/store/workspace', operator: '/operator', admin: '/admin', join: '/register' },
   // 분회: 자가 가입 없음 · 운영자 화면은 분회 slug 아래
   'kpa-branch': {},
 };
@@ -353,7 +379,7 @@ export function buildHomeEntryModel(user: User, data: HomeEntryData): HomeEntryM
   const isActive = (key: string) => byKey.get(key)?.membership?.status === 'active';
   const isPlatformAdmin = hasAnyRole(roles, PLATFORM_ROLES);
 
-  // ── 주요 업무 ──
+  // ── 내 업무 공간 (4대 Role Workspace) ──
   // 커뮤니티 — 출처는 `GET /communities`(Community Catalog + 서버 참여 판정) 하나. Community ≠ Service:
   //   약사 커뮤니티는 KPA/PH 두 진입 surface 를 가진 **하나의** Community 라, 이용 중인 서비스의 surface 로
   //   들어간다(PH 만 가입한 회원 → PH 진입). O4O 공통 커뮤니티는 Neture 내부 경로(로그인만 있으면 참여).
@@ -377,60 +403,57 @@ export function buildHomeEntryModel(user: User, data: HomeEntryData): HomeEntryM
     }
   }
 
-  // 매장 HUB · 내 매장 — 서비스별로 묶고 매장 이름은 전부 나열 (자동 선택 없음)
-  const storesByService = new Map<string, EntryStore[]>();
+  // 매장 — 버튼 하나 = 매장 하나 (`GET /neture/home/entry` stores 그대로, 자동 선택 없음).
+  //   진입은 그 매장이 속한 서비스의 Store Workspace Home. 같은 매장이 여러 서비스에 등록돼 있으면
+  //   (1 Store : N Services) 서비스마다 버튼이 생기고, 매장이 둘 이상일 때만 서비스 이름을 보조 정보로 붙인다.
+  //   "매장 HUB" 는 Store Workspace 안의 탭이므로 대표 홈에 별도 진입을 두지 않는다.
+  const store: EntryItem[] = [];
   for (const s of data.stores) {
-    if (!storesByService.has(s.serviceKey)) storesByService.set(s.serviceKey, []);
-    storesByService.get(s.serviceKey)!.push(s);
+    if (!isActive(s.serviceKey)) continue;
+    const path = SERVICE_PATHS[s.serviceKey]?.myStore;
+    if (!path) continue; // Store Workspace 경로가 확인된 서비스만 (dead link 0)
+    store.push({
+      id: `store:${s.organizationId}:${s.serviceKey}`,
+      label: s.name ?? '이름 없는 매장',
+      action: { kind: 'handoff', serviceKey: s.serviceKey, returnPath: path },
+    });
   }
-  const storeHub: EntryItem[] = [];
-  const myStore: EntryItem[] = [];
-  for (const [key, stores] of storesByService) {
-    if (!isActive(key)) continue;
-    const paths = SERVICE_PATHS[key];
-    const names = stores.map((s) => s.name ?? '이름 없는 매장');
-    const note = stores.length > 1 ? `${stores.length}개 매장 — 매장 선택은 서비스 화면에서 합니다: ${names.join(', ')}` : names[0];
-    if (paths?.storeHub) {
-      storeHub.push({ id: `store-hub:${key}`, label: `${nameOf(key)} 매장 HUB`, note, action: { kind: 'handoff', serviceKey: key, returnPath: paths.storeHub } });
-    }
-    if (paths?.myStore) {
-      myStore.push({ id: `my-store:${key}`, label: `${nameOf(key)} 내 매장`, note, action: { kind: 'handoff', serviceKey: key, returnPath: paths.myStore } });
-    }
+  if (store.length > 1) {
+    // 구분 정보는 매장이 여럿일 때만 (§6) — 서비스 이름
+    for (const item of store) item.note = nameOf((item.action as { serviceKey: string }).serviceKey);
   }
 
-  // 공급자 — 독립 서비스. 업무 진입은 **그 서비스 이용 상태가 active 일 때만**
-  // (관리자는 운영 목적으로 통과 — 서버 guard 와 동일). role 문자열 · neture 회원 여부로 판정하지 않는다.
+  // 공급자 — 독립 서비스. 업무 진입은 **공급자 서비스 이용 상태가 active 일 때만**.
+  //   관리자(neture:admin · platform:super_admin)의 guard bypass 는 "운영 목적 통과" 이지 공급자 이용 자격이
+  //   아니므로 개인 업무 공간으로 노출하지 않는다 (WO-O4O-HOME-ROLE-WORKSPACE-ENTRY-REALIGNMENT-V1 §7).
+  //   role 문자열 · neture 회원 여부로 판정하지 않는다. 서버 권한은 그대로다.
   const states = data.serviceStates ?? NONE_SERVICE_STATES;
-  const isAdmin = isPlatformAdmin || hasAnyRole(roles, ADMIN_ROLES);
   const supplier: EntryItem[] = [];
-  if (states.supplier.status === 'active' || isAdmin) {
+  if (states.supplier.status === 'active') {
     supplier.push({ id: 'supplier:neture', label: NETURE_SERVICE_INFO.supplier.workLabel, action: { kind: 'internal', to: NETURE_SERVICE_INFO.supplier.work } });
   }
 
-  // 서비스 운영자 화면 — 출처는 `GET /work-scope/operator-services` 하나 (role_assignments + service_memberships
-  // active 를 서버가 결합). 프런트는 role 문자열에서 서비스를 추측하지 않는다. platform:super_admin 은 Neture /admin
-  // (platformBypass 는 guard 의 예외이지 "운영하는 서비스" 가 아니므로 목록에 없다 — 별도 진입).
-  // 목록이 1개면 그 서비스로 바로, 여러 개면 여기서 선택한다 (WO-O4O-SERVICE-OPERATOR-WORKSPACE-REALIGNMENT-V1).
+  // 서비스 운영 — 출처는 `GET /work-scope/operator-services` 하나 (role_assignments + service_memberships
+  // active 를 서버가 결합). 프런트는 role 문자열에서 서비스를 추측하지 않는다. 버튼 라벨 = 서비스 이름
+  // (카드 제목이 이미 "서비스 운영"), admin scope 는 "관리자" 보조 정보. 목록이 1개면 그 서비스로 바로,
+  // 여러 개면 여기서 선택한다 (WO-O4O-SERVICE-OPERATOR-WORKSPACE-REALIGNMENT-V1).
+  // platform:super_admin 은 이 카드에 넣지 않는다 — Platform Admin ≠ Service Operator (`platformAdmin` 별도).
   const operator: EntryItem[] = [];
-  if (isPlatformAdmin) {
-    operator.push({ id: 'operator:platform', label: `${nameOf('neture')} 관리자`, action: { kind: 'internal', to: SERVICE_PATHS.neture.admin! } });
-  }
   for (const svc of data.operatorServices ?? []) {
     if (!svc.workspaceAvailable) continue;
     const key = svc.serviceKey;
-    const roleLabel = svc.scope === 'admin' ? '관리자' : '운영자';
+    const note = svc.scope === 'admin' ? '관리자' : undefined;
     const label = byKey.has(key) ? nameOf(key) : svc.serviceName;
     if (key === 'neture') {
-      if (isPlatformAdmin) continue; // 이미 Neture 관리자 진입이 있다
       const to = svc.scope === 'admin' ? SERVICE_PATHS.neture.admin! : SERVICE_PATHS.neture.operator!;
-      operator.push({ id: 'operator:neture', label: `${label} ${roleLabel}`, action: { kind: 'internal', to } });
+      operator.push({ id: 'operator:neture', label, note, action: { kind: 'internal', to } });
       continue;
     }
     if (key === 'kpa-branch') {
       // 분회 운영자 화면은 분회 slug 아래 (index route 없음 → 첫 운영 화면 operator/site) — 내 분회가 확인될 때만
       for (const b of data.branches) {
         if (!b.slug) continue;
-        operator.push({ id: `operator:kpa-branch:${b.organizationId}`, label: `${b.name} 운영자`, action: { kind: 'handoff', serviceKey: 'kpa-branch', returnPath: `/${b.slug}/operator/site` } });
+        operator.push({ id: `operator:kpa-branch:${b.organizationId}`, label: b.name, note: nameOf('kpa-branch'), action: { kind: 'handoff', serviceKey: 'kpa-branch', returnPath: `/${b.slug}/operator/site` } });
       }
       continue;
     }
@@ -439,18 +462,18 @@ export function buildHomeEntryModel(user: User, data: HomeEntryData): HomeEntryM
     if (!path) continue; // canonical route 가 확인된 서비스만 (dead link 0)
     const id = `operator:${key}:${svc.scope}`;
     if (operator.some((o) => o.id === id)) continue;
-    operator.push({ id, label: `${label} ${roleLabel}`, action: { kind: 'handoff', serviceKey: key, returnPath: path } });
+    operator.push({ id, label, note, action: { kind: 'handoff', serviceKey: key, returnPath: path } });
   }
 
-  const groups: EntryGroup[] = [
-    { id: 'community', title: '커뮤니티', items: community },
-    { id: 'store-hub', title: '매장 HUB', items: storeHub },
-    { id: 'my-store', title: '내 매장', items: myStore },
-    { id: 'supplier', title: '공급자 업무', items: supplier },
-    { id: 'operator', title: '서비스 운영자 화면', items: operator },
-  ].filter((g) => g.items.length > 0) as EntryGroup[];
+  const itemsOf: Record<WorkspaceKey, EntryItem[]> = { community, store, supplier, operator };
+  const groups: EntryGroup[] = WORKSPACE_CARDS.map((c) => ({ ...c, items: itemsOf[c.id] }));
 
-  // ── 내가 이용하는 서비스 (active 만) ──
+  // ── 플랫폼 관리 — platform:super_admin 만. 4 업무 공간과 분리된 내부 관리 진입 (Neture /admin) ──
+  const platformAdmin: EntryItem | null = isPlatformAdmin
+    ? { id: 'platform:admin', label: '플랫폼 관리', action: { kind: 'internal', to: SERVICE_PATHS.neture.admin! } }
+    : null;
+
+  // ── 내 서비스 (Service Identity 목록 · active 만 — 업무 공간이 아니다) ──
   const myServices: EntryItem[] = [];
   for (const svcKey of ['supplier'] as const) {
     if (states[svcKey].status !== 'active') continue;
@@ -536,5 +559,5 @@ export function buildHomeEntryModel(user: User, data: HomeEntryData): HomeEntryM
     });
   }
 
-  return { groups, myServices, statusItems, joinable };
+  return { groups, platformAdmin, myServices, statusItems, joinable };
 }

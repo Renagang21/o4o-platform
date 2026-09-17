@@ -42,7 +42,11 @@ const data = (communities: EntryCommunity[] | undefined, memberships: Record<str
   serviceStates: { supplier: { status: 'none', source: 'none' } },
   communities,
 });
-const group = (m: ReturnType<typeof buildHomeEntryModel>) => m.groups.find((g) => g.id === 'community');
+// WO-O4O-HOME-ROLE-WORKSPACE-ENTRY-REALIGNMENT-V1: 4 카드는 항상 있다 — 진입 0개인 카드는 "없음" 으로 본다
+const group = (m: ReturnType<typeof buildHomeEntryModel>) => {
+  const g = m.groups.find((x) => x.id === 'community');
+  return g && g.items.length > 0 ? g : undefined;
+};
 
 describe('buildHomeEntryModel — 커뮤니티 = /communities 만', () => {
   it('Scenario B: PH 만 가입한 회원 → 약사 커뮤니티는 PH surface 로, KPA membership 을 만들지 않는다', () => {

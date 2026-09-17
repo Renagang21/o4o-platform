@@ -3,7 +3,9 @@
  *
  * 대표 홈 "서비스 운영자 화면" 진입은 **`GET /work-scope/operator-services` 목록만** 근거로 만든다.
  * role 문자열을 프런트에서 파싱해 서비스를 추측하지 않는다 — 목록에 없는 서비스는 role 이 있어도 진입이 없다.
- * 1개면 바로 진입(버튼 1개), 여러 개면 선택(버튼 N개). platform:super_admin 은 Neture 관리자 진입(별도).
+ * 1개면 바로 진입(버튼 1개), 여러 개면 선택(버튼 N개).
+ * WO-O4O-HOME-ROLE-WORKSPACE-ENTRY-REALIGNMENT-V1: 카드 제목 "서비스 운영" · 버튼 라벨 = 서비스 이름(admin scope 는 "관리자" 보조).
+ * platform:super_admin 은 이 카드가 아니라 `platformAdmin`("플랫폼 관리") — Platform Admin ≠ Service Operator.
  */
 import { describe, it, expect, vi } from 'vitest';
 
@@ -46,9 +48,13 @@ const op = (serviceKey: string, scope: 'admin' | 'operator' = 'operator', worksp
   workspaceAvailable,
 });
 
-const operatorGroup = (m: ReturnType<typeof buildHomeEntryModel>) => m.groups.find((g) => g.id === 'operator');
+// 4 카드는 항상 있다 — "그룹 없음" 은 진입 0개로 본다
+const operatorGroup = (m: ReturnType<typeof buildHomeEntryModel>) => {
+  const g = m.groups.find((x) => x.id === 'operator');
+  return g && g.items.length > 0 ? g : undefined;
+};
 
-describe('buildHomeEntryModel — 서비스 운영자 화면 = operator-services 만', () => {
+describe('buildHomeEntryModel — 서비스 운영 카드 = operator-services 만', () => {
   it('합성 Operator X: KPA + K-Cos 2건 → 두 진입(선택) · PH 없음', () => {
     const m = buildHomeEntryModel(user(['kpa:operator', 'cosmetics:operator', 'pharmacy-hub:operator']), data([op('kpa-society'), op('k-cosmetics')]));
     const g = operatorGroup(m)!;
@@ -57,7 +63,8 @@ describe('buildHomeEntryModel — 서비스 운영자 화면 = operator-services
       { kind: 'handoff', serviceKey: 'kpa-society', returnPath: '/operator' },
       { kind: 'handoff', serviceKey: 'k-cosmetics', returnPath: '/operator' },
     ]);
-    expect(g.items.map((i) => i.label)).toEqual(['KPA Society 운영자', 'K-Cosmetics 운영자']);
+    expect(g.title).toBe('서비스 운영');
+    expect(g.items.map((i) => [i.label, i.note])).toEqual([['KPA Society', undefined], ['K-Cosmetics', undefined]]);
     // role 만 있고 목록에 없는 PH 는 진입이 없다 (누출 0)
     expect(g.items.some((i) => i.id.includes('pharmacy-hub'))).toBe(false);
   });
@@ -81,6 +88,8 @@ describe('buildHomeEntryModel — 서비스 운영자 화면 = operator-services
       ['operator:neture', { kind: 'internal', to: '/operator' }],
       ['operator:kpa-society:admin', { kind: 'handoff', serviceKey: 'kpa-society', returnPath: '/admin' }],
     ]);
+    expect(g.items.map((i) => [i.label, i.note])).toEqual([['Neture', undefined], ['KPA Society', '관리자']]);
+    expect(m.platformAdmin).toBeNull();
   });
 
   it('workspaceAvailable=false(undecided) 는 진입을 만들지 않고, kpa-branch 는 내 분회 slug 가 있을 때만', () => {
@@ -97,9 +106,23 @@ describe('buildHomeEntryModel — 서비스 운영자 화면 = operator-services
     ]);
   });
 
-  it('platform:super_admin 은 Neture 관리자 진입 + 목록의 다른 서비스 (Neture 중복 없음)', () => {
+  it('platform:super_admin 은 "플랫폼 관리" 로 분리 — 서비스 운영 카드에는 operator-services 목록만', () => {
     const m = buildHomeEntryModel(user(['platform:super_admin']), data([op('neture', 'admin', 'special'), op('kpa-society')]));
+    expect(m.platformAdmin).toEqual({ id: 'platform:admin', label: '플랫폼 관리', action: { kind: 'internal', to: '/admin' } });
     const g = operatorGroup(m)!;
-    expect(g.items.map((i) => i.id)).toEqual(['operator:platform', 'operator:kpa-society:operator']);
+    // 목록에 neture:admin 이 있으면 그것은 Service Operator(Neture) 자격 — 카드에 그대로 남는다
+    expect(g.items.map((i) => i.id)).toEqual(['operator:neture', 'operator:kpa-society:operator']);
+    expect(g.items.some((i) => i.id === 'operator:platform' || /관리자$/.test(i.label))).toBe(false);
+  });
+
+  it('platform:super_admin 만 있고 operator-services 가 비면: 플랫폼 관리만 · 서비스 운영 카드 진입 0', () => {
+    const m = buildHomeEntryModel(user(['platform:super_admin']), data([]));
+    expect(m.platformAdmin?.label).toBe('플랫폼 관리');
+    expect(operatorGroup(m)).toBeUndefined();
+  });
+
+  it('kpa-branch 운영자 버튼 = 분회 이름 · 보조 정보 = 서비스 이름', () => {
+    const m = buildHomeEntryModel(user([]), data([op('kpa-branch', 'operator', 'none')], [{ organizationId: 'b1', slug: 'seoul', name: '서울분회' }]));
+    expect(operatorGroup(m)!.items.map((i) => [i.label, i.note])).toEqual([['서울분회', 'kpa-branch']]);
   });
 });

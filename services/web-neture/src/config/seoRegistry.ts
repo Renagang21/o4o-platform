@@ -22,8 +22,9 @@ export const NETURE_SEO_DEFAULTS: PageSeoConfig = {
 export const netureSeoRegistry: SeoRegistry = {
   // WO-O4O-COMMON-HOME-PHASE1-V1: `/` 는 O4O 전체 서비스 대표 진입점.
   //   아직 구현되지 않은 기능(AI 자동업무 · Local Work Agent 등)은 표기하지 않는다.
+  //   WO-O4O-HOME-ROLE-WORKSPACE-ENTRY-REALIGNMENT-V1: 대표 홈 정체성은 O4O (index.html 정적 title · og 와 동일 문구).
   '/': {
-    title: 'O4O — 전문 매장 업무 플랫폼',
+    title: 'O4O — 소규모 사업자를 위한 통합 업무 공간',
     description: '소규모 사업자를 위한 O4O(Online for Offline) 통합 업무 공간입니다.',
     ogType: 'website',
   },
