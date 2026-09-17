@@ -18,6 +18,10 @@
 import { type CSSProperties, useCallback, useEffect, useState } from 'react';
 
 export interface PolicyDocumentDto {
+  /** WO-O4O-INTEGRATED-TERMS-ACCEPTANCE-AND-SIGNUP-ALIGNMENT-V1 §9: service_policy_documents.id (승낙 대상 식별자) */
+  id?: string;
+  /** 본문 sha256(hex) — 승낙 당시 본문 동일성 검증용 */
+  contentHash?: string;
   serviceKey: string;
   documentType: string;
   title: string;

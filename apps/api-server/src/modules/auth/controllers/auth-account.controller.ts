@@ -9,6 +9,7 @@ import { BaseController } from '../../../common/base.controller.js';
 import type { AuthRequest } from '../../../common/middleware/auth.middleware.js';
 import { AppDataSource } from '../../../database/connection.js';
 import logger from '../../../utils/logger.js';
+import { policyAcceptanceService } from '../../policy-acceptance/policy-acceptance.service.js';
 import { deriveUserScopes } from '../../../utils/scope-assignment.utils.js';
 // WO-O4O-KPA-PROFILE-WRITE-JSONB-CONCAT-CONVERGENCE-V1: businessInfo 부분 갱신 (스냅샷 되쓰기 제거)
 import type { BusinessInfoPatch } from '../../../utils/business-info-write.js';
@@ -104,6 +105,13 @@ export class AuthAccountController extends BaseController {
           [req.user.id]
         );
       } catch { ud.memberships = []; }
+
+      // WO-O4O-INTEGRATED-TERMS-ACCEPTANCE-AND-SIGNUP-ALIGNMENT-V1 §16:
+      //   현재 published 이용약관 중 이 사용자가 아직 승낙하지 않은 것(본문 없음 · 식별자만).
+      //   프론트는 이 목록이 비어 있지 않으면 닫을 수 없는 재동의 화면으로 전환한다. 판정 실패는 [] (hot path).
+      try {
+        ud.pendingPolicyAcceptances = await policyAcceptanceService.getPendingForUser(req.user.id);
+      } catch { ud.pendingPolicyAcceptances = []; }
 
       // WO-O4O-RESTRICTED-LOGIN-FOR-PENDING-REJECTED-V1 §5-D:
       //   restricted 계정은 role/scope 를 노출하지 않는다 (membership 상태만 유지).

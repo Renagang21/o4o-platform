@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation, usePa
 // WO-O4O-STORE-PRODUCTS-QUERYCLIENT-PROVIDER-ALIGN-V1
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider, useAuth, getKCosmeticsDashboardRoute } from '@/contexts/AuthContext';
+import { TermsAcceptanceGate } from '@/components/auth/TermsAcceptanceGate';
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { refetchOnWindowFocus: false, retry: 1 } },
@@ -1009,9 +1010,12 @@ export default function App() {
             <PostLoginRedirect />
             {/* WO-O4O-REFERENCE-DESIGN-IMPORT-V1: TemplateProvider 추가 */}
             <TemplateProvider template={templates[kcosmeticsConfig.template]}>
-              <Suspense fallback={<PageLoading />}>
-                <AppRoutes />
-              </Suspense>
+              {/* WO-O4O-INTEGRATED-TERMS-ACCEPTANCE-AND-SIGNUP-ALIGNMENT-V1 §17: 기존 회원 약관 재동의 게이트 */}
+              <TermsAcceptanceGate>
+                <Suspense fallback={<PageLoading />}>
+                  <AppRoutes />
+                </Suspense>
+              </TermsAcceptanceGate>
             </TemplateProvider>
           </LoginModalProvider>
         </AuthProvider>

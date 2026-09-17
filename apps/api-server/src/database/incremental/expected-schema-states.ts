@@ -83,6 +83,14 @@ export const EXPECTED_SCHEMA_STATES: readonly ExpectedSchemaState[] = [
     fingerprint: '24c5941710706267d92cdbf52981aae3fdf5bb81a1c299faa5c03c1d10d25da6',
     fingerprintLineCount: 5725,
   },
+  // WO-O4O-INTEGRATED-TERMS-ACCEPTANCE-AND-SIGNUP-ALIGNMENT-V1 — user_policy_acceptances (이용약관 acceptance 이력 ·
+  // unique user+service+document · FK users / service_policy_documents RESTRICT · index 2). Computed in an isolated
+  // PostgreSQL 15.19 (fresh bootstrap + migrations 1..6 via migrate.ts) on 2026-09-17.
+  {
+    appliedThrough: 'CreateUserPolicyAcceptances1789649959243',
+    fingerprint: 'dfc42b8e72e3672b132bf5cb8106d6707d15de3d7a4f3961d5a876475ecddbd4',
+    fingerprintLineCount: 5745,
+  },
 ] as const;
 
 /** Expected state after `prefixLength` incremental migrations; undefined when not registered. */

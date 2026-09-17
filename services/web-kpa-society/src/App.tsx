@@ -17,6 +17,7 @@ import { kpaConfig } from '@o4o/operator-ux-core';
 import { kpaSeoRegistry, KPA_SEO_DEFAULTS } from './config/seoRegistry';
 import { ServiceProvider } from './contexts/ServiceContext';
 import { useAuth } from './contexts/AuthContext';
+import { TermsAcceptanceGate } from './components/auth/TermsAcceptanceGate';
 import { getPharmacyInfo } from './api/pharmacyInfo';
 import { LoginModalProvider, useAuthModal } from './contexts/LoginModalContext';
 import LoginModal from './components/LoginModal';
@@ -668,6 +669,8 @@ function App() {
         <RegisterModal />
         {/* WO-O4O-ROLE-BASED-POST-LOGIN-REDIRECT-V1: KPA context 완료 후 역할 기반 redirect fallback */}
         <PostLoginRedirect />
+        {/* WO-O4O-INTEGRATED-TERMS-ACCEPTANCE-AND-SIGNUP-ALIGNMENT-V1 §17: 기존 회원 약관 재동의 게이트 */}
+        <TermsAcceptanceGate>
         <Suspense fallback={<PageLoader />}>
         <Routes>
           {/* =========================================================
@@ -1234,6 +1237,7 @@ function App() {
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
         </Suspense>
+        </TermsAcceptanceGate>
         </TemplateProvider>
         </ServiceProvider>
       </BrowserRouter>

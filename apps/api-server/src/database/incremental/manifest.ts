@@ -27,6 +27,8 @@ import { DropSellerRecruitmentCompatViewsAndSelectedSellerIds1789525702200 } fro
 import { CreateWorkRunCoordination1789540958496 } from '../migrations/1789540958496-CreateWorkRunCoordination.js';
 // WO-O4O-GOOGLE-IDENTITY-PREREQUISITES-V1 (Identity V3 Phase 2-A · F10 exception)
 import { PrepareGoogleIdentityLinkedAccountsAndUsersConstraints1789648511051 } from '../migrations/1789648511051-PrepareGoogleIdentityLinkedAccountsAndUsersConstraints.js';
+// WO-O4O-INTEGRATED-TERMS-ACCEPTANCE-AND-SIGNUP-ALIGNMENT-V1 (이용약관 acceptance 이력 · SSOT)
+import { CreateUserPolicyAcceptances1789649959243 } from '../migrations/1789649959243-CreateUserPolicyAcceptances.js';
 
 export const INCREMENTAL_MIGRATION_CUTOFF = {
   baselineVersion: '2026-09-15-id678',
@@ -47,6 +49,7 @@ export const INCREMENTAL_MIGRATIONS: readonly MigrationClass[] = [
   DropSellerRecruitmentCompatViewsAndSelectedSellerIds1789525702200,
   CreateWorkRunCoordination1789540958496,
   PrepareGoogleIdentityLinkedAccountsAndUsersConstraints1789648511051,
+  CreateUserPolicyAcceptances1789649959243,
 ];
 
 export function incrementalMigrationNames(): string[] {

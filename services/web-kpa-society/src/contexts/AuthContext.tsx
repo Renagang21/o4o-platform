@@ -14,7 +14,7 @@ import { normalizeMemberships, type ApiUser } from '@o4o/auth-utils';
 // WO-O4O-FRONTEND-AUTH-CONTEXT-AND-ROUTE-GUARD-COMMONIZATION-V1:
 //   세션 복구 · 토큰 정리 이벤트 · login/logout/logoutAll 은 공통 Core 로 이동.
 //   KPA 고유분(KPA context 비동기 로딩 · activityType)만 이 파일에 남는다.
-import { useServiceAuth, type AuthLoginResult } from '@o4o/auth-react';
+import { useServiceAuth, type AuthLoginResult, type PendingPolicyAcceptance, type PolicyAcceptanceResult } from '@o4o/auth-react';
 import { configureStoreProductsApi } from '@o4o/store-products-ui';
 
 // Re-export for client.ts to use
@@ -131,6 +131,9 @@ interface AuthContextType {
   checkAuth: () => Promise<void>;
   /** WO-KPA-A-PHARMACIST-ACTIVITY-TYPE-BUSINESS-INFO-FLOW-V1: activityType + optional businessInfo */
   setActivityType: (activityType: string, businessInfo?: Record<string, any>) => Promise<void>;
+  /** WO-O4O-INTEGRATED-TERMS-ACCEPTANCE-AND-SIGNUP-ALIGNMENT-V1 §16·§17: 미승낙 약관 · 승낙 제출 */
+  pendingPolicyAcceptances: PendingPolicyAcceptance[];
+  acceptPendingPolicies: () => Promise<PolicyAcceptanceResult>;
 }
 
 // WO-O4O-AUTH-CHAIN-UNIFICATION-V1: ApiUser is imported from @o4o/auth-utils
@@ -319,6 +322,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         logoutAll,
         checkAuth,
         setActivityType,
+        pendingPolicyAcceptances: core.pendingPolicyAcceptances,
+        acceptPendingPolicies: core.acceptPendingPolicies,
       }}
     >
       {children}

@@ -14,6 +14,11 @@ export { ContentHighlightSection } from './ContentHighlightSection';
 // WO-O4O-CROSSSERVICE-POLICY-ROUTES-V1: 공개 정책 문서(약관/개인정보) 뷰어
 export { PolicyDocumentViewer } from './legal/PolicyDocumentViewer';
 export type { PolicyDocumentViewerProps, PolicyDocumentDto } from './legal/PolicyDocumentViewer';
+// WO-O4O-INTEGRATED-TERMS-ACCEPTANCE-AND-SIGNUP-ALIGNMENT-V1: 재동의 게이트 · 가입 화면 문서 식별자
+export { PolicyAcceptanceGate } from './legal/PolicyAcceptanceGate';
+export type { PolicyAcceptanceGateProps, PendingPolicyAcceptanceLike } from './legal/PolicyAcceptanceGate';
+export { usePublishedPolicyDocument } from './legal/usePublishedPolicyDocument';
+export type { PublishedPolicyDocument, PublishedPolicyDocumentState } from './legal/usePublishedPolicyDocument';
 
 // WO-O4O-CROSSSERVICE-DYNAMIC-LEGAL-FOOTER-V1: 공개 푸터 동적 법정정보
 export { PublicLegalFooterInfo } from './legal/PublicLegalFooterInfo';

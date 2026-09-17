@@ -17,8 +17,10 @@ import { checkPasswordPolicy } from '@o4o/auth-utils';
 import { X, Eye, EyeOff, CheckCircle, ArrowLeft, Factory, type LucideIcon } from 'lucide-react';
 import { BusinessRegistrationFields } from '@o4o/account-ui';
 import { AddressSearch } from '@o4o/ui';
+import { usePublishedPolicyDocument } from '@o4o/shared-space-ui';
 import { useLoginModal } from '../contexts';
 import { api } from '../lib/apiClient';
+import { loadPolicy } from '../pages/legal/PolicyDocumentPage';
 
 // WO-O4O-NETURE-STORE-OWNER-SIGNUP-CARD-REMOVE-V1:
 // Neture 가입 유형에서 'store_owner'(매장 경영자) 제거 — 전용 workspace 없음, 권한/guard inert,
@@ -60,6 +62,9 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // WO-O4O-INTEGRATED-TERMS-ACCEPTANCE-AND-SIGNUP-ALIGNMENT-V1 §13: published 이용약관 식별자(id/version) 를
+  //   가입 payload 에 실어 "보여준 약관 그대로" 승낙이 기록되게 한다(서버 재검증). 게시 전에는 비어 있다.
+  const terms = usePublishedPolicyDocument('neture', 'terms', loadPolicy);
   const [emailAlreadyJoined, setEmailAlreadyJoined] = useState(false);
   const [autoCloseCount, setAutoCloseCount] = useState(3);
 
@@ -229,6 +234,7 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
         agreeTerms: formData.agreeTerms,
         agreePrivacy: formData.agreePrivacy,
         agreeMarketing: formData.agreeMarketing,
+        ...terms.signupFields,
         ...(selectedRole === 'supplier' && {
           representativeName: formData.representativeName,
           taxInvoiceEmail: formData.taxInvoiceEmail,
@@ -793,6 +799,7 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
                   />
                   <span>
                     <span className="text-red-500">*</span> 이용약관에 동의합니다{' '}
+                    {terms.status === 'ok' && terms.doc ? <span className="text-xs text-gray-400">(v{terms.doc.version}) </span> : null}
                     <a
                       href="/terms"
                       target="_blank"

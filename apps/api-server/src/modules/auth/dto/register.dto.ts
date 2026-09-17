@@ -293,6 +293,20 @@ export class RegisterRequestDto {
   @IsBoolean()
   privacyAccepted?: boolean;
 
+  /**
+   * WO-O4O-INTEGRATED-TERMS-ACCEPTANCE-AND-SIGNUP-ALIGNMENT-V1 §9:
+   * 가입 화면이 보여준 published 이용약관의 service_policy_documents.id · version.
+   * 서버가 해당 서비스의 현재 published terms 와 재검증한다(불일치 → 가입 거부).
+   * 해당 서비스에 published terms 가 없으면(게시 전) 요구하지 않는다.
+   */
+  @IsOptional()
+  @IsString()
+  policyDocumentId?: string;
+
+  @IsOptional()
+  @IsInt()
+  policyVersion?: number;
+
   /** Neture/K-Cosmetics: 마케팅 동의 (Controller에서 marketingAccepted와 통합) */
   @IsOptional()
   @IsBoolean()

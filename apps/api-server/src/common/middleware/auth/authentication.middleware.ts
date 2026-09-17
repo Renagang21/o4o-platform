@@ -17,6 +17,13 @@ import {
   resolveAccountAccess,
   type AccountAccess,
 } from '../../auth/account-access.policy.js';
+import {
+  TERMS_ACCEPTANCE_REQUIRED_CODE,
+  TERMS_ACCEPTANCE_REQUIRED_MESSAGE,
+  TERMS_ACCEPTANCE_REQUIRED_STATUS,
+  isTermsPendingRequestAllowed,
+} from '../../auth/terms-acceptance.policy.js';
+import { policyAcceptanceService } from '../../../modules/policy-acceptance/policy-acceptance.service.js';
 
 /**
  * WO-O4O-RESTRICTED-LOGIN-FOR-PENDING-REJECTED-V1 §5-B — 중앙 제한 접근 가드
@@ -68,6 +75,47 @@ function enforceAccountAccess(req: AuthRequest, res: Response, user: { id: strin
 
   (req as AuthRequest & { accountAccess?: AccountAccess }).accountAccess = decision;
   return false;
+}
+
+/**
+ * WO-O4O-INTEGRATED-TERMS-ACCEPTANCE-AND-SIGNUP-ALIGNMENT-V1 §18 — 중앙 약관 acceptance 게이트
+ *
+ * enforceAccountAccess 와 같은 이유로 requireAuth 안에 둔다(라우터별 마운트 구조라 단일 app.use 로
+ * 전 인증 경계를 덮을 수 없다). 판정 SSOT 는 DB `user_policy_acceptances` 이며 JWT 에 싣지 않는다.
+ *   - pending 이 없으면 통과(60s 긍정 캐시). published terms 가 없으면 아무도 막지 않는다 (WO §25).
+ *   - pending 이 있으면 allowlist(terms-acceptance.policy) 경로만 통과, 나머지는
+ *     428 TERMS_ACCEPTANCE_REQUIRED + pendingPolicyAcceptances (프론트가 재동의 화면으로 전환).
+ *   - 판정 자체가 실패(DB 오류)하면 fail-open 으로 통과시키고 warn 만 남긴다 — 약관 게이트가 인증
+ *     hot path 를 500 으로 만들지 않는다 (계정 차단은 enforceAccountAccess 가 이미 fail-closed).
+ *
+ * @returns 응답을 이미 보냈으면 true (호출측은 즉시 return)
+ */
+async function enforceTermsAcceptance(req: AuthRequest, res: Response, user: { id: string }): Promise<boolean> {
+  if (isTermsPendingRequestAllowed(req.method, req.originalUrl)) return false;
+  let pending;
+  try {
+    pending = await policyAcceptanceService.getPendingForUser(user.id);
+  } catch (error) {
+    logger.warn('[termsAcceptance] pending check failed (fail-open)', {
+      userId: user.id,
+      error: error instanceof Error ? error.message : String(error),
+    });
+    return false;
+  }
+  if (pending.length === 0) return false;
+  logger.info('[termsAcceptance] request denied — acceptance pending', {
+    userId: user.id,
+    path: req.originalUrl,
+    method: req.method,
+    pending: pending.map((p) => `${p.serviceKey}:${p.version}`),
+  });
+  res.status(TERMS_ACCEPTANCE_REQUIRED_STATUS).json({
+    success: false,
+    error: TERMS_ACCEPTANCE_REQUIRED_MESSAGE,
+    code: TERMS_ACCEPTANCE_REQUIRED_CODE,
+    pendingPolicyAcceptances: pending,
+  });
+  return true;
 }
 
 /**
@@ -157,6 +205,8 @@ export const requireAuth = async (
 
     // WO-O4O-RESTRICTED-LOGIN-FOR-PENDING-REJECTED-V1: 중앙 default-deny
     if (enforceAccountAccess(req, res, user)) return;
+    // WO-O4O-INTEGRATED-TERMS-ACCEPTANCE-AND-SIGNUP-ALIGNMENT-V1 §18: 약관 acceptance 게이트
+    if (await enforceTermsAcceptance(req, res, user)) return;
 
     // Phase3-E: Assign roles from JWT payload (set at login from role_assignments table)
     user.roles = payload.roles || [];
@@ -330,6 +380,8 @@ export const requirePlatformUser = async (
 
     // WO-O4O-RESTRICTED-LOGIN-FOR-PENDING-REJECTED-V1: 중앙 default-deny
     if (enforceAccountAccess(req, res, user)) return;
+    // WO-O4O-INTEGRATED-TERMS-ACCEPTANCE-AND-SIGNUP-ALIGNMENT-V1 §18: 약관 acceptance 게이트
+    if (await enforceTermsAcceptance(req, res, user)) return;
 
     // Phase3-E: Assign roles from JWT payload
     user.roles = payload.roles || [];

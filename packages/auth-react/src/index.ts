@@ -21,6 +21,9 @@ export type {
   AuthClientLike,
   ServiceAuthConfig,
   ServiceAuthCore,
+  PendingPolicyAcceptance,
+  PolicyAcceptanceResult,
 } from './types';
+export { readPendingPolicyAcceptances } from './useServiceAuth';
 export type { RouteGuardDeps, RouteGuardProps, GuardAuthState } from './createRouteGuard';
 export type { RoleSelection } from './useRoleSelection';

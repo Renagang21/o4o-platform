@@ -255,6 +255,22 @@ export function createAdminServiceLegalController(dataSource: DataSource): Route
         }
         const before = toAdminPolicyDocument(doc);
         const { title, slug, content, version, effectiveDate, changeReason } = req.body;
+        // WO-O4O-INTEGRATED-TERMS-ACCEPTANCE-AND-SIGNUP-ALIGNMENT-V1 §5: published 문서 무결성.
+        //   승낙 이력이 "어느 문서·본문에 동의했는가" 를 가리키므로 게시 중인 row 의 본문·버전·시행일은
+        //   덮어쓰지 않는다. 변경은 새 draft → 새 version → publish (구 published 는 draft 로 내려가 보존).
+        if (doc.status === 'published') {
+          const toTime = (v: unknown) => (v ? new Date(v as string | Date).getTime() : null);
+          const immutableTouched =
+            (typeof content === 'string' && content !== doc.content)
+            || (Number.isInteger(version) && version > 0 && version !== doc.version)
+            || (effectiveDate !== undefined && toTime(effectiveDate) !== toTime(doc.effective_date));
+          if (immutableTouched) {
+            return res.status(409).json({
+              success: false,
+              error: { code: 'PUBLISHED_POLICY_IMMUTABLE', message: '게시 중인 문서의 본문·버전·시행일은 수정할 수 없습니다. 새 버전을 등록해 게시하세요.' },
+            });
+          }
+        }
         if (title !== undefined) {
           const cleanTitle = normalizeStr(title);
           if (!cleanTitle) {

@@ -10,6 +10,8 @@ import { BaseController } from '../../../common/base.controller.js';
 import { AppDataSource } from '../../../database/connection.js';
 import { User } from '../entities/User.js';
 import { ServiceMembership } from '../entities/ServiceMembership.js';
+import { policyAcceptanceService } from '../../policy-acceptance/policy-acceptance.service.js';
+import { checkSignupTermsDocument } from '../../../common/auth/terms-acceptance.policy.js';
 // WO-O4O-IDENTITY-V2-PHASE1-REGISTER-LOGIN-V1: Identity V2 L2 Credential dual-write
 import { ServiceCredential } from '../entities/ServiceCredential.js';
 import type { RegisterRequestDto } from '../dto/index.js';
@@ -190,6 +192,24 @@ export class AuthRegisterController extends BaseController {
         return BaseController.error(res, 'Name is required (provide name or lastName+firstName)', 400);
       }
 
+      // WO-O4O-INTEGRATED-TERMS-ACCEPTANCE-AND-SIGNUP-ALIGNMENT-V1 §9:
+      //   해당 서비스에 published 이용약관이 있으면 가입 화면이 보여준 문서(policyDocumentId · version)가
+      //   현재 published 문서와 일치해야 한다. 클라이언트 값은 신뢰하지 않고 DB 로 재검증한다.
+      //   published terms 가 없으면(게시 전 · 4 서비스 외 키) 요구하지 않는다 → legacy `tos` 흐름 그대로.
+      const publishedTerms = await policyAcceptanceService.getPublishedTermsForService(serviceKey);
+      const termsCheck = checkSignupTermsDocument(publishedTerms, data.policyDocumentId, data.policyVersion);
+      if (termsCheck.kind === 'missing') {
+        return BaseController.error(res, '이용약관 문서 확인이 필요합니다. 화면을 새로고침한 뒤 다시 시도해 주세요.', 400,
+          'TERMS_DOCUMENT_REQUIRED');
+      }
+      if (termsCheck.kind === 'mismatch') {
+        return BaseController.error(res, '이용약관이 갱신되었습니다. 화면을 새로고침한 뒤 다시 동의해 주세요.', 409,
+          'TERMS_DOCUMENT_MISMATCH');
+      }
+      const termsAcceptanceInput = termsCheck.kind === 'ok'
+        ? { serviceKey, policyDocumentId: termsCheck.document.id, version: termsCheck.document.version }
+        : null;
+
       // WO-O4O-SERVICE-MEMBERSHIP-ARCHITECTURE-V1: Check existing user
       const existingUser = await userRepository.findOne({ where: { email: data.email } });
 
@@ -227,6 +247,11 @@ export class AuthRegisterController extends BaseController {
           membership.status = 'pending';
           membership.role = membershipRole;
           await txSmRepo.save(membership);
+
+          // WO-O4O-INTEGRATED-TERMS-ACCEPTANCE-AND-SIGNUP-ALIGNMENT-V1 §10: 같은 트랜잭션에서 약관 승낙 기록.
+          if (termsAcceptanceInput) {
+            await policyAcceptanceService.recordAcceptance({ userId: existingUser.id, ...termsAcceptanceInput }, manager);
+          }
 
           // WO-O4O-EXISTING-ACCOUNT-SERVICE-PASSWORD-SEPARATION-V1: Identity V2 dual-write
           // newServicePassword = servicePassword (새 서비스 전용) 또는 password (legacy fallback).
@@ -510,6 +535,12 @@ export class AuthRegisterController extends BaseController {
           },
           ['userId', 'serviceKey'],
         );
+
+        // WO-O4O-INTEGRATED-TERMS-ACCEPTANCE-AND-SIGNUP-ALIGNMENT-V1 §10: user·membership 과 같은 트랜잭션에서
+        //   약관 승낙 기록 — 승낙 저장 실패 시 가입 전체 rollback (partial state 0).
+        if (termsAcceptanceInput) {
+          await policyAcceptanceService.recordAcceptance({ userId: newUser.id, ...termsAcceptanceInput }, manager);
+        }
 
         // KPA Society: auto-create KPA member
         await AuthRegisterController.createKpaRecords(manager, newUser.id, data);

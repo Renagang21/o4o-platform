@@ -13,7 +13,7 @@
 import { createContext, useContext, useState, useRef, useEffect, useCallback, useMemo, ReactNode } from 'react';
 import { buildPlatformUser } from '@o4o/auth-utils';
 import { getAccessToken } from '@o4o/auth-client';
-import { useServiceAuth, useRoleSelection, type AuthLoginResult } from '@o4o/auth-react';
+import { useServiceAuth, useRoleSelection, type AuthLoginResult, type PendingPolicyAcceptance, type PolicyAcceptanceResult } from '@o4o/auth-react';
 import { authClient } from '../lib/apiClient';
 
 // Re-export for backward compatibility
@@ -54,6 +54,9 @@ interface AuthContextType {
   hasMultipleRoles: boolean;
   checkSession: () => Promise<void>;
   updateUser: (updates: Partial<User>) => void;
+  /** WO-O4O-INTEGRATED-TERMS-ACCEPTANCE-AND-SIGNUP-ALIGNMENT-V1 §16·§17: 미승낙 약관 · 승낙 제출 */
+  pendingPolicyAcceptances: PendingPolicyAcceptance[];
+  acceptPendingPolicies: () => Promise<PolicyAcceptanceResult>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -127,6 +130,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         hasMultipleRoles,
         checkSession,
         updateUser,
+        pendingPolicyAcceptances: core.pendingPolicyAcceptances,
+        acceptPendingPolicies: core.acceptPendingPolicies,
       }}
     >
       {children}

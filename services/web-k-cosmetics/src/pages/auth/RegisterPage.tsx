@@ -9,7 +9,9 @@ import { checkPasswordPolicy } from '@o4o/auth-utils';
 import { Link } from 'react-router-dom';
 import { Sparkles, Eye, EyeOff, ShoppingBag, Store, type LucideIcon } from 'lucide-react';
 import { BusinessRegistrationFields } from '@o4o/account-ui';
+import { usePublishedPolicyDocument } from '@o4o/shared-space-ui';
 import { api } from '../../lib/apiClient';
+import { loadPolicy } from '../legal/PolicyDocumentPage';
 
 type UserRole = 'consumer' | 'seller';
 
@@ -34,6 +36,9 @@ export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // WO-O4O-INTEGRATED-TERMS-ACCEPTANCE-AND-SIGNUP-ALIGNMENT-V1 §12: published 이용약관 식별자(id/version) 를
+  //   가입 payload 에 실어 "보여준 약관 그대로" 승낙이 기록되게 한다(서버 재검증). 게시 전에는 비어 있다.
+  const terms = usePublishedPolicyDocument('k-cosmetics', 'terms', loadPolicy);
   const [emailAlreadyJoined, setEmailAlreadyJoined] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [formData, setFormData] = useState({
@@ -128,6 +133,7 @@ export default function RegisterPage() {
         agreeTerms: formData.agreeTerms,
         agreePrivacy: formData.agreePrivacy,
         agreeMarketing: formData.agreeMarketing,
+        ...terms.signupFields,
       });
       const data = response.data;
 
@@ -458,7 +464,12 @@ export default function RegisterPage() {
                   style={styles.checkbox}
                   required
                 />
-                <span><span style={styles.required}>*</span> 이용약관에 동의합니다</span>
+                <span>
+                  <span style={styles.required}>*</span>{' '}
+                  <Link to="/terms" target="_blank" rel="noopener noreferrer" style={styles.link}>이용약관</Link>
+                  에 동의합니다
+                  {terms.status === 'ok' && terms.doc ? <span style={{ color: '#9ca3af', fontSize: 12 }}> (v{terms.doc.version})</span> : null}
+                </span>
               </label>
               <label style={styles.checkboxLabel}>
                 <input
@@ -469,7 +480,11 @@ export default function RegisterPage() {
                   style={styles.checkbox}
                   required
                 />
-                <span><span style={styles.required}>*</span> 개인정보처리방침에 동의합니다</span>
+                <span>
+                  <span style={styles.required}>*</span>{' '}
+                  <Link to="/privacy" target="_blank" rel="noopener noreferrer" style={styles.link}>개인정보처리방침</Link>
+                  에 동의합니다
+                </span>
               </label>
               <label style={styles.checkboxLabel}>
                 <input

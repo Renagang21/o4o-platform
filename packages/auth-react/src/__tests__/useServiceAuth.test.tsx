@@ -342,3 +342,103 @@ describe('useServiceAuth — clearSessionOnLogoutAll', () => {
   });
 });
 
+
+// WO-O4O-INTEGRATED-TERMS-ACCEPTANCE-AND-SIGNUP-ALIGNMENT-V1 §16·§17 — pending 약관 · 승낙 제출
+describe('useServiceAuth — 약관 acceptance', () => {
+  const PENDING = [
+    { serviceKey: 'neture', documentType: 'terms', policyDocumentId: 'doc-1', version: 1, title: 'O4O 통합 서비스 이용약관' },
+  ];
+
+  it('세션 복구 응답의 pendingPolicyAcceptances 를 toUser 와 무관하게 보존한다', async () => {
+    const client = makeClient({
+      api: {
+        get: vi.fn(async () => ({ data: { data: { user: { ...API_USER, pendingPolicyAcceptances: PENDING } } } })),
+        post: vi.fn(async () => ({ data: {} })),
+      },
+    } as never);
+    const { hook } = setup({ token: 't', client });
+
+    await waitFor(() => expect(hook.result.current.isLoading).toBe(false));
+    expect(hook.result.current.pendingPolicyAcceptances).toEqual(PENDING);
+    // toUser 가 버린 필드지만 Core 가 raw 응답에서 직접 읽었다.
+    expect((hook.result.current.user as unknown as Record<string, unknown>).pendingPolicyAcceptances).toBeUndefined();
+  });
+
+  it('형태가 어긋난 pending 은 [] 로 취급한다 (게이트 오탐 방지)', async () => {
+    const client = makeClient({
+      api: {
+        get: vi.fn(async () => ({ data: { data: { user: { ...API_USER, pendingPolicyAcceptances: 'nope' } } } })),
+        post: vi.fn(async () => ({ data: {} })),
+      },
+    } as never);
+    const { hook } = setup({ token: 't', client });
+    await waitFor(() => expect(hook.result.current.isLoading).toBe(false));
+    expect(hook.result.current.pendingPolicyAcceptances).toEqual([]);
+  });
+
+  it('acceptPendingPolicies: pending 마다 POST 하고 세션을 재확인해 pending 을 비운다', async () => {
+    let accepted = false;
+    const client = makeClient({
+      api: {
+        get: vi.fn(async () => ({
+          data: { data: { user: { ...API_USER, pendingPolicyAcceptances: accepted ? [] : PENDING } } },
+        })),
+        post: vi.fn(async () => {
+          accepted = true;
+          return { data: { success: true, data: { accepted: { policyDocumentId: 'doc-1' }, pending: [] } } };
+        }),
+      },
+    } as never);
+    const { hook } = setup({ token: 't', client });
+    await waitFor(() => expect(hook.result.current.pendingPolicyAcceptances).toHaveLength(1));
+
+    let result: Awaited<ReturnType<typeof hook.result.current.acceptPendingPolicies>> | undefined;
+    await act(async () => {
+      result = await hook.result.current.acceptPendingPolicies();
+    });
+    expect(result?.success).toBe(true);
+    expect(client.api.post).toHaveBeenCalledWith('/auth/policy-acceptances', {
+      serviceKey: 'neture',
+      policyDocumentId: 'doc-1',
+      version: 1,
+    });
+    await waitFor(() => expect(hook.result.current.pendingPolicyAcceptances).toEqual([]));
+    expect(hook.result.current.isAuthenticated).toBe(true);
+  });
+
+  it('acceptPendingPolicies: 서버 거부(409)는 throw 없이 실패 결과 + 남은 pending 을 돌려준다', async () => {
+    const client = makeClient({
+      api: {
+        get: vi.fn(async () => ({ data: { data: { user: { ...API_USER, pendingPolicyAcceptances: PENDING } } } })),
+        post: vi.fn(async () => {
+          throw { response: { status: 409, data: { success: false, error: '현재 적용 중인 약관이 아닙니다.', code: 'POLICY_NOT_CURRENT' } } };
+        }),
+      },
+    } as never);
+    const { hook } = setup({ token: 't', client });
+    await waitFor(() => expect(hook.result.current.pendingPolicyAcceptances).toHaveLength(1));
+
+    let result: Awaited<ReturnType<typeof hook.result.current.acceptPendingPolicies>> | undefined;
+    await act(async () => {
+      result = await hook.result.current.acceptPendingPolicies();
+    });
+    expect(result?.success).toBe(false);
+    expect(result?.code).toBe('POLICY_NOT_CURRENT');
+    expect(result?.pending).toEqual(PENDING);
+    expect(hook.result.current.pendingPolicyAcceptances).toEqual(PENDING);
+  });
+
+  it('logout 은 pending 도 비운다', async () => {
+    const client = makeClient({
+      api: {
+        get: vi.fn(async () => ({ data: { data: { user: { ...API_USER, pendingPolicyAcceptances: PENDING } } } })),
+        post: vi.fn(async () => ({ data: {} })),
+      },
+    } as never);
+    const { hook } = setup({ token: 't', client });
+    await waitFor(() => expect(hook.result.current.pendingPolicyAcceptances).toHaveLength(1));
+    await act(async () => { await hook.result.current.logout(); });
+    expect(hook.result.current.pendingPolicyAcceptances).toEqual([]);
+    expect(hook.result.current.user).toBeNull();
+  });
+});

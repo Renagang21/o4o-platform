@@ -21,7 +21,9 @@ import { checkPasswordPolicy } from '@o4o/auth-utils';
 import { X, Eye, EyeOff, AlertCircle, CheckCircle } from 'lucide-react';
 import { AddressSearch } from '@o4o/ui';
 import { BusinessRegistrationFields } from '@o4o/account-ui';
+import { usePublishedPolicyDocument } from '@o4o/shared-space-ui';
 import { useAuthModal } from '../contexts/AuthModalContext';
+import { loadPolicy } from '../lib/legalDocument';
 
 type MemberType = 'pharmacist_member' | 'pharmacy_student_member';
 type Step = 'select' | 'form' | 'success';
@@ -91,6 +93,9 @@ export default function RegisterModal() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // WO-O4O-INTEGRATED-TERMS-ACCEPTANCE-AND-SIGNUP-ALIGNMENT-V1 §13: published 이용약관 식별자(id/version) 를
+  //   가입 payload 에 실어 "보여준 약관 그대로" 승낙이 기록되게 한다(서버 재검증). 게시 전에는 비어 있다.
+  const terms = usePublishedPolicyDocument('kpa-society', 'terms', loadPolicy);
   const [licenseStatus, setLicenseStatus] = useState<'idle' | 'checking' | 'available' | 'duplicate'>('idle');
   // email onBlur 시 /auth/check-email 호출로 중복/가입 상태 선제 안내.
   const [emailAlreadyJoined, setEmailAlreadyJoined] = useState(false);
@@ -255,6 +260,7 @@ export default function RegisterModal() {
         membershipType: memberType,
         tos: formData.agreeTerms,
         privacyAccepted: formData.agreePrivacy,
+        ...terms.signupFields,
       };
 
       if (memberType === 'pharmacist_member') {
@@ -768,6 +774,7 @@ export default function RegisterModal() {
                         className="text-blue-600 underline hover:text-blue-700" onClick={(e) => e.stopPropagation()}>
                         이용약관
                       </a>에 동의합니다
+                      {terms.status === 'ok' && terms.doc ? <span className="text-xs text-gray-400"> (v{terms.doc.version})</span> : null}
                     </span>
                   </label>
                   <label className="flex items-start gap-3 cursor-pointer">

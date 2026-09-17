@@ -16,7 +16,36 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { parseAuthResponse, resolveAuthError, AUTH_TOKEN_CLEARED_EVENT } from '@o4o/auth-utils';
-import type { AuthLoginResult, ServiceAuthConfig, ServiceAuthCore } from './types';
+import type {
+  AuthLoginResult,
+  PendingPolicyAcceptance,
+  PolicyAcceptanceResult,
+  ServiceAuthConfig,
+  ServiceAuthCore,
+} from './types';
+
+/**
+ * WO-O4O-INTEGRATED-TERMS-ACCEPTANCE-AND-SIGNUP-ALIGNMENT-V1 §16
+ * API 사용자 payload(로그인 · /auth/me · 428 응답 본문)에서 `pendingPolicyAcceptances` 를 안전하게 읽는다.
+ * 형태가 어긋나면 [] — 게이트를 잘못 띄우지 않는다(서버 게이트가 최종 방어선).
+ */
+export function readPendingPolicyAcceptances(source: unknown): PendingPolicyAcceptance[] {
+  const raw = (source as { pendingPolicyAcceptances?: unknown } | null | undefined)?.pendingPolicyAcceptances;
+  if (!Array.isArray(raw)) return [];
+  const out: PendingPolicyAcceptance[] = [];
+  for (const item of raw) {
+    const p = item as Partial<PendingPolicyAcceptance> | null;
+    if (!p || typeof p.serviceKey !== 'string' || typeof p.policyDocumentId !== 'string') continue;
+    out.push({
+      serviceKey: p.serviceKey,
+      documentType: typeof p.documentType === 'string' ? p.documentType : 'terms',
+      policyDocumentId: p.policyDocumentId,
+      version: typeof p.version === 'number' ? p.version : Number(p.version ?? 0),
+      title: typeof p.title === 'string' ? p.title : '',
+    });
+  }
+  return out;
+}
 
 /** axios 계열 오류에서 응답 본문·상태코드를 안전하게 꺼낸다. */
 function readErrorResponse(error: unknown): { data?: Record<string, unknown>; status?: number } {
@@ -41,6 +70,7 @@ export function useServiceAuth<TUser>(config: ServiceAuthConfig<TUser>): Service
   } = config;
 
   const [user, setUser] = useState<TUser | null>(null);
+  const [pendingPolicyAcceptances, setPendingPolicyAcceptances] = useState<PendingPolicyAcceptance[]>([]);
   // 토큰이 없으면 복구할 세션도 없다 → 로딩 스피너 없이 즉시 비로그인 화면.
   const [isLoading, setIsLoading] = useState(() => !!getAccessToken());
 
@@ -60,13 +90,16 @@ export function useServiceAuth<TUser>(config: ServiceAuthConfig<TUser>): Service
       const { user: apiUser } = parseAuthResponse(response.data as never);
       if (apiUser) {
         const built = cfg.toUser(apiUser as unknown as Record<string, unknown>);
+        setPendingPolicyAcceptances(readPendingPolicyAcceptances(apiUser));
         setUser(built);
         cfg.onAuthenticated?.(built);
       } else {
+        setPendingPolicyAcceptances([]);
         setUser(null);
       }
     } catch {
       // 세션 없음/만료 — 비로그인 상태로 진행(정상 경로).
+      setPendingPolicyAcceptances([]);
       setUser(null);
     } finally {
       setIsLoading(false);
@@ -100,6 +133,7 @@ export function useServiceAuth<TUser>(config: ServiceAuthConfig<TUser>): Service
           return { success: false, error: '로그인 응답이 올바르지 않습니다.' };
         }
         const built = toUser(apiUser);
+        setPendingPolicyAcceptances(readPendingPolicyAcceptances(apiUser));
         setUser(built);
         onAuthenticated?.(built);
         return { success: true, user: built };
@@ -135,9 +169,42 @@ export function useServiceAuth<TUser>(config: ServiceAuthConfig<TUser>): Service
     } catch {
       // 서버 로그아웃 실패해도 로컬 상태는 반드시 정리한다.
     } finally {
+      setPendingPolicyAcceptances([]);
       setUser(null);
     }
   }, [authClient]);
+
+  /**
+   * WO-O4O-INTEGRATED-TERMS-ACCEPTANCE-AND-SIGNUP-ALIGNMENT-V1 §17·§20
+   * pending 약관을 하나씩 제출한다(서버가 문서·서비스·버전을 재검증). 전부 성공하면 세션을 재확인해
+   * pending 을 서버 판정으로 다시 채운다. 실패해도 throw 하지 않는다.
+   */
+  const acceptPendingPolicies = useCallback(async (): Promise<PolicyAcceptanceResult> => {
+    let remaining = pendingPolicyAcceptances;
+    for (const item of pendingPolicyAcceptances) {
+      try {
+        const response = await authClient.api.post('/auth/policy-acceptances', {
+          serviceKey: item.serviceKey,
+          policyDocumentId: item.policyDocumentId,
+          version: item.version,
+        });
+        const body = (response?.data ?? {}) as { data?: { pending?: unknown } };
+        remaining = readPendingPolicyAcceptances({ pendingPolicyAcceptances: body.data?.pending });
+      } catch (error: unknown) {
+        const { data, status } = readErrorResponse(error);
+        const code = typeof data?.code === 'string' ? data.code : undefined;
+        const message = typeof data?.error === 'string'
+          ? data.error
+          : status === 409
+            ? '약관이 갱신되었습니다. 화면을 새로고침한 뒤 다시 동의해 주세요.'
+            : '약관 동의 처리에 실패했습니다. 잠시 후 다시 시도해 주세요.';
+        return { success: false, error: message, code, pending: remaining };
+      }
+    }
+    setPendingPolicyAcceptances(remaining);
+    await refresh();
+    return { success: true, pending: remaining };
+  }, [authClient, pendingPolicyAcceptances, refresh]);
 
   const logoutAll = useCallback(async () => {
     try {
@@ -152,6 +219,8 @@ export function useServiceAuth<TUser>(config: ServiceAuthConfig<TUser>): Service
     user,
     isAuthenticated: !!user,
     isLoading,
+    pendingPolicyAcceptances,
+    acceptPendingPolicies,
     login,
     logout,
     logoutAll,

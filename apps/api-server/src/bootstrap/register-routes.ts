@@ -18,6 +18,8 @@ import logger from '../utils/logger.js';
 // ============================================================================
 import authRoutes from '../modules/auth/routes/auth.routes.js';
 import guestAuthRoutes from '../modules/auth/routes/guest-auth.routes.js';
+// WO-O4O-INTEGRATED-TERMS-ACCEPTANCE-AND-SIGNUP-ALIGNMENT-V1: 약관 acceptance (Core auth.routes 불변)
+import policyAcceptanceRoutes from '../modules/policy-acceptance/policy-acceptance.routes.js';
 import lmsRoutes from '../modules/lms/routes/lms.routes.js';
 // WO-O4O-LMS-AI-MINIMAL-V1
 import aiRoutes from '../modules/ai/routes/ai.routes.js';
@@ -115,6 +117,9 @@ import { createAdminOpsMetricsRoutes } from '../routes/admin/ops-metrics.routes.
 // ============================================================================
 export async function registerCoreRoutes(app: Application): Promise<void> {
   // Register core API routes
+  // WO-O4O-INTEGRATED-TERMS-ACCEPTANCE-AND-SIGNUP-ALIGNMENT-V1 §20: 약관 pending 조회·승낙 제출.
+  //   authRoutes(Core) 보다 먼저 — 더 구체적인 prefix. allowlist(terms-acceptance.policy) 경로와 일치해야 한다.
+  app.use('/api/v1/auth/policy-acceptances', policyAcceptanceRoutes);
   app.use('/api/v1/auth', authRoutes);
   app.use('/api/auth', authRoutes);  // Legacy path for backward compatibility
   // WO-O4O-AUTH-SERVICE-TOKEN-BOUNDARY-HARDENING-V1: /api/v1/auth/service (service login) RETIRED —

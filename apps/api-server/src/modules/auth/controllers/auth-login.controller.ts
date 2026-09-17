@@ -9,6 +9,7 @@ import { getTrustedClientIp } from '../../../utils/trusted-client-ip.js';
 import { Request, Response } from 'express';
 import { BaseController } from '../../../common/base.controller.js';
 import { authenticationService } from '../../../services/authentication.service.js';
+import { policyAcceptanceService } from '../../policy-acceptance/policy-acceptance.service.js';
 import type { LoginRequestDto } from '../dto/index.js';
 import logger from '../../../utils/logger.js';
 import { monitoringMetrics } from '../../../common/monitoring/metrics.service.js';
@@ -88,6 +89,12 @@ export class AuthLoginController extends BaseController {
         || `${result.user.lastName || ''}${result.user.firstName || ''}`.trim()
         || result.user.email?.split('@')[0]
         || '사용자';
+
+      // WO-O4O-INTEGRATED-TERMS-ACCEPTANCE-AND-SIGNUP-ALIGNMENT-V1 §16: pending 약관 (본문 없음).
+      //   /auth/me 와 동일 계약. 판정 실패는 [] — 로그인 자체를 막지 않는다 (게이트는 requireAuth 가 담당).
+      try {
+        loginUser.pendingPolicyAcceptances = await policyAcceptanceService.getPendingForUser(String(result.user.id));
+      } catch { loginUser.pendingPolicyAcceptances = []; }
 
       // Response: Cookie is primary, JSON tokens for cross-origin or legacy support
       return BaseController.ok(res, {

@@ -9,6 +9,7 @@
 
 import type { ServiceLegalProfile } from './entities/ServiceLegalProfile.entity.js';
 import type { ServicePolicyDocument } from './entities/ServicePolicyDocument.entity.js';
+import { computePolicyContentHash } from '../policy-acceptance/policy-acceptance.service.js';
 
 /** 공개 법정정보 DTO — 사업자 법정정보만 (id/is_active/updated_by/timestamps 제외). */
 export function toPublicLegalProfile(p: ServiceLegalProfile) {
@@ -45,9 +46,15 @@ export function toAdminLegalProfile(p: ServiceLegalProfile) {
   };
 }
 
-/** 공개 정책 문서 DTO — published 문서만 매핑(내부 audit 필드 제외). */
+/**
+ * 공개 정책 문서 DTO — published 문서만 매핑(내부 audit 필드 제외).
+ * WO-O4O-INTEGRATED-TERMS-ACCEPTANCE-AND-SIGNUP-ALIGNMENT-V1 §9: 가입·재동의 화면이 "보여준 문서 그대로"
+ * 승낙을 제출하도록 `id`(policyDocumentId) 와 `contentHash`(sha256) 를 함께 내려준다.
+ */
 export function toPublicPolicyDocument(d: ServicePolicyDocument) {
   return {
+    id: d.id,
+    contentHash: computePolicyContentHash(d.content),
     serviceKey: d.service_key,
     documentType: d.document_type,
     title: d.title,

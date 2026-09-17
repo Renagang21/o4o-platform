@@ -81,11 +81,43 @@ export interface ServiceAuthConfig<TUser> {
   clearSessionOnLogoutAll?: boolean;
 }
 
+/**
+ * WO-O4O-INTEGRATED-TERMS-ACCEPTANCE-AND-SIGNUP-ALIGNMENT-V1 §16
+ * 로그인 응답 · /auth/me 의 `pendingPolicyAcceptances` 항목 — 아직 승낙하지 않은 published 이용약관.
+ * 본문은 싣지 않는다(프론트가 public policy API 로 연다). 비어 있지 않으면 재동의 화면으로 전환한다.
+ */
+export interface PendingPolicyAcceptance {
+  serviceKey: string;
+  documentType: string;
+  policyDocumentId: string;
+  version: number;
+  title: string;
+}
+
+/** 승낙 제출 결과 — login 과 같이 throw 하지 않는다. */
+export interface PolicyAcceptanceResult {
+  success: boolean;
+  error?: string;
+  code?: string;
+  /** 제출 후 남은 pending (성공 시 보통 []). */
+  pending: PendingPolicyAcceptance[];
+}
+
 /** Core 가 제공하는 상태·행동(모든 서비스 공통). */
 export interface ServiceAuthCore<TUser> {
   user: TUser | null;
   isAuthenticated: boolean;
   isLoading: boolean;
+  /**
+   * WO-O4O-INTEGRATED-TERMS-ACCEPTANCE-AND-SIGNUP-ALIGNMENT-V1 §16·§17:
+   * 세션 복구/로그인 응답에서 읽은 미승낙 약관. `toUser` 가 무엇을 버리든 Core 가 raw 응답에서 직접 보존한다.
+   */
+  pendingPolicyAcceptances: PendingPolicyAcceptance[];
+  /**
+   * pending 약관을 순서대로 `POST /auth/policy-acceptances` 로 제출한 뒤 세션을 재확인한다.
+   * 4 서비스 본문이 동일한 통합약관이므로 한 번의 동의 행위로 전부 제출한다(사용자가 전문을 읽고 체크한 뒤).
+   */
+  acceptPendingPolicies: () => Promise<PolicyAcceptanceResult>;
   login: (email: string, password: string) => Promise<AuthLoginResult<TUser>>;
   logout: () => Promise<void>;
   logoutAll: () => Promise<void>;

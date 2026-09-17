@@ -20,7 +20,12 @@ import {
 } from '@o4o/auth-utils';
 import { getAccessToken } from '@o4o/auth-client';
 // WO-O4O-FRONTEND-AUTH-CONTEXT-AND-ROUTE-GUARD-COMMONIZATION-V1
-import { useServiceAuth, type AuthLoginResult } from '@o4o/auth-react';
+import {
+  useServiceAuth,
+  type AuthLoginResult,
+  type PendingPolicyAcceptance,
+  type PolicyAcceptanceResult,
+} from '@o4o/auth-react';
 import { authClient } from '../lib/apiClient';
 import { SERVICE_KEY } from '../config/service';
 
@@ -36,6 +41,9 @@ interface AuthContextValue {
   isLoading: boolean;
   login: (email: string, password: string) => Promise<AuthLoginResult<PharmacyHubUser>>;
   logout: () => void;
+  /** WO-O4O-INTEGRATED-TERMS-ACCEPTANCE-AND-SIGNUP-ALIGNMENT-V1 §16·§17: 미승낙 약관 · 승낙 제출 */
+  pendingPolicyAcceptances: PendingPolicyAcceptance[];
+  acceptPendingPolicies: () => Promise<PolicyAcceptanceResult>;
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
@@ -76,6 +84,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isLoading: core.isLoading,
         login: core.login,
         logout: () => { void core.logout(); },
+        pendingPolicyAcceptances: core.pendingPolicyAcceptances,
+        acceptPendingPolicies: core.acceptPendingPolicies,
       }}
     >
       {children}

@@ -107,3 +107,32 @@ export async function loadPublishedPolicyDocument(documentType: string): Promise
   if (legacy.status === 'empty') return { status: 'empty' };
   return { status: 'error' };
 }
+
+// ─── Canonical 문서 식별자 loader (acceptance 용) ───────────────────────────────
+// WO-O4O-INTEGRATED-TERMS-ACCEPTANCE-AND-SIGNUP-ALIGNMENT-V1 §9 · §13 · §17
+//
+// 가입 화면·재동의 게이트는 승낙 대상이 `service_policy_documents` row 여야 하므로 legacy fallback 없이
+// 표준 public API 만 조회한다(id · version · contentHash 포함). 공개 /policy 페이지의 fallback 과는 별개.
+
+export interface CanonicalPolicyDocument {
+  id?: string;
+  contentHash?: string;
+  serviceKey: string;
+  documentType: string;
+  title: string;
+  slug: string | null;
+  content: string;
+  version: number;
+  effectiveDate: string | null;
+  publishedAt: string | null;
+  updatedAt: string;
+}
+
+/** published 표준 문서 조회. 미게시/없음(404) → null. 그 외 오류는 throw. */
+export async function loadPolicy(serviceKey: string, documentType: string): Promise<CanonicalPolicyDocument | null> {
+  const res = await fetch(`${API_BASE}/api/v1/public/services/${serviceKey}/policies/${documentType}`);
+  if (res.status === 404) return null;
+  if (!res.ok) throw new Error(`policy load failed: ${res.status}`);
+  const json = await res.json();
+  return (json?.data as CanonicalPolicyDocument | undefined) ?? null;
+}

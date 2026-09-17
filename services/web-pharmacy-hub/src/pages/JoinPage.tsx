@@ -15,8 +15,10 @@
 
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { usePublishedPolicyDocument } from '@o4o/shared-space-ui';
 import { api } from '../lib/apiClient';
-import { BRAND } from '../config/service';
+import { BRAND, SERVICE_KEY } from '../config/service';
+import { loadPolicy } from './legal/PolicyDocumentPage';
 
 /** 가입 유형 — 백엔드 `ALLOWED_ROLE_TYPES` 와 같은 표다. */
 const ROLE_TYPES = [
@@ -54,6 +56,12 @@ export default function JoinPage() {
   const [error, setError] = useState<string | null>(null);
   const [missing, setMissing] = useState<string[]>([]);
   const [submitting, setSubmitting] = useState(false);
+  // WO-O4O-INTEGRATED-TERMS-ACCEPTANCE-AND-SIGNUP-ALIGNMENT-V1 §11:
+  //   약관·개인정보 처리방침 동의는 사용자가 직접 체크한다(하드코딩 제거). 이용약관은 published 문서의
+  //   id/version 을 payload 에 실어 "보여준 약관 그대로" 승낙이 기록되게 한다(서버 재검증).
+  const [agreeTerms, setAgreeTerms] = useState(false);
+  const [agreePrivacy, setAgreePrivacy] = useState(false);
+  const terms = usePublishedPolicyDocument(SERVICE_KEY, 'terms', loadPolicy);
 
   const set = (key: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm((prev) => ({ ...prev, [key]: e.target.value }));
@@ -62,6 +70,10 @@ export default function JoinPage() {
     e.preventDefault();
     setError(null);
     setMissing([]);
+    if (!agreeTerms || !agreePrivacy) {
+      setError('이용약관과 개인정보 처리방침에 동의해야 가입 신청할 수 있습니다.');
+      return;
+    }
     setSubmitting(true);
     try {
       await api.post('/pharmacy-hub/join', {
@@ -72,8 +84,10 @@ export default function JoinPage() {
         phone: form.phone,
         // 약국명은 약국 경영자 신청에만 보낸다 (백엔드 검증 축과 같은 표).
         ...(roleType === 'store_owner' ? { businessName: form.businessName } : {}),
-        tos: true,
-        privacyAccepted: true,
+        tos: agreeTerms,
+        privacyAccepted: agreePrivacy,
+        // published 이용약관 식별자 (게시 전에는 비어 있고 서버도 요구하지 않는다)
+        ...terms.signupFields,
       });
       navigate('/join/status?submitted=1');
     } catch (err) {
@@ -176,6 +190,46 @@ export default function JoinPage() {
             </label>
           )}
 
+          <fieldset className="space-y-2 rounded border border-gray-200 p-3">
+            <legend className="text-sm font-semibold text-gray-700">약관 동의</legend>
+            <label className="flex cursor-pointer items-start gap-2 text-sm">
+              <input
+                type="checkbox"
+                checked={agreeTerms}
+                onChange={(e) => setAgreeTerms(e.target.checked)}
+                className="mt-1"
+              />
+              <span>
+                <span className="text-red-600">*</span>{' '}
+                <Link to="/terms" target="_blank" rel="noopener noreferrer" className="text-primary-600 underline">
+                  이용약관
+                </Link>
+                에 동의합니다
+                {terms.status === 'ok' && terms.doc ? (
+                  <span className="ml-1 text-xs text-gray-400">(v{terms.doc.version})</span>
+                ) : null}
+              </span>
+            </label>
+            <label className="flex cursor-pointer items-start gap-2 text-sm">
+              <input
+                type="checkbox"
+                checked={agreePrivacy}
+                onChange={(e) => setAgreePrivacy(e.target.checked)}
+                className="mt-1"
+              />
+              <span>
+                <span className="text-red-600">*</span>{' '}
+                <Link to="/privacy" target="_blank" rel="noopener noreferrer" className="text-primary-600 underline">
+                  개인정보 처리방침
+                </Link>
+                에 동의합니다
+              </span>
+            </label>
+            {terms.status === 'error' && (
+              <p className="text-xs text-red-600">이용약관을 불러오지 못했습니다. 새로고침 후 다시 시도해 주세요.</p>
+            )}
+          </fieldset>
+
           {error && (
             <div className="text-sm text-red-600">
               <p>{error}</p>
@@ -189,7 +243,7 @@ export default function JoinPage() {
 
           <button
             type="submit"
-            disabled={submitting}
+            disabled={submitting || !agreeTerms || !agreePrivacy}
             className="w-full rounded bg-primary-600 px-3 py-2 text-white disabled:opacity-50"
           >
             {submitting ? '신청 중…' : '가입 신청'}

@@ -17,7 +17,7 @@ import { api } from '../../lib/apiClient';
 const SERVICE_KEY = 'k-cosmetics';
 
 /** public 정책 문서 조회. 미게시/없음(404) → null. 그 외 오류는 throw. */
-async function loadPolicy(serviceKey: string, documentType: string): Promise<PolicyDocumentDto | null> {
+export async function loadPolicy(serviceKey: string, documentType: string): Promise<PolicyDocumentDto | null> {
   try {
     const res = await api.get(`/public/services/${serviceKey}/policies/${documentType}`);
     return res.data?.data ?? null;

@@ -22,6 +22,7 @@ const queryClient = new QueryClient({
   defaultOptions: { queries: { refetchOnWindowFocus: false, retry: 1 } },
 });
 import { AuthProvider, LoginModalProvider, useLoginModal, useAuth, getNetureDashboardRoute, WorkScopeProvider } from './contexts';
+import { TermsAcceptanceGate } from './components/auth/TermsAcceptanceGate';
 import LoginModal from './components/LoginModal';
 import RegisterModal from './components/RegisterModal';
 import { O4OErrorBoundary, O4OToastProvider } from '@o4o/error-handling';
@@ -662,6 +663,8 @@ function App() {
           <O4OToastProvider />
           <PostLoginRedirect />
           <ModalRenderer />
+          {/* WO-O4O-INTEGRATED-TERMS-ACCEPTANCE-AND-SIGNUP-ALIGNMENT-V1 §17: 기존 회원 약관 재동의 게이트 */}
+          <TermsAcceptanceGate>
           <Suspense fallback={<PageLoading />}>
             <Routes>
             {/* ================================================================
@@ -1193,6 +1196,7 @@ function App() {
             <Route path="*" element={<NotFoundPage />} />
             </Routes>
           </Suspense>
+          </TermsAcceptanceGate>
           </WorkScopeProvider>
         </BrowserRouter>
       </LoginModalProvider>

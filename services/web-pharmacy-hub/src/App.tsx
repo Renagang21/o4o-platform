@@ -114,6 +114,8 @@ import {
   pharmacyHubGuideFeatureManualsProps,
 } from '@o4o/shared-space-ui';
 import { MembershipGate } from './components/MembershipGate';
+// WO-O4O-INTEGRATED-TERMS-ACCEPTANCE-AND-SIGNUP-ALIGNMENT-V1 §17: 기존 회원 약관 재동의 게이트
+import { TermsAcceptanceGate } from './components/TermsAcceptanceGate';
 import LoginPage from './pages/LoginPage';
 import ForgotPasswordPage from './pages/auth/ForgotPasswordPage';
 import ResetPasswordPage from './pages/auth/ResetPasswordPage';
@@ -275,6 +277,7 @@ export default function App() {
       <O4OToastProvider />
       <AuthProvider>
         <BrowserRouter>
+        <TermsAcceptanceGate>
         <Routes>
           {/*
             공개 영역 셸 (WO-O4O-CROSSSERVICE-HEADER-MENU-FOOTER-UI-COMPLETION-V1)
@@ -898,6 +901,7 @@ export default function App() {
             <Route path="*" element={<NotFoundPage />} />
           </Route>
         </Routes>
+        </TermsAcceptanceGate>
         </BrowserRouter>
       </AuthProvider>
     </O4OErrorBoundary>
