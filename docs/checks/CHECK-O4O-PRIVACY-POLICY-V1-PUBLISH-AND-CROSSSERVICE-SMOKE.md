@@ -25,7 +25,7 @@
 
 ## 2. 대상 서비스
 
-정확히 `neture` · `kpa-society` · `k-cosmetics` · `pharmacy-hub`. retired 서비스(GlycoPharm 등) write 0.
+정확히 `neture` · `kpa-society` · `k-cosmetics` · `pharmacy-hub`. retired 서비스 write 0.
 
 ## 3. API 경로 · 계약 (최신 main 재확인)
 
