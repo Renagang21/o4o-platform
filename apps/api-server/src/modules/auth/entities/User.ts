@@ -22,8 +22,10 @@ export class User {
   @Column({ type: 'varchar', length: 255, unique: true })
   email!: string;
 
-  @Column({ type: 'varchar', length: 255 })
-  password!: string; // bcrypt hashed
+  // WO-O4O-GOOGLE-IDENTITY-PREREQUISITES-V1 (Identity V3 §2 · REVIEW-8): Google-only user = NULL.
+  //   legacy `''` sentinel(social-only) 도 잔존 가능 — 두 경우 모두 `!user.password` 로 "password 없음" 판정.
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  password!: string | null; // bcrypt hashed · NULL = password 없음(Google-only)
 
   @Column({ type: 'varchar', length: 100, nullable: true })
   firstName?: string;
@@ -31,8 +33,9 @@ export class User {
   @Column({ type: 'varchar', length: 100, nullable: true })
   lastName?: string;
 
-  @Column({ type: 'varchar', length: 200, default: '운영자' })
-  name!: string;
+  // WO-O4O-GOOGLE-IDENTITY-PREREQUISITES-V1: optional profile. DB default '운영자'(placeholder) 제거 · NULL 허용.
+  @Column({ type: 'varchar', length: 200, nullable: true })
+  name?: string | null;
 
   // P1-T2: Nickname for forum/public display (separate from real name)
   @Column({ type: 'varchar', length: 100, nullable: true })

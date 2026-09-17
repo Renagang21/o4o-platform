@@ -16,13 +16,14 @@ export interface LinkedAccount {
   id: string;
   userId: string;
   provider: AuthProvider;
-  providerId?: string; // OAuth provider's user ID
-  email: string;
+  providerId?: string; // OAuth provider's user ID (Google `sub`)
+  // WO-O4O-GOOGLE-IDENTITY-PREREQUISITES-V1: 운영 schema 와 일치 — 스냅샷 컬럼은 optional (Google row 에 기록하지 않음)
+  email?: string;
   displayName?: string;
   profileImage?: string;
-  isVerified: boolean;
-  isPrimary: boolean;
-  linkedAt: Date;
+  isVerified?: boolean;
+  isPrimary?: boolean;
+  linkedAt?: Date;
   lastUsedAt?: Date;
 }
 

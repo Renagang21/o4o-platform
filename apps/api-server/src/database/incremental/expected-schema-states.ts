@@ -74,6 +74,15 @@ export const EXPECTED_SCHEMA_STATES: readonly ExpectedSchemaState[] = [
     fingerprint: '8b5be7bdad427bea966dedd13dd8ef86c4923e981ba6ccb2f9976a611d600f5b',
     fingerprintLineCount: 5722,
   },
+  // WO-O4O-GOOGLE-IDENTITY-PREREQUISITES-V1 (Identity V3 Phase 2-A · F10 exception) — computed in an isolated
+  // PostgreSQL 15.19 (fresh bootstrap + migrations 1..5 via migrate.ts) on 2026-09-17. linked_accounts: FK userId→users
+  // ON DELETE CASCADE · UNIQUE (provider,"providerId") WHERE "providerId" IS NOT NULL · UNIQUE ("userId") WHERE
+  // provider='google'. users: password DROP NOT NULL · name DROP NOT NULL · name DROP DEFAULT. No table created, no data changed.
+  {
+    appliedThrough: 'PrepareGoogleIdentityLinkedAccountsAndUsersConstraints1789648511051',
+    fingerprint: '24c5941710706267d92cdbf52981aae3fdf5bb81a1c299faa5c03c1d10d25da6',
+    fingerprintLineCount: 5725,
+  },
 ] as const;
 
 /** Expected state after `prefixLength` incremental migrations; undefined when not registered. */
