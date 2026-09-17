@@ -30,7 +30,7 @@ export default function MainLayout() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-500">
             <div className="text-center sm:text-left">
-              <p>&copy; 2026 Neture. 공급자 · 파트너 협업 플랫폼</p>
+              <p>&copy; 2026 Neture. O4O 통합 업무 공간</p>
               {/* WO-O4O-CROSSSERVICE-DYNAMIC-LEGAL-FOOTER-V1: 하드코딩 법정정보 제거 → API 값 있을 때만 표시 */}
               <div className="text-xs text-gray-400 mt-1">
                 <PublicLegalFooterInfo serviceKey="neture" loadProfile={loadFooterLegal} />

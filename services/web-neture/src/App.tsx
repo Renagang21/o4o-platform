@@ -26,7 +26,7 @@ import LoginModal from './components/LoginModal';
 import RegisterModal from './components/RegisterModal';
 import { O4OErrorBoundary, O4OToastProvider } from '@o4o/error-handling';
 import { usePageSeo } from '@o4o/shared-space-ui';
-import { netureSeoRegistry, NETURE_SEO_DEFAULTS } from './config/seoRegistry';
+import { netureSeoRegistry, resolveNetureSeoDefaults } from './config/seoRegistry';
 
 // Layouts
 import NetureLayout from './components/layouts/NetureLayout';
@@ -622,9 +622,12 @@ function RegisterRedirect() {
 const ProtectedRoute = RoleGuard;
 
 // WO-O4O-KPA-NETURE-SEO-REGISTRY-USEPAGESEO-V1: 페이지별 메타 동적 적용 (브라우저/SNS 보조용)
+// WO-O4O-NETURE-O4O-BRAND-HEADER-SEO-ALIGNMENT-V1: 미등록 경로의 fallback 은 surface 별
+//   (O4O 대표 / Supplier Workspace / Service Operator / Platform Admin) — O4O 대표 title 이
+//   Neture 업무 공간까지 퍼지지 않고, 옛 "유통·협업 플랫폼" 정체성도 퍼지지 않는다.
 function SeoWatcher() {
   const { pathname } = useLocation();
-  usePageSeo({ registry: netureSeoRegistry, pathname, defaults: NETURE_SEO_DEFAULTS });
+  usePageSeo({ registry: netureSeoRegistry, pathname, defaults: resolveNetureSeoDefaults(pathname) });
   return null;
 }
 

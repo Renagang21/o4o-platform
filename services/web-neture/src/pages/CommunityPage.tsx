@@ -238,7 +238,7 @@ function NetureHero() {
     <section className="bg-gradient-to-br from-primary-600 to-primary-800 text-white mb-16">
       <div className="max-w-5xl mx-auto px-4 py-16 text-center">
         <p className="text-sm font-semibold text-white/70 tracking-widest uppercase mb-3">
-          O4O 공급자 · 운영자 · 파트너 플랫폼
+          O4O 공급자 · 운영자 · 매장 협력 플랫폼
         </p>
         <h1 className="text-4xl font-bold mb-4">Neture</h1>
         <p className="text-lg text-white/80 mb-8 max-w-xl mx-auto leading-relaxed">

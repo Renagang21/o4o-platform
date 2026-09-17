@@ -30,6 +30,21 @@ import {
 } from '../config/navigation';
 import { NetureUserMenuItems } from './NetureUserMenu';
 import { resolveNetureNotificationTarget } from '../lib/notificationRouting';
+// ─── Brand ───────────────────────────────────────────────────────────────────
+
+/**
+ * WO-O4O-NETURE-O4O-BRAND-HEADER-SEO-ALIGNMENT-V1
+ * 이 헤더는 Neture chrome(커뮤니티 · 마이페이지 · 안내 · Supplier / Operator / Admin 업무 공간)에 쓰이고
+ * O4O 대표 홈(`/`)에는 씌우지 않는다. 브랜드 이름은 서비스 Identity(Neture) 그대로, 부제는
+ * Legacy Partner 은퇴 후 "공급자·파트너 협업 플랫폼" 대신 O4O 정체성으로 가장 짧게 둔다.
+ */
+export const NETURE_HEADER_BRAND = {
+  icon: '🌿',
+  name: 'Neture',
+  subtitle: 'O4O 통합 업무 공간',
+  primaryColor: '#059669',
+} as const;
+
 // ─── Component ───────────────────────────────────────────────────────────────
 
 export function NetureGlobalHeader() {
@@ -78,12 +93,7 @@ export function NetureGlobalHeader() {
 
   return (
     <GlobalHeader
-      brand={{
-        icon: '🌿',
-        name: 'Neture',
-        subtitle: '공급자·파트너 협업 플랫폼',
-        primaryColor: '#059669',
-      }}
+      brand={NETURE_HEADER_BRAND}
       publicNav={NETURE_PUBLIC_NAV}
       contextualNav={contextualNav}
       user={headerUser}
