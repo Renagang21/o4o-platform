@@ -19,7 +19,7 @@
 | 축 | 방법 | 결과 |
 |---|---|---|
 | 백엔드 route | `rg` 전체(`auth/service`, `auth/guest`, `handleServiceUserLogin`, `generateServiceTokens`, `upgradeGuestToServiceUser`, `requireServiceUser`, `isServiceToken` 등 20 패턴, node_modules 제외) | 발급 진입점 2곳 — `service-auth.routes.ts POST /login` · `guest-auth.routes.ts POST /upgrade`(같은 `handleServiceUserLogin` 재사용). service 토큰 소비 route 는 `GET /auth/service/me`(`requireServiceUser`) 1곳뿐. `requireServiceUser`/`optionalServiceAuth`/`requireGuestOrServiceUser`/`optionalGuestOrServiceAuth`/`requirePlatformUser` 의 route 소비 0 |
-| 프론트 클라이언트 (`services/**`, `packages/**`, admin) | Grep(`!node_modules`) | `services/web-kpa-society/src/contexts/AuthContext.tsx` 의 `serviceUserLogin` 블록 1곳 — 그 블록의 소비처 0 ([`CHECK-...-FRONTEND-AUTH-CONTEXT-...-FULL-CLOSE-V1`](CHECK-O4O-FRONTEND-AUTH-CONTEXT-AND-ROUTE-GUARD-COMMONIZATION-FULL-CLOSE-V1.md):100 이 dead 로 기록). GlycoPharm 잔존 참조 0 |
+| 프론트 클라이언트 (`services/**`, `packages/**`, admin) | Grep(`!node_modules`) | `services/web-kpa-society/src/contexts/AuthContext.tsx` 의 `serviceUserLogin` 블록 1곳 — 그 블록의 소비처 0 ([`CHECK-...-FRONTEND-AUTH-CONTEXT-...-FULL-CLOSE-V1`](CHECK-O4O-FRONTEND-AUTH-CONTEXT-AND-ROUTE-GUARD-COMMONIZATION-FULL-CLOSE-V1.md):100 이 dead 로 기록) |
 | workflow / scripts | `rg --hidden` `.github` · `scripts` | 0 |
 | 테스트 | `apps/api-server/src/**/__tests__` · `*.spec.ts` | 참조 0 (`restricted-account-access.spec.ts` 의 `isServiceToken: () => false` mock 만) |
 | 문서 | `docs/**` | 설계 · Census · dead-code IR 의 기록만 — 계약 문서 없음. [`IR-...-DEAD-CODE-...-PASS2`](../investigations/IR-O4O-REPOSITORY-WIDE-DEAD-CODE-AND-LEGACY-SURFACE-CENSUS-V1-PASS2.md):177-182 가 zero-literal-caller 후보로 이미 지목 |
