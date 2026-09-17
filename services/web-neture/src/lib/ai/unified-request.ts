@@ -162,9 +162,17 @@ export async function readAttachmentFile(att: PendingAttachment): Promise<Unifie
   return { name: att.name, mimeType: att.mimeType, base64: await readAsBase64(att.file) };
 }
 
+/** 원내약 + 약학정보원 결합 응답(WO-O4O-HOSPITAL-DRUG-COMPOSITE-QUERY-ORCHESTRATION-V1 §9). */
+export interface CompositeResult {
+  message: string;
+  plan: 'web_and_local' | 'local_only' | 'web_only' | 'unsupported';
+  steps?: { source: 'healthkr' | 'local_data'; tool: string; outcome: string }[];
+}
+
 export type UnifiedRequestResult =
   | { kind: 'chat'; route: string; reason: string; chat: HomeChatResult & { attachments?: { name: string; kind: UnifiedAttachmentKind; readable: boolean }[] } }
   | { kind: 'work'; route: string; reason: string; work: WorkAgentResult }
+  | { kind: 'composite'; route: string; reason: string; composite: CompositeResult }
   | { kind: 'confirm'; route: string; reason: string; confirm: { message: string; target: { targetType: 'browser_site' | 'windows_app'; displayName: string } } };
 
 export interface UnifiedRequestInput {

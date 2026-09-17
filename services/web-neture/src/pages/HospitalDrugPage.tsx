@@ -137,6 +137,11 @@ export default function HospitalDrugPage() {
           setWorkResult(result);
           return;
         }
+        // §9 — 원내약 + 약학정보원 결합 응답. 이미 하나로 합쳐진 한국어 답을 그대로 보여 준다.
+        if (result.kind === 'composite') {
+          setAnswer(result.composite.message);
+          return;
+        }
         setAnswer(result.chat.message);
       } catch (err) {
         // 저장된 세션이 만료·소실됐다. 로그인 모달을 열지 않는다(옵션 C):

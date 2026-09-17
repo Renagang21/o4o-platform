@@ -60,6 +60,19 @@ afterEach(() => {
 });
 
 const chatResult = (message: string) => ({ kind: 'chat', route: 'chat', reason: 'ok', chat: { message } });
+const compositeResult = (message: string) => ({
+  kind: 'composite',
+  route: 'composite',
+  reason: 'hospital_drug_composite',
+  composite: {
+    message,
+    plan: 'web_and_local',
+    steps: [
+      { source: 'healthkr', tool: 'pharmacy.web.entrypoint', outcome: 'list:3' },
+      { source: 'local_data', tool: 'data.local.query', outcome: 'rows:2' },
+    ],
+  },
+});
 
 describe('원내 약품 안내 — 게이트1 옵션 C', () => {
   it('미인증에서도 입력창이 열리고 로그인 UI 를 두지 않는다', async () => {
@@ -82,6 +95,21 @@ describe('원내 약품 안내 — 게이트1 옵션 C', () => {
 
     const answer = await screen.findByTestId('hospital-drug-answer');
     expect(answer.textContent).toContain('타이레놀정 재고 12개');
+  });
+
+  it('결합 응답(§9 composite)이면 이미 합쳐진 하나의 답을 그대로 보여준다', async () => {
+    probeLocalAgent.mockResolvedValue({ ok: true, health: { agentVersion: '0.1.0', connected: true, nonce: 'n' } });
+    sendUnifiedRequest.mockResolvedValue(
+      compositeResult("'우루사정' 과(와) 같은 성분(우르소데옥시콜산)의 원내 약품을 조회했습니다.\n\n[원내 약품] 2건 확인"),
+    );
+    render(<HospitalDrugPage />);
+
+    await userEvent.type(await screen.findByTestId('hospital-drug-input'), '우루사정 200mg과 같은 성분의 원내약 있어?');
+    await userEvent.click(screen.getByTestId('hospital-drug-submit'));
+
+    const answer = await screen.findByTestId('hospital-drug-answer');
+    expect(answer.textContent).toContain('우르소데옥시콜산');
+    expect(answer.textContent).toContain('[원내 약품] 2건 확인');
   });
 
   it('401(세션 만료)이면 로그인으로 보내지 않고 「재연결 필요」를 안내한다', async () => {

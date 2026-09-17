@@ -272,6 +272,12 @@ export default function O4OHomePage() {
         setResumeRunId(result.work.resumable && result.work.runId ? result.work.runId : null);
         return;
       }
+      // §9 — 원내약 + 약학정보원 결합 응답. 서버가 이미 하나로 합친 한국어 답을 그대로 보여 준다.
+      if (result.kind === 'composite') {
+        setAnswer(result.composite.message);
+        setResumeRunId(null);
+        return;
+      }
       setAnswer(result.chat.message);
       setOpenedSite(result.chat.browserSiteOpened ?? null);
       setAttachmentsUsed(result.chat.attachments ?? []);
