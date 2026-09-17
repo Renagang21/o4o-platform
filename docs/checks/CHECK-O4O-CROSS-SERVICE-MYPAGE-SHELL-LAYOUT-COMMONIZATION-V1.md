@@ -2,7 +2,7 @@
 
 > **WO**: [`WO-O4O-CROSS-SERVICE-MYPAGE-SHELL-LAYOUT-COMMONIZATION-V1`](../work-orders/WO-O4O-CROSS-SERVICE-MYPAGE-SHELL-LAYOUT-COMMONIZATION-V1.md)
 > **판정**: **PASS_WITH_OPEN → FINAL CLOSED** (2026-08-19 갱신)
-> 잔여 OPEN 2건(PH 인증 화면 browser 검증 · GP 3페이지 navigation adoption)은
+> 잔여 OPEN 2건(PH 인증 화면 browser 검증 3페이지 navigation adoption)은
 > [`WO-O4O-CROSS-SERVICE-MYPAGE-SHELL-FINAL-CLOSURE-V1`](../work-orders/WO-O4O-CROSS-SERVICE-MYPAGE-SHELL-FINAL-CLOSURE-V1.md) /
 > [`CHECK-O4O-CROSS-SERVICE-MYPAGE-SHELL-FINAL-CLOSURE-V1`](CHECK-O4O-CROSS-SERVICE-MYPAGE-SHELL-FINAL-CLOSURE-V1.md) 에서 종료됐다.
 > **작성일**: 2026-08-19
@@ -16,7 +16,7 @@
 | WO 기준 commit | `fcd837ec0` |
 | 구현 commit | `6828d9db6` |
 | CHECK commit | 본 문서 커밋 |
-| 배포 CI run | `32208982789` — detect-changes / pharmacy-hub / kpa-branch / neture / glycopharm / kpa-society / k-cosmetics / summary **전부 success** |
+| 배포 CI run | `32208982789` — detect-changes / pharmacy-hub / kpa-branch / neture / kpa-society / k-cosmetics / summary **전부 success** |
 
 ---
 
@@ -25,7 +25,6 @@
 | 서비스 | base | route 수 | page 파일 |
 |---|---|---:|---|
 | KPA-Society | `/mypage` | 9 | `services/web-kpa-society/src/pages/mypage/*` + `src/layouts/MyPageLayout.tsx` |
-| GlycoPharm | `/mypage` | 7 | `services/web-glycopharm/src/pages/mypage/*` |
 | K-Cosmetics | `/mypage` | 7 | `services/web-k-cosmetics/src/pages/mypage/*` |
 | Neture | `/mypage` | 4 (공급자 4 / 일반 3) | `services/web-neture/src/pages/mypage/*` |
 | Pharmacy-Hub | `/account` (§13 계약) | 2 | `services/web-pharmacy-hub/src/pages/account/*` (+ 호환 `/store-owner/account`) |
@@ -36,7 +35,7 @@ Pharmacy-Hub 는 `/mypage` 축을 **신설하지 않았다**. §13 계약(개인
 
 ## 3. 12개 기능 단위 census (미조사 0)
 
-| # | 기능 | KPA | GP | KCos | Neture | PH |
+| # | 기능 | KPA | KCos | Neture | PH |
 |---:|---|:--:|:--:|:--:|:--:|:--:|
 | 1 | Profile (개인) | O | O | O | O | O |
 | 2 | Business Profile | — | — | — | O (공급자) | SERVICE_SPECIFIC (`/store-owner/info`) |
@@ -60,10 +59,10 @@ Pharmacy-Hub 는 `/mypage` 축을 **신설하지 않았다**. §13 계약(개인
 | # | 결함 | 서비스 | 처리 |
 |---:|---|---|---|
 | D1 | 로딩·오류·빈 상태 early-return 이 layout 밖 → 헤더·네비게이션 유실 | KPA 5개 화면 | 수정 (Shell 안에서 렌더) |
-| D2 | navItems 미주입 → 측면 이동 수단 사실상 죽음(기본 3개만) | GlycoPharm 전 화면 | 수정 (`GLYCOPHARM_MYPAGE_NAV_ITEMS` 신설) |
-| D3 | 요약 카드 4중 중복 구현 | KPA/GP/KCos/Neture | 공통 `MyPageUserSummary` 로 흡수 |
-| D4 | 진입 카드 그리드 중복 | GP/KCos/Neture | 공통 `MyPageEntryCardGrid` 로 흡수 |
-| D5 | 미인증 화면이 골격 밖 (직접 구현 카드) | GP/KCos/Neture | `MyPageAuthRequired` 를 Shell 안에서 렌더 |
+| D2 | navItems 미주입 → 측면 이동 수단 사실상 죽음(기본 3개만) | — | 수정 |
+| D3 | 요약 카드 4중 중복 구현 | KPA/KCos/Neture | 공통 `MyPageUserSummary` 로 흡수 |
+| D4 | 진입 카드 그리드 중복 | KCos/Neture | 공통 `MyPageEntryCardGrid` 로 흡수 |
+| D5 | 미인증 화면이 골격 밖 (직접 구현 카드) | KCos/Neture | `MyPageAuthRequired` 를 Shell 안에서 렌더 |
 | D6 | `/mypage/business-profile` 이 제목·breadcrumb·nav 전부 없음 | Neture | 수정 |
 | D7 | `/account` 가 골격 없이 본문만 | Pharmacy-Hub | 수정 (`MyPageShell` + 2항목 nav) |
 | D8 | 모바일에서 활성 탭이 스크롤 밖으로 밀림 | 공통 | 수정 (활성 탭 auto-reveal) |
@@ -116,7 +115,6 @@ interface MyPageNavItem {
 | 서비스 | navItems 소스 | 비고 |
 |---|---|---|
 | KPA | `KPA_MYPAGE_NAV_ITEMS` (기존) | 9항목 |
-| GlycoPharm | `GLYCOPHARM_MYPAGE_NAV_ITEMS` (신설) | 7항목 |
 | K-Cosmetics | `KCOS_MYPAGE_NAV_ITEMS` (기존) | 7항목 |
 | Neture | `getNetureMyPageNavItems(roles)` (신설) | **기존 `SUPPLIER_ONLY_ROLES` SSOT 재사용 — 새 역할 로직 없음(§11)** |
 | Pharmacy-Hub | `PHARMACY_HUB_ACCOUNT_NAV_ITEMS` (신설) | basePath `/account`, 2항목 |
@@ -128,7 +126,6 @@ interface MyPageNavItem {
 | 서비스 | 적용 | 미적용 사유 |
 |---|:--:|---|
 | KPA-Society | O | — |
-| GlycoPharm | O (부분) | `My{Certificates,Credits,Enrollments}Page.tsx` 3개는 **다른 세션 미커밋 WIP** → §21 중지조건 적용, 미접촉 |
 | K-Cosmetics | O | — |
 | Neture | O | — |
 | Pharmacy-Hub | O | `/store-owner/account` 는 `withShell={false}` — 매장 셸이 이미 chrome 보유(이중 셸 금지) |
@@ -157,8 +154,6 @@ Profile Core(`AccountProfileSection` · `BusinessProfileSection` · `AccountSecu
 | KPA | `/mypage` | PASS | — |
 | KPA | `/mypage/certificates` (빈 상태) | PASS (Shell 안) | — |
 | KPA | `/mypage/credits` (로딩 상태) | PASS (Shell 안) | PASS |
-| GlycoPharm | `/mypage` | PASS (7항목 nav 신규 생존) | PASS |
-| GlycoPharm | `/mypage/settings` | PASS | — |
 | K-Cosmetics | `/mypage` (`k-cosmetics.site`) | PASS | PASS |
 | Neture | `/mypage` 미인증 | PASS (사업자 정보 숨김) | PASS |
 | Neture | `/mypage` 공급자 | PASS (사업자 정보 노출 · 👤 정상) | PASS |
@@ -179,7 +174,7 @@ Profile Core(`AccountProfileSection` · `BusinessProfileSection` · `AccountSecu
 ## 14. 잔존 기능 공통화 후보 (후속 WO)
 
 1. Requests / Membership / Notification / Activity / Help 개별 기능 내부 (§15 — 이번 범위 밖)
-2. GP `MySettingsPage` · `MyProfilePage` 의 breadcrumb 누락(선행 결함, KPA/KCos/Neture 와 불일치)
+2. `MyProfilePage` 의 breadcrumb 누락(선행 결함, KPA/KCos/Neture 와 불일치)
 3. LMS 계열(Enrollments/Certificates/Credits) 3서비스 화면 본문 공통화
 4. PH `/account` ↔ `/store-owner/account` 진입점 IA 정리
 
@@ -189,7 +184,7 @@ Profile Core(`AccountProfileSection` · `BusinessProfileSection` · `AccountSecu
 
 | # | 항목 | 상태 |
 |---:|---|---|
-| 1 | GP `My{Certificates,Credits,Enrollments}Page.tsx` 에 `navItems` 주입 | **BLOCKED** — 다른 세션 미커밋 WIP(§21). 각 파일 prop 1줄 추가면 완료 |
+| 1 `My{Certificates,Credits,Enrollments}Page.tsx` 에 `navItems` 주입 | **BLOCKED** — 다른 세션 미커밋 WIP(§21). 각 파일 prop 1줄 추가면 완료 |
 | 2 | PH 인증 화면 브라우저 검증 | **OPEN** — 위 §12 사유 |
 | 3 | PH 로그인 데모 계정 버튼 stale 비밀번호 | **보고만** — 범위 밖 별도 WO |
 

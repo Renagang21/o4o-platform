@@ -3,7 +3,6 @@
 - **작성일**: 2026-08-24
 - **기준 커밋**: `21ed6d88d` (origin/main) 시점 재조사 — 과거 `58업무 × 5서비스 = 290셀` census 수치는 폐기하고 전부 재산출
 - **대상(adoption)**: KPA-Society · K-Cosmetics · Neture · PharmacyHub
-- **GlycoPharm**: adoption 대상 아님 — 공통 모듈 회귀 검증 대상으로만 취급
 
 ---
 
@@ -17,7 +16,6 @@
 | K-Cosmetics | 32 | 5 | **0** | 0 (`users` redirect · `operator` 부모경로 artifact · `signage/content`=StoreCockpit 진입) |
 | Neture | 25 | 26 | **0** | 0 (본 WO 에서 3건 해소 — 아래 FIX-7) |
 | PharmacyHub | 12 | 0 | **0** | 0 |
-| GlycoPharm(회귀 전용) | 34 | 2 | **0** | 12 — OUT_OF_SCOPE |
 
 ### 1-2. Capability 판정
 
@@ -44,7 +42,7 @@
 | VIEW_DUPLICATED (정당하지 않은 중복) | **0** |
 | SERVICE_SPECIFIC | 23 |
 | NOT_IMPLEMENTED | 163 |
-| OUT_OF_SCOPE | GlycoPharm 전체 (adoption 축 제외 · 회귀 검증만) |
+| OUT_OF_SCOPE | 회귀 검증만) |
 
 > `CORE_ONLY = 0` 은 "Core 존재"가 아니라 **route + menu + 실제 View 소비**까지 따라가 확인한 결과다.
 > 교차 서비스 중복 후보 3계열(RoleManagementPage 4서비스 / UserDetailPage 4서비스 / AiReportPage 3서비스)은

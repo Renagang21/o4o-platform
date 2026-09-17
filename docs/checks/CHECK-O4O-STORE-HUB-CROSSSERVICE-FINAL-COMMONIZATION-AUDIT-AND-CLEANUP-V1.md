@@ -2,9 +2,9 @@
 >
 > 본 문서의 **"매장허브 공통화 트랙 종료" 판정을 철회한다.** 아래 문장은 조사 시점의 모집단 기준이며 전체 모집단 기준으로는 사실과 다르다.
 >
-> 1. **모집단 과소 설정** — 본 문서 매트릭스는 KPA / K-Cosmetics / PharmacyHub 3 서비스만 열로 두었다. **GlycoPharm 은 구조상 K-Cosmetics 와 동일한 `/store-hub` 9 route 를 가진 참여 서비스**이며, blog/pop/qr 3 페이지(975L)가 공통 Core 를 소비하지 않는 사본으로 남아 있다.
+> 1. **모집단 과소 설정** — 본 문서 매트릭스는 KPA / K-Cosmetics / PharmacyHub 3 서비스만 열로 두었다.
 > 2. **소비처 수치 오류** — 본문의 `useHubImportLibrary` · `buildEventOfferCartPayload` "소비처 18건" 은 `grep -rn` 라인 히트 수다. 실제 **페이지 소비처는 각각 6 · 3** 이다.
-> 3. **이벤트 오퍼 COMMONIZED 판정 정정** — KPA `KpaEventOfferPage`(969L)는 공통 `EventOffersHubList` 를 쓰지 않고 `resolveEventOfferStatusLabel` 하나만 소비한다. 공통화된 것은 K-Cosmetics · GlycoPharm 2 서비스뿐이다.
+> 3. **이벤트 오퍼 COMMONIZED 판정 정정** — KPA `KpaEventOfferPage`(969L)는 공통 `EventOffersHubList` 를 쓰지 않고 `resolveEventOfferStatusLabel` 하나만 소비한다. 공통화된 것은 K-Cosmetics 1 서비스뿐이다.
 > 4. **미착수 축 누락** — 사이니지 라이브러리(3 사본 1,811L · Core 0) · 주문 내역(4 사본) · 매장허브 API client(9종 × 3 서비스) · 허브 레이아웃(3 사본) 은 본 문서 매트릭스에 행 자체가 없었다.
 >
 > 실제 공통화 수준은 **32 기능 중 FULLY_COMMON 7 (22%)** 이다. 본 문서에 기록된 개별 작업(장바구니 endpoint 수렴 · PharmacyHub 진입점 연결)의 결과 자체는 유효하며, 판정 범위만 정정한다.
@@ -30,7 +30,7 @@
 | 매장허브 장바구니 | `/store-hub/cart` (전용 View) | `/store-hub/cart` (`StoreCartView`) | `/store-owner/cart` (별도 계약) | `storeCartTypes` · `createStoreCartApi` · `useStoreCart` · `StoreCartView` | COMMONIZED / PH 는 SERVICE-SPECIFIC-BY-DESIGN |
 | 매장 실행 자산 관리(`/store/*`) | Agent C | Agent C | Agent C | — | OUT-OF-SCOPE |
 
-- **GlycoPharm**: 공식 적용 대상 아님. 공통 package 소비(`storeCart` · `StoreCartView` · `SupplyCatalogHub`)만 유지하며 회귀 확인 대상.
+- 공통 package 소비(`storeCart` · `StoreCartView` · `SupplyCatalogHub`)만 유지하며 회귀 확인 대상.
 - **Neture**: 공급자→매장 계약 확인 대상. 화면은 매장허브가 아니다(§8).
 
 ### write 의미 (변경 없음)
@@ -61,7 +61,7 @@
 
 - 공통 Core: `useSupplyProductList`(목록·필터·페이지 상태) · `SupplyProductExplorer`(기본 View) · `SupplyCatalogHub`(신청 액션 포함 Hub).
 - KPA `HubB2BCatalogPage` 는 fuller UI(카테고리 트리 · 선택 일괄 신청 · 커스텀 제외 다이얼로그)를 유지하되, **신청·제외 상태 기계는 공통 `useSupplyProductApplication` 에 위임**한다. 남은 상태 중복 없음.
-- 공통 API 를 KPA 요구에 맞춰 넓히면 K-Cosmetics·GlycoPharm 이 쓰지 않는 옵션이 늘어나므로, View 는 **2 tier 유지**가 최소 복잡성이다 → `SERVICE-SPECIFIC-BY-DESIGN`.
+- 공통 API 를 KPA 요구에 맞춰 넓히면 K-Cosmetics 이 쓰지 않는 옵션이 늘어나므로, View 는 **2 tier 유지**가 최소 복잡성이다 → `SERVICE-SPECIFIC-BY-DESIGN`.
 
 ---
 
@@ -94,9 +94,9 @@
 ## 7. 장바구니
 
 - canonical(`/store/cart/{serviceKey}/*`) 과 PharmacyHub 계약(`createOrders()` → `paymentGroupId` → `/store-owner/payment`) 을 **섞지 않았다.** PharmacyHub 는 `lib/api/pharmacyHubOrders` 를 그대로 유지.
-- **이번에 정리한 실제 잔여 중복 (1건)**: KPA · K-Cosmetics · GlycoPharm 3 서비스의 `src/api/storeCart.ts` 가 동일한 7개 endpoint 목록(경로·메서드·body·응답 형상)을 각각 복제하고 있었다. 차이는 **전송 계층뿐**이었다.
+- **이번에 정리한 실제 잔여 중복 (1건)**: KPA · K-Cosmetics 2 서비스의 `src/api/storeCart.ts` 가 동일한 7개 endpoint 목록(경로·메서드·body·응답 형상)을 각각 복제하고 있었다. 차이는 **전송 계층뿐**이었다.
   - 신규 `packages/store-ui-core/src/components/store-cart/createStoreCartApi.ts` — endpoint 계약 단일 출처 + 주입용 `StoreCartHttp` 인터페이스.
-  - 서비스 파일은 전송 어댑터만 소유: KPA 는 `coreApiClient`(body 직접 반환) 주입, KCos·GP 는 axios `.data` 언랩 주입.
+  - 서비스 파일은 전송 어댑터만 소유: KPA 는 `coreApiClient`(body 직접 반환) 주입, KCos 는 axios `.data` 언랩 주입.
   - **API 계약 무변경** — 경로·메서드·payload·응답 형상 모두 기존 구현과 동일. typecheck·build 로 회귀 확인.
 - 소비자 storefront / 키오스크 장바구니는 대상 아님(미접촉).
 - 중복 타입 · 중복 state machine · 중복 empty/error/loading · dead local cart helper · 사용하지 않는 re-export: **추가 발견 0건** (직전 WO 에서 이미 제거됨).
@@ -152,15 +152,13 @@
 | typecheck `@o4o/store-ui-core` | PASS |
 | typecheck `web-kpa-society` | PASS |
 | typecheck `web-k-cosmetics` | PASS (1차 실패 → 수정 후 PASS, 아래 참조) |
-| typecheck `web-glycopharm` | PASS (1차 실패 → 수정 후 PASS) |
 | typecheck `web-pharmacy-hub` | PASS |
 | typecheck `web-neture` | PASS |
 | build `web-kpa-society` | PASS (28.64s) |
 | build `web-k-cosmetics` | PASS (19.40s) |
-| build `web-glycopharm` | PASS (20.17s) — 공식 적용 대상 아님, 회귀 확인 목적 |
 | build `web-pharmacy-hub` | PASS (16.00s) |
 
-- **1차 실패 내용(숨기지 않고 기록)**: KCos·GP 의 `StoreCartHttp` 어댑터를 화살표 함수로 작성하자 대상 시그니처의 제네릭 `T` 가 추론되지 않아 `TS2322: Type 'Promise<unknown>' is not assignable to type 'Promise<T>'` 4건씩 발생. 각 메서드에 제네릭을 명시(`get: <T,>(url: string) => axiosApi.get<T>(url)…`)하여 해소.
+- **1차 실패 내용(숨기지 않고 기록)**: KCos 의 `StoreCartHttp` 어댑터를 화살표 함수로 작성하자 대상 시그니처의 제네릭 `T` 가 추론되지 않아 `TS2322: Type 'Promise<unknown>' is not assignable to type 'Promise<T>'` 4건씩 발생. 각 메서드에 제네릭을 명시(`get: <T,>(url: string) => axiosApi.get<T>(url)…`)하여 해소.
 - **browser smoke: 수행 (read-only).** 로컬 `vite preview` 로 이번 branch 산출물을 띄우고 프로덕션 API(`api.neture.co.kr`)에 붙여 확인했다.
 
 | 서비스 | 경로 | 결과 |
@@ -191,7 +189,6 @@
 | `packages/store-ui-core/src/index.ts` | `createStoreCartApi` · `StoreCartHttp` · `StoreCartApiClient` export |
 | `services/web-kpa-society/src/api/storeCart.ts` | endpoint 복제 제거 → `coreApiClient` 주입만 |
 | `services/web-k-cosmetics/src/api/storeCart.ts` | endpoint 복제 제거 → axios `.data` 언랩 어댑터만 |
-| `services/web-glycopharm/src/api/storeCart.ts` | 동일 |
 | `services/web-pharmacy-hub/src/layouts/StoreOwnerShell.tsx` | `/store-hub` 진입점 `navItems` 1건 |
 | `services/web-pharmacy-hub/src/pages/store-owner/HomePage.tsx` | `/store-hub` 바로가기 1건(모바일 커버) |
 
@@ -209,11 +206,10 @@
 | 공급자 콘텐츠 탐색·가져오기 — 데이터 Core | **COMMONIZED** |
 | 이벤트 오퍼 (라벨·payload·UUID·상태 판정) | **COMMONIZED** |
 | 상품 신청·승인 진입 | **COMMONIZED** (backend 의미 무변경) |
-| 매장허브 장바구니 (KPA·KCos·GP) | **COMMONIZED** (타입·endpoint·state machine·View) |
+| 매장허브 장바구니 (KPA·KCos) | **COMMONIZED** (타입·endpoint·state machine·View) |
 | PharmacyHub 장바구니·주문 | **SERVICE-SPECIFIC-BY-DESIGN** (paymentGroupId 결제 계약) |
 | PharmacyHub 공급자 콘텐츠 · 이벤트 오퍼 · ProductApproval | **NOT_IMPLEMENTED** (원천/정책 부재 — 가짜 화면 없음) |
 | Neture 매장 장바구니·승인 화면 | **SERVICE-SPECIFIC-BY-DESIGN** (계약만 확인) |
-| GlycoPharm | **OUT-OF-SCOPE** (공통 package 소비·build 회귀만 확인, PASS) |
 | Agent C `/store/*` 관리 영역 | **OUT-OF-SCOPE** |
 | hub-import 6 페이지 공통 View | **REMAINING-DEBT** |
 

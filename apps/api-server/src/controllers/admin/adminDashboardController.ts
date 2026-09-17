@@ -59,7 +59,6 @@ export class AdminDashboardController {
         .andWhere('order.createdAt >= :startDate', { startDate })
         .getRawOne();
 
-      // WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1: glycopharm 집계 제거 (서비스 삭제).
       const totalRevenue = Number(netureResult?.totalAmount || 0);
       const totalOrders = Number(netureResult?.orderCount || 0);
       const averageOrderValue = totalOrders > 0 ? Math.round(totalRevenue / totalOrders) : 0;

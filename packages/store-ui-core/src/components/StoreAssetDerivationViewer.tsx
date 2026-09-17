@@ -5,7 +5,7 @@
  *
  * KPA StoreProductionMaterialsPage 의 원본 보기 모달을 canonical 기준으로 공통 컴포넌트 승격.
  * 결과물(derivedKind + derivedId) 1건의 원본(source) 역추적 결과를 읽기 전용으로 표시한다.
- * KPA / GlycoPharm / K-Cosmetics 3 서비스가 동일 코드를 사용한다.
+ * KPA / K-Cosmetics 2 서비스가 동일 코드를 사용한다.
  *
  * 제로-의존 원칙:
  *   - @o4o/* 직접 import 금지 — peerDeps(react, lucide-react)만 사용

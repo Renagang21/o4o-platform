@@ -166,7 +166,6 @@ user_id=A, role='kpa:store_owner', is_active=true  ← 유효 (별도 row)
 ```sql
 CASE WHEN ra.user_id IS NOT NULL THEN true ELSE false END AS is_store_owner
 ...
-AND role IN ('kpa:store_owner','glycopharm:store_owner','cosmetics:store_owner')
 ```
 
 `isStoreOwner`는 role_assignments 기준으로 판정한다. kpa_pharmacist_profiles.activity_type과 동기화가 깨지면 판정이 달라질 수 있다.

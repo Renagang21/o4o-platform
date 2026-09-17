@@ -23,7 +23,6 @@
 | 서비스 | catch-all 위치 | 방식 | 분류 |
 |------|------|------|------|
 | `web-kpa-society` | `App.tsx:1133` → 같은 파일 `NotFoundPage()` (inline) | **render** | `PASS_ALREADY_HAS_CATCH_ALL` |
-| `web-glycopharm` | `App.tsx:1101` → `pages/NotFoundPage.tsx` | **render** | `PASS_ALREADY_HAS_CATCH_ALL` |
 | `web-k-cosmetics` | `App.tsx:879` → `pages/NotFoundPage.tsx` | **render** | `PASS_ALREADY_HAS_CATCH_ALL` |
 | `web-pharmacy-hub` | `App.tsx:221` → `<Navigate to="/" replace />` | **redirect** ❌ | `FIX_ADD_CATCH_ALL` |
 | `web-neture` | `App.tsx:1251` → `pages/NotFoundPage.tsx` | **render** | 선행 WO 처리 완료 · 회귀 확인만 |
@@ -46,7 +45,6 @@
 | 서비스 | `/about` route 존재 | 링크 | 판정 |
 |------|:---:|------|------|
 | `web-kpa-society` | **있음** (`App.tsx:919` → `pages/about/AboutPage`) | `Footer.tsx:24` · `ContactPage.tsx:96` · `MobilePharmacyPage.tsx:96` | ✅ 정상 링크 (dead link 아님) |
-| `web-glycopharm` | 없음 | 0건 | ✅ 해당 없음 |
 | `web-k-cosmetics` | 없음 | `components/home/NoticeSection.tsx:54` 1건 | ⚠️ **아래 §5 참조** |
 | `web-pharmacy-hub` | 없음 | 0건 | ✅ 해당 없음 |
 | `web-neture` | 없음 | 0건 (선행 WO 에서 제거) | ✅ 정상 |
@@ -74,7 +72,7 @@
 - 요청한 경로 표시 (`location.pathname`)
 - **홈으로 이동** (`<Link to="/">`) · **이전 화면으로 돌아가기** (`navigate(-1)`)
 
-> Pharmacy-Hub 에는 `/forum` · `/contact` route 가 없어 KPA/GlycoPharm/K-Cos 의 3버튼(홈·커뮤니티·문의) 대신
+> Pharmacy-Hub 에는 `/forum`
 > Neture 와 같은 2버튼 구성을 썼다. 존재하지 않는 route 로 가는 버튼을 만드는 것은 dead link 를 새로 만드는 것이다.
 
 ---
@@ -84,7 +82,6 @@
 | 서비스 | 이유 |
 |------|------|
 | `web-kpa-society` | catch-all render 보유 · `/about` route 실재 → 링크 3건 전부 유효. **수정할 결함 없음** |
-| `web-glycopharm` | catch-all render 보유 · `/about` 참조 0건 |
 | `web-k-cosmetics` | catch-all render 보유 · `/about` 참조 1건이나 **orphan** (아래) |
 | `web-neture` | 선행 WO 에서 처리 완료 — 본 WO 는 회귀 확인만 |
 
@@ -113,9 +110,6 @@
 | KPA | `/forum` | KPA-Society 포럼 | ✅ |
 | KPA | `/contact` | 협업과 연결 | ✅ |
 | KPA | `/about` | 약사와 약국을 위한 하나의 전문 공간 (**실제 소개 페이지**) | ✅ |
-| GlycoPharm | `/` | GlycoPharm 관리 현황 | ✅ |
-| GlycoPharm | `/forum` | GlycoPharm 포럼 | ✅ |
-| GlycoPharm | `/contact` | 문의하기 | ✅ |
 | K-Cosmetics | `/` | K-Beauty Community Hub | ✅ |
 | K-Cosmetics | `/forum` | K-Cosmetics 포럼 | ✅ |
 | K-Cosmetics | `/contact` | 문의 | ✅ |
@@ -143,8 +137,6 @@ guard 코드는 이번 작업에서 전혀 건드리지 않았다.
 |------|------|------|:---:|:---:|
 | KPA | `/not-existing-test` | 동일 유지 | ✅ (`404` · 페이지를 찾을 수 없습니다) | 0 |
 | KPA | `/store-hub/not-existing-test` | 동일 유지 | ✅ | 0 |
-| GlycoPharm | `/about` | 동일 유지 | ✅ | 0 |
-| GlycoPharm | `/not-existing-test` | 동일 유지 | ✅ | 0 |
 | K-Cosmetics | `/about` | 동일 유지 | ✅ | 0 |
 | K-Cosmetics | `/not-existing-test` | 동일 유지 | ✅ | 0 |
 | Pharmacy-Hub | `/about` | 동일 유지 | ✅ (**신규**) | 0 |
@@ -164,7 +156,7 @@ Pharmacy-Hub 는 주소창 직접 진입(`https://pharmacyhub.co.kr/not-existing
 | 서비스 | 관측 | 판정 |
 |------|------|------|
 | Pharmacy-Hub | 에러 **0건** (autocomplete 힌트 VERBOSE 2건뿐) | ✅ |
-| KPA · GlycoPharm · K-Cosmetics · Neture | `401 /api/v1/auth/me` · `401 /api/v1/auth/refresh` · `Authentication failed. Tokens cleared.` | ⚠️ 비인증 세션 기인 · 본 변경과 무관 |
+| KPA · K-Cosmetics · Neture | `401 /api/v1/auth/me` · `401 /api/v1/auth/refresh` · `Authentication failed. Tokens cleared.` | ⚠️ 비인증 세션 기인 · 본 변경과 무관 |
 
 선행 WO 에서 Neture 는 **인증 상태로 재실행하여 console error 0건**임을 이미 확인했다.
 나머지 3개 서비스는 이번 작업에서 **코드를 변경하지 않았으므로** 비인증 401 은 사전 상태 그대로다 — 숨기지 않고 기록한다.
@@ -176,7 +168,6 @@ Pharmacy-Hub 는 주소창 직접 진입(`https://pharmacyhub.co.kr/not-existing
 | 서비스 | typecheck | build | deploy |
 |------|:---:|:---:|:---:|
 | `web-pharmacy-hub` | ✅ `pnpm run type-check` (`tsc -b`) PASS | ✅ `pnpm run build` PASS (15.04s) | ✅ run **31450226915** · `deploy-pharmacy-hub: success` |
-| `web-kpa-society` · `web-glycopharm` · `web-k-cosmetics` · `web-neture` | — | — | detect-changes **skipped** (변경 0) |
 
 **API 배포 없음** (WO §7 준수) — 백엔드 파일 변경 0건.
 
@@ -201,7 +192,7 @@ Pharmacy-Hub 는 주소창 직접 진입(`https://pharmacyhub.co.kr/not-existing
 ## 10. 후속 후보 (본 WO 범위 아님)
 
 1. `WO-O4O-KCOS-ORPHAN-HOME-COMPONENT-CLEANUP-V1` — `web-k-cosmetics` `components/home/NoticeSection.tsx` 소비처 0건 정리 (내부 `/about` dead link 동반 제거)
-2. `WO-O4O-NOTFOUND-PAGE-CONVENTION-ALIGN-V1` — 서비스별 404 문구·복귀 네비가 3종으로 갈라져 있다(KPA inline / GlycoPharm·K-Cos 3버튼 / Neture·PH 2버튼). 공통 패키지 승격 여부 판단
+2. `WO-O4O-NOTFOUND-PAGE-CONVENTION-ALIGN-V1` — 서비스별 404 문구·복귀 네비가 3종으로 갈라져 있다(KPA inline / K-Cos 3버튼 / Neture·PH 2버튼). 공통 패키지 승격 여부 판단
 3. `WO-O4O-WEB-DEAD-LINK-SWEEP-CROSS-SERVICE-V1` — `/about` 외 전 서비스 내부 링크 ↔ route 선언 대조 전수 (이번엔 `/about` 한 축만 봤다)
 
 ---

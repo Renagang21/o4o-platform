@@ -162,15 +162,13 @@ export function AdminRoute({ ... }) {
 
 ### GAP-1: PostLoginRedirect 컴포넌트 부재 (중)
 
-**현황**: GlycoPharm/K-Cosmetics는 App.tsx에 `PostLoginRedirect` 컴포넌트가 존재하여 로그인 직후 단 1회 역할 기반 redirect를 수행한다. Neture는 이 컴포넌트 없이 LoginModal의 `navigate()` 직접 호출로만 처리한다.
+**현황**: K-Cosmetics는 App.tsx에 `PostLoginRedirect` 컴포넌트가 존재하여 로그인 직후 단 1회 역할 기반 redirect를 수행한다. Neture는 이 컴포넌트 없이 LoginModal의 `navigate` 직접 호출로만 처리한다.
 
 **잠재적 문제**:
 - LoginModal에서 `navigate()` → `onClose()` 순서로 호출하지만, App level의 `wasAuthRef` + `didRedirectRef` 이중 가드가 없어 race condition 가능성 존재 (rare)
 - 다른 서비스와 구조적 불일치 — canonical 감사 범위에서 회귀 가능성
 
 **코드 위치**: `services/web-neture/src/App.tsx` (부재)
-
-**참조 구현**: `services/web-glycopharm/src/App.tsx` PostLoginRedirect 컴포넌트
 
 ---
 
@@ -197,7 +195,6 @@ export function AdminRoute({ ... }) {
 ### 🔴 우선순위 중: PostLoginRedirect 추가
 
 - 파일: `services/web-neture/src/App.tsx`
-- 참조: `services/web-glycopharm/src/App.tsx` PostLoginRedirect 구현
 - 특이사항: Neture는 LoginModal 기반 로그인 전용 → `isSessionChecked` 신호 및 workspace early-exit 경로 목록은 Neture 역할 구조에 맞게 조정
   - workspace prefix: `/supplier`, `/operator`, `/admin`, `/partner`, `/seller`
 
@@ -208,7 +205,7 @@ export function AdminRoute({ ... }) {
 ### WO-NETURE-POSTLOGINREDIRECT-CANONICAL-ALIGNMENT-V1 (필요)
 
 - **우선순위**: 중
-- **목적**: App.tsx에 PostLoginRedirect 추가로 GlycoPharm/K-Cosmetics canonical 패턴과 완전 일치
+- **목적**: App.tsx에 PostLoginRedirect 추가로 K-Cosmetics canonical 패턴과 완전 일치
 - **범위**: App.tsx 단일 파일 수정, LoginModal redirect 중복 제거 여부 검토
 - **주의**: LoginModal의 returnUrl 처리는 유지. PostLoginRedirect는 returnUrl 없는 일반 경우만 담당
 
@@ -231,5 +228,3 @@ Neture 서비스의 multi-role dashboard entry 구조는 **95% canonical 패턴�
 - GlobalHeader/AccountMenu — 완벽 구현
 
 **단 1개 구조적 GAP**: PostLoginRedirect 컴포넌트 부재 → `WO-NETURE-POSTLOGINREDIRECT-CANONICAL-ALIGNMENT-V1`로 추후 처리.
-
-KPA/GlycoPharm/K-Cosmetics 대비 수정 규모는 최소 (App.tsx 1개 파일, 40-50 lines 추가 예상).

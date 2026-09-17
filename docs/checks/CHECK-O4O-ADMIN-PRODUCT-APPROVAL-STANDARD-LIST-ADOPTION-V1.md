@@ -194,4 +194,4 @@
 
 `/admin/product-approvals` 가 표준 리스트(server-driven pagination/search/sort + URL sync + DataTable + Pagination + StandardListToolbar)로 전환됐고 KPI 는 `getSummary()` 전체 기준으로 정합화됐다. 승인/반려/상세 모달은 무회귀. backend/package/lock/schema 무변경, 다른 세션 staged 파일 미접촉.
 
-표준 리스트 Phase 1 주요 유형(operator stores / members / recruitment-exposure / GP·KCos applications / **admin product approvals**)이 모두 사례화됐다. **최종 종료 조건은 browser smoke 재시도**(환경 해제 후).
+표준 리스트 Phase 1 주요 유형(operator stores / members / recruitment-exposure / KCos applications / **admin product approvals**)이 모두 사례화됐다. **최종 종료 조건은 browser smoke 재시도**(환경 해제 후).

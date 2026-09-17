@@ -14,9 +14,9 @@
 > ⚠️ **현재 푸터는 법적 표시 기준 미달 + 일부 placeholder/불일치 위험 존재. 구현 전 사업자 정보 확정 필요.**
 >
 > 1. **공통 Footer 컴포넌트 없음** — 4개 서비스 각각 service-local Footer. 사업자 정보 전부 **하드코딩**(env/CMS 미사용).
-> 2. **GlycoPharm / K-Cosmetics 푸터에 placeholder 법정 정보** — `홍길동`(대표자), `000-00-00000`(사업자등록번호), GP는 `2025-서울서초-0000`(통신판매업 신고번호 placeholder)까지 노출. **허위/미확인 법정표시 위험** (전자상거래법 §10).
-> 3. **운영 주체 불일치** — KPA/Neture 푸터는 실값 `㈜쓰리라이프존 / 108-86-02873`. GP/KCos 푸터는 `(주)글라이코팜` / `(주)케이코스메틱스` (등기 법인 여부 미확인). **실제 운영 주체가 서비스별로 다른지 단일(쓰리라이프존)인지 확인 필요.**
-> 4. **이용약관/개인정보처리방침 route 부재** — Neture만 `/terms`·`/privacy`(CMS 기반) 보유. **GP/KCos는 둘 다 없음.** KPA는 PolicyPage/PrivacyPage 컴포넌트가 있으나 **route 미연결(orphaned)** → 푸터 개인정보처리방침 링크 데드링크 가능성.
+> 2. **허위/미확인 법정표시 위험** (전자상거래법 §10).
+> 3. **운영 주체 불일치** — KPA/Neture 푸터는 실값 `㈜쓰리라이프존 / 108-86-02873`. **실제 운영 주체가 서비스별로 다른지 단일(쓰리라이프존)인지 확인 필요.**
+> 4. **이용약관/개인정보처리방침 route 부재** — Neture만 `/terms`·`/privacy`(CMS 기반) 보유. **KCos는 둘 다 없음.** KPA는 PolicyPage/PrivacyPage 컴포넌트가 있으나 **route 미연결(orphaned)** → 푸터 개인정보처리방침 링크 데드링크 가능성.
 > 5. **전자상거래법 §10 필수 7항목 기준 대부분 미충족** — 상호·대표자·주소·전화·이메일·사업자등록번호·이용약관 + 호스팅 제공자 상호 + 공정위 사업자정보 공개페이지 연결.
 > 6. **통신판매중개 성격 검토 필요** — Neture B2B canonical checkout(supplier=판매자, checkout_orders→neture_orders bridge)은 **통신판매중개**(전자상거래법 §20) 성격일 수 있음. 서비스별 "판매 당사자 vs 중개자" 판단 + 중개자 고지(§20①) 필요성 법무 확인 필요.
 
@@ -93,15 +93,14 @@
 
 | 서비스 | 푸터 파일 | 표시 사업자 정보 | placeholder/실값 |
 |--------|----------|-----------------|:---------------:|
-| GlycoPharm | `services/web-glycopharm/src/components/common/Footer.tsx` | 상호 `GlycoPharm`/법인 `(주)글라이코팜`, 대표 `홍길동`, 사업자번호 `000-00-00000`, 통신판매 `2025-서울서초-0000`, 주소 `서울특별시 서초구 강남대로 000, 0층`, 전화 `02-0000-0000`, 이메일 `support@glycopharm.co.kr`, ©2025 | ⚠️ **대부분 placeholder** |
 | K-Cosmetics | `services/web-k-cosmetics/src/components/common/Footer.tsx` | 상호 `K-Cosmetics`/법인 `(주)케이코스메틱스`, 대표 `홍길동`, 사업자번호 `000-00-00000`, 주소 `서울특별시 서초구 강남대로 000, 0층`, 전화 `02-0000-0000`, 이메일 `support@k-cosmetics.site`, ©2025 (통신판매번호 없음) | ⚠️ **대부분 placeholder** |
 | KPA Society | `services/web-kpa-society/src/components/Footer.tsx` (+ `home/FooterLinksSection.tsx` CMS quick links) | 운영사 `㈜쓰리라이프존`, 사업자번호 `108-86-02873`, 주소 `서울특별시 OO구 OO로 123 약사회관`, 전화 `02-1234-5678`/팩스 `02-1234-5679`, 이메일 `info@kpa-society.kr`, 개인정보처리방침 링크, ©2024 약사회 | 사업자번호 **실값**, 주소·전화 **placeholder** |
 | Neture | `services/web-neture/src/components/Footer.tsx` | 운영사 `㈜쓰리라이프존`, 사업자번호 `108-86-02873`, CS `1577-2779`, 이메일 `support@neture.co.kr`, ©2026 | 사업자번호 **실값**, 최소 구성 |
 
 ### 4.1 핵심 관찰
 
-- **운영 주체 불일치**: KPA/Neture = `㈜쓰리라이프존 / 108-86-02873`(동일 실값). GP/KCos = `(주)글라이코팜` / `(주)케이코스메틱스`(등기 법인 여부 미확인). → **실제 운영 주체가 4개 서비스 단일(쓰리라이프존)인지, 서비스별 별도 법인인지 확인 필요.**
-- **GP/KCos placeholder 노출이 가장 큰 위험**: `홍길동`/`000-00-00000`/(GP)통신판매 placeholder 가 실제 운영 사이트에 노출되면 전상법 §10 미표시·허위표시 소지.
+- **운영 주체 불일치**: KPA/Neture = `㈜쓰리라이프존 / 108-86-02873`(동일 실값). → **실제 운영 주체가 4개 서비스 단일(쓰리라이프존)인지, 서비스별 별도 법인인지 확인 필요.**
+- **KCos placeholder 노출이 가장 큰 위험**: `홍길동`/`000-00-00000`/통신판매 placeholder 가 실제 운영 사이트에 노출되면 전상법 §10 미표시·허위표시 소지.
 - **하드코딩**: 4개 서비스 모두 env/CMS 아님 → 정보 변경 시 코드 수정 필요. 공통화·중앙관리(공통 Footer + 설정 주입) 후보.
 
 ---
@@ -110,7 +109,6 @@
 
 | 서비스 | `/terms` 이용약관 | `/privacy` 개인정보처리방침 | `/contact` | 콘텐츠 소스 |
 |--------|:---:|:---:|:---:|------|
-| GlycoPharm | ❌ 없음 | ❌ 없음 | ✅ `pages/ContactPage.tsx` | — |
 | K-Cosmetics | ❌ 없음 | ❌ 없음 | ✅ `pages/ContactPage.tsx` | — |
 | KPA Society | ❌ route 없음 | ❌ route 없음 (컴포넌트만) | ✅ `pages/contact/ContactPage.tsx` | PolicyPage/PrivacyPage 하드코딩+localStorage |
 | Neture | ✅ `/terms` (`LegalPage slug=terms-of-service`) | ✅ `/privacy` (`slug=privacy-policy`) | ✅ `pages/ContactPage.tsx` | **CMS** `/cms/public/page/{slug}` |
@@ -119,18 +117,14 @@
 
 - **Neture만 약관/개인정보 route 완비** (CMS 기반 — 운영자 편집 가능). 후속 공통화의 reference.
 - **KPA**: `pages/legal/PolicyPage.tsx`, `pages/legal/PrivacyPage.tsx` 컴포넌트 **존재하나 App.tsx route 미연결(orphaned)**. 푸터에 `개인정보처리방침` 링크가 있으나 대응 route 부재 → **데드링크 가능성(확인 필요)**.
-- **GP/KCos**: 약관/개인정보처리방침 자체가 없음. 전자상거래/주문 흐름이 있다면 §10①6(이용약관) 미충족.
+- **KCos**: 약관/개인정보처리방침 자체가 없음. 전자상거래/주문 흐름이 있다면 §10①6(이용약관) 미충족.
 
 ---
 
 ## 6. 서비스별 적용 필요 항목
 
-### 6.1 GlycoPharm (약국 경영자 대상)
-- 제품/이벤트 오퍼/주문 흐름 존재 가능성 → 전상법 §10 표시 + 약관/개인정보 route 필요.
-- placeholder 법정정보 **즉시 제거/확정 필요**(위험 1순위). 의약품 관련 표현 주의(별도).
-
 ### 6.2 K-Cosmetics (화장품 매장 경영자 대상)
-- GP와 동일 구조. placeholder 제거/확정 필요. 통신판매업 신고번호 표기 자체 없음 → 거래 성격 확정 후 추가.
+- placeholder 제거/확정 필요. 통신판매업 신고번호 표기 자체 없음 → 거래 성격 확정 후 추가.
 
 ### 6.3 KPA Society (약사·약대생 커뮤니티 중심)
 - 공개 푸터는 커뮤니티 정체성. 단, 약국 경영지원(권한 기반)에 주문/이벤트 오퍼 흐름이 있으면 그 범위에서 전상법 적용 검토.
@@ -146,11 +140,11 @@
 
 | # | 항목 | 현재 상태 | 확인 주체 |
 |:-:|------|----------|----------|
-| 1 | 4개 서비스 운영 주체(단일 vs 서비스별 법인) | KPA/Neture=쓰리라이프존, GP/KCos=가상 법인명 | 사용자/법무 |
-| 2 | 각 서비스 사업자등록번호 | KPA/Neture 108-86-02873, GP/KCos placeholder | 사용자 |
-| 3 | 대표자 성명 | GP/KCos `홍길동` placeholder | 사용자 |
-| 4 | 영업소 주소(불만처리) | KPA/GP/KCos placeholder | 사용자 |
-| 5 | 통신판매업 신고번호/신고기관 | GP placeholder, 타 서비스 없음 | 사용자/행정 |
+| 1 | 3개 서비스 운영 주체(단일 vs 서비스별 법인) | KPA/Neture=쓰리라이프존, KCos=가상 법인명 | 사용자/법무 |
+| 2 | 각 서비스 사업자등록번호 | KPA/Neture 108-86-02873, KCos placeholder | 사용자 |
+| 3 | 대표자 성명 | KCos `홍길동` placeholder | 사용자 |
+| 4 | 영업소 주소(불만처리) | KPA/KCos placeholder | 사용자 |
+| 5 | 통신판매업 신고번호/신고기관 placeholder, 타 서비스 없음 | 사용자/행정 |
 | 6 | 통신판매업 신고 의무 여부(서비스별) | 미확인 | 법무/행정 |
 | 7 | 판매 당사자 vs 통신판매중개자 구분 | 미확정 | 법무 (checkout 구조 기반) |
 | 8 | 개인정보보호책임자(성명/직위/연락처) | 코드에 없음 | 사용자 |
@@ -165,7 +159,7 @@
 다음은 **확인된 실값만 사용**하고, 미확인 시 푸터에 **표시하지 않거나 "확인 중"으로 비워둔다** (허위표시 금지):
 사업자등록번호 · 통신판매업 신고번호 · 대표자 성명 · 영업소 주소 · 개인정보보호책임자 · 호스팅 제공자 상호 · 상호(법인명).
 
-> GP/KCos의 `홍길동`/`000-00-00000`/통신판매 placeholder 는 **구현 WO 전이라도 우선 제거 검토 대상**(노출 시 위험). 단 이는 별도 WO에서 처리.
+> KCos의 `홍길동`/`000-00-00000`/통신판매 placeholder 는 **구현 WO 전이라도 우선 제거 검토 대상**(노출 시 위험). 단 이는 별도 WO에서 처리.
 
 ---
 
@@ -173,7 +167,7 @@
 
 1. 공통 `Footer` 컴포넌트 추출(`packages/ui` 또는 신규) + 서비스별 설정(brand/연락처/사업자정보) 주입 구조 — 하드코딩 → 중앙관리.
 2. 전상법 §10 7항목 + 호스팅 + 공정위 링크 슬롯 표준화.
-3. 약관/개인정보처리방침 route 정비: KPA orphaned 페이지 연결 / GP·KCos route 신설(또는 Neture식 CMS LegalPage 패턴 cross-service 도입).
+3. 약관/개인정보처리방침 route 정비: KPA orphaned 페이지 연결 / KCos route 신설(또는 Neture식 CMS LegalPage 패턴 cross-service 도입).
 4. 통신판매중개자 고지 슬롯(중개 성격 확정 서비스 한정).
 5. 푸터 정보 소스: env 또는 CMS(Neture LegalPage 패턴) 통일.
 
@@ -191,7 +185,7 @@
 
 ## 12. 위험 / 주의사항
 
-- ⚠️ **GP/KCos placeholder 법정정보 노출** = 전상법 §10 미표시·허위표시 위험. 최우선 정비.
+- ⚠️ **KCos placeholder 법정정보 노출** = 전상법 §10 미표시·허위표시 위험. 최우선 정비.
 - ⚠️ **운영 주체 불일치** 미해소 시 푸터 표기 자체가 부정확.
 - ⚠️ **통신판매중개 고지 누락 시 연대책임**(§20-2) — Neture/B2B 거래 성격 확정 전 단정 금지(법무 확인).
 - ⚠️ KPA 푸터 개인정보처리방침 **데드링크 가능성** — route 연결 확인 필요.
@@ -217,8 +211,8 @@
 | 생성 문서 | `docs/investigations/IR-O4O-CROSSSERVICE-FOOTER-LEGAL-DISPLAY-REQUIREMENTS-V1.md` (본 문서, 유일) |
 | 조사 기준 commit | `459d9438a` |
 | 푸터 컴포넌트 | 4 service-local (공통 없음), 전부 하드코딩 |
-| 약관/개인정보 route | Neture 2/2(CMS) · KPA orphaned · GP/KCos 0 |
-| 운영 주체 | KPA/Neture `㈜쓰리라이프존 108-86-02873` / GP/KCos placeholder |
-| 최대 위험 | GP/KCos placeholder 법정정보 노출 + 운영주체 불일치 + 중개자 고지 미검토 |
+| 약관/개인정보 route | Neture 2/2(CMS) · KPA orphaned · KCos 0 |
+| 운영 주체 | KPA/Neture `㈜쓰리라이프존 108-86-02873` / KCos placeholder |
+| 최대 위험 | KCos placeholder 법정정보 노출 + 운영주체 불일치 + 중개자 고지 미검토 |
 | git status | working tree clean (외부 세션 WIP 미접촉) |
 | commit hash | `b55530d62` |

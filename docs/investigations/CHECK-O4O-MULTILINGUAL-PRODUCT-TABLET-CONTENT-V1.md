@@ -64,7 +64,7 @@
 - 단일 commit(code+CHECK) — web deploy HEAD 변경감지.
 
 ## 6. 후속
-KPA 파일럿 외국인 응대 흐름 완성(가져오기→연결→배지→QR/URL→태블릿). 다음 = `WO-O4O-MULTILINGUAL-PRODUCT-CONTENT-CROSS-SERVICE-ADOPTION-V1`(GP/KCos).
+KPA 파일럿 외국인 응대 흐름 완성(가져오기→연결→배지→QR/URL→태블릿). 다음 = `WO-O4O-MULTILINGUAL-PRODUCT-CONTENT-CROSS-SERVICE-ADOPTION-V1`(KCos).
 
 ---
 

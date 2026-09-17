@@ -16,7 +16,7 @@ jest.mock('../../checkout.service.js', () => ({
       const subtotal = dto.items.reduce((s: number, i: any) => s + i.subtotal, 0);
       return {
         id: `order-${createOrderCalls.length}`,
-        orderNumber: `GP-${createOrderCalls.length}`,
+        orderNumber: `ORD-${createOrderCalls.length}`,
         subtotal,
         shippingFee: 0,
         totalAmount: subtotal,

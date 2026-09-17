@@ -88,7 +88,7 @@ SELECT COUNT(*) AS mt_listings,
        COUNT(*) FILTER (WHERE is_active) AS active
 FROM organization_product_listings WHERE source_type='market_trial';
 
--- 4. 전환 OPL 의 org 유형 + 서비스 enrollment (Store 노출 실위험 — KPA/GP/KCos 약국인지)
+-- 4. 전환 OPL 의 org 유형 + 서비스 enrollment (Store 노출 실위험 — KPA/KCos 약국인지)
 SELECT o.type AS org_type,
        COALESCE(string_agg(DISTINCT ose.service_code, ','), '(none)') AS services,
        COUNT(DISTINCT opl.id) AS cnt
@@ -104,7 +104,6 @@ SELECT COUNT(*) AS first_order FROM market_trial_participants WHERE "customerCon
 **판정 해석 기준**:
 - 3·4 가 모두 0 → 전환 미사용(실데이터 없음). **A(전환 중단/비활성)** 안전.
 - 4 의 services 가 neture-only/Neture 운영 org → Store 노출 위험 낮음, 기능 유지 검토.
-- 4 에 kpa-society/glycopharm/k-cosmetics 약국 org 포함 → **Store 노출 실위험 확정**, 기존 데이터 정리 WO 필요.
 
 ---
 

@@ -7,7 +7,7 @@
 - **작성일:** 2026-05-24
 - **분류:** Investigation (read-only)
 - **선행 산출물:**
-  - [IR-O4O-GLYCOPHARM-OPERATOR-USERS-400-AUDIT-V1](IR-O4O-GLYCOPHARM-OPERATOR-USERS-400-AUDIT-V1.md) (1 endpoint 확정)
+  - (1 endpoint 확정)
   - [CHECK-O4O-OPERATOR-MEMBERS-FRONTEND-SERVICEKEY-ALIGNMENT-V1](CHECK-O4O-OPERATOR-MEMBERS-FRONTEND-SERVICEKEY-ALIGNMENT-V1.md) (members 수정 완료)
 - **참조 SSOT:**
   - `docs/architecture/O4O-BOUNDARY-POLICY-V1.md` (F6)
@@ -24,15 +24,15 @@
 
 | Endpoint | 영향 service | 실 400 (7d) | 우선순위 |
 |---|---|:---:|:---:|
-| `GET /operator/products` | GP, K-Cos | ✅ 5+회 | **A 즉시** |
-| `GET /operator/stores` | GP, KPA, K-Cos | ✅ 6+회 | **A 즉시** |
+| `GET /operator/products` | K-Cos | ✅ 5+회 | **A 즉시** |
+| `GET /operator/stores` | KPA, K-Cos | ✅ 6+회 | **A 즉시** |
 | `GET /operator/analytics/summary` | (KPA 의심) | ✅ 3+회 | B 검증 후 |
 | `GET /operator/analytics/actions` | (KPA 의심) | ✅ 1+회 | B 검증 후 |
 | `GET /operator/analytics/insight` | (KPA 의심) | ✅ 1+회 | B 검증 후 |
 
 **핵심 관찰:**
 - Members WO 가 이미 회수한 패턴과 정확히 동일 drift 가 **Products / Stores** 에 잔존. 같은 frontend 정렬 작업으로 즉시 해결 가능.
-- Analytics 는 GP/Neture 가 axios `params: {serviceKey, days}` 패턴으로 이미 정렬됨. KPA 의 `platformApi.get('/...', {serviceKey, days})` 만 ApiClient 시그니처 검증 후 결정 필요 (의심).
+- Analytics 는 Neture 가 axios `params: {serviceKey, days}` 패턴으로 이미 정렬됨. KPA 의 `platformApi.get('/...', {serviceKey, days})` 만 ApiClient 시그니처 검증 후 결정 필요 (의심).
 - 4 service 의 detail endpoint (`/:id`, `/:id/channels`, `/:id/products` 등) 는 backend 가 resolveOperatorScope 미사용 → 400 가능성 없음 (audit 대상 외).
 
 ### 즉시 WO 후보 (1 건 — endpoint 별 분리 비권고)
@@ -47,7 +47,7 @@
 |---|---|
 | 조사일 | 2026-05-24 |
 | Repo 시점 | origin/main 와 일치 (0 commits 차이) |
-| 조사 범위 | 4 service (`web-{glycopharm,kpa-society,k-cosmetics,neture}`) + `apps/api-server/src/controllers/operator/*` + `apps/api-server/src/routes/operator/*` + Cloud Run logs |
+| 조사 범위 | 4 service + `apps/api-server/src/controllers/operator/*` + `apps/api-server/src/routes/operator/*` + Cloud Run logs |
 
 ---
 
@@ -73,7 +73,7 @@
 
 ### 3.1 핵심 매트릭스 (실 frontend 호출 기준)
 
-| Endpoint | GP | KPA | K-Cos | Neture | 비고 |
+| Endpoint | KPA | K-Cos | Neture | 비고 |
 |---|:---:|:---:|:---:|:---:|---|
 | `/operator/members` (list) | ✅ | ✅ | ✅ | ✅ | **prior WO 로 정렬 완료** |
 | `/operator/members/stats` | ✅ | ✅ | ✅ | ✅ | 동일 |
@@ -89,9 +89,6 @@
 ### 3.2 정렬된 (✅) 사례의 코드 패턴
 
 **Members (prior WO):**
-```ts
-params.set('serviceKey', 'glycopharm');  // 또는 'kpa-society' / 'k-cosmetics'
-```
 
 **Stores (Neture, 이미 정렬):**
 [services/web-neture/src/pages/operator/StoreManagementPage.tsx:70-79](services/web-neture/src/pages/operator/StoreManagementPage.tsx#L70-L79):
@@ -106,8 +103,7 @@ const params = new URLSearchParams({
 });
 ```
 
-**Analytics (GP / Neture, 이미 정렬):**
-[services/web-glycopharm/src/pages/operator/AnalyticsPage.tsx:66](services/web-glycopharm/src/pages/operator/AnalyticsPage.tsx#L66):
+**Analytics (Neture, 이미 정렬):**
 ```ts
 await api.get('/operator/analytics/summary', {
   params: { serviceKey: SERVICE_KEY, days },
@@ -120,14 +116,12 @@ await api.get('/operator/analytics/summary', {
 
 | 파일 | 라인 | 호출 |
 |---|---|---|
-| `services/web-glycopharm/src/pages/operator/ProductsPage.tsx` | 83-96 | `params` 에 page/limit/sortBy/sortOrder/search 만, serviceKey 없음 |
 | `services/web-k-cosmetics/src/pages/operator/ProductsPage.tsx` | 73-86 | 동일 패턴 |
 
 #### Stores
 
 | 파일 | 라인 | 호출 |
 |---|---|---|
-| `services/web-glycopharm/src/pages/operator/StoresPage.tsx` | 37-48 | `glycoStoresApi.listStores` adapter — qs 에 page/limit/sortBy/sortOrder/search 만. **`StoresConfig.serviceKey: 'glycopharm'` 은 라벨용 상수일 뿐, qs 에 안 들어감** |
 | `services/web-kpa-society/src/pages/operator/OperatorStoresPage.tsx` | 39-50 | 동일 (kpaStoresApi.listStores) |
 | `services/web-k-cosmetics/src/pages/operator/StoresPage.tsx` | 88-101 | params 에 직접 — serviceKey 없음 |
 | `services/web-kpa-society/src/pages/operator/KpaOperatorDashboard.tsx` | 64 | `${PLATFORM_API_BASE}/api/v1/operator/stores?limit=1` (대시보드 stats) — serviceKey 없음 |
@@ -179,8 +173,8 @@ Cloud Run 로그 (`netureyoutube`, 최근 7 일) 의 status=400 + 해당 endpoin
 
 | Endpoint | 영향 파일 | 패턴 |
 |---|---|---|
-| `/operator/products` | web-glycopharm/ProductsPage / web-k-cosmetics/ProductsPage | `params.set('serviceKey', '<svc>')` 1 줄 추가 |
-| `/operator/stores` | web-glycopharm/StoresPage (glycoStoresApi.listStores) / web-kpa-society/OperatorStoresPage (kpaStoresApi.listStores) / web-k-cosmetics/StoresPage | `qs.set('serviceKey', '<svc>')` 1 줄 추가 |
+| `/operator/products` | — | `params.set('serviceKey', '<svc>')` 1 줄 추가 |
+| `/operator/stores` | — | `qs.set('serviceKey', '<svc>')` 1 줄 추가 |
 | `/operator/stores?limit=1` (KPA 대시보드) | web-kpa-society/KpaOperatorDashboard:64 | URL 에 `&serviceKey=kpa-society` 추가 |
 
 **합계: 4 파일.** Members WO 와 동일 패턴, 매우 낮은 회귀 위험.
@@ -323,11 +317,9 @@ grep -rn "resolveOperatorScope\|PLATFORM_ADMIN_SCOPE_REQUIRED" \
 
 # 2. Frontend serviceKey 전달 매트릭스
 grep -rn "params.set('serviceKey'\|qs.set('serviceKey'\|serviceKey: '\|'serviceKey'," \
-  services/web-{glycopharm,kpa-society,k-cosmetics,neture}/src
 
 # 3. 4 service 의 list endpoint 호출처
 grep -rn "/api/v1/operator/(members\|products\|stores\|analytics)" \
-  services/web-{glycopharm,kpa-society,k-cosmetics,neture}/src
 
 # 4. Cloud Run 실 400 발생 확인
 for endpoint in members products stores analytics; do

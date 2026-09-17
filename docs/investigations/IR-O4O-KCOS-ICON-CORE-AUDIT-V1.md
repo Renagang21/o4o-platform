@@ -9,13 +9,11 @@
 |------|------|
 | 원천 파일 | `services/web-k-cosmetics/src/components/common/LoginModal.tsx` |
 | core / service-local | **service-local** (core 컴포넌트 아님) |
-| 형제 복사본 | `services/web-glycopharm/src/components/common/LoginModal.tsx` (독립 복사본) |
-| 표준 기준 | **GlycoPharm LoginModal** 이 이미 `lucide-react` 기반 (Activity / X / AlertCircle / Mail / Lock / Eye / EyeOff) |
+| 형제 복사본 | — |
+| 표준 기준 | — |
 | 의존성 | web-k-cosmetics 에 `lucide-react ^0.523.0` 존재 ✅ |
 
 **결론:** core 수정 불필요. K-Cosmetics 로그인 모달은 자체 구현이며, 동일 서비스의 다른 화면이 inline-style 구조를 쓰므로 **Tailwind 전면 재작성 없이 emoji만 lucide 로 최소 교체**한다.
-
-> 참고: GlycoPharm 모달도 체험 계정 버튼에 `🧪` emoji 가 남아있음 (본 WO 범위 외, 별도 정비 권장).
 
 ## 2. K-Cosmetics emoji 사용 전체 분류
 
@@ -63,7 +61,7 @@
 
 | 대상 | 사유 |
 |------|------|
-| `pages/operator/KCosmeticsOperatorDashboard.tsx` (KCOS_AXES 🏪📋) | **공유 core 계약** — `OperatorAxisGroup.icon: string`, `AxisNavigationSection` 이 `<span>{icon}</span>` 로 raw 렌더. **Neture / KPA / GlycoPharm / K-Cosmetics 4개 서비스 전부 emoji string** 사용. lucide 전환 시 core 계약(ReactNode) 변경 → 전 서비스 영향 → **별도 Shared Module WO 필요**. 본 WO 범위("타 서비스 흐름 불변") 외. |
+| `pages/operator/KCosmeticsOperatorDashboard.tsx` (KCOS_AXES 🏪📋) | **공유 core 계약** — `OperatorAxisGroup.icon: string`, `AxisNavigationSection` 이 `<span>{icon}</span>` 로 raw 렌더. lucide 전환 시 core 계약(ReactNode) 변경 → 전 서비스 영향 → **별도 Shared Module WO 필요**. 본 WO 범위("타 서비스 흐름 불변") 외. |
 | `config/homeStaticData.ts` (quickActionCards 📦📋) | **dead config** — `.tsx` 어디에서도 import/렌더되지 않음. 화면 비노출. 별도 정리(삭제 후보)는 본 WO 범위 외. |
 | `MyForumDashboardPage.tsx:559` `placeholder="예: 💄"` | 포럼 카테고리 iconEmoji **사용자 입력 예시**. UI 아이콘 아님. |
 | 각종 JSDoc/인라인 주석 `⚠️`/`❌` | 코드 주석. UI 아님. |

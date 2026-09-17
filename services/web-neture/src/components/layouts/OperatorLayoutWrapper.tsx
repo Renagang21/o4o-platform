@@ -7,7 +7,7 @@
  *   legacy OperatorShell(flat sidebar) → @o4o/operator-ux-core 의 OperatorAreaShell + DomainIASidebar 이행.
  *   Neture 전용 4-domain IA(NETURE_OPERATOR_DOMAIN_IA) 를 domainIAConfig 로 주입.
  *   NetureGlobalHeader 는 header slot 으로 유지. operator 전용(adminOnly 제외) 정책 보존 —
- *   filterMenuByRole(UNIFIED_MENU, false). footer 는 제거 (KPA/GlycoPharm/K-Cosmetics operator 정합).
+ *   filterMenuByRole(UNIFIED_MENU, false). footer 는 제거 (KPA/K-Cosmetics operator 정합).
  */
 
 import { filterMenuByRole } from '@o4o/ui';

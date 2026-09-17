@@ -15,7 +15,7 @@
 본 문서는 O4O 플랫폼의 AI 기반 콘텐츠/강의 제작 자동화 흐름을 단일 기준으로 정리한다. 콘텐츠 작성 / 단일 레슨 초안 / 강의 구조 후보 / 레슨 본문 생성의 4가지 흐름이 어떻게 구성되어 있는지, 어떤 API·컴포넌트가 사용되며 어디까지가 V1 범위이고 어디부터가 후속 작업인지 선을 긋는다.
 
 **기준 서비스**: KPA-Society (`services/web-kpa-society`).
-GlycoPharm / K-Cosmetics 는 본 문서 범위 외 — 동일 흐름을 적용하려면 별도 WO 필요.
+K-Cosmetics 는 본 문서 범위 외 — 동일 흐름을 적용하려면 별도 WO 필요.
 
 ---
 
@@ -343,7 +343,7 @@ lmsInstructorApi.createLesson(courseId, payload) — 항목별 순차
 
 - **순차 호출만**: V3 lesson-body 는 병렬 호출하지 않음 (rate-limit + 진행 UX 우려). 5개 선택 시 5회 순차 = 모델 응답 시간 × 5
 - **자동 저장 금지**: AI 응답은 사용자가 명시적으로 [선택한 레슨 추가] / [에디터에 삽입] 클릭 시점에만 저장됨. 모달 닫기 / 취소 시 데이터 폐기
-- **단일 출처(KPA)**: 본 흐름은 KPA-Society 에만 적용. GlycoPharm/K-Cosmetics 의 `LmsLessonPage` 는 별도 — 본 WO 범위 외
+- **단일 출처(KPA)**: 본 흐름은 KPA-Society 에만 적용. K-Cosmetics 의 `LmsLessonPage` 는 별도 — 본 WO 범위 외
 - **인증**: 모든 `/api/ai/*` 엔드포인트는 `authenticate` 미들웨어 적용 (쿠키 기반, frontend 는 `credentials: 'include'`)
 
 ---
@@ -393,7 +393,7 @@ lmsInstructorApi.createLesson(courseId, payload) — 항목별 순차
 | 3 | 퀴즈/과제 자동 생성 | 레슨 본문 → 평가 항목 추출 모델 + Quiz/Assignment 엔티티 작성 흐름 |
 | 4 | 매장 활용 프로세스 재연결 | StoreUseModal / `/api/ai/content-to-store-use` UI 복구 (이미 코드 유지) |
 | 5 | lesson-body 성능 (병렬 + throttle) | 큐 매니저 / 모델 quota / 부분 결과 저장 정책 |
-| 6 | GlycoPharm/K-Cosmetics 흐름 적용 | 각 서비스 LessonModal 패턴 정합성 + 도메인별 프롬프트 audience 변형 |
+| 6 | K-Cosmetics 흐름 적용 | 각 서비스 LessonModal 패턴 정합성 + 도메인별 프롬프트 audience 변형 |
 
 ---
 

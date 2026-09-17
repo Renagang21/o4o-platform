@@ -51,22 +51,22 @@ KPA POP 제작 화면에서 **POP 문구를 AI로 생성하는 페이지 진입�
 ## 5. 검증 기타
 - `web-kpa-society` 전체 tsc --noEmit 오류 0(StorePopPage 0). Web Cloud Run 배포 success(backend 무변경 → api 배포 불필요).
 
-## 6. GP/KCos 영향
+## 6. KCos 영향
 - 변경 파일 = `services/web-kpa-society/src/pages/pharmacy/StorePopPage.tsx` 단일(KPA 전용).
-- GP/KCos의 POP 화면(`services/web-glycopharm/*/StorePopPage.tsx`, `services/web-k-cosmetics/*/StorePopPage.tsx`)은 **별도 파일 → 무변경**. 공통 컴포넌트(AiContentModal) 미변경.
-- → **KPA POP만 AI 진입점 제거, GP/KCos 무영향.**
+- KCos의 POP 화면은 **별도 파일 → 무변경**. 공통 컴포넌트(AiContentModal) 미변경.
+- → **KPA POP만 AI 진입점 제거, KCos 무영향.**
 
 ## 7. 범위/안전
 - AiContentModal/api·ai-prompts·outputType='pop'/Toolbar AI 삭제 0. POP 생성 API·저장소·데이터·migration 0. QR/콘텐츠 제작 AI 제거 상태 회귀 0. 블로그/강의/상품설명/사이니지 AI는 본 WO 미포함.
 
 ## 8. 후속
 - **`WO-O4O-KPA-BLOG-AI-STEP-REMOVE-V1`**(다음 — PharmacyBlogPage 페이지 AI 진입, Toolbar AI 보존 주의).
-- 이후 PRODUCT-DESC / RESOURCE / COURSE-LECTURE / SIGNAGE → GP/KCos parity → 외부 LLM 안내(IR §G 순).
+- 이후 PRODUCT-DESC / RESOURCE / COURSE-LECTURE / SIGNAGE → KCos parity → 외부 LLM 안내(IR §G 순).
 
 ---
 
 ## 9. 최종 판정
 
-> KPA `/store/marketing/pop`의 POP 만들기 흐름에서 "AI 문구 생성/만들기" 진입점이 제거되고, POP 생성은 선택 자료 기반으로 정상 동작한다(PDF 생성·목록·삭제 회귀 없음). AiContentModal/`/api/ai/content`/편집기 Toolbar AI는 보존되며, inline POP·QR·콘텐츠 목록이 회귀하지 않는다. 가져온 POP(prefill) 문구 패널은 유지. GP/KCos 무영향.
+> KPA `/store/marketing/pop`의 POP 만들기 흐름에서 "AI 문구 생성/만들기" 진입점이 제거되고, POP 생성은 선택 자료 기반으로 정상 동작한다(PDF 생성·목록·삭제 회귀 없음). AiContentModal/`/api/ai/content`/편집기 Toolbar AI는 보존되며, inline POP·QR·콘텐츠 목록이 회귀하지 않는다. 가져온 POP(prefill) 문구 패널은 유지. KCos 무영향.
 
 → **충족.**

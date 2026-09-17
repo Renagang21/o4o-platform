@@ -3,7 +3,7 @@
  *
  * WO-O4O-OPERATOR-FORUM-DELETE-REQUESTS-CONSOLE-COMMONIZATION-V1
  *
- * GlycoPharm / K-Cosmetics 2 service 의 operator 포럼 삭제 요청 리스트 공통 wrapper 타입.
+ * K-Cosmetics 2 service 의 operator 포럼 삭제 요청 리스트 공통 wrapper 타입.
  * IR: docs/investigations/IR-O4O-OPERATOR-FORUM-REQUEST-CONSOLE-WRAPPER-FEASIBILITY-V1.md
  *
  * KPA / Neture 는 본 wrapper 범위 외 (도메인 차이 — 별도 IR).
@@ -36,7 +36,6 @@ export interface ForumDeleteRequest {
 
 /**
  * Normalized review result. 각 service 의 응답 shape 차이를 adapter 에서 정규화:
- *   - GP   apiClient: `{ error?: { message } }`  → { ok: !error, error: error?.message }
  *   - K-Cos axios   : `{ success, error? }`      → { ok: success, error }
  */
 export interface ForumDeleteReviewResult {
@@ -45,7 +44,7 @@ export interface ForumDeleteReviewResult {
 }
 
 /**
- * Service-side API client adapter. GP / K-Cos 가 각자 구현해 주입한다.
+ * Service-side API client adapter. 각 서비스가 구현해 주입한다.
  * 콘솔은 list / approve / reject 만 호출하고, endpoint·응답 shape 는 adapter 책임.
  */
 export interface ForumDeleteRequestsConsoleClient {
@@ -57,7 +56,7 @@ export interface ForumDeleteRequestsConsoleClient {
    * WO-O4O-OPERATOR-FORUM-CONSOLE-BATCH-CLIENT-OPTION-V1 (optional):
    * 서비스가 실제 batch endpoint 를 보유하면 제공한다(예: Neture).
    * 제공 시 bulk 승인은 per-id fan-out 대신 이 메서드를 1회 호출한다.
-   * 미제공 시(GP/K-Cos) 기존 fan-out(approve × Promise.allSettled) 유지.
+   * 미제공 시(K-Cos) 기존 fan-out(approve × Promise.allSettled) 유지.
    * 반환은 raw batch 응답 — useBatchAction 이 res.data.results / res.data.data.results 를 파싱한다.
    */
   batchApprove?(ids: string[], data?: { reviewComment?: string }): Promise<unknown>;
@@ -76,7 +75,7 @@ export interface ForumDeleteRequestsGuide {
 // ─── Wrapper Props ───────────────────────────────────────────
 
 export interface OperatorForumDeleteRequestsConsolePageProps {
-  /** Canonical service key (glycopharm / k-cosmetics). */
+  /** Canonical service key. */
   serviceKey: string;
   /** Service-side API client adapter. */
   client: ForumDeleteRequestsConsoleClient;

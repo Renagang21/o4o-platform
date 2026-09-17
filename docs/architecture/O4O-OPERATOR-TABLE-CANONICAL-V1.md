@@ -84,7 +84,7 @@ const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 | 중복 방지 | ✅ 자동 | ❌ 수동 필요 |
 | 포함 확인 | `set.has(id)` O(1) | `arr.includes(id)` O(n) |
 | 전환 비용 | — | 타입 변경 필요 |
-| 현재 canonical 페이지 | 모두 사용 | GlycoPharm 일부만 사용 |
+| 현재 canonical 페이지 | 모두 사용 | 미사용 |
 
 ### 3.2 Selection State 구조 (전체 패턴)
 
@@ -512,14 +512,11 @@ const columns: O4OColumn<T>[] = [
 | `apps/admin-dashboard/src/pages/operators/OperatorsPage.tsx` | Admin | BaseTable 사용 중, selection 없음 |
 | `services/web-k-cosmetics/src/pages/operator/UsersPage.tsx` | K-Cosmetics | ag-components DataTable, selection 없음 |
 | `services/web-k-cosmetics/src/pages/operator/ApplicationsPage.tsx` | K-Cosmetics | ag-components DataTable, selection 없음 |
-| `services/web-glycopharm/src/pages/operator/StoreApprovalsPage.tsx` | GlycoPharm | ag-components DataTable, selection 없음 |
 
 ### VARIANT (별도 마이그레이션 계획 필요)
 
 | 파일 | 서비스 | 문제 | Risk |
 |------|--------|------|------|
-| `services/web-glycopharm/src/pages/operator/UsersPage.tsx` | GlycoPharm | ag-components DataTable (`string[]`) + ActionBar | 중간 |
-| `services/web-glycopharm/src/pages/operator/PharmaciesPage.tsx` | GlycoPharm | ag-components DataTable + ActionBar (selection 미연결) | 중간 |
 | `services/web-neture/src/pages/operator/AllRegisteredProductsPage.tsx` | Neture | operator-ux-core DataTable + 커스텀 checkbox (BaseTable selectable 미사용) | 낮음 |
 
 ---
@@ -639,19 +636,6 @@ const result = await batch.executeBatch(apiFn, [...selectedIds]);
 | P3-B | KPA ForumDeleteRequestsPage | PARTIAL → CANONICAL |
 | P3-C | Neture ForumManagementPage | PARTIAL → CANONICAL |
 | P3-D | Event Offer 운영자 페이지 신규 개발 시 | V3 Canonical 적용 |
-
-### Phase 4 — GlycoPharm DataTable Alignment (높은 위험)
-
-| 작업 | 파일 | 내용 |
-|------|------|------|
-| P4-A | `GlycoPharm/UsersPage.tsx` | ag-components DataTable (`string[]`) → BaseTable (`Set<string>`) |
-| P4-B | `GlycoPharm/PharmaciesPage.tsx` | ag-components DataTable → BaseTable + selection 연결 |
-| P4-C | `K-Cosmetics/UsersPage.tsx` | ag-components DataTable → BaseTable |
-| P4-D | `K-Cosmetics/ApplicationsPage.tsx` | ag-components DataTable → BaseTable |
-
-> **Phase 4는 별도 WO 발행 후 진행.** API 불일치로 인한 regression 위험 있음.
-
----
 
 ## 10. 위험 요소 및 호환성
 

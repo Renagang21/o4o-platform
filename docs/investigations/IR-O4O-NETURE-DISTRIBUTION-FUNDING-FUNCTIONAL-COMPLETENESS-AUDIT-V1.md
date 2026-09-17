@@ -41,8 +41,6 @@
 [확장] /api/trial-shipping/:participationId (주소)  · /api/trial-fulfillment/:pid/* (주문/이행)  ← 무인증
 ```
 
-서비스 분담(문서 baseline 부합): 실행은 **Neture 단일**, KPA/GlycoPharm/K-Cosmetics 는 redirect 게이트.
-
 ---
 
 ## 3. 엔티티/DB 구조 분석 (`packages/market-trial`)
@@ -117,7 +115,7 @@ crowdfunding 코어(02-22) → conversion/listing(04-15) → customerConversion 
 `createListingFromParticipant` → `organization_product_listings`(source_type='market_trial') autolink + `participant.listingId` 역기록 + funnel/results 집계 = 랜딩 신호 존재. 그러나 **참여자에 store/org 식별자 부재**로 "어느 매장에 실제로 들어갔는가"를 직접 식별 못하고, `convertedProductId`+수동 `adopted` 선행 필요. 핵심 KPI("몇 개 매장 랜딩")는 listing 카운트로 근사 가능하나 매장 단위 추적은 약함 → **PARTIAL**.
 
 ## 11. 명칭/가이드 정합성 확인 → **PASS (bare "Trial"만 PARTIAL)**
-- cross-service(KPA/Glyco/KCos/shared-space-ui) CTA·리다이렉트: 전부 "유통참여형 펀딩"(붙여쓰기), 링크 `https://neture.co.kr/market-trial` 등 정상, dead link 0.
+- cross-service CTA·리다이렉트: 전부 "유통참여형 펀딩"(붙여쓰기), 링크 `https://neture.co.kr/market-trial` 등 정상, dead link 0.
 - Neture 프론트 렌더링: Market Trial/마켓 트라이얼/유통 참여형(공백) = 0.
 - 가이드(`/guide/features/market-trial`): 선행 WO로 8섹션+카드목차 PASS(라이브 검증 완료).
 - **단**: bare 영어 "Trial" 이 공급자/운영자/참여 화면에 다수 노출 → 외부 표기 표준상 정리 대상(작은 결함).

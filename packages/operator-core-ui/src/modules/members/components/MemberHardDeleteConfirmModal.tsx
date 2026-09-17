@@ -3,7 +3,7 @@
  *
  * WO-O4O-MEMBER-MANAGEMENT-HARD-DELETE-FLOW-COMMONIZATION-V1
  *
- * 4서비스(KPA / GlycoPharm / K-Cosmetics / Neture)의 admin 완전삭제 확인 UI 공통화.
+ * 3서비스(KPA / K-Cosmetics / Neture)의 admin 완전삭제 확인 UI 공통화.
  *
  * 책임 분리:
  *   - 본 컴포넌트: UI / 확인 입력 / 취소·삭제 버튼 / loading 표시 / onConfirm 호출

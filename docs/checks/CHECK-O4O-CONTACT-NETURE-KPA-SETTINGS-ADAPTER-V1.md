@@ -8,7 +8,7 @@
 ---
 
 ## 1. 작업 목적
-Neture/KPA 기존 Contact 구조(저장소·공개 route·운영 UI)를 유지한 채, GP/KCos의 `ServiceContactSettings` 기반 **운영자 이메일 알림 + 문의자 자동 회신 + Admin 수신자·문구 설정**을 adapter 방식으로 추가 (IR 권고 Option D).
+Neture/KPA 기존 Contact 구조(저장소·공개 route·운영 UI)를 유지한 채, KCos의 `ServiceContactSettings` 기반 **운영자 이메일 알림 + 문의자 자동 회신 + Admin 수신자·문구 설정**을 adapter 방식으로 추가 (IR 권고 Option D).
 
 ## 2. 선행 IR 반영
 IR 결과 Neture/KPA는 이미 DB 저장 + in-app `contact.new` 알림 + 운영자 관리 UI 보유. 실제 갭은 email 알림 / 자동 회신 / 설정 Admin 3가지뿐 → 이번 작업이 정확히 그 3가지만 보강.
@@ -32,7 +32,7 @@ IR 결과 Neture/KPA는 이미 DB 저장 + in-app `contact.new` 알림 + 운영�
 - KPA Admin 영역: 기존 `AdminRoutes`/`AdminLayout`/`AdminSidebar` **존재** → WO §12.2 blocker 아님. 설정 화면만 추가
 
 ## 6. ServiceContactSettings 확장
-- `admin-service-contact-settings.controller.ts` 의 `CONTACT_SETTINGS_SERVICE_KEYS` 에 `neture`, `kpa-society` 추가 (기존 `glycopharm`, `k-cosmetics` 유지).
+- `admin-service-contact-settings.controller.ts` 의 `CONTACT_SETTINGS_SERVICE_KEYS` 에 `neture`, `kpa-society` 추가 (기존 `k-cosmetics` 유지).
 - 권한 guard `requireServiceLegalScope('admin')` 는 이미 4서비스(`SUPPORTED_LEGAL_SERVICE_KEYS`) 지원 → KPA `platformBypass=false` 격리 자동 준수.
 - 설정 테이블(`service_contact_settings`)·helper(`toEffective`/`loadContactSettings`)는 serviceKey 중립적 → row 없으면 in-app=on / email=off / 자동회신=off / 수신자 empty 기본값. **seed 없음, 하드코딩 없음.**
 
@@ -41,12 +41,12 @@ IR 결과 Neture/KPA는 이미 DB 저장 + in-app `contact.new` 알림 + 운영�
 |--------|------|------|------|------|
 | Neture | `services/web-neture/src/pages/admin/ServiceContactSettingsPage.tsx` | `/admin/settings/contact` | `getAdminMenu()` system 그룹 "문의 설정" | `api`(axios, `/api/v1`) |
 | KPA | `services/web-kpa-society/src/pages/admin/ServiceContactSettingsPage.tsx` | `/admin/settings/contact` | `AdminSidebar` "설정 > 문의 설정" | `coreApiClient`(`/api/v1`, no `/kpa` prefix) |
-- 공통 컴포넌트 `@o4o/operator-core-ui/modules/service-contact-settings` 재사용 (GP/KCos와 동일).
+- 공통 컴포넌트 `@o4o/operator-core-ui/modules/service-contact-settings` 재사용 (KCos와 동일).
 - KPA 기본 `apiClient` 는 `/api/v1/kpa` prefix 라 공통 admin 엔드포인트에 닿지 못함 → `coreApiClient`(prefix 없음) 사용으로 해결.
 - 두 화면 모두 Admin 전용. Operator 메뉴에 신규 설정 화면 미노출.
 
 ## 8. 운영자 이메일 알림 연결 결과
-- 공통 helper `apps/api-server/src/modules/contact-inquiry/contact-notification.helper.ts` 신설 (`sendContactEmails`) — GP/KCos public controller 로직을 service-neutral 추출.
+- 공통 helper `apps/api-server/src/modules/contact-inquiry/contact-notification.helper.ts` 신설 (`sendContactEmails`) — KCos public controller 로직을 service-neutral 추출.
 - Neture/KPA submit handler에서 `loadContactSettings(serviceKey)` → `sendContactEmails()` 호출.
 - 원칙 준수: 수신자는 `recipientEmails`에서만 / `emailNotificationEnabled=false` 또는 수신자 0이면 미발송 / SMTP 실패가 접수 실패 안 됨(best-effort) / HTML escape.
 
@@ -91,7 +91,7 @@ IR 결과 Neture/KPA는 이미 DB 저장 + in-app `contact.new` 알림 + 운영�
 | 운영자 이메일 + 문의자 자동 회신 발송 | ✅ `sent` |
 | 기존 operator 목록(`/operator/collaboration-requests` 백엔드) 유지 | ✅ 정상 |
 
-> **UI 시각 렌더(`/admin/settings/contact` 화면):** 브라우저가 병렬 세션 점유로 잠겨 시각 확인 보류. neture/kpa web deploy 성공 + 백엔드 GET/PUT 검증 + wrapper 는 GP/KCos 에서 이미 프로덕션 검증된 공통 `ServiceContactSettingsPage` 의 얇은 어댑터 → 렌더 정상으로 판단. 브라우저 가용 시 1회 확인 권장.
+> **UI 시각 렌더(`/admin/settings/contact` 화면):** 브라우저가 병렬 세션 점유로 잠겨 시각 확인 보류. neture/kpa web deploy 성공 + 백엔드 GET/PUT 검증 + wrapper 는 KCos 에서 이미 프로덕션 검증된 공통 `ServiceContactSettingsPage` 의 얇은 어댑터 → 렌더 정상으로 판단. 브라우저 가용 시 1회 확인 권장.
 
 ## 15. 테스트 설정 복구 — ✅ 완료
 - Neture/KPA 모두 PUT 으로 email OFF + recipients [] + autoreply OFF 원복 확인.
@@ -99,9 +99,8 @@ IR 결과 Neture/KPA는 이미 DB 저장 + in-app `contact.new` 알림 + 운영�
 ## 16. 테스트 문의 처리 — ✅ 완료
 - Neture 테스트 문의 `fe7e4969…` → `resolved` + adminNote. KPA 테스트 요청 `fee9b001…` → `done`.
 
-## 17. GP/KCos 미수정 확인
-- ✅ `services/web-glycopharm/**`, `services/web-k-cosmetics/**` 변경 없음.
-- ✅ GP/KCos public-contact-inquiry.controller 인라인 구현 유지(helper 미적용 — WO 범위 경계).
+## 17. KCos 미수정 확인
+- ✅ KCos public-contact-inquiry.controller 인라인 구현 유지(helper 미적용 — WO 범위 경계).
 
 ## 18. 개인정보 동의 / IP hash 후속 분리 확인
 - 본 작업 범위 외. 후속 `WO-O4O-CONTACT-NETURE-KPA-PRIVACY-CONSENT-V1` 에서 처리:
@@ -115,12 +114,11 @@ IR 결과 Neture/KPA는 이미 DB 저장 + in-app `contact.new` 알림 + 운영�
 | 마이그레이션 (`o4o-api-migrations` job) | ✅ `[X] 541 AddContactNotificationStatusNetureKpa20261108000000` 적용 확인 |
 | web-neture | ✅ success (forum tip deploy 에 동승 — 내 변경 포함) |
 | web-kpa-society | ✅ success (`workflow_dispatch service=kpa-society` 재배포 — detect-changes 가 tip 기준 skip 했기에 명시 배포) |
-| web-glycopharm / web-k-cosmetics | skipped (범위 외 — 정상) |
 
 > WO §15 경고대로 KPA web 은 push tip(forum) detect-changes 에서 skip → `workflow_dispatch` 로 명시 재배포해 내 변경 반영.
 
 ## 20. Commit
-- 코드 14파일: `d8cc391bc` (`feat(contact): add ServiceContactSettings adapter for Neture and KPA`). GP/KCos·타 세션 파일 미포함(path-specific).
+- 코드 14파일: `d8cc391bc` (`feat(contact): add ServiceContactSettings adapter for Neture and KPA`). KCos·타 세션 파일 미포함(path-specific).
 - 본 CHECK 갱신: 별도 path-specific commit.
 
 ---

@@ -11,7 +11,7 @@
 ## 0. 성격 / 범위
 
 - **read-only.** 본 조사 과정에서 코드·DB·메뉴·운영 데이터를 변경하지 않았다.
-- 서비스: **KPA Society 우선.** GP/K-Cosmetics는 영향 여부만 확인하고 변경 대상 아님.
+- 서비스: **KPA Society 우선.** K-Cosmetics는 영향 여부만 확인하고 변경 대상 아님.
 - 본 문서는 결론(정비안)을 제시하되, 실제 변경은 후속 WO에서 수행한다.
 
 ### 배경 (해결된 임시 정합 + 남은 근본 과제)
@@ -77,17 +77,17 @@
 
 ## D. AI 기능 사용처
 
-| 영역 | AI 기능(버튼) | frontend | backend endpoint | outputType | GP/KCos 공유 | 제거 = 버튼 숨김만? |
+| 영역 | AI 기능(버튼) | frontend | backend endpoint | outputType | KCos 공유 | 제거 = 버튼 숨김만? |
 |------|---------------|----------|------------------|-----------|:---:|:---:|
 | QR 제작 | "AI 문구 생성" | [StoreQRPage.tsx:793](../../services/web-kpa-society/src/pages/pharmacy/StoreQRPage.tsx) (모달 1169-1183) | `POST /api/ai/content` | store_qr | ❌ **KPA 전용** | ✅ (안전) |
-| POP 제작 | "AI 문구 생성" | StorePopPage.tsx:467 (600-611) | `POST /api/ai/content` | pop | ✅ **GP+KCos 동일 페이지** | ✅ 단, GP/KCos도 영향 |
-| 블로그 | "AI로 정리하기" | PharmacyBlogPage.tsx:507 (547-557) | `POST /api/ai/content` | blog | ✅ **GP 동일 페이지** | ✅ 단, GP도 영향 |
+| POP 제작 | "AI 문구 생성" | StorePopPage.tsx:467 (600-611) | `POST /api/ai/content` | pop | ✅ **KCos 동일 페이지** | ✅ 단, KCos도 영향 |
+| 블로그 | "AI로 정리하기" | PharmacyBlogPage.tsx:507 (547-557) | `POST /api/ai/content` | blog | — | — |
 | 편집기 툴바 | "AI 정리" | [Toolbar.tsx](../../packages/content-editor/src/components/Toolbar.tsx):599 | `POST /api/ai/content` | flexible | ✅ 전 서비스 공유 | **유지(편집기 내부)** |
 | 직접 콘텐츠 작성 | — 없음 | — | — | — | — | — |
 
-- **단일 공유 엔드포인트** `POST /api/ai/content` ([ai-proxy.routes.ts:202](../../apps/api-server/src/routes/ai-proxy.routes.ts)) + `services/ai-prompts/`(pop/blog/storeQr/titleSuggest/summary/productDetail/storeSns/flexible). **백엔드 삭제 금지**(GP/KCos/툴바/LMS 공유).
+- **단일 공유 엔드포인트** `POST /api/ai/content` ([ai-proxy.routes.ts:202](../../apps/api-server/src/routes/ai-proxy.routes.ts)) + `services/ai-prompts/`(pop/blog/storeQr/titleSuggest/summary/productDetail/storeSns/flexible). **백엔드 삭제 금지**(KCos/툴바/LMS 공유).
 - **편집기 내부 AI 보조(`AiContentModal`/Toolbar "AI 정리")는 공유 컴포넌트 → 유지.**
-- **제거 안전도**: QR AI 버튼 = KPA 전용(안전). POP/블로그 AI 버튼 = GP/KCos와 페이지 공유 → KPA만 제거하려면 서비스별 분기 또는 GP/KCos 협의 필요.
+- **제거 안전도**: QR AI 버튼 = KPA 전용(안전). POP/블로그 AI 버튼 = KCos와 페이지 공유 → KPA만 제거하려면 서비스별 분기 또는 KCos 협의 필요.
 
 ---
 
@@ -98,7 +98,7 @@
 | `/store/library/production-materials` | 제작 결과물 통합 뷰 | StoreHomePage CTA / StoreLibraryContentsPage "새 제작 자료 만들기" / ProductionMaterialEditorPage 저장 후 redirect / 빈 상태 버튼 | ✅ (메뉴만) | ✅ **유지 권장** | route 제거 시 저장 후 redirect·딥링크 파손 |
 | `/store/library/production-materials/new` | 제작자료 에디터 | 위 진입 버튼들 | ✅ | ✅ | — |
 
-- **메뉴 config**: `packages/store-ui-core/src/config/storeMenuConfig.ts` (공유 패키지, `KPA_SOCIETY_STORE_CONFIG`/`COSMETICS_STORE_CONFIG`/`GLYCOPHARM_STORE_CONFIG`). **KPA만 메뉴 숨김 = config의 KPA 항목만 제거**(GP/KCos 무영향).
+- **메뉴 config**: `packages/store-ui-core/src/config/storeMenuConfig.ts` (공유 패키지, `KPA_SOCIETY_STORE_CONFIG`/`COSMETICS_STORE_CONFIG`). **KPA만 메뉴 숨김 = config의 KPA 항목만 제거**(KCos 무영향).
 - **결론**: **"메뉴 숨김 가능 / route 유지 필요"** — 메뉴에서 제작자료를 빼도 기존 저장/redirect/딥링크는 route가 살아있어야 안 깨진다. `store_execution_assets` 데이터·기존 QR 참조는 그대로 보존.
 - **주의**: ProductionMaterialEditorPage 저장 후 redirect 대상이 숨겨진 페이지가 되면 UX 단절 → 메뉴 숨김 WO 시 **redirect 목적지를 콘텐츠 목록으로 재지정**하는 후속 필요.
 
@@ -142,7 +142,7 @@
 | 기존 QR/POP 파손 위험 | **높음**(execution 참조 retarget) | 낮음 | **낮음**(legacy 유지) |
 | 데이터 중복 | 감소 | 유지 | 점진 감소 |
 | 검색/태그 구현 용이성 | 높음(단일 소스) | 중 | 중(direct에 태그 추가부터) |
-| GP/KCos 공통화 | 중 | 높음 | 높음 |
+| KCos 공통화 | 중 | 높음 | 높음 |
 | 장기 유지보수 | 높음 | 중 | **높음** |
 
 ### 권장 결론 (하이브리드: C 주축 + B의 뷰 + A의 신규 수렴)
@@ -268,6 +268,6 @@ SELECT count(*) FROM store_execution_assets e
 - [x] 검색·태그 구현 가능성 확인(현재 불가 + 필요 작업 명시)
 - [x] 제작자료 메뉴 제거 가능성·위험 정리(메뉴 숨김 가능 / route 유지 필요)
 - [x] QR/POP 콘텐츠 목록 직접 제작 경로 제시(후속 WO 2·3)
-- [x] AI 제거 범위 정리(QR 안전 / POP·블로그 GP·KCos 공유 / 백엔드 유지)
+- [x] AI 제거 범위 정리(QR 안전 / POP·블로그 KCos 공유 / 백엔드 유지)
 - [x] 기존 QR/POP 공개 URL 비파손 전략 제시(참조 유지 + legacy 보존 C안)
 - [x] 운영 DB 실제 count (§11 read-only 실행 완료 — 2026-06-26, WO-...-DB-COUNT-BACKFILL-V1)

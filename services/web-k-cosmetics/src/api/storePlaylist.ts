@@ -2,7 +2,6 @@
  * Store Playlist API — K-Cosmetics
  *
  * WO-O4O-SIGNAGE-STORE-ACTION-EXPANSION-V1
- * Adapted from GlycoPharm StorePlaylist API for K-Cosmetics.
  */
 
 import { api } from '../lib/apiClient';

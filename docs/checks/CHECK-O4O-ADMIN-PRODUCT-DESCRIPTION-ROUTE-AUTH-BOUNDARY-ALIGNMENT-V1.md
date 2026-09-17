@@ -86,7 +86,7 @@ route-level integration test (`admin-route-auth-boundary.test.ts`, 실제 router
 자격증명은 `docs/local/TEST-ACCOUNTS.local.md`(gitignore) 에서 런타임에 읽는다 — 스크립트/문서에 하드코딩하지 않았다.
 스크립트: `tmp/admin-product-description-auth-boundary/smoke.mjs`
 
-계정: `sohae2100@gmail.com` — 보유 역할 `cosmetics:admin/operator`, `neture:admin/operator`, `glycopharm:admin/operator`, `kpa:admin/operator`, `pharmacy-hub:admin/operator`, `kpa:store_owner`. **`platform:super_admin` 미보유.**
+계정: `sohae2100@gmail.com` — 보유 역할 `cosmetics:admin/operator`, `neture:admin/operator`, `kpa:admin/operator`, `pharmacy-hub:admin/operator`, `kpa:store_owner`. **`platform:super_admin` 미보유.**
 
 | API | 배포 전 실측 |
 |---|---|

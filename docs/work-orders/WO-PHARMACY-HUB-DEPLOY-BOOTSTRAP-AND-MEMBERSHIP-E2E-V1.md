@@ -126,7 +126,7 @@ write-path 규약과 일치한다 — `MembershipApprovalService` 가 이 값을
 | 검증 | 결과 |
 |------|------|
 | 최초 운영자 부여 | ✅ `sohae2100` roles 에 `pharmacy-hub:operator` |
-| **기존 역할 보존** | ✅ cosmetics/glycopharm/kpa/neture admin·operator 9개 전부 유지 (삭제·교체 0) |
+| **기존 역할 보존** | — |
 | 가입 신청 (store_owner / supplier) | ✅ 201 → `status=pending`, `role` 이 prefixed 로 저장 |
 | 중복 신청 차단 | ✅ 409 `ALREADY_PENDING` |
 | 승인 2건 | ✅ 200, `status=active`, `approvedBy`/`approvedAt` 기록 |

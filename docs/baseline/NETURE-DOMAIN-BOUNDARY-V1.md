@@ -51,7 +51,7 @@ Campaign (정책 레이어)
 
 ### 3.2 타 도메인의 역할
 
-타 도메인(GlycoPharm, KPA, Cosmetics 등)은:
+타 도메인(KPA, Cosmetics 등)은:
 
 ```text
 Neture API Consumer

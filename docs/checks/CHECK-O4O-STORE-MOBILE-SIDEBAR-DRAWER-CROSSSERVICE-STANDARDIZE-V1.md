@@ -9,7 +9,7 @@
 
 ## 1. 원인 (IR 확정)
 
-공용 `StoreDashboardLayout` 는 drawer(state·overlay·slide-in·close)를 완비했으나, drawer 를 여는 **유일한 트리거(`onMenuToggle` 햄버거)가 `StoreTopBar` 안에만** 존재. store 3서비스(KPA/GlycoPharm/K-Cosmetics)가 모두 `hideTopBar`(외부 GlobalHeader 사용) → `StoreTopBar` 미렌더 → `<1024px` 에서 업무 사이드바 진입점 소멸. 특히 768~1023 구간은 사이트 햄버거(`md:hidden`)마저 없어 접근 수단 0.
+공용 `StoreDashboardLayout` 는 drawer(state·overlay·slide-in·close)를 완비했으나, drawer 를 여는 **유일한 트리거(`onMenuToggle` 햄버거)가 `StoreTopBar` 안에만** 존재. store 3서비스가 모두 `hideTopBar`(외부 GlobalHeader 사용) → `StoreTopBar` 미렌더 → `<1024px` 에서 업무 사이드바 진입점 소멸. 특히 768~1023 구간은 사이트 햄버거(`md:hidden`)마저 없어 접근 수단 0.
 
 ---
 
@@ -44,7 +44,6 @@
 |---|---|
 | web-kpa-society `tsc --noEmit` | ✅ exit 0 |
 | web-k-cosmetics `tsc --noEmit` | ✅ exit 0 |
-| web-glycopharm `tsc -b` | ✅ exit 0 |
 | web-kpa-society `vite build` | ✅ exit 0 (13.1s) |
 
 ---
@@ -56,7 +55,7 @@
 | commit | `a8cbeccad` (push 완료) |
 | workflow | Deploy Web Services (Cloud Run) |
 | run ID | `29184181616` |
-| jobs | detect-changes / deploy-kpa-society / deploy-k-cosmetics / deploy-glycopharm / deploy-neture — **전부 success** |
+| jobs | — |
 | kpa live revision | `kpa-society-web-01599-f5b` |
 
 > `@o4o/store-ui-core`(공용) 변경 → 4개 web 서비스 전부 재빌드·배포 success (cross-service backward-compat 확인).
@@ -81,11 +80,6 @@
 |---|---|---|---|
 | 1023 | ✅ 표시("업무 메뉴") | 클릭 시 open(`translate-x-0`, aria-expanded=true) → ESC close(x=-256, 복원) | 홈/매장 상품·거래/매장 활성화/내 자료함/디지털 사이니지/채널/판매 채널 확장/분석/설정/로그아웃 (서비스별 라벨 보존) |
 
-### 6-C. GlycoPharm
-코드 동일(공용 `StoreDashboardLayout`, `GlycoGlobalHeader` 형제 + `hideTopBar`) + deploy-glycopharm success → 동일 판정. (GP live 도메인 SiteGuide 서빙 이슈로 별도 URL 확인 필요.)
-
----
-
 ## 7. 표준 정합
 
 - breakpoint lg(1024) ✅ / <1024 hamburger+drawer ✅ / overlay·메뉴선택·ESC close ✅ / body scroll lock ✅ / aria-label·expanded·controls ✅ / active 메뉴·토큰 무변경 ✅.
@@ -101,6 +95,6 @@
 
 ## 9. 결론
 
-공용 `StoreDashboardLayout` 1곳 수정으로 KPA/GP/KCos 3서비스 `<1024px` store 업무 사이드바 진입점 복구. KPA·K-Cosmetics live PASS, GlycoPharm 코드·배포 동일 판정. 데스크톱·권한·route·메뉴 무변경.
+공용 `StoreDashboardLayout` 1곳 수정으로 KPA/KCos 1서비스 `<1024px` store 업무 사이드바 진입점 복구. KPA·K-Cosmetics live PASS 코드·배포 동일 판정. 데스크톱·권한·route·메뉴 무변경.
 
 *작성: 2026-07-12 · Status: 완료*

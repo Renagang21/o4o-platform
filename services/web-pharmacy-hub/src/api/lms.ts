@@ -229,7 +229,7 @@ export const lmsApi = {
     learnerClient.submitAssignment<LmsAssignmentSubmission>(assignmentId, content),
 
   // ── Operator (WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §4 #95) ─
-  //   공통 `/api/v1/lms/operator/courses/*` — KPA/GP/KCos 와 같은 endpoint 이며
+  //   공통 `/api/v1/lms/operator/courses/*` — KPA/KCos 와 같은 endpoint 이며
   //   서비스 경계는 backend 가 course.serviceKey 로 강제한다(프런트 필터링 아니다).
   //   목록은 learner client 와 같은 경로를 쓰며 serviceKey 가 client 계층에서 붙는다.
   operatorGetCourses: (params?: { search?: string; status?: string; page?: number; limit?: number }) =>
@@ -261,7 +261,7 @@ export const lmsApi = {
   },
 
   // ── Instructor (WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §4 #42) ─
-  //   공통 `/api/v1/lms/*` 강사 계약을 그대로 소비한다 (KPA/GP 와 같은 endpoint).
+  //   공통 `/api/v1/lms/*` 강사 계약을 그대로 소비한다 (KPA 와 같은 endpoint).
   //   backend `requireInstructor`(lms:instructor) 는 서비스 중립이라 추가 guard 변경이 없고,
   //   생성 강의의 serviceKey 는 CourseController 가 작성자 membership 에서 파생한다
   //   (WO-O4O-LMS-COURSE-SERVICEKEY-V1) — 프런트가 serviceKey 를 주입하지 않는다.

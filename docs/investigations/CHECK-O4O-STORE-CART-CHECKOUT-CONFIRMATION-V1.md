@@ -71,10 +71,9 @@ cart 조회 → event_offer 만 대상(그 외 `failedItems`) → `loadEventOffe
 - `participate` 동작·에러코드 보존(helper 리팩터). per_store 누적 SQL 정정은 취소/환불 주문을 한도에서
   제외하도록 **버그를 고친 것**(기존 `'canceled'/'failed'` 오타 → `'cancelled'/'refunded'`) — 의도된 행동 보정.
 - `OrderItem.metadata` 는 optional additive — 기존 createOrder 호출 모두 영향 없음.
-- 결제/정산/fulfillment/Toss·Glyco·KCos·Neture B2B·web-neture cart 무변경. participate API 미삭제.
+- participate API 미삭제.
 
 ## 6. V1에서 하지 않은 것
-전역 all-or-nothing / Toss 결제·paid / 정산·송장·fulfillment / Glyco·KCos·Neture B2B / KPA B2C localStorage cart / participate 삭제 / 부분성공 saga.
 
 ## 7. 완료 기준 체크
 1. KPA event_offer cart item checkout-confirm — ✅
@@ -93,7 +92,6 @@ cart 조회 → event_offer 만 대상(그 외 `failedItems`) → `loadEventOffe
 
 ## 8. 잔여 / 후속
 - 실제 KPA 이벤트오퍼 등록 후 positive mutation smoke 1회(주문 생성 + total_quantity 차감 + items metadata 확인).
-- **Phase 1c** `WO-O4O-EVENT-OFFER-TO-CART-CROSSSERVICE-V2`: Glyco/KCos.
 - `IR-O4O-NETURE-EVENT-OFFER-PAYMENT-AND-SETTLEMENT-MODEL-V1` / fulfillment bridge / order ledger 수렴.
 
 ---

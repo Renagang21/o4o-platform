@@ -16,10 +16,10 @@
 | 파일 | 변경 |
 |------|------|
 | KPA `pages/pharmacy/PharmacyPopPage.tsx` | row 액션 "이 POP으로 제작"(Printer) → `navigate('/store/marketing/pop', { state:{ prefillPop:{title,content,excerpt} } })` |
-| GP `pages/store-management/StorePopStaffPage.tsx` | 동 |
+ `pages/store-management/StorePopStaffPage.tsx` | 동 |
 | KCos `pages/store/StorePopStaffPage.tsx` | 동 |
 | KPA `pages/pharmacy/StorePopPage.tsx` | prefill effect: `location.state.prefillPop` → `setPopAiContent({title, bullets:[], shortText:excerpt, longText:strip(content)})` + AI 패널 펼침. `history.replaceState` 로 state clear |
-| GP `pages/store-management/StorePopPage.tsx` | 동(prefill effect) |
+ `pages/store-management/StorePopPage.tsx` | 동(prefill effect) |
 | KCos `pages/store/StorePopPage.tsx` | 동 |
 
 - prefill 은 별도 옵션 state 필드(`prefillPop`)로 전달 — 기존 `production`(자료함→제작) state 흐름과 독립(parseProductionRouterState/production 효과 무영향).
@@ -37,7 +37,7 @@ POP 사본 관리(PharmacyPopPage/StorePopStaffPage) → "이 POP으로 제작"(
 
 ## 4. 검증
 
-- **TypeScript 0 errors:** KPA · GP · KCos.
+- **TypeScript 0 errors:** KPA · KCos.
 - **정적:**
   - 3서비스 사본 관리 row 에 "이 POP으로 제작" 액션 + StorePopPage prefill effect 추가.
   - `prefillPop` 미전달 시 prefill effect early-return → 기존 builder 동작 무변경. 기존 자료함→제작(production state) 흐름 무영향.
@@ -58,7 +58,7 @@ POP 사본 관리(PharmacyPopPage/StorePopStaffPage) → "이 POP으로 제작"(
 
 1. (배포 후) 3서비스 prefill 동선 smoke.
 2. (선택, Phase 2) `WO-O4O-POP-IMPORT-TO-BUILDER-SOURCE-KIND-V1` — generate 에 `storePopIds` source kind 추가(DB 불요) → POP 사본만으로 zero-click PDF.
-3. (선택) KPA/GP/KCos StorePopStaffPage 3중 dup → store-ui-core 공통 컴포넌트 추출.
+3. (선택) KPA/KCos StorePopStaffPage 3중 dup → store-ui-core 공통 컴포넌트 추출.
 
 ---
 

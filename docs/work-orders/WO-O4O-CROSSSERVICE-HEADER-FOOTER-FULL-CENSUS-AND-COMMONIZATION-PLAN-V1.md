@@ -2,7 +2,7 @@
 
 ## 1. 목적
 
-KPA Society / K-Cosmetics / GlycoPharm / PharmacyHub / Neture 전반에 존재하는 **Header / Footer / 관련 Layout·Shell 구조를 전수조사**하고, 실제 공통화 가능한 범위를 확정한다.
+KPA Society / K-Cosmetics / PharmacyHub / Neture 전반에 존재하는 **Header / Footer / 관련 Layout·Shell 구조를 전수조사**하고, 실제 공통화 가능한 범위를 확정한다.
 
 이번 WO는 **조사·분류·공통화 계획 수립**이 목적이다.
 
@@ -42,7 +42,6 @@ origin/main 최신 상태를 기준으로 조사한다.
 ```text
 KPA Society
 K-Cosmetics
-GlycoPharm
 PharmacyHub
 Neture
 ```
@@ -510,7 +509,7 @@ UNCLASSIFIED
 
 ```text
 GROUP-H1
-KPA / KCos / GP
+KPA / KCos
 Store Header
 VIEW_DUPLICATED
 ```
@@ -657,7 +656,7 @@ git push origin <현재 브랜치>
 
 - `packages/ui/src/layout/GlobalHeader.tsx` 를 소비하는 파일이 **44개**다.
 - 5개 서비스 모두 자체 wrapper 를 갖고 있다:
-  `KpaGlobalHeader.tsx` · `KCosGlobalHeader.tsx` · `GlycoGlobalHeader.tsx` · `PharmacyHubGlobalHeader.tsx` · `NetureGlobalHeader.tsx`
+  `KpaGlobalHeader.tsx` · `KCosGlobalHeader.tsx` · `PharmacyHubGlobalHeader.tsx` · `NetureGlobalHeader.tsx`
 - 파일명만 보면 5중 복제(VIEW_DUPLICATED)로 보이지만, **얇은 config adapter 일 가능성이 높다.**
   직전 트랙에서 KPA `MyPageLayout` 이 정확히 같은 모양이었고, grep 만으로 "복제"라 판정했다면 오탐이었다.
   → **반드시 5개 파일을 열어서 내용으로 판정한다.** grep 결과로 분류하지 않는다.
@@ -670,7 +669,6 @@ git push origin <현재 브랜치>
 |---|---:|---:|---:|
 | KPA-Society | 5 | 2 | 8 |
 | K-Cosmetics | 1 | 1 | 4 |
-| GlycoPharm | 2 | 1 | 7 |
 | PharmacyHub | 3 | 1 | 5 |
 | Neture | 2 | **0** | 10 |
 

@@ -131,7 +131,7 @@
 | 기존 | 신규 후보 | 적용 위치(대표) | 즉시 변경 | 위험 |
 |---|---|---|---|---|
 | 매장 자체 제품 | 매장 경영활용 제품 | StoreHandledProductsPage(탭/버튼/부제/빈상태), StoreLocalProductsPage(제목/도움말/빈상태), StoreTabletDisplaysPage(버튼/빈상태), handled-products originLabel(server, KPA mount) | ✅ KPA 단독 가능 | 낮음 |
-| 매장 취급 상품 | 매장 경영활용 상품 | StoreLocalProductsManager(packages/store-ui-core, **GP/KCos 공유**) | ⚠️ **prop 주입 필요** | 중 |
+| 매장 취급 상품 | 매장 경영활용 상품 | StoreLocalProductsManager(packages/store-ui-core, **KCos 공유**) | ⚠️ **prop 주입 필요** | 중 |
 | 매장 자체 상품입니다 | (서비스별 결정) | TabletKioskPage(packages/tablet-kiosk-core, **공개 고객 화면**) | ⚠️ 신중 | 높음(외부 노출) |
 | 내 매장 제품 | 취급 중인 O4O 제품 | StoreProductsManagerPage(prop 주입, App.tsx) | ✅ KPA prop | 낮음 |
 | 매장 취급제품 | 유지 | storeMenuConfig KPA, StoreHandledProductsPage | — | — |

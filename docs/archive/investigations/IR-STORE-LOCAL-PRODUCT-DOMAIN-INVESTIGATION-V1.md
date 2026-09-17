@@ -42,13 +42,13 @@ O4O 플랫폼에 **StoreLocalProduct(매장 자체 상품) + Tablet 전용 Displ
 │                    ECOMMERCE CORE (Universal)                    │
 │  EcommerceOrder (OrderType: RETAIL)                              │
 │  └── EcommerceOrderItem (productId: UUID, productName: snapshot) │
-│      metadata.serviceKey = 'glycopharm' | 'cosmetics'           │
+│      metadata.serviceKey | 'cosmetics'                          │
 └─────────┬───────────────────────────────────┬───────────────────┘
           │                                   │
           ▼                                   ▼
 ┌─────────────────────┐          ┌─────────────────────────┐
-│ GLYCOPHARM DOMAIN   │          │ COSMETICS DOMAIN        │
-│ glycopharm_products │          │ cosmetics_products      │
+│            DOMAIN   │          │ COSMETICS DOMAIN        │
+│                     │          │ cosmetics_products      │
 │ ├─ pharmacy_id      │          │ ├─ brand_id, line_id    │
 │ ├─ status (4-enum)  │          │ ├─ status (4-enum)      │
 │ └─ stock_quantity   │          │ └─ variants (JSONB)     │
@@ -90,7 +90,6 @@ O4O 플랫폼에 **StoreLocalProduct(매장 자체 상품) + Tablet 전용 Displ
 
 | Entity | Table | Schema | Service | 핵심 역할 |
 |--------|-------|--------|---------|-----------|
-| GlycopharmProduct | `glycopharm_products` | public | Glycopharm | 혈당 관련 상품 |
 | CosmeticsProduct | `cosmetics_products` | cosmetics | Cosmetics | K-화장품 |
 | NetureProduct | `neture_products` | neture | Neture | 파트너 건강 상품 |
 | NetureSupplierProduct | `neture_supplier_products` | public | Neture | 공급자 카탈로그 (유통 정책 정의) |
@@ -102,17 +101,13 @@ O4O 플랫폼에 **StoreLocalProduct(매장 자체 상품) + Tablet 전용 Displ
 
 ### A-3. Checkout 연결 흐름도
 
-**GlycoPharm (7-step + Distribution Hardening):**
 ```
-POST /glycopharm/checkout
 ├─ 1. OrganizationStore 활성 확인
 ├─ 2. Supply contract 검증 (neture_supplier_requests)
 ├─ 3. B2C channel 승인 확인 (organization_channels)
-├─ 4. GlycopharmProduct 로드 + status='active' + stock 확인
 ├─ 5. Distribution policy 검증 (neture_supplier_products.distributionType)
 ├─ 6. Channel mapping 검증 (org_product_channels + org_product_listings)
 ├─ 7. Sales limit FOR UPDATE → EcommerceOrder 생성
-└─ FK chain: EcommerceOrderItem.productId → GlycopharmProduct.id
 ```
 
 **Cosmetics (Product Validation):**
@@ -130,7 +125,7 @@ POST /cosmetics/orders
 |-----------|----------|:------:|------|
 | **Product ID 네임스페이스** | `external_product_id`가 공급자 상품 ID를 가정 | **Caution** | 별도 테이블 사용 시 충돌 없음 |
 | **EcommerceOrderItem.productId** | 공급자 상품 UUID를 가정, FK 제약 없음 | **Caution** | Display Domain이면 Checkout 진입 자체가 불필요 |
-| **Checkout validation** | GlycopharmProduct / CosmeticsProduct 기준 검증 | **Safe** | Display Domain은 Checkout 경로 없음 |
+| **Checkout validation** | — | **Safe** | Display Domain은 Checkout 경로 없음 |
 | **Distribution policy** | NetureSupplierProduct 기반 | **Safe** | LocalProduct는 유통 정책 대상 아님 |
 | **Sales limit** | OrganizationProductChannel 기반 FOR UPDATE | **Safe** | Display Domain은 주문 없음 |
 | **Supply contract** | neture_supplier_requests 기반 | **Safe** | LocalProduct는 공급자 계약 불필요 |
@@ -168,7 +163,6 @@ POST /cosmetics/orders
 B2C와 TABLET 모두 동일한 4중 게이트를 사용한다:
 
 ```sql
-glycopharm_products p
   INNER JOIN organization_product_listings opl
     ON opl.external_product_id = p.id::text
     AND opl.organization_id = $1 AND opl.is_active = true
@@ -183,7 +177,7 @@ WHERE p.pharmacy_id = $1 AND p.status = 'active'
 
 | 게이트 | 테이블 | 조건 |
 |--------|--------|------|
-| Gate 1 | `glycopharm_products` | `status = 'active'` |
+| Gate 1 | — | `status = 'active'` |
 | Gate 2 | `organization_product_listings` | `is_active = true` |
 | Gate 3 | `organization_product_channels` | `is_active = true` |
 | Gate 4 | `organization_channels` | `channel_type = X AND status = 'APPROVED'` |
@@ -234,7 +228,7 @@ Signage는 **완전히 별도 데이터 모델** (CMS 기반 플레이리스트)
 
 | 항목 | TABLET (현재) | StoreLocalProduct + Tablet Display (제안) |
 |------|--------------|------------------------------------------|
-| 상품 소스 | GlycopharmProduct (공급자) | StoreLocalProduct (매장 자체) |
+| 상품 소스 | — | StoreLocalProduct (매장 자체) |
 | 게이트 | 4중 게이트 (공급자 인프라) | **별도 게이트 필요** (자체 상품 테이블) |
 | 요청 엔티티 | TabletServiceRequest | 동일 또는 확장 가능 |
 | Checkout | ❌ 없음 | ❌ 없음 (Display Domain) |
@@ -273,12 +267,11 @@ Signage는 **완전히 별도 데이터 모델** (CMS 기반 플레이리스트)
 | getChannelBreakdown() | `ecommerce_orders` | ❌ 미사용 | **없음** |
 | getRecentOrders() | `ecommerce_orders` | ❌ 미사용 | **없음** |
 | **getTopProducts()** | `ecommerce_order_items` | ✅ **GROUP BY productId** | **⚠️ HIGH** |
-| Hub Channel KPI | `org_product_channels` + `glycopharm_products` | ✅ LEFT JOIN | **없음** (NULL 필터) |
+| Hub Channel KPI | `org_product_channels` | ✅ LEFT JOIN | **없음** (NULL 필터) |
 
 ### C-3. 핵심 위험: getTopProducts() 오염
 
 ```sql
--- 현재 쿼리 (glycopharm-store-data.adapter.ts, cosmetics-store-summary.service.ts)
 SELECT
   oi."productId", oi."productName",
   SUM(oi.quantity)::int as quantity,
@@ -338,7 +331,7 @@ ORDER BY revenue DESC LIMIT $3
 | Request body org_id 주입 | ✅ 차단 | `validateBodyTenant()` |
 | JWT org_id 스푸핑 | ✅ 차단 | org_id를 DB에서 실시간 조회 |
 | SQL injection on org_id | ✅ 차단 | 파라미터화 쿼리 ($1, $2) |
-| 교차 서비스 역할 우회 | ✅ 차단 | `kpa:admin` ≠ `glycopharm:admin` |
+| 교차 서비스 역할 우회 | ✅ 차단 | — |
 | 스코프 없는 글로벌 쿼리 | ✅ 없음 | 전수 조사에서 미발견 |
 
 ### D-3. StoreLocalProduct 격리 가능성 평가
@@ -450,7 +443,6 @@ ORDER BY revenue DESC LIMIT $3
 ### Product Domain
 | 파일 | 역할 |
 |------|------|
-| `routes/glycopharm/entities/glycopharm-product.entity.ts` | GlycopharmProduct 정의 |
 | `routes/cosmetics/entities/cosmetics-product.entity.ts` | CosmeticsProduct 정의 |
 | `modules/neture/entities/NetureSupplierProduct.entity.ts` | 공급자 상품 + 유통 정책 |
 | `routes/kpa/entities/organization-product-listing.entity.ts` | 매장 리스팅 |
@@ -463,14 +455,11 @@ ORDER BY revenue DESC LIMIT $3
 |------|------|
 | `routes/kpa/entities/organization-channel.entity.ts` | 채널 타입/상태 정의 |
 | `routes/platform/unified-store-public.routes.ts` | B2C + TABLET 4중 게이트 쿼리 |
-| `routes/glycopharm/controllers/tablet.controller.ts` | Tablet 서비스 요청 |
-| `routes/glycopharm/entities/tablet-service-request.entity.ts` | TabletServiceRequest 엔티티 |
 | `routes/platform/store-policy.routes.ts` | 채널 활성화 |
 
 ### Checkout
 | 파일 | 역할 |
 |------|------|
-| `routes/glycopharm/controllers/checkout.controller.ts` | GlycoPharm 7-step validation |
 | `core/checkout/checkout-guard.service.ts` | Supply contract 검증 |
 | `routes/cosmetics/controllers/cosmetics-order.controller.ts` | Cosmetics 주문 |
 
@@ -478,7 +467,6 @@ ORDER BY revenue DESC LIMIT $3
 | 파일 | 역할 |
 |------|------|
 | `routes/kpa/controllers/store-hub.controller.ts` | Hub KPI 집계 |
-| `routes/glycopharm/services/glycopharm-store-data.adapter.ts` | GlycoPharm KPI 어댑터 |
 | `routes/cosmetics/services/cosmetics-store-summary.service.ts` | Cosmetics KPI 어댑터 |
 | `packages/store-core/src/insights.engine.ts` | Insight Rules 엔진 |
 

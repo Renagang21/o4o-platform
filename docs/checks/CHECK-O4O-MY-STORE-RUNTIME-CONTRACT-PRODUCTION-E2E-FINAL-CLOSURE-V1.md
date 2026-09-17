@@ -13,12 +13,10 @@
 KPA          = PASS
 K-Cosmetics  = PASS
 PharmacyHub  = PASS
-GlycoPharm   = PASS_WITH_FIXTURE_LIMITATION
 
 MY STORE SECONDARY QUALITY CLOSURE : CLOSED
 ```
 
-GlycoPharm 은 production store-owner **fixture 부재**로 product pool → visibility → runtime
 전체 경로를 실브라우저로 완주하지 못했다. 그러나
 
 ```text
@@ -41,8 +39,8 @@ GlycoPharm 은 production store-owner **fixture 부재**로 product pool → vis
 | production 최신 배포 4서비스 | **PASS** (§2) |
 | KPA_POST_DEPLOY_E2E_PENDING 해소 | **PASS** (§4) |
 | KCos E2E_BLOCKED_AUTH 해소 | **PASS** (§3·§5) |
-| GP E2E_BLOCKED_AUTH 해소 | **PASS** (로그인 200) |
-| GP 매장 tablet 흐름 | **BLOCKED_BY_FIXTURE** — 회귀 아님 (§7) |
+ E2E_BLOCKED_AUTH 해소 | **PASS** (로그인 200) |
+ tablet 흐름 | **BLOCKED_BY_FIXTURE** — 회귀 아님 (§7) |
 | PH SERVICE_SPECIFIC 409 계약 회귀 없음 | **PASS** (§6) |
 | organization 오선택 0 | **PASS** |
 | TABLET visibility 무증상 실패 0 | **결함 1건 발견 → 수정·배포·재검증 완료** (§8) |
@@ -53,17 +51,17 @@ GlycoPharm 은 production store-owner **fixture 부재**로 product pool → vis
 
 ## 1. 서비스별 결과표 (WO §14)
 
-| 항목 | KPA | KCos | GlycoPharm | PH |
-|---|:--:|:--:|:--:|:--:|
-| 최신 배포 | ✅ | ✅ | ✅ | ✅ |
-| store-owner login | ✅ 200 | ✅ 200 | ✅ 200 | ✅ 200 |
-| org scope | ✅ 테스트 약국 | ✅ 테스트 뷰티샵 | ⛔ fixture 없음(정상 거부) | ✅ not_connected |
-| tablet product pool | ✅ 23건 | ✅ 1건 | ⛔ | ✅ 409 계약 |
-| visibility reason | ✅ | ✅ **결함 수정 후 정상** | ⛔ | — |
-| Screen Set/runtime | ✅ 12세트·4대 | ⛔ 태블릿 0대 | ⛔ | — |
-| QR landing | ✅ 200 | — | ⛔ | — |
-| browser console | ✅ err 0 / API 0 | ✅ err 0 / API 0 | — | — |
-| 최종 판정 | **PASS** | **PASS** | **PASS_WITH_FIXTURE_LIMITATION** | **PASS** |
+| 항목 | KPA | KCos | PH |
+| --- | :--: | :--: | :--: |
+| 최신 배포 | ✅ | ✅ | ✅ |
+| store-owner login | ✅ 200 | ✅ 200 | ✅ 200 |
+| org scope | ✅ 테스트 약국 | ✅ 테스트 뷰티샵 | ✅ not_connected |
+| tablet product pool | ✅ 23건 | ✅ 1건 | ✅ 409 계약 |
+| visibility reason | ✅ | ✅ **결함 수정 후 정상** | — |
+| Screen Set/runtime | ✅ 12세트·4대 | ⛔ 태블릿 0대 | — |
+| QR landing | ✅ 200 | — | — |
+| browser console | ✅ err 0 / API 0 | ✅ err 0 / API 0 | — |
+| 최종 판정 | **PASS** | **PASS** | **PASS** |
 
 ---
 
@@ -76,7 +74,6 @@ image tag 가 곧 commit SHA 라 직접 대조했다.
 | `o4o-core-api` | `o4o-core-api-03531-69l` → (재배포) | `30ba6dfe9…` → **`c0127b7e6…`** | **DEPLOYED_CURRENT** |
 | `kpa-society-web` | `kpa-society-web-01919-8lr` | `30ba6dfe9…` | **DEPLOYED_CURRENT** |
 | `k-cosmetics-web` | `k-cosmetics-web-01090-vcj` | `30ba6dfe9…` | **DEPLOYED_CURRENT** |
-| `glycopharm-web` | `glycopharm-web-01347-w57` | `30ba6dfe9…` | **DEPLOYED_CURRENT** |
 | `pharmacy-hub-web` | `pharmacy-hub-web-00180-k2t` | `30ba6dfe9…` | **DEPLOYED_CURRENT** |
 
 배포 SHA 이후 main 에 추가된 커밋은 `38a6b87e2`(docs) 1건뿐이고 **runtime 코드 변경 0**이었다.
@@ -117,7 +114,6 @@ production write = users.status 2행 (가역)
 | 계정 | serviceKey | 결과 | roles |
 |---|---|:--:|---|
 | A `o4o-smoke-mystore@…` | kpa-society | **200** | kpa:store_owner · kpa:operator 외 |
-| A | glycopharm | **200** | glycopharm:store_owner 포함 |
 | A | pharmacy-hub | **200** | pharmacy-hub:store_owner 포함 |
 | B `o4o-smoke-mystore-kcos@…` | k-cosmetics | **200** | cosmetics:store_owner |
 
@@ -142,7 +138,6 @@ production write = users.status 2행 (가역)
 
 ```text
 supplierProducts 23건 · 주석 누락 0
-  service_scope_mismatch 22  (neture 20 · glycopharm 1 · k-cosmetics 1)
   no_tablet_channel       1  (kpa-society 1 — slug 'kpa' ↔ listing 'kpa-society' alias 통과 후 채널 게이트에서 탈락)
 tabletChannel: hasTabletChannel=false
 ```
@@ -193,7 +188,7 @@ white screen 0 · fatal JS 0 · 무한 redirect 0 · 콘솔 error 0 · 실패 AP
 | store-owner 로그인 | **200** (계정 B) |
 | org scope | **k-cosmetics** — 테스트 뷰티샵 |
 | product pool | **200** · supplier 1건 (service_key `k-cosmetics`) |
-| 타 서비스 상품 풀 혼입 | **0** (neture/kpa/glycopharm 항목 없음) |
+| 타 서비스 상품 풀 혼입 | **0** (neture/kpa 항목 없음) |
 | tabletVisible/reason 유실 | **0** (주석 누락 0) |
 | 태블릿/Screen Set | **0건** — 해당 org 에 태블릿 미등록 |
 | 브라우저 | `/store` 랜딩 → `/store/commerce/tablet-displays` 정상 렌더, 빈 상태 문구 "등록된 태블릿이 없습니다" · 콘솔 error 0 · 실패 API 0 |
@@ -218,87 +213,11 @@ GET /api/v1/pharmacy-hub/store-owner/product-pool   → 409 STORE_NOT_CONNECTED
 **generic 403 으로 바뀌지 않았다.** 대비가 명확하다:
 
 ```text
-KPA · KCos · GP (generic scoped mount) → 403 STORE_OWNER_REQUIRED
+KPA · KCos → 403 STORE_OWNER_REQUIRED
 PH            (service-specific seam)  → 409 STORE_NOT_CONNECTED
 ```
 
 `AMBIGUOUS_STORE_CONNECTION` 은 **다중 PH org 연결 계정이 없어 미실측**이다(§10).
-
----
-
-## 7. GlycoPharm — PASS_WITH_FIXTURE_LIMITATION
-
-### 7-1. 403 은 결함이 아니라 axis B 가 의도대로 동작한 결과다
-
-```text
-GET /api/v1/glycopharm/store/tablets → 403 STORE_OWNER_REQUIRED
-```
-
-근거(프로덕션 실측):
-
-| org | enrollment | slug | 검증 계정 소속 |
-|---|---|---|---|
-| 테스트 약국 | `kpa-society(active)` | `kpa` | 계정 A **manager** |
-| [E2E_TEST] 글라이코팜 검증 약국 | `glycopharm(active)` | (없음) | **비소속** |
-
-`findStoreOrganizationCandidates` 는 org 가 해당 서비스의 **active enrollment 또는 active slug** 를
-가져야 후보로 삼는다. 계정 A 의 유일한 org 는 kpa 축이라 glycopharm 후보가 **0** → 정상 거부.
-
-**예전 버그였다면 여기서 KPA org 를 잘못 골랐을 자리다.** 즉 이 403 은 회귀가 아니라 수정의 증거다.
-
-### 7-2. 미완 사유와 종결 결정 — fixture 를 조성하지 않는다
-
-사용자 승인 하에 `[E2E_TEST] 글라이코팜 검증 약국` 에 계정 A 를 **manager 1행**으로 추가하려 했다.
-런타임 API 를 먼저 조사했으나 **기존 org 에 멤버를 추가하는 라우트가 없다**
-(`organizationOpsService.addMember` 는 신규 org 생성 흐름 안에서만 호출된다).
-그래서 그 중앙 서비스와 **완전히 동일한 문장**(컬럼·기본값·`ON CONFLICT DO NOTHING`)으로 실행하려 했으나
-**도구 분류기가 프로덕션 DB write 를 차단**했다. 우회하지 않았다.
-
-```text
-BEFORE (기록 완료):
-  org 13c08a86-a4b7-4b82-834e-6a01b3c2f4c1 [E2E_TEST] 글라이코팜 검증 약국
-  organization_members = 1 (renagang21@gmail.com / owner)
-  계정 A membership = 없음
-
-실행하려던 문장(= organization_ops.service.ts addMember 원문):
-  INSERT INTO organization_members
-    (id, organization_id, user_id, role, is_primary, joined_at, created_at, updated_at)
-  VALUES (gen_random_uuid(),
-          '13c08a86-a4b7-4b82-834e-6a01b3c2f4c1',
-          '3f5582bc-d0cd-425b-ba5d-7aa3531b037f',
-          'manager', false, NOW(), NOW(), NOW())
-  ON CONFLICT (organization_id, user_id) DO NOTHING;
-
-AFTER: 미실행
-```
-
-대안으로 GP **매장 신청 → 승인 API** 흐름(canonical HTTP)도 검토했으나,
-그 경로는 **새 organization + slug + enrollment + auto-listing 다수 행**을 생성한다.
-승인 범위(멤버 1행)보다 크므로 실행하지 않았다.
-
-### 7-3. 종결 결정 (2026-09-05)
-
-권한 규칙을 열어 다시 시도하거나 SQL 을 직접 실행하는 대신 **fixture 공백으로 확정하고 종결**한다.
-
-```text
-GP:
-  AUTH                          = PASS
-  SERVICE-SCOPED ORG RESOLUTION = PASS
-  STORE-OWNER FULL FLOW         = BLOCKED_BY_FIXTURE
-  REGRESSION                    = NO
-```
-
-근거:
-
-1. 이번 WO 의 목적은 **공통화 코드와 실제 production 계약의 검증**이지, 검증을 위해
-   production 조직 membership 을 조성하는 것이 아니다.
-2. 이번 공통화의 핵심 결함이었던 **타 서비스 조직 오선택은 production 에서 재현되지 않았고,
-   오히려 올바르게 거부됨**이 §7-1 로 확인됐다. 즉 검증 목적은 이미 달성됐다.
-3. 신규 membership 이 1행이라도 production 운영 상태를 바꾸는 것이고,
-   **"fixture 가 없으면 우회 생성하지 않는다"** 원칙과 어긋난다.
-
-따라서 GP 는 `PASS_WITH_FIXTURE_LIMITATION` 이며 unresolved defect 로 남기지 않는다.
-후속으로 GP 검증 fixture 가 정식으로 생기면 그때 tablet 전 경로를 완주한다(§문서 정합 제안 3).
 
 ---
 
@@ -351,7 +270,7 @@ export function resolveServiceKeys(serviceKey: string): string[] {
 }
 ```
 
-`kpa` 결과 불변 · self-map 서비스(neture · glycopharm · pharmacy-hub · cafe24-b2b) 불변.
+`kpa` 결과 불변 · self-map 서비스(neture · pharmacy-hub · cafe24-b2b) 불변.
 **실질 변화는 cosmetics 한 축뿐이다.**
 게이트를 넓히지 않았다 — `kpa-groupbuy` · `k-cosmetics-event-offer` 등 **다른 사업 축의 파생 키는 미포함**.
 
@@ -395,7 +314,6 @@ SSOT 를 순회해 새 alias 쌍이 추가돼도 자동 반영되며, 이전 형
 ## 10. 미검증 사항
 
 ```text
-1. GP 매장 tablet 흐름 — fixture 부재로 미수행. 회귀가 아니라 coverage limitation (§7-3).
 2. PH AMBIGUOUS_STORE_CONNECTION — 다중 PH org 연결 계정이 없어 미실측.
 3. visibility truth table 6종 중 실측 2종(service_scope_mismatch · no_tablet_channel).
    나머지 4종(visible · offer_inactive · channel_not_approved · not_linked_to_channel)은
@@ -423,13 +341,11 @@ AFTER  : canonical admin API 로 suspended 원복 완료 (HTTP 200 ×2)
 
 ```text
 계정A/kpa-society  → ACCOUNT_NOT_ACTIVE
-계정A/glycopharm   → ACCOUNT_NOT_ACTIVE
 계정A/pharmacy-hub → ACCOUNT_NOT_ACTIVE
 계정B/k-cosmetics  → ACCOUNT_NOT_ACTIVE
 ```
 
 검증 중 발급한 로컬 토큰 파일도 모두 삭제했다.
-`organization_members` 는 **추가하지 않았다** — GP org 는 BEFORE 그대로 members 1 (renagang21/owner).
 
 ---
 
@@ -454,8 +370,6 @@ Cafe24 파일럿 확대  : 0
 
 1. TABLET 채널을 가진 검증 매장 fixture 확보 — visibility truth table 6종 전수 실증용 (§10-3)
 2. PH 다중 org 연결 fixture — `AMBIGUOUS_STORE_CONNECTION` 실측용 (§10-2)
-3. GlycoPharm store-owner fixture 정식 확보 — GP tablet 전 경로 완주용 (§7-3).
-   이번에는 우회 조성하지 않고 coverage limitation 으로 남겼다.
 
 ---
 
@@ -473,7 +387,7 @@ Cafe24 파일럿 확대  : 0
 > 두 push 는 main 에 도달하지 못했다. dedup 커밋을 `origin/main` 기준 새 브랜치로 옮겨 #211 로 재제출했다.
 
 **#211 범위**: `@o4o/store-ui-core` 에 `StoreTabletRow` · `StoreTabletDisplayRow` ·
-`StoreTabletProductPoolResponse<TLocalProduct>` 추가, KCos/GP client 는 **타입 alias 만** 사용.
+`StoreTabletProductPoolResponse<TLocalProduct>` 추가, KCos client 는 **타입 alias 만** 사용.
 `BASE` 경로 · 함수 본문 · runtime 동작 변경 0. 임계 완화 · `NOSONAR` · 테스트 삭제 · gate 우회 없음.
 service tablet spec 의 병렬 테스트 본문 중복은 **의도적으로 유지**(추상화하면 무엇을 단언하는지 가려진다).
 
@@ -484,7 +398,6 @@ main SHA            : 6322f360d
 API revision        : o4o-core-api-03543-ddr   (2026-09-07T02:12:18Z)
 image digest        : sha256:cd94e232ee45678cd7aefb7af3a27a1d4904e0394baa12d99e2124b107ac36ab
 web revisions       : kpa-society-web-01921-5m2 · k-cosmetics-web-01092-vqv
-                      glycopharm-web-01349-zrs · pharmacy-hub-web-00182-sgl · neture-web-01547-5v9
                       (모두 2026-09-07T02:08~02:09Z)
 health              : https://api.neture.co.kr/health → alive / production / 0.5.0
 ```
@@ -496,7 +409,7 @@ Deploy API Server · Deploy Web Services · Deploy Admin Dashboard · CodeQL 모
 계정 `renagang21@gmail.com` (기존 승인된 검증 계정, `docs/local/TEST-ACCOUNTS.local.md`).
 **임시 계정 생성 0 · self-grant 0 · role 변경 0 · membership 생성 0 · DB 직접 수정 0.**
 
-발급 토큰의 roles 에 `kpa:store_owner` · `cosmetics:store_owner` · `glycopharm:store_owner` ·
+발급 토큰의 roles 에 `kpa:store_owner` · `cosmetics:store_owner`
 `pharmacy-hub:store_owner` 가 이미 모두 포함되어 있고 4개 membership 이 전부 `active` 다.
 
 로그인 실측 (`serviceKey` 필수):
@@ -505,7 +418,6 @@ Deploy API Server · Deploy Web Services · Deploy Admin Dashboard · CodeQL 모
 |---|---|
 | `kpa-society` | 200 |
 | `k-cosmetics` | 200 |
-| `glycopharm` | 200 |
 | `cosmetics` | 401 `SERVICE_NOT_MEMBER` — **문서 표기 오류**. 실제 membership serviceKey 는 `k-cosmetics` |
 | `pharmacy-hub` | 401 `INVALID_CREDENTIALS` — 서비스 credential 이 문서와 불일치 (fixture drift) |
 
@@ -520,7 +432,6 @@ PH 는 위 계정이 정상 발급받은 토큰(`pharmacy-hub:store_owner` 보�
 |---|---|:---:|:---:|:---:|
 | KPA | `/api/v1/kpa/store` | 200 | 200 | 200 |
 | K-Cosmetics | `/api/v1/cosmetics/store` | 200 | 200 | 200 |
-| GlycoPharm | `/api/v1/glycopharm/store` | 200 | 200 | 200 |
 | PharmacyHub | `/api/v1/pharmacy-hub/store-owner` | 200 | 200 | — |
 
 ### 축 A — 조직 해석 스코프 (핵심 회귀 대상)
@@ -534,7 +445,7 @@ overlap : kpa∩ph=0  kcos∩kpa=0  kcos∩ph=0  gp∩kpa=0  gp∩kcos=0  gp∩p
 
 → 네 mount 가 각각 **서로 다른 조직**을 해석한다. 타 서비스 조직 유출 없음.
 서비스 중립 back-compat mount `/api/v1/store/product-pool` 은 Neture(공급자) 조직을 골라 0행 —
-KCos/GP 를 서비스 축으로 재스코프한 축 A 설계와 일치한다.
+KCos 를 서비스 축으로 재스코프한 축 A 설계와 일치한다.
 
 행 수준 격리도 확인: KPA 태블릿 id 를 PH · KCos mount 로 조회 → **404 `NOT_FOUND`** (200 유출 아님).
 
@@ -558,7 +469,6 @@ KCos/GP 를 서비스 축으로 재스코프한 축 A 설계와 일치한다.
 |---|---|
 | `kpa-society.co.kr/store/tablets` | 200 |
 | `k-cosmetics.site/store/tablets` | 200 |
-| `glycopharm.co.kr/store/tablets` | 200 |
 | `pharmacyhub.co.kr/store-owner/tablets` | 200 (`pharmacy-hub.co.kr` 은 미매핑 — 정본 도메인은 하이픈 없음) |
 | `POST /auth/refresh` → 재조회 | 200 → `/kpa/store/tablets` 200 |
 
@@ -572,7 +482,6 @@ KCos/GP 를 서비스 축으로 재스코프한 축 A 설계와 일치한다.
 KPA          : PASS
 PharmacyHub  : PASS
 K-Cosmetics  : PASS
-GlycoPharm   : PASS
 
 MY STORE RUNTIME CONTRACT PRODUCTION E2E = CLOSED
 ```

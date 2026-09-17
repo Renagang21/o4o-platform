@@ -139,7 +139,7 @@ ARCHIVED_SCREEN_SET_QR_CONDITION  -- 보관 세트 종속 QR (M-1 에서 소비 
 
 | 항목 | 결과 |
 |---|---|
-| `태블렛` → `태블릿` | 18개 파일 173곳 치환(KPA + 공유 패키지 + Neture 공급자). GlycoPharm·K-Cosmetics 미접촉(WO 제외). 이전 WO 의 "'태블렛' 철자 통일" 주석도 폐기 명시. |
+| `태블렛` → `태블릿` | 18개 파일 173곳 치환(KPA + 공유 패키지 + Neture 공급자). K-Cosmetics 미접촉(WO 제외). 이전 WO 의 "'태블렛' 철자 통일" 주석도 폐기 명시. |
 | 홈 활성 QR KPI | 링크 없는 유일한 카드 → `/store/marketing/qr` 링크 카드로 변경(숫자 ↔ 목록 대조 가능). |
 | 홈 실행 흐름 QR 진입 | `매장에 적용하기` Step 3 에 `QR 코드` 진입 추가(사이니지·태블릿·판매 설정과 나란히). |
 | dead `HubSubNav.tsx` | 삭제. 삭제 전 전 저장소 참조 0 확인(자기 정의 + `packages/ui` 주석 언급뿐). |

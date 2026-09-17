@@ -12,7 +12,7 @@
  *   canonical price 재확정 → quantity 검증 → 공급자별 grouping →
  *   `checkoutService.createOrder()` → 성공 그룹 cart 정리
  *
- *   이 전부가 서비스와 무관하다. Neture / Pharmacy-Hub / 승인축 서비스(GlycoPharm 등)에서
+ *   이 전부가 서비스와 무관하다. Neture / Pharmacy-Hub / 승인축 서비스에서
  *   실제로 다른 것은 **공급 노출 정책 하나**이며 그것만 `OfferExposureStrategy` 로 분리한다.
  *
  * ─────────────────────────────────────────────────────────────────────────────

@@ -14,7 +14,7 @@
  *   config.renderActivitySection  — KPA: ForumActivitySection
  *   config.renderSearchSection    — KPA: ForumSearchBar
  *   config.renderSearchResults    — KPA: ForumSearchResults
- *   config.renderWritePrompt      — KPA/Glyco: 각자 auth-aware CTA
+ *   config.renderWritePrompt      — KPA: 각자 auth-aware CTA
  */
 
 import { useState, useEffect, useCallback } from 'react';

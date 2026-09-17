@@ -12,7 +12,7 @@
  * 역할 배열에서 해당 서비스의 admin 또는 operator 여부를 판정한다.
  *
  * @param roles    user.roles 배열
- * @param prefix   서비스 역할 접두어 (예: 'neture', 'glycopharm', 'kpa', 'k-cosmetics')
+ * @param prefix   서비스 역할 접두어 (예: 'neture', 'kpa', 'k-cosmetics')
  */
 export function isAdminOrOperator(roles: string[], prefix: string): boolean {
   return roles.some(

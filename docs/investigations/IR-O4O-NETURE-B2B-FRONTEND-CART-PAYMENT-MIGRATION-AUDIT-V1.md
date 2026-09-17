@@ -43,7 +43,6 @@
 P2d-1. WO-O4O-NETURE-B2B-PAYMENT-WIDGET-UI-V1
   - web-neture Toss 결제 위젯 + 결제 성공/실패 페이지 신설.
   - /neture/b2b/payments/order/:id (prepare 정보) → Toss 위젯 → confirm 호출 → 결과 처리.
-  - KPA/Glyco/KCos 결제 UI 패턴 재사용 가능 여부 조사(있으면 이식, 없으면 신규).
   - 이 단계는 아직 cart 와 연결하지 않거나, 테스트 주문으로만 검증.
 
 P2d-2. WO-O4O-NETURE-B2B-CANONICAL-CART-CHECKOUT-PHASE1-V1 (재정의)
@@ -63,7 +62,6 @@ P2e. legacy /neture/seller/orders retirement (P2d-2 후)
 
 ## 6. P2d-1 착수 전 확인 (다음 조사 항목)
 ```
-- KPA/Glyco/KCos 에 재사용 가능한 Toss 결제 위젯/페이지 컴포넌트가 있는가? (web-kpa-society 등)
 - web-neture 의 결제 성공/실패 redirect(successUrl/failUrl) 라우트 설계.
 - 결제 위젯 clientKey 환경변수/테스트 모드 처리.
 ```
@@ -76,7 +74,7 @@ backend P2a/P2b/P2c 무변경. legacy /neture/seller/orders 유지.
 ```
 
 ## 8. 후속 WO
-1. `WO-O4O-NETURE-B2B-PAYMENT-WIDGET-UI-V1` (P2d-1) — **다음 후보**(결제 위젯 선행). 단, KPA/Glyco/KCos 결제 UI 재사용성 조사 선행 권장.
+1. `WO-O4O-NETURE-B2B-PAYMENT-WIDGET-UI-V1` (P2d-1) — **다음 후보**(결제 위젯 선행).
 2. `WO-O4O-NETURE-B2B-CANONICAL-CART-CHECKOUT-PHASE1-V1` (P2d-2, 재정의) — cart cutover + 결제 연결 + positive 실측.
 3. `WO-O4O-NETURE-B2B-LEGACY-SELLER-ORDER-ROUTE-RETIREMENT-V1` (P2e).
 

@@ -4,13 +4,13 @@
 > **WO:** WO-O4O-NETURE-DIGITAL-SIGNAGE-REMOVAL-V1
 > **선행 IR:** IR-O4O-DIGITAL-SIGNAGE-CROSSSURFACE-UIUX-AUDIT-V1
 > **작성:** 2026-06-13
-> **판정:** **PASS** (Neture signage frontend surface 제거, KPA/GP/KCos·shared core·DB 무변경)
+> **판정:** **PASS** (Neture signage frontend surface 제거, KPA/KCos·shared core·DB 무변경)
 
 ---
 
 ## 1. 작업 개요
 
-IR 조사 중 "Neture 디지털사이니지 없음" 전제가 틀린 것으로 확인됨 → 사용자 결정에 따라 **Neture frontend signage surface(route/menu/page/API client/진입점)를 제거**했다. KPA/GP/KCos signage, shared signage core/backend, DB 데이터는 **변경하지 않았다**.
+IR 조사 중 "Neture 디지털사이니지 없음" 전제가 틀린 것으로 확인됨 → 사용자 결정에 따라 **Neture frontend signage surface(route/menu/page/API client/진입점)를 제거**했다. KPA/KCos signage, shared signage core/backend, DB 데이터는 **변경하지 않았다**.
 
 ## 2. 사전 git 상태
 
@@ -78,7 +78,7 @@ IR 조사 중 "Neture 디지털사이니지 없음" 전제가 틀린 것으로 �
 
 ### 7.1 shared signage core / backend / DB (WO 금지 — 무변경)
 - `packages/` / `@o4o-apps/digital-signage-core` (백엔드 entities/services/controllers)
-- backend signage API (`/api/signage/:serviceKey/*`) — KPA/GP/KCos 사용 중
+- backend signage API (`/api/signage:serviceKey/*`) — KPA/KCos 사용 중
 - `@o4o/shared-space-ui` 의 SignageManagerTemplate/SignageHubTemplate/SignageIcon
 - `@o4o/types/signage`
 - signage DB 테이블·migration — **무변경, DB 데이터 미삭제**
@@ -88,7 +88,7 @@ IR 조사 중 "Neture 디지털사이니지 없음" 전제가 틀린 것으로 �
 |------|------|----------|
 | pages/SupplierLandingPage.tsx:43 | "…POP 디자인, Digital Signage를 매장에 제공합니다." | 비클릭 마케팅/개념 prose. O4O 모델상 공급자 원천자료가 매장 signage 가 되는 개념 설명 |
 | pages/guide/GuideHomePage.tsx:152 | "POP · 블로그 · 디지털사이니지 · 타블렛 … 서비스별 제공 범위가 다르며" | 매장 실행 도구 개념 설명(명시적으로 "서비스별 상이"). 진입 route 아님 |
-| pages/guide/* , manual/concepts | O4O 사업 개념 내 '사이니지' 언급 | 플랫폼 개념 교육 텍스트(KPA/GP/KCos 에 실제 존재) |
+| pages/guide/* , manual/concepts | O4O 사업 개념 내 '사이니지' 언급 | 플랫폼 개념 교육 텍스트(KPA/KCos 에 실제 존재) |
 | pages/dashboard/MyContentPage.tsx:50 | `EXPOSURE_BADGE_CONFIG.signage` 배지 | 데이터 노출 타입 표시 fallback map(클릭 진입 아님) |
 | lib/api/dashboardCopy.ts:12 | `DashboardAssetSourceType` 의 `'signage_media'|'signage_playlist'` | 타입 union 플러밍(백엔드 응답 호환). 제거 시 타입 깨짐 위험 |
 | lib/apiClient.ts:26 | 주석 예시 `/api/signage` | 문서 주석 |
@@ -96,9 +96,9 @@ IR 조사 중 "Neture 디지털사이니지 없음" 전제가 틀린 것으로 �
 
 > 위 항목은 **진입점/route/CTA 가 아니므로** WO 범위("진입점 제거 + 문서/문구 미수정")에 따라 보존. 필요 시 별도 copy-cleanup WO 후보.
 
-## 8. KPA/GP/KCos 미수정 확인
+## 8. KPA/KCos 미수정 확인
 
-✅ git diff 상 변경 파일은 **전부 `services/web-neture/`** 한정. KPA-society / glycopharm / k-cosmetics / packages signage 파일 **diff 0**. (k-cosmetics LMS 2파일은 다른 세션 WIP — 본 커밋 미포함.)
+✅ git diff 상 변경 파일은 **전부 `services/web-neture/`** 한정. KPA-society / k-cosmetics / packages signage 파일 **diff 0**. (k-cosmetics LMS 2파일은 다른 세션 WIP — 본 커밋 미포함.)
 
 ## 9. DB / migration 미변경 확인
 
@@ -109,7 +109,7 @@ IR 조사 중 "Neture 디지털사이니지 없음" 전제가 틀린 것으로 �
 | 패키지 | 결과 |
 |--------|------|
 | web-neture (`npx tsc --noEmit`) | ✅ **PASS (exit 0, 0 error)** |
-| KPA/GP/KCos | 미수정(파일 diff 0) → 영향 없음. signage 파일 미변경 정적 확인 |
+| KPA/KCos | 미수정(파일 diff 0) → 영향 없음. signage 파일 미변경 정적 확인 |
 
 ## 11. grep 검증
 
@@ -140,7 +140,7 @@ IR 조사 중 "Neture 디지털사이니지 없음" 전제가 틀린 것으로 �
 | 삭제 page | 9개 |
 | 삭제 API client | 2개 (signageV2, assetSnapshot) |
 | 남긴 shared core/backend/DB | 전부 무변경 |
-| KPA/GP/KCos | 미수정(diff 0) |
+| KPA/KCos | 미수정(diff 0) |
 | DB/migration | 무변경(데이터 미삭제) |
 | TypeScript | web-neture PASS (0 error) |
 | browser smoke | tsc+grep 정적 갈음(라이브 보류) |

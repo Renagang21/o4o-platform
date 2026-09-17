@@ -87,7 +87,6 @@ config: { theme, layout, navigation, pages, variables }
 
 | code | name | service_type | status |
 |---|---|---|---|
-| `glycopharm` | GlycoPharm | tool | active |
 | `kpa-society` | KPA Society | community | active |
 | `k-cosmetics` | K-Cosmetics | extension | active |
 | `neture` | Neture | community | active |

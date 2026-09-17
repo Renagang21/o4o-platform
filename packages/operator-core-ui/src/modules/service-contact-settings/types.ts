@@ -3,7 +3,7 @@
  *
  * WO-O4O-SERVICE-CONTACT-SETTINGS-ADMIN-V1
  *
- * GP/KCos 공통 "문의 설정" Admin UI 의 데이터/어댑터 타입.
+ * KCos 공통 "문의 설정" Admin UI 의 데이터/어댑터 타입.
  * 서버 endpoint 가 service-scoped + 인증 필요 → 실제 HTTP 호출은 service 측(authClient)에서
  * 구현해 `ContactSettingsApi` 어댑터로 주입한다.
  *
@@ -60,7 +60,7 @@ export interface ContactSettingsApi {
 }
 
 export interface ServiceContactSettingsPageProps {
-  /** 대상 service canonical key (예: 'glycopharm'). */
+  /** 대상 service canonical key (예: 'k-cosmetics'). */
   serviceKey: string;
   /** service 측 HTTP 어댑터. */
   api: ContactSettingsApi;

@@ -3,7 +3,7 @@
  *
  * WO-O4O-ADMIN-UX-CORE-ADMIN-BLOCK-EXTRACTION-V1
  *
- * GlycoPharm / K-Cosmetics admin dashboard 에 각각 로컬로 중복 구현돼 있던
+ * K-Cosmetics admin dashboard 에 각각 로컬로 중복 구현돼 있던
  * `AdminBlock` 컴포넌트를 공통 추출. AdminDashboardLayout 4-Block 외부에서
  * 서비스별 사업 진입점(재무/거버넌스/네트워크 등) 섹션을 렌더링한다.
  *

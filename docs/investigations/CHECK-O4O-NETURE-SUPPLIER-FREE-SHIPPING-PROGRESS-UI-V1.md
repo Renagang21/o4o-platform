@@ -12,11 +12,10 @@
 
 ## 0. 범위 결정 (구조 검증 결과)
 이벤트오퍼 buyer 화면 구조가 **균일하지 않음**을 실측:
-- Glyco `HubEventOffersPage` ≈ KCos `HubEventOffersPage` (쌍둥이, 41줄 차이=주석+API명)
 - **KPA** = 전용 `EventOfferDetailPage`(301) + `KpaEventOfferPage`(938) — 다른 구조
 - web-neture `StoreCartPage` = B2B cart — 또 다른 구조
 
-→ 사용자 결정: **이번 V1은 KPA 단독**. (다른 세션 공통화 진행 중 → @o4o 공유 패키지 무수정, Glyco/KCos/neture-cart 는 별도 WO.)
+→ 사용자 결정: **이번 V1은 KPA 단독**.
 
 ---
 
@@ -60,7 +59,6 @@ subtotal < threshold        → "무료배송까지 N원 남았습니다." (보�
 ---
 
 ## 4. 제외 / 후속
-- 제외: GlycoPharm/K-Cosmetics 화면, web-neture cart, 배송비 계산/주문/원장/정산/송장 로직.
-- 후속: Glyco/KCos(동일 구조 쌍) + web-neture cart — 공통화 세션 정리 후 별도 WO(가능하면 `@o4o/ui` 공통 컴포넌트로 일원화).
+- 제외: K-Cosmetics 화면, web-neture cart, 배송비 계산/주문/원장/정산/송장 로직.
 
 *KPA 단독 표시 작업 기록. 계산/구조 무변경.*

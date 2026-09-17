@@ -18,13 +18,13 @@
 5. 원문 IP를 공개·Admin 화면·로그·문서에 노출 금지
 6. additive/safe migration
 7. `ipAddress` 컬럼 drop 안 함(후속 WO)
-8. Neture만 대상 (KPA/GP/KCos 미수정)
+8. Neture만 대상 (KPA/KCos 미수정)
 
 ## 3. 작업 대상
 `apps/api-server/**`(migration), CHECK 문서. (조사 결과 **frontend 미노출** → `services/web-neture` 수정 없음.)
 
 ## 4. 제외
-row 삭제 / `ipAddress` 컬럼 drop / ContactInquiry 이관 / 공개 form 수정 / 문의 관리 UI 교체 / KPA·GP·KCos 수정 / email·autoreply 로직 / 법정정보·약관·푸터 / 문의 내용 마스킹.
+row 삭제 / `ipAddress` 컬럼 drop / ContactInquiry 이관 / 공개 form 수정 / 문의 관리 UI 교체 / KPA·KCos 수정 / email·autoreply 로직 / 법정정보·약관·푸터 / 문의 내용 마스킹.
 
 ## 5. 사전 조사 결과
 - 컬럼: `neture_contact_messages."ipAddress"` VARCHAR(50) NULL, `"ipHash"` VARCHAR(64) NULL (camelCase 컨벤션).
@@ -68,16 +68,16 @@ before `ipAddress IS NOT NULL` count → after = 0, `ipHash IS NOT NULL` count �
 admin/operator 목록·상세 렌더 정상, IP 원문 노출 0, 상태 처리 정상.
 
 ## 11. 검증
-legacy `ipAddress` → null · 가능 시 `ipHash` 백필 · row 수 불변 · 신규 submit 정상(`ipAddress=null`/`ipHash=64`) · 운영 UI 정상 · email/autoreply/in-app 회귀 없음 · KPA/GP/KCos 미수정 · ContactInquiry 미이관 · backend tsc · migration additive/safe · **CHECK에 원문 IP 미기록**.
+legacy `ipAddress` → null · 가능 시 `ipHash` 백필 · row 수 불변 · 신규 submit 정상(`ipAddress=null`/`ipHash=64`) · 운영 UI 정상 · email/autoreply/in-app 회귀 없음 · KPA/KCos 미수정 · ContactInquiry 미이관 · backend tsc · migration additive/safe · **CHECK에 원문 IP 미기록**.
 
 ## 12. 배포
 backend migration 있음 → API Server 배포 + migration job 확인. web 변경 없음 → web 배포 불요.
 
 ## 13. staged 가드
-허용: `apps/api-server/**`, CHECK. **금지: `services/web-{kpa-society,glycopharm,k-cosmetics}/**`.** commit 명시 경로.
+허용: `apps/api-server/`, CHECK.
 
 ## 14. CHECK 문서
-`docs/checks/CHECK-O4O-CONTACT-NETURE-LEGACY-IP-CLEANUP-V1.md` — 목적·선행 반영·사전 count·migration 방식·**원문 IP 미기록 확인**·legacy 처리 결과·row 수 보존·신규 submit 검증·UI 회귀·알림 회귀·KPA/GP/KCos 미수정·ContactInquiry 미사용·검증·배포·commit hash.
+`docs/checks/CHECK-O4O-CONTACT-NETURE-LEGACY-IP-CLEANUP-V1.md` — 목적·선행 반영·사전 count·migration 방식·**원문 IP 미기록 확인**·legacy 처리 결과·row 수 보존·신규 submit 검증·UI 회귀·알림 회귀·KPA/KCos 미수정·ContactInquiry 미사용·검증·배포·commit hash.
 
 ## 15. 후속
 1. `WO-O4O-CONTACT-NETURE-IPADDRESS-COLUMN-DROP-V1` — legacy 컬럼 제거 검토

@@ -3,7 +3,7 @@
  *
  * WO-O4O-OPERATOR-MEMBERS-LIST-COMMONIZATION-V1
  *
- * Neture / GlycoPharm / K-Cosmetics 3 service 의 Operator Members list-side UI 를
+ * Neture / K-Cosmetics 2 service 의 Operator Members list-side UI 를
  * 단일 wrapper 로 정렬. KPA 는 KpaMember entity 기반 별도 페이지 (MemberManagementPage) 유지.
  *
  * IR: docs/investigations/IR-O4O-OPERATOR-MEMBERS-LIST-COMMONIZATION-DESIGN-V1.md (Option C)

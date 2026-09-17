@@ -4,7 +4,7 @@
  * WO-O4O-MYPAGE-HUB-CARD-CANONICAL-ALIGNMENT-V1
  * 근거: IR-O4O-MYPAGE-PROFILE-UI-CANONICAL-COMMONIZATION-V1
  *
- * GlycoPharm / K-Cosmetics / Neture MyPage Hub 의 바로가기 카드를
+ * K-Cosmetics / Neture MyPage Hub 의 바로가기 카드를
  * 공통 시각 톤으로 정렬하는 표시 컴포넌트.
  *
  * 시각 패턴 (Pattern A — KPA-Society canonical 정렬):

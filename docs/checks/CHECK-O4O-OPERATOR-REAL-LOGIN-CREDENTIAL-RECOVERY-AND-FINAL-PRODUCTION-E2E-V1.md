@@ -36,7 +36,6 @@ WO 의 "완료 선언하지 말고 차단 원인을 보고한다" 조항은 차�
 kpa:operator, kpa:admin, kpa:store_owner,
 cosmetics:operator, cosmetics:admin,
 neture:operator, neture:admin,
-glycopharm:operator, glycopharm:admin,
 pharmacy-hub:operator, pharmacy-hub:admin,
 kpa-branch:operator
 ```
@@ -50,7 +49,6 @@ kpa-branch:operator
 | `kpa-society` | KPA 계열 | **200 · 쿠키 정상 발급** |
 | `k-cosmetics` | KPA 계열 | **200 · 쿠키 정상 발급** |
 | `neture` | KPA 계열 | **200 · 쿠키 정상 발급** |
-| `glycopharm` | KPA 계열 | **200 · 쿠키 정상 발급** |
 | `pharmacy-hub` | PH 전용 | **200 · 쿠키 정상 발급** |
 | `kpa-society` / `k-cosmetics` / `neture` 에 **PH 비밀번호** | (교차 시도) | **401 `INVALID_CREDENTIALS`** |
 
@@ -70,7 +68,6 @@ localStorage/쿠키 주입 없음. 각 서비스 desktop(1440×900) + mobile(390
 | K-Cosmetics | `k-cosmetics.site` | **200** | `/admin` |
 | Neture | `neture.co.kr` | **200** | `/admin` |
 | Pharmacy-Hub | `pharmacyhub.co.kr` | **200** | `/` |
-| GlycoPharm (회귀) | `glycopharm.co.kr` | **200** | `/admin` |
 
 > K-Cosmetics 의 production origin 은 `k-cosmetics.site` 다 (`.co.kr` 아님).
 
@@ -117,18 +114,6 @@ deep link(새 탭 직접 진입) · 새로고침 모두 동일 렌더.
 | `/operator/memberships` | 808 / 798 | 없음 | 2 | 0 |
 
 본문 실측: `Pharmacy-Hub 운영자 · 현재 운영자 영역의 업무는 가입 신청 승인·반려 입니다.` — 문서상 좁은 범위와 일치.
-
-### GlycoPharm (공유 모듈 회귀만)
-
-| route | len | white | sidebar | placeholder |
-|---|---:|:---:|---:|:---:|
-| `/operator` | 612 | 없음 | 9 | 0 |
-
-deep link · 새로고침 · 재로그인 후 모두 612 동일. 공유 operator shell 회귀 없음.
-
-**dead link 0 / white screen 0 / placeholder 0 / JS exception 0** (§6 의 리소스 404 제외 — 스크립트 예외 아님).
-
----
 
 ## 4. logout · 재로그인 (실제 UI 조작)
 
@@ -207,7 +192,6 @@ R4 를 명시하는 이유: 결과 JSON 의 `netFail` 에 `401 /api/v1/auth/logo
 | K-Cosmetics | 200 | PASS | PASS | PASS | PASS | **PASS** |
 | Neture | 200 | PASS | PASS | PASS | PASS(R3) | **PASS** |
 | Pharmacy-Hub | 200 | PASS | PASS | PASS | PASS | **PASS(회귀)** |
-| GlycoPharm | 200 | PASS | — | PASS | PASS | **PASS(회귀)** |
 
 `/operator` 진입 5/5 · 권한 판정 4/4 · dead link 0 · white screen 0 · JS exception 0.
 

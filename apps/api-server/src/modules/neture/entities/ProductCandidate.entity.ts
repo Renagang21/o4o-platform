@@ -95,7 +95,7 @@ export class ProductCandidate {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  /** 서비스 스코프 (kpa/glycopharm/cosmetics/neture …). 미지정 가능 */
+  /** 서비스 스코프 (kpa/cosmetics/neture …). 미지정 가능 */
   @Column({ name: 'service_key', type: 'varchar', length: 50, nullable: true })
   serviceKey: string | null;
 

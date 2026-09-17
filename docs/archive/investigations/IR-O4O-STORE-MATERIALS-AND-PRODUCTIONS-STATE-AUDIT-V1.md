@@ -3,7 +3,7 @@
 > **"내 자료함 / 내 제작물" 현 상태 조사 (state audit)**
 > 작성일: 2026-05-08
 > 상태: READ-ONLY 조사 완료
-> 목적: 4개 서비스(KPA-Society / GlycoPharm / K-Cosmetics / Neture)에서 "내 자료함"과 "내 제작물(POP·QR·블로그·상품 상세설명)" 관련 실제 구현 상태를 식별하고, 재사용 가능한 자산과 신규 설계가 필요한 영역을 분리하기 위한 inventory를 만든다.
+> 목적: 3개 서비스(KPA-Society / K-Cosmetics / Neture)에서 "내 자료함"과 "내 제작물(POP·QR·블로그·상품 상세설명)" 관련 실제 구현 상태를 식별하고, 재사용 가능한 자산과 신규 설계가 필요한 영역을 분리하기 위한 inventory를 만든다.
 >
 > ⚠️ **이번 단계는 "조사"만 수행한다. canonical 판단은 하되, route 추가·코드 수정·DB 변경은 후속 WO에서 진행한다.**
 
@@ -37,7 +37,6 @@
 | **kpa-society** | 내 자료함 | 자료 | `/store/library/resources` | `StoreLibraryPlaceholderPage` | **stub** | `packages/store-ui-core/src/config/storeMenuConfig.ts:205` |
 | **kpa-society** | 매장 실행 | 자료실 | `/store/content` | (별개 페이지, 커뮤니티 자료 가져오기) | partial | `packages/store-ui-core/src/config/storeMenuConfig.ts:221` |
 | **kpa-society** | (대시보드) | 내 콘텐츠 | `/dashboard/my-content` | `MyContentPage.tsx` | **active** | `services/web-kpa-society/src/pages/dashboard/MyContentPage.tsx` |
-| **glycopharm** | 마케팅·콘텐츠 | 콘텐츠 가져오기 | `/store/content` | `ResourcesPage.tsx` (read-only hub) | partial | `packages/store-ui-core/src/config/storeMenuConfig.ts:146` |
 | **k-cosmetics** | — | — | `/resources` (메뉴 미연결) | `ResourcesPage.tsx` (empty fallback) | **stub** | `services/web-k-cosmetics/src/pages/resources/ResourcesPage.tsx` |
 | **neture** | (대시보드) | 내 콘텐츠 | `/dashboard/my-content` | `MyContentPage.tsx` | **active** | `services/web-neture/src/pages/dashboard/MyContentPage.tsx` |
 | **neture** | (공급자) | 라이브러리 | `/supplier/library` | `SupplierLibraryPage.tsx` | **active** | `services/web-neture/src/pages/supplier/SupplierLibraryPage.tsx` |
@@ -45,7 +44,7 @@
 **핵심 관찰:**
 - KPA 사이드바의 "내 자료함" 그룹은 메뉴만 배치되고 placeholder 연결 (소스 헤더 주석에 "콘텐츠 기획 확정 후 후속 WO에서 본 페이지 연결" 명시 — `storeMenuConfig.ts:200`)
 - KPA·Neture에는 별도로 `/dashboard/my-content` 라는 dashboard asset 시스템이 이미 active 상태 — 사이드바 "내 자료함"과 분리되어 있음
-- GlycoPharm·K-Cosmetics는 store 사이드바에 자료함 그룹 자체가 부재
+- K-Cosmetics는 store 사이드바에 자료함 그룹 자체가 부재
 
 ### 1-2. 백엔드 자산 inventory (재사용 가능 후보)
 
@@ -82,7 +81,6 @@
 | Service | UI 페이지 | 생성 API | AI 연동 | 저장 entity | 파일 출력 | Status |
 |---------|----------|----------|---------|-------------|----------|--------|
 | **kpa-society** | `ProductPopBuilderPage.tsx`, `StorePopPage.tsx` | `POST /pharmacy/pop/generate` | ✓ (pop_short/pop_long) | `StoreExecutionAsset` | PDF (A4/A5/A6) | **active** |
-| **glycopharm** | — | `POST /pharmacy/pop/generate` | ✓ (pop_short/pop_long) | `StoreExecutionAsset` | PDF | partial (UI 부재) |
 | **k-cosmetics** | — | `POST /pharmacy/pop/generate` | ✓ (pop_short/pop_long) | `StoreExecutionAsset` | PDF | partial (UI 부재) |
 | **neture** | — | (미등록) | — | — | — | missing |
 
@@ -97,7 +95,6 @@
 | Service | 관리 UI | 랜딩 페이지 | API | AI 연동 | Analytics | 파일 출력 | Status |
 |---------|---------|-------------|-----|---------|-----------|----------|--------|
 | **kpa-society** | `StoreQRPage.tsx` | (백엔드 공용) | `/pharmacy/qr/*` | ✓ (qr_description) | ✓ | PNG/SVG/PDF | **active** |
-| **glycopharm** | — | `QrLandingPage.tsx` (요청 라우팅 전용) | `/pharmacy/qr/*` | ✓ | ✓ | PNG/SVG/PDF | partial (관리 UI 부재) |
 | **k-cosmetics** | — | — | `/pharmacy/qr/*` | ✓ | ✓ | PNG/SVG/PDF | partial (UI 부재) |
 | **neture** | `SellerQRGuidePage.tsx` (가이드용) | `/qr/public/:slug` (공용) | (관리 API 미등록) | — | — | PNG (client) | partial |
 
@@ -112,12 +109,10 @@
 | Service | Staff Editor | 공개 페이지 | API | 저장 | AI 연동 | Status |
 |---------|--------------|-------------|-----|------|---------|--------|
 | **kpa-society** | `PharmacyBlogPage.tsx` | `StoreBlogPage.tsx` / `StoreBlogPostPage.tsx` | `/stores/:slug/blog/staff` | `store_blog_posts` | ✗ | **active** |
-| **glycopharm** | — | — | `/stores/:slug/blog` | `store_blog_posts` (serviceKey=glycopharm) | ✗ | partial (UI 부재) |
 | **k-cosmetics** | — | — | (미등록) | — | ✗ | missing |
 | **neture** | — | `StoreBlogListPage.tsx` / `StoreBlogPage.tsx` | `/stores/:slug/blog` (read-only) | `store_blog_posts` | ✗ | partial (read-only) |
 
 **파일 위치:**
-- 백엔드 entity: `apps/api-server/src/routes/glycopharm/entities/store-blog-post.entity.ts` (multi-service via `serviceKey` column)
 - 컨트롤러: `apps/api-server/src/routes/o4o-store/controllers/blog.controller.ts`
 - KPA UI: [PharmacyBlogPage.tsx](services/web-kpa-society/src/pages/pharmacy/PharmacyBlogPage.tsx) (사이드바 `매장 실행 → 블로그`)
 
@@ -126,7 +121,6 @@
 | Service | UI 페이지 | API | AI 연동 | 저장 entity | 파일 출력 | Status |
 |---------|----------|-----|---------|-------------|----------|--------|
 | **kpa-society** | `ProductPopBuilderPage.tsx` (간접) | `/products/:productId/ai-contents` | ✓ | `ProductAiContent` | (텍스트) + POP PDF | partial (전용 UI 부재) |
-| **glycopharm** | — | `/products/:productId/ai-contents` | ✓ | `ProductAiContent` | (텍스트) | partial (UI 부재) |
 | **k-cosmetics** | — | `/products/:productId/ai-contents` | ✓ | `ProductAiContent` | (텍스트) | partial (UI 부재) |
 | **neture** | — | `/products/:productId/ai-contents` | ✓ | `ProductAiContent` | (텍스트) | partial (UI 부재) |
 
@@ -213,9 +207,9 @@
 | (제안에 없음) | `매장 실행 → 자료실` (`/store/content`) | "내 자료함"과 의미 중복 가능 — 정리 필요 |
 | (제안에 없음) | `매장 실행 → 채널 관리`, `태블릿 진열`, `상담 요청` | 매장 실행 잔존 항목 — 별도 그룹 검토 |
 
-### 4-3. GlycoPharm·K-Cosmetics·Neture
+### 4-3. K-Cosmetics·Neture
 
-- **GlycoPharm:** 사이드바에 자료함/제작물 그룹 부재. `마케팅·콘텐츠 → 콘텐츠 가져오기`만 존재. 백엔드 API는 모두 등록되어 있어 UI만 추가하면 활성화 가능
+- `마케팅·콘텐츠 → 콘텐츠 가져오기`만 존재. 백엔드 API는 모두 등록되어 있어 UI만 추가하면 활성화 가능
 - **K-Cosmetics:** 매우 단순한 사이드바 (홈/채널/상품/사이니지/설정). 자료함·제작물 모두 부재. 일부 백엔드(POP·QR API)는 등록되어 있으나 entity 실데이터·UI 모두 부재
 - **Neture:** store-hub 사이드바 모델 자체가 없음 — supplier/partner/operator 역할 기반 네비게이션. 단, `/dashboard/my-content`는 active. 본 canonical 구조의 **적용 대상에서 제외하거나 별도 매핑 필요**
 
@@ -243,7 +237,6 @@
 |------|------|
 | KPA 내 자료함 콘텐츠/강좌/자료 | 메뉴 + route 존재, **페이지 placeholder** (StoreLibraryPlaceholderPage) |
 | KPA 내 자료함 자료실 (`/store/content`) | 별개 메뉴 — 의미 중복 가능 |
-| GlycoPharm POP·QR·블로그 | 백엔드 active, **UI 미구현** |
 | K-Cosmetics POP·QR | 백엔드 active, **UI·실데이터 부재** |
 | Neture 블로그 | Public read-only, **Staff editor·관리 API 미등록** |
 | Neture POP·QR 관리 | 백엔드 미등록, public 랜딩만 존재 |
@@ -268,7 +261,7 @@
 | `내 제작물` 메뉴 그룹 신설 | 현재 KPA `매장 실행`에 흩어진 POP/QR/블로그를 묶고, 상품 상세설명을 추가 |
 | 상품 상세설명 전용 UI | 4개 서비스 모두 백엔드만 존재. 사이드바 진입점 정의 + 페이지 필요 |
 | "Save To" 다이얼로그 (커뮤니티/내 매장/둘 다) | 코드 어디에도 없음. 현재 source는 implicit |
-| GlycoPharm·K-Cosmetics 자료함 UI | 백엔드는 다 있으나 사이드바 그룹·페이지 부재 |
+| K-Cosmetics 자료함 UI | 백엔드는 다 있으나 사이드바 그룹·페이지 부재 |
 | Neture 블로그 Staff editor (필요 시) | 현재 read-only public만. 의도된 read-only인지 확인 필요 |
 | origin breadcrumb / parent-child 추적 | 현재 snapshot은 frozen — "어디서 가져왔는지" UI 표기 메커니즘 부재 |
 
@@ -323,7 +316,7 @@
 | 1 | KPA `내 자료함` 실 페이지 연결 | 메뉴+route+entity+API 모두 active. 페이지 컴포넌트만 부재 — 가장 낮은 비용 |
 | 2 | KPA `내 제작물` 그룹 신설 + 매장 실행에서 POP/QR/블로그 이동 | 메뉴 재배치만으로 canonical 구조 정합성 확보 |
 | 3 | 상품 상세설명 전용 UI (4개 서비스) | 백엔드 100% 준비됨 — UI만 추가하면 4개 서비스 동시 활성화 |
-| 4 | GlycoPharm POP/QR/블로그 UI | 백엔드 active, UI 부재 |
+| 4 | — | 백엔드 active, UI 부재 |
 | 5 | "Save To" 다이얼로그 | 신규 흐름 정의 + sourceType enum 확장 + UI 동시 작업 |
 | 6 | K-Cosmetics 자료함/제작물 UI | 가장 마지막 — 실데이터·운영 사용 사례 확인 후 |
 | 7 | Neture canonical 적용 여부 결정 | role-based vs store-hub 정책 결정 선행 필요 |
@@ -340,5 +333,4 @@
 ---
 
 *작성: 2026-05-08*
-*조사 범위: services/{web-kpa-society, web-glycopharm, web-k-cosmetics, web-neture, signage-player-web}, packages/store-ui-core, apps/api-server*
 *상태: READ-ONLY 조사 완료. 후속 WO에서 우선순위 기반 구현 진행 권장.*

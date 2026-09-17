@@ -4,7 +4,7 @@
  * WO-O4O-STORE-HUB-API-CLIENT-AND-SERVICE-SCOPE-ALIGNMENT-V1
  *
  * 배경 (census §2 판정: SAME_CONTRACT)
- *   K-Cosmetics · GlycoPharm · Neture 세 사본이 **동일한 endpoint** 를 호출한다:
+ *   K-Cosmetics · Neture 두 사본이 **동일한 endpoint** 를 호출한다:
  *     GET /api/v1/hub/contents?serviceKey={key}&sourceDomain=...
  *   prefix 조차 다르지 않다(공용 `/hub` 네임스페이스). 세 파일의 차이는
  *   주석 · apiClient import 경로 · `SERVICE_KEY` 상수뿐이었다.
@@ -33,7 +33,7 @@ export interface HubContentHttp {
 }
 
 export interface CreateHubContentApiConfig {
-  /** `serviceKey` query 값. 예) `k-cosmetics` · `glycopharm` · `neture` */
+  /** `serviceKey` query 값. 예) `k-cosmetics` · `neture` */
   serviceKey: string;
 }
 

@@ -41,17 +41,6 @@
 | `platform:member` | 플랫폼 회원 |
 | `platform:contributor` | 플랫폼 기여자 |
 
-**GlycoPharm 역할:**
-
-| 역할 | 설명 |
-|------|------|
-| `glycopharm:admin` | GlycoPharm 관리자 |
-| `glycopharm:operator` | GlycoPharm 운영자 |
-| `glycopharm:pharmacy` | 약국 사용자 |
-| `glycopharm:supplier` | 공급자 |
-| `glycopharm:partner` | 파트너 |
-| `glycopharm:consumer` | 소비자 |
-
 **KPA 역할:**
 
 | 역할 | 설명 |
@@ -105,7 +94,7 @@ AccessTokenPayload {
 
 ---
 
-## B. 프론트엔드 활성 역할 목록 (GlycoPharm Web)
+## B. 프론트엔드 활성 역할 목록 
 
 ### B-1. UserRole 타입
 
@@ -113,13 +102,10 @@ AccessTokenPayload {
 type UserRole = 'admin' | 'pharmacy' | 'supplier' | 'partner' | 'operator' | 'consumer';
 ```
 
-**파일**: `services/web-glycopharm/src/types/index.ts`
-
 ### B-2. API → Web 역할 매핑
 
 | API 역할 | Web 역할 | 비고 |
 |----------|----------|------|
-| `pharmacy` | `pharmacy` | GlycoPharm 약국 |
 | `seller` | `pharmacy` | Seller → Pharmacy 통합 |
 | `customer` | `pharmacy` | Customer → Pharmacy 통합 |
 | `user` | `pharmacy` | 일반 User → Pharmacy |
@@ -129,20 +115,16 @@ type UserRole = 'admin' | 'pharmacy' | 'supplier' | 'partner' | 'operator' | 'co
 | `partner` | `partner` | 파트너 유지 |
 | (기타) | `consumer` | 기본값 |
 
-**파일**: `services/web-glycopharm/src/contexts/AuthContext.tsx` (mapApiRoleToWebRole)
-
 ### B-3. 역할별 기본 라우트
 
 | 역할 | 기본 경로 | 컴포넌트 |
 |------|----------|---------|
 | `pharmacy` | `/` | CareDashboardPage |
-| `admin` | `/admin` | GlycoPharmAdminDashboard |
-| `operator` | `/operator` | GlycoPharmOperatorDashboard |
+| `admin` | `/admin` | — |
+| `operator` | `/operator` | — |
 | `partner` | `/partner` | PartnerIndex |
 | `supplier` | `/supplier` | RoleNotAvailablePage |
 | `consumer` | `/` | HomePage |
-
-**파일**: `services/web-glycopharm/src/lib/auth-utils.ts`
 
 ### B-4. 역할 라벨/아이콘
 
@@ -167,8 +149,6 @@ type UserRole = 'admin' | 'pharmacy' | 'supplier' | 'partner' | 'operator' | 'co
 
 - **Layout**: MainLayout (Header + Footer, 사이드바 없음)
 - **보호**: 인증 필수, 역할 제한 없음 (모든 인증 사용자 접근 가능)
-
-**파일**: `services/web-glycopharm/src/App.tsx` (line 283-287)
 
 ### C-2. 화면 구성
 
@@ -206,8 +186,6 @@ type UserRole = 'admin' | 'pharmacy' | 'supplier' | 'partner' | 'operator' | 'co
 │ └─────────────────────────────────┘ │
 └─────────────────────────────────────┘
 ```
-
-**파일**: `services/web-glycopharm/src/pages/MyPage.tsx` (227줄)
 
 ### C-3. 구현 상태
 
@@ -272,14 +250,8 @@ USERS (auth-core)
   │
   ├── 1:N → KPA_PHARMACY_REQUESTS (약국 신청)
   │          └── userId, pharmacy_name, status
-  │
-  └── (created_by_user_id) → GLYCOPHARM_PHARMACIES
-                               │
                                ├── 1:1 (PK 공유) → KPA_ORGANIZATIONS
                                │                    └── name, type, parent_id (계층)
-                               │
-                               ├── 1:N → GLYCOPHARM_PRODUCTS
-                               │
                                ├── 1:N → CARE_KPI_SNAPSHOTS (pharmacy_id)
                                │
                                ├── 1:N → CARE_COACHING_SESSIONS (pharmacy_id)
@@ -291,13 +263,12 @@ USERS (auth-core)
 
 | 필드 | 테이블 | 연결 방식 |
 |------|--------|----------|
-| `created_by_user_id` | glycopharm_pharmacies | UUID soft FK (정식 FK 아님) |
+| `created_by_user_id` | — | UUID soft FK (정식 FK 아님) |
 | `user_id` | glucoseview_pharmacies | UUID soft FK |
 | `user_id` | kpa_members | UUID FK → users |
 
 **약국 조회 방식 (Care 모듈)**:
 ```sql
-SELECT id FROM glycopharm_pharmacies
 WHERE created_by_user_id = $userId AND status = 'active'
 LIMIT 1
 ```
@@ -307,7 +278,6 @@ LIMIT 1
 ### E-3. Pharmacy 엔티티 주요 필드
 
 ```
-glycopharm_pharmacies
 ├── id (uuid PK, KPA_ORGANIZATIONS.id와 공유)
 ├── name (varchar)
 ├── code (varchar, unique)
@@ -334,7 +304,6 @@ KPA_ORGANIZATIONS
 ```
 
 - `parent_id`로 자기 참조 트리 구성
-- `glycopharm_pharmacies.id === kpa_organizations.id` (PK 공유)
 
 ### E-5. User 엔티티의 약사 관련 필드
 
@@ -342,7 +311,7 @@ KPA_ORGANIZATIONS
 |------|------|------|
 | `pharmacistFunction` | 업무 분류 | pharmacy, hospital, industry, other |
 | `pharmacistRole` | 직무 분류 | general, pharmacy_owner, hospital, other |
-| `serviceKey` | 서비스 격리 키 | glycopharm, kpa 등 |
+| `serviceKey` | 서비스 격리 키 | kpa 등 |
 
 ---
 
@@ -352,7 +321,7 @@ KPA_ORGANIZATIONS
 
 | 영역 | Admin (`/admin`) | Operator (`/operator`) |
 |------|-----------------|----------------------|
-| 대시보드 | GlycoPharmAdminDashboard | GlycoPharmOperatorDashboard |
+| 대시보드 | — | — |
 | 약국 네트워크 | ✅ `/admin/pharmacies` | ❌ |
 | 회원 관리 | ✅ `/admin/users` | ❌ |
 | 설정 | ✅ `/admin/settings` | ❌ |
@@ -500,17 +469,6 @@ default                         → HomePage (비인증/consumer)
 | `consumer` | **대시보드 없음** | `/` → HomePage (비인증과 동일) |
 | `admin` | **접근 불가능** | API→Web 매핑에서 `admin`→`operator`, `/admin`은 `allowedRoles=['admin']`이나 매핑된 사용자 없음 |
 
-### H-2. 백엔드 정의됨 + 미사용 (GlycoPharm 맥락)
-
-| 역할 | 상태 |
-|------|------|
-| `VENDOR` | 레거시, GlycoPharm 미사용 |
-| `MANAGER` | 레거시, GlycoPharm 미사용 |
-| `BUSINESS` | 레거시, GlycoPharm 미사용 |
-| `CUSTOMER` | Deprecated → USER |
-| `glycopharm:consumer` | 정의됨, 프론트엔드 미연결 |
-| `glycopharm:pharmacy` | 정의됨, 프론트엔드는 레거시 `pharmacy` 사용 |
-
 ### H-3. 역할 매핑 불일치 정리
 
 | 이슈 | 설명 | 영향 |
@@ -518,7 +476,7 @@ default                         → HomePage (비인증/consumer)
 | `admin` 접근 불가 | API `admin`/`super_admin` → Web `operator` 매핑으로 `/admin` 라우트 접근 불가 | Admin 대시보드 사용 불가 |
 | `supplier` 미구현 | 라우트 존재하나 `RoleNotAvailablePage` 표시 | Supplier 기능 없음 |
 | `admin` roleLabel 누락 | `MyPage.roleLabels`에 `admin` 미정의 | 이론적 undefined (실제로는 operator로 매핑되어 발생하지 않음) |
-| 프리픽스 미적용 | 프론트엔드는 레거시 역할(`pharmacy`, `operator`) 사용, 프리픽스(`glycopharm:pharmacy`) 미사용 | P0 RBAC 전환 미완료 |
+| 프리픽스 미적용 | 프론트엔드는 레거시 역할(`pharmacy`, `operator`) 사용, 프리픽스 미사용 | P0 RBAC 전환 미완료 |
 
 ---
 
@@ -535,22 +493,6 @@ default                         → HomePage (비인증/consumer)
 | `apps/api-server/src/modules/auth/services/role-assignment.service.ts` | 역할 관리 서비스 |
 | `apps/api-server/src/middleware/auth.middleware.ts` | 인증/인가 미들웨어 |
 | `apps/api-server/src/utils/role.utils.ts` | 서비스 역할 유틸리티 |
-| `apps/api-server/src/routes/glycopharm/entities/glycopharm-pharmacy.entity.ts` | 약국 엔티티 |
 | `apps/api-server/src/routes/kpa/entities/kpa-organization.entity.ts` | 조직 엔티티 |
 | `apps/api-server/src/routes/kpa/entities/kpa-member.entity.ts` | 멤버십 엔티티 |
 | `apps/api-server/src/modules/care/care-pharmacy-context.middleware.ts` | Care 약국 컨텍스트 |
-
-### 프론트엔드 (web-glycopharm)
-
-| 파일 | 역할 |
-|------|------|
-| `src/types/index.ts` | UserRole 타입, User 인터페이스 |
-| `src/contexts/AuthContext.tsx` | 인증 컨텍스트, 역할 매핑, 토큰 관리 |
-| `src/pages/MyPage.tsx` | My Page 컴포넌트 |
-| `src/App.tsx` | 라우트 정의, RoleBasedHome, ProtectedRoute |
-| `src/components/auth/RoleGuard.tsx` | 역할 기반 접근 제어 |
-| `src/components/RoleSwitcher.tsx` | 멀티 역할 전환 |
-| `src/components/layouts/DashboardLayout.tsx` | 역할별 사이드바 메뉴 |
-| `src/components/layouts/MainLayout.tsx` | 공용 레이아웃 |
-| `src/components/layouts/StoreLayout.tsx` | 소비자 스토어 레이아웃 |
-| `src/lib/auth-utils.ts` | 역할별 기본 라우트 |

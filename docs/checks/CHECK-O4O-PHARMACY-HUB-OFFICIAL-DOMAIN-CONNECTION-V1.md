@@ -159,7 +159,7 @@ Cloud Run: `latestReadyRevision = pharmacy-hub-web-00011-qsp`, traffic **100%**,
 | `neture.co.kr` / `www` | 200 |
 | `admin.neture.co.kr` | 200 |
 | `kpa-society.co.kr` / `www` | 200 |
-| `glycopharm.co.kr` / `www` | 200 |
+| `www` | 200 |
 | `glucoseview.co.kr` / `www` | 200 |
 | `k-cosmetics.site` / `www` | 200 |
 | `api.neture.co.kr` | `/health` 200 · `/api/v1/auth/status` 200 (루트 `/` 404 = 라우트 없음, 정상) |

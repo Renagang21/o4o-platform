@@ -47,14 +47,13 @@ serviceKey 를 넘기지 않으면 두 가지가 느슨해진다.
 
 | # | 파일 | mount / route | 실제 소비처(프론트) | 조직 해석 | membership guard | 판정 |
 |---|---|---|---|---|---|---|
-| 1 | `modules/store-ai/controllers/store-ai.controller.ts:29` | `/api/v1/store-hub/ai/*` | **web-glycopharm 단독** (`src/api/pharmacy.ts`) | 가드 주입 `organizationId` | 가드 | **→ `'glycopharm'`** |
 | 2 | `routes/o4o-store/controllers/store-product-request.controller.ts:190` | `/api/v1/store/product-requests` | **web-kpa-society 단독** (admin 은 `/api/v1/operator/store-product-requests` 별도) | 가드 주입 | 가드 | **→ `'kpa'`** |
 | 3 | `routes/platform/store-handled-products.routes.ts:77,125,168,240` | `/api/v1/store/handled-products*` | **web-kpa-society 단독** (Pharmacy-Hub 는 `/api/v1/pharmacy-hub/store-owner/handled-products` 전용 컨트롤러) | `resolveStoreAccess` | 없음(원래 없음) | **→ `'kpa'`** |
 | 4 | `modules/store/store-library.routes.ts:32` | `/api/v1/store/library` | **0건** | 가드 주입 | 가드 | `SERVICE_NEUTRAL_BACKCOMPAT` |
 | 5 | `modules/store-ai/controllers/product-ai-recommendation.controller.ts:17` | `/api/v1/products/recommend*` | **0건** | 가드 주입 | 가드 | `SERVICE_NEUTRAL_BACKCOMPAT` |
 | 6 | `routes/o4o-store/controllers/store-product-library.controller.ts:81` | `/api/v1/store/products` | KPA + Neture | 가드 주입 | 가드 | `SERVICE_NEUTRAL_BACKCOMPAT` |
-| 7 | `routes/platform/store-tablet.routes.ts:247` | `/api/v1/store/*` (기본) + Pharmacy-Hub 주입 mount | KPA + GlycoPharm + K-Cosmetics | 가드 주입 또는 주입 seam | 가드 | `SERVICE_NEUTRAL_BACKCOMPAT` |
-| 8 | `routes/platform/store-local-product.routes.ts:97` | `/api/v1/store/local-products` | KPA + GlycoPharm + K-Cosmetics (3서비스 모두 API 호출 확인) | `resolveStoreAccess` | 없음 | `SERVICE_NEUTRAL_BACKCOMPAT` |
+| 7 | `routes/platform/store-tablet.routes.ts:247` | `/api/v1/store/*` (기본) + Pharmacy-Hub 주입 mount | KPA + K-Cosmetics | 가드 주입 또는 주입 seam | 가드 | `SERVICE_NEUTRAL_BACKCOMPAT` |
+| 8 | `routes/platform/store-local-product.routes.ts:97` | `/api/v1/store/local-products` | KPA + K-Cosmetics (2서비스 모두 API 호출 확인) | `resolveStoreAccess` | 없음 | `SERVICE_NEUTRAL_BACKCOMPAT` |
 | 9 | `modules/neture/controllers/seller.controller.ts:135,189` | Neture seller | Neture | `resolveStoreAccess` 후 enrollment 에서 serviceKey 사후 도출 | 별도 | `SERVICE_NEUTRAL_BACKCOMPAT` |
 
 ### 오탐으로 판정해 제외한 것
@@ -79,14 +78,7 @@ role-prefix 축 → membership canonical 축 변환은 기존 SSOT `resolveCanon
 |---|---|---|
 | `kpa` | `kpa-society` | `resolveCanonicalServiceKey()` |
 | `cosmetics` | `k-cosmetics` | 〃 |
-| `glycopharm` | `glycopharm` | 〃 |
 | `pharmacy-hub` | `pharmacy-hub` | 〃 |
-
-### 3-1. `/api/v1/store-hub/ai/*` → `'glycopharm'`
-
-- mount 는 `register-routes.ts:688` 단 한 곳.
-- 저장소 전역에서 이 경로를 호출하는 프론트는 `services/web-glycopharm/src/api/pharmacy.ts` 뿐이다.
-- 전환 전에는 KPA·K-Cosmetics·Pharmacy-Hub store_owner 도 GlycoPharm 매장 AI 스냅샷·인사이트에 도달할 수 있었다.
 
 ### 3-2. `/api/v1/store/product-requests` → `'kpa'`
 
@@ -97,9 +89,9 @@ role-prefix 축 → membership canonical 축 변환은 기존 SSOT `resolveCanon
 
 - 소비처 `services/web-kpa-society/src/api/handledProducts.ts` 단독.
 - Pharmacy-Hub 는 이미 이 문제를 알고 전용 컨트롤러(`PharmacyHubHandledProductController`)로 분기해 둔 상태였다.
-- GlycoPharm·K-Cosmetics 프론트에는 이 엔드포인트 호출이 **0건**이다
-  (두 서비스는 `routes/glycopharm/controllers/store.controller.ts` 등 자기 서비스 라우트로 listing 을 노출한다).
-- 파일 상단 기존 주석의 "KPA·GlycoPharm·K-Cosmetics = resolveStoreAccess" 표현은 **설계 의도 서술이며 실측 소비처와 다르다.**
+- K-Cosmetics 프론트에는 이 엔드포인트 호출이 **0건**이다
+  .
+- 파일 상단 기존 주석의 "KPA·K-Cosmetics = resolveStoreAccess" 표현은 **설계 의도 서술이며 실측 소비처와 다르다.**
   실측을 근거로 `'kpa'` 로 고정하고, 그 근거를 파일 주석에 남겼다.
 
 ---
@@ -111,11 +103,11 @@ WO §4 는 "기존 계약이 없으면 이번 WO 에서 새 API contract 를 만
 
 | # | 위치 | 남긴 이유 |
 |---|---|---|
-| 4 | `store-library.routes.ts` (`/api/v1/store/library`) | 프론트 소비처 0건. 실제 서비스별 자료함은 serviceKey 를 받는 `createStoreLibraryController`(`/cosmetics/pharmacy/library`, `/glycopharm/pharmacy/library`)가 담당하고 KPA 는 `/store/assets` 로 이동했다. 소비처가 없으므로 귀속할 서비스를 실측으로 정할 수 없다 |
+| 4 | `store-library.routes.ts` (`/api/v1/store/library`) | 프론트 소비처 0건. 실제 서비스별 자료함은 serviceKey 를 받는 `createStoreLibraryController`가 담당하고 KPA 는 `/store/assets` 로 이동했다. 소비처가 없으므로 귀속할 서비스를 실측으로 정할 수 없다 |
 | 5 | `product-ai-recommendation.controller.ts` (`/api/v1/products/recommend*`) | 프론트 소비처 0건. 위와 같은 이유 |
 | 6 | `store-product-library.controller.ts` (`/api/v1/store/products`) | KPA + Neture 양쪽이 소비한다. 같은 파일의 `deriveListingServiceKey(req)` 는 **요청 문맥이 아니라 JWT membership 우선순위**로 값을 정하므로 가드 축으로 쓰면 다중 서비스 계정에서 오귀속이 난다 → 가드 근거로 쓰지 않았다 |
-| 7 | `store-tablet.routes.ts` (`/api/v1/store/*` 기본 mount) | KPA·GlycoPharm·K-Cosmetics 3서비스 공용. Pharmacy-Hub 만 이미 `resolveOrganizationId` 주입 seam 으로 분리돼 있다. 진짜 공용 경로 |
-| 8 | `store-local-product.routes.ts` (`/api/v1/store/local-products`) | 3서비스 프론트가 모두 이 경로를 직접 호출한다(`web-kpa-society/src/api/localProducts.ts`, `web-glycopharm/src/api/localProducts.ts`, `web-k-cosmetics/src/services/localProductApi.ts`). 진짜 공용 경로 |
+| 7 | `store-tablet.routes.ts` (`/api/v1/store/*` 기본 mount) | KPA·K-Cosmetics 2서비스 공용. Pharmacy-Hub 만 이미 `resolveOrganizationId` 주입 seam 으로 분리돼 있다. 진짜 공용 경로 |
+| 8 | `store-local-product.routes.ts` (`/api/v1/store/local-products`) | 3서비스 프론트가 모두 이 경로를 직접 호출한다. 진짜 공용 경로 |
 | 9 | `seller.controller.ts` | Neture seller 축. serviceKey 를 조직 enrollment 에서 **사후** 도출하는 별도 구조이므로 가드 축 변경은 Neture 계약 변경이 된다(WO §8 변경 금지) |
 
 > 7·8 을 서비스별로 쪼개려면 mount 분리 또는 새 요청 계약이 필요하다. 둘 다 WO §8 변경 금지 항목이므로 별도 WO 로 분리한다.
@@ -132,9 +124,6 @@ DB 는 **read-only SELECT 만** 수행했다. 변경 0건.
 
 ```
 972ede50 | cosmetics                            | 1 | 0 | 0 | 1 | 0
-3f5582bc | cosmetics,glycopharm,kpa,pharmacy-hub | 1 | 1 | 0 | 0 | 0
-6967ebe0 | cosmetics,glycopharm,kpa,pharmacy-hub | 4 | 1 | 1 | 1 | 0
-44fa7733 | cosmetics,glycopharm,kpa,pharmacy-hub | 0 | 0 | 0 | 0 | 0
 cfd2a5e7 | kpa                                  | 1 | 1 | 0 | 0 | 0
 5853b6c4 | kpa                                  | 1 | 1 | 0 | 0 | 0
 028854c2 | kpa                                  | 1 | 1 | 0 | 0 | 0
@@ -147,7 +136,6 @@ cfd2a5e7 | kpa                                  | 1 | 1 | 0 | 0 | 0
 | service | 대상자 | 후보 1(resolved) | 후보 0(none) | 후보 2+(ambiguous) |
 |---|---:|---:|---:|---:|
 | kpa | 6 | 5 | 1 | **0** |
-| glycopharm | 3 | 1 | 2 | **0** |
 | cosmetics | 4 | 2 | 2 | **0** |
 | pharmacy-hub | 5 | 2 | 3 | **0** |
 
@@ -157,7 +145,6 @@ cfd2a5e7 | kpa                                  | 1 | 1 | 0 | 0 | 0
 
 | 전환 | 현재 통과 → 전환 후 통과 | 회귀 여부 |
 |---|---|---|
-| `/store-hub/ai` → glycopharm | GlycoPharm 조직 보유자 `6967ebe0` 만 통과. 나머지는 **GlycoPharm 프론트를 쓰지 않는 계정**이다 | 의도된 축소. 실사용 회귀 0 |
 | `/store/product-requests` → kpa | KPA store_owner 6명 중 KPA 조직 보유 5명 전원 통과. `44fa7733` 은 back-compat 후보도 0이라 **전환 전에도 이미 차단** | 회귀 0 |
 | `/store/handled-products` → kpa | 위와 동일 cohort. 비-KPA store_owner(`972ede50`, `9f8391b2`, `4f42110a`)는 이 엔드포인트의 프론트 소비처가 없다 | 회귀 0 |
 
@@ -169,9 +156,9 @@ kpa linkage — organization_service_enrollments('kpa-society','kpa')  : 7 조�
 organization_product_listings 총 29건 중 kpa linkage 조직 소유        : 26건
 ```
 
-나머지 3건은 K-Cosmetics(2) / GlycoPharm(1) 조직 소유이며, 해당 서비스는 자기 서비스 라우트로 노출한다.
+나머지 3건은 K-Cosmetics(2) 조직 소유이며, 해당 서비스는 자기 서비스 라우트로 노출한다.
 `/api/v1/store/handled-products` 를 호출하는 프론트가 없으므로 UI 회귀는 없다.
-(향후 GP·KCos 가 이 공용 경로에 handled-products UI 를 붙이려 하면 mount 분리가 선행되어야 한다 — §7 후속.)
+(향후 KCos 가 이 공용 경로에 handled-products UI 를 붙이려 하면 mount 분리가 선행되어야 한다 — §7 후속.)
 
 ---
 
@@ -179,7 +166,7 @@ organization_product_listings 총 29건 중 kpa linkage 조직 소유        : 2
 
 | 파일 | 변경 |
 |---|---|
-| `apps/api-server/src/modules/store-ai/controllers/store-ai.controller.ts` | 가드에 `'glycopharm'` 전달 + 근거 주석 |
+| `apps/api-server/src/modules/store-ai/controllers/store-ai.controller.ts` | — |
 | `apps/api-server/src/routes/o4o-store/controllers/store-product-request.controller.ts` | 가드에 `'kpa'` 전달 + 근거 주석 |
 | `apps/api-server/src/routes/platform/store-handled-products.routes.ts` | `resolveStoreAccess` 4호출에 `'kpa'` 전달 + 근거 주석 |
 | `apps/api-server/src/__tests__/store-owner-backcompat-servicekey.spec.ts` | **신규** — §6 계약 + §9 census 잠금 |
@@ -216,7 +203,7 @@ API contract · schema · migration · role/membership 정책 · organization �
 1. `/api/v1/store/*` 공용 mount(store-tablet · local-products · products)의 **서비스별 mount 분리**.
    분리되면 잔여 6곳 중 3곳이 자동으로 명시 serviceKey 로 전환 가능하다.
 2. 소비처 0건인 `/api/v1/store/library`, `/api/v1/products/recommend*` 의 **은퇴 여부 판정**.
-3. `store-handled-products.routes.ts` 상단 주석의 "KPA·GlycoPharm·K-Cosmetics 공용" 서술은 이번에 실측 근거로 정정했으나,
+3. `store-handled-products.routes.ts` 상단 주석의 "KPA·K-Cosmetics 공용" 서술은 이번에 실측 근거로 정정했으나
    `store-handled-products.service.ts` · `pharmacy-hub-store-org.seam.ts` 의 유사 서술도 같은 정정이 필요하다(기록 문서 아닌 소스 주석).
 
 ---
@@ -226,5 +213,5 @@ API contract · schema · migration · role/membership 정책 · organization �
 발견 1건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 1건
 
 - 발견: `store-handled-products.service.ts` · `pharmacy-hub-store-org.seam.ts` 의 설계 근거 주석이
-  `/api/v1/store/handled-products` 를 "KPA·GlycoPharm·K-Cosmetics 공용" 으로 서술하나 실측 소비처는 KPA 단독이다.
+  `/api/v1/store/handled-products` 를 "KPA·K-Cosmetics 공용" 으로 서술하나 실측 소비처는 KPA 단독이다.
   소스 주석이므로 §16 인라인 허용(SUPERSEDED 표기·링크 교정) 대상이 아니고, WO 범위 밖 파일이라 수정하지 않고 §8-3 으로 보고한다.

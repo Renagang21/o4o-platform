@@ -3,7 +3,7 @@
 > **상위 문서**: `CLAUDE.md`
 > **관련**: `docs/o4o-common-structure.md`, `docs/platform/hub/O4O-HUB-TEMPLATE-STANDARD-V1.md`, `docs/architecture/STORE-LAYER-ARCHITECTURE.md`, `docs/platform/operator/OPERATOR-DASHBOARD-STANDARD-V1.md`
 > **버전**: V3
-> **작성일**: 2026-05-02 · **개정**: 2026-08-04 (V3 — 서비스 프레임 정의 정렬 + GlycoPharm 대상 복귀) · 2026-09-17 (V3.2 — Neture 「공급자·파트너」 표현 정정, Legacy Partner 은퇴 반영)
+> **작성일**: 2026-05-02 · **개정**: 2026-08-04 (V3 — 서비스 프레임 정의 정렬) · 2026-09-17 (V3.2 — Neture 「공급자·파트너」 표현 정정, Legacy Partner 은퇴 반영)
 > **상태**: Active Standard
 >
 > 이 문서는 O4O 플랫폼에서 "**이게 공통화 맞느냐**"를 판단하는 기준 문서이다. 모든 공통화 관련 작업(WO/IR/구현/리뷰)은 이 문서를 기준으로 결정한다.
@@ -12,7 +12,7 @@
 
 ## 0. 현재 스코프 선언 (V3)
 
-> 근거: [`WO-O4O-COMMONIZATION-SERVICE-FRAME-AND-GLYCOPHARM-SCOPE-REALIGNMENT-V1`](../work-orders/WO-O4O-COMMONIZATION-SERVICE-FRAME-AND-GLYCOPHARM-SCOPE-REALIGNMENT-V1.md)(V3) · [`WO-O4O-COMMONIZATION-STANDARD-SCOPE-REALIGNMENT-V1`](../work-orders/WO-O4O-COMMONIZATION-STANDARD-SCOPE-REALIGNMENT-V1.md)(V2) · [`IR-O4O-EXISTING-COMMONIZATION-ASSET-AND-STATUS-REGISTRY-V1`](../investigations/IR-O4O-EXISTING-COMMONIZATION-ASSET-AND-STATUS-REGISTRY-V1.md)
+> 근거: [`WO-O4O-COMMONIZATION-STANDARD-SCOPE-REALIGNMENT-V1`](../work-orders/WO-O4O-COMMONIZATION-STANDARD-SCOPE-REALIGNMENT-V1.md)(V2) · [`IR-O4O-EXISTING-COMMONIZATION-ASSET-AND-STATUS-REGISTRY-V1`](../investigations/IR-O4O-EXISTING-COMMONIZATION-ASSET-AND-STATUS-REGISTRY-V1.md)
 
 ### 0.1 Cycle 1 은 종료되었다
 
@@ -25,11 +25,9 @@
 | 구분 | 내용 |
 |------|------|
 | V2 가 변경한 것 | **공식 대상 서비스 집합**(§3) 과 그에 따른 매트릭스 표기(§9) |
-| V3 가 변경한 것 | **서비스 프레임 정의**(§1.1 신설) · **GlycoPharm 대상 복귀**(§3.4) · **KPA↔K-Cosmetics 동일 프레임 관계**(§3.0.1) · **매장 경영자 공통 역할**(§3.2 신설) · **PharmacyHub 해석 정정**(§3.3) · 매트릭스 표기(§9) |
+| V3 가 변경한 것 | **서비스 프레임 정의**(§1.1 신설) · **KPA↔K-Cosmetics 동일 프레임 관계**(§3.0.1) · **매장 경영자 공통 역할**(§3.2 신설) · **PharmacyHub 해석 정정**(§3.3) · 매트릭스 표기(§9) |
 | 변경하지 않은 것 | 공통화 정의(§1) · Hub 표준(§2) · Layout 정책(§4) · Template 원칙(§5) · 판정 체크리스트(§6) · 금지사항(§7) · dead code 기준(§8) |
 | 번복하지 않은 것 | Cycle 1 종료 판정, 기존 채택 검증 기록, Neture 독립 경계(§3.1) |
-
-> **V3 는 문서 해석의 정정이며 코드·패키지·DB 변경을 수반하지 않는다.** V3 개정 작업에서 GlycoPharm 코드, PharmacyHub 코드·문서는 일절 수정하지 않았다.
 
 ### 0.3 Frozen baseline 은 본 개정으로 변경되지 않는다
 
@@ -75,8 +73,6 @@ Service Extension
 │  └─ 약국·약사·의약품
 ├─ K-Cosmetics
 │  └─ 화장품 매장·화장품
-├─ GlycoPharm
-│  └─ GlycoPharm 도메인
 ├─ PharmacyHub
 │  └─ 공급자 직결 B2B 거래
 └─ Neture
@@ -131,7 +127,6 @@ core
 |--------|------|----------------|-------------|--------|
 | **KPA-Society** | `services/web-kpa-society` | **공통 서비스 프레임 + 약국·약사·의약품 extension** — 현재 기준 구현을 가장 많이 보유 | 전체 | `MATURE_REFERENCE` |
 | **K-Cosmetics** | `services/web-k-cosmetics` | **공통 서비스 프레임 + 화장품 매장·화장품 extension** — KPA 와 **동일 지위** | 전체 | `MATURE_SHARED_CORE_CONSUMER` |
-| **GlycoPharm** | `services/web-glycopharm` | **공통 서비스 프레임 + GlycoPharm 도메인 extension** | 기존 공통화 구조 유지 | `EXISTING_ADOPTION_MAINTAINED` |
 | **Neture** | `services/web-neture` | **공급자 중심 독립 서비스**(O4O 공급자 서비스 + O4O 대표 진입 홈) + 넓은 공통 소비 | **부분 채택** — §3.1 | `INDEPENDENT_APP_WITH_SHARED_CORES` |
 | **PharmacyHub** | `services/web-pharmacy-hub` | **공통 매장 경영 프레임 + 공급자 직결 B2B 구매·주문·결제 extension** | **adoption 초기** — §3.3 | `NEW_SERVICE_EARLY_ADOPTION` |
 
@@ -243,29 +238,6 @@ PharmacyHub 영역은 다음 3구분으로만 다룬다.
 
 > V3 개정 작업은 **본 기준 문서의 해석만 정정**했다. PharmacyHub 조사·문서 수정·개발 요청·구현은 **하지 않았다** — PharmacyHub 는 별도 작업 트랙에서 진행 중이므로 그 범위를 침범하지 않는다.
 
-### 3.4 GlycoPharm — 공통화 대상 서비스 (V3 정정)
-
-**GlycoPharm 삭제 검토는 보류한다. GlycoPharm 은 현재 공통화 대상 서비스다.**
-
-V2 의 `historical out-of-scope` 판정(제거 검토 중 · 조사 금지 · 신규 공통 모듈 적용 검토 금지 · 현재 판정 근거에서 제외)은 **더 이상 유효하지 않으며 본 V3 로 정정한다.**
-
-| 항목 | V2 (폐기) | **V3 (현행)** |
-|------|-----------|---------------|
-| 대상 여부 | 공식 대상에서 제외 | **공통화 대상 서비스** |
-| 삭제 검토 | 제거 검토 중 | **보류** |
-| 조사 | 하지 않음 | 필요 시 다른 대상 서비스와 동일 기준으로 수행 |
-| 신규 공통 모듈 적용 | 검토하지 않음 | 다른 대상 서비스와 동일 기준으로 검토 |
-| 기존 공통화 구조 | — | **유지** (기존 채택 축과 후속 공통화 작업을 그대로 유지) |
-| 매트릭스 표기 | `(historical)` | 정규 열 |
-
-```text
-GlycoPharm = 공통 서비스 프레임 + GlycoPharm 도메인 extension
-```
-
-> **본 V3 개정 작업에서 GlycoPharm 코드·기능은 수정하지 않았다.** 문서상 스코프 판정만 복귀시킨 것이며, 실제 GlycoPharm adoption 실측 재검증은 별도 작업이다(현행 매트릭스 §9.1 의 GlycoPharm 값은 **2026-05-02 검증 시점 기준**임을 유지한다).
-
----
-
 ## 4. Layout 정책 (Hub 외 영역)
 
 ### 4.1 Home
@@ -370,17 +342,17 @@ Override 정책 상세: [`O4O-HUB-TEMPLATE-STANDARD-V1.md` § 8](../platform/hub
 
 ### 9.1 Hub Template
 
-**검증 일자**: 2026-05-02 (KPA/GlycoPharm/KCos/Neture) · 2026-08-03 (PharmacyHub 열 추가) — V3(2026-08-04)는 **표기만 정정**하고 실측을 재수행하지 않았다.
+**검증 일자**: 2026-05-02 (KPA/KCos/Neture) · 2026-08-03 (PharmacyHub 열 추가) — V3(2026-08-04)는 **표기만 정정**하고 실측을 재수행하지 않았다.
 **기준**: `services/web-{service}/src/pages/**/*.tsx`에서 `@o4o/shared-space-ui` Template import 여부
 
-| Domain | KPA-Society | K-Cosmetics | GlycoPharm | Neture | PharmacyHub |
-|--------|:-----------:|:-----------:|:----------:|:------:|:-----------:|
-| **Forum** | ✅ A | ✅ A | ✅ A | ✅ A | — 미채택 |
-| **Content** | ✅ A | ✅ A | ✅ A | ✅ A | — 미채택 |
-| **Resources** | ✅ A | ✅ A | ✅ A | ✅ A | — 미채택 |
-| **LMS** | ✅ A | ✅ A | ✅ A | ❌ 제외 | — 미채택 |
-| **Store-Hub** | ✅ A | ✅ A | ✅ A | ❌ 제외 | — 미채택 |
-| **Signage** | ✅ A (Manager) | ✅ A (Manager) | ✅ A (Hub) | ⏸ 보류 | — 미채택 |
+| Domain | KPA-Society | K-Cosmetics | Neture | PharmacyHub |
+| -------- | :-----------: | :-----------: | :------: | :-----------: |
+| **Forum** | ✅ A | ✅ A | ✅ A | — 미채택 |
+| **Content** | ✅ A | ✅ A | ✅ A | — 미채택 |
+| **Resources** | ✅ A | ✅ A | ✅ A | — 미채택 |
+| **LMS** | ✅ A | ✅ A | ❌ 제외 | — 미채택 |
+| **Store-Hub** | ✅ A | ✅ A | ❌ 제외 | — 미채택 |
+| **Signage** | ✅ A (Manager) | ✅ A (Manager) | ⏸ 보류 | — 미채택 |
 
 범례:
 - **A** = Adopted (Template 채택)
@@ -388,28 +360,28 @@ Override 정책 상세: [`O4O-HUB-TEMPLATE-STANDARD-V1.md` § 8](../platform/hub
 - **보류** = 향후 결정
 - **미채택** = 실측상 Template import 0. **적용 대상 여부는 미판정** — 화면군별 판정은 후속 IR(§3.3). `NOT_APPLICABLE` 로 단정하지 않는다
 - (Manager) = `SignageManagerTemplate` (영상/플레이리스트형) · (Hub) = `SignageHubTemplate` (콘텐츠 목록형)
-- GlycoPharm 열은 V3 에서 `(historical)` 표기를 해제했다(§3.4). 값 자체는 2026-05-02 실측이며 재검증 시 갱신한다.
+- 값 자체는 2026-05-02 실측이며 재검증 시 갱신한다.
 
 ### 9.2 채택 파일 위치 (verified)
 
-| Domain | KPA | K-Cos | Glyco | Neture | PharmacyHub |
-|--------|-----|-------|-------|--------|-------------|
-| Forum | `forum/ForumHomePage.tsx` | `forum/ForumHubPage.tsx` | `forum/ForumHubPage.tsx` | `forum/ForumHubPage.tsx` | — |
-| Content | `pharmacy/HubContentLibraryPage.tsx` | `library/ContentLibraryPage.tsx` | `hub/HubContentListPage.tsx` | `library/ContentLibraryPage.tsx` | — |
-| Resources | `resources/ResourcesHubPage.tsx` | `resources/ResourcesPage.tsx` | `resources/ResourcesPage.tsx` | `resources/NetureResourcesPage.tsx` | — |
-| LMS | `lms/EducationPage.tsx` | `lms/EducationPage.tsx` | `education/EducationPage.tsx` | — | — |
-| Store-Hub | `pharmacy/StoreHubPage.tsx` | `hub/KCosmeticsHubPage.tsx` | `hub/StoreHubPage.tsx` | — | — |
-| Signage | `signage/ContentHubPage.tsx` (Manager) | `signage/ContentHubPage.tsx` (Manager) | `store-management/signage/ContentLibraryPage.tsx` (Hub) | — | — |
+| Domain | KPA | K-Cos | Neture | PharmacyHub |
+| -------- | ----- | ------- | -------- | ------------- |
+| Forum | `forum/ForumHomePage.tsx` | `forum/ForumHubPage.tsx` | `forum/ForumHubPage.tsx` | — |
+| Content | `pharmacy/HubContentLibraryPage.tsx` | `library/ContentLibraryPage.tsx` | `library/ContentLibraryPage.tsx` | — |
+| Resources | `resources/ResourcesHubPage.tsx` | `resources/ResourcesPage.tsx` | `resources/NetureResourcesPage.tsx` | — |
+| LMS | `lms/EducationPage.tsx` | `lms/EducationPage.tsx` | — | — |
+| Store-Hub | `pharmacy/StoreHubPage.tsx` | `hub/KCosmeticsHubPage.tsx` | — | — |
+| Signage | `signage/ContentHubPage.tsx` (Manager) | `signage/ContentHubPage.tsx` (Manager) | — | — |
 
 ### 9.3 Layout 표준 (Hub 외)
 
 | 영역 | 표준 문서 | 적용 |
 |------|----------|------|
-| `/store` | `STORE-LAYER-ARCHITECTURE.md` | KPA · K-Cos (Neture 부분 · PharmacyHub 미채택 · **GlycoPharm 미조사**) |
-| `/operator` | `OPERATOR-DASHBOARD-STANDARD-V1.md` | KPA · K-Cos · Neture (PharmacyHub 미채택 · **GlycoPharm 미조사**) |
+| `/store` | `STORE-LAYER-ARCHITECTURE.md` | KPA · K-Cos (Neture 부분 · PharmacyHub 미채택) |
+| `/operator` | `OPERATOR-DASHBOARD-STANDARD-V1.md` | KPA · K-Cos · Neture (PharmacyHub 미채택) |
 | `/mypage` | (별도 표준 문서 미정) | 서비스별 운영, 향후 표준화 검토 |
 
-> GlycoPharm 은 V3 에서 대상 서비스로 복귀했으나(§3.4), Hub 외 영역의 실측은 수행되지 않았다. §9.0 "미조사 = 공백" 원칙에 따라 추정으로 채우지 않는다.
+> §9.0 "미조사 = 공백" 원칙에 따라 추정으로 채우지 않는다.
 
 > 상세 adoption 실측(공통 패키지 25종 × 4서비스)은 [`IR-O4O-EXISTING-COMMONIZATION-ASSET-AND-STATUS-REGISTRY-V1` §7](../investigations/IR-O4O-EXISTING-COMMONIZATION-ASSET-AND-STATUS-REGISTRY-V1.md) 참조.
 
@@ -421,9 +393,9 @@ Override 정책 상세: [`O4O-HUB-TEMPLATE-STANDARD-V1.md` § 8](../platform/hub
 
 | 축 | 내용 | 상태 |
 |:--:|------|------|
-| **A** | **기준 문서 재정렬** — 대상 서비스 집합, 서비스 프레임 정의(§1.1), KPA↔K-Cos 동일 지위(§3.0.1), 매장 경영자 공통 역할(§3.2), GlycoPharm 대상 복귀(§3.4) | **V2 → V3 개정으로 완료** |
+| **A** | **기준 문서 재정렬** — 대상 서비스 집합, 서비스 프레임 정의(§1.1), KPA↔K-Cos 동일 지위(§3.0.1), 매장 경영자 공통 역할(§3.2) | **V2 → V3 개정으로 완료** |
 | **B** | **PharmacyHub adoption** — 화면군 단위 판정 → 우선순위 → 리팩터링 순서 → 회귀 검증 | 후속 IR |
-| **C** | **legacy · seam 정비** — `@o4o/operator-core` · `@o4o/auth-context` · 서비스별 `AuthContext` · `forum-core`↔`shared-space-ui` 경계 · GP 페어링 추출물 잔존 소비처 · dormant LMS export | 후속 WO/IR (operator-core 는 **조사 완료**, 아래 참조) |
+| **C** | **legacy · seam 정비** — `@o4o/operator-core` · `@o4o/auth-context` · 서비스별 `AuthContext` · `forum-core`↔`shared-space-ui` 경계 · 페어링 추출물 잔존 소비처 · dormant LMS export | 후속 WO/IR (operator-core 는 **조사 완료**, 아래 참조) |
 
 **축 B 와 축 C 를 같은 작업에서 처리하지 않는다**(§0.4).
 
@@ -457,7 +429,6 @@ Override 정책 상세: [`O4O-HUB-TEMPLATE-STANDARD-V1.md` § 8](../platform/hub
 | **Cycle 1 종료 기록** | [`docs/checks/CHECK-O4O-CROSS-SERVICE-COMMONIZATION-CYCLE1-CLOSURE-V1.md`](../checks/CHECK-O4O-CROSS-SERVICE-COMMONIZATION-CYCLE1-CLOSURE-V1.md) |
 | **공통화 자산 현황 조사** | [`docs/investigations/IR-O4O-EXISTING-COMMONIZATION-ASSET-AND-STATUS-REGISTRY-V1.md`](../investigations/IR-O4O-EXISTING-COMMONIZATION-ASSET-AND-STATUS-REGISTRY-V1.md) |
 | **V2 재정렬 WO** | [`docs/work-orders/WO-O4O-COMMONIZATION-STANDARD-SCOPE-REALIGNMENT-V1.md`](../work-orders/WO-O4O-COMMONIZATION-STANDARD-SCOPE-REALIGNMENT-V1.md) |
-| **V3 재정렬 WO** | [`docs/work-orders/WO-O4O-COMMONIZATION-SERVICE-FRAME-AND-GLYCOPHARM-SCOPE-REALIGNMENT-V1.md`](../work-orders/WO-O4O-COMMONIZATION-SERVICE-FRAME-AND-GLYCOPHARM-SCOPE-REALIGNMENT-V1.md) |
 
 ---
 
@@ -466,8 +437,8 @@ Override 정책 상세: [`O4O-HUB-TEMPLATE-STANDARD-V1.md` § 8](../platform/hub
 | 날짜 | 버전 | 변경 |
 |------|------|------|
 | 2026-05-02 | V1 | 초안 작성 — 공통화 정의, 6개 Hub 채택 매트릭스 코드 검증, Neture 부분 채택 명시, 판정 체크리스트, 금지/dead code 정리 기준 |
-| 2026-08-03 | V2 | **공식 대상 서비스 재정렬** — §0 스코프 선언 신설(Cycle 1 CLOSED 계승 · frozen baseline 불변 · legacy↔adoption 분리) · §3.0 공식 4서비스(KPA/K-Cos/Neture/PharmacyHub) + 역할·성숙도 · §3.0.1 KPA reference 3분류 · §3.3 PharmacyHub 취급 원칙(3구분, 의무 적용 아님) · §3.4 GlycoPharm historical out-of-scope(삭제 아닌 표시) · §9.0 매트릭스 갱신 원칙(dependency≠adoption) · §9.1~9.3 매트릭스 열 재정렬 · §10 현재 트랙 3축(기존 §10 참조 문서 → §11). **공통화 정의·Hub 표준·Layout 정책·Template 원칙·체크리스트·금지사항은 변경 없음** |
-| 2026-08-04 | V3 | **서비스 프레임 정의 정렬 + GlycoPharm 대상 복귀** — §1.1 신설(O4O Common Service Frame ↔ Service Extension 구조, 공통화 5요소, 공통 core 서비스 조건문 금지) · §3.0 대상 서비스 표를 "프레임 + extension" 기준으로 재기술(GlycoPharm 행 복귀) · §3.0.1 **KPA Society ↔ K-Cosmetics 동일 프레임 지위** 명시(하위 서비스·단순 frame 검증체 표현 폐기) · §3.2 신설 **매장 경영자 공통 역할**(구매·판매·콘텐츠 실행 병행, "KPA=판매자 / PharmacyHub=구매자" 구분 폐기) · §3.3 **PharmacyHub 해석 정정**(공통 매장 경영 프레임 + B2B extension, `MISSING_BASE_FUNCTION` 표기 도입) · §3.4 **GlycoPharm historical out-of-scope 폐기 → 공통화 대상 복귀**(삭제 검토 보류) · §7 금지사항 1행 추가 · §9.0 표기 원칙 2행 추가 · §9.1~9.3 매트릭스 열 재정렬(GlycoPharm `(historical)` 해제, Hub 외 영역은 `미조사`). **공통화 정의·Hub 표준·Layout 정책·Template 원칙·체크리스트·Cycle 1 종료 판정·Neture 독립 경계는 변경 없음. 코드·패키지·DB 변경 0** |
-| 2026-08-08 | V3.1 | **§9.3 표 렌더링 정정** — V3 편집 시 `/mypage` 행이 GlycoPharm 미조사 note 아래로 밀려 표 밖으로 떨어져 있던 것을 표 안으로 복귀시키고 note 를 표 뒤로 이동. **판정·표기 내용 변경 없음. 코드·패키지·DB 변경 0** |
+| 2026-08-03 | V2 | **공식 대상 서비스 재정렬** — §0 스코프 선언 신설(Cycle 1 CLOSED 계승 · frozen baseline 불변 · legacy↔adoption 분리) · §3.0 공식 4서비스(KPA/K-Cos/Neture/PharmacyHub) + 역할·성숙도 · §3.0.1 KPA reference 3분류 · §3.3 PharmacyHub 취급 원칙(3구분, 의무 적용 아님) · §9.0 매트릭스 갱신 원칙(dependency≠adoption) · §9.1~9.3 매트릭스 열 재정렬 · §10 현재 트랙 3축(기존 §10 참조 문서 → §11). **공통화 정의·Hub 표준·Layout 정책·Template 원칙·체크리스트·금지사항은 변경 없음** |
+| 2026-08-04 | V3 | §3.0 대상 서비스 표를 "프레임 + extension" 기준으로 재기술 · §3.0.1 **KPA Society ↔ K-Cosmetics 동일 프레임 지위** 명시(하위 서비스·단순 frame 검증체 표현 폐기) · §3.2 신설 **매장 경영자 공통 역할**(구매·판매·콘텐츠 실행 병행, "KPA=판매자 / PharmacyHub=구매자" 구분 폐기) · §3.3 **PharmacyHub 해석 정정**(공통 매장 경영 프레임 + B2B extension, `MISSING_BASE_FUNCTION` 표기 도입) · §7 금지사항 1행 추가 · §9.0 표기 원칙 2행 추가 · **공통화 정의·Hub 표준·Layout 정책·Template 원칙·체크리스트·Cycle 1 종료 판정·Neture 독립 경계는 변경 없음. 코드·패키지·DB 변경 0** |
+| 2026-08-08 | V3.1 | **판정·표기 내용 변경 없음. 코드·패키지·DB 변경 0** |
 | 2026-09-17 | V3.2 | **Neture 「공급자·파트너」 표현 정정** — §1.1 구조도 · §3.0 표 · §3.1 예외 사유 · §3.1 `/store` 행 · §3.1 주의 문단에서 Legacy Partner(2026-09-15 은퇴, ROLE-WORKSPACE-ARCHITECTURE §7)를 현행 도메인처럼 서술하던 문구를 「공급자 중심(Supplier Workspace) + O4O 대표 진입 홈」 으로 정정. **Neture 독립 경계 · 부분 채택 판정 · Hub 매트릭스 변경 없음. 코드·패키지·DB 변경 0**. 근거: WO-O4O-LEGACY-PARTNER-USER-FACING-CONTENT-AND-ACTIVE-DOC-CLEANUP-V1 (CLAUDE.md §16-4 예외 — 명시적 WO 에 의한 기준문서 내용 정정) |
 | 2026-08-03 | V2.1 | **축 C `operator-core` 상태 정정** — §10.1 신설(`legacy 제거 대상` 이 아니라 `superseded` 판정 · 빌드 경로 참조 16곳 · 은퇴 판단과 core 재정의 판단 분리) · §9.0 각주 실측 정정(3서비스 → 4서비스 + Dockerfile/tailwind 참조). 근거: `IR-O4O-OPERATOR-CORE-CANONICAL-ROLE-AND-MODULAR-COMPOSITION-AUDIT-V1` |

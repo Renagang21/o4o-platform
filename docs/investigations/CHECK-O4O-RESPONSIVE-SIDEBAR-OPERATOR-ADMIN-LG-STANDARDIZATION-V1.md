@@ -11,10 +11,10 @@
 
 ## 1. 결론 요약
 
-- 공통 사이드바 2개 파일만 변경 → **5개 소비 surface 전부 일괄 적용** (KPA operator / GP operator / KCos operator / Neture operator / Neture admin).
+- 공통 사이드바 2개 파일만 변경 → **5개 소비 surface 전부 일괄 적용** (KPA operator operator / KCos operator / Neture operator / Neture admin).
 - breakpoint **md→lg**: tablet(768~1023) 구간도 이제 drawer (IR 확정 표준 = Desktop ≥1024).
 - ESC close **추가**(기존 X버튼+backdrop만 있었음). 메뉴 계층 토큰(group weight 600, child 13px·pl-14) 정리.
-- **frontend-only**. route/권한/menu visibility/메뉴명/backend/DB/package 변경 없음. store/store-hub/supplier/GP·KCos DashboardLayout **미변경**.
+- **frontend-only**. route/권한/menu visibility/메뉴명/backend/DB/package 변경 없음. store/store-hub/supplier/KCos DashboardLayout **미변경**.
 
 ---
 
@@ -30,7 +30,6 @@
 ### 소비처(영향 범위) — 전부 OperatorAreaShell 경유
 ```
 KpaOperatorLayoutWrapper       (KPA /operator)
-GlycoPharm OperatorLayoutWrapper (GP /operator)
 KCos OperatorLayoutWrapper      (KCos /operator)
 Neture OperatorLayoutWrapper    (Neture /operator)
 Neture AdminLayoutWrapper       (Neture /admin)
@@ -80,7 +79,6 @@ ESC            : 본 WO 추가 ✓ (useEffect keydown, open 시에만 리스너)
 | 앱 | 결과 |
 |----|------|
 | `@o4o/web-kpa-society` | ✅ ✓ built 17.0s (exit 0) |
-| `glycopharm-web` | ✅ ✓ built 21.7s (exit 0) |
 | `@o4o/web-k-cosmetics` | ✅ ✓ built 12.5s (exit 0) |
 | `@o4o/web-neture` | ✅ ✓ built 12.6s (exit 0) |
 
@@ -90,7 +88,7 @@ ESC            : 본 WO 추가 ✓ (useEffect keydown, open 시에만 리스너)
 ### browser smoke 체크리스트 (배포 후 — 미배포)
 ```
 viewport 375 / 768 / 1023 / 1024 / wide 에서:
-- KPA /operator , GP /operator , KCos /operator , Neture /admin(+/operator)
+- KPA /operator , operator , KCos /operator , Neture /admin(+/operator)
 - <1024: 햄버거 표시 · 사이드바 숨김 · drawer open
 - drawer close: overlay click / ESC / 메뉴선택 / X 버튼
 - >=1024: 사이드바 고정 표시 · 본문 미가림
@@ -104,7 +102,7 @@ viewport 375 / 768 / 1023 / 1024 / wide 에서:
 
 - **변경 모듈**: operator/admin 공통 sidebar(`DomainIASidebar`) + layout shell(`OperatorAreaShell`).
 - **소비처 전수 식별**: grep 결과 코드 소비처 = 5개 wrapper(전부 OperatorAreaShell 경유) + barrel index. standalone 소비처 없음.
-- **회귀 검증**: 4개 앱(KPA/GP/KCos/Neture) build PASS. 노출 결과(route/visibility) 불변 — 스타일·breakpoint·토큰만 변경.
+- **회귀 검증**: 3개 앱(KPA/KCos/Neture) build PASS. 노출 결과(route/visibility) 불변 — 스타일·breakpoint·토큰만 변경.
 - **임시 예외 없음**: 서비스별 분기 추가 없이 공통 컴포넌트 단일 변경.
 
 ---
@@ -114,7 +112,7 @@ viewport 375 / 768 / 1023 / 1024 / wide 에서:
 ```
 - browser/visual smoke 배포 후 필요 (1023↔1024 경계, drawer 동작, child 토큰).
 - 본 WO 범위 밖(후속 별도 WO):
-  · GP/KCos admin DashboardLayout (별도 컴포넌트, md→lg 미적용 + lg:ml-64 본문 margin 제거)
+KCos admin DashboardLayout (별도 컴포넌트, md→lg 미적용 + lg:ml-64 본문 margin 제거)
   · KPA admin AdminSidebar (별도 컴포넌트, md 기준)
   · store / store-hub / supplier (P0 에서 store-hub·supplier 만 lg drawer 적용 완료, store 는 lg 기준이나 별도 StoreSidebar)
   → 사이드바 6종 중 본 WO 는 #1(DomainIASidebar) 만 lg 표준화. 나머지(#2 DashboardLayout, #3 KPA AdminSidebar)는 후속.

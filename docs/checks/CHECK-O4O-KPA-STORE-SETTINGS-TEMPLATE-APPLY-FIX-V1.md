@@ -96,7 +96,7 @@ PATCH 성공 시 하나의 UPDATE 로 일치시킨다.
 | `template_profile` | 위와 동일 값으로 동기화 (`patch.template` 전송 시) |
 | `storefront_blocks` | 실제 렌더 blocks (`blocksChanged` 일 때만 write) |
 
-`template_profile` 은 **삭제하지 않고 호환 필드로 동기화만** 유지한다 (공개 홈 fallback·operator 콘솔·GlycoPharm 조회가 아직 소비).
+`template_profile` 은 **삭제하지 않고 호환 필드로 동기화만** 유지한다 (공개 홈 fallback·operator 콘솔 조회가 아직 소비).
 
 ```sql
 UPDATE organizations
@@ -140,7 +140,6 @@ organization_members.role IN ('owner','admin','manager') AND left_at IS NULL
 | 소비처 | 프론트 PATCH payload | 영향 |
 |--------|---------------------|------|
 | `kpa.routes.ts:577` | `{template, theme, blocks, applyTemplateDefaults}` | 신규 신호 사용 (본 WO 대상) |
-| `glycopharm.routes.ts:513` | `{theme}` 만 ([PharmacySettings.tsx:163](services/web-glycopharm/src/pages/store-management/PharmacySettings.tsx#L163) — `template` 미전송이 의도된 정책: 프랜차이즈 표준 template_profile 별도 관리) | **영향 0** — `template_profile` 동기화 조건(`patch.template` 존재)이 성립하지 않음 |
 | `cosmetics.routes.ts:121` | `{template, theme, blocks}` ([StoreSettingsPage.tsx:215](services/web-k-cosmetics/src/pages/store/StoreSettingsPage.tsx#L215)) | blocks 동작 **불변**(신호 미전송 → 요청 blocks 저장). `template_profile` 이 선택값과 정합되는 개선만 추가 |
 
 KPA-only 임시 예외를 만들지 않고 **공통 정책으로 처리**했다 (백엔드가 3서비스 공통으로 동일 계약을 제공).
@@ -262,7 +261,6 @@ API 계약상 blocks 를 "빈 상태"로 되돌릴 수는 없어(비어 있지 �
 PharmacyTemplatePage 삭제
 pages/pharmacy/index.ts barrel export 제거
 /store/settings/template → /store/settings redirect (1홉)
-PUT /stores/:slug/template 은퇴 여부는 별도 판단 (GlycoPharm 동명 API 별도 보유)
 ```
 
 ---

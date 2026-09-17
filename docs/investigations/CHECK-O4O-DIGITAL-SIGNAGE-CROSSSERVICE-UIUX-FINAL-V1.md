@@ -1,7 +1,7 @@
 # CHECK-O4O-DIGITAL-SIGNAGE-CROSSSERVICE-UIUX-FINAL-V1
 
 > **유형:** 최종 점검 CHECK (read-only, 코드/UI/API/DB/route/menu 무변경)
-> **목적:** KPA / GlycoPharm / K-Cosmetics 디지털사이니지 사용자-facing UI-UX baseline 정렬 완료 상태를 최종 점검하고 공식 종료한다.
+> **목적:** KPA / K-Cosmetics 디지털사이니지 사용자-facing UI-UX baseline 정렬 완료 상태를 최종 점검하고 공식 종료한다.
 > **작성:** 2026-06-13
 > **판정:** **PASS — 디지털사이니지 사용자-facing baseline 완료 고정**
 
@@ -9,7 +9,6 @@
 
 ## 1. 최종 판정 문구
 
-> **디지털사이니지 사용자-facing UI-UX baseline 은 KPA / GlycoPharm / K-Cosmetics 기준으로 PASS 완료 고정한다.**
 > Neture 는 signage frontend surface 제거 완료로 공통화 대상에서 제외한다.
 > 남은 항목은 공개 송출 정책, dead surface cleanup, operator console 공통화 등 후속 backlog 이며, 현재 baseline 완료를 막는 blocker 가 아니다.
 
@@ -33,18 +32,18 @@
 | 3 | WO-O4O-KPA-DIGITAL-SIGNAGE-UIUX-BASELINE-V1 | KPA 용어/제목/CTA baseline (commit 829d6bf27) |
 | 4 | IR-O4O-STORE-SIGNAGE-PLAYLIST-VIEW-MODES-AUDIT-V1 | 2-view 구조 조사 (commit 3b4057436) |
 | 5 | WO-O4O-KPA-STORE-SIGNAGE-PLAYLIST-TWO-VIEW-V1 | KPA 송출 route 격리 (commit 9058a81f6) |
-| 6 | WO-O4O-DIGITAL-SIGNAGE-CROSSSERVICE-APPLY-V1 | GP/KCos 확산+격리+cleanup (commit 4dbcb7ec7) |
+| 6 | WO-O4O-DIGITAL-SIGNAGE-CROSSSERVICE-APPLY-V1 | KCos 확산+격리+cleanup (commit 4dbcb7ec7) |
 
 ## 4. 최종 완료 기준 점검
 
 | # | 기준 | 결과 |
 |:-:|------|:--:|
-| 1 | KPA/GP/KCos 기능명 = `디지털사이니지` | ✅ |
-| 2 | 내 매장 제목 = `디지털사이니지 운영` | ✅ (KPA·GP StoreSignageMainPage·KCos StoreSignagePage) |
+| 1 | KPA/KCos 기능명 = `디지털사이니지` | ✅ |
+| 2 | 내 매장 제목 = `디지털사이니지 운영` | ✅ (KPA StoreSignageMainPage·KCos StoreSignagePage) |
 | 3 | 실제 송출 화면이 관리 layout 과 분리 | ✅ (3서비스 송출 route layout wrapper 밖 격리) |
 | 4 | 송출 화면 header/sidebar/footer/tabs/관리버튼 미마운트 | ✅ (가드-단독 route, layout 미적용) |
 | 5 | F11/ESC 전체화면 안내 존재 | ✅ (3서비스 SignagePlaybackPage 동일 코드) |
-| 6 | GP/KCos 에 KPA baseline 확산 | ✅ |
+| 6 | KCos 에 KPA baseline 확산 | ✅ |
 | 7 | KCos 깨진 route/link cleanup | ✅ (`/partner/signage/content` repoint+제거) |
 | 8 | Neture signage frontend surface 제거 | ✅ (route/page/lazy import/menu 그룹 제거) |
 | 9 | backend/API/DB/migration/shared signage core 무변경 | ✅ |
@@ -55,7 +54,6 @@
 | 서비스 | 상태 | 판정 |
 |--------|------|:--:|
 | **KPA Society** | 기준 baseline + 2-view 송출 route 격리 완료 | **PASS** |
-| **GlycoPharm** | baseline 확산 + 송출 route 격리 완료 | **PASS** |
 | **K-Cosmetics** | baseline 확산 + 송출 route 격리 + 깨진 route cleanup 완료 | **PASS** |
 | **Neture** | signage frontend surface 제거 완료 | **대상 제외** |
 
@@ -64,7 +62,7 @@
 | 서비스 | live user-facing "디지털 사이니지"(띄어쓰기) | 비고 |
 |--------|:--:|------|
 | KPA | 0 | 잔존=코드 주석/JSDoc만 |
-| GP | 0 | 잔존=주석 + dead/unrouted `StoreSignagePage.tsx`(StoreSignageMainPage 로 교체) |
+| 0 | 잔존=주석 + dead/unrouted `StoreSignagePage.tsx`(StoreSignageMainPage 로 교체) |
 | KCos | **0** (grep count 0 재확인) | — |
 
 기준: 기능명/제목/메뉴/카드 = `디지털사이니지`, 내 매장 = `디지털사이니지 운영`, 송출 선택 = `디지털사이니지 송출`, hub hero = `플랫폼 디지털사이니지`. operator technical term("사이니지 미디어/플레이리스트")·도메인 문구("내 약국에 추가")는 정책상 보존.
@@ -73,7 +71,7 @@
 
 | 보기 | route | layout | 가드 |
 |------|-------|--------|------|
-| 일반 관리 | `/store/marketing/signage/{playlist,videos,schedules,player}` | store layout(chrome 포함) | KPA PharmacyGuard / GP PharmacyStoreGuard / KCos StoreOwnerRoute (+ StoreLayoutWrapper) |
+| 일반 관리 | `/store/marketing/signage/{playlist,videos,schedules,player}` | store layout(chrome 포함) | KPA PharmacyGuard PharmacyStoreGuard / KCos StoreOwnerRoute (+ StoreLayoutWrapper) |
 | 실제 송출 | `/store/marketing/signage/play/:playlistId` | **layout wrapper 밖** | 동일 가드 **단독**(StoreLayoutWrapper 미적용) |
 
 - path 문자열 불필요 변경 없음(트리 위치만 격리). 인증/승인 가드 유지.
@@ -104,12 +102,11 @@
 
 ## 10. 빌드 검증 (참고)
 
-직전 `WO-...-APPLY-V1` 후 GP/KCos 빌드 확인 — KCos PASS, GP 는 **무관한 forum 회귀**(`ForumPage.tsx` viewCount, 타 세션 commit 260f84485)로 막혀 1줄 가드(commit 99d10733b) unblock 후 **GP·KCos 빌드 PASS**. signage 변경 자체는 빌드 무이슈.
+직전 `WO-...-APPLY-V1` 후 KCos 빌드 확인 — KCos PASS 는 **무관한 forum 회귀**(`ForumPage.tsx` viewCount, 타 세션 commit 260f84485)로 막혀 1줄 가드(commit 99d10733b) unblock 후 **KCos 빌드 PASS**. signage 변경 자체는 빌드 무이슈.
 
 ## 11. 남은 backlog (완료 blocker 아님)
 
 ### 선택적 cleanup
-- GP dead `StoreSignagePage.tsx` / `/preview` stub 정리
 - KCos 추가 dead link 정밀 점검
 - signage operator console 3서비스 공통 추출
 - signage hub template 추가 수렴(매장 허브 3 local copy → SignageHubTemplate)
@@ -117,7 +114,7 @@
 ### 정책 backlog
 - 공개 무인증 송출 URL 도입 여부 / token 기반 display·player route
 - device/screen 연결 기능 확장
-- GP/KCos 공개 송출 정책
+- KCos 공개 송출 정책
 - Neture signage DB 데이터 cleanup 여부
 
 ### 후속 후보
@@ -134,8 +131,8 @@
 |------|------|
 | 생성 CHECK | `docs/investigations/CHECK-O4O-DIGITAL-SIGNAGE-CROSSSERVICE-UIUX-FINAL-V1.md` |
 | 조사 기준 commit | `99d10733b` |
-| 최종 판정 | **PASS 완료 고정** (KPA/GP/KCos) |
-| KPA/GP/KCos | 용어 + 2-view 송출 route 격리 + (KCos)cleanup 완료 |
+| 최종 판정 | **PASS 완료 고정** (KPA/KCos) |
+| KPA/KCos | 용어 + 2-view 송출 route 격리 + (KCos)cleanup 완료 |
 | Neture | signage frontend surface 제거 완료 → 대상 제외 |
 | backend/API/DB/migration/shared core | 무변경 |
 | 공개 무인증 송출 URL | 미도입 |

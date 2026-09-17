@@ -10,7 +10,7 @@
  * - user state 정상 (nav/profile 표시)
  *
  * 환경변수 필요 (서비스별 분리 — helpers/auth.helpers.ts 상단 계약 참조):
- *   E2E_{KPA|KCOS|NETURE|GLYCO}_ADMIN_EMAIL / _PASSWORD
+ *   E2E_{KPA|KCOS|NETURE}_ADMIN_EMAIL / _PASSWORD
  *   (docs/local/TEST-ACCOUNTS.local.md 참조)
  */
 

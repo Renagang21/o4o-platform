@@ -67,7 +67,6 @@
 | `apps/api-server/.../kpa/controllers/member.controller.ts` hard-delete 인라인 체크 | `hasAdminScope` (`scopes.includes('kpa:admin')`) | `hasAdminRole`(role) OR `hasAdminMembership`(membership) | **없음** |
 | 동 파일 soft-withdraw 감사 로그 | `scopes?.includes('kpa:admin') ? 'kpa:admin' : 'kpa:operator'` | 상수 `'kpa:operator'` | **없음** (실제로 늘 `'kpa:operator'` 였음) |
 | `apps/api-server/src/controllers/OperatorNotificationController.ts` (2곳) | `req.user.scopes` 에서 `*:operator` 를 찾아 serviceCode 유추 | query 파라미터 → 기본값 `'neture'` | **없음** (분기 실행 이력 0) |
-| glycopharm `application` · `admin` · `store-applications` controller | 로컬 `AuthRequest.user.scopes?: string[]` 타입 필드 | `roles` | 타입만 |
 
 `{service}:admin` / `{service}:operator` 등 **주입형 `requireScope(...)` 호출 약 60여 곳은 전부 role·membership guard 로 동작**하므로 호출부는 하나도 변경하지 않았다(동명 3종 — `createServiceScopeGuard` 의 반환 함수 · `createMembershipScopeGuard` 의 반환 함수 · service-legal 위임 — 모두 role/membership 축).
 
@@ -90,7 +89,7 @@
 - 기능·`dropshipping-admin` 라우터·`requireDropshippingScope` 는 **선행 타 세션 커밋 `0c857f984` 에서 이미 제거 완료**. 본 작업에서 재조사·복구하지 않았다(원칙 ⑦).
 - 공용 인증 코드(`SERVICE_SCOPES` · JWT 생성 · guard · 테스트·fixture)에서 `dropshipping:*` **활성 참조 0** — 제거할 잔재가 남아 있지 않았다.
 - 남은 `dropshipping` 문자열 분류:
-  1. **현행 기능 · scope 아님** — `services/web-glycopharm/**` 5곳. 글라이코팜 입점 신청의 **판매 방식 라벨 맵 키**(`dropshipping: '무재고 판매'`). JWT scope 와 무관하므로 유지.
+  1. 현행 기능 · JWT scope 와 무관하므로 유지.
   2. **과거 CHECK · 작업 기록** — `docs/checks/**` (은퇴 감사 · census).
   3. **삭제 사실 설명 문서** — `docs/architecture/BUSINESS-SERVICE-RULES.md` 등.
   4. **과거 migration** — 미수정(원칙 ⑨).
@@ -119,7 +118,6 @@
 ## 12. 제거 후 전체 재검색 결과
 
 - `apps/api-server/src` + `packages/security-core/src` 에 남은 `scopes` 문자열 = **`/auth/me` 계약 경로 · 본 WO 설명 주석 · 무관 항목**(`entities/App.ts` OAuth 앱 scopes · migration 로그 문자열 · `signage-role.middleware.ts` 산문 주석)뿐. **backend 권한 판정용 scope 참조 0**.
-- `dropshipping:` 활성 코드 참조 = glycopharm 판매방식 라벨 5건뿐 (scope 아님).
 
 ## 13. 테스트 결과 (검증 ⑧⑨)
 

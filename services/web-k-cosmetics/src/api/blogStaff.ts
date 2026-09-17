@@ -2,7 +2,7 @@
  * Blog Staff API Client — Authenticated
  *
  * WO-O4O-KCOS-STORE-EXECUTION-CANONICAL-ALIGNMENT-V1
- * Adapted from GlycoPharm blogStaff (KPA canonical pattern).
+ * KPA canonical pattern.
  *
  * Service param defaults to 'cosmetics' for this service.
  */

@@ -19,8 +19,8 @@
 > 4. **AxisNavigation frontend 유지** — backend response 미포함 (I3 정합). config.kpis 5개 metric 파생 + storeStats 1개 보조 fetch.
 > 5. **OperatorRoleGuideCard frontend static 유지** — UI 위치 / 문구 / 링크 변경 0.
 > 6. **operatorConfig.ts 삭제** — `buildKpaOperatorConfig` + `KpaExtendedData` dead code 완전 제거 (import 잔존 0).
-> 7. **회귀 0** — api-server / web-kpa-society / web-k-cosmetics / web-neture 모두 0 errors. web-glycopharm 22 pre-existing errors (KPA 영역 무관, 변화 없음).
-> 8. **외부 세션 트랙 정합** — 본 CHECK 진행 중 외부 세션이 진행한 GlycoPharm 트랙 (`39847309a`, `b4f56fc1b`, `f81ba03e0`) 과 영역 완전 분리.
+> 7. **회귀 0** — api-server / web-kpa-society / web-k-cosmetics / web-neture 모두 0 errors.
+> 8.
 
 권고 단계: ① 본 CHECK 로 KPA 5-Block (Foundation + Adapter) 단계 CONDITIONAL PASS confirm → ② Cloud Run 배포 후 브라우저 smoke 별도 시점 수행 → ③ (선택) Compatibility Layer WO / 다른 후속 트랙 진행
 
@@ -45,7 +45,6 @@
 | web-kpa-society typecheck | ✅ 0 errors |
 | web-k-cosmetics typecheck (회귀) | ✅ 0 errors |
 | web-neture typecheck (회귀) | ✅ 0 errors |
-| web-glycopharm typecheck (회귀) | ⚠️ 22 pre-existing (변화 없음, KPA 영역 무관) |
 | Source file 수정 (본 CHECK) | ✅ 없음 |
 | 외부 세션 WIP 격리 | ✅ |
 | 브라우저 smoke | ⏸ 미수행 (별도 시점 권장) |
@@ -249,24 +248,6 @@ Dead code 완전 제거. 외부 사용처 0 — 안전 삭제.
 | services/web-kpa-society | `tsc --noEmit` | 0 | 0 ✅ |
 | services/web-k-cosmetics | `tsc --noEmit` | 0 | 0 ✅ (회귀 0) |
 | services/web-neture | `tsc --noEmit` | 0 | 0 ✅ (회귀 0) |
-| services/web-glycopharm | `tsc -b --noEmit` (project refs) | 22 (visible) | **0 ✅** (모두 pre-existing) |
-
-### 8.2 web-glycopharm 22 errors 분석
-
-| 영역 | Error 수 | KPA WO 무관성 |
-|------|:-------:|:------------:|
-| `src/api/lms.ts` | 4 | Promise ↔ ApiResponse 타입 mismatch (별도 track) |
-| `src/App.tsx` | 2 | unused ApplicationsPage / ApplicationDetailPage |
-| `src/components/layouts/DashboardLayout.tsx` | 1 | user 변수 unused |
-| `src/components/layouts/GlycoPharmHubLayout.tsx` | 1 | string \| undefined → To 타입 |
-| `src/pages/education/CourseDetailPage.tsx` | 5 | Lms* response shape |
-| `src/pages/education/LmsLessonPage.tsx` | 2 | content type union |
-| `src/pages/hub/HubBlogLibraryPage.tsx` | 1 | serviceKey 미지원 |
-| `src/pages/hub/HubContentListPage.tsx` | 2 | publishedAt 누락 |
-| `src/pages/instructor/InstructorDashboardPage.tsx` | 2 | divide / truncate CSS prop |
-| `src/pages/resources/ResourcesPage.tsx` | 1 | implicit any |
-
-**모두 pre-existing**, KPA WO 영역 (api/operator + KpaOperatorDashboard + operator-summary controller + operator-dashboard service) 와 무관. 신규 회귀 0.
 
 ### 8.3 grep -c 명령 환경 노트
 
@@ -356,12 +337,11 @@ operatorApi.getDashboard()
 
 ## 11. 회귀 확인
 
-### 11.1 Neture / GlycoPharm / K-Cosmetics source 수정
+### 11.1 Neture / K-Cosmetics source 수정
 
 | 영역 | 결과 |
 |------|:----:|
 | services/web-neture/* | ✅ 변경 0 |
-| services/web-glycopharm/* | ✅ KPA WO 영역 변경 0 (외부 세션의 BloodCare 트랙 별도) |
 | services/web-k-cosmetics/* | ✅ 변경 0 |
 | backend (apps/api-server/*) | ✅ KPA 영역 외 변경 0 |
 
@@ -413,9 +393,9 @@ operatorApi.getDashboard()
 
 | Commit | 작업 | 영역 |
 |--------|------|------|
-| `f81ba03e0` | IR-O4O-GLYCOPHARM-BUSINESS-HUB-ROUTE-AND-IA-AUDIT-V1 | GlycoPharm /business 허브 조사 |
-| `39847309a` | WO-O4O-GLYCOPHARM-BUSINESS-HUB-ROUTE-AND-PAGE-V1 | GlycoPharm /business 신설 |
-| `b4f56fc1b` | IR-O4O-GLYCOPHARM-STORE-HUB-PRODUCT-CATALOG-ALIGNMENT-AUDIT-V1 | GlycoPharm store-hub b2b 카탈로그 조사 |
+| `f81ba03e0` |  | business 허브 조사 |
+| `39847309a` |  | business 신설 |
+| `b4f56fc1b` |  | — |
 
 → **본 CHECK (KPA 5-Block) 영역과 완전 분리**. 충돌 0.
 
@@ -436,7 +416,7 @@ operatorApi.getDashboard()
 본 CHECK 진행 중 typecheck 결과 보고 직후 tool call 응답에서 API/socket interruption 발생.
 
 **상황**:
-- 5 서비스 typecheck 결과 모두 확인 완료 (api-server 0 / web-kpa-society 0 / web-k-cosmetics 0 / web-neture 0 / web-glycopharm 22 visible)
+- 5 서비스 typecheck 결과 모두 확인 완료
 - 정적 코드 경로 + grep 검증 (operatorConfig.ts 삭제 + import 잔존 0 + /operator/summary 보존) 완료
 - 문서 작성 단계로 진입하는 시점에서 tool 호출 응답 중단
 
@@ -510,11 +490,11 @@ operatorApi.getDashboard()
 | **AxisNavigation 검증 결과** | ✅ frontend 유지 + 6 metric (5 from config.kpis + 1 from storeStats) + 정보량 감소 0 + I3 정합 |
 | **OperatorRoleGuideCard 검증 결과** | ✅ frontend static 유지 + UI/문구/Link 변경 0 + I1 정합 |
 | **기존 summary 보존 결과** | ✅ backend handler 변경 0 + frontend `getSummary()` export 유지 |
-| **TypeScript 결과** | api-server / web-kpa-society / web-k-cosmetics / web-neture 0 errors. web-glycopharm 22 pre-existing (KPA 영역 무관). grep -c 24 vs visible 22 차이는 multi-line error 패턴 catch — 실제 22 |
+| **TypeScript 결과** | api-server / web-kpa-society / web-k-cosmetics / web-neture 0 errors. grep -c 24 vs visible 22 차이는 multi-line error 패턴 catch — 실제 22 |
 | **브라우저/static smoke 결과** | 정적 smoke PASS / 브라우저 smoke 별도 시점 |
 | **Socket interruption 처리** | typecheck 결과 보고 직후 일시적 connection 중단. 제품 결함 0. 검증 결과 보존. 문서 작성만 재개 — §13 명시 |
 | **Source file 수정 없음 확인** | ✅ (본 CHECK 진행 중 코드/DB/migration/source 일절 수정 0) |
-| **다른 세션 WIP 미포함 확인** | ✅ working tree clean (외부 세션 GlycoPharm 트랙 main 으로 merge 완료) |
+| **다른 세션 WIP 미포함 확인** | ✅ working tree clean |
 | **CHECK 문서 commit 여부** | **사용자 승인 대기** — 본 CHECK 문서 1개만 path-restricted commit 예정 |
 
 ---

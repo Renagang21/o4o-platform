@@ -184,7 +184,6 @@ A-1 (목록)
 |---------|------|----------|--------------|
 | `ContentWritePage` (KPA) | `pages/contents/ContentWritePage.tsx` | RichTextEditor 통합, AI 삽입 패턴, 태그 칩 입력 | 다중 입력 채널 (파일/URL/메모), 운영자 메타 (수신 채널·공급자 연결) |
 | `BrandManagementPage` (Neture) | `pages/operator/BrandManagementPage.tsx` | DataTable + GuideBlock + EditableTextCell | "검수 → 배정 → 발행" 이 아닌 "수신 → 등록 → B/C 배정" 워크플로 |
-| `GuidelineManagementPage` (Glyco) | `pages/operator/GuidelineManagementPage.tsx` | RichTextEditor 통합, 발행/초안 상태 전환, 상태 배지 | Workspace A 의 상태 머신 (`received → meta_extracted → assigned → completed`) |
 | `SupplierLibraryPage` (Neture) | `pages/supplier/SupplierLibraryPage.tsx` | 목록 조회 + 가시성 필터 패턴 | Workspace A 는 운영자 측 등록자, supplier 측 아님 — 권한·역할 분리 |
 | `WorkingContentEditPage` (KPA) | `pages/operator/WorkingContentEditPage.tsx` | 블록 단위 편집 + BlockRenderer 미리보기 | 원천 자료 → 메타 입력 → AI 변환 → 블록 구성 흐름 |
 
@@ -248,7 +247,7 @@ A-1 (목록)
 
 **현재 사용처와의 충돌:**
 
-- KPA / GlycoPharm / K-Cosmetics 3 서비스 공통 사용 — 충돌 위험 낮음
+- KPA / K-Cosmetics 2 서비스 공통 사용 — 충돌 위험 낮음
 - 기존 `share_status` 컬럼은 HUB 공유 (Store → HUB) 용도 — Workspace A 의 `workspaceStatus` 와 직교
 - 단, KPA 하드코딩 guard (`isStoreOwner(... 'kpa')`) 가 일부 존재 — [`WO-O4O-STORE-CONTENT-CONTROLLER-SERVICE-AGNOSTIC-V1`] 로 별도 정렬 필요
 
@@ -358,7 +357,7 @@ A-1 (목록)
 범위:
 - `/api/v1/{service}/operator/source-materials/*` 엔드포인트 신설 (CRUD)
 - `authorRole='operator'` / `visibilityScope='organization'` 서버 강제
-- 4 서비스 (Neture / KPA / Glycopharm / K-Cosmetics) 적용
+- 3 서비스 (Neture / KPA / K-Cosmetics) 적용
 
 크기: MEDIUM
 

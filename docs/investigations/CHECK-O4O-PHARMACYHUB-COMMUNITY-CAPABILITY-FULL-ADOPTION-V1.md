@@ -64,7 +64,6 @@
 1. 공통 `createContentResourceCore(dataSource, config)` 는 **물리 테이블 주입으로 서비스를 격리**한다. `config.tableName` 은 기본값이 없고(`assertSafeTableName`), 서비스가 반드시 명시한다.
    - `kpa_contents` (`routes/kpa/controllers/kpa-content-resource.config.ts:96`)
    - `cosmetics_contents` (`routes/cosmetics/controllers/resources.controller.ts:40`)
-   - `glycopharm_contents` (`routes/glycopharm/controllers/resources.controller.ts:40`)
 2. PharmacyHub 용 content 테이블은 존재하지 않는다. `grep -rhoE "pharmacy_hub[a-z_]*" apps/api-server/src/migrations/*.ts` → 0건.
 3. 따라서 §10~§13 채택은 **신규 테이블 + migration** 이 전제다. 이는 WO §12("새 테이블 필요 / schema migration 필요 이면 중지 조건") · §20 · CLAUDE.md 중지 조건에 정면으로 해당한다.
 4. 기존 서비스 테이블(`kpa_contents` 등)을 PH 가 공유하는 우회는 **cross-service mixing** 이라 §15 위반이다. 채택하지 않았다.
@@ -96,7 +95,7 @@
 - 새 route 3개는 전부 기존 `<MembershipGate>` 안에 배치. **새 권한 체계 0**.
 - 쓰기는 backend 공통 가드 `requireActiveServiceMembership(SERVICE_KEY)` 가 이미 담당한다.
 - PH client 는 서비스 스코프 base `'/pharmacy-hub/forum'` 로만 호출한다. 공통 base(`/forum/category-requests`, `/forum/operator`)를 쓰는 호출은 전부 `serviceCode=pharmacy-hub` 를 query 또는 body 로 동반한다. **generic unscoped API 신설 0** — backend 변경 자체가 0이다.
-- 타 서비스 base(`/kpa/forum`, `/cosmetics/forum`, `/glycopharm/forum`, `/neture/forum`) 호출 0 — 테스트로 고정.
+- 타 서비스 base 호출 0 — 테스트로 고정.
 
 ## 9. 공통 View / Core 채택 목록 (§4·§16)
 

@@ -87,7 +87,7 @@
 | # | 위치 | 분류 | 활성 | 비고 |
 |---|------|------|:---:|------|
 | 1 | [storeMenuConfig.ts:119](../../packages/store-ui-core/src/config/storeMenuConfig.ts#L119) (K-Cosmetics 블록) | 사이드바 | ✅ | **KPA 아님** — `매장 활성화 > 자체 상품` |
-| 2 | [storeMenuConfig.ts:197](../../packages/store-ui-core/src/config/storeMenuConfig.ts#L197) (GlycoPharm 블록) | 사이드바 | ✅ | **KPA 아님** — `약국 활성화 > 자체 상품` |
+| 2 | [storeMenuConfig.ts:197](../../packages/store-ui-core/src/config/storeMenuConfig.ts#L197) | 사이드바 | ✅ | **KPA 아님** — `약국 활성화 > 자체 상품` |
 | 3 | KPA 블록 | 사이드바 | ❌ | [storeMenuConfig.ts:273-277](../../packages/store-ui-core/src/config/storeMenuConfig.ts#L273-L277) 주석 — `WO-O4O-KPA-STORE-HANDLED-PRODUCTS-INTERNAL-TABS-V1` 로 **메뉴 제거** |
 | 4 | [StoreProductDescriptionsPage.tsx:238](../../services/web-kpa-society/src/pages/pharmacy/StoreProductDescriptionsPage.tsx#L238) | 화면 내부 CTA | ✅ | **KPA 유일 활성 진입** — 단, **목록이 0건일 때만** 노출되는 empty-state 링크 |
 | 5 | [StoreTabletDisplaysPage.tsx:796](../../services/web-kpa-society/src/pages/pharmacy/StoreTabletDisplaysPage.tsx#L796) | 화면 내부(뒤로가기 ←) | ⚠️ | **stale drift** — 태블릿은 `약국 경영지원` 소속인데 ← 화살표가 local-products 로 이동 |
@@ -155,7 +155,7 @@ WO-O4O-KPA-STORE-HANDLED-PRODUCT-REMOVE-AND-STATUS-AUDIT-V1
 - **(A1) 진입점 복원** — `매장 자체 상품` 메뉴를 KPA 블록에 복원. 소비처 3개가 살아있으므로 정합.
 - **(A2) 전면 은퇴** — `store_local_products` 를 KPA 에서 폐기. 단 상품 설명 화면 재설계(O4O listing 기반 전환)
   + 태블릿 `product_type='local'` 제거 + QR/다국어 경로 정리가 동반되는 **대형 작업**이며,
-  GP/KCos 는 정식 메뉴로 유지 중이라 공통 테이블·백엔드는 존치해야 한다.
+  KCos 는 정식 메뉴로 유지 중이라 공통 테이블·백엔드는 존치해야 한다.
 
 본 IR 은 **(A1) 을 권고**한다. 근거: 소비처가 정식 메뉴 2개이고, 현 상태에서 신규 매장은
 `상품 설명` 메뉴에 들어가도 등록된 상품이 0건이라 아무 작업도 할 수 없다(기능 은폐 = CLAUDE.md §1 위반 상태).
@@ -195,7 +195,7 @@ WO-O4O-KPA-STORE-HANDLED-PRODUCT-REMOVE-AND-STATUS-AUDIT-V1
 | # | 위치 | 대상 route | 분류 | 활성 |
 |---|------|-----------|------|:---:|
 | 1 | [storeMenuConfig.ts:131](../../packages/store-ui-core/src/config/storeMenuConfig.ts#L131) (K-Cosmetics) | list | 사이드바 | ✅ **KPA 아님** |
-| 2 | [storeMenuConfig.ts:209](../../packages/store-ui-core/src/config/storeMenuConfig.ts#L209) (GlycoPharm) | list | 사이드바 | ✅ **KPA 아님** |
+| 2 | [storeMenuConfig.ts:209](../../packages/store-ui-core/src/config/storeMenuConfig.ts#L209) | list | 사이드바 | ✅ **KPA 아님** |
 | 3 | KPA 블록 | list | 사이드바 | ❌ [storeMenuConfig.ts:307-310](../../packages/store-ui-core/src/config/storeMenuConfig.ts#L307-L310) — `WO-O4O-KPA-QR-POP-RESULT-SCOPE-V1` 로 숨김 |
 | 4 | [StoreContentsSelector.tsx:135](../../services/web-kpa-society/src/pages/pharmacy/StoreContentsSelector.tsx#L135) | **`/:id/edit`** | 자료함 콘텐츠 목록 행 [편집] | ✅ **KPA 유일 활성 진입** |
 | 5 | [StoreProductionMaterialsPage.tsx:244,254,334](../../services/web-kpa-society/src/pages/pharmacy/StoreProductionMaterialsPage.tsx#L244) | `/new` | 자기 페이지 내부 CTA | ❌ 부모가 도달 불가 → 사실상 죽은 진입 |
@@ -257,7 +257,7 @@ edit  (/store/library/production-materials/:id/edit) → 활성 인바운드 1 �
 `/:id/edit` 는 **B. 내부 액션·딥링크**로 별도 유지 필수 — 제거 시 자료함 콘텐츠 편집이 즉시 깨진다.)
 
 `D. 은퇴`로 가지 않은 이유: 컴포넌트 `ProductionMaterialEditorPage` 가 `/new` 와 `/:id/edit` 를 공유하므로
-list/new 만 떼어내는 실익이 작고, GP/KCos 는 동일 route 를 정식 메뉴로 사용 중이라 공통 계약을 건드리면 안 된다.
+list/new 만 떼어내는 실익이 작고, KCos 는 동일 route 를 정식 메뉴로 사용 중이라 공통 계약을 건드리면 안 된다.
 
 ---
 
@@ -335,7 +335,7 @@ PharmacyOwnerOnlyGuard 가 없다.
 | 매장 등록 상품 | ❌ `O4O 제품 취급 등록`과 혼동 |
 | ~~내 상품 / 자체 제품 / 매장 상품~~ | ❌ 회피(§8 지시) |
 
-> 참고: GP/KCos 는 현재 `자체 상품` 을 쓴다. KPA 는 `매장 경영활용 제품`과 나란히 놓이므로
+> 참고: KCos 는 현재 `자체 상품` 을 쓴다. KPA 는 `매장 경영활용 제품`과 나란히 놓이므로
 > `매장 자체 상품` 이 대비가 선명하다. 크로스서비스 라벨 통일 여부는 후속 WO 판단.
 
 ### production-materials
@@ -361,7 +361,7 @@ PharmacyOwnerOnlyGuard 가 없다.
   5. StoreProductDescriptionsPage empty-state 링크 라벨을 새 메뉴명과 정합
 Shared Module Change Protocol: 적용 대상 ✅
   - storeMenuConfig.ts 는 3서비스 공유 파일. 단, 변경은 KPA_SOCIETY_STORE_CONFIG 블록 한정.
-  - GP/KCos 블록 무변경 확인 + 두 서비스 사이드바 회귀 smoke 필수.
+  - KCos 블록 무변경 확인 + 서비스 사이드바 회귀 smoke 필수.
 검증: 브라우저 smoke — 메뉴 노출 / 등록·수정 / 상품 설명·태블릿 목록 반영
 ```
 
@@ -379,10 +379,10 @@ Shared Module Change Protocol: 적용 대상 ✅
      StorePopCreateModal L105, StoreHomePage L19
   5. 사이드바 메뉴 추가 금지 재확인
 Shared Module Change Protocol: 적용 대상 ✅ (판단만)
-  - GP/KCos 는 동일 route 를 정식 메뉴로 사용 → KPA 만 redirect 시 공통 컴포넌트
+  - KCos 는 동일 route 를 정식 메뉴로 사용 → KPA 만 redirect 시 공통 컴포넌트
     ProductionMaterialEditorShell 의 savedPath 기본값('/store/library/production-materials') 영향 확인 필요.
     KPA 는 이미 /store/library/contents 로 override 중이므로 무영향 예상 — 코드로 재확인.
-검증: 자료함 콘텐츠 [편집] 진입 회귀 smoke + GP/KCos 제작 자료 메뉴 회귀 smoke
+검증: 자료함 콘텐츠 [편집] 진입 회귀 smoke + KCos 제작 자료 메뉴 회귀 smoke
 ```
 
 ---
@@ -412,8 +412,8 @@ DB write / migration     0
 
 | 조건 | 해당 | 처리 |
 |------|:---:|------|
-| local-products 가 다른 서비스 공통 관리 화면 | ✅ | GP/KCos 정식 메뉴 + 공통 테이블·백엔드·배지 컴포넌트 공유. → **판정 범위를 KPA 메뉴 정책으로 한정**하고 플랫폼 은퇴는 권고하지 않음 |
-| production-materials 가 여러 서비스 공통 계약 | ✅ | GP/KCos 정식 메뉴 + `StoreProductionMaterialsView`/`ProductionMaterialEditorShell` 공유. → **KPA 자체 페이지만 대상**, 공통 패키지 무변경 전제로 판정 |
+| local-products 가 다른 서비스 공통 관리 화면 | ✅ | KCos 정식 메뉴 + 공통 테이블·백엔드·배지 컴포넌트 공유. → **판정 범위를 KPA 메뉴 정책으로 한정**하고 플랫폼 은퇴는 권고하지 않음 |
+| production-materials 가 여러 서비스 공통 계약 | ✅ | KCos 정식 메뉴 + `StoreProductionMaterialsView`/`ProductionMaterialEditorShell` 공유. → **KPA 자체 페이지만 대상**, 공통 패키지 무변경 전제로 판정 |
 | 데이터 소비 관계가 코드만으로 불명확 | ❌ | §2.5·§3.3 전부 코드로 확정 |
 | 프로덕션 실사용 확인 없이 은퇴 판단 불가 | ✅(부분) | **은퇴(D) 판정을 내리지 않음.** local=A, production=C 로, 둘 다 프로덕션 실측 없이 성립하는 판정 |
 | 메뉴 노출에 store-ui-core 공통 계약 변경 필수 | ⚠️ | `storeMenuConfig.ts` 는 공유 파일이나 서비스별 블록 분리 구조 → 계약 변경 아님. Shared Module Change Protocol 은 후속 WO 에서 적용 |

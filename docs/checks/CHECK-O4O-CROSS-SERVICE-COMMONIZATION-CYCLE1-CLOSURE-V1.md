@@ -13,7 +13,7 @@
 
 ## 2. 선행 overall audit 요약
 - 판정: **CLOSED with MINOR FOLLOW-UP**.
-- 4서비스 `tsc -b` green(KPA/GP/KCos/Neture 0). 직전 in-flight 빌드 실패(lms-ui 와이어링·product-applications phantom·reward-policy 타입) 전부 해소.
+- 3서비스 `tsc -b` green(KPA/KCos/Neture 0). 직전 in-flight 빌드 실패(lms-ui 와이어링·product-applications phantom·reward-policy 타입) 전부 해소.
 - 14개 축 A.CLOSED. 공통 package 3-tier 레이어링 일관. Neture 제외/포함 posture 정확.
 - D.NEEDS WO 없음. E.HOLD(Qwen live·Signage AI 등) 별도 작업선. 코드/backend/DB/package/lock/Dockerfile 무변경, 타 세션 WIP 미접촉.
 
@@ -21,7 +21,6 @@
 | 서비스 | `tsc -b` |
 |--------|:--------:|
 | web-kpa-society | ✅ 0 |
-| web-glycopharm | ✅ 0 |
 | web-k-cosmetics | ✅ 0 |
 | web-neture | ✅ 0 |
 > audit 에서 로컬 TS 로 4서비스 0/0/0/0 확정. 본 closure 는 그 결과 참조(재실행 불요).
@@ -49,8 +48,7 @@
 | 서비스 | 상태 |
 |--------|------|
 | **KPA Society** | community/LMS/store 실행/advanced 포함. reference 구현. KPA-only advanced(quiz/assignment/grading/CourseStructureAi)=**의도적 KEEP**(공통화 실패 아님). |
-| **GlycoPharm** | KPA 계열 공통 shell/manager 적용(thin). LMS reusablePolicy typecheck 차단 요인 **해소**(`WO-...-GP-REUSABLE-POLICY-TYPE-ALIGNMENT-V1`). store/content/POP/제품설명/legal/guide 정렬. |
-| **K-Cosmetics** | KPA/GP 와 가능한 범위 공통화(thin). **강사 편집기 부재=Phase 1-B/제품 요구 기반 후속**(미비 아님). store/content/POP/제품설명/legal/guide 정렬. |
+| **K-Cosmetics** | KPA 와 가능한 범위 공통화(thin). **강사 편집기 부재=Phase 1-B/제품 요구 기반 후속**(미비 아님). store/content/POP/제품설명/legal/guide 정렬. |
 | **Neture** | platform/admin/supplier 중심. operator 콘솔/legal/guide/content 축 **포함**. LMS·store-ui-core 등 member-service 전용 축 **정확히 제외**. 잘못 섞인 흔적 0. |
 
 ## 6. 공통 package 레이어링 고정
@@ -73,7 +71,6 @@
 - **dormant primitive(`CourseCard`/`CourseList`/`EnrollmentButton`/`LessonPlayerShell`)는 closure 차단 요인이 아니다**(export 보유, 후순위 활용/정리).
 
 ## 7. B.FUNCTIONAL+ (Minor Follow-up — closure 비차단)
-- copy/empty-state drift(reward/감사/NoPaymentNotice 하드카피 GP↔KCos 동일) → 공통 상수화 여지.
 - `@o4o/operator-core`(legacy layout) 정리 — operator-ux-core 로 대체됨, deprecation 경로 명시.
 - `@o4o/shared-space-ui` "community" 네이밍 마찰(실제=전 서비스 public) → 문서 정정.
 - dormant `LessonPlayerShell` + 강의 상세/레슨 플레이어 thick 병렬 → scope IR 후보.
@@ -81,7 +78,7 @@
 
 ## 8. C.INTENTIONAL DIFFERENCE (유지 타당)
 - KPA-only: QuizBuilder·AssignmentEditor·grading·CourseStructureAiModal — KPA reference KEEP.
-- KCos 강사 편집기 부재(Phase 1-B), GP/KCos quiz/assignment 부재 — 제품 요구 기반.
+- KCos 강사 편집기 부재(Phase 1-B), KCos quiz/assignment 부재 — 제품 요구 기반.
 - Neture: lms-ui·store-ui-core 미소비(정확한 제외).
 
 ## 9. D.NEEDS WO — **없음 (확인)**
@@ -92,7 +89,7 @@
 - Qwen live smoke(staging QWEN_API_KEY 대기, provider 선택 UI 는 live PASS 후).
 - Signage / admin builder AI pipeline(AI editing closure 가 별도 파이프라인 명시).
 - medium surface provider risk matrix · DeepSeek 1st-party blocked 유지.
-- 제품 요구 기반 KCos editor · GP/KCos quiz/assignment.
+- 제품 요구 기반 KCos editor · KCos quiz/assignment.
 
 ## 11. 최종 판정
 
@@ -100,7 +97,7 @@
 판정: CLOSED — O4O cross-service 공통화 Cycle 1 종료
 
 충족 조건:
-- 4서비스 typecheck 0 (KPA/GP/KCos/Neture) ✅
+- 3서비스 typecheck 0 (KPA/KCos/Neture) ✅
 - D.NEEDS WO 없음 ✅
 - Neture posture 정상(제외/포함 정확) ✅
 - KPA-only / service-specific 영역 = 의도적 차이(C)로 분류 ✅

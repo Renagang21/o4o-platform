@@ -2,7 +2,7 @@
  * RecruitmentApplicationsPage — 신청·승인 현황 (Pharmacy-Hub)
  *
  * WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §7
- *   KPA / GlycoPharm / K-Cosmetics 가 이미 쓰는 service-neutral 계약
+ *   KPA / K-Cosmetics 가 이미 쓰는 service-neutral 계약
  *   (GET /neture/seller-recruitment/applications/mine · POST .../:id/cancel) 을 그대로 채택한다.
  *   조회 실패를 0건으로 위장하지 않는다(4상태 계약).
  */

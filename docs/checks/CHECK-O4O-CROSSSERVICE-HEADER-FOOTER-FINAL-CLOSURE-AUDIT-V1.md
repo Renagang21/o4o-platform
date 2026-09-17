@@ -32,7 +32,6 @@
 
 ## 2. 최종 모집단 (§5 · §28-2)
 
-`services/web-{kpa-society,k-cosmetics,glycopharm,pharmacy-hub,neture}` + 이들이 소비하는 `packages/**` 의
 Header · Footer · Layout · Shell · Nav 자산 전수.
 
 | 영역 | 모집단 |
@@ -40,7 +39,6 @@ Header · Footer · Layout · Shell · Nav 자산 전수.
 | 공통 패키지 | 23 |
 | KPA-Society | 18 |
 | K-Cosmetics | 8 |
-| GlycoPharm | 12 |
 | Pharmacy-Hub | 8 |
 | Neture | 13 |
 | **합계** | **82** |
@@ -92,7 +90,7 @@ ACTIVE = 77 · DEAD(코드 소비 0) = 5 · DELETED_SINCE_CENSUS = 2(모집단�
 | K6 | `platform/PlatformFooter.tsx` | **VD → CORE_ONLY** | W1(`d783843f2`) 로 `PublicLegalFooterInfo serviceKey="kpa-society"` 채택 + 실 route 링크 + 동적 연도 |
 | K5 | `platform/PlatformHeader.tsx` | **VD → SERVICE_SPECIFIC** | `GlobalHeader` 와 **같은 UI 가 아니다** — anchor 기반 소개용 헤더로 UserArea·알림·contextual nav 자체가 없다. 잔여 부채(GlobalHeader 미채택·raw `<a>` 전체 리로드)는 20절 FOLLOW_UP |
 | K7 | `platform/InfoPageLayout.tsx` | **VD → SERVICE_SPECIFIC** | K5+K6 조합 셸. 본문은 이미 `@o4o/ui` primitive(`PageContainer`/`HeroSection`/`ContentCard`) 소비 |
-| K15 · G3 | KPA·Glyco `common/PageHeader.tsx` | **VD → OUT_OF_SCOPE** | 전역 Header 축이 아니라 **본문 페이지 타이틀 요소**다(census 가 `P10 ForumPostHeader` 를 OOS 로 둔 것과 같은 축). 두 파일은 props·렌더가 서로 달라(KPA=breadcrumb / Glyco=icon·actions) "같은 UI 복제"도 아니다 |
+| K15 · G3 | — | **VD → OUT_OF_SCOPE** | 전역 Header 축이 아니라 **본문 페이지 타이틀 요소**다(census 가 `P10 ForumPostHeader` 를 OOS 로 둔 것과 같은 축). 두 파일은 props·렌더가 서로 달라 "같은 UI 복제"도 아니다 |
 | K17 | `store/StoreUserDropdown.tsx` | **VD(dead) → DEAD_OR_UNUSED** | 코드 소비 0 |
 | N3~N7 | Neture 5 셸 inline footer | **VD → CORE_ONLY** | W2 로 5 셸 전부 `PublicLegalFooterInfo` + `loadFooterLegal` 채택. 남은 것은 셸별 chrome 과 **대상별로 다른 링크셋**(공개=포럼/약관, 공급자·파트너=문의, ops=워크스페이스) |
 
@@ -117,7 +115,6 @@ ACTIVE = 77 · DEAD(코드 소비 0) = 5 · DELETED_SINCE_CENSUS = 2(모집단�
 | 공통 패키지 | 13 | 0 | 0 | 0 | 0 | 6 | 4 (DEAD) | 23 |
 | KPA-Society | 6 | 6 | 0 | 3 | 0 | 2 | 1 (DEAD) | 18 |
 | K-Cosmetics | 4 | 4 | 0 | 0 | 0 | 0 | 0 | 8 |
-| GlycoPharm | 4 | 4 | 0 | 1 | 0 | 3 | 0 | 12 |
 | Pharmacy-Hub | 4 | 2 | 0 | 1 | 0 | 0 | 1 (N/A) | 8 |
 | Neture | 3 | 8 | 0 | 1 | 0 | 1 | 0 | 13 |
 
@@ -159,7 +156,6 @@ UNCLASSIFIED       0
 | serviceKey | HTTP | body |
 |---|---|---|
 | kpa-society | 200 | `{"success":true,"data":null}` |
-| glycopharm | 200 | `{"success":true,"data":null}` |
 | k-cosmetics | 200 | `{"success":true,"data":null}` |
 | neture | 200 | `{"success":true,"data":null}` |
 | pharmacy-hub | 200 | `{"success":true,"data":null}` |
@@ -185,31 +181,15 @@ UNCLASSIFIED       0
 | 서비스 | 이용약관 | 개인정보 | 문의 |
 |---|---|---|---|
 | KPA | `/policy` (App.tsx:925) | `/privacy` (926) | `/contact` (920) |
-| GlycoPharm | `terms` (App.tsx:674, **중첩**) | `privacy` (675) | `contact` (672) |
 | K-Cosmetics | `terms` (App.tsx:447, **중첩**) | `privacy` (448) | `contact` (445) |
 | Neture | `/terms` (755) | `/privacy` (756) | `/contact` (750) |
 | PharmacyHub | `/terms` | `/privacy` | **없음(의도)** |
 
-- GlycoPharm(App.tsx:609) · K-Cosmetics(App.tsx:437) 는 pathless `<Route element={<MainLayout />}>` 아래의
+- K-Cosmetics(App.tsx:437) 는 pathless `<Route element={<MainLayout />}>` 아래의
   **상대 경로 중첩 route** 다. `path="/terms"` 로 grep 하면 0건이 나오지만 실제로는 `/terms` 로 해석된다 → **dead link 오탐 아님**.
 - PharmacyHub footer 는 `/contact` 를 의도적으로 넣지 않았다. 대칭 목적의 추가는 데드링크 신설이므로 하지 않았다(§15).
 
 **활성 route 의 법정 dead link = 0.**
-
----
-
-## 8. GlycoPharm `/privacy` 404 재판정 (§11 · §28-8)
-
-**판정 B — 정책 문서 콘텐츠 미게시. `FOLLOW_UP`.**
-
-근거:
-
-- `GET /api/v1/public/services/{key}/policies/{terms|privacy}` 를 5서비스 × 2문서 = **10건 전부** 프로덕션에서 호출한 결과 **전부 404**다.
-  GlycoPharm 만의 문제가 아니다.
-- A(잘못된 route) 아님: `/privacy` route 는 존재한다(7절 표).
-- C(API 불일치) 아님: `service-legal-scope.ts` 가 5 serviceKey 와 `terms`/`privacy` 문서 타입을 모두 지원한다.
-- 프론트 `PolicyDocumentPage.loadPolicy` 는 404 → `null` → `PolicyDocumentViewer` 의 중립 빈 상태로 처리한다.
-  즉 사용자 Footer 계약이 깨지지 않는다 → §11 의 "실제 사용자 Footer 계약이 깨지면 MUST_FIX" 에 해당하지 않는다.
 
 ---
 
@@ -246,7 +226,6 @@ UNCLASSIFIED       0
 | 서비스 | 파일 | Core 채택 | LOC |
 |---|---|---|---:|
 | KPA | `components/MobileBottomNav.tsx` | `@o4o/account-ui` | 180 (census 303) |
-| GlycoPharm | `components/MobileBottomNav.tsx` | 동일 | 155 (census 256) |
 | K-Cosmetics | `components/MobileBottomNav.tsx` | 동일 | 154 (census 254) |
 | Neture | `components/NetureBottomNav.tsx` | 동일 | 140 (census 217) |
 
@@ -254,7 +233,7 @@ UNCLASSIFIED       0
 - Core(`MobileBottomNavShell`)는 `env(safe-area-inset-bottom)` 을 inline style 로 적용한다.
 - KPA 이중 bottom nav 없음: `App.tsx:532` 는 `/store/*` 의 `MyStoreShell` `below` 슬롯,
   `Layout.tsx:35` 는 공개 트리로 **route 트리가 겹치지 않는다**.
-- 브라우저 실측(17절): 모바일 390×844 에서 KPA·GlycoPharm·K-Cosmetics 공개 홈에 `position:fixed; bottom:0` nav 1개 확인.
+- 브라우저 실측(17절): 모바일 390×844 에서 KPA·K-Cosmetics 공개 홈에 `position:fixed; bottom:0` nav 1개 확인.
 
 ---
 
@@ -273,8 +252,6 @@ UNCLASSIFIED       0
 
 | 위치 | 수정 전 | 수정 후 |
 |---|---|---|
-| `web-glycopharm/src/components/common/Footer.tsx:121` | `© 2025 GlycoPharm` | `© {currentYear}` (`new Date().getFullYear()`) |
-| `web-glycopharm/src/components/layouts/StoreLayout.tsx:288` | `© 2025 GlycoPharm` | `© {currentYear}` |
 | `web-k-cosmetics/src/components/common/Footer.tsx:88` | `© 2025 K-Cosmetics` | `© {currentYear}` |
 
 - stale 은 정확히 **3건**이었다(부기 G 와 일치). KPA `Footer.tsx` `© 2026` · KPA `PlatformFooter` 동적 · Neture 5셸 `© 2026` ·
@@ -302,8 +279,8 @@ UNCLASSIFIED       0
 | # | 파일 | 변경 | 분류 |
 |---|---|---|---|
 | 1 | `services/web-kpa-society/src/components/platform/PlatformHeader.tsx` | `{ label: 'Services', href: '#services' }` 제거 (`Home` · `About` 유지) | **MUST_FIX_BEFORE_CLOSE 해소** |
-| 2 | `services/web-glycopharm/src/components/common/Footer.tsx` | `© 2025` → `© {currentYear}` | 최소 수정 |
-| 3 | `services/web-glycopharm/src/components/layouts/StoreLayout.tsx` | 동일 | 최소 수정 |
+| 2 | — | `© 2025` → `© {currentYear}` | 최소 수정 |
+| 3 | — | 동일 | 최소 수정 |
 | 4 | `services/web-k-cosmetics/src/components/common/Footer.tsx` | 동일 | 최소 수정 |
 
 **1번 근거(§7 "활성 route 의 dead link")**
@@ -330,12 +307,10 @@ worktree 에서 `pnpm install --frozen-lockfile` → `pnpm run build:packages` �
 | `pnpm install --frozen-lockfile` | Done (5m 13s) |
 | `pnpm run build:packages` | **exit 0** · error 0건 |
 | `pnpm --filter @o4o/web-kpa-society build` | **exit 0** · `✓ built in 1m 5s` |
-| `pnpm --filter glycopharm-web build` | **exit 0** · `✓ built in 35.38s` |
 | `pnpm --filter @o4o/web-k-cosmetics build` | **exit 0** · `✓ built in 21.13s` |
 
 - 세 명령 모두 `No projects matched` 출력 **0건**을 확인했다(§24 함정 — exit 0 만으로 PASS 로 인정하지 않았다).
-- 실제 package name 확인: `@o4o/web-kpa-society` · `glycopharm-web` · `@o4o/web-k-cosmetics` · `@o4o/web-neture` · `pharmacy-hub-web`.
-- 산출물 검증: `services/web-glycopharm/dist` · `services/web-k-cosmetics/dist` 에 `2025 GlycoPharm` / `2025 K-Cosmetics` 문자열 **0건**.
+- 실제 package name 확인: `@o4o/web-kpa-society` · `@o4o/web-k-cosmetics` · `@o4o/web-neture` · `pharmacy-hub-web`.
 - 수정하지 않은 Neture · PharmacyHub 는 build 를 돌리지 않았다(§24: 코드 수정 없는 서비스는 전체 build 반복 불필요).
 
 ---
@@ -351,7 +326,6 @@ Playwright(Chromium) 실브라우저. Desktop 1440×900 · Mobile 390×844.
 |---|---|---|---|---|---|---|---|---|
 | `kpa-society.co.kr/` | 200 | 1 | 1 | 65px | 0 | 0 | 1 | 없음 |
 | `kpa-society.co.kr/services/pharmacy` | 200 | 1 | 1 | 65px | 0 | **`#services`** | 0 | **모바일 396>390** |
-| `glycopharm.co.kr/` | 200 | 1 | 1 | 65px | 0 | 0 | 1 | 없음 |
 | `k-cosmetics.site/` | 200 | 1 | 1 | 65px | 0 | 0 | 1 | 없음 |
 | `pharmacyhub.co.kr/` | 200 | 1 | 1 | 65px | 0 | 0 | 0 (의도) | 없음 |
 | `neture.co.kr/` | 200 | 1 | 1 | 65px | 0 | 0 | 0 (비인증 시 미렌더) | 없음 |
@@ -392,8 +366,8 @@ Playwright(Chromium) 실브라우저. Desktop 1440×900 · Mobile 390×844.
 |---|---|
 | 수정 커밋 | `3635838ed` (4 파일) |
 | CI 워크플로 | `Deploy Web Services (Cloud Run)` run **`32454324338`** (headSha `3635838ed5b0690b622ce06ee49a99605c4c0122`, `conclusion=success`, 2026-08-21T06:25:22Z → 06:28:51Z) |
-| job 결과 | `deploy-kpa-society` / `deploy-glycopharm` / `deploy-k-cosmetics` = **success** · `deploy-pharmacy-hub` / `deploy-neture` / `deploy-kpa-branch` = **skipped** (해당 서비스 변경 없음 — 정상) |
-| Cloud Run 활성 리비전 (asia-northeast3) | `kpa-society-web-01880-7zw` (06:28:29Z) · `glycopharm-web-01309-vxs` (06:28:12Z) · `k-cosmetics-web-01052-6tp` (06:28:05Z) — 각 서비스 트래픽 100% |
+| job 결과 | `deploy-kpa-society` / `deploy-k-cosmetics` = **success** · `deploy-pharmacy-hub` / `deploy-neture` / `deploy-kpa-branch` = **skipped** (해당 서비스 변경 없음 — 정상) |
+| Cloud Run 활성 리비전 (asia-northeast3) | `kpa-society-web-01880-7zw` (06:28:29Z) · `k-cosmetics-web-01052-6tp` (06:28:05Z) — 각 서비스 트래픽 100% |
 | 미변경 서비스 리비전 | `neture-web-01505-cnh` · `pharmacy-hub-web-00133-k9v` (배포 skip 과 일치) |
 | 측정 시각 | 2026-08-21 06:32~06:38 UTC (Playwright/Chromium, 쿼리스트링 캐시 버스트 적용) |
 
@@ -402,11 +376,11 @@ Playwright(Chromium) 실브라우저. Desktop 1440×900 · Mobile 390×844.
 | # | 대상 | 기대 | production 실측 | 판정 |
 |---|---|---|---|---|
 | 1 | KPA `PlatformHeader` dead anchor | `#services` 없음 · `#about` 은 유지되고 대상 `id` 실재 | `kpa-society.co.kr/services/pharmacy` header/footer anchor = `["#about"]` **단 1건**, `#services` **0건**, `document.getElementById('about')` 존재 → **dead anchor 0** | PASS |
-| 2 | GlycoPharm 공개 Footer 연도 | 현재 연도(2026) | `© 2026 GlycoPharm. All rights reserved.` | PASS |
+| 2 | — | 현재 연도(2026) | All rights reserved.` | PASS |
 | 3 | K-Cosmetics 공개 Footer 연도 | 현재 연도(2026) | `© 2026 K-Cosmetics. All rights reserved.` | PASS |
-| 3-b | GlycoPharm `StoreLayout` footer 연도 (로그인 필요 영역) | 현재 연도(2026) | 배포 번들 `glycopharm.co.kr/assets/index--i8qzWqY.js` 전수 스캔 결과 `All rights reserved` 문자열 **2 occurrence 모두 동적 변수** (`["© ", t, " GlycoPharm. All rights reserved."]`) — 하드코딩 `2025` **0건**. 공개 Footer 가 같은 번들에서 2026 을 렌더하는 것으로 동일 변수의 정상 동작 확인 | PASS (번들 근거) |
+| 3-b | — | 현재 연도(2026) | 배포 번들 `index--i8qzWqY.js` 전수 스캔 결과 `All rights reserved` 문자열 **2 occurrence 모두 동적 변수** — 하드코딩 `2025` **0건**. 공개 Footer 가 같은 번들에서 2026 을 렌더하는 것으로 동일 변수의 정상 동작 확인 | PASS (번들 근거) |
 
-> `2025` 하드코딩 잔존 여부는 배포 번들 문자열 전수 스캔으로 확인했다 — GlycoPharm / K-Cosmetics 양쪽 모두 **0건**.
+> `2025` 하드코딩 잔존 여부는 배포 번들 문자열 전수 스캔으로 확인했다 — K-Cosmetics 양쪽 모두 **0건**.
 > 3-b 는 인증 필요 화면이라 브라우저 직접 렌더 대신 **배포 산출물 근거**로 판정했다(측정 한계 명시).
 
 ### 18-3. 5서비스 대표 화면 × 2 뷰포트 재측정 (Desktop 1440×900 / Mobile 390×844)
@@ -417,7 +391,6 @@ Playwright(Chromium) 실브라우저. Desktop 1440×900 · Mobile 390×844.
 |---|---|---|---|---|---|---|---|---|---|---|
 | `kpa-society.co.kr/` | D / M | 1 / 1 | 1 / 1 | 65 / 65 | 0 | 0 | 2026 | 1440/1440 · 390/390 | 0 | 정상 |
 | `kpa-society.co.kr/services/pharmacy` | D / M | 1 / 1 | 1 / 1 | 65 / 65 | 0 | **0** | 2026 | 1440/1440 · **390/390** | 0 | 정상 |
-| `glycopharm.co.kr/` | D / M | 1 / 1 | 1 / 1 | 65 / 65 | 0 | 0 | **2026** | 1440/1440 · 390/390 | 0 | 정상 |
 | `k-cosmetics.site/` | D / M | 1 / 1 | 1 / 1 | 65 / 65 | 0 | 0 | **2026** | 1440/1440 · 390/390 | 0 | 정상 |
 | `pharmacyhub.co.kr/` | D / M | 1 / 1 | 1 / 1 | 65 / 65 | 0 | 0 | 2026 | 1440/1440 · 390/390 | 0 | 정상 |
 | `neture.co.kr/` | D / M | 1 / 1 | 1 / 1 | 65 / 65 | 0 | 0 | 2026 | 1440/1440 · 390/390 | 0 | 정상 |
@@ -425,7 +398,7 @@ Playwright(Chromium) 실브라우저. Desktop 1440×900 · Mobile 390×844.
 - **이중 header / 이중 footer = 0** (전 화면 header 1 · footer 1).
 - **white screen / JS exception = 0** — 전 화면 `body.innerText` 555~1273자 렌더, console error 0, pageerror 0.
 - 17-1 에서 관측됐던 `kpa-society.co.kr/services/pharmacy` **모바일 가로 overflow(396>390) 도 해소**됐다 (390/390).
-- 모바일 bottom nav: KPA / GlycoPharm / K-Cosmetics = 1, PharmacyHub = 0(의도), Neture = 0(비인증 시 미렌더) — 11·12절 판정과 동일.
+- 모바일 bottom nav: KPA / K-Cosmetics = 1, PharmacyHub = 0(의도), Neture = 0(비인증 시 미렌더) — 11·12절 판정과 동일.
 - 검증 함정 주의 기록: K-Cosmetics 는 반드시 **`k-cosmetics.site`** 로 측정했다 (`k-cosmetics.co.kr` 은 외부 쇼핑몰).
 
 ### 18-4. header/footer dead link 전수 (production 실접속)
@@ -435,15 +408,14 @@ Playwright(Chromium) 실브라우저. Desktop 1440×900 · Mobile 390×844.
 | 서비스 | 검증 경로 | 결과 |
 |---|---|---|
 | KPA | `/` `/service-guide` `/about` `/contact` `/guide/intro` `/policy` `/privacy` `/login` `/guide/features/{signage,forum,content}` (11) | dead 0 |
-| GlycoPharm | `/` `/service-guide` `/contact` `/forum` `/lms` `/business` `/terms` `/privacy` (8) | dead 0 |
 | K-Cosmetics | `/` `/service-guide` `/contact` `/register` `/terms` `/privacy` (6) | dead 0 |
 | PharmacyHub | `/` `/community` `/education` `/service-guide` `/forum` `/account/{enrollments,certificates}` `/guide/{intro,features}` `/join` `/join/status` `/terms` `/privacy` (13) | dead 0 |
 | Neture | `/` `/guide` `/contact` `/terms` `/privacy` (5) | dead 0 |
 
-- GlycoPharm / K-Cosmetics 의 `terms` · `privacy` 는 중첩 상대 route 라 소스 grep 으로 보이지 않지만 **실접속 200 · 정상 렌더**로 확인했다.
+- K-Cosmetics 의 `terms` · `privacy` 는 중첩 상대 route 라 소스 grep 으로 보이지 않지만 **실접속 200 · 정상 렌더**로 확인했다.
 - 5서비스 `terms` / `privacy` 는 route 는 살아 있고 본문이 "현재 공개된 문서가 없습니다" 다 — **dead link 가 아니라 20절 FOLLOW_UP #2(정책 문서 미게시)** 이며 closure 를 막지 않는다.
 - PharmacyHub 에 `/contact` route 가 없는 것은 **의도된 계약**이므로 결함으로 세지 않는다(6·7절 판정 유지).
-- `mailto:` 링크 2건(GlycoPharm `support@glycopharm.co.kr` · K-Cosmetics `support@k-cosmetics.site`)은 route dead link 대상 밖이다.
+- `mailto:` 링크 2건(K-Cosmetics `support@k-cosmetics.site`)은 route dead link 대상 밖이다.
 
 ### 18-5. 판정
 
@@ -465,8 +437,8 @@ production adoption = PASS
 | 항목 | 값 |
 |---|---|
 | 검증 시점 `origin/main` | `82e54ff21` |
-| 최신 web 배포 run | `32455238689` (headSha `7387109bf`, `conclusion=success`) — `deploy-kpa-society` / `deploy-glycopharm` / `deploy-k-cosmetics` / `deploy-neture` / `deploy-pharmacy-hub` / `deploy-kpa-branch` **전부 success** |
-| Cloud Run 활성 리비전 (asia-northeast3, 트래픽 100%) | `kpa-society-web-01881-69c` · `glycopharm-web-01310-6vt` · `k-cosmetics-web-01053-k5c` · `neture-web-01506-wcx` · `pharmacy-hub-web-00134-qrh` |
+| 최신 web 배포 run | `32455238689` (headSha `7387109bf`, `conclusion=success`) — `deploy-kpa-society` / `deploy-k-cosmetics` / `deploy-neture` / `deploy-pharmacy-hub` / `deploy-kpa-branch` **전부 success** |
+| Cloud Run 활성 리비전 (asia-northeast3, 트래픽 100%) | `kpa-society-web-01881-69c` · `k-cosmetics-web-01053-k5c` · `neture-web-01506-wcx` · `pharmacy-hub-web-00134-qrh` |
 | `3635838ed..82e54ff21` 의 web 변경 | `packages/ui/src/operator-user-detail/UserDetailPage.tsx` · `services/web-k-cosmetics` 3파일 (운영자 회원 상세 WO) — **Header/Footer/Nav/Shell 모집단 무관** |
 | 측정 도구 | Playwright / Chromium headless, 쿼리스트링 캐시 버스트(`?cb=`) 적용 |
 
@@ -475,7 +447,6 @@ production adoption = PASS
 | 서비스 | 스캔 대상 | `#services` | 하드코딩 `2025` 저작권 | 판정 |
 |---|---|---|---|---|
 | KPA | `index-C3iEdDNX.js` + vendor 3종 (1,310,903 B) | **0건** | 0건 | PASS |
-| GlycoPharm | `index-BkR0Zar1.js` (1,254,386 B) | 0건 | **0건** — `All rights reserved` 3 occurrence 전부 동적 변수 (`["© ", t, " GlycoPharm. …"]` 2건 = 공개 Footer·`StoreLayout`, `["© ", l, " ", e, …]` 1건 = 공통 Footer) | PASS |
 | K-Cosmetics | `index-DKEko4y8.js` (1,227,587 B) | 0건 | **0건** — 2 occurrence 전부 동적 변수 | PASS |
 
 #### 18-6-3. 5서비스 × (대표 화면 + deep link 2) × 2 뷰포트 = **30 측정**
@@ -487,9 +458,6 @@ production adoption = PASS
 | KPA | `/` | 200/200 | 1/1 | 65 | 0 | 0 | 2026 | 1440/1440 · 390/390 | 1273 · 1177 | 없음 | 0 / 0 |
 | KPA | `/services/pharmacy` | 200/200 | 1/1 | 65 | 0 | **0** | 2026 | 1440/1440 · 390/390 | 613 · 613 | 없음 | 0 / 0 |
 | KPA | `/guide/intro` | 200/200 | 1/1 | 65 | 0 | 0 | 2026 | 1440/1440 · 390/390 | 1383 · 1358 | 없음 | 0 / 0 |
-| GlycoPharm | `/` | 200/200 | 1/1 | 65 | 0 | 0 | **2026** | 1440/1440 · 390/390 | 1133 · 1087 | 없음 | 0 / 0 |
-| GlycoPharm | `/service-guide` | 200/200 | 1/1 | 65 | 0 | 0 | 2026 | 1440/1440 · 390/390 | 1580 · 1561 | 없음 | 0 / 0 |
-| GlycoPharm | `/forum` | 200/200 | 1/1 | 65 | 0 | 0 | 2026 | 1440/1440 · 390/390 | 424 · 405 | 없음 | 0 / 0 |
 | K-Cosmetics | `/` | 200/200 | 1/1 | 65 | 0 | 0 | **2026** | 1440/1440 · 390/390 | 1133 · 1087 | 없음 | 0 / 0 |
 | K-Cosmetics | `/service-guide` | 200/200 | 1/1 | 65 | 0 | 0 | 2026 | 1440/1440 · 390/390 | 1589 · 1570 | 없음 | 0 / 0 |
 | K-Cosmetics | `/terms` | 200/200 | 1/1 | 65 | 0 | 0 | 2026 | 1440/1440 · 390/390 | 288 · 269 | 없음 | **1 / 0** (아래 주) |
@@ -510,11 +478,10 @@ production adoption = PASS
 | # | 대상 | production 실측 (DOM) | 판정 |
 |---|---|---|---|
 | 1 | KPA `#services` dead anchor 제거 | `kpa-society.co.kr/services/pharmacy` — `a[href="#services"]` **0개**, 페이지 HTML 전체에 `#services` 문자열 **부재**. 남은 hash anchor 는 `#about` 1건이며 `document.getElementById('about')` **존재** → dead anchor 0. `/` 는 hash anchor 자체가 0건 | PASS |
-| 2 | GlycoPharm 동적 연도 | footer 텍스트 `© 2026 GlycoPharm. All rights reserved.` | PASS |
+| 2 | — | All rights reserved.` | PASS |
 | 3 | K-Cosmetics 동적 연도 | footer 텍스트 `© 2026 K-Cosmetics. All rights reserved.` | PASS |
 | 참고 | 나머지 3서비스 저작권 | KPA `Copyright © 2026 약사회. All Rights Reserved.` · PharmacyHub `© 2026 Pharmacy-Hub. All rights reserved.` · Neture `© 2026 Neture. 공급자 · 파트너 협업 플랫폼` | 전부 2026 |
 
-> GlycoPharm `StoreLayout` footer(로그인 필요 영역)는 18-2 의 3-b 와 동일하게 **배포 번들 근거**로 판정했다.
 > 이번 재검증은 **비인증 공개 화면 범위**이며, 인증 필요 화면은 브라우저로 직접 렌더하지 않았다 — **측정 한계로 명시**한다.
 
 #### 18-6-5. Mobile navigation 기능 검증 (390×844, touch context)
@@ -522,7 +489,6 @@ production adoption = PASS
 | 서비스 | 메뉴 버튼 | 클릭 후 노출 링크 | 메뉴 링크 실이동 | fixed bottom nav | pageerror |
 |---|---|---|---|---|---|
 | KPA | `메뉴 열기` 존재 | 29 → **33** | `/service-guide` → 200 (`KPA Society — 약사 커뮤니티·강의·매장 지원`) | 1 | 0 |
-| GlycoPharm | `메뉴 열기` 존재 | 29 → **32** | `/service-guide` → 200 (`GlycoPharm - 혈당관리 전문 플랫폼`) | 1 | 0 |
 | K-Cosmetics | `메뉴 열기` 존재 | 28 → **31** | `/service-guide` → 200 (`K-Cosmetics - O4O Platform`) | 1 | 0 |
 | PharmacyHub | `메뉴 열기` 존재 | 20 → **24** | `/community` → 200 (`Pharmacy-Hub 파머시 허브`) | 0 (11·12절 판정대로 **의도**) | 0 |
 | Neture | `메뉴 열기` 존재 | 27 → **30** | `/guide` → 200 (`이용 안내 — Neture`) | 0 (비인증 시 미렌더 — 11절 판정) | 0 |
@@ -536,13 +502,12 @@ production adoption = PASS
 | 서비스 | 경로 수 | 결과 |
 |---|---|---|
 | KPA | 11 (`/` `/service-guide` `/about` `/contact` `/guide/intro` `/policy` `/privacy` `/login` `/guide/features/{signage,forum,content}`) | dead 0 |
-| GlycoPharm | 8 (`/` `/service-guide` `/contact` `/forum` `/lms` `/business` `/terms` `/privacy`) | dead 0 |
 | K-Cosmetics | 6 (`/` `/service-guide` `/contact` `/register` `/terms` `/privacy`) | dead 0 |
 | PharmacyHub | 13 (`/` `/community` `/education` `/service-guide` `/forum` `/account/{enrollments,certificates}` `/guide/{intro,features}` `/join` `/join/status` `/terms` `/privacy`) | dead 0 |
 | Neture | 5 (`/` `/guide` `/contact` `/terms` `/privacy`) | dead 0 |
 
-- Neture header 의 **cross-service 외부 링크 3건**도 추가 확인: `kpa-society.co.kr/` · `www.glycopharm.co.kr` · `www.k-cosmetics.site/` = 전부 **200**.
-- 18-4 의 오탐 방지 판정을 그대로 재확인했다 — PharmacyHub `/contact` 부재는 **의도된 계약**, GlycoPharm·K-Cosmetics `terms`/`privacy` 는 중첩 상대 route 라 **실접속으로 200 확인**, `terms`/`privacy` 본문의 "현재 공개된 문서가 없습니다" 는 dead link 가 아니라 **FOLLOW_UP #2**, 법정정보 블록 미표시는 `PublicLegalFooterInfo` 계약(profile 없으면 `null`)이다.
+- Neture header 의 **cross-service 외부 링크 3건**도 추가 확인: `kpa-society.co.kr/` · `www.k-cosmetics.site/` = 전부 **200**.
+- 18-4 의 오탐 방지 판정을 그대로 재확인했다 — PharmacyHub `/contact` 부재는 **의도된 계약**, K-Cosmetics `terms`/`privacy` 는 중첩 상대 route 라 **실접속으로 200 확인**, `terms`/`privacy` 본문의 "현재 공개된 문서가 없습니다" 는 dead link 가 아니라 **FOLLOW_UP #2**, 법정정보 블록 미표시는 `PublicLegalFooterInfo` 계약(profile 없으면 `null`)이다.
 - K-Cosmetics 는 반드시 **`k-cosmetics.site`** 로 측정했다 (`k-cosmetics.co.kr` 은 무관한 외부 쇼핑몰).
 
 #### 18-6-7. 재검증 판정
@@ -552,7 +517,7 @@ PRODUCTION_ADOPTION = PASS
 ```
 
 - 발견된 신규 결함 **0건** → 이번 재검증에서 수행한 **코드 수정 0건**.
-- 20절 FOLLOW_UP 은 재분류·구현하지 않았다. 미확인 항목은 **인증 필요 화면(GlycoPharm `StoreLayout` 등)** 이며 18-6-4 에 측정 한계로 명시했다.
+- 20절 FOLLOW_UP 은 재분류·구현하지 않았다. 미확인 항목은 **인증 필요 화면** 이며 18-6-4 에 측정 한계로 명시했다.
 
 ---
 

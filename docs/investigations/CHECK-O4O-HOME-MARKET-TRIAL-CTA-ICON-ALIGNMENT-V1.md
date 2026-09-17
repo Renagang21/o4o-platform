@@ -33,7 +33,6 @@
 ## 4. 변경하지 않은 항목
 
 - Neture(`CommunityPage.tsx`) — 이미 FlaskConical, 미변경
-- GlycoPharm — Market Trial CTA 대상 아님(사이니지 CTA), 미접촉
 - Home 구조 / 문구 / CTA 링크(`https://neture.co.kr`) / accentColor / 섹션 순서 — 불변
 - **`valueGuidePlacement` 정합성(IR §5)** — 미착수 (정책 결정 후 별도 WO)
 - `StandardHomeTemplate.tsx` / `HeroBannerSection.tsx` — **미접촉**

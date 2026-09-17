@@ -145,7 +145,7 @@ Source: `services/web-kpa-society/src/config/operatorMenuGroups.ts` `UNIFIED_MEN
 | QR 대상 picker | `ContentHubPickerModal`(로컬) | — | `StoreAssetSelectorModal`(로컬) | **NO(중복)** |
 | QR 생성 form | `OperatorQrWritePage`(template) | — | `StoreQrCreateModal`/`StoreQRPage`(row) | **NO(중복)** |
 
-> **핵심 비대칭**: 운영자 + 매장 HUB 선반은 이미 `operator-ux-core ListColumnDef` 스택. **내 매장 자체 콘텐츠(StoreQRPage/PharmacyVideoPage/StoreContentsSelector)만 `@o4o/ui Column<T>`** 사용. (두 DataTable 은 `system`/`onCellClick` 유무가 다른 별개 API — MEMORY 기록.) → 가장 가치 높은 정비 = 내 매장 자체 테이블을 ListColumnDef 로 수렴(KPA 로컬, 공통 패키지 무변경, GP/KCos 무영향).
+> **핵심 비대칭**: 운영자 + 매장 HUB 선반은 이미 `operator-ux-core ListColumnDef` 스택. **내 매장 자체 콘텐츠(StoreQRPage/PharmacyVideoPage/StoreContentsSelector)만 `@o4o/ui Column<T>`** 사용. (두 DataTable 은 `system`/`onCellClick` 유무가 다른 별개 API — MEMORY 기록.) → 가장 가치 높은 정비 = 내 매장 자체 테이블을 ListColumnDef 로 수렴(KPA 로컬, 공통 패키지 무변경, KCos 무영향).
 
 ---
 
@@ -175,7 +175,7 @@ Source: `services/web-kpa-society/src/config/operatorMenuGroups.ts` `UNIFIED_MEN
 
 ### 공통화 가능 (사용자 노출 + KPA 로컬)
 - **명칭/문구**: 같은 작업 같은 이름(블로그/POP/QR-code/동영상 어근 유지). 기술 구현명 비노출.
-- **리스트 테이블**: 내 매장 자체 콘텐츠를 `operator-ux-core ListColumnDef` 로 수렴(운영자·HUB와 동일). **공통 패키지 무변경, GP/KCos 무영향.**
+- **리스트 테이블**: 내 매장 자체 콘텐츠를 `operator-ux-core ListColumnDef` 로 수렴(운영자·HUB와 동일). **공통 패키지 무변경, KCos 무영향.**
 - **상태 배지**: 공유 StatusBadge 추출(additive).
 - **편집기**: 이미 공통 — 문서화만.
 
@@ -200,7 +200,7 @@ Source: `services/web-kpa-society/src/config/operatorMenuGroups.ts` `UNIFIED_MEN
 | R4 | QR form 통합이 import 경로 우회 → `ensureStoreCopyForPageTarget` 우회 → 운영자 원본 참조 불변식 위반 | `qr-content-hub-copy.service.ts:1-15` |
 | R5 | `landingTargetId` 타입 혼선(product/video/page 다른 테이블) → 공개 URL 깨짐 | `store-qr-landing.controller.ts:184-243` |
 | R6 | 상태 어휘 통일 중 기존 발행물(`ready` vs `published`) 목록 누락 | §7.2 |
-| R7 | `@o4o/content-editor` 등 **공통 패키지 변경 시 GP/KCos 동시 영향**(3서비스) — Shared-Module 프로토콜 필수, GP tsc 는 `tsc -b` 로 검증 | CLAUDE.md §1, MEMORY |
+| R7 | `@o4o/content-editor` 등 **공통 패키지 변경 시 KCos 동시 영향**(2서비스) — Shared-Module 프로토콜 필수 tsc 는 `tsc -b` 로 검증 | CLAUDE.md §1, MEMORY |
 | R8 | `kpa_store_contents` 이중 용도(매장 자료 + Workspace A) DB CHECK(`visibility_scope='organization'`) 위반 위험 | `kpa-store-content.entity.ts:89-142` |
 
 ---
@@ -218,7 +218,7 @@ Source: `services/web-kpa-society/src/config/operatorMenuGroups.ts` `UNIFIED_MEN
 ---
 
 ## 14. 권장 구현 단계 우선순위 근거
-- **즉시 가치·저위험**: P1(명칭) + P3(테이블 수렴, GP/KCos 무영향). 
+- **즉시 가치·저위험**: P1(명칭) + P3(테이블 수렴, KCos 무영향). 
 - **편집기**는 이미 공통 → 작업 불요, 문서화만.
 - **QR form/picker, 상태 어휘**는 데이터 모델 차이가 본질 → 설계 선행(P5), 무검증 통합 금지.
 

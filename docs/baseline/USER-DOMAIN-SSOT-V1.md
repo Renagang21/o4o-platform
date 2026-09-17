@@ -101,7 +101,6 @@ SELECT u.* FROM users u WHERE u.service_key = $1
 | 서비스 | Admin | Operator |
 |--------|-------|----------|
 | neture | `neture:admin` | `neture:operator` |
-| glycopharm | `glycopharm:admin` | `glycopharm:operator` |
 | glucoseview | `glucoseview:admin` | `glucoseview:operator` |
 | k-cosmetics | `cosmetics:admin` | `cosmetics:operator` |
 | kpa-society | `kpa:admin` | `kpa:operator` |

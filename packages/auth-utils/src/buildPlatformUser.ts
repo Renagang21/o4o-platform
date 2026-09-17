@@ -8,7 +8,7 @@
  *   const memberships = (apiUser as any).memberships || [];
  *   setUser({ ...base, roles, memberships });
  *
- * GlycoPharm / KPA 는 서비스별 User 구조가 달라 normalizeMemberships 만 사용.
+ * KPA 는 서비스별 User 구조가 달라 normalizeMemberships 만 사용.
  *
  * 미포함:
  *   - 서비스별 추가 필드 (isStoreOwner, activityType 등)

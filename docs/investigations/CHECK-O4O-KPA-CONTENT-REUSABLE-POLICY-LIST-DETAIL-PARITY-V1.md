@@ -75,11 +75,11 @@ WHERE·정렬·권한 분기·페이징 **전부 무변경**. 응답에 필드 �
 | `ContentListPage` (문서형 섹션) | ✅ 의도된 정합 |
 | `ContentDocumentsPage` (`/content/documents`·`/content/resources`) | ✅ 의도된 정합 |
 | `resources.ts` → `ResourcesHubPage` (`sub_type='resource'`) | ⚠️ **동작 변화** — 아래 |
-| GlycoPharm / K-Cosmetics `ContentListPage` | ❌ 영향 없음 — 각자 `/api/v1/glycopharm`·`/api/v1/k-cosmetics` 베이스, 별도 백엔드 라우트 |
+| K-Cosmetics `ContentListPage` | — |
 
 **자료실 HUB 동작 변화 (의도됨):** [ResourcesHubTemplate.tsx:671·857](../../packages/shared-space-ui/src/ResourcesHubTemplate.tsx#L671) 은 `row.reusable_policy !== 'restricted'` 로 `isStoreTarget` 을 정하고, restricted 면 store copy 대신 **클립보드 복사**로 폴백한다(WO-O4O-STORE-LIBRARY-RESOURCE-COPY-VISIBILITY-FIX-V1). 필드가 없던 동안 이 분기는 **무효**였다. 이제 restricted 자료는 설계대로 폴백한다 — 템플릿 코드는 손대지 않았고, 이미 있던 정책이 비로소 작동하는 것이다.
 
-> `ResourcesHubTemplate` 은 GlycoPharm·K-Cosmetics·Neture 도 쓰는 공통 컴포넌트지만 **템플릿을 변경하지 않았고** 다른 서비스는 각자 백엔드 응답을 쓰므로 영향 없음.
+> `ResourcesHubTemplate` 은 K-Cosmetics·Neture 도 쓰는 공통 컴포넌트지만 **템플릿을 변경하지 않았고** 다른 서비스는 각자 백엔드 응답을 쓰므로 영향 없음.
 
 ---
 
@@ -94,7 +94,7 @@ WHERE·정렬·권한 분기·페이징 **전부 무변경**. 응답에 필드 �
 | `ResourcesHubTemplate` 등 공통 패키지 | **0** |
 | 라벨 문구("내 자료함 가져가기") | **0** — 용어 정비는 별건 |
 | C6 (복사 완료 CTA 목적지) | **0** — 후속 |
-| GlycoPharm / K-Cosmetics 동일 패턴 점검 | **0** — 본 WO 는 KPA 범위 |
+| K-Cosmetics 동일 패턴 점검 | **0** — 본 WO 는 KPA 범위 |
 
 ---
 
@@ -165,7 +165,6 @@ services/web-kpa-society/src/pages/contents/ContentListPage.tsx
 
 **후속 권장 (본 WO 범위 밖, 미착수):**
 
-1. **GlycoPharm / K-Cosmetics 동일 패턴** — 각자 별도 백엔드 라우트를 쓰므로 본 수정의 영향은 없으나, 같은 "목록 SELECT 컬럼 누락" 이 있는지는 확인하지 않았다.
 2. **라벨 용어 정비** — "내 자료함 가져가기" 유지. 변경 시 전 진입점 일괄.
 3. **C6** — 복사 완료 CTA 의 canonical 관리 화면 정렬.
 

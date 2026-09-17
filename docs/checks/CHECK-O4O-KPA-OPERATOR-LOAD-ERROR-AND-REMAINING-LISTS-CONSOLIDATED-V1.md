@@ -53,7 +53,7 @@
 ## 5. 권한 3계층 교차 검증 (정적 — 가드 기준)
 
 - 프론트 `/operator/*` 게이트 = `PLATFORM_ROLES` = `[kpa:admin, kpa:operator, platform:super_admin]` (`OperatorRoutes.tsx` `RoleGuard`, `role-constants.ts`).
-- 백엔드 operator 라우트(`stores.routes.ts`·`analytics.routes.ts`) = 위 역할 + 교차 서비스 admin/operator(neture/glycopharm/cosmetics) + `platform:admin`, 이후 `injectServiceScope`.
+- 백엔드 operator 라우트(`stores.routes.ts`·`analytics.routes.ts`) = 위 역할 + 교차 서비스 admin/operator + `platform:admin`, 이후 `injectServiceScope`.
 
 | 계정 | 역할 | 프론트 | 백엔드 | 판정 |
 |------|------|:---:|:---:|------|

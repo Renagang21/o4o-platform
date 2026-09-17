@@ -6,7 +6,7 @@
  *   상태 변경: APPROVED ↔ SUSPENDED → TERMINATED.
  * WO-O4O-OPERATOR-LIST-TABLE-STANDARD-V3-PHASE3B-1: DataTable + ActionPolicy 표준.
  * WO-O4O-OPERATOR-CROSSSERVICE-CORE-ONLY-AND-VIEW-DUPLICATION-CLEANUP-V1:
- *   KPA / K-Cosmetics / GlycoPharm 3중복을 단일 콘솔로 수렴.
+ *   KPA / K-Cosmetics 2중복을 단일 콘솔로 수렴.
  *   서비스는 client adapter + accent + actionPolicyKey + 부제만 주입한다.
  *
  * 보존: 컬럼 · 필터(상태/채널타입/검색) · 페이지네이션 · 상태 전이 · 종료 확인 문구 · KPI 3종.

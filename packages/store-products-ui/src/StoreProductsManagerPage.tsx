@@ -502,7 +502,7 @@ export interface StoreProductsManagerPageProps {
   /**
    * WO-O4O-KPA-STORE-MY-PRODUCTS-REBUILD-AS-STORE-PRODUCT-BASE-V1:
    *   서비스별 사용자 문구 커스터마이즈(opt-in). 미지정 시 기존 문구 유지 →
-   *   기존 소비처(GP/KCos/Neture) 무영향. KPA 는 '내 매장 제품(매장 서비스 활용)' 프레이밍을 주입.
+   *   기존 소비처(KCos/Neture) 무영향. KPA 는 '내 매장 제품(매장 서비스 활용)' 프레이밍을 주입.
    */
   registerButtonLabel?: string;
   infoText?: string;

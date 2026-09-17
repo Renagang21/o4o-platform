@@ -66,10 +66,10 @@ Profile Core 공통화
 PharmacyHub /account 및 내 프로필 진입
 PATCH /api/v1/users/me/profile
 ACCOUNT_CORE allowlist
-GP/KCos/Neture/PH frontend adapter 전환
+KCos/Neture/PH frontend adapter 전환
 보안 regression
 production API smoke
-KPA/GP/PH browser smoke
+KPA/PH browser smoke
 ```
 
 현재 canonical self-profile allowlist:
@@ -249,7 +249,7 @@ K-Cosmetics typecheck/build
 Neture typecheck/build
 ```
 
-공통 component를 변경하면 GP/PH 포함 전체 소비처도 회귀 확인한다.
+공통 component를 변경하면 PH 포함 전체 소비처도 회귀 확인한다.
 
 backend 변경은 이번 WO에서 원칙적으로 불필요하다.
 

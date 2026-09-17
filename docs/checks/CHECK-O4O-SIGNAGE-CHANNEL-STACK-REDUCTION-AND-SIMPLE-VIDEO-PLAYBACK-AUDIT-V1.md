@@ -178,7 +178,7 @@ WO §24 의 "playlist table 없이 `mediaUrl` 하나" 1단계 모델로 충분�
 | # | 저장 위치 | 입력 UI | API | player 직접 사용 | 프로덕션 |
 |---|---|---|---|:---:|---|
 | 1 | **`store_tablet_screen_blocks.config`** (`idle_media`) | `packages/tablet-screen-set-editor` | `o4o-store/operator-screen-set` · `supplier-screen-set` · `store-public/*` | ✅ | **21건 YouTube** |
-| 2 | `signage_media.sourceUrl` + `embedId` | KPA/GP/PH 매장 signage 화면 | `/api/signage/:serviceKey/media`, PH `/store-owner/signage/media` | ✅ (축 B) | **7건 전부 YouTube** |
+| 2 | `signage_media.sourceUrl` + `embedId` | KPA/PH 매장 signage 화면 | `/api/signage:serviceKey/media`, PH `/store-owner/signage/media` | ✅ (축 B) | **7건 전부 YouTube** |
 | 3 | `store_tablets.idle_playlist_items` | — | — | — | **0 (미사용 컬럼)** |
 | 4 | `cms_contents` (URL 을 본문/metadata 로) | admin CMS | `/api/v1/cms/*` | 축 A 경유 | signage 용도 실사용 0 |
 
@@ -266,7 +266,7 @@ WO §24 의 "playlist table 없이 `mediaUrl` 하나" 1단계 모델로 충분�
 
 1. **축 C(활성)** — 태블릿 화면 세트 편집기의 `idle_media` 블록. `detectIdleMediaType` 이
    youtube/vimeo 만 허용하고 그 외는 invalid 처리한다.
-2. **축 B** — KPA(3) · GlycoPharm(2) · PharmacyHub(3) 매장 화면이 `signage/media` · `signage/schedules` 소비.
+2. **축 B** — KPA(3) · PharmacyHub(3) 매장 화면이 `signage/media` · `signage/schedules` 소비.
 
 ### 12-1. Tablet 관리 vs Channel 관리 (WO §20)
 
@@ -291,7 +291,7 @@ WO §24 의 "playlist table 없이 `mediaUrl` 하나" 1단계 모델로 충분�
 | **Playlist — `signage_playlists`** | 재생 목록 | 축 B | 1 / 3 | **SIMPLIFY** | 단일 URL 로 충분 |
 | **Playlist — `store_playlists`** | 매장 재생 목록 | PH 편성 참조 | 11 / **items 0** | **SIMPLIFY** | 항목 0, published+active 0 |
 | **Playlist — cosmetics** | 서비스 확장 | 없음 | 0 | **RETIRE** | 실사용 0 |
-| **`signage_media`** | 정규화된 영상 모델 | KPA/GP/PH 매장 UI | 7 (전부 YouTube) | **KEEP** | 이미 simple-video 모델. 최소안의 유력 후보 |
+| **`signage_media`** | 정규화된 영상 모델 | KPA/PH 매장 UI | 7 (전부 YouTube) | **KEEP** | 이미 simple-video 모델. 최소안의 유력 후보 |
 | **Player — `SignagePlayerPage`/Controller** | 축 B 재생기 | 배포됨 | — | **KEEP** | 실제 재생 엔진 |
 | **Player — `ChannelPlayerPage`/`api/channels.ts`** | 축 A 재생기 | 배포됨 | **0** | **RETIRE** | 빈 테이블만 조회 |
 | **Heartbeat (`channel_heartbeats`)** | 기기 생존 | admin ops 화면 | **0** | **RETIRE** | 소비 증거 0 |
@@ -373,7 +373,7 @@ serviceKey              DERIVED_ONLY
 ```text
 Phase 1  축 A write 중지 — /api/v1/channels 의 POST/PUT/PATCH/DELETE 를 비활성 (데이터 0이라 영향 0)
 Phase 2  ChannelPlayerPage · api/channels.ts · admin 채널 2화면을 dead 로 표시 (route 제거는 Phase 4)
-Phase 3  축 B 소비처(KPA/GP/PH 매장 signage 화면)를 signage_media 단일 축으로 정리
+Phase 3 축 B 소비처(KPA/PH 매장 signage 화면)를 signage_media 단일 축으로 정리
          — store_playlists(items 0) 의존 제거
 Phase 4  dead API/UI 제거 (channels routes · player route · admin route)
 Phase 5  table retirement: channel_heartbeats → channel_playback_logs → channels

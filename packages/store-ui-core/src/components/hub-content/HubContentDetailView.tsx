@@ -3,7 +3,7 @@
  *
  * WO-O4O-STORE-HUB-COMMON-VIEW-AND-SHELL-UNIFICATION-V1
  *
- * K-Cosmetics `/library/content/:id` (105줄, inline style) 와 GlycoPharm `/hub/content/:id`
+ * K-Cosmetics `/library/content/:id` (105줄, inline style) 와 약국형 서비스의 `/hub/content/:id`
  * (101줄, Tailwind) 는 같은 화면이었다 — 목록에서 넘긴 item(location.state) 을 카드로 보여주고
  * 하단에 감사 패널을 붙인다. 그 골격을 여기로 모은다.
  *

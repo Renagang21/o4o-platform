@@ -19,7 +19,7 @@
 ## 2. 코드상 PUBLIC 노출 계약
 
 **핵심 파일:** `apps/api-server/src/routes/o4o-store/controllers/pharmacy-products.controller.ts`
-3개 서비스가 동일 컨트롤러를 serviceKey 만 바꿔 마운트한다: kpa (`kpa.routes.ts:410`), glycopharm (`glycopharm.routes.ts:385`), cosmetics (`cosmetics.routes.ts:137`).
+2개 서비스가 동일 컨트롤러를 serviceKey 만 바꿔 마운트한다: kpa (`kpa.routes.ts:410`), cosmetics (`cosmetics.routes.ts:137`).
 
 ### 2.1 승인 게이트 — PUBLIC 단락(short-circuit)
 `buildServiceApprovalGateSql` (lines 83–93):
@@ -72,7 +72,7 @@
 |------|------|
 | 컬럼 | `organizations.type` (varchar). store 관점 엔티티 `OrganizationStore` 에서 plain string |
 | 실 판정 헬퍼 | `store-tablet.routes.ts:1712` `resolveStoreHubType(orgId)` — `type='pharmacy'`→pharmacy, `type='store'`→non_pharmacy, else→제외 |
-| 서비스별 조직유형 | KPA 매장 = `pharmacy` / GlycoPharm 매장 = `pharmacy` / **K-Cosmetics 매장 = `store`(비약국)** |
+| 서비스별 조직유형 | KPA 매장 = `pharmacy` = `pharmacy` / **K-Cosmetics 매장 = `store`(비약국)** |
 | 서비스 축(별개) | `service_audience_policies.is_pharmacy_target_service` (service_key 별 boolean). offer→service 연결 게이트가 이 축 사용 |
 | 사용자 축(별개) | `kpa_pharmacist_profiles`(user-scoped 자격). 매장 유형 게이트에는 미사용 |
 
@@ -105,7 +105,6 @@
 | 서비스 | 매장 조직유형 | PUBLIC 의약품 offer | 실제 비약국 의약품 노출 후보 |
 |--------|:---:|:---:|:---:|
 | KPA (kpa) | pharmacy | 0 (offer 테이블 0행) | 0 (약국 — 노출돼도 정책상 허용 대상) |
-| GlycoPharm (glycopharm) | pharmacy | 0 | 0 (약국) |
 | **K-Cosmetics (cosmetics)** | **store(비약국)** | **0** | **0** (해당 조직 활성 listing 자체 0건) |
 
 - offer 원천이 0건이므로 어느 서비스 카탈로그도 반환할 PUBLIC 의약품이 없음.

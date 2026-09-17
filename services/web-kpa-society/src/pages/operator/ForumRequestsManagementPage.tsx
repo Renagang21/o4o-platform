@@ -5,7 +5,7 @@
  * WO-O4O-KPA-FORUM-REQUESTS-CONSOLE-CONVERGENCE-WITH-STATE-EXTENSION-V1:
  *   직접 구현(DataTable+RowActionMenu+ActionBar+Drawer)을
  *   @o4o/operator-core-ui/modules/forum-requests 의 OperatorForumRequestsConsolePage
- *   thin wrapper 로 수렴. GP/K-Cosmetics/Neture 와 동일 콘솔 계열로 정합.
+ *   thin wrapper 로 수렴. K-Cosmetics/Neture 와 동일 콘솔 계열로 정합.
  *   KPA 고유 요소는 공통 콘솔의 optional 확장으로 주입 (공통 콘솔 기본 동작 불변):
  *     - 상태머신 creating/completed/failed → statusConfig + statusFilterOptions
  *     - forumType/tags → extraColumns + renderDetailExtra (+ 공통 search 가 tags 매칭)

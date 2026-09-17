@@ -208,7 +208,6 @@ async function verifyBranchAdmin(ds, userId, branchId, userRoles) {
 // packages/security-core/src/service-configs.ts
 KPA_SCOPE_CONFIG = {
   platformBypass: false,  // ← 유일하게 false인 서비스
-  blockedServicePrefixes: ['platform:', 'neture:', 'glycopharm:', 'cosmetics:', 'glucoseview:']
 }
 ```
 
@@ -273,9 +272,7 @@ ecommerce_orders (주문)
 ### 4.3 주문 생성 패턴
 
 ```typescript
-// kpa.routes.ts:2538 — "GlycoPharm createCoreOrder 패턴" 주석
 // ecommerce_orders에 주문 생성, metadata.serviceKey = 'kpa-groupbuy'
-// 주문번호: ORD-YYYYMMDD-XXXX (GlycoPharm 동일 포맷)
 ```
 
 ✅ E-COMMERCE-ORDER-CONTRACT 준수 (별도 주문 테이블 미생성)
@@ -306,7 +303,6 @@ ecommerce_orders (주문)
 | **백엔드 라우트** | 18개 마운트 | kpa.routes.ts:1813~1868 |
 | **백엔드 컨트롤러** | 14개 파일 | kpa/controllers/store-*, pharmacy-* |
 | **백엔드 엔티티** | 10개 파일 | kpa/entities/store-*, organization-* |
-| **GlycoPharm 컨트롤러** | 3개 import | tablet, blog, layout |
 | **프론트엔드 /store 라우트** | 40+ 페이지 | App.tsx:618~666 |
 | **프론트엔드 리다이렉트** | 20+ 경로 | /pharmacy/* → /store/* |
 | **합계** | **51+ 오염점** | |
@@ -351,20 +347,6 @@ kpa/entities/
 ├── store-playlist-item.entity.ts
 ```
 
-#### GlycoPharm 크로스 도메인 (3개 import)
-
-```typescript
-// kpa.routes.ts:90-92 — GlycoPharm 컨트롤러를 KPA에서 직접 import
-import { createTabletController } from '../glycopharm/controllers/tablet.controller.js';
-import { createBlogController } from '../glycopharm/controllers/blog.controller.js';
-import { createLayoutController } from '../glycopharm/controllers/layout.controller.js';
-
-// 마운트:
-router.use('/stores', kpaTabletController);  // kpa.routes.ts:1868
-```
-
-**⛔ Cross-domain 의존 위반** (Boundary Policy F6, Guard Rule #5)
-
 #### 라우트 마운트 (18개)
 
 ```typescript
@@ -381,9 +363,6 @@ router.use('/', storeLibrary)                  // Store 오염 (root에 마운�
 router.use('/', storeQrLanding)                // Store 오염 (root에 마운트!)
 router.use('/', storePop)                      // Store 오염 (root에 마운트!)
 router.use('/', storeAnalytics)                // Store 오염 (root에 마운트!)
-router.use('/stores', tabletController)        // GlycoPharm → Store 오염
-router.use('/stores', blogController)          // GlycoPharm → Store 오염
-router.use('/stores', layoutController)        // GlycoPharm → Store 오염
 router.use('/store-template', ...)             // Store 오염
 router.use('/groupbuy-admin', ...)             // KPA 고유
 router.use('/groupbuy', ...)                   // KPA 고유
@@ -450,7 +429,6 @@ kpa/controllers/
 | 항목 | 심각도 | 설명 |
 |------|--------|------|
 | Store 컨트롤러/엔티티 위치 | **SEVERE** | 14개 컨트롤러 + 10개 엔티티가 KPA 디렉토리에 존재 |
-| GlycoPharm Cross-import | **CRITICAL** | Boundary Policy 위반 — 다른 도메인 컨트롤러 직접 import |
 | Root 마운트 (`router.use('/')`) | **HIGH** | 4개 Store 컨트롤러가 KPA 루트에 마운트 → 경로 충돌 가능 |
 | /store 프론트엔드 | **SEVERE** | 40+ 페이지가 KPA App에 직접 마운트 |
 | KPA 역할 → Store bypass | **HIGH** | KPA_STORE_ACCESS_ROLES로 Layer 관통 |
@@ -508,7 +486,7 @@ kpa/controllers/
 │                                                             │
 │  ⛔ Store 오염: 51+ 오염점                                   │
 │  ┌─────────────────────────────────────────────────────┐    │
-│  │ 14 store 컨트롤러 + 10 store 엔티티 + 3 glycopharm  │    │
+│  │ 14 store 컨트롤러 + 10 store 엔티티 + 3             │    │
 │  │ 40+ /store 프론트엔드 페이지                          │    │
 │  │ KPA_STORE_ACCESS_ROLES Layer 관통                    │    │
 │  └─────────────────────────────────────────────────────┘    │
@@ -520,7 +498,7 @@ kpa/controllers/
 
 | # | 심각도 | 문제 | 영향 | 근거 |
 |---|--------|------|------|------|
-| B-1 | **CRITICAL** | GlycoPharm 컨트롤러 KPA에서 직접 import | Boundary Policy F6 위반, Cross-domain 의존 | kpa.routes.ts:90-92 |
+| B-1 | **CRITICAL** | — | Boundary Policy F6 위반, Cross-domain 의존 | kpa.routes.ts:90-92 |
 | B-2 | **SEVERE** | Store 컨트롤러/엔티티 14+10개가 KPA 디렉토리에 존재 | 도메인 경계 불명확, 유지보수 혼란 | kpa/controllers/store-*, kpa/entities/store-* |
 | B-3 | **SEVERE** | /store 프론트엔드 40+ 페이지가 KPA App에 마운트 | KPA-b와 Store 책임 혼합 | App.tsx:283-296, 618-666 |
 | B-4 | **HIGH** | KPA_STORE_ACCESS_ROLES로 Layer 1→3 관통 | KPA 운영자가 자동 매장 관리 권한 | store-owner.utils.ts:15-20 |
@@ -532,7 +510,7 @@ kpa/controllers/
 
 | 우선순위 | WO 후보 | 범위 | 예상 영향도 |
 |----------|---------|------|------------|
-| **P0** | GlycoPharm Cross-import 제거 (B-1) | kpa.routes.ts 3줄 import + 마운트 제거, GlycoPharm 독립 라우트로 이전 | LOW |
+| **P0** | — | kpa.routes.ts 3줄 import + 마운트 제거 독립 라우트로 이전 | LOW |
 | **P1** | Store 컨트롤러/엔티티 분리 (B-2) | 14 컨트롤러 + 10 엔티티를 `routes/store/` 또는 `routes/o4o-store/`로 이전 | HIGH — 모든 import 경로 변경 |
 | **P1** | /store 프론트엔드 분리 (B-3) | App.tsx에서 /store 라우트를 독립 컴포넌트/모듈로 분리 | HIGH — 프론트엔드 구조 변경 |
 | **P1** | KPA Store Access Roles 분리 (B-4) | store-owner.utils.ts에서 KPA 역할 bypass 제거, 독립 가드 체인으로 변경 | MEDIUM |
@@ -545,8 +523,6 @@ kpa/controllers/
 1. **KPA-b 고유 구조는 건전하다.** 조직 계층(association→branch→group), 회원 모델(kpa_members + kpa_member_services), 공동구매(E-commerce Core 재사용), 가드(verifyBranchAdmin + Service Scope Guard) 모두 설계 의도대로 구현됨.
 
 2. **문제는 Store 오염이다.** KPA-b의 51+ Store 오염점은 초기 "약국 = KPA 분회" 가정에서 비롯된 역사적 잔재. Store는 독립 도메인으로 분리해야 한다.
-
-3. **GlycoPharm Cross-import은 즉시 수정 가능.** Boundary Policy 위반이며, 3줄 import 제거 + GlycoPharm 독립 라우트 이전으로 해결 가능 (P0).
 
 4. **"KPA-b − 지부 구조 = KPA-c" 가설 검증 필요.** KPA-c를 별도 IR로 감사하여 KPA-b와의 관계를 정확히 규명해야 한다 (→ IR-KPA-C-SERVICE-AUDIT-V1).
 

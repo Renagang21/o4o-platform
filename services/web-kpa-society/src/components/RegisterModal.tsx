@@ -92,8 +92,7 @@ export default function RegisterModal() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [licenseStatus, setLicenseStatus] = useState<'idle' | 'checking' | 'available' | 'duplicate'>('idle');
-  // WO-O4O-KPA-REGISTRATION-UX-ALIGN-WITH-GLYCOPHARM-V1:
-  //   email onBlur 시 /auth/check-email 호출로 중복/가입 상태 선제 안내 (GlycoPharm 패턴 도입).
+  // email onBlur 시 /auth/check-email 호출로 중복/가입 상태 선제 안내.
   const [emailAlreadyJoined, setEmailAlreadyJoined] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -176,7 +175,6 @@ export default function RegisterModal() {
     }
   }, [isOpen]);
 
-  // WO-O4O-KPA-REGISTRATION-UX-ALIGN-WITH-GLYCOPHARM-V1:
   //   email blur 시 /auth/check-email 으로 중복 / pending 상태 미리 안내.
   //   alreadyJoined 인 경우 submit 차단 (isFormValid 에서 처리).
   const handleEmailBlur = async () => {
@@ -337,8 +335,7 @@ export default function RegisterModal() {
   };
   const isPasswordStrong = passwordPolicy.valid;
 
-  // WO-O4O-KPA-REGISTRATION-UX-ALIGN-WITH-GLYCOPHARM-V1:
-  //   GlycoPharm 의 명시적 format validation 패턴을 도입.
+  //   명시적 format validation 패턴을 도입.
   //   - phone 정규식 (length 체크와 동일 결과지만 명시성 향상)
   //   - businessNumber 10자리 정확 검증
   //   - taxInvoiceEmail email 형식 검증 (입력된 경우만 — 선택 필드)
@@ -385,9 +382,8 @@ export default function RegisterModal() {
     return false;
   };
 
-  // WO-O4O-KPA-REGISTRATION-UX-ALIGN-WITH-GLYCOPHARM-V1:
   //   submit disabled 사유를 사용자에게 명시. 형식 오류도 별도 항목으로 노출.
-  //   GlycoPharm 의 missing fields amber 박스 패턴과 동일.
+  //   missing fields 는 amber 박스 패턴으로 노출.
   const getMissingFields = (): string[] => {
     const missing: string[] = [];
     if (emailAlreadyJoined) return missing; // 별도 error 박스로 안내 — 여기선 생략
@@ -793,8 +789,7 @@ export default function RegisterModal() {
                   </div>
                 )}
 
-                {/* WO-O4O-KPA-REGISTRATION-UX-ALIGN-WITH-GLYCOPHARM-V1:
-                    누락/형식 오류 항목을 amber 박스로 명시 (GlycoPharm 패턴). */}
+                {/* 누락/형식 오류 항목을 amber 박스로 명시. */}
                 {!isFormValid() && !loading && !emailAlreadyJoined && (() => {
                   const missing = getMissingFields();
                   return missing.length > 0 ? (
@@ -832,8 +827,7 @@ export default function RegisterModal() {
                 <p className="text-sm text-blue-800 mt-1"><strong>회원 유형:</strong> {SUCCESS_TYPE_LABELS[memberType]}</p>
                 <p className="text-sm text-blue-800 mt-1">승인까지 1-2 영업일이 소요될 수 있습니다.</p>
               </div>
-              {/* WO-O4O-KPA-REGISTRATION-UX-ALIGN-WITH-GLYCOPHARM-V1:
-                  GlycoPharm 의 success UX 패턴 — "로그인하기" 직행 버튼 추가.
+              {/* success UX — "로그인하기" 직행 버튼.
                   approval 정책은 변경 없음 (승인 후에만 실제 로그인 가능). */}
               <div className="flex flex-col sm:flex-row gap-3">
                 <button

@@ -237,7 +237,7 @@ type HubDashboardData = Omit<IntegratedDashboardData, 'pendingReports'>;
 | 항목 | 값 |
 |------|------|
 | 타 세션 WIP 주 영역 | `apps/api-server/src/scripts/**` (HFF ZH 배치 · easy-drug 감사 산출물 등 다수 untracked/modified) |
-| 그 외 타 세션 변경 | `.github/workflows/deploy-api.yml` · `apps/admin-dashboard/src/pages/cms/**` · `apps/admin-dashboard/src/config/service-entry.ts` · `apps/admin-dashboard/src/pages/service-applications/**` · `apps/admin-dashboard/src/pages/supplierops/**` · `apps/api-server/**` 일부 · `packages/platform-core/**` · `packages/ui/**` · `packages/operator-ux-core/**` · `services/web-neture/**` · `services/web-account/**` · `services/web-glycopharm/**` · `e2e/**` · `scripts/**` |
+| 그 외 타 세션 변경 | `.github/workflows/deploy-api.yml` · `apps/admin-dashboard/src/pages/cms/**` · `apps/admin-dashboard/src/config/service-entry.ts` · `apps/admin-dashboard/src/pages/service-applications/**` · `apps/admin-dashboard/src/pages/supplierops/**` · `apps/api-server/**` 일부 · `packages/platform-core/**` · `packages/ui/**` · `packages/operator-ux-core/**` · `services/web-neture/**` · `services/web-account/**` · `e2e/**` · `scripts/` |
 | 본 WO 제거 대상과의 경로 교집합 | **0** |
 | 타 세션 파일에 대한 수정·삭제·stash·commit | **없음** |
 | staging 방식 | 내 파일만 **개별 경로 pathspec** 으로 add / commit |

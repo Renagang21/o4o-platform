@@ -38,7 +38,6 @@
 | 서비스 | Header | Loading | Error | NotFound | 비고 |
 |--------|:--:|:--:|:--:|:--:|------|
 | **KPA** | ✅ (badge=category/pinned, meta=조회/댓글 slot, tags 는 헤더 밖 유지) | ✅ (`LoadingSpinner`→`ForumDetailLoadingState`) | (closed-forum 분기 유지) | ✅ (generic not-found 만 치환) | **ClosedForumAccessBlocker 미변경** |
-| **GlycoPharm** | ✅ (badge=category, meta=Eye/Heart 아이콘 slot 보존) | ✅ (`Loader2`→공통) | ✅ | ✅ | Tailwind→inline 정규화(author/date 의 User/Calendar 아이콘 제거 = 경미한 정규화) |
 | **K-Cosmetics** | ✅ (meta=댓글수 slot) | ✅ | ✅ | ✅ | 댓글 렌더(blocksToHtmlInline)·footer Link 유지 |
 | **Neture** | **보류** | **보류(skeleton)** | — | ✅ | header=반응형+모바일 ⋮ 액션 메뉴+desktop 액션+edit/delete 소유권 / loading=정교한 skeleton → 시각·동작 변경 커서 보류(아래) |
 
@@ -51,9 +50,9 @@
 ## 6. 시각 변경 여부
 
 경미한 정규화 발생(방침대로):
-- loading: KPA `LoadingSpinner`·GP `Loader2` → 공통 border spinner(유사). KCos 텍스트→spinner+message.
+- loading: KPA `LoadingSpinner` `Loader2` → 공통 border spinner(유사). KCos 텍스트→spinner+message.
 - error/not-found: 공통 아이콘+제목+메시지+버튼 look 으로 정렬.
-- header: GP 의 author/date lucide 아이콘(User/Calendar) 제거(정규화). category·view/like(Eye/Heart)·pinned/posttype badge 는 slot 보존.
+- category·view/like(Eye/Heart)·pinned/posttype badge 는 slot 보존.
 - 본문(`ForumPostContent`)·comment·action·contact 시각은 **불변**.
 
 ## 7. KPA 고유 기능 보존 확인
@@ -64,7 +63,7 @@
 
 ✅ basePath·slug routing·contactSection·comment full CRUD·like·edit/delete CTA·모바일 action 메뉴·반응형 헤더(보류로 그대로) — **전부 미변경**.
 
-## 9. GP/KCos read-only 정책 유지 확인
+## 9. KCos read-only 정책 유지 확인
 
 ✅ comment list only·edit/delete·comment write 없음 유지. 부품 적용은 header/state 표현만.
 
@@ -77,20 +76,19 @@
 | 패키지 | 결과 |
 |--------|------|
 | shared-space-ui (ForumPostHeader/ForumDetailStates) | ✅ (web-neture tsc 가 source 컴파일, 0 error) |
-| web-neture / web-kpa-society / web-glycopharm / web-k-cosmetics | ✅ 전부 PASS (총 0 error) |
 
 ## 12. browser smoke 여부
 
 ✅ web-neture 수행(제출/mutation 없음):
 - 정상 detail(`/forum/post/forum-purpose-and-scope`): title·content·comments 정상.
 - 존재하지 않는 slug: **`ForumDetailNotFoundState`** 렌더("게시글을 찾을 수 없습니다"·"목록으로 돌아가기"·🔍·breadcrumb 유지) — 공통 state 부품 end-to-end 동작 확인.
-- KPA/GP/KCos(header + loading/error states): dev 인프라 비용으로 라이브 미수행. **tsc PASS + 순수 presentational(동일 컴포넌트)** 로 검증.
+- KPA/KCos(header + loading/error states): dev 인프라 비용으로 라이브 미수행. **tsc PASS + 순수 presentational(동일 컴포넌트)** 로 검증.
 
 ## 13. backend / API / DB / migration / route / menu 변경 없음 확인
 
 ✅ 변경 없음. 프론트 7파일(shared 3 + 서비스 4). route/menu/backend/DB 무변경. **새 @o4o dep 추가 없음**(ForumPostHeader/ForumDetailStates 는 기존 소비 패키지 shared-space-ui 내부) → 서비스 Dockerfile 변경 불요.
 
-> **커밋 격리:** 다른 세션 WIP(`pnpm-lock.yaml` staged, web-glycopharm/web-k-cosmetics LMS·Dockerfile·package.json 등)는 staging/커밋에서 **완전 제외**(path-specific add + `git commit -- <내 파일>`, pathspec 없는 commit 금지).
+> **커밋 격리:** 다른 세션 WIP는 staging/커밋에서 **완전 제외**(path-specific add + `git commit -- <내 파일>`, pathspec 없는 commit 금지).
 
 ## 14. 후속 후보
 
@@ -107,7 +105,7 @@
 | 항목 | 결과 |
 |------|------|
 | ForumPostHeader + Loading/Error/NotFound 추출 | ✅ |
-| 적용 | Header/States: KPA·GP·KCos 적용 / Neture=NotFound만(header·skeleton 보류) |
+| 적용 | Header/States: KPA·KCos 적용 / Neture=NotFound만(header·skeleton 보류) |
 | 시각 변경 | 경미한 정규화(방침대로), 본문·comment·action·contact 불변 |
 | KPA closed-forum/tags 보존 | ✅ |
 | Neture contact/basePath/반응형 헤더 보존 | ✅ |

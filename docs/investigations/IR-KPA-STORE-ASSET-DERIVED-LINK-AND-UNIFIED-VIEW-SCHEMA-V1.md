@@ -64,10 +64,6 @@ QR-code      → store_qr_codes (organization_id)                          [전�
 - 컬럼: id, **organization_id**(boundary), type, title, description, **library_item_id**(논리 ref→store_execution_assets, FK 없음), landing_type(link/page/product), landing_target_id, slug(unique), is_active, created_at, updated_at
 - **source 관계 컬럼: 없음** (출처=description prefix). list: `GET /pharmacy/qr` → items[+scanCount]. 삭제: **soft(is_active=false)**
 
-### store_blog_posts (`routes/glycopharm/entities/store-blog-post.entity.ts`)
-- 컬럼: id, **store_id**(boundary, nullable+CHECK), **service_key**, author_role(operator/store), title, slug, excerpt, content, status(draft/published/archived), published_at, created_at, updated_at
-- **source 관계 컬럼: 없음** (출처=excerpt prefix). list: `GET /stores/:slug/blog/staff`. 삭제: **hard(remove)**. boundary: slug→pharmacy.id + verifyOwner
-
 ### kpa_store_contents (canonical "Store Production Material")
 - 컬럼: id, snapshot_id, source_type(direct/snapshot_edit), **organization_id**, title, content_json, **source_metadata jsonb**, author_role, visibility_scope, workspace_status, …
 - **source 추적: 강함** (source_metadata + snapshot_id). 3서비스 공통, rename 금지.
@@ -135,7 +131,6 @@ QR-code      → store_qr_codes (organization_id)                          [전�
 ```text
 store_asset_derivations
   id uuid pk
-  service_key varchar(50)        -- kpa/glycopharm/cosmetics
   organization_id uuid           -- boundary(필수)
   source_kind varchar(30)        -- content_direct | content_snapshot | execution_asset
   source_id uuid

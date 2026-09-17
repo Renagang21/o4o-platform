@@ -46,7 +46,6 @@ const approvalService = new MembershipApprovalService();
 // WO-O4O-ADMIN-DEDICATED-SUPER-ADMIN-CUTOVER-AND-LEGACY-CLEANUP-V1: canonical 최고 관리자 역할
 const PLATFORM_SUPER_ADMIN_ROLE = 'platform:super_admin';
 
-// WO-O4O-GLYCOPHARM-OPERATOR-MEMBER-EDIT-INVALID-USERID-GUARD-V1:
 // :userId 라우트 파라미터가 UUID 형식인지 검증하여 PostgreSQL UUID 파싱 500 을 400 으로 정리한다.
 // 8 개 :userId 기반 endpoint 공통 사용.
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -189,7 +188,7 @@ export class MembershipConsoleController {
 
     // (3) 운영 계층 검증 — **선택된 서비스 안에서만** 판정한다.
     //     다른 서비스의 role 이나 사용자의 전체 최고 role 로 판정하지 않는다.
-    //     예) 대상이 kpa:admin 이어도 glycopharm 에서 일반 회원이면 glycopharm 에서는 member 다.
+    //     예) 대상이 kpa:admin 이어도 neture 에서 일반 회원이면 neture 에서는 member 다.
     //     platform 계정만 서비스와 무관한 최상위이며, 이는 "플랫폼 계정 비밀번호는
     //     이 경로가 다루지 않는다"는 계약을 표현한다(대상이 platform 이면 항상 차단).
     const rolePrefix = resolveRolePrefixFromCanonicalServiceKey(serviceKey);
@@ -317,7 +316,6 @@ export class MembershipConsoleController {
         paramIdx++;
       }
 
-      // WO-GLYCOPHARM-MEMBER-REGISTRATION-PENDING-VISIBILITY-FIX-V1:
       // Status + service scope → combined service_memberships subquery.
       // Uses sm.status (SSOT for service-level membership state) instead of u.status.
       const smConditions: string[] = [];
@@ -432,10 +430,8 @@ export class MembershipConsoleController {
       // Compose response
       const enrichedUsers = users.map((u: any) => {
         const memberships = membershipMap[u.id] || [];
-        // WO-GLYCOPHARM-MEMBER-REGISTRATION-PENDING-VISIBILITY-FIX-V1:
         // When filtering by membership status, reflect the matched membership status
         // so frontend action buttons (approve/reject) render correctly
-        // WO-O4O-GLYCOPHARM-OPERATOR-MEMBER-APPROVAL-ACTIVE-STATUS-FIX-V1:
         // Prefer service membership status over global users.status.
         // users.status may be 'deleted'/'inactive' while membership is 'active' —
         // in a service-scoped operator view, the membership status is authoritative.
@@ -831,7 +827,6 @@ export class MembershipConsoleController {
         //   진행 중 세션까지** 끊었다 (requireAuth 가 매 요청 users.isActive 를 검사한다).
         //   suspendMembership 이 이미 users 를 건드리지 않는 계약이므로 그 형태로 통일한다.
         //
-        // WO-GLYCOPHARM-MEMBER-REGISTRATION-PENDING-VISIBILITY-FIX-V1:
         //   service_memberships.status(SSOT) 갱신은 그대로 유지 — 목록 필터가 이 값을 본다.
         const rejectableMemberships = writeScope.isPlatformAdmin
           ? await AppDataSource.query(
@@ -1127,7 +1122,6 @@ export class MembershipConsoleController {
   /**
    * PUT /api/v1/operator/members/:userId
    * 사용자 정보 수정 (프로필 + 비밀번호 + 사업자 정보)
-   * WO-O4O-GLYCOPHARM-MEMBER-EDIT-V1
    */
   updateMember = async (req: Request, res: Response): Promise<void> => {
     try {
@@ -1724,7 +1718,6 @@ export class MembershipConsoleController {
         params.push(resolved.serviceKeys);
       }
 
-      // WO-GLYCOPHARM-MEMBER-REGISTRATION-PENDING-VISIBILITY-FIX-V1:
       // Use sm.status (SSOT for service-level membership state) instead of u.status
       // WO-O4O-NETURE-ADMIN-USERS-SCOPE-FIX-V1:
       // COUNT(DISTINCT user_id) — 동일 사용자가 다중 멤버십을 가진 경우에도

@@ -23,7 +23,7 @@
 | 실제 브라우저 런타임에 `window.wp` 가 존재하는가 | **아니오** — `typeof window.wp === "undefined"` · `Object.keys(window.wp \|\| {}) = []` |
 | `window.wp` 없이 화면·블록 등록이 동작하는가 | **예** — 현재 프로덕션이 이미 `window.wp` 없이 동작 중 |
 | `@wordpress/*` 패키지 의존성이 남아 있는가 | **아니오** — package.json 0건 / pnpm-lock.yaml 0건 / src import 0건 |
-| 서비스(KPA·GlycoPharm·PharmacyHub·K-Cosmetics·Neture) 소비처가 있는가 | **없음** — `services/**` 전체 0건 |
+| 서비스(KPA·PharmacyHub·K-Cosmetics·Neture) 소비처가 있는가 | **없음** — `services/` 전체 0건 |
 
 → `window.wp` 를 참조하는 모든 코드는 **optional guard 또는 fallback 뒤에 있고, 그 분기는 현재 어떤 빌드에서도 실행되지 않는다.**
 
@@ -142,7 +142,6 @@
 | 서비스 | `window.wp` 소비 |
 |---|---|
 | KPA-Society (`services/web-kpa-society`) | 0 |
-| GlycoPharm | 0 |
 | PharmacyHub | 0 |
 | K-Cosmetics | 0 |
 | Neture | 0 |

@@ -228,7 +228,7 @@ smoke 사본(`5596ba83`)만 사용하고 원본은 건드리지 않았다.
 **후속 (본 WO 범위 밖):**
 
 - 자료실 HUB(`/resources`, `assetType='resource'`)의 완료 CTA — 자료 사본은 `/store/library/resources` 계열이라 별도 판단 필요. WO §11.6 에 따라 이번엔 기존 동작 유지.
-- 라벨 용어 정비 / GlycoPharm·K-Cosmetics 동일 패턴 점검.
+- 라벨 용어 정비 / K-Cosmetics 동일 패턴 점검.
 
 ---
 

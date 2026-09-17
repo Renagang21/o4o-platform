@@ -8,7 +8,7 @@
 | 작성일 | 2026-06-03 |
 | 분류 | IR (Investigation, read-only) |
 | 대상 서비스 | `web-kpa-society` (operator 포럼 관리) |
-| 비교 대상 | GlycoPharm / K-Cosmetics / Neture 공통 콘솔 (`@o4o/operator-core-ui/modules/forum-requests`, `.../forum-delete-requests`) |
+| 비교 대상 | K-Cosmetics / Neture 공통 콘솔 (`@o4o/operator-core-ui/modules/forum-requests`, `.../forum-delete-requests`) |
 | 결론(요약) | **삭제 요청 = A(즉시 수렴 가능)** · **신청 탭 = B/C(분리 가능하나 선행 분해 + 상태머신 차이 해소 필요)** · **포럼 목록 = D(KPA 고유, 별도 유지)** |
 
 ---
@@ -18,14 +18,13 @@
 ### 1.1 목적
 
 KPA-Society operator 포럼 관리 화면이 현재 **신청 + 카테고리/관리 기능이 결합된 2탭 구조**인지 확인하고,
-이 중 "포럼 신청 관리" 기능만 GP/K-Cosmetics/Neture 의 공통 `OperatorForumRequestsConsolePage` 구조로
+이 중 "포럼 신청 관리" 기능만 K-Cosmetics/Neture 의 공통 `OperatorForumRequestsConsolePage` 구조로
 분리·수렴 가능한지 판정한다.
 
 ### 1.2 배경 (공통화 현황)
 
 | 서비스 | 신청 콘솔 | 삭제요청 콘솔 |
 |--------|:--------:|:------------:|
-| GlycoPharm | ✅ 적용 완료 (wrapper) | ✅ 적용 완료 (wrapper) |
 | K-Cosmetics | ✅ 적용 완료 (wrapper) | ✅ 적용 완료 (wrapper) |
 | Neture | ✅ 수렴 완료 (batch-client wrapper) | ✅ 수렴 완료 (batch-client wrapper) |
 | **KPA** | ❌ **별도 구조 (2탭 결합)** | ⚠️ 별도 구조이나 **공통 콘솔과 거의 동형** |
@@ -183,7 +182,7 @@ ForumManagementPage (1449 lines)
 
 ### 7.1 기능
 
-활성 포럼(카테고리) 운영 관리. **KPA 고유 — GP/K-Cosmetics/Neture 어느 서비스에도 대응 화면 없음.**
+활성 포럼(카테고리) 운영 관리. **KPA 고유 — K-Cosmetics/Neture 어느 서비스에도 대응 화면 없음.**
 
 - 조회: `getCategories()` → `CategoryData[]` (활성/비활성)
 - 단건: 태그 수정(`updateCategory`) / 활성화(`activate`) / 비활성화(soft, `directDeactivate`) / **완전 삭제(hard, `hardDelete` + `getDeleteCheck` 가드)**
@@ -253,7 +252,7 @@ ForumManagementPage (1449 lines)
 
 ---
 
-## 10. GP / K-Cosmetics / Neture 공통 콘솔과의 비교 (총괄표)
+## 10. K-Cosmetics / Neture 공통 콘솔과의 비교 (총괄표)
 
 | 영역 | KPA 현재 | 공통 콘솔 존재 | 동형성 | 분리 결합도 |
 |------|----------|:--------------:|--------|------------|
@@ -262,9 +261,9 @@ ForumManagementPage (1449 lines)
 | **삭제 요청** | ForumDeleteRequestsPage (단일) | ✅ delete 콘솔 | **거의 완전 동형** | 독립 화면 (분해 불필요) |
 | **포럼 분석** | ForumAnalyticsDashboard | ❌ (범위 외) | — | — |
 
-- GP/K-Cos: 신청·삭제 **각각 독립 화면**으로 존재 → wrapper 직접 치환이 쉬웠음.
+- K-Cos: 신청·삭제 **각각 독립 화면**으로 존재 → wrapper 직접 치환이 쉬웠음.
 - Neture: 신청·삭제 각각 독립 화면이었고 batch endpoint 보유 → batch-client wrapper 로 수렴.
-- **KPA 차이의 근원**: 신청 화면이 단독이 아니라 **"신청+카테고리 관리"가 한 메뉴(포럼 관리)에 묶여 2탭**으로 구현됨. 이것이 GP/K-Cos/Neture 와 다른 **유일한 구조적 차이**.
+- **KPA 차이의 근원**: 신청 화면이 단독이 아니라 **"신청+카테고리 관리"가 한 메뉴(포럼 관리)에 묶여 2탭**으로 구현됨. 이것이 K-Cos/Neture 와 다른 **유일한 구조적 차이**.
 
 ---
 
@@ -336,7 +335,7 @@ ForumManagementPage (1449 lines)
 
 ### 15.1 KPA 구조가 다른 이유 — **도메인 차이 아님, 구현 편차**
 
-- 신청 review / 삭제 요청 흐름 자체는 GP/K-Cos/Neture 와 **동일 도메인**(공통 `/api/v1/forum/operator/*` 사용, KPA 도 동일 엔드포인트).
+- 신청 review / 삭제 요청 흐름 자체는 K-Cos/Neture 와 **동일 도메인**(공통 `/api/v1/forum/operator/*` 사용, KPA 도 동일 엔드포인트).
 - 차이의 본질은 **(a) 신청+카테고리를 한 메뉴에 묶은 UI 구현 편차**, **(b) KPA 가 포럼 생성 상태머신(creating/failed/recreate)을 UI 까지 노출**한 점.
 - (a)는 순수 **구현 편차** → 공통화 정렬 대상.
 - (b)는 **운영 기능 차이**(생성 실패 복구)이나, 이는 *공통 콘솔이 아직 모델링하지 않은* 영역일 뿐 KPA 고유 도메인은 아님 → 공통 콘솔 확장 vs KPA 단순화의 **설계 결정 사항**.

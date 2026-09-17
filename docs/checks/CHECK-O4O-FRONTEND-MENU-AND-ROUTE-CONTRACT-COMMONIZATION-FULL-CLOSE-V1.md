@@ -2,7 +2,7 @@
 
 - **WO**: `WO-O4O-FRONTEND-MENU-AND-ROUTE-CONTRACT-COMMONIZATION-FULL-CLOSE-V1`
 - **일자**: 2026-08-12
-- **대상**: `kpa-society` / `neture` / `k-cosmetics` / `glycopharm` / `pharmacyhub`
+- **대상**: `kpa-society` / `neture` / `k-cosmetics` / `pharmacyhub`
 - **기준 커밋**: `6ad94a498` (직전 `d866faa08`)
 - **원칙**: 메뉴 내용이 아니라 **메뉴를 정의·필터링·표시·라우팅하는 구조**만 공통화
 
@@ -12,11 +12,11 @@
 
 | 축 | 공통 자산 | 5개 서비스 소비 상태 |
 |---|---|---|
-| 운영자 사이드바 메뉴 정의 | `@o4o/ui` `OperatorGroupKey` / `UnifiedMenuItem` | KPA·Neture·KCos·Glyco 4개 소비 (PH 없음) |
+| 운영자 사이드바 메뉴 정의 | `@o4o/ui` `OperatorGroupKey` / `UnifiedMenuItem` | — |
 | 운영자 메뉴 권한 필터 | `@o4o/ui` `filterMenuByRole` | 4개 소비 |
 | 운영자 셸·사이드바 접기·Domain IA | `@o4o/operator-ux-core` `OperatorAreaShell` | 4개 소비 |
 | 헤더 렌더링·현재 경로 판정·모바일 drawer | `@o4o/ui` `GlobalHeader` (`isActive`) | 4개 소비 |
-| 매장 대시보드 레이아웃·메뉴 | `@o4o/store-ui-core` `StoreDashboardLayout` | KPA·KCos·Glyco·PH 소비 (Neture 매장 없음) |
+| 매장 대시보드 레이아웃·메뉴 | `@o4o/store-ui-core` `StoreDashboardLayout` | — |
 
 → 이번 WO 이전에 이미 대부분 Core 로 승격돼 있었다. **중복이 남아 있던 곳은 아래 2곳뿐**이다.
 
@@ -26,9 +26,9 @@
 |---|---:|---|
 | 공통 Core 승격 | 1 | `filterContextualNav` — 4개 서비스 중복 구현 → `@o4o/ui` 단일 구현 |
 | 서비스별 Extension 유지 | 4 | 각 서비스 `config/navigation.ts` 의 메뉴 항목·`visibleWhen` 조건 키·역할 판정식 |
-| 의도된 차이 | 4 | ① KPA 는 operator/admin 전체 노출 정책 미적용 ② Neture operator 셸 `filterMenuByRole(UNIFIED_MENU, false)` (admin 항목은 별도 `AdminLayoutWrapper`) ③ GlycoPharm `pharmacyRelated`(pharmacist role/membership) ④ Neture legacy 미접두사 role(`supplier`/`partner`) |
+| 의도된 차이 | 4 | — |
 | 메뉴와 라우트 불일치 | **0** | 아래 §3 |
-| dead menu / dead export | 3 | `OPERATOR_MENU_ITEMS` (KPA·GlycoPharm·K-Cosmetics) — runtime consumer 0 |
+| dead menu / dead export | 3 | `OPERATOR_MENU_ITEMS` (KPA·K-Cosmetics) — runtime consumer 0 |
 
 ## 3. 메뉴 ↔ 라우트 존재 대응 검사
 
@@ -40,7 +40,6 @@ App.tsx 및 하위 라우터(`KPA OperatorRoutes`/`AdminRoutes`)를 중첩 경�
 | kpa-society | 300 | 60 (adminOnly 2) | 15 | 0 |
 | neture | 289 | 69 (adminOnly 20) | 12 | 0 |
 | k-cosmetics | 181 | 30 (adminOnly 0) | 12 | 0 |
-| glycopharm | 236 | 68 (adminOnly 3) | 12 | 0 |
 | pharmacyhub | 36 | — (운영자 메뉴 설정 없음) | — | 0 |
 
 - **메뉴 → 라우트 불일치 0건.** 임의 삭제한 메뉴·라우트 없음.
@@ -62,11 +61,10 @@ filterContextualNav<TCondition>(items, conditions, { showAll? }): GlobalHeaderNa
 | KPA | 로컬 filter + `KpaNavVisibility` | `filterContextualNav(KPA_CONTEXTUAL_NAV, { storeOwner })` — `showAll` 미주입 |
 | Neture | 로컬 filter + `NetureNavVisibility` | `{ supplier, partner }`, `{ showAll: isAdmin \|\| isOperator }` |
 | K-Cosmetics | 로컬 filter + `KCosNavVisibility` | `{ storeManager }`, `{ showAll: isAdmin \|\| isOperator }` |
-| GlycoPharm | 로컬 filter + `GlycoNavVisibility` | `{ storeOwner, pharmacyRelated }`, `{ showAll: isAdmin \|\| isOperator }` |
 
 ### 4-2. dead export 제거
 
-`OPERATOR_MENU_ITEMS` (KPA 52L / GlycoPharm 60L 는 `UNIFIED_MENU` 사본, K-Cosmetics 는 alias 1L) 제거.
+`OPERATOR_MENU_ITEMS` (KPA 52L 60L 는 `UNIFIED_MENU` 사본, K-Cosmetics 는 alias 1L) 제거.
 정본은 `UNIFIED_MENU` + `filterMenuByRole`. Neture 는 이미 제거 완료 상태였다.
 
 ### 4-3. 중복 감소량
@@ -102,7 +100,7 @@ filterContextualNav<TCondition>(items, conditions, { showAll? }): GlobalHeaderNa
 |---|---|
 | commit | `6ad94a498` |
 | workflow | `Deploy Web Services (Cloud Run)` run `31558072789` |
-| 결과 | 5개 서비스 job 전부 success (kpa-society / neture / k-cosmetics / glycopharm / pharmacy-hub) |
+| 결과 | 4개 서비스 job 전부 success (kpa-society / neture / k-cosmetics / pharmacy-hub) |
 
 ### 6-2. 역할별 브라우저 smoke (프로덕션, Playwright)
 
@@ -115,7 +113,6 @@ filterContextualNav<TCondition>(items, conditions, { showAll? }): GlobalHeaderNa
 | KPA-Society | 약국 경영자 | 중첩 경로 `/store/library/contents` 새로고침 시 `내 약국` 활성 판정 정상 | PASS |
 | KPA-Society | 약국 경영자 | 모바일(390×844) 메뉴에서 동일 contextual 항목 + 사용자 메뉴 노출 | PASS |
 | K-Cosmetics | 운영자/관리자 | `showAll` 정책대로 `매장 운영 허브 /store-hub` · `내 매장 /store` 2개 노출 (store_owner 역할 없이도) | PASS |
-| GlycoPharm | 운영자/관리자 | `showAll` 정책대로 `매장 운영 허브 /store-hub` · `내 약국 /store` 2개 노출 | PASS |
 | Neture | 공급자 | `공급자 대시보드 /supplier/dashboard` 만 노출, partner 항목 미노출 (조건 필터 정상) | PASS |
 | Pharmacy-Hub | 매장(store_owner) | 로그인 후 역할별 진입점 3종 정상 (본 WO 변경 대상 아님 — 회귀 없음) | PASS |
 
@@ -133,7 +130,6 @@ filterContextualNav<TCondition>(items, conditions, { showAll? }): GlobalHeaderNa
 
 | 항목 | 상태 |
 |---|---|
-| GlycoPharm `StoreLayout` 오류 표시(`setError(object)`) | 기존 결함, 이번 범위 밖 |
 | `logoutAll` 로컬 토큰 계약 | 기존 결함, 이번 범위 밖 |
 | 모바일 하단 메뉴 추가 공통화 | 사용자 지시로 확대 금지 — 의도된 차이로 유지 |
 

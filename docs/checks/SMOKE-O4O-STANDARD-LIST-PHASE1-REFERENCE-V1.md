@@ -15,7 +15,7 @@
 | DATATABLE-ONSORT-CONTROLLED-SORT | ed962cc59 | ✓ |
 | OPERATOR-MEMBERS-ADOPTION | fc0465b4a | ✓ |
 | RECRUITMENT-EXPOSURE-ADOPTION | 3c8f62b9b | ✓ |
-| OPERATOR-APPLICATIONS-ADOPTION (GP) | 280d757ab | ✓ |
+| OPERATOR-APPLICATIONS-ADOPTION | 280d757ab | ✓ |
 | KCOS-APPLICATIONS-URL-SYNC-MINIMAL | 40ed83132 | ✓ |
 | ADMIN-PRODUCT-APPROVAL-BACKEND-PAGINATION | 3ff222bfe | ✓ (API deploy success 13:19 UTC) |
 | ADMIN-PRODUCT-APPROVAL-STANDARD-LIST-ADOPTION | e59be827c | ✓ (neture-web rev `01129-wfd` @ 13:32:37Z, Deploy Web Services success) |
@@ -47,7 +47,7 @@
 | `productApprovals_f_approvalStatus` | `productApprovalsf_approvalStatus` |
 | `stores_search` | `storessearch` |
 
-→ **기능은 정상.** 다만 Phase 1 CHECK 문서들이 일관되게 underscore(`_`)를 가정해 표기한 것은 shipped core 규약과 어긋난다(cosmetic). adoption 화면들은 모두 동일 규약(no-underscore)으로 일관 — `/admin/product-approvals` 도 GP `applications`(→`applicationspage`)와 동일. baseline 문서(`O4O-STANDARD-LIST-PHASE1-BASELINE-V1`)에서 param 표기를 실제 규약으로 정정 권장.
+→ **기능은 정상.** 다만 Phase 1 CHECK 문서들이 일관되게 underscore(`_`)를 가정해 표기한 것은 shipped core 규약과 어긋난다(cosmetic). baseline 문서(`O4O-STANDARD-LIST-PHASE1-BASELINE-V1`)에서 param 표기를 실제 규약으로 정정 권장.
 
 ---
 
@@ -55,34 +55,27 @@
 
 전 화면 공통: 로그인 성공(token 확보, 모달 닫힘), 대상 route 렌더, **console error 0 / network 4xx·5xx 0**.
 
-### A. `/operator/stores` (Neture · GP · KCos · KPA) — **PASS**
+### A. `/operator/stores` (Neture · KCos · KPA) — **PASS**
 | 서비스 | 렌더 | 검색→URL(`storessearch`) | page=1 reset | 새로고침 복원 |
 |---|:--:|:--:|:--:|:--:|
 | Neture | ✓ | ✓ | ✓ | ✓ |
-| GlycoPharm | ✓ | ✓ | ✓ | ✓ |
 | K-Cosmetics | ✓ | ✓ | ✓ | ✓ |
 | KPA Society | ✓ | ✓ | ✓ | ✓ |
 
 - 4개 서비스 전부 `storessearch=a` URL 반영 + `storespage=1` 유지 + reload 후 query 동일.
 - legacy `/operator/pharmacies` 부활 흔적 없음(stores 정상 응답).
 
-### B. `/operator/members` (Neture · GP · KCos) — **PASS (render)**
+### B. `/operator/members` (Neture · KCos) — **PASS (render)**
 - 3개 서비스 렌더 정상, table 존재, console/network 오류 0.
 - 탭/email·createdAt 정렬 토글은 데이터 의존 상호작용으로 스크립트 미상호작용(렌더·무오류로 회귀 없음 확인). drawer/batch/stats 무회귀(이전 ADOPTION WO 에서 확정, 본 smoke 에서 오류 0).
 
-### C. `/operator/recruitment-exposure` (KPA · GP · KCos) — **PASS**
+### C. `/operator/recruitment-exposure` (KPA · KCos) — **PASS**
 | 서비스 | 렌더 | hasTable | 비고 |
 |---|:--:|:--:|---|
 | KPA | ✓ | **0** | 카드 큐 유지 |
-| GlycoPharm | ✓ | **0** | 카드 큐 유지 |
 | K-Cosmetics | ✓ | **0** | 카드 큐 유지 |
 
 - **DataTable/Pagination/search/sort 미도입 확인** (`hasTable=0`) — 카드 큐 최소 개선 정책대로. console/network 오류 0.
-
-### D. GP `/operator/applications` — **PASS (render)**
-- 렌더 정상(table 존재), console/network 오류 0.
-- 필터는 `<select>` 기반(코드 확인: status/serviceType/organizationType select) — 본 smoke 의 button 기반 필터 assertion 은 N/A(`button_not_found`는 select UI 라 false-negative). 필터 동작은 선행 WO(280d757ab)에서 확정.
-- 검색/정렬 UI 미노출(backend N/A) — 잘못 노출 안 됨.
 
 ### E. KCos `/operator/applications` — **PASS (render)**
 - 렌더 정상(table 존재), console/network 오류 0.
@@ -123,7 +116,7 @@
 | 승인/반려 live 실행 + 그 후 list/KPI refetch | prod 데이터 변경 → 금지선(DB 변경 금지) 준수, 미실행. 코드상 refetch+loadSummary 확정. |
 | 페이지 이동(2페이지 이상) | 대상 화면 데이터가 단일 페이지(20건 이내)로 추정 — page-nav 미발생. search/sort/filter 의 page=1 reset 및 URL sync 로 페이지네이션 상태 로직은 검증됨. |
 | members 정렬/탭 상호작용 | 데이터 의존 — 렌더·무오류로 회귀 없음 확인(상세 동작은 선행 WO 확정). |
-| GP/KCos applications 필터 상호작용 | select/최소 sync 구조 — 선행 WO 에서 확정, 본 smoke 는 렌더·무오류 확인. |
+| KCos applications 필터 상호작용 | select/최소 sync 구조 — 선행 WO 에서 확정, 본 smoke 는 렌더·무오류 확인. |
 
 ---
 
@@ -131,7 +124,7 @@
 
 ### ✅ PASS
 
-- 로그인: Neture / GlycoPharm / K-Cosmetics / KPA Society **4개 서비스 전부 성공**.
+- 로그인: Neture / K-Cosmetics / KPA Society **3개 서비스 전부 성공**.
 - 실행한 전 assertion 통과: stores 검색·page reset·새로고침(4사), product-approvals 검색·정렬·토글·status 필터·page reset·새로고침, recruitment-exposure 카드 큐(table 미도입), applications 렌더, admin/members 무회귀.
 - console/network 오류 0.
 - 미실행 항목은 모두 prod 데이터 변경 회피 또는 데이터 의존 상호작용으로, 코드/선행 WO 에서 이미 확정된 비차단 항목.
@@ -143,9 +136,9 @@
 | 유형 | 화면 |
 |------|------|
 | **Full reference** | `/operator/stores` (4사) |
-| **Targeted adoption** | `/operator/members` (Neture·GP·KCos) |
-| **Minimal (카드 큐)** | `/operator/recruitment-exposure` (KPA·GP·KCos) |
-| **Full, 검색·정렬 N/A** | GP `/operator/applications` |
+| **Targeted adoption** | `/operator/members` (Neture·KCos) |
+| **Minimal (카드 큐)** | `/operator/recruitment-exposure` (KPA·KCos) |
+| **Full, 검색·정렬 N/A** `/operator/applications` |
 | **Minimal URL sync** | KCos `/operator/applications` |
 | **Backend-first → Full** | `/admin/product-approvals` (Neture Admin) |
 

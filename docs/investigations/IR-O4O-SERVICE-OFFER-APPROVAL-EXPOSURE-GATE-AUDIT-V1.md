@@ -4,8 +4,8 @@
 > **작성일:** 2026-06-18
 > **검증:** 정적 코드 분석 + 프로덕션 read-only API 호출(운영자/약국 토큰, GET 위주) + 정상 플로우 상태 확인. raw SQL UPDATE 미사용.
 > **결론(요약):**
-> - **결함 1 (P0, 진성 구조 결함):** 약국 HUB **catalog 조회**(`pharmacy-products.controller.ts GET /catalog`, KPA/Glyco/KCos 공유)는 `spo.is_active = true` **전역 플래그만** 게이트하고, **요청 서비스의 `offer_service_approvals.approval_status='approved'` per-service 필터가 전혀 없다.** → 한 서비스에서 승인되어 `is_active=true`가 된 SERVICE/PUBLIC 상품이 **승인하지 않은 다른 서비스의 HUB catalog에도 노출**된다(교차 서비스 누출).
-> - **결함 2 (재분류: 토큰/세션 이슈, 코드 결함 아님):** `/operator/product-applications` 의 "승인 탭만 scope 오류"는 **정상 KPA operator 토큰(sohae2100, serviceKey=kpa-society)으로 전 탭 HTTP 200 — 재현되지 않음.** 모든 탭은 동일 endpoint(`?status=`)·동일 guard를 사용한다. 오류는 **요청 토큰에 `kpa:operator`가 없고 차단 prefix(neture/platform/glycopharm/cosmetics) role이 있을 때만** 발생 → 브라우저 세션/토큰 scope 문제.
+> - **결함 1 (P0, 진성 구조 결함):** 약국 HUB **catalog 조회**는 `spo.is_active = true` **전역 플래그만** 게이트하고, **요청 서비스의 `offer_service_approvals.approval_status='approved'` per-service 필터가 전혀 없다.** → 한 서비스에서 승인되어 `is_active=true`가 된 SERVICE/PUBLIC 상품이 **승인하지 않은 다른 서비스의 HUB catalog에도 노출**된다(교차 서비스 누출).
+> - **결함 2 (재분류: 토큰/세션 이슈, 코드 결함 아님):** `/operator/product-applications` 의 "승인 탭만 scope 오류"는 **정상 KPA operator 토큰(sohae2100, serviceKey=kpa-society)으로 전 탭 HTTP 200 — 재현되지 않음.** 모든 탭은 동일 endpoint(`?status=`)·동일 guard를 사용한다. 오류는 **요청 토큰에 `kpa:operator`가 없고 차단 prefix role이 있을 때만** 발생 → 브라우저 세션/토큰 scope 문제.
 
 ---
 
@@ -13,7 +13,7 @@
 
 | 영역 | 대상 |
 |------|------|
-| HUB 노출 | `apps/api-server/src/routes/o4o-store/controllers/pharmacy-products.controller.ts` `GET /catalog` (KPA/Glyco/KCos 공유) |
+| HUB 노출 | `apps/api-server/src/routes/o4o-store/controllers/pharmacy-products.controller.ts` `GET /catalog` |
 | 승인→리스팅 | `apps/api-server/src/utils/auto-listing.utils.ts`, `offer-service-approval.service.ts syncOfferFromServiceApprovals` |
 | KPA 승인 화면 | FE `services/web-kpa-society/.../ProductApplicationManagementPage.tsx` + `@o4o/operator-core-ui ProductApplicationManagementConsole` / BE `routes/kpa/controllers/operator-product-applications.controller.ts` |
 | scope guard | `packages/security-core/src/service-scope-guard.ts`, `service-configs.ts`, `membership-guard.middleware.ts` |
@@ -38,7 +38,7 @@ WHERE spo.distribution_type IN ('PUBLIC', 'SERVICE', 'PRIVATE')
   ${categoryFilter} ${distributionFilter} ${operatorFilter}
 ```
 
-**문제: `offer_service_approvals` 와의 JOIN/필터가 전혀 없다.** 요청 service_key(kpa-society/glycopharm/cosmetics)에 대한 `approval_status='approved'` 조건이 부재하다. 이 컨트롤러는 KPA(`kpa.routes.ts`)·GlycoPharm·K-Cosmetics(`cosmetics.routes.ts`) 라우트에 **공유 등록**되어 동일 쿼리가 세 서비스 모두에서 돈다 → **catalog는 service-agnostic**.
+**문제: `offer_service_approvals` 와의 JOIN/필터가 전혀 없다.** 요청 service_key에 대한 `approval_status='approved'` 조건이 부재하다.
 
 ### 2.2 `is_active` 의 의미 (확정)
 
@@ -50,7 +50,6 @@ WHERE spo.distribution_type IN ('PUBLIC', 'SERVICE', 'PRIVATE')
 | 상황 | is_active | catalog 노출 | 정책 부합? |
 |------|:---------:|:-----------:|:---------:|
 | 어느 서비스에도 미승인(신규/전부 pending) | false | ❌ 미노출 | ✅ (is_active로 차단됨) |
-| glycopharm 승인 / kpa-society 미승인(SERVICE) | **true** | **KPA catalog에 노출됨** | ❌ **누출** |
 | PUBLIC 승인(auto-expand 전체) | true | 전 서비스 노출 | △ PUBLIC은 의도일 수 있으나 게이트 부재는 동일 |
 
 즉 **"한 번도 승인 안 된 상품"은 `is_active`로 막히지만, "타 서비스에서 승인된 상품"은 미승인 서비스 HUB에 그대로 노출**된다. 서비스 운영자 승인이 그 서비스 HUB 노출의 게이트가 되어야 하는데, catalog는 이를 강제하지 않는다.
@@ -61,12 +60,12 @@ WHERE spo.distribution_type IN ('PUBLIC', 'SERVICE', 'PRIVATE')
 
 ### 2.5 실증 (프로덕션 read-only)
 
-- 약국(renagang21, serviceKey=kpa-society) `GET /kpa/pharmacy/products/catalog` → offer `3adc23b1`("미네락 600", PUBLIC) 노출 확인. (조회 시점 기준 해당 offer는 glycopharm·kpa-society **양쪽 approved**라 현 시점 노출 자체는 정당 — 라이브 누출 인스턴스는 아님.)
+- 약국(renagang21, serviceKey=kpa-society) `GET /kpa/pharmacy/products/catalog` → offer `3adc23b1`("미네락 600", PUBLIC) 노출 확인. (조회 시점 기준 해당 offer는 kpa-society **양쪽 approved**라 현 시점 노출 자체는 정당 — 라이브 누출 인스턴스는 아님.)
 - **코드 레벨로 게이트 부재는 확정**: catalog WHERE에 per-service 승인 조건이 0건. SERVICE 타입이 단일 서비스 승인일 때 타 서비스 catalog 노출은 구조적으로 발생.
 
 ### 2.6 영향 범위 (Shared Module)
 
-`/catalog` 컨트롤러는 KPA·GlycoPharm·K-Cosmetics **공통**. 세 서비스 모두 동일 결함. (CLAUDE.md Shared Module Change Rule 대상 — 수정 시 3서비스 동시 검증 필수.)
+`/catalog` 컨트롤러는 KPA·K-Cosmetics **공통**. 두 서비스 모두 동일 결함. (CLAUDE.md Shared Module Change Rule 대상 — 수정 시 2서비스 동시 검증 필수.)
 
 ---
 
@@ -97,7 +96,7 @@ WHERE spo.distribution_type IN ('PUBLIC', 'SERVICE', 'PRIVATE')
 
 ### 3.3 오류 발생 조건 (확정)
 
-`service-scope-guard.ts:82-102`: `hasScope || hasServiceRole`(= `kpa:operator`/`kpa:admin` 보유) 이면 통과. 아니면서 **차단 prefix(`platform`/`neture`/`glycopharm`/`cosmetics`) role 보유 시** `:101` 메시지로 403.
+`service-scope-guard.ts:82-102`: `hasScope || hasServiceRole`(= `kpa:operator`/`kpa:admin` 보유) 이면 통과. 아니면서 **차단 prefix role 보유 시** `:101` 메시지로 403.
 
 즉 이 오류는 **요청 토큰이 `kpa:operator`/`kpa:admin`을 갖지 못한 채 neture/platform 등 타 서비스 role을 가질 때** 발생한다. (sohae2100은 neture:operator/admin + platform:super_admin 보유 — 만약 kpa-society 컨텍스트 토큰에 kpa:operator가 실리지 않으면 정확히 이 메시지가 난다.)
 
@@ -132,7 +131,6 @@ pharmacy-products.controller.ts GET /catalog 쿼리에 요청 service_key 기준
 offer_service_approvals.approval_status='approved' 게이트 추가.
 - SERVICE/PRIVATE: 해당 service_key approved 필수
 - PUBLIC: 전체 노출이 정책상 의도인지 먼저 확정(전체 공개 = 모든 서비스). 의도면 PUBLIC만 예외, 아니면 PUBLIC도 per-service 승인 요구.
-KPA/Glyco/KCos 공유 컨트롤러 → 3서비스 동시 검증(Shared Module Rule).
 count 쿼리(:167-178)도 동일 조건 동기화.
 operatorView/distributionType 분기 회귀 없게.
 ```
@@ -157,11 +155,9 @@ WO-O4O-OPERATOR-ROLE-LITERAL-KPA-PREFIX-CONSISTENCY-V1
 
 ### HUB catalog (P0-1)
 ```text
-1. SERVICE offer를 glycopharm만 승인 → KPA 약국 catalog에 미노출이어야 함
 2. kpa-society 승인 후 → KPA catalog 노출 가능
 3. rejected/pending(kpa-society) → KPA catalog 미노출
 4. PUBLIC 정책 확정대로 동작
-5. GlycoPharm / K-Cosmetics catalog 동일 검증
 6. 기존 정상 승인 상품 회귀 없음
 ```
 

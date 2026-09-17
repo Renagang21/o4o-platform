@@ -66,7 +66,7 @@ backend(`ai-query.routes.ts` / `ai-admin.routes.ts` / `requireAdmin`) **무변�
 |---|---|
 | Neture type-check | PASS |
 | Neture production build | PASS (`✓ built`) |
-| KPA / K-Cosmetics / PharmacyHub / GlycoPharm type-check | PASS 4/4 (공통 패키지 미변경 회귀 확인) |
+| KPA / K-Cosmetics / PharmacyHub type-check | PASS 4/4 (공통 패키지 미변경 회귀 확인) |
 | api-server jest (auth·authorization·boundary·guard·scope) | 833/834 PASS. 실패 1건 = `cross-session-safe-commit-guard.spec.ts` 자기참조 census 케이스로 **본 WO 변경과 무관**(api-server 파일 0건 변경) |
 | 권한 음성 계약 | `neture:operator`·`neture:admin`·미인증·타 서비스 operator → `/api/ai/**` 403 유지(코드 무변경) / `platform:super_admin` 만 통과 |
 | serviceKey 조작 | `/api/ai/**` 에 serviceKey 파라미터 부재 → scope 확대 표면 0 |
@@ -108,7 +108,7 @@ viewport: **desktop 1440×900 / mobile 390×844** 양쪽 전수. 실계정 로�
 |---|---|
 | 미인증 | **401** (11/11 endpoint) |
 | `neture:operator`+`neture:admin` | **403** (11/11) |
-| 타 서비스 operator (`kpa:`·`cosmetics:`·`glycopharm:`·`pharmacy-hub:` operator 동시 보유) | **403** — cross-service leak 0 |
+| 타 서비스 operator (`kpa:`·`cosmetics:`·`pharmacy-hub:` operator 동시 보유) | **403** — cross-service leak 0 |
 | `platform:super_admin` | `/api/ai/card-report` 200 · `/api/ai/operations` 200 |
 
 serviceKey 조작(`?serviceKey=neture|platform|*`, `?service=platform&scope=all`, body `serviceKey`) → **전부 403 유지**. scope 확대 표면 0.

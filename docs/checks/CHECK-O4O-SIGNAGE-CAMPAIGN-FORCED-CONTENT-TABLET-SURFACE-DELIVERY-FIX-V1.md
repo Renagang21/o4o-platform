@@ -24,7 +24,7 @@ origin/main 에 포함?  아니오 (PR 미생성 · 미머지)
 ```
 
 `git rev-list --left-right --count origin/main...bc8aba79e` = `5 / 1`.
-새 main 5커밋(glycopharm AI 리포트 · 암호화 키 회전 · registry audit)은 signage 파일과 **교집합 0**.
+새 main 5커밋(암호화 키 회전 · registry audit)은 signage 파일과 **교집합 0**.
 
 → 본 수정은 retirement 와 **독립적**이므로 retirement 브랜치 위에 쌓지 않고
 최신 `origin/main` 기준 별도 브랜치에서 진행했다. 두 브랜치는 파일 교집합이 없다
@@ -106,7 +106,7 @@ Tests: 1 failed, 14 skipped, 15 total
 | R3 | `platform/store-tablet.routes.ts` 후보 목록 | 매장 경영자 선택 UI 후보 | `IN ('tablet_idle','both')` | `StoreTabletDisplaysPage` 등 | KEEP |
 | R4 | 〃 selection 상태 조회 | `unavailable` 판정 | `NOT IN ('tablet_idle','both')` → unavailable | 〃 | KEEP |
 | R5 | `signage/controllers/forced-content.controller.ts` → `list` | 운영자 HQ 관리 목록 | 없음(전체) + `targetSurface` 필드 반환 | `operator-core-ui/signage-hq/ForcedContentPage` (3개 서비스 라우팅) | KEEP |
-| R6 | `o4o-store/repositories/store-playlist.repository.ts` (`findPublicPlaylistItems`, `findPlaylistItems`) | **사이니지 surface** — store playlist 에 forced merge | **없음(전체 surface)** | `kpa` / `glycopharm` / `cosmetics` / `neture` 4개 서비스에 `/store-playlists` 마운트 + `PharmacyHubStoreSignageController` | KEEP (§4-2 참고) |
+| R6 | `o4o-store/repositories/store-playlist.repository.ts` (`findPublicPlaylistItems`, `findPlaylistItems`) | **사이니지 surface** — store playlist 에 forced merge | **없음(전체 surface)** | `kpa` / `cosmetics` / `neture` 3개 서비스에 `/store-playlists` 마운트 + `PharmacyHubStoreSignageController` | KEEP (§4-2 참고) |
 | R7 | `signage/services/media-usage.service.ts`, `signage/repositories/media.repository.ts` | 미디어 사용처 판정(삭제 가드) | 없음 | media library | KEEP |
 
 **UNKNOWN 0.**
@@ -450,7 +450,7 @@ organization 별 count                  N/A — 컬럼 자체가 없음 (코드�
    §9 금지사항(필요성 확인 전 schema 변경 금지)에 따라 이번에 만들지 않았다.
 
 5. `KPA_FORCED_SERVICE_KEY = 'kpa-society'` 하드코딩 (`store-tablet.routes.ts`)
-   태블릿 선택 후보 목록이 kpa-society 로 고정이라, 다른 서비스(glycopharm 등)를 대상으로 한 캠페인은
+   태블릿 선택 후보 목록이 kpa-society 로 고정이라, 다른 서비스를 대상으로 한 캠페인은
    **매장 경영자가 명시 선택할 수는 없고** resolver fallback(R2)으로만 도달한다. 기존 구조이며 본 WO 범위 밖.
 
 ---

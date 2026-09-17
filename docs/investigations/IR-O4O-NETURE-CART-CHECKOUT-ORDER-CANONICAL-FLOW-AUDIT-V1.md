@@ -9,11 +9,11 @@
 
 ## 1. 요약 판정
 
-**🛑 구현 중단. 이벤트오퍼 주문을 "장바구니→checkout" canonical flow 로 옮기는 작업은 안전한 최소 fix 가 불가능하다.** 이유는 단순 우회(participate)의 문제가 아니라 **매장 서비스(KPA/Glyco/KCos)에 정렬할 공유 canonical cart/checkout 인프라 자체가 없기 때문**이다.
+**🛑 구현 중단. 이벤트오퍼 주문을 "장바구니→checkout" canonical flow 로 옮기는 작업은 안전한 최소 fix 가 불가능하다.** 이유는 단순 우회(participate)의 문제가 아니라 **매장 서비스에 정렬할 공유 canonical cart/checkout 인프라 자체가 없기 때문**이다.
 
 | 중단 조건 (WO §9) | 실측 | 결과 |
 |------------------|------|:----:|
-| 현재 cart model 이 event_offer item 을 표현 불가 | KPA=localStorage B2C cart(이벤트오퍼 무관), KCos=cart 없음, Glyco=Neture B2B 전용 cart, **백엔드 cart 모델 0** | 🛑 HIT |
+| 현재 cart model 이 event_offer item 을 표현 불가 | — | 🛑 HIT |
 | cart checkout 이 supplierId/pricingSource 보존 불가 | event_offer/sourceType/eventOfferId 필드 없음, cart 타입 3서비스 상이 | 🛑 HIT |
 | event offer 수량 차감이 participate 에 강결합 | `SELECT FOR UPDATE` + `UPDATE total_quantity` 가 participate 트랜잭션 내 원자적(event-offer.service.ts:611-706) | 🛑 HIT |
 | checkout 결제 흐름이 주문 확정으로 사용 불가 | 이벤트오퍼는 'paid' 도달 경로 없음(선행 IR) + createOrder 는 **단일 supplierId/주문** | 🛑 HIT |
@@ -54,7 +54,6 @@ eventOfferApi.participate(id, qty)
 |------|------|------|
 | **백엔드 cart** | **없음** — Cart 엔티티/`cart_items` 테이블/`/cart` 라우트 부재. checkout_orders 는 cart 없이 직접 생성 | apps/api-server grep |
 | **web-kpa-society** | **localStorage B2C cart**(`services/cartService.ts`, item={productId,name,price,qty}) — 이벤트오퍼는 cart 미경유, participate 직접 | cartService.ts:1-96, EventOfferDetailPage.tsx:148 |
-| **web-glycopharm** | **server-backed cart**(`StoreCart.tsx`, `/store/cart`) 이나 **Neture B2B 공급 주문 전용**, 이벤트오퍼 무관 | StoreCart.tsx, HubEventOffersPage.tsx:81 |
 | **web-k-cosmetics** | **cart 없음** — 이벤트오퍼 participate(id,1) 직접 | HubEventOffersPage.tsx:84 |
 | **web-neture** | client cart(StoreCartPage) → `storeApi.createOrder` → **neture 전용 `/seller/orders`**. cart item={offerId,supplierId,priceGeneral,qty} — sourceType/eventOfferId 없음, Neture 공급상품 전용 | StoreCartPage.tsx, store.ts:30-41 |
 | **checkout.createOrder** | `CreateOrderDto.supplierId` **단일** → 1 호출=1 공급자 주문. 다중공급자 cart 는 **분할 오케스트레이션 필요** | checkout.service.ts:43-58 |
@@ -92,7 +91,6 @@ Phase 0 — Canonical Cart/Checkout 표준 수립 (선결, 대형)
   · 공유 cart 모델(서버 or 표준 client) + cart item 표준(sourceType/supplierId/pricingSource/eventOfferId/priceSnapshot)
   · checkout 오케스트레이션: 공급자별 분할 → checkoutService.createOrder N회
   · 수량차감을 checkout 확정 시점으로 이동(soft-hold 정책 포함)
-  · 매장 서비스(KPA/Glyco/KCos) 적용 — 공통화 우선, 서비스별 분기 최소
 
 Phase 1 — 이벤트오퍼를 cart item 으로 편입
   · 이벤트오퍼 buyer 화면 "주문하기" → "수량 선택 → 장바구니 담기"
@@ -135,8 +133,6 @@ cart/checkout/participate/event-offer/neture_orders/checkout_orders/정산/배�
 ### Evidence
 - participate/차감: `routes/kpa/services/event-offer.service.ts:546-771`(차감 611-706, createOrder 710)
 - checkout: `services/checkout.service.ts:43-58,127-180`(단일 supplierId), `routes/kpa/controllers/kpa-checkout.controller.ts:480-484`
-- cart: `web-kpa-society/src/services/cartService.ts`, `web-glycopharm/src/pages/store/StoreCart.tsx`, `web-k-cosmetics`(없음), `web-neture/src/pages/store/StoreCartPage.tsx` + `lib/api/store.ts:30-41`
-- buyer 진입: KPA `EventOfferDetailPage.tsx:148`/`KpaEventOfferPage.tsx`, Glyco `HubEventOffersPage.tsx:81`, KCos `HubEventOffersPage.tsx:84`
 - 백엔드 cart 부재: apps/api-server grep(Cart 엔티티/라우트 없음)
 
 *조사 전용 — WO 중단 조건 충족 산출물. 코드/스키마/라우트 변경 없음.*

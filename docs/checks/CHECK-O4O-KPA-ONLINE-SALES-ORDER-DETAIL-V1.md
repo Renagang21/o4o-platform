@@ -13,7 +13,7 @@
 | `services/web-kpa-society/src/App.tsx` | route `/store/online-sales/orders/:orderId` 추가(lazy) |
 | `services/web-kpa-society/src/pages/pharmacy/OnlineSalesOrdersPage.tsx` | 목록 주문번호 링크 + '상세 보기' 컬럼 → 상세 진입 |
 
-- backend/DB/migration **무변경**. checkout 생성/결제 로직 무변경. 상태변경/취소/환불 미포함. GP/KCos 무변경.
+- backend/DB/migration **무변경**. checkout 생성/결제 로직 무변경. 상태변경/취소/환불 미포함. KCos 무변경.
 
 ## 2. 상세 진입 방식
 
@@ -61,7 +61,7 @@
 ## 8·9·10. 회귀 / 무변경
 
 - 온라인 판매 주문 목록(`/online-sales/orders`)·발주 내역(`/commerce/orders`)·판매 설정/상품 화면 무변경(목록은 진입 링크만 추가).
-- GP/KCos 파일·메뉴 무변경(신규는 KPA 전용 파일, 공통 config 미변경).
+- KCos 파일·메뉴 무변경(신규는 KPA 전용 파일, 공통 config 미변경).
 
 ## 11. 테스트/빌드/smoke
 
@@ -83,4 +83,4 @@
 
 ## 결론
 
-온라인 판매 주문 상세를 **읽기 전용**으로 신설(기존 seller detail API 재사용, 개인정보 프론트 마스킹). 상태 처리·환불은 의도적으로 제외해 정책 범위를 키우지 않음. backend/DB/결제/GP/KCos 무영향, tsc·배포 통과. 브라우저 시각 smoke만 로컬 프로필 점유로 보류.
+온라인 판매 주문 상세를 **읽기 전용**으로 신설(기존 seller detail API 재사용, 개인정보 프론트 마스킹). 상태 처리·환불은 의도적으로 제외해 정책 범위를 키우지 않음. backend/DB/결제/KCos 무영향, tsc·배포 통과. 브라우저 시각 smoke만 로컬 프로필 점유로 보류.

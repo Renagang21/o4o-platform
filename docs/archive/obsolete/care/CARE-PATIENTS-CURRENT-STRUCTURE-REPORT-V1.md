@@ -2,7 +2,6 @@
 
 > **WO-CARE-PATIENTS-CURRENT-STATE-INVESTIGATION-V1**
 > 조사일: 2026-02-20
-> 대상: `services/web-glycopharm/src/pages/care/PatientsPage.tsx`
 > 원칙: 수정 제안 없음. 현재 상태 기록만 수행.
 
 ---
@@ -13,7 +12,7 @@
 
 | 항목 | 값 |
 |------|------|
-| 파일 | `services/web-glycopharm/src/pages/care/PatientsPage.tsx` |
+| 파일 | — |
 | 라우트 | `/patients` |
 | 레이아웃 | `MainLayout` (네비게이션 바 포함) |
 | 가드 | `ProtectedRoute allowedRoles={['pharmacy']}` |
@@ -279,7 +278,6 @@ grid grid-cols-2 gap-4
 | 마지막 주문 | "마지막 주문" | `selectedPatient.lastOrderAt` | `toLocaleDateString('ko-KR')`, 없으면 `-` |
 | 총 구매액 | "총 구매액" | `selectedPatient.totalSpent` | `toLocaleString()원` |
 
-> 모든 정보는 GlycoPharm 약국 고객 필드 (`PharmacyCustomer`).
 > Care 분석 데이터(TIR, CV, risk)는 info 탭에 표시되지 않음.
 
 ### 플레이스홀더 탭 공통 구조
@@ -304,7 +302,7 @@ const [customersRes, summaryRes] = await Promise.all([
 
 | API | 엔드포인트 | 용도 | 에러 처리 |
 |-----|-----------|------|-----------|
-| `getCustomers()` | `/api/v1/glycopharm/pharmacy/customers` | 환자 목록 | throw → 에러 상태 |
+| `getCustomers()` | — | 환자 목록 | throw → 에러 상태 |
 | `getCareDashboardSummary()` | `/api/v1/care/dashboard` | 위험도 카운트 | `.catch(() => null)` 무시 |
 
 ### 데이터 흐름 상세
@@ -326,7 +324,6 @@ interface PharmacyCustomer {
 }
 ```
 
-- 소스: GlycoPharm 약국 고객 테이블 (`glycopharm_pharmacy_customers`)
 - 페이지 크기: 50 (CareDashboardPage는 100)
 - 검색: `debouncedSearch` 기반
 
@@ -494,12 +491,12 @@ const getPatientRisk = (patient: PharmacyCustomer): keyof typeof RISK_CONFIG => 
 
 ### GlucoseView InsightsPage와의 비교
 
-| 항목 | GlycoPharm PatientsPage | GlucoseView InsightsPage |
+| 항목 || GlucoseView InsightsPage |
 |------|------------------------|-------------------------|
 | 환자 선택 | 좌측 리스트 클릭 | `<select>` 드롭다운 |
 | 분석 표시 | 플레이스홀더 | TIR/CV/Risk 카드 + KPI 비교 + 인사이트 |
 | 상담 기록 | 플레이스홀더 | 세션 목록 + 기록 모달 |
-| 데이터 소스 | GlycoPharm 고객 | GlucoseView 고객 |
+| 데이터 소스 | — | GlucoseView 고객 |
 | Care API 호출 | 없음 | `getCareAnalysis`, `getCareKpi`, `getCoachingSessions` |
 
 ---
@@ -508,18 +505,10 @@ const getPatientRisk = (patient: PharmacyCustomer): keyof typeof RISK_CONFIG => 
 
 ### 직접 관련 파일
 
-| 파일 | 줄 수 | 역할 |
-|------|-------|------|
-| `services/web-glycopharm/src/pages/care/PatientsPage.tsx` | 400 | 환자 관리 페이지 (본 조사 대상) |
-| `services/web-glycopharm/src/pages/care/index.ts` | 6 | 배럴 내보내기 |
-| `services/web-glycopharm/src/pages/care/CareDashboardPage.tsx` | 174 | Care Home (이동 원점) |
-| `services/web-glycopharm/src/api/pharmacy.ts` | 521 | API 클라이언트 + 타입 정의 |
-
 ### 간접 관련 파일
 
 | 파일 | 관계 |
 |------|------|
-| `services/web-glycopharm/src/App.tsx` | 라우트 정의, `RoleBasedHome` |
 | `apps/api-server/src/modules/care/care-dashboard.controller.ts` | `/api/v1/care/dashboard` 백엔드 |
 | `services/web-glucoseview/src/pages/InsightsPage.tsx` | 유사 기능 (GlucoseView 측 구현) |
 
@@ -553,9 +542,7 @@ Loader2, Filter, ChevronRight
 
 ## 요약
 
-PatientsPage는 **GlycoPharm 약국 고객 데이터 기반의 List/Detail 분할 레이아웃**이다.
-
-1. **데이터 소스**: `pharmacyApi.getCustomers()` (GlycoPharm 약국 고객 테이블)
+1. **데이터 소스**: `pharmacyApi.getCustomers()`
 2. **위험도**: `diabetesType` 기반 Mock 로직 (Care API 분석 결과 미사용)
 3. **탭 4개 중 1개만 구현**: `info` 탭 (이메일, 당뇨 유형, 주문 이력)
 4. **Care API 연동 없음**: 분석/상담/성과 탭은 모두 플레이스홀더

@@ -9,7 +9,6 @@
 > 본 문서는 작성 시점 기준 8 bootstrap 계정의 자동 복구를 전제했다. 그러나
 > `project_test_account_cleanup_policy` 채택 이후 임시 계정 (UUID ...000002~000008,
 > kpa-admin / kpa-operator / phamacy1 / neture-operator / kcos-admin / kcos-operator /
-> glyco-operator) 은 **production 부재가 정상 상태**이며 재생성하지 않는다.
 >
 > 따라서:
 > - "Bootstrap 자동 복구" 는 **super-admin@o4o.com (UUID ...000001) 1 계정만** 대상.
@@ -41,7 +40,6 @@
 - Auth: refresh_tokens, linking_sessions
 - KPA: kpa_members (non-bootstrap), kpa_pharmacist_profiles, kpa_store_contents
 - Neture: neture_orders, supplier_product_offers, product_masters, neture_suppliers, credit_balances
-- GlycoPharm: glycopharm_members, glycopharm_products, glyco_pharmacy_products
 - K-Cosmetics: cosmetics.* (별도 schema)
 - LMS: lms_courses, lms_lessons, lms_enrollments, lms_lesson_progress
 - Forum: forum_posts, forum_category_requests
@@ -154,7 +152,6 @@ COMMIT;  -- 또는 ROLLBACK
 2. Auth sessions (refresh_tokens, linking_sessions)
 3. KPA domain leaves (profiles, store_contents, kpa_members)
 4. Neture domain (offers 먼저 → masters → suppliers)
-5. GlycoPharm domain
 6. K-Cosmetics (cosmetics schema)
 7. LMS (leaf → courses)
 8. Forum

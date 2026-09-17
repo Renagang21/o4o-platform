@@ -21,7 +21,6 @@ WO: `WO-O4O-CONTENT-RENDERER-PLATFORM-CONSISTENCY-V1`
 | 2 iframe 보안 불변식 | `sanitizeRichHtml` 이 이미 youtube/vimeo **호스트 allowlist** 구현 → 임의 iframe 미허용 유지(회귀 없음) |
 | 3 표 CSS | ContentRenderer `injectTableCss()` (WO-2에서 도입) — 유지 확인 |
 | 4 YouTube embed CSS | `iframe.editor-youtube` / `div[data-youtube-video]` 반응형(16:9) CSS를 **전 variant 공통 주입**(`injectEmbedCss`) → 소비 표면에서 편집기와 동일 표시 |
-| 5 이탈 표면: glycopharm CourseDetailPage | raw `sanitizeHtml` 직접 호출(이미지 CSS·YouTube 누락) → **표준 `ContentRenderer`로 이관** |
 | 6 이탈 표면: signage-player / main-site forum | 별도 렌더 모델(sandbox iframe / 블록 배열) — **무리한 통합 없이 계약만 확인**(WO §6·§7), 이관 대상 아님 |
 
 ## 3. 검증 — typecheck / build / deploy
@@ -29,7 +28,6 @@ WO: `WO-O4O-CONTENT-RENDERER-PLATFORM-CONSISTENCY-V1`
 | 항목 | 결과 |
 |---|---|
 | content-editor build (tsup) | **EXIT 0** |
-| GlycoPharm typecheck (CourseDetailPage 이관) | **EXIT 0** |
 | KPA typecheck (ContentRenderer 광범위 소비) | **EXIT 0** |
 | Cloud Run 4서비스 배포 | **✓ success** |
 
@@ -52,7 +50,6 @@ kpa-society.co.kr, 2026-07-08, KPA admin. 매장 제품 등록 편집기:
 ## 6. 변경 파일 / 커밋
 
 - `packages/content-editor/src/components/ContentRenderer.tsx` (sanitize 단일화 + embed CSS)
-- `services/web-glycopharm/src/pages/education/CourseDetailPage.tsx` (ContentRenderer 이관)
 - 커밋: `bd0caf2a0`
 
 ## 7. 완료 기준 대비 (WO §9)
@@ -64,7 +61,7 @@ kpa-society.co.kr, 2026-07-08, KPA admin. 매장 제품 등록 편집기:
 | Table 동일 출력 | ✅ (WO-2 TABLE_STYLES ContentRenderer 주입) |
 | Video 동일 출력 | WO-3 연계(현재 YouTube 경로) |
 | sanitize 단일 정책 | ✅ 모든 variant sanitizeRichHtml |
-| 서비스별 Renderer 제거/계약 만족 | ✅ glycopharm 이관 · signage/forum 계약 확인(비이관) |
+| 서비스별 Renderer 제거/계약 만족 | signage/forum 계약 확인(비이관) |
 | iframe 보안 불변식 유지 | ✅ 호스트 allowlist |
 | 기존 기능 회귀 없음 | ✅ typecheck/deploy |
 | typecheck/build | ✅ |

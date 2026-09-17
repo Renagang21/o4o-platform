@@ -48,7 +48,6 @@ packages/operator-ux-core/src/sidebar/DomainIASidebar.tsx   ← 원칙적으로 
 ```text
 packages/operator-ux-core/src/sidebar/operatorDomainIA.ts
 services/web-neture/src/config/operatorMenuGroups.ts
-서비스 wrapper 5종 (KPA/Glyco/KCos operator + Neture operator/admin)
 ```
 
 위 파일들은 필요해지지 않으면 수정하지 않는다. 필요해지면 중간 보고한다.
@@ -123,7 +122,6 @@ const DomainIcon = DOMAIN_ICON_MAP[domain.key];
 - operator-ux-core (DomainIASidebar 소속 패키지) tsc --noEmit
 - 소비 4서비스 tsc --noEmit:
   · @o4o/web-kpa-society
-  · glycopharm-web
   · @o4o/web-k-cosmetics
   · @o4o/web-neture
 ```
@@ -133,7 +131,6 @@ const DomainIcon = DOMAIN_ICON_MAP[domain.key];
 ### 6.2 브라우저 smoke (가능 시)
 
 ```text
-- KPA / GlycoPharm / K-Cosmetics operator: desktop sidebar + mobile drawer 도메인 헤딩 아이콘
 - Neture operator: desktop + mobile drawer
 - Neture /admin: mobile drawer 도메인 헤딩 아이콘
 확인:

@@ -1,7 +1,7 @@
 # CHECK-O4O-KPA-ADMIN-SIDEBAR-LG-STANDARDIZATION-V1
 
 > **WO**: `WO-O4O-KPA-ADMIN-SIDEBAR-LG-STANDARDIZATION-V1`
-> **선행**: IR responsive sidebar audit · P0 drawer · operator/admin 공통 lg · GP/KCos admin flex · 누적 smoke PASS
+> **선행**: IR responsive sidebar audit · P0 drawer · operator/admin 공통 lg · KCos admin flex · 누적 smoke PASS
 > **목적**: KPA admin `AdminSidebar`/`AdminLayout` 의 반응형 breakpoint 를 O4O 표준 **md(768) → lg(1024)** 로 정렬. <1024 drawer / >=1024 고정 사이드바.
 > **작성일**: 2026-06-17
 > **상태**: 완료 · KPA build PASS · **browser smoke PASS (배포 후 실측 — §6)**
@@ -14,7 +14,7 @@
 - KPA admin sidebar 2개 파일(`AdminLayout`/`AdminSidebar`)의 md 기준 5곳을 **lg 로 정렬**. 사이드바 6종 중 마지막 독립 admin 사이드바(#3).
 - 메뉴 계층 토큰을 #1(DomainIASidebar) 표준에 **최소 정렬**(group 600, child 13px/pl-14).
 - **frontend-only**, route/권한/menu visibility/메뉴명/backend/DB/package 변경 없음.
-- 구조 패턴(fixed sidebar + `lg:ml-[260px]` 본문 margin)은 유지 — GP/KCos 의 flex-sibling 전환(#2)과 달리 본 WO 는 **breakpoint 정렬만**(WO 범위). margin 은 lg 에서만 적용되어 겹침 없음.
+- 구조 패턴(fixed sidebar + `lg:ml-[260px]` 본문 margin)은 유지 — KCos 의 flex-sibling 전환(#2)과 달리 본 WO 는 **breakpoint 정렬만**(WO 범위). margin 은 lg 에서만 적용되어 겹침 없음.
 
 ---
 
@@ -55,7 +55,7 @@ AdminLayout (min-h-screen flex flex-col)
 ```
 
 - 메뉴: Overview(관리자 홈) / 운영 기능(회원 관리) / 설정(문의 설정·법정정보 설정) — **무변경**.
-- 닫힘 트리거: backdrop click(`onMobileClose`), 메뉴 선택(`handleNavigate`→`onMobileClose`). **ESC 미적용** — GP/KCos admin DashboardLayout 과 동일(admin layout 일관성 유지, scope 밖).
+- 닫힘 트리거: backdrop click(`onMobileClose`), 메뉴 선택(`handleNavigate`→`onMobileClose`). **ESC 미적용** — KCos admin DashboardLayout 과 동일(admin layout 일관성 유지, scope 밖).
 
 ---
 
@@ -77,7 +77,7 @@ AdminLayout (min-h-screen flex flex-col)
 |------|------|
 | KPA build (`@o4o/web-kpa-society`) | ✅ ✓ built 15.6s (exit 0) |
 | route/active/권한/menu visibility | ✅ 무변경 |
-| 공통 DomainIASidebar/OperatorAreaShell, GP/KCos DashboardLayout, store/store-hub/supplier | ✅ 미변경 |
+| 공통 DomainIASidebar/OperatorAreaShell, KCos DashboardLayout, store/store-hub/supplier | ✅ 미변경 |
 | backend/DB/package/lock | ✅ 변경 0 |
 
 ### browser smoke (배포 후 — **수행 완료, PASS**)
@@ -95,7 +95,7 @@ AdminLayout (min-h-screen flex flex-col)
 - console error: 사이드바 무관한 법정문서 미게시 404(policies/legal `published/terms·privacy`)만 — **데이터 상태, 본 변경 무관**. 사이드바 관련 error 0.
 - route broken 0, active menu 정상.
 
-> 동일 패턴(fixed+margin, lg)은 GP/KCos admin 누적 smoke 와도 정합.
+> 동일 패턴(fixed+margin, lg)은 KCos admin 누적 smoke 와도 정합.
 
 ---
 
@@ -103,7 +103,7 @@ AdminLayout (min-h-screen flex flex-col)
 
 ```
 - browser smoke 배포 후 수행(코드/build 기준 통과).
-- 본 WO 는 breakpoint 정렬만 — fixed+margin 구조 유지(GP/KCos 처럼 flex-sibling 전환은 별도 결정 사항, 본 WO 범위 밖).
+- 본 WO 는 breakpoint 정렬만 — fixed+margin 구조 유지(KCos 처럼 flex-sibling 전환은 별도 결정 사항, 본 WO 범위 밖).
   · lg:ml-[260px] 는 lg 에서만 적용되어 겹침 없음(margin 잔재는 <lg 에서 발생 안 함).
 - ESC 미적용(admin layout 일관성). operator/store-hub/supplier 와의 ESC 정합은 후속 공통화 시 일괄 판단.
 - 남은 표준화: #4 store StoreSidebar 토큰 정렬(이미 lg 기준 → 토큰 중심).

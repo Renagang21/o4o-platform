@@ -15,7 +15,7 @@
 
 ## 0. 핵심 결론 (TL;DR)
 
-> **ServiceSwitcher UI 의 실질 사용처는 web-account (Account Center) 1곳에 집중**되어 있다. 4개 service web app (KPA / GlycoPharm / K-Cosmetics / Neture) 자체에는 inter-service switching UI 가 없다 — 헤더 드롭다운은 서비스 내부 navigation 일 뿐.
+> **ServiceSwitcher UI 의 실질 사용처는 web-account (Account Center) 1곳에 집중**되어 있다. 3개 service web app (KPA / K-Cosmetics / Neture) 자체에는 inter-service switching UI 가 없다 — 헤더 드롭다운은 서비스 내부 navigation 일 뿐.
 >
 > 가장 큰 충돌은 **`POST /auth/services/:key/join` 엔드포인트가 운영자 승인 절차를 우회하여 즉시 `active` membership 을 생성한다는 점**이다. 이는 Register 의 `pending → 운영자 승인 → active` 흐름과 정면 충돌하며, "서비스는 독립 사업자" 철학의 핵심 (서비스별 가입 승인) 을 깬다.
 >
@@ -40,7 +40,6 @@ service_credentials (서비스별 독립)
 service_memberships (서비스별 가입/승인/상태 — 독립 사업자)
 role_assignments    (서비스별 역할)
 
-→ KPA 가입은 KPA 에서, GlycoPharm 가입은 GlycoPharm 에서,
   각각 독립적으로 진행 (운영자 승인 포함)
 ```
 
@@ -57,7 +56,6 @@ role_assignments    (서비스별 역할)
 | 서비스 | 헤더 컴포넌트 | 드롭다운 메뉴 항목 | Inter-service UI |
 |---|---|---|:---:|
 | KPA-Society | [KpaGlobalHeader.tsx](services/web-kpa-society/src/components/KpaGlobalHeader.tsx) | 강의대시보드 / 관리자/운영 대시보드 / 내 매장 / 마이페이지 / 설정 | ❌ 없음 |
-| GlycoPharm | [GlycoGlobalHeader.tsx](services/web-glycopharm/src/components/GlycoGlobalHeader.tsx) | 강의대시보드 / 운영 대시보드 / 마이페이지 / 설정 | ❌ 없음 |
 | K-Cosmetics | [KCosGlobalHeader.tsx](services/web-k-cosmetics/src/components/KCosGlobalHeader.tsx) | 강의대시보드 / 운영/일반 대시보드 / 마이페이지 / 설정 | ❌ 없음 |
 | Neture | [NetureGlobalHeader.tsx](services/web-neture/src/components/NetureGlobalHeader.tsx) | 운영 대시보드 / 마이페이지 / 설정 | ❌ 없음 |
 

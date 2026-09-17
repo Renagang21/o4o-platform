@@ -29,7 +29,7 @@
  *   - PUT    /groups/:id/pages/:locale     — locale page upsert
  *   - PATCH  /groups/:id/pages/:locale/status — page 상태 변경
  *
- * 대상 서비스: KPA / GlycoPharm / K-Cosmetics
+ * 대상 서비스: KPA / K-Cosmetics
  * 제외: Neture (매장 기능 없음)
  *
  * 참조:

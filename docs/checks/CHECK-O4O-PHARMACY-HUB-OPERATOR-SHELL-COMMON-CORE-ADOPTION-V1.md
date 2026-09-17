@@ -17,11 +17,11 @@
 | 5 | `MembershipGate` · backend `pharmacy-hub:operator` 경계 · 승인/반려 업무 규칙 보존 | PASS |
 | 6 | typecheck / build | PASS |
 | 7 | 브라우저 smoke (운영자 계정 실 로그인 · 프로덕션 API) | PASS |
-| 8 | GlycoPharm 포함 공통 패키지 회귀 | PASS |
+| 8 | — | PASS |
 
 **종합: PASS** (승인·반려 **실행** 버튼 클릭은 미수행 — §5 참조)
 
-API 변경 0 · DB/migration 0 · KPA/K-Cosmetics/Neture/GlycoPharm 소스 변경 0 · 공통 패키지 변경 0.
+API 변경 0 · DB/migration 0 · KPA/K-Cosmetics/Neture 소스 변경 0 · 공통 패키지 변경 0.
 
 ---
 
@@ -40,7 +40,7 @@ API 변경 0 · DB/migration 0 · KPA/K-Cosmetics/Neture/GlycoPharm 소스 변�
 
 **공통 패키지(`packages/**`) 및 타 서비스 파일 변경 0건.**
 
-### 1-1. 채택한 공통 구조 (KPA / K-Cosmetics / GlycoPharm 와 동일 계약)
+### 1-1. 채택한 공통 구조 (KPA / K-Cosmetics 와 동일 계약)
 
 ```text
 OperatorLayoutWrapper
@@ -86,11 +86,10 @@ Neture 와 동일한 방식으로 서비스별 `domainIAConfig`(`가입·회원 
 |---|---|
 | `pnpm --filter pharmacy-hub-web type-check` | PASS (`tsc -b` 오류 0) |
 | `pnpm --filter pharmacy-hub-web build` | PASS (`✓ built in 22.68s` → tailwind 수정 후 재빌드도 PASS) |
-| `pnpm --filter glycopharm-web type-check` | PASS (공통 패키지 회귀 확인) |
 
 > 최초 typecheck 시 나온 `Cannot find module '@o4o/ui' …` 류 오류는 신규 worktree 에
 > dist-mode 패키지가 빌드되지 않은 환경 사유였다. `@o4o/{types,auth-utils,auth-client,ui,account-ui,content-editor}`
-> (glycopharm 은 추가로 `@o4o/utils`,`@o4o/lms-client`) 빌드 후 양쪽 모두 오류 0.
+>  빌드 후 양쪽 모두 오류 0.
 
 ---
 
@@ -124,7 +123,7 @@ Neture 와 동일한 방식으로 서비스별 `domainIAConfig`(`가입·회원 
 ## 6. 하지 않은 것 (WO 제외 범위 준수)
 
 회원관리 화면 공통화 / `OperatorMembersConsolePage` 적용 / 신규 운영자 메뉴 추가 /
-API·DB 변경 / KPA·K-Cosmetics·Neture 코드 수정 / GlycoPharm 기능 적용 — **전부 미수행**.
+API·DB 변경 / KPA·K-Cosmetics·Neture 코드 수정 기능 적용 — **전부 미수행**.
 
 ---
 

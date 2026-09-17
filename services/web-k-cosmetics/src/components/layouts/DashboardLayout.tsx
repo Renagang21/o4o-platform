@@ -1,6 +1,5 @@
 /**
  * DashboardLayout - K-Cosmetics 운영자/파트너 대시보드 레이아웃
- * GlycoPharm 스타일 적용
  */
 
 import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
@@ -165,7 +164,7 @@ const roleConfig: Record<string, RoleConfig> = {
     icon: icons.Shield,
     color: 'red',
     /* WO-O4O-ADMIN-DASHBOARD-REFINE-V1: 표준 Admin Capability 그룹
-     * WO-O4O-KCOS-ADMIN-SCOPE-CLEANUP-V1: 서비스 admin = 서비스 설정 관리자 역할로 축소 (GlycoPharm 기준 모델 적용).
+     * WO-O4O-KCOS-ADMIN-SCOPE-CLEANUP-V1: 서비스 admin = 서비스 설정 관리자 역할로 축소.
      *   제거: Approvals(매장 네트워크 → operator /operator/stores 대응) / System '문의 관리'(→ operator /operator/contacts) /
      *         System '역할 관리'(→ O4O 전체 관리자).
      *   유지: 법정정보·약관 / 문의 설정 / 서비스 설정.

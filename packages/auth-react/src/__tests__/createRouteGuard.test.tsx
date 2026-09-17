@@ -3,7 +3,7 @@
  *
  * WO-O4O-FRONTEND-AUTH-CONTEXT-AND-ROUTE-GUARD-COMMONIZATION-V1
  *
- * 4개 서비스(KPA / K-Cosmetics / GlycoPharm / Neture)의 기존 RoleGuard 동작을
+ * 3개 서비스(KPA / K-Cosmetics / Neture)의 기존 RoleGuard 동작을
  * Core 로 옮긴 뒤에도 판정이 동일한지 확인한다. 각 테스트는 "어느 서비스의 어떤 계약"인지
  * 명시한다 — 회귀 시 어느 서비스가 깨졌는지 바로 알기 위해서다.
  */
@@ -150,19 +150,19 @@ describe('createRouteGuard — 허용·금지 역할', () => {
   });
 });
 
-describe('createRouteGuard — isAllowed 술어 (GlycoPharm / K-Cosmetics OperatorRoute)', () => {
-  it('GlycoPharm: isOperatorOrAbove 동치 술어로 통과한다', () => {
+describe('createRouteGuard — isAllowed 술어 (서비스 OperatorRoute)', () => {
+  it('isOperatorOrAbove 동치 술어로 통과한다', () => {
     const isAllowed = (roles: string[]) =>
-      roles.some((r) => r === 'platform:super_admin' || r === 'glycopharm:admin' || r === 'glycopharm:operator');
+      roles.some((r) => r === 'platform:super_admin' || r === 'neture:admin' || r === 'neture:operator');
 
-    const Guard = createRouteGuard({ useAuth: () => authed(['glycopharm:operator']) });
+    const Guard = createRouteGuard({ useAuth: () => authed(['neture:operator']) });
     renderAtProtected(<Guard isAllowed={isAllowed}>{CHILD}</Guard>);
     expect(screen.getByTestId('child')).toBeTruthy();
   });
 
-  it('GlycoPharm: 술어 불충족이면 "/" 로 보낸다', () => {
-    const isAllowed = (roles: string[]) => roles.includes('glycopharm:operator');
-    const Guard = createRouteGuard({ useAuth: () => authed(['glycopharm:member']) });
+  it('술어 불충족이면 "/" 로 보낸다', () => {
+    const isAllowed = (roles: string[]) => roles.includes('neture:operator');
+    const Guard = createRouteGuard({ useAuth: () => authed(['neture:member']) });
     renderAtProtected(<Guard isAllowed={isAllowed}>{CHILD}</Guard>);
     expect(screen.getByTestId('home')).toBeTruthy();
   });
@@ -226,7 +226,7 @@ describe('createRouteGuard — MembershipGate 위임', () => {
     expect(screen.getByTestId('child')).toBeTruthy();
   });
 
-  it('enforceMembership=false 면 Gate 를 거치지 않는다 (KPA/K-Cos/Glyco public 계약)', () => {
+  it('enforceMembership=false 면 Gate 를 거치지 않는다 (KPA/K-Cos public 계약)', () => {
     const Gate = makeGate();
     const Guard = createRouteGuard({ useAuth: () => authed(['a:admin']), MembershipGate: Gate });
     renderAtProtected(

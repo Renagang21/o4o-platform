@@ -3,7 +3,7 @@
  *
  * WO-O4O-FRONTEND-AUTH-CONTEXT-AND-ROUTE-GUARD-COMMONIZATION-FULL-CLOSE-V1
  *
- * Neture(switchRole) · K-Cosmetics(switchRole) · GlycoPharm(selectRole) 의
+ * Neture(switchRole) · K-Cosmetics(switchRole) 의
  * 기존 동작을 그대로 고정한다 — 역할 집합은 불변, 선택 역할만 맨 앞으로.
  */
 
@@ -60,7 +60,7 @@ describe('useRoleSelection', () => {
     expect(result.current.core.user).toBeNull();
   });
 
-  it('availableRoles 를 주입하면 그 축으로 허용 여부를 판정한다 (GlycoPharm 계약)', () => {
+  it('availableRoles 를 주입하면 그 축으로 허용 여부를 판정한다', () => {
     const { result } = setup(USER, ['neture:supplier']);
 
     act(() => result.current.sel.switchRole('neture:operator'));

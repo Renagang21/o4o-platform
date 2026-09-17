@@ -18,11 +18,11 @@
 
 ### 핵심 수치
 
-| 항목 | KPA Society | GlycoPharm | K-Cosmetics |
-|------|:-----------:|:----------:|:-----------:|
-| Operator 페이지 수 | 18 | 37 | 23 |
-| Store 메뉴 항목 | 9 (커스텀) | 8 (전체) | 7 |
-| 커뮤니티 기능 | Forum + LMS + News + Events | Forum + Care + Education | Forum + Hub |
+| 항목 | KPA Society | K-Cosmetics |
+| ------ | :-----------: | :-----------: |
+| Operator 페이지 수 | 18 | 23 |
+| Store 메뉴 항목 | 9 (커스텀) | 7 |
+| 커뮤니티 기능 | Forum + LMS + News + Events | Forum + Hub |
 
 ---
 
@@ -55,42 +55,6 @@
 - **Layout**: `BranchOperatorLayout` (7개 메뉴: 대시보드, 공지사항, 게시판, 자료실, 포럼 관리, 콘텐츠 허브, 운영자 관리)
 - **Guard**: `BranchOperatorAuthGuard`, `RoleGuard`
 - **API**: `services/web-kpa-society/src/api/operator.ts`
-
-#### GlycoPharm (`/admin` → Operator)
-
-```
-/admin                     → GlycoPharmOperatorDashboard (5-Block)
-/admin/users               → UsersPage
-/admin/user/:id            → UserDetailPage
-/admin/stores              → StoresPage
-/admin/stores/:id          → StoreDetailPage
-/admin/store-approvals     → StoreApprovalsPage
-/admin/store-approvals/:id → StoreApprovalDetailPage
-/admin/store-template      → StoreTemplateManagerPage (3 tabs)
-/admin/products            → ProductsPage
-/admin/products/:id        → ProductDetailPage
-/admin/orders              → OrdersPage
-/admin/inventory           → InventoryPage
-/admin/settlements         → SettlementsPage
-/admin/invoices            → InvoicesPage
-/admin/billing-preview     → BillingPreviewPage
-/admin/applications        → ApplicationsPage
-/admin/application/:id     → ApplicationDetailPage
-/admin/forum-requests      → ForumRequestsPage
-/admin/forum-management    → OperatorForumManagementPage
-/admin/marketing           → MarketingPage
-/admin/reports             → ReportsPage
-/admin/analytics           → AnalyticsPage
-/admin/ai-report           → AiReportPage
-/admin/support             → SupportPage
-/admin/settings            → SettingsPage
-/admin/market-trial        → OperatorTrialSelectorPage
-/admin/signage/*           → HqMedia, Playlists, Templates (6 pages)
-```
-
-- **Guard**: `ProtectedRoute` with role checks
-- **Config**: `operatorConfig.ts` (GlycoPharm-specific signals: store, forum, content)
-- **특이사항**: `/operator` → `/admin` redirect (legacy support)
 
 #### K-Cosmetics (`/operator`)
 
@@ -149,16 +113,16 @@
 
 ### 3.2 서비스별 KPI 구성
 
-| KPI | KPA | GlycoPharm | K-Cosmetics |
-|-----|:---:|:----------:|:-----------:|
-| 회원 수 | ✅ | ✅ | ✅ |
-| 매장 수 | ✅ | ✅ | ✅ |
-| 콘텐츠 수 | ✅ | ✅ | - |
-| 주문 수 | - | ✅ | ✅ |
-| 포럼 활동 | ✅ | ✅ | - |
-| 약국 서비스 | ✅ | ✅ | - |
-| 상품 수 | - | ✅ | ✅ |
-| AI 요약 | ✅ | ✅ | ✅ |
+| KPI | KPA | K-Cosmetics |
+| ----- | :---: | :-----------: |
+| 회원 수 | ✅ | ✅ |
+| 매장 수 | ✅ | ✅ |
+| 콘텐츠 수 | ✅ | - |
+| 주문 수 | - | ✅ |
+| 포럼 활동 | ✅ | - |
+| 약국 서비스 | ✅ | - |
+| 상품 수 | - | ✅ |
+| AI 요약 | ✅ | ✅ |
 
 ---
 
@@ -166,30 +130,30 @@
 
 ### 4.1 서비스별 관리 기능 비교
 
-| 기능 | KPA | GlycoPharm | K-Cosmetics |
-|------|:---:|:----------:|:-----------:|
-| **회원 관리** | ✅ MemberManagement | ✅ UsersPage | ✅ UsersPage |
-| **회원 승인** | ✅ PharmacyRequest | ✅ StoreApprovals | ✅ Applications |
-| **매장 관리** | - (Branch 구조) | ✅ StoresPage | ✅ StoresPage |
-| **매장 승인** | - | ✅ StoreApprovalsPage | - |
-| **상품 관리** | ✅ ProductApplication | ✅ ProductsPage | ✅ ProductsPage |
-| **주문 관리** | - | ✅ OrdersPage | ✅ OrdersPage |
-| **포럼 관리** | ✅ ForumManagement | ✅ ForumRequests | - |
-| **콘텐츠 관리** | ✅ ContentManagement | - | - |
-| **사이니지** | ✅ Signage (6 pages) | ✅ Signage (6 pages) | ✅ Signage (6 pages) |
-| **정산** | - | ✅ Settlements | ✅ Settlements |
-| **재고** | - | ✅ InventoryPage | ✅ InventoryPage |
-| **마케팅** | - | ✅ MarketingPage | ✅ MarketingPage |
-| **분석** | ✅ ForumAnalytics | ✅ AnalyticsPage | ✅ AnalyticsPage |
-| **AI 리포트** | ✅ OperatorAiReport | ✅ AiReportPage | ✅ AiReportPage |
-| **감사 로그** | ✅ AuditLogPage | - | - |
-| **법률 관리** | ✅ LegalManagement | - | - |
-| **운영자 관리** | ✅ OperatorManagement | - | - |
-| **매장 템플릿** | - | ✅ StoreTemplate (3 tabs) | - |
-| **Store Cockpit** | - | - | ✅ StoreCockpitPage |
-| **지원** | - | ✅ SupportPage | ✅ SupportPage |
-| **설정** | - | ✅ SettingsPage | ✅ SettingsPage |
-| **Market Trial** | - | ✅ TrialSelector | - |
+| 기능 | KPA | K-Cosmetics |
+| ------ | :---: | :-----------: |
+| **회원 관리** | ✅ MemberManagement | ✅ UsersPage |
+| **회원 승인** | ✅ PharmacyRequest | ✅ Applications |
+| **매장 관리** | - (Branch 구조) | ✅ StoresPage |
+| **매장 승인** | - | - |
+| **상품 관리** | ✅ ProductApplication | ✅ ProductsPage |
+| **주문 관리** | - | ✅ OrdersPage |
+| **포럼 관리** | ✅ ForumManagement | - |
+| **콘텐츠 관리** | ✅ ContentManagement | - |
+| **사이니지** | ✅ Signage (6 pages) | ✅ Signage (6 pages) |
+| **정산** | - | ✅ Settlements |
+| **재고** | - | ✅ InventoryPage |
+| **마케팅** | - | ✅ MarketingPage |
+| **분석** | ✅ ForumAnalytics | ✅ AnalyticsPage |
+| **AI 리포트** | ✅ OperatorAiReport | ✅ AiReportPage |
+| **감사 로그** | ✅ AuditLogPage | - |
+| **법률 관리** | ✅ LegalManagement | - |
+| **운영자 관리** | ✅ OperatorManagement | - |
+| **매장 템플릿** | - | - |
+| **Store Cockpit** | - | ✅ StoreCockpitPage |
+| **지원** | - | ✅ SupportPage |
+| **설정** | - | ✅ SettingsPage |
+| **Market Trial** | - | - |
 
 ---
 
@@ -221,27 +185,6 @@
 /store/:slug/blog/:postSlug → Blog Post Detail
 ```
 
-#### GlycoPharm (`/store`)
-
-```
-/store                     → StoreEntryPage
-/store/hub                 → StoreOverviewPage
-/store/assets              → StoreAssetsPage
-/store/channels            → StoreChannelsPage
-/store/billing             → StoreBillingPage
-/store/settings            → Settings
-```
-
-**Consumer Storefront (Pharmacy):**
-```
-/store/:pharmacyId         → StoreFront
-/store/:pharmacyId/products → StoreProducts
-/store/:pharmacyId/products/:id → StoreProductDetail
-/store/:pharmacyId/cart    → StoreCart
-/store/:pharmacyId/kiosk   → KioskLayout
-/store/:pharmacyId/tablet  → TabletLayout
-```
-
 #### K-Cosmetics (`/store`)
 
 ```
@@ -270,18 +213,18 @@
 
 ### 6.1 Capability 매트릭스
 
-| Capability Key | 설명 | KPA | GlycoPharm | K-Cosmetics | GlucoseView |
-|---------------|------|:---:|:----------:|:-----------:|:-----------:|
-| `B2C_COMMERCE` | E-commerce 스토어 | ✅ | ✅ | ✅ | - |
-| `TABLET` | 태블릿 디스플레이 | - | ✅ | - | - |
-| `KIOSK` | POS 키오스크 | - | ✅ | - | - |
-| `QR_MARKETING` | QR 코드 마케팅 | ✅ | - | - | - |
-| `POP_PRINT` | POP 인쇄물 | ✅ | - | - | - |
-| `SIGNAGE` | 디지털 사이니지 | ✅ | ✅ | - | - |
-| `BLOG` | 블로그/콘텐츠 | ✅ | ✅ | ✅ | - |
-| `LIBRARY` | 자산 라이브러리 | ✅ | ✅ | ✅ | - |
-| `AI_CONTENT` | AI 콘텐츠 | - | - | - | - |
-| `LOCAL_PRODUCTS` | 지역 상품 | - | ✅ | - | - |
+| Capability Key | 설명 | KPA | K-Cosmetics | GlucoseView |
+| --------------- | ------ | :---: | :-----------: | :-----------: |
+| `B2C_COMMERCE` | E-commerce 스토어 | ✅ | ✅ | - |
+| `TABLET` | 태블릿 디스플레이 | - | - | - |
+| `KIOSK` | POS 키오스크 | - | - | - |
+| `QR_MARKETING` | QR 코드 마케팅 | ✅ | - | - |
+| `POP_PRINT` | POP 인쇄물 | ✅ | - | - |
+| `SIGNAGE` | 디지털 사이니지 | ✅ | - | - |
+| `BLOG` | 블로그/콘텐츠 | ✅ | ✅ | - |
+| `LIBRARY` | 자산 라이브러리 | ✅ | ✅ | - |
+| `AI_CONTENT` | AI 콘텐츠 | - | - | - |
+| `LOCAL_PRODUCTS` | 지역 상품 | - | - | - |
 
 **Default Capabilities** (매장 생성 시 자동 활성화):
 - `B2C_COMMERCE`, `QR_MARKETING`, `POP_PRINT`
@@ -381,8 +324,6 @@ KPA_SOCIETY_STORE_CONFIG = {
   ]
 }
 
-// GlycoPharm — 전체 8개 메뉴
-GLYCOPHARM_STORE_CONFIG = {
   basePath: '/store',
   enabledMenus: ['dashboard', 'products', 'channels', 'orders',
                  'content', 'signage', 'billing', 'settings']
@@ -408,16 +349,16 @@ GLUCOSEVIEW_STORE_CONFIG = {
 
 ### 9.1 커뮤니티 기능 비교
 
-| 기능 | KPA Society | GlycoPharm | K-Cosmetics |
-|------|:-----------:|:----------:|:-----------:|
-| **Forum** | ✅ forum-core + forum-yaksa | ✅ forum-core + forum-pharmacy | ✅ forum-core + forum-cosmetics |
-| **LMS/강좌** | ✅ lms-core + lms-yaksa (학점 관리) | ✅ EducationPage | - |
-| **News** | ✅ NewsListPage, GalleryPage | - | - |
-| **Blog** | ✅ Store Blog | ✅ Store Blog | - |
-| **Events** | ✅ EventsHomePage | - | - |
-| **Participation** | ✅ Surveys/Quizzes | - | - |
-| **Care/Health** | - | ✅ CareDashboard (AI Chat) | - |
-| **Content Hub** | ✅ ContentManagement | - | ✅ Hub |
+| 기능 | KPA Society | K-Cosmetics |
+| ------ | :-----------: | :-----------: |
+| **Forum** | ✅ forum-core + forum-yaksa | ✅ forum-core + forum-cosmetics |
+| **LMS/강좌** | ✅ lms-core + lms-yaksa (학점 관리) | - |
+| **News** | ✅ NewsListPage, GalleryPage | - |
+| **Blog** | ✅ Store Blog | - |
+| **Events** | ✅ EventsHomePage | - |
+| **Participation** | ✅ Surveys/Quizzes | - |
+| **Care/Health** | - | - |
+| **Content Hub** | ✅ ContentManagement | ✅ Hub |
 
 ### 9.2 Forum 아키텍처
 
@@ -538,10 +479,6 @@ kpa-b:district-admin     — KPA 데모 (deprecated)
 kpa-c:admin              — KPA Branch 관리자
 kpa-c:operator           — KPA Branch 운영자
 
-// GlycoPharm
-glycopharm:admin         — GlycoPharm 관리자
-glycopharm:operator      — GlycoPharm 운영자
-
 // K-Cosmetics
 cosmetics:admin          — K-Cosmetics 관리자
 cosmetics:operator       — K-Cosmetics 운영자
@@ -567,10 +504,10 @@ glucoseview:admin / operator — GlucoseView
 
 | 항목 | 현상 | 개선 방향 |
 |------|------|---------|
-| **Route prefix** | KPA `/operator`, GlycoPharm `/admin`, K-Cos `/operator` | 통일 필요 (`/operator` 표준) |
+| **Route prefix** | KPA `/operator` `/admin`, K-Cos `/operator` | 통일 필요 (`/operator` 표준) |
 | **Operator Layout** | KPA: BranchOperatorLayout, 나머지: App.tsx lazy | 공통 OperatorLayout 추출 |
-| **Config 패턴** | GlycoPharm/K-Cos: operatorConfig.ts, KPA: 없음 | 공통 operatorConfig 패턴 |
-| **기능 격차** | GlycoPharm 37페이지 vs KPA 18페이지 | 기능 표준 정의 필요 |
+| **Config 패턴** | K-Cos: operatorConfig.ts, KPA: 없음 | 공통 operatorConfig 패턴 |
+| **기능 격차** | — | 기능 표준 정의 필요 |
 | **Guard 패턴** | 3개 서비스 각각 다른 Guard 사용 | 공통 OperatorGuard 추출 |
 | **Store Config** | KPA: menuSections (커스텀), 나머지: enabledMenus | 통일 필요 |
 
@@ -588,7 +525,7 @@ glucoseview:admin / operator — GlucoseView
 
 ### WO-O4O-OPERATOR-DASHBOARD-STANDARD-V1 설계를 위한 핵심 결정 사항
 
-1. **Operator Route 표준**: `/operator` 통일 (GlycoPharm `/admin` → `/operator` 마이그레이션)
+1. **Operator Route 표준**: `/operator` 통일
 2. **공통 Operator Layout**: `@o4o/operator-ux-core` 기반 OperatorLayout 추출
 3. **필수 기능 정의**: 모든 서비스 최소 제공 기능 세트 결정
 4. **선택 기능 정의**: 서비스별 추가 기능 (Capability 시스템과 연동)
@@ -599,7 +536,6 @@ glucoseview:admin / operator — GlucoseView
 ```
 Phase 1: Standard 문서 작성 (이 보고서 기반)
 Phase 2: KPA-a 적용 (가장 작은 범위)
-Phase 3: GlycoPharm 적용 (가장 큰 범위)
 Phase 4: K-Cosmetics 적용
 Phase 5: KPA-b, KPA-c 적용
 ```
@@ -616,10 +552,6 @@ services/web-kpa-society/src/pages/operator/KpaOperatorDashboard.tsx
 services/web-kpa-society/src/routes/OperatorRoutes.tsx
 services/web-kpa-society/src/routes/BranchOperatorRoutes.tsx
 services/web-kpa-society/src/api/operator.ts
-
-# GlycoPharm
-services/web-glycopharm/src/pages/operator/GlycoPharmOperatorDashboard.tsx
-services/web-glycopharm/src/pages/operator/operatorConfig.ts
 
 # K-Cosmetics
 services/web-k-cosmetics/src/pages/operator/KCosmeticsOperatorDashboard.tsx

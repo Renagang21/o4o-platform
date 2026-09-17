@@ -118,7 +118,7 @@ Artifact Registry 에서 **KEEP 규칙은 DELETE 규칙보다 우선**하므로,
 | `api-server` | o4o-api | 353 | **1위** | O |
 | `admin-dashboard` | o4o-api | 145 | **1위** | O |
 | `glucoseview-web` | gcr.io | 30 | **1위** | O |
-| `glycopharm-web` · `k-cosmetics-web` · `kpa-branch-web` · `kpa-society-web` · `neture-web` · `pharmacy-hub-web` · `signage-player-web` | gcr.io | 25~154 | 전부 **최신 배포(1위)** | O |
+| `k-cosmetics-web` · `kpa-branch-web` · `kpa-society-web` · `neture-web` · `pharmacy-hub-web` · `signage-player-web` | gcr.io | 25~154 | 전부 **최신 배포(1위)** | O |
 
 **모든 active digest 가 자기 package 의 1위**다 → `keepCount=10` 으로 **삭제 불가능**이 보장된다.
 (WO §28 의 "Artifact policy 가 active digest 삭제 가능" 중지 조건 **해당 없음**)
@@ -250,7 +250,6 @@ D축을 실행하지 않았지만 A·C축 변경 후 TLS 정상성을 확인했�
 | `neture.co.kr` | **200** | OK |
 | `kpa-society.co.kr` | **200** | OK |
 | `k-cosmetics.site` | **200** | OK |
-| `glycopharm.co.kr` | **200** | OK |
 | `pharmacyhub.co.kr` | **200** | OK |
 | `glucoseview.co.kr` | **200** | OK |
 

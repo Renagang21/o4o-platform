@@ -193,7 +193,7 @@ ProductMaster.representative_product_id  uuid  NULL  FK → representative_produ
 - 현재 등록은 단일 모달, 백엔드 필수 검증은 `name`뿐. 이미지·설명·바코드·가격 없어도 등록 가능 → "빈 필드 허용" 원칙에 이미 부합.
 - 표준상품 연결 FK 전무(백지). Domain 경계 보증은 `ecommerce_order_items/organization_product_listings/organization_product_channels` 참조만 금지 → `product_masters`/`representative_products` 참조 nullable FK 추가는 **경계 위반 아님**. 단 1차에서는 추가하지 않고 후속 WO로 검토.
 - 매장 자체 제품의 온라인몰/상품설명 채널은 `not_supported` 고정(Display Domain). 주문가능 상품(`OrganizationProductListing`)과 구조적으로 완전 분리, 섞이는 곳은 읽기전용 `handled-products` UNION 한 곳뿐.
-- **GP/KCos 공통 폼 격차**: 바코드 입력·RichTextEditor·MediaPicker·콘텐츠 가져오기가 KPA 전용. 표준상품 검색을 3사 공통화하려면 Shared Module Change Protocol 적용 필요(§16 유보 5).
+- **KCos 공통 폼 격차**: 바코드 입력·RichTextEditor·MediaPicker·콘텐츠 가져오기가 KPA 전용. 표준상품 검색을 3사 공통화하려면 Shared Module Change Protocol 적용 필요(§16 유보 5).
 
 ---
 
@@ -318,7 +318,7 @@ ProductMaster.representative_product_id  uuid  NULL  FK → representative_produ
 2. **묶음의약품 대표 품목기준코드 ↔ O4O 대표상품 개념 완전 일치 여부** — 공공데이터 묶음 기준은 "성분 유사", O4O는 "동일제품 다른포장" → 정제 규칙 필요.
 3. **`representative_products.thumbnail_image_id`를 둘지 vs 멤버 ProductImage fallback만** — 대표상품 전용 썸네일 컬럼 보유 여부 결정 유보.
 4. **StoreLocalProduct에 `representative_product_id`만 둘지 vs `master_id`도 둘지** — 콘텐츠 정합(대표상품)과 실물/바코드 정합(포장단위) 중 어디까지 연결할지.
-5. **GP/KCos까지 표준상품 검색 공통화 vs KPA 우선** — 공통 폼 기능 격차(바코드/RichTextEditor/MediaPicker) → Shared Module Change Protocol 적용 대상.
+5. **KCos까지 표준상품 검색 공통화 vs KPA 우선** — 공통 폼 기능 격차(바코드/RichTextEditor/MediaPicker) → Shared Module Change Protocol 적용 대상.
 6. **`SharedProductDescription`을 매장 활용 참고 콘텐츠에 어떻게 연결할지** — master 기준 전용 엔티티이며 명시적으로 StoreLocalProduct 대상 아님(주석) → 끌어오기 금지, 연결 방식 별도 설계.
 
 ---

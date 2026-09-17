@@ -12,7 +12,7 @@
 | `apps/api-server/src/entities/Notification.ts` | NotificationType에 `store.online_sales_order_created` 추가 |
 | `apps/api-server/src/routes/kpa/controllers/kpa-checkout.controller.ts` | 주문 생성 commit 직후 매장 경영자 in-app 알림 생성(best-effort) + `notificationService` import |
 
-- DB/migration **무변경**(기존 `notifications` 구조·`NotificationService.createNotification` 재사용). checkout/결제 로직 무변경. 프론트 무변경. GP/KCos 무변경.
+- DB/migration **무변경**(기존 `notifications` 구조·`NotificationService.createNotification` 재사용). checkout/결제 로직 무변경. 프론트 무변경. KCos 무변경.
 
 ## 2. 알림 생성 위치
 
@@ -49,9 +49,9 @@
 - 프론트 무변경. `KpaGlobalHeader.handleNotificationClick`이 `metadata.targetUrl`을 읽어 **내부 path만 허용**(외부 `//`·`http(s)://` 차단)하고 `navigate(target)` → `/store/online-sales/orders/:id` 정상 이동. 공개 storefront(`/store/:slug`)로 이동 불가(가드).
 - 선행 상담요청 알림이 동일 경로로 동작 중 → 본 알림도 동일 인프라.
 
-## 9. GP/KCos 무변경
+## 9. KCos 무변경
 
-- 변경은 KPA checkout 경로(`kpa-checkout.controller`)와 공통 `Notification` 타입 추가(additive)만. GP/KCos checkout·notification 경로 무변경.
+- 변경은 KPA checkout 경로(`kpa-checkout.controller`)와 공통 `Notification` 타입 추가(additive)만. KCos checkout·notification 경로 무변경.
 
 ## 10. 테스트/빌드/smoke
 
@@ -73,4 +73,4 @@
 
 ## 결론
 
-온라인 스토어 신규 판매 주문 접수 시 매장 경영자에게 in-app 알림을 생성하고, 클릭 시 내부 주문 상세로 이동하도록 연결. **주문 생성은 알림 실패와 완전 격리**(commit 후 fire-and-forget). 개인정보 미노출, 내부 경로 전용 이동, backend/DB/결제/GP/KCos 무영향. 실주문 e2e만 환경 제약으로 보류.
+온라인 스토어 신규 판매 주문 접수 시 매장 경영자에게 in-app 알림을 생성하고, 클릭 시 내부 주문 상세로 이동하도록 연결. **주문 생성은 알림 실패와 완전 격리**(commit 후 fire-and-forget). 개인정보 미노출, 내부 경로 전용 이동, backend/DB/결제/KCos 무영향. 실주문 e2e만 환경 제약으로 보류.

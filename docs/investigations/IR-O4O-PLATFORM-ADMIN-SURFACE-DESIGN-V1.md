@@ -58,13 +58,13 @@
 
 ## 5. 배포 / 도메인 영향
 
-- Cloud Run: `neture-web` / `glycopharm-web` / `k-cosmetics-web` / `kpa-society-web` + `o4o-core-api`. **별도 admin/platform 도메인·서비스 없음.**
+- Cloud Run: `neture-web` / `k-cosmetics-web` / `kpa-society-web` + `o4o-core-api`. **별도 admin/platform 도메인·서비스 없음.**
 - Neture admin = `neture.co.kr/admin`(동일 SPA). `admin.neture.co.kr` 별도 frontend 부재.
 - `web-account`(account-web) 앱 존재(빌드 가능, 최소 계정 대시보드) — 배포 목록 미기재. **모노레포가 추가 앱을 수용한다는 선례**(C 실현 가능성 근거)이나 현재 platform-admin 아님.
 
 ## 6. 공유 `OperatorGroupKey` 확장 필요 여부
 
-- 고정 13-key enum(`packages/ui/operator-shell/types.ts`) + `STANDARD_GROUPS`(label/icon). 4 서비스(GP/KCos/KPA/Neture) operator shell 이 소비.
+- 고정 13-key enum(`packages/ui/operator-shell/types.ts`) + `STANDARD_GROUPS`(label/icon). 3 서비스(KCos/KPA/Neture) operator shell 이 소비.
 - "플랫폼 관리" **정식 group key** 추가 = packages/ui shared 변경 → 4 소비처 영향(optional/backward-compat 가능하나 contract 변경 + Shared Module Protocol 검증 ×4).
 - **B(별도 section/layout)는 자체 route+layout 이라 OperatorGroupKey 확장 불필요** — shared 변경 회피.
 

@@ -23,7 +23,7 @@
 |---|---|---|
 | A. active Handoff (generate + exchange) | ✅ **PASS** | kpa-society active → 토큰 발급 + exchange 성공 (`Handoff successful`) |
 | **B. pending 차단** | ✅ **PASS 2/2** | neture / k-cosmetics pending 양쪽 모두 `HANDOFF_TARGET_NOT_ACTIVE` (403) |
-| **C. 미가입 차단** | ✅ **PASS 3/3** | glycopharm / neture / k-cosmetics 미가입 모두 `HANDOFF_TARGET_NO_MEMBERSHIP` (403) |
+| **C. 미가입 차단** | ✅ **PASS 3/3** | neture / k-cosmetics 미가입 모두 `HANDOFF_TARGET_NO_MEMBERSHIP` (403) |
 | D. withdrawn 차단 | ⏭ SKIP | 데이터 부재 — 코드 경로 동일 |
 | E. rejected / suspended 차단 | ⏭ SKIP | 데이터 부재 — 코드 경로 동일 (`!= 'active'` 분기로 흡수) |
 | **F. Service Join 회귀** | ✅ **PASS** | 신규 pending → `requestSubmitted=true`, 재요청 pending → `requestSubmitted=false` |
@@ -103,7 +103,7 @@
 
 | 계정 | 용도 | 상태 |
 |---|---|---|
-| `handoff-v2-20260524-094515@example.test` (신규 disposable) | A/B/C/F 시나리오 | KPA active (Rena 운영자 승인), neture/k-cosmetics pending (B 검증용 setup), glycopharm 미가입 (C 검증용) |
+| `handoff-v2-20260524-094515@example.test` (신규 disposable) | A/B/C/F 시나리오 | KPA active (Rena 운영자 승인), neture/k-cosmetics pending (B 검증용 setup) 미가입 (C 검증용) |
 
 User ID: `34bd2682-3c19-40c5-ae31-37159ffaf30b`
 
@@ -139,7 +139,7 @@ User ID: `34bd2682-3c19-40c5-ae31-37159ffaf30b`
 
 | # | Step | Expected | Actual | 결과 |
 |---|---|---|---|:---:|
-| C-1 | `POST /auth/handoff { targetServiceKey: 'glycopharm' }` (미가입) | 403 `HANDOFF_TARGET_NO_MEMBERSHIP` | `{success:false, error:'대상 서비스에 가입되어 있지 않습니다.', code:'HANDOFF_TARGET_NO_MEMBERSHIP'}` | ✅ |
+| C-1 | — | 403 `HANDOFF_TARGET_NO_MEMBERSHIP` | `{success:false, error:'대상 서비스에 가입되어 있지 않습니다.', code:'HANDOFF_TARGET_NO_MEMBERSHIP'}` | ✅ |
 | C-2 | `POST /auth/handoff { targetServiceKey: 'neture' }` (가입 전) | 403 `HANDOFF_TARGET_NO_MEMBERSHIP` | 동일 | ✅ |
 | C-3 | `POST /auth/handoff { targetServiceKey: 'k-cosmetics' }` (가입 전) | 403 `HANDOFF_TARGET_NO_MEMBERSHIP` | 동일 | ✅ |
 
@@ -224,8 +224,6 @@ User ID: `34bd2682-3c19-40c5-ae31-37159ffaf30b`
 
 ### 9.3 본 WO 가 드러낸 별건 후속
 
-- `IR-O4O-GLYCOPHARM-OPERATOR-USERS-400-AUDIT-V1` — 본 검증 중 발견된 GlycoPharm `/operator/users` 400 에러 (본 WO 와 분리, 향후 별건 조사)
-
 ### 9.4 V2 doc 정정 (옵션)
 
 [O4O-IDENTITY-ARCHITECTURE-V2.md §7.2](../architecture/O4O-IDENTITY-ARCHITECTURE-V2.md#L213) 의 표현:
@@ -280,7 +278,6 @@ curl -X POST "$BASE/auth/handoff/exchange" \
   -d '{"token":"<token from above>"}'
 
 # C: 미가입 차단
-for svc in glycopharm neture k-cosmetics; do
   curl -X POST "$BASE/auth/handoff" -b sess.txt \
     -H "Content-Type: application/json" \
     -d "{\"targetServiceKey\":\"$svc\"}"

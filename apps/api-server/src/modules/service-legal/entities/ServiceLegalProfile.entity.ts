@@ -31,7 +31,7 @@ export class ServiceLegalProfile {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  /** neture | glycopharm | kpa-society | k-cosmetics (service-catalog canonical key) */
+  /** neture | kpa-society | k-cosmetics (service-catalog canonical key) */
   @Column({ type: 'varchar', length: 50, unique: true })
   service_key!: string;
 

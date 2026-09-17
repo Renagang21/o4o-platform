@@ -58,4 +58,4 @@ KPA 매장 자료함 `/store/library/contents` 의 "매장 제작 자료"(origin
 ## 후속
 
 - snapshot 편집은 별도 `WO-O4O-KPA-STORE-LIBRARY-SNAPSHOT-COPY-BEFORE-EDIT-V1` (복사해서 편집 + QR 정책).
-- GP/K-Cosmetics parity: 본 변경은 KPA mount(StoreContentsSelector)·공용 컨트롤러 기반. 컨트롤러 GET 은 3서비스 공통이나 액션 라벨/route 는 web-kpa-society 전용 → GP/KCos 무영향, parity 는 후속 후보.
+- K-Cosmetics parity: 본 변경은 KPA mount(StoreContentsSelector)·공용 컨트롤러 기반. 컨트롤러 GET 은 2서비스 공통이나 액션 라벨/route 는 web-kpa-society 전용 → KCos 무영향, parity 는 후속 후보.

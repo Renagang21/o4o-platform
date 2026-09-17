@@ -54,7 +54,7 @@ window.confirm 은 동기 blocking → 상태기반 defer 패턴(대상 보관 �
   내부 저장소 문서 경로 `docs/guides/O4O-SUPPLY-CATALOG-APPROVAL-FLOW-GUIDE-V1.md` 를 `<code>` 로 사용자 노출하던 지점 → **사용자 안내 문구로 대체**.
 - 조사 결과 **레코드별 파일/버킷/서버 경로 노출 없음**: 리스트/드로어 컬럼(org·product_name·supplier·price·category·status·reason)에 raw path 필드 부재,
   API(`GET /kpa/operator/product-applications`) 응답에도 storage/bucket/server 경로 컬럼 없음 → **보안 민감 경로 노출 0**. 정적 안내 파일명 1건만 제거.
-- 공유 모듈(KPA/GlycoPharm/Cosmetics/Neture operator 공통) — 정적 안내 텍스트 변경, 회귀 위험 없음.
+- 공유 모듈 — 정적 안내 텍스트 변경, 회귀 위험 없음.
 
 ## 4. KPI·메뉴 용어 정합 (영역 4)
 

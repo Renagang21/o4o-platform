@@ -44,7 +44,7 @@
 ## 6. Neture B2B 정산 상태
 - neture_orders 는 created 로 생성, payment_method/key/paid_at 미설정. status 전이(updateOrderStatus)에 **결제 확인 게이트 없음** → delivered 도달 가능. 정산은 delivered 만으로 집계.
 - **판정**: 이는 **의도된 offline/invoice 후불 도매 모델**(WO-O4O-SETTLEMENT-ENGINE-V1, F8 Distribution Engine freeze 영역). 즉 B2B 는 "delivered = 수금 책임 발생(후불 청구)" 운영 합의. **online PG checkout_orders 에 같은 기준을 적용하면 안 됨**(checkout 은 선결제 모델인데 미수금 상태).
-- **RISK(별도 버그)**: KPA B2C 는 `/kpa/payments/confirm`(Toss)로 paid 전환 가능하나 **KPA payment event handler 미초기화**(Glyco 는 있음, register-routes) → Toss 성공해도 checkout_orders.paymentStatus=pending 잔존. checkout 기반 정산 도입 전 **선결 수정 필요**.
+- **RISK(별도 버그)**: KPA B2C 는 `/kpa/payments/confirm`(Toss)로 paid 전환 가능하나 **KPA payment event handler 미초기화** → Toss 성공해도 checkout_orders.paymentStatus=pending 잔존. checkout 기반 정산 도입 전 **선결 수정 필요**.
 
 ## 7. sourceType / pricingSource 원칙 확인
 - 정산 코드에 sourceType/pricingSource 분기 **없음**(neture_order_items 엔 sourceType 자체가 없음). 정산 분기 기준은 **원장(neture vs checkout)** 과 **status='delivered'** 뿐. → 원칙 부합. 통일 기준은 collection readiness 여야 함.

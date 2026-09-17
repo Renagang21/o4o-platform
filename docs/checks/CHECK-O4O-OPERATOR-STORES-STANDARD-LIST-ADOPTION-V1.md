@@ -12,7 +12,6 @@
 - 공통 컴포넌트: `packages/operator-core-ui/src/modules/stores/OperatorStoresList.tsx`
 - **4앱 `/operator/stores` 모두 이 컴포넌트 사용** → 단일 변경 4앱 전파:
   - neture `pages/operator/StoreManagementPage.tsx`
-  - glycopharm `pages/operator/StoresPage.tsx`
   - kpa-society `pages/operator/OperatorStoresPage.tsx`
   - k-cosmetics `pages/operator/StoresPage.tsx`
 - 각 앱 wrapper(StoresApi adapter + config 주입)는 **무변경** — 공통 컴포넌트 내부만 전환.
@@ -74,7 +73,7 @@
 
 ## 11. legacy `/operator/pharmacies` 미접촉
 
-- pharmacies 관련 파일 **변경 0**(`git diff` 확인). 표준화 대상 아님(glycopharm legacy, backend stub). 기능 개선/신규 연결/표준 적용 **미수행**.
+- pharmacies 관련 파일 **변경 0**(`git diff` 확인). 표준화 대상 아님. 기능 개선/신규 연결/표준 적용 **미수행**.
 
 ## 12. 검증
 

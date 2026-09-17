@@ -154,7 +154,7 @@ LIVE writer 를 UI 에서 없애면 실제 운영 경로가 사라지므로 이�
 |---|---|
 | `@o4o/api-server` type-check | PASS |
 | `type-check:frontend` (6서비스) | **OK** |
-| build — KPA · K-Cosmetics · GlycoPharm · PharmacyHub | **4/4 OK** |
+| build — KPA · K-Cosmetics · PharmacyHub | **4/4 OK** |
 | 신규 `tablet-product-list-contract.spec` | **15/15 PASS** |
 | 갱신된 `kpa-tablet-generation-consolidation-contract.spec` | **19/19 PASS** |
 | tablet 회귀 5스위트 | **55/55 PASS** |
@@ -198,7 +198,7 @@ QR 뷰어가 local 상품 가격을 `price_display` 원시 문자열(`"6500.00"`
 | 3 | `store_tablet_displays` A/C 제거 필요 | 미해당 — 유지 |
 | 4 | public URL breaking | 미해당 — URL·shape 불변 |
 | 5 | 운영 데이터 write 없이 판단 불가 | 미해당 — 읽기 실측으로 전건 판정 |
-| 6 | 공통 package 변경이 KCos/GP breaking | 미해당 — 두 서비스 build OK · `store-ui-core` 무변경 |
+| 6 | 공통 package 변경이 KCos breaking | 미해당 — 서비스 build OK · `store-ui-core` 무변경 |
 | 7 | 다른 세션 파일 충돌 | 미해당 |
 
 ---
@@ -220,7 +220,7 @@ QR 뷰어가 local 상품 가격을 `price_display` 원시 문자열(`"6500.00"`
 | TABLET OPERATION COMMON CORE | **IMPLEMENTED** (`TabletCornerBoard`) |
 | KPA CANONICAL ADOPTION | **PASS** (-63 LOC · 표시 회귀 0) |
 | KPA PRODUCTION E2E | **PASS** |
-| KCOS/GP LEGACY CORE REGRESSION | **PASS** (build OK · `store-ui-core` 무변경) |
+| KCOS LEGACY CORE REGRESSION | **PASS** (build OK · `store-ui-core` 무변경) |
 
 → `WO-O4O-TABLET-PRODUCT-LIST-CONTRACT-AND-OPERATION-CORE-KPA-ADOPTION-V1` = **CLOSED**
 

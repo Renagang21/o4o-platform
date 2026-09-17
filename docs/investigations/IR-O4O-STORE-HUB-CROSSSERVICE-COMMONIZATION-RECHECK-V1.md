@@ -2,7 +2,7 @@
 
 > **Type:** IR (read-only 재조사)
 > **Date:** 2026-06-11
-> **Scope:** KPA / GlycoPharm / K-Cosmetics 3개 Store 서비스의 Store Hub 영역 공통화 완료 상태 전체 재점검
+> **Scope:** KPA / K-Cosmetics 3개 Store 서비스의 Store Hub 영역 공통화 완료 상태 전체 재점검
 > **수정 파일:** 없음 (read-only)
 
 ---
@@ -14,8 +14,7 @@
 
 **핵심 결론(요약):**
 - **Store Hub 골격(route/menu/경계)·backend asset contract 는 이미 공통·service-neutral 하게 완료.** Neture 비대상 정상.
-- **최대 편차는 frontend 제작 자료(StoreProductionMaterials) parity** — KPA(Phase 1, 1039줄, 4소스 병합+cross-create) vs GP/KCos(Phase 2-D, 311–313줄, executionAssets 단일). **backend 는 동등 지원** → frontend-only uplift WO 로 닫을 수 있음.
-- **2개 실(實)결함**: ① GP `SignagePreviewPage` live-routed **mock surface**(E), ② derivation **read 엔드포인트 serviceKey 필터 누락**(F, 경계 드리프트).
+- **최대 편차는 frontend 제작 자료(StoreProductionMaterials) parity** — KPA(Phase 1, 1039줄, 4소스 병합+cross-create) vs KCos(Phase 2-D, 311–313줄, executionAssets 단일). **backend 는 동등 지원** → frontend-only uplift WO 로 닫을 수 있음.
 
 ---
 
@@ -36,7 +35,6 @@
 | 서비스 | 대상 | 비고 |
 |--------|:---:|------|
 | KPA-Society | ✅ Store Hub (reference impl) | `/store-hub` + `pages/pharmacy/StoreHubPage.tsx` |
-| GlycoPharm | ✅ Store Hub | `/store-hub` + `pages/hub/StoreHubPage.tsx` |
 | K-Cosmetics | ✅ Store Hub | `/store-hub` + `pages/hub/KCosmeticsHubPage.tsx` |
 | **Neture** | ❌ **비대상** | supplier/partner/operator 중심. Store Hub route·menu·backend mount **없음**(정상) |
 
@@ -46,7 +44,7 @@
 
 Store Hub 메뉴는 **공통 config** `packages/store-ui-core/src/config/storeMenuConfig.ts` 로 통일 관리(서비스별 config 객체).
 
-| Store Hub 항목 | route | KPA | GP | KCos |
+| Store Hub 항목 | route | KPA | KCos |
 |----------------|-------|:---:|:--:|:----:|
 | Hub home | `/store-hub` (index) | ✅ | ✅ | ✅ |
 | B2B 카탈로그 | `/store-hub/b2b` | ✅ | ✅ | ✅ |
@@ -58,14 +56,14 @@ Store Hub 메뉴는 **공통 config** `packages/store-ui-core/src/config/storeMe
 | 이벤트 오퍼 | `/store-hub/event-offers` | ✅ | ✅ | ✅ |
 | 장바구니 | `/store-hub/cart` | ✅ | ✅ | ✅ |
 
-근거: KPA `App.tsx:686+`, GP `App.tsx:631+`, KCos `App.tsx:542+`; 메뉴 config `storeMenuConfig.ts:97–287`.
+근거: KPA `App.tsx:686+` `App.tsx:631+`, KCos `App.tsx:542+`; 메뉴 config `storeMenuConfig.ts:97–287`.
 
 **route/menu 불일치:**
 - KCos "매출 요약" 메뉴 label `/store/billing` → 실제 `/commerce/billing` 라우팅(의도적 alias, dead 아님). **표기 정합성만 점검 필요(경미).**
 - KCos "자체 상품"(`/commerce/local-products`)은 route 有·menu 의도적 제외(dead link 방지).
 - 그 외 dead menu(route 없는 메뉴)·고아 route 미발견.
 
-→ Store Hub route/menu 골격 **A(공통 완료)**. guard: KPA `HubGuard`, GP `GlycoHubGuard`, KCos `RoleGuard(allowedRoles)` — 형태 다르나 경계 동등.
+→ Store Hub route/menu 골격 **A(공통 완료)**. guard: KPA `HubGuard` KCos `RoleGuard(allowedRoles)` — 형태 다르나 경계 동등.
 
 ---
 
@@ -79,23 +77,10 @@ Store Hub 메뉴는 **공통 config** `packages/store-ui-core/src/config/storeMe
 
 ---
 
-## 6. GlycoPharm Store Hub 조사 결과
-
-- Hub home(`pages/hub/StoreHubPage.tsx`) + Hub 9항목 ✅.
-- `StoreProductionMaterialsPage.tsx` **313줄** — **executionAssets 단일 소스(Phase 2-D)**. direct content 병합·QR/blog 목록·cross-create **없음**. derivation viewer 는 **POP 한정**.
-- POP/QR/Blog/Signage 실행 화면 존재(공통 컴포넌트 사용).
-- **결함(E): `pages/store-management/signage/SignagePreviewPage.tsx`** — `mockPlaylist`/`mockChannels` 하드코딩(YouTube/Neture mock). **live-routed**(`App.tsx:791` `signage/preview`, `App.tsx:947` `marketing/signage/preview`). GP 전용(KPA/KCos 미존재).
-- 도메인 추가: "약국 경영/정산" 그룹(My Store 영역, 도메인 차이로 유지 — I).
-
----
-
 ## 7. K-Cosmetics Store Hub 조사 결과
 
 - Hub home(`pages/hub/KCosmeticsHubPage.tsx`, `StoreHubTemplate` 기반) + Hub 9항목 ✅.
-- `StoreProductionMaterialsPage.tsx` **311줄** — GP 와 동일 **executionAssets 단일(Phase 2-D)**, cross-create·QR/blog·direct 병합 없음, derivation viewer POP 한정.
 - POP/QR/Blog/Signage 실행 화면 존재(공통 컴포넌트). mock surface 미발견.
-
-→ KCos ≈ GP 수준(제작 자료 thin, 나머지 parity).
 
 ---
 
@@ -114,7 +99,7 @@ Store Hub 메뉴는 **공통 config** `packages/store-ui-core/src/config/storeMe
 
 ## 9. 주요 기능별 parity 매트릭스
 
-| 기능 | KPA | GP | KCos | 분류 |
+| 기능 | KPA | KCos | 분류 |
 |------|:---:|:--:|:----:|:---:|
 | Store Hub home | ✅ | ✅ | ✅ | **A** |
 | Hub 9항목 route/menu | ✅ | ✅ | ✅ | **A** |
@@ -131,7 +116,7 @@ Store Hub 메뉴는 **공통 config** `packages/store-ui-core/src/config/storeMe
 
 ## 10. 제작 자료 / derivation viewer parity
 
-| 항목 | KPA(1039L) | GP(313L) | KCos(311L) |
+| 항목 | KPA(1039L) | KCos(311L) |
 |------|:---:|:---:|:---:|
 | 데이터 소스 | direct+execution+QR+blog (4) | executionAssets (1) | executionAssets (1) |
 | cross-create CTA | ✅ POP/QR/블로그/사이니지 | ❌ | ❌ |
@@ -140,13 +125,13 @@ Store Hub 메뉴는 **공통 config** `packages/store-ui-core/src/config/storeMe
 | empty/loading/error | ✅ | ✅ | ✅ |
 
 - 공통 컴포넌트 `@o4o/store-ui-core` `StoreAssetDerivationViewer`(read-only, endpoint 주입형)·`GuideBackLink` 는 **3서비스 공유**.
-- GP/KCos 의 thin 상태는 **frontend Phase 2-D 미완**(파일 주석에 "Phase 2-D 범위" 명시). **backend 는 이미 지원**(§14) → frontend-only uplift 가능.
+- KCos 의 thin 상태는 **frontend Phase 2-D 미완**(파일 주석에 "Phase 2-D 범위" 명시). **backend 는 이미 지원**(§14) → frontend-only uplift 가능.
 
 ---
 
 ## 11. POP / QR / Blog / Signage parity
 
-| 자산 | KPA | GP | KCos | 분류 |
+| 자산 | KPA | KCos | 분류 |
 |------|:---:|:--:|:----:|:---:|
 | POP | ✅ | ✅ | ✅ | B(UI 편차) |
 | QR | ✅ | ✅ | ✅ | B |
@@ -156,7 +141,7 @@ Store Hub 메뉴는 **공통 config** `packages/store-ui-core/src/config/storeMe
 - 공통 컴포넌트: `@o4o/store-ui-core`(GuideBackLink, production state parse), `@o4o/content-editor`(RichTextEditor, AiContentModal), `@o4o/ui`(DataTable/ActionBar/BulkResultModal).
 - serviceKey/organizationId 처리: 서비스별 context 추상화는 다르나 자산 CRUD 흐름 동일.
 - **Signage 제품 파생 오처리 없음** — asset snapshot 기반, Playlist 단일 재생 단위(정상).
-- **mock/dead**: GP `SignagePreviewPage`(§16). 그 외 no-op 미발견.
+- 그 외 no-op 미발견.
 
 ---
 
@@ -175,7 +160,7 @@ Store Hub 메뉴는 **공통 config** `packages/store-ui-core/src/config/storeMe
 
 ## 13. 공통 컴포넌트/wrapper 사용 현황
 
-| 컴포넌트 | KPA | GP | KCos | 위치 |
+| 컴포넌트 | KPA | KCos | 위치 |
 |----------|:---:|:--:|:----:|------|
 | `storeMenuConfig`(메뉴) | ✅ | ✅ | ✅ | `packages/store-ui-core` |
 | `StoreAssetDerivationViewer` | ✅ | ✅ | ✅ | `packages/store-ui-core` |
@@ -183,7 +168,7 @@ Store Hub 메뉴는 **공통 config** `packages/store-ui-core/src/config/storeMe
 | `StoreHubTemplate` | ✅ | ✅ | ✅ | 공통 |
 | 제작 자료 페이지 로직 | KPA 풍부 | thin | thin | 서비스별 로컬(복붙 아님, 단계 차이) |
 
-→ 공통 컴포넌트 인프라는 정렬됨. 제작 자료 페이지 **본문 로직만 KPA↔GP/KCos 비대칭**(공통화 여지 = C uplift).
+→ 공통 컴포넌트 인프라는 정렬됨. 제작 자료 페이지 **본문 로직만 KPA↔KCos 비대칭**(공통화 여지 = C uplift).
 
 ---
 
@@ -192,7 +177,7 @@ Store Hub 메뉴는 **공통 config** `packages/store-ui-core/src/config/storeMe
 | 항목 | 결과 |
 |------|------|
 | `store_execution_assets` controller | **service-neutral 단일** `createStoreExecutionAssetsController`(serviceKey 컬럼 없음, organizationId 격리) |
-| 3서비스 mount | ✅ `/kpa/store/assets`(`kpa.routes.ts:395`) · `/glycopharm/store/assets`(`glycopharm.routes.ts:388`) · `/cosmetics/store/assets`(`cosmetics.routes.ts:139`) |
+| 3서비스 mount | ✅ `/kpa/store/assets`(`kpa.routes.ts:395`) · `/cosmetics/store/assets`(`cosmetics.routes.ts:139`) |
 | `store_asset_derivations` write-path | ✅ 3서비스 가능 — POP/QR(`serviceKey ?? 'kpa'`), blog(serviceKey 직접). UNIQUE(service_key, org, source, derived) |
 | migration | 이미 신설(`20261103000000-CreateStoreAssetDerivations.ts`, 2026-06-05) → **DB 변경 불필요** |
 | Neture mount | ❌ 미마운트(정상) |
@@ -212,7 +197,7 @@ const qb = repo.createQueryBuilder('d')
 ## 15. UI-UX 공통성 확인
 
 - page header/back link/empty·loading·error/drawer·modal 패턴: 공통 컴포넌트 기반 대체로 정렬.
-- 편차: GP/KCos 제작 자료 본문 thin(§10), GP Signage preview mock(§16). Signage 서브페이지 loading 표준화는 서비스별 독립 구현(경미).
+- 편차: KCos 제작 자료 본문 thin(§10) Signage preview mock(§16). Signage 서브페이지 loading 표준화는 서비스별 독립 구현(경미).
 
 ---
 
@@ -220,9 +205,9 @@ const qb = repo.createQueryBuilder('d')
 
 | # | 위치 | 유형 | 도달성 | 분류 |
 |---|------|------|--------|:---:|
-| 1 | `web-glycopharm/.../signage/SignagePreviewPage.tsx:31-50` | `mockPlaylist`/`mockChannels` 하드코딩 | **live-routed**(`App.tsx:791`, `:947`) | **E** |
+| 1 | — | `mockPlaylist`/`mockChannels` 하드코딩 | **live-routed**(`App.tsx:791`, `:947`) | **E** |
 
-> GP 전용. KPA/KCos 동일 mock 없음. 운영자/매장이 도달 시 가짜 플레이리스트 노출(정직성 위반 소지).
+> KPA/KCos 동일 mock 없음. 운영자/매장이 도달 시 가짜 플레이리스트 노출(정직성 위반 소지).
 
 그 외 no-op action·"준비중 위장" 화면 미발견(POP/QR/Blog/Signage 실행 화면은 실 API 연결).
 
@@ -242,11 +227,11 @@ const qb = repo.createQueryBuilder('d')
 |:---:|------|
 | **A** 공통 완료 | Store Hub route/menu 골격, Hub home, 경계 분리, derivation viewer 컴포넌트, backend asset contract |
 | **B** UI 편차 | POP/QR/Blog/Signage 실행 화면 |
-| **C** KPA 풍부·GP/KCos 누락 | 제작 자료 multi-source 병합·cross-create·QR/blog 목록·derivation viewer 커버리지 |
+| **C** KPA 풍부·KCos 누락 | 제작 자료 multi-source 병합·cross-create·QR/blog 목록·derivation viewer 커버리지 |
 | **D** route/menu 불일치 | (경미) KCos billing label alias |
-| **E** mock/dead | GP `SignagePreviewPage` mock |
+| **E** mock/dead `SignagePreviewPage` mock |
 | **F** backend/API | derivation READ serviceKey 필터 누락 |
-| **G** My Store 영역 | GP "약국 경영/정산" 그룹(별도 축) |
+| **G** My Store 영역 "약국 경영/정산" 그룹(별도 축) |
 | **H** Neture 비대상 | 확인 — 미혼입 정상 |
 | **I** 도메인 유지 | 서비스별 guard 형태, 약국 경영 그룹 |
 
@@ -254,8 +239,8 @@ const qb = repo.createQueryBuilder('d')
 
 ## 19. 즉시 WO 가능한 후보 (frontend-only)
 
-1. **GP `SignagePreviewPage` mock 제거/실연결**(E) — live-routed mock 노출 차단. 실 API 연결 또는 "준비중" 정직 처리. 저위험.
-2. **GP/KCos 제작 자료 parity uplift(C)** — KPA 패턴(multi-source 병합 + cross-create + QR/blog 목록 + derivation viewer 확장)을 GP/KCos `StoreProductionMaterialsPage` 에 이식. **backend 이미 지원**(§14) → frontend-only. 중간 규모(서비스당 페이지 본문 확장).
+1. 실 API 연결 또는 "준비중" 정직 처리. 저위험.
+2. **KCos 제작 자료 parity uplift(C)** — KPA 패턴(multi-source 병합 + cross-create + QR/blog 목록 + derivation viewer 확장)을 KCos `StoreProductionMaterialsPage` 에 이식. **backend 이미 지원**(§14) → frontend-only. 중간 규모(서비스당 페이지 본문 확장).
 
 ## 20. backend/API 선행 후보
 
@@ -263,19 +248,18 @@ const qb = repo.createQueryBuilder('d')
 
 ## 21. 별도 My Store 채팅방으로 넘길 후보
 
-- GP "약국 경영/정산" 그룹(G), My Store 실행/정산 영역 정비 — 본 Store Hub 공통화 축과 분리.
 - POP/QR/Blog/Signage **실행 화면 UI 편차 미세 정렬**(B) — My Store 실행 축에서 다룸.
 
 ## 22. 우선순위 제안
 
 | 순위 | 작업 | 분류 | 위험 | 비고 |
 |:---:|------|:---:|:---:|------|
-| **P1** | GP SignagePreviewPage mock 제거/정직 처리 | E | 낮음 | frontend, 정직성 |
+| **P1** SignagePreviewPage mock 제거/정직 처리 | E | 낮음 | frontend, 정직성 |
 | **P1** | derivation READ serviceKey 필터 보강 | F | 낮음 | backend, 경계 |
-| **P2** | GP/KCos 제작 자료 parity uplift(KPA 패턴 이식) | C | 중 | frontend, backend 준비됨 |
-| 분리 | My Store 실행/정산(GP 경영 그룹) | G | — | 별도 축 |
+| **P2** | KCos 제작 자료 parity uplift(KPA 패턴 이식) | C | 중 | frontend, backend 준비됨 |
+| 분리 | — | G | — | 별도 축 |
 
-권장 첫 작업: **P1 2건(GP mock 제거 + derivation read 필터)** — 작고 위험 낮음. 이후 **P2(제작 자료 parity uplift)** 로 "Store Hub 공통화 완료" 판정을 실질 충족.
+이후 **P2(제작 자료 parity uplift)** 로 "Store Hub 공통화 완료" 판정을 실질 충족.
 
 ---
 
@@ -299,11 +283,9 @@ const qb = repo.createQueryBuilder('d')
 ## 부록: 핵심 근거 파일
 
 - 메뉴 공통 config: `packages/store-ui-core/src/config/storeMenuConfig.ts:97-287`
-- 제작 자료: KPA `web-kpa-society/src/pages/pharmacy/StoreProductionMaterialsPage.tsx`(1039L) / GP `web-glycopharm/src/pages/store-management/StoreProductionMaterialsPage.tsx`(313L) / KCos `web-k-cosmetics/src/pages/store/StoreProductionMaterialsPage.tsx`(311L)
 - 공통 viewer: `packages/store-ui-core/src/components/StoreAssetDerivationViewer.tsx`
-- backend mount: `kpa.routes.ts:395` / `glycopharm.routes.ts:388` / `cosmetics.routes.ts:139`; Neture 미마운트 `neture.routes.ts:26-72`
+- backend mount: `kpa.routes.ts:395` / `cosmetics.routes.ts:139`; Neture 미마운트 `neture.routes.ts:26-72`
 - derivation read 결함: `apps/api-server/src/routes/o4o-store/controllers/store-execution-assets.controller.ts:117-118`
-- GP mock: `web-glycopharm/src/pages/store-management/signage/SignagePreviewPage.tsx:31-50` (route `App.tsx:791,947`)
 - canonical: `docs/architecture/O4O-STORE-PRODUCTION-MATERIAL-CANONICAL-V1.md`
 
 ---

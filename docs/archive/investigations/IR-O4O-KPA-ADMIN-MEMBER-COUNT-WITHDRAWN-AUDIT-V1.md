@@ -201,7 +201,7 @@ PATCH /kpa/members/:id/status 호출 시 각 테이블/필드가 어떻게 변�
 | **데이터 마이그레이션** | `UPDATE service_memberships SET status='withdrawn' WHERE status='inactive'` — Core freeze 우회 정책으로 들어간 row 전수 이전 |
 
 검증 필요:
-- 다른 서비스(neture, glycopharm, k-cosmetics) 가 `service_memberships.status='inactive'` 값을 가정하는 코드가 있는지 grep
+- 다른 서비스(neture, k-cosmetics) 가 `service_memberships.status='inactive'` 값을 가정하는 코드가 있는지 grep
 - `MembershipGate` (frontend) 의 access 차단 로직이 어떤 status 를 차단하는지 — `withdrawn` 도 차단해야 함
 
 ### 5.2 옵션 B — 프론트 contract 통일 (`'inactive'` 사용)
@@ -297,7 +297,6 @@ service_memberships.status 에 'withdrawn' 정식 도입.
 
 3. 데이터 마이그레이션 (TypeORM migration)
    - SELECT 사전 진단: COUNT(*) FROM service_memberships WHERE status='inactive'
-   - 가드: 'inactive' row 가 KPA 외 서비스(neture/k-cosmetics/glycopharm) 의 다른 의미로 쓰이는지 확인 후 마이그레이션
    - UPDATE service_memberships SET status='withdrawn' WHERE status='inactive'
    - 사후 검증 + 결과 로그
 
@@ -313,7 +312,6 @@ service_memberships.status 에 'withdrawn' 정식 도입.
 주의:
 - Core freeze (WO-O4O-CORE-FREEZE-V1) 의 변경 — 승인 필수
 - 데이터 마이그레이션 — 사용자 승인 필수
-- 다른 서비스(neture/glycopharm/k-cosmetics)의 service_memberships 사용 영향도 사전 점검 필수
 ```
 
 ### WO-O4O-OPERATOR-MEMBER-WITHDRAWN-TAB-ADD-V1 (의존: 위 WO 완료 후)
@@ -364,7 +362,7 @@ KpaAdminDashboardPage 의 '전체 회원' 라벨이 실제 '활성 회원' 만 �
   - `SELECT status, COUNT(*) FROM kpa_members GROUP BY status`
   - 두 결과 join 으로 mismatch row id 식별
 - `kpa_members.status='active' = 1` vs `sm.status='active' = 4` 의 정합성 (보너스 발견)
-- 다른 서비스(neture/glycopharm/k-cosmetics) 의 `service_memberships.status='inactive'` 사용 사례 grep — 옵션 A 의 영향도 평가
+- 다른 서비스 의 `service_memberships.status='inactive'` 사용 사례 grep — 옵션 A 의 영향도 평가
 
 ---
 

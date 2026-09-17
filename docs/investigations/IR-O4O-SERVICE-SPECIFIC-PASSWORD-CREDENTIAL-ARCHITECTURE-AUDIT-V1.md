@@ -228,7 +228,6 @@ CREATE INDEX idx_service_credentials_user ON service_credentials(user_id);
    ↓ 불일치: 401 PASSWORD_MISMATCH (+ 기존 가입 서비스 목록 반환)
 2. service_memberships insert (status='pending')
 3. businessInfo 병합
-4. KPA/GlycoPharm 자동 row 생성 (해당 시)
 ```
 
 → **현재는 password 가 본인 확인 수단으로 재사용된다.** 신규 password 입력 옵션 자체가 코드 경로에 없음.
@@ -238,8 +237,7 @@ CREATE INDEX idx_service_credentials_user ON service_credentials(user_id);
 | 시나리오 | 전환 후 UX |
 |----------|-----------|
 | 신규 사용자가 KPA 가입 | password A 입력 → service_credentials(user_id, 'kpa-society') 생성 |
-| 같은 user 가 GlycoPharm 추가 가입 | **본인 확인 방법 재설계 필요**: ① 기존 서비스 중 하나로 로그인된 상태에서만 가입 허용, ② OR 이메일 인증 토큰으로 본인 확인, ③ password B 신규 입력 |
-| 새 서비스에서 password 변경 | service_credentials(user_id, 'glycopharm').password_hash 만 갱신 |
+| 새 서비스에서 password 변경 | service_credentials.password_hash 만 갱신 |
 
 → "기존 password 로 본인 확인" 패턴이 사라지므로 **회원가입 UX 흐름 자체를 재설계** 해야 함. 이는 §H 의 결정 사안.
 
@@ -286,8 +284,6 @@ resetPassword(token, newPassword, serviceKey?):
   - 불일치: '유효하지 않은 토큰' 에러
   - 일치: users.password 갱신   ← 여전히 users.password 단일 컬럼
 ```
-
-→ **현재 reset 은 "어느 서비스에서 요청했는지" 만 격리되어 있고, 갱신 대상은 여전히 공통 users.password 다.** 즉 "KPA 에서 reset 요청 → 결과적으로 GlycoPharm 비번도 바뀜" 이 현재 동작.
 
 ### E.3 서비스별 credential 전환 시
 
@@ -370,7 +366,6 @@ resetPassword(token, newPassword, serviceKey?):
   userId, sub, email, role, roles, permissions, scopes,
   memberships: [
     { serviceKey: 'neture', status: 'active' },
-    { serviceKey: 'glycopharm', status: 'active' }, ...
   ],
   tokenType: 'user' | 'service' | 'guest',
   iss, aud
@@ -411,7 +406,7 @@ Identity Architecture V1 §8 의 Handoff 흐름:
 → **현재 Handoff 는 한 번 로그인하면 다른 서비스로 password 입력 없이 이동 가능**. 이는 "공통 password 모델" 위에서만 의미가 있는 흐름이다.
 
 **서비스별 독립 password 모델로 가면:**
-- Handoff 자체가 철학과 충돌 (KPA 비번으로 GlycoPharm 에 진입하는 셈)
+- Handoff 자체가 철학과 충돌
 - 또는 Handoff 시 "도착 서비스 비번 재입력" 필수 → SSO UX 가치 거의 소멸
 - Service Switcher 의 "원클릭 서비스 이동" 기능 의미 약화
 
@@ -456,9 +451,8 @@ Identity Architecture V1 §8 의 Handoff 흐름:
 
 | 원칙 | 현재 baseline 일치 여부 |
 |------|-----------------------|
-| 같은 이메일을 여러 서비스에서 사용 가능 (KPA `abc@test.com` + GlycoPharm `abc@test.com`) | 일치 (실제 동작) |
+| 같은 이메일을 여러 서비스에서 사용 가능 (KPA `abc@test.com` `abc@test.com`) | 일치 (실제 동작) |
 | 서비스는 독립 사업자 성격 (회원/권한/프로필/삭제 독립) | 부분 일치 (service_memberships + role_assignments 구조) |
-| **서비스별 비밀번호 가능 (KPA: A, GlycoPharm: B, K-Cosmetics: C)** | **직접 충돌** — Identity Arch §2.1 의 "비밀번호 동기화" 와 정면 충돌 |
 | users 공통 Identity 유지 | 일치 |
 | service_memberships 가 서비스 가입/승인/상태 담당 | 일치 |
 

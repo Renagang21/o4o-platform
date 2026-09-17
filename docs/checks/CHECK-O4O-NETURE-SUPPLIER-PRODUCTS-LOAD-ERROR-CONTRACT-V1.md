@@ -55,7 +55,7 @@ WO: `WO-O4O-NETURE-SUPPLIER-PRODUCTS-LOAD-ERROR-CONTRACT-V1`
 | 6 | `pages/supplier/SupplierB2BContentPage.tsx:35` | `try/catch → setProducts([])` | 안전 — 동일 |
 
 > 이름이 같은 `adminApi.getProducts` / `operatorProductApi.getProducts` / `eventOfferAdminApi.getProducts` /
-> glycopharm `pharmacy.getProducts` 는 **별개 객체**로 접촉하지 않았다. 타 서비스 영향 0.
+> 타 서비스 영향 0.
 
 ## 3. 변경한 오류 계약
 

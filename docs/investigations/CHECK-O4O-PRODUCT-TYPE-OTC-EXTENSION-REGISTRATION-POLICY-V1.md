@@ -43,7 +43,6 @@ OTC(비처방의약품)를 비의약품·처방의약품(Rx)과 **분류**하고
 api-server 의 **활성** 규제 메커니즘:
 - `ProductMaster.regulatoryType` (varchar, immutable): `DRUG` / `HEALTH_FUNCTIONAL` / `QUASI_DRUG` / `COSMETIC` / `GENERAL` (`offer.service.ts:32`, 한글 별칭 매핑 포함).
 - `isRegulated` ← `ProductCategory.isRegulated` (카테고리 기반).
-- `assertPharmacyOnlyServiceKeys(isRegulated, serviceKeys)` → 규제품은 `PHARMACY_ALLOWED_SERVICE_KEYS = ['glycopharm','kpa-society']` 부분집합만 허용 (`offer.service.ts:100`).
 - `assertRegulatedPermit(...)` → 규제품 MFDS 미검증 시 허가번호 필수.
 - Identifier Core(Phase 2): `KOREA_DRUG_CODE`/`KOREA_INSURANCE_CODE`/`ATC_CODE`/`MFDS_CODE`/`GTIN`/… 이미 정의됨 → OTC 식별자 정책 **재사용**(변경 불필요).
 

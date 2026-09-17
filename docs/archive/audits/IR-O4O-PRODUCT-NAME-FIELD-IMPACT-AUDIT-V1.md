@@ -94,7 +94,7 @@ name: string;  // ✅ 정상 — DB 컬럼명 'name'
 **YES.** DB 마이그레이션 및 TypeORM 엔티티는 `name`으로 정상 전환되었으나, raw SQL 쿼리·QueryBuilder 내 `pm.marketing_name` 참조 30여 건이 코드에 잔존한다.
 
 ### Q2. KPA 오류가 다른 서비스에도 전파될 가능성이 있는가?
-**YES.** `store-public-utils.ts`, `store-qr-landing.controller.ts` 등 공통 유틸은 `serviceKey` 기반으로 neture/glycopharm/k-cosmetics 등 모든 서비스에 적용된다. 해당 경로 접근 시 동일 오류 발생.
+해당 경로 접근 시 동일 오류 발생.
 
 ### Q3. 프론트가 구 필드를 기대하는가, 백엔드가 남아있는가?
 **주로 백엔드.** 프론트 타입 인터페이스 일부(`web-neture`)에도 `marketing_name`이 남아 있으나, 렌더링 전 데이터 전달 오류이므로 백엔드 쿼리 수정이 먼저다.

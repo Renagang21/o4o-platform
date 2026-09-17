@@ -72,9 +72,9 @@ WO §10(기존 사본 유지)을 지키기 위해 **차단은 resolver 에서만
 
 ### 공용 controller 영향 확인 (CLAUDE.md Shared Module Rule)
 
-`createAssetSnapshotController` 는 KPA·GlycoPharm·K-Cosmetics·Neture **4개 서비스가 공유**한다(설정·resolver 는 파일 내부 하드코딩, `sourceService:'kpa'`).
+`createAssetSnapshotController` 는 KPA·K-Cosmetics·Neture **3개 서비스가 공유**한다(설정·resolver 는 파일 내부 하드코딩, `sourceService:'kpa'`).
 
-- GP/K-Cos/Neture 프론트에서 `assetType: 'resource'` **복사 호출 0건**(그들의 `resource` 참조는 목록 조회용 `sub_type` 필터일 뿐).
+- K-Cos/Neture 프론트에서 `assetType: 'resource'` **복사 호출 0건**(그들의 `resource` 참조는 목록 조회용 `sub_type` 필터일 뿐).
 - 본 작업은 `allowedAssetTypes` 를 건드리지 않았고 resolver 분기만 제거 → **타 서비스 복사 동작 영향 0**.
 
 ---
@@ -174,7 +174,7 @@ isStoreTarget = !!config.onCopyToStore && reusable_policy !== 'restricted'
 "유지하라"고 명시한 자료 이용 기능이다.
 
 ⚠️ **라벨 혼동 가능성(후속 권장):** 자료 이용 액션의 라벨이 "가져가기" 라서 매장 복사로
-오인될 수 있다. 다만 이 라벨은 **공용 템플릿의 기존 동작**이며 GlycoPharm·K-Cosmetics 도
+오인될 수 있다. 다만 이 라벨은 **공용 템플릿의 기존 동작**이며 K-Cosmetics 도
 같은 템플릿을 쓰므로, 본 WO 범위(§11 "공통 UI 변경 금지" · 중지 조건 "공용 컴포넌트 변경이
 다른 서비스에 영향")에서 변경하지 않았다. 라벨 정비는 별도 작업 대상.
 
@@ -218,7 +218,7 @@ isStoreTarget = !!config.onCopyToStore && reusable_policy !== 'restricted'
 콘텐츠 복사 정책 · 디지털사이니지 복사 정책 · 콘텐츠 가져오기 CTA · 사이니지 UI
 자료실 다운로드 방식 · 포럼 커뮤니티 기능 · 자료실 route 이원화 · 로그인 유도
 태그 정책 · Home 구조 · 신규 테이블 · migration · 신규 오류 체계
-공용 복사 API 삭제 · allowedAssetTypes 목록 · 타 서비스(GP/KCos/Neture) 동작
+공용 복사 API 삭제 · allowedAssetTypes 목록 · 타 서비스(KCos/Neture) 동작
 기존 사본 데이터
 ```
 

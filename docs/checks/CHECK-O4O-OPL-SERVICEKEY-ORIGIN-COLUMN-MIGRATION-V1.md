@@ -28,7 +28,7 @@ ALTER TABLE organization_product_listings
 - [x] 기존 row **UPDATE 없음** (migration 에 UPDATE 문 자체가 없음. DEFAULT NULL → 기존 행은 NULL 로 읽힐 뿐 값 변경 아님)
 - [x] `service_key` **재태깅 없음**
 - [x] `deriveListingServiceKey` **수정 없음**
-- [x] 공개 B2C/Tablet/GP/KPA query **수정 없음**
+- [x] 공개 B2C/Tablet/KPA query **수정 없음**
 - [x] `resolveServiceKeys` **수정 없음**
 - [x] event-offer flow **수정 없음**
 - [x] 테스트 데이터 **생성 없음**

@@ -22,7 +22,7 @@
 - `packages/shared-space-ui/src/guide/*.tsx` (GuideFeaturesPage / GuideFeatureManualPage / GuideUsagePage / GuideIntro*)
 - `packages/shared-space-ui/src/guide/styles.ts` (heroStyles / sectionStyles / indexStyles)
 - `packages/ui/src/layout/Section.tsx` (PageHero / PageSection — 글로벌 Vertical Rhythm)
-- 비교: KPA / GlycoPharm / K-Cosmetics 가이드(동일 공통 컴포넌트 소비)
+- 비교: KPA / K-Cosmetics 가이드(동일 공통 컴포넌트 소비)
 
 ---
 
@@ -112,10 +112,10 @@
 | `/guide` (Home, index 먼저) | `heroLg` div | **~0px** (index) | ❌ |
 | `/guide/features`, `/guide/business/*`, `/guide/for-*`, `/guide/features/*` | `heroLg`/`hero` div | 32px (wrapLg) | ❌ |
 | `/guide/intro/*` | `hero` div(56px) | 20~32px | ❌ |
-| KPA/GP/KCos `/guide/*` | **동일 공통 컴포넌트** | 동일 | ❌ |
+| KPA/KCos `/guide/*` | **동일 공통 컴포넌트** | 동일 | ❌ |
 | `@o4o/ui` `PageHero` 쓰는 소비자 페이지(Home/Hub 계열) | `PageHero` mb-16 | mb 기반 정상 | ✅ |
 
-> 즉 **문제는 `/guide` 단일 페이지가 아니라 가이드 공통 컴포넌트 전체** — Neture·KPA·GP·KCos 가이드가 모두 동일하게 글로벌 rhythm 을 우회한다. index 를 쓰는 `/guide`(Home)만 추가로 더 붙는다.
+> 즉 **문제는 `/guide` 단일 페이지가 아니라 가이드 공통 컴포넌트 전체** — Neture·KPA·KCos 가이드가 모두 동일하게 글로벌 rhythm 을 우회한다. index 를 쓰는 `/guide`(Home)만 추가로 더 붙는다.
 
 ---
 
@@ -164,7 +164,7 @@
 - `packages/shared-space-ui/src/guide/styles.ts` (`heroStyles` / `sectionStyles.wrapLg` / `indexStyles.wrap` top 간격)
 - `packages/shared-space-ui/src/guide/GuideFeaturesPage.tsx` (index 블록을 표준 spacing 래퍼로)
 - (선택) `GuideFeatureManualPage.tsx` / `GuideUsagePage.tsx` 첫 섹션 spacing 정렬
-- 회귀 검증: web-neture · web-kpa-society · web-glycopharm · web-k-cosmetics (Shared Module Protocol)
+- 회귀 검증: web-neture · web-kpa-society · web-k-cosmetics (Shared Module Protocol)
 
 ---
 
@@ -189,7 +189,7 @@
 1. **섹션명**: `GuideHomePage.tsx:51` 단일 위치 → `O4O 사업 적용 예시` 로 교체(영향 없음).
 2. **카드 문안**: 현재 2문장 → 1문장 축약 + 상세는 이미 생성된 사업자 상세 페이지로 이관.
 3. **Hero-본문 간격**: **개별 페이지 문제가 아니라 가이드 공통 컴포넌트가 글로벌 Vertical Rhythm(PageHero mb-16)을 우회**하는 구조적 문제. 특히 index 블록은 top 간격 0 으로 가장 밀착.
-4. **해결 위치**: `packages/shared-space-ui/src/guide/{styles.ts, GuideFeaturesPage.tsx, …}` 공통 레이어 — 1곳 수정으로 Neture·KPA·GP·KCos 가이드 전체 정렬.
+4. **해결 위치**: `packages/shared-space-ui/src/guide/{styles.ts, GuideFeaturesPage.tsx, …}` 공통 레이어 — 1곳 수정으로 Neture·KPA·KCos 가이드 전체 정렬.
 5. **표준값**: mobile-first 28~32px(모바일)/44~48px(데스크톱), 글로벌 rhythm(`mb-8 md:mb-12`)과 정렬.
 6. **순서**: copy 정리(WO-1) → 공통 spacing 표준(WO-2, Shared Module Protocol).
 

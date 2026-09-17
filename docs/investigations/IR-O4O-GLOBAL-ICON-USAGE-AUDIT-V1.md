@@ -4,7 +4,6 @@
 
 - **작성일**: 2026-06-04
 - **작업 유형**: Investigation (IR) — 아이콘 교체·공통화는 본 작업 범위 밖
-- **조사 범위**: `services/web-kpa-society`, `services/web-glycopharm`, `services/web-k-cosmetics`, `services/web-neture`, `packages/ui`, `packages/account-ui`, `packages/shared-space-ui`, `packages/operator-core-ui`, `packages/operator-ux-core`, `packages/store-ui-core`, `packages/store-asset-policy-core`
 - **후속 예정**: `O4O-GLOBAL-ICON-SYSTEM-STANDARD-V1` (기준 문서) → 1차 적용(KPA 약국 운영 허브) → CHECK 문서
 
 ---
@@ -19,7 +18,7 @@ O4O는 **아이콘 시스템이 단일 표준 없이 3계열로 혼재**되어 �
 | **lucide-react** | Global Header 메뉴, Operator 사이드바(STANDARD_GROUPS), Store 사이드바, Admin 비즈니스 블록, 대부분의 액션 버튼 | △ 부분 표준 (operator만 중앙화) |
 | **custom SVG** (`ForumIcon`, `ContentIcon` …) | Home AppEntrySection, 커뮤니티 서비스 카드 | ✅ `shared-space-ui/HomeAppIcons` 중앙화 |
 
-**핵심 문제는 "emoji ↔ lucide 혼재"** 다. 같은 화면 안에서 일부 요소는 emoji, 일부는 lucide로 그려져 시각적 일관성이 깨진다. 사용자가 지적한 **KPA 약국 운영 허브**가 대표 사례이며, 동일 구조가 GlycoPharm/K-Cosmetics의 Store Hub·Admin·Channels 화면에 그대로 복제되어 있다.
+**핵심 문제는 "emoji ↔ lucide 혼재"** 다. 같은 화면 안에서 일부 요소는 emoji, 일부는 lucide로 그려져 시각적 일관성이 깨진다. 사용자가 지적한 **KPA 약국 운영 허브**가 대표 사례이며, 동일 구조가 K-Cosmetics의 Store Hub·Admin·Channels 화면에 그대로 복제되어 있다.
 
 **중요 — 이미 존재하는 표준화 레버리지 2곳:**
 - `packages/ui/src/operator-shell/constants.ts` → `STANDARD_GROUPS` (operator 메뉴 13개 lucide 아이콘 중앙 정의, 4서비스 공유). **emoji 표준화도 이 패턴을 따르면 된다.**
@@ -47,25 +46,11 @@ O4O는 **아이콘 시스템이 단일 표준 없이 3계열로 혼재**되어 �
 
 > **중복 구현 주의**: `components/home/CommunityServiceSection.tsx:39-67` 가 `shared-space-ui` 의 아이콘을 import 하지 않고 동일 SVG를 로컬 재구현하고 있다.
 
-### 2.2 GlycoPharm (`services/web-glycopharm`)
-
-| 표면 | 방식 | 위치 |
-|------|------|------|
-| Store Hub 카드 | emoji (`🛒🖥️📄🛍️🏥`) | `pages/hub/StoreHubPage.tsx:42-83` |
-| Admin Quick Actions | emoji (`👤🏥💰📄🛡️⚙️`) | `pages/admin/GlycoPharmAdminDashboard.tsx:122-127` |
-| Admin 비즈니스 블록 | **lucide** (`DollarSign, FileBarChart, ShieldCheck, Building2`) | `pages/admin/GlycoPharmAdminDashboard.tsx:29-39,136-150` |
-| 역할 상수 매핑 | emoji (`💊📦🛡️`) | `lib/role-constants.ts:44-46` |
-| Operator 대시보드 | emoji (`💬🏥`) | `pages/operator/GlycoPharmOperatorDashboard.tsx:45,57` |
-| Store Channels 채널 타입 | emoji (`🌐📱🖥️📺`) | `pages/store/StoreChannelsPage.tsx:676-679` |
-| Store Main Quick Actions | **lucide** (`Package, ShoppingCart, Tv, QrCode, Megaphone`) | `pages/store-management/StoreMainPage.tsx:19-40` |
-| Header / Mobile Nav | **lucide** | `components/GlycoGlobalHeader.tsx:16`, `components/MobileBottomNav.tsx:14` |
-| LMS lesson type | emoji (`📄🎬❓📝`) | `pages/education/LmsLessonPage.tsx:34-37` |
-
 ### 2.3 K-Cosmetics (`services/web-k-cosmetics`)
 
-GlycoPharm과 **구조적으로 거의 동일** (Store Hub / Admin / Channels / LMS 패턴 복제). 서비스 정체성에 따른 일부 emoji만 다름.
+서비스 정체성에 따른 일부 emoji만 다름.
 
-| 표면 | 방식 | 위치 | GlycoPharm 대비 |
+| 표면 | 방식 | 위치 ||
 |------|------|------|----------------|
 | Store Hub 카드 | emoji (`🛒🖥️📄📋💄`) | `pages/hub/KCosmeticsHubPage.tsx:42-83` | 이벤트 `📋`(vs `🛍️`), CTA `💄`(vs `🏥`) |
 | Admin Quick Actions | emoji (`👤🏪🛡️⚙️`) | `pages/admin/KCosmeticsAdminDashboard.tsx:108-111` | 매장 `🏪`(vs `🏥`) |
@@ -95,7 +80,7 @@ GlycoPharm과 **구조적으로 거의 동일** (Store Hub / Admin / Channels / 
   1. **Store Hub 진입 카드** — 모든 서비스가 emoji (`🛒🖥️📄` + 서비스별 CTA)
   2. **Operator/Admin Quick Actions** — emoji
   3. **LMS lesson type 매핑** — emoji (3서비스 동일)
-  4. **Store Channels 채널 타입** — emoji (Glyco·KCos 완전 동일)
+  4. **Store Channels 채널 타입** — emoji
   5. **회원가입 역할 선택 / 랜딩 카테고리** — emoji
 - **패키지 레벨 emoji 기본값(consumer가 안 넘기면 노출)**:
   - `shared-space-ui/AppreciationPanel.tsx:192,301-403` (`🎁👥` 하드코딩 기본값)
@@ -115,7 +100,7 @@ GlycoPharm과 **구조적으로 거의 동일** (Store Hub / Admin / Channels / 
   - `packages/ui/src/operator-shell/constants.ts` → `STANDARD_GROUPS` (13개 operator 그룹 아이콘: `Home, Users, FileCheck, Package, Store, ShoppingCart, FileText, Archive, BookOpen, Monitor, MessageSquare, BarChart3, Settings`). `operator-ux-core/sidebar/DomainIASidebar.tsx`가 소비 → 4서비스 일관 적용.
 - **서비스/패키지 로컬 하드코딩 매핑**:
   - `packages/store-ui-core/src/components/StoreSidebar.tsx:12-47` → `MENU_ICONS` / `SECTION_ICONS` (lucide). store-ui-core 내부에 있으나 export되지 않아 재사용 제한.
-  - 각 Global Header(`KpaGlobalHeader`, `GlycoGlobalHeader`, `KCosGlobalHeader`)가 개별적으로 lucide 메뉴 아이콘 정의 — 거의 동일 세트 반복.
+  - 각 Global Header(`KpaGlobalHeader`, `KCosGlobalHeader`)가 개별적으로 lucide 메뉴 아이콘 정의 — 거의 동일 세트 반복.
 
 ---
 
@@ -128,14 +113,12 @@ GlycoPharm과 **구조적으로 거의 동일** (Store Hub / Admin / Channels / 
 | KPA Home (CommunityHomePage) | AppEntry는 SVG/lucide, CTA는 `🧪` emoji | `pages/CommunityHomePage.tsx:289-302` |
 | KPA Global Header | 브랜드 `💊`·크레딧 `⭐` emoji vs 사용자 메뉴 lucide | `components/KpaGlobalHeader.tsx:129,154 ↔ 177-199` |
 | KPA 약국 허브 | 사이드바·카드는 emoji, 헤더는 lucide (**사용자 지적 지점**) | `PharmacyHubLayout.tsx:28-41` ↔ `KpaGlobalHeader` |
-| GlycoPharm/KCos Admin | Quick Actions emoji vs 비즈니스 블록 lucide (동일 대시보드) | `GlycoPharmAdminDashboard.tsx:122-127 ↔ 136-150` |
-| GlycoPharm/KCos Store Channels | 채널 타입 emoji vs 액션 버튼 lucide (동일 페이지) | `StoreChannelsPage.tsx:676-679 ↔ 795+` |
+| KCos Admin | Quick Actions emoji vs 비즈니스 블록 lucide (동일 대시보드) | — |
+| KCos Store Channels | 채널 타입 emoji vs 액션 버튼 lucide (동일 페이지) | `StoreChannelsPage.tsx:676-679 ↔ 795+` |
 | Neture Home | 역할 카드 lucide/SVG vs CTA `🧪` emoji | `CommunityPage.tsx:147-209` |
 | Neture Partner 랜딩 | `{emoji, icon}` 동시 정의(emoji만 렌더, lucide import는 미사용) | `PartnerLandingPage.tsx:74-78` |
 
 **서비스 간 동일 개념 ↔ 다른 emoji** (의미 불일치):
-- 이벤트/캠페인: Glyco `🛍️` vs KCos `📋`
-- 매장 표현: Glyco `🏥` vs KCos `🏪` (Admin)
 - emoji 렌더 방식: 문자열 `icon:'📦'` vs JSX `icon:<span>🧪</span>` 혼용
 
 ---
@@ -146,7 +129,7 @@ GlycoPharm과 **구조적으로 거의 동일** (Store Hub / Admin / Channels / 
 |------|------|----------|
 | **Store Hub 진입 카드 아이콘 세트** | 4서비스 동일 구조(`🛒🖥️📄` + 서비스별 CTA), 이미 `StoreHubTemplate` prop으로 주입 중 | `shared-space-ui` 또는 `store-ui-core` 표준 매핑 |
 | **LMS lesson type 아이콘** | 3서비스 `📄🎬❓📝` 동일 하드코딩 | `lms` 공통(APP-LMS Baseline 정합) |
-| **Store Channels 채널 타입** | Glyco·KCos 완전 동일 (`🌐📱🖥️📺`) | `store-ui-core` 공통 상수 |
+| **Store Channels 채널 타입** | — | `store-ui-core` 공통 상수 |
 | **Operator/Admin Quick Action 아이콘** | 역할/설정 아이콘(`🛡️⚙️👤`) 서비스 간 동일 | `operator-ux-core` (STANDARD_GROUPS 패턴 확장) |
 | **Global Header 메뉴 아이콘** | 3 Header가 거의 동일 lucide 세트 반복 | 공통 헤더 아이콘 상수 |
 | **shared-space-ui emoji 기본값** | AppreciationPanel/EmptyState 등 emoji 하드코딩 | 토큰화 또는 lucide/SVG 치환 |
@@ -166,8 +149,8 @@ GlycoPharm과 **구조적으로 거의 동일** (Store Hub / Admin / Channels / 
 | 순위 | 대상 | 이유 |
 |:---:|------|------|
 | **1** | **KPA 약국 운영 허브** (`StoreHubPage.tsx`, `PharmacyHubLayout.tsx`) | 사용자가 직접 지적 / emoji·lucide 혼재 명확 / O4O 매장 실행 UI 기준 화면 |
-| 2 | GlycoPharm 내 약국 (Store Hub/Channels) | KPA와 동일 구조 → 기준 이식 용이 |
-| 3 | K-Cosmetics 내 매장 | Glyco와 거의 동일 |
+| 2 | — | KPA와 동일 구조 → 기준 이식 용이 |
+| 3 | K-Cosmetics 내 매장 | — |
 | 4 | Neture Home / 역할 카드 | CTA emoji 1곳 등 소규모 |
 | 보조 | `shared-space-ui` emoji 기본값, Global Header 아이콘 | 공통 레이어 — 기준 문서 확정 후 |
 

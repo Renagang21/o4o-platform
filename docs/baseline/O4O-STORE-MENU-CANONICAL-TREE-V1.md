@@ -46,7 +46,6 @@
 
 ```text
 적용 대상: catalog 의 storeWorkspaceEnabled=true 서비스
-           (2026-09 현재 KPA-Society / K-Cosmetics / Pharmacy-Hub — GlycoPharm 은 catalog 에서 제거됨)
 제외:      Neture  (storeWorkspaceEnabled=false — 공급자 / 운영자 / 시장 실행 플랫폼, 매장 기능 부재)
 ```
 
@@ -62,11 +61,11 @@ Neture 는 매장 기능이 없으므로 이 흐름의 구현 대상이 아니�
 
 | # | 항목명 | HUB 진열 | 매장 제작 | 매장 가져가기 | 저장 대상 후보 | 기존 구현 | 후속 구현 |
 |---|--------|:--------:|:---------:|:-------------:|--------------|----------|----------|
-| 1 | **상품 상세정보** | HubB2BCatalogPage (KPA/Glyco) | **StoreHandledProductsPage (KPA)** — 상품 선택 후 STORE 설명서 조회·QR·다국어. 매장 자체 보완 설명 = StoreProductDescriptionsPage(`product_ai_contents`). ~~StoreProductInfoCreatorPage~~ = 은퇴 대상 (아래 정정 노트) | 부분 (읽기 전용 조회 + 매장 보완) | **읽기 = `shared_product_descriptions`(STORE)** / 매장 보완 = `product_ai_contents` | 부분 (KPA 단독) | 은퇴 게이트 진행 중 |
+| 1 | **상품 상세정보** | HubB2BCatalogPage | **StoreHandledProductsPage (KPA)** — 상품 선택 후 STORE 설명서 조회·QR·다국어. 매장 자체 보완 설명 = StoreProductDescriptionsPage(`product_ai_contents`). ~~StoreProductInfoCreatorPage~~ = 은퇴 대상 (아래 정정 노트) | 부분 (읽기 전용 조회 + 매장 보완) | **읽기 = `shared_product_descriptions`(STORE)** / 매장 보완 = `product_ai_contents` | 부분 (KPA 단독) | 은퇴 게이트 진행 중 |
 | 2 | **POP** | StoreHubSignageLibrary 내 | StorePopPage (KPA) | ✅ `assetType='signage'` | `store_execution_assets` | 정렬 (KPA 중심) | 일부 |
 | 3 | **QR-code** | 독립 진열 화면 부재 | StoreQRPage (KPA) | 부분 (library 참조) | `store_execution_assets` + URL | 부분 (KPA 단독) | 필요 |
 | 4 | **블로그** | 진열 화면 부재 | PharmacyBlogPage (KPA, direct) | ❌ Hub→Store 흐름 없음 | `kpa_store_contents` / staff_blog_posts | 미구현 (KPA 직접 작성만) | **필요 (HUB ↔ 매장 흐름 신설)** |
-| 5 | **사이니지** | HubSignageLibraryPage | StoreSignagePage | ✅ `assetType='signage'` | `o4o_asset_snapshots` + `signage_playlist_items` | 정렬 (KPA / Glyco) | 거의 없음 |
+| 5 | **사이니지** | HubSignageLibraryPage | StoreSignagePage | ✅ `assetType='signage'` | `o4o_asset_snapshots` + `signage_playlist_items` | 정렬 | 거의 없음 |
 | 6 | **고객 안내문 / 설명자료** | HubContentLibraryPage (CMS) | 매장 측 화면 부재 | ✅ `assetType='cms'` | `cms_contents` (visibilityScope='organization') / `kpa_store_contents` | 부분 (HUB 측만) | **필요 (매장 측 화면 신설 — 현재 0%)** |
 
 ### 2.2 설계 원칙
@@ -103,7 +102,7 @@ Neture 는 매장 기능이 없으므로 이 흐름의 구현 대상이 아니�
 | POP (HUB Signage 내 일부) | 내 매장 POP | 매장 인쇄 / 디스플레이 / 캠페인 | `assetSnapshotApi.copy({ assetType:'signage' })` 일부 + library 참조 | KPA 90%+ | **정렬** | W7 출처 통일 |
 | QR-code (HUB 진열 부재) | 내 매장 QR | 매장 안내 / 랜딩 / 설문 진입 | library 참조 (snapshot 표준화 필요) | KPA 단독 (90%) | 부분 정렬 | W5 |
 | 블로그 (HUB 진열 부재) | 내 매장 블로그 | 매장 블로그 게시 / SEO / 고객 안내 | **흐름 부재 — 신설 필요** | KPA 단독 direct only (70%) | **미정렬** | W3 |
-| 사이니지 (HubSignageLibraryPage) | 내 매장 사이니지 | 매장 디지털 디스플레이 송출 | `assetSnapshotApi.copy({ assetType:'signage' })` | KPA/Glyco 95% | **정렬** | W7 출처 통일 |
+| 사이니지 (HubSignageLibraryPage) | 내 매장 사이니지 | 매장 디지털 디스플레이 송출 | `assetSnapshotApi.copy({ assetType:'signage' })` | — | **정렬** | W7 출처 통일 |
 | 고객 안내문 (HubContentLibraryPage) | 내 매장 안내문 | 매장 안내 인쇄 / 화면 표시 | `assetSnapshotApi.copy({ assetType:'cms' })` | **매장 측 0%** | 부분 정렬 (HUB 측만) | W6 |
 
 ### 3.1 매핑 원칙
@@ -365,13 +364,13 @@ Store Side Standards ┐
 디지털 사이니지   플레이리스트 · 동영상 · 스케줄 · TV 재생   (변경 없음)
 채널/마케팅     채널 관리 · 태블릿 · 상담요청 · [펀딩/퍼널 등]
 분석           마케팅 분석
-[경영(GP)]      약국 경영 · 정산
+[경영] 약국 경영 · 정산
 설정           매장(약국) 정보 · 매장 설정
 ```
 
 **핵심 이동:** `내 매장(약국) 상품` 을 commerce(운영) 그룹에서 분리해 **"활성화" 그룹의 앵커**로 이동, 제품 파생 콘텐츠(블로그/POP/QR/상품설명)를 그 아래로 모음. 사이니지는 제품 파생이 아니므로 분리 유지(SMT 드리프트 가드 정합).
 
-**라벨:** KPA/GlycoPharm = "약국 운영/약국 활성화/약국 자료함", K-Cosmetics = "매장 운영/매장 활성화/내 자료함".
+**라벨:** KPA = "약국 운영/약국 활성화/약국 자료함", K-Cosmetics = "매장 운영/매장 활성화/내 자료함".
 
 **1차 범위 외 (2차 후보):**
 - 제품 row action 통일(상품설명/POP/QR/블로그/활용자료) — 화면 로직이라 분리
@@ -390,7 +389,7 @@ Store Side Standards ┐
 - 활성화에 `상품 설명` 추가(라우트 확인된 서비스). 매출/정산은 분석·경영 영역으로.
 - **원칙: 데드링크 0 / 실기능 은폐 0.** 라우트 없는 항목(거래 신청·상품 성과·노출 설정)은 미추가, 실기능(퍼널/경영/정산/태블릿/상담요청)은 보존.
 - 사이드바 active 판정에 `management` `end` 처리 추가(prefix 중복 하이라이트 방지).
-- 데드링크 정리: GP `/products`·`/market-trial`(미마운트) 제거.
+- 데드링크 정리: 미마운트 라우트(`/products`·`/market-trial`) 항목 제거.
 
 **검증:** `store-ui-core` typecheck PASS. 신규 데드링크 0(전 항목 마운트 라우트 1:1).
 

@@ -198,7 +198,7 @@ GuideEditable  → prefix 없는 key 사용 (legacy 호환)
 | 서비스 | pageKey 추정 | sectionKey | 파일 |
 |--------|-------------|------------|------|
 | Neture | `operator.brand.management` | `page-help` | `BrandManagementPage.tsx` |
-| KPA / Glyco / K-Cos | `store.channel.editor` | `hero-description` | `StoreChannelsPage.tsx` 각 서비스 |
+| KPA / K-Cos | `store.channel.editor` | `hero-description` | `StoreChannelsPage.tsx` 각 서비스 |
 
 **현재 조치 상태:**
 - `store.channel.editor`: GuideBlock이 `sectionKey='page-help'`를 사용하고 `GuideEditableSection`은 `sectionKey='hero-description'`을 사용 → **충돌 없음** (다른 key)
@@ -323,7 +323,6 @@ useEffect(() => {
 | 서비스 | pageKey | 현재 sectionKey | 상태 | 권장 전환 |
 |--------|---------|----------------|------|---------|
 | KPA | 전체 10개 | `page-help` | DB override 정상 | `guideblock-page-help`로 전환 권장 |
-| GlycoPharm | 전체 4개 | `page-help` | DB override 정상 | `guideblock-page-help`로 전환 권장 |
 | K-Cosmetics | 전체 4개 | `page-help` | DB override 정상 | `guideblock-page-help`로 전환 권장 |
 | Neture | 4개 | `page-help` | DB override 정상 | `guideblock-page-help`로 전환 권장 |
 | **Neture** | `operator.brand.management` | (없음) | **static fallback** | `guideblock-page-help` 추가 후 DB override 활성화 |

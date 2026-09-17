@@ -2,7 +2,7 @@
  * StoreTabletDisplaysView — 매장 태블릿 진열 관리 화면 본체
  * WO-O4O-MY-STORE-TABLET-DISPLAYS-KCOS-GP-COMMONIZATION-V1
  *
- * 기존 KCos/GP 페이지의 마크업·동선을 그대로 옮긴다.
+ * 기존 KCos 페이지의 마크업·동선을 그대로 옮긴다.
  * 검색·필터·정렬·pagination 은 원본에 없었고 추가하지 않는다(신규 기능 금지).
  */
 

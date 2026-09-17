@@ -17,7 +17,7 @@
 | `packages/operator-ux-core/src/list/standard/StandardListToolbar.tsx` | **신규** — 검색/필터/액션/summary 배치 표준(기존 SearchBar 재사용) |
 | `packages/operator-ux-core/src/list/index.ts` | export 추가(additive, 기존 export 무변경) |
 
-> 다른 세션 WIP(`layout/OperatorAreaShell.tsx`, `sidebar/DomainIASidebar.tsx`, GP `operatorMenuGroups.ts`) **미접촉**. backend/DB/migration/package.json/lock/Dockerfile/CI **변경 0**.
+> 다른 세션 WIP(`layout/OperatorAreaShell.tsx`, `sidebar/DomainIASidebar.tsx` `operatorMenuGroups.ts`) **미접촉**. backend/DB/migration/package.json/lock/Dockerfile/CI **변경 0**.
 
 ## 2. useStandardListQuery 제공 기능
 
@@ -94,7 +94,7 @@ return (
 - **operator-ux-core isolated `tsc --noEmit`: PASS (exit 0)** — tsconfig.json 존재, 신규 파일 포함 검사.
 - **breaking change**: DataTable/Pagination 파일 미수정(git diff 0) → 회귀 0.
 - web 앱 전체 빌드: baseline WIP 충돌 가능성으로 미실행(WO 허용). 변경 패키지 중심 isolated typecheck 로 대체.
-- **다른 세션 WIP 보존**: layout/sidebar/GP menu 등 미접촉.
+- **다른 세션 WIP 보존**: layout/sidebar menu 등 미접촉.
 
 ## 8. 제외 / 후속
 

@@ -180,7 +180,6 @@ function resolveMembershipKey(scopeServiceKey: string): string {
 | neture-operator@o4o.com | neture | neture:operator |
 | kcos-admin@o4o.com | k-cosmetics | cosmetics:admin |
 | kcos-operator@o4o.com | k-cosmetics | cosmetics:operator |
-| glyco-operator@o4o.com | glycopharm | glycopharm:operator |
 
 → **새 bootstrap migration 으로 생성된 계정은 `service_memberships.service_key='kpa-society'` 가 정확히 들어감**. 이들 계정은 가드를 통과해야 정상.
 
@@ -262,7 +261,7 @@ WHERE u.email = 'kpa-admin@o4o.com';
 - 의도: **role 만 있고 membership 없는 계정은 서비스 이용 불가** ([membershipGate.ts:8-11](services/web-kpa-society/src/lib/membershipGate.ts#L8-L11))
 - 결과: 백필 migration 또는 admin UI 에서 role 만 부여하고 membership 동기화를 빼먹으면 차단
 
-**이 정책 자체는 변경하지 않는 것이 권장됨** — service_memberships 가 service 이용 자격의 canonical 출처라는 원칙이 평행 서비스(neture/cosmetics/glycopharm) 와 동일하게 정렬됨.
+**이 정책 자체는 변경하지 않는 것이 권장됨** — service_memberships 가 service 이용 자격의 canonical 출처라는 원칙이 평행 서비스(neture/cosmetics) 와 동일하게 정렬됨.
 
 ---
 

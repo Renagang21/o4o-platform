@@ -388,7 +388,7 @@ Option B 는 더 minimum 이나 5 target 의 콘텐츠를 합치면 페이지가
 - `/o4o/channel-map` 의 삭제 vs redirect (placeholder 의 미래 활용 여부)
 - 사례 페이지 신설 (별건)
 - target 별 콘텐츠 합치기 후 layout 조정
-- 다른 service (KPA/GP/K-Cos) 의 동일 패턴 audit (cross-service drift 분리)
+- 다른 service (KPA/K-Cos) 의 동일 패턴 audit (cross-service drift 분리)
 - Cloud Run / CDN 레벨 HTTP 301 설정
 
 ---

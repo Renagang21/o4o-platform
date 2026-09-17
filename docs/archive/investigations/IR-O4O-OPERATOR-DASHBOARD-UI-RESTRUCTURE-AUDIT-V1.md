@@ -39,7 +39,7 @@ API 연결 완료, 역할 기반 메뉴 필터 작동 중.
 
 `operatorMenuGroups.ts`에 UNIFIED_MENU 상수로 전체 항목 고정.  
 `filterMenuByRole()` 함수가 `adminOnly: true` 항목을 operator 사용자에게 숨김.  
-서비스별(KPA/GlycoPharm/Neture) 별도 파일로 분리되어 있으나 동일한 구조 패턴 사용.
+서비스별 별도 파일로 분리되어 있으나 동일한 구조 패턴 사용.
 
 ### F3. 헤더 진입점 = KpaGlobalHeader 단일 지점
 
@@ -142,7 +142,6 @@ const menuItems = useMemo(
 | 서비스 | 메뉴 파일 | 상태 |
 |-------|---------|------|
 | KPA Society | `services/web-kpa-society/src/config/operatorMenuGroups.ts` | 완성 |
-| GlycoPharm | `services/web-glycopharm/src/config/operatorMenuGroups.ts` | 별도 파일 |
 | Neture | `services/web-neture/src/config/operatorMenuGroups.ts` | 별도 파일 |
 
 메뉴 구조 패턴(UNIFIED_MENU + filterMenuByRole)은 동일, 항목은 서비스별 맞춤.

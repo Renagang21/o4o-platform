@@ -101,7 +101,7 @@ const SECTION_ICONS: Record<string, typeof LayoutDashboard> = {
   'layout-builder': PanelLeft,
   template: Palette,
   billing: Receipt,
-  // 매장 섹션 키 (구 GlycoPharm 전용 → 공통 유지)
+  // 매장 섹션 키
   'funnel': TrendingUp,
   'management': Briefcase,
   'management-b2b': Package,

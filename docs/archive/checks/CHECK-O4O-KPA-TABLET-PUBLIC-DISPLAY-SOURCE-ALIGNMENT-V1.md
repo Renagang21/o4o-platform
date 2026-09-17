@@ -26,7 +26,7 @@
 - **local active 전체 노출 회귀 해소**: configured면 disp 있는 local만.
 - **selected content / 다국어**: 정책 불변. content attach는 disp.content_id 링크 유효 시, ready/published 번역만 노출, draft/status/model 미유출.
 - **fallback**: active tablet 없음/visible 0 → legacy 그대로(기존 매장 회귀 방지).
-- 마이그레이션/신규 테이블 없음. kiosk-core 미변경 → KCos/GP 무영향.
+- 마이그레이션/신규 테이블 없음. kiosk-core 미변경 → KCos 무영향.
 
 ## 5. 검증 결과
 ### 5.1 typecheck
@@ -34,7 +34,7 @@
 |---|---|
 | api-server | ✅ PASS |
 | web-kpa-society | ✅ PASS |
-| (kiosk-core 미변경 → KCos/GP typecheck 불요) | — |
+| (kiosk-core 미변경 → KCos typecheck 불요) | — |
 
 ### 5.2 API/브라우저 E2E (2026-07-03, 네뚜레-약국 · 약국 경영자 체험 계정, 인증 API)
 
@@ -53,4 +53,4 @@
 > 판정: **configured 집합 제한 / 편성 순서 / legacy fallback 모두 라이브 PASS.**
 
 ## 6. 미착수(범위 밖)
-device pairing / per-tablet public URL, QR Core, 소비자 관리, 상담/주문/결제, 사이니지 통합, GP/KCos 확장, 신규 마이그레이션. 전체 혼합(supplier+local) 단일 순서는 현행 분리 응답 유지(필요 시 후속).
+device pairing / per-tablet public URL, QR Core, 소비자 관리, 상담/주문/결제, 사이니지 통합, KCos 확장, 신규 마이그레이션. 전체 혼합(supplier+local) 단일 순서는 현행 분리 응답 유지(필요 시 후속).

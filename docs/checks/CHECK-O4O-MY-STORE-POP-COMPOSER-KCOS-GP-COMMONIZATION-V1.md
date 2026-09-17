@@ -3,7 +3,7 @@
 - **작업일**: 2026-08-13
 - **브랜치**: `work/commonization-my-store` (remote `work/commonization-my-store-shell-parts`) — main 병합 없음
 - **선행**: `CHECK-O4O-MY-STORE-CONTENT-PRODUCTION-CROSSSERVICE-AUDIT-V1` (61b0c81b5) 의 단일 권고 대상
-- **범위**: K-Cosmetics / GlycoPharm 의 POP 제작 흐름 전체를 `@o4o/store-ui-core` 로 공통화
+- **범위**: K-Cosmetics 의 POP 제작 흐름 전체를 `@o4o/store-ui-core` 로 공통화
 - **제외**: KPA (고유 POP·다국어·asset-policy 축) / PharmacyHub (`store_pops` CRUD 모델) — 회귀 build 만
 
 ---
@@ -13,14 +13,14 @@
 두 서비스 `StorePopPage` 전문을 `diff -u` 로 대조한 결과 **업무 규칙 차이는 0 건**이었다.
 실제 차이는 다음 6 종뿐이며 전부 서비스 config 다.
 
-| 축 | K-Cosmetics | GlycoPharm |
-|---|---|---|
-| accent color / soft bg | `#db2777` / `#fdf2f8` | `#ea580c` / `#fff7ed` |
-| endpoint prefix | `/cosmetics` | `/glycopharm` |
-| 템플릿 3번 라벨 | `매장 전문형` / `전문 매장 스타일` | `약국 전문형` / `전문 약국 스타일` |
-| 문구 | 매장 (`매장 POP PDF`, `매장 정보를 확인할 수 없습니다`, `내 매장 POP`) | 약국 (동일 문장의 약국 표기) |
-| localProduct import 경로 | `@/services/localProductApi` | `@/api/localProducts` |
-| 주석/공백 | 서비스별 WO 이력 주석 | 동일 |
+| 축 | K-Cosmetics |
+|---|---|
+| accent color / soft bg | `#db2777` / `#fdf2f8` |
+| endpoint prefix | `/cosmetics` |
+| 템플릿 3번 라벨 | `매장 전문형` / `전문 매장 스타일` |
+| 문구 | 매장 (`매장 POP PDF`, `매장 정보를 확인할 수 없습니다`, `내 매장 POP`) |
+| localProduct import 경로 | `@/services/localProductApi` |
+| 주석/공백 | 서비스별 WO 이력 주석 |
 
 동일했던 업무 규칙(공통 Core 로 이관):
 공급자 자료 **최대 8개** 선택 상한 · 생성 조건(**공급자 자료 또는 매장 자체 상품 1개 이상**) ·
@@ -61,7 +61,6 @@ prefill 문구(`prefillPop`) 파싱 + `history.replaceState` · `save:true` + `t
 | 서비스 | 파일 | before → after |
 |---|---|---:|
 | K-Cosmetics | `services/web-k-cosmetics/src/pages/store/StorePopPage.tsx` | 650 L → **83 L** |
-| GlycoPharm | `services/web-glycopharm/src/pages/store-management/StorePopPage.tsx` | 742 L → **85 L** |
 
 합계 1,392 L → 168 L (**-1,224 L**), 공통 Core 1,239 L 신설. 중복 사본 2 벌 → 1 벌.
 
@@ -88,7 +87,6 @@ loading/error/empty 블록 · payload 조립 · local product 정규화 · 404 �
 |---|---|
 | `pnpm run build:packages` + `store-ui-core` tsc build | PASS (dist 에 `components/pop` 생성, index 재수출 확인) |
 | web-k-cosmetics `tsc --noEmit` / `vite build` | PASS / PASS (22.48s) |
-| web-glycopharm `tsc --noEmit` / `vite build` | PASS / PASS (19.55s) |
 | web-kpa-society 회귀 `tsc` / `vite build` | PASS / PASS (19.88s) |
 | web-pharmacy-hub 회귀 `tsc` / `vite build` | PASS / PASS (12.79s) |
 | generate payload 등가성 | 정적 대조 PASS — `buildPopGeneratePayload` 가 원본 조건부 spread 를 필드·순서까지 동일 재현 |

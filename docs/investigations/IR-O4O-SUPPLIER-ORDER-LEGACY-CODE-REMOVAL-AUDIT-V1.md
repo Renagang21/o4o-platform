@@ -14,7 +14,7 @@
 
 | 영역 | 판정 | 핵심 |
 |------|------|------|
-| buyer 주문 원장 | **checkout_orders 가 canonical** | createOrder 단일 orchestrator. KPA/Glyco/KCos/event-offer-cart 모두 수렴 |
+| buyer 주문 원장 | **checkout_orders 가 canonical** | createOrder 단일 orchestrator. |
 | event_offer participate (4 서비스) | **DISABLE → REMOVE** | route 존재, **frontend 호출 0건**(전부 cart-add 전환됨). service @deprecated. helper 는 KEEP |
 | Neture B2B store cart 주문 | **CANONICALIZE (최우선)** | `web-neture StoreCartPage → POST /neture/seller/orders → legacyNetureService.createOrder → neture_orders` **직접 생성**. checkout_orders·결제 우회. **ACTIVE UI** |
 | trial fulfillment create-order | **UNKNOWN → KEEP(보류)** | operator-only, 소비자 UI 0건. neture_orders 직접 생성하나 운영 경로 불명확 |
@@ -61,7 +61,6 @@ Cart → supplier group → supplier subtotal → supplier shipping preview
 |------|-----------|-------|------|
 | `checkoutController.initiate` | `controllers/checkout/checkoutController.ts:110` | POST /api/checkout/initiate | Phase N-1 demo, 하드코딩 supplier |
 | KPA B2C checkout | `routes/kpa/controllers/kpa-checkout.controller.ts:480` | POST /kpa/checkout | createCheckoutOrder wrapper |
-| Glyco checkout | `routes/glycopharm/controllers/checkout.controller.ts:196` | POST /glycopharm/checkout | manager.save(checkout_orders) |
 | KCos order | `routes/cosmetics/controllers/cosmetics-order.controller.ts:370` | POST /cosmetics/orders | manager.save(checkout_orders) |
 | **event_offer cart-confirm** | `services/cart/event-offer-cart-checkout.service.ts:261` | POST /store/cart/:serviceKey/checkout-confirm | **canonical buyer event_offer 경로** |
 | event_offer participate | `routes/kpa/services/event-offer.service.ts:642` | (참여 route, 4서비스) | **@deprecated**, FE 호출 0 |
@@ -77,8 +76,8 @@ Cart → supplier group → supplier subtotal → supplier shipping preview
 
 ## 5. event_offer participate legacy 감사
 
-- **route 존재 (4 서비스)**: neture `event-offer.controller.ts:108`, kpa `:131`, glyco `:95`, cosmetics `:370`. `participate()` 는 checkout_orders 생성(우회 아님)이나 **주문 단위가 listing 단위로 쪼개짐** → canonical(공급자 단위 병합)과 불일치.
-- **frontend 호출**: web-kpa-society/web-glycopharm/web-k-cosmetics 전부 **participate → cart-add 로 전환 완료**, participate 직접 호출 **0건**. web-neture `eventOffer.ts:29` 에 메서드 정의는 있으나 MarketTrial 흐름이며 participate 버튼 없음.
+- `participate()` 는 checkout_orders 생성(우회 아님)이나 **주문 단위가 listing 단위로 쪼개짐** → canonical(공급자 단위 병합)과 불일치.
+- web-neture `eventOffer.ts:29` 에 메서드 정의는 있으나 MarketTrial 흐름이며 participate 버튼 없음.
 - **service @deprecated** (WO-O4O-EVENT-OFFER-PARTICIPATE-LEGACY-DEMOTION-V1).
 - **판정**: 외부 route → **DISABLE(410 Gone / canonical cart 안내) → REMOVE**. **검증/수량차감 helper(`loadEventOfferContext`/`reserveEventOfferListing`/`incrementListingQuantity`)는 cart-confirm 과 공유 → KEEP.**
 
@@ -127,7 +126,6 @@ Cart → supplier group → supplier subtotal → supplier shipping preview
 
 | route | backend | frontend | 판정 |
 |-------|---------|----------|------|
-| POST /{neture,kpa,glyco,cosmetics}/event-offers/:id/participate | 4 controller | **0건** | **DISABLE→REMOVE** |
 | POST /neture/seller/orders | seller.controller:322 | StoreCartPage ACTIVE | **CANONICALIZE** |
 | POST /api/trial-fulfillment/:id/create-order | trialFulfillment:235 | 0건(operator-only) | **KEEP(보류)** |
 | GET /supplier/orders (non-unified) | supplier-order:69 | unified 로 대체됨 | **DISABLE/DEPRECATE** |

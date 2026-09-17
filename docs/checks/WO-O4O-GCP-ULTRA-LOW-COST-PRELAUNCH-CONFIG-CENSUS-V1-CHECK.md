@@ -157,7 +157,6 @@ Cloud SQL 월비용 = 58.7 × (ON 비율) + 16.8
 **`o4o-core-api` 만 `minScale=1` 이고 나머지 9개는 전부 0 이다** (실측 전수 확인).
 
 ```text
-glucoseview-web · glycopharm-web · k-cosmetics-web · kpa-branch-web
 kpa-society-web · neture-web · o4o-admin-dashboard · pharmacy-hub-web
 signage-player-web                                    → minScale = 0
 o4o-core-api                                          → minScale = 1
@@ -247,12 +246,10 @@ RUN-B 대비 추가 이득은 **월 $2.5 (약 3,500원)** 에 불과하다. 반�
 ```text
 admin.neture.co.kr
 neture.co.kr / www.neture.co.kr
-glycopharm.co.kr / www.glycopharm.co.kr
 kpa-society.co.kr / www.kpa-society.co.kr
 k-cosmetics.site / www.k-cosmetics.site
 glucoseview.co.kr / www.glucoseview.co.kr
 pharmacyhub.co.kr / www.pharmacyhub.co.kr
-api.neture.co.kr / api.glycopharm.co.kr / api.glucoseview.co.kr
   / api.kpa-society.co.kr / api.k-cosmetics.site   ← API 5개 호스트가 1개 backend 로 수렴
 ```
 

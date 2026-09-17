@@ -14,7 +14,7 @@
 | 컬럼 | [`SupplierProductOffer.entity.ts:146`](../../apps/api-server/src/modules/neture/entities/SupplierProductOffer.entity.ts) `service_keys text[] DEFAULT '{}'` |
 | 별도 연결 테이블 | **없음** (배열 단일 축) |
 | 파생 필드 | `distribution_type` = `deriveDistributionType(is_public, service_keys)` — `is_public→PUBLIC`, `len>0→SERVICE`, else `PRIVATE` |
-| 승인 대상 키 SSOT | [`approval-service-keys.ts`](../../apps/api-server/src/modules/neture/constants/approval-service-keys.ts) `APPROVAL_ELIGIBLE_SERVICE_KEYS = ['glycopharm','kpa-society','k-cosmetics']` — **pharmacy-hub 미포함** |
+| 승인 대상 키 SSOT | — |
 
 ### 1-2. 서비스별 가격 구조
 
@@ -75,7 +75,6 @@ const nextKeys = input.serviceKeys !== undefined
 
 ### 2-2. `service_audience_policies` 에 pharmacy-hub 행 부재 — **seed 함**
 
-resolver fallback `DEFAULT_PHARMACY_SERVICE_KEYS = ['glycopharm','kpa-society']` → pharmacy-hub = `false`
 → 규제 상품(의약품) 연결이 `REGULATED_PRODUCT_NON_PHARMACY_SERVICE` 로 거부되었다.
 약국 전문 서비스라는 §4.6 정의와 어긋나므로 멱등 seed migration 으로 행을 추가했다.
 
@@ -158,13 +157,8 @@ Pharmacy-Hub: 'pharmacy-hub' = ANY(spo.service_keys)      ← 공급자 직접 o
 
 | 케이스 | current | input | 결과 |
 |--------|---------|-------|------|
-| 기존 3키 추가 | `[glycopharm]` | `[glycopharm,kpa-society]` | added=`[kpa-society]` — legacy 동일 |
-| 기존 3키 제거 | `[glycopharm,kpa-society]` | `[glycopharm]` | removed=`[kpa-society]` — legacy 동일 |
-| **pharmacy-hub 보존** | `[glycopharm,pharmacy-hub]` | `[glycopharm]` | next=`[glycopharm,pharmacy-hub]` (legacy 는 pharmacy-hub 삭제) |
-| **neture/glucoseview 보존** | `[glycopharm,neture,glucoseview]` | `[glycopharm]` | 3키 모두 보존 (legacy 는 2키 삭제) |
-| 3키 전부 해제 | `[glycopharm,pharmacy-hub]` | `[]` | next=`[pharmacy-hub]`, removed=`[glycopharm]` |
-| serviceKeys 미전달 | `[glycopharm,pharmacy-hub]` | `undefined` | 불변 |
-| 비승인키가 입력에 실림 | `[glycopharm]` | `[glycopharm,pharmacy-hub]` | 3키 diff 불변 (추가는 setServiceDelivery 책임) |
+| 3키 전부 해제 | — | `[]` | — |
+| serviceKeys 미전달 | — | `undefined` | 불변 |
 
 **승인 대상 3키의 `added`/`removed` 는 legacy 와 100% 동일** → 기존 승인·listing 캐스케이드 거동 불변.
 **비승인키 보존 실패 0건.**
@@ -192,7 +186,6 @@ offers with 3 eligible service_keys    0    (테스트 offer 는 pharmacy-hub �
 
 ### 5-4. 의약품 접근 경계
 
-- `service_audience_policies` 실측: `pharmacy-hub = true`, `glycopharm/kpa-society = true`, `neture/k-cosmetics = false`
 - 규제 상품은 `setServiceDelivery` 의 audience 게이트를 통과해야 pharmacy-hub 에 연결된다
 - 조회는 `pharmacy-hub:store_owner` scope + membership active 안에서만 가능 — 공개/비회원 경로 없음
 - 다른 일반 매장 서비스로 자동 노출되는 경로 없음 (OPL 자동 생성 0)
@@ -232,7 +225,6 @@ services/web-pharmacy-hub/src/pages/store-owner/ProductDetailPage.tsx   (신규)
 
 회귀 영향 범위: 변경은 `apps/api-server` + `services/web-pharmacy-hub` 에 한정된다.
 `packages/*` 및 다른 web 서비스 소스는 **변경 0** 이므로 web-neture / web-kpa-society /
-web-glycopharm / web-k-cosmetics 는 빌드 산출물이 달라질 여지가 없다.
 공유 로직인 `updateDistribution` 은 §5-1 격리 검증으로 3키 거동 동일성을 확인했다.
 
 Market Trial 연결 0 · serviceKey 충돌 0.
@@ -253,7 +245,7 @@ Market Trial 연결 0 · serviceKey 충돌 0.
 | `a9b823f8-27f4-476c-9248-38e554913046` | `5f5e1000-d2be-496a-a7cb-6429dde77737` | `[E2E_TEST] 파머시허브 검증상품 B 20260730-2340` | `is_active=false`, `service_keys={}` (미제공 — 음성 대조군) |
 
 - 명칭에 `[E2E_TEST]` 접두사로 실제 판매 상품과 구분
-- **다른 서비스에는 제공하지 않았다** (`service_keys` 에 glycopharm/kpa-society/k-cosmetics 없음)
+- **다른 서비스에는 제공하지 않았다**
 - 삭제하지 않았다 — 정리가 필요하면 비활성화(`is_active=false`) 또는 제공 중지로 처리한다
 - Offer B 활성화는 기존 Neture 규칙 `PRIVATE_REQUIRES_SELLER_IDS` 로 거부됨 (본 WO 무관, 음성 대조군으로 유지)
 

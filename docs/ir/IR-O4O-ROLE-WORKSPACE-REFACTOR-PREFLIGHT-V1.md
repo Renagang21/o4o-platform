@@ -191,7 +191,7 @@ SERVICE_STORE_MODEL = REUSE_AS_IS
 | 문서 | 판정 | 사유 · 처리 |
 |---|---|---|
 | [`O4O-ROLE-WORKSPACE-ARCHITECTURE-V1`](../baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md) | **신설 ACTIVE** | §1 사업·정책 정본에 추가 |
-| [`O4O-BUSINESS-PHILOSOPHY-V1`](../baseline/O4O-BUSINESS-PHILOSOPHY-V1.md) | UPDATE_REQUIRED (ACTIVE 유지) | §3 · §4 · §7 · 주의사항(Neture 내 매장 금지) · 적용 범위(GlycoPharm 잔존) 가 충돌. 충돌 절은 새 정본 우선. 본문 개정은 후속 WO |
+| [`O4O-BUSINESS-PHILOSOPHY-V1`](../baseline/O4O-BUSINESS-PHILOSOPHY-V1.md) | UPDATE_REQUIRED (ACTIVE 유지) | §3 · §4 · §7 · 주의사항(Neture 내 매장 금지) · 적용 범위 가 충돌. 충돌 절은 새 정본 우선. 본문 개정은 후속 WO |
 | [`O4O-3-ROLE-FLOW-BASELINE-V1`](../baseline/O4O-3-ROLE-FLOW-BASELINE-V1.md) | **판정 대기** | §2 단선 흐름 · §6 Drift 금지 2항이 새 정본 §2-1 · §6 과 정면 충돌. 헤더 표기 + 색인 §9 이동 |
 | [`NETURE-PARTNER-CONTRACT-FREEZE-V1`](../baseline/NETURE-PARTNER-CONTRACT-FREEZE-V1.md) (F7) | **판정 대기 → RETIRE_CANDIDATE** | Partner 전면 은퇴 대상. 헤더 표기. Partner Retirement 완료 시 SUPERSEDED/archive |
 | [`PLATFORM-CONTENT-POLICY-V1`](../baseline/PLATFORM-CONTENT-POLICY-V1.md) (F4) | UPDATE_REQUIRED (FROZEN 유지) | 3축 모델 유지. §3.1 · §6.3 · §10-5 "`producer='supplier'` = legacy 예외" 가 충돌 |

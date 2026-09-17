@@ -11,7 +11,6 @@
 ## 0. 범위 결정 (중요)
 
 조사 중 **4서비스 detail 이 2가지 스타일 시스템으로 갈림**을 확인했다:
-- **GlycoPharm = Tailwind className 기반** (Loader2 spinner)
 - **KPA / Neture / K-Cosmetics = inline `style` 기반** (KPA=`LoadingSpinner` 컴포넌트 + `ClosedForumAccessBlocker`, Neture=스켈레톤, KCos=텍스트)
 
 이 때문에 부품별 시각 회귀 위험이 다르다:
@@ -32,14 +31,13 @@
 
 ## 2. ForumPostContent 변환 정책
 
-- **forum-core-free:** shared-space-ui 는 forum-core 미의존(GP/KCos Dockerfile 이 forum-core 미COPY → transitive 의존 시 빌드 실패). `forumContentToHtml` 은 forum-core `blockToHtml` 을 **로컬 복제**(paragraph/heading/quote/list/code/image/divider/default 동일 분기).
+- **forum-core-free:** shared-space-ui 는 forum-core 미의존(KCos Dockerfile 이 forum-core 미COPY → transitive 의존 시 빌드 실패). `forumContentToHtml` 은 forum-core `blockToHtml` 을 **로컬 복제**(paragraph/heading/quote/list/code/image/divider/default 동일 분기).
 - **2가지 적용 모드:**
   - `content` prop → canonical `forumContentToHtml` (KPA/KCos 채택).
-  - `html` prop → 사전 변환 문자열 그대로 (GP plain-text / Neture legacy-escape 보존).
 - **출력 동등성:**
   - KPA: 기존 `blocksToHtml`(forum-core) ↔ `forumContentToHtml` = **동일 출력**(line-identical 복제).
   - KCos: 기존 로컬 `blocksToHtmlInline`(p/heading/quote) ⊂ `forumContentToHtml`(+list/code/image/divider) = **상위호환**(누락 블록이 이제 렌더, 회귀 아님).
-  - GP/Neture: 자기 변환 결과를 `html` 로 넘겨 **변경 0**.
+  - Neture: 자기 변환 결과를 `html` 로 넘겨 **변경 0**.
 
 ## 3. 4서비스 적용 결과
 
@@ -47,7 +45,6 @@
 |--------|:--:|------|----------|
 | **KPA** (`ForumDetailPage.tsx`) | ✅ | `content` (canonical) | `blocksToHtml`(forum-core)·`ContentRenderer` import 제거(미사용화) |
 | **K-Cosmetics** (`PostDetailPage.tsx`) | ✅ | `content` (canonical) | 본문 `contentHtml` 제거. 댓글 `blocksToHtmlInline`·`ContentRenderer` 는 **유지**(댓글은 범위 외) |
-| **GlycoPharm** (`ForumPostDetailPage.tsx`) | ✅ | `html={bodyText}` (extractText 보존) | `ContentRenderer` import 제거(미사용화) |
 | **Neture** (`ForumPostPage.tsx`) | ✅ | `html={contentToHtml(...)}` (legacy-escape 보존) | `ContentRenderer` import → `ForumPostContent`. `contentToHtml`·`blocksToHtml` 유지 |
 
 ## 4. KPA 고유 기능 보존 확인
@@ -58,9 +55,9 @@
 
 ✅ basePath·slug routing·contactSection(`shouldShowAuthorContact`)·comment full CRUD·like·edit/delete CTA·모바일 action 메뉴·`${basePath}/post/:slug` route — **전부 미변경**. 본문 변환 `contentToHtml`(legacy escape) 보존(html prop).
 
-## 6. GP/KCos read-only 정책 유지 확인
+## 6. KCos read-only 정책 유지 확인
 
-✅ GP·KCos detail 은 여전히 read-only(comment list only, edit/delete·comment write 없음). content render 부품만 교체, 정책 무변경.
+✅ KCos detail 은 여전히 read-only(comment list only, edit/delete·comment write 없음). content render 부품만 교체, 정책 무변경.
 
 ## 7. comment / action / contact / closed-forum 미수정 확인
 
@@ -73,14 +70,13 @@
 | shared-space-ui (ForumPostContent/forumContentToHtml) | ✅ (web-neture tsc 가 source 컴파일, 0 error) |
 | web-neture | ✅ PASS (0 error) |
 | web-kpa-society | ✅ PASS (총 0 error) |
-| web-glycopharm | ✅ PASS (총 0 error) |
 | web-k-cosmetics | ✅ PASS (총 0 error) |
 
 ## 9. browser smoke 여부
 
 ✅ Neture detail 수행(제출/mutation 없음):
 - `/forum/post/forum-purpose-and-scope` → title·**본문 content(ForumPostContent)**·댓글 정상 렌더. console error 3건은 **401 auth/me·refresh**(세션 만료, forum 무관).
-- KPA/GP/KCos: dev 인프라 비용으로 라이브 미수행. 대신 **tsc PASS + 출력 동등성(forumContentToHtml = blockToHtml line-identical, KCos 상위호환) + ForumPostContent 컴포넌트 Neture e2e 동작 확인**으로 검증. (canonical 경로 회귀 위험 최소)
+- KPA/KCos: dev 인프라 비용으로 라이브 미수행. 대신 **tsc PASS + 출력 동등성(forumContentToHtml = blockToHtml line-identical, KCos 상위호환) + ForumPostContent 컴포넌트 Neture e2e 동작 확인**으로 검증. (canonical 경로 회귀 위험 최소)
 
 ## 10. backend / API / DB / migration / route / menu 변경 없음 확인
 
@@ -94,7 +90,6 @@
 |--------|------|
 | `WO-O4O-FORUM-DETAIL-STATES-HEADER-EXTRACTION-V1` | ForumDetail{Loading,Error,NotFound}State + ForumPostHeader 추출(스타일 시스템 차이 흡수 위해 className/style·slot 설계 + 서비스별 시각 검증) |
 | `WO-O4O-FORUM-DETAIL-COMMENT-LIST-COMMONIZATION-V1` | comment **표시** 부품(작성/CRUD 제외) |
-| (선택) GP content 를 plain → canonical 전환할지 정책 결정(현재 extractText 보존) |
 
 ---
 
@@ -103,11 +98,11 @@
 | 항목 | 결과 |
 |------|------|
 | ForumPostContent + forumContentToHtml 추출 | ✅ (forum-core-free) |
-| 4서비스 적용 | ✅ (KPA/KCos=content, GP/Neture=html) |
-| content 변환 수렴 | KPA(동일)·KCos(상위호환) canonical 채택, GP/Neture 보존 |
+| 3서비스 적용 | ✅ (KPA/KCos=content, Neture=html) |
+| content 변환 수렴 | KPA(동일)·KCos(상위호환) canonical 채택, Neture 보존 |
 | KPA 고유(closed-forum/tags/appreciation) 보존 | ✅ |
 | Neture 고유(contact/basePath) 보존 | ✅ |
-| GP/KCos read-only 정책 | ✅ 유지 |
+| KCos read-only 정책 | ✅ 유지 |
 | comment/action/contact/closed-forum | 미수정 |
 | backend/API/DB/route/menu | 무변경 |
 | TypeScript | 4서비스 + shared PASS |

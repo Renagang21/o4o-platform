@@ -52,7 +52,6 @@
 | 사용자 상세 — 활동 로그 | `GET /users/:id/activity-log` | **없음** | — | **I** |
 
 `/users/:id/business-info` 는 백엔드 전수 검색 결과 존재하지 않는다. `users.businessInfo` 데이터는
-서비스별 **본인용** mypage 경로(`/cosmetics/mypage/business-info`, `/glycopharm/mypage/business-info`,
 `requireAuth` + 본인 scope)로만 노출되고, 관리자용 대응 API 는 만들어진 적이 없다.
 `UserDetail.tsx` 는 살아 있는 화면이므로 이 두 섹션은 항상 실패한다.
 

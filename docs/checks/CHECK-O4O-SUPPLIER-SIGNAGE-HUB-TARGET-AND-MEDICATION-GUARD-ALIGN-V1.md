@@ -185,7 +185,6 @@ WO §6.3 은 최소 필수를 이렇게 정의한다.
 services/web-kpa-society/src/pages/pharmacy/HubSignageLibraryPage.tsx
 services/web-kpa-society/src/pages/pharmacy/StoreHubLatestFeed.tsx
 services/web-kpa-society/src/components/home/SignageSection.tsx   ← 로그인 전 홈 노출
-services/web-glycopharm/src/pages/hub/HubSignageLibraryPage.tsx
 services/web-k-cosmetics/src/pages/hub/HubSignagePage.tsx
 services/web-neture/src/lib/api/supplierSignage.ts
 ```
@@ -240,7 +239,6 @@ import 경로  : @o4o/asset-copy-core createAssetCopyController [F1 FROZEN]
 > 조사 시점의 권장안(D1=②)은 채택되지 않았다 — 자기신고 방식도 공급자에게 적합성 판단을
 > 지우는 구조라 §0-A 결정과 어긋난다. 아래 표는 판단 경위 기록용이다.
 
-
 | # | 결정 | 선택지 |
 |:-:|------|--------|
 | **D1** | **정책 반전 승인 여부** | ① 기존 정책 유지(가드 없음 — 현행) ② 반전(Signage 에도 의약품 기반 유통 제한 도입) |
@@ -260,7 +258,6 @@ import 경로  : @o4o/asset-copy-core createAssetCopyController [F1 FROZEN]
 > Signage 관련 후속 작업은 없다. 다음 작업은 공급자 대시보드 IA
 > (`WO-O4O-NETURE-SUPPLIER-DASHBOARD-STORE-MATERIALS-IA-V1`)이며, 그 WO 는 **Signage 를
 > 의약품/비의약품 판정 대상에서 명시적으로 제외**한다.
-
 
 | ID | 제목(가칭) | 선행 결정 | 비고 |
 |----|-----------|-----------|------|

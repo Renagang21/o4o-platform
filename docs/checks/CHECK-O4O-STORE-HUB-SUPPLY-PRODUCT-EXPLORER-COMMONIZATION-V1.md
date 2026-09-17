@@ -41,7 +41,7 @@
 - A(그대로 확장) 기각: PharmacyHub 는 검색·select 필터·page 축·상세 진입이 필요하고 신청/제외가 **없다**.
   `SupplyCatalogHub` 에 이를 넣으면 신청 흐름과 주문 흐름이 한 컴포넌트에 섞여 §3 경계를 깬다.
 - B(내부 Core 분리 후 전면 소비) 부분 채택: `SupplyCatalogHub` 는 **상태 Core 만** 소비하고 **화면(accent 탭·안내 박스·액션 컬럼·ActionBar)은 그대로 둔다.**
-  공통 View 까지 태우면 GP/K-Cosmetics 의 accent 색·안내문이 바뀌어 §9 "목록 변화 없음"을 위반한다.
+  공통 View 까지 태우면 K-Cosmetics 의 accent 색·안내문이 바뀌어 §9 "목록 변화 없음"을 위반한다.
 - KPA(798줄 fuller)는 **무변경**. §4 보호 대상(공급자 로고·권장 소비자가·가격 sublabel·제외 확인 모달·`미추가 N개` statusInfo)을 축소하지 않기 위해 이번 범위에서 제외한다.
 
 ---
@@ -64,11 +64,11 @@
 | 서비스 | 적용 | 내용 |
 |---|---|---|
 | Pharmacy-Hub `/store-owner/products` | Core 전면 | `useSupplyProductList` + `SupplyProductExplorer` 소비. adapter(`/pharmacy-hub/store-owner/products` 그대로) + 컬럼 4개 + 상세 링크만 남김. 251줄 → 172줄 |
-| K-Cosmetics · GlycoPharm (`SupplyCatalogHub` 4개 소비처) | Core 부분 | 상태/조회/페이지네이션만 `useSupplyProductList` 로 위임. **props · 마크업 · accent · 안내문 · 액션 전부 무변경** |
+| K-Cosmetics | Core 부분 | 상태/조회/페이지네이션만 `useSupplyProductList` 로 위임. **props · 마크업 · accent · 안내문 · 액션 전부 무변경** |
 | KPA-Society `/store-hub/b2b` | 미적용 | fuller 구현 보호(§4). 후속 WO 후보 |
 | Neture | 코드 변경 0 | 공급 계약(`SupplierProductOffer` 등) 미접촉 — 조사만 |
 
-`SupplyCatalogHub` 소비처 4곳(K-Cos hub/store-commerce, GP hub/store-management)은 호출부 수정 0건.
+`SupplyCatalogHub` 소비처 3곳(K-Cos hub/store-commerce hub/store-management)은 호출부 수정 0건.
 
 ### KPA fuller 보존 방법
 KPA 는 이번 WO 에서 **파일을 열지 않았다**. 추후 적용 시에도 컬럼 `render`(로고·권장 소비자가·가격 sublabel), `toolbar`(statusInfo 포함 ActionBar), 별도 확인 모달을 그대로 주입하는 wrapper 형태만 허용한다.
@@ -99,13 +99,13 @@ KPA 는 이번 WO 에서 **파일을 열지 않았다**. 추후 적용 시에도
 | 항목 | 결과 |
 |---|---|
 | typecheck `pharmacy-hub-web` (`tsc -b`) | PASS (0) |
-| typecheck K-Cosmetics / GlycoPharm / KPA-Society | PASS (0) — 사전 실패는 미빌드 dist 패키지 원인, 빌드 후 0 |
-| `vite build` 4개 서비스 (PH / KCos / GP / KPA) | PASS |
+| typecheck K-Cosmetics / KPA-Society | PASS (0) — 사전 실패는 미빌드 dist 패키지 원인, 빌드 후 0 |
+| `vite build` 3개 서비스 (PH / KCos / KPA) | PASS |
 | PharmacyHub 브라우저 smoke (`/store-owner/products`, 프로덕션 API) | PASS — 목록 1건 렌더 · 규제유형 탭 · 공급자 select · 검색 · 공급가 sublabel · console error 0 |
 | PharmacyHub 상세 진입 | PASS — `/store-owner/products/3bb54519-…` 이동, 상세의 `장바구니에 담기` 정상 노출 |
 | PharmacyHub empty 분기 | PASS — 조건 있음 "조건에 맞는 상품이 없습니다" / 조건 없음 "아직 … 제공된 상품이 없습니다" |
 | `SupplyCatalogHub` 회귀 (stub API 하네스로 실브라우저 검증 후 하네스 삭제) | PASS — 20행/45건 · `1/3 → 2/3` 페이지 이동 · 탭 전환 시 1페이지 리셋(`1/2 · 22건`) · 단건 추가 후 뱃지 반영 · bulk 선택 시 ActionBar `내 매장에 추가 (2)` · console error 0 |
-| K-Cosmetics / GlycoPharm 실계정 브라우저 smoke | **미수행** — `cosmetics` / `glycopharm` serviceKey 로 로그인 가능한 store_owner 계정 없음(`SERVICE_NOT_MEMBER`). 위 stub 하네스 + build 로 대체 |
+| K-Cosmetics 실계정 브라우저 smoke | **미수행** — `cosmetics` serviceKey 로 로그인 가능한 store_owner 계정 없음(`SERVICE_NOT_MEMBER`). 위 stub 하네스 + build 로 대체 |
 | KPA 목록·신청·제외 | 파일 무변경 (코드 diff 0). 실계정 smoke 미수행 |
 | Neture 공급 계약 | 코드 변경 0 — 위반 없음 |
 

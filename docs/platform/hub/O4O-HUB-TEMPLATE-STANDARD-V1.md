@@ -2,7 +2,7 @@
 
 > **상위 문서**: `CLAUDE.md` § 13 (O4O 공통 구조 원칙), § 13-A (APP 표준화)
 > **패키지**: `@o4o/shared-space-ui` (`packages/shared-space-ui/src/`)
-> **적용 범위**: KPA Society, GlycoPharm, K-Cosmetics, 향후 모든 O4O 서비스
+> **적용 범위**: KPA Society, K-Cosmetics, 향후 모든 O4O 서비스
 > **상태**: Active Standard (2026-04-23)
 
 ---
@@ -137,7 +137,6 @@ import { LmsHubTemplate, type LmsHubConfig } from '@o4o/shared-space-ui';
 ```typescript
 // 모든 Config에 공통으로 존재하는 필드
 interface HeroCommon {
-  serviceKey: string;      // 서비스 식별자 (e.g., 'kpa-society', 'glycopharm')
   heroTitle: string;       // Hero 영역 제목
   heroDesc: string;        // Hero 영역 부제 설명
 }
@@ -315,17 +314,16 @@ return <LmsHubTemplate config={config} />;
 
 ### 7.1 현재 적용 현황
 
-| Template | KPA Society | GlycoPharm | K-Cosmetics |
-|----------|:-----------:|:----------:|:-----------:|
-| **ContentHub** | `pharmacy/HubContentLibraryPage.tsx` | `hub/HubContentListPage.tsx` | `library/ContentLibraryPage.tsx` |
-| **LmsHub** | `lms/EducationPage.tsx` | `education/EducationPage.tsx` | `lms/EducationPage.tsx` |
-| **ForumHub** | `forum/ForumHomePage.tsx` | `forum/ForumHubPage.tsx` | `forum/ForumHubPage.tsx` |
-| **StoreHub** | `pharmacy/StoreHubPage.tsx` | `hub/StoreHubPage.tsx` | `hub/KCosmeticsHubPage.tsx` |
-| **ResourcesHub** | `resources/ResourcesHubPage.tsx` | `resources/ResourcesPage.tsx` | `resources/ResourcesPage.tsx` |
-| **SignageHub** | `signage/ContentHubPage.tsx` ※ | `store-management/signage/ContentLibraryPage.tsx` | `signage/ContentHubPage.tsx` ※ |
+| Template | KPA Society | K-Cosmetics |
+| ---------- | :-----------: | :-----------: |
+| **ContentHub** | `pharmacy/HubContentLibraryPage.tsx` | `library/ContentLibraryPage.tsx` |
+| **LmsHub** | `lms/EducationPage.tsx` | `lms/EducationPage.tsx` |
+| **ForumHub** | `forum/ForumHomePage.tsx` | `forum/ForumHubPage.tsx` |
+| **StoreHub** | `pharmacy/StoreHubPage.tsx` | `hub/KCosmeticsHubPage.tsx` |
+| **ResourcesHub** | `resources/ResourcesHubPage.tsx` | `resources/ResourcesPage.tsx` |
+| **SignageHub** | `signage/ContentHubPage.tsx` ※ | `signage/ContentHubPage.tsx` ※ |
 
 > ※ KPA / K-Cosmetics는 `SignageManagerTemplate`(@o4o/shared-space-ui)을 사용한다 — 동영상/플레이리스트 탭 기반.
-> GlycoPharm은 `SignageHubTemplate`(콘텐츠 목록형)을 사용한다.
 > 두 변형 모두 `@o4o/shared-space-ui` 공통 Template이며, Override가 아니다.
 
 ### 7.2 서비스 페이지 작성 패턴
@@ -406,13 +404,6 @@ return <{Domain}HubTemplate config={config} />;
 | Store | `pages/pharmacy/StoreHubPage.tsx` | `/store-hub` |
 | Resources | `pages/resources/ResourcesHubPage.tsx` | `/resources` |
 | Signage | `pages/signage/ContentHubPage.tsx` | `/signage` |
-
-### 9.3 GlycoPharm은 KPA 패턴을 따른다
-
-GlycoPharm의 HUB 페이지는 KPA와 동일한 템플릿 + Config 패턴을 사용한다.
-차이점은 `serviceKey` (`'glycopharm'`)와 API 호출 대상뿐이다.
-
----
 
 ## 10. `/content` vs `/resources` Boundary
 

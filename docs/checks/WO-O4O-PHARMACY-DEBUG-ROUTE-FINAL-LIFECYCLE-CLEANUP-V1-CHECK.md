@@ -37,8 +37,8 @@
 | 2026-03-31 | `55cd4e664` | 생성 (약국 목록 + 비활성화) |
 | 2026-03-31 | `32ff2fcee` | 컬럼명 수정 |
 | 2026-04-01 | `322be4584` | Care 데이터 진단 추가 |
-| 2026-04-07 | `97aa5f81a` | `/lookup` 추가 — `WO-O4O-GLYCOPHARM-PHARMACY-SEARCH-DEBUG-MEASUREMENT-V1` |
-| 2026-04-08 | `e3d03724e` · `45996daa7` | `/appointment-trace` 추가·수정 — `IR-O4O-GLYCOPHARM-APPOINTMENT-REQUEST-MISSING-IN-PHARMACY-V1` |
+| 2026-04-07 | `97aa5f81a` | — |
+| 2026-04-08 | `e3d03724e` · `45996daa7` | — |
 | 2026-05-02 | `bf51255ce` | **타 WO 잔재 정리** (glucoseview dead query 제거) |
 | 2026-05-09 | `8a0416cd7` | **타 WO 잔재 정리** (Care 백엔드 정리) |
 | 2026-08-05 | `4274982e5` | **타 WO 잔재 정리** (GlucoseView 전 계층 제거) |
@@ -57,10 +57,7 @@
 
 | 소비처 | 영향 |
 |--------|------|
-| `modules/glycopharm/resolve-pharmacy.ts:34` | 환자 검색 SoR 에서 약국 소멸 |
-| `routes/glycopharm/pharmacy-context.middleware.ts:87` | enrollment `status='active'` 탈락 → 해당 약국 사용자의 약국 컨텍스트 상실 |
 | `modules/platform/platform-hub.controller.ts:144` | `activePharmacies` KPI 감소 |
-| `routes/glycopharm/services/operator-dashboard.service.ts` · `report.service.ts` | 운영자 대시보드·리포트 집계 제외 |
 | `routes/platform/physical-store.service.ts` · `store-network.service.ts` | 매장 네트워크 조회 제외 |
 
 한 번의 무인증 POST 가 위 전부를 되돌릴 절차 없이 바꿨다.

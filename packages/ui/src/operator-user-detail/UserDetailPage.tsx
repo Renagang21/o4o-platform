@@ -2,7 +2,7 @@
  * UserDetailPage — 공통 회원 상세 컴포넌트
  * WO-O4O-USER-DETAIL-PAGE-COMMONIZATION-V1
  *
- * 4개 서비스(Neture, GlycoPharm, K-Cosmetics, KPA) 공통.
+ * 3개 서비스(Neture, K-Cosmetics, KPA) 공통.
  * 서비스별 차이는 config + actions + apiAdapter로 주입.
  */
 

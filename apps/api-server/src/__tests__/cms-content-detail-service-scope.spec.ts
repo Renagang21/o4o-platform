@@ -108,11 +108,11 @@ function makeApp() {
 
 const PH = ROWS[0].id;
 const KPA = ROWS[1].id;
-const GP = ROWS[2].id;
+const NET = ROWS[2].id;
 const KPA_DRAFT = ROWS[3].id;
 const KCOS = ROWS[4].id;
 const KCOS_LEGACY = ROWS[5].id;
-const GP_PLATFORM = ROWS[6].id;
+const NET_PLATFORM = ROWS[6].id;
 const MISSING = '99999999-9999-4999-8999-999999999999';
 
 describe('§17 list/detail 정합 — 목록에 없는 타 서비스 row 는 상세로도 못 본다', () => {
@@ -123,7 +123,7 @@ describe('§17 list/detail 정합 — 목록에 없는 타 서비스 row 는 상
   });
 
   it('pharmacy-hub context 로 Neture content UUID → 404', async () => {
-    const res = await request(makeApp()).get(`/cms/contents/${GP}?serviceKey=pharmacy-hub`);
+    const res = await request(makeApp()).get(`/cms/contents/${NET}?serviceKey=pharmacy-hub`);
     expect(res.status).toBe(404);
   });
 
@@ -189,8 +189,8 @@ describe('KPA serviceKey alias — kpa / kpa-society 는 같은 경계다', () =
     expect(matchServiceKey({ serviceKey: 'kpa' }, lastWhere)).toBe(true);
   });
 
-  it('alias 는 KPA 축에만 적용된다 (kpa 로 GP 는 못 본다)', async () => {
-    const res = await request(makeApp()).get(`/cms/contents/${GP}?serviceKey=kpa`);
+  it('alias 는 KPA 축에만 적용된다 (kpa 로 neture 행은 못 본다)', async () => {
+    const res = await request(makeApp()).get(`/cms/contents/${NET}?serviceKey=kpa`);
     expect(res.status).toBe(404);
   });
 });
@@ -248,18 +248,18 @@ describe('§7 list/detail invariant — 목록·집계도 같은 경계로 닫�
 
 describe("§11 visibilityScope='platform' 은 cross-service global 이 아니다", () => {
   it('NET platform-visibility row 는 KPA context 에서 보이지 않는다', async () => {
-    const res = await request(makeApp()).get(`/cms/contents/${GP_PLATFORM}?serviceKey=kpa-society`);
+    const res = await request(makeApp()).get(`/cms/contents/${NET_PLATFORM}?serviceKey=kpa-society`);
     expect(res.status).toBe(404);
   });
 
   it('NET platform-visibility row 는 자기 서비스에서는 정상 조회된다', async () => {
-    const res = await request(makeApp()).get(`/cms/contents/${GP_PLATFORM}?serviceKey=neture`);
+    const res = await request(makeApp()).get(`/cms/contents/${NET_PLATFORM}?serviceKey=neture`);
     expect(res.status).toBe(200);
-    expect(res.body.data.id).toBe(GP_PLATFORM);
+    expect(res.body.data.id).toBe(NET_PLATFORM);
   });
 
   it('service boundary 가 visibilityScope 보다 먼저 적용된다 (조회 조건 자체)', async () => {
-    await request(makeApp()).get(`/cms/contents/${GP_PLATFORM}?serviceKey=kpa-society`);
+    await request(makeApp()).get(`/cms/contents/${NET_PLATFORM}?serviceKey=kpa-society`);
     expect(lastWhere.serviceKey?._value).toEqual(['kpa-society', 'kpa']);
   });
 });

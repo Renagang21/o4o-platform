@@ -11,7 +11,7 @@
 
 **PASS**
 
-> Neture canonical execution 구조는 정확히 구현되어 있으며, KPA-Society·GlycoPharm·K-Cosmetics는 redirect-only 게이트웨이로 동작한다. 단, 2차 승인(ServiceApproval) 레거시 인프라가 아직 코드 및 라우트에 잔존하고 있어 명시적 제거 작업이 필요하다.
+> Neture canonical execution 구조는 정확히 구현되어 있으며, KPA-Society·K-Cosmetics는 redirect-only 게이트웨이로 동작한다. 단, 2차 승인(ServiceApproval) 레거시 인프라가 아직 코드 및 라우트에 잔존하고 있어 명시적 제거 작업이 필요하다.
 
 ---
 
@@ -21,7 +21,7 @@
 |------|------|
 | **canonical execution service** | Neture (`services/web-neture`) |
 | **non-canonical legacy surfaces** | ServiceApproval 2차 승인 라우트 (`/api/v1/:serviceKey/operator/market-trial/*`) |
-| **gateway-only surfaces** | KPA-Society, GlycoPharm, K-Cosmetics (redirect 컴포넌트만 존재) |
+| **gateway-only surfaces** | KPA-Society, K-Cosmetics (redirect 컴포넌트만 존재) |
 | **deprecated execution patterns** | `approve2nd()`, `reject2nd()` — HTTP 403 반환하나 라우트 여전히 마운트됨 |
 | **현재 기준 source of truth** | Neture 운영자 승인 1단계 → Market Trial 상태 머신 전체 |
 
@@ -52,13 +52,6 @@
 | redirect 컴포넌트 | `components/MarketTrialNetureRedirect.tsx` | Neture로 자동 redirect | NO | PASS | KEEP |
 | `/market-trial` 라우트 | App.tsx | redirect 실행 | NO | PASS | KEEP |
 | `/market-trial/:id` 라우트 | App.tsx | redirect 실행 | NO | PASS | KEEP |
-
-### 3-3. GlycoPharm (gateway-only)
-
-| 컴포넌트 | 경로 | 현재 역할 | 실행성 | Canonical 부합 | 판정 |
-|---------|------|---------|------|--------------|------|
-| redirect 컴포넌트 | `components/common/MarketTrialNetureRedirect.tsx` | Neture로 자동 redirect | NO | PASS | KEEP |
-| `/store/market-trial*` 라우트 | App.tsx | redirect 실행 | NO | PASS | KEEP |
 
 ### 3-4. K-Cosmetics (gateway-only)
 
@@ -103,7 +96,7 @@
 | **고객 전환 상태** | `updateParticipantConversionStatus()` | Neture 운영자 | YES | PASS |
 | **공급자 관리** | Neture 공급자 대시보드 | Neture | YES | PASS |
 | **운영자 관리** | Neture 운영자 대시보드 | Neture | YES | PASS |
-| **외부 서비스 게이트 유입** | redirect 컴포넌트 (KPA/GlycoPharm/K-Cosmetics) | 게이트 전용 | YES — no exec | PASS |
+| **외부 서비스 게이트 유입** | redirect 컴포넌트 | 게이트 전용 | YES — no exec | PASS |
 | **Product 전환** | `convertToProduct()` — `/api/v1/neture/operator/market-trial/:id/convert` | Neture | YES | PASS |
 | **스토어 리스팅 연결** | `createListingFromParticipant()` | Neture | YES | PASS |
 | **포럼/홍보 연계** | `MarketTrialForumService` — 1차 승인 시 자동 생성 | Neture | YES (fire-and-forget) | PASS (모니터링 권장) |
@@ -120,7 +113,6 @@
 - Backend controllers: `marketTrialController.ts`, `marketTrialOperatorController.ts`
 - packages/market-trial: 엔티티(MarketTrial, MarketTrialParticipant, MarketTrialForum, MarketTrialDecision), 서비스 레이어 전체
 - `visibleServiceKeys` 컬럼 — 발견 가시성 제어 (실행 분산이 아님)
-- KPA-Society/GlycoPharm/K-Cosmetics redirect 컴포넌트 — 순수 게이트웨이
 - KPA-Society 홈 배너 (`MarketTrialSection.tsx`) — 외부 링크 전용
 
 ### HOLD — 즉시 제거하지 않되 후속 판단 필요
@@ -256,7 +248,7 @@
 **전체 판정: PASS**
 
 1. **Neture canonical 구조는 정확히 구현되어 있다.** 등록·승인·모집·참여·운영·정산·전환 모든 실행 흐름이 Neture 내에서 완결된다.
-2. **타 서비스(KPA-Society, GlycoPharm, K-Cosmetics)는 redirect 전용 게이트웨이로 동작한다.** 실행 로직·API 호출 없음. 완전히 준수.
+2. **타 서비스는 redirect 전용 게이트웨이로 동작한다.** 실행 로직·API 호출 없음. 완전히 준수.
 3. **2차 승인(ServiceApproval) 레거시가 코드 및 라우트에 잔존한다.** HTTP 403 반환으로 실제 동작은 안 하지만 라우트가 마운트되어 있어 명시적 제거 필요.
 4. **visibleServiceKeys는 발견/게이트 전용**으로 올바르게 사용되고 있다. 실행 분산 흔적 없음.
 5. **Admin/Operator URL 이중화**는 OPERATOR-DASHBOARD-STANDARD-V1과 충돌; redirect 처리로 정리 권장.

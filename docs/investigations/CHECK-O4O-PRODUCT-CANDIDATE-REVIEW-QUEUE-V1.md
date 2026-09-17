@@ -96,7 +96,7 @@ DB enum 이 아니라 **varchar + application-level union** (확장 시 enum mig
 
 ## 7. API Endpoints
 
-마운트: `/api/v1/operator/product-candidates` — guard: `authenticate` + `requireRole([platform/neture/glycopharm/cosmetics/kpa-society :admin|:operator])` + `injectServiceScope`.
+마운트: `/api/v1/operator/product-candidates` — guard: `authenticate` + `requireRole` + `injectServiceScope`.
 
 | Method | Path | 설명 |
 |---|---|---|

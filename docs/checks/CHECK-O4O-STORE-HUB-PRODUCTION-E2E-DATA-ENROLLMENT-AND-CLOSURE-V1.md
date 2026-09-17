@@ -2,31 +2,16 @@
 
 - **상태**: `PASS` (4개 서비스 전 흐름 desktop·mobile 실브라우저 검증 완료)
 - **작성일**: 2026-08-14
-- **대상 서비스**: KPA-Society · K-Cosmetics · GlycoPharm · Pharmacy-Hub (4개)
+- **대상 서비스**: KPA-Society · K-Cosmetics · Pharmacy-Hub (4개)
 - **검증 방식**: 프로덕션 실브라우저(Playwright chromium) 실로그인 · desktop(1440×900) + mobile(390×844, iPhone UA, isMobile/hasTouch)
 - **검증 계정**: `docs/local/TEST-ACCOUNTS.local.md` (SSOT) — 매장 경영자 · 운영자 · 공급자
 - **선행 문서**: [CHECK-O4O-STORE-HUB-ALL-SERVICES-PRODUCTION-ADOPTION-AND-E2E-V1](CHECK-O4O-STORE-HUB-ALL-SERVICES-PRODUCTION-ADOPTION-AND-E2E-V1.md)
 
-> **결론 먼저**: 선행 WO 의 blocker B1(GlycoPharm 조직 미연결) · B2(공급 카탈로그 0건)를
+> **결론 먼저**: 선행 WO 의 blocker B1 · B2(공급 카탈로그 0건)를
 > **canonical 경로로만** 해소했고, 4개 서비스 모두 `탐색 → 상세 → 신청/가져오기 → 장바구니 → 주문 진입`
 > 을 desktop·mobile 양쪽에서 통과했다. 검증 중 프로덕션 결함 2건을 발견해 수정·배포·재검증했다.
 
 ---
-
-## §1 B1 — GlycoPharm 조직 canonical enrollment
-
-`LIMIT 1` 방식(KPA 조직 우연 선택)은 **복구하지 않았다.** DB 직접 write 도 하지 않았다.
-정규 매장 가입 → 승인 경로만 사용했다.
-
-| 항목 | 값 |
-|---|---|
-| member | `b35e63d1-16e0-455a-bfc3-18aa064b45a9` |
-| organization | `13c08a86-a4b7-4b82-834e-6a01b3c2f4c1` (`gp-pharm-6967ebe02f87`, type `pharmacy`, role `owner`) |
-| enrollment | `organization_service_enrollments(service_code='glycopharm', status='active')` |
-
-결과: [resolveStoreOrganization](../../apps/api-server/src/utils/store-organization.resolver.ts) 의
-`glycopharm` linkage(enrollment `glycopharm`) 를 통해 `status='resolved'` 로 확정된다.
-선행 WO 에서 403 이던 5개 route (`/store-hub/b2b` · `/store-hub/blog` · `/store-hub/pop` · `/store-hub/qr` · `/store`) 전부 정상화.
 
 ## §2 B2 — E2E 전용 공급 offer + service approval
 
@@ -36,7 +21,7 @@
 |---|---|
 | product master | `7469448d-d5e1-4a13-8b73-cdd35bc99726` — `[E2E_TEST] 매장 허브 검증 상품` |
 | offer | `61db213b-547d-4473-9f28-a0586eb2524d` (SERVICE, 공급가 9,900원 / 권장 12,000원, 재고 999) |
-| service approvals | `kpa-society` · `glycopharm` · `k-cosmetics` 3건 모두 `approved` |
+| service approvals | `kpa-society` · `k-cosmetics` 3건 모두 `approved` |
 
 이후 서비스별 매장 취급 신청 → 운영자 승인을 **정규 API 경로**로 수행했다
 (`POST /{svc}/pharmacy/products/apply` → `PATCH /{base}/operator/product-applications/:id/approve`).
@@ -44,7 +29,6 @@
 | 서비스 | product_approvals | organization | 결과 |
 |---|---|---|---|
 | KPA-Society | `aedd7c5a-…` | `9c87f46b-…` | `listingActivated: true` |
-| GlycoPharm | `2be5963c-…` | `13c08a86-…` (§1 신규) | `listingActivated: true` |
 | K-Cosmetics | `12437bcc-…` | `83ff96c7-…` | `listingActivated: true` |
 
 장바구니 동선 검증용 이벤트·특가 listing 도 같은 offer 기준으로 구성했다.
@@ -52,20 +36,11 @@
 | 서비스 | listing | 생성 경로 | 상태 |
 |---|---|---|---|
 | KPA-Society | `02003281-…` | `POST /kpa/groupbuy-admin/products` (운영자 직접 등록) | `approved` |
-| GlycoPharm | `e627c1eb-…` | `POST /neture/supplier/event-offer-proposals` → 운영자 승인 | `approved` |
 | K-Cosmetics | `ec4f4b1a-…` | 동상 | `approved` |
 
 3개 서비스 `GET {base}/enriched?status=active` → 각 `n=1` 확인.
 
 ## §3 발견·수정한 프로덕션 결함 2건
-
-### D1. GlycoPharm 주문 조회 500 (`c6dcc16ec`)
-
-`GET /api/v1/glycopharm/checkout/orders` 가 500 `ORDER_LIST_ERROR`.
-Cloud Run 로그 근거: `syntax error at or near "order"`.
-원인은 TypeORM alias `'order'` — SQL 예약어다. KPA·Cosmetics 는 `'co'` 를 써서 정상이었다.
-
-**조치**: [checkout.controller.ts](../../apps/api-server/src/routes/glycopharm/controllers/checkout.controller.ts) 의 목록·상세 두 쿼리 alias 를 `'co'` 로 정렬. 배포 후 재검증 **200**.
 
 ### D2. KPA 주문 작업대 금액 0원 표시 (`d51342e83`)
 
@@ -79,26 +54,26 @@ Cloud Run 로그 근거: `syntax error at or near "order"`.
 
 범례: `PASS` / `N/A — 계약상 미구현`
 
-| 항목 | KPA-Society | K-Cosmetics | GlycoPharm | Pharmacy-Hub |
-|---|:---:|:---:|:---:|:---:|
-| 실로그인 | PASS | PASS | PASS | PASS |
-| Store Hub 진입 | PASS | PASS | PASS | PASS |
-| 상품 탐색 (B2B 카탈로그) | PASS 1건 | PASS 1건 | PASS 1건 | PASS 1건 |
-| 상품 상세 | N/A ※1 | N/A ※1 | N/A ※1 | PASS |
-| 신청 / 가져오기 | PASS | PASS | PASS | PASS ※2 |
-| 이벤트·특가 탐색 | PASS 1건 | PASS 1건 | PASS 1건 | N/A ※3 |
-| 장바구니 담기 | PASS 201 | PASS 201 | PASS 201 | PASS 201 |
-| 주문 진입 | PASS ※4 | PASS | PASS | PASS ※5 |
-| 결제 화면 진입 | N/A ※6 | N/A ※6 | N/A ※6 | PASS |
-| dead link | 0 | 0 | 0 | 0 |
-| "준비 중" | 0 | 0 | 0 | 0 |
-| white screen | 0 | 0 | 0 | 0 |
-| JS exception | 0 | 0 | 0 | 0 |
-| 핵심 API 4xx/5xx | 0 | 0 | 0 | 0 ※7 |
-| Desktop | PASS | PASS | PASS | PASS |
-| Mobile (390×844) | PASS | PASS | PASS | PASS |
+| 항목 | KPA-Society | K-Cosmetics | Pharmacy-Hub |
+| --- | :---: | :---: | :---: |
+| 실로그인 | PASS | PASS | PASS |
+| Store Hub 진입 | PASS | PASS | PASS |
+| 상품 탐색 (B2B 카탈로그) | PASS 1건 | PASS 1건 | PASS 1건 |
+| 상품 상세 | N/A ※1 | N/A ※1 | PASS |
+| 신청 / 가져오기 | PASS | PASS | PASS ※2 |
+| 이벤트·특가 탐색 | PASS 1건 | PASS 1건 | N/A ※3 |
+| 장바구니 담기 | PASS 201 | PASS 201 | PASS 201 |
+| 주문 진입 | PASS ※4 | PASS | PASS ※5 |
+| 결제 화면 진입 | N/A ※6 | N/A ※6 | PASS |
+| dead link | 0 | 0 | 0 |
+| "준비 중" | 0 | 0 | 0 |
+| white screen | 0 | 0 | 0 |
+| JS exception | 0 | 0 | 0 |
+| 핵심 API 4xx/5xx | 0 | 0 | 0 ※7 |
+| Desktop | PASS | PASS | PASS |
+| Mobile (390×844) | PASS | PASS | PASS |
 
-- **※1 상품 상세 `N/A — 계약상 미구현`**: KPA·K-Cos·GP 의 공통 `SupplyCatalogHub` 는 상세 페이지를 갖지 않는다
+- **※1 상품 상세 `N/A — 계약상 미구현`**: KPA·K-Cos 의 공통 `SupplyCatalogHub` 는 상세 페이지를 갖지 않는다
   (행 클릭 핸들러 미배선). 상품명·공급자·공급가·권장 소비자가가 **카탈로그 행에 인라인 표시**되며,
   매장 경영자의 취급 판단에 필요한 정보가 목록에서 모두 제공된다. 신청 액션도 행에서 직접 수행하므로
   상세 부재가 사용자 흐름을 끊지 않는다(클릭해도 아무 일이 없을 뿐 dead link 가 아니다).
@@ -115,7 +90,7 @@ Cloud Run 로그 근거: `syntax error at or near "order"`.
 
 ## §5 실행 기록 (프로덕션 실브라우저)
 
-### 이벤트·특가 → 장바구니 → 주문 확정 (KPA · GP · KCos, desktop + mobile 각 1회)
+### 이벤트·특가 → 장바구니 → 주문 확정 (KPA · KCos, desktop + mobile 각 1회)
 
 ```
 /store-hub/event-offers  → [E2E_TEST] 상품 노출 · "담기" 클릭
@@ -162,7 +137,7 @@ DB 직접 삭제는 하지 않았다.
 
 `GET /api/v1/public/services/pharmacy-hub/footer-legal` → 404 `UNKNOWN_SERVICE`.
 [service-legal-scope.ts](../../apps/api-server/src/modules/service-legal/service-legal-scope.ts) 의
-`SUPPORTED_LEGAL_SERVICE_KEYS` 는 `neture · glycopharm · kpa-society · k-cosmetics` 4개이며 `pharmacy-hub` 가 없다.
+`SUPPORTED_LEGAL_SERVICE_KEYS` 는 `neture · kpa-society · k-cosmetics` 4개이며 `pharmacy-hub` 가 없다.
 
 공통 로더 [footerLegalLoader.ts](../../packages/shared-space-ui/src/legal/footerLegalLoader.ts) 는 실패를 `null` 로
 처리해 **푸터 법정정보 영역을 렌더하지 않는다** — 사용자 흐름 영향 0. 브라우저가 404 를 console 에
@@ -178,7 +153,7 @@ security-core 신규 config 추가는 공통 계약 변경(CLAUDE.md 중지 조�
 ### R2. Store Hub 장바구니 주문의 매장측 조회·취소 경로 부재
 
 `checkout-confirm` 이 생성하는 주문은 `metadata.serviceKey` 가 이벤트 오퍼 키
-(`kpa-groupbuy` · `glycopharm-event-offer` · `k-cosmetics-event-offer`)다.
+(`kpa-groupbuy` · `k-cosmetics-event-offer`)다.
 
 - 구매자 주문 목록(`GET /{svc}/checkout/orders`)은 `metadata.serviceKey IN ('kpa-society','kpa')` 등
   **retail 축**만 조회한다 → 이 주문들이 잡히지 않는다.
@@ -187,7 +162,7 @@ security-core 신규 config 추가는 공통 계약 변경(CLAUDE.md 중지 조�
 
 실측: `ORD-20260814-4428` 조회 시 양쪽 모두 404 `ORDER_NOT_FOUND`.
 **주문 진입(본 WO 완료 기준)까지는 정상**이며, 그 이후 주문 이력 가시성 문제다.
-KPA·GP·KCos 3서비스 공통 계약 변경이 필요해 별도 WO 로 분리한다.
+KPA·KCos 2서비스 공통 계약 변경이 필요해 별도 WO 로 분리한다.
 검증 중 생성된 주문 7건은 정상 취소 경로가 없어 **DB 직접 삭제 없이 그대로 두었다** (대상은 모두 `[E2E_TEST]` 상품).
 
 → 별도 WO 제안: `WO-O4O-STORE-HUB-EVENT-OFFER-ORDER-BUYER-VISIBILITY-V1`
@@ -198,11 +173,6 @@ offer 생성 시점에 `product_approvals` `6c2c6ed2-f9aa-4e1b-8439-64833e9452f9
 (org `a0000000-0a00-4000-a000-000000000001`, `product_metadata.source='neture_bridge'`)가 자동 생성됐다.
 매장 취급 신청과 무관한 **기존 Neture→서비스 브릿지 동작**이며 본 WO 가 만든 결함이 아니다. 승인 처리에서 제외했다. 관측 기록만 남긴다.
 
-### R4. GlycoPharm `/store/b2b-order` 프랜차이즈 카탈로그 0건
-
-KPA 의 주문 작업대와 달리 GP 는 별도 프랜차이즈 발주 화면을 갖는데 데이터가 0건이다.
-빈 상태 안내가 정직하게 렌더되며 dead link·JS 오류는 없다. Store Hub 동선(이벤트·특가 → 장바구니)과는 별개 축이다.
-
 ### R5. Pharmacy-Hub `/store-owner/tablets` 409
 
 선행 WO B3. 사용자 판단대로 Store Hub blocker 로 잡지 않는다 — 내 매장/실행 자산(Agent C) 트랙 소관이다.
@@ -211,7 +181,7 @@ KPA 의 주문 작업대와 달리 GP 는 별도 프랜차이즈 발주 화면�
 
 | commit | 내용 |
 |---|---|
-| `c6dcc16ec` | fix(glycopharm): checkout 주문 조회 500 해소 — SQL 예약어 alias `order` 제거 |
+| `c6dcc16ec` | fix: checkout 주문 조회 500 해소 — SQL 예약어 alias `order` 제거 |
 | `d51342e83` | fix(kpa): 주문 작업대 금액 0원 표시 해소 — 진열 판매가 없으면 공급가 fallback |
 
 두 커밋 모두 `Deploy API Server` / `Deploy Web Services` success 확인 후 프로덕션에서 재검증했다.

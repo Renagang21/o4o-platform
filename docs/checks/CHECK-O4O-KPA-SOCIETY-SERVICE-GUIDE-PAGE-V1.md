@@ -16,7 +16,6 @@ KPA Society에 "서비스 안내" 페이지를 추가한다. KPA Society의 공�
 
 ## 제외 서비스와 제외 사유
 
-- `services/web-glycopharm` — 별도 WO(WO-O4O-GLYCOPHARM-SERVICE-GUIDE-PAGE-V1) 완료
 - `services/web-k-cosmetics` — 별도 WO(WO-O4O-KCOS-SERVICE-GUIDE-PAGE-V1) 완료
 - `services/web-neture` — O4O 전체 이용안내 성격이 있어 별도 작업으로 정비
 - **외부 working tree 변경 미포함**: 내 매장 메뉴 문구 정렬 / `O4O 주문 가능 상품` 문구 주입 / `자체 상품 관리` → `매장 취급 상품` relabeling (`WO-O4O-MY-STORE-CANONICAL-MENU-LABEL-ALIGNMENT-3SERVICES-V1` 성격) — 본 WO에서 stage/commit 하지 않음. 작업 시작 시 working tree clean 확인됨.
@@ -50,7 +49,7 @@ KPA Society에 "서비스 안내" 페이지를 추가한다. KPA Society의 공�
 5. 이용 흐름 (Step 5개)
 6. 문의 안내 (CTA — `/contact` 연결)
 
-GlycoPharm / K-Cosmetics 서비스 안내 페이지와 동일한 Tailwind 형식을 재사용하여 "서비스 안내" 페이지 family 일관성 확보. KPA `tailwind.config`의 `primary-*`가 blue(#2563eb)로 매핑되어 동일 클래스로 KPA 브랜드 톤 자동 반영.
+K-Cosmetics 서비스 안내 페이지와 동일한 Tailwind 형식을 재사용하여 "서비스 안내" 페이지 family 일관성 확보. KPA `tailwind.config`의 `primary-*`가 blue(#2563eb)로 매핑되어 동일 클래스로 KPA 브랜드 톤 자동 반영.
 
 ## KPA Society 문구 기준
 
@@ -79,7 +78,7 @@ GlycoPharm / K-Cosmetics 서비스 안내 페이지와 동일한 Tailwind 형식
 - TypeScript: `npx tsc --noEmit` (direct-include 패턴) → EXIT 0 (PASS)
 - Build: `npx vite build` → ✓ built (PASS)
 - 기존 커뮤니티 메뉴 / 매장 운영 허브 / 권한 기반 메뉴 동작 영향 없음 (nav 항목 추가만)
-- GlycoPharm / K-Cosmetics / Neture 파일 미수정
+- K-Cosmetics / Neture 파일 미수정
 - 외부 working tree 변경(매장 취급 상품 relabeling 등) stage/commit 안 함 — staged 가드로 확인
 
 ## 변경 파일

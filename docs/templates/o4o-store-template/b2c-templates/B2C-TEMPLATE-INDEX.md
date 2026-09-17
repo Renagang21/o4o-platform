@@ -37,7 +37,7 @@ B2C에 적합한 **톤/레이아웃/콘텐츠 구조**를 제공합니다.
 
 - **포지션**: 전문가 공간, "싸게 파는 곳"이 아닌 신뢰 매장
 - **톤**: 차분한 컬러, 텍스트 가독성 우선, 정보 구조 명확
-- **권장 OrderType**: `PHARMACY` (향후), `GLYCOPHARM` (read-only)
+- **권장 OrderType**: `PHARMACY` (향후)
 - **폴더**: `b2c-templates/professional-service/`
 
 ### 3. Beauty Experience Store

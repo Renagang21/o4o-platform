@@ -76,7 +76,7 @@ KPA_PH_COMMUNITY_MY_STORE_PARITY = NOT_COMPLETE
 | 11 | 좋아요 | ForumLikeButton | 동일 | ADOPTED | — |
 | 12 | 태그·검색 | 목록 검색·인기 태그 | `/community/search` + 목록 검색 | ADOPTED | — |
 | 13 | 내가 쓴 글 | `/forum/my-posts` | `/forum/my-posts` | ADOPTED | MyForumPostsTemplate 공통 |
-| 14 | **포럼 개설 신청** | `/forum/request` (KpaRequestCategoryPage) | **없음** | **MISSING_ADOPTION (P0)** | PH 운영자에는 `/operator/forum-requests` 심사 콘솔이 있고 백엔드 `POST /forum/categories` 도 살아 있는데, **회원 신청 입구가 없어 심사 큐에 유입 경로가 0** — 정상 핵심 동선 끊김. GP·KCos·Neture 는 모두 신청 화면 보유 |
+| 14 | **포럼 개설 신청** | `/forum/request` (KpaRequestCategoryPage) | **없음** | **MISSING_ADOPTION (P0)** | PH 운영자에는 `/operator/forum-requests` 심사 콘솔이 있고 백엔드 `POST /forum/categories` 도 살아 있는데, **회원 신청 입구가 없어 심사 큐에 유입 경로가 0** — 정상 핵심 동선 끊김. KCos·Neture 는 모두 신청 화면 보유 |
 | 15 | 내 포럼 대시보드(운영) | `/mypage/my-forums` | 없음 | MISSING_ADOPTION (P1) | 백엔드 `GET /forum/categories/mine`·`PATCH /categories/:id/owner` 존재 |
 | 16 | 포럼 회원 관리(승인/거절/추방) | `/mypage/my-forums/:forumId/members` | 없음 | MISSING_ADOPTION (P1) | 백엔드 `join-requests`·`members` 존재 |
 | 17 | 비공개 포럼 가입 신청·멤버십 게이트 | 있음 | 없음 | MISSING_ADOPTION (P1) | PH 소스에 `membership-status`·`join-requests` 참조 0건 |
@@ -97,7 +97,7 @@ KPA_PH_COMMUNITY_MY_STORE_PARITY = NOT_COMPLETE
 | 23 | 콘텐츠 수정·삭제 | `/content/:id/edit` | 없음 | MISSING_ADOPTION (P1) |
 | 24 | 설문(surveys) | `/content/surveys` | 없음 | MISSING_ADOPTION (P2) |
 
-근거: `CommunityContentDetailView` / `CommunityContentWriteShell` 은 KPA·GlycoPharm·K-Cosmetics 가 채택했으나 **PH 채택 0건**. 백엔드도 `/api/v1/pharmacy-hub/contents` 계열 라우터가 없다.
+근거: `CommunityContentDetailView` / `CommunityContentWriteShell` 은 KPA·K-Cosmetics 가 채택했으나 **PH 채택 0건**. 백엔드도 `/api/v1/pharmacy-hub/contents` 계열 라우터가 없다.
 §9 관점 확인: "KPA 사용자가 커뮤니티에서 하는 콘텐츠 업무를 PH 사용자는 어디서 하는가?" → **대체 경로 없음**(매장 콘텐츠 `/store-owner/content` 는 매장 실행 자산 축이라 커뮤니티 공유 콘텐츠를 대체하지 않는다).
 
 ---
@@ -111,7 +111,7 @@ KPA_PH_COMMUNITY_MY_STORE_PARITY = NOT_COMPLETE
 | 27 | 자료 등록·수정 | `/resources/new`, `/:id/edit` | 없음 | MISSING_ADOPTION (P1) |
 | 28 | 추천·조회수 | `/contents/:id/recommend`·`/view` | 없음 | MISSING_ADOPTION (P2) |
 
-`ResourcesHubTemplate` 채택 현황: KPA 1 / GlycoPharm 1 / K-Cosmetics 1 / Neture 1 / **PharmacyHub 0** — 5서비스 중 PH 만 미채택.
+`ResourcesHubTemplate` 채택 현황: KPA 1 1 / K-Cosmetics 1 / Neture 1 / **PharmacyHub 0** — 4서비스 중 PH 만 미채택.
 
 ---
 
@@ -243,7 +243,7 @@ export const phLmsPort: LmsLearnerPort = {
 
 ## 12. 공통 모듈 채택 현황 (§10)
 
-| 공통 View | KPA | GP | KCos | Neture | **PH** |
+| 공통 View | KPA | KCos | Neture | **PH** |
 |---|:--:|:--:|:--:|:--:|:--:|
 | StandardHomeTemplate | 1 | 1 | 1 | 1 | 2 |
 | ForumHubTemplate | 1 | 1 | 1 | 1 | 2 |

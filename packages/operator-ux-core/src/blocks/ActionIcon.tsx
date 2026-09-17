@@ -12,7 +12,7 @@
  * vocabulary 16종 (Phase A 9 + Phase B 7) 으로 확장.
  *  - 신규 7종: clipboard-list / megaphone / message-square / monitor-play /
  *             badge-percent / home / scroll-text
- *  - Phase A 의 emoji fallback / NAME_LIKE skip 동작은 유지 (GlycoPharm/K-Cos/
+ *  - Phase A 의 emoji fallback / NAME_LIKE skip 동작은 유지 (K-Cos /
  *    Neture 의 기존 emoji 또는 미매핑 lucide-name 회귀 0).
  */
 import type { LucideIcon } from 'lucide-react';
@@ -56,7 +56,7 @@ const ICON_NAME_MAP: Record<string, LucideIcon> = {
   'badge-percent': BadgePercent,
   home: Home,
   'scroll-text': ScrollText,
-  // WO-O4O-ADMIN-QUICKACTION-FRONTEND-CONVERGE-V1 (Phase C): KPA/GP admin 8 emoji 정렬용
+  // WO-O4O-ADMIN-QUICKACTION-FRONTEND-CONVERGE-V1 (Phase C): KPA admin 8 emoji 정렬용
   'bar-chart-3': BarChart3,
   'building-2': Building2,
   settings: Settings,

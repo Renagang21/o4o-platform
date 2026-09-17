@@ -51,7 +51,7 @@ export const ROLES = {
  * 플랫폼 전역 최고 관리자 (WO-O4O-PHARMACYHUB-ADMIN-OPERATOR-DUAL-AREA-ADOPTION-AND-PRODUCTION-CLOSURE-V1)
  *
  * backend `PHARMACY_HUB_SCOPE_CONFIG.platformBypass = true` 와 같은 계약이다.
- * K-Cosmetics / GlycoPharm / Neture 헤더도 동일하게 서비스 admin 과 함께 취급한다.
+ * K-Cosmetics / Neture 헤더도 동일하게 서비스 admin 과 함께 취급한다.
  */
 export const PLATFORM_SUPER_ADMIN = 'platform:super_admin' as const;
 

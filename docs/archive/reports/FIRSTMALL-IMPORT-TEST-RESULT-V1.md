@@ -192,7 +192,6 @@ SupplierProductOffer (APPROVED, isActive=true)
 | ProductMaster | **없음** | - |
 | SupplierProductOffer | **없음** | - |
 | NetureProduct (domain) | **있음** | JSONB `{ url, alt, is_primary, order }[]` |
-| GlycopharmProduct | **있음** | JSONB 동일 구조 |
 | CosmeticsProduct | **있음** | JSONB 동일 구조 |
 | StoreLocalProduct | **있음** | JSONB `string[]` + thumbnailUrl |
 

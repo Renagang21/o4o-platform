@@ -1,7 +1,6 @@
 # IR-O4O-MULTI-SERVICE-MEMBERSHIP-AUDIT-V1
 
 > **조사일**: 2026-03-13
-> **조사 트리거**: GlycoPharm 사용자(sohae21@naver.com)가 Neture 서비스 가입 시 차단됨
 > **조사 범위**: 멀티 서비스 가입 플로우 전체 (Backend + Frontend)
 
 ---
@@ -10,7 +9,7 @@
 
 **결론: 멀티 서비스 가입 백엔드는 정상 동작한다.** (WO-O4O-SERVICE-MEMBERSHIP-ARCHITECTURE-V1 적용 완료)
 
-사용자가 경험한 에러는 **PASSWORD_MISMATCH** (401) — 기존 GlycoPharm 비밀번호가 아닌 새 비밀번호를 입력했기 때문. 이는 설계 의도대로 보안 검증이 작동한 것이다.
+이는 설계 의도대로 보안 검증이 작동한 것이다.
 
 **발견된 부차적 문제**: 가입 시 RoleAssignment에 서비스 접두사 누락 (`supplier` vs `neture:supplier`)
 
@@ -37,14 +36,14 @@
 | 단계 | 동작 | 결과 |
 |------|------|------|
 | 1 | Neture 가입 페이지에서 sohae21@naver.com 입력 | - |
-| 2 | **새 비밀번호** 입력 (GlycoPharm 비밀번호가 아닌 다른 비밀번호) | - |
+| 2 | **새 비밀번호** 입력 | - |
 | 3 | POST /api/v1/auth/register `{service: 'neture'}` | - |
-| 4 | 서버: existingUser 발견 (GlycoPharm 계정) | - |
+| 4 | 서버: existingUser 발견 | - |
 | 5 | ServiceMembership 확인: neture 멤버십 없음 → 계속 | - |
-| 6 | bcrypt.compare 실패 (입력 비밀번호 ≠ GlycoPharm 비밀번호) | **401 PASSWORD_MISMATCH** |
+| 6 | bcrypt.compare 실패 | **401 PASSWORD_MISMATCH** |
 | 7 | 프론트엔드: "이미 다른 서비스에 가입된 계정입니다. 기존 비밀번호를 입력해주세요." | 사용자 혼란 |
 
-**근본 원인**: 사용자가 GlycoPharm 가입 시 사용한 비밀번호와 다른 비밀번호를 입력함. 정상 보안 동작.
+정상 보안 동작.
 
 ---
 
@@ -66,7 +65,6 @@
 |--------|------|----------------------|
 | Neture | `services/web-neture/src/pages/RegisterPage.tsx:91-92` | Error 메시지 표시 |
 | Neture (Modal) | `services/web-neture/src/components/RegisterModal.tsx:146-147` | Error 메시지 표시 |
-| GlycoPharm | `services/web-glycopharm/src/pages/auth/RegisterPage.tsx:103-104` | Error 메시지 표시 |
 | GlucoseView | `services/web-glucoseview/src/pages/RegisterPage.tsx:129-130` | Error 메시지 표시 |
 | K-Cosmetics | `services/web-k-cosmetics/src/pages/auth/RegisterPage.tsx:80-81` | Error 메시지 표시 |
 | KPA Society | `services/web-kpa-society/src/pages/auth/RegisterPage.tsx:121-122` | Error 메시지 표시 |
@@ -127,7 +125,6 @@ assignment.role = `${serviceKey}:${effectiveRole}`;  // 'neture:supplier'
 service_memberships
 ├── id (UUID PK)
 ├── user_id (UUID FK → users.id, ON DELETE CASCADE)
-├── service_key (VARCHAR 100) — 'neture' | 'glycopharm' | 'kpa-society' | ...
 ├── status (VARCHAR 50) — 'pending' | 'active' | 'suspended' | 'rejected'
 ├── role (VARCHAR 50) — 'customer' | 'supplier' | 'partner' | ...
 ├── approved_by (UUID, nullable)
@@ -171,7 +168,7 @@ service_memberships
 
 **프론트엔드 PASSWORD_MISMATCH 처리 개선**:
 - 현재: 에러 메시지만 표시 → 사용자 혼란
-- 개선안: 팝업/모달로 "이 이메일은 [GlycoPharm] 서비스에 이미 가입되어 있습니다. 기존 비밀번호를 입력해주세요." + 비밀번호 찾기 링크
+- 기존 비밀번호를 입력해주세요." + 비밀번호 찾기 링크
 
 ### P2 (코드 정리)
 

@@ -4,7 +4,7 @@
 - **인계자**: Agent E (Operator 트랙)
 - **인계 대상**: Agent A (cross-service legal/policy 축)
 - **기준**: `origin/main` = `fa0962cf7`
-- **대상 서비스**: KPA-Society / K-Cosmetics / Neture / PharmacyHub / GlycoPharm
+- **대상 서비스**: KPA-Society / K-Cosmetics / Neture / PharmacyHub
 
 ---
 
@@ -50,7 +50,7 @@ GET /public/services/unknown-svc/*                      → 404 UNKNOWN_SERVICE
 
 - **`policies/*` 의 404 는 장애가 아니라 "미게시" 를 뜻하는 계약 응답**이다. 공통 뷰어가 이를 흡수해 empty 상태를 렌더한다. 브라우저 콘솔의 404 를 결함으로 집계하지 말 것.
 - KPA 는 canonical 404 후 legacy `/api/v1/kpa/legal/documents/published/*` 를 한 번 더 시도하므로 **404 가 2건** 찍힌다. 기존 fallback 설계이며 화면은 정상이다.
-- serviceKey 는 `apps/api-server/src/modules/service-legal/service-legal-scope.ts` 의 `SUPPORTED_LEGAL_SERVICE_KEYS` 5개(`neture` `glycopharm` `kpa-society` `k-cosmetics` `pharmacy-hub`)가 유일 선언이다. 중복 목록 없음.
+- serviceKey 는 `apps/api-server/src/modules/service-legal/service-legal-scope.ts` 의 `SUPPORTED_LEGAL_SERVICE_KEYS` 5개가 유일 선언이다. 중복 목록 없음.
 - **KPA 의 이용약관 공개 경로는 `/terms` 가 아니라 `/policy`** 다 (서비스 고유 계약). `/terms` 로 검증하면 오탐이 난다.
 - **K-Cosmetics 의 실제 도메인은 `k-cosmetics.site`** 다. `k-cosmetics.co.kr` 은 무관한 Cafe24 쇼핑몰이다.
 
@@ -76,7 +76,6 @@ GET /public/services/unknown-svc/*                      → 404 UNKNOWN_SERVICE
 | kpa-society | 0 | 0 |
 | neture | 0 | 0 |
 | k-cosmetics | 0 | 0 |
-| glycopharm | 0 | 0 |
 | pharmacy-hub | **1** (§3-4 잔여물) | **0** (draft) |
 
 **게시 문서는 5서비스 통틀어 0건이다.** 레거시 `kpa_legal_documents` 도 `data:[]` 로 비어 있다.
@@ -89,7 +88,6 @@ GET /public/services/unknown-svc/*                      → 404 UNKNOWN_SERVICE
 | pharmacy-hub | 있음 | 전 필드 `null` |
 | kpa-society | **없음** | `data:null` |
 | k-cosmetics | **없음** | `data:null` |
-| glycopharm | **없음** | `data:null` |
 
 ### 3-4. `[E2E_TEST]` 잔류 문서 — 1건
 
@@ -116,7 +114,6 @@ GET /public/services/unknown-svc/*                      → 404 UNKNOWN_SERVICE
 |---|---|
 | KPA-Society | `/admin/settings/legal` |
 | K-Cosmetics | `/admin/settings/legal-terms` |
-| GlycoPharm | `/admin/settings/legal-terms` |
 | Neture | `/admin/settings/legal-terms` |
 | PharmacyHub | `/operator/settings/legal-terms` |
 
@@ -128,7 +125,6 @@ GET /public/services/unknown-svc/*                      → 404 UNKNOWN_SERVICE
 | K-Cosmetics | `/terms` | `/privacy` | 노출 |
 | PharmacyHub | `/terms` | `/privacy` | 노출 (`fa3c533c7` 신규) |
 | Neture | `/terms` | `/privacy` | `NetureLayout`·`MainLayout` 배선됨 (desktop footer 스캔에서는 미검출 — §5 R3) |
-| GlycoPharm | `/terms` | `/privacy` | desktop footer 스캔에서 미검출 — §5 R3 |
 
 **dead link 0건** — 코드상의 모든 legal 링크에 대응 route 가 존재한다.
 
@@ -141,7 +137,6 @@ KPA-Society
 K-Cosmetics
 Neture
 PharmacyHub
-GlycoPharm
 ```
 
 ---
@@ -155,7 +150,7 @@ WO 원문이 지시한 항목을 **현재 실측 결과에 맞춰 재조정**한
 | A1 | 5서비스 legal/policy 전체 census | **완료** | §3 표를 production 에서 spot check 만. 불일치가 나오면 그때 전수 재조사 |
 | A2 | 이용약관·개인정보처리방침 존재/게시 상태 | **완료 (게시 0건)** | 재조사 불필요. §5-R1 로 이어짐 |
 | A3 | legal profile | **완료 (전 서비스 미설정)** | 재조사 불필요. §5-R1 로 이어짐 |
-| A4 | footer / public route 실제 노출 | **완료** | Neture·GlycoPharm footer 약관 링크 노출 여부만 재확인 (§5-R3) |
+| A4 | footer / public route 실제 노출 | **완료** | Neture footer 약관 링크 노출 여부만 재확인 (§5-R3) |
 | A5 | production DB canonical 상태 | **완료** | `service_policy_documents` · `service_legal_profiles` 가 canonical 임을 §3 이 확인. 추가 조사 불필요 |
 | A6 | **테스트 문서 잔류 정리** | **미완** | **§5-R2** — 삭제/archive 엔드포인트 신설 후 `f347af0e-…` 제거 |
 | A7 | 게시 문서가 있는 경우 production 본문 렌더 확인 | **실증 완료** | PharmacyHub 실데이터 사이클(초안→게시→public 200→브라우저 렌더→수정→취소→404 복귀)로 이미 검증됨. 실제 법적 문서 게시 후 1회 재확인만 |
@@ -176,7 +171,7 @@ WO 원문이 지시한 항목을 **현재 실측 결과에 맞춰 재조정**한
 - 처리 방향: 소프트 삭제(archive) 우선 검토. **published 문서의 삭제 허용 여부는 법적 보존 관점에서 별도 판단** 필요.
 - 엔드포인트 신설 후 `f347af0e-bdf1-420e-9017-1f772da2a8d9` 를 정규 API 로 제거한다. **DB 직접 write 금지.**
 
-**R3 — Neture · GlycoPharm footer 약관 링크 노출 확인 (경미)**
+R3 — Neture
 
 - 두 서비스는 코드상 배선이 되어 있으나 desktop footer 텍스트 스캔에서 `약관|개인정보` 앵커가 검출되지 않았다 (Neture mobile 하단에는 표기 존재).
 - dead link 가 아니라 **노출 여부** 문제다. 실제 미노출이면 다른 3서비스와 동일하게 맞춘다.

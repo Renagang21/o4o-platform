@@ -49,21 +49,21 @@
 ## 5. 검증 기타
 - `web-kpa-society` 전체 tsc --noEmit 오류 0(모달+소비처 0). Web Cloud Run 배포 success(backend 무변경 → api 배포 불필요).
 
-## 6. GP/KCos 영향
+## 6. KCos 영향
 - 변경 파일 = `services/web-kpa-society/src/pages/pharmacy/CreateContentFromResourcesModal.tsx` 단일(KPA 전용).
-- GP/KCos는 자체 `StoreLibraryContentsPage`에서 `AiContentModal`을 직접 사용(별도 파일) → **무변경**. → **KPA 콘텐츠 제작만 AI 제거, GP/KCos 무영향.**
+- KCos는 자체 `StoreLibraryContentsPage`에서 `AiContentModal`을 직접 사용(별도 파일) → **무변경**. → **KPA 콘텐츠 제작만 AI 제거, KCos 무영향.**
 
 ## 7. 범위/안전
 - AiContentModal/api·ai-prompts/Toolbar AI 삭제 0. direct 저장 경로·콘텐츠 데이터·migration 0. store_execution_assets/production-materials 신규 생성 0(direct만). 콘텐츠 목록 검색/태그/출처 탭·QR/POP inline 무변경.
 
 ## 8. 후속
 - **`WO-O4O-KPA-POP-AI-STEP-REMOVE-V1`**(다음 — StorePopPage AiContentModal initialMode='pop' "AI 문구 생성").
-- 이후 BLOG-AI / PRODUCT-DESC / RESOURCE / COURSE-LECTURE / SIGNAGE → GP/KCos parity → 외부 LLM 안내(IR §G).
+- 이후 BLOG-AI / PRODUCT-DESC / RESOURCE / COURSE-LECTURE / SIGNAGE → KCos parity → 외부 LLM 안내(IR §G).
 
 ---
 
 ## 9. 최종 판정
 
-> KPA 콘텐츠 제작 흐름에서 "자료 선택 → AI 본문 생성" 단계가 제거되고, 빈 편집기 직접 작성·외부 LLM 붙여넣기 중심으로 단순화된다. 신규 콘텐츠는 direct content로 저장되어 콘텐츠 목록에 노출되고, store_execution_assets 신규 생성은 없다. AiContentModal/`/api/ai/content`/편집기 Toolbar AI는 보존되며, 콘텐츠 목록·QR/POP inline이 회귀하지 않는다. GP/KCos 무영향.
+> KPA 콘텐츠 제작 흐름에서 "자료 선택 → AI 본문 생성" 단계가 제거되고, 빈 편집기 직접 작성·외부 LLM 붙여넣기 중심으로 단순화된다. 신규 콘텐츠는 direct content로 저장되어 콘텐츠 목록에 노출되고, store_execution_assets 신규 생성은 없다. AiContentModal/`/api/ai/content`/편집기 Toolbar AI는 보존되며, 콘텐츠 목록·QR/POP inline이 회귀하지 않는다. KCos 무영향.
 
 → **충족.**

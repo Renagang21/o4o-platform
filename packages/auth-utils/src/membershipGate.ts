@@ -4,7 +4,7 @@
  *
  * WO-O4O-MEMBERSHIPGATE-SHARED-INSTANCE-V1
  *
- * 4개 서비스(KPA / Neture / GlycoPharm / K-Cosmetics) 공통 runtime gating 로직.
+ * 3개 서비스(KPA / Neture / K-Cosmetics) 공통 runtime gating 로직.
  *
  * 정책:
  *   - users 인증 성공 + service_memberships.status === 'active' 일 때만 서비스 이용 가능
@@ -66,7 +66,7 @@ const SUPER_ADMIN_ROLE = 'platform:super_admin' as const;
  * - 알 수 없는 status (legacy 'inactive' 포함) → 'none' (보수적 차단)
  *
  * @param user   - 인증된 사용자 객체 (또는 null/undefined)
- * @param serviceKey - 대상 서비스 키 (e.g., 'kpa-society', 'neture', 'glycopharm', 'k-cosmetics')
+ * @param serviceKey - 대상 서비스 키 (e.g., 'kpa-society', 'neture', 'k-cosmetics')
  */
 export function getServiceMembershipStatus(
   user: UserLike | null | undefined,

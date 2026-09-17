@@ -3,7 +3,7 @@
 > **Investigation Report — O4O Platform Store Hub Operational Flow Comprehensive Audit**
 > Date: 2026-03-09
 > Status: Complete
-> Scope: Store Hub operational flows across GlycoPharm / KPA Society / K-Cosmetics / GlucoseView
+> Scope: Store Hub operational flows across KPA Society / K-Cosmetics / GlucoseView
 > Prerequisite: IR-O4O-STORE-HUB-ARCHITECTURE-AUDIT-V1 (구조 조사 완료)
 
 ---
@@ -32,16 +32,16 @@ O4O Platform Store Hub의 **실제 운영 흐름**을 전수 조사한 결과, �
 
 ### Service Implementation Status
 
-| Feature | GlycoPharm | KPA Society | K-Cosmetics | GlucoseView |
-|---------|:----------:|:-----------:|:-----------:|:-----------:|
-| 제품 관리 | Full | Full | Partial (Cockpit) | None |
-| 채널 관리 | Full | Full | None | None |
-| 주문 관리 | Full | Full | Placeholder | None |
-| 콘텐츠 관리 | Full | Full (Library) | Placeholder | None |
-| 사이니지 | Full (8 sub-routes) | Full | Placeholder | None |
-| QR/POP | - | Full | - | - |
-| 분석 | AI Insights | Marketing Analytics | Stub | None |
-| 정산 | Full | Hidden route | Placeholder | None |
+| Feature | KPA Society | K-Cosmetics | GlucoseView |
+| --------- | :-----------: | :-----------: | :-----------: |
+| 제품 관리 | Full | Partial (Cockpit) | None |
+| 채널 관리 | Full | None | None |
+| 주문 관리 | Full | Placeholder | None |
+| 콘텐츠 관리 | Full (Library) | Placeholder | None |
+| 사이니지 | Full | Placeholder | None |
+| QR/POP | Full | - | - |
+| 분석 | Marketing Analytics | Stub | None |
+| 정산 | Hidden route | Placeholder | None |
 
 ---
 
@@ -359,8 +359,6 @@ WHERE spo.is_active = true                   -- Gate 4: offer active
   AND s.status = 'ACTIVE'                    -- Gate 4: supplier active
 ```
 
-**Multi-Service**: `?services=kpa,glycopharm` → `service_key = ANY($2::text[])`
-
 ### 6.2 Tablet Display
 
 | 항목 | 값 |
@@ -387,7 +385,7 @@ App-Level Merge (DB UNION 금지 — WO-STORE-LOCAL-PRODUCT-HARDENING-V1)
 
 | 항목 | 값 |
 |------|------|
-| **UI** | `services/web-glycopharm/src/components/layouts/KioskLayout.tsx` |
+| **UI** | — |
 | **특징** | Large buttons, auto-reset timer (30s), shopping cart |
 
 | Feature | Tablet | Kiosk |
@@ -583,7 +581,7 @@ PAID ──→ REFUNDED
 |------|------|
 | **Table** | `store_playlists`, `store_playlist_items` |
 | **API** | `/store-playlists` |
-| **사용 서비스** | GlycoPharm (8 sub-routes), KPA Society |
+| **사용 서비스** | KPA Society |
 
 **Playlist Types**:
 - **SINGLE**: 단일 영상 반복 (max 1 item)
@@ -647,7 +645,7 @@ StoreLibraryItem
 |------|------|
 | **Table** | `store_blog_posts` |
 | **API** | `/stores/:slug/blog` (public), `/stores/:slug/blog/staff` (auth) |
-| **사용 서비스** | GlycoPharm, KPA Society |
+| **사용 서비스** | KPA Society |
 
 **Public Endpoints**:
 
@@ -670,39 +668,6 @@ StoreLibraryItem
 ---
 
 ## 9. Service-Specific Operational Differences
-
-### 9.1 GlycoPharm — Full Store Operations + Care Integration
-
-**Dashboard Focus**: AI-driven operations hub
-
-**Hub Dashboard (StoreOverviewPage) Data**:
-
-```typescript
-CockpitData {
-  aiSummary: { summary, riskLevel, recommendedActions[] },
-  todayActions: { todayOrders, pendingOrders, pendingRequests, operatorNotices },
-  careDashboard: { totalPatients, highRiskCount, moderateRiskCount, lowRiskCount },
-  signageStats: { enabled, activeContents },
-  productStats: { total }
-}
-```
-
-**AI Signal System**:
-
-| Signal | Level | Trigger |
-|--------|-------|---------|
-| `glycopharm.high_risk` | critical/warning | 고위험 환자 수 |
-| `glycopharm.coaching` | critical | 미실시 코칭 |
-| `glycopharm.analysis` | info | 개선 추이 |
-| `glycopharm.ai_summary` | varies | AI 위험 레벨 |
-| `glycopharm.revenue` | info | 일일 주문 수 |
-| `glycopharm.pending_requests` | warning | 미처리 고객 요청 |
-
-**QuickActions**:
-- Care review 시작
-- 코칭 세션 자동 생성
-- AI 분석 갱신
-- 요청 처리 이동
 
 ### 9.2 KPA Society — Marketing Operations Hub
 
@@ -766,7 +731,6 @@ Block 5: AI Insights
 
 **Product Schema Difference**:
 - **K-Cosmetics**: `cosmetics_store_listings` (cosmetics schema, 격리)
-- **KPA/GlycoPharm**: `organization_product_listings` (공유 테이블, service_key 분리)
 
 ### 9.4 GlucoseView — Stub Implementation
 
@@ -922,7 +886,6 @@ Note: Local products are Display Domain ONLY (checkout 불가)
 ### RISK-7: QR Analytics 단방향 (INFO)
 
 **현상**: QR scan events는 append-only, 분석 대시보드는 KPA Society에만 존재
-**영향**: GlycoPharm 등 다른 서비스에서 QR 분석 불가
 **권장**: QR analytics를 Platform Common으로 확장 검토
 
 ---
@@ -959,12 +922,8 @@ Note: Local products are Display Domain ONLY (checkout 불가)
 | File | Purpose |
 |------|---------|
 | `apps/api-server/src/routes/platform/unified-store-public.routes.ts` | Unified storefront (4-Gate) |
-| `apps/api-server/src/routes/glycopharm/controllers/store.controller.ts` | GlycoPharm storefront |
 | `apps/api-server/src/routes/platform/store-tablet.routes.ts` | Tablet display |
 | `apps/api-server/src/routes/o4o-store/controllers/store-qr-landing.controller.ts` | QR landing |
-| `services/web-glycopharm/src/pages/store/StoreFront.tsx` | B2C storefront UI |
-| `services/web-glycopharm/src/components/layouts/TabletLayout.tsx` | Tablet UI |
-| `services/web-glycopharm/src/components/layouts/KioskLayout.tsx` | Kiosk UI |
 
 ### Order Flow
 
@@ -999,8 +958,6 @@ Note: Local products are Display Domain ONLY (checkout 불가)
 
 | Service | File | Page |
 |---------|------|------|
-| GlycoPharm | `services/web-glycopharm/src/pages/store/StoreOverviewPage.tsx` | Hub dashboard |
-| GlycoPharm | `services/web-glycopharm/src/pages/store/hooks/useStoreHub.ts` | Hub data hook |
 | KPA Society | `services/web-kpa-society/src/pages/pharmacy/StoreMarketingDashboardPage.tsx` | Marketing dashboard |
 | KPA Society | `services/web-kpa-society/src/pages/pharmacy/StoreQRPage.tsx` | QR management |
 | KPA Society | `services/web-kpa-society/src/pages/pharmacy/StorePopPage.tsx` | POP generation |

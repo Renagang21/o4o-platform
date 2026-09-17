@@ -100,7 +100,7 @@ Frontend `/operator/*` 전체는 operator role guard 아래에 있고 backend da
 - 기존 count query와 status 조건은 변경하지 않았다.
 - AI Summary도 사이니지 미디어/플레이리스트를 실제 route별로 분리했다.
 - `OperatorDashboardConfig` shape와 5-Block 순서는 변경하지 않았다.
-- GP, K-Cosmetics, Neture, 공통 `operator-ux-core`, sidebar, 권한, API route, DB는 수정하지 않았다.
+- K-Cosmetics, Neture, 공통 `operator-ux-core`, sidebar, 권한, API route, DB는 수정하지 않았다.
 - 정책 판단이나 신규 backend count가 필요한 항목은 추가하지 않았다.
 
 ## 7. 검증

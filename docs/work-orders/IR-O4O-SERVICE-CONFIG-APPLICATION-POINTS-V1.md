@@ -56,7 +56,6 @@ Hub Template 변경 / Table·Form 구조 변경
 
 ```ts
 export interface ServiceConfig {
-  key: 'kpa-society' | 'glycopharm' | 'k-cosmetics'
 
   branding: {
     primaryColor: string
@@ -95,7 +94,7 @@ Header / My 메뉴의 "내 매장" 표현
 
 **IR-O4O-SERVICE-CONFIG-HARDCODED-TEXT-AUDIT-V1**
 
-목적: KPA / GlycoPharm / K-Cosmetics에서 "약국 / 매장 / 내 매장 / 운영 허브" 하드코딩 문구 위치만 찾기
+목적: KPA / K-Cosmetics에서 "약국 / 매장 / 내 매장 / 운영 허브" 하드코딩 문구 위치만 찾기
 
 ---
 

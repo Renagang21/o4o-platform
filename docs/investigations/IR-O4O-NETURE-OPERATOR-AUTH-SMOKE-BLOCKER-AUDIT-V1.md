@@ -4,7 +4,7 @@
 > 인증 브라우저 smoke 블로커를 조사한다.
 > **성격**: read-only 조사 (코드/UI/API/DB/migration/운영데이터/테스트계정/commit 없음). 로그인 probe·read-only API/DB probe·Playwright 노출/점유 확인만 수행.
 > **작성일**: 2026-06-03
-> **대상**: Neture (KPA/GlycoPharm/K-Cosmetics는 참고 비교만)
+> **대상**: Neture
 
 ---
 
@@ -47,7 +47,7 @@ endpoint: GET /api/v1/neture/operator/dashboard
 
 | 계정 | 로그인 | 활성 roles | neture membership | operator 권한 | dashboard probe |
 |---|---|---|---|---|---|
-| `sohae2100@gmail.com` | ❌ (문서 PW 불일치) | neture:operator, neture:admin, **platform:super_admin** + cosmetics/glycopharm/kpa admin·operator (전부 active) | active(파생) | ✅ 완전 자격 | (토큰 미획득) |
+| `sohae2100@gmail.com` | ❌ (문서 PW 불일치) | — | active(파생) | ✅ 완전 자격 | (토큰 미획득) |
 | `renagang21@gmail.com` | ❌ (문서 PW 불일치) | — | — | — | — |
 | `sohae21@naver.com` | ✅ (`Seochuran1!` 유효) | kpa:store_owner, supplier | active(supplier) | ❌ (neture:operator **is_active=f**) | **403** |
 

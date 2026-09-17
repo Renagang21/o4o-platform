@@ -17,7 +17,7 @@ IR 에서 확인된 "검색(제목/본문/태그)이 백엔드 API엔 있으나 
 | 항목 | 값 |
 |------|------|
 | branch | `main` · HEAD `a426d8d8` · origin 0/0 |
-| 다른 세션 WIP | pnpm-lock · GP NotFoundPage · IR-LMS-QUIZ(staged, 타 세션) · CHECK-CODEX — **미접촉**(path-specific 커밋으로 배제) |
+| 다른 세션 WIP | pnpm-lock NotFoundPage · IR-LMS-QUIZ(staged, 타 세션) · CHECK-CODEX — **미접촉**(path-specific 커밋으로 배제) |
 | 조사 기준 commit | `a426d8d8` |
 
 ## 3. 변경 파일
@@ -67,7 +67,7 @@ IR 에서 확인된 "검색(제목/본문/태그)이 백엔드 API엔 있으나 
 
 ## 9. 공통화 가능성 판단
 
-- **검색 패턴은 GP/KCos 커뮤니티 콘텐츠에도 동일 적용 가능.** GP/KCos 도 동형 콘텐츠 리스트(ContentDocumentsPage 류 또는 ContentHubTemplate) 보유 가능성 높음 → 확인 후 동일 검색 노출.
+- **검색 패턴은 KCos 커뮤니티 콘텐츠에도 동일 적용 가능.** KCos 도 동형 콘텐츠 리스트(ContentDocumentsPage 류 또는 ContentHubTemplate) 보유 가능성 높음 → 확인 후 동일 검색 노출.
 - **공통 컴포넌트화 여부**: ContentDocumentsPage 는 현재 **KPA-local**(자료실 IR 에서 확인). 3서비스가 같은 콘텐츠 리스트 컴포넌트를 쓰는지 먼저 확인 필요. 이미 공유 템플릿(예: ContentHubTemplate)이 있으면 거기에 `searchable` config 로 확장이 적절(신규 컴포넌트 추출보다).
 - **이번 WO 미확산**: KPA 적용만. 확산은 후속.
 
@@ -75,8 +75,8 @@ IR 에서 확인된 "검색(제목/본문/태그)이 백엔드 API엔 있으나 
 
 | 후보 | 내용 |
 |------|------|
-| `IR-O4O-COMMUNITY-CONTENT-LIST-CROSSSERVICE-PARITY-V1` | GP/KCos 커뮤니티 콘텐츠 리스트가 KPA 와 동형/공유인지 확인 후 검색 패턴 공통화 방향 결정 |
-| `WO-O4O-COMMUNITY-CONTENT-SEARCH-CROSSSERVICE-APPLY-V1` | GP/KCos 에 동일 검색 UI 적용(공통 컴포넌트 or config) |
+| `IR-O4O-COMMUNITY-CONTENT-LIST-CROSSSERVICE-PARITY-V1` | KCos 커뮤니티 콘텐츠 리스트가 KPA 와 동형/공유인지 확인 후 검색 패턴 공통화 방향 결정 |
+| `WO-O4O-COMMUNITY-CONTENT-SEARCH-CROSSSERVICE-APPLY-V1` | KCos 에 동일 검색 UI 적용(공통 컴포넌트 or config) |
 | (선택) 태그 클릭 → 검색 주입 | drawer 태그 클릭 시 검색어 채우기(경미) |
 
 ---
@@ -92,5 +92,5 @@ IR 에서 확인된 "검색(제목/본문/태그)이 백엔드 API엔 있으나 
 | 자료실 구조 변경 | ✅ 없음(공유 컴포넌트 보조 뷰에 검색 동반 노출만, 무해) |
 | TypeScript | ✅ KPA PASS |
 | browser smoke | 라이브 보류(배포 필요) |
-| 공통화 | 가능 — 후속 parity IR 후 GP/KCos 확산 |
+| 공통화 | 가능 — 후속 parity IR 후 KCos 확산 |
 | 다른 세션 WIP | 미포함(path-specific) |

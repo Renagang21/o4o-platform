@@ -64,5 +64,5 @@ KPA 커뮤니티 콘텐츠 작성 화면과 강의 작성/편집 화면에도 �
 
 ## 후속
 
-- GP/K-Cosmetics 커뮤니티/강의 parity(공통 모달 mode 재사용).
+- K-Cosmetics 커뮤니티/강의 parity(공통 모달 mode 재사용).
 - 강의 레슨 본문 편집(LessonModal) 내부에도 버튼이 필요하면 추가 검토(현재는 화면 상단 1곳).

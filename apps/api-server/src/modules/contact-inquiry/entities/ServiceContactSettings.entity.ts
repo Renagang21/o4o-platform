@@ -14,7 +14,7 @@
  *   - serviceKey 당 1 row (unique). row 가 없으면 in-app=on / email=off 기본값으로 간주(controller 책임).
  *   - 설정 미비로 문의 접수 자체를 실패시키지 않는다.
  *
- * Boundary: serviceKey 기준. V1 소비처 = glycopharm / k-cosmetics
+ * Boundary: serviceKey 기준. V1 소비처 = k-cosmetics
  * (Neture/KPA 는 자체 contact 구조 유지 → 본 설정 적용 대상 아님).
  */
 
@@ -40,7 +40,7 @@ export class ServiceContactSettings {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  /** glycopharm | k-cosmetics (service-catalog canonical key) */
+  /** k-cosmetics (service-catalog canonical key) */
   @Column({ type: 'varchar', length: 50, unique: true })
   service_key!: string;
 

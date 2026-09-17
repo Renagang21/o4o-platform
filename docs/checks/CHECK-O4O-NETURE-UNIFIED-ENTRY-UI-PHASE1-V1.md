@@ -136,7 +136,6 @@
 
 ## 8. 범위 밖 발견 (보고만)
 
-- `docs/rbac` RBAC 카탈로그에 GlycoPharm 잔재 (IR 에서 기록) — 별도 WO 후보.
 - web-kpa-branch 에 `operator` index route 가 없어 분회 운영자 진입은 `operator/site` 로 보냈다. index route 신설은 분회 IA 영역이라 이번 범위 밖.
 
 ---

@@ -150,7 +150,7 @@ services/web-account/src/App.tsx  (27 lines)
 ```
 
 - **최소 계정센터**(서비스 목록 + handoff) 로 구현되어 있다.
-- Dockerfile 은 있으나 **배포 workflow 가 없다** — `deploy-web-services.yml` 의 대상은 neture / k-cosmetics / kpa-society / glycopharm / pharmacy-hub / kpa-branch 6개뿐.
+- Dockerfile 은 있으나 **배포 workflow 가 없다** — `deploy-web-services.yml` 의 대상은 neture / k-cosmetics / kpa-society / pharmacy-hub / kpa-branch 6개뿐.
 - 이는 사고가 아니라 **문서화된 결정**이다 — [`IR-O4O-MYPAGE-VS-ACCOUNT-CENTER-CANONICAL-V1`](../investigations/IR-O4O-MYPAGE-VS-ACCOUNT-CENTER-CANONICAL-V1.md) (2026-05-24) **Option D** 채택:
   - canonical 계정 위치 = **각 서비스 `/mypage`**
   - `web-account` = 최소 계정센터로 **유지**
@@ -178,7 +178,7 @@ ACCOUNT_CENTER_DEAD   ← 배포 인프라(host rule / backend / NEG / Cloud Run
 | 저장소 runtime 코드 | `git grep 'account\.neture' -- apps services packages scripts` | **0건** |
 | API CORS allowlist | `apps/api-server/src/bootstrap/setup-middlewares.ts` `getAllowedOrigins()` 전문 확인 | **미포함** |
 | service catalog | `apps/api-server/src/config/service-catalog.ts` | account 키 **없음** (6서비스) |
-| 런타임 서비스 목록 | 프로덕션 `GET /api/v1/auth/services` (로그인 후 실측) | neture / glycopharm / kpa-society / k-cosmetics / pharmacy-hub / kpa-branch — **account 없음** |
+| 런타임 서비스 목록 | 프로덕션 `GET /api/v1/auth/services` (로그인 후 실측) | neture / kpa-society / k-cosmetics / pharmacy-hub / kpa-branch — **account 없음** |
 | 프로덕션 DB | 전 스키마 `text`/`varchar`/`json`/`jsonb` 컬럼 전수 ILIKE `%account.neture%` 스캔 | **0 hit** |
 
 ### 6-1. CORS 결정적 근거
@@ -203,7 +203,7 @@ DO $$ ... RAISE NOTICE 'HIT %.%.% = %' ... $$;
 → 출력: SCAN_DONE (HIT 0건)
 ```
 
-`platform_services` 실측 9 row — `cosmetics / glycopharm / k-cosmetics / kpa / kpa-branch / kpa-groupbuy / kpa-society / neture / pharmacy-hub`. **account 없음.**
+**account 없음.**
 
 ---
 
@@ -212,7 +212,7 @@ DO $$ ... RAISE NOTICE 'HIT %.%.% = %' ... $$;
 | workflow | 대상 | account 관련 |
 |---|---|:---:|
 | `deploy-main-site.yml` | `SERVICE_NAME: o4o-main-site` (`apps/main-site/**` 변경 시) | 무관 |
-| `deploy-web-services.yml` | neture / k-cosmetics / kpa-society / glycopharm / pharmacy-hub / kpa-branch | **account 미포함** |
+| `deploy-web-services.yml` | neture / k-cosmetics / kpa-society / pharmacy-hub / kpa-branch | **account 미포함** |
 | `deploy-admin.yml` / `deploy-api.yml` | admin / api | 무관 |
 
 - **account-center 전용 workflow 는 존재하지 않는다.**
@@ -264,7 +264,7 @@ production URL map 에 잘못된 인덱스로 write 될 위험이 있어 **즉�
 편집본은 import 전에 다음을 assert 로 검증했다.
 
 - `account.neture.co.kr` / `path-matcher-1` / `backend-account-center-web` 문자열 **부재**
-- 나머지 8개 path matcher (`admin`, `glucoseview`, `glycopharm`, `k-cosmetics`, `neture`, `kpa-society`, `api`, `pharmacy-hub`) **전부 존재**
+- 나머지 8개 path matcher (`admin`, `glucoseview`, `k-cosmetics`, `neture`, `kpa-society`, `api`, `pharmacy-hub`) **전부 존재**
 - `defaultService` 불변 (`backend-neture-web-http`)
 
 import 후 실측 host rule 9개 = 변경 전 10개 − account 1개. **의도 외 변경 0건.**
@@ -311,7 +311,6 @@ NEG 의 target 이던 Cloud Run **`o4o-main-site` 는 삭제하지 않았다** �
 | `admin.neture.co.kr` | 200 |
 | `kpa-society.co.kr` / `www` | 200 / 200 |
 | `k-cosmetics.site` / `www` | 200 / 200 |
-| `glycopharm.co.kr` | 200 |
 | `glucoseview.co.kr` | 200 |
 | `pharmacyhub.co.kr` / `www` | 200 / 200 |
 | `siteguide.co.kr` | 200 |
@@ -327,7 +326,7 @@ NEG 의 target 이던 Cloud Run **`o4o-main-site` 는 삭제하지 않았다** �
 | `GET /health/database` | `{"status":"healthy","pingMs":5,"activeConnections":10}` |
 | `POST /api/v1/auth/login` (serviceKey=neture) | `success: true` |
 | `GET /api/v1/auth/me` | `success: true` |
-| `GET /api/v1/auth/services` | `success: true` — 6서비스(neture / glycopharm / kpa-society / k-cosmetics / pharmacy-hub / kpa-branch), **account 없음** |
+| `GET /api/v1/auth/services` | `success: true` — 5서비스(neture / kpa-society / k-cosmetics / pharmacy-hub / kpa-branch), **account 없음** |
 | `POST /api/v1/auth/logout` | `success: true` **200** |
 
 > 자격증명은 `docs/local/TEST-ACCOUNTS.local.md` (SSOT) 에서 스크립트로 읽어 사용했고 로그·문서 어디에도 기록하지 않았다.

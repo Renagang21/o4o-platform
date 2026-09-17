@@ -39,8 +39,8 @@
 
 ### 1.2 Product Core 단일화 가능성
 
-- **가능하다. 이미 진행 중이다.** `ProductMaster`가 SSOT로 정의돼 있고(`WO-O4O-PRODUCT-MASTER-CORE-RESET-V1`), GlycoPharm 레거시 상품은 이미 `catalog_products`+`store_products`로 마이그레이션됨(`20260409300000-MigrateGlycopharmProductsToCatalogAndStore.ts`).
-- 남은 단일화 대상은 **레거시 per-service 상품 테이블**(`glycopharm-product`, `cosmetics-product`, `neture-product`)의 잔존과, 규제식별자(Identifier) 단일화다.
+- **가능하다. 이미 진행 중이다.** `ProductMaster`가 SSOT로 정의돼 있고(`WO-O4O-PRODUCT-MASTER-CORE-RESET-V1`) 레거시 상품은 이미 `catalog_products`+`store_products`로 마이그레이션됨.
+- 남은 단일화 대상은 **레거시 per-service 상품 테이블**(`cosmetics-product`, `neture-product`)의 잔존과, 규제식별자(Identifier) 단일화다.
 
 ### 1.3 가장 먼저 정비해야 할 단계
 
@@ -81,7 +81,6 @@
 
 | 엔티티 | 상태 | 파일 |
 |---|---|---|
-| `GlycopharmProduct` | catalog+store로 마이그레이션 진행됨 | `apps/api-server/src/routes/glycopharm/entities/glycopharm-product.entity.ts` (+ migration `20260409300000`) |
 | `CosmeticsProduct` | cosmetics schema 격리, 잔존 | `apps/api-server/src/routes/cosmetics/entities/cosmetics-product.entity.ts` |
 | `NetureProduct` | neture schema 골격, 잔존 | `apps/api-server/src/routes/neture/entities/neture-product.entity.ts` |
 | `StoreLocalProduct` | display-only (commerce 금지), 별도 도메인 | `apps/api-server/src/routes/platform/entities/store-local-product.entity.ts` |
@@ -114,7 +113,7 @@
 - `20260307200000-CategoryBrandProductMasterExtension.ts`, `20260307210000-CreateProductImages.ts`
 - `20260309100000-CreateServiceProducts.ts`
 - `20260325400000-AddBarcodeSourceToProductMasters.ts` — `barcode_source` (`GTIN`/`INTERNAL`)
-- `20260409200000-CreateCatalogAndStoreProducts.ts`, `20260409300000-MigrateGlycopharmProductsToCatalogAndStore.ts`
+- `20260409200000-CreateCatalogAndStoreProducts.ts`
 - `20260307100000-CreateCatalogImportTables.ts`, `20260301300000-CsvImportBatchTables.ts`
 
 ---
@@ -164,12 +163,6 @@
 
 `WO-O4O-KPA-STORE-MY-PRODUCTS-FLOW-SIMPLIFY-V1`로 **offer 없이 master만으로도 매장 진열** 가능하게 이미 단순화됨.
 
-### 4.2 GlycoPharm (내 약국)
-
-- 레거시 `GlycopharmProduct`(CGM 기기/검사지 등)는 `catalog_products`+`store_products`로 **마이그레이션 진행됨** (`20260409300000`).
-- 내 약국 상품·거래·등록품목·상품 설명은 canonical store 흐름(store-products-ui)으로 수렴 가능.
-- Store Hub·POP·QR·블로그·태블릿·사이니지의 상품 정보 연결: Store Production Material / `store-ai`(product-ai-content, product-pop-pdf) 계층이 master/listing을 소비. (별도 IR 영역 — 본 IR은 등록 흐름 중심)
-
 ### 4.3 KPA (약국/분회)
 
 - KPA는 O4O 공통 구조의 reference implementation (CLAUDE.md §13). `OrganizationProductListing.service_key` 기본값 `'kpa'`, `ServiceProduct`도 KPA 라우트에 정의됨.
@@ -182,8 +175,7 @@
 
 ### 4.5 공통화 가능성 / 충돌
 
-- **가능:** 세 서비스 모두 `ProductMaster` + `OrganizationProductListing` + `StoreProductProfile`를 공유할 수 있고, KPA/GlycoPharm은 이미 그 방향.
-- **충돌/중복:** 레거시 `glycopharm-product`/`cosmetics-product`/`neture-product`가 canonical과 병존 → 단일화 시 마이그레이션·deprecation 필요. `StoreLocalProduct`(display-only)는 commerce와 무관한 별도 도메인이므로 **통합 대상 아님**(혼동 주의).
+- **충돌/중복:** 레거시 `cosmetics-product`/`neture-product`가 canonical과 병존 → 단일화 시 마이그레이션·deprecation 필요. `StoreLocalProduct`(display-only)는 commerce와 무관한 별도 도메인이므로 **통합 대상 아님**(혼동 주의).
 
 ---
 
@@ -258,7 +250,7 @@
 | `quasi_drug` | ✅ enum 존재 (QUASI_DRUG) | 추가 불필요 |
 | `health_functional_food` | ⚠️ regulatoryType 문자열로만 | 필요 시 profile |
 | `cosmetics` | ⚠️ cosmetics 독립 스키마 별존 | 통합 판단 별도 |
-| `device` | ⚠️ glycopharm CGM 기기(레거시) | profile |
+| `device` | — | profile |
 | `other` | ✅ GENERAL | — |
 
 ### 7.3 등록 UX 분기 필요성
@@ -307,7 +299,7 @@
 
 | Phase | 내용 | 산출물 |
 |---|---|---|
-| **Phase 1 — Terminology / Baseline** | 현존 canonical(`ProductMaster` SSOT, Offer=공급자전용, Listing/Profile=매장) 고정 선언, legacy(`glycopharm/cosmetics/neture-product`) 분류. 서비스별 용어 매핑(내 약국/내 매장/공급자) 명문화 | `O4O-PRODUCT-CORE-BASELINE-V1` (문서) |
+| **Phase 1 — Terminology / Baseline** | 현존 canonical(`ProductMaster` SSOT, Offer=공급자전용, Listing/Profile=매장) 고정 선언, legacy 분류. 서비스별 용어 매핑(내 약국/내 매장/공급자) 명문화 | `O4O-PRODUCT-CORE-BASELINE-V1` (문서) |
 | **Phase 2 — Identifier Core** | `product_identifiers` 도입(additive). primary barcode mirror, 다중/중복/비-GTIN 코드 수용 설계. 소비처(매칭/검색/slug) 영향 매핑 | WO (migration + service) |
 | **Phase 3 — Web 등록/검토 흐름** | `product_candidates` 검토 큐: 기존 Master 매칭 / 신규 후보 생성 / 매장 활용 전환. CSV import staging을 이 큐로 수렴 | WO |
 | **Phase 4 — Mobile draft → Web 검토** | `mobile_product_drafts` (바코드/상품명/이미지/가격수준 수집, "검토 필요" 상태) → Phase 3 검토 큐 연결. 모바일은 "수집"만, 웹이 "확정" | WO |
@@ -327,8 +319,8 @@
 | 10-3 | **모바일 데이터를 바로 상품으로 확정** | HIGH | draft 부재 상태에서 모바일→Master 직결 시 미검증 데이터가 SSOT 오염. 반드시 candidate/draft 경유 |
 | 10-4 | **비처방의약품을 일반 상품 등록 흐름으로 처리** | MED | 검증 정책/효능·용법 출처/광고 검토 없이 OTC 등록 시 약사법 리스크. UX 분기 필수 |
 | 10-5 | **처방의약품 노출/판매 정책 혼선** | HIGH | Rx는 고객 노출/온라인판매 차단이 핵심. 현재 `assertPharmacyOnlyServiceKeys` 게이트만 존재 → Rx 전용 차단 정책 별도 필요 |
-| 10-6 | **서비스별 용어 혼선** | LOW | 내 약국(GlycoPharm)/내 매장(K-Cosmetics)/약국·분회(KPA)/공급자·파트너(Neture) 사용자-facing 용어 보존. 구조는 공통, 용어는 서비스 정체성 |
-| 10-7 | **legacy ↔ 신규 product core 마이그레이션** | MED | `glycopharm/cosmetics/neture-product` 잔존. cosmetics 독립 스키마(`cosmetics_` prefix, §9)와 통합 시 도메인 규칙 충돌 주의. `StoreLocalProduct`(display-only)는 통합 대상 아님(혼동 금지) |
+| 10-6 | **서비스별 용어 혼선** | LOW | 내 약국/내 매장(K-Cosmetics)/약국·분회(KPA)/공급자·파트너(Neture) 사용자-facing 용어 보존. 구조는 공통, 용어는 서비스 정체성 |
+| 10-7 | **legacy ↔ 신규 product core 마이그레이션** | MED | cosmetics 독립 스키마(`cosmetics_` prefix, §9)와 통합 시 도메인 규칙 충돌 주의. `StoreLocalProduct`(display-only)는 통합 대상 아님(혼동 금지) |
 | 10-8 | **CLAUDE.md §4 E-commerce / §7 Boundary 위반** | MED | 독립 주문 테이블 금지, OrderType 불변, Store Ops=`organizationId` boundary. Product 작업이 commerce 경계 침범 금지 |
 
 ---
@@ -369,7 +361,6 @@
 - Service Product prep: `apps/api-server/src/routes/kpa/entities/service-product.entity.ts:1-30`
 - Import staging: `apps/api-server/src/modules/catalog-import/entities/`, `apps/api-server/src/modules/neture/entities/SupplierCsvImportRow.entity.ts`
 - 모바일 skeleton: `services/mobile-app/app/(app)/index.tsx` (`상품 관리`/`카메라/업로드` disabled "준비 중")
-- Legacy 마이그레이션: `apps/api-server/src/database/migrations/20260409300000-MigrateGlycopharmProductsToCatalogAndStore.ts`
 - Application 제거: `apps/api-server/src/routes/kpa/entities/organization-product-application.entity.ts` (빈 파일)
 
 ---

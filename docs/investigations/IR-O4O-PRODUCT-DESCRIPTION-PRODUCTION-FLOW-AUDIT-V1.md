@@ -29,7 +29,7 @@ Canonical 6단계 기준, 상품설명은 **④ 용도별 콘텐츠 저장까지
 
 ## 2. Scope
 
-대상: KPA-Society / GlycoPharm / K-Cosmetics 의 상품설명 제작(`/store/marketing/product-descriptions` · `StoreProductDescriptionsPage`) + 상품 상세 노출 경로.
+대상: KPA-Society / K-Cosmetics 의 상품설명 제작(`/store/marketing/product-descriptions` · `StoreProductDescriptionsPage`) + 상품 상세 노출 경로.
 제외: Neture(공급자/파트너 도메인, 매장 상품설명 대상 아님). POP PDF(pop_short/long)는 별도 산출물로만 확인.
 
 ---
@@ -56,7 +56,7 @@ Canonical 6단계 기준, 상품설명은 **④ 용도별 콘텐츠 저장까지
 - 모두 **authenticate + verifyProductOrgAccess**. 생성은 fire-and-forget(4초 폴링). 입력 자료 = `product_masters`(regulatory_name/marketingName/specification/category/brand/manufacturer/tags) + 옵션 `product_ocr_texts`.
 
 ### 3.3 편집 페이지 (3서비스 동형)
-`StoreProductDescriptionsPage.tsx` — KPA `pages/pharmacy` · GP `pages/store-management` · KCos `pages/store`.
+`StoreProductDescriptionsPage.tsx` — KPA `pages/pharmacy` `pages/store-management` · KCos `pages/store`.
 - ① 사이드바 `fetchLocalProducts()` → `GET /api/v1/store/local-products`(**StoreLocalProduct**, org-scoped, Display Domain).
 - ② `location.state.production.source.items[0].description` → prefillNote.
 - ③ RichTextEditor + AiContentModal(templateId/templateSystemPrompt/templateForcedOptions). 저장 후 재편집·AI 재생성 가능.
@@ -64,7 +64,7 @@ Canonical 6단계 기준, 상품설명은 **④ 용도별 콘텐츠 저장까지
 - **신규 생성은 자료함 경유만** — 페이지 직접 신규 진입 불가(블로그와 비대칭).
 
 ### 3.4 템플릿 (⑤ — 철학 일치)
-`productionTemplates`(KPA 로컬 / GP·KCos config): target='product-description'(desc-b2c-persuasion / desc-professional-spec / 서비스별 diabetes·skincare 등). `systemPromptOverride`+`starterHtml`+`forcedOptions` 를 **AI 생성 시점만** 적용, **`product_ai_contents` 에 templateId 미저장** → "템플릿=산출물/생성 시점, 콘텐츠 영구결합 금지" 원칙 충족.
+`productionTemplates`(KPA 로컬 / KCos config): target='product-description'(desc-b2c-persuasion / desc-professional-spec / 서비스별 diabetes·skincare 등). `systemPromptOverride`+`starterHtml`+`forcedOptions` 를 **AI 생성 시점만** 적용, **`product_ai_contents` 에 templateId 미저장** → "템플릿=산출물/생성 시점, 콘텐츠 영구결합 금지" 원칙 충족.
 
 ---
 
@@ -80,7 +80,7 @@ Canonical 6단계 기준, 상품설명은 **④ 용도별 콘텐츠 저장까지
 → **소비자 상품 상세·B2B·B2C·커머스 응답에 병합되는 경로 없음.**
 
 ### 4.2 소비자 상품 상세가 실제 보여주는 설명
-- GlycoPharm `StoreProductDetail.tsx:313` `{product.description}` 렌더 → 백엔드 `glycopharm/controllers/store.controller.ts:147` 에서 **`'' AS description` 하드코딩**. SQL(139-174)에 `product_ai_contents` JOIN **없음**.
+- SQL(139-174)에 `product_ai_contents` JOIN **없음**.
 - KPA `StorefrontProductDetailPage.tsx:292` 동일 백엔드 → **빈 문자열**(조건부 렌더라 미표시).
 - K-Cosmetics: **소비자 storefront 상품 상세 자체 부재**(내부 도구 페이지만).
 
@@ -103,7 +103,7 @@ Canonical 6단계 기준, 상품설명은 **④ 용도별 콘텐츠 저장까지
 
 ## 6. 3-Service Parity
 
-| 측면 | KPA | GP | KCos |
+| 측면 | KPA | KCos |
 |------|:--:|:--:|:--:|
 | 편집 페이지/컴포넌트 | ● | ● 동형 | ● 동형 |
 | 저장 엔드포인트(공통) | ● | ● | ● |
@@ -136,7 +136,7 @@ Canonical 6단계 기준, 상품설명은 **④ 용도별 콘텐츠 저장까지
 
 **권장:** WO 1(귀속 단위 표준)을 먼저 확정해야 WO 2(노출 연결)가 안전하다. 두 WO 가 canonical ⑥ 의 "꼬리 끊김"을 해소하는 핵심.
 
-> 본 IR 범위와 별개로, [`IR-O4O-STORE-COMMERCE-PRODUCT-PAGE-CROSSSERVICE-AUDIT-V1`](IR-O4O-STORE-COMMERCE-PRODUCT-PAGE-CROSSSERVICE-AUDIT-V1.md)(상품·거래 화면 parity)과 데이터 소스(GP 레거시 glycopharm_products)·노출 화면을 공유하므로, WO 2 진행 시 함께 정렬 권장.
+> 본 IR 범위와 별개로, [`IR-O4O-STORE-COMMERCE-PRODUCT-PAGE-CROSSSERVICE-AUDIT-V1`](IR-O4O-STORE-COMMERCE-PRODUCT-PAGE-CROSSSERVICE-AUDIT-V1.md)(상품·거래 화면 parity)과 데이터 소스·노출 화면을 공유하므로, WO 2 진행 시 함께 정렬 권장.
 
 ---
 

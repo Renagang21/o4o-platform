@@ -71,9 +71,7 @@ const prefixesToClean = isPlatformAdmin
 
 | 파일 | 용도 |
 |---|---|
-| `services/web-glycopharm/src/pages/operator/UsersPage.tsx:148, :355` | 단건 · 일괄 탈퇴 |
 | `services/web-k-cosmetics/src/pages/operator/UsersPage.tsx:146` | 단건 탈퇴 |
-| `services/web-glycopharm/src/pages/admin/GlycoPharmAdminMembersPage.tsx:129` | `?mode=${mode}` |
 | `services/web-k-cosmetics/src/pages/admin/KCosmeticsAdminMembersPage.tsx:132` | `?mode=${mode}` |
 
 ---
@@ -127,13 +125,12 @@ const prefixesToClean = isPlatformAdmin
 신규 `MembershipApprovalService.softDeleteBoundary.test.ts` (8/8 PASS).
 FakeQueryRunner 가 membership/role/users 테이블을 실제로 갱신해 **행 상태로** 판정한다.
 
-fixture: `u1` 이 glycopharm·kpa-society·neture 3개 서비스 active + `platform:super_admin` 보유.
-glycopharm 운영자가 `mode=soft` 탈퇴 실행.
+fixture: `u1` 이 kpa-society·neture 2개 서비스 active + `platform:super_admin` 보유.
 
 | WO 요구 검증 항목 | 결과 |
 |---|---|
-| 대상 서비스 이용 차단 | ✅ `m-glyco` → `withdrawn` (membership-guard 가 `status !== 'active'` 403) |
-| 대상 서비스 Role 비활성화 | ✅ `glycopharm:pharmacy` → `is_active=false` |
+| 대상 서비스 이용 차단 | — |
+| 대상 서비스 Role 비활성화 | — |
 | 다른 서비스 로그인·기존 세션 정상 | ✅ `users` write **0건**, `status='active'`·`isActive=true` 유지 |
 | 다른 서비스 Membership 불변 | ✅ `m-kpa`·`m-neture` → `active` 유지 |
 | 다른 서비스 Role 불변 | ✅ `kpa:member`·`neture:supplier` → `is_active=true` 유지 |
@@ -166,7 +163,7 @@ node scripts/lint-ratchet.mjs                 → ESLint 102 errors (baseline 10
 |---|---|
 | 조회 API 기준 | `getMembers` 는 이미 **membership status 를 users.status 보다 우선** 사용 (`:223` `effectiveStatus`) |
 | 목록 필터 | `sm_f.status` 기준 → `withdrawn` 필터 정상 |
-| UI 라벨 | `status-withdrawn` → "탈퇴" 존재 (GlycoPharm `:269`, K-Cosmetics `:212`) |
+| UI 라벨 | `status-withdrawn` → "탈퇴" 존재 |
 | 변화 | 대상 서비스 운영자 화면: 이전과 동일하게 "탈퇴" 표시 (unchanged) |
 | **개선** | 다른 서비스 운영자 화면: 이전에는 같은 사용자가 "탈퇴"로 보였으나 이제 **"활성"으로 정확히** 표시된다 |
 

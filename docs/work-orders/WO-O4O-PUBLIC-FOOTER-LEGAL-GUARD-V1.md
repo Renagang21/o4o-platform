@@ -20,10 +20,10 @@ Neture 공개 ContactPage에 남은 하드코딩 법정정보(`㈜쓰리라이�
 7. backend/API/DB/migration 미수정
 
 ## 3. 작업 대상
-`services/web-neture/**`, CHECK. (조건부 `packages/shared-space-ui/**` — 재사용 최소 수정 시만.) **금지: `apps/api-server/**`, `services/web-{glycopharm,k-cosmetics,kpa-society}/**`.**
+`services/web-neture/**`, CHECK. (조건부 `packages/shared-space-ui/**` — 재사용 최소 수정 시만.) **금지: `apps/api-server/**`, `services/web-{k-cosmetics,kpa-society}/**`.**
 
 ## 4. 제외
-Footer Core / 공통화 / 디자인 / `PublicLegalFooterInfo` 구조 / `service_legal_profiles` backend / Admin 설정 UI / Contact submit 로직 / email·autoreply 설정 / 약관·개인정보 본문 / GP·KCos·KPA / backend·API·DB·migration.
+Footer Core / 공통화 / 디자인 / `PublicLegalFooterInfo` 구조 / `service_legal_profiles` backend / Admin 설정 UI / Contact submit 로직 / email·autoreply 설정 / 약관·개인정보 본문 / KCos·KPA / backend·API·DB·migration.
 
 ## 5. 조사 결과
 - `services/web-neture/src/pages/ContactPage.tsx` "연락처 정보" 섹션 하단 **"회사 정보" 카드**(line 351~357)에 하드코딩: `㈜쓰리라이프존`, `사업자등록번호: 108-86-02873`.
@@ -42,7 +42,7 @@ Footer Core / 공통화 / 디자인 / `PublicLegalFooterInfo` 구조 / `service_
 `쓰리라이프존`, `108-86-02873`, `사업자등록번호`, `통신판매업`, `대표자` grep — **공개 표기로서의 하드코딩 값 0** 확인. (입점/공급자 폼 라벨·admin 헤더·주석은 법정정보 표기 아님 → 대상 아님.)
 
 ## 9. 검증
-ContactPage `㈜쓰리라이프존`·`108-86-02873` 제거 · Contact submit 회귀 없음 · 개인정보 동의 유지 · email/autoreply/in-app 구조 미변경 · Footer legal block 미변경 · placeholder 미표시 · GP/KCos/KPA 미수정 · backend/API/DB 미수정 · tsc 통과 · 가능 시 `/contact` 브라우저 smoke.
+ContactPage `㈜쓰리라이프존`·`108-86-02873` 제거 · Contact submit 회귀 없음 · 개인정보 동의 유지 · email/autoreply/in-app 구조 미변경 · Footer legal block 미변경 · placeholder 미표시 · KCos/KPA 미수정 · backend/API/DB 미수정 · tsc 통과 · 가능 시 `/contact` 브라우저 smoke.
 
 ## 10. Smoke
 배포 후 `https://neture.co.kr/contact`: 렌더 정상 · form 정상 · 동의 체크 유지 · `㈜쓰리라이프존`/`108-86-02873`/placeholder 미노출 · Footer 정상 · `/terms`·`/privacy`·`/contact`·`/guide` 링크 정상.
@@ -51,14 +51,14 @@ ContactPage `㈜쓰리라이프존`·`108-86-02873` 제거 · Contact submit 회
 web-neture만 변경 → web-neture 배포 확인. ⚠️ detect-changes skip 가능 → 라이브 확인 + 필요 시 `workflow_dispatch service=neture`.
 
 ## 12. staged 가드
-허용: `services/web-neture/**`, CHECK. 조건부 `packages/shared-space-ui/**`. **금지: `apps/api-server/**`, `services/web-{glycopharm,k-cosmetics,kpa-society}/**`.** commit 명시 경로.
+허용: `services/web-neture/**`, CHECK. 조건부 `packages/shared-space-ui/**`. **금지: `apps/api-server/**`, `services/web-{k-cosmetics,kpa-society}/**`.** commit 명시 경로.
 
 ## 13. CHECK 문서
-`docs/checks/CHECK-O4O-PUBLIC-FOOTER-LEGAL-GUARD-V1.md` — 목적·선행 반영·ContactPage 조사·제거한 하드코딩·처리 방식·Footer legal 미수정·submit 회귀 없음·동의 유지·GP/KCos/KPA 미수정·backend 미수정·검색 결과·tsc·smoke·배포·commit.
+`docs/checks/CHECK-O4O-PUBLIC-FOOTER-LEGAL-GUARD-V1.md` — 목적·선행 반영·ContactPage 조사·제거한 하드코딩·처리 방식·Footer legal 미수정·submit 회귀 없음·동의 유지·KCos/KPA 미수정·backend 미수정·검색 결과·tsc·smoke·배포·commit.
 
 ## 14. 후속
 1. `WO-O4O-PUBLIC-FOOTER-LEGAL-LOADER-CONSOLIDATION-V1` — `loadFooterLegal` 공통화 + Neture footer 3중 정리
-2. `WO-O4O-PUBLIC-FOOTER-CORE-GP-KCOS-V1` — GP/KCos 한정 FooterCore
+2. `WO-O4O-PUBLIC-FOOTER-CORE-GP-KCOS-V1` — KCos 한정 FooterCore
 
 > **기준 고정:** 공개 화면에서 사업자 법정정보가 나오는 곳은 **Footer 하나뿐**이어야 한다.
 

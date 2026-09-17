@@ -53,19 +53,18 @@ C. 유지 대상 — 편집기 안에서 문장 정리/요약/번역/표현 보�
 | 블로그 | `…/pharmacy/PharmacyBlogPage.tsx:404,461,496` | ✅ 제거 |
 | 콘텐츠 제작(자료→콘텐츠) | `…/pharmacy/CreateContentFromResourcesModal.tsx` | ✅ 제거 |
 
-> KPA POP/QR/Blog/Content-Create 는 **페이지 진입만 제거, AiContentModal·Toolbar AI 정리는 보존**. GP/KCos 동일 화면은 **별도 파일 → 미변경(parity 대기)**.
+> KPA POP/QR/Blog/Content-Create 는 **페이지 진입만 제거, AiContentModal·Toolbar AI 정리는 보존**. KCos 동일 화면은 **별도 파일 → 미변경(parity 대기)**.
 
 ### 2.2 잔존 AI 제작 진입점 (A/B 후보)
 
 | # | 화면 | 서비스 / 파일:line | 진입 형태 | 분류 |
 |---|---|---|---|---|
 | R1 | 상품 상세설명 | **KPA** `pharmacy/StoreProductDescriptionsPage.tsx:350,367,425` | 페이지 "AI로 작성" 배너 버튼 + AiContentModal("상품설명 AI 보조") | **A** |
-| | | **GP** `store-management/StoreProductDescriptionsPage.tsx:331,385` | 동일("약국 상품설명 AI 보조") | **A** (parity) |
 | | | **KCos** `store/StoreProductDescriptionsPage.tsx:331,385` | 동일("매장 상품설명 AI 보조") | **A** (parity) |
 | R2 | 내 자료함(제작 자료 생성) | **KPA** `pharmacy/StoreLibraryContentsPage.tsx:52,65,152,167` | 선택 → StartProductionModal "AI 카드" → AiContentModal "AI 매장 제작 자료 초안" 생성 | **A** |
-| | | **GP/KCos** `…/StoreLibraryContentsPage.tsx` | 동일 패턴(별도 파일) | **A** (parity) |
+| | | **KCos** `…/StoreLibraryContentsPage.tsx` | 동일 패턴(별도 파일) | **A** (parity) |
 | R3 | 자료 등록/수정 | **KPA** `resources/ResourceWritePage.tsx:16,572` | 편집 흐름 내 AiContentModal 진입(onInsert) | **B** (편집 보조로 재배치 가능 vs 제거) |
-| R4 | 강의(레슨) 편집 | **KPA** `instructor/courses/CourseEditPage.tsx:477` · **GP** `instructor/InstructorCourseEditPage.tsx` | "AI 레슨 초안 만들기"(URL-first 생성) | **A** but **RESERVED** — 별도 LMS 코스 구조 설계 축(아래 §5) |
+| R4 | 강의(레슨) 편집 | **KPA** `instructor/courses/CourseEditPage.tsx:477` | "AI 레슨 초안 만들기"(URL-first 생성) | **A** but **RESERVED** — 별도 LMS 코스 구조 설계 축(아래 §5) |
 
 ### 2.3 유지 대상 (C)
 
@@ -122,14 +121,14 @@ C. 유지 대상 — 편집기 안에서 문장 정리/요약/번역/표현 보�
        대상: R1(상품설명) · R2(내 자료함 제작) · R3(자료 등록) 의 KPA 페이지 진입 AI 제거.
        원칙: 페이지 진입(버튼/모달 open)만 제거, RichTextEditor Toolbar "AI 정리" 보존.
        R4(강의)·Signage 는 제외(RESERVED).
-       GP/KCos 는 별도 parity WO(KPA 선검증 후).
+       KCos 는 별도 parity WO(KPA 선검증 후).
 
 3순위  WO-O4O-AI-PROMPTS-SETTINGS-CLEANUP-AUDIT-V1
        대상: 제작 전용 outputType/프롬프트 orphan 여부, 운영자 화면 제작 설정 잔재,
             편집 보조용으로 유지할 프롬프트 선별. (read-only 우선)
 ```
 
-**중요:** 2순위는 **서비스별 별도 파일**(R1/R2/R3 가 KPA/GP/KCos 각각 존재) → 공통 컴포넌트(`AiContentModal`/Toolbar) 미변경. 공통 모듈 변경 없음 → 동시 세션 충돌 위험 낮음.
+**중요:** 2순위는 **서비스별 별도 파일**(R1/R2/R3 가 KPA/KCos 각각 존재) → 공통 컴포넌트(`AiContentModal`/Toolbar) 미변경. 공통 모듈 변경 없음 → 동시 세션 충돌 위험 낮음.
 
 ---
 
@@ -139,7 +138,7 @@ C. 유지 대상 — 편집기 안에서 문장 정리/요약/번역/표현 보�
 1. AI 제작 진입점이 제거/축소/유지(A/B/C)로 분류되었는가
 2. "페이지 진입 제거, Toolbar AI 정리 유지" 제약이 명시되었는가
 3. KPA 기 제거(QR/POP/Blog/Content-Create) 와 잔존(R1~R4) 이 구분되었는가
-4. GP/KCos parity 가 항목별로 표시되었는가
+4. KCos parity 가 항목별로 표시되었는가
 5. 백엔드 제작-actor / 편집-보조 / 설정 이 분리되었는가
 6. RESERVED(코스/Signage/admin builder/비-Gemini) 가 제외로 고정되었는가
 7. 2·3순위 WO 순서가 충돌 위험 낮은 순서인가
@@ -147,4 +146,4 @@ C. 유지 대상 — 편집기 안에서 문장 정리/요약/번역/표현 보�
 
 ## 8. 결론
 
-콘텐츠 제작 화면의 AI는 **페이지 진입형 "AI로 작성/생성/초안"** 으로 잔존한다 — KPA는 POP/QR/Blog/Content-Create 가 제거 완료, **상품설명(R1)·내 자료함 제작(R2)·자료 등록(R3)** 이 잔존하며 GP/KCos 는 전 항목 미변경(parity 대기). 편집기 Toolbar "AI 정리"(flexible)와 `AiContentModal` 컴포넌트·`/api/ai/content` 는 편집 보조로 **유지**한다. 다음 작업은 `WO-O4O-KPA-CONTENT-CREATION-AI-ENTRY-REMOVE-V1`(R1~R3, KPA 페이지 진입만 제거)로 진행한다.
+콘텐츠 제작 화면의 AI는 **페이지 진입형 "AI로 작성/생성/초안"** 으로 잔존한다 — KPA는 POP/QR/Blog/Content-Create 가 제거 완료, **상품설명(R1)·내 자료함 제작(R2)·자료 등록(R3)** 이 잔존하며 KCos 는 전 항목 미변경(parity 대기). 편집기 Toolbar "AI 정리"(flexible)와 `AiContentModal` 컴포넌트·`/api/ai/content` 는 편집 보조로 **유지**한다. 다음 작업은 `WO-O4O-KPA-CONTENT-CREATION-AI-ENTRY-REMOVE-V1`(R1~R3, KPA 페이지 진입만 제거)로 진행한다.

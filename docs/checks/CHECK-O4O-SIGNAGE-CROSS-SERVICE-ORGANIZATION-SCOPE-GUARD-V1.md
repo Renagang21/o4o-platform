@@ -31,12 +31,12 @@ Signage 는 My Store 축에서 **클라이언트가 organization 을 지정**하
 | B | 소유하지 않은 KPA 조직 | KPA | 403 | 403 |
 | C | 존재하지 않는 org | — | 403 | 403 |
 | D | 자기 K-Cosmetics 매장 | KCos | **200** ❌ | 403 |
-| E | 자기 GlycoPharm 매장 | GP | **200** ❌ | 403 |
+| E | — | **200** ❌ | 403 |
 | F | 자기 Neture 조직 | Neture | **200** ❌ | 403 |
 | G | 헤더 없음 | — | 400 `ORGANIZATION_ID_REQUIRED` | 동일 |
 | H | 미인증 | — | 401 | 동일 |
 
-**역방향도 동일**: `serviceKey=cosmetics` · `glycopharm` 로 요청해도 A(KPA 조직) 가 200 이었다.
+**역방향도 동일**: `serviceKey=cosmetics` 로 요청해도 A(KPA 조직) 가 200 이었다.
 즉 가드는 양방향으로 완전히 service-blind 였다.
 
 ---
@@ -125,7 +125,7 @@ Signage 는 My Store 축에서 **클라이언트가 organization 을 지정**하
 
 `signage-cross-service-org-guard.spec.ts` (20 케이스) — `AppDataSource.query` stub, DB 미접속.
 
-- A 자기 서비스 org → 통과 / B 미소유 org → 403 / D·E·F 타 서비스 org → 403 (kpa-society·cosmetics·glycopharm 3키)
+- A 자기 서비스 org → 통과 / B 미소유 org → 403 / D·E·F 타 서비스 org → 403 (kpa-society·cosmetics 3키)
 - 다중 서비스 조직 → 두 서비스 모두 통과 · 귀속 SSOT 없는 키 → 기존 동작 유지(귀속 조회 0회)
 - platform admin 우회 유지 · 헤더 없음 400 · 미인증 401 · DB 오류 fail-closed 403
 - `requireSignageOperatorOrStore`: 타 서비스 org 403 / 자기 서비스 org 통과 / **operator 는 org 없이 통과하며 귀속 조회 0회**
@@ -146,23 +146,22 @@ Signage 는 My Store 축에서 **클라이언트가 organization 을 지정**하
 
 `/schedules` (store 전용) · `/media` · `/playlists` (operator-or-store), 매장 소유 계정 기준.
 
-| organization | `serviceKey=kpa-society` | `cosmetics` | `glycopharm` |
-|---|---|---|---|
-| A 자기 KPA 매장 | **200** | 403 | 403 |
-| B 미소유 KPA 조직 | 403 | 403 | 403 |
-| C 존재하지 않는 org | 403 | 403 | 403 |
-| D 자기 KCos 매장 | **403** (이전 200) | **200** | 403 |
-| E 자기 GlycoPharm 매장 | **403** (이전 200) | 403 | **200** |
-| F 자기 Neture 조직 | **403** (이전 200) | 403 | 403 |
-| G 헤더 없음 | 400 `ORGANIZATION_ID_REQUIRED` | 동일 | 동일 |
-| H 미인증 | 401 | 401 | 401 |
+| organization | `serviceKey=kpa-society` | `cosmetics` |
+|---|---|---|
+| A 자기 KPA 매장 | **200** | 403 |
+| B 미소유 KPA 조직 | 403 | 403 |
+| C 존재하지 않는 org | 403 | 403 |
+| D 자기 KCos 매장 | **403** (이전 200) | **200** |
+| F 자기 Neture 조직 | **403** (이전 200) | 403 |
+| G 헤더 없음 | 400 `ORGANIZATION_ID_REQUIRED` | 동일 |
+| H 미인증 | 401 | 401 |
 
 - 정방향·역방향 모두 자기 서비스 매장에서만 200. **cross-service 통과 0.**
 - 403 코드: store 전용 `SIGNAGE_STORE_REQUIRED`, operator-or-store `SIGNAGE_ACCESS_DENIED` — 기존 코드 그대로.
 
 ### Operator 계약 회귀 (§11)
 
-`kpa:operator`·`cosmetics:operator`·`glycopharm:operator` 보유 계정으로 동일 매트릭스를 돌린 결과,
+`kpa:operator`·`cosmetics:operator` 보유 계정으로 동일 매트릭스를 돌린 결과
 `/media`·`/playlists` 는 **organization 과 무관하게 200** 을 유지했다 (operator branch 조기 통과).
 operator 가 organization scope 없이 접근하는 endpoint 에 store 검사를 강제하지 않았음을 확인.
 

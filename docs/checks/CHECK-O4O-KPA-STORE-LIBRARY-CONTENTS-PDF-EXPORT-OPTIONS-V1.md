@@ -114,7 +114,7 @@ end-to-end 확인. **사용자 확인 완료.**
 - `StoreContentsSelector` 는 **2개 화면 공유**: `StoreLibraryContentsPage`(mode='page') / `SelectContentsForProductionModal`(mode='modal').
 - PDF 기능은 **`enablePdfExport` opt-in + `mode === 'page'` 이중 게이트** → production-materials 선택 모달(mode='modal', opt-in 미전달)에 영향 0.
 - 강의(LessonsSection) 탭에는 추가 안 함(콘텐츠 전용).
-- KPA 전용 web 서비스 내부 컴포넌트 → GlycoPharm / K-Cosmetics 무관.
+- KPA 전용 web 서비스 내부 컴포넌트 → K-Cosmetics 무관.
 - 기존 액션(`제작 시작` / `선택 삭제`) 동작 불변.
 
 ---

@@ -73,7 +73,7 @@ setup: 운영자 [PILOT] 콘텐츠 ko/en 발행 → store-owner [PILOT] 상품 +
 4. locale=en ✅  5. fallback ✅  6. archived/draft 미노출 ✅  7. 내부 ID 미노출 ✅
 8. 기존 흐름 회귀 — 배지/가져오기/Store Hub 정상 ✅
 
-**최종 판정: CLOSED / PASS** (정적 + API + UI smoke 전부 PASS, GP/KCos 무변경, lockfile 미변경)
+**최종 판정: CLOSED / PASS** (정적 + API + UI smoke 전부 PASS, KCos 무변경, lockfile 미변경)
 
 ## 7. 후속
 - listing(targetKind=listing) 상품의 QR UI는 PharmacyB2BPage에 후속 (현재 모달은 local 상품)

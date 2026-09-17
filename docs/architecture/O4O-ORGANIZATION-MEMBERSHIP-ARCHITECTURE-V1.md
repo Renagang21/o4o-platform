@@ -211,10 +211,6 @@ API Access
 
 예
 
-```text
-GlycoPharm 약국 관리자
-```
-
 검사
 
 ```text
@@ -464,7 +460,6 @@ pending membership
 | 서비스        | 조직  |
 | ---------- | --- |
 | KPA        | 약사회 |
-| GlycoPharm | 약국  |
 | Neture     | 공급자 |
 | Cosmetics  | 파트너 |
 | O4O Store  | 매장  |

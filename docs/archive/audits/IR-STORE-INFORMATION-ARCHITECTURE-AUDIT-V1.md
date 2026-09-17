@@ -456,7 +456,7 @@
 - 페이지 분할/통합 (각 페이지는 현 상태 유지)
 - 신규 기능 추가 (기존 기능의 재배치만)
 - 공개 스토어프론트 (`/store/:slug/*`) 건드리기 (완전 별개 시스템)
-- `packages/store-ui-core` 의 다른 서비스용 config 건드리기 (glycopharm, cosmetics 영향 주의)
+- `packages/store-ui-core` 의 다른 서비스용 config 건드리기 (cosmetics 영향 주의)
 
 ---
 
@@ -482,7 +482,7 @@
 - KPA 커뮤니티 영역 (`/forum`, `/lms`, `/content`, `/hub`) — `/store` 밖
 - Operator / Admin 영역 (`/operator`, `/admin`)
 - 로그인/회원가입/마이페이지 (`/login`, `/mypage` 등)
-- 다른 서비스 (glycopharm, k-cosmetics 등)
+- 다른 서비스 (k-cosmetics 등)
 
 ---
 

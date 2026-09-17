@@ -5,7 +5,6 @@
  * WO-O4O-STORE-HUB-API-CLIENT-AND-SERVICE-SCOPE-ALIGNMENT-V1:
  *   query 조립을 `@o4o/store-ui-core` 의 `createHubContentApi` 로 이관.
  *   이 파일은 **전송(axios `.data` 언랩) · serviceKey · 타입 재노출**만 소유한다.
- *   (GlycoPharm·Neture 사본과 주석·import 경로·SERVICE_KEY 외 차이가 없었다 — SAME_CONTRACT)
  *   전송 URL · query · 응답 형상 무변경.
  *
  * GET /api/v1/hub/contents?serviceKey=k-cosmetics&sourceDomain=...

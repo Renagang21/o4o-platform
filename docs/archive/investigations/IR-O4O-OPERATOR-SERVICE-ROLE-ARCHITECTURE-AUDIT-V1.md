@@ -80,7 +80,6 @@ interface AssignRoleInput {
 | **operator** | **1** | 0 | **레거시 (프리픽스 없음)** |
 | partner | 1 | 0 | 레거시 |
 | glucoseview:admin | 1 | 0 | 서비스 프리픽스 |
-| glycopharm:admin | 1 | 0 | 서비스 프리픽스 |
 | supplier | 1 | 0 | 레거시 |
 | admin | 1 | 5 | 레거시 |
 | platform:admin | 0 | 4 | 플랫폼 프리픽스 |
@@ -99,7 +98,6 @@ interface AssignRoleInput {
 | kpa | kpa:branch_operator | L301-308 | Active |
 | kpa-c | kpa-c:operator | L345-352 | Active |
 | neture | neture:operator | L371-378 | Active |
-| glycopharm | glycopharm:operator | L413-420 | Active |
 | cosmetics | cosmetics:operator | L463-470 | Active |
 | glucoseview | glucoseview:operator | L521-528 | Active |
 
@@ -252,7 +250,6 @@ requiredRoles에 'super_admin' 포함 시:
 | KPA 데모 | kpa-b | kpa-b:district | kpa-b:branch |
 | KPA 분회 | kpa-c | kpa-c:admin | kpa-c:operator |
 | Neture | neture | neture:admin | neture:operator |
-| GlycoPharm | glycopharm | glycopharm:admin | glycopharm:operator |
 | K-Cosmetics | cosmetics | cosmetics:admin | cosmetics:operator |
 | GlucoseView | glucoseview | glucoseview:admin | glucoseview:operator |
 

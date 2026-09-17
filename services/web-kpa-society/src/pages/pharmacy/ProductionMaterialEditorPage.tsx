@@ -14,7 +14,7 @@
  *
  * WO-O4O-KPA-STORE-PRODUCTION-MATERIALS-ENTRY-ALIGNMENT-V1 (KPA 한정 진입 계약 정정):
  *   /store/library/production-materials/new 는 legacy redirect(→ /store/library/contents) 로 전환되어
- *   KPA 에서 더 이상 이 화면의 진입 경로가 아니다. 아래 state 계약은 GP/KCos 및 :id/edit 모드 기준으로 유지한다.
+ *   KPA 에서 더 이상 이 화면의 진입 경로가 아니다. 아래 state 계약은 KCos 및 :id/edit 모드 기준으로 유지한다.
  *   KPA 활성 진입 = 자료함 > 콘텐츠 → execution asset 행 [편집] → /store/library/production-materials/:id/edit
  *
  * 진입(legacy/타 서비스): StoreLibraryContentsPage → AiContentModal.onInsert → navigate('.../production-materials/new', { state })

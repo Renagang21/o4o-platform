@@ -76,8 +76,8 @@
 |---|---|---|
 | 1 | `packages/operator-core-ui/.../OperatorMembersConsolePage.tsx` (`PasswordModal`) | 공통 UI |
 | 2 | `packages/operator-core-ui/.../types.ts` (`MembersConsoleClient.updatePassword`) | 공통 계약 |
-| 3 | `services/web-glycopharm/.../operator/UsersPage.tsx` | 서비스 구현 |
-| 4 | `services/web-glycopharm/.../admin/GlycoPharmAdminMembersPage.tsx` | 서비스 구현 |
+| 3 | — | 서비스 구현 |
+| 4 | — | 서비스 구현 |
 | 5 | `services/web-k-cosmetics/.../operator/UsersPage.tsx` | 서비스 구현 |
 | 6 | `services/web-k-cosmetics/.../admin/KCosmeticsAdminMembersPage.tsx` | 서비스 구현 |
 | 7 | `services/web-kpa-society/.../operator/MemberManagementPage.tsx` | 서비스 구현 (memberId→userId 변환) |
@@ -135,7 +135,6 @@ UI 는 공통 모듈 1곳에만 있어 **5개 서비스가 동시에 반영**된
 ### 5-2. 다른 서비스 role 을 쓰지 않음
 
 `tier(roles, prefix)` 는 `{prefix}:admin` / `{prefix}:operator` 만 본다.
-대상이 `kpa:admin` 이어도 `glycopharm` 판정에서는 `member` 다 — 테스트로 고정.
 
 `platform:super_admin` 만 서비스와 무관한 최상위로 둔다. 이는 "전체 최고 role 로 판정" 이 아니라
 **"플랫폼 계정 비밀번호는 이 경로가 다루지 않는다"** 는 계약의 표현이며,
@@ -167,7 +166,6 @@ UI 는 공통 모듈 1곳에만 있어 **5개 서비스가 동시에 반영**된
 | 기타 | password 미포함 요청 → write 0 | ✅ |
 
 > WO 검증 항목 "대상자가 다른 서비스의 admin 이어도 현재 서비스에서 member 이면 member 로 판정" 은
-> `operator → member 허용` 케이스가 대상 role 을 `glycopharm:pharmacy` 로 두고 판정하는 것으로 커버된다.
 > 타 서비스 admin role 을 명시적으로 넣은 케이스는 §9 잔여로 남긴다.
 
 ---

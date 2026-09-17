@@ -30,7 +30,7 @@
 | # | 선행 잔존 위험 | 이번 결과 |
 |---|---|---|
 | 1 | 단건 course 외 **enroll / progress / lesson / certificate** 는 scope 미적용 | **해소**. 아래 §4~§7 |
-| 2 | generic route 를 쓰는 GP / KCos 는 호출부마다 serviceKey 를 붙여야 해 누락 위험 | **해소**. apiClient 계층에서 `/lms/*` 전체에 1회 부착(§8-3) |
+| 2 | generic route 를 쓰는 KCos 는 호출부마다 serviceKey 를 붙여야 해 누락 위험 | **해소**. apiClient 계층에서 `/lms/*` 전체에 1회 부착(§8-3) |
 | 3 | serviceKey 중복 전달 시 express 가 배열을 주어 scope 가 조용히 사라질 수 있음 | **해소**. `resolveLmsServiceScope` 가 배열 첫 값 사용(§3) |
 
 ---
@@ -73,33 +73,33 @@ service route/context → canonical serviceKey → 대상 course.serviceKey 확�
 
 | method/path | 소비자 | 유형 | service context | course service 확인 | enrollment guard | R/W | 판정 |
 |---|---|---|---|---|---|---|---|
-| GET /courses | KPA·KCos·GP | generic | query serviceKey | SQL 목록 필터 | optionalAuth | R | SCOPED (선행 WO) |
-| GET /courses/:id | KPA·KCos·GP | generic | query serviceKey | 단건 SQL | optionalAuth | R | SCOPED (선행 WO) |
-| GET /courses/:courseId/lessons | KPA·KCos·GP | generic | query serviceKey | requireEnrollment 내 판정 | requireEnrollment | R | **FIXED** |
-| GET /lessons/:id | KPA·KCos·GP | generic | query serviceKey | requireEnrollment + guardLessonScope | requireEnrollment(checkLesson) | R | **FIXED** |
-| GET /lessons/:lessonId/quiz | KPA·GP | generic | query serviceKey | guardLessonScope | requireAuth | R | **FIXED** |
-| POST /quizzes/:quizId/submit | KPA·GP | generic | query serviceKey | guardQuizScope | requireAuth | W | **FIXED** |
-| GET /quizzes/:quizId/attempts | KPA·GP | generic | query serviceKey | guardQuizScope | requireAuth | R | **FIXED** |
-| GET /lessons/:lessonId/assignment | KPA·GP | generic | query serviceKey | guardLessonScope | requireAuth | R | **FIXED** |
-| POST /assignments/:assignmentId/submit | KPA·GP | generic | query serviceKey | guardAssignmentScope | requireAuth | W | **FIXED** |
-| GET /assignments/:assignmentId/my | KPA·GP | generic | query serviceKey | guardAssignmentScope | requireAuth | R | **FIXED** |
-| GET /completions/me | KPA·KCos·GP | generic | query serviceKey | course JOIN SQL 필터 | requireAuth(본인) | R | **FIXED** |
-| POST /courses/:courseId/enroll | KPA·KCos·GP | generic | query serviceKey | guardCourseScope | requireAuth | W | **FIXED** |
-| GET /enrollments | KPA·KCos·GP | generic | query serviceKey | course JOIN SQL 필터 | requireAuth | R | **FIXED** |
-| GET /enrollments/me | KPA·KCos·GP | generic | query serviceKey | course JOIN SQL 필터 | requireAuth(본인) | R | **FIXED** |
-| GET /enrollments/:id | KPA·KCos·GP | generic | query serviceKey | guardLoadedCourseScope | requireAuth | R | **FIXED** |
-| PATCH /enrollments/:id | KPA·KCos·GP | generic | query serviceKey | ensureEnrollmentInScope | requireAuth | W | **FIXED** |
-| POST /enrollments/:id/start | KPA·KCos·GP | generic | query serviceKey | ensureEnrollmentInScope | requireAuth | W | **FIXED** |
-| POST /enrollments/:id/complete | KPA·KCos·GP | generic | query serviceKey | ensureEnrollmentInScope | requireAuth | W | **FIXED** |
-| POST /enrollments/:id/cancel | KPA·KCos·GP | generic | query serviceKey | ensureEnrollmentInScope | requireAuth | W | **FIXED** |
-| GET /enrollments/me/course/:courseId | KPA·KCos·GP | generic | query serviceKey | guardCourseScope | requireAuth(본인) | R | **FIXED** |
-| POST /enrollments/:courseId/progress | KPA·KCos·GP | generic | query serviceKey | guardCourseScope + lesson↔course 일치 | enrollment 소유 확인 | W | **FIXED** |
-| GET /certificates | KPA·KCos·GP | generic | query serviceKey | course JOIN SQL 필터 | requireAuth | R | **FIXED** |
-| GET /certificates/me | KPA·KCos·GP | generic | query serviceKey | course JOIN SQL 필터 | requireAuth(본인) | R | **FIXED** |
-| GET /certificates/verify/:verificationCode | KPA·GP | generic | query serviceKey | guardLoadedCourseScope | requireAuth | R | **FIXED** |
-| GET /certificates/number/:certificateNumber | KPA·GP | generic | query serviceKey | guardLoadedCourseScope | requireAuth | R | **FIXED** |
-| GET /certificates/:id | KPA·KCos·GP | generic | query serviceKey | guardLoadedCourseScope | requireAuth | R | **FIXED** |
-| GET /certificates/:id/pdf | KPA·GP | generic | query serviceKey | guardLoadedCourseScope(소유자 확인보다 먼저) | 본인만 | R | **FIXED** |
+| GET /courses | KPA·KCos·generic | query serviceKey | SQL 목록 필터 | optionalAuth | R | SCOPED (선행 WO) |
+| GET /courses:id | KPA·KCos·generic | query serviceKey | 단건 SQL | optionalAuth | R | SCOPED (선행 WO) |
+| GET /courses:courseId/lessons | KPA·KCos·generic | query serviceKey | requireEnrollment 내 판정 | requireEnrollment | R | **FIXED** |
+| GET /lessons:id | KPA·KCos·generic | query serviceKey | requireEnrollment + guardLessonScope | requireEnrollment(checkLesson) | R | **FIXED** |
+| GET /lessons:lessonId/quiz | KPA·generic | query serviceKey | guardLessonScope | requireAuth | R | **FIXED** |
+| POST /quizzes:quizId/submit | KPA·generic | query serviceKey | guardQuizScope | requireAuth | W | **FIXED** |
+| GET /quizzes:quizId/attempts | KPA·generic | query serviceKey | guardQuizScope | requireAuth | R | **FIXED** |
+| GET /lessons:lessonId/assignment | KPA·generic | query serviceKey | guardLessonScope | requireAuth | R | **FIXED** |
+| POST /assignments:assignmentId/submit | KPA·generic | query serviceKey | guardAssignmentScope | requireAuth | W | **FIXED** |
+| GET /assignments:assignmentId/my | KPA·generic | query serviceKey | guardAssignmentScope | requireAuth | R | **FIXED** |
+| GET /completions/me | KPA·KCos·generic | query serviceKey | course JOIN SQL 필터 | requireAuth(본인) | R | **FIXED** |
+| POST /courses:courseId/enroll | KPA·KCos·generic | query serviceKey | guardCourseScope | requireAuth | W | **FIXED** |
+| GET /enrollments | KPA·KCos·generic | query serviceKey | course JOIN SQL 필터 | requireAuth | R | **FIXED** |
+| GET /enrollments/me | KPA·KCos·generic | query serviceKey | course JOIN SQL 필터 | requireAuth(본인) | R | **FIXED** |
+| GET /enrollments:id | KPA·KCos·generic | query serviceKey | guardLoadedCourseScope | requireAuth | R | **FIXED** |
+| PATCH /enrollments:id | KPA·KCos·generic | query serviceKey | ensureEnrollmentInScope | requireAuth | W | **FIXED** |
+| POST /enrollments:id/start | KPA·KCos·generic | query serviceKey | ensureEnrollmentInScope | requireAuth | W | **FIXED** |
+| POST /enrollments:id/complete | KPA·KCos·generic | query serviceKey | ensureEnrollmentInScope | requireAuth | W | **FIXED** |
+| POST /enrollments:id/cancel | KPA·KCos·generic | query serviceKey | ensureEnrollmentInScope | requireAuth | W | **FIXED** |
+| GET /enrollments/me/course:courseId | KPA·KCos·generic | query serviceKey | guardCourseScope | requireAuth(본인) | R | **FIXED** |
+| POST /enrollments:courseId/progress | KPA·KCos·generic | query serviceKey | guardCourseScope + lesson↔course 일치 | enrollment 소유 확인 | W | **FIXED** |
+| GET /certificates | KPA·KCos·generic | query serviceKey | course JOIN SQL 필터 | requireAuth | R | **FIXED** |
+| GET /certificates/me | KPA·KCos·generic | query serviceKey | course JOIN SQL 필터 | requireAuth(본인) | R | **FIXED** |
+| GET /certificates/verify:verificationCode | KPA·generic | query serviceKey | guardLoadedCourseScope | requireAuth | R | **FIXED** |
+| GET /certificates/number:certificateNumber | KPA·generic | query serviceKey | guardLoadedCourseScope | requireAuth | R | **FIXED** |
+| GET /certificates:id | KPA·KCos·generic | query serviceKey | guardLoadedCourseScope | requireAuth | R | **FIXED** |
+| GET /certificates:id/pdf | KPA·generic | query serviceKey | guardLoadedCourseScope(소유자 확인보다 먼저) | 본인만 | R | **FIXED** |
 
 ### 3-2. INTENTIONALLY_UNSCOPED (1건)
 
@@ -159,10 +159,8 @@ service route/context → canonical serviceKey → 대상 course.serviceKey 확�
 - 목록(`/certificates`, `/certificates/me`)은 SQL JOIN 필터, 단건(`:id` · `number/:num` ·
   `verify/:code` · `:id/pdf`)은 `guardLoadedCourseScope`.
 - PDF 다운로드는 **service scope 를 소유자 확인보다 먼저** 판정한다 (WO §3 판정 순서).
-- **KPA / GP / KCos 의 수료증 발급 정책·UX 는 통일하지 않았다.** 발급 조건, 검증 도메인
+- **KPA / KCos 의 수료증 발급 정책·UX 는 통일하지 않았다.** 발급 조건, 검증 도메인
   (`resolveVerificationBase`), 응답 DTO 모두 기존 그대로다.
-- 프런트 결함 1건 수정: GlycoPharm `downloadCertificate` 가 존재하지 않는
-  `/lms/certificates/:id/download` 를 호출해 404 였다 → canonical `/pdf` 로 교정.
 
 ## 8. Generic route 처리 (WO §8)
 
@@ -182,12 +180,11 @@ service route/context → canonical serviceKey → 대상 course.serviceKey 확�
 |---|---|---|
 | KPA-Society | `/api/v1/kpa/lms/*` | **route context** (client 값 무시 — 스푸핑 차단) |
 | K-Cosmetics | generic `/api/v1/lms/*` | apiClient 가 `serviceKey=k-cosmetics` 부착 |
-| GlycoPharm | generic `/api/v1/lms/*` | apiClient 가 `serviceKey=glycopharm` 부착 |
 | Neture / PharmacyHub / KPA-Branch | **LMS 소비처 0** | 해당 없음 (코드 기준 확인) |
 
 ### 8-3. 프런트 serviceKey 주입
 
-`services/web-k-cosmetics/src/lib/apiClient.ts` · `services/web-glycopharm/src/lib/apiClient.ts`
+`services/web-k-cosmetics/src/lib/apiClient.ts`
 에 `/lms/*` 한정 axios request interceptor 를 1개씩 추가했다.
 
 - 호출부마다 붙이지 않으므로 **누락이 구조적으로 불가능**하다.
@@ -271,7 +268,7 @@ service route/context → canonical serviceKey → 대상 course.serviceKey 확�
 | `lms_assignments` / `lms_submissions` | 각 0건 |
 
 → 현재 운영 데이터에 **service_key NULL 도 cross-service 관계도 없다.**
-결함은 데이터가 아니라 **구조**였다(KCos/GP 화면이 KPA 강의를 그대로 보고 있었고,
+결함은 데이터가 아니라 **구조**였다(KCos 화면이 KPA 강의를 그대로 보고 있었고
 courseId 만 알면 write 도 가능했다).
 
 ---
@@ -286,7 +283,6 @@ courseId 만 알면 write 도 가능했다).
 |---|---|---|---|
 | KPA-Society | `/lms` → 상세 | `200 /kpa/lms/courses?status=published` n=3 keys=`["kpa-society"]` · `200 /kpa/lms/courses/:id` · `200 .../lessons` | PASS — 혼입 0 |
 | K-Cosmetics | `/lms` | `200 /lms/courses?serviceKey=k-cosmetics&status=published` n=0 keys=`[]` | PASS — "총 0개의 강의" (이전에는 KPA 강의 노출) |
-| GlycoPharm | `/lms` | `200 /lms/courses?serviceKey=glycopharm&status=published` n=0 keys=`[]` | PASS — "총 0개의 강의" |
 
 ### 13-2. 로그인 (KPA, `docs/local/TEST-ACCOUNTS.local.md` KPA operator)
 
@@ -334,9 +330,7 @@ courseId 만 알면 write 도 가능했다).
 
 | 파일 | 변경 |
 |---|---|
-| `services/web-glycopharm/src/lib/apiClient.ts` | `/lms/*` serviceKey interceptor |
 | `services/web-k-cosmetics/src/lib/apiClient.ts` | `/lms/*` serviceKey interceptor |
-| `services/web-glycopharm/src/api/lms.ts` | 수료증 다운로드 canonical `/pdf` 경로 교정 |
 
 **DB migration 0 · entity 변경 0 · 신규 테이블 0.**
 
@@ -366,11 +360,6 @@ courseId 만 알면 write 도 가능했다).
    쓰는데, 백엔드는 `app.use('/api/v1/appreciation', ...)` 로만 마운트돼 있다 (`coreApiClient` 를 써야 함).
    Forum·Contents·MyDashboard 도 같은 클라이언트를 쓰므로 **LMS 한정 문제가 아니고 이번 WO 이전부터 존재**한다.
    WO §14 "무관한 404 수정 금지" 에 해당하여 손대지 않았다. **별도 WO 필요.**
-
-5. **GlycoPharm `getMyCertificate` 는 dead code**
-   존재하지 않는 `/lms/certificates/course/:courseId` 를 호출하지만 **호출부가 없다**.
-   실패를 삼켜 `null` 을 반환하는 형태라 load-error 계약에도 어긋난다.
-   범위 밖이라 제거하지 않고 기록만 한다.
 
 ---
 

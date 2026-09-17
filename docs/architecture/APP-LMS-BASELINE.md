@@ -93,7 +93,6 @@ KPA-Society를 reference implementation으로 한다.
 | 서비스 | Learner | Instructor | 비고 |
 |---|---|---|---|
 | **KPA-Society** | Full (6+ 페이지) | Full (5+ 페이지) | reference implementation |
-| **GlycoPharm** | Partial (`/education` 위주) | Partial — Dashboard 1페이지만 | 강사 풀세트는 후속 |
 | **K-Cosmetics** | Partial (3페이지) | **Target — 미구현** | 공통화 대상. Phase에 따라 bootstrap 예정 (§11) |
 | **Neture** | None | None | LMS 미사용 |
 
@@ -156,7 +155,7 @@ KPA-Society를 reference implementation으로 한다.
 |---|---|---|
 | **Phase 1** | APP-LMS 기준 확정 | **본 문서** (완료) |
 | Phase 1-A | K-Cosmetics Instructor bootstrap | `WO-KCOS-LMS-INSTRUCTOR-BOOTSTRAP-V1` — 최소 라우트/페이지/메뉴 진입점 |
-| Phase 1-B | 전 서비스 Instructor 구조 통일 | KPA reference 기준으로 GlycoPharm/K-Cosmetics 풀세트화 (CourseList/Edit/Participants 등) |
+| Phase 1-B | 전 서비스 Instructor 구조 통일 | KPA reference 기준으로 K-Cosmetics 풀세트화 (CourseList/Edit/Participants 등) |
 | Phase 2 | Frontend 공통 client / types 추출 | `@o4o/lms-client`, `@o4o/lms-types` + 3개 서비스 마이그레이션 |
 | Phase 3 | LmsHubTemplate 도입 | `@o4o/shared-space-ui` 확장 + Learner UI 통일 |
 | Phase 4 | Instructor UI 공통화 | InstructorDashboardTemplate / CourseEditorTemplate |

@@ -51,8 +51,7 @@
 - `paymentStatus='paid'` 는 `completePayment`(Toss `paymentKey`+approvedAt) 로만 설정 → **실 수금 신뢰 가능** ✅.
 - 그러나 **checkout_orders 는 사실상 미수금**:
   - event_offer cart-confirm: 결제 confirm 단계 자체가 흐름에 없음 → **PENDING 영구**.
-  - KPA B2C `/kpa/checkout`: Toss confirm 경로 존재하나 **KPA payment event handler 미초기화**(Glyco 는 register-routes 에 있음) → Toss 성공해도 checkout_orders.paymentStatus=pending 잔존(**버그**).
-  - Glyco/KCos: payment handler 유무·event_offer 결제단계 부재 — 동일하게 event_offer 는 미결제.
+  - KPA B2C `/kpa/checkout`: Toss confirm 경로 존재하나 **KPA payment event handler 미초기화** → Toss 성공해도 checkout_orders.paymentStatus=pending 잔존(**버그**).
 - **collection/offline 확정 개념 부재**: checkout_orders 에 paymentStatus 외 collectionStatus/settlementReady 없음.
 - → 표준 4단계가 **online 경로에서 미완성**(미수금 잔존) + offline 확정 개념 부재.
 

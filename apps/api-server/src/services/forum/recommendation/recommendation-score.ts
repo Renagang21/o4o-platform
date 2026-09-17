@@ -95,7 +95,6 @@ export function calculateDomainScore(post: ForumPost, userContext: UserContext):
   }
 
   const yaksaData = (metadata.extensions?.['yaksa'] || (metadata as any).yaksa) as YaksaForumMeta | undefined;
-  // WO-O4O-GLYCOPHARM-PHARMACY-ONLY-ROLE-CLEANUP-V1 Phase 4-B:
   //   userContext.isPharmacist → isPharmacy (내부 필드명 표준화).
   //   yaksaData.pharmacistVerified 는 KPA/Neture 메타데이터라 유지.
   if (yaksaData && userContext.isPharmacy) {
@@ -312,7 +311,7 @@ export function scoreYaksaPost(
         }
       }
     } else if (userContext.isPharmacy) {
-      // WO-O4O-GLYCOPHARM-PHARMACY-ONLY-ROLE-CLEANUP-V1 Phase 4-B: isPharmacist → isPharmacy
+      // isPharmacist → isPharmacy
       if (['education', 'resource'].includes(documentType)) {
         domainScore += 0.3;
         if (reasonCode !== 'same_organization') {
@@ -392,7 +391,7 @@ export function generateReason(
       if (userContext.skinType) {
         return { reason: '회원님의 피부타입과 관심사에 맞는 글입니다.', reasonCode: 'similar_skin_type' };
       }
-      // WO-O4O-GLYCOPHARM-PHARMACY-ONLY-ROLE-CLEANUP-V1 Phase 4-B: isPharmacist → isPharmacy
+      // isPharmacist → isPharmacy
       if (userContext.isPharmacy) {
         return { reason: '약사님을 위한 전문 콘텐츠입니다.', reasonCode: 'recommended_for_role' };
       }

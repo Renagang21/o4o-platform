@@ -32,7 +32,7 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
   //   공급자가 제공한 콘텐츠의 수신·승인은 서비스 콘텐츠 업무 → 서비스 운영 (domain override).
   approvals: [
     // WO-KPA-LMS-INSTRUCTOR-APPROVAL-RELOCATE-V1: 자격 신청 관리 → lms 그룹으로 이동
-    // WO-O4O-KPA-PRODUCT-APPLICATIONS-MENU-EXPOSURE-V1: GP/KCos 와 메뉴명 정렬
+    // WO-O4O-KPA-PRODUCT-APPLICATIONS-MENU-EXPOSURE-V1: KCos 와 메뉴명 정렬
     { label: '공급 상품 신청 승인', path: '/operator/product-applications' },
     // WO-O4O-KPA-OPERATOR-ACTION-INTEGRITY-AND-APPROVAL-FLOW-COMPLETION-V1:
     //   공급자 CMS→HUB 콘텐츠 승인 + 사이니지 캠페인 요청 승인 (백엔드 kpa:operator 는 이미 존재,
@@ -47,12 +47,12 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
     //   승인 기능은 실재한다: proxy `/api/v1/kpa/operator/recruitment-exposure`(requireKpaScope
     //   'kpa:operator', serviceKey='kpa-society' 고정) → setRecruitmentExposure(SERVICE_MISMATCH 가드·
     //   idempotent). 공급자 create=exposure_status PENDING 기본, browse/apply=APPROVED 강제.
-    //   페이지(RecruitmentExposureApprovalPage)·라우트도 이미 live. GP/KCos 는 계속 노출 중이었고 KPA 만 회귀.
+    //   페이지(RecruitmentExposureApprovalPage)·라우트도 이미 live. KCos 는 계속 노출 중이었고 KPA 만 회귀.
     //   유통 기능(운영자 승인 필요)이며 콘텐츠 무승인 게시와 별개.
     { label: '판매자 모집 노출 승인', path: '/operator/recruitment-exposure' },
   ],
   // WO-O4O-KPA-OPERATOR-PRODUCT-ORDER-VIEW-INTRODUCE-V1: 상품 현황 (view-only, 서비스 전역 조회).
-  //   GP/KCos 와 동일한 products/orders 그룹/라벨.
+  //   KCos 와 동일한 products/orders 그룹/라벨.
   products: [{ label: '상품 현황', path: '/operator/products' }],
   // WO-O4O-KPA-OPERATOR-ORDER-VIEW-FRONTEND-WIRING-V1: 주문 현황 (view-only).
   //   backend GET /api/v1/kpa/operator/orders (kpa:operator) 연결.

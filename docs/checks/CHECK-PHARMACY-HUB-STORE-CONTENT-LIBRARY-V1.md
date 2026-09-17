@@ -23,7 +23,7 @@ Pharmacy-Hub 에는 매장 블로그 공개 URL(공개 storefront slug 라우트
 **(b) 공통 API 를 그대로 마운트하지 않고 PH adapter 를 둔 이유**
 
 공통 `/api/v1/store/{content,library}` · `{svc}/stores/:slug/blog/staff` 라우트는 `createRequireStoreOwner()` / `resolveStoreAccess()` 로
-**KPA·GlycoPharm·K-Cosmetics 기준의 조직**을 해석한다. Pharmacy-Hub enrollment 조직을 해석하지 않으므로 그대로 마운트하면
+Pharmacy-Hub enrollment 조직을 해석하지 않으므로 그대로 마운트하면
 `STORE_OWNER_REQUIRED` 로 전량 차단된다. 공통 가드를 고치는 것은 금지 항목이므로 **W7 과 동일한 B안(service-extraction)** 을 적용했다.
 
 - 공통 로직 → `apps/api-server/src/services/store/store-{content,library,blog}.service.ts`
@@ -117,7 +117,7 @@ PH 는 `/store/marketing/*` route 가 없으므로 PH route 로 override 하고 
 |------|------|
 | `pnpm --filter @o4o/api-server typecheck` | PASS |
 | `pnpm --filter @o4o/web-pharmacy-hub build` | PASS |
-| GlycoPharm · K-Cosmetics · KPA 빌드 | PASS (공통 컴포넌트 prop 추가가 optional 임을 확인) |
+| K-Cosmetics · KPA 빌드 | PASS (공통 컴포넌트 prop 추가가 optional 임을 확인) |
 | `pnpm-lock.yaml` | dependency 실변경(`@o4o/content-editor` workspace 추가) 있으므로 포함 |
 | `services/web-pharmacy-hub/Dockerfile` | 신규 workspace dependency COPY 2줄 + build 1줄 추가 (누락 시 빌드 실패하는 알려진 함정) |
 
@@ -207,14 +207,13 @@ PH store-owner 16 라우트 전부 **401 `AUTH_REQUIRED`**. 무방비 라우트 
 |--------|-----------|----------|--------|
 | `GET /api/v1/kpa/store-contents` | 200 · 15건 | 200 · 0건 | 401 `AUTH_REQUIRED` |
 | `GET /api/v1/kpa/store-library/contents` | 200 · 18건 | — | 401 |
-| `GET /api/v1/glycopharm/pharmacy/library` | 200 · 7건 | 403 `STORE_OWNER_REQUIRED` | 401 |
 | `GET /api/v1/cosmetics/pharmacy/library` | 200 · 7건 | 403 `STORE_OWNER_REQUIRED` | 401 |
 | `GET /api/v1/cosmetics/stores/:slug/blog` (미존재 slug) | 404 `STORE_NOT_FOUND` (nested envelope 불변) | — | — |
 
 응답 키 구성(`items` / `page` / `limit` / `total`)과 실패 envelope(nested `{error:{code,message}}`)가 추출 전과 동일하다.
 
 **한계(솔직 표시)** — 공통 블로그 staff 라우트의 **성공 경로**는 이번 회차에 실측하지 못했다.
-검증 계정에 접근 가능한 KPA/GP/KCos 매장 slug 를 확보하지 못했기 때문이다.
+검증 계정에 접근 가능한 KPA/KCos 매장 slug 를 확보하지 못했기 때문이다.
 대신 (a) 같은 추출 서비스(`store-blog.service.ts`)를 사용하는 PH 블로그 CRUD·publish·archive 전 경로가 green 이고,
 (b) 공통 블로그 라우트가 정상 마운트되어 원래 envelope 로 응답함을 확인했으며,
 (c) diff 상 컨트롤러 변경이 순수 위임 전환임을 확인했다.

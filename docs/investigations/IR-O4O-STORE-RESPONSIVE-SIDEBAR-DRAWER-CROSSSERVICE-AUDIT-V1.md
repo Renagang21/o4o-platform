@@ -11,12 +11,12 @@
 
 **결론: 공용 layout 결함 (유형 A). KPA 전용 아님.**
 
-공용 `StoreDashboardLayout`(`packages/store-ui-core`)에는 모바일 drawer 기능(`sidebarOpen` state + overlay + 좌측 slide-in `<aside>` + close 트리거들)이 **모두 구현되어 있으나**, drawer 를 여는 **유일한 트리거(hamburger `onMenuToggle`)가 `StoreTopBar` 안에만** 존재한다. store 를 소비하는 3개 서비스(KPA / GlycoPharm / K-Cosmetics)가 **모두 `hideTopBar` 로 `StoreTopBar` 를 숨기고 외부 GlobalHeader 를 형제로 렌더**하므로, `<1024px` 에서 **store 업무 사이드바를 열 수 있는 진입점이 아예 렌더되지 않는다.**
+공용 `StoreDashboardLayout`(`packages/store-ui-core`)에는 모바일 drawer 기능(`sidebarOpen` state + overlay + 좌측 slide-in `<aside>` + close 트리거들)이 **모구현되어 있으나**, drawer 를 여는 **유일한 트리거(hamburger `onMenuToggle`)가 `StoreTopBar` 안에만** 존재한다. store 를 소비하는 2개 서비스(KPA / K-Cosmetics)가 **모두 `hideTopBar` 로 `StoreTopBar` 를 숨기고 외부 GlobalHeader 를 형제로 렌더**하므로, `<1024px` 에서 **store 업무 사이드바를 열 수 있는 진입점이 아예 렌더되지 않는다.**
 
 결과적으로 3개 서비스 모두 `/store` 에서 화면 폭 `<1024px` 이면 좌측 업무 사이드바(진열/자료/POP/QR/블로그/사이니지 등)가 화면 밖(`translateX(-256px)`)으로 밀려나고, 이를 다시 불러올 방법이 없다. 특히 **768~1023px(tablet) 구간에서는 사이트 햄버거(`md:hidden`)조차 사라져** 업무 메뉴 접근 수단이 0이다.
 
 - **분류**: 유형 A(공용 layout 결함) + 유형 D(drawer 는 렌더되나 트리거 부재로 도달 불가).
-- **영향 서비스**: KPA / GlycoPharm / K-Cosmetics (동일 공용 layout · 동일 `hideTopBar` 패턴).
+- **영향 서비스**: KPA / K-Cosmetics (동일 공용 layout · 동일 `hideTopBar` 패턴).
 - **Neture**: 비해당 (store layout 미소비. 공급자 영역은 별도 `SupplierSpaceLayout`).
 - **수정 위치**: 공용 `StoreDashboardLayout` 1곳 수정으로 3서비스 동시 해결 가능(서비스별 중복 구현 불필요).
 
@@ -42,7 +42,6 @@ StoreDashboardLayout  (packages/store-ui-core/src/layout/StoreDashboardLayout.ts
 소비 (모두 hideTopBar + 외부 GlobalHeader 형제):
 ├─ web-kpa-society   App.tsx:512-528  <KpaGlobalHeader/> + <StoreDashboardLayout hideTopBar .../>
 ├─ web-k-cosmetics   App.tsx:361-377  <KCosGlobalHeader/> + <StoreDashboardLayout hideTopBar .../>
-└─ web-glycopharm    App.tsx:454-470  <GlycoGlobalHeader/> + <StoreDashboardLayout hideTopBar .../>
 
 web-neture: StoreDashboardLayout/StoreSidebar 미소비 (MediaPickerModal 만 store-ui-core 공유)
 ```
@@ -98,7 +97,7 @@ const [sidebarOpen, setSidebarOpen] = useState(false);
 |---|---|---|---|
 | 1023px | `translateX(-256px)` (fixed) | ❌ 화면 밖 | ❌ 없음 (헤더 버튼: 알림/사용자메뉴/메뉴열기[`md:hidden` 사이트]) |
 
-→ 두 서비스 live 동일. GlycoPharm 은 코드 동일(`GlycoGlobalHeader` 형제 + `hideTopBar`)로 동일 판정. (GP live 도메인은 SiteGuide 서빙 이슈로 별도 URL 확인 필요 — 본 조사는 코드 확정.)
+→ 두 서비스 live 동일.
 
 ---
 
@@ -107,7 +106,6 @@ const [sidebarOpen, setSidebarOpen] = useState(false);
 | 서비스 | store layout | sidebar 소스 | Desktop(≥1024) | Mobile 트리거(<1024) | Drawer 구현 | Overlay | 메뉴선택 close | X 버튼 | ESC | 사이트 vs 업무 햄버거 | 판정 |
 |---|---|---|---|---|---|---|---|---|---|---|---|
 | **KPA** | 공용 `StoreDashboardLayout`(`hideTopBar`) | 공용 `StoreSidebar` | ✅ sticky 표시(live) | ❌ **부재** | 있음(도달불가) | 있음 | 있음 | 있음 | ❌ 없음 | 사이트 햄버거만(업무 없음), tablet 은 사이트마저 `md:hidden` | **결함** |
-| **GlycoPharm** | 공용(`hideTopBar`) | 공용 `StoreSidebar` | ✅(코드) | ❌ **부재** | 있음(도달불가) | 있음 | 있음 | 있음 | ❌ 없음 | 동일 | **결함(코드확정)** |
 | **K-Cosmetics** | 공용(`hideTopBar`) | 공용 `StoreSidebar` | ✅(코드) | ❌ **부재**(live 확인) | 있음(도달불가) | 있음 | 있음 | 있음 | ❌ 없음 | 동일 | **결함** |
 | **Neture** | — (store layout 미소비) | — | — | — | — | — | — | — | — | 공급자=`SupplierSpaceLayout` 별도 | **비해당** |
 
@@ -134,7 +132,7 @@ WO-O4O-STORE-MOBILE-SIDEBAR-DRAWER-CROSSSERVICE-STANDARDIZE-V1
 - 범위: 공용 `StoreDashboardLayout` 1곳. `hideTopBar=true` 모드에서도 `<1024px` store drawer 진입점을 제공.
 - 설계 후보(택1, WO 에서 확정):
   1. **layout 내부에 독립 store hamburger 렌더** — `hideTopBar` 시 본문 상단(또는 외부 header 높이 `top-16` 아래)에 `lg:hidden` 업무 메뉴 버튼을 자체 렌더. 외부 header 무변경으로 가장 격리적.
-  2. **toggle 을 외부로 노출**(context 또는 render-prop) — `KpaGlobalHeader`/`GlycoGlobalHeader`/`KCosGlobalHeader` 가 `/store` 에서 store 햄버거를 host. 사이트/업무 햄버거 구분(유형 E) 동시 정리 가능하나 3 header 변경 필요.
+  2. **toggle 을 외부로 노출**(context 또는 render-prop) — `KpaGlobalHeader`/`KCosGlobalHeader` 가 `/store` 에서 store 햄버거를 host. 사이트/업무 햄버거 구분(유형 E) 동시 정리 가능하나 3 header 변경 필요.
 - 필수 준수: breakpoint lg(1024), overlay/메뉴선택 close 유지, ESC 권장 추가, aria-label/expanded/controls, **route/권한/menu visibility/메뉴명 무변경**.
 - 검증: 3서비스 build/typecheck + 375/768/1023/1024/wide smoke(전 구간 가로 스크롤 0·겹침 0·경계 정상) + Shared Module Change Protocol(전 소비처 회귀).
 - 표준 문서(`...NAVIGATION-STANDARD-V1`) matrix #4 주석 갱신(“hideTopBar 모드 트리거” 명문화) 병행 권장.
@@ -156,7 +154,7 @@ WO-O4O-STORE-MOBILE-SIDEBAR-DRAWER-CROSSSERVICE-STANDARDIZE-V1
 
 ## 10. 완료 기준 체크
 
-- [x] 모든 `StoreDashboardLayout`/`StoreSidebar` 소비처 확인 (KPA/GP/KCos + Neture 비해당)
+- [x] 모든 `StoreDashboardLayout`/`StoreSidebar` 소비처 확인 (KPA/KCos + Neture 비해당)
 - [x] 공용 결함 vs service-local 확정 → **공용(유형 A)**
 - [x] 사이트 햄버거 vs 업무 햄버거 관계 확인 (사이트만 존재, `md:hidden`)
 - [x] 1023/1024 경계 확인 (live KPA + K-Cosmetics)
@@ -165,4 +163,4 @@ WO-O4O-STORE-MOBILE-SIDEBAR-DRAWER-CROSSSERVICE-STANDARDIZE-V1
 
 ---
 
-*작성: 2026-07-12 · Investigation only · 결론: 공용 StoreDashboardLayout 의 hideTopBar 모드 모바일 drawer 트리거 부재 → KPA/GP/KCos 동시 결함, 공용 1곳 수정 권고.*
+*작성: 2026-07-12 · Investigation only · 결론: 공용 StoreDashboardLayout 의 hideTopBar 모드 모바일 drawer 트리거 부재 → KPA/KCos 동시 결함, 공용 1곳 수정 권고.*

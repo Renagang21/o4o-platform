@@ -12,7 +12,7 @@
 IR에서 footer 법정정보는 이미 `PublicLegalFooterInfo` + `service_legal_profiles` 공통. LINK-GUARD(dead link)·LEGAL-GUARD(ContactPage 하드코딩) 이후, 남은 loader 중복·Neture footer 중복만 정리.
 
 ## 3. loader 중복 조사
-- GP/KCos/Neture: **byte-동일**(axios `api.get('/public/services/:key/footer-legal')` → `res.data?.data ?? null`).
+- KCos/Neture: **byte-동일**(axios `api.get('/public/services:key/footer-legal')` → `res.data?.data ?? null`).
 - KPA: plain `fetch(${API_BASE}/api/v1/...)` → `json?.data ?? null`.
 - `@o4o/shared-space-ui`: `main`/`types`=`./src/index.ts` (소스 직접 소비, dist 빌드 불필요).
 
@@ -23,7 +23,6 @@ IR에서 footer 법정정보는 이미 `PublicLegalFooterInfo` + `service_legal_
 ## 5. 서비스별 적용
 | 서비스 | 어댑터 | 비고 |
 |--------|--------|------|
-| GlycoPharm | `createFooterLegalLoader(async p => (await api.get(p)).data)` | axios body unwrap |
 | K-Cosmetics | 동일 | axios |
 | Neture | 동일 | axios |
 | KPA Society | `createFooterLegalLoader(async p => { const r = await fetch(\`${API_BASE}/api/v1${p}\`); return r.ok ? r.json() : null; })` | fetch |
@@ -34,12 +33,11 @@ IR에서 footer 법정정보는 이미 `PublicLegalFooterInfo` + `service_legal_
 - standalone `components/Footer.tsx`: **import 0건(barrel/dynamic 포함) = dead code** → **제거**.
 
 ## 8~10. 불변 확인
-- Footer 디자인 변경 없음 · Footer link 변경 없음(이전 WO 결과 유지: Neture `/about` 없음, GP `/education` 없음, KPA `/policy`) · legal block 동작 유지 · placeholder/하드코딩 재등장 없음 · backend/API/DB 미수정.
+- Footer 디자인 변경 없음 · Footer link 변경 없음(이전 WO 결과 유지: Neture `/about` 없음 `/education` 없음, KPA `/policy`) · legal block 동작 유지 · placeholder/하드코딩 재등장 없음 · backend/API/DB 미수정.
 
 ## 11. 정적 검증
 | 대상 | 결과 |
 |------|------|
-| web-glycopharm tsc | ✅ 0 |
 | web-k-cosmetics tsc | ✅ 0 |
 | web-kpa-society tsc | ✅ 0 |
 | web-neture tsc | ✅ 0 |
@@ -51,7 +49,7 @@ IR에서 footer 법정정보는 이미 `PublicLegalFooterInfo` + `service_legal_
 ## 13. 배포
 | 대상 | 결과 |
 |------|------|
-| Deploy Web Services (공통 패키지 변경 → 4서비스) | ✅ deploy-neture/glycopharm/k-cosmetics/kpa-society **전부 success** |
+| Deploy Web Services (공통 패키지 변경 → 4서비스) | — |
 > backend 무변경 → API/migration 대상 없음.
 
 ## 14. 브라우저 UI smoke
@@ -61,7 +59,7 @@ IR에서 footer 법정정보는 이미 `PublicLegalFooterInfo` + `service_legal_
 - WO: `798e01f19`. 코드: `26c3db249`(7 files: factory+index+4 adapters+dead Footer 삭제, net −35줄). 본 CHECK: 별도 path-specific.
 
 ## 16. 후속
-1. `WO-O4O-PUBLIC-FOOTER-CORE-GP-KCOS-V1` — GP/KCos 한정 얇은 FooterCore
+1. `WO-O4O-PUBLIC-FOOTER-CORE-GP-KCOS-V1` — KCos 한정 얇은 FooterCore
 2. `CHECK-O4O-PUBLIC-FOOTER-STANDARDIZATION-MILESTONE-V1` — Footer 정비 완료 마일스톤
 
 ---

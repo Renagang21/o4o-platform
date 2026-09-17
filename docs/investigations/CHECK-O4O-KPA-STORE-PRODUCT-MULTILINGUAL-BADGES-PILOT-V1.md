@@ -33,8 +33,8 @@ GET /pharmacy/multilingual-product-contents/summary?targetKind=local|listing
 ```
 
 - `content_key='default'` 한정, `status<>'archived'` 만 집계 (V1 범위)
-- 컨트롤러는 kpa/cosmetics/glycopharm 공통이므로 GP/KCos backend 에도 동일 라우트가 생기지만
-  **프론트에서 호출하는 곳은 web-kpa-society 뿐** → GP/KCos UX 무변경 (Shared Module 정책 준수: KPA-only 포크 대신 공통 엔드포인트 추가)
+- 컨트롤러는 kpa/cosmetics 공통이므로 KCos backend 에도 동일 라우트가 생기지만
+  **프론트에서 호출하는 곳은 web-kpa-society 뿐** → KCos UX 무변경 (Shared Module 정책 준수: KPA-only 포크 대신 공통 엔드포인트 추가)
 
 ## 4. 변경 파일
 
@@ -106,7 +106,7 @@ QR 관련 문구 미사용 (후속 단계 안내만 약하게 표기).
 
 **WO-O4O-KPA-STORE-PRODUCT-MULTILINGUAL-BADGES-PILOT-V1 → CLOSED / PASS**
 - 정적 검증 PASS · 회귀/관찰성 PASS · 데이터 표시 경로 PASS (실데이터 검증 완료)
-- 성공 기준 1~7 모두 충족, GP/KCos 무변경, QR 미노출, 테스트 데이터 정리 완료
+- 성공 기준 1~7 모두 충족, KCos 무변경, QR 미노출, 테스트 데이터 정리 완료
 
 ## 7. 후속
 

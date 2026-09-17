@@ -44,7 +44,7 @@
 |---|---|
 | `service_memberships` | `pharmacy-hub` / `pharmacy-hub:store_owner` / **active** (2026-07-29) |
 | `role_assignments` | `pharmacy-hub:store_owner` **is_active=true** |
-| 타 서비스 membership | glycopharm(`pharmacy`) · k-cosmetics(`cosmetics:store_owner`) · kpa-society(`user`) · neture(`supplier`) · platform(`super_admin`) — 전부 active |
+| 타 서비스 membership | k-cosmetics(`cosmetics:store_owner`) · kpa-society(`user`) · neture(`supplier`) · platform(`super_admin`) — 전부 active |
 
 즉 **role·membership 은 이미 충족**돼 있고, 빠진 것은 조직 2행(`organization_members` + `enrollment`)뿐이다.
 

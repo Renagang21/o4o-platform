@@ -6,7 +6,7 @@
 
 ## 1. 목적
 
-3개 서비스(KPA, GlycoPharm, Neture)의 메인 홈 페이지를 Shared Space Standard Blocks 기준으로 분석하여, 공통 패턴과 서비스별 차이를 확정한다.
+2개 서비스(KPA, Neture)의 메인 홈 페이지를 Shared Space Standard Blocks 기준으로 분석하여, 공통 패턴과 서비스별 차이를 확정한다.
 
 ---
 
@@ -47,67 +47,6 @@
 - **잘 맞는 부분:** 5개 필수 블록 모두 충족. 선택 블록(Content, Signage)도 충족. 배치 순서가 표준 흐름과 일치.
 - **부족한 부분:** 없음. WO-KPA-HOME-SPACE-FRAME-ALIGNMENT-V1 완료 후 표준 정렬 완료 상태.
 - **구조 성격:** 정보 허브형 + 참여 유도형
-
----
-
-## 3. GlycoPharm — 분석
-
-### 3.1 현재 블록 구성 (10블록)
-
-```
- 1. Hero Section             — 제목 + 설명 + CTA 2개 (글 작성, 강좌 신청)
- 2. Notice Section           — 공지사항 (최근 5개)
- 3. KPI Card Block           — 오늘 글 / 참여자 / 인기 카테고리
- 4. Hot Posts Section        — 인기 글 Top 3
- 5. Feed Section             — 포럼 글 DataTable (탭 + 정렬)
- 6. Ads Section              — 커뮤니티 광고
- 7. Content Section          — 최근 콘텐츠 + 추천 콘텐츠
- 8. Sponsors Section         — 스폰서 로고
- 9. Digital Signage Preview  — 사이니지 미디어 + 플레이리스트
-10. Partner Logo Carousel    — 파트너 로고 마키
-```
-
-### 3.2 표준 블록 매핑
-
-| 표준 블록 | 매핑 | 상태 |
-|-----------|------|------|
-| Hero / Summary | Hero Section | **부분 충족** — 제목+CTA 존재하나, 요약 역할 약함 |
-| News / Notices | Notice Section | **충족** — 공지 5개 |
-| Activity | Hot Posts + Feed | **과잉** — DataTable 피드는 상세 중심 블록에 해당 |
-| App Entry | 없음 | **미충족** — 서비스 진입 카드 부재 |
-| Content Highlight | Content Section | **충족** — 최근 + 추천 콘텐츠 |
-| Signage Preview | Digital Signage Preview | **충족** |
-| CTA / Guidance | 없음 | **미충족** — Hero CTA 외 별도 유도 블록 없음 |
-| Utility | Ads + Sponsors + Partner Logo | **충족** |
-
-### 3.3 평가
-
-#### 잘 맞는 부분
-- Hero 존재 (제목 + CTA)
-- News/Notices 존재
-- Content Highlight 구분 명확 (최근/추천 분리)
-- Signage Preview 존재
-
-#### 부족한 부분
-- **KPI 블록 (Block 3):** 제외 대상 블록. 공동 공간에 KPI를 두면 관리형 포털처럼 보임
-- **Feed Section (Block 5):** DataTable 기반 상세 목록은 공동 공간의 "요약과 진입" 원칙에 위배. 기능 앱(Forum) 내부 책임
-- **App Entry 부재:** 포럼·강의·콘텐츠·사이니지 등으로 진입하는 카드/버튼이 없음
-- **CTA / Guidance 부재:** 다음 행동 제안 블록이 없음
-
-#### 구조 성격
-
-**현재:** 운영 도구형 (KPI + DataTable 중심)
-**목표:** 실무 커뮤니티 허브형 (요약 + 진입 + 참여 유도)
-
-### 3.4 KPA와 비교
-
-| 항목 | KPA | GlycoPharm | 의도된 차이? |
-|------|-----|-----------|------------|
-| Hero / Summary | 캐러셀 + CTA 카드 | 제목 + CTA 2개 | 의도된 차이 (CMS 캐러셀 유무) |
-| News / Notices | 3탭 통합 | 공지만 | 미의도 — 새소식 탭 추가 가능 |
-| Activity | 포럼 + 추천 요약 | KPI + DataTable 피드 | **미의도** — DataTable은 상세 중심 |
-| App Entry | 4개 서비스 카드 | 없음 | **미의도** — 추가 필요 |
-| CTA / Guidance | MarketTrial CTA | 없음 | **미의도** — 추가 필요 |
 
 ---
 
@@ -176,11 +115,11 @@
 
 | # | 패턴 | 근거 |
 |---|------|------|
-| 1 | **Hero / Summary는 항상 존재** | 3개 서비스 모두 Hero 보유. 공동 공간의 첫 인상이자 맥락 제공 |
-| 2 | **Activity는 항상 존재** | 3개 서비스 모두 최근 활동 보유. 공간을 살아있게 만드는 핵심 |
-| 3 | **CTA / Guidance는 항상 존재** | KPA, Neture 보유. GlycoPharm 부재는 미의도적 누락 |
-| 4 | **Utility (광고/스폰서/로고)는 하단 배치** | 3개 서비스 일관. 핵심 흐름을 방해하지 않는 위치 |
-| 5 | **Content Highlight 또는 Community Preview 존재** | 3개 서비스 모두 콘텐츠 요약 영역 보유 |
+| 1 | **Hero / Summary는 항상 존재** | 2개 서비스 모두 Hero 보유. 공동 공간의 첫 인상이자 맥락 제공 |
+| 2 | **Activity는 항상 존재** | 2개 서비스 모두 최근 활동 보유. 공간을 살아있게 만드는 핵심 |
+| 3 | **CTA / Guidance는 항상 존재** | KPA, Neture 보유 |
+| 4 | **Utility (광고/스폰서/로고)는 하단 배치** | 2개 서비스 일관. 핵심 흐름을 방해하지 않는 위치 |
+| 5 | **Content Highlight 또는 Community Preview 존재** | 2개 서비스 모두 콘텐츠 요약 영역 보유 |
 
 ### 5.2 서비스별로 달라져야 할 것 (허용 범위)
 
@@ -188,9 +127,9 @@
 |---|----------|------|
 | 1 | **News 비중** | KPA는 3탭 통합 (공지+새소식+외부). Neture는 News 없음 (대신 Market Trial). 도메인 특성에 따라 비중 조절 |
 | 2 | **CTA 강도** | Neture는 2개 CTA (상단+하단). KPA는 1개 하단 CTA. 전환 유도형 서비스일수록 CTA 강화 |
-| 3 | **Activity 소스** | KPA=포럼 글, GlycoPharm=인기 글, Neture=신규 참여자. 도메인별 데이터 소스 차이 |
-| 4 | **Signage 유무** | KPA/GlycoPharm은 Signage Preview 포함. Neture는 해당 없음 |
-| 5 | **Recommendation 유무** | Neture는 Featured Section (추천) 보유. KPA/GlycoPharm은 없음. 고도화 요소 |
+| 3 | **Activity 소스** | KPA=포럼 글, Neture=신규 참여자. 도메인별 데이터 소스 차이 |
+| 4 | **Signage 유무** | KPA는 Signage Preview 포함. Neture는 해당 없음 |
+| 5 | **Recommendation 유무** | Neture는 Featured Section (추천) 보유. KPA는 없음. 고도화 요소 |
 | 6 | **App Entry 구성** | KPA=4개 서비스 카드 (포럼/교육/콘텐츠/사이니지). Neture=공급자/파트너 진입. 도메인별 기능 앱 차이 |
 
 ### 5.3 표준 블록 구조 수정 필요 여부
@@ -199,30 +138,21 @@
 
 | 블록 | v1 분류 | 수정 필요? | 근거 |
 |------|---------|-----------|------|
-| Hero / Summary | 필수 | 유지 | 3개 서비스 모두 충족 |
+| Hero / Summary | 필수 | 유지 | 2개 서비스 모두 충족 |
 | News / Notices | 필수 | **재검토** | Neture에 News 없음. "공지가 없는 서비스"는 Activity로 대체 가능. 단, 필수 유지하되 "서비스 성격에 따라 최소 구성 허용" 주석 추가 권장 |
-| Activity | 필수 | 유지 | 3개 서비스 모두 보유 |
-| App Entry | 필수 | 유지 | KPA 충족, GlycoPharm/Neture 미충족 → 추가 필요 확인 |
-| CTA / Guidance | 필수 | 유지 | KPA/Neture 충족, GlycoPharm 미충족 → 추가 필요 확인 |
-| Content Highlight | 선택 | 유지 | 3개 서비스 모두 보유하나, 형태 다양 |
+| Activity | 필수 | 유지 | 2개 서비스 모두 보유 |
+| App Entry | 필수 | 유지 | KPA 충족, Neture 미충족 → 추가 필요 확인 |
+| CTA / Guidance | 필수 | 유지 | KPA/Neture 충족 |
+| Content Highlight | 선택 | 유지 | 2개 서비스 모두 보유하나, 형태 다양 |
 | Signage Preview | 선택 | 유지 | Neture 해당 없음 → 선택이 적절 |
 | Recommendation | 선택 | 유지 | Neture만 보유 → 선택이 적절 |
-| Utility | 선택 | 유지 | 3개 서비스 모두 보유 |
+| Utility | 선택 | 유지 | 2개 서비스 모두 보유 |
 
 ---
 
 ## 6. 서비스별 개선 권고
 
-### 6.1 GlycoPharm 개선 필요 항목
-
-| # | 항목 | 현재 | 권고 |
-|---|------|------|------|
-| 1 | KPI 블록 제거 | 메인 홈에 KPI 3개 노출 | Operator Dashboard로 이동. 메인 홈에서 제거 |
-| 2 | Feed DataTable 축소 | 전체 포럼 DataTable | 최근 글 5개 요약 리스트로 축소. 상세는 Forum 앱으로 |
-| 3 | App Entry 추가 | 없음 | KPA 패턴 참고: 포럼/교육/콘텐츠/사이니지 4개 카드 |
-| 4 | CTA / Guidance 추가 | 없음 | 하단 CTA 블록 추가 (강좌 신청, 케어 서비스 등) |
-
-### 6.2 Neture 개선 필요 항목
+### 6.1 Neture 개선 필요 항목
 
 | # | 항목 | 현재 | 권고 |
 |---|------|------|------|
@@ -233,26 +163,25 @@
 
 ## 7. 결론
 
-### 3개 서비스 표준 블록 충족 현황
+### 2개 서비스 표준 블록 충족 현황
 
 ```
-              KPA    GlycoPharm    Neture
-Hero          ✅        ✅           ✅
-News          ✅        ✅           ⚠ (없음)
-Activity      ✅        ⚠ (과잉)     ✅
-App Entry     ✅        ❌           ⚠ (약함)
-CTA/Guidance  ✅        ❌           ✅✅ (강함)
-Content       ✅        ✅           ✅
-Signage       ✅        ✅           N/A
-Utility       ✅        ✅           ✅
+              KPA    Neture
+Hero          ✅        ✅
+News          ✅        ⚠ (없음)
+Activity      ✅        ✅
+App Entry     ✅        ⚠ (약함)
+CTA/Guidance  ✅        ✅✅ (강함)
+Content       ✅        ✅
+Signage       ✅        N/A
+Utility       ✅        ✅
 ```
 
 ### 핵심 발견
 
 1. **KPA는 표준 정렬 완료 상태** — WO-KPA-HOME-SPACE-FRAME-ALIGNMENT-V1 이후 5개 필수 블록 모두 충족
-2. **GlycoPharm은 관리형 포털 패턴에 가까움** — KPI 블록과 DataTable 피드가 공동 공간 원칙 위배. App Entry와 CTA/Guidance 부재
-3. **Neture는 CTA 중심 구조로 강점** — 전환 유도형 서비스 특성이 잘 반영되나 News/App Entry 보완 필요
-4. **표준 블록 v1 구조는 유효** — 분류 변경 불필요. 필수/선택/제외 기준이 3개 서비스에서 자연스럽게 작동함
+2. **Neture는 CTA 중심 구조로 강점** — 전환 유도형 서비스 특성이 잘 반영되나 News/App Entry 보완 필요
+3. **표준 블록 v1 구조는 유효** — 분류 변경 불필요. 필수/선택/제외 기준이 2개 서비스에서 자연스럽게 작동함
 
 ---
 

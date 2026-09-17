@@ -68,7 +68,7 @@ POP 생성 흐름: `/pharmacy/pop/generate` (save=true) → PDF GCS 업로드 �
 
 ## 7. 범위/안전
 - POP 결과는 store_execution_assets(매장 제작 자료)에만 생성. 콘텐츠 원본(kpa_store_contents)·snapshot(o4o_asset_snapshots) 신규 0. 콘텐츠 목록 중복 노출 0(asset_type 분기).
-- **KPA 전용**(`/pharmacy/pop/generate`) → GP/KCos 무영향. modal(제작 자료 선택)은 POP 버튼 미노출. QR inline 무변경. POP AI 버튼 제거·제작자료 메뉴 숨김 미수행.
+- **KPA 전용**(`/pharmacy/pop/generate`) → KCos 무영향. modal(제작 자료 선택)은 POP 버튼 미노출. QR inline 무변경. POP AI 버튼 제거·제작자료 메뉴 숨김 미수행.
 
 ## 8. 미해결/후속
 - POP 결과가 **매장 제작 자료**에 보이는 것은 기존 backend 구조(store_execution_assets file/pop). "POP 결과는 POP 전용 위치에만" 원칙으로 더 정리하려면 후속 **`WO-O4O-KPA-QR-POP-RESULT-SCOPE-V1`**(결과물 저장/노출 범위 정리)에서 처리.

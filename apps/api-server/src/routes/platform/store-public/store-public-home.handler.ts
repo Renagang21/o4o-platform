@@ -30,12 +30,8 @@ export function createStorePublicHomeRoutes(deps: {
 
       const { pharmacy } = resolved;
 
-      // WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1:
-      //   `productCount` 는 glycopharm_products, `logo`/`hero_image` 는
-      //   glycopharm_pharmacy_extensions 가 유일한 출처였다 (둘 다 프로덕션 0행 —
-      //   이 엔드포인트는 이미 모든 매장에 대해 0/null 을 반환하고 있었다).
-      //   GlycoPharm 삭제로 출처가 사라졌다. 소비처(KPA·K-Cos 블로그 og:image)의
-      //   응답 shape 를 깨지 않기 위해 키는 유지하고 값은 상수로 둔다.
+      //   `productCount` / `logo` / `hero_image` 의 출처 테이블이 없다.
+      //   소비처(KPA·K-Cos 블로그 og:image)의 응답 shape 를 깨지 않기 위해 키는 유지하고 값은 상수로 둔다.
       //   대체 데이터원은 이번 범위에서 만들지 않는다.
 
       res.json({

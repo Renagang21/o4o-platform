@@ -16,7 +16,7 @@
 
 - IR(판정 B): LmsHubTemplate(테이블 container) ≠ CourseCard/List(카드 presentational) — 표현 상이, 직접 흡수 대상 아님.
 - Neture 가 `shared-space-ui` 소비 → LmsHubTemplate 이 lms-ui 를 import 하면 Neture 가 lms-ui 를 transitive 소비(제외 위반) → option A 차단. CourseCard 는 hub 와 결합하지 않음.
-- `/lms` hub: KPA/GP/KCos 모두 LmsHubTemplate(구조·accent·visibility 정렬 완료).
+- `/lms` hub: KPA/KCos 모두 LmsHubTemplate(구조·accent·visibility 정렬 완료).
 
 ## 3. CourseCard/List 현재 상태
 
@@ -47,7 +47,7 @@
 | `packages/lms-ui/src/components/CourseList.tsx` | 동일 |
 | `docs/checks/CHECK-O4O-LMS-COURSECARD-RETIRE-OR-SPECIALIZE-V1.md` | 본 문서 |
 
-**무변경:** export/type(유지), `index.ts`, `types.ts`, LmsHubTemplate, KPA/GP/KCos hub, Neture, backend, package.json/pnpm-lock, Dockerfile.
+**무변경:** export/type(유지), `index.ts`, `types.ts`, LmsHubTemplate, KPA/KCos hub, Neture, backend, package.json/pnpm-lock, Dockerfile.
 
 ## 7. Neture / 의존 경계 확인
 
@@ -58,7 +58,7 @@
 
 - **TypeScript:** `@o4o/lms-ui` `tsc --noEmit` **0 errors**(주석만 변경, export/type 유지).
 - **grep:** 서비스 `@o4o/lms-ui` CourseCard/List import 0. `shared-space-ui`↔`lms-ui` 상호 import 0.
-- **무변경:** KPA/GP/KCos `/lms` hub, Neture, backend, package/lock/Dockerfile.
+- **무변경:** KPA/KCos `/lms` hub, Neture, backend, package/lock/Dockerfile.
 - **browser smoke:** 불요 — 렌더되는 화면 변경 없음(dormant primitive 주석만).
 
 ## 9. 후속 작업

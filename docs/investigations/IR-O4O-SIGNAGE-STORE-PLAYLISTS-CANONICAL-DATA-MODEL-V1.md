@@ -123,7 +123,7 @@ K-Cosmetics 내 매장은 **cosmetics 격리 스키마의 별도 테이블**(`st
 
 ### 4.1 현행 내 매장 API
 파일: `apps/api-server/src/routes/o4o-store/controllers/store-playlist.controller.ts` (+ repository)
-마운트: KPA `kpa.routes.ts` / GP `glycopharm.routes.ts` 가 `/store-playlists` 로 **공유 컨트롤러** 호출. (K-Cosmetics 는 cosmetics 격리 — 별도)
+(K-Cosmetics 는 cosmetics 격리 — 별도)
 
 | Method | Path | R/W 테이블 | 스코핑/가드 |
 |---|---|---|---|
@@ -173,8 +173,8 @@ K-Cosmetics 내 매장은 **cosmetics 격리 스키마의 별도 테이블**(`st
 - `o4o-store/services/store-asset-derivation.service.ts`: derivedKind `signage_playlist`/`signage_item` 추적 — 전환 시 보존 대상.
 
 ### 5.4 주요 사용처 파일
-백엔드: store-playlist.controller/repository, kpa.routes, glycopharm.routes, cosmetics.routes(격리), schedule.service, SignageSchedule.entity, dashboard-assets.copy-handlers, store-asset-derivation.service, 마이그레이션 3종.
-프론트: web-kpa-society·web-k-cosmetics `api/storePlaylist.ts`, StorePlaylistCreatePage, StoreSignagePage(KPA)/StoreSignageMainPage(GP)/StoreSignagePage(KCos), SignagePlayerSelectPage, SignagePlaybackPage, HubSignageLibraryPage.
+백엔드: store-playlist.controller/repository, kpa.routes.routes, cosmetics.routes(격리), schedule.service, SignageSchedule.entity, dashboard-assets.copy-handlers, store-asset-derivation.service, 마이그레이션 3종.
+프론트: web-kpa-society·web-k-cosmetics `api/storePlaylist.ts`, StorePlaylistCreatePage, StoreSignagePage(KPA)/StoreSignageMainPage/StoreSignagePage(KCos), SignagePlayerSelectPage, SignagePlaybackPage, HubSignageLibraryPage.
 
 ---
 

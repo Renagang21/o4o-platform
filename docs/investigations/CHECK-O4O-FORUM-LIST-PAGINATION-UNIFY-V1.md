@@ -50,11 +50,10 @@
 | 서비스 | 파일 | accentColor | 기존 강조색 |
 |--------|------|-------------|-------------|
 | KPA | `pages/forum/ForumListPage.tsx` | `var(--color-primary)` | `bg-primary`(#2563eb 블루) |
-| GlycoPharm | `pages/forum/ForumPage.tsx` | `var(--color-primary)` | `bg-primary-600`(#16a34a 그린) |
 | K-Cosmetics | `pages/forum/ForumPage.tsx` | `var(--color-primary)` | `bg-primary`(#db2777 핑크) |
 | Neture | `pages/forum/ForumPage.tsx` | `PRIMARY`(#2563EB) | inline `#2563EB` 블루 |
 
-- KPA/GP/KCos 는 `var(--color-primary)` 로 **서비스 CSS 변수 그대로 바인딩**(기존 active 색 보존). Neture 는 기존 inline 상수(#2563EB) 그대로.
+- KPA/KCos 는 `var(--color-primary)` 로 **서비스 CSS 변수 그대로 바인딩**(기존 active 색 보존). Neture 는 기존 inline 상수(#2563EB) 그대로.
 - first/last(`«` `»`) 기능 **4서비스 유지**(showFirstLast). 5-page window 유지.
 
 ## 5. 잔여 시각 델타(기록)
@@ -66,7 +65,7 @@
 
 ## 6. 검증
 
-- **TypeScript:** shared-space-ui · web-kpa-society · web-glycopharm · web-k-cosmetics · web-neture **각각 0 errors** ✅.
+- **TypeScript:** shared-space-ui · web-kpa-society · web-k-cosmetics · web-neture **각각 0 errors** ✅.
 - **정적:**
   - 4서비스 inline pagination(`&laquo`/`pageNumbers.map`/`s.pageBtn`) 잔재 **0** 확인.
   - 4서비스 `HubPagination` + `showFirstLast` 사용 확인.

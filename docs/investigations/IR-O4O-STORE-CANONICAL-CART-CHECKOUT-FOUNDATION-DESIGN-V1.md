@@ -39,7 +39,7 @@
 
 ### 2-1. 주문 원장 2개
 - **neture_orders**: web-neture B2B 공급 주문(`/neture/seller/orders` → `seller.controller` → `legacyNetureService.createOrder`) + 공급자 fulfillment 원장(상태/송장/정산).
-- **checkout_orders**: ① 이벤트오퍼 participate, ② **KPA B2C storefront**(`kpa-checkout.controller` `createCheckoutOrder`, `channel_type='B2C'`, 약국=seller), ③ 서비스 주문. (Glyco/KCos 유사.)
+- **checkout_orders**: ① 이벤트오퍼 participate, ② **KPA B2C storefront**(`kpa-checkout.controller` `createCheckoutOrder`, `channel_type='B2C'`, 약국=seller), ③ 서비스 주문.
 
 > **⚠ 계약 충돌**: `CLAUDE.md §4` 는 `*_orders` 신규 생성 금지 + `checkoutService.createOrder()` 필수. **`neture_orders` 는 이 계약의 legacy 예외**(F4/boundary 에서 명문화). canonical 방향은 checkout_orders.
 
@@ -50,7 +50,6 @@ participate(이벤트), kpa-checkout(B2C), neture seller order(B2B) — 모두 *
 | 서비스 | cart | 성격 |
 |--------|------|------|
 | web-kpa-society | localStorage `cartService.ts` | B2C storefront 전용, 이벤트오퍼 무관 |
-| web-glycopharm | server cart `/store/cart`(StoreCart.tsx) | Neture B2B 공급주문 전용 |
 | web-k-cosmetics | 없음 | — |
 | web-neture | client cart(StoreCartPage) → neture_orders | Neture 공급상품 전용 |
 | **백엔드 공유 cart** | **없음**(Cart 엔티티/`cart_items`/`/cart` 라우트 0) | — |
@@ -86,7 +85,6 @@ participate(이벤트), kpa-checkout(B2C), neture seller order(B2B) — 모두 *
 interface CanonicalCartItem {
   // 식별/그룹
   sourceType: 'regular' | 'operator_approved' | 'b2b' | 'event_offer' | 'seller_recruitment';
-  serviceKey: string;            // 매장이 속한 서비스(kpa/glycopharm/k-cosmetics/neture)
   supplierId: string;            // 공급자별 그룹·배송비 기준 (NetureSupplier.id)
   // 상품 참조 (sourceType 별)
   supplierProductOfferId?: string;        // SPO id (일반/B2B/이벤트 공통 가격원)
@@ -112,7 +110,6 @@ interface CanonicalCartItem {
 - 근거: 다중 기기·다중 공급자·checkout 재검증을 위해 client-only(localStorage)는 부적합. Boundary Policy(Commerce=storeId)와 정합.
 - 수렴 전략:
   - web-kpa localStorage cart(B2C storefront) → 표준 cart 로 흡수(또는 B2C 는 별도 유지 판단 — §12 governance).
-  - web-glyco server cart(/store/cart, Neture B2B) → 표준 cart 로 일반화하거나 표준이 이를 대체.
   - web-neture cart → 표준 cart + checkoutService 경로로 이전(현재 neture_orders 직접 생성 → §8).
   - 프론트는 `@o4o/*` 공통 cart hook/컴포넌트로 일원화(공통화 우선, 서비스 분기 최소).
 - **대안(경량)**: 표준 client cart 모델 + 표준 checkout API 만 두고 서버 cart 는 후속. → Phase 0 범위 축소 가능(governance 선택지).
@@ -164,7 +161,6 @@ Phase 0 (본 IR → 후속 WO)
   0c. 이벤트오퍼/매장 주문을 checkout_orders 표준으로 정렬(neture B2B 수렴은 제외)
 Phase 1
   - 이벤트오퍼 buyer "주문하기"→"장바구니 담기", participate 격하
-  - KPA/Glyco/KCos 공통 cart UI(공통화 우선)
 Phase 2
   - 공급자 fulfillment 연결(선행 IR 후보 B) + 정산(결제·수금 모델 IR 후)
   - (거버넌스) neture_orders B2B → checkout 수렴 여부 결정
@@ -198,7 +194,6 @@ cart/checkout/participate/event-offer/neture_orders/checkout_orders/정산/배�
 ### Evidence
 - 원장/생성경로: `modules/neture/controllers/seller.controller.ts:339`(legacyNetureService.createOrder→neture_orders), `routes/kpa/controllers/kpa-checkout.controller.ts:114-117,474-484`(checkout_orders, channelType B2C), `routes/kpa/services/event-offer.service.ts:546-771`(participate→checkout_orders)
 - checkout: `services/checkout.service.ts:43-58`(단일 supplierId)
-- cart 변종: `web-kpa-society/src/services/cartService.ts`, `web-glycopharm/src/pages/store/StoreCart.tsx`, `web-k-cosmetics`(없음), `web-neture/src/pages/store/StoreCartPage.tsx`+`lib/api/store.ts:334`
 - 계약: `CLAUDE.md §4`, `docs/baseline/E-COMMERCE-ORDER-CONTRACT.md`
 
 *설계 전용 — 코드/스키마/라우트 변경 없음. Phase 0 후속 WO 의 기준 문서.*

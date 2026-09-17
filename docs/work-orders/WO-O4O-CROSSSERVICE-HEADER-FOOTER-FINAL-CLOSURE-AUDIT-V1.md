@@ -2,7 +2,7 @@
 
 ## 1. 목적
 
-KPA Society / GlycoPharm / K-Cosmetics / PharmacyHub / Neture의 Header / Footer / Mobile navigation / 관련 Shell 공통화 상태를 **현재 main 기준으로 최종 재감사**하고, 필요한 최소 수정까지 포함하여 이번 트랙의 **전체 CLOSE / NOT CLOSE**를 판정한다.
+KPA Society / K-Cosmetics / PharmacyHub / Neture의 Header / Footer / Mobile navigation / 관련 Shell 공통화 상태를 **현재 main 기준으로 최종 재감사**하고, 필요한 최소 수정까지 포함하여 이번 트랙의 **전체 CLOSE / NOT CLOSE**를 판정한다.
 
 이번 WO는 별도 W5를 분리하지 않고 다음을 한 번에 수행한다.
 
@@ -72,7 +72,6 @@ git pull --ff-only origin main
 
 ```text
 KPA Society
-GlycoPharm
 K-Cosmetics
 PharmacyHub
 Neture
@@ -298,30 +297,6 @@ KPA/Neture에서 이미 수정한 계약이 회귀하지 않았는지도 확인�
 
 ---
 
-## 11. GlycoPharm `/privacy` 기존 404 재판정
-
-W3에서 발견된 GlycoPharm `/privacy` 관련 API 404를 다시 확인한다.
-
-반드시 다음을 분리한다.
-
-```text
-A. Footer link가 잘못된 route로 감
-B. route는 정상인데 정책 콘텐츠/API가 없음
-C. API endpoint 자체가 Header/Footer 계약과 불일치
-```
-
-판정:
-
-```text
-A → MUST_FIX_BEFORE_CLOSE
-B → FOLLOW_UP
-C → 실제 사용자 Footer 계약이 깨지면 MUST_FIX, 아니면 별도 정책/API FOLLOW_UP
-```
-
-이번 WO에서 범위를 과도하게 정책 시스템 수정으로 확대하지 않는다.
-
----
-
 ## 12. PharmacyHub GlobalHeader `children` 미렌더 재판정
 
 W4에서 발견:
@@ -396,7 +371,6 @@ W3 공통화 결과를 확인한다.
 
 ```text
 KPA
-GlycoPharm
 K-Cosmetics
 Neture
 ```
@@ -512,8 +486,6 @@ Footer가 없는 업무 shell은 무조건 결함으로 보지 않는다.
 서비스 정책/법인 문구와 결합
 → 별도 판정
 ```
-
-특히 선행 발견된 GlycoPharm stale copyright를 재확인한다.
 
 ---
 
@@ -660,7 +632,6 @@ NOT CLOSE라면 각 blocker에 대해 별도 후속 WO 이름을 제안한다.
 ```text
 공통 package
 KPA
-GlycoPharm
 K-Cosmetics
 PharmacyHub
 Neture
@@ -770,7 +741,6 @@ docs/checks/CHECK-O4O-CROSSSERVICE-HEADER-FOOTER-FINAL-CLOSURE-AUDIT-V1.md
 5. Public Footer config alignment 재판정
 6. 5서비스 legal contract
 7. KPA/Neture legal 회귀 확인
-8. Glyco privacy 404 재판정
 9. PH GlobalHeader children 재판정
 10. AdminVault Footer 정책 판정
 11. MobileBottomNav 최종 상태
@@ -882,7 +852,6 @@ git push origin <현재 브랜치>
 
 ```
 web-kpa-society : Footer.tsx · KpaGlobalHeader.tsx · MobileBottomNav.tsx (+ platform/PlatformFooter.tsx)
-web-glycopharm  : GlycoGlobalHeader.tsx · MobileBottomNav.tsx (+ common/Footer.tsx)
 web-k-cosmetics : KCosGlobalHeader.tsx · MobileBottomNav.tsx (+ common/Footer.tsx)
 web-neture      : NetureGlobalHeader.tsx · NetureBottomNav.tsx (+ layouts/* 5종 인라인 footer)
 web-pharmacy-hub: Footer.tsx · PharmacyHubGlobalHeader.tsx (bottom nav 없음 — W4 판정 NOT_APPLICABLE)
@@ -894,7 +863,6 @@ web-pharmacy-hub: Footer.tsx · PharmacyHubGlobalHeader.tsx (bottom nav 없음 �
 ### D. `PublicLegalFooterInfo` 실소비처 (§10 · §14)
 
 ```
-web-glycopharm/components/common/Footer.tsx
 web-k-cosmetics/components/common/Footer.tsx
 web-kpa-society/components/Footer.tsx
 web-kpa-society/components/platform/PlatformFooter.tsx
@@ -911,12 +879,11 @@ web-pharmacy-hub/components/Footer.tsx
 | 서비스 | 이용약관 | 개인정보 | 문의 |
 |---|---|---|---|
 | KPA | **`/policy`** | `/privacy` | `/contact` |
-| GlycoPharm | `terms` (중첩 route) | `privacy` | `contact` |
 | K-Cosmetics | `terms` (중첩 route) | `privacy` | `contact` |
 | Neture | `/terms` | `/privacy` | `/contact` |
 | PharmacyHub | `/terms` | `/privacy` | **없음** |
 
-- **함정 1**: GlycoPharm·KCos 는 `<Route path="terms">` 형태의 **상대 경로 중첩 route** 다.
+- **함정 1**: KCos 는 `<Route path="terms">` 형태의 **상대 경로 중첩 route** 다.
   `path="/terms"` 로 grep 하면 0건이 나와 **dead link 오탐**이 발생한다. 반드시 중첩 부모까지 확인한다.
 - **함정 2**: PharmacyHub 에는 `/contact` route 가 없다. §15 대칭 맞추기로 footer 에 `/contact` 를 추가하면
   **데드링크를 새로 만드는 것**이다. 기존 계약(데드링크 0)이 의도된 상태다.
@@ -932,8 +899,6 @@ web-pharmacy-hub/components/Footer.tsx
 ### G. copyright 실측 (§18)
 
 ```
-GlycoPharm  common/Footer.tsx:121        © 2025   ← stale
-GlycoPharm  layouts/StoreLayout.tsx:288  © 2025   ← stale
 K-Cosmetics common/Footer.tsx:88         © 2025   ← stale
 KPA         Footer.tsx:49                © 2026
 KPA         platform/PlatformFooter.tsx  © {currentYear}  (동적)
@@ -941,15 +906,13 @@ Neture      layouts/* 5종                © 2026
 PharmacyHub Footer.tsx:61                © 2026
 ```
 
-- stale 은 **3건**이며 GlycoPharm 2 · KCos 1 이다. KCos 는 이전 보고에서 언급되지 않았다 —
+- KCos 1 이다. KCos 는 이전 보고에서 언급되지 않았다 —
   §2 대로 과거 수치를 믿지 말라는 실례다.
 - stale copyright 는 §7 MUST_FIX 목록에 없다. §20 "허용된 최소 수정"에는 포함된다.
   **§7 blocker 로 승격시키지 않는다.**
 
 ### H. 이월 3건 재판정 (§11 · §12 · §13) — 이전 측정값
 
-- **§11 GlycoPharm `/privacy`**: W3 smoke 중 `GET /api/v1/public/services/glycopharm/policies/privacy` 404 ×2 관측.
-  route 자체는 존재(위 E 표) → **A(잘못된 route) 가 아닐 가능성이 높다**. B(콘텐츠 미게시) / C(API 불일치) 를 구분하라.
 - **§12 PharmacyHub GlobalHeader `children`**: `packages/ui/src/layout/GlobalHeader.tsx:24` 가
   `children?: { label; href }[]` 를 타입으로 선언하지만 **nav 렌더링에서 `item.children` 을 읽는 코드가 0건**이다.
   `children:` 을 채우는 곳은 PharmacyHub `config/navigation.ts` (35행 · 53행) **단독**이다.

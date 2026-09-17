@@ -2,7 +2,7 @@
 
 > **유형:** read-only 조사 — 코드/DB/API/UI 변경 0.
 > **대상:** 4서비스 사업자 가입/정보 화면의 주소 입력 방식 + 공통 `AddressSearch`(Daum Postcode) 적용 상태.
-> **핵심 결론: 백엔드는 `zipCode/address1/address2`를 가입·프로필 경로에서 손실 없이 수용 → Neture supplier 가입 주소검색 적용은 frontend-only 가능. 단 서비스 간 drift 큼.** KPA=가입·정보 양쪽 PASS(레퍼런스). Neture=가입 FAIL/프로필 PASS(내부 불일치). GlycoPharm=가입 PASS/정보 FAIL(역방향). K-Cosmetics=양쪽 미적용.
+> **핵심 결론: 백엔드는 `zipCode/address1/address2`를 가입·프로필 경로에서 손실 없이 수용 → Neture supplier 가입 주소검색 적용은 frontend-only 가능. 단 서비스 간 drift 큼.** KPA=가입·정보 양쪽 PASS(레퍼런스). Neture=가입 FAIL/프로필 PASS(내부 불일치). K-Cosmetics=양쪽 미적용.
 > 선행: WO-O4O-NETURE-SUPPLIER-BUSINESS-TYPE-SELECT-REMOVE-V1 (업종 select 정리) — 2026-06-18
 
 ---
@@ -21,8 +21,6 @@
 | Neture store_owner 가입 | web-neture/RegisterModal.tsx:630-635 | free-text(지역) | ❌ | ❌ | ❌ | businessAddress | 가입 | FAIL |
 | Neture partner 가입 | web-neture/RegisterModal.tsx | (주소 없음) | — | — | — | — | 가입 | N/A |
 | Neture 공급자 프로필 | web-neture/SupplierProfilePage.tsx:563 | **AddressSearch** | ✅ | ✅ | ✅ | businessZipCode/businessAddress/businessAddressDetail | profile | **PASS** |
-| GlycoPharm 약국경영자 가입 | web-glycopharm/RegisterFlowModal.tsx:614 | **AddressSearch** | ✅ | ✅ | ✅ | zipCode/address1/address2 | 가입 | **PASS** |
-| GlycoPharm 약국 정보 | web-glycopharm/store/PharmacyInfoPage.tsx:281-287 | free-text | ❌ | ❌ | ❌ | businessAddress | info | FAIL |
 | K-Cosmetics 판매자 가입 | web-k-cosmetics/auth/RegisterPage.tsx | (주소 없음) | — | — | ❌ | — | 가입 | FAIL/없음 |
 | K-Cosmetics 매장 정보 | web-k-cosmetics/store/StoreInfoPage.tsx | free-text | ❌ | ❌ | ❌ | businessAddress | info | FAIL |
 | KPA 개설약사 가입 | web-kpa-society/RegisterModal.tsx:695-708 | **AddressSearch** | ✅ | ✅ | ✅ | zipCode/address1/address2 | 가입 | **PASS** |
@@ -33,7 +31,6 @@
 
 - **KPA = 레퍼런스** — 개설약사 가입 + 약국 정보 양쪽 AddressSearch. (단 비개설 약사 근무처는 free-text — 사업장 아님)
 - **Neture = 내부 불일치** — 공급자 **프로필(SupplierProfilePage)은 AddressSearch(PASS)** 인데 **가입(RegisterModal supplier)은 free-text(FAIL)**. 같은 공급자 흐름 안에서 가입↔프로필 UX 불일치.
-- **GlycoPharm = 역방향 불일치** — **가입은 AddressSearch(PASS)** 인데 **약국 정보 수정은 free-text(FAIL)**.
 - **K-Cosmetics = 미적용** — 가입엔 주소 자체 없음, 매장 정보는 free-text.
 
 ## 4. 백엔드 수용성 (핵심)
@@ -63,7 +60,7 @@ DTO(`register.dto.ts`)에 5개 키 전부 optional 정의: `zipCode`(228) / `bus
 
 ### 후보 2 (중·횡단) — 4서비스 사업자 주소 공통 정렬
 `WO-O4O-CROSSSERVICE-BUSINESS-ADDRESS-POSTCODE-SEARCH-ALIGNMENT-V1`
-- 범위: GlycoPharm 약국정보 / K-Cosmetics 매장정보(+가입 주소 수집 여부 판단) / Neture store_owner 등 FAIL 화면 + 운영자 gap 2건(MembershipConsoleController canonical 수용 / Neture supplier 승인 응답 주소 노출). KPA 레퍼런스 기준 정렬.
+- KPA 레퍼런스 기준 정렬.
 - Shared 컴포넌트/백엔드 동시 → 중규모 별 WO.
 
 ## 7. 비범위
@@ -80,4 +77,4 @@ DTO(`register.dto.ts`)에 5개 키 전부 optional 정의: `zipCode`(228) / `bus
 
 ---
 
-*read-only · AddressSearch(Daum Postcode) 존재·export · 백엔드 zipCode/address1/address2 가입·프로필 경로 손실 없이 수용 → Neture supplier 가입 주소검색=frontend-only 가능 · drift: KPA(PASS/PASS 레퍼런스)/Neture(가입FAIL·프로필PASS)/GlycoPharm(가입PASS·정보FAIL)/KCos(미적용) · 후속1=NETURE-SUPPLIER-SIGNUP-ADDRESS-POSTCODE-SEARCH-V1(소·frontend-only), 후속2=CROSSSERVICE-ALIGNMENT(중) · 운영자 gap 2건(멤버수정 canonical 미지원/supplier 승인 주소 미노출).*
+*read-only · AddressSearch(Daum Postcode) 존재·export · 백엔드 zipCode/address1/address2 가입·프로필 경로 손실 없이 수용 → Neture supplier 가입 주소검색=frontend-only 가능 · drift: KPA(PASS/PASS 레퍼런스)/Neture(가입FAIL·프로필PASS)/KCos(미적용) · 후속1=NETURE-SUPPLIER-SIGNUP-ADDRESS-POSTCODE-SEARCH-V1(소·frontend-only), 후속2=CROSSSERVICE-ALIGNMENT(중) · 운영자 gap 2건(멤버수정 canonical 미지원/supplier 승인 주소 미노출).*

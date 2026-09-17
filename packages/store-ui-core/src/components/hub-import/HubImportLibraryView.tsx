@@ -3,7 +3,7 @@
  *
  * WO-O4O-STORE-HUB-COMMON-VIEW-AND-SHELL-UNIFICATION-V1
  *
- * KPA-Society · K-Cosmetics · GlycoPharm 의 블로그 / POP / QR 진열 화면 9개가
+ * KPA-Society · K-Cosmetics 의 블로그 / POP / QR 진열 화면 9개가
  * 문구·아이콘·경로·accent 를 빼면 동일한 마크업이었다. 그 화면 골격을 한 곳으로 모은다.
  *
  * 상태는 `useHubImportLibrary`(Core)가, 화면은 이 View 가, API adapter 와 문구는
@@ -61,7 +61,7 @@ export interface HubImportLibraryViewProps<T extends HubImportLibraryRow> {
   sortable?: boolean;
   /** 헤더 우측 CTA ('직접 만들기'). 없으면 헤더는 제목만 렌더한다. */
   headerAction?: ReactNode;
-  /** 설명문 아래 보조 링크 (KCos/GP POP '사본 관리 →'). */
+  /** 설명문 아래 보조 링크 (KCos POP '사본 관리 →'). */
   headerBelow?: ReactNode;
   /** 하단 안내문. 사본 정책 문구가 자료 종류마다 달라 통째로 주입한다. */
   footerNote?: ReactNode;

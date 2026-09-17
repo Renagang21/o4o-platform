@@ -354,7 +354,6 @@ function rolesToScopeLevel(role: string, roles?: string[]): ScopeLevel {
 | Neture | `neture:admin` | unprefixed only | **BROKEN** |
 | KPA Society | `kpa:admin` | 자체 auth-utils | 별도 확인 필요 |
 | K-Cosmetics | `cosmetics:admin` | 동일 패키지 가능 | 위험 |
-| GlycoPharm | `glycopharm:admin` | 동일 패키지 가능 | 위험 |
 
 **권장 후속 조사:** `IR-O4O-ALL-SERVICES-ROLE-REDIRECT-AUDIT-V1`
 

@@ -187,7 +187,7 @@ API 단 게이트는 다른 축이다: `requireAuth` 는 `users.status` 가 아�
 | KPA Society | `services/web-kpa-society/src/components/LoginModal.tsx:134` | 동일 |
 | 공통 메시지 사전 | `packages/error-handling/src/error-messages.ts:34`, `packages/auth-utils/src/errorMessages.ts:5` | 동일 |
 | **Pharmacy-Hub** | `services/web-pharmacy-hub/src/pages/LoginPage.tsx:31-37` | **분기 없음** → `wrapped.message` 그대로 = **`'Account is not active'` 영문 원문 노출** (`errors/AuthErrors.ts:93-101`) |
-| Neture / GlycoPharm / K-Cosmetics 로그인 화면 | – | `ACCOUNT_NOT_ACTIVE` 분기 없음 |
+| Neture / K-Cosmetics 로그인 화면 | – | `ACCOUNT_NOT_ACTIVE` 분기 없음 |
 
 **어느 소비처도 "반려됨"을 구분하지 못한다.** 문구는 전부 "승인 대기"로 고정돼 있어, 반려된 사용자에게 사실과 다른 안내가 표시된다.
 Pharmacy-Hub 의 `/join/status` 는 `requireAuth` 를 요구하므로(`routes/pharmacy-hub/pharmacy-hub.routes.ts:104`) 반려 사유 화면 자체가 dead path 다. `MembershipGate.tsx:34-35` 는 `rejected → '반려 사유 확인'` 링크를 제공하지만 D1 상황에서는 도달 불가능하다.
@@ -216,7 +216,7 @@ Pharmacy-Hub 의 `/join/status` 는 `requireAuth` 를 요구하므로(`routes/ph
 | `users.status` 분포 | `deleted 19` / `active 16` / `approved 4` / `pending 1` |
 | `users.status × isEmailVerified` | `active` 16명 중 **미인증 11 / 인증 5**, `approved` 4명 전원 미인증, `pending` 1명 미인증 |
 | `users.status × isActive` | `active|approved` 20명 전원 `isActive=true`, `deleted` 19명 전원 `false` |
-| membership 분포 | `platform:active 7`, `k-cosmetics:active 5`, `kpa-society:active 5`, `glycopharm:active 4`, `neture:active 4`, `pharmacy-hub:active 4`, `k-cosmetics:pending 1`, `pharmacy-hub:rejected 1` |
+| membership 분포 | `platform:active 7`, `k-cosmetics:active 5`, `kpa-society:active 5`, `neture:active 4`, `pharmacy-hub:active 4`, `k-cosmetics:pending 1`, `pharmacy-hub:rejected 1` |
 | users.pending × membership.rejected | **0** |
 | users.pending × membership.active | 0 |
 | users.active × membership.pending(승인 0) | 0 |
@@ -283,7 +283,7 @@ D 는 IR 지시에 따라 이번 범위에서 구현 대상이 아니다.
 | 컨트롤러 | `modules/auth/controllers/auth-login.controller.ts:115-129` | 제한 로그인 응답에 `membershipStatus`/`rejectionReason` 전달 |
 | 프론트 (공통) | `packages/auth-utils/src/errorMessages.ts` 외 | 반려/대기 구분 문구 분리 |
 | 프론트 (Pharmacy-Hub) | `LoginPage.tsx`, `MembershipGate.tsx`, `JoinStatusPage.tsx` | 제한 로그인 후 `/join/status` 리디렉션 |
-| 프론트 (기타 서비스) | KPA / Neture / GlycoPharm / K-Cosmetics 로그인 화면 | 공통 처리 확인 (Shared Module Change Rule 적용 — 5개 서비스 전수 확인 필수) |
+| 프론트 (기타 서비스) | KPA / Neture / K-Cosmetics 로그인 화면 | 공통 처리 확인 (Shared Module Change Rule 적용 — 5개 서비스 전수 확인 필수) |
 
 **migration: 불필요.** 신규 컬럼·테이블 없음.
 **기존 데이터 정비: 불필요.** pending 1건 / rejected 1건 모두 재해석 대상 아님.

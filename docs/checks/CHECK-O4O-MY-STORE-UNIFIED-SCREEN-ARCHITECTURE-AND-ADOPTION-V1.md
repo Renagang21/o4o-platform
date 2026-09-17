@@ -1,7 +1,7 @@
 # CHECK — WO-O4O-MY-STORE-UNIFIED-SCREEN-ARCHITECTURE-AND-ADOPTION-V1
 
 - **작성일**: 2026-08-19
-- **대상**: KPA-Society / K-Cosmetics / GlycoPharm / Pharmacy-Hub 의 "내 매장" 화면 전체
+- **대상**: KPA-Society / K-Cosmetics / Pharmacy-Hub 의 "내 매장" 화면 전체
 - **작업 기준 커밋**: `fcd837ec0` (main)
 - **성격**: 화면 골격(Shell/Layout/Navigation/Home/Page structure) 재조사 + 공통 Shell 확정 + 4서비스 채택
 
@@ -13,7 +13,6 @@
 |---|---|---|---|
 | KPA-Society | `/store` | `KpaStoreLayoutWrapper` (App.tsx) | `/store` |
 | K-Cosmetics | `/store` | `StoreLayoutWrapper` (App.tsx) | `/store` |
-| GlycoPharm | `/store` | `StoreLayoutWrapper` (App.tsx) | `/store` |
 | Pharmacy-Hub | `/store-owner` | `StoreOwnerShell` (layouts/) | `/store-owner` |
 
 **Neture 제외 판정**: `services/web-neture` 에는 매장 경영자용 "내 매장" 영역이 없다.
@@ -31,7 +30,6 @@ route → page component → 파일 → 공통 패키지 사용 여부를 App.ts
 |---|---:|---:|---:|---:|---:|
 | KPA | 77 | 51 | 14 | 3 | 34 |
 | K-Cosmetics | 43 | 32 | 21 | 1 | 10 |
-| GlycoPharm | 47 | 38 | 22 | 0 | 16 |
 | Pharmacy-Hub | 63 | 49 | 6 | 0 | 43 |
 
 - "공통 View 채택" = `@o4o/store-ui-core` 의 View/Manager/Shell 컴포넌트를 렌더하는 adapter 화면.
@@ -41,7 +39,7 @@ route → page component → 파일 → 공통 패키지 사용 여부를 App.ts
 
 ### 메뉴 ↔ route 정합 (§14)
 
-`storeMenuConfig` 의 4 서비스 메뉴 항목 **92개** (KPA 25 / KCos 24 / GP 27 / PH 16) 전부에 대해
+`storeMenuConfig` 의 3 서비스 메뉴 항목 **92개** (KPA 25 / KCos 24 27 / PH 16) 전부에 대해
 `basePath + subPath` 대응 route 존재를 기계 검증했다 → **dead link 0**.
 
 ---
@@ -94,9 +92,7 @@ userName, userInitial?, orgName?, homeLink?, onLogout?, navItems?, serviceLabel?
 | `packages/store-ui-core/src/index.ts` | export 추가 |
 | `services/web-kpa-society/src/App.tsx` | wrapper → `MyStoreShell` (header/footer/below/orgName slot) |
 | `services/web-k-cosmetics/src/App.tsx` | wrapper → `MyStoreShell` (header/footer slot) |
-| `services/web-glycopharm/src/App.tsx` | wrapper → `MyStoreShell` (header/banner/footer slot) |
 | `services/web-pharmacy-hub/src/layouts/StoreOwnerShell.tsx` | `StoreDashboardLayout` → `MyStoreShell` (가드 2단 불변) |
-| `services/web-{kpa-society,k-cosmetics,glycopharm}/src/hooks/useStoreCapabilities.ts` | **삭제** — byte-identical 3중 복제 |
 
 제거된 중복: 동일 골격 배선 3벌 + 동일 hook 3벌. 남은 서비스 코드는 slot·config 주입뿐이다.
 
@@ -110,8 +106,8 @@ Navigation(§8)·Home(§9) 은 이미 공통 정본을 4서비스가 채택하�
 
 | # | 중립 mount | 실제 소비처 | 판정 |
 |---|---|---|---|
-| 1 | `/api/v1/store` ← `createStoreTabletRoutes` | KPA·KCos·GP 3서비스 프론트가 모두 중립 경로 호출 (PH 는 이미 자체 scoped mount) | **유지** — 실제 다중 서비스 공유. 조직 해석 축의 service-scoped 이관은 별도 WO |
-| 2 | `/api/v1/store` ← `createStoreLibraryRoutes` | **frontend 호출 0건**. KCos=`/cosmetics/pharmacy/library`, GP=`/glycopharm/pharmacy/library`, KPA=`/store/assets` 사용 | **은퇴 후보** — 트래픽 확인 후 별도 WO |
+| 1 | `/api/v1/store` ← `createStoreTabletRoutes` | KPA·KCos 2서비스 프론트가 모두 중립 경로 호출 (PH 는 이미 자체 scoped mount) | **유지** — 실제 다중 서비스 공유. 조직 해석 축의 service-scoped 이관은 별도 WO |
+| 2 | `/api/v1/store` ← `createStoreLibraryRoutes` | **frontend 호출 0건**. | **은퇴 후보** — 트래픽 확인 후 별도 WO |
 | 3 | `/api/v1/store/products` ← `createStoreProductLibraryController` | KPA(`o4oStandardProducts.ts`) + Neture(`lib/api/store.ts`) 2서비스 | **유지** — 실제 공유 경로 |
 | 4 | `/api/v1/products` ← `createProductAiRecommendationRouter` | **frontend 호출 0건** (`/recommend`, `/recommend/store` 소비처 없음) | **은퇴 후보** — 별도 WO |
 | 5 | `seller.controller` 의 `resolveStoreAccess` | mount = `/api/v1/neture/seller` (중립 경로 아님), 소비처 = web-neture 단독 | **유지** — 서비스 컨텍스트가 이미 Neture 단일 |
@@ -127,7 +123,6 @@ Navigation(§8)·Home(§9) 은 이미 공통 정본을 4서비스가 채택하�
 | 공통 패키지 빌드 (`pnpm run build:packages`) | PASS |
 | `@o4o/web-kpa-society` production build (`tsc && vite build`) | PASS |
 | `@o4o/web-k-cosmetics` production build | PASS |
-| `glycopharm-web` production build | PASS |
 | `pharmacy-hub-web` production build | PASS |
 | frontend tests | 해당 없음 — 4서비스에 test script 없음 |
 | api-server Jest | 해당 없음 — backend 무변경 |
@@ -167,7 +162,6 @@ Navigation(§8)·Home(§9) 은 이미 공통 정본을 4서비스가 채택하�
 |---|---|---:|:---:|:---:|
 | KPA-Society | `kpa-society.co.kr` | 25 | 25/25 PASS | 25/25 PASS |
 | K-Cosmetics | `k-cosmetics.site` | 24 | 24/24 PASS | 24/24 PASS |
-| GlycoPharm | `glycopharm.co.kr` | 27 | 27/27 PASS | 27/27 PASS |
 | Pharmacy-Hub | `pharmacyhub.co.kr` | 16 | 16/16 PASS | 16/16 PASS |
 | **합계** | | **92** | **92/92** | **92/92** |
 
@@ -182,9 +176,7 @@ Navigation(§8)·Home(§9) 은 이미 공통 정본을 4서비스가 채택하�
 | horizontal overflow | 매장 화면 **0** (아래 주석 1건 예외) |
 | 콘텐츠 잘림 | 관측 없음 |
 
-**주석 — GlycoPharm 모바일 39px overflow(본 WO 원인 아님)**
-
-`glycopharm.co.kr` 모바일 390px 에서 `scrollWidth 429` 가 관측됐다. 원인 요소는
+원인 요소는
 class 없는 폭 119px `BUTTON` 이며 **로그인 전 공개 홈 `/` 에서도 동일하게 재현**된다.
 같은 Shell 안의 `/store/products` 는 overflow 0 이다.
 → Shell/Layout 이 아니라 전역에 얹히는 요소(위젯)의 문제다. 본 WO 범위 밖이며 별도 확인 대상으로 보고만 한다.

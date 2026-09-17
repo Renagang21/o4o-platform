@@ -48,7 +48,7 @@ exposureStatus(PENDING/APPROVED/REJECTED) = 서비스 노출 승인 상태 (신�
 ## 5. operator approve/reject API + 권한
 
 - neture:operator 스코프(= neture:operator/neture:admin). `OfferServiceApproval`/`operator-product-approval` 컨벤션 미러.
-- ⚠️ **serviceKey 별 권한 enforcement / KPA·GP·KCos 서비스 operator 앱 호출 wiring 은 본 WO 범위 외 → 후속 EXPOSURE-OPERATOR-UI-V1**. 조사 발견: 서비스 operator 페이지(예 KPA ProductApplicationManagementPage)는 자기 service-locked `apiClient`(`/api/v1/{service}`)로 자기 backend 호출. 본 WO 는 neture:operator 큐 surface 제공(neture 컨벤션). UI WO 에서 (a)cross-service client (b)per-service proxy (c)serviceKey ownership 강제를 결정.
+- ⚠️ **serviceKey 별 권한 enforcement / KPA·KCos 서비스 operator 앱 호출 wiring 은 본 WO 범위 외 → 후속 EXPOSURE-OPERATOR-UI-V1**. 조사 발견: 서비스 operator 페이지(예 KPA ProductApplicationManagementPage)는 자기 service-locked `apiClient`(`/api/v1/{service}`)로 자기 backend 호출. 본 WO 는 neture:operator 큐 surface 제공(neture 컨벤션). UI WO 에서 (a)cross-service client (b)per-service proxy (c)serviceKey ownership 강제를 결정.
 
 ## 6. 기존 데이터 backfill 정책
 
@@ -56,7 +56,7 @@ exposureStatus(PENDING/APPROVED/REJECTED) = 서비스 노출 승인 상태 (신�
 
 ## 7. 제외 범위 (WO 준수)
 
-operator UI / 준비중 페이지 교체 / 공급자 status 화면 / 판매자 신청·취소 UI / C bridge / allowedSellerIds·OPL / 계약·RBAC / 가격 / ProductApproval 재사용 / 별도 RecruitmentExposure entity / multi-service 구조 / 이메일·알림 / package.json·lock. **모두 미수행.** frontend 무변경. DRUG audience gate 는 createRecruitment 생성단계 기존 적용 유지(재검증 불요). 다른 세션 GP frontend WIP 미접촉.
+operator UI / 준비중 페이지 교체 / 공급자 status 화면 / 판매자 신청·취소 UI / C bridge / allowedSellerIds·OPL / 계약·RBAC / 가격 / ProductApproval 재사용 / 별도 RecruitmentExposure entity / multi-service 구조 / 이메일·알림 / package.json·lock. **모두 미수행.** frontend 무변경. DRUG audience gate 는 createRecruitment 생성단계 기존 적용 유지(재검증 불요).
 
 ## 8. 검증
 

@@ -32,7 +32,7 @@ desktop 에서도 flex-col 만 적용
 | | 경로 |
 |---|---|
 | 공통 shell | [packages/operator-ux-core/src/layout/OperatorAreaShell.tsx](../../packages/operator-ux-core/src/layout/OperatorAreaShell.tsx) |
-| `lg:flex-row` 유일 출처 | 위 파일 (grep 결과: packages/services 전체에서 이 파일 + glycopharm src 2개 페이지뿐) |
+| `lg:flex-row` 유일 출처 | 위 파일 (grep 결과: packages/services 전체에서 이 파일 src 2개 페이지뿐) |
 
 ---
 
@@ -47,7 +47,6 @@ CLAUDE.md Shared Module Change Rule 에 따라 operator-ux-core 소비처 4개 �
 | 서비스 | 파일 |
 |---|---|
 | Neture | [services/web-neture/tailwind.config.js](../../services/web-neture/tailwind.config.js) |
-| GlycoPharm | [services/web-glycopharm/tailwind.config.js](../../services/web-glycopharm/tailwind.config.js) |
 | K-Cosmetics | [services/web-k-cosmetics/tailwind.config.js](../../services/web-k-cosmetics/tailwind.config.js) |
 | KPA-Society | [services/web-kpa-society/tailwind.config.js](../../services/web-kpa-society/tailwind.config.js) |
 

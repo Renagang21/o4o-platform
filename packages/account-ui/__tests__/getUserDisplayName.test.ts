@@ -3,7 +3,7 @@
  *
  * WO-O4O-SERVICE-USER-DISPLAY-NAME-COMMONIZATION-G1-V1
  *
- * KPA · Neture · GlycoPharm · K-Cosmetics 4개 서비스의 Global Header 가
+ * KPA · Neture · K-Cosmetics 3개 서비스의 Global Header 가
  * 각자 복제해 두었던 동일 로직을 이 함수 하나로 통합했다. 이 테스트는
  * **통합 이전의 표시 결과를 계약으로 고정**한다 — 우선순위나 fallback 문구를
  * 바꾸려면 4개 서비스 헤더 표시가 동시에 바뀐다는 뜻이므로 별도 WO 가 필요하다.
@@ -92,7 +92,7 @@ describe('getUserDisplayName', () => {
     it.each([
       ['KPA (name + email)', { id: '1', email: 'sohae2100@gmail.com', name: '서상원' }, '서상원'],
       ['K-Cosmetics (name === email)', { email: 'ops@k-cosmetics.site', name: 'ops@k-cosmetics.site' }, 'ops'],
-      ['GlycoPharm (lastName + firstName)', { email: 'gp@glycopharm.co.kr', name: 'gp', lastName: '김', firstName: '약사' }, '김약사'],
+      ['lastName + firstName', { email: 'ph@example.com', name: 'ph', lastName: '김', firstName: '약사' }, '김약사'],
       ['Neture (displayName)', { email: 'n@neture.co.kr', name: 'n', displayName: '네처운영자' }, '네처운영자'],
     ])('%s → %s', (_label, input, expected) => {
       expect(getUserDisplayName(input as never)).toBe(expected);

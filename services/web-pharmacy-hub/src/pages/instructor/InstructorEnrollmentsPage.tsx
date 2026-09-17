@@ -5,7 +5,7 @@
  * 경로: /instructor/courses/:courseId/enrollments
  *
  * 공통 `/api/v1/lms/instructor/participants/:courseId` (+ `/summary`) 계약을 그대로 쓴다.
- * KPA ContentParticipantsPage · GlycoPharm 과 같은 화면 축이며 PH 전용 endpoint 는 없다.
+ * KPA ContentParticipantsPage 과 같은 화면 축이며 PH 전용 endpoint 는 없다.
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';

@@ -55,11 +55,11 @@ F2 상품명 병합 로직 (master_id 축)      — 미착수, 별건 유지
 master_id 기준 UI 재설계                — 미착수
 진열 관리 목록 구조 변경                — 미착수
 UX 정비 WO(2단계)와 병합                — 분리 유지
-GP/KCos 수정                            — 무변경
+KCos 수정 — 무변경
 backend / DB / migration                — 무변경
 ```
 
-**GP/KCos 영향 없음 근거:** `services/web-glycopharm` · `services/web-k-cosmetics` 에
+`services/web-k-cosmetics` 에
 `updateListing` / `getListingChannels` / `updateListingChannels` **소비처 0건** (grep 확인).
 `pharmacyProducts.ts` 는 서비스별 독립 사본이며 공통 패키지가 아니다.
 
@@ -89,11 +89,11 @@ backend / DB / migration                — 무변경
 | commit | `5cbd66f73` |
 | workflow | `deploy-web-services.yml` |
 | run ID | `30269621937` |
-| detect-changes 결과 | `deploy-kpa-society` **선택** / glycopharm·k-cosmetics·neture **skipped** |
+| detect-changes 결과 | `deploy-kpa-society` **선택** / k-cosmetics·neture **skipped** |
 | 결과 | **success** |
 | 리비전 | `kpa-society-web-01724-svq` (이전 `kpa-society-web-01720-s27`) |
 
-→ WO §8 "GP/KCos 무접촉" 이 배포 단계에서도 관철됨.
+→ WO §8 "KCos 무접촉" 이 배포 단계에서도 관철됨.
 
 ---
 
@@ -165,7 +165,7 @@ BEFORE       : is_active = true       (전체 20행 스냅샷 기록)
 | `organization_channels` | 2행 (무변경) |
 | 생성한 Offer / approval / listing / channel | **0** |
 | 순증·변경 | **0** (토글은 변경 후 원복 완료, 채널 PUT 은 빈 배열로 쓰기 미발생) |
-| GP/KCos 접촉 | 없음 (코드·배포 모두) |
+| KCos 접촉 | 없음 (코드·배포 모두) |
 
 ---
 

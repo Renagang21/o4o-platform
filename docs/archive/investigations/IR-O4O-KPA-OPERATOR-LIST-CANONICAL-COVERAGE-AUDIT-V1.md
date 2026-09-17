@@ -266,7 +266,7 @@ KPA admin 6개 페이지 중 V3 5요소 전부 충족하는 페이지는 **0건*
 - `@o4o/ui` 의 `RoleManagementPage`, `AiReportPage` canonical 준수 감사
 - KPA Admin Phase 1 (HubContents/HubNoticeList) 의 BulkAction API 백엔드 존재 여부
 - `MyStoreContentsPage` / `StoreContentWorkspacePage` 의 정책 (read-only 의도 / bulk 필요 여부)
-- GlycoPharm / K-Cosmetics / Neture / admin-dashboard 의 비-KPA 영역 (canonical doc 등재 항목은 별도 IR 권장)
+- K-Cosmetics / Neture / admin-dashboard 의 비-KPA 영역 (canonical doc 등재 항목은 별도 IR 권장)
 - canonical doc 자체의 **2026-05-16 시점 재정렬** (Phase 분류 갱신)
 
 ---

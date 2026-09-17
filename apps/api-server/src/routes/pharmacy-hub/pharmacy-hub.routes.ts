@@ -342,7 +342,7 @@ export function createPharmacyHubRoutes(): Router {
   //
   //   원장은 공통 store_qr_codes / store_qr_scan_events 다 — 신규 테이블 0 / migration 0.
   //   저장·검증·집계 계약은 공통 services/store/store-qr.service.ts 를 그대로 호출한다
-  //   (KPA·GlycoPharm·K-Cosmetics 와 같은 함수 — 새 QR 엔진 0).
+  //   (KPA·K-Cosmetics 와 같은 함수 — 새 QR 엔진 0).
   //
   //   공통 `/pharmacy/qr/*` 를 마운트하지 않는 이유는 content/library 와 같다:
   //   createRequireStoreOwner(=resolveStoreAccess) 가 service scope 없이
@@ -756,7 +756,7 @@ export function createPharmacyHubRoutes(): Router {
   // ===========================================================================
   // News / Notice Routes - /api/v1/pharmacy-hub/news/*
   // WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §4
-  //   KPA / GlycoPharm / K-Cosmetics 가 이미 쓰는 **공통 factory** 를 그대로 마운트한다.
+  //   KPA / K-Cosmetics 가 이미 쓰는 **공통 factory** 를 그대로 마운트한다.
   //   원장 = 공통 `cms_contents` (serviceKey='pharmacy-hub') — 신규 table 0 / migration 0.
   //   신규 계약이 아니라 기존 공통 계약의 서비스 채택이다.
   // ===========================================================================
@@ -772,7 +772,7 @@ export function createPharmacyHubRoutes(): Router {
   // ===========================================================================
   // Store Marketing Analytics - /api/v1/pharmacy-hub/pharmacy/analytics/*
   // WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §7
-  //   KPA / GlycoPharm / K-Cosmetics 와 **동일한 공통 factory** 를 동일한 형태로 마운트한다.
+  //   KPA / K-Cosmetics 와 **동일한 공통 factory** 를 동일한 형태로 마운트한다.
   //   집계 원장 = 공통 store_qr_scan_events / store_qr_codes (organization_id 축) — 신규 table 0.
   // ===========================================================================
   router.use('/', createStoreAnalyticsController(AppDataSource, requireAuth as any, 'pharmacy-hub'));
@@ -780,7 +780,7 @@ export function createPharmacyHubRoutes(): Router {
   // ===========================================================================
   // Multilingual Product Content - /api/v1/pharmacy-hub/pharmacy/multilingual-product-contents/*
   // WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §8 (#76)
-  //   KPA / GlycoPharm / K-Cosmetics 와 **동일한 공통 factory** 를 serviceKey 만 바꿔 마운트한다.
+  //   KPA / K-Cosmetics 와 **동일한 공통 factory** 를 serviceKey 만 바꿔 마운트한다.
   //   원장 = 공통 store_multilingual_product_content_groups/pages (organization_id 축) — 신규 table 0.
   //   HUB 탐색(/hub)·가져오기(/import)는 service_key 로 스코프되어 PH 는 운영자 원본이 0건이다
   //   (매장허브 운영자 개입 부재 = #85·#86 INTENTIONAL_DIFFERENCE). 따라서 PH UI 는 저작 축만 노출한다.

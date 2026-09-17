@@ -50,7 +50,7 @@ consumer 자체가 없어 권한 변화가 발생할 수 없다. 나머지 bare 
 ### `service_memberships.role` 축 (참고 — 본 WO 의 정리 대상 아님)
 
 접두어 없는 membership role 이 6개 service_key 에 남아 있다:
-glycopharm(`member` · `operator` · `pharmacy` · `store_owner`) · k-cosmetics(`customer` ·
+k-cosmetics(`customer`
 `member` · `store_owner`) · kpa-branch(`user`) · kpa-society(`admin` · `member` ·
 `store_owner` · `user`) · neture(`member` · `supplier`) · platform(`customer` · `super_admin`).
 이 값들은 승인·재활성화 시 `role_assignments` 로 흘러가므로 §5 의 재발 방지 대상이다.
@@ -66,7 +66,7 @@ glycopharm(`member` · `operator` · `pharmacy` · `store_owner`) · k-cosmetics
 | `customer` | `RBAC-ROLE-CATALOG-V1` §1 Platform Roles 정식 항목 | 살아있는 보유자 5명 전원이 `platform` membership 단독 — 서비스 축이 애초에 없다 |
 | `user` | 같은 카탈로그의 **기본값** 역할 | 소셜/일반 가입 write path 가 지금도 `UserRole.USER` 로 부여한다 (`auth-login.service.ts` · `socialAuthService.ts` · `user.service.ts`) |
 | `supplier` | 카탈로그 §1 Commerce Roles 정식 항목 | 살아있는 인가 consumer — `content-assets.routes.ts:459` `requireRole(['partner','affiliate','seller','supplier'])`. Neture 는 WO-NETURE-ROLE-NORMALIZATION-V1 로 **의도적 unprefixed** (`supplier.service.ts:145`) |
-| `pharmacy` | 살아있는 consumer — `ForumRecommendationController.ts:290` 가 bare 문자열을 그대로 읽어 추천 가중치를 준다 | `scope-assignment.utils.ts` 의 member 매핑 목록 항목. 대응 prefixed 이름(`glycopharm:pharmacy`)이 카탈로그에 **없어** 정규화 대상이 아니다 |
+| `pharmacy` | 살아있는 consumer — `ForumRecommendationController.ts:290` 가 bare 문자열을 그대로 읽어 추천 가중치를 준다 | `scope-assignment.utils.ts` 의 member 매핑 목록 항목. 대응 prefixed 이름이 카탈로그에 **없어** 정규화 대상이 아니다 |
 
 → 삭제·변환 대상이 아니다. (§8 "정상 global/platform role 삭제" 금지)
 
@@ -74,7 +74,7 @@ glycopharm(`member` · `operator` · `pharmacy` · `store_owner`) · k-cosmetics
 
 - 대상: user `5196c1f8…` — `users.status='deleted'` · membership **0건** · prefixed role **0건**
 - 근거 1 (consumer 부재): 매장 경영자 판정은 전부 prefixed 다.
-  `store-owner.utils.ts` `SERVICE_STORE_OWNER_ROLES` = `kpa:store_owner` · `glycopharm:store_owner` ·
+  `store-owner.utils.ts` `SERVICE_STORE_OWNER_ROLES` = `kpa:store_owner`
   `cosmetics:store_owner` · `pharmacy-hub:store_owner`, `kpa-store-owner.util.ts` 는 `kpa:store_owner`.
   `scope-assignment.utils.ts` 의 member 매핑 목록에도 `store_owner` 는 없다 → 현재 권한 0.
 - 근거 2 (카탈로그): 접두어 없는 정식 목록(Platform/Commerce)에 `store_owner` 가 없다.
@@ -154,7 +154,7 @@ Neture 공급자·파트너 가입 승인 트랜잭션 전체가 깨진다.
 `MembershipApprovalService` STEP3 은 `service_memberships.role` 을 그대로 부여하는데,
 정규화 대상은 `member` · `store_owner` 뿐이라 bare `admin` · `operator` · `super_admin` 은
 그대로 통과했다. 프로덕션에 그런 membership 이 실재한다(kpa-society/`admin` 1 ·
-glycopharm/`operator` 1 · platform/`super_admin` 2).
+`operator` 1 · platform/`super_admin` 2).
 
 특히 **`super_admin` 은 로그인 경로가 `platform:super_admin` 과 동등하게 취급**하므로
 (`auth-login.service.ts` `PLATFORM_ADMIN_ROLES = ['platform:super_admin','super_admin']`),
@@ -177,7 +177,7 @@ membership 보유자 2명 중 1명은 `platform:super_admin` 을 갖고 있지 �
 | 경로 | 부여 role | 판정 |
 |---|---|---|
 | `cosmetics-store.service.ts` | `cosmetics:store_owner` | prefixed ✔ |
-| `glycopharm-member.service.ts` · `glycopharm/admin.controller.ts` | `glycopharm:pharmacist` · `glycopharm:store_owner` | prefixed ✔ |
+| `admin.controller.ts` | — | prefixed ✔ |
 | `kpa-store-organization.provisioning.ts` | `kpa:store_owner` | prefixed ✔ |
 | `kpa/member.controller.ts` ROLE_MAP | `kpa:operator` · `kpa:admin` (member → 부여 없음) | prefixed ✔ |
 | `PharmacyHubStoreProvisioningService.ts` | `pharmacy-hub:store_owner` | prefixed ✔ |
@@ -251,10 +251,8 @@ membership 보유자 2명 중 1명은 `platform:super_admin` 을 갖고 있지 �
 
 1. **`service_memberships.role` 의 bare 표기 자체는 남아 있다.** 부여 경로는 정규화·차단으로
    막았지만 저장값은 그대로다. `pharmacy-hub` 처럼 표기 교정 migration 을 하려면 서비스별로
-   "대응 prefixed 역할을 이미 활성 보유" 가드가 성립해야 하는데, glycopharm `pharmacy` 처럼
+   "대응 prefixed 역할을 이미 활성 보유" 가드가 성립해야 하는데 `pharmacy` 처럼
    대응 prefixed 이름이 카탈로그에 없는 값이 있어 일괄 처리할 수 없다 → 별도 WO.
-2. **bare `pharmacy` 의 서비스 축 부재.** GlycoPharm 전용 의미인데 전역 역할로 저장되고
-   consumer 도 bare 를 읽는다. 정리하려면 consumer 와 함께 옮겨야 한다 → 별도 WO.
 3. **soft-deleted 사용자에 남은 활성 bare 전역 역할 9행.** 카탈로그상 정상 역할이고 계정이
    비활성이라 권한 영향이 없어 이번 범위에서 제외했다. 계정 hard delete 정책과 함께 다뤄야 한다.
 4. **`RBAC-ROLE-CATALOG-V1` §1 의 bare `super_admin`·`admin` 항목과 현재 정책의 충돌.**

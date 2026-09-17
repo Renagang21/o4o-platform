@@ -44,7 +44,6 @@ gcloud run services describe o4o-core-api ... → env 21건, URL/FRONT 매칭 0�
 | serviceKey | 1순위 | 2순위 | 코드 fallback |
 |---|---|---|---|
 | `k-cosmetics` | `KCOSMETICS_FRONTEND_URL` | `FRONTEND_URL` | **`https://k-cosmetics.site`** (변경) |
-| `glycopharm` | `GLYCOPHARM_FRONTEND_URL` | `FRONTEND_URL` | `https://glycopharm.co.kr` (미변경) |
 | `kpa-society` / `null` / unknown | `KPA_FRONTEND_URL` | `FRONTEND_URL` | `https://kpa-society.co.kr` (미변경) |
 
 - 호출부는 **정확히 1곳**: `CertificateController.downloadPdf()` (수정 후 `:283`).
@@ -115,7 +114,7 @@ Tests:       6 passed, 6 total
 | 1 | `KCOSMETICS_FRONTEND_URL` 설정 시 최우선 | PASS |
 | 2 | `FRONTEND_URL` 만 설정 시 그 값 | PASS |
 | 3 | 둘 다 없으면 `https://k-cosmetics.site` (`k-cosmetics.co.kr` 미포함) | PASS |
-| 4 | glycopharm / kpa-society / null / unknown 회귀 없음 | PASS |
+| 4 | kpa-society / null / unknown 회귀 없음 | PASS |
 | 4-b | 서비스별 env 가 다른 서비스로 새지 않음 | PASS |
 | 5 | 최종 URL host `k-cosmetics.site` + path `/certificate/verify/{id}` + query 없음 | PASS |
 
@@ -144,7 +143,6 @@ Tests:       6 passed, 6 total
 - 신규 리비전 severity>=ERROR → **0건**
 - 신규 리비전 `httpRequest.status>=500` → **0건**
   (조회된 500 1건은 배포 **이전** 리비전 `o4o-core-api-03376-ztj` 의 03:00:16
-  `/api/v1/lms/courses/courses?serviceKey=glycopharm` 로, 이번 변경과 무관한 기존 결함이다.
   경로가 `courses/courses` 로 중복돼 있다 — 이번 WO 범위 밖, 별도 WO 후보로 기록만 한다.)
 - 소스 잔존 `k-cosmetics.co.kr` (dist 제외 3건, 모두 URL 생성 경로 아님):
   - `migrations/1736611201000-SeedNetureData.ts:258` — §5 판정에 따라 미변경
@@ -155,7 +153,7 @@ Tests:       6 passed, 6 total
 
 - `FRONTEND_URL` 은 `packages/mail-core/src/mail.service.ts` 등 여러 곳에서
   `neture.co.kr` / `admin.neture.co.kr` 기본값과 함께 쓰이는 **범용 env** 다.
-  만약 이 값이 API 서버에 설정되면 k-cosmetics/glycopharm 검증 링크가 모두 그 값으로 끌려간다.
+  만약 이 값이 API 서버에 설정되면 k-cosmetics 검증 링크가 모두 그 값으로 끌려간다.
   현재 미설정이라 문제되지 않지만, 향후 `FRONTEND_URL` 을 API 서버에 넣을 때는
   **서비스별 env 3개를 함께 설정**해야 한다. (별도 WO 후보)
 - `k-cosmetics.co.kr` 은 제3자 Cafe24 몰이다. O4O 문서·코드에서 이 도메인을
@@ -167,7 +165,7 @@ Tests:       6 passed, 6 total
 |---|---|
 | production fallback = `k-cosmetics.site` | ✅ |
 | `k-cosmetics.co.kr` 신규 생성 = 0 | ✅ (리터럴 제거, 저장 경로 없음) |
-| 다른 서비스 회귀 = 0 | ✅ (glycopharm/kpa fallback 미변경 + test case 4/4-b) |
+| 다른 서비스 회귀 = 0 | ✅ (kpa fallback 미변경 + test case 4/4-b) |
 | UNKNOWN = 0 | ✅ (env·DB·seed·소비처 모두 실측 확정) |
 | production 검증 PASS | §8 — 실제 수료증 e2e 만 데이터 0건으로 미수행 |
 | LB/DNS/forwarding rule 미포함 | ✅ 변경 0 |

@@ -273,7 +273,7 @@ API 역할 → Web 역할 매핑:
 | sellerId | UUID | 판매자 |
 | sellerName | varchar | |
 | sellerEmail/Phone/StoreUrl | varchar | 판매자 연락처 |
-| serviceId | varchar | 서비스 식별자 (glycopharm, k-cosmetics 등) |
+| serviceId | varchar | 서비스 식별자 (k-cosmetics 등) |
 | serviceName | varchar | |
 | productId | UUID | 대상 상품 |
 | productName | varchar | 스냅샷 |
@@ -402,7 +402,6 @@ NetureSupplierRequest (공급 신청)
   ├── supplierId → NetureSupplier (Soft)
   ├── sellerId → User (Soft)
   ├── productId → NetureSupplierProduct (Soft)
-  └── serviceId → 서비스 식별자 (glycopharm, k-cosmetics 등)
 
 NeturePartnershipRequest (파트너십 제안)
   │
@@ -428,10 +427,10 @@ OrganizationProductListing (약국 진열 상품)
 |--------|--------|---------|------|
 | OrganizationProductListing | service_key | 'kpa' | 서비스별 상품 분류 |
 | OrganizationProductApplication | service_key | 'kpa' | 서비스별 신청 분류 |
-| OrganizationServiceEnrollment | service_key | 'kpa', 'glycopharm' | 조직→서비스 등록 |
+| OrganizationServiceEnrollment | service_key | — | 조직→서비스 등록 |
 | KpaMember (user.service_key) | service_key | 'kpa' | 사용자 서비스 소속 |
-| NetureSupplierRequest | serviceId | 'glycopharm', 'k-cosmetics' | 공급 대상 서비스 |
-| NetureSupplierContent | availableServices | ['glycopharm', 'k-cosmetics'] | 콘텐츠 대상 서비스 |
+| NetureSupplierRequest | serviceId | — | 공급 대상 서비스 |
+| NetureSupplierContent | availableServices | — | 콘텐츠 대상 서비스 |
 
 ---
 
@@ -596,13 +595,13 @@ OrganizationProductListing (약국 진열 상품)
                     ┌──────────▼──────────────┐
                     │ NetureSupplierRequest    │
                     │ (공급 신청)              │
-                    │ serviceId: glycopharm    │
+                    │ serviceId:               │
                     │ status: PENDING→APPROVED │
                     └──────────┬──────────────┘
                                │ approved
                     ┌──────────▼──────────────┐
                     │ 서비스별 상품 테이블       │
-                    │ glycopharm_products      │
+                    │                          │
                     │ k-cosmetics_products     │
                     │ neture_products          │
                     └─────────────────────────┘

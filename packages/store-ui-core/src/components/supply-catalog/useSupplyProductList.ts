@@ -3,7 +3,7 @@
  *
  * WO-O4O-STORE-HUB-SUPPLY-PRODUCT-EXPLORER-COMMONIZATION-V1
  *
- * 3 서비스(KPA / K-Cosmetics · GlycoPharm / Pharmacy-Hub)의 "공급 상품 탐색" 화면에서
+ * 3 서비스(KPA / K-Cosmetics / Pharmacy-Hub)의 "공급 상품 탐색" 화면에서
  * 실제로 동일한 부분만 담는다.
  *   목록 조회 · 페이지네이션 · 탭/셀렉트 필터 · 검색어 · loading · empty · error
  *

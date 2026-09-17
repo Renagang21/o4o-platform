@@ -92,7 +92,7 @@ blocks = hasCustomBlocks ? storefront_blocks
 | 코드 참조 | `App.tsx` lazy import + Route, `pages/pharmacy/index.ts` barrel export (3건) |
 | 문서 | `docs/archive/**` 감사 문서 + `docs/investigations/IR-O4O-KPA-MY-STORE-FULL-STRUCTURE-AUDIT-V1.md` (모두 과거 감사 기록) |
 
-→ **hidden route (URL 직접 접근 전용), 활성 인바운드 0.** 다른 서비스(GlycoPharm/K-Cosmetics)는 이 컴포넌트를 공유하지 않는다(GlycoPharm 은 자체 `store.controller.ts` 의 동명 API 를 별도 보유).
+→ **hidden route (URL 직접 접근 전용), 활성 인바운드 0.** 다른 서비스는 이 컴포넌트를 공유하지 않는다.
 
 ---
 
@@ -131,7 +131,7 @@ canonical 화면이 템플릿을 실제 적용하게 하려면 둘 중 하나가
 | 매장 storefront 설정(운영 데이터) | **0** |
 | store-ui-core / 공통 모듈 | **0** |
 | 사이드바 | **0** |
-| GlycoPharm · K-Cosmetics | **0** |
+| K-Cosmetics | **0** |
 
 ---
 

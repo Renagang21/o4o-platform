@@ -181,7 +181,6 @@
 
 ### 4-A. Post-Normalization 상태
 
-- `glycopharm_pharmacies` 테이블 **DROP 완료** (Phase C)
 - 약국 데이터 → `organizations` 테이블 (type='pharmacy')
 - 소유자 → `organizations.created_by_user_id`
 

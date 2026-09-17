@@ -158,7 +158,7 @@ return /* 관리자 역할 게이트 */;                                    // �
 
 | 항목 | 내용 |
 |---|---|
-| **관리자 셸 전체 게이트** | `apps/admin-dashboard/src/App.tsx:186` 이 대시보드 전체를 `requiredRoles={['admin']}` 로 감싼다. 여기를 좁히면 **KCos·GlycoPharm 서비스 운영자가 잠긴다** — 이들은 `requireServiceLegalScope('operator')` 로 `/api/v1/admin/services` 를 정당하게 사용한다(`WO-O4O-KCOS-OPERATOR-CONTACT-MANAGEMENT-MIGRATION-V1`). **정책 결정 사안이라 임의로 바꾸지 않았다.** |
+| **관리자 셸 전체 게이트** | `apps/admin-dashboard/src/App.tsx:186` 이 대시보드 전체를 `requiredRoles={['admin']}` 로 감싼다. **정책 결정 사안이라 임의로 바꾸지 않았다.** |
 | **permission 공급** | 백엔드 인증 응답이 `user.permissions` 를 채우도록 하는 작업. 별도 WO. 그때 88건 선언이 자동 활성화되므로 **선언 내용 자체의 감사**가 선행돼야 한다 |
 | 메뉴 권한 선언 정비 | 9단계 순서 5번 |
 | 개별 API 경로 오류 정비 | 9단계 순서 6번 |

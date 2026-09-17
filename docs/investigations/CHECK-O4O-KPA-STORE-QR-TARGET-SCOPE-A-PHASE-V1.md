@@ -80,4 +80,4 @@
   콘텐츠 탭은 `contentHub.ts` 재사용(권한 확인됨). 콘텐츠 선택 시 C-1(참조형: `landingType='page'`,
   `landingTargetId=content.id`) 저장 경로 연결.
 - **동영상 통합** — `PharmacyVideoPage` prefill 경로를 모달 "내 매장 제작자료" 탭으로 흡수(선택).
-- GP/KCos 공통화는 KPA 안정화 후 별도 IR/WO.
+- KCos 공통화는 KPA 안정화 후 별도 IR/WO.

@@ -30,7 +30,7 @@ curl "https://o4o-core-api-.../api/v1/guide/contents?serviceKey={service}&pageKe
 
 - 테이블: `guide_contents` (migration `2026042900001-CreateGuideContents.ts`)
 - API: `https://o4o-core-api-117791934476.asia-northeast3.run.app/api/v1/guide/contents`
-- 확인 서비스: `kpa-society`, `glycopharm`, `k-cosmetics`, `neture`
+- 확인 서비스: `kpa-society`, `k-cosmetics`, `neture`
 
 ---
 
@@ -115,15 +115,6 @@ page-help sectionKey row 중 content가 JSON 형태인 것
 | `content.resource.editor` | fallback |
 | `forum.request.management` | fallback |
 | `store.channel.editor` | fallback |
-| `signage.playlist.manager` | fallback |
-
-### GlycoPharm (4개 pageKey)
-
-| pageKey | 현재 상태 |
-|---------|----------|
-| `store.channel.editor` | fallback |
-| `forum.request.management` | fallback |
-| `store.product.management` | fallback |
 | `signage.playlist.manager` | fallback |
 
 ### K-Cosmetics (4개 pageKey)

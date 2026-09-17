@@ -3,8 +3,8 @@
  *
  * WO-O4O-FORUM-LIST-DATA-SHAPE-NORMALIZATION-V1
  *
- * 4서비스 forum list page 가 각자 다른 표시 shape(KPA `ForumPost` flatten / GP local
- * `ForumPost`(author/views/likes/comments 축약) / KCos·Neture `DisplayPost`)를 사용한다.
+ * 각 서비스 forum list page 가 각자 다른 표시 shape(KPA `ForumPost` flatten /
+ * KCos·Neture `DisplayPost`)를 사용한다.
  * 향후 `ForumListTemplate` 공통화를 위한 단일 표시 기준 타입을 정의한다.
  *
  * - 필수: 전 서비스 공통 렌더 필드 + `routeTo`(상세 경로 — id/slug/basePath 차이를 page 가 흡수).
@@ -40,7 +40,7 @@ export interface ForumListItem {
   routeTo: string;
 
   // ── optional (서비스 subset) ──
-  /** 조회수 (KPA·GlycoPharm) */
+  /** 조회수 (KPA) */
   viewCount?: number;
   /** 게시글 유형 배지 (K-Cosmetics·Neture) */
   postType?: ForumListItemPostType;

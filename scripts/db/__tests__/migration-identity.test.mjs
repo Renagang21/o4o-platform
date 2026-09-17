@@ -36,17 +36,17 @@ ${body}
 `;
 
 // ---- §6.1 false positives that must NOT become the identity
-test('SQL text `SET name = \'pharmacy\'` inside a query string is not a declared name (UnifyGlycopharmRolesCatalog shape)', () => {
+test('SQL text `SET name = \'pharmacy\'` inside a query string is not a declared name (UnifyRolesCatalog shape)', () => {
   const r = parse(wrap(`  public async up2(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(\`
       UPDATE roles SET name = 'pharmacy', role_key = 'pharmacy', updated_at = NOW()
-      WHERE name = 'glycopharm:pharmacy'
+      WHERE name = 'legacy:pharmacy'
         AND NOT EXISTS (SELECT 1 FROM roles WHERE name = 'pharmacy')
     \`);
-  }`, 'UnifyGlycopharmRolesCatalog1711882400000'));
-  assert.equal(r.className, 'UnifyGlycopharmRolesCatalog1711882400000');
+  }`, 'UnifyRolesCatalog1711882400000'));
+  assert.equal(r.className, 'UnifyRolesCatalog1711882400000');
   assert.equal(r.declaredName, null);
-  assert.equal(r.runtimeName, 'UnifyGlycopharmRolesCatalog1711882400000');
+  assert.equal(r.runtimeName, 'UnifyRolesCatalog1711882400000');
 });
 
 test('`SET name = \'seller\'` / DELETE ... WHERE name = \'seller\' (UnifyCosmeticsRolesCatalog · BackfillStoreOwnerRoles shape)', () => {

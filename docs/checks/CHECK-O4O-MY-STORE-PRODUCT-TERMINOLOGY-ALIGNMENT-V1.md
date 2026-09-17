@@ -43,7 +43,7 @@
 
 ## 7. 제외/무변경 항목
 - `storeMenuConfig.ts` 3서비스 canonical 라벨("내 약국 제품"/"자체 상품") — **무변경**(canonical 정렬 보존, 사용자 결정).
-- 공유 `StoreProductsManagerPage`(`packages/store-products-ui`) 기본 heading — **무변경**(GP/KCos 영향 방지, Phase 5 이관).
+- 공유 `StoreProductsManagerPage`(`packages/store-products-ui`) 기본 heading — **무변경**(KCos 영향 방지, Phase 5 이관).
 - DB schema / migration / API / 주문 로직 / ProductApproval / OrganizationProductListing / StoreLocalProduct entity — **무변경**.
 
 ## 8. 검증 결과

@@ -15,7 +15,7 @@
 `GET /api/v1/lms/courses` 가 service boundary 없이 전 서비스 강의를 반환했다.
 `CourseService.listCourses` 의 QueryBuilder 에 service 조건 자체가 없었고, generic route
 (`/api/v1/lms/*`) 에는 서비스 컨텍스트를 주입하는 미들웨어가 없었다. 그 결과
-KPA-Society 강의가 K-Cosmetics · GlycoPharm 사용자 화면에 그대로 노출됐다.
+KPA-Society 강의가 K-Cosmetics 사용자 화면에 그대로 노출됐다.
 
 Forum 은 이미 `forumContextMiddleware → resolveCanonicalServiceKey → applyServiceScope`
 계약을 갖고 있었으나 **LMS 에는 대응 계약이 없었다**. 즉 데이터 문제가 아니라 계약 누락이다.
@@ -30,8 +30,6 @@ Forum 은 이미 `forumContextMiddleware → resolveCanonicalServiceKey → appl
 |---|---|---|---|---|
 | `services/web-kpa-society/src/api/lms.ts` | `apiClient` = `/api/v1/kpa` | (불필요) | O | **route context 로 해결** |
 | `services/web-k-cosmetics/src/api/lms.ts` | `api` = `/api/v1` (generic) | ✗ → **추가** | O | **serviceKey 주입** |
-| `services/web-glycopharm/src/api/lms.ts` | `api` = `/api/v1` (generic) | ✗ → **추가** | O | **serviceKey 주입** |
-| `services/web-glycopharm/.../operator/LmsCoursesPage.tsx` | 직접 `api.get('/lms/courses?…')` | ✗ | O | **lmsApi 경유로 이관** |
 | `apps/main-site/src/pages/lms/*` | `authClient` = `/api/v1` (generic) | ✗ | **X (상세/레슨만)** | 무경계 유지 (legacy) |
 | `services/web-kpa-society/src/api/lms-instructor.ts` | generic | ✗ | 강사 본인 코스 | 범위 밖 (instructorId 로 이미 격리) |
 | Neture · PharmacyHub · KPA-Branch | — | — | **소비처 0건** | 해당 없음 |
@@ -40,7 +38,7 @@ Forum 은 이미 `forumContextMiddleware → resolveCanonicalServiceKey → appl
   `LessonController.listLessonsByCourse`.
 - 강의 원장 service 축: `packages/interactive-content-core/src/entities/Course.ts`
   → 테이블 `lms_courses`, 컬럼 `service_key` (**이미 존재** → migration 불필요, §13 중지 조건 미해당).
-- 서비스 remount: `/api/v1/kpa/lms` 만 존재 (K-Cosmetics · GlycoPharm 은 generic 소비).
+- 서비스 remount: `/api/v1/kpa/lms` 만 존재 (K-Cosmetics 은 generic 소비).
 
 ---
 
@@ -50,7 +48,7 @@ Forum 은 이미 `forumContextMiddleware → resolveCanonicalServiceKey → appl
 
 - `resolveCanonicalServiceKey()` — `packages/security-core/src/service-configs.ts`
 - `SERVICE_KEYS` — `apps/api-server/src/constants/service-keys.ts`
-- 매핑: `kpa → kpa-society`, `cosmetics → k-cosmetics`, `glycopharm` · `neture` ·
+- 매핑: `kpa → kpa-society`, `cosmetics → k-cosmetics`, `neture`
   `pharmacy-hub` · `kpa-branch` 는 self-map.
 
 회귀 테스트가 "자체 매핑 테이블 신설 없음" 을 소스 텍스트로 고정한다.
@@ -74,11 +72,11 @@ Forum 은 이미 `forumContextMiddleware → resolveCanonicalServiceKey → appl
 ## 5. 하위 호환 선택 (§5) — **옵션 B (+ 옵션 A 의 KPA 부분)**
 
 - KPA-Society: 이미 `/api/v1/kpa/lms/*` 를 쓰므로 **라우트 컨텍스트**로 경계 확보 (옵션 A 성격).
-- K-Cosmetics · GlycoPharm: generic route 유지 + **canonical `serviceKey` 를 client 계층에서 주입**.
+- K-Cosmetics: generic route 유지 + **canonical `serviceKey` 를 client 계층에서 주입**.
 - generic + serviceKey 미전달: **무경계 유지** — `apps/main-site` (legacy) · admin · 플랫폼 카탈로그 호환.
 
 > 서비스 전용 LMS remount 를 신설하는 방식(옵션 A 전면)은 §7 의 **부분 remount 위험**
-> (KPA remount 에 quiz/assignment 라우트가 없는 문제)을 K-Cosmetics · GlycoPharm 에까지
+> (KPA remount 에 quiz/assignment 라우트가 없는 문제)을 K-Cosmetics 에까지
 > 복제하게 되어 채택하지 않았다. §13 "대규모 API 재설계" 중지 조건 회피이기도 하다.
 
 **§5 완료 조건 — 서비스 사용자 화면에서 unscoped 목록 사용 = 0**
@@ -87,8 +85,6 @@ Forum 은 이미 `forumContextMiddleware → resolveCanonicalServiceKey → appl
 |---|---|
 | KPA `/lms` 목록 | 라우트 컨텍스트 (`kpa` → `kpa-society`) |
 | K-Cosmetics `/lms` 목록 | `serviceKey='k-cosmetics'` |
-| GlycoPharm `/lms` 목록 | `serviceKey='glycopharm'` |
-| GlycoPharm 운영자 강의 관리 | `lmsApi.operatorGetCourses` → 동일 client 주입 |
 
 `apps/main-site` 는 **목록 소비가 없고**(상세/레슨만) 서비스 사용자 화면이 아니라 legacy
 플랫폼 화면이므로 무경계 대상에서 제외했다.
@@ -134,10 +130,9 @@ CertificateController)과 동일한 판단이며, 현재 해당 row 는 **0건**
 | 중복·legacy key (`kpa`, `cosmetics` 등 비-canonical) | **0** |
 | `status='published' AND content_kind='lecture'` | **5** |
 | `visibility='public' AND status='published' AND content_kind='lecture'` | **3** |
-| 서비스별 published 강의 | kpa-society 5 / k-cosmetics 0 / glycopharm 0 / neture 0 / pharmacy-hub 0 |
+| 서비스별 published 강의 | kpa-society 5 / k-cosmetics 0 0 / neture 0 / pharmacy-hub 0 |
 
-**KPA 강의가 KCos·GP 에 보인 이유 확정**: 데이터 오염이 아니다. K-Cosmetics ·
-GlycoPharm 자체 강의는 0건이고, 목록 쿼리에 service 조건이 없어 KPA 의 public+published
+**KPA 강의가 KCos 에 보인 이유 확정**: 데이터 오염이 아니다. K-Cosmetics
 강의 **3건이 그대로 노출**된 것이다. 수정 후 두 서비스의 정상 결과는 **빈 목록**이다.
 
 > 실측 결과 `service_key IS NULL` 이 0 이므로 legacy fallback 규칙은 현재 영향 row 0건이다.
@@ -147,7 +142,7 @@ GlycoPharm 자체 강의는 0건이고, 목록 쿼리에 service 조건이 없�
 ## 9. 잔여 리스크 (미해결, 의도적 보류)
 
 1. **cross-service 수강 신청** — `POST /lms/courses/:courseId/enroll` 은 generic route 라
-   서비스 컨텍스트가 없다. K-Cosmetics · GlycoPharm 화면에서 courseId 를 직접 아는 경우
+   서비스 컨텍스트가 없다. K-Cosmetics 화면에서 courseId 를 직접 아는 경우
    타 서비스 강의 수강이 여전히 가능하다. 목록·상세·레슨에서 courseId 를 얻는 경로는
    이번 수정으로 막혔으나, write path 자체의 경계는 **수강/권한 정책 재설계(§12 제외 범위)**
    가 필요해 보류한다.
@@ -168,8 +163,7 @@ GlycoPharm 자체 강의는 0건이고, 목록 쿼리에 service 조건이 없�
 
 **프런트 (client 추상화 계층, §8)**
 - `packages/lms-client/src/index.ts` — `createLmsLearnerClient(http, { serviceKey })` 옵션. 미전달 시 종전 동작 동일
-- `services/web-glycopharm/src/api/lms.ts` · `services/web-k-cosmetics/src/api/lms.ts` — canonical key 주입
-- `services/web-glycopharm/src/pages/operator/LmsCoursesPage.tsx` — 직접 URL → `lmsApi.operatorGetCourses`
+- `services/web-k-cosmetics/src/api/lms.ts` — canonical key 주입
 
 **테스트**
 - `apps/api-server/src/__tests__/lms-public-course-service-scope.spec.ts` (**신규**, 20 케이스)
@@ -187,8 +181,8 @@ GlycoPharm 자체 강의는 0건이고, 목록 쿼리에 service 조건이 없�
 | status 필터 · 검색 · 페이지네이션 보존 | PASS |
 | parameter binding (interpolation 금지) | PASS |
 | api-server 전체 회귀 | **132 suites / 2114 tests PASS** |
-| typecheck | api-server · glycopharm · k-cosmetics · kpa-society **PASS** |
-| build | `@o4o/lms-client` · `glycopharm-web` · `@o4o/web-k-cosmetics` **PASS** |
+| typecheck | api-server · k-cosmetics · kpa-society **PASS** |
+| build | `@o4o/lms-client` · `@o4o/web-k-cosmetics` **PASS** |
 
 ---
 
@@ -204,7 +198,7 @@ GlycoPharm 자체 강의는 0건이고, 목록 쿼리에 service 조건이 없�
 |---|---|---|
 | 0 | (배포 전 baseline) generic `?status=published` | KPA 강의 3건 노출 — **결함 재현 확인** |
 | 1 | generic `?serviceKey=k-cosmetics` | `data: []`, total 0 |
-| 2 | generic `?serviceKey=glycopharm` | `data: []`, total 0 |
+| 2 | — | `data: []`, total 0 |
 | 3 | `/api/v1/kpa/lms/courses?status=published` | 3건, serviceKey 전량 `kpa-society` |
 | 4 | generic `?serviceKey=no-such-service` | **400** `{"code":"INVALID_SERVICE_KEY"}` |
 | 5 | generic serviceKey 미전달 | 3건 (무경계 유지 — legacy/admin 호환 계약대로) |
@@ -218,7 +212,6 @@ GlycoPharm 자체 강의는 0건이고, 목록 쿼리에 service 조건이 없�
 | KPA 강의 상세 | 200 · 레슨 목록 200 · 정상 렌더 |
 | KPA 레슨 화면 | 정상 렌더. 비로그인 시 `401 → "Authentication required"` 안내 (기존 인증 계약, 백지 아님) |
 | `k-cosmetics.site/lms` | HTTP 200 · 호출 URL 에 **`serviceKey=k-cosmetics` 포함** · 0건 · "등록된 강의가 없습니다" 빈 상태 · console error 0 |
-| `glycopharm.co.kr/lms` | HTTP 200 · 호출 URL 에 **`serviceKey=glycopharm` 포함** · 0건 · 빈 상태 정상 · console error 0 |
 
 **§11 완료 조건**: 백지 화면 **0** / LMS 관련 404·500 **0** / 빈 상태 정상 표시 **확인** /
 cross-service 혼입 **0**.

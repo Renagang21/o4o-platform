@@ -4,7 +4,7 @@
  * WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §4 (#97) · §6 (#24)
  *
  * backend = 공통 `/api/v1/surveys` (WO-O4O-SURVEY-CORE-PHASE1-V1).
- * 신규 table·endpoint·migration 0 — KPA/GlycoPharm/K-Cosmetics 와 **같은 계약**이며
+ * 신규 table·endpoint·migration 0 — KPA/K-Cosmetics 와 **같은 계약**이며
  * 서비스 경계는 `serviceKey='pharmacy-hub'` 로만 건다(목록 질의에 항상 주입한다).
  * 생성 시 `ownerType='service_operator'` · `visibility='members_only'` 기본값도
  * 3서비스와 동일하다 — PH 전용 분기 없음.

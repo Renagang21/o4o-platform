@@ -43,7 +43,7 @@
 |---|---|
 | api-server | ✅ PASS |
 | web-kpa-society | ✅ PASS |
-| (kiosk-core 미변경 → KCos/GP 무영향; ForcedContentPage는 서비스별 별도 파일) | — |
+| (kiosk-core 미변경 → KCos 무영향; ForcedContentPage는 서비스별 별도 파일) | — |
 
 ### 7.2 API/브라우저 E2E (2026-07-03, 배포+마이그레이션 CI/CD success)
 
@@ -70,4 +70,4 @@
 기존 사이니지 forced content CRUD, 매장 사이니지 playlist, 태블릿 코너 idle/YouTube/자동복귀, 개인정보/상담/주문 미노출.
 
 ## 8. 미착수
-per-tablet 고유 URL/비밀키, 다중 공통 영상 playlist(태블릿당 1개 고정), operator 영상 인코딩/스트리밍, GP/KCos 확장(KPA 스코프 serviceKey='kpa-society').
+per-tablet 고유 URL/비밀키, 다중 공통 영상 playlist(태블릿당 1개 고정), operator 영상 인코딩/스트리밍, KCos 확장(KPA 스코프 serviceKey='kpa-society').

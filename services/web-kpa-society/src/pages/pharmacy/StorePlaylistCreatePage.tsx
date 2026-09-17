@@ -7,7 +7,7 @@
  *   - 항목(미디어)은 생성 후 목록/상세에서 HUB 복사로 추가한다.
  *
  * WO-O4O-MY-STORE-REMAINING-FEATURE-VIEW-COMMONIZATION-V1 §5-A:
- *   KPA/KCos/GP 3벌이 복제하던 화면 껍데기(뒤로가기·제목·부제)를 공통 StorePlaylistCreateView 로 이관.
+ *   KPA/KCos 2벌이 복제하던 화면 껍데기(뒤로가기·제목·부제)를 공통 StorePlaylistCreateView 로 이관.
  *   저장 API·목록 경로·accent 색만 주입한다. 동작·문구 변경 없음.
  *
  * ⚠️ KEEP-LEGACY (docs/baseline/O4O-SIGNAGE-STORE-PLAYLIST-MODEL-BOUNDARY-V1.md):

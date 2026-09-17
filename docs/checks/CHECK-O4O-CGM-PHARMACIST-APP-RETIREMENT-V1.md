@@ -62,14 +62,13 @@
 
 | 항목 | 판정 | 이유 |
 |------|:---:|------|
-| GlycoPharm 도메인의 "CGM"(연속혈당측정기) — `services/web-glycopharm/**`, glycopharm 컨트롤러·엔티티 | **RETAIN** | **제품 카테고리 용어**이며 현행 운영 기능. 패키지 식별자 `cgm-pharmacist-app` 과 무관 |
 | `service-groups/index.ts` 의 `forbiddenKeys: ['pharmacy','cgm','lms','membership']` | **RETAIN** | 네비게이션 **메뉴 키 blocklist** 문자열. 패키지 참조 아님 |
 | `CGM_PROVIDER` 환경변수 — `.env.apiserver.example:75`, `deploy-cloudrun.sh:136`, `.github/workflows/deploy-api.yml:325` | **RETAIN (범위 외)** | 코드 소비처 **0건**. 배포 env 잔재이나 본 WO 범위(패키지·라우트·카탈로그·프런트) 밖 → 후속 정리 대상으로 기록 |
 | `packages/pharmacy-ai-insight` 및 그 `src/backend/utils/glucoseUtils.ts` | **RETAIN** | admin `/pharmacy-ai-insight` 라우트 **LIVE**. 의존 방향은 `cgm-pharmacist-app → pharmacy-ai-insight` (optional) 이며 **역방향 아님** → 삭제 영향 없음 |
 | `20260600000000-DropGlucoseviewAndCgmTables` 등 glucoseview 마이그레이션 | **RETAIN** | 실행 이력. 삭제 금지 |
 | `glucoseview` service key | **범위 외** | 사용자 지정 후속 WO `WO-O4O-GLUCOSEVIEW-SERVICE-KEY-RETIREMENT-V1` |
 | 일반 health check (`/health`, `/health/detailed`, `/health/database`) | **미접촉** | 본 WO 무관 |
-| HFF · GlycoPharm 현행 기능 | **미접촉** | 원칙 준수 |
+| HFF 현행 기능 | **미접촉** | 원칙 준수 |
 | 병렬 세션 WIP (`apps/api-server/src/scripts/hff-zh-*`, `src/scripts/data/hff-zh-b04-*`) | **미접촉** | 커밋 pathspec 명시로 제외 |
 
 ---
@@ -123,7 +122,7 @@
 |------|------|
 | `o4o-core-api` | **없음** — api-server `src/**` 무변경 (삭제된 스텁은 workspace 밖) |
 | admin-dashboard | 번들에서 CGM 청크 소멸. 도달 불가 라우트만 제거되어 **사용자 노출 기능 변화 0** |
-| `neture-web` / `glycopharm-web` / `k-cosmetics-web` / `kpa-society-web` | **없음** — 참조 0 |
+| `neture-web` / `k-cosmetics-web` / `kpa-society-web` | **없음** — 참조 0 |
 | DB | **없음** |
 
 ---
@@ -134,7 +133,7 @@
 |------|:---:|
 | 신규 대체 기능 생성 금지 | ✅ |
 | DB write · migration 0 | ✅ |
-| health check / HFF / GlycoPharm 현행 기능 미접촉 | ✅ |
+| health check / HFF 현행 기능 미접촉 | ✅ |
 | 병렬 세션 WIP 미접촉 | ✅ (명시 pathspec 커밋) |
 | 삭제 후 package·route·menu·manifest 실참조 0 | ✅ (§4) |
 

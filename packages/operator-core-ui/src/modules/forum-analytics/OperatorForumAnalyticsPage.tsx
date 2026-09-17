@@ -3,7 +3,7 @@
  *
  * WO-O4O-CROSSSERVICE-OPERATOR-FORUM-ANALYTICS-COMMONIZE-V1
  *
- * KPI 카드 + 일별 트렌드 + 최근 활동. KPA/GlycoPharm/K-Cosmetics 공통.
+ * KPI 카드 + 일별 트렌드 + 최근 활동. KPA/K-Cosmetics 공통.
  * 기존 3서비스 페이지의 구조/지표/데이터 접근을 그대로 보존하고, 서비스 차이(accent, API)만 props 로 주입.
  * mutation 없음 — 운영자가 지표를 조회하는 화면.
  *

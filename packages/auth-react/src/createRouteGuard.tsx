@@ -3,7 +3,7 @@
  *
  * WO-O4O-FRONTEND-AUTH-CONTEXT-AND-ROUTE-GUARD-COMMONIZATION-V1
  *
- * KPA·Neture·K-Cosmetics·GlycoPharm 의 일반 RoleGuard 는 판정 순서가 **동일**했다:
+ * KPA·Neture·K-Cosmetics 의 일반 RoleGuard 는 판정 순서가 **동일**했다:
  *
  *   1) isLoading            → 로딩 표시
  *   2) !isAuthenticated     → Navigate(fallback, state.from)   ← 로그인 후 복귀 경로 보존
@@ -16,7 +16,7 @@
  *   - MembershipGate 컴포넌트 (이번 WO 에서 통합하지 않는다 — 주입만)
  *   - redirectMap (Neture 전용: 역할별 선행 리다이렉트)
  *
- * KPA 전용 Guard(PharmacyGuard/HubGuard 등)와 GlycoPharm 전용 Guard 는 이 WO 범위 밖이며
+ * KPA 전용 Guard(PharmacyGuard/HubGuard 등)는 이 WO 범위 밖이며
  * 여기서 대체하지 않는다.
  */
 

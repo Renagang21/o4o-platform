@@ -66,9 +66,8 @@ export type NetureRole =
 /**
  * 서비스 접두사 없는 legacy bare roles.
  *
- * WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1:
- *   과거 GlycoPharm 경계 안에 잘못 등록돼 있던 공용 역할이다.
- *   `glycopharm:*` 접두 역할은 서비스 삭제와 함께 제거했으나, 아래 bare role 은
+ *   과거 특정 서비스 경계 안에 잘못 등록돼 있던 공용 역할이다.
+ *   서비스 접두 역할은 서비스 삭제와 함께 제거했으나, 아래 bare role 은
  *   Neture(supplier)·플랫폼 전반이 실제 보유 중이므로 유지한다.
  *   ('partner' bare role 은 WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1 로 은퇴 — 보유자 0)
  */
@@ -366,8 +365,7 @@ export const ROLE_REGISTRY: Record<PrefixedRole, RoleMetadata> = {
     deprecated: false
   },
 
-  // GlycoPharm roles — REMOVED (WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1)
-  //   아래 bare role 은 GlycoPharm 전용이 아니라 플랫폼 공용이므로 유지한다.
+  //   아래 bare role 은 플랫폼 공용이므로 유지한다.
   'pharmacy': {
     role: 'pharmacy',
     label: '약국',

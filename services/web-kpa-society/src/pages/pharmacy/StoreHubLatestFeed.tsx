@@ -13,7 +13,7 @@
  * 최신 디지털 자료(POP/QR/동영상/사이니지)를 미리보기로 안내한다.
  * - 복사·신청·가져오기 mutation 없음(미리보기만). 각 항목/섹션은 기존 HUB 하위 목록으로 이동.
  * - 섹션별 독립 로딩/빈/부분오류 — 한 소스 실패가 전체 페이지로 전파되지 않는다.
- * - StoreHubTemplate.renderMainSections 슬롯으로 주입(KPA opt-in, GP/KCos 무영향).
+ * - StoreHubTemplate.renderMainSections 슬롯으로 주입(KPA opt-in, KCos 무영향).
  */
 
 import { useCallback, useEffect, useMemo, useState, type CSSProperties, type ReactNode } from 'react';

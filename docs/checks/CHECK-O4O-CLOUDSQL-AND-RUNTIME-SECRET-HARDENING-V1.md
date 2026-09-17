@@ -40,7 +40,6 @@ connectionName `netureyoutube:asia-northeast3:o4o-platform-db`
 | service | cloudsql-instances | DB env | production critical |
 |---|---|---|---|
 | glucoseview-web | 없음 | 없음 | no (DB 미접속) |
-| glycopharm-web | 없음 | 없음 | no |
 | k-cosmetics-web | 없음 | 없음 | no |
 | kpa-branch-web | 없음 | 없음 | no |
 | kpa-society-web | 없음 | 없음 | no |
@@ -173,7 +172,6 @@ GitHub secret `GCP_DB_PASSWORD` 는 이제 미사용이 된다 (삭제는 별도
 | `/health` · `/health/database` · `/api/v1/auth/status` | 200 · healthy(pingMs 4) · 200 |
 
 → 이관이 **CI 배포 사이클을 통과해 지속됨**을 확인했다 (일회성 수동 변경 아님).
-
 
 ---
 

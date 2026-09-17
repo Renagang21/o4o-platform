@@ -6,7 +6,7 @@
  * GET /api/v1/cosmetics/stores/admin/applications (cosmetics:admin scope)
  *
  * WO-O4O-KCOS-OPERATOR-APPLICATIONS-URL-SYNC-MINIMAL-V1:
- *   GP 와 달리 backend array-only + client filter 구조 → STANDARD-LIST full adoption 비대상.
+ *   backend array-only + client filter 구조 → STANDARD-LIST full adoption 비대상.
  *   기존 client filter/카드/drawer 유지하고 statusFilter 만 URL query(applications_status)와 동기화.
  */
 

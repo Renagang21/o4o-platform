@@ -7,7 +7,6 @@
  * 판정 근거 (§6 — "제품 정책 + 실제 KPA capability" 기준)
  *
  *   KPA   : `contentRouter.post('/', authenticate, ...)`  (kpa.routes.ts)
- *   GP    : `router.post('/', authenticate, write.create)` (resources.controller.ts)
  *   KCos  : `router.post('/', authenticate, write.create)` (resources.controller.ts)
  *
  *   → 회원 콘텐츠 작성은 KPA 단독 특례가 아니라 **3개 원장 서비스 공통의 회원 capability**
@@ -20,14 +19,14 @@
  *   등록 기준은 선호가 아니라 **원장 결합(ledger binding)** 이라는 사실이다:
  *
  *     서비스        회원 콘텐츠 원장          이 파일 등록 여부
- *     KPA/GP/KCos   `{service}_contents`      ✗ (자기 원장에 이미 회원 write 보유)
+ *     KPA/KCos   `{service}_contents`      ✗ (자기 원장에 이미 회원 write 보유)
  *     PharmacyHub   공통 `cms_contents`       ✓ (원장이 공통이라 공통 경로에 필요)
  *
  *   즉 3서비스가 비어 있는 것은 권한 차별이 아니라 **원장이 다르기 때문**이다.
  *   신규 table(`pharmacy_hub_contents`) 을 만들지 않는다는 §6 제약과 정확히 같은 결론이다.
  *
  *   기본값이 없으므로(등록되지 않은 serviceKey 는 null) **기존 서비스의 CMS write 정책
- *   변화는 0** 이다 — KPA/GP/KCos/Neture 의 cms_contents 는 종전대로 operator/admin 전용.
+ *   변화는 0** 이다 — KPA/KCos/Neture 의 cms_contents 는 종전대로 operator/admin 전용.
  *
  * ─────────────────────────────────────────────────────────────────────────────
  * type 축
@@ -51,7 +50,7 @@ export interface CmsMemberAuthoringCapability {
   /** 회원이 만들 수 있는 `cms_contents.type` 화이트리스트. 그 외 type 은 회원 경로로 생성 불가. */
   readonly types: readonly string[];
   /**
-   * 원장 안의 하위 축. KPA/GP/KCos 원장의 `sub_type` 컬럼과 **같은 의미**다
+   * 원장 안의 하위 축. KPA/KCos 원장의 `sub_type` 컬럼과 **같은 의미**다
    *   'content'  → 커뮤니티 콘텐츠 (`/content`)
    *   'resource' → 자료실 (`/resources`)
    * `cms_contents` 에는 컬럼이 없으므로 기존 `metadata` jsonb 안에 둔다 — schema/migration 0.

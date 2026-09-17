@@ -11,7 +11,7 @@
   - `apps/api-server/src/routes/kpa` (KpaMember / KpaPharmacyRequest / KpaApprovalRequest / pharmacy-request 컨트롤러)
   - `apps/api-server/src/services/approval` (MembershipApprovalService)
 - 범위 제약
-  - **KPA-Society 만 1차 정리**. GlycoPharm / Neture / K-Cosmetics 공통화 여부는 Phase 3 별도 검토.
+  - **KPA-Society 만 1차 정리**. Neture / K-Cosmetics 공통화 여부는 Phase 3 별도 검토.
   - schema migration / auth rewrite / audience system 도입 / forum membership 개편 모두 **본 IR 범위 외**.
 
 ---
@@ -376,15 +376,15 @@ capability 변경 (신청 + 승인):
 
 ## 11. 이후 공통화(Phase 3) 가능 영역 — 사전 평가
 
-> **GlycoPharm / Neture / K-Cosmetics 공통화는 본 IR 범위 외**. 단, 향후 평가에 사용할 수 있는 사전 단서 정리.
+> 단, 향후 평가에 사용할 수 있는 사전 단서 정리.
 
 | 영역 | 공통화 가능성 | 근거 |
 |---|---|---|
-| **profile metadata 구조** | 낮음 | 각 서비스마다 활동유형이 다름 (KPA: 약사 11종 / GlycoPharm: 환자/약사 / Neture: 공급자/판매자). 공유 base table + 서비스별 extension 패턴 필요 |
-| **capability(role_assignments) SSOT** | 높음 | 이미 `role_assignments` 가 4개 서비스 공통 사용. role 키만 서비스별 prefix (`kpa:` / `glyco:` / `cosmetics:`) |
+| **profile metadata 구조** | 낮음 | 각 서비스마다 활동유형이 다름 (KPA: 약사 11종: 환자/약사 / Neture: 공급자/판매자). 공유 base table + 서비스별 extension 패턴 필요 |
+| **capability(role_assignments) SSOT** | 높음 | 이미 `role_assignments` 가 3개 서비스 공통 사용. role 키만 서비스별 prefix (`kpa:` / `cosmetics:`) |
 | **승인(approval) 엔진** | 중간 | `kpa_approval_requests` 패턴은 generic 하지만 entity_type 별 sideeffect 가 서비스 종속. 추상화 가능 |
 | **Store/HUB capability** | 높음 | `useStoreCapabilities` + `StoreDashboardConfig` 가 이미 4개 서비스 공통 (`packages/store-ui-core`) |
-| **PharmacyGuard 패턴** | 낮음 | KPA 도메인 특화 ("약국 신청 → 승인 → 매장 경영자 role"). 다른 서비스는 다른 도메인 흐름 (예: GlycoPharm 환자 vs 약사). 패턴은 같으나 구체화는 서비스별 |
+| **PharmacyGuard 패턴** | 낮음 | KPA 도메인 특화 ("약국 신청 → 승인 → 매장 경영자 role"). 다른 서비스는 다른 도메인 흐름 패턴은 같으나 구체화는 서비스별 |
 
 → Phase 3 권장: **`role_assignments` SSOT 와 `kpa_approval_requests` 패턴은 우선 공통화**, profile / Guard 는 서비스별 유지.
 

@@ -104,7 +104,7 @@ UI 비노출은 **모듈/컴포넌트 단위 플래그 `SHOW_MARKET_TRIAL_COMMER
 DB migration / schema drop — 없음
 DTO/API 계약 대규모 정리 — 없음 (P2)
 참여 신청·콘텐츠 작성·게시 승인·참여자 목록 — 유지
-KPA/GP/KCos store 작업 — 없음
+KPA/KCos store 작업 — 없음
 다른 세션 WIP(ProductForm/supplier.ts/ProductDetailDrawer) — 미접촉/미커밋
 package/lock/Dockerfile — 무변경
 ```

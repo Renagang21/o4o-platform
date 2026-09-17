@@ -222,7 +222,6 @@ const AuthBootstrapDebug: React.FC = () => {
 
       // Step 5: 후속 API 호출 테스트 (Cockpit APIs)
       const postLoginApis: string[] = [
-        // WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1: glycopharm cockpit probe 제거 (서비스 삭제).
       ];
 
       for (const apiPath of postLoginApis) {

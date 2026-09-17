@@ -5,7 +5,7 @@
  *
  * ## 배경
  *
- * KPA / GlycoPharm / K-Cosmetics 세 서비스가 **같은 의미의** 매장 buyer 주문 조회를
+ * KPA / K-Cosmetics 두 서비스가 **같은 의미의** 매장 buyer 주문 조회를
  * 각자 구현하고 있었다(DF-4: controller 3벌). 목록·상세의 ownership 필터와 serviceKey
  * 격리 조건은 동일한데 구현체가 달라(TypeORM QueryBuilder 2벌 + raw SQL 1벌)
  * 금액 타입·필드 이름·필터 지원이 서비스마다 갈라졌다(DF-1).

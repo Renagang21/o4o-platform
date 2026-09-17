@@ -211,12 +211,11 @@ pharmacy_request 가 매장 경영자 신청 단일 용도라 다른 용도(일�
 
 ---
 
-## 9. 다른 서비스(GlycoPharm / K-Cosmetics) 공통화 가능성 — 낮음
+## 9. 다른 서비스(K-Cosmetics) 공통화 가능성 — 낮음
 
 | 서비스 | activity_type 개념 | pharmacy_request 류 흐름 | store_owner role |
 |--------|:-----------------:|:----------------------:|:----------------:|
 | KPA-Society | ✅ 11종 | ✅ kpa_pharmacy_requests | `kpa:store_owner` |
-| GlycoPharm | ❌ 없음 | ❌ 없음 | `glycopharm:store_owner` (단순 부여) |
 | K-Cosmetics | ❌ 없음 | ❌ 없음 | `cosmetics:store_owner` (단순 부여) |
 
 다른 서비스는 "단순 판매자 권한" 1단계 모델. KPA-Society 는 "약사회 회원 + 매장 경영자" 2단계 검증 모델. **개념 자체가 다름** → 공통화 가치 없음.

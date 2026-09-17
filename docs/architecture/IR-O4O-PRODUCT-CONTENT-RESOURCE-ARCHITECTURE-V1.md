@@ -2,14 +2,14 @@
 
 Status: DRAFT (설계 확정용 IR) — **문서 작성 전용. 코드/DB/API/UI/Migration 변경 없음.**
 Date: 2026-07-08 (rev.2 — Description 중심 → Product Content Resource 중심 일반화)
-Scope: O4O 전체 서비스(KPA / GlycoPharm / K-Cosmetics / Neture 및 향후 서비스) 공통
+Scope: O4O 전체 서비스(KPA / K-Cosmetics / Neture 및 향후 서비스) 공통
 
 > 본 IR은 O4O `ProductMaster` 기반 **모든 콘텐츠(설명서·QR·POP·Tablet·Signage·Blog·Video·AI Voice)의 공통 구조** —
 > **Product Content Resource Architecture** — 를 확정하기 위한 기준 문서다.
 > 이번 작업은 **아키텍처 확정만** 수행하며, 구현(스키마·API·페이지)은 §14 후속 WO 로 분리한다.
 
 > **최상위 원칙 (Foundational Principle)**
-> **모든 Product Content Resource 는 O4O 의 공통 디지털 자산이며, 특정 서비스(KPA·GP·KCos 등)에 종속되지 않는다.**
+> **모든 Product Content Resource 는 O4O 의 공통 디지털 자산이며, 특정 서비스(KPA·KCos 등)에 종속되지 않는다.**
 > 콘텐츠는 `neture.co.kr` 의 공통 자산이고, 각 서비스는 그 자산을 **소비**한다.
 > 이 원칙은 앞으로 어떤 서비스가 추가되더라도 흔들리지 않는 기준이 된다.
 
@@ -140,7 +140,7 @@ Product Content Resource                     ← 1급 개념 (공통 디지털 �
 - **경계 명시**: 본 원칙은 **ProductMaster Resource 를 가리키는 QR**(→ `neture.co.kr/r/{id}`) 에 적용된다. 매장이 직접 저작한 콘텐츠에 대한 기존 KPA `store_execution_assets` 사본·QR 트랙(copy-on-import 불변식)은 **다른 트랙**이며 본 IR 이 즉시 대체·회수하지 않는다. 두 트랙의 통합 여부는 §12/§14 후속 판단.
 
 ### 4.6 서비스 독립성 (소유권) — 최상위 원칙의 구체화
-- Resource(설명서·POP·Video·…)는 **KPA·GP·KCos 소유가 아니다.** 모두 **`neture.co.kr` 기반 O4O 공통 Resource** 이며, 각 서비스는 이를 **소비**한다.
+- Resource(설명서·POP·Video·…)는 **KPA·KCos 소유가 아니다.** 모두 **`neture.co.kr` 기반 O4O 공통 Resource** 이며, 각 서비스는 이를 **소비**한다.
 - 정합: F4 HUB 3축(Producer/Visibility/ServiceScope) + F6 Broadcast(serviceKey 소비) 모델을 재사용한다. **새 소유·권한 축을 신설하지 않는다.**
 
 ---

@@ -16,7 +16,7 @@
 | 3 | 기존 B2B 기능(상품·장바구니·주문·결제) 회귀 0 | PASS |
 | 4 | dead link 0 · "준비 중" 메뉴 0 | PASS |
 | 5 | 권한 경계 정상 (미로그인·비매장·타서비스) | PASS |
-| 6 | KPA / GlycoPharm / K-Cosmetics 회귀 0 | PASS |
+| 6 | KPA / K-Cosmetics 회귀 0 | PASS |
 | 7 | 배포 + 프로덕션 브라우저 smoke | PASS |
 | 8 | CHECK 작성 · commit · push | PASS |
 
@@ -35,7 +35,7 @@ DB schema 변경 0 · migration 0 · backend 계약 변경 0 · 결제 실거래
 | `@o4o/ui` | (의존 체인 — store-ui-core 경유) | dist-mode 라 Docker 빌드 단계 추가 |
 | `@o4o/operator-ux-core` | (의존 체인 — store-ui-core 경유) | source-mode |
 
-**공통 패키지 변경은 전부 additive** — 기존 소비처(KPA / GlycoPharm / K-Cosmetics) 코드 경로 무변경:
+**공통 패키지 변경은 전부 additive** — 기존 소비처(KPA / K-Cosmetics) 코드 경로 무변경:
 
 | 파일 | 변경 |
 |---|---|
@@ -179,7 +179,7 @@ React Router v7 은 정적 세그먼트가 더 구체적인 `/store-owner/paymen
 
 대상: `https://pharmacyhub.co.kr` (Cloud Run `pharmacy-hub-web`)
 배포: `.github/workflows/deploy-web-services.yml` run `30961442024` — 커밋 `f39b34f4b`,
-6 job 전부 success (detect-changes / neture / kpa-society / k-cosmetics / pharmacy-hub / glycopharm).
+6 job 전부 success (detect-changes / neture / kpa-society / k-cosmetics / pharmacy-hub).
 
 브라우저: Playwright (실제 Chromium) — 데스크톱 1440×900 · 모바일 390×844.
 
@@ -210,7 +210,6 @@ React Router v7 은 정적 세그먼트가 더 구체적인 `/store-owner/paymen
 | 서비스 | 영향 | 근거 |
 |---|:---:|---|
 | KPA-Society | 0 | `KPA_SOCIETY_STORE_CONFIG` · `SERVICE_ROLES.kpa` 무변경. `SECTION_ICONS` 는 신규 키 추가만 |
-| GlycoPharm | 0 | `GLYCOPHARM_STORE_CONFIG` · `SERVICE_ROLES.glycopharm` 무변경 |
 | K-Cosmetics | 0 | `COSMETICS_STORE_CONFIG` · `SERVICE_ROLES.cosmetics` 무변경 |
 | Neture | 0 | store-ui-core 의 변경 지점 미소비 |
 

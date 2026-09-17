@@ -3,7 +3,7 @@
  *
  * WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §6
  *
- * KPA / GlycoPharm / K-Cosmetics 가 이미 소비하는 공통 `CommunityContentListTemplate` 을
+ * KPA / K-Cosmetics 가 이미 소비하는 공통 `CommunityContentListTemplate` 을
  * 그대로 채택한다 — PH 전용 목록 컴포넌트를 복제하지 않고, 공통 View 안에 serviceKey 분기를
  * 넣지도 않는다. wrapper 책임은 PH 고유 축(원장 adapter · 라우팅 · 문구)뿐이다.
  *

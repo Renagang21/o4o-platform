@@ -16,7 +16,7 @@
 | 질문 | 답 |
 |------|-----|
 | `LmsHubTemplate` 은 무엇인가? | **shared-space-ui 의 LMS 전용 container 템플릿** — 상태/검색/페이지네이션/bulk-select 관리 + `config.fetchCourses` 주입 호출. **`@o4o/ui BaseTable` 기반 "테이블" 렌더**(카드 아님). |
-| 3서비스가 같은 `LmsHubTemplate` 을 쓰는가? | **GP=YES, KCos=YES, KPA=NO.** KPA `/lms` 는 자체 **raw `<table>`** `LmsCoursesPage`(768줄, store_owner 자료함 가져가기 포함). LmsHubTemplate 은 "KPA EducationPage 에서 추출"됐으나 KPA 본인은 미채택(분기). |
+| 3서비스가 같은 `LmsHubTemplate` 을 쓰는가? | LmsHubTemplate 은 "KPA EducationPage 에서 추출"됐으나 KPA 본인은 미채택(분기). |
 | CourseCard/List 와 역할이 겹치는가? | **부분 중복(개념만)·presentational 중복 아님.** LmsHubTemplate=container+**테이블**, CourseCard/List=presentational+**카드 그리드**. 둘 다 "강의 목록"이나 **표현(table vs card)이 다르다.** |
 | CourseCard/List 의 바람직한 위치? | **`@o4o/lms-ui` 에 유지하되 hub 흡수 안 함(판정 B).** 현재 3서비스 hub 가 전부 테이블이라 card grid 소비처가 없음 → **미래 card 맥락(featured/related/추천 강의)용 dormant primitive 로 유지·필요 시 specialize.** LmsHubTemplate(테이블)에 CourseCard(카드) 주입은 표현 불일치 + **Neture 경계 위반 위험**(아래). |
 | 다음 WO 1순위? | **목록 축 핵심 lever = `WO-O4O-LMS-KPA-COURSESPAGE-HUBTEMPLATE-ALIGNMENT-V1`**(KPA 자체 table → LmsHubTemplate 수렴, store_owner 기능은 renderRowActions/config 로). CourseCard/List 는 **`WO-O4O-LMS-COURSECARD-RETIRE-OR-SPECIALIZE-V1`(판정 B)**. |
@@ -43,19 +43,13 @@
 
 - KPA `/lms` → **`LmsCoursesPage`**(`pages/lms/LmsCoursesPage.tsx`, 768줄). **LmsHubTemplate 미사용.**
 - 자체 **raw `<table>`** 구현(`<table>`/`<thead>`/직접 styles). store_owner 전용 **자료함 가져가기(library import) 선택/체크박스** 로직 포함(`selectableIds`, `isStoreOwner`).
-- 즉 KPA 는 GP/KCos 와 **다른 별도 table 구현** — LmsHubTemplate 이 "KPA EducationPage 에서 추출"됐다는 주석과 달리 현재 KPA 본인은 미채택.
-
-## 6. GlycoPharm EducationPage 구조 (Q2-GP)
-
-- `services/web-glycopharm/src/pages/education/EducationPage.tsx` → `<LmsHubTemplate config={glycoConfig} />`.
-- config: serviceKey `glycopharm`, hero, `courseDetailPath: id => /lms/course/${id}`, `fetchCourses`(lmsApi.getCourses → mapCourse → LmsHubCourse). renderRowActions 미사용.
-- 완전 위임(페이지 = wrapper + config). accent 는 LmsHubTemplate 내부 고정 색(파랑 계열) — service accent 주입 경로 없음(테이블 링크/버튼 `#2563eb` 하드코딩).
+- 즉 KPA 는 KCos 와 **다른 별도 table 구현** — LmsHubTemplate 이 "KPA EducationPage 에서 추출"됐다는 주석과 달리 현재 KPA 본인은 미채택.
 
 ## 7. K-Cosmetics EducationPage 구조 (Q2-KCos)
 
 - `services/web-k-cosmetics/src/pages/lms/EducationPage.tsx` → `<LmsHubTemplate config={config} />`.
 - config: serviceKey `k-cosmetics`, hero, courseDetailPath, fetchCourses(status:'published'). renderRowActions 미구현(주석: 향후 KPA instructor 패턴 도입 시).
-- GP 와 동일 구조(완전 위임). KCos visibility 노출 약함은 LmsHubTemplate 컬럼(유형/상태)에 visibility 미표시인 것과 연결 — 별도 후속.
+- KCos visibility 노출 약함은 LmsHubTemplate 컬럼(유형/상태)에 visibility 미표시인 것과 연결 — 별도 후속.
 
 ## 8. @o4o/lms-ui CourseCard/List 현황 (Q3 자료)
 
@@ -72,7 +66,7 @@
 | 성격 | container(상태·fetch·검색·페이지) | presentational(데이터·콜백 주입) |
 | 표현 | **테이블**(BaseTable) | **카드 그리드** |
 | API | config.fetchCourses 주입 | 없음 |
-| 현재 소비 | GP·KCos `/lms` hub | 없음(dormant) |
+| 현재 소비 | KCos `/lms` hub | 없음(dormant) |
 | 의존 | @o4o/ui | react only |
 
 - **중복 판정: 부분 중복(개념: 둘 다 강의 목록) · presentational 중복 아님(table vs card).** 직접 대체/흡수 관계 아님.
@@ -100,8 +94,8 @@
 | R2 | **shared-space-ui → lms-ui import 시 Neture transitive 소비**(LMS 제외 위반 + Dockerfile 깨짐) | option A 비권장(§10). 결합 회피 |
 | R3 | lms-ui → shared-space-ui import 시 순환 의존 | 금지 |
 | R4 | CourseCard 적용하며 기존 LmsHubTemplate(테이블) UX 깨짐 | hub 는 테이블 유지, 카드는 별도 맥락 |
-| R5 | KPA/GP/KCos route/href 차이가 card primitive 에 새어듦 | hrefFor 주입 유지(현 설계 OK) |
-| R6 | visibility/isPaid 없는 서비스(GP/KCos)에 KPA badge/notice 억지 주입 | 데이터 있는 서비스만(현 정책 유지) |
+| R5 | KPA/KCos route/href 차이가 card primitive 에 새어듦 | hrefFor 주입 유지(현 설계 OK) |
+| R6 | visibility/isPaid 없는 서비스(KCos)에 KPA badge/notice 억지 주입 | 데이터 있는 서비스만(현 정책 유지) |
 | R7 | KPA 자체 table 과 LmsHubTemplate 분기 지속 → 목록 hub 3중 유지보수 | **KPA→LmsHubTemplate 수렴 WO(권장 1순위)** |
 | R8 | reward/결제/YouTube 정책이 목록 UI 에 재유입 | 목록 컴포넌트는 presentational, 정책 미포함 |
 
@@ -136,7 +130,7 @@
 - [x] 문서 1개만 생성 (`docs/investigations/IR-O4O-LMS-COURSE-HUB-CARD-ALIGNMENT-V1.md`)
 - [x] 코드/package.json/pnpm-lock/Dockerfile/backend/Neture 변경 없음 (read-only)
 - [x] LmsHubTemplate 위치·역할(container·테이블·config·@o4o/ui 의존) 확인 (§4)
-- [x] Q2 3서비스 사용 매트릭스 — GP/KCos=LmsHubTemplate, KPA=자체 table (§5-7)
+- [x] Q2 2서비스 사용 매트릭스 — KCos=LmsHubTemplate, KPA=자체 table (§5-7)
 - [x] CourseCard/List 현황(presentational 카드·dormant) (§8)
 - [x] 역할 중복/경계(table vs card, 부분 중복·presentational 중복 아님) (§9)
 - [x] dependency/Dockerfile + Neture transitive 위험(option A 차단 근거) (§10·§11)

@@ -136,7 +136,7 @@ supplier_product_offers 전체 2건
 
 | 엔드포인트 | 가드 |
 |---|---|
-| `GET /operator/products/:productId/suppliers` | `authenticate` → `requireRole([platform:admin, platform:super_admin, neture:*, glycopharm:*, cosmetics:*, kpa:*])` → `injectServiceScope` |
+| `GET /operator/products/:productId/suppliers` | `authenticate` → `requireRole` → `injectServiceScope` |
 | `GET /neture/operator/product-cleanup/*` | `requireAuth` → `requireNetureScope('neture:operator')` |
 
 미인증 401 / 권한 없음 403 은 이 가드가 그대로 담당한다 — 이번 변경은 가드 코드를 건드리지 않았다.

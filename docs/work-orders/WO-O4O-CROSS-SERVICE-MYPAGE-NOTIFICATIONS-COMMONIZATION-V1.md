@@ -36,7 +36,6 @@ My Page의 다음 개별 기능인 **Notifications / 알림**을 5서비스 기�
 
 ```text
 KPA-Society
-GlycoPharm
 K-Cosmetics
 Neture
 Pharmacy-Hub
@@ -389,13 +388,6 @@ push
 약사회 업무
 ```
 
-### GlycoPharm
-
-```text
-신청/교육
-서비스 상태
-```
-
 ### K-Cosmetics
 
 ```text
@@ -538,7 +530,6 @@ backend DB 직접 write
 
 ```text
 KPA
-GP
 KCos
 Neture
 PH
@@ -677,7 +668,6 @@ membership lifecycle 변경
 @o4o/account-ui build
 
 KPA typecheck/build
-GP typecheck/build
 KCos typecheck/build
 Neture typecheck/build
 PH typecheck/build
@@ -873,7 +863,6 @@ packages/account-ui/src/notifications/types.ts            ← 타입
 
 ```text
 services/web-kpa-society/src/api/notifications.ts
-services/web-glycopharm/src/lib/api/notifications.ts
 services/web-k-cosmetics/src/lib/api/notifications.ts
 services/web-neture/src/lib/api/notifications.ts
 services/web-pharmacy-hub/src/lib/api/notifications.ts
@@ -926,7 +915,6 @@ docs/archive/investigations/IR-O4O-CROSSSERVICE-NOTIFICATION-EMISSION-AUDIT-V1.m
 공통 컴포넌트 커밋 전 실행하고, 매칭이 주석 외에 남으면 §9·§12 위반이다.
 
 ```bash
-grep -nE "serviceKey|kpa|glycopharm|cosmetics|neture|pharmacy|type ===|'/mypage|'/forum" \
   packages/account-ui/src/<새-또는-변경-파일>
 ```
 

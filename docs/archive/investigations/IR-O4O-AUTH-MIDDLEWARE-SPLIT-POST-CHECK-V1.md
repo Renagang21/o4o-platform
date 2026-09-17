@@ -77,7 +77,6 @@
 
 | 파일 | Import 패턴 | 결과 |
 |------|------------|:----:|
-| glycopharm.routes.ts | `requireAuth as alias, authenticate, optionalAuth` | ✅ |
 | auth.routes.ts | `requireAuth, optionalAuth` (common 경로) | ✅ |
 | forum.routes.ts | `authenticate, optionalAuth` | ✅ |
 | user.controller.ts | `import type { AuthRequest }` | ✅ |

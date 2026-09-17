@@ -73,13 +73,13 @@
 |------|-----------|:---:|------|:---:|:---:|
 | `sohae2100` | `3Lz157727791!` (doc) | 200 | — | ✅ | ❌ (admin/operator/super_admin 보유) |
 | `renagang21` | `seochuran1!` (**doc**) | **401** | INVALID_CREDENTIALS | — | — |
-| `renagang21` | `3Lz157727791!` (**사용자 제시**) | **200** | — | ✅ | ❌ (`kpa:store_owner`·`glycopharm:store_owner`만) |
+| `renagang21` | `3Lz157727791!` (**사용자 제시**) | **200** | — | ✅ | ❌ |
 
 ### 4.1 사용자 지적 검증
 
 - ✅ **적중**: `renagang21` 실제 비밀번호는 `3Lz157727791!`. **문서의 `seochuran1!` 는 오기** → 정정함.
 - ✅ **적중**: `renagang21` 은 K-Cosmetics **회원**이다 (membership 존재). 로그인 실패는 비번 문제였지 미가입이 아님.
-- ❗ **정정**: 단, `renagang21` 은 `cosmetics:store_owner` role 을 **보유하지 않는다** (KPA/GlycoPharm store_owner 일 뿐). 따라서 "각 서비스 store_owner" 가 K-Cosmetics 에는 해당하지 않음.
+- ❗ **정정**: 단, `renagang21` 은 `cosmetics:store_owner` role 을 **보유하지 않는다** (KPA store_owner 일 뿐). 따라서 "각 서비스 store_owner" 가 K-Cosmetics 에는 해당하지 않음.
 
 ### 4.2 serviceKey 오판 여부
 

@@ -2,7 +2,7 @@
 
 > **Status:** Investigation Report (조사 전용) — 구현 금지
 > **Date:** 2026-05-28
-> **Scope:** KPA-Society / GlycoPharm / K-Cosmetics MyRequestsInbox cross-service 적용 가능성 조사
+> **Scope:** KPA-Society / K-Cosmetics MyRequestsInbox cross-service 적용 가능성 조사
 > **Predecessor:** IR-O4O-MYPAGE-PROFILE-UI-CANONICAL-COMMONIZATION-V1 (Phase 0~3 완료)
 
 ---
@@ -11,21 +11,20 @@
 
 ### 1-1. 핵심 질문 답변
 
-> KPA의 통합 inbox를 그대로 복사할 수 있는가? GlycoPharm/K-Cos의 흩어진 신청 상태를 같은 사용자 경험으로 모을 수 있는가?
+> KPA의 통합 inbox를 그대로 복사할 수 있는가? K-Cos의 흩어진 신청 상태를 같은 사용자 경험으로 모을 수 있는가?
 
 **부분적으로 가능. 단, 3개 서비스 모두 Backend foundation 추가가 필요하다.**
 
 | 결론 | 상세 |
 |---|---|
 | **KPA 의 통합 inbox 패턴 = canonical** | `kpa_approval_requests` 테이블 + 도메인 polymorphism (`payload` JSONB) + `entity_type` discriminator. 4종 entity (forum_category, course, instructor_qualification, membership). + `forum_category_requests` legacy cross-service table 도 클라이언트 merge. |
-| **Glyco — 분산 3소스, KPA inbox 직접 적용 불가** | Forum requests (공통 API), `glycopharm_applications` (서비스 신청), `lms_enrollments` (LMS) — 3 endpoint 분산. 약사 membership 은 frontend 페이지 자체 부재. **status enum 4종 다름**. |
 | **K-Cos — 분산 + 추가 gap** | Forum requests (공통 API), `lms_enrollments`, `cosmetics_store_applications` (backend 있으나 frontend 없음), partner application (form-only). **Store application UX gap + Partner application status 조회 endpoint 없음**. |
-| **Common shape 추출 가능** | KPA `UnifiedRequestItem` 이 이미 cross-service 적용 가능한 형태. 다만 status enum 매핑 필요 (Glyco `submitted` ↔ KPA `pending`, K-Cos `draft` 등). |
+| **Common shape 추출 가능** | KPA `UnifiedRequestItem` 이 이미 cross-service 적용 가능한 형태. 다만 status enum 매핑 필요 |
 
 ### 1-2. 권고 결론
 
 - **`@o4o/account-ui/MyRequestsInbox` 추출 가능** — 표시·필터·정렬 로직은 KPA MyRequestsPage 가 그대로 모델.
-- **3 서비스 모두 backend endpoint 보강 필요** (Glyco 약사 membership 페이지 부재 / K-Cos store application·partner application 상태 조회 부재).
+- **3 서비스 모두 backend endpoint 보강 필요**
 - **Status enum 정규화 — 정책 결정 필요** (canonical: `pending / approved / rejected / revision_requested / cancelled`).
 - **권장 진행 순서**: ① Component 추출 → ② 각 서비스 adapter 구현 → ③ backend gap 별도 WO 분리.
 
@@ -91,23 +90,6 @@ interface UnifiedRequestItem {
 
 ---
 
-## 3. GlycoPharm 신청 상태 경로 Matrix
-
-| 신청 유형 | 현재 route | API | 응답 shape | 상태 enum | inbox 매핑 |
-|---|---|---|---|---|---|
-| Forum category 생성 | `/forum/my-requests` | `GET /forum/category-requests/my?serviceCode=glycopharm` | `CategoryRequest` (id, name, status, reviewComment) | `pending, revision_requested, approved, rejected` | ✅ (KPA 와 동일 endpoint) |
-| 약국 경영자 service 신청 (드롭쉽 / 사인니지) | `/apply/my-applications` | `GET /api/v1/glycopharm/applications/mine` | `GlycopharmApplication` (id, organizationType, serviceTypes, status, rejectionReason) | `submitted, approved, rejected` | ⚠️ status enum 매핑 (submitted → pending) |
-| LMS Course Enrollment | `/mypage/enrollments` | `GET /api/v1/lms/enrollments/me` | `LmsEnrollment` (id, courseId, status, progress) | `pending, in_progress, completed, cancelled, expired` | ⚠️ status enum 매핑 + entity_type 부재 |
-| 약사 membership | ❌ **frontend 없음** | `GET /api/v1/glycopharm/members/me` | `GlycopharmMemberRecord` (status, approvedBy) | `pending, approved, rejected, suspended` | ❌ 페이지 부재 |
-| Instructor qualification | ❌ 없음 | ❌ 없음 | N/A | N/A | ❌ 시스템 부재 |
-
-### 3-1. Drift signals
-- ⚠️ `MyApplicationsPage` 가 MyPageHub / Header 어디에도 link 없음 (orphaned)
-- ⚠️ 약사 membership backend 는 있으나 사용자가 본인 상태 확인할 수 있는 frontend 없음
-- ✅ Forum + LMS 는 공통 endpoint 사용 — 즉시 inbox 적용 가능
-
----
-
 ## 4. K-Cosmetics 신청 상태 경로 Matrix
 
 | 신청 유형 | 현재 route | API | 응답 shape | 상태 enum | inbox 매핑 |
@@ -140,10 +122,7 @@ type MyRequestEntityType =
   | 'forum_category'
   | 'forum_delete'           // K-Cos: category.metadata 에서 추출
   | 'course'                 // KPA
-  | 'course_enrollment'      // Glyco/K-Cos LMS
   | 'instructor_qualification'
-  | 'membership'             // KPA / Glyco 약사 membership
-  | 'service_application'    // Glyco 약국 경영자 service
   | 'store_application'      // K-Cos 매장 신청
   | 'partner_application'    // Neture-Cos partner
   | 'other';
@@ -173,7 +152,6 @@ interface MyRequestItem {
   createdAt: string;
   updatedAt: string;
   href?: string;             // result detail link (approved 상태에서)
-  serviceKey?: string;       // 'kpa-society' / 'glycopharm' / 'k-cosmetics'
   payload?: Record<string, unknown>;
 }
 ```
@@ -182,12 +160,10 @@ interface MyRequestItem {
 
 | 서비스 / source | 원 status | canonical |
 |---|---|---|
-| Glyco application | `submitted` | `pending` |
 | LMS enrollment | `in_progress` | (그대로 — display 만 진행 중) |
 | LMS enrollment | `expired` | `cancelled` |
 | K-Cos store application | `draft` | (필터 제외 가능) |
 | K-Cos store application | `submitted` | `pending` |
-| Glyco membership | `suspended` | `revoked` |
 
 ---
 
@@ -196,17 +172,12 @@ interface MyRequestItem {
 | 서비스 | 신청 유형 | Case | 이유 | 필요한 후속 작업 |
 |---|---|:---:|---|---|
 | **KPA** | 모두 4종 | A | `kpa_approval_requests` + forum legacy 표 통합 동작 | 없음 (canonical) |
-| **Glyco** | Forum category | A | 공통 endpoint 동작 | 없음 |
-| **Glyco** | LMS enrollment | B | endpoint 존재, frontend aggregation 가능 | status enum 매핑 adapter |
-| **Glyco** | Service application | B | endpoint 존재, frontend aggregation 가능 | status 매핑 adapter + entity_type 마킹 |
-| **Glyco** | 약사 membership | C | backend 있으나 user-facing 페이지 없음 | frontend page + (선택) `GET /glycopharm/mypage/requests` 통합 endpoint |
 | **K-Cos** | Forum category | A | 공통 endpoint 동작 | 없음 |
 | **K-Cos** | LMS enrollment | B | endpoint 존재 | status 매핑 adapter |
 | **K-Cos** | Store application | C | backend 있으나 frontend client 함수 없음 | API client + status 매핑 |
 | **K-Cos** | Partner application | C | POST 만 있고 GET 없음 | backend `GET /api/v1/partner/applications/me` 신설 |
 | **K-Cos** | Forum delete request | D | `category.metadata` 에 embedded | 정책: 별도 항목으로 노출할지 결정 |
 | **K-Cos** | Event-offer participation | E | 시스템 부재 (현재 보류) | 별도 WO — 본 IR 범위 외 |
-| **K-Cos / Glyco** | Instructor qualification | E | self-service 없음 (admin grant) | 정책 결정 — 본 IR 범위 외 |
 
 **Case 분류**:
 - **A** Backend 이미 준비됨 — frontend page + adapter
@@ -226,17 +197,16 @@ interface MyRequestItem {
 | 서비스 | 현재 | 권장 |
 |---|---|---|
 | KPA | ✅ 이미 존재 | 유지 |
-| Glyco | ❌ | `/mypage/my-requests` 신규 + `/apply/my-applications` redirect 또는 link |
 | K-Cos | ❌ | `/mypage/my-requests` 신규 + `/forum/my-dashboard` 내 forum request 부분 link |
 
 ### 7-3. Navigation 노출
-| 위치 | KPA | Glyco | K-Cos |
-|---|---|---|---|
-| MyPageNavigation 탭 | ✅ `내 신청` (KPA_MYPAGE_NAV_ITEMS:10) | 추가 권장 | 추가 권장 (KCOS_MYPAGE_NAV_ITEMS 확장) |
-| MyPageHub card | ❌ (현재 부재 — 통일성 위해 추가 권장) | 추가 권장 | 추가 권장 |
+| 위치 | KPA | K-Cos |
+|---|---|---|
+| MyPageNavigation 탭 | ✅ `내 신청` (KPA_MYPAGE_NAV_ITEMS:10) | 추가 권장 (KCOS_MYPAGE_NAV_ITEMS 확장) |
+| MyPageHub card | ❌ (현재 부재 — 통일성 위해 추가 권장) | 추가 권장 |
 
 ### 7-4. Legacy route 처리
-- Glyco `/apply/my-applications` → orphaned 상태. 통합 inbox 도입 시 `Navigate to /mypage/my-requests?type=service_application` redirect 권장.
+- 통합 inbox 도입 시 `Navigate to /mypage/my-requests?type=service_application` redirect 권장.
 - K-Cos `/forum/my-dashboard` 의 my-requests 영역 — 유지하되 MyPage 통합 inbox 에서 우선 진입하도록 cross-link.
 
 ---
@@ -267,9 +237,6 @@ KPA MyRequestsPage 가 사용 중인 UI:
 
 | Drift / Gap | 분류 |
 |---|---|
-| KPA 통합 inbox 존재, Glyco/K-Cos 부재 | **C** Backend 공통 endpoint 필요 (per service) + **D** route/menu 정렬 |
-| Glyco `MyApplicationsPage` orphaned | **D** route/menu 정렬 (link 부재) |
-| Glyco 약사 membership user 페이지 부재 | **C** Backend 있으나 frontend page 부재 |
 | K-Cos store application frontend 부재 | **C** API client + frontend page 신설 필요 |
 | K-Cos partner application GET endpoint 부재 | **C** Backend foundation 필요 |
 | K-Cos forum delete request metadata embedded | **F** 정책 결정 (별도 항목 표시 여부) |
@@ -300,18 +267,12 @@ KPA MyRequestsPage 가 사용 중인 UI:
 
 ### Phase B — Backend foundation (gap 채우기 — 정책 결정 후)
 2. **WO-O4O-MYPAGE-MY-REQUESTS-INBOX-BACKEND-FOUNDATION-V1**
-   - Glyco 약사 membership user-facing API 정리
    - K-Cos store application frontend client 함수 추가
    - K-Cos partner application `GET /api/v1/partner/applications/me` 신설
    - Status enum 매핑 표준 문서화
    - Risk: 중간 (backend touch — RBAC + 정책 결정)
 
 ### Phase C — 서비스별 적용 (Phase A + B 완료 후)
-3. **WO-O4O-GLYCOPHARM-MYPAGE-MY-REQUESTS-ROUTE-V1**
-   - Glyco `/mypage/my-requests` route 신설 (MyRequestsInbox + adapter)
-   - 3 source: Forum / Service application / LMS enrollment
-   - MyPageNavigation 탭 추가
-   - Legacy `/apply/my-applications` redirect
 
 4. **WO-O4O-KCOSMETICS-MYPAGE-MY-REQUESTS-ROUTE-V1**
    - K-Cos `/mypage/my-requests` route 신설
@@ -336,7 +297,7 @@ KPA MyRequestsPage 가 사용 중인 UI:
 | Phase A — Component 추출 | 낮음 | 즉시 없음 (KPA 시각 회귀 없음) | **1순위** |
 | Phase D — Hub card 진입 | 낮음 | 큼 (KPA 가시 효과 즉시) | **2순위** |
 | Phase B — Backend foundation | 중간 | 없음 (구조만) | 3순위 (정책 결정 선행) |
-| Phase C — 서비스별 적용 | 중간 | 큼 (Glyco / K-Cos 통합 inbox 가시) | 4순위 (Phase A + B 완료 후) |
+| Phase C — 서비스별 적용 | 중간 | 큼 | 4순위 (Phase A + B 완료 후) |
 | Phase E — Neture | 미확정 | 보류 | 별도 IR |
 
 **의사 결정 분기점:**
@@ -352,7 +313,7 @@ CLAUDE.md §13 ("O4O 공통 구조 원칙") 및 IR-O4O-MYPAGE-PROFILE-UI-CANONIC
 | 항목 | 정합? | 비고 |
 |---|:---:|---|
 | O4O 의 forum/lms/signage 는 공통 구조, 데이터는 serviceKey 격리 | ✅ | KPA 의 `forum_category_requests` 가 이미 `service_code` column 으로 격리 — 공통 endpoint + serviceKey 패턴 유지 |
-| KPA = reference implementation | ✅ | MyRequestsPage 가 reference 역할 — Glyco/K-Cos 가 patten mirror |
+| KPA = reference implementation | ✅ | — |
 | 동결 Core 영역 변경 금지 | ✅ | `kpa_approval_requests` 는 KPA 영역. 다른 서비스용 등가 테이블 신설 시 별도 Core 영역에 영향 없음 (entity_type discriminator 패턴은 schema 변경 없이 확장 가능) |
 | Boundary Policy (F6) | ✅ | Domain primary boundary 필터 (`requester_id` + `service_code`) 이미 적용 |
 | MyPage shell 추출 불필요 — 이미 `@o4o/account-ui` 정렬 | ✅ | MyRequestsInbox 도 동일 패키지에 추가 — 일관성 유지 |
@@ -371,13 +332,6 @@ CLAUDE.md §13 ("O4O 공통 구조 원칙") 및 IR-O4O-MYPAGE-PROFILE-UI-CANONIC
 - Backend controller: [apps/api-server/src/routes/kpa/controllers/mypage.controller.ts:124-138](../../apps/api-server/src/routes/kpa/controllers/mypage.controller.ts#L124-L138)
 - Service: [apps/api-server/src/routes/kpa/services/mypage.service.ts:236-283](../../apps/api-server/src/routes/kpa/services/mypage.service.ts#L236-L283)
 - Entity: [apps/api-server/src/routes/kpa/entities/kpa-approval-request.entity.ts](../../apps/api-server/src/routes/kpa/entities/kpa-approval-request.entity.ts)
-
-### GlycoPharm
-- Forum requests: [services/web-glycopharm/src/pages/forum/MyRequestsPage.tsx](../../services/web-glycopharm/src/pages/forum/MyRequestsPage.tsx)
-- Service applications: [services/web-glycopharm/src/pages/apply/MyApplicationsPage.tsx](../../services/web-glycopharm/src/pages/apply/MyApplicationsPage.tsx) (orphaned)
-- Enrollments: [services/web-glycopharm/src/pages/mypage/MyEnrollmentsPage.tsx](../../services/web-glycopharm/src/pages/mypage/MyEnrollmentsPage.tsx)
-- API: [services/web-glycopharm/src/api/glycopharm.ts:417-423](../../services/web-glycopharm/src/api/glycopharm.ts#L417-L423)
-- Backend: [apps/api-server/src/routes/glycopharm/controllers/application.controller.ts:227-281](../../apps/api-server/src/routes/glycopharm/controllers/application.controller.ts#L227-L281)
 
 ### K-Cosmetics
 - Forum dashboard: [services/web-k-cosmetics/src/pages/forum/MyForumDashboardPage.tsx](../../services/web-k-cosmetics/src/pages/forum/MyForumDashboardPage.tsx)
@@ -399,8 +353,6 @@ canonical: `pending / approved / rejected / revision_requested / cancelled / dra
 |---|---|---|
 | KPA `kpa_approval_requests` | draft / pending / submitted / approved / rejected / revision_requested / cancelled / revoked | 그대로 (canonical 정의) |
 | Forum `forum_category_requests` | pending / revision_requested / approved / rejected | 그대로 |
-| Glyco `glycopharm_applications` | submitted / approved / rejected | submitted → pending |
-| Glyco `glycopharm_member_records` | pending / approved / rejected / suspended | suspended → revoked |
 | LMS `lms_enrollments` | pending / in_progress / completed / cancelled / expired | expired → cancelled, in_progress + completed 는 display 만 (request 가 아닌 active state) |
 | K-Cos `cosmetics_store_applications` | draft / submitted / approved / rejected | submitted → pending |
 | K-Cos partner application | (POST 만, GET 부재) | 정책 결정 후 mapping |
@@ -417,7 +369,6 @@ canonical: `pending / approved / rejected / revision_requested / cancelled / dra
 - ✅ Frontend route 수정 없음
 - ✅ MyPageNavigation / MyPageHubCard 수정 없음
 - ✅ KPA MyRequestsPage 수정 없음
-- ✅ Glyco / K-Cos 코드 수정 없음
 - ✅ mock data 추가 없음
 
 다음 단계 시작 전 사용자 승인 필요. 권고 1순위: **Phase A — Component 추출 (Risk 낮음, KPA 시각 회귀 없음, 후속 적용의 토대)**.

@@ -132,7 +132,6 @@ types/           14 파일
 AnnualFeeRouter, CosmeticsPartnerRouter, CosmeticsProductsRouter,
 CosmeticsProductsAdminRouter, CosmeticsSampleRouter, CosmeticsSupplierRouter,
 CPTACFRouter, DigitalSignageRouter, DropshippingOffersRouter,
-GlucoseViewRouter, GlycopharmRouter, LmsInstructorRouter,
 LmsYaksaRouter, MarketingPublisherRouter, MembershipRouter,
 NetureRouter, PagesRouter, PartnerOpsRouter, ReportingRouter,
 SellerOpsRouter, StorefrontRouter, SupplierOpsRouter, YaksaForumRouter
@@ -250,7 +249,6 @@ admin-dashboard = 모든 서비스의 운영 도구 통합
   ↓ + Cosmetics Partner (+12 파일)
   ↓ + LMS Yaksa (+9 파일)
   ↓ + Commerce (Neture, Store, Orders) (+80 파일)
-  ↓ + GlycoPharm, GlucoseView, K-Cosmetics 서비스별 페이지
   ↓ + 포럼, 회원관리, 정산, AI 도구
 현재: 1,348 파일, 23 Router, 200 Route
 ```

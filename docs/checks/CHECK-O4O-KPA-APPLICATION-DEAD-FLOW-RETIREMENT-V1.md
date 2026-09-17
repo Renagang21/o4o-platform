@@ -29,7 +29,7 @@ canonical 회원 승인 경로 무접촉(회귀 검증만). 최종: live route 0
 ## 3. 이메일·dead review URL 처리 (중지 #1)
 
 - KpaApplication 이메일 4종(`sendServiceApplication{OperatorNotification|Submitted|Approved|Rejected}Email`, mail-core)은
-  **glycopharm·kpa/organization-join-request 와 SHARED** → 함수 미삭제. KpaApplication 호출 site는 controller 삭제로 자동 소멸.
+  KpaApplication 호출 site는 controller 삭제로 자동 소멸.
 - review URL `/operator/kpa/applications/:id` 는 controller 문자열에만 존재 → 파일 삭제로 소멸(서빙 route 0).
 
 ## 4. 대시보드 recentActivity 처리 (중지 #3 미발동)
@@ -73,7 +73,7 @@ canonical 회원 승인 경로 무접촉(회귀 검증만). 최종: live route 0
 
 ## 10. 잔여 참조 census
 
-- `kpa/applications`·`createApplicationController`·`ApplicationsTab` 소비처 **0**(grep). glycopharm application flow는
+- `kpa/applications`·`createApplicationController`·`ApplicationsTab` 소비처 **0**(grep).
   별개 도메인(무접촉). entity/table/mail-core 함수만 의도적 잔존(HOLD).
 
 ## 11. 커밋

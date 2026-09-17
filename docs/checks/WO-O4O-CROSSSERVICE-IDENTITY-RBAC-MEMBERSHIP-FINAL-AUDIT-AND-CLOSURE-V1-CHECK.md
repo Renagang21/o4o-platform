@@ -3,7 +3,7 @@
 - 작업일: 2026-08-25
 - 기준점: `origin/main` (작업 시작 시 `HEAD == origin/main == 0dc6b6c6c`)
 - 성격: 회원·membership·role·authorization 공통화 트랙 **최종 감사 및 종료**
-- 대상 서비스: KPA Society · K-Cosmetics · GlycoPharm · Neture · Pharmacy-Hub
+- 대상 서비스: KPA Society · K-Cosmetics · Neture · Pharmacy-Hub
 
 ---
 
@@ -107,7 +107,7 @@ api-server 의 진입 게이트 계열별 집계 (테스트 제외, live 코드�
 표면으로 계속 들어왔다.
 
 - `hasSignageServiceMembership()` 추가 — `platform:super_admin` 우회 유지, DB 로 판정
-- membership 축이 있는 canonical key 4종(`kpa-society`/`k-cosmetics`/`glycopharm`/`neture`)
+- membership 축이 있는 canonical key 4종(`kpa-society`/`k-cosmetics`/`neture`)
   에만 적용. `pharmacy`/`tourism`/`common`/`test` 는 membership SSOT 가 없는 legacy signage
   key 이므로 **추정으로 차단하지 않는다**
 - 차단 응답은 공통 `403 MEMBERSHIP_NOT_ACTIVE`
@@ -157,7 +157,7 @@ scope 를 깨지 않기 위해). sync 시그니처 유지 → 20개 호출부 �
 `apps/api-server/src/routes/kpa/controllers/me-context.controller.ts`
 
 KPA-Society 의 `me-context` 가 `is_store_owner` 를
-`role IN ('kpa:store_owner','glycopharm:store_owner','cosmetics:store_owner')` 로 계산했다.
+`role IN ` 로 계산했다.
 
 소비 경로:
 
@@ -168,7 +168,6 @@ me-context.is_store_owner
   → store-ui-core StoreOwnerGuard: isStoreOwnerByRole = roles.includes(...) || !!user?.isStoreOwner
 ```
 
-즉 **GlycoPharm 전용 / Cosmetics 전용 매장 경영자에게 KPA 약국 HUB UI 가 열렸다.**
 판정을 `kpa:store_owner` 로 한정하고 `kpa-society` active membership 을 요구하도록 고쳤다.
 분류: `CROSS_SERVICE_LEAK` + `PRIVILEGE_ESCALATION_PATH` → **닫힘**.
 
@@ -229,7 +228,6 @@ row 생성이다.
 |--------|----------------------|-------------|--------------------------|-------------|
 | KPA Society | `kpa-society` | `kpa` | `lib/membershipGate` (`SERVICE_KEY='kpa-society'`) | RoleGuard→MembershipGate · **AdminAuthGuard(본 WO 에서 추가)** |
 | K-Cosmetics | `k-cosmetics` | `cosmetics` | `SERVICE_KEY='k-cosmetics'` | RoleGuard→MembershipGate |
-| GlycoPharm | `glycopharm` | `glycopharm` | `SERVICE_KEY='glycopharm'` | RoleGuard→MembershipGate · OperatorRoute |
 | Neture | `neture` | `neture` | `SERVICE_KEY='neture'` | RoleGuard(기본 enforce) · OperatorRoute/AdminRoute/SupplierRoute(`requireMembership='neture'`) |
 | Pharmacy-Hub | `pharmacy-hub` | `pharmacy-hub` | `config/service` 의 `SERVICE_KEY` | AdminLayoutWrapper = MembershipGate + 역할 |
 

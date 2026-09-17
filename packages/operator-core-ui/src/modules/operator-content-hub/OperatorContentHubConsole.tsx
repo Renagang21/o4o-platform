@@ -4,7 +4,6 @@
  * WO-O4O-COMMUNITY-OPERATOR-CONSOLE-VIEW-CONVERGENCE-V1
  *
  * KPA `pages/operator/OperatorContentHubPage` 를 canonical 로 승격.
- * GlycoPharm 의 동일 화면(KPA 포팅본 · VIEW_DUPLICATED)이 이 View 를 소비한다.
  *
  * 계약:
  *   - fetch/axios 직접 호출 없음 (ContentHubClient adapter 주입).

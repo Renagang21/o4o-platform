@@ -38,7 +38,7 @@
 
 | 무리 | 대표 사용처 | 실제 도메인 | 조치 |
 |---|---|---|---|
-| 매장 허브 PRIVATE 탭 라벨 "판매자 모집" | KPA `HubB2BCatalogPage.tsx`, GP `HubB2BCatalogPage.tsx`, KCos `HubB2BPage.tsx` (DISTRIBUTION_TABS) | 매장 공급 승인(PRIVATE→ProductApproval) | **본 WO 정정** → "공급 승인 대상" |
+| 매장 허브 PRIVATE 탭 라벨 "판매자 모집" | KPA `HubB2BCatalogPage.tsx` `HubB2BCatalogPage.tsx`, KCos `HubB2BPage.tsx` (DISTRIBUTION_TABS) | 매장 공급 승인(PRIVATE→ProductApproval) | **본 WO 정정** → "공급 승인 대상" |
 | `seller_recruitment` cart sourceType | `StoreCartItem.entity.ts`, `store-cart.service.ts`, 3서비스 `api/storeCart.ts` | 매장 공급 승인(신청 전 상태) | **본 WO 경계 주석**(값 불변) |
 | Neture 가이드 "판매자 모집" 본문 | `packages/shared-space-ui/src/guide/copy/neture.ts`(40+), `/guide/business/seller-recruitment` | 정의된 O4O 사업 개념(공급자가 매장 모집) | **제외**(사업 철학 카피 — 별도 결정) |
 | Neture 공급자/운영자 "판매자 모집" UI | `RecruitingProductsOverviewPage.tsx`, `AllRegisteredProductsPage.tsx`, `supplierProductTypes.ts`, `productConstants.ts`, `SupplierSupplyOffersPage.tsx` (`is_partner_recruiting`) | Neture partner_recruitment 메커니즘 | **제외**(narrow 범위 외 — 후속 Neture 도메인 정합) |
@@ -53,7 +53,6 @@
 | 파일 | 변경 |
 |---|---|
 | `services/web-kpa-society/src/pages/pharmacy/HubB2BCatalogPage.tsx` | PRIVATE 탭 라벨 "판매자 모집" → "공급 승인 대상" + 경계 주석 |
-| `services/web-glycopharm/src/pages/hub/HubB2BCatalogPage.tsx` | 동일 (헤더 주석 포함) |
 | `services/web-k-cosmetics/src/pages/hub/HubB2BPage.tsx` | 동일 (헤더 주석 포함) |
 
 근거: PRIVATE = 공급자가 `allowed_seller_ids` 로 지정한 비공개 공급. 매장 입장에선 취급 신청/공급 승인 대상이며,
@@ -79,7 +78,6 @@
 | `apps/api-server/src/entities/cart/StoreCartItem.entity.ts` | `CartSourceType` 에 경계 주석(legacy/internal · 주문 경로 아님 · Neture 파트너 모집과 무관) |
 | `apps/api-server/src/services/cart/store-cart.service.ts` | `VALID_SOURCE_TYPES` 에 동일 취지 주석 |
 | `services/web-kpa-society/src/api/storeCart.ts` | 프론트 미러 경계 주석 |
-| `services/web-glycopharm/src/api/storeCart.ts` | 동일 |
 | `services/web-k-cosmetics/src/api/storeCart.ts` | 동일 |
 
 > 관찰: 현재 코드에서 `seller_recruitment` 가 실제 checkout 주문으로 진행되는 경로는 발견되지 않음(KPA checkout 대상은 `event_offer`).
@@ -101,12 +99,10 @@
 
 ```
 services/web-kpa-society/src/pages/pharmacy/HubB2BCatalogPage.tsx   PRIVATE 라벨 + 주석
-services/web-glycopharm/src/pages/hub/HubB2BCatalogPage.tsx          PRIVATE 라벨 + 헤더/주석
 services/web-k-cosmetics/src/pages/hub/HubB2BPage.tsx                PRIVATE 라벨 + 헤더/주석
 apps/api-server/src/entities/cart/StoreCartItem.entity.ts            sourceType 경계 주석
 apps/api-server/src/services/cart/store-cart.service.ts             sourceType 경계 주석
 services/web-kpa-society/src/api/storeCart.ts                        sourceType 경계 주석
-services/web-glycopharm/src/api/storeCart.ts                         sourceType 경계 주석
 services/web-k-cosmetics/src/api/storeCart.ts                        sourceType 경계 주석
 ```
 
@@ -134,14 +130,13 @@ services/web-k-cosmetics/src/api/storeCart.ts                        sourceType 
 | 대상 | 명령 | 결과 |
 |---|---|---|
 | web-kpa-society | `tsc --noEmit` | PASS |
-| web-glycopharm | `tsc --noEmit -p tsconfig.app.json` | PASS |
 | web-k-cosmetics | `tsc --noEmit` | PASS |
 | api-server | `tsc --noEmit` | 본 WO 변경 파일(cart 주석)은 영향 없음. ⚠️ 무관한 기존 baseline 에러 1건(`market-trial/marketTrialController.ts:162` CreateTrialDto.productId) — 본 WO 변경과 무관(comment-only). |
 
 > api-server 변경은 cart 도메인 **주석만**이라 타 모듈 컴파일에 영향 불가. baseline 에러는 본 WO 범위 외(market-trial 도메인).
 
 ### Smoke
-- 문구/주석 변경 — typecheck + 정적 검증으로 대체. 배포 후 매장 허브 유통유형 탭에 "공급 승인 대상" 렌더 확인 권장(KPA/GP/KCos).
+- 문구/주석 변경 — typecheck + 정적 검증으로 대체. 배포 후 매장 허브 유통유형 탭에 "공급 승인 대상" 렌더 확인 권장(KPA/KCos).
 
 ---
 

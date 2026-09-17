@@ -57,9 +57,8 @@ Beta Mode OFF 시: 위 기능 모두 비활성. 기존 동작 동일.
 ```
 1. GET /internal/ops/metrics → checkout.blocked.* 확인
 2. blocked.distribution 증가 → neture_supplier_products.distribution_type 확인
-3. blocked.stock 증가 → glycopharm_products.stock_quantity 확인
-4. blocked.sales_limit 증가 → organization_product_channels.sales_limit 확인
-5. error 증가 → Cloud Run 로그에서 [GlycoPharm Checkout] Create order error 검색
+3. blocked.sales_limit 증가 → organization_product_channels.sales_limit 확인
+4. error 증가 → Cloud Run 로그에서 Checkout Create order error 검색
 ```
 
 ### 4.2 Payment 실패 증가
@@ -109,7 +108,6 @@ Redis 연결 실패 / 타임아웃 시:
   "level": "warn",
   "message": "[SlowRequest]",
   "method": "POST",
-  "url": "/api/v1/glycopharm/checkout",
   "statusCode": 201,
   "durationMs": 820,
   "thresholdMs": 700,
@@ -128,11 +126,6 @@ Threshold 기준:
 
 ```
 [OpsMetrics] 60s summary {
-  "checkout.attempt{service=glycopharm}": 12,
-  "checkout.success{service=glycopharm}": 10,
-  "checkout.blocked.stock{service=glycopharm}": 2,
-  "payment.prepare{service=glycopharm}": 10,
-  "payment.confirm.success{service=glycopharm}": 8,
   "cache.hit": 340,
   "cache.miss": 45,
   "cache.error": 0

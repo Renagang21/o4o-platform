@@ -39,13 +39,13 @@
 ## 3. 공통 규칙 적용 판단 (WO 요구: "다른 서비스에도 같은 위험이 있는지")
 
 Neture 고정 문자열이 아니라 **서비스 공통 규칙**으로 일반화했다. `role_assignments` 는 F9 RBAC SSOT 이며
-`kpa:admin` · `cosmetics:admin` · `glycopharm:admin` 등도 동일 경로로 해제되므로 위험이 같다.
+`kpa:admin` · `cosmetics:admin` 등도 동일 경로로 해제되므로 위험이 같다.
 
 **판정 기준**: role 이 `{serviceKey}:admin` 형태이고 `serviceKey != 'platform'` 일 때 서비스 admin.
 
 | 대상 | 보호 | 근거 |
 |---|:---:|---|
-| `neture:admin` · `kpa:admin` · `cosmetics:admin` · `glycopharm:admin` · `glucoseview:admin` · `pharmacy-hub:admin` | O | 서비스 단위 관리자 |
+| `neture:admin` · `kpa:admin` · `cosmetics:admin` · `glucoseview:admin` · `pharmacy-hub:admin` | O | 서비스 단위 관리자 |
 | `kpa:district_admin` · `kpa:branch_admin` | X | `is_admin_role=true` 이지만 서비스 단위 관리자가 아니다. `_admin` 접미사는 `:admin` 과 다르므로 문자열 규칙으로 정확히 갈린다 |
 | `platform:super_admin` | (별도) | 기존 `SUPER_ADMIN_ROLE_PROTECTED` 가 상위에서 이미 차단. 기존 보호 유지 |
 | `platform:admin` | X | 서비스 admin 아님(deprecated). 기존 동작 그대로 |

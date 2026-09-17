@@ -2,8 +2,8 @@
 
 > **작업명:** WO-O4O-LMS-KCOSMETICS-ADOPTION-V1
 > **유형:** K-Cosmetics 사용자 LMS 화면에 `@o4o/lms-ui` 공통 presentational UI 1차 적용 (frontend-only)
-> **결과: PASS** — KCos `LmsCourseDetailPage` + `LmsLessonPage` 가 공통 `CourseProgressBar`(accent `#db2777`) 소비 시작. KCos Dockerfile 에 `@o4o/lms-ui` source-direct COPY 2줄 동봉. 기존 기능·route·API 유지. YouTube/LIVE·고정 reward·결제·reward UI 재도입 0. Neture/KPA/GP 미수정. web-k-cosmetics typecheck 0.
-> **선행:** `IR-O4O-LMS-SERVICE-COMMONIZATION-BOUNDARY-V1` · `WO-O4O-LMS-GPKCOS-POLICY-DRIFT-ALIGNMENT-V1` · `WO-O4O-LMS-COMMON-UI-EXTRACTION-V1`(`7020e2c4c`) · `WO-O4O-LMS-GLYCOPHARM-ADOPTION-V1`(`2f2122559`) · KPA Docker hotfix `e4a9edef1`
+> **결과: PASS** — KCos `LmsCourseDetailPage` + `LmsLessonPage` 가 공통 `CourseProgressBar`(accent `#db2777`) 소비 시작. KCos Dockerfile 에 `@o4o/lms-ui` source-direct COPY 2줄 동봉. 기존 기능·route·API 유지. YouTube/LIVE·고정 reward·결제·reward UI 재도입 0. Neture/KPA 미수정. web-k-cosmetics typecheck 0.
+> **선행:** `IR-O4O-LMS-SERVICE-COMMONIZATION-BOUNDARY-V1` · `WO-O4O-LMS-GPKCOS-POLICY-DRIFT-ALIGNMENT-V1` · `WO-O4O-LMS-COMMON-UI-EXTRACTION-V1`(`7020e2c4c`) · KPA Docker hotfix `e4a9edef1`
 > **작성일:** 2026-06-13 · 기준 HEAD `ea4068f77`
 
 ---
@@ -23,7 +23,7 @@ K-Cosmetics 사용자 LMS 화면에 `@o4o/lms-ui` 1차 적용. KCos 는 이미 �
 | `pnpm-lock.yaml` | web-k-cosmetics 에 `@o4o/lms-ui` link |
 | `docs/checks/CHECK-O4O-LMS-KCOSMETICS-ADOPTION-V1.md` | 본 문서 |
 
-**무변경:** backend, DB/migration, KPA, GlycoPharm, Neture, reward/budget, 결제, KCos route/menu.
+**무변경:** backend, DB/migration, KPA, Neture, reward/budget, 결제, KCos route/menu.
 
 ## 3. 적용한 `@o4o/lms-ui` 컴포넌트
 
@@ -49,7 +49,7 @@ K-Cosmetics 사용자 LMS 화면에 `@o4o/lms-ui` 1차 적용. KCos 는 이미 �
 | `LessonList` | KCos 레슨 목록(상세=선택형, 레슨페이지 사이드바=full-row Link)이 lms-ui `LessonList`(trailing "보기" 링크) 와 UX semantics 불일치 → 보류(후속 row-click 옵션 후 재검토) |
 | `LessonPlayerShell` | KCos 플레이어가 quiz/assignment/AI 채점/article 렌더와 강결합 → shell 교체 위험 |
 
-> GP adoption(§5)과 동일 사유 — GP/KCos 가 구조적으로 유사(둘 다 KPA 구조 기준·inline-style·LmsHubTemplate 목록·AI 채점). 공통화 surface 가 동일하게 좁다.
+> 공통화 surface 가 동일하게 좁다.
 
 ## 6. Dockerfile `lms-ui` COPY 반영 결과
 
@@ -66,29 +66,29 @@ K-Cosmetics 사용자 LMS 화면에 `@o4o/lms-ui` 1차 적용. KCos 는 이미 �
 - grep(KCos `src/pages/lms/`): youtube/youtu.be/iframe/checkout/payment/`+10 C`/`+20 C`/`+50 C`/rewardPolicy **0**.
 - MyCreditsPage(고정 스케줄 제거 상태) 미변경. reward 지갑/budget/proposal UI 0.
 
-## 8. Neture / KPA / GlycoPharm 미수정 확인
+## 8. Neture / KPA 미수정 확인
 
 - `services/web-neture` 파일 0, package.json 에 `@o4o/lms-ui` 미추가, LMS route/menu/import 0.
-- KPA·GlycoPharm 소스 미변경(각 직전 커밋에서 처리됨).
+- KPA 소스 미변경(각 직전 커밋에서 처리됨).
 
 ## 9. 검증 결과
 
 - **TypeScript:** `web-k-cosmetics` `tsc --noEmit` **0 errors**(편집 파일·lms-ui 해상 포함 전체 clean).
 - **grep:** KCos lms-ui 소비 2 import 확인. Dockerfile lms-ui COPY 2건. reintro(YouTube/reward/결제) 0.
 - **pnpm:** `@o4o/lms-ui` link 등록(pnpm-lock). 
-- **무변경:** backend/DB/Neture/KPA/GP.
+- **무변경:** backend/DB/Neture/KPA.
 - **browser smoke:** 미수행 — 렌더 변경 중심. 배포 후 KCos 강의 상세·레슨 화면 진도 렌더 + YouTube 미노출 확인 권장.
 
 ## 10. 남은 후속 작업
 
 1. **`CHECK-O4O-LMS-NETURE-EXCLUSION-GUARD-V1`** — Neture LMS route/menu/package 소비처 부재 최종 확인.
 2. **`WO-O4O-LMS-KPA-FULLER-ADOPTION-V1`** — KPA 목록/레슨에서 미사용 공통 컴포넌트 활용 확대.
-3. **`WO-O4O-LMS-LESSONLIST-ROWCLICK-OPTION-V1`** — `LessonList` full-row navigation 옵션 추가 → GP/KPA/KCos 사이드바 LessonList 적용 재검토(§5 보류 해소).
+3. **`WO-O4O-LMS-LESSONLIST-ROWCLICK-OPTION-V1`** — `LessonList` full-row navigation 옵션 추가 → KPA/KCos 사이드바 LessonList 적용 재검토(§5 보류 해소).
 4. **`IR-O4O-REWARD-BUDGET-FLOW-PLATFORM-SERVICE-INSTRUCTOR-V1`** — 별도 작업선(강사 reward 지갑/충전/배정/ledger).
 5. **`WO-O4O-LMS-COMMON-INSTRUCTOR-OPERATOR-UI-BOUNDARY-V1`** — 강사/운영자 LMS 관리 화면 공통화 경계.
 
 ## 11. 완료 판정
 
-**PASS.** K-Cosmetics `LmsCourseDetailPage` + `LmsLessonPage` 가 공통 `CourseProgressBar`(accent `#db2777`) 소비 시작 — 기존 기능·route·API 보존, KCos Dockerfile lms-ui COPY 동봉(빌드 회귀 사전 차단), YouTube/LIVE·고정 reward·결제·reward UI 재도입 0, Neture/KPA/GP 미수정. 구조 차이 컴포넌트는 사유와 함께 보류(§5). typecheck 0.
+**PASS.** K-Cosmetics `LmsCourseDetailPage` + `LmsLessonPage` 가 공통 `CourseProgressBar`(accent `#db2777`) 소비 시작 — 기존 기능·route·API 보존, KCos Dockerfile lms-ui COPY 동봉(빌드 회귀 사전 차단), YouTube/LIVE·고정 reward·결제·reward UI 재도입 0, Neture/KPA 미수정. 구조 차이 컴포넌트는 사유와 함께 보류(§5). typecheck 0.
 
-> **3서비스 adoption 완료:** KPA(reference: VisibilityBadge+NoPaymentNotice) / GlycoPharm(ProgressBar ×2) / K-Cosmetics(ProgressBar ×2). 공통 `@o4o/lms-ui` 가 3서비스에서 소비되기 시작. 더 깊은 수렴(LessonList row-click, CourseCard via LmsHubTemplate 정렬, 강사/운영자 화면)은 후속.
+> **2서비스 adoption 완료:** KPA(reference: VisibilityBadge+NoPaymentNotice) / K-Cosmetics(ProgressBar ×2). 공통 `@o4o/lms-ui` 가 3서비스에서 소비되기 시작. 더 깊은 수렴(LessonList row-click, CourseCard via LmsHubTemplate 정렬, 강사/운영자 화면)은 후속.

@@ -27,7 +27,7 @@
 ---
 
 ## 2. collectionStatus 가 필요한 이유
-- online 결제(KPA/Glyco/KCos B2C): `payment.completed` → `paymentStatus='paid'` 로 readiness 확정(검증됨).
+- online 결제: `payment.completed` → `paymentStatus='paid'` 로 readiness 확정(검증됨).
 - **B2B(Neture store cart)**: 결제 단계 없음. 주문 = 공급자에게 보내는 발주이고, 대금은 **인보이스/계좌입금/운영자 확인** 방식으로 사후 처리될 가능성. → "이 주문은 수금이 확인되었다"를 표현할 상태가 **없으면**, 공급자 배송·정산 readiness 를 판정할 수 없다.
 - `paymentStatus='paid'` 한 축만으로는 B2B 가 영원히 not-ready → 배송/정산 불가. **collectionStatus 가 두 번째 readiness 축.**
 

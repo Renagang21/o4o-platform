@@ -3,7 +3,7 @@
  *
  * WO-O4O-OPERATOR-RESOURCES-CANONICAL-COMMONIZATION-V1
  *
- * KPA / GP / K-Cos 3 service 의 Operator Resources Console 공통 wrapper 의 타입.
+ * KPA / K-Cos 2 service 의 Operator Resources Console 공통 wrapper 의 타입.
  * 선행: WO-O4O-KCOS-RESOURCES-BACKEND-V1.
  */
 
@@ -63,7 +63,7 @@ export interface ResourcesConsoleListParams {
 }
 
 /**
- * Service-side API client adapter. Each service (KPA / GP / K-Cos) provides
+ * Service-side API client adapter. Each service (KPA / K-Cos) provides
  * its own client. The wrapper calls these methods. Response shape varies
  * across services so the wrapper does defensive unwrapping (see component).
  */
@@ -91,7 +91,7 @@ export interface ResourcesConsoleClient {
  * passes `open / onClose / onSaved` to the render function. `onSaved` should
  * be called after a successful AI save to trigger list refresh.
  *
- * GP 의 AiContentModal 분기는 본 slot 으로 흡수 (service-별 page 분리 회피).
+ * AI 콘텐츠 모달 분기는 본 slot 으로 흡수 (service-별 page 분리 회피).
  */
 export interface ResourcesConsoleAiSlot {
   /** Header button label (e.g., 'AI 콘텐츠 생성'). */
@@ -106,11 +106,11 @@ export interface ResourcesConsoleAiSlot {
 }
 
 export interface OperatorResourcesConsolePageProps {
-  /** Canonical service key (kpa-society / glycopharm / k-cosmetics). */
+  /** Canonical service key (kpa-society / k-cosmetics). */
   serviceKey: string;
   /** Service-side API client. */
   client: ResourcesConsoleClient;
-  /** Optional AI integration. KPA / K-Cos 는 unset, GP 는 set. */
+  /** Optional AI integration. KPA / K-Cos 는 unset. */
   aiSlot?: ResourcesConsoleAiSlot;
   /** Optional override of policy banner text. Default: 자료실 운영 정책 문구. */
   policyBanner?: string;
@@ -246,7 +246,7 @@ export type ResourcesActionKey = 'view' | 'edit' | 'create' | 'delete';
  *   서비스 분기(`if (serviceKey === ...)`)가 아니라 명사 주입이다.
  *
  *   미지정 시 기존 문구("자료" / "자료실" / "자료실 관리")가 그대로 쓰인다 —
- *   기존 4개 소비처(KPA/GP/KCos/PH 자료실)의 화면 문구 변화 = 0.
+ *   기존 3개 소비처(KPA/KCos/PH 자료실)의 화면 문구 변화 = 0.
  */
 export interface ResourcesNouns {
   /** 개별 항목 — "자료" / "콘텐츠" */

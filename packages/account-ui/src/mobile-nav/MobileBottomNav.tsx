@@ -27,7 +27,7 @@ export interface MobileBottomNavProps {
   items: MobileBottomNavItem[];
   /** 브랜드 active 색 (서비스 토큰). */
   activeColor: string;
-  /** 서비스별 기존 z-index 유지 (KPA·Neture `z-40`, GlycoPharm·K-Cosmetics `z-50`). */
+  /** 서비스별 기존 z-index 유지 (KPA·Neture `z-40`·K-Cosmetics `z-50`). */
   zIndexClassName?: string;
   ariaLabel?: string;
   /** 알림/프로필 시트 · backdrop 등 nav 안에 붙는 요소. */

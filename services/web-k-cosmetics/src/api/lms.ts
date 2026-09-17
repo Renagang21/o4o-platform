@@ -198,7 +198,7 @@ export const lmsApi = {
   // 레슨 목록 — WO-O4O-LMS-CLIENT-EXTRACTION-V2-STEP1.
   getLessons: (courseId: string) => learnerClient.getLessons<LmsLesson>(courseId),
 
-  // 레슨 상세 — getLesson 은 V2 Step 1 범위 외(GlycoPharm 미구현). 기존 구현 유지.
+  // 레슨 상세 — getLesson 은 V2 Step 1 범위 외. 기존 구현 유지.
   getLesson: async (_courseId: string, lessonId: string): Promise<ApiResponse<{ lesson: LmsLesson }>> => {
     const { data } = await api.get<ApiResponse<{ lesson: LmsLesson }>>(`/lms/lessons/${lessonId}`);
     return data;

@@ -15,13 +15,12 @@
 
 ### 1.1 목적
 
-3 서비스(KPA / GlycoPharm / K-Cosmetics)의 Operator Users / Members 페이지를 `@o4o/operator-core-ui` 의 페이지 수준 모듈로 추출한다.
+2 서비스(KPA / K-Cosmetics)의 Operator Users / Members 페이지를 `@o4o/operator-core-ui` 의 페이지 수준 모듈로 추출한다.
 
 ### 1.2 현재 상태 (조사 결과)
 
-| 항목 | KPA `UsersPage` | Glyco `UsersPage` | K-Cos `UsersPage` |
+| 항목 | KPA `UsersPage` || K-Cos `UsersPage` |
 |---|---|---|---|
-| 파일 | [services/web-kpa-society/src/pages/operator/UsersPage.tsx](../../services/web-kpa-society/src/pages/operator/UsersPage.tsx) | [services/web-glycopharm/src/pages/operator/UsersPage.tsx](../../services/web-glycopharm/src/pages/operator/UsersPage.tsx) | [services/web-k-cosmetics/src/pages/operator/UsersPage.tsx](../../services/web-k-cosmetics/src/pages/operator/UsersPage.tsx) |
 | Backend Endpoint | `/api/v1/operator/members` | `/api/v1/operator/members` | `/api/v1/operator/members` |
 | HTTP Client | `authClient.api` (axios wrapper) | `api` (axios) | `api` (axios) |
 | DataTable | `@o4o/operator-ux-core` ✅ 표준 | `@o4o/ui` ❌ 비표준 | `@o4o/ui` ❌ 비표준 |
@@ -32,10 +31,10 @@
 | Tab 필터링 | server-side (`status`) | client-side `ROLE_TAB_FILTER` | client-side `ROLE_TAB_FILTER` |
 | Selection | `Set<string>` | `string[]` | (없음) |
 | Batch Actions | approve / reject / suspend + AI Summary | approve / reject | (없음) |
-| Action Policy | `defineActionPolicy('kpa:users')` | `defineActionPolicy('glycopharm:users')` | `defineActionPolicy('k-cosmetics:users')` |
+| Action Policy | `defineActionPolicy('kpa:users')` | `defineActionPolicy` | `defineActionPolicy('k-cosmetics:users')` |
 | Action Set (rules) | approve, reject, suspend, activate, edit, password, delete | (동일) | (동일) |
 | AI Summary | ✅ Sparkles (KPA 전용) | ❌ | ❌ |
-| Delete Risk Modal | ❌ (단순 confirm) | ✅ DeleteRiskModal (Glyco 전용) | ❌ (단순 confirm) |
+| Delete Risk Modal | ❌ (단순 confirm) | ✅ DeleteRiskModal | ❌ (단순 confirm) |
 | Stats 카드 | 4개 (전체/활성/대기/거부) | 4개 (동일) | 4개 (동일) |
 
 추가 사항:
@@ -43,16 +42,16 @@
 
 ### 1.3 EditUserModal 현황 (4 서비스)
 
-| 항목 | KPA | Glyco | K-Cos | Neture |
-|---|---|---|---|---|
-| 파일 | [services/web-kpa-society/src/pages/operator/EditUserModal.tsx](../../services/web-kpa-society/src/pages/operator/EditUserModal.tsx) | [services/web-glycopharm/src/pages/operator/EditUserModal.tsx](../../services/web-glycopharm/src/pages/operator/EditUserModal.tsx) | [services/web-k-cosmetics/src/pages/operator/EditUserModal.tsx](../../services/web-k-cosmetics/src/pages/operator/EditUserModal.tsx) | [services/web-neture/src/pages/operator/EditUserModal.tsx](../../services/web-neture/src/pages/operator/EditUserModal.tsx) |
-| 기본 정보 필드 | lastName, firstName, nickname, phone | (동일) | (동일) | (동일) |
-| 사업자 정보 | 약국 정보 (businessName 등 9 필드) | (동일) | 사업자 정보 (동일) | (동일) |
-| AddressSearch | ✅ (`@o4o/ui`) | ✅ | ✅ | ✅ |
-| Membership Role | **읽기 전용** (pharmacist/student) | **편집 가능** (pharmacy/customer/supplier) | **편집 가능** (seller/consumer/pharmacist/supplier/partner) | **편집 가능** (supplier/partner/seller/customer) |
-| Admin Role 옵션 | kpa:operator / kpa:admin | glycopharm:operator / glycopharm:admin | cosmetics:operator / cosmetics:admin | neture:operator / neture:admin |
-| 저장 흐름 | PUT `/operator/members/{id}` → role DELETE/POST | (동일) | (동일) | (동일) |
-| color | primary | primary | primary | primary |
+| 항목 | KPA | K-Cos | Neture |
+|---|---|---|---|
+| 파일 | [services/web-kpa-society/src/pages/operator/EditUserModal.tsx](../../services/web-kpa-society/src/pages/operator/EditUserModal.tsx) | [services/web-k-cosmetics/src/pages/operator/EditUserModal.tsx](../../services/web-k-cosmetics/src/pages/operator/EditUserModal.tsx) | [services/web-neture/src/pages/operator/EditUserModal.tsx](../../services/web-neture/src/pages/operator/EditUserModal.tsx) |
+| 기본 정보 필드 | lastName, firstName, nickname, phone | (동일) | (동일) |
+| 사업자 정보 | 약국 정보 (businessName 등 9 필드) | 사업자 정보 (동일) | (동일) |
+| AddressSearch | ✅ (`@o4o/ui`) | ✅ | ✅ |
+| Membership Role | **읽기 전용** (pharmacist/student) | **편집 가능** (seller/consumer/pharmacist/supplier/partner) | **편집 가능** (supplier/partner/seller/customer) |
+| Admin Role 옵션 | kpa:operator / kpa:admin | cosmetics:operator / cosmetics:admin | neture:operator / neture:admin |
+| 저장 흐름 | PUT `/operator/members/{id}` → role DELETE/POST | (동일) | (동일) |
+| color | primary | primary | primary |
 
 → 4 서비스 모두 거의 동일. **차이점은 (a) membership role 옵션 list, (b) admin role 옵션 list, (c) membership role 편집 가능 여부**의 3가지뿐. → config 주입으로 100% 흡수 가능.
 
@@ -77,7 +76,7 @@
 | Membership / Admin Role 옵션 list | 🟡 Service Logic | config 주입 |
 | Stats 라벨 / Tab 정의 | 🟡 Service Logic | config 주입 |
 | **AI Summary (Sparkles)** | 🔴 Extension (KPA only) | **slot only** — `bulkActionsExtra` |
-| **DeleteRiskModal** | 🔴 Extension (Glyco only) | **slot only** — `onDeleteOverride` 또는 `rowActionsExtra` |
+| **DeleteRiskModal** | 🔴 Extension | **slot only** — `onDeleteOverride` 또는 `rowActionsExtra` |
 | **KPA-a MemberManagementPage** (organization 기반) | 🔴 Extension | core-ui 흡수 금지 — KPA-a 자체 유지 |
 
 → Core 가 Extension(AI Summary, DeleteRiskModal, KPA-a)을 흡수하지 않는다.
@@ -180,7 +179,6 @@ export interface UserDetailResponse<T extends OperatorUserBase = OperatorUserBas
   roles?: Array<{ role: string; isActive: boolean }>;
 }
 
-/** 서비스가 자체 http 클라이언트(KPA: authClient.api / Glyco·K-Cos: api)를 어댑터로 주입 */
 export interface UsersApi<T extends OperatorUserBase = OperatorUserBase> {
   // List + Stats
   listUsers(params: UsersListParams): Promise<UsersListResponse<T>>;
@@ -204,7 +202,6 @@ export interface UsersApi<T extends OperatorUserBase = OperatorUserBase> {
   // Password
   setPassword(id: string, password: string): Promise<void>;
 
-  // Delete risk (선택 — Glyco-only Extension)
   getDeleteRisk?(id: string): Promise<{
     user: { id: string; email: string; name: string; status: string };
     risks: Record<string, number>;
@@ -229,9 +226,9 @@ export interface UsersApi<T extends OperatorUserBase = OperatorUserBase> {
 | POST | `/api/v1/operator/members/{id}/roles` | addRole |
 | DELETE | `/api/v1/operator/members/{id}/roles/{role}` | removeRole |
 | POST | `/api/v1/operator/members/batch-status` | batchSetStatus |
-| GET | `/api/v1/operator/members/{id}/delete-risk` | getDeleteRisk (Glyco only) |
+| GET | `/api/v1/operator/members/{id}/delete-risk` | getDeleteRisk |
 
-→ **모든 어댑터는 같은 endpoint 호출.** 차이는 단지 baseURL 구성 (KPA `authClient.api` 는 prefix `/`, Glyco/K-Cos `api` 는 axios baseURL 처리).
+→ **모든 어댑터는 같은 endpoint 호출.** 차이는 단지 baseURL 구성
 
 ### 4.3 Config — `UsersConfig`
 
@@ -242,7 +239,6 @@ export interface UserRoleOption {
 }
 
 export interface UsersConfig {
-  serviceKey: 'kpa-society' | 'glycopharm' | 'k-cosmetics' | 'neture';
 
   /** 표현 라벨 */
   terminology: {
@@ -275,13 +271,11 @@ export interface UsersConfig {
 
   /** EditUserModal 설정 */
   editUserModal: {
-    /** Membership role 편집 가능 여부 (KPA: false / Glyco·K-Cos·Neture: true) */
     membershipRoleEditable: boolean;
     /** Membership role 옵션 (라벨 매핑) */
     membershipRoleOptions: UserRoleOption[];
     /** Admin role 옵션 (운영 권한) */
     adminRoleOptions: UserRoleOption[];
-    /** membership.serviceKey (예: 'glycopharm', 'kpa-society') */
     membershipServiceKey: string;
     /** Admin role 패턴 (해당 서비스의 *:admin / *:operator 인식용) */
     adminRolePattern: RegExp;
@@ -290,7 +284,6 @@ export interface UsersConfig {
   /** Action policy override (선택) — 기본 set은 core 제공 */
   actionPolicies?: Record<string, unknown>;
 
-  /** 서비스별 추가 카운트 fetcher — 예: Glyco의 pharmacy/customer count */
   fetchExtraStats?: (api: UsersApi) => Promise<Record<string, number>>;
 }
 ```
@@ -340,7 +333,6 @@ export interface OperatorUsersListProps<T extends OperatorUserBase = OperatorUse
   }>;
 
   /**
-   * 삭제 동작 override (Glyco DeleteRiskModal 같은 custom flow).
    * 미지정 시 core 가 표준 confirm + api.deleteUser(id) 처리.
    */
   onDeleteOverride?: (user: T, refresh: () => void) => void;
@@ -515,30 +507,6 @@ export default function UsersPage() {
 
 → 페이지 코드 약 ~80% 감소 (현재 847 lines → 예상 ~150 lines).
 
-### 5.4 Glyco DeleteRiskModal 흡수 (Slot)
-
-```tsx
-// services/web-glycopharm/src/pages/operator/UsersPage.tsx (예시 — 추출 후)
-const [deleteTarget, setDeleteTarget] = useState(null);
-
-<OperatorUsersList
-  api={glycoUsersApi}
-  config={glycoUsersConfig}
-  onDeleteOverride={(user, refresh) => setDeleteTarget({ user, refresh })}
-/>
-{deleteTarget && (
-  <DeleteRiskModal
-    userId={deleteTarget.user.id}
-    onDeleted={() => { deleteTarget.refresh(); setDeleteTarget(null); }}
-    onClose={() => setDeleteTarget(null)}
-  />
-)}
-```
-
-DeleteRiskModal 컴포넌트는 web-glycopharm 내부에 유지 (Extension).
-
----
-
 ## 6. 마이그레이션 전략
 
 ### 6.1 단계 (3 step + 2 soak — Stores 와 동일 패턴)
@@ -548,15 +516,9 @@ DeleteRiskModal 컴포넌트는 web-glycopharm 내부에 유지 (Extension).
 | **Step 0** | `modules/users/` 신설 — types + 메인 컴포넌트 + EditUserModal + PasswordModal + useUsersQuery | 0 (신규) | +~700 |
 | **Step 1** | KPA `UsersPage` thin wrapper 변환 + adapter + config + AI Summary slot | KPA 는 이미 `ListColumnDef` + `useBatchAction` + `defineActionPolicy` 사용 — Stores Step 1 처럼 가장 가까움 | 낮음 | -650 / +150 |
 | **(soak 1주)** | KPA 안정성 검증 | smoke + log + AI Summary 동작 확인 | — | — |
-| **Step 2** | Glyco `UsersPage` — `@o4o/ui Column` → `ListColumnDef` 변환 + adapter + config + DeleteRiskModal slot 보존 | 중간 (Stores Step 2 와 유사) | 낮음 | -700 / +160 |
-| **(soak 1주)** | Glyco 안정성 검증 | smoke + log + DeleteRiskModal 동작 | — | — |
+| **Step 2** | — | 중간 (Stores Step 2 와 유사) | 낮음 | -700 / +160 |
+| **(soak 1주)** | — | smoke + log + DeleteRiskModal 동작 | — | — |
 | **Step 3** | K-Cos `UsersPage` — `@o4o/ui Column` → `ListColumnDef` 변환 + adapter + config | K-Cos 는 batch 없음 — `enableBatch: false` 또는 표준 batch 도입 결정 | 낮음~중 | -500 / +130 |
-
-### 6.2 마이그레이션 순서 근거 (Stores 와 동일: KPA → Glyco → K-Cos)
-
-- **KPA**: 이미 Operator 표준 (`ListColumnDef` + ux-core DataTable + useBatchAction + defineActionPolicy) 사용 — 가장 가까운 형태. AI Summary 만 slot 으로 분리하면 됨.
-- **Glyco**: 비표준 DataTable 사용. Column 변환 + DeleteRiskModal slot 분리.
-- **K-Cos**: 비표준 DataTable + batch 없음. 가장 단순하지만 패턴 정합성 마지막에 검증.
 
 ### 6.3 Soak 전략 (Stores 와 동일)
 
@@ -564,11 +526,11 @@ DeleteRiskModal 컴포넌트는 web-glycopharm 내부에 유지 (Extension).
 - Cloud Run 로그 ERROR 0
 - 페이지 진입 / 탭 전환 / 검색 / 페이지네이션 / 행 클릭 / 액션 정상
 - 회귀 흔적 없음
-- AI Summary (KPA) / DeleteRiskModal (Glyco) 정상
+- AI Summary (KPA) / DeleteRiskModal 정상
 
 ### 6.4 Neture 처리
 
-본 IR 범위는 KPA / Glyco / K-Cos 3 서비스. **Neture 는 Phase 4 별도 검토** — Neture EditUserModal 만 별도로 다루거나, Phase 4 에 일괄 추가.
+**Neture 는 Phase 4 별도 검토** — Neture EditUserModal 만 별도로 다루거나, Phase 4 에 일괄 추가.
 
 ---
 
@@ -601,15 +563,12 @@ DeleteRiskModal 컴포넌트는 web-glycopharm 내부에 유지 (Extension).
 | 리스크 | 심각도 | 완화 |
 |---|---|---|
 | **AI Summary 동작 회귀 (KPA)** | 중 | Step 1 진입 후 smoke. AI Summary 는 slot 으로 보존되므로 핵심 흐름은 영향 없음 |
-| **DeleteRiskModal 회귀 (Glyco)** | 중 | Step 2 진입 후 smoke. `onDeleteOverride` slot 으로 위임 — Glyco 측 DeleteRiskModal 컴포넌트는 이전 그대로 유지 |
-| **Glyco/K-Cos DataTable 변환 시 시각/기능 차이** | 중 | Step 2/3 전 컬럼 정의 사전 매핑 검증. Stores Step 2/3 의 변환 경험 적용 |
 | **K-Cos batch 도입 vs 생략 결정** | 낮음 | `enableBatch: false` 로 K-Cos 는 batch 없이 진행 가능. 표준 batch 도입은 별도 WO |
 | **Membership Role 편집 권한 차이** | 낮음 | `membershipRoleEditable` config 로 흡수 — KPA 만 `false` |
 | **KPA-a `MemberManagementPage` 가 Core 범위 침범** | 낮음 | 명시적 분리 — KPA-a 는 organization-based, 본 모듈 범위 아님 |
-| **Glyco stats fetch 의 1000건 client-side 집계** | 중 | 본 WO 범위 외. config 의 `fetchExtraStats` 슬롯으로 보존하되, 백엔드 집계 endpoint 추가는 별도 WO |
 | **기존 `@o4o/ui/operator-user-detail/EditUserModal` 와 중복** | 낮음 | 본 WO 후 cleanup WO 에서 제거 |
 | **role assignment API 의 일부 endpoint 누락** | 낮음 | Step 1 진입 전 KPA 의 PUT/POST/DELETE 동작 spot check 필요 |
-| **batch endpoint 의 응답 shape 차이** | 낮음 | KPA 와 Glyco 가 같은 endpoint(`/batch-status`) 사용 — 응답 shape 동일 가정. Step 1 에서 검증 |
+| **batch endpoint 의 응답 shape 차이** | 낮음 | Step 1 에서 검증 |
 
 ---
 
@@ -638,7 +597,6 @@ DeleteRiskModal 컴포넌트는 web-glycopharm 내부에 유지 (Extension).
 2. packages/operator-core-ui/src/index.ts barrel 추가
 3. KPA UsersPage thin wrapper 변환 + adapter + config + AI Summary slot (Step 1)
 4. (1주 soak)
-5. Glyco UsersPage thin wrapper 변환 + adapter + config + DeleteRiskModal slot (Step 2)
 6. (1주 soak)
 7. K-Cos UsersPage thin wrapper 변환 + adapter + config (Step 3)
 
@@ -654,13 +612,11 @@ DeleteRiskModal 컴포넌트는 web-glycopharm 내부에 유지 (Extension).
 - 3 서비스 typecheck (tsc -b --noEmit)
 - 3 서비스 컬럼 렌더링 / 페이지네이션 / 검색 / 행 클릭 / 선택 / batch / EditUserModal / PasswordModal / 삭제 동일성
 - KPA AI Summary 동작
-- Glyco DeleteRiskModal 동작
 - Cloud Run 로그 ERROR 0
 - 각 Step 후 1주 soak smoke
 
 완료 기준:
 - 3 서비스 모두 OperatorUsersList 사용
-- 페이지 레벨 코드 ~70~80% 감소 (KPA 847→~150, Glyco 785→~160, K-Cos 555→~130)
 - 회귀 0
 - 본 문서 §6.1 의 단계별 라인 추정 ±25% 이내
 ```
@@ -672,7 +628,7 @@ DeleteRiskModal 컴포넌트는 web-glycopharm 내부에 유지 (Extension).
 본 IR 발행 이후 명시적 IR/WO 없이 다음 금지:
 
 - ❌ 본 문서의 인터페이스 (UsersApi, UsersConfig, OperatorUsersListProps, EditUserModalProps 등) 즉흥 변경
-- ❌ Step 순서 변경 (KPA → Glyco → K-Cos 외 다른 순서)
+- ❌ Step 순서 변경
 - ❌ Step 사이 soak 생략
 - ❌ Extension 영역(`AI Summary`, `DeleteRiskModal`, `KPA-a MemberManagementPage`) 을 core-ui 모듈로 흡수 시도
 - ❌ Operator 페이지에서 `@o4o/ui` `DataTable` 직접 사용 (`OPERATOR-DATATABLE-POLICY-V1` 위반)
@@ -683,7 +639,7 @@ DeleteRiskModal 컴포넌트는 web-glycopharm 내부에 유지 (Extension).
 
 ## 11. 결론
 
-> **`@o4o/operator-core-ui/modules/users` 는 Stores 모듈과 동일한 패턴(Adapter / Config / Slot)으로 추출하며, KPA → Glyco → K-Cos 순으로 점진적 마이그레이션한다. AI Summary(KPA) / DeleteRiskModal(Glyco) 등 서비스 전용 영역은 slot 으로만 노출하고 core 가 흡수하지 않는다. EditUserModal 의 차이(membership role 편집 가능 여부, role 옵션 list)는 config 로 100% 흡수 가능하다.**
+> AI Summary(KPA) / DeleteRiskModal 등 서비스 전용 영역은 slot 으로만 노출하고 core 가 흡수하지 않는다. EditUserModal 의 차이(membership role 편집 가능 여부, role 옵션 list)는 config 로 100% 흡수 가능하다.
 
 본 IR 은 `WO-O4O-OPERATOR-USERS-CORE-EXTRACTION-V1` 의 직접 입력이다. 코드 수정은 본 IR 발행 후 별도 WO 진입 시점에 수행한다.
 
@@ -700,11 +656,9 @@ DeleteRiskModal 컴포넌트는 web-glycopharm 내부에 유지 (Extension).
   - [packages/operator-core-ui/src/modules/stores/OperatorStoresList.tsx](../../packages/operator-core-ui/src/modules/stores/OperatorStoresList.tsx)
 - 서비스별 UsersPage (마이그레이션 대상):
   - [services/web-kpa-society/src/pages/operator/UsersPage.tsx](../../services/web-kpa-society/src/pages/operator/UsersPage.tsx)
-  - [services/web-glycopharm/src/pages/operator/UsersPage.tsx](../../services/web-glycopharm/src/pages/operator/UsersPage.tsx)
   - [services/web-k-cosmetics/src/pages/operator/UsersPage.tsx](../../services/web-k-cosmetics/src/pages/operator/UsersPage.tsx)
 - 서비스별 EditUserModal:
   - [services/web-kpa-society/src/pages/operator/EditUserModal.tsx](../../services/web-kpa-society/src/pages/operator/EditUserModal.tsx)
-  - [services/web-glycopharm/src/pages/operator/EditUserModal.tsx](../../services/web-glycopharm/src/pages/operator/EditUserModal.tsx)
   - [services/web-k-cosmetics/src/pages/operator/EditUserModal.tsx](../../services/web-k-cosmetics/src/pages/operator/EditUserModal.tsx)
 - 기존 부분 공통화 (cleanup 대상):
   - [packages/ui/src/operator-user-detail/EditUserModal.tsx](../../packages/ui/src/operator-user-detail/EditUserModal.tsx)

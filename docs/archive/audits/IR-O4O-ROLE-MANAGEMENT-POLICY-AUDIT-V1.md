@@ -83,7 +83,6 @@ export function isPlatformAdmin(userRoles: string[]): boolean {
 
 | 서비스 | ASSIGNABLE_ROLES | `:admin` 포함 | 위반 |
 |--------|-----------------|:---:|:---:|
-| **glycopharm** | `glycopharm:admin`, `glycopharm:operator`, `glycopharm:member` | ✅ | **❌ 위반** |
 | **glucoseview** | `glucoseview:admin`, `glucoseview:operator`, `glucoseview:member` | ✅ | **❌ 위반** |
 | **neture** | `neture:admin`, `neture:operator`, `neture:member` | ✅ | **❌ 위반** |
 | **k-cosmetics** | `k-cosmetics:admin`, `k-cosmetics:operator`, `k-cosmetics:member` | ✅ | **❌ 위반** |
@@ -146,9 +145,7 @@ KPA는 완전히 다른 아키텍처:
 ### Case 2: Operator → 다른 사용자의 Admin 추가
 
 ```
-1. glycopharm:operator 로그인
 2. 회원 상세 페이지 → 역할 추가 모달
-3. "GlycoPharm Admin" 선택 → 추가
 4. → 200 OK
 ```
 
@@ -234,7 +231,6 @@ if (!scope.isPlatformAdmin) {
 
 ```
 1. Backend MembershipConsoleController (1개 파일, 즉시 전체 적용)
-2. Frontend GlycoPharm (기준)
 3. Frontend GlucoseView
 4. Frontend Neture
 5. Frontend K-Cosmetics

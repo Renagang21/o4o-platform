@@ -25,7 +25,7 @@
 |---|---|
 | 기준 `origin/main` | `e485baba96e9d9675a30a6d1a72031dfac495b22` |
 | 작업 branch | `work/signage-legacy-stack-simplification-v2` (최신 origin/main 에서 신규 생성) |
-| 이전 기준 `449568b0` → `e485baba` delta | 32 파일 (cart / glycopharm / audit script) — **삭제 후보와 교집합 0** |
+| 이전 기준 `449568b0` → `e485baba` delta | 32 파일 (cart / audit script) — **삭제 후보와 교집합 0** |
 | 다른 세션 파일 수정·삭제·stash | **0건** |
 | `git add .` | **미사용** (path-specific stage) |
 | 임의 rebase | **미수행** — clean worktree 에서 새 branch 생성으로 정렬 |
@@ -42,7 +42,7 @@
 
 | 놓친 surface | 실체 | 교정된 영향 |
 |---|---|---|
-| `packages/operator-core-ui/src/modules/signage-hq/**` (11 파일) | glycopharm · k-cosmetics · kpa-society **3개 배포 서비스에서 라우팅됨** (`App.tsx` → `signage/templates`) | `/templates` · `/media` · `/playlists` · `/hq/*` 가 **live 소비처를 가진다** → `DEFER`/`RETIRE` 가 아니라 **KEEP** |
+| `packages/operator-core-ui/src/modules/signage-hq/**` (11 파일) | k-cosmetics · kpa-society **3개 배포 서비스에서 라우팅됨** (`App.tsx` → `signage/templates`) | `/templates` · `/media` · `/playlists` · `/hq/*` 가 **live 소비처를 가진다** → `DEFER`/`RETIRE` 가 아니라 **KEEP |
 | `apps/admin-dashboard/src/pages/digital-signage/{operations,media,display,schedule,action}/**` (19 파일) | `DigitalSignageRouter` 에서 **라우팅됨** — 그러나 전부 `lib/api/digitalSignage.ts` (`API_BASE='/signage'`) 사용 | 존재하지 않는 4번째 축. 프로덕션 실측 `/api/v1/signage/*` → **404**. 신규 RETIRE 후보 (§12-2) |
 | `apps/admin-dashboard/src/pages/digital-signage/v2/MonitoringDashboard.tsx` | 라우팅되지만 `/api/signage/monitoring/*` 호출 — `monitoring` 은 route family 에도, `validateServiceKey` allowlist 에도 없다 | 신규 RETIRE 후보 (§12-2) |
 

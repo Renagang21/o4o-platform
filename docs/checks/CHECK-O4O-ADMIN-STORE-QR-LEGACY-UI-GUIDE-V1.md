@@ -10,7 +10,7 @@
 ## 1. 목적
 
 운영자 콘솔(admin-dashboard)의 매장 QR 생성/목록 화면은 `/api/v1/pharmacy/qr/*` 를 호출했으나
-그 경로는 service router 안에만 마운트돼 있어(`/api/v1/{kpa|glycopharm|cosmetics}/pharmacy/qr/*`)
+그 경로는 service router 안에만 마운트돼 있어
 생성 시점부터 계속 404 였다. QR 기능을 복구하는 것이 아니라, **작동하지 않는 UI를 노출하지 않도록
 안내 화면으로 교체**하는 것이 이번 WO 의 목적이다.
 
@@ -49,7 +49,6 @@
 안내 화면이 노출하는 매장 QR 진입점 (링크만, API 호출 없음):
 
 - KPA-Society `kpa-society.co.kr/store/marketing/qr`
-- GlycoPharm `glycopharm.co.kr/store/marketing/qr`
 - K-Cosmetics `k-cosmetics.site/store/marketing/qr`
 - Pharmacy-Hub `pharmacyhub.co.kr/store-owner/qr`
 

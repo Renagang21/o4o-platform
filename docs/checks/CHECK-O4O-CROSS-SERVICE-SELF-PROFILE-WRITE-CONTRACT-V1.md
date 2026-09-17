@@ -27,7 +27,7 @@
 
 | # | route | 인증 | role/scope | 대상 table | 허용 필드 | 실제 consumer | 동작 | 판정 |
 |---|-------|------|-----------|-----------|----------|--------------|------|------|
-| B1 | `PUT /api/v1/users/profile` | — | — | — | — | GP·KCos·Neture frontend | **라우트 미등록**. `/profile` 이 `router.use(requireAdmin)` 뒤 `PUT /:id`(`param('id').isUUID()`) 에 걸려 비관리자 403 / 관리자 400 | **DEAD (구현만 존재, mount 0)** |
+| B1 | `PUT /api/v1/users/profile` | — | — | — | — | KCos·Neture frontend | **라우트 미등록**. `/profile` 이 `router.use(requireAdmin)` 뒤 `PUT:id`(`param('id').isUUID`) 에 걸려 비관리자 403 / 관리자 400 | **DEAD (구현만 존재, mount 0)** |
 | B2 | `GET/PATCH /api/v1/users/me/contact` | `authenticate` | 없음 (self) | `users` | `contactEnabled`·`kakaoOpenChatUrl`·`kakaoChannelUrl` | Neture 외부 연락처 | 정상 | LIVE (self 축 관례) |
 | B3 | `PUT /api/v1/users/password` | `authenticate` | 없음 (self) | `users` / `service_credentials` | 비밀번호 | 전 서비스 | 정상 | LIVE (범위 밖) |
 | B4 | `PUT /api/v1/users/:id` | `authenticate` | `requireAdmin` | `users` | 관리자 필드 | admin 콘솔 | 정상 | LIVE (admin 축 — self 아님) |
@@ -40,13 +40,12 @@
 
 | # | 서비스 | 화면 | 호출 (작업 전) | 결과 | 작업 후 |
 |---|--------|------|---------------|------|--------|
-| F1 | GlycoPharm | `/mypage/profile` | `PUT /users/profile` | 저장 실패 (403/400) | `PATCH /users/me/profile` |
 | F2 | K-Cosmetics | `/mypage/profile` | `PUT /users/profile` | 저장 실패 | `PATCH /users/me/profile` |
 | F3 | Neture | `/mypage/profile` | `PUT /users/profile` | 저장 실패 | `PATCH /users/me/profile` |
 | F4 | Pharmacy-Hub | `/account`, `/store-owner/account` | `GET/PATCH /pharmacy-hub/store-owner/account/profile` | store_owner 만 성공, operator·supplier 는 403 → 조회 전용 | `GET/PATCH /users/me/profile` |
 | F5 | KPA | `/mypage/profile` | `GET/PUT /kpa/mypage/profile` | 정상 | **미변경** (회귀만 확인) |
 | F6 | KPA | 직역/면허 | `PATCH /auth/me/profile` | 정상 | **미변경** |
-| F7 | GP/KCos | 사업자정보 (`BusinessProfileSection`) | 서비스별 기존 API | 정상 | **미변경** |
+| F7 | KCos | 사업자정보 (`BusinessProfileSection`) | 서비스별 기존 API | 정상 | **미변경** |
 | F8 | Neture | 공급자 프로필 | 기존 Neture API | 정상 | **미변경** |
 
 **미조사 0** — `grep -rn "users/profile" services/ packages/` 및 `users.routes.ts` 전 route 열거로 확인했다.
@@ -72,7 +71,7 @@ canonical: GET  /api/v1/users/me/profile
 
 A안(`PUT /users/profile` 복구)을 택하지 않은 근거는 추측이 아니라 다음 실측이다.
 
-1. **소비처는 많지만 계약은 존재한 적이 없다.** GP·KCos·Neture 3서비스가 호출하고 있으나, 그 라우트는
+1. **소비처는 많지만 계약은 존재한 적이 없다.** KCos·Neture 2서비스가 호출하고 있으나, 그 라우트는
    `users.routes.ts` 에 **한 번도 등록된 적이 없다** (history 검색 무결과). 즉 "복구" 대상이 아니라 애초에 없는 계약이다.
 2. **admin 축과 literal/param 충돌.** `/users/profile` 은 `requireAdmin` 뒤 `PUT /:id` 에 흡수된다.
    `/profile` 을 requireAdmin 앞에 두면 동작하지만, 같은 router 안에서 literal 과 `:id` 파라미터가
@@ -134,7 +133,6 @@ authenticate (router.use) → req.user.id 확인 → allowlist validation
 
 | 서비스 | 변경 파일 | 내용 |
 |--------|----------|------|
-| GlycoPharm | `services/web-glycopharm/src/pages/mypage/MyProfilePage.tsx` | `api.put('/users/profile')` → `api.patch('/users/me/profile')` |
 | K-Cosmetics | `services/web-k-cosmetics/src/pages/mypage/MyProfilePage.tsx` | 동일 |
 | Neture | `services/web-neture/src/pages/mypage/MyProfilePage.tsx` | 동일 |
 | Pharmacy-Hub | `services/web-pharmacy-hub/src/lib/api/pharmacyHubAccount.ts` | `PROFILE_PATH` → `/users/me/profile`, `editableFields` 타입 추가 |
@@ -186,7 +184,6 @@ KPA 는 **코드 변경 0건**이다 (§10 기본 미변경).
 
 | # | 서비스 / 계정 | `editableFields` | PATCH | 재조회 persist | 금지 필드(`roles`,`status`) | 원복 |
 |---|---------------|------------------|:-----:|:--------------:|-----------------------------|:----:|
-| 1 | GlycoPharm (`glycopharm`) | name·firstName·lastName·nickname·phone | 200 | O | 400 `FIELD_NOT_EDITABLE` | O |
 | 2 | K-Cosmetics (`k-cosmetics`) | 동일 | 200 | O | 400 `FIELD_NOT_EDITABLE` | O |
 | 3 | Neture (`neture`) | 동일 | 200 | O | 400 `FIELD_NOT_EDITABLE` | O |
 | 4 | PharmacyHub operator (`pharmacy-hub`) | 동일 | 200 | O | 400 `FIELD_NOT_EDITABLE` | O |
@@ -203,15 +200,14 @@ KPA 는 **코드 변경 0건**이다 (§10 기본 미변경).
 |---|------|----------|:----:|
 | 1 | PharmacyHub operator — `/account` | 사용자 메뉴 "내 프로필" 진입 → 프로필 수정 노출 → nickname 수정 → 저장("계정 정보를 저장했습니다.") → 재진입 유지 → 원복 · 비밀번호 변경 모달 open/cancel 정상 · console error 0 | PASS |
 | 2 | PharmacyHub — `/store-owner/account` (thin wrapper) | wrapper 경로 렌더 → 프로필 수정 → 저장 → 값 반영 → 원복 · console error 0 | PASS |
-| 3 | GlycoPharm — `/mypage/profile` | 로그인 → 프로필 수정 → nickname 수정 → 저장("프로필이 수정되었습니다.") → **새로고침 후 값 유지** → 원복 → 새로고침 재확인 | PASS |
+| 3 | — | 로그인 → 프로필 수정 → nickname 수정 → 저장("프로필이 수정되었습니다.") → **새로고침 후 값 유지** → 원복 → 새로고침 재확인 | PASS |
 | 4 | KPA-Society — `/mypage/profile` (회귀) | 로그인 → 수정 → 저장("기본 정보가 저장되었습니다.") → 값 반영 → 원복. 기존 KPA 전용 write 경로 동작 변화 없음 | PASS (회귀 이상 0) |
 | 5 | K-Cosmetics — `/mypage/profile` | **미수행** | SKIPPED |
 | 6 | Neture — `/mypage/profile` | **미수행** | SKIPPED |
 
 **5·6 SKIPPED 사유 (숨기지 않고 명시)** — 두 사이트는 브라우저에 저장된 자격증명이 없어 로그인 폼 자동 채움이 되지 않는다. 자격증명을 자동화 입력으로 넘기려면 `docs/local/TEST-ACCOUNTS.local.md` 의 비밀번호를 평문으로 노출해야 하는데, 이는 §15 자격증명 취급 원칙 위반이므로 수행하지 않았다 (자격증명을 로컬에서 브라우저로 전달하는 우회 경로도 환경 정책상 차단됨).
 
-**대체 근거** — 두 서비스의 화면 변경분은 GlycoPharm 과 **동일한 1줄 호출 전환**(`api.put('/users/profile')` → `api.patch('/users/me/profile')`)이며, GP 브라우저 PASS + KCos/Neture API 레벨 PASS(위 11-1 #2·#3)로 계약 동작이 확인된다. 잔여 미확인 범위는 두 서비스의 화면 렌더링뿐이다.
-
+잔여 미확인 범위는 두 서비스의 화면 렌더링뿐이다.
 
 ---
 
@@ -246,7 +242,7 @@ KPA 는 **코드 변경 0건**이다 (§10 기본 미변경).
 | # | 내용 | 상태 |
 |---|------|------|
 | #6 | PH operator 가 본인 프로필을 **수정**할 수 없음 (backend 계약 부재) | **해소** — canonical 계약으로 인증 사용자 전원 수정 가능 |
-| #7 | GP/KCos/Neture 의 `PUT /users/profile` 저장 실패 | **해소** — canonical 로 전환 |
+| #7 | KCos/Neture 의 `PUT /users/profile` 저장 실패 | **해소** — canonical 로 전환 |
 | #8 | 프로필 write 계약이 서비스별로 흩어져 있음 | **해소** — ACCOUNT_CORE write 단일 계약 확정 (KPA 전용 축은 의도적 유지) |
 
 ---
@@ -262,7 +258,6 @@ KPA 는 **코드 변경 0건**이다 (§10 기본 미변경).
 | stage 방식 | path-specific only (`git add .` 미사용) |
 | 타 세션 작업 | `packages/lms-ui/**` · `packages/shared-space-ui/**` · `services/web-kpa-society/src/components/education/**` 등 LMS 계열 미커밋 변경은 **손대지 않았다** (수정·삭제·stash 0) |
 | 완료 기준 | 본 WO 범위 미커밋 변경 0 / `HEAD == origin/main` |
-
 
 ---
 

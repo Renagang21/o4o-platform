@@ -4,7 +4,7 @@
  * WO-KPA-PHARMACY-HUB-SIDEBAR-LAYOUT-AND-PRODUCT-TABS-FIX-V1
  * WO-O4O-PHARMACY-HUB-LAYOUT-MOBILE-V1: drawer 패턴 적용
  * WO-O4O-STORE-HUB-COMMON-VIEW-AND-SHELL-UNIFICATION-V1:
- *   K-Cosmetics·GlycoPharm 과 같은 골격이던 사이드바/드로어를 공통 `StoreHubShell` 로 이관.
+ *   K-Cosmetics 과 같은 골격이던 사이드바/드로어를 공통 `StoreHubShell` 로 이관.
  *   이 파일은 **메뉴 config(그룹 포함) + accent + label + 이벤트 배지 조회** 만 소유한다.
  *   메뉴 항목 / 라우트 / 권한 / API 무변경.
  *   inline style → 공통 Tailwind 마크업, drawer 분기점 md → lg 로 정규화(공통 Shell 기준).

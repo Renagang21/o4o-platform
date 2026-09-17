@@ -20,7 +20,7 @@
 | engine registry | AiEnginesPage 2.5 정렬 + 무효 `gemini-3.0-flash` 제거 | ✅ |
 | 공통 모달 | `AiContentModal`(@o4o/content-editor) — POP 3서비스 정렬 | ✅ |
 | preset 표준 | surface-agnostic `EditingPreset`(@o4o/types) + store `ProductionTemplate` 경계 보존 | ✅ |
-| preset 적용 | resources(KPA)·LMS lesson(KPA/GP)·library-entry(KPA/GP/KCos) | ✅ |
+| preset 적용 | resources(KPA)·LMS lesson(KPA)·library-entry(KPA/KCos) | ✅ |
 
 ## 3. 모델 / 엔진 트랙 완료 상태
 
@@ -31,7 +31,7 @@
 ## 4. AiContentModal adoption 완료 상태
 
 - 공통 편집 모달 = **`AiContentModal`(@o4o/content-editor)** — 신규 모달 추출 없음.
-- POP: KPA/GP/KCos **인라인 fetch → AiContentModal 정렬**(GP/KCos 인라인 제거). 제품설명: 3서비스 template-aware 확인. QR: **KPA-only AI**(GP/KCos surface 부재 — 미구축 유지). 제작자료 editor: 모달 미렌더(nav state 로 결과 수신). 라이브러리 진입: 3서비스 generic → library-entry preset 적용.
+- POP: KPA/KCos **인라인 fetch → AiContentModal 정렬**(KCos 인라인 제거). 제품설명: 2서비스 template-aware 확인. QR: **KPA-only AI**(KCos surface 부재 — 미구축 유지). 제작자료 editor: 모달 미렌더(nav state 로 결과 수신). 라이브러리 진입: 3서비스 generic → library-entry preset 적용.
 - 근거: `WO-O4O-AI-EDITING-MODAL-ADOPTION-ALIGNMENT-V1`, `WO-O4O-AI-QR-PRODUCT-DESCRIPTION-PRESET-ALIGNMENT-V1`.
 
 ## 5. store ProductionTemplate 경계
@@ -42,7 +42,7 @@
 ## 6. EditingPreset 적용 결과
 
 - `@o4o/types` `EditingPreset`/`EditingSurface` + `EDITING_PRESETS`(비-store canonical) + `findEditingPreset` + `productionTemplateToEditingPreset`(store→상위계층 변환). store 4-target 을 부분집합으로 포함하는 상위 계층.
-- 적용: **resource**(KPA resources, professional/medium) · **lms-lesson**(KPA/GP 레슨 본문, professional/long) · **library-entry**(KPA/GP/KCos 라이브러리, 중립 — target 미고정, systemPrompt 없음). 전부 `AiContentModal` 기존 prop(`templateSystemPrompt`/`templateForcedOptions`) 재사용.
+- 적용: **resource**(KPA resources, professional/medium) · **lms-lesson**(KPA 레슨 본문, professional/long) · **library-entry**(KPA/KCos 라이브러리, 중립 — target 미고정, systemPrompt 없음). 전부 `AiContentModal` 기존 prop(`templateSystemPrompt`/`templateForcedOptions`) 재사용.
 - 근거: `IR-O4O-AI-EDITING-PROMPT-PRESET-STANDARD-V1`, `WO-O4O-AI-PRODUCTION-TEMPLATE-SURFACE-PRESET-EXTEND-V1`, `WO-O4O-AI-EDITING-PRESET-ADOPTION-LMS-RESOURCES-V1`.
 
 ## 7. 고정 결론 (재논의 금지)
@@ -62,7 +62,7 @@
 - **CourseStructureAiModal**(2단계·고정 프롬프트·AiContentModal 비경유) → 별도 설계(§10-1).
 - **Signage AI**(`/api/signage/.../ai/generate` 별도 파이프라인, 현재 placeholder) · **admin builder generator**(`/api/ai/generate`, block/page/section) → 별도 조사(§10-4).
 - **비-Gemini provider**(DeepSeek/Qwen) → abstraction WO(§10-2) + 거버넌스 IR(§10-3) 후.
-- **GP/KCos QR AI · KCos LMS editor** → surface 부재(신규 미구축).
+- **KCos QR AI · KCos LMS editor** → surface 부재(신규 미구축).
 - **잔여 hardcode**(admin-builder/resolver/LMS service의 gemini 기본값) → provider abstraction 시 단계 정리.
 
 ## 9. 남은 리스크

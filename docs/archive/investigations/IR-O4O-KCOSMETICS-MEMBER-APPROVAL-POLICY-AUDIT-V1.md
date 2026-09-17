@@ -148,7 +148,7 @@ statusTabs={[
 
 **단점**:
 - 스팸/악의 회원 통제 어려움
-- 다른 서비스(GlycoPharm/KPA)와 불일치
+- 다른 서비스(KPA)와 불일치
 - B2B 시나리오(매장 승인) 부적합
 
 **비용**: €0
@@ -203,7 +203,6 @@ statusTabs={[
 **정의**: cosmetics_store_applications 패턴을 회원 신청에 적용
 
 **장점**:
-- GlycoPharm과 통일
 - 세분화된 상태 (reviewing, revision_requested)
 - 복잡한 승인 로직 수용
 
@@ -320,7 +319,6 @@ B안 구현 시 모든 철학적 요구사항 충족
 - [ ] 개발팀과 구현 계획 수립
 
 ### Long-term
-- [ ] GlycoPharm 검점 (약국 승인 flow)
 - [ ] Neture supplier approval과 통일 가능성 평가
 - [ ] Platform-wide approval policy 문서화
 

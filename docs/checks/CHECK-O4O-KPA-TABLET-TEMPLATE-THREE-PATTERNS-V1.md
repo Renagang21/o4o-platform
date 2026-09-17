@@ -13,7 +13,7 @@ KPA 태블릿 Screen Set 에서 선택 가능한 템플릿을 2종 → **5종**�
 - **대기 영상형**(`idle_touch_video`): 상단 hero 영상 + "화면을 터치하세요 / Touch to start" 한/영 오버레이 + QR chip.
 - **코너 소개형**(`corner_overview_qr`): 코너 설명 + 콘텐츠 + QR (상품 그리드 생략, 정적 안내).
 - **제품 진열형**(`product_grid_qr`): 축약 헤더 + 밀집 상품 그리드(5~10개 수준) + 하단 QR.
-- 새 block 타입 0 · DB migration 0 · public runtime API 계약 변경 0(`/tablet/screen` 은 `resolveTemplateKey` pass-through) · GP/KCos 무영향(screen=null).
+- 새 block 타입 0 · DB migration 0 · public runtime API 계약 변경 0(`/tablet/screen` 은 `resolveTemplateKey` pass-through) · KCos 무영향(screen=null).
 
 ---
 
@@ -50,7 +50,7 @@ KPA 태블릿 Screen Set 에서 선택 가능한 템플릿을 2종 → **5종**�
 - **실제 스캔 QR**: `qrcode.react` 의 `QRCodeSVG` 로 `qr_guide.url`(운영자 설정)을 렌더. 그 화면(코너 안내)을 여는 QR — 상품 개별 QR 아님.
 - 백엔드/QR entity/저장 모델 추가 0. 이미 존재하는 qr_guide.url 만 소비. url 없으면 ▣ 아이콘 fallback.
 - 위치: 기본/코너 소개형=상단 카드, product 레이아웃=하단 배너, 대기 영상형=hero 우하단 chip(공통 흰 여백 박스로 스캔 안정성). 공통 헬퍼 `QrImage`.
-- **의존성 추가**: `qrcode.react@^4.2.0` → `@o4o/tablet-kiosk-core` dependencies(이미 lockfile resolved, additive). kiosk-core 는 소스 소비 → 모든 소비처 transitive 해결. **GP/KCos 는 fetchScreen KPA 전용 → screen=null → qrGuide 없음 → QR/템플릿 경로 미실행**(추가 번들만, 코드 무동작).
+- **의존성 추가**: `qrcode.react@^4.2.0` → `@o4o/tablet-kiosk-core` dependencies(이미 lockfile resolved, additive). kiosk-core 는 소스 소비 → 모든 소비처 transitive 해결. **KCos 는 fetchScreen KPA 전용 → screen=null → qrGuide 없음 → QR/템플릿 경로 미실행**(추가 번들만, 코드 무동작).
 
 ## 6. 선택 UI (§5)
 - `TabletScreenSetManager.tsx` `TEMPLATE_OPTIONS` 에 3종 추가(각 label + 적합 화면 설명). 기존 select 편집기 그대로 노출. preview 전면 개편 없음(§5 단서).
@@ -128,4 +128,4 @@ apps/api-server/.../__tests__/shared-product-description.cosmetic-guard.test.ts 
 
 ---
 
-*태블릿 템플릿 3종(대기 영상형 idle_touch_video / 코너 소개형 corner_overview_qr / 제품 진열형 product_grid_qr) = template_key viewer 레이아웃 분기(새 block/migration 0). 화면 QR = qr_guide.url 기반 실제 스캔 QR(qrcode.react, 백엔드/entity 0, GP/KCos screen=null 무동작). 서버=저장 화이트리스트 +3, 프론트=선택 UI +3. 부수=cosmetic-guard 목 query() 사전버그 수정(10/10). typecheck 0·태블릿/guard 테스트 PASS. 신규 템플릿 실화면 smoke=인증 필요 DEFERRED.*
+*태블릿 템플릿 3종(대기 영상형 idle_touch_video / 코너 소개형 corner_overview_qr / 제품 진열형 product_grid_qr) = template_key viewer 레이아웃 분기(새 block/migration 0). 화면 QR = qr_guide.url 기반 실제 스캔 QR(qrcode.react, 백엔드/entity 0, KCos screen=null 무동작). 서버=저장 화이트리스트 +3, 프론트=선택 UI +3. 부수=cosmetic-guard 목 query 사전버그 수정(10/10). typecheck 0·태블릿/guard 테스트 PASS. 신규 템플릿 실화면 smoke=인증 필요 DEFERRED.*

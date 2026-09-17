@@ -64,7 +64,7 @@ feed 각 branch 검색 절에 `tags::text ILIKE` 추가. snapshot은 content_jso
 - `api-server` / `web-kpa-society` tsc --noEmit 오류 0. API+Web 배포 success.
 
 ## 5. 범위/안전
-- **KPA mount 전용**(`kpa.routes.ts`) → GP/KCos 무영향. migration 없음.
+- **KPA mount 전용**(`kpa.routes.ts`) → KCos 무영향. migration 없음.
 - QR/POP 제작 흐름·제작자료 메뉴·AI·운영자 콘텐츠 editor 무변경. 기존 QR target/공개 URL 무변경. 데이터 삭제/이동 0.
 - 태그 chip 클릭은 `stopPropagation`으로 체크박스/행 클릭과 분리. modal(제작 자료 선택)은 출처 탭 미노출(page 게이트) → 모달 흐름 회귀 없음.
 

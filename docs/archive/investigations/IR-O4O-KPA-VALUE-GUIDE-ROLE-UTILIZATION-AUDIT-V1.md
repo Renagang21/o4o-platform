@@ -64,7 +64,7 @@
 | 조사일 | 2026-05-24 |
 | Repo 시점 | origin/main 와 일치 (0 commits 차이) |
 | 조사 방법 | 4 병렬 Explore agent — (1) Philosophy SSOT + 로그인 직후 화면 / (2) 3 역할별 활용 매트릭스 / (3) 현재 Guide 구조 / (4) 가치 전달 격차 |
-| 조사 범위 | `services/web-kpa-society/src/**` + `docs/baseline/O4O-*` + `packages/shared-space-ui/src/guide/copy/kpa.ts` (Guide 정적 카피) + 4 service 비교 (Neture/GP/K-Cos) |
+| 조사 범위 | `services/web-kpa-society/src/` + `docs/baseline/O4O-*` + `packages/shared-space-ui/src/guide/copy/kpa.ts` (Guide 정적 카피) + 3 service 비교 (Neture/K-Cos) |
 
 ---
 
@@ -153,7 +153,7 @@ AI 는 경쟁력 증폭 도구다.
 | **B** | 공급자 / 운영사업자 / 매장 3자 협력 구조 (HUB 철학) | §3, §4, §5 |
 | **C** | AI 를 통한 콘텐츠 / 자료 제작 활용 (경쟁력 증폭) | §6 |
 | **D** | 운영자가 매장을 지원하는 생태계 | §3.2 |
-| **E** | 공통 인프라 + 서비스별 독립 (KPA/Neture/GP/K-Cos) | §1, §9 |
+| **E** | 공통 인프라 + 서비스별 독립 (KPA/Neture/K-Cos) | §1, §9 |
 | **F** | 단순 정보 커뮤니티가 아닌 실행 자산 플랫폼 | §5, §8 |
 
 ---
@@ -408,7 +408,6 @@ Philosophy §4 의 Canonical Flow 가 코드에 어떻게 반영되어 있는가
 |---|:---:|
 | **KPA** | ✅ 14 page (production) |
 | Neture | ❌ 0 (shared-space-ui 컴포넌트만 존재, neture.ts props 미작성 — IR-O4O-NETURE-GUIDE-STRUCTURE-AUDIT-V1 대기) |
-| GlycoPharm | ❌ 0 |
 | K-Cosmetics | ❌ 0 |
 
 → 본 IR 권고가 KPA 에서 적용된 후, 다른 3 service 로 확장 가능.
@@ -592,7 +591,7 @@ Philosophy §4 의 Canonical Flow 가 코드에 어떻게 반영되어 있는가
 | 후속 | 우선순위 | 비고 |
 |---|:---:|---|
 | `IR-O4O-NETURE-GUIDE-STRUCTURE-AUDIT-V1` | 中 | (이미 존재) Neture Guide 구현 검토 |
-| `IR-O4O-GP-KCOS-GUIDE-STRUCTURE-AUDIT-V1` | 低 | GlycoPharm / K-Cosmetics Guide 구현 필요성 |
+| `IR-O4O-GP-KCOS-GUIDE-STRUCTURE-AUDIT-V1` | 低 | K-Cosmetics Guide 구현 필요성 |
 | `IR-O4O-4SERVICE-HERO-MESSAGE-CONSISTENCY-V1` | 低 | 4 service Hero 메시지 통일성 (KPA 가 현재 가장 약함) |
 
 ---
@@ -637,7 +636,7 @@ Philosophy §4 의 Canonical Flow 가 코드에 어떻게 반영되어 있는가
    포럼 게시물 / 자료 등의 환류 경로 신설 시 운영자 큐레이션 의도 반영.
 
 7. 4 service 의 Hero 메시지는 통일된 톤 가능. 단 각 service 의 사업 성격
-   (KPA 약사회 / Neture 공급자 / GP 약품 / K-Cos 화장품) 차이 보존.
+   (KPA 약사회 / Neture 공급자 약품 / K-Cos 화장품) 차이 보존.
 ```
 
 ---
@@ -651,7 +650,7 @@ Philosophy §4 의 Canonical Flow 가 코드에 어떻게 반영되어 있는가
 | Tier 1 별건 IR/WO 후보 | 3 (Main Nav Value Message / Guide for Role / Dashboard Value Connection) |
 | Tier 2 별건 IR 후보 | 5 (Operator Workspace A-E 각각) |
 | Tier 3 별건 IR 후보 | 3 (Community 환류 / 인센티브 / 사용자 콘텐츠 생산) |
-| Tier 4 별건 IR 후보 | 3 (Neture/GP/K-Cos Guide 확장 / 4 service Hero consistency) |
+| Tier 4 별건 IR 후보 | 3 (Neture/K-Cos Guide 확장 / 3 service Hero consistency) |
 | Philosophy 정합 명문화 | ✅ 6 가치 명제 (A-F) 의 현재 전달도 매트릭스 |
 | 사용자 오인 원인 명문화 | ✅ Top 5 구조적 원인 + 코드 근거 |
 | 사이클 정리 | 본 IR 로 "O4O 가치 전달 체계" 의 큰 그림 확정. 후속 IR / WO 시리즈는 점진 진행 |
@@ -695,7 +694,6 @@ grep -rnoE "label:\s*'[^']+'" \
   services/web-kpa-society/src/config/navigation.ts
 
 # 10. 4 service Hero 메시지 비교
-for SVC in kpa-society neture glycopharm k-cosmetics; do
   echo "=== $SVC ==="
   grep -nE "title:|subtitle:|heroTitle:|heroDesc:" \
     services/web-$SVC/src/config/navigation.ts \

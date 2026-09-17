@@ -10,7 +10,7 @@
  *   ProductMaster → SupplierProductOffer → ServiceProduct → OrganizationProductListing
  *
  * 역할:
- *   특정 서비스(kpa, glycopharm, cosmetics 등)에서 사용 가능한 제품을 정의.
+ *   특정 서비스(kpa, cosmetics 등)에서 사용 가능한 제품을 정의.
  *   서비스별 가시성, 상태 정책을 독립 관리.
  */
 

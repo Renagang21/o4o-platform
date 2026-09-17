@@ -46,9 +46,9 @@
 
 ### 4.4 UNKNOWN_KEEP — scanned dir 커버 file-level 미확정 → 삭제 금지 (WO §6.4)
 IR §4 에서 C 후보로 거론됐으나 **scanned dir CREATE 매칭 0 또는 file-level 커버 미확정** + data-migration 성격이라 보수적 보존:
-- scanned 매칭 0 확인: `forum_categories`(CreateForumTables) · `glycopharm_featured_products` · `glycopharm_billing_invoices`(+AddInvoiceDispatchFields) · `platform_store_policies` · `platform_store_payment_configs`.
+- scanned 매칭 0 확인: `forum_categories`(CreateForumTables) · `platform_store_policies` · `platform_store_payment_configs`.
 - data/normalization migration(스키마 아님, 멱등·이력 추적 가치): `BackfillPlatformStoreSlugs1771200000001` · `KpaBRoleDataNormalization1771200000009` · `PrefixUnprefixedRoles1771200000019`.
-- 기타 보류(table 일부만 grep 확인 — file-level 미확정): CreateNetureTables · AddProductInfoFields · AddImagesToGlycopharmProducts · CreateGlycopharmFeaturedProducts · CreateGlycopharmBillingInvoices · AddForumPostPerformanceIndexes · AddCoursePaidFields · CreatePlatformStoreSlugsTables · AddRequestedSlugToApplications · CreatePlatformStorePolicies · CreatePlatformStorePaymentConfigs · AddTemplateProfileToPharmacies · AddStorefrontBlocksToPharmacies · AddDescriptionFieldsToOffer · OfferDistributionTypeV1 · AddCourseServiceKey · EventOfferCoreReform.
+- 기타 보류(table 일부만 grep 확인 — file-level 미확정): CreateNetureTables · AddProductInfoFields · AddForumPostPerformanceIndexes · AddCoursePaidFields · CreatePlatformStoreSlugsTables · AddRequestedSlugToApplications · CreatePlatformStorePolicies · CreatePlatformStorePaymentConfigs · AddTemplateProfileToPharmacies · AddStorefrontBlocksToPharmacies · AddDescriptionFieldsToOffer · OfferDistributionTypeV1 · AddCourseServiceKey · EventOfferCoreReform.
 
 > 원칙(WO §6.4): UNKNOWN 이면 삭제하지 않는다. 본 WO 는 **file-level 로 커버/폐기가 증명된 5개만** 정리. 나머지 C 후보는 별도 후속에서 prod 실재 확인 후 일괄 정리.
 

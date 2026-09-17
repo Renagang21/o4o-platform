@@ -85,7 +85,6 @@ WO §6 의 **A안**(`/` 만 `NetureLayout` 밖에 배치)을 선택했다. 신�
 | 약국 | `https://kpa-society.co.kr/` | 외부 |
 | 약국 경영 | `https://pharmacyhub.co.kr` | 외부 |
 | 화장품 | `https://www.k-cosmetics.site/` | 외부 |
-| 혈당 관리 | `https://www.glycopharm.co.kr` | 외부 |
 | 공급자 | `/supplier` | 내부 canonical |
 | 파트너 | `/partner` | 내부 canonical |
 | 커뮤니티 | `/community` | 내부 canonical |

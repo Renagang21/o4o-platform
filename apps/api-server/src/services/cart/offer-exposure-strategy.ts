@@ -14,7 +14,7 @@
  * ─────────────────────────────────────────────────────────────────────────────
  * 3종 (현재 canonical 분류 그대로 — 새 정책을 만들지 않는다)
  *
- *   approval  : glycopharm / kpa-society / k-cosmetics
+ *   approval  : kpa-society / k-cosmetics
  *               `offer_service_approvals` 에 해당 serviceKey 승인(APPROVED) 행이 있어야 한다.
  *               `service_keys` opt-in 만으로 우회할 수 없다.
  *   optin     : pharmacy-hub
@@ -108,7 +108,7 @@ export interface OfferExposureStrategy {
  * 무관하게 게이트를 완화하지 않는다 — 0건이면 "공급 승인/온보딩이 없다"는 사실이지
  * 게이트를 낮출 근거가 아니다.
  *
- * 표기 축 (WO-O4O-GLYCOPHARM-CANONICAL-B2B-CART-PRODUCER-UI-ADOPTION-V1 §19):
+ * 표기 축:
  *   `offer_service_approvals.approval_status` 는 **소문자** 도메인이다
  *   (entity default 'pending', backfill migration 'approved', 카탈로그 SSOT
  *   `buildServiceApprovalGateSql` 도 'approved').
@@ -150,7 +150,7 @@ const approvalStrategy: OfferExposureStrategy = {
  *
  * 조회(`PharmacyHubStoreProductController` EXPOSURE_GATE_SQL)와 **같은 기준**으로 재검증한다 —
  * 조회에 보이면 담을 수 있고, 담을 수 있으면 주문 시점에 같은 기준으로 다시 본다.
- * `approval_status` 는 보지 않는다(승인 대상 3키 파생값이라 PENDING 이 정상).
+ * `approval_status` 는 보지 않는다(승인 대상 2키 파생값이라 PENDING 이 정상).
  */
 const optinStrategy: OfferExposureStrategy = {
   key: 'optin',

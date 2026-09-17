@@ -3,7 +3,7 @@
  *
  * WO-O4O-CROSSSERVICE-OPERATOR-FORUM-ANALYTICS-COMMONIZE-V1
  *
- * KPA-Society / GlycoPharm / K-Cosmetics 의 forum 분석 화면(조회 전용)을 단일 콘솔로 수렴.
+ * KPA-Society / K-Cosmetics 의 forum 분석 화면(조회 전용)을 단일 콘솔로 수렴.
  * 서비스 차이는 accent(className 문자열) + client adapter 로만 흡수.
  */
 

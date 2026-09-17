@@ -16,7 +16,7 @@
 - LMS 백엔드(`apps/api-server/src/modules/lms`)는 **모든 서비스가 공유하는 단일 모듈**이다.
 - `kpaLmsScopeGuard` 는 `/api/v1/lms` **전체에 마운트**되어 있다.
 - 하지만 가드의 **실제 검증 범위는 매우 좁다** — KPA 조직 코스의 쓰기 작업만 제한한다.
-- 다른 서비스(GlycoPharm / K-Cosmetics / Neture)의 LMS 호출은 자연스럽게 통과한다.
+- 다른 서비스(K-Cosmetics / Neture)의 LMS 호출은 자연스럽게 통과한다.
 
 ---
 
@@ -88,7 +88,7 @@ const COURSE_WRITE_RE = /^\/courses(\/[0-9a-f-]+)?(\/(?:publish|unpublish|archiv
 ### 의도적으로 풀어둔 것
 - **GET 전부 통과** — 강의 목록/상세 조회는 누구나 가능 (인증·권한은 하위 라우트에서 별도 처리).
 - **다른 강사 자원(quiz/assignment/live)** — 이미 코스 ownership을 통해 간접 보호되므로 가드 검증 불필요. 각 컨트롤러에서 처리.
-- **KPA 조직이 아닌 모든 호출** — 다른 서비스(Glyco/K-Cos/...)의 LMS 사용을 방해하지 않음. 공통 LMS 구조 유지.
+- **KPA 조직이 아닌 모든 호출** — 다른 서비스의 LMS 사용을 방해하지 않음. 공통 LMS 구조 유지.
 
 ---
 
@@ -97,7 +97,6 @@ const COURSE_WRITE_RE = /^\/courses(\/[0-9a-f-]+)?(\/(?:publish|unpublish|archiv
 | 서비스 | 영향 | 비고 |
 |---|---|---|
 | **KPA-Society** | 코스 쓰기 시 `lms_creator` 자격 필요 | 정상 설계 동작 |
-| **GlycoPharm** | 영향 없음 (현재 강사는 GET 1개만 호출) | 향후 코스 쓰기 도입 시 §7 참조 |
 | **K-Cosmetics** | 영향 없음 (학습자 GET만 사용) | — |
 | **Neture** | 영향 없음 (LMS 미사용) | — |
 
@@ -105,7 +104,7 @@ const COURSE_WRITE_RE = /^\/courses(\/[0-9a-f-]+)?(\/(?:publish|unpublish|archiv
 
 ## 7. 향후 개발자 주의사항
 
-### 7.1 GlycoPharm / 신규 서비스 강사 도입 시
+### 7.1 신규 서비스 강사 도입 시
 
 - 가드는 **`serviceKey` 기반이 아니라 `organizationId` → `kpa_members` 매핑 기반**이다.
 - 다른 서비스 사용자의 `organizationId` 는 `kpa_members` 에 매핑되지 않으므로 자연 통과한다.
@@ -137,7 +136,7 @@ const COURSE_WRITE_RE = /^\/courses(\/[0-9a-f-]+)?(\/(?:publish|unpublish|archiv
 
 > **kpaLmsScopeGuard 는 전체 LMS 를 막는 것이 아니라 KPA 조직의 코스 생성·수정·발행·아카이브만 제한하는 보호 장치이다.**
 
-GlycoPharm / K-Cosmetics / Neture 의 LMS 호출은 가드와 무관하게 정상 통과한다. 공통 LMS 백엔드와 호환되도록 의도적으로 좁게 설계되어 있다.
+K-Cosmetics / Neture 의 LMS 호출은 가드와 무관하게 정상 통과한다. 공통 LMS 백엔드와 호환되도록 의도적으로 좁게 설계되어 있다.
 
 ---
 

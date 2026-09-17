@@ -3,7 +3,7 @@
  * WO-O4O-SHARED-HUB-CARD-COMPONENT-V1
  *
  * LMS / Forum 카드를 동일 구조로 표현하기 위한 컴포넌트.
- * 썸네일은 지원하지 않는다. 다른 서비스(Glycopharm 등)로의 승격 전엔 KPA 전용.
+ * 썸네일은 지원하지 않는다. 다른 서비스로의 승격 전엔 KPA 전용.
  *
  * 렌더 순서:
  *   [badges row]                            ← LMS visibility 등

@@ -7,7 +7,7 @@
  * (집계 chip + 최근 메시지 + 보내기 버튼 + 모달)를 통합한 공통 컴포넌트.
  *
  * API 의존성은 props 로 주입한다 — 컴포넌트는 어떤 서비스의 apiClient 도 직접
- * import 하지 않는다. KPA `apiClient` 와 Glyco/K-Cos/Neture `api` 차이는
+ * import 하지 않는다. KPA `apiClient` 와 K-Cos/Neture `api` 차이는
  * consumer 가 wrapper 함수로 흡수해서 전달한다.
  *
  * 두 가지 layout variant 지원:

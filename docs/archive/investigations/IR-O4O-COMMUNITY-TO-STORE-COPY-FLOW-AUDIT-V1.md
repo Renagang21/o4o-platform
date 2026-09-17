@@ -14,7 +14,7 @@
   - `kpa_store_contents` (매장 전용 편집) + `staff_blog_posts` ownership
   - Store → Community publish 흐름 존재 여부
 - 범위 제약
-  - **KPA-Society 1차 정리**. GlycoPharm / K-Cosmetics 비교는 후속.
+  - **KPA-Society 1차 정리**. K-Cosmetics 비교는 후속.
   - 실제 entity 변경·migration·UI 리팩토링은 **본 IR 범위 외**.
 
 ---
@@ -359,7 +359,7 @@ Store Layer (organization_id 격리)
 | **4** | **WO-O4O-LMS-DETAIL-PAGE-LIBRARY-ACTION-V1** | LMS 강의 상세 페이지에도 "내 자료함에 추가" 버튼 추가 (현재는 목록만) | (선택) |
 | **5** | **WO-O4O-LMS-COURSES-BULK-LIBRARY-V1** | LMS 강의 목록에 Bulk 가져오기 (현재 콘텐츠는 지원, LMS 는 개별만) | 콘텐츠 패턴 참고 |
 | **6** | **WO-O4O-RESOURCES-LIBRARY-IMPORT-FLOW-V1** | 자료실(library/resources) 에 가져오기 흐름 도입 (asset_type='resource' 신규) | 정책 결정 (3-c 옵션) 후 |
-| **7** | **WO-O4O-ASSET-SNAPSHOT-CROSS-SERVICE-AUDIT-V1** | GlycoPharm / K-Cosmetics 도 동일 패턴인지 비교 | KPA 정리 후 |
+| **7** | **WO-O4O-ASSET-SNAPSHOT-CROSS-SERVICE-AUDIT-V1** | K-Cosmetics 도 동일 패턴인지 비교 | KPA 정리 후 |
 
 ---
 

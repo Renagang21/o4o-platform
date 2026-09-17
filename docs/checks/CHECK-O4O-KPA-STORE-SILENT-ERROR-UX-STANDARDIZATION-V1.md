@@ -133,7 +133,7 @@ services/web-kpa-society/src/pages/pharmacy/PharmacySellPage.tsx
 | DB · migration · 운영 데이터 | **0** |
 | `@o4o/store-ui-core` · `@o4o/store-asset-policy-core` | **0** (래퍼에서만 처리) |
 | 사이드바 · route | **0** |
-| GlycoPharm · K-Cosmetics | **0** |
+| K-Cosmetics | **0** |
 | 새 공통 오류 프레임워크 · ErrorBoundary · 로깅 플랫폼 | **도입 0** |
 
 ---

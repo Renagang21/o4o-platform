@@ -195,7 +195,7 @@ export default function PostDetailPage() {
     }
   };
 
-  // WO-O4O-APPRECIATION-GLYCO-KCOS-MIGRATION-V1: AppreciationPanel onError 핸들러
+  // AppreciationPanel onError 핸들러
   const handleAppreciationError = (err: any) => {
     const msg = String(err?.response?.data?.error || err?.message || '');
     if (msg.includes('INSUFFICIENT_BALANCE') || msg.includes('부족')) toast.error('포인트가 부족합니다');
@@ -266,7 +266,7 @@ export default function PostDetailPage() {
         </div>
       </article>
 
-      {/* WO-O4O-APPRECIATION-GLYCO-KCOS-MIGRATION-V1: 공통 AppreciationPanel */}
+      {/* 공통 AppreciationPanel */}
       <AppreciationPanel
         targetType="forum_post"
         targetId={post.id}

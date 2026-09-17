@@ -4,7 +4,7 @@
 > **성격**: 코드/DB/migration/UI **무변경**. 조사 문서만.
 > **결론**: **판정 A+C** — 유통참여형 펀딩 = Market Trial 의 **외부(사업)명**, 내부 코드/엔티티/route 명 = `market_trial`.
 > 단 **참여 = 주문이 아니라 신청/약정(사전 모집)** 이며, 성공 후 운영자가 **SupplierProductOffer → OrganizationProductListing 전환** 시에만 O4O 주문 가능 상품이 된다.
-> 결제는 일반 online checkout(o4o_payments)이 아니라 **오프라인 정산 ledger**. Store 서비스(KPA/GP/KCos)는 **Neture 리다이렉트**(자체 구현 없음).
+> 결제는 일반 online checkout(o4o_payments)이 아니라 **오프라인 정산 ledger**. Store 서비스(KPA/KCos)는 **Neture 리다이렉트**(자체 구현 없음).
 > **작성일**: 2026-06-11
 
 ---
@@ -18,7 +18,7 @@
 > - Market Trial 은 별도 `market_trial` 도메인. `distribution_type` 에 `FUNDING` 값 없음.
 >
 > 다만 본 IR 작성 당시의 다음 **Store 연결 기준은 폐기**한다(이후 정책 정정):
-> - "Store 서비스(KPA/GlycoPharm/K-Cosmetics)는 Neture 리다이렉트 유지"
+> - "Store 서비스는 Neture 리다이렉트 유지"
 > - "매장 허브 카드 / 내 매장 참여 이력·펀딩 상태 표시"
 > - "전환 후 OrganizationProductListing 이 Store 서비스의 O4O 주문 가능 상품으로 합류"
 > - Store 서비스에서 유통참여형 펀딩을 관련 기능처럼 취급
@@ -28,7 +28,6 @@
 >
 > **최신 정책:**
 > - 유통참여형 펀딩은 **Neture 전용** 기능이다.
-> - KPA/GlycoPharm/K-Cosmetics 의 운영자·매장 허브·내 매장·O4O 주문 가능 상품·참여 이력과 **연결하지 않는다.**
 > - Store frontend 연결 흔적(route/card/banner/menu/redirect)은 **제거**되었다.
 > - Market Trial → SPO → OPL **신규 전환은 비활성화**되었고, checkout 의 trial 역연결(first_order 승격)도 중단되었다.
 > - production DB 실측 결과 `source_type='market_trial'` OPL 은 **0 건**으로, 기존 데이터 cleanup 은 **불필요**하다.
@@ -48,7 +47,7 @@
 ---
 
 ## 4. 조사 범위
-backend `apps/api-server/src/{controllers/market-trial, jobs, database/migrations, extensions/trial-*}`; frontend `services/web-neture/src/pages/market-trial`, `services/web-{glycopharm,k-cosmetics}` redirect; guide copy `packages/shared-space-ui/src/guide/copy/neture.ts`. (코드 근거 file:line 기반, read-only.)
+backend `apps/api-server/src/{controllers/market-trial, jobs, database/migrations, extensions/trial-*}`; guide copy `packages/shared-space-ui/src/guide/copy/neture.ts`. (코드 근거 file:line 기반, read-only.)
 
 ---
 
@@ -64,7 +63,7 @@ backend `apps/api-server/src/{controllers/market-trial, jobs, database/migration
 | Neture FE 매장/참여 | 허브·상세·내 참여 | `pages/market-trial/{MarketTrialHubPage,MarketTrialDetailPage,MyParticipationsPage}` (`/market-trial`, `/market-trial/:id`) | — |
 | Neture FE 운영자 | 승인·전환 | `pages/operator/{MarketTrialApprovalsPage,MarketTrialApprovalDetailPage}` | — |
 | Neture Guide | 사업/기능 안내 | `GuideBusinessMarketTrialPage`(`/guide/business/market-trial`), `GuideFeatureMarketTrialPage`(`/guide/features/market-trial`) — **외부명 "유통참여형 펀딩"** | — |
-| GP/KCos FE | 리다이렉트 | `components/common/MarketTrialNetureRedirect.tsx` (`/store/market-trial` → `https://neture.co.kr/market-trial`) | 없음(자체 구현 X) |
+| KCos FE | 리다이렉트 | `components/common/MarketTrialNetureRedirect.tsx` (`/store/market-trial` → `https://neture.co.kr/market-trial`) | 없음(자체 구현 X) |
 
 > **중요 구분**: `supplier_product_offers.distribution_type` enum = **`PUBLIC` / `PRIVATE` / `SERVICE`** (migration `20260301100000-ProductMasterCoreReset.ts:80`). **`FUNDING` 값은 없다.** 즉 유통참여형 펀딩은 distribution_type 의 한 값이 아니라 **별도 market_trial 도메인**이며, 전환 시 그 결과물이 SPO(=PUBLIC/PRIVATE/SERVICE 중 하나)가 된다. (선행 IR 의 "distributionType='FUNDING' catalog" 전제는 코드와 불일치 — FUNDING 은 distribution_type 가 아님.)
 
@@ -94,7 +93,7 @@ backend `apps/api-server/src/{controllers/market-trial, jobs, database/migration
 | 화면 외부명 | 일부 "마켓 트라이얼" 잔존 가능 | Neture guide·사업 안내에서 **"유통참여형 펀딩"** | 외부=펀딩 |
 | 공급자 안내 | — | "유통참여형 펀딩 제안/작성" | 외부=펀딩 |
 | 매장/운영자 | — | "유통참여형 펀딩 참여/검토 운영" | 외부=펀딩 |
-| GP/KCos | redirect 컴포넌트 제목 **"유통참여형 펀딩은 Neture에서 운영됩니다"** | (동일) | 외부=펀딩 |
+| KCos | redirect 컴포넌트 제목 **"유통참여형 펀딩은 Neture에서 운영됩니다"** | (동일) | 외부=펀딩 |
 
 → **판정 = A (유통참여형 펀딩 = Market Trial 의 외부명)**, 운영 정책은 **C** (내부 코드명 `market_trial` 유지 + 외부명 "유통참여형 펀딩" 으로 정렬). guide copy(`neture.ts`)가 이미 "유통참여형 펀딩" 외부명을 일관 사용 → 정렬은 진행 중. **D/E 아님**(구조 명확, 사용 위험 아님). 잔여 "마켓 트라이얼/Market Trial" 사용자-facing 표기는 외부명 정렬 소형 WO 대상.
 
@@ -118,7 +117,7 @@ backend `apps/api-server/src/{controllers/market-trial, jobs, database/migration
 ### 매장 허브
 - 표시: **"유통참여형 펀딩" 카드/섹션**, 상태 = `모집 중(recruiting)` / `종료(fulfilled·closed)`. 목표 참여 매장 수·달성률·기간 노출.
 - 액션 = **"참여하기"**(주문 아님). 참여는 약정/관심 표시 + (필요 시) 배송지.
-- **Store 서비스(KPA/GP/KCos)는 Neture 리다이렉트 유지**(자체 참여 구현 금지 — `MarketTrialNetureRedirect`). 매장 허브 카드는 "Neture에서 운영" 안내·링크로.
+- **Store 서비스(KPA/KCos)는 Neture 리다이렉트 유지**(자체 참여 구현 금지 — `MarketTrialNetureRedirect`). 매장 허브 카드는 "Neture에서 운영" 안내·링크로.
 
 ### 내 매장
 - 참여 직후: **"참여 이력 / 펀딩 참여 상태"**(주문 내역 아님). 결제는 오프라인 정산 상태(`choice_completed/offline_review/offline_settled`)로 표시.

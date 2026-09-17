@@ -15,8 +15,8 @@ serviceKey audit 과정에서 "`category-request`/`forum_category_*`/`/categorie
 1. **`forum_category_*` = forum 그 자체의 legacy 명칭.** `forum_category_requests.id = forum identifier (SSOT)` — "category" 라는 단어는 코드/API/DB 에만 남았고, 실제 의미는 **포럼(forum)** 이다. (분류 C — 명칭≠개념, 문서화·유지)
 2. **tag = 자유입력형(free-input) 분류 키워드.** `forum_tag` 테이블은 제거(`DropForumTagTable` — "O4O 태그 정책 v1(자유입력형)")되고 `tags TEXT[]` 컬럼으로 이동. **tag 는 entity 가 아니며 membership 과 무관.** (정책 확정)
 3. **membership = 폐쇄형 forum(forumType='closed') 기준** — `forum_category_members`(forum_category_id=forumId). **tag 가 아니라 forum 접근권.** → closed-forum visibility gate 는 **forum membership 기준**이어야 함(search WO 방향 확정).
-4. 사용자/운영자는 화면에서 **"포럼"·"태그"** 만 본다. "카테고리" 잔존은 **GP/KCos/Neture 신청 페이지 help text 3건**("원하시는 포럼 카테고리가 없나요?")뿐(KPA 는 이미 "포럼"). (분류 B — 소규모 label cleanup)
-5. **부수 발견(parity/기능 gap):** backend 는 포럼 생성 시 **tags 필수**(`TAGS_REQUIRED`)인데, **KPA frontend 만 tag 입력 구현**. GP/KCos/Neture 신청 폼은 tags 미전송 → 신청 거부 가능성. "tag 중심 이동"이 backend 엔 강제됐으나 비-KPA frontend 미반영.
+4. 사용자/운영자는 화면에서 **"포럼"·"태그"** 만 본다. "카테고리" 잔존은 **KCos/Neture 신청 페이지 help text 3건**("원하시는 포럼 카테고리가 없나요?")뿐(KPA 는 이미 "포럼"). (분류 B — 소규모 label cleanup)
+5. **부수 발견(parity/기능 gap):** backend 는 포럼 생성 시 **tags 필수**(`TAGS_REQUIRED`)인데, **KPA frontend 만 tag 입력 구현**. KCos/Neture 신청 폼은 tags 미전송 → 신청 거부 가능성. "tag 중심 이동"이 backend 엔 강제됐으나 비-KPA frontend 미반영.
 
 ---
 
@@ -61,12 +61,11 @@ serviceKey audit 과정에서 "`category-request`/`forum_category_*`/`/categorie
 | 서비스 | 신청 페이지 | "카테고리" 노출 | "태그" 노출 |
 |--------|-------------|-----------------|-------------|
 | KPA | mypage/RequestCategoryPage "새 포럼 신청"·"포럼 이름/설명" | ❌ ("원하시는 포럼이…") | "인기 태그"(목록), "태그"(operator) |
-| GlycoPharm | forum/RequestCategoryPage "새 포럼 신청" | ⚠️ help text "원하시는 포럼 **카테고리**가 없나요?"(L116) | (operator) |
 | K-Cosmetics | forum/RequestCategoryPage "새 포럼 신청" | ⚠️ 동일 help text(L95) | (operator) |
 | Neture | supplier/RequestCategoryPage "새 포럼 신청" | ⚠️ 동일 help text(L95) | (operator) |
 
 - 사용자가 보는 canonical: **"포럼"**(엔티티) + **"태그"**(분류). 폼 필드는 "포럼 이름"/"포럼 설명".
-- "카테고리"가 화면에 보이는 곳: **GP/KCos/Neture 신청 help text 3건뿐**. KPA 는 이미 "포럼"으로 정리됨. → 사용자 혼선 최소, 정리 시 3문구 교체.
+- "카테고리"가 화면에 보이는 곳: **KCos/Neture 신청 help text 3건뿐**. KPA 는 이미 "포럼"으로 정리됨. → 사용자 혼선 최소, 정리 시 3문구 교체.
 - "관심 태그"/"주제"/"분야" 라벨은 없음.
 
 ## 6. API/DB contract 조사
@@ -97,7 +96,6 @@ serviceKey audit 과정에서 "`category-request`/`forum_category_*`/`/categorie
 | 서비스 | tag 도메인 의미 | 신청 폼 tag 입력 |
 |--------|-----------------|:----:|
 | KPA | 약사·약대생 커뮤니티 주제(자유입력) | ✅ selectedTags 전송 |
-| GlycoPharm | 질환/약국운영/콘텐츠 주제 | ❌ 미전송 |
 | K-Cosmetics | 피부타입/고민/제품군 주제 | ❌ 미전송 |
 | Neture | supplier/partner 중심 — forum/tag 의미 축소 가능(H) | ❌ 미전송 |
 
@@ -109,7 +107,7 @@ serviceKey audit 과정에서 "`category-request`/`forum_category_*`/`/categorie
 | 분류 | 의미 | 해당 |
 |------|------|------|
 | A | 내부 legacy 명칭·사용자 혼선 없음, 유지 | `categoryId`(=forumId), `/forum/categories/*` 등 코드/API 내부 명칭 |
-| B | 사용자-facing 문구 category 잔존 → tag/forum 정리 | GP/KCos/Neture 신청 help text "포럼 카테고리"(3건) |
+| B | 사용자-facing 문구 category 잔존 → tag/forum 정리 | KCos/Neture 신청 help text "포럼 카테고리"(3건) |
 | C | API/DB 명칭 category 이나 실제 forum/topic, 문서화 | `forum_category_requests`(=forum SSOT), `category-request`(=포럼 신청), `forum_category_members`(=폐쇄포럼 멤버십) |
 | D | tag↔membership 혼동 정책 결정 | **해소** — tag=분류, membership=forum 접근권(직교) |
 | E | category 기반 죽은/mock 기능 | 없음(forum_category 테이블은 drop, SSOT 이전 완료) |
@@ -119,8 +117,8 @@ serviceKey audit 과정에서 "`category-request`/`forum_category_*`/`/categorie
 
 ## 11. 즉시 WO 가능한 후보
 
-1. **`WO-O4O-FORUM-CATEGORY-TO-TAG-LABEL-CLEANUP-V1`** (B) — GP/KCos/Neture 신청 페이지 help text "원하시는 포럼 카테고리가 없나요?" → "원하시는 포럼이 없나요?"(KPA 문구와 정렬). frontend copy-only, 3파일, 무위험.
-2. **(parity) `WO-O4O-FORUM-REQUEST-TAG-INPUT-PARITY-V1`** (§11-3) — GP/KCos/Neture 신청 폼에 tag 입력 추가 또는 backend tags 필수 완화 결정. **선결: backend `TAGS_REQUIRED` 가 4서비스 모두에 의도된 정책인지 확인** 후 ① UI 추가(KPA 패턴) 또는 ② backend optional 화 택1.
+1. **`WO-O4O-FORUM-CATEGORY-TO-TAG-LABEL-CLEANUP-V1`** (B) — KCos/Neture 신청 페이지 help text "원하시는 포럼 카테고리가 없나요?" → "원하시는 포럼이 없나요?"(KPA 문구와 정렬). frontend copy-only, 3파일, 무위험.
+2. **(parity) `WO-O4O-FORUM-REQUEST-TAG-INPUT-PARITY-V1`** (§11-3) — KCos/Neture 신청 폼에 tag 입력 추가 또는 backend tags 필수 완화 결정. **선결: backend `TAGS_REQUIRED` 가 3서비스 모두에 의도된 정책인지 확인** 후 ① UI 추가(KPA 패턴) 또는 ② backend optional 화 택1.
 
 ## 12. backend/API/DB 변경이 필요한 후보
 
@@ -138,7 +136,7 @@ serviceKey audit 과정에서 "`category-request`/`forum_category_*`/`/categorie
 | 순위 | 항목 | 근거 |
 |:---:|------|------|
 | 1 | §11-1 label cleanup(B) | 사용자 혼선 즉시 제거, 무위험 copy |
-| 2 | §11-2 tag 입력 parity(정책 확인 후) | GP/KCos/Neture 포럼 신청 실패 가능성(기능 gap) |
+| 2 | §11-2 tag 입력 parity(정책 확인 후) | KCos/Neture 포럼 신청 실패 가능성(기능 gap) |
 | 3 | §12-2 search visibility gate(forum 기준) | 본 IR 로 기준 확정, 다음 보안 축 |
 | 4 | §13 문서화(category=forum, tag 정책) | drift 방지 기준선 |
 | 5 | §12-1 rename 타당성(장기) | 현재 비권장, 필요 시 별도 |
@@ -165,11 +163,11 @@ serviceKey audit 과정에서 "`category-request`/`forum_category_*`/`/categorie
 - **생성 IR 문서:** `docs/investigations/IR-O4O-FORUM-CATEGORY-TO-TAG-TERMINOLOGY-BOUNDARY-V1.md`
 - **조사 기준 commit:** `b26c61807` (main, origin 동기화)
 - **용어 사용처:** `forum_category_*`/`categoryId`(=forumId) 는 forum 의 legacy 내부 명칭(코드/API/DB 31+/49 files), `tags TEXT[]`(128 files) 는 자유입력 분류 키워드. `forumTag` 0, `Tag.ts` forum 미사용.
-- **사용자-facing category 잔존:** GP/KCos/Neture 신청 help text "포럼 카테고리" 3건뿐(KPA 정리됨). 화면 canonical = "포럼"+"태그".
+- **사용자-facing category 잔존:** KCos/Neture 신청 help text "포럼 카테고리" 3건뿐(KPA 정리됨). 화면 canonical = "포럼"+"태그".
 - **DB/API category 명칭 유지 판단:** **유지 권장**(rename 은 SSOT·31+ files 위험, F). 주석/문서로 "category=forum" 명문화.
 - **membership↔tag 관계:** 직교 — membership=폐쇄 forum 접근권(forumId 기준), tag=분류. tag 에 membership 붙이지 않음.
 - **search visibility 영향:** gate 는 **forum membership 기준**으로 설계해야 함(tag 아님) — 후속 WO 기준선 확정.
-- **부수 발견:** GP/KCos/Neture 신청 폼 tag 미전송 vs backend tags 필수 → 포럼 신청 실패 가능성(parity gap, §11-2).
+- **부수 발견:** KCos/Neture 신청 폼 tag 미전송 vs backend tags 필수 → 포럼 신청 실패 가능성(parity gap, §11-2).
 - **즉시 WO:** label cleanup(B, copy-only) / tag 입력 parity(정책 확인 후)
 - **backend/DB 후보:** forum-기준 search visibility gate / (장기) rename 타당성 IR(비권장)
 - **우선순위:** label cleanup → tag parity → search visibility gate → 문서화 → (장기)rename

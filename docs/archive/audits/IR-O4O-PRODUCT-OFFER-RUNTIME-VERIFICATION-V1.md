@@ -36,7 +36,7 @@
 | Supplier ID | 96a0c96d-93fd-4213-b5ff-b6f6b8aa85a4 |
 | Supplier Slug | ir-product-test |
 | Admin (Neture) | admin-neture@o4o.com (neture:admin) |
-| Admin (Platform) | admin-glycopharm@o4o.com (glycopharm:admin) |
+| Admin (Platform) | — |
 | Date | 2026-03-11 |
 
 ---

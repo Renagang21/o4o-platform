@@ -9,7 +9,7 @@
 
 ## 1. 목적
 
-Neture 에는 KPA/GlycoPharm/K-Cosmetics 와 달리 '내 매장 / 매장 허브 / 매장 경영자 업무공간' 이 구현되어 있지 않다. 현재 RegisterModal 의 `store_owner` 가입 유형이 실제로 필요한지, 제거 또는 일반/포럼 회원으로 치환 가능한지 조사한다.
+현재 RegisterModal 의 `store_owner` 가입 유형이 실제로 필요한지, 제거 또는 일반/포럼 회원으로 치환 가능한지 조사한다.
 
 ## 2. store_owner 정의·정책 (backend 주석)
 
@@ -34,7 +34,7 @@ Neture 에는 KPA/GlycoPharm/K-Cosmetics 와 달리 '내 매장 / 매장 허브 
 | AccountMenu 대시보드 버튼 | ❌ | hasDashboardRole 체크에 store_owner 없음 → 로그인해도 대시보드 메뉴 미노출 |
 | Hub 섹션 | ❌ | /workspace/hub roles 에 store_owner 미포함 |
 | forum/community 권한 분기 | ❌ | 참조 없음 |
-| backend guard/capability | ❌ | `store-owner.utils.ts` STORE_OWNER_ROLES_BY_SERVICE = {kpa,glycopharm,cosmetics} — **neture 없음**. `grep neture:store_owner` = 주석만 |
+| backend guard/capability | ❌ | `store-owner.utils.ts` STORE_OWNER_ROLES_BY_SERVICE = {kpa,cosmetics} — **neture 없음**. `grep neture:store_owner` = 주석만 |
 | operator 회원 표시 | ⚠️ collapse | UsersManagementPage: NETURE_PARTICIPANT_ROLES=['supplier','partner','seller'] — store_owner 미포함 → getPrimaryRole='general'="일반 회원". roleTabs/EditUserModal 옵션에 store_owner 없음 |
 
 **프론트 store_owner 참조 = 단 3파일** (RegisterModal.tsx / config/dashboard.ts / operator/EditUserModal.tsx). 그 외 전무.
@@ -56,7 +56,7 @@ Neture 에는 KPA/GlycoPharm/K-Cosmetics 와 달리 '내 매장 / 매장 허브 
 
 ## 6. 철학 vs 구현 tension (주의)
 
-`O4O-BUSINESS-PHILOSOPHY-V1 §3` 는 참여 주체를 **공급자 / 운영사업자 / 매장** 3자로 정의한다. store_owner 가입 유형은 이 '매장' 축의 흔적일 수 있다. 그러나 **Neture 구현에는 매장(store) 측 workspace 가 없다**(매장 실행은 KPA/GlycoPharm/K-Cosmetics 등 서비스별로 구현). 따라서 "Neture 자체 가입에 store_owner 를 두는 것"과 "매장은 서비스별로 실행된다"는 구조가 어긋난다. 제거는 이 어긋남을 정리하는 방향이며, 철학상의 '매장' 개념을 부정하는 것은 아니다(매장은 서비스 측에 존재). → 제거 WO 시 이 근거를 명시할 것.
+`O4O-BUSINESS-PHILOSOPHY-V1 §3` 는 참여 주체를 **공급자 / 운영사업자 / 매장** 3자로 정의한다. store_owner 가입 유형은 이 '매장' 축의 흔적일 수 있다. 그러나 **Neture 구현에는 매장(store) 측 workspace 가 없다**. 따라서 "Neture 자체 가입에 store_owner 를 두는 것"과 "매장은 서비스별로 실행된다"는 구조가 어긋난다. 제거는 이 어긋남을 정리하는 방향이며, 철학상의 '매장' 개념을 부정하는 것은 아니다(매장은 서비스 측에 존재). → 제거 WO 시 이 근거를 명시할 것.
 
 ## 7. 후속 WO 후보
 

@@ -22,13 +22,12 @@
  *   WO-O4O-PHARMACYHUB-STORE-ORGANIZATION-SERVICE-SCOPED-RESOLUTION-V1 (2026-09-04)
  *     후보 판정은 전 서비스 조직이 아니라 **PH 에 귀속된 조직**만 본다. 귀속 판정 SSOT 는
  *     읽기 측과 동일한 `store-organization.resolver` (enrollment + platform_store_slugs) 다.
- *     그전에는 KPA·GlycoPharm·K-Cosmetics·Neture 조직까지 한 후보군으로 세어,
+ *     그전에는 KPA·K-Cosmetics·Neture 조직까지 한 후보군으로 세어,
  *     멀티서비스 사용자가 PH 조직 0개인데도 AMBIGUOUS_ORGANIZATION 으로 영구 보류됐다.
  *   1) 사용자가 소속된 **PH** 매장 조직(owner/admin/manager, left_at IS NULL) 이 정확히 1개면 그것을 쓴다.
  *      resolveStoreAccess() 가 바로 그 row 를 읽으므로 재사용이 곧 정합이다.
  *   2) 0개이고 businessInfo.businessNumber 가 있으면 동일 사업자번호 **PH** 조직을 찾아 재사용한다.
- *   3) 그래도 없으면 신규 생성. code = `ph-pharm-{userId 앞 12 hex}` — GlycoPharm 선례
- *      (`gp-pharm-{userId 12 hex}`) 와 동일한 **사용자 스코프 결정적 코드**다.
+ *   3) 그래도 없으면 신규 생성. code = `ph-pharm-{userId 앞 12 hex}` — **사용자 스코프 결정적 코드**다.
  *      Pharmacy-Hub 가입 폼은 사업자번호를 받지 않으므로(약국명·연락처만) KPA 의
  *      `kpa-pharm-{businessNumber}` 규칙을 쓸 수 없다. 결정적 코드이므로 재실행해도
  *      ensureOrganization 의 ON CONFLICT (code) 가 동일 row 를 반환한다(멱등).
@@ -63,7 +62,7 @@ import {
 const SERVICE_KEY = SERVICE_KEYS.PHARMACY_HUB;
 /** 매장 주체를 갖는 유일한 Pharmacy-Hub 역할. supplier/operator 는 매장이 없다. */
 const STORE_OWNER_ROLE = `${SERVICE_KEY}:store_owner`;
-/** organizations.type — KPA/GlycoPharm 약국 조직과 동일 값 */
+/** organizations.type — KPA 약국 조직과 동일 값 */
 const ORG_TYPE = 'pharmacy';
 
 export type ProvisionOutcome =
@@ -168,7 +167,7 @@ function emptyCreated(): ProvisionResult['created'] {
   return { organization: false, member: false, enrollment: false, role: false, slug: false };
 }
 
-/** userId(UUID) → 하이픈 제거 후 앞 12 hex. GlycoPharm `gp-pharm-` 규칙과 동일 형태. */
+/** userId(UUID) → 하이픈 제거 후 앞 12 hex. */
 function orgCodeForUser(userId: string): string {
   return `ph-pharm-${userId.replace(/-/g, '').substring(0, 12)}`;
 }
@@ -528,7 +527,7 @@ export class PharmacyHubStoreProvisioningService {
     //    WO-O4O-PHARMACYHUB-STORE-ORGANIZATION-SERVICE-SCOPED-RESOLUTION-V1
     //
     //    결함(PH-BUG-03d): 이전 구현은 서비스 구분 없이 owner/admin/manager 조직
-    //    전체를 후보로 셀다. 그래서 KPA 약국 + GlycoPharm 약국 + K-Cosmetics 매장 +
+    //    전체를 후보로 셀다. 그래서 KPA 약국 + K-Cosmetics 매장 +
     //    Neture 공급자를 함께 가진 멀티서비스 사용자는 **PH 조직이 0개인데도**
     //    AMBIGUOUS_ORGANIZATION 으로 영구 보류되어 PH 매장을 영원히 가질 수 없었다.
     //    O4O 는 한 사람이 여러 서비스에 동시 참여하는 구조이므로 이건 정상 모양이 아니다.

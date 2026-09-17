@@ -2,7 +2,7 @@
 
 - **WO**: `WO-O4O-CROSSSERVICE-PRODUCTION-RESIDUAL-404-AUTH-AND-LEGAL-CLEANUP-V1`
 - **작성일**: 2026-08-18
-- **대상 서비스**: KPA-Society · Neture · Pharmacy-Hub (K-Cosmetics · GlycoPharm 은 회귀 확인)
+- **대상 서비스**: KPA-Society · Neture · Pharmacy-Hub (K-Cosmetics 은 회귀 확인)
 - **판정**: **PASS_WITH_BLOCKED_ITEM**
   - 사용자 노출 404 / dead link / white screen / JS exception: **0**
   - 다만 **법적 문서 본문 자체는 production 에 1건도 게시되어 있지 않다**. 게시는 본 WO 가 명시적으로 금지한 행위(`법적 문서 내용 임의 생성·수정`)여서 수행하지 않았다. §5 참조.
@@ -64,8 +64,6 @@ desktop 검증 실행 중 PharmacyHub `/terms` 에서 다음이 실제로 렌더
 
 Neture 의 `/login` 은 페이지가 아니라 **모달**이다 (`LoginRedirect` → `openLoginModal(returnUrl)` → `<Navigate to="/" replace />`). 따라서 미인증 `/operator` 진입 시 `/` 에 착지하는 것 자체는 설계다. 실제 결함은 **로그인 성공 후 원래 경로로 돌아오지 않는 것**이었다 (실측: `/admin` 착지).
 
-원인은 GlycoPharm 에서 `4e62945ad` 로 이미 확정된 것과 동일한 경쟁 조건이다.
-
 - `LoginModal.handleLoginSuccess()` 가 `navigate(returnUrl)` 호출
 - `PostLoginRedirect` 도 같은 auth 상태 변화에 반응하고, 그 시점 `pathname` 이 아직 `/` 이므로 가드를 통과해 역할 대시보드로 이동
 - 결과적으로 `returnUrl` 이 덮어써짐
@@ -104,7 +102,6 @@ WO 지시: `이미 다른 커밋에서 해결된 항목이면 재구현하지 �
 | **Neture** (mobile) | `/` (모달, 설계) | 200 | **`/operator`** | ✅ |
 | KPA (d/m) | `/login` | 200 | `/operator` | ✅ |
 | K-Cosmetics (d/m) | `/login` | 200 | `/operator` | ✅ |
-| GlycoPharm (d/m) | `/` (모달) | 200 | `/operator` | ✅ |
 | Pharmacy-Hub (d/m) | `/operator` 에서 "로그인이 필요합니다" 게이트 | — | 인라인 로그인 폼 없음 | 관찰 (§6) |
 
 Neture 의 `/admin` 오착지는 재현되지 않는다 — 수정 확인.
@@ -121,7 +118,6 @@ Neture 의 `/admin` 오착지는 재현되지 않는다 — 수정 확인.
 | Neture | `/terms` `/privacy` | ✅ | 동일 (이전 "준비 중 / CMS slug" 문구 사라짐) |
 | Pharmacy-Hub | `/terms` `/privacy` | ✅ | 동일 (이전 앱 404 사라짐) |
 | K-Cosmetics | `/terms` `/privacy` | ✅ | 동일 |
-| GlycoPharm | `/terms` `/privacy` | ✅ | 동일 |
 
 미인증 · 인증 · 새로고침 3가지 상태 전부 동일하게 정상 렌더.
 
@@ -133,9 +129,8 @@ Neture 의 `/admin` 오착지는 재현되지 않는다 — 수정 확인.
 | K-Cosmetics | 이용약관 / 개인정보처리방침 | `/terms` / `/privacy` | ✅ |
 | **Pharmacy-Hub** | 이용약관 / 개인정보처리방침 | `/terms` / `/privacy` | ✅ (신규 노출) |
 | Neture | footer 에 약관 링크 노출 없음 (desktop 스캔 0건, mobile 하단에는 표기 존재) | — | dead link 0 |
-| GlycoPharm | footer 스캔 결과 약관 링크 없음 (`회원 데이터 관리` 만 매칭) | — | dead link 0 |
 
-**dead link 0건.** Neture·GlycoPharm 의 footer 약관 링크 부재는 404 가 아니라 노출 여부 문제이므로 본 WO 범위 밖으로 §6 에 기록한다.
+**dead link 0건.** Neture 의 footer 약관 링크 부재는 404 가 아니라 노출 여부 문제이므로 본 WO 범위 밖으로 §6 에 기록한다.
 
 ### 3-5. 오류 계측
 
@@ -193,8 +188,8 @@ Neture 의 `/admin` 오착지는 재현되지 않는다 — 수정 확인.
 | # | 내용 | 성격 |
 |---|---|---|
 | O1 | `service_policy_documents` 게시 문서 0건 (5개 서비스 × 전 문서 유형) | 법무·콘텐츠 |
-| O2 | `service_legal_profiles` — Neture·Pharmacy-Hub 는 row 존재하나 전 필드 null, KPA·K-Cosmetics·GlycoPharm 은 row 없음 | 사업자 정보 등록 |
-| O3 | Neture·GlycoPharm footer 에 약관·개인정보 링크가 desktop 에서 노출되지 않음 (dead link 아님, 미노출) | UX |
+| O2 | `service_legal_profiles` — Neture·Pharmacy-Hub 는 row 존재하나 전 필드 null, KPA·K-Cosmetics 은 row 없음 | 사업자 정보 등록 |
+| O3 | Neture footer 에 약관·개인정보 링크가 desktop 에서 노출되지 않음 (dead link 아님, 미노출) | UX |
 | O4 | Pharmacy-Hub `/operator` 는 별도 "로그인이 필요합니다" 게이트를 렌더하며 인라인 로그인 폼이 없음 — 타 서비스와 동선이 다름 | UX 일관성 |
 | O5 | 병행 세션이 production 에 `[E2E_TEST]` 법적 문서를 게시·회수 중. 잔류 여부 주기 확인 권장 | 운영 위생 |
 

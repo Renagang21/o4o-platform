@@ -139,7 +139,7 @@ export type {
 
 // ---------------------------------------------------------------------------
 // Profile Core — WO-O4O-CROSS-SERVICE-PROFILE-COMMONIZATION-V1
-// 5 서비스(KPA / GlycoPharm / K-Cosmetics / Neture / Pharmacy-Hub) 프로필 화면 공통 계층.
+// 4 서비스(KPA / K-Cosmetics / Neture / Pharmacy-Hub) 프로필 화면 공통 계층.
 // ---------------------------------------------------------------------------
 export { MyPageAuthRequired } from './components/MyPageAuthRequired.js';
 export type { MyPageAuthRequiredProps } from './components/MyPageAuthRequired.js';
@@ -168,7 +168,7 @@ export type {
 
 // ---------------------------------------------------------------------------
 // LMS MyPage Views — WO-O4O-COMMUNITY-CROSSSERVICE-FINAL-RECENSUS-AND-RESIDUAL-COMMONIZATION-AUDIT-V1
-// K-Cosmetics / GlycoPharm 의 수강·크레딧·수료증 View 중복 공통화.
+// K-Cosmetics 의 수강·크레딧·수료증 View 중복 공통화.
 // ---------------------------------------------------------------------------
 export { MyEnrollmentsView } from './components/MyEnrollmentsView.js';
 export type { MyEnrollmentsViewProps, MyEnrollmentStatus } from './components/MyEnrollmentsView.js';
@@ -219,7 +219,7 @@ export type {
 
 // ---------------------------------------------------------------------------
 // Mobile Bottom Nav Core — WO-O4O-CROSSSERVICE-MOBILE-BOTTOM-NAV-COMMONIZATION-V1
-// KPA / GlycoPharm / K-Cosmetics / Neture 하단 nav 의 렌더 shell · 탭 · 시트 개폐를
+// KPA / K-Cosmetics / Neture 하단 nav 의 렌더 shell · 탭 · 시트 개폐를
 // 공통화한다. 메뉴 구성 · route · active 판정 · 역할별 노출은 서비스가 주입한다
 // (공통 Core 안에 serviceKey 분기를 두지 않는다).
 // ---------------------------------------------------------------------------

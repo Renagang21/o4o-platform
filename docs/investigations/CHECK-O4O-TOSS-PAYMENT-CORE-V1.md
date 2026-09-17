@@ -21,11 +21,11 @@ WO §15 중단 기준 **#1(동일 Payment Core 모델 기존재) + #2(기존 Tos
 | 계층 | 구현 | 비고 |
 |---|---|---|
 | Core 패키지 | `packages/payment-core` | `PaymentCoreService`(prepare/confirm/cancel/refund/getStatus) + `PaymentStateMachine`(assertTransition) + `PaymentStatus` enum + `PaymentProps` interface + `PaymentEventLog`/`PaymentEventPublisher` |
-| 결제 원장 entity | `apps/api-server/src/entities/payment/PlatformPayment.entity.ts` → `@Entity('o4o_payments')` | `WO-O4O-PAYMENT-CORE-GLYCOPHARM-PILOT-V1` |
+| 결제 원장 entity | `apps/api-server/src/entities/payment/PlatformPayment.entity.ts` → `@Entity('o4o_payments')` | — |
 | migration | `src/database/migrations/1771027200000-CreateO4oPaymentsTable.ts` (+ `...01-AddPaymentKeyUniqueAndStatusIndex`) | `WO-O4O-PAYMENTCORE-O4O-PAYMENTS-MIGRATION-RELOCATE-V1` (스캔 dir 이전 완료 → CI/CD 적용) |
 | repository adapter | `services/payment/adapters/TypeORMPaymentRepository.ts` → PlatformPayment | |
 | Toss provider | `services/payment/adapters/TossPaymentProviderAdapter.ts` · `services/toss-payments.service.ts` · `config/payment.config.ts`(TOSS_SECRET_KEY/CLIENT_KEY env, getTossAuthHeader) | **WO §10 이 "설정 안 함"이라 한 Toss env/SDK 가 이미 존재** |
-| 서비스 소비처 | `routes/{kpa,glycopharm,cosmetics}/controllers/*-payment.controller.ts` + `routes/neture/controllers/neture-b2b-payment.controller.ts` | 4 서비스 전부 PaymentCoreService → o4o_payments 공통 의존 (IR-...-SCHEMA-CONTRACT §2) |
+| 서비스 소비처 | — | 4 서비스 전부 PaymentCoreService → o4o_payments 공통 의존 (IR-...-SCHEMA-CONTRACT §2) |
 
 → WO §3 목표("O4O 의 모든 Toss 결제가 공통으로 사용할 Payment Core")는 **이미 구축되어 4 서비스에서 prepare/confirm 가동 중**이다.
 
@@ -49,7 +49,6 @@ WO §15 중단 기준 **#1(동일 Payment Core 모델 기존재) + #2(기존 Tos
 
 1. **#1·#2**: `o4o_payments`/`PlatformPayment`/`PaymentCoreService`/Toss adapter 가 이미 존재·배포·4 서비스 가동. 신규 `O4oPayment` entity + `o4o_payments` 테이블 생성은 **기존 `@Entity('o4o_payments')` 와 직접 충돌**(중복 테이블/엔티티).
 2. **#6**: 본 WO 는 `entities.ts` 등록이 필요한데, 현재 `apps/api-server/src/database/entities.ts` 는 **다른 세션 WIP**(`WO-O4O-MULTILINGUAL-PRODUCT-CONTENT-ENTITY-REGISTRY-AND-ROUTE-MOUNT-V1`, uncommitted)로 수정 중 → 접촉 금지(작업 규칙 "다른 세션 WIP 미접촉").
-3. **공유 코어 리스크**: PlatformPayment 는 KPA/Glyco/KCos/Neture B2B 공통 원장 — 스키마 변경은 4 서비스 계약에 영향하며 `IR-...-SCHEMA-CONTRACT-AUDIT-V1` 거버넌스 대상.
 
 ## 5. `paymentType` GAP 처리 권고 (후속)
 

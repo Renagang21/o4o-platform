@@ -3,7 +3,7 @@
  *
  * WO-O4O-LMS-KPA-COURSESPAGE-HUBTEMPLATE-ALIGNMENT-V1:
  * - 자체 raw <table> → 공통 LmsHubTemplate(@o4o/shared-space-ui)로 수렴.
- *   3서비스(KPA/GP/KCos) /lms 목록 hub 를 단일 테이블 템플릿으로 정렬.
+ *   2서비스(KPA/KCos) /lms 목록 hub 를 단일 테이블 템플릿으로 정렬.
  * - KPA 고유 요소는 config 로 주입:
  *     headerAction       → InstructorHeaderAction(강사 등록/신청 CTA)
  *     renderCta          → 동적 수강 CTA(공개=바로 보기 / 비로그인=로그인 후 수강)

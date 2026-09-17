@@ -163,7 +163,7 @@ describe('cross-service table isolation', () => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 describe('목록 가시성 (계약 보존)', () => {
-  it('기본 규칙 — GP/KCos 기존 동작', () => {
+  it('기본 규칙 — KCos 기존 동작', () => {
     expect(defaultListVisibility({ my: 'true', userId: 'u', user: {} }).visibility).toBe('owner-only');
     expect(defaultListVisibility({ user: undefined } as any).visibility).toBe('published-only');
     expect(defaultListVisibility({ userId: 'u', user: {} }).visibility).toBe('published-or-own');

@@ -1,7 +1,7 @@
 # CHECK — WO-O4O-MULTILINGUAL-PRODUCT-CONTENT-ENTITY-REGISTRY-AND-ROUTE-MOUNT-V1
 
 > 다국어 상품 콘텐츠 저장소/API를 실제 backend 에 연결하는 정합 작업.
-> 신규 entity 2개를 TypeORM registry 에 등록하고, KPA / GlycoPharm / K-Cosmetics
+> 신규 entity 2개를 TypeORM registry 에 등록하고, KPA / K-Cosmetics
 > 3서비스에서 store-owner API route 를 활성화한다.
 
 ---
@@ -39,7 +39,6 @@
 | 서비스 | 파일 | serviceKey |
 |--------|------|-----------|
 | KPA | `routes/kpa/kpa.routes.ts` | `'kpa'` |
-| GlycoPharm | `routes/glycopharm/glycopharm.routes.ts` | `'glycopharm'` |
 | K-Cosmetics | `routes/cosmetics/cosmetics.routes.ts` | `'cosmetics'` |
 
 ---

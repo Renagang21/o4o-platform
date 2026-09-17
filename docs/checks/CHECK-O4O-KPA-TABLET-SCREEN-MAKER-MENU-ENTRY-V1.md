@@ -26,15 +26,14 @@ WO 전제(“태블릿 화면 제작 진입점이 없음 → 메뉴 추가”)�
 |--------|:---:|------|------|---------|
 | **KPA-Society** | ✅ | 타블렛 구성 | 약국 경영지원 | `/commerce/tablet-displays` |
 | K-Cosmetics | ✅ | 태블릿 | 채널 | `/commerce/tablet-displays` |
-| GlycoPharm | ❌ | — | — | (route는 존재, 메뉴 미노출) |
 
 - KPA 진입점은 선행 `WO-O4O-KPA-STORE-PRODUCT-MENU-IA-REORG-V1` 에서 `약국 경영지원`(상품 설명·블로그·POP·QR 과 동일 그룹)으로 이동하며 `타블렛 구성` 라벨이 부여됨.
 - route 등록: `services/web-kpa-society/src/App.tsx:1002` `commerce/tablet-displays` → `StoreTabletDisplaysPage`. (변경 없음)
 
 ## 2. Shared Module Change Rule 확인 (CLAUDE.md §1)
 
-- 변경 파일 = 공통 모듈 `storeMenuConfig.ts`. 모든 소비처(KPA/GP/KCos) 영향 검토 완료.
-- 수정 범위는 **KPA_SOCIETY_STORE_CONFIG 블록의 단일 항목 label 문자열**뿐 → GP/KCos config 무접촉.
+- 변경 파일 = 공통 모듈 `storeMenuConfig.ts`. 모든 소비처(KPA/KCos) 영향 검토 완료.
+- 수정 범위는 **KPA_SOCIETY_STORE_CONFIG 블록의 단일 항목 label 문자열**뿐 → KCos config 무접촉.
 - `타블렛 구성` 라벨을 코드에서 하드코딩하는 다른 소비처 없음(grep: 코드 히트는 이 파일 1건 + 문서만).
 - 데드링크 0 / 기능 은폐 0: route 유지, 새 항목 미추가(중복 방지).
 
@@ -69,14 +68,14 @@ WO 전제(“태블릿 화면 제작 진입점이 없음 → 메뉴 추가”)�
 |------|------|
 | typecheck (web-kpa-society `tsc --noEmit`) | ✅ EXIT 0 |
 | 다른 소비처 라벨 하드코딩 없음(grep) | ✅ |
-| GP/KCos config 무영향 | ✅ |
+| KCos config 무영향 | ✅ |
 | 배포 | ✅ web deploy run 29231020890 **success** (커밋 028af6014) |
 | 코드 반영 확인 | ✅ KPA 블록(storeMenuConfig.ts:302) label `태블릿 화면 제작`, subPath `/commerce/tablet-displays` 불변. 구 `태블릿`(:142)은 별도 서비스 변형 블록(KPA 무관) |
 | 브라우저 smoke (메뉴 노출/클릭 이동) | ⏸ **Deferred** — 매장 사이드 메뉴는 로그인 후 노출. `/store/commerce/tablet-displays` 접속 시 `/login` 리다이렉트(매장 세션 없음), 자동 로그인/토큰 입력 금지 정책 → 인증 세션에서 후속 확인 |
 
 ### 6.1 배포 후 prod smoke (2026-07-13)
 - 배포: `Deploy Web Services` run **29231020890 success**(028af6014). storeMenuConfig 변경 반영.
-- 코드 정합: KPA 블록만 `태블릿 화면 제작`(route/key/기능 불변), GP/KCos 무영향.
+- 코드 정합: KPA 블록만 `태블릿 화면 제작`(route/key/기능 불변), KCos 무영향.
 - **라이브 메뉴 클릭 검증은 Deferred**: 매장 관리 영역은 로그인 게이트(`/login` 리다이렉트). 정책상 프로덕션 자동 로그인/체험계정 클릭을 하지 않음. 인증(매장 경영자) 세션에서 아래를 확인 권장:
   1. 메뉴에 `태블릿 화면 제작` 라벨 노출
   2. 클릭 → `/store/commerce/tablet-displays` 이동

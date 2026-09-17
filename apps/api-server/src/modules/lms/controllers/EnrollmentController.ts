@@ -292,7 +292,7 @@ export class EnrollmentController extends BaseController {
         // - video/article에서 메트릭이 전혀 전달되지 않은 호출은 legacy fallback으로 완료 허용
         // - 일부라도 전달되면 strict 정책 그대로 적용
         // - quiz/assignment/live는 fallback 없이 strict 유지 (전용 API 사용 강제)
-        // - fallback은 GlycoPharm/K-Cosmetics 프론트가 메트릭 전송 적용되면 제거 가능
+        // - fallback은 K-Cosmetics 프론트가 메트릭 전송 적용되면 제거 가능
         const lessonRepo = AppDataSource.getRepository('Lesson');
         const lesson: any = await lessonRepo.findOne({ where: { id: lessonId } });
         if (!lesson) return BaseController.notFound(res, 'Lesson not found');

@@ -45,7 +45,6 @@ K-Cosmetics 매장 소유권 판정이 **매장 PK 축(`cosmetics.cosmetics_stor
 | slug service_key | 분기 존재 | 조회 table | 비교 id | 결과 |
 |---|:---:|---|---|---|
 | `cosmetics` | O | `cosmetics.cosmetics_stores` | 매장 PK + 없는 컬럼 | **500** |
-| `glycopharm` | O | `organizations` | `organizations.id` (생성자) | 축 일치 (활성 slug 0건) |
 | `kpa` | **X** | — | — | **항상 403** (활성 slug 7건) |
 | `pharmacy-hub` | **X** | — | — | **항상 403** (활성 slug 6건) |
 | `neture` | X | — | — | 403 (매장 소유 축 없음 — 정상) |
@@ -65,7 +64,7 @@ Cloud SQL Proxy 실측 (`platform_store_slugs` 활성 15건):
 | 〃 `cosmetics_stores.organization_id` 와 일치 | **2건 (전부)** |
 | `cosmetics.cosmetics_stores` 의 `created_by_user_id` 컬럼 | **없음** (42703) |
 | `organizations.created_by_user_id` NULL | 24건 중 11건 |
-| 활성 slug service_key 분포 | cosmetics 2 / kpa 7 / pharmacy-hub 6 (glycopharm 0) |
+| 활성 slug service_key 분포 | cosmetics 2 / kpa 7 / pharmacy-hub 6 |
 
 HTTP 실측 (`api.neture.co.kr`, 계정 = `renagang21@gmail.com`, 조직 `테스트 뷰티샵` owner):
 
@@ -101,7 +100,7 @@ store-policy 는 **organization 단위 정책**이다(정책·결제설정·B2C 
 
 | 파일 | 내용 |
 |---|---|
-| `apps/api-server/src/routes/platform/store-policy.ownership.ts` (신규) | 소유권 판정 분리. ① role 게이트 = `store-owner.utils.isStoreOwner` ② 조직 후보 = `store-organization.resolver.findStoreOrganizationCandidates` ③ 후보 집합에 `storeId` 포함 여부. slug service_key → store_owner serviceKey 매핑은 `STORE_SERVICE_ORG_LINKAGE.slugKeys` 를 **역으로 파생**(새 로컬 맵 금지). glycopharm 은 기존 `organizations.created_by_user_id` 축을 legacy fallback 으로 유지 |
+| `apps/api-server/src/routes/platform/store-policy.ownership.ts` (신규) | 소유권 판정 분리. ① role 게이트 = `store-owner.utils.isStoreOwner` ② 조직 후보 = `store-organization.resolver.findStoreOrganizationCandidates` ③ 후보 집합에 `storeId` 포함 여부. slug service_key → store_owner serviceKey 매핑은 `STORE_SERVICE_ORG_LINKAGE.slugKeys` 를 **역으로 파생**(새 로컬 맵 금지). |
 | `apps/api-server/src/routes/platform/store-policy.routes.ts` | 로컬 raw-SQL `isStoreOwner` 제거 → 위 모듈 import. 라우트·응답 payload·상태코드 무변경 |
 | `apps/api-server/src/__tests__/store-policy-ownership-axis.spec.ts` (신규) | 회귀 테스트 9건 |
 
@@ -139,7 +138,7 @@ store-policy 는 **organization 단위 정책**이다(정책·결제설정·B2C 
 
 회귀 케이스: KCos 소유자 자기 매장 PASS / 다른 KCos 매장 403 / **매장 PK(`cosmetics_stores.id`)로는 절대 통과 불가**
 (`organization.id != cosmetics_stores.id` 강제 fixture) / role 없으면 조직 조회 없이 차단 /
-같은 서비스 조직 2개여도 slug 특정 매장이면 통과 / kpa·pharmacy-hub 동일 축 판정 / glycopharm legacy 유지 / neture 판정 제외.
+같은 서비스 조직 2개여도 slug 특정 매장이면 통과 / kpa·pharmacy-hub 동일 축 판정 legacy 유지 / neture 판정 제외.
 
 ### 7-1. production post-fix smoke (revision `o4o-core-api-03358-s55`)
 
@@ -163,8 +162,8 @@ read-only 요청만 수행했다 (production write 0).
 1. **kpa / pharmacy-hub 접근 복구는 KCos 범위를 넘는 변화다.** 공통 계약으로 통일한 결과
    두 서비스의 정상 매장 소유자가 store-policy 에 진입할 수 있게 됐다(기존 = 항상 403).
    권한 축소가 아니라 복구이며, 축소를 원하면 별도 WO 로 되돌릴 수 있다.
-2. `glycopharm` legacy `created_by_user_id` 축을 유지했다. `organizations.created_by_user_id`
-   는 24건 중 11건 NULL 이고 활성 glycopharm slug 는 0건 — 실질 소비 없음. 정리는 별도 WO.
+2. `organizations.created_by_user_id`
+   정리는 별도 WO.
 3. `cosmetics.cosmetics_stores.slug` 레거시 컬럼(1건 NULL)은 이번에도 손대지 않았다(§10 금지).
 4. store-policy 프론트 소비처가 없거나 적어 사용자 관측 리포트가 존재하지 않는다 —
    본 CHECK 는 API 계층 실측만으로 판정했다.

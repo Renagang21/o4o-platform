@@ -45,7 +45,7 @@
 - `apps/api-server/**` **0건**. 기존 public API 재사용만. service_policy_documents 미참조.
 
 ## 12. KPA footer 미수정 / 13. 타 서비스 미수정
-- KPA `Footer.tsx` 무변경(선행 WO 에서 처리됨). web-neture/glycopharm/k-cosmetics 0건. shared-space-ui 0건.
+- KPA `Footer.tsx` 무변경(선행 WO 에서 처리됨). shared-space-ui 0건.
 
 ## 14. 렌더 안전성
 - 본문은 **line 기반 markdown 렌더**(기존 PolicyPage 렌더러 — `#/##/###/-/숫자.` → React element 생성).

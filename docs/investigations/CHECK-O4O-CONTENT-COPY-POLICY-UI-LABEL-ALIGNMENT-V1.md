@@ -9,7 +9,6 @@
 
 ## 1. 조사 범위
 
-- Frontend: web-kpa-society / web-glycopharm / web-k-cosmetics / web-neture 의 store-hub / library / my-content / content hub 페이지.
 - Packages: `@o4o/shared-space-ui` ContentHubTemplate/ContentHubCardGrid(공통 copy 문구 주입), store-ui-core.
 - 키워드: 가져오기/가져가기/복사/사본/담기/내 약국/내 매장/내 보관함/원본/삭제/Hub/publish/assetSnapshot/dashboardCopy.
 
@@ -20,7 +19,6 @@
 | 서비스 | copyLabel | infoTextAfter (원본 단절) |
 |---|---|---|
 | KPA `HubContentLibraryPage` | "내 매장에 복사" | "…별도 사본으로 저장됩니다. 원본이 수정·삭제되어도 내 매장 사본은 영향받지 않습니다. 다시 복사하면 새 사본으로 저장…" |
-| GlycoPharm `HubContentListPage` | "내 약국에 복사" | "…원본이 수정·삭제되어도 내 약국 사본은 영향받지 않습니다…" |
 | K-Cosmetics `HubContentPage` | "내 매장에 복사" | (동일 gold-standard 문구) |
 
 근거: `STORE-CONTENT-TERMINOLOGY-AND-GUIDE-COPY-V1`(가져오기=복사·원본 단절) + `STORE-LIBRARY-DUPLICATE-COPY-UX-POLICY-V1`(재복사 허용, '복사 완료'=이력) 이 이미 적용. 공통 props: `copyLabel/copiedLabel/copyingLabel/recopyLabel/infoText/infoTextAfter`(`shared-space-ui/ContentHubTemplate.tsx`).
@@ -30,12 +28,12 @@
 | Surface | 상태 | 근거 |
 |---|---|---|
 | Store Hub content 복사 버튼/안내 | ✅ 정렬 | §2 (copyLabel + 원본 단절 infoTextAfter) |
-| copy 성공 toast | ✅ | GP "…내 약국에 복사되었습니다", KCos "…내 매장에 복사되었습니다", blog "가져오기 완료 — 내 매장 블로그(초안)에 추가" |
+| copy 성공 toast | ✅ "…내 약국에 복사되었습니다", KCos "…내 매장에 복사되었습니다", blog "가져오기 완료 — 내 매장 블로그(초안)에 추가" |
 | Blog/POP/QR Hub 가져가기 | ✅ copy 전달 | 버튼 "내 매장에 가져가기" + info "가져온 블로그는 매장 소유이며, **초안 상태로 복사**되어 자유롭게 수정·발행" + toast "초안" |
 | My Store/library 사본 삭제 confirm | ✅ | KPA ResourcesPage snapshot 삭제 "내 자료함에서 제거…**원본 커뮤니티 자료는 삭제되지 않습니다**"(단건/일괄). 직접 업로드(비-사본)는 원본 문구 미적용(정상) |
 | Hub publish ↔ copy 구분 | ✅ | anti-pattern("Hub에 복사"/"원본 가져오기"/"상품설명으로 가져오기") **0건**. publish=노출, copy=사본 분리 유지 |
 | Neture dashboardCopy 문구 | ✅(문구 한정) | MyContentPage "허브에서 **복사**한 콘텐츠", "허브에서 가져온 콘텐츠 관리", 카드 "…복사"(copiedAt). 구조 정렬은 후속 |
-| 서비스별 용어 | ✅ 유지 | KPA/KCos="내 매장", GP="내 약국"(가드됨, PHARMACY-LABEL-RESTORE-AND-GUARD-V1). 선행 결정 보존 — 본 WO 에서 변경 안 함 |
+| 서비스별 용어 | ✅ 유지 | KPA/KCos="내 매장"="내 약국"(가드됨, PHARMACY-LABEL-RESTORE-AND-GUARD-V1). 선행 결정 보존 — 본 WO 에서 변경 안 함 |
 
 ## 4. anti-pattern 점검 (WO §4.4)
 
@@ -55,7 +53,7 @@ rg "Hub에 복사|허브에 복사|원본 가져오기|연결된 콘텐츠 가�
 
 - **코드 변경 없음.** 조사 결과 정책 위배·오해 유발 문구가 없어 추가 정렬 불요.
 - API/DB/schema/route/menu/copy 동작 **무변경**.
-- 다른 세션 WIP(`web-glycopharm`/`web-k-cosmetics` App.tsx·operatorMenuGroups, `operator-core-ui/forum-hub`, 3서비스 OperatorForumPage = FORUM-HUB-READONLY-INTRODUCE) **미접촉**.
+- 다른 세션 WIP **미접촉**.
 
 ## 7. Typecheck
 

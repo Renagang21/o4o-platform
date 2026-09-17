@@ -50,7 +50,7 @@ QR 만들기 선택기와 콘텐츠 목록이 **서로 다른 데이터 소스**
 
 | 파일 | 변경 |
 |------|------|
-| `apps/api-server/.../store-library-feed.controller.ts` | snapshot+direct UNION 에 **`store_execution_assets`(asset_type='content', is_active) 브랜치 추가**. `origin='execution-asset'`, `content_json = jsonb_build_object('html', html_content)`, `sort_at=created_at`. data/count 쿼리 + search($4/$2) 양쪽. normalized origin 타입 확장. **KPA 전용 mount**(kpa.routes.ts:400) → GP/KCos 무영향 |
+| `apps/api-server/.../store-library-feed.controller.ts` | snapshot+direct UNION 에 **`store_execution_assets`(asset_type='content', is_active) 브랜치 추가**. `origin='execution-asset'`, `content_json = jsonb_build_object('html', html_content)`, `sort_at=created_at`. data/count 쿼리 + search($4/$2) 양쪽. normalized origin 타입 확장. **KPA 전용 mount**(kpa.routes.ts:400) → KCos 무영향 |
 | `services/web-kpa-society/src/api/assetSnapshot.ts` | `LibraryContentOrigin` 에 `'execution-asset'` 추가 |
 | `services/web-kpa-society/.../StoreContentsSelector.tsx` | `RowOrigin`/`DocSourceType` 확장. `toDocumentRow`: 원본유형 "매장 제작 자료", 작성자 "내 매장", href→`/store/library/production-materials`(전용 단건 뷰어 부재). 배지 "제작 자료"(보라). 액션 "열기". 제작 선택(`handleStart`) 시 `'execution-asset'`→canonical `'library'` 매핑(기존 production 흐름 재사용) |
 
@@ -77,7 +77,7 @@ QR 만들기 선택기와 콘텐츠 목록이 **서로 다른 데이터 소스**
 | 행 "열기" → `/store/library/production-materials` 링크 | ✅ |
 | 기존 스냅샷 **해양 심층수 효능**(커뮤니티 콘텐츠 허브, `/view/…`) 보존 | ✅ |
 | 기존 QR 공개 URL `/qr/3`(역노화) 본문 전체 정상 렌더 (store_execution_assets html 무변경 → **QR 안 깨짐**) | ✅ |
-| GP/KCos 무영향(피드는 `kpa.routes.ts` mount 전용) | ✅ (코드) |
+| KCos 무영향(피드는 `kpa.routes.ts` mount 전용) | ✅ (코드) |
 
 > 비고: renagang21 계정은 1·2차 비밀번호 불일치 후 3차(`3Lz1…`)로 로그인 성공. 데이터 삭제/이동/마이그레이션 0 — 원본 store_execution_assets·QR 무변경(비파괴 노출).
 
@@ -85,6 +85,6 @@ QR 만들기 선택기와 콘텐츠 목록이 **서로 다른 데이터 소스**
 
 ## 5. 최종 판정
 
-> QR "내 매장 자료" 선택기에서 선택 가능한 제작 콘텐츠(store_execution_assets content)가 `/store/library/contents` 목록에도 "매장 제작 자료"로 노출된다. 원본 자산·기존 QR 공개 URL은 무변경(비파괴). GP/KCos 무영향.
+> QR "내 매장 자료" 선택기에서 선택 가능한 제작 콘텐츠(store_execution_assets content)가 `/store/library/contents` 목록에도 "매장 제작 자료"로 노출된다. 원본 자산·기존 QR 공개 URL은 무변경(비파괴). KCos 무영향.
 
 → **코드 충족. 운영 smoke 확인 후 종료.**

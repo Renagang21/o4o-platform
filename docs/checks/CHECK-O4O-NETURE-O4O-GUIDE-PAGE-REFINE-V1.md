@@ -18,7 +18,6 @@ Neture의 "이용안내"를 O4O 플랫폼 전체 안내 + Neture 사업자(공�
 
 ## 3. 제외 서비스와 제외 사유
 
-- `services/web-glycopharm` / `services/web-k-cosmetics` / `services/web-kpa-society` — 각 서비스별 "서비스 안내" 작업 별도 완료, 본 WO 범위 외
 - 푸터 구조 정비 — 후속 별도 WO로 분리
 - 외부 working tree 변경 — 작업 시작 시 clean 확인, stage/commit 안 함
 
@@ -62,7 +61,7 @@ Neture의 "이용안내"를 O4O 플랫폼 전체 안내 + Neture 사업자(공�
 
 ## 8. O4O 플랫폼 안내 반영 여부
 
-- ✅ 반영됨. `/guide` 는 명시적으로 "O4O 플랫폼 이용 안내 허브"이며 Online for Offline 구조, 공급자·운영자·매장 참여 구조, 현재 운영 중인 O4O 서비스(KPA/GlycoPharm/K-Cosmetics) 쇼케이스를 포함.
+- ✅ 반영됨. `/guide` 는 명시적으로 "O4O 플랫폼 이용 안내 허브"이며 Online for Offline 구조, 공급자·운영자·매장 참여 구조, 현재 운영 중인 O4O 서비스 쇼케이스를 포함.
 
 ## 9. Neture 공급자/파트너 안내 반영 여부
 
@@ -101,7 +100,7 @@ Neture의 "이용안내"를 O4O 플랫폼 전체 안내 + Neture 사업자(공�
 - Neture 를 매장 경영자용 "내 매장" 서비스로 과장하는 표현 없음 확인
 - 커뮤니티 기능 과대 강조 없음 — 커뮤니티는 Forum/자료실 기능 안내 수준, 유통참여형 펀딩은 참여형 유통 프로그램으로 한정
 - 유통참여형 펀딩 금융상품 오해 차단 표현 확인
-- GlycoPharm / K-Cosmetics / KPA Society 파일 미수정
+- K-Cosmetics / KPA Society 파일 미수정
 - 외부 working tree 변경 stage/commit 안 함
 - **코드 변경 없음 → TypeScript/build 영향 없음** (기존 빌드 상태 유지)
 

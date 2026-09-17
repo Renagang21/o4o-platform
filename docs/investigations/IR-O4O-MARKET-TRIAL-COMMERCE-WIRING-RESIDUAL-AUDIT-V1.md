@@ -14,7 +14,6 @@
 2. **출력 측(전환·커머스 퍼널)이 진짜 잔존 배선이다.** 펀딩 참여 → 제품 전환 → OPL 매장 진열 → 첫 주문 추적 → 정산 ledger → 결제 → 풀필먼트/배송이 **operator/supplier UI + backend + DB 까지 완전 배선**되어 있다.
 3. **일부는 이미 차단됨.** `createListingFromParticipant`(OPL 생성, 409 차단)·`tryConnectOrderToTrial`(checkout 역연결, no-op) 2건은 `WO-O4O-MARKET-TRIAL-CONVERSION-DISABLE-V1` 로 비활성. **단 코드·라우트·DB 컬럼은 잔존** → 완전 제거 후보.
 4. **여전히 ACTIVE**: 제품 전환(`convertToProduct`), 정산 state machine, 오프라인 결제 ledger, 풀필먼트 주문 생성·동기화, 배송지 수집, 전환/정산/결제 KPI·퍼널.
-5. **Store 서비스(KPA/GP/KCos)는 깨끗.** 이전 `WO-O4O-MARKET-TRIAL-STORE-REDIRECT-AND-CARD-REMOVAL-V1` cleanup 이 검증됨. GP 사업안내 **텍스트 언급만** 잔존(C, 저위험).
 6. **DB**: 6 테이블 중 5 테이블에 커머스/정산/결제/배송/전환 필드 **약 45개**가 content-only 원칙과 충돌. `market_trial_forums` 만 충돌 0.
 7. ⚠️ **정산·결제 ledger 는 별도 WO(OFFLINE-PAYMENT-LEDGER / PAYMENT-READINESS)로 구축된 운영 서브시스템**이다. content-only 전환은 이 전체를 폐기하므로, **운영 데이터 존재 여부 확인(SQL)** 후 P0 차단·제거 순서를 정해야 한다.
 
@@ -40,7 +39,7 @@
 ## 2. 조사 범위 · 키워드
 
 - **Backend**: `apps/api-server/src/controllers/market-trial/*`, `routes/market-trial*`, `jobs/market-trial-lifecycle.job.ts`, `extensions/trial-{fulfillment,shipping,forum-monitor}`, `services/checkout.service.ts`, `modules/store-core/entities/organization-product-listing.entity.ts`, `database/migrations/*MarketTrial*`, `packages/market-trial/src/{entities,dto,types}`.
-- **Frontend**: `services/web-neture/src/{pages/market-trial,pages/operator,pages/supplier,api/trial.ts}`; `services/web-{kpa-society,glycopharm,k-cosmetics}`; `packages/{store-ui-core,store-products-ui,shared-space-ui}`.
+- **Frontend**: `services/web-neture/src/{pages/market-trial,pages/operator,pages/supplier,api/trial.ts}`; `packages/{store-ui-core,store-products-ui,shared-space-ui}`.
 - **키워드**: marketTrial, market_trial, MarketTrial, createListingFromParticipant, tryConnectOrderToTrial, convertedProductId, customerConversionStatus, settlementStatus, paymentStatus, source_type='market_trial', trial-shipping, trial-fulfillment, 매장 진열, 첫 주문, 전환, 정산, 발송.
 
 ---
@@ -63,17 +62,14 @@
 
 ---
 
-## 4. Store 서비스(KPA/GP/KCos) 잔존 — CLEAN 확인
+## 4. Store 서비스(KPA/KCos) 잔존 — CLEAN 확인
 
 | 서비스 | 결과 |
 |--------|------|
 | **KPA** | route/sidebar/menu 모두 0건 — clean |
-| **GlycoPharm** | store-facing 0건. `pages/business/*`(BusinessProducts/Preparation/Hub/Forum/BloodCare) 에 "유통참여형 펀딩 기반 제품 개발" **텍스트 언급만**(C, 저위험, "실행은 Neture" 귀속) |
 | **K-Cosmetics** | 0건 — clean |
 | **store-ui-core** | `StoreSidebar.tsx` market-trial 아이콘 매핑 없음, `storeMenuConfig.ts` 는 정리 완료 주석만 |
 | **shared-space-ui** | `O4OHelpSection.tsx:48-51` cross-service 카탈로그에서 Market Trial 제거 완료. neture guide copy 는 Neture 전용으로 격리 |
-
-→ **이전 `WO-O4O-MARKET-TRIAL-STORE-REDIRECT-AND-CARD-REMOVAL-V1` cleanup 검증됨.** Store 측 신규 제거 작업 불필요(GP 텍스트 표현 정리만 선택적 C).
 
 ---
 
@@ -143,7 +139,7 @@
 | 정산 ledger / 결제 lifecycle | **상** | 운영 데이터 존재 가능. `WO-...-OFFLINE-PAYMENT-LEDGER` / `PAYMENT-READINESS` 로 구축된 서브시스템. **DB 실측 선행 필수** |
 | 풀필먼트/배송 | **중** | NetureService 실주문 생성 — 운영 사용 시 데이터 존재 가능. 실측 권장 |
 | DB 컬럼/테이블 정리 | **상** | migration. 데이터 백업·하위호환 확인 필요. 마지막 단계 |
-| Store 서비스 | **하** | 이미 clean. GP 텍스트만(선택) |
+| Store 서비스 | **하** | 이미 clean. |
 | operator/supplier KPI 표현 | **하** | read-only, 표현 정정 |
 
 ---
@@ -163,7 +159,6 @@ WO 2 (P1) — UI/문구 정정 [WO-O4O-MARKET-TRIAL-UI-COMMERCE-LABEL-CLEANUP-V1
   - supplier "매장 진열" KPI / SupplierTrialDetail 전환단계·이행률 제거·정정
   - MyParticipations 정산 UI 제거, 참여자 안내 문구 content-only 로 정정
   - "매장 진열 / 첫 주문 / 상품 전환 / 정산 / 발송" 용어 제거
-  - (선택) GP business 페이지 텍스트 표현 정리
 
 WO 3 (P2) — DTO/API 계약 정리 [WO-O4O-MARKET-TRIAL-CONTRACT-CLEANUP-V1]
   - trial.ts / dto: productId·convertedProductId·listingId·settlement*·payment*·ShippingAddress·Fulfillment 제거

@@ -4,7 +4,7 @@
  * WO-O4O-START-PRODUCTION-MODAL-SHARED-COMPONENT-PHASE2-H-V1
  *
  * KPA StartProductionModal 을 canonical 기준으로 삼아 공통 컴포넌트로 승격.
- * KPA / K-Cosmetics 가 동일 코드를 사용 (GlycoPharm 은 2026-09-08 서비스 삭제).
+ * KPA / K-Cosmetics 가 동일 코드를 사용.
  * 서비스별 차이는 targets / getTemplates props 로만 제어한다.
  *
  * 제로-의존 원칙:

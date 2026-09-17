@@ -48,7 +48,6 @@
 | listing id | service_key | source_type | price | is_active | status | 하위 참조 |
 |-----------|-------------|-------------|-------|-----------|--------|-----------|
 | `64ae4184-…` | kpa-society | NULL (의도 등록) | NULL | true | pending | 0 |
-| `ce99ef20-…` | glycopharm | event-offer | NULL | true | pending | 0 |
 | `09a400e6-…` | k-cosmetics | event-offer | NULL | true | pending | 0 |
 
 공급처(offer)·가격·승인상태·주문가능성·visibility 가 **모두 동일**하고, 다른 축은
@@ -65,7 +64,6 @@
 | service_key | listing |
 |-------------|---------|
 | neture | 20 |
-| glycopharm | 1 |
 | k-cosmetics | 1 |
 | kpa-society | 1 |
 
@@ -150,7 +148,6 @@ ORDER BY opl.is_active DESC,
 | 동일 master 중복 | **3회 반복 재현** (`09a400e6` / `ce99ef20` / `64ae4184`, 이름·originLabel 동일) |
 | `GET /api/v1/pharmacy-hub/store-owner/handled-products` | 200 · items 0 (PH 조직 해석 결과로 대상 org 아님 — 계약대로) |
 | `GET /api/v1/store/local-products` | 200 · items 0 — handled-products 의 local 8건과 혼동 없음(아래 관찰 참조) |
-| KCos(테스트 뷰티샵) · GP([E2E_TEST] 글라이코팜 검증 약국) org | 각 listing 1건 → 중복 대상 없음 |
 
 배포 후 재smoke 시 동일 계정에서 items 31 → **29**, 3회 반복 → **1행**이 되어야 한다.
 

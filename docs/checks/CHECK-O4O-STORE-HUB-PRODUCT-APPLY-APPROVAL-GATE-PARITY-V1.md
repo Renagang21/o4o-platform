@@ -13,10 +13,9 @@
 | 서비스 | 마운트 route | 주입 serviceKey | 승인키 (`offer_service_approvals.service_key`) |
 |--------|--------------|:---------------:|:----------------------------------------------:|
 | KPA-Society | `/api/v1/kpa/pharmacy/products` | `kpa` | `kpa-society` |
-| GlycoPharm | `/api/v1/glycopharm/pharmacy/products` | `glycopharm` | `glycopharm` |
 | K-Cosmetics | `/api/v1/cosmetics/pharmacy/products` | `cosmetics` | `k-cosmetics` |
 
-- 근거: [kpa.routes.ts:410](apps/api-server/src/routes/kpa/kpa.routes.ts#L410) · [glycopharm.routes.ts:385](apps/api-server/src/routes/glycopharm/glycopharm.routes.ts#L385) · [cosmetics.routes.ts:137](apps/api-server/src/routes/cosmetics/cosmetics.routes.ts#L137)
+- 근거: [kpa.routes.ts:410](apps/api-server/src/routes/kpa/kpa.routes.ts#L410) · [cosmetics.routes.ts:137](apps/api-server/src/routes/cosmetics/cosmetics.routes.ts#L137)
 - **마운트 3개 전부 serviceKey 를 주입한다** → `approvalServiceKey` 가 항상 정의되며 게이트 미적용 back-compat 경로는 현재 존재하지 않는다.
 - 매핑은 기존 `STORE_SERVICE_KEY_TO_APPROVAL_KEY` (동 controller) 를 **재사용**했다. 새 문자열 변환을 추가하지 않았다 (WO §3).
 
@@ -29,10 +28,9 @@ WO §5 의 "서버 고정" 이 데이터 축을 갈라놓지 않는지 먼저 �
 | 서비스 | 프론트가 보내던 값 | 종전 저장값 | 서버 도출값 | 일치 |
 |--------|-------------------|-------------|-------------|:----:|
 | KPA | **미전송** | `kpa-society` (백엔드 기본값) | `kpa-society` | ✅ |
-| GlycoPharm | `glycopharm` | `glycopharm` | `glycopharm` | ✅ |
 | K-Cosmetics | `k-cosmetics` | `k-cosmetics` | `k-cosmetics` | ✅ |
 
-근거: [web-glycopharm/pharmacyProducts.ts:89](services/web-glycopharm/src/api/pharmacyProducts.ts#L89) · [web-k-cosmetics/pharmacyProducts.ts:70](services/web-k-cosmetics/src/api/pharmacyProducts.ts#L70) · [web-kpa-society/pharmacyProducts.ts:166](services/web-kpa-society/src/api/pharmacyProducts.ts#L166) (KPA `applyBySupplyProductId` 는 `{ supplyProductId }` 만 전송)
+[web-k-cosmetics/pharmacyProducts.ts:70](services/web-k-cosmetics/src/api/pharmacyProducts.ts#L70) · [web-kpa-society/pharmacyProducts.ts:166](services/web-kpa-society/src/api/pharmacyProducts.ts#L166) (KPA `applyBySupplyProductId` 는 `{ supplyProductId }` 만 전송)
 
 **→ 도출값이 현행 저장값과 완전히 동일하므로 신규/기존 row 의 축이 갈라지지 않는다. migration 불필요, 조회 회귀 없음.**
 (이 결과가 나오지 않았다면 WO §14 "기존 approval/listing 데이터 migration이 필요한 경우" 로 중지했을 것이다.)
@@ -108,7 +106,6 @@ offer 없음 / 비활성 / 공급자 비활성 / 현재 서비스 미승인 / �
 
 | 파일 | 변경 |
 |------|------|
-| [web-glycopharm/api/pharmacyProducts.ts](services/web-glycopharm/src/api/pharmacyProducts.ts) | `/apply` body 에서 `service_key: 'glycopharm'` 제거 |
 | [web-k-cosmetics/api/pharmacyProducts.ts](services/web-k-cosmetics/src/api/pharmacyProducts.ts) | `/apply` body 에서 `service_key: 'k-cosmetics'` 제거 |
 | [web-kpa-society/api/pharmacyProducts.ts](services/web-kpa-society/src/api/pharmacyProducts.ts) | `applyProduct` 시그니처에서 `service_key?` 제거 · `getApplications`/`getApprovedProducts` 의 죽은 `service_key?` 제거 |
 | [web-kpa-society/pages/pharmacy/PharmacySellPage.tsx](services/web-kpa-society/src/pages/pharmacy/PharmacySellPage.tsx) | `applyProduct({ ..., service_key })` → `service_key` 전송 제거 |
@@ -136,7 +133,6 @@ grep resolveServiceKeyFrom* (pharmacy-products.controller.ts 외)  →  없음
 | 노출 불가 offer → `404 OFFER_NOT_AVAILABLE` | PASS |
 | 게이트 SQL 에 `offer_service_approvals` + `approval_status='approved'` + `spo.is_active` + `s.status='ACTIVE'` 포함 | PASS |
 | kpa 마운트 → 승인키 `kpa-society` 바인딩 (role-prefix `kpa` 아님) | PASS |
-| glycopharm → `glycopharm` / cosmetics → `k-cosmetics` | PASS |
 | PUBLIC 예외 조항이 게이트에 존재 (기존 정책 유지) | PASS |
 | 비-UUID offerId → 500 아닌 404, uuid 캐스팅 쿼리 미발행 | PASS |
 
@@ -144,18 +140,13 @@ grep resolveServiceKeyFrom* (pharmacy-products.controller.ts 외)  →  없음
 
 | 검증 | 결과 |
 |------|:----:|
-| kpa 경로 + `service_key='glycopharm'` → `400 SERVICE_KEY_MISMATCH` | PASS |
-| glycopharm 경로 + `service_key='kpa-society'` → 400 | PASS |
-| cosmetics 경로 + `service_key='glycopharm'` → 400 | PASS |
+| kpa 경로 → `400 SERVICE_KEY_MISMATCH` | PASS |
+| cosmetics 경로 → 400 | PASS |
 | 거부가 게이트 조회보다 **먼저** — write 경로 미진입 | PASS |
 | 도출값과 동일한 값 전송 시 통과 (기존 프론트 회귀 방지) ×3 | PASS |
 | `service_key` 미전송(KPA 현행) 통과 | PASS |
 
 ### 읽기 축
-
-| 검증 | 결과 |
-|------|:----:|
-| `/approved?service_key=glycopharm` 을 3개 마운트에서 호출 → query 무시하고 각 마운트 도출값으로 조회 | PASS |
 
 ### 회귀
 
@@ -171,9 +162,7 @@ grep resolveServiceKeyFrom* (pharmacy-products.controller.ts 외)  →  없음
 |------|------|
 | `api-server tsc --noEmit` | 변경 파일 **오류 0**. 전체 13건은 전부 `src/scripts/*` (drug-otc-*, hff-*) **선재 오류** — 본 변경 집합 밖 |
 | `web-kpa-society tsc` | PASS (exit 0) |
-| `web-glycopharm tsc` | PASS (exit 0) |
 | `web-k-cosmetics tsc` | PASS (exit 0) |
-| `glycopharm-web build` | PASS |
 | `@o4o/web-k-cosmetics build` | PASS |
 | `@o4o/web-kpa-society build` | PASS |
 
@@ -222,7 +211,7 @@ WO §4 의 서비스별 승인 분포 / 우회 신청 가능 후보 수 집계�
 | PUBLIC 정책 변경 | **0** (예외 유지) |
 | `offer_service_approvals` 데이터 정리 | **0** |
 | 상품 카탈로그 UI 개편 | **0** |
-| GP/KCos asset snapshot 수정 | **0** (HUB-P0-03 별도 WO) |
+| KCos asset snapshot 수정 | **0** (HUB-P0-03 별도 WO) |
 | dependency / lockfile | **0** |
 
 변경 파일 6개 (신규 1 포함):
@@ -230,7 +219,6 @@ WO §4 의 서비스별 승인 분포 / 우회 신청 가능 후보 수 집계�
 ```
 apps/api-server/src/routes/o4o-store/controllers/pharmacy-products.controller.ts
 apps/api-server/src/__tests__/security/store-hub-product-apply-gate.spec.ts   (신규)
-services/web-glycopharm/src/api/pharmacyProducts.ts
 services/web-k-cosmetics/src/api/pharmacyProducts.ts
 services/web-kpa-society/src/api/pharmacyProducts.ts
 services/web-kpa-society/src/pages/pharmacy/PharmacySellPage.tsx
@@ -254,7 +242,7 @@ services/web-kpa-society/src/pages/pharmacy/PharmacySellPage.tsx
 | SERVICE/PRIVATE 신청 시 현재 서비스 승인 재검증 | ✅ |
 | 목록 비노출 offer ID 직접 신청 차단 | ✅ (테스트) |
 | 클라이언트 `service_key` 로 타 서비스 row 생성 불가 | ✅ (테스트) |
-| KPA·GP·KCos 정상 신청 회귀 없음 | ✅ (§2 도출값 동일 + 168 테스트) |
+| KPA·KCos 정상 신청 회귀 없음 | ✅ (§2 도출값 동일 + 168 테스트) |
 | PUBLIC 기존 정책 유지 | ✅ |
 | PRIVATE seller scope 기존 상태 유지 | ✅ |
 | DB migration 0 | ✅ |

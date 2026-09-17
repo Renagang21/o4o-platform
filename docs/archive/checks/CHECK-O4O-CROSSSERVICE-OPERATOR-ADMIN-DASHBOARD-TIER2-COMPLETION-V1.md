@@ -4,7 +4,7 @@
 **검증 환경**: HEAD (main) `8ccb79f55` 시점 정적 코드 / git history / TypeScript 검증
 **검증 도구**: Grep / Git log / TypeScript compiler
 **작업 성격**: 검증 및 문서화 전용 — 코드/DB/source 수정 없음
-**선행 CHECK**: [CHECK-O4O-CROSSSERVICE-OPERATOR-ADMIN-DASHBOARD-TIER1-COMPLETION-V1](CHECK-O4O-CROSSSERVICE-OPERATOR-ADMIN-DASHBOARD-TIER1-COMPLETION-V1.md), [CHECK-O4O-GLYCOPHARM-CARE-GLUCOSEVIEW-RESIDUE-CLEANUP-FINAL-PASS-V1](CHECK-O4O-GLYCOPHARM-CARE-GLUCOSEVIEW-RESIDUE-CLEANUP-FINAL-PASS-V1.md), [CHECK-O4O-KCOSMETICS-OPERATOR-VOCABULARY-RECHECK-V1](CHECK-O4O-KCOSMETICS-OPERATOR-VOCABULARY-RECHECK-V1.md)
+**선행 CHECK**: [CHECK-O4O-CROSSSERVICE-OPERATOR-ADMIN-DASHBOARD-TIER1-COMPLETION-V1](CHECK-O4O-CROSSSERVICE-OPERATOR-ADMIN-DASHBOARD-TIER1-COMPLETION-V1.md), [CHECK-O4O-KCOSMETICS-OPERATOR-VOCABULARY-RECHECK-V1](CHECK-O4O-KCOSMETICS-OPERATOR-VOCABULARY-RECHECK-V1.md)
 
 ---
 
@@ -15,7 +15,7 @@
 > 1. **W4 K-Cosmetics 어휘 정리** — pharmacy/약사/(K-Cos 회원분류)공급자 active code 잔존 0건. Neture 공급자 / 상품 공급자 / Event Offer 공급자 사업 개념은 모두 보존.
 > 2. **W5 Care + GlucoseView 정리** — Care active code 0건 / GlucoseView active code 0건. 1차 최종 완료 (`9e9bd7ac9` Final PASS).
 > 3. **W6 Neture pharmacy placeholder 정리** — operator/ 부적절한 placeholder 0건 (RecruitingProducts + StoreManagement).
-> 4. **TypeScript 신규 에러 0건** — 5개 서비스 + api-server 검증 통과 (web-glycopharm 22 는 pre-existing, lms.ts + Dashboard unused, 본 Tier 2 작업 전체와 무관).
+> 4. **TypeScript 신규 에러 0건** — 5개 서비스 + api-server 검증 통과
 > 5. **Source file 수정 0건** — 본 CHECK 는 검증 + 문서화만.
 
 ---
@@ -41,20 +41,6 @@
 ```
 6beabab22 refactor(k-cosmetics): WO-O4O-KCOSMETICS-OPERATOR-VOCABULARY-PHARMACY-CLEANUP-V2
 984140f55 docs(kcosmetics): CHECK-O4O-KCOSMETICS-OPERATOR-VOCABULARY-RECHECK-V1
-```
-
-### W5 — GlycoPharm Care + GlucoseView residue cleanup (chain)
-
-```
-9e9bd7ac9 docs(glycopharm): CHECK-...-FINAL-PASS-V1                         ← 최종 PASS
-b18858252 refactor(api-server): W-Patch auth GlucoseView cleanup
-ee221f185 docs(glycopharm): CHECK-...-COMPLETION-V1 (CONDITIONAL PASS)
-3abfdfe7b refactor(operator): I-β GlucoseView shared residue cleanup
-14240d0ad refactor(operator): W5c-v2 shared CARE type contract removal
-c94ed8e49 refactor(glycopharm): W5d-Frontend type/intro/guard cleanup
-1c65e0ad0 refactor(glycopharm): W5b backend Care alert metrics cleanup
-d3b56d525 docs(glycopharm): I-α Care 재도입 정책 IR (옵션 A)
-741e59b4e refactor(glycopharm): W5a Admin KPI whitelist cleanup
 ```
 
 ### W6 — Neture pharmacy placeholder cleanup
@@ -109,58 +95,6 @@ fe0a71fb5 refactor(neture): WO-O4O-NETURE-OPERATOR-PAGES-RESIDUAL-PHARMACY-LABEL
 ### 3.5 판정
 
 ✅ **W4 PASS**
-
----
-
-## 4. W5 GlycoPharm Care + GlucoseView cleanup 검증
-
-### 4.1 Care active code 잔존 검색
-
-| 검색어 | 영역 | active code 잔존 |
-|-------|------|:----------------:|
-| `OperatorCapability.CARE` | apps + packages + services | **0** ✅ |
-| `OperatorGroupKey 'care'` / `key: 'care'` (STANDARD_GROUPS) | packages/ui | **0** ✅ |
-| `GROUP_TO_DOMAIN.care` | 3 서비스 web | **0** ✅ |
-| `openCareAlerts / careAdoptionRate / highRiskPatients / weeklyCareActivity` | apps/api-server | **0** ✅ |
-| `CARE_ALERTS / CARE_ADOPTION / HIGH_RISK / WEEKLY_CARE` THRESHOLDS | apps/api-server | **0** ✅ |
-| `AlertItem.type='care'` | services/web-glycopharm | **0** ✅ |
-| `FeatureIntro care config` | services/web-glycopharm | **0** ✅ |
-| `ADMIN_KPI_KEYS` 의 `'total-patients'`/`'high-risk-patients'`/`'open-care-alerts'` | services/web-glycopharm/admin | **0** ✅ |
-| `'care-alerts'` (active aiRuleGenerator check) | apps/api-server | **0** ✅ |
-
-### 4.2 GlucoseView active code 잔존 검색
-
-| 검색어 | 영역 | active code 잔존 |
-|-------|------|:----------------:|
-| `glucoseview:admin/operator` MemberBadges | packages/operator-ux-core | **0** ✅ |
-| `SERVICE_OPTIONS` 의 `'glucoseview'` | packages/ui | **0** ✅ |
-| `SERVICE_LABELS` 의 `glucoseview` | packages (ui/operator-ux-core) | **0** ✅ |
-| `'glucoseview'` service key union | packages/platform-core (slug/policy/payment-config) | **0** ✅ |
-| `/admin/glucoseview` alias | apps/admin-dashboard | **0** ✅ |
-| `register.dto.ts` GlucoseView 전용 displayName 필드 | apps/api-server | **0** ✅ |
-| `password.controller.ts` `'https://glucoseview.co.kr'` ALLOWED_ORIGINS | apps/api-server | **0** ✅ |
-| 사용자 노출 GlucoseView 표시 (UI badge/option/label/service key) | apps + packages + services | **0** ✅ |
-
-### 4.3 W5 잔존 항목 분류 (모두 F 보존)
-
-| 위치 | 분류 |
-|------|:----:|
-| `docs/investigations/IR-*.md`, `CHECK-*.md` 다수 | F (정책/감사 문서) |
-| `services/web-glycopharm/src/pages/admin/GlycoPharmAdminDashboard.tsx:54-56,262` | F (W5a 정리 trace + line 262 totalPatients **W5a 명시 보존 결정 dead-on-the-vine** — §10 후속 추적) |
-| `services/web-glycopharm/src/config/operatorCapabilities.ts:19` | F (W5d trace) |
-| `packages/ui/src/operator-shell/constants.ts:9` | F (W5c-v2 trace, HeartPulse import 제거) |
-| `apps/api-server/src/utils/operator-alert.utils.ts:21,48` `pendingApprovals?` | F (W5b 의도적 보존 주석) |
-| `apps/api-server/src/modules/auth/dto/register.dto.ts:7,252` 정리 사유 주석 | F |
-| `apps/api-server/src/modules/auth/controllers/password.controller.ts:26` 정리 사유 주석 | F |
-| `apps/api-server/src/modules/auth/entities/ServiceMembership.ts:46` entity docstring | F (선행 CHECK 보존) |
-| `apps/api-server/__tests__/security/*.spec.ts` glucoseview role | F (cross-service 차단 검증 fixture) |
-| `services/web-glycopharm/src/api/public.ts:85` `supplier: 'GlucoseView'` | F (mock supplier 별도 트랙) |
-| `scripts/care-*.{mjs,py,sh}` | F (broken test, dead endpoint) |
-| migration 파일 다수 (1737100*, 1771200000016, 1739700000000, 20260205070000, 20260600000000 등) | F (이미 실행된 변경 이력) |
-
-### 4.4 판정
-
-✅ **W5 PASS** (선행 Final PASS CHECK `9e9bd7ac9` 재확인 — Care + GlucoseView active 모두 0건)
 
 ---
 
@@ -224,8 +158,6 @@ fe0a71fb5 refactor(neture): WO-O4O-NETURE-OPERATOR-PAGES-RESIDUAL-PHARMACY-LABEL
 
 | ID (가칭) | 우선순위 |
 |-----------|:--------:|
-| `WO-O4O-GLYCOPHARM-ADMIN-DASHBOARD-TOTAL-PATIENTS-VAR-CLEANUP-V1` — `GlycoPharmAdminDashboard.tsx:262` totalPatients dead-on-the-vine 변수 + line 265 networkStats '회원 수' 항목 (W5a 보존 결정 재확정 시) | 낮음 |
-| `WO-O4O-GLYCOPHARM-PUBLIC-API-GLUCOSEVIEW-MOCK-CLEANUP-V1` — `web-glycopharm/api/public.ts:85` mock `supplier: 'GlucoseView'` 라벨 중립화 | 낮음 |
 | `WO-O4O-SCRIPTS-DEAD-GLUCOSEVIEW-TEST-CLEANUP-V1` — `scripts/care-*.{mjs,py,sh}` broken test scripts | 매우 낮음 |
 | `WO-O4O-API-SERVER-AUTH-SERVICEMEMBERSHIP-DOCSTRING-CLEANUP-V1` — ServiceMembership.ts:46 entity docstring 의 'glucoseview' 예시 제거 | 매우 낮음 |
 
@@ -241,15 +173,8 @@ fe0a71fb5 refactor(neture): WO-O4O-NETURE-OPERATOR-PAGES-RESIDUAL-PHARMACY-LABEL
 | web-k-cosmetics | **0** ✅ | W4-v2 변경 신규 에러 0 |
 | web-kpa-society | **0** ✅ | W5c-v2 shared CARE type contract 정리 후 정합 |
 | web-neture | **0** ✅ | W6 placeholder + GlucoseView shared 정리 후 정합 |
-| web-glycopharm | 22 (pre-existing) | lms.ts 4 + DashboardLayout/InstructorDashboardPage unused 등 — 본 Tier 2 작업 전체와 무관. Tier 1 시점 (`b904ef30c`) 부터 동일 수치 |
 
 **본 Tier 2 작업 신규 에러 0건** ✅
-
-### 7.1 web-glycopharm pre-existing 22 errors 의 출처
-
-이전 CHECK (`b904ef30c`, `89a285593`, `b746c2da4`, `ee221f185`, `9e9bd7ac9`) 시점 모두 동일 수치. 본 Tier 2 의 W4-v2 / W5 chain / W6 어느 작업과도 무관한 별도 영역 (lms.ts 의 LMS api 반환 type mismatch, DashboardLayout 의 unused 'user' 변수, InstructorDashboardPage 의 CSS property 정합 문제). **별도 cleanup 트랙**.
-
----
 
 ## 8. Working tree 격리 상태
 
@@ -306,18 +231,11 @@ fe0a71fb5 refactor(neture): WO-O4O-NETURE-OPERATOR-PAGES-RESIDUAL-PHARMACY-LABEL
 본 Tier 2 PASS 에 영향 없는 별도 트랙 (필요 시 진행):
 
 1. **OPTIONAL — Care/GlucoseView 잔존 정리** (Final PASS CHECK §10):
-   - `WO-O4O-GLYCOPHARM-ADMIN-DASHBOARD-TOTAL-PATIENTS-VAR-CLEANUP-V1`
-   - `WO-O4O-GLYCOPHARM-PUBLIC-API-GLUCOSEVIEW-MOCK-CLEANUP-V1`
    - `WO-O4O-SCRIPTS-DEAD-GLUCOSEVIEW-TEST-CLEANUP-V1`
    - `WO-O4O-API-SERVER-AUTH-SERVICEMEMBERSHIP-DOCSTRING-CLEANUP-V1`
 
-2. **OPTIONAL — web-glycopharm pre-existing 22 errors 별도 cleanup** (본 Tier 2 작업 무관, 별도 트랙):
-   - lms.ts type mismatch (4건)
-   - DashboardLayout / InstructorDashboardPage unused 등
-
 3. **별도 IR 트랙 (Tier 4)** (선행 IR §12):
    - `IR-O4O-KPA-OPERATOR-DASHBOARD-API-5BLOCK-UNIFICATION-V1`
-   - `IR-O4O-GLYCOPHARM-EVENT-OFFER-APPROVAL-SCOPE-AUDIT-V1`
    - `IR-O4O-CROSSSERVICE-OPERATOR-AXIS-NAVIGATION-CONVERGENCE-V1`
    - `IR-O4O-KCOSMETICS-OPERATOR-MENU-ADMIN-ENTRY-MIX-V1` (W3 finding 정정에서 파생)
 
@@ -334,7 +252,6 @@ Tier 2 PASS 후 자연스러운 다음 단계:
 
 선행 IR §12 의 3개 + 신규 1개:
 - **I1**: KPA backend `/operator/dashboard` 5-Block unified 응답 도입 여부 (Neture/Cosmetics 와 정합)
-- **I2**: GlycoPharm Event Offer approval 권한 (operator vs admin) — 본 Tier 2 와 인접
 - **I3**: 4개 서비스 AxisNavigationSection 형태 정합 (Neture 도 axis 도입 vs 메뉴 그룹 통합)
 - **Iα**: K-Cos operator menu admin entry mix 여부 (W3 finding 정정)
 
@@ -345,8 +262,6 @@ Tier 2 PASS 후 자연스러운 다음 단계:
 §10 의 4개 OPTIONAL WO. PASS 판정에 영향 없으나 코드베이스 노이즈 감소.
 
 ### 3순위 — pre-existing 22 errors cleanup
-
-web-glycopharm 의 lms.ts + Dashboard unused 정리 — 본 dashboard 트랙과 별개이나 일반 코드 위생.
 
 ### 4순위 — 별도 영역 진행
 
@@ -364,7 +279,7 @@ Tier 2 와 무관한 다른 트랙 (대시보드 외 다른 정비 영역) 으�
 | **W5 검증** | Care + GlucoseView active 잔존 0 ✅. 1차 최종 완료 (Final PASS `9e9bd7ac9`) 재확인 |
 | **W6 검증** | Neture operator 부적절한 약국 placeholder active 잔존 0 ✅. 사업 본질 약국 채널 안내 보존 |
 | **잔존 항목과 분류** | 모두 §6.1 의 F (문서/주석/migration/test fixture/정상 business / mock optional) |
-| **TypeScript 결과** | api-server / web-k-cos / web-kpa / web-neture 모두 0 ✅ / web-glycopharm 22 pre-existing (lms.ts + Dashboard unused, 본 Tier 2 무관) |
+| **TypeScript 결과** | — |
 | **Source file 수정** | 없음 ✅ |
 | **다른 세션 WIP 미포함** | ✅ working tree clean |
 | **Commit 여부** | **사용자 승인 대기** — 본 CHECK 문서 1개만 path-restricted commit 예정 |

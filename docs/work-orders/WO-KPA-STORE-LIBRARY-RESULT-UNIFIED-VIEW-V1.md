@@ -81,7 +81,6 @@ git status --short
 - GCS orphan cleanup — 별도 운영성 WO
 - 저장소 통합/미러링 금지 (읽기 병합만)
 - 사이니지 결과물 통합 — 후속(snapshot 참조 기반 별도)
-- GlycoPharm/K-Cosmetics 변경 / 3서비스 공통화 금지
 - kpa_store_contents rename 금지
 - HeroBannerSection.tsx / Home 영역 / drawer 미접촉
 - 라벨/권한/API 구조 변경 금지 (읽기 호출만 추가)

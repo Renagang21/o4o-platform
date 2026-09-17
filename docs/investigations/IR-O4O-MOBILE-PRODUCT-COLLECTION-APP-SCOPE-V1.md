@@ -271,7 +271,7 @@ admin.neture.co.kr → 상품 자산 관리 → 후보 상품 검토
 | route 활성 마운트 | ✅ `register-routes.ts:437-444` |
 | draft↔candidate 연결 ↔ 문서 일치 | ✅ |
 
-> 본 IR 은 코드 변경 없음(문서 산출). api-server full type-check 는 본 IR 이 backend 를 건드리지 않으므로 재실행하지 않음 — Phase 4 CHECK 의 0-error 정적검증에 의존. (작업 시작 시 working tree 에 타 세션 WIP: `entities.ts`, `glycopharm.routes.ts`, `kpa.routes.ts` — **본 IR 무관, 미접촉**.)
+> 본 IR 은 코드 변경 없음(문서 산출). api-server full type-check 는 본 IR 이 backend 를 건드리지 않으므로 재실행하지 않음 — Phase 4 CHECK 의 0-error 정적검증에 의존. (작업 시작 시 working tree 에 타 세션 WIP: `entities.ts`, `kpa.routes.ts` — **본 IR 무관, 미접촉**.)
 
 ---
 

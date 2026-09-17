@@ -17,7 +17,7 @@
 |------|------|
 | lesson type enum canonical | ✅ `interactive-content-core` 1곳 (video/article/quiz/assignment) |
 | 아이콘 현재 형태 | 🟠 **emoji string** (📄🎬❓📝, KPA CourseIntro 는 🔴 live 추가) |
-| 아이콘 map 위치 | 🟠 **3~4 파일 중복** (KPA LmsLessonPage·CourseIntroPage / Glyco·KCos LmsLessonPage) |
+| 아이콘 map 위치 | 🟠 **3~4 파일 중복** |
 | 공통 아이콘 map | ❌ 없음 (서비스별 로컬 복제) |
 | lucide 선례 | 🟢 admin-dashboard ContentType 은 이미 lucide(`Video/FileText/...`) 사용 — **lesson type 만 미적용** |
 | Neture LMS | ✅ 미사용 (lesson type 아이콘 렌더 없음) |
@@ -55,7 +55,6 @@ const LESSON_TYPE_ICON: Record<string, string> = {
 |------|------|------|------|
 | `services/web-kpa-society/src/pages/lms/LmsLessonPage.tsx` | `LESSON_TYPE_ICON` | 25-30 | + `LESSON_TYPE_LABEL`(19-24) |
 | `services/web-k-cosmetics/src/pages/lms/LmsLessonPage.tsx` | `LESSON_TYPE_ICON` | 37-42 | 동일 emoji |
-| `services/web-glycopharm/src/pages/education/LmsLessonPage.tsx` | `LESSON_TYPE_ICON` | 33-38 | 동일 emoji |
 | `services/web-kpa-society/src/pages/courses/CourseIntroPage.tsx` | `LESSON_TYPE_ICONS` | 23-29 | **`live: '🔴'` 추가**(5종), fallback `'📄'` |
 
 - **아이콘 형태**: 전부 **emoji string** (React component/lucide-name 아님).
@@ -71,9 +70,8 @@ const LESSON_TYPE_ICON: Record<string, string> = {
 | KPA `LmsLessonPage.tsx` | 499 | 플레이어 사이드바 lesson 목록 |
 | KPA `LmsLessonPage.tsx` | 532 | 현재 lesson 헤더(아이콘 + 라벨) |
 | KCos `LmsLessonPage.tsx` | 436, 462 | 사이드바 목록 / 헤더 |
-| Glyco `LmsLessonPage.tsx` | 393, 418 | 사이드바 목록 / 헤더 (`aria-hidden` 부여됨) |
 
-→ **render 6곳 / 4 파일.** Glyco 는 이미 `aria-hidden` 적용(접근성 장식). 공통 컴포넌트 없음(서비스별 LmsLessonPage 독립 구현).
+공통 컴포넌트 없음(서비스별 LmsLessonPage 독립 구현).
 
 ---
 
@@ -82,7 +80,6 @@ const LESSON_TYPE_ICON: Record<string, string> = {
 | 서비스 | lesson type 아이콘 렌더 | 비고 |
 |--------|:---:|------|
 | KPA-Society | ✅ LmsLessonPage + CourseIntroPage | live 타입 추가 사용 |
-| GlycoPharm | ✅ education/LmsLessonPage | canonical 4종 |
 | K-Cosmetics | ✅ lms/LmsLessonPage | canonical 4종 |
 | Neture | ❌ 없음 | LMS 미구현 |
 
@@ -144,7 +141,7 @@ render:      6곳
 | `assignment` | 📝 | `ClipboardList` | `FileCheck` | — |
 | `live`(KPA only) | 🔴 | `Radio` | `Circle`/`Video` | — |
 
-- size/색은 기존 emoji 위치(사이드바 작은 아이콘)에 맞춰 `size≈16~18` + 텍스트색 상속, `aria-hidden` 유지(Glyco 선례).
+- size/색은 기존 emoji 위치(사이드바 작은 아이콘)에 맞춰 `size≈16~18` + 텍스트색 상속, `aria-hidden` 유지.
 
 ---
 
@@ -156,11 +153,9 @@ WO-O4O-LMS-LESSON-TYPE-ICON-MAPPING-STANDARDIZE-V1
 
 **범위(권장):**
 1. `packages/shared-space-ui` 에 공통 lesson type 아이콘 헬퍼/맵 1개 신설 (lucide 컴포넌트, `Record<LessonType, LucideIcon>` + fallback).
-2. KPA/Glyco/KCos `LmsLessonPage` 의 로컬 `LESSON_TYPE_ICON` emoji 맵 제거 → 공통 헬퍼 사용. 라벨(`LESSON_TYPE_LABEL`)은 이번 범위 밖(원하면 함께 공통화).
+2. 라벨(`LESSON_TYPE_LABEL`)은 이번 범위 밖(원하면 함께 공통화).
 3. KPA `CourseIntroPage` 의 `LESSON_TYPE_ICONS`(+`live`) 도 공통 헬퍼로 정렬(live 매핑 포함).
 4. render 6곳 lucide 컴포넌트 렌더로 교체, `aria-hidden` 유지.
-
-**검증:** `@o4o/shared-space-ui` 소비 4서비스 tsc + KPA/Glyco/KCos LMS lesson 화면 smoke(사이드바/헤더/커리큘럼 아이콘 lucide 확인).
 
 **주의:** instructor 편집 페이지(label-only)·`LessonCardPreview`(🎓 badge)·digital-signage·DomainIASidebar 무접촉. emoji→lucide만, lesson type enum/DB/API 무변경.
 
@@ -173,7 +168,6 @@ WO-O4O-LMS-LESSON-TYPE-ICON-MAPPING-STANDARDIZE-V1
 | 소비처 | lesson type 아이콘 | 영향 |
 |--------|:---:|------|
 | KPA-Society | LmsLessonPage + CourseIntroPage | 변경 대상(emoji→lucide) |
-| GlycoPharm | education/LmsLessonPage | 변경 대상 |
 | K-Cosmetics | lms/LmsLessonPage | 변경 대상 |
 | Neture | 없음 | 무영향 |
 | admin-dashboard | ContentType(별도 enum) 이미 lucide | 무관(참고 선례) |
@@ -189,8 +183,7 @@ WO-O4O-LMS-LESSON-TYPE-ICON-MAPPING-STANDARDIZE-V1
 ## 12. Evidence
 
 - enum: `packages/interactive-content-core/src/entities/Lesson.ts:17-22`
-- 아이콘 map(중복): KPA `pages/lms/LmsLessonPage.tsx:25-30` · `pages/courses/CourseIntroPage.tsx:23-29`(+live) · KCos `pages/lms/LmsLessonPage.tsx:37-42` · Glyco `pages/education/LmsLessonPage.tsx:33-38`
-- render: KPA 499·532, KCos 436·462, Glyco 393·418, KPA CourseIntro 251
+- 아이콘 map(중복): KPA `pages/lms/LmsLessonPage.tsx:25-30` · `pages/courses/CourseIntroPage.tsx:23-29`(+live) · KCos `pages/lms/LmsLessonPage.tsx:37-42`
 - lucide 선례(ContentType): `apps/admin-dashboard/src/pages/content/assets/index.tsx:33-37`
 - 공통 배치 후보: `packages/shared-space-ui`(src 소비, LessonCardPreview.tsx 등 React/lucide 보유) vs `packages/lms-core`(`main: dist/index.js`, utils/lmsPermissions.ts 패턴)
 - DB lowercase: `apps/api-server/src/database/migrations/20260502160000-NormalizeLessonTypeLowercase.ts`

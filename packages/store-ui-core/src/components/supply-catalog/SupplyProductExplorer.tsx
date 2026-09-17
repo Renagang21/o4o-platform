@@ -9,7 +9,7 @@
  *                    · 안내문(notice/footer)
  *
  * 업무 의미는 본 컴포넌트가 결정하지 않는다.
- *   - 신청(ProductApproval PENDING) / 제외 = KPA · K-Cosmetics · GlycoPharm 측 액션
+ *   - 신청(ProductApproval PENDING) / 제외 = KPA · K-Cosmetics 측 액션
  *   - 장바구니 / 주문 = Pharmacy-Hub 측 액션
  *   두 축을 섞지 않는다. 여기에는 어떤 액션 로직도 넣지 않는다.
  */

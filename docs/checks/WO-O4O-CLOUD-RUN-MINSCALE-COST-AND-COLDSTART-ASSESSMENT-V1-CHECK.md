@@ -16,7 +16,6 @@
 | **o4o-core-api** | **1** | 10 | 1 | 1Gi | 80 | 300s | internal-and-cloud-load-balancing | 261,869 | **724.12** |
 | neture-web | 0 | 5 | 1 | 256Mi | 80 | 60s | all | 249,363 | 5.97 |
 | k-cosmetics-web | 0 | 5 | 1 | 256Mi | 80 | 300s | all | 33,583 | 1.20 |
-| glycopharm-web | 0 | 5 | 1 | 256Mi | 80 | 300s | all | 25,672 | 1.04 |
 | kpa-society-web | 0 | 5 | 1 | 256Mi | 80 | 300s | all | 32,761 | 0.87 |
 | glucoseview-web | 0 | 5 | 1 | 256Mi | 80 | 300s | all | 18,065 | 0.75 |
 | o4o-admin-dashboard | 0 | 5 | 1 | 256Mi | 80 | 60s | all | 16,396 | 0.33 |

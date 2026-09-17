@@ -56,7 +56,7 @@ INACTIVE → 비활성 (is_active = false)
 
 | 필드 | 타입 | 용도 |
 |------|------|------|
-| `serviceKey` | VARCHAR(50) | 서비스 스코프 ('kpa', 'glycopharm', 'cosmetics') |
+| `serviceKey` | VARCHAR(50) | 서비스 스코프 |
 | `organizationId` | UUID | 조직 스코프 (null = 플랫폼 전체) |
 | `status` | VARCHAR(20) | 생명주기 ('draft' → 'published' → 'archived') |
 

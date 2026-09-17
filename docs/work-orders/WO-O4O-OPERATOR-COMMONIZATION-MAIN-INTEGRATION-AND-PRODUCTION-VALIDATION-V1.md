@@ -35,7 +35,6 @@ Operator 공통화는 **main 반영이 끝난 뒤에야** production baseline �
 4. 충돌 발생 시 **기능 의미를 유지하며** 해결 (한쪽 일괄 채택 금지)
 5. 관련 서비스 전체 검증
    - KPA / K-Cosmetics / Neture / PharmacyHub
-   - GlycoPharm 은 **공유모듈 회귀 확인 목적**으로만 포함 (공식 4서비스 대상 아님)
 6. `main` 병합
 7. `main` 기준 build / typecheck 재검증
 8. `main` push
@@ -56,7 +55,6 @@ Operator 공통화는 **main 반영이 끝난 뒤에야** production baseline �
 - Store Hub(`work/commonization-store-hub`) 통합 — 본 WO 완료 후 **별도 WO**
 - Operator 공통화 자체의 추가 리팩토링 · 신규 화면 공통화
 - production DB write (migration 포함) — 본 WO 는 read-only 검증만
-- GlycoPharm 전용 기능 변경
 - 이번 변경과 무관한 lint / typecheck 부채 정리
 
 ## 5. 중지 조건

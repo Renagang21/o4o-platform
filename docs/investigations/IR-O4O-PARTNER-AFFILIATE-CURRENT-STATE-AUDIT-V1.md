@@ -131,7 +131,7 @@
 ## 6. Foreign Visitor Partner QR 재분류 판단
 
 ### 6.1 현재 구조
-- `ForeignVisitorPartner`: **매장 경영자 소유** — `organizationId` + `serviceKey`(`kpa`|`glycopharm`|`cosmetics`) 스코프. 가드 `isStoreOwner` 검증, client storeId 불신.
+- `ForeignVisitorPartner`: **매장 경영자 소유** — `organizationId` + `serviceKey`(`kpa`|`cosmetics`) 스코프. 가드 `isStoreOwner` 검증, client storeId 불신.
 - 결제/수수료/POS 코드 **전무**. entity 주석(`foreign-visitor-partner.entity.ts:11`): "결제/커미션 정산과 무관… 수수료는 POS/매장/수기 별도(후속)".
 - scan event privacy: `ipHash`=sha256(salt+IP) **원문 미저장**, `userAgentHash`=sha256, `userAgentSummary`=UA 앞 160자, 5분 dedupe(`DEDUPE_WINDOW_MINUTES=5`), 익명 집계(totalScans/todayScans/lastScannedAt).
 
@@ -167,7 +167,7 @@
 | **A 즉시 제거** | `modules/partner` PartnerApplication 경로 (`PartnerApplication.ts`, `partner-application.routes.ts`, `partner-application.service.ts`, `register-routes.ts:369`) | 엔티티 entities.ts 미등록 → 테이블 미생성 → public POST가 영속 불가한 dead code |
 | **B 비활성화(대안)** | (A 즉시 삭제 위험 시) Legacy `/api/partner` → `410 Gone` / `FEATURE_DISABLED` 응답 전환 | frontend 무참조 확인되어 삭제가 1순위지만, 외부 클라이언트 미상 시 410 단계 경유 가능 |
 | **C 정비 후 유지** | `modules/partner` dashboard(content/event/target/overview/status) | commission/conversion 차단 구현 양호. 단 명칭이 'partner'라 affiliate 와 혼동 → `promoter-*` 류 개명 검토 |
-| **C 정비 후 유지** | `partner-context.guard.ts` serviceId 하드코딩(`'glycopharm'` default, `['glycopharm','k-cosmetics']` allow) | env/카탈로그 기반으로 외부화 (`PARTNER_DEFAULT_SERVICE`/`ALLOWED`) |
+| **C 정비 후 유지** | `partner-context.guard.ts` serviceId 하드코딩 | env/카탈로그 기반으로 외부화 (`PARTNER_DEFAULT_SERVICE`/`ALLOWED`) |
 | **C 정비 후 유지** | `ForeignVisitorPartner` 원장(partner CRUD) | 결제 무관, org+serviceKey 스코프 정상. 향후 공급자-인플루언서/가이드 원장 기반 후보 |
 | **D 매장 재분류** | `ForeignVisitorPartnerQrCode` + `QrScanEvent` + `/affiliate/:shortCode/resolve` + KPA public landing | QR/scan/landing은 매장 안내·노출 기능. partner 도메인에서 분리, partnerCode/campaignCode 선택 참조 |
 | **D 명칭 정비** | `affiliate`/`AFFILIATE_MARKETING` 라우트·템플릿 타입 | Neture commission affiliate 와 어휘 충돌 제거 |

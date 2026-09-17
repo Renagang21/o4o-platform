@@ -625,10 +625,7 @@ placement 축 추가는 QR 쪽 메타데이터일 뿐 개인 식별성을 높이
 
 ---
 
-## §16. K-Cosmetics / GlycoPharm
-
-### GlycoPharm
-**존재하지 않는다.** `WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1`(`86bf574ae`) 로 서비스 전체 삭제. 판정 대상 아님.
+## §16. K-Cosmetics
 
 ### K-Cosmetics — **이번 회차 adoption 하지 않는다**
 

@@ -12,7 +12,6 @@ E2E 테스트에서 다음 현상이 발견됨:
 
 ```
 Neture에서 test-id@o4o.com 가입 완료 후
-GlycoPharm에서 동일 이메일로 가입 시도 →
 "이미 가입된 이메일입니다" (409 Conflict)
 ```
 
@@ -124,7 +123,6 @@ service 컬럼 없음
 ```
 kpa:admin, kpa:pharmacist, kpa:branch_admin
 neture:admin, neture:operator, neture:seller
-glycopharm:admin, glycopharm:operator
 glucoseview:admin, glucoseview:operator
 cosmetics:admin, cosmetics:operator
 platform:super_admin
@@ -201,7 +199,7 @@ assignment.assignedAt = new Date();
 
 **추가 발견**: 가입 시 생성되는 역할에 **서비스 접두사가 없음**
 - 가입 시: `customer` 또는 `user`
-- 운영자 계정: `neture:operator`, `glycopharm:admin` (별도 할당)
+- 운영자 계정: `neture:operator`
 
 ---
 
@@ -262,7 +260,6 @@ hasRole(role: string): boolean {
 **결과**:
 - `platform:admin` → `admin` 매칭 **가능**
 - `neture:admin` → `admin` 매칭 **불가**
-- `glycopharm:operator` → `operator` 매칭 **불가**
 
 ### 서비스별 승인 엔드포인트 현황
 
@@ -347,7 +344,6 @@ hasRole(role: string): boolean {
 | 이메일 | service_key | role_assignment | users.status |
 |--------|------------|-----------------|-------------|
 | test-id@o4o.com | neture (추정) | customer/user | PENDING |
-| test-glycopharm@o4o.com | glycopharm (추정) | customer/user | PENDING |
 | test-kpa@o4o.com | kpa-society (추정) | customer/user | PENDING |
 | test-kcosmetics@o4o.com | k-cosmetics (추정) | customer/user | PENDING |
 | test-glucoseview@o4o.com | — (가입 실패) | — | — |
@@ -356,7 +352,6 @@ hasRole(role: string): boolean {
 
 ```
 test-id@o4o.com (Neture 가입 후)
-→ GlycoPharm 가입 시도
 → "이미 가입된 이메일입니다" (409)
 ```
 

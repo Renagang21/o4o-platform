@@ -2,10 +2,10 @@
  * SignagePlaybackView — 사이니지 플레이리스트 재생 (공통 화면 본체)
  * WO-O4O-MY-STORE-CROSSSERVICE-FINAL-COMMONIZATION-AUDIT-AND-CLEANUP-V1
  *
- * 원본: WO-O4O-KCOSMETICS-SIGNAGE-PLAYER-V1 / WO-O4O-GLYCOPHARM-SIGNAGE-PHASE1-V1
+ * 원본: WO-O4O-KCOSMETICS-SIGNAGE-PLAYER-V1
  *      + WO-O4O-SIGNAGE-PLAYLIST-FULLSCREEN-CORE-PROMOTION-V1 (재생 전 전체화면/일반화면 선택)
  *
- * KCos·GP 사본의 차이는 serviceKey 를 품은 조회 함수와 accent Tailwind class 뿐이었다.
+ * 서비스별 사본의 차이는 serviceKey 를 품은 조회 함수와 accent Tailwind class 뿐이었다.
  * 조회는 서비스 API adapter 로, accent 는 완성된 class 문자열로 주입받는다
  * (Tailwind 가 동적 class 조합을 purge 하므로 문자열 조립을 하지 않는다).
  * 2단 조회(1차 인증 API → 2차 공개 API) 순서와 오류 문구는 원본 그대로다.

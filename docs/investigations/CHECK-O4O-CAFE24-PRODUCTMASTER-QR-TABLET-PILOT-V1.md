@@ -89,7 +89,7 @@ origin='supplier' → organization_id NULL, supplier_id NOT NULL, service_key NO
 ## 5. Digital Signage — **중지 조건 성립**
 
 - 관리 API: `/api/signage/:serviceKey/*` 에 `requireAuth` + `validateServiceKey` 전역 적용 — `routes/signage/signage.routes.ts:47-48`
-- **serviceKey 화이트리스트**: `pharmacy · cosmetics · tourism · common · kpa-society · neture · glycopharm` — `middleware/signage-role.middleware.ts:644`. 미등록 키는 400 `INVALID_SERVICE_KEY`.
+- **serviceKey 화이트리스트**: `pharmacy · cosmetics · tourism · common · kpa-society · neture · 미등록 키는 400 `INVALID_SERVICE_KEY`.
 - playlist 생성은 `requireSignageStore` → **organizationId 필수**(header/query/body 어디로든) + 해당 조직 권한 — `middleware/signage-role.middleware.ts:261-272`
 - 무인증 공개 API 는 존재하나 **`scope='global'` 미디어 읽기 전용**이다 — `routes/signage/signage-public.routes.ts:50`. 매장 playlist 편성·publish 경로가 아니다.
 - 엔티티는 `packages/digital-signage-core/src/backend/entities/` 에 17개 존재(Playlist / PlaylistItem / Media / Schedule / Display …). **새 Signage 시스템을 만들 이유는 없다** — WO §3 의 전제는 옳았다.
@@ -102,9 +102,9 @@ Cafe24 는 세 곳 모두에서 배제된다. 하나만 뚫어도 나머지가 �
 
 | 위치 | 허용 키 |
 |---|---|
-| `config/service-catalog.ts` | neture · glycopharm · kpa-society · k-cosmetics · pharmacy-hub · kpa-branch |
-| `middleware/signage-role.middleware.ts:644` | pharmacy · cosmetics · tourism · common · kpa-society · neture · glycopharm |
-| `routes/platform/store-screen-set-qr.service.ts:18-24` (`SVC_TO_CATALOG`) | kpa · kpa-society · glycopharm · cosmetics · k-cosmetics |
+| `config/service-catalog.ts` | neture · kpa-society · k-cosmetics · pharmacy-hub · kpa-branch |
+| `middleware/signage-role.middleware.ts:644` | pharmacy · cosmetics · tourism · common · kpa-society · neture |
+| `routes/platform/store-screen-set-qr.service.ts:18-24` (`SVC_TO_CATALOG`) | kpa · kpa-society · cosmetics · k-cosmetics |
 
 ---
 

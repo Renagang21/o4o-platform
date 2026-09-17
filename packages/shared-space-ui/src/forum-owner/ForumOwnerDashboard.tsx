@@ -3,11 +3,10 @@
  *
  * WO-O4O-COMMUNITY-FORUM-OWNER-AREA-COMMONIZATION-V1
  * 선행: WO-O4O-FORUM-MY-FORUM-EXPANSION-V1 (K-Cosmetics) →
- *       WO-O4O-GLYCOPHARM-FORUM-DASHBOARD-V1 (GlycoPharm 복제) →
  *       Neture 공급자 공간 복제 → KPA 축소판
  *
- * census(IR-O4O-COMMUNITY-CROSSSERVICE-FULL-CENSUS-V1 F31) 기준 4서비스에
- * 285 / 572 / 581 / 576 줄로 복제돼 있었고, GlycoPharm ↔ K-Cosmetics 는
+ * census(IR-O4O-COMMUNITY-CROSSSERVICE-FULL-CENSUS-V1 F31) 기준 여러 서비스에
+ * 복제돼 있었고 K-Cosmetics 는
  * 실질 차이가 이모지 placeholder 1줄뿐이었다.
  *
  * 구성 (위→아래)
@@ -132,8 +131,7 @@ export function ForumOwnerDashboard({
     try {
       setOwnedForums(await api.listOwnedForums());
     } catch (err) {
-      // WO-O4O-GLYCOPHARM-API-WRAPPER-FAILURE-CONTRACT-CLOSEOUT-BATCH-V1 계약:
-      // 조회 실패를 "정상 0건" 으로 위장하지 않는다. 기존 서비스 구현은 silent catch 였다.
+      // 계약: 조회 실패를 "정상 0건" 으로 위장하지 않는다. 기존 서비스 구현은 silent catch 였다.
       setForumsError(ownerErrorMessage(err, '운영 중인 포럼을 불러오지 못했습니다.'));
     } finally {
       setForumsLoading(false);

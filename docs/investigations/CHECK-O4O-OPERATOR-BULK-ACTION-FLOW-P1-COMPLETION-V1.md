@@ -32,8 +32,6 @@
 |------|-------------|
 | `services/web-k-cosmetics/src/pages/operator/ProductsPage.tsx` | `68dfead02` (dead selectable 제거) |
 | `services/web-kpa-society/src/pages/operator/QualificationRequestsPage.tsx` | `d190f30cb` (BulkResultModal 연결) |
-| `services/web-glycopharm/src/pages/operator/QualificationRequestsPage.tsx` | `d190f30cb` (BulkResultModal 연결) |
-| `services/web-glycopharm/src/pages/operator/PharmaciesPage.tsx` | `d4124102f` (dead surface cleanup 반영) |
 | `apps/api-server/src/modules/neture/neture.routes.ts` | `531809f7f` (supply-products guard) |
 
 > 워킹트리에는 본 CHECK 와 무관한 다른 세션의 WIP(가이드 카피/seoRegistry/Order CHECK 등)가
@@ -47,11 +45,11 @@
 |------|------|
 | `ff2dbb60d` | `IR-O4O-OPERATOR-BULK-ACTION-FLOW-CROSSSERVICE-AUDIT-V1` |
 | `68dfead02` | `WO-O4O-KCOS-OPERATOR-PRODUCTS-DEAD-SELECTABLE-CLEANUP-V1` |
-| `d190f30cb` | `WO-O4O-OPERATOR-QUALIFICATION-BULK-RESULT-MODAL-V1` (KPA/GP) |
+| `d190f30cb` | `WO-O4O-OPERATOR-QUALIFICATION-BULK-RESULT-MODAL-V1` (KPA) |
 | `e1687bcc5` | `IR-O4O-OPERATOR-CUSTOM-BULK-CONVERGENCE-SAFETY-AUDIT-V1` |
 | `82119f532` | `WO-O4O-NETURE-ALL-OFFERS-SCOPE-GUARD-FIX-V1` |
 | `531809f7f` | `WO-O4O-NETURE-SUPPLY-PRODUCTS-SCOPE-GUARD-FIX-V1` |
-| `e908c8906` / `d4124102f` | `WO-O4O-GLYCOPHARM-PHARMACIES-DEAD-SURFACE-CLEANUP-V1` (정렬→cleanup 반영) |
+| `e908c8906` / `d4124102f` | — |
 
 bulk P1 커밋들(`68dfead02`/`d190f30cb`/`82119f532`/`531809f7f`)의 변경은 4개 프론트 페이지 +
 `neture.routes.ts` 로 한정되며, **migration/SQL/entity 변경 0건**임을 확인했다.
@@ -93,45 +91,6 @@ bulk P1 커밋들(`68dfead02`/`d190f30cb`/`82119f532`/`531809f7f`)의 변경은 
 bulk 흐름: `handleBulkDelete` → confirm → `batch.executeBatch(batchDeleteRequests, ids)` →
 성공 시 selection 초기화 + reload. 결과는 `BulkResultModal` 로 성공/실패/부분실패 표시.
 → **PASS**.
-
----
-
-## 6. GlycoPharm QualificationRequests 확인
-
-`services/web-glycopharm/src/pages/operator/QualificationRequestsPage.tsx`
-
-KPA 와 동일 구조(이식판):
-
-| 확인 항목 | 결과 |
-|-----------|------|
-| `BulkResultModal` 연결(open/result/onClose+load/onRetry) | ✅ (L356-361) |
-| 기존 bulk action 정책 유지 (`bulk-delete` 단일) | ✅ |
-| 신규 위험 action 없음 | ✅ |
-| serviceKey='glycopharm' API(`glycopharmQualificationApi`) 사용 | ✅ |
-
-→ **PASS**.
-
----
-
-## 7. GlycoPharm PharmaciesPage 확인
-
-`services/web-glycopharm/src/pages/operator/PharmaciesPage.tsx`
-
-| 확인 항목 | 결과 |
-|-----------|------|
-| `selectedIds` 없음 | ✅ |
-| `selectable` 없음 | ✅ |
-| `selectedKeys` 없음 | ✅ |
-| `onSelectionChange` 없음 | ✅ |
-| ActionBar 없음 | ✅ |
-| RowActionMenu no-op action 없음 | ✅ (RowActionMenu 자체 제거됨) |
-| `API 연결 필요` 류 dead 주석이 live action 에 남음 | ✅ 없음 |
-| 준비중 안내 배너 존재 | ✅ "약국 상태 관리 기능 준비 중" (L337-347) |
-| 목록 조회/필터/페이지네이션/loading/error/empty 유지 | ✅ |
-| backend/API/route/menu 변경 없음 | ✅ (backend stub 유지, 변경 없음) |
-
-파일 헤더에 cleanup 의도가 명문화되어 있고(`WO-O4O-GLYCOPHARM-PHARMACIES-DEAD-SURFACE-CLEANUP-V1`),
-DataTable 은 조회 전용으로만 사용된다. 죽은 단건/일괄 action 제거 완료 → **PASS**.
 
 ---
 
@@ -186,7 +145,6 @@ operator sub-router 가드 이후 등록된 standalone route 의 guard 미상속
 | 대상 | 명령 | 결과 |
 |------|------|------|
 | api-server | `npx tsc --noEmit` | ✅ clean (error 0, neture.routes 오류 0) |
-| web-glycopharm | `npx tsc -b` | ✅ clean (error 0) |
 | web-kpa-society | `npx tsc` | ✅ clean (error 0) |
 | web-k-cosmetics | `npx tsc` | ✅ clean (error 0) |
 
@@ -227,8 +185,7 @@ API: `https://o4o-core-api-117791934476.asia-northeast3.run.app`
 
 정적 코드 검증으로 대체(브라우저 UI smoke 미실행). 각 페이지 구조는 §4~§7 에서 확인:
 - K-Cos `/operator/products`: 체크박스 컬럼 없음 / row click 상세 이동 — 정적 확인
-- GP `/operator/pharmacies`: 체크박스 컬럼 없음 / 죽은 단건 action 없음 / 준비중 안내 — 정적 확인
-- KPA·GP QualificationRequests: bulk modal 정적 구조 정상. pending 데이터 실동작은 미실행.
+- KPA QualificationRequests: bulk modal 정적 구조 정상. pending 데이터 실동작은 미실행.
 
 ---
 
@@ -237,7 +194,7 @@ API: `https://o4o-core-api-117791934476.asia-northeast3.run.app`
 - Neture `AllRegisteredProductsPage` 는 custom bulk 이나 `IR-O4O-OPERATOR-CUSTOM-BULK-CONVERGENCE-SAFETY-AUDIT-V1`
   에서 confirm/부분실패/soft delete 구조로 **안전** 판정됨. 표준 `BulkResultModal` 로의 polish 는
   선택적 P2.
-- GlycoPharm 약국 관리 backend(상태변경 API)는 현재 stub. 실제 약국 상태 관리가 필요하면
+- 실제 약국 상태 관리가 필요하면
   별도 기능 WO 로 분리.
 - admin member bulk 표준화(P2).
 - standalone operator route scope guard 일괄 점검(보안 우선, P2).
@@ -251,8 +208,7 @@ API: `https://o4o-core-api-117791934476.asia-northeast3.run.app`
 코드 상태 기준 PASS 조건은 모두 충족한다:
 
 - ✅ K-Cos Products dead selectable 제거 완료
-- ✅ KPA/GP QualificationRequests `BulkResultModal` 연결 완료
-- ✅ GP Pharmacies dead selectable/no-op action 제거 + 준비중 안내
+- ✅ KPA QualificationRequests `BulkResultModal` 연결 완료
 - ✅ Neture all-offers (GET/PATCH) operator scope guard 보강
 - ✅ Neture supply-products (GET) operator scope guard 보강
 - ✅ Neture `AllRegisteredProductsPage` 안전한 custom bulk 로 유지(선행 IR)
@@ -276,12 +232,12 @@ API: `https://o4o-core-api-117791934476.asia-northeast3.run.app`
 
 | 확인 | 결과 |
 |------|------|
-| 운영자가 체크박스 선택 후 실제 가능한 작업만 보는가 | ✅ 죽은 selectable 제거(K-Cos/GP Pharmacies). 실행 가능한 곳만 selectable 유지(QualificationRequests delete) |
+| 운영자가 체크박스 선택 후 실제 가능한 작업만 보는가 | ✅ 죽은 selectable 제거(K-Cos Pharmacies). 실행 가능한 곳만 selectable 유지(QualificationRequests delete) |
 | 죽은 선택 UI / no-op action 제거되었는가 | ✅ |
-| bulk 결과가 성공/실패/부분실패로 투명 표시되는가 | ✅ `BulkResultModal` (KPA/GP) |
+| bulk 결과가 성공/실패/부분실패로 투명 표시되는가 | ✅ `BulkResultModal` (KPA) |
 | operator 전용 API 가 operator scope 로 보호되는가 | ✅ Neture all-offers/supply-products `requireNetureScope('neture:operator')` |
 | 위험 action 이 쉽게 실행되지 않게 보호되는가 | ✅ 삭제는 confirm + danger + 결과 모달, mutation route 는 operator scope |
-| 공통화가 1인 개발 유지보수성을 높이는가 | ✅ KPA→GP 동일 `BulkResultModal`/`useBatchAction` 패턴, `@o4o/operator-ux-core` 공유 |
+| 공통화가 1인 개발 유지보수성을 높이는가 | — |
 | Supplier/Store Hub/My Store/Guide 영역 부적절 혼입 없는가 | ✅ 본 범위는 operator 페이지 + neture operator route 한정 |
 
 철학(`O4O-BUSINESS-PHILOSOPHY-V1` §3.2 Operator 정의, §11 Operator Dashboard 표준)과 충돌 없음.

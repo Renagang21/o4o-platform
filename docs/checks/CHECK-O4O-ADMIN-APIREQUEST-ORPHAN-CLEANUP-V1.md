@@ -39,7 +39,6 @@ typecheck·build 진행 중 병렬 세션이 아래 변경을 시작했다 (내 
 
 ```text
  M packages/account-ui/package.json
- M services/web-glycopharm/src/components/GlycoGlobalHeader.tsx
  M services/web-k-cosmetics/src/components/KCosGlobalHeader.tsx
  M services/web-kpa-society/src/components/KpaGlobalHeader.tsx
  M services/web-kpa-society/src/components/KpaUserMenu.tsx

@@ -47,21 +47,20 @@ COALESCE(spd.content, sp.description, spo.consumer_detail_description, '') AS de
 
 ## 5. HTML 처리
 
-- 이번 WO 에서 HTML 렌더 정책 **재정의 안 함**. KPA `ContentRenderer`(HTML) 흐름 유지 — canonical/sp.description 모두 strip 없이 반환(기존 KPA 동작 동일). GP(plain strip) ↔ KPA(HTML) 통일은 별도 `HTML-RENDERING-POLICY` WO.
+- 이번 WO 에서 HTML 렌더 정책 **재정의 안 함**. KPA `ContentRenderer`(HTML) 흐름 유지 — canonical/sp.description 모두 strip 없이 반환(기존 KPA 동작 동일).
 
 ## 6. 안정성
 
 - **canonical 1개/master**(partial unique) + LEFT JOIN 동일 조건 + `DISTINCT ON (spo.id)` → 행 증식 없음(순서만 바뀜, JOIN 동일).
 - **count/pagination 무영향**(count 쿼리 spd 미참여, 변경 없음).
 - **fallback 안정:** canonical 없으면 sp → supplier → `''`. 상품 row 안 사라짐.
-- **GP 무회귀:** GP 는 별도 glycopharm 컨트롤러 — 본 파일 미사용.
 
 ## 7. 불변 / 미도입 확인 (§7)
 
 - `store_product_profiles.description` 컬럼/데이터 **삭제 0**, migration **0**, 대량 보정 **0**.
 - 매장별 override UI **제거 안 함**(보존). 매장별 override/selection **신규 추가 0**.
 - `product_ai_contents` 직접 노출 **없음**.
-- 상품설명 편집기/콘텐츠 만들기/AI batch/bulk seed/GP 경로/KCos storefront **미변경**.
+- 상품설명 편집기/콘텐츠 만들기/AI batch/bulk seed 경로/KCos storefront **미변경**.
 
 ## 8. 데이터 영향 (DB 실측 미수행)
 
@@ -94,8 +93,7 @@ COALESCE(spd.content, sp.description, spo.consumer_detail_description, '') AS de
 
 1. `WO-O4O-PRODUCT-DESCRIPTION-STORE-PROFILE-OVERRIDE-DEPRECATION-V1` — (DB 사용량 확인 후) 편집 UI 축소/legacy 안내/폐지 결정.
 2. `WO-O4O-KPA-TABLET-DESCRIPTION-CANONICAL-LINK-V1` — tablet(`queryTabletVisibleProducts`)에도 canonical 연결(+ 동일 순서 정렬).
-3. `WO-O4O-PRODUCT-DESCRIPTION-HTML-RENDERING-POLICY-V1` — GP plain ↔ KPA HTML 렌더 정책 통일.
 
 ---
 
-*Date: 2026-06-16 · store profile override 정책 정렬 · PASS · KPA storefront queryVisibleProducts description = COALESCE(canonical → store_profile legacy → supplier → '') · 데이터/컬럼/migration/UI 무삭제, 매장 override legacy fallback 격하 · product_ai_contents 미노출, GP 무회귀, tablet 미변경 · typecheck 0 · DB 사용량 실측은 후속/배포후 · 후속 deprecation/tablet/HTML 정책.*
+*Date: 2026-06-16 · store profile override 정책 정렬 · PASS · KPA storefront queryVisibleProducts description = COALESCE(canonical → store_profile legacy → supplier → '') · 데이터/컬럼/migration/UI 무삭제, 매장 override legacy fallback 격하 · product_ai_contents 미노출 무회귀, tablet 미변경 · typecheck 0 · DB 사용량 실측은 후속/배포후 · 후속 deprecation/tablet/HTML 정책.*

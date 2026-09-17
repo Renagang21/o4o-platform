@@ -115,10 +115,6 @@ Entity에 enum으로 정의되어 있지만, 실제 생성 경로는 `hq`와 `st
 
 ### 3.2 허용된 serviceKey 목록
 
-```
-pharmacy, cosmetics, tourism, common, kpa-society, neture, glycopharm
-```
-
 ### 3.3 역할별 접근 매트릭스
 
 | 작업 | Store (매장) | Operator (운영자) | Supplier | Community |
@@ -137,12 +133,11 @@ Entity에서는 `supplier`, `community` source를 지원하지만, 실제 API에
 
 ### 4.1 HUB 페이지 구조
 
-HUB 페이지(GlycoPharm, KPA, K-Cosmetics)는 `HubExplorationLayout` 사용.
+HUB 페이지(KPA, K-Cosmetics)는 `HubExplorationLayout` 사용.
 **Signage 전용 섹션 없음** — Core Services 배너에서 별도 페이지로 링크.
 
 | 서비스 | Signage 배너 | 링크 대상 |
 |--------|-------------|----------|
-| GlycoPharm | "디지털 사이니지" | `/pharmacy/signage` |
 | KPA Society | "플랫폼 사이니지" | `/hub/signage` |
 | K-Cosmetics | "디지털 사이니지" | 배지: "준비중" (링크 없음) |
 

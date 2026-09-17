@@ -68,7 +68,7 @@ constitution:
 | 단건 action | `handleToggleStatus` (draft↔published↔hidden cycle), `handleEdit` (→ snapshot edit 페이지) |
 | 자체 bulk | **없음** |
 | 표준화 위치 | **`@o4o/store-asset-policy-core` 패키지 내부** — 페이지 자체는 88줄 wrapper, 실제 UI는 패키지 |
-| 전환 난이도 | **높음** — 패키지 변경 필요. 같은 패키지를 사용하는 다른 서비스(GlycoPharm/K-Cos 등) 영향 확인 필요 |
+| 전환 난이도 | **높음** — 패키지 변경 필요. 같은 패키지를 사용하는 다른 서비스(K-Cos 등) 영향 확인 필요 |
 
 → **본 IR 범위 외로 분리 권장**. 패키지 표준화는 별도 트랙 (`@o4o/store-asset-policy-core` 자체 IR/WO).
 
@@ -201,7 +201,7 @@ constitution:
 | 3 | **WO-O4O-KPA-STORE-TABLET-DISPLAYS-STANDARD-TABLE-V1** | StoreTabletDisplaysPage — `tablets.map` 영역만 DataTable. 슬롯 grid 그대로. bulk 활성/강제 새로고침 backend 확인 선행 (없으면 단순 삭제 fan-out만) | 中 (큰 페이지, list만 부분 변경) |
 | 4 | **IR-O4O-KPA-STORE-CONTENTS-SELECTOR-STANDARDIZATION-V1** (IR 선행) | StoreContentsSelector 위임 구조 표준화 방향 결정 — page wrapper vs selector 내부. | 小 (IR) |
 | 5 | **WO-O4O-KPA-STORE-LIBRARY-CONTENTS-STANDARD-TABLE-V1** | IR 결과 따라 진행 | 中 |
-| 6 | **IR-O4O-STORE-ASSET-POLICY-CORE-DATATABLE-V1** (별도 트랙) | `@o4o/store-asset-policy-core` 패키지의 `StoreAssetsPanel` 표준화 — 다른 서비스(GlycoPharm/K-Cos) 영향 분석 포함 | 中 (IR) — 패키지 변경 신중 |
+| 6 | **IR-O4O-STORE-ASSET-POLICY-CORE-DATATABLE-V1** (별도 트랙) | `@o4o/store-asset-policy-core` 패키지의 `StoreAssetsPanel` 표준화 — 다른 서비스(K-Cos) 영향 분석 포함 | 中 (IR) — 패키지 변경 신중 |
 
 ### 5.3 1순위 진행 권장: WO-1 (StoreLibraryResources)
 
@@ -239,7 +239,7 @@ constitution:
 | bulk backend 신규 endpoint 구현 | 1차 fan-out으로 가능 — 사용 빈도 측정 후 결정 |
 | 5초 polling 변경 (TabletRequests) | 기존 운영 가정 유지 |
 | 슬롯 grid 영역 변경 (StoreTabletDisplays) | bulk 무관, list만 표준화 |
-| GlycoPharm / K-Cosmetics 동일 페이지 | KPA 검증 후 별도 WO |
+| K-Cosmetics 동일 페이지 | KPA 검증 후 별도 WO |
 
 ---
 

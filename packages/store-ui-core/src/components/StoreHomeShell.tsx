@@ -2,7 +2,7 @@
  * StoreHomeShell — 3서비스 내 약국/내 매장 홈 본문의 canonical 셸
  *
  * WO-O4O-STORE-HOME-CANONICAL-SHELL-V1
- * 선행: IR-O4O-STORE-HOME-CROSSSERVICE-AUDIT-V1 / WO-O4O-STORE-HOME-GLYCOPHARM-REFERENCE-STABILIZATION-V1
+ * 선행: IR-O4O-STORE-HOME-CROSSSERVICE-AUDIT-V1
  *
  * 역할 (canonical "pre-sections" 영역 공통화):
  *  - 3서비스 홈은 이미 StoreDashboardLayout(셸) + HubLayout(카드 섹션) 을 공유한다.
@@ -32,7 +32,7 @@
  *
  * 서비스별 주입 (slot):
  *  - storeSelectorSlot : 다중 매장 선택 (K-Cosmetics). 단일 매장이면 미주입.
- *  - bannerSlot        : 서비스 배너 (예: GlycoPharm 주문/매출 준비 중 안내).
+ *  - bannerSlot        : 서비스 배너 (예: 주문/매출 준비 중 안내).
  *  - aiSummarySlot     : AI 운영 요약 카드 (서비스별 데이터/문구).
  *  - onboardingSlot    : 초기 사용자/빈 상태 안내 (예: KPA 실행 흐름 3단계).
  */

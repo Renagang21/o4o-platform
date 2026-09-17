@@ -75,7 +75,6 @@
 | KPA | `services/web-kpa-society/src/api/forum.ts` | like · comment create/delete · pin | FULLY_COMMON (pin 은 route 부재로 사망 → 복구) |
 | Neture | `services/web-neture/src/services/forumApi.ts` | like · comment create/update/delete | FULLY_COMMON |
 | K-Cosmetics | `services/web-k-cosmetics/src/services/forumApi.ts` | post create + reads only | SERVICE_SPECIFIC (의도된 read-only) |
-| GlycoPharm | `services/web-glycopharm/src/services/forumApi.ts` | post create + reads only | SERVICE_SPECIFIC (의도된 read-only) |
 | Pharmacy-Hub | `services/web-pharmacy-hub/src/services/forumApi.ts` | categories · list · detail · post create | NOT_IMPLEMENTED (백엔드는 공통, UI 미구현) |
 | Admin | `apps/admin-dashboard/src/api/unified-client.ts` + `packages/forum-core/src/admin-ui` | generic write | OUT_OF_SCOPE (platform admin 경로) |
 
@@ -156,7 +155,6 @@
 | Neture | 회귀 통과 | `createServiceForumRouter` 공통 경로, 코드 변경 없음 |
 | Pharmacy-Hub | 백엔드 FULLY_COMMON / 프런트 NOT_IMPLEMENTED | 공통 라우터로 interaction endpoint 보유, UI 없음. **신규 UI 는 §18 제외 범위** |
 | K-Cosmetics | 의도된 read-only 유지 | 공통 라우터 경계 결함만 수정, 신규 UI 없음 |
-| GlycoPharm | 의도된 read-only 유지 | 동일 |
 
 ---
 
@@ -189,7 +187,7 @@
 | 항목 | 결과 |
 |---|---|
 | 신규 spec | 25 passed |
-| api-server 전체 jest | 154 suites / 2,443 tests PASS (기존 `glycopharm-forum-service-boundary` 정적 가드 1건은 공통 resolver 기준으로 갱신) |
+| api-server 전체 jest | 154 suites / 2,443 tests PASS |
 | api-server typecheck | PASS |
 | frontend | 프런트 소스 변경 0건 (KPA pin 은 백엔드 route 복구로 해소) |
 | migration | 0 |
@@ -216,7 +214,6 @@
 | Neture `/forum`, `/forum/posts` | 정상 렌더 · JS error 0 · 4xx/5xx 0 |
 | Pharmacy-Hub `/forum`, `/forum/posts` | MembershipGate 로그인 안내 정상 노출 · JS error 0 · 4xx/5xx 0 |
 | K-Cosmetics `/forum`, `/forum/posts` | 정상 렌더 · JS error 0 · 4xx/5xx 0 |
-| GlycoPharm `/forum`, `/forum/posts` | 정상 렌더 · JS error 0 · 4xx/5xx 0 · 총 0건 |
 
 - 타 서비스 데이터 혼입 0 (게시글 4건 전부 kpa-society, 타 서비스 목록에 미노출).
 - API guard smoke (비인증, 상태 변경 없음): generic `POST /api/v1/forum/posts`, `PATCH /api/v1/forum/posts/:id/pin`, `POST /api/v1/forum/comments`, 서비스 `POST /api/v1/kpa/forum/posts/:id/like` 모두 `401 AUTH_REQUIRED`. 서비스 read (`/api/v1/kpa/forum/posts`, `/api/v1/neture/forum/posts`) `200`.
@@ -278,10 +275,9 @@ OUT_OF_SCOPE: 16
 | Neture | `ForumPostPage.tsx` | O | O | O | FULLY_COMMON |
 | Pharmacy-Hub | `ForumDetailPage.tsx` | O | O | O | FULLY_COMMON (기존 `NOT_IMPLEMENTED` 해소) |
 | K-Cosmetics | `PostDetailPage.tsx` | O | O | O | FULLY_COMMON (기존 "read-only 유지" 무효) |
-| GlycoPharm | `ForumPostDetailPage.tsx` | O | O | O | FULLY_COMMON |
 
 - 서비스별 중복 댓글/좋아요 JSX **0건** — 재조사 시점에 이미 제거돼 있어 본 회차 View 재작성 0건 (§13 "backend 수정만 필요하면 억지로 View 를 재작성하지 않는다" 적용).
-- KCos / GP 에 신규 write 버튼·endpoint 추가 0건 (§12) — 기존 adoption 확인만 했다.
+- KCos 에 신규 write 버튼·endpoint 추가 0건 (§12) — 기존 adoption 확인만 했다.
 
 ### 12-5. 중복 제거 수치 (§19)
 
@@ -300,12 +296,12 @@ OUT_OF_SCOPE: 16
 
 | 항목 | 결과 (API 관측) |
 |---|---|
-| forum service_code × type | kpa-society open 1 / kpa-society closed 1 / neture open 1 · cosmetics·glycopharm·pharmacy-hub 0 |
+| forum service_code × type | kpa-society open 1 / kpa-society closed 1 / neture open 1 · cosmetics·pharmacy-hub 0 |
 | post 분포 | kpa-society 3 (전량, 단일 open forum) · 그 외 서비스 0 |
 | pinned post | 0 |
 | comment | 2 (전부 `postId` = 같은 kpa 게시글, orphan 0) |
 | 대댓글(`parentId` 有) | 0 → 12-2 수정의 데이터 영향 없음 |
-| cross-service post 조회 | KPA post id 를 neture/cosmetics/glycopharm/pharmacy-hub prefix 로 조회 → **전부 404** |
+| cross-service post 조회 | — |
 | cross-service comment 조회 | 동일 id 의 `/comments` → **전부 404** |
 | closed forum 비로그인 조회 | `403 CLOSED_FORUM_ACCESS_DENIED` |
 
@@ -316,7 +312,7 @@ OUT_OF_SCOPE: 16
 | 본 spec | 27 passed (25 → +2) |
 | api-server 전체 jest | **161 suites / 2,490 tests PASS** |
 | api-server typecheck | PASS |
-| frontend build 5종 (kpa-society · k-cosmetics · glycopharm · neture · pharmacy-hub) | 전부 exit 0 |
+| frontend build 5종 (kpa-society · k-cosmetics · neture · pharmacy-hub) | 전부 exit 0 |
 | migration | 0 |
 
 ### 12-8. 판정 집계 (재조사)
@@ -342,8 +338,6 @@ VIEW_DUPLICATION_FIXED: 0     (재조사 시점 잔여 0)
 
 > §9 잔존 위험 중 3번(Pharmacy-Hub interaction UI 부재)은 12-4 로 **해소**됐다. 1·2·4 번은 유지된다.
 
-
-
 ### 12-9. Production 배포 · Browser Smoke (§18, 재조사분)
 
 - commit `3b06ad03d` → `Deploy API Server (Cloud Run)` run `32316171958` **success**
@@ -360,6 +354,5 @@ VIEW_DUPLICATION_FIXED: 0     (재조사 시점 잔여 0)
 - cross-service 데이터 혼입 0 (KPA 목록 3건 전부 kpa-society, Neture/PH 목록에 미노출)
 - 비로그인 상태에서 **댓글 작성 폼 · 수정/삭제 · pin 컨트롤 노출 0** (unauthorized control 노출 없음)
 - production 에 대한 mutation(댓글 작성/삭제/좋아요 토글) 시도 0건. cross-service 거부는 negative test + read API 404 관측으로 증명한다.
-
 
 **이 CHECK 는 Forum Interaction / Write Boundary 축 기록이며, 커뮤니티 전체 공통화 완료를 의미하지 않는다.**

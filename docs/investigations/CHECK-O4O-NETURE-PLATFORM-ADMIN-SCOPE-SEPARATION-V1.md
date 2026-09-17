@@ -57,7 +57,7 @@ Neture admin 안에 섞여 있는 **Neture 서비스 admin** 기능과 **O4O pla
 ## 8. route/page/backend/DB 무변경 확인
 
 - route 삭제/추가 0, page 삭제/생성 0, backend guard·API·DB·migration 0.
-- 신규 group key(OperatorGroupKey)·신규 도메인·공유 모듈 변경 0 → GP/KCos/KPA 무영향.
+- 신규 group key(OperatorGroupKey)·신규 도메인·공유 모듈 변경 0 → KCos/KPA 무영향.
 - 정식 "플랫폼 관리" 그룹(별도 sidebar 섹션)은 공유 `OperatorGroupKey`(packages/ui) 확장이 필요 → 본 1차 범위 외, platform-admin surface 설계 후 분리(§9.1).
 
 ## 9. 후속 platform-admin 별도 앱/영역 결정 필요 여부

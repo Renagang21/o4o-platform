@@ -16,7 +16,7 @@
 
 ### 핵심 발견 (3줄)
 1. **Backend canonical response 후보 확정 가능** — `{success, data:T[], pagination:{page,limit,total,totalPages,hasNextPage?,hasPreviousPage?}}`. 대다수 endpoint가 이미 page-based이고 `BaseController.okPaginated`(30+ 컨트롤러 사용)와 Signage `meta` 패턴을 병합하면 됨. **단, response shape가 실제 5종 혼재**(중복형 Forum / meta형 / pagination형 / items형 / total만형)이고 `totalPages` vs `pages` 등 필드명 불일치, limit guard 미적용 endpoint 존재.
-2. **Frontend는 화면별 inline pagination state + 화면별 독자 response 추출이 반복**(공통 hook은 `useStoresQuery` 1건, `usePagination`은 admin-dashboard 전용으로 서비스 미사용). **순수 함수 normalizer + opt-in hook으로 additive(기존 화면 무변경) 도입 가능** — 회귀 위험 낮음. 단 API client가 서비스별 상이(KPA/GP fetch wrapper vs KCos/Neture authClient axios), React Query 미사용.
+2. **Frontend는 화면별 inline pagination state + 화면별 독자 response 추출이 반복**(공통 hook은 `useStoresQuery` 1건, `usePagination`은 admin-dashboard 전용으로 서비스 미사용). **순수 함수 normalizer + opt-in hook으로 additive(기존 화면 무변경) 도입 가능** — 회귀 위험 낮음. 단 API client가 서비스별 상이(KPA fetch wrapper vs KCos/Neture authClient axios), React Query 미사용.
 3. **Table UI core는 DataTable 2종이 서로 다른 도메인에서 정착**(ag DataTable 18+ 파일 / operator-ux-core DataTable 50+ 파일, 둘 다 BaseTable→O4OColumn 기반이나 column type·pagination 모델·selection API 상이). **즉시 통합은 68개 파일 breaking → 비권장. interface 정렬(ListColumnDef를 canonical로) 우선이 안전.** RowActionMenu는 이미 `fixed` positioning이라 overflow에 갇히지 않음(선행 IR의 "갇힘" 가설은 정정 필요) — 다만 z-index 경쟁·우측 edge clamp는 개선 여지.
 
 ### core 정비 필요 여부
@@ -48,7 +48,7 @@
 
 | Shape | 대표 endpoint | 정확한 필드 | Compatibility Risk | Notes |
 |---|---|---|---|---|
-| **S1 pagination형** | Checkout(KPA/GP), Cosmetics Members, Channel logs(offset) | `{success, data:T[], pagination:{page,limit,total,totalPages}}` | 낮음 | **canonical 후보**. 다수 채택 |
+| **S1 pagination형** | Checkout(KPA), Cosmetics Members, Channel logs(offset) | `{success, data:T[], pagination:{page,limit,total,totalPages}}` | 낮음 | **canonical 후보**. 다수 채택 |
 | **S2 meta형** | Signage Playlists, Neture Products | `{data:T[], meta:{page,limit,total,totalPages,hasNext,hasPrev}}` | 낮음 | 필드 완비(hasNext/Prev 포함). 이름만 `meta`→`pagination` |
 | **S3 중복형** | **Forum Posts** | `{success, data, total, page, limit, totalPages, pagination:{page,limit,totalPages}, totalCount}` | **높음** | top-level + nested + alias 동시. 최악 — 정리 필요 |
 | **S4 items형** | KPA Members(raw SQL), Cosmetics Members(`data.items`), Neture Partners(`partners`) | `{data:{items:T[],total,page,limit}}` 또는 `{partners,total}` | 중간~높음 | `data:T[]` canonical과 충돌. page 정보 누락 가능 |
@@ -71,12 +71,12 @@
 | 패턴 | 예시 | page base | limit guard | Notes |
 |---|---|---|---|---|
 | parseInt direct | Forum Posts | 1 | `Math.min(.||20, 50)` | 가장 흔함 |
-| Number() coercion | GP Operator | 1 | `Math.min(.||10, ...)` | |
+| Number coercion Operator | 1 | `Math.min(. || 10, ...)` | |
 | 조건부 ternary | (일부 legacy) | 1 | 없음 | guard 미적용 |
 | parseInt radix | Signage/KPA | 1 | `Math.min(.,20~100)` | |
 | offset-based | AI Admin, Channel logs | N/A | `Math.min(., 1000/200)` | 소수(~10 endpoint) |
 
-- **limit guard 100 적용**: store/product/membership/supplier console, GP resources, KPA qualification 등 다수.
+- **limit guard 100 적용**: store/product/membership/supplier console resources, KPA qualification 등 다수.
 - **guard 미적용/상이**: ForumComment(없음), ForumModeration(없음), 일부 legacy, offset계열(1000/200 cap).
 - **offset 기반**: AI Admin, Channel playback logs, 일부 content assets — page 변환은 `page = floor(offset/limit)+1` 로 가능하나 일부는 의도적 offset.
 
@@ -97,9 +97,9 @@
 
 | 패턴 | 대표 화면 | page state | limit state | reset | 빈도 |
 |---|---|---|---|---|---|
-| currentPage + 상수 | GP/KCos `OrdersPage` | `currentPage`(useState(1)) | `ITEMS_PER_PAGE=20` | 필터 onChange서 수동 `setCurrentPage(1)` | 매우 높음 |
+| currentPage + 상수 | KCos `OrdersPage` | `currentPage`(useState(1)) | `ITEMS_PER_PAGE=20` | 필터 onChange서 수동 `setCurrentPage(1)` | 매우 높음 |
 | page + 상수 | `OperatorBlogListPage`(다수 서비스) | `page` | `PAGE_LIMIT=20` | useCallback 의존성 자동 | 높음 |
-| pagination object | Neture `OrdersManagementPage`, GP `ProductsPage` | `currentPage` | `limit`(객체 내) | 수동 reset | 중간 |
+| pagination object | Neture `OrdersManagementPage` `ProductsPage` | `currentPage` | `limit`(객체 내) | 수동 reset | 중간 |
 | 공통 hook | `useStoresQuery`(operator-core-ui) | props page | props pageSize | 호출처 관리 | 낮음(유일 공통화) |
 
 **명칭 혼재**: `page` vs `currentPage` / `limit` vs `PAGE_LIMIT` vs `pageSize` vs `perPage` / `total` vs `totalItems` vs `totalOrders`.
@@ -108,10 +108,10 @@
 
 | backend shape | 받는 화면 | 현재 추출(요약) | 정규화 필요 | Risk |
 |---|---|---|---|---|
-| `data.pagination.total` | GP `OrdersPage` | `response.data.pagination?.total` 직접 | ✅ | shape 변경 시 전파 |
+| `data.pagination.total` `OrdersPage` | `response.data.pagination?.total` 직접 | ✅ | shape 변경 시 전파 |
 | `data.pagination`(nested data) | KCos `OrdersPage` | `body.data.pagination?.total` | ✅ | wrapper 로직 상이 |
-| top-level `pagination` | GP `ProductsPage` | `data.pagination.total` | ✅ | nesting 위치 차이 |
-| `meta` | GP `operatorBlog.ts` | `res.meta.total` | ✅ | 필드명 `meta`(비표준) |
+| top-level `pagination` `ProductsPage` | `data.pagination.total` | ✅ | nesting 위치 차이 |
+| `meta` `operatorBlog.ts` | `res.meta.total` | ✅ | 필드명 `meta`(비표준) |
 
 - **기존 정규화 유틸**: API list 응답용 **없음**(`ai-core/response-normalizer`는 AI 전용, 무관).
 - **타입**: `packages/types/src/api.ts`의 `PaginatedApiResponse<T>` **정의만 있고 실사용 거의 없음**. `common.ts`엔 `pageSize` 명칭의 중복 정의.
@@ -130,8 +130,8 @@
 
 - **page reset 공통화 가능**: hook이 filter/search setter를 래핑해 자동 page=1.
 - **URL query 보존(useSearchParams)**: 현재 **0 사용**. 필요 없음 → opt-in으로만.
-- **API client**: KPA/GP는 fetch wrapper, KCos/Neture는 `authClient.api`(axios). **React Query 미사용**. → normalizer/hook은 client 무관하게 설계(응답 객체만 받음). client 통일은 **본 트랙 범위 밖**(별도 WO).
-- **package boundary**: 타입/normalizer는 `packages/types`(+ shared util), hook은 `packages/operator-ux-core/list`(UI 인접). 의존 방향 Core→…→Service 준수. service-specific adapter(예: GP `operatorBlog.ts`)는 서비스에 잔류, common adapter는 패키지.
+- **React Query 미사용**. → normalizer/hook은 client 무관하게 설계(응답 객체만 받음). client 통일은 **본 트랙 범위 밖**(별도 WO).
+- **package boundary**: 타입/normalizer는 `packages/types`(+ shared util), hook은 `packages/operator-ux-core/list`(UI 인접). 의존 방향 Core→…→Service 준수.
 
 > **결론(frontend)**: normalizer/타입은 **순수·opt-in → 기존 화면 무변경 additive 가능, 회귀 위험 낮음**. hook은 신규/시범 화면부터. 가장 큰 위험은 본 트랙이 아니라 **API client 통일**(별도 WO로 격리).
 
@@ -230,7 +230,7 @@
 5. **WO-O4O-OPERATOR-ADMIN-LIST-PAGINATION-V1** — Neture 상품승인/브랜드/운영자 등 P0 전체로드 → server pagination(normalizer/hook 위에서).
 6. **WO-O4O-STORE-LIST-RESPONSIVE-PAGINATION-V1** / **WO-O4O-SUPPLIER-LIST-PAGINATION-V1** — 매장/공급자 계층.
 7. **(별도 IR 권장) IR-O4O-DATATABLE-VARIANT-CONSOLIDATION-V1** — ag DataTable ↔ operator-ux-core DataTable interface 정렬/통합 결정. **column type·selection·expandable·pagination 모델 정합** 설계. 본 IR 결론: **즉시 통합 금지, 별도 상세 IR 후 단계적**.
-8. **(별도 WO 격리) WO-O4O-FRONTEND-API-CLIENT-UNIFICATION-V1** — KPA/GP fetch ↔ KCos/Neture axios 통일(+React Query 검토). **본 트랙과 분리**.
+8. **(별도 WO 격리) WO-O4O-FRONTEND-API-CLIENT-UNIFICATION-V1** — KPA fetch ↔ KCos/Neture axios 통일(+React Query 검토). **본 트랙과 분리**.
 
 ---
 

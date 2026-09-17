@@ -23,7 +23,7 @@ KPA 태블릿 공개 supplier 상품 조회(`queryTabletVisibleProducts`)가 `se
 
 | 항목 | 결과 |
 |------|------|
-| `platform_store_slugs.service_key` 분포 | `kpa`(9), `glycopharm`(2), `cosmetics`(1). **`kpa-society` slug 없음** |
+| `platform_store_slugs.service_key` 분포 | `kpa`(9), `cosmetics`(1). **`kpa-society` slug 없음** |
 | `organization_product_listings` 전체 | **10건, 전량 `service_key='neture'`** |
 | 위 10건 소유 org | 1곳. 그 org 의 slug service_key = **`kpa`** (네뚜레-약국) |
 | `organization_channels` TABLET APPROVED | **0건 (전 서비스)** |
@@ -61,7 +61,6 @@ KPA 태블릿 공개 supplier 상품 조회(`queryTabletVisibleProducts`)가 `se
 ```ts
 // store-public-utils.ts (기존 helper 재사용, 신규 도입 없음)
 resolveServiceKeys('kpa')        → ['kpa', 'kpa-society']
-resolveServiceKeys('glycopharm') → ['glycopharm']
 resolveServiceKeys('neture')     → ['neture']
 ```
 
@@ -146,7 +145,7 @@ INNER JOIN organization_product_listings opl
 
 - `apps/api-server` `pnpm run type-check` (`tsc --noEmit`): **변경 파일(store-public-utils / store-public-tablet.handler) 에러 0**.
 - 잔존 에러는 전부 `src/scripts/drug-otc-*` 배치 스크립트의 중복 선언(`TS2451/TS2393`) — 본 변경과 무관한 사전 존재 이슈(병행 세션 산출물).
-- web-kpa-society / GP / KCos: **프론트 파일 무변경**(백엔드 응답 shape 불변)이므로 별도 typecheck 불요. 단일키 서비스는 `resolveServiceKeys(key)=[key]` → `ANY([key])==（= key)` 로 동작 불변(DB 등가 실측 §6).
+- web-kpa-society / KCos: **프론트 파일 무변경**(백엔드 응답 shape 불변)이므로 별도 typecheck 불요. 단일키 서비스는 `resolveServiceKeys(key)=[key]` → `ANY([key])==（= key)` 로 동작 불변(DB 등가 실측 §6).
 
 ---
 

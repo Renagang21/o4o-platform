@@ -75,7 +75,7 @@
 | `MyProfilePage.tsx` — 수정 폼 초기값 | `businessContact` 우선 + 기존 `storeAddress`/`businessInfo` fallback 유지 (구버전 응답 호환) |
 | `mypage.ts` 타입 | `businessContact?` optional 추가 |
 | `MemberManagementPage.tsx` · `UserDetailPage.tsx` | **미변경** |
-| 다른 서비스(Neture / K-Cosmetics / GlycoPharm / Pharmacy-Hub)의 `businessInfo` 계약 | **미변경** — resolver 는 `routes/kpa/shared` 에 두어 KPA 읽기 경로에서만 소비 |
+| 다른 서비스(Neture / K-Cosmetics / Pharmacy-Hub)의 `businessInfo` 계약 | **미변경** — resolver 는 `routes/kpa/shared` 에 두어 KPA 읽기 경로에서만 소비 |
 
 **범위 밖으로 남긴 것** (WO 제외 조건 준수): write 키 변경 없음, JSONB concat 전환 없음, 데이터 소유권 재설계 없음, 주소·약국 전화 외 필드 확장 없음.
 승인 시 `organizations` 동기화 블록(`member.controller.ts` pharmacy_owner 자동 활성화)도 `storeAddress`/`address` 를 읽지만 **read 화면이 아닌 write 경로**여서 이번 범위에서 제외했다 (별도 WO 제안, §7).

@@ -15,7 +15,7 @@
 | API deployed revision | `o4o-core-api-03398-749` |
 | 본 WO 로 인한 배포 | **없음** (코드 변경 0건) |
 
-프로덕션 실측 도메인: `kpa-society.co.kr` · `glycopharm.co.kr` · `k-cosmetics.site` · `neture.co.kr` · `pharmacyhub.co.kr`
+프로덕션 실측 도메인: `kpa-society.co.kr` · `k-cosmetics.site` · `neture.co.kr` · `pharmacyhub.co.kr`
 (§28 canonical URL 은 `CHECK-O4O-CROSS-SERVICE-MYPAGE-HOME-HUB-COMMONIZATION-V1.md:171-175` 기준)
 
 ---
@@ -29,7 +29,6 @@
 | 서비스 | `/mypage/activity` | `/mypage/history` | 비고 |
 |---|:---:|:---:|---|
 | KPA-Society | 없음 | 없음 | `https://kpa-society.co.kr/mypage/activity` → 정상 404 페이지 (백지 아님) |
-| GlycoPharm | 없음 | 없음 | |
 | K-Cosmetics | 없음 | 없음 | |
 | Neture | 없음 | 없음 | |
 | Pharmacy-Hub | 없음 | 없음 | PH 는 `/mypage` 가 아니라 `/account` 축 |
@@ -43,14 +42,13 @@
 | KPA | `services/web-kpa-society/src/pages/mypage/MyDashboardPage.tsx` | `<MyPageActivityFeed items={activities.map(...)} />` | `GET /api/v1/kpa/mypage/activities` (stub) |
 | Neture | `services/web-neture/src/pages/mypage/MyPageHub.tsx:103-108` | `<MyPageActivityFeed items={[]} />` | **하드코딩 빈 배열** (API 호출 없음) |
 
-GlycoPharm · K-Cosmetics · Pharmacy-Hub 는 Activity UI 자체가 **없다**.
+K-Cosmetics · Pharmacy-Hub 는 Activity UI 자체가 **없다**.
 
 ### 2-3. navItems — dead entry 0
 
 `services/*/src/pages/mypage/navItems.ts` 전수 확인. 5서비스 어디에도 활동/이력 메뉴 항목이 없다 → §24 dead entry = 0.
 
 - KPA: 홈 / 프로필 / 내 포럼 / 내 수강 / 내 신청 / 학습 결과 / 내 자격 / 크레딧 / 설정
-- GlycoPharm: 홈 / 프로필 / 내 수강 / 내 신청 / 학습 결과 / 크레딧 / 설정
 - K-Cosmetics: 홈 / 프로필 / 내 신청 / 내 수강 / 학습 결과 / 크레딧 / 설정
 - Neture: 홈 / 프로필 / 사업자 정보(supplier only) / 설정
 - Pharmacy-Hub(`/account`): 내 프로필 / 가입 상태
@@ -73,7 +71,7 @@ GlycoPharm · K-Cosmetics · Pharmacy-Hub 는 Activity UI 자체가 **없다**.
 판정 어휘: `FULLY_COMMON` / `CORE_ONLY` / `VIEW_DUPLICATED` / `SERVICE_SPECIFIC` / `NOT_IMPLEMENTED` / `OUT_OF_SCOPE`
 **미조사 0.**
 
-| # | 기능 | KPA | GP | KCos | Neture | PH |
+| # | 기능 | KPA | KCos | Neture | PH |
 |---:|---|---|---|---|---|---|
 | 1 | Activity/History 기능 존재 | NOT_IMPLEMENTED¹ | NOT_IMPLEMENTED | NOT_IMPLEMENTED | NOT_IMPLEMENTED¹ | NOT_IMPLEMENTED |
 | 2 | 최근 활동 목록 | NOT_IMPLEMENTED¹ | NOT_IMPLEMENTED | NOT_IMPLEMENTED | NOT_IMPLEMENTED¹ | NOT_IMPLEMENTED |
@@ -153,7 +151,7 @@ GET https://api.neture.co.kr/api/v1/kpa/mypage/activities?limit=5
 
 프로덕션 `/mypage` 네트워크 로그 전수 확인: activity 계열 요청 **0건** (footer-legal, login, notifications/unread-count ×2 만 관측). 소스의 하드코딩 `items={[]}` 와 일치.
 
-### 4-4. GP / KCos / PH
+### 4-4. KCos / PH
 
 Activity API 자체가 없다. PH 는 `/account` 에서 프로필·보안·가입상태만 조회한다.
 
@@ -290,7 +288,6 @@ export interface MyPageActivityItem {
 | 서비스 | Activity UI | 공통 컴포넌트 | adoption 판정 |
 |---|---|---|---|
 | KPA-Society | 있음 (항상 빈 상태) | `MyPageActivityFeed` | **ADOPTED** — 서비스 로컬 구현 0 |
-| GlycoPharm | 없음 | — | **N/A (NOT_IMPLEMENTED)** — 신설 금지(§24) |
 | K-Cosmetics | 없음 | — | **N/A (NOT_IMPLEMENTED)** — 신설 금지(§24) |
 | Neture | 있음 (하드코딩 `[]`) | `MyPageActivityFeed` | **ADOPTED** — 서비스 로컬 구현 0 |
 | Pharmacy-Hub | 없음 | — | **N/A (NOT_IMPLEMENTED)** — `/account` 축, 신설 금지(§24) |
@@ -304,7 +301,6 @@ export interface MyPageActivityItem {
 | 서비스 | URL | desktop 1440×900 | mobile 390×844 | 가로 overflow |
 |---|---|:---:|:---:|---|
 | KPA-Society | `/mypage` | PASS | PASS | 없음 (375/375) |
-| GlycoPharm | `/mypage` | PASS | PASS | 없음 (382/382) |
 | K-Cosmetics | `/mypage` | PASS | PASS | 없음 (375/375) |
 | Neture | `/mypage` | PASS | PASS | 없음 (375/375) |
 | Pharmacy-Hub | `/account` | PASS | PASS | 없음 (375/375) |
@@ -329,11 +325,11 @@ Playwright MCP · 프로덕션 실계정(`docs/local/TEST-ACCOUNTS.local.md` SSO
 **건너뛴 항목 (숨기지 않고 기록)**
 
 - §28 의 "뒤로가기" 시나리오는 Activity 전용 route 가 어느 서비스에도 없어 **수행 대상 자체가 없다** → 미수행(대상 부재). 새로고침 지속성만 KPA 에서 실측했다.
-- Neture supplier 전용 뷰, GP/KCos store_owner 스코프에서의 Activity 재확인은 **미수행** — 세 서비스 모두 소스 레벨에서 Activity UI 가 0이므로 role 별 분기 자체가 없다.
+- Neture supplier 전용 뷰, KCos store_owner 스코프에서의 Activity 재확인은 **미수행** — 두 서비스 모두 소스 레벨에서 Activity UI 가 0이므로 role 별 분기 자체가 없다.
 
 **신규 발견 (부기에 없던 항목)**
 
-- **GlycoPharm 비로그인 `/mypage` SoftGuard 프리뷰에 "활동 내역" 칩이 노출된다** ("프로필 관리"·"알림 설정" 옆). 로그인 후에는 존재하지 않는 기능이다.
+- 로그인 후에는 존재하지 않는 기능이다.
   링크가 아니라 클릭 불가 칩이므로 §24/§30 의 dead entry(=클릭 시 깨지는 진입점)에 해당하지 않는다 → **MUST_FIX 아님**, copy drift followup(F-1).
 
 ---
@@ -368,7 +364,7 @@ Playwright MCP · 프로덕션 실계정(`docs/local/TEST-ACCOUNTS.local.md` SSO
 
 | ID | 내용 | 사유 |
 |---|---|---|
-| F-1 | GlycoPharm 비로그인 `/mypage` SoftGuard 프리뷰의 "활동 내역" 칩 — 실제 없는 기능 광고 | copy drift. 링크 아님 → dead entry 아님 |
+| F-1 | — | copy drift. 링크 아님 → dead entry 아님 |
 | F-2 | KPA `MyDashboardPage` 어댑터가 `UserActivity.link` → `href` 미매핑 | 상수 stub 위 투기적 수정 금지. 실계약 생길 때 함께 |
 | F-3 | `formatRelativeTime` 7벌 중복 (공통 2 + 로컬 5) | §13 상 통합은 본 WO 범위 밖 |
 | F-4 | KPA `/mypage/activities`·`/mypage/summary` placeholder stub 처리 방침 (실구현 vs 은퇴) | §16·§31 — 신규 backend 계약은 별도 WO |

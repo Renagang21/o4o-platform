@@ -138,7 +138,6 @@ DB enum 이 아니라 **varchar + application-level union** (확장 시 enum mig
 - ✅ Rx 등록 루트 구현하지 않음
 - ✅ `SupplierProductOffer` 경계 변경하지 않음
 - ✅ `StoreProductProfile` / `OrganizationProductListing` 경계 변경하지 않음
-- ✅ cosmetics/glycopharm/neture legacy product migration 포함하지 않음
 - ✅ API endpoint 신규 공개하지 않음 (내부 service/util 수준)
 
 ### Risks / Follow-ups

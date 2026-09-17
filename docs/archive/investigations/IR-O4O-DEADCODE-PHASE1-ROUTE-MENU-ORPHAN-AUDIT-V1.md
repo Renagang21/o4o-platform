@@ -2,7 +2,7 @@
 
 > **조사 전용 문서 — 삭제·수정·리팩토링 작업 없음**
 >
-> 이 IR은 O4O 4개 서비스(KPA-Society, Neture, GlycoPharm, K-Cosmetics)의 Route Orphan·Menu Orphan·Dead Code 후보를 조사한 결과이다.
+> 이 IR은 O4O 3개 서비스(KPA-Society, Neture, K-Cosmetics)의 Route Orphan·Menu Orphan·Dead Code 후보를 조사한 결과이다.
 > 실제 삭제 작업은 Phase 2 WO에서 별도 진행한다.
 
 ---
@@ -12,10 +12,10 @@
 | 항목 | 내용 |
 |------|------|
 | 조사 일자 | 2026-05-15 |
-| 조사 대상 | services/web-kpa-society, web-neture, web-glycopharm, web-k-cosmetics |
+| 조사 대상 | — |
 | 조사 방법 | App.tsx 전수 분석 + 파일 존재 교차확인 + WO 주석 추적 |
-| App.tsx 총 라인 수 | KPA 1201줄 / Neture 1042줄 / GlycoPharm 685줄 / K-Cosmetics 489줄 |
-| Navigate/redirect 건수 | KPA 99 / Neture 58 / GlycoPharm 23 / K-Cosmetics 8 |
+| App.tsx 총 라인 수 | KPA 1201줄 / Neture 1042줄 685줄 / K-Cosmetics 489줄 |
+| Navigate/redirect 건수 | KPA 99 / Neture 58 23 / K-Cosmetics 8 |
 
 ---
 
@@ -138,57 +138,6 @@ Neture App.tsx는 공급자(supplier/partner) 중심 플랫폼이며, 크게 3�
 
 ---
 
-## 3. GlycoPharm (`services/web-glycopharm/`)
-
-### 3-A. 라우터 구조 개요
-
-GlycoPharm App.tsx는 약국 전문 매장 운영 중심. 주요 영역:
-- **Store Management**: `/store/*` — canonical
-- **Operator/Admin**: `/operator/*`, `/admin/*`
-- **Signage**: `/store/signage/*`, `/operator/signage/*`
-- **Phase 2 (experimental)**: `/service`, `/service-login`
-
-### 3-B. Route 목록 및 상태
-
-| 구분 | 경로/파일 | 상태 | 근거 | 위험도 | 삭제 후보 |
-|------|-----------|------|------|--------|-----------|
-| File | `pages/store/StoreEntryPage.tsx` | ORPHAN | 라우트 제거됨 (WO-O4O-GLYCO-STORE-CANONICAL-ENTRY-ALIGN-V1). import 없음. 파일만 잔존. | LOW | YES |
-| Route | `/pharmacy` → `/store` | LEGACY | 역할 명칭 전환 backward-compat | LOW | YES |
-| Route | `/pharmacist` → `/store` | LEGACY | 역할 명칭 전환 backward-compat | LOW | YES |
-| Route | `/pharmacist/*` → `/store` | LEGACY | 역할 명칭 전환 backward-compat | LOW | YES |
-| Route | `/hub` → `/store-hub` | LEGACY | backward-compat | LOW | YES |
-| Route | `/hub/*` → `/store-hub` | LEGACY | backward-compat | LOW | YES |
-| Route | `/education` → `/lms` | LEGACY | backward-compat (WO-O4O-LMS-ROUTING-V1) | LOW | YES |
-| Route | `/education/:id` → `/lms/:id` | LEGACY | EduRedirect helper | LOW | YES |
-| Route | `/store/signage` → `/store/signage/library` | LEGACY | 단순 index redirect | LOW | YES |
-| Route | `/store/hub` → `/store` | LEGACY | 구 store hub 개념 통합됨 | LOW | YES |
-| Route | `/store/products` → `/store/my-products` | LEGACY | 구 경로 | LOW | YES |
-| Route | `/store/market-trial/*` | LEGACY | MarketTrialNetureRedirect — Neture로 redirect (WO-MARKET-TRIAL-CROSS-SERVICE-ENTRY-ONLY-MIGRATION-V1) | LOW | YES |
-| Route | `/service` | UNKNOWN | Phase 2 WO-AUTH-SERVICE-IDENTITY-PHASE2-GLYCOPHARM — 방향 미확정 | HIGH | HOLD |
-| Route | `/service-login` | UNKNOWN | Phase 2 experimental | HIGH | HOLD |
-| Route | `/service/dashboard` | UNKNOWN | Phase 2 experimental | HIGH | HOLD |
-| Route | (제거됨) `/store/services` | REMOVED | WO-O4O-GLYCO-CARE-CLEANUP-V1 PharmacyPatients 제거됨 | - | - |
-| Route | (제거됨) `/signage/my` | REMOVED | WO-O4O-GLYCOPHARM-SIGNAGE-MIGRATION-V1 | - | - |
-| Route | (제거됨) `/operator/roles` | REMOVED | `/admin/roles`로 단일화 | - | - |
-
-### 3-C. Dead Code 밀집 영역
-
-**1) StoreEntryPage.tsx — 즉시 삭제 후보**
-- 위치: `services/web-glycopharm/src/pages/store/StoreEntryPage.tsx`
-- 라우트 제거됨, import 없음, 파일만 잔존
-- **결론: YES — 즉시 삭제 가능 (LOW risk)**
-
-**2) Phase 2 실험 라우트 3개 (/service, /service-login, /service/dashboard)**
-- WO-AUTH-SERVICE-IDENTITY-PHASE2-GLYCOPHARM 진행 여부 미확정
-- **결론: HOLD — WO 상태 확인 후 판단**
-
-**3) backward-compat redirect 8개**
-- `/pharmacy`, `/pharmacist`, `/pharmacist/*`, `/hub`, `/hub/*`, `/education`, `/store/hub`, `/store/products`
-- 모두 단순 Navigate
-- **결론: YES (삭제 후보) — bookmark 트래픽 없다면 제거 가능**
-
----
-
 ## 4. K-Cosmetics (`services/web-k-cosmetics/`)
 
 ### 4-A. 라우터 구조 개요
@@ -236,19 +185,17 @@ K-Cosmetics는 4개 서비스 중 가장 라우터가 단순하다 (489줄). 주
 | 서비스 | 상태 |
 |--------|------|
 | Neture | ACTIVE — 실제 Market Trial 구현체 존재 |
-| GlycoPharm | LEGACY — `/store/market-trial/*` → Neture redirect |
 | K-Cosmetics | LEGACY — `/store/market-trial/*` → Neture redirect |
 | KPA-Society | 확인 필요 |
 
 - WO-MARKET-TRIAL-CROSS-SERVICE-ENTRY-ONLY-MIGRATION-V1 완료됨
 - **Neture 외 3개 서비스의 market-trial redirect route는 삭제 가능**
 
-### 5-B. /pharmacy → /store 명칭 전환 잔재 (KPA + GlycoPharm)
+### 5-B. /pharmacy → /store 명칭 전환 잔재 (KPA)
 
 | 서비스 | redirect 개수 |
 |--------|--------------|
 | KPA-Society | 20+ 개별 route |
-| GlycoPharm | 4개 (/pharmacy, /pharmacist, /pharmacist/*) |
 
 - wildcard catch-all로 통합 가능
 - **결론: Phase 2 consolidation WO에서 처리**
@@ -267,9 +214,6 @@ K-Cosmetics는 4개 서비스 중 가장 라우터가 단순하다 (489줄). 주
 
 | 서비스 | 항목 | 내용 |
 |--------|------|------|
-| GlycoPharm | File | `pages/store/StoreEntryPage.tsx` — route 제거됨, import 없음 |
-| GlycoPharm | Routes (8개) | `/pharmacy`, `/pharmacist/*`, `/hub/*`, `/education`, `/store/hub`, `/store/products`, `/store/signage` (index redirect) |
-| GlycoPharm | Route | `/store/market-trial/*` → Neture redirect |
 | K-Cosmetics | Routes (4개) | `/hub`, `/hub/*`, `/store/products`, `/store/market-trial/*` |
 | Neture | Routes (8개) | `/manual/*`, `/channel/*` → `/o4o/*` redirect 전체 |
 | Neture | Routes (5개) | `/about`, `/my`, `/partner/product-pool`, `/partner/referrals`, `/workspace/platform/principles` |
@@ -287,7 +231,6 @@ K-Cosmetics는 4개 서비스 중 가장 라우터가 단순하다 (489줄). 주
 |--------|------|------|
 | KPA | `/demo/*` 전체 블록 | 독립 SVC-B 서비스 출시 WO 완료 후 삭제. `DemoLayout`, `IntranetRoutes`, `AdminRoutes` 포함. |
 | KPA | `pages/news/` 3파일 | /demo 영역에서 실제 사용 중. /demo 삭제 WO와 동시 처리. |
-| GlycoPharm | `/service`, `/service-login`, `/service/dashboard` | WO-AUTH-SERVICE-IDENTITY-PHASE2-GLYCOPHARM 방향 확정 전 보류. |
 | K-Cosmetics | `/partner/*` (5 routes) | `k-cosmetics:partner` 역할 실제 할당 현황 확인 필요. 할당자 없으면 삭제 후보. |
 
 ---
@@ -302,7 +245,6 @@ K-Cosmetics는 4개 서비스 중 가장 라우터가 단순하다 (489줄). 주
 | KPA | `/pharmacy/*` redirect chain (20+) | 개별 1:1 route 정의 | wildcard catch-all 2개로 통합 |
 | KPA | legacy operator 구조 일부 | /demo/admin/* 하위 | /demo 삭제 WO와 함께 제거 |
 | Neture | workspace redirect helpers | 개별 함수 + route | 단일 wildcard redirect로 통합 |
-| GlycoPharm | StoreEntryPage.tsx | 파일만 잔존 | 즉시 삭제 |
 
 ---
 
@@ -314,8 +256,6 @@ K-Cosmetics는 4개 서비스 중 가장 라우터가 단순하다 (489줄). 주
 | KPA-Society | `/pharmacy/*` redirect chain | 20+ routes | Phase 2 consolidation |
 | Neture | legacy workspace redirect (함수+route) | ~50줄 | YES 삭제 가능 |
 | Neture | /manual/* /channel/* redirects | 8 routes | YES 삭제 가능 |
-| GlycoPharm | `StoreEntryPage.tsx` | 1 파일 | YES 즉시 삭제 |
-| GlycoPharm | Phase 2 `/service/*` | 3 routes | HOLD |
 | K-Cosmetics | `/partner/*` | 5 routes | HOLD (역할 확인 후) |
 | K-Cosmetics | backward-compat redirects | 4 routes | YES 삭제 가능 |
 
@@ -326,13 +266,10 @@ K-Cosmetics는 4개 서비스 중 가장 라우터가 단순하다 (489줄). 주
 이번 Phase 1 조사 결과를 기반으로 다음 순서의 Phase 2 작업을 권고한다.
 
 ### Priority 1: LOW risk 즉시 삭제 (배치)
-- GlycoPharm `StoreEntryPage.tsx` 파일 삭제
 - Neture legacy redirect functions + routes 일괄 제거
 - K-Cosmetics backward-compat 4개 route 제거
-- GlycoPharm backward-compat 8개 route 제거
 
 ### Priority 2: HOLD 항목 조건 확인
-- GlycoPharm Phase 2 service auth WO 방향 확정
 - K-Cosmetics `k-cosmetics:partner` 역할 할당 현황 DB 조회
 - KPA SVC-B 독립 서비스 출시 일정 확인
 

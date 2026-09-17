@@ -42,8 +42,8 @@ O4O 취급 제품  → O4O 기반 제품 (handled-products 화면 구분/탭)
 
 ## 6. 공유 컴포넌트 영향 여부
 
-- 공유 `StoreLocalProductsManager`(packages/store-ui-core, GP/KCos) **직접 변경 안 함** — StoreLocalProductsPage(KPA 자체 JSX)만 수정.
-- 공유 `StoreProductsManagerPage`는 **라벨 prop 주입**(App.tsx)으로만 KPA 표시 변경 → GP/KCos 무영향.
+- 공유 `StoreLocalProductsManager`(packages/store-ui-core, KCos) **직접 변경 안 함** — StoreLocalProductsPage(KPA 자체 JSX)만 수정.
+- 공유 `StoreProductsManagerPage`는 **라벨 prop 주입**(App.tsx)으로만 KPA 표시 변경 → KCos 무영향.
 - 공개 `TabletKioskPage`(고객 화면) **미변경**(별도 협의 대상).
 
 ## 7. route/API/DB 무변경 확인

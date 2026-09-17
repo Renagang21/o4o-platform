@@ -1,7 +1,7 @@
 # CHECK-O4O-CONTACT-OPERATIONS-STRUCTURE-MILESTONE-V1
 
 > **유형:** Read-only 마일스톤 (코드/DB/route/UI/API 변경 없음, 문서 1개만 생성)
-> **목적:** O4O 4개 서비스(GlycoPharm / K-Cosmetics / Neture / KPA Society)의 Contact Us 운영 구조 정비 완료 상태를 하나의 마일스톤으로 고정한다.
+> **목적:** O4O 3개 서비스(K-Cosmetics / Neture / KPA Society)의 Contact Us 운영 구조 정비 완료 상태를 하나의 마일스톤으로 고정한다.
 > **작성일:** 2026-06-13
 > **선행 SSOT:** [IR-O4O-CONTACT-CROSSSERVICE-STANDARDIZATION-V1](../investigations/IR-O4O-CONTACT-CROSSSERVICE-STANDARDIZATION-V1.md)
 
@@ -24,10 +24,10 @@ read-only 문서 정리 · 코드/backend/API/DB/migration/frontend 수정 없�
 `docs/checks/CHECK-O4O-CONTACT-OPERATIONS-STRUCTURE-MILESTONE-V1.md`
 
 ## 4. 정리 대상
-GlycoPharm · K-Cosmetics · Neture · KPA Society
+K-Cosmetics · Neture · KPA Society
 
 ## 5. 선행 작업
-- **GP/KCos 신규 구조:** DELIVERY-AND-NOTIFICATION / INQUIRY-ADMIN-MANAGEMENT / SERVICE-CONTACT-SETTINGS-ADMIN / EMAIL-NOTIFICATION / AUTO-REPLY
+- **KCos 신규 구조:** DELIVERY-AND-NOTIFICATION / INQUIRY-ADMIN-MANAGEMENT / SERVICE-CONTACT-SETTINGS-ADMIN / EMAIL-NOTIFICATION / AUTO-REPLY
 - **Cross-service 조사·Neture/KPA 보강:** IR-CROSSSERVICE-STANDARDIZATION / SETTINGS-ADAPTER / PRIVACY-CONSENT / LEGACY-IP-CLEANUP
 - **공개 정보 마일스톤:** CHECK-O4O-PUBLIC-INFO-LEGAL-CONTACT-STRUCTURE-MILESTONE-V1
 
@@ -35,13 +35,12 @@ GlycoPharm · K-Cosmetics · Neture · KPA Society
 
 | 서비스 | 저장소 | 공개 submit | 운영자 알림 | 운영자 이메일 | 자동 회신 | 관리 화면 | 설정 화면 | 동의 | IP 처리 |
 |--------|--------|-------------|:------:|------|------|----------|----------|:----:|--------|
-| GlycoPharm | `contact_inquiries` | `/api/v1/public/services/glycopharm/contact-inquiries` | in-app | 설정 기반 | 설정 기반 | `/admin/contact-inquiries` | `/admin/settings/contact` | 필수 | `ip_hash` |
 | K-Cosmetics | `contact_inquiries` | `/api/v1/public/services/k-cosmetics/contact-inquiries` | in-app | 설정 기반 | 설정 기반 | `/admin/contact-inquiries` | `/admin/settings/contact` | 필수 | `ip_hash` |
 | Neture | `neture_contact_messages` | `/neture/contact` | in-app | 설정 기반 adapter | 설정 기반 adapter | `/admin/contact-messages`, `/operator/contact-messages` | `/admin/settings/contact` | 필수 | 신규/기존 모두 원문 제거, `ipHash` |
 | KPA Society | `contact_requests` | `/api/v1/kpa/contact-requests` | in-app | 설정 기반 adapter | 설정 기반 adapter | `/operator/collaboration-requests` | `/admin/settings/contact` | 필수 | IP 미저장 |
 
 ## 7. 구조적 결론
-1. **GP/KCos**는 신규 `ContactInquiry` 기반 공통 구조로 운영 흐름 완성.
+1. **KCos**는 신규 `ContactInquiry` 기반 공통 구조로 운영 흐름 완성.
 2. **Neture/KPA**는 기존 저장소·route·운영 UI 유지 상태에서 설정/알림/동의/개인정보 보강 완료(Option D).
 3. 4서비스 모두 접수 시 운영자가 알 수 있는 구조(in-app).
 4. 4서비스 모두 운영자 이메일 알림을 Admin 설정 기반으로 사용 가능.
@@ -66,13 +65,13 @@ GlycoPharm · K-Cosmetics · Neture · KPA Society
 
 ## 9. 데이터 소스 정리
 
-| 영역 | GlycoPharm | K-Cosmetics | Neture | KPA Society |
-|------|-----------|-------------|--------|-------------|
-| 문의 저장 | `ContactInquiry` | `ContactInquiry` | `NetureContactMessage` | `ContactRequest` |
-| 설정 저장 | `ServiceContactSettings` | `ServiceContactSettings` | `ServiceContactSettings` | `ServiceContactSettings` |
-| 알림 상태 | `notification_status` | `notification_status` | `notificationStatus` | `notification_status` |
-| 개인정보 동의 | `privacy_consent` | `privacy_consent` | `privacyConsent` | `privacy_consent` |
-| IP | `ip_hash` | `ip_hash` | `ipHash`, legacy `ipAddress`=null | 미저장 |
+| 영역 | K-Cosmetics | Neture | KPA Society |
+| ------ | ------------- | -------- | ------------- |
+| 문의 저장 | `ContactInquiry` | `NetureContactMessage` | `ContactRequest` |
+| 설정 저장 | `ServiceContactSettings` | `ServiceContactSettings` | `ServiceContactSettings` |
+| 알림 상태 | `notification_status` | `notificationStatus` | `notification_status` |
+| 개인정보 동의 | `privacy_consent` | `privacyConsent` | `privacy_consent` |
+| IP | `ip_hash` | `ipHash`, legacy `ipAddress`=null | 미저장 |
 
 > 컬럼 네이밍: `contact_inquiries`/`contact_requests`/`service_contact_settings`는 snake_case, `neture_contact_messages`는 camelCase(`notificationStatus`/`privacyConsent`/`ipHash`) — 각 테이블 기존 컨벤션 유지.
 
@@ -80,21 +79,21 @@ GlycoPharm · K-Cosmetics · Neture · KPA Society
 
 | 작업 | 목적 | commit (closing) |
 |------|------|--------|
-| `WO-O4O-CONTACT-DELIVERY-AND-NOTIFICATION-V1` | GP/KCos 저장 + in-app 알림 | `b7db3213e` |
-| `WO-O4O-CONTACT-INQUIRY-ADMIN-MANAGEMENT-V1` | GP/KCos 문의 Admin 관리 | `6256b50ad` |
-| `WO-O4O-SERVICE-CONTACT-SETTINGS-ADMIN-V1` | GP/KCos 문의 설정 Admin | `b3659de05` |
-| `WO-O4O-CONTACT-EMAIL-NOTIFICATION-V1` | GP/KCos 운영자 이메일 알림 검증 | `442c73d78` |
-| `WO-O4O-CONTACT-AUTO-REPLY-V1` | GP/KCos 문의자 자동 회신 | `649f16791` |
+| `WO-O4O-CONTACT-DELIVERY-AND-NOTIFICATION-V1` | KCos 저장 + in-app 알림 | `b7db3213e` |
+| `WO-O4O-CONTACT-INQUIRY-ADMIN-MANAGEMENT-V1` | KCos 문의 Admin 관리 | `6256b50ad` |
+| `WO-O4O-SERVICE-CONTACT-SETTINGS-ADMIN-V1` | KCos 문의 설정 Admin | `b3659de05` |
+| `WO-O4O-CONTACT-EMAIL-NOTIFICATION-V1` | KCos 운영자 이메일 알림 검증 | `442c73d78` |
+| `WO-O4O-CONTACT-AUTO-REPLY-V1` | KCos 문의자 자동 회신 | `649f16791` |
 | `IR-O4O-CONTACT-CROSSSERVICE-STANDARDIZATION-V1` | 4서비스 Contact 구조 조사(Option D 권고) | `1bd90f986` |
 | `WO-O4O-CONTACT-NETURE-KPA-SETTINGS-ADAPTER-V1` | Neture/KPA 설정·알림 adapter | code `d8cc391bc` · CHECK `809ca1445` |
 | `WO-O4O-CONTACT-NETURE-KPA-PRIVACY-CONSENT-V1` | Neture/KPA 동의 + Neture IP hash | code `953c69597` · CHECK `ea4068f77` |
 | `WO-O4O-CONTACT-NETURE-LEGACY-IP-CLEANUP-V1` | Neture legacy IP 원문 제거 | code `6144c39f6` · CHECK `3638aa1e5` |
 
-> GP/KCos 5건은 각 WO를 닫은 CHECK 커밋 hash. Neture/KPA 4건은 본 세션 code/CHECK 커밋.
+> KCos 5건은 각 WO를 닫은 CHECK 커밋 hash. Neture/KPA 4건은 본 세션 code/CHECK 커밋.
 
 ## 11. 검증 상태 정리
 
-### 11.1 GP/KCos (선행 WO CHECK 기준)
+### 11.1 KCos (선행 WO CHECK 기준)
 공개 submit 성공 · DB 저장 · in-app 알림 · 운영자 이메일 알림(`email:sent`) · 문의자 자동 회신(`autoreply:sent`) · Admin 문의 관리 · Contact 설정 저장 · 테스트 문의 spam 처리 · 테스트 수신자/설정 복구 — 각 CHECK에서 PASS.
 
 ### 11.2 Neture/KPA (본 세션 smoke 기준, API 레벨 prod)
@@ -122,7 +121,7 @@ GlycoPharm · K-Cosmetics · Neture · KPA Society
 - [x] 문서 1개만 생성 (`docs/checks/CHECK-O4O-CONTACT-OPERATIONS-STRUCTURE-MILESTONE-V1.md`)
 - [x] 코드/backend/API/DB/migration/frontend 변경 없음 (read-only)
 - [x] 4서비스 Contact 운영 구조 한눈 정리 (§6·§9)
-- [x] GP/KCos vs Neture/KPA 구조 차이 명확 (§7)
+- [x] KCos vs Neture/KPA 구조 차이 명확 (§7)
 - [x] 완료 WO/IR 목록 + commit hash (§10)
 - [x] 개인정보 동의/IP 처리 완료 상태 (§11)
 - [x] 남은 선택 과제 분리 (§13)

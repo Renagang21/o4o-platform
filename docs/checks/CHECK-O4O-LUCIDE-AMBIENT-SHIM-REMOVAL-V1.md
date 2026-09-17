@@ -71,7 +71,7 @@ shim 제거 직후 `apps/admin-dashboard` 에서 정확히 7건이 드러났다 
 | shortcodes typecheck | `pnpm --filter @o4o/shortcodes run type-check` | **EXIT 0** |
 | operator-ux-core typecheck | `npx tsc --noEmit -p tsconfig.json` | **EXIT 0** |
 | 프론트 전체 typecheck | `node scripts/dev.mjs type-check:frontend` | **EXIT 0** (`type-check:frontend: OK`) — main-site · admin-dashboard · web-kpa-society · dropshipping-core · dropshipping-cosmetics · forum-yaksa |
-| 나머지 web 서비스 typecheck | `npx tsc --noEmit` ×5 | web-neture / web-glycopharm / web-k-cosmetics / web-account / signage-player-web **각 errors=0** (S1 루트 shim 제거 연쇄 없음 확인) |
+| 나머지 web 서비스 typecheck | `npx tsc --noEmit` ×5 | — |
 | lint | `node scripts/dev.mjs lint` | **EXIT 0** |
 | admin-dashboard test | `npx vitest run --pool=forks --poolOptions.forks.maxForks=1` | **12 files / 220 tests PASS** |
 | admin-dashboard build | `bash scripts/ci-build-app.sh admin-dashboard` | **EXIT 0** (`✅ Build completed successfully!`) |

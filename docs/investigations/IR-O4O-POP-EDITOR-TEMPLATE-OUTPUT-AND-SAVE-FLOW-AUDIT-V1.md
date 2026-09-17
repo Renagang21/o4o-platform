@@ -47,7 +47,7 @@ POP 제작이 "PDF 생성 기능"이 아니라 **콘텐츠 제작 한 턴**(자�
 
 ## 4. 3서비스 parity
 
-| 항목 | KPA | GP | KCos |
+| 항목 | KPA | KCos |
 |------|:---:|:--:|:----:|
 | 입력(production state + supplier + prefill) | ✅ | ✅ | ✅ |
 | AiContentModal(template-aware) | ✅ | ✅ | ✅ |
@@ -55,7 +55,7 @@ POP 제작이 "PDF 생성 기능"이 아니라 **콘텐츠 제작 한 턴**(자�
 | PDF 출력 → execution_assets | ✅ | ✅ | ✅ |
 | **POP 콘텐츠 저장** | ✗ | ✗ | ✗ |
 
-> 기존 PDF 흐름은 3서비스 parity. **콘텐츠 저장은 전 서비스 공통 부재**(C). (GP/KCos templateId 참조가 KPA보다 많으나 동작 동일 — minor.)
+> 기존 PDF 흐름은 2서비스 parity. **콘텐츠 저장은 전 서비스 공통 부재**(C). (KCos templateId 참조가 KPA보다 많으나 동작 동일 — minor.)
 
 ## 5. 판정
 
@@ -80,7 +80,7 @@ POP 제작이 "PDF 생성 기능"이 아니라 **콘텐츠 제작 한 턴**(자�
    - **product 결정 선행**: 저장 대상 — `store_pops`(author_role='store', POP 문안 라인) vs `kpa_store_contents`(Store Production Material). 기존 staff 흐름과 정합 위해 **store_pops 권장**(사본 관리 페이지에서 바로 재편집·재제작 가능). PUT `/stores/:slug/pop/staff` 활용 가능성 — 단 현재 "직접 작성 POST" 미제공(staff 는 import+edit+delete만) → POST 추가 필요 가능(backend 소폭, DB 불요).
 2. (선택) `WO-O4O-POP-EDITOR-INLINE-EDIT-V1` — StorePopPage 에 popAiContent 인라인 편집(제목/본문 textarea) 추가(현재 AI모달 의존) — 편집기 단계 강화.
 3. (선택) `IR-O4O-POP-DATA-ROLE-CLARIFICATION-V1`(D) — store_pops/execution_assets/kpa_store_contents/product_ai_contents 의 POP 역할을 사용자 관점 "한 턴" 으로 문서·UX 정리(테이블 통합 아님 — canonical 기준).
-4. (선택) KPA/GP/KCos StorePopPage·StorePopStaffPage dup → 공통 컴포넌트 추출.
+4. (선택) KPA/KCos StorePopPage·StorePopStaffPage dup → 공통 컴포넌트 추출.
 
 > **권장 순서**: ① product 결정(저장 대상 테이블) → ② `WO-O4O-POP-SAVE-AS-CONTENT-V1`(콘텐츠 저장 + 재편집 round-trip) → ③ 역할 정리(D) / 편집기 강화.
 

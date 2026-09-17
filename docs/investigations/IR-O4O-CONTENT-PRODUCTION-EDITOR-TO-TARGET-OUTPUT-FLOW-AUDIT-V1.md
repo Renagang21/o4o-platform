@@ -23,7 +23,7 @@
 
 ## 2. 공통 제작 골격 (이미 존재 — 긍정적 토대)
 
-3개 서비스가 **공유하는 제작 진입·편집·템플릿 골격**이 이미 구축되어 있다 (KPA reference, GP/KCos 동형):
+2개 서비스가 **공유하는 제작 진입·편집·템플릿 골격**이 이미 구축되어 있다 (KPA reference, KCos 동형):
 
 | 골격 | 위치 | 역할 |
 |------|------|------|
@@ -31,7 +31,7 @@
 | **Router state 표준** | `@o4o/types/production.ts:63` (`ProductionRouterState{ source, target, selectedTemplateId }`) | "자료함 → 제작 시작 → 대상" 라우팅 표준 |
 | **공통 편집기/AI** | `packages/content-editor/.../AiContentModal.tsx` | initialMode = pop / blog / store_qr / title_suggest. templateSystemPrompt/ForcedOptions 수용 |
 | **RichTextEditor** | `@o4o/content-editor` | manual 편집 공통 |
-| **템플릿 레지스트리** | `productionTemplates.ts:49`(KPA) / `@o4o/types/production-template`(GP·KCos) | 10 seed (POP 3·Blog 3·QR 3·Desc 2). `systemPromptOverride`+`starterHtml`+`forcedOptions` |
+| **템플릿 레지스트리** | `productionTemplates.ts:49`(KPA) / `@o4o/types/production-template`(KCos) | 10 seed (POP 3·Blog 3·QR 3·Desc 2). `systemPromptOverride`+`starterHtml`+`forcedOptions` |
 | **산출물(OUTPUT) 테이블** | `store-execution-asset.entity.ts:22` (`sourceType=generated`, `usageType=pop/qr/signage/banner/notice`) | 생성/업로드 결과물. **재편집 대상 아님** |
 
 > **중요:** `store_execution_assets` 는 **산출물(OUTPUT)** 전용이며, **재편집 콘텐츠는 대상별 테이블**(`store_pops`/`store_qr_codes`/`store_blog_posts`/`product_ai_contents`/`kpa_store_contents`)에 저장된다 — 이 분리는 사용자 철학과 **정확히 일치**한다.
@@ -96,7 +96,7 @@
 
 - **B (부분 정합)** — POP/블로그는 6단계 정합, 상품설명은 ④까지·⑥ 미완, 사이니지·안내문은 패러다임 이탈/부재.
 - **D (기능별 drift)** — 저장 모델이 대상마다 상이: POP(콘텐츠+산출물 분리) / QR(단일 엔티티 통합) / 블로그(이중 역할) / 상품설명(콘텐츠만·산출물 없음) / 사이니지(조립) / 안내문(없음).
-- **E (서비스 drift)** — QR AI(qr_description) KPA만 실효 · 상품설명 derivation tracking KPA만 · 사이니지 탭 KPA(3)>GP(2)>KCos(1) · `productionTemplates.ts` KPA 로컬 vs GP/KCos 공유패키지 경로.
+- **E (서비스 drift)** — QR AI(qr_description) KPA만 실효 · 상품설명 derivation tracking KPA만
 - **NOT C** — 산출물만 저장하는 게 아니라 재사용 콘텐츠 분리가 다수 대상에서 이미 존재.
 - **NOT A** — 6대상 전부가 동일 canonical 을 따르지는 않음.
 
@@ -120,7 +120,7 @@
 | **P2** | `WO-O4O-PRODUCT-DESCRIPTION-PRODUCTION-FLOW-AUDIT-V1` | 상품설명 ⑥ 산출물(상품 상세 노출) 경로 확정 + 신규 진입점 + derivation parity | 구현된 대상 중 유일하게 꼬리 끊김 |
 | **P2** | `WO-O4O-EDITOR-TO-TARGET-CONTENT-SAVE-STANDARD-V1` | "용도별 콘텐츠 저장" 공통 계약(어떤 대상이 어떤 재편집 테이블에) 표준화 | D(저장 모델 drift) 해소 |
 | **P3** | `WO-O4O-SIGNAGE-AND-NOTICE-PRODUCTION-FLOW-AUDIT-V1` | 사이니지 canonical 편입 여부 결정 + 고객 안내문 구현/보류 결정 | 패러다임·부재 결정 선행 |
-| **P3** | `WO-O4O-QR-FLOW-ALIGNMENT-TO-CANONICAL-V1` (선택) | QR AI(qr_description)·통계 GP/KCos parity, 템플릿 레지스트리 경로 통일 | E(서비스 drift) 잔여 |
+| **P3** | `WO-O4O-QR-FLOW-ALIGNMENT-TO-CANONICAL-V1` (선택) | QR AI(qr_description)·통계 KCos parity, 템플릿 레지스트리 경로 통일 | E(서비스 drift) 잔여 |
 
 > POP/블로그는 이미 canonical 정합이므로 별도 alignment WO 불요 (P1 문서로 모범 사례로 인용).
 

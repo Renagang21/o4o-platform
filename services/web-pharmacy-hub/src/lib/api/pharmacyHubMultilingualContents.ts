@@ -3,7 +3,7 @@
  *
  * WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §8 (#76)
  *
- * 계약은 KPA / GlycoPharm / K-Cosmetics 와 **동일한 공통 controller**
+ * 계약은 KPA / K-Cosmetics 와 **동일한 공통 controller**
  * (routes/o4o-store/controllers/multilingual-product-content.controller.ts) 다:
  *   GET    /pharmacy-hub/pharmacy/multilingual-product-contents            내 매장 그룹 목록
  *   GET    /pharmacy-hub/pharmacy/multilingual-product-contents/summary    상품별 요약(배지)

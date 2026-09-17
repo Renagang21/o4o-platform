@@ -4,7 +4,6 @@
 **작성 일자**: 2026-05-30
 **검증 환경 (예정)**: production
   - `https://kpa-society.co.kr`
-  - `https://glycopharm.co.kr`
   - `https://k-cosmetics.site`
   - `https://neture.co.kr`
 **검증 도구 (예정)**: Playwright (chromium 1.57.0, headless 기본) + 필요 시 curl / API 직접 호출
@@ -49,7 +48,6 @@ P3. BusinessRegistrationFields 공통 UI 컴포넌트 추출 및 4서비스 가�
 
 ```text
 KPA-Society
-GlycoPharm
 K-Cosmetics
 Neture
 ```
@@ -149,7 +147,6 @@ KPA:
 업태 = 보건업
 종목 = 약국
 
-GlycoPharm:
 업태 = 보건업
 종목 = 약국
 
@@ -190,33 +187,6 @@ Neture:
 
 ```text
 면허번호 중복, 기존 가입 계정 문제를 피하기 위해 테스트 계정/테스트 면허번호 사용
-```
-
-## 2. GlycoPharm 검증
-
-### 대상 흐름
-
-```text
-약국 경영자 가입 신청
-```
-
-### 확인 항목
-
-```text
-1. GlycoPharm 가입 화면에서 약국 경영자 유형 선택
-2. BusinessRegistrationFields 공통 UI가 적용되어 있는지 확인
-3. 업태/종목/사업자유형/개업일 입력 가능 여부 확인
-4. 기존 businessCategory ↔ businessItem mapping이 깨지지 않았는지 확인
-5. 제출 payload에 4개 필드 포함 확인
-6. operator/admin 신청 상세에서 4개 필드 표시 확인
-7. 계좌 정보가 노출되지 않는지 확인
-```
-
-### 주의
-
-```text
-삭제된 StoreApplyPage 경로가 복구되었는지 확인하지 않는다.
-실제 canonical 가입 경로만 검증한다.
 ```
 
 ## 3. K-Cosmetics 검증
@@ -377,7 +347,6 @@ CHECK-O4O-BUSINESS-REGISTRATION-CROSSSERVICE-E2E-V1 결과 보고
 
 3. 서비스별 결과
    - KPA-Society
-   - GlycoPharm
    - K-Cosmetics
    - Neture
 
@@ -449,7 +418,7 @@ operator/admin 화면에서 확인 불가능한 경우
 | Chromium 143 | ✅ 설치됨 (`C:\Users\sohae\AppData\Local\ms-playwright\chromium-1200`) |
 | Firefox / WebKit | ⚠️ 미설치 — auth-runtime config(chromium-only)에는 무관, 필요 시 `npx playwright install firefox webkit` |
 | `docs/local/TEST-ACCOUNTS.local.md` | ✅ 존재 (67줄) |
-| 4서비스 도달성 (HTTP 200) | ✅ neture.co.kr / glycopharm.co.kr / kpa-society.co.kr / k-cosmetics.site |
+| 4서비스 도달성 (HTTP 200) | ✅ neture.co.kr / kpa-society.co.kr / k-cosmetics.site |
 | `gcloud` CLI (DB read-only 검증용) | ✅ 사용 가능 — CLAUDE.md §0 |
 
 ## 실행 시 참고할 기존 자산

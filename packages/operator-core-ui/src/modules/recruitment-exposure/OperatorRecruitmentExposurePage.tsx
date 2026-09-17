@@ -4,14 +4,14 @@
  * WO-O4O-SELLER-RECRUITMENT-EXPOSURE-OPERATOR-UI-V1 (원본 업무)
  * WO-O4O-OPERATOR-RECRUITMENT-EXPOSURE-STANDARD-LIST-ADOPTION-V1 (필터 + URL sync)
  * WO-O4O-OPERATOR-CROSSSERVICE-CORE-ONLY-AND-VIEW-DUPLICATION-CLEANUP-V1:
- *   KPA / K-Cosmetics / GlycoPharm 에 복제돼 있던 페이지 셸을 공통화.
+ *   KPA / K-Cosmetics 에 복제돼 있던 페이지 셸을 공통화.
  *
  * 보존:
  *   - 카드 승인 큐(RecruitmentExposureConsole) 그대로
  *   - exposureStatus 필터 + URL sync(`recruitmentExposure_status`), 기본 `pending` 은 param 생략
  *   - 조회 실패를 0건(=승인 대상 없음)으로 위장하지 않는 4상태 계약
  *
- * 에러 표면 정합: 조회 실패는 공통 `LoadError`(KCos/GP 형태), 처리 실패는 `toast.error`(KPA 형태)로
+ * 에러 표면 정합: 조회 실패는 공통 `LoadError`(KCos 형태), 처리 실패는 `toast.error`(KPA 형태)로
  * 수렴했다. KPA 의 자체 빨간 패널과 KCos 의 `window.alert` 는 각각 여기에 흡수된다.
  */
 

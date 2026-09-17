@@ -53,7 +53,7 @@
 ## 3. 검색 (§3.4) — 통합 검색 부재, 사일로
 
 - **통합 Resource 검색 화면·API 없음.** 저장소마다 독립 목록 API: `MediaLibraryService.list()`(folder/assetType 필터만, **검색어 파라미터 없음**), `AssetCopyService.listByOrganization()`(title ILIKE), store execution asset 목록, signage media, neture 상품 이미지 — 전부 분리.
-- 태그 검색 실재 위치: `kpa.routes.ts`(kpa_contents), `store-library-feed.controller.ts`(snapshot/execution asset 통합 피드 — **매장 자료함 내부 한정**), glycopharm resources, working-content.
+- 태그 검색 실재 위치: `kpa.routes.ts`(kpa_contents), `store-library-feed.controller.ts`(snapshot/execution asset 통합 피드 — **매장 자료함 내부 한정**) resources, working-content.
 - 교차-표면 검색 부재는 기존 감사에도 기록(`IR-O4O-LIBRARY-CROSSSURFACE-UIUX-AUDIT-V1`).
 
 ## 4. 재사용 (§3.5) — 값-복사 사본, 중복 누적

@@ -33,7 +33,7 @@
 - 스캔 디렉터리에 동일 o4o_payments/CreateO4oPaymentsTable/AddPaymentKeyUnique migration **없음**(grep 0). class name/filename timestamp 충돌 **없음**.
 
 ## 6. 영향 범위
-- o4o_payments 적용 시 **KPA/Glyco/KCos/Neture B2B 4 서비스 PaymentCore prepare/confirm 활성화**(공통 `TypeORMPaymentRepository`→PlatformPayment). 이전엔 모두 미작동(테이블 부재) → 본 이전으로 결제 leg 가능.
+- 이전엔 모두 미작동(테이블 부재) → 본 이전으로 결제 leg 가능.
 
 ## 7. 검증
 - **api-server tsc 0** ✅

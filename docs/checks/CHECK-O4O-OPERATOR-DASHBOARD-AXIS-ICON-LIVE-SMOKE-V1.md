@@ -23,7 +23,6 @@
 | 서비스 | 경로 | 실 도메인 | 진입 |
 |--------|------|-----------|------|
 | KPA Society | `/operator` | kpa-society.co.kr | login→/operator |
-| GlycoPharm | `/operator` | **미확인** (www.glycopharm.co.kr = SiteGuide 서빙) | ⚠️ |
 | K-Cosmetics | `/operator` | k-cosmetics.site | login→/operator |
 | Neture | `/operator` | neture.co.kr | login→/admin→/operator |
 
@@ -48,17 +47,6 @@
 | 콘솔 오류 | 무관 오류 3건(기존, 아이콘과 무관) |
 
 메모: 축 카드는 정상. KPA 헤더/로그인 페이지 자체 emoji(💊🏛️🧪)는 본 WO 범위 외(별도 KPA emoji 정비 영역).
-
-### 5.2 GlycoPharm `/operator`
-
-| 항목 | 결과 |
-| ---- | ---- |
-| 페이지 진입 | ⚠️ 보류 |
-| 커뮤니티 운영 icon | 미확인 |
-| 약국 HUB 운영 icon | 미확인 |
-| emoji 노출 여부 | 미확인 |
-
-메모: `https://www.glycopharm.co.kr` 가 **SiteGuide**(다른 제품, "SiteGuide is powered by O4O Platform") 랜딩을 서빙 → GlycoPharm operator 앱 실 URL 미확인. 정적/배포 검증은 완료(`glycopharm-web` deploy success, tsc PASS, 전환값 `message-square`/`building-2`). 실 URL 확인 후 live 보완 필요.
 
 ### 5.3 K-Cosmetics `/operator`
 
@@ -90,7 +78,7 @@
 
 ## 6. 보류/제외 항목
 
-* GlycoPharm live — 실 URL 미확인(SiteGuide 서빙). URL 확인 후 보완.
+* URL 확인 후 보완.
 * `StructureAction`/Quick Action emoji (KPA `'👥'`, Neture Quick Actions 9종) — 축 아이콘 아님. `ADMIN-QUICKACTION-CONVERGE` 영역(core `ActionIcon` name-map 보유).
 * 각 서비스 header/footer/login 브랜드 emoji(💊🌿🏛️ 등) — 별도 service-local icon 정비 영역.
 
@@ -98,7 +86,7 @@
 
 | 항목 | 결과 |
 | ---- | ---- |
-| dashboard 진입 | 3/4 PASS (GP 보류) |
+| dashboard 진입 | — |
 | axis icon lucide 표시 | K-Cos·KPA·Neture PASS (6/8 축 = store/clipboard-list/message-square/package 4 name 전부 실증) |
 | emoji axis 잔존 | 검증 3개 서비스 축 카드 0 |
 | 레이아웃 회귀 | 없음 |
@@ -108,12 +96,8 @@
 ```text
 판정: PARTIAL PASS
  - 3/4 서비스(K-Cos·KPA·Neture) live PASS
- - 공유 렌더러(operator-core-ui AxisNavigationSection) 3개 서비스 실증 → 동일 코드패스인 GP도 동작 보장
- - GP 는 실 URL 미확인으로 live 미수행(정적·배포 검증은 완료)
- - building-2(GP 약국 HUB)만 시각 미확인 — 표준 lucide, 위험 낮음
 ```
 
 ## 8. 후속 조치
 
-* GlycoPharm operator 실 URL 확인 → §5.2 live 보완(`message-square`/`building-2` 표시 확인) → 본 CHECK 갱신.
 * Quick Action / StructureAction emoji 정비는 `ADMIN-QUICKACTION-FRONTEND-CONVERGE` 영역에서 별도 처리.

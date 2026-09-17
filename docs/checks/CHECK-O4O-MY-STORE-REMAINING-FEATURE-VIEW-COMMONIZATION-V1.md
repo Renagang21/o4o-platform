@@ -2,7 +2,7 @@
 
 - **작업일**: 2026-08-19
 - **대상**: 내 매장(My Store) 남은 기능 화면 View 중복 재산출 · 공통 View 채택
-- **범위 서비스**: KPA-Society / K-Cosmetics / GlycoPharm / Pharmacy-Hub
+- **범위 서비스**: KPA-Society / K-Cosmetics / Pharmacy-Hub
 - **선행**: `WO-O4O-MY-STORE-UNIFIED-SCREEN-ARCHITECTURE-AND-ADOPTION-V1` (Shell/Navigation/Home 골격 — 완료)
 
 ---
@@ -24,7 +24,6 @@
 |---|---|
 | KPA-Society | `services/web-kpa-society/src/pages/pharmacy` |
 | K-Cosmetics | `services/web-k-cosmetics/src/pages/store` |
-| GlycoPharm | `services/web-glycopharm/src/pages/store-management`, `.../pages/store` |
 | Pharmacy-Hub | `services/web-pharmacy-hub/src/pages/store-owner` |
 
 전체 표는 **부록 A** (135행, 미조사 0). 표기: `LOC✔` = 공통 core 패키지(`@o4o/store-ui-core` · `shared-space-ui` · `store-asset-policy-core` · `tablet-screen-set-editor` · `tablet-kiosk-core`) 소비, `—` = 해당 서비스에 없음.
@@ -36,31 +35,31 @@
 | # | 공통 자산 | 위치 | 채택 서비스 | 비고 |
 |---|---|---|---|---|
 | 1 | `StorePageShell` / `storePageStyles` | `@o4o/store-ui-core` `components/page/` | KPA(자료함 콘텐츠·자료) + 기존 `StoreLibraryPageShell` 전체 | 자료함 전용 셸을 자료함 밖에서도 쓰도록 일반화. `StoreLibraryPageShell` 은 위임(렌더 무변경) |
-| 2 | `StoreAssetsView` | `@o4o/store-asset-policy-core` | KPA · KCos · GP | 제작물 목록 3벌 복제 제거 |
-| 3 | `StorePlaylistCreateView` | `@o4o/shared-space-ui` | KPA · KCos · GP | 플레이리스트 등록 화면 껍데기 3벌 제거. 저장 endpoint 는 KEEP-LEGACY 유지 |
-| 4 | `signageHelpers` (순수 로직 12함수) | `@o4o/store-ui-core` `signage/` | KPA · GP | 날짜/스케줄/강제표출/KPI 계산 — 두 서비스 본문이 동일했다. 렌더 무변경 |
-| 5 | `SignagePlayerSelectView` (+`headerExtra`·`rowSelection` slot) | `@o4o/store-ui-core` | KPA 신규 채택(기존 KCos·GP) | KPA 고유(활성 스케줄 배너·송출 대상 다중선택)는 slot 주입. KCos/GP 렌더 무변경 |
-| 6 | `ProductMarketingView` (+load-error 계약) | `@o4o/store-ui-core` | KPA 신규 채택(기존 KCos·GP) | 아래 3-1 |
+| 2 | `StoreAssetsView` | `@o4o/store-asset-policy-core` | KPA · KCos · 제작물 목록 2벌 복제 제거 |
+| 3 | `StorePlaylistCreateView` | `@o4o/shared-space-ui` | KPA · KCos · 플레이리스트 등록 화면 껍데기 2벌 제거. 저장 endpoint 는 KEEP-LEGACY 유지 |
+| 4 | `signageHelpers` (순수 로직 12함수) | `@o4o/store-ui-core` `signage/` | KPA · 날짜/스케줄/강제표출/KPI 계산 — 서비스 본문이 동일했다. 렌더 무변경 |
+| 5 | `SignagePlayerSelectView` (+`headerExtra`·`rowSelection` slot) | `@o4o/store-ui-core` | KPA 신규 채택(기존 KCos) | KPA 고유(활성 스케줄 배너·송출 대상 다중선택)는 slot 주입. KCos 렌더 무변경 |
+| 6 | `ProductMarketingView` (+load-error 계약) | `@o4o/store-ui-core` | KPA 신규 채택(기존 KCos) | 아래 3-1 |
 
 ### 3-1. `ProductMarketingView` load-error 계약 상향
 
-공통 View 는 조회·연결해제 실패를 silent catch 로 삼키고 있었다(= 플랫폼 load-error 계약 위반, KCos/GP 소비). KPA 사본만 계약을 지키고 있어 그동안 공통화가 막혀 있었다.
+공통 View 는 조회·연결해제 실패를 silent catch 로 삼키고 있었다(= 플랫폼 load-error 계약 위반, KCos 소비). KPA 사본만 계약을 지키고 있어 그동안 공통화가 막혀 있었다.
 
 - 조치: 실패/빈 상태 분리 · 재조회 실패 시 기존 내용 유지 + 인라인 안내·재시도 · 연결 해제 실패 안내 · 중복 클릭 잠금을 공통 View 로 이관 → KPA 가 채택(607 → 33 LOC).
-- 성공 경로 렌더·문구·동선 변경 없음. KCos/GP 는 실패 경로에서만 동작이 바뀐다(조용한 빈 화면 → 명시적 실패+재시도). 신규 기능이 아니라 기존 계약 미준수 정정이다.
+- 성공 경로 렌더·문구·동선 변경 없음. KCos 는 실패 경로에서만 동작이 바뀐다(조용한 빈 화면 → 명시적 실패+재시도). 신규 기능이 아니라 기존 계약 미준수 정정이다.
 
 ---
 
 ## 4. 판정표 (§4) — 2개 이상 서비스에 존재하는 화면 27종
 
-| 화면 | KPA | KCos | GP | PH | 판정 | 근거 |
+| 화면 | KPA | KCos | PH | 판정 | 근거 |
 |---|---:|---:|---:|---:|---|---|
 | StoreAssetsPage | 24 | 21 | 21 | — | FULLY_COMMON | 이번 WO 채택(#2) |
 | StorePlaylistCreatePage | 52 | 42 | 42 | — | FULLY_COMMON | 이번 WO 채택(#3) |
 | SignagePlayerSelectPage | 89 | 23 | 23 | — | FULLY_COMMON | 이번 WO 채택(#5) |
 | ProductMarketingPage | 33 | 24 | 24 | — | FULLY_COMMON | 이번 WO 채택(#6) |
 | StoreLibraryContentsPage | 195 | 68 | 68 | — | FULLY_COMMON | 공통 StoreLibraryContentsView + KPA 는 StorePageShell |
-| StoreLibraryResourcesPage | 870 | 31 | 44 | — | FULLY_COMMON (KPA superset) | KCos/GP=공통 View. KPA 는 등록·QR·다국어 상위집합이며 헤더는 StorePageShell 채택 |
+| StoreLibraryResourcesPage | 870 | 31 | 44 | — | FULLY_COMMON (KPA superset) | KCos=공통 View. KPA 는 등록·QR·다국어 상위집합이며 헤더는 StorePageShell 채택 |
 | StoreProductDescriptionsPage | 116 | 47 | 47 | — | FULLY_COMMON | 기존 StoreProductDescriptionsView |
 | ProductPopBuilderPage | 36 | 33 | 33 | — | FULLY_COMMON | 기존 공통 View |
 | StoreProductionMaterialsPage | — | 73 | 73 | — | FULLY_COMMON | 기존 공통 View (PH LibraryPage 도 동일 View 소비) |
@@ -72,14 +71,14 @@
 | StoreLocalProductsPage | 533 | 24 | 24 | — | FULLY_COMMON (slot) | 공통 StoreLocalProductsManager + KPA 는 extraColumns/renderFormModal slot |
 | StoreOrdersPage | 306 | 373 | — | — | FULLY_COMMON | 두 서비스 모두 공통 BuyerOrderLedgerView + buyer 상태 계약 소비. 남은 차이는 DataTable 컬럼 정의와 서비스 API 모듈(주입값) |
 | ForeignVisitorSalesSupportPage | 108 | 27 | 27 | — | FULLY_COMMON | 공통 ForeignVisitorSalesSupportPanel |
-| StoreTabletDisplaysPage | 1877 | 43 | 110 | — | KCos/GP FULLY_COMMON · KPA SERVICE_SPECIFIC | KCos/GP=상품 진열 배정. KPA=TOUCH-FIRST 코너·Screen Set 편집(다른 업무 축, @o4o/tablet-screen-set-editor 공유) |
-| StorePopPage | 1085 | 83 | 85 | — | KCos/GP FULLY_COMMON · KPA SERVICE_SPECIFIC | KCos/GP 는 WO-O4O-GP-KCOS-POP-QR-BLOG-AI-ENTRY-REMOVE-V1 로 AI 문구·template 축을 의도적으로 제거했다. 병합하면 KCos/GP 에 제거된 기능이 되살아난다(§13 금지) |
-| StoreChannelsPage | 1521 | 98 | 112 | — | KCos/GP FULLY_COMMON · KPA SERVICE_SPECIFIC | KPA 는 자체 storefront 폐기·네이버/쿠팡 대체 트랙 진행 중. 전환 중 화면을 공통 View 로 고정하면 트랙과 충돌 |
+| StoreTabletDisplaysPage | 1877 | 43 | 110 | — | KCos FULLY_COMMON · KPA SERVICE_SPECIFIC | KCos=상품 진열 배정. KPA=TOUCH-FIRST 코너·Screen Set 편집(다른 업무 축, @o4o/tablet-screen-set-editor 공유) |
+| StorePopPage | 1085 | 83 | 85 | — | KCos FULLY_COMMON · KPA SERVICE_SPECIFIC | KCos 는 WO-O4O-GP-KCOS-POP-QR-BLOG-AI-ENTRY-REMOVE-V1 로 AI 문구·template 축을 의도적으로 제거했다. 병합하면 KCos 에 제거된 기능이 되살아난다(§13 금지) |
+| StoreChannelsPage | 1521 | 98 | 112 | — | KCos FULLY_COMMON · KPA SERVICE_SPECIFIC | KPA 는 자체 storefront 폐기·네이버/쿠팡 대체 트랙 진행 중. 전환 중 화면을 공통 View 로 고정하면 트랙과 충돌 |
 | ProductionMaterialEditorPage | 490 | 56 | 56 | — | SERVICE_SPECIFIC (후속) | 공통 ProductionMaterialEditorShell 은 생성 전용. KPA 의 실제 진입은 `:id/edit`(수정 모드) — shell 확장 필요 → §7 |
 | SignagePlaybackPage | 529 | 38 | 38 | — | SERVICE_SPECIFIC | KPA 는 `_schedule`(활성 스케줄 해석) 재생 모드 + mediaType 미기재 항목도 이미지로 재생. 공통 View 는 mediaType='image' 필수 — 병합 시 매장 TV 가 빈 화면이 될 수 있다 |
-| StoreSignagePage | 2202 | 394 | 986 | — | KPA/KCos SERVICE_SPECIFIC · GP 986=dead | KPA↔GP(StoreSignageMainPage) 정규화 후 동일 1,497행 / 상이 1,517행 — 단일 WO 로 안전 병합 불가(§7). GP `pages/store-management/StoreSignagePage.tsx`(986)은 어느 route 에도 연결되지 않은 잔존 파일 — 은퇴 후보로만 기록(§8) |
-| PharmacyBlogPage | 760 | — | 93 | — | SERVICE_SPECIFIC | KPA=매장 블로그 제작·발행 콘솔, GP=목록 진입. 업무 범위 상이 |
-| PharmacyInfoPage | 687 | — | 76 | — | SERVICE_SPECIFIC | SSOT 상이: KPA=organizations, GP/KCos=users.businessInfo(공통 BusinessProfileSection). SSOT 통합은 데이터 소유권 결정 → §14 중지 |
+| StoreSignagePage | 2202 | 394 | 986 | — | KPA/KCos SERVICE_SPECIFIC 986=dead | — |
+| PharmacyBlogPage | 760 | — | 93 | — | SERVICE_SPECIFIC | KPA=매장 블로그 제작·발행 콘솔=목록 진입. 업무 범위 상이 |
+| PharmacyInfoPage | 687 | — | 76 | — | SERVICE_SPECIFIC | SSOT 상이: KPA=organizations, KCos=users.businessInfo(공통 BusinessProfileSection). SSOT 통합은 데이터 소유권 결정 → §14 중지 |
 | StoreInfoPage | — | 72 | — | 439 | SERVICE_SPECIFIC | KCos=사업자 프로필(account-ui). PH=organizations + organization_service_enrollments + platform_store_slugs 조회·수정(not_connected/ambiguous 상태 포함) |
 | PH 전용 QrPage/PopPage/SignagePage/ContentPage/LibraryResourcesPage | — | — | — | 617/458/420/291/383 | SERVICE_SPECIFIC | §5 참조 |
 
@@ -112,7 +111,7 @@
 
 | mount | 화면 census 상 소비 | 판정 |
 |---|---|---|
-| store-tablet | KPA/KCos/GP/PH 태블릿 화면이 사용 | 유지 |
+| store-tablet | KPA/KCos/PH 태블릿 화면이 사용 | 유지 |
 | store-product-library | 자료함·제작물 화면이 사용 | 유지 |
 | store-library (neutral mount) | 이번 census 의 프론트 화면 호출 0 (각 서비스는 서비스 prefix 경로 사용) | 은퇴 후보로만 기록 |
 | product-ai-recommendation | 프론트 호출 0 | 은퇴 후보로만 기록 |
@@ -122,10 +121,9 @@
 
 ## 7. 후속 WO 후보 (이번에 억지 병합하지 않은 것)
 
-1. KPA StoreSignagePage ↔ GP StoreSignageMainPage 공통 View 추출 — 정규화 후 동일 1,497행 / 상이 1,517행. 순수 로직은 이번에 공통화 완료(#4), 남은 것은 View 본체이며 실데이터 smoke 없이는 안전하지 않다.
+1. 순수 로직은 이번에 공통화 완료(#4), 남은 것은 View 본체이며 실데이터 smoke 없이는 안전하지 않다.
 2. ProductionMaterialEditorShell 수정(edit) 모드 확장 후 KPA ProductionMaterialEditorPage 채택.
 3. KPA SignagePlaybackPage `_schedule` 모드 + mediaType 관대 처리를 공통 SignagePlaybackView 옵션으로 승격.
-4. GP `services/web-glycopharm/src/pages/store-management/StoreSignagePage.tsx`(986행) 은퇴 — 어느 route 에도 연결되어 있지 않다.
 5. PH 화면 골격: store-ui-core View 의 Tailwind 지원 여부 결정 후 재판정.
 
 ---
@@ -138,14 +136,14 @@
 | KPA SignagePlayerSelectPage | 214 | 89 |
 | KPA StoreAssetsPage | 154 | 24 |
 | KCos StoreAssetsPage | 94 | 21 |
-| GP StoreAssetsPage | 93 | 21 |
+ StoreAssetsPage | 93 | 21 |
 | KPA StoreLibraryContentsPage | 252 | 195 |
 | KPA StoreLibraryResourcesPage | 923 | 870 |
 | KPA StorePlaylistCreatePage | 65 | 52 |
 | KCos StorePlaylistCreatePage | 59 | 42 |
-| GP StorePlaylistCreatePage | 59 | 42 |
+ StorePlaylistCreatePage | 59 | 42 |
 | KPA StoreSignagePage | 2,290 | 2,202 |
-| GP StoreSignageMainPage | 1,831 | 1,740 |
+ StoreSignageMainPage | 1,831 | 1,740 |
 | **서비스 합계** | **6,641** | **5,331 (−1,310)** |
 
 신규 공통 자산: StorePageShell 189 · StoreAssetsView 185 · signageHelpers 148 · StorePlaylistCreateView 74 = **596행**.
@@ -160,7 +158,6 @@
 | pnpm run build:packages | PASS |
 | tsc --noEmit — web-kpa-society | PASS |
 | tsc --noEmit — web-k-cosmetics | PASS |
-| tsc --noEmit — web-glycopharm | PASS |
 | tsc --noEmit — web-pharmacy-hub | PASS |
 | vite build — 4서비스 | 전부 BUILD OK |
 | Frontend unit test | 해당 4서비스에 test suite 없음 (미실행) |
@@ -173,7 +170,7 @@
 
 수행: 2026-08-19, 배포 완료(Deploy Web Services / Cloud Run, sha `3e801ec69`) 이후.
 도구: Playwright chromium headless (repo 내장), 계정 = `docs/local/TEST-ACCOUNTS.local.md` 의 매장 계정(자격증명은 이 문서에 적지 않는다).
-호스트: KPA `kpa-society.co.kr` · GP `glycopharm.co.kr` · PH `pharmacyhub.co.kr` · KCos `k-cosmetics-web-...run.app`
+호스트: KPA `kpa-society.co.kr` PH `pharmacyhub.co.kr` · KCos `k-cosmetics-web-...run.app`
 (`k-cosmetics.co.kr` 은 Cafe24 쇼핑몰 도메인이라 앱 진입점이 아니다 — 검증 호스트 주의).
 
 ### 10-1. 배포 반영 확인 (chunk 실측)
@@ -184,7 +181,7 @@
 | 서비스 | chunk | 새 load-error 문구 |
 |---|---|:--:|
 | KPA | ProductMarketingPage-DYKZ-ryY.js (11,197B) | YES |
-| GP | ProductMarketingPage-Brg7M0NE.js (11,161B) | YES |
+| ProductMarketingPage-Brg7M0NE.js (11,161B) | YES |
 | KCos | ProductMarketingPage-DG75DeEt.js (11,195B) | YES |
 
 ### 10-2. 경로별 결과
@@ -200,13 +197,13 @@
 | KCos | /store/content | PASS | PASS | 0 | 0 | |
 | KCos | /store/marketing/signage/playlist/new | PASS | PASS | 0 | 0 | 태그·설명 비노출 config 그대로 |
 | KCos | /store/marketing/signage/player | PASS | PASS | 0 | 0 | |
-| GP | /store/content | PASS | PASS | 0 | 0 | |
-| GP | /store/marketing/signage/playlist/new | PASS | PASS | 0 | 0 | |
-| GP | /store/marketing/signage/player | PASS | PASS | 0 | 0 | |
+| store/content | PASS | PASS | 0 | 0 | |
+| store/marketing/signage/playlist/new | PASS | PASS | 0 | 0 | |
+| store/marketing/signage/player | PASS | PASS | 0 | 0 | |
 | PH | /store-owner (회귀) | PASS | PASS | 0 | 0 | 이번 변경 없음 · 진입 정상 |
 
 white screen 0 · JS exception(pageerror) 0 · editor/preview clipping 0.
-KPA/KCos/GP/PH 4서비스 모두 매장 계정 로그인 성공(로그인 후 각 매장 진입 경로로 정상 리다이렉트).
+KPA/KCos/PH 3서비스 모두 매장 계정 로그인 성공(로그인 후 각 매장 진입 경로로 정상 리다이렉트).
 
 ### 10-3. 실측으로 발견해 이번 WO 안에서 고친 결함 1건
 
@@ -230,7 +227,7 @@ KPA/KCos/GP/PH 4서비스 모두 매장 계정 로그인 성공(로그인 후 �
 |---|---|:--:|:--:|:--:|
 | KPA | /store/library/contents | 0 | **0** (수정 전 20) | 0 |
 | KPA | /store/library/resources · /store/content · signage/playlist/new · signage/player | 0 | 0 | 0 |
-| GP | /store/content · signage/playlist/new | 0 | 0 | 0 |
+| store/content · signage/playlist/new | 0 | 0 | 0 |
 | KCos | /store/content · signage/playlist/new | 0 | 0 | 0 |
 
 M390 표 화면에서 뷰포트 밖으로 나가는 버튼(자료함 4~7개, 매장 자산 2개)은 **전부 가로 스크롤
@@ -243,7 +240,7 @@ M390 표 화면에서 뷰포트 밖으로 나가는 버튼(자료함 4~7개, 매
 
 표기: `LOC✔` = 공통 core 패키지 소비 · `—` = 해당 서비스에 없음.
 
-| 화면 | KPA | KCos | GP | PH |
+| 화면 | KPA | KCos | PH |
 |---|---:|---:|---:|---:|
 | AccountPage | — | — | — | 21 |
 | AddO4oStandardProductModal | 316✔ | — | — | — |

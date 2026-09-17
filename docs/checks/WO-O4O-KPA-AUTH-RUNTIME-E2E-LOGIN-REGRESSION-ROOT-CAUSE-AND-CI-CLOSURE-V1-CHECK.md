@@ -25,7 +25,6 @@
 | 서비스 | login #9 | #10 | #11 | #12 | logout #21 | #22 |
 |---|:--:|:--:|:--:|:--:|:--:|:--:|
 | Neture | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
-| GlycoPharm | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | **KPA-Society** | **✘** | ✓ | ✓ | ✓ | **✘** | **✘** |
 | K-Cosmetics | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 
@@ -66,7 +65,7 @@ sohae2100@gmail.com × kpa-society
 
 | service_key | 최종 생성/변경 |
 |---|---|
-| glycopharm · k-cosmetics · kpa-society · neture (일괄) | ~2026-08-14 |
+| k-cosmetics · kpa-society · neture (일괄) | ~2026-08-14 |
 | **`sohae2100 × kpa-society`** | **2026-08-21 01:26:53** ← 유일하게 이후 |
 | pharmacy-hub (E2E 임시계정) | 2026-08-21 05:xx (E2E 픽스처, 무관) |
 
@@ -103,7 +102,6 @@ CI secret `E2E_ADMIN_PASSWORD` 는 변경 이전 값을 그대로 들고 있어 
 |---|---|---|:--:|:--:|
 | **KPA-Society** | `/admin` | `/admin` 유지 — "🔒 접근 권한이 없습니다" 인라인 표시 | ❌ | **예** |
 | Neture | `/admin` | `/` (로그인 화면) | ❌ | **예** |
-| GlycoPharm | `/operator` | `/` (로그인 화면) | ❌ | **예** |
 | K-Cosmetics | `/operator` | `/login` | ✅ | 아니오 |
 
 → **4개 중 3개에서 #12 는 로그아웃 상태에서도 통과한다.** 실질 판정력이 있는 건 K-Cosmetics 뿐이다.
@@ -230,7 +228,6 @@ CI secret `E2E_ADMIN_PASSWORD` 는 변경 이전 값을 그대로 들고 있어 
 | `kpa-society` | `E2E_KPA_ADMIN_EMAIL` | `E2E_KPA_ADMIN_PASSWORD` |
 | `k-cosmetics` | `E2E_KCOS_ADMIN_EMAIL` | `E2E_KCOS_ADMIN_PASSWORD` |
 | `neture` | `E2E_NETURE_ADMIN_EMAIL` | `E2E_NETURE_ADMIN_PASSWORD` |
-| `glycopharm` | `E2E_GLYCO_ADMIN_EMAIL` | `E2E_GLYCO_ADMIN_PASSWORD` |
 
 기존 `E2E_ADMIN_EMAIL` / `E2E_ADMIN_PASSWORD` 는 8개 등록 후 삭제 대상이다.
 

@@ -160,7 +160,7 @@ V2 는 이 테이블에 새 산출물을 추가할 뿐 기존 행을 수정·삭
 ### 5-5. 단순 참조(주석·패턴 mirror) — 대상 아님
 
 `operator-qr-template.entity.ts` · `store-video.entity.ts` · `operator-video.controller.ts` ·
-`CreateOperatorQrTemplates` · `CreateStoreVideos` · `DropGlycopharmService` · `store-library-feed.controller.ts` ·
+`CreateOperatorQrTemplates` · `CreateStoreVideos` · `store-library-feed.controller.ts`
 `packages/types/src/hub-content.ts` · `packages/store-ui-core/src/config/storeMenuConfig.ts` 등.
 
 ---

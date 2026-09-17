@@ -16,7 +16,7 @@
   ```
   → `store_local_products.price_display` 는 **numeric(12,2)** 컬럼인데, **조사자(Claude)가 직접 API 로 표시용 문자열 `"10,000원"`(쉼표·원 포함)을 전송**해서 Postgres 숫자 변환이 실패한 것. **운영 버그가 아니라 테스트 payload 문제.**
 - **운영 생성 UI 는 정상**: KPA `StoreLocalProductsPage` 의 가격 입력은 `type="number"`("표시 가격 (원)") 라 숫자만 전송 → numeric 컬럼 정상 저장.
-- **진짜 UX 공백(KPA)**: `/store/commerce/local-products`(자체 상품 생성 페이지) 라우트는 존재하나 **KPA 사이드바 메뉴에 없다**(GP/KCos 는 '자체 상품' 메뉴 보유). 또 타블렛의 '매장 자체 제품' 탭과 '내 매장 제품 관리 →' 링크는 모두 **listings(/store/my-products)** 로만 연결되어, **자체 제품을 만들 동선이 KPA UI 에 없다**. 이 때문에 타블렛 테스트 데이터를 만들기 어려웠다.
+- **진짜 UX 공백(KPA)**: `/store/commerce/local-products`(자체 상품 생성 페이지) 라우트는 존재하나 **KPA 사이드바 메뉴에 없다**(KCos 는 '자체 상품' 메뉴 보유). 또 타블렛의 '매장 자체 제품' 탭과 '내 매장 제품 관리 →' 링크는 모두 **listings(/store/my-products)** 로만 연결되어, **자체 제품을 만들 동선이 KPA UI 에 없다**. 이 때문에 타블렛 테스트 데이터를 만들기 어려웠다.
 - **부차적 견고성 갭(공유)**: 백엔드가 `priceDisplay` 문자열을 numeric 컬럼에 그대로 전달 → 비숫자 입력 시 400 이 아니라 **500**. 정제/검증 권장(낮은 우선순위).
 
 ---
@@ -94,10 +94,10 @@
 ## 10. 후속 WO 제안
 
 1. **WO-O4O-KPA-STORE-LOCAL-PRODUCT-MENU-ACCESS-V1 (후보 C 변형, 권장 1순위)**
-   - KPA 에서 자체 제품 생성 동선 확보: '자체 상품'을 **타블렛 그룹 또는 내 매장 제품 영역에 메뉴/링크 추가**(라우트 `/store/commerce/local-products` 재사용, GP/KCos 와 동일 패턴). 데드링크 0.
+   - KPA 에서 자체 제품 생성 동선 확보: '자체 상품'을 **타블렛 그룹 또는 내 매장 제품 영역에 메뉴/링크 추가**(라우트 `/store/commerce/local-products` 재사용, KCos 와 동일 패턴). 데드링크 0.
    - 이걸로 타블렛 테스트 데이터 동선 + 자동 넘김/미리보기 smoke 가 풀림.
 2. **WO-O4O-KPA-STORE-LOCAL-PRODUCT-PRICE-INPUT-HARDENING-V1 (후보 B, 선택)**
-   - 백엔드: `priceDisplay` 숫자 검증/정제(쉼표·통화기호 strip 또는 비숫자 400). 공유 API 라 GP/KCos 영향 검토.
+   - 백엔드: `priceDisplay` 숫자 검증/정제(쉼표·통화기호 strip 또는 비숫자 400). 공유 API 라 KCos 영향 검토.
    - 또는 컬럼 의미 정합(`price_display` numeric ↔ 이름) 재검토.
 
 > 후보 A(프론트 payload fix)는 불필요 — 운영 프론트는 이미 정상(number input).
@@ -118,5 +118,5 @@
 | 엔티티 | `apps/api-server/src/routes/platform/entities/store-local-product.entity.ts` (price_display numeric:45) |
 | KPA 생성 페이지 | `services/web-kpa-society/src/pages/pharmacy/StoreLocalProductsPage.tsx` (가격 number input:627) / 라우트 `App.tsx:1003` |
 | 공유 매니저 | `packages/store-ui-core/src/components/local-products/StoreLocalProductsManager.tsx` |
-| 메뉴(자체 상품: GP/KCos 만) | `packages/store-ui-core/src/config/storeMenuConfig.ts:119,197` (KPA 블록 없음) |
+| 메뉴(자체 상품: KCos 만) | `packages/store-ui-core/src/config/storeMenuConfig.ts:119,197` (KPA 블록 없음) |
 | Cloud Run 로그 | `[StoreLocalProduct] POST /local-products error: QueryFailedError: invalid input syntax for type numeric` (2026-06-26 02:45 KST) |

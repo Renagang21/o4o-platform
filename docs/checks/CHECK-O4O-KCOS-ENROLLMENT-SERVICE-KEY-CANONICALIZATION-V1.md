@@ -57,7 +57,6 @@ enrollment.service_code 를 OPL 로 그대로 복사하는 auto-listing 은 lega
 | `kpa-society` | 7 |
 | `pharmacy-hub` | 6 |
 | `neture` | 3 |
-| `glycopharm` | 2 |
 | `k-cosmetics` | 2 |
 | **`cosmetics`** | **1** |
 
@@ -93,10 +92,10 @@ organization-service centralization 이전의 매장 생성 경로가 남긴 행
 | 8 | `utils/auto-listing.utils.ts` (PUBLIC 자동확산) | enrollment.service_code 를 **그대로 복사** | **LEGACY_WRONG → 수정** |
 | 9 | `routes/kpa/helpers/event-offer-organization.helper.ts` | `SERVICE_KEYS.COSMETICS` 단일 | **LEGACY_WRONG → 수정** |
 | 10 | `modules/neture/services/seller.service.ts#resolveServiceKey` | `LIMIT 1` (ORDER BY 없음) | **LEGACY_WRONG(비결정) → 수정** |
-| 11 | `routes/glycopharm/**` (pharmacy-context · repository · report · operator-dashboard) | `'glycopharm'` 고정 | SERVICE_SPECIFIC |
+| 11 | repository · report · operator-dashboard) | — | SERVICE_SPECIFIC |
 | 12 | `routes/pharmacy-hub/**` · `services/pharmacy-hub/PharmacyHubStoreProvisioningService` | `'pharmacy-hub'` 고정 | SERVICE_SPECIFIC |
 | 13 | `routes/kpa/services/operator-dashboard.service.ts` | `'kpa-society'` 고정 | SERVICE_SPECIFIC |
-| 14 | `modules/platform/platform-hub.controller.ts` · `routes/platform/physical-store.service.ts` · `store-network.service.ts` | `'glycopharm'` 고정 | SERVICE_SPECIFIC |
+| 14 | `modules/platform/platform-hub.controller.ts` · `routes/platform/physical-store.service.ts` · `store-network.service.ts` | — | SERVICE_SPECIFIC |
 | 15 | `modules/neture/controllers/operator-dashboard.controller.ts` | `'neture'` 고정 | SERVICE_SPECIFIC |
 | 16 | login / service membership guard | enrollment 미참조 (`service_memberships` 축) | 해당 없음 |
 
@@ -112,7 +111,6 @@ organization-service centralization 이전의 매장 생성 경로가 남긴 행
 | `routes/cosmetics/services/cosmetics-store.service.ts` `createStoreWithOrg` | `'k-cosmetics'` | CANONICAL |
 | 〃 `linkOwnerToStore` | `'k-cosmetics'` | CANONICAL |
 | `routes/kpa/services/kpa-store-organization.provisioning.ts` · `routes/kpa/controllers/organization.controller.ts` | `KPA_CANONICAL_SERVICE_CODE` | CANONICAL |
-| `routes/glycopharm/**` (admin 승인 · store-applications ×2 · member.service) | `'glycopharm'` | CANONICAL |
 | `services/pharmacy-hub/PharmacyHubStoreProvisioningService` | `SERVICE_KEY` 상수 | CANONICAL |
 | `modules/neture/services/supplier.service.ts` | `'neture'` | CANONICAL |
 | migration `20260930000000-BackfillCosmeticsServiceEnrollments` | `'k-cosmetics'` | CANONICAL |
@@ -192,7 +190,7 @@ role key·membership·RBAC·schema·API contract·frontend 무변경.
 
 회귀 케이스: canonical 판정 / 별칭 집합 SSOT 파생 / resolver enrollmentCodes 계약 /
 KCos provisioning write = canonical / 런타임 legacy write 0 /
-Event Offer operator·supplier 해석이 canonical 포함 집합 질의 / GlycoPharm 오인 금지 /
+Event Offer operator·supplier 해석이 canonical 포함 집합 질의 오인 금지
 dual-key 조직에서 canonical 결정적 선택 / PUBLIC 자동확산의 legacy key 확산 차단.
 
 ---
@@ -240,7 +238,6 @@ dual-key 조직에서 canonical 결정적 선택 / PUBLIC 자동확산의 legacy
 | 서비스 | 결과 |
 |---|---|
 | KPA (`kpa-society`) | `/kpa/store-hub/overview` 200 (테스트 약국) · `/store/handled-products` 200 |
-| GlycoPharm | `/glycopharm/store-hub/overview` 200 (E2E 검증 약국) |
 | Pharmacy-Hub | `/pharmacy-hub/store-owner/{dashboard,info,handled-products}` 200 (`status='not_connected'` — 해당 계정의 기존 데이터 상태이며 본 WO 와 무관) |
 
 회귀 0건. production write 0.

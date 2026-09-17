@@ -2,8 +2,8 @@
 
 > **유형:** Read-only Investigation Report — 코드/DB/API/UI 변경 0.
 > **작성일:** 2026-06-18
-> **선행:** IR-O4O-CROSSSERVICE-BUSINESS-CONTACT-FIELDS-AUDIT-V1 · WO-O4O-CROSSSERVICE-BUSINESS-CONTACT-FIELDS-BACKEND-SUPPORT-V1 · WO-O4O-GLYCOPHARM-… · WO-O4O-KCOSMETICS-BUSINESS-CONTACT-FIELDS-UI-EXTEND-V1
-> **결론(요약):** **KPA 는 GP/KCos 와 구조가 다르다.** (1) `pharmacyPhone`(약국 전화)이 **이미 사업장 전화 = businessPhone 의미** → **businessPhone 신규 UI 추가 금지(드리프트)**. (2) `ownerPhone`·`users.phone` 은 개인 연락처 → businessPhone 과 분리 유지. (3) `businessEmail`/`contactEmail` 은 대응 필드 부재 → 신규 가능하나 KPA pharmacy-info 저장 경로가 **`organizations` 테이블 + `org.metadata`** (GP/KCos 의 `users.businessInfo` 와 다름) → **frontend-only 불가, backend pharmacy-info 컨트롤러 확장 필요**. → 권고 = **축소 WO**(businessPhone 제외, businessEmail/contactEmail 만, backend 포함).
+> **선행:** IR-O4O-CROSSSERVICE-BUSINESS-CONTACT-FIELDS-AUDIT-V1 · WO-O4O-CROSSSERVICE-BUSINESS-CONTACT-FIELDS-BACKEND-SUPPORT-V1 · … · WO-O4O-KCOSMETICS-BUSINESS-CONTACT-FIELDS-UI-EXTEND-V1
+> **결론(요약):** **KPA 는 KCos 와 구조가 다르다.** (1) `pharmacyPhone`(약국 전화)이 **이미 사업장 전화 = businessPhone 의미** → **businessPhone 신규 UI 추가 금지(드리프트)**. (2) `ownerPhone`·`users.phone` 은 개인 연락처 → businessPhone 과 분리 유지. (3) `businessEmail`/`contactEmail` 은 대응 필드 부재 → 신규 가능하나 KPA pharmacy-info 저장 경로가 **`organizations` 테이블 + `org.metadata`** (KCos 의 `users.businessInfo` 와 다름) → **frontend-only 불가, backend pharmacy-info 컨트롤러 확장 필요**. → 권고 = **축소 WO**(businessPhone 제외, businessEmail/contactEmail 만, backend 포함).
 
 ---
 
@@ -49,11 +49,10 @@
 
 ---
 
-## 3. 저장 경로 — GP/KCos 와의 결정적 차이
+## 3. 저장 경로 — KCos 와의 결정적 차이
 
 | 서비스 | 정보수정 컨트롤러 | 연락처 저장 위치 |
 |--------|------------------|-----------------|
-| GlycoPharm | `/glycopharm/mypage/business-info` | **`users.businessInfo`** (white-list 에 businessEmail/contactEmail 기수용) |
 | K-Cosmetics | `/cosmetics/mypage/business-info` | **`users.businessInfo`** (동일) |
 | **KPA** | **`/pharmacy/info`** | **`organizations` 테이블 + `org.metadata`** (taxInvoiceEmail/ownerPhone/ceoName/contactName/managerPhone 전부 `org.metadata`). **P2/P4 만 `users.businessInfo`** |
 
@@ -61,7 +60,7 @@
 - KPA pharmacy-info `PUT` 은 연락처를 `org.metadata` 로 merge. **businessEmail/contactEmail white-list 부재** → 보내도 silently drop.
 - 공통 `/auth/register` DTO 는 businessEmail/contactEmail 을 수용(users.businessInfo 저장)하나, **KPA RegisterModal 은 이 2종을 payload 에 보내지 않으며**, 보내더라도 pharmacy-info GET 이 organizations 기준이라 **store owner 화면에 surfacing 안 됨**.
 
-→ **결론: KPA 에 businessEmail/contactEmail 을 붙이려면 GP/KCos 처럼 frontend-only 로 끝나지 않는다.** pharmacy-info 컨트롤러(GET projection + PUT white-list + org.metadata merge) + API 클라이언트 타입 + UI 2파일 변경이 필요하다. (DB migration 은 불요 — org.metadata JSONB.)
+→ **결론: KPA 에 businessEmail/contactEmail 을 붙이려면 KCos 처럼 frontend-only 로 끝나지 않는다.** pharmacy-info 컨트롤러(GET projection + PUT white-list + org.metadata merge) + API 클라이언트 타입 + UI 2파일 변경이 필요하다. (DB migration 은 불요 — org.metadata JSONB.)
 
 ---
 
@@ -98,7 +97,7 @@
 **판정 요약:**
 - `pharmacyPhone = 사업장 전화 = businessPhone` 확정 → **businessPhone UI 신규 추가하지 않는다.**
 - `ownerPhone` / `users.phone` 은 개인 연락처 → **분리 유지.**
-- `businessEmail` / `contactEmail` 은 대응 필드 부재 → **신규 추가 후보**(축소 WO), 단 **backend(org.metadata) 변경 필요** — GP/KCos 의 frontend-only 패턴과 다름.
+- `businessEmail` / `contactEmail` 은 대응 필드 부재 → **신규 추가 후보**(축소 WO), 단 **backend(org.metadata) 변경 필요** — KCos 의 frontend-only 패턴과 다름.
 
 ---
 

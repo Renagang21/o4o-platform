@@ -35,7 +35,7 @@
 │ SERVICE (Frontend + Service-Specific API)               │
 │                                                         │
 │  Neture      : Homepage CMS (Hero/Ads/Logos)            │
-│  GlycoPharm  : Guidelines + Signage Library + Assets    │
+│  Guidelines + Signage Library + Assets                  │
 │  K-Cosmetics : Signage Only                             │
 │  KPA         : News/Docs + Content Mgmt + Hub Library   │
 └─────────────────────────────────────────────────────────┘
@@ -168,14 +168,6 @@ HUB Content (public) → POST /api/v1/dashboard/assets/copy
 - **구현 완료**: dashboard-assets.copy-handlers.ts
 - **공개 콘텐츠만** 복사 가능
 
-#### D. Signage Library 가져오기 (GlycoPharm 전용)
-
-```
-Signage 콘텐츠 라이브러리 (HQ/Supplier/Community 소스)
-  → POST /api/v1/glycopharm/signage/my-signage
-  → 매장 소유 사이니지 콘텐츠로 복사
-```
-
 ### 3.3 자료실 흐름 관련 구현 여부
 
 | 질문 | 답변 |
@@ -192,53 +184,39 @@ Signage 콘텐츠 라이브러리 (HQ/Supplier/Community 소스)
 
 ### 4.1 기능 비교
 
-| 기능 | Neture | GlycoPharm | K-Cosmetics | KPA |
-|------|--------|-----------|-------------|-----|
-| **CMS 콘텐츠 관리** | Homepage CMS (Hero/Ads/Logos) | Guidelines (환자용/약사용) | ❌ 없음 | News + Content Mgmt |
-| **자료실 (docs)** | ❌ 없음 | ❌ 없음 | ❌ 없음 | ✅ DocsPage (규정/양식/매뉴얼/자료) |
-| **콘텐츠 라이브러리 (browse)** | ❌ 없음 | ✅ Signage Library | ❌ 없음 | ✅ Hub Content Library |
-| **가져오기 (copy to store)** | ❌ 없음 | ✅ assetSnapshotApi | ❌ 없음 | ✅ assetSnapshotApi |
-| **내 콘텐츠 (store assets)** | ❌ 없음 | ✅ StoreAssetsPage | ❌ 없음 | ✅ (store/content 라우트 존재) |
-| **콘텐츠 수정** | Homepage CMS 직접 편집 | Asset 편집 + 가이드라인 편집 | ❌ | Content Mgmt 편집 + Override |
-| **사이니지** | ✅ Supplier Hub | ✅ HQ/Playlist/Template/Library | ✅ HQ/Playlist/Template | ✅ HQ/Playlist/Template |
-| **API 패턴** | 자체 CMS API | 자체 가이드라인 API + 공통 Signage | 공통 Signage만 | KPA news API + 공통 CMS/Hub |
+| 기능 | Neture | K-Cosmetics | KPA |
+| ------ | -------- | ------------- | ----- |
+| **CMS 콘텐츠 관리** | Homepage CMS (Hero/Ads/Logos) | ❌ 없음 | News + Content Mgmt |
+| **자료실 (docs)** | ❌ 없음 | ❌ 없음 | ✅ DocsPage (규정/양식/매뉴얼/자료) |
+| **콘텐츠 라이브러리 (browse)** | ❌ 없음 | ❌ 없음 | ✅ Hub Content Library |
+| **가져오기 (copy to store)** | ❌ 없음 | ❌ 없음 | ✅ assetSnapshotApi |
+| **내 콘텐츠 (store assets)** | ❌ 없음 | ❌ 없음 | ✅ (store/content 라우트 존재) |
+| **콘텐츠 수정** | Homepage CMS 직접 편집 | ❌ | Content Mgmt 편집 + Override |
+| **사이니지** | ✅ Supplier Hub | ✅ HQ/Playlist/Template | ✅ HQ/Playlist/Template |
+| **API 패턴** | 자체 CMS API | 공통 Signage만 | KPA news API + 공통 CMS/Hub |
 
 ### 4.2 메뉴 위치
 
 | 서비스 | Content 메뉴 항목 | 위치 |
 |--------|-------------------|------|
 | Neture | 홈페이지 CMS | content 그룹 |
-| GlycoPharm | 가이드라인 관리 + 콘텐츠 라이브러리 | content + signage 그룹 |
 | K-Cosmetics | (없음) | — |
 | KPA | 공지사항 + 자료실 + 콘텐츠 관리 | content 그룹 |
 
 ### 4.3 서비스별 용어 차이
 
-| 개념 | Neture | GlycoPharm | KPA |
-|------|--------|-----------|-----|
-| 콘텐츠 원본 | Hero Slides, Ads, Logos | Guidelines, Signage | 공지사항, 뉴스, 자료 |
-| 라이브러리 | — | 콘텐츠 라이브러리 | Hub 콘텐츠 라이브러리 |
-| 가져오기 | — | 내 등록 추가 | 내 매장에 복사 |
-| 내 콘텐츠 | — | 매장 자산 | 매장 콘텐츠 |
+| 개념 | Neture | KPA |
+| ------ | -------- | ----- |
+| 콘텐츠 원본 | Hero Slides, Ads, Logos | 공지사항, 뉴스, 자료 |
+| 라이브러리 | — | Hub 콘텐츠 라이브러리 |
+| 가져오기 | — | 내 매장에 복사 |
+| 내 콘텐츠 | — | 매장 콘텐츠 |
 
 ---
 
 ## 5. 실제 흐름 조사 (Flow Analysis)
 
 ### 5.1 완전한 흐름이 이어지는 서비스
-
-#### GlycoPharm — Signage Library Flow ✅
-
-```
-1. 운영자가 콘텐츠 등록 (HQ/Supplier/Community)
-2. 약국이 /store/signage/library 에서 콘텐츠 목록 조회
-3. 소스 필터링 (본부/공급자/내 등록/광고)
-4. "가져오기" 클릭 → POST /api/v1/glycopharm/signage/my-signage
-5. /store/assets 에서 가져온 콘텐츠 확인 (draft 상태)
-6. publish/edit 가능
-```
-
-**판정: 흐름이 처음부터 끝까지 이어진다.**
 
 #### KPA — Hub Content Copy Flow ✅
 
@@ -304,9 +282,8 @@ Signage 콘텐츠 라이브러리 (HQ/Supplier/Community 소스)
 | AssetSnapshot Copy (불변 스냅샷) | ✅ Core 패키지 + KPA/Neture Resolver |
 | KPA Store Content Override | ✅ Backend + Frontend 연결 |
 | HUB 통합 조회 (3축 모델) | ✅ Backend API (공개) |
-| ContentQueryService (공통 쿼리) | ✅ KPA/Neture/GlycoPharm 연결 |
+| ContentQueryService (공통 쿼리) | ✅ KPA/Neture 연결 |
 | Template → StoreContent Copy | ✅ interactive-content-core 패키지 |
-| GlycoPharm Signage Library | ✅ 라이브러리→가져오기→매장 자산 |
 | KPA Hub Content Library | ✅ 라이브러리→복사→매장 콘텐츠 |
 | 추천/조회수 (cms_content_recommendations) | ✅ toggle API + graceful fallback |
 
@@ -325,10 +302,10 @@ Signage 콘텐츠 라이브러리 (HQ/Supplier/Community 소스)
 
 | 항목 | 편차 내용 |
 |------|----------|
-| CMS 콘텐츠 유형 | Neture: Hero/Ads/Logos, GlycoPharm: Guidelines, KPA: News/Notice, K-Cosmetics: 없음 |
-| 라이브러리 명칭 | GlycoPharm: 콘텐츠 라이브러리, KPA: Hub 콘텐츠 라이브러리, Neture/K-Cosmetics: 없음 |
-| 콘텐츠 관리 UI | Neture: 3탭 CMS, GlycoPharm: 2탭 가이드라인, KPA: 2탭 Content + 별도 News/Docs |
-| API 패턴 | Neture: 자체 CMS API, KPA: KPA news API, GlycoPharm: 자체 가이드라인 API |
+| CMS 콘텐츠 유형 | Neture: Hero/Ads/Logos: Guidelines, KPA: News/Notice, K-Cosmetics: 없음 |
+| 라이브러리 명칭 | — |
+| 콘텐츠 관리 UI | Neture: 3탭 CMS: 2탭 가이드라인, KPA: 2탭 Content + 별도 News/Docs |
+| API 패턴 | Neture: 자체 CMS API, KPA: KPA news API: 자체 가이드라인 API |
 | 메뉴 구성 | 4개 서비스 모두 다름 (content 그룹 항목 불일치) |
 
 ### D. 아직 개념 자체가 불명확한 것
@@ -351,7 +328,6 @@ Signage 콘텐츠 라이브러리 (HQ/Supplier/Community 소스)
 Core         ████████████████████ 90%  ← 구조/API/정책 완비, 슬롯 UI만 미구현
 Extension    ██████████████░░░░░░ 70%  ← 복사 메커니즘 4종 완비, 일부 서비스 미연결
 KPA          ████████████████░░░░ 80%  ← 가장 완성도 높음 (CMS+Docs+Hub+Copy+Store)
-GlycoPharm   ████████████░░░░░░░░ 60%  ← 사이니지 라이브러리 우수, CMS는 가이드라인만
 Neture       ████████░░░░░░░░░░░░ 40%  ← Homepage CMS만, 라이브러리/가져오기 없음
 K-Cosmetics  ████░░░░░░░░░░░░░░░░ 20%  ← 사이니지만, 콘텐츠 관리 전무
 ```
@@ -424,7 +400,6 @@ K-Cosmetics  ████░░░░░░░░░░░░░░░░ 20%  �
 | 서비스 | 콘텐츠 관리 | 라이브러리 |
 |--------|------------|----------|
 | Neture | `services/web-neture/src/pages/operator/HomepageCmsPage.tsx` | — |
-| GlycoPharm | `services/web-glycopharm/src/pages/operator/GuidelineManagementPage.tsx` | `services/web-glycopharm/src/pages/pharmacy/signage/ContentLibraryPage.tsx` |
 | K-Cosmetics | — | — |
 | KPA | `services/web-kpa-society/src/pages/operator/ContentManagementPage.tsx` | `services/web-kpa-society/src/pages/hub/HubContentLibraryPage.tsx` |
 | KPA (자료실) | `services/web-kpa-society/src/pages/admin-branch/DocsPage.tsx` | — |

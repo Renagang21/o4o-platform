@@ -8,7 +8,7 @@
 ---
 
 ## 1. 목적
-KPA-society 기준으로 내 매장 상품 영역의 기준 모델(매장 취급 상품 / 기본 O4O 주문 가능 상품 / 신청·승인 현황 / 이벤트형 O4O 주문 가능 상품 / 주문 내역)을 확정하고, GP/KCos 확장 baseline 을 만든다. 본 작업은 KPA-only·최소 수정, 3서비스 영향 항목은 후속 분리.
+KPA-society 기준으로 내 매장 상품 영역의 기준 모델(매장 취급 상품 / 기본 O4O 주문 가능 상품 / 신청·승인 현황 / 이벤트형 O4O 주문 가능 상품 / 주문 내역)을 확정하고, KCos 확장 baseline 을 만든다. 본 작업은 KPA-only·최소 수정, 2서비스 영향 항목은 후속 분리.
 
 ## 2. 선행 IR/WO 기준
 - `IR-O4O-KPA-SUPPLIER-PRODUCT-EXPOSURE-ORDER-FLOW-AUDIT-V1`: 신청 ≠ 주문 가능(SERVICE/PRIVATE).
@@ -41,7 +41,7 @@ KPA-society 기준으로 내 매장 상품 영역의 기준 모델(매장 취급
 - `StoreProductsManagerPage`(`packages/store-products-ui`)는 **3서비스 공유**. props = `headerSlot`/`containerClassName`/`guideSlot` — **`title`/`subtitle` prop 없음**. 기본 heading "내 매장 상품"은 내부 하드코딩(L676).
 - KPA App.tsx 는 `<StoreProductsManagerPage />` 를 **prop 없이** 렌더(L928).
 - 데이터: `getMyStoreListings()` = OrganizationProductListing(O4O 주문 가능). ProductApproval(PENDING) 미혼입(승인 후 listing 생성).
-- **결론 = B**: 공유 기본 heading 변경은 GP/KCos 영향 → **KPA-only 변경 불가**. headerSlot 주입은 헤더 JSX 복제(과한 변경) → 본 baseline 범위 외. **Phase 5 canonical 후속(§8)으로 분리.**
+- **결론 = B**: 공유 기본 heading 변경은 KCos 영향 → **KPA-only 변경 불가**. headerSlot 주입은 헤더 JSX 복제(과한 변경) → 본 baseline 범위 외. **Phase 5 canonical 후속(§8)으로 분리.**
 
 ## 6. Phase 3 — 이벤트형 O4O 주문 가능 상품 기준 (정정 기준 검증)
 
@@ -96,7 +96,7 @@ KPA-society 기준으로 내 매장 상품 영역의 기준 모델(매장 취급
 - `WO-O4O-STORE-PRODUCTS-MANAGER-HEADING-PROP-ALIGNMENT-V1`(공유 heading title prop)
 - `WO-O4O-MY-STORE-CANONICAL-MENU-LABEL-ALIGNMENT-3SERVICES-V1`(canonical 메뉴)
 - `IR-O4O-SELLER-RECRUITMENT-TO-SUPPLY-APPROVAL-FLOW-V1` / `IR-O4O-DISTRIBUTION-FUNDING-VS-MARKET-TRIAL-DEFINITION-V1`
-- 이후 GP/KCos 확장: 본 baseline 모델 적용(service-neutral entity 기반 — 적용 가능성 높음).
+- 이후 KCos 확장: 본 baseline 모델 적용(service-neutral entity 기반 — 적용 가능성 높음).
 
 ---
 

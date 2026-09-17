@@ -25,7 +25,6 @@
 |------|------|
 | 태블릿 콘텐츠 소스 | `routes/platform/store-public/store-public-tablet-content-source.ts:66-83` |
 | 매장 공개 조회 | `store-public-utils.ts:221-230`, `:515-524` |
-| GlycoPharm 매장 | `routes/glycopharm/controllers/store.controller.ts:161-170` |
 | QR 랜딩 언어 목록·본문 | `modules/neture/services/product-landing.service.ts:248-253`, `:267-275` |
 
 `hidden` 의 정의는 "관리자 숨김 또는 노출 중단" (`SharedProductDescription.entity.ts:67`).

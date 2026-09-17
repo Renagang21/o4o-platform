@@ -25,12 +25,9 @@
 | # | 서비스 | 프론트 경로 | membership gate | My Page 진입 |
 |---|---|---|---|---|
 | 1 | KPA-Society | `services/web-kpa-society` | `src/components/auth/MembershipGate.tsx` | `/mypage` → `MyDashboardPage.tsx` |
-| 2 | GlycoPharm | `services/web-glycopharm` | `src/components/auth/MembershipGate.tsx` | `/mypage` → `MyPageHub.tsx` |
 | 3 | K-Cosmetics | `services/web-k-cosmetics` | `src/components/auth/MembershipGate.tsx` | `/mypage` → `MyPageHub.tsx` |
 | 4 | Neture | `services/web-neture` | `src/components/auth/MembershipGate.tsx` | `/mypage` → `MyPageHub.tsx` |
 | 5 | Pharmacy-Hub | `services/web-pharmacy-hub` | `src/components/MembershipGate.tsx` | `/account` → `MyProfilePage.tsx`, `/join/status` → `JoinStatusPage.tsx` |
-
-GlycoPharm 은 공식 4서비스 밖(MEMORY 기준)이나 본 WO §2 가 5서비스를 명시하므로 포함한다.
 
 ---
 
@@ -38,24 +35,24 @@ GlycoPharm 은 공식 4서비스 밖(MEMORY 기준)이나 본 WO §2 가 5서비
 
 판정 코드: `FC`=FULLY_COMMON · `CO`=CORE_ONLY · `VD`=VIEW_DUPLICATED · `SS`=SERVICE_SPECIFIC · `NI`=NOT_IMPLEMENTED · `OOS`=OUT_OF_SCOPE
 
-| # | 기능 | KPA | Glyco | KCos | Neture | PH | 비고 |
-|---|---|---|---|---|---|---|---|
-| 1 | 서비스 membership 존재 여부 | FC | FC | FC | FC | FC | 판정 SSOT=`getServiceMembershipStatus` (`@o4o/auth-utils`), 표시=`buildMembershipViewModel().membershipExists` |
-| 2 | membership 현재 상태 | FC | FC | FC | FC | FC | `service_memberships.status` 6 enum → 공통 `MembershipStatusBadge` |
-| 3 | 가입 승인 상태(active) | FC | FC | FC | FC | FC | `DEFAULT_MEMBERSHIP_STATUS_CONFIG.active` 단일 표현 |
-| 4 | 거절/반려 상태(rejected) | FC | FC | FC | FC | FC | PH 만 문구 override(반려 사유 확인 동선) |
-| 5 | 활성/비활성(suspended·withdrawn) | FC | FC | FC | FC | FC | 5서비스 동일 표현 |
-| 6 | 역할(role) 표시 | FC | FC | FC | FC | FC | 공통 `resolveRoleLabel` — 사전·우선순위는 서비스 소관 |
-| 7 | 복수 역할 표시 | FC | FC | FC | FC | SS | KPA/Glyco/KCos/Neture=`RoleBadgeGroup`. PH `MyProfilePage` 는 대표 1역할만 노출(기존 UX 유지, §10 과잉공통화 금지) |
-| 8 | 역할별 기능 진입 | SS | SS | SS | SS | SS | dashboard map/entry path 는 서비스 라우팅 자산. 공통화 대상 아님(§13) |
-| 9 | 상태 메타데이터(가입일/승인일) | NI | NI | NI | NI | FC | view model 에 `joinedAt`·`approvedAt` 슬롯 존재. 실제 표시는 PH `/join/status` 만(다른 4서비스는 소비 API 없음 — §21 backend 신설 금지) |
-| 10 | membership 없음(none) 상태 | FC | FC | FC | SS | FC | Neture 는 단일 가입 화면이 없어 가입 CTA 없음(§23 신규 화면 생성 금지) |
-| 11 | pending/rejected 사용자 UX | FC | FC | FC | FC | FC | 공통 `MembershipStatusNotice` 로 5벌 마크업 수렴 |
-| 12 | role/membership 기반 visibility | SS | SS | SS | SS | SS | Guard/Route 계층. §12 상 판정은 서비스 소관, 표시만 공통 |
-| 13 | Home/Navigation 진입 | OOS | OOS | OOS | OOS | OOS | 선행 WO(SHELL-LAYOUT / HOME-HUB COMMONIZATION)에서 이미 공통화 완료 |
-| 14 | empty/loading/error | FC | FC | FC | FC | FC | gate loading 문구 공통화, 오류는 각 화면 기존 계약 유지 |
-| 15 | mobile UX | FC | FC | FC | FC | FC | `MembershipStatusNotice` 가 `flex-wrap`·`max-w` 기반 단일 반응형 마크업 |
-| 16 | 서비스별 membership extension | SS | SS | SS | SS | SS | override(`overrides` prop) + actions 주입으로 흡수. 공통 View 내부 분기 0 |
+| # | 기능 | KPA | KCos | Neture | PH | 비고 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 1 | 서비스 membership 존재 여부 | FC | FC | FC | FC | 판정 SSOT=`getServiceMembershipStatus` (`@o4o/auth-utils`), 표시=`buildMembershipViewModel().membershipExists` |
+| 2 | membership 현재 상태 | FC | FC | FC | FC | `service_memberships.status` 6 enum → 공통 `MembershipStatusBadge` |
+| 3 | 가입 승인 상태(active) | FC | FC | FC | FC | `DEFAULT_MEMBERSHIP_STATUS_CONFIG.active` 단일 표현 |
+| 4 | 거절/반려 상태(rejected) | FC | FC | FC | FC | PH 만 문구 override(반려 사유 확인 동선) |
+| 5 | 활성/비활성(suspended·withdrawn) | FC | FC | FC | FC | 5서비스 동일 표현 |
+| 6 | 역할(role) 표시 | FC | FC | FC | FC | 공통 `resolveRoleLabel` — 사전·우선순위는 서비스 소관 |
+| 7 | 복수 역할 표시 | FC | FC | FC | SS | PH `MyProfilePage` 는 대표 1역할만 노출(기존 UX 유지, §10 과잉공통화 금지) |
+| 8 | 역할별 기능 진입 | SS | SS | SS | SS | dashboard map/entry path 는 서비스 라우팅 자산. 공통화 대상 아님(§13) |
+| 9 | 상태 메타데이터(가입일/승인일) | NI | NI | NI | FC | view model 에 `joinedAt`·`approvedAt` 슬롯 존재. 실제 표시는 PH `/join/status` 만(다른 4서비스는 소비 API 없음 — §21 backend 신설 금지) |
+| 10 | membership 없음(none) 상태 | FC | FC | SS | FC | Neture 는 단일 가입 화면이 없어 가입 CTA 없음(§23 신규 화면 생성 금지) |
+| 11 | pending/rejected 사용자 UX | FC | FC | FC | FC | 공통 `MembershipStatusNotice` 로 5벌 마크업 수렴 |
+| 12 | role/membership 기반 visibility | SS | SS | SS | SS | Guard/Route 계층. §12 상 판정은 서비스 소관, 표시만 공통 |
+| 13 | Home/Navigation 진입 | OOS | OOS | OOS | OOS | 선행 WO(SHELL-LAYOUT / HOME-HUB COMMONIZATION)에서 이미 공통화 완료 |
+| 14 | empty/loading/error | FC | FC | FC | FC | gate loading 문구 공통화, 오류는 각 화면 기존 계약 유지 |
+| 15 | mobile UX | FC | FC | FC | FC | `MembershipStatusNotice` 가 `flex-wrap`·`max-w` 기반 단일 반응형 마크업 |
+| 16 | 서비스별 membership extension | SS | SS | SS | SS | override(`overrides` prop) + actions 주입으로 흡수. 공통 View 내부 분기 0 |
 
 집계: 미조사 **0** · `VIEW_DUPLICATED` **0** · `CORE_ONLY` **0** → §24/§32 기준 충족.
 
@@ -80,12 +77,11 @@ GlycoPharm 은 공식 4서비스 밖(MEMORY 기준)이나 본 WO §2 가 5서비
 
 - `MembershipGate` 5벌이 각자 `STATUS_MESSAGES` 표 + 안내 화면 마크업을 복제. KPA/PH 는 인라인 CSS 객체, KCos 는 lucide 아이콘 + 하드코딩 `bg-pink-600`.
 - 역할 라벨 해석 루프(우선순위 매칭)가 Neture·PH 에 각각 복제, KPA 는 인라인 삼항, KCos 는 `ROLE_LABELS[user.roles[0]]`(배열 순서 의존 결함).
-- GlycoPharm `MyPageHub` 는 상태 축을 `users.status`(AuthContext 기본값 `'approved'`)로 표시 — `service_memberships.status` 와 축 불일치.
 
 **After**
 
 - 상태 표현·안내 화면·역할 라벨 해석이 `@o4o/account-ui` 3개 자산으로 수렴. 서비스 파일에는 서비스명·경로·사전·우선순위만 남음.
-- KCos 배열 순서 결함, GlycoPharm 축 드리프트 교정.
+- KCos 배열 순서 결함 축 드리프트 교정.
 - KPA·Neture·PH My Page 에 서비스 가입 상태 표시 추가(기존 미표시).
 
 ---
@@ -104,7 +100,6 @@ GlycoPharm 은 공식 4서비스 밖(MEMORY 기준)이나 본 WO §2 가 5서비
 **§12 anti-hardcoding 자체 점검 (부기 G)** — 커밋 전 실행:
 
 ```
-grep -nE "serviceKey|kpa|glycopharm|cosmetics|neture|pharmacy|role ===|status ===" \
   packages/account-ui/src/components/MembershipStatusNotice.tsx \
   packages/account-ui/src/components/MembershipStatusBadge.tsx \
   packages/account-ui/src/adapters/membershipNormalizers.ts
@@ -150,7 +145,6 @@ membershipNormalizers.ts:12: *   - 서비스명·serviceKey·역할 문자열을
 | 서비스 | 사전 | 우선순위 | fallback |
 |---|---|---|---|
 | KPA | `KPA_ROLE_LABELS`(admin/officer) | `KPA_ROLE_PRIORITY` | 회원 |
-| GlycoPharm | `roleLabels` (MyPageHub) | `GLYCOPHARM_ROLE_PRIORITY` | `roles[0]` |
 | K-Cosmetics | `ROLE_LABELS` (AuthContext) | `KCOSMETICS_ROLE_PRIORITY` | 사용자 |
 | Neture | `ROLE_LABELS` (config/dashboard) | `NETURE_ROLE_PRIORITY` | 사용자 |
 | Pharmacy-Hub | `ROLE_LABELS` (config/service) | `PHARMACY_HUB_ROLE_PRIORITY` | 회원 |
@@ -162,7 +156,6 @@ membershipNormalizers.ts:12: *   - 서비스명·serviceKey·역할 문자열을
 ## 9. pending / rejected UX
 
 - 공통 `MembershipStatusNotice` 단일 마크업. 제목/문구/아이콘/배지/액션 전부 prop.
-- 액션은 서비스가 주입: KPA `가입 신청하기`(`/member/apply`), Glyco(`/apply`), KCos(`/partners/apply`), PH(`/join/status` 반려 사유 확인), 공통 `홈으로 돌아가기`.
 - rejected 사용자는 차단 문구만 보지 않고 다음 행동(재검토 요청/사유 확인) 경로를 갖는다 (§14).
 
 ---
@@ -170,7 +163,6 @@ membershipNormalizers.ts:12: *   - 서비스명·serviceKey·역할 문자열을
 ## 10. membership 없음(none) UX
 
 - `membershipExists = status !== 'none'`.
-- KPA/Glyco/KCos/PH: 가입 신청 CTA 노출.
 - **Neture: SERVICE_SPECIFIC** — 단일 가입 신청 화면이 존재하지 않는다(공급자/파트너 등 역할별 온보딩 분기). §23 에 따라 이번 WO 에서 신규 가입 화면을 만들지 않고 홈 복귀 액션만 둔다. 후속 후보로 §18 에 기록.
 
 ---
@@ -178,7 +170,7 @@ membershipNormalizers.ts:12: *   - 서비스명·serviceKey·역할 문자열을
 ## 11. role-based entry
 
 - 진입 경로 결정(dashboard map, entry path)은 서비스 라우팅 자산으로 유지(§13). 공통화하지 않았다.
-- dead role entry 확인: KPA `/mypage` · Glyco `/mypage` · KCos `/mypage` · Neture `/mypage` · PH `/account`·`/join/status` 모두 실제 route 존재. 없는 서비스에 메뉴를 새로 만들지 않았다.
+- dead role entry 확인: KPA `/mypage` · KCos `/mypage` · Neture `/mypage` · PH `/account`·`/join/status` 모두 실제 route 존재. 없는 서비스에 메뉴를 새로 만들지 않았다.
 
 ---
 
@@ -195,7 +187,6 @@ membershipNormalizers.ts:12: *   - 서비스명·serviceKey·역할 문자열을
 | 서비스 | 변경 파일 | 판정 |
 |---|---|---|
 | KPA-Society | `components/auth/MembershipGate.tsx`, `pages/mypage/MyDashboardPage.tsx` | ADOPTED |
-| GlycoPharm | `components/auth/MembershipGate.tsx`, `pages/mypage/MyPageHub.tsx` | ADOPTED (+축 교정) |
 | K-Cosmetics | `components/auth/MembershipGate.tsx`, `pages/mypage/MyPageHub.tsx` | ADOPTED (+결함 교정) |
 | Neture | `components/auth/MembershipGate.tsx`, `config/dashboard.ts`, `pages/mypage/MyPageHub.tsx` | ADOPTED |
 | Pharmacy-Hub | `components/MembershipGate.tsx`, `pages/JoinStatusPage.tsx`, `pages/account/MyProfilePage.tsx` | ADOPTED |
@@ -208,15 +199,14 @@ K-Cosmetics 브랜드 색: 하드코딩 `bg-pink-600` 제거 후 공통 `bg-prim
 
 | viewport | 검증 서비스 | 결과 |
 |---|---|---|
-| desktop 1440x900 | KPA / GlycoPharm / K-Cosmetics / Neture / Pharmacy-Hub | PASS |
-| mobile 390x844 | KPA / GlycoPharm / K-Cosmetics / Neture / Pharmacy-Hub | PASS |
+| desktop 1440x900 | KPA / K-Cosmetics / Neture / Pharmacy-Hub | PASS |
+| mobile 390x844 | KPA / K-Cosmetics / Neture / Pharmacy-Hub | PASS |
 
 mobile 은 검증한 전 화면에서 `document.documentElement.scrollWidth === clientWidth` 로 가로 overflow 0 을 확인했다.
 
 | 서비스 | 경로 | mobile scrollWidth / clientWidth | 배지 렌더 |
 |---|---|---|---|
 | KPA-Society | `/mypage` | 375 / 375 | `관리자`(53x24) + `승인됨`(53x24) 한 줄 |
-| GlycoPharm | `/mypage` | 382 / 382 | `운영자` + `승인됨` |
 | K-Cosmetics | `/mypage` | 375 / 375 | `관리자` + `승인됨` |
 | Neture | `/mypage` | 375 / 375 | `관리자` + `승인됨` |
 | Pharmacy-Hub | `/join/status` | 375 / 375 | 상태 배지 47x20 |
@@ -234,7 +224,6 @@ mobile 에서 배지 줄바꿈 깨짐·잘림·네비게이션 소실 없음.
 | # | 서비스 | URL | 확인한 실제 렌더 문자열 | 판정 |
 |---|---|---|---|---|
 | 1 | KPA-Society | `https://kpa-society.co.kr/mypage` | `관리자` · `승인됨` | PASS (아래 결함 교정 후) |
-| 2 | GlycoPharm | `https://glycopharm.co.kr/mypage` | `운영자` · `승인됨` · 역할 `운영자` · 상태 `승인됨` | PASS |
 | 3 | K-Cosmetics | `https://k-cosmetics.site/mypage` | `관리자` · `승인됨` · 역할 `관리자` · 상태 `승인됨` | PASS |
 | 4 | Neture | `https://neture.co.kr/mypage` | `관리자` · `승인됨` | PASS |
 | 5 | Pharmacy-Hub | `https://pharmacyhub.co.kr/join/status` | 가입 상태 배지 (override `신청 전` 계약 포함) | PASS |

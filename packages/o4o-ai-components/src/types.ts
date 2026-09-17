@@ -22,7 +22,7 @@ export interface AiSummaryModalProps {
   contextLabel?: string;
   /** 요약할 데이터 컨텍스트 */
   contextData?: Record<string, unknown>;
-  /** 서비스 ID (예: 'neture', 'glycopharm') */
+  /** 서비스 ID (예: 'neture', 'kpa-society') */
   serviceId?: string;
   /** 액세스 토큰 반환 함수 (제공 시 Authorization 헤더에 추가) */
   getAccessToken?: () => string | null;

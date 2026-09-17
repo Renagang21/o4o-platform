@@ -240,12 +240,10 @@ O4O 플랫폼 전체 코드베이스의 기술부채를 전수 조사한 결과:
 
 | # | File | 패턴 | 분류 |
 |---|------|------|------|
-| H1 | `glycopharm/services/glycopharm-store-data.adapter.ts:41,61,93` | `'glycopharm'` raw SQL | REFACTOR |
-| H2 | `glycopharm/services/glycopharm.service.ts:143,150,157` | `'glycopharm'` 직접 문자열 | REFACTOR |
-| H3 | `glycopharm/services/invoice.service.ts:116` | `'glycopharm'` SQL INSERT | REFACTOR |
-| H4 | `glycopharm/services/report.service.ts:134` | `'glycopharm'` JOIN 조건 | REFACTOR |
-
-**수정 방향**: `SERVICE_KEYS.GLYCOPHARM` 상수 사용으로 변경.
+| H1 | — | — | REFACTOR |
+| H2 | — | — | REFACTOR |
+| H3 | — | — | REFACTOR |
+| H4 | — | — | REFACTOR |
 
 ### 6.2 Role 문자열 직접 비교 (MEDIUM)
 
@@ -365,7 +363,6 @@ O4O 플랫폼 전체 코드베이스의 기술부채를 전수 조사한 결과:
 플랫폼 확장 전 반드시 수행.
 
 ```
-- Service Key 하드코딩: 4개 파일 (glycopharm)
 - Role 문자열 하드코딩: 4개 파일
 - URL 하드코딩: 5개 파일 (CLAUDE.md 위반)
 ```
@@ -465,10 +462,6 @@ services/web-neture/src/components/home/HomeHeroSection_v2.tsx
 ### 하드코딩 수정 대상 (Priority 2)
 
 ```
-apps/api-server/src/routes/glycopharm/services/glycopharm-store-data.adapter.ts
-apps/api-server/src/routes/glycopharm/services/glycopharm.service.ts
-apps/api-server/src/routes/glycopharm/services/invoice.service.ts
-apps/api-server/src/routes/glycopharm/services/report.service.ts
 apps/api-server/src/controllers/templatesController.ts
 apps/api-server/src/controllers/admin/adminOrderController.ts
 apps/api-server/src/controllers/checkout/checkoutController.ts

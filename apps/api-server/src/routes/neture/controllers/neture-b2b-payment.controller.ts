@@ -4,7 +4,7 @@
  * WO-O4O-NETURE-B2B-PAYMENT-FLOW-V1 (P2b)
  *
  * Neture B2B checkout_order(metadata.source='neture_b2b_checkout', paymentStatus='pending')의
- * 결제 흐름. KPA/Glyco/KCos checkout payment controller 와 동일 패턴(PaymentCoreService),
+ * 결제 흐름. KPA/KCos checkout payment controller 와 동일 패턴(PaymentCoreService),
  * sourceService='neture-b2b' 로 분리.
  *
  * - POST /prepare → PaymentCoreService.prepare()  (결제 세션)

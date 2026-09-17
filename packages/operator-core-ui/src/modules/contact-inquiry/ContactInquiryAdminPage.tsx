@@ -1,5 +1,5 @@
 /**
- * ContactInquiryAdminPage — 공통 "문의 관리" Admin UI (GP/KCos)
+ * ContactInquiryAdminPage — 공통 "문의 관리" Admin UI (KCos)
  *
  * WO-O4O-CONTACT-INQUIRY-ADMIN-MANAGEMENT-V1
  *

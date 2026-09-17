@@ -25,7 +25,7 @@
 | 빈 DB replay — 파일명 순서 | **FAIL** — 6번째 `1736400000000-AddEnabledServicesToPharmacy` 부터 · 성공 515 / 실패 129 |
 | 빈 DB replay — 운영 실제 순서(현 저장소 644개만) | **FAIL** — 성공 549 / 실패 95 |
 | 빈 DB replay — 운영 실제 순서 + 삭제 30개 원본 포함(674개, 격리 DB 실험) | **FAIL** — 성공 628 / 실패 46 · `roles` 미생성 → **과거 history chain 을 그대로 재생해도 현 운영 스키마는 재현되지 않는다** |
-| 운영 스키마의 migration 외 기원 (증거) | `users`.`createdAt`/`updatedAt`/`domain`/`phone` · `forum_post`/`forum_comment`/`forum_category` · `roles` · `glycopharm_products.origin_country` — 어떤 migration(현존 644 + 삭제 30)도 생성하지 않음 → synchronize/수동 시대 산물 |
+| 운영 스키마의 migration 외 기원 (증거) | `users`.`createdAt`/`updatedAt`/`domain`/`phone` · `forum_post`/`forum_comment`/`forum_category` · `roles` — 어떤 migration(현존 644 + 삭제 30)도 생성하지 않음 → synchronize/수동 시대 산물 |
 
 **판정 요약** (§13): `HISTORY_CHAIN_RECOVERABLE = NO` · `FULL_FRESH_DATABASE_REPLAY = FAIL`(선행 IR 재확정) · `PROD_PENDING = 0` · `ORDERING_RISK_ON_PROD_INCREMENTAL = LOW`(pending 이 신규 파일뿐이므로) · `ORDERING_RISK_ON_FRESH_DATABASE = BLOCKING` · `BOOTSTRAP_INCREMENTAL_SEPARATION_REQUIRED = YES`.
 
@@ -131,7 +131,7 @@ executePendingMigrations():
 
 ### 5-4. 동점(같은 계산 timestamp) 32 그룹
 
-`Array.prototype.sort` 가 stable 이므로 glob 로드 순(= 파일명 순)이 유지된다. 예: `1737100300000-FixPartnerTestAccountRole` / `1737100300000-SeedNetureData`, `20260228000001-CleanupLegacyRoles` / `20260228000001-DropLegacyRbacColumns`, `20270326000000-CreateBranchEducationCreditLedger` / `20270326000000-DropGlycopharmService`. 서로 다른 파일명의 동점 2쌍은 구간을 넘나든다: `1771200000019-AddSupplierBusinessProfileFields` = `20260417200000-DropMarketTrialServiceApprovals`(class `…1771200000019`), `1771200000020-CreateOperatorActionDismissals` = `20260417300000-CreateMarketTrialForumSyncFailures`(class `…1771200000020`).
+`Array.prototype.sort` 가 stable 이므로 glob 로드 순(= 파일명 순)이 유지된다. 예: `1737100300000-FixPartnerTestAccountRole` / `1737100300000-SeedNetureData`, `20260228000001-CleanupLegacyRoles` / `20260228000001-DropLegacyRbacColumns`, `20270326000000-CreateBranchEducationCreditLedger`. 서로 다른 파일명의 동점 2쌍은 구간을 넘나든다: `1771200000019-AddSupplierBusinessProfileFields` = `20260417200000-DropMarketTrialServiceApprovals`(class `…1771200000019`), `1771200000020-CreateOperatorActionDismissals` = `20260417300000-CreateMarketTrialForumSyncFailures`(class `…1771200000020`).
 
 ### 5-5. 운영 incremental 에 대한 실제 영향
 
@@ -188,8 +188,8 @@ executePendingMigrations():
 | 12 | `SeedCosmeticsData1735470000001` | `1735470000001-SeedCosmeticsData.ts` | A | DML | cosmetics seed INSERT | 데이터 | 없음 |
 | 13 | `CreateYaksaTables1735563600000` | `1735563600000-CreateYaksaTables.ts` | A | DDL | `yaksa_categories` `yaksa_posts` `yaksa_post_logs` | **3개 모두 운영에 존재** | 없음 |
 | 14 | `SeedYaksaData1735563600001` | `1735563600001-SeedYaksaData.ts` | A | DML | yaksa seed | 데이터 | 없음 |
-| 15 | `CreateGlycopharmTables1735564800000` | `1735564800000-CreateGlycopharmTables.ts` | A | DDL | `glycopharm_pharmacies` `glycopharm_products` `glycopharm_product_logs` | 3개 모두 부재 — `20260221100000-…PhaseC`(pharmacies 1차 DROP) → `20260318120000-EnsureGlycopharmPharmaciesTable`(재생성) → `20270326000000-DropGlycopharmService`(최종 DROP) | **14개 migration 이 `glycopharm_pharmacies` 참조** — 파일명 순 replay 의 최초 실패 지점(§9-E2) |
-| 16 | `SeedGlycopharmData1735564800001` | `1735564800001-SeedGlycopharmData.ts` | A | DML | glycopharm seed | 데이터/테이블 부재 | 없음 |
+| 15 | — | — | A | DDL | — | — | — |
+| 16 | — | — | A | DML | — | 데이터/테이블 부재 | 없음 |
 | 17 | `CreateGlucoseViewTables1735566000000` | `1735566000000-CreateGlucoseViewTables.ts` | A | DDL | `glucoseview_vendors` `glucoseview_view_profiles` `glucoseview_connections` | 부재 — `20260600000000-DropGlucoseviewAndCgmTables` 로 DROP | 16개 migration 이 `glucoseview_*` 참조 |
 | 29 | `SeedProductionTestAccounts1737000000000` | `1737000000000-SeedProductionTestAccounts.ts` | D | DML | `users` INSERT(테스트 계정) | 데이터 | 없음 |
 | 32 | `SeedAdditionalTestAccounts1737100200000` | `1737100200000-SeedAdditionalTestAccounts.ts` | D | DML | `users` | 데이터 | 없음 |
@@ -220,7 +220,7 @@ executePendingMigrations():
 | 분류 | 개수 | 대상 | 판정 |
 |---|---:|---|---|
 | **현 소스가 의존하는 테이블의 유일한 생성 출처** | 1 | id 11 `CreateCosmeticsSchema` (cosmetics 핵심 6 테이블) | **필요** — 현 저장소 어디에도 `cosmetics_brands/_lines/_products/_price_policies/_product_logs/_price_logs` 의 CREATE 가 없다. entity 12개·후속 migration 2개가 의존 |
-| 최종 스키마에는 없지만 **chain 재생에는 필요** | 2 | id 15 Glycopharm 3 테이블 · id 17 GlucoseView 3 테이블 | 후속 migration 14·16개가 참조하고 나중에 DROP 됨. "chain 복구" 방향에서만 필요, 최종 스키마 재현에는 불필요 |
+| 최종 스키마에는 없지만 **chain 재생에는 필요** | 2 | id 17 GlucoseView 3 테이블 | 후속 migration 14·16개가 참조하고 나중에 DROP 됨. "chain 복구" 방향에서만 필요, 최종 스키마 재현에는 불필요 |
 | 운영에 **존재하지만 소비처 없음** | 3 | id 9·10·13 yaksa 9 테이블 | 현 소스 entity/migration 참조 0. 운영 스키마 "그대로" 재현에는 필요하나 현행 기능 재현에는 불필요 → 처분은 별도 WO(본 IR 범위 밖) |
 | 이미 DROP 되었거나 no-op | 2 | id 8 CMS V2 4 테이블(20270412 로 DROP) · id 7 `products` 컬럼(테이블 부재) | 불필요 |
 | DML(seed·테스트 계정·데이터 정정) | 22 | 나머지 | 스키마 재현 불필요. 테스트 계정은 `WO-O4O-KPA-TEMP-SEED-BOOTSTRAP-DEPRECATION-V1` 로 폐기가 확정된 축이며, 데이터 재현은 별도 정책 |
@@ -234,7 +234,7 @@ executePendingMigrations():
 | 실험 | 순서 | 대상 | 성공 | 실패 | 최초 실패 | `roles` | public 테이블 수(종료 시) |
 |---|---|---|---:|---:|---|---|---:|
 | **E1** | TypeORM 계산 순(= 실 배포 job) | 644 | 344 | **300** | #1 `20260205033223-RolePrefixMigrationFoundation` — `relation "users" does not exist` | 미생성 | 210 |
-| **E2** | 파일명 순 | 644 | 515 | **129** | #6 `1736400000000-AddEnabledServicesToPharmacy` — `relation "glycopharm_pharmacies" does not exist` | 미생성 | 234 |
+| **E2** | 파일명 순 | 644 | 515 | **129** | — | 미생성 | 234 |
 | **E3** | 운영 실제(id) 순 · 현 저장소 644만 | 644 | 549 | **95** | #7(운영 id 18) 동일 파일 · 동일 오류 | 미생성 | 236 |
 | **E4** | 운영 실제(id) 순 · **삭제 30개 원본(git 이력) 포함 674** | 674 | 628 | **46** | #29 `1737000000000-SeedProductionTestAccounts` — `column "domain" of relation "users" does not exist` | **미생성** | 267 |
 
@@ -249,7 +249,7 @@ executePendingMigrations():
 
 ### 9-2. E2·E3 — 순서를 고쳐도 남는 실패
 
-파일명 순(E2)·운영 순(E3)으로 바꾸면 실패가 129·95 로 줄지만, 첫 실패는 둘 다 **삭제된 `CreateGlycopharmTables` 가 만들던 테이블** 이다. 이후 실패의 상위 원인: `organizations` · `service_memberships` · `roles` · `forum_category` · `glycopharm_pharmacies` · `users`(컬럼) · `store_tablet_*` … 전체는 **부록 D · E**.
+이후 실패의 상위 원인: `organizations` · `service_memberships` · `roles` · `forum_category` · `users`(컬럼) · `store_tablet_*` … 전체는 **부록 D · E**.
 
 ### 9-3. E4 — history chain 을 원본 그대로 재생해도 남는 46 (전수)
 
@@ -260,7 +260,6 @@ executePendingMigrations():
 | `forum_category` 부재 | 7 | 67 68 262 271 337 361 407 |
 | `forum_comment` / `forum_post` 부재 | 4 | 65 324 / 417 435 |
 | `users.phone` 부재(`u.phone`) | 3 | 298 469 551 |
-| `glycopharm_products.origin_country` 부재 | 2 | 348 349 |
 | migration 자체 data guard(ABORT/Validation) | 2 | 287(`SeedNetureOrgEnrollments` — KPA 조직 없음) 471(`FixKpaOrphanRoleCleanup`) |
 | 트랜잭션 abort(선행 문 실패) | 1 | 434(`ForumFullCategoryRemoval`) |
 
@@ -270,7 +269,7 @@ executePendingMigrations():
 
 - `1700000000000-CreateUsersTable` 은 `CREATE TABLE IF NOT EXISTS "users"` 에 **`created_at`/`updated_at`(snake)** 를 정의한다. 운영 `users` 에는 `created_at` 과 **`createdAt`·`updatedAt`·`domain`·`phone`** 이 함께 있다 → 운영 `users` 는 이 migration 이전에 entity synchronize 로 만들어졌고 migration 은 no-op 였다.
 - `forum_post`·`forum_comment` 는 운영에 존재하지만 CREATE 하는 migration 이 현존 644·삭제 30 어디에도 없다(`forum_category` 는 이후 `ForumFullCategoryRemoval` 로 제거).
-- `roles` — 선행 IR 과 동일(생성 migration 없음). `glycopharm_products.origin_country` 도 동일 유형.
+- `roles` — 선행 IR 과 동일(생성 migration 없음).
 - 따라서 **"과거 history 를 복구해서 chain 을 완성한다" 는 방향은 성립하지 않는다.** 복구할 원본이 존재하지 않고, 만들면 그것이 곧 금지된 "누락 migration 추정 복원" 이다.
 
 ---
@@ -384,10 +383,10 @@ executePendingMigrations():
 | 12 | 260207400000 | `20260207400000-SeedKpaSignageContent.ts` | `SeedKpaSignageContent20260207400000` | 92 | 88 | 73 |
 | 13 | 260207500000 | `20260207500000-SeedKpaBannerContent.ts` | `SeedKpaBannerContent20260207500000` | 93 | 89 | 74 |
 | 14 | 260207700000 | `20260207700000-SeedKpaBenefitContent.ts` | `SeedKpaBenefitContent20260207700000` | 94 | 90 | 75 |
-| 15 | 260209000001 | `20260209000001-CreateGlycopharmCustomerRequests.ts` | `CreateGlycopharmCustomerRequests20260209000001` | 96 | 94 | 77 |
-| 16 | 260209000002 | `20260209000002-CreateGlycopharmEvents.ts` | `CreateGlycopharmEvents20260209000002` | 97 | 95 | 78 |
+| 15 | 260209000001 | — | — | 96 | 94 | 77 |
+| 16 | 260209000002 | — | — | 97 | 95 | 78 |
 | 17 | 260210000001 | `20260210000001-AddContentViewCountAndRecommendations.ts` | `AddContentViewCountAndRecommendations20260210000001` | 98 | 96 | 79 |
-| 18 | 260210000002 | `20260210000002-CreateGlycopharmRequestActionLogs.ts` | `CreateGlycopharmRequestActionLogs20260210000002` | 99 | 97 | 80 |
+| 18 | 260210000002 | — | — | 99 | 97 | 80 |
 | 19 | 260212000001 | `20260212000001-CreateCosmeticsStoreTables.ts` | `CreateCosmeticsStoreTables20260212000001` | 106 | 99 | 86 |
 | 20 | 260212000002 | `20260212000002-AddStoreAttributionToEcommerceOrders.ts` | `AddStoreAttributionToEcommerceOrders20260212000002` | 107 | 100 | 87 |
 | 21 | 260212000003 | `20260212000003-CreateCosmeticsStorePlaylistTables.ts` | `CreateCosmeticsStorePlaylistTables20260212000003` | 108 | 102 | 88 |
@@ -431,7 +430,7 @@ executePendingMigrations():
 | 59 | 260222400000 | `20260222400000-AddOrganizationIdToGlucoseViewCustomers.ts` | `AddOrganizationIdToGlucoseViewCustomers20260222400000` | 150 | 144 | 128 |
 | 60 | 260222500000 | `20260222500000-AddPharmacyIdToCareCoachingSessions.ts` | `AddPharmacyIdToCareCoachingSessions20260222500000` | 151 | 145 | 129 |
 | 61 | 260222600000 | `20260222600000-CreateStorePlaylistTables.ts` | `CreateStorePlaylistTables20260222600000` | 152 | 146 | 130 |
-| 62 | 260222900000 | `20260222900000-GlycopharmOrgEnrollmentRepair.ts` | `GlycopharmOrgEnrollmentRepair20260222900000` | 156 | 149 | 134 |
+| 62 | 260222900000 | — | — | 156 | 149 | 134 |
 | 63 | 260224200000 | `20260224200000-CreateStoreLocalProductTables.ts` | `CreateStoreLocalProductTables20260224200000` | 161 | 154 | 139 |
 | 64 | 260224300000 | `20260224300000-HardenStoreLocalProductDomain.ts` | `HardenStoreLocalProductDomain20260224300000` | 162 | 155 | 140 |
 | 65 | 260224400000 | `20260224400000-AddStoreLocalProductContentFields.ts` | `AddStoreLocalProductContentFields20260224400000` | 163 | 156 | 141 |
@@ -471,7 +470,7 @@ executePendingMigrations():
 | 99 | 260304210000 | `20260304210000-BackfillKpaStoreOwners.ts` | `BackfillKpaStoreOwners20260304210000` | 203 | 200 | 181 |
 | 100 | 260305100000 | `20260305100000-AllowNullableKpaMembersOrganizationId.ts` | `AllowNullableKpaMembersOrganizationId20260305100000` | 207 | 201 | 185 |
 | 101 | 260306120000 | `20260306120000-CreateHealthReadings.ts` | `CreateHealthReadings20260306120000` | 208 | 202 | 186 |
-| 102 | 260307000001 | `20260307000001-AddRequestedSlugToGlycopharmApplications.ts` | `AddRequestedSlugToGlycopharmApplications20260307000001` | 211 | 203 | 189 |
+| 102 | 260307000001 | — | — | 211 | 203 | 189 |
 | 103 | 260307100000 | `20260307100000-CreateCatalogImportTables.ts` | `CreateCatalogImportTables20260307100000` | 209 | 204 | 187 |
 | 104 | 260307200000 | `20260307200000-CategoryBrandProductMasterExtension.ts` | `CategoryBrandProductMasterExtension20260307200000` | 212 | 205 | 190 |
 | 105 | 260307210000 | `20260307210000-CreateProductImages.ts` | `CreateProductImages20260307210000` | 213 | 206 | 191 |
@@ -506,15 +505,15 @@ executePendingMigrations():
 | 134 | 260315120000 | `20260315120000-CreatePatientAiInsights.ts` | `CreatePatientAiInsights20260315120000` | 250 | 240 | 228 |
 | 135 | 260316100000 | `20260316100000-DropUserServiceEnrollments.ts` | `DropUserServiceEnrollments20260316100000` | 251 | 241 | 229 |
 | 136 | 260317100000 | `20260317100000-NormalizeUserStatusCase.ts` | `NormalizeUserStatusCase20260317100000` | 253 | 243 | 231 |
-| 137 | 260317110000 | `20260317110000-ActivateGlycopharmTestAccounts.ts` | `ActivateGlycopharmTestAccounts20260317110000` | 254 | 244 | 232 |
+| 137 | 260317110000 | — | — | 254 | 244 | 232 |
 | 138 | 260318100000 | `20260318100000-BackfillServiceMembershipsFromRoles.ts` | `BackfillServiceMembershipsFromRoles20260318100000` | 255 | 245 | 233 |
 | 139 | 260318100000 | `20260318100000-ExtendRolesTable.ts` | `ExtendRolesTable20260318100000` | 259 | 246 | 237 |
 | 140 | 260318110000 | `20260318110000-RenamePharmacistToPharmacyRole.ts` | `RenamePharmacistToPharmacyRole20260318110000` | 256 | 247 | 234 |
-| 141 | 260318120000 | `20260318120000-EnsureGlycopharmPharmaciesTable.ts` | `EnsureGlycopharmPharmaciesTable20260318120000` | 257 | 248 | 235 |
+| 141 | 260318120000 | — | — | 257 | 248 | 235 |
 | 142 | 260318130000 | `20260318130000-LinkTestPharmacistToOrganization.ts` | `LinkTestPharmacistToOrganization20260318130000` | 258 | 249 | 236 |
 | 143 | 260321100000 | `20260321100000-AddFieldsToCatalogImportRows.ts` | `AddFieldsToCatalogImportRows20260321100000` | 264 | 253 | 242 |
 | 144 | 260322000001 | `20260322000001-CreatePatientHealthProfiles.ts` | `CreatePatientHealthProfiles20260322000001` | 265 | 254 | 243 |
-| 145 | 260322100000 | `20260322100000-SeedGlycopharmForumCategory.ts` | `SeedGlycopharmForumCategory20260322100000` | 266 | 255 | 244 |
+| 145 | 260322100000 | — | — | 266 | 255 | 244 |
 | 146 | 260323100000 | `20260323100000-CreateAiLlmPolicies.ts` | `CreateAiLlmPolicies20260323100000` | 267 | 257 | 245 |
 | 147 | 260323200000 | `20260323200000-CreateAiUsageLogs.ts` | `CreateAiUsageLogs20260323200000` | 268 | 258 | 246 |
 | 148 | 260323300000 | `20260323300000-CreateAiQuotaTables.ts` | `CreateAiQuotaTables20260323300000` | 269 | 259 | 247 |
@@ -525,7 +524,7 @@ executePendingMigrations():
 | 153 | 260325100000 | `20260325100000-AddPromptVersionToAiModelSettings.ts` | `AddPromptVersionToAiModelSettings20260325100000` | 277 | 266 | 255 |
 | 154 | 260325200000 | `20260325200000-AddServiceKeysToOffers.ts` | `AddServiceKeysToOffers20260325200000` | 278 | 267 | 256 |
 | 155 | 260325300000 | `20260325300000-CreateOfferServiceApprovals.ts` | `CreateOfferServiceApprovals20260325300000` | 279 | 268 | 257 |
-| 156 | 260326100000 | `20260326100000-NormalizeGlycopharmPharmacyRole.ts` | `NormalizeGlycopharmPharmacyRole20260326100000` | 281 | 270 | 259 |
+| 156 | 260326100000 | — | — | 281 | 270 | 259 |
 | 157 | 260326200000 | `20260326200000-CreateKpaStudentProfiles.ts` | `CreateKpaStudentProfiles20260326200000` | 284 | 271 | 262 |
 | 158 | 260326300000 | `20260326300000-AddUserIdToGlucoseviewCustomers.ts` | `AddUserIdToGlucoseviewCustomers20260326300000` | 282 | 272 | 260 |
 | 159 | 260326300000 | `20260326300000-DeactivateQualificationRoles.ts` | `DeactivateQualificationRoles20260326300000` | 285 | 273 | 263 |
@@ -546,7 +545,7 @@ executePendingMigrations():
 | 174 | 260330100000 | `20260330100000-CreateContentTemplatesTable.ts` | `CreateContentTemplatesTable20260330100000` | 304 | 293 | 282 |
 | 175 | 260330200000 | `20260330200000-AddIsPublicToContentTemplates.ts` | `AddIsPublicToContentTemplates20260330200000` | 305 | 294 | 283 |
 | 176 | 260330300000 | `20260330300000-AddUsageAnalyticsToContentTemplates.ts` | `AddUsageAnalyticsToContentTemplates20260330300000` | 306 | 295 | 284 |
-| 177 | 260331100000 | `20260331100000-BackfillGlycopharmPharmacyOrganizations.ts` | `BackfillGlycopharmPharmacyOrganizations20260331100000` | 313 | 296 | 291 |
+| 177 | 260331100000 | — | — | 313 | 296 | 291 |
 | 178 | 260331500000 | `20260331500000-UnifyNetureRoles.ts` | `UnifyNetureRoles20260331500000` | 310 | 302 | 288 |
 | 179 | 260401300000 | `20260401300000-CreateMediaAssetsTable.ts` | `CreateMediaAssetsTable20260401300000` | 316 | 305 | 294 |
 | 180 | 260401400000 | `20260401400000-AddMediaAssetFolder.ts` | `AddMediaAssetFolder20260401400000` | 317 | 306 | 295 |
@@ -562,12 +561,12 @@ executePendingMigrations():
 | 190 | 260405300000 | `20260405300000-CreateCommunityAdsAndSponsors.ts` | `CreateCommunityAdsAndSponsors20260405300000` | 341 | 326 | 315 |
 | 191 | 260406200000 | `20260406200000-CreateMarketTrialForumCategory.ts` | `CreateMarketTrialForumCategory20260406200000` | 342 | 327 | 316 |
 | 192 | 260406300000 | `20260406300000-BackfillTestProductsEmptyFields.ts` | `BackfillTestProductsEmptyFields20260406300000` | 343 | 328 | 317 |
-| 193 | 260406400000 | `20260406400000-BackfillGlycopharmApplicationsForPendingPharmacy.ts` | `BackfillGlycopharmApplicationsForPendingPharmacy20260406400000` | 344 | 329 | 318 |
+| 193 | 260406400000 | — | — | 344 | 329 | 318 |
 | 194 | 260409100000 | `20260409100000-AddIsFeaturedToSupplierProductOffers.ts` | `AddIsFeaturedToSupplierProductOffers20260409100000` | 345 | 330 | 319 |
 | 195 | 260409110000 | `20260409110000-DropOfferCurationsTable.ts` | `DropOfferCurationsTable20260409110000` | 346 | 331 | 320 |
 | 196 | 260409200000 | `20260409200000-CreateCatalogAndStoreProducts.ts` | `CreateCatalogAndStoreProducts20260409200000` | 347 | 332 | 321 |
-| 197 | 260409300000 | `20260409300000-MigrateGlycopharmProductsToCatalogAndStore.ts` | `MigrateGlycopharmProductsToCatalogAndStore20260409300000` | 348 | 333 | 322 |
-| 198 | 260409400000 | `20260409400000-RebackfillGlycopharmProductsAfterDualWrite.ts` | `RebackfillGlycopharmProductsAfterDualWrite20260409400000` | 349 | 334 | 323 |
+| 197 | 260409300000 | — | — | 348 | 333 | 322 |
+| 198 | 260409400000 | — | — | 349 | 334 | 323 |
 | 199 | 260409500000 | `20260409500000-UnifyCareMessagesSenderTypePharmacy.ts` | `UnifyCareMessagesSenderTypePharmacy20260409500000` | 350 | 335 | 324 |
 | 200 | 260410000001 | `20260410000001-CreateLmsCoreTables.ts` | `CreateLmsCoreTables20260410000001` | 351 | 336 | 325 |
 | 201 | 260410100000 | `20260410100000-CreateSignageCategories.ts` | `CreateSignageCategories20260410100000` | 352 | 337 | 326 |
@@ -590,8 +589,8 @@ executePendingMigrations():
 | 218 | 260415260000 | `20260415260000-CreateCreditTables.ts` | `CreateCreditTables20260415260000` | 380 | 355 | 354 |
 | 219 | 260415260000 | `20260415260000-ReseedMarketTrialForumCategory.ts` | `ReseedMarketTrialForumCategory20260415260000` | 378 | 356 | 352 |
 | 220 | 260415270000 | `20260415270000-CreateCourseCompletionsTable.ts` | `CreateCourseCompletionsTable20260415270000` | 381 | 357 | 355 |
-| 221 | 260415280000 | `20260415280000-CreateGlycopharmMembersTable.ts` | `CreateGlycopharmMembersTable20260415280000` | 382 | 358 | 356 |
-| 222 | 260416000001 | `20260416000001-BackfillPharmacyToGlycopharmPharmacist.ts` | `BackfillPharmacyToGlycopharmPharmacist20260416000001` | 383 | 359 | 357 |
+| 221 | 260415280000 | — | — | 382 | 358 | 356 |
+| 222 | 260416000001 | — | — | 383 | 359 | 357 |
 | 223 | 260416100000 | `20260416100000-AddRewardRateToMarketTrials.ts` | `AddRewardRateToMarketTrials20260416100000` | 384 | 360 | 358 |
 | 224 | 260416200000 | `20260416200000-ForceAddRewardRateToMarketTrials.ts` | `ForceAddRewardRateToMarketTrials20260416200000` | 385 | 361 | 359 |
 | 225 | 260416300000 | `20260416300000-BackfillMissingKpaSlugs.ts` | `BackfillMissingKpaSlugs20260416300000` | 386 | 362 | 360 |
@@ -643,8 +642,8 @@ executePendingMigrations():
 | 271 | 260524083827 | `20260524083827-CreateCosmeticsMembersTable.ts` | `CreateCosmeticsMembersTable20260524083827` | 511 | 414 | 477 |
 | 272 | 260524224943 | `20260524224943-CreateOperatorQrTemplates.ts` | `CreateOperatorQrTemplates20260524224943` | 512 | 415 | 478 |
 | 273 | 260530124500 | `20260530124500-NullifyKpaWithdrawnLicenseNumbers.ts` | `NullifyKpaWithdrawnLicenseNumbers20260530124500` | 517 | 416 | 483 |
-| 274 | 260530180000 | `20260530180000-RepairForumGlycopharmOrganization.ts` | `RepairForumGlycopharmOrganization20260530180000` | 518 | 417 | 484 |
-| 275 | 260530220000 | `20260530220000-BackfillGlycopharmStoreOwnerEnrollmentAndRole.ts` | `BackfillGlycopharmStoreOwnerEnrollmentAndRole20260530220000` | 519 | 418 | 485 |
+| 274 | 260530180000 | — | — | 518 | 417 | 484 |
+| 275 | 260530220000 | — | — | 519 | 418 | 485 |
 | 276 | 260600000000 | `20260600000000-DropGlucoseviewAndCgmTables.ts` | `DropGlucoseviewAndCgmTables20260600000000` | 371 | 419 | 345 |
 | 277 | 260601000000 | `20260601000000-DropCareTables.ts` | `DropCareTables20260601000000` | 372 | 420 | 346 |
 | 278 | 260601200000 | `20260601200000-ForumRequestStateMachineColumns.ts` | `ForumRequestStateMachineColumns20260601200000` | 407 | 421 | 378 |
@@ -734,7 +733,7 @@ executePendingMigrations():
 | 362 | 261029000000 | `20261029000000-CreateCosmeticsContentsTables.ts` | `CreateCosmeticsContentsTables20261029000000` | 509 | 505 | 475 |
 | 363 | 261029000000 | `20261029000000-CreateStorePops.ts` | `CreateStorePops20261029000000` | 510 | 506 | 476 |
 | 364 | 261030000000 | `20261030000000-CanonicalBusinessFieldAlignment.ts` | `CanonicalBusinessFieldAlignment20261030000000` | 515 | 507 | 481 |
-| 365 | 261030000001 | `20261030000001-GlycopharmPharmaciesOrgBridgeV2.ts` | `GlycopharmPharmaciesOrgBridgeV220261030000001` | 516 | 508 | 482 |
+| 365 | 261030000001 | — | — | 516 | 508 | 482 |
 | 366 | 261031000000 | `20261031000000-NormalizeKCosmeticsSellerRoleWritepathBackfill.ts` | `NormalizeKCosmeticsSellerRoleWritepathBackfill20261031000000` | 521 | 509 | 487 |
 | 367 | 261031000001 | `20261031000001-BackfillKCosmeticsSellerStoreContext.ts` | `BackfillKCosmeticsSellerStoreContext20261031000001` | 522 | 510 | 488 |
 | 368 | 261101000000 | `20261101000000-AddServiceKeyToLmsCourses.ts` | `AddServiceKeyToLmsCourses20261101000000` | 523 | 511 | 489 |
@@ -820,8 +819,8 @@ executePendingMigrations():
 | 448 | 270219000000 | `20270219000000-RemoveLegacyCosmeticsPartnerAppRegistry.ts` | `RemoveLegacyCosmeticsPartnerAppRegistry20270219000000` | 626 | 591 | 592 |
 | 449 | 270220000000 | `20270220000000-AddCosmeticsProductInfoColumns.ts` | `AddCosmeticsProductInfoColumns20270220000000` | 627 | 592 | 593 |
 | 450 | 270221000000 | `20270221000000-CreatePlatformStorePolicyTables.ts` | `CreatePlatformStorePolicyTables20270221000000` | 628 | 593 | 594 |
-| 451 | 270222000000 | `20270222000000-CreateGlycopharmFeaturedProductsTable.ts` | `CreateGlycopharmFeaturedProductsTable20270222000000` | 629 | 594 | 595 |
-| 452 | 270223000000 | `20270223000000-CreateGlycopharmBillingInvoicesTable.ts` | `CreateGlycopharmBillingInvoicesTable20270223000000` | 630 | 595 | 596 |
+| 451 | 270222000000 | — | — | 629 | 594 | 595 |
+| 452 | 270223000000 | — | — | 630 | 595 | 596 |
 | 453 | 270224000000 | `20270224000000-AddServiceKeyToNetureOrders.ts` | `AddServiceKeyToNetureOrders20270224000000` | 631 | 596 | 597 |
 | 454 | 270225000000 | `20270225000000-AddActionLogsStatusCheckConstraint.ts` | `AddActionLogsStatusCheckConstraint20270225000000` | 632 | 597 | 598 |
 | 455 | 270226000000 | `20270226000000-SeedPharmacyHubAdminRole.ts` | `SeedPharmacyHubAdminRole20270226000000` | 633 | 598 | 599 |
@@ -851,7 +850,7 @@ executePendingMigrations():
 | 479 | 270324000000 | `20270324000000-AddAnnualReportReview.ts` | `AddAnnualReportReview20270324000000` | 657 | 622 | 623 |
 | 480 | 270325000000 | `20270325000000-CreateBranchFeeLedger.ts` | `CreateBranchFeeLedger20270325000000` | 658 | 623 | 624 |
 | 481 | 270326000000 | `20270326000000-CreateBranchEducationCreditLedger.ts` | `CreateBranchEducationCreditLedger20270326000000` | 659 | 624 | 625 |
-| 482 | 270326000000 | `20270326000000-DropGlycopharmService.ts` | `DropGlycopharmService20270326000000` | 660 | 625 | 626 |
+| 482 | 270326000000 | — | — | 660 | 625 | 626 |
 | 483 | 270327000000 | `20270327000000-AddStoreQrContentSource.ts` | `AddStoreQrContentSource20270327000000` | 661 | 626 | 627 |
 | 484 | 270328000000 | `20270328000000-AddBranchFeeExemptionReason.ts` | `AddBranchFeeExemptionReason20270328000000` | 662 | 627 | 628 |
 | 485 | 270329000000 | `20270329000000-CreateBranchEvents.ts` | `CreateBranchEvents20270329000000` | 663 | 628 | 629 |
@@ -906,9 +905,9 @@ executePendingMigrations():
 | 534 | 1711501100000 | `20260327110000-ImportProductTrace.ts` | `ImportProductTrace1711501100000` | 293 | 282 | 271 |
 | 535 | 1711584060000 | `20260328000100-BackfillOfferServiceApprovals.ts` | `BackfillOfferServiceApprovals1711584060000` | 294 | 283 | 272 |
 | 536 | 1711871600000 | `20260331100000-UnifyUserRoleToCustomer.ts` | `UnifyUserRoleToCustomer1711871600000` | 307 | 297 | 285 |
-| 537 | 1711875200000 | `20260331200000-UnifyGlycopharmSellerToPharmacy.ts` | `UnifyGlycopharmSellerToPharmacy1711875200000` | 308 | 298 | 286 |
-| 538 | 1711878800000 | `20260331300000-UnifyGlycopharmPharmacyRole.ts` | `UnifyGlycopharmPharmacyRole1711878800000` | 309 | 299 | 287 |
-| 539 | 1711882400000 | `20260331400000-UnifyGlycopharmRolesCatalog.ts` | `UnifyGlycopharmRolesCatalog1711882400000` | 311 | 300 | 289 |
+| 537 | 1711875200000 | — | — | 308 | 298 | 286 |
+| 538 | 1711878800000 | — | — | 309 | 299 | 287 |
+| 539 | 1711882400000 | — | — | 311 | 300 | 289 |
 | 540 | 1711886000000 | `20260331500000-UnifyCosmeticsRolesCatalog.ts` | `UnifyCosmeticsRolesCatalog1711886000000` | 312 | 301 | 290 |
 | 541 | 1712000000000 | `20260401100000-BackfillHealthReadingsPharmacyId.ts` | `BackfillHealthReadingsPharmacyId1712000000000` | 314 | 303 | 292 |
 | 542 | 1712070000000 | `20260401200000-FixHealthReadingsPatientId.ts` | `FixHealthReadingsPatientId1712070000000` | 315 | 304 | 293 |
@@ -933,7 +932,7 @@ executePendingMigrations():
 | 561 | 1736700000000 | `1736700000000-CreateChannelPlaybackLog.ts` | `CreateChannelPlaybackLog1736700000000` | 22 | 10 | 11 |
 | 562 | 1736710000000 | `1736710000000-CreateChannelHeartbeat.ts` | `CreateChannelHeartbeat1736710000000` | 23 | 11 | 12 |
 | 563 | 1736720000000 | `1736720000000-AddSlotLockFields.ts` | `AddSlotLockFields1736720000000` | 24 | 12 | 13 |
-| 564 | 1736800000000 | `1736800000000-CreateGlycopharmApplications.ts` | `CreateGlycopharmApplications1736800000000` | 25 | 13 | 14 |
+| 564 | 1736800000000 | — | — | 25 | 13 | 14 |
 | 565 | 1736900000000 | `1736900000000-CreateAIQueryTables.ts` | `CreateAIQueryTables1736900000000` | 27 | 14 | 16 |
 | 566 | 1736950000000 | `1736950000000-CreateNetureTables.ts` | `CreateNetureTables1736950000000` | 28 | 15 | 17 |
 | 567 | 1737100000000 | `1737100000000-UpdateGlucoseViewTestAccountPasswords.ts` | `UpdateGlucoseViewTestAccountPasswords1737100000000` | 30 | 16 | 18 |
@@ -942,7 +941,7 @@ executePendingMigrations():
 | 570 | 1737100300000 | `1737100300000-SeedNetureData.ts` | `SeedNetureData1737100300000` | 33 | 19 | 20 |
 | 571 | 1737100400000 | `1737100400000-RecreateNetureTables.ts` | `RecreateNetureTables1737100400000` | 34 | 20 | 21 |
 | 572 | 1737100500000 | `1737100500000-AddNetureProductColumns.ts` | `AddNetureProductColumns1737100500000` | 35 | 21 | 22 |
-| 573 | 1737100600000 | `1737100600000-CreateGlycopharmForumCategoryRequests.ts` | `CreateGlycopharmForumCategoryRequests1737100600000` | 36 | 22 | 23 |
+| 573 | 1737100600000 | — | — | 36 | 22 | 23 |
 | 574 | 1737100700000 | `1737100700000-CreateAiEnginesAndAdminColumns.ts` | `CreateAiEnginesAndAdminColumns1737100700000` | 38 | 23 | 25 |
 | 575 | 1737100800000 | `1737100800000-AddUserIdToNetureSuppliers.ts` | `AddUserIdToNetureSuppliers1737100800000` | 39 | 24 | 26 |
 | 576 | 1737200000000 | `1737200000000-CreateNetureSupplierDashboardTables.ts` | `CreateNetureSupplierDashboardTables1737200000000` | 40 | 25 | 27 |
@@ -950,7 +949,7 @@ executePendingMigrations():
 | 578 | 1737330000000 | `1737330000000-CreateSiteGuideTables.ts` | `CreateSiteGuideTables1737330000000` | 42 | 27 | 29 |
 | 579 | 1737450000000 | `1737450000000-RemoveKCosmeticsConsumerAccount.ts` | `RemoveKCosmeticsConsumerAccount1737450000000` | 46 | 28 | 30 |
 | 580 | 1737900000000 | `1737900000000-AddCmsSlotLockColumns.ts` | `AddCmsSlotLockColumns1737900000000` | 51 | 29 | 35 |
-| 581 | 1738300000000 | `1738300000000-AddPartnerRecruitingToGlycopharmProducts.ts` | `AddPartnerRecruitingToGlycopharmProducts1738300000000` | 61 | 30 | 43 |
+| 581 | 1738300000000 | — | — | 61 | 30 | 43 |
 | 582 | 1739500000000 | `1739500000000-AddInstructorRoleSupport.ts` | `AddInstructorRoleSupport1739500000000` | 538 | 31 | 504 |
 | 583 | 1739600000000 | `1739600000000-AddKpaMemberProfessionFields.ts` | `AddKpaMemberProfessionFields1739600000000` | 103 | 32 | 84 |
 | 584 | 1739700000000 | `1739700000000-NormalizePhoneNumbers.ts` | `NormalizePhoneNumbers1739700000000` | 104 | 33 | 85 |
@@ -970,7 +969,7 @@ executePendingMigrations():
 | 598 | 1771200000006 | `1771200000006-CreateStoreBlogPosts.ts` | `CreateStoreBlogPosts1771200000006` | 420 | 37 | 391 |
 | 599 | 1771200000010 | `1771200000010-CreateServiceMemberships.ts` | `CreateServiceMemberships1771200000010` | 239 | 38 | 217 |
 | 600 | 1771200000015 | `1771200000015-CreateAuthTokenTables.ts` | `CreateAuthTokenTables1771200000015` | 243 | 39 | 221 |
-| 601 | 1771200000016 | `1771200000016-RemoveGlycopharmTestAccounts.ts` | `RemoveGlycopharmTestAccounts1771200000016` | 245 | 40 | 223 |
+| 601 | 1771200000016 | — | — | 245 | 40 | 223 |
 | 602 | 1771200000017 | `20260320000001-AddForumTypeToCategory.ts` | `AddForumTypeToCategory1771200000017` | 262 | 251 | 240 |
 | 603 | 1771200000018 | `20260320000002-CreateMarketTrialServiceApprovals.ts` | `CreateMarketTrialServiceApprovals1771200000018` | 263 | 252 | 241 |
 | 604 | 1771200000019 | `1771200000019-AddSupplierBusinessProfileFields.ts` | `AddSupplierBusinessProfileFields1771200000019` | 261 | 41 | 239 |
@@ -981,7 +980,7 @@ executePendingMigrations():
 | 609 | 1771200000024 | `1771200000024-CreateKpaExternalExpertProfiles.ts` | `CreateKpaExternalExpertProfiles1771200000024` | 366 | 44 | 340 |
 | 610 | 1771200000025 | `1771200000025-CreateKpaSupplierStaffProfiles.ts` | `CreateKpaSupplierStaffProfiles1771200000025` | 367 | 45 | 341 |
 | 611 | 1771200000026 | `1771200000026-MakeKpaMemberOrganizationIdNullable.ts` | `MakeKpaMemberOrganizationIdNullable1771200000026` | 368 | 46 | 342 |
-| 612 | 1771200000027 | `1771200000027-CreateGlycopharmContentsTables.ts` | `CreateGlycopharmContentsTables1771200000027` | 497 | 47 | 463 |
+| 612 | 1771200000027 | — | — | 497 | 47 | 463 |
 | 613 | 1771200000027 | `1771200000027-CreateQualificationTables.ts` | `CreateQualificationTables1771200000027` | 369 | 48 | 343 |
 | 614 | 1771200000028 | `1771200000028-CreateInstructorProfiles.ts` | `CreateInstructorProfiles1771200000028` | 370 | 49 | 344 |
 | 615 | 2025011100001 | `2025011100001-AddExternalContactToUsers.ts` | `AddExternalContactToUsers2025011100001` | 26 | 50 | 15 |
@@ -1066,9 +1065,6 @@ executePendingMigrations():
 | `20260327110000-ImportProductTrace.ts` | `ImportProductTrace1711501100000` | `ImportProductTrace1711501100000` | `(없음)` | 14자리 파일명 · 13자리 epoch class |
 | `20260328000100-BackfillOfferServiceApprovals.ts` | `BackfillOfferServiceApprovals1711584060000` | `BackfillOfferServiceApprovals1711584060000` | `BackfillOfferServiceApprovals1711584060000` | 14자리 파일명 · 13자리 epoch class |
 | `20260331100000-UnifyUserRoleToCustomer.ts` | `UnifyUserRoleToCustomer1711871600000` | `UnifyUserRoleToCustomer1711871600000` | `(없음)` | 14자리 파일명 · 13자리 epoch class |
-| `20260331200000-UnifyGlycopharmSellerToPharmacy.ts` | `UnifyGlycopharmSellerToPharmacy1711875200000` | `UnifyGlycopharmSellerToPharmacy1711875200000` | `(없음)` | 14자리 파일명 · 13자리 epoch class |
-| `20260331300000-UnifyGlycopharmPharmacyRole.ts` | `UnifyGlycopharmPharmacyRole1711878800000` | `UnifyGlycopharmPharmacyRole1711878800000` | `(없음)` | 14자리 파일명 · 13자리 epoch class |
-| `20260331400000-UnifyGlycopharmRolesCatalog.ts` | `UnifyGlycopharmRolesCatalog1711882400000` | `UnifyGlycopharmRolesCatalog1711882400000` | `(없음)` | 14자리 파일명 · 13자리 epoch class |
 | `20260331500000-UnifyCosmeticsRolesCatalog.ts` | `UnifyCosmeticsRolesCatalog1711886000000` | `UnifyCosmeticsRolesCatalog1711886000000` | `(없음)` | 14자리 파일명 · 13자리 epoch class |
 | `20260401100000-BackfillHealthReadingsPharmacyId.ts` | `BackfillHealthReadingsPharmacyId1712000000000` | `BackfillHealthReadingsPharmacyId1712000000000` | `(없음)` | 14자리 파일명 · 13자리 epoch class |
 | `20260401200000-FixHealthReadingsPatientId.ts` | `FixHealthReadingsPatientId1712070000000` | `FixHealthReadingsPatientId1712070000000` | `(없음)` | 14자리 파일명 · 13자리 epoch class |
@@ -1108,18 +1104,18 @@ executePendingMigrations():
 | 13 | `20260207500000-SeedKpaBannerContent.js` | 93 | relation "users" does not exist |
 | 14 | `20260207700000-SeedKpaBenefitContent.js` | 94 | relation "users" does not exist |
 | 17 | `20260210000001-AddContentViewCountAndRecommendations.js` | 98 | relation "cms_contents" does not exist |
-| 29 | `20260215000003-AddStorefrontConfig.js` | 118 | relation "glycopharm_pharmacies" does not exist |
-| 40 | `20260215300002-AddFkPharmacyOrganization.js` | 127 | relation "glycopharm_pharmacies" does not exist |
+| 29 | `20260215000003-AddStorefrontConfig.js` | 118 | — |
+| 40 | `20260215300002-AddFkPharmacyOrganization.js` | 127 | — |
 | 48 | `20260219000004-PharmacyIdentityRealign.js` | 139 | relation "users" does not exist |
 | 49 | `20260219000005-CreateKpaPharmacyRequests.js` | 140 | relation "users" does not exist |
 | 51 | `20260221000000-OrgServiceModelNormalizationPhaseA.js` | 142 | relation "platform_services" does not exist |
-| 52 | `20260221100000-OrgServiceModelNormalizationPhaseC.js` | 143 | relation "glycopharm_pharmacy_extensions" does not exist |
+| 52 | `20260221100000-OrgServiceModelNormalizationPhaseC.js` | 143 | — |
 | 53 | `20260222000000-NetureSupplierRelationStateExtension.js` | 145 | type "neture_supplier_request_status_enum" does not exist |
 | 54 | `20260222000000-OfficerMemberFK.js` | 144 | relation "users" does not exist |
 | 56 | `20260222100000-RequestTypeNormalization.js` | 146 | relation "kpa_organization_join_requests" does not exist |
 | 57 | `20260222200000-RemoveKpaCRolesFromUsers.js` | 147 | relation "users" does not exist |
 | 59 | `20260222400000-AddOrganizationIdToGlucoseViewCustomers.js` | 150 | relation "organizations" does not exist |
-| 62 | `20260222900000-GlycopharmOrgEnrollmentRepair.js` | 156 | relation "organizations" does not exist |
+| 62 | — | 156 | relation "organizations" does not exist |
 | 63 | `20260224200000-CreateStoreLocalProductTables.js` | 161 | relation "organizations" does not exist |
 | 64 | `20260224300000-HardenStoreLocalProductDomain.js` | 162 | relation "store_tablet_displays" does not exist |
 | 65 | `20260224400000-AddStoreLocalProductContentFields.js` | 163 | relation "store_local_products" does not exist |
@@ -1143,7 +1139,7 @@ executePendingMigrations():
 | 95 | `20260304100000-CreateStoreLibraryItems.js` | 198 | relation "organizations" does not exist |
 | 96 | `20260304120000-CreateStoreQrCodes.js` | 199 | relation "organizations" does not exist |
 | 98 | `20260304200000-CreateProductMarketingAssets.js` | 201 | relation "organizations" does not exist |
-| 102 | `20260307000001-AddRequestedSlugToGlycopharmApplications.js` | 211 | relation "glycopharm_applications" does not exist |
+| 102 | — | 211 | — |
 | 103 | `20260307100000-CreateCatalogImportTables.js` | 209 | relation "neture_suppliers" does not exist |
 | 104 | `20260307200000-CategoryBrandProductMasterExtension.js` | 212 | relation "product_masters" does not exist |
 | 105 | `20260307210000-CreateProductImages.js` | 213 | relation "product_masters" does not exist |
@@ -1155,19 +1151,19 @@ executePendingMigrations():
 | 131 | `20260311100000-CreateStoreCapabilities.js` | 241 | relation "organizations" does not exist |
 | 132 | `20260311200000-CosmeticsStoreOrgBridge.js` | 242 | relation "organizations" does not exist |
 | 136 | `20260317100000-NormalizeUserStatusCase.js` | 253 | relation "users" does not exist |
-| 137 | `20260317110000-ActivateGlycopharmTestAccounts.js` | 254 | relation "users" does not exist |
+| 137 | — | 254 | relation "users" does not exist |
 | 138 | `20260318100000-BackfillServiceMembershipsFromRoles.js` | 255 | relation "role_assignments" does not exist |
 | 139 | `20260318100000-ExtendRolesTable.js` | 259 | relation "roles" does not exist |
 | 140 | `20260318110000-RenamePharmacistToPharmacyRole.js` | 256 | relation "role_assignments" does not exist |
 | 142 | `20260318130000-LinkTestPharmacistToOrganization.js` | 258 | relation "users" does not exist |
 | 143 | `20260321100000-AddFieldsToCatalogImportRows.js` | 264 | relation "catalog_import_rows" does not exist |
-| 145 | `20260322100000-SeedGlycopharmForumCategory.js` | 266 | relation "organizations" does not exist |
+| 145 | — | 266 | relation "organizations" does not exist |
 | 150 | `20260323500000-AddIsRegulatedToProductCategories.js` | 272 | relation "product_categories" does not exist |
 | 151 | `20260323700000-AddMetadataToForumCategory.js` | 271 | relation "forum_category" does not exist |
 | 152 | `20260323700000-SeedProductCategories.js` | 275 | relation "product_categories" does not exist |
 | 154 | `20260325200000-AddServiceKeysToOffers.js` | 278 | relation "supplier_product_offers" does not exist |
 | 155 | `20260325300000-CreateOfferServiceApprovals.js` | 279 | relation "supplier_product_offers" does not exist |
-| 156 | `20260326100000-NormalizeGlycopharmPharmacyRole.js` | 281 | relation "role_assignments" does not exist |
+| 156 | — | 281 | relation "role_assignments" does not exist |
 | 157 | `20260326200000-CreateKpaStudentProfiles.js` | 284 | relation "users" does not exist |
 | 158 | `20260326300000-AddUserIdToGlucoseviewCustomers.js` | 282 | relation "users" does not exist |
 | 159 | `20260326300000-DeactivateQualificationRoles.js` | 285 | relation "role_assignments" does not exist |
@@ -1180,7 +1176,7 @@ executePendingMigrations():
 | 170 | `20260328400000-AddCmsMetadataGinIndex.js` | 300 | relation "cms_contents" does not exist |
 | 172 | `20260329100000-CreateCategoryMappingRulesTable.js` | 302 | relation "product_categories" does not exist |
 | 173 | `20260329200000-ExpandCategoryTreeAndMappingRules.js` | 303 | relation "product_categories" does not exist |
-| 177 | `20260331100000-BackfillGlycopharmPharmacyOrganizations.js` | 313 | relation "users" does not exist |
+| 177 | — | 313 | relation "users" does not exist |
 | 178 | `20260331500000-UnifyNetureRoles.js` | 310 | relation "role_assignments" does not exist |
 | 181 | `20260402100000-AddConsultationResultToAppointments.js` | 318 | relation "care_appointments" does not exist |
 | 182 | `20260403100000-CleanupNetureServiceData.js` | 321 | relation "offer_service_approvals" does not exist |
@@ -1202,8 +1198,8 @@ executePendingMigrations():
 | 213 | `20260415210000-AddNotificationSentAtToMarketTrials.js` | 374 | relation "market_trials" does not exist |
 | 214 | `20260415220000-AddCustomerConversionToMarketTrialParticipants.js` | 375 | relation "market_trial_participants" does not exist |
 | 215 | `20260415230000-AddListingLinkToMarketTrialParticipants.js` | 376 | relation "market_trial_participants" does not exist |
-| 221 | `20260415280000-CreateGlycopharmMembersTable.js` | 382 | relation "users" does not exist |
-| 222 | `20260416000001-BackfillPharmacyToGlycopharmPharmacist.js` | 383 | relation "role_assignments" does not exist |
+| 221 | — | 382 | relation "users" does not exist |
+| 222 | — | 383 | relation "role_assignments" does not exist |
 | 223 | `20260416100000-AddRewardRateToMarketTrials.js` | 384 | relation "market_trials" does not exist |
 | 224 | `20260416200000-ForceAddRewardRateToMarketTrials.js` | 385 | relation "market_trials" does not exist |
 | 225 | `20260416300000-BackfillMissingKpaSlugs.js` | 386 | relation "organizations" does not exist |
@@ -1232,7 +1228,7 @@ executePendingMigrations():
 | 270 | `20260523000000-CreateServiceCredentials.js` | 505 | relation "users" does not exist |
 | 271 | `20260524083827-CreateCosmeticsMembersTable.js` | 511 | relation "users" does not exist |
 | 273 | `20260530124500-NullifyKpaWithdrawnLicenseNumbers.js` | 517 | relation "kpa_pharmacist_profiles" does not exist |
-| 275 | `20260530220000-BackfillGlycopharmStoreOwnerEnrollmentAndRole.js` | 519 | relation "service_memberships" does not exist |
+| 275 | — | 519 | relation "service_memberships" does not exist |
 | 278 | `20260601200000-ForumRequestStateMachineColumns.js` | 407 | relation "forum_category_requests" does not exist |
 | 279 | `20260603000000-AddServiceKeyToQualification.js` | 520 | relation "qualification_requests" does not exist |
 | 280 | `20260606000000-CreateProductIdentifiers.js` | 526 | relation "product_masters" does not exist |
@@ -1285,11 +1281,11 @@ executePendingMigrations():
 | 360 | `20261028000000-AddAuthorRoleToStoreBlogPosts.js` | 507 | relation "store_blog_posts" does not exist |
 | 361 | `20261028100000-MakeStoreBlogPostsStoreIdNullableForOperator.js` | 508 | relation "store_blog_posts" does not exist |
 | 364 | `20261030000000-CanonicalBusinessFieldAlignment.js` | 515 | relation "neture_suppliers" does not exist |
-| 365 | `20261030000001-GlycopharmPharmaciesOrgBridgeV2.js` | 516 | relation "organizations" does not exist |
+| 365 | — | 516 | relation "organizations" does not exist |
 | 366 | `20261031000000-NormalizeKCosmeticsSellerRoleWritepathBackfill.js` | 521 | relation "role_assignments" does not exist |
 | 367 | `20261031000001-BackfillKCosmeticsSellerStoreContext.js` | 522 | relation "role_assignments" does not exist |
 | 378 | `20261111000000-AlignGeminiEngineRegistry.js` | 544 | relation "ai_engines" does not exist |
-| 379 | `20261112000000-AddBodyToGpKcosContents.js` | 545 | relation "glycopharm_contents" does not exist |
+| 379 | `20261112000000-AddBodyToGpKcosContents.js` | 545 | — |
 | 381 | `20261114000000-CreateSharedProductDescriptions.js` | 552 | relation "product_masters" does not exist |
 | 383 | `20261116000000-DropMarketTrialConversionColumns.js` | 559 | relation "market_trials" does not exist |
 | 384 | `20261117000000-CreateOfferServicePrices.js` | 558 | relation "supplier_product_offers" does not exist |
@@ -1338,7 +1334,7 @@ executePendingMigrations():
 | 445 | `20270216000000-SeedPharmacyHubServiceAndRoles.js` | 623 | relation "platform_services" does not exist |
 | 446 | `20270217000000-GrantPharmacyHubInitialOperator.js` | 624 | relation "users" does not exist |
 | 449 | `20270220000000-AddCosmeticsProductInfoColumns.js` | 627 | [AddCosmeticsProductInfoColumns] ABORT: cosmetics.cosmetics_products 이 존재하지 않는다. 선행 스키마 확인 필요. |
-| 451 | `20270222000000-CreateGlycopharmFeaturedProductsTable.js` | 629 | relation "glycopharm_products" does not exist |
+| 451 | — | 629 | — |
 | 455 | `20270226000000-SeedPharmacyHubAdminRole.js` | 633 | relation "roles" does not exist |
 | 456 | `20270301000000-ReplaceRoleAssignmentsActiveUniqueConstraint.js` | 634 | relation "role_assignments" does not exist |
 | 457 | `20270302000000-NormalizeNetureOperatorMembershipRole.js` | 635 | relation "service_memberships" does not exist |
@@ -1352,7 +1348,7 @@ executePendingMigrations():
 | 473 | `20270318000000-RevokeOrphanedBareStoreOwnerRole.js` | 651 | relation "role_assignments" does not exist |
 | 475 | `20270320000000-DropUsersPermissionsColumn.js` | 653 | relation "users" does not exist |
 | 477 | `20270322000000-CreateCafe24MemberLinksAndSeedCafe24B2bService.js` | 655 | relation "users" does not exist |
-| 482 | `20270326000000-DropGlycopharmService.js` | 660 | relation "roles" does not exist |
+| 482 | — | 660 | relation "roles" does not exist |
 | 483 | `20270327000000-AddStoreQrContentSource.js` | 661 | relation "store_qr_codes" does not exist |
 | 486 | `20270330000000-CreateStoreQrPlacements.js` | 664 | relation "store_qr_codes" does not exist |
 | 496 | `20270409000000-RemoveProductContentFromTabletBlockTypeCheck.js` | 674 | relation "store_tablet_screen_blocks" does not exist |
@@ -1376,9 +1372,9 @@ executePendingMigrations():
 | 534 | `20260327110000-ImportProductTrace.js` | 293 | relation "supplier_csv_import_rows" does not exist |
 | 535 | `20260328000100-BackfillOfferServiceApprovals.js` | 294 | relation "supplier_product_offers" does not exist |
 | 536 | `20260331100000-UnifyUserRoleToCustomer.js` | 307 | relation "service_memberships" does not exist |
-| 537 | `20260331200000-UnifyGlycopharmSellerToPharmacy.js` | 308 | relation "service_memberships" does not exist |
-| 538 | `20260331300000-UnifyGlycopharmPharmacyRole.js` | 309 | relation "service_memberships" does not exist |
-| 539 | `20260331400000-UnifyGlycopharmRolesCatalog.js` | 311 | relation "roles" does not exist |
+| 537 | — | 308 | relation "service_memberships" does not exist |
+| 538 | — | 309 | relation "service_memberships" does not exist |
+| 539 | — | 311 | relation "roles" does not exist |
 | 540 | `20260331500000-UnifyCosmeticsRolesCatalog.js` | 312 | relation "roles" does not exist |
 | 541 | `20260401100000-BackfillHealthReadingsPharmacyId.js` | 314 | relation "health_readings" does not exist |
 | 542 | `20260401200000-FixHealthReadingsPatientId.js` | 315 | relation "health_readings" does not exist |
@@ -1387,7 +1383,7 @@ executePendingMigrations():
 | 546 | `20260403950000-BackfillKpaSecondReviewPendingRows.js` | 330 | relation "product_approvals" does not exist |
 | 552 | `20260403800000-BackfillServiceOfferListings.js` | 329 | column "master_id" of relation "organization_product_listings" does not exist |
 | 553 | `20260404100000-FixCoachingPatientIdNormalization.js` | 333 | relation "care_coaching_sessions" does not exist |
-| 581 | `1738300000000-AddPartnerRecruitingToGlycopharmProducts.js` | 61 | relation "public.glycopharm_products" does not exist |
+| 581 | — | 61 | — |
 | 588 | `20260226100001-RemoveExternalProductIdFromListings.js` | 181 | column "product_id" does not exist |
 | 593 | `20260422100000-RenameMarketingNameToName.js` | 410 | relation "product_masters" does not exist |
 | 594 | `20260422200000-CreateProductAliases.js` | 411 | relation "product_masters" does not exist |
@@ -1406,12 +1402,12 @@ executePendingMigrations():
 
 | 순번 | 파일 | 운영 id | 오류 |
 |---:|---|---:|---|
-| 6 | `1736400000000-AddEnabledServicesToPharmacy.js` | 18 | relation "glycopharm_pharmacies" does not exist |
-| 30 | `1738300000000-AddPartnerRecruitingToGlycopharmProducts.js` | 61 | relation "public.glycopharm_products" does not exist |
+| 6 | `1736400000000-AddEnabledServicesToPharmacy.js` | 18 | — |
+| 30 | — | 61 | — |
 | 32 | `1739600000000-AddKpaMemberProfessionFields.js` | 103 | relation "kpa_members" does not exist |
 | 34 | `1770601460383-ActivateAdminUser.js` | 95 | column "updatedAt" of relation "users" does not exist |
 | 38 | `1771200000010-CreateServiceMemberships.js` | 239 | column u.service_key does not exist |
-| 40 | `1771200000016-RemoveGlycopharmTestAccounts.js` | 245 | relation "role_assignments" does not exist |
+| 40 | — | 245 | relation "role_assignments" does not exist |
 | 43 | `1771200000023-AddKpaMemberSubRole.js` | 365 | relation "kpa_members" does not exist |
 | 46 | `1771200000026-MakeKpaMemberOrganizationIdNullable.js` | 368 | relation "kpa_members" does not exist |
 | 65 | `2026013100004-CleanupForumOrphanedPosts.js` | 65 | relation "forum_comment" does not exist |
@@ -1420,12 +1416,12 @@ executePendingMigrations():
 | 76 | `20260205040103-KpaRolePrefixMigration.js` | 83 | column "service_key" does not exist |
 | 77 | `20260205060000-NetureRolePrefixMigration.js` | 84 | column "service_key" does not exist |
 | 78 | `20260205070000-Phase4MultiServiceRolePrefixMigration.js` | 85 | column "service_key" does not exist |
-| 113 | `20260215000003-AddStorefrontConfig.js` | 118 | relation "glycopharm_pharmacies" does not exist |
-| 124 | `20260215300002-AddFkPharmacyOrganization.js` | 127 | relation "glycopharm_pharmacies" does not exist |
-| 135 | `20260221000000-OrgServiceModelNormalizationPhaseA.js` | 142 | relation "glycopharm_pharmacies" does not exist |
-| 136 | `20260221100000-OrgServiceModelNormalizationPhaseC.js` | 143 | relation "glycopharm_pharmacy_extensions" does not exist |
+| 113 | `20260215000003-AddStorefrontConfig.js` | 118 | — |
+| 124 | `20260215300002-AddFkPharmacyOrganization.js` | 127 | — |
+| 135 | `20260221000000-OrgServiceModelNormalizationPhaseA.js` | 142 | — |
+| 136 | `20260221100000-OrgServiceModelNormalizationPhaseC.js` | 143 | — |
 | 144 | `20260222400000-AddOrganizationIdToGlucoseViewCustomers.js` | 150 | relation "organizations" does not exist |
-| 149 | `20260222900000-GlycopharmOrgEnrollmentRepair.js` | 156 | relation "organizations" does not exist |
+| 149 | — | 156 | relation "organizations" does not exist |
 | 154 | `20260224200000-CreateStoreLocalProductTables.js` | 161 | relation "organizations" does not exist |
 | 155 | `20260224300000-HardenStoreLocalProductDomain.js` | 162 | relation "store_tablet_displays" does not exist |
 | 156 | `20260224400000-AddStoreLocalProductContentFields.js` | 163 | relation "store_local_products" does not exist |
@@ -1442,25 +1438,25 @@ executePendingMigrations():
 | 233 | `20260311100000-CreateStoreCapabilities.js` | 241 | relation "organizations" does not exist |
 | 234 | `20260311200000-CosmeticsStoreOrgBridge.js` | 242 | relation "organizations" does not exist |
 | 243 | `20260317100000-NormalizeUserStatusCase.js` | 253 | column "updatedAt" of relation "users" does not exist |
-| 244 | `20260317110000-ActivateGlycopharmTestAccounts.js` | 254 | column "updatedAt" of relation "users" does not exist |
+| 244 | — | 254 | column "updatedAt" of relation "users" does not exist |
 | 245 | `20260318100000-BackfillServiceMembershipsFromRoles.js` | 255 | relation "service_memberships" does not exist |
 | 246 | `20260318100000-ExtendRolesTable.js` | 259 | relation "roles" does not exist |
 | 247 | `20260318110000-RenamePharmacistToPharmacyRole.js` | 256 | relation "service_memberships" does not exist |
 | 250 | `20260318200000-AddStructuredAddress.js` | 260 | relation "organizations" does not exist |
 | 251 | `20260320000001-AddForumTypeToCategory.js` | 262 | relation "forum_category" does not exist |
-| 255 | `20260322100000-SeedGlycopharmForumCategory.js` | 266 | relation "organizations" does not exist |
+| 255 | — | 266 | relation "organizations" does not exist |
 | 263 | `20260323700000-AddMetadataToForumCategory.js` | 271 | relation "forum_category" does not exist |
-| 270 | `20260326100000-NormalizeGlycopharmPharmacyRole.js` | 281 | relation "service_memberships" does not exist |
+| 270 | — | 281 | relation "service_memberships" does not exist |
 | 275 | `20260326500000-RepointListingOrganizationFK.js` | 286 | relation "organizations" does not exist |
 | 276 | `20260326600000-NetureSupplierOrgBridge.js` | 288 | relation "organizations" does not exist |
 | 277 | `20260326600000-SeedNetureOrgEnrollments.js` | 287 | relation "organizations" does not exist |
 | 287 | `20260328200000-AddOperatorNotesToServiceMemberships.js` | 297 | relation "service_memberships" does not exist |
 | 288 | `20260328300000-BridgeApprovedRegistrationsToSuppliers.js` | 298 | relation "service_memberships" does not exist |
-| 296 | `20260331100000-BackfillGlycopharmPharmacyOrganizations.js` | 313 | relation "service_memberships" does not exist |
+| 296 | — | 313 | relation "service_memberships" does not exist |
 | 297 | `20260331100000-UnifyUserRoleToCustomer.js` | 307 | relation "service_memberships" does not exist |
-| 298 | `20260331200000-UnifyGlycopharmSellerToPharmacy.js` | 308 | relation "service_memberships" does not exist |
-| 299 | `20260331300000-UnifyGlycopharmPharmacyRole.js` | 309 | relation "service_memberships" does not exist |
-| 300 | `20260331400000-UnifyGlycopharmRolesCatalog.js` | 311 | relation "roles" does not exist |
+| 298 | — | 308 | relation "service_memberships" does not exist |
+| 299 | — | 309 | relation "service_memberships" does not exist |
+| 300 | — | 311 | relation "roles" does not exist |
 | 301 | `20260331500000-UnifyCosmeticsRolesCatalog.js` | 312 | relation "roles" does not exist |
 | 302 | `20260331500000-UnifyNetureRoles.js` | 310 | relation "service_memberships" does not exist |
 | 303 | `20260401100000-BackfillHealthReadingsPharmacyId.js` | 314 | column gc.organization_id does not exist |
@@ -1471,7 +1467,7 @@ executePendingMigrations():
 | 339 | `20260410300000-DeleteKpaSocietyOrganizationChannels.js` | 353 | relation "organization_service_enrollments" does not exist |
 | 342 | `20260411100000-BackfillKpaOrgsToOrganizations.js` | 357 | relation "organizations" does not exist |
 | 346 | `20260412100000-CleanupForumTestData.js` | 361 | relation "forum_category" does not exist |
-| 358 | `20260415280000-CreateGlycopharmMembersTable.js` | 382 | relation "organizations" does not exist |
+| 358 | — | 382 | relation "organizations" does not exist |
 | 362 | `20260416300000-BackfillMissingKpaSlugs.js` | 386 | relation "organizations" does not exist |
 | 363 | `20260416400000-BackfillKpaSlugsByMembership.js` | 388 | relation "organizations" does not exist |
 | 371 | `20260419100000-AddAssetTypeFieldsToStoreLibraryItems.js` | 396 | relation "store_library_items" does not exist |
@@ -1481,7 +1477,7 @@ executePendingMigrations():
 | 408 | `20260518000000-BackfillKpaSlugsLateJoin.js` | 491 | relation "organizations" does not exist |
 | 411 | `20260521120000-AddSurveyRewardFields.js` | 499 | relation "lms_surveys" does not exist |
 | 416 | `20260530124500-NullifyKpaWithdrawnLicenseNumbers.js` | 517 | relation "kpa_pharmacist_profiles" does not exist |
-| 418 | `20260530220000-BackfillGlycopharmStoreOwnerEnrollmentAndRole.js` | 519 | relation "service_memberships" does not exist |
+| 418 | — | 519 | relation "service_memberships" does not exist |
 | 437 | `20260618000000-BackfillNetureSupplierProfiles.js` | 555 | column "tax_invoice_email" of relation "neture_suppliers" does not exist |
 | 442 | `20260700000000-AddTagsToForumCategory.js` | 408 | relation "forum_category" does not exist |
 | 444 | `20260801000000-ResetAndSeedKpaChannels.js` | 415 | relation "organization_service_enrollments" does not exist |
@@ -1502,7 +1498,7 @@ executePendingMigrations():
 | 492 | `20261004000000-BackfillMissingKpaMembersCanonical.js` | 488 | relation "service_memberships" does not exist |
 | 495 | `20261022000000-BackfillKpaSlugsPostMemberApprovalPath.js` | 492 | relation "organizations" does not exist |
 | 496 | `20261023000000-BackfillKpaOrganizationPharmacyInfo.js` | 493 | relation "organizations" does not exist |
-| 508 | `20261030000001-GlycopharmPharmaciesOrgBridgeV2.js` | 516 | relation "organizations" does not exist |
+| 508 | — | 516 | relation "organizations" does not exist |
 | 509 | `20261031000000-NormalizeKCosmeticsSellerRoleWritepathBackfill.js` | 521 | relation "service_memberships" does not exist |
 | 510 | `20261031000001-BackfillKCosmeticsSellerStoreContext.js` | 522 | relation "service_memberships" does not exist |
 | 528 | `20261118000000-CleanupNetureTestSuppliers.js` | 560 | relation "service_memberships" does not exist |
@@ -1519,7 +1515,7 @@ executePendingMigrations():
 | 583 | `20270211000000-AddScreenSetHubTargetStoreType.js` | 618 | relation "store_tablet_screen_sets" does not exist |
 | 588 | `20270216000000-SeedPharmacyHubServiceAndRoles.js` | 623 | relation "roles" does not exist |
 | 592 | `20270220000000-AddCosmeticsProductInfoColumns.js` | 627 | [AddCosmeticsProductInfoColumns] ABORT: cosmetics.cosmetics_products 이 존재하지 않는다. 선행 스키마 확인 필요. |
-| 594 | `20270222000000-CreateGlycopharmFeaturedProductsTable.js` | 629 | relation "glycopharm_products" does not exist |
+| 594 | — | 629 | — |
 | 598 | `20270226000000-SeedPharmacyHubAdminRole.js` | 633 | relation "roles" does not exist |
 | 600 | `20270302000000-NormalizeNetureOperatorMembershipRole.js` | 635 | relation "service_memberships" does not exist |
 | 603 | `20270305000000-SeedKpaBranchServiceAndRoles.js` | 638 | relation "roles" does not exist |
@@ -1530,7 +1526,7 @@ executePendingMigrations():
 | 615 | `20270317000000-NormalizePharmacyHubBareMembershipRoles.js` | 650 | relation "service_memberships" does not exist |
 | 616 | `20270318000000-RevokeOrphanedBareStoreOwnerRole.js` | 651 | relation "service_memberships" does not exist |
 | 620 | `20270322000000-CreateCafe24MemberLinksAndSeedCafe24B2bService.js` | 655 | relation "organizations" does not exist |
-| 625 | `20270326000000-DropGlycopharmService.js` | 660 | relation "roles" does not exist |
+| 625 | — | 660 | relation "roles" does not exist |
 | 626 | `20270327000000-AddStoreQrContentSource.js` | 661 | relation "store_qr_codes" does not exist |
 | 629 | `20270330000000-CreateStoreQrPlacements.js` | 664 | relation "store_qr_codes" does not exist |
 | 639 | `20270409000000-RemoveProductContentFromTabletBlockTypeCheck.js` | 674 | relation "store_tablet_screen_blocks" does not exist |
@@ -1544,18 +1540,18 @@ executePendingMigrations():
 
 | 순번 | 파일 | 운영 id | 오류 |
 |---:|---|---:|---|
-| 7 | `1736400000000-AddEnabledServicesToPharmacy.js` | 18 | relation "glycopharm_pharmacies" does not exist |
-| 43 | `1738300000000-AddPartnerRecruitingToGlycopharmProducts.js` | 61 | relation "public.glycopharm_products" does not exist |
+| 7 | `1736400000000-AddEnabledServicesToPharmacy.js` | 18 | — |
+| 43 | — | 61 | — |
 | 47 | `2026013100004-CleanupForumOrphanedPosts.js` | 65 | relation "forum_comment" does not exist |
 | 49 | `2026020200001-AddIconUrlToForumCategory.js` | 67 | relation "forum_category" does not exist |
 | 50 | `2026020300001-AddPinnedAndIconEmojiToForumCategory.js` | 68 | relation "forum_category" does not exist |
 | 76 | `1770601460383-ActivateAdminUser.js` | 95 | column "updatedAt" of relation "users" does not exist |
-| 98 | `20260215000003-AddStorefrontConfig.js` | 118 | relation "glycopharm_pharmacies" does not exist |
-| 107 | `20260215300002-AddFkPharmacyOrganization.js` | 127 | relation "glycopharm_pharmacies" does not exist |
-| 120 | `20260221000000-OrgServiceModelNormalizationPhaseA.js` | 142 | relation "glycopharm_pharmacies" does not exist |
-| 121 | `20260221100000-OrgServiceModelNormalizationPhaseC.js` | 143 | relation "glycopharm_pharmacy_extensions" does not exist |
+| 98 | `20260215000003-AddStorefrontConfig.js` | 118 | — |
+| 107 | `20260215300002-AddFkPharmacyOrganization.js` | 127 | — |
+| 120 | `20260221000000-OrgServiceModelNormalizationPhaseA.js` | 142 | — |
+| 121 | `20260221100000-OrgServiceModelNormalizationPhaseC.js` | 143 | — |
 | 128 | `20260222400000-AddOrganizationIdToGlucoseViewCustomers.js` | 150 | relation "organizations" does not exist |
-| 134 | `20260222900000-GlycopharmOrgEnrollmentRepair.js` | 156 | relation "organizations" does not exist |
+| 134 | — | 156 | relation "organizations" does not exist |
 | 139 | `20260224200000-CreateStoreLocalProductTables.js` | 161 | relation "organizations" does not exist |
 | 140 | `20260224300000-HardenStoreLocalProductDomain.js` | 162 | relation "store_tablet_displays" does not exist |
 | 141 | `20260224400000-AddStoreLocalProductContentFields.js` | 163 | relation "store_local_products" does not exist |
@@ -1571,19 +1567,19 @@ executePendingMigrations():
 | 219 | `20260311100000-CreateStoreCapabilities.js` | 241 | relation "organizations" does not exist |
 | 220 | `20260311200000-CosmeticsStoreOrgBridge.js` | 242 | relation "organizations" does not exist |
 | 231 | `20260317100000-NormalizeUserStatusCase.js` | 253 | column "updatedAt" of relation "users" does not exist |
-| 232 | `20260317110000-ActivateGlycopharmTestAccounts.js` | 254 | column "updatedAt" of relation "users" does not exist |
+| 232 | — | 254 | column "updatedAt" of relation "users" does not exist |
 | 237 | `20260318100000-ExtendRolesTable.js` | 259 | relation "roles" does not exist |
 | 238 | `20260318200000-AddStructuredAddress.js` | 260 | relation "organizations" does not exist |
 | 240 | `20260320000001-AddForumTypeToCategory.js` | 262 | relation "forum_category" does not exist |
-| 244 | `20260322100000-SeedGlycopharmForumCategory.js` | 266 | relation "organizations" does not exist |
+| 244 | — | 266 | relation "organizations" does not exist |
 | 249 | `20260323700000-AddMetadataToForumCategory.js` | 271 | relation "forum_category" does not exist |
 | 264 | `20260326500000-RepointListingOrganizationFK.js` | 286 | relation "organizations" does not exist |
 | 265 | `20260326600000-SeedNetureOrgEnrollments.js` | 287 | relation "organizations" does not exist |
 | 266 | `20260326600000-NetureSupplierOrgBridge.js` | 288 | relation "organizations" does not exist |
 | 276 | `20260328300000-BridgeApprovedRegistrationsToSuppliers.js` | 298 | column u.phone does not exist |
-| 289 | `20260331400000-UnifyGlycopharmRolesCatalog.js` | 311 | relation "roles" does not exist |
+| 289 | — | 311 | relation "roles" does not exist |
 | 290 | `20260331500000-UnifyCosmeticsRolesCatalog.js` | 312 | relation "roles" does not exist |
-| 291 | `20260331100000-BackfillGlycopharmPharmacyOrganizations.js` | 313 | relation "organizations" does not exist |
+| 291 | — | 313 | relation "organizations" does not exist |
 | 292 | `20260401100000-BackfillHealthReadingsPharmacyId.js` | 314 | column gc.organization_id does not exist |
 | 302 | `20260403500000-CleanupKpaForumPostsV2.js` | 324 | relation "forum_comment" does not exist |
 | 306 | `20260403800000-BackfillServiceOfferListings.js` | 329 | relation "organization_service_enrollments" does not exist |
@@ -1592,7 +1588,7 @@ executePendingMigrations():
 | 327 | `20260410300000-DeleteKpaSocietyOrganizationChannels.js` | 353 | relation "organization_service_enrollments" does not exist |
 | 331 | `20260411100000-BackfillKpaOrgsToOrganizations.js` | 357 | relation "organizations" does not exist |
 | 335 | `20260412100000-CleanupForumTestData.js` | 361 | relation "forum_category" does not exist |
-| 356 | `20260415280000-CreateGlycopharmMembersTable.js` | 382 | relation "organizations" does not exist |
+| 356 | — | 382 | relation "organizations" does not exist |
 | 360 | `20260416300000-BackfillMissingKpaSlugs.js` | 386 | relation "organizations" does not exist |
 | 362 | `20260416400000-BackfillKpaSlugsByMembership.js` | 388 | relation "organizations" does not exist |
 | 369 | `20260419100000-AddAssetTypeFieldsToStoreLibraryItems.js` | 396 | relation "store_library_items" does not exist |
@@ -1611,8 +1607,8 @@ executePendingMigrations():
 | 458 | `20261022000000-BackfillKpaSlugsPostMemberApprovalPath.js` | 492 | relation "organizations" does not exist |
 | 459 | `20261023000000-BackfillKpaOrganizationPharmacyInfo.js` | 493 | relation "organizations" does not exist |
 | 479 | `20260930000000-BackfillCosmeticsServiceEnrollments.js` | 513 | column cs.organization_id does not exist |
-| 482 | `20261030000001-GlycopharmPharmaciesOrgBridgeV2.js` | 516 | relation "organizations" does not exist |
-| 485 | `20260530220000-BackfillGlycopharmStoreOwnerEnrollmentAndRole.js` | 519 | relation "organizations" does not exist |
+| 482 | — | 516 | relation "organizations" does not exist |
+| 485 | — | 519 | relation "organizations" does not exist |
 | 521 | `20260618000000-BackfillNetureSupplierProfiles.js` | 555 | column u.phone does not exist |
 | 536 | `20261125000000-AddQrConsultationCtaAndNullableInterestMaster.js` | 570 | relation "store_qr_codes" does not exist |
 | 537 | `20261126000000-AddTagsToStoreContentSources.js` | 571 | relation "store_execution_assets" does not exist |
@@ -1627,14 +1623,14 @@ executePendingMigrations():
 | 584 | `20270211000000-AddScreenSetHubTargetStoreType.js` | 618 | relation "store_tablet_screen_sets" does not exist |
 | 589 | `20270216000000-SeedPharmacyHubServiceAndRoles.js` | 623 | relation "roles" does not exist |
 | 593 | `20270220000000-AddCosmeticsProductInfoColumns.js` | 627 | [AddCosmeticsProductInfoColumns] ABORT: cosmetics.cosmetics_products 이 존재하지 않는다. 선행 스키마 확인 필요. |
-| 595 | `20270222000000-CreateGlycopharmFeaturedProductsTable.js` | 629 | relation "glycopharm_products" does not exist |
+| 595 | — | 629 | — |
 | 599 | `20270226000000-SeedPharmacyHubAdminRole.js` | 633 | relation "roles" does not exist |
 | 604 | `20270305000000-SeedKpaBranchServiceAndRoles.js` | 638 | relation "roles" does not exist |
 | 605 | `20270306000000-CreateExternalChannelProductLinks.js` | 639 | relation "organizations" does not exist |
 | 613 | `20270314000000-DeactivatePharmacyHubSupplierRole.js` | 647 | relation "roles" does not exist |
 | 614 | `20270315000000-SeedPharmacyHubMemberRole.js` | 648 | relation "roles" does not exist |
 | 621 | `20270322000000-CreateCafe24MemberLinksAndSeedCafe24B2bService.js` | 655 | relation "organizations" does not exist |
-| 626 | `20270326000000-DropGlycopharmService.js` | 660 | relation "roles" does not exist |
+| 626 | — | 660 | relation "roles" does not exist |
 | 627 | `20270327000000-AddStoreQrContentSource.js` | 661 | relation "store_qr_codes" does not exist |
 | 630 | `20270330000000-CreateStoreQrPlacements.js` | 664 | relation "store_qr_codes" does not exist |
 | 640 | `20270409000000-RemoveProductContentFromTabletBlockTypeCheck.js` | 674 | relation "store_tablet_screen_blocks" does not exist |
@@ -1662,19 +1658,19 @@ executePendingMigrations():
 | 132 | `20260216200001-CreateKpaAdminAccount.js` | 132 | column "domain" of relation "users" does not exist |
 | 187 | `20260228100000-AddUserConsentColumns.js` | 187 | column "createdAt" does not exist |
 | 253 | `20260317100000-NormalizeUserStatusCase.js` | 253 | column "updatedAt" of relation "users" does not exist |
-| 254 | `20260317110000-ActivateGlycopharmTestAccounts.js` | 254 | column "updatedAt" of relation "users" does not exist |
+| 254 | — | 254 | column "updatedAt" of relation "users" does not exist |
 | 259 | `20260318100000-ExtendRolesTable.js` | 259 | relation "roles" does not exist |
 | 262 | `20260320000001-AddForumTypeToCategory.js` | 262 | relation "forum_category" does not exist |
 | 271 | `20260323700000-AddMetadataToForumCategory.js` | 271 | relation "forum_category" does not exist |
 | 287 | `20260326600000-SeedNetureOrgEnrollments.js` | 287 | ABORT: Target organizations not found. Seed KPA organizations first. |
 | 298 | `20260328300000-BridgeApprovedRegistrationsToSuppliers.js` | 298 | column u.phone does not exist |
-| 311 | `20260331400000-UnifyGlycopharmRolesCatalog.js` | 311 | relation "roles" does not exist |
+| 311 | — | 311 | relation "roles" does not exist |
 | 312 | `20260331500000-UnifyCosmeticsRolesCatalog.js` | 312 | relation "roles" does not exist |
 | 324 | `20260403500000-CleanupKpaForumPostsV2.js` | 324 | relation "forum_comment" does not exist |
 | 328 | `20260403900000-SeedKpaOperatorTestData.js` | 328 | column "createdAt" of relation "users" does not exist |
 | 337 | `20260404400000-CreateForumCategoryMembersTable.js` | 337 | relation "forum_category" does not exist |
-| 348 | `20260409300000-MigrateGlycopharmProductsToCatalogAndStore.js` | 348 | column gp.origin_country does not exist |
-| 349 | `20260409400000-RebackfillGlycopharmProductsAfterDualWrite.js` | 349 | column gp.origin_country does not exist |
+| 348 | — | 348 | column gp.origin_country does not exist |
+| 349 | — | 349 | column gp.origin_country does not exist |
 | 361 | `20260412100000-CleanupForumTestData.js` | 361 | relation "forum_category" does not exist |
 | 407 | `20260700000000-AddTagsToForumCategory.js` | 408 | relation "forum_category" does not exist |
 | 417 | `20260425300000-ConvertForumPostTagsToArray.js` | 418 | relation "forum_post" does not exist |
@@ -1692,7 +1688,7 @@ executePendingMigrations():
 | 643 | `20270314000000-DeactivatePharmacyHubSupplierRole.js` | 647 | relation "roles" does not exist |
 | 644 | `20270315000000-SeedPharmacyHubMemberRole.js` | 648 | relation "roles" does not exist |
 | 651 | `20270322000000-CreateCafe24MemberLinksAndSeedCafe24B2bService.js` | 655 | relation "roles" does not exist |
-| 656 | `20270326000000-DropGlycopharmService.js` | 660 | relation "roles" does not exist |
+| 656 | — | 660 | relation "roles" does not exist |
 | 674 | `20270413000000-BaselineRbacAndAccountTables.js` | 678 | [BaselineRbacAndAccountTables] role_permissions: required table "roles" is absent — cannot create FK target (roles has no creation migration: report, do not imp |
 
 </details>

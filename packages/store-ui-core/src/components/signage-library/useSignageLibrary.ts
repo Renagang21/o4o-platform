@@ -3,8 +3,8 @@
  *
  * WO-O4O-STORE-HUB-COMMON-VIEW-AND-SHELL-UNIFICATION-V1
  *
- * KPA-Society(652L) · K-Cosmetics(579L) · GlycoPharm(580L) 이 각자 갖고 있던 동일 상태 기계를
- * 하나로 모은다. 세 화면의 상태 흐름은 문구·accent 와 copy adapter 를 빼면 동일했다.
+ * KPA-Society(652L) · K-Cosmetics(579L) 이 각자 갖고 있던 동일 상태 기계를
+ * 하나로 모은다. 두 화면의 상태 흐름은 문구·accent 와 copy adapter 를 빼면 동일했다.
  *
  * 담는 것:
  *   미디어/플레이리스트 2탭 · producer 필터(client-side) · 탭별 페이지네이션 ·

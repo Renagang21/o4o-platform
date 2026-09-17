@@ -78,7 +78,7 @@ CMS slot 과 join 하지 않는다 → 이번 WO 에서 미접촉.
 | admin `pages/cms/channels/ChannelContentsPreview.tsx` | `/channels/:id/contents` | 없음(채널 row 사용) | R | **예** | 예 |
 | admin `pages/channels/ops/ChannelOpsDashboard.tsx` | `/admin/channels/ops` | **자유 입력 text** | R | – | 예 (`/admin/cms/channels/ops`) |
 | services/signage-player-web | `/channels/:id`, `/:id/contents`, playback-log, heartbeat | URL path 의 `:serviceKey` 는 **플레이어 라우팅용**(API 로 안 보냄) | R+W(log) | **예** | **아니오** — `deploy-web-services.yml` 에 없음(미배포) |
-| KPA / KCos / GP / PH / Neture web | – | – | – | – | **소비 0** (`/api/v1/channels` 호출 없음) |
+| KPA / KCos / PH / Neture web | – | – | – | – | **소비 0** (`/api/v1/channels` 호출 없음) |
 | shared packages (`store-ui-core`, `operator-core-ui`) | `/channels` 문자열은 **스토어 메뉴 subPath** | – | – | – | CMS channels API 소비 0 |
 
 `ChannelOpsDashboard` 의 serviceKey 필터가 **자유 입력**이라는 점이 §9 invariant 가 실사용에서
@@ -98,15 +98,12 @@ channels                 0행   (serviceKey별/status별 그룹 결과 0행)
 channel_playback_logs    0행
 channel_heartbeats       0행
 
-cms_content_slots   kpa-society 28 / kpa 1 / glycopharm 1
-cms_contents        glycopharm 66 / kpa-society 53 / neture 6 / kpa 1 / pharmacy-hub 1
 ```
 
 slot 의 `slotKey × serviceKey` 실측(핵심):
 
 ```
 intranet-hero          kpa            org=NULL  active  1     ← legacy alias slot
-home-hero              glycopharm     org=NULL  active  1
 kpa-dashboard-banner   kpa-society    …                 4
 kpa-dashboard-benefit  kpa-society    …                 5
 kpa-main-benefit       kpa-society    …                 6
@@ -150,7 +147,7 @@ kpa-supplier-promo     kpa-society    …                 5
 | 9 | `channel-heartbeat.routes.ts` GET `/status` | `channelWhere.serviceKey = ...` | **ALIAS_UNSAFE** | alias 집합 |
 | 10 | `channel-playback-logs.routes.ts` GET `/` | `where.serviceKey = ...` | **ALIAS_UNSAFE** | alias 집합 |
 | 11 | `channel-playback-logs.routes.ts` stats | `log.serviceKey = :serviceKey` | **ALIAS_UNSAFE** | `IN (:...serviceKeys)` |
-| 12 | `Channel.entity.ts` 주석 예시 | `'glycopharm','kpa','neture','k-cosmetics'` (축 혼재 문서) | **DEAD**(문서) | canonical 예시로 정정 |
+| 12 | `Channel.entity.ts` 주석 예시 | — | **DEAD**(문서) | canonical 예시로 정정 |
 | 13 | admin `ChannelFormModal.tsx` / `ChannelList.tsx` | `{ value: 'kpa' }` | **ALIAS_UNSAFE**(UI → ledger 전송값) | `'kpa-society'` |
 | 14 | `signage-player-web` URL 의 `:serviceKey` | 플레이어 라우팅 파라미터 | **ROUTE_KEY_ONLY** | 미변경 |
 | 15 | `ChannelOpsDashboard` serviceKey 자유 입력 | UI 필터 문자열 | **ROLE_SCOPE_COMPARISON 아님 / 서버에서 해석** | 미변경(서버 수렴) |
@@ -171,7 +168,6 @@ kpa-supplier-promo     kpa-society    …                 5
 ```
 kpa | kpa-society        → 저장 kpa-society   / 읽기 ['kpa-society','kpa']
 cosmetics | k-cosmetics  → 저장 k-cosmetics   / 읽기 ['k-cosmetics','cosmetics']
-neture | glycopharm | pharmacy-hub | platform → self-map, 집합 크기 1
 serviceKey 없음/null      → null 유지 (cross-service 채널, 기존 계약)
 ```
 
@@ -183,7 +179,7 @@ serviceKey 없음/null      → null 유지 (cross-service 채널, 기존 계약
 ## 8. Read / Write 결과 (§9·§10)
 
 - read: `GET /channels?serviceKey=kpa` 와 `=kpa-society` 가 **같은 모집단**(canonical+legacy 채널 둘 다).
-  타 서비스(glycopharm) 혼입 0. 필터는 **query 단계**(`In`)에서 적용 — 응답 후 JS filter 없음.
+  타 서비스 혼입 0. 필터는 **query 단계**(`In`)에서 적용 — 응답 후 JS filter 없음.
 - write: `kpa→kpa-society`, `cosmetics→k-cosmetics`, canonical 입력은 그대로, 미지정은 `null` 유지.
   PUT 에서 `serviceKey: null` 로 cross-service 복귀도 가능(기존 동작 보존, 이제 `null` 명시 처리).
 - role prefix 가 ledger 컬럼에 저장되는 경로는 남지 않았다(서버가 최종 관문이므로 UI 가 `'kpa'` 를
@@ -268,14 +264,13 @@ schema/migration 0. 새 helper·새 alias 배열 0.
 ## 14. 자동 테스트 (§17·§18)
 
 `apps/api-server/src/__tests__/channels-servicekey-canonical-scope.spec.ts` — **33 tests, 전부 PASS**.
-fixture 는 프로덕션 구조(legacy `kpa` slot `intranet-hero` + canonical slot + GP slot + 글로벌 slot)를 그대로 옮겼다.
+fixture 는 프로덕션 구조(legacy `kpa` slot `intranet-hero` + canonical slot slot + 글로벌 slot)를 그대로 옮겼다.
 
 - canonicalization 9: `kpa|kpa-society→kpa-society`, `cosmetics|k-cosmetics→k-cosmetics`,
-  `neture|glycopharm|pharmacy-hub|platform` self-map, alias 집합 양방향 동일.
 - read 4: alias/canonical 동일 모집단, 타 서비스 혼입 0, self-map 필터, serviceKey 미지정 전체.
 - write 9: POST 5축 canonical 저장, 미지정 null, PUT alias→canonical, PUT null 복귀, 비관리자 403.
 - slot linkage 4: **canonical 채널이 legacy `kpa` slot 을 놓치지 않음**, legacy 채널이 canonical slot 조회,
-  쿼리 파라미터가 security-core 파생값과 일치, GP 채널에 KPA slot 혼입 0.
+  쿼리 파라미터가 security-core 파생값과 일치 채널에 KPA slot 혼입 0.
 - static 7: channels 4개 파일에 로컬 alias 배열/맵 금지, `where.serviceKey = serviceKey` ·
   `slot.serviceKey = :serviceKey` 금지, admin 필터 alias 집합 사용, admin 화면 canonical value 만.
 
@@ -356,7 +351,6 @@ channels 0행 → empty state 정상, SQL/에러 0. production fixture 생성하
    / `ChannelList.tsx` 를 함께 건드리므로 병합 시 해당 hunk 충돌이 예상된다(양쪽 모두 canonical
    value 로 수렴하는 방향이라 해소는 자명하다). 이 WO 는 미병합 브랜치 모듈에 의존하지 않는다.
 6. §21 제외 목록(slot `KNOWN_PREFIXES` pharmacy-hub 누락, admin CMS 카탈로그 pharmacy-hub 누락,
-   GP dead `getContent`, platform+organizationId 정책, Resource category/tag, PH operator upload UI)은
    손대지 않았다.
 
 ---

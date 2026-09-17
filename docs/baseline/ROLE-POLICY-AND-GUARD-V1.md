@@ -46,7 +46,6 @@ Platform Layer       → platform:super_admin
 |--------|----------------------------|------|
 | KPA Society | **차단** | 약사회 자치 |
 | Neture | 허용 | 플랫폼 운영 |
-| GlycoPharm | 허용 | 플랫폼 운영 |
 | K-Cosmetics | 허용 | 플랫폼 운영 |
 | GlucoseView | 미설정 | — |
 
@@ -54,12 +53,11 @@ Platform Layer       → platform:super_admin
 
 ## 4. 서비스 격리 매트릭스
 
-|  | KPA | Neture | GlycoPharm | K-Cosmetics | GlucoseView | Platform |
-|--|-----|--------|------------|-------------|-------------|----------|
-| **kpa:*** | **허용** | 차단 | 차단 | 차단 | 차단 | 차단 |
-| **neture:*** | 차단 | **허용** | 차단 | 차단 | 차단 | 차단 |
-| **glycopharm:*** | 차단 | 차단 | **허용** | 차단 | 차단 | 차단 |
-| **platform:*** | 차단 | 허용 | 허용 | 허용 | 미설정 | **허용** |
+|  | KPA | Neture | K-Cosmetics | GlucoseView | Platform |
+| -- | ----- | -------- | ------------- | ------------- | ---------- |
+| **kpa:*** | **허용** | 차단 | 차단 | 차단 | 차단 |
+| **neture:*** | 차단 | **허용** | 차단 | 차단 | 차단 |
+| **platform:*** | 차단 | 허용 | 허용 | 미설정 | **허용** |
 
 ---
 
@@ -114,7 +112,6 @@ requireScope('{service}:branch_admin') + validateBranchOwnership()
 | 서비스 | 보호 영역 수 | 조직 스코프 |
 |--------|------------|-----------|
 | Neture | 5 | 없음 |
-| GlycoPharm | 4 | 없음 |
 | K-Cosmetics | 4 | 없음 |
 | GlucoseView | 4 | 없음 |
 | KPA-a | 5 | 없음 |
@@ -133,7 +130,6 @@ requireScope('{service}:branch_admin') + validateBranchOwnership()
 | platform | `platform:super_admin` |
 | kpa | `kpa:admin`, `kpa:operator`, `kpa:district_admin`, `kpa:branch_admin`, `kpa:branch_operator` |
 | neture | `neture:admin`, `neture:operator`, `neture:supplier` (`neture:partner` 는 2026-09-15 Legacy Partner 은퇴로 scope 제거) |
-| glycopharm | `glycopharm:admin`, `glycopharm:operator` |
 
 ### Frontend 역할 매핑
 
@@ -141,7 +137,6 @@ requireScope('{service}:branch_admin') + validateBranchOwnership()
 |--------|------|
 | KPA | string 동적 (`kpa:admin` 등) |
 | Neture | admin/super_admin → `admin` |
-| GlycoPharm | admin/super_admin → `operator` |
 | K-Cosmetics | admin/super_admin → `admin` |
 | GlucoseView | admin/super_admin → `admin` |
 

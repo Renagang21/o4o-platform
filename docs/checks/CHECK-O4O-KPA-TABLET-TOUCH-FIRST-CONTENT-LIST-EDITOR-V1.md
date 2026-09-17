@@ -78,7 +78,7 @@ services/web-kpa-society/src/pages/pharmacy/TabletScreenSetManager.tsx  (UI only
 - content_list config 계약·sourceType·정렬/표시/override 필드·dedup·Screen Set/Block 저장 API·template_key·public `/tablet/screen` resolve·viewer card·ContentRenderer 상세 모달 — **코드 미접촉**. migration/샘플 0.
 
 ## 12. typecheck / 배포 / 회귀
-- web-kpa-society `tsc --noEmit`: **TabletScreenSetManager 에러 0**(KPA 전용 → GP/KCos 무관).
+- web-kpa-society `tsc --noEmit`: **TabletScreenSetManager 에러 0**(KPA 전용 → KCos 무관).
 - web deploy(3d94371a7) **success**.
 - **공개 viewer 회귀 없음(read-only)**: 배포 전/후 `/tablet/screen` 200, content_list 카드 **구강 5 / 피부 4 불변**. 운영 샘플 무변경.
 

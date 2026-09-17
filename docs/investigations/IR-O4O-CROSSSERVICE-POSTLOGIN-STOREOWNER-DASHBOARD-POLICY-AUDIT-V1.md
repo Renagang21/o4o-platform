@@ -4,7 +4,6 @@
 
 - **작성일:** 2026-06-02
 - **유형:** Investigation Report (조사 전용)
-- **범위:** web-kpa-society / web-glycopharm / web-k-cosmetics / web-neture + 공통 패키지(auth-utils, store-ui-core)
 - **기준 문서:** `docs/baseline/O4O-BUSINESS-PHILOSOPHY-V1.md`, `docs/baseline/O4O-STORE-MENU-CANONICAL-TREE-V1.md`
 - **방침:** 코드/문서 수정·이동·삭제 없음. 추측 금지. 주석-구현 불일치는 명시적으로 표기.
 
@@ -12,7 +11,7 @@
 
 ## 0. 한 줄 결론
 
-> **GlycoPharm·K-Cosmetics 는 store_owner 를 로그인 직후 `/store`(내 매장/내 약국)로 자동 이동시킨다. KPA-Society 만 store_owner 를 자동 이동시키지 않고 커뮤니티 Home 에 머무르게 한다.** 이 차이는 **우발적 잔재가 아니라 명시적 정책 결정**(`WO-O4O-KPA-POST-LOGIN-PRIMARY-ROUTE-FIX-V1`)이며, "KPA = 커뮤니티 서비스" 전제 위에 서 있다. 이 전제는 본 IR 이 채택한 O4O 철학("KPA 도 약국 경쟁력 강화 O4O 서비스, 예외 아님")과 **정면 충돌**한다. 더불어 KPA `LoginModal.tsx` 에는 구현과 반대되는 **stale 주석**("약국 경영자 → /store")이 남아 있다.
+> KPA-Society 만 store_owner 를 자동 이동시키지 않고 커뮤니티 Home 에 머무르게 한다.** 이 차이는 **우발적 잔재가 아니라 명시적 정책 결정**(`WO-O4O-KPA-POST-LOGIN-PRIMARY-ROUTE-FIX-V1`)이며, "KPA = 커뮤니티 서비스" 전제 위에 서 있다. 이 전제는 본 IR 이 채택한 O4O 철학("KPA 도 약국 경쟁력 강화 O4O 서비스, 예외 아님")과 **정면 충돌**한다. 더불어 KPA `LoginModal.tsx` 에는 구현과 반대되는 **stale 주석("약국 경영자 → /store")이 남아 있다.
 
 ---
 
@@ -22,7 +21,6 @@
 
 | 서비스 | store_owner 역할명 | 로그인 직후 store_owner 이동 | Home 유지 여부 | 비고 |
 |--------|-------------------|------------------------------|----------------|------|
-| **GlycoPharm** | `glycopharm:store_owner` | **`/store`** (내 약국 워크스페이스) | 자동 이동됨 | 정책-구현 일치 |
 | **K-Cosmetics** | `cosmetics:store_owner` | **`/store`** (StoreCockpitPage) | 자동 이동됨 | 정책-구현 일치 |
 | **KPA-Society** | `kpa:store_owner` | **이동 없음 → 커뮤니티 Home 유지** | 유지됨 | `/store` 는 헤더 "내 약국" 메뉴로만 진입 |
 | **Neture** | `store_owner` (참여 유형, role 아님) | `/seller/overview` (일반 overview) | 자동 이동됨 | B2B 공급자/파트너 중심 — store_owner 정식 role 없음 |
@@ -40,14 +38,9 @@
 | `kpa:store_owner` | **(map 에 없음) → null → Home 유지** |
 | `lms:instructor` / `kpa:pharmacist` / 일반 | null → Home 유지 |
 
-**GlycoPharm** — [config/dashboard.ts:21-37](services/web-glycopharm/src/config/dashboard.ts#L21)
 | role | route |
 |------|-------|
 | `platform:super_admin` | `/admin` |
-| `glycopharm:admin` | `/admin` |
-| `glycopharm:operator` | `/operator` |
-| `glycopharm:store_owner` | **`/store`** |
-| `glycopharm:pharmacist` | `/store/hub` |
 | `customer` | `/patient` |
 
 **K-Cosmetics** — [config/dashboard.ts:18-34](services/web-k-cosmetics/src/config/dashboard.ts#L18)
@@ -91,14 +84,6 @@
 - **/store Guard:** `PharmacyGuard` → 공통 `StoreOwnerGuard(serviceKey='kpa')` + 승인 상태 체크. 미승인 시 `/pharmacy` 안내 페이지.
 - ⚠️ **주석-구현 불일치 (확정):** [LoginModal.tsx:107-108](services/web-kpa-society/src/components/LoginModal.tsx#L107) 에 `"약국 경영자(isStoreOwner) → /store"` 주석이 남아 있으나, 실제 구현은 `null`(이동 없음). 이는 `WO-O4O-KPA-POST-LOGIN-PRIMARY-ROUTE-FIX-V1` 이전 설계의 **잔재 주석**이다.
 
-### 2-2. GlycoPharm — store_owner → /store (정책-구현 일치)
-
-- **로그인 진입:** [LoginModal.tsx](services/web-glycopharm/src/components/common/LoginModal.tsx) + [App.tsx:436-481 PostLoginRedirect](services/web-glycopharm/src/App.tsx#L436)
-- **store_owner 정책:** `glycopharm:store_owner` → `/store`(StoreOverviewPage, "내 약국 홈"). pharmacist 는 `/store/hub`(읽기 중심). 우선순위상 store_owner > pharmacist.
-- **/store Guard:** `PharmacyStoreGuard` → 공통 `StoreOwnerGuard(serviceKey='glycopharm')`, membership(`pharmacy` active/approved)도 허용, operator/admin 통과. 거부 시 `/`.
-- **헤더:** "내 약국"→`/store`(storeOwner), "매장 운영 허브"→`/store-hub`. 모바일 "약국 경영" 탭.
-- 주석-구현 일치. 다중 WO 로 store_owner 진입 보장 안정화됨([App.tsx:865-870](services/web-glycopharm/src/App.tsx#L865)).
-
 ### 2-3. K-Cosmetics — store_owner → /store (정책-구현 일치)
 
 - **로그인 진입:** LoginModal/LoginPage + [App.tsx:327-370 PostLoginRedirect](services/web-k-cosmetics/src/App.tsx#L327)
@@ -112,7 +97,7 @@
   > `store_owner 가 canonical (Neture 내부 participant type, 권한 role 아님)... neture:store_owner role 은 만들지 않으며 다른 서비스 store_owner 와 연결하지 않는다.`
 - **핵심 역할 이동:** supplier→`/supplier/dashboard`, partner→`/partner/dashboard`, admin→`/admin`, operator→`/operator`. store_owner/seller→`/seller/overview`(전용 대시보드 아님, 헤더 진입점 없음).
 - [navigation.ts:32-39](services/web-neture/src/config/navigation.ts#L32): `Neture 는 공급자·파트너 조직 중심 — store owner / 매장 허브 구조를 적용하지 않는다.` (명시적 설계)
-- **판단:** Neture 는 O4O 매장 경영자 흐름의 대상이 아니라 **공급 계층** 서비스. store_owner 첫 화면 정책 비교에서 KPA/GP/K-Cos 와 동일 축으로 두면 안 됨.
+- **판단:** Neture 는 O4O 매장 경영자 흐름의 대상이 아니라 **공급 계층** 서비스. store_owner 첫 화면 정책 비교에서 KPA/K-Cos 와 동일 축으로 두면 안 됨.
 
 ---
 
@@ -123,22 +108,22 @@
 KPA 는 코드 레벨에서 **명시적으로 "커뮤니티 서비스"로 특별 취급**된다. 근거:
 1. `KPA_DASHBOARD_MAP` 이 admin/operator 만 매핑하고 store_owner 를 의도적으로 배제 — `WO-O4O-KPA-POST-LOGIN-PRIMARY-ROUTE-FIX-V1` 주석에 "커뮤니티 철학" 명시.
 2. `WO-O4O-ROLEBASED-HOME-REMOVAL-AND-ROUTING-NORMALIZATION-V1` 로 "/" 를 항상 커뮤니티 Home 으로 고정.
-3. GlycoPharm/K-Cosmetics 는 동일 store_owner 를 `/store` 로 보내지만 KPA 만 보내지 않음.
+3. K-Cosmetics 는 동일 store_owner 를 `/store` 로 보내지만 KPA 만 보내지 않음.
 
 → **이 예외는 우발적 잔재(legacy residue)가 아니라 "의도된 최근 정책 결정"이다.** 다만 그 정책의 전제("KPA = 커뮤니티 우선")가 본 IR 의 O4O 철학 기준과 충돌한다.
 
 ### 3-2. store_owner 첫 화면 정책의 서비스 간 불일치 — **불일치 존재 (확정)**
 
-| | GlycoPharm | K-Cosmetics | KPA-Society |
-|---|:---:|:---:|:---:|
-| store_owner 로그인 직후 | `/store` | `/store` | **Home 유지** |
+| | K-Cosmetics | KPA-Society |
+| --- | :---: | :---: |
+| store_owner 로그인 직후 | `/store` | **Home 유지** |
 
 매장/약국 경영자가 동일한 역할 의미를 갖는데도 KPA 만 첫 경험이 다르다. O4O 철학("약국/매장 경영자는 주 사용자")을 적용하면 이는 정책 표류(drift)에 해당.
 
 ### 3-3. Home/Community 중심 구조가 O4O 목적과 충돌하는지 — **부분 충돌**
 
 - 공개 Home 을 비로그인/일반 참여자 진입점으로 유지하는 것 자체는 O4O 목적과 충돌하지 않음(IR 판단 기준과 일치).
-- 충돌 지점은 **"로그인한 store_owner 까지 커뮤니티 Home 에 머무르게 하는 것"** 이다. Home 을 내 약국으로 바꾸지 않고도(=공개 Home 유지) store_owner 의 첫 화면만 `/store` 로 보내는 것이 GlycoPharm/K-Cos 에서 이미 구현되어 있으므로, KPA 도 Home 구조를 훼손하지 않고 정렬 가능.
+- 충돌 지점은 **"로그인한 store_owner 까지 커뮤니티 Home 에 머무르게 하는 것"** 이다. Home 을 내 약국으로 바꾸지 않고도(=공개 Home 유지) store_owner 의 첫 화면만 `/store` 로 보내는 것이 K-Cos 에서 이미 구현되어 있으므로, KPA 도 Home 구조를 훼손하지 않고 정렬 가능.
 
 ---
 
@@ -173,7 +158,7 @@ KPA 는 코드 레벨에서 **명시적으로 "커뮤니티 서비스"로 특별
 
 ### 5-2. KPA store_owner 를 `/store` 로 보낼지 — **최종 권고: 보낸다 (조건부)**
 
-- **근거:** 본 IR 이 채택한 O4O 철학상 KPA 는 예외 서비스가 아니며, 약국 경영자는 주 사용자다. GlycoPharm/K-Cos 와의 불일치를 제거하는 것이 정합적이다.
+- **근거:** 본 IR 이 채택한 O4O 철학상 KPA 는 예외 서비스가 아니며, 약국 경영자는 주 사용자다. K-Cos 와의 불일치를 제거하는 것이 정합적이다.
 - **조건부 설계 권고:** 무조건 이동이 아니라 **"승인된(approved) store_owner 에 한해 `/store` 자동 이동"**. 미승인자는 현행대로 `/pharmacy` 안내 또는 Home 유지(Guard 재튕김 UX 방지).
 - **공개 Home 은 유지** — Home 을 내 약국으로 바꾸지 않는다. 변경 대상은 "로그인 직후 store_owner 의 목적지"뿐.
 - **stale 주석 정리:** KPA `LoginModal.tsx:107-108` 의 "약국 경영자 → /store" 주석을 구현과 일치시키는 작업을 동반.
@@ -198,7 +183,7 @@ KPA 는 코드 레벨에서 **명시적으로 "커뮤니티 서비스"로 특별
 | [services/web-kpa-society/src/components/LoginModal.tsx:107](services/web-kpa-society/src/components/LoginModal.tsx#L107) | stale 주석 정리 (구현 일치) |
 | [services/web-kpa-society/src/App.tsx:330](services/web-kpa-society/src/App.tsx#L330) | 승인 상태 기반 조건부 이동 검토 (필요 시) |
 
-> ⚠️ 단, KPA 의 "커뮤니티 우선" 정책은 `WO-O4O-KPA-POST-LOGIN-PRIMARY-ROUTE-FIX-V1` 에서 **의도적으로 결정된 것**이다. 이를 뒤집는 WO 는 해당 WO 의 결정을 명시적으로 갱신(supersede)하는 것이므로, 착수 전 **사업 의사결정 확인**(KPA 를 store_owner 첫 화면 기준으로 GlycoPharm/K-Cos 와 동일하게 둘 것인지)이 선행되어야 한다.
+> ⚠️ 단, KPA 의 "커뮤니티 우선" 정책은 `WO-O4O-KPA-POST-LOGIN-PRIMARY-ROUTE-FIX-V1` 에서 **의도적으로 결정된 것**이다. 이를 뒤집는 WO 는 해당 WO 의 결정을 명시적으로 갱신(supersede)하는 것이므로, 착수 전 **사업 의사결정 확인**(KPA 를 store_owner 첫 화면 기준으로 K-Cos 와 동일하게 둘 것인지)이 선행되어야 한다.
 
 ---
 
@@ -206,7 +191,7 @@ KPA 는 코드 레벨에서 **명시적으로 "커뮤니티 서비스"로 특별
 
 | # | O4O 철학 기준 (본 IR 채택) | 현재 구조 | 충돌? |
 |---|---------------------------|-----------|:-----:|
-| 1 | 약국/매장 경영자는 O4O 주 사용자 | GlycoPharm/K-Cos: store_owner→/store ✅ / KPA: Home 유지 ❌ | **충돌 (KPA)** |
+| 1 | 약국/매장 경영자는 O4O 주 사용자 | K-Cos: store_owner→/store ✅ / KPA: Home 유지 ❌ | **충돌 (KPA)** |
 | 2 | KPA 는 O4O 철학의 예외 서비스가 아니다 | 코드가 KPA 를 "커뮤니티 철학" 예외로 명시 취급 | **충돌** |
 | 3 | 공개 Home 유지 가능 | 4서비스 모두 공개 Home 유지 ✅ | 일치 |
 | 4 | 로그인 후 시작 화면은 역할에 맞아야 함 | admin/operator 는 전 서비스 일치 ✅ / store_owner 는 KPA 만 불일치 ❌ | **부분 충돌** |
@@ -222,7 +207,7 @@ KPA 는 코드 레벨에서 **명시적으로 "커뮤니티 서비스"로 특별
 
 - **조사한 주요 파일:** 4서비스 `config/dashboard.ts`·`config/navigation.ts`·`App.tsx`(PostLoginRedirect)·`LoginModal.tsx`·각 Guard, 공통 `packages/auth-utils/src/getPrimaryDashboardRoute.ts`·`packages/store-ui-core/src/auth/StoreOwnerGuard.tsx`
 - **서비스별 post-login redirect 표:** §1-1 / §1-2
-- **store_owner 계열 실제 이동 경로:** GP `/store` · K-Cos `/store` · **KPA Home 유지** · Neture `/seller/overview`(참여유형)
+- K-Cos `/store` · **KPA Home 유지** · Neture `/seller/overview`(참여유형)
 - **KPA 예외 여부:** **명시적·의도적 예외**(legacy 잔재 아님). 단 `LoginModal.tsx` 에 구현과 반대되는 stale 주석 1건 확정.
 - **공통화 가능성:** 핵심 로직은 이미 ~85% 공통화(`getPrimaryDashboardRoute`, `StoreOwnerGuard`). 정렬은 **KPA `config/dashboard.ts` 값 변경만으로 가능**(구조 변경 불필요). `PostLoginRedirect`/`RoleGuard` 는 4서비스 복제본(이번 정렬과 무관, 별도 추출 후보).
 - **후속 WO 필요 여부:** **필요(권장)** — `WO-O4O-KPA-POSTLOGIN-STOREOWNER-DASHBOARD-ALIGNMENT-V1`(가칭). 단, KPA 커뮤니티 정책을 뒤집는 결정이므로 착수 전 사업 의사결정 확인 선행.

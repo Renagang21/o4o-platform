@@ -16,8 +16,6 @@
 
 따라서 관측된 증상("회원 관리에 승인 대기 대상이 없다")의 **정확한 원인은 "회원 목록이 pending을 거른다"가 아니라, "공급사 승인은 membership이 아니라 `neture_suppliers` 테이블의 별도 상태이고, 회원 콘솔은 그 테이블을 조회하지 않는다"** 이다. 두 카운터가 다른 테이블·다른 생애주기 단계를 보고 있어 영원히 일치하지 않는다.
 
-부차적으로 운영자 콘솔 IA 자체가 정리되지 않았다 — 같은 데이터(`supplier_product_offers` 등)를 보는 화면이 operator/admin 중복, 사이드바에 라우트 없는 **죽은 링크 다수**, Neture 운영자 화면이 `glycopharm_products`를 직접 수정하는 cross-domain 결합 존재.
-
 ---
 
 ## 관련 파일 / 컴포넌트 / API 목록
@@ -111,7 +109,7 @@ Neture 공급자 온보딩은 2단계 활성화(`operator-registration.service.t
 - **죽은 사이드바 링크** (`operatorMenuGroups.ts` / UNIFIED_MENU의 `adminOnly` 항목): `/operator/partners`, `/operator/partner-settlements`, `/operator/settlements`, `/operator/commissions`, `/operator/categories`, `/operator/brands`, `/operator/service-approvals`, `/operator/product-cleanup`, `/operator/masters`, `/operator/catalog-import`, `/operator/operators`, `/operator/roles` 등 — `/operator/*` 라우트 없고 `/admin/*` 만 존재 → admin이 operator 사이드바를 볼 때 깨진 링크. `/admin/*`로 정정하거나 메뉴에서 제거.
 - **죽은 네비게이션**: `AdminPartnerMonitoringPage`가 `navigate('/operator/partners/:id')` 하지만 해당 라우트 없음.
 - **중복 화면(operator/admin twin)**: 공급사·상품·서비스 승인이 operator와 admin에 각각 존재(같은 테이블). 통합 또는 역할 경계 명문화 — 후순위.
-- **Cross-domain 결합**: `RecruitingProductsOverviewPage`가 Neture 엔드포인트로 **`glycopharm_products`**(`is_featured`/`is_partner_recruiting`)를 직접 수정 — Boundary Policy(§7) 검토 대상. 후순위지만 기록 필요.
+- 후순위지만 기록 필요.
 
 ---
 
@@ -174,9 +172,9 @@ Neture 공급자 온보딩은 2단계 활성화(`operator-registration.service.t
 `docs/baseline/O4O-BUSINESS-PHILOSOPHY-V1.md` §3·§7 기준:
 
 - ✅ **정합**: 공급자가 in-app 콘텐츠 제작 주체가 아님(§3.1 "원천 자료 전달"). Neture에서 supplier signage/content 진입점이 실제 제거됨(App.tsx 주석). 운영자 화면이 수신·등록·큐레이션·매장지원 역할 담당.
-- ✅ **정합**: §7 "내 매장이 없는 서비스(현재: Neture)에 내 매장 기능을 추가하지 않는다" — Neture에 operator-scope 매장 실행/내 매장 surface 없음. store ops는 downstream(GlycoPharm/Cosmetics/KPA).
+- ✅ **정합**: §7 "내 매장이 없는 서비스(현재: Neture)에 내 매장 기능을 추가하지 않는다" — Neture에 operator-scope 매장 실행/내 매장 surface 없음. store ops는 downstream.
 - ⚠️ **Drift(경미)**: 운영자 사이드바가 라우트 없는 `/operator/*` 정산·카탈로그 링크를 광고 — 거버넌스 drift(철학 위반 아님).
-- ⚠️ **Boundary 검토**: Neture 운영자 화면이 `glycopharm_products`를 직접 변경 — §7 Boundary Policy(Cross-domain) 위반 소지. 별도 판단 필요.
+- 별도 판단 필요.
 - ⚠️ **개념 혼선**: "회원 관리 ↔ 승인 업무"가 UX상 섞여 2단계 공급자 승인의 가시성 저하 — IA 재설계로 해소 권장.
 
 ---
@@ -223,11 +221,10 @@ Neture 공급자 온보딩은 2단계 활성화(`operator-registration.service.t
 근거:
 1. **2단계 흐름의 "stage-2 미완" 상태** — 두 row 모두 stage-1(가입 승인)은 완료되어 `service_memberships.status='active'` + `role_assignments.supplier(is_active=t)` 를 보유. 그러나 `neture_suppliers.status='PENDING'` 이고 `approved_by/approved_at/rejected_reason` 가 전부 비어 있어 **stage-2(공급 승인)가 한 번도 처리되지 않음**. 이는 조사 본문의 "2단계 불일치" 가설을 **DB로 실증**한다 — 즉 회원 목록엔 "활성"으로 보이고, 공급사 승인 큐엔 "대기"로 남는 정확히 그 상태.
 2. **처리 가능 대상 맞음** — `/operator/suppliers` 화면(`operator-supplier.controller.ts` → `neture_suppliers WHERE status='PENDING'`)이 이 2건을 그대로 나열하며, 운영자가 승인(→ACTIVE)/거절(→REJECTED) 할 수 있다. 고아(orphan)·손상 데이터 아님.
-3. **그러나 stale test 잔재로 판단** — 두 계정 모두 개발자/사용자 본인 테스트 계정(`renagang21@gmail.com` = git committer Renagang21, `sohae21@naver.com` = 사용자 본인 계열)이고, 공급자 프로필이 사실상 비어 있으며, 생성 후 수일~수주간 미처리로 방치됨. 한 계정은 store_owner(kpa/cosmetics/glycopharm)·lms:instructor·pharmacy 등 잡다한 역할을 동시에 보유한 전형적 테스트 계정. 프로젝트 정책상 운영 DB 데이터는 현재 disposable(pre-service)이므로, 실제 사업 공급자의 승인 대기가 아니라 **완료되지 않은 테스트 온보딩**으로 보는 것이 타당.
+3. **그러나 stale test 잔재로 판단** — 두 계정 모개발자/사용자 본인 테스트 계정(`renagang21@gmail.com` = git committer Renagang21, `sohae21@naver.com` = 사용자 본인 계열)이고, 공급자 프로필이 사실상 비어 있으며, 생성 후 수일~수주간 미처리로 방치됨. 한 계정은 store_owner(kpa/cosmetics)·lms:instructor·pharmacy 등 잡다한 역할을 동시에 보유한 전형적 테스트 계정. 프로젝트 정책상 운영 DB 데이터는 현재 disposable(pre-service)이므로, 실제 사업 공급자의 승인 대기가 아니라 **완료되지 않은 테스트 온보딩**으로 보는 것이 타당.
 
 ### 후속 작업 권장안
 
 1. **데이터 측면** — 이 2건은 코드 버그가 아니므로 코드 수정 불필요. 대시보드 baseline을 깨끗이 하려면 (a) `/operator/suppliers`에서 거절/승인으로 큐 비우기, 또는 (b) test 잔재로 정리. **단, 어느 쪽이든 DB write 이므로 사용자 승인 후 진행** (이번 작업 범위 외).
 2. **UX 측면 (대시보드 v2의 핵심)** — 카운트 자체는 정확하므로 **데이터 repair가 아니라 가시성 재설계**가 본질. 회원 상세에 `neture_suppliers.status` 노출 + 승인 큐 허브화(본문 IA 제안)로 2단계 불일치를 운영자에게 드러내는 것이 우선.
 3. **검증 채널 메모** — 프로덕션 read-only 검증은 `gcloud sql connect o4o-platform-db --user=o4o_api`(IP 5분 화이트리스트) 후 동일 IP에서 `psql -h 34.64.96.252 sslmode=require` 직접 접속으로 수행. 운영 DB user는 `postgres` 가 아니라 **`o4o_api`** (Cloud Run env 기준).
-

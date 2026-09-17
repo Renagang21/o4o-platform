@@ -16,7 +16,7 @@ export interface StoreLibraryResourceRowProps {
   item: StoreLibraryResourceItem;
   iconColor?: string;
   /**
-   * 원본 열기 아이콘 판정 — GlycoPharm 은 링크형 자료에 LinkIcon 을 쓴다.
+   * 원본 열기 아이콘 판정 — 일부 서비스는 링크형 자료에 LinkIcon 을 쓴다.
    * 서비스 기존 동작을 하나로 강제하지 않기 위해 주입한다(미지정 시 ExternalLink 고정).
    */
   useLinkIcon?: (item: StoreLibraryResourceItem) => boolean;

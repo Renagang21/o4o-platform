@@ -12,7 +12,7 @@ scope:
 related:
   - docs/investigations/IR-O4O-KPA-STORE-BLOG-SITE-ARCHITECTURE-V1.md
   - docs/investigations/IR-O4O-STORE-COMMON-CANONICAL-AUDIT-V1.md
-  - docs/investigations/IR-O4O-GLYCO-STORE-CANONICAL-GAP-AUDIT-V1.md
+  - 
   - docs/architecture/STORE-LAYER-ARCHITECTURE.md
   - docs/baseline/CONTENT-STABLE-DECLARATION-V1.md
 work_orders_referenced:
@@ -195,7 +195,7 @@ work_orders_referenced:
 
 ### 2.6 Blog 제작 흐름 (조사 항목 6)
 
-- **[PharmacyBlogPage.tsx:617-619](services/web-glycopharm/src/pages/pharmacy/PharmacyBlogPage.tsx#L617-L619)** — "새 글 작성" 신규 버튼 제거됨
+- **[PharmacyBlogPage.tsx:617-619]** — "새 글 작성" 신규 버튼 제거됨
 - 진입: 자료함 → StartProductionModal → location.state로 title/description prefill ([:136-157](services/web-kpa-society/src/pages/pharmacy/PharmacyBlogPage.tsx#L136-L157))
 - 본문 입력은 RichTextEditor(preset=`full`)로 HTML만 ([:407-421](services/web-kpa-society/src/pages/pharmacy/PharmacyBlogPage.tsx#L407-L421))
 - **asset selector / lesson embed 없음** — Blog editor 안에서 콘텐츠/강의 직접 가져오는 기능 없음
@@ -393,7 +393,6 @@ work_orders_referenced:
 - `services/web-kpa-society/src/pages/pharmacy/StoreQRPage.tsx`
 - `services/web-kpa-society/src/pages/pharmacy/StorePopPage.tsx`
 - `services/web-kpa-society/src/pages/pharmacy/PharmacyBlogPage.tsx`
-- `services/web-glycopharm/src/pages/pharmacy/PharmacyBlogPage.tsx`
 - `services/web-kpa-society/src/pages/pharmacy/StoreChannelsPage.tsx`
 - `packages/tablet-kiosk-core/src/IdlePlaylistEditor.tsx`
 
@@ -428,7 +427,7 @@ work_orders_referenced:
 
 - IR-O4O-KPA-STORE-BLOG-SITE-ARCHITECTURE-V1
 - IR-O4O-STORE-COMMON-CANONICAL-AUDIT-V1
-- IR-O4O-GLYCO-STORE-CANONICAL-GAP-AUDIT-V1
+- 
 - WO-O4O-CONTENT-HUB-ASSET-SNAPSHOT-WIRING-V1
 - WO-O4O-LMS-STORE-LIBRARY-FOUNDATION-V1
 - WO-O4O-LESSON-CARD-PREVIEW-COMPONENT-V1

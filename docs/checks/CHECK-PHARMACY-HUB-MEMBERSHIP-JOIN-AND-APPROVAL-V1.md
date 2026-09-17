@@ -71,7 +71,7 @@ services/web-pharmacy-hub/src/pages/LoginPage.tsx                         (가�
 ```
 
 `auth-register.controller.ts` 변경은 `serviceKey === 'pharmacy-hub'` 조건 안에서만 동작한다.
-기존 서비스(Neture / GlycoPharm / KPA / K-Cosmetics)의 가입 분기는 코드·동작 모두 불변 → 중지 조건 3 미해당.
+기존 서비스(Neture / KPA / K-Cosmetics)의 가입 분기는 코드·동작 모두 불변 → 중지 조건 3 미해당.
 
 ---
 
@@ -172,7 +172,7 @@ migration 은 멱등이며 down 에서 seed 3행 + 서비스 1행만 제거한�
 | 2 | `web-pharmacy-hub` `tsc -b --noEmit` | **PASS** |
 | 3 | `web-pharmacy-hub` `vite build` | **PASS** (168 modules, 297.64 kB) |
 | 4 | 회귀 `web-neture` `tsc -b` | **PASS** |
-| 5 | 회귀 `web-glycopharm` typecheck | **PASS** |
+| 5 | — | **PASS** |
 | 6 | 회귀 `web-kpa-society` `tsc -b` | **PASS** |
 | 7 | 회귀 `web-k-cosmetics` `tsc -b` | **PASS** |
 | 8 | headless 렌더 `/` `/login` `/join` `/join/status` `/operator/memberships` `/operator/memberships/:id` | **PASS** — 6/6 렌더, page error 0 |
@@ -299,7 +299,7 @@ pnpm-lock.yaml                                                               (�
 | D3 | **반려가 `role_assignments` 를 비활성화하지 않는다** | 반려 후 재로그인 JWT: `roles=["pharmacy-hub:store_owner"]`, `GET /me/access` → `entryPoints.storeOwner=true` (membershipStatus 는 `rejected`). read-only 실측에서도 `role_assignments.is_active=true` 잔존. | 실제 접근은 membership 기반 guard 가 403 으로 막으므로 **권한 누수는 없다**. 다만 역할 배열만 보고 분기하는 소비처(진입점 노출 등)는 오판할 수 있다. |
 
 > D2 는 `MembershipApprovalService` = **4개 서비스 공유 Core** 다. CLAUDE.md §1 Shared Module Change Rule 에 따라
-> 전 소비처(neture / glycopharm / k-cosmetics / kpa-society / pharmacy-hub) 영향을 먼저 식별해야 하므로
+> 전 소비처(neture / k-cosmetics / kpa-society / pharmacy-hub) 영향을 먼저 식별해야 하므로
 > 본 사후 E2E 에서 수정하지 않고 별도 WO 로 넘긴다. D1 · D3 도 정책 판단이 필요해 동일하게 분리한다.
 
 ### 13-4. 절차 준수

@@ -33,7 +33,7 @@ WO-O4O-CONTENT-EDITOR-VIDEO-STANDARDIZATION-V1
 
 **공통** — `packages/content-editor` (`RichTextEditor`, `ContentRenderer`, `Toolbar`), `packages/store-ui-core`
 
-**서비스** — Neture / KPA / GlycoPharm / K-Cosmetics
+**서비스** — Neture / KPA / K-Cosmetics
 
 ---
 
@@ -170,7 +170,7 @@ Media Picker에서 동영상 선택 → `insertMedia()` → Video Node 생성 �
 
 ## 17. 검증
 
-Neture / KPA / GlycoPharm / K-Cosmetics 모든 RichTextEditor 소비 화면에서:
+Neture / KPA / K-Cosmetics 모든 RichTextEditor 소비 화면에서:
 
 - 동영상 삽입 / 저장 / 재로드 정상
 - **ContentRenderer 동일 출력**

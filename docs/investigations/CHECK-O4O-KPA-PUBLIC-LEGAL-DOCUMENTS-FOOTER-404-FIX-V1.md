@@ -54,7 +54,7 @@ GET /api/v1/kpa/legal/documents/published/privacy          → 404
 ## 5. 권장 후속 (운영 — 별도)
 1. 운영자가 `/admin/settings/legal`(법정정보·약관 설정 → 정책 문서 탭)에서 실제 KPA 이용약관·개인정보처리방침 본문 작성 후 게시.
 2. 게시 시 primary `service_policy_documents`(kpa-society) published row 생성 → 404 해소 + `/policy`·`/privacy` 정상 콘텐츠 렌더.
-3. (선택) 콘솔 404 소음을 게시 전에 제거하려면 → 별도 WO 로 공유 컨트롤러 graceful-empty 검토(neture/GP/KCos 회귀 포함).
+3. (선택) 콘솔 404 소음을 게시 전에 제거하려면 → 별도 WO 로 공유 컨트롤러 graceful-empty 검토(neture/KCos 회귀 포함).
 
 ## 6. 무변경 확인
-다국어 콘텐츠/Store Hub/QR/태블릿/Neture guide/GP·KCos/payment·store-entitlement/DB schema **미접촉**. 본 CHECK 문서만 추가.
+다국어 콘텐츠/Store Hub/QR/태블릿/Neture guide/KCos/payment·store-entitlement/DB schema **미접촉**. 본 CHECK 문서만 추가.

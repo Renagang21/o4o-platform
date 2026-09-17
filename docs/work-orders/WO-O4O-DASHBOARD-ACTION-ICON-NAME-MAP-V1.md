@@ -14,7 +14,7 @@
 
 공통 대시보드 블록이 `item.icon`(string)을 `<span>{item.icon}</span>`로 그대로 렌더하여, 백엔드가 보내는 **lucide-name 문자열**(`users`/`shield`/`store`/`dollar-sign`/`percent`/`key`/`package`/`file-text`/`shopping-cart`)이 화면에 **텍스트로 노출**된다. 공통 블록에 **icon-name → lucide 컴포넌트 매핑**을 추가해 결함을 해소한다.
 
-**즉시 해소 대상:** Neture `/admin` Structure Actions, GlycoPharm `/operator` Quick Actions, K-Cosmetics `/operator` Quick Actions.
+**즉시 해소 대상:** Neture `/admin` Structure Actions `/operator` Quick Actions, K-Cosmetics `/operator` Quick Actions.
 
 ---
 
@@ -33,7 +33,6 @@
 
 ```text
 Neture admin (structureActions):  users · shield · store · dollar-sign · percent · key
-GlycoPharm operator (quickActions): store · package · file-text
 K-Cosmetics operator (quickActions): store · package · shopping-cart · file-text
 KPA operator (quickActions):       emoji (🧑‍💼💊🛒📝📢💬🖥️🏪🎯🏠🔑📋) ← Phase A 미변경
 ```
@@ -73,7 +72,6 @@ packages/admin-ux-core/src/blocks/StructureActionBlock.tsx     (icon 렌더 → 
 ```text
 - 백엔드 dashboard icon 값 변경 금지 (Phase B)
 - KPA operator emoji → lucide-name 변경 금지 (Phase B)
-- KPA / GlycoPharm admin 프론트 하드코딩 emoji 정리 금지 (Phase C)
 - DomainIASidebar / OperatorAreaShell (operator drawer) 수정 금지
 - packages/shared-space-ui/src/HeroBannerSection.tsx — 미접촉
 - Store Hub / Channels / Home 아이콘 1차 정비 파일 — 미접촉
@@ -112,7 +110,6 @@ cd packages/admin-ux-core && npx tsc --noEmit
 ### 7.2 화면 smoke (배포 또는 local)
 ```text
 - Neture /admin Structure Actions: users/shield/store/dollar-sign/percent/key 텍스트 → lucide 아이콘으로 표시
-- GlycoPharm /operator Quick Actions: store/package/file-text 텍스트 해소
 - K-Cosmetics /operator Quick Actions: store/package/shopping-cart/file-text 텍스트 해소
 - KPA /operator Quick Actions: 기존 emoji 표시 회귀 없음 (Phase A 미변경)
 - 라벨/링크/클릭/순서 회귀 없음
@@ -139,7 +136,7 @@ cd packages/admin-ux-core && npx tsc --noEmit
 ```text
 docs/investigations/CHECK-O4O-DASHBOARD-ACTION-ICON-NAME-MAP-V1.md
 ```
-포함: 1 최종 판정 / 2 근본 원인·수정 요약 / 3 수정 파일 / 4 매핑한 icon-name 목록 / 5 변경하지 않은 항목(백엔드/KPA emoji/admin 프론트/drawer) / 6 TS 결과 / 7 desktop·mobile smoke(Neture admin·Glyco/KCos operator·KPA 회귀) / 8 staged 검증 / 9 후속(Phase B/C).
+포함: 1 최종 판정 / 2 근본 원인·수정 요약 / 3 수정 파일 / 4 매핑한 icon-name 목록 / 5 변경하지 않은 항목(백엔드/KPA emoji/admin 프론트/drawer) / 6 TS 결과 / 7 desktop·mobile smoke / 8 staged 검증 / 9 후속(Phase B/C).
 
 ---
 
@@ -152,7 +149,6 @@ docs/investigations/CHECK-O4O-DASHBOARD-ACTION-ICON-NAME-MAP-V1.md
 - 백엔드/admin 프론트/drawer 파일 미접촉
 - 라벨/링크/순서/권한/API 불변
 - operator-ux-core / admin-ux-core tsc PASS
-- Neture admin · Glyco/KCos operator smoke PASS
 - 의도한 파일만 staged/commit
 - CHECK 작성 / push 완료
 ```
@@ -163,7 +159,6 @@ docs/investigations/CHECK-O4O-DASHBOARD-ACTION-ICON-NAME-MAP-V1.md
 
 ```text
 B. WO-O4O-DASHBOARD-ACTION-ICON-VOCAB-STANDARDIZE-V1 — KPA 백엔드 emoji→lucide-name + 4서비스 어휘 카탈로그 고정
-C. WO-O4O-ADMIN-QUICKACTION-FRONTEND-CONVERGE-V1 — Glyco/KPA admin 프론트 emoji 하드코딩 수렴
 ```
 
 ---

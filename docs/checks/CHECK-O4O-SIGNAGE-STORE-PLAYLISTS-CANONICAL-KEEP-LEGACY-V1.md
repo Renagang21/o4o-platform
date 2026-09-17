@@ -22,7 +22,7 @@ IR 결론(전면 canonical 통합 비권장)을 운영 규칙으로 고정. 향�
 | **경계 baseline (SSOT)** | [docs/baseline/O4O-SIGNAGE-STORE-PLAYLIST-MODEL-BOUNDARY-V1.md](../baseline/O4O-SIGNAGE-STORE-PLAYLIST-MODEL-BOUNDARY-V1.md) |
 | CHECK (본 문서) | docs/checks/CHECK-O4O-SIGNAGE-STORE-PLAYLISTS-CANONICAL-KEEP-LEGACY-V1.md |
 | CLAUDE.md 인덱스 | "상세 규칙 문서 목록" 1줄 추가 |
-| adapter 주석 보강 (3 store 등록 페이지) | KPA `StorePlaylistCreatePage.tsx` / GP `StorePlaylistCreatePage.tsx` / KCos `StorePlaylistCreatePage.tsx` |
+| adapter 주석 보강 (3 store 등록 페이지) | KPA `StorePlaylistCreatePage.tsx` `StorePlaylistCreatePage.tsx` / KCos `StorePlaylistCreatePage.tsx` |
 
 ---
 

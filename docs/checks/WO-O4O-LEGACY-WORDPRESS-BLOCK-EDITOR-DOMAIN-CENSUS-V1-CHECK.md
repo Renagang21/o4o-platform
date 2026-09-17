@@ -84,7 +84,6 @@
 
 `cms_contents` 129 행 중 `bodyBlocks` 가 비어 있지 않은 것은 **2 행뿐**이며, 둘 다 `archived` 상태·`2026-07-30` 자(30일 밖 / 90일 안)다. 블록 타입 분포는 paragraph 3 / heading 2 / list 2 로, Gutenberg 편집 산출물의 특징(그룹·컬럼·커버 등)이 없다.
 
-- serviceKey 분포: glycopharm 66 / kpa-society 53 / neture 6 / pharmacy-hub 3 / kpa 1
 - `updatedAt` 최근 30 일 3 건 / 90 일 15 건 → **현행 콘텐츠 축은 `cms_contents` 이며, 그 편집기는 legacy editor 가 아니다**(§4).
 
 **Post/Page 엔티티는 백엔드에서 이미 제거됐다** — `content.routes.tsx` 헤더 주석이 커밋 `6354e8755`(2025-12-11, Phase 8-3)를 기록한다.

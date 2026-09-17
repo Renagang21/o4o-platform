@@ -31,13 +31,13 @@ PATCH /api/signage/:serviceKey/hq/forced-content/<valid-but-missing-uuid>
 `sohae2100@gmail.com` (operator) 로 3개 서비스 모두 재현. missing UUID 만 사용 →
 **0-row DELETE · 데이터 변경 0**.
 
-| 요청 | kpa-society | k-cosmetics | glycopharm |
-|---|---|---|---|
-| `GET /hq/forced-content` | 200 `data:[]` | 200 `data:[]` | 200 `data:[]` |
-| `DELETE .../{missing}` | **200 `{deleted:true}`** | **200 `{deleted:true}`** | **200 `{deleted:true}`** |
-| `DELETE .../not-a-uuid` | 400 `INVALID_ID` | 400 `INVALID_ID` | 400 `INVALID_ID` |
-| `PATCH .../{missing}` | **200 `data:[]`** | **200 `data:[]`** | **200 `data:[]`** |
-| `PATCH .../not-a-uuid` | 400 `INVALID_ID` | 400 `INVALID_ID` | 400 `INVALID_ID` |
+| 요청 | kpa-society | k-cosmetics |
+|---|---|---|
+| `GET /hq/forced-content` | 200 `data:[]` | 200 `data:[]` |
+| `DELETE .../{missing}` | **200 `{deleted:true}`** | **200 `{deleted:true}`** |
+| `DELETE .../not-a-uuid` | 400 `INVALID_ID` | 400 `INVALID_ID` |
+| `PATCH .../{missing}` | **200 `data:[]`** | **200 `data:[]`** |
+| `PATCH .../not-a-uuid` | 400 `INVALID_ID` | 400 `INVALID_ID` |
 
 우선순위 확인:
 
@@ -66,7 +66,7 @@ route 정의: `signage.routes.ts:267~277`. **`GET detail` endpoint 는 존재하
 
 | # | method / path | guard | handler | ID 계약 | 수정 전 missing 응답 | repository/service | frontend consumer |
 |---|---|---|---|---|---|---|---|
-| 1 | `GET /hq/forced-content` | operator | `list` | — | — (collection) | controller raw `SELECT` | HQContentManager · operator-core-ui · web-glycopharm |
+| 1 | `GET /hq/forced-content` | operator | `list` | — | — (collection) | controller raw `SELECT` | HQContentManager · operator-core-ui |
 | 2 | `POST /hq/forced-content` | operator | `create` | — | — (create) | controller raw `INSERT ... RETURNING` | 동일 |
 | 3 | `PATCH /hq/forced-content/:id` | operator + `validateUuidParams('id')` | `update` | UUID | **200 `data:[]`** ❌ | controller raw `UPDATE ... RETURNING` | 동일 |
 | 4 | `DELETE /hq/forced-content/:id` | operator + `validateUuidParams('id')` | `remove` | UUID | **200 `{deleted:true}`** ❌ | controller raw `UPDATE deleted_at ... RETURNING id` (soft) | 동일 |
@@ -250,14 +250,14 @@ if (affected === 0 || rows.length === 0) { /* 기존 404 분기 */ }
 
 `sohae2100@gmail.com` (operator) · **missing UUID 만 사용 → 0-row · 데이터 변경 0**.
 
-| 요청 | k-cosmetics | `cosmetics` (alias) | glycopharm |
-|---|---|---|---|
-| `GET /hq/forced-content` | 200 `data:[]` | 200 `data:[]` | 200 `data:[]` |
-| `DELETE .../{missing}` | **404 `NOT_FOUND`** | **404 `NOT_FOUND`** | **404 `NOT_FOUND`** |
-| `DELETE .../not-a-uuid` | 400 `INVALID_ID` | 400 `INVALID_ID` | 400 `INVALID_ID` |
-| `PATCH .../{missing}` | **404 `NOT_FOUND`** | **404 `NOT_FOUND`** | **404 `NOT_FOUND`** |
-| `PATCH .../not-a-uuid` | 400 `INVALID_ID` | 400 `INVALID_ID` | 400 `INVALID_ID` |
-| 미인증 `DELETE .../{missing}` | 401 `AUTH_REQUIRED` | 401 `AUTH_REQUIRED` | 401 `AUTH_REQUIRED` |
+| 요청 | k-cosmetics | `cosmetics` (alias) |
+|---|---|---|
+| `GET /hq/forced-content` | 200 `data:[]` | 200 `data:[]` |
+| `DELETE .../{missing}` | **404 `NOT_FOUND`** | **404 `NOT_FOUND`** |
+| `DELETE .../not-a-uuid` | 400 `INVALID_ID` | 400 `INVALID_ID` |
+| `PATCH .../{missing}` | **404 `NOT_FOUND`** | **404 `NOT_FOUND`** |
+| `PATCH .../not-a-uuid` | 400 `INVALID_ID` | 400 `INVALID_ID` |
+| 미인증 `DELETE .../{missing}` | 401 `AUTH_REQUIRED` | 401 `AUTH_REQUIRED` |
 
 - 잘못된 serviceKey: `DELETE /api/signage/nope/hq/forced-content/{missing}` → **400 `INVALID_SERVICE_KEY`**
   (not-found 판정보다 앞선다)
@@ -267,7 +267,7 @@ if (affected === 0 || rows.length === 0) { /* 기존 404 분기 */ }
 
 `sohae2100@gmail.com` + `serviceKey:"kpa-society"` 로그인이 본 검증 시점에 **401
 `INVALID_CREDENTIALS`** 를 반환했다 (같은 계정·같은 비밀번호로 `k-cosmetics` /
-`glycopharm` 은 200). `ACCOUNT_LOCKED` 가 아닌 자격 불일치이므로
+`ACCOUNT_LOCKED` 가 아닌 자격 불일치이므로
 `service_credentials` 의 kpa-society 행 문제로 보이며, **본 WO 변경과 무관한 계정
 환경 이슈**다. 비밀번호 변경은 WO 범위 밖이라 수행하지 않았다.
 
@@ -287,7 +287,6 @@ if (affected === 0 || rows.length === 0) { /* 기존 404 분기 */ }
 | 서비스 | 화면 | 결과 |
 |---|---|---|
 | k-cosmetics | `/operator/signage/forced-content` | 정상 렌더 · console error 0 · api 4xx/5xx 0 |
-| glycopharm | `/operator/signage/forced-content` | 정상 렌더 · console error 0 · api 4xx/5xx 0 |
 | kpa-society | `/operator/signage/forced-content` | **미수행** — 위 operator 로그인 401 |
 
 ---

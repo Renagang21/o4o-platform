@@ -11,7 +11,7 @@
 
 **EditUserModal 공통화는 이미 완료되어 있다.**
 
-3개 서비스(Neture/GlycoPharm/K-Cosmetics) 모두 `CommonEditUserModal` (config-driven) 기반 thin wrapper로 전환 완료. KPA는 `KpaEditUserModal`로 별도 유지 (코드 명시적 금지 주석 포함).
+3개 서비스 모두 `CommonEditUserModal` (config-driven) 기반 thin wrapper로 전환 완료. KPA는 `KpaEditUserModal`로 별도 유지 (코드 명시적 금지 주석 포함).
 
 **판정: C — slot 유지 권장** (현재 구조가 이미 안전하며 완료됨)
 
@@ -57,7 +57,6 @@ interface EditUserModalConfig {
 | 서비스 | 파일 크기 | 구현 방식 | 서비스별 차이 |
 |--------|---------|---------|------------|
 | Neture | 67줄 | `CommonEditUserModal` + `NETURE_CONFIG` | 공급자/파트너 역할 옵션, neture: prefix |
-| GlycoPharm | 63줄 | `CommonEditUserModal` + `GLYCOPHARM_CONFIG` | pharmacy/supplier 역할, '약국 정보'/'약국명' 레이블 |
 | K-Cosmetics | 79줄 | `CommonEditUserModal` + `KCOSMETICS_CONFIG` | 판매자/소비자/파트너, `profileClassification` (cosmetics_members.subRole) |
 | KPA | 별도 `KpaEditUserModal` | 별도 컴포넌트 (통합 금지 명시) | kpa_members.id, 분리 API, activity_type 로직 |
 
@@ -82,11 +81,10 @@ profileClassification: {
 | 서비스 | 공통 endpoint | 서비스별 추가 |
 |--------|------------|------------|
 | Neture | `GET/PATCH /operator/members/:userId` | 없음 |
-| GlycoPharm | `GET/PATCH /operator/members/:userId` | 없음 |
 | K-Cosmetics | `GET/PATCH /operator/members/:userId` | `GET/PATCH /cosmetics/members/:userId` (subRole) |
 | KPA | `GET /kpa/members/:id` + `PATCH /kpa/members/:id/info` | 완전 별도 |
 
-Neture/GP/K-Cos는 공통 endpoint 사용 — `makeRequest` 어댑터로 baseURL 차이만 흡수.
+Neture/K-Cos는 공통 endpoint 사용 — `makeRequest` 어댑터로 baseURL 차이만 흡수.
 
 ---
 

@@ -25,7 +25,6 @@ Operator 공통화 완료 선언 이후에도 Pharmacy-Hub 계정 메뉴에는 `
 |---|---|---|---|---|
 | KPA-Society | `관리자 대시보드` + `운영 대시보드` **독립** (`KpaUserMenu.tsx`) | `/admin/*` → `AdminRoutes` | 있음 | canonical |
 | K-Cosmetics | 독립 2항목 (`KCosGlobalHeader.tsx`, legacy ternary 제거 완료) | 있음 | 있음 | canonical |
-| GlycoPharm | 독립 2항목 (`GlycoGlobalHeader.tsx`) | 있음 | 있음 | canonical |
 | Neture | 독립 2항목 (`NetureUserMenu.tsx`) | `/admin` → `AdminDashboardPage` | 있음 | canonical |
 | **Pharmacy-Hub** | **`서비스 운영자` 1항목** | **없음** | 있음 | **결함(본 WO 대상)** |
 
@@ -54,7 +53,7 @@ Operator 공통화 완료 선언 이후에도 Pharmacy-Hub 계정 메뉴에는 `
 이 화면이 operator 영역에 얹혀 있어 권한 축이 어긋났을 뿐이다. 화면 없는 링크만 추가하지 않았다 —
 `/admin` 은 실데이터 대시보드 + 실제 동작하는 설정 화면 2개로 구성했다.
 
-**셸은 새로 만들지 않았다.** 저장소에 공유 admin *셸* 패키지는 없다(K-Cosmetics·GlycoPharm 은 각자
+**셸은 새로 만들지 않았다.** 저장소에 공유 admin *셸* 패키지는 없다(K-Cosmetics 은 각자
 로컬 `DashboardLayout` 보유). 따라서 공통 `@o4o/operator-ux-core` `OperatorAreaShell` 을 라벨·메뉴·IA
 주입만으로 재사용하고, 진짜 공유 자산인 `@o4o/admin-ux-core` `AdminDashboardLayout` 4-Block 을 채택했다.
 
@@ -96,7 +95,6 @@ Operator 공통화 완료 선언 이후에도 Pharmacy-Hub 계정 메뉴에는 `
 | `@o4o/web-kpa-society` build | PASS |
 | `@o4o/web-k-cosmetics` build | PASS |
 | `@o4o/web-neture` build | PASS |
-| `glycopharm-web` build | PASS |
 
 ## 7. CI · 배포
 
@@ -152,7 +150,6 @@ E2E 에서 `/admin` 모바일 드로어가 공유 셸 기본값인 `운영자 �
 | KPA-Society `/operator` 드로어 라벨 유지 | PASS (JS exception 0) |
 | K-Cosmetics `/operator` 드로어 라벨 유지 | PASS (JS exception 0) |
 | Neture `/operator` 드로어 라벨 유지 | PASS (JS exception 0) |
-| GlycoPharm `/operator` 드로어 라벨 유지 | PASS (JS exception 0) |
 
 ## 10. 잔여 미검증 / 후속
 

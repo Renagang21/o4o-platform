@@ -6,7 +6,7 @@
  * 종전 `/terms`·`/privacy` 는 CMS(`GET /api/v1/cms/public/page/:slug`) 를 읽었으나
  * 해당 CMS 라우터는 프로덕션에 **마운트되어 있지 않아 항상 404** → 공개 화면이 영구히
  * "해당 페이지를 준비 중입니다" 를 노출하고 있었다(WO §7 dead surface).
- * GlycoPharm / K-Cosmetics / KPA / Pharmacy-Hub 와 같은 canonical 소스로 정렬한다.
+ * K-Cosmetics / KPA / Pharmacy-Hub 와 같은 canonical 소스로 정렬한다.
  *
  * backend: GET /api/v1/public/services/neture/policies/:documentType (published only).
  * 문서 미게시 시에는 공통 뷰어의 중립 empty 상태를 쓴다 — 가짜 약관 문구를 만들지 않는다.

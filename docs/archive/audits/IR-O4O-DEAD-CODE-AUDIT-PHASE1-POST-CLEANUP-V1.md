@@ -2,7 +2,6 @@
 
 **날짜:** 2026-03-21
 **기준 커밋:** `3c50db232` (WO-O4O-DEAD-CODE-CLEANUP-PHASE1-STEP1-P0-V1)
-**범위:** api-server, web-neture, web-glycopharm, web-glucoseview, web-k-cosmetics, web-kpa-society, packages
 **유형:** 조사 전용 (수정 없음)
 
 ---
@@ -45,7 +44,7 @@
 |---|-----------|------|------|----------|
 | P2-1 | `routes/admin/seller-authorization.routes.ts` (344줄) | **SAFE REMOVE** | main.ts 미등록. Feature flag `ENABLE_SELLER_AUTHORIZATION` default false. 모든 엔드포인트 501 stub. 프론트엔드 UI 없음 | 삭제 |
 | P2-2 | `pages/partner/ReferralLinkModal.tsx` (neture, 240줄) | **HOLD** | import 0건이나 WO-O4O-PARTNER-LINK-CREATION-UX-V1 미완성 기능. ReferralLinksPage/PartnerLinksPage가 실제 활성 페이지 | 모듈 담당자 확인 후 판단 |
-| P2-3 | `pages/care/patient-tabs/SummaryTab.tsx` (glycopharm, 133줄) | **NEEDS REVIEW** | index.ts에서 export되나 App.tsx에서 import 안 함. 4개 탭(Data, Analysis, Coaching, History)만 라우트에 등록. 의도적 누락인지 확인 필요 | Care 모듈 확인 후 판단 |
+| P2-3 | `pages/care/patient-tabs/SummaryTab.tsx` (133줄) | **NEEDS REVIEW** | index.ts에서 export되나 App.tsx에서 import 안 함. 4개 탭(Data, Analysis, Coaching, History)만 라우트에 등록. 의도적 누락인지 확인 필요 | Care 모듈 확인 후 판단 |
 | P2-4 | `pages/operator/operatorConfig.ts` (k-cosmetics) | **ACTIVE** | KCosmeticsOperatorDashboard에서 `buildKCosmeticsOperatorConfig()` 직접 import/호출. 3개 서비스 공통 패턴 | 유지 |
 | P2-5 | `packages/yaksa-admin/` (root + api-server 2벌) | **SAFE REMOVE** | import 0건. admin-dashboard는 로컬 `/pages/yaksa-admin/` 컴포넌트 사용. 패키지는 orphan | root + api-server 양쪽 삭제 |
 | P2-6 | `packages/cgm-pharmacist-app/` | **ACTIVE** | admin-dashboard에서 lazy import 4건 (PatientList, PatientDetail, Coaching, Alerts). AppRouteGuard 연동. Phase 1 개발 중 | 유지 |
@@ -133,7 +132,7 @@ packages/yaksa-admin/
 | 항목 | 상태 | 관리 방법 |
 |------|------|----------|
 | `ReferralLinkModal.tsx` (neture) | HOLD | 네처 파트너 모듈 WO 진행 시 통합 또는 삭제 |
-| `SummaryTab.tsx` (glycopharm) | NEEDS REVIEW | Care 모듈 개선 시 라우트 연결 또는 삭제 |
+| `SummaryTab.tsx` | NEEDS REVIEW | Care 모듈 개선 시 라우트 연결 또는 삭제 |
 | `routes/v1/platformInquiry.routes.ts` | ACTIVE | v1 디렉토리에 단독 잔존. 구조 정비 시 이동 검토 가능 |
 
 ---

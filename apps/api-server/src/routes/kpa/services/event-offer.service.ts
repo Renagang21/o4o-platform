@@ -603,7 +603,7 @@ export class EventOfferService {
    *   Buyer 주문의 canonical entry 는 Store Cart checkout-confirm 으로 이전됨:
    *   StoreCartItem(sourceType='event_offer') → POST /store/cart/:serviceKey/checkout-confirm
    *   → (supplier, sellerOrg) 그룹별 checkoutService.createOrder.
-   *   이 method 는 단건 직접 주문 legacy/호환 경로다 (KPA/Glyco/KCos buyer UI 직접 호출 0건).
+   *   이 method 는 단건 직접 주문 legacy/호환 경로다 (KPA/KCos buyer UI 직접 호출 0건).
    *   검증/차감 로직은 loadEventOfferContext + reserveEventOfferListing helper 로 분리되어
    *   checkout-confirm 오케스트레이터가 재사용한다. 동작·에러코드는 보존한다. route 미삭제.
    *
@@ -1300,7 +1300,6 @@ export class EventOfferService {
   /**
    * COUNT pending listings — operator dashboard Action Queue 등에서 count 만 필요할 때.
    *
-   * WO-O4O-GLYCOPHARM-OPERATOR-DASHBOARD-EVENT-OFFER-ACTION-QUEUE-V1
    *   listPendingListings 가 list + total 을 함께 반환하므로 count-only 호출 시
    *   불필요한 list query 가 실행됨 → count-only 메서드 분리.
    * status='pending' AND service_key 필터.

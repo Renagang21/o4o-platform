@@ -392,7 +392,6 @@ BaseDetailDrawer (행 클릭): 강의 요약 + 최근 수강자 5명 + 빠른 �
 
 | 대상 | 적용 가능성 | 비고 |
 |------|:----------:|------|
-| GlycoPharm LMS 페이지 | ⚠️ | LMS 백엔드는 단일 모듈, GlycoPharm은 LMS 페이지 부분만 존재. KPA의 canonical 패턴이 표준화되면 GlycoPharm은 thin migration |
 | K-Cosmetics LMS 페이지 | ⚠️ | 동일 |
 | Neture | ❌ | LMS 페이지 자체 부재 |
 | Store Library Contents 페이지 | ✅ 이미 적용 | [StoreLibraryContentsPage.tsx](services/web-kpa-society/src/pages/pharmacy/StoreLibraryContentsPage.tsx) — 이미 lesson 표시 + LessonCardPreview 사용 중. bulk 흐름의 결과로 자료함 이동 시 자연스럽게 연결 |
@@ -420,7 +419,7 @@ BaseDetailDrawer (행 클릭): 강의 요약 + 최근 수강자 5명 + 빠른 �
 | **A. 현재 유지** | 카드 그대로, raw table 그대로 | ❌ 강사 dashboard raw `<table>`은 OPERATOR-DATATABLE-POLICY-V1 어휘 표준에서 점차 부합도가 떨어짐. canonical 어휘 일관성 손상 |
 | **B. 3개 페이지 전면 DataTable 전환 (강제)** | 학습자 hub도 카드 폐기 → DataTable 강제 | ❌ 학습자 hub의 discovery UX 손상. design intent 위반 |
 | **C. 역할별 패턴 분리 (권장)** | 학습자 hub = 카드 default + 매장운영자 토글 / my-courses = DataTable / dashboard = DataTable single-select | ✅ **권장**. UX/canonical 어휘 양립 |
-| D. APP-LMS 공통 frontend 패키지 신설 | LmsCourseTable 등 | ⏳ Phase 2 이후. 1차는 KPA에서만 검증 후 GlycoPharm/K-Cos 적용 |
+| D. APP-LMS 공통 frontend 패키지 신설 | LmsCourseTable 등 | ⏳ Phase 2 이후. 1차는 KPA에서만 검증 후 K-Cos 적용 |
 
 ### 9.2 권장 방향 = C (Phase 1)
 
@@ -432,13 +431,13 @@ BaseDetailDrawer (행 클릭): 강의 요약 + 최근 수강자 5명 + 빠른 �
 
 **Phase 2 (선택)**
 
-4. **WO-O4O-APP-LMS-COURSE-TABLE-COMMON-PACKAGE-V1** — KPA에서 검증 후 GlycoPharm/K-Cosmetics에 적용 가능한 공통 LmsCourseTable 컴포넌트 추출 (APP-LMS frontend 공통화의 첫 산출물)
+4. **WO-O4O-APP-LMS-COURSE-TABLE-COMMON-PACKAGE-V1** — KPA에서 검증 후 K-Cosmetics에 적용 가능한 공통 LmsCourseTable 컴포넌트 추출 (APP-LMS frontend 공통화의 첫 산출물)
 5. **WO-O4O-LMS-COURSE-LIKE-VIEW-COUNT-V1** — 좋아요/조회수 entity 추가 (별도 counter 테이블)
 6. **WO-O4O-LMS-COURSE-CATEGORY-COLUMN-V1** — `category` 컬럼 신설 또는 `tags`와의 관계 정립
 
 ### 9.3 KPA 외 서비스 적용 가능성
 
-`apps/api-server/src/modules/lms/`는 단일 모듈, `services/web-glycopharm/`와 `services/web-k-cosmetics/`도 동일한 `Course` 타입을 사용. Phase 1 결과를 reference로 Phase 2에서 thin migration. Neture는 LMS 페이지 자체 부재.
+Phase 1 결과를 reference로 Phase 2에서 thin migration. Neture는 LMS 페이지 자체 부재.
 
 ---
 
@@ -464,7 +463,7 @@ BaseDetailDrawer (행 클릭): 강의 요약 + 최근 수강자 5명 + 빠른 �
 | 2 | **WO-O4O-LMS-INSTRUCTOR-DASHBOARD-DATATABLE-V1** | `/instructor/dashboard` raw `<table>` → DataTable single-select | 없음 (1과 병렬 가능) |
 | 3 | **WO-O4O-LMS-HUB-STORE-IMPORT-BULK-V1** | `/lms/courses` 매장운영자 한정 리스트 모드 + bulk 자료함 일괄 추가 | DataTable getRowSelectable 확장(필요 시 선행 micro-WO) |
 | 4 | **WO-O4O-OPERATOR-UX-CORE-DISABLE-SELECT-EXPANSION-V1** (필요 시) | DataTable selection의 row-level disable API 확장 | 없음 (3 진행 중 발견되면 분리) |
-| 5 | **WO-O4O-APP-LMS-COURSE-TABLE-COMMON-PACKAGE-V1** (Phase 2) | KPA reference → GlycoPharm/K-Cos 적용 가능한 공통 컴포넌트 추출 | 1, 2, 3 |
+| 5 | **WO-O4O-APP-LMS-COURSE-TABLE-COMMON-PACKAGE-V1** (Phase 2) | KPA reference → K-Cos 적용 가능한 공통 컴포넌트 추출 | 1, 2, 3 |
 | 6 | **WO-O4O-LMS-COURSE-LIKE-VIEW-COUNT-V1** (Phase 2) | 좋아요 / 조회수 entity + counter 테이블 | 없음 |
 | 7 | **WO-O4O-LMS-COURSE-CATEGORY-V1** (Phase 2) | `category` 컬럼 또는 tags 표준화 | 없음 |
 
@@ -478,7 +477,7 @@ WO 1·2는 병렬 가능. WO 3은 4(필요 시) 후. WO 5·6·7은 Phase 1 완�
 - **bulk add는 idempotent** — DUPLICATE_SNAPSHOT을 success로 집계, 사용자 혼란 방지.
 - **OperatorLmsCoursesPage 변경 금지** — 이미 canonical, 본 IR은 non-operator 영역만 다룸.
 - **신규 backend endpoint / migration 금지** — frontend canonical 변경만으로 완성됨.
-- **APP-LMS frontend 공통화는 Phase 2** — KPA에서 reference 검증 전 GlycoPharm/K-Cos에 동시 진행 금지.
+- **APP-LMS frontend 공통화는 Phase 2** — KPA에서 reference 검증 전 K-Cos에 동시 진행 금지.
 - **F11 KPA-a 예외 패턴 준수** — RoleGuard + allowedRoles 사용, OperatorRoute 사용 금지.
 
 ---

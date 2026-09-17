@@ -358,7 +358,7 @@ business_info?: {
 3. mobile-app / API 외부 consumer 의 stale 영향
 4. PharmacyInfoPage (`/store/info`) 와 MyProfilePage 사이의 약국 정보 sync — 부분 추적 IR-O4O-BUSINESS-CANONICAL-POLICY-ALIGNMENT-V1
 5. role grant / revoke 의 트랜잭션 atomicity (현재 try-catch silent fail allow 패턴) — RBAC freeze 정책과 정렬 검토 필요
-6. KPA-society 외 서비스 (GlycoPharm / K-Cosmetics) 의 동등 profile/operator 화면 정합성 — 본 IR 은 KPA-only
+6. KPA-society 외 서비스 (K-Cosmetics) 의 동등 profile/operator 화면 정합성 — 본 IR 은 KPA-only
 
 ---
 

@@ -12,7 +12,6 @@
 | 서비스 | 상태 | 커밋 |
 |--------|------|------|
 | **KPA-Society** | ✅ 완료 | `8215e94dd` |
-| **GlycoPharm** | ✅ 완료 | `8fa5a7c65` |
 | **K-Cosmetics** | ✅ 완료 | `774b6f60a` |
 | **Neture** | ✅ 완료 | `c8e4df477` |
 
@@ -67,22 +66,6 @@
 | `signage.playlist.manager` | `signage/PlaylistEditorPage.tsx` | A (DB override) |
 
 > `lms.quiz.editor`, `lms.assignment.editor`, `lms.live.editor`: 모달 내 마운트 구조로 독립 fetch 복잡 → static fallback 채택
-
-### 3-2. GlycoPharm (4 pages)
-
-| pageKey | 파일 | 패턴 |
-|---------|------|------|
-| `store.channel.editor` | `store/StoreChannelsPage.tsx` | A (DB override, GuideEditableSection 공존) |
-| `forum.request.management` | `operator/ForumDeleteRequestsPage.tsx` | A (DB override) |
-| `store.product.management` | `store-management/PharmacyProducts.tsx` | A (DB override) |
-| `signage.playlist.manager` | `operator/signage/HqPlaylistDetailPage.tsx` | A (DB override) |
-
-**Skip:**
-
-| pageKey | 사유 |
-|---------|------|
-| `content.document.editor` | GlycoPharm에 콘텐츠 작성/편집 페이지 없음 |
-| `content.resource.editor` | `ResourcesPage.tsx`는 목록 전용, 편집 페이지 없음 |
 
 ### 3-3. K-Cosmetics (4 pages)
 
@@ -203,7 +186,6 @@ DB override를 사용하지 않고 항상 하드코딩 fallback을 표시한다.
 | 서비스 | 파일 | pageKey |
 |--------|------|---------|
 | KPA | `pharmacy/StoreChannelsPage.tsx` | `store.channel.editor` |
-| GlycoPharm | `store/StoreChannelsPage.tsx` | `store.channel.editor` |
 | K-Cosmetics | `store/StoreChannelsPage.tsx` | `store.channel.editor` |
 | Neture | `operator/BrandManagementPage.tsx` | `operator.brand.management` |
 
@@ -271,12 +253,11 @@ plain text를 이미 저장하고 있는 경우.
 
 ## 7. Skip 항목 해석
 
-`content.document.editor` / `content.resource.editor`가 GlycoPharm, K-Cosmetics, Neture에서 skip된 것은 **Guide 시스템 실패가 아니라, 해당 서비스에 작성/편집 화면 자체가 없기 때문이다.**
+`content.document.editor` / `content.resource.editor`가 K-Cosmetics, Neture에서 skip된 것은 **Guide 시스템 실패가 아니라, 해당 서비스에 작성/편집 화면 자체가 없기 때문이다.**
 
 | 서비스 | content.document.editor | content.resource.editor |
 |--------|:------------------------:|:-----------------------:|
 | KPA-Society | ✅ 적용 | ✅ 적용 |
-| GlycoPharm | ❌ 편집 페이지 없음 | ❌ 목록 전용 |
 | K-Cosmetics | ❌ 편집 페이지 없음 | ❌ 편집 페이지 없음 |
 | Neture | ❌ 편집 페이지 없음 | ❌ 편집 페이지 없음 |
 
@@ -336,7 +317,7 @@ KPA-Society가 content/resource 편집 화면을 가진 reference implementation
 
 ### WO-O4O-CONTENT-RESOURCE-EDITOR-GAP-AUDIT-V1
 
-**목적:** GlycoPharm / K-Cosmetics / Neture에서 content/resource 편집 화면이 없는 이유와 필요성 조사.
+**목적:** K-Cosmetics / Neture에서 content/resource 편집 화면이 없는 이유와 필요성 조사.
 
 **조사 항목:**
 - 각 서비스에서 콘텐츠/리소스를 누가 작성하는가?

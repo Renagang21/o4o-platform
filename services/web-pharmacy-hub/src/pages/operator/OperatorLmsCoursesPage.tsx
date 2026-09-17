@@ -3,7 +3,7 @@
  *
  * WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §4 (#95)
  *
- * 화면 본체는 공통 `OperatorLmsCoursesManager`(@o4o/operator-core-ui) — KPA/GP/KCos 가
+ * 화면 본체는 공통 `OperatorLmsCoursesManager`(@o4o/operator-core-ui) — KPA/KCos 가
  * 이미 쓰는 그 화면이다. PH 차이는 API adapter 하나뿐이고, 상태 전이·액션 정책은 불변이다.
  * backend 는 공통 `/api/v1/lms/operator/courses/*` 이며 allowlist 만 확장했다.
  */

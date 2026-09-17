@@ -52,7 +52,7 @@
 - 역할 카드/이용 가이드/서비스 바로가기/Market Trial CTA 카드·링크·문구 — 불변
 - **`StandardHomeTemplate.tsx`** — 미접촉 (after-help 기존 옵션 + valueGuideSlot fragment 활용)
 - **`HeroBannerSection.tsx`** — 미접촉
-- **GlycoPharm / K-Cosmetics / Neture** — 미접촉. `O4OHelpSection` 변경은 **가산적(default true)** → `help` 만 넘기는 3서비스는 usage+services 둘 다 렌더(기존 동작 동일). `web-neture` tsc 회귀 없음 확인.
+- `O4OHelpSection` 변경은 **가산적(default true)** → `help` 만 넘기는 3서비스는 usage+services 둘 다 렌더(기존 동작 동일). `web-neture` tsc 회귀 없음 확인.
 
 ---
 
@@ -66,7 +66,6 @@ services/web-neture        npx tsc --noEmit   # exit 0 (공통 O4OHelpSection �
   - 하단 순서 = 이용 가이드 → 내 역할에 따른 활용 방법 → **다른 서비스 소개(맨 아래)**
   - "다른 서비스 보기" 표현이 "다른 서비스 소개"로 바뀌었는지
   - 다른 서비스 카드 링크/내용 회귀 없음
-  - GlycoPharm/K-Cosmetics/Neture Home 의 "다른 서비스 보기" 블록 회귀 없음(기본 both-blocks)
 
 ---
 

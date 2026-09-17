@@ -46,7 +46,7 @@ Store Hub published-only 노출 정책            — 불변
 backend API / controller / route             — 무변경
 DB / schema / migration                      — 0
 매장 가져오기(import) flow                    — 무변경
-GP / KCos / Neture / 태블릿 / 결제 / 관광객앱 — 미접촉
+KCos / Neture / 태블릿 / 결제 / 관광객앱 — 미접촉
 발행 가드는 frontend 안내/차단만 (backend contract 무변경)
 ```
 

@@ -3,7 +3,7 @@
  *
  * WO-O4O-EVENT-OFFER-TO-CART-CROSSSERVICE-V2
  * WO-O4O-STORE-HUB-PRODUCT-APPLICATION-AND-CART-COMMONIZATION-V1
- *   K-Cosmetics / GlycoPharm 의 near-identical 장바구니 화면을 공통 Core 로 이관했다.
+ *   K-Cosmetics 의 near-identical 장바구니 화면을 공통 Core 로 이관했다.
  *   상태 기계 = `useStoreCart`, 화면 = `StoreCartView`(accent 만 다름).
  *   API endpoint · payload · 주문 확정 계약은 변경하지 않았다.
  *

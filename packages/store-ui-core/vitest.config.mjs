@@ -10,7 +10,6 @@
  * 실행: 저장소 루트에서
  *   npx vitest run --config packages/store-ui-core/vitest.config.mjs
  *
- * WO-O4O-GLYCOPHARM-CANONICAL-B2B-CART-PRODUCER-UI-ADOPTION-V1:
  *   공급 카탈로그에 opt-in 장바구니 producer 가 붙으면서 컴포넌트 렌더 테스트가 생겼다.
  *   environment 를 node → jsdom 으로 올린다 (기존 정적 계약 테스트는 그대로 통과한다).
  *

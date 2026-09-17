@@ -16,7 +16,7 @@
 
 1. **불일치 사실 확정**: KPA dashboard 는 이미 **2-domain 축** (`커뮤니티 운영` + `매장 HUB 운영`) 으로 구성되어 있으나, 좌측 sidebar 는 **11-feature 그룹** (`dashboard / users / approvals / stores / content / resources / lms / signage / forum / analytics / system`) 으로 분기되어 IA drift 가 존재함.
 
-2. **핵심 제약 (Critical)**: `STANDARD_GROUPS` 가 `packages/ui/src/operator-shell/constants.ts` 에 정의되어 **4개 서비스 (KPA / Neture / GlycoPharm / K-Cosmetics) 가 공유**. 그룹 순서·라벨·아이콘이 모두 packages/ui 에 hardcoded — KPA-only 변경 불가능하거나 packages/ui 변경이 cross-service 영향을 줌. 또한 `docs/platform/operator/OPERATOR-DASHBOARD-STANDARD-V1.md` 가 "11-그룹 순서 고정 / feature-centric grouping" 을 표준으로 명시.
+2. **핵심 제약 (Critical)**: `STANDARD_GROUPS` 가 `packages/ui/src/operator-shell/constants.ts` 에 정의되어 **4개 서비스 가 공유**. 그룹 순서·라벨·아이콘이 모두 packages/ui 에 hardcoded — KPA-only 변경 불가능하거나 packages/ui 변경이 cross-service 영향을 줌. 또한 `docs/platform/operator/OPERATOR-DASHBOARD-STANDARD-V1.md` 가 "11-그룹 순서 고정 / feature-centric grouping" 을 표준으로 명시.
 
 3. **권장 방향**: cross-service 표준을 깨는 STANDARD_GROUPS 자체 변경(옵션 C)은 비용·리스크 가장 큼. KPA-only 로 **service-local domain 헤더 + 기존 STANDARD_GROUPS 보존** 하는 옵션 A 또는 B 가 1차 정비 안전 경로. 단순 menu rename 수준이 아니라 **OperatorShell 컨벤션 협상이 필요한 IA 작업**.
 
@@ -122,7 +122,6 @@ deprecated 코드:
 |---|---:|---|
 | KPA-Society | 11 | dashboard, users, approvals, stores, content, resources, lms, signage, forum, analytics, system |
 | Neture | 11 | dashboard, users, approvals, products, stores, orders, content, signage, forum, analytics, system |
-| GlycoPharm | 9 | (resources/lms/care 미포함) |
 | K-Cosmetics | 9 | (resources/lms/care/orders 미포함) |
 
 → **4개 서비스 모두 feature-centric STANDARD_GROUPS 를 그대로 사용**. domain-centric 그루핑 사례 0건.
@@ -192,7 +191,7 @@ KPA-only sidebar 에서 STANDARD_GROUPS 를 **2 도메인 헤딩 + 그룹 묶음
 - 다른 서비스는 prop 미전달 → 기존 동작 유지
 
 **장점**:
-- 공통 패키지에 정식 컨벤션 도입 — neture / glycopharm / k-cosmetics 도 추후 적용 가능
+- 공통 패키지에 정식 컨벤션 도입 — neture / k-cosmetics 도 추후 적용 가능
 - mobile 탭에도 domain 표시 가능 (구현 협상)
 
 **단점**:
@@ -219,7 +218,7 @@ STANDARD_GROUPS 의 14 그룹을 도메인 축 기반으로 재정의. 모든 �
 **단점 / 리스크**: **매우 큼**
 - F1 Frozen Baseline 위반 가능성
 - 4개 서비스 동시 정비 — 회귀 위험 ↑
-- 다른 서비스 운영자에게 도메인 추상화가 부적합할 수 있음 (예: GlycoPharm 의 운영 도메인은 다를 수 있음)
+- 다른 서비스 운영자에게 도메인 추상화가 부적합할 수 있음
 
 **리스크**: 높음
 
@@ -311,7 +310,6 @@ cross-service 영향: 없음
 - mobile / desktop sidebar 렌더 정상
 - dashboard quick links 정상
 - breadcrumb 영향 없음
-- 다른 서비스 (neture/glycopharm/k-cosmetics) 영향 0
 ```
 
 ### WO-O4O-OPERATOR-SHELL-DOMAIN-GROUPING-CONVENTION-V1 (Phase 2, 조건부)

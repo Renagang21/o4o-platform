@@ -9,14 +9,14 @@
 
 ## 1. 대상 축 (누적 변경)
 
-Neture supplier 업종 select 제거 · AddressSearch · store_owner 카드 제거 · cross-service contact backend support · Neture supplier 연락처 3종 · GlycoPharm 3종 · K-Cosmetics 3종 · KPA businessEmail/contactEmail.
+Neture supplier 업종 select 제거 · AddressSearch · store_owner 카드 제거 · cross-service contact backend support · Neture supplier 연락처 3종 3종 · K-Cosmetics 3종 · KPA businessEmail/contactEmail.
 
 ## 2. 배포 (force dispatch — skip 회귀 방지)
 
 - `git push origin main` → origin/main = `94a14005a` (KPA WO 포함, 직전 미push 1건 반영).
-- `gh workflow run deploy-web-services.yml --ref main -f service=all` → run `27761986516` **success(4m57s)**. job 별: deploy-neture / deploy-glycopharm / deploy-k-cosmetics / deploy-kpa-society **전부 success(skip 0)**.
+- `gh workflow run deploy-web-services.yml --ref main -f service=all` → run `27761986516` **success(4m57s)**.
 - api: push 트리거 `deploy-api.yml` run `27761942605` **success(7m3s)** (pharmacy-info.controller.ts 포함).
-- Cloud Run latestReadyRevision 서빙 확인: o4o-core-api-02244-x7r · neture-web-01147-sbl · glycopharm-web-01071-2nx · k-cosmetics-web-00819-wll · kpa-society-web-01421-fc8 (전부 traffic=latest).
+- Cloud Run latestReadyRevision 서빙 확인: o4o-core-api-02244-x7r · neture-web-01147-sbl · k-cosmetics-web-00819-wll · kpa-society-web-01421-fc8 (전부 traffic=latest).
 
 ## 3. API 스모크 (계정 생성 없음)
 
@@ -32,7 +32,6 @@ console error / page error / 연락처-API 4xx·5xx = **전 서비스 0**.
 | 서비스 | 확인 항목 | 결과 |
 |--------|----------|------|
 | **Neture**(공급자) | 역할 카드 공급자/파트너만 · 매장경영자 카드 부재 · 업종 select 부재 · 우편번호 검색 · 업태/종목/개업일 · **회사전화/회사이메일/담당자이메일** | ✅ 전부 |
-| **GlycoPharm**(약국 경영자) | **약국 전화/약국 대표 이메일/담당자 이메일** · 세금계산서 이메일/사업자등록번호 유지 | ✅ 전부 |
 | **K-Cosmetics**(판매자) | **회사/매장 전화/회사 대표 이메일/담당자 이메일** · 상호명/사업자등록번호 유지 | ✅ 전부 |
 | **KPA**(개설약사) | **약국 대표 이메일/담당자 이메일** · 세금계산서 이메일 분리 · 약국 전화 유지 · **businessPhone 중복 필드 부재** | ✅ 전부 |
 
@@ -45,10 +44,9 @@ console error / page error / 연락처-API 4xx·5xx = **전 서비스 0**.
 | 서비스 | view/edit 이메일 2종 | GET 응답 키 | businessPhone | 에러 |
 |--------|:---:|------|:---:|:---:|
 | **KPA** (`GET /pharmacy/info`, org.metadata SSOT) | ✅ 약국 대표/담당자 | businessEmail ✅ / contactEmail ✅ | 키 부재(정상 — KPA는 `phone` 사용) | 0 |
-| **GlycoPharm** (`GET /glycopharm/mypage/business-info`) | ✅ | businessEmail ✅ / contactEmail ✅ | businessPhone ✅(기존 유지) | 0 |
 | **K-Cosmetics** (`GET /cosmetics/mypage/business-info`) | ✅ | businessEmail ✅ / contactEmail ✅ | businessPhone ✅(기존 유지) | 연락처 0 (※아래 무관 500 별건) |
 
-- GlycoPharm 편집 화면 시각 확인: 사업장 전화번호(기존) → 약국 대표 이메일(신규) → 담당자 이메일(신규) → 업태/종목 → 사업자유형/개업일 → **세금계산서 이메일(별도)**. taxInvoiceEmail ≠ businessEmail 분리 확인. 레이아웃 정상.
+- taxInvoiceEmail ≠ businessEmail 분리 확인. 레이아웃 정상.
 
 ## 6. @IsEmail 무손상 확인
 
@@ -73,7 +71,7 @@ console error / page error / 연락처-API 4xx·5xx = **전 서비스 0**.
 | 4서비스 가입/정보수정 화면 정상 렌더 | ✅ |
 | Neture 가입 유형 공급자/파트너만 | ✅ |
 | Neture supplier 사업자 기본정보 정비 반영(업종 select 제거/AddressSearch/연락처 3종) | ✅ |
-| GP/KCos/KPA 연락처 필드 의도 범위 표시 | ✅ |
+| KCos/KPA 연락처 필드 의도 범위 표시 | ✅ |
 | KPA businessPhone 신규 중복 필드 없음 | ✅ |
 | console error / 연락처 API 4xx·5xx 0 | ✅ (무관 store-dashboard 500은 §7 분리) |
 

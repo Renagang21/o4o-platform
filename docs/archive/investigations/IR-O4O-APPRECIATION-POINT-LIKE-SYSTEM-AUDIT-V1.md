@@ -88,7 +88,6 @@ domain 테이블
 | LMS Lesson | `packages/interactive-content-core/src/entities/Lesson.ts` | `lms_lessons` | *(직접 없음 — courseId → Course.instructorId)* | — |
 | CMS Content | `packages/cms-core/src/entities/CmsContent.entity.ts` | `cms_contents` | `createdBy` | ✅ nullable |
 | KPA Content | `apps/api-server/src/routes/kpa/entities/kpa-content.entity.ts` | `kpa_contents` | `created_by` | ✅ nullable |
-| GlycoPharm Content | `apps/api-server/src/routes/glycopharm/entities/glycopharm-content.entity.ts` | `glycopharm_contents` | `created_by` | ✅ nullable |
 | Forum Comment | `packages/forum-core/src/backend/entities/ForumComment.ts` | `forum_comment` | `authorId` | ✅ nullable |
 
 ### 2-2. 필드명 불일치 문제
@@ -97,7 +96,6 @@ domain 테이블
 authorId      ← Forum Post, Forum Comment
 instructorId  ← LMS Course
 createdBy     ← CMS Content, KPA Content
-created_by    ← GlycoPharm Content (snake_case)
 ```
 
 → **감사 포인트 서비스 레이어에서 targetType별 제작자 ID 추출 로직 필요**

@@ -16,7 +16,7 @@
  * org 해석은 store-content.controller 의 resolveDualOrgId 선례와 동일:
  *   organization_members (isStoreOwner) 우선 → kpa_members fallback.
  *
- * 본 유틸은 KPA 전용이다. GlycoPharm / K-Cosmetics 는 호출하지 않으며, 해당 서비스의 동일
+ * 본 유틸은 KPA 전용이다. K-Cosmetics 는 호출하지 않으며, 해당 서비스의 동일
  * 패턴 정비는 별도 parity WO 로 분리한다.
  */
 import type { DataSource } from 'typeorm';

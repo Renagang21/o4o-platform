@@ -3,7 +3,7 @@
  * WO-O4O-MY-STORE-UNIFIED-SCREEN-ARCHITECTURE-AND-ADOPTION-V1 §6 / §12
  *
  * 문제:
- *   KPA / K-Cosmetics / GlycoPharm 이 App.tsx 안에서 동일한 골격 배선을
+ *   KPA / K-Cosmetics 이 App.tsx 안에서 동일한 골격 배선을
  *   각자 복사해 갖고 있었다 —
  *     `div.min-h-screen.flex.flex-col` + GlobalHeader + capability fetch +
  *     `resolveStoreMenu(SERVICE_CONFIG, caps)` + `StoreDashboardLayout hideTopBar`

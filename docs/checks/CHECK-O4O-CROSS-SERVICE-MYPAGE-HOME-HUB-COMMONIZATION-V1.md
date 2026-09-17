@@ -22,7 +22,6 @@
 | 서비스 | 개인영역 첫 진입 route | source page | Shell |
 |---|---|---|---|
 | KPA-Society | `/mypage` | `services/web-kpa-society/src/pages/mypage/MyDashboardPage.tsx` | `layouts/MyPageLayout.tsx` → 공통 `MyPageShell` |
-| GlycoPharm | `/mypage` | `services/web-glycopharm/src/pages/mypage/MyPageHub.tsx` | 공통 `MyPageShell` |
 | K-Cosmetics | `/mypage` | `services/web-k-cosmetics/src/pages/mypage/MyPageHub.tsx` | 공통 `MyPageShell` |
 | Neture | `/mypage` | `services/web-neture/src/pages/mypage/MyPageHub.tsx` | 공통 `MyPageShell` |
 | Pharmacy-Hub | `/account` (+ `/store-owner/account`) | `services/web-pharmacy-hub/src/pages/account/MyProfilePage.tsx` | 공통 `MyPageShell` |
@@ -35,7 +34,7 @@
 
 판정 어휘: `FULLY_COMMON` / `CORE_ONLY` / `VIEW_DUPLICATED` / `SERVICE_SPECIFIC` / `NOT_IMPLEMENTED` / `OUT_OF_SCOPE`
 
-| # | 기능 | KPA | GP | KCos | Neture | PH | After 판정 |
+| # | 기능 | KPA | KCos | Neture | PH | After 판정 |
 |---|---|---|---|---|---|---|---|
 | 1 | 사용자 요약 | 손수 구현 → `MyPageUserSummary` | 공통 | 공통 | 공통 | 공통(Profile Core 카드) | **FULLY_COMMON** |
 | 2 | 내 프로필 진입 | 공통 카드 + 요약 액션 | 공통 | 공통 | 공통 | 자기 자신(현재 화면) | **FULLY_COMMON** |
@@ -63,7 +62,7 @@ CORE_ONLY       = 0
 
 **Before** — Home/Hub 면에 남아 있던 중복 4건
 
-1. 감사 활동 카드 3벌 (KPA inline style · GP Tailwind · KCos Tailwind)
+1. 감사 활동 카드 2벌 (KPA inline style Tailwind · KCos Tailwind)
 2. 최근 활동 카드 2벌 (KPA · Neture)
 3. KPA 손수 만든 사용자 요약 블록 — 공통 `MyPageUserSummary` 미사용 (5서비스 중 유일)
 4. KPA 손수 만든 바로가기 grid — 공통 `MyPageEntryCardGrid` 미사용 (유일)
@@ -111,7 +110,7 @@ export 는 `packages/account-ui/src/index.ts` 에 WO 주석과 함께 추가.
 
 - 진입 카드는 5서비스 모두 `MyPageEntryCardGrid` → `MyPageHubCard`.
 - KPA `columns={3}` · 6 카드: 프로필 / 내 포럼 / 학습 결과 / 내 자격 / 내 신청 / 설정.
-- GP 4 카드 · KCos 4 카드 · Neture 4 카드(프로필/포럼/사업자 정보/설정).
+- KCos 4 카드 · Neture 4 카드(프로필/포럼/사업자 정보/설정).
 - Primary Action(업무 대시보드 이동 · 로그아웃)은 기존 `QuickActionsSection` 유지 — 새 개념을 만들지 않았다.
 - **dead link 0** — 모든 nav item·카드 대상 route 가 각 서비스 `App.tsx` 에 실재함을 정적 확인 + 프로덕션 브라우저로 재확인.
 
@@ -130,7 +129,7 @@ export 는 `packages/account-ui/src/index.ts` 에 WO 주석과 함께 추가.
 | 서비스 | Extension | 게이트 |
 |---|---|---|
 | KPA | 학습·포럼 통계 타일 5종 (수강 중 / 수료 / 수료증 / 작성 글 / 이벤트) | 없음 (전 회원) |
-| GP | 상태 배지 · 매장 진입 | 기존 role SSOT |
+| 상태 배지 · 매장 진입 | 기존 role SSOT |
 | KCos | `대시보드로 이동` → `/store` | 기존 role SSOT |
 | Neture | `사업자 정보` nav·카드 + `공급자 대시보드` | `SUPPLIER_ONLY_ROLES` (`services/web-neture/src/lib/role-constants`) — 신규 SSOT 만들지 않음 |
 | PH | `가입 상태` → `/join/status` | 기존 계약 유지 |
@@ -145,7 +144,6 @@ export 는 `packages/account-ui/src/index.ts` 에 WO 주석과 함께 추가.
 | 서비스 | 판정 | 근거 |
 |---|---|---|
 | KPA-Society | **ADOPTED** | UserSummary + EntryCardGrid + ActivityFeed + AppreciationCard 전부 공통 전환 |
-| GlycoPharm | **ADOPTED** | AppreciationCard 공통 전환 (나머지는 이미 공통) |
 | K-Cosmetics | **ADOPTED** | AppreciationCard 공통 전환 |
 | Neture | **ADOPTED** | ActivityFeed 공통 전환 |
 | Pharmacy-Hub | **SERVICE_SPECIFIC (정당)** | Home/Hub 화면 자체가 없고 `/account` 첫 화면 = Profile. WO §11 이 `/mypage` 신설·Dashboard 신설을 금지. 이미 `MyPageShell` + `PHARMACY_HUB_ACCOUNT_NAV_ITEMS` 위에 있음 |
@@ -156,7 +154,7 @@ export 는 `packages/account-ui/src/index.ts` 에 WO 주석과 함께 추가.
 
 - 검증 뷰포트: desktop **1440×900**, mobile **390×844**.
 - 5서비스 × 2 뷰포트 = 10 케이스 전부 실브라우저 확인.
-- 모바일 기능 진입 소실 0 — nav 항목 수가 desktop 과 동일 (KPA 9 / GP 7 / KCos 7 / Neture 3~4(공급자 4) / PH 2).
+- 모바일 기능 진입 소실 0 — nav 항목 수가 desktop 과 동일 (KPA 9 7 / KCos 7 / Neture 3~4(공급자 4) / PH 2).
 - double shell 0.
 - `MyPageActivityFeed` 는 좁은 폭에서 meta 가 제목을 밀지 않도록 flex 배치를 사용.
 
@@ -169,7 +167,6 @@ export 는 `packages/account-ui/src/index.ts` 에 WO 주석과 함께 추가.
 | 서비스 | URL | desktop | mobile | 비고 |
 |---|---|:---:|:---:|---|
 | KPA-Society | `https://kpa-society.co.kr/mypage` | PASS | PASS | Home → Profile → Settings → 뒤로가기 → 새로고침 전부 정상. `MyPageAppreciationCard` 는 합계 0 + `hideWhenEmpty` 로 미표시 = 기존 동작 보존 |
-| GlycoPharm | `https://glycopharm.co.kr/mypage` | PASS | PASS | 감사 활동 카드 공통 빈 상태 렌더 |
 | K-Cosmetics | `https://k-cosmetics.site/mypage` | PASS | PASS | 정본 도메인 `k-cosmetics.site` 사용 (`k-cosmetics.co.kr` 미사용) |
 | Neture | `https://neture.co.kr/mypage` | PASS | PASS | 공급자 계정 — `최근 활동` 공통 카드 + 공급자 Extension 정상 |
 | Pharmacy-Hub | `https://pharmacyhub.co.kr/account` | PASS | PASS | 데모 계정 버튼(stale 401) 미사용, interactive login |

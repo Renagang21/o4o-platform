@@ -69,7 +69,7 @@ services/web-kpa-society/src/pages/pharmacy/StoreTabletDisplaysPage.tsx  (UI onl
 - migration 0 · API 0 · 신규 pairing 0 · store_tablets 구조 0 · 운영 샘플 0.
 
 ## 9. typecheck / 배포
-- web-kpa-society `tsc --noEmit`: **StoreTabletDisplaysPage 에러 0**(KPA 페이지 → GP/KCos 무관).
+- web-kpa-society `tsc --noEmit`: **StoreTabletDisplaysPage 에러 0**(KPA 페이지 → KCos 무관).
 - web deploy(62cefd9c2) **success**.
 
 ## 10. 브라우저 smoke — Deferred (§12.3)

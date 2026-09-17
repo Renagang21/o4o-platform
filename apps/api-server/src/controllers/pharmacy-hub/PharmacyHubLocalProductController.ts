@@ -12,7 +12,7 @@
  * ─────────────────────────────────────────────────────────────────────────────
  * 이 컨트롤러가 하는 일은 **조직 결정 + 상태코드 매핑**뿐이다.
  * 검증·SQL 계약은 공통 services/store/store-local-products.service.ts 를 호출한다
- * (KPA·GlycoPharm·K-Cosmetics 가 쓰는 것과 같은 함수 — 로직 복제 0).
+ * (KPA·K-Cosmetics 가 쓰는 것과 같은 함수 — 로직 복제 0).
  *
  * 조직 계약 (PharmacyHubStoreInfoController 와 동일)
  *   0개      : GET 200 안내 / write 409 STORE_NOT_CONNECTED
@@ -102,7 +102,7 @@ function rejectsOrganizationId(req: Request, res: Response): boolean {
  * `store_local_products.id` 는 uuid 컬럼이므로 비-uuid 를 그대로 넘기면 Postgres 캐스팅
  * 오류(500)가 난다. 공통 service 는 원본 라우트의 동작(가드는 GET 상세에만)을 그대로
  * 보존해야 하므로(WO 동작 불변), 이 가드는 서비스 계층이 아니라 여기에서 건다.
- * 다른 서비스(KPA·GlycoPharm·K-Cosmetics)의 동작에는 영향이 없다.
+ * 다른 서비스(KPA·K-Cosmetics)의 동작에는 영향이 없다.
  */
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 

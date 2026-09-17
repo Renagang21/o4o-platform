@@ -20,7 +20,7 @@ KPA-Society 강의/LMS 의 rewardPolicy 계약을 안정화한다. 강사/운영
 - reward 지급 로직이 임의 json 구조에 의존하지 않도록 안정화
 - 이후 강사 UI / 운영자 UI / 서비스 공통화가 동일 계약을 사용하도록 기준선 고정
 
-KPA-Society 한정. GlycoPharm / K-Cosmetics / Neture 미적용. **Neture 는 LMS/강의 대상 아님** — 메뉴/라우트/API/공통 UI 소비처 연결 없음.
+KPA-Society 한정. K-Cosmetics / Neture 미적용. **Neture 는 LMS/강의 대상 아님** — 메뉴/라우트/API/공통 UI 소비처 연결 없음.
 
 ## 2. 선행 상태 요약
 
@@ -154,7 +154,7 @@ interface RewardPolicyMetadata {
   - git tree 의 `services/web-neture/.../ForumWritePage.tsx` 변경은 **타 세션 forum 공통화 작업**(최근 커밋 `8ac1cd8a`/`a1c5df4a` 계열) — 본 LMS WO 와 무관, 미접촉·미스테이징.
 - Neture LMS 메뉴 없음 / 라우트 없음 / rewardPolicy UI 없음 / 공통 소비처 없음.
 - Neture 는 공급자/파트너/운영 기반 서비스 — 강의 수강·rewardPolicy 적용 대상 아님.
-- LMS 공통화 대상 = KPA-Society / GlycoPharm / K-Cosmetics. Neture 제외.
+- LMS 공통화 대상 = KPA-Society / K-Cosmetics. Neture 제외.
 
 ## 14. 검증 결과
 
@@ -186,7 +186,7 @@ interface RewardPolicyMetadata {
 | `apps/api-server/src/modules/lms/services/QuizService.ts` | `updateQuiz` metadata shallow merge(방어적) |
 | `docs/checks/CHECK-O4O-LMS-REWARD-POLICY-CONTRACT-STABILIZE-V1.md` | 본 문서(신규) |
 
-**무변경:** DB/migration/schema, jsonb 컬럼 구조, credit-constants 금액, referenceKey 규칙, OrderType.LMS/price/isPaid, payment/checkout/order, reward 설정 UI(강사/운영자), 공통 UI 패키지, GP/KCos/Neture.
+**무변경:** DB/migration/schema, jsonb 컬럼 구조, credit-constants 금액, referenceKey 규칙, OrderType.LMS/price/isPaid, payment/checkout/order, reward 설정 UI(강사/운영자), 공통 UI 패키지, KCos/Neture.
 
 ## 16. 남은 후속 작업
 
@@ -203,12 +203,11 @@ interface RewardPolicyMetadata {
 2. **`WO-O4O-KPA-LMS-OPERATOR-REWARD-POLICY-APPROVAL-UI-V1`** — 운영자가 제안을 승인/수정/비활성화(`rewardPolicy`)하는 UI.
 3. **`IR-O4O-LMS-SERVICE-COMMONIZATION-BOUNDARY-V1`** — rewardPolicy 계약 안정화 후 LMS 공통화 경계 조사.
 4. **`WO-O4O-LMS-COMMON-UI-EXTRACTION-V1`** — CourseCard/CourseList/CourseDetail/LessonPlayer/QuizPanel 공통 UI 추출.
-5. **`WO-O4O-LMS-GLYCOPHARM-KCOSMETICS-ADOPTION-V1`** — GP/KCos 적용.
 6. **`CHECK-O4O-LMS-NETURE-EXCLUSION-GUARD-V1`** — Neture 제외 최종 확인.
 
 ## 17. 완료 판정
 
-**PASS.** rewardPolicy 정식 계약(rich entry + legacy 호환) 고정, 단일 `normalizeRewardEntry` 로 의미 확정(invalid→미지급+warn), metadata partial update 유실 방지(Course/Lesson/Quiz merge), 강사 제안/운영자 승인 metadata 구조 타입·문서 기반 마련. 지급 로직·금액·referenceKey·DB 무변경, 호출처 시그니처 호환, Neture/GP/KCos 무변경, api-server typecheck 0. reward 설정 UI 는 후속 WO 로 분리.
+**PASS.** rewardPolicy 정식 계약(rich entry + legacy 호환) 고정, 단일 `normalizeRewardEntry` 로 의미 확정(invalid→미지급+warn), metadata partial update 유실 방지(Course/Lesson/Quiz merge), 강사 제안/운영자 승인 metadata 구조 타입·문서 기반 마련. 지급 로직·금액·referenceKey·DB 무변경, 호출처 시그니처 호환, Neture/KCos 무변경, api-server typecheck 0. reward 설정 UI 는 후속 WO 로 분리.
 
 ---
 

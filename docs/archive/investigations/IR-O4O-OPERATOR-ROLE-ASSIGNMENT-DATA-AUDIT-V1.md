@@ -55,11 +55,10 @@
 
 | # | Email | service_key | sm.role | 기대 RA 값 | active RA | inactive RA | 보정 필요 |
 |---|-------|-------------|---------|-----------|-----------|-------------|:--------:|
-| 1 | `glyco-operator@o4o.com` | glycopharm | operator | `glycopharm:operator` | `[]` | `['glycopharm:operator']` | **YES** |
 | 2 | `kcos-operator@o4o.com` | k-cosmetics | operator | `cosmetics:operator` | `[]` | `['cosmetics:operator']` | **YES** |
 | 3 | `kcos-admin@o4o.com` | k-cosmetics | admin | `cosmetics:admin` | `[]` | `['cosmetics:admin']` | **YES** |
 | 4 | `neture-operator@o4o.com` | neture | operator | `neture:operator` | `[]` | `['neture:operator']` | **YES** |
-| 5 | `sohae2100@gmail.com` | kpa-society | admin | `kpa:admin` | `['kpa:admin', 'kpa:operator', 'neture:admin', 'neture:operator', 'glycopharm:admin', 'glycopharm:operator', 'cosmetics:admin', 'cosmetics:operator', 'kpa:store_owner', 'platform:super_admin']` | `[]` | 정상 |
+| 5 | `sohae2100@gmail.com` | kpa-society | admin | `kpa:admin` | — | `[]` | 정상 |
 
 **보정 대상 = 4 건.** sohae2100 (platform admin) 1 건은 정상.
 
@@ -99,7 +98,6 @@ super-admin@o4o.com:
 |------------|:--------:|------|
 | **neture** | 1 | `neture-operator@o4o.com` |
 | **k-cosmetics** | 2 | `kcos-operator@o4o.com`, `kcos-admin@o4o.com` |
-| **glycopharm** | 1 | `glyco-operator@o4o.com` |
 | **kpa-society** | 0 | sohae2100 은 정상. KPA seed 계정 (kpa-admin, kpa-operator, phamacy1) **production 에 부재** |
 | 합계 | **4** | |
 
@@ -111,7 +109,7 @@ super-admin@o4o.com:
 - production 의 20 명 user 목록 중 위 3 계정이 보이지 않음
 - seed migration 의 파일명 timestamp `20260927100000` (2026-09-27) 가 현재(2026-05-23) 보다 미래 → **이 seed migration 자체가 production 에 아직 적용되지 않음**
 
-**그러나** 다른 4 계정 (`neture-operator`, `kcos-operator`, `kcos-admin`, `glyco-operator`) 은 **이미 존재** — 다른 더 이른 시점의 seed 또는 수동 생성으로 보임.
+**그러나** 다른 4 계정 (`neture-operator`, `kcos-operator`, `kcos-admin`) 은 **이미 존재** — 다른 더 이른 시점의 seed 또는 수동 생성으로 보임.
 
 → **KPA seed 계정 부재는 본 IR 의 범위 밖.** 별도 추후 검토 (필요 시 seed migration 강제 실행 또는 수동 생성).
 
@@ -151,9 +149,7 @@ WHERE u.email IN (
   'neture-operator@o4o.com',
   'kcos-operator@o4o.com',
   'kcos-admin@o4o.com',
-  'glyco-operator@o4o.com'
 )
-  AND ra.role IN ('neture:operator', 'cosmetics:operator', 'cosmetics:admin', 'glycopharm:operator')
 ORDER BY u.email, ra.role;
 ```
 
@@ -173,7 +169,6 @@ WHERE ra.user_id = u.id
     (u.email = 'neture-operator@o4o.com' AND ra.role = 'neture:operator')
     OR (u.email = 'kcos-operator@o4o.com' AND ra.role = 'cosmetics:operator')
     OR (u.email = 'kcos-admin@o4o.com' AND ra.role = 'cosmetics:admin')
-    OR (u.email = 'glyco-operator@o4o.com' AND ra.role = 'glycopharm:operator')
   );
 ```
 

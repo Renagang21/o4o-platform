@@ -9,7 +9,7 @@
 
 ## 1. 목적
 
-O4O 4개 서비스(GlycoPharm / K-Cosmetics / KPA Society / Neture)의 **공개 정보 구조 정비 결과를 하나의 마일스톤 문서로 고정**한다.
+O4O 3개 서비스(K-Cosmetics / KPA Society / Neture)의 **공개 정보 구조 정비 결과를 하나의 마일스톤 문서로 고정**한다.
 일련의 WO/IR 을 통해 아래 영역이 순차 정비되었으며, 본 문서는 **새 기능 구현 없이 현재 완료 상태 + 남은 후속 과제**를 정리한다.
 
 ```
@@ -27,7 +27,7 @@ O4O 4개 서비스(GlycoPharm / K-Cosmetics / KPA Society / Neture)의 **공개 
 
 ## 3. 정리 대상 서비스
 
-GlycoPharm · K-Cosmetics · KPA Society · Neture (4개).
+K-Cosmetics · KPA Society · Neture (4개).
 
 ---
 
@@ -35,14 +35,13 @@ GlycoPharm · K-Cosmetics · KPA Society · Neture (4개).
 
 | 서비스 | 서비스 안내 | 약관/개인정보 | 법정정보 푸터 | Contact 제출 | Contact Admin 관리 |
 |--------|:----------:|:-----------:|:-----------:|:----------:|:----------------:|
-| **GlycoPharm** | ✅ `/service-guide` | ✅ `/terms`·`/privacy` ← `service_policy_documents` | ✅ `service_legal_profiles` | ✅ `/contact` → `ContactInquiry` | ✅ `/admin/contact-inquiries` |
 | **K-Cosmetics** | ✅ `/service-guide` | ✅ `/terms`·`/privacy` ← `service_policy_documents` | ✅ `service_legal_profiles` | ✅ `/contact` → `ContactInquiry` | ✅ `/admin/contact-inquiries` |
 | **KPA Society** | ✅ `/service-guide` | ✅ `/policy`·`/privacy` ← `kpa_legal_documents`(public API) | ✅ `service_legal_profiles` | 기존 KPA 구조 유지 | 기존 KPA 구조 유지 |
 | **Neture** | ✅ `/guide` | ✅ `/terms`·`/privacy` ← 기존 CMS(`cms_pages`) | ✅ `service_legal_profiles` | 기존 Neture 구조 유지 | 기존 Neture 구조 유지 |
 
 - 법정정보 푸터는 **4서비스 모두 `service_legal_profiles` 기반 동적 렌더**로 통일됨(값 없으면 비표시).
-- 약관/개인정보 본문 출처는 서비스별 상이(GP/KCos=`service_policy_documents`, KPA=`kpa_legal_documents`, Neture=CMS) — 장기 일원화는 후속 과제(§7).
-- Contact 신규 `ContactInquiry` 흐름은 **GP/KCos 한정**(접수→알림→Admin 관리). KPA/Neture 는 기존 구조 유지.
+- 약관/개인정보 본문 출처는 서비스별 상이(KCos=`service_policy_documents`, KPA=`kpa_legal_documents`, Neture=CMS) — 장기 일원화는 후속 과제(§7).
+- Contact 신규 `ContactInquiry` 흐름은 **KCos 한정**(접수→알림→Admin 관리). KPA/Neture 는 기존 구조 유지.
 
 ---
 
@@ -54,7 +53,6 @@ GlycoPharm · K-Cosmetics · KPA Society · Neture (4개).
 
 | 작업 | 구현 | CHECK |
 |------|------|-------|
-| `WO-O4O-GLYCOPHARM-SERVICE-GUIDE-PAGE-V1` | `d63aa54c2` | `1fbf98d5a` |
 | `WO-O4O-KCOS-SERVICE-GUIDE-PAGE-V1` | `7bda9ece9` | `2a4f65939` |
 | `WO-O4O-KPA-SOCIETY-SERVICE-GUIDE-PAGE-V1` | `78f21d0f6` | `4945dd0d0` |
 | `WO-O4O-NETURE-O4O-GUIDE-PAGE-REFINE-V1` | (현행 `/guide` 유지 판정) `608125933` | `4b5e52582` |
@@ -103,7 +101,7 @@ GlycoPharm · K-Cosmetics · KPA Society · Neture (4개).
 
 ### 6.2 약관/개인정보처리방침
 
-1. GP/KCos 는 `service_policy_documents` 기반 `/terms`·`/privacy` 사용.
+1. KCos 는 `service_policy_documents` 기반 `/terms`·`/privacy` 사용.
 2. Neture 는 기존 CMS 기반 `/terms`·`/privacy` 유지.
 3. KPA 는 기존 `kpa_legal_documents` 기반 `/policy`·`/privacy` 사용.
 4. KPA 의 장기 표준 일원화는 **후속 과제**로 남긴다(§7).
@@ -119,7 +117,7 @@ GlycoPharm · K-Cosmetics · KPA Society · Neture (4개).
 
 ### 6.4 Contact
 
-1. GP/KCos 는 신규 `ContactInquiry` 기반으로 **접수·알림·Admin 관리까지 연결**되었다.
+1. KCos 는 신규 `ContactInquiry` 기반으로 **접수·알림·Admin 관리까지 연결**되었다.
 2. Neture/KPA 는 **기존 Contact 구조를 유지**한다.
 3. 이메일 알림은 **후속 작업으로 분리**한다.
 4. Contact 수신자 설정 Admin 도 **후속 작업으로 분리**한다.
@@ -130,18 +128,17 @@ GlycoPharm · K-Cosmetics · KPA Society · Neture (4개).
 
 ### 7.1 데이터 소스
 
-| 영역 | GlycoPharm | K-Cosmetics | KPA Society | Neture |
-|------|-----------|-------------|-------------|--------|
-| 법정정보 | `service_legal_profiles` | `service_legal_profiles` | `service_legal_profiles` | `service_legal_profiles` |
-| 약관 | `service_policy_documents` | `service_policy_documents` | `kpa_legal_documents` | `cms_pages` |
-| 개인정보 | `service_policy_documents` | `service_policy_documents` | `kpa_legal_documents` | `cms_pages` |
-| Contact | `ContactInquiry` | `ContactInquiry` | 기존 KPA 구조 | 기존 Neture 구조 |
+| 영역 | K-Cosmetics | KPA Society | Neture |
+| ------ | ------------- | ------------- | -------- |
+| 법정정보 | `service_legal_profiles` | `service_legal_profiles` | `service_legal_profiles` |
+| 약관 | `service_policy_documents` | `kpa_legal_documents` | `cms_pages` |
+| 개인정보 | `service_policy_documents` | `kpa_legal_documents` | `cms_pages` |
+| Contact | `ContactInquiry` | 기존 KPA 구조 | 기존 Neture 구조 |
 
 ### 7.2 공개 route
 
 | 서비스 | 안내 | 이용약관 | 개인정보처리방침 | 문의 |
 |--------|------|---------|----------------|------|
-| GlycoPharm | `/service-guide` | `/terms` | `/privacy` | `/contact` |
 | K-Cosmetics | `/service-guide` | `/terms` | `/privacy` | `/contact` |
 | KPA Society | `/service-guide` | `/policy` | `/privacy` | 기존 route |
 | Neture | `/guide` | `/terms` | `/privacy` | 기존 route |
@@ -152,7 +149,7 @@ GlycoPharm · K-Cosmetics · KPA Society · Neture (4개).
 
 우선순위 후보:
 
-1. **`WO-O4O-CONTACT-EMAIL-NOTIFICATION-V1`** — GP/KCos Contact 이메일 알림(서비스별 수신자 설정과 함께 검토).
+1. **`WO-O4O-CONTACT-EMAIL-NOTIFICATION-V1`** — KCos Contact 이메일 알림(서비스별 수신자 설정과 함께 검토).
 2. **`WO-O4O-SERVICE-CONTACT-SETTINGS-ADMIN-V1`** — 서비스별 문의 수신자 / 문의 유형 / 자동응답 문구 / 이메일 알림 사용 여부 Admin 설정.
 3. **`WO-O4O-KPA-LEGAL-ADMIN-UI-CONSOLIDATION-V1`** — KPA `/operator/legal` 과 Admin 설정 체계 정리.
 4. **`WO-O4O-KPA-LEGAL-DOCUMENTS-MIGRATION-TO-SERVICE-POLICY-V1`** — KPA `kpa_legal_documents` → `service_policy_documents` 이관 여부 검토·실행.
@@ -166,7 +163,7 @@ GlycoPharm · K-Cosmetics · KPA Society · Neture (4개).
 1. **실제 사업자등록번호 · 대표자 · 주소 · 통신판매업 신고번호** 등은 사용자/법무 확인 후 입력해야 한다.
 2. 현재 미입력 상태에서는 **푸터 법정정보가 비표시**될 수 있다(정상 — placeholder 노출 금지 정책).
 3. placeholder 를 넣어 공개 노출하면 **안 된다.**
-4. Contact 테스트 문의([SMOKE] GP/KCos 2건)는 smoke 에서 **spam 처리 완료**됨(`CHECK-O4O-CONTACT-INQUIRY-ADMIN-MANAGEMENT-V1` §10).
+4. Contact 테스트 문의([SMOKE] KCos 2건)는 smoke 에서 **spam 처리 완료**됨(`CHECK-O4O-CONTACT-INQUIRY-ADMIN-MANAGEMENT-V1` §10).
 5. 동시 세션 혼입 방지를 위해 commit 은 반드시 **pathspec(`git commit -- <명시 경로>`)** 로 수행해야 한다(§5.3 `6f7e0e22a` 사고 참조).
 
 ---

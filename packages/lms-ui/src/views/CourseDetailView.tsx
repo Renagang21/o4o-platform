@@ -3,7 +3,7 @@
  *
  * WO-O4O-COMMUNITY-LMS-COURSE-DETAIL-AND-LESSON-PLAYER-COMMONIZATION-V1
  *
- * KPA / K-Cosmetics / GlycoPharm 의 강의 상세 화면을 한 벌로 수렴한다.
+ * KPA / K-Cosmetics 의 강의 상세 화면을 한 벌로 수렴한다.
  * 데이터 IO 는 `LmsLearnerPort`, 경로·라벨·accent 는 `LmsViewConfig`,
  * 서비스 고유 영역(감사 포인트 패널 · 수료증 다운로드 등)은 slot 으로 주입한다.
  */

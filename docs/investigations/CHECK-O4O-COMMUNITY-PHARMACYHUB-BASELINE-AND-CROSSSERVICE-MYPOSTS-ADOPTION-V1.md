@@ -29,7 +29,6 @@
 |---|---|---|---|---|
 | KPA-Society | **없음** (`WorkCommunityPage` 는 mock 데이터, My Posts 아님) | `forumApi.getPosts(params)` (`/kpa/forum`) | `/forum/post/:id` | `author` 파라미터 + wrapper |
 | K-Cosmetics | **없음** (`MyForumDashboardPage` = "내 포럼" 소유 대시보드, 별개 축) | `fetchForumPosts` (`/cosmetics/forum`) | `/forum/post/:postId` | `fetchMyForumPosts` + wrapper |
-| GlycoPharm | **없음** | `fetchForumPosts` (`/glycopharm/forum`) | `/forum/posts/:id` | `fetchMyForumPosts` + wrapper |
 | Neture | **없음** | `fetchForumPosts` (`/neture/forum`, mock fallback 있음) | `/forum/post/:slug` (**slug 기반**) | `fetchMyForumPosts`(mock fallback 없음) + wrapper |
 | PharmacyHub | **없음** | `fetchPharmacyHubForumPosts` | `/forum/posts/:postId` | `author` 파라미터 + wrapper |
 
@@ -80,7 +79,6 @@
 |---|---|---|---|---|---|
 | PharmacyHub | ADOPTED_THIS_WO | `/forum/my-posts` | `fetchPharmacyHubForumPosts({author:'me'})` | `/forum/posts/:id` | 커뮤니티 메뉴 + Home 카드 |
 | K-Cosmetics | ADOPTED_THIS_WO | `/forum/my-posts` | `fetchMyForumPosts` | `/forum/post/:id` | 포럼 허브 infoLinks |
-| GlycoPharm | ADOPTED_THIS_WO | `/forum/my-posts` | `fetchMyForumPosts` | `/forum/posts/:id` | 포럼 허브 infoLinks |
 | KPA-Society | ADOPTED_THIS_WO | `/forum/my-posts` | `forumApi.getPosts({author:'me'})` | `/forum/post/:id` | 포럼 홈 infoLinks |
 | Neture | ADOPTED_THIS_WO | `/forum/my-posts` | `fetchMyForumPosts` | `/forum/post/:slug` | 포럼 허브 infoLinks (`/forum` 허브에서만) |
 
@@ -95,7 +93,7 @@
 
 | §18 조건 | 판정 |
 |---|---|
-| backend 변경 불필요 또는 아주 작음 | ❌ `/neture/home/latest` 집계 endpoint 자체가 없다 (cosmetics·glycopharm·kpa 에만 존재). 신규 route 신설이 필요하다. |
+| backend 변경 불필요 또는 아주 작음 | ❌ `/neture/home/latest` 집계 endpoint 자체가 없다 (cosmetics·kpa 에만 존재). 신규 route 신설이 필요하다. |
 | service-specific 분기 대량 불필요 | △ |
 | 기존 UX 손실 없음 | ❌ Neture 의 forum 최신글은 공지 그리드 **우측 컬럼 slot** 으로 들어가 있다. 공통 `LatestActivitySection` 은 탭형 전체폭 블록이라 홈 레이아웃 재구성이 필요하고 현재 배치가 사라진다. |
 
@@ -119,7 +117,7 @@
 
 ### services
 - PharmacyHub: `api/lms.ts`, `api/home.ts`, `pages/education/{lmsViewAdapter.ts,EducationPage.tsx,LmsCourseDetailPage.tsx,LmsLessonPage.tsx}`, `pages/community/{CommunityHomePage.tsx,CommunitySearchPage.tsx}`, `pages/forum/MyPostsPage.tsx`, `services/forumApi.ts`, `App.tsx`, `config/navigation.ts`, `package.json`, `Dockerfile`
-- K-Cosmetics / GlycoPharm / Neture: `services/forumApi.ts`(+`fetchMyForumPosts`), `pages/forum/MyPostsPage.tsx`, `App.tsx`, `pages/forum/ForumHubPage.tsx`
+- K-Cosmetics / Neture: `services/forumApi.ts`(+`fetchMyForumPosts`), `pages/forum/MyPostsPage.tsx`, `App.tsx`, `pages/forum/ForumHubPage.tsx`
 - KPA-Society: `api/forum.ts`(+`author`), `pages/forum/MyPostsPage.tsx`, `App.tsx`, `pages/forum/ForumHomePage.tsx`
 - `pnpm-lock.yaml` — PharmacyHub importer 에 `@o4o/lms-client`·`@o4o/lms-ui` 6줄
 
@@ -176,7 +174,6 @@ white screen 0 / JS exception 0 / dead link 0 / horizontal overflow 0.
 |---|---|---|:---:|:---:|:---:|
 | KPA-Society | `kpa-society.co.kr` | 총 3건 (본인 글 목록 정상) | 0 | 0 | 0 |
 | K-Cosmetics | `k-cosmetics.site` | 총 0건 (empty state) | 0 | 0 | 0 |
-| GlycoPharm | `glycopharm.co.kr` | 총 0건 (empty state) | 0 | 0 | 0 |
 | Neture | `neture.co.kr` | 총 1건 | 0 | 0 | 0 |
 | PharmacyHub | `pharmacyhub.co.kr` | 총 0건 (empty state) | 0 | 0 | 0 |
 

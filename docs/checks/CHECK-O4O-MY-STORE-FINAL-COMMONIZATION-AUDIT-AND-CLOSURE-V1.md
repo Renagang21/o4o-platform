@@ -17,7 +17,6 @@
 |---|---|---:|
 | KPA-Society | `services/web-kpa-society/src/App.tsx` 939–1083 | 44 |
 | K-Cosmetics | `services/web-k-cosmetics/src/App.tsx` 787–875 | 33 |
-| GlycoPharm | `services/web-glycopharm/src/App.tsx` 994–1114 | 42 |
 | PharmacyHub | `services/web-pharmacy-hub/src/App.tsx` 290–317 (+`layouts/StoreOwnerShell.tsx`) | 22 |
 | **합계** | | **141** |
 
@@ -31,7 +30,6 @@
 
 | 서비스 | MyStoreShell 사용처 | Store config |
 |---|---|---|
-| GlycoPharm | `App.tsx:454` | `GLYCOPHARM_STORE_CONFIG` |
 | K-Cosmetics | `App.tsx:363` | `COSMETICS_STORE_CONFIG` |
 | KPA-Society | `App.tsx:509` | `KPA_SOCIETY_STORE_CONFIG` |
 | PharmacyHub | `layouts/StoreOwnerShell.tsx:40` | `PHARMACY_HUB_STORE_CONFIG` |
@@ -43,7 +41,7 @@
 
 공유 View 심볼을 각 page 파일에서 실측.
 
-| 기능 | 공통 View | KPA | KCos | GP | PH |
+| 기능 | 공통 View | KPA | KCos | PH |
 |---|---|:--:|:--:|:--:|:--:|
 | Shell/Navigation | `MyStoreShell` + `storeMenuConfig` | O | O | O | O |
 | Home | `StoreHomeShell` 계열 | O | O | O | O |
@@ -91,7 +89,7 @@
 
 | 항목 | 서비스 | 근거 |
 |---|---|---|
-| 사이니지 콘솔 | KPA vs KCos/GP | `store_playlist_items(snapshot_id)` ≠ `signage_playlist_items(mediaId)` — `O4O-SIGNAGE-STORE-PLAYLIST-MODEL-BOUNDARY-V1` KEEP-LEGACY |
+| 사이니지 콘솔 | KPA vs KCos/`store_playlist_items(snapshot_id)` ≠ `signage_playlist_items(mediaId)` — `O4O-SIGNAGE-STORE-PLAYLIST-MODEL-BOUNDARY-V1` KEEP-LEGACY |
 | POP | KPA | 다국어 POP · `store-asset-policy-core` 정책 축 (`CHECK-O4O-MY-STORE-POP-COMPOSER-KCOS-GP-COMMONIZATION-V1` 명시 제외) |
 | POP | PH | `store_pops` CRUD 모델 (공통 View 는 자료함 기반 조립 모델) |
 | QR | KPA | 배치 인쇄 · screen-set 상태 · 다국어 축 |
@@ -102,7 +100,7 @@
 | 판매 채널 | KPA | 자체 storefront 폐기 트랙(네이버·쿠팡 대체) — 축 자체가 다름 |
 | 블로그 | PH | pharmacy-hub 블로그 계약(편집기 `RichTextEditor` 만 공용) |
 | 주문 | PH | B2B 장바구니/주문 축(공통 View 는 B2C 체크아웃 상태 모델) |
-| 매장 설정/정보 | KCos/GP/PH | 서비스별 설정 필드·API 상이 |
+| 매장 설정/정보 | KCos/PH | 서비스별 설정 필드·API 상이 |
 
 ## 6. SERVICE_NEUTRAL_BACKCOMPAT 5곳 최종 판정 (§9)
 
@@ -110,9 +108,9 @@
 
 | # | 경로 | 판정 | 근거 |
 |---|---|---|---|
-| 1 | `modules/store/store-library.routes.ts` | **VALID_SERVICE_NEUTRAL** | KPA/KCos/GP 프론트가 소비 |
-| 2 | `routes/o4o-store/controllers/store-product-library.controller.ts` | **VALID_SERVICE_NEUTRAL** | KPA/GP 등 다수 소비 |
-| 3 | `routes/platform/store-tablet.routes.ts` | **VALID_SERVICE_NEUTRAL** | KPA/KCos/GP 태블릿 API 공용, PH 는 자체 `withStoreAuth` seam |
+| 1 | `modules/store/store-library.routes.ts` | **VALID_SERVICE_NEUTRAL** | KPA/KCos 프론트가 소비 |
+| 2 | `routes/o4o-store/controllers/store-product-library.controller.ts` | **VALID_SERVICE_NEUTRAL** | KPA 등 다수 소비 |
+| 3 | `routes/platform/store-tablet.routes.ts` | **VALID_SERVICE_NEUTRAL** | KPA/KCos 태블릿 API 공용, PH 는 자체 `withStoreAuth` seam |
 | 4 | `modules/neture/controllers/seller.controller.ts` | **OUT_OF_SCOPE** | Neture 판매자(공급) 축 — 내 매장 화면군 아님 |
 | 5 | `modules/store-ai/controllers/product-ai-recommendation.controller.ts` | **DEAD · RETIRE_CANDIDATE** | `GET /api/v1/products/recommend/store` 프론트 소비처 **0건** |
 
@@ -140,7 +138,6 @@ Desktop 1440×900 / Mobile 390×844, 실제 프로덕션 도메인 로그인 후
 |---|---|---:|
 | KPA-Society | `https://kpa-society.co.kr` | 58 |
 | K-Cosmetics | `https://k-cosmetics-web-3e3aws7zqa-du.a.run.app` | 50 |
-| GlycoPharm | `https://glycopharm.co.kr` | 56 |
 | PharmacyHub | `https://pharmacyhub.co.kr` | 36 |
 | **합계** | | **200** |
 
@@ -151,7 +148,6 @@ Desktop 1440×900 / Mobile 390×844, 실제 프로덕션 도메인 로그인 후
 - 데이터/권한 상태로 분류된 항목(화면 오류 아님)
   - PH `/store-owner/tablets`·`/store-owner/handled-products` → 409 + "연결된 매장이 없습니다" 안내 = **BLOCKED_DATA**
   - KCos `/store/content/blog` → 403 + "이 매장의 경영자만 접근할 수 있습니다" = 권한 상태 정상 표기
-  - GP `/store/content/blog` → 404(해당 매장 블로그 미개설) = **BLOCKED_DATA**
   - KPA 사이니지 동영상/스케줄 → `GET /api/signage/kpa-society/{media,schedules,playlists}` **403**.
     화면은 "데이터를 불러오지 못했습니다 / 다시 시도" 로 표기하여 조회 실패를 0건으로 위장하지 않음(load-error 계약 준수).
     → **권한 계약 갭(별도 WO)**. 본 WO 는 RBAC 변경 금지(§18).
@@ -162,11 +158,11 @@ Desktop 1440×900 / Mobile 390×844, 실제 프로덕션 도메인 로그인 후
 |---|---|---:|---|---|
 | 1 | KPA `/store/marketing/product-descriptions` | 145px | 공통 View 고정 grid `280px 1fr` + grid item `min-width:auto` | `StoreProductDescriptionsView` 모바일 1열 + `minWidth:0` |
 | 2 | KCos `/store/library/product-descriptions` | 50px | 동일(공통 View) | 동일 |
-| 3 | GP `/store/library/product-descriptions` | 49px | 동일(공통 View) | 동일 |
+| 3 `/store/library/product-descriptions` | 49px | 동일(공통 View) | 동일 |
 | 4 | KPA `/store/analytics/marketing` | 213px | KPI 4열 고정 · 2단 섹션 고정 | `StoreMarketingAnalyticsView` 모바일 2열/1열 |
 | 5 | KPA `/store/marketing/qr` | 221px | 헤더 액션 3개 `flexShrink:0` | 헤더·액션행 `flex-wrap` |
-| 6 | GP `/store` | 39px | `@o4o/hub-core` `HubSection` 카드 3열 고정 | 모바일 1열 |
-| 7 | GP `/store/settings` | 100px | `lg:grid-cols-4` 자식 `min-width:auto` | 양쪽 컬럼 `min-w-0` |
+| 6 `/store` | 39px | `@o4o/hub-core` `HubSection` 카드 3열 고정 | 모바일 1열 |
+| 7 `/store/settings` | 100px | `lg:grid-cols-4` 자식 `min-width:auto` | 양쪽 컬럼 `min-w-0` |
 | 8 | PH `/store-owner/handled-products` | 45px | 공통 `HandledProductsToolbar` 검색 폼 non-wrap | `flex-wrap` 허용 |
 
 공통 View 는 inline style 이라 media query 를 쓸 수 없어 `useIsNarrowViewport`(≤768px) 훅을
@@ -187,8 +183,6 @@ Desktop 1440×900 / Mobile 390×844, 실제 프로덕션 도메인 로그인 후
 | editor·preview clipping | 0 |
 | flagged rows | **0 / 184** |
 
-GP `/store/settings`(9-2 표 7번)만 1차 수정 후에도 76px 이 남아 3차까지 좁혀 마감했다.
-
 | 회차 | 조치 | 잔여 overflow(390px) |
 |---|---|---|
 | 1 | 좌/우 컬럼 `min-w-0` | 100 → 76 |
@@ -208,7 +202,6 @@ GP `/store/settings`(9-2 표 7번)만 1차 수정 후에도 76px 이 남아 3차
 ## 11. 중복 재탐색 (§15)
 
 최신 코드 기준 재스캔 결과 서비스 간 실질 중복은 **얇은 어댑터(공통 View 호출 + API/색/명사 주입)** 뿐이다.
-byte-identical 한 유일 쌍은 `StoreBlogPage`/`StoreBlogPostPage`(KCos↔GP)이며 공개 storefront
 `/store/:slug/blog` = **OUT_OF_SCOPE**.
 
 ## 12. NOT_IMPLEMENTED (§16)
@@ -216,7 +209,7 @@ byte-identical 한 유일 쌍은 `StoreBlogPage`/`StoreBlogPostPage`(KCos↔GP)�
 > **SUPERSEDED-BY-ADDENDUM**: 재판정 결과는 **ADDENDUM A-3** (필수 NOT_IMPLEMENTED = 0).
 
 메뉴·route 가 모두 없어 "미구현"으로 판정한 축(공통화 결함 아님):
-KCos/GP 취급 제품 · PH 상품 상세설명 / 마케팅 분석 / 채용 지원 / 외국인 관광객 / 매장 자산 /
+KCos 취급 제품 · PH 상품 상세설명 / 마케팅 분석 / 채용 지원 / 외국인 관광객 / 매장 자산
 판매 채널 / 사이니지 플레이리스트·플레이어 선택 · KPA 공급 카탈로그.
 
 ## 13. BLOCKING / NON_BLOCKING (§17)
@@ -270,7 +263,6 @@ NON_BLOCKING_TECH_DEBT 4건(13절)은 본 트랙의 종료 조건이 아니며 �
 |---|---:|
 | KPA-Society | 44 |
 | K-Cosmetics | 33 |
-| GlycoPharm | 42 |
 | PharmacyHub | 22 |
 | **합계** | **141** |
 | 미조사 | **0** |
@@ -319,7 +311,7 @@ WO 계약 — *필수 기능 누락 → BLOCKING · 정책상 부재 → SERVICE
 | # | 축 | 서비스 | 메뉴 축 | 판정 |
 |---:|---|---|---|---|
 | 1 | 취급 제품 | KCos | 없음 | OUT_OF_SCOPE |
-| 2 | 취급 제품 | GP | 없음 | OUT_OF_SCOPE |
+| 2 | 취급 제품 | 없음 | OUT_OF_SCOPE |
 | 3 | 상품 상세설명 | PH | 없음 | OUT_OF_SCOPE |
 | 4 | 판매 채널 | PH | 없음 | OUT_OF_SCOPE |
 | 5 | 마케팅 분석 | PH | 없음 | OUT_OF_SCOPE |
@@ -346,10 +338,10 @@ WO 계약 — *필수 기능 누락 → BLOCKING · 정책상 부재 → SERVICE
 
 | # | route | 메뉴 노출 | 판단 |
 |---:|---|---|---|
-| 1 | GP `/store/commerce/tablet-displays` (`StoreTabletDisplaysPage`) | GP config 에만 `tablet-displays` 키 없음 (KPA·KCos·PH 는 있음) | **IA drift 후보** — GP 태블릿 비노출이 정책인지 확인 필요 |
-| 2 | KPA·KCos `/store/content` (`StoreAssetsPage`) | GP 만 `content` 키 보유 | **의도된 legacy** — KPA/KCos 는 자료함(`StoreLibraryResourcesPage`)이 `/store/assets` 를 흡수 |
+| 1 | — | — | — |
+| 2 | KPA·KCos `/store/content` (`StoreAssetsPage`) 만 `content` 키 보유 | **의도된 legacy** — KPA/KCos 는 자료함(`StoreLibraryResourcesPage`)이 `/store/assets` 를 흡수 |
 
-- 2번은 자료함 통합의 결과로 정상. 1번은 **메뉴 노출 여부가 GP 서비스 정책 판단**이라
+- 2번은 자료함 통합의 결과로 정상.
   본 감사에서 임의로 메뉴를 추가하지 않았다(§18 기능 추가 금지). 13절에 기술부채로 등재한다.
 - 정정된 8절 결론: **dead menu 0 · dead route 0 · unexpected 404 0 · 메뉴 미노출 라이브 route 2
   (의도 1 / 확인 필요 1)**.
@@ -360,7 +352,6 @@ WO 계약 — *필수 기능 누락 → BLOCKING · 정책상 부재 → SERVICE
 
 NON_BLOCKING_TECH_DEBT 에 다음을 추가한다(기존 4건 + 2건 = 6건).
 
-5. GP `/store/commerce/tablet-displays` 메뉴 미노출 — 노출/은퇴 중 택일 필요(A-4 #1)
 6. NON_BLOCKING_OPTIONAL 4 cell(POP 직원용 KPA·PH / PH 사이니지 하위 2화면) — 선택 기능
 
 ## A-6. 최종 판정 재확인

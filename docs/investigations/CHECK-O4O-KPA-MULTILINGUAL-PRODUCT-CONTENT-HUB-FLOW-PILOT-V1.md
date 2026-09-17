@@ -70,10 +70,9 @@ import 동작:
 | 서비스 | 운영자 controller | hub/import (store-owner controller) |
 |--------|:----------------:|:-----------------------------------:|
 | KPA | ✅ `/operator/multilingual-product-contents` | ✅ (기존 3-mount controller) |
-| GlycoPharm | ✅ (backend symmetry) | ✅ |
 | K-Cosmetics | ✅ (backend symmetry) | ✅ |
 
-> **3-서비스 백엔드 mount 결정:** operator-pop / store-owner multilingual 이 이미 3서비스 대칭 mount 이므로 동일 패턴 유지. WO §3.1 "KPA only" 는 **UI/운영 흐름/smoke** 레벨에서 준수 — glyco/cosmetics 는 UI 0, operator 원본 0 이므로 운영 흐름 미활성. §8 성공기준 6("GlycoPharm/K-Cosmetics UI 변경 없음") 은 UI 한정이라 충족.
+> **3-서비스 백엔드 mount 결정:** operator-pop / store-owner multilingual 이 이미 3서비스 대칭 mount 이므로 동일 패턴 유지. §8 성공기준 6 은 UI 한정이라 충족.
 
 ## 4. 검증
 

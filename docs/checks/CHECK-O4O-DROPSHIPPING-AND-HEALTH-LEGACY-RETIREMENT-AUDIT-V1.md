@@ -80,7 +80,7 @@ partnerops ──▶ partner-core            (dropshipping 무관 — 범위 밖
 | glucoseview 마이그레이션 7건 | `1737100000000-UpdateGlucoseViewTestAccountPasswords`, `1737100100000-ActivateGlucoseViewTestAccounts`, `20260222300000-CreateGlucoseViewCustomersTable`, `20260222400000-AddOrganizationIdToGlucoseViewCustomers`, `20260326300000-AddUserIdToGlucoseviewCustomers`, `20260404200000-RemoveGlucoseViewFromFeatured`, `20260600000000-DropGlucoseviewAndCgmTables` |
 | care/health_readings 마이그레이션 16건 | `2026021500000{1,2}`, `2026021510000{1,2}`, `20260222500000`, `20260306120000-CreateHealthReadings`, `20260308{2,3,5}00000`, `20260312100000`, `20260313100000`, `20260314100000`, `20260322000001-CreatePatientHealthProfiles`, `20260322120000`, `20260326400000`, `20260327000100`, `20260401100000`, `20260401200000`, `20260409500000`, `20260601000000-DropCareTables` |
 | `glucoseview` **service key** | `service-catalog.ts` 5키 중 하나. `service-scopes.ts`, `rbac-catalog.ts`, `ServiceMembership`, `register.dto.ts`, CMS 채널/슬롯/콘텐츠 셀렉터, `PartnerApplication/Content/Event/Target` 등 **공유 enum·셀렉터 전반에 분포** |
-| 프론트 잔재 | `apps/admin-dashboard/src/components/guards/GlucosecareParticipationNotice.tsx`, `services/web-glycopharm/src/pages/business/BloodCareBusinessStatusPage.tsx` |
+| 프론트 잔재 | — |
 
 ---
 
@@ -119,7 +119,7 @@ partnerops ──▶ partner-core            (dropshipping 무관 — 범위 밖
 | `app_registry` (6 rows) | `annualfee-yaksa`, `digital-signage`, `digital-signage-core`, `membership-yaksa`, `partnerops`, `reporting-yaksa` — **dropshipping·sellerops·supplierops·cgm 계열 0건** |
 | `apps` | 1 row |
 | `app_instances` / `app_usage_logs` | **0 rows** |
-| `service_memberships` by `service_key` | `platform` 7 / `k-cosmetics` 6 / `pharmacy-hub` 5 / `kpa-society` 5 / `glycopharm` 4 / `neture` 4 — **`glucoseview` 0건** |
+| `service_memberships` by `service_key` | `platform` 7 / `k-cosmetics` 6 / `pharmacy-hub` 5 / `kpa-society` 5 4 / `neture` 4 — **`glucoseview` 0건** |
 
 > `partnerops` 는 `app_registry` 에 `active` 이나 `partner-core` 의존이며 dropshipping 체인 밖이다. **본 WO 삭제 범위에서 제외**한다.
 

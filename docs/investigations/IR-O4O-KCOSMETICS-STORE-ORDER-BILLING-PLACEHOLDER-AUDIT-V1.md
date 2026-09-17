@@ -16,7 +16,7 @@
 
 **핵심 결론:**
 - K-Cosmetics 주문 backend API는 **완전 구현 완료** (819줄). frontend만 없는 상태.
-- K-Cosmetics 정산 backend는 **존재하지 않음**. GlycoPharm 전용 구조만 있음.
+- K-Cosmetics 정산 backend는 **존재하지 않음**.
 - **주문과 정산은 반드시 분리**해야 한다.
 
 ---
@@ -119,11 +119,10 @@ router.use('/orders', orderController); // H2-0: 주문 엔드포인트
 `apps/api-server/src/routes/cosmetics/` 전체 탐색:
 
 - billing/invoice/settlement 관련 controller: **없음**
-- GlycoPharm만 `apps/api-server/src/routes/glycopharm/entities/billing-invoice.entity.ts` 존재
 
 ---
 
-## 5. KPA / GlycoPharm Reference
+## 5. KPA Reference
 
 ### 5.1 KPA-Society 주문
 
@@ -147,26 +146,6 @@ getStoreOrder(id)  → GET /checkout/store-orders/:id
 > K-Cosmetics는 service-specific `/cosmetics/orders` 사용.  
 > **K-Cosmetics는 KPA API를 그대로 재사용할 수 없고, 전용 API client가 필요하다.**
 
-### 5.2 GlycoPharm 주문
-
-| 항목 | 내용 |
-|------|------|
-| Frontend page | `PharmacyOrders.tsx` — 완전 구현 |
-| API client | `src/api/pharmacy.ts` |
-| Backend endpoint | `GET /glycopharm/pharmacy/orders` (GlycoPharm 전용) |
-| 메뉴 | `orders: '주문 내역'` → `/commerce/orders` |
-
-### 5.3 GlycoPharm 정산
-
-| 항목 | 내용 |
-|------|------|
-| Frontend page | `StoreBillingPage.tsx` — 부분 구현 (Mock 데이터 사용) |
-| Backend entity | `billing-invoice.entity.ts` (GlycoPharm 전용) |
-| 수수료 | COMMISSION_RATE = 5% 하드코딩 |
-| 상태 | 완전 구현 아님 — Mock 수준 |
-
----
-
 ## 6. 데이터 모델 확인
 
 ### 6.1 EcommerceOrder (공통)
@@ -176,7 +155,7 @@ getStoreOrder(id)  → GET /checkout/store-orders/:id
 | `metadata.serviceKey` | `'cosmetics'` (JSONB) — K-Cosmetics 주문 필터 기준 |
 | `channel` | `'local'` / `'travel'` |
 | `storeId` | nullable (metadata 내부 권장) |
-| `orderType` | `COSMETICS` (WO-O4O-ECOMMERCE 계약에서 GLYCOPHARM은 BLOCKED) |
+| `orderType` | `COSMETICS` |
 
 → **K-Cosmetics 주문은 이미 checkout_orders에 들어가는 구조.** sellerOrganizationId 매핑도 backend에서 처리됨.
 
@@ -185,10 +164,7 @@ getStoreOrder(id)  → GET /checkout/store-orders/:id
 | 서비스 | Invoice Entity |
 |--------|---------------|
 | KPA-Society | ❌ 없음 |
-| GlycoPharm | ✅ `billing-invoice.entity.ts` |
 | K-Cosmetics | ❌ 없음 |
-
-→ **K-Cosmetics 정산 구현 시 별도 entity 설계 또는 GlycoPharm 패턴 검토 필요.**
 
 ### 6.3 Migration 필요 여부
 
@@ -205,7 +181,7 @@ getStoreOrder(id)  → GET /checkout/store-orders/:id
 | 정산/인보이스 지금 구현해야 하는가? | **NO** — backend 미존재. 별도 설계 IR 필요 |
 | 주문 먼저, 정산 후순위로 둘 수 있는가? | **YES** — 독립적인 기능, 분리 가능 |
 | placeholder "준비 중" 표시 개선? | **선택적** — 현재 `StorePlaceholderPage`가 이미 "준비 중" 표시함 |
-| K-Cosmetics 문구 기준 | "내 매장", "매장 주문", "매장 정산" — KPA/GlycoPharm 약국 문구 사용 금지 |
+| K-Cosmetics 문구 기준 | "내 매장", "매장 주문", "매장 정산" — KPA 문구 사용 금지 |
 
 ---
 
@@ -219,12 +195,10 @@ getStoreOrder(id)  → GET /checkout/store-orders/:id
 이유:
 - Backend API 완전 구현됨 (cosmetics-order.controller.ts 819줄)
 - EcommerceOrder 데이터 이미 쌓이는 구조
-- KPA/GlycoPharm 구현 패턴 참조 가능
 - Frontend API client + page + menu 항목 추가만 필요
 
 주의:
 - K-Cosmetics API endpoint는 /cosmetics/orders (KPA Core API와 다름)
-- orderType=COSMETICS 확인 필요 (GLYCOPHARM은 BLOCKED 상태)
 - local/travel 채널 구분 UI 반영 필요 여부 검토
 ```
 
@@ -235,7 +209,6 @@ getStoreOrder(id)  → GET /checkout/store-orders/:id
 
 이유:
 - Backend entity/controller 미존재
-- GlycoPharm 정산도 Mock 수준 (완성 아님)
 - 정산은 PG 정산 주기, 수수료 정책, 외부 정산 시스템과 연결 필요
 - K-Cosmetics 정산 정책 미정의
 
@@ -284,7 +257,7 @@ getStoreOrder(id)  → GET /checkout/store-orders/:id
 |------|------|------|
 | **매장 실행 capability 정렬** | 주문 backend 완비, frontend 미구현. 매장 운영자가 주문을 볼 수 없는 상태 | ⚠️ 불완전 |
 | **공통 capability = UI+API+데이터 동시 정렬** | 주문 API 있으나 UI/클라이언트 없음 → 운영 차단 | ⚠️ 갭 존재 |
-| **정산 = 운영 리스크 영역** | PG/수수료/정책 미정의. GlycoPharm 정산도 Mock 수준 | ✅ 보류 정당 |
+| **정산 = 운영 리스크 영역** | PG/수수료/정책 미정의. | ✅ 보류 정당 |
 | **placeholder는 "준비 중" 명확 표시 필요** | StorePlaceholderPage가 "이 기능은 준비 중입니다" 표시 중 | ✅ 현재도 명확 |
 | **K-Cosmetics = 내 매장 문구** | 구현 시 "매장 주문", "내 매장 주문"으로 가야 함 | — (구현 전) |
 | **O4O는 매장 실행 중심 플랫폼** | 주문 조회 불가는 매장 운영자 실행 capability 차단 → 우선순위 높음 | ⚠️ 구현 권장 |
@@ -307,7 +280,6 @@ getStoreOrder(id)  → GET /checkout/store-orders/:id
 | `apps/api-server/src/routes/cosmetics/controllers/cosmetics-payment.controller.ts` | 결제 backend (333줄, 완전 구현) |
 | `apps/api-server/src/routes/cosmetics/cosmetics.routes.ts:110-111` | 주문/결제 마운트 |
 | `services/web-kpa-society/src/api/checkout.ts` | KPA 주문 API client 패턴 |
-| `services/web-glycopharm/src/api/pharmacy.ts` | GlycoPharm 주문 API client 패턴 |
 | `packages/ecommerce-core/src/entities/EcommerceOrder.entity.ts` | 공통 주문 entity |
 
 ---

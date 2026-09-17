@@ -50,10 +50,9 @@
 | 서비스 | 탭 구성 |
 |--------|---------|
 | **KPA Society** | all, notice, news, guide, knowledge, event, promo (7개) |
-| **GlycoPharm** | all, notice, guide, knowledge, promo, news (6개) |
 | **Neture** | all, notice, guide, knowledge, promo, news (6개) |
 
-KPA만 `event` 탭이 추가되어 있다. GlycoPharm/Neture는 동일 구성.
+KPA만 `event` 탭이 추가되어 있다. Neture는 동일 구성.
 
 ---
 
@@ -78,7 +77,6 @@ KPA만 `event` 탭이 추가되어 있다. GlycoPharm/Neture는 동일 구성.
 | serviceKey | hero | notice | news | promo | guide | knowledge | event | featured |
 |------------|:----:|:------:|:----:|:-----:|:-----:|:---------:|:-----:|:--------:|
 | `kpa` | 1 | 3 (1 pub) | 0 | 0 | 0 | 0 | 0 | 0 |
-| `glycopharm` | 1 | 2 (1 pub) | 0 | 0 | 0 | 0 | 0 | 0 |
 | `neture` | 0 | 5 (3 pub) | 0 | 0 | 0 | 0 | 0 | 0 |
 | `cosmetics` | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
 | `glucoseview` | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
@@ -90,7 +88,7 @@ KPA만 `event` 탭이 추가되어 있다. GlycoPharm/Neture는 동일 구성.
 2. **`news`는 2건 있지만 모두 미발행** (draft/archived)
 3. **`guide`, `knowledge`, `event`, `featured`는 데이터 0건**
 4. **대부분 데이터가 serviceKey=null** (글로벌 플랫폼 레벨)
-5. 서비스별 콘텐츠는 극소수 (KPA: 4건, GlycoPharm: 3건, Neture: 5건)
+5. 서비스별 콘텐츠는 극소수 (KPA: 4건: 3건, Neture: 5건)
 
 ---
 
@@ -190,7 +188,7 @@ KPA만 `event` 탭이 추가되어 있다. GlycoPharm/Neture는 동일 구성.
 
 | 항목 | 내용 |
 |------|------|
-| **변경 범위** | 프론트엔드 Hub 페이지만 (KPA, GlycoPharm, Neture) |
+| **변경 범위** | 프론트엔드 Hub 페이지만 (KPA, Neture) |
 | **Backend 변경** | 없음 |
 | **DB 변경** | 없음 |
 | **구현 시간** | 0.5일 |
@@ -293,7 +291,6 @@ export const VALID_CONTENT_TYPES = [
 
 - **기존 DB type 유지**: 리매핑은 프론트엔드 display layer에서만
 - **cms-core 변경 불가**: Frozen 정책 준수 (§3, F5)
-- **서비스별 독립 매핑**: KPA/GlycoPharm/Neture 각자 Hub Tab 구성 가능
 
 ---
 
@@ -309,5 +306,4 @@ export const VALID_CONTENT_TYPES = [
 | `apps/api-server/src/routes/cms-content/cms-content-query.handler.ts:32-116` | GET /stats (6타입 하드코딩) |
 | `apps/api-server/src/routes/cms-content/cms-content-mutation.handler.ts:141-148` | POST validation |
 | `services/web-kpa-society/src/pages/pharmacy/HubContentLibraryPage.tsx:32-42` | KPA Hub TYPE_TABS (7탭) |
-| `services/web-glycopharm/src/pages/hub/HubContentListPage.tsx:47-54` | GlycoPharm TYPE_FILTERS (6탭) |
 | `services/web-neture/src/pages/library/ContentLibraryPage.tsx:18-25` | Neture TYPE_FILTERS (6탭) |

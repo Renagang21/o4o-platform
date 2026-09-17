@@ -2,14 +2,13 @@
 
 > **작업명:** WO-O4O-LMS-COURSE-DETAIL-XSS-FIX-V1
 > **유형:** 보안 긴급 수정 — raw HTML 주입 sanitize. 최소 범위(파일 1개). 신규 dependency **0**.
-> **결과: PASS — GP LMS `CourseDetailPage` lesson content `dangerouslySetInnerHTML` 에 `sanitizeHtml`(DOMPurify) 적용. 미-sanitize raw HTML 잔여 0(education). web-glycopharm typecheck 0.**
+> 미-sanitize raw HTML 잔여 0(education).
 > 발견: `IR-O4O-PRODUCT-DESCRIPTION-HTML-RENDERING-POLICY-V1 §7`(범위 밖 CRITICAL) — 2026-06-16
 
 ---
 
 ## 1. 문제 위치
 
-`services/web-glycopharm/src/pages/education/CourseDetailPage.tsx`
 - `69` `const raw = lesson.content` → `84` `typeof raw === 'string'` 분기 → `88` `dangerouslySetInnerHTML={{ __html: raw }}` **(sanitize 없음)**.
 - raw=lesson content(강사/admin 입력) → 수강생 브라우저 **XSS 실행 가능**.
 - (doc-object 분기는 text 변환이라 안전 — string 분기만 위험.)
@@ -18,7 +17,6 @@
 
 | 파일 | 변경 |
 |------|------|
-| `services/web-glycopharm/src/pages/education/CourseDetailPage.tsx` | import `sanitizeHtml` (`@o4o/content-editor`) + `__html: raw` → `__html: sanitizeHtml(raw \|\| '')` |
 | `docs/investigations/CHECK-O4O-LMS-COURSE-DETAIL-XSS-FIX-V1.md` | 본 CHECK |
 
 ```tsx
@@ -30,7 +28,7 @@ dangerouslySetInnerHTML={{ __html: sanitizeHtml(raw || '') }}
 
 ## 3. sanitize 적용 방식
 
-- **기존 공통 sanitizer 재사용:** `import { sanitizeHtml } from '@o4o/content-editor'` (DOMPurify 기반, `packages/content-editor/src/sanitize.ts`). web-glycopharm 이 이미 `@o4o/content-editor` 소비(ContentRenderer/RichTextEditor) → **신규 dependency 0**, import 정상.
+- **기존 공통 sanitizer 재사용:** `import { sanitizeHtml } from '@o4o/content-editor'` (DOMPurify 기반, `packages/content-editor/src/sanitize.ts`).
 - DOMPurify 기본 정책 → script/event handler(on*)/javascript: URL/위험 태그 제거, 서식(p/strong/ul/li 등)은 유지.
 - 동일 안전 패턴: 같은 디렉토리 `LmsLessonPage` 는 이미 `ContentRenderer`(sanitize 내장) 사용 — 본 수정으로 CourseDetailPage 도 안전 정렬.
 
@@ -48,13 +46,9 @@ dangerouslySetInnerHTML={{ __html: sanitizeHtml(raw || '') }}
 
 ## 6. 검증
 
-- **web-glycopharm typecheck PASS** (`tsc --noEmit -p tsconfig.json` → error 0).
 - 정적: string 분기 raw → `sanitizeHtml` 경유 렌더, import 경로 정상, education 미-sanitize 잔여 0.
-- **브라우저 확인(배포 후 권장):** GP 강의 상세 정상 렌더(서식 유지) + `<script>/onerror` 등 위험 HTML 미실행 + console error 0.
 
 ## 7. 완료 판정
-
-**PASS.** CourseDetailPage raw HTML 주입 sanitize 적용, 동일 파일 내 잔여 0, 신규 dependency 없음, backend/DB 무변경, web-glycopharm typecheck 통과.
 
 ## 8. 후속 (선택)
 
@@ -63,4 +57,4 @@ dangerouslySetInnerHTML={{ __html: sanitizeHtml(raw || '') }}
 
 ---
 
-*Date: 2026-06-16 · GP LMS CourseDetailPage XSS 긴급 수정 · PASS · lesson content raw HTML → sanitizeHtml(@o4o/content-editor, DOMPurify) · education 미-sanitize 잔여 0 · 신규 dep 0, backend/DB 무변경, 상품설명 축 미혼합 · web-glycopharm typecheck 0 · 후속 전수조사 선택.*
+*Date: 2026-06-16 LMS CourseDetailPage XSS 긴급 수정 · PASS · lesson content raw HTML → sanitizeHtml(@o4o/content-editor, DOMPurify) · education 미-sanitize 잔여 0 · 신규 dep 0, backend/DB 무변경, 상품설명 축 미혼합 · 후속 전수조사 선택.*

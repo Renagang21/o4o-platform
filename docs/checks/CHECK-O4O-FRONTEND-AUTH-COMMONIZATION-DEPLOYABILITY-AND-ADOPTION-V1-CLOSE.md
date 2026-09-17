@@ -34,7 +34,6 @@
 | web-kpa-society | L25 | L66 |
 | web-neture | L26 | L60 |
 | web-k-cosmetics | L23 | L56 |
-| web-glycopharm | L25 | L60 |
 | web-pharmacy-hub | L32 | L61 |
 
 추가로 `auth-react` 만이 아니라 **각 서비스의 transitive `workspace:*` 의존 전량**과 Dockerfile COPY 목록을 스크립트로 대조했다.
@@ -44,7 +43,6 @@
 | kpa-society | 29 | 30 | **0** (`hub-core` 1건 여분) |
 | neture | 22 | 22 | **0** |
 | k-cosmetics | 22 | 22 | **0** |
-| glycopharm | 24 | 24 | **0** |
 | pharmacy-hub | 13 | 13 | **0** |
 
 ## 4. AuthContext / RoleGuard 채택 현황
@@ -54,7 +52,6 @@
 | web-kpa-society | `useServiceAuth` (443L) | `kpa-society` | `createRouteGuard` (43L) |
 | web-neture | `useServiceAuth` + `useRoleSelection` (111L) | `neture` | `createRouteGuard` (180L) |
 | web-k-cosmetics | `useServiceAuth` (143L) | `k-cosmetics` | `createRouteGuard` (92L) |
-| web-glycopharm | `useServiceAuth` (228L) | `glycopharm` | `createRouteGuard` (57L) |
 | web-pharmacy-hub | `useServiceAuth` (90L) | `SERVICE_KEY` | 컴포넌트 없음(역할 판정 인라인) |
 
 - `services/web-account` 는 `@o4o/auth-react` 미소비(참조 0건). WO 5개 서비스 범위 밖이고 Dockerfile 이 `COPY packages/` 일괄 방식이라 배포 리스크 없음 → **관측만, 수정 없음**.
@@ -67,7 +64,6 @@
 | `services/web-kpa-society` | PASS | PASS |
 | `services/web-neture` | PASS | PASS |
 | `services/web-k-cosmetics` | PASS | PASS |
-| `services/web-glycopharm` | PASS | PASS |
 | `services/web-pharmacy-hub` | PASS | PASS |
 | `apps/admin-dashboard` | PASS | PASS |
 
@@ -89,7 +85,6 @@
 | KPA-Society | PASS → `/admin/kpa-dashboard` | PASS | PASS (`auth/me` 401 → `refresh` 401 → 토큰 정리) | PASS ×2 — 미로그인 "로그인이 필요합니다" / store_owner 계정 "지부 관리자 권한이 없습니다." | 사용자 메뉴 `KPA 서비스 · 서비스 관리자 (kpa:admin)` |
 | Neture | PASS → `/supplier/dashboard` (returnTo 복원) | PASS (localStorage 토큰 0) | PASS | PASS — 미로그인 `/supplier/dashboard` → `/` + 로그인 모달 | 공급자 컨텍스트 `(주)네뚜레 공급자 테스트` 정상 로드 |
 | K-Cosmetics | PASS → `/operator` (returnTo 복원) | PASS (localStorage 0) | PASS | PASS — 미로그인 `/operator` → `/login` | `auth/me` roles `cosmetics:admin` · `cosmetics:operator` |
-| GlycoPharm | PASS → `/admin` | PASS (localStorage 0) | PASS | PASS — 미로그인 `/operator` → `/` + 로그인 모달 | `glycopharm:admin` 대시보드 진입 |
 | Pharmacy-Hub | **PASS ×2** (operator · store_owner) | PASS (localStorage 0) | PASS | PASS — 미로그인 `/operator` "로그인이 필요합니다" / 역할 미보유 `/supplier` "이 역할이 부여되지 않았습니다" | 화면 표기 `pharmacy-hub:operator` |
 
 → **선행 CHECK §4-3 의 "Pharmacy-Hub 로그인 이후 동선 미검증" 제한 사항이 해소됐다.**

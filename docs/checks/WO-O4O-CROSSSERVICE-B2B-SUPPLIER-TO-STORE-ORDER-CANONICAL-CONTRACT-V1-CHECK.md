@@ -9,7 +9,7 @@
 
 ## 0. 요약
 
-5개 서비스(KPA Society · GlycoPharm · K-Cosmetics · PharmacyHub · Neture)와 공통 모듈에 흩어진
+4개 서비스(KPA Society · K-Cosmetics · PharmacyHub · Neture)와 공통 모듈에 흩어진
 B2B 주문 · 발주 · 공급 신청 흐름을 current main 기준으로 전수조사했다.
 
 - **살아 있는 공급자→매장 B2B 주문 축은 3개**이고, 셋 다 `store_cart_items` → `checkout_orders` 로 수렴한다.
@@ -56,7 +56,7 @@ B2B 주문 · 발주 · 공급 신청 흐름을 current main 기준으로 전수
 | 공통 | `/api/v1/store/cart/:serviceKey` | DELETE | Store | 인증 user | — | path param | auth + membership | W | 동일 | `B2B_CANONICAL` |
 | 공통 | `/api/v1/store/cart/:serviceKey/groups` | GET | Store | 인증 user | 공급자별 묶음 | path param | auth + membership | R | 동일 | `B2B_CANONICAL` |
 | 공통 | `/api/v1/store/cart/:serviceKey/checkout-preview` | GET | Store | 인증 user | 공급자별 | path param | auth + membership | R | 동일 | `B2B_CANONICAL` |
-| 공통 | `/api/v1/store/cart/:serviceKey/checkout-confirm` | POST | Store | 인증 user | 공급자별 분리 생성 | path param | auth + membership | W | KPA/GP/KCos | `B2B_CANONICAL` (Axis A) |
+| 공통 | `/api/v1/store/cart:serviceKey/checkout-confirm` | POST | Store | 인증 user | 공급자별 분리 생성 | path param | auth + membership | W | KPA/KCos | `B2B_CANONICAL` (Axis A) |
 | 공통 | `/api/v1/store/cart/:serviceKey/checkout-confirm-b2b` | POST | Store | 인증 user | 공급자별 | path param + 서비스 내부 `'neture'` 하드 게이트 | W | web-neture | `B2B_CANONICAL` (Axis B) |
 
 ### 2-2. 매장(buyer) 주문 조회
@@ -66,8 +66,6 @@ B2B 주문 · 발주 · 공급 신청 흐름을 current main 기준으로 전수
 | KPA | `/api/v1/kpa/checkout/orders` | GET | Store | 인증 user | — | 마운트 고정 | auth + service scope | R | `web-kpa-society/api/checkout.ts` | `B2B_COMMONIZABLE` |
 | KPA | `/api/v1/kpa/checkout/orders/:orderId` | GET | Store | 인증 user | — | 마운트 고정 | 동일 | R | 동일 | `B2B_COMMONIZABLE` |
 | KPA | `POST /api/v1/kpa/checkout` | — | — | — | — | — | — | — | — | `DEAD` — 소비자 주문 생성 leg, **라우트 제거(404)** |
-| GlycoPharm | `/api/v1/glycopharm/checkout/orders(/:id)` | GET | Store | 인증 user | — | 마운트 고정 | auth + service scope | R | `web-glycopharm/api/store.ts` | `B2B_COMMONIZABLE` |
-| GlycoPharm | `/api/v1/glycopharm/checkout/cleanup-expired` | POST | Operator | — | — | 마운트 고정 | 운영 write scope guard | W | 운영 | `B2B_SERVICE_SPECIFIC` |
 | K-Cosmetics | `/api/v1/cosmetics/orders(/:id)` | GET | Store | 인증 user | — | 마운트 고정 | auth + service scope | R | `web-k-cosmetics/api/storeOrders.ts` | `B2B_COMMONIZABLE` (경로만 불일치 → DF-1) |
 | K-Cosmetics | `POST /api/v1/cosmetics/orders` | POST | — | — | — | — | — | — | — | `LEGACY_CONSUMER_COMMERCE` — **410 `STORE_CONSUMER_ORDER_RETIRED`** (production 확인) |
 
@@ -115,7 +113,6 @@ B2B 주문 · 발주 · 공급 신청 흐름을 current main 기준으로 전수
 | `/health` | 200 | 호스트 확인 |
 | `POST /api/v1/cosmetics/orders` | **410 `STORE_CONSUMER_ORDER_RETIRED`** | 소비자 주문 은퇴 유지 |
 | `POST /api/v1/kpa/checkout/orders` | **404** | 라우트 제거 유지 |
-| `POST /api/v1/glycopharm/checkout/orders` | **404** | 라우트 제거 유지 |
 | `/api/v1/ecommerce/*` | **404** | 서버에 존재하지 않음 → 결함 D2 근거 |
 | `/api/v1/store/cart/*` | **401** | 마운트됨 · fail-closed |
 | `/api/v1/pharmacy-hub/store-owner/*` | **401** | 마운트됨 · fail-closed |
@@ -139,9 +136,6 @@ B2B 주문 · 발주 · 공급 신청 흐름을 current main 기준으로 전수
 | KPA | `pages/pharmacy/StoreOrdersPage.tsx` · `api/checkout.ts` | `/kpa/checkout/orders` | `B2B_CANONICAL` |
 | KPA | `pages/pharmacy/StoreOrderWorktablePage.tsx` (관심상품 주문 작업대) | 조회 + canonical 장바구니 안내 | `B2B_SERVICE_SPECIFIC` — 주문 실행 leg 은 이미 은퇴, 화면은 의도적 보존 (DF-3) |
 | KPA | `api/eventOffer.ts` | event-offer 조회 | `EVENT_OR_PROMOTION_FLOW` |
-| GlycoPharm | `pages/store-management/PharmacyOrders.tsx` · `api/store.ts` | `/glycopharm/checkout/orders` | `B2B_CANONICAL` |
-| GlycoPharm | `pages/store-management/b2b-order/B2BOrderPage.tsx` | `/glycopharm/b2b/products?type=…` (조회만) | `APPLICATION_NOT_ORDER` (조회 leg) + `DEAD` (제거된 취급 신청 write → D4) |
-| GlycoPharm | `components/layouts/DashboardLayout.tsx` SUPPLIER 메뉴 | `/supplier*` → `RoleNotAvailablePage` | `DEAD` → D3 에서 제거 |
 | K-Cosmetics | `pages/store/StoreOrdersPage.tsx` · `api/storeOrders.ts` | `/cosmetics/orders` | `B2B_CANONICAL` |
 | K-Cosmetics | `api/operatorOrders.ts` · `StoreRevenueSummaryPage.tsx` | 운영자 주문 조회 | `B2B_SERVICE_SPECIFIC` |
 | PharmacyHub | `pages/store-owner/{CartPage,OrdersPage,OrderDetailPage,ProductDetailPage}.tsx` | `/pharmacy-hub/store-owner/*` | `B2B_CANONICAL` |
@@ -151,7 +145,6 @@ B2B 주문 · 발주 · 공급 신청 흐름을 current main 기준으로 전수
 | admin-dashboard | `src/api/unified-client.ts` `ecommerce = {products, orders, cart}` | `/api/v1/ecommerce/*` (404) | `LEGACY_CONSUMER_COMMERCE` → D2 에서 제거 |
 
 **route guard / deep link**: 서비스 프론트의 B2B 메뉴 항목은 전부 마운트된 라우트를 가리킨다.
-GlycoPharm `/supplier`, `/supplier/*` 는 404 가 아니라 `RoleNotAvailablePage` 로 고정돼 있다
 (= "이 서비스에는 공급자 역할이 없다" 는 계약의 표현). **404 dead link 0.**
 
 ---
@@ -177,7 +170,7 @@ GlycoPharm `/supplier`, `/supplier/*` 는 404 가 아니라 `RoleNotAvailablePag
 
 | producer | 산출 | consumer |
 |---|---|---|
-| `EventOfferCartCheckoutService` | `checkout_orders` (Axis A) | KPA/GP/KCos 매장 주문 조회 |
+| `EventOfferCartCheckoutService` | `checkout_orders` (Axis A) | KPA/KCos 매장 주문 조회 |
 | `NetureB2BCartCheckoutService` | `checkout_orders` (Axis B, pending) | 결제 → bridge |
 | `PharmacyHubCartCheckoutService` | `checkout_orders` (Axis C) | 결제 → bridge |
 | 결제 완료 이벤트 | `checkout_orders.paid` | `CheckoutFulfillmentBridgeService` |
@@ -209,16 +202,6 @@ GlycoPharm `/supplier`, `/supplier/*` 는 404 가 아니라 `RoleNotAvailablePag
   **프로덕션 실측 결과 해당 경로는 전부 404** — 서버에 존재하지 않는 소비자 commerce 잔재였다.
 - **수정**: 블록 제거 + 재추가 금지 주석.
 
-### D3 — GlycoPharm 공급자 메뉴 dead config
-
-- **위치**: `services/web-glycopharm/src/components/layouts/DashboardLayout.tsx`
-- **내용**: `[GLYCOPHARM_ROLES.SUPPLIER]` 메뉴 블록(대시보드/상품 관리/주문 현황/설정)이 남아 있었다.
-  (1) 이 레이아웃은 `App.tsx` 에서 ADMIN / CONSUMER 로만 렌더링되므로 도달 불가능한 dead config 였고,
-  (2) 가리키던 `/supplier*` 는 `App.tsx` 에서 `RoleNotAvailablePage` 로 고정돼 있었다.
-- **수정**: 메뉴 블록 제거 + 미사용 아이콘 import(`Truck`, `Package`, `ShoppingCart`) 제거 + 근거 주석.
-- **주의**: 이 라우트들은 **404 dead link 가 아니다.** 조사 중 초기 판단(404)이 틀렸음을 확인하고
-  주석과 회귀 가드를 사실에 맞게 고쳤다.
-
 ### D4 — 은퇴한 공급자 취급 요청(handling request) 축의 프론트 잔재 2건
 
 - **서버 사실**: `POST /api/v1/neture/supplier/requests` 는 커밋 `9798e2d80`
@@ -226,12 +209,8 @@ GlycoPharm `/supplier`, `/supplier/*` 는 404 가 아니라 `RoleNotAvailablePag
   관련 테이블은 migration `20260226000002` 에서 drop 됐다.
   전수 검색(`grep -rnE "\.(post)\(\s*['\"\`][^'\"\`]*requests['\"\`]"`) 결과 어떤 `/supplier` 마운트에도
   `POST /requests` 가 없다.
-- **수정 1**: `services/web-glycopharm/src/services/api.ts` — `supplierRequestApi.createHandlingRequest` 제거.
-- **수정 2**: `services/web-glycopharm/src/pages/store-management/b2b-order/B2BOrderPage.tsx` —
-  '취급 요청' 버튼 · `handleRequestHandling` 핸들러 · 관련 state 3개 · 미사용 import 제거.
 - **수정 3**: `services/web-neture/src/lib/api/seller.ts` — `sellerApi.createHandlingRequest` 제거(호출부 0).
 - **대체 기능을 새로 만들지 않았다** (§22). canonical 축은
-  `/api/v1/store/cart/glycopharm/*` → `checkout-confirm` → `/api/v1/glycopharm/checkout/orders` 다.
 
 ---
 
@@ -243,7 +222,7 @@ GlycoPharm `/supplier`, `/supplier/*` 는 404 가 아니라 `RoleNotAvailablePag
 | 프론트 장바구니 API/hook (`store-ui-core` `createStoreCartApi` · `useStoreCart`) | **FULLY_COMMON** | 서비스별 복제 없음 |
 | 매장 주문 원장 뷰 (`BuyerOrderLedgerView`) | **FULLY_COMMON** | 뷰는 이미 공통 |
 | 주문 원장 (`checkout_orders`) | **FULLY_COMMON** | 서비스별 주문 테이블 0 |
-| 매장 buyer 주문 **조회 컨트롤러** (KPA / GP / KCos) | **VIEW_DUPLICATED** → `B2B_COMMONIZABLE` | 3벌 중복. 다만 경로·scope guard 가 서비스별로 달라 동시 회귀 필요 → **DF-4 로 유보** |
+| 매장 buyer 주문 **조회 컨트롤러** (KPA / KCos) | **VIEW_DUPLICATED** → `B2B_COMMONIZABLE` | 2벌 중복. 다만 경로·scope guard 가 서비스별로 달라 동시 회귀 필요 → **DF-4 로 유보** |
 | PharmacyHub 라우트 표면 (`/store-owner/cart`·`/orders`·`/payments`) | **SERVICE_SPECIFIC** | 공용 라우트로는 Pharmacy-Hub 역할 가드를 걸 수 없다. 저장은 canonical 재사용이므로 정당 |
 | 공급자(seller) 주문 화면 | **CORE_ONLY (Neture 단일)** | Neture 가 canonical. 타 서비스 복제 금지 |
 | serviceKey → event-offer 매핑 (`CART_TO_EVENT_OFFER_SERVICE_KEY`) | **FULLY_COMMON** | 단일 상수 |
@@ -252,7 +231,7 @@ GlycoPharm `/supplier`, `/supplier/*` 는 404 가 아니라 `RoleNotAvailablePag
 | POS · 외부 판매채널 주문 API | **OUT_OF_SCOPE** | §11 · §12 |
 
 **무조건 공통화하지 않았다.** 하나의 Order 모델로 강제 통합하지 않았고, 단순 신청서를 주문으로
-재해석하지 않았다(GlycoPharm b2b-order 조회 leg 은 `APPLICATION_NOT_ORDER` 로 남겼다).
+재해석하지 않았다.
 
 ---
 
@@ -283,7 +262,6 @@ GlycoPharm `/supplier`, `/supplier/*` 는 404 가 아니라 `RoleNotAvailablePag
 주요 가드:
 
 - 은퇴한 supplier handling-request 축 재유입 차단 (D4)
-- GlycoPharm 공급자 화면 축 재유입 차단 (D3) — `RoleNotAvailablePage` 고정도 함께 단언
 - `/api/v1/ecommerce/*` client 재유입 차단 (D2)
 - B2B 장바구니 membership 게이트 존재 단언 (D1)
 - serviceKey 하드코딩(`COALESCE(... service_key, 'neture')`) SSOT 이탈 차단
@@ -301,7 +279,6 @@ GlycoPharm `/supplier`, `/supplier/*` 는 404 가 아니라 `RoleNotAvailablePag
 | 항목 | 결과 |
 |---|---|
 | 계약 회귀 스펙 | **20/20 통과** |
-| `tsc --noEmit` — api-server · admin-dashboard · web-glycopharm · web-neture | **통과** |
 | api-server jest 전체 (최종) | **204/204 suites · 3416/3416 tests 통과** |
 | admin-dashboard vitest 전체 | **229/229 통과** |
 | production smoke (`https://api.neture.co.kr`) | §2-5 표대로 전부 기대값 일치 |
@@ -386,7 +363,7 @@ DB 대신 **프로덕션 HTTP 실측**(§2-5)과 정적 분석 + git 이력으�
 
 | 지표 | 값 |
 |---|---|
-| 조사한 서비스 | 5 (KPA Society · GlycoPharm · K-Cosmetics · PharmacyHub · Neture) + 공통 모듈 |
+| 조사한 서비스 | 5 (KPA Society · K-Cosmetics · PharmacyHub · Neture) + 공통 모듈 |
 | 살아 있는 B2B 주문 축 | 3 (Axis A / B / C) |
 | route census `UNJUDGED` | **0** |
 | 분류 `UNKNOWN` | **0** |
@@ -410,9 +387,6 @@ DB 대신 **프로덕션 HTTP 실측**(§2-5)과 정적 분석 + git 이력으�
 A  apps/api-server/src/__tests__/b2b-supplier-to-store-order-canonical-contract.spec.ts
 M  apps/api-server/src/routes/cart/store-cart.routes.ts                       (D1)
 M  apps/admin-dashboard/src/api/unified-client.ts                             (D2)
-M  services/web-glycopharm/src/components/layouts/DashboardLayout.tsx         (D3)
-M  services/web-glycopharm/src/pages/store-management/b2b-order/B2BOrderPage.tsx (D4)
-M  services/web-glycopharm/src/services/api.ts                                (D4)
 M  services/web-neture/src/lib/api/seller.ts                                  (D4)
 A  docs/baseline/O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1.md               (§32)
 A  docs/checks/WO-O4O-CROSSSERVICE-B2B-SUPPLIER-TO-STORE-ORDER-CANONICAL-CONTRACT-V1-CHECK.md

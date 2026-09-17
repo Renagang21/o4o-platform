@@ -4,8 +4,8 @@
  * WO-O4O-KCOSMETICS-STORE-ORDERS-FRONTEND-ALIGNMENT-V1
  * WO-O4O-STORE-HUB-MAIN-INDEPENDENT-PRODUCTION-VERIFICATION-V1:
  *   본 화면의 데이터 계약은 `/api/v1/cosmetics/orders` = **buyerId 스코프 checkout_orders**
- *   (컨트롤러 list/get 모두 `co."buyerId" = 요청자`). 즉 KPA `StoreOrdersPage` ·
- *   GlycoPharm `PharmacyOrders` 와 **같은 buyer 구매/발주 내역**이다.
+ *   (컨트롤러 list/get 모두 `co."buyerId" = 요청자`). 즉 KPA `StoreOrdersPage` 와
+ *   **같은 buyer 구매/발주 내역**이다.
  *   그럼에도 헤더 / 상태 탭 / loading·error·empty / 페이지네이션 뼈대를 inline style 로
  *   따로 구현하고 있어(사본), 두 서비스가 공유하는 `BuyerOrderLedgerView` 로 이관한다.
  *   K-Cosmetics 고유는 config·slot 으로만 남긴다 — 채널(local/travel) 컬럼 · 행 클릭 상세 패널.

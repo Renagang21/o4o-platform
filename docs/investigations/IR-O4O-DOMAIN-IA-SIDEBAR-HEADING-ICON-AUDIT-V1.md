@@ -60,7 +60,7 @@ emoji 는 resolve 단계에서 `domainIAConfig.labels[domainKey].emoji` 로 `Res
 
 ## 3. 도메인 헤딩 emoji 전수 인벤토리 (핵심 산출물)
 
-### 소스 A — KPA 계열 (KPA-Society / GlycoPharm / K-Cosmetics 공통)
+### 소스 A — KPA 계열 (KPA-Society / K-Cosmetics 공통)
 `packages/operator-ux-core/src/sidebar/operatorDomainIA.ts:25-29`
 ```ts
 export const DOMAIN_LABELS: Record<OperatorDomainKey, { label: string; emoji: string }> = {
@@ -85,9 +85,6 @@ export const NETURE_DOMAIN_LABELS: Record<NetureOperatorDomainKey, { label: stri
 
 | 서비스 | domain key | 라벨 | emoji |
 |--------|-----------|------|:-----:|
-| KPA / Glyco / KCos | `community` | 커뮤니티 운영 | 💬 |
-| KPA / Glyco / KCos | `store_hub` | 매장 HUB 운영 | 🏪 |
-| KPA / Glyco / KCos | `common` | 운영 공통 | ⚙️ |
 | Neture (Op+Admin) | `supply_distribution` | 공급·유통 운영 | 📦 |
 | Neture (Op+Admin) | `commerce_settlement` | 커머스·정산 운영 | 💳 |
 | Neture (Op+Admin) | `community_content` | 커뮤니티·콘텐츠 운영 | 💬 |
@@ -104,7 +101,6 @@ export const NETURE_DOMAIN_LABELS: Record<NetureOperatorDomainKey, { label: stri
 | 서비스 | wrapper | domainIAConfig |
 |--------|---------|----------------|
 | KPA-Society | `services/web-kpa-society/.../KpaOperatorLayoutWrapper.tsx` | 미주입 → DEFAULT(KPA 계열) |
-| GlycoPharm | `services/web-glycopharm/.../layouts/OperatorLayoutWrapper.tsx` | 미주입 → DEFAULT |
 | K-Cosmetics | `services/web-k-cosmetics/.../layouts/OperatorLayoutWrapper.tsx` | 미주입 → DEFAULT |
 | Neture Operator | `services/web-neture/.../layouts/OperatorLayoutWrapper.tsx` | `NETURE_OPERATOR_DOMAIN_IA` |
 | **Neture Admin** | `services/web-neture/.../layouts/AdminLayoutWrapper.tsx` | `NETURE_OPERATOR_DOMAIN_IA` (operator 와 동일 IA) |
@@ -160,8 +156,8 @@ WO-O4O-DOMAIN-IA-SIDEBAR-HEADING-ICON-ALIGNMENT-V1
 - **범위**: `DomainIASidebar.tsx` 1파일 렌더 지점 교체 + lucide 아이콘 맵 추가 (Option A).
 - **수정 최소화**: config 2개 소스(`operatorDomainIA.ts` / Neture `operatorMenuGroups.ts`) 데이터는 무변경(emoji fallback 잔존). 필요 시 주석만 보강.
 - **검증**:
-  - `tsc --noEmit`: `@o4o/web-kpa-society` / `glycopharm-web` / `@o4o/web-k-cosmetics` / `@o4o/web-neture` 4개.
-  - 브라우저 smoke: 5 wrapper(KPA/Glyco/KCos operator + Neture operator/admin) 에서 desktop sidebar + mobile drawer 헤딩 아이콘 렌더 확인, drawer open/close 동작 회귀 확인.
+  - `tsc --noEmit`: `@o4o/web-kpa-society` / `@o4o/web-k-cosmetics` / `@o4o/web-neture` 4개.
+  - 브라우저 smoke: 5 wrapper 에서 desktop sidebar + mobile drawer 헤딩 아이콘 렌더 확인, drawer open/close 동작 회귀 확인.
 - **주의**: `HeroBannerSection.tsx` 미접촉 · `StoreSidebar.tsx`/`storeMenuConfig.ts` 등 store-ui-core WIP 파일 staging 금지 · path-specific staging.
 
 ---

@@ -287,9 +287,7 @@ export class ForumRecommendationController {
       context.concerns = (req.query.concerns as string).split(',');
     }
 
-    // Pharmacy-role context (GlycoPharm 'pharmacy' 롤 + legacy yaksa signal)
-    // WO-O4O-GLYCOPHARM-PHARMACY-ONLY-ROLE-CLEANUP-V1 Phase 3:
-    // WO-GLYCOPHARM-ROLE-PREFIX-MIGRATION-V1: glycopharm:pharmacist OR legacy pharmacy
+    // Pharmacy-role context (legacy pharmacy 표기 포함)
     if (
       req.query.isPharmacy === 'true' ||
       req.query.isPharmacist === 'true' ||

@@ -171,7 +171,7 @@ export function resolveOperatorScope(
     //   다중 서비스 operator(여러 서비스에 operator/admin role 을 가진 계정)는
     //   scope.serviceKeys 가 복수였고, 명시한 serviceKey 가 무시돼 **타 서비스 데이터가
     //   섞여 나왔다** (프로덕션 확인: Pharmacy-Hub 회원 관리에 neture/kpa-society/
-    //   k-cosmetics 회원 7명, 운영 활동 로그에 glycopharm.* 액션 노출).
+    //   k-cosmetics 회원 7명, 운영 활동 로그에 타 서비스 액션 노출).
     //   F6 Boundary Policy Rule 3 위반이므로 명시 serviceKey 로 **좁히기만** 한다.
     //   - 보유 scope 안의 키  → 그 키 하나로 축소
     //   - 보유 scope 밖의 키  → 빈 scope (권한 확대 불가 · 결과 0건)

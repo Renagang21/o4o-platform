@@ -174,7 +174,6 @@ export class StoreNetworkService {
     };
   }
 
-  // getGlycopharmServiceStats() — REMOVED (WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1)
 
   private async getCosmeticsTopStores(monthStartISO: string, limit: number): Promise<TopStore[]> {
     // WO-O4O-STORE-KPI-DASHBOARD-CHECKOUT-ORDERS-ALIGNMENT-V1:
@@ -207,5 +206,4 @@ export class StoreNetworkService {
     }));
   }
 
-  // getGlycopharmTopStores() — REMOVED (WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1)
 }

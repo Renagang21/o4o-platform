@@ -49,8 +49,6 @@ IR §4 실측: `POST /auth/register` 가 `zipCode`/`address1`(→businessAddress
 
 ## 6. 비범위 / 후속
 
-- GlycoPharm 약국정보 / K-Cosmetics / Neture store_owner FAIL 화면 + 운영자 gap 2건(멤버수정 canonical 미지원 / supplier 승인 주소 미노출) = `WO-O4O-CROSSSERVICE-BUSINESS-ADDRESS-POSTCODE-SEARCH-ALIGNMENT-V1`(중규모, IR §6 후속2).
-
 ## 7. 배포 후 권장 (선택)
 
 - 브라우저: Neture 공급자 가입 모달 supplier 선택 → 우편번호 검색/자동입력/상세주소 동작, submit payload 에 zipCode/address1/address2 포함 확인. (frontend-only, tsc 로 정합 확인됨)

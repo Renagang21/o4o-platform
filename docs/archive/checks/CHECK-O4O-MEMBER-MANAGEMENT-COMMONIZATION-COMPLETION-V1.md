@@ -15,15 +15,15 @@
 | 영역 | 진행도 |
 |------|:-----:|
 | 공통 wrapper (`OperatorMembersConsolePage`) | ✅ 4개 서비스 적용 |
-| admin roleTabs/statusTabs 정렬 | ✅ GP/KCOS 완료 |
+| admin roleTabs/statusTabs 정렬 | ✅ KCOS 완료 |
 | searchPlaceholder prop | ✅ wrapper 노출 완료 |
-| Delete Flow 공통화 | ✅ GP/KCOS 공통화. KPA/Neture 공통 패턴 기완료 |
+| Delete Flow 공통화 | ✅ KCOS 공통화. KPA/Neture 공통 패턴 기완료 |
 | Neture canonical route | ✅ `/operator/members` 정합 |
 | TypeScript 기준선 | ✅ kpa/kcos/neture/api-server 0 errors |
 | Care/GlucoseView 재오염 | ✅ 없음 |
 | K-Cos pharmacist/supplier 재도입 | ✅ 없음 |
 
-**남은 항목**: GlycoPharm tsconfig 구조 특이점(tsconfig.json `files:[]`)으로 단독 `tsc --noEmit`이 실제 검사 없이 통과하는 구조. pre-existing 22개 오류는 모두 LMS/Hub 영역이며 회원 관리와 무관.
+pre-existing 22개 오류는 모두 LMS/Hub 영역이며 회원 관리와 무관.
 
 ---
 
@@ -48,7 +48,6 @@
 | 서비스 | operator page | admin page | 공통 wrapper | 남은 독립 구현 | 판정 |
 |--------|--------------|-----------|:------------:|:------------:|:----:|
 | **KPA** | `MemberManagementPage` (thin wrapper + 외부 ApplicationsTab) | `AdminMemberManagementPage` | ✅ (`OperatorMembersConsolePage`) | ApplicationsTab (정당 분리), `MemberDeleteRiskModal` (공통 패턴 적용 완료) | ✅ |
-| **GlycoPharm** | `UsersPage` (thin wrapper) | `GlycoPharmAdminMembersPage` (thin wrapper) | ✅ | `gpFetchDeleteRisk`/`gpExecuteDelete` adapter (정상) | ✅ |
 | **K-Cosmetics** | `UsersPage` (thin wrapper) | `KCosmeticsAdminMembersPage` (thin wrapper) | ✅ | `kcosFetchDeleteRisk`/`kcosExecuteDelete` adapter (정상) | ✅ |
 | **Neture** | `UsersManagementPage` (thin wrapper) | `AdminMemberManagementPage` (hard delete 전용, wrapper 미사용 — 의도된 분리) | ✅ (operator) | `AdminMemberDeleteModal` (공통 패턴 적용 완료) | ✅ |
 
@@ -61,17 +60,17 @@
 | 항목 | 완료 여부 | commit | 비고 |
 |------|:--------:|--------|------|
 | `OperatorMembersConsolePage` wrapper | ✅ | 선행 WO | 4개 서비스 전부 |
-| `CommonEditUserModal` 공통화 | ✅ | 선행 WO | GP/KCOS/Neture. KPA는 `KpaEditUserModal` (정당 분리) |
+| `CommonEditUserModal` 공통화 | ✅ | 선행 WO | KCOS/Neture. KPA는 `KpaEditUserModal` (정당 분리) |
 | KPA thin wrapper 전환 | ✅ | 선행 WO | 1427줄 → wrapper |
 | Neture bulk action (정지/복원/탈퇴) | ✅ | `7b62a1071` | extraBulkActions 3개 |
-| GP/KCOS statusTabs (operator) 확장 | ✅ | 선행 WO | GP 4개, KCOS 5개 |
-| GP/KCOS admin roleTabs/statusTabs 정렬 | ✅ | `c39f728d7` | canonical role 추가 |
-| GP/KCOS admin extraColumns (운영 권한) | ✅ | `c39f728d7` | operator 기준 정렬 |
+| KCOS statusTabs (operator) 확장 | ✅ | 선행 WO 4개, KCOS 5개 |
+| KCOS admin roleTabs/statusTabs 정렬 | ✅ | `c39f728d7` | canonical role 추가 |
+| KCOS admin extraColumns (운영 권한) | ✅ | `c39f728d7` | operator 기준 정렬 |
 | K-Cos pharmacist/supplier 회원 유형 제거 | ✅ | 선행 WO | DB 0건 확인됨 |
 | `searchPlaceholder` prop | ✅ | `02c5da8fb` | MemberListLayout 전달 |
-| `OperatorMemberDeleteFlow` 공통화 | ✅ | `6f9471173` | GP/KCOS admin 적용 |
+| `OperatorMemberDeleteFlow` 공통화 | ✅ | `6f9471173` | KCOS admin 적용 |
 | Neture `/operator/members` canonical route | ✅ | `7b62a1071` | `/operator/users` alias 유지 |
-| Care/GlucoseView 재오염 없음 | ✅ | — | `GlycoPharm active code 0` 유지 |
+| Care/GlucoseView 재오염 없음 | ✅ | — | — |
 
 ---
 
@@ -89,7 +88,6 @@ packages/operator-core-ui/src/modules/members/
 
 | 서비스 | 적용 방식 | 상태 |
 |--------|---------|:----:|
-| **GlycoPharm** | `OperatorMemberDeleteFlow` + `gpFetchDeleteRisk`/`gpExecuteDelete` adapter | ✅ |
 | **K-Cosmetics** | `OperatorMemberDeleteFlow` + `kcosFetchDeleteRisk`/`kcosExecuteDelete` adapter | ✅ |
 | **KPA** | `MemberDeleteRiskModal` → 내부에서 `MemberHardDeleteConfirmModal` 사용 (공통 패턴) | ✅ |
 | **Neture** | `AdminMemberDeleteModal` → 내부에서 `MemberHardDeleteConfirmModal` 사용 (공통 패턴) | ✅ |
@@ -151,24 +149,6 @@ packages/operator-core-ui/src/modules/members/
 | `web-k-cosmetics` | `tsc --noEmit` | **0** | — | ✅ |
 | `web-neture` | `tsc --noEmit` | **0** | — | ✅ |
 | `api-server` | `tsc --noEmit` | **0** | — | ✅ |
-| `web-glycopharm` | `tsc --noEmit` (tsconfig.json) | **0** ⚠️ | — | 구조적 문제 |
-| `web-glycopharm` | `tsc --noEmit -p tsconfig.app.json` | **22** | **0** | ✅ (pre-existing) |
-
-### GlycoPharm tsconfig 특이점 (중요)
-
-GlycoPharm의 `tsconfig.json`은 `"files": []` + references 구조로, `pnpm exec tsc --noEmit` 단독으로는 실제 type-checking이 수행되지 않는다. 반드시 `tsc --noEmit -p tsconfig.app.json`으로 검증해야 한다.
-
-GlycoPharm pre-existing 22개 오류:
-- `src/api/lms.ts` — LMS API response shape 불일치
-- `src/App.tsx` — 미사용 imports
-- `src/components/layouts/` — unused variable
-- `src/pages/education/` — LMS course/lesson 타입
-- `src/pages/hub/` — HubContent 타입
-- `src/pages/instructor/` — CSS property 타입
-
-**모두 LMS/Hub 영역 — 회원 관리와 무관.** 어떤 admin/member 페이지 관련 오류도 없음.
-
----
 
 ## 8. 서비스별 유지해야 할 차이 검증
 
@@ -182,15 +162,6 @@ GlycoPharm pre-existing 22개 오류:
 | ApplicationsTab 외부 렌더 (가입 신청서) | ✅ |
 | KpaEditUserModal (도메인 특화 editModal) | ✅ |
 | `/kpa/members` 별도 endpoint | ✅ |
-
-### GlycoPharm — 유지 확인 ✅
-
-| 항목 | 상태 |
-|------|:----:|
-| 약사 / 약국 경영자 roleTabs | ✅ (`glycopharm:pharmacist`, `glycopharm:store_owner`) |
-| businessInfoLabel='약국 정보' | ✅ |
-| Care/GlucoseView active code 0 | ✅ (`public.ts` 내 mock data만 잔존, active route 없음) |
-| 당뇨인 회원 유형 제거 상태 | ✅ |
 
 ### K-Cosmetics — 유지 확인 ✅
 
@@ -230,8 +201,6 @@ GlycoPharm pre-existing 22개 오류:
 
 | 항목 | 우선도 |
 |------|:-----:|
-| GlycoPharm tsconfig.json `files:[]` 구조 — 항상 `tsconfig.app.json`으로 검증해야 하는 불편함 | 낮음 |
-| GlycoPharm pre-existing 22 오류 (LMS/Hub) 정리 | 낮음 (별도 LMS WO) |
 | `/operator/users` legacy alias 장기 제거 (사용자 북마크 소멸 후) | 장기 |
 | KPA `AdminMemberManagementPage` wrapper 전환 여부 재검토 | 장기 |
 | Neture `AdminMemberDeleteModal` wrapper 통합 재검토 | 장기 |
@@ -263,9 +232,9 @@ GlycoPharm pre-existing 22개 오류:
 | **operator = 일상 운영, admin = 정책/구조/거버넌스** | operator: soft delete만. admin: soft + hard delete. hard delete는 admin-only 정책 전 서비스 일관. | ✅ |
 | **RBAC F11 (service_memberships 기반)** | 모든 회원 관리가 `service_memberships.status`를 SSOT로 사용. KPA는 `kpa_members` 추가이나 SM 참조. | ✅ |
 | **KPA canonical 기준, 다른 서비스는 slot으로 차이 흡수** | KPA 구조가 wrapper의 reference implementation. 다른 3서비스는 adapter/slot으로 차이 흡수. | ✅ |
-| **1인 개발 생산성 vs 중복 유지** | GP/KCOS admin delete flow 공통화로 약 430줄 중복 제거. wrapper 4개 서비스 적용으로 개별 구현 비용 ↓. | ✅ |
-| **도메인 분리 원칙** | KPA 약사 직역 / KCOS store 기반 / GP 약국 경영자 / Neture 공급자·파트너 — 각 도메인 데이터 서비스별 유지. wrapper는 공통 UX 제공만. | ✅ |
-| **Boundary Policy F6** | serviceKey 기반 scope 분리 (`/operator/members?serviceKey=glycopharm`). cross-service 접근 방지 유지. | ✅ |
+| **1인 개발 생산성 vs 중복 유지** | KCOS admin delete flow 공통화로 약 430줄 중복 제거. wrapper 3개 서비스 적용으로 개별 구현 비용 ↓. | ✅ |
+| **도메인 분리 원칙** | KPA 약사 직역 / KCOS store 기반 경영자 / Neture 공급자·파트너 — 각 도메인 데이터 서비스별 유지. wrapper는 공통 UX 제공만. | ✅ |
+| **Boundary Policy F6** | serviceKey 기반 scope 분리 . cross-service 접근 방지 유지. | ✅ |
 
 **결론**: O4O 철학과 충돌 없음. 공통화가 "의미 통일"이 아닌 "패턴 통일"로 올바르게 구현되었다.
 
@@ -274,7 +243,6 @@ GlycoPharm pre-existing 22개 오류:
 ## 11. Working tree / staged 파일 격리 상태
 
 ```
-M  services/web-glycopharm/src/pages/hub/HubContentListPage.tsx  ← 다른 세션 WIP (미포함)
 ?? docs/investigations/CHECK-O4O-STORE-HUB-CANONICAL-CROSSSERVICE-COMPLETION-V2.md  ← 다른 세션 WIP (미포함)
 ?? *.png  ← 사용자 스크린샷 (미포함)
 ```
@@ -290,16 +258,15 @@ staged 없음. 코드/DB/source 수정 없음.
 | 판정 기준 | 결과 |
 |---------|:----:|
 | 핵심 회원 관리 공통화 항목 완료 | ✅ |
-| Delete Flow 공통화 완료 (GP/KCOS) | ✅ |
+| Delete Flow 공통화 완료 (KCOS) | ✅ |
 | Neture canonical route 정합 | ✅ |
 | kpa/kcos/neture/api-server TypeScript 0 errors | ✅ |
-| glycopharm 회원 관리 신규 TS 오류 없음 | ✅ |
 | Care/GlucoseView 재오염 없음 | ✅ |
 | K-Cos supplier/pharmacist 회원 유형 재도입 없음 | ✅ |
 | backend/API/DB/migration 미수정 | ✅ |
 | O4O 철학 충돌 없음 | ✅ |
 
-**CONDITIONAL 이유**: GlycoPharm pre-existing 22개 오류(LMS/Hub)가 잔존하고 있으며, browser smoke test는 미실행. 회원 관리 공통화 자체에는 문제없으나 전체 clean 상태는 아님.
+회원 관리 공통화 자체에는 문제없으나 전체 clean 상태는 아님.
 
 ---
 
@@ -309,7 +276,6 @@ staged 없음. 코드/DB/source 수정 없음.
 
 | 후보 | 설명 |
 |------|------|
-| **GlycoPharm LMS/Hub pre-existing 오류 정리** | 22개 오류 대상 별도 WO/IR |
 | **backend회원 관리 contract IR** | KPA kpa_members vs SM-based 3서비스 API 단일화 검토 |
 | **회원 관리 공통화 → 다음 공통화 도메인** | 매장 관리 / 상품 관리 / 주문 관리 공통화 흐름 시작 가능 |
 | **Neture-KPA UX canonical alignment** | IR-O4O-NETURE-KPA-UX-CANONICAL-ALIGNMENT-AUDIT-V1 후속 |

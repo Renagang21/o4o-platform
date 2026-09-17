@@ -49,7 +49,7 @@ Action Queue·Quick Action 무회귀. 프로덕션 pending 0건 → KPI 0 정상
   기존 operator 가드 유지, 비로그인 **401** 실측.
 - count 조건 `service_id='kpa-society'` 고정 → 타 서비스 모집 미포함. 공급자 소유권·모집 데이터 무변경.
 - `operator-dashboard.service.ts`/`buildKpaOperatorDashboardConfig`는 **KPA operator-summary.controller 에서만
-  소비**(GP/KCos/Neture 대시보드는 자체 service, 미참조) → 타 서비스 대시보드 영향 0.
+  소비(KCos/Neture 대시보드는 자체 service, 미참조) → 타 서비스 대시보드 영향 0.
 
 ## 6. 중지 조건 — 전부 미해당
 
@@ -58,7 +58,7 @@ Action Queue·Quick Action 무회귀. 프로덕션 pending 0건 → KPI 0 정상
 | 1 | 공통 스키마 변경 필요 | ❌ read-only count만, 컬럼 기존 존재 |
 | 2 | KPA scope 구분 불가 | ❌ service_id='kpa-society' |
 | 3 | 기존 대시보드 계약 파손 | ❌ 추가만(KPI 배열 append), 응답 shape 불변 |
-| 4 | GP/KCos/Neture 동시 영향 | ❌ KPA 전용 service |
+| 4 | KCos/Neture 동시 영향 | ❌ KPA 전용 service |
 | 5 | 동시 작업 파일 충돌 | ❌ recruitment/dashboard 미커밋 0 |
 | 6 | 승인 목록 기본 pending 아님·필터 미지원 | ❌ 기본 탭 pending(DEFAULT_STATUS), URL 필터도 지원 |
 

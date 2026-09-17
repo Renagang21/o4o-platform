@@ -1,7 +1,7 @@
 # IR-O4O-CROSSSERVICE-OPERATOR-CAPABILITY-POLICY-AUDIT-V1
 
 > Status: **read-only investigation**, no code modified
-> Scope: KPA-Society / GlycoPharm / K-Cosmetics 의 `ENABLED_CAPABILITIES` 정책 정합성 + dead-defined 그룹 판정
+> Scope: KPA-Society / K-Cosmetics 의 `ENABLED_CAPABILITIES` 정책 정합성 + dead-defined 그룹 판정
 > Date: 2026-05-30
 > Predecessor: `IR-O4O-CROSSSERVICE-OPERATOR-SIDEBAR-COMMONIZATION-AUDIT-V1` (sidebar 공통화 audit, Conditional GO 판정)
 > Successor (candidate): `WO-O4O-CROSSSERVICE-OPERATOR-CAPABILITY-GAP-FIX-V1` + `WO-O4O-CROSSSERVICE-OPERATOR-SIDEBAR-COMMON-COMPONENT-V1`
@@ -9,7 +9,6 @@
 ## TL;DR
 
 5 케이스 모두 **단순 capability 활성화 누락 (Accidental Gap)** 판정.
-- Glyco STORE_MANAGEMENT, Glyco COMMUNITY, Glyco SETTINGS
 - K-Cos ANALYTICS, K-Cos COMMUNITY
 
 각 케이스 모두 (1) `UNIFIED_MENU` 에 그룹이 명시 정의됨 + (2) `App.tsx` 에 라우트가 실재 + (3) 페이지 컴포넌트가 lazy import 로 구현됨. capability 만 활성화 안 되어 sidebar 에서 hide. 운영자 도구로 사용될 의도였다고 보는 것이 자연스럽다.
@@ -24,22 +23,19 @@ K-Cos system 그룹만 **의도된 부재** — `UNIFIED_MENU` 에 그룹 자체
 
 출처:
 - `services/web-kpa-society/src/config/operatorCapabilities.ts`
-- `services/web-glycopharm/src/config/operatorCapabilities.ts`
 - `services/web-k-cosmetics/src/config/operatorCapabilities.ts`
 
-| Capability (`@o4o/types` `OperatorCapability`) | KPA | GlycoPharm | K-Cosmetics |
-|------------------------------------------------|:---:|:----------:|:-----------:|
-| `USER_MANAGEMENT` | ✓ | ✓ | ✓ |
-| `MEMBERSHIP_APPROVAL` | ✓ | ✓ | ✓ |
-| `CONTENT_MANAGEMENT` | ✓ | ✓ | ✓ |
-| `COMMUNITY` | ✓ | ❌ | ❌ |
-| `SIGNAGE` | ✓ | ✓ | ✓ |
-| `STORE_MANAGEMENT` | ✓ | ❌ | ✓ |
-| `ANALYTICS` | ✓ | ✓ | ❌ |
-| `CARE` | ❌ | ✓ | ❌ |
-| `SETTINGS` | ✓ | ❌ | ❌ |
-
-총 capability: KPA 8 / Glyco 6 / K-Cos 5.
+| Capability (`@o4o/types` `OperatorCapability`) | KPA | K-Cosmetics |
+| ------------------------------------------------ | :---: | :-----------: |
+| `USER_MANAGEMENT` | ✓ | ✓ |
+| `MEMBERSHIP_APPROVAL` | ✓ | ✓ |
+| `CONTENT_MANAGEMENT` | ✓ | ✓ |
+| `COMMUNITY` | ✓ | ❌ |
+| `SIGNAGE` | ✓ | ✓ |
+| `STORE_MANAGEMENT` | ✓ | ✓ |
+| `ANALYTICS` | ✓ | ❌ |
+| `CARE` | ❌ | ❌ |
+| `SETTINGS` | ✓ | ❌ |
 
 ---
 
@@ -49,38 +45,13 @@ K-Cos system 그룹만 **의도된 부재** — `UNIFIED_MENU` 에 그룹 자체
 
 | Capability | 영향받는 group | 차단되면 hide되는 UNIFIED_MENU 메뉴 (서비스별) |
 |------------|----------------|-----------------------------------------------|
-| `STORE_MANAGEMENT` | `products`, `stores`, `orders` | Glyco: 약국 관리 / 매장 관리 / 채널 관리 / 약국 HUB 블로그 / 약국 HUB POP / 약국 HUB QR / 상품 관리 / 주문 관리 (총 8) |
+| `STORE_MANAGEMENT` | `products`, `stores`, `orders` | — |
 | `ANALYTICS` | `analytics` | K-Cos: AI 리포트 (1) |
-| `COMMUNITY` | `forum` | Glyco: 포럼 관리 / 포럼 신청 / 포럼 삭제 요청 / 커뮤니티 관리 / 포럼 분석 (5) · K-Cos: 포럼 신청 / 삭제 요청 / 포럼 분석 (3) |
-| `SETTINGS` | `system` | Glyco: 서비스 설정 / 회원 관리 (Admin) (2, admin-only) · K-Cos: (`UNIFIED_MENU` 에 system 그룹 자체 없음) |
+| `COMMUNITY` | `forum` | K-Cos: 포럼 신청 / 삭제 요청 / 포럼 분석 (3) |
+| `SETTINGS` | `system` | K-Cos: (`UNIFIED_MENU` 에 system 그룹 자체 없음) |
 
 빈 도메인 reject 효과:
 - K-Cos `common` 도메인의 그룹은 `analytics`, `system` 둘 뿐. ANALYTICS 와 SETTINGS 둘 다 차단되면 common 도메인 자체가 빈 도메인 → `KCosOperatorSidebar` 가 도메인 헤딩까지 hide. (운영 smoke 에서 직접 확인됨)
-
----
-
-## 3. GlycoPharm `STORE_MANAGEMENT` disabled 판정
-
-### 3.1 기능 실재 여부
-
-| 자원 | 확인 |
-|------|------|
-| UNIFIED_MENU `stores` 그룹 | 6 항목 정의 (`/operator/pharmacies`, `/operator/stores`, `/operator/store-channels`, `/operator/blog`, `/operator/pop`, `/operator/qr`) |
-| UNIFIED_MENU `products` 그룹 | `/operator/products` |
-| UNIFIED_MENU `orders` 그룹 | `/operator/orders` |
-| App.tsx 라우트 | 모두 실재 (`services/web-glycopharm/src/App.tsx` 716/717/719/721/774/778/782/790) |
-| 페이지 컴포넌트 lazy import | `OperatorStoresPage`, `ProductsPage`, `OrdersPage`, `OperatorBlogListPage`, `OperatorPopListPage`, `OperatorQrListPage`, `OperatorStoreChannelsPage`, `PharmaciesPage` 모두 lazy 정의 (App.tsx 상단부) |
-| 최근 관련 WO | `WO-O4O-GLYCOPHARM-OPERATOR-STORE-HUB-WRITE-CAPABILITY-V1`, `WO-O4O-GLYCOPHARM-OPERATOR-STORE-CHANNELS-V1`, `WO-O4O-GLYCOPHARM-OPERATOR-MENU-ALIGN-WITH-KPA-V1` 등 stores 그룹 적극 정비 이력 |
-
-### 3.2 판정
-
-**Accidental Gap (회귀)** — 다음 근거 종합:
-1. 매뉴 8개, 라우트 8개, 페이지 8개 모두 구현된 상태에서 sidebar 에서만 hide.
-2. GlycoPharm 의 사업 본질이 "매장(약국) 운영"이며 stores 그룹 미노출은 사용자 시나리오상 비정상.
-3. 최근 WO 들이 stores 그룹을 명시적으로 추가/재배치 중인데 capability 만 누락된 채 유지.
-4. 운영 smoke 에서 사용자가 sidebar 에 Stores 가 안 보여 진단 cycle 발생 (본 IR 의 직접 트리거).
-
-**suggested fix (참고용, 본 IR 외)**: `ENABLED_CAPABILITIES` 에 `OperatorCapability.STORE_MANAGEMENT` 추가. 단일 줄 변경.
 
 ---
 
@@ -103,15 +74,7 @@ K-Cos system 그룹만 **의도된 부재** — `UNIFIED_MENU` 에 그룹 자체
 
 ---
 
-## 5. GlycoPharm / K-Cosmetics `COMMUNITY` disabled 판정
-
-### 5.1 기능 실재 여부 — GlycoPharm
-
-| 자원 | 확인 |
-|------|------|
-| UNIFIED_MENU `forum` | 5 항목 (`/operator/forum-management`, `/operator/forum-requests`, `/operator/forum-delete-requests`, `/operator/community`, `/operator/forum-analytics`) |
-| App.tsx 라우트 | 모두 실재 (line 724-729) |
-| 페이지 컴포넌트 | `OperatorForumManagementPage`, `ForumRequestsPage`, `ForumDeleteRequestsPage`, `CommunityManagementPage`, `ForumAnalyticsPage` 모두 lazy 정의 |
+## 5. K-Cosmetics `COMMUNITY` disabled 판정
 
 ### 5.2 기능 실재 여부 — K-Cosmetics
 
@@ -133,19 +96,6 @@ K-Cos system 그룹만 **의도된 부재** — `UNIFIED_MENU` 에 그룹 자체
 ---
 
 ## 6. SETTINGS disabled 및 `system` group dead-defined 여부
-
-### 6.1 GlycoPharm
-
-| 자원 | 확인 |
-|------|------|
-| UNIFIED_MENU `system` | 2 항목, **모두 `adminOnly: true`** — 서비스 설정 (`/operator/settings`), 회원 관리 Admin (`/admin/members`) |
-| App.tsx 라우트 | `/operator/settings` (line 795), `/admin/members` 라우트 실재 |
-| 페이지 컴포넌트 | `SettingsPage`, `GlycoPharmAdminMembersPage` lazy 정의 |
-| WO 단서 | `WO-GLYCOPHARM-OPERATOR-MENU-ADMIN-GUARD-V1` — system = admin 전용으로 명시 설정 |
-
-**판정**: **Accidental Gap (회귀, admin 한정)** — admin/operator 겸용 사용자가 sidebar 에서 보아야 할 메뉴인데 capability gate 가 hide. `adminOnly` 플래그가 role 분리를 이미 수행하므로 추가 capability gate 는 over-restrictive. UNIFIED_MENU 의 system 그룹 정의 자체는 의도 있음.
-
-**suggested fix (참고용)**: `ENABLED_CAPABILITIES` 에 `OperatorCapability.SETTINGS` 추가. admin 사용자만 항목이 보이는 동작이 보존됨.
 
 ### 6.2 K-Cosmetics
 
@@ -170,7 +120,6 @@ sidebar 컴포넌트는 capability 정책과 **독립**. 공통화 자체는 cap
 ### 7.2 인지/UX 측면
 
 다음 시나리오 위험:
-1. **공통화 WO PR 리뷰 단계**: 리뷰어가 운영 smoke 에서 "Glyco Stores 미표시"를 보고 "공통화로 회귀 발생" 으로 오해.
 2. **공통화 직후 운영자 사용**: 운영자가 sidebar 변경을 인지하고 메뉴 변화를 점검하면서 "공통화 때문에 메뉴가 사라졌다"고 보고할 가능성.
 3. **운영 smoke 자동화 (`c:/tmp/smoke/smoke2.mjs`) 재실행**: 본 IR 의 5건이 그대로 미표시 → 검증 결과의 noise 가 됨.
 
@@ -192,10 +141,6 @@ sidebar 컴포넌트는 capability 정책과 **독립**. 공통화 자체는 cap
 
 - **목적**: 본 IR 의 5건 Accidental Gap 보정
 - **변경**:
-  - `services/web-glycopharm/src/config/operatorCapabilities.ts`:
-    - `OperatorCapability.STORE_MANAGEMENT` 추가
-    - `OperatorCapability.COMMUNITY` 추가
-    - `OperatorCapability.SETTINGS` 추가
   - `services/web-k-cosmetics/src/config/operatorCapabilities.ts`:
     - `OperatorCapability.ANALYTICS` 추가
     - `OperatorCapability.COMMUNITY` 추가
@@ -217,9 +162,6 @@ sidebar 컴포넌트는 capability 정책과 **독립**. 공통화 자체는 cap
 
 ### 8.4 (선택) `CARE` capability 검토
 
-- KPA: `CARE` 미보유, K-Cos: `CARE` 미보유, Glyco: `CARE` 보유.
-- Glyco UNIFIED_MENU 에 `care` 그룹 미정의 (`care group removed — WO-O4O-GLYCOPHARM-CARE-REMOVAL-V1` 코멘트).
-- 즉 Glyco 가 CARE capability 를 활성화하고 있으나 UNIFIED_MENU `care` 그룹은 제거됨 — **dead capability** (그룹은 없는데 capability 만 활성).
 - 영향: 없음 (sidebar 그룹이 없으니 표시할 게 없음). 정리 가치는 있으나 시급성 낮음. 별도 cleanup WO 후보.
 
 ---
@@ -246,13 +188,13 @@ CLAUDE.md SSOT Priority Chain 과의 정합:
 
 | SSOT | 본 IR 판정과의 정합 | 비고 |
 |------|---------------------|------|
-| `O4O-BUSINESS-PHILOSOPHY-V1` §3.2 Operator 정의 | ⚠️ **부분 불일치** | Glyco 의 stores/products/orders 미노출은 §3.2 의 Operator 책임 ("자료 수신·등록·구성 + AI 활용 + 매장 실행 자산 제작") 와 정면 충돌. capability 보정으로 정합 회복 |
+| `O4O-BUSINESS-PHILOSOPHY-V1` §3.2 Operator 정의 | ⚠️ **부분 불일치** | capability 보정으로 정합 회복 |
 | `O4O-3-ROLE-FLOW-BASELINE-V1` §2 책임 매트릭스 | ⚠️ **부분 불일치** | 매장 운영 흐름의 시작점이 stores 그룹인데 hide. K-Cos analytics 미노출도 운영 모니터링 책임과 충돌 |
-| CLAUDE.md §13 O4O 공통 구조 원칙 | ⚠️ **명시 충돌** | "forum, lms, signage 는 서비스별 기능이 아니라 플랫폼 공통 구조" — Glyco/K-Cos 의 COMMUNITY 비활성은 이 원칙 위배. forum 페이지는 다 구현되어 있는데 sidebar 진입점만 차단 |
+| CLAUDE.md §13 O4O 공통 구조 원칙 | ⚠️ **명시 충돌** | forum 페이지는 다 구현되어 있는데 sidebar 진입점만 차단 |
 | `O4O-OPERATOR-CANONICAL-WORKFLOW-V1` | ✅ 정합 | approvals 그룹은 세 서비스 모두 활성화 — 본 IR 영역 외 |
-| `O4O-OPERATOR-NON-APPROVAL-UX-BASELINE-V1` (5 Workspace) | ⚠️ **부분 영향** | "D 매장 지원" Workspace 가 stores/products/orders 그룹 진입에 의존 → Glyco STORE_MANAGEMENT 비활성이 Workspace 흐름을 잘라냄. "E 운영 수익" 도 analytics 의존 → K-Cos 도 동일 영향 |
-| `O4O-OPERATOR-HUB-CONTENT-PUBLISHING-STANDARD-V1` | ⚠️ **명시 충돌** | "RichTextEditor 기반 항목별 게시" 의 게시 대상이 stores 그룹의 매장 HUB 블로그/POP/QR. Glyco 에서 이 6 항목이 stores 그룹 안에 정렬되어 있는데 capability gate 가 stores 자체를 차단 → HUB Publishing Standard 의 운영 경로가 sidebar 상 진입 불가 |
-| `O4O-STORE-MENU-CANONICAL-TREE-V1` | ⚠️ **명시 충돌** | 매장 HUB 측 6 항목 (상품 상세 / POP / QR / 블로그 / 사이니지 / 고객 안내문) 의 게시 측이 Glyco/K-Cos stores 그룹. Glyco 에서 hide |
+| `O4O-OPERATOR-NON-APPROVAL-UX-BASELINE-V1` (5 Workspace) | ⚠️ **부분 영향** | "E 운영 수익" 도 analytics 의존 → K-Cos 도 동일 영향 |
+| `O4O-OPERATOR-HUB-CONTENT-PUBLISHING-STANDARD-V1` | ⚠️ **명시 충돌** | "RichTextEditor 기반 항목별 게시" 의 게시 대상이 stores 그룹의 매장 HUB 블로그/POP/QR. |
+| `O4O-STORE-MENU-CANONICAL-TREE-V1` | ⚠️ **명시 충돌** | — |
 | `BASELINE-OPERATOR-OS-V1` (Freeze F1) | ✅ 정합 | 본 IR 의 후속 WO 는 capability 배열에 항목 추가뿐 — Freeze 영역 구조 변경 없음 |
 | `RBAC-FREEZE-DECLARATION-V1` (Freeze F9) | ✅ 정합 | capability 와 RBAC role 은 다른 축, role 정의 무변경 |
 
@@ -277,10 +219,8 @@ CLAUDE.md SSOT Priority Chain 과의 정합:
 | 자원 | 위치 |
 |------|------|
 | STANDARD_GROUPS SSOT | `packages/ui/src/operator-shell/constants.ts` |
-| Glyco capabilities | `services/web-glycopharm/src/config/operatorCapabilities.ts` |
 | K-Cos capabilities | `services/web-k-cosmetics/src/config/operatorCapabilities.ts` |
 | KPA capabilities | `services/web-kpa-society/src/config/operatorCapabilities.ts` |
-| Glyco 라우트 | `services/web-glycopharm/src/App.tsx` |
 | K-Cos 라우트 | `services/web-k-cosmetics/src/App.tsx` |
 | 운영 smoke 스크립트 (재실행 자산) | `c:/tmp/smoke/smoke2.mjs` |
 | 선행 IR | `docs/investigations/IR-O4O-CROSSSERVICE-OPERATOR-SIDEBAR-COMMONIZATION-AUDIT-V1.md` |

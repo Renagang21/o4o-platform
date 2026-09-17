@@ -3,14 +3,14 @@
 **작성 일자**: 2026-06-02
 **조사 환경**: HEAD (main) `4beea18fb` 시점 (read-only)
 **작업 성격**: read-only 조사 IR — 코드/UI/route/menu/API/DB/migration/package 수정 없음
-**선행**: GP/K-Cos 포럼 신청·삭제요청 콘솔 공통화 완료(`f3bd56e21`/`098403588`/smoke `34f8bd754`) + GP orphan 제거(`4beea18fb`)
-**목적**: Neture operator 포럼 신청·삭제요청 화면이 GP/K-Cos 공통 콘솔(`@o4o/operator-core-ui/modules/forum-requests`, `.../forum-delete-requests`)로 수렴 가능한지 판단
+**선행**: K-Cos 포럼 신청·삭제요청 콘솔 공통화 완료(`f3bd56e21`/`098403588`/smoke `34f8bd754`) orphan 제거(`4beea18fb`)
+**목적**: Neture operator 포럼 신청·삭제요청 화면이 K-Cos 공통 콘솔(`@o4o/operator-core-ui/modules/forum-requests`, `.../forum-delete-requests`)로 수렴 가능한지 판단
 
 ---
 
 ## 1. 조사 개요
 
-GP/K-Cos는 신청·삭제요청을 공통 콘솔 2모듈로 추출 완료했다. 본 IR은 Neture의 대응 화면이 같은 콘솔에 **adapter/config 주입만으로** 수렴 가능한지, 아니면 공통 콘솔 수정·UI 변경이 필요한지 정적 코드로 판정한다. 구현은 하지 않는다.
+K-Cos는 신청·삭제요청을 공통 콘솔 2모듈로 추출 완료했다. 본 IR은 Neture의 대응 화면이 같은 콘솔에 **adapter/config 주입만으로** 수렴 가능한지, 아니면 공통 콘솔 수정·UI 변경이 필요한지 정적 코드로 판정한다. 구현은 하지 않는다.
 
 **핵심 판정**: **수렴 가능하나 "adapter/config만으로는 불가"** — ① Neture 상세가 **고정 Modal**(canonical은 `BaseDetailDrawer`), ② Neture는 **실제 batch endpoint** 사용(canonical 콘솔은 per-id fan-out), ③ row 진입이 **Eye 버튼**(canonical은 row-click). 따라서 **(A) 공통 콘솔에 optional batch-client 옵션 확장 + (B) Neture Modal→Drawer UX 전환**이 선행돼야 한다. 도메인 차이가 아니라 **구현 편차**이므로 수렴 자체는 정합적. 단 Modal→Drawer는 가시적 UX 변경이라 검수가 필요하다.
 
@@ -46,8 +46,8 @@ git status --short (non-png):
 
 | 화면 | 대응 | 비고 |
 |------|------|------|
-| **ForumManagementPage** | GP/K-Cos `ForumRequestsPage`(신청) 대응 | 단, 파일명이 "Management" (신청 review 단일 기능 — KPA식 2탭 아님) |
-| **ForumDeleteRequestsPage** | GP/K-Cos `ForumDeleteRequestsPage` 대응 | 1:1 대응 |
+| **ForumManagementPage** | K-Cos `ForumRequestsPage`(신청) 대응 | 단, 파일명이 "Management" (신청 review 단일 기능 — KPA식 2탭 아님) |
+| **ForumDeleteRequestsPage** | K-Cos `ForumDeleteRequestsPage` 대응 | 1:1 대응 |
 | **ForumAnalyticsPage** | 분석 (별도 트랙) | 본 IR 범위 외 |
 
 → **전용 "ForumRequestsPage"는 없으나 ForumManagementPage가 신청 콘솔에 정확히 대응**(2탭 결합 아닌 단일 신청 review). "도메인상 없음"이 아니라 **명칭만 다른 동일 기능**.
@@ -133,7 +133,7 @@ menu (`operatorMenuGroups.ts`, "forum"을 **"n"으로 리브랜딩**):
 
 ---
 
-## 10. GP/K-Cos 공통 콘솔과의 차이 (요약)
+## 10. K-Cos 공통 콘솔과의 차이 (요약)
 
 | 차이 | 성격 | 수렴 시 처리 |
 |------|------|-------------|
@@ -162,7 +162,7 @@ menu (`operatorMenuGroups.ts`, "forum"을 **"n"으로 리브랜딩**):
 ## 12. 수렴 위험 영역
 
 1. **Modal→Drawer UX 변경** (최대) — Neture 상세가 중앙 Modal→우측 Drawer로 바뀜. 기능 동일하나 가시적. Neture UX 검수 필요.
-2. **batch endpoint 활용 방식** — canonical 콘솔이 per-id fan-out만 지원. Neture batch endpoint를 살리려면 **콘솔 옵션 확장**(optional `batchReview`/`batchApprove`/`batchReject` client 메서드; 미제공 시 기존 fan-out) 필요. GP/K-Cos 동작은 불변(backward compatible).
+2. **batch endpoint 활용 방식** — canonical 콘솔이 per-id fan-out만 지원. Neture batch endpoint를 살리려면 **콘솔 옵션 확장**(optional `batchReview`/`batchApprove`/`batchReject` client 메서드; 미제공 시 기존 fan-out) 필요. K-Cos 동작은 불변(backward compatible).
 3. **revision 의견 필수** — 콘솔이 강제하면 Neture에도 적용(개선이나 동작 변화).
 
 ---
@@ -178,21 +178,21 @@ menu (`operatorMenuGroups.ts`, "forum"을 **"n"으로 리브랜딩**):
 
 | WO/IR | 범위 | 위험 | 전제 |
 |-------|------|:---:|------|
-| `WO-O4O-OPERATOR-FORUM-CONSOLE-BATCH-CLIENT-OPTION-V1` | 공통 콘솔 2모듈에 optional batch-client(`batchReview`/`batchApprove`/`batchReject`) 확장. 미제공 시 기존 fan-out 유지(GP/K-Cos 불변) | 낮음 | 콘솔 enhancement(backward compatible) |
+| `WO-O4O-OPERATOR-FORUM-CONSOLE-BATCH-CLIENT-OPTION-V1` | 공통 콘솔 2모듈에 optional batch-client(`batchReview`/`batchApprove`/`batchReject`) 확장. 미제공 시 기존 fan-out 유지(K-Cos 불변) | 낮음 | 콘솔 enhancement(backward compatible) |
 | `WO-O4O-NETURE-FORUM-CONSOLE-CONVERGENCE-APPLY-V1` | Neture ForumManagementPage(신청)·ForumDeleteRequestsPage를 공통 콘솔 thin wrapper로 전환 (Modal→Drawer, row-click, batch client 주입) | **중간** (Modal→Drawer UX 검수) | 위 batch-option WO 선행 + Neture UX 수용 결정 |
 | `CHECK-O4O-NETURE-OPERATOR-FORUM-MENU-ROUTE-MISMATCH-V1` | 메뉴 `n-delete-requests`/`n-analytics` ↔ route `forum-delete-requests`/`forum-analytics` 불일치 확인/정리 | 낮음 | 본 수렴과 독립 (부수 발견) |
 
-**권장 순서**: (1) batch-client 옵션 확장 WO(저위험·GP/K-Cos 불변) → (2) Neture 수렴 적용 WO(UX 검수 동반) → (별도) 메뉴-route 불일치 CHECK.
+**권장 순서**: (1) batch-client 옵션 확장 WO(저위험·K-Cos 불변) → (2) Neture 수렴 적용 WO(UX 검수 동반) → (별도) 메뉴-route 불일치 CHECK.
 
 ---
 
 ## 15. Current Structure vs O4O Philosophy Conflict Check
 
-- **Neture forum이 GP/K-Cos와 같은 도메인인가?** ✅ 동일 도메인 — 셋 다 `/api/v1/forum/operator/*` 공통 API의 "포럼 신청/삭제요청 검토" operator flow. Neture는 "n"/community로 **브랜딩만** 다름. 신청 화면이 KPA식 2탭 결합이 아닌 단일 기능이라 GP/K-Cos와 동형.
+- **Neture forum이 K-Cos와 같은 도메인인가?** ✅ 동일 도메인 — 셋 다 `/api/v1/forum/operator/*` 공통 API의 "포럼 신청/삭제요청 검토" operator flow. Neture는 "n"/community로 **브랜딩만** 다름. 신청 화면이 KPA식 2탭 결합이 아닌 단일 기능이라 K-Cos와 동형.
 - **공통 콘솔 수렴이 운영 경험 공통화 원칙에 부합하는가?** ✅ 부합. 4서비스가 동일 검수 UX로 수렴하면 Operator OS 일관성·유지보수성 향상.
 - **Neture supplier/partner/operator 특수성 훼손?** ❌ 없음. 포럼 운영 콘솔은 커뮤니티 모더레이션으로 supplier/partner B2B 구조와 직교. 수렴은 forum operator 표면만 정렬.
 - **Modal/Drawer 차이가 도메인 차이인가 구현 편차인가?** **구현 편차.** 동일 데이터·동일 액션을 중앙 Modal vs 우측 Drawer로 렌더하는 표현 차이일 뿐, Neture 도메인 요구가 아님.
-- **공통화가 1인 개발 유지보수성을 높이는가?** ✅ Neture 2개 화면(약 940줄)을 thin wrapper로 축소 + 검수 정책 단일 지점화. 단 batch 옵션 확장·UX 검수 비용이 GP/K-Cos보다 큼.
+- **공통화가 1인 개발 유지보수성을 높이는가?** ✅ Neture 2개 화면(약 940줄)을 thin wrapper로 축소 + 검수 정책 단일 지점화. 단 batch 옵션 확장·UX 검수 비용이 K-Cos보다 큼.
 
 **결론**: 도메인 충돌 없음. 수렴은 정합적이나 **adapter/config만으로는 부족** — 콘솔 batch-option 확장 + Neture Modal→Drawer UX 전환이 선행돼야 하는 **중간 난이도**. 즉시 적용보다, batch-option 확장(저위험)을 먼저 닫고 Neture UX 수용 결정 후 적용 WO로 진행 권장.
 
@@ -205,7 +205,7 @@ menu (`operatorMenuGroups.ts`, "forum"을 **"n"으로 리브랜딩**):
 - **조사 주요 파일/route/menu**: Neture `ForumManagementPage`/`ForumDeleteRequestsPage`/`ForumAnalyticsPage`, `services/forumApi.ts`, `App.tsx`(operator+admin route), `operatorMenuGroups.ts`, 기준 콘솔 2모듈
 - **신청 콘솔 수렴 가능성**: 가능(동형 기능). 단 Modal→Drawer + batch-option + revision 의견 필수 적용 필요 → **adapter/config만으로는 불가**
 - **삭제요청 콘솔 수렴 가능성**: 가능. GuideBlock/loadGuideSections 호환. 단 Modal→Drawer + batch-option 필요
-- **공통 콘솔 수정 필요 여부**: **필요** — optional batch-client 옵션 확장(backward compatible). GP/K-Cos 동작 불변
+- **공통 콘솔 수정 필요 여부**: **필요** — optional batch-client 옵션 확장(backward compatible). K-Cos 동작 불변
 - **후속 WO 후보**: ① batch-client 옵션 확장 WO(저위험) → ② Neture 수렴 적용 WO(중간, UX 검수) / 별도 메뉴-route 불일치 CHECK
 - **git status**: 본 IR 생성 외 변경 없음. 다른 세션 WIP 2건 미접촉
 

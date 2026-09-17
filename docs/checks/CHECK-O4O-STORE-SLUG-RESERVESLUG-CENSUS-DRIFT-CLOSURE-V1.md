@@ -38,10 +38,10 @@ provisioning 에 slug 예약 경로를 추가하면서 census 를 갱신하지 �
 | # | 파일 | storeId 인자 |
 |---|---|---|
 | 1 | `routes/cosmetics/services/cosmetics-store.service.ts` (2 call) | `orgId` · `organizationId` |
-| 2 | `routes/glycopharm/services/glycopharm-member.service.ts` | `organizationId` |
-| 3 | `routes/glycopharm/controllers/admin.controller.ts` | `createdOrg.id` |
-| 4 | `routes/glycopharm/controllers/store-applications.controller.ts` | `createdOrg.id` |
-| 5 | `routes/glycopharm/services/glycopharm.service.ts` | `org.id` |
+| 2 | — | `organizationId` |
+| 3 | — | `createdOrg.id` |
+| 4 | — | `createdOrg.id` |
+| 5 | — | `org.id` |
 | 6 | `routes/kpa/controllers/organization.controller.ts` | `saved.id` |
 | 7 | `routes/kpa/services/kpa-store-organization.provisioning.ts` | `orgResult.id` |
 | 8 | **`services/cafe24-b2b/Cafe24B2bStoreProvisioningService.ts`** (신규) | `organizationId` |

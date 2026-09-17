@@ -21,7 +21,7 @@
 | `apps/api-server/src/controllers/market-trial/marketTrialController.ts` | `gateway()` 메서드 · `toGatewayDTO()` 헬퍼 · 헤더 주석 |
 
 ## 4. Phase 1 — 호출자 재확인
-- frontend 전수(`services/web-{kpa-society,glycopharm,k-cosmetics,neture}`, `*.ts/tsx`) grep `market-trial/gateway|/gateway|no_kpa_membership|not_pharmacy_member` → **0건**.
+- frontend 전수 grep `market-trial/gateway|/gateway|no_kpa_membership|not_pharmacy_member` → **0건**.
 - backend `gateway` 참조: `marketTrialController.ts`(메서드/DTO/주석) + `market-trial.routes.ts:24`(등록) 만. (migration 의 "payment gateway" 는 무관.)
 - 결론: **고아 엔드포인트 확정**.
 

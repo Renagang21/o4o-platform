@@ -4,7 +4,7 @@
 > **성격**: audit (census) — 코드 변경 0
 > **작성일**: 2026-08-20
 > **시작 commit**: `31ec7bcd5`
-> **대상 서비스**: KPA-Society / K-Cosmetics / GlycoPharm / PharmacyHub / Neture
+> **대상 서비스**: KPA-Society / K-Cosmetics / PharmacyHub / Neture
 
 ---
 
@@ -59,7 +59,7 @@ KPA 는 QR 과 Tablet 안내를 한 화면(`kpaGuideFeatureQrTabletProps`)으로
 
 FC=FULLY_COMMON · CO=CORE_ONLY · VD=VIEW_DUPLICATED · SS=SERVICE_SPECIFIC · NI=NOT_IMPLEMENTED · OOS=OUT_OF_SCOPE
 
-| # | 단위 | KPA | KCos | GP | PharmacyHub | Neture |
+| # | 단위 | KPA | KCos | PharmacyHub | Neture |
 |---|------|:---:|:----:|:--:|:-----------:|:------:|
 | A | Guide Shell | FC | FC | FC | NI | FC |
 | B | Guide Home 허브 | NI | NI | NI | NI | CO |
@@ -89,7 +89,6 @@ FC=FULLY_COMMON · CO=CORE_ONLY · VD=VIEW_DUPLICATED · SS=SERVICE_SPECIFIC · 
 |--------|:---:|:--:|:--:|:--:|:--:|:--:|:---:|:---:|
 | KPA-Society | 19 | 16 | 1 | 0 | 0 | 1 | 1 | 0 |
 | K-Cosmetics | 19 | 12 | 0 | 1 | 0 | 5 | 1 | 0 |
-| GlycoPharm | 19 | 11 | 0 | 1 | 0 | 6 | 1 | 0 |
 | PharmacyHub | 19 | 0 | 0 | 0 | 0 | 17 | 2 | 0 |
 | Neture | 19 | 10 | 2 | 0 | 1 | 1 | 5 | 0 |
 | **합계** | **95** | **49** | **3** | **2** | **1** | **30** | **10** | **0** |
@@ -122,13 +121,13 @@ FC=FULLY_COMMON · CO=CORE_ONLY · VD=VIEW_DUPLICATED · SS=SERVICE_SPECIFIC · 
 - **공통 page 템플릿 8개** (1,012L) — `GuideIntroPage` · `GuideIntroStructurePage` · `GuideIntroKpaPage` · `GuideIntroOperationPage` · `GuideIntroConceptPage` · `GuideUsagePage` · `GuideFeaturesPage` · `GuideFeatureManualPage`
 - **공통 style primitive 8군** (`styles.ts`) — `heroStyles` · `sectionStyles`(page header/route badge) · `cardStyles` · `indexStyles` · `flowStyles`(step list) · `featureListStyles` · `compareStyles` · `bottomNavStyles`(previous·next)
 - **공통 타입 22종** (`types.ts`) — `GuideNavLink` · `GuideCardItem` · `GuideFlowRow` · `GuideLabelDetailItem` · `GuideFeatureGroup` 등
-- **서비스별 copy 4파일** — `copy/kpa.ts`(1,965L, 21 export) · `copy/k-cosmetics.ts`(1,132L, 15) · `copy/glycopharm.ts`(1,118L, 14) · `copy/neture.ts`(4,258L, 31)
+- **서비스별 copy 4파일** — `copy/kpa.ts`(1,965L, 21 export) · `copy/k-cosmetics.ts`(1,132L, 15) · `copy/neture.ts`(4,258L, 31)
 - **인라인 편집 계약** — `packages/shared-space-ui/src/guide-client/{createGuideClient, GuideEditableSection}` + 서비스별 `src/api/guideContent.ts`(4서비스 전부 존재)
 - **운영자 콘솔** — `packages/operator-core-ui/src/modules/guide-contents/`, 서비스별 wrapper 는 14L 동일 형태(`serviceKey` 만 다름)
 
 소비 형태:
 - **KPA / Neture** — 서비스에 얇은 wrapper page 파일을 두고 shared 컴포넌트에 props 주입 (KPA 21개 파일 19~24L, Neture 32개 파일 18~23L)
-- **KCos / GP** — wrapper 파일조차 없이 `App.tsx` 에서 shared 컴포넌트 + props 를 직접 라우팅
+- **KCos** — wrapper 파일조차 없이 `App.tsx` 에서 shared 컴포넌트 + props 를 직접 라우팅
 
 → **A(shell) 은 4서비스 FULLY_COMMON.** 내용(문구·서비스명·단계 수·강조색) 차이는 WO §8 에 따라 공통화 방해 사유로 보지 않았다.
 
@@ -140,11 +139,9 @@ FC=FULLY_COMMON · CO=CORE_ONLY · VD=VIEW_DUPLICATED · SS=SERVICE_SPECIFIC · 
 |--------|:-------:|:---------:|------|
 | KPA | `/lms` ✅ | `/guide/features/lms` (`kpaGuideFeatureLmsProps`) ✅ | FULLY_COMMON |
 | KCos | `/lms` ✅ | `/guide/features/lms` (`kCosmeticsGuideFeatureLmsProps`) ✅ | FULLY_COMMON |
-| **GlycoPharm** | `/lms` · `/lms/:id` ✅ | **없음** (route·props 모두 부재) | **NOT_IMPLEMENTED (A형)** |
 | **PharmacyHub** | `/education` · `/education/course/:id` · lesson ✅ | **없음** | **NOT_IMPLEMENTED (A형)** |
 | Neture | LMS 기능 없음 | 없음 | OUT_OF_SCOPE |
 
-GP 는 `copy/glycopharm.ts` 에 LMS props 자체가 없고 `App.tsx` 에도 `guide/features/lms` route 가 없다.
 반면 footer 는 `/lms`("교육/자료")를 노출한다 → **기능은 안내 없이 노출 중**.
 
 ---
@@ -155,7 +152,7 @@ GP 는 `copy/glycopharm.ts` 에 LMS props 자체가 없고 `App.tsx` 에도 `gui
 |--------|:-----------:|:-------------:|------|
 | KPA | `/content` · `/store/content/*` ✅ | `/guide/features/content` ✅ | FULLY_COMMON |
 | KCos | `/library/content` · `/store-hub/content` ✅ | `/guide/features/content` ✅ | FULLY_COMMON |
-| GP | `/content` · `/hub/content/:id` ✅ | `/guide/features/content` ✅ | FULLY_COMMON |
+| `/content` · `/hub/content:id` ✅ | `/guide/features/content` ✅ | FULLY_COMMON |
 | PharmacyHub | store-owner `content` ✅ | **없음** | NOT_IMPLEMENTED (A형) |
 | Neture | `/content` · `/supplier/b2b-content` ✅ | `/guide/features/b2b-content` ✅ | FULLY_COMMON |
 
@@ -170,7 +167,7 @@ route + props + 실제 shared 컴포넌트 소비를 개별 확인한 결과다.
 |--------|:----------:|:-----:|------|
 | KPA | `/resources` ✅ | `/guide/features/resources` ✅ | FULLY_COMMON |
 | KCos | `/resources` ✅ | `/guide/features/resources` ✅ | FULLY_COMMON |
-| GP | `/resources` ✅ | `/guide/features/resources` ✅ | FULLY_COMMON |
+| `/resources` ✅ | `/guide/features/resources` ✅ | FULLY_COMMON |
 | PharmacyHub | `library` · `library/resources` ✅ | **없음** | NOT_IMPLEMENTED (A형) |
 | Neture | `/resources` · `/supplier/library` ✅ | `/guide/features/forum-resources` ✅ | FULLY_COMMON |
 
@@ -197,8 +194,8 @@ store-owner `content` · `library` · `library/resources` · `qr` · `signage` �
 
 | 대상 | 서비스 | 유사도 | 판정 | 표시 |
 |------|--------|:-----:|------|------|
-| `ServiceGuidePage` | KCos(222L) ↔ GP(221L) | **0.871** | VIEW_DUPLICATED × 2 | `HIGH_VALUE_COMMONIZATION` |
-| `ServiceGuidePage` | KPA(219L) ↔ KCos 0.671 / ↔ GP 0.673 | <0.80 | CORE_ONLY | `HIGH_VALUE_COMMONIZATION` |
+| `ServiceGuidePage` | KCos(222L) ↔ **0.871** | VIEW_DUPLICATED × 2 | `HIGH_VALUE_COMMONIZATION` |
+| `ServiceGuidePage` | — | <0.80 | CORE_ONLY | `HIGH_VALUE_COMMONIZATION` |
 | `GuideHomePage` | Neture(189L) | 단독 | CORE_ONLY | `HIGH_VALUE_COMMONIZATION` |
 | `SellerQRGuidePage` | Neture(629L) | 단독 | CORE_ONLY | `ACCEPTABLE_DIFFERENCE` |
 
@@ -237,12 +234,12 @@ ACCEPTABLE_DIFFERENCE: 1
 | KCos | K QR·Tablet | `/store/marketing/qr` · `commerce/tablet-displays` |
 | KCos | N Survey | survey route 2건 |
 | KCos | O 역할별 안내 | 매장/운영자/회원 역할 구조 존재 |
-| GP | B Guide Home | `/guide` 진입점 없음 |
-| GP | **I LMS** | `/lms` · `/lms/:id` |
-| GP | J Store 운영 | `/store/**` 전체 |
-| GP | K QR·Tablet | `/store/marketing/qr` · `commerce/tablet-displays` |
-| GP | N Survey | survey route 2건 |
-| GP | O 역할별 안내 | 역할 구조 존재 |
+| B Guide Home | `/guide` 진입점 없음 |
+| **I LMS** | `/lms` · `/lms:id` |
+| J Store 운영 | `/store/` 전체 |
+| K QR·Tablet | `/store/marketing/qr` · `commerce/tablet-displays` |
+| N Survey | survey route 2건 |
+| O 역할별 안내 | 역할 구조 존재 |
 | Neture | J Store 운영 | `/store/manage/**` |
 | PharmacyHub | A·B·C·D·E (shell·허브·intro·usage·features index) | 서비스 전체 |
 | PharmacyHub | F Forum | `/forum` · `/community` |
@@ -256,13 +253,13 @@ ACCEPTABLE_DIFFERENCE: 1
 | PharmacyHub | O 역할별 안내 | membership · operator 셸 |
 | PharmacyHub | Q Service Guide | 서비스 공개면 존재 |
 
-(PharmacyHub 15 + KCos 5 + GP 6 + KPA 1 + Neture 1 = 28)
+(PharmacyHub 15 + KCos 5 6 + KPA 1 + Neture 1 = 28)
 
 ---
 
 ## 13. 기능 구현 vs Guide coverage (WO §10)
 
-| 기능축 | KPA | KCos | GP | PH | Neture |
+| 기능축 | KPA | KCos | PH | Neture |
 |--------|:---:|:----:|:--:|:--:|:------:|
 | Forum·Community | 기능✅ Guide✅ | 기능✅ Guide✅ | 기능✅ Guide✅ | 기능✅ **Guide❌** | 기능✅ Guide✅ |
 | Content | ✅/✅ | ✅/✅ | ✅/✅ | ✅/**❌** | ✅/✅ |
@@ -285,14 +282,12 @@ stale/dead Guide: 5
 
 | # | 분류 | 서비스 | 위치 | 내용 | 확인 |
 |---|------|--------|------|------|------|
-| 1 | **STALE_ROUTE (dead link)** | GP | `copy/glycopharm.ts:526` → `/guide/features` "B2C 가격 설정" | `/store/commerce/products/b2c` — GP 에 해당 route 없음 | 프로덕션 이동 시 ErrorBoundary "문제가 발생했습니다" 화면 (비로그인 관측) |
 | 2 | **STALE_ROUTE (dead link)** | KCos | `copy/k-cosmetics.ts:846`(primaryAction) · `:517`(primaryRoute) · `:438`·`:854`(routeLabel) | `/store/signage/playlist` — canonical 은 `/store/marketing/signage/playlist` | `/guide/features/signage` CTA "플레이리스트 관리로 이동 →" href 확인 |
 | 3 | STALE_ROUTE (배지 텍스트) | KCos | `copy/k-cosmetics.ts:396` usage step 04 | `routeLabel: '/store/requests'` — KCos 에 route 없음. `routeLabel` 은 링크가 아닌 배지 텍스트라 이동 실패는 없음 | `GuideUsagePage.tsx:43` |
-| 4 | STALE_ROUTE (배지 텍스트) | GP | `copy/glycopharm.ts:550` | `'/tablet/:slug'` — GP 실제는 `/store/:pharmacyId/tablet`. `:` 포함이라 href 는 `group.linkTo`(`/store/marketing/qr`)로 fallback, 표시 텍스트만 stale | `GuideFeaturesPage.tsx:125` |
 | 5 | STALE_FEATURE | KPA | `copy/kpa.ts:1728-1740` | 섹션 설명의 "B2C 판매" 표현이 KPA 자체 storefront 폐기 트랙과 어긋남. 하위 item label·route 자체는 현행 유효 | `project-kpa-internal-storefront-retirement-track` 대조 |
 
-- **DEAD_GUIDE: 0** — guide route 전체(KPA 22 · KCos 17 · GP 17 · Neture 39)에 대해 inbound link 를 전수 검사한 결과 **inbound 0 인 route 0건**.
-- **PLACEHOLDER: 0** — guide 전체에 `<img>`·screenshot 섹션이 **없다**. "준비 중" 표기(`copy/kpa.ts:1842-1851` Workspace A~E, `copy/{glycopharm,k-cosmetics}.ts` POP 삭제 기능)는
+- **DEAD_GUIDE: 0** — guide route 전체(KPA 22 · KCos 17 17 · Neture 39)에 대해 inbound link 를 전수 검사한 결과 **inbound 0 인 route 0건**.
+- **PLACEHOLDER: 0** — guide 전체에 `<img>`·screenshot 섹션이 **없다**. "준비 중" 표기는
   미구현 기능을 의도적으로 명시한 기대치 관리이므로 placeholder 결함으로 세지 않았다.
 - **참고(정상 동작)** — KPA `/store/library/production-materials` 와 KCos `/library/content` 는 `<Navigate>` redirect 대상이다. 이동은 성공하며 결함 아님.
 
@@ -306,12 +301,12 @@ stale/dead Guide: 5
 |--------|:-----------:|--------------|:----------:|:----------:|
 | KPA | 22 (`/guide/*` 21 + `/service-guide`) | GlobalHeader "서비스 안내"(`/service-guide`) · Footer `/guide/intro` · 매장 QR/POP/Blog/Signage 화면 · Operator Dashboard | ✅ | ✅ |
 | KCos | 17 (`guide/*` 15 + `service-guide` + `guide-contents`) | GlobalHeader `/service-guide` · Operator Dashboard `/guide/usage` · StoreSignagePage `/guide/features/signage` | ✅ | ✅ |
-| GP | 17 (+`guidelines` → `/operator/content` redirect) | GlobalHeader `/service-guide` · Operator Dashboard `/guide/usage` · StoreSignageMainPage `/guide/features/signage` | ✅ | ✅ |
+| 17 (+`guidelines` → `/operator/content` redirect) | GlobalHeader `/service-guide` · Operator Dashboard `/guide/usage` · StoreSignageMainPage `/guide/features/signage` | ✅ | ✅ |
 | Neture | 39 (`/guide/*` 37 + `/seller/qr-guide` + `/operator/guide-contents`) | GlobalHeader "이용 안내"(`/guide`) · Supplier/Partner/Seller 다수 화면 | ✅ | ✅ |
 | PharmacyHub | 0 | — | ❌ | ❌ |
 
-**주의 — `/service-guide` 는 `/guide/*` 로 연결되지 않는다.** KPA·KCos·GP 3서비스의 `ServiceGuidePage` 는 `/contact`·`/store-hub` 만 링크한다.
-결과적으로 KCos·GP 에서 `/guide/*` 허브로 가는 공개 진입 경로는 **운영자 대시보드와 매장 사이니지 화면 2곳뿐**이다(KPA 는 Footer `/guide/intro` 보유).
+**주의 — `/service-guide` 는 `/guide/*` 로 연결되지 않는다.** KPA·KCos 2서비스의 `ServiceGuidePage` 는 `/contact`·`/store-hub` 만 링크한다.
+결과적으로 KCos 에서 `/guide/*` 허브로 가는 공개 진입 경로는 **운영자 대시보드와 매장 사이니지 화면 1곳뿐**이다(KPA 는 Footer `/guide/intro` 보유).
 dead route 는 아니지만 **발견 가능성(discoverability) 결함**이며 §17-A 후속 묶음에 포함한다.
 
 ---
@@ -321,8 +316,8 @@ dead route 는 아니지만 **발견 가능성(discoverability) 결함**이며 �
 | 항목 | 결과 |
 |------|------|
 | 코드 변경 | **0** (audit) |
-| 5서비스 typecheck (`tsc --noEmit`) | **PASS** (exit 0 · @o4o/web-kpa-society · @o4o/web-k-cosmetics · glycopharm-web · pharmacy-hub-web · @o4o/web-neture) |
-| guide route inbound link 전수 | orphan **0** (KPA/KCos/GP/Neture) |
+| 5서비스 typecheck (`tsc --noEmit`) | **PASS** (exit 0 · @o4o/web-kpa-society · @o4o/web-k-cosmetics · pharmacy-hub-web · @o4o/web-neture) |
+| guide route inbound link 전수 | orphan **0** (KPA/KCos/Neture) |
 | guide copy → app route 정합 | 참조 168건 중 미해결 4건 → §14 #1~#4 (KPA 61건 중 `/store/commerce/*` 는 와일드카드 라벨로 정상 · Neture 44건 미해결 0) |
 | 재배포 | 불필요 (코드 변경 0) |
 
@@ -336,29 +331,26 @@ dead route 는 아니지만 **발견 가능성(discoverability) 결함**이며 �
 | `kpa-society.co.kr/guide/features` (desktop) | 정상 · guide 링크 23 / 기능 링크 13 전부 유효 |
 | `kpa-society.co.kr/guide/features/lms` (**mobile 390×844**) | 정상 · overflow 0 |
 | `kpa-society.co.kr/guide` | **404** (의도된 상태 — 허브 미구현. 복구 링크 `/guide/intro` 제공) |
-| `www.glycopharm.co.kr/guide/features` (desktop) | 정상 렌더. "B2C 가격 설정" → `/store/commerce/products/b2c` **dead link 확인**, "태블릿 키오스크" 표시 텍스트 `/tablet/:slug` stale 확인 |
-| `www.glycopharm.co.kr/store/commerce/products/b2c` | **오류 화면**("문제가 발생했습니다" · ErrorBoundary) |
 | `k-cosmetics.site/guide/features/signage` (desktop) | 정상 렌더. CTA href = `/store/signage/playlist` **dead link 확인** |
 | `neture.co.kr/guide` (desktop) | 정상 · 안내 영역 7 · guide 링크 29 · overflow 0 |
 | `pharmacyhub.co.kr/guide` | **404** · footer 는 커뮤니티/포럼/교육 노출 → 기능 존재 + Guide 부재 확증 |
 
-white screen 0 · 치명 JS exception 0(GP dead link 화면 제외) · mobile overflow 0 · dead navigation 2건(§14 #1·#2).
+white screen 0 · mobile overflow 0 · dead navigation 2건(§14 #1·#2).
 
 ---
 
 ## 18. 후속 작업 판정 (WO §17 — 최대 1~3 묶음)
 
 ### A. Guide 진입·랜딩 공통화 (HIGH_VALUE 4건 + discoverability)
-- `ServiceGuidePage` 3서비스(KCos↔GP 0.871 복제, KPA 0.67) → 공통 `ServiceGuideLandingPage` + 서비스별 copy 로 수렴
-- Neture `GuideHomePage` → 공통 `GuideHomePage` 승격, KPA·KCos·GP 에 `/guide` 허브 route 신설(현재 404)
+- Neture `GuideHomePage` → 공통 `GuideHomePage` 승격, KPA·KCos 에 `/guide` 허브 route 신설(현재 404)
 - `/service-guide` → `/guide/*` 진입 링크 연결 (§15 discoverability 결함)
 
 ### B. Guide coverage gap 해소 (NI A형 28건)
 - **B-1 PharmacyHub Guide 도입** (15건) — shared guide shell + `copy/pharmacy-hub.ts` + `api/guideContent.ts` + `/operator/guide-contents`. 단일 서비스 작업으로 gap 의 과반 해소
-- **B-2 기존 4서비스 누락 축** (13건) — GP LMS · KCos/GP QR·Tablet·Store·Survey·역할별 · Neture Store. 기존 shared 템플릿에 copy 만 추가하는 형태
+- Neture Store. 기존 shared 템플릿에 copy 만 추가하는 형태
 
 ### C. Guide stale route 정리 (5건)
-- dead link 2건(GP `/store/commerce/products/b2c` · KCos `/store/signage/playlist`) 은 **사용자가 실제로 오류 화면을 만나므로 우선순위 최상**
+- KCos `/store/signage/playlist`) 은 **사용자가 실제로 오류 화면을 만나므로 우선순위 최상**
 - 배지 텍스트 stale 2건 + KPA "B2C 판매" 표현 1건은 copy 수정만으로 종료
 
 권장 순서: **C(소·즉시) → A(중) → B-1(대) → B-2(대)**.

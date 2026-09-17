@@ -43,8 +43,6 @@
 
 - **`StandardHomeTemplate.tsx`** — 미접촉 (`after-help` 는 기존 지원 옵션, 템플릿 변경 불필요)
 - **`HeroBannerSection.tsx`** — 미접촉
-- **Neture / GlycoPharm / K-Cosmetics** — 미접촉.
-  - Neture 역할 카드는 **시작 진입 성격이라 `before-app-entry` 유지**(미변경). → KPA(활용 안내, after-help)와 Neture(진입, before-app-entry)는 **의도적 차이**로 명문화.
 - 서비스 바로가기 / Market Trial 링크·문구 — 불변
 - placement 표준 WO(`b11c06d74`)의 "기본값 before-app-entry" 는 유효하되, **KPA 의 valueGuide 는 '활용 안내'로 재분류되어 after-help 적용**(본 CHECK 가 KPA 한정 보정 기록).
 

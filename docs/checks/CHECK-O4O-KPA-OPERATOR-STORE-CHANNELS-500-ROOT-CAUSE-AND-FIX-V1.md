@@ -22,7 +22,7 @@ Cloud Run 로그(`o4o-core-api`):
 
 - Route: `GET /api/v1/operator/stores/:storeId/channels` → `StoreConsoleController.getStoreChannels`.
 - 실패 지점: [StoreConsoleController.ts:306](apps/api-server/src/controllers/operator/StoreConsoleController.ts#L306) raw SQL 의 `oc.approved_by` + `LEFT JOIN users`.
-- 미들웨어: `authenticate` → `requireRole([platform/neture/glycopharm/cosmetics/kpa :admin·:operator])` → `injectServiceScope` 정상 통과(로그상 controller 진입 후 SQL 단계 실패).
+- 미들웨어: `authenticate` → `requireRole` → `injectServiceScope` 정상 통과(로그상 controller 진입 후 SQL 단계 실패).
 - 접근 게이트 `assertStoreAccess`(enrollment 기반)는 통과 → 즉 접근 권한/404 문제가 아니라 **순수 컬럼 mismatch**.
 
 ## 3. 수정 내용
@@ -58,7 +58,7 @@ Cloud Run 로그(`o4o-core-api`):
 
 ## 6. 다른 서비스 · 소비처 영향
 
-- 동일 컨트롤러 `getStoreChannels` 는 **모든 서비스 운영자 매장 상세 공용**(KPA/Neture/GlycoPharm/K-Cosmetics/플랫폼 운영자). 이 500 은 모든 서비스에서 동일하게 발생하던 공용 버그였고, 수정도 전 서비스에 공통 적용됨(회귀 아니라 공통 복구).
+- 동일 컨트롤러 `getStoreChannels` 는 **모든 서비스 운영자 매장 상세 공용**. 이 500 은 모든 서비스에서 동일하게 발생하던 공용 버그였고, 수정도 전 서비스에 공통 적용됨(회귀 아니라 공통 복구).
 - `getAllChannels`/`updateChannelStatus`(service) 미변경 → 매장 본인 채널 관리·채널 관리 화면 무영향.
 - 프론트 조회 실패 계약(직전 WO 배포)은 유지 — 이제 정상 경로가 200 이므로 섹션 오류가 뜨지 않음.
 - 배치·스크립트: `organization_channels` 에 `approved_by` 참조 스크립트 없음(grep 확인).

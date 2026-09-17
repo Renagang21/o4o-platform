@@ -329,7 +329,6 @@ CMS의 `cms_media` 테이블을 Content Core 타입으로 변환하여 읽기 �
 |--------|:------------:|------|
 | **KPA Society** | Branch Docs + 메인(Placeholder) + Store Library | 분회 문서, 약국 자료 |
 | **Neture** | Supplier Library | 공급자 문서/파일 관리 |
-| **GlycoPharm** | Store Library (공유) | 약국 자료 (KPA와 동일 테이블) |
 | **K-Cosmetics** | Store Library (공유) | 매장 자료 |
 | **GlucoseView** | 없음 | — |
 

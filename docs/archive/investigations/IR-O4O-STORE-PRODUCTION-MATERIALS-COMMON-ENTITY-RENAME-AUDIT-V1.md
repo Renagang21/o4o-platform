@@ -7,7 +7,7 @@ scope:
   - 현재 `kpa_store_contents` table / `KpaStoreContent` entity 의 사용처 inventory
   - O4O 공통 Store capability 로 승격(`store_production_materials`) 가능 여부
   - rename / 신규 table / view alias / class-only rename 4 가지 전략 비교
-  - API path, frontend, 다중 서비스(KPA / GlycoPharm / Cosmetics / Neture) 영향 범위
+  - API path, frontend, 다중 서비스(KPA / Cosmetics / Neture) 영향 범위
 related:
   - docs/investigations/IR-O4O-KPA-STORE-PRODUCTION-MATERIALS-CAPABILITY-AUDIT-V1.md
   - docs/investigations/IR-O4O-STORE-EXECUTION-CONTENT-ASSET-POLICY-V1.md
@@ -34,13 +34,13 @@ constraint:
 
 ## 0. 결론 요약 (TL;DR)
 
-> **현재 `kpa_store_contents` 는 코드 수준에서 이미 *KPA 전용이 아닌 공통 자산* 으로 동작하고 있다 — KPA / GlycoPharm / Cosmetics 세 서비스가 동일 컨트롤러(`createStoreContentController`) 를 `/store-contents` prefix 로 마운트하며 같은 table 을 공유한다. 컨트롤러·라우트 식별자에는 이미 `kpa-` prefix 가 없다. 다만 entity class(`KpaStoreContent`) 와 table 이름(`kpa_store_contents`) 두 곳만 KPA prefix 가 붙어 있고, 이로 인해 "이 자산이 KPA 전용처럼 보인다" 는 인지적 왜곡이 남아 있다. rename 의 *기술적 비용은 낮다* (FK 0개 · seed 0건 · raw SQL 2 군데 · 외부 API path 변경 불필요). 다만 결정적 제약이 하나 — `store_contents` 라는 이름은 *이미 점유* 되어 있다. `packages/interactive-content-core` 의 LMS Template-copy entity (`StoreContent` → table `store_contents`) 가 별도 도메인으로 살아 있고 `/api/v1/lms/store-contents/*` 로 노출된다. 즉, "공통화 = 단순 prefix 제거" 는 불가능하며, *반드시 다른 이름* 이 필요하다. IR 제안인 `store_production_materials` 는 이 충돌을 회피하면서 §1 자매 IR 의 의미("매장 제작 자료")와 정확히 일치한다.**
+> **현재 `kpa_store_contents` 는 코드 수준에서 이미 *KPA 전용이 아닌 공통 자산* 으로 동작하고 있다 — KPA / Cosmetics 두 서비스가 동일 컨트롤러(`createStoreContentController`) 를 `/store-contents` prefix 로 마운트하며 같은 table 을 공유한다. 컨트롤러·라우트 식별자에는 이미 `kpa-` prefix 가 없다. 다만 entity class(`KpaStoreContent`) 와 table 이름(`kpa_store_contents`) 두 곳만 KPA prefix 가 붙어 있고, 이로 인해 "이 자산이 KPA 전용처럼 보인다" 는 인지적 왜곡이 남아 있다. rename 의 *기술적 비용은 낮다* (FK 0개 · seed 0건 · raw SQL 2 군데 · 외부 API path 변경 불필요). 다만 결정적 제약이 하나 — `store_contents` 라는 이름은 *이미 점유* 되어 있다. `packages/interactive-content-core` 의 LMS Template-copy entity (`StoreContent` → table `store_contents`) 가 별도 도메인으로 살아 있고 `/api/v1/lms/store-contents/*` 로 노출된다. 즉, "공통화 = 단순 prefix 제거" 는 불가능하며, *반드시 다른 이름* 이 필요하다. IR 제안인 `store_production_materials` 는 이 충돌을 회피하면서 §1 자매 IR 의 의미("매장 제작 자료")와 정확히 일치한다.**
 
 > **권장 경로: Option 2 — entity / class / 내부 SQL identifier 우선 변경, table rename 은 2단계.** Option 1(즉시 table rename) 은 다운타임 / 마이그레이션 오류 1 회 만으로도 운영 데이터가 사라질 수 있고, Cloud Run 의 dual-execution 마이그레이션 구조(api-server 시작 시 + Migration Job 양쪽) 와 잘 어울리지 않는다. Option 4(table 유지 + 문서만 공통화) 는 과거 prefix 가 고스란히 남아 장기 부채가 된다. Option 3(신규 table + 점진 이관) 은 *장점이 가장 크지만* 현재 운영 데이터 양·`source_type='direct'` 흐름의 신생함을 고려할 때 over-engineering 이다.
 
 ### 핵심 발견 8가지
 
-1. **이미 multi-service 컨트롤러** — `createStoreContentController` 는 KPA / GlycoPharm / Cosmetics 세 라우터에서 공통 마운트되어 있다 ([§3.2](#32-라우트-마운트-3개-서비스-동일-컨트롤러)). 즉 공통화는 *완료된 사실* 이고, 남은 것은 entity / table 이름의 일관성뿐이다.
+1. **이미 multi-service 컨트롤러** — `createStoreContentController` 는 KPA / Cosmetics 세 라우터에서 공통 마운트되어 있다 ([§3.2](#32-라우트-마운트-3개-서비스-동일-컨트롤러)). 즉 공통화는 *완료된 사실* 이고, 남은 것은 entity / table 이름의 일관성뿐이다.
 2. **`store_contents` 이름은 이미 점유됨** — `packages/interactive-content-core` 의 LMS Template-copy entity 가 `@Entity('store_contents')` 로 등록되고 `/api/v1/lms/store-contents/*` 로 활성 운영 중. 단순 prefix 제거 rename 은 충돌 ([§4.1](#41-store_contents-이름-점유-블로커-아님-회피-블로커)).
 3. **FK 0건 / seed 0건** — `REFERENCES kpa_store_contents` / `FOREIGN KEY ... kpa_store_contents` 어디에도 없음. seed migration 도 0건. rename 의 데이터 무결성 부담이 거의 없다 ([§3.5](#35-fk--seed--demo-data-touchpoint)).
 4. **raw SQL JOIN 2 군데** — `asset-render-filter.ts:120` / `published-assets.controller.ts:123` 두 곳에서 `LEFT JOIN kpa_store_contents sc ON sc.snapshot_id = s.id` 형태로 직접 참조. table rename 시 이 두 SQL 의 동기 변경이 필수.
@@ -170,7 +170,6 @@ export class KpaStoreContent {
 | 라우터 | 라인 | 마운트 path |
 |--------|------|-------------|
 | [apps/api-server/src/routes/kpa/kpa.routes.ts](apps/api-server/src/routes/kpa/kpa.routes.ts) | 77, 375 | `/store-contents` |
-| [apps/api-server/src/routes/glycopharm/glycopharm.routes.ts](apps/api-server/src/routes/glycopharm/glycopharm.routes.ts) | 32, 362 | `/store-contents` |
 | [apps/api-server/src/routes/cosmetics/cosmetics.routes.ts](apps/api-server/src/routes/cosmetics/cosmetics.routes.ts) | 27, 117 | `/store-contents` |
 
 > 컨트롤러 자체는 이미 `o4o-store/controllers/` 디렉토리에 있고 함수명도 `createStoreContentController` 로 KPA prefix 가 없다. **즉 "공통화" 는 컨트롤러 / 라우트 / 디렉토리 수준에서 *이미 완성* 되어 있다.** 남은 것은 entity 와 table 이름뿐.
@@ -189,7 +188,7 @@ GET    /api/v1/kpa/store-contents/:snapshotId
 PUT    /api/v1/kpa/store-contents/:snapshotId
 ```
 
-(GlycoPharm / Cosmetics 도 path 만 다르고 서명 동일)
+(Cosmetics 도 path 만 다르고 서명 동일)
 
 ### 3.4 raw SQL 직접 참조 — **2 군데**
 
@@ -393,7 +392,6 @@ export class StoreContent {
 | Service | mount | 사용 |
 |---------|:-----:|:----:|
 | KPA | ✅ | `/api/v1/kpa/store-contents` |
-| GlycoPharm | ✅ | `/api/v1/glycopharm/store-contents` |
 | Cosmetics | ✅ | `/api/v1/cosmetics/store-contents` |
 | Neture | ❌ | 미마운트 |
 
@@ -420,7 +418,7 @@ export class StoreContent {
 | line 383 | `await isStoreOwner(dataSource, userId, 'kpa')` |
 | line 36, 49-52, 153, 226-227, 318 | `KpaMember` repository fallback |
 
-> 이는 *컨트롤러가 GlycoPharm / Cosmetics 라우트에 mount 되어도 권한 검사는 KPA 기준* 으로 한다는 뜻. **rename 의 책임 범위 밖** — 후속 WO `WO-O4O-STORE-CONTENT-CONTROLLER-SERVICE-AGNOSTIC-V1` 로 분리 권장.
+> 이는 *컨트롤러가 Cosmetics 라우트에 mount 되어도 권한 검사는 KPA 기준* 으로 한다는 뜻. **rename 의 책임 범위 밖** — 후속 WO `WO-O4O-STORE-CONTENT-CONTROLLER-SERVICE-AGNOSTIC-V1` 로 분리 권장.
 
 ### 7.4 공통 entity 승격 적합성
 
@@ -441,7 +439,7 @@ export class StoreContent {
 | 운영 데이터 손상 | 🟢 낮음 | FK 0건 / seed 0건 / `ALTER ... RENAME TO` 는 in-place 식별자 변경만 | Phase 2-B 트랜잭션 1 개로 처리, DOWN 정의 |
 | migration 실패 | 🟡 중간 | TypeORM migration class name 식별자 규칙 ([Memory: TypeORM Migration Class Naming](C:/Users/sohae/.claude/projects/c--Users-sohae-o4o-platform/memory/MEMORY.md)), index rename 누락 | rename migration 생성 시 4 index + UQ partial 모두 명시 |
 | API backward compatibility | 🟢 낮음 | 외부 path `/store-contents` 유지 / 응답 필드 명 유지 | rename 작업이 응답 필드 건드리지 않음 |
-| old route dependency | 🟢 낮음 | KPA / GlycoPharm / Cosmetics 라우트 마운트 코드는 `createStoreContentController` 함수명 의존 | 함수명 유지 또는 동시 변경 |
+| old route dependency | 🟢 낮음 | KPA / Cosmetics 라우트 마운트 코드는 `createStoreContentController` 함수명 의존 | 함수명 유지 또는 동시 변경 |
 | dashboard assets 연결 | 🟡 중간 | `published-assets.controller.ts` 의 raw SQL JOIN | Phase 2-B 에서 SQL 동기 변경 |
 | snapshot/direct origin 깨짐 | 🟢 낮음 | `source_type` 컬럼 자체는 변경 없음, COALESCE 로직 동일 | (확인) `asset-render-filter.ts` 와 `published-assets.controller.ts` 두 SQL 동기 |
 | 운영 row 의 service 구분 불명 | 🟡 중간 | 현재는 `organization_id` 만으로 service 구분 (서비스 분리는 mount path) | service 별 통계 필요 시 후속 컬럼화 |
@@ -466,7 +464,7 @@ export class StoreContent {
 | Index/UQ | 4건 (`IDX_*_snap` / `IDX_*_org` / `UQ_*_snap_org_partial` / `IDX_*_share_status`) |
 | Controller 파일 | `apps/api-server/src/routes/o4o-store/controllers/store-content.controller.ts` |
 | Controller 함수 | `createStoreContentController` (이미 KPA prefix 없음) |
-| 라우트 마운트 | KPA / GlycoPharm / Cosmetics 3 곳 |
+| 라우트 마운트 | KPA / Cosmetics 2 곳 |
 | API path | `/api/v1/{service}/store-contents` (외부 변경 불필요) |
 | Raw SQL JOIN | 2 (`asset-render-filter.ts:120`, `published-assets.controller.ts:123`) |
 | Hub-content 참조 | 주석/식별자 only — `hub-content.service.ts` 4 군데 (실 query 없음) |
@@ -541,7 +539,7 @@ API path     :  /api/v1/{service}/store-contents  (변경 없음)
 | `WO-O4O-STORE-CONTENT-PRODUCTION-MATERIAL-CODE-RENAME-V1` | Phase 2-A | — |
 | `WO-O4O-STORE-CONTENT-PRODUCTION-MATERIAL-TABLE-RENAME-V1` | Phase 2-B | Phase 2-A 머지 |
 | `WO-O4O-STORE-CONTENT-LEGACY-SHARE-COLUMNS-CLEANUP-V1` | 독립 | — |
-| `WO-O4O-STORE-CONTENT-CONTROLLER-SERVICE-AGNOSTIC-V1` | 독립 | KPA 하드코딩 (`isStoreOwner('kpa')` × 4) 제거, GlycoPharm / Cosmetics 권한 분기 도입 |
+| `WO-O4O-STORE-CONTENT-CONTROLLER-SERVICE-AGNOSTIC-V1` | 독립 | KPA 하드코딩 (`isStoreOwner('kpa')` × 4) 제거, Cosmetics 권한 분기 도입 |
 | `WO-O4O-STORE-CONTENT-ENTITY-RELOCATE-V1` (선택) | 독립 | `routes/kpa/entities/` → `modules/store-core/entities/` 또는 `store-core` 패키지 |
 | `WO-O4O-STORE-CONTENT-FRONTEND-TYPE-RENAME-V1` (선택) | 독립 | type 이름 / API client 정합성 |
 | `WO-O4O-STORE-CONTENT-SOURCE-MATERIAL-REFERENCE-V1` (자매 IR Phase 1 #2,#3 후속) | 독립 | 결과물 → 제작 자료 reference 통일 |
@@ -590,7 +588,7 @@ Option 4. 현재 table 유지, 문서상 canonical만 공통화                 
 | `apps/api-server/src/routes/kpa/entities/index.ts:18` | re-export path 갱신 |
 | `apps/api-server/src/database/connection.ts:288, 793` | import / DataSource 등록 갱신 |
 | `apps/api-server/src/routes/o4o-store/controllers/store-content.controller.ts` | import / repository 호출 7 군데 |
-| (선택) controller 파일명 / 함수명 / mount 호출 측 (kpa.routes.ts:77,375 / glycopharm.routes.ts:32,362 / cosmetics.routes.ts:27,117) | 선택적 정렬 |
+| (선택) controller 파일명 / 함수명 / mount 호출 측 (kpa.routes.ts:77,375.routes.ts:32,362 / cosmetics.routes.ts:27,117) | 선택적 정렬 |
 
 ### Backend 변경 대상 파일 (Phase 2-B)
 

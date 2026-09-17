@@ -121,7 +121,7 @@
 
 | service_key | is_pharmacy_target_service |
 |---|:---:|
-| `glycopharm` · `kpa-society` · `pharmacy-hub` | **true** |
+| `kpa-society` · `pharmacy-hub` | **true** |
 | `k-cosmetics` · `neture` | false |
 
 정책 테이블 자체는 건전하다. 문제는 이를 **소비하는 지점이 사실상 없다**는 것.
@@ -230,7 +230,7 @@ DRUG 전량이 rx/otc/unspecified 중 하나 → **`regulatory_type='DRUG'` 를 
 | 데이터에 등장하나 정책 행이 없는 `service_key` (OPL·service_products) | **0건** |
 | 정책 행 5개 vs 실제 DRUG OPL 보유 | `neture`(비약국) 만 5건, 나머지 4개 서비스 0건 |
 
-하드코딩 fallback(`['glycopharm','kpa-society']`)과 운영 데이터는 **불일치 없음** — 단 `pharmacy-hub` 는 DB 행에만 존재하므로 **fallback 경로로 판정되면 비약국으로 오판**된다(구조적 위험 잔존).
+하드코딩 fallback과 운영 데이터는 **불일치 없음** — 단 `pharmacy-hub` 는 DB 행에만 존재하므로 **fallback 경로로 판정되면 비약국으로 오판**된다(구조적 위험 잔존).
 
 ---
 

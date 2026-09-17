@@ -2,7 +2,7 @@
 
 > **유형**: Investigation (read-only) — POP(판촉물/Point-of-Purchase) 제작 흐름 operator→store 감사. 기능별 제작 정비 첫 축.
 > **성격**: 코드/DB/route/UI **무변경**. 조사 문서만 (file:line 근거).
-> **결론(요약)**: **POP 흐름은 O4O 철학·3서비스 parity 와 대체로 정합(A 주).** operator 발행(`store_pops` author_role='operator')→`/store-hub/pop` browse(`hub-content queryPop`)→**import(복사+단절)**→매장 POP(`store_pops` author_role='store')→제작 PDF(`store_execution_assets` usage_type=pop) 흐름이 KPA/GP/KCos 동일 마운트. 가져오기=복사·원본 단절 충족. 잔여(관찰): **B** 출처 추적이 excerpt prefix(`[운영자 자료 가져옴]`)로 비구조적, **C** POP 복사가 content(snapshot `o4o_asset_snapshots`)와 **다른 domain import(`store_pops`→`store_pops`)** — 메커니즘 이원화(snapshot 'pop' resolver 잠재 dormant), **D** import 된 `store_pops`(내 매장 POP staff) ↔ StorePopPage PDF builder(library/direct/snapshot 입력) **연결 불명확**. 구조 통합 불필요.
+> **결론(요약)**: **POP 흐름은 O4O 철학·2서비스 parity 와 대체로 정합(A 주).** operator 발행(`store_pops` author_role='operator')→`/store-hub/pop` browse(`hub-content queryPop`)→**import(복사+단절)**→매장 POP(`store_pops` author_role='store')→제작 PDF(`store_execution_assets` usage_type=pop) 흐름이 KPA/KCos 동일 마운트. 가져오기=복사·원본 단절 충족. 잔여(관찰): **B** 출처 추적이 excerpt prefix(`[운영자 자료 가져옴]`)로 비구조적, **C** POP 복사가 content(snapshot `o4o_asset_snapshots`)와 **다른 domain import(`store_pops`→`store_pops`)** — 메커니즘 이원화(snapshot 'pop' resolver 잠재 dormant), **D** import 된 `store_pops`(내 매장 POP staff) ↔ StorePopPage PDF builder(library/direct/snapshot 입력) **연결 불명확**. 구조 통합 불필요.
 > **선행/근거**: `O4O-OPERATOR-HUB-CONTENT-PUBLISHING-STANDARD-V1` · `O4O-STORE-MENU-CANONICAL-TREE-V1` · `O4O-STORE-PRODUCTION-MATERIAL-CANONICAL-V1`.
 > **작성일**: 2026-06-15
 
@@ -49,13 +49,13 @@ POP 제작이 운영자 발행 → 매장 허브 → 내 매장 복사 → 매�
 ### 3.2 backend (3서비스 마운트)
 | 컨트롤러 | 엔드포인트 | mount |
 |----------|-----------|-------|
-| `operator-pop.controller.ts` | `/operator/pop/posts` CRUD + publish/archive (author_role=operator 서버강제) | kpa.routes:450 · glycopharm:445 · cosmetics:189 |
-| `pop.controller.ts`(staff) | `/stores/:slug/pop/staff`(list) ·`/import`·PUT·DELETE (author_role=store) | kpa:430 · glycopharm:466 · cosmetics:206 |
+| `operator-pop.controller.ts` | `/operator/pop/posts` CRUD + publish/archive (author_role=operator 서버강제) | kpa.routes:450:445 · cosmetics:189 |
+| `pop.controller.ts`(staff) | `/stores/:slug/pop/staff`(list) ·`/import`·PUT·DELETE (author_role=store) | kpa:430:466 · cosmetics:206 |
 | `store-pop.controller.ts` | `/pharmacy/pop/generate`(PDF, save→execution_assets) ·`/pharmacy/pop/source/supplier-items` | `router.use('/')` 3서비스 |
 | `hub-content.service` `queryPop` | `GET /hub/contents?sourceDomain=pop&producer=operator` | 공통 |
 
 ### 3.3 frontend (3서비스)
-| 화면 | route | KPA / GP / KCos |
+| 화면 | route | KPA / KCos |
 |------|-------|------|
 | 운영자 POP 목록·작성 | `/operator/pop`(+write) | OperatorRoutes:182 / App:875 / App:726 (**3서비스 마운트**) |
 | HUB POP browse | `/store-hub/pop` | HubPopLibraryPage (pharmacy/ · hub/ · hub/) |
@@ -65,15 +65,13 @@ POP 제작이 운영자 발행 → 매장 허브 → 내 매장 복사 → 매�
 
 ## 4. 3서비스 parity
 
-| 항목 | KPA | GP | KCos |
+| 항목 | KPA | KCos |
 |------|:---:|:--:|:----:|
 | operator POP 작성(프론트+backend) | ✅ | ✅ | ✅ |
 | HUB POP browse + import | ✅ | ✅ | ✅ |
 | 매장 POP staff(list/import/edit/delete) | ✅ | ✅ | ✅ |
 | POP PDF generate(save→execution_assets) | ✅ | ✅ | ✅ |
 | 상품 POP builder | ✅ | ✅ | ✅ |
-
-> **POP 흐름 3서비스 full parity.** (조사 중 "GP/KCos operator route 미마운트" 의심 있었으나 **오확인** — GP App.tsx:875·KCos App.tsx:726 마운트 확인됨.)
 
 ## 5. 철학 정합 (Drift Guard)
 
@@ -115,7 +113,7 @@ POP 제작이 운영자 발행 → 매장 허브 → 내 매장 복사 → 매�
 1. `IR-O4O-POP-IMPORT-TO-BUILDER-LINK-AUDIT-V1`(후속 조사, D) — import 된 `store_pops` 사본이 StorePopPage PDF 제작 입력으로 연결되는지 / 끊겨 있으면 연결 설계.
 2. `WO-O4O-POP-COPY-ORIGIN-METADATA-V1`(B) — import 출처를 excerpt prefix → 구조적 source 메타(operator sourceId/serviceKey) 보강. (DB 컬럼 추가 동반 — 신중.)
 3. `IR-O4O-POP-COPY-MECHANISM-DUALITY-AUDIT-V1`(C) — snapshot 'pop' resolver dormant 여부 + content(snapshot) vs POP/blog(domain import) 복사 일원화/문서화 판단.
-4. (선택) HubPopLibraryPage GP/KCos near-identical wrapper dedup(browse WO 동형) — POP/QR/blog hub 페이지.
+4. (선택) HubPopLibraryPage KCos near-identical wrapper dedup(browse WO 동형) — POP/QR/blog hub 페이지.
 
 ## 9. 결론
 

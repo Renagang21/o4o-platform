@@ -56,7 +56,7 @@
 
 - 저장소 migration 파일 644 (`apps/api-server/src/database/migrations/`, 13자리 이름 82 · 14자리 562).
 - 운영 `typeorm_migrations` 677행. **운영에만 있고 저장소에 없는 이름 30건** — 삭제된 초기 스키마 · seed · 테스트 계정 migration:
-  `AddProductCommissionColumns1732422000000` · `CreateCMSTablesV2_1733302800000` · `CreateMembershipYaksaTables1733458800000` · `ExtendYaksaMemberFields1733600000000` · `CreateCosmeticsSchema1735470000000` · `SeedCosmeticsData1735470000001` · `CreateYaksaTables1735563600000` · `SeedYaksaData1735563600001` · `CreateGlycopharmTables1735564800000` · `SeedGlycopharmData1735564800001` · `CreateGlucoseViewTables1735566000000` · `SeedProductionTestAccounts1737000000000` · `SeedAdditionalTestAccounts1737100200000` · `UpdateKpaTestAccountPasswords1737400000000` · `UpdateGlucoseViewTestAccountPasswords1737400100000` · `CreateTestAccounts1737400200000` · `UpdateTestAccountEmailsToO4O1737200000000` · `UpdateOperatorPasswords1769408012358` · `SeedKpaTestAccounts20260207100000` · `CreateKpaSocietyOperatorAccount20260212200000` · `CreateKpaAdminAccount20260216200001` · `AddYaksa01ToKpaA20260216200002` · `SeedKpaOperatorTestData1712203200001` · `SeedKpaOrgJoinAndForumActivity20260404000100` · `SeedKpaTestPharmacyOwnerOrgMember20260404100000` · `SeedPhamacy1OrgMember20260405100000` · `FixPhamacy1OrgMemberAlignment20260419500000` · `EnsurePhamacy1OrgMemberForKpa20260419600000` · `SeedKCosmeticsStoreOwnerTestAccount20260501100000` · `ServiceMembershipCanonicalKeyDataMigration20260928000000`
+  `AddProductCommissionColumns1732422000000` · `CreateCMSTablesV2_1733302800000` · `CreateMembershipYaksaTables1733458800000` · `ExtendYaksaMemberFields1733600000000` · `CreateCosmeticsSchema1735470000000` · `SeedCosmeticsData1735470000001` · `CreateYaksaTables1735563600000` · `SeedYaksaData1735563600001` · `CreateGlucoseViewTables1735566000000` · `SeedProductionTestAccounts1737000000000` · `SeedAdditionalTestAccounts1737100200000` · `UpdateKpaTestAccountPasswords1737400000000` · `UpdateGlucoseViewTestAccountPasswords1737400100000` · `CreateTestAccounts1737400200000` · `UpdateTestAccountEmailsToO4O1737200000000` · `UpdateOperatorPasswords1769408012358` · `SeedKpaTestAccounts20260207100000` · `CreateKpaSocietyOperatorAccount20260212200000` · `CreateKpaAdminAccount20260216200001` · `AddYaksa01ToKpaA20260216200002` · `SeedKpaOperatorTestData1712203200001` · `SeedKpaOrgJoinAndForumActivity20260404000100` · `SeedKpaTestPharmacyOwnerOrgMember20260404100000` · `SeedPhamacy1OrgMember20260405100000` · `FixPhamacy1OrgMemberAlignment20260419500000` · `EnsurePhamacy1OrgMemberForKpa20260419600000` · `SeedKCosmeticsStoreOwnerTestAccount20260501100000` · `ServiceMembershipCanonicalKeyDataMigration20260928000000`
 - 저장소에만 있고 운영에 없는 이름 0 (11개 파일은 class 명 `…1709…` 과 `name` 속성 `…2026…` 이 다르지만 `name` 이 운영과 일치).
 - **`CREATE TABLE roles` 는 677건 어디에도 없다** (`CreateRolePermissionTables1810000000000` 미실행 · 이후 삭제). 운영 `roles` 최초 생성은 `users` 등과 같은 synchronize 시대(2025-10, 원본 entity `0785eab80` camelCase) 다.
 
@@ -70,17 +70,15 @@
 |---|---|---|---|---|---|
 | *(synchronize · migration 아님)* | camelCase 테이블 생성 (`id name displayName description permissions isSystem createdAt updatedAt isActive`) | — | 생성 | — | 재현 불가 (코드 경로 없음) |
 | `20260228000002-DropLegacyRbacColumns` | 주석 언급만 | — | 없음 | 없음 | OK |
-| `20260318100000-ExtendRolesTable` | `ALTER TABLE roles` ×22 (`name` varchar(100) · snake 컬럼 10개 `ADD COLUMN IF NOT EXISTS`) · 인덱스 2 · legacy 4행 UPDATE · **37행 seed** (`ON CONFLICT (name) DO UPDATE`, `is_system=true`, glycopharm:* 6 · glucoseview:* 4 포함) | `roles` | 있음 | 있음 (구조 + seed 혼합) | **FAIL** `relation "roles" does not exist` |
-| `20260331400000-UnifyGlycopharmRolesCatalog` | `glycopharm:pharmacy/consumer/supplier/partner` → bare 개명 | `roles` | 없음 | 있음 | FAIL (roles 부재) |
+| `20260318100000-ExtendRolesTable` | `ALTER TABLE roles` ×22 (`name` varchar(100) · snake 컬럼 10개 `ADD COLUMN IF NOT EXISTS`) · 인덱스 2 · legacy 4행 UPDATE · **37행 seed** (`ON CONFLICT (name) DO UPDATE`, `is_system=true`:* 6 · glucoseview:* 4 포함) | `roles` | 있음 | 있음 (구조 + seed 혼합) | **FAIL** `relation "roles" does not exist` |
 | `20260331500000-UnifyCosmeticsRolesCatalog` | `cosmetics:seller/user/supplier/pharmacist/partner` → bare 개명 | `roles` | 없음 | 있음 | FAIL |
-| `20260900000000-BackfillStoreOwnerRoles` | `kpa:/glycopharm:/cosmetics:store_owner` INSERT (`is_system=false`) + `role_assignments` backfill | `roles` · `role_assignments` | 없음 | 있음 | FAIL |
+| `20260900000000-BackfillStoreOwnerRoles` | — | `roles` · `role_assignments` | 없음 | 있음 | FAIL |
 | `20270216000000-SeedPharmacyHubServiceAndRoles` | `pharmacy-hub:operator/store_owner/supplier` + `platform_services` | `roles` · `platform_services` | 없음 | 있음 | FAIL |
 | `20270226000000-SeedPharmacyHubAdminRole` | `pharmacy-hub:admin` | `roles` | 없음 | 있음 | FAIL |
 | `20270305000000-SeedKpaBranchServiceAndRoles` | `kpa-branch:admin/operator/member` | `roles` · `platform_services` | 없음 | 있음 | FAIL |
 | `20270314000000-DeactivatePharmacyHubSupplierRole` | `pharmacy-hub:supplier` `is_active=false` | `roles` | 없음 | 있음 | FAIL |
 | `20270315000000-SeedPharmacyHubMemberRole` | `pharmacy-hub:member` | `roles` | 없음 | 있음 | FAIL |
 | `20270322000000-CreateCafe24MemberLinksAndSeedCafe24B2bService` | `cafe24-b2b:store_owner` | `roles` · `organizations` · `platform_services` | 있음(다른 테이블) | 있음 | FAIL (`organizations` 부재 — roles 보다 먼저) |
-| `20270326000000-DropGlycopharmService` | bare 4행 `service_key` glycopharm→platform · `glycopharm:%` DELETE (roles · role_assignments) · `platform_services` DELETE | `roles` · `role_assignments` · `platform_services` | 없음 | 있음 (삭제) | FAIL |
 | `20270413000000-BaselineRbacAndAccountTables` | `role_permissions` FK 대상으로 `roles` 존재 **요구** (부재 시 throw) | `roles` | 5 테이블 생성 | 없음 | **FAIL** `required table "roles" is absent` (설계된 동작) |
 
 운영 이력에서 role 관련으로 실행된 나머지(`RolePrefixMigrationFoundation` · `KpaRolePrefixMigration` · `MigrateLegacyRolesToPlatformPrefixed` · `CleanupKpaOrphanRoles` · `FixKpaAdminRole` 등) 는 `users.roles[]` · `role_assignments` 를 대상으로 하며 `roles` 테이블을 읽거나 쓰지 않는다.
@@ -92,7 +90,7 @@
 | A | fresh DB + `uuid-ossp` (운영과 동일 확장) · 파일명 `< 20260318100000` 244개만 · **deploy 와 동일한 `DataSource.runMigrations({transaction:'each'})`** | **실행 0건**, 첫 migration `RolePrefixMigrationFoundation20260205033223` 실패 `relation "users" does not exist`. `roles` 존재 = false |
 | B | 위와 같되 644개 전체 | 동일 (실행 0건 · 같은 지점) |
 | B' | `uuid-ossp` 없이 | 같은 migration 이 `function uuid_generate_v4() does not exist` 로 실패 — 운영은 확장이 있으므로 참고값 |
-| C | 파일명(타임스탬프) 순으로 1건씩 트랜잭션 실행 · 첫 실패에서 중지 | **5건 성공 후 6번째** `1736400000000-AddEnabledServicesToPharmacy` 실패 `relation "glycopharm_pharmacies" does not exist` (생성 migration `CreateGlycopharmTables1735564800000` 은 §3 의 삭제된 30건에 속함). `roles` 존재 = false |
+| C | 파일명(타임스탬프) 순으로 1건씩 트랜잭션 실행 · 첫 실패에서 중지 | — |
 | D | 파일명 순 · 실패 건은 롤백하고 건너뜀 | 성공 515 / 실패 129. `roles` 존재 = false (끝까지). 실패 129 중 112 = `relation … does not exist`. `users` · `role_assignments` · `platform_services` · `kpa_members` 는 생성됨, `roles` · `organizations` · `service_memberships` · baseline 5 테이블은 미생성 |
 
 **A/B 의 원인 (재현성의 첫 번째 벽)**: TypeORM 0.3.27 `MigrationExecutor.getMigrations()` 는 `parseInt(migrationClassName.substr(-13))` 으로 정렬한다. 14자리 `…20260205033223` 은 `0260205033223`(2.6e11) 로 파싱되어 13자리 `…1700000000000`(1.7e12) 보다 **앞**에 선다. 운영에서는 pending 이 항상 1~수 건이라 문제가 드러나지 않았지만, fresh DB 에서는 562개 14자리 migration 이 legacy 82개보다 먼저 실행된다. 이는 `roles` 와 무관한 **저장소 전체의 fresh-DB 재현성 결함**이며 이 IR 범위 밖 → §11 중지 조건 · §10 별도 WO.
@@ -117,7 +115,7 @@
 | 8 | `updatedAt` | timestamp | NN | CURRENT_TIMESTAMP | synchronize | ✕ | 0 | — | **LEGACY_UNUSED** (불일치 14/41 — entity 는 snake 만 갱신) |
 | 9 | `isActive` | boolean | NULL | true | synchronize | ✕ | 0 | — | **LEGACY_UNUSED** (불일치 1/41 = `pharmacy-hub:supplier` camel true / snake false) |
 | 10 | `display_name` | varchar(200) | NULL | — | ExtendRolesTable | ○ `displayName` (entity: varchar(100) **NOT NULL**) | seed 전부 | — | **CANONICAL** · drift(길이 · nullability) |
-| 11 | `service_key` | varchar(50) | NULL | — | ExtendRolesTable | ○ `serviceKey` | seed · DropGlycopharmService UPDATE | `idx_roles_service_key` · `idx_roles_service_role`(partial unique, `WHERE service_key IS NOT NULL`) | **CANONICAL** |
+| 11 | `service_key` | varchar(50) | NULL | — | ExtendRolesTable | ○ `serviceKey` | seed | `idx_roles_service_key` · `idx_roles_service_role`(partial unique, `WHERE service_key IS NOT NULL`) | **CANONICAL** |
 | 12 | `role_key` | varchar(50) | NULL | — | ExtendRolesTable | ○ `roleKey` | seed · MembershipConsole tier 판정(`roleEntity.roleKey === 'operator'`) | `idx_roles_service_role` | **CANONICAL** |
 | 13 | `is_admin_role` | boolean | NULL | false | ExtendRolesTable | ○ `isAdminRole` (entity NOT NULL) | MembershipConsole raw `COALESCE(r.is_admin_role,false)` | — | **CANONICAL** · drift(nullability) |
 | 14 | `is_system` | boolean | NULL | false | ExtendRolesTable | ○ `isSystem` (entity NOT NULL) | seed | — | **CANONICAL** · drift |
@@ -194,14 +192,14 @@
 | `pharmacy-hub:supplier` | pharmacy-hub | SeedPharmacyHubServiceAndRoles → Deactivate | t/**f**/t/f | 0/0 | 카탈로그 "없다" 명시 | **INACTIVE_RETIRED** | fresh seed 재도입 금지 |
 | `lms:instructor` | lms/instructor | ExtendRolesTable | t/t/t/f | 1/0 | types/roles.ts · guard 15 | **ACTIVE_BUT_NOT_SEEDED** | `lms` 는 `platform_services` 에 없음 · 카탈로그 접두어 표에 없음 |
 | `cafe24-b2b:store_owner` | cafe24-b2b | CreateCafe24MemberLinks… | t/t/t/f | 0/0 | 런타임 리터럴 0 (migration 만) · `platform_services` active | **DECISION_REQUIRED** | 서비스는 살아 있으나 판정 코드 0 |
-| `supplier` (platform) · `pharmacy` (platform) · `customer` (platform) | platform | UnifyGlycopharm… 개명 → DropGlycopharmService 가 platform 으로 이관 | t/t/t/f | 6/0 · 2/0 · 7/1 | 카탈로그 Layer A bare 허용 | **ACTIVE_BUT_NOT_SEEDED** (3) | seed 원본은 삭제된 glycopharm 행 — 현재 값은 migration 연쇄의 산물이며 어떤 seed 도 이 형태를 직접 만들지 않음 |
+| `supplier` (platform) · `pharmacy` (platform) · `customer` (platform) | platform | — | t/t/t/f | 6/0 · 2/0 · 7/1 | 카탈로그 Layer A bare 허용 | **ACTIVE_BUT_NOT_SEEDED** (3) | — |
 | `partner` (platform) | platform | 동일 | t/t/t/f | 0/0 | 카탈로그 허용 · 보유자 0 | **ORPHAN_NO_CONSUMER** | 카탈로그 "신규 부여 대상 아님" |
 
 집계 (41): CANONICAL_SYSTEM_ROLE 1 · CANONICAL_SERVICE_ROLE 19 (kpa 5 · kpa-branch 3 · neture 4 · cosmetics 3 · pharmacy-hub 4) · ACTIVE_BUT_NOT_SEEDED 4(`lms:instructor` · `supplier` · `pharmacy` · `customer`) · DEPRECATED_BUT_REQUIRED_FOR_HISTORY 5(`platform:admin` · `platform:operator` · `kpa:district_admin` · `kpa:branch_admin` · `kpa:branch_operator`) · INACTIVE_RETIRED 1 · ORPHAN_NO_CONSUMER 7(`platform:manager/vendor/member/contributor` · `consumer` · `pharmacist` · `partner`) · DECISION_REQUIRED 4(`neture:user` · `cosmetics:partner` · `cosmetics:supplier` · `cafe24-b2b:store_owner`).
 
 **`roles` 에 없는 `role_assignments` 값 7종**: `user`(활성 2 · 카탈로그 허용) · `neture:member`(활성 4 · `service_memberships` 정규값) · `cosmetics:member`(1) · `kpa:member`(1) · `member` · `store_owner` · `super_admin`(비활성 이력). `service_memberships.role` 에는 bare `member/store_owner/admin/user/operator/supplier/customer/super_admin` 이 혼재 — 이 축은 `roles` 와 계약이 없다.
 
-> **fresh DB 에 재도입 금지**: `glycopharm:*` 6 · `glucoseview:*` 4 (ExtendRolesTable seed 에 남아 있음) · `pharmacy-hub:supplier` · `kpa:district_admin/branch_admin/branch_operator`. 운영 데이터 삭제는 이 IR 에서 하지 않는다.
+> `glucoseview:*` 4 (ExtendRolesTable seed 에 남아 있음) · `pharmacy-hub:supplier` · `kpa:district_admin/branch_admin/branch_operator`. 운영 데이터 삭제는 이 IR 에서 하지 않는다.
 
 ---
 
@@ -221,8 +219,8 @@
 |---|---|---|---|---|
 | **A** | 구조 전용 baseline(존재 시 assertion · 부재 시 canonical 12컬럼 생성) + **별도** canonical 최소 seed migration(system 1 + 서비스 19 + bare 4, `ON CONFLICT (name) DO NOTHING`) | 스키마/데이터 분리 · 선행 CHECK 의 5테이블 baseline 과 동일 패턴 · 은퇴 role 미재도입 · 운영 no-op | migration 2개 · seed 목록이 곧 정책이라 RBAC-ROLE-CATALOG-V1 갱신 WO 와 짝 필요 | **권고** |
 | B | 구조 + 최소 system role 1행을 한 migration 에 | 파일 1개 | 구조 migration 이 데이터를 만든다(선행 CHECK 계약 위반 · 테스트 `INSERT 0` 규칙과 충돌) · 서비스 role 은 어차피 별도 | 불채택 |
-| C | 41행 전체 snapshot | 운영과 동일 | DEPRECATED 5 · ORPHAN 7 · DECISION 4 를 canonical 로 승격 · glycopharm 잔재 형태의 bare 행을 "정본" 으로 고정 | **불채택** (사용자 규칙과 일치) |
-| D | 기존 per-service seed migration 에 의존 | 추가 없음 | ExtendRolesTable 이 `roles` 를 만들지 않고 glycopharm/glucoseview 를 seed 함 · kpa/neture/cosmetics/platform 은 독립 seed 가 없음 · §4-2 순서 결함으로 fresh 에서 어차피 실행 불가 | 불채택 |
+| C | 41행 전체 snapshot | 운영과 동일 | DEPRECATED 5 · ORPHAN 7 · DECISION 4 를 canonical 로 승격 잔재 형태의 bare 행을 "정본" 으로 고정 | **불채택** (사용자 규칙과 일치) |
+| D | 기존 per-service seed migration 에 의존 | 추가 없음 | ExtendRolesTable 이 `roles` 를 만들지 않고 glucoseview 를 seed 함 · kpa/neture/cosmetics/platform 은 독립 seed 가 없음 · §4-2 순서 결함으로 fresh 에서 어차피 실행 불가 | 불채택 |
 
 A 안 전제: (1) `ExtendRolesTable` 은 실행 완료 migration 이므로 수정하지 않는다 — 새 baseline 이 fresh 에서 그보다 **먼저** 실행되도록 순서를 보장해야 하는데 §4-2 의 TypeORM 정렬 결함 때문에 타임스탬프만으로는 보장할 수 없다 → 순서 결함 WO 가 선행하거나, baseline 을 "존재 시 canonical 로 수렴(legacy 컬럼 무시)" 로 설계해 순서 무관하게 만들어야 한다. (2) seed migration 은 `is_system=true` 여부 · `is_assignable` 값을 §7 판정에 맞춰 명시한다.
 

@@ -3,7 +3,7 @@
  *
  * WO-O4O-KCOSMETICS-STORE-PROFILE-EDIT-PAGE-V1
  * WO-O4O-CROSS-SERVICE-PROFILE-COMMONIZATION-V1:
- *   GlycoPharm `PharmacyInfoPage` 와 95% 동일하던 화면 본문(475줄)을
+ *   화면 본문(475줄)을
  *   `@o4o/account-ui` 의 `BusinessProfileSection` 으로 수렴.
  *   이 파일은 용어(매장) · accent · API adapter 만 남긴다.
  *

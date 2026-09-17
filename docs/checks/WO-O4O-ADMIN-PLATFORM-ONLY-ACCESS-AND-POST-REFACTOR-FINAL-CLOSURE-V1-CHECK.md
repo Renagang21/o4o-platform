@@ -13,7 +13,7 @@
 `admin.neture.co.kr` 을 O4O 플랫폼 전체 관리자 전용 사이트로 확정했다.
 진입 floor 를 legacy `admin` 에서 canonical `platform:super_admin` 으로 좁혔고,
 잠금 사고 없이 `sohae2100` 의 canonical 역할을 정렬했다.
-`/partnerops/*` 프런트 잔재 8 라우트를 제거했고, GlycoPharm 타입 잔재는 활성 소스에 0 임을 확인했다.
+`/partnerops/*` 프런트 잔재 8 라우트를 제거했고 타입 잔재는 활성 소스에 0 임을 확인했다.
 
 **데이터(역할) 변경과 코드 변경은 서로 다른 시점·다른 경로의 작업이다. 아래 §1 과 §2 로 분리해 기록한다.**
 
@@ -115,9 +115,9 @@ platform 전용 메뉴는 추가로 명시 role 을 선언한다.
 - `appsCatalog.ts` 의 `partnerops` appId 엔트리
 - **`app_registry` 의 활성 `partnerops` row — 운영 데이터이므로 WO §6.2 에 따라 삭제 중지·보고**
 
-### 2.5 B축 · GlycoPharm 잔재 (`insight-rules.ts`)
+### 2.5 B축 잔재 (`insight-rules.ts`)
 
-활성 소스에서 GlycoPharm 서비스 계약 **0건**. fallback·placeholder·default 로 재추가하지 않았다.
+fallback·placeholder·default 로 재추가하지 않았다.
 `SERVICE_LINKS` 키와 `AIServiceId` union 의 exhaustiveness 를 회귀 테스트로 고정했다.
 
 ### 2.6 회귀 테스트 (신규)
@@ -129,7 +129,6 @@ platform 전용 메뉴는 추가로 명시 role 을 선언한다.
 - 거부가 redirect 아닌 안내 화면인지 (login loop 금지)
 - 메뉴가 "설정 없음 = 허용" 에 기대지 않는지 (백엔드 `ADMIN_ROLES` 대조 포함)
 - `/partnerops/*` 프런트 잔재 0
-- 활성 소스 GlycoPharm 서비스 계약 0
 
 주의: 소스 문자열 단언 테스트라 **제거 근거 주석에 남은 식별자가 오탐**된다.
 주석 제거 시 일반 블록 주석 정규식을 쓰면 라우트 선언의 `path="/*"` 를 주석 시작으로 오인해
@@ -287,8 +286,6 @@ PARTNEROPS_ACTIVE_MENU                = ZERO
 PARTNEROPS_ACTIVE_ROUTES              = ZERO
 PARTNEROPS_ACTIVE_CONSUMERS           = ZERO
 PARTNEROPS_PRODUCTION_404_RESIDUAL    = ZERO
-GLYCOPHARM_ACTIVE_INSIGHT_RULE        = ZERO
-GLYCOPHARM_ACTIVE_TYPE_CONTRACT       = ZERO
 RELATED_PACKAGE_TYPECHECK             = PASS
 CI_COVERAGE_GAP                       = CLOSED_OR_JUSTIFIED
 OTHER_SERVICE_REGRESSION              = PASS

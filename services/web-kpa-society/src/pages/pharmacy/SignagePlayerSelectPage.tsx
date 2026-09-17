@@ -8,7 +8,7 @@
  * + 현재 활성 스케줄 배너 → 스케줄 기준 재생
  *
  * WO-O4O-MY-STORE-REMAINING-FEATURE-VIEW-COMMONIZATION-V1 §5-B:
- *   목록·검색·표·재생 동선은 KCos/GP 사본과 완전히 동일했다(VIEW_DUPLICATED).
+ *   목록·검색·표·재생 동선은 KCos 사본과 완전히 동일했다(VIEW_DUPLICATED).
  *   공통 SignagePlayerSelectView 로 이관하고, KPA 에만 있는 활성 스케줄 배너는 headerExtra slot,
  *   송출 대상 다중 선택은 rowSelection prop 으로 주입한다. 문구·동작 변경 없음.
  */

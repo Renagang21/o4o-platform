@@ -150,7 +150,7 @@ controller(`shared-product-description.controller.ts`) create catch: `empty afte
 ## 14. 작업 규칙 준수 / 다른 세션 WIP
 
 - path-specific stage(본 WO 파일만). `git add .` **미사용**.
-- 작업 중 working tree 에 **다른 세션 WIP** 감지(`partner-contract.service.ts`, `web-glycopharm/web-k-cosmetics operatorMenuGroups.ts`, `web-neture supplier*` — `wip-not-mine-cross-session` stash). 스테이지에서 제외 의도.
+- 작업 중 working tree 에 **다른 세션 WIP** 감지. 스테이지에서 제외 의도.
 
 ### 14-A. Mixed commit 발생 (커밋 위생 이슈 — 기능/빌드 영향 없음)
 

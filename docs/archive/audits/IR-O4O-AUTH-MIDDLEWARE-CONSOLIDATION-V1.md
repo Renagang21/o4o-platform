@@ -250,7 +250,6 @@ requireAdmin:
 |--------|-------|--------|-----------|
 | **Neture** | `requireNetureScope` | `NETURE_SCOPE_CONFIG` | `middleware/neture-scope.middleware.ts:12` |
 | **KPA** | `requireKpaScope` | `KPA_SCOPE_CONFIG` | `routes/kpa/kpa.routes.ts:131` |
-| **GlycoPharm** | `requireGlycopharmScope` | `GLYCOPHARM_SCOPE_CONFIG` | `routes/glycopharm/glycopharm.routes.ts:69` |
 | **K-Cosmetics** | `requireCosmeticsScope` | `COSMETICS_SCOPE_CONFIG` | `routes/cosmetics/cosmetics.routes.ts:49` |
 | **GlucoseView** | `requireGlucoseViewScope` | `GLUCOSEVIEW_SCOPE_CONFIG` | `routes/glucoseview/glucoseview.routes.ts:36` |
 | **KPA LMS** | `kpaLmsScopeGuard` | (특수) | `middleware/kpa-lms-scope-guard.ts:64` |
@@ -290,7 +289,7 @@ Request → createMembershipScopeGuard
 |------|------|------|
 | **Bare role** | `admin`, `operator`, `user` | Platform 레벨 역할 |
 | **Platform-prefixed** | `platform:admin`, `platform:super_admin` | Platform 명시적 역할 |
-| **Service-prefixed** | `neture:operator`, `kpa:admin`, `glycopharm:admin` | Service 레벨 역할 |
+| **Service-prefixed** | `neture:operator`, `kpa:admin` | Service 레벨 역할 |
 | **Legacy enum** | `UserRole.ADMIN = 'admin'` | `types/auth.ts` Enum |
 
 ### 7.2 서비스별 역할 목록
@@ -301,7 +300,6 @@ Request → createMembershipScopeGuard
 | **Platform (prefixed)** | `platform:admin`, `platform:super_admin` |
 | **Neture** | `neture:admin`, `neture:operator`, `neture:supplier`, `neture:seller`, `neture:partner` |
 | **KPA** | `kpa:admin`, `kpa:operator`, `kpa:pharmacist`, `kpa:branch_admin` |
-| **GlycoPharm** | `glycopharm:admin`, `glycopharm:operator`, `glycopharm:pharmacist` |
 | **K-Cosmetics** | `cosmetics:admin`, `cosmetics:operator` |
 | **GlucoseView** | `glucoseview:admin`, `glucoseview:operator` |
 | **Commerce** | `supplier`, `seller`, `partner`, `affiliate`, `vendor`, `business` |
@@ -623,7 +621,6 @@ requireRole([
 |--------|-------------|-----------------|----------------|
 | Neture | `neture` | true | `neture:admin`, `neture:operator` |
 | KPA | `kpa` | false | `kpa:admin`, `kpa:operator`, `kpa:pharmacist`, `kpa:branch_admin` |
-| GlycoPharm | `glycopharm` | true | `glycopharm:admin`, `glycopharm:operator`, `glycopharm:pharmacist` |
 | K-Cosmetics | `cosmetics` | true | `cosmetics:admin`, `cosmetics:operator` |
 | GlucoseView | `glucoseview` | true | `glucoseview:admin`, `glucoseview:operator` |
 

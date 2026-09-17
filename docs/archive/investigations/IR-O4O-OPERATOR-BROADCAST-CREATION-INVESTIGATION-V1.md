@@ -47,7 +47,7 @@ Q4 (Admin vs Operator):     3단계 역할 분리 (admin / service_admin+operato
 | 역할 | Role 예시 | authorRole | visibilityScope | serviceKey |
 |------|----------|:----------:|:---------------:|:----------:|
 | **Platform Admin** | `platform:admin`, `platform:super_admin` | `'admin'` | 사용자 선택 (기본: `'platform'`) | 선택 (생략 가능) |
-| **Service Admin** | `glycopharm:admin`, `kpa:admin` | `'service_admin'` | `'service'` (강제) | 필수 |
+| **Service Admin** | `kpa:admin` | `'service_admin'` | `'service'` (강제) | 필수 |
 | **Supplier** | `supplier`, `*:supplier` | `'supplier'` | `'service'` (강제) | 필수 |
 
 ### authorRole 결정 로직
@@ -181,7 +181,7 @@ WHERE serviceKey = $1
 │  권한: 모든 서비스, 모든 기능                           │
 ├─────────────────────────────────────────────────────┤
 │  Level 2: Service Admin / Operator                   │
-│  CMS Roles: glycopharm:admin, kpa:admin 등           │
+│  CMS Roles: kpa:admin 등                             │
 │  Signage Roles: signage:{serviceKey}:operator        │
 │  CMS: authorRole='service_admin', visibility='service'│
 │  Signage: source='hq', scope='global'                │
@@ -246,7 +246,6 @@ WHERE serviceKey = $1
 |------|------|------|
 | `apps/admin-dashboard/src/pages/cms/contents/ContentFormModal.tsx` | 플랫폼 관리자 CMS 편집 | Platform Admin |
 | `services/web-kpa-society/src/pages/operator/ContentManagementPage.tsx` | KPA 운영자 공지/뉴스 | kpa:operator / kpa:admin |
-| `services/web-glycopharm/src/pages/partner/ContentPage.tsx` | GlycoPharm 파트너 콘텐츠 | glycopharm:partner |
 | `services/web-k-cosmetics/src/pages/partner/ContentPage.tsx` | K-Cosmetics 파트너 콘텐츠 | Partner role |
 
 ### Signage 편집기
@@ -256,7 +255,6 @@ WHERE serviceKey = $1
 | `apps/admin-dashboard/src/pages/digital-signage/v2/hq/HQContentManager.tsx` | **HQ 글로벌 콘텐츠 생성** | Platform Admin / Operator |
 | `apps/admin-dashboard/src/pages/digital-signage/v2/store/StoreSignageDashboard.tsx` | 매장 로컬 사이니지 관리 | Store User |
 | `services/web-kpa-society/src/pages/signage/ContentHubPage.tsx` | 글로벌 콘텐츠 **소비** (복사) | Store User |
-| `services/web-glycopharm/src/pages/pharmacy/signage/MySignagePage.tsx` | 약국 로컬 사이니지 관리 | Pharmacy Operator |
 
 ---
 

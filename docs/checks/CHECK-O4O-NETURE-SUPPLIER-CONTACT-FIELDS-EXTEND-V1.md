@@ -70,7 +70,7 @@ WO 가드("두 의미가 충돌하면 무리하게 같은 컬럼에 합치지 �
 
 ## 7. 비범위
 
-- DB migration / neture_suppliers schema 변경 / operator UI / 4서비스 UI alignment / GlycoPharm·K-Cosmetics·KPA UI / 주소 정렬 / 기존 phone·contactPhone·managerPhone·taxInvoiceEmail 의미 변경 / Neture supplier 외부공개 연락처 정책 변경 — 전부 비범위.
+- DB migration / neture_suppliers schema 변경 / operator UI / 3서비스 UI alignment / K-Cosmetics·KPA UI / 주소 정렬 / 기존 phone·contactPhone·managerPhone·taxInvoiceEmail 의미 변경 / Neture supplier 외부공개 연락처 정책 변경 — 전부 비범위.
 
 ---
 

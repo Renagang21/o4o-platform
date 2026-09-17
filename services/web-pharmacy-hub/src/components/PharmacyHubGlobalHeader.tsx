@@ -44,7 +44,7 @@ export function PharmacyHubGlobalHeader() {
    * WO-O4O-PHARMACYHUB-ADMIN-OPERATOR-DUAL-AREA-ADOPTION-AND-PRODUCTION-CLOSURE-V1
    *
    * admin 과 operator 는 **독립 업무 영역**이다. admin 이 operator API 를 쓸 수 있다는
-   * 이유로 메뉴를 하나로 합치지 않는다 (K-Cosmetics / GlycoPharm / Neture 와 같은 계약).
+   * 이유로 메뉴를 하나로 합치지 않는다 (K-Cosmetics / Neture 와 같은 계약).
    * 두 역할을 모두 만족하면 두 항목이 모두 보인다.
    */
   const isAdmin = isAuthenticated && satisfiesRole(roles, ROLES.admin);
@@ -61,7 +61,7 @@ export function PharmacyHubGlobalHeader() {
    *   강사 진입점은 **실제 `lms:instructor` 보유자에게만** 노출한다.
    *   admin/operator 도 route guard 는 통과하지만(운영 목적 진입),
    *   관리자라는 이유로 강의 대시보드를 메뉴에 띄우지 않는다
-   *   (KPA / GlycoPharm / K-Cosmetics canonical 정합 — 메뉴 오염 방지).
+   *   (KPA / K-Cosmetics canonical 정합 — 메뉴 오염 방지).
    */
   const isInstructor = isAuthenticated && roles.includes('lms:instructor');
 

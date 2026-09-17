@@ -146,7 +146,7 @@
 | **DB** | 변경 없음 |
 | **공개 URL/모바일** | **이미 정상**. `/qr/{slug}` public route, `GET /qr/public/:slug` 무인증, mobile-first 설계(420px max-width) — 추가 작업 불필요 |
 | **운영 데이터** | `store_qr_codes` row 영향 없음 |
-| **다른 서비스** | KPA 단독 (web-kpa-society) — neture/glycopharm/k-cosmetics 영향 없음 |
+| **다른 서비스** | — |
 | **테스트** | smoke 수준: 자료함 → 제작 시작 → QR → 생성 → /qr/{slug} 접근 |
 
 ---

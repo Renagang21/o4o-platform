@@ -52,7 +52,7 @@ legacy 전용 backend 는 `store-pop.controller.ts` 이며 이것은 제거했�
 | 요청 | 건수 | 비고 |
 |---|---|---|
 | `POST /api/v1/*/pharmacy/pop/generate` | **0** | GET 404 1건(9/10, 조사 세션의 probe) 뿐 |
-| `GET /api/v1/*/pharmacy/pop/source/supplier-items` | 19 | 전부 2026-08-13~19, cosmetics/glycopharm legacy 페이지 마운트 fetch. glycopharm 은 이미 제거됨 |
+| `GET /api/v1/*/pharmacy/pop/source/supplier-items` | 19 | — |
 
 → 외부/public consumer 없음. **중지 조건 5개 모두 해당 없음**
 (외부 consumer 0 / HUB handoff 는 `marketing/pop/library` staff page 가 담당(legacy page 불필요) / KCos deep-link 는 V2 redirect 로 치환 / schema 변경 불필요 / 병렬 세션 충돌 없음).

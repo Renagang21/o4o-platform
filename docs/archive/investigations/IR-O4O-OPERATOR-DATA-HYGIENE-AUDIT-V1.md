@@ -236,7 +236,6 @@ WHERE role = 'super_admin';
 | `neture-operator@o4o.com` | `neture:operator` | [] | [`neture:operator`] |
 | `kcos-operator@o4o.com` | `cosmetics:operator` | [] | [`cosmetics:operator`] |
 | `kcos-admin@o4o.com` | `cosmetics:admin` | [] | [`cosmetics:admin`] |
-| `glyco-operator@o4o.com` | `glycopharm:operator` | [] | [`glycopharm:operator`] |
 
 W1 이 4 계정 모두 reactivate 완료 (CHECK §1.2).
 
@@ -260,7 +259,7 @@ W1 이 4 계정 모두 reactivate 완료 (CHECK §1.2).
 | ...000005 | neture-operator | neture:operator | 2026-05-18 01:29, 2026-05-19 02:20 | Neture admin OperatorsPage 의 비활성화 액션 (commit `97759f002` 직전 코드 경로) |
 | ...000007 | kcos-operator | cosmetics:operator | 2026-05-19 02:09 / 02:10 | 동일 패턴의 Cosmetics 측 operator 비활성화 |
 | ...000006 | kcos-admin | cosmetics:admin | 30 일 내 로그 없음 | 30 일 전 발생 (로그 retention 밖) 또는 다른 경로 |
-| ...000008 | glyco-operator | glycopharm:operator | 30 일 내 로그 없음 | 동일 |
+| ...000008 | — | — | 30 일 내 로그 없음 | 동일 |
 
 #### 출처 코드 (W1 이전, 2026-05-19 fix 직전 버전)
 
@@ -279,7 +278,6 @@ W1 이 4 계정 모두 reactivate 완료 (CHECK §1.2).
 | neture-operator | Neture admin UI 의 운영자 비활성화 액션 (commit `97759f002` 직전 코드) |
 | kcos-operator | Cosmetics 측 운영자 비활성화 액션 (동일 패턴) |
 | kcos-admin | 30 일 전 사건 — 코드 history 로 보아 동일 카테고리 |
-| glyco-operator | 동일 |
 
 → **공통 원인**: W1 이전 시점, 운영자 비활성화/재활성화 UX 가 RA 만 deactivate 하고 reactivate 흐름이 미정비 상태였음. 운영자가 수동 테스트 차원에서 비활성화한 4 계정이 reactivate 되지 않은 채 잔존.
 
@@ -457,7 +455,6 @@ gcloud logging read 'resource.type=cloud_run_revision
 apps/api-server/src/database/migrations/
   20260216200001-CreateKpaAdminAccount.ts                  (legacy, dropped columns 참조)
   20260326300000-DeactivateQualificationRoles.ts           (kpa:pharmacist/student soft-deactivate)
-  20260331400000-UnifyGlycopharmRolesCatalog.ts            (admin/operator 제외)
   20260331500000-UnifyCosmeticsRolesCatalog.ts             (동일)
   20260404500000-FixKpaAdminRole.ts                        (admin-kpa-society@o4o.com 전용)
   20260901000000-CleanupKCosmeticsSellerRole.ts            (seller variants only)

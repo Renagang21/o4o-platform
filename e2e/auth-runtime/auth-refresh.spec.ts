@@ -10,7 +10,7 @@
  * - K-Cosmetics lazy session: protected route에서 checkSession 정상 트리거
  *
  * 환경변수 필요 (서비스별 분리):
- *   E2E_{KPA|KCOS|NETURE|GLYCO}_ADMIN_EMAIL / _PASSWORD
+ *   E2E_{KPA|KCOS|NETURE}_ADMIN_EMAIL / _PASSWORD
  *
  * WO-O4O-KPA-AUTH-RUNTIME-E2E-LOGIN-REGRESSION-ROOT-CAUSE-AND-CI-CLOSURE-V1
  * 세션 복원 판정도 URL 문자열이 아니라 인증 상태로 한다.

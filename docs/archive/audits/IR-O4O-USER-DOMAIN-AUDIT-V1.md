@@ -4,7 +4,7 @@
 >
 > Date: 2026-03-16
 > Status: Complete
-> 근거: IR-GLYCOPHARM-OPERATOR-SYSTEM-AUDIT-V1 (P0 문제 발견)
+> 근거: (P0 문제 발견)
 
 ---
 
@@ -154,13 +154,12 @@ const queryBuilder = userRepository.createQueryBuilder('user');
 | `partner.service.ts` L296 | `JOIN users ON partner_commissions` | NO | MEDIUM (전 서비스 파트너) |
 | `partner.service.ts` L539 | `JOIN users ON partner_settlements` | NO | MEDIUM (전 서비스 정산) |
 
-### 4-2. GlycoPharm / GlucoseView
+### 4-2. GlucoseView
 
 | 쿼리 위치 | 패턴 | 격리 | 판정 |
 |-----------|------|:----:|------|
 | `patient-coaching.controller.ts` | `glucoseview_customers` 전용 테이블 | YES | SAFE |
 | `pharmacist.service.ts` | `glucoseview_pharmacists` 전용 테이블 | YES | SAFE |
-| GlycoPharm Care 모듈 | `care-pharmacy-context.middleware.ts` 조직 기반 | YES | SAFE |
 
 ### 4-3. KPA
 
@@ -282,7 +281,7 @@ role_assignments
 | `/api/v1/operator/members` | service_memberships EXISTS | **정상** |
 | Neture 가입 관리 | `service_key = 'neture'` 하드코딩 | **정상** |
 | KPA 멤버 관리 | `organization_id` 필터 | **정상** |
-| GlycoPharm/GlucoseView | 도메인 전용 테이블 | **정상** |
+| GlucoseView | 도메인 전용 테이블 | **정상** |
 | Auth 로그인/가입 | email unique + service_memberships | **정상** |
 
 ### 8-2. 문제 영역
@@ -348,7 +347,6 @@ role_assignments
 | `docs/rbac/RBAC-FREEZE-DECLARATION-V1.md` | RBAC SSOT 선언 (F9) |
 | `docs/architecture/O4O-CORE-FREEZE-V1.md` | Core 모듈 동결 (F10) |
 | `docs/platform/operator/OPERATOR-DASHBOARD-STANDARD-V1.md` | Admin/Operator 역할 분리 표준 |
-| `docs/audit/IR-GLYCOPHARM-OPERATOR-SYSTEM-AUDIT-V1.md` | 선행 조사 (P0 문제 발견) |
 
 ---
 

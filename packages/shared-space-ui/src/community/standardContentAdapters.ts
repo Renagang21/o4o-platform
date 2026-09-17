@@ -3,7 +3,7 @@
  *
  * WO-O4O-COMMUNITY-CONTENT-RESOURCE-FRONTEND-VIEW-COMMONIZATION-V1
  *
- * KPA / K-Cosmetics / GlycoPharm 의 `api/content.ts` 는 동일한 표준 레코드 shape
+ * KPA / K-Cosmetics 의 `api/content.ts` 는 동일한 표준 레코드 shape
  * (`id · title · summary · author_name · created_at · view_count · status · body · tags`)를 쓴다.
  * 서비스 wrapper 마다 복제되던 상태 라벨 · 날짜 포맷 · 배지 매핑을 한 곳에 고정한다.
  *

@@ -21,7 +21,7 @@ PharmacyHub operator/supplier
 → 조회 + 비밀번호 변경 가능
 → 이름/닉네임/연락처 수정 불가
 
-GP / KCos / Neture
+KCos / Neture
 → frontend는 PUT /api/v1/users/profile 호출
 → backend canonical self-profile route 부재
 → 일반 사용자 저장 실패 가능
@@ -33,7 +33,7 @@ GP / KCos / Neture
 self-profile write 전체 census
 → canonical 계약 확정
 → backend 구현
-→ GP/KCos/Neture/PH adoption
+→ KCos/Neture/PH adoption
 → KPA 회귀 확인
 → 보안/권한 검증
 → production 검증
@@ -129,7 +129,6 @@ UserController / UserManagementController
 /users/password
 /pharmacy-hub/store-owner/account/profile
 KPA mypage profile
-GP mypage
 KCos mypage
 Neture profile
 ```
@@ -138,7 +137,6 @@ Neture profile
 
 ```text
 KPA MyProfilePage / api/mypage
-GP MyProfilePage / api
 KCos MyProfilePage / api
 Neture MyProfilePage / api
 PharmacyHub MyProfilePage / account api
@@ -313,14 +311,13 @@ StoreOwnerGuard나 backend scope를 완화해 우회하지 않는다.
 
 ---
 
-## 9. GP / KCos / Neture adoption
+## 9. KCos / Neture adoption
 
 각 서비스 Profile Core의 save adapter를 canonical self-profile endpoint로 정렬한다.
 
 목표:
 
 ```text
-GP       → ACCOUNT_CORE save 정상
 KCos     → ACCOUNT_CORE save 정상
 Neture   → ACCOUNT_CORE save 정상
 ```
@@ -426,7 +423,6 @@ operator → admin
 ```text
 unauthenticated → 401
 
-authenticated GP user → self profile update 200
 authenticated KCos user → 200
 authenticated Neture user → 200
 authenticated PH operator → 200
@@ -444,17 +440,6 @@ cross-user update → 불가
 ## 13. Production browser smoke
 
 배포 후 실제 브라우저 검증한다.
-
-### GlycoPharm
-
-```text
-login
-→ Profile
-→ 이름/연락처/닉네임 수정
-→ 저장
-→ 새로고침
-→ 값 유지
-```
 
 ### K-Cosmetics
 
@@ -611,7 +596,6 @@ frontend:
 ```text
 @o4o/account-ui build
 KPA tsc
-GP tsc
 KCos tsc
 Neture tsc
 PharmacyHub tsc/build
@@ -629,7 +613,6 @@ PharmacyHub tsc/build
 self-profile write census 미조사 0
 canonical endpoint 1개 확정
 
-GP 일반 사용자 save PASS
 KCos 일반 사용자 save PASS
 Neture 일반 사용자 save PASS
 PH operator save PASS

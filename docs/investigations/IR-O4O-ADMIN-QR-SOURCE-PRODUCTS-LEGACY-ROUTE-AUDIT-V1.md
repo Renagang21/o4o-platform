@@ -65,7 +65,7 @@ https://api.neture.co.kr/api/v1  +  /pharmacy/qr/source/products
 ```
 
 **접두 조립 자체는 정상이다.** LMS 건(`/api` 이중 접두)과 성격이 다르다.
-문제는 **경로에 service segment(`/kpa` · `/glycopharm` · `/cosmetics`)가 없다**는 점이다.
+문제는 **경로에 service segment(`/kpa` · `/cosmetics`)가 없다**는 점이다.
 
 프로덕션 실측 (미인증 GET · 상태코드만 확인, 조회 결과 없음):
 
@@ -73,7 +73,6 @@ https://api.neture.co.kr/api/v1  +  /pharmacy/qr/source/products
 |---|:---:|---|
 | `/api/v1/pharmacy/qr/source/products` | **404** | route 없음 |
 | `/api/v1/kpa/pharmacy/qr/source/products` | **401** | **route 존재** (가드가 인터셉트) |
-| `/api/v1/glycopharm/pharmacy/qr/source/products` | **401** | route 존재 |
 | `/api/v1/cosmetics/pharmacy/qr/source/products` | **401** | route 존재 |
 | `/api/v1/pharmacy/qr` | **404** | route 없음 |
 | `/api/v1/kpa/pharmacy/qr` | **401** | route 존재 |
@@ -100,10 +99,9 @@ https://api.neture.co.kr/api/v1  +  /pharmacy/qr/source/products
 | mount | 파일 |
 |---|---|
 | `router.use('/', createStoreQrLandingController(…, 'kpa'))` | `routes/kpa/kpa.routes.ts:437` |
-| `… 'glycopharm'` | `routes/glycopharm/glycopharm.routes.ts:406` |
 | `… 'cosmetics'` | `routes/cosmetics/cosmetics.routes.ts:173` |
 
-`bootstrap/register-routes.ts` 는 이 라우터들을 `/api/v1/kpa` · `/api/v1/glycopharm` · `/api/v1/cosmetics`
+`bootstrap/register-routes.ts` 는 이 라우터들을 `/api/v1/kpa` · `/api/v1/cosmetics`
 에 마운트한다. **`/api/v1/pharmacy` 마운트는 존재하지 않으며, git 이력상 존재한 적도 없다**
 (`git log -S"'/api/v1/pharmacy'"` — bootstrap 계열 0건).
 
@@ -130,7 +128,6 @@ SELECT spo.id, COALESCE(pm.name, pm.regulatory_name,'Unknown') AS name,
 | 소비 주체 | 경로 | 파일 |
 |---|---|---|
 | KPA 매장 | `/api/v1/kpa/pharmacy/qr/*` | `services/web-kpa-society/src/api/storeQr.ts` |
-| GlycoPharm 매장 | `/api/v1/glycopharm/pharmacy/qr/*` | `services/web-glycopharm/src/pages/store/StoreQrPage.tsx` |
 | K-Cosmetics 매장 | `/api/v1/cosmetics/pharmacy/qr/*` | `services/web-k-cosmetics/src/pages/store/StoreQrPage.tsx` |
 | Pharmacy-Hub 매장 | `/api/v1/pharmacy-hub/store-owner/qr/*` | `controllers/pharmacy-hub/PharmacyHubStoreQrController.ts` |
 | **admin-dashboard** | `/api/v1/pharmacy/qr/*` | **어디에도 마운트되지 않음 → 404** |
@@ -186,11 +183,11 @@ SELECT spo.id, COALESCE(pm.name, pm.regulatory_name,'Unknown') AS name,
 ### **REPLACE** (route 복구 단독은 부적절)
 
 - **REMOVE 아님** — 백엔드 route 는 canonical 로 살아 있고 3개 서비스 매장 프론트가 실사용 중이다.
-  route 를 지우면 KPA·GlycoPharm·K-Cosmetics 매장 QR 이 깨진다.
+  route 를 지우면 KPA·K-Cosmetics 매장 QR 이 깨진다.
 - **단순 PRODUCE 아님** — `/kpa` 를 붙이면 401 은 넘겠지만 다음 3가지가 미해결로 남는다.
   1. **주체 축**: admin-dashboard 는 운영자/관리자 콘솔이고 이 route 의 가드는 `store_owner` 다.
      운영자 계정이 `organization_members` `LIMIT 1` 로 어떤 매장에 붙을지 보장이 없다(§6-1).
-  2. **서비스 축**: admin-dashboard 는 cross-service 콘솔이라 `kpa` / `glycopharm` / `cosmetics`
+  2. **서비스 축**: admin-dashboard 는 cross-service 콘솔이라 `kpa` / `cosmetics`
      중 무엇을 붙일지는 코드가 아니라 **정책 결정**이다.
   3. **소스 축**: `supplier_product_offers` 를 QR 소스로 쓰는 것은 최신 canonical 이 채택하지 않은 방향이다(§6-1).
 - 따라서 **화면을 유지한다면** 소스와 경로를 현행 canonical 로 교체해야 하고,

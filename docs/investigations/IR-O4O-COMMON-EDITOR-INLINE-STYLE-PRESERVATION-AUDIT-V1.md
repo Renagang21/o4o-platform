@@ -81,7 +81,6 @@ setHtmlSource(html);
 ```
 services/web-kpa-society  27
 services/web-neture       14
-services/web-glycopharm   14
 apps/admin-dashboard      13
 services/web-k-cosmetics  11
 apps/main-site             7
@@ -114,7 +113,7 @@ packages/store-ui-core / forum-core / shortcodes / tablet-kiosk-core …
 
 ## 7. 권장 다음 단계
 
-1. 본 IR 기준 **WO 발의** (Shared Module Change Protocol 적용): 모든 소비처(KPA/GP/KCos/Neture admin·operator·store) 영향 매트릭스 + 회귀 시나리오 정의.
+1. 본 IR 기준 **WO 발의** (Shared Module Change Protocol 적용): 모든 소비처(KPA/KCos/Neture admin·operator·store) 영향 매트릭스 + 회귀 시나리오 정의.
 2. 방안 B 시제: HTML 작성 콘텐츠의 raw 보존 경로 + 편집탭 진입 시 경고/모드 고정.
 3. 회귀 검증: 각 서비스 대표 편집 화면에서 기존 콘텐츠 편집·저장이 깨지지 않는지(색/정렬/이미지/유튜브 보존, 빈 본문 판정).
 

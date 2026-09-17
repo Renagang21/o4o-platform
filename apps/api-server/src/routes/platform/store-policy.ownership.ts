@@ -81,9 +81,6 @@ export async function isStoreOwner(
     }
   }
 
-  // Legacy(조직 생성자) 축 — REMOVED (WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1)
-  //   serviceKey='glycopharm' 전용 분기였다. 서비스 삭제로 도달 불가.
-
   return false;
 }
 

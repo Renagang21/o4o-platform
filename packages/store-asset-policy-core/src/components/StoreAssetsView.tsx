@@ -3,16 +3,16 @@
  *
  * WO-O4O-MY-STORE-REMAINING-FEATURE-VIEW-COMMONIZATION-V1
  *
- * KPA / K-Cosmetics / GlycoPharm 세 서비스의 StoreAssetsPage 는 화면(StoreAssetsPanel)은
+ * KPA / K-Cosmetics 두 서비스의 StoreAssetsPage 는 화면(StoreAssetsPanel)은
  * 이미 공통이었지만 **조회·상태전이 controller 가 3벌 복제**되어 있었다
- * (KCos 94L · GP 93L 은 주석을 빼면 동일, KPA 155L 은 여기에 실패 안내 배너만 추가).
+ * (KCos 94L 기준, KPA 155L 은 여기에 실패 안내 배너만 추가).
  * 이 View 가 그 controller 를 한 곳으로 모은다 — API 클라이언트만 주입받는다.
  *
  * 상태 전이 계약은 그대로다: draft → published → hidden → draft 순환,
  * isForced 항목은 전이 불가(canToggleStatus), 실패 시 publishStatus 미갱신(성공 위장 금지).
  *
  * 실패 안내는 KPA 동작(WO-O4O-KPA-STORE-SILENT-ERROR-UX-STANDARDIZATION-V1)을 공통 기본값으로
- * 채택한다. 기존 KCos/GP 의 "조용한 실패"는 사용자가 결과를 알 수 없던 결함이므로 유지하지 않는다.
+ * 채택한다. 기존 KCos 의 "조용한 실패"는 사용자가 결과를 알 수 없던 결함이므로 유지하지 않는다.
  */
 
 import { useState, useCallback, useEffect } from 'react';

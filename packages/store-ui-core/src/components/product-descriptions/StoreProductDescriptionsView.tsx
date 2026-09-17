@@ -7,7 +7,7 @@
  *   WO-O4O-PRODUCT-DESCRIPTION-GUIDE-NOTICE-V1 (공용 상품 DB 정책 안내)
  *   WO-O4O-PRODUCTION-TEMPLATE-REGISTRY-CROSSSERVICE-PHASE2-J-V1 (서비스별 template registry)
  *
- * K-Cosmetics/GlycoPharm 사본의 차이는 사용자-facing 명사(매장/약국)와 localProduct API import 경로뿐이었다.
+ * K-Cosmetics 사본의 차이는 사용자-facing 명사(매장/약국)와 localProduct API import 경로뿐이었다.
  *   ⚠️ 명사는 서비스가 storeNoun 으로 주입한다. 어느 한쪽으로 일괄 치환하지 않는다.
  * RichTextEditor(@o4o/content-editor)·getAccessToken(@o4o/auth-client)·template registry 는
  * store-ui-core 의존성이 아니므로 slot/prop 으로 주입받는다(신규 dependency 를 만들지 않는다).
@@ -54,7 +54,7 @@ export interface StoreProductDescriptionsApi {
  * 사용자-facing 문구.
  * WO-O4O-MY-STORE-REMAINING-VIEW-DUPLICATION-ZERO-CLEANUP-V1:
  *   KPA 채택 시 기존 KPA 문구가 조용히 바뀌지 않도록 **원문 그대로** adapter 에서 주입한다.
- *   미지정 항목은 storeNoun 기반 기존 기본값(KCos/GP 현행)이 유지된다.
+ *   미지정 항목은 storeNoun 기반 기존 기본값(KCos 현행)이 유지된다.
  */
 export interface StoreProductDescriptionsLabels {
   breadcrumbRoot: string;
@@ -77,7 +77,7 @@ export interface StoreProductDescriptionsLabels {
 /**
  * 서비스 palette.
  * KPA 는 slate 계열(`styles/theme` colors) + primary `#2563EB`,
- * KCos/GP 는 gray 계열 + accent `#0EA5E9` 를 쓴다. 원본 값을 그대로 주입한다.
+ * KCos 는 gray 계열 + accent `#0EA5E9` 를 쓴다. 원본 값을 그대로 주입한다.
  */
 export interface StoreProductDescriptionsTheme {
   /** 제목 아이콘 · 저장 버튼 · 자료함 링크 · 선택 항목 아이콘 */
@@ -97,7 +97,7 @@ export interface StoreProductDescriptionsTheme {
   templateBadgeColor: string;
 }
 
-/** KCos/GP 현행 palette (기본값 — 변경 금지) */
+/** KCos 현행 palette (기본값 — 변경 금지) */
 const DEFAULT_THEME: StoreProductDescriptionsTheme = {
   accent: '#0EA5E9',
   accentText: '#fff',
@@ -116,17 +116,17 @@ const DEFAULT_THEME: StoreProductDescriptionsTheme = {
 
 export interface StoreProductDescriptionsViewProps {
   api: StoreProductDescriptionsApi;
-  /** 사용자-facing 명사 — GlycoPharm 은 '약국', 그 외는 '매장'. labels 미지정 항목의 기본값을 만든다. */
+  /** 사용자-facing 명사 — 약국형 서비스는 '약국', 그 외는 '매장'. labels 미지정 항목의 기본값을 만든다. */
   storeNoun?: string;
   /** 서비스별 문구 override (미지정 시 storeNoun 기반 기본값) */
   labels?: Partial<StoreProductDescriptionsLabels>;
-  /** 서비스별 palette override (미지정 시 KCos/GP 현행 값) */
+  /** 서비스별 palette override (미지정 시 KCos 현행 값) */
   theme?: Partial<StoreProductDescriptionsTheme>;
   /** 제작 시작에서 넘어온 templateId 해석 (서비스별 registry) */
   findTemplate?: (templateId: string) => StoreDescriptionTemplate | null | undefined;
   /**
    * WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §7:
-   *   화면 안 두 링크의 basePath 가 서비스마다 다르다(KPA·GP·KCos `/store` / PharmacyHub `/store-owner`).
+   *   화면 안 두 링크의 basePath 가 서비스마다 다르다(KPA·KCos `/store` / PharmacyHub `/store-owner`).
    *   기존 하드코딩 경로를 **기본값으로 그대로 둔 optional prop** 으로 연다 — serviceKey 분기를 만들지 않는다.
    *   미주입 서비스의 링크는 이전과 완전히 동일하다.
    */
@@ -160,7 +160,7 @@ export function StoreProductDescriptionsView({
   const isNarrow = useIsNarrowViewport();
   const styles = buildStyles(t, isNarrow);
 
-  // KCos/GP 현행 문구 = storeNoun 기반 기본값. 서비스가 준 원문이 있으면 그것을 그대로 쓴다.
+  // KCos 현행 문구 = storeNoun 기반 기본값. 서비스가 준 원문이 있으면 그것을 그대로 쓴다.
   const labels: StoreProductDescriptionsLabels = {
     breadcrumbRoot: `내 ${storeNoun}`,
     breadcrumbCurrent: `${storeNoun} 상품 설명`,
@@ -528,7 +528,7 @@ export function StoreProductDescriptionsView({
 
 /**
  * 서비스 palette 를 적용한 style map.
- * 값은 KCos/GP 현행과 동일하며, theme 미주입 시 DEFAULT_THEME 로 기존과 완전히 같은 결과가 된다.
+ * 값은 KCos 현행과 동일하며, theme 미주입 시 DEFAULT_THEME 로 기존과 완전히 같은 결과가 된다.
  * 서비스 간 차이가 없는 값(경고/성공 색 등)은 토큰화하지 않고 그대로 둔다.
  */
 function buildStyles(t: StoreProductDescriptionsTheme, isNarrow = false): Record<string, CSSProperties> {

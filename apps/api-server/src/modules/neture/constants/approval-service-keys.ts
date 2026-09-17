@@ -5,7 +5,7 @@
  *
  * 배경:
  * - offer.service_keys에는 'neture' 를 포함한 모든 대상 서비스가 저장될 수 있음
- * - 하지만 **승인 요청 대상**은 운영 정책상 glycopharm / kpa-society / k-cosmetics 만
+ * - 하지만 **승인 요청 대상**은 운영 정책상 kpa-society / k-cosmetics 만
  * - 이 정책을 여러 곳에서 필터링하면 누락/불일치 위험이 있으므로 한 곳에서만 정의
  *
  * 정책 변경 시 이 파일만 수정한다.

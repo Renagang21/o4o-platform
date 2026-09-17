@@ -18,13 +18,13 @@ Neture/KPA 공개 Contact form에 개인정보 수집·이용 동의 절차를 �
 4. backend도 동의 필드 검증 (미동의 → 400, 저장·알림 없음)
 5. Neture 신규 저장부터 IP 원문 대신 hash
 6. 기존 데이터 파괴 금지 (legacy `ipAddress` 컬럼 drop 안 함)
-7. GP/KCos 미수정
+7. KCos 미수정
 
 ## 3. 작업 대상
 `apps/api-server/**`, `services/web-neture/**`, `services/web-kpa-society/**`, CHECK 문서. (공통 유틸 필요 시 `packages/**` 조건부.)
 
 ## 4. 제외
-ContactInquiry 이관 / 운영 UI 교체 / submit route 변경 / email·자동회신 구조 변경 / Admin 설정 변경 / 법정정보·약관·푸터 / GP·KCos 수정 / **기존 Neture IP 원문 데이터 일괄 삭제·변환**(후속 cleanup WO) / 개인정보처리방침 본문 작성.
+ContactInquiry 이관 / 운영 UI 교체 / submit route 변경 / email·자동회신 구조 변경 / Admin 설정 변경 / 법정정보·약관·푸터 / KCos 수정 / **기존 Neture IP 원문 데이터 일괄 삭제·변환**(후속 cleanup WO) / 개인정보처리방침 본문 작성.
 
 ## 5. 선행 상태
 Neture/KPA = 기존 저장소·운영 UI 유지 + ServiceContactSettings 기반 email·자동회신 연결됨(설정 adapter WO). 동의 체크 없음. Neture IP 원문 저장 잔존.
@@ -72,16 +72,16 @@ Neture: `POST /neture/contact`, `/admin/contact-messages`, `/operator/contact-me
 ① 동의 체크박스 ② 미동의 차단 ③ 동의 누락 API → 400 ④ 동의 후 201 ⑤ operator 목록 확인 ⑥ notification_status 기존대로 ⑦ email/autoreply 기존 동작 ⑧ 테스트 처리 ⑨ 설정 복구
 
 ## 13. 검증 기준
-1~2 동의 추가(Neture/KPA) · 3~4 backend 동의 거부 · 5 동의 후 정상 · 6 Neture hash 저장 · 7~8 email/autoreply·in-app 회귀 없음 · 9 운영 UI 유지 · 10 GP/KCos 미수정 · 11 ContactInquiry 미이관 · 12 backend tsc · 13 web tsc · 14 migration additive 적용 · 15 브라우저 smoke.
+1~2 동의 추가(Neture/KPA) · 3~4 backend 동의 거부 · 5 동의 후 정상 · 6 Neture hash 저장 · 7~8 email/autoreply·in-app 회귀 없음 · 9 운영 UI 유지 · 10 KCos 미수정 · 11 ContactInquiry 미이관 · 12 backend tsc · 13 web tsc · 14 migration additive 적용 · 15 브라우저 smoke.
 
 ## 14. 배포
 backend 변경 → API Server. Neture/KPA web 변경 → 각각. ⚠️ detect-changes가 push tip 기준 skip 가능 → 라이브 확인 + 필요 시 `workflow_dispatch` 대상 재배포.
 
 ## 15. staged 파일 가드
-`git diff --cached --name-only` 확인. 허용: `apps/api-server/**`, `services/web-neture/**`, `services/web-kpa-society/**`, CHECK. 조건부 `packages/**`. **금지: `services/web-glycopharm/**`, `services/web-k-cosmetics/**`.** commit은 명시 경로.
+`git diff --cached --name-only` 확인. 허용: `apps/api-server/**`, `services/web-neture/**`, `services/web-kpa-society/**`, CHECK. 조건부 `packages/**`.
 
 ## 16. CHECK 문서
-완료 후 `docs/checks/CHECK-O4O-CONTACT-NETURE-KPA-PRIVACY-CONSENT-V1.md` 생성. 기록: 목적·선행 반영·Neture/KPA 동의 추가·backend validation·Neture IP hash 전환·migration·기존 구조 유지·email/autoreply·in-app 회귀·GP/KCos 미수정·ContactInquiry 미사용·Neture smoke·KPA smoke·테스트 처리·검증·배포·commit hash.
+완료 후 `docs/checks/CHECK-O4O-CONTACT-NETURE-KPA-PRIVACY-CONSENT-V1.md` 생성. 기록: 목적·선행 반영·Neture/KPA 동의 추가·backend validation·Neture IP hash 전환·migration·기존 구조 유지·email/autoreply·in-app 회귀·KCos 미수정·ContactInquiry 미사용·Neture smoke·KPA smoke·테스트 처리·검증·배포·commit hash.
 
 ## 17. 후속
 1. `WO-O4O-CONTACT-NETURE-LEGACY-IP-CLEANUP-V1` — 기존 `ipAddress` 원문 보존/삭제/마스킹 정책

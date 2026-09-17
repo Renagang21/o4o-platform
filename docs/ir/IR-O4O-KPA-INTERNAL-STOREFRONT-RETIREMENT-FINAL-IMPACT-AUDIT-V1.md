@@ -16,7 +16,6 @@
 | 서비스 | storefront API 베이스 | 구현 |
 |---|---|---|
 | KPA-Society | `/api/v1/stores/*` | **플랫폼 공용** ([unified-store-public.routes.ts:44-47](apps/api-server/src/routes/platform/unified-store-public.routes.ts#L44-L47), 마운트 [register-routes.ts:323](apps/api-server/src/bootstrap/register-routes.ts#L323)) |
-| GlycoPharm | `/api/v1/glycopharm/stores/*` | **자체 컨트롤러** ([store.controller.ts](apps/api-server/src/routes/glycopharm/controllers/store.controller.ts)) — `/:slug` · `/storefront-config` · `/hero` · `/template` · `/categories` · `/products` · `/cart` · `/orders` 를 **중복 구현** |
 | K-Cosmetics | `/api/v1/cosmetics/stores/*` | 자체 — `settings` · `listings` 중심. storefront-config/hero **없음** |
 | Pharmacy-Hub | — | 플랫폼 storefront API **소비 0건** |
 
@@ -24,38 +23,38 @@
 
 ### 1-2. endpoint × 서비스 소비 매트릭스 (플랫폼 `/api/v1/stores` 기준)
 
-| endpoint | KPA | Glyco | K-Cos | PH | 판정 |
-|---|:--:|:--:|:--:|:--:|---|
-| `GET /:slug` | O | **O** | **O** | – | **CROSS-SERVICE → KEEP** |
-| `GET /:slug/layout` | O | – | – | – | KPA-only → REMOVE |
-| `GET /:slug/template` | – | – | – | – | **DEAD** |
-| `GET /:slug/storefront-config` | – | – | – | – | **DEAD** |
-| `GET /:slug/hero` | – | – | – | – | **DEAD** |
-| `GET /:slug/products/featured` | O | – | – | – | KPA-only → REMOVE |
-| `GET /:slug/products` | – | – | – | – | **DEAD** |
-| `GET /:slug/products/:id` | O | – | – | – | KPA-only → REMOVE |
-| `GET /:slug/categories` | – | – | – | – | **DEAD** |
-| `GET /:slug/blog` · `/blog/settings` · `/blog/:postSlug` | O | **O** | **O** | – | **CROSS-SERVICE → KEEP** |
-| `/:slug/tablet/*` (6개) | O | O | – | – | **CROSS-SERVICE → KEEP** |
+| endpoint | KPA | K-Cos | PH | 판정 |
+| --- | :--: | :--: | :--: | --- |
+| `GET /:slug` | O | **O** | – | **CROSS-SERVICE → KEEP** |
+| `GET /:slug/layout` | O | – | – | KPA-only → REMOVE |
+| `GET /:slug/template` | – | – | – | **DEAD** |
+| `GET /:slug/storefront-config` | – | – | – | **DEAD** |
+| `GET /:slug/hero` | – | – | – | **DEAD** |
+| `GET /:slug/products/featured` | O | – | – | KPA-only → REMOVE |
+| `GET /:slug/products` | – | – | – | **DEAD** |
+| `GET /:slug/products/:id` | O | – | – | KPA-only → REMOVE |
+| `GET /:slug/categories` | – | – | – | **DEAD** |
+| `GET /:slug/blog` · `/blog/settings` · `/blog/:postSlug` | O | **O** | – | **CROSS-SERVICE → KEEP** |
+| `/:slug/tablet/*` (6개) | O | – | – | **CROSS-SERVICE → KEEP** |
 
 **근거**
 
 - `GET /:slug` 가 cross-service 인 이유 — 블로그 공개 페이지가 매장 identity 를 이 endpoint 로 읽는다.
   [packages/shared-space-ui/src/blog/client.ts:78](packages/shared-space-ui/src/blog/client.ts#L78) `fetchPublicStoreInfo()` → `{base}/api/v1/stores/{slug}`.
-  소비처: KPA `StoreBlogPage` · GlycoPharm [StoreBlogPage.tsx](services/web-glycopharm/src/pages/store/StoreBlogPage.tsx) · K-Cosmetics `StoreBlogPage.tsx` (3서비스 모두 `@o4o/shared-space-ui` 재사용).
+  소비처: KPA `StoreBlogPage` · K-Cosmetics `StoreBlogPage.tsx` (3서비스 모두 `@o4o/shared-space-ui` 재사용).
 - KPA-only 3건의 유일 소비처 — [StorefrontHomePage.tsx:140-183](services/web-kpa-society/src/pages/store/StorefrontHomePage.tsx#L140-L183) (`/:slug`, `/:slug/layout`, `/products/featured`, `/blog`) · [StorefrontProductDetailPage.tsx:10](services/web-kpa-society/src/pages/storefront/StorefrontProductDetailPage.tsx#L10) (`/products/:id`).
-- DEAD 5건 — 플랫폼 경로로 호출하는 프런트가 **한 곳도 없다**. GlycoPharm 이 쓰는 것은 동명의 **자체** endpoint(`/glycopharm/stores/...`)다. `packages/ui/store-blocks` 도 직접 fetch 하지 않는다(렌더 전용).
+- DEAD 5건 — 플랫폼 경로로 호출하는 프런트가 **한 곳도 없다**. `packages/ui/store-blocks` 도 직접 fetch 하지 않는다(렌더 전용).
 
 ### 1-3. 선행 IR 판정 정정 2건
 
 | 선행 IR 판정 | 정정 |
 |---|---|
 | 공용 홈 API(`store-public-home.handler.ts`) 전체를 REMOVE 후보 | **`GET /:slug` 는 KEEP.** handler 파일 삭제 불가. 삭제 단위는 `/layout` + product handler 3건이며, `/template`·`/storefront-config`·`/hero`·`/products`·`/categories` 는 dead 정리 대상 |
-| `매장 홈 디자인` REMOVE | **프런트만 REMOVE.** 백엔드 [store-settings.controller.ts](apps/api-server/src/routes/o4o-store/controllers/store-settings.controller.ts) · [layout.controller.ts](apps/api-server/src/routes/o4o-store/controllers/layout.controller.ts) 는 kpa/glycopharm/cosmetics **3서비스 라우터에 각각 마운트**된 공용 컨트롤러다 (`kpa.routes.ts:113` · `glycopharm.routes.ts:41` · `cosmetics.routes.ts:57`). KPA 소비만 제거하고 컨트롤러는 KEEP |
+| `매장 홈 디자인` REMOVE | **프런트만 REMOVE.** 백엔드 [store-settings.controller.ts](apps/api-server/src/routes/o4o-store/controllers/store-settings.controller.ts) · `cosmetics.routes.ts:57`). KPA 소비만 제거하고 컨트롤러는 KEEP |
 
 ### 1-4. O-1 부수 발견 (범위 밖, 별도 판단 필요)
 
-GlycoPharm 자체 storefront 는 **`/cart` · `/orders` · `/orders/:id/cancel` 까지 살아 있다** ([store.controller.ts](apps/api-server/src/routes/glycopharm/controllers/store.controller.ts), 소비 [web-glycopharm/src/api/store.ts:179-282](services/web-glycopharm/src/api/store.ts#L179-L282)). 결제만 `410` 이므로 **장바구니·주문 생성 UI 는 남고 결제에서 막히는 상태**다. KPA 철거와 동일한 문제가 GlycoPharm 에도 있으나 이번 WO 범위 밖이므로 **별도 WO 로 분리**한다.
+`/orders` · 결제만 `410` 이므로 **장바구니·주문 생성 UI 는 남고 결제에서 막히는 상태**다.
 
 ---
 
@@ -81,10 +80,6 @@ GlycoPharm 자체 storefront 는 **`/cart` · `/orders` · `/orders/:id/cancel` 
 ### 2-2. O-3 — RETAIL + KPA + B2C 주문 census · **결과**
 
 **전제가 틀렸다.** `checkout_orders.order_type` 은 enum `checkout_orders_order_type_enum` 이고 실제 값은 다음 5개뿐이다.
-
-```
-GENERIC · DROPSHIPPING · GLYCOPHARM · COSMETICS · TOURISM
-```
 
 **`RETAIL` 은 enum 에 존재하지 않는다.** 선행 IR 과 [kpa-checkout.controller.ts:7](apps/api-server/src/routes/kpa/controllers/kpa-checkout.controller.ts#L7) 주석의 "OrderType = RETAIL" 은 DB 계약이 아니다. 코드의 `orderType: 'retail'` ([L571](apps/api-server/src/routes/kpa/controllers/kpa-checkout.controller.ts#L571) · [L713](apps/api-server/src/routes/kpa/controllers/kpa-checkout.controller.ts#L713)) 은 **응답 JSON 리터럴**일 뿐 저장되지 않는다. 컬럼도 `"orderType"` 이 아니라 snake_case `order_type` 이다.
 
@@ -210,6 +205,5 @@ A 안이면 이번 WO 범위 안에서 끝나고, B·C 는 QR 업무동선 트�
 ## 7. 다음 단계
 
 1. **§6 판정 확정** (A / B / C)
-2. `WO-O4O-KPA-INTERNAL-STOREFRONT-RETIREMENT-V1` — 데이터 삭제 없이 **신규 B2C 생성 차단** + 자체몰 프런트·라우트·KPA-only handler·dead endpoint 정리. `GET /:slug` · blog · tablet · `platform_store_slugs`(17행: kpa 9 · pharmacy-hub 5 · glycopharm 2 · cosmetics 1) · `checkout_orders` 공용 축 · GlycoPharm·K-Cosmetics 경로는 **불가침**
+2. `WO-O4O-KPA-INTERNAL-STOREFRONT-RETIREMENT-V1` — 데이터 삭제 없이 **신규 B2C 생성 차단** + 자체몰 프런트·라우트·KPA-only handler·dead endpoint 정리. `GET:slug` · blog · tablet · `platform_store_slugs`(17행: kpa 9 · pharmacy-hub 5 2 · cosmetics 1) · `checkout_orders` 공용 축 · K-Cosmetics 경로는 **불가침**
 3. 네이버 연동 조사·파일럿 → 쿠팡 → 공통 Online Sales 모듈 추출
-4. 별도 분리: **GlycoPharm 자체 storefront cart/orders 잔존** (§1-4)

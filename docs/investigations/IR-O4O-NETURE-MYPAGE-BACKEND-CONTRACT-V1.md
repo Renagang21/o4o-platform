@@ -14,7 +14,7 @@
 >
 > 1. **Neture `/mypage` 4 page 의 personal account 영역은 공통 endpoint 로 100% cover** — `PUT /users/profile` (프로필), `PUT /users/password` + serviceKey='neture' (V2 scoping), `POST /auth/logout-all`, `GET /auth/me` (hub), `/notifications/*` (header).
 > 2. **business-info 는 이미 supplier workspace 영역 `/neture/supplier/profile` 에 격리** — `/mypage/business-profile` 은 `SupplierProfilePage` 의 wrapper. 의도된 단방향 surface (의미 차이 없음, workspace 데이터의 정직한 noting).
-> 3. **다른 3 서비스 mypage controller 의 endpoint 중 Neture 에서 필요한 것은 0** — KPA / GP my-requests 는 service-specific 신청 (membership / forum / course / instructor) 인데 Neture 의 신청 (supplier proposal / partner application) 은 이미 supplier/partner workspace 별도 처리. LMS / credits / certificates 는 Neture 도메인 부재.
+> 3. **다른 2 서비스 mypage controller 의 endpoint 중 Neture 에서 필요한 것은 0** — KPA my-requests 는 service-specific 신청 (membership / forum / course / instructor) 인데 Neture 의 신청 (supplier proposal / partner application) 은 이미 supplier/partner workspace 별도 처리. LMS / credits / certificates 는 Neture 도메인 부재.
 > 4. **MyPageHub "최근 활동" empty state 는 의도된 placeholder** — TODO 아님. WO-O4O-NETURE-MYPAGE-KPA-CANONICAL-REALIGNMENT-V1 의 의도. 미래 Neture-specific 활동 데이터 수요 발생 시 별도 endpoint 추가 가능 (현 시점 불필요).
 > 5. **Neture workspace 경계 원칙 보존 우선** — `/mypage` personal + `/supplier`/`/partner`/`/account/*` workspace 분리가 가장 모범적 (선행 IR 평가). mypage controller 신설은 이 분리 원칙을 흐릴 위험.
 
@@ -31,7 +31,7 @@
 ### 1.2 범위
 
 - Neture `/mypage` 4 page 의 실제 API 호출 인벤토리
-- 3 서비스 (KPA / GP / K-Cos) mypage controller endpoint 와의 동등성 검토
+- 2 서비스 (KPA / K-Cos) mypage controller endpoint 와의 동등성 검토
 - 공통 `/users/*` + `/auth/me` + `/notifications/*` 로 cover 가능성 분석
 - workspace 경계 원칙 (Neture 모범) 정합
 
@@ -84,7 +84,7 @@
 
 ### 4.1 endpoint 인벤토리 비교
 
-| Endpoint | KPA | GP | K-Cos | Neture | Neture 동등 필요? |
+| Endpoint | KPA | K-Cos | Neture | Neture 동등 필요? |
 |----------|:---:|:--:|:-----:|:------:|:----------------:|
 | `GET/PUT /mypage/profile` | ✅ (User+KpaMember+OrgMember join) | ❌ (공통 `/users/profile` 만) | ❌ | ❌ (공통 사용) | ❌ — 공통 충분 |
 | `GET/PUT /mypage/settings` | ⚠️ placeholder | ❌ | ❌ | ❌ | ❌ — Neture 도 부재 정합 |
@@ -250,7 +250,7 @@
 - frontend Neture `/mypage` 4 page ❌ (현재 공통 endpoint 사용 그대로)
 - `/neture/supplier/profile` ❌
 - 공통 `/users/*` / `/auth/me` / `/notifications/*` ❌
-- KPA / GP / K-Cos ❌
+- KPA / K-Cos ❌
 - DB / migration / route 0
 
 ---

@@ -44,7 +44,7 @@ export interface RecruitmentExposureConsoleProps {
   loading: boolean;
   /** 승인/반려 처리 중인 id */
   busyId?: string | null;
-  /** "매장/약국 사용자"(KPA·GP) | "매장 사용자"(KCos) */
+  /** "매장/약국 사용자"(KPA) | "매장 사용자"(KCos) */
   audienceLabel?: string;
   onApprove: (id: string, note?: string) => void;
   onReject: (id: string, note?: string) => void;

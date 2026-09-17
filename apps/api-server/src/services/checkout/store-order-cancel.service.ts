@@ -8,7 +8,7 @@
  * Store Hub 장바구니(`checkout-confirm`)로 만들어진 이벤트 오퍼 주문에는
  * 매장측 취소 경로가 없었다. Pharmacy-Hub 에만 결제 전 취소가 존재했고
  * (`POST /pharmacy-hub/store-owner/orders/:orderId/cancel`)
- * KPA·GlycoPharm·K-Cosmetics 의 checkout 컨트롤러에는 취소 route 자체가 없었다.
+ * KPA·K-Cosmetics 의 checkout 컨트롤러에는 취소 route 자체가 없었다.
  *
  * ## 계약 (Pharmacy-Hub `cancelBeforePayment` 와 동일 의미)
  *

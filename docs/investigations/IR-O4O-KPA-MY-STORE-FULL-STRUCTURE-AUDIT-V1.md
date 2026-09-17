@@ -325,7 +325,7 @@
 | **G9** | legacy redirect 정리(유지/폐기 판정) | channels, channels/tablet, 기타 legacy 단축 | P3 |
 | **G10** | PharmacyOwnerOnlyGuard 적용 기준 일관화(공통 정책 판단 — store-ui-core 소비처 전수 영향) | OwnerOnly 4곳 vs 미적용 편집화면 | P3 |
 
-> **G10 주의:** 가드/메뉴 config는 `@o4o/store-ui-core` 공통 모듈이므로 KPA 단독 변경 금지 — Shared Module Change Protocol 대상(GlycoPharm/K-Cosmetics 동시 영향 확인 필수).
+> **G10 주의:** 가드/메뉴 config는 `@o4o/store-ui-core` 공통 모듈이므로 KPA 단독 변경 금지 — Shared Module Change Protocol 대상(K-Cosmetics 동시 영향 확인 필수).
 
 ---
 

@@ -20,7 +20,7 @@ O4O에서 **매장 경영자의 판매·주문·결제·환불 범위**를 반�
 | 사례 | 결과 |
 |---|---|
 | KPA 자체 B2C storefront (자체몰) | 철거 — `CHECK-O4O-KPA-INTERNAL-STOREFRONT-RETIREMENT-V1` |
-| 소비자→매장 결제 (glycopharm · cosmetics · kpa) | `410 STORE_SALE_PAYMENT_DEPRECATED` 차단 — `WO-O4O-STORE-SALE-CHECKOUT-ROUTE-DEPRECATION-V1` |
+| 소비자→매장 결제 (cosmetics · kpa) | `410 STORE_SALE_PAYMENT_DEPRECATED` 차단 — `WO-O4O-STORE-SALE-CHECKOUT-ROUTE-DEPRECATION-V1` |
 | 네이버 온라인 판매 연동 파일럿 | 외부 판매채널로 대체하는 방향으로 진행 (자격정보 단계에서 중지) |
 | 매장 경영자 PG 환불 권한 | `WO-O4O-CHECKOUT-REFUND-AUTHORIZATION-CANONICAL-ROLE-CONTRACT-V1` 에서 축으로 식별 |
 

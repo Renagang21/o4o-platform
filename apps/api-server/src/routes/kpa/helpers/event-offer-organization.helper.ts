@@ -113,7 +113,6 @@ export async function resolveOrganizationForEventOffer(
     return null;
   }
 
-  // GlycoPharm Event Offer — REMOVED (WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1)
 
 
   // ── 향후 추가 ─────────────────────────────────────────────────────────────

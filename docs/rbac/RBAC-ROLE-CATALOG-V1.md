@@ -50,14 +50,14 @@ bare 값을 여전히 인정하므로, 값이 존재하면 그대로 동작한�
 | `supplier` | 공급자 — Neture 공급자에 실사용. 접두어 없음이 의도된 계약이다 (WO-NETURE-ROLE-NORMALIZATION-V1) |
 | ~~`partner`~~ | ~~파트너~~ — 은퇴 (2026-09-15, Legacy Partner runtime 은퇴 · 활성 보유자 0 · 비활성 이력 row 3건은 physical cleanup 대상) |
 | `manager` | 매니저 |
-| `pharmacy` | GlycoPharm 약국. 접두어 없음이 **정규값**이다 — `20260318110000-RenamePharmacistToPharmacyRole` 로 `pharmacist` → `pharmacy` 개명, `20260326100000-NormalizeGlycopharmPharmacyRole` 로 확정. 소비처는 bare 문자열을 직접 읽는다 (`controllers/forum/ForumRecommendationController.ts`) |
+| `pharmacy` | 은퇴 서비스 유래 bare 역할. 접두어 없음이 **정규값**이다. 소비처는 bare 문자열을 직접 읽는다 (`controllers/forum/ForumRecommendationController.ts`) |
 
 > 2026-08-24 프로덕션 실측(활성 role_assignments): `supplier` 6 · `pharmacy` 2 · `customer` 7 · `user` 2.
 > `vendor` · `seller` · `manager` 는 **보유자 0** 이다. 목록에는 남기되 신규 부여 대상이 아니다. (`partner` 는 카탈로그·가드에서 제거됨)
 > (`manager` 를 조회하는 코드 대부분은 `organization_members.role` — RBAC role 축이 아니다.)
 
 > `store_owner` 는 이 목록에 없다 — 매장 경영자 판정은 전부 접두어 형태다
-> (`{kpa|glycopharm|cosmetics|pharmacy-hub}:store_owner`). bare `store_owner` 를 읽는
+> (`{kpa|cosmetics|pharmacy-hub}:store_owner`). bare `store_owner` 를 읽는
 > 소비처는 0이며, 유일하게 남아 있던 활성 1행은 회수됐다
 > (migration `20270318000000-RevokeOrphanedBareStoreOwnerRole`).
 
@@ -68,14 +68,13 @@ bare 값을 여전히 인정하므로, 값이 존재하면 그대로 동작한�
 | `platform:` | 플랫폼 Core | `platform:super_admin` |
 | `kpa:` | KPA 약사회 | `kpa:admin`, `kpa:pharmacist`, `kpa:branch_admin`, `kpa:branch_operator` |
 | `neture:` | 네처 | `neture:admin`, `neture:operator`, `neture:seller`, `neture:supplier` (~~`neture:partner`~~ 은퇴 2026-09-15) |
-| `glycopharm:` | 글라이코팜 | `glycopharm:admin`, `glycopharm:operator`, `glycopharm:pharmacist`, `glycopharm:store_owner` |
 | `glucoseview:` | 글루코스뷰 | `glucoseview:admin`, `glucoseview:operator` |
 | `cosmetics:` | K-화장품 | `cosmetics:admin`, `cosmetics:operator` |
 | `pharmacy-hub:` | 파머시 허브 | `pharmacy-hub:admin`, `pharmacy-hub:operator`, `pharmacy-hub:store_owner` |
 
 #### Admin ⊃ Operator 계층
 
-KPA · Neture · K-Cosmetics · Pharmacy-Hub · GlycoPharm 은 동일 계층을 `scopeRoleMapping` 으로 **명시**한다.
+KPA · Neture · K-Cosmetics · Pharmacy-Hub 는 동일 계층을 `scopeRoleMapping` 으로 **명시**한다.
 
 ```text
 {service}:admin    요구 → admin 만 허용
@@ -90,9 +89,6 @@ KPA · Neture · K-Cosmetics · Pharmacy-Hub · GlycoPharm 은 동일 계층을 
   [`docs/baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md`](../baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md).
 - Pharmacy-Hub scope config 위치는 `apps/api-server/src/middleware/pharmacy-hub-scope.middleware.ts` 다.
   `security-core` 가 F1 Freeze 대상이라 의도적으로 로컬에 둔 것이며, 아래 §5 절차 2번의 예외다.
-- GlycoPharm 은 `scopeRoleMapping` 이 없어 두 역할이 fallback(allowedRoles 전체 허용) 으로
-  평가되던 상태였으나 **WO-O4O-GLYCOPHARM-AUTHORIZATION-HIERARCHY-AUDIT-AND-FIX-V1 에서 해소**됐다.
-  이제 5개 서비스 모두 fallback 에 의존하지 않는다.
 
 ---
 

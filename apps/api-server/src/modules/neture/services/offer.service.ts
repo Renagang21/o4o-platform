@@ -1268,7 +1268,7 @@ export class NetureOfferService {
       // 공급 방식을 설정하기 전까지 가격·설명·재고 등 어떤 정보도 저장할 수 없었다 (실사용 차단).
       //
       // 노출·거래 안전성은 이 게이트가 아니라 소비 경로가 이미 보장한다 —
-      // 매장 HUB(pharmacy-products.controller) · 매장 checkout(kpa/glycopharm) ·
+      // 매장 HUB(pharmacy-products.controller) · 매장 checkout(kpa) ·
       // 파트너 조달(seller.service · neture-b2b-cart-checkout) 이 모두
       // `distribution_type <> 'PRIVATE' OR $x = ANY(allowed_seller_ids)` 로 필터하므로
       // allowedSellerIds 가 비어 있는 PRIVATE offer 는 어디에도 노출되지 않고 주문도 되지 않는다.
@@ -1345,7 +1345,7 @@ export class NetureOfferService {
 
     const currentKeys: string[] = offer.service_keys || [];
     // WO-PHARMACY-HUB-SUPPLIER-PRODUCT-OFFER-DELIVERY-V1:
-    //   이 경로는 **승인 대상 키(SSOT) 3개만 책임진다**. 그 밖의 키
+    //   이 경로는 **승인 대상 키(SSOT) 2개만 책임진다**. 그 밖의 키
     //   (pharmacy-hub / neture 등)는 다른 경로가 소유하므로 그대로 보존한다.
     //
     //   이전 구현은 nextKeys = filterApprovalEligibleServiceKeys(input.serviceKeys) 였다.
@@ -1440,7 +1440,7 @@ export class NetureOfferService {
    * 특정 서비스 1개에 대한 제공 시작/중지 — `service_keys` 에서 그 키만 멱등 추가/제거한다.
    *
    * updateDistribution 과의 관계:
-   *   updateDistribution 은 **승인 대상 3키(glycopharm/kpa-society/k-cosmetics)** 를 책임진다.
+   *   updateDistribution 은 **승인 대상 2키(kpa-society/k-cosmetics)** 를 책임진다.
    *   승인 큐·listing 캐스케이드가 그 3키에만 존재하기 때문이다.
    *   이 메서드는 **승인 대상이 아닌 키**(pharmacy-hub 등)를 담당한다 — 승인 레코드를
    *   만들지 않고 즉시 제공을 시작/중지한다. 유통 관리 기능을 복제하지 않으려고

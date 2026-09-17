@@ -15,7 +15,7 @@
 > 컴포넌트 **메커니즘**(menuItems shape / active route / capability gate / header slot / NotificationBell)은 전부 호환되어 OperatorAreaShell 결합은 기술적으로 trivial 하다. 그러나 **domain IA 의 의미(semantics)** 가 막힌다:
 >
 > 1. **DomainIASidebar 는 KPA 축(커뮤니티 / 매장 HUB / 운영 공통) domain IA 를 하드코딩** (operatorDomainIA.ts). Neture 는 **Supplier/B2B 축** (가입 승인 / 유통 펀딩 / 공급자 활성화 / 상품·카탈로그 / 주문·정산·커미션 / 파트너) — 기존 IA 를 그대로 적용하면 supplier/product/order/settlement 가 **"매장 HUB 운영" 헤딩 아래로 오분류**된다. Twin Axis(KPA + Neture canonical) 위반.
-> 2. **Neture 는 domain IA 메타데이터(DOMAIN_LABELS/GROUP_TO_DOMAIN/DOMAIN_GROUP_ORDER) 부재** — KPA/Glyco/KCos 와 달리 flat STANDARD_GROUPS sidebar(OperatorShell) 사용 중. 이행 = **flat → domain-grouped 헤딩 도입 = 의도적 UX 변화** (no-op 리팩토링 아님).
+> 2. 이행 = **flat → domain-grouped 헤딩 도입 = 의도적 UX 변화** (no-op 리팩토링 아님).
 > 3. **DomainIASidebar 가 operatorDomainIA 를 static import** → Neture 에 다른 domain 집합을 주려면 DomainIASidebar 를 **IA config 주입형으로 파라미터화**(operator-ux-core, additive, Freeze-safe)해야 함.
 >
 > 호환 OK: menuItems shape / active 로직 / capability gate / NetureGlobalHeader slot / profile dropdown / NotificationBell / isAdmin=false(보존 가능).
@@ -154,7 +154,7 @@ return (
 | 외곽 div / container / main spacing | ✅ | OperatorAreaShell = `min-h-screen flex flex-col bg-gray-50` + `max-w-[1400px] flex gap-6` + `main flex-1 min-w-0` — Neture OperatorShell 과 동일 spacing |
 | **footer** | ❌ | OperatorAreaShell 미보유. Neture 현재 OperatorShell 기본 footer 렌더 중 → **이행 시 footer 사라짐** (결정 필요: 제거 수용 vs OperatorAreaShell footer slot 추가) |
 
-→ OperatorAreaShell 결합은 footer 1건 외 전부 호환. (footer 는 KPA/Glyco/KCos operator 영역에도 없음 → 제거가 cross-service 정합이긴 함.)
+→ OperatorAreaShell 결합은 footer 1건 외 전부 호환.
 
 ---
 
@@ -170,7 +170,7 @@ return (
 | logout | NetureGlobalHeader 자체 처리 (`logout(); navigate('/')`) | wrapper 의 onLogout 불필요해짐 |
 | role 판정 | isAdmin/isOperator/isSupplier/isPartner | header 내부 — 변화 없음 |
 
-→ **header slot 으로 그대로 전달, profile dropdown / NotificationBell 무변경 유지 가능** ✅. Neture 는 supplier/partner 항목이 추가로 있는 점만 KPA/Glyco/KCos 대비 다름(정당한 차이, slot 보존).
+→ **header slot 으로 그대로 전달, profile dropdown / NotificationBell 무변경 유지 가능** ✅.
 
 ---
 
@@ -216,15 +216,15 @@ Neture 축에 맞는 domain 후보 (설계 결정 대상):
 | profile dropdown href 회귀 | 낮음 | NetureGlobalHeader 미변경 → 무영향 |
 | active route 오판 | 낮음 | isItemActive 로직 동일 |
 | NotificationBell serviceKey | 낮음 | header 내부 유지 → 무영향 |
-| legacy OperatorShell 의존 누락 | 낮음 | OperatorShell 은 **Neture AdminLayoutWrapper + (glyco/kcos) DashboardLayout 등에서 계속 사용** → 이행해도 orphan 아님. import 제거는 Neture operator wrapper 1곳만 |
-| 운영 smoke 범위 부족 | **HIGH** | smoke2.mjs 는 **glyco+kcos 만 커버 — Neture 미포함**. Neture 이행은 **신규 Neture operator smoke** 필요 |
+| legacy OperatorShell 의존 누락 | 낮음 | OperatorShell 은 **Neture AdminLayoutWrapper + DashboardLayout 등에서 계속 사용** → 이행해도 orphan 아님. import 제거는 Neture operator wrapper 1곳만 |
+| 운영 smoke 범위 부족 | **HIGH** | Neture 이행은 **신규 Neture operator smoke** 필요 |
 | isAdmin false 변질 | 낮음 | false 그대로 유지 (§8) |
 
 ---
 
 ## 11. 운영 smoke 필요 범위
 
-- **현 smoke2.mjs 는 Neture 미커버** (glycopharm.co.kr / k-cosmetics.site 만). Neture 이행 검증 불가.
+- **현 smoke2.mjs 는 Neture 미커버** (k-cosmetics.site 만). Neture 이행 검증 불가.
 - 이행 WO 는 **Neture operator 전용 smoke** 신규 필요:
   - origin: neture.co.kr (또는 운영 도메인)
   - `/operator` 진입 + sidebar 도메인 헤딩 노출
@@ -287,7 +287,7 @@ Neture 축에 맞는 domain 후보 (설계 결정 대상):
 
 ## 15. Working tree 격리 / commit 정책
 
-- 조사 시작 시점: 다른 세션 WIP 존재 — `M apps/api-server/src/routes/cosmetics/action-definitions.ts`, `?? docs/investigations/IR-O4O-GLYCOPHARM-EVENT-OFFER-APPROVAL-SCOPE-AUDIT-V1.md`. **둘 다 본 IR 무관 — 미접촉/미포함.**
+- 조사 시작 시점: 다른 세션 WIP 존재 — `M apps/api-server/src/routes/cosmetics/action-definitions.ts`. **둘 다 본 IR 무관 — 미접촉/미포함.**
 - 본 IR 문서 1개만 생성. **read-only — 코드/Neture/공통 컴포넌트/menu/capability/route/header 미변경.**
 - commit 시 본 IR 문서 1개만 path-restricted. `git add .` / `-am` 금지.
 

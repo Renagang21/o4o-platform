@@ -5,7 +5,7 @@
 > **상태:** ✅ **완료** — 구현 + tsc + 배포 + prod error-path smoke PASS. success-path write smoke는 pending 0건으로 생략(사유 §14).
 
 ## 1. 목적
-Supply Catalog 승인 approve 구현을 `ProductApprovalV2Service` 중심으로 통일. KPA direct SQL approve 흡수, 승인 시 OPL `is_active=true` canonical화. GP/KCos surface enable 전 approve 구현 정리.
+Supply Catalog 승인 approve 구현을 `ProductApprovalV1Service` 중심으로 통일. KPA direct SQL approve 흡수, 승인 시 OPL `is_active=true` canonical화. KCos surface enable 전 approve 구현 정리.
 
 ## 2. 선행 IR 결정 반영
 per-store 승인(신청 매장 OPL 편입), OPL active=주문가능 자격(≠ storefront 진열), KPA direct SQL 폐기, surface 확장 전 구현 통일.
@@ -44,8 +44,8 @@ operator 승인 경로(KPA approve/batch-approve)가 `{ activateListing: true }`
 ## 10. storefront gate 미수정
 OPC/channel approval 관련 코드 무수정.
 
-## 11. GP/KCos surface 미추가
-GP/KCos operator 승인 route/UI 미추가. frontend 무수정(`services/web-*` 0건).
+## 11. KCos surface 미추가
+KCos operator 승인 route/UI 미추가. frontend 무수정(`services/web-*` 0건).
 
 ## 12. DB migration 없음
 신규 migration 0건. 배포 후 migration job: `Migrations executed: 0`, `No migrations are pending` 확인.

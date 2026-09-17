@@ -1,7 +1,6 @@
 /**
  * Guide Styles — shared across all 7 guide pages
  *
- * WO-O4O-GUIDE-COMMON-AND-GLYCOPHARM-HOME-V1
  *
  * 기존 KPA Guide 7개 페이지에서 동일했던 스타일을 한 곳에 모았다.
  * 페이지별로 약간 다른 hero padding은 컴포넌트 내부 override로 처리.

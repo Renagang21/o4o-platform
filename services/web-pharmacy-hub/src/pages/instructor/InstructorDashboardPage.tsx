@@ -4,7 +4,7 @@
  * WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §4 (#42)
  * 경로: /instructor
  *
- * 구성(KPA·GlycoPharm 과 같은 축):
+ * 구성(KPA 과 같은 축):
  *  1. KPI 4 카드 (총 강의 / 총 수강생 / 평균 완료율 / 승인 대기)
  *  2. 승인 대기 수강신청 (승인 · 거절)
  *  3. 내 강의 목록 (편집 · 수강자 진입)
@@ -74,7 +74,7 @@ export default function InstructorDashboardPage() {
       setCourses(courseRes.data);
       setPendingEnrollments(enrollRes);
     } catch {
-      // 부분 실패는 조용히 무시하고 빈 상태로 렌더한다(KPA·GP 와 동일).
+      // 부분 실패는 조용히 무시하고 빈 상태로 렌더한다(KPA 와 동일).
     } finally {
       setLoading(false);
     }

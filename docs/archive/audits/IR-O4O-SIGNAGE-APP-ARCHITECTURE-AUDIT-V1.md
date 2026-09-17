@@ -26,22 +26,9 @@
 | 서비스 | 사이니지 페이지 | Store 연동 | 비고 |
 |--------|:---------------:|:----------:|------|
 | **KPA Society** | 4개 | YES (Asset Snapshot) | 가장 완전한 구현 |
-| **GlycoPharm** | 5+개 | YES (자체 Display 시스템) | Smart Display + Editorial |
 | **K-Cosmetics** | 3개 | NO (Browse only) | Content Hub 탐색만 |
 | **Neture** | 1개 | NO (외부 링크만) | Browse only |
 | **GlucoseView** | 0개 | N/A | 사이니지 미사용 |
-
-### 1-3. GlycoPharm Legacy Display 시스템
-
-GlycoPharm은 **독자적인 Display 엔티티**를 가짐:
-- `glycopharm_display_playlists`
-- `glycopharm_display_media`
-- `glycopharm_display_playlist_items`
-- `glycopharm_display_schedules`
-
-이는 Core Signage 시스템과 **별도로 존재**하는 레거시 구조.
-
----
 
 ## 2. Signage 데이터 모델
 
@@ -426,7 +413,6 @@ LifecycleStatus = 'active' | 'expired' | 'archived'
 | 서비스 | Store HUB 연동 | 방식 |
 |--------|:--------------:|------|
 | **KPA Society** | YES | Asset Snapshot Copy → Store Playlist |
-| **GlycoPharm** | YES | 자체 Display 시스템 + Asset Snapshot |
 | **K-Cosmetics** | NO | Browse-only (Content Hub 탐색만) |
 | **Neture** | NO | 외부 링크만 |
 | **GlucoseView** | N/A | 사이니지 미사용 |
@@ -646,7 +632,6 @@ Zone 관리              → /api/signage/:serviceKey/templates/:id/zones
 
 | 서비스 | serviceKey |
 |--------|-----------|
-| GlycoPharm | `glycopharm` |
 | K-Cosmetics | `k-cosmetics` |
 | Neture | `neture` |
 | KPA Society | `kpa-society` |

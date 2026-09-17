@@ -3,7 +3,7 @@
  *
  * WO-O4O-CROSSSERVICE-OPERATOR-DASHBOARD-UI-PARITY-V1:
  *   KPA inline OperatorRoleGuideCard → 공통 컴포넌트로 추출.
- *   "운영자는 관리자가 아닙니다" 운영 철학 안내를 세 서비스(KPA/GlycoPharm/K-Cos)
+ *   "운영자는 관리자가 아닙니다" 운영 철학 안내를 두 서비스(KPA/K-Cos)
  *   operator 첫 화면에서 동일 구조로 표시한다.
  *
  * 카드 본문(제목/설명/철학)은 service-neutral static.

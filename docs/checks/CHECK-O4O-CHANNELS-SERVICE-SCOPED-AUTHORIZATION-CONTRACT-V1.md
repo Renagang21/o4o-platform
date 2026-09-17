@@ -57,7 +57,6 @@ channels runtime 은 직전 WO(entity 등록)로 살아났으나, 권한 계약�
 | signage player (device) | **credential 없음** | `GET /:id`, `GET /?code=`, `GET /:id/contents`, `POST /:id/playback-log`, `POST /:id/heartbeat` | `services/signage-player-web/src/api/channels.ts` — 전부 plain `fetch`, Authorization 헤더·쿠키 없음 |
 | anonymous(웹 방문자) | – | 없음 | 공개 웹에서 channel API 를 호출하는 코드 없음 |
 
-**오귀속 방지**: `services/web-glycopharm/.../StoreChannelsPage.tsx` 계열은 **판매 채널**
 (`organization_channels`) 축이며 `/api/v1/channels` consumer 가 아니다.
 `admin-dashboard/pages/digital-signage/v2/*` 는 `/api/signage/:serviceKey/channels` 라는
 별도 축을 쓴다. 둘 다 이 WO 의 consumer 목록에서 제외했다.

@@ -11,7 +11,6 @@
 | 파일 | 변경 |
 |------|------|
 | `apps/api-server/src/routes/kpa/controllers/event-offer.controller.ts` | participate 핸들러 → 410. orphaned `EventOfferError` import 제거 |
-| `apps/api-server/src/routes/glycopharm/controllers/event-offer.controller.ts` | 동일 |
 | `apps/api-server/src/routes/cosmetics/controllers/event-offer.controller.ts` | 동일 (import 멀티라인에서 `EventOfferError` 제거, `EventOfferCreateError` 유지) |
 | `apps/api-server/src/routes/neture/controllers/event-offer.controller.ts` | 동일 |
 
@@ -28,8 +27,7 @@
 - **service.participate 미호출 → 주문 생성·`total_quantity` 차감 미발생.**
 
 ## 3. 조사 결과
-- **route 전수 (4)**: kpa `/groupbuy/:id/participate`, glyco `/glycopharm/event-offers/:id/participate`, cosmetics `/cosmetics/event-offers/:id/participate`, neture `/neture/event-offers/:id/participate`.
-- **frontend buyer 호출 0건 재확인**: services/web-* 전체에서 `.participate(` **컴포넌트/핸들러 호출 0건**. 잔존하는 것은 api client **method 정의**뿐(web-kpa/glyco/kcos/neture `api/eventOffer.ts`) — 410 이라 실사용 불가, 정의 제거는 V3.
+- **frontend buyer 호출 0건 재확인**: services/web-* 전체에서 `.participate(` **컴포넌트/핸들러 호출 0건**. 잔존하는 것은 api client **method 정의**뿐 — 410 이라 실사용 불가, 정의 제거는 V3.
 - **helper 공유 확인 → 보존**: `loadEventOfferContext` / `reserveEventOfferListing` / `incrementListingQuantity` / `countStoreOrderedQuantity` 는 `event-offer-cart-checkout.service`(canonical cart-confirm)가 사용 → **KEEP**. service.participate 함수 자체도 미삭제(내부/테스트 호환).
 - **EventOfferError**: 4 controller 모두 participate catch 에서만 사용 → 핸들러 제거에 따라 **import 정리**(unused 방지).
 
@@ -40,7 +38,6 @@
 - **API smoke (graceful, live)** — 배포 완료 후(`o4o-core-api` 신리비전) 4 route no-auth POST:
   - KPA `/api/v1/kpa/groupbuy/:id/participate` → **401** ✅
   - Neture `/api/v1/neture/event-offers/:id/participate` → **401** ✅
-  - Glyco `/api/v1/glycopharm/event-offers/:id/participate` → **401** ✅
   - KCos `/api/v1/cosmetics/event-offers/:id/participate` → **401** ✅
   - → **4 route 모두 mount 유지 + auth 미들웨어 정상(auth-first 401)**, 500/route-누락 없음. authenticated 통과 시 핸들러가 **무조건 410** 반환(코드 검증 §4) → 주문 생성·차감 미발생. (authed 410 직접 실측은 토큰 필요 — 401+코드로 갈음, 회귀 위험 없음.)
 

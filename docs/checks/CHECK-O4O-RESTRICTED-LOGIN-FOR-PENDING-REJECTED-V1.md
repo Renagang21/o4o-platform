@@ -110,7 +110,7 @@ WO §10 중지 조건 ②는 "중앙 차단 지점이 존재하지 않는 경우
 | GET | `/api/v1/pharmacy-hub/join/status` | 가입 상태 + 반려 사유 (§5-E) |
 | GET | `/api/v1/pharmacy-hub/me/access` | 내 접근 상태 |
 | GET | `/api/v1/kpa/me/membership` | KPA 가입 상태 |
-| GET | `/api/v1/glycopharm/members/me` | GlycoPharm 가입 상태 |
+| GET | — | — |
 | GET | `/api/v1/cosmetics/members/me` | K-Cosmetics 가입 상태 |
 
 ### 서비스별 상태 조회 경로 실측 (WO §4-C)
@@ -119,7 +119,6 @@ WO §10 중지 조건 ②는 "중앙 차단 지점이 존재하지 않는 경우
 |---|---|---|
 | Pharmacy-Hub | `GET /join/status`, `GET /me/access` | ✅ |
 | KPA Society | `GET /api/v1/kpa/me/membership` (`@deprecated` 주석이나 라이브) | ✅ |
-| GlycoPharm | `GET /api/v1/glycopharm/members/me` | ✅ |
 | K-Cosmetics | `GET /api/v1/cosmetics/members/me` | ✅ |
 | Neture | **전용 경로 없음** | 공통 `/auth/me` · `/auth/services` 로 대체 |
 
@@ -312,6 +311,4 @@ cloud-sql-proxy 경유 **read-only SELECT** (2026-07-31, `o4o_platform`).
 
 1. Neture 전용 가입상태 API 부재 — 공통 `/auth/me` 로 대체 중. 필요 시 별도 WO.
 2. 재신청(재가입 신청) 정책은 본 WO 범위 밖 (§2.4) — `POST /auth/services/:serviceKey/join` 은 제한 계정에 닫혀 있다.
-3. KPA/GlycoPharm/K-Cosmetics 프론트의 restricted 로그인 후 라우팅은 본 WO 에서 변경하지 않았다
-   (해당 서비스는 기존 membership 게이트 화면이 이미 동작). Pharmacy-Hub 만 리다이렉트를 정렬했다.
 4. `users.status='deleted'` legacy 값은 enum 외 값으로 남아 있다 — 정리는 별도 WO 대상.

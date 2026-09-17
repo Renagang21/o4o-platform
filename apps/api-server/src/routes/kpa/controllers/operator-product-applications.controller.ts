@@ -32,9 +32,9 @@ type ScopeMiddleware = (scope: string) => RequestHandler;
 
 /**
  * WO-O4O-PRODUCT-APPROVAL-OPERATOR-SURFACE-ENABLE-GP-KCOS-V1:
- *   KPA 전용이던 본 컨트롤러를 serviceKey/scope 파라미터화하여 GlycoPharm/K-Cosmetics 에서도 재사용.
+ *   KPA 전용이던 본 컨트롤러를 serviceKey/scope 파라미터화하여 K-Cosmetics 에서도 재사용.
  *   - scope 미지정 시 'kpa:operator' (KPA 호출부 무변경).
- *   - serviceKey 지정 시(GP/KCos) list/stats/delete/approve/reject 가 해당 serviceKey 의 product_approvals 로
+ *   - serviceKey 지정 시(KCos) list/stats/delete/approve/reject 가 해당 serviceKey 의 product_approvals 로
  *     격리(cross-service 누수/변조 차단, CLAUDE.md §7 Boundary). 미지정(KPA)이면 기존대로 전체(현행 동작 보존).
  */
 export interface OperatorProductApplicationsOptions {

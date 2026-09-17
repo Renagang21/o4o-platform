@@ -59,7 +59,6 @@ isRowExpandable?: (row: T) => boolean;
 | `manualSort`/`onSort` 사용 | 4 |
 | `RowActionMenu` 병용 | 46 |
 | **신규 prop 사용처** | **0** (전환 대상 외 전부 미사용) |
-| typecheck — `web-neture` / `web-kpa-society` / `web-glycopharm` / `web-k-cosmetics` | **4/4 PASS** |
 
 소비처를 **한 파일도 수정하지 않았고**, 타입·렌더 구조상 prop 미사용 시 기존 경로가 그대로 실행된다.
 

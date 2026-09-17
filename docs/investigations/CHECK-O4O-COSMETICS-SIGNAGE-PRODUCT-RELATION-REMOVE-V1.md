@@ -70,7 +70,7 @@
 - api-server `/store-playlists`(`o4o-store/controllers/store-playlist.controller.ts`), `apps/api-server/src/routes/cosmetics/cosmetics.routes.ts`
 - `cosmetics_store_playlists` / `cosmetics_store_playlist_items`
 - snapshot / assetSnapshotApi / signage-media 경로, `SignageContentMapperService`, `digital-signage-core`
-- KPA/GlycoPharm active signage, Neture
+- KPA active signage, Neture
 - StoreSidebar / storeMenuConfig / menuCapabilityMap / HeroBannerSection
 
 ---
@@ -108,7 +108,6 @@
 | dropshipping-cosmetics B route/entity/service/controller/DTO | 제거 | dead code removal | PASS(typecheck) |
 | admin-dashboard cosmetics signage page | 제거 | client-only dead removal | PASS(typecheck) |
 | KPA signage | 없음 | 무접촉 | PASS |
-| GlycoPharm signage | 없음 | 무접촉(동일 패키지 B 미사용) | PASS |
 | Neture | 없음 | 대상 아님 | PASS |
 
 ---
@@ -123,7 +122,6 @@
 ## 9. Risks / Follow-ups
 
 - migration: B 테이블 부재(라이브 확정) → drop/schema migration **미작성**, DB write 없음.
-- GlycoPharm: 동일 패키지(dropshipping-cosmetics) 공유 — B 미사용이므로 본 제거로 동반 정리됨(별도 영향 없음).
 - 후속(별도 WO, 본 작업 외): `WO-O4O-COSMETICS-SIGNAGE-STORE-PLAYLIST-CORE-CONVERGENCE-V1`(활성 A 의 digital-signage-core 수렴 검토), IR-AUDIT §13-6 KC 사이니지 동영상/스케줄 탭 — 본 제거 후 진행 가능.
 
 ---

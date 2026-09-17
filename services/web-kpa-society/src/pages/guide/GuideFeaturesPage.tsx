@@ -1,7 +1,6 @@
 /**
  * GuideFeaturesPage — wrapper around shared component
  *
- * WO-O4O-GUIDE-COMMON-AND-GLYCOPHARM-HOME-V1
  * WO-O4O-GUIDE-INLINE-EDIT-V1: GuideEditableSection 연결
  */
 import { GuideFeaturesPage as Shared, kpaGuideFeaturesProps } from '@o4o/shared-space-ui';

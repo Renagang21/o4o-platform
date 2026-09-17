@@ -25,7 +25,7 @@ KPA 서비스 관리자가 **운영자·관리자 계정 정보를 확인하는 
 | 항목 | 값 |
 |------|-----|
 | KPA canonical role prefix | `kpa:` — 카탈로그 실측 `kpa:admin`, `kpa:operator`, `kpa:branch_admin`, `kpa:branch_operator`, `kpa:district_admin`, `kpa:pharmacist`, `kpa:store_owner`, `kpa:student` (8개) |
-| 역할 카탈로그 총량 | 39개 (platform / neture / glycopharm / cosmetics / kpa / lms / glucoseview) |
+| 역할 카탈로그 총량 | 39개 (platform / neture / cosmetics / kpa / lms / glucoseview) |
 | `kpa-society:*` 역할 | **카탈로그에 0건** (§6-A 참조) |
 | `scope.isPlatformAdmin` | `platform:admin` \| `platform:super_admin` 만 true — `kpa:admin` 은 **false** (`role.utils.ts:135`) |
 | 화면 guard | `/operator/roles` = `KPA_ADMIN` + `PLATFORM_SUPER_ADMIN`, `/operator/members` = operator 이상 |
@@ -91,7 +91,7 @@ requireRole([... , 'kpa-society:admin', 'kpa-society:operator'])
 
 - `requireRole` 는 `roleAssignmentService.hasAnyRole` 로 **정확 문자열 매칭**하며 prefix 정규화가 없다.
 - 역할 카탈로그에 `kpa-society:*` 는 **0건**(실측). KPA 실 역할은 `kpa:admin` / `kpa:operator`.
-- neture / glycopharm / cosmetics 는 모두 올바른 prefix 를 쓰며 **KPA 만 canonical serviceKey(`kpa-society`) 를 role prefix 자리에 잘못 사용**.
+- neture / cosmetics 는 모두 올바른 prefix 를 쓰며 **KPA 만 canonical serviceKey(`kpa-society`) 를 role prefix 자리에 잘못 사용**.
 - 영향: 순수 `kpa:admin` / `kpa:operator` 는 `/api/v1/operator/members/*`, `/api/v1/operator/roles/*` 에서 **403**
   → 회원 상세(`/operator/users/:id`)·역할 관리(`/operator/roles`) 화면이 비거나 오류. 목록(`/api/v1/kpa/members`)은 별도 라우터라 영향 없음.
 - **본 WO 에서 수정하지 않음** — 중지 조건 해당:
@@ -184,5 +184,5 @@ GET /api/v1/operator/members/<uuid>      → 200 success
 | 1 | `kpa:operator` 전용 검증 계정 발급 | §5 — 거부 경로 검증 불가 상태 해소 |
 | 2 | `WO-O4O-OPERATOR-ROUTER-KPA-ROLE-PREFIX-ALIGNMENT-V1` | §6-A — guard 정합화(권한 확대 포함, 별도 승인 필요) |
 | 3 | 공통 `RoleModal` 의 operator tier 필터 | §6-D — 4개 서비스 공통 |
-| 4 | 형제 서비스 `RoleManagementPage` isAdmin 기준 재정렬 | §6-C — GP/KCos/Neture 는 `{service}:admin` 에 CUD 버튼 노출(403 유발) |
+| 4 | 형제 서비스 `RoleManagementPage` isAdmin 기준 재정렬 | §6-C — KCos/Neture 는 `{service}:admin` 에 CUD 버튼 노출(403 유발) |
 | 5 | 카탈로그 `glucoseview` 역할 잔재 정리 | §6-E |

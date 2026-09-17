@@ -6,8 +6,8 @@
  * `/store/library/production-materials` 의 다중 소스(execution assets / blog / qr / direct)를
  * 단일 `ProductionMaterialItem[]` 로 정규화 + updatedAt DESC 정렬하는 순수 함수.
  * - API client / JSX / 서비스 의존 없음(순수) — 각 서비스 wrapper 가 raw 배열을 주입.
- * - GP/KCos 의 동일 매핑/병합 로직 중복 제거. (KPA 는 richer 구현 — 본 helper 범위 밖.)
- * - qr/direct 는 선택 소스(GP/KCos ready client 완성 시 주입). 미주입 시 빈 배열.
+ * - KCos 의 매핑/병합 로직을 공통화. (KPA 는 richer 구현 — 본 helper 범위 밖.)
+ * - qr/direct 는 선택 소스(KCos ready client 완성 시 주입). 미주입 시 빈 배열.
  */
 
 export type ProductionMaterialKind = 'material' | 'blog' | 'qr' | 'direct';

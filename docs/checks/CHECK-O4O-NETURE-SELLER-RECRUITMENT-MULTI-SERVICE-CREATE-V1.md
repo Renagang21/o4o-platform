@@ -8,7 +8,7 @@
 ## 1. 설계 (안 A — 서비스당 row)
 
 - recruitment ↔ service = **단일 `service_id` 유지**. 복수 서비스 선택 시 **서비스 수만큼 row 생성**.
-- 각 row의 `exposure_status` 독립 → KPA 승인 / GP 반려 독립 성립. (단일 row + serviceKeys 배열[안 C]은 exposure_status 공유라 부적합 — IR §6)
+- 각 row의 `exposure_status` 독립 → KPA 승인 반려 독립 성립. (단일 row + serviceKeys 배열[안 C]은 exposure_status 공유라 부적합 — IR §6)
 - **원자적 생성**(사용자 정책 확정): 선택 서비스 중 하나라도 불가(규제 미충족/중복)면 **전체 실패**, 부분 성공 없음.
 
 ## 2. 변경 (6 + migration 1)
@@ -21,12 +21,12 @@
 | `neture.service.ts` | facade `createPartnerRecruitment` 시그니처에 `serviceKeys?` 추가 |
 | `controllers/partner-recruitment.controller.ts` | body 에서 `serviceKeys` 추출·전달. 기존 에러맵(SERVICE_KEY_REQUIRED/DRUG_SERVICE_NOT_PHARMACY_AUDIENCE/RECRUITMENT_ALREADY_EXISTS) 그대로 |
 | `lib/api/supplier.ts` | `supplierRecruitmentApi.create` 입력 `serviceKeys?`/`serviceKey?`, 응답 타입 `recruitments?[]` |
-| `components/supplier/RecruitmentCreateModal.tsx` | 단일 `<select>` → 복수 체크박스. 최소 1개 강제. 규제(regulatoryType∈DRUG/QUASI_DRUG/MEDICAL_DEVICE/HEALTH_FUNCTIONAL) 시 약국(GlycoPharm/KPA) 외 비활성. 문구 "모집할 서비스(복수 선택 가능)" |
+| `components/supplier/RecruitmentCreateModal.tsx` | 단일 `<select>` → 복수 체크박스. 최소 1개 강제. 규제(regulatoryType∈DRUG/QUASI_DRUG/MEDICAL_DEVICE/HEALTH_FUNCTIONAL) 시 약국(KPA) 외 비활성. 문구 "모집할 서비스(복수 선택 가능)" |
 
 ## 3. 서비스별 승인 분리 보장
 
-- 상품 P → KPA+GP 선택 → recruitment row 2개(serviceId=kpa-society / glycopharm), 각 `exposure_status=PENDING` 독립.
-- 운영자 노출 승인: 서비스별 proxy(`service-recruitment-exposure-proxy`)가 해당 row만 승인/반려(`SERVICE_MISMATCH` 가드 유효) → KPA approved / GP rejected 독립.
+- 상품 P → KPA 선택 → recruitment row 2개(serviceId=kpa-society), 각 `exposure_status=PENDING` 독립.
+- 운영자 노출 승인: 서비스별 proxy(`service-recruitment-exposure-proxy`)가 해당 row만 승인/반려(`SERVICE_MISMATCH` 가드 유효) → KPA approved rejected 독립.
 - 신청/allowedSellerIds/알림 targetUrl/계약 = **무변경**(각 service row 기준 기존 동작).
 
 ## 4. 원자성 / 멱등
@@ -62,8 +62,8 @@
 | # | 항목 | 결과 |
 |---|------|------|
 | migration | `ExpandRecruitmentUniqueToService` 제약 교체 | ✅ **PASS** — 2차 배포(`ada03af5c`)에서 `[X] 556 ExpandRecruitmentUniqueToService20260619000000` 기록, `name[]=text[]` 에러 없음. UNIQUE→(product_id,seller_id,service_id) 적용. (1차는 §6-1 FAIL→캐스팅 수정) |
-| 2 라이브 복수 생성 | KPA+GP → row 2개 | ⏳ **미실행(차단)** — active-supplier 세션 확보 불가(renagang21 Neture 자격증명 stale=INVALID_CREDENTIALS, 타 ACTIVE 공급자 자격 미보유). 무차별 시도 회피. 생성 API 응답이 `recruitments[]` 반환하므로 유효 세션만 있으면 DB 없이 검증 가능 — **사용자 브라우저 smoke 또는 자격 제공 시 수행** |
-| 3 서비스별 승인 독립 | KPA approved / GP rejected | ⏳ 2에 의존 — 코드·구조 보증(서비스별 row + proxy SERVICE_MISMATCH 가드) |
+| 2 라이브 복수 생성 | KPA → row 2개 | ⏳ **미실행(차단)** — active-supplier 세션 확보 불가(renagang21 Neture 자격증명 stale=INVALID_CREDENTIALS, 타 ACTIVE 공급자 자격 미보유). 무차별 시도 회피. 생성 API 응답이 `recruitments[]` 반환하므로 유효 세션만 있으면 DB 없이 검증 가능 — **사용자 브라우저 smoke 또는 자격 제공 시 수행** |
+| 2 서비스별 승인 독립 | KPA approved rejected | ⏳ 2에 의존 — 코드·구조 보증(서비스별 row + proxy SERVICE_MISMATCH 가드) |
 | 4 단일 모집 회귀 | serviceKey 단수 하위호환 | ✅ 코드 보증(serviceKeys 없으면 serviceKey 1개 처리), tsc PASS |
 | 5 UI | 복수 체크박스/최소1/규제 비활성 | ✅ 코드·tsc. 시각 확인은 사용자 브라우저 |
 
@@ -82,10 +82,8 @@
 
 **복수 서비스 모집 브라우저 smoke** (ACTIVE 공급자 계정으로 neture.co.kr)
 1. `/supplier/products` → PRIVATE(판매자 제한) 유통 상품에서 "판매자 모집 생성"
-2. **모집할 서비스에서 KPA Society + GlycoPharm 복수 체크** → 생성
-3. 모집 목록에서 동일 상품에 **모집 2건**(service kpa-society / glycopharm) 확인
+3. 모집 목록에서 동일 상품에 **모집 2건**(service kpa-society) 확인
 4. 각 모집 노출 승인 상태가 **독립 pending** 확인
-5. 운영자 노출 승인 화면에서 KPA/GP가 **별도 승인 대상**으로 보이는지 + KPA만 승인/GP 대기·반려 독립 확인
 6. (회귀) 단일 서비스 선택 생성도 정상 1건
 
 **판정:** row 2개 생성 + 서비스별 승인 독립 → 최종 PASS. 1개만/실패/승인 공유 → FAIL.
@@ -98,7 +96,7 @@
 | 모달 복수 서비스 선택 | ✅ |
 | 미선택 시 생성 불가 | ✅ |
 | 규제 약국 서비스 제한 유지 | ✅ (프론트 비활성 + 백엔드 원자 gate) |
-| KPA+GP → row 2개, serviceId 각각 | ✅ (코드·tsc; 라이브는 §7) |
+| KPA → row 2개, serviceId 각각 | ✅ (코드·tsc; 라이브는 §7) |
 | exposure_status 독립 PENDING | ✅ |
 | 단일 serviceKey 하위호환 | ✅ |
 | 기존 단일 모집 표시 회귀 없음 | ✅ |

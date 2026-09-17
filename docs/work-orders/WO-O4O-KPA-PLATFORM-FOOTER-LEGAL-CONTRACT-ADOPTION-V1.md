@@ -415,7 +415,7 @@ pages/services/PharmacyServicePage.tsx
 ### G. §6.3 — 손대면 안 되는 것
 
 `PlatformFooter` 의 `styles` 객체, 브랜드 문구("O4O Platform" / "약사 직능을 위한 공동 플랫폼"), 색상, spacing, `InfoPageLayout` 구조는 유지한다.
-`© {currentYear}` 는 이미 동적이므로 건드릴 것이 없다(선행 CHECK 의 `© 2025` stale 지적은 **GlycoPharm** 건이며 이번 범위 밖이다).
+`© {currentYear}` 는 이미 동적이므로 건드릴 것이 없다.
 
 ### H. 검증·커밋
 

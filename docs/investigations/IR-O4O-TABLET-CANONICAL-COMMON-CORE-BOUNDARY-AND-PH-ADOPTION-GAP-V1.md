@@ -14,8 +14,8 @@ WO 는 「@o4o/store-ui-core 의 StoreTabletDisplaysView 가 구세대 모델일
 실측 결과 그 전제는 맞았고, **그보다 중요한 사실 하나가 더 있다.**
 
 > **백엔드는 이미 4개 서비스 전부 공통이다.**
-> `createStoreTabletRoutes` 를 KPA · PharmacyHub · K-Cosmetics · GlycoPharm 이 **모두** 마운트한다.
-> 남은 격차는 **프론트엔드 전용**이며, KCos/GP 는 2세대 백엔드를 **이미 갖고도 1세대 화면만 쓴다.**
+> `createStoreTabletRoutes` 를 KPA · PharmacyHub · K-Cosmetics 이 **모두** 마운트한다.
+> 남은 격차는 **프론트엔드 전용**이며, KCos 는 2세대 백엔드를 **이미 갖고도 1세대 화면만 쓴다.**
 
 따라서 이번 공통화는 "백엔드까지 새로 만드는 일" 이 아니라 **프론트 화면을 canonical 로 맞추는 일**이다.
 
@@ -24,7 +24,6 @@ WO 는 「@o4o/store-ui-core 의 StoreTabletDisplaysView 가 구세대 모델일
 | **KPA-Society** | ✅ | ✅ (공유 편집기) | ✅ 2탭 | ✅ `/tablet/:slug` · `/kpa/tablet/:slug` |
 | **PharmacyHub** | ✅ | ✅ (**같은** 공유 편집기) | △ 단일 목록 | ❌ **없음** |
 | K-Cosmetics | ✅ | ❌ | ❌ (1세대 진열) | ✅ `tablet/:slug` |
-| GlycoPharm | ✅ | ❌ | ❌ (1세대 진열) | ✅ `store/:pharmacyId/tablet` |
 
 **PharmacyHub 최대 갭 = 화면 세트를 만들고 적용할 수 있는데 그것을 재생할 URL 이 없다.**
 
@@ -78,7 +77,7 @@ kiosk route 경로 shape(서비스마다 이미 다름).
 | `first_active` fallback | `tabletId` 없는 기존 공개 URL 이 이것으로 동작 — E2E `M` PASS |
 | legacy idle fallback (`idle_playlist_items`) | 적용 세트 5개 중 3개가 이 소스를 가리킨다 |
 | 기존 public URL shape (`/tablet/:slug`, `/qr/:slug`) | 인쇄된 QR·북마크가 존재 |
-| `@o4o/store-ui-core` tablet view | KCos/GP 운영 화면 — §3 참조 |
+| `@o4o/store-ui-core` tablet view | KCos 운영 화면 — §3 참조 |
 
 ### D. REMOVE_OR_RETIRE — 확장 금지 / 정리 대상
 
@@ -87,7 +86,7 @@ kiosk route 경로 shape(서비스마다 이미 다름).
 | `product_content` 블록 | **application 계약에서 제거 완료**(`7971407f0`). DB CHECK residue 만 남음 — 범위 밖 |
 | `store_tablet_displays.content_id` 선택 UI·계약 | **DEAD**(0행). `7971407f0` 이 1순위 근거에서 분리. UI 는 아직 남아 있을 수 있음 → 공통화 시 미이식 |
 | KPA/PH 가 각자 가진 **같은 업무** 화면 (태블릿 목록·적용·세트 목록·lifecycle) | 공통화 대상 — 둘 중 하나를 복제하지 말고 Core 로 흡수 |
-| 1세대 UI 중 consumer 0 인 부분 | 현재 없음 — `store-ui-core` 는 KCos/GP 가 실사용 중 |
+| 1세대 UI 중 consumer 0 인 부분 | 현재 없음 — `store-ui-core` 는 KCos 가 실사용 중 |
 
 ---
 
@@ -109,9 +108,9 @@ fetchTabletIdlePlaylist · saveTabletIdlePlaylist
 
 | 후보 | 채택 | 사유 |
 |---|:---:|---|
-| KEEP_AS_LEGACY_CORE | **✅** | KCos/GP 운영 화면이며 그 두 서비스는 프로덕션에 screen set 이 **0건**(전량 KPA + service_key NULL). 지금 끊으면 두 서비스의 매장 화면이 사라진다. |
+| KEEP_AS_LEGACY_CORE | **✅** | KCos 운영 화면이며 그 서비스는 프로덕션에 screen set 이 **0건**(전량 KPA + service_key NULL). 지금 끊으면 두 서비스의 매장 화면이 사라진다. |
 | REPURPOSE | 부분 | `TabletStateBlocks`(empty/loading/error) · `TabletProductTypeBadge` 정도는 신규 Core 가 재사용 가능. 나머지는 1세대 데이터 모델에 결합. |
-| REPLACE_BY_CANONICAL_CORE | 보류 | 방향은 맞으나 **이번 회차 범위 밖**(KCos/GP 강제 변경 금지). 백엔드는 이미 준비돼 있어(§0) 후속에서 가능. |
+| REPLACE_BY_CANONICAL_CORE | 보류 | 방향은 맞으나 **이번 회차 범위 밖**(KCos 강제 변경 금지). 백엔드는 이미 준비돼 있어(§0) 후속에서 가능. |
 
 **결론**: 신규 canonical Core 와 **분리 유지**한다. `store-ui-core` tablet 을 canonical 로 승격하지 않는다.
 
@@ -224,7 +223,7 @@ Core 가 이 드리프트를 그대로 흡수하면 4개 서비스로 복제된�
 > PH kiosk route 는 신규 공개 URL 이라 검증 축이 다르다. 2개로 나누는 편이 안전하다.
 > 하나로 묶어야 한다면 **다음 1 + 다음 2 를 순서 고정된 단일 WO 의 Phase 1/2** 로 두는 형태를 권한다.
 
-**KCos/GP adoption 은 그 다음 단계**로 둔다(백엔드는 이미 준비 — §0).
+**KCos adoption 은 그 다음 단계**로 둔다(백엔드는 이미 준비 — §0).
 
 ---
 

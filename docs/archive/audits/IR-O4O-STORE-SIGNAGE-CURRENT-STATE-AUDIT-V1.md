@@ -5,12 +5,12 @@
 > 조사 전용 (investigation-only). 코드 수정 없음.
 >
 > 작성 일자: 2026-04-17
-> **2차 검증 일자: 2026-04-17** (GlycoPharm 판정 정정, 전체 판정 FAIL→PARTIAL)
+> **2차 검증 일자: 2026-04-17**
 > 조사 기준: 실제 코드 기준, 추측 배제.
-> 범위: 4개 서비스 (KPA Society, GlycoPharm, Neture, K-Cosmetics) 전체의 Store Signage 구현 상태
+> 범위: 3개 서비스 (KPA Society, Neture, K-Cosmetics) 전체의 Store Signage 구현 상태
 > 선행 문서: IR-KPA-SIGNAGE-CURRENT-STATE-AUDIT-V1 (2026-04-16, KPA 한정)
 >
-> **2차 검증 요약**: GlycoPharm이 Core 직접 CRUD를 한다는 초기 판정은 **오류**였음. 실제로는 KPA와 동일한 `store_playlists` 스냅샷 엔진을 이미 사용 중. K-Cosmetics의 격리(`cosmetics_store_*`)는 COSMETICS-DOMAIN-RULES.md에 의한 **필수 격리**이며 통합 대상이 아님.
+> 실제로는 KPA와 동일한 `store_playlists` 스냅샷 엔진을 이미 사용 중. K-Cosmetics의 격리(`cosmetics_store_*`)는 COSMETICS-DOMAIN-RULES.md에 의한 **필수 격리**이며 통합 대상이 아님.
 
 ---
 
@@ -21,10 +21,9 @@
 
 **근거 요약:**
 
-- ✅ **데이터 엔진은 예상보다 통일** — 2차 검증 결과, KPA와 GlycoPharm 모두 `store_playlists` 스냅샷 엔진을 사용 중. K-Cosmetics의 격리(`cosmetics_store_*`)는 Cosmetics Domain Rules에 의한 필수 사항
-- ⚠️ **UI 완성도가 서비스마다 극단적으로 다름** — GlycoPharm(4-tab 풀스택 1,569줄) vs KPA(2-tab 레거시 공존 1,622줄) vs Neture(browse-only) vs K-Cosmetics(기본형)
-- ⚠️ **HUB/Store 경계 혼재** — 탐색(browse)과 운영(manage)이 같은 화면에 공존 (KPA ContentHubPage의 operatorMode, GlycoPharm Explore 탭)
-- ⚠️ **Schedule 구현 불일치** — GlycoPharm만 완전 구현, 나머지 서비스 미구현
+- K-Cosmetics의 격리(`cosmetics_store_*`)는 Cosmetics Domain Rules에 의한 필수 사항
+- ⚠️ **UI 완성도가 서비스마다 극단적으로 다름** — KPA(2-tab 레거시 공존 1,622줄) vs Neture(browse-only) vs K-Cosmetics(기본형)
+- ⚠️ **HUB/Store 경계 혼재** — 탐색(browse)과 운영(manage)이 같은 화면에 공존 (KPA ContentHubPage의 operatorMode Explore 탭)
 - ⚠️ **KPA raw SQL + Entity 충돌** 미해결
 - ✅ **forced content 시스템은 정상 설계** — `signage_forced_content` + `store_playlist_items` UNION 병합으로 store 단계에서 적용
 
@@ -80,7 +79,8 @@
 │  /public/signage?playlist=:id   /public/signage?playlist=:id  │
 │  (태블릿 재생)                   (태블릿 재생)                  │
 │                                                               │
-│  [GlycoPharm]                                                 │
+│                                                               │
+│                                                               │
 │  store_playlists + store_playlist_items (KPA와 동일 엔진)      │
 │  + signage_schedules (스케줄 완전 구현)                         │
 │  ※ 2차 검증 결과: Core 직접 사용 아님, 이미 snapshot 기반        │
@@ -96,11 +96,10 @@
 | 서비스 | Core 테이블 사용 | Store 전용 테이블 | 스냅샷 여부 | 재생 엔진 |
 |--------|:----------------:|:-----------------:|:-----------:|:---------:|
 | **KPA Society** | HQ 콘텐츠 등록/조회 | `store_playlists` + `store_playlist_items` | YES (snapshot_* 컬럼) | `/public/signage` |
-| **GlycoPharm** | HQ 콘텐츠 조회 (Public API) | `store_playlists` + `store_playlist_items` (KPA와 공유) | YES (snapshot 기반, 2차 검증으로 정정) | store 기반 + Schedule |
 | **Neture** | Seller/Operator 콘텐츠 조회 | 없음 | NO | N/A |
 | **K-Cosmetics** | HQ 콘텐츠 조회 | `cosmetics_store_playlists` + items | YES (격리 스키마) | `/public/signage` |
 
-**핵심 발견 (2차 검증 정정)**: KPA와 GlycoPharm은 **동일한 `store_playlists` 스냅샷 엔진**을 사용 중. GlycoPharm의 코드 주석 `"globalContentApi 삭제 (clone 경로 전면 제거)"`가 이를 확인. 실제 분열은 2개 엔진: (1) `store_playlists` (KPA+GlycoPharm 공유) (2) `cosmetics_store_playlists` (K-Cosmetics 격리, Cosmetics Domain Rules 필수).
+실제 분열은 2개 엔진: (1) `store_playlists` (2) `cosmetics_store_playlists` (K-Cosmetics 격리, Cosmetics Domain Rules 필수).
 
 ---
 
@@ -299,8 +298,6 @@ HQ가 만든 콘텐츠 (source=hq, scope=global)
      │   → o4o_asset_snapshots 에 스냅샷 생성
      │   → store_playlist_items.snapshot_* 컬럼에 데이터 복사
      │   → 원본과 완전 독립 (원본 삭제해도 재생 가능)
-     │
-     └── [GlycoPharm 방식] 직접 참조
          → signage_playlist_items.mediaId = 원본 media ID
          → 원본에 직접 의존 (원본 삭제 시 재생 불가)
 ```
@@ -363,7 +360,7 @@ HQ가 만든 콘텐츠 (source=hq, scope=global)
 |---|------|------|------|
 | 1 | HQ 경로 | GET은 `?source=hq` 쿼리, 변이(POST/PATCH/DELETE)는 `/hq/` prefix | 동일 도메인에 2가지 규칙 |
 | 2 | Copy | Signage 전용 `/copy` 제거됨 → `assetSnapshotApi.copy()` 으로 이전. 화면 문구 잔재 | 사용자 혼란 |
-| 3 | Schedule | API 존재하나 KPA에서 화면 미구현. GlycoPharm만 4-tab에서 사용 | 서비스 간 불일치 |
+| 3 | Schedule | API 존재하나 KPA에서 화면 미구현. | 서비스 간 불일치 |
 | 4 | Scope filter | Public API에서 `scope='global'` 필터가 누락될 수 있음 | store 콘텐츠 노출 위험 |
 
 ---
@@ -389,31 +386,6 @@ HQ가 만든 콘텐츠 (source=hq, scope=global)
 **KPA 가져오기**: `assetSnapshotApi.copy({ sourceService: 'kpa', sourceAssetId, assetType: 'signage' })`
 - 위치: ContentHubPage 테이블의 "가져가기" 버튼 (Download 아이콘)
 - 결과: `o4o_asset_snapshots` 에 스냅샷 생성 → `store_playlist_items`에서 참조
-
-### 6.2 GlycoPharm
-
-| 화면 | Route | 역할 | 상태 |
-|------|-------|------|------|
-| **StoreSignageMainPage** | `/store/signage/main` | **메인 4-tab 인터페이스** | ACTIVE — 가장 완성도 높음 |
-| StoreSignagePage (legacy) | `/store/signage` | Legacy 2-tab (Playlist + Assets) | SUNSET 대상 |
-| ContentLibraryPage | `/store/signage/library` | 콘텐츠 라이브러리 | ACTIVE |
-| MediaDetailPage | `/store/signage/media/:id` | 미디어 상세 | ACTIVE |
-| PlaylistDetailPage | `/store/signage/playlist/:id` | 플레이리스트 상세 | ACTIVE |
-| SignagePreviewPage | `/store/signage/preview` | 미리보기 | ACTIVE |
-| SignagePlaybackPage | `/store/signage/playback` | 재생 시뮬레이터 | ACTIVE |
-
-**GlycoPharm StoreSignageMainPage 4-tab 상세:**
-
-| Tab | 이름 | 기능 |
-|-----|------|------|
-| 1 | 가져올 콘텐츠 (Explore) | ContentLibraryPage 연결, 콘텐츠 탐색 후 매장으로 가져오기 |
-| 2 | 내 동영상 (Assets) | KPI 카드 5종 + 필터/정렬 + 채널 토글 + 게시 상태 순환 |
-| 3 | 내 플레이리스트 (Playlist) | CRUD + DataTable + 드래그 재정렬 + 항목 추가 |
-| 4 | 스케줄 (Schedules) | 스케줄 CRUD + 요일/시간/우선순위 + 실시간 "현재 재생" 패널 |
-
-**GlycoPharm 가져오기**: `?mediaId=` URL 파라미터로 선택 플레이리스트에 자동 추가 (Community → Store 흐름)
-
-**2차 검증 정정**: GlycoPharm은 Core 직접 CRUD가 **아님**. 실제로는 `store_playlists` + `store_playlist_items` + `o4o_asset_snapshots` 스냅샷 기반 구조를 **이미 사용 중**. API 클라이언트 `storePlaylist.ts`가 `/glycopharm/store-playlists` 엔드포인트를 호출하며, 코드 주석 `"globalContentApi 삭제"`가 Core 직접 접근 제거를 확인. Tab 1 "Explore"는 Public API를 통한 **읽기 전용** 탐색일 뿐, Core CRUD가 아님.
 
 ### 6.3 Neture
 
@@ -445,18 +417,18 @@ HQ가 만든 콘텐츠 (source=hq, scope=global)
 
 ### 6.5 UI 일관성 비교표
 
-| 기능 | KPA | GlycoPharm | Neture | K-Cosmetics |
-|------|:---:|:----------:|:------:|:-----------:|
-| Store Playlist CRUD | Snapshot 기반 | Core 직접 | 없음 | 격리 스키마 |
-| Schedule CRUD | 없음 | 4-tab에서 완전 구현 | 없음 | 없음 |
-| 가져오기 | assetSnapshot.copy | URL param 기반 | 없음 (browse-only) | Hub 링크 |
-| KPI 대시보드 | 없음 | 5종 카드 | 없음 | 없음 |
-| 강제 콘텐츠 표시 | 뱃지 (StoreSignagePage) | 뱃지+만료 경고 | 없음 | 없음 |
-| 커뮤니티 콘텐츠 생성 | Modal (YouTube URL) | 없음 | 없음 | 없음 |
-| 실시간 재생 상태 | 없음 | "현재 재생" + "다음 예정" 패널 | 없음 | 없음 |
-| Operator 템플릿 | 화면 존재 여부 미확인 | 없음 (Operator 없음) | TemplatesPage 활성 | TemplatesPage 활성 |
-| Design Core 적용 | 미적용 | 미적용 | 미적용 | 미적용 |
-| 스타일링 | Custom table | Custom table | Card grid | Custom table |
+| 기능 | KPA | Neture | K-Cosmetics |
+| ------ | :---: | :------: | :-----------: |
+| Store Playlist CRUD | Snapshot 기반 | 없음 | 격리 스키마 |
+| Schedule CRUD | 없음 | 없음 | 없음 |
+| 가져오기 | assetSnapshot.copy | 없음 (browse-only) | Hub 링크 |
+| KPI 대시보드 | 없음 | 없음 | 없음 |
+| 강제 콘텐츠 표시 | 뱃지 (StoreSignagePage) | 없음 | 없음 |
+| 커뮤니티 콘텐츠 생성 | Modal (YouTube URL) | 없음 | 없음 |
+| 실시간 재생 상태 | 없음 | 없음 | 없음 |
+| Operator 템플릿 | 화면 존재 여부 미확인 | TemplatesPage 활성 | TemplatesPage 활성 |
+| Design Core 적용 | 미적용 | 미적용 | 미적용 |
+| 스타일링 | Custom table | Card grid | Custom table |
 
 ---
 
@@ -481,9 +453,9 @@ store_playlists → store_playlist_items
 **장점**: 원본 삭제/수정에 영향 없음. 재생 안정성 최고.
 **단점**: 원본 업데이트 시 스냅샷은 갱신되지 않음. 저장 공간 증가.
 
-#### ~~패턴 B: 직접 참조 (GlycoPharm)~~ — **2차 검증으로 삭제**
+#### ~~패턴 B: 직접 참조 ~~ — **2차 검증으로 삭제**
 
-> **정정**: GlycoPharm도 패턴 A(스냅샷 기반)를 사용 중. `storePlaylist.ts` API 클라이언트가 `/glycopharm/store-playlists` 엔드포인트를 호출하며, `store_playlist_items` + `o4o_asset_snapshots` 기반. 코드 주석 `"globalContentApi 삭제 (clone 경로 전면 제거)"`가 확인.
+> 코드 주석 `"globalContentApi 삭제 (clone 경로 전면 제거)"`가 확인.
 >
 > 따라서 **패턴 B는 현재 사용되지 않음**. 모든 서비스가 패턴 A(스냅샷)를 사용.
 
@@ -492,7 +464,6 @@ store_playlists → store_playlist_items
 Core 엔티티에 `parentMediaId`, `parentPlaylistId` 필드가 존재하지만:
 - **실제 사용 확인 불가** — clone 생성 시 이 필드를 설정하는 코드 경로가 명확하지 않음
 - KPA는 `assetSnapshotApi.copy()`를 사용하므로 이 필드를 사용하지 않음
-- GlycoPharm은 직접 참조하므로 clone 자체가 없음
 
 **결론**: parent 추적 필드는 **설계만 존재하고 실사용되지 않는 상태**.
 
@@ -502,7 +473,7 @@ Core 엔티티에 `parentMediaId`, `parentPlaylistId` 필드가 존재하지만:
 
 ### 8.1 의도된 역할 vs 현재 역할
 
-| 항목 | 원래 의도 | 현재 KPA 구현 | 현재 GlycoPharm 구현 |
+| 항목 | 원래 의도 | 현재 KPA 구현 ||
 |------|----------|-------------|---------------------|
 | **콘텐츠 탐색** | HUB에서 global 콘텐츠 browse | `/hub/signage` + `/signage` (ContentHubPage) | `/store/signage/library` (ContentLibraryPage) |
 | **콘텐츠 가져오기** | HUB → 매장으로 소유권 전환 | `assetSnapshotApi.copy()` (스냅샷) | Explore tab → URL param → 직접 추가 |
@@ -515,12 +486,12 @@ Core 엔티티에 `parentMediaId`, `parentPlaylistId` 필드가 존재하지만:
 
 | # | GAP | 심각도 | 설명 |
 |---|-----|:------:|------|
-| G1 | **데이터 엔진 분열** | MEDIUM (정정) | KPA+GlycoPharm은 동일 `store_playlists` 스냅샷 엔진 공유. K-Cosmetics만 격리 (`cosmetics_store_playlists`, Cosmetics Domain Rules 필수). 실제 분열은 3개→2개 |
+| G1 | **데이터 엔진 분열** | MEDIUM (정정) | K-Cosmetics만 격리 (`cosmetics_store_playlists`, Cosmetics Domain Rules 필수). 실제 분열은 3개→2개 |
 | G2 | **Store Signage 정의 부재** | HIGH | "Store Signage"가 무엇인지 플랫폼 수준에서 정의되지 않음. 각 서비스가 독자 해석 |
-| G3 | **Schedule 불일치** | HIGH | GlycoPharm만 완전 구현, KPA/Neture/K-Cosmetics는 미구현. Core에 테이블은 존재 |
-| G4 | **가져오기 패턴 불일치** | HIGH | KPA: assetSnapshot, GlycoPharm: URL param + 직접 추가, Neture: 없음, K-Cosmetics: Hub 링크 |
+| G3 | **Schedule 불일치** | HIGH | Core에 테이블은 존재 |
+| G4 | **가져오기 패턴 불일치** | HIGH | KPA: assetSnapshot: URL param + 직접 추가, Neture: 없음, K-Cosmetics: Hub 링크 |
 | G5 | **HUB/Store 경계 혼재** | MEDIUM | KPA에서 `ContentHubPage`가 탐색 + operatorMode로 관리까지 겸용 |
-| G6 | **재생 경로 불명확** | MEDIUM | GlycoPharm의 재생이 `signage_*` Core 기반인데, 어떻게 store device에 연결되는지 불명확 |
+| G6 | **재생 경로 불명확** | MEDIUM | — |
 | G7 | **forced content 적용 범위** | MEDIUM | HQ 강제 콘텐츠가 KPA 스냅샷 엔진에도 영향을 미치는지 불명확 |
 | G8 | **Design Core 전면 미적용** | LOW | 모든 서비스의 사이니지 화면이 custom table 사용 |
 
@@ -531,10 +502,10 @@ Core 엔티티에 `parentMediaId`, `parentPlaylistId` 필드가 존재하지만:
 ### P1. 2개 데이터 엔진 공존 — Cosmetics 격리는 규칙 필수 (MEDIUM, 정정)
 
 **현상 (2차 검증 정정)**: 실제로는 2개 경로:
-- KPA + GlycoPharm: `store_playlists` → `store_playlist_items` (snapshot 기반, **공유**)
+- KPA: `store_playlists` → `store_playlist_items` (snapshot 기반, **공유**)
 - K-Cosmetics: `cosmetics_store_playlists` → `cosmetics_store_playlist_items` (격리 스키마)
 
-GlycoPharm이 Core 직접 CRUD를 한다는 초기 판정은 **오류**. 이미 `store_playlists` 스냅샷 엔진 사용 중.
+이미 `store_playlists` 스냅샷 엔진 사용 중.
 
 **K-Cosmetics 격리는 의도적**: COSMETICS-DOMAIN-RULES.md §1.1-1.2에 의해 `cosmetics_` prefix + 독립 스키마 **필수**. 통합 대상이 아님.
 
@@ -544,7 +515,6 @@ GlycoPharm이 Core 직접 CRUD를 한다는 초기 판정은 **오류**. 이미 
 
 **현상**: "가져오기"(Import) 버튼이 Store Signage 화면에 존재
 - KPA: ContentHubPage의 "가져가기" 버튼
-- GlycoPharm: Explore 탭의 "콘텐츠 허브 열기"
 
 **문제**: "가져오기"는 HUB(탐색)의 기능이지 Store(운영)의 기능이 아님. Store 화면 안에 탐색 기능이 들어있으면 HUB와 역할이 중복되고, Store의 "내 플레이리스트 운영"이라는 핵심 목적이 희석됨.
 
@@ -552,7 +522,6 @@ GlycoPharm이 Core 직접 CRUD를 한다는 초기 판정은 **오류**. 이미 
 
 **현상**:
 - KPA: `/hub/signage` (HubSignageLibraryPage) + `/signage` (ContentHubPage) + `/store/marketing/signage` (StoreSignagePage) — 3곳에서 콘텐츠 탐색 가능
-- GlycoPharm: `/store/signage/library` (ContentLibraryPage) + `/store/signage` Explore 탭
 
 **문제**: 탐색(browse) 진입점이 분산되어 있어, 사용자가 "어디서 콘텐츠를 찾아야 하는지" 혼란.
 
@@ -560,17 +529,15 @@ GlycoPharm이 Core 직접 CRUD를 한다는 초기 판정은 **오류**. 이미 
 
 **현상**:
 - KPA ContentHubPage: `operatorMode` prop으로 커뮤니티(탐색) + 운영자(관리) 겸용
-- GlycoPharm StoreSignageMainPage: 4-tab 중 Tab 1이 "가져올 콘텐츠" = 탐색 기능
 
 **문제**: 단일 컴포넌트/화면이 탐색과 운영을 모두 담당하면 책임 분리 원칙 위반. 각 역할에 맞는 최적 UX를 제공하기 어려움.
 
 ### P5. Schedule 테이블 존재하나 사용 불일치 (MEDIUM)
 
 **현상**: `signage_schedules` 테이블과 API(GET/POST/PATCH/DELETE)가 모두 존재하지만:
-- GlycoPharm만 4-tab에서 Schedule CRUD를 완전 구현
 - KPA/Neture/K-Cosmetics는 Schedule UI가 없음
 
-**문제**: "스케줄은 플랫폼 표준인가, GlycoPharm 전용인가"가 불명확.
+**문제**: "스케줄은 플랫폼 표준인가 전용인가"가 불명확.
 
 ### P6. Entity 충돌 + raw SQL (KPA 고유, 기존 IR에서 지적)
 
@@ -581,7 +548,6 @@ GlycoPharm이 Core 직접 CRUD를 한다는 초기 판정은 **오류**. 이미 
 
 **현상**:
 - KPA: `PublicSignagePage`에서 `store_playlists` 스냅샷 기반 재생
-- GlycoPharm: `SignagePlaybackPage`에서 Core `signage_playlists` 기반 재생
 - 공유 컴포넌트(`@o4o-apps/signage/SignagePlayer`)는 존재하나, 어떤 데이터 소스를 사용하는지 서비스마다 다름
 
 **문제**: "플레이리스트를 재생한다"는 같은 동작이 서비스마다 다른 데이터 경로를 탐.
@@ -594,7 +560,6 @@ GlycoPharm이 Core 직접 CRUD를 한다는 초기 판정은 **오류**. 이미 
 
 **문제**:
 - KPA의 `store_playlists` 스냅샷 엔진에는 forced content가 어떻게 반영되는지 불명확
-- GlycoPharm의 Core 기반 playlist에는 `signage_playlist_items.isForced` 플래그로 반영
 - 두 엔진 간 forced content 적용 방식이 다를 수 있음
 
 ---
@@ -620,7 +585,6 @@ GlycoPharm이 Core 직접 CRUD를 한다는 초기 판정은 **오류**. 이미 
 
 ```
 현실 (정정 후):
-┌──────── KPA + GlycoPharm (공유 엔진) ────────┐
 │ store_playlists (동일 테이블)                  │
 │ store_playlist_items (동일 테이블)              │
 │ o4o_asset_snapshots (동일 스냅샷)              │
@@ -628,7 +592,7 @@ GlycoPharm이 Core 직접 CRUD를 한다는 초기 판정은 **오류**. 이미 
 │                                               │
 │ 차이점:                                       │
 │   KPA: Schedule 미구현, raw SQL, 2-tab legacy  │
-│   GlycoPharm: Schedule 완전 구현, 4-tab 풀스택  │
+│   Schedule 완전 구현, 4-tab 풀스택              │
 │               Forced content UNION 병합         │
 └───────────────────────────────────────────────┘
 
@@ -652,7 +616,7 @@ GlycoPharm이 Core 직접 CRUD를 한다는 초기 판정은 **오류**. 이미 
 |---|------|------|
 | 1 | Core 패키지가 엔티티만 제공하고 **사용 계약을 강제하지 않음** | 서비스가 Core를 무시하고 독자 엔진 구축 |
 | 2 | "매장이 global 콘텐츠를 어떻게 사용하는가"에 대한 **플랫폼 표준이 없음** | 스냅샷 vs 직접 참조 분열 |
-| 3 | Schedule 기능의 **필수/선택 여부가 정의되지 않음** | GlycoPharm만 구현 |
+| 3 | Schedule 기능의 **필수/선택 여부가 정의되지 않음** | — |
 | 4 | Store Signage의 **최소 기능 세트(MVP)가 정의되지 않음** | 서비스마다 구현 범위가 다름 |
 | 5 | KPA가 먼저 구현되면서 `store_playlists` 독자 엔진 생성 → 이것이 Core와 충돌 | 이후 서비스들이 어느 쪽을 따를지 혼란 |
 
@@ -669,7 +633,6 @@ GlycoPharm이 Core 직접 CRUD를 한다는 초기 판정은 **오류**. 이미 
 | 서비스 | 엔진 | 상태 |
 |--------|------|------|
 | KPA | `store_playlists` (snapshot) | ✅ 표준 |
-| GlycoPharm | `store_playlists` (snapshot) | ✅ 표준 (이미 전환 완료) |
 | K-Cosmetics | `cosmetics_store_playlists` (snapshot, 격리) | ✅ 규칙 필수 |
 | Neture | 없음 (browse-only) | N/A |
 
@@ -696,7 +659,7 @@ GlycoPharm이 Core 직접 CRUD를 한다는 초기 판정은 **오류**. 이미 
 
 | 기능 | 방향 | 근거 |
 |------|------|------|
-| Schedule | 플랫폼 표준으로 승격 또는 Out of Scope 공식화 | GlycoPharm만 구현된 현 상태는 불안정 |
+| Schedule | 플랫폼 표준으로 승격 또는 Out of Scope 공식화 | — |
 | Template | Hold 유지 → 사용도 재평가 후 결정 | 3개 서비스 TemplatesPage 존재 |
 | Forced Content | Core 수준으로 통합 필요 | 현재 KPA 스냅샷 엔진과 Core 사이의 적용 방식 불명확 |
 
@@ -706,12 +669,12 @@ GlycoPharm이 Core 직접 CRUD를 한다는 초기 판정은 **오류**. 이미 
 
 | 기준 | 결과 | 근거 |
 |------|------|------|
-| **구조 일관성** | PARTIAL (정정) | 데이터 엔진은 KPA+GlycoPharm 공유 + K-Cosmetics 격리(규칙 필수). UI 완성도만 불일치 |
+| **구조 일관성** | PARTIAL (정정) | 데이터 엔진은 KPA 공유 + K-Cosmetics 격리(규칙 필수). UI 완성도만 불일치 |
 | **HUB/Store 경계** | FAIL | 탐색과 운영이 혼재, 가져오기 위치 불일치 |
 | **데이터 흐름 명확성** | PARTIAL | Core 설계는 명확하나 실제 사용이 설계를 따르지 않음 |
 | **API 계약 일관성** | PARTIAL | 공통 라우트 구조는 있으나 HQ 경로 규칙 불일치 |
 | **재생 경로 안정성** | PASS (KPA) | KPA 스냅샷 기반 재생은 안정적으로 동작 |
-| **신규 서비스 온보딩** | PARTIAL (정정) | `store_playlists` 스냅샷 엔진이 사실상 표준 (KPA+GlycoPharm). 문서화만 필요 |
+| **신규 서비스 온보딩** | PARTIAL (정정) | `store_playlists` 스냅샷 엔진이 사실상 표준 (KPA). 문서화만 필요 |
 
 **종합 판정: PARTIAL** (2차 검증으로 FAIL→PARTIAL 상향)
 
@@ -721,10 +684,8 @@ GlycoPharm이 Core 직접 CRUD를 한다는 초기 판정은 **오류**. 이미 
 
 ### 필수 결정 사항 (2차 검증 반영)
 
-1. **데이터 엔진: 이미 수렴됨** — `store_playlists` 스냅샷 엔진이 사실상 표준 (KPA+GlycoPharm 공유). K-Cosmetics 격리는 규칙 필수이므로 유지. **엔진 선택 결정은 불필요.**
-2. **Store Signage MVP 기능 세트 정의** — GlycoPharm의 4-tab(Assets/Playlist/Schedule + Explore)을 기준으로 모든 서비스가 갖춰야 할 최소 기능 목록 확정
+1. **데이터 엔진: 이미 수렴됨** — `store_playlists` 스냅샷 엔진이 사실상 표준 (KPA 공유). K-Cosmetics 격리는 규칙 필수이므로 유지. **엔진 선택 결정은 불필요.**
 3. **가져오기 패턴: 이미 통일됨** — 스냅샷 방식(`assetSnapshotApi.copy()` + `store_playlist_items` snapshot 컬럼)이 표준. **패턴 선택 결정은 불필요.**
-4. **Schedule 정책 확정** — GlycoPharm 기준으로 플랫폼 표준 승격 or Out of Scope 공식화
 5. **HUB/Store 역할 분리** — 탐색(HUB)과 운영(Store) 경계 명확화. Store 내 Explore 탭 정책 결정
 6. **KPA 정비** — raw SQL 제거, Entity 통일, 2-tab legacy 정리, Schedule 도입 여부
 
@@ -732,7 +693,6 @@ GlycoPharm이 Core 직접 CRUD를 한다는 초기 판정은 **오류**. 이미 
 
 ```
 Step 1: 본 IR 결과를 기반으로 MVP 기능 세트 합의
-Step 2: WO-KPA-SIGNAGE-STORE-MODERNIZATION-V1 (KPA를 GlycoPharm 수준으로 끌어올림)
         - raw SQL → Repository 전환
         - 2-tab → 3-tab(Assets/Playlist/Schedule) 통합
         - Entity 충돌 해소
@@ -742,7 +702,7 @@ Step 3: WO-O4O-SIGNAGE-HUB-STORE-BOUNDARY-V1 (HUB/Store 역할 분리 표준화)
 Step 4: Schedule/Forced Content 정책 문서화
 ```
 
-**주의**: GlycoPharm 데이터 마이그레이션은 **불필요** (이미 스냅샷 기반). K-Cosmetics 통합도 **불가** (규칙 위반).
+K-Cosmetics 통합도 **불가** (규칙 위반).
 
 ---
 
@@ -778,13 +738,6 @@ Step 4: Schedule/Forced Content 정책 문서화
 | `services/web-kpa-society/src/pages/store/StoreSignagePage.tsx` | 매장 사이니지 (2-tab) |
 | `services/web-kpa-society/src/pages/public/PublicSignagePage.tsx` | 태블릿 재생 |
 | `services/web-kpa-society/src/pages/signage/HubSignageLibraryPage.tsx` | HUB 라이브러리 |
-
-### Frontend — GlycoPharm
-
-| 파일 | 화면 |
-|------|------|
-| `services/web-glycopharm/src/pages/store/signage/StoreSignageMainPage.tsx` | 메인 4-tab |
-| `services/web-glycopharm/src/pages/store/signage/ContentLibraryPage.tsx` | 콘텐츠 라이브러리 |
 
 ### Frontend — Neture
 

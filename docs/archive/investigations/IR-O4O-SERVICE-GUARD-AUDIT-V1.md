@@ -132,21 +132,6 @@ userData.scopes = deriveUserScopes({ role: roles[0], roles });
 
 Neture는 공개 정보 플랫폼. 인증 불필요.
 
-### GlycoPharm
-
-| 엔드포인트 | Auth | Scope Guard | Membership Check |
-|-----------|------|------------|------------------|
-| GET /glycopharm/pharmacies | NO | NO | NO |
-| /glycopharm/admin/* | requireAuth | requireGlycopharmScope | **NO** |
-
-```typescript
-router.get('/admin/pharmacies',
-  requireAuth,
-  requireScope('glycopharm:admin'),  // role만 확인
-  handler
-);
-```
-
 ### KPA Society
 
 | 엔드포인트 | Auth | Scope Guard | Membership Check |
@@ -186,7 +171,6 @@ const [member] = await ds.query(
 | 서비스 | Status 저장 | Status 검사 | Membership 검사 | 차단 UI |
 |--------|:---------:|:---------:|:-------------:|---------|
 | **Neture** | NO | NO | NO | 없음 |
-| **GlycoPharm** | YES (미사용) | NO | NO | 없음 |
 | **KPA Society** | YES | **YES** | **YES** (kpaMembership) | PendingApprovalPage |
 | **GlucoseView** | YES | **YES** | NO | PendingPage |
 | **K-Cosmetics** | NO | NO | NO | 없음 |
@@ -224,11 +208,8 @@ if (isPending || isRejected) {
 
 ```
 1. User A: Neture 가입 (active)
-2. User A: GlycoPharm 추가 가입 (pending)
-3. Register API → service_memberships에 GlycoPharm pending 생성
 4. Register API → role_assignments에 customer 역할 생성
 5. User A 로그인 → JWT에 모든 active roles 포함
-6. GlycoPharm API 접근 → role 확인만 → 접근 허용
 ```
 
 **결과: service_memberships.status='pending'이지만 접근 가능**
@@ -313,7 +294,6 @@ if (isPending || isRejected) {
 | Service | Auth | Role Guard | Scope Guard | Membership Guard | 판정 |
 |---------|:----:|:----------:|:-----------:|:----------------:|:----:|
 | **Neture** | 없음 | 없음 | 없음 | 없음 | N/A (공개) |
-| **GlycoPharm** | requireAuth | requireRole | requireGlycopharmScope | **없음** | **UNSAFE** |
 | **KPA Society** | requireAuth | requireRole | requireKpaScope | kpa_members (자체) | **PARTIAL** |
 | **GlucoseView** | requireAuth | requireRole | requireGlucoseViewScope | **없음** | **UNSAFE** |
 | **K-Cosmetics** | requireAuth | requireRole | requireCosmeticsScope | **없음** | **UNSAFE** |

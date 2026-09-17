@@ -82,7 +82,7 @@ K-Cosmetics 사이니지는 두 경로 공존:
 
 | 항목 | 결과 |
 |---|---|
-| 활성 경로 | `/store-playlists` → `apps/api-server/src/routes/o4o-store/controllers/store-playlist.controller.ts` (각 서비스 라우트에서 마운트: cosmetics.routes.ts:145, kpa:387, glycopharm:394, neture:50) |
+| 활성 경로 | `/store-playlists` → `apps/api-server/src/routes/o4o-store/controllers/store-playlist.controller.ts` (각 서비스 라우트에서 마운트: cosmetics.routes.ts:145, kpa:387:394, neture:50) |
 | item 소스 | snapshot / library / **signage-media**(`/items/from-signage`) — **product 없음** |
 | 테이블 | `cosmetics_store_playlists` / `cosmetics_store_playlist_items`(`asset_type`+`reference_id`, migration 20260212000003) — product 컬럼 없음 |
 | frontend | `services/web-k-cosmetics/.../store/StoreSignagePage.tsx` — `assetSnapshotApi.copy` 기반 |
@@ -98,7 +98,6 @@ K-Cosmetics 사이니지는 두 경로 공존:
 | K-Cosmetics backend(api-server) | 사용 | 있음 | B route/entity runtime 마운트 | PASS — 미마운트·엔티티 제거됨 |
 | admin-dashboard | 사용 | 있음 | B endpoint 호출 | NOTE — client-only dead(404), 함께 제거 권장 |
 | KPA-Society | 미사용 | 없음 | digital-signage-core 표준 | PASS |
-| GlycoPharm | 확인 필요 | 낮음 | 동일 패키지(B) 코드 — 동일하게 미마운트 | NOTE — 패키지 제거 시 동반 정리 |
 | Neture | 미사용 | 없음 | 매장 사이니지 대상 아님 | PASS |
 
 ---
@@ -136,7 +135,7 @@ REMEDIATION IR §7 의 진행 조건 대조:
 | # | Risk | 등급 | 비고 |
 |---|---|---|---|
 | 11-1 | 라이브 DB 미확인 — 정적상 DB_ABSENT 이나 1회 SELECT 미수행 | LOW | REMOVE 착수 시 선실행으로 종료 |
-| 11-2 | B 패키지가 GlycoPharm 등 다른 소비처에도 노출 가능성(패키지 단위 제거 시) | LOW | 동일 미마운트 — 동반 정리, smoke 로 확인 |
+| 11-2 | — | LOW | 동일 미마운트 — 동반 정리, smoke 로 확인 |
 | 11-3 | admin-dashboard signage 페이지 라우팅 잔존 시 빈 화면/404 UX | LOW | 페이지 동반 제거 권장 |
 
 ---

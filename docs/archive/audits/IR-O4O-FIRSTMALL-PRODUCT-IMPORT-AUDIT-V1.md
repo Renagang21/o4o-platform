@@ -114,8 +114,6 @@ CSV File
 ### 3.2 상품 이미지 저장 구조
 
 ```typescript
-// GlycopharmProduct 이미지 구조
-interface GlycopharmProductImage {
   url: string;        // 이미지 URL
   alt?: string;       // 대체 텍스트
   is_primary: boolean; // 대표 이미지 여부
@@ -124,7 +122,6 @@ interface GlycopharmProductImage {
 
 // DB 저장: JSONB 배열
 @Column({ type: 'jsonb', nullable: true })
-images?: GlycopharmProductImage[];
 ```
 
 ### 3.3 이미지 Import 가능성
@@ -142,7 +139,7 @@ images?: GlycopharmProductImage[];
 
 **현재 ProductMaster에 이미지 컬럼이 없음.**
 
-이미지는 도메인별 상품 엔티티(glycopharm_products, store_local_products 등)에만 존재.
+이미지는 도메인별 상품 엔티티에만 존재.
 ProductMaster에 이미지를 추가하려면 마이그레이션 필요.
 
 대안: `store_product_profiles` 테이블 활용 (organization별 커스텀 표시).

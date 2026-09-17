@@ -111,7 +111,6 @@
 | 서비스 | MyProfilePage | capability 카드 | 자동 부여 |
 |--------|--------------|----------------|-----------|
 | `web-kpa-society` | 있음 (700+ lines) | **있음** (capabilitySection, L620+) | **있음** (member.controller 자동 활성화) |
-| `web-glycopharm` | 있음 (간단) | **없음** | **없음** |
 | `web-k-cosmetics` | 있음 (매우 간단) | **없음** | **없음** |
 | `web-neture` | (조사 범위 외) | — | — |
 

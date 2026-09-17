@@ -4,7 +4,7 @@
 
 - **작성일**: 2026-06-05
 - **commit**: `b955a09b4` — `feat(kpa): record blog derivations from source items`
-- **배포**: Deploy API Server + Web(KPA) **success** (GP/KCos/Neture skipped)
+- **배포**: Deploy API Server + Web(KPA) **success** (KCos/Neture skipped)
 
 ---
 
@@ -32,13 +32,12 @@ snapshot→`content_snapshot` / direct→`content_direct` / library→`store_exe
 ## 5. Shared Module Change Verification (O4O-SHARED-MODULE-CHANGE-PROTOCOL-V1 §10)
 
 ### Changed shared module
-`blog.controller.ts` (serviceKey 파라미터로 KPA/GlycoPharm 공유), `store-asset-derivation.service`(공통).
+`blog.controller.ts` (serviceKey 파라미터로 KPA 공유), `store-asset-derivation.service`(공통).
 
 ### Consumer impact matrix
 | 소비처 | blog.controller | optional sourceItems 영향 | 결과 |
 |--------|:---------------:|---------------------------|------|
 | KPA-Society (`kpa`) | ✅ | 본 작업 대상(프론트 forwarding) | 기록됨 |
-| GlycoPharm (`glycopharm`) | ✅ | **없음** — additive optional, 미전달 시 기존 동작. 프론트 미연동 | 무영향 |
 | K-Cosmetics | △ | **없음**(미전달) | 무영향 |
 | Neture | 미사용 | 없음 | 무영향 |
 | derivation read endpoint | 공통 | blog_post 조회(org 격리 동일) | 정합 |
@@ -57,11 +56,11 @@ snapshot→`content_snapshot` / direct→`content_direct` / library→`store_exe
 ---
 
 ## 6. 변경하지 않은 항목
-DB/migration / blog hard delete 정책 / 저장소 통합 / QR relation write-path / derivation viewer / GP·KCos 프론트 / Home·HeroBanner·StoreSidebar·storeMenuConfig·menuCapabilityMap.
+DB/migration / blog hard delete 정책 / 저장소 통합 / QR relation write-path / derivation viewer / KCos 프론트 / Home·HeroBanner·StoreSidebar·storeMenuConfig·menuCapabilityMap.
 
 ## 7. 후속
 1. **QR/blog relation viewer 확장** (POP 전용 "원본 보기"를 derivedKind 파라미터화 → QR/블로그 행).
 2. relation cleanup/delete policy, GCS orphan cleanup, 사이니지 relation.
-3. **IR-O4O-STORE-ASSET-DERIVATION-CROSSSERVICE-COMMONIZATION-V1** (GP/KCos 확장).
+3. **IR-O4O-STORE-ASSET-DERIVATION-CROSSSERVICE-COMMONIZATION-V1** (KCos 확장).
 
 *KPA relation write-path = POP + QR + 블로그 완료. 다음은 viewer 확장 → cross-service IR.*

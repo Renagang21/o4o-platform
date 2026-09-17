@@ -6,7 +6,7 @@
  * 업무 계약 구분(§8) — 주문 내역은 하나가 아니다:
  *   (1) **buyer checkout ledger** = 매장이 공급자에게 낸 구매/발주 내역.
  *       buyerId 기준 `checkout_orders` (`/checkout/orders`). ← **본 View 의 범위**
- *       현행 소비처: KPA `StoreOrdersPage`, GlycoPharm `PharmacyOrders`,
+ *       현행 소비처: KPA `StoreOrdersPage`,
  *       K-Cosmetics `StoreOrdersPage`.
  *       (K-Cosmetics `/cosmetics/orders` 는 list/get 모두 `co."buyerId" = 요청자` 스코프이므로
  *        같은 buyer ledger 다 — WO-O4O-STORE-HUB-MAIN-INDEPENDENT-PRODUCTION-VERIFICATION-V1
@@ -19,9 +19,9 @@
  *   (선택) 주문번호 검색 / loading · error · empty 상태 / (선택) 페이지네이션.
  *
  * 서비스 차이는 조건문이 아니라 config·adapter·slot 으로 유지한다(§10):
- *   - 상태 탭 정의와 매칭 = `statusTabs` + `matchStatus` (GP 의 결제중심 파생 3상태 유지)
+ *   - 상태 탭 정의와 매칭 = `statusTabs` + `matchStatus` (결제중심 파생 상태도 주입 가능)
  *   - 결제완료 / 취소 판정 = `isPaid` · `isCancelled` adapter (KPI 집계 정책 보존)
- *   - 목록 본문 = `renderList` slot (KPA DataTable / GP 확장 카드 — 업무상 다른 표현)
+ *   - 목록 본문 = `renderList` slot (KPA DataTable / 확장 카드 등 — 업무상 다른 표현)
  *   - 헤더 우측 액션 = `headerAction` slot (KPA 주문 작업대 링크)
  *
  * 상태 변경은 **결제 전 취소 하나뿐**이다(seller 이행 화면은 별도).

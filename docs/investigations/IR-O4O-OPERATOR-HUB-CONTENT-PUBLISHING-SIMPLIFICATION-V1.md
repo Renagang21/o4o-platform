@@ -74,7 +74,7 @@
 
 | 항목 | 매장 HUB 진열 | 매장 측 제작 | 가져가기 (snapshot copy) | 정렬 상태 |
 |------|:------------:|:-----------:|:-----------------------:|:--------:|
-| **상품 상세정보** | HubB2BCatalogPage (KPA/Glyco) | StoreProductInfoCreatorPage (KPA) | 부분 (`assetType='product'` 미확인) | **부분 정렬** |
+| **상품 상세정보** | HubB2BCatalogPage | StoreProductInfoCreatorPage (KPA) | 부분 (`assetType='product'` 미확인) | **부분 정렬** |
 | **POP** | StoreHubSignageLibrary 내 / 부분 | StorePopPage (KPA) | ✅ `assetType='signage'` | **정렬** |
 | **QR-code** | 독립 진열 화면 부재 | StoreQRPage (KPA) | ✅ via library | **부분 정렬** |
 | **블로그** | 진열 화면 부재 | PharmacyBlogPage (KPA, direct) | ❌ Hub→Store 흐름 없음 | **미정렬** |
@@ -151,7 +151,7 @@ OperatorContentHubPage (목록 + Workspace C 진입 허브)
 |------|:--------------:|------|
 | POP | 100% (KPA 중심) | `StorePopPage` + `store_execution_assets` |
 | QR | 90% (KPA) | `StoreQRPage` + library 참조 |
-| 사이니지 | 95% (KPA / Glyco) | `StoreSignagePage` + `o4o_asset_snapshots` |
+| 사이니지 | 95% | `StoreSignagePage` + `o4o_asset_snapshots` |
 | 블로그 | 70% (KPA 단독) | `PharmacyBlogPage` — 직접 작성 위주, Hub 가져오기 없음 |
 | 상품 상세 | 60% (KPA 단독) | `StoreProductInfoCreatorPage` — 직접 작성, Hub 흐름 부재 |
 | 고객 안내문 | 0% | 전체 미구현 |
@@ -236,7 +236,6 @@ CmsContentManager 패턴을 다른 항목으로 확장:
 | `DataTable + BaseDetailDrawer + ActionBar` | `@o4o/operator-ux-core` | 운영자 목록 / 상세 / bulk |
 | `ContentWritePage` 패턴 | KPA | 블로그 wrapping 토대 |
 | `ResourceWritePage` 패턴 | KPA | 자료 wrapping 토대 |
-| `GuidelineManagementPage` 패턴 | Glyco | 안내문 wrapping 토대 |
 
 ### 7.2 신규 작성 (소규모)
 

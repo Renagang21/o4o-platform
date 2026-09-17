@@ -19,7 +19,7 @@
 ## 2. 구현한 언어 선택 UI (실행 4)
 
 - **7개 언어 = 기존 `LOCALE_LABELS` 재사용**(태블렛 전용 목록 신규 하드코딩 없음): `ko 한국어 · en English · zh 中文 · ja 日本語 · vi Tiếng Việt · th ภาษาไทย · id Bahasa`(값=매장 축 SSOT `STORE_MLC_LOCALE_LABELS` 와 동일, [[CHECK-O4O-MULTILINGUAL-LANGUAGE-UI-CONSOLIDATION-V1]]). 순서 = 정의 순(ko 우선).
-- 좌상단 44px 셀렉터(우상단 QR 버튼과 대칭). **실 태블렛 런타임 + 적용 Screen Set(screen_set) 에서만 노출** — legacy/미리보기/임베드/fetchScreen 미주입 서비스(GP·KCos) 미노출.
+- 좌상단 44px 셀렉터(우상단 QR 버튼과 대칭). **실 태블렛 런타임 + 적용 Screen Set(screen_set) 에서만 노출** — legacy/미리보기/임베드/fetchScreen 미주입 서비스(KCos) 미노출.
 - 7 언어 미정의 시 임의 결정 금지 조항 해당 없음: **공통 설정에 7개 전량 정의 확인**(gap 0).
 
 ## 3. 선택값 유지 범위 (실행 5) — 브라우저 로컬만
@@ -57,7 +57,7 @@
 
 ## 8. typecheck·test·build·배포 (실행 9·10)
 
-- tsc 0: api-server(변경 파일) · kiosk-core · tablet-screen-set-editor · web-kpa-society. **shared 소비처 build 0**: web-kpa-society · **web-glycopharm**(kiosk) · **web-neture**(editor). (GP/KCos 는 fetchScreen 미주입 → 셀렉터·언어 경로 dead → 무영향.)
+- tsc 0: api-server(변경 파일) · kiosk-core · tablet-screen-set-editor · web-kpa-society. **shared 소비처 build 0**: web-kpa-society · **web-neture**(editor). (KCos 는 fetchScreen 미주입 → 셀렉터·언어 경로 dead → 무영향.)
 - 배포: **Deploy API Server success** + **deploy-web(kpa-society) success**.
 
 ## 9. 프로덕션 브라우저 smoke (실행 10) — ✅ PASS

@@ -93,7 +93,7 @@ stash 금지
 
 ```text
 Neture 2건
-GP/KCos 5건
+KCos 5건
 총 7건
 ```
 
@@ -296,7 +296,6 @@ target 생성 방식
 
 ```text
 web-kpa-society
-web-glycopharm
 web-k-cosmetics
 web-neture
 web-pharmacy-hub
@@ -503,7 +502,6 @@ DB 직접 알림 생성 금지.
 
 ```text
 KPA
-GP
 KCos
 Neture
 PH
@@ -856,7 +854,7 @@ const metadata = JSON.stringify({ trialId, productId, linkUrl: `/hub/products/${
 - 프로덕션 DB 직접 TCP 불가. `cloud-sql-proxy` 경유 (CLAUDE.md §0, `SETUP.md` 가 정본)
 - SELECT 계열 read-only census 는 직접 수행 가능
 - **§6 이 이번 WO 에 한해 제한적 production UPDATE 를 명시 승인한다.** 이는 CLAUDE.md §0 의 "데이터 변경은 사용자 승인 필요" 를 이 범위에서 충족한 것으로 본다. 단 승인 범위는 **notification target 필드뿐**이며, §7 금지 목록 밖으로 한 칸이라도 넘어가면 중지·보고한다
-- 과거 보고 숫자(neture 2 / GP·KCos 5 = 7)는 §4 지시대로 **재산출한다.** 그 숫자를 predicate 에 넣지 말 것
+- 과거 보고 숫자(neture 2 / KCos 5 = 7)는 §4 지시대로 **재산출한다.** 그 숫자를 predicate 에 넣지 말 것
 
 교정 이전 producer 가 내보낸 dead 값 2종(census 출발점, 전수 아님):
 

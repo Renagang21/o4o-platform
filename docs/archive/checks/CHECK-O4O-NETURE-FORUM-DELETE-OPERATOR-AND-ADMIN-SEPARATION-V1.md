@@ -13,7 +13,7 @@
 - "포럼" = `forum_category_requests` row (엔티티 `ForumCategoryRequest`, `@o4o/forum-core`). `forum_category` 테이블·`Forum` 엔티티는 이미 제거됨.
 - 삭제 상태는 전용 컬럼 없이 **`status`** (활성 `completed` / 소프트삭제 `archived`) + **`metadata` jsonb**(`deleteRequestStatus`, `directDeactivatedAt/By/Reason`, `archivedAt`, `reactivatedAt` 등) 로 표현.
 - 삭제 요청 흐름: 소유자 요청(`metadata.deleteRequestStatus='pending'`) → Operator 승인(`archived`) / 반려(상태 유지). **별도 테이블 없음**.
-- 삭제 로직은 **4개 서비스(KPA/GlycoPharm/K-Cosmetics/Neture) 공유** 라우터 `apps/api-server/src/routes/forum/operator-forum.routes.ts`(mount `/api/v1/forum/operator`)에 존재. `serviceCode` 쿼리 파라미터 + operator 역할로 서비스 격리.
+- 삭제 로직은 **4개 서비스 공유** 라우터 `apps/api-server/src/routes/forum/operator-forum.routes.ts`(mount `/api/v1/forum/operator`)에 존재. `serviceCode` 쿼리 파라미터 + operator 역할로 서비스 격리.
 - FK/cascade: `forum_post.forum_id`=SET NULL, `forum_comment.postId`→`forum_post`=CASCADE, `forum_category_members`·`forum_post_like`·`forum_notifications`는 포럼 FK 없음(수동 정리 필요).
 
 ---
@@ -42,7 +42,7 @@
 
 - 신규 **admin-scoped** 라우터 `apps/api-server/src/routes/forum/admin-forum.routes.ts` (mount `/api/v1/forum/admin`).
 - 서버 가드 `requireServiceAdmin` = `isServiceAdmin(serviceCode)` → **`neture:admin` 또는 `platform:super_admin`** 만 통과. 일반 operator 는 URL/API 직접 호출로도 완전 삭제 불가(UI 숨김만으로 통제하지 않음).
-- 기존 공통 `DELETE /forum/operator/categories/:id/hard` 는 **역할 게이트/제거 변경 없음**(KPA/GP/KCos 호환). Neture Admin UI 는 공통 operator hard-delete 가 아닌 **admin 전용 API 만** 호출.
+- 기존 공통 `DELETE /forum/operator/categories:id/hard` 는 **역할 게이트/제거 변경 없음**(KPA/KCos 호환). Neture Admin UI 는 공통 operator hard-delete 가 아닌 **admin 전용 API 만** 호출.
 - Admin 완전 삭제는 **`archived` 상태만** 대상(활성 포럼 차단, `NOT_ARCHIVED`).
 
 ---
@@ -77,14 +77,13 @@
   - [ ] Neture Operator 직접 soft delete(비활성화) + 사용자 화면 미노출
   - [ ] Neture Admin `삭제된 포럼` 목록/복구/완전삭제 + 삭제 이력
   - [ ] 일반 Operator 의 admin hard-delete API 호출 403 차단
-  - [ ] KPA/GlycoPharm/K-Cosmetics 기존 포럼 삭제(카테고리 관리/삭제요청) 회귀
 
 ---
 
 ## 7. 타 서비스 영향 (공유 모듈)
 
-- 백엔드 공통 라우터(operator-forum.routes.ts hard-delete) 동작 변경: likes/notifications 정리 추가 + 트랜잭션 + 감사로그. **정상 게시글 차단 가드 동일** → KPA/GP/KCos 회귀 검증 필요.
-- `@o4o/operator-core-ui` forum-categories 콘솔에 `disableHardDelete`/`requireNameConfirmForNonEmpty` **옵션 추가(기본 off)** → KPA/GP/KCos 동작 불변.
+- 백엔드 공통 라우터(operator-forum.routes.ts hard-delete) 동작 변경: likes/notifications 정리 추가 + 트랜잭션 + 감사로그. **정상 게시글 차단 가드 동일** → KPA/KCos 회귀 검증 필요.
+- `@o4o/operator-core-ui` forum-categories 콘솔에 `disableHardDelete`/`requireNameConfirmForNonEmpty` **옵션 추가(기본 off)** → KPA/KCos 동작 불변.
 - serviceCode 격리로 Neture 삭제가 타 서비스 포럼 데이터에 영향 없음.
 
 ---

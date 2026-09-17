@@ -45,8 +45,8 @@ Cloud SQL Auth Proxy v2 + `gcloud auth print-access-token`, 임시 포트 5452, 
 
 | 계정 | credential 보유 serviceKey | L1 과 동일? |
 |------|---------------------------|:-----------:|
-| 계정 A | kpa-society · glycopharm · k-cosmetics · neture | 전부 **false** |
-| 계정 B | kpa-society · glycopharm · k-cosmetics · neture · pharmacy-hub | 전부 **false** |
+| 계정 A | kpa-society · k-cosmetics · neture | 전부 **false** |
+| 계정 B | kpa-society · k-cosmetics · neture · pharmacy-hub | 전부 **false** |
 | 계정 C | neture · pharmacy-hub | 전부 **false** |
 
 → **문서의 단일 비밀번호로는 어떤 서비스 웹 로그인도 되지 않는다.** 구조 개편이 불가피했다.

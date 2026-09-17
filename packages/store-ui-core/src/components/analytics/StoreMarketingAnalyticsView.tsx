@@ -2,7 +2,7 @@
  * StoreMarketingAnalyticsView — 매장 마케팅 분석 (공통 화면 본체)
  * WO-O4O-MY-STORE-CROSSSERVICE-FINAL-COMMONIZATION-AUDIT-AND-CLEANUP-V1
  *
- * 원본 3 사본(KPA MarketingAnalyticsPage / KCos·GP StoreMarketingAnalyticsPage)은
+ * 원본 2 사본(KPA MarketingAnalyticsPage / KCos StoreMarketingAnalyticsPage)은
  * 팔레트 primary 와 breadcrumb 상위 라벨만 달랐다. 그 둘만 config 로 받는다.
  * API endpoint·response·문구·레이아웃은 원본 그대로다(신규 기능 없음).
  */
@@ -25,7 +25,7 @@ export interface StoreMarketingAnalyticsData {
 export interface StoreMarketingAnalyticsViewProps {
   /** 서비스 API adapter — endpoint 는 서비스 소유 */
   fetchAnalytics: () => Promise<{ success: boolean; data: StoreMarketingAnalyticsData }>;
-  /** 서비스 accent (KPA #2563EB / KCos #0ea5e9 / GP #16a34a) */
+  /** 서비스 accent (KPA #2563EB / KCos #0ea5e9) */
   primaryColor?: string;
   /** breadcrumb 상위 라벨 — 서비스 사이드바 그룹명과 일치시킨다 */
   breadcrumbRootLabel?: string;

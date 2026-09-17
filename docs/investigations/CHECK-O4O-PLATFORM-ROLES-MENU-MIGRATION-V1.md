@@ -52,7 +52,7 @@
 ## 6. 불변 확인 (§7)
 
 - backend roles API/guard/schema/seed/permission matrix **변경 0**. DB migration 0.
-- `/admin/roles` hard delete 0(기능 보존). 운영자 관리/서비스 대상 정책 route **미이동**. service-audience guard 미변경. Neture admin sidebar 대규모 정리 0. GP/KCos/KPA 미접촉.
+- `/admin/roles` hard delete 0(기능 보존). 운영자 관리/서비스 대상 정책 route **미이동**. service-audience guard 미변경. Neture admin sidebar 대규모 정리 0. KCos/KPA 미접촉.
 
 ## 7. 완료 판정
 

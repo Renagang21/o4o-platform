@@ -62,7 +62,7 @@
 - `orchestration/providers/gemini.provider.ts` (146 lines) — Gemini 2.0-flash, JSON 강제, 10초 타임아웃
 - `orchestration/providers/openai.provider.ts` (142 lines) — OpenAI gpt-4o-mini 폴백
 - `orchestration/prompt-composer.ts` (67 lines) — 시스템+유저 프롬프트 구성
-- `orchestration/types.ts` (196 lines) — AIServiceId: kpa | neture | glycopharm | glucoseview | cosmetics
+- `orchestration/types.ts` (196 lines) — AIServiceId: kpa | neture | glucoseview | cosmetics
 
 #### packages/ai-common-core (1,183 lines / 10 files)
 
@@ -255,7 +255,6 @@
 |---------|-------|-------------|-------------|
 | **web-neture** | 14 | 3,840 | Admin AI 대시보드 (8파일 2,830), AI Insight (4파일 330), FloatingAiButton (630) |
 | **web-glucoseview** | 5 | 577 | AIChatWidget (364), 프롬프트 (112), AIChatButton (52) |
-| **web-glycopharm** | 3 | 217 | store-ai-summary (218), store-ai-recommend (93) |
 | **web-k-cosmetics** | 1 | 9 | index (re-exports only) |
 | **web-kpa-society** | 1 | 9 | index (re-exports only) |
 | **합계** | **24** | **4,652** | — |
@@ -293,15 +292,6 @@
 | `AIChatButton.tsx` | 52 |
 | `types.ts` | 32 |
 | `index.ts` | 11 |
-
-### 5.4 web-glycopharm 상세 (217 lines)
-
-| 파일 | Lines |
-|------|-------|
-| `store-ai-summary.ts` | 218 (규칙 기반 매장 요약 생성) |
-| `store-ai-recommend.ts` | 93 (카피 옵션 어드바이저) |
-
----
 
 ## 6. Partner Extension AI (packages/cosmetics-partner-extension/)
 
@@ -420,7 +410,6 @@
 | o4o-ai-components | 772 | `packages/o4o-ai-components/` |
 | ai-common-core (UI 컴포넌트) | 449 | `packages/ai-common-core/src/components/` + `types/` |
 | web-glucoseview AI | 577 | `services/web-glucoseview/src/components/ai/` |
-| web-glycopharm AI | 217 | `services/web-glycopharm/src/*ai*` |
 | AiQueryController | 269 | `apps/api-server/src/controllers/ai/` |
 | web-k-cosmetics/kpa stubs | 18 | `services/web-*/src/*ai*/index.ts` |
 
@@ -478,7 +467,6 @@
 | Neture UI | 3,840 | 12.8% |
 | GlucoseView | 577 | 1.9% |
 | Cosmetics/Partner | 2,969 | 9.9% |
-| GlycoPharm | 217 | 0.7% |
 | KPA | 9 | 0.03% |
 
 ### 10.4 모델 사용 현황

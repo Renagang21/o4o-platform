@@ -57,7 +57,7 @@
 
 | 계정 | 용도 |
 |---|---|
-| `sohae2100+v2check2@gmail.com` (Account #3) | C/D/G 시나리오 — KPA + GP active 멤버, neture/k-cosmetics 미가입 |
+| `sohae2100+v2check2@gmail.com` (Account #3) | C/D/G 시나리오 — KPA active 멤버, neture/k-cosmetics 미가입 |
 | `register-regression-20260523-083933@example.test` (신규 disposable) | F 시나리오 — register pending 회귀 |
 
 ---
@@ -76,10 +76,10 @@
 **자동 검증 한계 + 검증 기준 정정:**
 
 - SPA 는 어떤 URL 이든 HTTP 200 + HTML shell 반환 — HTTP 만으로 UI 검증 불가.
-- 더 중요한 정정: **`account.neture.co.kr` 직접 URL 접근은 web-account 의 정상 진입 경로가 아니다.** web-account 는 각 서비스 (KPA / GP / K-Cosmetics / Neture) 에서 "계정/내 정보/서비스 관리" 흐름으로 진입하는 **계정센터** 이므로, 직접 도메인 검증은 본 서비스의 실제 사용 경로와 무관.
+- 더 중요한 정정: **`account.neture.co.kr` 직접 URL 접근은 web-account 의 정상 진입 경로가 아니다.** web-account 는 각 서비스 (KPA / K-Cosmetics / Neture) 에서 "계정/내 정보/서비스 관리" 흐름으로 진입하는 **계정센터** 이므로, 직접 도메인 검증은 본 서비스의 실제 사용 경로와 무관.
 
 **후속 검증 기준 (본 CHECK 대상 외 — `IR-O4O-AUTH-HANDOFF-POLICY-AUDIT-V1` 에서 함께 다룸):**
-- 각 서비스 (KPA / GP / K-Cosmetics / Neture) 의 사용자 메뉴/마이페이지에서 web-account 진입 링크/버튼 존재 여부
+- 각 서비스 (KPA / K-Cosmetics / Neture) 의 사용자 메뉴/마이페이지에서 web-account 진입 링크/버튼 존재 여부
 - 위 경로로 진입 시 Dashboard 의 노출 상태:
   - "이용 가능한 서비스" 섹션 미노출
   - "가입" / "활성화" 버튼 미노출
@@ -90,7 +90,7 @@
 
 ### C. Join API 신규 membership 정책 — ✅ PASS (3/3)
 
-**검증 방법:** Account #3 (KPA + GP active, neture/k-cosmetics 미가입) 로 join 요청 3 가지 케이스.
+**검증 방법:** Account #3 (KPA active, neture/k-cosmetics 미가입) 로 join 요청 3 가지 케이스.
 
 | # | Step | Expected | Actual | 결과 |
 |---|---|---|---|---|
@@ -98,7 +98,7 @@
 | C-2 | `POST /auth/services/k-cosmetics/join` (미가입) | status='pending' | 동일 응답 (k-cosmetics) | ✅ |
 | C-3 | `POST /auth/services/kpa-society/join` (already active) | status='active', alreadyActive=true | `{success:true, status:'active', alreadyActive:true, message:'이미 가입된 서비스입니다.'}` | ✅ |
 
-**후속 검증:** 재로그인 후 memberships 확인 → `["kpa-society:active", "neture:pending", "k-cosmetics:pending", "glycopharm:active"]`. neture / k-cosmetics 가 active 가 아닌 **pending 상태로 생성**됨 직접 확인. ✅
+neture / k-cosmetics 가 active 가 아닌 **pending 상태로 생성**됨 직접 확인. ✅
 
 ### D. Pending 재요청 → no transition to active — ✅ PASS
 
@@ -128,12 +128,6 @@
 Register 흐름은 본 WO 변경 외 — 회귀 없음 확인.
 
 ### G. Handoff 회귀 — ✅ PASS
-
-**검증 방법:** Account #3 (KPA active 세션) 에서 GlycoPharm 으로 handoff 요청.
-
-| Step | Expected | Actual | 결과 |
-|---|---|---|---|
-| `POST /auth/handoff { targetServiceKey: 'glycopharm' }` | token + targetUrl 발급 | `{success:true, handoffToken:..., targetUrl:..., targetService:{key:'glycopharm'}}` | ✅ |
 
 Handoff API 변경 없음 — 본 WO 와 무관 영역 정상 작동 확인.
 
@@ -256,7 +250,6 @@ curl -X POST "$BASE/auth/register" \
 
 # G: handoff regression
 curl -X POST "$BASE/auth/handoff" -b sess.txt \
-  -H "Content-Type: application/json" -d '{"targetServiceKey":"glycopharm"}'
 ```
 
 ---

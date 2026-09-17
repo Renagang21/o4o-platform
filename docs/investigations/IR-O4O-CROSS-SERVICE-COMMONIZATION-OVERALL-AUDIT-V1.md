@@ -1,7 +1,7 @@
 # IR-O4O-CROSS-SERVICE-COMMONIZATION-OVERALL-AUDIT-V1
 
 > **유형**: 종합 점검 Investigation (read-only) — 코드/backend/DB/package/lock/Dockerfile **무변경**. 문서 1개만 생성.
-> **목적**: O4O Platform(KPA Society / GlycoPharm / K-Cosmetics / Neture) 전체 cross-service 공통화 상태를 한 번에 점검 — 이미 닫힌 축과 남은 축을 구분(무조건 더 공통화 아님).
+> **목적**: O4O Platform(KPA Society / K-Cosmetics / Neture) 전체 cross-service 공통화 상태를 한 번에 점검 — 이미 닫힌 축과 남은 축을 구분(무조건 더 공통화 아님).
 > **결론(요약)**: **CLOSED with MINOR FOLLOW-UP** — 주요 공통화 축(LMS·AI 편집·내 매장 실행·콘텐츠/자료실/제작자료·운영자 콘솔·법정정보·가이드·아이콘/사이드바·Contact·Order status·Forum·Mypage)이 closure/CHECK 문서 + **4서비스 `tsc -b` 0**으로 닫힘. 공통 package 레이어링 일관, Neture 제외/포함 posture 정확. 남은 것은 **제품 요구 기반(C)** + **경미 정리(B: copy/empty-state, operator-core legacy 정리, dormant primitive)** + **별도 작업선(E: Qwen live smoke·Signage/admin builder AI)**. **즉시 NEEDS-WO(빌드 실패·미적용 shell·UX drift) 없음.**
 > **작성일**: 2026-06-15 · HEAD `36fafa48f`(main 동기화)
 
@@ -14,7 +14,6 @@
 | 서비스 | `tsc -b` | 비고 |
 |--------|:--------:|------|
 | web-kpa-society | ✅ **0** | reference |
-| web-glycopharm | ✅ **0** | LMS reusablePolicy 해소 후 green |
 | web-k-cosmetics | ✅ **0** | — |
 | web-neture | ✅ **0** | platform/admin/supplier |
 > **4서비스 전부 green** — 직전 `IR-O4O-WORKSPACE-INTERRUPTED-BUILD-STATE-AUDIT-V1`의 in-flight 빌드 실패(lms-ui 와이어링 L1·product-applications phantom P1·reward-policy L2) **전부 해소**. 전체 closure 의 핵심 신호.
@@ -43,17 +42,17 @@ O4O 공통화는 **다수 축에서 closure/CHECK 문서로 닫힌 성숙 단계
 
 ## 5. 서비스별 상태 매트릭스
 
-| 축 | KPA | GlycoPharm | K-Cosmetics | Neture |
-|----|:---:|:---:|:---:|:---:|
-| LMS 사용자/운영자/강사 | ✅ reference | ✅ thin | ✅ thin(강사 read-only Phase 1-B) | — 제외(정확) |
-| 내 매장 실행 | ✅ baseline | ✅ thin wrapper | ✅ thin wrapper | — 제외(정확) |
-| 콘텐츠/자료실/제작자료 | ✅ | ✅ | ✅ | ✅(supplier B2B content) |
-| 운영자 콘솔 | ✅ | ✅ | ✅ | ✅(admin/supplier) |
-| 법정정보/약관 | ✅ | ✅ rollout | ✅ rollout | ✅ |
-| 가이드/아이콘/사이드바 | ✅ | ✅ | ✅ | ✅ |
-| Contact/문의 | ✅ | ✅ | ✅ | ✅(operator notification) |
-| Forum | ✅ reference | ✅ | ✅ | ✅(write form) |
-| Mypage/회원 | ✅ | ✅ | ✅ | ✅(admin members) |
+| 축 | KPA | K-Cosmetics | Neture |
+| ---- | :---: | :---: | :---: |
+| LMS 사용자/운영자/강사 | ✅ reference | ✅ thin(강사 read-only Phase 1-B) | — 제외(정확) |
+| 내 매장 실행 | ✅ baseline | ✅ thin wrapper | — 제외(정확) |
+| 콘텐츠/자료실/제작자료 | ✅ | ✅ | ✅(supplier B2B content) |
+| 운영자 콘솔 | ✅ | ✅ | ✅(admin/supplier) |
+| 법정정보/약관 | ✅ | ✅ rollout | ✅ |
+| 가이드/아이콘/사이드바 | ✅ | ✅ | ✅ |
+| Contact/문의 | ✅ | ✅ | ✅(operator notification) |
+| Forum | ✅ reference | ✅ | ✅(write form) |
+| Mypage/회원 | ✅ | ✅ | ✅(admin members) |
 > 서비스 wrapper 는 대부분 thin(27~92L) + config/api 어댑터. 예외=강의 상세/레슨 플레이어(서비스별 thick, §7-B/D).
 
 ## 6. 공통 package 역할표 (레이어링)
@@ -76,7 +75,7 @@ O4O 공통화는 **다수 축에서 closure/CHECK 문서로 닫힌 성숙 단계
 - 축 1·2·4·5·6·7·8·10·11·12·13·14 (§4). closure/CHECK 문서 + 4서비스 typecheck green + 공통 컴포넌트 thin wrapper.
 
 ### B. FUNCTIONAL+ (경미 정리 후순위)
-- **copy/empty-state drift**: reward/감사 에러 문구·NoPaymentNotice copy 가 GP↔KCos 동일 하드코딩(파생 아닌 복사). 공통 상수화 여지.
+- 공통 상수화 여지.
 - **operator-core(legacy) 정리**: operator-ux-core 로 대체됨 — deprecation/제거 경로 명시.
 - **dormant lms-ui primitive**: `CourseCard`·`CourseList`·`EnrollmentButton`·`LessonPlayerShell` export 됐으나 미소비.
 - **shared-space-ui 네이밍**: "community" → "cross-service public" 문서 정정.
@@ -85,7 +84,7 @@ O4O 공통화는 **다수 축에서 closure/CHECK 문서로 닫힌 성숙 단계
 ### C. INTENTIONAL DIFFERENCE (유지 타당)
 - **KPA-only advanced**: QuizBuilder·AssignmentEditor·grading·CourseStructureAiModal — KPA reference KEEP.
 - **KCos 강사 편집기 부재**(Phase 1-B, read-only) — 제품 요구 시만.
-- **GP/KCos quiz/assignment 부재** — 제품 요구 기반.
+- **KCos quiz/assignment 부재** — 제품 요구 기반.
 - **Neture 제외**: lms-ui·store-ui-core 미소비(정확). store 는 operator 콘솔의 OperatorStoresList(admin list)만 — store owner mypage 아님.
 
 ### D. NEEDS WO (즉시) — **없음(hard 차단 0)**

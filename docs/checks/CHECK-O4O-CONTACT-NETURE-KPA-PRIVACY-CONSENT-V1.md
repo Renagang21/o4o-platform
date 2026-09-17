@@ -40,8 +40,8 @@ Neture `POST /neture/contact`·`/admin/contact-messages`·`/operator/contact-mes
 ## 9~10. email/autoreply · in-app 알림 회귀
 - smoke에서 두 서비스 모두 `notification_status: inapp:sent;email:off;autoreply:off` 확인(설정 off라 email/autoreply off, in-app 정상 sent). 기존 알림 경로 회귀 없음. (email/autoreply ON 동작은 설정 adapter WO smoke에서 sent 확인 완료.)
 
-## 11~12. GP/KCos 미수정 · ContactInquiry 미사용
-- 커밋 9파일 모두 neture/kpa/api-server — GP/KCos 0건. ContactInquiry 미사용.
+## 11~12. KCos 미수정 · ContactInquiry 미사용
+- 커밋 9파일 모두 neture/kpa/api-server — KCos 0건. ContactInquiry 미사용.
 
 ## 13. 정적 검증
 | 대상 | 결과 |
@@ -80,7 +80,7 @@ Neture `POST /neture/contact`·`/admin/contact-messages`·`/operator/contact-mes
 | 마이그레이션 | ✅ `[X] 542 AddContactPrivacyConsentNetureKpa20261109000000` |
 | web-neture | ✅ success (`workflow_dispatch service=neture` — detect-changes skip 우회) |
 | web-kpa-society | ✅ success (docker tip deploy 동승) |
-| GP/KCos | 이 변경으로 미배포(범위 외) |
+| KCos | 이 변경으로 미배포(범위 외) |
 
 ## 18. Commit
 - 코드 9파일: `953c69597`. WO 문서: `43c34bc2b`. 본 CHECK: 별도 path-specific commit.

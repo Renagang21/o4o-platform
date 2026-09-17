@@ -2,7 +2,6 @@
 
 > **조사일:** 2026-03-10
 > **조사 범위:** 5개 웹 서비스의 Auth Chain 전체 구조
-> **대상 서비스:** web-neture, web-glycopharm, web-k-cosmetics, web-glucoseview, web-kpa-society
 
 ---
 
@@ -15,7 +14,7 @@
 | mapApiRole 함수 | **5개** | 각각 다른 매핑 테이블 |
 | 에러 메시지 중복 | **5세트** | 동일 메시지가 5곳에 복제 |
 | 응답 파싱 패턴 | **4가지** | 서비스마다 다른 fallback 체인 |
-| RBAC roles[] 대응 | **2/5** | glycopharm, kpa-society만 배열 지원 |
+| RBAC roles[] 대응 | **2/5** | kpa-society만 배열 지원 |
 
 ---
 
@@ -26,22 +25,21 @@
 | Service | 파일 | Lines | 주요 함수 |
 |---------|------|------:|-----------|
 | **web-neture** | `contexts/AuthContext.tsx` | 193 | login, logout, checkSession, switchRole |
-| **web-glycopharm** | `contexts/AuthContext.tsx` | 407 | login, logout, checkSession, refreshToken, switchRole, selectRole, serviceUserLogin |
 | **web-k-cosmetics** | `contexts/AuthContext.tsx` | 200 | login, logout, checkSession, switchRole |
 | **web-glucoseview** | `contexts/AuthContext.tsx` | 215 | login, logout, checkSession, updateUser |
 | **web-kpa-society** | `contexts/AuthContext.tsx` | 498 | login, logout, checkAuth, loginAsTestAccount, setActivityType, serviceUserLogin |
 
 ### 2.2 구조 차이 요약
 
-| 기능 | neture | glycopharm | k-cosmetics | glucoseview | kpa-society |
-|------|:------:|:----------:|:-----------:|:-----------:|:-----------:|
-| Token 방식 | Cookie | **Bearer** | Cookie | Cookie | **AuthClient** |
-| Session Check | useEffect 자동 | useEffect 자동 | **Lazy (수동)** | useEffect 자동 | useCallback 자동 |
-| Token Refresh | ❌ | ✅ | ❌ | ❌ | ✅ (AuthClient) |
-| Service User | ❌ | ✅ | ❌ | ❌ | ✅ |
-| Role Switching | ✅ | ✅ | ✅ | ❌ | ❌ |
-| Test Account | ❌ | ❌ | ❌ | ❌ | ✅ |
-| Approval Status | ❌ | ❌ | ❌ | ✅ | ❌ |
+| 기능 | neture | k-cosmetics | glucoseview | kpa-society |
+| ------ | :------: | :-----------: | :-----------: | :-----------: |
+| Token 방식 | Cookie | Cookie | Cookie | **AuthClient** |
+| Session Check | useEffect 자동 | **Lazy (수동)** | useEffect 자동 | useCallback 자동 |
+| Token Refresh | ❌ | ❌ | ❌ | ✅ (AuthClient) |
+| Service User | ❌ | ❌ | ❌ | ✅ |
+| Role Switching | ✅ | ✅ | ❌ | ❌ |
+| Test Account | ❌ | ❌ | ❌ | ✅ |
+| Approval Status | ❌ | ❌ | ✅ | ❌ |
 
 ---
 
@@ -52,7 +50,6 @@
 | Service | Login Endpoint | Token Storage | 로그인 호출 방식 |
 |---------|---------------|---------------|-----------------|
 | **web-neture** | `POST /api/v1/auth/login` | httpOnly Cookie | `fetch(credentials:'include')` |
-| **web-glycopharm** | `POST /api/v1/auth/login` | localStorage (`glycopharm_access_token`) | `fetch` + Bearer Header |
 | **web-k-cosmetics** | `POST /api/v1/auth/login` | httpOnly Cookie | `fetch(credentials:'include')` |
 | **web-glucoseview** | `POST /api/v1/auth/login` | httpOnly Cookie | `fetch(credentials:'include')` |
 | **web-kpa-society** | `POST /api/v1/auth/login` | localStorage (`@o4o/auth-client`) | `authClient.login()` |
@@ -65,7 +62,6 @@ Type A: httpOnly Cookie (neture, k-cosmetics, glucoseview)
   → 로컬 토큰 저장 없음
   → cross-domain에서 동작하지 않을 수 있음
 
-Type B: Bearer Token (glycopharm)
   → localStorage에 직접 저장
   → Authorization: Bearer {token} 헤더
   → 수동 refresh 로직 필요
@@ -85,7 +81,6 @@ Type C: AuthClient (kpa-society)
 | Service | checkSession 파싱 | 버그 여부 |
 |---------|------------------|:---------:|
 | **web-neture** | `data.data?.user ∥ data.user` | ✅ 정상 |
-| **web-glycopharm** | `data.data?.user ∥ data.data ∥ data.user ∥ data` | ⚠️ 수정됨 (기존: `data.data` 폴백 시 wrapper 반환) |
 | **web-k-cosmetics** | `data.data?.user ∥ data.user` | ✅ 정상 |
 | **web-glucoseview** | `data.data?.user ∥ data.data ∥ data.user` | ⚠️ `data.data` 폴백 시 wrapper `{ user: {...} }` 반환 가능 |
 | **web-kpa-society** | `data.data.user ∥ data.data` (AuthClient 내부) | ✅ 정상 |
@@ -95,7 +90,6 @@ Type C: AuthClient (kpa-society)
 | Service | login 파싱 | 비고 |
 |---------|----------|------|
 | **web-neture** | `data.data?.user ∥ data.user` | 정상 |
-| **web-glycopharm** | `data.data?.user ∥ data.user` | 정상 |
 | **web-k-cosmetics** | `data.data?.user ∥ data.user` | 정상 |
 | **web-glucoseview** | `data.data?.user ∥ data.user` | 정상 |
 | **web-kpa-society** | `response.user` (AuthClient) | 정상 |
@@ -105,7 +99,6 @@ Type C: AuthClient (kpa-society)
 | Service | 401 처리 | catch 처리 |
 |---------|---------|-----------|
 | **web-neture** | 무시 (세션 없음 간주) | 무시 |
-| **web-glycopharm** | `refreshAccessToken()` 시도 | `clearStoredTokens()` |
 | **web-k-cosmetics** | 무시 | 무시 |
 | **web-glucoseview** | 무시 | 무시 |
 | **web-kpa-society** | 토큰 없으면 호출 자체 생략 | `setUser(null)` |
@@ -116,29 +109,28 @@ Type C: AuthClient (kpa-society)
 
 ### 5.1 필드 비교
 
-| 필드 | neture | glycopharm | k-cosmetics | glucoseview | kpa-society |
-|------|:------:|:----------:|:-----------:|:-----------:|:-----------:|
-| id | ✅ | ✅ | ✅ | ✅ | ✅ |
-| email | ✅ | ✅ | ✅ | ✅ | ✅ |
-| name | ✅ | ✅ | ✅ | ✅ | ✅ |
-| roles[] | ✅ | ✅ | ✅ | ✅ | ✅ |
-| role (singular) | ❌ | ❌ | ❌ | ✅ deprecated | ✅ deprecated |
-| status | ❌ | ✅ | ❌ | ❌ | ❌ |
-| approvalStatus | ❌ | ❌ | ❌ | ✅ | ❌ |
-| phone | ❌ | ❌ | ❌ | ✅ | ❌ |
-| pharmacyName | ❌ | ❌ | ❌ | ✅ | ❌ |
-| isStoreOwner | ❌ | ❌ | ❌ | ❌ | ✅ |
-| activityType | ❌ | ❌ | ❌ | ❌ | ✅ |
-| kpaMembership | ❌ | ❌ | ❌ | ❌ | ✅ |
-| membershipType | ❌ | ❌ | ❌ | ❌ | ✅ |
-| profileImage | ❌ | ✅ | ❌ | ❌ | ❌ |
+| 필드 | neture | k-cosmetics | glucoseview | kpa-society |
+| ------ | :------: | :-----------: | :-----------: | :-----------: |
+| id | ✅ | ✅ | ✅ | ✅ |
+| email | ✅ | ✅ | ✅ | ✅ |
+| name | ✅ | ✅ | ✅ | ✅ |
+| roles[] | ✅ | ✅ | ✅ | ✅ |
+| role (singular) | ❌ | ❌ | ✅ deprecated | ✅ deprecated |
+| status | ❌ | ❌ | ❌ | ❌ |
+| approvalStatus | ❌ | ❌ | ✅ | ❌ |
+| phone | ❌ | ❌ | ✅ | ❌ |
+| pharmacyName | ❌ | ❌ | ✅ | ❌ |
+| isStoreOwner | ❌ | ❌ | ❌ | ✅ |
+| activityType | ❌ | ❌ | ❌ | ✅ |
+| kpaMembership | ❌ | ❌ | ❌ | ✅ |
+| membershipType | ❌ | ❌ | ❌ | ✅ |
+| profileImage | ❌ | ❌ | ❌ | ❌ |
 
 ### 5.2 UserRole 타입 정의
 
 | Service | UserRole 타입 | 기본값 |
 |---------|-------------|--------|
 | **web-neture** | `'admin' ∥ 'supplier' ∥ 'partner' ∥ 'user'` | `'user'` |
-| **web-glycopharm** | `'admin' ∥ 'pharmacy' ∥ 'supplier' ∥ 'partner' ∥ 'operator' ∥ 'consumer'` | `'consumer'` |
 | **web-k-cosmetics** | `'admin' ∥ 'supplier' ∥ 'seller' ∥ 'partner' ∥ 'operator'` | `'seller'` |
 | **web-glucoseview** | `'pharmacist' ∥ 'admin' ∥ 'partner'` | `'pharmacist'` |
 | **web-kpa-society** | `string[]` (free-form, 매핑 없음) | `'pharmacist'` |
@@ -149,25 +141,24 @@ Type C: AuthClient (kpa-society)
 
 ### 6.1 mapApiRole 매핑 테이블
 
-| API Role | neture | glycopharm | k-cosmetics | glucoseview | kpa-society |
-|----------|:------:|:----------:|:-----------:|:-----------:|:-----------:|
-| `admin` | admin | operator | admin | admin | 그대로 |
-| `super_admin` | admin | operator | admin | admin | 그대로 |
-| `operator` | ❌**user** | operator | operator | ❌**pharmacist** | 그대로 |
-| `supplier` | supplier | supplier | supplier | ❌**pharmacist** | 그대로 |
-| `partner` | partner | partner | partner | partner | 그대로 |
-| `seller` | user | pharmacy | seller | pharmacist | 그대로 |
-| `customer` | user | pharmacy | seller | pharmacist | 그대로 |
-| `user` | user | pharmacy | seller | pharmacist | 그대로 |
-| `pharmacy` | ❌**user** | pharmacy | ❌**seller** | ❌**pharmacist** | 그대로 |
-| 미매핑 기본값 | user | consumer | seller | pharmacist | pharmacist |
+| API Role | neture | k-cosmetics | glucoseview | kpa-society |
+| ---------- | :------: | :-----------: | :-----------: | :-----------: |
+| `admin` | admin | admin | admin | 그대로 |
+| `super_admin` | admin | admin | admin | 그대로 |
+| `operator` | ❌**user** | operator | ❌**pharmacist** | 그대로 |
+| `supplier` | supplier | supplier | ❌**pharmacist** | 그대로 |
+| `partner` | partner | partner | partner | 그대로 |
+| `seller` | user | seller | pharmacist | 그대로 |
+| `customer` | user | seller | pharmacist | 그대로 |
+| `user` | user | seller | pharmacist | 그대로 |
+| `pharmacy` | ❌**user** | ❌**seller** | ❌**pharmacist** | 그대로 |
+| 미매핑 기본값 | user | seller | pharmacist | pharmacist |
 
 ### 6.2 `operator` Role 처리 현황
 
 | Service | `operator` API role 매핑 | 매핑 결과 | 버그 |
 |---------|------------------------|----------|:----:|
 | **web-neture** | 매핑 없음 | → `'user'` (기본값 폴백) | ✅ **버그** |
-| **web-glycopharm** | `'operator' → 'operator'` | 정상 | ✅ 수정됨 |
 | **web-k-cosmetics** | `'operator' → 'operator'` | 정상 | ❌ |
 | **web-glucoseview** | 매핑 없음 | → `'pharmacist'` (기본값 폴백) | ✅ **버그** |
 | **web-kpa-society** | 매핑 없음 (그대로 사용) | `'operator'` | ❌ |
@@ -177,7 +168,6 @@ Type C: AuthClient (kpa-society)
 | Service | `apiUser.roles[]` 사용 | `apiUser.role` 사용 | RBAC 대응 |
 |---------|:---------------------:|:-------------------:|:---------:|
 | **web-neture** | ❌ | ✅ singular만 | **미대응** |
-| **web-glycopharm** | ✅ 배열 우선 | ✅ 폴백 | **대응 완료** |
 | **web-k-cosmetics** | ❌ | ✅ singular만 | **미대응** |
 | **web-glucoseview** | ❌ | ✅ singular만 | **미대응** |
 | **web-kpa-society** | ✅ `apiUser.roles ∥ [role]` | ✅ 폴백 | **대응 완료** |
@@ -191,29 +181,27 @@ Type C: AuthClient (kpa-society)
 | Service | 노출 방식 | 판정 기준 | 구현 위치 |
 |---------|----------|----------|----------|
 | **web-neture** | `ROLE_DASHBOARDS[roles[0]]` | roles[0] 기준 | `AccountMenu.tsx:93-94` |
-| **web-glycopharm** | `roleDashboardLinks` 조건부 | `isOperator`, `isPharmacy` 분리 판정 | `Header.tsx:47-50` |
 | **web-k-cosmetics** | `ROLE_DASHBOARDS[roles[0]]` | roles[0] 기준 | `Header.tsx:52` |
 | **web-glucoseview** | N/A | 대시보드 링크 없음 (단일 역할) | — |
 | **web-kpa-society** | `hasAnyRole(roles, PLATFORM_ROLES)` | roles 배열 순회 | `Header.tsx:101` |
 
 ### 7.2 ROLE_DASHBOARDS 경로 비교
 
-| Role | neture | glycopharm | k-cosmetics |
-|------|--------|------------|-------------|
-| admin | `/workspace/admin` | `/admin` | `/admin` |
-| operator | ❌ 없음 | `/operator` | `/operator` |
-| supplier | `/account/supplier` | `/supplier` | `/supplier` |
-| partner | `/account/partner` | `/partner` | `/partner` |
-| user/consumer | `/` | `/` | — |
-| pharmacy | — | `/care` | — |
-| seller | — | — | `/seller` |
+| Role | neture | k-cosmetics |
+| ------ | -------- | ------------- |
+| admin | `/workspace/admin` | `/admin` |
+| operator | ❌ 없음 | `/operator` |
+| supplier | `/account/supplier` | `/supplier` |
+| partner | `/account/partner` | `/partner` |
+| user/consumer | `/` | — |
+| pharmacy | — | — |
+| seller | — | `/seller` |
 
 ### 7.3 로그인 후 기본 이동 경로
 
 | Service | 기본 리다이렉트 방식 |
 |---------|------------------|
 | **web-neture** | `navigate(ROLE_DASHBOARDS[role])` |
-| **web-glycopharm** | `navigate(getDefaultRouteByRole(role))` (auth-utils.ts) |
 | **web-k-cosmetics** | `navigate(ROLE_DASHBOARDS[role])` |
 | **web-glucoseview** | 고정 `/` |
 | **web-kpa-society** | 고정 `/` (KPA는 단일 대시보드) |
@@ -239,7 +227,7 @@ Type C: AuthClient (kpa-society)
 
 | Service | 기본 에러 메시지 |
 |---------|---------------|
-| neture, glycopharm, k-cosmetics, kpa | `로그인에 실패했습니다.` |
+| neture, k-cosmetics, kpa | `로그인에 실패했습니다.` |
 | glucoseview | `이메일 또는 비밀번호가 올바르지 않습니다.` |
 
 ---
@@ -263,7 +251,7 @@ Type C: AuthClient (kpa-society)
 
 | # | 불일치 항목 | 영향 |
 |---|-----------|------|
-| 1 | **응답 파싱 fallback 체인** — 4가지 패턴 공존 | 세션 복원 실패 (glycopharm 이미 발생) |
+| 1 | **응답 파싱 fallback 체인** — 4가지 패턴 공존 | 세션 복원 실패 |
 | 2 | **operator 매핑 누락** — neture, glucoseview에서 `'user'`로 폴백 | 운영자 대시보드 접근 불가 |
 | 3 | **RBAC roles[] 미대응** — 3개 서비스에서 singular role만 사용 | 다중 역할 사용자 권한 판정 오류 |
 | 4 | **Token 방식 3가지 혼재** — Cookie / Bearer / AuthClient | 인증 문제 디버깅 난이도 증가 |
@@ -300,7 +288,7 @@ Type C: AuthClient (kpa-society)
 | `kpaMembership` 파싱 | kpa-society | KPA 고유 조직 구조 |
 | `loginAsTestAccount` | kpa-society | 테스트 전용 |
 | `setActivityType` | kpa-society | KPA 고유 약사 자격 |
-| `serviceUserLogin` | glycopharm, kpa-society | Phase 2 고유 기능 |
+| `serviceUserLogin` | kpa-society | Phase 2 고유 기능 |
 
 ---
 
@@ -338,7 +326,6 @@ Type C: AuthClient (kpa-society)
 
 비용 추정:
 - Auth 관련 수정 1건 = 실제 수정 5건 + 빌드 5회 + 배포 5회
-- 수정 누락 확률: 높음 (glycopharm만 수정하고 나머지 방치한 이번 케이스가 대표적)
 ```
 
 ---
@@ -351,7 +338,6 @@ Type C: AuthClient (kpa-society)
 동일 Auth 로직이 5개 서비스에 복제
 → 한 곳 수정 시 나머지 4곳도 수정해야 함
 → 수정 누락 시 서비스별 동작 불일치 발생
-→ 이번 glycopharm operator 버그가 정확히 이 패턴
 ```
 
 ### 문제 2: 응답 파싱 불안정
@@ -385,7 +371,6 @@ Type A (Cookie): neture, k-cosmetics, glucoseview
   → cross-domain 환경에서 불안정할 수 있음
   → refresh 메커니즘 없음
 
-Type B (Bearer): glycopharm
   → 수동 토큰 관리
   → refresh 로직 직접 구현
 
@@ -417,7 +402,6 @@ packages/auth-utils/
 | Service | 예상 변경 | 비고 |
 |---------|---------|------|
 | **web-neture** | 중간 — 파싱/매핑 교체, operator 수정 | Token 방식 유지 |
-| **web-glycopharm** | 최소 — 이미 수정됨, 공통 함수 교체만 | Bearer 방식 유지 |
 | **web-k-cosmetics** | 중간 — 파싱/매핑 교체 | Token 방식 유지 |
 | **web-glucoseview** | 중간 — 파싱/매핑 교체, operator 수정, 파싱 버그 수정 | Token 방식 유지 |
 | **web-kpa-society** | 최소 — 이미 RBAC 대응됨, 에러 메시지만 교체 | AuthClient 유지 |

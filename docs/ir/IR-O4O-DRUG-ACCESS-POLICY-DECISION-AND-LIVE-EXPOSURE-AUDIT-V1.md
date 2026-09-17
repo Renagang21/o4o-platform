@@ -54,7 +54,6 @@
 
 | service_key | is_pharmacy_target_service |
 |---|:---:|
-| `glycopharm` | **true** |
 | `kpa-society` | **true** |
 | `pharmacy-hub` | **true** |
 | `k-cosmetics` | false |

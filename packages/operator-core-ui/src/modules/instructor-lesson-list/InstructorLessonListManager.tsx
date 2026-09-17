@@ -12,7 +12,7 @@
  *   `renderEditor(lesson|null, {close})` render-prop 으로 wrapper 가 주입. manager 는 open 상태만 소유.
  * - drag-reorder 는 wrapper 의 `onReorder` 가 있을 때만 활성(없으면 정적 목록).
  *
- * 소비: KPA CourseEditPage, GlycoPharm InstructorCourseEditPage.
+ * 소비: KPA CourseEditPage · InstructorCourseEditPage.
  *       K-Cosmetics 는 editor 미구축(Phase 1-B) — 미적용.
  */
 

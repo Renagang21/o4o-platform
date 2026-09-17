@@ -176,7 +176,7 @@ frontend에서 호출하지 않는 상태.
 | `/api/v1/ops/seed-store-hub` | Admin Secret | Store HUB 테스트 데이터 |
 | `/llm-insight/health` | NONE | AI 시스템 상태 |
 | `/health` (store-ai) | NONE | AI 시스템 상태 |
-| `/health` (glycopharm) | NONE | Public 상태 체크 |
+| `/health` | NONE | Public 상태 체크 |
 
 ---
 

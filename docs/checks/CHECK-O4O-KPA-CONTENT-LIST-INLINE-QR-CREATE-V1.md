@@ -64,7 +64,7 @@
 
 ## 8. 범위/안전
 - QR 결과는 `store_qr_codes` 에만 생성. 콘텐츠 원본/제작자료 신규 생성 0. 기존 QR target/공개 URL 무변경. execution-asset legacy target 해석 무변경.
-- **KPA 전용**(`createStoreQrCode`=`/api/v1/kpa/pharmacy/qr`) → GP/KCos 무영향. modal(제작 자료 선택)은 QR 버튼 미노출.
+- **KPA 전용**(`createStoreQrCode`=`/api/v1/kpa/pharmacy/qr`) → KCos 무영향. modal(제작 자료 선택)은 QR 버튼 미노출.
 - QR AI 버튼 제거·POP·제작자료 메뉴 숨김은 본 WO에서 미수행.
 
 ## 9. 미해결/후속

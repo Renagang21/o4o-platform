@@ -40,7 +40,7 @@
 
 | 형태 | 예시 |
 |---|---|
-| prefixed | `kpa:admin` · `kpa:operator` · `neture:admin` · `neture:operator` · `cosmetics:*` · `glycopharm:*` · `pharmacy-hub:*` · `lms:instructor` · `platform:super_admin` |
+| prefixed | `kpa:admin` · `kpa:operator` · `neture:admin` · `neture:operator` · `cosmetics:*` · `pharmacy-hub:*` · `lms:instructor` · `platform:super_admin` |
 | **unprefixed (정본)** | `supplier`(6) · `customer`(7) · `pharmacy`(2) · `store_owner`(1) · `user`(1) · `super_admin`(1 inactive) |
 
 → **접두 없는 role 도 저장 정본이다.** write 대상을 `roleEntity.name` 으로 정규화하면

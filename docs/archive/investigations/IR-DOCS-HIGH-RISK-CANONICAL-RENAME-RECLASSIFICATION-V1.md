@@ -148,7 +148,6 @@ CLAUDE.md:315 — | E-commerce 계약 | `docs/baseline/E-COMMERCE-ORDER-CONTRACT
 ```
 docs/architecture/COSMETICS-DOMAIN-RULES.md:185
 docs/architecture/O4O-STORE-RULES.md:260
-docs/baseline/legacy/GLYCOPHARM-LEGACY-POSTMORTEM.md:173
 docs/baseline/README.md:14
 docs/investigations/IR-KPA-B-SERVICE-AUDIT-V1.md:281
 docs/templates/o4o-store-template/STORE-TEMPLATE-README.md:129

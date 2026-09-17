@@ -20,7 +20,6 @@ navigation config에 추가된 supplier/partner 진입 항목이 기존 route·f
 
 ```
  M docs/investigations/CHECK-O4O-CURRENT-WORKSTREAM-NEXT-SCOPE-AUDIT-V1.md  ← 다른 세션 WIP (미접촉)
- M services/web-glycopharm/src/pages/operator/ForumRequestsPage.tsx        ← 다른 세션 WIP (미접촉)
  M services/web-k-cosmetics/src/pages/operator/ForumRequestsPage.tsx       ← 다른 세션 WIP (미접촉)
 ?? *.png (사용자 스크린샷)
 ```
@@ -121,9 +120,9 @@ navigation.ts 단일 파일, 배열 콘텐츠만 추가. route/guard/component �
 | 매장 허브(Store Hub) 구조 추가 | ✅ 없음 |
 | 내 매장(My Store) 구조 추가 | ✅ 없음 |
 | supplier/partner 조직 중심 워크스페이스 유지 | ✅ |
-| 다른 서비스(KPA/GP/KCOS) 파일 수정 | ✅ 없음 |
+| 다른 서비스(KPA/KCOS) 파일 수정 | ✅ 없음 |
 
-Neture는 공급자·파트너 조직 중심 구조 유지. KPA/GP/KCOS의 store owner IA를 Neture에 강제하지 않음.
+Neture는 공급자·파트너 조직 중심 구조 유지. KPA/KCOS의 store owner IA를 Neture에 강제하지 않음.
 
 ---
 

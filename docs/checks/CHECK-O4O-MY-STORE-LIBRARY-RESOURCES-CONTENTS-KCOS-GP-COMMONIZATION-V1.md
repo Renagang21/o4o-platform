@@ -2,7 +2,7 @@
 
 - 작업일: 2026-08-13
 - 작업 브랜치: `work/commonization-my-store` → remote `work/commonization-my-store-shell-parts` (main 병합 없음)
-- 범위: K-Cosmetics / GlycoPharm 내 자료함 **Resources + Contents 2화면** 공통화
+- 범위: K-Cosmetics 내 자료함 **Resources + Contents 2화면** 공통화
 
 ---
 
@@ -12,7 +12,7 @@
 
 | 화면 | 서비스 간 차이 | 판정 |
 |---|---|---|
-| Resources | 헤더 주석 · import 경로(`../../api` vs `@/api`) · GP만 링크형 자료에 `LinkIcon` 사용 | **config 차이** |
+| Resources | 헤더 주석 · import 경로(`../../api` vs `@/api`) | **config 차이** |
 | Contents | 헤더 주석 · import 경로 · target 상수명 · `defaultTemplateId` 2건 | **config 차이** |
 
 - 문구(breadcrumb / 제목 / subtitle / empty title·hint)는 두 서비스가 **문자열까지 동일**했다. 그래도 서비스 소유로 두기 위해 Core 에 하드코딩하지 않고 `StoreLibraryLabels` 로 주입한다.
@@ -26,7 +26,7 @@
 
 ### API client
 
-`storeLibrary.ts` 는 GP 쪽에 CRUD(`create/update/delete/getStoreLibraryItem`) + `NetureLibraryItem` 가 더 있고 다른 소비처가 있어 **병합하지 않았다.** Core 는 `fetchResources` / `fetchContents` adapter 만 받는다 (endpoint · request · response 는 서비스 소유, 계약 무변경).
+request · response 는 서비스 소유, 계약 무변경).
 
 ---
 
@@ -55,14 +55,14 @@
 
 ## 3. 서비스 adapter 차이 (유지한 것)
 
-| 항목 | K-Cosmetics | GlycoPharm |
-|---|---|---|
-| API prefix | `/cosmetics/*` | `/glycopharm/*` |
-| import alias | 상대경로 `../../api` | `@/api` |
-| 링크형 자료 아이콘 | 미사용(ExternalLink 고정) | `useLinkIcon` 주입(LinkIcon) |
-| POP template | `kcos-pop-beauty-expert` | `glyco-pop-diabetes-info` |
-| QR template | `kcos-qr-usage-guide` | `glyco-qr-glucose-management` |
-| target 상수 | `COSMETICS_PRODUCTION_TARGETS` | `GLYCOPHARM_PRODUCTION_TARGETS` |
+| 항목 | K-Cosmetics |
+|---|---|
+| API prefix | `/cosmetics/*` |
+| import alias | 상대경로 `../../api` |
+| 링크형 자료 아이콘 | 미사용(ExternalLink 고정) |
+| POP template | `kcos-pop-beauty-expert` |
+| QR template | `kcos-qr-usage-guide` |
+| target 상수 | `COSMETICS_PRODUCTION_TARGETS` |
 
 route(`/store/marketing/pop`, `/store/marketing/qr`) · 권한 · payload · 문구 · 사용자 동선 모두 무변경.
 
@@ -86,7 +86,6 @@ route(`/store/marketing/pop`, `/store/marketing/qr`) · 권한 · payload · 문
 | `pnpm run build:packages` | PASS |
 | `store-ui-core` `tsc --build` | PASS |
 | web-k-cosmetics typecheck / vite build | PASS / PASS (18.15s) |
-| web-glycopharm typecheck / vite build | PASS / PASS (19.99s) |
 | web-kpa-society 회귀 typecheck / build | PASS / PASS (28.35s) |
 | web-pharmacy-hub 회귀 typecheck / build | PASS / PASS (18.52s) |
 | Resources loading/error/empty/list | 정적 등가 확인 (`git show HEAD:<file>` 대조) |
@@ -112,8 +111,8 @@ backend · DB · migration · route · permission · API 계약 · package.json 
 |---|--:|--:|
 | KCos Resources | 257L | 31L |
 | KCos Contents | 217L | 68L |
-| GP Resources | 261L | 44L |
-| GP Contents | 217L | 68L |
+ Resources | 261L | 44L |
+ Contents | 217L | 68L |
 | 합계 | **952L** | **211L** (−741L) |
 | 신규 Core | — | 637L (10 파일, 4서비스 재사용 가능) |
 

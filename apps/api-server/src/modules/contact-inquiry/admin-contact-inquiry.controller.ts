@@ -3,7 +3,7 @@
  *
  * WO-O4O-CONTACT-INQUIRY-ADMIN-MANAGEMENT-V1
  *
- * GP/KCos operator(및 admin)가 접수된 문의를 조회·상태 처리한다. Mount: /api/v1/admin/services
+ * KCos operator(및 admin)가 접수된 문의를 조회·상태 처리한다. Mount: /api/v1/admin/services
  *   GET   /:serviceKey/contact-inquiries          — 목록(status/page/limit). 본문 미노출(미리보기만).
  *   GET   /:serviceKey/contact-inquiries/:id       — 상세(본문 포함)
  *   PATCH /:serviceKey/contact-inquiries/:id/status — 상태 변경(+handled_at/handled_by)
@@ -11,11 +11,9 @@
  *
  * 권한: requireServiceLegalScope('operator') — 문의 '처리'는 operator 업무다 (WO-O4O-KCOS-OPERATOR-CONTACT-MANAGEMENT-MIGRATION-V1).
  *   scopeRoleMapping 상 admin ⊃ operator 이므로 admin 도 그대로 통과한다.
- *     (WO-O4O-GLYCOPHARM-AUTHORIZATION-HIERARCHY-AUDIT-AND-FIX-V1 이전에는 mapping 부재로
- *      allowedRoles fallback 이었다. 본 route 는 operator 레벨이라 접근 결과는 동일하다.)
  *   - K-Cosmetics: 'cosmetics:operator' → ['cosmetics:operator','cosmetics:admin'] 통과 (기존 admin-only 403 해소).
  *   문의 '설정'(admin-service-contact-settings.controller)은 그대로 admin 전용 유지.
- *   + serviceKey 화이트리스트 = glycopharm / k-cosmetics (Neture/KPA 는 자체 contact 시스템 → 거부).
+ *   + serviceKey 화이트리스트 = k-cosmetics (Neture/KPA 는 자체 contact 시스템 → 거부).
  *   개인정보(본문/연락처)는 상세에서만.
  */
 
@@ -85,7 +83,7 @@ export function createAdminContactInquiryController(dataSource: DataSource): Rou
   const router = Router();
   const repo = dataSource.getRepository(ContactInquiry);
   // WO-O4O-KCOS-OPERATOR-CONTACT-MANAGEMENT-MIGRATION-V1: 문의 처리 = operator 업무.
-  //   operator 레벨 가드(admin ⊃ operator)로 GP/KCos operator 의 문의 관리 접근 허용. 설정은 별도 컨트롤러에서 admin 유지.
+  //   operator 레벨 가드(admin ⊃ operator)로 KCos operator 의 문의 관리 접근 허용. 설정은 별도 컨트롤러에서 admin 유지.
   const manageGuard = requireServiceLegalScope('operator');
 
   // ── 목록 ──

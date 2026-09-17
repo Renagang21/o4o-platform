@@ -1,6 +1,6 @@
 # CHECK-O4O-STORE-INFO-OWNER-GATE-CANONICAL-ROLE-ALIGN-BACKEND-V1
 
-> GlycoPharm / K-Cosmetics `/store/info` business-info API 인가를 **legacy member.subRole → canonical role(role_assignments)** 로 정렬.
+> K-Cosmetics `/store/info` business-info API 인가를 **legacy member.subRole → canonical role(role_assignments)** 로 정렬.
 > **결과: PASS** — backend controller 2파일 인가 소스 교정. api-server 변경 파일 tsc 0. schema/migration/frontend 무변경.
 > 선행: `IR-O4O-STORE-INFO-OWNER-GATE-LEGACY-CLEANUP-V1`(`4d77db844`) · 2026-06-16
 
@@ -10,10 +10,10 @@
 
 | 계층 | 인가 소스(전) | 결과 |
 |---|---|---|
-| `/store/info` 라우트 진입 | canonical role `glycopharm:store_owner` (route guard) | ✅ 통과 |
-| business-info GET/PATCH | **legacy** `glycopharm_members.subRole === 'pharmacy_owner'` (`cosmetics_members.subRole === 'store_owner'`) | ❌ 403 |
+| `/store/info` 라우트 진입 | — | ✅ 통과 |
+| business-info GET/PATCH | — | ❌ 403 |
 
-→ 승인된 canonical store_owner 가 라우트는 통과하나 business-info 403 → "경영자만 이용 가능". (라이브 검증: 계정 roles 에 `glycopharm:store_owner` 포함 + 페이지 도달 + business-info 403 — IR §3.)
+→ 승인된 canonical store_owner 가 라우트는 통과하나 business-info 403 → "경영자만 이용 가능".
 
 ---
 
@@ -21,7 +21,6 @@
 
 | 파일 | 변경 |
 |---|---|
-| `apps/api-server/src/routes/glycopharm/controllers/mypage.controller.ts` | business-info GET/PATCH 인가를 `isStoreOwner(dataSource, userId, 'glycopharm')`(canonical role_assignments)로 교체. legacy `memberService.getMyMembership().subRole==='pharmacy_owner'` 제거 |
 | `apps/api-server/src/routes/cosmetics/controllers/cosmetics-mypage.controller.ts` | 로컬 `isStoreOwner(userId)` 를 canonical `isStoreOwner(ds, userId, 'cosmetics')` 위임으로 교체. legacy `cosmetics_members.subRole==='store_owner'` + `CosmeticsMember` repo 의존 제거 |
 
 공통 인가 util: `apps/api-server/src/utils/store-owner.utils.ts` 의 `isStoreOwner(dataSource, userId, serviceKey)` —
@@ -30,15 +29,6 @@
 ---
 
 ## 3. 인가 정렬 내용
-
-### GlycoPharm
-```
-- const member = await memberService.getMyMembership(userId);
-- if (!member || member.subRole !== 'pharmacy_owner') 403
-+ const { isOwner } = await isStoreOwner(dataSource, userId, 'glycopharm');
-+ if (!isOwner) 403
-```
-GET·PATCH 양쪽 적용. `memberService` 는 `/my-requests`(membership 표시)에서 계속 사용 — 유지.
 
 ### K-Cosmetics
 ```
@@ -68,12 +58,11 @@ GET·PATCH 의 `await isStoreOwner(userId)` 호출부 무변경(헬퍼 내부만
 | 신규 dependency | 없음(기존 util 재사용) |
 
 ### Smoke (배포 후 권장)
-- GP `renagang21`(roles 에 `glycopharm:store_owner`): `GET/PATCH /glycopharm/mypage/business-info` **200**, `/store/info` 차단 문구 미표시.
 - KCos store_owner 계정: `GET/PATCH /cosmetics/mypage/business-info` 200, 차단 문구 미표시.
 - store_owner role 없는 계정: 계속 **403** 유지.
 
-> 미배포 — 본 CHECK 의 smoke 는 배포 후 검증 항목. 정적: 라이브 IR smoke 에서 `renagang21` 이 `glycopharm:store_owner`
-> 보유 확인됨(IR §3) → canonical `isStoreOwner('glycopharm')` 통과 보장.
+> 미배포 — 본 CHECK 의 smoke 는 배포 후 검증 항목.
+> 보유 확인됨(IR §3) → canonical `isStoreOwner` 통과 보장.
 
 ---
 
@@ -81,7 +70,7 @@ GET·PATCH 의 `await isStoreOwner(userId)` 호출부 무변경(헬퍼 내부만
 
 | 항목 | 변경 |
 |---|---|
-| backend controller 인가 (GP/KCos business-info) | ✅ canonical role 정렬 |
+| backend controller 인가 (KCos business-info) | ✅ canonical role 정렬 |
 | backend schema / migration / DB | ❌ 무변경 |
 | frontend | ❌ 무변경 |
 | KPA | ❌ 무변경 |

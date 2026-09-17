@@ -251,7 +251,7 @@ const StoreLibraryResourcesPage = lazy(() => import('./pages/pharmacy/StoreLibra
 //   KPA 의 제작 자료 목록은 자료함 > 콘텐츠(/store/library/contents)로 통합되어 별도 list 화면이 없다.
 // WO-O4O-MY-STORE-FINAL-CLEANUP-AND-CLOSEOUT-V1 (범위 C):
 //   위 통합으로 고아가 된 StoreProductionMaterialsPage / SelectContentsForProductionModal /
-//   ProductionTypeSelectorModal 3개 파일을 삭제했다(활성 참조 0). GlycoPharm·K-Cosmetics 는
+//   ProductionTypeSelectorModal 3개 파일을 삭제했다(활성 참조 0). K-Cosmetics 는
 //   list route 가 살아 있어 각 서비스 자체 파일을 그대로 사용한다.
 // WO-O4O-STORE-PRODUCTION-MATERIALS-STANDARD-EDITOR-APPLY-V1: 제작 자료 편집기 (:id/edit 딥링크 전용)
 const ProductionMaterialEditorPage = lazy(() => import('./pages/pharmacy/ProductionMaterialEditorPage'));
@@ -1111,7 +1111,7 @@ function App() {
                   - new : list 의 CTA 에만 종속된 고아 생성 route. 신규 제작은 자료함 > 콘텐츠 /
                           POP / QR-code / 블로그 / 상품 설명의 canonical 제작 흐름을 사용한다.
                   과거 북마크·가이드 링크 보호를 위해 제거 대신 replace redirect(1홉) 로 수렴시킨다.
-                  GP/KCos 는 정식 '제작 자료' 메뉴를 유지하므로 각 서비스 route 무변경.
+                  KCos 는 정식 '제작 자료' 메뉴를 유지하므로 각 서비스 route 무변경.
                   IR: docs/investigations/IR-O4O-KPA-STORE-HIDDEN-MANAGEMENT-ENTRY-POLICY-AUDIT-V1.md */}
             <Route path="library/production-materials" element={<Navigate to="/store/library/contents" replace />} />
             <Route path="library/production-materials/new" element={<Navigate to="/store/library/contents" replace />} />

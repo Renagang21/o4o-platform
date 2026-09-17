@@ -13,25 +13,10 @@ K-Cosmetics `/store-hub/signage`는 **33줄 placeholder** 수준에 머물러 �
 
 - K-Cosmetics Hub 탭 중 Blog · Pop · QR · B2B · Content는 모두 `hubContentApi` + DataTable + ActionBar + 가져가기 패턴으로 구현됨
 - Signage만 `WO-O4O-STOREHUB-STRUCTURE-ALIGNMENT-V1` 시점에 placeholder 수준으로 추가된 채 방치
-- GlycoPharm이 동일한 상황에서 `WO-O4O-GLYCOPHARM-STORE-HUB-SIGNAGE-CANONICAL-ALIGNMENT-V1`으로 완전 해결한 패턴을 그대로 이식 가능
 - **Backend API는 이미 완전 지원** — hubContentApi(`SERVICE_KEY='k-cosmetics'`)와 assetSnapshotApi(`/cosmetics/assets/copy`, `assetType='signage'` 허용) 모두 존재
 
-**권장 옵션: Option C (GlycoPharm HubSignageLibraryPage 패턴 이식)**  
+**권장 옵션: Option C **
 Frontend 1개 파일만 교체. Backend 변경 불필요.
-
----
-
-## 배경: GlycoPharm drift 해결 흐름 참조
-
-K-Cosmetics 상황은 GlycoPharm이 `IR-O4O-GLYCOPHARM-STORE-HUB-SIGNAGE-STRUCTURE-DECISION-V1`에서 기록한 pre-fix 상태와 동일하다.
-
-| 단계 | GlycoPharm | K-Cosmetics |
-|------|-----------|-------------|
-| 현재 signage hub | ❌ redirect (pre-fix) / ✅ canonical (현재) | ❌ 33줄 placeholder |
-| blog/pop/qr hub | ✅ 완료 | ✅ 완료 |
-| hubContentApi | ✅ | ✅ (k-cosmetics) |
-| assetSnapshotApi.copy | ✅ | ✅ (cosmetics) |
-| 후속 조치 | WO 완료 | **이번 IR 대상** |
 
 ---
 
@@ -81,9 +66,7 @@ export function HubSignagePage() {
 
 ---
 
-## 3. 참조 canonical 구현 (GlycoPharm)
-
-`services/web-glycopharm/src/pages/hub/HubSignageLibraryPage.tsx` (581줄)
+## 3. 참조 canonical 구현 
 
 | 항목 | 내용 |
 |------|------|
@@ -97,8 +80,6 @@ export function HubSignagePage() {
 | producer filter | 전체 / 운영자 / 커뮤니티 |
 | BaseDetailDrawer | ✅ row click 상세 |
 | 내 매장 연결 | `/store/marketing/signage` |
-
-WO 참조: `WO-O4O-GLYCOPHARM-STORE-HUB-SIGNAGE-CANONICAL-ALIGNMENT-V1`
 
 ---
 
@@ -162,15 +143,15 @@ allowedAssetTypes: ['cms', 'signage', 'lesson', 'content', 'resource', 'blog', '
 
 ## 6. 이식 가능성 분석
 
-| 항목 | GlycoPharm | K-Cosmetics 이식 시 | 변경 필요 |
-|------|-----------|---------------------|---------|
-| `hubContentApi` | `SERVICE_KEY='glycopharm'` | `SERVICE_KEY='k-cosmetics'` (이미 설정) | 없음 |
-| `assetSnapshotApi.copy()` | `/glycopharm/assets/copy` | `/cosmetics/assets/copy` (이미 설정) | 없음 |
-| `assetType: 'signage'` | ✅ | ✅ 이미 정의됨 | 없음 |
-| 복사 성공 문구 | "내 약국에 추가" | "내 매장에 추가" | 문구 수정 |
-| 내 매장 연결 링크 | `/store/marketing/signage` | `/store/marketing/signage/playlist` | 경로 확인 |
-| import 경로 | `@/api/assetSnapshot`, `@/api/hubContent` | `@/api/assetSnapshot`, `@/lib/api/hubContent` | 경로 수정 |
-| 서비스별 소개 문구 | 약국 컨텍스트 | 매장 컨텍스트 | 문구 수정 |
+| 항목 | K-Cosmetics 이식 시 | 변경 필요 |
+| ------ | --------------------- | --------- |
+| `hubContentApi` | `SERVICE_KEY='k-cosmetics'` (이미 설정) | 없음 |
+| `assetSnapshotApi.copy()` | `/cosmetics/assets/copy` (이미 설정) | 없음 |
+| `assetType: 'signage'` | ✅ 이미 정의됨 | 없음 |
+| 복사 성공 문구 | "내 매장에 추가" | 문구 수정 |
+| 내 매장 연결 링크 | `/store/marketing/signage/playlist` | 경로 확인 |
+| import 경로 | `@/api/assetSnapshot`, `@/lib/api/hubContent` | 경로 수정 |
+| 서비스별 소개 문구 | 매장 컨텍스트 | 문구 수정 |
 
 **결론: frontend 1개 파일(HubSignagePage.tsx → HubSignageLibraryPage.tsx)만 교체. Backend 변경 없음.**
 
@@ -181,7 +162,6 @@ allowedAssetTypes: ['cms', 'signage', 'lesson', 'content', 'resource', 'blog', '
 | 서비스 | 영향 |
 |--------|------|
 | KPA | 없음 |
-| GlycoPharm | 없음 |
 | K-Cosmetics | `HubSignagePage.tsx` → `HubSignageLibraryPage.tsx` 교체 |
 | Backend | 없음 (API 지원 완료) |
 | `operator-core-ui` 공통 패키지 | 없음 |
@@ -199,7 +179,7 @@ allowedAssetTypes: ['cms', 'signage', 'lesson', 'content', 'resource', 'blog', '
 
 **예.** Store HUB는 "운영자가 준비한 실행 자산을 매장이 탐색·가져가는 공간"이다. 현재 사이니지 placeholder는 링크만 제공해 매장 운영자를 store management area로 내보낸다. 탐색·가져가기 흐름이 없으므로 HUB 철학에 부합하지 않는다.
 
-### ③ KPA/GlycoPharm canonical과 다를 합리적 이유가 있는가?
+### ③ KPA canonical과 다를 합리적 이유가 있는가?
 
 없음. K-Cosmetics의 Blog/Pop/QR 패턴이 이미 KPA canonical과 동일하게 정렬되어 있다. Signage만 예외로 남길 근거가 없다.
 
@@ -209,40 +189,9 @@ allowedAssetTypes: ['cms', 'signage', 'lesson', 'content', 'resource', 'blog', '
 
 ### ⑤ 바로 구현할지, lightweight wrapper로 충분한지?
 
-Backend 지원이 완전하고 GlycoPharm 이식 패턴이 검증되어 있으므로, lightweight wrapper 단계 없이 **직접 canonical 이식(Option C)**이 가능하다.
-
 ---
 
 ## 9. 후속 WO 범위
-
-### Option C — GlycoPharm HubSignageLibraryPage 패턴 이식 (권장)
-
-```
-파일: services/web-k-cosmetics/src/pages/hub/HubSignagePage.tsx
-  → HubSignageLibraryPage 내용으로 교체 (파일명 유지 또는 rename)
-
-변경 내용:
-  1. hubContentApi.list({ sourceDomain: 'signage-media' / 'signage-playlist' }) 추가
-  2. assetSnapshotApi.copy({ assetType: 'signage' }) 추가
-  3. DataTable + checkbox + ActionBar + BaseDetailDrawer 구성
-  4. "내 매장에 추가" 문구 (GlycoPharm: "내 약국에 추가")
-  5. 내 매장 연결 링크 → /store/marketing/signage/playlist
-  6. import 경로: @/lib/api/hubContent (K-Cosmetics 경로)
-
-App.tsx:
-  - 기존 HubSignagePage route 유지 (동일 파일 교체)
-  - route 변경 없음
-
-Backend:
-  - 변경 없음
-
-선결 조건:
-  - 없음
-```
-
-**WO 이름**: `WO-O4O-KCOSMETICS-STORE-HUB-SIGNAGE-CANONICAL-ALIGNMENT-V1`
-
----
 
 ## 읽은 파일 (코드 변경 없음)
 
@@ -252,8 +201,5 @@ Backend:
 - `services/web-k-cosmetics/src/lib/api/hubContent.ts`
 - `services/web-k-cosmetics/src/api/assetSnapshot.ts`
 - `services/web-k-cosmetics/src/App.tsx`
-- `services/web-glycopharm/src/pages/hub/HubSignageLibraryPage.tsx`
-- `services/web-glycopharm/src/api/assetSnapshot.ts`
-- `services/web-glycopharm/src/api/hubContent.ts`
 - `apps/api-server/src/routes/cosmetics/cosmetics.routes.ts`
 - `apps/api-server/src/routes/o4o-store/controllers/asset-snapshot.controller.ts`

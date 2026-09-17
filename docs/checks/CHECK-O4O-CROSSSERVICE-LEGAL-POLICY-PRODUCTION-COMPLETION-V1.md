@@ -4,7 +4,7 @@
 - **성격**: 5서비스 legal/policy 축 전체 마감 (조사 + 구현 + 프로덕션 E2E)
 - **작성일**: 2026-08-18
 - **기준 브랜치**: `main`
-- **대상 서비스**: KPA-Society / K-Cosmetics / GlycoPharm / PharmacyHub / Neture
+- **대상 서비스**: KPA-Society / K-Cosmetics / PharmacyHub / Neture
 
 ---
 
@@ -12,7 +12,7 @@
 
 기존 문서 수치를 신뢰하지 않고 **코드 + 프로덕션 실측**으로 다시 확인했다. 미조사 0건.
 
-| 항목 | KPA | KCos | GP | PH | Neture | 판정 |
+| 항목 | KPA | KCos | PH | Neture | 판정 |
 |---|---|---|---|---|---|---|
 | operator/admin legal 설정 화면 | 있음 `/admin/settings/legal` | 있음 `/admin/settings/legal-terms` | 있음 `/admin/settings/legal-terms` | 있음 `/operator/settings/legal-terms` | 있음 `/admin/settings/legal-terms` | **IMPLEMENTED** |
 | 메뉴 링크 | 있음 | 있음 (System) | 있음 (System) | 있음 | 있음 | **IMPLEMENTED** |
@@ -35,7 +35,7 @@
 | B4 | Neture | `/terms` · `/privacy` 가 CMS 기반 `LegalPage` → **항상 "해당 페이지를 준비 중입니다."** (CMS 라우터 미마운트) | 공통 `PolicyDocumentViewer` 로 교체, `LegalPage.tsx` 삭제 |
 | B5 | Neture | 푸터에 법정정보·약관 링크 없음 | `NetureLayout` · `MainLayout` 에 배선 |
 
-KPA / KCos / GP 는 착수 시점에 이미 IMPLEMENTED 였고 **코드 변경 0건**이다.
+KPA / KCos 는 착수 시점에 이미 IMPLEMENTED 였고 **코드 변경 0건**이다.
 
 ---
 
@@ -53,7 +53,6 @@ KPA / KCos / GP 는 착수 시점에 이미 IMPLEMENTED 였고 **코드 변경 0
 |---|---|---|
 | KPA-Society | `kpa-society` | 3탭 |
 | K-Cosmetics | `k-cosmetics` | 3탭 |
-| GlycoPharm | `glycopharm` | 3탭 |
 | PharmacyHub | `pharmacy-hub` | 3탭 |
 | Neture | `neture` | 3탭 |
 
@@ -159,7 +158,6 @@ PharmacyHub 의 `[E2E_TEST]` 정책 문서 행 `f347af0e-bdf1-420e-9017-1f772da2
 |---|:---:|:---:|---|
 | KPA-Society | **PASS** | **PASS** | 로그인 → `/admin/settings/legal` (3탭) → `/policy` → `/privacy` |
 | K-Cosmetics | **PASS** | **PASS** | 로그인 → `/admin/settings/legal-terms` (법정정보·정책문서 탭) → `/terms` → `/privacy` |
-| GlycoPharm | **PASS** | **PASS** | 로그인 → `/admin/settings/legal-terms` (3탭 전부) → `/terms` → `/privacy` · 설정화면 모바일 `overflowX=false` |
 | PharmacyHub | **PASS** | **PASS** | 로그인 → operator 설정 → 저장/게시/수정/취소 사이클 → `/terms` → `/privacy` |
 | Neture | **PASS** | **PASS** | 로그인 → `/admin/settings/legal-terms` → 저장·수정·원복 → 푸터 → `/terms` → `/privacy` |
 
@@ -177,7 +175,6 @@ PharmacyHub 의 `[E2E_TEST]` 정책 문서 행 `f347af0e-bdf1-420e-9017-1f772da2
 |---|---|---|
 | `services/web-kpa-society` | `tsc -b` | ✅ PASS |
 | `services/web-k-cosmetics` | `tsc -b` | ✅ PASS |
-| `services/web-glycopharm` | `tsc -b` | ✅ PASS |
 | `services/web-pharmacy-hub` | `tsc -b` | ✅ PASS |
 | `services/web-neture` | `tsc -b` | ✅ PASS |
 | 주요 legal API | 위 §4 · §5 실측 | ✅ 전 항목 계약 일치 |
@@ -206,7 +203,7 @@ PharmacyHub 의 `[E2E_TEST]` 정책 문서 행 `f347af0e-bdf1-420e-9017-1f772da2
 
 ## 11. 완료 매트릭스 (§11)
 
-| 항목 | KPA | KCos | GP | PH | Neture |
+| 항목 | KPA | KCos | PH | Neture |
 |---|:---:|:---:|:---:|:---:|:---:|
 | operator legal settings | PASS | PASS | PASS | PASS | PASS |
 | footer legal | PASS | PASS | PASS | PASS | PASS |

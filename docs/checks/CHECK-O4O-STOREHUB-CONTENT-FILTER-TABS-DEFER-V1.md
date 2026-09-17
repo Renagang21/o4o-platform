@@ -9,7 +9,7 @@
 
 ## 1. 작업 목적
 
-KPA Society / GlycoPharm / K-Cosmetics 3서비스 `/store-hub/content` 의 CMS type 필터 탭(전체/공지/가이드/지식/프로모션/뉴스)을 보류한다. 콘텐츠 수가 적은 현 단계에서 6개 탭은 대부분 비어 보여 "자료 부족" 인상을 준다. 매장 사용자 관점의 자료실은 **검색 + 전체 목록 중심**이 더 적합하다.
+KPA Society / K-Cosmetics 2서비스 `/store-hub/content` 의 CMS type 필터 탭(전체/공지/가이드/지식/프로모션/뉴스)을 보류한다. 콘텐츠 수가 적은 현 단계에서 6개 탭은 대부분 비어 보여 "자료 부족" 인상을 준다. 매장 사용자 관점의 자료실은 **검색 + 전체 목록 중심**이 더 적합하다.
 
 "필터 기능 삭제"가 아니라 **상단 탭 탐색 UI 보류**다. CMS type enum / backend query param / 데이터 type 값은 무변경.
 
@@ -31,7 +31,6 @@ KPA Society / GlycoPharm / K-Cosmetics 3서비스 `/store-hub/content` 의 CMS t
 |------|------|
 | `packages/shared-space-ui/src/ContentHubTemplate.tsx` | `ContentHubConfig` 에 `showTypeFilters?: boolean`(기본 true) 추가. 필터 탭 렌더 가드를 `config.showTypeFilters !== false && config.filters && config.filters.length > 1` 로 변경 |
 | `services/web-kpa-society/src/pages/pharmacy/HubContentLibraryPage.tsx` | config 에 `showTypeFilters: false` 추가. filters 배열 보존 |
-| `services/web-glycopharm/src/pages/hub/HubContentListPage.tsx` | config 에 `showTypeFilters: false` 추가. filters 배열 보존 |
 | `services/web-k-cosmetics/src/pages/hub/HubContentPage.tsx` | config 에 `showTypeFilters: false` 추가. filters 배열 보존 |
 | `docs/checks/CHECK-O4O-STOREHUB-CONTENT-FILTER-TABS-DEFER-V1.md` | 본 CHECK |
 
@@ -39,7 +38,7 @@ KPA Society / GlycoPharm / K-Cosmetics 3서비스 `/store-hub/content` 의 CMS t
 
 - **shared `ContentHubTemplate` 변경 O** — 단, 추가는 **순수 가산·backward-compatible**. `showTypeFilters` 미지정 시 `!== false` 가 true → 기존 동작(탭 표시) 그대로.
 - **소비처 전수(코드 5개) 확인:**
-  - 대상 3개: `/store-hub/content` (KPA/GP/KCos) → `showTypeFilters: false` 적용
+  - 대상 3개: `/store-hub/content` (KPA/KCos) → `showTypeFilters: false` 적용
   - 비대상 2개: `web-k-cosmetics/.../library/ContentLibraryPage.tsx`, `web-neture/.../library/ContentLibraryPage.tsx` (`/store/library` 계열) → 플래그 미지정 → **탭 그대로 표시, 무회귀**
 - CLAUDE.md §1 Shared Module Change Rule 준수: 모든 소비처 식별 후 영향 확인. 임시 서비스별 예외 아님(공통 플래그 도입).
 
@@ -49,7 +48,7 @@ KPA Society / GlycoPharm / K-Cosmetics 3서비스 `/store-hub/content` 의 CMS t
 - 기본 fetch = 전체 목록 (`activeFilter='all'`, type param 없음 → 기존 `전체` 탭과 동일 결과)
 - 총 콘텐츠 수 표기 / 페이지네이션 (`pageLimit`)
 - 카드 type 배지 (콘텐츠 성격 보조 정보)
-- 복사/가져오기 흐름 및 서비스별 문구 (KPA·GP=`내 약국`, KCos=`내 매장`)
+- 복사/가져오기 흐름 및 서비스별 문구 (KPA=`내 약국`, KCos=`내 매장`)
 - 서비스별 Hero 문맥 (약국/매장 용어)
 
 ## 6. 변경하지 않은 항목 (명시적 비대상)
@@ -61,14 +60,13 @@ backend / DB migration / schema / CMS type enum / 데이터 type 값 / `/api/v1/
 | 서비스 | 결과 |
 |--------|------|
 | web-kpa-society | `tsc --noEmit` EXIT 0 |
-| web-glycopharm | `tsc -b --noEmit` EXIT 0 |
 | web-k-cosmetics | `tsc --noEmit` EXIT 0 |
 | web-neture (비대상 소비처 무회귀) | `tsc --noEmit` EXIT 0 |
 
 ## 8. browser smoke 수행 여부
 
 - **미수행** — 배포 후 권장. 체크리스트:
-  - KPA/GP/KCos `/store-hub/content`: 제목·검색창 표시 / **CMS 필터 탭 미표시** / 총 콘텐츠 수 표시 / 카드 목록(전체) 표시 / 카드 type 배지 표시 / 복사 버튼 문구(KPA·GP `내 약국`, KCos `내 매장`) / console error 0
+  - KPA/KCos `/store-hub/content`: 제목·검색창 표시 / **CMS 필터 탭 미표시** / 총 콘텐츠 수 표시 / 카드 목록(전체) 표시 / 카드 type 배지 표시 / 복사 버튼 문구(KPA `내 약국`, KCos `내 매장`) / console error 0
   - 검색 입력 시 전체 CMS 콘텐츠 내 검색 동작
   - 무영향: `/store-hub/{blog,pop,qr,signage}`, `/store/library/contents`, `/store/content`, `/store/library/contents`(neture·kcos library 탭 그대로)
 

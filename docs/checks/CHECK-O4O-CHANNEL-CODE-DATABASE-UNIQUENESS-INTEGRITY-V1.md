@@ -220,7 +220,7 @@ POST / PUT 의 catch 에서 이 판정이 참이면 `409 DUPLICATE_CODE`, 아니
 - push: `9cc838ff0` → `origin/main`
 - 파이프라인: `Deploy API Server (Cloud Run)` — 이미지 빌드 → `o4o-api-migrations` Cloud Run Job 실행 → API 배포
 - **적용 전 최종 gate(§24)**: production 은 익명 read 로 확인 가능한 8개 serviceKey
-  (`kpa`, `kpa-society`, `kpa-branch`, `k-cosmetics`, `cosmetics`, `glycopharm`, `neture`, `pharmacy-hub`)
+  (`kpa`, `kpa-society`, `kpa-branch`, `k-cosmetics`, `cosmetics`, `neture`, `pharmacy-hub`)
   전부 `total: 0`, 인증 없는 전체 목록은 계약대로 400 이다.
   cross-service 전체 행수/중복 여부는 익명 API 로는 확인할 수 없고(platform admin 필요),
   production DB credential 접근은 이 환경의 권한 정책상 차단되어 있다.
@@ -282,7 +282,7 @@ POST / PUT 의 catch 에서 이 판정이 참이면 `409 DUPLICATE_CODE`, 아니
 | 6 | duplicate rows | 0 | 0 (12.2) | PASS |
 
 serviceKey 8개 전수 재확인(적용 후): `kpa`, `kpa-society`, `kpa-branch`, `k-cosmetics`,
-`cosmetics`, `glycopharm`, `neture`, `pharmacy-hub` — 모두 `total: 0`.
+`cosmetics`, `neture`, `pharmacy-hub` — 모두 `total: 0`.
 
 `channels` 가 0행이라 409 의 production 실행 경로는 여기서 관측할 수 없다(§31 이 허용한 상태).
 409/23505 매핑은 실 Postgres 통합 테스트로 증명했다(§7 #15) → `SMOKE_409_NOT_OBSERVABLE_NO_PRODUCTION_CHANNEL_ROW`.
@@ -322,35 +322,24 @@ duplicate 409 의 실제 write 검증은 throwaway Postgres 통합 테스트로 
 | 워크플로 | 실패 지점 | 원인 |
 |---|---|---|
 | `CI Pipeline` → Code Quality Check | `src/pages/store-management/b2b-order/B2BOrderPage.tsx(467,17): error TS1109: Expression expected` | 아래 동일 |
-| `Deploy Web Services (Cloud Run)` → deploy-glycopharm | `vite:esbuild ... B2BOrderPage.tsx:467:17: ERROR: Expected identifier but found "/"` | 아래 동일 |
 
-원인: `services/web-glycopharm/src/pages/store-management/b2b-order/B2BOrderPage.tsx:466` 의
 JSX 주석이 닫히지 않았다 — 줄이 `*/` 로 끝나고 `}` 가 없다(`*/}` 이어야 한다).
 도입 커밋은 **`2bb1a3e65 feat(b2b): 공급자→매장 B2B 주문 canonical contract 확정 및 결함 4건 수정`**
 (다른 세션). 해당 커밋의 Web Services 배포도 이미 실패했다(2026-08-26T03:34Z).
 
 - `CI Pipeline` 은 `9cc838ff0` 뿐 아니라 `f8c9aedfc`, `20cb1d6c8`, `cc0f28709`, `f6b35153e` …
   모든 선행 커밋에서 실패한다 → **PRE_EXISTING**.
-- `Deploy Web Services` 는 `f8c9aedfc` 에서 "success" 였지만 그 실행의 `deploy-glycopharm` 은
-  **skipped** 였다(detect-changes 가 glycopharm 변경 없음으로 판정). 즉 그 success 는 공허하다.
-  이번 커밋은 `packages/cms-core` 를 건드렸으므로 detect-changes 가 전 서비스를 재빌드했고,
-  그 결과 기존에 깨져 있던 glycopharm 빌드가 드러났다. 새로 깨뜨린 것이 아니다.
 - `Deploy Admin Dashboard`, `CodeQL` 은 success.
 
 ### 16.1 후속 조치 (별건 커밋 `9c2e8970c`)
 
-이 WO 의 변경이 아니지만 main 의 CI 와 glycopharm production 배포를 계속 막고 있었으므로,
 사용자 지시에 따라 **별개 커밋**으로 분리해 종료 문자 `}` 하나만 추가했다.
 
 - 채널 유일성 커밋(`9cc838ff0`)과 섞지 않았다 — path-specific stage, 파일 1개, 1문자.
 - 렌더 결과/동작 변경 없음(주석은 여전히 주석이다).
-- 검증: `services/web-glycopharm` 단독 `tsc -b` PASS,
-  루트 `pnpm run type-check:frontend` → **OK (실패 단계 0)**.
-  수정 전 같은 명령은 `1 step(s) FAILED — type-check services/web-glycopharm` 였다.
 
 ### 16.2 ESLint ratchet — 내 spec 의 규칙명 오기 (커밋 `ca0338c78`)
 
-glycopharm type 오류가 걷히자 CI 는 다음 단계인 `node scripts/lint-ratchet.mjs` 에서 멈췄다:
 `ESLint 오류가 baseline 을 초과했습니다 (71 > 69)`.
 
 원인은 **이 WO 가 추가한 spec** 이었다.
@@ -374,4 +363,4 @@ glycopharm type 오류가 걷히자 CI 는 다음 단계인 `node scripts/lint-r
 | `CI Pipeline` | **success** (이 계열에서 처음으로 green) |
 | `CodeQL Security Analysis` | success |
 | `Deploy API Server (Cloud Run)` | success |
-| `Deploy Web Services (Cloud Run)` (`f2d304808`) | success — glycopharm 빌드 복구 확인 |
+| `Deploy Web Services (Cloud Run)` (`f2d304808`) | — |

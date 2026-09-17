@@ -205,7 +205,6 @@ KPA/PH 는 endpoint · accent 색 · 문구만 주입한다. 두 화면의 UX �
 | 기존 analytics 응답 shape (`total`/`today`/`weekly`/`device`) | **무변경** — placement 는 **별도 endpoint** 로만 노출 |
 | 공개 랜딩 PRODUCT / CONTENT / SCREEN_SET / EXTERNAL_LINK | 계약 spec 회귀 통과 (아래 §9) |
 | K-Cosmetics | **코드 변경 0.** Board 신규 prop 이 전부 optional 이라 1세대 `StoreQrConsoleView` 소비처는 영향 없음 |
-| GlycoPharm 등 공통 라우터 주입 서비스 | placement 라우트는 KPA/PH 컨트롤러에만 추가 — 공통 `createStoreTabletRoutes` 미접촉 |
 
 ### 8-1. Phase 1 범위 가드 갱신 (회귀 아님)
 

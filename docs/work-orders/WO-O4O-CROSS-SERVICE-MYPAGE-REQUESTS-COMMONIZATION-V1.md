@@ -33,7 +33,6 @@ My Page의 공통 Shell과 Home/Hub가 안정화된 상태에서, 다음 개별 
 
 ```text
 KPA-Society
-GlycoPharm
 K-Cosmetics
 Neture
 Pharmacy-Hub
@@ -262,13 +261,6 @@ available action
 약사회 특화 승인 흐름
 ```
 
-### GlycoPharm
-
-```text
-서비스 신청
-교육/등록 관련 신청
-```
-
 ### K-Cosmetics
 
 ```text
@@ -429,7 +421,6 @@ dead link를 `SERVICE_SPECIFIC`으로 숨기지 않는다.
 
 ```text
 KPA
-GP
 KCos
 Neture
 PH
@@ -471,7 +462,6 @@ OUT_OF_SCOPE
 @o4o/account-ui build
 
 KPA typecheck/build
-GP typecheck/build
 KCos typecheck/build
 Neture typecheck/build
 PH typecheck/build
@@ -736,7 +726,6 @@ packages/account-ui/src/components/MyPageAppreciationCard.tsx
 
 ```text
 KPA-Society      /mypage  (MyDashboardPage)
-GlycoPharm       /mypage  (MyPageHub) + navItems.ts
 K-Cosmetics      /mypage  (MyPageHub)
 Neture           /mypage  (MyPageHub) + navItems.ts
 Pharmacy-Hub     /account (+ /store-owner/account 호환 계약 유지 — /mypage 신설 금지)

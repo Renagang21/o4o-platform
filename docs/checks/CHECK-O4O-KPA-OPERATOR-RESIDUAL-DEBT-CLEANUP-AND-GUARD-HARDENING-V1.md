@@ -25,7 +25,7 @@ KPA 운영자 콘솔 종료 감사([IR-O4O-KPA-OPERATOR-TRACK-FINAL-CLOSEOUT-AND
 
 ## 2. 범위 A — action-queue 가드 명시화
 
-`action-queue.controller` 는 **KPA/GlycoPharm/Cosmetics 3서비스 공유 컨트롤러**(`common/action-queue/`)이며, 각 서비스가 자신의 `*:admin` executeGuard 를 주입한다. 따라서 KPA scope 하드닝은 **공유 컨트롤러 내부가 아니라 KPA 마운트 지점**에서 수행해야 한다(공유 컨트롤러 수정 시 glycopharm/cosmetics 빌드·계약 파손).
+따라서 KPA scope 하드닝은 **공유 컨트롤러 내부가 아니라 KPA 마운트 지점**에서 수행해야 한다.
 
 - **변경 전** [kpa.routes.ts:258](../../apps/api-server/src/routes/kpa/kpa.routes.ts): `router.use('/operator', coreRequireAuth as any, createActionQueueRouter(dataSource, kpaActionConfig, requireKpaScope('kpa:admin')))`
   - `GET /operator/actions`·`POST /operator/actions/dismiss/:id` 는 `coreRequireAuth`(인증) 만 + 같은 `/operator` prefix 에 **먼저** 마운트된 operator-summary 라우터([:251](../../apps/api-server/src/routes/kpa/kpa.routes.ts))의 `router.use(requireKpaScope('kpa:operator'))` 에 **간접 의존**하여 보호. 마운트 순서 취약(P2).

@@ -2,7 +2,7 @@
 
 **Date**: 2025-02-12  
 **Investigator**: Claude Code  
-**Scope**: EditUserModal structure across Neture, GlycoPharm, K-Cosmetics, KPA  
+**Scope**: EditUserModal structure across Neture, K-Cosmetics, KPA  
 **Purpose**: Identify commonization scope and design risks
 
 ---
@@ -13,7 +13,7 @@
 O4O 플랫폼의 EditUserModal은 **이미 상당 부분 공통화되었으나, 구조적 설계 차이로 인해 단순 통합의 함정이 존재한다.**
 
 - **기존 진행**: WO-O4O-OPERATOR-EDITUSER-MODAL-PHASE1-NETURE-GP-KCOS-V1 완료
-  - Neture / GlycoPharm / K-Cosmetics: CommonEditUserModal 을 경량 wrapper로 채택
+  - Neture / K-Cosmetics: CommonEditUserModal 을 경량 wrapper로 채택
   - KPA: 별도 KpaEditUserModal 구현 (entity/API 차이)
 
 - **공통화 완성도**: 약 85%
@@ -46,15 +46,12 @@ O4O 플랫폼의 EditUserModal은 **이미 상당 부분 공통화되었으나, 
 - packages/operator-core-ui/src/modules/members/components/MemberHardDeleteConfirmModal.tsx
 
 ### 서비스별 thin wrapper
-- services/web-glycopharm/src/pages/operator/EditUserModal.tsx
 - services/web-k-cosmetics/src/pages/operator/EditUserModal.tsx
 - services/web-neture/src/pages/operator/EditUserModal.tsx
 
 ### 서비스별 페이지
-- services/web-glycopharm/src/pages/operator/UsersPage.tsx
 - services/web-k-cosmetics/src/pages/operator/UsersPage.tsx
 - services/web-neture/src/pages/operator/UsersManagementPage.tsx
-- services/web-glycopharm/src/pages/admin/GlycoPharmAdminMembersPage.tsx
 - services/web-k-cosmetics/src/pages/admin/KCosmeticsAdminMembersPage.tsx
 - services/web-neture/src/pages/admin/AdminMemberManagementPage.tsx
 
@@ -65,7 +62,6 @@ O4O 플랫폼의 EditUserModal은 **이미 상당 부분 공통화되었으나, 
 | 서비스 | 회원 유형 | 운영 권한 | profileClassification | Hard Delete | 비고 |
 |--------|---------|---------|-----|------|------|
 | Neture | supplier, partner | neture:operator, admin | ✗ | ✓ | status tabs 지원 |
-| GlycoPharm | pharmacy, supplier | glycopharm:operator, admin | ✗ | ✓ | DeleteRiskModal |
 | K-Cosmetics | seller, consumer, pharmacist, supplier, partner | cosmetics:operator, admin | ✓ (subRole) | ✓ | store_owner/staff |
 | KPA | pharmacist, student | (내부 유형) | ✗ | ✓ | 별도 entity/API |
 
@@ -83,7 +79,6 @@ interface CommonEditUserModalProps {
 }
 
 interface EditUserModalConfig {
-  serviceKey: 'neture' | 'glycopharm' | 'k-cosmetics';
   makeRequest: ApiRequestFn;
   membershipRoleOptions: EditUserModalOption[];
   adminRoleOptions: EditUserModalOption[];
@@ -145,7 +140,6 @@ lastName, firstName, nickname (required), phone, businessName, businessNumber, t
 ### 서비스별 추가 필드
 - **K-Cosmetics**: profileClassification (subRole)
 - **Neture**: 없음
-- **GlycoPharm**: 없음
 - **KPA**: activity_type, pharmacy_name, pharmacy_phone 등 10개 추가
 
 ---
@@ -175,7 +169,6 @@ lastName, firstName, nickname (required), phone, businessName, businessNumber, t
 
 ### 서비스별 구현
 - **Neture**: AdminMemberDeleteModal 래핑
-- **GlycoPharm**: DeleteRiskModal (forum post/comment 카운트)
 - **K-Cosmetics**: simple confirm
 - **KPA**: AdminMemberManagementPage hard delete 전용
 
@@ -217,7 +210,7 @@ lastName, firstName, nickname (required), phone, businessName, businessNumber, t
 
 2. **Admin hard delete 통합** (C안, ~3일)
    - MemberHardDeleteConfirmModal 확장 (riskInfo children, mode select)
-   - GlycoPharm / K-Cosmetics / Neture adapter 작성
+   - K-Cosmetics / Neture adapter 작성
    - API 호출 순서 테스트
 
 3. **KPA 별도 유지 공식화** (문서화, ~1일)
@@ -272,7 +265,7 @@ lastName, firstName, nickname (required), phone, businessName, businessNumber, t
 
 ## 15. 최종 요약
 
-**공통화 현황**: 85% (Neture/GP/K-Cos 통합, KPA 별도)
+**공통화 현황**: 85% (Neture/K-Cos 통합, KPA 별도)
 
 **Phase 2 권장 범위**:
 - profileClassification 문서화 (Low Risk)
@@ -282,4 +275,3 @@ lastName, firstName, nickname (required), phone, businessName, businessNumber, t
 **절대 금지**: KPA를 CommonEditUserModal에 통합
 
 **평가 시점**: Phase 3 (3-6개월) - KPA entity 구조 변경 가능성 재평가
-

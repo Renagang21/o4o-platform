@@ -15,7 +15,7 @@
  *     → null (메인/커뮤니티 유지)
  *
  * O4O 공통 철학 정렬 (WO-O4O-KPA-POSTLOGIN-STOREOWNER-DASHBOARD-ALIGNMENT-V1):
- *   KPA 는 O4O 의 예외 서비스가 아니다. 약국 경영자(store_owner)는 GlycoPharm/K-Cosmetics
+ *   KPA 는 O4O 의 예외 서비스가 아니다. 약국 경영자(store_owner)는 K-Cosmetics
  *   와 동일하게 로그인 직후 내 약국(/store)을 기본 시작 화면으로 본다.
  *   본 변경은 WO-O4O-KPA-POST-LOGIN-PRIMARY-ROUTE-FIX-V1 의 "store_owner 도 커뮤니티 Home 유지"
  *   결정을 supersede 한다. (선행 IR: IR-O4O-CROSSSERVICE-POSTLOGIN-STOREOWNER-DASHBOARD-POLICY-AUDIT-V1,
@@ -24,7 +24,7 @@
  *   일반 회원/약사/약대생은 기존처럼 메인/커뮤니티를 유지한다.
  *   공개 Home("/") 구조는 변경하지 않는다.
  *
- * 참고: GlycoPharm/K-Cosmetics는 LoginPage.tsx에서 getXxxDashboardRoute()로 처리 완료.
+ * 참고: K-Cosmetics는 LoginPage.tsx에서 getXxxDashboardRoute()로 처리 완료.
  *       KPA만 모달 로그인 구조여서 별도 처리 필요.
  */
 

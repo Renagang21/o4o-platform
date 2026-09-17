@@ -4,7 +4,7 @@
  * WO-O4O-PHARMACYHUB-COMMUNITY-CONTENT-RESOURCE-TABLE-AND-ADOPTION-V1
  *
  * 공통 `ResourcesHubTemplate` + PH adapter (read-only). Route: `/resources`.
- * KPA / K-Cosmetics / GlycoPharm / Neture 가 이미 소비하는 공통 View 를 그대로 채택한다 —
+ * KPA / K-Cosmetics / Neture 가 이미 소비하는 공통 View 를 그대로 채택한다 —
  * PH 전용 ResourceTable 복제 없음, shared View 내부 serviceKey 분기 추가 없음 (§9).
  *
  * WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §6 (#27·#28):

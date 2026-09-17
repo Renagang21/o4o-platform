@@ -402,7 +402,7 @@ WO #7 spec 의 "후속 정리 대상" 주석은 이번 WO 로 종결됐으므로
 | 문서 | 결과 |
 |---|---|
 | root `README.md` · `CLAUDE.md` · `SETUP.md` · `AGENTS.md` | main-site 문맥의 `axios`/`tsx` 참조 **0** |
-| `docs/baseline/**` · `docs/architecture/**` · `docs/rules/**` | `axios` 언급 2건 — 전부 **GlycoPharm / K-Cosmetics** 의 HTTP 클라이언트 규약(`LMS-CLIENT-CONVENTION-V1.md` · `OPERATOR-CORE-DESIGN-V1.md`)으로 main-site 와 무관. **drift 아님** |
+| `docs/baseline/**` · `docs/architecture/**` · `docs/rules/**` | `OPERATOR-CORE-DESIGN-V1.md`)으로 main-site 와 무관. **drift 아님 |
 | `apps/main-site/README.md` | 현재형 문서이므로 이번 정리 내용을 반영 (§16-3 범위 내 갱신) |
 
 **`문서 정합: 발견 0건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 1건`**

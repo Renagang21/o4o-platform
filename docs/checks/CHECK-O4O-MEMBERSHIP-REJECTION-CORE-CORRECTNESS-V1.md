@@ -2,7 +2,7 @@
 
 - WO: [WO-O4O-MEMBERSHIP-REJECTION-CORE-CORRECTNESS-V1](../work-orders/WO-O4O-MEMBERSHIP-REJECTION-CORE-CORRECTNESS-V1.md)
 - 일자: 2026-07-31
-- 범위: 공유 Core `MembershipApprovalService` (Neture / KPA Society / GlycoPharm / K-Cosmetics / Pharmacy-Hub 공용)
+- 범위: 공유 Core `MembershipApprovalService` (Neture / KPA Society / K-Cosmetics / Pharmacy-Hub 공용)
 - 판정: **PASS** (단위 테스트 14/14, api-server build 통과, migration 0 / 신규 테이블 0)
 
 ---
@@ -169,7 +169,7 @@ Pharmacy-Hub 콘솔 응답:
 
 | 소비처 | 경로 | 확인 |
 |--------|------|------|
-| 공통 operator 콘솔 (Neture / KPA / GlycoPharm / K-Cosmetics) | `MembershipConsoleController.approveMembership` L415 · `rejectMembership` L461 | 반환값 소비 정상화, 404 분기 복원 |
+| 공통 operator 콘솔 (Neture / KPA / K-Cosmetics) | `MembershipConsoleController.approveMembership` L415 · `rejectMembership` L461 | 반환값 소비 정상화, 404 분기 복원 |
 | 공통 operator — 사용자 상태 변경 | `updateMemberStatus` L537(approve) / L588(reject) | 반환값 미사용(루프 호출). role 비활성화가 이제 실제 동작 |
 | 공통 operator — 일괄 변경 | `batchUpdateStatus` L668 / L709 | 동일 |
 | Pharmacy-Hub 전용 콘솔 | `PharmacyHubMembershipConsoleController` approve L217 / reject L275 | 응답 payload 보강 |

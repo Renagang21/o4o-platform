@@ -28,7 +28,6 @@ DB/schema/migration:      변경 0 · production write 0
 
 | 케이스 | content serviceKey | HTTP | 응답 serviceKey | organizationId | visibility |
 |---|---|:---:|---|---|---|
-| A/B | `glycopharm` | **200** | glycopharm | null | platform |
 | A/B | `kpa` | **200** | kpa | null | platform |
 | A/B | `kpa-society` | **200** | kpa-society | null | platform |
 | A/B | `neture` | **200** | neture | null | platform |
@@ -65,12 +64,11 @@ mount: `app.use('/api/v1/cms', ...)` (`register-routes.ts:988`), 3 handler 분�
 |---|:---:|---|---|:---:|---|
 | **PharmacyHub** | ✅ | `/resources` (`PharmacyHubResourcesPage` `fetchDetail`) | 회원 | ✅ | ❌ → **✅ (이번 수정)** |
 | **admin-dashboard** | ✅ | `CMSContentList.tsx:132` | platform admin | — | ❌ (유지 — cross-service 가 설계 의도) |
-| GlycoPharm | ⚠️ dead | `api/cms.ts:118 getContent` | — | — | 소비처 **0** |
 | KPA / Neture | ❌ | — | — | — | `/cms/` 호출 자체 0 |
 | K-Cosmetics | ❌(상세) | `/cms/slots/:slotKey`, `/cms/contents`(목록)만 | — | — | — |
 | shared UI/packages | ❌ | — | — | — | — |
 
-> GP·KCos 는 콘텐츠 상세를 **서비스 prefix 경로**(`/glycopharm/contents/:id`, `/cosmetics/contents/:id`)로 별도 소비한다.
+> KCos 는 콘텐츠 상세를 **서비스 prefix 경로**로 별도 소비한다.
 
 ---
 
@@ -90,7 +88,6 @@ mount: `app.use('/api/v1/cms', ...)` (`register-routes.ts:988`), 3 handler 분�
 
 | serviceKey | published | draft | archived | organizationId 보유 |
 |---|---:|---:|---:|---:|
-| glycopharm | 2 | 63 | 1 | 0 |
 | **kpa** | **1** | 0 | 0 | 0 |
 | **kpa-society** | **53** | 0 | 0 | **32** |
 | neture | 3 | 2 | 1 | 0 |
@@ -204,7 +201,7 @@ after : 404 {"code":"NOT_FOUND","message":"Content not found"}   (DB 까지 가�
 
 | 옵션 | 내용 | 영향 |
 |---|---|---|
-| **A** | `/cms/contents/:id` 를 **공개 published 전용**으로 명문화 + 회원 자료는 서비스 prefix 경로로 이관(GP·KCos 방식) | 공개·admin 무변경. PH 1곳 이관. 신규 서비스 경로 필요 |
+| **A** | `/cms/contents:id` 를 **공개 published 전용**으로 명문화 + 회원 자료는 서비스 prefix 경로로 이관(KCos 방식) | 공개·admin 무변경. PH 1곳 이관. 신규 서비스 경로 필요 |
 | **B (이번 적용분)** | `serviceKey` opt-in 유지 — 아는 소비처가 붙여 쓰고, 공개/admin 은 종전대로 | 하위호환 100%. **경계가 클라이언트 선택**이라 보안 경계로는 약함 |
 | **C** | 인증 사용자에 한해 membership 과 `content.serviceKey` 교차검증, 익명은 공개 동작 유지 | 공개 보존 + 회원 경계 확보. admin 예외 필요. **visibility 정책 정의 선행** |
 
@@ -217,7 +214,7 @@ after : 404 {"code":"NOT_FOUND","message":"Content not found"}   (DB 까지 가�
 | # | 내용 | 성격 |
 |---|---|---|
 | 1 | `kpa-society` 콘텐츠 53건이 platform admin 외 수정 불가 (alias 미정규화, §6-1) | 결함 |
-| 2 | GlycoPharm `api/cms.ts getContent` **dead code** (소비처 0) | 정리 |
+| 2 | — | 정리 |
 | 3 | 목록 API 도 `serviceKey` 없이 호출하면 전 서비스 반환 (§5) | 정책 |
 
 ---
@@ -246,7 +243,7 @@ after : 404 {"code":"NOT_FOUND","message":"Content not found"}   (DB 까지 가�
 ```text
 §17 list/detail 정합
   PH context + KPA UUID        → 404
-  PH context + GP UUID         → 404
+  PH context UUID → 404
   KPA context + PH UUID        → 404 (반대 방향)
   차단이 응답 가공이 아니라 DB where 조건임을 검증 (lastWhere 대조)
 자기 서비스 상세

@@ -18,8 +18,6 @@
 
 - Neture 공급자/파트너/매장 경영자 가입 모달
   - `services/web-neture/src/components/RegisterModal.tsx`
-- GlycoPharm 약국 경영자 가입 모달
-  - `services/web-glycopharm/src/pages/auth/RegisterFlowModal.tsx`
 - K-Cosmetics 판매자 가입 페이지
   - `services/web-k-cosmetics/src/pages/auth/RegisterPage.tsx`
 - KPA Society 개설약사 가입 모달
@@ -80,25 +78,6 @@
 Neture 매장 경영자 가입에도 `업종` select가 노출된다. 파트너 가입에는 `활동 분야`라는 이름으로 같은 계열 select가 노출된다.
 
 판정: 사업자 등록 정보로는 불일치. 단, 파트너의 `활동 분야`는 사업자등록증 항목이 아니라 서비스 활동 분류라면 별도 섹션으로 분리 가능하다.
-
-### 4.3 GlycoPharm 약국 경영자 가입
-
-GlycoPharm 약국 경영자 가입은 `약국명`, `대표자명`, `사업자등록번호`, `세금계산서 이메일`, `사업자등록증 표준 4 필드`, 주소를 입력받는다.
-
-공통 `BusinessRegistrationFields`를 전체 사용하므로 `업태`, `종목`, `사업자 유형`, `개업일`이 모두 노출된다.
-
-판정: 부분 불일치.
-
-좋은 점:
-
-- 사업자등록증 기준의 `업태`와 `종목`이 이미 존재한다.
-- 세금계산서 이메일과 주소가 존재한다.
-
-문제:
-
-- `사업자 유형`이 가입 단계에서 과도하게 앞에 나온다.
-- 약국/회사 전화, 담당자명, 담당자 전화, 담당자 이메일, 회사 이메일이 부족하다.
-- `businessCategory` legacy 동기화가 남아 있어 종목 의미와 혼동될 수 있다.
 
 ### 4.4 K-Cosmetics 판매자 가입
 
@@ -185,7 +164,7 @@ KPA 개설약사 가입은 `약국명`, `사업자등록번호`, `대표자명`,
   - 회사전화/이메일
   - 담당자명/전화/이메일
 - 서비스별 명칭만 override:
-  - KPA/GlycoPharm: 약국명
+  - KPA: 약국명
   - Neture: 회사명
   - K-Cosmetics: 상호명/매장명
 
@@ -222,7 +201,7 @@ KPA 개설약사 가입은 `약국명`, `사업자등록번호`, `대표자명`,
 | Step | 커밋 | 내용 |
 |------|------|------|
 | Step1 Backend | `1c64b2047` | `register.dto.ts` 에 `businessEntityType`/`businessStartDate` 추가 + `auth-register.controller`(신규·기존 양 flow) + `auth-account.controller` white-list 수용. **`businessType`(업태)/`businessItem`(종목) 은 이미 수용 중이라 추가 0.** DB/migration 0 (`users.businessInfo` JSONB). |
-| Step2 Frontend | `8dc5a135d` | 4서비스 가입폼(neture/glycopharm/k-cosmetics/kpa)에 공통 `BusinessRegistrationFields` 로 사업자등록증 cert 필드 렌더 추가. |
+| Step2 Frontend | `8dc5a135d` | 4서비스 가입폼에 공통 `BusinessRegistrationFields` 로 사업자등록증 cert 필드 렌더 추가. |
 
 → **FORM-ALIGNMENT-V1 = "사업자등록증 4필드(업태/종목/사업자유형/개업일) 를 4서비스 폼 + 백엔드 DTO 에 도입"까지.** 다음 3가지는 **처리하지 않음**: ① 업종 select 제거 ② 연락처 필드 보강 ③ 사업자유형 가입단계 후순위화.
 
@@ -230,22 +209,22 @@ KPA 개설약사 가입은 `약국명`, `사업자등록번호`, `대표자명`,
 
 - **업종 select 는 전 서비스 공통 문제가 아니라 Neture 에만 존재한다.**
   - Neture: supplier(700–714), store_owner(609–622) = `업종` select / partner(837–852) = `활동 분야` select. 값 `cosmetics/health/medical/food/other`.
-  - GlycoPharm / K-Cosmetics / KPA: 업종 select **없음** — 이미 `BusinessRegistrationFields` 로 `업태(businessType free-text)`/`종목`/`사업자유형`/`개업일` 4필드 노출 중.
+  - K-Cosmetics / KPA: 업종 select **없음** — 이미 `BusinessRegistrationFields` 로 `업태(businessType free-text)`/`종목`/`사업자유형`/`개업일` 4필드 노출 중.
 - **Neture supplier 만 `업태(businessType)` 가 빠져 있다.** `includeFields={['businessItem','businessEntityType','businessStartDate']}` 로 3필드만 렌더(업태 제외). 기존 카테고리형 `업종` select 가 업태 자리를 대체하고 있어 사업자등록증 원문과 불일치.
 - **연락처 3필드(`companyPhone`/`companyEmail`/`contactEmail`)는 4서비스 전부 부재** = 공통 delta.
-- 세금계산서 이메일: K-Cosmetics 만 부재(neture/glycopharm/kpa 보유).
+- 세금계산서 이메일: K-Cosmetics 만 부재.
 
 ### 11.3 남은 Delta 매트릭스 (현재 코드 실측)
 
-| Delta | Neture | GlycoPharm | K-Cosmetics | KPA | FORM-ALIGN |
-|------|:--:|:--:|:--:|:--:|:--:|
-| 업종 select 제거 | ❗3곳 존재 | 없음 | 없음 | 없음 | ❌ |
-| 업태(businessType) 노출 | ❌Neture만 빠짐 | ✅ | ✅ | ✅ | ⚠️ |
-| 사업자유형 후순위화 | 노출 | 노출 | 노출 | 노출 | ❌(오히려 추가) |
-| 회사전화 | ❌ | ❌ | ❌ | ❌ | ❌ |
-| 회사이메일 | ❌ | ❌ | ❌ | ❌ | ❌ |
-| 담당자 이메일 | ❌ | ❌ | ❌ | ❌ | ❌ |
-| 세금계산서 이메일 | ✅ | ✅ | ❌ | ✅ | — |
+| Delta | Neture | K-Cosmetics | KPA | FORM-ALIGN |
+| ------ | :--: | :--: | :--: | :--: |
+| 업종 select 제거 | ❗3곳 존재 | 없음 | 없음 | ❌ |
+| 업태(businessType) 노출 | ❌Neture만 빠짐 | ✅ | ✅ | ⚠️ |
+| 사업자유형 후순위화 | 노출 | 노출 | 노출 | ❌(오히려 추가) |
+| 회사전화 | ❌ | ❌ | ❌ | ❌ |
+| 회사이메일 | ❌ | ❌ | ❌ | ❌ |
+| 담당자 이메일 | ❌ | ❌ | ❌ | ❌ |
+| 세금계산서 이메일 | ✅ | ❌ | ✅ | — |
 
 ### 11.4 WO 시퀀싱 (확정)
 

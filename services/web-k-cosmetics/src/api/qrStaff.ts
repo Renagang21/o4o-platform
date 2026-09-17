@@ -2,7 +2,7 @@
  * QR Staff API Client — Authenticated (K-Cosmetics Store HUB QR Import)
  *
  * WO-O4O-KCOS-STORE-HUB-POP-QR-PORT-V1
- * GlycoPharm qrStaff (KPA canonical) mirror — service param defaults to 'cosmetics'.
+ * KPA canonical mirror — service param defaults to 'cosmetics'.
  *
  * 매장 owner 가 운영자 발행 QR 템플릿(operator_qr_templates)을 가져가 자기 매장 store_qr_codes 사본으로 변환.
  * Backend: o4o-store qr.controller — POST /api/v1/cosmetics/stores/:slug/qr/staff/import (serviceKey='cosmetics').

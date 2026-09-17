@@ -17,7 +17,7 @@ O4O Platform은 **6개 프론트엔드 서비스 + 1개 Admin Dashboard 앱 + 1�
 ┌─────────────────────────────────────────────────────────────┐
 │                    O4O Platform Services                     │
 ├─────────────┬───────────┬──────────┬──────────┬─────────────┤
-│   Neture    │GlycoPharm │   KPA    │GlucoseV. │K-Cosmetics  │
+│   Neture    │           │   KPA    │GlucoseV. │K-Cosmetics  │
 │ /workspace/ │  /admin   │ /admin   │  /admin  │  /admin     │
 │   admin     │ /operator │/operator │/operator/│ /operator   │
 │ /workspace/ │           │/branch-* │glucoseview│             │
@@ -40,7 +40,6 @@ O4O Platform은 **6개 프론트엔드 서비스 + 1개 Admin Dashboard 앱 + 1�
 | 서비스 | Admin Route | Operator Route | Guard 방식 | Dashboard 타입 |
 |--------|------------|----------------|-----------|---------------|
 | **Neture** | `/workspace/admin` | `/workspace/operator` | RoleGuard `['admin']` / `['admin','operator']` | Admin 4-Block / Operator 8-Block |
-| **GlycoPharm** | `/admin` | `/operator` | ProtectedRoute `['admin']` / `['operator']` | Admin 4-Block / Operator 5-Block |
 | **KPA** | `/admin` → `/demo/admin` | `/operator` | AdminAuthGuard / RoleGuard PLATFORM_ROLES | Admin 4-Block / Operator 5-Block |
 | **GlucoseView** | `/admin` | `/operator/glucoseview/*` | RoleGuard `['admin']` / `['admin','operator']` | Monolithic AdminPage / OperatorLayout |
 | **K-Cosmetics** | `/admin` | `/operator` | ProtectedRoute `['admin']` / `['operator']` | 5-Block (공유) / 5-Block (공유) |
@@ -62,7 +61,6 @@ O4O Platform은 **6개 프론트엔드 서비스 + 1개 Admin Dashboard 앱 + 1�
 | 서비스 | Profile 위치 | Dashboard 링크 | 연결 방식 | 문제 |
 |--------|-------------|---------------|----------|------|
 | **Neture** | AccountMenu + MyPage | "내 대시보드" | `getPrimaryDashboardRoute()` + ROUTE_OVERRIDES | **정상** |
-| **GlycoPharm** | Header User Menu | "운영자 대시보드" | `roleDashboardLinks` 동적 생성 | **Admin 경로 누락** (Header에서 admin은 `/operator`로 이동) |
 | **KPA** | Header | DashboardSwitcher 또는 `/dashboard` 직접 링크 | `getDefaultRouteByRole()` | **정상** (다중 대시보드 지원) |
 | **GlucoseView** | Layout User Menu | MyPage/Settings 링크만 존재 | Admin은 nav bar에 별도 표시 | **Operator 대시보드 링크 없음** |
 | **K-Cosmetics** | Header + MyPage | "대시보드" + "대시보드로 이동" | `getPrimaryDashboardRoute()` | **정상** |
@@ -74,12 +72,6 @@ O4O Platform은 **6개 프론트엔드 서비스 + 1개 Admin Dashboard 앱 + 1�
 - Operator용 대시보드 링크가 Profile/Header 어디에도 없음
 - 사용자가 `/operator/glucoseview`에 직접 URL 입력해야만 접근 가능
 
-#### Problem B2: GlycoPharm — Admin 대시보드 직접 링크 없음
-- Header의 `roleDashboardLinks`에서 `isOperator` 조건으로 `/operator`만 생성
-- admin 사용자도 `/operator`로 이동 (admin 전용 `/admin` 경로 접근 수단 없음)
-
----
-
 ## 4. Role / Permission 구조
 
 ### 4.1 Frontend Role Mapping 비교
@@ -87,18 +79,11 @@ O4O Platform은 **6개 프론트엔드 서비스 + 1개 Admin Dashboard 앱 + 1�
 | 서비스 | API `admin` → | API `operator` → | API `super_admin` → | Default Role |
 |--------|:-------------|:-----------------|:-------------------|:------------|
 | **Neture** | `admin` | `operator` | `admin` | `user` |
-| **GlycoPharm** | **`operator`** ⚠️ | `operator` | **`operator`** ⚠️ | `consumer` |
 | **KPA** | 직접 사용 (`kpa:admin`) | 직접 사용 (`kpa:operator`) | `platform:super_admin` | — |
 | **GlucoseView** | `admin` | **(미매핑)** ⚠️ | `admin` | `pharmacist` |
 | **K-Cosmetics** | `admin` | `operator` | `admin` | `seller` |
 
 ### 4.2 Critical Role Mapping Issues
-
-#### Issue C1: GlycoPharm — admin → operator 매핑 (CRITICAL)
-- **파일:** `services/web-glycopharm/src/contexts/AuthContext.tsx` (lines 107-108)
-- API에서 `admin` 역할을 받은 사용자가 프론트엔드에서 `operator`로 매핑됨
-- **결과:** `/admin` 라우트 (allowedRoles: `['admin']`) 접근 불가
-- Admin 대시보드가 사실상 사용 불가능한 상태
 
 #### Issue C2: GlucoseView — operator 역할 미매핑
 - **파일:** `services/web-glucoseview/src/contexts/AuthContext.tsx` (lines 56-64)
@@ -120,7 +105,6 @@ O4O Platform은 **6개 프론트엔드 서비스 + 1개 Admin Dashboard 앱 + 1�
 | 서비스 | Guard 컴포넌트 | Role Check 방식 |
 |--------|--------------|---------------|
 | **Neture** | `RoleGuard` | `user.roles.some(r => allowedRoles.includes(r))` |
-| **GlycoPharm** | `RoleGuard` (= ProtectedRoute) | 동일 |
 | **KPA** | `RoleGuard` + `AdminAuthGuard` + `BranchAdminAuthGuard` + `BranchOperatorAuthGuard` | 동일 + scope check |
 | **GlucoseView** | `RoleGuard` (= RoleProtectedRoute) | 동일 |
 | **K-Cosmetics** | `RoleGuard` (= ProtectedRoute) | 동일 |
@@ -146,24 +130,6 @@ Operator
 Profile → Dashboard: AccountMenu "내 대시보드" + MyPage 퀵 링크
 Role Guard: RoleGuard (admin: ['admin'], operator: ['admin','operator'])
 Layout: SupplierOpsLayout (공유 상단 네비게이션)
-```
-
-### 5.2 GlycoPharm
-
-```
-Admin
-  Dashboard: /admin (4-Block)
-  Menu: 대시보드, 약국 네트워크, 회원 관리, 설정
-
-Operator
-  Dashboard: /operator (5-Block)
-  Menu: 대시보드, 신청 관리, 상품 관리, 주문 관리, 재고/공급, 정산 관리,
-        분석/리포트, 마케팅, 사이니지, 고객지원, 회원 관리, AI 리포트 (20+ 페이지)
-
-Profile → Dashboard: Header "운영자 대시보드" (admin/operator 모두 /operator로)
-Role Guard: ProtectedRoute (admin: ['admin'], operator: ['operator'])
-Layout: DashboardLayout with role-specific sidebar
-⚠️ 문제: API admin → frontend operator 매핑으로 admin 대시보드 접근 불가
 ```
 
 ### 5.3 KPA Society
@@ -241,13 +207,11 @@ RoleSwitcher: admin/seller/operator 전환 가능
 | # | 서비스 | 문제 | 영향 |
 |---|--------|------|------|
 | B1 | GlucoseView | Operator Dashboard 링크가 Header/Profile에 없음 | URL 직접 입력 필요 |
-| B2 | GlycoPharm | Admin Dashboard 링크가 Header에 없음 (operator로만 이동) | Admin 대시보드 사실상 접근 불가 |
 
 ### C. Role Guard Conflict
 
 | # | 서비스 | 문제 | 심각도 | 영향 |
 |---|--------|------|--------|------|
-| C1 | GlycoPharm | API `admin` → frontend `operator` 매핑 | **CRITICAL** | Admin Dashboard 접근 불가 |
 | C2 | GlucoseView | `operator` 역할이 ROLE_MAP에 없음 | **HIGH** | Operator 전용 기능 분리 불가능 |
 | C3 | 전체 | Role prefix 사용 비통일 (KPA만 prefix 사용) | **MEDIUM** | 서비스 간 역할 체계 불일치 |
 
@@ -264,7 +228,6 @@ RoleSwitcher: admin/seller/operator 전환 가능
 | 서비스 | @o4o/admin-ux-core (4-Block) | @o4o/operator-ux-core (5-Block) |
 |--------|:---------------------------:|:-------------------------------:|
 | Neture | ✅ Admin | ❌ (자체 8-Block) |
-| GlycoPharm | ✅ Admin | ✅ Operator |
 | KPA | ✅ Admin + Branch Admin | ✅ Operator + Branch Operator |
 | GlucoseView | ❌ (Monolithic) | ❌ (자체 Layout) |
 | K-Cosmetics | ❌ (5-Block 공유) | ✅ Operator |
@@ -342,7 +305,6 @@ Phase 4: Single Admin Architecture
 | 서비스 | App.tsx | AuthContext | RoleGuard | Dashboard Layout |
 |--------|---------|------------|-----------|-----------------|
 | Neture | `services/web-neture/src/App.tsx` | `contexts/AuthContext.tsx` | `components/auth/RoleGuard.tsx` | `components/layouts/SupplierOpsLayout.tsx` |
-| GlycoPharm | `services/web-glycopharm/src/App.tsx` | `contexts/AuthContext.tsx` | `components/auth/RoleGuard.tsx` | `components/layouts/DashboardLayout.tsx` |
 | KPA | `services/web-kpa-society/src/App.tsx` | `contexts/AuthContext.tsx` | `components/auth/RoleGuard.tsx` | `routes/OperatorRoutes.tsx` |
 | GlucoseView | `services/web-glucoseview/src/App.tsx` | `contexts/AuthContext.tsx` | `components/auth/RoleGuard.tsx` | `components/layouts/OperatorLayout.tsx` |
 | K-Cosmetics | `services/web-k-cosmetics/src/App.tsx` | `contexts/AuthContext.tsx` | `components/auth/RoleGuard.tsx` | `components/layouts/DashboardLayout.tsx` |
@@ -365,7 +327,6 @@ Phase 4: Single Admin Architecture
 ### 핵심 발견
 
 1. **Operator Console 아키텍처 부재** — 각 서비스가 독립 구현, 통합 설계 없음
-2. **Role Mapping 불일치가 가장 심각한 문제** — GlycoPharm의 admin→operator 매핑이 admin 대시보드를 사용 불가능하게 만듬
 3. **RoleGuard 패턴은 이미 통일됨** — 5개 서비스 모두 동일한 `user.roles.some()` 패턴 사용
 4. **Dashboard UX 라이브러리 활용도 불균일** — 3/5만 표준 블록 레이아웃 사용
 5. **KPA가 가장 완성도 높은 구조** — 4-tier 대시보드 + DashboardSwitcher + scope-based guard

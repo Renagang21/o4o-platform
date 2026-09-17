@@ -53,7 +53,6 @@ Grep "kpa-admin@o4o\.com|kpa-operator@o4o\.com|phamacy1@o4o\.com"
 Grep "b0000000-b000-4000-b000-00000000000[234]"
 Grep "O4oBootstrap1!|BootstrapCanonicalSeed|BOOTSTRAP_PASSWORD|SEED_BOOTSTRAP_PASSWORD"
 Grep "O4oTestPass"
-Grep "kcos-admin@|kcos-operator@|glyco-operator@|neture-operator@|super-admin@" (확장 범위)
 ```
 
 ---
@@ -64,9 +63,9 @@ Grep "kcos-admin@|kcos-operator@|glyco-operator@|neture-operator@|super-admin@" 
 
 | # | 파일 | 역할 | 분류 | 우선순위 |
 |---|------|------|:----:|:--------:|
-| A1 | [`20260927100000-BootstrapCanonicalSeedAccounts.ts`](apps/api-server/src/database/migrations/20260927100000-BootstrapCanonicalSeedAccounts.ts) | **8 임시 계정 정식 seed** — super-admin / kpa-admin / kpa-operator / phamacy1 / neture-operator / kcos-admin / kcos-operator / glyco-operator. 매 배포마다 idempotent 재실행 (Cloud Run 로그 5 회 확인) | **A 삭제** (또는 super-admin 만 보존) | **HIGH** |
-| A2 | [`apps/api-server/src/routes/admin/seed-test-accounts.ts`](apps/api-server/src/routes/admin/seed-test-accounts.ts) | **runtime 엔드포인트 `POST /api/v1/admin/seed-test-accounts`** — 평문 `O4oTestPass@1` 으로 `patient_test@glycopharm.co.kr`, `pharmacist_test@glycopharm.co.kr` 생성. 호출 = production 에 임시 계정 즉시 재생성 | **A 삭제** | **CRITICAL** |
-| A3 | [`1769408012358-UpdateOperatorPasswords.ts`](apps/api-server/src/database/migrations/1769408012358-UpdateOperatorPasswords.ts) | 모든 operator 계정 (admin-kpa-society, admin-neture, admin-glycopharm 등) 비밀번호를 평문 `O4oTestPass` 로 일괄 reset. precomputed bcrypt hash 직접 SQL | **A 삭제** (이미 적용됨 — git/migration 파일만 잔재) | M |
+| A1 | [`20260927100000-BootstrapCanonicalSeedAccounts.ts`](apps/api-server/src/database/migrations/20260927100000-BootstrapCanonicalSeedAccounts.ts) | 매 배포마다 idempotent 재실행 (Cloud Run 로그 5 회 확인) | **A 삭제** (또는 super-admin 만 보존) | **HIGH** |
+| A2 | [`apps/api-server/src/routes/admin/seed-test-accounts.ts`](apps/api-server/src/routes/admin/seed-test-accounts.ts) | 호출 = production 에 임시 계정 즉시 재생성 | **A 삭제** | **CRITICAL** |
+| A3 | [`1769408012358-UpdateOperatorPasswords.ts`](apps/api-server/src/database/migrations/1769408012358-UpdateOperatorPasswords.ts) | 모든 operator 계정 비밀번호를 평문 `O4oTestPass` 로 일괄 reset. precomputed bcrypt hash 직접 SQL | **A 삭제** (이미 적용됨 — git/migration 파일만 잔재) | M |
 | A4 | [`20260212200000-CreateKpaSocietyOperatorAccount.ts`](apps/api-server/src/database/migrations/20260212200000-CreateKpaSocietyOperatorAccount.ts) | `kpa-society@o4o.com` operator 계정 — dropped columns (`role`, `roles`, `permissions`) 참조. legacy dead code | C (자연 무효화) | L |
 
 ### 2.2 phamacy1 전용 보조 migration 3 종
@@ -154,7 +153,7 @@ Grep "kcos-admin@|kcos-operator@|glyco-operator@|neture-operator@|super-admin@" 
 | `b0000000-b000-4000-b000-000000000003` | kpa-operator (deleted) | 동일 | 동일 |
 | `b0000000-b000-4000-b000-000000000004` | phamacy1 (deleted) | 동일 | 동일 |
 | `b0000000-b000-4000-b000-000000000001` | super-admin (존재) | 동일 + audit | **유지 또는 정식 계정 UUID 로 마이그레이션** |
-| `b0000000-b000-4000-b000-00000000000{5,6,7,8}` | neture/kcos/glyco operator (존재) | 동일 | **D 전환** (정식 운영 계정 UUID 로 마이그레이션 검토) |
+| `b0000000-b000-4000-b000-00000000000{5,6,7,8}` | — | 동일 | **D 전환** (정식 운영 계정 UUID 로 마이그레이션 검토) |
 
 → 본 IR 범위는 002/003/004 의 cleanup. 005~008 은 별도 후속 audit 권고 (CLAUDE.md §15 의 "운영 계정 사용 금지" 와 충돌하는 것 아닌지).
 
@@ -166,9 +165,8 @@ Grep "kcos-admin@|kcos-operator@|glyco-operator@|neture-operator@|super-admin@" 
 
 | # | 파일 | 위반 | 분류 | 우선순위 |
 |---|------|------|:----:|:--------:|
-| E1 | [`services/web-glycopharm/src/pages/auth/LoginPage.tsx:213-244`](services/web-glycopharm/src/pages/auth/LoginPage.tsx#L213-L244) | "테스트 계정" 섹션 + "약국 경영자 로그인" 버튼 — `phamacy1@o4o.com` + `O4oTestPass@1` setEmail/setPassword 평문 | **A 삭제** | **CRITICAL** |
-| E2 | 동 파일:219-223 | "테스트 약국" 버튼 — `pharmacist_test@glycopharm.co.kr` + `O4oTestPass@1` 평문 | **A 삭제** | **CRITICAL** |
-| E3 | `services/web-glycopharm/src/components/common/LoginModal.tsx` | 유사 패턴 추정 (확인 필요) | A 삭제 | HIGH |
+| E2 | 동 파일:219-223 | "테스트 약국" 버튼 — `O4oTestPass@1` 평문 | **A 삭제** | **CRITICAL** |
+| E3 | — | 유사 패턴 추정 (확인 필요) | A 삭제 | HIGH |
 | E4 | `services/web-k-cosmetics/src/pages/auth/LoginPage.tsx` | 동일 패턴 추정 (Grep 매치) | A 삭제 | HIGH |
 | E5 | `services/web-k-cosmetics/src/components/common/LoginModal.tsx` | 동일 | A 삭제 | HIGH |
 
@@ -225,7 +223,7 @@ Grep "kcos-admin@|kcos-operator@|glyco-operator@|neture-operator@|super-admin@" 
 - 실제 코드 / 데이터 / 문서 수정 — 본 IR 은 read-only audit
 - A1 (Bootstrap migration) 의 삭제 방식 — 전체 삭제 / super-admin 만 보존 / down() 만 보강 등 결정은 WO 단계
 - `test-yaksa*` 패턴 (A9) 의 cleanup — 본 IR 범위 밖, 별도 audit 권고
-- UUID 005~008 (neture/kcos/glyco operator) 의 정식 계정 전환 여부 — 별도 후속 audit 권고
+- UUID 005~008 의 정식 계정 전환 여부 — 별도 후속 audit 권고
 - 본 IR 의 B4-6 정정을 IR 본문 직접 수정 vs supersession note 추가로 처리 — WO 시 결정
 - 정식 운영 super-admin 의 인증/MFA 정책 — 본 IR 범위 밖
 
@@ -276,7 +274,6 @@ Grep -r "b0000000-b000-4000-b000-00000000000[234]" .
 Grep -r "O4oBootstrap1!|BootstrapCanonicalSeed|O4oTestPass" .
 
 # 확장 — 다른 8 임시 계정
-Grep -r "kcos-admin@|kcos-operator@|glyco-operator@|neture-operator@|super-admin@" .
 ```
 
 ### 13.2 핵심 파일 inspection
@@ -287,7 +284,6 @@ Grep -r "kcos-admin@|kcos-operator@|glyco-operator@|neture-operator@|super-admin
 - `apps/api-server/src/database/migrations/20260212200000-CreateKpaSocietyOperatorAccount.ts`
 - `apps/api-server/src/database/migrations/1769408012358-UpdateOperatorPasswords.ts`
 - `apps/api-server/src/routes/admin/seed-test-accounts.ts`
-- `services/web-glycopharm/src/pages/auth/LoginPage.tsx:213-244`
 - `scripts/verify/verify-ai-content-modal.mjs:14-15`
 - `e2e/registration-approval-login.spec.ts:13,102,161,221,298`
 - `docs/archive/reports/O4O-PLATFORM-RESET-EXECUTION-PLAN-V1.md:18,182,191,203-205`

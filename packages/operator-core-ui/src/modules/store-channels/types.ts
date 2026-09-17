@@ -3,7 +3,7 @@
  *
  * WO-O4O-OPERATOR-CROSSSERVICE-CORE-ONLY-AND-VIEW-DUPLICATION-CLEANUP-V1
  *
- * KPA(412) / K-Cosmetics(396) / GlycoPharm(408) 이 같은 업무 화면
+ * KPA(412) / K-Cosmetics(396) 이 같은 업무 화면
  * (`GET /api/v1/operator/stores/channels` cross-store 채널 목록 + 상태 전이)을
  * 각각 구현하고 있었다. 실차이는 HTTP client · actionPolicy key · accent · 부제 뿐이다.
  *
@@ -45,7 +45,7 @@ export interface StoreChannelListResult {
 
 /**
  * 서비스별 HTTP adapter.
- * KPA 는 Bearer fetch, K-Cosmetics/GlycoPharm 은 axios wrapper 를 쓴다 — 그 차이만 흡수한다.
+ * KPA 는 Bearer fetch, K-Cosmetics 은 axios wrapper 를 쓴다 — 그 차이만 흡수한다.
  */
 export interface StoreChannelsClient {
   list(params: StoreChannelListParams): Promise<StoreChannelListResult>;

@@ -1,10 +1,10 @@
 # CHECK-O4O-STORE-SIDEBAR-HIERARCHY-TOKEN-ALIGNMENT-V1
 
 > **WO**: `WO-O4O-STORE-SIDEBAR-HIERARCHY-TOKEN-ALIGNMENT-V1`
-> **선행**: IR responsive sidebar audit + #1 DomainIASidebar lg/토큰 + #2 GP/KCos admin flex + #3 KPA admin lg + #5/#6 P0 + 누적 smoke PASS
+> **선행**: IR responsive sidebar audit + #1 DomainIASidebar lg/토큰 + #2 KCos admin flex + #3 KPA admin lg + #5/#6 P0 + 누적 smoke PASS
 > **목적**: 내 매장 `StoreSidebar`(store-ui-core 공통) 메뉴 계층 **시각 토큰만** O4O 표준에 정렬. breakpoint/drawer/구조 무변경.
 > **작성일**: 2026-06-17
-> **상태**: 코드 완료 · GP/KCos build PASS · KPA build 외부 WIP 차단(내 변경 무관) · browser smoke 배포 후
+> **상태**: 코드 완료 · KCos build PASS · KPA build 외부 WIP 차단(내 변경 무관) · browser smoke 배포 후
 > **분류**: frontend-only, 공통 컴포넌트(store-ui-core), 3서비스 store 소비
 
 ---
@@ -22,7 +22,6 @@
 
 | 서비스 | 사용 |
 |--------|------|
-| GlycoPharm | `web-glycopharm/src/App.tsx` (StoreDashboardLayout), `pages/store/StoreOverviewPage.tsx` |
 | K-Cosmetics | `web-k-cosmetics/src/App.tsx` |
 | KPA-Society | `web-kpa-society/src/App.tsx`, `pages/pharmacy/StoreSignagePage.tsx` |
 
@@ -42,7 +41,7 @@
 
 | 위치 | before | after | 근거(표준) |
 |------|--------|-------|-----------|
-| section item active (accordion) | `bg-teal-100 text-teal-700` | **`bg-teal-50 text-teal-700 font-semibold`** | active light bg `-50`(DomainIASidebar `bg-blue-50` / GP store-hub `bg-teal-50` / KPA admin `bg-indigo-50`) + active 강조 |
+| section item active (accordion) | `bg-teal-100 text-teal-700` | **`bg-teal-50 text-teal-700 font-semibold`** | active light bg `-50`(DomainIASidebar `bg-blue-50` store-hub `bg-teal-50` / KPA admin `bg-indigo-50`) + active 강조 |
 | flat item active | `bg-teal-100 text-teal-700` | **`bg-teal-50 text-teal-700 font-semibold`** | 동일 |
 | section(group) 헤더 | `px-3 py-2 … font-semibold` | `px-3 **py-2.5** … font-semibold` | group height 42~44 정합(font-semibold 600 은 이미 부합) |
 
@@ -61,18 +60,17 @@
 
 | 항목 | 결과 |
 |------|------|
-| `glycopharm-web` build | ✅ ✓ built 13.1s (exit 0) |
 | `@o4o/web-k-cosmetics` build | ✅ ✓ built 13.3s (exit 0) |
 | `@o4o/web-kpa-society` build | ⚠️ FAIL — **내 변경 무관**: `operator-ux-core/recruitment-exposure/RecruitmentExposureConsole.tsx` TS6133(미사용 import). 해당 파일은 **다른 세션 미커밋 WIP**(git status `M`, 본 커밋 미포함) |
 | breakpoint/drawer/구조 | ✅ 무변경 |
 | route/active/권한/menu visibility/메뉴명 | ✅ 무변경 |
 | backend/DB/package/lock | ✅ 변경 0 |
 
-> **내 StoreSidebar 변경 clean 근거**: 동일 store-ui-core 소스를 컴파일하는 GP/KCos build PASS. KPA 실패는 무관한 operator-ux-core WIP(다른 세션) — path-specific 커밋이라 미포함, 해당 WIP 정리 시 KPA build 자동 해소.
+> **내 StoreSidebar 변경 clean 근거**: 동일 store-ui-core 소스를 컴파일하는 KCos build PASS. KPA 실패는 무관한 operator-ux-core WIP(다른 세션) — path-specific 커밋이라 미포함, 해당 WIP 정리 시 KPA build 자동 해소.
 
 ### browser smoke (배포 후)
 ```
-GP /store, KCos /store, KPA /store · viewport 375/768/1023/1024/wide:
+store, KCos /store, KPA /store · viewport 375/768/1023/1024/wide:
 - 기존 lg responsive 유지(<1024 drawer / >=1024 고정) — 본 WO 미변경
 - top-level(section item)/group(section label) 시각 계층 명확
 - active 메뉴: bg-teal-50 + teal-700 + 강조(semibold) 표시
@@ -101,4 +99,4 @@ WO-O4O-STORE-SIDEBAR-HIERARCHY-TOKEN-ALIGNMENT-V1 커밋 (이 CHECK 포함, path
 
 ---
 
-*frontend-only. StoreSidebar 토큰 3건(active bg -100→-50, active semibold, group height) 표준 정렬. breakpoint/drawer/구조/brand 무변경. GP/KCos build PASS(내 변경 clean), KPA 는 외부 WIP 차단. browser smoke 배포 후.*
+*frontend-only. StoreSidebar 토큰 3건(active bg -100→-50, active semibold, group height) 표준 정렬. breakpoint/drawer/구조/brand 무변경. KCos build PASS(내 변경 clean), KPA 는 외부 WIP 차단. browser smoke 배포 후.*

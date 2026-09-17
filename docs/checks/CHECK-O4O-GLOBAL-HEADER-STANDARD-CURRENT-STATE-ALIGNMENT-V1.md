@@ -14,15 +14,15 @@
 
 | # | 위치 | 수정 전 서술 | 현재 코드 |
 |:-:|------|--------------|-----------|
-| 1 | 문서 헤더 `범위` | kpa-society, glycopharm, neture, k-cosmetics (4서비스) | 5서비스 (pharmacy-hub 포함) |
+| 1 | 문서 헤더 `범위` | kpa-society, neture, k-cosmetics (3서비스) | 5서비스 (pharmacy-hub 포함) |
 | 2 | §1 문제 목록 | "공통 컴포넌트가 존재하지 않는다" / "4개 서비스 모두 독립 구현하고 있다" (현재형) | `@o4o/ui GlobalHeader` 존재, 5서비스 채택 완료 |
 | 3 | §2 조사 결과 표 | Main/Public Header 공유 컴포넌트 = **없음**, 메뉴 중앙 관리 시스템 = **없음** | 둘 다 존재 |
 | 4 | §3.3 | "8~12개의 독립된 Header 코드가 존재한다" | Core 1 + bridge 5 |
-| 5 | §5.1 Layer A | "해당하는 현재 컴포넌트: kpa `Header.tsx` / glycopharm `Header.tsx` / …" | 서비스별 독립 `Header.tsx` 파일 **0개** |
+| 5 | §5.1 Layer A | "해당하는 현재 컴포넌트: kpa `Header.tsx` `Header.tsx` / …" | 서비스별 독립 `Header.tsx` 파일 **0개** |
 | 6 | §6.1 | "현재 문제 — 메뉴가 Header/Layout 내부에 하드코딩" | 5서비스 `src/config/navigation.ts` |
-| 7 | §7.3 | "현재 위반 사례" 4건 (kpa admin/operator, glyco 이중헤더, neture 역할별 Layout) | 4건 모두 해소 |
+| 7 | §7.3 | "현재 위반 사례" 4건 | 4건 모두 해소 |
 | 8 | §8.1 | kpa inline style 70px 등 서비스별 상이 | 공통 Core Tailwind `h-16`(64px) |
-| 9 | §8.3 브랜드 토큰 표 | 4서비스, 실제 주입값과 불일치 (glyco `#10b981`, kcos `#e91e63`, neture 텍스트 로고 등) | 실제 `brand` prop 값과 다름 · pharmacy-hub 누락 |
+| 9 | §8.3 브랜드 토큰 표 | 4서비스, 실제 주입값과 불일치 | 실제 `brand` prop 값과 다름 · pharmacy-hub 누락 |
 | 10 | §11 적용 우선순위 | Phase 1~6 미래 계획형 | Phase 1~5 완료, 6은 상시 |
 | 11 | §12 / 문서 말미 | "다음 단계: WO-O4O-GLOBAL-LAYOUT-UNIFICATION-V1 (구현)" | 구현 완료 · 트랙 CLOSED |
 
@@ -36,11 +36,11 @@
 |-----------|------|
 | 공통 Core 존재 | `packages/ui/src/layout/GlobalHeader.tsx` — 4슬롯(Brand/PrimaryNav/Utility/User), `h-16`, props-only(서비스 Context 비의존) |
 | Core export | `packages/ui/src/layout/index.ts` → `export * from './GlobalHeader'` · `'./filterContextualNav'` |
-| 5서비스 bridge | `KpaGlobalHeader` · `GlycoGlobalHeader` · `KCosGlobalHeader` · `NetureGlobalHeader` · `PharmacyHubGlobalHeader` (모두 `GlobalHeader` from `@o4o/ui` import) |
-| navigation config | `services/web-{kpa-society,glycopharm,neture,k-cosmetics,pharmacy-hub}/src/config/navigation.ts` — 5/5 존재 |
+| 5서비스 bridge | `KpaGlobalHeader` · `KCosGlobalHeader` · `NetureGlobalHeader` · `PharmacyHubGlobalHeader` (모두 `GlobalHeader` from `@o4o/ui` import) |
+| navigation config | — |
 | contextual 필터 공통화 | 5 bridge 중 4개가 `filterContextualNav` 직접 사용, KPA 는 `filterContextualNav(KPA_CONTEXTUAL_NAV, …)` 결과를 `publicNav` 로 병합(서비스 의도) |
 | 레거시 Header 제거 | `git ls-files` 기준 `services/web-*/src/**/Header.tsx` **0건** |
-| 역할 영역 GlobalHeader 유지 | KPA `AdminLayout`·`KpaOperatorLayoutWrapper`, Glyco `DashboardLayout`·`MainLayout`·`OperatorLayoutWrapper`, Neture `MainLayout`·`NetureLayout`·`AdminLayoutWrapper` 전부 bridge 렌더 |
+| 역할 영역 GlobalHeader 유지 | — |
 | 서비스별 차이 유지 | 브랜드(색·아이콘·서브타이틀), 메뉴 항목, 역할 판정(`isPharmacistRole` / `isStoreOwnerDual` / `satisfiesRole`), 대시보드 route, 알림 `serviceKey` 가 서비스마다 다름 |
 
 ---
@@ -79,7 +79,7 @@
 
 ## 5. PharmacyHub 포함 여부
 
-포함했다. 적용 대상 = **kpa-society / glycopharm / neture / k-cosmetics / pharmacy-hub 5서비스**.
+포함했다.
 
 - 문서 헤더 `범위`, §2.2 표, §5.1 표, §8.3 브랜드 토큰 표, §11 Phase 6 에 반영.
 - 단, "5서비스 Header 가 동일하다" 는 의미로 쓰지 않았다. PharmacyHub 는 자체 `PH_PUBLIC_NAV` / `PH_CONTEXTUAL_NAV`,

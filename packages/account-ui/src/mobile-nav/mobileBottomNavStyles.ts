@@ -5,7 +5,7 @@ import type { CSSProperties } from 'react';
  *
  * WO-O4O-CROSSSERVICE-MOBILE-BOTTOM-NAV-COMMONIZATION-V1
  *
- * KPA / GlycoPharm / K-Cosmetics / Neture 네 구현이 각자 들고 있던 동일한
+ * KPA / K-Cosmetics / Neture 세 구현이 각자 들고 있던 동일한
  * style 상수(tabStyle / labelStyle / navSafeArea / badgeStyle)의 정본이다.
  * 브랜드 색(activeColor)과 z-index 만 서비스가 주입한다.
  *

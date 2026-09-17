@@ -79,7 +79,7 @@ Identity (계정)
 │  valid_until, assigned_by, scope_type, scope_id              │
 │                                                              │
 │  Roles: 'platform:super_admin', 'kpa:admin',                │
-│         'glycopharm:operator', 'cosmetics:seller', ...       │
+│         'cosmetics:seller', ...                              │
 │  UNIQUE(user_id, role, is_active)                            │
 └──────────────────────────────────────────────────────────────┘
          │
@@ -128,7 +128,6 @@ Identity (계정)
 | **KPA-a (커뮤니티)** | Auth Core + auto-enroll | kpa_members.role | 가입 시 member/pending | 없음 |
 | **KPA-b (지부)** | Admin 생성 | kpa_branch_officers.role | Admin 수동 | 없음 |
 | **KPA-c (분회)** | Admin 생성 | kpa_stewards.scope_type | Admin 수동 | 없음 |
-| **GlycoPharm** | 신청서 기반 | role_assignments + users.roles | 승인 시 glycopharm:store_owner | 없음 |
 | **Cosmetics** | 신청서 기반 | cosmetics_store_members.role | 승인 시 owner | 없음 |
 | **Neture** | 신청서 기반 | neture_suppliers.user_id FK | 승인 시 ACTIVE | 없음 |
 | **Store Domain** | 매장 생성 연동 | organization_service_enrollments | 매장 승인 시 | 없음 |
@@ -151,7 +150,7 @@ Identity (계정)
 
 **분석**: pharmacistRole/pharmacistFunction은 KPA 서비스의 Qualification인데
 User 엔티티(전역 Identity)에 저장되어 있다.
-이는 KPA가 아닌 서비스(GlycoPharm, Cosmetics)에서도 이 필드에 접근 가능하며,
+이는 KPA가 아닌 서비스(Cosmetics)에서도 이 필드에 접근 가능하며
 Qualification이 Identity와 분리되지 않은 상태이다.
 
 ### 5-B. Business Role 혼합
@@ -159,7 +158,7 @@ Qualification이 Identity와 분리되지 않은 상태이다.
 | # | 문제 | 위치 | 영향도 |
 |---|------|------|--------|
 | B1 | `pharmacy_owner`가 `users.pharmacist_role`에 VARCHAR로 저장 | users 테이블 | **HIGH** |
-| B2 | `glycopharm:store_owner`가 `users.roles[]`에 추가 (승인 시) | users.roles 배열 | **HIGH** |
+| B2 | — | users.roles 배열 | **HIGH** |
 | B3 | Business Role과 Qualification이 같은 필드(`pharmacist_role`)에 혼합 | users 테이블 | **RED** |
 | B4 | `cosmetics_store_members.role = 'owner'`는 별도 테이블 — 일관성 부재 | cosmetics schema | **MEDIUM** |
 
@@ -184,7 +183,7 @@ Qualification이 Identity와 분리되지 않은 상태이다.
 | # | 문제 | 위치 | 영향도 |
 |---|------|------|--------|
 | S1 | KPA 전용 필드(pharmacistRole)가 User 전역에 존재 → 모든 서비스 접근 가능 | users 테이블 | **HIGH** |
-| S2 | GlycoPharm 승인 시 `users.roles[]`에 직접 push → RBAC 우회 | glycopharm admin controller | **HIGH** |
+| S2 | — | — | **HIGH** |
 | S3 | `platform:admin`이 모든 서비스 admin 체크를 통과 → 의도적 설계이나 문서화 부재 | role.utils.ts | **LOW** |
 | S4 | `pharmacistRole = 'pharmacy_owner'`와 `KpaMember.membership_type = 'student'` 동시 가능 — 충돌 검증 없음 | users + kpa_members | **HIGH** |
 
@@ -237,20 +236,6 @@ Qualification이 Identity와 분리되지 않은 상태이다.
   6. 자동 로그인 없음 — 운영자 승인 대기
 ```
 
-### GlycoPharm 매장 가입 (POST /api/v1/glycopharm/applications)
-
-```
-입력: organizationType, organizationName, businessNumber, serviceTypes, requestedSlug
-상태: submitted → 운영자 검토
-
-승인 시 (PATCH /:id/review):
-  1. OrganizationStore 생성 (type='pharmacy')
-  2. GlycopharmPharmacyExtension 생성
-  3. organization_service_enrollments 생성
-  4. users.roles[] 에 'glycopharm:store_owner' 직접 push  ← 문제점
-  5. Slug 예약
-```
-
 ### Cosmetics 매장 가입 (POST /api/v1/cosmetics/stores/apply)
 
 ```
@@ -275,7 +260,6 @@ Qualification이 Identity와 분리되지 않은 상태이다.
   role: UserRole,           // deprecated, 하위호환
   roles: string[],          // ['kpa:admin', 'platform:super_admin']
   permissions: string[],
-  scopes: string[],         // ['kpa:membership:manage', 'glycopharm:products:read']
   domain: 'neture.co.kr',
   tokenType: 'user',
   iss: 'o4o-platform',
@@ -339,7 +323,6 @@ public → member → operator → admin (누적)
 | 4 | FunctionalRole 이중 시스템 | users.roles[] + role_assignments 공존 | Auth Core | **MEDIUM** |
 | 5 | Qualification 이중 관리 | User.pharmacistRole vs KpaMember.membership_type 교차 검증 없음 | KPA-a | **HIGH** |
 | 6 | Qualification 이중 저장 | license_number가 users.businessInfo + kpa_members 양쪽 저장 | Auth Core + KPA | **MEDIUM** |
-| 7 | 서비스 침투 | GlycoPharm 승인 시 users.roles[]에 직접 push (RBAC 우회) | GlycoPharm | **HIGH** |
 | 8 | Qualification 세분도 불일치 | User.pharmacistFunction (4종) vs KpaMember.activity_type (10+종) | KPA | **MEDIUM** |
 | 9 | 역할 비활성화 누락 | 매장 비활성화 시 owner 역할 자동 제거 없음 | Store Domain | **MEDIUM** |
 | 10 | Legacy 정리 미완 | users.role, users.roles, dbRoles 등 deprecated 필드 잔존 | Auth Core | **MEDIUM** |
@@ -384,7 +367,6 @@ public → member → operator → admin (누적)
 
 현재:
   ✗ pharmacy_owner가 users.pharmacist_role에 저장 (Qualification 필드)
-  ✗ glycopharm:store_owner는 users.roles[]에 직접 push (RBAC 우회)
   ✗ cosmetics는 별도 store_members 테이블 사용 (일관성 없음)
   ✗ 매장 비활성화 시 Business Role 자동 제거 없음
 ```
@@ -443,7 +425,6 @@ public → member → operator → admin (누적)
 | Auth Controller (Register) | `apps/api-server/src/modules/auth/controllers/auth.controller.ts` |
 | Register DTO | `apps/api-server/src/modules/auth/dto/register.dto.ts` |
 | Token Utilities | `apps/api-server/src/utils/token.utils.ts` |
-| GlycoPharm Admin (Approval) | `apps/api-server/src/routes/glycopharm/controllers/admin.controller.ts` |
 | Cosmetics Store Controller | `apps/api-server/src/routes/cosmetics/controllers/cosmetics-store.controller.ts` |
 
 ---
@@ -456,7 +437,6 @@ public → member → operator → admin (누적)
 2. **Business Role 분리**: `pharmacy_owner`를 pharmacistRole에서 제거 → 별도 Business Role 시스템
 3. **면허 검증 워크플로우**: 면허번호 형식 검증 + Admin 수동 확인 절차 최소 도입
 4. **이중 시스템 정리**: Legacy users.role/roles[]/dbRoles 컬럼 제거
-5. **RBAC 통합**: GlycoPharm 승인 시 users.roles[] push → role_assignments 사용으로 전환
 6. **교차 검증**: User.pharmacistRole과 KpaMember.membership_type 일관성 검증
 
 ### 예상 수정 파일 규모
@@ -465,7 +445,6 @@ public → member → operator → admin (누적)
 |------|---------|--------|
 | User Entity + Auth | ~5 | HIGH |
 | KPA Members | ~8 | MEDIUM |
-| GlycoPharm Approval | ~3 | MEDIUM |
 | Role Utilities | ~4 | MEDIUM |
 | Frontend Auth | ~10+ | MEDIUM |
 | Migration | ~3 | HIGH |

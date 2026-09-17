@@ -2,7 +2,7 @@
 
 > **유형**: Investigation (read-only) — 콘텐츠 제작·보관·가져가기·활용이 약국/매장 경영 지원 환경에서 어떻게 연결되는지 흐름 조사.
 > **성격**: 코드/DB/UI **무변경**. 조사 문서만 (file:line 근거).
-> **결론(요약)**: **현재 구조는 O4O 철학과 대체로 일치(A)** — 운영자 발행(`cms_contents` status='published')→`/store-hub/content` browse→`assetSnapshotApi.copy('/assets/copy')`→**불변 스냅샷**(`o4o_asset_snapshots`, source FK 없음)→내 매장 편집 레이어(`kpa_store_contents`, snapshot_id nullable·독립 content_json)→제작 결과물. **가져오기=복사+원본 단절+출처 메타 = 구현됨**. 복사 의미 UX 명시(`내 매장에 복사`/`복사 완료`). 잔여: **B**(GP `내 약국` vs `내 매장` 용어·Download 아이콘 polish), **D-대부분완료**(3서비스 route/table parity 존재 — 컴포넌트 near-identical dedup 기회), **E-경미**(다중 테이블/3 라이브러리 경계는 문서로 정의됨 — 안내 보강 여지). **C/F 아님**(발행↔복사 혼동 없음, 원본-사본 단절 DB 충돌 없음).
+> **결론(요약)**: **현재 구조는 O4O 철학과 대체로 일치(A)** — 운영자 발행(`cms_contents` status='published')→`/store-hub/content` browse→`assetSnapshotApi.copy('/assets/copy')`→**불변 스냅샷**(`o4o_asset_snapshots`, source FK 없음)→내 매장 편집 레이어(`kpa_store_contents`, snapshot_id nullable·독립 content_json)→제작 결과물. **가져오기=복사+원본 단절+출처 메타 = 구현됨**. 복사 의미 UX 명시(`내 매장에 복사`/`복사 완료`). **C/F 아님**(발행↔복사 혼동 없음, 원본-사본 단절 DB 충돌 없음).
 > **선행/근거**: `O4O-STORE-PRODUCTION-MATERIAL-CANONICAL-V1` · `O4O-STORE-MENU-CANONICAL-TREE-V1` · `O4O-OPERATOR-HUB-CONTENT-PUBLISHING-STANDARD-V1` · `PLATFORM-CONTENT-POLICY-V1` · `O4O-BUSINESS-PHILOSOPHY-V1` · `O4O-3-ROLE-FLOW-BASELINE-V1`.
 > **작성일**: 2026-06-15
 
@@ -14,7 +14,7 @@
 
 ## 2. 대상 서비스
 
-KPA Society / GlycoPharm / K-Cosmetics. (Neture 는 매장 기능 부재로 제외 — 운영자 발행 참고만. `O4O-STORE-MENU-CANONICAL-TREE-V1 §1.3`.)
+KPA Society / K-Cosmetics. (Neture 는 매장 기능 부재로 제외 — 운영자 발행 참고만. `O4O-STORE-MENU-CANONICAL-TREE-V1 §1.3`.)
 
 ## 3. 기준 원칙 (doctrine digest)
 
@@ -36,20 +36,18 @@ KPA Society / GlycoPharm / K-Cosmetics. (Neture 는 매장 기능 부재로 제�
 | 서비스 | 발행 route | 컴포넌트 | 상태 | API | 테이블 |
 |--------|-----------|---------|------|-----|--------|
 | **KPA** | `/operator/content` | `ContentManagementPage`(`@o4o/operator-core-ui CmsContentManager`) | draft/published/archived | `/api/v1/kpa/news/*` | `cms_contents` (serviceKey=`kpa`) |
-| **GP** | `/operator/content-management` | `OperatorContentPage`(동 CmsContentManager) | 동 | `/api/v1/glycopharm/news/*` | `cms_contents` (`glycopharm`) |
 | **KCos** | `/operator/content-management` | `OperatorContentPage`(동) | 동 | `/api/v1/cosmetics/news/*` | `cms_contents` (`cosmetics`) |
 
 - 발행 UI 는 **`CmsContentManager`(operator-core-ui)로 공통화**. status `published`='게시', `draft`='임시저장', `archived`='보관' (`packages/operator-core-ui/src/modules/cms-content/CmsContentManager.tsx`).
 - backend `news.controller.ts`(`apps/api-server/src/routes/o4o-store/controllers/`) 파라미터화 컨트롤러 — `cms_contents` 단일 테이블 + `serviceKey` 필터.
 - `cms_contents` 가시성 컬럼: `authorRole`(admin|operator), `visibilityScope`(platform|service|organization) — `PLATFORM-CONTENT-POLICY §7` 서버 강제(P7).
-- **차이**: KPA 발행 route 명 `/operator/content` vs GP/KCos `/operator/content-management` (컴포넌트 wrapper 명만 상이, 내부 CmsContentManager 동일).
+- **차이**: KPA 발행 route 명 `/operator/content` vs KCos `/operator/content-management` (컴포넌트 wrapper 명만 상이, 내부 CmsContentManager 동일).
 
 ## 5. Phase 2 — `/store-hub/content` browse 흐름
 
 | 서비스 | route | 컴포넌트 | 공통 베이스 | 필터 |
 |--------|-------|---------|------------|------|
 | **KPA** | `/store-hub/content` | `HubContentLibraryPage`(`pages/pharmacy/`) | `@o4o/shared-space-ui ContentHubTemplate` | status='published' |
-| **GP** | `/store-hub/content` | `HubContentListPage`(`pages/hub/`) | 동 ContentHubTemplate | 동 |
 | **KCos** | `/store-hub/content` | `HubContentPage`(`pages/hub/`) | 동 | 동 |
 
 - 3서비스 모두 **shared `ContentHubTemplate`** 기반(`packages/shared-space-ui/src/ContentHubTemplate.tsx`) — 서비스별 차이는 config/adapter(fetch·필터·문구·테마)로 주입. 탭(전체/공지/가이드/지식/프로모션/뉴스 등) + 검색.
@@ -60,7 +58,7 @@ KPA Society / GlycoPharm / K-Cosmetics. (Neture 는 매장 기능 부재로 제�
 
 ### 6.1 복사 메커니즘
 - frontend: `assetSnapshot.ts:62-63` → `apiClient.post('/assets/copy', {sourceService, sourceAssetId, assetType})` (서비스 base 접두 → `POST /api/v1/{svc}/assets/copy`). 목록 `GET /assets`(`:73`).
-- backend: `createAssetSnapshotController`(`apps/api-server/src/routes/o4o-store/controllers/asset-snapshot.controller.ts`) → `@o4o/asset-copy-core AssetCopyService.copyWithResolver()`(`packages/asset-copy-core/src/services/asset-copy.service.ts:85-136`). 각 서비스 routes 에 mount(kpa/glycopharm/cosmetics `*/assets/copy`).
+- backend: `createAssetSnapshotController`(`apps/api-server/src/routes/o4o-store/controllers/asset-snapshot.controller.ts`) → `@o4o/asset-copy-core AssetCopyService.copyWithResolver()`(`packages/asset-copy-core/src/services/asset-copy.service.ts:85-136`). 각 서비스 routes 에 mount.
 - service-specific resolver(`KpaAssetResolver` 등)가 source 유형별 표준 `ResolvedContent` 반환: `cms / signage / lesson / content / resource / blog / pop / qr`.
 
 ### 6.2 데이터 모델 — 원본/사본 단절 (P2/P3/P4 검증)
@@ -80,10 +78,10 @@ KPA Society / GlycoPharm / K-Cosmetics. (Neture 는 매장 기능 부재로 제�
 | 서비스 | copyLabel | copiedLabel | 복사 후 안내(infoLinks) |
 |--------|-----------|-------------|------------------------|
 | KPA | `내 매장에 복사`(`HubContentLibraryPage.tsx:149`) | `복사 완료`(`:150`) | — |
-| GP | **`내 약국에 복사`**(`HubContentListPage.tsx:185`) | `복사 완료`(`:186`) | `내 약국 > 자산 관리`→`/store/library/contents`(`:193`) |
+| **`내 약국에 복사`**(`HubContentListPage.tsx:185`) | `복사 완료`(`:186`) | `내 약국 > 자산 관리`→`/store/library/contents`(`:193`) |
 | KCos | `내 매장에 복사`(`HubContentPage.tsx:180`) | `복사 완료`(`:181`) | `내 매장 > 자산 관리`→`/store/library/contents`(`:188`) |
 
-> "복사" 의미는 **명확히 노출**됨(P2 UX 충족). `다운로드` 라벨 없음. **잔여(B)**: GP `내 약국` vs KPA/KCos `내 매장` 용어 변이, GP 복사 버튼이 `Download` 아이콘 사용(`HubContentListPage.tsx:102`, 라벨은 정상) — 경미 polish.
+> "복사" 의미는 **명확히 노출**됨(P2 UX 충족). `다운로드` 라벨 없음.
 
 ## 7. Phase 4 — 내 매장 보관·편집 흐름
 
@@ -111,7 +109,7 @@ KPA Society / GlycoPharm / K-Cosmetics. (Neture 는 매장 기능 부재로 제�
 | **고객 안내문/상품설명** | `/store/marketing/product-descriptions` (`StoreProductDescriptionsPage`) | RTE | `store_execution_assets`(category) | ProductionMaterials(material) | ✅ |
 
 - HUB 가져가기 대응: `/store-hub/{pop,qr,blog,signage,content}` 각 `Hub*LibraryPage` → 동일 `assetSnapshotApi.copy(assetType)`(P6 동일 축 충족).
-- KPA = reference. **GP/KCos route+table parity 확인됨**(Agent 조사: `/store/library/*`, `/store/marketing/*`, `/store-hub/*` 전 항목 3서비스 동일).
+- KPA = reference. **KCos route+table parity 확인됨**(Agent 조사: `/store/library/*`, `/store/marketing/*`, `/store-hub/*` 전 항목 2서비스 동일).
 
 ## 9. Phase 6 — route / API / table 인벤토리
 
@@ -136,7 +134,7 @@ KPA Society / GlycoPharm / K-Cosmetics. (Neture 는 매장 기능 부재로 제�
 | 회원 /content ↔ 운영자 /store-hub/content 혼입 | P7 | ✅ producer/status 분리 |
 | serviceKey cross-service | P8 | ✅ serviceKey 필터 |
 | 중복 복사 dedup | — | ⚠️ backend 가드 없음(의도된 독립 복사) — UX 안내 여지 |
-| 용어/아이콘 일관성 | — | ⚠️ GP `내 약국` vs `내 매장`, GP Download 아이콘 |
+| 용어/아이콘 일관성 | — | — |
 
 **중대한 철학 충돌 없음.** 가져오기=복사·원본 단절·발행↔복사 구분·콘텐츠/자료실 분리 모두 구현. → **C/F 해당 없음.**
 
@@ -149,18 +147,17 @@ KPA Society / GlycoPharm / K-Cosmetics. (Neture 는 매장 기능 부재로 제�
 - 내 매장 보관/편집/결과물: route+table parity 3서비스 동일, `RichTextEditor` 편집기 공통.
 
 **서비스 차이(잔여):**
-- KPA browse `HubContentLibraryPage`(custom tab remap) vs GP/KCos `HubContentListPage`/`HubContentPage` — 모두 ContentHubTemplate 기반이나 wrapper near-identical 중복(dedup 기회, b2b IR 동형 패턴).
-- 발행 route 명 KPA `/operator/content` vs GP/KCos `/operator/content-management`.
-- 복사 라벨 GP `내 약국` vs `내 매장`, GP Download 아이콘.
+- KPA browse `HubContentLibraryPage`(custom tab remap) vs KCos `HubContentListPage`/`HubContentPage` — 모두 ContentHubTemplate 기반이나 wrapper near-identical 중복(dedup 기회, b2b IR 동형 패턴).
+- 발행 route 명 KPA `/operator/content` vs KCos `/operator/content-management`.
 
 ## 12. 결과 판정
 
 | 안 | 해당 | 근거 |
 |----|:---:|------|
 | **A** 철학 대체로 일치, 문구/안내 보강 | **주** | 복사·단절·발행↔복사 구분·격리 전부 구현 |
-| **B** 복사=구현됨, UX 안내 일부 보강 | **부분** | 라벨/아이콘/용어 변이(GP 내 약국/Download), 중복 복사 안내 |
+| **B** 복사=구현됨, UX 안내 일부 보강 | **부분** | — |
 | **C** 발행↔복사 혼동, route/UI 정리 | ❌ | 발행(cms_contents)·복사(snapshot) 명확 분리 |
-| **D** 내 매장 제작자료 KPA 정리·GP/KCos parity 필요 | **대부분 완료** | route/table parity **존재** — 남은 건 컴포넌트 dedup |
+| **D** 내 매장 제작자료 KPA 정리·KCos parity 필요 | **대부분 완료** | route/table parity **존재** — 남은 건 컴포넌트 dedup |
 | **E** 콘텐츠/자료실/제작자료 경계 불명확 | **경미** | 경계는 canonical 문서로 정의됨 — 다중 테이블 인지 복잡성/안내 여지 |
 | **F** 원본-사본 단절 DB 충돌 | ❌ | 단절 정상 구현(FK 없음, 자기완결 스냅샷) |
 
@@ -169,8 +166,8 @@ KPA Society / GlycoPharm / K-Cosmetics. (Neture 는 매장 기능 부재로 제�
 ## 13. 후속 WO 후보 / 우선순위
 
 **저위험 정렬 (우선)**
-1. `WO-O4O-STORE-CONTENT-TERMINOLOGY-AND-GUIDE-COPY-V1` — 복사 라벨/아이콘/용어 정렬(GP `내 약국`↔`내 매장` 정책 결정, GP Download→Copy 아이콘), "가져오기=복사·원본 단절" 안내 문구 보강, 중복 복사 안내. **(B/E)**
-2. `WO-O4O-STORE-HUB-CONTENT-BROWSE-COMPONENT-EXTRACTION-V1`(후보) — KPA `HubContentLibraryPage` vs GP/KCos near-identical browse wrapper 공통 추출(ContentHubTemplate config 정렬). **(D 컴포넌트 dedup, b2b IR 동형)**
+1. **(B/E)**
+2. `WO-O4O-STORE-HUB-CONTENT-BROWSE-COMPONENT-EXTRACTION-V1`(후보) — KPA `HubContentLibraryPage` vs KCos near-identical browse wrapper 공통 추출(ContentHubTemplate config 정렬). **(D 컴포넌트 dedup, b2b IR 동형)**
 
 **평가 후**
 3. `WO-O4O-STORE-LIBRARY-DUPLICATE-COPY-UX-POLICY-V1`(후보) — 중복 복사 정책(허용 유지 + UX 명시 vs soft-dedup) 결정. **(중복 복사 §6.2-4)**
@@ -188,7 +185,7 @@ KPA Society / GlycoPharm / K-Cosmetics. (Neture 는 매장 기능 부재로 제�
 - **운영자 발행 → 허브 browse → 복사 → 보관/편집 → 제작 결과물 → 경영 지원** 전 흐름이 **O4O 철학과 대체로 정합(A)**. 핵심 원칙(가져오기=복사·원본 단절·출처 메타·발행↔복사 구분·콘텐츠/자료실/허브 분리·6항목 동일 축)이 **코드·DB·UX 에 구현**되어 있다.
 - 데이터 모델은 **자기완결 스냅샷(`o4o_asset_snapshots`, source FK 없음) + 독립 편집 레이어(`kpa_store_contents`, snapshot FK 없음)** 로 원본-사본 단절을 구조적으로 보장 → **F(DB 충돌) 없음**.
 - 발행(`cms_contents`)과 복사(snapshot)가 명확히 분리되어 **C(혼동) 없음**.
-- 내 매장 제작자료는 KPA reference + **GP/KCos route/table parity 존재(D 대부분 완료)** — 잔여는 컴포넌트 near-identical dedup.
+- 내 매장 제작자료는 KPA reference + **KCos route/table parity 존재(D 대부분 완료)** — 잔여는 컴포넌트 near-identical dedup.
 - 보강 여지는 **B(복사 라벨/아이콘/용어 polish·중복 복사 안내)** 와 **E(다중 테이블 경계 안내)** 로 모두 **저위험 후속**.
 - **권고**: 구조 정비가 아니라 **용어/안내 정렬(B/E) → browse 컴포넌트 dedup(D)** 순으로 진행. 계약/데이터 모델은 추가 정렬 불요(이미 A).
 

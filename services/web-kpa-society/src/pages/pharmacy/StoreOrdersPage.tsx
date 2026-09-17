@@ -7,8 +7,8 @@
  *    seller "받은 주문/판매 이행" 은 별도 화면으로 분리 — 본 화면 범위 외.)
  *
  * WO-O4O-STORE-HUB-COMMON-VIEW-AND-SHELL-UNIFICATION-V1 §8:
- *   헤더 / KPI 3블록 / 상태 필터 바 / loading·error·empty / pagination 뼈대를 GlycoPharm
- *   `PharmacyOrders` 와 공유하는 `BuyerOrderLedgerView` 로 이관했다. 여기 남는 것은
+ *   헤더 / KPI 3블록 / 상태 필터 바 / loading·error·empty / pagination 뼈대를
+ *   공통 `BuyerOrderLedgerView` 로 이관했다. 여기 남는 것은
  *   KPA 고유 config 뿐이다 — 상태 탭(3서비스 공통 매핑) · 결제 판정 · 주문 작업대 링크 ·
  *   DataTable 컬럼 정의. 데이터 소스(getBuyerOrders)·문구·집계 정책 무변경.
  *
@@ -16,7 +16,7 @@
  *   독립 검증에서 KPA 만 (1) 주문 상세 진입 경로가 없고 (2) 결제 전 취소 UI 가 없었다
  *   (백엔드 `GET /checkout/orders/:id` · `POST /checkout/orders/:id/cancel` 는 이미 있었다).
  *   → 행 펼침 상세 + 공통 취소 조각(`useBuyerOrderCancel`)으로 흐름 단절을 닫는다.
- *   목록 본문은 `renderList` slot 이라 표현은 KPA 가 소유한다(GlycoPharm 확장 카드와 형태가 다르다).
+ *   목록 본문은 `renderList` slot 이라 표현은 KPA 가 소유한다.
  */
 
 import { useState, useEffect, useCallback, useMemo } from 'react';

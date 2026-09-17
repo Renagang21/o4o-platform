@@ -17,7 +17,7 @@
 - Node 요구사항: `>=22.18.0`.
 - Volta 기준: Node `22.18.0`, pnpm `9.15.0`.
 
-조사 시점의 working tree는 이미 dirty 상태였다. 기존 변경 파일에는 `packages/operator-core-ui`, `services/web-glycopharm`, `services/web-k-cosmetics`, `services/web-kpa-society`, `pnpm-lock.yaml` 등이 포함되어 있었다. Codex 초기 도입 단계에서는 이 기존 변경과 섞이지 않도록 새 문서 작성 또는 read-only 조사로 범위를 제한해야 한다.
+조사 시점의 working tree는 이미 dirty 상태였다. Codex 초기 도입 단계에서는 이 기존 변경과 섞이지 않도록 새 문서 작성 또는 read-only 조사로 범위를 제한해야 한다.
 
 ## 2. CLAUDE.md에서 확인한 핵심 규칙
 
@@ -28,7 +28,7 @@
 - 계층 의존성은 `Core -> Extension -> Feature -> Service` 방향만 허용하고 역방향 의존을 금지한다.
 - API 호출은 `authClient.api.get()` / `authClient.api.post()`를 사용하며, 하드코딩 URL과 환경변수 직접 사용을 피한다.
 - 공통 모듈, 공통 config, sidebar/menu, layout, capability/permission map, core+extension contract 수정 시 단일 서비스 기준으로 완료 판단하지 않는다.
-- 공통 변경 전 KPA-Society, GlycoPharm, K-Cosmetics, Neture 및 관련 admin/operator/store/forum/store-hub/mypage 소비처를 식별한다.
+- 공통 변경 전 KPA-Society, K-Cosmetics, Neture 및 관련 admin/operator/store/forum/store-hub/mypage 소비처를 식별한다.
 - TypeORM entity relation은 runtime import가 아니라 `import type`과 문자열 relation을 사용한다.
 - `cms-core`, `auth-core`, `platform-core`, `organization-core`는 동결 Core로, 구조/테이블 변경에는 명시적 WO 승인이 필요하다.
 - Boundary Policy:
@@ -107,14 +107,12 @@ git diff --cached --name-only
 |---|---|
 | `o4o-core-api` | API 서버 |
 | `neture-web` | Neture 메인 |
-| `glycopharm-web` | GlycoPharm |
 | `k-cosmetics-web` | K-Cosmetics |
 | `kpa-society-web` | KPA Society |
 
 경계 원칙:
 
-- Neture, KPA-Society, GlycoPharm, K-Cosmetics를 임의로 혼동하지 않는다.
-- KPA-only, GlycoPharm-only, K-Cosmetics-only, Neture-only 예외로 공통 정책 문제를 덮지 않는다.
+- Neture, KPA-Society, K-Cosmetics를 임의로 혼동하지 않는다.
 - Forum/LMS/Signage는 서비스별 독립 구현이 아니라 O4O 공통 구조 위의 서비스별 데이터 노출로 판단한다.
 - Store Production Material은 logical canonical 개념이며, `kpa_store_contents`는 legacy physical table name으로 취급한다.
 
@@ -132,7 +130,7 @@ git diff --cached --name-only
 수정 전 필수 확인:
 
 - 모든 소비처 식별.
-- KPA-Society / GlycoPharm / K-Cosmetics / Neture 영향 확인.
+- KPA-Society / K-Cosmetics / Neture 영향 확인.
 - route 존재 여부와 메뉴 노출 여부 확인.
 - role/capability/visibility filter 영향 확인.
 - DB backfill이나 capability 주입으로 UI 정책 문제를 임시 해결하지 않는지 확인.

@@ -71,7 +71,7 @@ export * from './guide-client';
 /* WO-O4O-HOME-SHARED-ICONS-V1: AppEntry 카드용 공통 아이콘 */
 export { ForumIcon, EducationIcon, ContentIcon, SignageIcon, ResourcesIcon } from './HomeAppIcons';
 
-/* WO-O4O-STANDARD-HOME-TEMPLATE-V1: 공통 Home 레이아웃 (KPA/GlycoPharm/K-Cosmetics) */
+/* WO-O4O-STANDARD-HOME-TEMPLATE-V1: 공통 Home 레이아웃 (KPA/K-Cosmetics) */
 export { StandardHomeTemplate } from './StandardHomeTemplate';
 export type { StandardHomeTemplateProps } from './StandardHomeTemplate';
 
@@ -251,7 +251,7 @@ export type { StoreHubResourceCard, StoreHubFlowStep, StoreHubConfig, StoreHubTe
 
 export { ContentHubTemplate } from './ContentHubTemplate';
 export type { ContentHubItem, ContentHubFilter, ContentHubFetchParams, ContentHubFetchResult, ContentHubItemContext, ContentHubConfig } from './ContentHubTemplate';
-/* WO-O4O-STORE-HUB-CONTENT-BROWSE-COMPONENT-EXTRACTION-V1: GP/KCos 공통 카드 그리드 */
+/* WO-O4O-STORE-HUB-CONTENT-BROWSE-COMPONENT-EXTRACTION-V1: KCos 공통 카드 그리드 */
 export { contentHubCardGrid } from './ContentHubCardGrid';
 export type { ContentHubCardAccent } from './ContentHubCardGrid';
 
@@ -275,7 +275,7 @@ export type {
 } from './signage/SignagePlaylistCreateShell';
 
 /* WO-O4O-MY-STORE-REMAINING-FEATURE-VIEW-COMMONIZATION-V1 §5-A:
-   내 매장 플레이리스트 등록 화면 공통 View (KPA/KCos/GP 3벌 껍데기 복제 제거) */
+   내 매장 플레이리스트 등록 화면 공통 View (KPA/KCos 2벌 껍데기 복제 제거) */
 export { StorePlaylistCreateView } from './signage/StorePlaylistCreateView';
 export type { StorePlaylistCreateViewProps } from './signage/StorePlaylistCreateView';
 
@@ -283,7 +283,7 @@ export type { StorePlaylistCreateViewProps } from './signage/StorePlaylistCreate
 export { templates, templatePresets } from './templates';
 export type { TemplateKey, TemplateTokens, TemplatePreset, PresetCategory } from './templates';
 
-/* Guide pages — WO-O4O-GUIDE-COMMON-AND-GLYCOPHARM-HOME-V1 */
+/* Guide pages */
 export * from './guide';
 
 /* Public Blog UI — WO-O4O-BLOG-UI-PARTIAL-EXTRACT-V1

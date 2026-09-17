@@ -52,7 +52,6 @@ notification producer census
 
 ```text
 KPA-Society
-GlycoPharm
 K-Cosmetics
 Neture
 Pharmacy-Hub
@@ -183,9 +182,6 @@ null
 ```text
 kpa notification
 → web-kpa-society
-
-glycopharm notification
-→ web-glycopharm
 
 k-cosmetics notification
 → web-k-cosmetics
@@ -499,7 +495,6 @@ destination이 없는 경우
 예:
 
 ```text
-KPA → GP
 KCos → Neture
 Neture → Admin
 PH → KPA
@@ -853,7 +848,6 @@ modules/auth/controllers/auth-register.controller.ts
 modules/auth/controllers/handoff.controller.ts
 modules/contact-inquiry/public-contact-inquiry.controller.ts
 modules/lms/services/CourseService.ts
-routes/glycopharm/services/glycopharm-member.service.ts
 routes/kpa/controllers/member.controller.ts
 routes/kpa/controllers/contact-request.controller.ts
 routes/kpa/controllers/kpa-checkout.controller.ts
@@ -912,7 +906,6 @@ resolver 는 내부 절대경로 검증 → 서비스 fallback → `null` 순으
 
 ```text
 services/web-kpa-society/src/     (KPA store 프론트는 이 패키지다)
-services/web-glycopharm/src/
 services/web-k-cosmetics/src/
 services/web-neture/src/
 services/web-pharmacy-hub/src/

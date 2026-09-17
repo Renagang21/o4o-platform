@@ -117,7 +117,7 @@ Home 이 쓰는 `SignageQueryService` 의 KPA config 는 `sources: ['hq','store'
 | 항목 | 사유 |
 |------|------|
 | §3-2 사이니지 source 설정 | **정책 결정 필요**(WO §6) — Home 노출 범위 + operator 집계 동시 변경 |
-| GlycoPharm·K-Cosmetics 의 동일 `lms_courses` 컬럼 버그 | 동일 SQL 패턴이 [glycopharm.routes.ts:639](../../apps/api-server/src/routes/glycopharm/glycopharm.routes.ts#L639) · [cosmetics.routes.ts:344](../../apps/api-server/src/routes/cosmetics/cosmetics.routes.ts#L344) 에도 존재하나 **WO §5 "GP·KCos·Neture 정비 금지"** 로 미변경 |
+| K-Cosmetics 의 동일 `lms_courses` 컬럼 버그 | [cosmetics.routes.ts:344](../../apps/api-server/src/routes/cosmetics/cosmetics.routes.ts#L344) 에도 존재하나 **WO §5 "KCos·Neture 정비 금지"** 로 미변경 |
 | 자료실 `LINK`/`COPY` 유형 라벨 | KPA 자료 전부 `DOWNLOAD` 유형이라 실데이터 부재 — **PASS 처리하지 않음** |
 | IR C5(최신글 자료 링크) · U4(자료실 이원화) | 사용자 결정으로 **진행하지 않음** |
 
@@ -175,7 +175,7 @@ Home 이 쓰는 `SignageQueryService` 의 KPA config 는 `sources: ['hq','store'
 > 후속 `WO-...-CONTENT-ACCESS-AND-COPY-POLICY-FINAL-ALIGNMENT-V1` 에서 접근·복사 통제(비공개 콘텐츠
 > 조회/복사 차단 · 사이니지·CMS 서비스 격리 · assetType 정리 · Home 오류 구분)까지 완료됐다.
 >
-> **남은 기술 부채(KPA 범위 밖):** GlycoPharm·K-Cosmetics·Neture 가 KPA 전용 `KpaAssetResolver` 를
+> **남은 기술 부채(KPA 범위 밖):** K-Cosmetics·Neture 가 KPA 전용 `KpaAssetResolver` 를
 > 공유 mount 하고 있어, 각 서비스 정비 시 `serviceKey` 주입형 공용 resolver 또는 서비스별 resolver 분리가
 > 필요하다. 기존 구조 문제이며 본 정비에서 확장하지 않았다.
 

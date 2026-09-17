@@ -43,7 +43,7 @@
 |---|:---:|:---:|:---:|
 | **KPA** | ❌ | ❌ | "약사 커뮤니티" 만 (가치명 0) |
 | **Neture** | ✅ "이용 가이드" + "O4O 플랫폼 소개" | ✅ "Supplier" / "Partner" / "유통 참여형 펀딩" | 마켓 트라이얼 섹션 명시 |
-| GP | ❌ | ❌ | 미확인 |
+| ❌ | ❌ | 미확인 |
 | K-Cos | ❌ | ❌ | 미확인 |
 
 → **KPA 만 4 service 중 메뉴 차원 가치 메시지 0%.** Neture 의 메뉴 패턴이 본 IR 의 KPA 후속 권고의 참고점.
@@ -342,11 +342,11 @@ helpSlot (last, mb-0)
 
 ## 5. 산출물 4 — 4 service 비교
 
-본 IR 의 가장 결정적 신호: **Neture 만 메뉴에서 가치 메시지를 노출**, KPA / GP / K-Cos 는 모두 미노출.
+본 IR 의 가장 결정적 신호: **Neture 만 메뉴에서 가치 메시지를 노출**, KPA / K-Cos 는 모두 미노출.
 
 ### 5.1 메뉴 가치 메시지 매트릭스
 
-| 항목 | KPA | Neture | GP | K-Cos |
+| 항목 | KPA | Neture | K-Cos |
 |---|:---:|:---:|:---:|:---:|
 | 메뉴: "이용 가이드" | ❌ | ✅ `/guide` | ❌ | ❌ |
 | 메뉴: "O4O 플랫폼 소개" | ❌ | ✅ `/o4o` | ❌ | ❌ |
@@ -530,7 +530,7 @@ KPA_ABOUT_NAV_ITEM 유지 (현재 그대로)
 
 | IR 후보 | 비고 |
 |---|---|
-| `IR-O4O-4SERVICE-HERO-MESSAGE-CONSISTENCY-V1` | KPA / GP / K-Cos 의 Hero 메시지 통일 (Neture 와 격차 해소) |
+| `IR-O4O-4SERVICE-HERO-MESSAGE-CONSISTENCY-V1` | KPA / K-Cos 의 Hero 메시지 통일 (Neture 와 격차 해소) |
 | `IR-O4O-MOBILE-BOTTOM-NAV-EXPANSION-DECISION-V1` | 4 service 모두 MobileBottomNav 탭 수 / 가이드 탭 정책 결정 |
 | `IR-O4O-HERO-DYNAMIC-AD-VS-STATIC-VALUE-POLICY-V1` | Hero 가 광고 vs 가치 명제 중 어디 우선해야 하는지 정책 |
 
@@ -563,7 +563,7 @@ KPA_ABOUT_NAV_ITEM 유지 (현재 그대로)
 - Hero 동적 광고 vs 정적 가치 메시지 우선순위 정책 — 별건 IR
 - 본 IR 의 Tier 1 / Tier 2 진행 시점 — 사용자 결정 사안
 - `StandardHomeTemplate` 의 신규 slot 명명 (`appEntryAboveSlot` / `valueGuideSlot` 등) — 구현 시 결정
-- 4 service (Neture / GP / K-Cos) 의 동등 패턴 적용 시기 — 별건 IR
+- 3 service (Neture / K-Cos) 의 동등 패턴 적용 시기 — 별건 IR
 
 ---
 
@@ -581,7 +581,7 @@ KPA_ABOUT_NAV_ITEM 유지 (현재 그대로)
    동적 광고 운영자 미입력 시에도 fallback 으로 메시지 보존.
 
 4. 메뉴는 4 service 의 톤 유지 가능. 단 메뉴 항목에 "가치명·역할명" 0 인 상태는 회피.
-   KPA / GP / K-Cos 가 Neture 의 메뉴 패턴 (가치명·역할명 5+ 항목) 을 점진 반영.
+   KPA / K-Cos 가 Neture 의 메뉴 패턴 (가치명·역할명 5+ 항목) 을 점진 반영.
 
 5. 모바일 사용자가 첫 화면 스크롤 1 회 이내에 가치 메시지를 만날 수 있어야 한다.
    모바일에서 Hero 직후 또는 BottomNav 의 1 탭으로 가이드 진입 가능.
@@ -638,7 +638,6 @@ grep -nE "Quick Actions|AxisNavigation|5-Block|KpiGrid" \
 cat services/web-kpa-society/src/components/MobileBottomNav.tsx | head -50
 
 # 7. 4 service 메뉴 비교
-for SVC in kpa-society neture glycopharm k-cosmetics; do
   echo "=== $SVC ==="
   grep -nE "PUBLIC_NAV|BASE_NAV|label:" \
     services/web-$SVC/src/config/navigation.ts 2>/dev/null | head -10

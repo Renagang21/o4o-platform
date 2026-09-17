@@ -4,21 +4,19 @@
 
 - **작성일**: 2026-06-04
 - **작업 유형**: Investigation (IR)
-- **계기**: Neture `/admin` Structure Actions 가 lucide 아이콘명(`users`/`shield`/`store`/`dollar-sign`/`percent`/`key`)을 **텍스트로 노출**하는 결함 (Neture Phase 4 live smoke 중 발견). GlycoPharm `/operator` Quick Actions 도 동일 증상(`store`/`package`/`file-text` 텍스트).
+- **계기**: Neture `/admin` Structure Actions 가 lucide 아이콘명(`users`/`shield`/`store`/`dollar-sign`/`percent`/`key`)을 **텍스트로 노출**하는 결함 (Neture Phase 4 live smoke 중 발견).
 - **조사 범위**: `packages/operator-ux-core`, `packages/admin-ux-core`, 4서비스 operator/admin dashboard 프론트, `apps/api-server` dashboard 백엔드
 
 ---
 
 ## 1. Executive Summary
 
-**근본 원인: 공통 대시보드 블록이 `item.icon`(string)을 lucide 컴포넌트로 매핑하지 않고 `<span>{item.icon}</span>`으로 그대로 렌더한다.** 백엔드 dashboard 서비스가 아이콘을 **문자열**로 내려주는데, Neture/Glyco/KCos는 **lucide 이름 문자열**을 보내므로 그 이름이 화면에 텍스트로 찍힌다.
-
 | 항목 | 결과 |
 |------|------|
 | 근본 원인 | 공통 블록 2곳이 `{item.icon}` 문자열을 직접 렌더 (icon-name → 컴포넌트 매핑 부재) |
-| 결함 노출 서비스 | **Neture admin / GlycoPharm operator / K-Cosmetics operator** (백엔드가 lucide-name 문자열 전송) |
+| 결함 노출 서비스 | — |
 | 가려진 케이스 | **KPA operator** — 백엔드가 emoji 문자열 전송 → 텍스트지만 emoji로 보여 결함이 안 보임(그러나 lucide 표준 위반) |
-| 프론트 하드코딩 케이스 | KPA admin / GlycoPharm admin — 프론트에서 emoji 직접 하드코딩(공통 블록 우회) |
+| 프론트 하드코딩 케이스 | KPA admin admin — 프론트에서 emoji 직접 하드코딩(공통 블록 우회) |
 | 수정 위치 | **공통 블록 2곳**(`QuickActionBlock`/`StructureActionBlock`)에 icon-name→lucide 매핑 추가 → 다수 서비스 일괄 해소 |
 
 ---
@@ -48,7 +46,6 @@
 | 서비스 | 파일 | 필드 | icon 값 형태 | 예시 |
 |--------|------|------|-------------|------|
 | **Neture admin** | `apps/api-server/src/modules/neture/controllers/admin-dashboard.controller.ts:163-170` | `structureActions` | **lucide-name string** | `users` `shield` `store` `dollar-sign` `percent` `key` |
-| **GlycoPharm operator** | `apps/api-server/src/routes/glycopharm/services/operator-dashboard.service.ts:102-106` | `quickActions` | **lucide-name string** | `store` `package` `file-text` |
 | **K-Cosmetics operator** | `apps/api-server/src/routes/cosmetics/controllers/operator-dashboard.controller.ts:128-133` | `quickActions` | **lucide-name string** | `store` `package` `shopping-cart` `file-text` |
 | **KPA operator** | `apps/api-server/src/routes/kpa/services/operator-dashboard.service.ts:613-630` | `quickActions` | **emoji** (outlier) | `🧑‍💼` `💊` `🛒` `📝` `📢` `💬` `🖥️` `🏪` `🎯` `🏠` `🔑` `📋` |
 
@@ -60,9 +57,8 @@
 
 | 화면 | 파일 | 방식 |
 |------|------|------|
-| GlycoPharm **admin** | `services/web-glycopharm/src/pages/admin/GlycoPharmAdminDashboard.tsx:122-128` | emoji(`👤🏥💰📄🛡️⚙️`) 프론트 하드코딩 (Quick Actions 배열) |
 | KPA **admin** | `services/web-kpa-society/src/pages/admin/KpaAdminDashboardPage.tsx:35-36` | emoji(`👤📊`) 프론트 하드코딩 |
-| GlycoPharm/KCos **operator** | `*OperatorDashboard.tsx` → `OperatorDashboardLayout` → `QuickActionBlock` | 백엔드 quickActions 위임 → §2 결함 노출 |
+| KCos **operator** | `*OperatorDashboard.tsx` → `OperatorDashboardLayout` → `QuickActionBlock` | 백엔드 quickActions 위임 → §2 결함 노출 |
 
 > 즉 admin 일부는 프론트 emoji 하드코딩(공통 블록 우회), operator는 백엔드 위임(공통 블록 사용). 혼재.
 
@@ -82,11 +78,11 @@
 
 | 질문 | 답 |
 |------|----|
-| Quick Actions가 icon을 어떤 타입으로 전달? | **string** (백엔드 → `icon?: string`). Neture/Glyco/KCos=lucide-name, KPA=emoji |
+| Quick Actions가 icon을 어떤 타입으로 전달? | **string** (백엔드 → `icon?: string`). |
 | Neture admin 텍스트 노출 원인? | 공통 `StructureActionBlock`이 lucide-name 문자열을 `<span>{icon}</span>`로 직접 렌더(매핑 부재) |
 | 구현 공통 vs 개별? | **렌더는 공통**(2 블록), **icon 데이터는 백엔드별 상이** + admin 일부 프론트 하드코딩 |
-| 공통 수정 가능? | **예** — 공통 블록 2곳에 name→lucide 매핑 추가 시 operator(Glyco/KCos/KPA) + Neture admin 일괄 해소 |
-| emoji/문자열 잔존 위치? | 백엔드 4 서비스 dashboard 서비스 + Glyco/KPA admin 프론트 |
+| 공통 수정 가능? | **예** — 공통 블록 2곳에 name→lucide 매핑 추가 시 operator + Neture admin 일괄 해소 |
+| emoji/문자열 잔존 위치? | — |
 | 우선 수정 대상 | (1) 공통 블록 매핑, (2) KPA 백엔드 emoji→lucide-name 정렬, (3) icon-name 어휘 표준화 |
 
 ---
@@ -102,9 +98,7 @@
 - 4서비스 dashboard 서비스의 icon-name 어휘를 공통 카탈로그로 고정.
 
 ### Phase C — admin 프론트 하드코딩 정리 (저위험)
-- GlycoPharm/KPA admin 프론트의 emoji 하드코딩 Quick Actions를 공통 블록 + lucide 매핑 경로로 수렴(또는 lucide ReactNode 주입).
-
-**우선순위: A → B → C.** Phase A만으로 Neture admin / Glyco·KCos operator의 가시적 텍스트 결함이 즉시 해소된다.
+- KPA admin 프론트의 emoji 하드코딩 Quick Actions를 공통 블록 + lucide 매핑 경로로 수렴(또는 lucide ReactNode 주입).
 
 ---
 
@@ -129,7 +123,7 @@
 
 ## 10. 후속 작업 제안
 
-1. **WO-O4O-DASHBOARD-ACTION-ICON-NAME-MAP-V1** (Phase A) — 공통 블록 2곳에 icon-name→lucide 매핑 + 안전 fallback. Neture admin/Glyco·KCos operator 즉시 해소. 4서비스 dashboard 회귀 smoke.
+1. **WO-O4O-DASHBOARD-ACTION-ICON-NAME-MAP-V1** (Phase A) — 공통 블록 2곳에 icon-name→lucide 매핑 + 안전 fallback. 4서비스 dashboard 회귀 smoke.
 2. **WO-O4O-DASHBOARD-ACTION-ICON-VOCAB-STANDARDIZE-V1** (Phase B) — KPA 백엔드 emoji→lucide-name + 4서비스 어휘 카탈로그 고정.
 3. **WO-O4O-ADMIN-QUICKACTION-FRONTEND-CONVERGE-V1** (Phase C) — admin 프론트 emoji 하드코딩 수렴.
 
@@ -140,8 +134,6 @@
 ### 부록. 핵심 파일 인덱스
 - 공통 렌더(버그): `packages/operator-ux-core/src/blocks/QuickActionBlock.tsx:24`, `packages/admin-ux-core/src/blocks/StructureActionBlock.tsx:23`
 - 타입: `operator-ux-core/src/types.ts:78`(`QuickActionItem.icon?: string`), `admin-ux-core/src/types.ts:66`(`StructureAction.icon?: string`)
-- 백엔드 icon 정의: `modules/neture/controllers/admin-dashboard.controller.ts:163-170`, `routes/glycopharm/services/operator-dashboard.service.ts:102-106`, `routes/cosmetics/controllers/operator-dashboard.controller.ts:128-133`, `routes/kpa/services/operator-dashboard.service.ts:613-630`
 - 올바른 참고 패턴: `apps/admin-dashboard/src/components/widgets/actions/QuickActionsWidget.tsx:12-27`, `packages/admin-ux-core/src/blocks/AdminLinkBlock.tsx`
-- 프론트 하드코딩: `services/web-glycopharm/src/pages/admin/GlycoPharmAdminDashboard.tsx:122-128`, `services/web-kpa-society/src/pages/admin/KpaAdminDashboardPage.tsx:35-36`
 
 *조사 방식: read-only 병렬 코드 조사(Explore agents) + 핵심 라인 직접 확인. 코드/CSS/아이콘 변경 없음.*

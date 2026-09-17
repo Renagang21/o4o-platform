@@ -41,8 +41,8 @@ select 가 입력창처럼 보여 다른 서비스를 고를 수 있다는 사�
 | 항목 | 재정비 후 |
 |---|---|
 | 단계 분리 | **1. 대상 서비스** / **2. 역할** 을 별도 블록으로 분리 |
-| 서비스 목록 | KPA · Neture · Pharmacy-Hub · GlycoPharm · K-Cosmetics 5개를 라디오 카드로 **모두 노출** |
-| 표시값 | 각 항목에 `resolveCanonicalServiceKey(key)` 결과를 함께 표기 (kpa-society / neture / pharmacy-hub / glycopharm / k-cosmetics) — 표시명에서 키를 추론하지 않는다 |
+| 서비스 목록 | KPA · Neture · Pharmacy-Hub · K-Cosmetics 5개를 라디오 카드로 **모두 노출** |
+| 표시값 | 각 항목에 `resolveCanonicalServiceKey(key)` 결과를 함께 표기 (kpa-society / neture / pharmacy-hub / k-cosmetics) — 표시명에서 키를 추론하지 않는다 |
 | 기본값 | **없음.** `targetServiceKey=''` · `targetRole=''` 로 시작하고 모달을 열 때도 자동 확정하지 않는다 |
 | 역할 목록 | 선택한 서비스의 역할만 렌더. 미선택이면 안내문만 표시 (Pharmacy-Hub 는 Operator 하나) |
 | 서비스 변경 | 역할 선택을 **초기화**한다(첫 역할 자동 확정 금지) — 표시 서비스와 실제 role 이 어긋나지 않는다 |
@@ -102,7 +102,7 @@ select 가 입력창처럼 보여 다른 서비스를 고를 수 있다는 사�
 | `service_credentials` | `service_key = 'pharmacy-hub'` **신규 1건 생성** (2026-08-10) · bcrypt(`$2a$`) ✅ |
 | 최근 24h write | pharmacy-hub credential **1건뿐** — 부분 생성·중복 write 없음 |
 | 기존 role/membership | 이미 있던 것을 재사용(중복 생성 0) — **기존 사용자 권한 추가** 경로가 설계대로 동작 |
-| 타 서비스 credential | kpa-society · neture · glycopharm · k-cosmetics 4건 **updated_at 불변** ✅ |
+| 타 서비스 credential | kpa-society · neture · k-cosmetics 4건 **updated_at 불변** ✅ |
 
 → 이번 WO 의 핵심(등록이 서비스 credential 을 실제로 만든다)이 프로덕션에서 확인됐다.
 

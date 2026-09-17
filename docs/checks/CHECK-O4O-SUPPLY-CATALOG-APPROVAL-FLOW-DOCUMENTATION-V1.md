@@ -27,7 +27,7 @@ Supply Catalog 공급 상품 신청 승인 흐름을 운영자용 end-to-end 가
 > 사용자 지시: "운영자 대시보드 어디엔가 적절한 곳에 운영자가 읽을 수 있도록 간단한 버튼."
 
 - 배치: **공유 콘솔 `ProductApplicationManagementConsole`** (operator-core-ui) 제목 우측에 "승인 흐름 안내" 버튼.
-  - 근거: 승인 작업 화면이 안내가 가장 필요한 "적절한 곳". 공통 콘솔 1곳 편집으로 **KPA/GP/KCos 3서비스에 자동 노출** (DRY).
+  - 근거: 승인 작업 화면이 안내가 가장 필요한 "적절한 곳". 공통 콘솔 1곳 편집으로 **KPA/KCos 2서비스에 자동 노출** (DRY).
 - 동작: 버튼 클릭 → 이미 import된 `BaseDetailDrawer` 재사용(새 의존성 0) → 흐름/주의점/상세 가이드 경로 표시.
 - 내용: 승인=편입 자격(소비자 노출 아님), per-store 단건, 거절 사유, 삭제 의미 — 가이드 문서 요약.
 
@@ -44,17 +44,17 @@ Supply Catalog 공급 상품 신청 승인 흐름을 운영자용 end-to-end 가
 | 소비자 노출 = 별도 4-gate | 가이드 §7, §8 |
 | per-store 단건 활성 | 가이드 §5, FAQ, 버튼 안내 |
 | offer-wide 일괄 금지 | 가이드 FAQ |
-| KPA/GP/KCos 성숙도 차이 | 가이드 §8 |
+| KPA/KCos 성숙도 차이 | 가이드 §8 |
 
 ## 7. 제외/무변경 항목
 
-backend / DB / migration / route / 승인 로직 / ProductApprovalV2Service / GP/KCos backend / Neture / EventOffer / storefront·channel·OPC / checkout·order — 전부 무변경.
+backend / DB / migration / route / 승인 로직 / ProductApprovalV1Service / KCos backend / Neture / EventOffer / storefront·channel·OPC / checkout·order — 전부 무변경.
 콘솔 변경은 **안내 버튼+Drawer(읽기 전용 UI) 추가만**(승인/목록/액션 로직 무변경).
 
 ## 8. 검증 결과
 
 - ✅ `@o4o/operator-core-ui` tsc → 콘솔 파일 **0 errors** (패키지 1건은 pre-existing `error-handling/import.meta.env`).
-- ✅ `glycopharm-web` / `@o4o/web-k-cosmetics` / `@o4o/web-kpa-society` tsc → **0 errors** (변경 콘솔 소비 확인).
+- ✅ `@o4o/web-k-cosmetics` / `@o4o/web-kpa-society` tsc → **0 errors** (변경 콘솔 소비 확인).
 - ✅ 금지어 0건.
 - 변경 파일: 가이드 doc(1) + CHECK doc(1) + 콘솔(1) = 3건.
 - 주의: 동시 세션 WIP(`operator-core-ui/modules/instructor-courses`, `index.ts`, instructor 페이지, 미푸시 footer 커밋) 존재 — 본 작업 파일과 **무중복**. path-specific staging 으로 격리(내 3파일만 commit).

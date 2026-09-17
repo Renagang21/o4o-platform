@@ -4,7 +4,7 @@
  * WO-O4O-MYPAGE-PHASE1-NAV-ROLEBADGE-CANONICALIZATION-V1
  * 근거: IR-O4O-MYPAGE-PROFILE-UI-CANONICAL-COMMONIZATION-V1
  *
- * 4 서비스 (KPA / GlycoPharm / K-Cosmetics / Neture) MyPage Hub 의
+ * 3 서비스 (KPA / K-Cosmetics / Neture) MyPage Hub 의
  * inline role badge 표시를 공통화한 표시 컴포넌트.
  *
  * - 단일 badge: <RoleBadge label="약사" tone="emerald" />
@@ -79,7 +79,7 @@ const TONE_CLS: Record<RoleBadgeTone, Record<RoleBadgeVariant, string>> = {
     soft:    'bg-rose-50 text-rose-700',
     outline: 'border border-rose-300 text-rose-700',
   },
-  // 'white-overlay' tone: gradient hero 위에 얹는 반투명 화이트 (KPA / Glyco / K-Cos hub 공통 패턴)
+  // 'white-overlay' tone: gradient hero 위에 얹는 반투명 화이트 (KPA / K-Cos hub 공통 패턴)
   'white-overlay': {
     solid:   'bg-white/20 text-white',
     soft:    'bg-white/10 text-white',

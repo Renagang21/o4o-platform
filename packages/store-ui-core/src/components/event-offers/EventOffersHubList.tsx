@@ -1,7 +1,7 @@
 /**
- * EventOffersHubList — Store Hub 이벤트 오퍼 단순 목록 (GP/KCos 진입점).
+ * EventOffersHubList — Store Hub 이벤트 오퍼 단순 목록 (KCos 진입점).
  *
- * WO-O4O-STORE-HUB-EVENT-OFFER-GP-KCOS-COMMON-COMPONENT-EXTRACTION-V1: GP/KCos 통합
+ * WO-O4O-STORE-HUB-EVENT-OFFER-GP-KCOS-COMMON-COMPONENT-EXTRACTION-V1: 공통 컴포넌트 추출
  * WO-O4O-STORE-HUB-COMMON-VIEW-AND-SHELL-UNIFICATION-V1:
  *   테이블 마크업을 공통 `EventOfferHubView` 로 이관하고, 이 컴포넌트는
  *   **조회 상태 + 장바구니 담기 + 단순 목록 config** 만 소유한다.

@@ -145,7 +145,7 @@ interface SlotHeroSliderProps {
 
 **4개 서비스 공통 UX 패턴:**
 - 5초 자동 전환 (4개 모두 동일)
-- 좌우 화살표 (Neture, KPA, GlycoPharm 동일)
+- 좌우 화살표 (Neture, KPA 동일)
 - 하단 dots 인디케이터 (4개 모두 동일)
 - 배경 이미지 위 텍스트 (4개 모두 동일)
 
@@ -170,7 +170,6 @@ interface SlotAdGridProps {
 
 **레퍼런스:**
 - Neture [HomepageAds.tsx](../../../services/web-neture/src/components/home/HomepageAds.tsx)
-- GlycoPharm [AdSection.tsx](services/web-glycopharm/src/components/community/AdSection.tsx)
 
 ### 4.3 SlotLogoCarousel
 
@@ -214,7 +213,6 @@ interface SlotPromoBannerProps {
 ```
 
 **레퍼런스:**
-- GlycoPharm [BannerSection.tsx](services/web-glycopharm/src/components/dashboard/BannerSection.tsx) (placeholder)
 
 ---
 

@@ -1,11 +1,10 @@
 /**
  * GuideIntroKpaPage — 서비스 위치 (공통)
  *
- * WO-O4O-GUIDE-COMMON-AND-GLYCOPHARM-HOME-V1
  *
  * Route name `/guide/intro/kpa` is preserved per WO; copy/title varies per service.
  * Future cleanup candidate: rename route to neutral form (e.g. `/guide/intro/service`)
- * since GlycoPharm and any future service also reaches this page.
+ * since other services also reach this page.
  */
 
 import { Link } from 'react-router-dom';

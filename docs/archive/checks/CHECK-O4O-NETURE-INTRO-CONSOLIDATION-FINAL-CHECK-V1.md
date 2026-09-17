@@ -306,7 +306,7 @@ grep -nE 'path="/o4o' services/web-neture/src/App.tsx
 - `/o4o/apply` form 구현 (별건 IR + WO)
 - HTTP 301 redirect 보강 (현재 React Router Navigate 로 충분, SEO 우선순위 낮음)
 - 사례 페이지 (`/o4o/cases`) 신설 (현 baseline 의 원칙 §5 "메인 흡수 가능한지 먼저 검토" 적용)
-- 다른 service (KPA / GP / K-Cos) 의 동일 패턴 audit (cross-service drift 영역, 별건)
+- 다른 service (KPA / K-Cos) 의 동일 패턴 audit (cross-service drift 영역, 별건)
 - `/o4o/site-operator` 의 향후 `/partner` 흡수 여부 (audience 분리 유지 권고)
 
 ---

@@ -66,7 +66,7 @@
 
 ## 8. 결정 기준 (정책 질문)
 
-1. **"서비스별 가격"의 범위**: serviceKey별(KPA/Glyco/KCos) 단일가 vs org/매장별 vs 계약(파트너)별 — 세 축이 다른 옵션(B/C vs D vs E).
+1. **"서비스별 가격"의 범위**: serviceKey별 단일가 vs org/매장별 vs 계약(파트너)별 — 세 축이 다른 옵션(B/C vs D vs E).
 2. **price_gold(서비스가) 재사용 vs 신규**: 기존 "서비스가" 컬럼을 주문 반영으로 승격(A)할지, 진짜 per-serviceKey 신규 구조(C)로 갈지. A는 단일가 한계, C는 정석.
 3. **승인 결합**: 서비스별 가격도 운영자 승인 대상인가? (C는 offer_service_approvals처럼 per-service 가격 승인 가능; B는 어려움.)
 4. **이벤트 검증 기준**: 서비스별 base가 생기면 `eventPrice ≤ 서비스별가` 로 검증 기준 변경 필요.

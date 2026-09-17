@@ -39,7 +39,6 @@ Profile 공통화는 종료됐다.
 
 ```text
 KPA-Society
-GlycoPharm
 K-Cosmetics
 Neture
 Pharmacy-Hub
@@ -223,12 +222,6 @@ KPA Profile UX 재공통화
 직역/면허
 약사회 관련 개인 업무
 소속/활동
-```
-
-### GlycoPharm
-
-```text
-약사/서비스 특화 신청
 ```
 
 ### K-Cosmetics
@@ -417,7 +410,6 @@ schema/migration
 
 ```text
 KPA
-GP
 KCos
 Neture
 PH
@@ -522,7 +514,6 @@ membership 정책 변경
 ```text
 공통 UI package build
 KPA typecheck/build
-GP typecheck/build
 KCos typecheck/build
 Neture typecheck/build
 PH typecheck/build
@@ -671,7 +662,6 @@ packages/account-ui/src/components/MyCertificatesView.tsx   (untracked)
 packages/account-ui/src/components/MyCreditsView.tsx        (untracked)
 packages/account-ui/src/components/MyEnrollmentsView.tsx    (untracked)
 packages/shared-space-ui/src/*
-services/web-glycopharm/src/pages/mypage/My{Certificates,Credits,Enrollments}Page.tsx
 services/web-k-cosmetics/src/pages/mypage/My{Certificates,Credits,Enrollments}Page.tsx
 + forum 계열 파일 다수
 ```

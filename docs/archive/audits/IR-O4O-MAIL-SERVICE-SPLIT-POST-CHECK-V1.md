@@ -154,7 +154,7 @@
 
 외부 소비자 목록 (모두 `import { emailService } from '../services/email.service.js'`):
 - `platformInquiryController.ts`, `passportDynamic.ts`, `role-application.controller.ts`
-- `organization-join-request.controller.ts`, `application.controller.ts` (kpa, glycopharm, glucoseview)
+- `organization-join-request.controller.ts`, `application.controller.ts` (kpa, glucoseview)
 - `socialAuthService.ts`, `passwordResetService.ts`, `BackupService.ts`
 - `invoice-dispatch.service.ts`, `auth-account-inquiry.service.ts`
 - `account-linking.service.ts`, `ErrorAlertService.ts`, `store-applications.controller.ts`

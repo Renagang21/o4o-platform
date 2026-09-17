@@ -28,7 +28,6 @@ IR 은 서비스 `pages` 디렉터리 기준 128건을 셌으나, **전 소스 �
 | `apps/admin-dashboard/src/pages` | 71 | 플랫폼 Admin 화면 | 2차 이후 (최대 규모) |
 | `services/web-neture/src` | 49 | 서비스 최대 격차 | 2차 |
 | `services/web-kpa-society/src` | 20 | 상당수 이미 표준 위임 | 3차 |
-| `services/web-glycopharm/src` | 16 | | 3차 |
 | `services/web-k-cosmetics/src` | 13 | | 3차 |
 | **`packages/operator-core-ui/src`** | **2** | **공용 — 최고 레버리지** | **1차** |
 | `packages/ui/src` | 5 | 아래 분해 참조 | — |
@@ -58,8 +57,6 @@ IR 은 서비스 `pages` 디렉터리 기준 128건을 셌으나, **전 소스 �
 
 **소비처 4화면 / 2서비스** — 1회 수정으로 동시 개선:
 
-- `services/web-glycopharm/src/pages/admin/ContactInquiriesPage.tsx`
-- `services/web-glycopharm/src/pages/operator/OperatorContactInquiriesPage.tsx`
 - `services/web-k-cosmetics/src/pages/admin/ContactInquiriesPage.tsx`
 - `services/web-k-cosmetics/src/pages/operator/OperatorContactInquiriesPage.tsx`
 
@@ -98,9 +95,7 @@ WO 원칙("기능이 없는 목록에 불필요한 체크박스나 ActionBar 를
 |------|:---:|
 | `@o4o/operator-core-ui` typecheck — 변경 파일 | **오류 0** |
 | 패키지 잔여 오류 1건 | `@o4o/error-handling` 의 `ImportMeta.env` — **타 패키지 사전 오류**(무관) |
-| `web-glycopharm` typecheck (ContactInquiry 관련) | **0** |
 | `web-k-cosmetics` typecheck (ContactInquiry 관련) | **0** |
-| `web-glycopharm` build | **PASS** |
 | `web-k-cosmetics` build | **PASS** |
 | backend / DB / migration | **0** |
 
@@ -110,9 +105,9 @@ WO 원칙("기능이 없는 목록에 불필요한 체크박스나 ActionBar 를
 |------|-----|
 | commit | `03106f795` |
 | workflow | `Deploy Web Services (Cloud Run)` run `30200431004` — **success** |
-| job 결과 | `deploy-kpa-society` · `deploy-glycopharm` · `deploy-neture` · `deploy-k-cosmetics` **전부 success** |
+| job 결과 | `deploy-kpa-society` · `deploy-neture` · `deploy-k-cosmetics` **전부 success** |
 
-공용 패키지 변경이라 4개 서비스가 모두 재배포되었다(소비처는 GP·KCos 2곳이지만
+공용 패키지 변경이라 3개 서비스가 모두 재배포되었다(소비처는 KCos 2곳이지만
 `@o4o/operator-core-ui` 를 참조하는 전 서비스가 빌드 대상).
 
 ### 3-2. 배포 산출물 검증 (브라우저 대체)
@@ -122,7 +117,6 @@ WO 원칙("기능이 없는 목록에 불필요한 체크박스나 ActionBar 를
 | 서비스 | 청크 | 신규 문구<br>`접수된 문의가 없습니다` | 구 inline 마커<br>`borderCollapse` |
 |--------|------|:---:|:---:|
 | `k-cosmetics.site` | `ContactInquiryAdminPage-BzQN08DN.js` (7,397 B) | **1** ✅ | **0** ✅ |
-| `glycopharm.co.kr` | `ContactInquiryAdminPage-JvMuH-8o.js` (7,322 B) | **1** ✅ | **0** ✅ |
 
 `borderCollapse` 는 제거된 `S.table` inline 스타일의 고유 마커다. **양쪽 프로덕션 번들에서 0** 이므로
 inline style 이 실제로 제거되고 새 구현이 서빙되고 있음이 확인된다.
@@ -157,7 +151,7 @@ inline style 30곳 중 표 영역은 일부이며, 표만 `DataTable` 로 바꾸
 | 2 | `web-neture` 49건 | 서비스 최대 격차, 공용 재사용 최저 |
 | 3 | `apps/admin-dashboard` 71건 | 최대 규모 — 화면 중요도순 분할 필수 |
 | 4 | `packages/ui` 의 `UserDetailPage`/`AiReportPage`/`RoleManagementPage` | 이미 Tailwind — 구조 표준화만 |
-| 5 | KPA 20 · GP 16 · KCos 13 | 상당수가 이미 표준 컴포넌트 위임 wrapper |
+| 5 | KPA 20 16 · KCos 13 | 상당수가 이미 표준 컴포넌트 위임 wrapper |
 
 **주의:** 2차 착수 전 `web-neture`·`admin-dashboard` 의 파일별 성격 분류가 필요하다.
 IR 과 본 CHECK 의 집계 차이(128 vs 176)에서 보듯 **디렉터리 범위에 따라 수치가 달라지므로**,

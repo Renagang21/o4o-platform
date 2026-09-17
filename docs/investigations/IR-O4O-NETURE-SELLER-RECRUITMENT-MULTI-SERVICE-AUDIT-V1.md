@@ -2,7 +2,7 @@
 
 > **유형:** read-only 조사 — 코드/DB/API/UI 변경 0.
 > **대상:** Neture 판매자 모집(seller recruitment) "모집 대상 서비스" 단일→복수 전환 가능성 + 서비스별 승인 분리 데이터 모델.
-> **핵심 결론: 현재 recruitment ↔ service = 단일 `service_id` 컬럼(1 모집 = 1 서비스), 노출 승인도 단일 `exposure_status`. "서비스별 승인 분리"(KPA 승인·GP 반려 독립) 요구를 충족하는 유일 안전안 = 안 A(선택 서비스 수만큼 recruitment row 생성, serviceId 단일 유지).** 안 C(serviceKeys 배열 1 row)는 단일 exposure_status 라 서비스별 승인 분리 불가 → 부적합. 안 B(조인테이블)는 offer_service_approvals 식 재설계라 과대. 안 A 는 현 구조 거의 무변경(UNIQUE 제약 1건 확장 + 프론트 multi-select + 백엔드 serviceKeys[] 루프 생성).
+> **핵심 결론: 현재 recruitment ↔ service = 단일 `service_id` 컬럼(1 모집 = 1 서비스), 노출 승인도 단일 `exposure_status`. "서비스별 승인 분리"(KPA 승인 반려 독립) 요구를 충족하는 유일 안전안 = 안 A(선택 서비스 수만큼 recruitment row 생성, serviceId 단일 유지).** 안 C(serviceKeys 배열 1 row)는 단일 exposure_status 라 서비스별 승인 분리 불가 → 부적합. 안 B(조인테이블)는 offer_service_approvals 식 재설계라 과대. 안 A 는 현 구조 거의 무변경(UNIQUE 제약 1건 확장 + 프론트 multi-select + 백엔드 serviceKeys[] 루프 생성).
 > 선행: WO-O4O-SELLER-RECRUITMENT-EXPOSURE-* (노출 승인) · partner recruitment 계열
 
 ---
@@ -21,7 +21,7 @@
 ## 3. 프론트 현황 (단일 select)
 
 - `RecruitmentCreateModal.tsx:28` `const [serviceKey, setServiceKey] = useState('')` — 단수 state, `<select>`(82-91) 단일.
-- `SERVICE_OPTIONS`(14-19): glycopharm/kpa-society(pharmacy:true) / k-cosmetics / neture. 약국 제한은 **백엔드 gate**(의약품·규제 → 약국 서비스만), 프론트는 전체 노출 + 주석으로 위임.
+- `SERVICE_OPTIONS`(14-19): kpa-society(pharmacy:true) / k-cosmetics / neture. 약국 제한은 **백엔드 gate**(의약품·규제 → 약국 서비스만), 프론트는 전체 노출 + 주석으로 위임.
 - API `supplier.ts:1419` `supplierRecruitmentApi.create({masterId, serviceKey, ...})` → `POST /neture/partner/recruitments`. payload **serviceKey 단수**.
 - 목록/상세(`SupplierRecruitmentsPage.tsx:120`, `SupplierRecruitmentDetailPage.tsx:165`): `serviceId` 단수 표시. 타입 `SupplierRecruitment.serviceId: string`.
 
@@ -30,7 +30,7 @@
 - 노출 승인 `NeturePartnerRecruitment.entity.ts:89-104`: `exposure_status`(pending/approved/rejected) + `exposure_reviewed_at/by/note` **단일 세트**. → 한 recruitment 의 승인 상태는 1개.
 - 신청 검증 `partner-contract.service.ts:625`: `recruitment.exposureStatus !== APPROVED → RECRUITMENT_NOT_EXPOSED`. 단일 status 전제.
 - 노출 승인 proxy `service-recruitment-exposure-proxy.controller.ts:69`: `recruitment.serviceId !== serviceKey → SERVICE_MISMATCH`. service 고정 1개.
-- → **현 구조에서 서비스별 독립 승인은 row 단위로만 가능**(한 row = 한 service = 한 status). 사용자 요구("KPA 승인 / GP 대기·반려 독립")는 row 분리로만 충족.
+- → **현 구조에서 서비스별 독립 승인은 row 단위로만 가능**(한 row = 한 service = 한 status). 사용자 요구("KPA 승인 대기·반려 독립")는 row 분리로만 충족.
 
 ## 5. 다운스트림 의존성 (전부 단일 serviceId 전제)
 
@@ -64,14 +64,14 @@
 
 ## 8. 서비스별 승인 분리 보장 (안 A)
 
-- 상품 P 를 KPA+GP 모집 → recruitment row 2개(serviceId=kpa-society / glycopharm), 각 `exposure_status` 독립.
-- 운영자 노출 승인: 서비스별 proxy(`service-recruitment-exposure-proxy`)가 해당 service row 만 승인/반려 → **KPA approved / GP rejected 독립 성립**. SERVICE_MISMATCH 가드도 그대로 유효.
+- 상품 P 를 KPA 모집 → recruitment row 2개(serviceId=kpa-society), 각 `exposure_status` 독립.
+- 운영자 노출 승인: 서비스별 proxy(`service-recruitment-exposure-proxy`)가 해당 service row 만 승인/반려 → **KPA approved rejected 독립 성립**. SERVICE_MISMATCH 가드도 그대로 유효.
 - 한 service 반려가 다른 service row 에 영향 없음(별 row). 모집 종료/재개도 row 별 `status` 로 분리.
 
 ## 9. 후속 WO + 수용 기준
 
 `WO-O4O-NETURE-SELLER-RECRUITMENT-MULTI-SERVICE-CREATE-V1` (안 A)
-- 수용: ① 모달 복수 서비스 선택 ② 미선택 시 생성 불가 ③ 규제 상품 약국 서비스 제한 유지 ④ KPA+GP 동시 생성(=row 2개) ⑤ 서비스별 노출승인/신청/알림 독립 동작 ⑥ 기존 단일 모집 정상 표시 ⑦ typecheck PASS ⑧ (가능 시) 브라우저 복수 생성 smoke.
+- 수용: ① 모달 복수 서비스 선택 ② 미선택 시 생성 불가 ③ 규제 상품 약국 서비스 제한 유지 ④ KPA 동시 생성(=row 2개) ⑤ 서비스별 노출승인/신청/알림 독립 동작 ⑥ 기존 단일 모집 정상 표시 ⑦ typecheck PASS ⑧ (가능 시) 브라우저 복수 생성 smoke.
 - 순서: DB UNIQUE 확장 → 백엔드 serviceKeys[] 루프 생성 → 프론트 multi-select → 목록/상세 그룹 표시 → 검증.
 
 ## 10. 비범위 / 준수

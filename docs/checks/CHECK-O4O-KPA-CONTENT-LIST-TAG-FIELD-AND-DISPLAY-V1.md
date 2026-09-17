@@ -54,7 +54,7 @@ store-side 콘텐츠 3 source에 `tags`(jsonb string[]) 저장·반환·표시 �
 - API + Web Cloud Run 배포 success. migration CI/CD 자동 적용.
 
 ## 5. 범위/안전
-- **KPA endpoint 한정**(`/store-contents`, `/store-library/contents` = `kpa.routes.ts` mount). `store_execution_assets`/`o4o_asset_snapshots` 컬럼은 service-neutral이나 default '[]'로 GP/KCos row 무영향(읽기/표시 변경 없음).
+- **KPA endpoint 한정**(`/store-contents`, `/store-library/contents` = `kpa.routes.ts` mount). `store_execution_assets`/`o4o_asset_snapshots` 컬럼은 service-neutral이나 default '[]'로 KCos row 무영향(읽기/표시 변경 없음).
 - 운영자 콘텐츠 `kpa_contents` editor 무변경. 기존 QR 공개 URL·execution-asset legacy target 무변경. 데이터 삭제/이동 0(컬럼 추가만).
 
 ---

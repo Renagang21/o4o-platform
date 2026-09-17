@@ -8,7 +8,7 @@
 
 ## 0. 한 줄 결론
 
-**KPA UI에서는 청소할 게 이미 없다(template/theme/blocks만 노출, components/customizations는 미노출·미전송).** `template`=**LEGACY_KEEP**(UI에서 블록 재생성 seed + 폴백으로 실제 쓰임), `components`/`customizations`=**LEGACY_KEEP / REMOVE_LATER 후보**(공통 백엔드 store-settings.controller·types·StorefrontHomePage가 GP/KCos 공통이라 KPA 단독 제거 불가). **운영 데이터 확인 결과 components/customizations 값은 전 org(15개) 0건**이라 데이터 손실 위험은 낮으나, 제거는 **크로스서비스 백엔드 작업**이라 이득 대비 비용이 작다 → **권장: 현행 유지 + deprecation 문서화. 즉시 제거 불필요.**
+**KPA UI에서는 청소할 게 이미 없다(template/theme/blocks만 노출, components/customizations는 미노출·미전송).** `template`=**LEGACY_KEEP**(UI에서 블록 재생성 seed + 폴백으로 실제 쓰임), `components`/`customizations`=**LEGACY_KEEP / REMOVE_LATER 후보**(공통 백엔드 store-settings.controller·types·StorefrontHomePage가 KCos 공통이라 KPA 단독 제거 불가). **운영 데이터 확인 결과 components/customizations 값은 전 org(15개) 0건**이라 데이터 손실 위험은 낮으나, 제거는 **크로스서비스 백엔드 작업**이라 이득 대비 비용이 작다 → **권장: 현행 유지 + deprecation 문서화. 즉시 제거 불필요.**
 
 ---
 
@@ -33,9 +33,9 @@
   - PATCH: components(shallow)/customizations(deep) merge 저장. **검증 없음.** KPA 프론트는 이 필드를 보내지 않음.
   - template: `normalizeTemplate(cfg.template ?? org.template_profile)` + blocks 폴백 생성에 사용 → **폴백/생성 seed 역할.**
 - **타입 `store-settings.types.ts`**: `StorefrontConfig.components?: Record<string,boolean>`, `customizations?: Record<string,any>`("Service-specific extensions") 정의. 실제 read 사용처 **store-settings.controller 저장 로직뿐.**
-- **GP/KCos**: 각자 별도 설정 페이지(PharmacySettings/StoreSettingsPage)도 components/customizations 미노출, **공통 API 사용**.
+- **KCos**: 각자 별도 설정 페이지(PharmacySettings/StoreSettingsPage)도 components/customizations 미노출, **공통 API 사용**.
 
-→ **확인:** components/customizations 는 KPA·GP·KCos 어디에서도 읽지 않으며, 공통 컨트롤러의 저장/응답 로직에만 흔적이 남은 **고아 필드**. template 은 UI에서 블록 재생성에 쓰여 살아있다.
+→ **확인:** components/customizations 는 KPA·KCos 어디에서도 읽지 않으며, 공통 컨트롤러의 저장/응답 로직에만 흔적이 남은 **고아 필드**. template 은 UI에서 블록 재생성에 쓰여 살아있다.
 
 ## 3. 운영 데이터 확인 (read-only, cloud-sql-proxy)
 
@@ -59,7 +59,7 @@
 |---|---|---|
 | KPA UI 숨김 | — | **이미 숨김**(노출 자체가 없음) — 할 일 없음 |
 | KPA 저장 payload 제거 | — | **이미 미전송** — 할 일 없음 |
-| 공통 GET 응답에서 components/customizations 제거 | 중간 | **공통(GP/KCos 공유)** — 소비처 0 확인됐으나 3서비스 응답 계약 변경. 데이터 0이라 데이터 위험은 낮음 |
+| 공통 GET 응답에서 components/customizations 제거 | 중간 | **공통(KCos 공유)** — 소비처 0 확인됐으나 2서비스 응답 계약 변경. 데이터 0이라 데이터 위험은 낮음 |
 | 공통 PATCH 에서 두 필드 수용 중단 | 낮음~중간 | 보내는 곳 0 → 기능 영향 없음. 공통 변경이라 회귀 확인 필요 |
 | DB(storefront_config) key 제거 | 낮음 | 키 자체 부재(0건) → 정리할 데이터 없음. 타입/마이그레이션은 별도 |
 | template_profile 컬럼 정리 | 중간 | 전 org BASIC. storefront_config.template 로 일원화 시 폴백 로직(공통) 변경 동반 — 별도 대형 판단 |
@@ -68,13 +68,13 @@
 
 > KPA 체감 이득이 거의 없고(이미 UI 깨끗) 제거는 크로스서비스라, **P3(저우선)** 로 둔다.
 
-- **WO-1 (선택·P3, 크로스서비스)**: 공통 `store-settings.types`/`store-settings.controller` 에서 components/customizations **deprecation 주석 + GET 응답 제거 또는 빈값 유지** 결정. 3서비스(KPA/GP/KCos) 회귀 smoke. 데이터 0이라 안전하나 이득 작음.
+- **WO-1 (선택·P3, 크로스서비스)**: 공통 `store-settings.types`/`store-settings.controller` 에서 components/customizations **deprecation 주석 + GET 응답 제거 또는 빈값 유지** 결정. 2서비스(KPA/KCos) 회귀 smoke. 데이터 0이라 안전하나 이득 작음.
 - **WO-2 (보류·P3)**: `template_profile` 레거시 컬럼 → `storefront_config.template` 일원화. 폴백 로직(공통) 변경 + migration 필요 → 별도 IR 후 판단.
 - **권장 기본값**: **현행 유지 + 본 IR 로 "고아 필드/데이터 0" 명문화.** 추후 storefront 설정을 손볼 때 WO-1 을 묶어 처리.
 
 ## 6. 확인 vs 추정
 
-**확인됨:** §2 모든 코드 경로(파일:라인), §3 운영 데이터(전 org components/customizations 0·키 부재, template_profile 전부 BASIC). 공통 컴포넌트(StorefrontHomePage/store-settings.controller/types)가 GP/KCos 공유.
+**확인됨:** §2 모든 코드 경로(파일:라인), §3 운영 데이터(전 org components/customizations 0·키 부재, template_profile 전부 BASIC). 공통 컴포넌트(StorefrontHomePage/store-settings.controller/types)가 KCos 공유.
 
 **추정/미결:** components/customizations 의 원 도입 의도(과거 토글맵/서비스 확장 예약) — 코드 주석상 "dead 토글" 흔적만 있고 정확한 히스토리는 깊이 추적 안 함. template_profile 폐기 시 영향 범위는 WO-2 에서 정밀 산정 필요.
 

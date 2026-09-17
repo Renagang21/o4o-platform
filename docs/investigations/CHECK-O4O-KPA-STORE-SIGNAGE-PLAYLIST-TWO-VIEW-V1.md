@@ -86,7 +86,7 @@ KPA 내 매장 디지털사이니지 플레이리스트의 **2-view(일반 관�
 
 | 항목 | 결과 |
 |------|------|
-| GP / KCos | ✅ 미수정 |
+| KCos | ✅ 미수정 |
 | Neture | ✅ 대상 아님(signage 제거 완료) |
 | backend / API / DB / migration | ✅ 무변경 |
 | route path 문자열 | ✅ 동일(`/store/marketing/signage/play/:playlistId`) — 트리 위치만 격리, menu/링크 무변경 |
@@ -105,13 +105,13 @@ KPA 내 매장 디지털사이니지 플레이리스트의 **2-view(일반 관�
 ⚠️ **라이브 미수행(보류).** 변경은 route 트리 격리(동일 path) + 문자열 2건이며 tsc PASS + route 단일성 grep 확인. SignagePlaybackPage 컴포넌트 자체 무변경(layout context 비의존 검증). 회귀 위험 낮아 정적 검증으로 갈음.
 - 권장 후속(사람 확인): `/store/marketing/signage/player` 진입 → "재생" → 새 탭 `/store/marketing/signage/play/:id` 에서 **header/sidebar 부재** + 전체화면 안내 + 재생 확인.
 
-## 12. GP/KCos 확산 기준 (다음 WO)
+## 12. KCos 확산 기준 (다음 WO)
 
 `WO-O4O-DIGITAL-SIGNAGE-CROSSSERVICE-APPLY-V1` 에서 적용:
-1. **송출 route 격리**: GP 는 이미 layout 밖(격리 완료). **KCos 만** `/store/marketing/signage/play/:playlistId` 를 store wrapper 밖 가드-단독 route 로 격리(KPA 패턴).
+1. **KCos 만** `/store/marketing/signage/play/:playlistId` 를 store wrapper 밖 가드-단독 route 로 격리(KPA 패턴).
 2. **용어**: 송출 선택 화면 "디지털사이니지 송출" 정렬.
 3. **KCos 깨진 CTA cleanup**: "콘텐츠 탐색" → `/partner/signage/content`(404) 제거/정정.
-4. **F11 안내**: GP/KCos 송출 start screen 에 ESC/F11 안내 동등 보강(KPA 기준).
+4. **F11 안내**: KCos 송출 start screen 에 ESC/F11 안내 동등 보강(KPA 기준).
 5. 공개 무인증 송출(`/public/signage`)은 별도 IR 정책 결정 후.
 
 ---
@@ -125,9 +125,9 @@ KPA 내 매장 디지털사이니지 플레이리스트의 **2-view(일반 관�
 | 송출 chrome | ✅ 부재(route 격리로 layout 미마운트) |
 | F11/전체화면 안내 | ✅ 이미 존재(ESC/F11) — 기준 고정 |
 | 용어 | "디지털사이니지 송출" 정렬 |
-| GP/KCos/Neture | 미수정 |
+| KCos/Neture | 미수정 |
 | backend/API/DB/route path/menu | 무변경(트리 위치만 격리) |
 | TypeScript | web-kpa-society PASS |
 | browser smoke | tsc+grep 정적 갈음(라이브 보류) |
 | 다른 세션 WIP | 미포함 |
-| 다음 | `WO-O4O-DIGITAL-SIGNAGE-CROSSSERVICE-APPLY-V1` (GP/KCos 확산 + KCos cleanup) |
+| 다음 | `WO-O4O-DIGITAL-SIGNAGE-CROSSSERVICE-APPLY-V1` (KCos 확산 + KCos cleanup) |

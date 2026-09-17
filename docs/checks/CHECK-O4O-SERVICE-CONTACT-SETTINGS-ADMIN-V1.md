@@ -1,14 +1,14 @@
 # CHECK-O4O-SERVICE-CONTACT-SETTINGS-ADMIN-V1
 
 > **작업명:** WO-O4O-SERVICE-CONTACT-SETTINGS-ADMIN-V1
-> **유형:** GP/KCos Contact Us 문의 수신·알림 설정 Admin 관리 + submit 알림 정책 연동(이메일 발송 포함)
-> **결과: PASS** (api-server tsc 0 / GP·KCos tsc 0 / 배포 success / GP·KCos 브라우저 smoke PASS / submit→notification_status 실증 `inapp:sent;email:off`). — 2026-06-12
+> **유형:** KCos Contact Us 문의 수신·알림 설정 Admin 관리 + submit 알림 정책 연동(이메일 발송 포함)
+> **결과: PASS** (api-server tsc 0 / KCos tsc 0 / 배포 success / KCos 브라우저 smoke PASS / submit→notification_status 실증 `inapp:sent;email:off`). — 2026-06-12
 > 선행: `WO-O4O-CONTACT-DELIVERY-AND-NOTIFICATION-V1` · `WO-O4O-CONTACT-INQUIRY-ADMIN-MANAGEMENT-V1` · `WO-O4O-PUBLIC-INFO-LEGAL-CONTACT-STRUCTURE-MILESTONE-V1`
 
 ---
 
 ## 1. 작업 목적
-GP/KCos 문의 접수 시 알림 채널(in-app/email)·이메일 수신자·문의 유형·안내 문구를 **Admin에서 설정**하도록 한다.
+KCos 문의 접수 시 알림 채널(in-app/email)·이메일 수신자·문의 유형·안내 문구를 **Admin에서 설정**하도록 한다.
 수신 이메일을 코드에 하드코딩하지 않고, 설정 미비로 접수가 실패하지 않으며, 알림 결과를 `notification_status`에 기록한다.
 
 ## 2. 선행 반영
@@ -23,12 +23,12 @@ GP/KCos 문의 접수 시 알림 채널(in-app/email)·이메일 수신자·문�
 
 ## 4. Admin API
 - `admin-service-contact-settings.controller.ts`: `GET/PUT /:serviceKey/contact-settings`. mount `/api/v1/admin/services`.
-- 권한: `requireServiceLegalScope('admin')` 재사용(`{prefix}:admin`) + 화이트리스트 **glycopharm/k-cosmetics**(Neture/KPA 404). operator 기본 접근 없음.
+- operator 기본 접근 없음.
 - PUT 검증: 이메일 형식·중복 제거·최대 20개, 이메일 알림 ON인데 수신자 0 → 400. 안내 문구 plain text(길이 제한). 수신 이메일은 **admin 응답에만** 포함.
 
-## 5·6·7. GP/KCos Admin UI / 메뉴·route
+## 5·6·7. KCos Admin UI / 메뉴·route
 - 공통 `ServiceContactSettingsPage`(`@o4o/operator-core-ui/modules/service-contact-settings`): 알림 설정 / 이메일 수신자(추가·삭제·형식검증) / 문의 유형 토글 / 안내 문구. inline style, HTML 렌더 안 함.
-- GP/KCos thin wrapper(serviceKey + authClient 어댑터) + route `/admin/settings/contact` + DashboardLayout System 그룹 **"문의 설정"**.
+- KCos thin wrapper(serviceKey + authClient 어댑터) + route `/admin/settings/contact` + DashboardLayout System 그룹 **"문의 설정"**.
 
 ## 8. in-app 알림 설정 처리
 - submit 시 `loadContactSettings` 로 effective 조회 → `inAppNotificationEnabled`가 true일 때만 `{prefix}:operator|admin` 대상 `contact.new` 생성.
@@ -53,24 +53,19 @@ GP/KCos 문의 접수 시 알림 채널(in-app/email)·이메일 수신자·문�
 - 본문/이메일 HTML escape, 안내 문구 plain text(dangerouslySetInnerHTML 미사용), 수신 이메일 admin-only, 로그 최소화.
 
 ## 15. 테스트 설정 저장 여부
-- GP: 검증 중 `test-operator@example.com`(RFC reserved 비실 주소) 임시 저장 + email ON → **검증 후 수신자 삭제 + email OFF 로 정리**(최종 in-app ON/email OFF/수신자 0).
 - KCos: 개인정보 안내 문구만 저장(email OFF 유지). 실 운영 이메일 미사용·실발송 미수행.
-- 테스트 문의 1건(GP `[SMOKE] settings notification_status…`) → **spam 처리 완료**(hard delete 없음).
 
 ## 16. 검증 결과
-- tsc: api-server 0 / web-glycopharm `tsc --noEmit` 0 / web-k-cosmetics `tsc --noEmit` 0 / contact-settings 파일 0 ✅
 - migration: additive 1건(seed 없음). CI/CD 자동 적용.
 - 참고: 로컬 `npm run build`(`tsc -b`)에서 `services/web-*/src/pages/forum/ForumPage.tsx` viewCount 관련 phantom 오류 — **타 세션 forum 패키지 dist 불일치**에 따른 로컬 아티팩트(본 WO 무관). CI Web 배포는 clean 빌드로 success 지속 확인.
 
 ## 17. 브라우저 smoke 결과 (2026-06-12, 배포 51c8c392b · api/web deploy success)
-> web 배포 주의: push tip(ee6c6cf6f, docs-only)만 diff 하는 detect-changes 로 자동 web 배포가 전 서비스 skip → GP/KCos 는 `workflow_dispatch`(service=glycopharm / k-cosmetics)로 수동 재배포하여 신규 번들 게시 확인(`settings/contact` 포함).
-- **GP** `glycopharm.co.kr/admin/settings/contact`: System 그룹 "문의 설정" 메뉴 노출 → 페이지 렌더 → GET effective 기본값(in-app on/email off/기본 유형 5개) → 수신자 추가 + email ON + 저장 "저장되었습니다" → 새로고침 영속 확인 → 수신자 삭제 + email OFF + 저장(정리) ✅
+> web 배포 주의: push tip(ee6c6cf6f, docs-only)만 diff 하는 detect-changes 로 자동 web 배포가 전 서비스 skip → KCos 는 `workflow_dispatch`(service=k-cosmetics)로 수동 재배포하여 신규 번들 게시 확인(`settings/contact` 포함).
 - **KCos** `www.k-cosmetics.site/admin/settings/contact`: 메뉴 노출 → 렌더 → 안내 문구 저장 + 영속 ✅ → email ON + 수신자 0 저장 시 **검증 차단**("수신 이메일 1개 이상") ✅ → 정리 ✅
-- **submit→notification_status 실증**: GP(in-app ON/email OFF) 공개 API 제출 → 문의 관리 상세 **알림 상태 `inapp:sent;email:off`**(설정 정확 반영) ✅ → 테스트 문의 spam 정리 ✅
 - 결과: **PASS** (설정 조회/저장/영속/검증 + submit 알림 정책 반영, 서비스별 격리).
 
 ## 18. commit hash
-- 구현/문서: `51c8c392b` (feat(contact): service contact notification settings admin for GP/KCos)
+- 구현/문서: `51c8c392b` (feat(contact): service contact notification settings admin for KCos)
 - smoke 반영: 본 갱신 커밋(아래)
 
 ---
@@ -81,4 +76,4 @@ GP/KCos 문의 접수 시 알림 채널(in-app/email)·이메일 수신자·문�
 3. `WO-O4O-CONTACT-CROSSSERVICE-STANDARDIZATION-V1` — Neture/KPA ↔ ContactInquiry 통합.
 - 공개 form 문의 유형 동적 로드 / 안내 문구 공개 표시는 후속 확장.
 
-*Date: 2026-06-12 · WO-O4O-SERVICE-CONTACT-SETTINGS-ADMIN-V1 · GP/KCos 문의 수신·알림 설정 Admin + submit 알림 정책(이메일 발송 포함). migration 1, Neture/KPA·공개폼 무변경.*
+*Date: 2026-06-12 · WO-O4O-SERVICE-CONTACT-SETTINGS-ADMIN-V1 · KCos 문의 수신·알림 설정 Admin + submit 알림 정책(이메일 발송 포함). migration 1, Neture/KPA·공개폼 무변경.*

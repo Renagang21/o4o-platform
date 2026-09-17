@@ -1,6 +1,6 @@
 # CHECK-O4O-MY-STORE-CANONICAL-MENU-LABEL-ALIGNMENT-3SERVICES-V1
 
-> 내 매장 공통화 Phase 5 후속 — 3서비스(KPA / GlycoPharm / K-Cosmetics) canonical 메뉴 라벨 / IA 정렬.
+> 내 매장 공통화 Phase 5 후속 — 2서비스(KPA / K-Cosmetics) canonical 메뉴 라벨 / IA 정렬.
 > **결과: PASS** — 메뉴 config 무변경(canonical 보존) + page heading 데이터 의미 정렬(my-products / local-products 3서비스 동시) + tsc 0.
 > 선행: `WO-O4O-MY-STORE-COMMONIZATION-PHASE5-KPA-BASELINE-V1`(PASS) · `WO-O4O-STORE-PRODUCTS-MANAGER-HEADING-PROP-ALIGNMENT-V1`(PASS) · `WO-O4O-MY-STORE-PRODUCT-TERMINOLOGY-ALIGNMENT-V1`(PASS)
 > 상위 기준: `IR-O4O-STORE-ORDERABLE-VS-CARRIED-PRODUCT-MODEL-V1` — 2026-06-11
@@ -9,7 +9,7 @@
 
 ## 1. 목적
 
-KPA / GlycoPharm / K-Cosmetics 의 내 매장 상품 관련 **메뉴 라벨 / IA** 가 기준 모델과 충돌하지 않는지
+KPA / K-Cosmetics 의 내 매장 상품 관련 **메뉴 라벨 / IA** 가 기준 모델과 충돌하지 않는지
 확인하고, 필요 시 3서비스 동시 기준으로 라벨·설명을 정리한다. DB / API / 주문·결제 로직 변경 없음.
 
 ---
@@ -50,7 +50,6 @@ KPA baseline(Phase 5) 확정 모델:
 | 서비스 | 활성화 앵커 라벨 (메뉴) | route | local-products 라벨 (메뉴) | 데이터 기준 | 판정 |
 |---|---|---|---|---|---|
 | KPA | **내 약국 제품** | `/my-products` | (메뉴 미노출) | OrganizationProductListing | 유지 (A) |
-| GlycoPharm | **내 약국 제품** | `/my-products` | 자체 상품 (`/commerce/local-products`) | OrganizationProductListing | 유지 (A) |
 | K-Cosmetics | **내 매장 제품** | `/my-products` | 자체 상품 (`/commerce/local-products`) | OrganizationProductListing | 유지 (A) |
 
 - 메뉴 라벨은 이미 **"제품"**(제작 기준 데이터 앵커)으로 canonical 정렬됨. 위험했던 포괄 라벨 `내 매장 상품` 은
@@ -78,7 +77,6 @@ page heading 을 데이터 의미("O4O 주문 가능 상품")로 정렬. 메뉴 
 | 서비스 | title | description | 비고 |
 |---|---|---|---|
 | KPA | O4O 주문 가능 상품 | …약국에서 반복 주문… | 선행 WO 에서 주입 완료 (유지) |
-| GlycoPharm | O4O 주문 가능 상품 | 공급자 또는 운영자 승인 후 **약국**에서 반복 주문할 수 있는 O4O 공급 상품을 관리합니다. | 본 WO 주입 |
 | K-Cosmetics | O4O 주문 가능 상품 | 공급자 또는 운영자 승인 후 **매장**에서 반복 주문할 수 있는 O4O 공급 상품을 관리합니다. | 본 WO 주입 (`약국` 미사용) |
 
 - `ProductApproval(PENDING)` 을 주문 가능 상품처럼 표현하지 않음 — "승인 후 반복 주문" 으로 기술.
@@ -87,10 +85,10 @@ page heading 을 데이터 의미("O4O 주문 가능 상품")로 정렬. 메뉴 
 
 ## 7. Phase 4 — 매장 취급 상품(StoreLocalProduct) 라벨 정렬
 
-KPA 는 선행 terminology WO 에서 이미 "매장 취급 상품" 으로 정렬됨. GP/KCos 를 동일 기준으로 마저 정렬하여
+KPA 는 선행 terminology WO 에서 이미 "매장 취급 상품" 으로 정렬됨. KCos 를 동일 기준으로 마저 정렬하여
 **3서비스 동시 정렬 완성**.
 
-| 위치 | 전 (GP/KCos) | 후 (GP/KCos, = KPA) |
+| 위치 | 전 (KCos) | 후 (KCos, = KPA) |
 |---|---|---|
 | 페이지 heading | 자체 상품 관리 | **매장 취급 상품** |
 | 설명 | 매장에서 직접 등록하는 상품입니다. Display Domain 전용 — 결제/주문 시스템과 연결되지 않습니다. | O4O 주문과 무관하게 매장에서 자체적으로 취급·진열하는 상품입니다. 결제/주문 시스템과 연결되지 않습니다. |
@@ -115,9 +113,7 @@ KPA 는 선행 terminology WO 에서 이미 "매장 취급 상품" 으로 정렬
 
 | 파일 | 변경 |
 |---|---|
-| `services/web-glycopharm/src/App.tsx` | `/store/my-products` 라우트에 title/description prop 주입 (약국 기준) |
 | `services/web-k-cosmetics/src/App.tsx` | `/store/my-products` 라우트에 title/description prop 주입 (매장 기준) |
-| `services/web-glycopharm/src/pages/store-management/StoreLocalProductsPage.tsx` | heading/설명/empty 문구 → "매장 취급 상품" 정렬 |
 | `services/web-k-cosmetics/src/pages/store/StoreLocalProductsPage.tsx` | heading/설명/empty 문구 → "매장 취급 상품" 정렬 |
 | `docs/checks/CHECK-...-3SERVICES-V1.md` | 본 문서 |
 
@@ -140,7 +136,7 @@ KPA 는 선행 terminology WO 에서 이미 "매장 취급 상품" 으로 정렬
 - [x] 3서비스 메뉴 라벨 canonical 정렬 미파괴 (`storeMenuConfig.ts` 무변경)
 - [x] "제품 = IA 앵커 유지" 판단 문서화, 메뉴 `O4O 주문 가능 상품` 미축소
 - [x] KPA my-products title prop 적용 상태 유지
-- [x] GP/KCos my-products title/description 주입 (3서비스 동시 완성)
+- [x] KCos my-products title/description 주입 (2서비스 동시 완성)
 - [x] StoreLocalProduct 기반 화면 = "매장 취급 상품" (3서비스 동시), 주문 가능 상품처럼 표현 안 됨
 - [x] OrganizationProductListing 기반 화면 = "O4O 주문 가능 상품", 매장 취급 상품처럼 표현 안 됨
 - [x] 이벤트 오퍼 = 이벤트형 O4O 주문 가능 상품 기준 유지, 제외 표현 없음
@@ -149,7 +145,6 @@ KPA 는 선행 terminology WO 에서 이미 "매장 취급 상품" 으로 정렬
 
 | 대상 | 명령 | 결과 |
 |---|---|---|
-| web-glycopharm | `tsc --noEmit -p tsconfig.app.json` | PASS |
 | web-k-cosmetics | `tsc --noEmit` | PASS |
 
 (공유 패키지 `store-products-ui` 무변경 — 재검증 불필요. KPA 무변경.)
@@ -157,12 +152,11 @@ KPA 는 선행 terminology WO 에서 이미 "매장 취급 상품" 으로 정렬
 ### Smoke 검증
 
 - 배포 전 — typecheck + 정적 검증으로 대체. heading/문구 변경은 순수 텍스트이며 레이아웃·route·prop 계약 변동 없음.
-  배포 후 다음 렌더 확인 권장: GP/KCos `/store/my-products`("O4O 주문 가능 상품"),
-  GP/KCos `/store/commerce/local-products`("매장 취급 상품").
+  배포 후 다음 렌더 확인 권장: KCos `/store/my-products`("O4O 주문 가능 상품")
+  KCos `/store/commerce/local-products`("매장 취급 상품").
 
 ### 병렬 세션 격리
 
-- 작업 중 병렬 세션이 GlycoPharm → K-Cosmetics ServiceGuide 를 순차 커밋(`d63aa54c2`, `1fbf98d5a`, `2a4f65939`).
 - 해당 세션이 App.tsx 를 미커밋 점유한 동안에는 그 파일을 건드리지 않고, 커밋 완료(클린) 후 진입하여
   staging 오염 0. path-specific add 로 본 WO 파일만 커밋.
 
@@ -176,7 +170,7 @@ KPA 는 선행 terminology WO 에서 이미 "매장 취급 상품" 으로 정렬
 | "제품 = 제작 기준 데이터 앵커" 유지 판단 | ✅ |
 | 메뉴 `O4O 주문 가능 상품` 축소 여부 3서비스 기준 확정 (→ 축소 안 함) | ✅ |
 | KPA my-products heading prop 유지 | ✅ |
-| GP/KCos title/description 적용 결정·실행 | ✅ (적용) |
+| KCos title/description 적용 결정·실행 | ✅ (적용) |
 | StoreLocalProduct 화면 = 매장 취급 상품 (3서비스) | ✅ |
 | EventOffer = 이벤트형 O4O 주문 가능 상품 기준 | ✅ |
 | DB/API/주문/결제 로직 무변경 | ✅ |
@@ -189,6 +183,6 @@ KPA 는 선행 terminology WO 에서 이미 "매장 취급 상품" 으로 정렬
 
 ## 13. 후속 작업
 
-- 배포 후 GP/KCos 5개 화면(my-products / local-products) heading smoke 확인.
+- 배포 후 KCos 5개 화면(my-products / local-products) heading smoke 확인.
 - 메뉴 라벨 자체의 재정의(예: "제품" → 다른 체계)는 본 WO 에서 의도적으로 보류 — 콘텐츠/제작 자료 흐름과의
   관계를 별도 IR 로 판단한 뒤에만 진행 (제품 IA 앵커는 콘텐츠 제작 기준 데이터로도 쓰이므로 성급한 축소 금지).

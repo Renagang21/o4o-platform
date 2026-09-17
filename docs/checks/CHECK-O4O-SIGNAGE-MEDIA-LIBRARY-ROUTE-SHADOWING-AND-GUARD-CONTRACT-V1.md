@@ -29,7 +29,6 @@
 | kpa-society | `/media/library` (org 헤더 있음) | **500** `invalid input syntax for type uuid: "library"` |
 | kpa-society | `/media/library` (org 헤더 없음) | **403** `SIGNAGE_ACCESS_DENIED` |
 | k-cosmetics | 동일 2건 | **500 / 403** |
-| glycopharm | 동일 2건 | **500 / 403** |
 | alias `cosmetics` · `kpa` | `/media/library` | **500** (동일) |
 
 ### 실제 진입 handler · 적용 guard 확정 근거
@@ -106,7 +105,6 @@ mount: `app.use('/api/signage/:serviceKey', signageRoutes)` — `/api/v1` 아래
 |---|---|
 | KPA (`web-kpa-society`) | 없음 |
 | K-Cosmetics | 없음 |
-| GlycoPharm | 없음 |
 | PharmacyHub | 없음 |
 | Neture / admin-dashboard | wrapper 함수만 존재, 호출 0 |
 | Operator / HQ | 없음 (`/hq/media/*` 사용) |
@@ -190,7 +188,7 @@ guard 계층 검증 결과:
 
 | 검사 | `/media/library` 수정 후 |
 |---|---|
-| KPA store_owner 가 KCos/GP media 를 보는가 | 불가 — guard 403 + repository serviceKey 필터 |
+| KPA store_owner 가 KCos media 를 보는가 | 불가 — guard 403 + repository serviceKey 필터 |
 | organizationId 없이 전 tenant media 를 보는가 | 불가 — store 는 403, operator 는 `platform`(자기 serviceKey 공용)만 |
 | 타 서비스 organizationId 통과 | 불가 — `isSignageOrganizationInService` 403 |
 | 서비스 귀속 없는 org | 불가 — 소유 검사 실패 시 403 |
@@ -251,7 +249,7 @@ organization 자동 치환 없음 · `requireAuth` 제거 없음 · cross-servic
 - 두 route 의 **guard chain 이름 배열 동일** + `requireSignageOperatorOrStore` 포함 (권한 완화 감지)
 - dispatch: `/media/library` → `getMediaLibrary` 진입, `getMedia` 미진입
 - `/media/:id` → `getMedia` · `/media` → `getMediaList` · PATCH/DELETE 회귀 없음
-- k-cosmetics / glycopharm + legacy alias(`cosmetics` / `kpa`) 동일 동작 (canonicalization 회귀)
+- k-cosmetics / legacy alias(`cosmetics` / `kpa`) 동일 동작 (canonicalization 회귀)
 - guard: 미인증 401 · 알 수 없는 serviceKey 400 · org context 없음 403 · 미소유/타 서비스 org 403 (모두 handler 미진입)
 - repository: `findMediaLibrary` 의 각 QueryBuilder 에서 `where()` 는 **정확히 1회**이고 그 조건이 `media.serviceKey` 임을 고정,
   organizationId 없으면 organization 쿼리를 만들지 않음
@@ -293,8 +291,6 @@ organization 자동 치환 없음 · `requireAuth` 제거 없음 · cross-servic
 | kpa-society | `/media/library` (org 없음) | 403 `SIGNAGE_ACCESS_DENIED` |
 | k-cosmetics | `/media/library` (org 있음) | **200** `platform` 0 / `organization` 0 |
 | k-cosmetics | `/media/library` (org 없음) | 403 `SIGNAGE_ACCESS_DENIED` |
-| glycopharm | `/media/library` (org 있음) | **200** `platform` 0 / `organization` 0 |
-| glycopharm | `/media/library` (org 없음) | 403 `SIGNAGE_ACCESS_DENIED` |
 
 **`/media/library` 관련 500 = 0** (수정 전 3 서비스 전부 500 → 수정 후 0).
 
@@ -304,18 +300,17 @@ organization 자동 치환 없음 · `requireAuth` 제거 없음 · cross-servic
 |---|---|---|---|
 | kpa-society | 5 / 0 | `["kpa-society"]` | `[null]` |
 | k-cosmetics | 0 / 0 | `[]` | `[]` |
-| glycopharm | 0 / 0 | `[]` | `[]` |
 
 → 타 서비스 media 0건 · 타 organization media 0건. 경계 필터 복구가 실제로 적용됐다.
 (수정 전이라면 shadowing 해소 시점부터 3 서비스 모두 전 tenant media 를 최대 50건 반환했을 것이다.)
 
 ### 대조군 (회귀 없음)
 
-| 요청 | kpa-society | k-cosmetics | glycopharm |
-|---|---|---|---|
-| `/media` | 200 (total 0) | 200 (total 0) | 200 (total 0) |
-| `/media/<random-uuid>` | 404 `Media not found` | 404 | 404 |
-| `/media/not-a-uuid` | 500 (기존 debt · §14) | 500 | 500 |
+| 요청 | kpa-society | k-cosmetics |
+|---|---|---|
+| `/media` | 200 (total 0) | 200 (total 0) |
+| `/media/<random-uuid>` | 404 `Media not found` | 404 |
+| `/media/not-a-uuid` | 500 (기존 debt · §14) | 500 |
 
 ### Guard 회귀 매트릭스 (`/media/library`)
 
@@ -345,7 +340,6 @@ organization 자동 치환 없음 · `requireAuth` 제거 없음 · cross-servic
 | KPA | `/store/marketing/signage/player` | 정상 | 0 | 0 |
 | KPA | `/store-hub/signage` | 정상 | 0 | 0 |
 | K-Cosmetics | `/store-hub/signage` | 정상 | 0 | 0 |
-| GlycoPharm | `/store-hub/signage` | 정상 | 0 | 0 |
 
 **white screen 0 · JS exception 0 · Signage API 회귀 0.**
 

@@ -66,10 +66,6 @@ Option B 적용 시 platform admin 호출에 `serviceKey` 또는 `all=true` 미�
 | web-kpa-society | `OperatorStoresPage.tsx` | `/operator/stores?...` | **NO** | kpa:operator |
 | web-kpa-society | `KpaOperatorDashboard.tsx` | `/operator/stores?limit=1` (KPI count) | **NO** | kpa:operator |
 | web-kpa-society | `AnalyticsPage.tsx` | `/operator/analytics/*` | **NO** | kpa:operator |
-| **web-glycopharm** | `UsersPage.tsx` | `/operator/members?...` | **NO** | glycopharm:operator |
-| web-glycopharm | `StoresPage.tsx` | `/operator/stores?...` | **NO** | glycopharm:operator |
-| web-glycopharm | `ProductsPage.tsx` | `/operator/products?...` | **NO** | glycopharm:operator |
-| web-glycopharm | `AnalyticsPage.tsx` | `/operator/analytics/*` | **YES** (`SERVICE_KEY='glycopharm'`) | glycopharm:operator |
 | **web-k-cosmetics** | `UsersPage.tsx` | `/operator/members?...` + `/stats` + `?limit=1000` | **NO** | cosmetics:operator |
 | web-k-cosmetics | `StoresPage.tsx` | `/operator/stores?...` | **NO** | cosmetics:operator |
 | web-k-cosmetics | `ProductsPage.tsx` | `/operator/products?...` | **NO** | cosmetics:operator |
@@ -96,9 +92,9 @@ Option B 적용 시 platform admin 호출에 `serviceKey` 또는 `all=true` 미�
 
 | 분류 | 정의 | 해당 caller |
 |------|------|------------|
-| **A. 항상 serviceKey 전달** | 호출 시 무조건 `serviceKey` 또는 `SERVICE_KEY` 상수를 query 에 포함 | web-neture `UsersManagementPage` · web-neture `AnalyticsPage` · web-glycopharm `AnalyticsPage` |
+| **A. 항상 serviceKey 전달** | 호출 시 무조건 `serviceKey` 또는 `SERVICE_KEY` 상수를 query 에 포함 | web-neture `UsersManagementPage` · web-neture `AnalyticsPage` |
 | **B. 조건부 전달** | 일부 조건에서만 전달 | **0건** — 분류 B 에 해당하는 caller 없음 |
-| **C. 미전달 (service-scoped operator)** | serviceKey 미전달이지만 caller role 이 service operator → backend `injectServiceScope` 자동 적용으로 safe | kpa `UsersPage` · kpa `MemberManagementPage` · kpa `OperatorStoresPage` · kpa `KpaOperatorDashboard` · kpa `AnalyticsPage` · glycopharm `UsersPage` · glycopharm `StoresPage` · glycopharm `ProductsPage` · k-cosmetics `UsersPage` · k-cosmetics `StoresPage` · k-cosmetics `ProductsPage` · web-neture `StoreManagementPage` |
+| **C. 미전달 (service-scoped operator)** | serviceKey 미전달이지만 caller role 이 service operator → backend `injectServiceScope` 자동 적용으로 safe | kpa `UsersPage` · kpa `MemberManagementPage` · kpa `OperatorStoresPage` · kpa `KpaOperatorDashboard` · kpa `AnalyticsPage` `UsersPage` `StoresPage` `ProductsPage` · k-cosmetics `UsersPage` · k-cosmetics `StoresPage` · k-cosmetics `ProductsPage` · web-neture `StoreManagementPage` |
 | **D. 미전달 + platform admin 컨텍스트 (위험)** | serviceKey 미전달 + caller 가 platform admin 권한으로 호출 가능 → cross-service leak 발생 | **admin-dashboard `pop.api.ts`** (platform admin 도구) · 그 외 분류 C 의 모든 caller 도 *platform:super_admin 보유자가 해당 web 에 접근하면* D 로 전환 |
 
 **분류 D 의 이중성**
@@ -123,7 +119,6 @@ Option B 적용 시 platform admin 호출에 `serviceKey` 또는 `all=true` 미�
 
 | Caller | cross-service 의도? | 판정 |
 |--------|:------------------:|:----:|
-| service-scoped frontends (kpa / glyco / cosmetics) 의 모든 list page | **NO** — 각 web 은 본인 서비스 회원/매장/상품만 보는 것이 명백한 의도 | legacy drift (의도 없음) |
 | web-neture `/admin/users` | **NO** — Neture 회원 관리 의도 (WO-FIX-V1 으로 확정) | 의도 없음 |
 | web-neture `/operator/stores` | **NO** — Neture 매장 관리 의도 | 의도 없음 (구조적 leak 잔존) |
 | **admin-dashboard `pop.api.ts`** | **확정 필요** — POP 제작이 cross-service 상품을 필요로 하는지 명시 SSOT 없음. 코드 주석상 "platform 상품 관리" 로 표현되어 *cross-service 가능성 있음* | **사용자 / 도메인 확정 필요** |
@@ -244,7 +239,7 @@ W1 의 backend WO 와 *동시 / 동반* 처리 권장 사항:
 |---|------|
 | **(a)** | admin-dashboard `pop.api.ts:66` 의 `/operator/products` 호출에 `?serviceKey=<key>` 또는 `?all=true` 명시 추가. 어느 쪽인지 사용자 / 도메인 확정 필요 — POP 제작이 platform-level cross-service 인지 service-scoped 인지 |
 | (b) | admin-dashboard `AuthAnalyticsPage.tsx:42` 의 `/operator/analytics/auth/logs` 호출은 별도 sub-path 라 본 7-endpoint 와 분리 — 그러나 동일 패턴 점검 권장 |
-| (c) | service-scoped frontend (kpa/glyco/cosmetics) 의 list page 는 변경 없이 통과 — 단, 회귀 테스트 권장 |
+| (c) | service-scoped frontend 의 list page 는 변경 없이 통과 — 단, 회귀 테스트 권장 |
 | (d) | platform:super_admin 의 service web 진입 정책 — RouteGuard 강화 또는 명시적 안내 화면 추가 검토 (선택, 후속) |
 
 ---

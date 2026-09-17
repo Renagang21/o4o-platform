@@ -38,7 +38,7 @@ users.permissions
 | # | 경로 | 파일:행 | 갱신 키 | 중첩 |
 |---|------|--------|--------|------|
 | F1 | KPA 약국 기본정보 `PUT /pharmacy/info` | `routes/o4o-store/controllers/pharmacy-info.controller.ts:349` | businessType · businessItem · businessEntityType · businessStartDate | 없음 |
-| F2 | GlycoPharm 마이페이지 `PATCH /glycopharm/mypage/business-info` | `routes/glycopharm/controllers/mypage.controller.ts:288` | pharmacyName · businessName · representativeName · businessAddress · businessPhone · businessType · businessItem · businessEntityType · businessStartDate · taxInvoiceEmail · businessEmail · contactEmail | 없음 |
+| F2 | — | — | pharmacyName · businessName · representativeName · businessAddress · businessPhone · businessType · businessItem · businessEntityType · businessStartDate · taxInvoiceEmail · businessEmail · contactEmail | 없음 |
 | F3 | K-Cosmetics 마이페이지 `PATCH /cosmetics/mypage/business-info` | `routes/cosmetics/controllers/cosmetics-mypage.controller.ts:202` | F2 와 동일 (단 `pharmacyName` 대신 **`storeName`**) | 없음 |
 | F4 | Neture 공급자 프로필 P4 | `modules/neture/services/supplier.service.ts:1159` | businessEntityType · businessStartDate | 없음 |
 
@@ -59,11 +59,6 @@ users.permissions
 
 테스트 계정(`renagang21`, 약국/매장 경영자)으로 프로덕션 API 직접 호출:
 
-```
-GET   /api/v1/glycopharm/mypage/business-info   → 200 (조회는 정상)
-PATCH /api/v1/glycopharm/mypage/business-info   → 500 {"success":false,"error":"사업자 정보 수정 중 오류가 발생했습니다."}
-```
-
 ### 사용자 영향 (경로별로 다르다)
 
 | 경로 | 사용자에게 보이는 것 | 심각도 |
@@ -81,7 +76,7 @@ F1 은 KPA 약국이 업태·종목·사업자유형·개업일을 저장하면 
 - 각 경로가 **원래 쓰던 키 집합을 그대로 유지**했다. 키 이름·의미·검증 규칙 변경 없음.
 - KPA 에서 확정한 주소·전화 우선순위(`address` > `businessAddress`, `metadata.pharmacy_phone`)는
   **다른 서비스에 적용하지 않았다.** F2/F3 는 계속 `businessAddress` 를 쓴다.
-- 서비스 경계 유지: K-Cosmetics 는 `storeName`, GlycoPharm 은 `pharmacyName` — 상호 침범 없음(테스트로 고정).
+- 서비스 경계 유지: K-Cosmetics 는 `storeName` 은 `pharmacyName` — 상호 침범 없음(테스트로 고정).
 - 요청에 없는 키는 patch 에 담기지 않아 DB 값이 그대로 보존된다.
 - 권한 가드(403) · 검증(400) · 응답 projection 은 전부 그대로.
 
@@ -132,14 +127,13 @@ F2·F3 는 원래 삼키지 않았다(500 반환) — **오류 처리 구조를 
 | 파일 | 건수 |
 |---|---|
 | `utils/__tests__/business-info-json-column-guard.test.ts` (신규) — **저장소 전수 스캔 가드** | 3 |
-| `routes/glycopharm/controllers/__tests__/mypage.businessInfoWrite.test.ts` (신규) | 7 |
 | `routes/cosmetics/controllers/__tests__/cosmetics-mypage.businessInfoWrite.test.ts` (신규) | 5 |
 | `routes/o4o-store/controllers/__tests__/pharmacy-info.businessInfoWrite.test.ts` (신규) | 5 |
 
 가드 테스트는 주석을 제거한 뒤 소스 전체를 스캔해 `COALESCE("businessInfo", ...)` 재유입을 막는다.
 (컴파일·기존 테스트로는 못 잡고 프로덕션에서만 터지던 종류라 회귀 가드를 남겼다.)
 
-영향 범위 일괄(`kpa · glycopharm · cosmetics · o4o-store · operator · auth · neture · utils`):
+영향 범위 일괄(`kpa · cosmetics · o4o-store · operator · auth · neture · utils`):
 **53 suites / 681 tests 전부 PASS.** 직전 WO 의 JSONB 수렴·dual-read 회귀 포함.
 
 ### typecheck / lint
@@ -187,8 +181,6 @@ revision_name = "o4o-core-api-03314-rf4" AND textPayload:"could not convert type
 해당 revision 이 실제 트래픽을 받고 있음을 요청 로그로 확인 (2026-08-12T12:57~12:58Z).
 
 ### API runtime smoke — 동일 계정 · 동일 엔드포인트 BEFORE / AFTER
-
-테스트 계정 `renagang21@gmail.com` (약국/매장 경영자), `PATCH /api/v1/glycopharm/mypage/business-info`.
 
 | 시점 | 결과 |
 |---|---|

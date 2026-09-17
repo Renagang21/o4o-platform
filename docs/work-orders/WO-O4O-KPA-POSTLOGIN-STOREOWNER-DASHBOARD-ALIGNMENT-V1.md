@@ -1,6 +1,6 @@
 # WO-O4O-KPA-POSTLOGIN-STOREOWNER-DASHBOARD-ALIGNMENT-V1
 
-> KPA-Society 의 post-login redirect 정책을 O4O 공통 철학에 맞게 정렬한다. 약국 경영자(`kpa:store_owner`)는 GlycoPharm/K-Cosmetics 와 동일하게 로그인 직후 내 약국(`/store`)을 기본 시작 화면으로 본다. 공개 Home 구조는 변경하지 않는다.
+> KPA-Society 의 post-login redirect 정책을 O4O 공통 철학에 맞게 정렬한다. 약국 경영자(`kpa:store_owner`)는 K-Cosmetics 와 동일하게 로그인 직후 내 약국(`/store`)을 기본 시작 화면으로 본다. 공개 Home 구조는 변경하지 않는다.
 
 - **작성일:** 2026-06-02
 - **유형:** Work Order (실행 — 코드 변경 포함)

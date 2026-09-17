@@ -47,7 +47,6 @@
 
 - `@o4o/ui` `tsc --noEmit` **exit 0**, `tsc --build` **성공**(dist d.ts 에 `showMobileUserMenu` 반영)
 - `web-kpa-society` `tsc --noEmit` **exit 0**, production build(`tsc && vite build`) **성공**
-- Shared Module Change Protocol — 공용 GlobalHeader 소비 3서비스 회귀 검증: `web-glycopharm` / `web-k-cosmetics` / `web-neture` `tsc --noEmit` **각 exit 0** (prop 기본값 true, 미주입 → 영향 없음)
 
 ## 8. 배포
 

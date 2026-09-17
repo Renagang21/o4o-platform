@@ -14,16 +14,16 @@
 
 ### 1-A. 콘텐츠 진열 화면 (`/store-hub/content`)
 
-| 항목 | KPA-Society | K-Cosmetics | GlycoPharm(참고) | PharmacyHub |
-|---|---|---|---|---|
-| route | `/store-hub/content` | `/store-hub/content` | `/store-hub/content` | **없음** |
-| page | `pages/pharmacy/HubContentLibraryPage.tsx` | `pages/hub/HubContentPage.tsx` | `pages/hub/HubContentListPage.tsx` | — |
-| 공통 컴포넌트 | `ContentHubTemplate` (`@o4o/shared-space-ui`) | 동일 | 동일 | — |
-| 목록 API | `GET /api/v1/hub/contents?serviceKey=kpa&sourceDomain=kpa_content\|cms` | `…serviceKey=k-cosmetics&sourceDomain=cms` | `…serviceKey=glycopharm&sourceDomain=cms` | — |
-| 검색·필터 | 소스 탭 2개(`filtersAsSourceTabs`) + 검색 | 검색만(`showTypeFilters:false`) | 검색만 | — |
+| 항목 | KPA-Society | K-Cosmetics | PharmacyHub |
+|---|---|---|---|
+| route | `/store-hub/content` | `/store-hub/content` | **없음** |
+| page | `pages/pharmacy/HubContentLibraryPage.tsx` | `pages/hub/HubContentPage.tsx` | — |
+| 공통 컴포넌트 | `ContentHubTemplate` (`@o4o/shared-space-ui`) | 동일 | — |
+| 목록 API | `GET /api/v1/hub/contents?serviceKey=kpa&sourceDomain=kpa_content\ | cms` | `…serviceKey=k-cosmetics&sourceDomain=cms` | — | — |
+| 검색·필터 | 소스 탭 2개(`filtersAsSourceTabs`) + 검색 | 검색만(`showTypeFilters:false`) | — |
 | 가져오기 | `assetSnapshotApi.copy({ sourceService:'kpa', sourceAssetId, assetType:'content'\|'cms' })` | `assetSnapshotApi.copy({ assetType:'cms' })` | 동일 | — |
-| 사본 | `o4o_asset_snapshots` row | 동일 | 동일 | — |
-| 중복 정책 | 이미 복사한 id 를 `loadCopiedIds` 로 표시하고 **재복사 허용**(`recopyLabel`) | 동일 | 동일 | — |
+| 사본 | `o4o_asset_snapshots` row | 동일 | — |
+| 중복 정책 | 이미 복사한 id 를 `loadCopiedIds` 로 표시하고 **재복사 허용**(`recopyLabel`) | 동일 | — |
 
 → **이 화면군은 이미 공통 Core(`ContentHubTemplate`, 816L)를 3(+Neture 1) 서비스가 소비**하고 있다.
 서비스 차이는 전부 `ContentHubConfig`(fetchItems / loadCopiedIds / onCopy / 문구 / accent)로 흡수돼 있다.
@@ -31,20 +31,20 @@
 
 ### 1-B. 가져오기 라이브러리 화면 (`/store-hub/blog|pop|qr`)
 
-| 항목 | KPA-Society | K-Cosmetics | GlycoPharm(참고) | PharmacyHub |
-|---|---|---|---|---|
-| route | `/store-hub/{blog,pop,qr}` | 동일 | 동일 | **없음** |
-| page | `pages/pharmacy/Hub{Blog,Pop,Qr}LibraryPage.tsx` | `pages/hub/Hub{Blog,Pop,Qr}LibraryPage.tsx` | `pages/hub/…` | — |
-| 원본 source | `hub_contents` view(운영자 발행 blog/pop/qr 원본) | 동일 | 동일 | — |
-| 목록 API | `GET /api/v1/hub/contents?serviceKey=kpa&sourceDomain=blog\|pop\|qr` | `serviceKey=k-cosmetics` (클라이언트 상수) | `serviceKey=glycopharm` | — |
-| 검색·필터·분류 | **없음** (페이지네이션만) | 없음 | 없음 | — |
-| 미리보기·상세 | 행 클릭 → `BaseDetailDrawer` | 동일 | 동일 | — |
-| 가져오기(단건) | `importOperator{Blog,Pop,Qr}(slug, sourceId)` | 동일 | 동일 | — |
-| 가져오기(일괄) | 단건 endpoint `Promise.allSettled` fan-out + `useBatchAction` | 동일 | 동일 | — |
-| 생성되는 사본 | blog/pop: 매장 소유 초안(author_role='store') · qr: `store_qr_codes` row(매장 slug 신규 발급) | 동일 | 동일 | — |
-| 중복 가져오기 | **제한 없음** (매번 새 사본 생성 · 이미 가져왔는지 표시하지 않음) | 동일 | 동일 | — |
-| 원본-사본 연결 | blog/pop: 사본 row 의 source id 보존 · qr: 변환 INSERT (양방향 동기화 없음) | 동일 | 동일 | — |
-| UI 차이 | `Pagination`(operator-ux-core) · `Download`/`Plus` 아이콘 · "내 약국" 문구 | 손수 만든 이전/다음 버튼 · `Copy` 아이콘 · pink accent · "내 매장" 문구 | KCos 와 거의 동일(teal accent) | — |
+| 항목 | KPA-Society | K-Cosmetics | PharmacyHub |
+|---|---|---|---|
+| route | `/store-hub/{blog,pop,qr}` | 동일 | **없음** |
+| page | `pages/pharmacy/Hub{Blog,Pop,Qr}LibraryPage.tsx` | `pages/hub/Hub{Blog,Pop,Qr}LibraryPage.tsx` | — |
+| 원본 source | `hub_contents` view(운영자 발행 blog/pop/qr 원본) | 동일 | — |
+| 목록 API | `GET /api/v1/hub/contents?serviceKey=kpa&sourceDomain=blog\ | pop\ | qr` | `serviceKey=k-cosmetics` (클라이언트 상수) | — | — |
+| 검색·필터·분류 | **없음** (페이지네이션만) | 없음 | — |
+| 미리보기·상세 | 행 클릭 → `BaseDetailDrawer` | 동일 | — |
+| 가져오기(단건) | `importOperator{Blog,Pop,Qr}(slug, sourceId)` | 동일 | — |
+| 가져오기(일괄) | 단건 endpoint `Promise.allSettled` fan-out + `useBatchAction` | 동일 | — |
+| 생성되는 사본 | blog/pop: 매장 소유 초안(author_role='store') · qr: `store_qr_codes` row(매장 slug 신규 발급) | 동일 | — |
+| 중복 가져오기 | **제한 없음** (매번 새 사본 생성 · 이미 가져왔는지 표시하지 않음) | 동일 | — |
+| 원본-사본 연결 | blog/pop: 사본 row 의 source id 보존 · qr: 변환 INSERT (양방향 동기화 없음) | 동일 | — |
+| UI 차이 | `Pagination`(operator-ux-core) · `Download`/`Plus` 아이콘 · "내 약국" 문구 | 손수 만든 이전/다음 버튼 · `Copy` 아이콘 · pink accent · "내 매장" 문구 | — |
 
 → 이 6 페이지의 **상태 기계(조회·페이지·loading/error·slug·선택·단건/일괄 가져오기)는 실질적으로 동일**하고,
 차이는 문구·아이콘·accent·페이지네이션 UI 뿐이다. **여기가 이번 WO 의 실제 중복 영역**이다.
@@ -79,7 +79,7 @@ WO §6 판단 근거(실측):
 
 1. `services/web-pharmacy-hub/src/App.tsx` 의 `/store-hub` 하위는 **index(홈) 뿐**이다. 콘텐츠 탐색 route 가 없다.
 2. 프론트엔드에 `hubContentApi` · `assetSnapshotApi` 소비처가 **0건**이다.
-3. backend `/assets`(asset snapshot copy) 컨트롤러는 **kpa · cosmetics · glycopharm · neture 에만 mount** 돼 있고
+3. backend `/assets`(asset snapshot copy) 컨트롤러는 **kpa · cosmetics · neture 에만 mount** 돼 있고
    `pharmacy-hub` 라우터에는 없다.
 4. PharmacyHub store-owner 의 content/library/blog 는 **매장이 직접 작성하는 CRUD**(`PharmacyHubStoreContentController`)이며
    HUB 조회·복사 개념이 없다.
@@ -90,11 +90,11 @@ WO §6 판단 근거(실측):
 
 ---
 
-## 5. Neture · GlycoPharm
+## 5. Neture
 
 - **Neture**: 공급자 원천/계약 확인만 수행. `services/web-neture/src/pages/library/ContentLibraryPage.tsx` 가
   동일한 `ContentHubTemplate` 을 소비한다. **코드 변경 0건.**
-- **GlycoPharm**: WO 상 공식 적용 대상 제외. 페이지 **변경 0건**, 공통 패키지 회귀만 확인(§8).
+- 페이지 **변경 0건**, 공통 패키지 회귀만 확인(§8).
 
 ---
 
@@ -151,13 +151,12 @@ useHubImportLibrary<T>({ fetchPage, resolveStoreSlug, importOne, messages, limit
 
 | 항목 | 결과 |
 |---|---|
-| `tsc -b` — KPA / K-Cosmetics / GlycoPharm / PharmacyHub | **4/4 PASS** |
-| `vite build` — KPA / K-Cosmetics / GlycoPharm / PharmacyHub | **4/4 PASS** |
+| `tsc -b` — KPA / K-Cosmetics / PharmacyHub | **4/4 PASS** |
+| `vite build` — KPA / K-Cosmetics / PharmacyHub | **4/4 PASS** |
 | HUB 목록 계약(프로덕션 read) `serviceKey=kpa&sourceDomain=blog` | `total=1` — 조회 계약 정상 |
 | 동 `pop`/`qr`, `serviceKey=k-cosmetics` 전 도메인 | `total=0` — **기존 상태**(이번 변경과 무관) |
 | 원본 write 경로 부재 | 탐색 경로에 원본 UPDATE 없음 (코드 확인) |
 | 사본 write 경로 분리 | `importOperator*` / `assetSnapshotApi.copy` 만 write, 원본 미변경 (코드 확인) |
-| GlycoPharm 회귀 | 페이지 무변경 + typecheck/build PASS |
 | Neture 침범 | 코드 변경 0건 |
 
 **미수행(숨기지 않고 기록):**
@@ -175,13 +174,13 @@ useHubImportLibrary<T>({ fetchPage, resolveStoreSlug, importOne, messages, limit
 **남은 중복**
 
 - KPA `HubSignageLibraryPage`(미디어+플레이리스트 2목록) · `HubVideoLibraryPage` · `HubScreenSetLibraryPage` — 목록 형태가 달라 제외.
-- GlycoPharm blog/pop/qr 3 페이지 — WO 상 적용 대상 제외(코드 무변경). 동일 Core 로 흡수 가능.
+- 동일 Core 로 흡수 가능.
 - 목록 View(컬럼·drawer·안내 박스)는 여전히 서비스별로 중복. 통합하려면 카드/테이블 표현 통일 결정이 선행돼야 한다.
 
 **후속 WO 제안**
 
 1. `WO-O4O-PHARMACY-HUB-STORE-HUB-CONTENT-SOURCE-V1` — PharmacyHub 의 공급자 콘텐츠 **원천**(hub_contents 발행 경로 · asset snapshot mount) 도입 여부 결정. 화면은 그다음.
-2. `WO-O4O-STORE-HUB-IMPORT-LIBRARY-VIEW-COMMONIZATION-V1` — 가져오기 라이브러리 **View 계층**(컬럼·drawer·페이지네이션 UI) 공통화 + GlycoPharm 3 페이지 흡수.
+2. `WO-O4O-STORE-HUB-IMPORT-LIBRARY-VIEW-COMMONIZATION-V1` — 가져오기 라이브러리 **View 계층**(컬럼·drawer·페이지네이션 UI) 공통화 3 페이지 흡수.
 3. `WO-O4O-STORE-HUB-IMPORT-DUPLICATE-POLICY-V1` — blog/pop/qr 의 무제한 재가져오기 정책을 콘텐츠 진열(복사 이력 표시)과 맞출지 결정.
 
 ---

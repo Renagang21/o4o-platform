@@ -184,7 +184,6 @@ WO 의 "dependency 또는 lockfile 변경이 필요하면 중지" 조건에 해�
 검증 3(`bash scripts/ci-build-app.sh admin-dashboard`) 실행 시 스크립트 내부의
 **비-frozen `pnpm install`** 이 `pnpm-lock.yaml` 을 재생성해 아래 2가지를 만들었다.
 
-- `services/web-glycopharm` importer 블록 제거 (해당 서비스는 이미 은퇴, lockfile 에만 잔존)
 - `ts-jest` peer 해상도에 `(esbuild@0.27.0)` 추가
 
 둘 다 이번 변경과 인과관계가 없는 스크립트 실행 부수효과이므로
@@ -207,7 +206,6 @@ lockfile 이 실제로 drift 상태라는 사실 자체는 **후속 후보**로 
    정리 여부는 별도 판단 대상.
 
 3. **`pnpm-lock.yaml` drift** — 위 §9 참조. `ci-build-app.sh` 의 비-frozen `pnpm install` 이
-   lockfile 을 재생성하면 `services/web-glycopharm` importer 제거 + `ts-jest` peer 해상도 변경이
    발생한다. 즉 커밋된 lockfile 이 현재 워크스페이스 구성과 완전히 일치하지 않는다.
    lockfile 변경은 본 WO 금지 범위이므로 손대지 않았다. 별도 WO 후보.
 

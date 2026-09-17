@@ -169,7 +169,6 @@ ORDER BY role;
 | `user` | 4 | 4 | 0 |
 | `pharmacist` | 3 | 3 | 0 |
 | `kpa:admin` | 2 | 2 | 0 |
-| `glycopharm:admin` | 1 | 1 | 0 |
 | `neture:admin` | 1 | 1 | 0 |
 | `partner` | 1 | 1 | 0 |
 | `supplier` | 1 | 1 | 0 |

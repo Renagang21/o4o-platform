@@ -71,7 +71,6 @@
 | KPA-Society | `StoreTabletDisplaysPage.tsx` 1877L / 99KB, `TabletContentLibraryList` 39KB, `TabletCornerContentsPanel` 24KB, `TabletCornerSwapModal` 10KB, `TabletScreenSetManager` 286L, `HubScreenSetLibraryPage` 24KB, `TabletRequestsPage` 16KB | 3세대 전부 |
 | PharmacyHub | `TabletsPage.tsx` 400L | 축소 모델 |
 | K-Cosmetics | `StoreTabletDisplaysPage.tsx` + `TabletStorePage.tsx` + `tabletDisplayApi.ts` | 1세대 |
-| GlycoPharm | `StoreTabletDisplaysPage.tsx` + `TabletLayout.tsx` + `api/tabletDisplays.ts` | 1세대 |
 
 ---
 
@@ -85,13 +84,13 @@
 | `VALID_QR_LANDING_TYPES` (KPA/공통) | `CANONICAL_KEEP` | `['product','promotion','page','link','video','screen_set']` (`store-qr.service.ts` 883L). |
 | `store_qr_codes.type` 컬럼 | `CANONICAL_NEEDS_ALIGNMENT` | `store-qr.service.ts:757` `type: type \|\| landingType` — `type` 이 `landing_type` 을 사실상 중복한다. 이중 진실 원천. |
 | PH `ALLOWED_LANDING_TYPES` | `CANONICAL_NEEDS_ALIGNMENT` (의도적 축소) | `['page','product','link']`. 컨트롤러 헤더가 사유를 명시: "**연결 대상이 없는 QR 타입은 만들지 않는다**(스캔했을 때 빈 화면이 되는 QR 0)". 정본 §5 의 마지막 행과 **일치하는 원칙** — 다만 매장축이 붙으면 확대해야 하는 임시 상태. |
-| `operator_qr_templates` | `CANONICAL_KEEP` | 운영자 HUB QR 템플릿. slug/organization/scan tracking **없음** — 실제 발급은 매장 가져가기 시점 `store_qr_codes`. 3서비스(KPA/GP/KCos) `api/operatorQr.ts` 보유. |
+| `operator_qr_templates` | `CANONICAL_KEEP` | 운영자 HUB QR 템플릿. slug/organization/scan tracking **없음** — 실제 발급은 매장 가져가기 시점 `store_qr_codes`. 2서비스(KPA/KCos) `api/operatorQr.ts` 보유. |
 | QR HUB 가져오기 | `CANONICAL_KEEP` | `hub-content.controller/service` + `asset-snapshot.controller` 경유. |
 | QR analytics | `CANONICAL_NEEDS_ALIGNMENT` | `store-analytics.controller.ts`(157L) = organization 단위 KPI + TOP QR + device + 일별 추이. **Content 축·Placement 축 없음.** 활성 QR 판정은 `QR_LANDABLE_CONDITION` 로 공개 게이트와 동일 — 이 부분은 이미 정렬됨. |
 | QR 인쇄/출력 | `CANONICAL_KEEP` | KPA `QrPrintTemplateModal.tsx`. 타 서비스 미보유. |
 | PH QR 컨트롤러 | `DUPLICATED_TO_COMMONIZE` | `PharmacyHubStoreQrController.ts` 604L — 공통 `store_qr_codes` 원장 위의 **PH 전용 구현**. 태블릿과 달리 공통 라우터를 쓰지 않는다. |
 | PH `/qr/public/:slug` | `DUPLICATED_TO_COMMONIZE` | 공개 resolver 가 서비스별로 존재. |
-| 프론트 QR 화면 | `DUPLICATED_TO_COMMONIZE` | KPA `StoreQRPage.tsx` 2070L · `QrLandingPage.tsx` 622L / PH `QrPage.tsx` 617L · `QrLandingPage.tsx` 120L / GP·KCos `StoreQrPage.tsx`. **4서비스 4구현.** |
+| 프론트 QR 화면 | `DUPLICATED_TO_COMMONIZE` | KPA `StoreQRPage.tsx` 2070L · `QrLandingPage.tsx` 622L / PH `QrPage.tsx` 617L · `QrLandingPage.tsx` 120L / KCos `StoreQrPage.tsx`. **3서비스 4구현.** |
 
 ### 3-1. KPA QR target source 5종 (`StoreAssetSelectorModal.tsx`)
 
@@ -114,12 +113,12 @@
 | `@o4o/screen-content-core` | api-server + editor 패키지 | `CANONICAL_KEEP` |
 | `@o4o/tablet-screen-set-editor` (1639L) | web-kpa-society · web-neture · web-pharmacy-hub | `CANONICAL_KEEP` |
 | `@o4o/tablet-kiosk-core` | 태블릿 runtime | `CANONICAL_KEEP` |
-| `@o4o/store-ui-core` `StoreTabletDisplaysView`(172L, tablet 컴포넌트 총 546L) | **web-glycopharm · web-k-cosmetics 만** | `LEGACY_INTERMEDIATE` |
-| `@o4o/store-ui-core` `StoreQrConsoleView` | **web-glycopharm · web-k-cosmetics 만** | `LEGACY_INTERMEDIATE` |
+| `@o4o/store-ui-core` `StoreTabletDisplaysView`(172L, tablet 컴포넌트 총 546L) | web-k-cosmetics 만 | `LEGACY_INTERMEDIATE` |
+| `@o4o/store-ui-core` `StoreQrConsoleView` | web-k-cosmetics 만 | `LEGACY_INTERMEDIATE` |
 
 ### 4-1. 핵심 발견 — 공통화가 잘못된 세대를 가리킨다
 
-현재 유일한 "공통 매장 Tablet/QR UI"인 `@o4o/store-ui-core` 는 **1세대(`store_tablet_displays`) 모델**을 담고 있고, 그것을 쓰는 서비스는 GlycoPharm · K-Cosmetics 둘뿐이다. 반면:
+현재 유일한 "공통 매장 Tablet/QR UI"인 `@o4o/store-ui-core` 는 **1세대(`store_tablet_displays`) 모델**을 담고 있고, 그것을 쓰는 서비스는 K-Cosmetics 둘뿐이다. 반면:
 
 - **KPA** — 가장 두꺼운 3세대 구현을 **자체 보유**(공통 패키지 미사용)
 - **PharmacyHub** — 가장 얇은 구현을 **자체 보유**(공통 패키지 미사용)

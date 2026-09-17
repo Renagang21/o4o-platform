@@ -155,7 +155,7 @@ role 부여는 **DB write + 권한 변경**이라 CLAUDE.md 중지 조건 *"권�
 | 미인증 | 401 | **401** `{"success":false,"code":"AUTH_REQUIRED"}` |
 | 인증 O · kpa-branch 미가입 (`sohae2100`) | 403 | **403** `{"success":false,"code":"MEMBERSHIP_NOT_FOUND"}` |
 
-`sohae2100` 은 `kpa:admin`·`neture:admin` 등 **타 서비스 admin 을 다수 보유**하지만 차단됐다. `KPA_BRANCH_SCOPE_CONFIG.blockedServicePrefixes` 가 `kpa`·`neture`·`glycopharm`·`cosmetics`·`pharmacy-hub` 를 막고 있어 **서비스 간 권한 누수가 없음**이 실증됐다.
+`sohae2100` 은 `kpa:admin`·`neture:admin` 등 **타 서비스 admin 을 다수 보유**하지만 차단됐다. `KPA_BRANCH_SCOPE_CONFIG.blockedServicePrefixes` 가 `kpa`·`neture`·`cosmetics`·`pharmacy-hub` 를 막고 있어 **서비스 간 권한 누수가 없음**이 실증됐다.
 
 ### 4-9. 회귀 — ✅
 

@@ -354,7 +354,6 @@ Block 1: "Neture 이용 가이드"
   - Market Trial → /guide/features/market-trial
 
 Block 2: "다른 서비스 보기"
-  - GlycoPharm, K-Cosmetics, KPA-Society (외부 링크)
 ```
 
 `O4OHelpSection` (`@o4o/shared-space-ui`) 재사용 — `currentServiceKey='neture'` 자동 필터.

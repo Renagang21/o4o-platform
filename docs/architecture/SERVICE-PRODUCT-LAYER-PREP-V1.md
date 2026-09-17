@@ -23,7 +23,7 @@
 | Column | Type | Description |
 |--------|------|-------------|
 | id | UUID PK | gen_random_uuid() |
-| service_key | VARCHAR(50) | 서비스 식별자 (kpa, glycopharm, cosmetics) |
+| service_key | VARCHAR(50) | 서비스 식별자 (kpa, cosmetics) |
 | master_id | UUID FK | → product_masters.id |
 | offer_id | UUID FK | → supplier_product_offers.id (CASCADE) |
 | status | VARCHAR(20) | active / inactive / suspended |

@@ -583,7 +583,6 @@ SCHEDULED ──start──→ IN_PROGRESS ──complete──→ COMPLETED
 | 서비스 | LMS 사용 | 비고 |
 |--------|---------|------|
 | web-kpa-society | **YES** (유일) | 9개 교육 페이지 + 5 컴포넌트 |
-| web-glycopharm | NO | 강좌 관련 코드 없음 |
 | web-glucoseview | NO | 강좌 관련 코드 없음 |
 | web-k-cosmetics | NO | 강좌 관련 코드 없음 |
 
@@ -655,7 +654,7 @@ O4O Boundary Policy V1에 따르면:
 
 - LMS Core는 **서비스 무관(service-agnostic)** Core 패키지
 - KPA Extension이 KPA 특화 워크플로(승인, 강사자격)를 추가
-- 다른 서비스(Glycopharm, GlucoseView, K-Cosmetics)는 LMS를 사용하지 않음
+- 다른 서비스(GlucoseView, K-Cosmetics)는 LMS를 사용하지 않음
 - 향후 다른 서비스에서 LMS를 사용하면 `organizationId`로 자연 격리됨
 
 ---
@@ -803,7 +802,6 @@ KPA Extension에서 생성되는 모든 강좌는 **`isOrganizationExclusive=tru
 | 서비스 | LMS 의존 | 향후 도입 가능성 |
 |--------|---------|----------------|
 | web-kpa-society | ✅ 직접 사용 | 현재 유일 소비자 |
-| web-glycopharm | ❌ 없음 | 낮음 (제약 도메인) |
 | web-glucoseview | ❌ 없음 | 낮음 (혈당 모니터링) |
 | web-k-cosmetics | ❌ 없음 | 중간 (교육 콘텐츠 가능) |
 | neture (B2B) | ❌ 없음 | 중간 (공급자 교육) |

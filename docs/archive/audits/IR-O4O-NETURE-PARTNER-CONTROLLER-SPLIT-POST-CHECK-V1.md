@@ -56,7 +56,7 @@
 | 도메인 | 파트너 모집(recruiting) + 신청(application) |
 | 경계 적절성 | 적절 — 모집 공고 → 신청 → 승인/거절의 단일 워크플로우 |
 | 타 도메인 혼합 | 없음 |
-| 서비스 의존 | `NetureService` (모집/신청), `GlycopharmRepository` (모집 상품) |
+| 서비스 의존 | `NetureService` (모집/신청) |
 
 #### partner-dashboard.controller.ts
 
@@ -65,7 +65,7 @@
 | 도메인 | 대시보드 아이템 CRUD + 콘텐츠 링크 CRUD |
 | 경계 적절성 | 적절 — content link는 dashboard item의 하위 리소스. 분리 시 응집도 하락 |
 | 타 도메인 혼합 | 없음 |
-| 서비스 의존 | `PartnerService` (콘텐츠 batch fetch), `NetureService` (summary), `GlycopharmRepository` (제품 정보) |
+| 서비스 의존 | `PartnerService` (콘텐츠 batch fetch), `NetureService` (summary) |
 | 크기 관련 | 473 lines — 10 endpoints 기준 endpoint당 평균 47 lines. 적정 |
 
 #### partner-commerce.controller.ts
@@ -108,7 +108,6 @@
 | 검사 항목 | 결과 |
 |----------|------|
 | 사용되지 않는 import | **없음** |
-| `GlycopharmProduct` type import (dashboard) | 사용됨 — line 109 `Map<string, GlycopharmProduct>` |
 | `netureService` (dashboard) | 사용됨 — line 202 `getPartnerDashboardSummary()` |
 | `RequestHandler` type import (recruitment) | 사용됨 — line 25 deps type |
 | facade에 stale code | **없음** — 순수 compose만 |

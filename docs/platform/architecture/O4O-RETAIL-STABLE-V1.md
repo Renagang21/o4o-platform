@@ -12,7 +12,7 @@
 > "매장 경영자는 O4O를 이용하여 소비자에게 판매하지 않는다" 원칙과 **충돌 후보**다.
 >
 > 실제로 이 loop 의 **결제 leg 은 이미 차단되어 있다** — `WO-O4O-STORE-SALE-CHECKOUT-ROUTE-DEPRECATION-V1`
-> 이 glycopharm · cosmetics · kpa 의 payment prepare/confirm 을 `410 STORE_SALE_PAYMENT_DEPRECATED`
+> 이 cosmetics · kpa 의 payment prepare/confirm 을 `410 STORE_SALE_PAYMENT_DEPRECATED`
 > 로 막았다. 즉 본 문서가 기술하는 "폐쇄 루프"는 현재 문서 그대로 동작하지 않는다.
 >
 > 본 표기는 판정이 아니다. 해당 문서 §8 판정 절차(producer / consumer / production 사용 여부)를
@@ -20,7 +20,6 @@
 > 본 문서의 FROZEN 상태와 본문은 변경하지 않았다.
 >
 > ---
-
 
 > **Status**: FROZEN
 > **Effective**: 2026-02-16
@@ -46,7 +45,6 @@ Hub → Storefront → Checkout → Payment → Event → Order 전이가 단일
 opl.is_active = true          -- organization_product_listings
 opc.is_active = true          -- organization_product_channels
 oc.status = 'APPROVED'        -- organization_channels (channel_type = 'B2C')
-p.status = 'active'           -- glycopharm_products
 ```
 
 ### 적용 구간
@@ -56,7 +54,7 @@ p.status = 'active'           -- glycopharm_products
 | Hub KPI | `store-hub.controller.ts` | COUNT FILTER |
 | Storefront | `store.controller.ts` → `queryVisibleProducts()` | 4-way INNER JOIN |
 | Checkout | `checkout.controller.ts` | Channel query + mapping query + product validation |
-| Confirm 재검증 | `GlycopharmPaymentEventHandler.ts` → `checkSalesLimitBeforePaid()` | Channel mapping query |
+| Confirm 재검증 | — | Channel mapping query |
 
 ### 변경 금지
 
@@ -82,7 +80,7 @@ WHERE o.status = 'PAID'
 | 보호 계층 | 위치 | 메커니즘 |
 |----------|------|---------|
 | Checkout | `checkout.controller.ts` | QueryRunner Transaction + `FOR UPDATE OF o` |
-| Confirm | `GlycopharmPaymentEventHandler.ts` | `checkSalesLimitBeforePaid()` 재검증 |
+| Confirm | — | `checkSalesLimitBeforePaid()` 재검증 |
 | Payment | `PaymentCoreService.ts` | `transitionStatus()` atomic UPDATE WHERE |
 
 ### 흐름
@@ -126,7 +124,7 @@ Confirm: checkSalesLimitBeforePaid()
 
 | 항목 | 값 |
 |------|------|
-| 대상 | `status='created'`, `orderType='RETAIL'`, `serviceKey='glycopharm'` |
+| 대상 | `status='created'`, `orderType='RETAIL'` |
 | TTL | 15분 |
 | 동작 | `status → 'cancelled'` |
 | Endpoint | `POST /checkout/cleanup-expired` |

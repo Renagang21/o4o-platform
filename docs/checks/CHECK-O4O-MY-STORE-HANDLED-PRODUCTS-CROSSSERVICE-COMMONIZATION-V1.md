@@ -11,7 +11,6 @@
 - PharmacyHub만 `masterId`와 `storeConnection`을 추가로 가진다.
 - KPA UI는 O4O 표준상품 추가, 신규상품 요청, 상세설명서, 다국어 콘텐츠, 상품 QR 등 KPA 고유 액션이 많다.
 - PharmacyHub UI는 공급 상품에서 추가, 활성/비활성, 매장 연결 상태 등 PharmacyHub 업무 규칙을 가진다.
-- K-Cosmetics/GlycoPharm의 `StoreLocalProductsManager`는 `StoreLocalProduct` CRUD 축으로 의미가 다르므로 이번 handled-products 공통화 대상에서 제외한다.
 - Neture에는 대응하는 store-owner handled-products 화면을 확인하지 못해 미적용한다.
 
 ## 2. 공통 Core
@@ -60,7 +59,7 @@
 - 주문/장바구니/공급상품 의미
 - KPA QR·상세설명서·다국어·신규상품 요청
 - PharmacyHub 공급상품 추가·매장연결·활성화 정책
-- K-Cosmetics / GlycoPharm Local Products
+- K-Cosmetics Local Products
 
 ## 5. 검증
 

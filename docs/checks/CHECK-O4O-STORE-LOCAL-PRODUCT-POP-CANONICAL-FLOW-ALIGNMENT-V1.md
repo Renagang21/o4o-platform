@@ -2,7 +2,7 @@
 
 > WO: `WO-O4O-STORE-LOCAL-PRODUCT-POP-CANONICAL-FLOW-ALIGNMENT-V1`
 > 일자: 2026-07-29
-> 대상: KPA-Society / GlycoPharm / K-Cosmetics (3 서비스 동시 정렬)
+> 대상: KPA-Society / K-Cosmetics (2 서비스 동시 정렬)
 
 ---
 
@@ -15,8 +15,8 @@ WO §1 의 방향 **B-3** (ProductPopBuilderPage 은퇴 → 기존 canonical POP
 
 | 근거 | 확인 사실 |
 |------|-----------|
-| canonical POP 화면이 3 서비스 모두 존재 | `/store/marketing/pop` (KPA `StorePopPage.tsx` / GP `StorePopPage.tsx` / KCos `StorePopPage.tsx`) |
-| **저장·렌더 백엔드가 3 서비스 공통** | `createStorePopController` 단일 구현을 `serviceKey='kpa' / 'glycopharm' / 'cosmetics'` 로 3회 mount → `POST /api/v1/{service}/pharmacy/pop/generate` |
+| canonical POP 화면이 2 서비스 모두 존재 | `/store/marketing/pop` (KPA `StorePopPage.tsx` `StorePopPage.tsx` / KCos `StorePopPage.tsx`) |
+| **저장·렌더 백엔드가 3 서비스 공통** | — |
 | **organization ownership 보장됨** | `requireAuth` → `createRequireStoreOwner(serviceKey)` 가 `req.organizationId` 를 주입하고, 모든 source 조회가 `organizationId` 조건으로 격리된다 |
 | **매장 소유 저장 계약이 이미 존재** | `save:true` → GCS 업로드 후 `store_execution_assets` (`organizationId` / `assetType='file'` / `usageType='pop'` / `sourceType='generated'`) 저장 |
 | **자료함 노출 경로가 이미 존재** | KPA `/store/marketing/pop` "생성된 POP" 목록 + 3 서비스 공통 `/store/library/production-materials` (`getStoreExecutionAssets`) |
@@ -26,10 +26,10 @@ WO §1 의 방향 **B-3** (ProductPopBuilderPage 은퇴 → 기존 canonical POP
 
 ### C(중지)를 선택하지 않은 이유
 
-사전 조사 시점에 GP/KCos canonical POP 화면은 **공급자 공개 자료(`supplierItemIds`) 전용 + blob 다운로드(저장 없음)** 이어서
+사전 조사 시점에 KCos canonical POP 화면은 **공급자 공개 자료(`supplierItemIds`) 전용 + blob 다운로드(저장 없음)** 이어서
 WO §21 의 "매장 POP 결과가 자료함에 저장되지 않음 / 3 서비스 구조 상이" 에 해당하는 것처럼 보였다.
 그러나 이는 **프런트엔드가 기존 백엔드 기능을 호출하지 않고 있었을 뿐**이며,
-`save:true` + org-scoped 저장 + 자료함 노출은 GP/KCos 에도 이미 백엔드·자료함 화면 양쪽에 존재했다.
+`save:true` + org-scoped 저장 + 자료함 노출은 KCos 에도 이미 백엔드·자료함 화면 양쪽에 존재했다.
 따라서 프런트 호출 정렬만으로 3 서비스 동일 정책 적용이 가능 → **C 아님, B**.
 
 ---
@@ -84,7 +84,6 @@ WO §21 의 "매장 POP 결과가 자료함에 저장되지 않음 / 3 서비스
 3 서비스 파일 모두 **얇은 legacy redirect wrapper 로 치환**(물리 삭제 아님 — App.tsx lazy import 계약 보존):
 
 - `services/web-kpa-society/src/pages/pharmacy/ProductPopBuilderPage.tsx`
-- `services/web-glycopharm/src/pages/store-management/ProductPopBuilderPage.tsx`
 - `services/web-k-cosmetics/src/pages/store/ProductPopBuilderPage.tsx`
 
 제거된 기능: `product_ai_contents` 조회 / `pop_short`·`pop_long` 저장 / ProductMaster POP PDF 호출 / local UUID 를 ProductMaster ID 로 전달 — **전부 0**.
@@ -99,8 +98,8 @@ WO §21 의 "매장 POP 결과가 자료함에 저장되지 않음 / 3 서비스
 | 진입점 | 변경 |
 |--------|------|
 | KPA `StoreLocalProductsPage.tsx` (BaseTable, KPA 전용) | `[POP 만들기]` → `CANONICAL_STORE_POP_ROUTE` 직접 진입 |
-| GP·KCos 공통 `StoreLocalProductsManager.tsx` (`@o4o/store-ui-core`) | `[POP 만들기]` → `CANONICAL_STORE_POP_ROUTE` 직접 진입 |
-| KPA / GP / KCos `ProductMarketingPage.tsx` | `handleCreatePop` → `CANONICAL_STORE_POP_ROUTE`. 연결 자료실 항목이 있으면 기존 `origin='library'` prefill 보존, 없으면 `origin='local'` |
+| KCos 공통 `StoreLocalProductsManager.tsx` (`@o4o/store-ui-core`) | `[POP 만들기]` → `CANONICAL_STORE_POP_ROUTE` 직접 진입 |
+| KPA / KCos `ProductMarketingPage.tsx` | `handleCreatePop` → `CANONICAL_STORE_POP_ROUTE`. 연결 자료실 항목이 있으면 기존 `origin='library'` prefill 보존, 없으면 `origin='local'` |
 
 legacy route 를 경유하는 앱 내부 진입은 **0** (App.tsx 의 route 등록만 남음).
 
@@ -111,8 +110,7 @@ legacy route 를 경유하는 앱 내부 진입은 **0** (App.tsx 의 route 등�
 | 서비스 | canonical route | 화면 | 최소 확장 내용 |
 |--------|-----------------|------|----------------|
 | KPA | `/store/marketing/pop` | `pages/pharmacy/StorePopPage.tsx` | `PopItemOrigin` 에 `'local'` 추가 · 진입 자료 로딩/실패/차단 상태 분리 + 재시도 · `localProductItemIds` 전송 |
-| GlycoPharm | `/store/marketing/pop` | `pages/store-management/StorePopPage.tsx` | `origin='local'` 수신 섹션 신규 · `localProductItemIds` + `save:true` 전송(local 진입 시) |
-| K-Cosmetics | `/store/marketing/pop` | `pages/store/StorePopPage.tsx` | GP 와 동일 |
+| K-Cosmetics | `/store/marketing/pop` | `pages/store/StorePopPage.tsx` 와 동일 |
 
 기존 ProductMaster·listing·공급자 자료 흐름은 **변경 없음** (`supplierItemIds` / `libraryItemIds` / `directContentItemIds` / `snapshotItemIds` 경로 그대로).
 하나의 `productId` 로 local/master 를 추측하는 코드는 없다 — origin 분기 명시.
@@ -200,7 +198,6 @@ POST /api/v1/{service}/pharmacy/pop/generate  { save: true, ... }
 | 서비스 | 결과 노출 |
 |--------|-----------|
 | KPA | `/store/marketing/pop` "생성된 POP" 목록(즉시 갱신, PDF 열기·삭제) + `/store/library/production-materials` |
-| GlycoPharm | `/store/library/production-materials` (`getStoreExecutionAssets` 병합 목록) |
 | K-Cosmetics | `/store/library/production-materials` (동일) |
 
 기존 POP PDF 자산은 재편집이 아닌 **재출력** 모델이다. 본 WO 에서 신규 버전관리 구조를 만들지 않았다.
@@ -209,17 +206,17 @@ POST /api/v1/{service}/pharmacy/pop/generate  { save: true, ... }
 
 ## 11~13. 서비스별 결과
 
-| 항목 | KPA | GlycoPharm | K-Cosmetics |
-|------|-----|-----------|-------------|
-| legacy builder route | 유지(redirect wrapper) | 유지(redirect wrapper) | 유지(redirect wrapper) |
-| 진입 버튼 | canonical 직접 | canonical 직접(공통 컴포넌트) | canonical 직접(공통 컴포넌트) |
-| canonical POP route | `/store/marketing/pop` | `/store/marketing/pop` | `/store/marketing/pop` |
-| local prefill | ✅ (`getLocalProduct`) | ✅ (`getLocalProduct`) | ✅ (`getLocalProduct`) |
-| 저장 | `save:true` → `store_execution_assets` | 동일(local 진입 시) | 동일(local 진입 시) |
-| 렌더 | 기존 `generatePopPdf` | 기존 | 기존 |
-| 자료함 이동 | POP 목록 + 제작 자료 | 제작 자료 | 제작 자료 |
-| 오류 UX | 로딩/실패/차단 분리 + 재시도 | 동일 | 동일 |
-| build | ✅ PASS | ✅ PASS | ✅ PASS |
+| 항목 | KPA | K-Cosmetics |
+| ------ | ----- | ------------- |
+| legacy builder route | 유지(redirect wrapper) | 유지(redirect wrapper) |
+| 진입 버튼 | canonical 직접 | canonical 직접(공통 컴포넌트) |
+| canonical POP route | `/store/marketing/pop` | `/store/marketing/pop` |
+| local prefill | ✅ (`getLocalProduct`) | ✅ (`getLocalProduct`) |
+| 저장 | `save:true` → `store_execution_assets` | 동일(local 진입 시) |
+| 렌더 | 기존 `generatePopPdf` | 기존 |
+| 자료함 이동 | POP 목록 + 제작 자료 | 제작 자료 |
+| 오류 UX | 로딩/실패/차단 분리 + 재시도 | 동일 |
+| build | ✅ PASS | ✅ PASS |
 
 ---
 
@@ -264,7 +261,6 @@ rg "ai-contents|pop_short|pop_long|/products/.*/pop/" services/web-*/src
 | `pnpm --filter @o4o/api-server type-check` | ⚠️ **기존 baseline 실패 유지** — 오류 전부 `src/scripts/*` (HFF/OTC 트랙 스크립트, 본 WO 무관·미수정). 본 WO 가 수정한 `src/routes/**` 파일에서 오류 0 (tsc 는 프로젝트 전체 오류를 보고하므로 미보고 = 오류 없음) |
 | `pnpm --filter @o4o/api-server jest store-local-product-description.spec.ts` | ✅ 8 passed (기존 route 회귀 0) |
 | `pnpm --filter @o4o/web-kpa-society build` (`tsc && vite build`) | ✅ PASS |
-| `pnpm --filter glycopharm-web build` (`tsc -b && vite build`) | ✅ PASS |
 | `pnpm --filter @o4o/web-k-cosmetics build` (`tsc && vite build`) | ✅ PASS |
 
 `@o4o/store-ui-core` 는 source-consumed 패키지(`main: ./src/index.ts`)로 별도 build 스텝이 없으며,
@@ -291,19 +287,6 @@ rg "ai-contents|pop_short|pop_long|/products/.*/pop/" services/web-*/src
 | legacy route | `/store/commerce/products/{id}/pop` → `/store/marketing/pop` **1홉 수렴** ✅ · 뒤로가기 loop **없음** ✅ |
 | 전역 API | `ai-contents` **0** · ProductMaster POP(`/products/*/pop/*`) **0** ✅ |
 | console error | **0** ✅ |
-
-### GlycoPharm — `https://glycopharm.co.kr`
-
-| 검증 | 결과 |
-|------|------|
-| 진입 | canonical 직접 진입 ✅ · "매장 자체 상품" 섹션 + 상품명 표시 ✅ |
-| local 단건 조회 | `GET /api/v1/store/local-products/cd3a2b29-…` → **200 success:true** ✅ |
-| **저장(실제 실행)** | `POST /api/v1/glycopharm/pharmacy/pop/generate` → **200** `{assetId:"16aaff1b-…", fileUrl:"…/…98.pdf", title:"후시딘연고(퓨시드산나트륨) POP"}` ✅ |
-| **toast** | `POP PDF가 생성되었습니다. 내 자료함에서 다시 열고 출력할 수 있습니다.` ✅ |
-| **자료함 노출** | `/store/library/production-materials` 에 상품명 POP 노출 ✅ (지표 4 → 6) |
-| legacy route | 1홉 수렴 ✅ · loop 없음 ✅ |
-| 전역 API | `ai-contents` **0** · ProductMaster POP **0** ✅ |
-| console error | 0 ✅ |
 
 ### K-Cosmetics — `https://k-cosmetics.site`
 
@@ -336,7 +319,7 @@ legacy route 에 존재하지 않는 UUID 로 진입 시 canonical 화면이 단
 ### smoke 산출물 (정리 대상)
 
 아래 테스트 POP 자산이 생성되어 남아 있다. 필요 시 각 서비스 UI 에서 삭제:
-`055e995d-af81-4e5a-af12-073176ffcd98`(KPA) · `16aaff1b-38a2-4a46-aafc-fc94f0a9c696`(GP) · `e23f838c-1064-4bd3-babc-2058369c0698`(KCos)
+`055e995d-af81-4e5a-af12-073176ffcd98`(KPA) · `16aaff1b-38a2-4a46-aafc-fc94f0a9c696` · `e23f838c-1064-4bd3-babc-2058369c0698`(KCos)
 (추가로 KPA 에 1차 smoke 산출물 1건.)
 
 ---
@@ -346,10 +329,10 @@ legacy route 에 존재하지 않는 UUID 로 진입 시 canonical 화면이 단
 중지 없음. 프로덕션 smoke 3 서비스 PASS. 잔여:
 
 1. **`api/productAiContent.ts` 미참조 상태** (3 서비스) — `@deprecated` 표기만 함. 물리 삭제는 별도 판단.
-2. **공통화 미수행** (WO §14 명시 범위 외) — GP/KCos `StorePopPage` 의 local 수신 로직이 두 파일에 동일 형태로 존재.
+2. **공통화 미수행** (WO §14 명시 범위 외) — KCos `StorePopPage` 의 local 수신 로직이 두 파일에 동일 형태로 존재.
    본 WO 는 "먼저 3 서비스 기능 계약 정렬" 단계이며, 공통 package 추출은 별도 WO 대상.
-3. **KPA vs GP/KCos canonical POP 화면 구조 차이 잔존** — KPA 는 production state 기반 다중 origin,
-   GP/KCos 는 공급자 자료 선택 중심. 본 WO 는 local 흐름만 동일 정책으로 정렬했고 화면 구조 통합은 범위 외.
+3. **KPA vs KCos canonical POP 화면 구조 차이 잔존** — KPA 는 production state 기반 다중 origin
+   KCos 는 공급자 자료 선택 중심. 본 WO 는 local 흐름만 동일 정책으로 정렬했고 화면 구조 통합은 범위 외.
 4. **새로고침 시 선택 해제** — 전 origin 공통 기존 정책(§6 노트). 지속성이 필요하면 별도 WO.
 5. **K-Cosmetics `/store/{orgId}/insights` 500** — 본 WO 무관 기존 결함. 별도 처리 필요.
 6. **smoke 테스트 POP 자산 3~4건 잔존** (§17) — 필요 시 UI 삭제.
@@ -371,6 +354,6 @@ legacy route 에 존재하지 않는 UUID 로 진입 시 canonical 화면이 단
 - `packages/store-ui-core/src/components/StoreAssetDerivationViewer.tsx` — source kind 라벨
 - `packages/store-ui-core/src/components/local-products/StoreLocalProductsManager.tsx` — POP 진입 canonical
 
-**KPA (5)** · **GlycoPharm (4)** · **K-Cosmetics (4)**
+**KPA (5)** · **K-Cosmetics (4)**
 - `ProductPopBuilderPage.tsx` (legacy wrapper) / `StorePopPage.tsx` / `ProductMarketingPage.tsx` /
   local product API client(`getLocalProduct`) / (KPA) `StoreLocalProductsPage.tsx` / `productAiContent.ts` deprecation

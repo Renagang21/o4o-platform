@@ -133,7 +133,7 @@ export class StoreQrScanEvent {
 
 ### 4.2 Mount
 
-`createStoreQrLandingController` 가 KPA / GlycoPharm / K-Cosmetics 3 서비스 routes 에 mount ([kpa.routes.ts:397](apps/api-server/src/routes/kpa/kpa.routes.ts#L397), [glycopharm.routes.ts:379](apps/api-server/src/routes/glycopharm/glycopharm.routes.ts#L379), [cosmetics.routes.ts:139](apps/api-server/src/routes/cosmetics/cosmetics.routes.ts#L139)). `serviceKey` 인자로 `createRequireStoreOwner` 가 cross-service 차단.
+`serviceKey` 인자로 `createRequireStoreOwner` 가 cross-service 차단.
 
 ### 4.3 부재 endpoint
 
@@ -251,7 +251,6 @@ QR 은 **URL indirection** 으로 콘텐츠가 아닌 redirect rule. 운영자�
 
 - `landingType='tablet'` 이미 frontend [`QrLandingPage:65-68`](services/web-kpa-society/src/pages/qr/QrLandingPage.tsx#L65-L68) 에서 처리: `navigate(/tablet/${storeSlug}?from=qr)`
 - backend POST validation 에 `'tablet'` 부재 — 별도 흐름으로 생성된 듯 (조사 범위 외)
-- GlycoPharm `event.entity.ts` 의 `sourceType` 에 `'qr' | 'tablet' | 'web' | 'signage' | 'print'` 정의 — funnel/report 에서 사용
 - 매장 태블릿 자체는 별도 트랙 (`/tablet/:storeSlug`) — 본 IR QR 트랙과 직교
 
 ### 7.2 설문

@@ -214,7 +214,7 @@ function LessonRow({ lesson, index, accent, openLabel, rowClickMode, palette, pa
  * 완료/현재/잠금 상태는 view model 로 주입(서비스가 enrollment 기준 계산).
  *
  * - `rowClickMode='action'`(기본): 우측 trailing "보기" 링크/버튼(기존 동작).
- * - `rowClickMode='row'`: 행 전체 클릭/링크(레슨 사이드바 패턴 — KPA/GP/KCos 수렴용).
+ * - `rowClickMode='row'`: 행 전체 클릭/링크(레슨 사이드바 패턴 — KPA/KCos 수렴용).
  *   href 있으면 `<a>`(네이티브 키보드/링크), 없으면 `<button>`(네이티브 키보드).
  *   locked 레슨은 비클릭(aria-disabled).
  */

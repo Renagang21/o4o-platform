@@ -3,7 +3,7 @@
  *
  * WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §8 (#79)
  *
- * backend 는 KPA / GlycoPharm / K-Cosmetics 와 **완전히 동일한 공통 모듈**이다:
+ * backend 는 KPA / K-Cosmetics 와 **완전히 동일한 공통 모듈**이다:
  *   /api/v1/foreign-visitor/partners (WO-O4O-FOREIGN-VISITOR-PARTNER-MODEL-V1).
  * 이번 WO 는 그 모듈의 serviceKey allowlist 에 'pharmacy-hub' 를 더했을 뿐이며
  * 분기·복제·신규 table 은 없다. 조직 해석은 서버의 isStoreOwner(serviceKey) 가 한다

@@ -12,7 +12,7 @@
 | 항목 | 내용 |
 |------|------|
 | 조사 일자 | 2026-05-15 |
-| 조사 항목 | KPA /demo/*, KPA /pharmacy/* chain, GlycoPharm /service/*, K-Cosmetics /partner/* |
+| 조사 항목 | KPA /demo/*, KPA /pharmacy/* chain, service/*, K-Cosmetics /partner/* |
 | 조사 방법 | App.tsx 전수 분석 + 페이지 파일 직접 읽기 + 백엔드 API 존재 확인 + 메뉴/링크 교차확인 |
 | 선행 IR | IR-O4O-DEADCODE-PHASE1-ROUTE-MENU-ORPHAN-AUDIT-V1 |
 
@@ -147,62 +147,6 @@
 
 ---
 
-## 3. GlycoPharm `/service`, `/service-login`, `/service/dashboard`
-
-### 3-A. 현황 요약
-
-| 항목 | 내용 |
-|------|------|
-| WO | WO-AUTH-SERVICE-IDENTITY-PHASE2-GLYCOPHARM |
-| 현재 Phase | Phase 1 구현 완료, Phase 2 진행 예정 |
-| Frontend 구현 | **완성** (ServiceLoginPage + ServiceDashboardPage) |
-| Backend API 구현 | **완성** (service auth routes + service-user service) |
-| 메뉴/nav 노출 | **없음** — 직접 URL 또는 redirect로만 접근 |
-
-### 3-B. 페이지 구현 상태
-
-**ServiceLoginPage** (`pages/auth/ServiceLoginPage.tsx`):
-- OAuth provider 버튼 UI (Google, Kakao, Naver) 구현 완료
-- `/api/v1/auth/service/login` API 호출 완료
-- serviceId: 'glycopharm' 전달
-- Phase 1: JSON-encoded OAuth 테스트 프로필 방식
-
-**ServiceDashboardPage** (`pages/service/ServiceDashboardPage.tsx`):
-- 인증된 서비스 사용자 프로필 표시 완료
-- /forum, /education, / 빠른 링크
-- 로그아웃 기능
-- AuthContext에서 서비스 사용자 컨텍스트 로드
-
-### 3-C. 백엔드 API 구현 상태
-
-| 엔드포인트 | 상태 |
-|------------|------|
-| `POST /api/v1/auth/service/login` | **구현 완료** |
-| `POST /api/v1/auth/service/refresh` | **구현 완료** |
-| `GET /api/v1/auth/service/me` | **구현 완료** |
-| `GET /api/v1/auth/service/status` | **구현 완료** |
-
-- Service JWT 토큰(`tokenType: 'service'`) 분리 발급
-- `requireServiceUser` middleware 구현
-- Phase 2 TODO: 실제 OAuth provider validation (현재 스텁)
-
-### 3-D. 메뉴/링크 노출 여부
-
-- 어떤 sidebar, header, 메뉴에도 `/service`, `/service-login` 링크 없음
-- ServiceUserProtectedRoute를 통한 자동 redirect 또는 직접 URL만으로 접근 가능
-- 일반 사용자에게 노출된 진입점 없음
-
-### 3-E. 판정
-
-**HOLD UNTIL AUTH PHASE2**
-
-- Phase 1 구현은 완료 상태 — 스텁이 아니라 실제 동작하는 코드
-- 삭제 금지 — 백엔드 API 및 프론트엔드 플로우가 연결되어 있음
-- Phase 2(실제 OAuth provider validation) 완료 후 production 활성화 예정
-- 현재 메뉴 비노출은 의도적 — Phase 2 완료 전 일반 사용자 접근 차단
-
----
-
 ## 4. K-Cosmetics `/partner/*`
 
 ### 4-A. 현황 요약
@@ -263,7 +207,6 @@
 |--------|------|-----------|------|-----------|-------------------|
 | KPA-Society | `/demo/*` 블록 전체 | 삭제 조건 미충족. 진입 링크 2곳 존재. 일부 페이지는 실제 API 호출. | 독립 도메인 미출시. PlatformFooter + KpaOperatorDashboard에 링크. | **HOLD** | YES — SVC-B 출시 WO와 연계 |
 | KPA-Society | `/pharmacy/*` redirect chain 23개 | 전원 /store 계열 수렴. 메뉴/외부 링크 0개. | wildcard 통합 안전성 확인됨. 실제 페이지 2개는 유지. | **CONSOLIDATE** | YES — Phase 4 WO (route 수정) |
-| GlycoPharm | `/service`, `/service-login`, `/service/dashboard` | Phase 1 구현 완료. 백엔드 API 완성. 메뉴 미노출(의도적). | Phase 2 OAuth 미완. 삭제 시 기구현 플로우 파괴. | **HOLD UNTIL AUTH PHASE2** | YES — WO-AUTH-SERVICE-IDENTITY-PHASE2-GLYCOPHARM 완료 후 |
 | K-Cosmetics | `/partner/*` (5 routes) | 전 페이지 구현 완료. nav 노출. 역할 정의. 테스트 계정. | WO-PARTNER-DASHBOARD-API-FE-INTEGRATION-V1 진행 중. | **KEEP** | NO (ongoing WO 있음) |
 
 ---
@@ -304,7 +247,6 @@
 |------|-------------------|-----------|
 | KPA `/pharmacy/*` 통합 | 23개 route → wildcard 1개로 통합 | 없음 (즉시 가능) |
 | KPA `/demo/*` 삭제 | DemoLayout, 진입 링크, 페이지 파일 일괄 제거 | SVC-B 독립 서비스 출시 |
-| GlycoPharm `/service/*` 활성화 | Phase 2 OAuth 연동 완료 후 메뉴 노출 | WO-AUTH-SERVICE-IDENTITY-PHASE2-GLYCOPHARM |
 
 ---
 
@@ -313,7 +255,6 @@
 | 항목 | 이유 |
 |------|------|
 | K-Cosmetics `/partner/*` (5 routes) | 완성된 구현체, 역할 정의, nav 노출, 진행 중 WO |
-| GlycoPharm `/service`, `/service-login`, `/service/dashboard` | Phase 1 완성, 백엔드 API 연결, Phase 2 진행 예정 |
 | KPA `/pharmacy`, `/pharmacy/approval` | 실제 동작하는 페이지 (redirect 아님) |
 | KPA `/demo/*` | 삭제 조건 미충족 상태에서 강제 삭제 금지 |
 

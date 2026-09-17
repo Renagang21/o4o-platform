@@ -576,7 +576,7 @@ export function createMemberController(
         //   KPA 회원관리 화면의 "추가 권한" 컬럼은 KPA scope 만 표시 (cross-service leak 방지).
         //   - kpa:* (KPA 서비스 권한)
         //   - platform:super_admin (운영자가 식별해야 할 플랫폼 관리자)
-        //   다른 service role (supplier, neture:*, glycopharm:*, lms:instructor, pharmacy 등) 은
+        //   다른 service role (supplier, neture:*, lms:instructor, pharmacy 등) 은
         //   KPA 운영자 mental model 외이므로 응답에서 제외.
         //   (역할 자체는 그대로 보존 — 부여/삭제 로직 미변경.)
         //   IR: docs/investigations/IR-O4O-KPA-MEMBER-ROLE-BADGE-CROSSSERVICE-LEAK-AUDIT-V1.md

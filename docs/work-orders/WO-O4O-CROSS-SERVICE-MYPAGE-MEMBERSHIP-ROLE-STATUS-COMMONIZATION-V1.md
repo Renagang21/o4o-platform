@@ -35,7 +35,6 @@ My Page의 다음 개별 기능인 **회원 상태 / 서비스 역할 / 가입·
 
 ```text
 KPA-Society
-GlycoPharm
 K-Cosmetics
 Neture
 Pharmacy-Hub
@@ -326,13 +325,6 @@ service config
 승인 상태
 ```
 
-### GlycoPharm
-
-```text
-서비스 가입/승인 상태
-약사 관련 역할
-```
-
 ### K-Cosmetics
 
 ```text
@@ -536,7 +528,6 @@ thin wrapper 전환 허용.
 
 ```text
 KPA
-GP
 KCos
 Neture
 PH
@@ -688,7 +679,6 @@ role hierarchy 변경
 @o4o/account-ui build
 
 KPA typecheck/build
-GP typecheck/build
 KCos typecheck/build
 Neture typecheck/build
 PH typecheck/build
@@ -888,7 +878,6 @@ MyRequestsInbox.tsx      → §6 경계 확인용 (Requests 소유, 침범 금�
 
 ```text
 KPA-Society   /mypage            (프론트 = services/web-kpa-society)
-GlycoPharm    /mypage
 K-Cosmetics   /mypage
 Neture        /mypage
 Pharmacy-Hub  /account · /store-owner/account   ← /mypage 없음. §23 "억지로 새 페이지 금지" 적용 대상
@@ -921,7 +910,6 @@ kpa_pharmacist_profiles = 자격(Qualification)
 공통 컴포넌트 커밋 전 아래를 실행하고, 매칭이 주석 외에 남으면 §12 위반이다.
 
 ```bash
-grep -nE "serviceKey|kpa|glycopharm|cosmetics|neture|pharmacy|role ===|status ===" \
   packages/account-ui/src/components/<새-또는-변경-컴포넌트>.tsx
 ```
 

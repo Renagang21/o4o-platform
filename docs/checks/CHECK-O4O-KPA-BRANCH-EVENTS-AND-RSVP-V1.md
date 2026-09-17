@@ -235,6 +235,5 @@ API 로 현재 상태를 확인하니 `published` 였다. 실제로 `cancelled` 
 발견 1건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 1건
 
 **발견 1건 (범위 밖 · 미수정)** — `apps/api-server/src/copilot/insight-rules.ts:38` 타입 오류가
-W9 CHECK 기록 이후에도 남아 있다. `83853d8d3 GlycoPharm 서비스 완전 삭제` 가 데이터에서
-`glycopharm` 을 제거했으나 `AIServiceId` 타입에는 남겨두어 `Record<AIServiceId, …>` 불만족.
+W9 CHECK 기록 이후에도 남아 있다.
 이번 변경과 무관한 기존 실패이며 CLAUDE.md 중지 조건에 해당해 고치지 않았다. → 별도 WO 후보.

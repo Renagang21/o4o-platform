@@ -268,7 +268,7 @@ https://www.youtube.com/embed/{videoId}?autoplay=1&mute=1&loop=1&playlist={video
            서비스 웹 로그인이 전 서비스에서 불가하다.
            문서가 허용하는 우회(L1 토큰 주입)는 "로그인 자체의 검증에는 쓸 수 없다" 고 §4-2 가 명시한다.
 확인한 것: L1 API 로그인 200 · GET /api/v1/store/tablets 200 (계약 살아 있음)
-           단 data=[] — renagang21 은 org 4개(공급자/GP약국/테스트약국/뷰티샵) 소속이라
+           단 data=[] — renagang21 은 org 4개(공급자/테스트약국/뷰티샵) 소속이라
            service-scoped org 해석이 테스트 약국으로 수렴하지 않았다.
            x-service-key(kpa · kpa-society) · x-organization-id 를 줘도 동일하게 0.
            이는 TEST-ACCOUNTS §7 주의가 이미 기록한 다중 org 특성이며 신규 결함이 아니다.

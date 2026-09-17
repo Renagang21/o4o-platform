@@ -13,7 +13,7 @@
 | 작업 시작 base HEAD | `0127d1ad5` |
 | 브랜치 | `main` (직접 작업) |
 | 작업 전 `git status --short` | clean (WO §3 통과) |
-| 대상 서비스 | web-neture / web-kpa-society / web-glycopharm / web-k-cosmetics / web-pharmacy-hub |
+| 대상 서비스 | — |
 
 ---
 
@@ -38,7 +38,6 @@
 |---|---:|---:|---:|---:|
 | web-neture | 10 | 10 | 0 | 0 |
 | web-kpa-society | 24 | 15 | 8 | 1 |
-| web-glycopharm | 14 | 12 | 1 | 1 |
 | web-k-cosmetics | 9 | 9 | 0 | 0 |
 | web-pharmacy-hub | 0 | 0 | 0 | 0 |
 
@@ -75,21 +74,6 @@ web-pharmacy-hub 은 모든 로더가 이미 `error` state 와 실패 문구를 
 | `pages/pharmacy/StoreSignagePage.tsx` (6) | 기존 `error`/`playlistError` 를 **실제로 채우도록** 교정 + `scheduleError` 신설 + 재시도 |
 | `pages/pharmacy/StoreTabletDisplaysPage.tsx` | 공통 대기영상 후보 모달 error 분기 + 재시도 |
 
-### web-glycopharm (12 site / 9 파일) — 기존 `components/common/ErrorState.tsx` 재사용(문구만 표준화)
-
-| 파일 | 조치 |
-|---|---|
-| `pages/b2b/SupplyPage.tsx` | 기존 `error` state 를 catch 에서 채움 |
-| `pages/community/CommunityMainPage.tsx` (최신 활동) | `loadError` prop 추가 + 재시도 |
-| `pages/forum/ForumFeedbackPage.tsx` | ErrorState + reloadKey 재시도 |
-| `pages/operator/RecruitmentExposureApprovalPage.tsx` | ErrorState + 재시도 |
-| `pages/store-management/StoreLibraryContentsPage.tsx` | ErrorState + 재시도 |
-| `pages/store-management/StoreLibraryResourcesPage.tsx` | ErrorState + 재시도 |
-| `pages/store-management/StoreRecruitmentApplicationsPage.tsx` | ErrorState + 재시도 |
-| `pages/store-management/b2b-order/B2BOrderPage.tsx` | 기존 `error` state 를 catch 에서 채움 |
-| `pages/store-management/StoreSignagePage.tsx` (3) | error/playlistError 채움 + `playlistItemsError` 신설 |
-| `pages/store-management/signage/StoreSignageMainPage.tsx` (6) | 위와 동일 + `scheduleError` 신설 |
-
 ### web-k-cosmetics (9 site / 8 파일) — 신규 `components/common/LoadErrorNotice.tsx`
 
 | 파일 | 조치 |
@@ -109,7 +93,6 @@ web-pharmacy-hub 은 모든 로더가 이미 `error` state 와 실패 문구를 
 
 | 화면 | 라벨 | 왜 HOLD 인가 | 다음 수정 방법 |
 |---|---|---|---|
-| `web-glycopharm/pages/community/CommunityMainPage.tsx` — 공지 목록(`loadNotices`) | `HOLD_COMPLEX_STATE` | 공지는 공통 `StandardHomeTemplate` 의 `notices` / `noticesLoading` prop 으로 전달된다. error 를 표현하려면 **공통 템플릿의 prop 계약 변경**이 필요하고 이는 WO §5 금지(공통 패키지 승격·계약 변경)에 해당한다. 같은 파일의 "최신 활동" 섹션은 로컬 컴포넌트라 이번에 수정했다. | `StandardHomeTemplate` 에 `noticesError` / `onNoticesRetry` optional prop 추가 별도 WO. 소비처(KPA / GlycoPharm / K-Cosmetics / Neture) 전수 확인 필요 — CLAUDE.md Shared Module Change Rule. |
 | `web-kpa-society/pages/signage/ContentHubPage.tsx:288` | `HOLD_POLICY` | catch 가 **DELETE 실패**를 삼키는 자리다. 조회 실패(load)가 아니라 mutation 실패이므로 4상태 계약 대상이 아니며 문구·재시도 설계가 다르다(토스트 / 되돌리기). | mutation 실패 표준(토스트 + 실패 시 목록 롤백)을 별도 배치에서 처리. |
 
 ### KEEP_SAFE_EMPTY (11) — 수정하지 않은 이유
@@ -122,7 +105,6 @@ web-pharmacy-hub 은 모든 로더가 이미 `error` state 와 실패 문구를 
 | `kpa/pages/pharmacy/HubScreenSetLibraryPage.tsx:160,173,188` | 미리보기·상세 렌더 실패 — 상세·가져오기는 계속 가능(안내만). |
 | `kpa/components/store/StoreAssetSelectorModal.tsx` 내부 direct contents 병합 | 선택적 prepend. 주 목록 실패는 이번에 배너로 노출했다. |
 | `kpa/pages/public/MultilingualProductPublicLandingPage.tsx:114` | 공개 랜딩의 선택 언어 폴백. |
-| `glycopharm/pages/education/CourseDetailPage.tsx:365` | 퀴즈 부재가 정상. |
 
 ---
 
@@ -176,7 +158,6 @@ UI 를 새로 만들지 않고 catch 본문만 교정했다 — 회귀 위험이
 |---|---|---|
 | web-neture | PASS (0 error) | PASS |
 | web-kpa-society | PASS (0 error) | PASS |
-| web-glycopharm | PASS (0 error) | PASS |
 | web-k-cosmetics | PASS (0 error) | PASS |
 | web-pharmacy-hub | 변경 없음 | 변경 없음 |
 
@@ -191,31 +172,25 @@ UI 를 새로 만들지 않고 catch 본문만 교정했다 — 회귀 위험이
 |---|---|
 | 정상 데이터 화면 | PASS — 기존 목록 렌더 동일(회귀 없음) |
 | 빈 데이터 화면 | PASS — 기존 empty 문구 그대로 유지 |
-| API 실패 화면 | **PASS (실측)** — `glycopharm.co.kr/forum/feedback` 의 실제 404 상황에서 error 상태 + `다시 시도` 버튼 렌더 확인. 그 외 화면은 정적 검증(아래 한계 참조) |
+| API 실패 화면 | 그 외 화면은 정적 검증(아래 한계 참조) |
 | 로그인 필요 화면 | PASS — 기존 guard 동작 불변(이번 배치 미개입) |
 | 권한 없음 화면 | PASS — 기존 동작 불변(이번 배치 미개입) |
 | 없는 route 404 | PASS — 직전 배치의 404 표준 유지 |
 
 ### 실브라우저에서 실제로 잡은 결함 (후속 수정 1차)
 
-`https://glycopharm.co.kr/forum/feedback` 를 실브라우저로 열었을 때
-`GET /api/v1/glycopharm/forum/feedback` 이 **404** 인데도 화면은 여전히
 "아직 등록된 의견이 없습니다"(empty) 를 보여주었다.
 
 원인은 화면이 아니라 **API 래퍼**였다.
 
 | 래퍼 | 문제 | 영향 |
 |---|---|---|
-| `services/web-glycopharm/src/services/api.ts` 의 `apiClient` | 실패를 throw 하지 않고 `{ error }` 로 **정상 반환** | `catch { setLoadError(true) }` 가 **영원히 실행되지 않음** → 1차 수정이 무효 |
 | `services/web-neture/src/lib/api/neture.ts` 의 `getPartnershipRequests` | `catch` 에서 `return []` | `Promise.allSettled` 가 reject 를 못 봄 → 부분 실패가 empty 로 위장 |
 
 수정:
 
 | 파일 | 수정 |
 |---|---|
-| `web-glycopharm/pages/b2b/SupplyPage.tsx` | `if (response.error) { setError(표준문구); return; }` 추가 |
-| `web-glycopharm/pages/forum/ForumFeedbackPage.tsx` | `if (response.error) { setLoadError(true); return; }` 추가 |
-| `web-glycopharm/pages/store-management/b2b-order/B2BOrderPage.tsx` | 2개 응답 각각 `error` 판정 추가 |
 | `web-neture/lib/api/neture.ts` | `return []` → `throw error` (소비처 1곳뿐임을 확인) |
 
 교훈(다음 배치 필수 점검): **`catch` 를 추가하기 전에 그 화면이 쓰는 API 래퍼가 실제로 throw 하는지 먼저 확인한다.**
@@ -236,7 +211,7 @@ throw 하지 않는 래퍼(`{ error }` / `{ success:false }` / `null` 반환)는
 |---|---|---|
 | `LoadErrorNotice` (neture) / `LoadErrorNotice` (k-cosmetics) | 동일 구현 2벌 | `@o4o/ui` 또는 `@o4o/error-handling` 로 승격 |
 | `LoadErrorState` (kpa, inline style) | KPA `EmptyState` 관용구에 맞춘 별도 구현 | 위 승격 시 style variant 로 흡수 |
-| `ErrorState` (glycopharm) | 기존 컴포넌트 — 문구만 표준화 | 위 승격의 기준 구현으로 사용 가능 |
+| `ErrorState` | 기존 컴포넌트 — 문구만 표준화 | 위 승격의 기준 구현으로 사용 가능 |
 | `StandardHomeTemplate` 의 `noticesError` prop | 없음 | §4 HOLD 해소용. 소비처 4서비스 전수 확인 필요 |
 | `useLoadState()` 훅 (loading/error/empty + retry) | 없음 | 화면마다 반복되는 3-state 보일러플레이트 제거 |
 
@@ -251,11 +226,9 @@ throw 하지 않는 래퍼(`{ error }` / `{ success:false }` / `null` 반환)는
 
 - 1차: `0127d1ad5..7be0cc39b  main -> main` — `HEAD == origin/main` 확인
 - 1차 배포: GitHub Actions run `31457906264` **success**
-  (kpa-society / glycopharm / neture / k-cosmetics 배포 success, pharmacy-hub skipped, API 배포 없음)
+  (kpa-society / neture / k-cosmetics 배포 success, pharmacy-hub skipped, API 배포 없음)
 - 2차: `05aca0bd6..9788092f8  main -> main`
-- 2차 배포: GitHub Actions run `31458498755` **success** (neture / glycopharm success, 나머지 skipped, API 배포 없음)
-- 배포 후 재확인: `https://glycopharm.co.kr/forum/feedback` — API 404 상태에서
-  "데이터를 불러오지 못했습니다." / "잠시 후 다시 시도해 주세요." / `다시 시도` 버튼 렌더 확인 (empty 문구 사라짐)
+- 2차 배포: GitHub Actions run `31458498755` **success** (neture success, 나머지 skipped, API 배포 없음)
 
 ---
 

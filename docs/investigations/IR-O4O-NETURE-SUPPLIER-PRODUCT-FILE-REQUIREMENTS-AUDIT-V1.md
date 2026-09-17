@@ -82,7 +82,7 @@
 
 ## 8. submit-approval gate 영향
 
-`submitForApproval`(411–510): ① 공급자 regulated-category status='approved'(번호/status, **파일 아님**) ② service eligibility(glycopharm/kpa-society/k-cosmetics) ③ pharmacy-audience(규제품) ④ 승인 시 mfdsPermitNumber. **파일 게이트 0.**
+`submitForApproval`(411–510): ① 공급자 regulated-category status='approved'(번호/status, **파일 아님**) ② service eligibility ③ pharmacy-audience(규제품) ④ 승인 시 mfdsPermitNumber. **파일 게이트 0.**
 
 ## 9. operator/admin 승인 화면 노출
 

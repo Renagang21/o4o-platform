@@ -1,7 +1,6 @@
 /**
  * GuideIntroStructurePage — O4O 기본 구조 (공통)
  *
- * WO-O4O-GUIDE-COMMON-AND-GLYCOPHARM-HOME-V1
  */
 
 import { Link } from 'react-router-dom';

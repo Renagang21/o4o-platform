@@ -6,7 +6,7 @@ import { PASSWORD_MIN_LENGTH, PASSWORD_POLICY_REGEX, PASSWORD_POLICY_MESSAGE_EN 
  * Register Request DTO
  *
  * WO-NETURE-REGISTER-IDENTITY-STABILIZATION-V1
- * 4개 서비스(KPA, GlycoPharm, Neture, K-Cosmetics) 공유 DTO.
+ * 3개 서비스(KPA, Neture, K-Cosmetics) 공유 DTO.
  * 서비스별 필드 차이를 수용하기 위해 이름/동의 필드는 optional.
  * Controller에서 서비스별 정규화 수행.
  */
@@ -45,12 +45,12 @@ export class RegisterRequestDto {
 
   // --- 이름 필드 (서비스별 택일) ---
 
-  /** KPA/GlycoPharm: 성 */
+  /** KPA: 성 */
   @IsOptional()
   @IsString()
   lastName?: string;
 
-  /** KPA/GlycoPharm: 이름 */
+  /** KPA: 이름 */
   @IsOptional()
   @IsString()
   firstName?: string;
@@ -60,7 +60,7 @@ export class RegisterRequestDto {
   @IsString()
   name?: string;
 
-  /** KPA/GlycoPharm: 닉네임 (포럼 표시용) */
+  /** KPA: 닉네임 (포럼 표시용) */
   @IsOptional()
   @IsString()
   nickname?: string;
@@ -90,7 +90,7 @@ export class RegisterRequestDto {
   @IsString()
   licenseNumber?: string;
 
-  /** WO-O4O-GLYCOPHARM-REGISTRATION-ROLE-TYPE-ALIGNMENT-V1: GlycoPharm 참여 유형 (staff_pharmacist | pharmacy_owner) */
+  /** 참여 유형 (staff_pharmacist | pharmacy_owner) */
   @IsOptional()
   @IsString()
   subRole?: string;
@@ -193,7 +193,7 @@ export class RegisterRequestDto {
   // WO-O4O-CROSSSERVICE-BUSINESS-CONTACT-FIELDS-BACKEND-SUPPORT-V1:
   //   사업자 연락처 3종 공통 수용 (users.businessInfo JSONB). 기존 phone(개인)/managerPhone(담당자 전화)/
   //   taxInvoiceEmail(세금계산서)와 의미 분리. companyPhone 신규 키 금지 — businessPhone 재사용.
-  /** 회사/사업장 전화 (canonical) — GlycoPharm/K-Cosmetics mypage 기존 키 재사용 */
+  /** 회사/사업장 전화 (canonical) — K-Cosmetics mypage 기존 키 재사용 */
   @IsOptional()
   @IsString()
   businessPhone?: string;
@@ -273,7 +273,7 @@ export class RegisterRequestDto {
 
   // --- 동의 필드 (서비스별 택일) ---
 
-  /** KPA/GlycoPharm: 약관 동의 */
+  /** KPA: 약관 동의 */
   @IsOptional()
   @IsBoolean()
   tos?: boolean;
@@ -288,7 +288,7 @@ export class RegisterRequestDto {
   @IsBoolean()
   agreePrivacy?: boolean;
 
-  /** GlycoPharm: 개인정보 동의 */
+  /** 개인정보 동의 */
   @IsOptional()
   @IsBoolean()
   privacyAccepted?: boolean;
@@ -298,7 +298,7 @@ export class RegisterRequestDto {
   @IsBoolean()
   agreeMarketing?: boolean;
 
-  /** GlycoPharm: 마케팅 동의 */
+  /** 마케팅 동의 */
   @IsOptional()
   @IsBoolean()
   marketingAccepted?: boolean;

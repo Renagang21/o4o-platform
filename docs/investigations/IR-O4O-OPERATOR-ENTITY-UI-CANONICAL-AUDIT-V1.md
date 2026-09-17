@@ -32,11 +32,11 @@
 | **Roles** | 매우 낮음 | 4 service 모두 `@o4o/ui RoleManagementPage` thin wrapper — 정합 우수 |
 | **Approvals** | **높음** | 도메인 다양성 (Collaboration / MarketTrial / StoreApproval / Pharmacy / Forum / Product) 때문에 list-detail 패턴이 4-5 가지 공존. 일부는 의도된 차이 |
 | **Products** | **높음** | Neture 의 `AllProductsOverviewPage` (raw HTML table + custom drawer) 가 큰 D. Brand/Category 는 의도된 service-specific |
-| **Forums** | 中-高 | KPA = 2 탭 (requests + categories), Neture = 1 탭 (requests), GP/K-Cos = analytics-only. Backend capability 차이도 의심 |
+| **Forums** | 中-高 | KPA = 2 탭 (requests + categories), Neture = 1 탭 (requests), K-Cos = analytics-only. Backend capability 차이도 의심 |
 | **Stores** | 中 | Stores list 는 3 패턴 (wrapper / direct DataTable / custom HTML). StoreDetail 은 3 service 가 동일 |
 | **LMS** | **높음** | 4 service 의 page 명/유무 가 모두 다름. Neture 부재, 나머지 3 service 명명 불일치 |
 | **Content / Resources** | **매우 높음** | KPA 만 5 page (Content Hub / Detail / Working content / Resources), 나머지 subset. GuideContents 만 공통 |
-| **Misc (Settings/Reports/Billing)** | **C 위주** (의도된 service-specific) | GP 의 Billing/Settlement, KPA 의 Audit/Legal, Neture 의 SupplierQuality — 도메인 본질 |
+| **Misc (Settings/Reports/Billing)** | **C 위주** (의도된 service-specific) 의 Billing/Settlement, KPA 의 Audit/Legal, Neture 의 SupplierQuality — 도메인 본질 |
 | **Dashboards** | 매우 낮음 | 4 service 모두 `OperatorDashboardLayout` + 5-Block 채택. Config builder 만 service-별 |
 
 ### 0.3 즉시 처리 가치 — Top 5
@@ -44,10 +44,10 @@
 | # | Drift | 영향 service | 분류 | 권고 |
 |---|---|---|:---:|---|
 | 1 | **OperatorGuideContentsPage.tsx 4 service copy-paste** (24 lines × 4, serviceKey 만 다름) | 4 | A | 즉시 통합 가능 — `@o4o/operator-core-ui/modules/guide-contents` 가 이미 canonical, wrapper 만 service config 로 통합 |
-| 2 | **aiReportConfig.tsx 의 2-tier feature parity 깨짐** (KPA/Neture empty mode 23 lines vs GP/K-Cos full mode 155 lines + mock) | 4 | D | 정합 필요 — 전부 empty 또는 전부 full 로 정렬 + mock 제거 |
-| 3 | **Members detail surface 분기** (KPA/Neture = BaseDetailDrawer, GP/K-Cos = `/operator/users/:id` page nav) | 4 | B | drawer or page 중 canonical 선택 → 정렬 |
-| 4 | **Stores list 3 패턴 공존** (GP/KPA = `OperatorStoresList` adapter, K-Cos = direct DataTable, Neture = raw HTML table) | 4 | B/D | K-Cos → adapter 마이그레이션 + Neture → adapter 마이그레이션 |
-| 5 | **Members bulk action 비대칭** (KPA/Neture/GP 정렬, K-Cos 만 없음) | 1 (K-Cos) | B | useBatchAction + ActionBar 추가 |
+| 2 | **aiReportConfig.tsx 의 2-tier feature parity 깨짐** (KPA/Neture empty mode 23 lines vs K-Cos full mode 155 lines + mock) | 4 | D | 정합 필요 — 전부 empty 또는 전부 full 로 정렬 + mock 제거 |
+| 3 | **Members detail surface 분기** (KPA/Neture = BaseDetailDrawer, K-Cos = `/operator/users:id` page nav) | 4 | B | drawer or page 중 canonical 선택 → 정렬 |
+| 4 | **Stores list 3 패턴 공존** (KPA = `OperatorStoresList` adapter, K-Cos = direct DataTable, Neture = raw HTML table) | 4 | B/D | K-Cos → adapter 마이그레이션 + Neture → adapter 마이그레이션 |
+| 5 | **Members bulk action 비대칭** (KPA/Neture 정렬, K-Cos 만 없음) | 1 (K-Cos) | B | useBatchAction + ActionBar 추가 |
 
 ### 0.4 사이클 정리 의도
 
@@ -62,7 +62,7 @@
 | 조사일 | 2026-05-24 |
 | Repo 시점 | origin/main 와 일치 |
 | 조사 방법 | 4 병렬 Explore agent (Members+Roles+Approvals / Products+Forums+Stores / LMS+Content+Misc / Common UX inventory) |
-| 조사 범위 | `services/web-{kpa-society, neture, glycopharm, k-cosmetics}/src/pages/operator/**` + `packages/{operator-ux-core, ui, account-ui, error-handling}/src/**` + `apps/admin-dashboard/src/pages/operator/**` (간접 비교) |
+| 조사 범위 | — |
 
 ---
 
@@ -70,7 +70,7 @@
 
 ### 2.1 핵심 컴포넌트별 service 별 reference count
 
-| Component | Package | KPA | Neture | GP | K-Cos | Adoption |
+| Component | Package | KPA | Neture | K-Cos | Adoption |
 |---|---|:---:|:---:|:---:|:---:|---|
 | `DataTable` | operator-ux-core/list | 71 | 31 | 39 | 26 | ✅ 100% |
 | `EditableDataTable` | operator-ux-core/list | 0 | 0 | 0 | 0 | ❌ 0% (정의됨, 미사용) |
@@ -99,7 +99,7 @@
 2. **정의돼 있으나 미사용 (Tier 0):** `EditableDataTable`, `FormField`, `Section`, `EmptyState` — 4 service 모두 0 회. 정의/사용 사이에 큰 갭.
 3. **KPA 미적용:** `RoleBadge`, `ServiceBadge` 가 KPA 만 0 회. KPA 의 member list 가 inline role/service rendering 패턴 유지 (legacy 가능성).
 4. **K-Cos 가 일관되게 낮음:** ActionBar 2 / BulkResultModal 2 / useBatchAction 2 / ConfirmActionDialog 0 — bulk action 패턴 전반에서 K-Cos 만 빈약. 패턴 adoption 누락.
-5. **Raw HTML `<table>` 잔재:** 4 service 합쳐 30 파일 (KPA 6 / Neture 11 / GP 9 / K-Cos 4) — DataTable 으로 마이그레이션 후보.
+5. **Raw HTML `<table>` 잔재:** 3 service 합쳐 30 파일 (KPA 6 / Neture 11 9 / K-Cos 4) — DataTable 으로 마이그레이션 후보.
 
 ---
 
@@ -111,11 +111,9 @@
 |---|---|:---:|---|:---:|:---:|---|:---:|
 | **KPA** | `UsersPage.tsx` | core | **BaseDetailDrawer (520w)** | useBatchAction (approve/reject/suspend) | StatusBadge ✅ / RoleBadge ❌ inline | EditUserModal | **A** |
 | **Neture** | `UsersManagementPage.tsx` | core | **BaseDetailDrawer (520w)** | useBatchAction (pending only) | StatusBadge ✅ / RoleBadge ✅ | EditUserModal | **A** |
-| **GP** | `UsersPage.tsx` | core | **navigate `/users/:id` page** | useBatchAction (approve/reject) | StatusBadge ✅ / RoleBadge ✅ | EditUserModal | **B** |
 | **K-Cos** | `UsersPage.tsx` | core | **navigate `/users/:id` page** | **없음** | StatusBadge ✅ / RoleBadge ✅ | EditUserModal | **B** |
-| **GP** | `GlycopharmMembersPage.tsx` | core | drawer | 없음 (inline buttons) | local StatusBadge | (detail only) | **C** (의도된 분리) |
 
-**Root cause:** KPA = canonical reference → Neture = full copy → GP/K-Cos = page-nav 패턴으로 분기 (drawer vs page 선택 정책 미정). K-Cos 만 bulk action 누락 — 단순 누락.
+**Root cause:** KPA = canonical reference → Neture = full copy → K-Cos = page-nav 패턴으로 분기 (drawer vs page 선택 정책 미정). K-Cos 만 bulk action 누락 — 단순 누락.
 
 **판정:**
 - Detail surface (drawer vs page) — **canonical 선택 필요** (drawer 권고: light view, page nav 권고: heavy edit)
@@ -141,16 +139,15 @@
 | Neture | `MarketTrialApprovalsPage.tsx` | C | 시장체험 펀딩 — 도메인 복잡, custom workflow |
 | Neture | `ProductServiceApprovalPage.tsx` / `OperatorProductApprovalPage.tsx` | B | |
 | Neture | `ForumDeleteRequestsPage.tsx` | B | |
-| GP | `ApplicationsPage.tsx` | B | DataTable + status/serviceType/orgType 3중 필터 |
-| GP | `StoreApprovalsPage.tsx` + `StoreApprovalDetailPage.tsx` | C | 의도된 분리 (DataTable list + checkpoint form detail page) — 규제 도메인 |
-| GP | `ForumRequestsPage.tsx` / `ForumDeleteRequestsPage.tsx` | B | |
+| `ApplicationsPage.tsx` | B | DataTable + status/serviceType/orgType 3중 필터 |
+| `StoreApprovalsPage.tsx` + `StoreApprovalDetailPage.tsx` | C | 의도된 분리 (DataTable list + checkpoint form detail page) — 규제 도메인 |
+| `ForumRequestsPage.tsx` / `ForumDeleteRequestsPage.tsx` | B | |
 | K-Cos | `ApplicationsPage.tsx` | C | inline filter buttons (검토중/승인대기/승인완료/반려) + drawer-based modal |
 | K-Cos | `EventOfferApprovalsPage.tsx` / `ForumRequestsPage.tsx` / `ForumDeleteRequestsPage.tsx` | B | |
 
 **Root cause:**
-- Filter pattern 4 가지 (KPA dropdown / Neture tab / GP 다중 dropdown / K-Cos inline button) — 서비스 도메인 본질이 아니라 frontend 작성자 선택의 결과
-- Detail surface 분기 (KPA = drawer, GP = full page with form, K-Cos = drawer modal)
-- 의도된 차이: GP StoreApprovalDetailPage (규제 checkpoint), Neture MarketTrial (펀딩 워크플로우)
+- Filter pattern 4 가지 (KPA dropdown / Neture tab 다중 dropdown / K-Cos inline button) — 서비스 도메인 본질이 아니라 frontend 작성자 선택의 결과
+- Detail surface 분기 (KPA = drawer = full page with form, K-Cos = drawer modal)
 
 **판정:** Approval list 의 column / filter / row action 부분만 thin wrapper (`@o4o/operator-ux-core/approvals/ApprovalListPage`) 후보. Detail 은 service-specific 유지.
 
@@ -158,9 +155,9 @@
 
 | Service | 파일 | DataTable | 분류 | 본질 |
 |---|---|:---:|:---:|---|
-| GP | `ProductsPage.tsx` | core | **A** | canonical 패턴 (image+barcode column, search+sortBy) |
-| K-Cos | `ProductsPage.tsx` | core | **B** | GP 와 거의 동일하나 supplierCount badge 색상 차이 (blue-100 vs pink-100) + bulk selection 추가 |
-| GP | `ProductDetailPage.tsx` | raw HTML | A | (detail page — 거의 동일) |
+| `ProductsPage.tsx` | core | **A** | canonical 패턴 (image+barcode column, search+sortBy) |
+| K-Cos | `ProductsPage.tsx` | core | **B** 와 거의 동일하나 supplierCount badge 색상 차이 (blue-100 vs pink-100) + bulk selection 추가 |
+| `ProductDetailPage.tsx` | raw HTML | A | (detail page — 거의 동일) |
 | K-Cos | `ProductDetailPage.tsx` | raw HTML | A | (동일) |
 | Neture | `AllProductsOverviewPage.tsx` | **raw HTML table + custom slide Drawer** | **D** | legacy 패턴, 다른 3 service 와 완전 다름 |
 | Neture | `BrandManagementPage.tsx` | core (EditableTextCell) | C | brand merge 등 도메인 특화 |
@@ -172,7 +169,7 @@
 **Root cause:**
 - Neture 의 `AllProductsOverviewPage` 는 다른 3 service 의 ProductsPage 와 같은 위치 (상품 목록) 인데 raw HTML + custom slide drawer 패턴. 명백한 legacy.
 - Brand/Category 는 도메인 본질 (tree, merge) — 의도된 차이
-- KPA 의 hex color (STATUS_LABELS) vs Neture/GP/K-Cos 의 tailwind className — 작은 inconsistency
+- KPA 의 hex color (STATUS_LABELS) vs Neture/K-Cos 의 tailwind className — 작은 inconsistency
 
 **판정:** Neture `AllProductsOverviewPage` 만 D — DataTable 마이그레이션 가치. 나머지는 정합.
 
@@ -184,34 +181,32 @@
 | KPA | `OperatorForumPage.tsx` | hub (post 관리), DataTable | C | hub 페이지 |
 | Neture | `ForumManagementPage.tsx` | **1 탭 (requests only, no categories)** | B | KPA 의 simpler 버전 |
 | Neture | `ForumDeleteRequestsPage.tsx` | DataTable | B | 별건 page |
-| GP | `ForumAnalyticsPage.tsx` | KPI cards only (analytics) | D (analytics) | 다른 service 의 ForumManagement 와 다른 페이지 |
-| GP | `forum-management/OperatorForumManagementPage.tsx` | **mock data, UI skeleton** | **D** | placeholder — backend 미연결 |
-| GP | `ForumRequestsPage.tsx` / `ForumDeleteRequestsPage.tsx` | DataTable | B | 별건 |
-| K-Cos | `ForumAnalyticsPage.tsx` | KPI cards | D | GP 와 유사 |
+| `ForumAnalyticsPage.tsx` | KPI cards only (analytics) | D (analytics) | 다른 service 의 ForumManagement 와 다른 페이지 |
+| `forum-management/OperatorForumManagementPage.tsx` | **mock data, UI skeleton** | **D** | placeholder — backend 미연결 |
+| `ForumRequestsPage.tsx` / `ForumDeleteRequestsPage.tsx` | DataTable | B | 별건 |
+| K-Cos | `ForumAnalyticsPage.tsx` | KPI cards | D 와 유사 |
 | K-Cos | `ForumRequestsPage.tsx` / `ForumDeleteRequestsPage.tsx` | DataTable | B | 별건 |
-| All | `CommunityManagementPage.tsx` (KPA, GP) | community ads/sponsors — forum 아님 | C | 이름 충돌 (community vs forum) |
+| All | `CommunityManagementPage.tsx` (KPA) | community ads/sponsors — forum 아님 | C | 이름 충돌 (community vs forum) |
 
 **Root cause:**
 - KPA = full ForumManagement (requests + categories). Neture 는 categories 탭 부재 — backend capability 차이 or feature 미구현 의심
-- GP 의 `forum-management/OperatorForumManagementPage` = mock data + UI skeleton (D) — backend 연결 없음
-- "Community Management" 가 KPA/GP 에서 ad/sponsor 관리에 쓰임 — forum 과 분리된 별도 도메인
+- "Community Management" 가 KPA 에서 ad/sponsor 관리에 쓰임 — forum 과 분리된 별도 도메인
 
 **판정:**
 - KPA ForumManagement 를 canonical wrapper 후보로 추출 가능 (`@o4o/operator-ux-core/forums/ForumManagementPage`)
 - Neture 1 탭 → 2 탭 확장은 backend 확인 후 별건
-- GP mock skeleton 제거 또는 backend 연결 결정 필요
 
 ### 3.6 Stores — 中
 
 | Service | 파일 | 패턴 | 분류 |
 |---|---|---|:---:|
-| GP | `StoresPage.tsx` | **`OperatorStoresList` adapter** (thin wrapper from `@o4o/operator-core-ui`) | **A** |
+| `StoresPage.tsx` | **`OperatorStoresList` adapter** (thin wrapper from `@o4o/operator-core-ui`) | **A** |
 | KPA | `OperatorStoresPage.tsx` | **`OperatorStoresList` adapter** | **A** |
 | K-Cos | `StoresPage.tsx` | **direct `@o4o/operator-ux-core DataTable`** (adapter 미사용) | **B** |
 | Neture | `StoreManagementPage.tsx` | **raw HTML table** | **D** |
-| GP / K-Cos / KPA | `*StoreDetailPage.tsx` | Info + Channels + Capabilities + Products section — 3 service 거의 동일 | A |
-| GP | `StoreApprovalsPage.tsx` + `StoreApprovalDetailPage.tsx` | DataTable + form detail | C (의도) |
-| GP | `PharmaciesPage.tsx` | DataTable + tier badge + region/tier 필터 | B (의도) |
+| K-Cos / KPA | `*StoreDetailPage.tsx` | Info + Channels + Capabilities + Products section — 2 service 거의 동일 | A |
+| `StoreApprovalsPage.tsx` + `StoreApprovalDetailPage.tsx` | DataTable + form detail | C (의도) |
+| `PharmaciesPage.tsx` | DataTable + tier badge + region/tier 필터 | B (의도) |
 | K-Cos | `StoreCockpitPage.tsx` | custom dashboard (KPI + product mini-list) | D (이름 충돌) |
 
 **Root cause:** Stores list = 3 패턴 (adapter / direct DataTable / raw HTML). adapter 는 이미 canonical wrapper.
@@ -224,7 +219,7 @@
 |---|---|---|:---:|
 | KPA | `OperatorLmsCoursesPage.tsx` (89 lines) | canonical 후보 | A |
 | K-Cos | `OperatorLmsCoursesPage.tsx` | KPA 직복사 | A (commonize) |
-| GP | `LmsCoursesPage.tsx` (59 lines) | naming + 구현 다름 | B |
+| `LmsCoursesPage.tsx` (59 lines) | naming + 구현 다름 | B |
 | Neture | **부재** | Neture LMS 도메인 부재 | — |
 
 **Root cause:** Page naming (Operator prefix 유무) 분기. 공통 모듈 `@o4o/operator-lms-core` 부재.
@@ -233,7 +228,7 @@
 
 ### 3.8 Content / Resources — 매우 高
 
-| Page | KPA | Neture | GP | K-Cos | 분류 |
+| Page | KPA | Neture | K-Cos | 분류 |
 |---|:---:|:---:|:---:|:---:|:---:|
 | `OperatorContentPage` | — | — | CmsContentManager wrapper (29L) | CmsContentManager wrapper (29L) | A |
 | `OperatorContentHubPage` | ✅ | ❌ | ❌ | ❌ | D (KPA-only?) |
@@ -242,33 +237,31 @@
 | **`OperatorGuideContentsPage`** | **wrapper (24L)** | **wrapper (24L)** | **wrapper (24L)** | **wrapper (24L)** | **A — 100% copy-paste, serviceKey 만 다름** |
 | `OperatorResourcesPage` | ResourcesPage (50L) | ❌ | ResourcesPage (50L) | ❌ | B |
 | `HomepageCmsPage` | ❌ | ✅ | ❌ | ❌ | C (Neture-only) |
-| `GuidelineManagementPage` | ❌ | ❌ | ✅ | ❌ | C (GP-only) |
+| `GuidelineManagementPage` | ❌ | ❌ | ✅ | ❌ | C |
 
 **Root cause:**
 - KPA 가 content 도메인 5 page 보유. 나머지 service 는 subset
 - OperatorGuideContentsPage 는 4 service 모두 동일 (serviceKey 만 변수) — 100% commonize 가능
-- Neture HomepageCms, GP Guideline 은 service-domain (의도된 차이)
+- Neture HomepageCms Guideline 은 service-domain (의도된 차이)
 
 **판정:** OperatorGuideContentsPage 즉시 통합 가능 (24×4=96 lines → 1 wrapper). Content Hub/Detail/WorkingContent 는 KPA-only 가 의도인지 별건 audit 필요.
 
 ### 3.9 Misc (Settings / Analytics / Reports / Billing / Audit) — C 위주
 
-| Page | KPA | Neture | GP | K-Cos | 분류 |
+| Page | KPA | Neture | K-Cos | 분류 |
 |---|:---:|:---:|:---:|:---:|:---:|
 | `SettingsPage` | ❌ | ❌ | ✅ | ✅ | C (service-specific) |
 | `AnalyticsPage` | ❌ | ✅ | ✅ | ❌ | B (잠재 공통) |
 | `AiReportPage` / `OperatorAiReportPage` (wrapper) | ✅ | ✅ | ✅ | ✅ | **A** |
 | **`aiReportConfig.tsx`** | empty (23L) | empty (23L) | **full+mock (155L)** | **full+mock (155L)** | **D (parity 깨짐)** |
-| `AiUsageDashboardPage` | ❌ | ❌ | ✅ | ❌ | C (GP-only) |
+| `AiUsageDashboardPage` | ❌ | ❌ | ✅ | ❌ | C |
 | `AiBillingPage` | ❌ | ❌ | ✅ | ❌ | C |
 | `ReportsPage` | ❌ | ❌ | ✅ | ❌ | C |
-| `SettlementsPage` / `BillingPreviewPage` / `InvoicesPage` | ❌ | ❌ | ✅ | ❌ | C (GP 정산 도메인) |
+| `SettlementsPage` / `BillingPreviewPage` / `InvoicesPage` | ❌ | ❌ | ✅ | ❌ | — |
 | `OrdersPage` / `OrdersManagementPage` | ❌ | ✅ | ✅ | ✅ | B |
 | `AuditLogPage` | ✅ | ❌ | ❌ | ❌ | C (KPA-only) |
 | `LegalManagementPage` | ✅ | ❌ | ❌ | ❌ | C (KPA-only) |
 | `SupplierQualityPage` | ❌ | ✅ | ❌ | ❌ | C (Neture-only) |
-
-**Root cause:** 대부분 service 도메인 본질 (GP 정산, KPA 약사회 audit, Neture 공급자 품질) — 의도된 차이. 다만 **aiReportConfig 의 KPA/Neture empty vs GP/K-Cos full** 은 inconsistent rollout — feature 가 있어야 하는데 누락된 상태.
 
 **판정:** aiReportConfig parity 정합 필요. 다른 page 는 service-specific 유지.
 
@@ -278,7 +271,7 @@
 |---|---|---|:---:|
 | KPA | `KpaOperatorDashboard.tsx` | 5-Block + Admin/Operator role split config (45L) | A |
 | Neture | `NetureOperatorDashboard.tsx` | 5-Block, pass-through fetch | A |
-| GP | `GlycoPharmOperatorDashboard.tsx` | 5-Block + 추가 OperatorAlerts | B |
+| — | 5-Block + 추가 OperatorAlerts | B |
 | K-Cos | `KCosmeticsOperatorDashboard.tsx` | 5-Block | A |
 
 → 4 service 모두 `OperatorDashboardLayout` (operator-ux-core) 채택. 5-Block 표준 준수.
@@ -295,15 +288,14 @@
 | **역할 관리 / RoleManagementPage** | ✅ 같다 | ✅ 같다 (thin wrapper) | **A (이미 정렬)** |
 | **상품 관리 / ProductsPage / AllProductsOverviewPage** | ✅ 같다 (목록) | ❌ 다르다 (Neture 만 raw HTML + drawer) | **D (Neture 만 정렬 필요)** |
 | **매장 관리 / StoresPage / OperatorStoresPage / StoreManagementPage** | ✅ 같다 | ❌ 3 패턴 (adapter / direct / raw HTML) | **B (정렬 가능)** |
-| **포럼 관리 / ForumManagementPage** | △ KPA = 2 탭, Neture = 1 탭, GP/K-Cos = analytics | ❌ 다르다 | **B (backend capability 확인 후)** |
+| **포럼 관리 / ForumManagementPage** | △ KPA = 2 탭, Neture = 1 탭, K-Cos = analytics | ❌ 다르다 | **B (backend capability 확인 후)** |
 | **승인 관리 / Applications / ProductApproval / ForumRequest** | ❌ 다르다 (도메인별 본질 다름) | ❌ 다르다 | **C (의도된 차이, but list 패턴은 정렬 가능)** |
-| **강의 관리 / LmsCourses / OperatorLmsCourses** | ✅ KPA/GP/K-Cos 같다, Neture 부재 | ❌ naming/구현 다르다 | **B (3 service 정렬 가능)** |
+| **강의 관리 / LmsCourses / OperatorLmsCourses** | ✅ KPA/K-Cos 같다, Neture 부재 | ❌ naming/구현 다르다 | **B (2 service 정렬 가능)** |
 | **가이드 콘텐츠 / OperatorGuideContents** | ✅ 같다 (100% wrapper) | ✅ 같다 | **A (이미 commonize, copy-paste 만 정합)** |
-| **자료 / ResourcesPage** | △ KPA/GP 만 보유 | ✅ 같다 | **B (2 service commonize 가능)** |
+| **자료 / ResourcesPage** | △ KPA 만 보유 | ✅ 같다 | **B (1 service commonize 가능)** |
 | **분석 / AnalyticsPage / ForumAnalyticsPage / AiReportPage** | △ 일부 부재 | △ wrapper 일부 정합 | **B (config parity 정합 후)** |
-| **설정 / SettingsPage** | △ GP/K-Cos 만 | △ inline | **C (의도된 service 차이)** |
+| **설정 / SettingsPage** | △ K-Cos 만 | △ inline | **C (의도된 service 차이)** |
 | **운영자 대시보드 / *OperatorDashboard** | ✅ 같다 (5-Block) | ✅ 같다 | **A (이미 정렬)** |
-| **빌링/정산 / SettlementsPage / BillingPreview / Invoices / AiBilling** | ❌ GP-only | — | **C (도메인 본질)** |
 | **감사 / AuditLogPage** | ❌ KPA-only | — | **C (도메인 본질)** |
 | **법무 / LegalManagementPage** | ❌ KPA-only | — | **C (도메인 본질)** |
 | **공급자 품질 / SupplierQualityPage** | ❌ Neture-only | — | **C (도메인 본질)** |
@@ -315,7 +307,7 @@
 | **A (이미 commonize / 즉시 가능)** | 4 | Roles, Dashboard, GuideContents wrapper copy-paste, Forum requests subset |
 | **B (정렬 가능 — WO 후보)** | 7 | Members detail surface, Stores list pattern, Forum management, LMS Courses, Resources, Analytics config, Approval list wrapper |
 | **C (의도된 service-specific)** | 6 | Approvals detail, Settings, Billing/Audit/Legal/SupplierQuality 도메인 |
-| **D (위험 / Legacy)** | 3 | Neture AllProductsOverview (raw HTML), GP forum-management mock, aiReportConfig parity |
+| **D (위험 / Legacy)** | 3 | Neture AllProductsOverview (raw HTML) forum-management mock, aiReportConfig parity |
 
 ---
 
@@ -324,12 +316,12 @@
 ### 5.1 Tier 1 — 즉시 가능 (A → 완전 commonize)
 
 1. **`OperatorGuideContentsPage.tsx` × 4 service copy-paste 통합** — 96 lines (24×4) → 1 wrapper. import 경로 표준화만 필요. 회귀 위험 0.
-2. **`OperatorLmsCoursesPage.tsx` × 3 service (KPA / GP / K-Cos) 통합** — page naming 표준화 + 공통 wrapper.
-3. **`OperatorResourcesPage` × 2 service (KPA / GP) 통합** — 같은 구조.
+2. **`OperatorLmsCoursesPage.tsx` × 2 service (KPA / K-Cos) 통합** — page naming 표준화 + 공통 wrapper.
+3. **`OperatorResourcesPage` × 1 service (KPA) 통합** — 같은 구조.
 
 ### 5.2 Tier 2 — 정합 결정 + 정렬 (B)
 
-4. **Members detail surface canonical 선택** — drawer (KPA/Neture) vs page nav (GP/K-Cos) 결정. 권고: 1차 drawer (light view), 2차 page (heavy edit).
+4. **Members detail surface canonical 선택** — drawer (KPA/Neture) vs page nav (K-Cos) 결정. 권고: 1차 drawer (light view), 2차 page (heavy edit).
 5. **Members bulk action: K-Cos 추가** — useBatchAction + ActionBar + BulkResultModal.
 6. **Stores list: K-Cos / Neture → `OperatorStoresList` adapter 마이그레이션.**
 7. **KPA Members: `RoleBadge` / `ServiceBadge` 채택** (inline rendering → core 컴포넌트).
@@ -338,7 +330,6 @@
 ### 5.3 Tier 3 — 정책 결정 후 (B 또는 D)
 
 9. **Forum management 2 탭 vs 1 탭** — Neture backend capability 확인 후 정합 결정.
-10. **GP `forum-management/OperatorForumManagementPage` mock 제거** — backend 연결 결정 (별건).
 11. **Neture `AllProductsOverviewPage` → DataTable 마이그레이션** (D legacy 정합).
 
 ### 5.4 Tier 4 — Common 인프라 확장 (별건 큰 WO)
@@ -351,8 +342,7 @@
 
 ### 5.5 분류 정상 (의도된 차이) — 정렬 작업 불필요
 
-- Approvals detail (KPA Pharmacy / Neture MarketTrial / GP StoreApproval / K-Cos Application) — 도메인 본질
-- GP Billing/Settlement/Invoices/AiBilling — GP 도메인
+- Approvals detail (KPA Pharmacy / Neture MarketTrial StoreApproval / K-Cos Application) — 도메인 본질
 - KPA Audit/Legal — KPA 도메인
 - Neture SupplierQuality — Neture 도메인
 - Neture Brand/Category — catalog 도메인 본질 (tree/merge)
@@ -368,10 +358,10 @@
 | **Legacy 잔재** | Neture AllProductsOverview, Neture StoreManagement (raw HTML), KPA Members inline role rendering |
 | **Canonical 미적용** | OperatorGuideContentsPage copy-paste, OperatorLmsCoursesPage 명명 분기, OperatorResourcesPage 직복사 |
 | **Wrapper 차이** | Stores: adapter / direct / raw HTML 3 패턴 |
-| **Service 확장** | GP GlycopharmMembersPage (pharmacy 분리), Neture Brand/Category (tree/merge), GP StoreApprovalDetailPage (checkpoint) |
+| **Service 확장** | — |
 | **Backend 차이** | Neture forum categories 부재, Neture LMS 부재 (도메인) |
 | **의도된 차이** | Settings/Billing/Audit/Legal/SupplierQuality 의 service-only — 도메인 본질 |
-| **Inconsistent rollout** | aiReportConfig parity (KPA/Neture empty vs GP/K-Cos full + mock) |
+| **Inconsistent rollout** | aiReportConfig parity (KPA/Neture empty vs K-Cos full + mock) |
 | **Adoption density gap** | K-Cos 전반 bulk action / ConfirmActionDialog 누락 |
 
 ---
@@ -455,7 +445,6 @@
 
 ```bash
 # 1. 4 service operator pages 전체 목록
-find services/web-{kpa-society,neture,glycopharm,k-cosmetics}/src/pages/operator \
   -name '*.tsx' -o -name '*.ts' | sort
 
 # 2. operator-ux-core / @o4o/ui adoption count
@@ -463,14 +452,12 @@ for COMP in DataTable EditableDataTable MemberListLayout StatusBadge RoleBadge S
             useBatchAction OperatorDashboardLayout ActionBar RowActionMenu BulkResultModal \
             ConfirmActionDialog BaseDetailDrawer EmptyState FormField Section; do
   echo "=== $COMP ==="
-  for SVC in kpa-society neture glycopharm k-cosmetics; do
     COUNT=$(grep -rln "\b$COMP\b" services/web-$SVC/src/pages/operator 2>/dev/null | wc -l)
     echo "  $SVC: $COUNT"
   done
 done
 
 # 3. Raw HTML <table> 파일 검색
-grep -rln "<table" services/web-{kpa-society,neture,glycopharm,k-cosmetics}/src/pages/operator
 
 # 4. 동일 이름 페이지 (copy-paste 후보)
 for PAGE in OperatorGuideContentsPage aiReportConfig OperatorLmsCoursesPage; do

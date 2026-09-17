@@ -64,28 +64,6 @@ interface CatalogProduct {
 }
 ```
 
-### 1.2 GlycoPharm — ⚠️ CONFUSING
-
-| 항목 | 값 |
-|------|------|
-| 페이지 | `ProductsPage.tsx` |
-| 위치 | `services/web-glycopharm/src/pages/operator/ProductsPage.tsx` |
-| 라우트 | `/operator/products` |
-| 메뉴 | 사이드바 → 상품 관리 (Package 아이콘) |
-
-**문제:** 이 페이지는 **운영자용 ProductMaster 관리 콘솔**이다.
-매장 관리자가 공급자 상품을 탐색하는 페이지가 **아님**.
-
-- 검색: 상품명, 바코드, 브랜드, 제조사
-- 통계: 전체 상품 | 이미지 보유 | 공급자 연결 | 중복 바코드
-- 테이블: 이미지 | 이름 | 바코드 | 브랜드 | 카테고리 | 공급자 수 | 날짜
-
-**API 호출:**
-- `GET /api/v1/operator/products` — 플랫폼 전체 상품 목록
-- `GET /api/v1/operator/products/:productId` — 상품 상세 + 공급자 오퍼
-
-**결론:** 매장용 카탈로그 브라우징 UI 없음. 운영자 콘솔만 존재.
-
 ### 1.3 K-Cosmetics — ❌ MISSING
 
 매장 관리자용 공급자 상품 조회 화면 없음.
@@ -167,12 +145,6 @@ interface ProductApplication {
 }
 ```
 
-### 2.3 GlycoPharm — ❌ MISSING
-
-- 매장 채택 신청 UI 없음
-- 운영자 승인 워크플로우 없음
-- 상품 채택 버튼/API 미구현
-
 ### 2.4 K-Cosmetics — ❌ MISSING
 
 - 상품 채택 워크플로우 전체 미구현
@@ -195,7 +167,7 @@ interface ProductApplication {
 | 메뉴 | 사이드바 → Store → B2B 구매 |
 
 **기능:**
-- 도메인 탭 필터: 전체 | 일반 B2B (kpa) | 공동구매 (kpa-groupbuy) | 혈당관리 (glycopharm) | 화장품 (cosmetics)
+- 도메인 탭 필터: 전체 | 일반 B2B (kpa) | 공동구매 (kpa-groupbuy) | 혈당관리  | 화장품 (cosmetics)
 - 채택된 상품 카드 목록
 - 상품 카드: 이름 | 공급자 | 카테고리 | 상태
 
@@ -207,7 +179,6 @@ interface ProductApplication {
 interface ProductListing {
   id: string;
   organization_id: string;
-  service_key: string;       // kpa | kpa-groupbuy | glycopharm | cosmetics
   external_product_id: string;
   product_name: string;
   retail_price: number | null;
@@ -243,10 +214,6 @@ updateListing(id: string, params: {
 | 채널 설정 | ✅ OK | StoreChannelsPage |
 | 정렬 변경 | ⚠️ PARTIAL | API 존재, UI 불명확 |
 | 삭제 | ❌ MISSING | API/UI 미발견 |
-
-### 3.3 GlycoPharm — ❌ MISSING
-
-채택 상품 관리 화면 없음.
 
 ### 3.4 K-Cosmetics — ❌ MISSING
 
@@ -330,7 +297,7 @@ updateListingChannels(listingId: string, channels: Array<{
 }>) → { updated: number }
 ```
 
-### 4.3 GlycoPharm / K-Cosmetics / Neture — ❌ MISSING
+### 4.3 K-Cosmetics / Neture — ❌ MISSING
 
 채널 설정 UI 없음 (백엔드 구조는 존재하지만 프론트엔드 미구현).
 
@@ -342,7 +309,7 @@ updateListingChannels(listingId: string, channels: Array<{
 
 **공급자 상품 (채택 상품):**
 - `PharmacyB2BPage` (`/store/commerce/products`)
-- 서비스 키 탭: kpa | kpa-groupbuy | glycopharm | cosmetics
+- 서비스 키 탭: kpa | kpa-groupbuy | cosmetics
 - 데이터 소스: `organization_product_listings`
 
 **로컬 상품:**
@@ -364,7 +331,7 @@ updateListingChannels(listingId: string, channels: Array<{
 - 로컬 상품: `store_local_products`에서 별도 쿼리
 - **DB UNION 금지** — 앱 레이어에서 병합
 
-### 5.3 GlycoPharm / K-Cosmetics / Neture — ❌ MISSING
+### 5.3 K-Cosmetics / Neture — ❌ MISSING
 
 로컬 상품/공급자 상품 구분 UI 없음.
 
@@ -410,10 +377,6 @@ updateListingChannels(listingId: string, channels: Array<{
 
 **참조 토큰:** `?ref=TOKEN` → sessionStorage (리퍼럴 추적)
 
-### 6.3 B2C 스토어프론트 — GlycoPharm ❌ MISSING
-
-매장 스토어프론트 없음.
-
 ### 6.4 Tablet 채널 — ⚠️ PARTIAL
 
 | 항목 | 값 |
@@ -442,23 +405,23 @@ updateListingChannels(listingId: string, channels: Array<{
 
 ### 7.1 서비스별 종합 평가
 
-| # | 영역 | KPA Society | GlycoPharm | K-Cosmetics | Neture |
-|---|------|:-----------:|:----------:|:-----------:|:------:|
-| 1 | 공급자 상품 조회 | ✅ OK | ⚠️ CONFUSING | ❌ MISSING | ❌ MISSING |
-| 2 | 상품 채택 신청 | ✅ OK | ❌ MISSING | ❌ MISSING | ❌ MISSING |
-| 3 | 운영자 승인 | ✅ OK | ❌ MISSING | ❌ MISSING | ❌ MISSING |
-| 4 | 채택 상품 목록 | ✅ OK | ❌ MISSING | ❌ MISSING | ❌ MISSING |
-| 5 | 가격/노출 편집 | ⚠️ PARTIAL | ❌ MISSING | ❌ MISSING | ❌ MISSING |
-| 6 | 채널 관리 | ✅ OK | ❌ MISSING | ❌ MISSING | ❌ MISSING |
-| 7 | B2C 스토어프론트 | ✅ OK | ❌ MISSING | ❌ MISSING | ⚠️ PARTIAL |
-| 8 | 로컬 상품 관리 | ⚠️ PARTIAL | ❌ MISSING | ❌ MISSING | ❌ MISSING |
-| 9 | Tablet/Signage | ⚠️ PARTIAL | ⚠️ PARTIAL | ⚠️ PARTIAL | ⚠️ PARTIAL |
+| # | 영역 | KPA Society | K-Cosmetics | Neture |
+| --- | ------ | :-----------: | :-----------: | :------: |
+| 1 | 공급자 상품 조회 | ✅ OK | ❌ MISSING | ❌ MISSING |
+| 2 | 상품 채택 신청 | ✅ OK | ❌ MISSING | ❌ MISSING |
+| 3 | 운영자 승인 | ✅ OK | ❌ MISSING | ❌ MISSING |
+| 4 | 채택 상품 목록 | ✅ OK | ❌ MISSING | ❌ MISSING |
+| 5 | 가격/노출 편집 | ⚠️ PARTIAL | ❌ MISSING | ❌ MISSING |
+| 6 | 채널 관리 | ✅ OK | ❌ MISSING | ❌ MISSING |
+| 7 | B2C 스토어프론트 | ✅ OK | ❌ MISSING | ⚠️ PARTIAL |
+| 8 | 로컬 상품 관리 | ⚠️ PARTIAL | ❌ MISSING | ❌ MISSING |
+| 9 | Tablet/Signage | ⚠️ PARTIAL | ⚠️ PARTIAL | ⚠️ PARTIAL |
 
 ### 7.2 Critical UX 문제
 
 | # | 문제 | 영향 | 심각도 |
 |---|------|------|:------:|
-| 1 | **GlycoPharm 매장 채택 UX 전체 부재** | GlycoPharm 매장이 상품을 채택할 수 없음 | 🔴 HIGH |
+| 1 | — | — | 🔴 HIGH |
 | 2 | **K-Cosmetics 매장 채택 UX 전체 부재** | K-Cosmetics 매장이 상품을 채택할 수 없음 | 🔴 HIGH |
 | 3 | **KPA 리스팅 편집 UI 불명확** | 매장 관리자가 가격/노출 변경할 방법이 모호 | 🟡 MEDIUM |
 | 4 | **KPA 로컬 상품 관리 UI 미발견** | 매장 자체 상품(Display Domain) 관리 경로 불분명 | 🟡 MEDIUM |
@@ -471,11 +434,9 @@ updateListingChannels(listingId: string, channels: Array<{
 카탈로그 → 판매 신청 → 운영자 승인 → 자동 리스팅 생성 → 채널 설정 → B2C 표시
 ```
 
-**GlycoPharm/K-Cosmetics/Neture:**
 - 백엔드 인프라(엔티티, 마이그레이션, API 라우트)는 대부분 존재
 - 프론트엔드 UI가 미구현 → 실질적으로 상품 채택 불가
 
-**GlycoPharm 특이사항:**
 - 운영자용 ProductMaster 콘솔은 존재 (`/operator/products`)
 - 매장용 카탈로그/채택 페이지는 없음
 - 운영자 콘솔과 매장 관리 화면의 혼동 가능성
@@ -514,7 +475,6 @@ updateListingChannels(listingId: string, channels: Array<{
  (공개 스토어프론트에 표시)                      │
 ```
 
-**GlycoPharm / K-Cosmetics (Missing):**
 ```
 [매장 관리자]
     │
@@ -544,7 +504,6 @@ updateListingChannels(listingId: string, channels: Array<{
 | KPA 채택 상품 목록 | `services/web-kpa-society/src/pages/pharmacy/PharmacyB2BPage.tsx` |
 | KPA 채널 관리 | `services/web-kpa-society/src/pages/pharmacy/StoreChannelsPage.tsx` |
 | KPA 스토어프론트 상품 | `services/web-kpa-society/src/pages/storefront/StorefrontProductDetailPage.tsx` |
-| GlycoPharm 운영자 상품 | `services/web-glycopharm/src/pages/operator/ProductsPage.tsx` |
 | Neture 스토어 상품 | `services/web-neture/src/pages/store/StoreProductPage.tsx` |
 
 ### API 클라이언트
@@ -579,7 +538,7 @@ updateListingChannels(listingId: string, channels: Array<{
 
 | WO | 목적 |
 |------|------|
-| `WO-O4O-STORE-PRODUCT-ADOPTION-UX-FIX-V1` | GlycoPharm/K-Cosmetics 매장 채택 UX 구현 |
+| `WO-O4O-STORE-PRODUCT-ADOPTION-UX-FIX-V1` | K-Cosmetics 매장 채택 UX 구현 |
 | `WO-O4O-STORE-CATALOG-MANAGEMENT-V1` | 카탈로그 브라우징 + 채택 관리 UI 통합 |
 | `WO-O4O-STORE-CHANNEL-EXPOSURE-FIX-V1` | 채널 관리 메뉴 노출 + 리스팅 편집 UI |
 

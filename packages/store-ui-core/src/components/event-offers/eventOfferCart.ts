@@ -3,7 +3,7 @@
  *
  * WO-O4O-STORE-HUB-EVENT-OFFER-COMMONIZATION-V1
  *
- * KPA-Society / K-Cosmetics / GlycoPharm 이 각자 `src/utils/eventOfferCart.ts` 로
+ * KPA-Society / K-Cosmetics 이 각자 `src/utils/eventOfferCart.ts` 로
  * 갖고 있던 동일 로직(uuid 형태 검증 + canonical cart payload 조립)을 한 곳으로 모은다.
  *
  * 업무 의미 (변경 없음):

@@ -4,11 +4,9 @@ title: "남아 있는 operator/admin raw table 화면 리스크 재분류"
 status: draft
 date: 2026-05-09
 scope:
-  - GlycoPharm operator InvoicesPage / SettlementsPage
   - Neture admin OperatorsPage / AdminSupplierApprovalPage / AdminPartnerMonitoringPage / CommunityManagementPage
   - Neture partner PartnerStoresPage
   - K-Cosmetics signage HqMediaPage / HqPlaylistsPage
-  - GlycoPharm signage HqMediaPage / HqPlaylistsPage
 related:
   - docs/investigations/IR-O4O-OPERATOR-LIST-COMMONIZATION-AUDIT-V1.md
   - docs/architecture/O4O-KPA-OPERATOR-CANONICAL-STATE-V1.md
@@ -36,7 +34,7 @@ constraint:
 ## 0. 결론 요약 (TL;DR)
 
 > **자매 IR(IR-O4O-OPERATOR-LIST-COMMONIZATION-AUDIT-V1) 의 D 분류 4건이 오분류였음을 본 IR 가 정정한다.**
-> HQ Signage 4개 화면(K-Cosmetics × 2, GlycoPharm × 2)은 *카드 그리드가 아니라 raw `<table>`*
+> HQ Signage 4개 화면(K-Cosmetics × 2 × 2)은 *카드 그리드가 아니라 raw `<table>`*
 > 이며, 이 중 3개는 즉시 canonical 가능, 1개는 thumbnail 컬럼 정책 결정 후 가능.
 > 자매 IR §5.2 "HQ Signage 카드 그리드 — UX 가 정답" 은 *코드를 읽지 않은 추정* 이었다.
 
@@ -44,8 +42,6 @@ constraint:
 
 | # | 서비스 | 화면 | 이전 분류 | **재분류** | 우선순위 |
 |---|---|---|:---:|:---:|---|
-| 1 | GlycoPharm | `operator/InvoicesPage` | C | **B** | 자금 도메인 IR 후 정비 |
-| 2 | GlycoPharm | `operator/SettlementsPage` | C | **B** (mock) | 실 API 정의 후 정비 |
 | 3 | Neture | `admin/OperatorsPage` | C | **A** | 즉시 정비 가능 (가장 단순) |
 | 4 | Neture | `admin/AdminSupplierApprovalPage` | C | **B** | freeze §2.1 확인 후 정비 (Approval drawer 추출 후보) |
 | 5 | Neture | `admin/AdminPartnerMonitoringPage` | C | **A** (read-only KPI) | 즉시 정비 가능, 변경 금지 (freeze §5) |
@@ -53,26 +49,23 @@ constraint:
 | 7 | Neture | `partner/PartnerStoresPage` | C | **C** (mock) | 실 API 연결 전 정비 가치 0 |
 | 8 | K-Cosmetics | `signage/HqMediaPage` | D | **A** | 즉시 정비 가능 (오분류 정정) |
 | 9 | K-Cosmetics | `signage/HqPlaylistsPage` | D | **A** | 즉시 정비 가능 (오분류 정정) |
-| 10 | GlycoPharm | `signage/HqMediaPage` | D | **B** | thumbnail 컬럼 정책 결정 후 (오분류 정정) |
-| 11 | GlycoPharm | `signage/HqPlaylistsPage` | D | **A** | 즉시 정비 가능 (오분류 정정) |
 
 ### 핵심 발견 6가지
 
 1. **HQ Signage D 4건 모두 오분류**:
-   - K-Cosmetics `HqMediaPage` / `HqPlaylistsPage`, GlycoPharm `HqPlaylistsPage` — *카드 그리드가 아닌 raw `<table>`* (실제 6~7컬럼 표). 자매 IR §5.2 의 "thumbnail-first 카드 그리드" 라는 비공통화 사유 미성립.
-   - GlycoPharm `HqMediaPage` 만 *thumbnail 컬럼이 있는 raw table* (table + thumbnail 하이브리드). 카드 그리드는 아니지만 thumbnail 보존 결정이 필요해 B.
+   - K-Cosmetics `HqMediaPage` / `HqPlaylistsPage` `HqPlaylistsPage` — *카드 그리드가 아닌 raw `<table>`* (실제 6~7컬럼 표). 자매 IR §5.2 의 "thumbnail-first 카드 그리드" 라는 비공통화 사유 미성립.
+   - 카드 그리드는 아니지만 thumbnail 보존 결정이 필요해 B.
 
 2. **즉시 A 분류 가능 화면 4개**:
    - Neture `admin/OperatorsPage` (가장 단순, deactivate/reactivate toggle만)
    - Neture `admin/AdminPartnerMonitoringPage` (read-only KPI display, freeze §5 "조회 최적화" 허용)
    - K-Cosmetics `signage/HqMediaPage`, `HqPlaylistsPage` (raw 6컬럼 table, no card grid)
-   - GlycoPharm `signage/HqPlaylistsPage` (raw 7컬럼 table, no thumbnail column)
 
 3. **B 분류 (도메인 검토 후 정비) 4개**:
-   - GlycoPharm `InvoicesPage` — 자금 도메인 회귀 리스크: KRW 포매팅 + 다중상태 머신 (DRAFT→CONFIRMED→SENT→RECEIVED) + dispatch log. 실 API 사용 중.
-   - GlycoPharm `SettlementsPage` — mock data only. 실 API 정의 + 5% commission rate 정책 확정 + status workflow 정의 후 정비.
+   - 실 API 사용 중.
+   - 실 API 정의 + 5% commission rate 정책 확정 + status workflow 정의 후 정비.
    - Neture `admin/AdminSupplierApprovalPage` — `NETURE-DOMAIN-ARCHITECTURE-FREEZE-V3` §2.1 (Layer 1 Supplier Approval Gate) 인접. 상태 머신 (PENDING → APPROVED|REJECTED) 보존 확인 후 정비. **`ApprovalDrawerLayout` 추출 후보 1순위**.
-   - GlycoPharm `signage/HqMediaPage` — table + thumbnail 컬럼. 마이그레이션 가능하나 thumbnail-in-DataTable 패턴이 캐노니컬에 없음 → 정책 결정 필요.
+   - 마이그레이션 가능하나 thumbnail-in-DataTable 패턴이 캐노니컬에 없음 → 정책 결정 필요.
 
 4. **C 분류 (현 구조 유지 권장) 2개**:
    - Neture `admin/CommunityManagementPage` — 3 탭 + 듀얼 테이블 + 인라인 모달 폼. 트래픽 낮음, Layer 5 캠페인 유연성 영역. 정비 가치 < 비용.
@@ -101,71 +94,6 @@ constraint:
 ---
 
 ## 2. 화면별 조사 결과
-
-### 2.1 GlycoPharm operator/InvoicesPage
-
-**현재 구조**:
-- **실 API**: `api.get('/glycopharm/invoices')`, `POST /glycopharm/invoices/{id}/confirm` 등 다수
-- 필터: status 탭 (all/DRAFT/CONFIRMED/ARCHIVED), 검색 없음, **pagination 없음**
-- Row actions: inline icon buttons 6개 (View detail / CSV export / Confirm / Send / Mark received / Dispatch log) — status 별 조건부
-- Detail modal: 라인 769-887 (line-item nested table 포함)
-- State complexity: **10개 useState** (상위권 복잡도)
-- Status badges: 다중상태 (`InvoiceStatus + DispatchStatus` 2D 매트릭스)
-- Lifecycle: DRAFT → CONFIRMED → SENT → RECEIVED + ARCHIVED 분기
-- `<table>` 위치: 라인 417-521 (9 컬럼)
-
-**raw table 사용 사유**:
-- KRW 포매팅 복잡도: `unitPrice`, `amount` → `krw()` + `.toLocaleString()` (라인 114-116)
-- 다중 상태 배지: status × dispatch 2D
-- 조건부 액션 버튼 5-6개 (status 별 가시성)
-- 단순 "아직 마이그레이션 안 됨" — 아키텍처 차단 요소 없음
-
-**DataTable 마이그레이션 가능성**:
-- 9 컬럼 → `ListColumnDef<Invoice>` 매핑 자체는 직선적
-- DataTable 미지원: expandable rows, footer totals, row grouping (모두 본 화면에 없음)
-- detail modal 의 nested line-item table 은 그대로 유지 가능
-
-**회귀 리스크**:
-| 항목 | 강도 | 이유 |
-|---|:---:|---|
-| KRW 포매팅 표시 변경 | 🟡 중간 | `krw()` formatter 가 column render 로 이동 시 thousands separator / 자릿수 누락 위험 |
-| 상태→액션 매핑 | 🟡 중간 | DRAFT-only confirm, CONFIRMED-only send 등 조건부 가시성 정확히 보존 필요 |
-| dispatch log 모달 wiring | 🟡 중간 | row click 외 별도 trigger, 마이그레이션 시 분리 필요 |
-| 운영 데이터 (실 API) | 🟡 중간 | mock 아님 — 실 청구 데이터 표시 사이클 |
-
-**재분류**: **B** — 자금 도메인 정확성 IR 선행 필요 (KRW formatter 통일, status transition 정의, dispatch log 분리)
-
----
-
-### 2.2 GlycoPharm operator/SettlementsPage
-
-**현재 구조**:
-- **Mock data only** (라인 46-104 `sampleSettlements` 인라인) — API 미연결
-- 필터: 탭 (all/pending/processing/completed) + 약국 검색 + 기간 필터
-- Row actions: dropdown menu (4 actions: detail / process / retry / download statement)
-- Detail modal: 미구현
-- State complexity: 5개 useState
-- Status badges: custom `StatusBadge()` (라인 117-133) icon + label
-- Lifecycle: pending → processing → completed; failed → retry
-- Pagination: client-side (10/page, full UI: prev/page-numbers/next)
-- `<table>` 위치: 라인 348-460 (8 컬럼)
-
-**raw table 사용 사유**:
-- 만원 단위 포매팅: `(amount/10000).toLocaleString() + '만원'` (라인 395-404)
-- Custom dropdown 액션 메뉴 (라인 417-455, 고정 backdrop)
-- 자체 pagination 위젯 (라인 471-497)
-- mock 단계 — 실 API 미정의로 인한 미마이그레이션
-
-**DataTable 마이그레이션 가능성**:
-- 8 컬럼 → `ListColumnDef<Settlement>` 매핑 직선적
-- 자체 pagination → 외부 JSX pagination block (canonical 패턴) 으로 교체 가능
-- **차단 요소**: 실 API 미정의 — endpoint / response schema / commission rate 정책 / status transition 규칙 미확정
-
-**회귀 리스크**: mock-only → **운영 영향 0**. 단 정비 가치도 0 (실 API 정의 전).
-
-**재분류**: **B** — *실 API 정의 + commission 정책 확정* 후 정비.
-
----
 
 ### 2.3 Neture admin/OperatorsPage
 
@@ -326,53 +254,14 @@ constraint:
 
 ---
 
-### 2.10 GlycoPharm signage/HqMediaPage ⚠ 오분류 부분 정정
-
-**자매 IR §5.2 분류**: D
-
-**실제 구조** (라인 489-566):
-- **Raw `<table>` 7 컬럼 + thumbnail 컬럼** — *table + thumbnail 하이브리드*
-- 컬럼: 미리보기 (thumbnail), 제목, 소스 (hidden md), 상태, 사용 여부, 생성일 (hidden lg), chevron
-- `MediaThumbnail` 컴포넌트 (라인 492, 528-529): `thumbnailUrl` 또는 YouTube ID 추출
-- Debounced search + status filter + 사용 횟수 집계
-- 인라인 생성 폼 + URL preview 검증 (`UrlPreview` 컴포넌트)
-
-**자매 IR D 분류 부분 정정**:
-- "카드 그리드" 가 아니라 *table* — D 사유 (카드 그리드 UX 보존) 미성립
-- 단 thumbnail 컬럼 보존이 필요 → canonical DataTable 로 마이그레이션 시 thumbnail 컬럼 패턴 결정 필요
-
-**DataTable 마이그레이션 가능성**: 중간-높음. canonical DataTable 에 *thumbnail 컬럼* 정책이 명시되지 않음 — `ListColumnDef.render` 로 thumbnail 표시 가능하나 caching / lazy-load / placeholder 패턴 결정 필요.
-
-**재분류**: **B** — thumbnail-in-DataTable 정책 결정 후 정비. (오분류 부분 정정 — D → B)
-
----
-
-### 2.11 GlycoPharm signage/HqPlaylistsPage ⚠ 오분류 정정
-
-**자매 IR §5.2 분류**: D
-
-**실제 구조** (라인 396-474):
-- **Raw `<table>` 7 컬럼**
-- 컬럼: 이름 (+optional desc), 항목 수, 총 시간 (hidden md), 상태, 매장 복사 횟수, 생성일 (hidden lg), chevron
-- Debounced search
-- 인라인 생성 폼 (name / desc / duration / transition / loop / tags)
-- **thumbnail 컬럼 없음** (sequence 도메인이라 적절)
-- 매장 복사 횟수 집계 (`parentPlaylistId` 역참조)
-
-**DataTable 마이그레이션 가능성**: 매우 높음. 7 컬럼 직선 매핑, copy count 는 단순 mapped 필드.
-
-**재분류**: **A** — 즉시 정비 가능. (오분류 정정)
-
----
-
 ## 3. 서비스 횡단 매트릭스
 
 ### 3.1 분류별 화면 수 (재분류 기준)
 
 | 분류 | 화면 수 | 화면 |
 |---|---:|---|
-| **A 즉시 정비** | 5 | Neture `OperatorsPage`, `AdminPartnerMonitoringPage`, K-Cosmetics signage 2개, GlycoPharm `HqPlaylistsPage` |
-| **B 도메인 IR 후** | 4 | GlycoPharm `InvoicesPage`, `SettlementsPage`, `signage/HqMediaPage`; Neture `AdminSupplierApprovalPage` |
+| **A 즉시 정비** | 5 | Neture `OperatorsPage`, `AdminPartnerMonitoringPage`, K-Cosmetics signage 2개 `HqPlaylistsPage` |
+| **B 도메인 IR 후** | 4 | Neture `AdminSupplierApprovalPage` |
 | **C 현 구조 유지** | 2 | Neture `CommunityManagementPage`, `partner/PartnerStoresPage` |
 | **D 미적용** | 0 | (자매 IR 의 D 4건 모두 A/B 로 정정) |
 
@@ -380,8 +269,6 @@ constraint:
 
 | 화면 | 이전 | 재분류 | 변화 사유 |
 |---|:---:|:---:|---|
-| GlycoPharm `InvoicesPage` | C | **B** | 자금 도메인 회귀 리스크 명시화 (formatter / 상태 머신) |
-| GlycoPharm `SettlementsPage` | C | **B** | mock-only 명시화 (실 API 정의 선행) |
 | Neture `admin/OperatorsPage` | C | **A** | 단순 raw table, freeze 미접촉 |
 | Neture `admin/AdminSupplierApprovalPage` | C | **B** | freeze §2.1 인접 + ApprovalDrawerLayout 추출 후보 |
 | Neture `admin/AdminPartnerMonitoringPage` | C | **A** | read-only KPI, freeze §5 조회 최적화 허용 |
@@ -389,8 +276,6 @@ constraint:
 | Neture `partner/PartnerStoresPage` | C | **C** (유지) | mock-only, API 미연결 |
 | K-Cosmetics `signage/HqMediaPage` | **D** | **A** | ⚠ 오분류 정정 — raw table, no thumbnail |
 | K-Cosmetics `signage/HqPlaylistsPage` | **D** | **A** | ⚠ 오분류 정정 — raw table |
-| GlycoPharm `signage/HqMediaPage` | **D** | **B** | ⚠ 오분류 부분 정정 — table+thumbnail 하이브리드, 정책 결정 필요 |
-| GlycoPharm `signage/HqPlaylistsPage` | **D** | **A** | ⚠ 오분류 정정 — raw table |
 
 **정정 4건 / 재확정 5건 / 유지 2건**
 
@@ -406,7 +291,7 @@ constraint:
 | 2 | Neture `admin/AdminPartnerMonitoringPage` | read-only KPI, 변경 위험 0 |
 | 3 | K-Cosmetics `signage/HqMediaPage` | 6 컬럼 raw table, no thumbnail |
 | 4 | K-Cosmetics `signage/HqPlaylistsPage` | 7 컬럼 raw table |
-| 5 | GlycoPharm `signage/HqPlaylistsPage` | 7 컬럼 raw table, copy count 매핑만 |
+| 5 | — | 7 컬럼 raw table, copy count 매핑만 |
 
 → **WO 후보**: `WO-O4O-NETURE-ADMIN-OPERATOR-DATATABLE-ALIGN-V1`, `WO-O4O-NETURE-ADMIN-PARTNER-MONITORING-DATATABLE-ALIGN-V1`, `WO-O4O-SIGNAGE-HQ-MEDIA-PLAYLIST-DATATABLE-ALIGN-V1` (3개 화면 묶음 가능)
 
@@ -415,9 +300,9 @@ constraint:
 | 순위 | 화면 | 선행 IR / WO |
 |---|---|---|
 | 6 | Neture `admin/AdminSupplierApprovalPage` | (a) freeze §2.1 상태 머신 명시 확인 — 별도 IR 또는 WO 노트 / (b) `ApprovalDrawerLayout` 추출 WO 와 함께 |
-| 7 | GlycoPharm `signage/HqMediaPage` | thumbnail-in-DataTable 정책 결정 (lazy-load / placeholder / cache 패턴) |
-| 8 | GlycoPharm `InvoicesPage` | 자금 도메인 IR — KRW formatter 통일 + status transition 정의 + dispatch log 분리 |
-| 9 | GlycoPharm `SettlementsPage` | 실 API 정의 + commission rate 정책 + status workflow 정의 |
+| 7 | — | thumbnail-in-DataTable 정책 결정 (lazy-load / placeholder / cache 패턴) |
+| 8 | — | 자금 도메인 IR — KRW formatter 통일 + status transition 정의 + dispatch log 분리 |
+| 9 | — | 실 API 정의 + commission rate 정책 + status workflow 정의 |
 
 ### Phase 3 — `ApprovalDrawerLayout` 추출 (자매 IR §6.1 후속)
 
@@ -442,17 +327,17 @@ constraint:
 
 자매 IR (IR-O4O-OPERATOR-LIST-COMMONIZATION-AUDIT-V1) 의 D 분류 4건이 모두 *코드를 읽지 않은 추정* 이었음. 이는 다음 의문을 제기:
 
-1. 자매 IR 의 다른 분류 (특히 GlycoPharm/K-Cosmetics/Neture 의 다른 D/E 분류) 에서도 같은 추정이 있을 가능성?
+1. 자매 IR 의 다른 분류 에서도 같은 추정이 있을 가능성?
 2. 자매 IR §5 "공통화 비추천 항목" 명단의 신뢰도 재검증 필요?
 
 **대응**: 본 IR 는 11개만 재검증. 나머지 D 분류 (Neture freeze 화면 5개) 는 freeze 계약 문서가 비공통화의 *정책적* 사유이므로 코드 재읽기 없이도 정당. 단 *향후 IR 작성 시 코드 읽기 우선* 원칙을 강화할 것.
 
 ### 5.2 Open Questions
 
-1. **GlycoPharm InvoicesPage 의 KRW formatter 규격** — 통일 formatter는 무엇이어야 하는가? (현재 `krw()` vs `(amount/10000) + '만원'` 불일치) → 자금 도메인 IR 선행 필요.
-2. **GlycoPharm SettlementsPage 의 commission rate** — 5% 하드코딩이 정책인가, 약국별 가변인가? → 회계 팀 / 도메인 오너 확인 필요.
+1. (현재 `krw()` vs `(amount/10000) + '만원'` 불일치) → 자금 도메인 IR 선행 필요.
+2. → 회계 팀 / 도메인 오너 확인 필요.
 3. **Neture AdminSupplierApprovalPage 의 reject reason 라운드트립** — drawer 마이그레이션 시 textarea → API 와이어 보존 검증 필수. 회귀 시 거부 사유 소실.
-4. **GlycoPharm HqMediaPage 의 thumbnail 컬럼** — DataTable 에 thumbnail-in-column 패턴이 캐노니컬에 없음. 정책 결정: (a) `ListColumnDef.render` 에 inline 표시 / (b) 별도 `MediaThumbnailColumn` 추출 / (c) thumbnail-only side panel.
+4. 정책 결정: (a) `ListColumnDef.render` 에 inline 표시 / (b) 별도 `MediaThumbnailColumn` 추출 / (c) thumbnail-only side panel.
 5. **Neture admin 영역 전반의 staff-facing 트래픽 측정** — 본 IR 는 코드 기반으로 "scaffold/저트래픽" 추정. 운영 텔레메트리로 정량 확인 필요.
 
 ### 5.3 Constitutional 정합성
@@ -475,9 +360,6 @@ constraint:
 2. `WO-O4O-NETURE-ADMIN-PARTNER-MONITORING-DATATABLE-ALIGN-V1` — Phase 1 #2 (read-only)
 3. `WO-O4O-SIGNAGE-HQ-DATATABLE-ALIGN-V1` — Phase 1 #3-5 묶음 (3개 signage 화면)
 4. `WO-O4O-OPERATOR-APPROVAL-DRAWER-EXTRACT-V1` — Phase 3 (KPA + 4서비스 7화면 추상화)
-5. `IR-O4O-GLYCOPHARM-FINANCIAL-DOMAIN-FORMATTER-AUDIT-V1` — Phase 2 #8 자금 도메인 IR
-6. `WO-O4O-GLYCOPHARM-INVOICES-DATATABLE-ALIGN-V1` — Phase 2 #8 (#5 IR 후)
-7. `WO-O4O-GLYCOPHARM-SETTLEMENTS-API-DEFINE-V1` — Phase 2 #9 (실 API 정의)
 
 자매 IR 의 D 분류 정정 사항은 자매 IR 본문 갱신 또는 본 IR 인용으로 추적.
 

@@ -15,7 +15,6 @@ O4O 플랫폼의 **서비스 운영자 대시보드(Operator HUB)** 구조를 �
 | 서비스 | Route | 페이지 수 |
 |--------|-------|:---------:|
 | KPA Society | `/operator` | 18 |
-| GlycoPharm | `/admin` | 37 |
 | K-Cosmetics | `/operator` | 23 |
 
 3개 서비스 모두 `@o4o/operator-ux-core` 기반 **5-Block Dashboard** 구조를 사용 중.
@@ -30,7 +29,6 @@ O4O 플랫폼의 **서비스 운영자 대시보드(Operator HUB)** 구조를 �
 
 **1차 적용:**
 - KPA-a
-- GlycoPharm
 - K-Cosmetics
 
 **2차 적용 (표준 기반):**
@@ -58,7 +56,6 @@ O4O 플랫폼의 **서비스 운영자 대시보드(Operator HUB)** 구조를 �
 ```
 
 **변경 필요:**
-- GlycoPharm: `/admin` → `/operator` (legacy redirect 유지)
 
 ### 3.2 Operator Layout 표준
 
@@ -85,7 +82,6 @@ OperatorLayout
 
 현재 분산된 Guard 패턴:
 - KPA: `RoleGuard`, `BranchOperatorAuthGuard`
-- GlycoPharm: `ProtectedRoute`
 - K-Cosmetics: `ProtectedRoute`
 
 **통일 대상:**
@@ -152,24 +148,6 @@ export const operatorConfig = {
 | Legal | `/operator/legal` |
 | Operator Management | `/operator/operators` (Admin only) |
 
-### GlycoPharm Extensions
-
-| 기능 | Route |
-|------|-------|
-| Store Approvals | `/operator/store-approvals` |
-| Store Template | `/operator/store-template` |
-| Forum Requests | `/operator/forum-requests` |
-| Forum Management | `/operator/forum-management` |
-| Inventory | `/operator/inventory` |
-| Settlements | `/operator/settlements` |
-| Invoices | `/operator/invoices` |
-| Billing Preview | `/operator/billing-preview` |
-| Applications | `/operator/applications` |
-| Marketing | `/operator/marketing` |
-| Reports | `/operator/reports` |
-| Support | `/operator/support` |
-| Market Trial | `/operator/market-trial` |
-
 ### K-Cosmetics Extensions
 
 | 기능 | Route |
@@ -190,7 +168,6 @@ export const operatorConfig = {
 | 서비스 | 방식 |
 |--------|------|
 | KPA | `menuSections` (커스텀) |
-| GlycoPharm | `enabledMenus` |
 | K-Cosmetics | `enabledMenus` |
 | GlucoseView | `enabledMenus` |
 
@@ -276,7 +253,6 @@ PATCH  /api/v1/operator/members/:id/reject  → 거절
 ```
 Phase 1: Standard 문서 작성 (이 문서)
 Phase 2: KPA-a 적용 (가장 작은 범위)
-Phase 3: GlycoPharm 적용 (가장 큰 범위, /admin → /operator 마이그레이션)
 Phase 4: K-Cosmetics 적용
 Phase 5: KPA-b, KPA-c 적용
 ```

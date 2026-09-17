@@ -40,7 +40,7 @@
 - **유일 결함**: 매장 현황이 신청일(appliedAt)만 표시, **처리일(decidedAt) 미표시**(WO §8 목록 표시 항목).
   payload에 decidedAt 이미 존재.
 - **수정**: `StoreRecruitmentApplicationsView.tsx` 신청일 라인에 `decidedAt` 조건부 표시(additive, null이면 미표시).
-  공통 컴포넌트라 KPA/GP/KCos 공통 이득. 승인·반려·관계 생성 로직 무변경.
+  공통 컴포넌트라 KPA/KCos 공통 이득. 승인·반려·관계 생성 로직 무변경.
 
 ## 5. 소유권·service scope 가드
 
@@ -70,7 +70,7 @@
 
 ### 정적
 - 승인/반려 소유권·PENDING·반복차단 가드 · 자기 모집만 · service scope · 반려사유 표시 · 감사정보 매장 미노출 ·
-  migration 0 · typecheck(store-ui-core/web-kpa-society/web-glycopharm) 0 · KPA build 0.
+  migration 0 · typecheck 0 · KPA build 0.
 
 ### 라이브 API smoke (프로덕션, backend 무변경)
 - store mine 200(빈) · 비로그인 401 · 공급자 approve/reject 존재하지 않는 id 404 가드 · (renagang21=supplier 겸직이라
@@ -85,7 +85,7 @@
 
 ## 10. KPA 외 영향
 
-- 변경 파일 = store-ui-core 공통 View 1개(additive). GP tsc 0 확인. 승인·반려 로직·엔드포인트 무변경 → Neture 무회귀.
+- 변경 파일 = store-ui-core 공통 View 1개(additive). 승인·반려 로직·엔드포인트 무변경 → Neture 무회귀.
 
 ## 11. 후속 / 보류 (중지 조건 부분 해당)
 

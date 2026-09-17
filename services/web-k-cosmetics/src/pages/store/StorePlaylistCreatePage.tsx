@@ -8,7 +8,7 @@
  *   - 항목(미디어)은 생성 후 목록/상세에서 HUB 복사로 추가한다.
  *
  * WO-O4O-MY-STORE-REMAINING-FEATURE-VIEW-COMMONIZATION-V1 §5-A:
- *   화면 껍데기를 공통 StorePlaylistCreateView 로 이관(KPA/GP 와 동일 View). 동작·문구 변경 없음.
+ *   화면 껍데기를 공통 StorePlaylistCreateView 로 이관(KPA 와 동일 View). 동작·문구 변경 없음.
  *
  * ⚠️ KEEP-LEGACY (docs/baseline/O4O-SIGNAGE-STORE-PLAYLIST-MODEL-BOUNDARY-V1.md):
  *   K-Cosmetics 내 매장은 cosmetics_store_playlists 격리 스키마. canonical signage_playlists 로 바꾸지 말 것.

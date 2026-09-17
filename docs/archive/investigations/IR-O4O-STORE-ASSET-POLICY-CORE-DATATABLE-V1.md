@@ -48,10 +48,9 @@ StoreAssetsPanel
 | 서비스 | StoreAssetsPanel 사용 | StoreAssetsPage 파일 | 비고 |
 |--------|----------------------|---------------------|------|
 | **KPA Society** | ✅ | `pages/pharmacy/StoreAssetsPage.tsx` | `/store/content` route |
-| **GlycoPharm** | ✅ | `pages/store/StoreAssetsPage.tsx` | `/store/content` route |
 | **K-Cosmetics** | ❌ | 없음 | types만 import 사용 |
 
-**결론**: 패키지 변경 시 KPA + GlycoPharm 두 서비스에 영향. K-Cosmetics 무관.
+**결론**: 패키지 변경 시 KPA 서비스에 영향. K-Cosmetics 무관.
 
 ---
 
@@ -156,7 +155,6 @@ StoreAssetsPanel.tsx
   + ActionBar (게시 / 숨김 / 초안 3종)
   + StoreAssetsPanelProps.onBulkStatusChange?: (ids: string[], status) => Promise<void>
 
-StoreAssetsPage.tsx (KPA + GlycoPharm 각 1개)
   + handleBulkStatusChange 핸들러 추가 (fan-out 로직)
 ```
 
@@ -166,7 +164,7 @@ StoreAssetsPage.tsx (KPA + GlycoPharm 각 1개)
 - BaseTable API 내에서 처리 — DataTable 마이그레이션 불필요
 
 **위험**:
-- 패키지 변경 → KPA + GlycoPharm 두 빌드 동시 검증 필요
+- 패키지 변경 → KPA 두 빌드 동시 검증 필요
 - `StoreAssetsPanelProps` 인터페이스 변경 (optional prop 추가, 하위 호환)
 
 **난이도**: 중간
@@ -192,7 +190,7 @@ StoreAssetsPage.tsx (KPA + GlycoPharm 각 1개)
 ### Option C — wrapper 페이지에서 별도 DataTable 구성
 
 **문제점**: 데이터 fetch + filter + sort + pagination 로직이 StoreAssetsPanel 내부에 있음.  
-wrapper 에서 재구성하면 KPA/GlycoPharm 양쪽에 중복 구현 발생. **채택 불가**.
+wrapper 에서 재구성하면 KPA 양쪽에 중복 구현 발생. **채택 불가**.
 
 ---
 
@@ -202,7 +200,7 @@ wrapper 에서 재구성하면 KPA/GlycoPharm 양쪽에 중복 구현 발생. **
 1. BaseTable 이미 selection API 내장 → 최소한의 변경
 2. `O4OColumn` / `ForcedSection` 무변경 → 리스크 격리
 3. `StoreAssetsPanelProps` optional prop 추가 → 하위 호환
-4. KPA + GlycoPharm 동시 표준화
+4. KPA 동시 표준화
 
 ---
 
@@ -221,7 +219,6 @@ packages/store-asset-policy-core/src/components/StoreAssetsPanel.tsx
 services/web-kpa-society/src/pages/pharmacy/StoreAssetsPage.tsx
   - handleBulkStatusChange 추가 (Promise.allSettled fan-out)
 
-services/web-glycopharm/src/pages/store/StoreAssetsPage.tsx
   - handleBulkStatusChange 추가 (동일 패턴)
 ```
 
@@ -232,8 +229,6 @@ packages/store-asset-policy-core/src/components/ForcedSection.tsx — 무변경
 services/web-k-cosmetics/**                                        — 무관
 backend API                                                        — 무변경
 ```
-
-**TypeScript 검증**: `web-kpa-society` + `web-glycopharm` 두 서비스 모두 검증 필요.
 
 ---
 
@@ -266,6 +261,5 @@ packages/store-asset-policy-core/src/components/ForcedSection.tsx
 packages/ui/src/components/table/types.ts           (BaseTableProps — selectable API)
 packages/ui/src/components/table/BaseTable.tsx
 services/web-kpa-society/src/pages/pharmacy/StoreAssetsPage.tsx
-services/web-glycopharm/src/pages/store/StoreAssetsPage.tsx
 services/web-k-cosmetics/src/api/assetSnapshot.ts   (types only, StoreAssetsPanel 미사용)
 ```

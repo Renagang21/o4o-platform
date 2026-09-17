@@ -58,7 +58,6 @@
 ```text
 우선:   packages/operator-ux-core/src/sidebar/DomainIASidebar.tsx   (모바일 분기 교체 + 세로 nav 재사용 추출)
 필요 시: packages/operator-ux-core/src/layout/OperatorAreaShell.tsx (모바일 토글 바 슬롯/오프셋 — 최소)
-서비스 wrapper (KPA/Glyco/KCos/Neture): 가능하면 미수정 (공통 컴포넌트로 해결)
 ```
 
 ---
@@ -95,7 +94,7 @@
 ```bash
 cd packages/operator-ux-core && npx tsc --noEmit   # 또는 repo 표준 build/typecheck
 ```
-- operator-ux-core 의존 서비스(KPA/Glyco/KCos/Neture) 중 최소 1곳 `tsc --noEmit` 회귀 확인 권장.
+- operator-ux-core 의존 서비스 중 최소 1곳 `tsc --noEmit` 회귀 확인 권장.
 
 ### 6.2 화면 smoke (배포 또는 local)
 ```text
@@ -115,7 +114,6 @@ mobile (390px 전후):
 ### 6.3 대상 서비스 (모두 동일 공통 컴포넌트 → 일괄)
 ```text
 - KPA-Society /operator        mobile/desktop
-- GlycoPharm /operator         mobile/desktop
 - K-Cosmetics /operator        mobile/desktop
 - Neture /operator             mobile/desktop
 - Neture /admin                가능하면 확인 (AdminLayoutWrapper 도 DomainIASidebar 사용)

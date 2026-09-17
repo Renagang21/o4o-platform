@@ -26,7 +26,6 @@ O4O 플랫폼의 운영자(Admin / Operator) 구조가 서비스마다 일관되
 |---------|:--------:|------|
 | neture | O | |
 | k-cosmetics | O | |
-| glycopharm | O | |
 | glucoseview | O | |
 | kpa-a (Platform Admin/Operator) | O | |
 | kpa-b (Branch Operator) | O | Operator만 조사 |
@@ -42,7 +41,6 @@ O4O 플랫폼의 운영자(Admin / Operator) 구조가 서비스마다 일관되
 | Service | Admin Route | Operator Route | 분리 여부 | 비고 |
 |---------|-----------|---------------|:--------:|------|
 | **Neture** | `/workspace/admin` | `/workspace/operator` | YES | ROUTE_OVERRIDES 사용 |
-| **GlycoPharm** | `/admin` | `/admin` | **NO** | 동일 경로, AdminIndexRedirect에서 내부 분기 |
 | **K-Cosmetics** | `/admin` | `/operator` | YES | 표준 매핑 |
 | **GlucoView** | `/admin` (단일 페이지) | `/operator` | YES | Admin은 단일 페이지, Operator가 실제 관리 |
 | **KPA-a** | `/demo/admin` | `/operator` | YES | Admin→구조 관리, Operator→운영 관리 |
@@ -53,7 +51,6 @@ O4O 플랫폼의 운영자(Admin / Operator) 구조가 서비스마다 일관되
 
 | # | 문제 | 서비스 | 설명 |
 |---|------|--------|------|
-| R1 | Admin/Operator 동일 경로 | GlycoPharm | 둘 다 `/admin` → 역할 혼동 가능 |
 | R2 | Admin 단일 페이지 | GlucoView | `/admin` = 단일 승인 페이지, 실질적 관리는 `/operator` |
 
 ---
@@ -66,13 +63,6 @@ O4O 플랫폼의 운영자(Admin / Operator) 구조가 서비스마다 일관되
 |------|:------:|----------|
 | Admin | 27 | 대시보드, 운영자, 문의메시지, 공급자승인/목록, 상품승인/Masters/Import, 파트너목록/정산, 정산/수수료, 커뮤니티, AI대시보드/카드규칙/비즈니스팩, 이메일설정 |
 | Operator | 10 | 대시보드, 가입승인, 공급현황, 사이니지, CMS, 포럼관리, AI리포트/카드리포트/운영/AssetQuality, 알림설정 |
-
-### 4.2 GlycoPharm
-
-| Role | 메뉴 수 | 주요 메뉴 |
-|------|:------:|----------|
-| Admin | 4 | 대시보드, 약국네트워크, 회원관리, 설정 |
-| Operator | 23 | 대시보드, 신청관리, 상품관리, 주문관리, 재고/공급, 정산관리, 분석/리포트, 청구리포트/미리보기/인보이스, 마케팅, 포럼신청/관리, Trial관리, 콘텐츠허브/라이브러리/사이니지/HQ미디어/플레이리스트/템플릿, 고객지원, AI리포트, 회원관리 |
 
 ### 4.3 K-Cosmetics
 
@@ -115,7 +105,7 @@ O4O 플랫폼의 운영자(Admin / Operator) 구조가 서비스마다 일관되
 
 각 서비스 메뉴를 기능 단위(Capability)로 매핑한다.
 
-| # | Capability | Neture Admin | Neture Oper | Glyco Admin | Glyco Oper | KCos Admin | KCos Oper | GlucoV Oper | KPA-a Admin | KPA-a Oper | KPA-b Oper | KPA-c |
+| # | Capability | Neture Admin | Neture Oper ||| KCos Admin | KCos Oper | GlucoV Oper | KPA-a Admin | KPA-a Oper | KPA-b Oper | KPA-c |
 |---|-----------|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
 | C01 | **User/Member Management** | O | — | O | O | O | O | O | O | O | — | — |
 | C02 | **Registration/Approval** | — | O | O | O | — | O | O | — | O | — | — |
@@ -149,17 +139,17 @@ O4O 플랫폼의 운영자(Admin / Operator) 구조가 서비스마다 일관되
 
 | # | Capability | 존재 서비스 | 비고 |
 |---|-----------|-----------|------|
-| C01 | **User/Member Management** | Neture, GlycoPharm, K-Cosmetics, GlucoView, KPA-a | 가장 보편적 |
-| C02 | **Registration/Approval** | Neture, GlycoPharm, K-Cosmetics, GlucoView, KPA-a | 가입/신청 승인 |
-| C05 | **Signage/Media** | Neture, GlycoPharm, K-Cosmetics, KPA-a, KPA-b, KPA-c | 6개 서비스 공통 |
-| C06 | **AI/Analytics** | Neture, GlycoPharm, K-Cosmetics, GlucoView, KPA-a | 5개 서비스 공통 |
-| C07 | **System Settings** | Neture, GlycoPharm, K-Cosmetics, KPA-a, KPA-c | 5개 서비스 |
-| C09 | **Product Management** | Neture, GlycoPharm, K-Cosmetics, GlucoView, KPA-a | 5개 서비스 |
-| C04 | **Forum Management** | Neture, GlycoPharm, KPA-a, KPA-b | 4개 서비스 |
+| C01 | **User/Member Management** | Neture, K-Cosmetics, GlucoView, KPA-a | 가장 보편적 |
+| C02 | **Registration/Approval** | Neture, K-Cosmetics, GlucoView, KPA-a | 가입/신청 승인 |
+| C05 | **Signage/Media** | Neture, K-Cosmetics, KPA-a, KPA-b, KPA-c | 6개 서비스 공통 |
+| C06 | **AI/Analytics** | Neture, K-Cosmetics, GlucoView, KPA-a | 5개 서비스 공통 |
+| C07 | **System Settings** | Neture, K-Cosmetics, KPA-a, KPA-c | 5개 서비스 |
+| C09 | **Product Management** | Neture, K-Cosmetics, GlucoView, KPA-a | 5개 서비스 |
+| C04 | **Forum Management** | Neture, KPA-a, KPA-b | 4개 서비스 |
 | C03 | **Content CMS** | Neture, KPA-a, KPA-b, KPA-c | 4개 서비스 |
 | C08 | **Store Management** | K-Cosmetics, GlucoView, KPA-a | 3개 서비스 |
-| C10 | **Order Management** | Neture, GlycoPharm, K-Cosmetics | 3개 서비스 |
-| C11 | **Settlement/Finance** | Neture, GlycoPharm, K-Cosmetics, KPA (연회비) | 3~4개 서비스 |
+| C10 | **Order Management** | Neture, K-Cosmetics | 3개 서비스 |
+| C11 | **Settlement/Finance** | Neture, K-Cosmetics, KPA (연회비) | 3~4개 서비스 |
 
 ### SERVICE_SPECIFIC (1~2개 서비스에만 존재)
 
@@ -167,12 +157,12 @@ O4O 플랫폼의 운영자(Admin / Operator) 구조가 서비스마다 일관되
 |---|-----------|--------|------|
 | C12 | Supplier/Vendor Management | Neture | Neture 고유 공급자 구조 |
 | C13 | Partner Management | Neture | Neture 고유 파트너 구조 |
-| C14 | Marketing | GlycoPharm, K-Cosmetics | 마케팅 메뉴 |
+| C14 | Marketing | K-Cosmetics | 마케팅 메뉴 |
 | C15 | Community Hub (Ads/Sponsors) | Neture, KPA-a | 커뮤니티 광고/스폰서 |
-| C16 | Support/CS | GlycoPharm, K-Cosmetics | 고객지원 |
+| C16 | Support/CS | K-Cosmetics | 고객지원 |
 | C17 | Legal Management | KPA-a | 약관/정책 관리 |
 | C18 | Audit Log | KPA-a | 감사 로그 |
-| C19 | Organization Structure | GlycoPharm(Admin), K-Cosmetics(Admin), KPA-a(Admin), KPA-c | 조직/분회/네트워크 구조 관리 |
+| C19 | Organization Structure | K-Cosmetics(Admin), KPA-a(Admin), KPA-c | 조직/분회/네트워크 구조 관리 |
 | C20 | LMS/Education | KPA-c | 연수교육 (Intranet 연동) |
 | C21 | Group Buy | KPA-c | 공동구매 (KPA 특화) |
 | C22 | Meeting/Schedule | KPA-c | 회의/일정 (Intranet 특화) |
@@ -182,8 +172,8 @@ O4O 플랫폼의 운영자(Admin / Operator) 구조가 서비스마다 일관되
 
 | # | 메뉴 | 서비스 | 상태 |
 |---|------|--------|------|
-| D1 | 주문 관리 | GlycoPharm Operator | Backend deprecated ("Phase 4-A: Legacy deprecated, returns empty") |
-| D2 | 재고/공급 | GlycoPharm Operator | Backend 부분 구현 |
+| D1 | 주문 관리 | — | Backend deprecated ("Phase 4-A: Legacy deprecated, returns empty") |
+| D2 | 재고/공급 | — | Backend 부분 구현 |
 | D3 | `/demo/admin` 경로 | KPA-a Admin | Legacy demo prefix 잔존 |
 
 ---
@@ -193,7 +183,6 @@ O4O 플랫폼의 운영자(Admin / Operator) 구조가 서비스마다 일관되
 | Service | Admin 메뉴 | Operator 메뉴 | 역전 여부 | Admin 역할 | Operator 역할 |
 |---------|:---------:|:------------:|:---------:|-----------|--------------|
 | **Neture** | 27 | 10 | **정상** | 플랫폼 관리 (공급자, 상품, 파트너, 정산) | 운영 (가입, 콘텐츠, 포럼, AI) |
-| **GlycoPharm** | 4 | 23 | **역전** | 구조 관리만 (약국, 회원, 설정) | 전체 운영 |
 | **K-Cosmetics** | 4 | 16 | **역전** | 구조 관리만 (매장, 회원, 설정) | 전체 운영 |
 | **GlucoView** | 1 | 5 | **역전** | 승인 페이지만 | 전체 운영 |
 | **KPA-a** | 11 | 24 | **역전** | 조직 구조 관리 | 전체 운영 |
@@ -204,7 +193,7 @@ O4O 플랫폼의 운영자(Admin / Operator) 구조가 서비스마다 일관되
 
 **Neture만 정상** — Admin이 플랫폼 관리 권한을 갖고, Operator가 일상 운영 수행.
 
-**나머지 4개 서비스(GlycoPharm, K-Cosmetics, GlucoView, KPA-a)**: Admin = "구조 관리자", Operator = "실무 운영자"로 설계됨. 기능 수로만 보면 역전이나, **의도적 설계**일 가능성 높음.
+**나머지 4개 서비스**: Admin = "구조 관리자", Operator = "실무 운영자"로 설계됨. 기능 수로만 보면 역전이나, **의도적 설계**일 가능성 높음.
 
 - **Admin**: 네트워크/조직 구조 관리 (드물게 변경)
 - **Operator**: 일상 운영 관리 (매일 사용)
@@ -217,7 +206,6 @@ O4O 플랫폼의 운영자(Admin / Operator) 구조가 서비스마다 일관되
 
 | # | 문제 | 서비스 | 설명 | 심각도 |
 |---|------|--------|------|:------:|
-| R1 | Admin/Operator 동일 라우트 | GlycoPharm | 둘 다 `/admin` → 역할 혼동 | HIGH |
 | R2 | Admin 사실상 미사용 | GlucoView | `/admin` = 단일 페이지, 실질 관리는 admin-dashboard 앱에서 수행 | MEDIUM |
 | R3 | Demo prefix 잔존 | KPA-a | `/demo/admin/*` → production에서 `/demo` prefix 부적절 | LOW |
 | R4 | RoleGuard 누락 없음 | 전체 | 모든 operator/admin 라우트에 RoleGuard 적용 확인 | OK |
@@ -231,7 +219,6 @@ O4O 플랫폼의 운영자(Admin / Operator) 구조가 서비스마다 일관되
 | Service | Admin 메뉴 | Operator 메뉴 | 분리 여부 | 평가 |
 |---------|:---------:|:------------:|:---------:|:----:|
 | **Neture** | 27 | 10 | 완전 분리 | 정상 |
-| **GlycoPharm** | 4 | 23 | 미분리 (`/admin` 공유) | 정비 필요 |
 | **K-Cosmetics** | 4 | 16 | 분리 | 정상 (역할 명확화 필요) |
 | **GlucoView** | 1 | 5 | 분리 | 정상 (Admin 최소화 의도적) |
 | **KPA-a** | 11 | 24 | 분리 | 정상 (구조/운영 분리) |
@@ -260,7 +247,6 @@ O4O 플랫폼의 운영자(Admin / Operator) 구조가 서비스마다 일관되
 
 ```
 Neture:       Supplier Management, Partner Management
-GlycoPharm:   Marketing, Support/CS
 K-Cosmetics:  Marketing, Support/CS
 KPA-a:        Legal Management, Audit Log, Community Hub, Operator Management
 KPA-c:        LMS/Education, Group Buy, Meeting/Schedule, Organization Structure
@@ -270,8 +256,6 @@ GlucoView:    Vendor Management (admin-dashboard 앱 경유)
 ### 9.4 Deprecated 메뉴
 
 ```
-GlycoPharm Operator:  주문 관리 (Backend deprecated)
-GlycoPharm Operator:  재고/공급 (Backend 부분 구현)
 KPA-a Admin:          /demo/admin 경로 (demo prefix 잔존)
 ```
 
@@ -282,14 +266,13 @@ KPA-a Admin:          /demo/admin 경로 (demo prefix 잔존)
 ### Phase 1: 라우팅 정비
 
 **WO-O4O-DASHBOARD-ROUTING-NORMALIZE-V1**
-- GlycoPharm: Admin/Operator 라우트 분리 (`/admin` vs `/operator`)
 - KPA-a: `/demo/admin` → `/admin` 경로 정리
 
 ### Phase 2: Admin/Operator 역할 명확화
 
 **WO-O4O-ADMIN-OPERATOR-ROLE-CLARIFICATION-V1**
 - 각 서비스에서 Admin = "구조 관리자" vs Operator = "운영 관리자" 역할 정의 표준화
-- GlycoPharm/K-Cosmetics Admin 기능 보강 또는 역할 의도 문서화
+- K-Cosmetics Admin 기능 보강 또는 역할 의도 문서화
 
 ### Phase 3: 공통 Capability 플랫폼화
 

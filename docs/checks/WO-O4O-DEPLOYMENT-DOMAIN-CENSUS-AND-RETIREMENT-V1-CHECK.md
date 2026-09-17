@@ -165,7 +165,7 @@ DTO 의 `InstanceType = nano_3_0 / micro_3_0 / small_3_0 / medium_3_0` 과 `Inst
 | service provisioning 이 deployment entity 를 실제 호출하는가? | **아니오** | `service-provisioning.routes.ts` · `service-admin.routes.ts` · `AppStoreService.ts` · `service-templates/` 에 `deploy` 문자열 **0건** |
 | sites retire 이후 deployment 가 독립적인 의미를 갖는가? | **아니오** | 유일한 진입점(route)·UI·DB·연결 컬럼이 모두 사라져 남은 것은 등록만 된 entity 클래스뿐이다 |
 
-`scaffold` 검색 결과 deployment 를 참조하는 active consumer **0** (LMS·glycopharm payment 등은 무관한 문맥).
+`scaffold` 검색 결과 deployment 를 참조하는 active consumer **0** (LMS payment 등은 무관한 문맥).
 
 ---
 
@@ -320,7 +320,6 @@ UNKNOWN 0
   이번 WO 의 위험(entity 등록 제거로 인한 부팅/스키마 오류)은 이 범위에서 배제된다.
 - 로그 조회 창은 신규 리비전 기준 `--freshness=1h` 이며, 동일 쿼리에서 리비전 로그 자체는 정상 반환된다
   (빈 결과가 필터 오류가 아님을 sanity 확인 완료).
-
 
 ---
 

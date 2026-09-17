@@ -56,7 +56,6 @@
 |--------|:--------------:|:-------------------:|:-------------------:|:-----:|
 | **web-neture** | ✅ Active | ✅ `SupplierSpaceLayout` (8 메뉴 그룹) | ✅ `/supplier/signage/content` 명시 라우트 | **HIGH** |
 | **web-kpa-society** | ⚠️ 제한적 | ✅ `/supplier/event-offers` (Neture 진입 redirect) | ⚠️ HubSignageLibraryPage `'supplier'` 탭 필터 잔존 | **MEDIUM** |
-| **web-glycopharm** | ❌ 차단 | ❌ `RoleNotAvailablePage` 게이트 | ❌ | **LOW** |
 | **web-k-cosmetics** | ❌ 차단 | ❌ `RoleNotAvailablePage` 게이트 | ❌ | **LOW** |
 
 ### 3.2 web-neture 상세 (HIGH)
@@ -85,7 +84,7 @@
 
 ### 3.4 정렬된 서비스 (LOW)
 
-`web-glycopharm` / `web-k-cosmetics` 모두 `<Route path="supplier/*" element={<RoleNotAvailablePage role="supplier" />} />` 로 명시적 차단. 정책 일관됨.
+정책 일관됨.
 
 ---
 
@@ -203,7 +202,7 @@ HUB 노출
 | **MEDIUM** | web-kpa-society `HubSignageLibraryPage` 'supplier' 탭 필터 | UI 필터에서 'supplier' producer 옵션 노출 — 정책 (Legacy) 과 정합되지 않음 |
 | **LOW** | `HubProducer` enum (`packages/types/src/hub-content.ts:17`) | Stable 보호 대상, 의도된 잔존. 12개 import 경로. |
 | **LOW** | PLATFORM-CONTENT-POLICY-V1 §3, §6.3 supplier producer 정책 | 이미 Legacy 명문화 완료 (2026-05-23) |
-| **LOW** | web-glycopharm / web-k-cosmetics `/supplier/*` RoleNotAvailablePage | 정책상 차단됨, 정렬 완료 |
+| **LOW** | — | 정책상 차단됨, 정렬 완료 |
 
 ### 7.2 가장 위험한 잔존 경로 (HIGH 후보)
 
@@ -254,7 +253,6 @@ web-neture / 공급자 로그인
 
 | 항목 | 상태 |
 |------|------|
-| web-glycopharm `/supplier/*` RoleNotAvailablePage | 정책 차단 |
 | web-k-cosmetics `/supplier/*` RoleNotAvailablePage | 정책 차단 |
 | PLATFORM-CONTENT-POLICY §3, §6.3 Legacy 명문화 | 2026-05-23 정렬 완료 |
 | 3-ROLE-FLOW §6.1 Drift 가드 | 2026-05-23 명문화 완료 |
@@ -320,7 +318,6 @@ Phase 3 (Enum cleanup) — 장기 일정
 | 3-ROLE-FLOW §6.1 금지 흐름 | "공급자 → HUB 직접 배포 (Operator 가공 없음)" Drift | KPA backend 경로 명문화된 예외로 처리됨 (§6.3 PLATFORM-CONTENT-POLICY) | **명문화된 예외 — 충돌 해소** |
 | PLATFORM-CONTENT-POLICY-V1 §6.3 | "공급자 탭 Legacy / 명문화된 예외" | KPA HubSignageLibraryPage 'supplier' 필터 옵션이 일반 탭처럼 노출 | **부분 충돌 (UI 측 정합 부족)** |
 | CONTENT-STABLE-DECLARATION §4-A | HubProducer Stable 보호 | 12 import 경로 그대로 존재 | **충돌 없음 (의도된 Legacy)** |
-| 정렬된 서비스 (Glyco / K-Cos) | `/supplier/*` 차단 | RoleNotAvailablePage 강제 | **충돌 없음** |
 
 **종합 판정:** 
 - **정책·문서 측: 정렬 완료 (LOW)** — Legacy 명문화 일관됨

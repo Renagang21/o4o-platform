@@ -2,7 +2,7 @@
  * LatestActivitySection — 커뮤니티 홈 "최신 활동(최신글)" 공통 View
  *
  * WO-O4O-COMMUNITY-HOME-LATEST-ACTIVITY-SECTION-COMMONIZATION-V1:
- * KPA-Society / K-Cosmetics / GlycoPharm 홈에 인라인으로 복제돼 있던 동일 섹션을
+ * KPA-Society / K-Cosmetics 홈에 인라인으로 복제돼 있던 동일 섹션을
  * View 수준까지 공통화한다. 서비스 차이(accent · 탭 바로가기 경로 · 문구)는
  * 전부 props(config) 로 표현하며 `serviceType` 분기는 두지 않는다.
  *

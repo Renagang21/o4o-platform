@@ -87,12 +87,6 @@ export function getKpaPostLoginRoute(user: User): string | null {
 
 ---
 
-#### GlycoPharm — 중간 구조
-
-`LoginPage.tsx`에서 `getGlycopharmDashboardRoute()` 호출. 단일 진입 경로.
-
----
-
 ### 1-2. Header 메뉴 역할별 Workspace 진입점
 
 **파일**: `services/web-kpa-society/src/components/KpaGlobalHeader.tsx:68-160`
@@ -161,7 +155,6 @@ LMS_INSTRUCTOR: 'lms:instructor',
 
 - **K-Cosmetics**: `k-cosmetics:supplier` 정의됨, dashboard map에 포함 (`/`)
 - **KPA**: **미정의** — `/supplier/event-offers` 라우트는 존재하나 역할 정의 없음
-- **GlycoPharm**: 미정의
 
 ---
 
@@ -351,7 +344,6 @@ if (isOperator && hasStoreOwner) {
 | 서비스 | 현재 구조 | 공통화 가능 여부 |
 |--------|---------|--------------|
 | **K-Cosmetics** | PRIORITY + MAP + getPrimaryDashboardRoute | ✅ 기준 구조 |
-| **GlycoPharm** | LoginPage에서 처리, 유사 구조 | ✅ 공통화 용이 |
 | **KPA** | boolean + 이중 처리 | ⚠️ 리팩토링 필요 |
 | **Neture** | 미조사 (구조 확인 필요) | ❓ |
 
@@ -415,7 +407,7 @@ if (isOperator && hasStoreOwner) {
 
 **대상**: 전 서비스 비교 분석
 
-- Neture/GlycoPharm redirect 구조 현행화 확인
+- Neture redirect 구조 현행화 확인
 - 서비스별 PRIORITY + MAP 일관성 점검
 - 공통 PostLoginRedirect 컴포넌트 후보 검토
 

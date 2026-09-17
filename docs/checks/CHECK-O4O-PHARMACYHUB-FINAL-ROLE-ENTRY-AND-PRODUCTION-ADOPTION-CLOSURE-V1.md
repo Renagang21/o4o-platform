@@ -68,7 +68,7 @@ EXISTS 가드로 **권한 확대가 구조적으로 불가능**하다. row 삭�
 
 | 대상 | 사유 |
 |---|---|
-| bare `member` role_assignment (`44fa7733…`) | KPA-Society/GlycoPharm/K-Cosmetics/Neture 가 membership.role 을 bare `member` 로 저장 → **다른 서비스 축에서 유래**. PharmacyHub scope 를 부여하지 않는다. 타 서비스 role 변경은 WO 금지 항목. |
+| bare `member` role_assignment (`44fa7733…`) | PharmacyHub scope 를 부여하지 않는다. 타 서비스 role 변경은 WO 금지 항목. |
 | bare `store_owner` role_assignment (`5196c1f8…`) | user status = `deleted`, membership 0건인 legacy orphan. hard delete 금지 · 사용자 삭제 금지. PharmacyHub scope 미부여. |
 | legacy role `pharmacy` (2계정) | PharmacyHub role 이 아니며 어떤 scope 도 열지 않는다. 별도 legacy 정리 축. |
 

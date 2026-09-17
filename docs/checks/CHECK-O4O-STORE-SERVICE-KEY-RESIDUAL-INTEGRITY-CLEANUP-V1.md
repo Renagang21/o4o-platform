@@ -11,11 +11,11 @@
 
 | 테이블 | 전체 | 키별 분포 | legacy 후보 |
 |---|---:|---|---|
-| `organization_service_enrollments` | 21 | cosmetics 1 / glycopharm 2 / k-cosmetics 2 / kpa-society 7 / neture 3 / pharmacy-hub 6 (전부 active) | **cosmetics 1** |
-| `organization_product_listings` | 29 | glycopharm 2 / glycopharm-event-offer 1 / k-cosmetics 2 / k-cosmetics-event-offer 1 / **kpa 1** / kpa-groupbuy 1 / kpa-society 1 / neture 20 | **kpa 1** |
-| `product_approvals` | 4 | glycopharm approved 1 / k-cosmetics approved 1 / kpa-society approved 1 + pending 1 | 0 |
-| `service_audience_policies` | 5 | glycopharm / k-cosmetics / kpa-society / neture / pharmacy-hub 각 1 | 0 |
-| `service_memberships` | 40 | glycopharm 4 / k-cosmetics 5 / kpa-branch 2 / kpa-society 6 / neture 7 / pharmacy-hub 8 active + 1 rejected / platform 7 | 0 |
+| `organization_service_enrollments` | 21 | cosmetics 1 2 / k-cosmetics 2 / kpa-society 7 / neture 3 / pharmacy-hub 6 (전부 active) | **cosmetics 1** |
+| `organization_product_listings` | 29 | — | **kpa 1** |
+| `product_approvals` | 4 | — | 0 |
+| `service_audience_policies` | 5 | k-cosmetics / kpa-society / neture / pharmacy-hub 각 1 | 0 |
+| `service_memberships` | 40 | — | 0 |
 | `platform_store_slugs` | 15 | cosmetics 2 / kpa 7 / pharmacy-hub 6 (전부 active) | 0 (**slug 축은 정상값**) |
 
 **미조사 0** — 6 테이블 전수 집계 + dual-key / orphan 검증까지 수행했다(§6).
@@ -89,7 +89,6 @@
 | `modules/organization/services/organization-ops.service.ts` `enrollService()` | 호출자 인자 | CANONICAL(호출자 전수 확인) |
 | `routes/cosmetics/services/cosmetics-store.service.ts` (2 호출) | 리터럴 `'k-cosmetics'` | CANONICAL |
 | `modules/neture/services/supplier.service.ts` | 리터럴 `'neture'` | CANONICAL |
-| `routes/glycopharm/**`(admin·store-applications·member) | `'glycopharm'` | CANONICAL |
 | `services/pharmacy-hub/PharmacyHubStoreProvisioningService.ts` | `'pharmacy-hub'` | CANONICAL |
 
 → **enrollment 쪽에 살아 있는 legacy writer 없음.** 운영 데이터의 `cosmetics` 1행은 2026-05-17 생성으로, canonical 정렬(2026-05-26 backfill migration) 이전의 잔재다.
@@ -98,12 +97,12 @@
 
 1. `apps/api-server/src/routes/kpa/services/event-offer.service.ts`
    `STORE_SERVICE_KEY_MAP[SERVICE_KEYS.KPA_GROUPBUY]` : `SERVICE_KEYS.KPA` → **`SERVICE_KEYS.KPA_SOCIETY`**
-   (형제 항목 K-Cosmetics·GlycoPharm 은 이미 canonical. KPA 만 role-prefix 로 남아 legacy 행을 계속 생성했다.)
+   (형제 항목 K-Cosmetics 은 이미 canonical. KPA 만 role-prefix 로 남아 legacy 행을 계속 생성했다.)
 2. `apps/api-server/src/routes/o4o-store/controllers/pharmacy-products.controller.ts`
    파생행을 `service_key='kpa'` 로 설명하던 **주석 2곳 정정**(구분은 `source_type` 으로만 한다). 쿼리 로직 무변경.
 3. `apps/api-server/src/routes/kpa/services/operator-dashboard.service.ts`
    "이벤트 오퍼 승인 대기" KPI 를 `service_key='kpa-society'` → **`'kpa-groupbuy'`**.
-   ①본래 주석이 "`EventOfferService.countPendingListings` 와 동일 쿼리" 라고 선언했고 실제 운영자 큐는 `listPendingListings(KPA_GROUPBUY)` 이며, GlycoPharm 대시보드도 `GLYCOPHARM_EVENT_OFFER` 를 센다(형제 정합). ②1번 수정으로 파생행이 canonical 키를 갖게 되어, 그대로 두면 이 KPI 가 파생행까지 세어 큐 목록과 더 크게 어긋난다.
+   ②1번 수정으로 파생행이 canonical 키를 갖게 되어, 그대로 두면 이 KPI 가 파생행까지 세어 큐 목록과 더 크게 어긋난다.
 4. `apps/api-server/src/__tests__/store-service-key-residual.spec.ts` (신규, 4 test) — legacy key 신규 생성 경로 재발 방지 회귀.
 
 ## 7. 운영 데이터 정리 (§9)
@@ -143,7 +142,7 @@ VALUES ('29d91f79-794a-4dba-b8f6-81c2914cf3ba','9c87f46b-57a1-4afe-80bd-60782c49
 | enrollment dual-key org (cosmetics∧k-cosmetics / kpa∧kpa-society) | **0** |
 | enrollment orphan (`platform_services` / `organizations`) | 0 / 0 |
 | OPL orphan (org / master) | 0 / 0 |
-| OPL 동일 (org, offer) 다중행 | 1건 — `9c87f46b…` × `61db213b…` 가 `glycopharm` / `k-cosmetics` / `kpa-society` 3행 (**서비스별 정상 진열**, legacy key 아님) |
+| OPL 동일 (org, offer) 다중행 | 1건 — `9c87f46b…` × `61db213b…` 가 `k-cosmetics` / `kpa-society` 3행 (**서비스별 정상 진열**, legacy key 아님) |
 | `service_memberships` dual-key 사용자 | 0 |
 | `platform_store_slugs` orphan | 0 |
 | `product_approvals` orphan org | 1건 (`a0000000-…-0001` bridge org) — **사전 존재**, 본 WO 범위 밖(§9 별도 WO 제안) |
@@ -163,7 +162,6 @@ VALUES ('29d91f79-794a-4dba-b8f6-81c2914cf3ba','9c87f46b-57a1-4afe-80bd-60782c49
 | KPA 로그인(`kpa-society`) → `/kpa/store-hub/overview` · `/capabilities` | 200 / 200 |
 | KPA `/store/handled-products` · `/store/local-products` | 200 / 200 |
 | KPA `/kpa/pharmacy/products/orderable` | 200 — canonical `64ae4184…` 정상 반환 |
-| GlycoPharm 로그인 → `/glycopharm/store-hub/overview` | 200 (타 서비스 영향 0) |
 
 > 코드 수정분은 본 커밋 push 후 CI/CD 배포로 반영된다. 위 스모크는 **데이터 정리에 대한 회귀 확인**이다.
 

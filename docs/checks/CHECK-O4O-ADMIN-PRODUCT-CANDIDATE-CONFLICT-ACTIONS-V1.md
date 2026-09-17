@@ -26,7 +26,7 @@ Scope: `/admin/o4o-product-db/candidates` conflict(및 일반) 후보를 **안�
 
 ## 2. 백엔드 (api-server) — 신규 2 + 재사용
 
-mount `/api/v1/operator/product-candidates` (guard = OPERATOR_ROLES: platform/neture/glycopharm/cosmetics/kpa admin+operator).
+mount `/api/v1/operator/product-candidates`
 
 | 엔드포인트 | 역할 |
 | --- | --- |

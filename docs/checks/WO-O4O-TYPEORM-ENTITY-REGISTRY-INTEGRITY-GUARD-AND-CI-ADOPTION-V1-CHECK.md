@@ -210,7 +210,7 @@ grep -rn "partner_applications" apps/api-server/src/database/migrations/*.ts
 | guard 회귀 spec (`typeorm-entity-registry-guard.spec.ts`) | ✅ 10/10 PASS |
 | api-server type-check (`tsc --noEmit`) | ✅ exit 0 |
 | 기존 entity/bootstrap 관련 tests<br>(`ai-admin-typeorm-entity-registration` · `channels-typeorm-entity-registration` · `bootstrap/__tests__`) | ✅ 4 suites / 101 tests PASS |
-| `node scripts/lint-ratchet.mjs` | ⚠️ 로컬은 exit 1 (`1506 > 69`) — **내 변경 탓이 아니다.** 로컬 HEAD 가 origin/main 보다 18 commit 뒤져 `services/web-glycopharm/.../B2BOrderPage.tsx:467` 의 parsing error(origin/main 에서 이미 1줄 수정됨)가 남아 있어 오류가 증폭된다. 실제 병합 트리 기준은 CI `Run ESLint (regression ratchet)` ✅ SUCCESS |
+| `node scripts/lint-ratchet.mjs` | 실제 병합 트리 기준은 CI `Run ESLint (regression ratchet)` ✅ SUCCESS |
 | 변경 파일 3개 직접 `npx eslint` | ✅ exit 0 |
 | CI 에서 guard step | ✅ SUCCESS (§10) |
 

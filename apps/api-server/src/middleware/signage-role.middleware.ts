@@ -171,7 +171,7 @@ export function hasSignageOperatorPermission(user: any, serviceKey: string): boo
   //   authentication.middleware 로드 relations 에도 없음). 권한 판정은 role 축을 따른다.
 
   // Service-level operator/admin roles also grant signage access
-  // e.g. glycopharm:operator, glycopharm:admin → signage:glycopharm access
+  // e.g. kpa:operator, kpa:admin → signage:kpa access
   // KPA services: kpa-society serviceKey maps to kpa: role prefix
   const userRoles: string[] = user.roles || [];
   const rolePrefix = resolveRolePrefixFromCanonicalServiceKey(serviceKey);

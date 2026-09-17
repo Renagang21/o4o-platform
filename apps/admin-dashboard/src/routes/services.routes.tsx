@@ -37,9 +37,6 @@ export function ServiceRoutes() {
       </AdminProtectedRoute>
     } />,
 
-    // Service Applications Admin — REMOVED (WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1)
-    //   ServiceType = 'glycopharm' 단일 멤버였다. GlycoPharm 삭제로 모듈 전체가 소멸한다.
-
     // Neture - B2C Reference Service Management (Phase D-3)
     <Route key="/neture/*" path="/neture/*" element={
       <AdminProtectedRoute requiredRoles={['admin']}>

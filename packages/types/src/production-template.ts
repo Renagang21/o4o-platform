@@ -4,7 +4,7 @@
  * WO-O4O-PRODUCTION-TEMPLATE-REGISTRY-CROSSSERVICE-PHASE2-J-V1 (2026-05-27)
  *
  * KPA productionTemplates.ts 에 로컬 정의되어 있던 타입들을 공통화.
- * GlycoPharm / K-Cosmetics 가 동일 타입 기반으로 서비스별 template registry 를 정의한다.
+ * K-Cosmetics 가 동일 타입 기반으로 서비스별 template registry 를 정의한다.
  *
  * Phase 2-J 범위 (본 모듈):
  *   - LengthOption / ToneOption
@@ -13,7 +13,6 @@
  *
  * 사용처:
  *   - KPA: services/web-kpa-society/src/pages/pharmacy/productionTemplates.ts
- *   - GlycoPharm: services/web-glycopharm/src/config/productionTemplates.ts
  *   - K-Cosmetics: services/web-k-cosmetics/src/config/productionTemplates.ts
  */
 

@@ -13,7 +13,7 @@ web deploy 의 detect-changes 가 `git diff HEAD~1 HEAD`(tip-only)로 변경을 
 
 - `on.push.paths` 트리거는 **push batch(before..sha) 범위**로 평가되어 워크플로가 실행되지만, detect-changes 스텝은 `HEAD~1 HEAD`(tip 1커밋)만 비교 → **불일치**.
 - web 변경이 tip 이 아니면 모든 서비스 false → 배포 skip → `workflow_dispatch` 수동 재배포 필요.
-- 반복 사례: 상품 parity 배포(GP/KCos skip), 디지털 사이니지 smoke(operator 500/store 404 = 코드버그 아닌 배포 skip).
+- 반복 사례: 상품 parity 배포(KCos skip), 디지털 사이니지 smoke(operator 500/store 404 = 코드버그 아닌 배포 skip).
 
 ## 3. Changed Files
 
@@ -22,7 +22,7 @@ web deploy 의 detect-changes 가 `git diff HEAD~1 HEAD`(tip-only)로 변경을 
 | `.github/workflows/deploy-web-services.yml` | detect-changes: checkout `fetch-depth: 2→0`, push 비교 `HEAD~1 HEAD` → `event.before..github.sha`(+fallback +force-all +base/head/decision 로깅) |
 | `docs/investigations/CHECK-O4O-WEB-DEPLOY-DETECT-CHANGES-LAST-DEPLOYED-SHA-V1.md` | 본 CHECK |
 
-> 앱 코드/backend/DB/Dockerfile/Cloud Run/배포 job 본문 변경 0. deploy-{neture,k-cosmetics,kpa-society,glycopharm}/summary job 무변경.
+> 앱 코드/backend/DB/Dockerfile/Cloud Run/배포 job 본문 변경 0. deploy-{neture,k-cosmetics,kpa-society}/summary job 무변경.
 
 ## 4. Before / After
 
@@ -40,7 +40,6 @@ web deploy 의 detect-changes 가 `git diff HEAD~1 HEAD`(tip-only)로 변경을 
 - `HEAD_SHA = github.sha`, `BASE_SHA = github.event.before`.
 - **fallback**: `before` 가 빈 값 / all-zeros(신규 브랜치·첫 push·force push) / 로컬 미존재(`git cat-file -e` 실패) → `HEAD~1`; 그조차 없으면 **force ALL**(안전 기본).
 - `packages/**` 변경 또는 force-all → 전 서비스 rebuild(기존 정책 유지).
-- per-service: `services/web-{neture,k-cosmetics,kpa-society,glycopharm}/` prefix 매칭(`decide()` 헬퍼, 결정 로그 출력).
 - checkout `fetch-depth: 0` — before..sha 다중 커밋 범위 diff 위해 전체 히스토리 필요(detect-changes job 한정, 경량).
 
 ## 6. workflow_dispatch Behavior
@@ -55,12 +54,10 @@ web deploy 의 detect-changes 가 `git diff HEAD~1 HEAD`(tip-only)로 변경을 
 
 ## 8. Validation
 
-- **YAML 유효**(pyyaml safe_load): jobs = detect-changes/deploy-neture/k-cosmetics/kpa-society/glycopharm/summary, detect-changes outputs 4종 유지.
 - **tip-only 제거 확인**: 실제 비교에서 `git diff ... HEAD~1 HEAD` 제거(잔존은 주석 1줄뿐). fallback 의 `HEAD~1` 단독 ref 만 사용.
 - shell: `set` 미사용(기존 스타일 유지), `decide()` 헬퍼는 `$GITHUB_OUTPUT` append + echo. before all-zeros/부재 분기 처리.
 - **운영 검증(배포 후 권장)**:
   1. web 변경 커밋 뒤 docs-only 커밋이 같은 push HEAD 인 range → 해당 web 서비스 deploy decision=true 확인(로그 base/head/changed files).
-  2. `workflow_dispatch(service=glycopharm)` → glycopharm 만 deploy(변경무관).
   3. `workflow_dispatch(service=k-cosmetics)` → k-cosmetics 만 deploy.
 
 ## 9. Regression Check

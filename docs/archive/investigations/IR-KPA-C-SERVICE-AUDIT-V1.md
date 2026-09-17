@@ -257,7 +257,6 @@ OrderItem → ProductVariant → ProductListing
 
 | 대상 | 오염 여부 | 설명 |
 |------|:---------:|------|
-| GlycoPharm | **X** | cross-import 없음 |
 | Cosmetics | **X** | cross-import 없음 |
 | Platform | **X** | cross-import 없음 |
 | Store HUB | **X** | Store 관련 import 없음 |

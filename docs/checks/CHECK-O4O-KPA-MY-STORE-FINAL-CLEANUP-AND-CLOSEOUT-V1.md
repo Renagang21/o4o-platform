@@ -3,7 +3,7 @@
 > WO: `WO-O4O-KPA-MY-STORE-FINAL-CLEANUP-AND-CLOSEOUT-V1`
 > 일자: 2026-07-29
 > 대상: **KPA-Society 내 매장 전용**
-> 불변: **GlycoPharm 변경 0 · K-Cosmetics 변경 0 · 공용 모듈 변경 0**
+> K-Cosmetics 변경 0 · 공용 모듈 변경 0
 
 ---
 
@@ -15,7 +15,7 @@
 | 단계 | commit | 내용 |
 |---|---|---|
 | 축소 전 | `1f0278cab` | 범위 A/D/F — cosmetics repo, 공용 owner guard, 외국인 QR 공용 backend |
-| 축소 전 | `f57c4240b` | 범위 B/C — KPA dead code(범위 내) + GP/KCos 용어(범위 밖) |
+| 축소 전 | `f57c4240b` | 범위 B/C — KPA dead code(범위 내) + KCos 용어(범위 밖) |
 | 축소 전 | `29ff133c7` | 범위 E/G — 공용 태블릿 handler·공용 kiosk package + 3서비스 dead file |
 | **원복** | `cba87a635` | **forward revert** — 범위 밖 전부 `b95804c40` 상태로 복구 (history 재작성 없음) |
 | 축소 후 | `7ddec3506` | 범위 2 — KPA 메뉴·내비게이션 정합 |
@@ -25,13 +25,12 @@
 | 파일 | 왜 범위 밖인가 |
 |------|----------------|
 | `routes/cosmetics/repositories/{cosmetics-store,cosmetics}.repository.ts` | K-Cosmetics `/insights` 500 수정 → K-Cos 정비 범위 |
-| `modules/foreign-visitor-partner/foreign-visitor-partner-qr-code.{service,routes}.ts` | glycopharm/cosmetics serviceKey 동작 변경 → KPA 단독 불가 |
+| `modules/foreign-visitor-partner/foreign-visitor-partner-qr-code.{service,routes}.ts` | cosmetics serviceKey 동작 변경 → KPA 단독 불가 |
 | `utils/store-owner.utils.ts` | 3 서비스 공용 owner guard |
 | `routes/platform/store-public/store-public-tablet.handler.ts` | 3 서비스 공용 태블릿 공개 API |
 | `packages/tablet-kiosk-core/src/TabletKioskPage.tsx` | 3 서비스 공용 kiosk package |
-| `services/web-glycopharm/**` · `services/web-k-cosmetics/**` | 타 서비스 |
 
-원복 후 3 서비스 build PASS 로 GP/K-Cos 가 baseline 상태임을 확인했다.
+원복 후 2 서비스 build PASS 로 K-Cos 가 baseline 상태임을 확인했다.
 `git diff b95804c40..HEAD` 기준 순 변경은 **KPA 파일 + 문서** 뿐이다.
 
 ---
@@ -59,7 +58,7 @@
    **service-catalog SSOT(`k-cosmetics.site`)와 불일치**. `landing_url` 은 생성 후 불변이라 잘못된 도메인이 QR 에 영구 각인된다.
    (POP QR 은 `HOTFIX-O4O-STORE-POP-PUBLIC-DOMAIN-CANONICAL-FIX-V1` 로 이미 SSOT 정렬됨 — 같은 결함 클래스가 여기 남아 있다.)
 2. landing route 는 **KPA 에만 등록**되어 있는데 발급 API 는 `serviceKey` 를 client 로 받아
-   `glycopharm`/`cosmetics` 로도 발급 가능 → 해당 QR 은 404 로 죽은 URL 이 된다.
+   `cosmetics` 로도 발급 가능 → 해당 QR 은 404 로 죽은 URL 이 된다.
    (파트너·QR 관리 화면 자체가 KPA 전용이라 현재 UI 진입점은 없음.)
 
 → **`WO-O4O-SHARED-FOREIGN-VISITOR-QR-LANDING-SERVICE-CATALOG-ALIGNMENT-V1`** 로 분리.
@@ -118,7 +117,7 @@
 
 canonical 용어(`매장 취급 상품` / `O4O 주문 가능 상품` / `매장 경영활용 제품`)는 유지.
 금지 표현 `매장 경영활동 제품` 은 KPA 코드베이스에 **0건**.
-`내 매장 상품` 은 KPA 에 UI 문구로 없음(그룹 영역명 `내 매장 상품·거래` 는 GP/KCos 파일 — 범위 밖).
+`내 매장 상품` 은 KPA 에 UI 문구로 없음(그룹 영역명 `내 매장 상품·거래` 는 KCos 파일 — 범위 밖).
 
 #### 전수 검증 (스크립트)
 
@@ -143,7 +142,7 @@ legacy redirect 경유 UI 링크  → 0 (전부 canonical 직접 연결)
 **유지**: `StartProductionModal`(StoreLibraryContentsPage 활성), `ProductionMaterialEditorPage`
 (`StoreContentsSelector` 의 `/store/library/production-materials/:id/edit` 딥링크 활성).
 
-GlycoPharm·K-Cosmetics 는 list route 가 살아 있어 각 서비스 자체 파일을 그대로 사용한다 — **일괄 삭제하지 않았다**.
+K-Cosmetics 는 list route 가 살아 있어 각 서비스 자체 파일을 그대로 사용한다 — **일괄 삭제하지 않았다**.
 
 #### redirect 전수 점검
 
@@ -234,7 +233,7 @@ GlycoPharm·K-Cosmetics 는 list route 가 살아 있어 각 서비스 자체 �
 직전 WO 에서 유일 소비처 `ProductPopBuilderPage` 가 은퇴하며 고아가 된 파일이고,
 전역 `product_ai_contents` 는 ProductMaster 소유라 매장 write 가 금지된 경로다.
 
-GlycoPharm·K-Cosmetics 의 동일 파일은 **범위 밖이라 복구**했다(각 서비스 정비 시 처리).
+K-Cosmetics 의 동일 파일은 **범위 밖이라 복구**했다(각 서비스 정비 시 처리).
 
 ---
 
@@ -264,7 +263,6 @@ GlycoPharm·K-Cosmetics 의 동일 파일은 **범위 밖이라 복구**했다(�
 | 서비스 | 결과 |
 |--------|------|
 | **KPA-Society** | 위 범위 2/3/7 반영. build PASS |
-| **GlycoPharm** | **변경 0** (원복 완료). build PASS |
 | **K-Cosmetics** | **변경 0** (원복 완료). build PASS |
 | **Neture** | 변경 0 (본 WO 무관) |
 | 공용 package·backend | **변경 0** |
@@ -274,7 +272,6 @@ GlycoPharm·K-Cosmetics 의 동일 파일은 **범위 밖이라 복구**했다(�
 | 명령 | 결과 |
 |------|------|
 | `pnpm --filter @o4o/web-kpa-society build` (`tsc && vite build`) | ✅ PASS |
-| `pnpm --filter glycopharm-web build` | ✅ PASS (baseline 확인) |
 | `pnpm --filter @o4o/web-k-cosmetics build` | ✅ PASS (baseline 확인) |
 | `pnpm --filter @o4o/web-neture build` | ✅ PASS |
 | `pnpm --filter @o4o/api-server type-check` | 기존 `src/scripts/*` baseline 실패 유지 — 본 WO 무관·미수정 (최종 상태에서 api-server 변경 0) |

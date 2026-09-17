@@ -5,7 +5,6 @@
  * WO-O4O-STORE-HUB-API-CLIENT-AND-SERVICE-SCOPE-ALIGNMENT-V1:
  *   endpoint · 타입 계약을 `@o4o/store-ui-core` 의 `createEventOfferApi` 로 이관.
  *   이 파일은 **전송(axios) · `/cosmetics` basePath · export 이름**만 소유한다.
- *   (GlycoPharm 사본과 주석·export명·prefix 외 차이가 없었다 — SAME_CONTRACT_DIFFERENT_PREFIX)
  *   전송 URL · query · body · 응답 형상 무변경.
  *
  * Backend endpoint: GET /api/v1/cosmetics/event-offers/enriched

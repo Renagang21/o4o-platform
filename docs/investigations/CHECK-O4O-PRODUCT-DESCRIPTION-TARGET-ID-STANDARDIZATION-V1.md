@@ -28,7 +28,7 @@
 ## 2. 증거 체인 (정적, 전수)
 
 ### 2.1 편집기가 보내는 id = StoreLocalProduct.id
-`services/web-kpa-society/src/pages/pharmacy/StoreProductDescriptionsPage.tsx` (GP/KCos 동형)
+`services/web-kpa-society/src/pages/pharmacy/StoreProductDescriptionsPage.tsx` (KCos 동형)
 - `71` `fetchLocalProducts({...})` → `72` `setProducts(res.items)` → `74` `setSelectedId(res.items[0].id)`.
 - `176` `saveProductAiContent(selectedId, 'product_description', ...)` · `91/155` `getProductAiContents(selectedId)` / `generateProductAiContent(selectedId, ...)`.
 - `fetchLocalProducts` client: `GET /api/v1/store/local-products` → `store_local_products` rows (`api/localProducts.ts:6,112`).

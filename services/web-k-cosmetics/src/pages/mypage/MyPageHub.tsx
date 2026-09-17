@@ -131,7 +131,6 @@ export default function MyPageHub() {
           { key: 'enrollments', title: '내 수강', href: '/mypage/enrollments', icon: <BookOpen className="w-5 h-5" /> },
           { key: 'certificates', title: '학습 결과', href: '/mypage/certificates', icon: <Award className="w-5 h-5" /> },
           { key: 'credits', title: '내 크레딧', href: '/mypage/credits', icon: <Coins className="w-5 h-5" /> },
-          // WO-O4O-MYPAGE-MY-REQUESTS-INBOX-GLYCO-KCOS-ROUTE-V1
           { key: 'my-requests', title: '내 신청', href: '/mypage/my-requests', icon: <ClipboardList className="w-5 h-5" /> },
         ]}
       />

@@ -5,7 +5,7 @@
  *
  * ─────────────────────────────────────────────────────────────────────────────
  * 확정 계약: OPL.service_key 는 **platform-level canonical key** 축이다.
- *   'kpa-society' / 'glycopharm' / 'k-cosmetics' / 'neture'
+ *   'kpa-society' / 'k-cosmetics' / 'neture'
  *
  * 근거 (전수 census):
  *   - migration 20260411300000-NormalizeKpaServiceKeys 가 이미

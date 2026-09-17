@@ -4,17 +4,16 @@
 
 - **작성일**: 2026-03-23
 - **상태**: 조사 완료
-- **조사 대상**: 전 서비스 (Neture / GlycoPharm / KPA Society / K-Cosmetics / GlucoseView)
+- **조사 대상**: 전 서비스 (Neture / KPA Society / K-Cosmetics / GlucoseView)
 
 ---
 
 ## 1. 조사 요약 (Executive Summary)
 
-사용자 대시보드의 Forum 메뉴는 **GlycoPharm의 pharmacy 역할 사이드바에만 존재**하며, 이 메뉴는 공개 포럼 허브(`ForumHubPage`)로 연결된다. 커뮤니티 Forum과 **완전 중복**이다.
+커뮤니티 Forum과 **완전 중복**이다.
 
 한편 "내 포럼 관리" 기반은 **부분적으로 이미 존재**한다:
 - Backend: `forum_category_requests` API 완비 (생성/조회/수정/상태추적)
-- Frontend: GlycoPharm에 `/forum/my-requests`, `/forum/request-category` 페이지 존재
 - Data Model: `ForumCategory.createdBy` 필드 존재
 
 **결론: 대시보드 Forum은 "내 포럼 관리" 중심으로 재정의가 적절하다 (Option C).**
@@ -26,10 +25,6 @@
 ### 대시보드 Forum 관련
 | 파일 | 역할 |
 |------|------|
-| `services/web-glycopharm/src/components/layouts/DashboardLayout.tsx:87` | pharmacy 사이드바 → `/forum` 메뉴 정의 |
-| `services/web-glycopharm/src/pages/forum/ForumHubPage.tsx` | 대시보드 Forum이 가리키는 실제 페이지 (공개 허브) |
-| `services/web-glycopharm/src/pages/forum/MyRequestsPage.tsx` | 내 포럼 신청 내역 (이미 존재) |
-| `services/web-glycopharm/src/pages/forum/RequestCategoryPage.tsx` | 포럼 생성 신청 폼 (이미 존재) |
 | `services/web-kpa-society/src/components/branch-operator/BranchOperatorLayout.tsx` | 분회 운영자 `게시판`+`포럼 관리` 메뉴 |
 
 ### 커뮤니티 Forum 관련
@@ -56,31 +51,10 @@
 
 | 서비스 | 대시보드 Forum 메뉴 | 라우트 | 실제 화면 |
 |--------|:---:|--------|--------|
-| **GlycoPharm** (pharmacy) | ✅ 있음 | `/forum` | ForumHubPage (공개 허브) |
-| **GlycoPharm** (operator) | ✅ 있음 | `/operator/forum-management` | Operator 전용 관리 |
 | **Neture** (supplier) | ❌ 없음 | — | — |
 | **K-Cosmetics** (partner) | ❌ 없음 | — | — |
 | **KPA Society** (branch op) | ✅ 있음 | `/branch-services/:id/operator/forum` | Branch 운영자 포럼 관리 |
 | **GlucoseView** | ❌ 없음 | — | 포럼 미구현 |
-
-### 3.2 GlycoPharm pharmacy 대시보드 Forum 분석
-
-```
-사이드바 메뉴: "포럼" (MessageSquare 아이콘)
-  → path: /forum
-  → 렌더링: ForumHubPage.tsx
-  → 내용:
-    - 전체 포럼 카테고리 카드 (다음 카페 스타일)
-    - 인기글/최신글 섹션
-    - 글쓰기 CTA
-    - 검색/필터
-```
-
-**판정: 100% "일반 포럼 이용" 화면. 관리 기능 없음.**
-
-이 화면은 커뮤니티에서 `/forum`으로 진입해도 동일하게 표시된다. 대시보드 안에서 같은 페이지를 보여주는 것이므로 **역할 중복**.
-
----
 
 ## 4. 현재 커뮤니티 Forum 구조
 
@@ -89,7 +63,6 @@
 | 서비스 | 커뮤니티 진입 | 포럼 라우트 |
 |--------|-------------|-----------|
 | Neture | `/community` | `/community/forum` → Hub, `/community/forum/posts` → 목록 |
-| GlycoPharm | `/community` | `/forum` → Hub, `/forum/posts` → 목록 |
 | K-Cosmetics | `/community` | `/forum` → Hub, `/forum/posts` → 목록 |
 | KPA Society | `/community` | `/forum` → Home, `/forum/all` → 전체 목록 |
 
@@ -140,8 +113,8 @@
 
 | 기능 | Backend | Frontend | 상태 |
 |------|:---:|:---:|------|
-| 포럼 생성 신청 | ✅ `POST /api/v1/forum/category-requests` | ✅ `RequestCategoryPage` (GlycoPharm) | 완성 |
-| 내 신청 목록 조회 | ✅ `GET /api/v1/forum/category-requests/my` | ✅ `MyRequestsPage` (GlycoPharm) | 완성 |
+| 포럼 생성 신청 | ✅ `POST /api/v1/forum/category-requests` | ✅ `RequestCategoryPage` | 완성 |
+| 내 신청 목록 조회 | ✅ `GET /api/v1/forum/category-requests/my` | ✅ `MyRequestsPage` | 완성 |
 | 신청 상세 조회 | ✅ `GET /api/v1/forum/category-requests/:id` | ✅ (MyRequestsPage 내 확장) | 완성 |
 | 대기 중 신청 수정 | ✅ `PATCH /api/v1/forum/category-requests/:id` | ❌ | API만 존재 |
 | 내가 만든 포럼 목록 | ❌ (createdBy 필드 존재, 전용 API 없음) | ❌ | 미구현 |
@@ -171,23 +144,19 @@ createdCategoryId?: string;  // 승인 시 생성된 카테고리 ID
 
 ## 7. 서비스별 패턴 비교
 
-| 항목 | Neture | GlycoPharm | KPA Society | K-Cosmetics | GlucoseView |
-|------|--------|-----------|-------------|-------------|-------------|
-| 대시보드 Forum | 없음 | ✅ 공개 허브 (중복) | Branch 운영자 전용 | 없음 | 미구현 |
-| 커뮤니티 Forum | ✅ 완성 | ✅ 완성 | ✅ 완성 | ✅ 완성 | 없음 |
-| 포럼 신청 UI | 없음 | ✅ 있음 | API만 | 없음 | 없음 |
-| Operator 관리 | ✅ 있음 | ✅ 있음 | ✅ 있음 | ✅ 있음 (기본) | 없음 |
-| 대시보드 재정의 필요 | 해당 없음 | **필요** | Branch OP는 별도 | 해당 없음 | 해당 없음 |
-
-**공통화 가능성**: GlycoPharm에서 먼저 구현 → 패턴 확립 → 다른 서비스 확산 가능
+| 항목 | Neture | KPA Society | K-Cosmetics | GlucoseView |
+| ------ | -------- | ------------- | ------------- | ------------- |
+| 대시보드 Forum | 없음 | Branch 운영자 전용 | 없음 | 미구현 |
+| 커뮤니티 Forum | ✅ 완성 | ✅ 완성 | ✅ 완성 | 없음 |
+| 포럼 신청 UI | 없음 | API만 | 없음 | 없음 |
+| Operator 관리 | ✅ 있음 | ✅ 있음 | ✅ 있음 (기본) | 없음 |
+| 대시보드 재정의 필요 | 해당 없음 | Branch OP는 별도 | 해당 없음 | 해당 없음 |
 
 ---
 
 ## 8. 필수 질문 답변
 
 ### Q1. 현재 사용자 대시보드의 Forum 메뉴는 실제로 어떤 화면을 보여주는가?
-
-**GlycoPharm pharmacy 사이드바의 "포럼" 메뉴 → `/forum` → `ForumHubPage`**
 
 전체 포럼 카테고리 카드를 다음 카페 스타일로 표시하는 공개 허브 화면이다. 사용자 관련 필터링/관리 기능은 전혀 없다.
 
@@ -205,8 +174,6 @@ createdCategoryId?: string;  // 승인 시 생성된 카테고리 ID
 
 ### Q4. 대시보드 Forum과 커뮤니티 Forum의 역할이 중복되고 있는가?
 
-**YES — GlycoPharm에서 완전 중복이다.**
-
 대시보드 `/forum`과 커뮤니티 `/forum`이 같은 `ForumHubPage` 컴포넌트를 렌더링한다.
 
 ### Q5. 사용자가 관리하는 포럼을 보여줄 기반이 이미 존재하는가?
@@ -217,8 +184,8 @@ createdCategoryId?: string;  // 승인 시 생성된 카테고리 ID
 |------|------|
 | 포럼 신청 API | ✅ 완성 |
 | 내 신청 목록 API | ✅ 완성 |
-| 내 신청 목록 UI (GlycoPharm) | ✅ 완성 (`MyRequestsPage`) |
-| 포럼 신청 폼 UI (GlycoPharm) | ✅ 완성 (`RequestCategoryPage`) |
+| 내 신청 목록 UI | ✅ 완성 (`MyRequestsPage`) |
+| 포럼 신청 폼 UI | ✅ 완성 (`RequestCategoryPage`) |
 | ForumCategory.createdBy | ✅ 존재 |
 | 내가 만든 포럼 목록 API | ❌ 미구현 |
 | 통합 "내 포럼" 대시보드 | ❌ 미구현 |
@@ -319,7 +286,6 @@ createdCategoryId?: string;  // 승인 시 생성된 카테고리 ID
 
 | 서비스 | Phase 1 적용 | 비고 |
 |--------|:---:|------|
-| GlycoPharm | ✅ 우선 | 유일하게 대시보드 Forum 메뉴 존재 |
 | KPA Society | ⏸️ 보류 | Branch OP Forum은 별도 맥락 (운영자 관리) |
 | Neture | ⏸️ 보류 | 대시보드에 Forum 메뉴 없음 (필요 시 추가) |
 | K-Cosmetics | ⏸️ 보류 | 대시보드에 Forum 메뉴 없음 |

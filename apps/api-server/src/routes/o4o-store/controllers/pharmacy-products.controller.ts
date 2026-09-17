@@ -176,7 +176,6 @@ async function findApplicableOffer(
 export function createPharmacyProductsController(
   dataSource: DataSource,
   requireAuth: AuthMiddleware,
-  // WO-GLYCOPHARM-STORE-GUARD-SERVICE-AWARE-FIX-V1:
   //   serviceKey 지정 시 해당 서비스의 store_owner role 만 통과 (cross-service leakage 차단).
   //   미지정 시 기존 동작 유지 (back-compat — 모든 서비스 store_owner role 허용).
   serviceKey?: StoreOwnerServiceKey,
@@ -186,12 +185,12 @@ export function createPharmacyProductsController(
   const auditRepo = dataSource.getRepository(KpaAuditLog);
 
   // WO-ROLE-NORMALIZATION-PHASE3-A-V1: organization_members 기반 middleware
-  // WO-GLYCOPHARM-STORE-GUARD-SERVICE-AWARE-FIX-V1: serviceKey 전파.
+  // serviceKey 전파.
   const requirePharmacyOwner = createRequireStoreOwner(dataSource, serviceKey);
 
   // WO-O4O-KPA-STORE-ORDERABLE-PRODUCT-SOURCE-TABS-V1:
   //   마운트 serviceKey 캡처. /apply 내부에서 body-resolved serviceKey 가 동명 지역변수로 가려지므로
-  //   "마운트가 KPA 인지" 판별용으로 별도 보관. (KPA 한정 정책 적용 — GP/KCos 무영향)
+  //   "마운트가 KPA 인지" 판별용으로 별도 보관. (KPA 한정 정책 적용 — KCos 무영향)
   const mountServiceKey = serviceKey;
 
   // WO-O4O-STORE-HUB-PRODUCT-APPLY-APPROVAL-GATE-PARITY-V1 (HUB-P0-04):
@@ -450,7 +449,7 @@ export function createPharmacyProductsController(
       // WO-O4O-KPA-STORE-ORDERABLE-PRODUCT-SOURCE-TABS-V1 (KPA 한정 정책):
       //   KPA 는 '활성화 대기'(inactive OPL) 상태를 사용하지 않는다 — 약국이 허브에서 PUBLIC 상품을
       //   선택하면 즉시 주문 가능한 active OPL 이 된다. createPublicListing 의 공유 기본값(is_active=false)은
-      //   유지하고(GP/KCos 무영향), KPA 마운트일 때만 생성 직후 활성화한다.
+      //   유지하고(KCos 무영향), KPA 마운트일 때만 생성 직후 활성화한다.
       if (mountServiceKey === 'kpa' && result.success && (result.data as any)?.id) {
         await dataSource.query(
           `UPDATE organization_product_listings SET is_active = true, updated_at = NOW() WHERE id = $1`,
@@ -479,7 +478,7 @@ export function createPharmacyProductsController(
     const limit = Math.min(parseInt(req.query.limit as string) || 20, 100);
     // WO-O4O-STORE-HUB-PRODUCT-APPLY-APPROVAL-GATE-PARITY-V1 (HUB-P0-04):
     //   query.service_key 대신 마운트에서 도출 — /apply 가 기록하는 값과 동일 축을 읽는다.
-    //   (KPA 도출값 'kpa-society' = 종전 기본값이므로 회귀 없음. GP/KCos 는 종전 기본값
+    //   (KPA 도출값 'kpa-society' = 종전 기본값이므로 회귀 없음. KCos 는 종전 기본값
     //    'kpa-society' 로 빈 결과가 나오던 경로가 자기 서비스 값으로 교정된다.)
     const readServiceKey = resolveMountServiceKeyForRead();
 

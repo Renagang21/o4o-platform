@@ -63,7 +63,7 @@
 
 ## 3. KPA API 엔드포인트 구조
 
-CommonEditUserModal이 사용하는 3-서비스(Neture/GlycoPharm/K-Cosmetics) 패턴과 비교:
+CommonEditUserModal이 사용하는 3-서비스 패턴과 비교:
 
 | 구분 | 3-서비스 패턴 | KPA 패턴 |
 |------|--------------|----------|
@@ -155,7 +155,6 @@ CommonEditUserModal과 **병렬 구조**이며, 내부적으로 공통 서브컴
 ```
 packages/operator-core-ui/src/modules/
   members/
-    CommonEditUserModal.tsx        ← 기존 (Neture/GlycoPharm/K-Cosmetics)
     KpaEditUserModal.tsx           ← 신규
     sections/
       BasicInfoSection.tsx         ← name, nickname 공용

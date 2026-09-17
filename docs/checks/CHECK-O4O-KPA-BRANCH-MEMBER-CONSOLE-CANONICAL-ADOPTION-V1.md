@@ -44,8 +44,6 @@ WO 는 "두 구현이 병렬로 자라고 있다"는 전제로 착수했다. **c
 
 ```text
 services/web-neture/src/pages/operator/UsersManagementPage.tsx          Neture 회원 관리
-services/web-glycopharm/src/pages/operator/UsersPage.tsx                GlycoPharm
-services/web-glycopharm/src/pages/admin/GlycoPharmAdminMembersPage.tsx  GlycoPharm admin
 services/web-k-cosmetics/src/pages/operator/UsersPage.tsx               K-Cosmetics
 services/web-k-cosmetics/src/pages/admin/KCosmeticsAdminMembersPage.tsx K-Cosmetics admin
 services/web-pharmacy-hub/src/pages/operator/MembersPage.tsx            Pharmacy-Hub 회원 관리
@@ -137,7 +135,7 @@ MembersConsolePage            (branch_memberships · annual_reports
 
 ## 6. 타 서비스 회귀 (WO §6)
 
-`packages/operator-core-ui/**` · `services/web-{neture,glycopharm,k-cosmetics,pharmacy-hub,kpa-society}/**`
+`packages/operator-core-ui/`
 **미변경.** 소비처 7개 화면에 회귀 가능성이 없다.
 
 `services/web-kpa-branch/**` 도 미변경이므로 W7 검증(목록·상세·전문화면 링크·브라우저 smoke)이

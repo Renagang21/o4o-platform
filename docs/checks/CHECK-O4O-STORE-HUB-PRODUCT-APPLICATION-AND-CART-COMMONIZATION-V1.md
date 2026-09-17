@@ -45,7 +45,6 @@ canonical: `POST/GET /store/cart/{serviceKey}/items` · `GET /groups` · `PATCH|
 |---|---|---|---|
 | KPA-Society | `kpa-society` | `api/storeCart.ts` (coreApiClient, body 반환) | `pages/store-cart/StoreCartPage.tsx` (493L, 자체 디자인 시스템) |
 | K-Cosmetics | `k-cosmetics` | `api/storeCart.ts` (authClient.api + `.data` 언랩) | `pages/store-cart/StoreCartPage.tsx` (282L, Tailwind pink) |
-| GlycoPharm | `glycopharm` | 동일 형상 | `pages/store-cart/StoreCartPage.tsx` (283L, Tailwind teal) |
 | Neture | `neture` | `lib/api/storeCart.ts` — 같은 base 를 쓰지만 **checkout-confirm-b2b + paymentGroupId(payment-first)** | 화면 적용 대상 아님 (§8) |
 | PharmacyHub | — | `lib/api/pharmacyHubOrders` (별도 계약) | 위 3 항 |
 
@@ -64,10 +63,10 @@ canonical: `POST/GET /store/cart/{serviceKey}/items` · `GET /groups` · `PATCH|
 |---|---|---|
 | 장바구니 타입 | 동일 타입 블록 3벌 (~90L × 3) | `@o4o/store-ui-core` 로 이관 후 각 서비스에서 re-export |
 | 장바구니 상태 기계 | `load / changeQty / remove / clearAll / confirmCheckout` + 합계 계산 3벌 | `useStoreCart` 1벌 |
-| 장바구니 화면 | KCos 282L vs GP 283L — 실차이 38줄(accent · 결과 헤더 아이콘) | `StoreCartView` 1벌 (KPA 는 제외 — 디자인 시스템이 다름) |
+| 장바구니 화면 | KCos 282L 283L — 실차이 38줄(accent · 결과 헤더 아이콘) | `StoreCartView` 1벌 (KPA 는 제외 — 디자인 시스템이 다름) |
 | 신청 액션 상태 | `applyingId / removingId / bulkAdding` + 토스트 + 중복코드 + fan-out 집계 2벌 | `useSupplyProductApplication` 1벌 |
 
-**공통화하지 않은 것 (의도적):** KPA 장바구니 View, KPA 카탈로그 페이지 전체(기능 상위집합 + 커스텀 제외 확인 다이얼로그), PharmacyHub 장바구니, GlycoPharm `pages/store/StoreCart.tsx` 와 Neture `pages/store/StoreCartPage.tsx`(둘 다 **소비자 storefront/키오스크 장바구니** — 매장 경영자 B2B 장바구니와 다른 도메인).
+**공통화하지 않은 것 (의도적):** KPA 장바구니 View, KPA 카탈로그 페이지 전체(기능 상위집합 + 커스텀 제외 확인 다이얼로그), PharmacyHub 장바구니 `pages/store/StoreCart.tsx` 와 Neture `pages/store/StoreCartPage.tsx`(둘 다 **소비자 storefront/키오스크 장바구니** — 매장 경영자 B2B 장바구니와 다른 도메인).
 
 ## 7. 선택한 공통화 구조
 
@@ -75,8 +74,8 @@ canonical: `POST/GET /store/cart/{serviceKey}/items` · `GET /groups` · `PATCH|
 
 ```
 components/store-cart/storeCartTypes.ts        타입 + StoreCartApi 구조적 계약(adapter)
-components/store-cart/useStoreCart.ts          headless 상태 기계 (KPA · KCos · GP)
-components/store-cart/StoreCartView.tsx        공통 View (KCos · GP 만)
+components/store-cart/useStoreCart.ts headless 상태 기계 (KPA · KCos)
+components/store-cart/StoreCartView.tsx 공통 View (KCos 만)
 components/supply-catalog/useSupplyProductApplication.ts   headless 신청/제외 상태 기계
 ```
 
@@ -95,8 +94,6 @@ components/supply-catalog/useSupplyProductApplication.ts   headless 신청/제�
 - `packages/store-ui-core/src/index.ts` — export 추가
 - `packages/store-ui-core/src/components/supply-catalog/SupplyCatalogHub.tsx` — 신청 상태 → Core 위임
 - `services/web-kpa-society/src/pages/pharmacy/HubB2BCatalogPage.tsx` — 신청 상태 → Core 위임 (View 유지)
-- `services/web-{kpa-society,k-cosmetics,glycopharm}/src/api/storeCart.ts` — 타입 re-export (client 구현·endpoint 무변경)
-- `services/web-{k-cosmetics,glycopharm}/src/pages/store-cart/StoreCartPage.tsx` — 공통 Core+View 래퍼(각 282/283L → 32L)
 - `services/web-kpa-society/src/pages/store-cart/StoreCartPage.tsx` — `useStoreCart` 사용, 자체 View 유지
 
 ## 9. Route · Menu 연결 (§7)
@@ -112,12 +109,10 @@ components/supply-catalog/useSupplyProductApplication.ts   headless 신청/제�
 | `packages/store-ui-core` typecheck | ✅ PASS |
 | `services/web-kpa-society` `npx tsc -b` | ✅ PASS |
 | `services/web-k-cosmetics` `npx tsc -b` | ✅ PASS |
-| `services/web-glycopharm` `npx tsc -b` | ✅ PASS |
 | `services/web-pharmacy-hub` `npx tsc -b` | ✅ PASS (무변경 회귀) |
 | `services/web-neture` `npx tsc -b` | ✅ PASS (무변경 회귀) |
 | `web-kpa-society` vite build | ✅ 27.21s |
 | `web-k-cosmetics` vite build | ✅ 21.08s |
-| `web-glycopharm` vite build | ✅ 24.46s |
 | `web-pharmacy-hub` vite build | ✅ 13.28s |
 | browser smoke | ⏸ **미수행** — 신청 · 수량변경 · 삭제 · 주문 확정은 **모두 production write** 경로다. CLAUDE.md §0 상 사용자 승인 없이 실행하지 않는다. 승인 시 KPA(`/store-hub` → B2B 카탈로그 신청 → `/store-cart` 수량/삭제) · K-Cosmetics 동일 · PharmacyHub(`/store-owner/cart`) 순으로 수행 가능. |
 
@@ -132,7 +127,7 @@ components/supply-catalog/useSupplyProductApplication.ts   headless 신청/제�
 1. **PharmacyHub 주문 축** — `createOrders`/paymentGroupId 계약이 canonical checkout-confirm 과 다르다. 통합하려면 주문·결제 backend 재설계가 필요하므로 별도 판단 대상(현재는 adapter 분리 유지).
 2. **Neture B2B 장바구니** — 같은 endpoint 를 쓰지만 payment-first(`checkout-confirm-b2b`)라 View 공통화 대상이 아니다. 공급자 정책과 매장 신청 정책을 섞지 않는다.
 3. **KPA 카탈로그 화면(798L)** — 기능 상위집합(진열 채널 · 승인 상품 조회 등)이라 `SupplyCatalogHub` 로 축소하지 않았다. 축소 여부는 별도 판단.
-4. **소비자 storefront 장바구니 2벌**(GP `pages/store/StoreCart.tsx`, Neture `pages/store/StoreCartPage.tsx`) — 매장허브 축이 아닌 별도 도메인. 공통화 여부는 별도 트랙.
+4. 공통화 여부는 별도 트랙.
 5. Store Hub 전체 잔여 공통화 감사 · route/menu 연결 정리 (Agent D 트랙 마감 항목).
 
 ---

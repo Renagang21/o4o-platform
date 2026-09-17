@@ -45,7 +45,6 @@ import type { RelatedEntity } from './related.entity.js';
 |--------|---------|-----------|
 | Cosmetics | 4 | Brand ↔ Line ↔ Product ↔ PricePolicy |
 | Yaksa | 3 | Category ↔ Post ↔ PostLog |
-| Glycopharm | 5 | Pharmacy ↔ Product, Order ↔ OrderItem |
 | GlucoseView | 6 | Vendor ↔ Connection, Branch ↔ Chapter |
 | Neture | 4 | Supplier ↔ Product, Partnership ↔ Product |
 | KPA | 0 | (self-ref는 자체 해결) |

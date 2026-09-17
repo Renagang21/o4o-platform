@@ -44,16 +44,16 @@ PharmacyHub 에서 Community / Content / Resource 를 **PH 전용 복제 구현�
 
 ### 4-1. 회원(Member) 축 route 보유 현황 — 5 서비스
 
-| 항목 | KPA | K-Cosmetics | GlycoPharm | Neture | PharmacyHub |
-|------|:---:|:---:|:---:|:---:|:---:|
-| Community 홈 | `/community` | (홈 통합) | `community` | `/operator/community` | `/community` |
-| Forum 목록·상세·작성 | O | O | O | O | O |
-| 내 글 | `/forum/my-posts` | `forum/my-posts` | `forum/my-posts` | `/forum/my-posts` | `/forum/my-posts` |
-| 내 포럼(소유자) | `/mypage/my-forums` | `forum/my-dashboard` | `forum/my-dashboard` | `/supplier/my-forum` | `/forum/my-dashboard` |
-| 포럼 개설 신청 | `/forum/request` | `forum/request-category` | `forum/request-category` | `/forum/request` | `/forum/request` |
-| 커뮤니티 검색 | (통합) | - | - | - | `/community/search` |
-| **Content(공지·소식)** | `/content` | `content` | `content` | `/content` | **없음 → EXCLUDED (§10)** |
-| **Resource(자료실)** | `/resources` | `resources` | `resources` | `/resources` | **없음 → 본 WO 에서 ADOPTED_NEW** |
+| 항목 | KPA | K-Cosmetics | Neture | PharmacyHub |
+|------|:---:|:---:|:---:|:---:|
+| Community 홈 | `/community` | (홈 통합) | `/operator/community` | `/community` |
+| Forum 목록·상세·작성 | O | O | O | O |
+| 내 글 | `/forum/my-posts` | `forum/my-posts` | `/forum/my-posts` | `/forum/my-posts` |
+| 내 포럼(소유자) | `/mypage/my-forums` | `forum/my-dashboard` | `/supplier/my-forum` | `/forum/my-dashboard` |
+| 포럼 개설 신청 | `/forum/request` | `forum/request-category` | `/forum/request` | `/forum/request` |
+| 커뮤니티 검색 | (통합) | - | - | `/community/search` |
+| **Content(공지·소식)** | `/content` | `content` | `/content` | **없음 → EXCLUDED (§10)** |
+| **Resource(자료실)** | `/resources` | `resources` | `/resources` | **없음 → 본 WO 에서 ADOPTED_NEW** |
 
 > **PH 만 회원 자료실이 없었다 (4/5 보유).** 공통 View 가 이미 존재하므로 adapter 작업만으로 해소 가능했다.
 
@@ -70,7 +70,7 @@ PharmacyHub 에서 Community / Content / Resource 를 **PH 전용 복제 구현�
 
 ### 4-3. Community Hub 부가 축 (ads / sponsors / quick links)
 
-KPA · K-Cosmetics · GlycoPharm · Neture 4서비스가 `CommunityHubService` 를 채택했고
+KPA · K-Cosmetics · Neture 3서비스가 `CommunityHubService` 를 채택했고
 **PharmacyHub 만 미채택** 이다. 판정은 **EXCLUDED** — PH operator 에는 광고·매장지원 축이 없고
 (`O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1`), 프로덕션 3 테이블 모두 row 0 이다.
 
@@ -85,7 +85,6 @@ KPA · K-Cosmetics · GlycoPharm · Neture 4서비스가 `CommunityHubService` �
 | `cms_contents` | **`serviceKey`** | `organizationId` | `POST/PUT/PATCH /api/v1/cms/contents` — `platform:super_admin` 또는 `{serviceKey}:admin` / `{serviceKey}:operator` | `GET /api/v1/cms/contents` (optionalAuth) | 126 |
 | `kpa_contents` | 없음 (물리 분리) | 없음 | `/api/v1/kpa/contents` | 동일 | 16 |
 | `cosmetics_contents` | 없음 (물리 분리) | 없음 | cosmetics route | 동일 | 2 |
-| `glycopharm_contents` | 없음 (물리 분리) | 없음 | glycopharm route | 동일 | 4 |
 | `pharmacy_hub_contents` | - | - | - | - | **테이블 자체가 없음** |
 | `forum_category_requests` | **`service_code`** | `organization_id` | 공통 신청·심사 API | `ForumControllerBase.applyServiceScope` | 5 |
 | `forum_post` | 상위 forum 경유 | `organization_id` | service forum router | 동일 | 8 |
@@ -100,7 +99,6 @@ KPA · K-Cosmetics · GlycoPharm · Neture 4서비스가 `CommunityHubService` �
 
 ### 5-2. `cms_contents` serviceKey 분포 (프로덕션)
 
-glycopharm 66 / kpa-society 53 / neture 6 / kpa 1 / **pharmacy-hub 0**.
 `type='resource'` row 는 **전 서비스 통틀어 0** 이다.
 
 ### 5-3. 이름 유사 테이블 — 병합하지 않음 (§5 금지 조항)
@@ -184,7 +182,7 @@ KPA 글 4건은 `service_code='kpa-society'` 조건에서만 조회되며 PH 컨
 | 주입 | `ResourcesHubConfig` (serviceKey · tableId · hero 문구 · pageLimit · fetchItems · fetchDetail · empty 문구) |
 | adapter | `services/web-pharmacy-hub/src/lib/api/pharmacyHubResources.ts` — 공통 CMS API 소비 |
 | shared View 내부 분기 | **0** — `ResourcesHubTemplate` 안에 `pharmacy-hub` 문자열이 없다 (spec 고정) |
-| 복붙 | 0 — KPA·KCos·GP 페이지를 복사하지 않았다 |
+| 복붙 | 0 — KPA·KCos 페이지를 복사하지 않았다 |
 
 최소 기능 충족: 목록 · 제목 · 유형(source_type 파생) · 등록일 · 제공 주체 · 보기/다운로드 ·
 검색 · empty / loading / error.
@@ -304,7 +302,7 @@ PH 안에서 **실제로 렌더되는 진입점 두 곳**을 보강했다.
 | 23 | Community Hub 광고·스폰서·퀵링크 | **EXCLUDED** | §4-3 — PH operator 에 광고 축 없음. prod row 0 |
 | 24 | 최신 활동 자료 탭 | **EXCLUDED** | §11 — backend 미공급. 빈 탭 금지 |
 | 25 | 매장 콘텐츠·자료함 (store 축) | ADOPTED_EXISTING | 선행 WO 에서 공통 원장 채택 완료 |
-| 26 | `/store/asset-derivations` 연동 | **GAP (기존)** | `requirePharmacyOwner` 가 KPA/GP/KCos 전용. 선행 WO 부채 |
+| 26 | `/store/asset-derivations` 연동 | **GAP (기존)** | `requirePharmacyOwner` 가 KPA/KCos 전용. 선행 WO 부채 |
 
 ---
 
@@ -345,7 +343,7 @@ PH 안에서 **실제로 렌더되는 진입점 두 곳**을 보강했다.
 | 관련 회귀 14 suite | **291 tests PASS** |
 | `services/web-pharmacy-hub` `tsc --noEmit` | **PASS** |
 | `services/web-pharmacy-hub` `vite build` | **PASS** |
-| KPA / KCos / GP / Neture forum empty 회귀 | **0** — forum 계약 · `forumContext` 미변경 |
+| KPA / KCos / Neture forum empty 회귀 | **0** — forum 계약 · `forumContext` 미변경 |
 | 기존 resource · library route 404 | **0** — 공통 패키지 미변경 |
 | service filtering 회귀 | **0** — `ResourcesHubTemplate` 내부에 `pharmacy-hub` 문자열 0 (spec 고정) |
 
@@ -379,11 +377,11 @@ PH 안에서 **실제로 렌더되는 진입점 두 곳**을 보강했다.
 
 ### 판정 보류 없이 정리한 검출 1건 — `/community` 의 타 서비스 문자열
 
-smoke 검출기가 `/community` 에서 `약사회` · `KPA` · `GlycoPharm` 을 잡았다. DOM leaf 단위로 추적한 결과
+smoke 검출기가 `/community` 에서 `약사회` · `KPA` 을 잡았다. DOM leaf 단위로 추적한 결과
 출처는 공통 `packages/shared-space-ui/src/O4OHelpSection.tsx` 의
 `ALL_SERVICE_ITEMS` — **"다른 서비스 보기" 서비스 카탈로그(외부 도메인 링크)** 였다.
 
-- 노출된 것은 **서비스 소개 문구와 외부 홈페이지 링크**이며, KPA/GP 의 포럼 글·카테고리·자료 등
+- 노출된 것은 **서비스 소개 문구와 외부 홈페이지 링크**이며, KPA 의 포럼 글·카테고리·자료 등
   **서비스 경계 데이터는 단 한 건도 렌더되지 않았다.**
 - 이 블록은 5서비스 공통으로 의도적으로 제공되는 cross-service 카탈로그다.
 - 따라서 **§7 cross-service 데이터 노출 0 은 충족**이며, 검출기의 문자열 매칭 오탐으로 정리한다.
@@ -437,7 +435,7 @@ recommendation 0 / DB 통합 0 / Store Hub · Operator 개편 0 / role hierarchy
 | 2 | 공통 `GlobalHeader` 가 nav item 의 `children` 을 렌더하지 않음 | `packages/ui/src/layout/GlobalHeader.tsx` 의 desktop · mobile 양쪽 map 이 `children` 미사용. 5서비스가 정의만 하고 노출되지 않는 하위 메뉴 다수 | 별도 WO — 공통 헤더 dropdown 렌더 도입 (전 서비스 IA 영향) |
 | 3 | PH 회원 자료실 데이터 0 | 운영자 등록 UI 부재 (backend 는 이미 인가됨) | 별도 WO — PH operator 자료 등록 화면 (§15 #18) |
 | 4 | Resource 카테고리 · 태그 부재 | `cms_contents` 컬럼 없음 (5서비스 공통) | 별도 WO — 공통 CMS 분류 축 |
-| 5 | `/store/asset-derivations` 가 PH 미지원 | `requirePharmacyOwner` 가 KPA/GP/KCos 전용 | 선행 WO 부채 유지 |
+| 5 | `/store/asset-derivations` 가 PH 미지원 | `requirePharmacyOwner` 가 KPA/KCos 전용 | 선행 WO 부채 유지 |
 | 6 | PH 활성 포럼 0 | 운영 데이터 문제 (rejected 1건만 존재) | 운영 과제 |
 
 ---
