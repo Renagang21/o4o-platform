@@ -1,7 +1,7 @@
 # CHECK-O4O-INTEGRATED-TERMS-ACCEPTANCE-AND-SIGNUP-ALIGNMENT-V1
 
 > **WO**: [`WO-O4O-INTEGRATED-TERMS-ACCEPTANCE-AND-SIGNUP-ALIGNMENT-V1`](../work-orders/WO-O4O-INTEGRATED-TERMS-ACCEPTANCE-AND-SIGNUP-ALIGNMENT-V1.md)
-> **상태**: IMPLEMENTED — 구현·검증 완료, production migration/deploy 및 smoke 는 §14~§16 (push 후 갱신)
+> **상태**: COMPLETE (2026-09-17) — 구현 `c9ca615c0` · CI Pipeline success · Deploy API success · production migration Job SUCCESS · read-only DB 확인 · API·가입 화면 smoke PASS
 > **날짜**: 2026-09-17 · **작성**: Claude Code (Opus 5)
 > **원칙**: 검증하지 않은 것을 PASS 로 쓰지 않는다. 기존 회원 acceptance backfill 0 · 개인정보/role/membership 변경 0.
 
@@ -122,11 +122,26 @@ migration 은 CREATE TABLE/INDEX 만. `users.tos_accepted_at` 은 유지되며 �
 
 ## 15. production migration / deploy
 
-(push 후 갱신)
+- commit `c9ca615c0` push → GitHub Actions: **CI Pipeline success** · CodeQL success · **Deploy API Server success**(revision `o4o-core-api-03692-8sw` 100%) · Deploy Admin Dashboard success · Deploy Web Services: 4 서비스(k-cosmetics · kpa-society · pharmacy-hub · neture) + kpa-branch **success**, `deploy-signage-player` failure(원인: WO-2A `ae2e7fe32` 가 추가한 `google-auth-library@11.1.0` · `gcp-metadata@9.0.4` 이 24h 미만 신규 패키지라 signage-player Dockerfile 의 pnpm `minimumReleaseAge` 정책 위반 — 이 WO 무관 · 별도 처리 필요) · E2E Auth Runtime Regression failure(`44101be12` 05:15 부터 연속 failure — 이 WO 이전부터).
+- migration Job 실행 `o4o-api-migrations-xd6gb` 로그: `expected schema states: 7` · `CLASSIFICATION = LEGACY_ESTABLISHED` · `CURRENT_INCREMENTAL_PREFIX = 5 / 6` · `PRE_MIGRATION_SCHEMA_ASSERTION = PASS`(24c5941… 5725) · `INCREMENTAL_PENDING = 1` · `INCREMENTAL_EXECUTED = 1` · `LIVE_FINGERPRINT = dfc42b8e… (5745)` = expected · `POST_MIGRATION_SCHEMA_ASSERTION = PASS` · **`MIGRATION_JOB = SUCCESS`**.
+- 운영 read-only(Cloud SQL Auth Proxy · `default_transaction_read_only` · ROLLBACK): `typeorm_migrations` 최신 = `CreateUserPolicyAcceptances1789649959243` · `user_policy_acceptances` 10 컬럼 · 제약 5(PK · UQ · FK 2 · CHECK) · **row 0**(backfill 0) · `users.tos_accepted_at` NOT NULL 38 / 58(IR 실측과 동일 · 변경 0) · published `terms` 0(pharmacy-hub archived 1건뿐 → 게이트 비활성).
 
-## 16. production smoke
+## 16. production smoke (`https://api.neture.co.kr` · 2026-09-17)
 
-(deploy 후 갱신)
+| 항목 | 결과 |
+|---|---|
+| 비인증 `GET`/`POST /api/v1/auth/policy-acceptances` | **401** (route 존재 · requireAuth) |
+| public `GET /public/services/kpa-society/policies/privacy` | 200 · 응답에 `id` · `contentHash` 포함 · contentHash `bec62205fc50eec7…` = 처리방침 게시 시 산출한 sha256 과 동일(hash 계약 일치) |
+| public `…/neture/policies/terms` | 404(게시 전 · 정상) |
+| renagang21 L1 로그인 | 200 · `user.pendingPolicyAcceptances = []` |
+| `GET /auth/me` | `pendingPolicyAcceptances []` · memberships 6(kpa-society · platform · kpa-branch · pharmacy-hub · neture · k-cosmetics) |
+| `GET /auth/policy-acceptances`(인증) | `{ pending: [] }` |
+| 보호 API 회귀 `GET /auth/services` | 200 (게시 전 차단 0) |
+| `POST /auth/policy-acceptances` 임의 uuid | `404 POLICY_NOT_FOUND` · 이후 DB row 0 유지 |
+| PH `https://pharmacyhub.co.kr/join` (Playwright headless) | 약관 동의 fieldset: 체크박스 2 · `/terms` `/privacy` 링크 · **가입 버튼 비활성**(미체크) · pageerror 0 · 하드코딩 흔적 0 |
+| KCos `https://k-cosmetics.site/register` → 소비자 선택 | 체크박스 3(약관·처리방침·마케팅) · `/terms` `/privacy` 링크 · 버튼 비활성 · pageerror 0 |
+
+미실측: 실제 pending → 428 → 재동의 화면 → 승낙 흐름의 **운영 end-to-end** 는 published terms 가 없어 지금 재현 불가(격리 PG jest 2/2 · 게이트 jest 24/24 · 게이트 UI vitest 6/6 으로 대체). 약관 v1 publish 직후 renagang21 로 재실측한다(§21). 신규 가입 실제 제출은 운영 계정 생성이 되므로 하지 않았다(테스트 계정 acceptance 생성 0).
 
 ## 17. 개인정보 / role / membership 변경
 
@@ -135,8 +150,10 @@ migration 은 CREATE TABLE/INDEX 만. `users.tos_accepted_at` 은 유지되며 �
 
 ## 18~20. commit · push · 최종 Git 상태
 
-(push 후 갱신)
+- 구현 commit **`c9ca615c0`** (pathspec 커밋 · `check-staged-scope` 범위 내 · 타 세션 파일 0) · push 완료 · 본 CHECK 갱신 commit 은 별도(docs).
+- 최종: `HEAD == origin/main` · 이 WO 범위 미커밋 0. 작업트리 잔여는 타 세션 소유(`docs/checks/CHECK-O4O-GOOGLE-IDENTITY-PREREQUISITES-V1.md` 미추적) — 불가침.
 
 ## 21. 통합약관 v1 게시 가능 여부
 
-(§15·§16 후 판정)
+**가능(선행조건 2건 충족)**. 남은 순서(WO §25 7~9): ① `O4O-INTEGRATED-TERMS-OF-SERVICE-V1.0.md` 시행일·공고일 확정 → DRAFT → ACTIVE ② `render-policy-plain.mjs --verify` 게시본 → admin policy API 로 4 서비스 `terms` draft 등록 → publish(직접 SQL 0 · 처리방침 `699e54ec2` 절차 동일) ③ publish 직후 renagang21 로 `/auth/me pendingPolicyAcceptances 4건` · 보호 API 428 · 재동의 화면 · 승낙 → row 생성 · 통과 실측 → CHECK 추가 ④ CANONICAL-INDEX §7 등록.
+주의: publish 순간부터 기존 회원(membership active/pending) 전원이 다음 요청에서 428 + 재동의 화면을 만난다 — 4 서비스 web deploy(이번 커밋)가 이미 완료됐으므로 화면은 준비돼 있다. signage-player 실패는 게시와 무관.

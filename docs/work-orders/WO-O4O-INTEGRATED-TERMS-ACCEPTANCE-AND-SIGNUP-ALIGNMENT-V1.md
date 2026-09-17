@@ -1,7 +1,7 @@
 # WO-O4O-INTEGRATED-TERMS-ACCEPTANCE-AND-SIGNUP-ALIGNMENT-V1
 
 > **성격**: 구현 WO — [`O4O-INTEGRATED-TERMS-OF-SERVICE-V1.0`](../baseline/O4O-INTEGRATED-TERMS-OF-SERVICE-V1.0.md)(DRAFT) 의 **게시 선행조건 2건**(가입 UI 정비 · 약관 acceptance 이력 + 기존 회원 재동의 게이트)을 한 번에 완료한다.
-> **상태**: IMPLEMENTED (2026-09-17) — 구현·로컬 검증 완료, production migration/deploy/smoke 는 CHECK [`CHECK-O4O-INTEGRATED-TERMS-ACCEPTANCE-AND-SIGNUP-ALIGNMENT-V1`](../checks/CHECK-O4O-INTEGRATED-TERMS-ACCEPTANCE-AND-SIGNUP-ALIGNMENT-V1.md) §15~§16
+> **상태**: COMPLETE (2026-09-17) — 구현 `c9ca615c0` · production migration SUCCESS · smoke PASS · CHECK [`CHECK-O4O-INTEGRATED-TERMS-ACCEPTANCE-AND-SIGNUP-ALIGNMENT-V1`](../checks/CHECK-O4O-INTEGRATED-TERMS-ACCEPTANCE-AND-SIGNUP-ALIGNMENT-V1.md) §15~§16
 > **Migration 승인**: 이 WO 승인 자체가 `user_policy_acceptances` 신규 테이블 migration 승인이다(§2 · §24). 그 외 schema 변경 금지.
 > **설계 확정(2026-09-17)**: ① acceptance history 신규 테이블 + `users.tos_accepted_at` 은 legacy snapshot 유지 · v1 소급 backfill 0 ② 재동의 게이트 = **하이브리드**(로그인 허용 · `pendingPolicyAcceptances` · 닫을 수 없는 재동의 화면 · 서버 `428 TERMS_ACCEPTANCE_REQUIRED` + allowlist). 테이블명은 `consents` 가 아니라 **`acceptances`**(개인정보 동의 consent 와 계약상 승낙 acceptance 구분).
 > **선행**: [`IR-O4O-INTEGRATED-TERMS-RUNTIME-CONTRACT-CENSUS-V1`](../investigations/IR-O4O-INTEGRATED-TERMS-RUNTIME-CONTRACT-CENSUS-V1.md) §4(TIMESTAMP_ONLY) · §5 · §10 · 약관 원문 DRAFT `3f9bcb7e2`
