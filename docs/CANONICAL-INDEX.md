@@ -135,6 +135,7 @@
 | [DOCUMENT-LIFECYCLE-AND-ARCHIVE-RULES-V1](rules/DOCUMENT-LIFECYCLE-AND-ARCHIVE-RULES-V1.md) | 문서 상태 · archive · 헤더 형식 정본 | ACTIVE |
 | [ESM-CIRCULAR-DEPENDENCY-ANALYSIS-V01](reference/ESM-CIRCULAR-DEPENDENCY-ANALYSIS-V01.md) | TypeORM Entity ESM 규칙(type-only import + 문자열 관계)의 근거 분석 | ACTIVE |
 | [O4O-PRIVACY-DATA-RETENTION-POLICY-V1](baseline/O4O-PRIVACY-DATA-RETENTION-POLICY-V1.md) | 개인정보 보유기간 정책 SSOT (2026-09-17 확정) — 문의 1년 · 이메일 로그 1년 · 로그인 시도 30일 · 접속·감사기록 1년(민감정보 시스템 2년) · AI 메타 1년 · 백업 7일 · 수동 export 30일 · 전자상거래 기록은 거래 개시 시. 처리방침 v1.0 보유기간 항목과 집행 WO 의 단일 기준 | ACTIVE |
+| [O4O-PRIVACY-POLICY-V1.0](baseline/O4O-PRIVACY-POLICY-V1.0.md) | 개인정보 처리방침 v1.0 게시 원문 SSOT (시행 2026-09-17 · 15개 조 · 보호책임자 서철환) — 활성 4 서비스(neture · kpa-society · k-cosmetics · pharmacy-hub) 공통 · 런타임 본문은 `service_policy_documents`(privacy/published) · Footer 책임자는 `service_legal_profiles`. 관련: [RETENTION-POLICY-V1](baseline/O4O-PRIVACY-DATA-RETENTION-POLICY-V1.md) · [IR RUNTIME-DATA-FLOW-CENSUS](investigations/IR-O4O-PRIVACY-POLICY-RUNTIME-DATA-FLOW-CENSUS-V1.md) · [CHECK RETENTION-ENFORCEMENT](checks/CHECK-O4O-PRIVACY-DATA-RETENTION-ENFORCEMENT-V1.md) · 게시 검증 [CHECK PUBLISH-AND-CROSSSERVICE-SMOKE](checks/CHECK-O4O-PRIVACY-POLICY-V1-PUBLISH-AND-CROSSSERVICE-SMOKE.md) | ACTIVE |
 | `docs/local/TEST-ACCOUNTS.local.md` | 검증용 테스트 계정 SSOT — **로컬 전용 · git 미추적** · 자격증명 하드코딩 금지 | ACTIVE |
 
 ## 8. 콘텐츠 저작 진입점
