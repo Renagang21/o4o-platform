@@ -22,7 +22,9 @@ import { LoginModalProvider, useAuthModal } from './contexts/LoginModalContext';
 import LoginModal from './components/LoginModal';
 import { getKpaPostLoginRoute } from './config/dashboard';
 import RegisterModal from './components/RegisterModal';
-const HandoffPage = lazy(() => import('./pages/HandoffPage'));
+// WO-O4O-AUTH-REFRESH-TOKEN-FAMILY-CONTINUITY-AND-HANDOFF-STALE-TOKEN-GUARD-V1: 정적 import —
+//   lazy 면 AuthProvider 의 세션 복구 effect 가 chunk 로드보다 먼저 실행돼 stale 토큰 guard 가 늦는다.
+import HandoffPage from './pages/HandoffPage';
 const AccountRecoveryPage = lazy(() => import('./pages/auth/AccountRecoveryPage'));
 const ResetPasswordPage = lazy(() => import('./pages/auth/ResetPasswordPage'));
 // WO-O4O-AUTH-VERIFY-EMAIL-FRONTEND-PAGE-V1: 이메일 인증 결과 페이지

@@ -1,10 +1,22 @@
 /**
  * WO-O4O-LOGOUT-ALL-TOKEN-INVALIDATION-V1
+ * WO-O4O-AUTH-REFRESH-TOKEN-FAMILY-CONTINUITY-AND-HANDOFF-STALE-TOKEN-GUARD-V1
  *
- * `logout-all` 이 실제로 모든 기기의 refresh token 을 무효화하는지 고정한다.
+ * `logout-all` 이 실제로 모든 기기의 refresh token 을 무효화하는지,
+ * 그리고 refresh 회전이 family 를 **승계**하는지 고정한다.
+ *
+ * ── 계약 ───────────────────────────────────────────────────────────────────
+ *   login            → 새 family
+ *   handoff A → B    → B 가 같은 family 승계
+ *   refresh (A 또는 B) → 토큰 회전, family 불변, users.refreshTokenFamily 불변
+ *   다른 family 토큰   → TOKEN_FAMILY_MISMATCH + family null
+ *   family null 이후   → TOKEN_FAMILY_REVOKED
+ *   logout / logout-all → family null
  *
  * ── 이 테스트가 증명하는 것 ────────────────────────────────────────────────
- *   - 정상 세션은 refresh 로 재발급되고 family 가 회전한다 (기존 계약 유지)
+ *   - 정상 세션은 refresh 로 재발급되고 **family 는 유지**된다
+ *     (회귀 지점: 회전마다 새 family 를 단일 슬롯에 덮어써 handoff 로 family 를 공유한
+ *      다른 origin 의 refresh token 을 stale 로 만들었다 — IR-O4O-CROSSSERVICE-HANDOFF-SESSION-PERSISTENCE-V1)
  *   - `logoutAll()` 이후 기존 refresh token 은 절대 재발급되지 않는다
  *     (회귀 지점: `users.refreshTokenFamily = null` 이 family 검사 전체를 우회시켰다)
  *   - 다른 기기에서 발급된 family 는 mismatch 로 거부되고 전체 세션이 폐기된다
@@ -60,18 +72,55 @@ describe('refresh token family 계약 — logout-all 무효화', () => {
     (user as any).__loginRefreshToken = issued.refreshToken;
   });
 
-  it('정상 세션은 refresh 로 재발급되고 family 가 회전한다', async () => {
+  it('B · 정상 세션은 refresh 로 재발급되고 family 는 유지된다 (DB 저장 없음)', async () => {
     const before = user.refreshTokenFamily;
+    const save = (service as any)._userRepo.save as jest.Mock;
 
     const tokens = await service.refreshTokens(user.__loginRefreshToken);
 
     expect(tokens.accessToken).toBeTruthy();
     expect(tokens.refreshToken).toBeTruthy();
-    expect(user.refreshTokenFamily).toBe(tokenUtils.getTokenFamily(tokens.refreshToken));
-    expect(user.refreshTokenFamily).not.toBe(before);
+    expect(tokenUtils.getTokenFamily(tokens.refreshToken)).toBe(before);
+    expect(user.refreshTokenFamily).toBe(before);
+    expect(save).not.toHaveBeenCalled();
   });
 
-  it('logout-all 이후에는 기존 refresh token 으로 재발급할 수 없다', async () => {
+  it('C · handoff 로 family 를 공유하는 두 origin 이 교대로 refresh 해도 모두 200', async () => {
+    const family = user.refreshTokenFamily;
+    let source = user.__loginRefreshToken as string;
+    let target = makeRefreshTokenForCurrentFamily();
+
+    const r1 = await service.refreshTokens(source);
+    source = r1.refreshToken;
+    expect(tokenUtils.getTokenFamily(source)).toBe(family);
+
+    const r2 = await service.refreshTokens(target);
+    target = r2.refreshToken;
+    expect(tokenUtils.getTokenFamily(target)).toBe(family);
+
+    const r3 = await service.refreshTokens(source);
+    expect(tokenUtils.getTokenFamily(r3.refreshToken)).toBe(family);
+    expect(user.refreshTokenFamily).toBe(family);
+  });
+
+  it('A · 신규 로그인은 여전히 새 family 를 만든다', () => {
+    const first = tokenUtils.generateTokens(user, [], 'neture.co.kr');
+    const second = tokenUtils.generateTokens(user, [], 'neture.co.kr');
+    expect(tokenUtils.getTokenFamily(first.refreshToken)).not.toBe(
+      tokenUtils.getTokenFamily(second.refreshToken)
+    );
+  });
+
+  it('E · family null 이후에는 승계된 family 토큰도 TOKEN_FAMILY_REVOKED', async () => {
+    const rotated = await service.refreshTokens(user.__loginRefreshToken);
+    user.refreshTokenFamily = null;
+
+    await expect(service.refreshTokens(rotated.refreshToken)).rejects.toMatchObject({
+      code: 'TOKEN_FAMILY_REVOKED',
+    });
+  });
+
+  it('F · logout-all 이후에는 기존 refresh token 으로 재발급할 수 없다', async () => {
     const stolenToken = user.__loginRefreshToken;
 
     await service.logoutAll(USER_ID);
@@ -107,7 +156,7 @@ describe('refresh token family 계약 — logout-all 무효화', () => {
     expect(tokens.refreshToken).toBeTruthy();
   });
 
-  it('family 가 어긋난 토큰은 도난으로 판정하고 전체 세션을 폐기한다', async () => {
+  it('D · family 가 어긋난 토큰은 도난으로 판정하고 전체 세션을 폐기한다', async () => {
     const staleToken = user.__loginRefreshToken;
     // 다른 곳에서 회전이 일어나 users 의 family 가 바뀐 상황
     const rotated = tokenUtils.generateTokens(user, [], 'neture.co.kr');

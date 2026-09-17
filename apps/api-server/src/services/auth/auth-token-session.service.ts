@@ -127,12 +127,25 @@ export class AuthTokenSessionService {
 
     // Generate new tokens (with rotation)
     // WO-O4O-AUTH-JWT-SECURITY-REFINE-V1: refresh 시에도 최신 memberships 포함
+    // WO-O4O-AUTH-REFRESH-TOKEN-FAMILY-CONTINUITY-AND-HANDOFF-STALE-TOKEN-GUARD-V1:
+    //   family = 로그인 세션 계보, refresh token = 그 family 안에서 회전.
+    //   회전 시 기존 family 를 승계한다. users.refreshTokenFamily 는 사용자당 단일 슬롯이라
+    //   매 refresh 마다 새 family 를 덮어쓰면 handoff 로 같은 family 를 승계한 다른 origin 의
+    //   refresh token 이 즉시 stale 이 되고, 그 다음 refresh 가 MISMATCH → family null →
+    //   모든 origin 이 TOKEN_FAMILY_REVOKED 로 연쇄 사망했다 (IR-O4O-CROSSSERVICE-HANDOFF-SESSION-PERSISTENCE-V1).
+    //   새 로그인 = 새 family / logout·logout-all = family null 계약은 그대로다.
     const ctx = await freshenUserContext(user.id);
-    const tokens = tokenUtils.generateTokens(user, ctx.roles, 'neture.co.kr', ctx.memberships);
+    const tokens = tokenUtils.generateTokens(
+      user,
+      ctx.roles,
+      'neture.co.kr',
+      ctx.memberships,
+      payload.tokenFamily
+    );
 
-    // Update token family
+    // family 는 승계됐으므로 users 갱신이 필요 없다. 방어적으로 값이 다를 때만 저장한다.
     const tokenFamily = tokenUtils.getTokenFamily(tokens.refreshToken);
-    if (tokenFamily) {
+    if (tokenFamily && user.refreshTokenFamily !== tokenFamily) {
       user.refreshTokenFamily = tokenFamily;
       await this.userRepository.save(user);
     }

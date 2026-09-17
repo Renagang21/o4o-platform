@@ -9,12 +9,18 @@
  *   - exchange 는 공개 endpoint 라 `fetch` 로 직접 호출한다 — authClient 인터셉터가
  *     401(만료·무효 토큰)을 refresh 시도로 오해해 기존 세션을 지우는 일을 막는다.
  *   - 토큰 값은 어떤 로그·화면에도 남기지 않는다.
+ *   - WO-O4O-AUTH-REFRESH-TOKEN-FAMILY-CONTINUITY-AND-HANDOFF-STALE-TOKEN-GUARD-V1:
+ *     `/handoff` 착지 origin 에 이전 세션의 낡은 토큰이 남아 있으면 부모 AuthProvider 의 세션 복구가
+ *     그 토큰으로 `/auth/me` → 401 → `/auth/refresh` 를 쏘고, stale refresh 가 서버 family 를 null 로
+ *     만들어 exchange 가 승계할 family 가 사라진다(출발 서비스 세션 즉시 소실). 그래서 exchange **전에**
+ *     `useLayoutEffect` 로 저장 토큰을 선제 제거한다 — layout effect 는 모든 passive effect(AuthProvider
+ *     의 `useEffect` 복구) 보다 먼저 실행되므로 낡은 토큰으로 `/auth/me` 가 나가지 않는다.
  *
  * URL: /handoff?token={handoffToken}[&returnTo=/relative/path]
  */
 
-import { useEffect, useState } from 'react';
-import { storeTokens } from '@o4o/auth-client';
+import { useEffect, useLayoutEffect, useState } from 'react';
+import { clearStoredTokens, storeTokens } from '@o4o/auth-client';
 import { API_BASE_URL } from '../lib/apiClient';
 
 type HandoffStatus = 'loading' | 'success' | 'error';
@@ -38,6 +44,11 @@ export default function HandoffPage() {
   const [status, setStatus] = useState<HandoffStatus>('loading');
   const [error, setError] = useState<string>('');
   const basename = '';
+
+  // 낡은 토큰 선제 제거 — AuthProvider 의 passive effect(/auth/me) 보다 먼저 실행된다 (상단 주석).
+  useLayoutEffect(() => {
+    clearStoredTokens();
+  }, []);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
