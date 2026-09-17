@@ -18,7 +18,7 @@
 
 - 행 추가·제거·상태 변경은 별도 WO 로 한다 (`CLAUDE.md` §16-4 준용). 깨진 링크 교정만 인라인 허용.
 - 우선순위(충돌 시)는 아래 절 번호 순이 아니라 `CLAUDE.md` / `AGENTS.md` 의 Source of Truth 절이 정한다. 요지: **1절(사업·정책) > 2절(구조 계약) > 나머지 도메인 정본 > 기록물**.
-- 2026-09-15 부터 **역할별 업무공간 리팩터링**이 진행 중이다. 상위 기준은 1절 [O4O-ROLE-WORKSPACE-ARCHITECTURE-V1](baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md) 이며, 각 단계 WO 는 착수 시 최신 `origin/main` 에서 모집단을 다시 만든다(동 문서 §9). 아래 행의 `UPDATE_REQUIRED` 표기는 그 단계에서 처리한다.
+- **역할별 업무공간 리팩터링**(2026-09-15 ~ 2026-09-17)은 8단계 전부 완료되어 `ROLE_WORKSPACE_REFACTOR = CLOSED` 다 ([CHECK](checks/CHECK-O4O-FINAL-ROLE-WORKSPACE-ARCHITECTURE-CENSUS-AND-CLOSURE-V1.md)). 상위 기준은 1절 [O4O-ROLE-WORKSPACE-ARCHITECTURE-V1](baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md) 이며 이후 변경은 동 문서 §9 규칙을 따르는 명시적 WO 로만 한다. 아래 행에 `UPDATE_REQUIRED` 잔여는 없다.
 
 ---
 
@@ -27,7 +27,7 @@
 | 문서 | 역할 | 상태 |
 |---|---|---|
 | [O4O-ROLE-WORKSPACE-ARCHITECTURE-V1](baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md) | **사용자 역할별 업무공간 Architecture SSOT** (2026-09-15) — Community / Store / Supplier / Service Operator 4 업무공간 · Supplier → Store Hub · Service Operator 공식 경로 · 1 Store : N Services · My Services · Community Workspace(Community Identity ≠ Service Identity · Community Catalog · Industry Community 폐기) · Store 콘텐츠 유입 3+1 경로 · **Legacy Partner = FULL RETIREMENT** · 리팩터링 실행 규칙(§9). 역할 경계 · 업무공간 · 콘텐츠 유입 · Partner 에 관해 아래 PHILOSOPHY 와 충돌하면 **이 문서가 우선** (§8). Preflight: [IR](ir/IR-O4O-ROLE-WORKSPACE-REFACTOR-PREFLIGHT-V1.md) | ACTIVE |
-| [O4O-BUSINESS-PHILOSOPHY-V1](baseline/O4O-BUSINESS-PHILOSOPHY-V1.md) | 사업 철학 SSOT — 공급자 / 운영사업자 / 매장 정의, HUB 철학, AI 역할, Drift 방지. **§3 · §4 · §7 · 주의사항(Neture 내 매장) 은 ROLE-WORKSPACE-ARCHITECTURE 와 충돌 → 충돌 절은 그 문서 우선, 본문 정정은 후속 WO (UPDATE_REQUIRED)** | ACTIVE |
+| [O4O-BUSINESS-PHILOSOPHY-V1](baseline/O4O-BUSINESS-PHILOSOPHY-V1.md) | 사업 철학 SSOT — 공급자 / 운영사업자 / 매장 정의, HUB 철학, AI 역할, Drift 방지. ROLE-WORKSPACE-ARCHITECTURE 와 동급(역할 경계 · 업무공간 · 콘텐츠 유입 경로는 그 문서 우선). 종전 충돌 절(§3 · §4 · §7 · 주의사항) 은 2026-09-17 Final Census 로 본문 정렬 완료 | ACTIVE |
 | [O4O-STORE-COMMERCE-BOUNDARY-V1](baseline/O4O-STORE-COMMERCE-BOUNDARY-V1.md) | 매장 commerce 경계 SSOT — 소비자→매장 O4O commerce 없음 · 판매 실행 = 외부 POS·외부 채널 · legacy commerce 판정 규칙 · 개발 금지선 · **§15 사업 모델 변경 절차**. cart · checkout · orders · payments · refund · PG · POS · tablet · QR 작업 전 **코드보다 먼저 읽는다** | ACTIVE |
 | [O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1](baseline/O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1.md) | 공급자→매장 B2B 주문 정본 — `store_cart_items → checkout_orders` 수렴, actor · ownership · serviceKey · lifecycle · 취소 계약. 위 문서의 B2B 축 쌍 | ACTIVE |
 
@@ -62,11 +62,11 @@
 
 | 문서 | 역할 | 상태 |
 |---|---|---|
-| [OPERATOR-DASHBOARD-STANDARD-V1](platform/operator/OPERATOR-DASHBOARD-STANDARD-V1.md) | 5-Block 대시보드 · A~F 6 Workspace 진입 허브 · Sidebar 순서 · KPI 분류 | ACTIVE |
+| [OPERATOR-DASHBOARD-STANDARD-V1](platform/operator/OPERATOR-DASHBOARD-STANDARD-V1.md) | 5-Block 대시보드 · KPI 분류 · Guard · Route 표준. §4-2-A~E(8 Group / 6 Workspace A~F Sidebar)는 SUPERSEDED (2026-09-17) → Sidebar IA 는 ROLE-WORKSPACE-ARCHITECTURE §4 3도메인 | ACTIVE |
 | [O4O-OPERATOR-CANONICAL-WORKFLOW-V1](architecture/O4O-OPERATOR-CANONICAL-WORKFLOW-V1.md) | 검수·승인 UX | ACTIVE |
 | [O4O-OPERATOR-NON-APPROVAL-UX-BASELINE-V1](baseline/O4O-OPERATOR-NON-APPROVAL-UX-BASELINE-V1.md) | 검수 외 5 Workspace UX (자료 등록 / AI 작업 / 큐레이션 / 매장 지원 / 운영 수익) | ACTIVE |
 | [O4O-OPERATOR-HUB-CONTENT-PUBLISHING-STANDARD-V1](baseline/O4O-OPERATOR-HUB-CONTENT-PUBLISHING-STANDARD-V1.md) | 매장 HUB 콘텐츠 게시 표준 (RichTextEditor 기반 항목별 게시 · Source Ingestion 보류). §6 첫 항목(공급자 HUB 직접 게시 금지)은 2026-09-16 삭제 — 공급자 유입은 ROLE-WORKSPACE-ARCHITECTURE §2-1 | ACTIVE |
-| [O4O-STORE-MENU-CANONICAL-TREE-V1](baseline/O4O-STORE-MENU-CANONICAL-TREE-V1.md) | 매장 HUB ↔ 내 매장 메뉴 같은 축 정렬 (6 항목). §1.3(Neture 제외) · §5.1(출처 4종)은 ROLE-WORKSPACE-ARCHITECTURE §1 · §6 과 부분 충돌 → UPDATE_REQUIRED (Store 단계) | ACTIVE |
+| [O4O-STORE-MENU-CANONICAL-TREE-V1](baseline/O4O-STORE-MENU-CANONICAL-TREE-V1.md) | 매장 HUB ↔ 내 매장 메뉴 같은 축 정렬 (6 항목). §1.3(적용 서비스 = catalog `storeWorkspaceEnabled`) · §5.1(출처 4종 ↔ ROLE-WORKSPACE §6 3+1 경로) · SMT-G8 은 2026-09-17 Final Census 로 정정 완료 | ACTIVE |
 | [OPERATOR-DATATABLE-POLICY-V1](architecture/OPERATOR-DATATABLE-POLICY-V1.md) | Operator DataTable 정책 | ACTIVE |
 | [O4O-OPERATOR-TABLE-CANONICAL-V1](architecture/O4O-OPERATOR-TABLE-CANONICAL-V1.md) | Operator Table canonical | ACTIVE |
 | [OPERATOR-INTEGRATION-STATE-V1](architecture/OPERATOR-INTEGRATION-STATE-V1.md) | Operator 통합 상태 | ACTIVE |
@@ -90,7 +90,7 @@
 |---|---|---|
 | [COSMETICS-DOMAIN-RULES](architecture/COSMETICS-DOMAIN-RULES.md) | Cosmetics — 독립 스키마(`cosmetics_` prefix), 주문은 E-commerce Core 경유 | ACTIVE |
 | [BUSINESS-SERVICE-RULES](architecture/BUSINESS-SERVICE-RULES.md) | Business Service — OpenAPI 계약 우선, 서비스 간 직접 호출 / DB 접근 금지 | ACTIVE |
-| [KPA-SOCIETY-SERVICE-STRUCTURE](baseline/KPA-SOCIETY-SERVICE-STRUCTURE.md) | KPA 3개 서비스 공존 구조 (커뮤니티 / 분회 / 데모) — 라우트 위치 ≠ 서비스 소속 | ACTIVE |
+| [KPA-SOCIETY-SERVICE-STRUCTURE](baseline/KPA-SOCIETY-SERVICE-STRUCTURE.md) | KPA 3개 화면 영역 공존 구조 (커뮤니티 / 분회 / 데모=제거 완료) — 라우트 위치 ≠ 서비스 소속. v1.1(2026-09-17): Forum = 약사 커뮤니티(communityKey=pharmacy, ROLE-WORKSPACE §5) | ACTIVE |
 | [KPA-SIGNAGE-STRUCTURE-V1](baseline/KPA-SIGNAGE-STRUCTURE-V1.md) | KPA Signage 구조 baseline | ACTIVE |
 | [NETURE-DOMAIN-ARCHITECTURE-FREEZE-V3](baseline/NETURE-DOMAIN-ARCHITECTURE-FREEZE-V3.md) | Neture 도메인 아키텍처 (공급자 화면 canonical) | FROZEN |
 | [O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1](baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) | PharmacyHub = KPA류 공통 매장경영 구조 − 공급 승인/매장지원 capability · supplier 역할 없음 | ACTIVE |

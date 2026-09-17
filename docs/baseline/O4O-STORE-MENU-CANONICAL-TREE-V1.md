@@ -9,8 +9,9 @@
 - **작성일:** 2026-05-23
 - **분류:** Baseline (Standard)
 - **버전:** V1
-- **상태:** Active
+- **상태:** Active (정정 2026-09-17 — §1.3 적용 서비스 · §5.1 출처↔유입 경로 대응 · SMT-G8 을 `O4O-ROLE-WORKSPACE-ARCHITECTURE-V1` §1 · §2-1 · §6 기준으로 정렬, `WO-O4O-FINAL-ROLE-WORKSPACE-ARCHITECTURE-CENSUS-AND-CLOSURE-V1`)
 - **상위 문서:**
+  - [`O4O-ROLE-WORKSPACE-ARCHITECTURE-V1`](O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md) (역할별 업무공간 · Store §3 · 콘텐츠 유입 경로 §6 — 충돌 시 우선)
   - [`O4O-OPERATOR-HUB-CONTENT-PUBLISHING-STANDARD-V1`](O4O-OPERATOR-HUB-CONTENT-PUBLISHING-STANDARD-V1.md) (게시 표준)
   - [`O4O-BUSINESS-PHILOSOPHY-V1 §3.3`](O4O-BUSINESS-PHILOSOPHY-V1.md) (Store 정의)
   - [`O4O-3-ROLE-FLOW-BASELINE-V1`](O4O-3-ROLE-FLOW-BASELINE-V1.md)
@@ -41,16 +42,17 @@
 - 6 항목 (상품 상세정보 / POP / QR-code / 블로그 / 사이니지 / 고객 안내문)
 - **설문 제외** (별도 후속 IR — §7 참조)
 
-### 1.3 적용 서비스 (Neture 제외 확정)
+### 1.3 적용 서비스 (catalog `storeWorkspaceEnabled` 기준)
 
 ```text
-적용 대상: KPA / GlycoPharm / K-Cosmetics  (매장 기능 보유 서비스)
-제외:      Neture  (매장 기능 부재 — 공급자 / 운영자 / 시장 실행 플랫폼)
+적용 대상: catalog 의 storeWorkspaceEnabled=true 서비스
+           (2026-09 현재 KPA-Society / K-Cosmetics / Pharmacy-Hub — GlycoPharm 은 catalog 에서 제거됨)
+제외:      Neture  (storeWorkspaceEnabled=false — 공급자 / 운영자 / 시장 실행 플랫폼, 매장 기능 부재)
 ```
 
-**확정 사유:** Neture 는 매장 (Store) 기능 자체가 없는 공급자/운영자/시장 실행 중심 서비스. 매장 HUB ↔ 내 매장 흐름의 모든 항목 (블로그 / POP / QR / 상품 상세 / 사이니지 / 고객 안내문) 의 구현 대상이 아니다.
+**정정 (2026-09-17):** 적용 범위의 정본은 서비스명 나열이 아니라 canonical service catalog(`apps/api-server/src/config/service-catalog.ts`)의 `workspace.storeWorkspaceEnabled` 다 (ROLE-WORKSPACE §4-1 Service Identity ≠ Service Workspace). 매장 HUB ↔ 내 매장 흐름은 `@o4o/store-ui-core` `workspace/` 한 구현을 각 서비스가 조립한다 (ROLE-WORKSPACE §3-1).
 
-향후 Neture 에 매장 기능이 신설되는 경우 본 §1.3 의 적용 범위 재검토.
+Neture 는 매장 기능이 없으므로 이 흐름의 구현 대상이 아니다. 다만 Neture O4O Home 의 「내 매장」은 타 서비스 Store Workspace 로의 진입 목록(`/work-scope/store-services`)이며 Neture 자체 매장 기능이 아니다. 향후 Neture 의 `storeWorkspaceEnabled` 가 바뀌면 catalog 가 정본이다.
 
 ---
 
@@ -159,6 +161,8 @@ assetSnapshotApi.copy({
 
 ### 5.1 표준 출처 (4 종)
 
+> **유입 경로 대응 (2026-09-16 확정, ROLE-WORKSPACE §6):** 출처 4종은 Store 콘텐츠 공식 유입 경로 3+1(Community → My Store = `community_snapshot` · Store Hub → My Store = `operator_hub`, Hub adapter 는 operator 와 `supplier-library` 를 모두 포함 · Store Direct Authoring = `store_direct` / `library_self` · My Services → My Store 는 출처 값 미신설)과 1:1 대응한다. Supplier → Store Hub 는 공식 경로이므로 `operator_hub` 출처는 "운영자 게시" 뿐 아니라 공급자 라이브러리 공개 항목의 Hub 가져오기도 포함한다 — 배지 문구의 세분화는 Store Hub UI 단계가 정한다.
+
 기존 `StorePopPage` 의 `library` / `snapshot` / `direct` 명칭을 표준화 + 확장:
 
 | Origin | 의미 | UI Badge 권장 |
@@ -247,7 +251,7 @@ direct      = store_direct       (매장 직접 작성)
 | SMT-G5 | 매장 자료실 안에서 운영자 게시 콘텐츠 ↔ 매장 자체 작성이 별도 화면으로 분리됨 (통합 표시 위반) | MED |
 | SMT-G6 | 출처 표시 (`origin badge`) 가 누락된 항목 존재 | MED |
 | SMT-G7 | 설문을 본 V1 범위에 포함해 구조를 복잡하게 만듦 | LOW |
-| SMT-G8 | 공급자가 O4O 내부 Producer 로 다시 등장 (`HubProducer='supplier'` 제외 — 명문화된 예외 유지) | HIGH (기존 정책) |
+| SMT-G8 | 공급자 콘텐츠가 공식 온라인 제공 경로(Supplier → Store Hub · Supplier → Service Operator) 밖으로 유입됨 — 특정 Store 직접 온라인 전달 · Community 직접 게시 (ROLE-WORKSPACE §2-2). `HubProducer='supplier'` 는 Canonical 이며 금지 대상이 아니다 (2026-09-17 정정 — 종전 "공급자 = 내부 Producer 재등장 금지" 는 폐기) | HIGH |
 
 ---
 

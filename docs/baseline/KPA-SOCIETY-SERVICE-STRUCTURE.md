@@ -1,8 +1,9 @@
 # KPA Society 서비스 구조 기준 문서
 
 > **문서 성격**: 헌법 문서 (Constitution)
-> **최종 수정**: 2026-02-06
-> **버전**: 1.0
+> **최종 수정**: 2026-09-17 (v1.1 — Community Identity · 데모 서비스 제거 완료 반영, `WO-O4O-FINAL-ROLE-WORKSPACE-ARCHITECTURE-CENSUS-AND-CLOSURE-V1`)
+> **버전**: 1.1
+> **정합 기준**: 역할별 업무공간 · Community Identity 는 [`O4O-ROLE-WORKSPACE-ARCHITECTURE-V1`](O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md) §1 · §3 · §5 가 상위 정본이다. 본 문서의 "3개 서비스" 는 `kpa-society.co.kr` 도메인 안의 **화면 영역 구분**이며 catalog Service Identity(`kpa-society` · `kpa-branch`)나 Community Identity(`pharmacy`)를 대체하지 않는다.
 
 ---
 
@@ -20,7 +21,7 @@
 |--------|------|------|------|
 | **커뮤니티 서비스** | 약사/약대생 대상 커뮤니티 | **유지** | Forum 포함 |
 | **분회 서비스** | 실제 분회 운영 서비스 | **유지** | 다분회, 서브디렉토리 기반 |
-| **지부/분회 서비스 데모** | 데모/시연용 서비스 | **제거 예정** | `/demo` 경로 |
+| **지부/분회 서비스 데모** | 데모/시연용 서비스 | **제거 완료** (2026-09 기준 `/demo/*` route 없음) | 기록 보존 |
 
 ---
 
@@ -35,12 +36,14 @@
   - 홈 피드
   - 사용자 프로필
 - **진입점**: `/` (메인 홈)
+- **Community Identity (2026-09-16~)**: Forum 은 KPA-Society 만의 기능이 아니라 O4O **약사 커뮤니티**(`communityKey=pharmacy`, Catalog `apps/api-server/src/config/community-catalog.ts`)의 기능이다. KPA `/kpa/forum` 과 Pharmacy-Hub `/pharmacy-hub/forum` 은 같은 원장 코드 집합(kpa-society + pharmacy-hub)을 소비하며 참여 판정은 `resolveCommunityAccess` 한 곳이다 (ROLE-WORKSPACE §5). "커뮤니티 서비스" 라는 이 문서의 화면 영역 이름은 그대로 두되, 데이터 · Identity 경계로 읽지 않는다.
+- **Store Workspace**: 「약국경영」 영역은 공통 Store Workspace(`@o4o/store-ui-core` `workspace/`, `/store/workspace`)의 KPA 조립이다 (ROLE-WORKSPACE §3-1). `/mobile/pharmacy` 는 `/store/workspace` 로 redirect 만 남았다.
 
 ### 3.2 분회 서비스
 
 - **대상**: 각 지역 분회
 - **목적**: 분회별 실제 운영 서비스 제공
-- **구조**: 서브디렉토리 기반 다분회 구조
+- **구조**: 서브디렉토리 기반 다분회 구조 — 별도 프런트 `services/web-kpa-branch` · catalog Service `kpa-branch` (`workspaceMode=none`, operator 만)
 - **상태**: 실서비스 (Production)
 - **진입점**: 분회 서비스 안내 페이지
 
@@ -49,7 +52,7 @@
 - **대상**: 시연/테스트용
 - **목적**: 서비스 데모, 기능 테스트
 - **경로**: `/demo/*`
-- **상태**: 제거 예정 (Deprecated)
+- **상태**: 제거 완료 — `services/web-kpa-society/src/App.tsx` 에 `/demo/*` route 없음 (2026-09-17 확인). 본 절은 기록 보존
 - **비고**: 실서비스 분회와 혼동 주의
 
 ---
@@ -82,7 +85,7 @@ Forum은 커뮤니티 서비스의 기능이다.
 
 ```
 올바른 메뉴 구조:
-홈 | 약국경영 | 분회 서비스 | 지부/분회 서비스 데모
+홈 | 약국경영 | 분회 서비스   (지부/분회 서비스 데모는 제거 완료)
 
 잘못된 메뉴 구조:
 홈 | 포럼 | 관리자 | 약국경영 | ...
@@ -104,7 +107,7 @@ Forum은 커뮤니티 서비스의 기능이다.
 ### 5.2 혼선 방지 규칙
 
 - Forum 관련 작업 시: "커뮤니티 서비스"로 인식
-- `/demo` 관련 작업 시: "데모 서비스(제거 예정)"로 인식
+- `/demo` 관련 작업 시: 제거 완료된 영역 — 재도입하지 않는다
 - 분회 기능 작업 시: "분회 서비스"로 인식
 - 상단 메뉴 변경 시: 본 문서 기준 준수
 
@@ -129,7 +132,9 @@ Forum은 커뮤니티 서비스의 기능이다.
 ## 7. 관련 문서
 
 - `CLAUDE.md` - 플랫폼 개발 헌법
-- `docs/app-guidelines/` - 앱 개발 가이드라인
+- [`O4O-ROLE-WORKSPACE-ARCHITECTURE-V1`](O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md) - 역할별 업무공간 · Community Identity(§5) · Store Workspace(§3)
+- [`KPA-UX-BASELINE-V1`](KPA-UX-BASELINE-V1.md) - KPA UX Frozen (F2)
+- [`docs/CANONICAL-INDEX.md`](../CANONICAL-INDEX.md) - 정본 색인 (구 `docs/app-guidelines/` 는 삭제됨 — 링크 정리 2026-09-17)
 
 ---
 

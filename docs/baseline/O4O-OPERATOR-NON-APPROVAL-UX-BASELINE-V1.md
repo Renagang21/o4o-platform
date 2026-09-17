@@ -50,6 +50,7 @@ Operator Dashboard는 5 Workspace 진입 허브다.
 - 5-Block 구조(KPI → AI Summary → Action Queue → Activity Log → Quick Actions)는 운영 상태를 보여주는 진입점이며, 심사 큐가 주목적이 아니다.
 - A~F 6 Workspace 모두 동등하게 접근 가능한 허브를 기본으로 한다.
 - 상세: `docs/platform/operator/OPERATOR-DASHBOARD-STANDARD-V1.md`
+- **주의 (2026-09-17)**: A~F 는 운영자 업무 활동의 분류이지 Sidebar 최상위 IA 가 아니다. 표준 Service Operator Sidebar 는 [`O4O-ROLE-WORKSPACE-ARCHITECTURE-V1`](O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md) §4 의 3도메인(서비스 운영 / 사업 운영 / 운영 관리)을 따른다 (OPERATOR-DASHBOARD-STANDARD §4-2-A~E 는 SUPERSEDED).
 
 ## 구현 주의사항
 

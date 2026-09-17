@@ -2,9 +2,10 @@
 
 > **운영자 대시보드 개발 시 반드시 따라야 하는 플랫폼 표준**
 >
-> Date: 2026-03-16
+> Date: 2026-03-16 · 정정: 2026-09-17
 > Status: Active Standard
-> Version: 1.1
+> Version: 1.2
+> **Sidebar IA 정정 (2026-09-17, `WO-O4O-FINAL-ROLE-WORKSPACE-ARCHITECTURE-CENSUS-AND-CLOSURE-V1`)**: §4-2-A · §4-2-B · §4-2-D · §4-2-E 의 "8 Group (Dashboard + 6 Workspace A~F + System)" Sidebar 구조는 구현되지 않았고 [`O4O-ROLE-WORKSPACE-ARCHITECTURE-V1`](../../baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md) §4 · §4-2 의 표준 Service Operator 3도메인 IA(서비스 운영 / 사업 운영 / 운영 관리 — `@o4o/operator-ux-core` `operatorDomainIA.ts` `DEFAULT_OPERATOR_DOMAIN_IA`)로 대체되었다. 해당 절은 SUPERSEDED 기록으로 보존한다. §1 ~ §3 · §4-1 · §4-2-C · §5 ~ (5-Block 대시보드 · KPI 분류 · Guard · Route) 는 그대로 유효하다.
 > 근거: IR-O4O-ADMIN-OPERATOR-ROLE-ARCHITECTURE-AUDIT-V1
 
 ---
@@ -247,6 +248,9 @@ if (user.roles.includes('admin')) { ... }
 ---
 
 ### 4-2-A. Operator Sidebar — 8 Group 표준 (Dashboard + 6 Workspace + System)
+
+> **상태**: SUPERSEDED (§4-2-A · §4-2-B · §4-2-D · §4-2-E 공통) · **대체 문서**: [`O4O-ROLE-WORKSPACE-ARCHITECTURE-V1`](../../baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md) §4 · §4-2 (표준 Service Operator 3도메인 IA — 서비스 운영 / 사업 운영 / 운영 관리, Neture 는 SPECIAL 자체 IA) · **표기일**: 2026-09-17
+> 아래 본문은 기록 보존용이다. 8 Group / 6 Workspace A~F 를 Sidebar 최상위 그룹으로 구현하지 않는다. 11 Capability Group(§4-2)은 capability 게이트 단위로 계속 유효하며, 도메인 배치는 `GROUP_TO_DOMAIN` + 서비스 `operatorMenuGroups.ts` 의 항목 단위 `domain` override 가 정한다.
 
 모든 서비스의 Operator Sidebar 는 다음 **8 개 Group** 을 기준으로 구성한다.
 서비스에 해당 Workspace 가 없으면 해당 Group 을 생략한다.
@@ -692,5 +696,5 @@ Neture의 `/workspace/operator` 접두사는 레거시이며 신규 서비스에
 > 📄 근거: `docs/archive/audits/IR-O4O-ADMIN-OPERATOR-ROLE-ARCHITECTURE-AUDIT-V1.md`
 > 📄 참조: `docs/baseline/BASELINE-OPERATOR-OS-V1.md`
 
-*Version: 1.1*
+*Version: 1.2 (2026-09-17 — §4-2-A~E Sidebar IA SUPERSEDED 표기)*
 *Status: Active Standard*

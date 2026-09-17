@@ -1,7 +1,7 @@
 # O4O-ROLE-WORKSPACE-ARCHITECTURE-V1
 
 > **상태**: ACTIVE
-> **작성일**: 2026-09-15 · **최종 갱신**: 2026-09-16 (§2-1 제공 경로 구현 계약 상세화 · §4 Service Identity ≠ Service Workspace · §7 물리 정리 완료 · §9-1 4단계 Supplier Workspace 반영 · §3-1 Store Workspace 구현 상태 · §6 출처 4종↔3+1 경로 대응 · §9-1 5단계 반영 · §4-2 Service Operator Workspace 구현 상태 · §9-1 6단계 반영 · §5 Community Workspace(Community Identity ≠ Service Identity · Industry Community 폐기) · §9-1 7단계 반영)
+> **작성일**: 2026-09-15 · **최종 갱신**: 2026-09-17 (§8 PHILOSOPHY · STORE-MENU-CANONICAL-TREE 정정 완료 · §9-1 8단계 Final Census 완료 — `ROLE_WORKSPACE_REFACTOR = CLOSED`) · 2026-09-16 (§2-1 제공 경로 구현 계약 상세화 · §4 Service Identity ≠ Service Workspace · §7 물리 정리 완료 · §9-1 4단계 Supplier Workspace 반영 · §3-1 Store Workspace 구현 상태 · §6 출처 4종↔3+1 경로 대응 · §9-1 5단계 반영 · §4-2 Service Operator Workspace 구현 상태 · §9-1 6단계 반영 · §5 Community Workspace(Community Identity ≠ Service Identity · Industry Community 폐기) · §9-1 7단계 반영)
 > **근거 WO/IR**: `WO-O4O-ROLE-WORKSPACE-REFACTOR-BASELINE-AND-PREFLIGHT-V1` · [`IR-O4O-ROLE-WORKSPACE-REFACTOR-PREFLIGHT-V1`](../ir/IR-O4O-ROLE-WORKSPACE-REFACTOR-PREFLIGHT-V1.md)
 > **위치**: 사업·정책 정본(우선순위 2). [`O4O-BUSINESS-PHILOSOPHY-V1`](O4O-BUSINESS-PHILOSOPHY-V1.md) 과 동급이며, **역할 경계 · 업무공간 구조 · 콘텐츠 유입 경로 · Legacy Partner** 에 관해 두 문서가 충돌하면 **이 문서가 우선**한다 (§8).
 
@@ -215,11 +215,13 @@ FUTURE PARTNER  = GREENFIELD
 
 | 문서 | 관계 | 처리 |
 |---|---|---|
-| [`O4O-BUSINESS-PHILOSOPHY-V1`](O4O-BUSINESS-PHILOSOPHY-V1.md) | 동급 상위 정본. §1 · §2 · §5 · §6 은 그대로 유효. **§3(공급자 = 직접 제작 주체 아님) · §4 (3자 구조) · §7 (3자 경계 Drift) · 주의사항(Neture 내 매장 기능 추가 금지)** 은 이 문서와 충돌 | 충돌 절은 **이 문서가 우선**. 본문 정정은 후속 WO(UPDATE_REQUIRED) |
+| [`O4O-BUSINESS-PHILOSOPHY-V1`](O4O-BUSINESS-PHILOSOPHY-V1.md) | 동급 상위 정본. §1 · §2 · §5 · §6 은 그대로 유효. **§3(공급자 = 직접 제작 주체 아님) · §4 (3자 구조) · §7 (3자 경계 Drift) · 주의사항(Neture 내 매장 기능 추가 금지)** 은 이 문서와 충돌 | 충돌 절은 **이 문서가 우선**. **본문 정정 완료 (2026-09-17, Final Census)** — 적용 범위 · §3 · §4 · §6 · §7 · 주의사항 · 후속 문서 표를 §1 · §2-1 · §3 · §4 · §5 기준으로 정렬 (사업 결정 변경 없음) |
 | [`O4O-3-ROLE-FLOW-BASELINE-V1`](O4O-3-ROLE-FLOW-BASELINE-V1.md) | §2 Canonical Flow(공급자 → 운영자 → 매장 단선) · §6 첫 항목(공급자 HUB 직접 게시 금지) · §3 공급자 직접 제작 ❌ 가 §2-1 · §6 과 충돌 | **판정 확정 (2026-09-16, Content Boundary Alignment)** — 충돌 절 SUPERSEDED (헤더 표기, 본문 보존). §4 · §5 는 참고 가능하나 근거로 승격하지 않는다 |
 | [`PLATFORM-CONTENT-POLICY-V1`](PLATFORM-CONTENT-POLICY-V1.md) (F4) | 3축 모델(Producer / Visibility / ServiceScope)은 유지. `producer='supplier'` 를 "legacy 예외" 로 둔 §3.1 · §6.3 · §10-5 가 §2-1 과 충돌 | FROZEN 유지. **§3.1 · §3.2 · §6.3 · §10-5 정정 완료 (2026-09-16, Content Boundary Alignment)** — supplier = Canonical. Hub 축 축소는 Store Hub 단계 |
 | [`O4O-OPERATOR-HUB-CONTENT-PUBLISHING-STANDARD-V1`](O4O-OPERATOR-HUB-CONTENT-PUBLISHING-STANDARD-V1.md) | §6 첫 항목(공급자 HUB 직접 제작·게시 금지)이 §2-1 과 충돌 | ACTIVE 유지. **§6 첫 항목 삭제 완료 (2026-09-16, Content Boundary Alignment)** |
-| [`O4O-STORE-MENU-CANONICAL-TREE-V1`](O4O-STORE-MENU-CANONICAL-TREE-V1.md) | §1.3(Neture 제외) · §5.1(출처 4종)이 §1 · §6 과 부분 충돌. 6 항목 축 · 사본화 원칙은 유지 | ACTIVE 유지, 해당 절 UPDATE_REQUIRED (Store 단계) |
+| [`OPERATOR-DASHBOARD-STANDARD-V1`](../platform/operator/OPERATOR-DASHBOARD-STANDARD-V1.md) · [`O4O-OPERATOR-NON-APPROVAL-UX-BASELINE-V1`](O4O-OPERATOR-NON-APPROVAL-UX-BASELINE-V1.md) | §4-2-A~E "8 Group (6 Workspace A~F) Sidebar" 가 §4 3도메인 IA 와 충돌 (미구현). 5-Block 대시보드 · KPI · Guard · Route · Non-Approval UX 원칙은 무관 | **§4-2-A~E SUPERSEDED 표기 완료 (2026-09-17, Final Census)** · NON-APPROVAL §5 에 "A~F ≠ Sidebar IA" 1줄 |
+| [`KPA-SOCIETY-SERVICE-STRUCTURE`](KPA-SOCIETY-SERVICE-STRUCTURE.md) | §3.1 "Forum = 커뮤니티 서비스 기능" 이 §5 Community Identity(pharmacy, KPA+PH 합집합) 와 충돌 · 데모 서비스 제거 완료 미반영 | **v1.1 정정 완료 (2026-09-17, Final Census)** — 3개 서비스 = 화면 영역 구분, Identity 아님 |
+| [`O4O-STORE-MENU-CANONICAL-TREE-V1`](O4O-STORE-MENU-CANONICAL-TREE-V1.md) | §1.3(Neture 제외) · §5.1(출처 4종)이 §1 · §6 과 부분 충돌. 6 항목 축 · 사본화 원칙은 유지 | ACTIVE 유지. **§1.3 · §5.1 · SMT-G8 정정 완료 (2026-09-17, Final Census)** — 적용 서비스 = catalog `storeWorkspaceEnabled` · 출처 4종 ↔ §6 3+1 경로 대응 · SMT-G8 = §2-2 제외 경로 재등장 |
 | [`NETURE-PARTNER-CONTRACT-FREEZE-V1`](../archive/obsolete/partner/NETURE-PARTNER-CONTRACT-FREEZE-V1.md) (구 F7) | §7 은퇴 대상 | **SUPERSEDED (2026-09-15) · ARCHIVED (2026-09-16)** — runtime · 물리 스키마 · dependency 정리 모두 완료 |
 | [`NETURE-DISTRIBUTION-ENGINE-FREEZE-V1`](NETURE-DISTRIBUTION-ENGINE-FREEZE-V1.md) (F8) | 공급자 제품 → 조직 진열 흐름. Partner 무관. §2-1 의 Supplier → Store Hub 제품 축 근거 | KEEP |
 | [`O4O-STORE-COMMERCE-BOUNDARY-V1`](O4O-STORE-COMMERCE-BOUNDARY-V1.md) · [`O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1`](O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1.md) | commerce 경계 · B2B 주문 계약. 이 문서는 commerce 를 바꾸지 않는다 | KEEP (Supplier › Orders · Business Operation › Products 의 주문 축 근거) |
@@ -264,7 +266,7 @@ latest main sync
 5. Store Workspace        ← Home · My Store · Store Hub · My Services 상위 구조(store-ui-core `workspace/`) · My Services(`/work-scope/store-services`) · 대표 홈 진입 정렬 · KPA 모바일 전용 화면 RETIRE (2026-09-16 완료, schema 변경 없음)
 6. Service Operator Workspace ← 표준 최상위 IA 서비스 운영 / 사업 운영 / 운영 관리 (항목 단위 분류) · operator-services 기반 다중 서비스 전환 · Supplier → Service Operator 수신함 · Neture SPECIAL 보존 (2026-09-16 완료, schema 변경 없음 — §4-2)
 7. Community Workspace        ← Community Catalog(SSOT 1) · Community Identity / Service Identity 분리 · 초기 3 Community(pharmacy · cosmetics · o4o-general) · access policy(authenticated / service_membership_any) · 공통 Forum Core adoption(communityKey 컨텍스트) · Industry Community 폐기 (2026-09-16 완료, schema 변경 없음 — §5)
-8. Final Role Workspace Census ← Supplier / Store / Service Operator / Community 4축의 코드 · 문서 · 권한 · route 일치 최종 검증
+8. Final Role Workspace Census ← Supplier / Store / Service Operator / Community 4축의 코드 · 문서 · 권한 · route 일치 최종 검증 (2026-09-17 완료 — Fresh Global Census · 잔여 drift 정리 · 최신 API 기준 Community smoke PASS · 5 active doc 정렬 · `ROLE_WORKSPACE_REFACTOR = CLOSED`, CHECK-O4O-FINAL-ROLE-WORKSPACE-ARCHITECTURE-CENSUS-AND-CLOSURE-V1)
 ```
 
 순서는 권장이며, 각 단계 WO 가 착수 시점의 fresh census 로 확정한다.
