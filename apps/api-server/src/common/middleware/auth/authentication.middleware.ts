@@ -118,6 +118,19 @@ export const requireAuth = async (
       });
     }
 
+    // WO-O4O-AUTH-SERVICE-TOKEN-BOUNDARY-HARDENING-V1:
+    //   requireAuth 는 사람 사용자(tokenType:'user') 경계다. service / guest 등 다른 tokenType 은
+    //   userId 가 실제 users.id 와 일치하더라도 통과시키지 않는다 (Human Auth ≠ Service Auth).
+    //   tokenType 미기재 토큰은 기존 isPlatformUserToken 규약대로 사용자 토큰으로 취급한다.
+    if (payload.tokenType && payload.tokenType !== 'user') {
+      logger.warn('[requireAuth] Non-user token rejected', { tokenType: payload.tokenType });
+      return res.status(401).json({
+        success: false,
+        error: 'Token type is not allowed for this endpoint',
+        code: 'TOKEN_TYPE_NOT_ALLOWED',
+      });
+    }
+
     // Get user from database
     // Note: dbRoles relation is deprecated - use RoleAssignment for RBAC
     const userRepo = AppDataSource.getRepository(User);
@@ -199,6 +212,11 @@ export const optionalAuth = async (
 
     if (!payload) {
       return next(); // Invalid token, continue without authentication
+    }
+
+    // WO-O4O-AUTH-SERVICE-TOKEN-BOUNDARY-HARDENING-V1: requireAuth 와 동일 — 사용자 토큰이 아니면 비로그인 취급
+    if (payload.tokenType && payload.tokenType !== 'user') {
+      return next();
     }
 
     // Get user from database

@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 import { v4 as uuidv4 } from 'uuid';
 import { User } from '../entities/User.js';
 import { AccessTokenPayload, RefreshTokenPayload, AuthTokens, TokenType } from '../types/auth.js';
-import type { ServiceUserData, GuestUserData } from '../types/account-linking.js';
+import type { GuestUserData } from '../types/account-linking.js';
 import logger from './logger.js';
 import { resolveAccountAccess } from '../common/auth/account-access.policy.js';
 
@@ -107,98 +107,9 @@ export function generateAccessToken(user: User, roles: string[], domain: string 
   return jwt.sign(payload, jwtSecret);
 }
 
-/**
- * Generate access token for Service Users
- *
- * === Phase 1: Service User 인증 기반 (WO-AUTH-SERVICE-IDENTITY-PHASE1) ===
- *
- * Service User tokens are distinct from Platform User tokens:
- * - tokenType: 'service' (not 'user')
- * - Contains serviceId and optional storeId
- * - No platform role/permissions
- * - Cannot access Admin/Operator APIs
- *
- * @param serviceUser - Service user data from OAuth
- * @param domain - Domain for the token (default: neture.co.kr)
- * @returns JWT access token string
- */
-export function generateServiceAccessToken(
-  serviceUser: ServiceUserData,
-  domain: string = 'neture.co.kr'
-): string {
-  const { jwtSecret, jwtIssuer, jwtAudience } = getJwtConfig();
-
-  const payload: AccessTokenPayload = {
-    userId: serviceUser.providerUserId,
-    sub: serviceUser.providerUserId,
-    email: serviceUser.email,
-    name: serviceUser.displayName,
-    role: 'service_user', // Not a platform role, just for identification
-    tokenType: 'service',  // Phase 1: Service User 인증 기반
-    serviceId: serviceUser.serviceId,
-    storeId: serviceUser.storeId,
-    iss: jwtIssuer,        // Phase 2.5: Server isolation
-    aud: jwtAudience,      // Phase 2.5: Server isolation
-    exp: Math.floor(Date.now() / 1000) + ACCESS_TOKEN_EXPIRES_IN,
-    iat: Math.floor(Date.now() / 1000)
-  };
-
-  return jwt.sign(payload, jwtSecret);
-}
-
-/**
- * Generate refresh token for Service Users
- *
- * === Phase 1: Service User 인증 기반 (WO-AUTH-SERVICE-IDENTITY-PHASE1) ===
- *
- * @param serviceUser - Service user data from OAuth
- * @param tokenFamily - Token family ID for refresh token rotation
- * @returns JWT refresh token string
- */
-export function generateServiceRefreshToken(
-  serviceUser: ServiceUserData,
-  tokenFamily?: string
-): string {
-  const { jwtRefreshSecret, jwtIssuer, jwtAudience } = getJwtConfig();
-
-  const payload: RefreshTokenPayload = {
-    userId: serviceUser.providerUserId,
-    sub: serviceUser.providerUserId,
-    tokenVersion: 1,
-    tokenFamily: tokenFamily || uuidv4(),
-    iss: jwtIssuer,     // Phase 2.5: Server isolation
-    aud: jwtAudience,   // Phase 2.5: Server isolation
-    exp: Math.floor(Date.now() / 1000) + REFRESH_TOKEN_EXPIRES_IN,
-    iat: Math.floor(Date.now() / 1000)
-  };
-
-  return jwt.sign(payload, jwtRefreshSecret);
-}
-
-/**
- * Generate both access and refresh tokens for Service Users
- *
- * === Phase 1: Service User 인증 기반 (WO-AUTH-SERVICE-IDENTITY-PHASE1) ===
- *
- * @param serviceUser - Service user data from OAuth
- * @param domain - Domain for the token (default: neture.co.kr)
- * @returns AuthTokens object with both tokens
- */
-export function generateServiceTokens(
-  serviceUser: ServiceUserData,
-  domain: string = 'neture.co.kr'
-): AuthTokens {
-  const tokenFamily = uuidv4();
-
-  const accessToken = generateServiceAccessToken(serviceUser, domain);
-  const refreshToken = generateServiceRefreshToken(serviceUser, tokenFamily);
-
-  return {
-    accessToken,
-    refreshToken,
-    expiresIn: ACCESS_TOKEN_EXPIRES_IN
-  };
-}
+// WO-O4O-AUTH-SERVICE-TOKEN-BOUNDARY-HARDENING-V1: generateServiceAccessToken / generateServiceRefreshToken /
+//   generateServiceTokens RETIRED — tokenType:'service' 발급 경로(service login · guest upgrade) 은퇴.
+//   사용자 access token 과 같은 jwtSecret 으로 임의 providerUserId 를 userId 로 서명하던 함수였다.
 
 /**
  * Generate refresh token

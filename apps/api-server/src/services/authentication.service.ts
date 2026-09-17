@@ -8,16 +8,11 @@ import type {
   AuthProvider,
   UnifiedLoginRequest,
   UnifiedLoginResponse,
-  ServiceUserLoginRequest,
-  ServiceUserLoginResponse,
   GuestTokenIssueRequest,
   GuestTokenIssueResponse,
-  GuestUpgradeRequest,
-  GuestUpgradeResponse,
 } from '../types/account-linking.js';
 import { AuthLoginService } from './auth/auth-login.service.js';
 import { AuthTokenSessionService } from './auth/auth-token-session.service.js';
-import { AuthServiceUserService } from './auth/auth-service-user.service.js';
 import { AuthGuestService } from './auth/auth-guest.service.js';
 import { AuthAccountInquiryService } from './auth/auth-account-inquiry.service.js';
 
@@ -48,8 +43,7 @@ import { AuthAccountInquiryService } from './auth/auth-account-inquiry.service.j
  * Sub-services:
  * - AuthLoginService          (login, email/OAuth flows)
  * - AuthTokenSessionService   (token refresh, verify, logout, cookies)
- * - AuthServiceUserService    (service user OAuth login)
- * - AuthGuestService          (guest token issuance, upgrade)
+ * - AuthGuestService          (guest token issuance)
  * - AuthAccountInquiryService (provider checks, test accounts, find-id)
  *
  * @see docs/architecture/auth-ssot-declaration.md
@@ -58,8 +52,7 @@ import { AuthAccountInquiryService } from './auth/auth-account-inquiry.service.j
 export class AuthenticationService {
   private readonly loginService = new AuthLoginService();
   private readonly tokenSessionService = new AuthTokenSessionService();
-  private readonly serviceUserService = new AuthServiceUserService();
-  private readonly guestService = new AuthGuestService(this.serviceUserService);
+  private readonly guestService = new AuthGuestService();
   private readonly accountInquiryService = new AuthAccountInquiryService();
 
   // ==================== Login ====================
@@ -68,22 +61,10 @@ export class AuthenticationService {
     return this.loginService.login(request);
   }
 
-  // ==================== Service User ====================
-
-  async handleServiceUserLogin(
-    request: ServiceUserLoginRequest,
-  ): Promise<ServiceUserLoginResponse> {
-    return this.serviceUserService.handleServiceUserLogin(request);
-  }
-
   // ==================== Guest ====================
 
   async issueGuestToken(request: GuestTokenIssueRequest): Promise<GuestTokenIssueResponse> {
     return this.guestService.issueGuestToken(request);
-  }
-
-  async upgradeGuestToServiceUser(request: GuestUpgradeRequest): Promise<GuestUpgradeResponse> {
-    return this.guestService.upgradeGuestToServiceUser(request);
   }
 
   // ==================== Token / Session ====================

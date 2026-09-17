@@ -17,7 +17,6 @@ import logger from '../utils/logger.js';
 // CORE ROUTE IMPORTS (registered before server listen)
 // ============================================================================
 import authRoutes from '../modules/auth/routes/auth.routes.js';
-import serviceAuthRoutes from '../modules/auth/routes/service-auth.routes.js';
 import guestAuthRoutes from '../modules/auth/routes/guest-auth.routes.js';
 import lmsRoutes from '../modules/lms/routes/lms.routes.js';
 // WO-O4O-LMS-AI-MINIMAL-V1
@@ -118,8 +117,8 @@ export async function registerCoreRoutes(app: Application): Promise<void> {
   // Register core API routes
   app.use('/api/v1/auth', authRoutes);
   app.use('/api/auth', authRoutes);  // Legacy path for backward compatibility
-  // Phase 1: Service User 인증 기반 (WO-AUTH-SERVICE-IDENTITY-PHASE1)
-  app.use('/api/v1/auth/service', serviceAuthRoutes);
+  // WO-O4O-AUTH-SERVICE-TOKEN-BOUNDARY-HARDENING-V1: /api/v1/auth/service (service login) RETIRED —
+  //   legitimate caller 0 · {id,email} JSON 만으로 tokenType:'service' JWT 가 발급되던 경로.
   // Phase 3: Guest 인증 (WO-AUTH-SERVICE-IDENTITY-PHASE3-QR-GUEST-DEVICE)
   app.use('/api/v1/auth/guest', guestAuthRoutes);
   // LMS routes (WO-KPA-B-LMS-GUARD-BYPASS-AUDIT-AND-IMPLEMENTATION-V1: KPA org scope guard BEFORE lmsRoutes)

@@ -1,5 +1,4 @@
-import { IsString, IsIn, IsOptional, ValidateNested, MinLength } from 'class-validator';
-import { Type } from 'class-transformer';
+import { IsString, IsIn, IsOptional, MinLength } from 'class-validator';
 
 /**
  * Guest Token Issue Request DTO
@@ -29,45 +28,6 @@ export class GuestTokenIssueRequestDto {
 }
 
 /**
- * Guest Upgrade Credentials DTO
- *
- * OAuth credentials for upgrading guest to service user
- */
-export class GuestUpgradeCredentialsDto {
-  @IsIn(['google', 'kakao', 'naver'], { message: 'Provider must be google, kakao, or naver' })
-  provider: 'google' | 'kakao' | 'naver';
-
-  @IsString()
-  @MinLength(1, { message: 'OAuth token is required' })
-  oauthToken: string;
-
-  @IsString()
-  @MinLength(1, { message: 'Service ID is required' })
-  serviceId: string;
-
-  @IsOptional()
-  @IsString()
-  storeId?: string;
-}
-
-/**
- * Guest Upgrade Request DTO
- *
- * Phase 3: Guest 인증 (WO-AUTH-SERVICE-IDENTITY-PHASE3-QR-GUEST-DEVICE)
- *
- * Validates guest to service user upgrade request
- */
-export class GuestUpgradeRequestDto {
-  @IsString()
-  @MinLength(1, { message: 'Guest token is required' })
-  guestToken: string;
-
-  @ValidateNested()
-  @Type(() => GuestUpgradeCredentialsDto)
-  credentials: GuestUpgradeCredentialsDto;
-}
-
-/**
  * Guest Token Issue Response interface
  */
 export interface GuestTokenIssueResponseDto {
@@ -84,28 +44,4 @@ export interface GuestTokenIssueResponseDto {
     deviceId?: string;
     entryType: string;
   };
-}
-
-/**
- * Guest Upgrade Response interface
- */
-export interface GuestUpgradeResponseDto {
-  success: boolean;
-  user: {
-    providerUserId: string;
-    provider: 'google' | 'kakao' | 'naver';
-    email: string;
-    displayName?: string;
-    profileImage?: string;
-    serviceId: string;
-    storeId?: string;
-  };
-  tokens: {
-    accessToken: string;
-    refreshToken: string;
-    expiresIn: number;
-  };
-  tokenType: 'service';
-  previousGuestSessionId: string;
-  activityPreserved: boolean;
 }

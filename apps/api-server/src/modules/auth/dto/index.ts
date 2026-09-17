@@ -20,7 +20,6 @@ export * from './password.dto.js';
 export * from './verification.dto.js';
 
 // Service Login DTOs (Phase 1: WO-AUTH-SERVICE-IDENTITY-PHASE1)
-export * from './service-login.dto.js';
 
 // Guest Auth DTOs (Phase 3: WO-AUTH-SERVICE-IDENTITY-PHASE3-QR-GUEST-DEVICE)
 export * from './guest-auth.dto.js';
