@@ -172,7 +172,7 @@ Relationship    "이 사람은 이 사업자/매장/분회와 어떤 관계인�
 Authorization   "이 서비스에서 무엇을 할 수 있는가?"
 
 professional_credentials(pharmacist=verified) + store_memberships(store_123=owner)
-        → 정책 판단 → role_assignments(glycopharm:store_owner)
+        → 정책 판단 → role_assignments(kpa-society:store_owner)
 ```
 
 Credential/Relationship 자체를 `role_assignments` 로 대체하지 않는다. 반대로 모든 서비스가 원본 Credential/Relationship 을 직접 조회하도록 만들지도 않는다. **서비스별 Claim 계약 후보** 를 설계한다 (현행 JWT `roles[]` · `memberships[]` · `accountAccess` · 미삽입 `businessInfo` 와의 관계 포함).
