@@ -124,6 +124,15 @@ Community 를 Service 와 **별도 Identity** 로 세웠다. SSOT 는 `apps/api-
 
 **한계(숨기지 않음)**: backend 동작 전부가 API 배포 차단에 걸려 있다. 차단 해소(별도 WO, F1) 후 S1·S3·S4 를 재실행해야 PASS 로 바뀐다 — 그때까지 프로덕션 커뮤니티 동작은 종전(서비스별 격리)과 같다.
 
+#### 4-1-a. 재실행 (2026-09-17 · API 배포 해소 후 — Deploy API `bbd61992a` success, `c1fc325d8` 포함)
+
+| # | 항목 | 결과 | 확인 내용 |
+|---|---|---|---|
+| S1' | `GET /api/v1/communities` (비로그인) | **PASS** | 200 · `pharmacy:false · cosmetics:false · o4o-general:false` (AUTH_REQUIRED — 공개 read 와 분리된 참여 판정, D9) |
+| S3' | KPA `/kpa/forum/categories` vs PH `/pharmacy-hub/forum/categories` (read-only) | **PASS** | 두 목록 동일 = `["O4O 서비스 소식","kpa-society 개선"]` — **약사 커뮤니티 동일성(§36) 프로덕션 실측**. 종전(S3) 에는 PH 0건이었음 |
+| S4' | 로그인 계정별 Community 참여(A~E) · O4O Home 커뮤니티 카드 | **BLOCKED_CREDENTIALS** | `sohae2100` L1 로그인 401 INVALID_CREDENTIALS(최초 시도) → 재시도 후 403 `ACCOUNT_LOCKED`(2026-09-17T10:44Z 까지). 로컬 TEST-ACCOUNTS 의 L1 값이 프로덕션과 불일치(교체 추정) — 추측 금지 원칙에 따라 중단. 계정 소유자가 §1 표를 갱신하면 재실행 |
+| S5' | write smoke | 미실행 | 안전한 테스트 데이터 없음 (WO §39) |
+
 ---
 
 ## 5. Re-census (§40)
@@ -208,7 +217,7 @@ INDUSTRY_COMMUNITY           = RETIRED
 LEGACY_DATA_COMPLEXITY       = 0 (adapter 1 · migration 0 · bridge 0)
 LEGACY_ROUTE_COMPAT          = /kpa/forum · /pharmacy-hub/forum · /cosmetics/forum · /neture/forum = KEEP_AS_CONTEXT_ALIAS (RETIRE 0)
 
-PRODUCTION_SMOKE             = PARTIAL_API_DEPLOY_BLOCKED (web 배포 · 홈 fallback PASS · backend 는 선행 migration Job 실패로 미도달, unit 28 로 대체 검증 — §4-1)
+PRODUCTION_SMOKE             = PARTIAL_CREDENTIALS (2026-09-17 재실행: API 배포 해소 · /communities 200 · KPA=PH 포럼 목록 동일 실측 PASS · 로그인 시나리오는 smoke 계정 L1 불일치+lock 으로 BLOCKED — §4-1-a; unit 28 로 대체 검증)
 
 NEXT                         = GO_FINAL_ROLE_WORKSPACE_ARCHITECTURE_CENSUS
 ```
