@@ -7,10 +7,13 @@
  * WO-O4O-RESPONSIVE-PRIMITIVES-AND-SAFE-AREA-V1:
  *   `pb-14` 고정값 → MobileSafeArea로 교체.
  *   iOS home-indicator(`env(safe-area-inset-bottom)`)까지 반영.
+ * WO-O4O-KPA-KCOS-MOBILE-FOOTER-BOTTOM-NAV-OCCLUSION-FIX-V1:
+ *   Footer 뒤에 공통 MobileBottomNavSpacer 추가 — fixed nav 가 Footer 법정정보를 가리지 않게 한다.
  */
 
 import type { ReactNode } from 'react';
 import { MobileSafeArea } from '@o4o/ui';
+import { MobileBottomNavSpacer } from '@o4o/account-ui';
 import { KpaGlobalHeader } from './KpaGlobalHeader';
 import { MobileBottomNav } from './MobileBottomNav';
 import { Footer } from './Footer';
@@ -32,6 +35,8 @@ export function Layout({ serviceName: _serviceName, children }: LayoutProps) {
         {children}
       </MobileSafeArea>
       <Footer />
+      {/* fixed MobileBottomNav 높이만큼 문서 흐름 여백 — Footer 마지막 줄 가림 방지 */}
+      <MobileBottomNavSpacer />
       <MobileBottomNav />
     </div>
   );
