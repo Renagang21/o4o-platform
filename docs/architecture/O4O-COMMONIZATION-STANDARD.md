@@ -3,7 +3,7 @@
 > **상위 문서**: `CLAUDE.md`
 > **관련**: `docs/o4o-common-structure.md`, `docs/platform/hub/O4O-HUB-TEMPLATE-STANDARD-V1.md`, `docs/architecture/STORE-LAYER-ARCHITECTURE.md`, `docs/platform/operator/OPERATOR-DASHBOARD-STANDARD-V1.md`
 > **버전**: V3
-> **작성일**: 2026-05-02 · **개정**: 2026-08-04 (V3 — 서비스 프레임 정의 정렬 + GlycoPharm 대상 복귀)
+> **작성일**: 2026-05-02 · **개정**: 2026-08-04 (V3 — 서비스 프레임 정의 정렬 + GlycoPharm 대상 복귀) · 2026-09-17 (V3.2 — Neture 「공급자·파트너」 표현 정정, Legacy Partner 은퇴 반영)
 > **상태**: Active Standard
 >
 > 이 문서는 O4O 플랫폼에서 "**이게 공통화 맞느냐**"를 판단하는 기준 문서이다. 모든 공통화 관련 작업(WO/IR/구현/리뷰)은 이 문서를 기준으로 결정한다.
@@ -80,7 +80,7 @@ Service Extension
 ├─ PharmacyHub
 │  └─ 공급자 직결 B2B 거래
 └─ Neture
-   └─ 공급자·파트너 중심 업무
+   └─ 공급자 중심 업무 (Supplier Workspace) + O4O 대표 진입 홈
 ```
 
 공통화 실현 방식은 다음 5요소이며, **이 순서 밖의 방식(공통 core 내부의 서비스별 조건문)은 금지**한다(§7).
@@ -132,7 +132,7 @@ core
 | **KPA-Society** | `services/web-kpa-society` | **공통 서비스 프레임 + 약국·약사·의약품 extension** — 현재 기준 구현을 가장 많이 보유 | 전체 | `MATURE_REFERENCE` |
 | **K-Cosmetics** | `services/web-k-cosmetics` | **공통 서비스 프레임 + 화장품 매장·화장품 extension** — KPA 와 **동일 지위** | 전체 | `MATURE_SHARED_CORE_CONSUMER` |
 | **GlycoPharm** | `services/web-glycopharm` | **공통 서비스 프레임 + GlycoPharm 도메인 extension** | 기존 공통화 구조 유지 | `EXISTING_ADOPTION_MAINTAINED` |
-| **Neture** | `services/web-neture` | **공급자·파트너 중심 독립 서비스** + 넓은 공통 소비 | **부분 채택** — §3.1 | `INDEPENDENT_APP_WITH_SHARED_CORES` |
+| **Neture** | `services/web-neture` | **공급자 중심 독립 서비스**(O4O 공급자 서비스 + O4O 대표 진입 홈) + 넓은 공통 소비 | **부분 채택** — §3.1 | `INDEPENDENT_APP_WITH_SHARED_CORES` |
 | **PharmacyHub** | `services/web-pharmacy-hub` | **공통 매장 경영 프레임 + 공급자 직결 B2B 구매·주문·결제 extension** | **adoption 초기** — §3.3 | `NEW_SERVICE_EARLY_ADOPTION` |
 
 ### 3.0.1 KPA Society 와 K-Cosmetics 의 관계 (V3 정정)
@@ -165,7 +165,7 @@ KPA↔K-Cosmetics 비교의 목적은 **두 앱을 하나로 합치는 것이 �
 
 ### 3.1 Neture 예외 사유
 
-Neture는 공급자/파트너 협업 공간이 1차 도메인이며, 매장·교육 도메인을 직접 운영하지 않는다. 따라서 공통 Hub 중 일부만 채택한다.
+Neture는 공급자 업무 공간(Supplier Workspace)과 O4O 대표 진입 홈이 1차 도메인이며, 매장·교육 도메인을 직접 운영하지 않는다(과거 「공급자/파트너 협업 공간」 정의는 2026-09-15 Legacy Partner 은퇴로 폐기 — [`O4O-ROLE-WORKSPACE-ARCHITECTURE-V1`](../baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md) §7). 따라서 공통 Hub 중 일부만 채택한다.
 
 | Route | Neture 상태 | 사유 |
 |-------|-------------|------|
@@ -174,10 +174,10 @@ Neture는 공급자/파트너 협업 공간이 1차 도메인이며, 매장·교
 | `/resources` | ✅ 채택 | 자료실 공통 구조 |
 | `/lms` | ❌ 제외 | Neture 도메인에 LMS 없음 |
 | `/store-hub` | ❌ 제외 | Neture는 매장 운영 주체 아님 |
-| `/store` | ❌ 제외 | 단, `/store/*` 일부는 공급자/파트너 운영 화면으로 별도 패턴 운영 (§ 4.2 참조) |
+| `/store` | ❌ 제외 | 단, `/store/*` 일부는 공급자 운영 화면으로 별도 패턴 운영 (§ 4.2 참조) |
 | `/signage` | ⏸ 보류 | 향후 결정 |
 
-> **주의**: Neture 가 채택하지 않은 축(LMS · 매장 실행)은 **adoption gap 이 아니라 의도된 서비스 경계**다. 이 축들을 "미달"로 집계하거나 채택을 요구하지 않는다. Neture 는 **공급자·파트너 중심의 독립 서비스**이며, 이 경계는 V3 에서도 그대로 유지된다.
+> **주의**: Neture 가 채택하지 않은 축(LMS · 매장 실행)은 **adoption gap 이 아니라 의도된 서비스 경계**다. 이 축들을 "미달"로 집계하거나 채택을 요구하지 않는다. Neture 는 **공급자 중심의 독립 서비스**이며, 이 경계는 V3 에서도 그대로 유지된다.
 
 ### 3.2 매장 경영자 공통 역할 (V3 신설)
 
@@ -469,4 +469,5 @@ Override 정책 상세: [`O4O-HUB-TEMPLATE-STANDARD-V1.md` § 8](../platform/hub
 | 2026-08-03 | V2 | **공식 대상 서비스 재정렬** — §0 스코프 선언 신설(Cycle 1 CLOSED 계승 · frozen baseline 불변 · legacy↔adoption 분리) · §3.0 공식 4서비스(KPA/K-Cos/Neture/PharmacyHub) + 역할·성숙도 · §3.0.1 KPA reference 3분류 · §3.3 PharmacyHub 취급 원칙(3구분, 의무 적용 아님) · §3.4 GlycoPharm historical out-of-scope(삭제 아닌 표시) · §9.0 매트릭스 갱신 원칙(dependency≠adoption) · §9.1~9.3 매트릭스 열 재정렬 · §10 현재 트랙 3축(기존 §10 참조 문서 → §11). **공통화 정의·Hub 표준·Layout 정책·Template 원칙·체크리스트·금지사항은 변경 없음** |
 | 2026-08-04 | V3 | **서비스 프레임 정의 정렬 + GlycoPharm 대상 복귀** — §1.1 신설(O4O Common Service Frame ↔ Service Extension 구조, 공통화 5요소, 공통 core 서비스 조건문 금지) · §3.0 대상 서비스 표를 "프레임 + extension" 기준으로 재기술(GlycoPharm 행 복귀) · §3.0.1 **KPA Society ↔ K-Cosmetics 동일 프레임 지위** 명시(하위 서비스·단순 frame 검증체 표현 폐기) · §3.2 신설 **매장 경영자 공통 역할**(구매·판매·콘텐츠 실행 병행, "KPA=판매자 / PharmacyHub=구매자" 구분 폐기) · §3.3 **PharmacyHub 해석 정정**(공통 매장 경영 프레임 + B2B extension, `MISSING_BASE_FUNCTION` 표기 도입) · §3.4 **GlycoPharm historical out-of-scope 폐기 → 공통화 대상 복귀**(삭제 검토 보류) · §7 금지사항 1행 추가 · §9.0 표기 원칙 2행 추가 · §9.1~9.3 매트릭스 열 재정렬(GlycoPharm `(historical)` 해제, Hub 외 영역은 `미조사`). **공통화 정의·Hub 표준·Layout 정책·Template 원칙·체크리스트·Cycle 1 종료 판정·Neture 독립 경계는 변경 없음. 코드·패키지·DB 변경 0** |
 | 2026-08-08 | V3.1 | **§9.3 표 렌더링 정정** — V3 편집 시 `/mypage` 행이 GlycoPharm 미조사 note 아래로 밀려 표 밖으로 떨어져 있던 것을 표 안으로 복귀시키고 note 를 표 뒤로 이동. **판정·표기 내용 변경 없음. 코드·패키지·DB 변경 0** |
+| 2026-09-17 | V3.2 | **Neture 「공급자·파트너」 표현 정정** — §1.1 구조도 · §3.0 표 · §3.1 예외 사유 · §3.1 `/store` 행 · §3.1 주의 문단에서 Legacy Partner(2026-09-15 은퇴, ROLE-WORKSPACE-ARCHITECTURE §7)를 현행 도메인처럼 서술하던 문구를 「공급자 중심(Supplier Workspace) + O4O 대표 진입 홈」 으로 정정. **Neture 독립 경계 · 부분 채택 판정 · Hub 매트릭스 변경 없음. 코드·패키지·DB 변경 0**. 근거: WO-O4O-LEGACY-PARTNER-USER-FACING-CONTENT-AND-ACTIVE-DOC-CLEANUP-V1 (CLAUDE.md §16-4 예외 — 명시적 WO 에 의한 기준문서 내용 정정) |
 | 2026-08-03 | V2.1 | **축 C `operator-core` 상태 정정** — §10.1 신설(`legacy 제거 대상` 이 아니라 `superseded` 판정 · 빌드 경로 참조 16곳 · 은퇴 판단과 core 재정의 판단 분리) · §9.0 각주 실측 정정(3서비스 → 4서비스 + Dockerfile/tailwind 참조). 근거: `IR-O4O-OPERATOR-CORE-CANONICAL-ROLE-AND-MODULAR-COMPOSITION-AUDIT-V1` |

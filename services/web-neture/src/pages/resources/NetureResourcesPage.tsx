@@ -54,7 +54,7 @@ function useNetureResourcesConfig(): ResourcesHubConfig {
     tableId: 'neture-resources',
 
     heroTitle: '자료실',
-    heroDesc: '공급자·파트너를 위한 공유 자료 모음입니다.',
+    heroDesc: '공급자·매장을 위한 공유 자료 모음입니다.',
     searchPlaceholder: '자료를 검색하세요',
 
     pageLimit: 12,

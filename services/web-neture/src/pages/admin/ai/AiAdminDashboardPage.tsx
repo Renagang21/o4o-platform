@@ -369,7 +369,7 @@ export default function AiAdminDashboardPage() {
             className="bg-white rounded-lg p-4 shadow-sm border border-gray-100 hover:border-primary-300 transition-colors"
           >
             <div className="font-medium text-gray-900">사업자용 안내</div>
-            <div className="text-sm text-gray-500">파트너 설명용</div>
+            <div className="text-sm text-gray-500">공급자 · 영업 설명용</div>
           </Link>
         </div>
       </main>

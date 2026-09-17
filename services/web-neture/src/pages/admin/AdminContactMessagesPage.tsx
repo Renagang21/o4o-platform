@@ -37,7 +37,8 @@ interface Pagination {
 
 const typeLabels: Record<string, string> = {
   supplier: 'Supplier',
-  partner: 'Partner',
+  // 'partner' 문의 유형은 Legacy Partner 은퇴(2026-09-15)로 신규 접수 종료 — 과거 접수분 표시용 라벨만 유지
+  partner: 'Partner (접수 종료)',
   service: '서비스',
   other: '기타',
 };
@@ -198,7 +199,7 @@ export default function AdminContactMessagesPage() {
         >
           <option value="all">전체 유형</option>
           <option value="supplier">Supplier</option>
-          <option value="partner">Partner</option>
+          <option value="partner">Partner (접수 종료 · 과거 문의)</option>
           <option value="service">서비스</option>
           <option value="other">기타</option>
         </select>

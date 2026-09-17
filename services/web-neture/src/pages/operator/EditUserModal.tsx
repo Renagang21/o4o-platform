@@ -25,7 +25,7 @@ const makeRequest: EditUserModalConfig['makeRequest'] = async (method, path, dat
 // ─── Config ──────────────────────────────────────────────────
 
 // WO-O4O-NETURE-ADMIN-OPERATOR-DASHBOARD-AND-MEMBER-TYPE-FIX-V1:
-// Neture 회원 유형은 운영자 / 공급자 / 파트너 로 제한.
+// Neture 회원 유형은 운영자 / 공급자 로 제한 (파트너는 2026-09-15 Legacy Partner 은퇴).
 // "운영자" 는 admin role 영역 (adminRoleOptions), 회원 유형으로 직접 노출하지 않는다.
 // "소비자(customer)" 옵션 제거 — Neture 에서는 사용하지 않는 유형.
 // "셀러(seller)" 는 store_owner canonical 정렬 진행 중 — 본 작업 범위 외이므로

@@ -201,7 +201,7 @@ const MOCK_POST_DETAILS: Record<string, { post: ForumPost; comments: ForumCommen
       content: `이 포럼에서는 다음과 같은 이야기들을 특히 환영합니다.
 
 - 이 구조가 현실과 맞지 않아 보이는 이유
-- 공급자 또는 파트너 입장에서 느껴지는 거리감
+- 공급자 또는 매장 입장에서 느껴지는 거리감
 - 기존 플랫폼과 비교했을 때의 장단점
 - 설명이 부족하거나 오해를 부를 수 있는 표현
 

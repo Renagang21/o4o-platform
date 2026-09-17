@@ -46,8 +46,8 @@ const benefits = [
   },
   {
     icon: Megaphone,
-    title: '파트너 마케팅',
-    desc: '파트너 네트워크를 통해 제품 홍보와 판매를 확장합니다.',
+    title: '매장 홍보 지원',
+    desc: '매장 HUB 콘텐츠와 QR 안내로 매장 현장의 제품 홍보와 판매를 지원합니다.',
     color: { bg: 'bg-emerald-50', text: 'text-emerald-600' },
   },
   {
@@ -103,7 +103,7 @@ export default function SupplierLandingPage() {
           <p className="text-lg text-blue-100 mb-8 leading-relaxed max-w-2xl mx-auto">
             Neture는 오프라인 매장 네트워크와 연결되는 유통 플랫폼입니다.
             <br />
-            공급자는 제품과 콘텐츠를 등록하고 매장과 파트너를 통해 판매를 확장할 수 있습니다.
+            공급자는 제품과 콘텐츠를 등록하고 매장을 통해 판매를 확장할 수 있습니다.
           </p>
           {isAuthenticated ? (
             <ServiceApplyPanel service="supplier" />

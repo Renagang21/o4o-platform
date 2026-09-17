@@ -75,7 +75,7 @@ export interface EntryBranch {
   name: string;
 }
 
-/** 공급자 · 파트너 서비스 이용 상태 — 서버 `resolveNetureServiceStates` 와 같은 값 */
+/** 공급자 서비스 이용 상태 — 서버 `resolveNetureServiceStates` 와 같은 값 */
 export type NetureServiceUsageStatus = 'none' | 'pending' | 'active' | 'rejected' | 'suspended' | 'withdrawn';
 
 export interface NetureServiceState {
@@ -217,7 +217,7 @@ export const STATUS_LABELS: Record<string, string> = {
   withdrawn: '탈퇴',
 };
 
-/** 공급자 · 파트너 서비스는 "O4O 계정 가입" 이 아니라 "서비스 신청" 이다 — 문구를 구분한다. */
+/** 공급자 서비스는 "O4O 계정 가입" 이 아니라 "서비스 신청" 이다 — 문구를 구분한다. */
 export const SERVICE_STATUS_LABELS: Record<NetureServiceUsageStatus, string> = {
   none: '미신청',
   active: '이용 중',

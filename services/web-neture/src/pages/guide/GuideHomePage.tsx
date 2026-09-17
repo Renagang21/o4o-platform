@@ -17,7 +17,7 @@
  *   04. O4O 기반 사업 안내 (네트워크 운영 예시)
  *   05. 공급자 참여 안내
  *   06. 판매자 / 매장 이용 안내
- *   07. 파트너 안내
+ *   (07. 파트너 안내 — 2026-09-15 Legacy Partner 은퇴로 섹션 제거 · WO-O4O-LEGACY-PARTNER-USER-FACING-CONTENT-AND-ACTIVE-DOC-CLEANUP-V1)
  *
  * 구조/route/콘텐츠는 코드 SSOT 유지 — 본 작업은 기존 카드·route 의 재배치다.
  * route 없는 항목(강좌·설문·광고·블로그·POP)은 데드링크 0 원칙으로 미노출.
@@ -39,16 +39,16 @@ const homeProps: GuideFeaturesPageProps = {
     eyebrow: '이용 안내',
     title: 'O4O 플랫폼 이용 안내',
     description:
-      'O4O는 좋은 제품이 실제 매장에서 움직이도록 지원하는 플랫폼입니다. O4O 이해부터 서비스 운영 · 기능 사용 · 사업 운영 · 공급자/판매자/파트너 참여까지, 목적에 맞는 영역을 선택해 이동하세요.',
+      'O4O는 좋은 제품이 실제 매장에서 움직이도록 지원하는 플랫폼입니다. O4O 이해부터 서비스 운영 · 기능 사용 · 사업 운영 · 공급자/판매자 참여까지, 목적에 맞는 영역을 선택해 이동하세요.',
     flowBarTitle: '안내 영역',
-    flowLabels: ['O4O 이해', '서비스 운영자', '기능 설명', '사업 안내', '공급자', '판매자/매장', '파트너'],
+    flowLabels: ['O4O 이해', '서비스 운영자', '기능 설명', '사업 안내', '공급자', '판매자/매장'],
   },
   // WO-O4O-NETURE-GUIDE-O4O-BUSINESS-OPERATION-EXAMPLES-V1 (1차 초안):
   //   기능 설명보다 먼저 "O4O 기반으로 어떤 사업 운영 장면을 만들 수 있는가"를 보여주는 대표 예시 4개.
   //   기능 나열·복잡한 사업자 분류 금지. 각 카드는 기존 Business/판매자 Guide 로만 연결(데드링크 0),
   //   마지막 카드는 하단 안내 + 상담 CTA(/contact). 의료행위·KCos commerce 완료 표현 회피. /o4o(/apply) 미사용.
   // WO-O4O-NETURE-GUIDE-BUSINESS-EXAMPLES-BOTTOM-SECTION-FIX-V1:
-  //   "사업 적용 예시"는 첫 진입 설명이 아니라 전체 가이드(O4O 이해 → … → 파트너)를 본 뒤
+  //   "사업 적용 예시"는 첫 진입 설명이 아니라 전체 가이드(O4O 이해 → … → 판매자/매장)를 본 뒤
   //   "내 상황엔 어떻게 적용하나"를 확인하는 마무리 섹션 → indexPosition='bottom' 으로 맨 하단 이동.
   indexPosition: 'bottom',
   index: {
@@ -107,7 +107,7 @@ const homeProps: GuideFeaturesPageProps = {
       title: 'O4O 기능 설명',
       primaryRoute: '/guide/features',
       description:
-        '사업 모델이 아니라 O4O에서 제공하는 개별 기능의 사용 방법입니다. 각 기능이 O4O에서 어떻게 구현되는지 매뉴얼 수준으로 안내합니다. 아래는 핵심 기능이며, 공급자 시작 가이드 · 파트너 프로그램 가이드는 각각 「공급자 참여 안내」 · 「파트너 안내」에 있습니다. 전체 기능 목록은 「기능 전체 보기」(/guide/features)에서 확인할 수 있습니다.',
+        '사업 모델이 아니라 O4O에서 제공하는 개별 기능의 사용 방법입니다. 각 기능이 O4O에서 어떻게 구현되는지 매뉴얼 수준으로 안내합니다. 아래는 핵심 기능이며, 공급자 시작 가이드는 「공급자 참여 안내」에 있습니다. 전체 기능 목록은 「기능 전체 보기」(/guide/features)에서 확인할 수 있습니다.',
       items: [
         { label: '상품 등록 & 유통', route: '/guide/features/product-registration' },
         { label: '콘텐츠(B2B) 운영', route: '/guide/features/b2b-content' },

@@ -1,5 +1,5 @@
 /**
- * AdminServiceApprovalPage - 파트너/서비스 승인 관리
+ * AdminServiceApprovalPage - 서비스 승인 관리 (서비스별 상품 노출 승인 · 「파트너」 명칭은 Legacy Partner 은퇴로 제거)
  *
  * WO-O4O-ADMIN-UI-COMPLETION-V1
  * Uses: /admin/service-approvals API
@@ -154,7 +154,7 @@ export default function AdminServiceApprovalPage() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-slate-800">파트너/서비스 승인 관리</h1>
+        <h1 className="text-2xl font-bold text-slate-800">서비스 승인 관리</h1>
         <p className="text-slate-500 mt-1">서비스 이용 신청을 검토하고 승인/거절/철회합니다</p>
       </div>
 

@@ -8,7 +8,7 @@
  * 섹션 구조:
  * ├─ Hero             — Neture O4O 플랫폼 정체성 + 3 CTA
  * ├─ 공지사항 / 포럼 최신글 — 2-column (좌: CMS 공지, 우: 포럼 최신글)
- * ├─ valueGuideSlot   — 내 역할로 시작하기 (공급자 / 파트너 협력 / Market Trial)
+ * ├─ valueGuideSlot   — 내 역할로 시작하기 (공급자 / Market Trial)
  * ├─ AppEntrySection  — 서비스 바로가기 (Market Trial / 포럼 / 콘텐츠 / 자료실)
  * ├─ CtaGuidanceSection — Market Trial CTA
  * └─ O4OHelpSection   — 이용 안내 / 매뉴얼
@@ -142,8 +142,8 @@ export default function CommunityPage() {
 
       valueGuideSlot={
         /* WO-O4O-NETURE-HOME-KPA-UI-STRUCTURE-ALIGNMENT-V1:
-         * "내 역할로 시작하기" — 공급자·파트너·Market Trial 3 역할 카드.
-         * 파트너 영역은 완성 기능이 아닌 협력 방향 안내 수준으로 표현. */
+         * "내 역할로 시작하기" — 공급자·Market Trial 역할 카드.
+         * (파트너 카드는 2026-09-15 Legacy Partner 은퇴로 없음) */
         <AppEntrySection
           title="내 역할로 시작하기"
           accentColor="var(--color-primary)"
@@ -217,7 +217,7 @@ export default function CommunityPage() {
           },
           {
             title: '서비스 활용 방법',
-            description: '공급자, 유통참여형 펀딩, 파트너 협력 방식을 안내합니다',
+            description: '공급자, 유통참여형 펀딩, 매장 참여 방식을 안내합니다',
             href: '/guide/usage',
           },
           {

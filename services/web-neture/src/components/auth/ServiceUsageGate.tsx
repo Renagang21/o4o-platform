@@ -1,5 +1,5 @@
 /**
- * ServiceUsageGate — 공급자 · 파트너 업무 공간 진입 게이트
+ * ServiceUsageGate — 공급자 업무 공간 진입 게이트 (파트너 축은 Legacy Partner 은퇴)
  *
  * WO-O4O-NETURE-MAIN-ACCOUNT-AND-SUPPLIER-PARTNER-SERVICE-SEPARATION-V1
  *

@@ -7,8 +7,9 @@
  * 5-Block operator 데이터 변환 제거 — 백엔드에서 4-Block 직접 반환.
  *
  * Block 구조:
- *  [A] Structure Snapshot — 구조 지표 (사용자, 공급사, 승인, 파트너)
- *  [B] Policy Overview   — 승인 현황 (상품, 공급사, 가입, 파트너)
+ *  [A] Structure Snapshot — 구조 지표 (사용자, 공급사, 승인)
+ *  [B] Policy Overview   — 승인 현황 (상품, 공급사, 가입)
+ *  (파트너 지표는 2026-09-15 Legacy Partner 은퇴로 제거)
  *  [C] Governance Alerts  — AI 기반 거버넌스 경고
  *  [D] Structure Actions  — 구조 변경 진입점
  */

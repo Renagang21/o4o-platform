@@ -1277,7 +1277,7 @@ export default function SupplierProfilePage() {
         <p className="text-xs font-medium text-blue-800">공개 범위 안내</p>
         <ul className="text-xs text-blue-700 space-y-1">
           <li><strong>전체 공개</strong> — 로그인한 모든 판매자에게 표시됩니다.</li>
-          <li><strong>파트너만</strong> — 취급 승인을 받은 판매자에게만 표시됩니다.</li>
+          <li><strong>승인 거래처만</strong> — 공급 승인된 매장(거래처)에게만 표시됩니다.</li>
           <li><strong>비공개</strong> — 본인만 확인할 수 있으며, 프로필에서 숨겨집니다.</li>
         </ul>
       </div>

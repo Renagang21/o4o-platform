@@ -86,7 +86,7 @@ export default function SupplierSupplyOffersPage() {
             <h2 className="font-semibold text-slate-800">판매자 모집</h2>
           </div>
           <p className="text-sm text-slate-600 mb-3">
-            등록된 제품에 대해 판매자(파트너)를 모집하고, 모집 상태·신청 현황·서비스 노출 승인을 관리합니다.
+            등록된 제품에 대해 판매자(매장)를 모집하고, 모집 상태·신청 현황·서비스 노출 승인을 관리합니다.
           </p>
           <Link
             to="/supplier/recruitments"

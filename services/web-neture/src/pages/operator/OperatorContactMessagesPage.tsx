@@ -28,7 +28,8 @@ import {
 
 const typeLabels: Record<string, string> = {
   supplier: '공급자',
-  partner: '파트너',
+  // 'partner' 문의 유형은 Legacy Partner 은퇴(2026-09-15)로 신규 접수 종료 — 과거 접수분 표시용 라벨만 유지
+  partner: '파트너 (접수 종료)',
   service: '서비스',
   other: '기타',
 };
@@ -111,7 +112,7 @@ export default function OperatorContactMessagesPage() {
   const contactTypeOptions: Array<{ value: ContactTypeFilter; label: string }> = [
     { value: '', label: '전체 문의 (기본)' },
     { value: 'supplier', label: '공급자' },
-    { value: 'partner', label: '파트너' },
+    { value: 'partner', label: '파트너 (접수 종료 · 과거 문의)' },
     { value: 'service', label: '서비스' },
     { value: 'other', label: '기타' },
   ];
@@ -198,7 +199,7 @@ export default function OperatorContactMessagesPage() {
       <div>
         <h1 className="text-2xl font-bold text-slate-900">문의 메시지 (운영자)</h1>
         <p className="text-slate-500 mt-1">
-          Contact us 로 접수된 모든 문의(공급자 · 파트너 · 서비스 · 기타)를 확인합니다. 개별 상세 처리·메모는 관리자 화면에서 진행하세요.
+          Contact us 로 접수된 모든 문의(공급자 · 서비스 · 기타 — 과거 접수된 파트너 문의 포함)를 확인합니다. 개별 상세 처리·메모는 관리자 화면에서 진행하세요.
         </p>
       </div>
 
@@ -229,13 +230,13 @@ export default function OperatorContactMessagesPage() {
             onClick={handleBulkMarkRead}
             disabled={markingRead}
             className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-60 text-white rounded-lg text-sm font-medium"
-            title="공급자 / 파트너 문의 중 status='new' 항목을 한 번에 처리중으로 전환합니다."
+            title="공급자 문의(과거 파트너 문의 포함) 중 status='new' 항목을 한 번에 처리중으로 전환합니다."
           >
-            {markingRead ? '처리 중...' : '공급자/파트너 신규 문의 일괄 확인'}
+            {markingRead ? '처리 중...' : '공급자 신규 문의 일괄 확인'}
           </button>
         </div>
         <p className="text-xs text-slate-400 mt-3">
-          ※ 일괄 확인은 공급자/파트너 contactType 의 신규(`new`) 문의만 대상입니다. 서비스/기타 문의는 관리자 화면에서 처리합니다.
+          ※ 일괄 확인은 공급자 contactType(과거 접수된 파트너 문의 포함)의 신규(`new`) 문의만 대상입니다. 서비스/기타 문의는 관리자 화면에서 처리합니다.
         </p>
       </div>
 

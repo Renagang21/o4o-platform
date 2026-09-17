@@ -1,7 +1,7 @@
 # O4O Global Header / Layout / Navigation Standard v1.0
 
 > **작성일**: 2026-04-17
-> **최종 갱신**: 2026-08-21 — WO-O4O-GLOBAL-HEADER-STANDARD-CURRENT-STATE-ALIGNMENT-V1 (현재 구현 상태 정합)
+> **최종 갱신**: 2026-09-17 — WO-O4O-LEGACY-PARTNER-USER-FACING-CONTENT-AND-ACTIVE-DOC-CLEANUP-V1 (§8.3 neture 서브타이틀 · Phase 4 Partner 표기 정정 — Legacy Partner 은퇴 반영) · 2026-08-21 — WO-O4O-GLOBAL-HEADER-STANDARD-CURRENT-STATE-ALIGNMENT-V1 (현재 구현 상태 정합)
 > **근거**: IR-O4O-GLOBAL-LAYOUT-HEADER-AUDIT-V1 ([docs/archive/audits/IR-O4O-GLOBAL-LAYOUT-HEADER-AUDIT-V1.md](../../archive/audits/IR-O4O-GLOBAL-LAYOUT-HEADER-AUDIT-V1.md))
 > **상태**: Active Standard
 > **범위**: kpa-society, glycopharm, neture, k-cosmetics, **pharmacy-hub** 및 향후 신규 서비스 전체
@@ -437,13 +437,13 @@ serviceNavigation
 
 ### 8.3 서비스별 브랜드 토큰 (참고)
 
-각 서비스 bridge 의 `brand` prop 이 실제 주입값이다 (2026-08-21 기준).
+각 서비스 bridge 의 `brand` prop 이 실제 주입값이다 (2026-09-17 기준 — neture 는 `NETURE_HEADER_BRAND`, WO-O4O-NETURE-O4O-BRAND-HEADER-SEO-ALIGNMENT-V1).
 
 | 서비스 | Primary Color | 로고 아이콘 | 서비스명 | 서브타이틀 |
 |--------|:------------:|:----------:|:--------:|:---------:|
 | kpa-society | `#2563eb` | 💊 | KPA-Society | 약사 전문 플랫폼 |
 | glycopharm | `#059669` | 💉 | GlycoPharm | 혈당관리 전문 플랫폼 |
-| neture | `#059669` | 🌿 | Neture | 공급자 협업 플랫폼 (O4O 대표 진입) |
+| neture | `#059669` | 🌿 | Neture | O4O 통합 업무 공간 (O4O 대표 진입 · Legacy Partner 은퇴 후 「공급자·파트너 협업 플랫폼」 폐기) |
 | k-cosmetics | `#db2777` | Sparkles (lucide) | K-Cosmetics | K-Beauty 전문 플랫폼 |
 | pharmacy-hub | `PH_PRIMARY` (config) | Pill (lucide) | Pharmacy-Hub | 파머시 허브 |
 
@@ -536,7 +536,7 @@ serviceNavigation
 ### Phase 4: Neture 적용
 
 - NetureLayout + MainLayout 이중 브랜드 문제 해결
-- Supplier/Partner Space의 GlobalHeader 연결
+- Supplier Space의 GlobalHeader 연결 (Partner Space 는 2026-09-15 Legacy Partner 은퇴로 소멸)
 
 ### Phase 5: K-Cosmetics 적용
 

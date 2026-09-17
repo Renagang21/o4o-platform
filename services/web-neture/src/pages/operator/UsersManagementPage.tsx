@@ -45,7 +45,7 @@ function netureTokens(u: UserData): Set<string> {
   ]);
 }
 
-// "회원 유형" 컬럼 + roleTabs 필터용. 참여 유형(공급자/파트너/셀러)만 도출, 없으면 general(일반 회원).
+// "회원 유형" 컬럼 + roleTabs 필터용. 참여 유형(공급자/셀러)만 도출 — 파트너는 Legacy Partner 은퇴, 없으면 general(일반 회원).
 // operator/admin 등 운영 권한은 여기서 제외 — 별도 "운영 권한" 컬럼이 담당한다.
 const NETURE_PARTICIPANT_ROLES: ReadonlyArray<string> = ['supplier', 'seller'];
 function getPrimaryRole(u: UserData): string {
