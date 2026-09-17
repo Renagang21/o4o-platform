@@ -72,6 +72,12 @@ O4O Automation Core
 
 > **권장 지향점**(조사가 허용하면): `병동 PC → Local Agent 설치/초기 연결 1회` 이후 `누구든 /hospital-drug 사용 → 현재 PC 의 Local Agent/SQLite 사용`. 즉 사람 인증 대신 **PC-local context**.
 
+**Local File Binding 확인**(같은 PHASE 0 에서 함께 조사 — 실제 구현에서 가장 먼저 부딪힐 지점):
+
+`/hospital-drug` 에서 사용자가 `[원내 약품 파일 연결]` 을 눌렀을 때, 단순 browser upload 로 끝내지 않고 **Local Agent 가 해당 Windows 파일을 지속적으로 식별·재접근할 수 있는 canonical 연결 방식**을 조사한다. 목표: `파일 선택 → Local Agent 가 local source 로 등록 → 이후 동일 경로 파일의 수정시각/크기 확인 → 변경 시 재import`.
+
+일반 웹페이지의 `<input type=file>` 은 보안상 **실제 Windows 경로를 제공하지 않을 수 있다** — 그러면 "한 번 업로드" 는 되어도 "이후 같은 파일 덮어쓰기 → 변경 감지" 가 불가능하다. 따라서 브라우저가 실제 local path 를 주지 않는 경우, **Local Agent 측 native file picker 또는 기존 local bridge** 로 파일을 선택·바인딩하는 방식을 우선 검토한다. **파일 내용을 Cloud 를 경유시켜 해결하지 않는다.** 이 바인딩이 성립하지 않으면 §7 변경 감지 전체가 불가하므로 PHASE 0 STOP 판단 대상이다.
+
 ## 5. 화면 (`/hospital-drug`)
 
 일반 Neture 홈을 그대로 보여주지 않는다. 매우 단순한 업무 화면으로 만든다.
@@ -90,7 +96,17 @@ O4O Automation Core
 
 ## 6. Excel Local Data Source
 
-최초 사용 시 `[원내 약품 파일 연결] → Windows 파일 탐색기 → Excel 선택`. **파일명 자체를 데이터 식별 기준으로 쓰지 않는다** — 논리적 소스 `hospital_drug_list` 로 등록. 지원: XLSX · XLS · (필요 시) CSV.
+최초 사용 시(§4 Local File Binding 결과에 따른 canonical 흐름 — 일반 HTML `<input type=file>` 업로드로 만들지 않는다):
+
+```text
+[원내 약품 파일 연결]
+→ Local Agent 가 로컬 파일 선택
+→ local source 등록
+→ 파일 식별정보/경로는 Local 에만 보관(Cloud 저장 X)
+→ Excel 내용을 Local SQLite 로 import
+```
+
+**파일명 자체를 데이터 식별 기준으로 쓰지 않는다** — 논리적 소스 `hospital_drug_list` 로 등록. 지원: XLSX · XLS · (필요 시) CSV.
 
 **컬럼**: 병원마다 Excel 구조가 다르므로 파일명/고정 column index 에 의존하지 않는다. 실제 파일의 가능한 컬럼을 확인해 매핑한다(예: 원내 코드 · 상품명 · 성분 · 함량 · 제형 · 제조사 · 과거 사용/주문 여부). **실제 Excel 에 없는 정보는 만들어내지 않는다.** 필요하면 최초 1회 column mapping UX 사용.
 
@@ -103,6 +119,8 @@ Excel = 원본, Local SQLite = 실행용 검색 데이터. 최소 메타 저장:
 ## 8. 첫 자동화 Workflow — 약학정보원
 
 사용자 실제 경로는 확인됨: `상품명 검색 → 결과에서 제품 선택 → 의약품 정보 → 동일성분 의약품`. 처음부터 사이트 전체를 AI 가 탐색하게 하지 않는다 — **DOM/accessibility 기반 deterministic path 우선**, 사이트 변경/불일치 시에만 Work Agent/AI self-healing 사용(상위 WO 의 replay 기준 계승).
+
+> **주의(구현자 오해 방지)**: 이 deterministic path 는 상위 원칙의 **"사이트별 업무 사전 정의 금지" 와 충돌하지 않는다.** 운영자가 임의로 사이트 Workflow 를 미리 만든 것이 아니라, **실제 사용자가 이미 수행하는 업무 경로가 확인된 사례를 첫 검증 Workflow 로 구현**하는 것이기 때문이다(사용자 행동에서 학습한 Candidate 를 재검증형으로 재생 — 상위 WO PHASE 2 기준과 동일).
 
 ## 9. 첫 업무 범위 (V1)
 
