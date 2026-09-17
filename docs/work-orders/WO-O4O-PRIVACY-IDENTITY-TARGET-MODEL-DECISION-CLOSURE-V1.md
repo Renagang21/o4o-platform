@@ -131,4 +131,4 @@ D1 ~ D7
 
 ---
 
-*작성: 2026-09-17 · 상태: **DRAFT — 핸드오프 대기** · 실행 지시 전 착수하지 않음*
+*작성: 2026-09-17 · 상태: **IR 산출 완료 — 판정 `APPROVE_WITH_REVIEW` · 사용자 검토 대기** (2026-09-17) · 산출물: [`IR-O4O-PRIVACY-IDENTITY-TARGET-MODEL-DECISION-CLOSURE-V1`](../investigations/IR-O4O-PRIVACY-IDENTITY-TARGET-MODEL-DECISION-CLOSURE-V1.md) · D5=`DEAD_RETIRE` · D3=별도 row · 다음 제안=`WO-O4O-PRIVACY-IDENTITY-TARGET-MODEL-CANONICALIZATION-V1`(승격은 검토 후)*
