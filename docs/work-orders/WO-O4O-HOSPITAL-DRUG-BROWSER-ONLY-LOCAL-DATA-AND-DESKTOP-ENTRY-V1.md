@@ -154,3 +154,17 @@ PRODUCTION_SMOKE =
 - **다음 단계:** ① 사용자가 Secret 등록 → ② 라이브 1회 probe 로 실제 응답 필드명(camelCase/UPPER, serviceKey 인코딩) 확정 →
   ③ O4O 서버에 공공 API client + 정규화 계층 구현 → ④ /hospital-drug 에서 공공 API(성분/동일성분) + 병동 로컬 Excel 결합.
   필드명을 추측으로 고정하지 않기 위해 **probe 를 구현보다 먼저** 둔다.
+
+### 라이브 probe 실측 결과 (2026-09-17)
+
+probe 도구: `scripts/dev/probe-public-drug-api.mjs`(dev 전용·인증키는 env `PUBLIC_DRUG_API_SERVICE_KEY` 에서만·XML 1급 파싱).
+
+- **API #1 = 식약처 의약품 제품 허가정보 — 라이브 검증 성공.**
+  - endpoint: `DrugPrdtPrmsnInfoService07/getDrugPrdtPrmsnInq07` (버전 07 이 현행)
+  - 요청 파라미터: **소문자 `item_name`**(제품명 검색) · 응답 형식: **XML**(`resultCode=00` 정상)
+  - 응답 item 필드: `ITEM_SEQ` · `ITEM_NAME` · `ENTP_NAME`(업체) · `PRDLST_STDR_CODE`(품목기준코드) · `SPCLTY_PBLC`(전문/일반) ·
+    `PRDUCT_TYPE`(제형/분류) · `ITEM_INGR_NAME`(주성분명) · `ITEM_INGR_CNT`(성분 수) · `EDI_CODE`(심평원 제품/EDI 코드) · `CANCEL_NAME`(취소·취하)
+  - 실측 샘플: `타이레놀정500밀리그람` → totalCount=1 · `PRDLST_STDR_CODE=202106092` · `ITEM_INGR_NAME=Acetaminophen`
+  - 확정: 체인 1~2단계(`상품명 → 품목기준코드 + 주성분명 + 제형 + 심평원코드(EDI)`)가 이 API 단독으로 실측됨.
+- **API #2 = 묶음의약품정보서비스 — 라이브 probe 대기**(요청주소 확인 후 진행). 확인 목표 필드:
+  `PRDLST_STDR_CODE → 대표 주성분 · 함량 · 심평원 주성분코드 · 묶음 구성원(동일성분 제품군)`.
