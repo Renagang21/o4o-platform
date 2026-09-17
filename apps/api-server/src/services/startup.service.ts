@@ -4,6 +4,7 @@ import { AppDataSource } from '../database/connection.js';
 import { backupService } from './BackupService.js';
 import { errorAlertService } from './ErrorAlertService.js';
 import { marketTrialLifecycleJob } from '../jobs/market-trial-lifecycle.job.js';
+import { privacyRetentionJob } from '../jobs/privacy-retention.job.js';
 import { spdRevisionExpiryJob } from '../jobs/spd-revision-expiry.job.js';
 import { videoTempOutputExpiryJob } from '../jobs/video-temp-output-expiry.job.js';
 import { env } from '../utils/env-validator.js';
@@ -211,6 +212,11 @@ export class StartupService {
       // VIDEO Job 완성본 임시 output TTL 만료 → storage object 삭제 + EXPIRED 기록 (부팅+매시간).
       videoTempOutputExpiryJob.start();
       logger.info('✅ Video Temp Output Expiry Job started');
+
+      // WO-O4O-PRIVACY-DATA-RETENTION-ENFORCEMENT-V1
+      // 개인정보 보유기간 집행(6 테이블 · 부팅+24h). PRIVACY_RETENTION_MODE=apply 일 때만 실삭제, 기본 dry-run.
+      privacyRetentionJob.start();
+      logger.info('✅ Privacy Retention Job started');
     } catch (schedulerError) {
       logger.warn('Scheduler initialization failed (non-critical):', schedulerError);
     }
@@ -294,6 +300,7 @@ export class StartupService {
       marketTrialLifecycleJob.stop();
       spdRevisionExpiryJob.stop();
       videoTempOutputExpiryJob.stop();
+      privacyRetentionJob.stop();
       logger.info('✅ Schedulers stopped');
     } catch (error) {
       logger.error('Error during shutdown:', error);

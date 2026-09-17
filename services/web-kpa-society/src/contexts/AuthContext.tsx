@@ -4,9 +4,8 @@
  * Uses @o4o/auth-client with localStorage strategy for cross-domain auth.
  * Server auto-detects cross-origin and includes tokens in response.
  *
- * Phase 2-b: Service User 인증 추가 (WO-AUTH-SERVICE-IDENTITY-PHASE2B-KPA-PHARMACY)
- * - Platform User와 Service User 완전 분리
- * - Service User는 약국 서비스 전용 인증
+ * WO-O4O-AUTH-SERVICE-TOKEN-BOUNDARY-HARDENING-V1: Phase 2-b Service User 로그인 블록
+ * (/api/v1/auth/service/login · kpa_pharmacy_service_* 토큰) RETIRED — 소비처 0 · 서버 경로 은퇴.
  */
 
 import React, { createContext, useContext, useState, useMemo, useCallback, useRef } from 'react';
@@ -14,54 +13,12 @@ import { AuthClient, getAccessToken } from '@o4o/auth-client';
 import { normalizeMemberships, type ApiUser } from '@o4o/auth-utils';
 // WO-O4O-FRONTEND-AUTH-CONTEXT-AND-ROUTE-GUARD-COMMONIZATION-V1:
 //   세션 복구 · 토큰 정리 이벤트 · login/logout/logoutAll 은 공통 Core 로 이동.
-//   KPA 고유분(KPA context 비동기 로딩 · activityType · Service User)만 이 파일에 남는다.
+//   KPA 고유분(KPA context 비동기 로딩 · activityType)만 이 파일에 남는다.
 import { useServiceAuth, type AuthLoginResult } from '@o4o/auth-react';
 import { configureStoreProductsApi } from '@o4o/store-products-ui';
 
 // Re-export for client.ts to use
 export { getAccessToken };
-
-// ============================================================================
-// Phase 2-b: Service User 인증 (WO-AUTH-SERVICE-IDENTITY-PHASE2B-KPA-PHARMACY)
-// ============================================================================
-
-// Service User token storage keys
-const SERVICE_ACCESS_TOKEN_KEY = 'kpa_pharmacy_service_access_token';
-const SERVICE_REFRESH_TOKEN_KEY = 'kpa_pharmacy_service_refresh_token';
-
-// Service User types
-export interface ServiceUser {
-  providerUserId: string;
-  provider: 'google' | 'kakao' | 'naver';
-  email: string;
-  displayName?: string;
-  profileImage?: string;
-  serviceId: string;
-  storeId?: string;
-}
-
-export interface ServiceLoginCredentials {
-  provider: 'google' | 'kakao' | 'naver';
-  oauthToken: string; // OAuth profile JSON for Phase 1 testing
-  serviceId: string;
-  storeId?: string;
-}
-
-// Service User token management
-function storeServiceTokens(accessToken: string, refreshToken: string) {
-  localStorage.setItem(SERVICE_ACCESS_TOKEN_KEY, accessToken);
-  localStorage.setItem(SERVICE_REFRESH_TOKEN_KEY, refreshToken);
-}
-
-function clearServiceTokens() {
-  localStorage.removeItem(SERVICE_ACCESS_TOKEN_KEY);
-  localStorage.removeItem(SERVICE_REFRESH_TOKEN_KEY);
-}
-
-// Export for use in Service API clients
-export function getServiceAccessToken(): string | null {
-  return localStorage.getItem(SERVICE_ACCESS_TOKEN_KEY);
-}
 
 // ============================================================================
 // Auth Client Instance
@@ -174,11 +131,6 @@ interface AuthContextType {
   checkAuth: () => Promise<void>;
   /** WO-KPA-A-PHARMACIST-ACTIVITY-TYPE-BUSINESS-INFO-FLOW-V1: activityType + optional businessInfo */
   setActivityType: (activityType: string, businessInfo?: Record<string, any>) => Promise<void>;
-  // Phase 2-b: Service User (WO-AUTH-SERVICE-IDENTITY-PHASE2B-KPA-PHARMACY)
-  serviceUser: ServiceUser | null;
-  isServiceUserAuthenticated: boolean;
-  serviceUserLogin: (credentials: ServiceLoginCredentials) => Promise<void>;
-  serviceUserLogout: () => void;
 }
 
 // WO-O4O-AUTH-CHAIN-UNIFICATION-V1: ApiUser is imported from @o4o/auth-utils
@@ -239,9 +191,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // WO-KPA-LOGIN-LATENCY-CLEANUP-V1: KPA context 비동기 로딩 상태
   // true = 로딩 불필요 또는 로딩 완료 / false = 아직 로딩 중
   const [isKpaContextLoaded, setIsKpaContextLoaded] = useState(true);
-
-  // Phase 2-b: Service User state (WO-AUTH-SERVICE-IDENTITY-PHASE2B-KPA-PHARMACY)
-  const [serviceUser, setServiceUser] = useState<ServiceUser | null>(null);
 
   /**
    * WO-O4O-FRONTEND-AUTH-CONTEXT-AND-ROUTE-GUARD-COMMONIZATION-V1:
@@ -357,58 +306,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  // ============================================================================
-  // Phase 2-b: Service User Login (WO-AUTH-SERVICE-IDENTITY-PHASE2B-KPA-PHARMACY)
-  // ============================================================================
-
-  /**
-   * Service User 로그인
-   *
-   * Phase 1 API 기반: /api/v1/auth/service/login
-   * Service User는 Platform User와 완전히 분리됨
-   * serviceId: 'kpa-pharmacy' 고정
-   */
-  const serviceUserLogin = async (credentials: ServiceLoginCredentials) => {
-    const response = await fetch(`${API_BASE_URL}/api/v1/auth/service/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ credentials }),
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.message || data.error || 'Service User 로그인에 실패했습니다.');
-    }
-
-    // Service JWT 저장 (tokenType: 'service')
-    const tokens = data.tokens;
-    if (tokens?.accessToken && tokens?.refreshToken) {
-      storeServiceTokens(tokens.accessToken, tokens.refreshToken);
-    }
-
-    // Service User 상태 설정
-    const serviceUserData: ServiceUser = {
-      providerUserId: data.user.providerUserId,
-      provider: data.user.provider,
-      email: data.user.email,
-      displayName: data.user.displayName,
-      profileImage: data.user.profileImage,
-      serviceId: data.user.serviceId,
-      storeId: data.user.storeId,
-    };
-
-    setServiceUser(serviceUserData);
-  };
-
-  /**
-   * Service User 로그아웃
-   */
-  const serviceUserLogout = () => {
-    clearServiceTokens();
-    setServiceUser(null);
-  };
-
   return (
     <AuthContext.Provider
       value={{
@@ -422,11 +319,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         logoutAll,
         checkAuth,
         setActivityType,
-        // Phase 2-b: Service User (WO-AUTH-SERVICE-IDENTITY-PHASE2B-KPA-PHARMACY)
-        serviceUser,
-        isServiceUserAuthenticated: !!serviceUser,
-        serviceUserLogin,
-        serviceUserLogout,
       }}
     >
       {children}

@@ -125,4 +125,4 @@ Kakao 구분: Kakao Login/OAuth 구성 = `DELETE_CANDIDATE` / `users.kakao_*` = 
 
 ---
 
-*작성: 2026-09-17 · 상태: DRAFT (핸드오프 · 실행 지시 대기)*
+*작성: 2026-09-17 · 상태: **CLOSED (RETIRE)** 2026-09-17 — legitimate caller 0 · 운영 service_login 로그 0 건 · 발급 경로 3파일 제거 + `guest/upgrade` 제거 + `requireAuth`/`optionalAuth` tokenType 경계 · Negative test 14/14 · CHECK: [`CHECK-O4O-AUTH-SERVICE-TOKEN-BOUNDARY-HARDENING-V1`](../checks/CHECK-O4O-AUTH-SERVICE-TOKEN-BOUNDARY-HARDENING-V1.md)*

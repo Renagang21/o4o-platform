@@ -1,9 +1,9 @@
 import { Router, type IRouter, type Request, type Response } from 'express';
 import { validateDto } from '../../../common/middleware/validation.middleware.js';
-import { GuestTokenIssueRequestDto, GuestUpgradeRequestDto } from '../dto/index.js';
+import { GuestTokenIssueRequestDto } from '../dto/index.js';
 import { asyncHandler } from '../../../middleware/error-handler.js';
 import { getAuthenticationService } from '../../../services/authentication.service.js';
-import type { GuestTokenIssueRequest, GuestUpgradeRequest, ServiceLoginCredentials } from '../../../types/account-linking.js';
+import type { GuestTokenIssueRequest } from '../../../types/account-linking.js';
 import { requireGuestUser, type GuestAuthRequest } from '../../../common/middleware/auth.middleware.js';
 import logger from '../../../utils/logger.js';
 
@@ -77,60 +77,8 @@ router.post(
   })
 );
 
-/**
- * POST /api/v1/auth/guest/upgrade
- *
- * Upgrade Guest token to Service User token via OAuth
- *
- * This is NOT a "login" - it's a session upgrade that preserves
- * guest activity (cart, browsing history, etc.)
- *
- * Request body:
- * {
- *   "guestToken": "current_guest_jwt",
- *   "credentials": {
- *     "provider": "google" | "kakao" | "naver",
- *     "oauthToken": "...",
- *     "serviceId": "kpa-pharmacy",
- *     "storeId": "store_123" (optional)
- *   }
- * }
- *
- * Response:
- * {
- *   "success": true,
- *   "user": { providerUserId, provider, email, displayName, serviceId },
- *   "tokens": { accessToken, refreshToken, expiresIn },
- *   "tokenType": "service",
- *   "previousGuestSessionId": "guest_xxx",
- *   "activityPreserved": true
- * }
- */
-router.post(
-  '/upgrade',
-  validateDto(GuestUpgradeRequestDto),
-  asyncHandler(async (req: Request, res: Response) => {
-    const authService = getAuthenticationService();
-
-    const upgradeRequest: GuestUpgradeRequest = {
-      guestToken: req.body.guestToken,
-      credentials: req.body.credentials as ServiceLoginCredentials,
-      ipAddress: req.ip || req.socket.remoteAddress || 'unknown',
-      userAgent: req.get('User-Agent') || 'unknown'
-    };
-
-    const result = await authService.upgradeGuestToServiceUser(upgradeRequest);
-
-    logger.info('Guest upgraded to Service User', {
-      previousGuestSessionId: result.previousGuestSessionId,
-      provider: result.user.provider,
-      serviceId: result.user.serviceId,
-      activityPreserved: result.activityPreserved
-    });
-
-    res.json(result);
-  })
-);
+// WO-O4O-AUTH-SERVICE-TOKEN-BOUNDARY-HARDENING-V1: POST /upgrade (guest → service token) RETIRED —
+//   service login 과 동일한 무검증 {id,email} 경로를 재사용하던 두 번째 진입점.
 
 /**
  * GET /api/v1/auth/guest/status
