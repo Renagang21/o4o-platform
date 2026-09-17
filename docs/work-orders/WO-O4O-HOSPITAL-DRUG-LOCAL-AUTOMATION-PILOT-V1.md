@@ -204,3 +204,8 @@ PRODUCTION_SMOKE       = PENDING_USER_VERIFICATION (실 병동 PC 종단 §14 3~
 > **실행 결과(2026-09-17)**: 상세는 `docs/checks/CHECK-O4O-HOSPITAL-DRUG-LOCAL-AUTOMATION-PILOT-V1.md`.
 > commit `5ed603aed`·`31e62159c`·`aa106a7df`·`c8fb4e9f7`. §9 단일응답 자동결합은 「요청당 tool 1」 엔진 계약상
 > 신규 오케스트레이션이 필요하고 실 하드웨어 검증이 필수라 **별도 WO 후보**로 분리(현 병동 페이지는 2단계 순차 질의로 지원).
+>
+> **§9 후속 진행(2026-09-17)**: 위 후속을 `WO-O4O-HOSPITAL-DRUG-COMPOSITE-QUERY-ORCHESTRATION-V1` 로 구현·단위검증 완료
+> — 엔진 확장 없이 cloud 쪽 결정론 오케스트레이터가 단계마다 tool 1개씩 순차 호출해 한 문장을 두 소스로 결합, 하나의 답으로
+> 병합한다. 상세·상태 키는 `docs/checks/CHECK-O4O-HOSPITAL-DRUG-COMPOSITE-QUERY-ORCHESTRATION-V1.md`. 실 병동 PC 종단
+> smoke 는 여전히 PENDING_USER_VERIFICATION.
