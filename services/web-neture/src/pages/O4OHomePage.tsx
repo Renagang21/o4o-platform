@@ -60,6 +60,8 @@ import {
 import { useHomeEntry } from '../lib/home-entry';
 import HomeEntryPanel from '../components/home/HomeEntryPanel';
 import HomeServiceNews from '../components/home/HomeServiceNews';
+import { PublicLegalFooterInfo } from '@o4o/shared-space-ui';
+import { loadFooterLegal } from '../lib/footerLegal';
 
 // ─── 서비스 안내 (로그인 전) ────────────────────────────────────────────────────
 // 신규 도메인·route 를 만들지 않는다.
@@ -675,6 +677,11 @@ export default function O4OHomePage() {
         <Link to="/contact" className="no-underline hover:text-slate-600">
           Contact
         </Link>
+        {/* WO-O4O-HOME-LEGAL-FOOTER-ADOPTION-V1: 대표 홈도 NetureLayout 과 같은 축으로
+            법정정보 노출 — 하드코딩 없이 public footer-legal API 값만(미설정 시 비표시). */}
+        <div className="mx-auto mt-3 max-w-3xl text-slate-400">
+          <PublicLegalFooterInfo serviceKey="neture" loadProfile={loadFooterLegal} />
+        </div>
       </footer>
     </div>
   );
