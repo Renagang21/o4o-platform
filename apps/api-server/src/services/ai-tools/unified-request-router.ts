@@ -23,8 +23,9 @@ import { asksForLogin, asksForSiteOpen, asksForWindowActivation } from './ai-too
 import { resolveWorkTarget, type WorkTargetRef } from './work-target-resolver.js';
 import { WINDOWS_APP_REGISTRY } from '../local-agent/windows-app-registry.js';
 import { PHARMACY_WEB_SITE_REGISTRY } from '../local-agent/pharmacy-web-core.js';
+import { extractProduct, mentionsHospital, mentionsSameIngredient } from './hospital-drug-composite.js';
 
-export type UnifiedRoute = 'chat' | 'work' | 'confirm_work';
+export type UnifiedRoute = 'chat' | 'work' | 'confirm_work' | 'composite';
 
 export type UnifiedRouteReason =
   | 'resume'
@@ -35,7 +36,8 @@ export type UnifiedRouteReason =
   | 'open_or_activate_only'
   | 'document_attached'
   | 'task_intent'
-  | 'ambiguous';
+  | 'ambiguous'
+  | 'hospital_drug_composite';
 
 export interface UnifiedRouteDecision {
   route: UnifiedRoute;
@@ -124,6 +126,18 @@ export function hasTaskIntent(message: string): boolean {
 }
 
 /**
+ * 원내약 + 약학정보원 **결합 요청**인가(WO-O4O-HOSPITAL-DRUG-COMPOSITE-QUERY-ORCHESTRATION-V1 §9).
+ *   제품 토큰이 있고, "원내" 지시(원내 보유 조회) 또는 "동일성분" 지시(성분 결합)가 있을 때.
+ *   이 경우 한 요청을 두 소스로 내부 분해해 하나의 답으로 합치는 composite 경로로 보낸다.
+ *   대상 등재(resolveWorkTarget) 여부와 무관하게 판정한다 — "원내에 우루사정 있어?"(§13-B)는
+ *   등재 사이트/앱 이름이 없어도 원내 조회를 해야 하기 때문이다.
+ */
+export function isCompositeHospitalDrugRequest(message: string): boolean {
+  if (!extractProduct(message)) return false;
+  return mentionsHospital(message) || mentionsSameIngredient(message);
+}
+
+/**
  * 판정 본체. 순서가 곧 정책이다:
  *   runId → 확인된 요청 → 대상 없음 → 로그인 안내 → 상태 조회 → 열기/활성화만 → 문서 첨부 → 업무 지시어 → 모호(확인).
  */
@@ -131,6 +145,11 @@ export function classifyUnifiedRequest(message: string, input: UnifiedRouteInput
   const text = String(message ?? '');
   if (typeof input.runId === 'string' && input.runId.length > 0) {
     return { route: 'work', target: resolveWorkTarget(text), reason: 'resume' };
+  }
+  // 원내약 + 약학정보원 결합 요청(§9)은 대상 등재 판정보다 먼저 가로챈다 — "원내에 …"(§13-B)는
+  // 등재 사이트/앱 이름이 없어(target=null → 기존엔 chat) 원내 조회로 가지 못했다.
+  if (isCompositeHospitalDrugRequest(text)) {
+    return { route: 'composite', target: resolveWorkTarget(text), reason: 'hospital_drug_composite' };
   }
   const target = resolveWorkTarget(text);
   if (!target) return { route: 'chat', target: null, reason: 'no_registered_target' };

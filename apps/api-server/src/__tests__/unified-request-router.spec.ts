@@ -3,7 +3,8 @@
  *
  * 고정하려는 것:
  *   - 사용자가 "질문 / 작업 수행" 을 고르지 않아도 서버가 결정론적으로 경로를 고른다(AI 호출 없음).
- *   - WO §13 의 예문이 명시된 경로로 간다: 일반 질문 → chat · "약학정보원에서 … 찾아줘" → work.
+ *   - WO §13 의 예문이 명시된 경로로 간다: 일반 질문 → chat · 등재 사이트 위 일반 검색 업무 → work.
+ *   - (§9) "원내" · "동일성분" 결합 요청은 composite 로 가로챈다 — raw browser work 이 아니다.
  *   - 열기 · 상태 · 로그인 문장은 home-chat 의 1-step 축(chat)에 남는다 — Work Agent 로 새지 않는다(회귀 금지 §10).
  *   - 모호하면 실행하지 않고 confirm 으로 되묻고, 확인(routeHint)이 오면 work.
  *   - runId(PHASE 1 same-run) 는 무조건 work.
@@ -39,8 +40,16 @@ describe('unified request router — 경로 판정', () => {
     }
   });
 
-  it('WO §13 웹 작업 — "약학정보원에서 우루사정 동일성분 찾아줘" → work (browser_site healthkr)', () => {
+  // WO-O4O-HOSPITAL-DRUG-COMPOSITE-QUERY-ORCHESTRATION-V1 §9 — "동일성분" 결합 요청은 이제 raw browser work 이
+  // 아니라 composite(web+local 내부 분해 → 하나의 답)로 간다. 아래 두 테스트가 그 경계를 고정한다.
+  it('WO §9 동일성분 결합 요청 — "약학정보원에서 우루사정 동일성분 찾아줘" → composite (§13-A)', () => {
     const d = classifyUnifiedRequest('약학정보원에서 우루사정 동일성분 찾아줘.');
+    expect(d.route).toBe('composite');
+    expect(d.reason).toBe('hospital_drug_composite');
+  });
+
+  it('WO §13 웹 작업 — 등재 사이트 위 일반 검색 업무(결합 아님) → work (browser_site healthkr)', () => {
+    const d = classifyUnifiedRequest('약학정보원에서 타이레놀 검색해줘.');
     expect(d.route).toBe('work');
     expect(d.reason).toBe('task_intent');
     expect(d.target).toEqual(expect.objectContaining({ targetType: 'browser_site', targetId: 'healthkr' }));

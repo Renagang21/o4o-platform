@@ -4,6 +4,7 @@
  * DB · provider · Local Agent 는 전부 주입한다. 고정하려는 것:
  *   ①  text-only 일반 질문      → kind=chat, home-chat 본체(execute) 1회, Work Agent 미호출
  *   ②  text-only 웹 작업 요청   → kind=work, Work Agent 본체 1회, execute 미호출 · 응답에 runId/resumable 통과
+ *   ②-b text-only 결합 요청(§9) → kind=composite, 결합 오케스트레이터 1회, Work/chat 미호출
  *   ③  image + 질문(대상 없음)  → kind=chat, Gemini inline 경로(fetch)로 이미지가 실린다
  *   ④  PDF/XLSX + 질문          → kind=chat, 첨부 사실이 응답 data.chat.attachments 에 (내용 없이) 온다
  *   ⑤  첨부 없이 Work intent    → kind=work
@@ -21,6 +22,7 @@ import request from 'supertest';
 
 const executeMock = jest.fn();
 const runWorkAgentMock = jest.fn();
+const runCompositeMock = jest.fn();
 const resolveTargetDeviceMock = jest.fn();
 const fetchMock = jest.fn();
 const logInfo = jest.fn();
@@ -55,6 +57,12 @@ jest.mock('../services/ai-tools/work-agent-runtime.js', () => ({
 // ai-proxy.service 는 DB entity 를 끌고 온다 — 이 spec 이 쓰는 두 경로는 그것을 쓰지 않는다.
 jest.mock('../services/ai-proxy.service.js', () => ({ aiProxyService: {} }));
 jest.mock('../services/ai-model-registry.service.js', () => ({ isGeminiModelAllowedSync: () => true }));
+// 결합 오케스트레이션 본체만 갈아끼운다 — 분류기가 쓰는 extractProduct/mentionsHospital/mentionsSameIngredient 는
+// 실제 구현을 그대로 둬야 라우팅이 유지된다(WO §9). 세부 단계는 hospital-drug-composite.spec.ts 가 덮는다.
+jest.mock('../services/ai-tools/hospital-drug-composite.js', () => {
+  const actual = jest.requireActual('../services/ai-tools/hospital-drug-composite.js');
+  return { ...actual, runHospitalDrugComposite: (...a: unknown[]) => runCompositeMock(...a) };
+});
 
 import router from '../routes/ai-proxy.routes.js';
 import { AI_TOOL_NAMES } from '../services/ai-tools/ai-tool-contract.js';
@@ -91,6 +99,17 @@ beforeEach(() => {
   jest.clearAllMocks();
   executeMock.mockResolvedValue({ content: '텍스트 답변', model: 'gemini-test' });
   runWorkAgentMock.mockResolvedValue(workResult());
+  runCompositeMock.mockResolvedValue({
+    answer: '결합 답변',
+    plan: 'web_and_local',
+    product: '우루사정',
+    ingredient: '우르소데옥시콜산',
+    strength: '200mg',
+    steps: [
+      { source: 'healthkr', tool: AI_TOOL_NAMES.PHARMACY_WEB_ENTRYPOINT, outcome: 'list:3' },
+      { source: 'local_data', tool: AI_TOOL_NAMES.DATA_LOCAL_QUERY, outcome: 'rows:2' },
+    ],
+  });
   resolveTargetDeviceMock.mockResolvedValue(CONNECTED);
   fetchMock.mockResolvedValue({ ok: true, status: 200, json: async () => ({ candidates: [{ content: { parts: [{ text: '이미지 답변' }] } }] }) });
   (globalThis as any).fetch = fetchMock;
@@ -116,9 +135,9 @@ describe('POST /api/ai/request', () => {
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
-  it('② text-only 웹 작업 → work (execute 미호출 · runId/resumable 통과)', async () => {
+  it('② text-only 웹 작업(결합 아님) → work (execute 미호출 · runId/resumable 통과)', async () => {
     runWorkAgentMock.mockResolvedValueOnce(workResult({ goal: { goalId: 'g_2', runId: 'g_2', status: 'waiting_for_user' }, progress: 'needs_user', resumable: true, takeover: { reason: 'user_judgment_required', step: 2 } }));
-    const r = await request(app).post('/api/ai/request').send({ text: '약학정보원에서 우루사정 동일성분 찾아줘' });
+    const r = await request(app).post('/api/ai/request').send({ text: '약학정보원에서 타이레놀 검색해줘' });
     expect(r.status).toBe(200);
     expect(r.body.data.kind).toBe('work');
     expect(r.body.data.reason).toBe('task_intent');
@@ -126,9 +145,25 @@ describe('POST /api/ai/request', () => {
     expect(r.body.data.work.resumable).toBe(true);
     expect(r.body.data.work.aiPlanCount).toBe(1);
     expect(executeMock).not.toHaveBeenCalled();
+    expect(runCompositeMock).not.toHaveBeenCalled();
     const input = runWorkAgentMock.mock.calls[0][2];
-    expect(input.request).toBe('약학정보원에서 우루사정 동일성분 찾아줘');
+    expect(input.request).toBe('약학정보원에서 타이레놀 검색해줘');
     expect(input.image).toBeUndefined();
+  });
+
+  // WO-O4O-HOSPITAL-DRUG-COMPOSITE-QUERY-ORCHESTRATION-V1 §9 — "동일성분" 결합 요청은 composite 로 가고,
+  // 하나의 답(kind=composite)으로 돌아온다. Work Agent · home-chat 본체는 타지 않는다.
+  it('②-b text-only 결합 요청("동일성분") → composite (한 요청 · 하나의 답 · Work/chat 미호출)', async () => {
+    const r = await request(app).post('/api/ai/request').send({ text: '우루사정 200mg과 같은 성분의 원내약 있어?' });
+    expect(r.status).toBe(200);
+    expect(r.body.data.kind).toBe('composite');
+    expect(r.body.data.reason).toBe('hospital_drug_composite');
+    expect(r.body.data.composite.message).toBe('결합 답변');
+    expect(r.body.data.composite.plan).toBe('web_and_local');
+    expect(r.body.data.composite.steps.map((s: { source: string }) => s.source)).toEqual(['healthkr', 'local_data']);
+    expect(runCompositeMock).toHaveBeenCalledTimes(1);
+    expect(runWorkAgentMock).not.toHaveBeenCalled();
+    expect(executeMock).not.toHaveBeenCalled();
   });
 
   it('③ image + 질문(대상 없음) → chat · Gemini inline 경로에 이미지가 실린다', async () => {

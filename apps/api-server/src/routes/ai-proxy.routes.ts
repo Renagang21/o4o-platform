@@ -55,6 +55,7 @@ import {
   type UnifiedAttachment,
 } from '../services/ai-tools/unified-request-contract.js';
 import { classifyUnifiedRequest, confirmWorkMessage } from '../services/ai-tools/unified-request-router.js';
+import { runHospitalDrugComposite } from '../services/ai-tools/hospital-drug-composite.js';
 import { readAttachments, renderAttachmentTextBlocks } from '../services/ai-tools/attachment-reader.js';
 import { executeMultimodalChat } from '../services/ai-tools/multimodal-chat.js';
 import { resolveWorkScopeStore, STORE_SCOPED_WORKSPACES } from '../utils/work-scope-store-resolution.js';
@@ -2205,6 +2206,65 @@ router.post('/home-chat', authenticate, dynamicLimiter('free'), async (req, res:
   return res.status(reply.status).json(reply.body);
 });
 
+/**
+ * 원내약 + 약학정보원 결합 요청 본체(WO-O4O-HOSPITAL-DRUG-COMPOSITE-QUERY-ORCHESTRATION-V1 §9).
+ *
+ *   한 요청을 두 소스(health.kr web · Local SQLite)로 내부 분해해 하나의 답으로 합친다.
+ *   각 단계는 `executeAiTool`(권한·인자 게이트)을 그대로 지난다 — 이 경로는 권한을 넓히지 않는다.
+ *   local device 는 서버가 확정한다(클라이언트 값은 권한 근거가 아니다). 조회 tool 은 READ 라
+ *   COMMIT·never-escalate 판정 대상이 아니지만, 게이트는 단계마다 다시 걸린다.
+ */
+async function performHospitalDrugComposite(userId: string, reqBody: Record<string, unknown>): Promise<RouteReply> {
+  const validation = validateHomeChatMessage(reqBody.text);
+  if (!validation.ok || !validation.message) {
+    const code = validation.error ?? 'INVALID_MESSAGE';
+    return { status: 400, body: { success: false, error: homeChatValidationMessage(code), code } };
+  }
+  const message = validation.message;
+
+  const clientScope = (reqBody.workScope ?? {}) as Record<string, unknown>;
+  const workspace = typeof clientScope.workspace === 'string' ? clientScope.workspace : 'home';
+
+  try {
+    // 서버가 확정한 사실만 담는다(home-chat 과 같은 규칙).
+    const toolCtx: VerifiedToolContext = { userId, workspace };
+    const deviceResolution = await resolveTargetDevice(AppDataSource, userId);
+    toolCtx.localAgentStatus = deviceResolution.status === 'ok' ? 'connected' : deviceResolution.status;
+    if (deviceResolution.status === 'ok') toolCtx.localDeviceId = deviceResolution.device.id;
+
+    const result = await runHospitalDrugComposite(
+      (name, args) => executeAiTool(AppDataSource, name, args, toolCtx),
+      message,
+    );
+
+    // §20 안전 로그 — plan · 단계 결과만. 제품명·성분·값 원문·raw row 는 남기지 않는다.
+    logger.info('hospital-drug composite', {
+      userId,
+      plan: result.plan,
+      steps: result.steps.map((s) => `${s.source}:${s.outcome}`),
+      localAgentStatus: toolCtx.localAgentStatus,
+    });
+
+    return {
+      status: 200,
+      body: {
+        success: true,
+        data: {
+          message: result.answer,
+          plan: result.plan,
+          steps: result.steps,
+        },
+      },
+    };
+  } catch (error: unknown) {
+    logger.error('hospital-drug composite error', {
+      userId,
+      error: (error as { message?: string })?.message,
+    });
+    return { status: 502, body: { success: false, error: '응답을 생성하지 못했습니다. 다시 시도해 주세요.', code: 'AI_ERROR' } };
+  }
+}
+
 // ===========================================
 // POST /api/ai/request — 단일 자연어 요청 진입점 (Unified Request Router)
 // WO-O4O-AI-COMPOSER-UNIFIED-REQUEST-AND-ATTACHMENT-UX-V1 §4·§5·§6
@@ -2270,6 +2330,12 @@ router.post('/request', authenticate, dynamicLimiter('free'), async (req, res: R
         },
       },
     });
+  }
+
+  if (decision.route === 'composite') {
+    const reply = await performHospitalDrugComposite(userId, { text, workScope: body.workScope });
+    if (reply.status !== 200) return res.status(reply.status).json(reply.body);
+    return res.json({ success: true, data: { kind: 'composite', route: decision.route, reason: decision.reason, composite: reply.body.data } });
   }
 
   if (decision.route === 'work') {
