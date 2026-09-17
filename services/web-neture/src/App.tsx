@@ -333,6 +333,9 @@ const ProductLandingPage = lazy(() => import('./pages/ProductLandingPage'));
 // Cafe24 App URL 진입점 (WO-O4O-CAFE24-APP-ENTRY-ROUTE-V1) — neture.co.kr/cafe24
 const Cafe24AppEntryPage = lazy(() => import('./pages/Cafe24AppEntryPage'));
 
+// 원내 약품 안내 — 병동 PC 공용·무로그인 (WO-O4O-HOSPITAL-DRUG-LOCAL-AUTOMATION-PILOT-V1) — neture.co.kr/hospital-drug
+const HospitalDrugPage = lazy(() => import('./pages/HospitalDrugPage'));
+
 // Catalog Import
 const CatalogImportDashboardPage = lazy(() => import('./pages/admin/catalog-import/CatalogImportDashboardPage'));
 const CSVImportPage = lazy(() => import('./pages/admin/catalog-import/CSVImportPage'));
@@ -676,6 +679,9 @@ function App() {
             {/* Cafe24 Developers 의 App URL 진입점. Cafe24 관리자 iframe 안에서 열리므로
                 Neture 사이트 크롬(NetureLayout)을 씌우지 않는다. */}
             <Route path="/cafe24" element={<Cafe24AppEntryPage />} />
+            {/* 원내 약품 안내 — 병동 PC 공용 진입점. 무로그인(옵션 C)·Neture 크롬 없음이라
+                NetureLayout 밖·guard 없이 둔다. WorkScopeProvider 안이라 useWorkScope() 가 동작한다. */}
+            <Route path="/hospital-drug" element={<HospitalDrugPage />} />
 
             {/* ================================================================
                 O4O 공통 Home (WO-O4O-COMMON-HOME-PHASE1-V1)

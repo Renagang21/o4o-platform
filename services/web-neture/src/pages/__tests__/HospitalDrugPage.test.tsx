@@ -1,0 +1,109 @@
+/**
+ * 원내 약품 안내 — 병동 PC 공용·무로그인 (게이트1 = 옵션 C)
+ *
+ * WO-O4O-HOSPITAL-DRUG-LOCAL-AUTOMATION-PILOT-V1
+ *
+ * 실행: 저장소 루트에서
+ *   npx vitest run --config services/web-neture/vitest.config.mjs
+ *
+ * ─────────────────────────────────────────────────────────────────────────────
+ * 무엇을 세우는가
+ *
+ * 이 화면이 O4OHomePage 와 갈라지는 지점 하나를 못박는다: **미인증/세션 만료(401)
+ * 에서 로그인 모달을 열거나 이동하지 않는다.** 대신 "재연결 필요" 를 보여준다.
+ * 그래서 mock 은 화면이 의존하는 세 경계(useWorkScope · sendUnifiedRequest ·
+ * probeLocalAgent)에만 두고, 화면의 분기·문구는 실제 코드가 하게 둔다.
+ */
+
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import { cleanup, render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+
+const sendUnifiedRequest = vi.fn();
+const probeLocalAgent = vi.fn();
+
+// UnifiedRequestError 는 실제 클래스를 그대로 쓴다(status 401 판정이 실제 코드 경로다).
+vi.mock('../../lib/ai/unified-request', async () => {
+  const actual = await vi.importActual<typeof import('../../lib/ai/unified-request')>(
+    '../../lib/ai/unified-request',
+  );
+  return { ...actual, sendUnifiedRequest: (...args: unknown[]) => sendUnifiedRequest(...args) };
+});
+
+vi.mock('../../api/localAgent', async () => {
+  const actual = await vi.importActual<typeof import('../../api/localAgent')>('../../api/localAgent');
+  return { ...actual, probeLocalAgent: (...args: unknown[]) => probeLocalAgent(...args) };
+});
+
+// 병동 진입점은 공개 축(home) scope 로 성립한다 — 미인증에서도 resolved.
+vi.mock('../../contexts', () => ({
+  useWorkScope: () => ({
+    workScope: {
+      serviceKey: 'neture',
+      workspace: 'home',
+      capabilities: ['navigate', 'read'],
+      executionMode: 'cloud',
+      status: 'resolved',
+    },
+    isResolvingStore: false,
+    lastResolvedWorkspace: null,
+  }),
+}));
+
+import HospitalDrugPage from '../HospitalDrugPage';
+import { UnifiedRequestError } from '../../lib/ai/unified-request';
+
+afterEach(() => {
+  cleanup();
+  sendUnifiedRequest.mockReset();
+  probeLocalAgent.mockReset();
+});
+
+const chatResult = (message: string) => ({ kind: 'chat', route: 'chat', reason: 'ok', chat: { message } });
+
+describe('원내 약품 안내 — 게이트1 옵션 C', () => {
+  it('미인증에서도 입력창이 열리고 로그인 UI 를 두지 않는다', async () => {
+    probeLocalAgent.mockResolvedValue({ ok: true, health: { agentVersion: '0.1.0', connected: true, nonce: 'n' } });
+    render(<HospitalDrugPage />);
+
+    expect(await screen.findByTestId('hospital-drug-input')).toBeTruthy();
+    // 로그인/회원가입 진입이 없어야 한다.
+    expect(screen.queryByText('로그인')).toBeNull();
+    expect(screen.queryByText('회원가입')).toBeNull();
+  });
+
+  it('정상 응답이면 답을 보여준다', async () => {
+    probeLocalAgent.mockResolvedValue({ ok: true, health: { agentVersion: '0.1.0', connected: true, nonce: 'n' } });
+    sendUnifiedRequest.mockResolvedValue(chatResult('타이레놀정 재고 12개, 단가 90원입니다.'));
+    render(<HospitalDrugPage />);
+
+    await userEvent.type(await screen.findByTestId('hospital-drug-input'), '타이레놀정 재고');
+    await userEvent.click(screen.getByTestId('hospital-drug-submit'));
+
+    const answer = await screen.findByTestId('hospital-drug-answer');
+    expect(answer.textContent).toContain('타이레놀정 재고 12개');
+  });
+
+  it('401(세션 만료)이면 로그인으로 보내지 않고 「재연결 필요」를 안내한다', async () => {
+    probeLocalAgent.mockResolvedValue({ ok: true, health: { agentVersion: '0.1.0', connected: true, nonce: 'n' } });
+    sendUnifiedRequest.mockRejectedValue(new UnifiedRequestError('unauthorized', 'UNAUTHORIZED', 401));
+    render(<HospitalDrugPage />);
+
+    await userEvent.type(await screen.findByTestId('hospital-drug-input'), '아무 질문');
+    await userEvent.click(screen.getByTestId('hospital-drug-submit'));
+
+    const reconnect = await screen.findByTestId('hospital-drug-reconnect');
+    expect(reconnect.textContent).toContain('재연결');
+    // 일반 오류 박스로 새지 않았다.
+    expect(screen.queryByTestId('hospital-drug-error')).toBeNull();
+  });
+
+  it('Agent 미연결이면 상태 배지가 「원내 자료 미연결」을 보여준다', async () => {
+    probeLocalAgent.mockResolvedValue({ ok: false, reason: 'AGENT_NOT_RUNNING', permission: 'granted' });
+    render(<HospitalDrugPage />);
+
+    await waitFor(() => {
+      expect(screen.getByTestId('hospital-drug-agent-status').textContent).toContain('원내 자료 미연결');
+    });
+  });
+});
