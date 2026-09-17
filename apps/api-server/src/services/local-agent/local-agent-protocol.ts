@@ -122,6 +122,12 @@ export const LOCAL_AGENT_ACTIONS = {
   DATA_HEALTH: 'local.data.health',
   /** allowlist 된 meta 키 하나의 값을 읽는다(§13). 임의 SQL·임의 키가 아니다. */
   DATA_GET_META: 'local.data.get_meta',
+  /**
+   * 원내 약품 목록(정규 dataset)에서 **한 필드=한 값** 좁은 조회(성분/함량/상품명 등).
+   * 임의 SQL 이 아니다 — dataset·field 는 allowlist, value 는 짧은 단일 토큰, 응답은 canonical
+   * 필드만. HOSPITAL-DRUG-COMPOSITE §7(성분→함량→제형→제조사) 매칭의 로컬 축.
+   */
+  DATA_QUERY: 'local.data.query',
   /** allowlist 된 setting 키에 검증된 값을 쓴다(§10·§11). 범용 KV 저장이 아니다. */
   DATA_SET_SETTING: 'local.data.set_setting',
   // ── same-run resume 정본 원장 (WEB-AUTOMATION-RESUME-V1 PHASE 1) ────────────
@@ -246,6 +252,7 @@ export function isUiaTargetAction(base: string): boolean {
 export const DATA_TARGET_ACTIONS: readonly string[] = Object.freeze([
   LOCAL_AGENT_ACTIONS.DATA_HEALTH,
   LOCAL_AGENT_ACTIONS.DATA_GET_META,
+  LOCAL_AGENT_ACTIONS.DATA_QUERY,
   LOCAL_AGENT_ACTIONS.DATA_SET_SETTING,
   LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_UPSERT,
   LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_SET_STATUS,
@@ -325,6 +332,75 @@ export function isValidLocalSettingValue(key: string, value: unknown): boolean {
   return false;
 }
 
+/**
+ * `local.data.query` 가 조회할 수 있는 **정규 dataset 이름**과 **필드 allowlist**.
+ *
+ * 이 축은 일부러 좁다. agent 쪽 tool(handlers.mjs·local-db.mjs)은 필드-범용이지만,
+ * cloud 로 나가는 값은 여기 등록된 것만 통과한다 — imported 원자료의 임의 컬럼(환자·처방·
+ * 보험 등 병동이 무엇을 넣었든)이 cloud 로 새지 않게, `pickSafeDataQueryInfo` 가 이 목록으로
+ * 응답 행을 화이트리스트한다(§검증 D · WO-...-COMPOSITE §4 금지: raw row cloud 유입).
+ *
+ * 필드 이름은 전부 소문자 snake_case 다 — agent 의 FIELD_NAME_RE(`^[a-z][a-z0-9_]{0,63}$`)와
+ * import 매핑 규칙이 대문자를 거부하기 때문이다. 병동 bind 는 Excel 열을 이 이름들로 매핑한다
+ * (WO §6 매핑 · §7 매칭 축: 성분→함량→제형→제조사/상품명).
+ */
+export const LOCAL_DATASET_NAMES: readonly string[] = Object.freeze(['hospital_drug_list']);
+export const LOCAL_DATASET_FIELDS: readonly string[] = Object.freeze([
+  'code',
+  'product_name',
+  'ingredient',
+  'strength',
+  'dosage_form',
+  'manufacturer',
+  'status',
+]);
+export const LOCAL_DATASET_QUERY_MATCHES: readonly string[] = Object.freeze(['exact', 'contains']);
+export const LOCAL_DATASET_QUERY_MAX_LIMIT = 50;
+/** query value 한도 — 단일 토큰(성분·상품명 등)이라 짧다. 화면 dump·raw 유입 차단. */
+const LOCAL_DATASET_QUERY_VALUE_MAX = 100;
+
+export interface DataQueryArgs {
+  dataset: string;
+  field: string;
+  value: string;
+  match?: string;
+  limit?: number;
+  columns?: string[];
+}
+
+/**
+ * `{ dataset, field, value, match?, limit?, columns? }` — 정규 dataset 한 필드 조회.
+ * dataset/field/columns 는 allowlist, value 는 `<>{}` 없는 짧은 문자열, limit 은 1..50.
+ * 알 수 없는 키가 있으면 실패(정규화된 사본만 통과). agent 쪽이 같은 규칙을 다시 본다.
+ */
+export function validateDataQueryArgs(args: unknown): { ok: boolean; args?: DataQueryArgs } {
+  if (!args || typeof args !== 'object' || Array.isArray(args)) return { ok: false };
+  const src = args as Record<string, unknown>;
+  const allowed = new Set(['dataset', 'field', 'value', 'match', 'limit', 'columns']);
+  for (const k of Object.keys(src)) if (!allowed.has(k)) return { ok: false };
+  if (typeof src.dataset !== 'string' || !LOCAL_DATASET_NAMES.includes(src.dataset)) return { ok: false };
+  if (typeof src.field !== 'string' || !LOCAL_DATASET_FIELDS.includes(src.field)) return { ok: false };
+  if (typeof src.value !== 'string') return { ok: false };
+  const value = src.value.trim();
+  if (value.length === 0 || value.length > LOCAL_DATASET_QUERY_VALUE_MAX) return { ok: false };
+  if (/[<>{}]/.test(value)) return { ok: false };
+  const out: DataQueryArgs = { dataset: src.dataset, field: src.field, value };
+  if (src.match !== undefined) {
+    if (typeof src.match !== 'string' || !LOCAL_DATASET_QUERY_MATCHES.includes(src.match)) return { ok: false };
+    out.match = src.match;
+  }
+  if (src.limit !== undefined) {
+    if (typeof src.limit !== 'number' || !Number.isInteger(src.limit) || src.limit < 1 || src.limit > LOCAL_DATASET_QUERY_MAX_LIMIT) return { ok: false };
+    out.limit = src.limit;
+  }
+  if (src.columns !== undefined) {
+    if (!Array.isArray(src.columns) || src.columns.length === 0 || src.columns.length > LOCAL_DATASET_FIELDS.length) return { ok: false };
+    for (const c of src.columns) if (typeof c !== 'string' || !LOCAL_DATASET_FIELDS.includes(c)) return { ok: false };
+    out.columns = [...(src.columns as string[])];
+  }
+  return { ok: true, args: out };
+}
+
 export interface DataGetMetaArgs {
   key: string;
 }
@@ -344,7 +420,7 @@ export interface DataWorkRunSetStatusArgs {
   status: string;
   note?: string;
 }
-export type DataActionArgs = DataGetMetaArgs | DataSetSettingArgs | DataWorkRunUpsertArgs | DataWorkRunSetStatusArgs;
+export type DataActionArgs = DataGetMetaArgs | DataQueryArgs | DataSetSettingArgs | DataWorkRunUpsertArgs | DataWorkRunSetStatusArgs;
 
 /** `{ key }` — allowlist 된 meta 키 하나. 그 밖의 키·추가 필드는 실패. */
 export function validateDataGetMetaArgs(args: unknown): { ok: boolean; args?: DataGetMetaArgs } {
@@ -459,6 +535,10 @@ export function validateLocalCommandArgs(
   }
   if (base === LOCAL_AGENT_ACTIONS.DATA_GET_META) {
     const r = validateDataGetMetaArgs(args);
+    return r.ok && r.args ? { ok: true, args: r.args } : { ok: false };
+  }
+  if (base === LOCAL_AGENT_ACTIONS.DATA_QUERY) {
+    const r = validateDataQueryArgs(args);
     return r.ok && r.args ? { ok: true, args: r.args } : { ok: false };
   }
   if (base === LOCAL_AGENT_ACTIONS.DATA_SET_SETTING) {
@@ -1063,6 +1143,42 @@ export function pickSafeDataInfo(data: unknown): Record<string, unknown> {
 }
 
 /**
+ * `local.data.query` 응답 화이트리스트. **canonical 필드(LOCAL_DATASET_FIELDS)만** 통과한다.
+ *
+ * agent tool 은 필드-범용이라 병동이 매핑한 임의 컬럼이 행에 섞여 올 수 있다 — 여기서 등록된
+ * 7개 필드만 남기고 나머지(파일 경로·원자료 컬럼·rowKey 원문 등)는 버린다. 행 수는 상한(50),
+ * 각 값은 문자열로 강제·절단(120자). 이것이 raw row 가 cloud 로 새지 않게 하는 마지막 문(§4 금지).
+ */
+const SAFE_DATA_QUERY_ROW_MAX = 50;
+const SAFE_DATA_QUERY_VALUE_MAX = 120;
+
+export function pickSafeDataQueryInfo(data: unknown): Record<string, unknown> {
+  if (!data || typeof data !== 'object' || Array.isArray(data)) return {};
+  const src = data as Record<string, unknown>;
+  const out: Record<string, unknown> = {};
+  if (typeof src.dataset === 'string' && LOCAL_DATASET_NAMES.includes(src.dataset)) out.dataset = src.dataset;
+  if (typeof src.field === 'string' && LOCAL_DATASET_FIELDS.includes(src.field)) out.field = src.field;
+  if (typeof src.match === 'string' && LOCAL_DATASET_QUERY_MATCHES.includes(src.match)) out.match = src.match;
+  if (typeof src.count === 'number' && Number.isInteger(src.count) && src.count >= 0 && src.count <= 100000) out.count = src.count;
+  const rowsIn = Array.isArray(src.rows) ? src.rows : [];
+  const rows: Record<string, string>[] = [];
+  for (const r of rowsIn) {
+    if (rows.length >= SAFE_DATA_QUERY_ROW_MAX) break;
+    if (!r || typeof r !== 'object' || Array.isArray(r)) continue;
+    const rec = r as Record<string, unknown>;
+    const row: Record<string, string> = {};
+    for (const f of LOCAL_DATASET_FIELDS) {
+      const v = rec[f];
+      if (typeof v === 'string' && v.length > 0) row[f] = v.slice(0, SAFE_DATA_QUERY_VALUE_MAX);
+      else if (typeof v === 'number' && Number.isFinite(v)) row[f] = String(v).slice(0, SAFE_DATA_QUERY_VALUE_MAX);
+    }
+    if (Object.keys(row).length > 0) rows.push(row);
+  }
+  out.rows = rows;
+  return out;
+}
+
+/**
  * action 에 맞는 출력 화이트리스트를 고른다.
  *
  * **모르는 action 은 빈 객체를 돌려준다.** 새 action 을 추가하면서 여기에 등록하지 않으면
@@ -1125,6 +1241,9 @@ export function pickSafeResultData(action: string, data: unknown): Record<string
   }
   if (COMPUTER_TARGET_ACTIONS.includes(base)) {
     return pickSafeComputerInfo(data);
+  }
+  if (base === LOCAL_AGENT_ACTIONS.DATA_QUERY) {
+    return pickSafeDataQueryInfo(data);
   }
   if (DATA_TARGET_ACTIONS.includes(base)) {
     return pickSafeDataInfo(data);

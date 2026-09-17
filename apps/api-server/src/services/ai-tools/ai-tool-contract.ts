@@ -44,6 +44,7 @@ import {
 } from '../local-agent/computer-use-contract.js';
 import {
   validateDataGetMetaArgs,
+  validateDataQueryArgs,
   validateDataSetSettingArgs,
 } from '../local-agent/local-agent-protocol.js';
 import {
@@ -369,9 +370,11 @@ export type DomArgumentSchema = 'domSite' | 'domFind' | 'domTarget' | 'domInput'
  * LOCAL-DATA-TOOL-BRIDGE-CLOSURE-V1 §6 인자 형상. 자유 args 채널이 아니다 — tool 별로 좁다.
  *   dataMetaKey → { key }           key 는 allowlist(local_meta) 등재분
  *   dataSetting → { key, value }    key 는 allowlist(settings) 등재분 · value 는 per-key 스키마
+ *   dataQuery   → { dataset, field, value, match?, limit?, columns? }
+ *                 dataset·field·columns 는 allowlist(정규 원내약 dataset), value 는 짧은 단일 토큰
  * health 는 인자 없음('none')이라 여기 없다.
  */
-export type DataArgumentSchema = 'dataMetaKey' | 'dataSetting';
+export type DataArgumentSchema = 'dataMetaKey' | 'dataQuery' | 'dataSetting';
 
 /**
  * COMPUTER-USE-V0 §15~§20 인자 형상. 전부 `targetId`(= 등재 appId) 를 포함한다.
@@ -449,6 +452,8 @@ export const AI_TOOL_NAMES = {
   // WO-O4O-LOCAL-DATA-TOOL-BRIDGE-CLOSURE-V1 §5·§12
   DATA_LOCAL_HEALTH: 'local.data.health',
   DATA_GET_LOCAL_META: 'local.data.get_meta',
+  // WO-O4O-HOSPITAL-DRUG-COMPOSITE-QUERY-ORCHESTRATION-V1 §7 — 원내약 좁은 필드 조회
+  DATA_LOCAL_QUERY: 'local.data.query',
   DATA_SET_LOCAL_SETTING: 'local.data.set_setting',
   // WO-O4O-BROWSER-DOM-CONTROL-V0 §9·§10·§15·§17·§18·§21·§22·§26
   DOM_GET_CONTEXT: 'local.browser.dom.get_context',
@@ -628,6 +633,16 @@ export const AI_TOOL_REGISTRY: readonly AiToolDefinition[] = Object.freeze([
     executionMode: 'local',
     readOnly: true,
     argumentSchema: 'dataMetaKey',
+  },
+  {
+    name: AI_TOOL_NAMES.DATA_LOCAL_QUERY,
+    automationMethod: 'api',
+    riskLevel: 'READ',
+    description: '연결된 PC 의 원내 약품 목록에서 한 필드(성분·상품명·함량 등)로 좁은 조회를 한다. 임의 SQL 이 아니다.',
+    requiredCapabilities: [AiCapability.READ_ONLY_LOCAL_DATA],
+    executionMode: 'local',
+    readOnly: true,
+    argumentSchema: 'dataQuery',
   },
   {
     name: AI_TOOL_NAMES.DATA_SET_LOCAL_SETTING,
@@ -1059,6 +1074,12 @@ export function validateToolArguments(
     // key 는 서버 protocol 의 meta allowlist 등재분이어야 한다 — 임의 key 를 넘길 통로가 없다.
     // 검증 논리는 서버 단일 출처(local-agent-protocol)를 재사용한다.
     return validateDataGetMetaArgs(args).ok ? { ok: true } : { ok: false, reason: 'INVALID_ARGUMENTS' };
+  }
+
+  if (schema === 'dataQuery') {
+    // 원내약 좁은 조회(HOSPITAL-DRUG-COMPOSITE §7): dataset·field·columns 는 allowlist, value 는 짧은 토큰.
+    // 검증 논리는 서버 단일 출처(local-agent-protocol)를 재사용한다 — 임의 SQL·임의 컬럼 통로가 없다.
+    return validateDataQueryArgs(args).ok ? { ok: true } : { ok: false, reason: 'INVALID_ARGUMENTS' };
   }
 
   if (schema === 'dataSetting') {

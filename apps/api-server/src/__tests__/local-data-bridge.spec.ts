@@ -26,8 +26,11 @@ import {
   DATA_TARGET_ACTIONS,
   LOCAL_AGENT_ACTIONS,
   LOCAL_AGENT_ERROR,
+  LOCAL_DATASET_FIELDS,
   isAllowedLocalAction,
   pickSafeDataInfo,
+  pickSafeDataQueryInfo,
+  validateDataQueryArgs,
   validateLocalCommandArgs,
 } from '../services/local-agent/local-agent-protocol.js';
 import {
@@ -211,11 +214,14 @@ describe('5~8. 좁은 structured args 강제 (§6·§11)', () => {
 // ─── 9~11. allowlist · registry (§12·§18) ────────────────────────────────────
 
 describe('9~11. tool 등록부 · allowlist', () => {
-  it('9. 데이터 축은 V1 3개 + PHASE 1 work_run ledger 2개뿐 — allowlist 에 접미사 없이 그대로 있고, #appId 형태는 없다', () => {
-    // PHASE 1 same-run(WEB-AUTOMATION-RESUME-V1)이 cloud→local write 전용 ledger 명령 2개를 더했다. 그 밖의 확장은 없다.
+  it('9. 데이터 축은 V1 3개 + 좁은 조회 query 1개 + PHASE 1 work_run ledger 2개뿐 — allowlist 에 접미사 없이 그대로 있고, #appId 형태는 없다', () => {
+    // PHASE 1 same-run(WEB-AUTOMATION-RESUME-V1)이 cloud→local write 전용 ledger 명령 2개를 더했다.
+    // COMPOSITE-QUERY-ORCHESTRATION-V1 이 원내 약품 좁은 조회 read-only 명령 1개(query)를 더했다 — 임의 SQL 이 아니라
+    // 등재 dataset(hospital_drug_list) + 등재 필드 화이트리스트 안의 field/value 조회다. 그 밖의 확장은 없다.
     expect(DATA_TARGET_ACTIONS).toEqual([
       LOCAL_AGENT_ACTIONS.DATA_HEALTH,
       LOCAL_AGENT_ACTIONS.DATA_GET_META,
+      LOCAL_AGENT_ACTIONS.DATA_QUERY,
       LOCAL_AGENT_ACTIONS.DATA_SET_SETTING,
       LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_UPSERT,
       LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_SET_STATUS,
@@ -228,11 +234,18 @@ describe('9~11. tool 등록부 · allowlist', () => {
     }
   });
 
-  it('10. 임의 SQL · 파일 tool 은 등록부에도 allowlist 에도 없다', () => {
-    for (const name of ['local.data.execute_sql', 'local.data.query', 'local.sqlite.raw', 'local.data.read_file']) {
+  it('10. 임의 SQL · 파일 tool 은 등록부에도 allowlist 에도 없다 (좁은 query 는 예외 — 등재 dataset·field 화이트리스트만)', () => {
+    for (const name of ['local.data.execute_sql', 'local.sqlite.raw', 'local.data.read_file', 'local.data.raw_query']) {
       expect(findToolDefinition(name)).toBeUndefined();
       expect(isAllowedLocalAction(name)).toBe(false);
     }
+    // 좁은 조회 query 는 존재하되, 임의 SQL 이 아니라 read-only + 등재 dataset/field 만 통과한다.
+    const query = findToolDefinition(AI_TOOL_NAMES.DATA_LOCAL_QUERY)!;
+    expect(query).toBeDefined();
+    expect(query.readOnly).toBe(true);
+    expect(query.executionMode).toBe('local');
+    expect(isAllowedLocalAction(LOCAL_AGENT_ACTIONS.DATA_QUERY)).toBe(true);
+    expect(isAllowedLocalAction(`${LOCAL_AGENT_ACTIONS.DATA_QUERY}#windows.notepad`)).toBe(false);
   });
 
   it('11. 데이터 tool 은 executionMode=local 이고 set_setting 만 쓰기(effect 선언)다', () => {
@@ -423,9 +436,10 @@ describe('V1. health 확장 · 실패 원인 구분 · agent 경계', () => {
     const handlers = readAgentSrc('handlers.mjs');
     expect(handlers).not.toContain('local-data-cli');
     expect(handlers).not.toContain("'node:fs'");
-    // 서버 계약의 데이터 action 은 V1 3개 + PHASE 1 work_run ledger 2개 — import/export/backup 은 여전히 cloud 명령이 아니라 로컬 CLI 다(§63).
+    // 서버 계약의 데이터 action 은 V1 3개 + 좁은 조회 query 1개 + PHASE 1 work_run ledger 2개 — import/export/backup 은 여전히 cloud 명령이 아니라 로컬 CLI 다(§63).
     expect(Object.values(LOCAL_AGENT_ACTIONS).filter((a) => a.startsWith('local.data.'))).toEqual([
-      LOCAL_AGENT_ACTIONS.DATA_HEALTH, LOCAL_AGENT_ACTIONS.DATA_GET_META, LOCAL_AGENT_ACTIONS.DATA_SET_SETTING,
+      LOCAL_AGENT_ACTIONS.DATA_HEALTH, LOCAL_AGENT_ACTIONS.DATA_GET_META, LOCAL_AGENT_ACTIONS.DATA_QUERY,
+      LOCAL_AGENT_ACTIONS.DATA_SET_SETTING,
       LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_UPSERT, LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_SET_STATUS,
     ]);
     const cli = readAgentSrc('local-data-cli.mjs');
@@ -434,5 +448,139 @@ describe('V1. health 확장 · 실패 원인 구분 · agent 경계', () => {
     // 서버 코드 어디에도 CSV 원문을 명령 인자로 싣는 통로가 없다(§46 local first).
     const service = readFileSync(join(__dirname, '..', 'services', 'local-agent', 'local-agent-service.ts'), 'utf8');
     expect(service).not.toContain('csvText');
+  });
+});
+
+// ─── COMPOSITE-QUERY-ORCHESTRATION-V1 (Layer 2) — 좁은 원내 약품 조회 왕복·경계 ──────
+// local.data.query 는 임의 SQL 이 아니다: 등재 dataset(hospital_drug_list) + 등재 필드
+// 화이트리스트 안의 field/value 조회만 통과하고, cloud 로 나가는 행은 등록된 7개 필드만 남는다.
+
+describe('Q. local.data.query — 좁은 조회 왕복 · 인자 · 안전 경계', () => {
+  it('Q1. 왕복 — {dataset,field,value,match} 가 실려 가고, 행은 등록 필드만 남아 돌아온다', async () => {
+    const db = makeDb();
+    await connected(db);
+    const { result, cmds } = await runDataTool(
+      db,
+      AI_TOOL_NAMES.DATA_LOCAL_QUERY,
+      { dataset: 'hospital_drug_list', field: 'ingredient', value: '우르소데옥시콜산', match: 'contains', limit: 50 },
+      {
+        status: 'success',
+        data: {
+          dataset: 'hospital_drug_list',
+          field: 'ingredient',
+          match: 'contains',
+          count: 1,
+          // agent 가 매핑한 임의 컬럼(원자료 경로·환자 등)이 섞여 와도 서버가 버려야 한다.
+          rows: [
+            {
+              code: 'A001',
+              product_name: '우루사정',
+              ingredient: '우르소데옥시콜산',
+              strength: '200mg',
+              dosage_form: '정제',
+              manufacturer: '대웅제약',
+              status: '사용',
+              source_path: 'C:\\ward\\drugs.xlsx',
+              patient_note: '환자메모',
+              rowKey: 'raw-42',
+            },
+          ],
+        },
+      },
+    );
+    expect(cmds).toHaveLength(1);
+    expect(cmds[0].action).toBe(LOCAL_AGENT_ACTIONS.DATA_QUERY);
+    expect(cmds[0].action).not.toContain('#');
+    expect(result.ok).toBe(true);
+    expect(result.data).toMatchObject({ available: true, dataset: 'hospital_drug_list', field: 'ingredient', count: 1 });
+    const rows = (result.data as { rows: Record<string, string>[] }).rows;
+    expect(rows).toHaveLength(1);
+    expect(rows[0]).toEqual({
+      code: 'A001',
+      product_name: '우루사정',
+      ingredient: '우르소데옥시콜산',
+      strength: '200mg',
+      dosage_form: '정제',
+      manufacturer: '대웅제약',
+      status: '사용',
+    });
+    // 원자료 컬럼·환자 메모·경로·rowKey 는 어디에도 없다(§4 금지: raw row cloud 유입).
+    const text = JSON.stringify(result) + (renderToolContext(result) ?? '');
+    for (const leaked of ['source_path', 'patient_note', 'rowKey', 'raw-42', 'C:\\ward', '환자메모']) {
+      expect(text).not.toContain(leaked);
+    }
+  });
+
+  it('Q2. 인자 검증 — 등재 밖 dataset·field, 임의 SQL 형태, 범위 밖 limit, 알 수 없는 키는 명령이 되지 못한다', async () => {
+    const db = makeDb();
+    await connected(db);
+    for (const args of [
+      { dataset: 'patients', field: 'ingredient', value: 'x' }, // 등재 밖 dataset
+      { dataset: 'hospital_drug_list', field: 'ssn', value: 'x' }, // 등재 밖 field
+      { dataset: 'hospital_drug_list', field: 'ingredient', value: '' }, // 빈 value
+      { dataset: 'hospital_drug_list', field: 'ingredient', value: "'; DROP TABLE {x}" }, // <>{} 금지
+      { dataset: 'hospital_drug_list', field: 'ingredient', value: 'x', limit: 0 }, // 범위 밖
+      { dataset: 'hospital_drug_list', field: 'ingredient', value: 'x', limit: 999 }, // 상한 초과
+      { dataset: 'hospital_drug_list', field: 'ingredient', value: 'x', match: 'regex' }, // 등재 밖 match
+      { dataset: 'hospital_drug_list', field: 'ingredient', value: 'x', sql: 'SELECT 1' }, // 알 수 없는 키
+      { dataset: 'hospital_drug_list', field: 'ingredient', value: 'x', columns: ['ssn'] }, // 등재 밖 컬럼
+    ]) {
+      const r = await executeAiTool(db.dataSource, AI_TOOL_NAMES.DATA_LOCAL_QUERY, args, ctx());
+      expect(r).toMatchObject({ ok: false, reason: 'INVALID_ARGUMENTS' });
+    }
+    expect(db.commands).toHaveLength(0);
+    // 서버 명령 계약(validateLocalCommandArgs)도 같은 규칙을 강제한다.
+    expect(validateLocalCommandArgs(LOCAL_AGENT_ACTIONS.DATA_QUERY, { dataset: 'hospital_drug_list', field: 'ingredient', value: 'x' }).ok).toBe(true);
+    expect(validateLocalCommandArgs(LOCAL_AGENT_ACTIONS.DATA_QUERY, { dataset: 'hospital_drug_list', field: 'ssn', value: 'x' }).ok).toBe(false);
+    expect(validateLocalCommandArgs(LOCAL_AGENT_ACTIONS.DATA_QUERY, { dataset: 'hospital_drug_list', field: 'ingredient', value: 'x', sql: 'x' }).ok).toBe(false);
+  });
+
+  it('Q3. validateDataQueryArgs — 정규화된 사본만 통과하고 등재 밖 컬럼은 거부한다', () => {
+    const ok = validateDataQueryArgs({ dataset: 'hospital_drug_list', field: 'ingredient', value: '  아세트아미노펜  ', columns: ['product_name', 'strength'] });
+    expect(ok.ok).toBe(true);
+    expect(ok.args).toEqual({ dataset: 'hospital_drug_list', field: 'ingredient', value: '아세트아미노펜', columns: ['product_name', 'strength'] });
+    expect(validateDataQueryArgs({ dataset: 'hospital_drug_list', field: 'ingredient', value: 'x', columns: [] }).ok).toBe(false);
+    expect(validateDataQueryArgs(null).ok).toBe(false);
+  });
+
+  it('Q4. pickSafeDataQueryInfo — 등록 필드만 남고, 경로·환자·rowKey 는 통과하지 못한다', () => {
+    const safe = pickSafeDataQueryInfo({
+      dataset: 'hospital_drug_list',
+      field: 'ingredient',
+      match: 'contains',
+      count: 2,
+      rows: [
+        { product_name: '우루사정', ingredient: '우르소데옥시콜산', patient: '홍길동', db_path: 'C:\\x\\local.db' },
+        { product_name: '가나정', strength: 100 }, // number → String
+      ],
+    });
+    expect(safe).toEqual({
+      dataset: 'hospital_drug_list',
+      field: 'ingredient',
+      match: 'contains',
+      count: 2,
+      rows: [
+        { product_name: '우루사정', ingredient: '우르소데옥시콜산' },
+        { product_name: '가나정', strength: '100' },
+      ],
+    });
+    // 등재 밖 dataset/field 는 통과하지 못한다.
+    expect(pickSafeDataQueryInfo({ dataset: 'patients', field: 'ssn' })).toEqual({ rows: [] });
+    // 등록 필드 집합은 7개로 고정(성분·함량·제형·제조사/상품명 + code·status).
+    expect(LOCAL_DATASET_FIELDS.slice().sort()).toEqual(
+      ['code', 'dosage_form', 'ingredient', 'manufacturer', 'product_name', 'status', 'strength'],
+    );
+  });
+
+  it('Q5. 자격 · §10 — 미연결 PC 는 조회 자격이 없고, 실패는 "원내 약품 파일 연결" 안내로 렌더된다', async () => {
+    // 연결 안 된 컨텍스트에서는 데이터 자격이 없어 명령이 나가지 않는다.
+    const r = await executeAiTool(makeDb().dataSource, AI_TOOL_NAMES.DATA_LOCAL_QUERY, { dataset: 'hospital_drug_list', field: 'ingredient', value: 'x' }, ctx({ localAgentStatus: 'none', localDeviceId: undefined }));
+    expect(r).toMatchObject({ ok: false });
+    // §10 — 파일 미연결/미준비는 병동이 알아볼 문장 + [원내 약품 파일 연결] 안내로 렌더된다.
+    const render = (errorCode: string) =>
+      renderToolContext({ ok: true, tool: AI_TOOL_NAMES.DATA_LOCAL_QUERY, data: { available: false, errorCode } }) ?? '';
+    for (const code of [LOCAL_AGENT_ERROR.NO_DEVICE, LOCAL_AGENT_ERROR.OFFLINE, LOCAL_AGENT_ERROR.DATA_DB_NOT_AVAILABLE, LOCAL_AGENT_ERROR.DATA_DB_NOT_READY]) {
+      expect(render(code)).toContain('[원내 약품 파일 연결]');
+    }
   });
 });

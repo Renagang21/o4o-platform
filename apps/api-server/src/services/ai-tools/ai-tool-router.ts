@@ -53,6 +53,7 @@ import {
   pickSafeBrowserInfo,
   pickSafeComputerInfo,
   pickSafeDataInfo,
+  pickSafeDataQueryInfo,
   pickSafeSystemInfo,
   pickSafeWindowInfo,
 } from '../local-agent/local-agent-protocol.js';
@@ -589,6 +590,66 @@ function executeLocalDataSetSetting(
   );
 }
 
+/**
+ * 원내 약품 목록 좁은 조회 (HOSPITAL-DRUG-COMPOSITE §7). dataset·field·value 는 validateToolArguments
+ * 를 통과한 값이고, issueCommand 가 같은 규칙(validateLocalCommandArgs)으로 서버에서 한 번 더 검사한다.
+ *
+ * `executeLocalDataAction` 과 형상은 같지만 응답을 **`pickSafeDataQueryInfo`** 로 거른다 —
+ * 행(rows)을 통과시켜야 하므로 pickSafeDataInfo 가 아니다. 그래도 canonical 필드(LOCAL_DATASET_FIELDS)
+ * 만 남고 파일 경로 · imported 원자료의 임의 컬럼은 이 문을 지나지 못한다(§4 금지: raw row cloud 유입).
+ */
+async function executeLocalDataQuery(
+  dataSource: DataSource,
+  ctx: VerifiedToolContext,
+  args: Record<string, unknown>,
+): Promise<ToolResult> {
+  const tool = AI_TOOL_NAMES.DATA_LOCAL_QUERY;
+  const resolution = await resolveTargetDevice(dataSource, ctx.userId);
+  if (resolution.status !== 'ok') {
+    const errorCode =
+      resolution.status === 'none'
+        ? LOCAL_AGENT_ERROR.NO_DEVICE
+        : resolution.status === 'ambiguous'
+          ? LOCAL_AGENT_ERROR.AMBIGUOUS
+          : LOCAL_AGENT_ERROR.OFFLINE;
+    return { ok: true, tool, data: { available: false, errorCode } };
+  }
+
+  const issued = await issueCommand(dataSource, {
+    userId: ctx.userId,
+    deviceId: resolution.device.id,
+    action: LOCAL_AGENT_ACTIONS.DATA_QUERY,
+    toolName: tool,
+    args,
+  });
+  if (issued.ok === false) {
+    return { ok: true, tool, data: { available: false, errorCode: issued.errorCode } };
+  }
+
+  const result = await awaitCommandResult(dataSource, issued.command.commandId);
+  const safe = pickSafeDataQueryInfo(result.data);
+
+  // §20 안전 로그 — dataset · field · 행 수 · 상태까지만. value 원문 · 행 내용은 남기지 않는다.
+  logger.info('local-agent data query', {
+    tool,
+    status: result.status,
+    errorCode: result.errorCode ?? null,
+    dataset: typeof safe.dataset === 'string' ? safe.dataset : null,
+    field: typeof safe.field === 'string' ? safe.field : null,
+    rowCount: Array.isArray(safe.rows) ? safe.rows.length : 0,
+    deviceId: resolution.device.id,
+  });
+
+  if (result.status !== 'success') {
+    return {
+      ok: true,
+      tool,
+      data: { available: false, errorCode: result.errorCode ?? LOCAL_AGENT_ERROR.EXECUTION_FAILED },
+    };
+  }
+  return { ok: true, tool, data: { available: true, ...safe } };
+}
+
 // ─── Router ──────────────────────────────────────────────────────────────────
 
 /**
@@ -774,6 +835,8 @@ export async function executeAiTool(
       return executeLocalDataHealth(dataSource, ctx);
     case AI_TOOL_NAMES.DATA_GET_LOCAL_META:
       return executeLocalDataGetMeta(dataSource, ctx, String((args as { key: string }).key));
+    case AI_TOOL_NAMES.DATA_LOCAL_QUERY:
+      return executeLocalDataQuery(dataSource, ctx, (args ?? {}) as Record<string, unknown>);
     case AI_TOOL_NAMES.DATA_SET_LOCAL_SETTING: {
       const a = args as { key: string; value: unknown };
       return executeLocalDataSetSetting(dataSource, ctx, String(a.key), a.value);
@@ -1507,6 +1570,9 @@ export function renderToolContext(result: ToolResult): string | null {
   if (result.tool === AI_TOOL_NAMES.DATA_GET_LOCAL_META) {
     return renderDataGetMeta(result.data);
   }
+  if (result.tool === AI_TOOL_NAMES.DATA_LOCAL_QUERY) {
+    return renderDataQuery(result.data);
+  }
   if (result.tool === AI_TOOL_NAMES.DATA_SET_LOCAL_SETTING) {
     return renderDataSetSetting(result.data);
   }
@@ -1591,6 +1657,51 @@ function renderDataGetMeta(data: Record<string, unknown>): string {
   const value = typeof data.value === 'string' ? data.value : null;
   if (value === null) return DATA_HEADER + `- 항목 "${key}" 은(는) 아직 값이 없습니다.`;
   return DATA_HEADER + `- ${key}: ${value}`;
+}
+
+// HOSPITAL-DRUG-COMPOSITE §7 — canonical 원내약 필드의 한국어 라벨. LOCAL_DATASET_FIELDS 와 짝.
+const DATA_QUERY_FIELD_LABELS: Record<string, string> = {
+  product_name: '상품명',
+  ingredient: '성분',
+  strength: '함량',
+  dosage_form: '제형',
+  manufacturer: '제조사',
+  code: '코드',
+  status: '사용여부',
+};
+
+/**
+ * 원내약 조회 결과 문장. §10: 로컬 데이터 미연결이면 파일 연결 안내를, 조회 성공이면 매칭 행 요약을 낸다.
+ * 행 값은 이미 `pickSafeDataQueryInfo` 로 canonical 필드만 남은 상태다 — 경로·원자료는 없다.
+ */
+function renderDataQuery(data: Record<string, unknown>): string {
+  const header = '## 원내 약품 조회\n';
+  if (data.available !== true) {
+    const code = String(data.errorCode ?? '');
+    // §10 — 로컬 데이터 소스가 없거나(미연결) 준비되지 않았을 때는 파일 연결을 안내한다.
+    if (
+      code === LOCAL_AGENT_ERROR.NO_DEVICE ||
+      code === LOCAL_AGENT_ERROR.OFFLINE ||
+      code === LOCAL_AGENT_ERROR.DATA_DB_NOT_AVAILABLE ||
+      code === LOCAL_AGENT_ERROR.DATA_DB_NOT_READY
+    ) {
+      return header + '- 원내 약품 파일이 연결되어 있지 않습니다. [원내 약품 파일 연결]이 필요합니다.';
+    }
+    return renderDataFailure(data);
+  }
+  const rows = Array.isArray(data.rows) ? (data.rows as Record<string, unknown>[]) : [];
+  if (rows.length === 0) {
+    return header + '- 원내 약품 목록에서 일치하는 항목을 찾지 못했습니다.';
+  }
+  const lines = rows.slice(0, 20).map((row) => {
+    const parts: string[] = [];
+    for (const f of ['product_name', 'ingredient', 'strength', 'dosage_form', 'manufacturer']) {
+      const v = row[f];
+      if (typeof v === 'string' && v.length > 0) parts.push(`${DATA_QUERY_FIELD_LABELS[f]} ${v}`);
+    }
+    return `- ${parts.join(' · ') || '(표시 가능한 항목 없음)'}`;
+  });
+  return header + `원내 약품 ${rows.length}건이 확인되었습니다.\n` + lines.join('\n');
 }
 
 function renderDataSetSetting(data: Record<string, unknown>): string {
