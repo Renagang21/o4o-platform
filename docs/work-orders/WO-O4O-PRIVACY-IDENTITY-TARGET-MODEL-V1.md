@@ -276,4 +276,4 @@ Git: `git fetch origin` → `git status -sb` → `node scripts/git/check-staged-
 
 ---
 
-*작성: 2026-09-17 · 상태: DRAFT (핸드오프 · 실행 지시 대기)*
+*작성: 2026-09-17 · 상태: **IR 산출 완료 — 사용자 검토 대기** (2026-09-17) · 산출물: [`IR-O4O-PRIVACY-IDENTITY-TARGET-MODEL-V1`](../investigations/IR-O4O-PRIVACY-IDENTITY-TARGET-MODEL-V1.md) · 정본 승격·구현은 검토 후 별도 WO*
