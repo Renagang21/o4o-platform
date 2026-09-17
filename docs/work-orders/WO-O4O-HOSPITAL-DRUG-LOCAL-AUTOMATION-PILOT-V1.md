@@ -78,6 +78,29 @@ O4O Automation Core
 
 일반 웹페이지의 `<input type=file>` 은 보안상 **실제 Windows 경로를 제공하지 않을 수 있다** — 그러면 "한 번 업로드" 는 되어도 "이후 같은 파일 덮어쓰기 → 변경 감지" 가 불가능하다. 따라서 브라우저가 실제 local path 를 주지 않는 경우, **Local Agent 측 native file picker 또는 기존 local bridge** 로 파일을 선택·바인딩하는 방식을 우선 검토한다. **파일 내용을 Cloud 를 경유시켜 해결하지 않는다.** 이 바인딩이 성립하지 않으면 §7 변경 감지 전체가 불가하므로 PHASE 0 STOP 판단 대상이다.
 
+### 4-A. PHASE 0 조사 결과 · 결정 (2026-09-17, 실제 코드 기준 확정)
+
+**게이트 1 — 무로그인 병동 PC ↔ Local Agent 명령 채널 (결정: 옵션 C)**
+
+실제 코드 확인: 명령을 발행하는 모든 경로가 **인증된 `userId`** 에 3중 고정돼 있다 — 스키마(`local_agent_devices.user_id NOT NULL` · `local_agent_commands.user_id NOT NULL`), 라우트(`/api/ai/work-agent/run` · `/api/ai/request` · 모든 `local.data.*` 가 `authenticate` + `ctx.userId` 필수), 대상 기기 결정(`resolveTargetDevice(userId)`), 설계 원칙("deviceId·userId 는 요청 본문에서 읽지 않고 세션에서 파생"). 브라우저가 직접 닿는 loopback(포트 47821)은 `GET /health` + `POST /pair` 2개뿐이고 `/pair` 조차 로그인 브라우저가 발급받은 user-owned grant 필요.
+
+→ **진짜 익명(세션 없는) 페이지가 Local Agent 를 구동하는 것은 frozen 계약(스키마·route·trust boundary) 완화 없이 불가능**하다. 계약 완화는 파일럿 범위를 크게 넘어가는 STOP 조건이므로 채택하지 않는다.
+
+**확정 = 옵션 C**: 병동 PC **최초 설치/설정 시 1회** 관리자/설치 담당자가 O4O 로그인 + Local Agent pairing 을 수행한다. 이후 병동 일반 사용자는 **회원가입·로그인 절차 없이** 그 PC 의 `원내 약품 안내` 를 사용한다. 시스템은 기존 userId-bound trust boundary 를 **변경하지 않고 그대로** 사용한다("인증이 없는 시스템" 이 아니라 "인증을 설치 시점에만 처리하고 일상 사용에서 감춘다"). 누가 그 PC 를 쓰는지는 구분하지 않는다.
+
+> **Pilot limitation (문서화 필수)**: 이 구조는 파일럿용 현실적 타협이다. 브라우저 로그인 세션 만료 또는 PC 초기화 시 설치 담당자가 다시 로그인/pairing 해야 할 수 있다. 향후 여러 병원 대규모 보급 단계에서 `device identity` 를 사람 계정에서 더 분리할 필요가 있는지는 **그때 별도 검토**한다(지금 계약 완화 없음).
+
+**게이트 2 — Local File Binding (결정: Agent 로컬 바인딩)**
+
+실제 코드 확인: 클라우드가 도달하는 `local.data.*` allowlist 에는 파일 선택/읽기/watch 액션이 없고, 명령 디스패처 `handlers.mjs` 는 `node:fs` 를 import 하지 않는 것이 명시적 불변식이며 프로토콜은 `local.read_file` 류 이름의 사전 생성조차 금지한다. 반면 로컬 파일 읽기(CLI)·SQLite datasets/upsert import·mtime/size 원시 기능은 이미 존재한다. Agent 는 zero-dependency 라 로컬 xlsx 파서는 없다(파서는 cloud 업로드용만).
+
+→ **웹 버튼이 클라우드 명령으로 Agent 파일 선택을 호출하는 방식**(웹버튼 온디맨드)은 `local.file.*` allowlist 신설 + handlers 에 fs 도입 = 계약 완화이므로 채택하지 않는다.
+
+**확정 = Agent 로컬 바인딩**: 파일 선택 · 경로 저장 · import · 변경 감지 · 재import 를 **전부 Local Agent 쪽(로컬 전용 모듈)에서** 처리한다. 파일 선택/연결은 설치·설정 시 로컬에서 수행하고, 이후 Agent 가 같은 경로 파일의 mtime/size 로 변경을 자율 감지해 재import 한다. **웹 페이지는 연결 상태·결과만** 기존 `local.data.*` 읽기로 조회한다. 파일 내용/경로는 Cloud 로 보내지 않는다. `handlers.mjs`(cloud 도달) 는 fs 무접촉 불변식을 유지한다.
+
+- V1 파싱: **기존 CSV 파이프라인을 우선 재사용**한다(필요 시 사용자가 CSV 저장). **XLSX 직접 파싱**은 zero-dep 파괴 리스크가 있으므로 필요성이 확인되면 **후속으로 분리**한다.
+- 신규 저장은 **additive local-db migration**(논리 소스 → bound file path + last mtime/size) 범위 — Local SQLite 신규 테이블은 상위 WO 승인 경계 내 additive 만.
+
 ## 5. 화면 (`/hospital-drug`)
 
 일반 Neture 홈을 그대로 보여주지 않는다. 매우 단순한 업무 화면으로 만든다.
