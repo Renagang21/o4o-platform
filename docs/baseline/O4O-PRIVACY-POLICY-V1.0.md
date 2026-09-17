@@ -2,7 +2,7 @@
 > **런타임 SSOT**: 게시 본문의 실제 공개 출처는 `service_policy_documents`(document_type=`privacy`, status=`published`) 이며 각 서비스 `/privacy` 는 그 API 만 읽는다. 이 파일은 등록·게시에 사용하는 **원문 사본**이다 — 본문 변경은 이 파일 개정 → `service_policy_documents` 신규 version 게시 순으로 한다(코드 하드코딩 금지).
 > **보유기간 근거**: [`O4O-PRIVACY-DATA-RETENTION-POLICY-V1`](O4O-PRIVACY-DATA-RETENTION-POLICY-V1.md) §15 (본문 제2조·제7조 기간은 그 표를 옮긴 것 · 여기서 바꾸지 않는다)
 > **개인정보 보호책임자**: 서철환(대표이사) — 2026-09-17 사용자 확정. 활성 4 서비스 `service_legal_profiles.privacy_officer_name` 과 동일해야 한다(Footer 는 그 값을 자동 반영).
-> **적용 서비스**: Neture · KPA Society · K-Cosmetics · PharmacyHub (GlycoPharm 제외)
+> **적용 서비스**: Neture · KPA Society · K-Cosmetics · PharmacyHub
 > **게시 WO**: `WO-O4O-PRIVACY-POLICY-V1-PUBLISH-V1` (예정 — `service_policy_documents` 등록·게시 + 4 서비스 `/privacy` 검증)
 
 # 개인정보 처리방침

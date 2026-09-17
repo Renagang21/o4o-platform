@@ -71,7 +71,7 @@ Phase 1 IR (매핑 완료) → 본 WO: D1~D7 결정 마감 → 정본 승격 WO 
 
 ```text
 Credential   = 현재 자격 상태 (예: credential.pharmacist.status)
-Role         = 서비스 권한 할당 기록 (role_assignments · 예: glycopharm:store_owner)
+Role         = 서비스 권한 할당 기록 (role_assignments · 예: kpa-society:store_owner)
 Relationship = 사업자/매장/조직 소속 (organization_members · branch_memberships)
 
 실제 접근 허용 = Role 존재 + 필요 Credential 조건 충족 + 필요 Relationship 조건 충족
