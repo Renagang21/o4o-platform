@@ -12,6 +12,7 @@
 - 다른 활성 Store 서비스가 같은 organization을 사용하는 동안 organization-shared 데이터는 삭제하지 않는다.
 - GCS 삭제 실패는 성공으로 간주하지 않는다. case는 `failed / PURGE_INCOMPLETE` 상태로 남고 hourly job이 재시도한다.
 - 실제 운영 매장 purge 전에는 반드시 `purge-preview`를 확인한다.
+- scheduler는 실삭제를 수행하지 않는다. 파기는 admin의 명시적 `mode=apply`만 허용한다.
 
 ## 2. API
 
@@ -76,7 +77,7 @@
 { "mode": "apply" }
 ```
 
-hourly job도 기한이 도래한 `terminated/failed` case를 자동 재시도한다.
+hourly job은 7일 기한 도래/초과 건수를 감지·경고만 한다. 실제 purge는 운영자가 dry-run을 확인한 뒤 `mode=apply`로 명시 실행한다. 실패한 `PURGE_INCOMPLETE` 건도 같은 절차로 재시도한다.
 
 ## 3. GCS
 
