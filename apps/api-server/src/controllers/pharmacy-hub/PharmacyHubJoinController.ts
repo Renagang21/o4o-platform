@@ -90,9 +90,13 @@ function validateMinimalProfile(body: Record<string, any>, roleType: AllowedRole
   if (!filled(body.name) && !(filled(body.lastName) && filled(body.firstName))) missing.push('name');
   if (digits(body.phone) < 9) missing.push('phone');
 
-  // 약국명 — 기존 businessName 축 재사용 (companyName fallback). 약국 경영자 전용 항목.
-  if (roleType === 'store_owner' && !filled(body.businessName) && !filled(body.companyName)) {
-    missing.push('businessName');
+  // 매장 경영자 계약 §5 / WO §4: Store Workspace 활성 전 최소 사업자정보 5항목.
+  if (roleType === 'store_owner') {
+    if (!filled(body.businessName) && !filled(body.companyName)) missing.push('businessName');
+    if (!filled(body.representativeName) && !filled(body.ceoName)) missing.push('representativeName');
+    if (!filled(body.businessNumber)) missing.push('businessNumber');
+    if (!filled(body.businessAddress) && !filled(body.address1)) missing.push('businessAddress');
+    if (digits(body.businessPhone) < 9) missing.push('businessPhone');
   }
   return missing;
 }
