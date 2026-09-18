@@ -183,6 +183,12 @@ export interface UnifiedRequestInput {
   runId?: string;
   /** confirm 응답에 사용자가 "진행" 으로 답했을 때만. UI 모드가 아니다. */
   routeHint?: 'work';
+  /**
+   * 요청이 온 화면(surface). 서버는 이 값이 'hospital-drug' 일 때만 원내약+약학정보원 결합(composite)
+   * 경계를 연다 — 전역 Router 는 병원 특수 규칙을 갖지 않는다
+   * (WO-O4O-HOSPITAL-DRUG-GOAL-DRIVEN-AI-COMPOSER-REALIGNMENT-V1 §16). 일반 홈 Composer 는 보내지 않는다.
+   */
+  surface?: 'hospital-drug';
 }
 
 /**
@@ -206,6 +212,7 @@ export async function sendUnifiedRequest(input: UnifiedRequestInput): Promise<Un
       ...(attachments.length > 0 ? { attachments } : {}),
       ...(input.runId ? { runId: input.runId } : {}),
       ...(input.routeHint ? { routeHint: input.routeHint } : {}),
+      ...(input.surface ? { surface: input.surface } : {}),
       workScope: toHomeChatScope(input.workScope),
     });
     const data = res?.data?.data as UnifiedRequestResult | undefined;

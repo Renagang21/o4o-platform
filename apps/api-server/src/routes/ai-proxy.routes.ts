@@ -55,7 +55,7 @@ import {
   type UnifiedAttachment,
 } from '../services/ai-tools/unified-request-contract.js';
 import { classifyUnifiedRequest, confirmWorkMessage } from '../services/ai-tools/unified-request-router.js';
-import { runHospitalDrugComposite } from '../services/ai-tools/hospital-drug-composite.js';
+import { runHospitalDrugComposite, isCompositeHospitalDrugRequest } from '../services/ai-tools/hospital-drug-composite.js';
 import { readAttachments, renderAttachmentTextBlocks } from '../services/ai-tools/attachment-reader.js';
 import { executeMultimodalChat } from '../services/ai-tools/multimodal-chat.js';
 import { resolveWorkScopeStore, STORE_SCOPED_WORKSPACES } from '../utils/work-scope-store-resolution.js';
@@ -2304,6 +2304,24 @@ router.post('/request', authenticate, dynamicLimiter('free'), async (req, res: R
 
   const runId = typeof body.runId === 'string' && body.runId.length > 0 ? body.runId : undefined;
   const routeHint = body.routeHint === 'work' ? 'work' : undefined;
+
+  // /hospital-drug 전용 경계 — 이 화면(surface)에서 온 원내약+약학정보원 결합 요청만 composite 로 분해한다.
+  // 전역 Router 는 병원 특수 규칙을 갖지 않는다: composite 결정은 오직 여기(HTTP 계층 · surface 명시)에서만 내려
+  // 메인 자동화(홈 Composer)로 새지 않는다 (WO-O4O-HOSPITAL-DRUG-GOAL-DRIVEN-AI-COMPOSER-REALIGNMENT-V1 §16).
+  // runId 재개는 composite 보다 우선한다(같은-run Work resume).
+  if (!runId && body.surface === 'hospital-drug' && isCompositeHospitalDrugRequest(text)) {
+    logger.info('ai unified request routed', {
+      userId,
+      route: 'composite',
+      reason: 'hospital_drug_composite',
+      targetType: null,
+      attachmentCount: attachments.length,
+    });
+    const reply = await performHospitalDrugComposite(userId, { text, workScope: body.workScope });
+    if (reply.status !== 200) return res.status(reply.status).json(reply.body);
+    return res.json({ success: true, data: { kind: 'composite', route: 'composite', reason: 'hospital_drug_composite', composite: reply.body.data } });
+  }
+
   const decision = classifyUnifiedRequest(text, {
     runId,
     routeHint,
@@ -2330,12 +2348,6 @@ router.post('/request', authenticate, dynamicLimiter('free'), async (req, res: R
         },
       },
     });
-  }
-
-  if (decision.route === 'composite') {
-    const reply = await performHospitalDrugComposite(userId, { text, workScope: body.workScope });
-    if (reply.status !== 200) return res.status(reply.status).json(reply.body);
-    return res.json({ success: true, data: { kind: 'composite', route: decision.route, reason: decision.reason, composite: reply.body.data } });
   }
 
   if (decision.route === 'work') {

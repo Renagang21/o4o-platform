@@ -40,12 +40,20 @@ describe('unified request router — 경로 판정', () => {
     }
   });
 
-  // WO-O4O-HOSPITAL-DRUG-COMPOSITE-QUERY-ORCHESTRATION-V1 §9 — "동일성분" 결합 요청은 이제 raw browser work 이
-  // 아니라 composite(web+local 내부 분해 → 하나의 답)로 간다. 아래 두 테스트가 그 경계를 고정한다.
-  it('WO §9 동일성분 결합 요청 — "약학정보원에서 우루사정 동일성분 찾아줘" → composite (§13-A)', () => {
+  // WO-O4O-HOSPITAL-DRUG-GOAL-DRIVEN-AI-COMPOSER-REALIGNMENT-V1 §16 — 전역 Router 는 병원 특수 규칙(composite)을
+  // 갖지 않는다. '동일성분/원내' 문장도 일반 규칙으로만 판정한다 — composite 경계는 ai-proxy 가 surface='hospital-drug'
+  // 로만 연다(unified-request-http.spec.ts 가 그 계층을 덮는다).
+  it('WO §16 전역 Router 는 composite 를 내지 않는다 — 등재 사이트 위 업무어는 그냥 work', () => {
     const d = classifyUnifiedRequest('약학정보원에서 우루사정 동일성분 찾아줘.');
-    expect(d.route).toBe('composite');
-    expect(d.reason).toBe('hospital_drug_composite');
+    expect(d.route).toBe('work');
+    expect(d.reason).toBe('task_intent');
+    expect(d.target).toEqual(expect.objectContaining({ targetType: 'browser_site', targetId: 'healthkr' }));
+  });
+
+  it('WO §16 등재 대상 없는 원내 문장은 composite 가 아니라 chat 으로 떨어진다', () => {
+    const d = classifyUnifiedRequest('원내에 우루사정 200mg 있어?');
+    expect(d.route).toBe('chat');
+    expect(d.reason).toBe('no_registered_target');
   });
 
   it('WO §13 웹 작업 — 등재 사이트 위 일반 검색 업무(결합 아님) → work (browser_site healthkr)', () => {

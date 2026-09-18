@@ -27,10 +27,11 @@ import {
   extractStrength,
   mentionsHospital,
   mentionsSameIngredient,
+  isCompositeHospitalDrugRequest,
   type CompositeToolExecutor,
   type CompositeToolResult,
 } from '../services/ai-tools/hospital-drug-composite.js';
-import { isCompositeHospitalDrugRequest, classifyUnifiedRequest } from '../services/ai-tools/unified-request-router.js';
+import { classifyUnifiedRequest } from '../services/ai-tools/unified-request-router.js';
 
 // ─── 가짜 executor 빌더 ───────────────────────────────────────────────────────
 
@@ -85,7 +86,10 @@ describe('hospital-drug composite — 문장 파싱', () => {
   });
 });
 
-describe('unified router — composite 분기(§9)', () => {
+// composite 경계 판정은 이제 hospital-drug-composite 모듈이 소유한다(전역 Router 가 아니다).
+// 어느 요청을 composite 로 볼지의 경계(surface='hospital-drug')는 ai-proxy HTTP 계층이 건다 —
+// unified-request-http.spec.ts 가 그 계층을 덮는다(WO-...-GOAL-DRIVEN-AI-COMPOSER-REALIGNMENT-V1 §16).
+describe('composite 경계 술어 · 전역 Router 격리(§16)', () => {
   test('isCompositeHospitalDrugRequest — A·B 는 composite, 제품 없음/일반은 아님', () => {
     expect(isCompositeHospitalDrugRequest(A)).toBe(true);
     expect(isCompositeHospitalDrugRequest(B)).toBe(true);
@@ -93,13 +97,13 @@ describe('unified router — composite 분기(§9)', () => {
     expect(isCompositeHospitalDrugRequest('안녕하세요')).toBe(false);
   });
 
-  test('classifyUnifiedRequest — 등재 대상 없어도 composite 로(§13-B)', () => {
+  test('전역 Router 는 composite 를 내지 않는다 — 등재 대상 없는 원내 문장은 chat', () => {
     const d = classifyUnifiedRequest(B);
-    expect(d.route).toBe('composite');
-    expect(d.reason).toBe('hospital_drug_composite');
+    expect(d.route).toBe('chat');
+    expect(d.reason).toBe('no_registered_target');
   });
 
-  test('runId 재개는 composite 보다 우선(Work resume)', () => {
+  test('runId 재개는 그대로 Work resume', () => {
     const d = classifyUnifiedRequest(B, { runId: 'run-1' });
     expect(d.route).toBe('work');
     expect(d.reason).toBe('resume');

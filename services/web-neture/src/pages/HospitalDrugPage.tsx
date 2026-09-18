@@ -39,7 +39,7 @@ import {
 const EXAMPLE_QUERIES: readonly string[] = [
   '타이레놀정 재고와 가격 알려줘',
   '아목시실린 원내 보유 여부 확인해줘',
-  '리피토정 동일성분 의약품 약학정보원에서 찾아줘',
+  '리피토정과 동일성분 의약품 찾아줘',
 ];
 
 type AgentStatus =
@@ -126,7 +126,8 @@ export default function HospitalDrugPage() {
       setWorkResult(null);
       setConfirm(null);
       try {
-        const result = await sendUnifiedRequest({ text, attachments: [], workScope, routeHint });
+        // surface='hospital-drug' — 이 화면에서만 원내약+약학정보원 결합(composite) 경계가 열린다(§16).
+        const result = await sendUnifiedRequest({ text, attachments: [], workScope, routeHint, surface: 'hospital-drug' });
         if (result.kind === 'confirm') {
           // 실행하지 않았다. [진행] 을 기다린다.
           setConfirm({ text, message: result.confirm.message });

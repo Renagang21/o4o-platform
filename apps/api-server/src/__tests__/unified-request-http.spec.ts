@@ -4,7 +4,8 @@
  * DB · provider · Local Agent 는 전부 주입한다. 고정하려는 것:
  *   ①  text-only 일반 질문      → kind=chat, home-chat 본체(execute) 1회, Work Agent 미호출
  *   ②  text-only 웹 작업 요청   → kind=work, Work Agent 본체 1회, execute 미호출 · 응답에 runId/resumable 통과
- *   ②-b text-only 결합 요청(§9) → kind=composite, 결합 오케스트레이터 1회, Work/chat 미호출
+ *   ②-b text-only 결합 요청(§9) + surface=hospital-drug → kind=composite, 결합 오케스트레이터 1회, Work/chat 미호출
+ *   ②-c 같은 결합 문장이라도 surface 없으면 composite 아님(전역 Router 오염 제거 · 메인 자동화 격리)
  *   ③  image + 질문(대상 없음)  → kind=chat, Gemini inline 경로(fetch)로 이미지가 실린다
  *   ④  PDF/XLSX + 질문          → kind=chat, 첨부 사실이 응답 data.chat.attachments 에 (내용 없이) 온다
  *   ⑤  첨부 없이 Work intent    → kind=work
@@ -57,8 +58,9 @@ jest.mock('../services/ai-tools/work-agent-runtime.js', () => ({
 // ai-proxy.service 는 DB entity 를 끌고 온다 — 이 spec 이 쓰는 두 경로는 그것을 쓰지 않는다.
 jest.mock('../services/ai-proxy.service.js', () => ({ aiProxyService: {} }));
 jest.mock('../services/ai-model-registry.service.js', () => ({ isGeminiModelAllowedSync: () => true }));
-// 결합 오케스트레이션 본체만 갈아끼운다 — 분류기가 쓰는 extractProduct/mentionsHospital/mentionsSameIngredient 는
-// 실제 구현을 그대로 둬야 라우팅이 유지된다(WO §9). 세부 단계는 hospital-drug-composite.spec.ts 가 덮는다.
+// 결합 오케스트레이션 본체만 갈아끼운다 — surface 게이트가 쓰는 isCompositeHospitalDrugRequest(및 그 안의
+// extractProduct/mentionsHospital/mentionsSameIngredient)는 실제 구현을 그대로 둬야 경계가 유지된다.
+// 세부 단계는 hospital-drug-composite.spec.ts 가 덮는다.
 jest.mock('../services/ai-tools/hospital-drug-composite.js', () => {
   const actual = jest.requireActual('../services/ai-tools/hospital-drug-composite.js');
   return { ...actual, runHospitalDrugComposite: (...a: unknown[]) => runCompositeMock(...a) };
@@ -151,10 +153,10 @@ describe('POST /api/ai/request', () => {
     expect(input.image).toBeUndefined();
   });
 
-  // WO-O4O-HOSPITAL-DRUG-COMPOSITE-QUERY-ORCHESTRATION-V1 §9 — "동일성분" 결합 요청은 composite 로 가고,
-  // 하나의 답(kind=composite)으로 돌아온다. Work Agent · home-chat 본체는 타지 않는다.
-  it('②-b text-only 결합 요청("동일성분") → composite (한 요청 · 하나의 답 · Work/chat 미호출)', async () => {
-    const r = await request(app).post('/api/ai/request').send({ text: '우루사정 200mg과 같은 성분의 원내약 있어?' });
+  // WO-O4O-HOSPITAL-DRUG-GOAL-DRIVEN-AI-COMPOSER-REALIGNMENT-V1 §16 — composite 경계는 오직 이 화면(surface)에서만
+  // 열린다. surface='hospital-drug' 결합 요청은 하나의 답(kind=composite)으로 돌아오고 Work/chat 본체는 타지 않는다.
+  it('②-b text-only 결합 요청("동일성분") + surface=hospital-drug → composite (한 요청 · 하나의 답 · Work/chat 미호출)', async () => {
+    const r = await request(app).post('/api/ai/request').send({ text: '우루사정 200mg과 같은 성분의 원내약 있어?', surface: 'hospital-drug' });
     expect(r.status).toBe(200);
     expect(r.body.data.kind).toBe('composite');
     expect(r.body.data.reason).toBe('hospital_drug_composite');
@@ -164,6 +166,18 @@ describe('POST /api/ai/request', () => {
     expect(runCompositeMock).toHaveBeenCalledTimes(1);
     expect(runWorkAgentMock).not.toHaveBeenCalled();
     expect(executeMock).not.toHaveBeenCalled();
+  });
+
+  // §16 — 전역 Router 는 병원 특수 규칙을 갖지 않는다. surface 가 없으면(메인 홈 Composer) 같은 결합 문장도
+  // composite 로 가지 않는다 — 등재 대상·업무어가 없어 일반 chat 으로 떨어지고, 결합 오케스트레이터는 호출되지 않는다.
+  it('②-c 같은 결합 문장이라도 surface 가 없으면 composite 로 라우팅되지 않는다(오염 제거)', async () => {
+    const r = await request(app).post('/api/ai/request').send({ text: '우루사정 200mg과 같은 성분의 원내약 있어?' });
+    // 전역 Router 에 병원 규칙이 없다 — 결합 오케스트레이터는 호출되지 않고 composite 로 응답하지 않는다.
+    expect(runCompositeMock).not.toHaveBeenCalled();
+    expect(r.body?.data?.kind).not.toBe('composite');
+    // 라우팅 판정 로그가 composite 가 아님을 직접 확인한다(홈 Composer 로 새지 않는다 · §16).
+    const routed = logInfo.mock.calls.find((c) => c[0] === 'ai unified request routed');
+    expect(routed?.[1]?.route).not.toBe('composite');
   });
 
   it('③ image + 질문(대상 없음) → chat · Gemini inline 경로에 이미지가 실린다', async () => {

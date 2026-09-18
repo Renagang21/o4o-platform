@@ -104,6 +104,18 @@ export function extractStrength(message: string): string | null {
   return m ? `${m[1]}${m[2].toLowerCase()}` : null;
 }
 
+/**
+ * 원내약 + 약학정보원 **결합 요청**인가(WO-O4O-HOSPITAL-DRUG-COMPOSITE-QUERY-ORCHESTRATION-V1 §9).
+ *   제품 토큰이 있고, "원내"(원내 보유 조회) 또는 "동일성분"(성분 결합) 지시가 있을 때.
+ *   composite 가부는 이 술어로 보되, **어느 요청을 composite 로 볼지의 경계는 호출측(ai-proxy)이
+ *   `surface==='hospital-drug'` 로 명시적으로 건다.** 전역 Router 는 병원 특수 규칙을 갖지 않는다
+ *   (WO-O4O-HOSPITAL-DRUG-GOAL-DRIVEN-AI-COMPOSER-REALIGNMENT-V1 §16 — Source 가 아니라 Context 를 고정).
+ */
+export function isCompositeHospitalDrugRequest(message: string): boolean {
+  if (!extractProduct(message)) return false;
+  return mentionsHospital(message) || mentionsSameIngredient(message);
+}
+
 // ─── 계획 판정 (§2·§9) ────────────────────────────────────────────────────────
 
 /**
