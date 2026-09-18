@@ -328,3 +328,157 @@ describe('Provider structural checks', () => {
     ).rejects.toThrow('OPENAI_API_KEY');
   });
 });
+
+// ─────────────────────────────────────────────────────
+// 6. Gemini Web Research (grounding) — Capability A
+//    WO-O4O-COMMON-AUTOMATION-CORE-CAPABILITY-A-GEMINI-WEB-RESEARCH-V1
+// ─────────────────────────────────────────────────────
+
+describe('Gemini grounding (Web Research capability)', () => {
+  const realFetch = global.fetch;
+  let captured: { url: string; body: any } | null = null;
+
+  function mockFetch(responseJson: any) {
+    captured = null;
+    global.fetch = (async (url: any, init: any) => {
+      captured = { url: String(url), body: JSON.parse(init.body) };
+      return {
+        ok: true,
+        status: 200,
+        json: async () => responseJson,
+        text: async () => JSON.stringify(responseJson),
+      } as any;
+    }) as any;
+  }
+
+  afterEach(() => {
+    global.fetch = realFetch;
+    captured = null;
+  });
+
+  function newProvider() {
+    const { GeminiProvider } = require('@o4o/ai-core');
+    return new GeminiProvider();
+  }
+
+  // ① grounding=true → tools:[{google_search:{}}] 존재 · responseMimeType 부재(text 경로)
+  it('grounding=true adds google_search tool and drops responseMimeType', async () => {
+    mockFetch({
+      candidates: [{ content: { parts: [{ text: '근거 있는 답변입니다.' }] } }],
+      usageMetadata: { promptTokenCount: 10, candidatesTokenCount: 20 },
+    });
+    const provider = newProvider();
+    await provider.complete('sys', 'user', {
+      apiKey: 'k', model: 'gemini-2.5-flash', grounding: true, responseMode: 'text',
+    });
+    expect(captured!.body.tools).toEqual([{ google_search: {} }]);
+    expect(captured!.body.generationConfig.responseMimeType).toBeUndefined();
+  });
+
+  // ② groundingMetadata → response.grounding.{used,queries,sources} 정규화
+  it('parses groundingMetadata into response.grounding', async () => {
+    mockFetch({
+      candidates: [{
+        content: { parts: [{ text: '답변' }] },
+        groundingMetadata: {
+          webSearchQueries: ['우루사정 성분'],
+          groundingChunks: [
+            { web: { uri: 'https://example.com/a', title: 'A' } },
+            { web: { uri: '', title: '빈-uri' } },
+          ],
+        },
+      }],
+      usageMetadata: { promptTokenCount: 5, candidatesTokenCount: 8 },
+    });
+    const provider = newProvider();
+    const r = await provider.complete('sys', 'user', {
+      apiKey: 'k', model: 'gemini-2.5-flash', grounding: true, responseMode: 'text',
+    });
+    expect(r.grounding).toBeDefined();
+    expect(r.grounding.used).toBe(true);
+    expect(r.grounding.queries).toEqual(['우루사정 성분']);
+    // 빈 uri 출처는 제거된다
+    expect(r.grounding.sources).toEqual([{ uri: 'https://example.com/a', title: 'A' }]);
+  });
+
+  // ③ groundingMetadata 부재 → used:false (grounded 로 간주하지 않음)
+  it('reports used:false when no groundingMetadata present', async () => {
+    mockFetch({
+      candidates: [{ content: { parts: [{ text: '답변' }] } }],
+      usageMetadata: { promptTokenCount: 5, candidatesTokenCount: 8 },
+    });
+    const provider = newProvider();
+    const r = await provider.complete('sys', 'user', {
+      apiKey: 'k', model: 'gemini-2.5-flash', grounding: true, responseMode: 'text',
+    });
+    expect(r.grounding.used).toBe(false);
+    expect(r.grounding.sources).toEqual([]);
+  });
+
+  // ④ 회귀 가드 — grounding 미지정 호출 body 는 종전과 동일
+  it('non-grounded call keeps JSON mode and adds no tools (regression guard)', async () => {
+    mockFetch({
+      candidates: [{ content: { parts: [{ text: '{"summary":"ok","confidenceScore":0.5}' }] } }],
+      usageMetadata: { promptTokenCount: 3, candidatesTokenCount: 4 },
+    });
+    const provider = newProvider();
+    const r = await provider.complete('sys', 'user', { apiKey: 'k', model: 'gemini-2.5-flash' });
+    expect(captured!.body.generationConfig.responseMimeType).toBe('application/json');
+    expect(captured!.body.tools).toBeUndefined();
+    expect(r.grounding).toBeUndefined();
+  });
+
+  // ⑤ 명시 responseMode:'json' + grounding → INVALID_ARGUMENT
+  it('rejects explicit json responseMode combined with grounding', async () => {
+    mockFetch({ candidates: [{ content: { parts: [{ text: 'x' }] } }] });
+    const provider = newProvider();
+    await expect(
+      provider.complete('sys', 'user', {
+        apiKey: 'k', model: 'gemini-2.5-flash', grounding: true, responseMode: 'json',
+      }),
+    ).rejects.toThrow('INVALID_ARGUMENT');
+  });
+});
+
+describe('execute() grounding routing', () => {
+  const realFetch = global.fetch;
+  afterEach(() => { global.fetch = realFetch; });
+
+  it('execute rejects grounding on non-gemini provider', async () => {
+    const { execute } = require('@o4o/ai-core');
+    await expect(
+      execute({
+        systemPrompt: 'sys', userPrompt: 'user', provider: 'openai', grounding: true,
+        config: { apiKey: 'k', model: 'gpt-4o-mini' },
+      }),
+    ).rejects.toThrow('INVALID_ARGUMENT');
+  });
+
+  it('execute defaults grounding to text path and returns grounding metadata', async () => {
+    let capturedBody: any = null;
+    global.fetch = (async (_url: any, init: any) => {
+      capturedBody = JSON.parse(init.body);
+      return {
+        ok: true, status: 200,
+        json: async () => ({
+          candidates: [{
+            content: { parts: [{ text: '자유 텍스트 답변' }] },
+            groundingMetadata: { webSearchQueries: ['q'], groundingChunks: [{ web: { uri: 'https://e.com', title: 'E' } }] },
+          }],
+          usageMetadata: { promptTokenCount: 1, candidatesTokenCount: 2 },
+        }),
+        text: async () => '',
+      } as any;
+    }) as any;
+    const { execute } = require('@o4o/ai-core');
+    const r = await execute({
+      systemPrompt: 'sys', userPrompt: 'user', provider: 'gemini', grounding: true,
+      config: { apiKey: 'k', model: 'gemini-2.5-flash' },
+    });
+    // text 경로로 분리 — JSON 강제 없음
+    expect(capturedBody.generationConfig.responseMimeType).toBeUndefined();
+    expect(capturedBody.tools).toEqual([{ google_search: {} }]);
+    expect(r.grounding.used).toBe(true);
+    expect(r.grounding.queries).toEqual(['q']);
+  });
+});

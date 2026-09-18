@@ -99,6 +99,12 @@ export interface AIProviderConfig {
   responseMode?: 'json' | 'text';
   /** Provider 타임아웃 override (ms) */
   timeoutMs?: number;
+  /**
+   * true 면 Gemini 네이티브 Google Search grounding 활성화(범용 Web Research capability).
+   * 명시하지 않으면(undefined/false) 기존 동작 그대로 — grounding 미사용.
+   * grounding 은 text 응답 경로에서만 동작한다(JSON 강제와 병용 불가). gemini provider 전용.
+   */
+  grounding?: boolean;
 }
 
 /** Provider adapter — all LLM backends implement this */
@@ -113,11 +119,27 @@ export interface AIProvider {
   ): Promise<AIProviderResponse>;
 }
 
+/**
+ * Web Research(grounding) 근거 메타데이터 — grounding 요청에서만 채워진다(additive).
+ * `used` 는 응답에 실제 groundingMetadata 가 있었는지를 정직하게 반영한다 —
+ * false 면 모델이 검색을 수행하지 않은 것이므로 grounded research 로 간주하면 안 된다.
+ */
+export interface AIGroundingMetadata {
+  /** 모델이 실제로 검색 도구를 사용했는가(groundingMetadata 존재 여부) */
+  used: boolean;
+  /** 모델이 실행한 검색 질의 */
+  queries: string[];
+  /** 인용 출처 */
+  sources: Array<{ uri: string; title?: string }>;
+}
+
 export interface AIProviderResponse {
   content: string;
   model: string;
   promptTokens: number;
   completionTokens: number;
+  /** grounding 요청 시 근거 메타데이터(additive · 비-grounding 응답에는 없음) */
+  grounding?: AIGroundingMetadata;
 }
 
 // ── Streaming Support (WO-O4O-AI-STREAMING-SSE-IMPLEMENTATION-V1) ──

@@ -14,7 +14,7 @@
  * 5. 10초 타임아웃 (execute 기본, streaming은 config.timeoutMs 사용)
  */
 
-import type { AIProviderConfig, AIProviderResponse, AIStreamChunk, AIStreamProvider } from '../types.js';
+import type { AIGroundingMetadata, AIProviderConfig, AIProviderResponse, AIStreamChunk, AIStreamProvider } from '../types.js';
 
 const GEMINI_API_BASE = 'https://generativelanguage.googleapis.com/v1beta/models';
 const REQUEST_TIMEOUT_MS = 10_000;
@@ -24,6 +24,11 @@ interface GeminiAPIResponse {
   candidates?: Array<{
     content?: {
       parts?: Array<{ text?: string }>;
+    };
+    /** Grounding with Google Search 메타데이터 (grounding 요청 시에만 존재) */
+    groundingMetadata?: {
+      webSearchQueries?: string[];
+      groundingChunks?: Array<{ web?: { uri?: string; title?: string } }>;
     };
   }>;
   usageMetadata?: {
@@ -54,6 +59,19 @@ export class GeminiProvider implements AIStreamProvider {
     const model = config.model || 'gemini-2.5-flash';
     const url = `${GEMINI_API_BASE}/${model}:generateContent?key=${config.apiKey}`;
 
+    // ── Grounding (범용 Web Research) ──
+    // grounding 은 Google Search tool 사용을 요구하며, JSON 강제(responseMimeType)와 병용할 수 없다.
+    // 명시적으로 'json' 을 요청하면서 grounding 을 켜는 것은 계약 위반이므로 즉시 거부한다(금지).
+    // 그 외에는 grounding = text 경로로 분리한다(명시적 분리).
+    const useGrounding = config.grounding === true;
+    if (useGrounding && config.responseMode === 'json') {
+      throw new Error(
+        "INVALID_ARGUMENT: grounding cannot combine with responseMode 'json' — use responseMode 'text'",
+      );
+    }
+    // grounding 이면 응답 파싱·body 모두 text 경로로 취급한다.
+    const effectiveMode: 'json' | 'text' | undefined = useGrounding ? 'text' : config.responseMode;
+
     const body = {
       system_instruction: {
         parts: [{ text: systemPrompt }],
@@ -64,18 +82,18 @@ export class GeminiProvider implements AIStreamProvider {
       generationConfig: {
         temperature: config.temperature ?? 0.3,
         maxOutputTokens: config.maxTokens ?? 2048,
-        ...(config.responseMode !== 'text' ? { responseMimeType: 'application/json' } : {}),
+        ...(effectiveMode !== 'text' ? { responseMimeType: 'application/json' } : {}),
       },
+      ...(useGrounding ? { tools: [{ google_search: {} }] } : {}),
     };
 
     // Attempt with retry on parse failure
     let lastError: Error | null = null;
-    const responseMode = config.responseMode;
 
     for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
       try {
         const data = await this.callAPI(url, body, config.timeoutMs);
-        return this.parseResponse(data, model, responseMode);
+        return this.parseResponse(data, model, effectiveMode, useGrounding);
       } catch (error) {
         lastError = error instanceof Error ? error : new Error(String(error));
 
@@ -236,7 +254,12 @@ export class GeminiProvider implements AIStreamProvider {
     }
   }
 
-  private parseResponse(data: GeminiAPIResponse, model: string, responseMode?: string): AIProviderResponse {
+  private parseResponse(
+    data: GeminiAPIResponse,
+    model: string,
+    responseMode?: string,
+    grounding?: boolean,
+  ): AIProviderResponse {
     // Check for API-level error
     if (data.error) {
       throw new Error(`Gemini API error: ${data.error.message} (${data.error.status})`);
@@ -257,11 +280,28 @@ export class GeminiProvider implements AIStreamProvider {
       }
     }
 
-    return {
+    const response: AIProviderResponse = {
       content,
       model,
       promptTokens: data.usageMetadata?.promptTokenCount ?? 0,
       completionTokens: data.usageMetadata?.candidatesTokenCount ?? 0,
     };
+
+    // Grounding metadata (additive) — grounding 요청 시에만 채운다.
+    // groundingMetadata 가 실제로 없으면 used:false 로 정직하게 반영한다
+    // (citation 없는 응답을 grounded research 로 간주하지 않는다).
+    if (grounding) {
+      const gm = data.candidates?.[0]?.groundingMetadata;
+      const meta: AIGroundingMetadata = {
+        used: !!gm,
+        queries: gm?.webSearchQueries ?? [],
+        sources: (gm?.groundingChunks ?? [])
+          .map((c) => ({ uri: c.web?.uri ?? '', title: c.web?.title }))
+          .filter((s) => s.uri.length > 0),
+      };
+      response.grounding = meta;
+    }
+
+    return response;
   }
 }
