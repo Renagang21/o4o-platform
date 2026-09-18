@@ -134,6 +134,10 @@ function runQuery(sql: string, params: any[] = []): any {
     }
     return driverShape(s, rows.map((k) => ({ user_id: k.user_id })));
   }
+  // WO-O4O-STORE-OWNER-AGREEMENT-PUBLISH-PREREQUISITES-V1 §4: 승인 직전 사업자정보 5항목 재검증
+  if (has(s, 'SELECT "businessInfo" FROM users')) {
+    return driverShape(s, db.users.filter((u) => u.id === params[0]).map((u) => ({ businessInfo: u.businessInfo ?? null })));
+  }
   if (has(s, 'SELECT 1 FROM kpa_members')) {
     return driverShape(s, db.kpaMembers.filter((k) => k.user_id === params[0]).map(() => ({ '?column?': 1 })));
   }
@@ -174,9 +178,17 @@ jest.mock('../../../utils/logger.js', () => ({
   default: { info: jest.fn(), warn: jest.fn(), error: jest.fn() },
 }));
 
-import { MembershipApprovalService } from '../MembershipApprovalService.js';
+import { MembershipApprovalService, StoreOwnerBusinessInfoRequiredError } from '../MembershipApprovalService.js';
 
 const service = new MembershipApprovalService();
+
+const COMPLETE_BUSINESS_INFO = {
+  businessName: '테스트약국',
+  representativeName: '홍길동',
+  businessNumber: '123-45-67890',
+  businessAddress: '서울시 강남구 1',
+  businessPhone: '02-000-0000',
+};
 
 const ALL_KEYS = ['pharmacy-hub', 'kpa-society', 'neture', 'k-cosmetics'];
 
@@ -193,7 +205,8 @@ beforeEach(() => {
       { id: 'ra-neture', user_id: 'u1', role: 'neture:supplier', is_active: true },
     ],
     kpaMembers: [{ user_id: 'u1', status: 'active' }],
-    users: [{ id: 'u1', status: 'pending' }],
+    // pharmacy-hub store_owner 승인 게이트(§4 사업자정보 5항목)를 통과하는 완비 픽스처
+    users: [{ id: 'u1', status: 'pending', businessInfo: COMPLETE_BUSINESS_INFO }],
     cosmeticsMembers: [],
   };
   jest.clearAllMocks();
@@ -289,6 +302,34 @@ describe('rejectMembership — KPA 동기화 (D2 부수 효과)', () => {
   it('다른 서비스 반려는 kpa_members 를 건드리지 않는다', async () => {
     await reject('m-ph');
     expect(db.kpaMembers[0].status).toBe('active');
+  });
+});
+
+describe('매장 경영자 승인 게이트 — 사업자정보 5항목 (AGREEMENT-PUBLISH-PREREQUISITES §4)', () => {
+  it('사업자정보가 누락되면 StoreOwnerBusinessInfoRequiredError 로 롤백하고 active role 을 만들지 않는다', async () => {
+    db.users[0].businessInfo = { ...COMPLETE_BUSINESS_INFO, businessNumber: '' };
+
+    await expect(approve('m-ph')).rejects.toBeInstanceOf(StoreOwnerBusinessInfoRequiredError);
+
+    expect(rolledBack).toBe(true);
+    expect(committed).toBe(false);
+    expect(db.roles.filter((r) => r.role === 'pharmacy-hub:store_owner' && r.is_active)).toHaveLength(0);
+  });
+
+  it('누락 항목을 missingFields 로 보고한다', async () => {
+    db.users[0].businessInfo = { businessName: '테스트약국' };
+
+    const err = await approve('m-ph').catch((e) => e);
+    expect(err).toBeInstanceOf(StoreOwnerBusinessInfoRequiredError);
+    expect(err.missingFields).toEqual(['representativeName', 'businessNumber', 'businessAddress', 'businessPhone']);
+  });
+
+  it('store_owner 가 아닌 멤버십(kpa member)은 사업자정보 없이도 승인된다', async () => {
+    db.users[0].businessInfo = null;
+    db.memberships[1].status = 'pending';
+
+    const approved = await approve('m-kpa');
+    expect(approved!.status).toBe('active');
   });
 });
 

@@ -77,6 +77,7 @@ export default function LoginPage() {
           loginWithGoogle={loginWithGoogle}
           signupWithGoogle={signupWithGoogle}
           onSuccess={({ user }) => { setError(null); finishLogin(user); }}
+          onStart={() => setError(null)}
           onError={(e) => setError(e.message)}
           termsHref="/terms"
           privacyHref="/privacy"

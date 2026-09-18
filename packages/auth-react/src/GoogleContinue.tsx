@@ -7,6 +7,11 @@
  *   → code === 'GOOGLE_SIGNUP_REQUIRED': 약관/개인정보(+마케팅) 동의 → signupWithGoogle → onSuccess
  * 서비스명 조건문 없음. 스타일은 inline 최소값(서비스 Tailwind 와 충돌하지 않도록 className 으로 덮어쓸 수 있다).
  * 서버 allowlist 가 비어 있으면(enabled=false) "준비 중" 안내만 보여준다.
+ *
+ * 콜백 props(getConfig · loginWithGoogle · signupWithGoogle · onSuccess · onError · onStart)는 모두 ref 로 보관한다 —
+ * 호출부(AuthProvider)가 render 마다 새 함수를 넘겨도 config 를 재조회하거나 stage(특히 consent)를 리셋하지 않는다.
+ * config 는 mount 시 1회만 읽고, 오류 후 복귀·취소처럼 명시적으로 loadConfig() 를 부를 때만 재조회한다.
+ * (프로덕션 smoke 2026-09-18: provider 의 isLoading true→false re-render 가 consent 화면을 덮어쓴 결함의 수정)
  */
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from 'react';
 import { renderGoogleButton, type GoogleAuthConfig } from '@o4o/auth-client';
@@ -23,6 +28,8 @@ export interface GoogleContinueProps<TUser = unknown> {
   onSuccess: (result: { user: TUser; isNewUser: boolean }) => void;
   /** 서버 오류 표시용(선택). `code` 는 서버 응답 code(ACCOUNT_NOT_ACTIVE · EMAIL_IN_USE 등). */
   onError?: (error: { message: string; code?: string; accountStatus?: string }) => void;
+  /** Google credential 을 받아 인증을 시작하는 시점(선택). 호출부가 legacy email 로그인 오류 표시를 지우는 데 쓴다. */
+  onStart?: () => void;
   /** 동의 화면의 약관/개인정보 링크. 기본값은 대표 도메인 상대 경로. */
   termsHref?: string;
   privacyHref?: string;
@@ -55,6 +62,7 @@ export function GoogleContinue<TUser = unknown>({
   signupWithGoogle,
   onSuccess,
   onError,
+  onStart,
   termsHref = '/terms',
   privacyHref = '/privacy',
   className,
@@ -67,39 +75,45 @@ export function GoogleContinue<TUser = unknown>({
   const containerRef = useRef<HTMLDivElement>(null);
   const mountedRef = useRef(true);
 
+  // 콜백 props 는 최신값을 ref 로만 읽는다 — 참조가 바뀌어도 effect/stage 에 영향을 주지 않는다.
+  const callbacksRef = useRef({ getConfig, loginWithGoogle, signupWithGoogle, onSuccess, onError, onStart });
+  callbacksRef.current = { getConfig, loginWithGoogle, signupWithGoogle, onSuccess, onError, onStart };
+
   useEffect(() => {
     mountedRef.current = true;
     return () => { mountedRef.current = false; };
   }, []);
 
-  /** 공개 Client ID 조회 → button | disabled. 실패 시 disabled(준비 중). */
+  /** 공개 Client ID 조회 → button | disabled. 실패 시 disabled(준비 중). 명시적 호출 시에만 실행된다. */
   const loadConfig = useCallback(async () => {
     setStage({ kind: 'loading' });
     try {
-      const cfg = await getConfig();
+      const cfg = await callbacksRef.current.getConfig();
       if (!mountedRef.current) return;
       setStage(cfg.enabled && cfg.clientId ? { kind: 'button', clientId: cfg.clientId } : { kind: 'disabled' });
     } catch {
       if (mountedRef.current) setStage({ kind: 'disabled' });
     }
-  }, [getConfig]);
+  }, []);
 
+  // mount 시 1회만. (getConfig 참조 변화로 재실행되지 않는다.)
   useEffect(() => { void loadConfig(); }, [loadConfig]);
 
   const fail = useCallback((result: AuthLoginResult<TUser>) => {
     const msg = result.error || 'Google 인증에 실패했습니다.';
     setMessage(msg);
-    onError?.({ message: msg, code: result.code, accountStatus: result.accountStatus });
-  }, [onError]);
+    callbacksRef.current.onError?.({ message: msg, code: result.code, accountStatus: result.accountStatus });
+  }, []);
 
   /** credential → login → (미등록) consent */
   const handleCredential = useCallback(async (idToken: string) => {
     setMessage(null);
+    callbacksRef.current.onStart?.();
     setStage({ kind: 'busy' });
-    const result = await loginWithGoogle(idToken);
+    const result = await callbacksRef.current.loginWithGoogle(idToken);
     if (!mountedRef.current) return;
     if (result.success && result.user) {
-      onSuccess({ user: result.user, isNewUser: false });
+      callbacksRef.current.onSuccess({ user: result.user, isNewUser: false });
       return;
     }
     if (result.code === 'GOOGLE_SIGNUP_REQUIRED') {
@@ -108,7 +122,7 @@ export function GoogleContinue<TUser = unknown>({
     }
     fail(result);
     void loadConfig();
-  }, [loginWithGoogle, onSuccess, fail, loadConfig]);
+  }, [fail, loadConfig]);
 
   // GIS 버튼 렌더
   useEffect(() => {
@@ -136,16 +150,16 @@ export function GoogleContinue<TUser = unknown>({
     const idToken = stage.idToken;
     setMessage(null);
     setStage({ kind: 'busy' });
-    const result = await signupWithGoogle(idToken, { terms, privacy, marketing });
+    const result = await callbacksRef.current.signupWithGoogle(idToken, { terms, privacy, marketing });
     if (!mountedRef.current) return;
     if (result.success && result.user) {
-      onSuccess({ user: result.user, isNewUser: true });
+      callbacksRef.current.onSuccess({ user: result.user, isNewUser: true });
       return;
     }
     fail(result);
     // ID token 은 짧게 유효 — 동의 화면으로 되돌려 재시도를 허용한다(EMAIL_IN_USE 등은 메시지로 안내).
     setStage({ kind: 'consent', idToken });
-  }, [stage, terms, privacy, marketing, signupWithGoogle, onSuccess, fail]);
+  }, [stage, terms, privacy, marketing, fail]);
 
   return (
     <div className={className} style={box} data-testid="google-continue">

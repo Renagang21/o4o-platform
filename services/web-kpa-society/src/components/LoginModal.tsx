@@ -230,6 +230,7 @@ export default function LoginModal() {
               loginWithGoogle={loginWithGoogle}
               signupWithGoogle={signupWithGoogle}
               onSuccess={({ user: loggedInUser }) => { setError(null); setIsNotMember(false); finishLogin(loggedInUser); }}
+              onStart={() => { setError(null); setIsNotMember(false); }}
               onError={(e) => { setIsNotMember(false); setError(e.message); }}
               termsHref="/policy"
               privacyHref="/privacy"
