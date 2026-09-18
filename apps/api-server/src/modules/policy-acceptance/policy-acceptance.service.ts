@@ -35,6 +35,14 @@ type Queryable = Pick<DataSource, 'query'> | Pick<EntityManager, 'query'>;
 
 const PUBLISHED_TTL_MS = 60_000;
 const USER_OK_TTL_MS = 60_000;
+export const STORE_OWNER_AGREEMENT_DOCUMENT_TYPE = 'store_owner_agreement' as const;
+export type MandatoryAgreementDocumentType = typeof REQUIRED_POLICY_DOCUMENT_TYPE | typeof STORE_OWNER_AGREEMENT_DOCUMENT_TYPE;
+const MANDATORY_AGREEMENT_TYPES: ReadonlySet<string> = new Set([REQUIRED_POLICY_DOCUMENT_TYPE, STORE_OWNER_AGREEMENT_DOCUMENT_TYPE]);
+const STORE_OWNER_ROLE_BY_SERVICE: Readonly<Record<string, string>> = {
+  'kpa-society': 'kpa:store_owner',
+  'k-cosmetics': 'cosmetics:store_owner',
+  'pharmacy-hub': 'pharmacy-hub:store_owner',
+};
 
 /** 승낙 당시 본문 동일성 검증용 안정 hash (WO §5). 게시 도구 sha256 과 같은 입력(원문 그대로). */
 export function computePolicyContentHash(content: string): string {
@@ -81,6 +89,7 @@ const PUBLISHED_TERMS_SQL = `
 
 export class PolicyAcceptanceService {
   private publishedCache: { at: number; docs: PublishedTermsDocument[] } | null = null;
+  private readonly publishedAgreementCache = new Map<string, { at: number; docs: PublishedTermsDocument[] }>();
   private readonly userOkCache = new Map<string, number>();
 
   constructor(private readonly db: () => Queryable = () => AppDataSource) {}
@@ -88,6 +97,7 @@ export class PolicyAcceptanceService {
   /** 테스트·게시 직후 강제 갱신. */
   invalidateAll(): void {
     this.publishedCache = null;
+    this.publishedAgreementCache.clear();
     this.userOkCache.clear();
   }
 
@@ -113,6 +123,74 @@ export class PolicyAcceptanceService {
       [REQUIRED_POLICY_DOCUMENT_TYPE, serviceKey],
     )) as PublishedRow[];
     return rows[0] ? toPublished(rows[0]) : null;
+  }
+
+  /** 서비스별 현재 published mandatory agreement. terms 외 계약도 같은 검증 계약을 쓴다. */
+  async getPublishedAgreementForService(
+    serviceKey: string,
+    documentType: MandatoryAgreementDocumentType,
+    q: Queryable = this.db(),
+  ): Promise<PublishedTermsDocument | null> {
+    if (documentType === REQUIRED_POLICY_DOCUMENT_TYPE) return this.getPublishedTermsForService(serviceKey, q);
+    const rows = (await q.query(
+      `${PUBLISHED_TERMS_SQL.replace('WHERE document_type = $1', 'WHERE document_type = $1 AND service_key = $2')}`,
+      [documentType, serviceKey],
+    )) as PublishedRow[];
+    return rows[0] ? toPublished(rows[0]) : null;
+  }
+
+  /** store_owner role + active membership 를 모두 가진 서비스 중 미승낙 매장계약 목록. */
+  async getPendingStoreOwnerAgreementsForUser(
+    userId: string,
+    serviceKey?: string,
+  ): Promise<PendingPolicyAcceptance[]> {
+    if (!userId) return [];
+    const now = Date.now();
+    let cached = this.publishedAgreementCache.get(STORE_OWNER_AGREEMENT_DOCUMENT_TYPE);
+    if (!cached || now - cached.at >= PUBLISHED_TTL_MS) {
+      const rows = (await this.db().query(PUBLISHED_TERMS_SQL, [STORE_OWNER_AGREEMENT_DOCUMENT_TYPE])) as PublishedRow[];
+      cached = { at: now, docs: rows.map(toPublished) };
+      this.publishedAgreementCache.set(STORE_OWNER_AGREEMENT_DOCUMENT_TYPE, cached);
+    }
+    let published = cached.docs;
+    if (serviceKey) published = published.filter((d) => d.serviceKey === serviceKey);
+    if (published.length === 0) return [];
+
+    const q = this.db();
+    const memberships = (await q.query(
+      `SELECT service_key AS "serviceKey", status FROM service_memberships
+       WHERE user_id = $1 AND status = 'active'`,
+      [userId],
+    )) as { serviceKey: string; status: string }[];
+    const activeServices = new Set(memberships.map((m) => m.serviceKey));
+    const roles = (await q.query(
+      `SELECT role FROM role_assignments WHERE user_id = $1 AND is_active = true`,
+      [userId],
+    )) as { role: string }[];
+    const activeRoles = new Set(roles.map((r) => r.role));
+
+    const required = published.filter((doc) => {
+      const role = STORE_OWNER_ROLE_BY_SERVICE[doc.serviceKey];
+      return !!role && activeServices.has(doc.serviceKey) && activeRoles.has(role);
+    });
+    if (required.length === 0) return [];
+
+    const ids = required.map((d) => d.id);
+    const acceptedRows = (await q.query(
+      `SELECT policy_document_id AS id FROM user_policy_acceptances
+       WHERE user_id = $1 AND policy_document_id = ANY($2::uuid[])`,
+      [userId, ids],
+    )) as { id: string }[];
+    const accepted = new Set(acceptedRows.map((r) => r.id));
+    return required
+      .filter((doc) => !accepted.has(doc.id))
+      .map((doc) => ({
+        serviceKey: doc.serviceKey,
+        documentType: doc.documentType,
+        policyDocumentId: doc.id,
+        version: doc.version,
+        title: doc.title,
+      }));
   }
 
   /** 사용자의 pending 목록 (WO §15 · §16). published terms 0 → 즉시 [] (테이블 미조회). */
@@ -161,9 +239,13 @@ export class PolicyAcceptanceService {
    * 이미 같은 문서를 승낙했으면 멱등(중복 row 없음, WO §4 unique).
    */
   async recordAcceptance(
-    input: { userId: string; serviceKey: string; policyDocumentId: string; version?: number | null },
+    input: { userId: string; serviceKey: string; policyDocumentId: string; version?: number | null; documentType?: MandatoryAgreementDocumentType },
     q: Queryable = this.db(),
   ): Promise<{ created: boolean; document: PublishedTermsDocument }> {
+    const documentType = input.documentType ?? REQUIRED_POLICY_DOCUMENT_TYPE;
+    if (!MANDATORY_AGREEMENT_TYPES.has(documentType)) {
+      throw new PolicyAcceptanceError('POLICY_TYPE_NOT_ALLOWED', '승낙할 수 없는 문서 유형입니다.', 400);
+    }
     const { userId, serviceKey, policyDocumentId } = input;
     if (!userId) throw new PolicyAcceptanceError('AUTH_REQUIRED', '인증이 필요합니다.', 401);
     if (typeof policyDocumentId !== 'string' || !/^[0-9a-f-]{36}$/i.test(policyDocumentId)) {
@@ -180,8 +262,8 @@ export class PolicyAcceptanceService {
     )) as (PublishedRow & { status: string })[];
     const row = rows[0];
     if (!row) throw new PolicyAcceptanceError('POLICY_NOT_FOUND', '약관 문서를 찾을 수 없습니다.', 404);
-    if (row.document_type !== REQUIRED_POLICY_DOCUMENT_TYPE) {
-      throw new PolicyAcceptanceError('POLICY_TYPE_MISMATCH', '이용약관 문서가 아닙니다.', 409);
+    if (row.document_type !== documentType) {
+      throw new PolicyAcceptanceError('POLICY_TYPE_MISMATCH', '요청한 계약 문서 유형과 일치하지 않습니다.', 409);
     }
     if (row.status !== 'published') {
       throw new PolicyAcceptanceError('POLICY_NOT_PUBLISHED', '게시 중인 약관만 승낙할 수 있습니다.', 409);
@@ -191,7 +273,7 @@ export class PolicyAcceptanceService {
     }
     // 같은 서비스의 "현재 적용 약관" 이어야 한다 (구 published 는 publish 시 draft 로 내려가므로
     // status 검사로 대부분 걸러지지만, 정렬 기준으로 한 번 더 확정한다).
-    const current = await this.getPublishedTermsForService(serviceKey, q);
+    const current = await this.getPublishedAgreementForService(serviceKey, documentType, q);
     if (!current || current.id !== row.id) {
       throw new PolicyAcceptanceError('POLICY_NOT_CURRENT', '현재 적용 중인 약관이 아닙니다.', 409);
     }
@@ -209,8 +291,8 @@ export class PolicyAcceptanceService {
       [userId, serviceKey, row.id, row.document_type, row.version, document.contentHash, ACCEPTANCE_KIND_AGREEMENT],
     )) as { id: string }[];
     const created = inserted.length > 0;
-    if (created) {
-      // WO §6: legacy snapshot 갱신 (SSOT 아님 · 판정에 쓰지 않음).
+    if (created && documentType === REQUIRED_POLICY_DOCUMENT_TYPE) {
+      // terms 전용 legacy snapshot. 매장 경영자 계약 acceptance 로 tos_accepted_at 을 오염시키지 않는다.
       await q.query(`UPDATE users SET tos_accepted_at = NOW() WHERE id = $1`, [userId]);
     }
     this.invalidateUser(userId);

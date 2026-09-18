@@ -16,8 +16,13 @@ import { Router, type IRouter, type Request, type Response } from 'express';
 import { requireAuth } from '../../common/middleware/auth.middleware.js';
 import { asyncHandler } from '../../middleware/error-handler.js';
 import { AppDataSource } from '../../database/connection.js';
-import { REQUIRED_MEMBERSHIP_STATUSES } from '../../common/auth/terms-acceptance.policy.js';
-import { PolicyAcceptanceError, policyAcceptanceService } from './policy-acceptance.service.js';
+import { REQUIRED_MEMBERSHIP_STATUSES, REQUIRED_POLICY_DOCUMENT_TYPE } from '../../common/auth/terms-acceptance.policy.js';
+import {
+  PolicyAcceptanceError,
+  STORE_OWNER_AGREEMENT_DOCUMENT_TYPE,
+  policyAcceptanceService,
+  type MandatoryAgreementDocumentType,
+} from './policy-acceptance.service.js';
 import logger from '../../utils/logger.js';
 
 const router: IRouter = Router();
@@ -28,7 +33,11 @@ router.get(
   asyncHandler(async (req: Request, res: Response) => {
     const userId = (req as any).user?.id as string | undefined;
     if (!userId) return res.status(401).json({ success: false, error: 'Authentication required', code: 'AUTH_REQUIRED' });
-    const pending = await policyAcceptanceService.getPendingForUser(userId);
+    const requestedType = typeof req.query.documentType === 'string' ? req.query.documentType : '';
+    const requestedService = typeof req.query.serviceKey === 'string' ? req.query.serviceKey.trim() : '';
+    const pending = requestedType === STORE_OWNER_AGREEMENT_DOCUMENT_TYPE
+      ? await policyAcceptanceService.getPendingStoreOwnerAgreementsForUser(userId, requestedService || undefined)
+      : await policyAcceptanceService.getPendingForUser(userId);
     return res.json({ success: true, data: { pending } });
   }),
 );
@@ -44,6 +53,9 @@ router.post(
     const serviceKey = typeof body.serviceKey === 'string' ? body.serviceKey.trim() : '';
     const policyDocumentId = typeof body.policyDocumentId === 'string' ? body.policyDocumentId.trim() : '';
     const version = body.version === undefined || body.version === null ? undefined : Number(body.version);
+    const documentType = (typeof body.documentType === 'string' && body.documentType.trim()
+      ? body.documentType.trim()
+      : REQUIRED_POLICY_DOCUMENT_TYPE) as MandatoryAgreementDocumentType;
     if (!serviceKey || !policyDocumentId || (version !== undefined && !Number.isInteger(version))) {
       return res.status(400).json({
         success: false,
@@ -59,17 +71,39 @@ router.post(
         [userId, serviceKey],
       )) as { status: string }[];
       const status = rows[0]?.status;
-      if (!status || !REQUIRED_MEMBERSHIP_STATUSES.has(status)) {
+      const isStoreAgreement = documentType === STORE_OWNER_AGREEMENT_DOCUMENT_TYPE;
+      const membershipAllowed = isStoreAgreement ? status === 'active' : !!status && REQUIRED_MEMBERSHIP_STATUSES.has(status);
+      if (!membershipAllowed) {
         return res.status(403).json({
           success: false,
-          error: '해당 서비스의 회원만 약관을 승낙할 수 있습니다.',
+          error: '해당 서비스의 유효한 회원자격이 필요합니다.',
           code: status ? 'MEMBERSHIP_NOT_ACTIVE' : 'MEMBERSHIP_NOT_FOUND',
         });
       }
+      if (isStoreAgreement) {
+        const roleByService: Record<string, string> = {
+          'kpa-society': 'kpa:store_owner',
+          'k-cosmetics': 'cosmetics:store_owner',
+          'pharmacy-hub': 'pharmacy-hub:store_owner',
+        };
+        const requiredRole = roleByService[serviceKey];
+        if (!requiredRole) {
+          return res.status(400).json({ success: false, error: '매장 경영자 계약 대상 서비스가 아닙니다.', code: 'POLICY_SERVICE_NOT_ALLOWED' });
+        }
+        const roleRows = await AppDataSource.query(
+          `SELECT 1 FROM role_assignments WHERE user_id = $1 AND role = $2 AND is_active = true LIMIT 1`,
+          [userId, requiredRole],
+        );
+        if (!roleRows.length) {
+          return res.status(403).json({ success: false, error: '매장 경영자만 계약에 동의할 수 있습니다.', code: 'STORE_OWNER_REQUIRED' });
+        }
+      }
 
-      const result = await policyAcceptanceService.recordAcceptance({ userId, serviceKey, policyDocumentId, version });
-      const pending = await policyAcceptanceService.getPendingForUser(userId);
-      logger.info('[PolicyAcceptance] terms accepted', {
+      const result = await policyAcceptanceService.recordAcceptance({ userId, serviceKey, policyDocumentId, version, documentType });
+      const pending = isStoreAgreement
+        ? await policyAcceptanceService.getPendingStoreOwnerAgreementsForUser(userId, serviceKey)
+        : await policyAcceptanceService.getPendingForUser(userId);
+      logger.info('[PolicyAcceptance] agreement accepted', {
         userId,
         serviceKey,
         policyDocumentId: result.document.id,

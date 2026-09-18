@@ -36,6 +36,8 @@ import type { Request, Response, NextFunction } from 'express';
 import type { AuthContext } from '../auth/auth-context.js';
 import { resolveCanonicalServiceKey } from '@o4o/security-core';
 import { getServiceWorkspaceCapability } from '../config/service-catalog.js';
+import { policyAcceptanceService } from '../modules/policy-acceptance/policy-acceptance.service.js';
+import type { PendingPolicyAcceptance } from '../common/auth/terms-acceptance.policy.js';
 import {
   resolveStoreOrganization,
   type StoreOrganizationResolution,
@@ -114,6 +116,8 @@ export interface StoreOwnerCheckResult {
   memberRole: string;
   /** 조직 해석 상세 — 'ambiguous' 를 403 과 구분해 응답하려는 호출 측이 사용 */
   resolution: StoreOrganizationResolution;
+  /** 게시된 매장 경영자 계약 미승낙 시 server-side workspace 차단 근거. */
+  pendingAgreement?: PendingPolicyAcceptance | null;
 }
 
 export async function isStoreOwner(
@@ -172,6 +176,7 @@ export async function isStoreOwner(
       organizationId: null,
       memberRole: '',
       resolution: { status: 'none', organizationId: null, memberRole: '', candidateCount: 0 },
+      pendingAgreement: null,
     };
   }
 
@@ -179,11 +184,16 @@ export async function isStoreOwner(
   //   조직 선택은 공통 해석기가 담당한다. serviceKey 가 있으면 그 서비스에 등록된
   //   조직만 후보이며, 2개 이상이면 organizationId 를 주지 않는다(임의 선택 금지).
   const resolution = await resolveStoreOrganization(dataSource, userId, serviceKey);
+  const agreementServiceKey = serviceKey ? resolveCanonicalServiceKey(serviceKey) : undefined;
+  const pendingAgreements = await policyAcceptanceService.getPendingStoreOwnerAgreementsForUser(userId, agreementServiceKey);
+  const pendingAgreement = pendingAgreements[0] ?? null;
   return {
-    isOwner: true,
+    // 다른 직접 호출(resolveStoreAccess/requireStoreAuth)도 계약 미승낙을 우회하지 못한다.
+    isOwner: !pendingAgreement,
     organizationId: resolution.organizationId,
     memberRole: resolution.memberRole,
     resolution,
+    pendingAgreement,
   };
 }
 
@@ -263,7 +273,7 @@ export function createRequireStoreOwner(
       }
     }
 
-    const { isOwner, organizationId, memberRole, resolution } = await isStoreOwner(
+    const { isOwner, organizationId, memberRole, resolution, pendingAgreement } = await isStoreOwner(
       dataSource,
       user.id,
       serviceKey,
@@ -271,11 +281,20 @@ export function createRequireStoreOwner(
     // WO-O4O-STORE-OWNER-SERVICE-SCOPED-ORGANIZATION-RESOLUTION-V1:
     //   같은 서비스 후보가 2개 이상이면 하나를 골라 통과시키지 않는다.
     //   Pharmacy-Hub 전용 seam 과 같은 코드·같은 상태코드(409)로 응답한다.
-    if (isOwner && resolution.status === 'ambiguous') {
+    if (resolution.status === 'ambiguous') {
       res.status(409).json({
         success: false,
         error: '연결된 매장이 여러 개입니다. 운영자에게 문의해 주세요.',
         code: 'AMBIGUOUS_STORE_CONNECTION',
+      });
+      return;
+    }
+    if (pendingAgreement) {
+      res.status(428).json({
+        success: false,
+        error: '매장 경영자 이용계약에 동의한 뒤 이용할 수 있습니다.',
+        code: 'STORE_OWNER_AGREEMENT_REQUIRED',
+        pendingPolicyAcceptances: [pendingAgreement],
       });
       return;
     }

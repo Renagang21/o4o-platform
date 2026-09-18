@@ -55,6 +55,7 @@ export const SUPPORTED_POLICY_DOCUMENT_TYPES = [
   'community',
   'marketing',
   'location',
+  'store_owner_agreement',
   'custom',
 ] as const;
 
