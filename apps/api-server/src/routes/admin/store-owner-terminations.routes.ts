@@ -6,11 +6,13 @@ import {
   type StoreOwnerContractServiceKey,
 } from '../../services/store-owner-termination.service.js';
 import logger from '../../utils/logger.js';
-import { standardLimiter } from '../../config/rate-limiters.config.js';
+import { apiLimiter } from '../../middleware/rateLimiter.js';
 
 const router = Router();
-// destructive/PII-return admin workflow — centralized authenticated-endpoint limiter first.
-router.use(standardLimiter);
+// destructive/PII-return admin workflow — (ip, userId) keyed limiter first (60 req/min).
+// CodeQL js/missing-rate-limiting: config/rate-limiters.config 의 standardLimiter 는 인식되지 않아
+// notifications.routes.ts 와 동일하게 middleware/rateLimiter 의 apiLimiter 를 사용한다.
+router.use(apiLimiter);
 router.use(authenticate);
 router.use(requireAdmin);
 
