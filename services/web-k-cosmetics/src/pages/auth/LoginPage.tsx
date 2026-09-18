@@ -69,6 +69,7 @@ export default function LoginPage() {
             loginWithGoogle={loginWithGoogle}
             signupWithGoogle={signupWithGoogle}
             onSuccess={() => { setError(null); setIsNotMember(false); if (returnUrl) navigate(returnUrl); }}
+            onStart={() => { setError(null); setIsNotMember(false); }}
             onError={(e) => { setIsNotMember(false); setError(e.message); }}
             termsHref="/terms"
             privacyHref="/privacy"

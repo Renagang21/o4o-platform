@@ -194,6 +194,12 @@ function createUserFromApiResponse(apiUser: ApiUser): User {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+/**
+ * WO-O4O-GOOGLE-IDENTITY-PRODUCTION-ACTIVATION-AND-SMOKE-V1: 모듈 수준 상수 — render 마다 새 참조를 만들지 않는다.
+ * (<GoogleContinue /> 는 자체 ref 로도 방어하지만, provider 가 안정된 참조를 넘기는 것이 2차 방어다.)
+ */
+const getGoogleAuthConfig = () => authClient.getGoogleAuthConfig();
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   // WO-KPA-LOGIN-LATENCY-CLEANUP-V1: KPA context 비동기 로딩 상태
   // true = 로딩 불필요 또는 로딩 완료 / false = 아직 로딩 중
@@ -287,7 +293,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
    *   KPA context 후속 로딩은 Core 의 onAuthenticated 훅에서 일어난다.
    */
   const login = core.login;
-  const getGoogleAuthConfig = () => authClient.getGoogleAuthConfig();
 
   const logout = core.logout;
 
