@@ -23,6 +23,7 @@ import type {
   AIOrchestrationRequest,
   AIInsight,
 } from '@o4o/ai-core';
+import { GEMINI_CANONICAL_MODEL } from '../../types/ai-proxy.types.js';
 
 // ─────────────────────────────────────────────────────
 // 1. Context Builder
@@ -438,6 +439,30 @@ describe('Gemini grounding (Web Research capability)', () => {
         apiKey: 'k', model: 'gemini-2.5-flash', grounding: true, responseMode: 'json',
       }),
     ).rejects.toThrow('INVALID_ARGUMENT');
+  });
+
+  // ⑥ 모델 SSOT 결합 — grounding 은 resolved model 을 덮어쓰지 않는다.
+  //    admin resolver 의 canonical fallback(GEMINI_CANONICAL_MODEL='gemini-3.8-flash' · 실측 스모크와 동일)을
+  //    넣으면 그 모델이 그대로 Gemini 요청 URL 에 실린다(하드코딩·override 없음).
+  it('grounding call targets the resolved model unchanged (no model override)', async () => {
+    expect(GEMINI_CANONICAL_MODEL).toBe('gemini-3.8-flash');
+    mockFetch({
+      candidates: [{
+        content: { parts: [{ text: 'ok' }] },
+        groundingMetadata: {
+          webSearchQueries: ['q'],
+          groundingChunks: [{ web: { uri: 'https://e.com', title: 'E' } }],
+        },
+      }],
+      usageMetadata: { promptTokenCount: 1, candidatesTokenCount: 2 },
+    });
+    const provider = newProvider();
+    const r = await provider.complete('sys', 'user', {
+      apiKey: 'k', model: GEMINI_CANONICAL_MODEL, grounding: true, responseMode: 'text',
+    });
+    expect(captured!.url).toContain(`/models/${GEMINI_CANONICAL_MODEL}:generateContent`);
+    expect(captured!.body.tools).toEqual([{ google_search: {} }]);
+    expect(r.grounding.used).toBe(true);
   });
 });
 
