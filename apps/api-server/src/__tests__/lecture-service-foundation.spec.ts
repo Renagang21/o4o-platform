@@ -22,6 +22,12 @@ describe('Lecture Service Foundation', () => {
     expect(cors).toContain('"https://study.neture.co.kr"');
   });
 
+  it('study.neture.co.kr origin을 neture가 아니라 exact hostname으로 판정한다', () => {
+    expect(join).toContain('new URL(origin).hostname.toLowerCase()');
+    expect(join).toContain('svc.domain.toLowerCase() === originHost');
+    expect(join).not.toContain('origin.includes(svc.domain)');
+  });
+
   it('Lecture 역할은 3개뿐이고 lecture:member는 만들지 않는다', () => {
     for (const role of ['lecture:admin', 'lecture:operator', 'lecture:instructor']) {
       expect(roles).toContain(role);
