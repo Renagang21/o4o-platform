@@ -91,6 +91,14 @@ export const EXPECTED_SCHEMA_STATES: readonly ExpectedSchemaState[] = [
     fingerprint: 'dfc42b8e72e3672b132bf5cb8106d6707d15de3d7a4f3961d5a876475ecddbd4',
     fingerprintLineCount: 5745,
   },
+  // WO-O4O-RETIRED-SERVICE-SCHEMA-ENUM-CLEANUP-V1 — checkout_orders_order_type_enum 에서 retired enum label 1개 제거
+  // (label 5 → 4 · column default/NOT NULL/index 불변 · ENUM fingerprint line 1개만 변경, line count 동일). Computed in an
+  // isolated PostgreSQL 15.17 (fresh bootstrap + migrations 1..7 via migrate.ts) on 2026-09-18.
+  {
+    appliedThrough: 'RemoveRetiredCheckoutOrderTypeEnumValue1789690338675',
+    fingerprint: '0ca1a71b9a511f0147583c919eb37814b1ad28f1ba042ceba1038393bb54df70',
+    fingerprintLineCount: 5745,
+  },
 ] as const;
 
 /** Expected state after `prefixLength` incremental migrations; undefined when not registered. */

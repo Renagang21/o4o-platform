@@ -29,6 +29,8 @@ import { CreateWorkRunCoordination1789540958496 } from '../migrations/1789540958
 import { PrepareGoogleIdentityLinkedAccountsAndUsersConstraints1789648511051 } from '../migrations/1789648511051-PrepareGoogleIdentityLinkedAccountsAndUsersConstraints.js';
 // WO-O4O-INTEGRATED-TERMS-ACCEPTANCE-AND-SIGNUP-ALIGNMENT-V1 (이용약관 acceptance 이력 · SSOT)
 import { CreateUserPolicyAcceptances1789649959243 } from '../migrations/1789649959243-CreateUserPolicyAcceptances.js';
+// WO-O4O-RETIRED-SERVICE-SCHEMA-ENUM-CLEANUP-V1 (retired enum label 제거 · DB_SCHEMA_RESIDUAL 1 → 0)
+import { RemoveRetiredCheckoutOrderTypeEnumValue1789690338675 } from '../migrations/1789690338675-RemoveRetiredCheckoutOrderTypeEnumValue.js';
 
 export const INCREMENTAL_MIGRATION_CUTOFF = {
   baselineVersion: '2026-09-15-id678',
@@ -50,6 +52,7 @@ export const INCREMENTAL_MIGRATIONS: readonly MigrationClass[] = [
   CreateWorkRunCoordination1789540958496,
   PrepareGoogleIdentityLinkedAccountsAndUsersConstraints1789648511051,
   CreateUserPolicyAcceptances1789649959243,
+  RemoveRetiredCheckoutOrderTypeEnumValue1789690338675,
 ];
 
 export function incrementalMigrationNames(): string[] {
