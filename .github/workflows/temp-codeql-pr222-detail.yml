@@ -1,0 +1,55 @@
+name: TEMP CodeQL PR222 Detail
+
+on:
+  push:
+    branches: [debug/codeql-pr222]
+
+jobs:
+  analyze-detail:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v6
+      - uses: github/codeql-action/init@v3
+        with:
+          languages: typescript
+          config: |
+            paths:
+              - 'apps/api-server/src'
+            paths-ignore:
+              - '**/node_modules'
+              - '**/dist'
+              - '**/build'
+              - '**/*.test.ts'
+              - '**/*.spec.ts'
+              - '**/__tests__'
+              - '**/coverage'
+              - '**/scripts'
+              - '**/components'
+              - '**/pages'
+      - uses: github/codeql-action/autobuild@v3
+      - name: Analyze to local SARIF only
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:typescript-temp"
+          upload: false
+          output: codeql-sarif
+      - name: Print finding details only
+        shell: bash
+        run: |
+          python - <<'PY'
+          import glob,json
+          for p in glob.glob('codeql-sarif/*.sarif'):
+              d=json.load(open(p,encoding='utf-8'))
+              for run in d.get('runs',[]):
+                  rules={r.get('id'):r for r in run.get('tool',{}).get('driver',{}).get('rules',[])}
+                  for x in run.get('results',[]):
+                      loc=((x.get('locations') or [{}])[0].get('physicalLocation') or {})
+                      art=(loc.get('artifactLocation') or {}).get('uri')
+                      reg=loc.get('region') or {}
+                      rid=x.get('ruleId')
+                      msg=(x.get('message') or {}).get('text')
+                      sec=(rules.get(rid,{}).get('properties') or {}).get('security-severity')
+                      print(json.dumps({'ruleId':rid,'securitySeverity':sec,'message':msg,'file':art,'line':reg.get('startLine')},ensure_ascii=False))
+          PY
