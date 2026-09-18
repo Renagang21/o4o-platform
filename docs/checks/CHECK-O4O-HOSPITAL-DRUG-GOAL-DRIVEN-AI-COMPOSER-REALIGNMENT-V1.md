@@ -3,7 +3,8 @@
 > **대상 WO**: `WO-O4O-HOSPITAL-DRUG-GOAL-DRIVEN-AI-COMPOSER-REALIGNMENT-V1`
 > **표기일**: 2026-09-18
 > **판정**: 증분 1 = COMPLETE (전역 Router 오염 제거 · surface 격리 · 예시문구 일반화).
-> 증분 2 = FOLLOW-UP (Gemini 조사 · Astra 화면 · Local Context surface 주입 · goal별 모델 선택 재구축 — 미착수).
+> 증분 2 = **STOP (구조적 차단)** — 착수 게이트 조사 결과 "검색=Gemini · 화면=Astra" 두 전제가 모두
+> 현재 코드에 **없다**(§11 게이트). 코드 변경 없이 원인·최소 대안만 보고. 아래 **증분 2 착수 게이트 판정** 절 참조.
 
 이 CHECK는 본 WO를 **두 증분**으로 나눠 그 중 **증분 1(전역 Router 병원 특수 규칙 격리)** 를 기록한다.
 핵심 원칙("고정되는 것은 Source가 아니라 Context다")에서, 이번 증분은 **전역 Router에서 병원 특수 규칙을
@@ -114,6 +115,93 @@ PRODUCTION_SMOKE                     = PENDING
 
 ---
 
+## 증분 2 착수 게이트 판정 (2026-09-18 · STOP)
+
+증분 2 착수 승인을 받아, WO §11 이 요구한 **두 구조적 게이트를 코드 변경 전 실제 main(afe519c80) 기준으로
+확인**했다. 두 게이트 모두 현재 코드에 **없다**. WO §7·§8·§11·§13 은 이 경우 "기능이 있다고 가정해 구현하지 않는다 ·
+구조적 변경이 크면 STOP" 을 명령한다 → **코드 변경 0, STOP.**
+
+### 게이트 1 — GEMINI_RESEARCH_CAPABILITY = ABSENT
+
+Gemini 호출은 3개 지점 모두 순수 `generateContent`(텍스트/이미지 in → 텍스트 out)다. 어떤 요청에도
+`tools`·`googleSearch`·`google_search_retrieval`·grounding 이 붙지 않고, provider config 타입에 그것을
+표현할 필드조차 없다. AI-tools 계약에도 범용 web-search/fetch/research tool 이 없다(web 접촉 tool 은
+전부 allowlist 사이트 DOM 자동화뿐).
+- `packages/ai-core/src/orchestration/providers/gemini.provider.ts:57-69` — body = `system_instruction` +
+  `contents`(text) + `generationConfig`. tools/grounding 없음.
+- `packages/ai-core/src/orchestration/types.ts` `AIProviderConfig` — apiKey/model/temperature/maxTokens/
+  responseMode/timeoutMs 만. tools/search 를 넘길 필드 없음.
+- `apps/api-server/src/services/ai-tools/ai-tool-contract.ts` — `AI_TOOL_NAMES`/`AI_TOOL_REGISTRY` 에
+  범용 웹조사 tool 없음. `browser` executionMode 는 비활성(`EXECUTABLE_MODES = ['server','local']`).
+
+즉 "조사/검색 → Gemini" 를 실제로 구현하려면 **`@o4o/ai-core` provider 계약에 grounding/tool 입력을
+신설**해야 한다(+ grounding 응답 파싱). 이는 공통 패키지 계약 변경 = 구조적 증분. WO §13 은 "새 대형 검색
+시스템" 을 금지한다.
+
+### 게이트 2 — ASTRA_SCREEN_CAPABILITY = ABSENT
+
+이미지 입력은 **현재 Gemini 전용**이다. `gpt-6-astra`(=OpenAI 플래그십 모델 id, provider 아님) 는
+스크린샷을 받지 못한다.
+- `apps/api-server/src/services/ai-tools/work-agent-runtime.ts:253` — `if (input.image && provider === 'gemini')`
+  일 때만 이미지를 `inline_data` 로 전송.
+- 같은 파일 `:277` — openai 분기는 이미지를 버리고 프롬프트에 "이 provider 는 이미지를 볼 수 없다 · 필요하면
+  takeover(user_judgment_required)" 를 적는다.
+- `apps/api-server/src/services/ai-tools/multimodal-chat.ts:42` — inline 이미지/PDF 도 `provider === 'gemini'`
+  전용, 그 외엔 "이미지·PDF 를 볼 수 없다" 안내 후 텍스트 경로.
+
+즉 "화면 이해/조작 → Astra" 는 **현행 설계(Gemini = vision provider · openai = vision 없음 → takeover)를
+역전**시켜야 한다. OpenAI vision content-part 구성 신설 + visual planner provider 게이팅 반전 = 구조적
+provider 계약 변경. WO §7 은 이 경우 "가장하지 않고 capability gap·최소안·계약 변경 범위 보고, 크면 STOP" 을
+명령한다.
+
+### 판정 근거 — 왜 STOP 인가 (모달리티 라우팅에 실 target 이 없다)
+
+증분 2 의 핵심 산출물은 "입력창 → 공통 Core → **Gemini/Astra/Local Context 선택**" 3분기다. 그중 두 분기의
+실제 target 이 없다:
+- "화면 → Astra" 라우팅을 지금 붙이면, 화면을 **못 보는** provider 로 보내는 것이라 오늘보다 **더 나쁘다**
+  (오늘은 화면 국면에 Gemini vision 을 쓴다). 작동하는 vision 경로를 깨뜨린다.
+- "조사 → Gemini" 는 실제 웹조사가 없어, 라우팅해도 그냥 텍스트 LLM 응답이다(약효 조사에 grounding 없는
+  환각 위험). 라우팅할 실 capability 가 없다.
+
+모델 선택 seam 자체(`resolveProvider(requestedProvider)`)는 `ai-provider-runtime.ts:88-94·201-211` 에 이미
+있으나, **route 할 대상 capability 가 두 모달리티 모두 부재**하므로 지금 seam 을 배선하는 것은 "없는 기능을
+있다고 가정한 구현"(§11 금지)이 된다.
+
+### 안전하게 가능한 잔여 범위(참고 · 미착수)
+
+- 성공기준 B("우리 원내에 이 약 있어?")의 **Local Context surface 주입**은 두 부재 capability 와 무관하게 분리
+  구현 가능(현 composite `local_only` 경로 = SQLite). 단독 소증분으로 뗄 수 있다.
+- 성공기준 E(홈 hospital-drug 로직 0)는 증분 1 에서 이미 달성.
+- 성공기준 A·C·D 는 위 두 부재 capability 에 의존 → 이번 STOP 대상.
+
+### 최소 대안 (사용자 판단 필요 · 셋 중 택)
+
+1. **Local Context 소증분만 진행** — B 기준의 surface Context 주입만. provider 계약 무변경. 안전.
+2. **capability 신설 승인** — `@o4o/ai-core` 에 (a) Gemini grounding/web-search 입력 또는 (b) OpenAI vision
+   입력 중 필요한 것을 별도 WO 로 신설. 공통 패키지 계약 변경이라 명시 WO·범위 합의 필요.
+3. **재정의** — "조사=Gemini 텍스트(grounding 없음)", "화면=현행 Gemini vision 유지" 로 성공기준을 현 capability
+   에 맞게 낮춰 재작성 후 라우팅 seam 만 구현. (WO 원문 "화면=Astra" 와 배치되므로 사용자 승인 필요.)
+
+**PUBLIC_DRUG_API_SERVICE_KEY** 는 이 조사에서도 무접촉. 인증키는 코드·문서·로그 어디에도 기록하지 않았다.
+
+### 완료 보고 (증분 2 게이트 · STOP)
+
+```text
+GEMINI_RESEARCH_CAPABILITY            = ABSENT (generateContent 텍스트 전용 · tools/grounding 없음 · config 표현 불가)
+ASTRA_SCREEN_CAPABILITY               = ABSENT (이미지 입력 Gemini 전용 · openai=takeover)
+TASK_MODALITY_ROUTING                 = NOT_IMPLEMENTED (route 대상 capability 부재 → 배선 보류)
+HOSPITAL_DRUG_LOCAL_CONTEXT           = UNCHANGED (composite 내부 SQLite 경로 · surface 주입은 소증분 후보)
+HOSPITAL_DRUG_COMPOSITE_ACTIVE_PATH   = UNCHANGED (증분 1 격리 유지 · active-path 재판정은 재구축 시)
+GLOBAL_ROUTER_REGRESSION              = NONE (코드 무변경)
+QUESTION_RESUME_REGRESSION            = NONE (코드 무변경)
+SAFETY_REGRESSION                     = NONE (코드 무변경)
+PRODUCTION_SMOKE                      = N/A (코드 무변경)
+DECISION                              = STOP · 사용자 판단 대기(위 최소 대안 1/2/3)
+```
+
+---
+
 ## 문서 정합
 
-발견 0건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 0건 (증분 2는 본 WO 내 FOLLOW-UP 으로 관리).
+발견 0건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 0건.
+(증분 2 게이트 STOP 은 본 WO 내 기록 · capability 신설을 택하면 그때 별도 WO 로 분리 제안.)
