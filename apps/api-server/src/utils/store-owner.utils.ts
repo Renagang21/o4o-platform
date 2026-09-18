@@ -36,6 +36,7 @@ import type { Request, Response, NextFunction } from 'express';
 import type { AuthContext } from '../auth/auth-context.js';
 import { resolveCanonicalServiceKey } from '@o4o/security-core';
 import { getServiceWorkspaceCapability } from '../config/service-catalog.js';
+import { enforceStoreOwnerAgreement } from '../modules/policy-acceptance/store-owner-agreement.middleware.js';
 import {
   resolveStoreOrganization,
   type StoreOrganizationResolution,
@@ -293,6 +294,13 @@ export function createRequireStoreOwner(
         code: 'STORE_OWNER_REQUIRED',
       });
       return;
+    }
+
+    // WO-O4O-STORE-OWNER-AGREEMENT-PUBLISH-PREREQUISITES-V1:
+    // published 계약이 생긴 뒤에만 이 서비스의 Store Workspace 를 428 로 막는다.
+    if (serviceKey) {
+      const canonicalServiceKey = resolveCanonicalServiceKey(serviceKey);
+      if (await enforceStoreOwnerAgreement(req, res, user.id, canonicalServiceKey)) return;
     }
 
     req.organizationId = organizationId as any;

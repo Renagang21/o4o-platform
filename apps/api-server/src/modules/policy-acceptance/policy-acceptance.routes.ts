@@ -17,7 +17,11 @@ import { requireAuth } from '../../common/middleware/auth.middleware.js';
 import { asyncHandler } from '../../middleware/error-handler.js';
 import { AppDataSource } from '../../database/connection.js';
 import { REQUIRED_MEMBERSHIP_STATUSES } from '../../common/auth/terms-acceptance.policy.js';
-import { PolicyAcceptanceError, policyAcceptanceService } from './policy-acceptance.service.js';
+import {
+  PolicyAcceptanceError,
+  policyAcceptanceService,
+  STORE_OWNER_AGREEMENT_DOCUMENT_TYPE,
+} from './policy-acceptance.service.js';
 import logger from '../../utils/logger.js';
 
 const router: IRouter = Router();
@@ -30,6 +34,110 @@ router.get(
     if (!userId) return res.status(401).json({ success: false, error: 'Authentication required', code: 'AUTH_REQUIRED' });
     const pending = await policyAcceptanceService.getPendingForUser(userId);
     return res.json({ success: true, data: { pending } });
+  }),
+);
+
+/**
+ * Store Workspace 전용 계약 상태. published 문서가 없으면 required=false.
+ */
+router.get(
+  '/store-owner/:serviceKey',
+  requireAuth,
+  asyncHandler(async (req: Request, res: Response) => {
+    const userId = (req as any).user?.id as string | undefined;
+    if (!userId) return res.status(401).json({ success: false, error: 'Authentication required', code: 'AUTH_REQUIRED' });
+    const serviceKey = String(req.params.serviceKey || '').trim();
+    if (!['kpa-society', 'k-cosmetics', 'pharmacy-hub'].includes(serviceKey)) {
+      return res.status(404).json({ success: false, error: '지원하지 않는 매장 서비스입니다.', code: 'UNKNOWN_SERVICE' });
+    }
+    const requirement = await policyAcceptanceService.getStoreOwnerAgreementRequirement(userId, serviceKey);
+    return res.json({
+      success: true,
+      data: {
+        required: requirement.required,
+        accepted: requirement.accepted,
+        pending: requirement.required && !requirement.accepted && requirement.document
+          ? [{
+              serviceKey,
+              documentType: STORE_OWNER_AGREEMENT_DOCUMENT_TYPE,
+              policyDocumentId: requirement.document.id,
+              version: requirement.document.version,
+              title: requirement.document.title,
+            }]
+          : [],
+      },
+    });
+  }),
+);
+
+router.post(
+  '/store-owner',
+  requireAuth,
+  asyncHandler(async (req: Request, res: Response) => {
+    const user = (req as any).user as { id?: string; roles?: string[] } | undefined;
+    const userId = user?.id;
+    if (!userId) return res.status(401).json({ success: false, error: 'Authentication required', code: 'AUTH_REQUIRED' });
+
+    const body = (req.body ?? {}) as Record<string, unknown>;
+    const serviceKey = typeof body.serviceKey === 'string' ? body.serviceKey.trim() : '';
+    const policyDocumentId = typeof body.policyDocumentId === 'string' ? body.policyDocumentId.trim() : '';
+    const version = body.version === undefined || body.version === null ? undefined : Number(body.version);
+    const roleByService: Record<string, string[]> = {
+      'kpa-society': ['kpa:store_owner', 'pharmacy'],
+      'k-cosmetics': ['cosmetics:store_owner'],
+      'pharmacy-hub': ['pharmacy-hub:store_owner'],
+    };
+    const allowedRoles = roleByService[serviceKey];
+    if (!allowedRoles || !policyDocumentId || (version !== undefined && !Number.isInteger(version))) {
+      return res.status(400).json({ success: false, error: 'serviceKey 와 policyDocumentId 가 필요합니다.', code: 'VALIDATION_ERROR' });
+    }
+
+    const membershipRows = (await AppDataSource.query(
+      `SELECT status FROM service_memberships WHERE user_id = $1 AND service_key = $2 LIMIT 1`,
+      [userId, serviceKey],
+    )) as { status: string }[];
+    if (membershipRows[0]?.status !== 'active') {
+      return res.status(403).json({ success: false, error: '활성 매장 서비스 회원만 계약을 승낙할 수 있습니다.', code: 'MEMBERSHIP_NOT_ACTIVE' });
+    }
+    const roles = Array.isArray(user?.roles) ? user!.roles! : [];
+    if (!allowedRoles.some((role) => roles.includes(role))) {
+      return res.status(403).json({ success: false, error: '매장 경영자 권한이 필요합니다.', code: 'STORE_OWNER_REQUIRED' });
+    }
+
+    try {
+      const result = await policyAcceptanceService.recordAgreementAcceptance({
+        userId,
+        serviceKey,
+        policyDocumentId,
+        version,
+        documentType: STORE_OWNER_AGREEMENT_DOCUMENT_TYPE,
+      });
+      logger.info('[PolicyAcceptance] store owner agreement accepted', {
+        userId,
+        serviceKey,
+        policyDocumentId: result.document.id,
+        version: result.document.version,
+        created: result.created,
+      });
+      return res.json({
+        success: true,
+        data: {
+          accepted: {
+            serviceKey,
+            documentType: STORE_OWNER_AGREEMENT_DOCUMENT_TYPE,
+            policyDocumentId: result.document.id,
+            version: result.document.version,
+            created: result.created,
+          },
+          pending: [],
+        },
+      });
+    } catch (error) {
+      if (error instanceof PolicyAcceptanceError) {
+        return res.status(error.httpStatus).json({ success: false, error: error.message, code: error.code });
+      }
+      throw error;
+    }
   }),
 );
 

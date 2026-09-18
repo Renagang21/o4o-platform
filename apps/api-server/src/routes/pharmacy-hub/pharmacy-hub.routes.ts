@@ -42,6 +42,7 @@ import { getService } from '../../config/service-catalog.js';
 import { SERVICE_KEYS } from '../../constants/service-keys.js';
 import { requireAuth } from '../../middleware/auth.middleware.js';
 import { requirePharmacyHubScope } from '../../middleware/pharmacy-hub-scope.middleware.js';
+import { createRequireStoreOwnerAgreement } from '../../modules/policy-acceptance/store-owner-agreement.middleware.js';
 import { PharmacyHubJoinController } from '../../controllers/pharmacy-hub/PharmacyHubJoinController.js';
 import { PharmacyHubMembershipConsoleController } from '../../controllers/pharmacy-hub/PharmacyHubMembershipConsoleController.js';
 import { PharmacyHubStoreProductController } from '../../controllers/pharmacy-hub/PharmacyHubStoreProductController.js';
@@ -199,6 +200,7 @@ export function createPharmacyHubRoutes(): Router {
     '/store-owner/ping',
     requireAuth as any,
     requirePharmacyHubScope(`${SERVICE_KEY}:store_owner`),
+    createRequireStoreOwnerAgreement(SERVICE_KEY),
     (_req, res) => res.json({ success: true, data: { scope: `${SERVICE_KEY}:store_owner` } })
   );
 
@@ -218,7 +220,11 @@ export function createPharmacyHubRoutes(): Router {
   //   Pharmacy-Hub 제공 대상 + 공통 안전 게이트를 통과한 상품만 노출한다.
   //   담기·주문·취급등록 액션은 이번 WO 범위 밖 (§9).
   // ───────────────────────────────────────────────────────────────────────────
-  const storeOwnerGuards = [requireAuth as any, requirePharmacyHubScope(`${SERVICE_KEY}:store_owner`)];
+  const storeOwnerGuards = [
+    requireAuth as any,
+    requirePharmacyHubScope(`${SERVICE_KEY}:store_owner`),
+    createRequireStoreOwnerAgreement(SERVICE_KEY),
+  ];
 
   router.get('/store-owner/products', ...storeOwnerGuards, PharmacyHubStoreProductController.list);
   router.get('/store-owner/products/:offerId', ...storeOwnerGuards, PharmacyHubStoreProductController.detail);
