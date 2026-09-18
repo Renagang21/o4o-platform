@@ -133,6 +133,23 @@ export const O4O_SERVICES: O4OService[] = [
     workspace: { workspaceMode: 'standard', storeWorkspaceEnabled: true, operatorWorkspaceEnabled: true },
   },
   /**
+   * WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 — Phase 1 Foundation
+   *
+   * 독립 O4O 강의 서비스. URL 은 Neture 브랜드 하위 도메인을 사용하지만
+   * Service Identity / membership / role / runtime 은 neture 와 완전히 분리한다.
+   * 일반 학습자는 role 없이 service_memberships(service_key='lecture') 로 판정하며,
+   * 가입 UX·약관 게시가 준비되기 전까지 joinEnabled=false 로 둔다.
+   */
+  {
+    key: 'lecture',
+    name: 'O4O Lecture',
+    nameKo: 'O4O 강의',
+    domain: 'study.neture.co.kr',
+    description: '강의·학습·평가·수료를 제공하는 O4O 학습 서비스',
+    joinEnabled: false,
+    workspace: { workspaceMode: 'none', storeWorkspaceEnabled: false, operatorWorkspaceEnabled: true },
+  },
+  /**
    * WO-O4O-PHARMACIST-BRANCH-SERVICE-FOUNDATION-DESIGN-AND-IMPLEMENTATION-V1
    *
    * KPA Branch (약사회 분회) — 209개 분회를 동급 tenant 로 두는 분회 홈페이지 SaaS.

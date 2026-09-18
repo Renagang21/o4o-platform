@@ -18,7 +18,8 @@ export type ServiceKey =
   | 'kpa'          // KPA 커뮤니티 서비스
   | 'neture'       // Neture service
   | 'cosmetics'    // K-Cosmetics service
-  | 'lms'          // LMS service
+  | 'lms'          // Legacy LMS role namespace (Phase 1에서는 유지)
+  | 'lecture'      // O4O 강의 독립 서비스
   | 'pharmacy-hub'; // Pharmacy-Hub (파머시 허브) — WO-PHARMACY-HUB-NEW-SERVICE-FOUNDATION-V1
 
 /**
@@ -91,7 +92,13 @@ export type CosmeticsRole =
  * LMS roles
  */
 export type LmsRole =
-  | 'lms:instructor';     // LMS 강사
+  | 'lms:instructor';     // Legacy LMS 강사 — Lecture cutover 완료 전 유지
+
+/** O4O Lecture service roles — 일반 학습자는 role이 아니라 service_memberships로 판정 */
+export type LectureRole =
+  | 'lecture:admin'
+  | 'lecture:operator'
+  | 'lecture:instructor';
 
 /**
  * Pharmacy-Hub service roles
@@ -128,6 +135,7 @@ export type PrefixedRole =
   | LegacyBareRole
   | CosmeticsRole
   | LmsRole
+  | LectureRole
   | PharmacyHubRole;
 
 /**
@@ -450,6 +458,20 @@ export const ROLE_REGISTRY: Record<PrefixedRole, RoleMetadata> = {
     service: 'lms',
     category: 'service',
     deprecated: false
+  },
+
+  // O4O Lecture roles (WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1)
+  'lecture:admin': {
+    role: 'lecture:admin', label: 'O4O Lecture Admin', description: 'O4O 강의 서비스 관리자',
+    service: 'lecture', category: 'service', deprecated: false
+  },
+  'lecture:operator': {
+    role: 'lecture:operator', label: 'O4O Lecture Operator', description: 'O4O 강의 서비스 운영자',
+    service: 'lecture', category: 'service', deprecated: false
+  },
+  'lecture:instructor': {
+    role: 'lecture:instructor', label: 'O4O Lecture Instructor', description: 'O4O 강의 서비스 강사',
+    service: 'lecture', category: 'service', deprecated: false
   },
 
   // Pharmacy-Hub roles (WO-PHARMACY-HUB-NEW-SERVICE-FOUNDATION-V1)

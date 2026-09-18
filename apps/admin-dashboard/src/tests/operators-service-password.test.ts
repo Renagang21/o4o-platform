@@ -73,12 +73,12 @@ describe('OperatorsPage — 비밀번호 write 계약', () => {
 
     // WO-O4O-ADMIN-SERVICE-OPERATOR-REGISTRATION-IDENTITY-V2-V1 (재정비):
     //   화면에 KPA 가 고정 표시되고 다른 서비스를 고를 수 없던 결함의 회귀 방지.
-    it('다섯 서비스가 모두 등록 카탈로그에 있다', () => {
+    it('운영 서비스가 모두 등록 카탈로그에 있다', () => {
       const catalog = SRC.slice(
         SRC.indexOf('const ASSIGNABLE_ROLES'),
         SRC.indexOf('CATALOG_ROLE_VALUES'),
       );
-      for (const key of ['kpa', 'neture', 'pharmacy-hub', 'cosmetics']) {
+      for (const key of ['kpa', 'neture', 'pharmacy-hub', 'lecture', 'cosmetics', 'kpa-branch']) {
         expect(catalog).toMatch(new RegExp(`${key}:`));
       }
     });
@@ -96,6 +96,16 @@ describe('OperatorsPage — 비밀번호 write 계약', () => {
       expect(roles).toMatch(/'pharmacy-hub:operator'/);
       // 사업자 신분 역할은 이 화면(서비스 운영자 등록)의 대상이 아니다.
       expect(roles).not.toMatch(/pharmacy-hub:store_owner/);
+    });
+
+    it('Lecture 는 admin·operator만 운영자 등록 대상이고 instructor/member는 제외한다', () => {
+      const catalog = SRC.slice(SRC.indexOf('const ASSIGNABLE_ROLES'), SRC.indexOf('CATALOG_ROLE_VALUES'));
+      const block = catalog.slice(catalog.indexOf("lecture: ["));
+      const roles = block.slice(0, block.indexOf('],'));
+      expect(roles).toMatch(/'lecture:admin'/);
+      expect(roles).toMatch(/'lecture:operator'/);
+      expect(roles).not.toMatch(/lecture:instructor/);
+      expect(roles).not.toMatch(/lecture:member/);
     });
 
     // WO-O4O-ADMIN-OPERATOR-CATALOG-KPA-BRANCH-V1:
