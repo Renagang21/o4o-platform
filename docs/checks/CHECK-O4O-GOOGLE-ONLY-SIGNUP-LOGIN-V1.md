@@ -42,7 +42,10 @@
 
 | 커밋 | 범위 |
 |---|---|
-| (보고 본문 참조) | WO 문서 · 서버(controller/dto/service/routes/tests) · packages(auth-client/auth-react/auth-context) · 5 web 서비스 · admin-dashboard · CHECK |
+| `8df41b1b8` | 서버 endpoint 3종 + DTO + service + tests · WO 문서 |
+| `1a139385b` | `@o4o/auth-client` · `@o4o/auth-react`(GoogleContinue + tests) · `@o4o/auth-context` |
+| `883db772d` | 5 web 서비스 로그인 진입점 + AuthContext · admin-dashboard Login · 하드코딩 자격증명 4곳 제거 |
+| `999fa5101` | 본 CHECK (git 표는 후속 커밋으로 갱신) |
 
 ## 4. 후속
 
