@@ -17,6 +17,8 @@ import { AppDataSource } from '../../database/connection.js';
 import logger from '../../utils/logger.js';
 import { resolveRolePrefixFromCanonicalServiceKey } from '@o4o/security-core';
 import { isAdminTierRoleName } from '../../utils/role-revoke-safety.js';
+import { getMissingStoreOwnerBusinessFields } from '../../utils/store-owner-business-info.js';
+import { ConflictError } from '../../utils/api-error.js';
 
 /**
  * WO-O4O-KPA-MEMBERSHIP-STATUS-SINGLE-TRANSACTION-CONVERGENCE-V1
@@ -373,6 +375,29 @@ export class MembershipApprovalService {
         });
         await queryRunner.rollbackTransaction();
         throw new Error(`CRITICAL: service_memberships.user_id is null for id=${membershipId}`);
+      }
+
+      // WO-O4O-STORE-OWNER-AGREEMENT-PUBLISH-PREREQUISITES-V1 §4.5:
+      // K-Cosmetics / PharmacyHub store_owner 는 active role 부여 직전에 사업자정보 5종을 서버에서 재검증한다.
+      // KPA 는 별도 canonical 개설약사 승인 흐름을 유지하므로 이 공통 보강의 대상이 아니다.
+      const prospectiveRole = resolveGrantedRole(membership.service_key, membership.role);
+      if (
+        prospectiveRole &&
+        ['k-cosmetics', 'pharmacy-hub'].includes(membership.service_key) &&
+        ['cosmetics:store_owner', 'pharmacy-hub:store_owner'].includes(prospectiveRole)
+      ) {
+        const userRows = await queryRunner.query(
+          `SELECT "businessInfo" FROM users WHERE id = $1 LIMIT 1`,
+          [userId],
+        );
+        const missingFields = getMissingStoreOwnerBusinessFields(userRows?.[0]?.businessInfo || {});
+        if (missingFields.length > 0) {
+          throw new ConflictError(
+            '매장 경영자 승인 전에 필수 사업자정보를 보완해야 합니다.',
+            'STORE_OWNER_BUSINESS_INFO_REQUIRED',
+            { missingFields },
+          );
+        }
       }
 
       // STEP1: Activate membership

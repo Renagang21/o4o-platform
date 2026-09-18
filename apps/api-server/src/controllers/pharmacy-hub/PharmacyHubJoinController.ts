@@ -39,6 +39,7 @@ import {
   type PharmacyHubSignupRole,
 } from '../../constants/pharmacy-hub-signup-roles.js';
 import logger from '../../utils/logger.js';
+import { getMissingStoreOwnerBusinessInput } from '../../utils/store-owner-business-info.js';
 
 const SERVICE_KEY = SERVICE_KEYS.PHARMACY_HUB;
 
@@ -90,9 +91,12 @@ function validateMinimalProfile(body: Record<string, any>, roleType: AllowedRole
   if (!filled(body.name) && !(filled(body.lastName) && filled(body.firstName))) missing.push('name');
   if (digits(body.phone) < 9) missing.push('phone');
 
-  // 약국명 — 기존 businessName 축 재사용 (companyName fallback). 약국 경영자 전용 항목.
-  if (roleType === 'store_owner' && !filled(body.businessName) && !filled(body.companyName)) {
-    missing.push('businessName');
+  // WO-O4O-STORE-OWNER-AGREEMENT-PUBLISH-PREREQUISITES-V1:
+  // Store Workspace 활성 전 계약상 필수 사업자정보 5종을 신청 단계에서도 받는다.
+  if (roleType === 'store_owner') {
+    for (const field of getMissingStoreOwnerBusinessInput(body)) {
+      if (!missing.includes(field)) missing.push(field);
+    }
   }
   return missing;
 }
@@ -124,7 +128,7 @@ export class PharmacyHubJoinController {
       return res.status(400).json({
         success: false,
         error: `${ROLE_LABEL[roleType as AllowedRoleType]} 가입 신청에 필요한 정보가 누락되었습니다.`,
-        code: 'PHARMACY_HUB_REQUIRED_FIELDS_MISSING',
+        code: roleType === 'store_owner' ? 'STORE_OWNER_BUSINESS_INFO_REQUIRED' : 'PHARMACY_HUB_REQUIRED_FIELDS_MISSING',
         missingFields,
       });
     }

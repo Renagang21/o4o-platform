@@ -285,7 +285,13 @@ export class PharmacyHubMembershipConsoleController {
         membershipId,
         error: error instanceof Error ? error.message : String(error),
       });
-      return res.status(500).json({ success: false, error: '가입 승인에 실패했습니다.' });
+      const statusCode = (error as any)?.statusCode === 409 ? 409 : 500;
+      return res.status(statusCode).json({
+        success: false,
+        error: error instanceof Error ? error.message : '가입 승인에 실패했습니다.',
+        code: (error as any)?.code,
+        ...((error as any)?.details?.missingFields ? { missingFields: (error as any).details.missingFields } : {}),
+      });
     }
   }
 

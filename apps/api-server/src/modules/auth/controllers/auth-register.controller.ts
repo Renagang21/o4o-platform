@@ -23,6 +23,7 @@ import { PasswordResetService } from '../../../services/passwordResetService.js'
 //   contact-request.controller.ts 의 broadcast 패턴을 그대로 사용한다.
 import { notificationService } from '../../../services/NotificationService.js';
 import { isPharmacyHubSignupRole } from '../../../constants/pharmacy-hub-signup-roles.js';
+import { getMissingStoreOwnerBusinessInput } from '../../../utils/store-owner-business-info.js';
 
 export class AuthRegisterController extends BaseController {
   /**
@@ -121,6 +122,19 @@ export class AuthRegisterController extends BaseController {
       //   - operator / admin / 강사 / 커뮤니티 운영자는 자가 신청 경로가 없다 — 사후 role grant 뿐이다.
       //   (Neture 의 NETURE_SIGNUP_ROLE_REQUIRED 와 동일 패턴 — serviceKey 로 한정하므로 타 서비스 무영향.)
       //   허용 목록 SSOT = constants/pharmacy-hub-signup-roles.ts (래퍼와 같은 목록을 본다)
+      // K-Cosmetics 판매자 = canonical store_owner. 프론트 검증 우회 방지를 위해 가입 write-path 에서도 5종 필수.
+      if (serviceKey === 'k-cosmetics' && ['seller', 'cosmetics:store_owner', 'k-cosmetics:store_owner'].includes(String(data.role || ''))) {
+        const missingFields = getMissingStoreOwnerBusinessInput(data as any);
+        if (missingFields.length > 0) {
+          return res.status(400).json({
+            success: false,
+            error: '매장 경영자 신청에 필요한 사업자정보를 모두 입력해 주세요.',
+            code: 'STORE_OWNER_BUSINESS_INFO_REQUIRED',
+            missingFields,
+          });
+        }
+      }
+
       if (serviceKey === 'pharmacy-hub') {
         if (!isPharmacyHubSignupRole(data.role)) {
           return BaseController.error(

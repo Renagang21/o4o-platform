@@ -669,10 +669,12 @@ export class MembershipConsoleController {
         code: (error as any)?.code,
         detail: (error as any)?.detail,
       });
-      res.status(500).json({
+      const statusCode = (error as any)?.statusCode === 409 ? 409 : 500;
+      res.status(statusCode).json({
         success: false,
         error: error instanceof Error ? error.message : 'Failed to approve membership',
         code: (error as any)?.code,
+        ...((error as any)?.details?.missingFields ? { missingFields: (error as any).details.missingFields } : {}),
       });
     }
   };
@@ -902,10 +904,12 @@ export class MembershipConsoleController {
         error: error instanceof Error ? error.message : String(error),
         code: (error as any)?.code,
       });
-      res.status(500).json({
+      const statusCode = (error as any)?.statusCode === 409 ? 409 : 500;
+      res.status(statusCode).json({
         success: false,
         error: error instanceof Error ? error.message : 'Failed to update user status',
         code: (error as any)?.code,
+        ...((error as any)?.details?.missingFields ? { missingFields: (error as any).details.missingFields } : {}),
       });
     }
   };
