@@ -36,6 +36,13 @@ import type { Request, Response, NextFunction } from 'express';
 import type { AuthContext } from '../auth/auth-context.js';
 import { resolveCanonicalServiceKey } from '@o4o/security-core';
 import { getServiceWorkspaceCapability } from '../config/service-catalog.js';
+import { policyAcceptanceService } from '../modules/policy-acceptance/policy-acceptance.service.js';
+import {
+  STORE_OWNER_AGREEMENT_REQUIRED_CODE,
+  STORE_OWNER_AGREEMENT_REQUIRED_MESSAGE,
+  STORE_OWNER_AGREEMENT_REQUIRED_STATUS,
+} from '../common/auth/store-owner-agreement.policy.js';
+import logger from './logger.js';
 import {
   resolveStoreOrganization,
   type StoreOrganizationResolution,
@@ -295,6 +302,31 @@ export function createRequireStoreOwner(
       return;
     }
 
+    // WO-O4O-STORE-OWNER-AGREEMENT-PUBLISH-PREREQUISITES-V1 §3:
+    // published 계약이 생긴 뒤에만 실제 store_owner 를 차단한다. 판정 장애는 인증 hot path 보호를 위해 fail-open.
+    try {
+      const canonicalServiceKey = serviceKey ? resolveCanonicalServiceKey(serviceKey) : undefined;
+      const pendingAgreements = await policyAcceptanceService.getPendingStoreOwnerAgreements(
+        user.id,
+        canonicalServiceKey,
+      );
+      if (pendingAgreements.length > 0) {
+        res.status(STORE_OWNER_AGREEMENT_REQUIRED_STATUS).json({
+          success: false,
+          error: STORE_OWNER_AGREEMENT_REQUIRED_MESSAGE,
+          code: STORE_OWNER_AGREEMENT_REQUIRED_CODE,
+          pendingPolicyAcceptances: pendingAgreements,
+        });
+        return;
+      }
+    } catch (error) {
+      logger.warn('[storeOwnerAgreement] pending check failed (fail-open)', {
+        userId: user.id,
+        serviceKey: serviceKey ?? null,
+        error: error instanceof Error ? error.message : String(error),
+      });
+    }
+
     req.organizationId = organizationId as any;
     req.authContext = {
       userId: user.id as string,
@@ -320,6 +352,20 @@ export async function resolveStoreAccess(
 ): Promise<string | null> {
   // ambiguous 는 organizationId 가 null 이므로 자연히 차단된다(임의 선택 없음).
   const { isOwner, organizationId } = await isStoreOwner(dataSource, userId, serviceKey);
-  if (isOwner) return organizationId;
-  return null;
+  if (!isOwner || !organizationId) return null;
+
+  // service-neutral back-compat API 도 계약 게이트를 우회할 수 없게 한다.
+  // 이 helper 는 Response 를 갖지 않으므로 pending 은 null 로 축소되고 호출 route 의 기존 403/empty 계약을 따른다.
+  try {
+    const canonicalServiceKey = serviceKey ? resolveCanonicalServiceKey(serviceKey) : undefined;
+    const pending = await policyAcceptanceService.getPendingStoreOwnerAgreements(userId, canonicalServiceKey);
+    if (pending.length > 0) return null;
+  } catch (error) {
+    logger.warn('[storeOwnerAgreement] resolveStoreAccess pending check failed (fail-open)', {
+      userId,
+      serviceKey: serviceKey ?? null,
+      error: error instanceof Error ? error.message : String(error),
+    });
+  }
+  return organizationId;
 }
