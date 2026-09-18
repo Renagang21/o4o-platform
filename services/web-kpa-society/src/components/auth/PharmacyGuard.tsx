@@ -23,6 +23,7 @@ import { AccessDenied } from '@o4o/ui';
 import { useAuth } from '../../contexts/AuthContext';
 import { hasAnyRole, PLATFORM_ROLES, STORE_OWNER_ROLES } from '../../lib/role-constants';
 import { MembershipGate } from './MembershipGate';
+import { StoreOwnerAgreementGate } from './StoreOwnerAgreementGate';
 
 interface PharmacyGuardProps {
   children: React.ReactNode;
@@ -86,7 +87,7 @@ export function PharmacyGuard({ children }: PharmacyGuardProps) {
       }
       membershipGate={MembershipGate}
     >
-      {children}
+      <StoreOwnerAgreementGate>{children}</StoreOwnerAgreementGate>
     </StoreOwnerGuard>
   );
 }
