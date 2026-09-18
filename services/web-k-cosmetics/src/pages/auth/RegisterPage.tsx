@@ -50,7 +50,9 @@ export default function RegisterPage() {
     nickname: '',
     phone: '',
     businessName: '',
+    representativeName: '',
     businessNumber: '',
+    businessAddress: '',
     // 사업자 연락처 3종 — WO-O4O-KCOSMETICS-BUSINESS-CONTACT-FIELDS-UI-EXTEND-V1
     //   회사/매장 전화 / 회사 대표 이메일 / 담당자 이메일 — users.businessInfo 저장(백엔드 기수용).
     businessPhone: '',
@@ -118,7 +120,9 @@ export default function RegisterPage() {
         role: selectedRole,
         service: 'k-cosmetics',
         businessName: formData.businessName,
+        representativeName: formData.representativeName,
         businessNumber: formData.businessNumber,
+        businessAddress: formData.businessAddress,
         // 사업자 연락처 3종 — WO-O4O-KCOSMETICS-BUSINESS-CONTACT-FIELDS-UI-EXTEND-V1
         //   DTO 가 businessEmail/contactEmail 에 @IsEmail 강제 → 빈 문자열 전송 금지(조건부).
         //   businessPhone/businessEmail/contactEmail → users.businessInfo (백엔드 기수용).
@@ -170,7 +174,14 @@ export default function RegisterPage() {
     if (emailAlreadyJoined) return false;
     const base = formData.email && formData.lastName && formData.firstName && formData.nickname &&
       formData.phone && isPhoneValid && formData.agreeTerms && formData.agreePrivacy;
-    return !!(base && isPasswordStrong && formData.password === formData.passwordConfirm);
+    const sellerBusinessComplete =
+      selectedRole !== 'seller' ||
+      (formData.businessName &&
+        formData.representativeName &&
+        formData.businessNumber &&
+        formData.businessAddress &&
+        formData.businessPhone);
+    return !!(base && sellerBusinessComplete && isPasswordStrong && formData.password === formData.passwordConfirm);
   };
 
   if (isSuccess) {
@@ -384,22 +395,36 @@ export default function RegisterPage() {
               <div style={styles.businessSection}>
                 <h3 style={styles.businessTitle}>사업자 정보</h3>
                 <div style={styles.inputGroup}>
-                  <label style={styles.label}>상호명</label>
+                  <label style={styles.label}>상호명 *</label>
                   <input
                     type="text"
                     name="businessName"
                     value={formData.businessName}
+                    required
                     onChange={handleInputChange}
                     placeholder="OO뷰티샵"
                     style={styles.input}
                   />
                 </div>
                 <div style={styles.inputGroup}>
-                  <label style={styles.label}>사업자등록번호</label>
+                  <label style={styles.label}>대표자명 *</label>
+                  <input
+                    type="text"
+                    name="representativeName"
+                    value={formData.representativeName}
+                    onChange={handleInputChange}
+                    placeholder="대표자 성명"
+                    style={styles.input}
+                    required
+                  />
+                </div>
+                <div style={styles.inputGroup}>
+                  <label style={styles.label}>사업자등록번호 *</label>
                   <input
                     type="text"
                     name="businessNumber"
                     value={formData.businessNumber}
+                    required
                     onChange={handleInputChange}
                     placeholder="000-00-00000"
                     style={styles.input}
@@ -408,11 +433,24 @@ export default function RegisterPage() {
                 {/* 사업자 연락처 3종 — WO-O4O-KCOSMETICS-BUSINESS-CONTACT-FIELDS-UI-EXTEND-V1
                     회사/매장 전화 · 회사 대표 이메일 · 담당자 이메일 (모두 선택). */}
                 <div style={styles.inputGroup}>
-                  <label style={styles.label}>회사/매장 전화</label>
+                  <label style={styles.label}>사업장 주소 *</label>
+                  <input
+                    type="text"
+                    name="businessAddress"
+                    value={formData.businessAddress}
+                    onChange={handleInputChange}
+                    placeholder="사업장 주소"
+                    style={styles.input}
+                    required
+                  />
+                </div>
+                <div style={styles.inputGroup}>
+                  <label style={styles.label}>회사/매장 전화 *</label>
                   <input
                     type="tel"
                     name="businessPhone"
                     value={formData.businessPhone}
+                    required
                     onChange={handleInputChange}
                     placeholder="숫자만 입력 (선택)"
                     style={styles.input}
