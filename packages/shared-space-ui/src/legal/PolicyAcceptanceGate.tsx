@@ -39,8 +39,14 @@ export interface PolicyAcceptanceGateProps {
   allowPaths?: string[];
   /** 서비스 표시명(제목에 사용). 예: 'KPA Society' */
   serviceName?: string;
-  /** 약관 전문 페이지 경로(새 탭 링크). 예: '/terms' · KPA 는 '/policy' */
+  /** 약관/계약 전문 페이지 경로(새 탭 링크). 예: '/terms' · KPA 는 '/policy' */
   termsPath?: string;
+  /** 기본 '이용약관'. 매장 계약 등 같은 UI 를 재사용할 때 표시명만 바꾼다. */
+  documentLabel?: string;
+  /** 기본 안내문을 교체할 때 사용. */
+  leadText?: string;
+  checkboxText?: string;
+  primaryText?: string;
   children: ReactNode;
 }
 
@@ -75,6 +81,10 @@ export function PolicyAcceptanceGate({
   allowPaths = [],
   serviceName,
   termsPath,
+  documentLabel = '이용약관',
+  leadText,
+  checkboxText,
+  primaryText,
   children,
 }: PolicyAcceptanceGateProps) {
   const location = useLocation();
@@ -133,10 +143,10 @@ export function PolicyAcceptanceGate({
   return (
     <div style={S.wrap} role="dialog" aria-modal="true" aria-labelledby="policy-acceptance-title">
       <div style={S.card}>
-        <p style={S.eyebrow}>{serviceName ? `${serviceName} · ` : ''}이용약관 동의</p>
+        <p style={S.eyebrow}>{serviceName ? `${serviceName} · ` : ''}{documentLabel} 동의</p>
         <h1 id="policy-acceptance-title" style={S.h1}>{first?.title || '서비스 이용약관'}에 동의해 주세요</h1>
         <p style={S.lead}>
-          서비스를 계속 이용하려면 아래 이용약관을 확인하고 동의해야 합니다. 동의하기 전까지는 약관 열람, 문의, 로그아웃만 이용할 수 있습니다.
+          {leadText ?? `서비스를 계속 이용하려면 아래 ${documentLabel}을 확인하고 동의해야 합니다. 동의하기 전까지는 문서 열람, 문의, 로그아웃만 이용할 수 있습니다.`}
           {services.length > 1 && (
             <> 이 약관은 회원님이 가입한 {services.join(' · ')} 서비스에 공통으로 적용되며, 한 번의 동의로 함께 처리됩니다.</>
           )}
@@ -166,7 +176,7 @@ export function PolicyAcceptanceGate({
             onChange={(e) => setChecked(e.target.checked)}
             style={{ marginTop: 3 }}
           />
-          <span>위 이용약관을 확인하였으며 이에 동의합니다. (필수)</span>
+          <span>{checkboxText ?? `위 ${documentLabel}을 확인하였으며 이에 동의합니다. (필수)`}</span>
         </label>
 
         {error && <div style={S.error} role="alert">{error}</div>}
@@ -178,14 +188,14 @@ export function PolicyAcceptanceGate({
             disabled={!canSubmit}
             onClick={submit}
           >
-            {submitting ? '처리 중…' : '동의하고 계속하기'}
+            {submitting ? '처리 중…' : (primaryText ?? '동의하고 계속하기')}
           </button>
           <button type="button" style={S.secondary} onClick={() => { void onLogout(); }} disabled={submitting}>
             로그아웃
           </button>
           {termsPath && (
             <a href={termsPath} target="_blank" rel="noopener noreferrer" style={S.link}>
-              약관 전문 새 탭에서 보기
+              {documentLabel} 전문 새 탭에서 보기
             </a>
           )}
         </div>
