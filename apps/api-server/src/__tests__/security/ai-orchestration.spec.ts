@@ -16,6 +16,8 @@ import {
   composePrompt,
   normalizeResponse,
   mapActions,
+  GeminiProvider,
+  execute,
 } from '@o4o/ai-core';
 import type {
   AIOrchestrationRequest,
@@ -357,7 +359,6 @@ describe('Gemini grounding (Web Research capability)', () => {
   });
 
   function newProvider() {
-    const { GeminiProvider } = require('@o4o/ai-core');
     return new GeminiProvider();
   }
 
@@ -445,7 +446,6 @@ describe('execute() grounding routing', () => {
   afterEach(() => { global.fetch = realFetch; });
 
   it('execute rejects grounding on non-gemini provider', async () => {
-    const { execute } = require('@o4o/ai-core');
     await expect(
       execute({
         systemPrompt: 'sys', userPrompt: 'user', provider: 'openai', grounding: true,
@@ -470,7 +470,6 @@ describe('execute() grounding routing', () => {
         text: async () => '',
       } as any;
     }) as any;
-    const { execute } = require('@o4o/ai-core');
     const r = await execute({
       systemPrompt: 'sys', userPrompt: 'user', provider: 'gemini', grounding: true,
       config: { apiKey: 'k', model: 'gemini-2.5-flash' },
