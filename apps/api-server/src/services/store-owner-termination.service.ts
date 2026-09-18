@@ -517,9 +517,8 @@ export class StoreOwnerTerminationService {
          FROM store_execution_assets sea
          JOIN media_assets ma ON ma.url=sea.file_url
         WHERE sea.organization_id=$1 AND sea.file_url IS NOT NULL
-          AND ma.uploaded_by=$2
-          AND ma.service_key=ANY($3::text[])`,
-      [c.organizationId, c.userId, cfg.contentKeys],
+          AND ma.uploaded_by=$2`,
+      [c.organizationId, c.userId],
     );
 
     return {
@@ -559,16 +558,14 @@ export class StoreOwnerTerminationService {
   }
 
   private async purgeOwnedMedia(c: StoreOwnerTerminationCase): Promise<void> {
-    const cfg = configFor(c.serviceKey);
     const rows = await this.dataSource.query(
       `SELECT DISTINCT ma.id, ma.url
          FROM store_execution_assets sea
          JOIN media_assets ma ON ma.url=sea.file_url
         WHERE sea.organization_id=$1
           AND sea.file_url IS NOT NULL
-          AND ma.uploaded_by=$2
-          AND ma.service_key=ANY($3::text[])`,
-      [c.organizationId, c.userId, cfg.contentKeys],
+          AND ma.uploaded_by=$2`,
+      [c.organizationId, c.userId],
     );
     const mediaService = new MediaLibraryService(this.dataSource);
     for (const row of rows) {
