@@ -56,6 +56,7 @@ export const SUPPORTED_POLICY_DOCUMENT_TYPES = [
   'marketing',
   'location',
   'custom',
+  'store_owner_agreement',
 ] as const;
 
 export function isSupportedPolicyDocumentType(t: string): boolean {
