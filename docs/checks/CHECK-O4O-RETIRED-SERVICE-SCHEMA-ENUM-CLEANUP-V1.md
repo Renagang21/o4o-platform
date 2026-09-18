@@ -97,19 +97,40 @@ git grep -niE '<retired keywords>' -- ':!apps/api-server/src/database/**' → 1
 ## 8. PR · CI
 
 ```text
-__PR_CI__
+branch work/retired-service-schema-enum-cleanup-v1 → PR #219 (fix(db): remove retired checkout order enum value)
+commit 290eea6dc (origin/main be247421c 위 rebase) · 이후 main 이동 3회를 병합(caefa8a99 · 0ee9ad063 · b0f12443f) — migration/baseline/deploy 파일 겹침 0
+CI: API Server Jest · Analyze(typescript) · Build Applications · Code Quality Check · CodeQL · SonarCloud · Size Labels → 전부 PASS (최종 head b0f12443f)
+  ※ 중간 1회 Code Quality FAIL = main acb449b4c(다른 세션 · lint-ratchet 회귀) 기인 · main 738f7671d 가 수정 → 병합 후 PASS. 이 WO 파일 원인 아님
+merge: gh pr merge --merge → main 1af2abdc4 (2026-09-18 02:12Z)
 ```
 
 ## 9. PRODUCTION (canonical Deploy API migration Job 경로 · 직접 SQL 0)
 
 ```text
-__PRODUCTION__
+머지 직전 read-only 게이트(2회 · 02:0x Z): label 5 · retired row 0 · GENERIC 23 · default/NOT NULL/index 불변 · 소비 = 컬럼 1 + 자체 인덱스 1 · typeorm_migrations 683/684 → drift 0
+Deploy API run 35298432884 (1af2abdc4) → build-and-deploy success
+Cloud Run Job o4o-api-migrations-nc6xl (02:22Z):
+  DATABASE_STATE = LEGACY_ESTABLISHED · CURRENT_INCREMENTAL_PREFIX = 6 / 7 · PRE_MIGRATION_SCHEMA_ASSERTION = PASS (dfc42b8e… 5745)
+  pending: RemoveRetiredCheckoutOrderTypeEnumValue1789690338675 → executed successfully · INCREMENTAL_EXECUTED = 1
+  LIVE_FINGERPRINT = 0ca1a71b9a511f0147583c919eb37814b1ad28f1ba042ceba1038393bb54df70 (5745) == EXPECTED (격리 PG 산출값과 일치)
+  POST_MIGRATION_SCHEMA_ASSERTION = PASS · MIGRATION_JOB = SUCCESS
+서비스: o4o-core-api-03698-2s8 traffic 100 · /health 200
+사후 read-only 점검: label 4 (GENERIC,DROPSHIPPING,COSMETICS,TOURISM) · retired row 0 · 총 23 = GENERIC 23 (분포 불변) · default 'GENERIC' · NOT NULL · IDX_checkout_orders_order_type 1 · enum 타입 1(임시 타입 0) · typeorm_migrations 684/685 최신 = RemoveRetiredCheckoutOrderTypeEnumValue1789690338675
+KEEP 재확인: checkout_orders.metadata.serviceKey 4 (UPDATE 0) · organizations.name 1 · store_playlists.name 1 · users.name 0
+  ※ users.name 1 → 0 은 이 WO 가 아니라 main 09d322654 (다른 세션 · WO-2C Legacy 테스트 계정 reset · users 58→1) 에 의한 것. 이 WO 의 데이터 write 0.
+직접 SQL write 0 · migration 수동 적용 0
 ```
 
 ## 10. 판정
 
 ```text
-__FINAL__
+DB_STRUCTURED_RESIDUAL = 0
+DB_SCHEMA_RESIDUAL = 0            (1 → 0 · production Job nc6xl)
+REPOSITORY_ACTIVE_RESIDUAL = 0    (census 1건 = docs/investigations 기록물 · HISTORICAL_RECORD)
+DB_HISTORICAL_ORDER_METADATA = 4  (KEEP · 영구 제외)
+DB_FREE_TEXT_RESIDUAL = 2         (KEEP · organizations 1 · store_playlists 1 · users 0 — 감소분은 WO-2C 09d322654 기인)
+MIGRATION_HISTORY_RESIDUAL = 104  (historical · 불변) + 이번 incremental 1 (label 문자열을 가드 대상으로 포함 · squash 대상)
+ACTIVE_SYSTEM_RESIDUAL = 0        (현행 코드 0 + 현행 업무 데이터 0 + 현행 DB 스키마 0)
 ```
 
 `RETIRED_SERVICE_TOTAL_REPOSITORY_RESIDUAL = 0` 은 선언하지 않는다 (migration history 104 는 최종 squash WO 대상).
