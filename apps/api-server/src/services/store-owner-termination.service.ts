@@ -678,8 +678,8 @@ export class StoreOwnerTerminationService {
               [c.organizationId],
             );
             await m.query(
-              `UPDATE organization_members SET "leftAt"=COALESCE("leftAt",NOW()), "updatedAt"=NOW()
-                WHERE organization_id=$1 AND user_id=$2 AND role='owner' AND "leftAt" IS NULL`,
+              `UPDATE organization_members SET left_at=COALESCE(left_at,NOW()), updated_at=NOW()
+                WHERE organization_id=$1 AND user_id=$2 AND role='owner' AND left_at IS NULL`,
               [c.organizationId,c.userId],
             );
           }
