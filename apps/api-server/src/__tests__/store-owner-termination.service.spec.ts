@@ -1,9 +1,11 @@
 import { StoreOwnerTerminationService } from '../services/store-owner-termination.service.js';
+import { MediaLibraryService } from '../modules/media/services/media-library.service.js';
 
 function fakeDs(handler: (sql:string, params:any[])=>any[]) {
   return {
     query: jest.fn(async (sql:string, params:any[]=[]) => handler(sql, params)),
     transaction: jest.fn(async (fn:any) => fn({ query: async (sql:string, params:any[]=[]) => handler(sql, params) })),
+    getRepository: jest.fn(() => ({})),
   } as any;
 }
 
@@ -62,6 +64,33 @@ describe('StoreOwnerTerminationService', () => {
     const result=await service.runDueCases(now);
     expect(result).toEqual({ terminated:0, overduePurges:1, failed:0 });
     expect(purgeSpy).not.toHaveBeenCalled();
+  });
+
+  it('keeps store_execution_assets retry evidence when GCS deletion fails', async () => {
+    const now=new Date('2026-09-26T00:00:00Z');
+    const due=new Date('2026-09-25T00:00:00Z');
+    const queries:string[]=[];
+    const ds=fakeDs((sql)=>{
+      queries.push(sql);
+      if (sql.includes('FROM store_owner_termination_cases WHERE id=')) return [{
+        id:'1', service_key:'pharmacy-hub', organization_id:'2', user_id:'3', status:'terminated',
+        requested_at:due, requested_by:null, return_requested:false, return_completed_at:null,
+        termination_effective_at:due, purge_due_at:due, purge_completed_at:null, cancelled_at:null,
+        failure_reason:null, created_at:due, updated_at:due,
+      }];
+      if (sql.includes('service_code<>')) return [];
+      if (sql.includes('COUNT(*)::int n')) return [{ n:0 }];
+      if (sql.includes('SELECT DISTINCT ma.id')) return [{ id:'media-1', url:'https://storage.googleapis.com/o4o-media-library/media/x.webp' }];
+      if (sql.includes('AS used_elsewhere')) return [{ used_elsewhere:false }];
+      return [];
+    });
+    const mediaSpy=jest.spyOn(MediaLibraryService.prototype,'deleteAsset')
+      .mockRejectedValue(Object.assign(new Error('MEDIA_STORAGE_DELETE_FAILED'),{code:'MEDIA_STORAGE_DELETE_FAILED'}));
+    const service=new StoreOwnerTerminationService(ds);
+    await expect(service.purgeCase('1',{dryRun:false,now})).rejects.toMatchObject({code:'PURGE_INCOMPLETE'});
+    expect(queries.some(q=>q.includes('DELETE FROM store_execution_assets'))).toBe(false);
+    expect(queries.some(q=>q.includes("SET status='failed'"))).toBe(true);
+    mediaSpy.mockRestore();
   });
 
   it('return package excludes supplier originals and system logs by construction', async () => {
