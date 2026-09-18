@@ -42,7 +42,9 @@ export type MigrationClass = new () => MigrationInterface;
 export const INCREMENTAL_MIGRATIONS: readonly MigrationClass[] = [];
 
 export function incrementalMigrationNames(): string[] {
-  return INCREMENTAL_MIGRATIONS.map((m) => {
+  // Append-only registry: empty right after a baseline rollover, populated by the next incremental
+  // migration. The emptiness is a point-in-time fact, not a reason to drop this read path.
+  return INCREMENTAL_MIGRATIONS.map((m) => { // NOSONAR typescript:S4158
     const instance = new m();
     const name = (instance as { name?: string }).name ?? m.name;
     if (name !== m.name) {
