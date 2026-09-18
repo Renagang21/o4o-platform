@@ -452,7 +452,7 @@ export class StoreOwnerTerminationService {
           SET name='Deleted Store ' || substring(id::text,1,8),
               "isActive"=false, address=NULL, address_detail=NULL, phone=NULL, description=NULL,
               business_number=NULL, metadata='{}'::jsonb, storefront_config='{}'::jsonb,
-              storefront_blocks=NULL, updated_at=NOW()
+              storefront_blocks=NULL, "updatedAt"=NOW()
         WHERE id=$1`,
       [c.organizationId],
     );
@@ -487,13 +487,7 @@ export class StoreOwnerTerminationService {
     try {
       await this.deleteServiceScoped(runner, c);
       if (plan.sharedPurgeEligible) await this.deleteShared(runner, c);
-      await runner.query(`DELETE FROM organization_service_enrollments WHERE organization_id=$1 AND service_code=$2`, [c.organizationId, c.serviceKey]);
-      await runner.query(
-        `UPDATE store_owner_termination_cases
-            SET status='purge_completed', purge_completed_at=NOW(), updated_at=NOW(), failure_reason=NULL
-          WHERE id=$1`,
-        [c.id],
-      );
+      // enrollment/case 완료 표시는 post-assertion 뒤에 한다. 경계 판정 근거를 먼저 지우지 않는다.
       await runner.commitTransaction();
     } catch (error) {
       await runner.rollbackTransaction();
@@ -514,6 +508,15 @@ export class StoreOwnerTerminationService {
       );
       throw Object.assign(new Error('파기 후 검증에 실패했습니다.'), { statusCode: 500, code: 'PURGE_INCOMPLETE' });
     }
+    await this.dataSource.transaction(async (m) => {
+      await m.query(`DELETE FROM organization_service_enrollments WHERE organization_id=$1 AND service_code=$2`, [c.organizationId, c.serviceKey]);
+      await m.query(
+        `UPDATE store_owner_termination_cases
+            SET status='purge_completed', purge_completed_at=NOW(), updated_at=NOW(), failure_reason=NULL
+          WHERE id=$1`,
+        [c.id],
+      );
+    });
     return { plan, deleted: true };
   }
 }
