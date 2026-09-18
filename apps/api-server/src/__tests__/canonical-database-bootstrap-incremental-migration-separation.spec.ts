@@ -1,14 +1,16 @@
 /**
  * Canonical DB bootstrap ↔ incremental migration 분리 계약 회귀 테스트
- * (WO-O4O-CANONICAL-DATABASE-BOOTSTRAP-AND-INCREMENTAL-MIGRATION-SEPARATION-V1)
+ * (WO-O4O-CANONICAL-DATABASE-BOOTSTRAP-AND-INCREMENTAL-MIGRATION-SEPARATION-V1,
+ *  2026-09-18-id685 baseline rollover: WO-O4O-RETIRED-SERVICE-MIGRATION-HISTORY-SQUASH-AND-BASELINE-FINAL-CLOSURE-V1)
  *
  * 배경
  * ────
- * 운영 DB 는 644개 historical migration 의 결과물이지만 그 파일들은 빈 DB 에서 재생(replay)되지
- * 않는다(TypeORM 끝 13자리 정렬 + 삭제된 30개 migration). 그래서 빈 DB 는 canonical schema-only
+ * 운영 DB 는 수백 개 historical migration 의 결과물이지만 그 파일들은 빈 DB 에서 재생(replay)되지
+ * 않는다(TypeORM 끝 13자리 정렬 + 삭제된 migration). 그래서 빈 DB 는 canonical schema-only
  * snapshot 으로 bootstrap 하고, 운영 DB 는 baseline 이후의 incremental manifest 만 적용한다.
  * 두 경로는 `src/migrate.ts` 한 곳에서 DATABASE_STATE 분류로 갈라지며, 어떤 경로에서도
- * historical migration 은 로드되지 않는다.
+ * historical migration 은 로드되지 않는다. historical source 파일은 runtime provenance 가 아니다 —
+ * 운영 DB 의 legacy history 정당성은 ordered history fingerprint 로 검증한다.
  *
  * 방식
  * ────
@@ -27,11 +29,8 @@ import {
   FINGERPRINT_EXCLUDED_RELATIONS,
   SCHEMA_FINGERPRINT_SQL,
 } from '../database/bootstrap/schema-fingerprint.js';
-import {
-  CANONICAL_SCHEMA_BASELINE_META,
-  LEGACY_HISTORY_ANCHORS,
-  CORE_TABLES,
-} from '../database/bootstrap/canonical-schema-baseline.meta.js';
+import { CANONICAL_SCHEMA_BASELINE_META, CORE_TABLES } from '../database/bootstrap/canonical-schema-baseline.meta.js';
+import { LEGACY_HISTORY_BASELINE } from '../database/incremental/legacy-history-baseline.js';
 import {
   CANONICAL_SCHEMA_BASELINE_CENSUS,
   CANONICAL_SCHEMA_BASELINE_STATEMENTS,
@@ -87,8 +86,26 @@ describe('canonical schema baseline (snapshot + meta)', () => {
     expect(CANONICAL_SCHEMA_BASELINE_META.expectedFingerprint).toMatch(/^[0-9a-f]{64}$/);
     expect(CANONICAL_SCHEMA_BASELINE_META.expectedFingerprintLineCount).toBeGreaterThan(0);
     expect(CANONICAL_SCHEMA_BASELINE_META.baselineVersion).toBe(INCREMENTAL_MIGRATION_CUTOFF.baselineVersion);
-    expect(CANONICAL_SCHEMA_BASELINE_META.lastHistoricalMigration).toBe(INCREMENTAL_MIGRATION_CUTOFF.lastHistoricalMigration);
-    expect(CANONICAL_SCHEMA_BASELINE_META.historicalMigrationFileCount).toBe(historical.count);
+    expect(CANONICAL_SCHEMA_BASELINE_META.baselineVersion).toMatch(/^\d{4}-\d{2}-\d{2}-id\d+$/);
+    expect(CANONICAL_SCHEMA_BASELINE_META.supersedesBaselineVersion).not.toBe(CANONICAL_SCHEMA_BASELINE_META.baselineVersion);
+    expect(CANONICAL_SCHEMA_BASELINE_META.absorbedIncrementalMigrationCount).toBeGreaterThanOrEqual(0);
+    // no historical-name cutoff fields survive the rollover
+    expect(CANONICAL_SCHEMA_BASELINE_META).not.toHaveProperty('lastHistoricalMigration');
+    expect(CANONICAL_SCHEMA_BASELINE_META).not.toHaveProperty('historicalMigrationFileCount');
+    expect(INCREMENTAL_MIGRATION_CUTOFF).not.toHaveProperty('lastHistoricalMigration');
+    expect(INCREMENTAL_MIGRATION_CUTOFF).not.toHaveProperty('lastHistoricalSortKey');
+  });
+
+  it('legacy production history is an ordered fingerprint (no plaintext names), captured for this baseline', () => {
+    expect(LEGACY_HISTORY_BASELINE.orderedNameSequenceSha256).toMatch(/^[0-9a-f]{64}$/);
+    expect(LEGACY_HISTORY_BASELINE.rowCount).toBeGreaterThan(0);
+    expect(LEGACY_HISTORY_BASELINE.distinctNameCount).toBeLessThanOrEqual(LEGACY_HISTORY_BASELINE.rowCount);
+    expect(LEGACY_HISTORY_BASELINE.capturedThroughId).toBeGreaterThanOrEqual(LEGACY_HISTORY_BASELINE.rowCount);
+    expect(LEGACY_HISTORY_BASELINE.capturedAt).toBe(CANONICAL_SCHEMA_BASELINE_META.sourceCapturedAt);
+    expect(read('database/incremental/legacy-history-baseline.ts')).not.toMatch(/'[A-Z][A-Za-z0-9_]*\d{13,14}'/);
+    for (const f of ['historical-migration-names.ts', 'legacy-history.facts.ts']) {
+      expect(fs.existsSync(path.join(SRC, 'database', 'incremental', f))).toBe(false);
+    }
   });
 
   it('census matches the statement list', () => {
@@ -122,13 +139,16 @@ describe('canonical schema baseline (snapshot + meta)', () => {
     }
   });
 
-  it('core tables and legacy anchors are consistent with the snapshot / historical manifest', () => {
+  it('core tables are present in the snapshot and no retired object pattern is resurrected', () => {
     for (const t of CORE_TABLES) {
       const re = new RegExp(`^CREATE TABLE ${t.schema}\\.${t.table} \\(`);
       expect(CANONICAL_SCHEMA_BASELINE_STATEMENTS.some((s) => re.test(s))).toBe(true);
     }
-    for (const a of LEGACY_HISTORY_ANCHORS) expect(historicalNames.has(a)).toBe(true);
-    expect(historicalNames.has(CANONICAL_SCHEMA_BASELINE_META.lastHistoricalMigration)).toBe(true);
+    const created = CANONICAL_SCHEMA_BASELINE_STATEMENTS
+      .map((s) => /^CREATE (?:TABLE|TYPE) public\.(\w+)/.exec(s)?.[1])
+      .filter((n): n is string => Boolean(n));
+    const resurrected = created.filter((n) => CANONICAL_SCHEMA_BASELINE_META.retiredObjectPatterns.some((re) => re.test(n)));
+    expect(resurrected).toEqual([]);
   });
 });
 
@@ -163,9 +183,31 @@ describe('historical migrations are frozen and never loaded', () => {
     const guard = path.join(SRC, '..', '..', '..', 'scripts', 'db', 'check-migration-contract.mjs');
     const r = spawnSync(process.execPath, [guard, '--write-historical'], { encoding: 'utf8', env: { ...process.env, CI: '1' } });
     expect(r.status).toBe(0);
-    expect(r.stdout).toMatch(/historical entries 644 · identity corrections 0 · historical-migration-names\.ts in lockstep/);
+    expect(r.stdout).toMatch(new RegExp(`historical entries ${historical.count} · identity corrections 0 · removed 0`));
+    // the manifest is an identity freeze of the RETAINED source files only (not runtime provenance)
+    const incrementalFiles = new Set(incrementalFilesOf());
+    expect(historical.entries.map((e) => e.file)).toEqual(files.filter((f) => !incrementalFiles.has(f)));
+  });
+
+  it('no runtime module imports a historical migration source (they are never runtime provenance)', () => {
+    const offenders: string[] = [];
+    const walk = (dir: string) => {
+      for (const ent of fs.readdirSync(dir, { withFileTypes: true })) {
+        const p = path.join(dir, ent.name);
+        if (ent.isDirectory()) { if (!/__tests__|migrations$/.test(ent.name)) walk(p); continue; }
+        if (!ent.name.endsWith('.ts')) continue;
+        const stripped = fs.readFileSync(p, 'utf8').replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
+        if (/\/migrations\/\d{13,14}-/.test(stripped)) offenders.push(path.relative(SRC, p));
+      }
+    };
+    walk(SRC);
+    expect(offenders).toEqual([]);
   });
 });
+
+function incrementalFilesOf(): string[] {
+  return [...read('database/incremental/manifest.ts').matchAll(/from\s+['"]\.\.\/migrations\/([^'"]+?)(?:\.js)?['"]/g)].map((m) => `${m[1]}.ts`);
+}
 
 describe('incremental manifest', () => {
   it('names equal classes, are unique, strictly increasing 13-digit epochs after the cutoff, and not historical', () => {
@@ -177,12 +219,12 @@ describe('incremental manifest', () => {
       expect({ n, epoch }).toEqual({ n, epoch: expect.any(String) });
       const e = Number(epoch);
       expect(e).toBeGreaterThanOrEqual(INCREMENTAL_MIGRATION_CUTOFF.minimumEpoch13);
-      expect(e).toBeGreaterThan(INCREMENTAL_MIGRATION_CUTOFF.lastHistoricalSortKey);
       expect(e).toBeGreaterThan(prev);
       prev = e;
       expect(historicalNames.has(n)).toBe(false);
     }
     expect(INCREMENTAL_MIGRATIONS.length).toBe(names.length);
+    expect(String(INCREMENTAL_MIGRATION_CUTOFF.minimumEpoch13)).toMatch(/^\d{13}$/);
   });
 });
 
