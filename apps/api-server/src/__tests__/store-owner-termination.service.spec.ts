@@ -50,6 +50,20 @@ describe('StoreOwnerTerminationService', () => {
     expect(preview.mediaCandidates).toBe(0);
   });
 
+  it('scheduler detects overdue purge but never executes destructive purge automatically', async () => {
+    const now=new Date('2026-09-25T00:00:00Z');
+    const ds=fakeDs((sql)=>{
+      if (sql.includes("status IN ('termination_scheduled','return_completed')")) return [];
+      if (sql.includes("status IN ('terminated','failed')")) return [{ id:'overdue-1' }];
+      return [];
+    });
+    const service=new StoreOwnerTerminationService(ds);
+    const purgeSpy=jest.spyOn(service,'purgeCase');
+    const result=await service.runDueCases(now);
+    expect(result).toEqual({ terminated:0, overduePurges:1, failed:0 });
+    expect(purgeSpy).not.toHaveBeenCalled();
+  });
+
   it('return package excludes supplier originals and system logs by construction', async () => {
     const now=new Date('2026-09-18T00:00:00Z');
     const ds=fakeDs((sql)=>{
