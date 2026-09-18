@@ -1,5 +1,13 @@
 import axios, { AxiosInstance, AxiosError } from 'axios';
-import type { LoginCredentials, AuthResponse, GoogleAuthResponse, GoogleAuthConfig, GoogleSignupConsents } from './types.js';
+import type {
+  LoginCredentials,
+  AuthResponse,
+  GoogleAuthResponse,
+  GoogleAuthConfig,
+  GoogleSignupConsents,
+  GoogleLinkStatus,
+  GoogleLinkResult,
+} from './types.js';
 import {
   getAccessToken,
   setAccessToken,
@@ -314,6 +322,30 @@ export class AuthClient {
       return { enabled: data?.enabled === true && !!data?.clientId, clientId: data?.clientId ?? null };
     } catch {
       return { enabled: false, clientId: null };
+    }
+  }
+
+  /**
+   * WO-O4O-GOOGLE-IDENTITY-OPERATOR-EXPLICIT-LINK-V1
+   * 로그인된 계정에 Google Identity 명시 연결 — POST /auth/google/link `{ idToken, currentPassword }`.
+   * 세션은 바뀌지 않는다(토큰 재발급 없음). 서버 오류(INVALID_PASSWORD 401 · GOOGLE_IDENTITY_IN_USE 409 ·
+   * GOOGLE_ACCOUNT_ALREADY_LINKED 409 · PASSWORD_NOT_SET 400)는 axios 오류로 전파된다.
+   */
+  async linkGoogle(idToken: string, currentPassword: string): Promise<GoogleLinkResult> {
+    const response = await this.api.post('/auth/google/link', { idToken, currentPassword });
+    const data = (response.data as { data?: Partial<GoogleLinkResult> })?.data;
+    return { linked: true, alreadyLinked: data?.alreadyLinked === true };
+  }
+
+  /** GET /auth/google/link/status — `{ linked, passwordSet }`. 실패 시 null(화면은 카드를 숨긴다). */
+  async getGoogleLinkStatus(): Promise<GoogleLinkStatus | null> {
+    try {
+      const response = await this.api.get('/auth/google/link/status');
+      const data = (response.data as { data?: Partial<GoogleLinkStatus> })?.data;
+      if (!data || typeof data.linked !== 'boolean') return null;
+      return { linked: data.linked, passwordSet: data.passwordSet === true };
+    } catch {
+      return null;
     }
   }
 

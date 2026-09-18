@@ -7,6 +7,7 @@
  * displayName · pendingPolicyAcceptances). 검증·조회·세션 발급은 전부 `googleAuthService` 가 담당한다.
  */
 import { Request, Response } from 'express';
+import type { AuthRequest } from '../../../common/middleware/auth.middleware.js';
 import { getTrustedClientIp } from '../../../utils/trusted-client-ip.js';
 import { BaseController } from '../../../common/base.controller.js';
 import { authenticationService } from '../../../services/authentication.service.js';
@@ -14,7 +15,7 @@ import { policyAcceptanceService } from '../../policy-acceptance/policy-acceptan
 import { googleAuthService, GoogleAuthError, type GoogleAuthSession } from '../../../services/auth/google-auth.service.js';
 import { GoogleIdTokenError } from '../../../services/auth/google-identity.service.js';
 import { googleIdentityConfig } from '../../../config/google-identity.config.js';
-import type { GoogleLoginRequestDto, GoogleSignupRequestDto } from '../dto/index.js';
+import type { GoogleLinkRequestDto, GoogleLoginRequestDto, GoogleSignupRequestDto } from '../dto/index.js';
 import logger from '../../../utils/logger.js';
 import { monitoringMetrics } from '../../../common/monitoring/metrics.service.js';
 import { isCrossOriginRequest } from './auth-helpers.js';
@@ -74,6 +75,43 @@ export class GoogleAuthController extends BaseController {
     }
   }
 
+  /**
+   * POST /api/v1/auth/google/link — `{ idToken, currentPassword }` (requireAuth)
+   * WO-O4O-GOOGLE-IDENTITY-OPERATOR-EXPLICIT-LINK-V1: 대상 user 는 세션에서만. 세션은 새로 발급하지 않는다.
+   */
+  static async link(req: AuthRequest, res: Response): Promise<any> {
+    const userId = req.user?.id;
+    if (!userId) {
+      return BaseController.unauthorized(res, 'Authentication required', 'AUTH_REQUIRED');
+    }
+    const { idToken, currentPassword } = req.body as GoogleLinkRequestDto;
+    try {
+      const result = await googleAuthService.link({
+        userId,
+        idToken,
+        currentPassword,
+        ipAddress: getTrustedClientIp(req),
+        userAgent: req.headers['user-agent'] || 'Unknown',
+      });
+      return BaseController.ok(res, result);
+    } catch (error) {
+      return GoogleAuthController.handleError(res, error, 'link');
+    }
+  }
+
+  /** GET /api/v1/auth/google/link/status — `{ linked, passwordSet }` (requireAuth · PII 없음) */
+  static async linkStatus(req: AuthRequest, res: Response): Promise<any> {
+    const userId = req.user?.id;
+    if (!userId) {
+      return BaseController.unauthorized(res, 'Authentication required', 'AUTH_REQUIRED');
+    }
+    try {
+      return BaseController.ok(res, await googleAuthService.getLinkStatus(userId));
+    } catch (error) {
+      return GoogleAuthController.handleError(res, error, 'link');
+    }
+  }
+
   private static async respondWithSession(
     req: Request,
     res: Response,
@@ -112,7 +150,7 @@ export class GoogleAuthController extends BaseController {
     return status === 201 ? BaseController.created(res, body) : BaseController.ok(res, body);
   }
 
-  private static handleError(res: Response, error: unknown, op: 'login' | 'signup'): any {
+  private static handleError(res: Response, error: unknown, op: 'login' | 'signup' | 'link'): any {
     const err = error as Error & { code?: string; reason?: string; statusCode?: number; details?: { status?: unknown } };
     monitoringMetrics.recordAuthFailure(err.code || 'UNKNOWN');
 
@@ -135,6 +173,6 @@ export class GoogleAuthController extends BaseController {
       code: err.code,
       stack: err.stack?.split('\n').slice(0, 3).join(' | '),
     });
-    return BaseController.error(res, op === 'login' ? 'Login failed' : 'Signup failed');
+    return BaseController.error(res, op === 'login' ? 'Login failed' : op === 'signup' ? 'Signup failed' : 'Google link failed');
   }
 }

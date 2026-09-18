@@ -5,7 +5,7 @@
 import 'reflect-metadata';
 import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
-import { GoogleLoginRequestDto, GoogleSignupRequestDto } from '../google-auth.dto.js';
+import { GoogleLinkRequestDto, GoogleLoginRequestDto, GoogleSignupRequestDto } from '../google-auth.dto.js';
 
 const OPTS = { whitelist: true, forbidNonWhitelisted: true, skipMissingProperties: false } as const;
 const run = (cls: any, body: unknown) => validate(plainToInstance(cls, body), OPTS);
@@ -30,6 +30,15 @@ describe('Google auth DTO — 입력 계약', () => {
     for (const field of ['name', 'phone', 'email', 'sub', 'role', 'serviceKey', 'password']) {
       const errors = await run(GoogleSignupRequestDto, { idToken: 't', consents: { terms: true, privacy: true }, [field]: 'x' });
       expect(errors.some((e) => e.property === field)).toBe(true);
+    }
+  });
+  it('link: { idToken, currentPassword } 만 허용 — userId/email/sub/providerId/serviceKey 는 400 (WO-O4O-GOOGLE-IDENTITY-OPERATOR-EXPLICIT-LINK-V1)', async () => {
+    expect(await run(GoogleLinkRequestDto, { idToken: 't', currentPassword: 'p' })).toHaveLength(0);
+    expect((await run(GoogleLinkRequestDto, { idToken: 't' })).length).toBeGreaterThan(0);
+    expect((await run(GoogleLinkRequestDto, { idToken: 't', currentPassword: '' })).length).toBeGreaterThan(0);
+    for (const field of ['userId', 'email', 'sub', 'providerId', 'provider', 'role', 'serviceKey', 'includeLegacyTokens']) {
+      const errors = await run(GoogleLinkRequestDto, { idToken: 't', currentPassword: 'p', [field]: 'x' });
+      expect(errors.some((e) => e.property === field && e.constraints?.whitelistValidation)).toBe(true);
     }
   });
 });

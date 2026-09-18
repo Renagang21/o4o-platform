@@ -18,6 +18,8 @@ export { createRouteGuard } from './createRouteGuard';
 export { useRoleSelection } from './useRoleSelection';
 export { GoogleContinue } from './GoogleContinue';
 export type { GoogleContinueProps } from './GoogleContinue';
+export { GoogleAccountLink } from './GoogleAccountLink';
+export type { GoogleAccountLinkProps } from './GoogleAccountLink';
 export type {
   AuthLoginResult,
   AuthClientLike,
