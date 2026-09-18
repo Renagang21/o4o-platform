@@ -32,7 +32,6 @@ import {
 } from '@/api/blogStaff';
 import { fetchChannelOverviewWithCode } from '@/api/storeHub';
 import { RichTextEditor, LlmAssistPanel } from '@o4o/content-editor';
-import { getAccessToken } from '@o4o/auth-client';
 
 const SERVICE = 'cosmetics';
 
@@ -89,10 +88,6 @@ export default function StoreBlogManagePage() {
           placeholder={placeholder}
           minHeight="360px"
           preset="full"
-          aiRequestHeaders={(() => {
-            const token = getAccessToken();
-            return token ? { Authorization: `Bearer ${token}` } : undefined;
-          })()}
         />
       )}
     />

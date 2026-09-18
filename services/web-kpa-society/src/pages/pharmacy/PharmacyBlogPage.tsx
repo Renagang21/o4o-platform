@@ -28,7 +28,6 @@ import { getStoreSlug } from '../../api/pharmacyInfo';
 import { RichTextEditor, LlmAssistPanel } from '@o4o/content-editor';
 import { buildStoreContentAuthoringPrompt, STORE_LLM_ASSIST_LABEL } from '@o4o/store-ui-core';
 import { mediaApi } from '../../api/media';
-import { getAccessToken } from '../../contexts/AuthContext';
 // WO-O4O-BLOG-TEMPLATE-WORKFLOW-V1: 블로그 템플릿 연결
 import { findTemplate } from './productionTemplates';
 import type { ProductionTemplate } from './productionTemplates';
@@ -444,7 +443,8 @@ export function PharmacyBlogPage({ service }: { service?: string }) {
           </div>
         ) : undefined}
         /* WO-O4O-KPA-BLOG-AI-STEP-REMOVE-V1: 블로그 초안 AI 생성 진입점 제거(초안 생성 AI 제거 정책).
-           외부 AI 도구에서 작성한 글을 본문에 붙여넣어 편집한다. (본문 편집기 Toolbar "AI 정리"는 유지.) */
+           외부 AI 도구에서 작성한 글을 본문에 붙여넣어 편집한다.
+           WO-O4O-STORE-INTERNAL-AI-RETIREMENT-V1: 편집기 내부 AI(aiRequestHeaders)도 은퇴 — 외부 LLM 경로만 남는다. */
         beforeEditor={(
           <div>
             {/* WO-O4O-STORE-PRODUCTION-EXTERNAL-LLM-REALIGNMENT-V1 §16: 외부 LLM 블로그 본문 작업 — Prompt 는 store-ui-core(task='blog').
@@ -481,10 +481,6 @@ export function PharmacyBlogPage({ service }: { service?: string }) {
             placeholder="전문 칼럼을 작성하세요"
             minHeight="360px"
             preset="full"
-            aiRequestHeaders={(() => {
-              const token = getAccessToken();
-              return token ? { Authorization: `Bearer ${token}` } : undefined;
-            })()}
           />
         )}
       />

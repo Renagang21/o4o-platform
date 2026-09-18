@@ -18,7 +18,6 @@ import {
   STORE_LLM_ASSIST_LABEL,
 } from '@o4o/store-ui-core';
 import { RichTextEditor, LlmAssistPanel } from '@o4o/content-editor';
-import { getAccessToken } from '@o4o/auth-client';
 import { fetchLocalProducts, updateLocalProduct } from '@/services/localProductApi';
 import { findTemplate } from '@/config/productionTemplates';
 
@@ -60,10 +59,6 @@ export default function StoreProductDescriptionsPage() {
           placeholder={placeholder}
           minHeight="360px"
           preset="full"
-          aiRequestHeaders={(() => {
-            const token = getAccessToken();
-            return token ? { Authorization: `Bearer ${token}` } : undefined;
-          })()}
         />
       )}
     />

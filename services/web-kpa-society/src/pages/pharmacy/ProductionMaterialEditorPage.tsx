@@ -1,5 +1,9 @@
 /**
- * ProductionMaterialEditorPage — AI 결과 검토/수정 전용 편집기
+ * ProductionMaterialEditorPage — 매장 제작 자료 편집기(외부 LLM 결과 검토/수정)
+ *
+ * WO-O4O-STORE-INTERNAL-AI-RETIREMENT-V1:
+ *   편집기 내부 AI(aiRequestHeaders) 은퇴. 아래 AiContentModal 관련 진입 계약 설명은 이력이며,
+ *   현행 제작 경로는 LlmAssistPanel(ChatGPT로 작업) → 편집기 → 저장이다.
  *
  * WO-O4O-STORE-PRODUCTION-MATERIALS-STANDARD-EDITOR-APPLY-V1
  * WO-O4O-STORE-PRODUCTION-MATERIALS-FLOW-RECOVERY-V1:
@@ -43,7 +47,6 @@ import {
   getStoreExecutionAsset,
   updateStoreExecutionAsset,
 } from '../../api/storeExecutionAssets';
-import { getAccessToken } from '../../contexts/AuthContext';
 import { colors } from '../../styles/theme';
 import { PRODUCTION_TARGET_CATALOG, type ProductionTarget } from './productionTargets';
 import { findTemplate } from './productionTemplates';
@@ -139,11 +142,6 @@ export default function ProductionMaterialEditorPage() {
       cancelled = true;
     };
   }, [editId, navigate]);
-
-  const aiHeaders = useCallback((): Record<string, string> | undefined => {
-    const token = getAccessToken();
-    return token ? { Authorization: `Bearer ${token}` } : undefined;
-  }, []);
 
   const handleChange = useCallback((content: EditorContent) => {
     setEditorContent(content);
@@ -325,7 +323,6 @@ export default function ProductionMaterialEditorPage() {
           placeholder="직접 작성하거나 ChatGPT 등 외부 AI에서 만든 내용을 붙여넣으세요."
           minHeight="520px"
           preset="full"
-          aiRequestHeaders={aiHeaders()}
         />
       </div>
 

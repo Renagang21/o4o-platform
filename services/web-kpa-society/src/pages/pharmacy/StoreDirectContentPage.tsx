@@ -31,7 +31,6 @@ import { BlockRenderer } from '@o4o/block-renderer';
 import { directContentApi, type DirectContentItem } from '../../api/assetSnapshot';
 import { kpaBlocksToRendererBlocks } from '../../utils/kpa-block-adapter';
 import { TagInput } from '../../components/store/TagInput';
-import { getAccessToken } from '../../contexts/AuthContext';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -145,11 +144,6 @@ export default function StoreDirectContentPage() {
   useEffect(() => { fetchContent(); }, [fetchContent]);
 
   // 표준 편집기는 html 로 동작 — 저장된 contentJson 을 html 로 정규화해 주입(유형 분기 아님).
-  const aiHeaders = useCallback((): Record<string, string> | undefined => {
-    const token = getAccessToken();
-    return token ? { Authorization: `Bearer ${token}` } : undefined;
-  }, []);
-
   const startEdit = () => {
     if (!content) return;
     setEditTitle(content.title);
@@ -372,7 +366,6 @@ export default function StoreDirectContentPage() {
             placeholder="본문 내용을 입력하세요"
             minHeight="420px"
             preset="full"
-            aiRequestHeaders={aiHeaders()}
           />
         </div>
       ) : (

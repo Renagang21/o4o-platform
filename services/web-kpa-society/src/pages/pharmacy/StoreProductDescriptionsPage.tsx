@@ -8,7 +8,9 @@
  * WO-O4O-PRODUCT-DESCRIPTION-TEMPLATE-WORKFLOW-V1:
  *   RichTextEditor 기반 편집 · selectedTemplateId 수신 · template badge · starterHtml 주입.
  * WO-O4O-KPA-CONTENT-CREATION-AI-ENTRY-REMOVE-V1:
- *   페이지형 AI 진입 제거. 직접 작성/저장/prefill 및 Toolbar "AI 정리"는 보존.
+ *   페이지형 AI 진입 제거. 직접 작성/저장/prefill 보존.
+ * WO-O4O-STORE-INTERNAL-AI-RETIREMENT-V1:
+ *   편집기 내부 AI(aiRequestHeaders) 은퇴 — 외부 LLM(ChatGPT로 작업) 경로만 남는다.
  * WO-O4O-STORE-PRODUCT-DESCRIPTION-OWNERSHIP-ALIGNMENT-V1 (2026-07-29):
  *   canonical 저장 위치 = `store_local_products.detail_html`
  *     - 조회: 목록 응답 row 의 detailHtml / detail_html (추가 조회 API 없음)
@@ -33,7 +35,6 @@ import {
 import { RichTextEditor, LlmAssistPanel } from '@o4o/content-editor';
 import { fetchLocalProducts, updateLocalProduct } from '../../api/localProducts';
 import { mediaApi } from '../../api/media';
-import { getAccessToken } from '../../contexts/AuthContext';
 import { colors } from '../../styles/theme';
 import { findTemplate } from './productionTemplates';
 
@@ -126,10 +127,6 @@ export default function StoreProductDescriptionsPage() {
           placeholder={placeholder}
           minHeight="360px"
           preset="full"
-          aiRequestHeaders={(() => {
-            const token = getAccessToken();
-            return token ? { Authorization: `Bearer ${token}` } : undefined;
-          })()}
         />
       )}
     />

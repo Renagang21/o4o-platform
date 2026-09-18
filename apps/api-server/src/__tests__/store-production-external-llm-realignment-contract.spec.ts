@@ -11,7 +11,7 @@
  *   (C) TARGET_SPECIFIC 13 census — 전부 external LLM entry(LlmAssistPanel + Prompt Core + 라벨) 보유 ·
  *       showInternalAi={false} 유지 · AiContentModal/`/api/ai/content` 재연결 0 · Prompt 전문 복사본 0 ·
  *       provider-specific provenance(generatedBy='chatgpt' 등) 0.
- *   (D) QR — legacy 내부 AI(/api/ai/qr-description) 는 유지(WO 4 대상) 하되 외부 경로는 Gemini provenance 를 쓰지 않는다.
+ *   (D) QR — 외부 경로는 Gemini provenance 를 쓰지 않는다. (legacy 내부 AI 는 WO 4 에서 은퇴 — 별도 spec)
  *   (E) 실행 자동화 금지 — 결과 적용은 편집기 반영뿐. 적용과 동시에 저장/발행/QR 생성 호출 없음.
  *
  * web 서비스·UI 패키지에는 DOM test runner 가 없다(dependency 추가 = 중지 조건) → 저장소 관례대로
@@ -156,13 +156,8 @@ describe('WO-O4O-STORE-PRODUCTION-EXTERNAL-LLM-REALIGNMENT-V1 — (C) TARGET_SPE
         it('provider-specific 신규 provenance · Prompt 저장 없음', () => {
           expect(src).not.toMatch(/sourceType:\s*'chatgpt'|generatedBy:\s*'chatgpt'|llmPrompt|promptText/);
         });
-        it('내부 AI 새 호출 없음 — QR legacy 만 예외', () => {
-          const aiCalls = src.match(/\/api\/ai\/[a-z-]+/g) ?? [];
-          if (group === 'QR') {
-            expect(new Set(aiCalls)).toEqual(new Set(['/api/ai/qr-description']));
-          } else {
-            expect(aiCalls).toEqual([]);
-          }
+        it('내부 AI 호출 없음 — 문자열 리터럴로서의 /api/ai/* endpoint 0 (WO 4 이후 QR legacy 예외도 소멸)', () => {
+          expect(src).not.toMatch(/['"`][^'"`\n]*\/api\/ai\/[a-z-]+/);
         });
       });
     }
@@ -198,20 +193,16 @@ describe('WO-O4O-STORE-PRODUCTION-EXTERNAL-LLM-REALIGNMENT-V1 — (C) TARGET_SPE
   });
 });
 
-describe('WO-O4O-STORE-PRODUCTION-EXTERNAL-LLM-REALIGNMENT-V1 — (D) QR provenance · legacy 유지', () => {
+describe('WO-O4O-STORE-PRODUCTION-EXTERNAL-LLM-REALIGNMENT-V1 — (D) QR provenance', () => {
   const src = read(TARGET_SPECIFIC.QR[0]);
 
-  it('legacy 내부 AI 경로 유지(WO 4 대상) — handleGenerate · /api/ai/qr-description', () => {
-    expect(src).toContain('const handleGenerate = useCallback(');
-    expect(src).toContain('/api/ai/qr-description');
-  });
-  it("외부 경로는 Gemini provenance 를 쓰지 않는다 — authoredBy 분기 · generatedBy 'chatgpt' 없음", () => {
-    expect(src).toContain("const [authoredBy, setAuthoredBy] = useState<'internal' | 'external' | null>(null)");
-    expect(src).toContain("setAuthoredBy('external')");
-    expect(src).toContain("setAuthoredBy('internal')");
-    expect((src.match(/generatedBy:\s*authoredBy === 'external' \? undefined : 'gemini-qr-description'/g) ?? []).length).toBe(2);
-    expect(src).not.toMatch(/generatedBy:\s*'gemini-qr-description'\s*,/);
+  // WO-O4O-STORE-INTERNAL-AI-RETIREMENT-V1: WO 3 시점의 "legacy 내부 AI 유지 · authoredBy 분기" 단언은 WO 4 에서
+  //   legacy 자체가 은퇴하며 대체됐다. 이 spec 은 "외부 경로가 Gemini provenance 를 쓰지 않는다" 만 계속 고정하고,
+  //   은퇴 상태(handleGenerate 0 · fetch 0 · gemini 문자열 0)는 store-internal-ai-retirement-contract.spec.ts 가 고정한다.
+  it("외부 경로는 Gemini provenance 를 쓰지 않는다 — generatedBy 'gemini-qr-description' · 'chatgpt' 모두 없음", () => {
+    expect(src).not.toMatch(/generatedBy:\s*'gemini-qr-description'/);
     expect(src).not.toMatch(/generatedBy:\s*'chatgpt'|model:\s*'chatgpt'/);
+    expect(src).toContain('aiDescription: aiMeta ?? undefined');
   });
   it('외부 결과 aiDescription = 화면 구조 정보만(mode · productName/cornerName · emphasis · items[name/emphasis]) — model/generatedAt/descriptionHtml 없음', () => {
     const apply = src.slice(src.indexOf('const handleExternalApply'), src.indexOf('// 콘텐츠 저장(없으면 생성)'));

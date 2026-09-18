@@ -6,27 +6,26 @@
  *   "자료 선택 → AI 본문 생성" 진입점 제거(O4O 초안 생성 안 함 정책,
  *    IR-O4O-AI-CONTENT-GENERATION-ENTRYPOINT-AUDIT-V1). 콘텐츠 제작은 빈 편집기에서
  *    직접 작성·외부 LLM(ChatGPT/Claude/Gemini) 결과 붙여넣기 중심으로 단순화.
- *   - 유지: 제목 / 태그 / RichTextEditor(preset='full' → Toolbar "AI 정리" 편집 보조) / 저장
+ *   - 유지: 제목 / 태그 / RichTextEditor(preset='full') / 저장
  *   - 유지: direct content 저장 경로(POST /store-contents, generatedBy='manual-direct',
  *           sourceResources=[]) → /store/library/contents 문서형 목록 '내 콘텐츠'로 노출
  *   - 제거: 자료 multi-select 단계, 자료 기반 AI 본문 생성(/api/ai/content 직접 호출),
  *           제작 요청/보조 옵션 preset
- *   - 보존(미삭제): AiContentModal 컴포넌트, /api/ai/content endpoint, ai-prompts,
- *           RichTextEditor Toolbar AI(편집 보조)
+ *   - 보존(미삭제): AiContentModal 컴포넌트, /api/ai/content endpoint, ai-prompts (공통 패키지 — 비-Store 소비자)
+ *   - WO-O4O-STORE-INTERNAL-AI-RETIREMENT-V1: Store 편집기 내부 AI(aiRequestHeaders) 은퇴 — 외부 LLM(ChatGPT로 작업)만 남는다.
  *
  * 흐름:
  *   콘텐츠 제작 → 빈 편집기(제목/태그/본문) → 직접 작성 또는 붙여넣기 → 저장
  *   → POST /store-contents → navigate('/store/content/direct/:id')
  */
 
-import { useEffect, useState, useCallback, useMemo, type CSSProperties } from 'react';
+import { useEffect, useState, useCallback, type CSSProperties } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { X, Save, Loader2 } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
 import { RichTextEditor, LlmAssistPanel, type EditorContent } from '@o4o/content-editor';
 import { buildStoreContentAuthoringPrompt, resolveStoreContentLlmTask, STORE_LLM_ASSIST_LABEL } from '@o4o/store-ui-core';
 import { apiClient } from '../../api/client';
-import { getAccessToken } from '../../contexts/AuthContext';
 import { colors } from '../../styles/theme';
 import { TagInput } from '../../components/store/TagInput';
 
@@ -66,12 +65,6 @@ export function CreateContentFromResourcesModal({ open, onClose, onCreated, prod
   }, [open]);
 
   const handleEditorChange = useCallback((content: EditorContent) => setEditorHtml(content.html), []);
-
-  // RichTextEditor Toolbar "AI 정리"(편집 보조) 호출용 Authorization 헤더 — 유지 대상.
-  const aiHeaders = useMemo<Record<string, string> | undefined>(() => {
-    const token = getAccessToken();
-    return token ? { Authorization: `Bearer ${token}` } : undefined;
-  }, []);
 
   // 저장 — direct content 로 POST /store-contents (manual-direct, sourceResources=[]).
   const handleSave = useCallback(async () => {
@@ -193,7 +186,6 @@ export function CreateContentFromResourcesModal({ open, onClose, onCreated, prod
                 placeholder="본문을 직접 작성하거나, 외부 AI에서 만든 초안을 붙여넣은 뒤 편집하세요."
                 minHeight="320px"
                 preset="full"
-                aiRequestHeaders={aiHeaders}
               />
             </div>
           </div>

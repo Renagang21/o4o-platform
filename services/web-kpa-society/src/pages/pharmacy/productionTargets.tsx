@@ -83,7 +83,7 @@ export interface ProductionTargetMeta {
   supportsTemplates: boolean;
   /**
    * 기본 template id (registry 첫 번째 항목과 동기).
-   * template-less fallback에서 AiContentModal에 전달되는 기본값.
+   * template-less fallback 기본값(제작 시작 시 template 미선택이면 이 id 를 쓴다).
    */
   defaultTemplateId: string;
   /**
@@ -178,28 +178,9 @@ export function findProductionTarget(key: ProductionTarget): ProductionTargetMet
 //   기존 사용처 호환을 위해 re-export.
 export const buildProductionState = _buildProductionState;
 
-// ─── AiContentModal 진입용 매핑 ─────────────────────────────────────────────
+// WO-O4O-STORE-INTERNAL-AI-RETIREMENT-V1: AiContentModal 진입용 매핑(AiModeForProduction · PRODUCTION_TARGET_TO_AI_MODE)은
+//   consumer 0 으로 확인돼 제거. 제작 시작은 template registry + 외부 LLM(ChatGPT로 작업) 경로만 쓴다.
 
-/**
- * AiContentModal 의 MODE_CONFIG 와 1:1 대응되는 AiMode 키.
- * AiContentModal 내부 type AiMode 와 동일 (모달이 내부 type 만 export 하지 않으므로 string literal 로 정의).
- *
- * MODE_CONFIG 변경 시 동기 갱신 필요:
- *   packages/content-editor/src/components/AiContentModal.tsx:MODE_CONFIG
- */
-export type AiModeForProduction =
-  | 'customer_rewrite'
-  | 'pop'
-  | 'blog'
-  | 'store_qr';
-
-/**
- * 4유형 카드 → AiContentModal 초기 모드 매핑.
- *  pop                 → 'pop'           (outputType=pop)
- *  qr                  → 'store_qr'      (outputType=store_qr)
- *  blog                → 'blog'          (outputType=blog)
- *  product-description → 'customer_rewrite' (outputType=product_detail)
- */
 // ─── composeSourceTextFromItems ─────────────────────────────────────────────
 
 // WO-O4O-STORE-PRODUCTION-ROUTER-UTILS-COMMONIZATION-PHASE2-G-V1:
@@ -207,9 +188,3 @@ export type AiModeForProduction =
 //   기존 사용처 호환을 위해 re-export.
 export const composeSourceTextFromItems = _composeSourceTextFromItems;
 
-export const PRODUCTION_TARGET_TO_AI_MODE: Record<ProductionTarget, AiModeForProduction> = {
-  pop: 'pop',
-  qr: 'store_qr',
-  blog: 'blog',
-  'product-description': 'customer_rewrite',
-};

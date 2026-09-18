@@ -39,7 +39,6 @@ import {
 import { RichTextEditor, LlmAssistPanel, type EditorContent } from '@o4o/content-editor';
 import { buildStoreContentAuthoringPrompt, resolveStoreContentLlmTask, STORE_LLM_ASSIST_LABEL } from '@o4o/store-ui-core';
 import { storeContentApi } from '../../api/assetSnapshot';
-import { getAccessToken } from '../../contexts/AuthContext';
 
 type ContentBlock = {
   type: 'text' | 'image' | 'link' | 'list';
@@ -179,11 +178,6 @@ export default function StoreContentEditPage() {
   const [rawJson, setRawJson] = useState<Record<string, unknown>>({});
   const [orgId, setOrgId] = useState<string | null>(null);
   const [source, setSource] = useState<'store' | 'snapshot'>('snapshot');
-
-  const aiHeaders = useCallback((): Record<string, string> | undefined => {
-    const token = getAccessToken();
-    return token ? { Authorization: `Bearer ${token}` } : undefined;
-  }, []);
 
   const fetchContent = useCallback(async () => {
     if (!snapshotId) return;
@@ -357,7 +351,6 @@ export default function StoreContentEditPage() {
             placeholder="본문 내용을 입력하세요"
             minHeight="420px"
             preset="full"
-            aiRequestHeaders={aiHeaders()}
           />
         </div>
       </div>
