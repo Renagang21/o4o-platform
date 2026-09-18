@@ -19,10 +19,25 @@
 
 import { Navigate, useLocation } from 'react-router-dom';
 import { StoreOwnerGuard } from '@o4o/store-ui-core';
+import { StoreOwnerAgreementGate } from '@o4o/shared-space-ui';
 import { AccessDenied } from '@o4o/ui';
-import { useAuth } from '../../contexts/AuthContext';
+import { authClient, useAuth } from '../../contexts/AuthContext';
+import { loadPolicy } from '../../lib/legalDocument';
 import { hasAnyRole, PLATFORM_ROLES, STORE_OWNER_ROLES } from '../../lib/role-constants';
 import { MembershipGate } from './MembershipGate';
+
+async function loadStoreOwnerAgreementPending(api: { get: (url: string) => Promise<any> }, serviceKey: string) {
+  const res = await api.get(`/auth/policy-acceptances/store-owner?serviceKey=${encodeURIComponent(serviceKey)}`);
+  return res.data?.data?.pending ?? [];
+}
+
+async function acceptStoreOwnerAgreement(api: { post: (url: string, body: unknown) => Promise<any> }, item: { serviceKey: string; policyDocumentId: string; version: number }) {
+  await api.post('/auth/policy-acceptances/store-owner', {
+    serviceKey: item.serviceKey,
+    policyDocumentId: item.policyDocumentId,
+    version: item.version,
+  });
+}
 
 interface PharmacyGuardProps {
   children: React.ReactNode;
@@ -52,7 +67,7 @@ const PlatformOnlyCard = (
 );
 
 export function PharmacyGuard({ children }: PharmacyGuardProps) {
-  const { user, isAuthenticated, isLoading } = useAuth();
+  const { user, isAuthenticated, isLoading, logout } = useAuth();
   const location = useLocation();
 
   if (isLoading) return Loading;
@@ -86,7 +101,16 @@ export function PharmacyGuard({ children }: PharmacyGuardProps) {
       }
       membershipGate={MembershipGate}
     >
-      {children}
+      <StoreOwnerAgreementGate
+        serviceKey="kpa-society"
+        serviceName="KPA Society"
+        loadPolicy={loadPolicy}
+        loadPending={(serviceKey) => loadStoreOwnerAgreementPending(authClient.api, serviceKey)}
+        acceptAgreement={(item) => acceptStoreOwnerAgreement(authClient.api, item)}
+        onLogout={logout}
+      >
+        {children}
+      </StoreOwnerAgreementGate>
     </StoreOwnerGuard>
   );
 }
