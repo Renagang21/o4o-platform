@@ -1,7 +1,7 @@
 # WO-O4O-SUPPLIER-PRODUCT-CANDIDATE-PROMOTION-ADAPTER-V1
 
-> **상태:** READY FOR EXECUTION · HANDOFF ONLY · 구현 WO (등록일 2026-09-19 · 실행 착수는 별도 명시 지시)
-> **기준 코드:** `origin/main` `9b201b504`(② CHECK) 이후 — 접수 시점 `1846bf355`
+> **상태:** READY FOR EXECUTION · HANDOFF ONLY · 구현 WO (등록일 2026-09-19 · **보강 2026-09-19**: MEDICAL_DEVICE 분류 기대값 · 롤백 검증 기준 · 신규 Master 저장 필드 범위 · 실행 착수는 별도 명시 지시)
+> **기준 코드:** `origin/main` `9b201b504`(② CHECK) 이후 — 접수 시점 `1846bf355` · WO 커밋 `7c8367ccf` 뒤로 타 세션 커밋이 계속 쌓인다(보강 시점 `ee03cbf21`). **실행은 항상 최신 `origin/main` 에서 시작**한다 — `7c8367ccf` 로 reset/rebase 해 타 세션 커밋을 제거하지 않는다
 > **목적:** 공급자 Candidate(단건 `supplier_web` · 대량 `csv_import`/`'공급자 대량 등록'`)를 **하나의 Supplier Promotion Adapter 계열**로 Promotion Core 에 연결해, 공급자 후보의 dead-end 를 백엔드 수준에서 해소한다. 신규 Master 는 **GENERAL · COSMETIC 만** 생성하고, 규제 제품(DRUG/HFF/QUASI/MEDICAL_DEVICE)은 **기존 Master exact link 만** 허용한다
 > **선행:** ① [`WO-…-GENERAL-PROMOTION-CORE-FOUNDATION-V1`](WO-O4O-PRODUCT-CANDIDATE-GENERAL-PROMOTION-CORE-FOUNDATION-V1.md)(`cc287d3ee`) · ② [`WO-…-SINGLE-PRODUCT-CANDIDATE-INTAKE-V1`](WO-O4O-SUPPLIER-SINGLE-PRODUCT-CANDIDATE-INTAKE-V1.md)(`02f71d6d9`) · [② CHECK](../checks/CHECK-O4O-SUPPLIER-SINGLE-PRODUCT-CANDIDATE-INTAKE-V1.md) §9 · ③ 조사(2026-09-19 · `9b201b504` 기준 · 세션 인라인)
 > **기준 문서:** [`O4O-PRODUCT-CORE-BASELINE-V1`](../baseline/O4O-PRODUCT-CORE-BASELINE-V1.md) §2 · §5 · §6 · §12 (Candidate 경유 · Master immutable 4필드 · Master 확정 ≠ Offer · 공급자 전용 필드의 Product Core 상승 금지) · [`O4O-PRODUCT-RESOURCE-ARCHITECTURE-BASELINE-V1`](../baseline/O4O-PRODUCT-RESOURCE-ARCHITECTURE-BASELINE-V1.md)(F12) · [`RBAC-FREEZE-DECLARATION-V1`](../rbac/RBAC-FREEZE-DECLARATION-V1.md)(F9 — `requireProductDbWrite=requireAdmin` 유지)
@@ -72,7 +72,7 @@ supplier_web / 'neture-supplier-single'          csv_import / '공급자 대량 
 
 ## 1.4 다른 세션 보호
 
-다중 세션이 `main` 에 직접 커밋한다. `git fetch origin` → `git status -sb` 후 착수, 타 세션의 dirty · 미추적 파일 불가침, path-specific stage · `git commit -- <paths>` 만 사용. 동일 WO 가 이미 origin 에 push 돼 있으면 그 정본을 유지하고 결함만 전달한다.
+다중 세션이 `main` 에 직접 커밋한다. `git fetch origin` → `git status -sb` 후 착수, 타 세션의 dirty · 미추적 파일 불가침, path-specific stage · `git commit -- <paths>` 만 사용. 동일 WO 가 이미 origin 에 push 돼 있으면 그 정본을 유지하고 결함만 전달한다. WO 커밋 `7c8367ccf` 는 정상 merge base 일 뿐이다 — 그 시점으로 reset/rebase 하지 않는다.
 
 ---
 
@@ -98,6 +98,7 @@ interface NormalizedSupplierCandidate {
     mfdsPermitNumber: string | null;          // 단건
     reportNo: string | null;                  // bulk '품목신고번호'
     supplierSku: string | null;               // 단건 없음 · bulk '공급자상품코드'
+    brandName: string | null;                 // 단건 rawPayload.brandName · bulk fields['브랜드'] — Master 에 쓰지 않음(§2.2-A)
     originCountry: string | null;
     categoryId: string | null;
   };
@@ -141,6 +142,25 @@ buildSupplierPromotionPlan(n: NormalizedSupplierCandidate, ctx: { reviewedBy: st
 - `approvalMeta = { kind: 'supplier', origin, supplierId, evidence }`.
 - `landingSource = 'supplier-candidate'`.
 - Plan Builder 는 `origin` 으로 **분기하지 않는다**(라벨 문자열에만 쓴다).
+
+**§2.2-A 신규 Master 저장 필드 범위 — 명시적 계약**
+
+Core `DbPromotionStore.createMaster()`([`product-promotion.store.ts`](../../apps/api-server/src/modules/neture/promotion/product-promotion.store.ts) 98~110) 가 신규 Master 에 쓰는 것은 **다음이 전부**다:
+
+```text
+barcode · regulatory_type · drug_category · regulatory_name(=name) · name · manufacturer_name · specification
+is_mfds_verified=false · status='ACTIVE' · tags='[]'
+```
+
+따라서 공급자 Candidate 에 있는 아래 값은 **이 WO 의 승격으로 Master 에 저장되지 않는다.** 숨기지 않고 계약으로 기록한다:
+
+| 값 | 처리 |
+|---|---|
+| `mfdsPermitNumber` | evidence 만. Master 에 쓰지 않음(§1.3) |
+| `regulatoryName`(공급자 제출) | immutable Master 필드로 직접 확정하지 않음. 신규 GENERAL/COSMETIC Master 의 `regulatory_name` 은 현행 Core 계약대로 **`name` 과 동일** |
+| `categoryId` · `brandName` · `originCountry` | Product Core 성격이지만 현행 최소 Core 에 필드 없음 → Candidate `rawPayload` + `evidence` 에 보존 |
+
+**금지:** Supplier Adapter 가 승격 뒤 `product_masters` 를 직접 UPDATE 해 이 값을 보강하는 **두 번째 쓰기 경로를 만들지 않는다**(Core 우회 금지 · 소스 계약 테스트로 `UPDATE product_masters` 문자열 0 고정). 실행 중 "이 정보가 반드시 승격 시점에 함께 저장돼야 한다" 가 확인되어 Core 계약 변경이 필요하면 **중지 조건 A** 로 보고하고 임의 확장하지 않는다. category/brand/origin 의 Core canonical metadata 확장 필요 여부는 ⑤/⑥ 전 별도 작은 작업으로 판정한다(완료 보고 §7-9).
 
 **정책 후검사** (`assertSupplierPolicy(m, n, outcome)` — 같은 TX 안 · `PromotionOutcome` 을 받아 throw 또는 통과):
 
@@ -195,8 +215,20 @@ P2(`store-product-request-admin.service.ts` 229~262) 와 같은 골격. `promote
 1. `SUPPLIER_CANDIDATE_DRUG_CATEGORIES = ['otc', 'rx']` — `quasi_drug` 제거. `regulatoryType=DRUG` + `drugCategory='quasi_drug'` 는 400 `DRUG_CATEGORY_REQUIRED`(메시지: 의약외품은 `regulatoryType=QUASI_DRUG`). `QUASI_DRUG` 의 `drugCategory` 는 `null`(현행).
 2. HFF/MEDICAL_DEVICE 의 `rawPayload.product_type` — `classifyProductType()` 이 `product_type` 을 먼저 보므로 `non_drug` 를 넣으면 오분류. 해결은 **둘 중 하나**를 실행자가 택하고 CHECK 에 근거를 적는다:
    - (a) `product-type.util.ts` `classifyProductType()` 에 additive fallback: `rawPayload.regulatoryType`(영문/별칭) 을 `input.regulatoryType` 이 없을 때 읽는다. mapper 는 HFF/MEDICAL_DEVICE 에 `product_type` 을 **넣지 않는다**(`drug_category=null`). 공유 util 변경이므로 **소비처 3곳**(`product-candidate.service.ts` 210 · 214 · 459) 의 동작이 바뀌지 않음을 테스트로 증명(`product_type`/`drug_category` 가 있는 기존 rawPayload 는 우선순위상 영향 0).
-   - (b) util 무접촉 · mapper 가 HFF 에 `product_type='health_functional'` 를 넣고 `fromDrugCategory` 에 `health_functional` 케이스만 additive 추가. MEDICAL_DEVICE 는 `ProductTypeClass` 에 값이 없어 `non_drug` 로 남는다(한계를 CHECK 에 기록).
+   - (b) util 무접촉 · mapper 가 HFF 에 `product_type='health_functional'` 를 넣고 `fromDrugCategory` 에 `health_functional` 케이스만 additive 추가.
    - 권장 (a). 어느 쪽이든 `deriveSupplierCandidateProductType` 은 `DRUG`(otc/rx) · `QUASI_DRUG` 에만 `product_type` 을 돌려주고 나머지는 `null`.
+
+   **분류 기대값(둘 중 어느 안이든 동일 · 테스트로 고정):**
+
+   | `regulatoryType` | `classifyProductType({rawPayload})` 기대 | 근거 |
+   |---|---|---|
+   | `HEALTH_FUNCTIONAL` | `health_functional` | 이번 WO 가 정상화 |
+   | `COSMETIC` · `GENERAL` | `non_drug` | 기존 |
+   | `QUASI_DRUG` | `quasi_drug` | 기존(`drug_category='quasi_drug'`) |
+   | `DRUG`+otc / rx | `otc_drug` / `rx_drug` | 기존 |
+   | `MEDICAL_DEVICE` | **`unknown` 유지** | `ProductTypeClass` · `fromRegulatoryType()` 에 `medical_device` 가 없다(표시용 `ProductClassification` 에만 있음). 임의로 `non_drug` 로 만들지 않는다. 운영자 화면 별도 분류 표시는 **별도 ProductType 확장 작업**으로 남긴다 |
+
+   Supplier Promotion Adapter 의 승격 정책(§2.2 create 허용 제품군 · link 검사)은 표시용 `ProductTypeClass` 가 아니라 **canonical `regulatoryType`** 만 본다. `MEDICAL_DEVICE` 가 화면에서 `unknown` 이어도 Adapter 는 `regulatoryType='MEDICAL_DEVICE'` 로 규제 제품 정책을 적용한다.
 3. ② CHECK §9 의 `mfdsPermitNumber → MFDS_CODE` 인계는 **철회** — 이 WO §1.3. ② CHECK 본문은 기록물이므로 수정하지 않고 이 WO 가 대체 사실을 적는다.
 
 ## 2.5 허용되는 부수 작업
@@ -263,10 +295,11 @@ P2(`store-product-request-admin.service.ts` 229~262) 와 같은 골격. `promote
 | Single Normalizer | jest | 인식 조건 3개 모두 검사(하나라도 다르면 null) · EAN13→identityKey true+barcode · UNKNOWN→false+barcode null · identifier 없음→[] · `mfdsPermitNumber` 가 identifiers 에 **없음** · supplierId 없음→`SUPPLIER_ID_MISSING` |
 | Bulk Normalizer | jest | 인식 조건 3개(특히 `csv_import`+공공 seed 라벨 → null · `csv_import`+`'공급자 대량 등록'`+`source` 없음 → null) · `fields` fallback 6키 각각 · `바코드또는표준코드` 형식/제품군 분기 · `품목신고번호`/`공급자상품코드` 가 identifiers 에 **없음**(evidence 에 있음) · candidate 컬럼 우선 + fields 보강 + 중복 제거 · `unclassified`→`SUPPLIER_PRODUCT_TYPE_UNCLASSIFIED` · `quasi_drug`→`QUASI_DRUG+null` |
 | Plan Builder | jest | `origin` 별 라벨만 다르고 나머지 동일 · `effects.ensureDrugExtension` DRUG 만 true · `approvalMeta.kind='supplier'` · `landingSource='supplier-candidate'` · 빈 name/manufacturer 는 `''` 로 전달(합성 없음) |
-| 정책 후검사 + 실행 | jest · InMemory store · `promoteWithStore` 또는 TX mock | GENERAL create 통과 · COSMETIC create 통과 · HFF/QUASI/MEDICAL_DEVICE/DRUG(otc) create → throw `SUPPLIER_REGULATED_CREATE_BLOCKED` + **store write 카운터 롤백 확인(candidate 상태 pending 유지)** · link + 같은 regulatoryType(한글 별칭 `건강기능식품` vs `HEALTH_FUNCTIONAL`) 통과 · link + 다른 regulatoryType → `SUPPLIER_REGULATORY_TYPE_MISMATCH` · link + 기존 rx → `SUPPLIER_RX_LINK_BLOCKED` · 후보 rx → Core hold `rx_not_promotable`(throw 아님) · conflict 그대로 · `afterCommit` 은 성공 커밋 후 1회 · throw 시 0회 |
+| 정책 후검사(결정 경로) | jest · InMemory store · `promoteWithStore` | GENERAL create 통과 · COSMETIC create 통과 · HFF/QUASI/MEDICAL_DEVICE/DRUG(otc) create → throw `SUPPLIER_REGULATED_CREATE_BLOCKED` · link + 같은 regulatoryType(한글 별칭 `건강기능식품` vs `HEALTH_FUNCTIONAL`) 통과 · link + 다른 regulatoryType → `SUPPLIER_REGULATORY_TYPE_MISMATCH` · link + 기존 rx → `SUPPLIER_RX_LINK_BLOCKED` · 후보 rx → Core hold `rx_not_promotable`(throw 아님) · conflict 그대로. **InMemory write 카운터는 "정책 throw 이전에 Core write 가 실제로 존재한다" 는 보조 검증일 뿐이다 — 롤백 증명으로 기록하지 않는다**(InMemory 객체는 TypeORM 롤백을 재현하지 않는다) |
+| **실제 TX 롤백(서비스 계층)** | 다음 중 하나: (i) transaction fake 가 **진입 시 state snapshot 을 만들고 throw 시 restore** 하도록 구현한 InMemory 위에서 `SupplierCandidatePromotionService.promote()` 실행 (ii) 격리 DB(PG15) transaction 테스트 | regulated create → Core 내부 Master/Identifier/Candidate write 발생 → 정책 throw → 롤백 → **Master 증가 0 · Identifier 증가 0 · Candidate `pending` + `matchedProductMasterId null` · `afterCommit` 호출 0**. 성공 경로(GENERAL create)는 커밋 후 `afterCommit` 1회. 이 행이 PASS 여야 §1.2 #2 "롤백 → candidate pending 유지" 를 보고할 수 있다 |
 | route | supertest | `platform:super_admin` 만 200/409 · `neture:operator`/`neture:admin` 403 · 미인증 401 · 응답 shape 4종 + 409 3종 + 400 3종 + 404 |
 | ② mapper 회귀 | 기존 30건 갱신 | `DRUG+quasi_drug` 400 · HFF `product_type` 규칙 변경 반영 · 나머지 불변 |
-| 소스 계약 | 파일 원문 | `promote(` 외피 0 · P3/offer 참조 0 · Bulk Normalizer 에 `'공급자 대량 등록'` 과 `'supplier_bulk_upload'` 문자열 둘 다 존재 · `MFDS_CODE` 문자열이 supplier adapter 디렉터리에 없음 · `SUPPLIER_SKU` 없음 |
+| 소스 계약 | 파일 원문 | `promote(` 외피 0 · **`UPDATE product_masters`/`product_masters SET` 0(Core 우회 쓰기 경로 금지 · §2.2-A)** · P3/offer 참조 0 · Bulk Normalizer 에 `'공급자 대량 등록'` 과 `'supplier_bulk_upload'` 문자열 둘 다 존재 · `MFDS_CODE` 문자열이 supplier adapter 디렉터리에 없음 · `SUPPLIER_SKU` 없음 |
 | 무접촉 | `git diff --stat origin/main -- promotion/product-promotion*.ts promotion/adapters/store-web-promotion.adapter.ts drug-import services/offer.service.ts services/catalog.service.ts services/store-product-request-admin.service.ts controllers/supplier-product.controller.ts services/web-neture apps/admin-dashboard` | 0 files |
 | 빌드 · 정적 | build · 영향 subset jest · lint ratchet | 전부 PASS(무관한 실패는 원문 보고) |
 | 프로덕션 smoke | §3-8 (a)(b)(c) + read-only: `product_masters`/`product_identifiers` count 전후 동일 · 대상 후보 상태 불변 | 계정이 없으면 PENDING 사유 명시 — PASS 로 쓰지 않는다 |
@@ -292,6 +325,6 @@ WO 제목을 첫 줄에 두고 한국어로. 다음 항목을 **전부** 포함�
 6. 무접촉 증명(`git diff --stat`)
 7. 프로덕션 smoke 결과 또는 PENDING 사유 · read-only count 전후
 8. 중지 조건 A~G 발동 여부
-9. 후속 인계 — ④(Existing Master 직접 연결 API 가 이 Adapter 의 link 경로/regulatoryType 검사를 재사용할 수 있는가) · ⑤(`offerDraft`/SKU 를 Offer 로 옮길 때 필요한 것) · 규제 제품 신규 Master 를 위한 정부 데이터 Adapter 자리 · UI(`promote-supplier` 버튼) WO 제안 · 기준 문서 갱신 WO 제안(Promotion Core 위치 · Supplier create 정책)
+9. 후속 인계 — ④(Existing Master 직접 연결 API 가 이 Adapter 의 link 경로/regulatoryType 검사를 재사용할 수 있는가) · ⑤(`offerDraft`/SKU 를 Offer 로 옮길 때 필요한 것) · **Promotion Core canonical metadata 확장(category/brand/origin) 필요 여부 판정 자료(§2.2-A)** · MEDICAL_DEVICE `ProductTypeClass` 확장 필요 여부 · 규제 제품 신규 Master 를 위한 정부 데이터 Adapter 자리 · UI(`promote-supplier` 버튼) WO 제안 · 기준 문서 갱신 WO 제안(Promotion Core 위치 · Supplier create 정책)
 10. 문서 정합: `발견 N건 / SUPERSEDED 표기 N건 / 링크 수정 N건 / 별도 WO 제안 N건` — ② CHECK §9 `MFDS_CODE` 인계 철회는 "기록물 불변 · 이 WO 가 대체" 로 기록 · `regulatory_type` 한글 별칭 40,948건 backfill 제안 유지
 11. 커밋 hash · `HEAD == origin/main`
