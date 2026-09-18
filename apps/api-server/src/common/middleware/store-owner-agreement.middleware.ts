@@ -50,7 +50,11 @@ export async function enforceStoreOwnerAgreement(
     const explicit = rolePrefixOrServiceKey
       ? canonicalStoreOwnerAgreementServiceKey(rolePrefixOrServiceKey)
       : null;
-    const serviceKeys = explicit ? [explicit] : await resolveActiveStoreOwnerServiceKeys(dataSource, userId);
+    const activeStoreOwnerKeys = await resolveActiveStoreOwnerServiceKeys(dataSource, userId);
+    const serviceKeys = explicit
+      ? (activeStoreOwnerKeys.includes(explicit) ? [explicit] : [])
+      : activeStoreOwnerKeys;
+    // operator/admin 등 StoreOwnerGuard 우회 역할은 별도 계약 대상이 아니다.
     if (serviceKeys.length === 0) return false;
 
     const pending = await policyAcceptanceService.getPendingRequiredAgreements(
