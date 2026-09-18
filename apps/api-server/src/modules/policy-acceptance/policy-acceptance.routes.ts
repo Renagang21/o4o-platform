@@ -18,9 +18,124 @@ import { asyncHandler } from '../../middleware/error-handler.js';
 import { AppDataSource } from '../../database/connection.js';
 import { REQUIRED_MEMBERSHIP_STATUSES } from '../../common/auth/terms-acceptance.policy.js';
 import { PolicyAcceptanceError, policyAcceptanceService } from './policy-acceptance.service.js';
+import {
+  STORE_OWNER_AGREEMENT_DOCUMENT_TYPE,
+  STORE_OWNER_ROLE_BY_SERVICE,
+  isStoreOwnerAgreementServiceKey,
+} from '../../common/auth/store-owner-agreement.policy.js';
 import logger from '../../utils/logger.js';
 
 const router: IRouter = Router();
+
+/** 매장 경영자 계약 승낙 자격 — active membership + 해당 서비스 store_owner role. */
+async function hasActiveStoreOwnerAccess(userId: string, serviceKey: string): Promise<boolean> {
+  if (!isStoreOwnerAgreementServiceKey(serviceKey)) return false;
+  const role = STORE_OWNER_ROLE_BY_SERVICE[serviceKey];
+  const rows = (await AppDataSource.query(
+    `SELECT 1
+       FROM service_memberships sm
+      WHERE sm.user_id = $1
+        AND sm.service_key = $2
+        AND sm.status = 'active'
+        AND EXISTS (
+          SELECT 1 FROM role_assignments ra
+           WHERE ra.user_id = sm.user_id
+             AND ra.role = $3
+             AND ra.is_active = true
+        )
+      LIMIT 1`,
+    [userId, serviceKey, role],
+  )) as unknown[];
+  return rows.length > 0;
+}
+
+/**
+ * Store owner agreement pending 조회.
+ * published 계약이 없으면 pending=[] — 게시 전 코드 선배포 안전.
+ */
+router.get(
+  '/store-owner',
+  requireAuth,
+  asyncHandler(async (req: Request, res: Response) => {
+    const userId = (req as any).user?.id as string | undefined;
+    if (!userId) return res.status(401).json({ success: false, error: 'Authentication required', code: 'AUTH_REQUIRED' });
+    const serviceKey = typeof req.query.serviceKey === 'string' ? req.query.serviceKey.trim() : '';
+    if (!serviceKey || !isStoreOwnerAgreementServiceKey(serviceKey)) {
+      return res.status(400).json({ success: false, error: '유효한 serviceKey 가 필요합니다.', code: 'VALIDATION_ERROR' });
+    }
+    if (!(await hasActiveStoreOwnerAccess(userId, serviceKey))) {
+      return res.status(403).json({ success: false, error: '매장 경영자 권한이 필요합니다.', code: 'STORE_OWNER_REQUIRED' });
+    }
+    const pending = await policyAcceptanceService.getPendingStoreOwnerAgreements(userId, serviceKey);
+    return res.json({ success: true, data: { pending } });
+  }),
+);
+
+router.post(
+  '/store-owner',
+  requireAuth,
+  asyncHandler(async (req: Request, res: Response) => {
+    const userId = (req as any).user?.id as string | undefined;
+    if (!userId) return res.status(401).json({ success: false, error: 'Authentication required', code: 'AUTH_REQUIRED' });
+
+    const body = (req.body ?? {}) as Record<string, unknown>;
+    const serviceKey = typeof body.serviceKey === 'string' ? body.serviceKey.trim() : '';
+    const policyDocumentId = typeof body.policyDocumentId === 'string' ? body.policyDocumentId.trim() : '';
+    const version = body.version === undefined || body.version === null ? undefined : Number(body.version);
+    if (!serviceKey || !isStoreOwnerAgreementServiceKey(serviceKey) || !policyDocumentId || (version !== undefined && !Number.isInteger(version))) {
+      return res.status(400).json({
+        success: false,
+        error: 'serviceKey 와 policyDocumentId 가 필요합니다.',
+        code: 'VALIDATION_ERROR',
+      });
+    }
+    if (!(await hasActiveStoreOwnerAccess(userId, serviceKey))) {
+      return res.status(403).json({ success: false, error: '매장 경영자 권한이 필요합니다.', code: 'STORE_OWNER_REQUIRED' });
+    }
+
+    try {
+      const result = await policyAcceptanceService.recordRequiredAgreement({
+        userId,
+        serviceKey,
+        policyDocumentId,
+        documentType: STORE_OWNER_AGREEMENT_DOCUMENT_TYPE,
+        version,
+      });
+      const pending = await policyAcceptanceService.getPendingStoreOwnerAgreements(userId, serviceKey);
+      logger.info('[PolicyAcceptance] store owner agreement accepted', {
+        userId,
+        serviceKey,
+        policyDocumentId: result.document.id,
+        version: result.document.version,
+        created: result.created,
+      });
+      return res.json({
+        success: true,
+        data: {
+          accepted: {
+            serviceKey: result.document.serviceKey,
+            documentType: result.document.documentType,
+            policyDocumentId: result.document.id,
+            version: result.document.version,
+            created: result.created,
+          },
+          pending,
+        },
+      });
+    } catch (error) {
+      if (error instanceof PolicyAcceptanceError) {
+        return res.status(error.httpStatus).json({ success: false, error: error.message, code: error.code });
+      }
+      logger.error('[PolicyAcceptance] store owner agreement accept failed', {
+        userId,
+        serviceKey,
+        error: error instanceof Error ? error.message : String(error),
+      });
+      return res.status(500).json({ success: false, error: '매장 경영자 계약 승낙 처리에 실패했습니다.', code: 'INTERNAL_ERROR' });
+    }
+  }),
+);
+
 
 router.get(
   '/',
