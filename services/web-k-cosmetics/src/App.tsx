@@ -8,6 +8,7 @@ import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation, usePa
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider, useAuth, getKCosmeticsDashboardRoute } from '@/contexts/AuthContext';
 import { TermsAcceptanceGate } from '@/components/auth/TermsAcceptanceGate';
+import { StoreOwnerAgreementGate } from '@/components/auth/StoreOwnerAgreementGate';
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { refetchOnWindowFocus: false, retry: 1 } },
@@ -60,6 +61,7 @@ const ServiceGuidePage = lazy(() => import('@/pages/ServiceGuidePage'));
 // WO-O4O-CROSSSERVICE-POLICY-ROUTES-V1: 공개 약관/개인정보처리방침
 const TermsPage = lazy(() => import('@/pages/legal/PolicyDocumentPage').then(m => ({ default: m.TermsPage })));
 const PrivacyPage = lazy(() => import('@/pages/legal/PolicyDocumentPage').then(m => ({ default: m.PrivacyPage })));
+const StoreOwnerAgreementPage = lazy(() => import('@/pages/legal/PolicyDocumentPage').then(m => ({ default: m.StoreOwnerAgreementPage })));
 // MyPage 3-split (WO-O4O-KCOSMETICS-MYPAGE-SPLIT-V1)
 const MyPageHub = lazy(() => import('@/pages/mypage/MyPageHub'));
 const MyProfilePage = lazy(() => import('@/pages/mypage/MyProfilePage'));
@@ -374,7 +376,7 @@ function StoreOwnerRoute({ children }: { children: React.ReactNode }) {
       renderDenied={<AccessDenied message="내 매장은 매장 경영자 계정만 이용할 수 있습니다." />}
       membershipGate={MembershipGate}
     >
-      {children}
+      <StoreOwnerAgreementGate>{children}</StoreOwnerAgreementGate>
     </StoreOwnerGuard>
   );
 }
@@ -516,6 +518,7 @@ function AppRoutes() {
         {/* WO-O4O-CROSSSERVICE-POLICY-ROUTES-V1: 공개 약관/개인정보처리방침 (published 만 표시) */}
         <Route path="terms" element={<TermsPage />} />
         <Route path="privacy" element={<PrivacyPage />} />
+        <Route path="store-owner-agreement" element={<StoreOwnerAgreementPage />} />
         {/* WO-O4O-KCOS-SERVICE-GUIDE-PAGE-V1: 서비스 안내 (공개) */}
         <Route path="service-guide" element={<ServiceGuidePage />} />
         {/* WO-O4O-KCOS-MENU-CANONICAL-ALIGN-V1: 모바일 매장 경영 허브 */}
