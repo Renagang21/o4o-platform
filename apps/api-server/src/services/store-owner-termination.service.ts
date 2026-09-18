@@ -599,10 +599,20 @@ export class StoreOwnerTerminationService {
       throw new StoreOwnerTerminationError('PURGE_NOT_DUE', '아직 7일 파기 기한이 도래하지 않았습니다.', 409);
     }
 
-    try {
-      if (!preview.hasOtherActiveStoreService) await this.purgeOwnedMedia(c);
-      const cfg = configFor(c.serviceKey);
+    const cfg = configFor(c.serviceKey);
 
+    try {
+      /**
+       * Phase 1 — 현재 매장의 Store 참조를 먼저 제거하되 store_execution_assets 는 보존한다.
+       *
+       * 이유:
+       * - MediaLibraryService.deleteAsset() 는 Screen Set 등의 사용 여부를 보호한다.
+       * - 현재 org 참조를 먼저 제거해야 "다른 org/공용 참조"만 남는지 정확히 판정할 수 있다.
+       * - GCS 삭제 실패 시 store_execution_assets 를 남겨 media candidate 를 재구성할 수 있어야 한다.
+       *
+       * 따라서 GCS 실패 시 case=failed/PURGE_INCOMPLETE 이며 execution asset + media row/GCS가
+       * 모두 남아 다음 명시적 apply 에서 재시도할 수 있다.
+       */
       await this.dataSource.transaction(async (m) => {
         // 서비스 전용 매장 사본/출력물
         await m.query(`DELETE FROM signage_schedules WHERE "organizationId"=$1 AND "serviceKey"=ANY($2::text[])`, [c.organizationId,cfg.contentKeys]);
@@ -630,7 +640,6 @@ export class StoreOwnerTerminationService {
         await m.query(`DELETE FROM platform_store_slugs WHERE store_id=$1 AND service_key=ANY($2::text[])`, [c.organizationId,cfg.slugKeys]);
 
         if (c.serviceKey === 'k-cosmetics') {
-          // cosmetics local store는 canonical organization 의 service-specific projection.
           const stores = await m.query(`SELECT id FROM cosmetics.cosmetics_stores WHERE organization_id=$1`, [c.organizationId]);
           const storeIds = stores.map((r:any)=>r.id);
           if (storeIds.length) {
@@ -660,9 +669,22 @@ export class StoreOwnerTerminationService {
           await m.query(`DELETE FROM store_multilingual_product_content_groups WHERE organization_id=$1`, [c.organizationId]);
           await m.query(`DELETE FROM store_asset_derivations WHERE organization_id=$1`, [c.organizationId]);
           await m.query(`DELETE FROM kpa_store_contents WHERE organization_id=$1`, [c.organizationId]);
-          await m.query(`DELETE FROM store_execution_assets WHERE organization_id=$1`, [c.organizationId]);
           await m.query(`DELETE FROM o4o_asset_snapshots WHERE organization_id=$1`, [c.organizationId]);
           await m.query(`DELETE FROM store_local_products WHERE organization_id=$1`, [c.organizationId]);
+          // store_execution_assets 는 GCS/Media 삭제 재시도 근거이므로 Phase 2까지 보존.
+        }
+      });
+
+      // Phase 2 — 현재 org 참조가 제거된 뒤 물리 미디어를 지운다.
+      // storage 실패 시 MediaLibraryService가 DB media row를 보존하고 throw → case failed.
+      if (!preview.hasOtherActiveStoreService) {
+        await this.purgeOwnedMedia(c);
+      }
+
+      // Phase 3 — GCS/Media 처리 성공(또는 외부 참조로 보존 결정) 후 실행자산과 case를 확정한다.
+      await this.dataSource.transaction(async (m) => {
+        if (!preview.hasOtherActiveStoreService) {
+          await m.query(`DELETE FROM store_execution_assets WHERE organization_id=$1`, [c.organizationId]);
 
           const [activeAny] = await m.query(
             `SELECT 1 FROM organization_service_enrollments WHERE organization_id=$1 AND status='active' LIMIT 1`,
