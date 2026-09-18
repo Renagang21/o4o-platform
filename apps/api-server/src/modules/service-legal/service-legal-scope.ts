@@ -55,6 +55,8 @@ export const SUPPORTED_POLICY_DOCUMENT_TYPES = [
   'community',
   'marketing',
   'location',
+  // WO-O4O-STORE-OWNER-AGREEMENT-PUBLISH-PREREQUISITES-V1: 매장 경영자 B2B 계약 정식 유형.
+  'store_owner_agreement',
   'custom',
 ] as const;
 
