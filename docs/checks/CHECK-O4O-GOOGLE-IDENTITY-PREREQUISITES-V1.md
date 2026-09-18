@@ -161,6 +161,7 @@ smoke 계정 = `docs/local/TEST-ACCOUNTS.local.md`(git 미추적) · 비밀번�
 **판정:** 기존 password login 계약을 깨는 근거 0(schema · 값 · 코드 경로 · 오류 로그) / 200 로그인 **실측 미완**. WO §6-C 의 "기존 사용자 로그인 실패 = WO 실패" 판정은 **사용자(계정 소유자) 1회 실로그인** 또는 갱신된 smoke 계정으로 닫는다. smoke 계정 L1 값 갱신은 계정 소유자 몫(로컬 파일 §1 규칙).
 
 > **§6-C 종결(2026-09-18, `WO-O4O-LEGACY-TEST-USER-ACCOUNT-DOMAIN-RESET-V1` §8):** `WO-2A manual production login smoke: N/A — legacy test account population intentionally retired before Google cutover`. 운영 `users` 58행 전부가 테스트 계정 잔재로 확정되어 legacy 계정 보존 검증의 의미가 없다. 테스트 계정 password 오류는 추가 조사하지 않는다. 판정은 `WO-2A: COMPLETE` 로 확정.
+> **보강 실측(2026-09-18 11:40Z · read-only count):** `account_activities` `login_email` success · createdAt ≥ WO-2A 배포(09-17 13:06Z) → **9건 · distinct user 1 · 09-18 00:10~00:11Z**. 변경 schema(password/name nullable · linked_accounts FK/unique) 위에서 email/password 로그인이 실사용으로 성공 — 회귀 0 을 실측으로도 확인.
 
 ## 10. Google Client Configuration Checklist (WO-2D 입력 · 이번 WO 실행 0)
 
