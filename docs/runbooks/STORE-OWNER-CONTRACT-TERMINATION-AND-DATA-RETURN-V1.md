@@ -10,7 +10,7 @@
 - 해당 서비스의 `store_owner` role과 Store↔Service 연결만 종료한다.
 - 공급자/운영자 원본과 보안·감사로그는 Store purge 대상이 아니다.
 - 다른 활성 Store 서비스가 같은 organization을 사용하는 동안 organization-shared 데이터는 삭제하지 않는다.
-- GCS 삭제 실패는 성공으로 간주하지 않는다. case는 `failed / PURGE_INCOMPLETE` 상태로 남고 hourly job이 재시도한다.
+- GCS 삭제 실패는 성공으로 간주하지 않는다. case는 `failed / PURGE_INCOMPLETE` 상태로 남고, 운영자가 원인을 확인한 뒤 `purge-preview` → `mode=apply`로 명시 재시도한다. hourly job은 파기 기한 도래/초과를 감지·경고할 뿐 실삭제나 재시도를 수행하지 않는다.
 - 실제 운영 매장 purge 전에는 반드시 `purge-preview`를 확인한다.
 - scheduler는 실삭제를 수행하지 않는다. 파기는 admin의 명시적 `mode=apply`만 허용한다.
 
@@ -88,7 +88,13 @@ hourly job은 7일 기한 도래/초과 건수를 감지·경고만 한다. 실�
 
 인 경우에만 물리 삭제 후보가 된다.
 
-`MediaLibraryService.deleteAsset()`의 reference guard를 통과해야 하며 storage 삭제 실패 시 DB row도 성공 처리하지 않는다.
+파기는 3단계로 실행한다.
+
+1. 현재 매장의 Store 참조를 제거하되 `store_execution_assets`는 재시도 근거로 보존한다.
+2. `MediaLibraryService.deleteAsset()`로 GCS/Media를 삭제한다. 다른 매장·공용 참조가 있으면 보존한다.
+3. GCS/Media 단계가 성공한 뒤에만 `store_execution_assets`를 삭제하고 case를 `purge_completed`로 확정한다.
+
+storage 삭제 실패 시 media row와 `store_execution_assets`를 남기고 case를 `failed / PURGE_INCOMPLETE`로 기록한다. 따라서 다음 명시적 apply에서 같은 후보를 다시 계산해 재시도할 수 있다.
 
 ## 4. 백업
 
