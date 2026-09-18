@@ -107,6 +107,7 @@ const SignageFullscreenPlayerPage = lazy(() => import('./pages/signage/SignageFu
 // Legal pages — Phase 2 lazy (barrel unwound)
 const PolicyPage = lazy(() => import('./pages/legal/PolicyPage').then(m => ({ default: m.PolicyPage })));
 const PrivacyPage = lazy(() => import('./pages/legal/PrivacyPage').then(m => ({ default: m.PrivacyPage })));
+const StoreOwnerAgreementPage = lazy(() => import('./pages/legal/PolicyPage').then(m => ({ default: m.StoreOwnerAgreementPage })));
 
 // MyPage pages — Phase 2 lazy (barrel unwound; 9 named + 4 default-as-named)
 const MyDashboardPage = lazy(() => import('./pages/mypage/MyDashboardPage').then(m => ({ default: m.MyDashboardPage })));
@@ -1022,6 +1023,7 @@ function App() {
           {/* Legal (이용약관/개인정보처리방침) - WO-KPA-LEGAL-PAGES-V1 */}
           <Route path="/policy" element={<Layout serviceName={SERVICE_NAME}><PolicyPage /></Layout>} />
           <Route path="/privacy" element={<Layout serviceName={SERVICE_NAME}><PrivacyPage /></Layout>} />
+          <Route path="/store-owner-agreement" element={<Layout serviceName={SERVICE_NAME}><StoreOwnerAgreementPage /></Layout>} />
 
           {/* Tablet Kiosk (WO-STORE-TABLET-REQUEST-CHANNEL-V1) — fullscreen, no auth */}
           <Route path="/tablet/setup" element={<TabletSetupPage />} />
