@@ -16,7 +16,8 @@ import { LoginModalProvider } from '@/contexts/LoginModalContext';
 import LoginModal from '@/components/common/LoginModal';
 import { O4OErrorBoundary, O4OToastProvider } from '@o4o/error-handling';
 import { TemplateProvider, AccessDenied } from '@o4o/ui';
-import { templates } from '@o4o/shared-space-ui';
+import { StoreOwnerAgreementGate, templates } from '@o4o/shared-space-ui';
+import { loadPolicy } from '@/pages/legal/PolicyDocumentPage';
 import { kcosmeticsConfig } from '@o4o/operator-ux-core';
 import { KCosGlobalHeader } from '@/components/KCosGlobalHeader';
 
@@ -362,8 +363,21 @@ const ProtectedRoute = RoleGuard;
  *   membershipGate 를 주입한다. 이전에는 이 마운트만 gate 없이 role 로 통과해서,
  *   membership 이 정지돼도 role 이 살아 있으면 매장 UI 가 열렸다
  */
+async function loadStoreOwnerAgreementPending(api: { get: (url: string) => Promise<any> }, serviceKey: string) {
+  const res = await api.get(`/auth/policy-acceptances/store-owner?serviceKey=${encodeURIComponent(serviceKey)}`);
+  return res.data?.data?.pending ?? [];
+}
+
+async function acceptStoreOwnerAgreement(api: { post: (url: string, body: unknown) => Promise<any> }, item: { serviceKey: string; policyDocumentId: string; version: number }) {
+  await api.post('/auth/policy-acceptances/store-owner', {
+    serviceKey: item.serviceKey,
+    policyDocumentId: item.policyDocumentId,
+    version: item.version,
+  });
+}
+
 function StoreOwnerRoute({ children }: { children: React.ReactNode }) {
-  const { user, isAuthenticated, isLoading } = useAuth();
+  const { user, isAuthenticated, isLoading, logout } = useAuth();
   return (
     <StoreOwnerGuard
       serviceKey="cosmetics"
@@ -374,7 +388,16 @@ function StoreOwnerRoute({ children }: { children: React.ReactNode }) {
       renderDenied={<AccessDenied message="내 매장은 매장 경영자 계정만 이용할 수 있습니다." />}
       membershipGate={MembershipGate}
     >
-      {children}
+      <StoreOwnerAgreementGate
+        serviceKey="k-cosmetics"
+        serviceName="K-Cosmetics"
+        loadPolicy={loadPolicy}
+        loadPending={(serviceKey) => loadStoreOwnerAgreementPending(coreApi, serviceKey)}
+        acceptAgreement={(item) => acceptStoreOwnerAgreement(coreApi, item)}
+        onLogout={logout}
+      >
+        {children}
+      </StoreOwnerAgreementGate>
     </StoreOwnerGuard>
   );
 }
