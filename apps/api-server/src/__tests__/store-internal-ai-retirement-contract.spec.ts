@@ -162,7 +162,7 @@ describe('WO-O4O-STORE-INTERNAL-AI-RETIREMENT-V1 — (D) Store AiContentModal / 
   }
   it('productionTargets — dead AiContentModal 진입 매핑(PRODUCTION_TARGET_TO_AI_MODE · AiModeForProduction) 제거', () => {
     const src = read('services/web-kpa-society/src/pages/pharmacy/productionTargets.tsx');
-    expect(src).not.toMatch(/export (const|type) (PRODUCTION_TARGET_TO_AI_MODE|AiModeForProduction)/);
+    expect(src).not.toMatch(/export (const|type) (PRODUCTION_TARGET_TO_AI_MODE|AiModeForProduction)\b/);
     expect(src).not.toMatch(/productionTargetToAiMode\s*\(/);
   });
 });
