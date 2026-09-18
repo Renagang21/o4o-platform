@@ -16,7 +16,8 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { RichTextEditor } from '@o4o/content-editor';
+import { RichTextEditor, LlmAssistPanel } from '@o4o/content-editor';
+import { buildStoreContentAuthoringPrompt, resolveStoreContentLlmTask, STORE_LLM_ASSIST_LABEL } from '@o4o/store-ui-core';
 import {
   fetchStoreContents,
   fetchStoreContent,
@@ -275,6 +276,21 @@ function ContentEditor({
             placeholder="콘텐츠 제목을 입력하세요"
             className="mb-4 w-full rounded-md border border-gray-200 px-3 py-2 text-sm"
           />
+          {/* WO-O4O-STORE-EXTERNAL-LLM-CONTENT-AUTHORING-V1: 외부 LLM 작업 (KPA 와 동일 계약 · Prompt 는 store-ui-core) */}
+          <div className="mb-2">
+            <LlmAssistPanel
+              label={STORE_LLM_ASSIST_LABEL}
+              contextLabel="매장 콘텐츠 — 새로 작성하거나 현재 내용을 다듬습니다"
+              guideText={({ additionalInstruction }) => buildStoreContentAuthoringPrompt({
+                task: resolveStoreContentLlmTask(html),
+                title,
+                currentHtml: html,
+                additionalInstruction,
+              })}
+              currentHtml={html}
+              onApplyHtml={(next) => setHtml(next)}
+            />
+          </div>
           <div className="overflow-hidden rounded-lg border border-gray-200">
             <RichTextEditor showInternalAi={false}
               value={html}

@@ -23,7 +23,8 @@ import { useEffect, useState, useCallback, useMemo, type CSSProperties } from 'r
 import { useNavigate } from 'react-router-dom';
 import { X, Save, Loader2 } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
-import { RichTextEditor, type EditorContent } from '@o4o/content-editor';
+import { RichTextEditor, LlmAssistPanel, type EditorContent } from '@o4o/content-editor';
+import { buildStoreContentAuthoringPrompt, resolveStoreContentLlmTask, STORE_LLM_ASSIST_LABEL } from '@o4o/store-ui-core';
 import { apiClient } from '../../api/client';
 import { getAccessToken } from '../../contexts/AuthContext';
 import { colors } from '../../styles/theme';
@@ -168,6 +169,23 @@ export function CreateContentFromResourcesModal({ open, onClose, onCreated, prod
 
           <div style={styles.composeRow}>
             <label style={styles.label}>매장 콘텐츠 본문</label>
+            {/* WO-O4O-STORE-EXTERNAL-LLM-CONTENT-AUTHORING-V1: 외부 LLM(사용자 ChatGPT 등) 작업 — Prompt 는 store-ui-core 순수 함수, 결과는 편집기로만 */}
+            <div style={{ marginBottom: 8 }}>
+              <LlmAssistPanel
+                label={STORE_LLM_ASSIST_LABEL}
+                contextLabel="매장 콘텐츠 본문 — 새로 작성하거나 현재 내용을 다듬습니다"
+                guideText={({ additionalInstruction }) => buildStoreContentAuthoringPrompt({
+                  task: resolveStoreContentLlmTask(editorHtml),
+                  title,
+                  currentHtml: editorHtml,
+                  productName: product?.name,
+                  additionalInstruction,
+                })}
+                currentHtml={editorHtml}
+                onApplyHtml={(html) => setEditorHtml(html)}
+                onNotify={(message, kind) => (kind === 'error' ? toast.error(message) : toast.success(message))}
+              />
+            </div>
             <div style={styles.editorWrap}>
               <RichTextEditor showInternalAi={false}
                 value={editorHtml}

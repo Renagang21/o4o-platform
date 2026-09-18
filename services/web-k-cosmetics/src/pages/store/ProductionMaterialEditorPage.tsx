@@ -13,7 +13,7 @@
 
 import { useState } from 'react';
 import { ProductionMaterialEditorShell } from '@o4o/store-ui-core';
-import { RichTextEditor, type MediaInsert } from '@o4o/content-editor';
+import { RichTextEditor, LlmAssistPanel, type MediaInsert } from '@o4o/content-editor';
 import { toast } from '@o4o/error-handling';
 import { getAccessToken } from '@o4o/auth-client';
 import { createStoreExecutionAsset } from '../../api/storeExecutionAssets';
@@ -40,6 +40,7 @@ export default function ProductionMaterialEditorPage() {
         notify={{ success: toast.success, error: toast.error }}
         onImageUpload={handleImageUpload}
         onMediaLibraryPick={(insertMedia) => setMediaPickerTarget(() => insertMedia)}
+        LlmAssistComponent={LlmAssistPanel}
       />
       <MediaPickerModal
         open={!!mediaPickerTarget}

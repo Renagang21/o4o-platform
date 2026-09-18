@@ -1,5 +1,5 @@
 /**
- * ProductionMaterialEditorShell — AI 제작 자료 초안 편집기 공통 shell
+ * ProductionMaterialEditorShell — 매장 제작 자료 편집기 공통 shell
  *
  * WO-O4O-PRODUCTION-MATERIAL-EDITOR-SHELL-COMMONIZATION-V1
  *
@@ -12,11 +12,18 @@
  *   - 이로써 store-ui-core 의존 방향(F3 Store Layer freeze) 불변, 신규 dependency 0.
  *
  * 서비스 wrapper 는 위 5개 어댑터만 주입한다 (api base path / template registry 차이 흡수).
+ *
+ * WO-O4O-STORE-EXTERNAL-LLM-CONTENT-AUTHORING-V1:
+ *   - 콘텐츠 생성은 사용자의 외부 LLM(ChatGPT 등)이 한다. `LlmAssistComponent` 슬롯(구조적 타입)으로
+ *     @o4o/content-editor 의 LlmAssistPanel 을 주입하면 편집기 위에 "ChatGPT로 작업" 진입점이 생긴다.
+ *   - Prompt 는 이 패키지의 buildStoreContentAuthoringPrompt(순수 함수)로 만든다. 결과는 편집기로만 들어가고
+ *     저장은 기존 저장 버튼(사용자 확인) 경로 그대로다. 미주입 시 기존 동작 유지.
  */
 
 import { useState, useCallback, type CSSProperties, type ComponentType } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { ArrowLeft, Save, FileText, Megaphone, QrCode } from 'lucide-react';
+import { buildStoreContentAuthoringPrompt, resolveStoreContentLlmTask, STORE_LLM_ASSIST_LABEL } from '../llm/storeContentAuthoringPrompt';
 
 // ─── 제작 유형 (POP/QR) ──────────────────────────────────────────
 
@@ -57,6 +64,16 @@ interface InjectedEditorProps {
   onMediaLibraryPick?: (insertMedia: (media: InjectedMediaInsert) => void) => void;
 }
 
+/** LlmAssistPanel(@o4o/content-editor) 구조적 호환 prop 집합 (필요한 것만) */
+export interface InjectedLlmAssistProps {
+  label?: string;
+  contextLabel?: string;
+  guideText: string | ((opts: { additionalInstruction: string }) => string);
+  currentHtml?: string;
+  onApplyHtml?: (html: string) => void;
+  onNotify?: (message: string, kind: 'success' | 'error') => void;
+}
+
 /** createStoreExecutionAsset 호출 입력 (shell 이 실제로 보내는 형태) */
 export interface ProductionMaterialCreateInput {
   title: string;
@@ -87,6 +104,11 @@ export interface ProductionMaterialEditorShellProps {
   onMediaLibraryPick?: (insertMedia: (media: InjectedMediaInsert) => void) => void;
   /** 이미지 직접 업로드 (파일 → URL) */
   onImageUpload?: (file: File) => Promise<string>;
+  /**
+   * WO-O4O-STORE-EXTERNAL-LLM-CONTENT-AUTHORING-V1: 외부 LLM 작업 패널(서비스가 LlmAssistPanel 주입).
+   * 미주입 시 진입점 없음(기존 동작).
+   */
+  LlmAssistComponent?: ComponentType<InjectedLlmAssistProps>;
 }
 
 // ─── Location State ──────────────────────────────────────────────────────────
@@ -113,6 +135,7 @@ export function ProductionMaterialEditorShell({
   savedPath = '/store/library/production-materials',
   onMediaLibraryPick,
   onImageUpload,
+  LlmAssistComponent,
 }: ProductionMaterialEditorShellProps) {
   const navigate = useNavigate();
   const location = useLocation();
@@ -124,6 +147,8 @@ export function ProductionMaterialEditorShell({
   const [title, setTitle] = useState(state.title ?? '');
   const [selectedType, setSelectedType] = useState<ProductionType | null>(null);
   const [editorHtml, setEditorHtml] = useState<string>(initialHtml);
+  // 편집기 value: 외부 LLM 결과 적용(onApplyHtml) 시 여기를 바꿔 편집기에 반영한다. 사용자 타이핑은 onChange→editorHtml 만 갱신.
+  const [editorValue, setEditorValue] = useState<string>(initialHtml);
   const [saving, setSaving] = useState(false);
 
   const aiHeaders = useCallback((): Record<string, string> | undefined => {
@@ -181,7 +206,7 @@ export function ProductionMaterialEditorShell({
         </button>
         <div style={styles.headerCenter}>
           <FileText size={18} style={{ color: '#3b82f6' }} />
-          <h1 style={styles.pageTitle}>AI 제작 자료 초안 편집</h1>
+          <h1 style={styles.pageTitle}>매장 제작 자료 편집</h1>
         </div>
         <button onClick={handleSave} disabled={saving} style={styles.saveBtn}>
           <Save size={14} />
@@ -240,12 +265,33 @@ export function ProductionMaterialEditorShell({
         </div>
       )}
 
+      {/* 외부 LLM 작업 진입점 (주입 시) */}
+      {LlmAssistComponent && (
+        <div style={{ marginBottom: 8 }}>
+          <LlmAssistComponent
+            label={STORE_LLM_ASSIST_LABEL}
+            contextLabel="매장 제작 자료 — 새로 작성하거나 현재 내용을 다듬습니다"
+            guideText={({ additionalInstruction }) => buildStoreContentAuthoringPrompt({
+              task: resolveStoreContentLlmTask(editorHtml),
+              title,
+              currentHtml: editorHtml,
+              sourceTitle: state.sourceMetadata?.sourceTitle,
+              sourceOrigin: state.sourceMetadata?.sourceOrigin,
+              additionalInstruction,
+            })}
+            currentHtml={editorHtml}
+            onApplyHtml={(html) => { setEditorValue(html); setEditorHtml(html); }}
+            onNotify={(message, kind) => (kind === 'error' ? notify.error(message) : notify.success(message))}
+          />
+        </div>
+      )}
+
       {/* Editor */}
       <div style={styles.editorWrap}>
         <EditorComponent
-          value={initialHtml}
+          value={editorValue}
           onChange={handleChange}
-          placeholder="AI가 정리한 내용을 편집하거나, 직접 내용을 입력하세요."
+          placeholder="직접 작성하거나 ChatGPT 등 외부 AI에서 만든 내용을 붙여넣으세요."
           minHeight="520px"
           preset="full"
           showInternalAi={false}

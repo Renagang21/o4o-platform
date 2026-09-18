@@ -17,7 +17,8 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { RichTextEditor } from '@o4o/content-editor';
+import { RichTextEditor, LlmAssistPanel } from '@o4o/content-editor';
+import { buildStoreContentAuthoringPrompt, resolveStoreContentLlmTask, STORE_LLM_ASSIST_LABEL } from '@o4o/store-ui-core';
 import {
   fetchLibraryAssets,
   createLibraryAsset,
@@ -366,6 +367,21 @@ function AssetForm({
         {assetType === 'content' && (
           <div>
             <label className="mb-1 block text-xs font-semibold text-gray-500">내용</label>
+            {/* WO-O4O-STORE-EXTERNAL-LLM-CONTENT-AUTHORING-V1: 외부 LLM 작업 (content 유형 자료만) */}
+            <div className="mb-2">
+              <LlmAssistPanel
+                label={STORE_LLM_ASSIST_LABEL}
+                contextLabel="매장 제작 자료 — 새로 작성하거나 현재 내용을 다듬습니다"
+                guideText={({ additionalInstruction }) => buildStoreContentAuthoringPrompt({
+                  task: resolveStoreContentLlmTask(htmlContent),
+                  title,
+                  currentHtml: htmlContent,
+                  additionalInstruction,
+                })}
+                currentHtml={htmlContent}
+                onApplyHtml={(next) => setHtmlContent(next)}
+              />
+            </div>
             <div className="overflow-hidden rounded-lg border border-gray-200">
               <RichTextEditor showInternalAi={false}
                 value={htmlContent}
