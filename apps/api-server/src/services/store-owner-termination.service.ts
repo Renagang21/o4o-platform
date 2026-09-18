@@ -221,6 +221,30 @@ export class StoreOwnerTerminationService {
          FROM o4o_asset_snapshots WHERE organization_id=$1 ORDER BY created_at, id`,
       [c.organizationId],
     );
+    const storePlaylists = await q.query(
+      `SELECT id, name, playlist_type, publish_status, is_active, source_playlist_id, created_at, updated_at
+         FROM store_playlists WHERE organization_id=$1 ORDER BY created_at, id`,
+      [c.organizationId],
+    );
+    const storePlaylistIds = storePlaylists.map((r: any) => r.id);
+    const storePlaylistItems = storePlaylistIds.length
+      ? await q.query(
+          `SELECT id, playlist_id, snapshot_id, display_order, is_forced, is_locked,
+                  forced_start_at, forced_end_at, created_at, updated_at
+             FROM store_playlist_items WHERE playlist_id=ANY($1::uuid[]) ORDER BY playlist_id, display_order, id`,
+          [storePlaylistIds],
+        )
+      : [];
+    const tablets = await q.query(
+      `SELECT id, name, location, is_active, current_screen_set_id, created_at
+         FROM store_tablets WHERE organization_id=$1 ORDER BY created_at, id`,
+      [c.organizationId],
+    );
+    const tabletDevices = await q.query(
+      `SELECT id, name, current_location_id, last_seen_at, is_active, created_at, updated_at
+         FROM store_tablet_devices WHERE organization_id=$1 ORDER BY created_at, id`,
+      [c.organizationId],
+    );
     const storeContents = await q.query(
       `SELECT id, snapshot_id, source_type, title, content_json, tags, created_at, updated_at,
               author_role, visibility_scope, source_metadata, workspace_status
@@ -289,6 +313,8 @@ export class StoreOwnerTerminationService {
         productListings: listings,
         localProducts,
         snapshots,
+        storePlaylists: { playlists: storePlaylists, items: storePlaylistItems },
+        tablets: { locations: tablets, devices: tabletDevices },
         storeContents,
         executionAssets,
         storePops: pops,
@@ -412,6 +438,13 @@ export class StoreOwnerTerminationService {
     const otherStore = await this.hasOtherActiveStoreService(c.organizationId, c.serviceKey, m);
     if (!otherStore) {
       await m.query(`UPDATE store_qr_codes SET is_active=false, updated_at=NOW() WHERE organization_id=$1 AND is_active=true`, [c.organizationId]);
+      await m.query(`UPDATE store_playlists SET is_active=false, publish_status='draft', updated_at=NOW() WHERE organization_id=$1 AND is_active=true`, [c.organizationId]);
+      await m.query(
+        `UPDATE store_tablet_devices
+            SET is_active=false, device_token_hash=NULL, pairing_code=NULL, pairing_expires_at=NULL, updated_at=NOW()
+          WHERE organization_id=$1 AND is_active=true`,
+        [c.organizationId],
+      );
       await m.query(
         `UPDATE store_tablet_screen_sets
             SET status='archived', deleted_at=COALESCE(deleted_at,NOW()), updated_at=NOW()
@@ -466,6 +499,9 @@ export class StoreOwnerTerminationService {
       ['kpa_store_contents', `SELECT COUNT(*)::int n FROM kpa_store_contents WHERE organization_id=$1`],
       ['store_execution_assets', `SELECT COUNT(*)::int n FROM store_execution_assets WHERE organization_id=$1`],
       ['store_qr_codes', `SELECT COUNT(*)::int n FROM store_qr_codes WHERE organization_id=$1`],
+      ['store_playlists', `SELECT COUNT(*)::int n FROM store_playlists WHERE organization_id=$1`],
+      ['store_playlist_items', `SELECT COUNT(*)::int n FROM store_playlist_items WHERE playlist_id IN (SELECT id FROM store_playlists WHERE organization_id=$1)`],
+      ['store_tablet_devices', `SELECT COUNT(*)::int n FROM store_tablet_devices WHERE organization_id=$1`],
       ['store_tablet_screen_sets', `SELECT COUNT(*)::int n FROM store_tablet_screen_sets WHERE organization_id=$1 AND origin='store'`],
       ['store_multilingual_product_content_groups(shared)', `SELECT COUNT(*)::int n FROM store_multilingual_product_content_groups WHERE organization_id=$1 AND service_key IS NULL`],
     ] as const) {
@@ -575,7 +611,13 @@ export class StoreOwnerTerminationService {
         await m.query(`DELETE FROM signage_schedules WHERE "organizationId"=$1 AND "serviceKey"=ANY($2::text[])`, [c.organizationId,cfg.contentKeys]);
         await m.query(`DELETE FROM signage_playlist_items WHERE "playlistId" IN (SELECT id FROM signage_playlists WHERE "organizationId"=$1 AND "serviceKey"=ANY($2::text[]))`, [c.organizationId,cfg.contentKeys]);
         await m.query(`DELETE FROM signage_playlists WHERE "organizationId"=$1 AND "serviceKey"=ANY($2::text[])`, [c.organizationId,cfg.contentKeys]);
-        await m.query(`DELETE FROM signage_media WHERE "organizationId"=$1 AND "serviceKey"=ANY($2::text[])`, [c.organizationId,cfg.contentKeys]);
+        await m.query(
+          `DELETE FROM signage_media sm
+            WHERE sm."organizationId"=$1
+              AND sm."serviceKey"=ANY($2::text[])
+              AND NOT EXISTS (SELECT 1 FROM signage_playlist_items spi WHERE spi."mediaId"=sm.id)`,
+          [c.organizationId,cfg.contentKeys],
+        );
         await m.query(`DELETE FROM store_pop_documents WHERE organization_id=$1 AND service_key=ANY($2::text[])`, [c.organizationId,cfg.contentKeys]);
         await m.query(`DELETE FROM store_pops WHERE store_id=$1 AND service_key=ANY($2::text[]) AND author_role='store'`, [c.organizationId,cfg.contentKeys]);
         await m.query(`DELETE FROM store_blog_posts WHERE store_id=$1 AND service_key=ANY($2::text[]) AND author_role='store'`, [c.organizationId,cfg.contentKeys]);
@@ -606,6 +648,9 @@ export class StoreOwnerTerminationService {
 
         if (!preview.hasOtherActiveStoreService) {
           // 조직 공용 Store 데이터 — 마지막 활성 Store 서비스가 끝나는 경우에만 파기한다.
+          await m.query(`DELETE FROM store_playlist_items WHERE playlist_id IN (SELECT id FROM store_playlists WHERE organization_id=$1)`, [c.organizationId]);
+          await m.query(`DELETE FROM store_playlists WHERE organization_id=$1`, [c.organizationId]);
+          await m.query(`DELETE FROM store_tablet_devices WHERE organization_id=$1`, [c.organizationId]);
           await m.query(`UPDATE store_tablets SET current_screen_set_id=NULL WHERE organization_id=$1`, [c.organizationId]);
           await m.query(`DELETE FROM store_tablet_displays WHERE tablet_id IN (SELECT id FROM store_tablets WHERE organization_id=$1)`, [c.organizationId]);
           await m.query(`DELETE FROM store_tablet_corner_contents WHERE organization_id=$1`, [c.organizationId]);
@@ -616,6 +661,7 @@ export class StoreOwnerTerminationService {
           await m.query(`DELETE FROM store_multilingual_product_content_pages WHERE group_id IN (
                             SELECT id FROM store_multilingual_product_content_groups WHERE organization_id=$1)`, [c.organizationId]);
           await m.query(`DELETE FROM store_multilingual_product_content_groups WHERE organization_id=$1`, [c.organizationId]);
+          await m.query(`DELETE FROM store_asset_derivations WHERE organization_id=$1`, [c.organizationId]);
           await m.query(`DELETE FROM kpa_store_contents WHERE organization_id=$1`, [c.organizationId]);
           await m.query(`DELETE FROM store_execution_assets WHERE organization_id=$1`, [c.organizationId]);
           await m.query(`DELETE FROM o4o_asset_snapshots WHERE organization_id=$1`, [c.organizationId]);
