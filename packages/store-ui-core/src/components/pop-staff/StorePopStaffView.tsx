@@ -49,6 +49,17 @@ export interface StorePopStaffViewProps {
   storeNoun?: string;
   /** 본문 편집기 slot (RichTextEditor 주입) */
   renderEditor: (ctx: { value: string; onChange: (html: string) => void; disabled: boolean }) => ReactNode;
+  /**
+   * WO-O4O-STORE-PRODUCTION-EXTERNAL-LLM-REALIGNMENT-V1 §17:
+   *   외부 LLM 보조 slot — 본문 편집기 위에 렌더된다. 서비스 wrapper 가 LlmAssistPanel + Prompt Core(task='pop') 를 주입한다.
+   *   미주입 시 동작 불변. onApplyHtml 은 편집 중 본문만 바꾼다(저장은 기존 버튼).
+   */
+  renderAssist?: (ctx: {
+    title: string;
+    excerpt: string;
+    value: string;
+    onApplyHtml: (html: string) => void;
+  }) => ReactNode;
 }
 
 type ViewMode = 'list' | 'editor';
@@ -66,7 +77,7 @@ const STATUS_BADGE: Record<StaffPopPost['status'], string> = {
   archived: 'bg-amber-50 text-amber-700',
 };
 
-export function StorePopStaffView({ api, storeNoun = '매장', renderEditor }: StorePopStaffViewProps) {
+export function StorePopStaffView({ api, storeNoun = '매장', renderEditor, renderAssist }: StorePopStaffViewProps) {
   const { getStoreSlug, fetchStaffPopPosts, updateStaffPopPost, deleteStaffPopPost } = api;
   const navigate = useNavigate();
   const [slug, setSlug] = useState<string | null>(null);
@@ -275,7 +286,15 @@ export function StorePopStaffView({ api, storeNoun = '매장', renderEditor }: S
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1.5">본문</label>
+            <div className="flex items-center justify-between gap-2 mb-1.5">
+              <label className="block text-sm font-medium text-slate-700">본문</label>
+              {renderAssist?.({
+                title: editTitle,
+                excerpt: editExcerpt,
+                value: editContent,
+                onApplyHtml: (html) => setEditContent(html),
+              })}
+            </div>
             {renderEditor({
               value: editContent,
               onChange: (html) => setEditContent(html),

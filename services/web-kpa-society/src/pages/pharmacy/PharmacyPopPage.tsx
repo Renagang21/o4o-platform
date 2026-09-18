@@ -26,9 +26,14 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Loader2, AlertCircle, Edit3, Trash2, ArrowLeft, Save, ExternalLink, Printer } from 'lucide-react';
-import { RichTextEditor } from '@o4o/content-editor';
+import { RichTextEditor, LlmAssistPanel } from '@o4o/content-editor';
 import { toast } from '@o4o/error-handling';
-import { CANONICAL_STORE_POP_V2_ROUTE, buildPopV2HandoffState } from '@o4o/store-ui-core';
+import {
+  CANONICAL_STORE_POP_V2_ROUTE,
+  buildPopV2HandoffState,
+  buildStoreContentAuthoringPrompt,
+  STORE_LLM_ASSIST_LABEL,
+} from '@o4o/store-ui-core';
 // WO-O4O-KPA-MY-STORE-COPIES-STANDARD-TABLE-V1: list view 표준 테이블
 import { DataTable, type Column, ActionBar, BulkResultModal } from '@o4o/ui';
 import { useBatchAction } from '@o4o/operator-ux-core';
@@ -278,7 +283,25 @@ export function PharmacyPopPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1.5">본문</label>
+            <div className="flex items-center justify-between gap-2 mb-1.5">
+              <label className="block text-sm font-medium text-slate-700">본문</label>
+              {/* WO-O4O-STORE-PRODUCTION-EXTERNAL-LLM-REALIGNMENT-V1 §17: 외부 LLM POP 문안 작업 — Prompt 는 store-ui-core(task='pop'). 현재 화면 데이터(제목·요약·본문)만 Context */}
+              <LlmAssistPanel
+                label={STORE_LLM_ASSIST_LABEL}
+                contextLabel="매장 POP 문안 — 짧게 읽히는 POP 문안으로 작성·재구성합니다"
+                guideText={({ additionalInstruction }) =>
+                  buildStoreContentAuthoringPrompt({
+                    task: 'pop',
+                    title: editTitle,
+                    currentHtml: editContent,
+                    referenceText: editExcerpt,
+                    additionalInstruction,
+                  })
+                }
+                currentHtml={editContent}
+                onApplyHtml={(html) => setEditContent(html)}
+              />
+            </div>
             <RichTextEditor showInternalAi={false}
               value={editContent}
               onChange={(c) => setEditContent(c.html)}

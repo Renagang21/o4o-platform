@@ -80,7 +80,9 @@ describe('WO-O4O-STORE-EXTERNAL-LLM-CONTENT-AUTHORING-V1 — (B) Store Prompt Co
   it('export 계약 — buildStoreContentAuthoringPrompt · resolveStoreContentLlmTask · task create|revise · 라벨 ChatGPT로 작업', () => {
     expect(src).toContain('export function buildStoreContentAuthoringPrompt(ctx: StoreContentLlmContext): string');
     expect(src).toContain('export function resolveStoreContentLlmTask(');
-    expect(src).toContain("export type StoreContentLlmTask = 'create' | 'revise'");
+    // WO 3(WO-O4O-STORE-PRODUCTION-EXTERNAL-LLM-REALIGNMENT-V1 §6)에서 목적별 task 가 같은 union 에 additive 로 추가됐다.
+    //   create | revise 는 그대로 남아 있어야 한다(WO 2 소비처 계약 불변).
+    expect(src).toMatch(/export type StoreContentLlmTask =[\s\S]*?\|\s*'create'[\s\S]*?\|\s*'revise'/);
     expect(src).toContain("export const STORE_LLM_ASSIST_LABEL = 'ChatGPT로 작업'");
   });
   it('의존 0 — import 문 없음(React/API/auth/router 미사용)', () => {

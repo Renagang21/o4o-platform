@@ -143,6 +143,19 @@ export interface StoreProductDescriptionsViewProps {
     onChange: (html: string) => void;
     placeholder: string;
   }) => ReactNode;
+  /**
+   * WO-O4O-STORE-PRODUCTION-EXTERNAL-LLM-REALIGNMENT-V1 §19:
+   *   외부 LLM(ChatGPT 등) 보조 slot — 편집기 위에 렌더된다. 서비스 wrapper 가 LlmAssistPanel + Prompt Core 를 주입한다.
+   *   store-ui-core 는 @o4o/content-editor 를 import 하지 않는다. 미주입 시 화면은 이전과 완전히 동일하다.
+   *   onApplyHtml 은 편집기 내용만 바꾼다(자동 저장 없음 — 저장은 기존 버튼).
+   */
+  renderAssist?: (ctx: {
+    product: StoreDescriptionProduct;
+    value: string;
+    /** 자료함에서 넘어온 prefill 메모(있으면) — 참고 문안 */
+    prefillNote: string | null;
+    onApplyHtml: (html: string) => void;
+  }) => ReactNode;
 }
 
 export function StoreProductDescriptionsView({
@@ -152,6 +165,7 @@ export function StoreProductDescriptionsView({
   theme: themeOverrides,
   findTemplate,
   renderEditor,
+  renderAssist,
   links,
 }: StoreProductDescriptionsViewProps) {
   const localProductsHref = links?.localProducts ?? '/store/commerce/local-products';
@@ -493,6 +507,17 @@ export function StoreProductDescriptionsView({
               {saveError && (
                 <div style={styles.saveErrorBanner}>
                   <span>{saveError}</span>
+                </div>
+              )}
+
+              {renderAssist && (
+                <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                  {renderAssist({
+                    product: selectedProduct,
+                    value: content,
+                    prefillNote,
+                    onApplyHtml: setContent,
+                  })}
                 </div>
               )}
 

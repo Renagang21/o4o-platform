@@ -17,6 +17,8 @@
 import {
   StoreBlogManageView,
   type StoreBlogManageApi,
+  buildStoreContentAuthoringPrompt,
+  STORE_LLM_ASSIST_LABEL,
 } from '@o4o/store-ui-core';
 import {
   fetchStaffBlogPosts,
@@ -29,7 +31,7 @@ import {
   updateBlogSettings,
 } from '@/api/blogStaff';
 import { fetchChannelOverviewWithCode } from '@/api/storeHub';
-import { RichTextEditor } from '@o4o/content-editor';
+import { RichTextEditor, LlmAssistPanel } from '@o4o/content-editor';
 import { getAccessToken } from '@o4o/auth-client';
 
 const SERVICE = 'cosmetics';
@@ -66,6 +68,20 @@ export default function StoreBlogManagePage() {
           heroImagePlaceholder: 'https:// 이미지 URL',
         },
       }}
+      /* WO-O4O-STORE-PRODUCTION-EXTERNAL-LLM-REALIGNMENT-V1 §16: 외부 LLM(ChatGPT) 블로그 본문 작업 — Prompt 는 store-ui-core(task='blog'), UI 는 공용 LlmAssistPanel */
+      renderAssist={({ title, value, onApplyHtml }) => (
+        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+          <LlmAssistPanel
+            label={STORE_LLM_ASSIST_LABEL}
+            contextLabel="매장 블로그 본문 — 새로 작성하거나 현재 글을 다듬습니다"
+            guideText={({ additionalInstruction }) =>
+              buildStoreContentAuthoringPrompt({ task: 'blog', title, currentHtml: value, additionalInstruction })
+            }
+            currentHtml={value}
+            onApplyHtml={onApplyHtml}
+          />
+        </div>
+      )}
       renderEditor={({ value, onChange, placeholder }) => (
         <RichTextEditor showInternalAi={false}
           value={value}

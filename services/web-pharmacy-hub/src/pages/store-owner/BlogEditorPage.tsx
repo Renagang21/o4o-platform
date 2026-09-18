@@ -10,7 +10,8 @@
 
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { RichTextEditor } from '@o4o/content-editor';
+import { RichTextEditor, LlmAssistPanel } from '@o4o/content-editor';
+import { buildStoreContentAuthoringPrompt, STORE_LLM_ASSIST_LABEL } from '@o4o/store-ui-core';
 import {
   fetchBlogPost,
   createBlogPost,
@@ -137,6 +138,18 @@ export default function StoreOwnerBlogEditorPage() {
             />
           </div>
 
+          {/* WO-O4O-STORE-PRODUCTION-EXTERNAL-LLM-REALIGNMENT-V1 §16: 외부 LLM 블로그 본문 작업 — KPA/KCos 와 동일 Prompt Core(task='blog'). 저장은 기존 버튼 */}
+          <div className="mb-2 flex justify-end">
+            <LlmAssistPanel
+              label={STORE_LLM_ASSIST_LABEL}
+              contextLabel="매장 블로그 본문 — 새로 작성하거나 현재 글을 다듬습니다"
+              guideText={({ additionalInstruction }) =>
+                buildStoreContentAuthoringPrompt({ task: 'blog', title, currentHtml: content, additionalInstruction })
+              }
+              currentHtml={content}
+              onApplyHtml={(html) => setContent(html)}
+            />
+          </div>
           <div className="overflow-hidden rounded-lg border border-gray-200">
             <RichTextEditor showInternalAi={false}
               value={content}
