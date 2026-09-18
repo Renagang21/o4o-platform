@@ -37,6 +37,8 @@ baseline(2026-09-18 14:02Z): users 2 · linked_accounts 1(테스트 계정) · �
 | 3 | `admin.neture.co.kr` | Admin 정상 진입 · 테스트 계정은 계속 불가 | PENDING |
 | N | 잘못된 비밀번호 1회 | `INVALID_PASSWORD` 오류 표시 · row 0 | PENDING |
 
+**⚠️ 발견(2026-09-18 21:55Z read-only · 범위 밖 · 보고만):** 운영자 계정(`cfd2a5e7`)이 **E2E Auth Runtime 워크플로에 의해 push 마다 잠긴다.** `account_activities` `login_email` 실패가 09-17 05:00Z 이후 매 시간대 33~39건씩 묶여 있고(총 10회), 각 묶음이 `e2e-auth-runtime.yml` 실행 시각(09-17 05:15·06:57·13:42Z, 09-18 02:07·04:52·05:51·14:22Z)과 일치한다. 워크플로는 `packages/auth-client/src/**`·`auth-react/src/**` 변경 push 에 자동 실행되며 `E2E_{KPA|KCOS|NETURE}_ADMIN_*` secret(WO-2C reset 이후 stale)으로 3 서비스 × 반복 로그인 → 같은 users row 에 `loginAttempts` 누적 → 5회 이상에서 **30분 잠금**(`handleFailedLogin`). 이번 커밋 `35548dd65` 도 auth 패키지를 건드려 14:22~14:28Z 잠금을 유발했다. 14:04:54Z 의 `invalid_password` 1건 + 14:05Z `account_locked` 4건은 사용자 시도로 보인다. 현재: `lockedUntil` 14:34:54Z 만료(잠금 해제) · **`loginAttempts=8` 잔존 → 다음 password 실패 1회에 즉시 30분 재잠금**, 성공 로그인 시 0 리셋. **제안(별도 승인):** ① `e2e-auth-runtime.yml` push 트리거 제거 또는 워크플로 비활성(WO-2F 에서 Google 경로 기준 재정의 전까지) — CI 변경 = 중지 조건 · ② `loginAttempts` 1행 리셋은 UPDATE 이므로 사용자 명시 승인 시에만.
+
 **주의(WO §3):** 이메일 로그인은 service_credentials 해시를 우선 쓰므로 평소 비밀번호가 `users.password` 와 다를 수 있다. Smoke 1 에서 `INVALID_PASSWORD` 가 나오면 `PUT /users/password`(serviceKey 없이) 로 `users.password` 를 먼저 정렬한 뒤 재시도한다 — 값은 추측·조회하지 않는다.
 
 ## 4. Git
@@ -47,4 +49,4 @@ baseline(2026-09-18 14:02Z): users 2 · linked_accounts 1(테스트 계정) · �
 | `35548dd65` | 서버 · 패키지 · neture 화면 · 테스트 |
 | (본 커밋) | CHECK 초안 |
 
-문서 정합: 발견 0건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 0건 (E2E Auth Runtime 기존 red 는 보고만)
+문서 정합: 발견 0건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 1건(E2E Auth Runtime 워크플로 = 운영자 계정 잠금 유발 · push 트리거 제거/비활성)
