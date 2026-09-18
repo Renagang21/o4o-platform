@@ -14,6 +14,12 @@
  *   - linked_accounts 에 email/displayName/profileImage/providerData 스냅샷을 쓰지 않는다(picture 미저장).
  *   - users.name = NULL · users.password = NULL. email 은 `users.email NOT NULL UNIQUE` 가 남아 있어
  *     Google email claim 을 과도기 프로필 값으로만 저장한다. claim 이 없으면 placeholder 없이 실패.
+ *
+ * 명시 연결(WO-O4O-GOOGLE-IDENTITY-OPERATOR-EXPLICIT-LINK-V1):
+ *   - `link()` 는 세션의 users.id + `users.password` 재인증 + Google ID token 검증을 모두 요구한다.
+ *     email 일치는 연결 근거가 아니다(달라도 연결). users 신설 0 · users.email 변경 0 · role/membership 변경 0.
+ *   - sub 는 1 user 에만 붙는다: 다른 user 의 sub → GOOGLE_IDENTITY_IN_USE(이동·merge 0),
+ *     같은 user 에 다른 sub → GOOGLE_ACCOUNT_ALREADY_LINKED(교체 기능 없음), 같은 sub → 멱등.
  */
 
 import type { DataSource, EntityManager, Repository } from 'typeorm';
@@ -35,6 +41,7 @@ import {
   injectRolesIntoPublicData,
 } from './auth-context.helper.js';
 import * as tokenUtils from '../../utils/token.utils.js';
+import { comparePassword } from '../../utils/auth.utils.js';
 import logger from '../../utils/logger.js';
 
 export type GoogleAuthErrorCode =
@@ -43,7 +50,11 @@ export type GoogleAuthErrorCode =
   | 'GOOGLE_EMAIL_MISSING'
   | 'EMAIL_IN_USE'
   | 'CONSENT_REQUIRED'
-  | 'INVALID_USER';
+  | 'INVALID_USER'
+  | 'PASSWORD_NOT_SET'
+  | 'INVALID_PASSWORD'
+  | 'GOOGLE_ACCOUNT_ALREADY_LINKED'
+  | 'GOOGLE_IDENTITY_IN_USE';
 
 const GOOGLE_AUTH_ERROR_STATUS: Record<GoogleAuthErrorCode, number> = {
   GOOGLE_SIGNUP_REQUIRED: 404,
@@ -52,6 +63,10 @@ const GOOGLE_AUTH_ERROR_STATUS: Record<GoogleAuthErrorCode, number> = {
   EMAIL_IN_USE: 409,
   CONSENT_REQUIRED: 400,
   INVALID_USER: 401,
+  PASSWORD_NOT_SET: 400,
+  INVALID_PASSWORD: 401,
+  GOOGLE_ACCOUNT_ALREADY_LINKED: 409,
+  GOOGLE_IDENTITY_IN_USE: 409,
 };
 
 const GOOGLE_AUTH_ERROR_MESSAGE: Record<GoogleAuthErrorCode, string> = {
@@ -61,6 +76,10 @@ const GOOGLE_AUTH_ERROR_MESSAGE: Record<GoogleAuthErrorCode, string> = {
   EMAIL_IN_USE: '이미 사용 중인 이메일입니다. 기존 계정은 자동으로 연결되지 않습니다.',
   CONSENT_REQUIRED: '이용약관과 개인정보 처리방침에 동의해야 합니다.',
   INVALID_USER: '계정 정보를 확인할 수 없습니다.',
+  PASSWORD_NOT_SET: '비밀번호가 없는 계정은 Google 계정 연결 대상이 아닙니다.',
+  INVALID_PASSWORD: '현재 비밀번호가 올바르지 않습니다.',
+  GOOGLE_ACCOUNT_ALREADY_LINKED: '이 계정에는 이미 다른 Google 계정이 연결되어 있습니다.',
+  GOOGLE_IDENTITY_IN_USE: '이 Google 계정은 이미 다른 사용자에게 연결되어 있습니다.',
 };
 
 export class GoogleAuthError extends Error {
@@ -93,6 +112,25 @@ export interface GoogleSignupInput extends GoogleAuthRequestMeta {
   consents: GoogleSignupConsents;
 }
 
+/** POST /auth/google/link — 세션 user + users.password + Google ID token. userId 는 세션에서만 온다. */
+export interface GoogleLinkInput extends GoogleAuthRequestMeta {
+  userId: string;
+  idToken: string;
+  currentPassword: string;
+}
+
+export interface GoogleLinkResult {
+  linked: true;
+  /** 같은 sub 가 이미 같은 user 에 연결돼 있어 row 를 만들지 않은 경우(멱등). */
+  alreadyLinked: boolean;
+}
+
+/** GET /auth/google/link/status — 화면 상태 표시용. Google email/sub 등 PII 는 없다. */
+export interface GoogleLinkStatus {
+  linked: boolean;
+  passwordSet: boolean;
+}
+
 export interface GoogleAuthSession {
   user: Record<string, unknown>;
   tokens: AuthTokens;
@@ -112,6 +150,8 @@ export interface GoogleAuthServiceDeps {
   identity?: Pick<GoogleIdentityService, 'verifyGoogleIdToken' | 'findGoogleIdentityBySub'>;
   dataSource?: Pick<DataSource, 'getRepository' | 'transaction'>;
   issueSession?: SessionIssuer;
+  /** users.password bcrypt 비교 — 테스트에서 주입. service_credentials 는 어떤 경로로도 쓰지 않는다. */
+  verifyPassword?: (plain: string, hash: string) => Promise<boolean>;
 }
 
 /** Postgres unique violation 판별 — TypeORM QueryFailedError 는 driverError 에 원본을 둔다. */
@@ -126,11 +166,13 @@ export class GoogleAuthService {
   private readonly identity: Pick<GoogleIdentityService, 'verifyGoogleIdToken' | 'findGoogleIdentityBySub'>;
   private readonly _dataSource?: Pick<DataSource, 'getRepository' | 'transaction'>;
   private readonly issueSession: SessionIssuer;
+  private readonly verifyPassword: (plain: string, hash: string) => Promise<boolean>;
 
   constructor(deps: GoogleAuthServiceDeps = {}) {
     this.identity = deps.identity ?? googleIdentityService;
     this._dataSource = deps.dataSource;
     this.issueSession = deps.issueSession ?? ((user) => generateTokensWithContext(user));
+    this.verifyPassword = deps.verifyPassword ?? comparePassword;
   }
 
   private get dataSource(): Pick<DataSource, 'getRepository' | 'transaction'> {
@@ -259,6 +301,81 @@ export class GoogleAuthService {
     return user;
   }
 
+  /**
+   * POST /auth/google/link (WO-O4O-GOOGLE-IDENTITY-OPERATOR-EXPLICIT-LINK-V1 §3·§5·§7)
+   * 단일 트랜잭션: 세션 user 조회 → users.password 재인증 → ID token 검증 → 기존 연결/충돌 검사 → INSERT.
+   * 실패 시 부분 row 0. email 은 어디에서도 조회·비교하지 않는다.
+   */
+  async link(input: GoogleLinkInput): Promise<GoogleLinkResult> {
+    const outcome = await this.dataSource.transaction(async (manager) => {
+      const userRepo = manager.getRepository(User);
+      const linkedRepo = manager.getRepository(LinkedAccount);
+
+      const user = await userRepo.findOne({ where: { id: input.userId } });
+      if (!user) {
+        throw new GoogleAuthError('INVALID_USER');
+      }
+      if (!user.password) {
+        throw new GoogleAuthError('PASSWORD_NOT_SET');
+      }
+      if (!(await this.verifyPassword(input.currentPassword, user.password))) {
+        // 로그인 경로가 아니므로 loginAttempts/lockedUntil 은 건드리지 않는다.
+        throw new GoogleAuthError('INVALID_PASSWORD');
+      }
+
+      const identity = await this.identity.verifyGoogleIdToken(input.idToken);
+
+      const mine = await linkedRepo.findOne({ where: { userId: user.id, provider: 'google' } });
+      if (mine) {
+        if (mine.providerId === identity.sub) return { alreadyLinked: true };
+        throw new GoogleAuthError('GOOGLE_ACCOUNT_ALREADY_LINKED');
+      }
+      const other = await linkedRepo.findOne({ where: { provider: 'google', providerId: identity.sub } });
+      if (other) {
+        throw new GoogleAuthError('GOOGLE_IDENTITY_IN_USE');
+      }
+
+      const now = new Date();
+      const linked = linkedRepo.create({
+        userId: user.id,
+        provider: 'google',
+        providerId: identity.sub,
+        isVerified: true,
+        isPrimary: true,
+        linkedAt: now,
+        lastUsedAt: now,
+      });
+      try {
+        await linkedRepo.save(linked);
+      } catch (error) {
+        const detail = uniqueViolationDetail(error);
+        if (detail !== null && /provider/i.test(detail)) {
+          // 동시 연결 race — 다른 user 가 먼저 가져갔다. 이동·merge 없이 거절.
+          throw new GoogleAuthError('GOOGLE_IDENTITY_IN_USE');
+        }
+        throw error;
+      }
+      return { alreadyLinked: false };
+    });
+
+    this.logActivity(input.userId, input, true, outcome.alreadyLinked ? 'google_link_idempotent' : 'google_link', 'link_google')
+      .catch((err) => logger.warn('[GoogleAuth] activity log failed (non-critical)', { err }));
+
+    return { linked: true, alreadyLinked: outcome.alreadyLinked };
+  }
+
+  /** GET /auth/google/link/status — 세션 user 의 연결 여부 · password 보유 여부만. */
+  async getLinkStatus(userId: string): Promise<GoogleLinkStatus> {
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+    if (!user) {
+      throw new GoogleAuthError('INVALID_USER');
+    }
+    const linked = await this.dataSource
+      .getRepository(LinkedAccount)
+      .findOne({ where: { userId, provider: 'google' } });
+    return { linked: !!linked, passwordSet: !!user.password };
+  }
+
   /** canonical 세션: tokens + refresh family + lastLoginAt. 로그인/가입 공통. */
   private async establishSession(
     user: User,
@@ -294,13 +411,14 @@ export class GoogleAuthService {
     meta: GoogleAuthRequestMeta,
     success: boolean,
     reason?: string,
+    type: 'login_google' | 'link_google' = 'login_google',
   ): Promise<void> {
     try {
       const repo = this.dataSource.getRepository(AccountActivity);
       await repo.save(
         repo.create({
           userId,
-          type: 'login_google',
+          type,
           email: null,
           ipAddress: meta.ipAddress,
           userAgent: meta.userAgent,

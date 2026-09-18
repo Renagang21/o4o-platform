@@ -8,6 +8,10 @@
  * WO-O4O-LOCAL-WORK-AGENT-ONECLICK-PAIRING-V1:
  *   [ 이 PC 연결 ] 카드를 여기에 둔다. 별도 설정 화면을 만들지 않는다 (§5).
  *
+ * WO-O4O-GOOGLE-IDENTITY-OPERATOR-EXPLICIT-LINK-V1 (§8):
+ *   "로그인 방법" 카드 — 기존 계정(users.id 유지)에 Google Identity 를 명시 연결한다.
+ *   현재 비밀번호(users.password) 재인증 + Google 계정 선택 → POST /auth/google/link. Google-only 계정은 "연결됨" 만.
+ *
  * /mypage/settings — 보안 / 계정 관리.
  */
 
@@ -15,10 +19,16 @@ import { User } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
 import { useAuth } from '../../contexts';
 import { useLoginModal } from '../../contexts/LoginModalContext';
-import { api } from '../../lib/apiClient';
-import { MyPageLayout, MyPageAuthRequired, MyPageLoadingState, AccountSecuritySettings } from '@o4o/account-ui';
+import { api, authClient } from '../../lib/apiClient';
+import { GoogleAccountLink } from '@o4o/auth-react';
+import { MyPageLayout, MyPageAuthRequired, MyPageLoadingState, AccountSecuritySettings, SettingsSection } from '@o4o/account-ui';
 import { getNetureMyPageNavItems } from './navItems';
 import LocalAgentCard from '../../components/mypage/LocalAgentCard';
+
+// 모듈 상수 — render 마다 새 함수를 넘겨 카드가 status 를 재조회하지 않도록 한다.
+const getGoogleAuthConfig = () => authClient.getGoogleAuthConfig();
+const getGoogleLinkStatus = () => authClient.getGoogleLinkStatus();
+const linkGoogle = (idToken: string, currentPassword: string) => authClient.linkGoogle(idToken, currentPassword);
 
 export default function MySettingsPage() {
   const { user, isAuthenticated, isLoading, logoutAll } = useAuth();
@@ -66,6 +76,18 @@ export default function MySettingsPage() {
     >
       <div className="mb-6">
         <LocalAgentCard />
+      </div>
+
+      <div className="mb-6">
+        <SettingsSection title="로그인 방법" description="Google 계정을 연결하면 비밀번호 없이 Google로 로그인할 수 있습니다.">
+          <GoogleAccountLink
+            getConfig={getGoogleAuthConfig}
+            getStatus={getGoogleLinkStatus}
+            linkGoogle={linkGoogle}
+            onLinked={() => toast.success('Google 계정이 연결되었습니다.')}
+            onError={(e) => toast.error(e.message)}
+          />
+        </SettingsSection>
       </div>
 
       <AccountSecuritySettings

@@ -31,6 +31,7 @@ import {
   EmailVerificationDto,
   GoogleLoginRequestDto,
   GoogleSignupRequestDto,
+  GoogleLinkRequestDto,
 } from '../dto/index.js';
 import { asyncHandler } from '../../../middleware/error-handler.js';
 
@@ -77,6 +78,21 @@ router.post(
   '/google/signup',
   validateDto(GoogleSignupRequestDto),
   asyncHandler(GoogleAuthController.signup)
+);
+
+// WO-O4O-GOOGLE-IDENTITY-OPERATOR-EXPLICIT-LINK-V1: 로그인된 계정에 Google Identity 명시 연결
+// POST /api/v1/auth/google/link        - { idToken, currentPassword } → linked_accounts 1행 (users.password 재인증)
+// GET  /api/v1/auth/google/link/status - { linked, passwordSet } (PII 없음)
+router.post(
+  '/google/link',
+  requireAuth,
+  validateDto(GoogleLinkRequestDto),
+  asyncHandler(GoogleAuthController.link)
+);
+router.get(
+  '/google/link/status',
+  requireAuth,
+  asyncHandler(GoogleAuthController.linkStatus)
 );
 
 // POST /api/v1/auth/check-email - Check email existence (multi-service registration UX)
