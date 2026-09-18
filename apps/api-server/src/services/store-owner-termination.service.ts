@@ -506,7 +506,7 @@ export class StoreOwnerTerminationService {
         );
       }
       await manager.query(
-        `UPDATE service_memberships SET status = 'withdrawn', "updatedAt" = NOW()
+        `UPDATE service_memberships SET status = 'withdrawn', updated_at = NOW()
           WHERE user_id = $1 AND service_key = $2`,
         [current.userId, svc],
       );
@@ -765,6 +765,13 @@ export class StoreOwnerTerminationService {
                   SET "isActive" = false,
                       name = '종료된 매장',
                       metadata = '{}'::jsonb,
+                      address = NULL,
+                      address_detail = NULL,
+                      phone = NULL,
+                      description = NULL,
+                      business_number = NULL,
+                      storefront_config = '{}'::jsonb,
+                      storefront_blocks = NULL,
                       "updatedAt" = NOW()
                 WHERE id = $1`,
               [org],
