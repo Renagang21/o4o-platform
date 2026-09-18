@@ -25,7 +25,8 @@ import {
 } from 'lucide-react';
 // WO-O4O-KPA-STORE-LIBRARY-CONTENTS-DIRECT-EDITOR-UNIFY-V1:
 //   direct 콘텐츠 편집을 o4o 표준 RichTextEditor(@o4o/content-editor)로 통일 — 제작 자료 편집기와 동일 모듈.
-import { RichTextEditor, type EditorContent } from '@o4o/content-editor';
+import { RichTextEditor, LlmAssistPanel, type EditorContent } from '@o4o/content-editor';
+import { buildStoreContentAuthoringPrompt, resolveStoreContentLlmTask, STORE_LLM_ASSIST_LABEL } from '@o4o/store-ui-core';
 import { BlockRenderer } from '@o4o/block-renderer';
 import { directContentApi, type DirectContentItem } from '../../api/assetSnapshot';
 import { kpaBlocksToRendererBlocks } from '../../utils/kpa-block-adapter';
@@ -348,6 +349,23 @@ export default function StoreDirectContentPage() {
         // WO-O4O-KPA-STORE-LIBRARY-CONTENTS-DIRECT-EDITOR-UNIFY-V1:
         //   o4o 표준 RichTextEditor(편집/HTML/미리보기 탭) — 제작 자료 편집기와 동일 모듈. 유형 구분 없음.
         <div className="bg-white border border-slate-200 rounded-lg p-2 mb-4">
+          {/* WO-O4O-STORE-EXTERNAL-LLM-CONTENT-AUTHORING-V1: 외부 LLM 작업 — 적용 시 initialHtml(편집기 value)·editorContent(저장값) 동시 갱신 */}
+          <div className="mb-2">
+            <LlmAssistPanel
+              label={STORE_LLM_ASSIST_LABEL}
+              contextLabel="매장 직접 작성 콘텐츠 — 현재 내용을 다듬거나 새로 씁니다"
+              guideText={({ additionalInstruction }) => buildStoreContentAuthoringPrompt({
+                task: resolveStoreContentLlmTask(editorContent.html),
+                title: editTitle,
+                currentHtml: editorContent.html,
+                sourceOrigin: 'direct',
+                additionalInstruction,
+              })}
+              currentHtml={editorContent.html}
+              onApplyHtml={(html) => { setEditorInitialHtml(html); setEditorContent({ html }); }}
+              onNotify={(message, kind) => showToast(message, kind === 'success')}
+            />
+          </div>
           <RichTextEditor showInternalAi={false}
             value={editorInitialHtml}
             onChange={(c) => setEditorContent(c)}

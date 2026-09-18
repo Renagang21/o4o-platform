@@ -1,7 +1,7 @@
 # CHECK-O4O-COMMON-AUTOMATION-CORE-CAPABILITY-A-GEMINI-WEB-RESEARCH-V1
 
 > **WO**: [WO-O4O-COMMON-AUTOMATION-CORE-CAPABILITY-A-GEMINI-WEB-RESEARCH-V1](../work-orders/WO-O4O-COMMON-AUTOMATION-CORE-CAPABILITY-A-GEMINI-WEB-RESEARCH-V1.md)
-> **상태**: 구현·결정적 검증 COMPLETE · **실측 grounding 스모크 PASS(gemini-3.8-flash)** · 운영 통합(admin→Web Research 실호출) = **단계 D 로 유보**(production 소비처 부재) · CAPABILITY_A_CLOSED 는 사용자 판단 대기
+> **상태**: **CAPABILITY_A_CLOSED = YES** · 실측 grounding 스모크 PASS(gemini-3.8-flash) · admin 모델 해석→grounding end-to-end 통합 PASS(내부 service `runWebResearch`) · 실업무 연결(/hospital-drug)만 단계 D 로 유보
 
 ---
 
@@ -13,15 +13,19 @@
 | `packages/ai-core/src/orchestration/index.ts` | `AIGroundingMetadata` type export |
 | `packages/ai-core/src/orchestration/providers/gemini.provider.ts` | `complete()` grounding 분기(`tools:[{google_search:{}}]` + text 경로 강제 + json+grounding 거부) · `GeminiAPIResponse.groundingMetadata` · `parseResponse()` 정규화 |
 | `packages/ai-core/src/orchestration/execute.ts` | `ExecuteRequest.grounding?` · gemini 전용 가드 · providerConfig 전달(text 기본 분리) · `ExecuteResult.grounding?` |
-| `apps/api-server/src/__tests__/security/ai-orchestration.spec.ts` | grounding 결정적 테스트 7건 |
+| `apps/api-server/src/__tests__/security/ai-orchestration.spec.ts` | grounding 결정적 테스트 8건 |
 | `scripts/ai/gemini-grounding-smoke.mts` | 실측 스모크(env 키만) |
+| `apps/api-server/src/services/ai/web-research.service.ts` | **범용 Web Research 소비자 `runWebResearch()`** — admin SSOT 모델 해석→grounding 실호출(내부 service 함수 · HTTP route 없음) |
+| `apps/api-server/src/__tests__/ai/web-research.service.spec.ts` | admin 모델 해석→grounding end-to-end 통합 테스트 4건 |
 
 **streamComplete·openai·Astra·특정 Source(health.kr/HIRA/MFDS/약품) 로직 무접촉.** `/hospital-drug` 재연결 안 함.
 
 ## 2. 검증 결과
 
-- `pnpm --filter @o4o/ai-core typecheck` → **PASS**.
+- `pnpm --filter @o4o/ai-core typecheck` → **PASS**. `@o4o/ai-core` 재빌드(dist 갱신, gitignore·미추적)로 api-server tsc 가 grounding 타입 해석 · `apps/api-server tsc --noEmit` 신규 파일 오류 0.
+- `apps/api-server` eslint(신규 2파일) → 0 error / 0 warning (lint-ratchet 회귀 없음).
 - `npx jest ai-orchestration.spec.ts` (api-server 프로젝트) → **34/34 PASS** (기존 26 + grounding 8).
+- `npx jest src/__tests__/ai/web-research.service.spec.ts` → **4/4 PASS** (admin 모델 해석→grounding end-to-end · §3-c).
   - ① grounding=true → `tools:[{google_search:{}}]` 존재 · `responseMimeType` 부재(text 경로) — PASS
   - ② `groundingMetadata` → `response.grounding.{used,queries,sources}` 정규화(빈 uri 제거) — PASS
   - ③ groundingMetadata 부재 → `used:false`(grounded 로 간주 안 함) — PASS
@@ -70,21 +74,47 @@ whitelist ∪ Google ListModels 로 검증. resolver = `resolveEditingModel()`
 요청 URL 에 `/models/gemini-3.8-flash:generateContent` 그대로 실림 · `tools` 존재 · `grounding.used=true` 확인.
 → **모델 pass-through(WEB_RESEARCH_USES_ADMIN_MODEL 계약 레벨) PASS**.
 
-**그러나 실호출 production 소비처는 아직 없다**: `execute({ grounding: true })` 를 호출하는 운영 서비스는 저장소 전역 0건
-(`grounding` 은 `@o4o/ai-core` 3파일 + 본 스펙에만 존재). Web Research 실행 소비처(=`/hospital-drug` 재연결)는 합의된 순서상
-**단계 D**(B·C 이후)로 유보되어 있어, admin→resolver→**Web Research 실호출** 의 end-to-end 는 지금 만들지 않는다
-("빈 capability 선연결 금지"). 따라서 `ADMIN_MODEL_RESOLUTION`/`WEB_RESEARCH_USES_ADMIN_MODEL` 의 **운영 런타임 검증은 단계 D 로 유보**하고,
-지금은 계약 레벨(pass-through)까지만 PASS 로 기록한다.
+계약 레벨(pass-through)까지는 결정적 테스트 ⑧ 로 확정. admin→resolver→**실호출** end-to-end 는 §3-c 의 범용 소비자로 닫는다.
 
 **상태 요약**:
 ```
 GEMINI_GROUNDING_CAPABILITY   = PASS (실측)
 GEMINI_3_8_FLASH_GROUNDING    = PASS (실측 · used=true · sources=4)
 MODEL_PASSTHROUGH_CONTRACT    = PASS (결정적 테스트 ⑧ · grounding 이 모델 override 안 함)
-WEB_RESEARCH_PRODUCTION_TARGET= ABSENT (소비처 0 · 단계 D 유보)
-ADMIN_MODEL_RESOLUTION(런타임) = 단계 D 유보
-CAPABILITY_A_CLOSED           = 사용자 판단 대기 (아래 §5 결정 항목)
 ```
+
+## 3-c. admin 모델 해석 → grounding end-to-end (범용 소비자) — PASS
+
+사용자 결정 = **옵션 2**(내부 service 함수만 · HTTP route 없음). Capability A 종료 검증을 위해 **범용 Web Research 소비자 하나**만 만든다.
+
+**구현**: `apps/api-server/src/services/ai/web-research.service.ts` 의 `runWebResearch({ query })`:
+```
+resolveEditingModel()               // admin SSOT(AiQueryPolicy.defaultModel) → 모델 해석 (하드코딩 금지)
+→ resolveAiApiKey(AppDataSource,'gemini')   // 키는 ai_settings/env 에서만
+→ execute({ provider:'gemini', model: resolvedModel, grounding:true, ... })
+```
+- **범용**: 특정 약품·사이트(health.kr/HIRA/MFDS) 로직 없음 · 임의 질의 pass-through.
+- **HTTP route 없음** · 인증/guard/route contract 신설 없음 · `/hospital-drug` 미연결(실업무=단계 D).
+- 모델 강제(`AI_DEFAULT_MODEL`/새 상수) 없음 · fallback = `GEMINI_CANONICAL_MODEL`.
+
+**통합 테스트**(`apps/api-server/src/__tests__/ai/web-research.service.spec.ts`, AppDataSource·fetch mock) — **4/4 PASS**:
+- ① **ADMIN_MODEL_RESOLUTION**: admin 이 고른 `gemini-2.5-pro`(fallback `gemini-3.8-flash` 와 **다른** 값)가 실제로 읽혀
+  요청 URL `/models/gemini-2.5-pro:generateContent` 에 실림 — fallback 이 아니라 admin 값이 해석됨을 증명 — PASS
+- ② **운영 canonical**: admin 활성 모델 = `gemini-3.8-flash` → grounding 요청 URL 일치 · `tools:[{google_search:{}}]` ·
+  `responseMimeType` 부재(text) · `grounding.used=true` · sources 2 · queries 정규화 — PASS
+- ③ **범용성**: 임의 질의 pass-through · 요청 body 에 하드코딩 도메인(health.kr/hira/mfds) 없음 — PASS
+- ④ **안전 강등**: admin 이 비-gemini(`gpt-6-astra`) 설정 시 grounding 은 gemini 전용 → `gemini-3.8-flash` fallback — PASS
+
+**상태 요약**:
+```
+ADMIN_MODEL_RESOLUTION        = PASS (admin gemini-2.5-pro ≠ fallback 실제 해석)
+WEB_RESEARCH_USES_ADMIN_MODEL = PASS (해석 모델이 grounding 요청 URL 에 그대로 사용)
+GROUNDING_END_TO_END          = PASS (used=true · googleSearch tool · metadata 정규화)
+WEB_RESEARCH_CONSUMER         = PRESENT (runWebResearch · 내부 service · route 없음)
+CAPABILITY_A_CLOSED           = YES
+```
+실업무 연결(/hospital-drug)만 순서상 단계 D 로 유보. admin 화면 실계정에서의 최종 운영 smoke 도 소비처가 실업무에 연결되는
+단계 D 에서 함께 수행한다(현재는 결정적 통합으로 admin 모델 해석 경로를 확정).
 
 ## 4. 중지 조건 준수
 
@@ -94,20 +124,28 @@ CAPABILITY_A_CLOSED           = 사용자 판단 대기 (아래 §5 결정 항�
 - 비-grounding 회귀 → 회귀 가드 테스트 PASS.
 - 특정 사이트/약품 로직 → 추가 없음(범용).
 
-## 5. CAPABILITY_A_CLOSED — 사용자 결정 항목
+## 5. CAPABILITY_A_CLOSED = YES
 
-실측 grounding PASS·additive 계약·모델 pass-through 까지 확인됐으나, admin→resolver→**Web Research 실호출**
-end-to-end 는 그 소비처가 단계 D 로 유보돼 지금은 존재하지 않는다. 따라서 A 종료 경계는 두 갈래 중 사용자 선택이 필요하다.
+사용자가 **옵션 2**(지금 최소 Web Research 소비처 선행 · 내부 service 함수만)를 선택. §3-c 의 `runWebResearch()` 로
+admin→resolver→grounding end-to-end 를 결정적으로 확정했다. Capability A 종료 조건 전부 충족:
 
-- **옵션 1 (권장) — A = CLOSED, 운영 통합 검증은 단계 D 로 유보**: capability(계약+실측+모델 pass-through)는 완결로 보고,
-  admin→Web Research 실호출 검증은 소비처를 실제로 만드는 단계 D(/hospital-drug 재연결)에서 함께 수행. 다음 = Capability B 착수.
-- **옵션 2 — 지금 최소 Web Research 실호출 소비처를 만들어 admin→resolver→grounding end-to-end 실측**: 합의된 순서(A→B→C→D)에서
-  D 를 앞당기는 것이라 "빈 capability 선연결 금지"와 상충. 채택 시 별도 지시 필요.
+```
+GEMINI_GROUNDING_CAPABILITY   = PASS (실측)
+ADMIN_MODEL_RESOLUTION        = PASS
+WEB_RESEARCH_USES_ADMIN_MODEL = PASS
+GROUNDING_END_TO_END          = PASS
+범용성(특정 사이트/약품 로직 없음) = 유지
+회귀(비-grounding·기존 편집 경로)   = 없음
+CAPABILITY_A_CLOSED           = YES
+```
+
+유보(단계 D): `/hospital-drug` 등 **실업무 연결** + admin 실계정 최종 운영 smoke. 소비처(`runWebResearch`)는 이미 존재하므로
+단계 D 는 "빈 capability 선연결"이 아니라 기존 범용 소비자를 실업무에 연결하는 작업이다.
 
 ## 6. 다음
 
-- (옵션 1 선택 시) **Capability B(Astra Screen)** — 코드 변경 전 `gpt-6-astra` 이미지 입력 수용 실측 → PASS 시에만 openai vision 분기(현행 Gemini vision 존치).
-- 그 다음 Capability C(Router) → `/hospital-drug` 재연결(단계 D) — 이때 admin→Web Research 실호출 운영 통합을 함께 검증.
+- **Capability B(Astra Screen)** — 코드 변경 전 `gpt-6-astra` 이미지 입력 수용 실측 → PASS 시에만 openai vision 분기(현행 Gemini vision 존치, B1).
+- 그 다음 Capability C(Router) → `/hospital-drug` 재연결(단계 D) — 이때 `runWebResearch` 를 실업무에 연결하고 admin 실계정 운영 통합 smoke 를 함께 수행.
 
 ---
 

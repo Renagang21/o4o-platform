@@ -36,7 +36,8 @@ import {
 // WO-O4O-KPA-STORE-LIBRARY-SNAPSHOT-EDITOR-UNIFY-V1:
 //   snapshot 콘텐츠 편집을 o4o 표준 RichTextEditor 로 통일(direct/제작자료와 동일 모듈). 레거시 블록 편집기 대체.
 //   snapshot 은 body(html) 권위 + usage 설정 별도 보존. body 없으면 blocks→html 정규화.
-import { RichTextEditor, type EditorContent } from '@o4o/content-editor';
+import { RichTextEditor, LlmAssistPanel, type EditorContent } from '@o4o/content-editor';
+import { buildStoreContentAuthoringPrompt, resolveStoreContentLlmTask, STORE_LLM_ASSIST_LABEL } from '@o4o/store-ui-core';
 import { storeContentApi } from '../../api/assetSnapshot';
 import { getAccessToken } from '../../contexts/AuthContext';
 
@@ -333,6 +334,23 @@ export default function StoreContentEditPage() {
       <div className="mb-8">
         <label className="block text-sm font-medium text-slate-700 mb-2">본문</label>
         <div className="bg-white border border-slate-200 rounded-lg p-2">
+          {/* WO-O4O-STORE-EXTERNAL-LLM-CONTENT-AUTHORING-V1: 외부 LLM 작업 — 매장 편집본(kpa_store_contents)만 갱신, 원본 snapshot 불변 */}
+          <div className="mb-2">
+            <LlmAssistPanel
+              label={STORE_LLM_ASSIST_LABEL}
+              contextLabel="매장 편집본 — 가져온 콘텐츠를 우리 매장에 맞게 다듬습니다 (원본은 바뀌지 않습니다)"
+              guideText={({ additionalInstruction }) => buildStoreContentAuthoringPrompt({
+                task: resolveStoreContentLlmTask(editorContent.html),
+                title,
+                currentHtml: editorContent.html,
+                sourceOrigin: source,
+                additionalInstruction,
+              })}
+              currentHtml={editorContent.html}
+              onApplyHtml={(html) => { setEditorInitialHtml(html); setEditorContent({ html }); }}
+              onNotify={(message) => { setToast(message); setTimeout(() => setToast(null), 3000); }}
+            />
+          </div>
           <RichTextEditor showInternalAi={false}
             value={editorInitialHtml}
             onChange={(c) => setEditorContent(c)}

@@ -28,8 +28,13 @@ export interface LlmAssistPanelProps {
   label?: string;
   /** 어떤 콘텐츠를 만드는 작업인지 한 줄 설명(모달 상단 안내). */
   contextLabel?: string;
-  /** 참고자료·작업 안내(요청문). LLM 대화창에 붙여 넣을 본문. */
-  guideText: string;
+  /**
+   * 참고자료·작업 안내(요청문). LLM 대화창에 붙여 넣을 본문.
+   * - string: 고정 안내문(태블릿 코너 편집기 등 기존 소비처 — 동작 불변).
+   * - 함수: 패널 안에 "추가 요청" 입력칸이 열리고, 사용자가 적은 짧은 요청을 넘겨 안내문을 만든다
+   *   (WO-O4O-STORE-EXTERNAL-LLM-CONTENT-AUTHORING-V1 §17 — Store Prompt Builder 연결용. 입력값은 저장되지 않는다).
+   */
+  guideText: string | ((opts: { additionalInstruction: string }) => string);
   /** 현재 편집 중인 내용(HTML). 있으면 "현재 내용 복사" 노출. */
   currentHtml?: string;
   /**
@@ -103,6 +108,12 @@ export function LlmAssistPanel({
   const [copied, setCopied] = useState<'guide' | 'current' | 'fix' | null>(null);
   const [pasted, setPasted] = useState('');
   const [message, setMessage] = useState<string | null>(null);
+  const [additionalInstruction, setAdditionalInstruction] = useState('');
+
+  const guideIsDynamic = typeof guideText === 'function';
+  const resolvedGuideText = guideIsDynamic
+    ? (guideText as (opts: { additionalInstruction: string }) => string)({ additionalInstruction })
+    : (guideText as string);
 
   const notify = (msg: string, kind: 'success' | 'error') => {
     if (onNotify) onNotify(msg, kind);
@@ -114,7 +125,7 @@ export function LlmAssistPanel({
 
   const handleCopy = async (kind: 'guide' | 'current' | 'fix') => {
     const text =
-      kind === 'guide' ? guideText
+      kind === 'guide' ? resolvedGuideText
       : kind === 'current' ? (currentHtml ?? '')
       : `${HTML_FIX_PROMPT_HEAD}${currentHtml ?? ''}`;
     if (!text.trim()) {
@@ -178,6 +189,21 @@ export function LlmAssistPanel({
                 <li>결과 HTML 을 복사해 {onApplyHtml ? '아래 붙여넣기 칸' : '편집기의 HTML 탭'}에 붙여 넣습니다.</li>
                 <li>편집기에서 내용을 확인·수정한 뒤 저장합니다.</li>
               </ol>
+
+              {/* 1-a) 추가 요청 (guideText 가 함수일 때만) */}
+              {guideIsDynamic && (
+                <div>
+                  <div style={{ fontSize: '12px', fontWeight: 600, color: '#374151', marginBottom: '6px' }}>추가 요청 <span style={{ fontWeight: 400, color: '#9ca3af' }}>(선택)</span></div>
+                  <textarea
+                    value={additionalInstruction}
+                    onChange={(e) => setAdditionalInstruction(e.target.value)}
+                    rows={2}
+                    maxLength={300}
+                    placeholder="예: 친근한 말투로 / 3문단 이내로 / 표 형식으로 정리"
+                    style={{ width: '100%', padding: '8px 12px', border: '1px solid #d1d5db', borderRadius: '8px', fontSize: '12px', resize: 'vertical', boxSizing: 'border-box' }}
+                  />
+                </div>
+              )}
 
               {/* 1·2·4) 복사 액션 */}
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
@@ -246,7 +272,7 @@ export function LlmAssistPanel({
               <div>
                 <div style={{ fontSize: '12px', fontWeight: 600, color: '#374151', marginBottom: '6px' }}>작업 안내 전문</div>
                 <pre style={{ fontSize: '11px', color: '#374151', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '12px', whiteSpace: 'pre-wrap', wordBreak: 'break-word', maxHeight: '220px', overflowY: 'auto', margin: 0 }}>
-                  {guideText}
+                  {resolvedGuideText}
                 </pre>
               </div>
             </div>

@@ -35,7 +35,8 @@ import { useState, useCallback, useEffect, type CSSProperties } from 'react';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import { ArrowLeft, Save, FileText, Loader2 } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
-import { RichTextEditor } from '@o4o/content-editor';
+import { RichTextEditor, LlmAssistPanel } from '@o4o/content-editor';
+import { buildStoreContentAuthoringPrompt, resolveStoreContentLlmTask, STORE_LLM_ASSIST_LABEL } from '@o4o/store-ui-core';
 import type { EditorContent } from '@o4o/content-editor';
 import {
   createStoreExecutionAsset,
@@ -96,7 +97,7 @@ export default function ProductionMaterialEditorPage() {
       ? '새 제작 자료 작성'
       : isFromExistingSource
         ? '제작 자료 편집'
-        : 'AI 제작 자료 초안 편집';
+        : '매장 제작 자료 편집';
 
   const [title, setTitle] = useState(state.title ?? '');
   const [selectedType, setSelectedType] = useState<ProductionTarget | null>(null);
@@ -297,12 +298,31 @@ export default function ProductionMaterialEditorPage() {
         </div>
       )}
 
+      {/* WO-O4O-STORE-EXTERNAL-LLM-CONTENT-AUTHORING-V1: 외부 LLM 작업 — 적용 시 initialHtml(편집기 value)·editorContent(저장값) 동시 갱신 */}
+      <div style={{ marginBottom: 8 }}>
+        <LlmAssistPanel
+          label={STORE_LLM_ASSIST_LABEL}
+          contextLabel="매장 제작 자료 — 새로 작성하거나 현재 내용을 다듬습니다"
+          guideText={({ additionalInstruction }) => buildStoreContentAuthoringPrompt({
+            task: resolveStoreContentLlmTask(editorContent.html),
+            title,
+            currentHtml: editorContent.html,
+            sourceTitle: state.sourceMetadata?.sourceTitle,
+            sourceOrigin: state.sourceMetadata?.sourceOrigin,
+            additionalInstruction,
+          })}
+          currentHtml={editorContent.html}
+          onApplyHtml={(html) => { setEditorInitialHtml(html); setEditorContent({ html }); }}
+          onNotify={(message, kind) => (kind === 'error' ? toast.error(message) : toast.success(message))}
+        />
+      </div>
+
       {/* Editor */}
       <div style={styles.editorWrap}>
         <RichTextEditor showInternalAi={false}
           value={editorInitialHtml}
           onChange={handleChange}
-          placeholder="AI가 정리한 내용을 편집하거나, 직접 내용을 입력하세요."
+          placeholder="직접 작성하거나 ChatGPT 등 외부 AI에서 만든 내용을 붙여넣으세요."
           minHeight="520px"
           preset="full"
           aiRequestHeaders={aiHeaders()}

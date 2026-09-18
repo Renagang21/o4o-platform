@@ -517,3 +517,13 @@ export type {
   StoreServiceWorkspaceMode,
   MyServicesSelection,
 } from './api/createStoreServicesApi';
+
+// 내 매장 외부 LLM 콘텐츠 작업 Prompt Core (WO-O4O-STORE-EXTERNAL-LLM-CONTENT-AUTHORING-V1)
+//   순수 함수. 화면은 Context 만 넘기고 Prompt 문구를 하드코딩하지 않는다. UI 는 @o4o/content-editor LlmAssistPanel 재사용.
+export {
+  buildStoreContentAuthoringPrompt,
+  resolveStoreContentLlmTask,
+  isBlankStoreHtml,
+  STORE_LLM_ASSIST_LABEL,
+} from './llm/storeContentAuthoringPrompt';
+export type { StoreContentLlmTask, StoreContentLlmContext } from './llm/storeContentAuthoringPrompt';
