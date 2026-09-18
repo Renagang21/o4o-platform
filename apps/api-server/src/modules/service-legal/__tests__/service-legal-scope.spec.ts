@@ -39,10 +39,15 @@ describe('SUPPORTED_LEGAL_SERVICE_KEYS', () => {
     expect(isSupportedLegalServiceKey('cosmetics')).toBe(false);
   });
 
-  it('집합은 정확히 4개 canonical key 다 (의도치 않은 확장 감지)', () => {
+  it('lecture 를 legal 서비스로 받아들인다 (WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 1)', () => {
+    expect(isSupportedLegalServiceKey('lecture')).toBe(true);
+  });
+
+  it('집합은 정확히 5개 canonical key 다 (의도치 않은 확장 감지)', () => {
     expect([...SUPPORTED_LEGAL_SERVICE_KEYS].sort()).toEqual([
       'k-cosmetics',
       'kpa-society',
+      'lecture',
       'neture',
       'pharmacy-hub',
     ]);

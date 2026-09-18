@@ -70,6 +70,7 @@ async function auditRoles(): Promise<RoleAuditResult> {
       cosmetics: 0,
       lms: 0,
       'pharmacy-hub': 0,
+      lecture: 0,
       none: 0
     },
     migrationStatus: {
@@ -84,6 +85,7 @@ async function auditRoles(): Promise<RoleAuditResult> {
       cosmetics: 0,
       lms: 0,
       'pharmacy-hub': 0,
+      lecture: 0,
       none: 0
     }
   };

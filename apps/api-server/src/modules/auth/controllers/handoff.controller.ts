@@ -137,14 +137,22 @@ export class HandoffController extends BaseController {
         );
       }
 
-      // Detect source service from request origin
+      // Detect source service from the exact Origin hostname.
+      // WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1:
+      //   study.neture.co.kr includes the string "neture.co.kr", so substring matching would
+      //   misclassify the independent Lecture service as Neture. Origin is host-level data;
+      //   compare hostnames exactly. Services sharing one host (e.g. basePath tenants) keep
+      //   the catalog's first-host match because Origin headers do not carry a path.
       const origin = req.get('origin') || '';
       let sourceServiceKey = 'unknown';
-      for (const svc of O4O_SERVICES) {
-        if (origin.includes(svc.domain)) {
-          sourceServiceKey = svc.key;
-          break;
-        }
+      try {
+        const originHost = new URL(origin).hostname.toLowerCase();
+        const sourceService = O4O_SERVICES.find(
+          (svc) => svc.domain.toLowerCase() === originHost,
+        );
+        sourceServiceKey = sourceService?.key ?? 'unknown';
+      } catch {
+        sourceServiceKey = 'unknown';
       }
 
       const handoffToken = await handoffTokenService.generateToken(
