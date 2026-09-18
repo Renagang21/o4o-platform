@@ -13,7 +13,7 @@ async function seedIdentity(ds:any,userId:string,email:string,orgId:string,code:
      VALUES ($1,$2,$3,'store',$4,'123-45-67890','서울 테스트 주소','02-000-0000')`,
     [orgId,'격리 테스트 매장',code,`/${code}`],
   );
-  await ds.query(`INSERT INTO organization_members (organization_id,user_id,role,"isPrimary") VALUES ($1,$2,'owner',true)`,[orgId,userId]);
+  await ds.query(`INSERT INTO organization_members (organization_id,user_id,role,is_primary) VALUES ($1,$2,'owner',true)`,[orgId,userId]);
   await ds.query(`INSERT INTO role_assignments (user_id,role) VALUES ($1,$2)`,[userId,role]);
   await ds.query(`INSERT INTO organization_service_enrollments (organization_id,service_code,status) VALUES ($1,$2,'active')`,[orgId,service]);
   if(extraService) await ds.query(`INSERT INTO organization_service_enrollments (organization_id,service_code,status) VALUES ($1,$2,'active')`,[orgId,extraService]);
@@ -76,8 +76,8 @@ describe('store-owner termination isolated PostgreSQL lifecycle',()=>{
     expect(Number((await ds.query(`SELECT COUNT(*) n FROM store_playlists WHERE organization_id=$1`,[ORG2]))[0].n)).toBe(0);
     const org=(await ds.query(`SELECT name,business_number,address,phone,"isActive" FROM organizations WHERE id=$1`,[ORG2]))[0];
     expect(org).toEqual(expect.objectContaining({name:'종료된 매장',business_number:null,address:null,phone:null,isActive:false}));
-    const member=(await ds.query(`SELECT "leftAt" FROM organization_members WHERE organization_id=$1 AND user_id=$2`,[ORG2,USER2]))[0];
-    expect(member.leftAt).not.toBeNull();
+    const member=(await ds.query(`SELECT left_at FROM organization_members WHERE organization_id=$1 AND user_id=$2`,[ORG2,USER2]))[0];
+    expect(member.left_at).not.toBeNull();
     const term=(await ds.query(`SELECT status,purge_completed_at FROM store_owner_termination_cases WHERE id=$1`,[c.id]))[0];
     expect(term.status).toBe('purge_completed');
     expect(term.purge_completed_at).not.toBeNull();
