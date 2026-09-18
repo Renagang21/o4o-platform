@@ -2,7 +2,7 @@
 
 > **WO**: [`WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1`](../work-orders/WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1.md)
 > **범위**: **Phase 1 — Lecture Service Foundation** (WO §6.1 step 01~04). step 05 이후(LMS Core 정리 · surface 구축 · course migration · 기존 서비스 LMS 제거)는 **NOT_STARTED**.
-> **상태**: Phase 1 코드 완료 · PR #223 (`work/lecture-service-foundation-v1-20260918`) head `af35070c0` **CI Pipeline = success**(run `35357077686`) — merge 대기. **운영 reference seed 는 미실행(PENDING_PRODUCTION_EXECUTION)**.
+> **상태**: **Phase 1 MERGED** — PR #223 → main `3e56425b7` (2026-09-19 · merge commit) · `lecture-web` Cloud Run 첫 revision 배포 성공. **운영 reference seed 는 미실행(PENDING_PRODUCTION_EXECUTION)** · `study.neture.co.kr` DNS/도메인 매핑 미설정(§9).
 > **날짜**: 2026-09-18 · **작성**: Claude Code (Opus 5) — ChatGPT 세션이 만든 PR 을 이어받아 정리 · 검증
 > **원칙**: 검증하지 않은 것을 PASS 로 쓰지 않는다. 접속값 · 자격증명 출력 0.
 
@@ -140,3 +140,17 @@ EXISTING_SERVICE_LMS_REMOVAL = NOT_STARTED
 
 - 커밋(모두 path-specific · `git add .` 0 · force 0): `778bc3fde`(catalog tail 복구) · `b1e888059`(vite-env + legal test) · `687e28e8e`(seed CLI 전환 + CHECK) · `dbd575236`(audit-roles) · 본 docs 커밋. main 병합 커밋 `1ecb25951` · `7d93150f3` · `b70c929a7` · `af35070c0`(각 교집합 0).
 - 문서 정합: 발견 0건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 **1건** — `PRODUCTION-MIGRATION-STANDARD` 에 "data-only reference seed 는 incremental migration 으로 등록하지 않는다(C22 fingerprint 중복) · CLI seed 경로" 를 명문화하는 문서 보강(기준 문서라 인라인 수정 안 함 · 보고만).
+
+## 9. merge 후 (2026-09-19)
+
+| 항목 | 결과 |
+|---|---|
+| merge | PR #223 `--merge` → main `3e56425b7`. head `78bfb8d30` CI Pipeline success · MERGEABLE(UNSTABLE 표시 = 비필수 SonarCloud 뿐) |
+| main CI Pipeline | `3e56425b7` 은 직후 타 세션 push `0f2c71f15`(docs merge)에 의해 **cancelled** → `0f2c71f15` CI Pipeline **success**(Lecture 코드 포함) |
+| Deploy API Server | success (`35399192942`) |
+| Deploy Web Services | success (`35399192940`) — **`deploy-lecture: success`** → Cloud Run `lecture-web` revision `lecture-web-00001-6k7` · run.app 직접 `GET /` 200 |
+| Deploy Admin Dashboard | success |
+| `study.neture.co.kr` | **DNS 미해석(curl exit 6)** — Cloud Run 도메인 매핑 + DNS 레코드는 인프라 작업(코드 범위 밖 · 별도 승인). WO §1.3 "DNS 배치 ≠ 서비스 종속" 대로 서비스 identity 는 영향 없음. `LECTURE_DOMAIN_MAPPING = PENDING_INFRA` |
+| E2E — Auth Runtime Regression | **failure** — PR 이 `packages/security-core/src/types.ts` 를 건드려 path 트리거로 자동 실행. 실패 자체는 09-17 이후 연속 red(stale E2E secret · `d5be1eb31` 기록). ⚠️ 부작용: 이 워크플로는 3서비스 반복 로그인으로 운영자 계정 `loginAttempts` 를 누적시킨다(타 세션 기록 "잔존 8 · 실패 1회면 재잠금") → 본 merge 가 유발한 실행이 **운영자 계정을 재잠금했을 수 있음**. 확인 · 해제 · 워크플로 트리거 정비는 `WO-O4O-GOOGLE-IDENTITY-OPERATOR-EXPLICIT-LINK-V1` 트랙(별도 승인)에서 |
+
+남은 순서: ① 운영자 계정 잠금 상태 확인(read-only) → ② 승인 후 `seed-lecture-service-and-roles.ts` dry-run → apply 1회 → §4.2 갱신 → ③ 도메인 매핑(인프라 승인) → ④ Phase 2 (WO §6.1 step 05~).
