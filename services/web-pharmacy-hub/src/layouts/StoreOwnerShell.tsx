@@ -185,7 +185,7 @@ export function StoreOwnerShell({
  *   가드(역할·가입 상태)는 셸과 완전히 동일한 것을 재사용한다 — 판정 로직 복제 0.
  */
 export function StoreOwnerChromeFreeGuard({ children }: { children: ReactNode }) {
-  const { user, isAuthenticated, isLoading } = useAuth();
+  const { user, isAuthenticated, isLoading, logout } = useAuth();
   const guardUser: StoreOwnerGuardUser | null = user
     ? { roles: user.roles ?? undefined, memberships: user.memberships ?? undefined }
     : null;
