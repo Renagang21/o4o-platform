@@ -17,6 +17,8 @@ export type { PolicyDocumentViewerProps, PolicyDocumentDto } from './legal/Polic
 // WO-O4O-INTEGRATED-TERMS-ACCEPTANCE-AND-SIGNUP-ALIGNMENT-V1: 재동의 게이트 · 가입 화면 문서 식별자
 export { PolicyAcceptanceGate } from './legal/PolicyAcceptanceGate';
 export type { PolicyAcceptanceGateProps, PendingPolicyAcceptanceLike } from './legal/PolicyAcceptanceGate';
+export { StoreOwnerAgreementGate } from './legal/StoreOwnerAgreementGate';
+export type { StoreOwnerAgreementGateProps, StoreOwnerAgreementApi } from './legal/StoreOwnerAgreementGate';
 export { usePublishedPolicyDocument } from './legal/usePublishedPolicyDocument';
 export type { PublishedPolicyDocument, PublishedPolicyDocumentState } from './legal/usePublishedPolicyDocument';
 

@@ -16,7 +16,7 @@ import { LoginModalProvider } from '@/contexts/LoginModalContext';
 import LoginModal from '@/components/common/LoginModal';
 import { O4OErrorBoundary, O4OToastProvider } from '@o4o/error-handling';
 import { TemplateProvider, AccessDenied } from '@o4o/ui';
-import { templates } from '@o4o/shared-space-ui';
+import { templates, StoreOwnerAgreementGate } from '@o4o/shared-space-ui';
 import { kcosmeticsConfig } from '@o4o/operator-ux-core';
 import { KCosGlobalHeader } from '@/components/KCosGlobalHeader';
 
@@ -362,6 +362,20 @@ const ProtectedRoute = RoleGuard;
  *   membershipGate 를 주입한다. 이전에는 이 마운트만 gate 없이 role 로 통과해서,
  *   membership 이 정지돼도 role 이 살아 있으면 매장 UI 가 열렸다
  */
+function KCosStoreOwnerAgreementGate({ children }: { children: React.ReactNode }) {
+  const { logout } = useAuth();
+  return (
+    <StoreOwnerAgreementGate
+      serviceKey="k-cosmetics"
+      serviceName="K-Cosmetics"
+      api={coreApi}
+      onLogout={logout}
+    >
+      {children}
+    </StoreOwnerAgreementGate>
+  );
+}
+
 function StoreOwnerRoute({ children }: { children: React.ReactNode }) {
   const { user, isAuthenticated, isLoading } = useAuth();
   return (
@@ -373,6 +387,7 @@ function StoreOwnerRoute({ children }: { children: React.ReactNode }) {
       // WO-O4O-WEB-COMMON-UX-COMPONENT-PROMOTION-BATCH-V1: 무안내 redirect 대신 공통 안내 화면
       renderDenied={<AccessDenied message="내 매장은 매장 경영자 계정만 이용할 수 있습니다." />}
       membershipGate={MembershipGate}
+      agreementGate={KCosStoreOwnerAgreementGate}
     >
       {children}
     </StoreOwnerGuard>

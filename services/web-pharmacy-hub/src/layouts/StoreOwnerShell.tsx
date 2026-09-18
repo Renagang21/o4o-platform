@@ -37,8 +37,10 @@ import {
 } from '@o4o/store-ui-core';
 import type { StoreOwnerGuardUser } from '@o4o/store-ui-core';
 import { AccessDenied } from '@o4o/ui';
+import { StoreOwnerAgreementGate } from '@o4o/shared-space-ui';
 import { getUserDisplayName } from '@o4o/account-ui';
 import { useAuth } from '../contexts/AuthContext';
+import { api } from '../lib/apiClient';
 import { MembershipGate } from '../components/MembershipGate';
 import { BRAND } from '../config/service';
 
@@ -50,6 +52,20 @@ export const PHARMACY_HUB_STORE_WORKSPACE_PATHS = resolveStoreWorkspacePaths(PHA
  * (WO-O4O-STORE-WORKSPACE-INTEGRATION-AND-MY-SERVICES-V1 §14: Store Hub 편입 — 중복 진입점 제거)
  */
 const STORE_NAV_ITEMS = [{ label: '이용 가이드', href: '/guide/features' }];
+
+function PharmacyHubStoreOwnerAgreementGate({ children }: { children: ReactNode }) {
+  const { logout } = useAuth();
+  return (
+    <StoreOwnerAgreementGate
+      serviceKey="pharmacy-hub"
+      serviceName="PharmacyHub"
+      api={api}
+      onLogout={logout}
+    >
+      {children}
+    </StoreOwnerAgreementGate>
+  );
+}
 
 function ShellLayout() {
   const { user, logout } = useAuth();
@@ -145,6 +161,7 @@ export function StoreOwnerShell({
       // WO-O4O-WEB-COMMON-UX-COMPONENT-PROMOTION-BATCH-V1: 무안내 redirect 대신 공통 안내 화면
       renderDenied={<AccessDenied message="약국 경영 화면은 약국 경영자 계정만 이용할 수 있습니다." />}
       membershipGate={MembershipGate}
+      agreementGate={PharmacyHubStoreOwnerAgreementGate}
     >
       <ShellLayout />
     </StoreOwnerGuard>
@@ -173,6 +190,7 @@ export function StoreOwnerChromeFreeGuard({ children }: { children: ReactNode })
       isLoading={isLoading}
       renderDenied={<AccessDenied message="약국 경영 화면은 약국 경영자 계정만 이용할 수 있습니다." />}
       membershipGate={MembershipGate}
+      agreementGate={PharmacyHubStoreOwnerAgreementGate}
     >
       {children}
     </StoreOwnerGuard>
