@@ -11,3 +11,7 @@ import { LegalDocumentView } from './LegalDocumentView';
 export function PolicyPage() {
   return <LegalDocumentView documentType="terms" heading="이용약관" />;
 }
+
+export function StoreOwnerAgreementPage() {
+  return <LegalDocumentView documentType="store_owner_agreement" heading="매장 경영자 이용계약" />;
+}
