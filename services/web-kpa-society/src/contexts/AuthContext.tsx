@@ -9,12 +9,12 @@
  */
 
 import React, { createContext, useContext, useState, useMemo, useCallback, useRef } from 'react';
-import { AuthClient, getAccessToken } from '@o4o/auth-client';
+import { AuthClient, getAccessToken, type GoogleAuthConfig } from '@o4o/auth-client';
 import { normalizeMemberships, type ApiUser } from '@o4o/auth-utils';
 // WO-O4O-FRONTEND-AUTH-CONTEXT-AND-ROUTE-GUARD-COMMONIZATION-V1:
 //   세션 복구 · 토큰 정리 이벤트 · login/logout/logoutAll 은 공통 Core 로 이동.
 //   KPA 고유분(KPA context 비동기 로딩 · activityType)만 이 파일에 남는다.
-import { useServiceAuth, type AuthLoginResult, type PendingPolicyAcceptance, type PolicyAcceptanceResult } from '@o4o/auth-react';
+import { useServiceAuth, type AuthLoginResult, type GoogleSignupConsents, type PendingPolicyAcceptance, type PolicyAcceptanceResult } from '@o4o/auth-react';
 import { configureStoreProductsApi } from '@o4o/store-products-ui';
 
 // Re-export for client.ts to use
@@ -126,6 +126,10 @@ interface AuthContextType {
    *   서버 `code`(SERVICE_NOT_MEMBER 등)를 호출부가 그대로 분기할 수 있다.
    */
   login: (email: string, password: string) => Promise<AuthLoginResult<User>>;
+  /** WO-O4O-GOOGLE-ONLY-SIGNUP-LOGIN-V1: Google 기본 진입(email/password 는 임시 테스트/전환용). */
+  loginWithGoogle: (idToken: string) => Promise<AuthLoginResult<User>>;
+  signupWithGoogle: (idToken: string, consents: GoogleSignupConsents) => Promise<AuthLoginResult<User>>;
+  getGoogleAuthConfig: () => Promise<GoogleAuthConfig>;
   logout: () => Promise<void>;
   logoutAll: () => Promise<void>;
   checkAuth: () => Promise<void>;
@@ -283,6 +287,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
    *   KPA context 후속 로딩은 Core 의 onAuthenticated 훅에서 일어난다.
    */
   const login = core.login;
+  const getGoogleAuthConfig = () => authClient.getGoogleAuthConfig();
 
   const logout = core.logout;
 
@@ -318,6 +323,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         isLoading: core.isLoading,
         isKpaContextLoaded,
         login,
+        loginWithGoogle: core.loginWithGoogle,
+        signupWithGoogle: core.signupWithGoogle,
+        getGoogleAuthConfig,
         logout,
         logoutAll,
         checkAuth,

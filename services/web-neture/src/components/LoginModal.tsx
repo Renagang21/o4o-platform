@@ -3,6 +3,7 @@
  * 현재 페이지 위에 오버레이로 표시되어 메뉴 등이 보임
  * WO-O4O-AUTH-MODAL-LOGIN-AND-ACCOUNT-STANDARD-V1: 비밀번호 찾기/회원가입 링크 포함
  * WO-O4O-LOGIN-STANDARDIZATION-V1: 전체 서비스 로그인 표준화
+ * WO-O4O-GOOGLE-ONLY-SIGNUP-LOGIN-V1: Google 로 계속하기 = 기본 진입 · email/password = 임시 테스트/전환용
  * 표준 기능:
  * - 이메일/비밀번호 입력
  * - 비밀번호 보기/숨기기 토글
@@ -14,7 +15,9 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { X, Eye, EyeOff } from 'lucide-react';
+import { GoogleContinue } from '@o4o/auth-react';
 import { useAuth, useLoginModal } from '../contexts';
+import type { User } from '../contexts/AuthContext';
 
 const REMEMBER_EMAIL_KEY = 'neture_remember_email';
 // WO-O4O-CROSSSERVICE-PRODUCTION-RESIDUAL-404-AUTH-AND-LEGAL-CLEANUP-V1:
@@ -30,7 +33,7 @@ interface LoginModalProps {
 
 export default function LoginModal({ isOpen, onClose, returnUrl }: LoginModalProps) {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, loginWithGoogle, signupWithGoogle, getGoogleAuthConfig } = useAuth();
   const { openRegisterModal } = useLoginModal();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -69,11 +72,13 @@ export default function LoginModal({ isOpen, onClose, returnUrl }: LoginModalPro
 
   // WO-O4O-NETURE-POSTLOGINREDIRECT-CANONICAL-ALIGNMENT-V1:
   // returnUrl만 LoginModal에서 처리. 역할 기반 redirect는 App.tsx PostLoginRedirect 담당.
-  const handleLoginSuccess = () => {
-    if (rememberEmail) {
-      localStorage.setItem(REMEMBER_EMAIL_KEY, email);
-    } else {
-      localStorage.removeItem(REMEMBER_EMAIL_KEY);
+  const handleLoginSuccess = (viaPassword = true) => {
+    if (viaPassword) {
+      if (rememberEmail) {
+        localStorage.setItem(REMEMBER_EMAIL_KEY, email);
+      } else {
+        localStorage.removeItem(REMEMBER_EMAIL_KEY);
+      }
     }
 
     if (returnUrl && !returnUrl.startsWith('/workspace/')) {
@@ -153,6 +158,25 @@ export default function LoginModal({ isOpen, onClose, returnUrl }: LoginModalPro
         </div>
 
         <div className="p-6">
+              {/* WO-O4O-GOOGLE-ONLY-SIGNUP-LOGIN-V1: Google 로 계속하기(기본) — 미등록이면 약관 동의 → 계정 생성 */}
+              <div className="mb-6">
+                <GoogleContinue<User>
+                  getConfig={getGoogleAuthConfig}
+                  loginWithGoogle={loginWithGoogle}
+                  signupWithGoogle={signupWithGoogle}
+                  onSuccess={() => { setError(null); setIsNotMember(false); handleLoginSuccess(false); }}
+                  onError={(e) => { setIsNotMember(false); setError(e.message); }}
+                  termsHref="/terms"
+                  privacyHref="/privacy"
+                />
+              </div>
+
+              <div className="flex items-center gap-4 mb-4">
+                <div className="flex-1 h-px bg-gray-200" />
+                <span className="text-xs text-gray-400">임시 테스트 · 전환용 이메일 로그인</span>
+                <div className="flex-1 h-px bg-gray-200" />
+              </div>
+
               <form onSubmit={handleSubmit} className="space-y-4">
                 {error && !isNotMember && (
                   <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
@@ -227,26 +251,12 @@ export default function LoginModal({ isOpen, onClose, returnUrl }: LoginModalPro
                   </label>
                 </div>
 
-                {/* 체험용 공용 계정 빠른 입력 (WO-O4O-HOME-TEMP-EXPERIENCE-ACCOUNT-NOTICE-V1) — KCos/KPA 동일 패턴 */}
-                <button
-                  type="button"
-                  onClick={() => {
-                    setEmail('renagang21@gmail.com');
-                    setPassword('3Lz157727791!');
-                    setError(null);
-                    setIsNotMember(false);
-                  }}
-                  className="w-full py-2.5 text-sm font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-xl hover:bg-emerald-100 transition-colors"
-                >
-                  🧪 체험용 공급자 계정
-                </button>
-
                 <button
                   type="submit"
                   disabled={loading}
                   className="w-full py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {loading ? '로그인 중...' : '로그인'}
+                  {loading ? '로그인 중...' : '이메일로 로그인 (임시)'}
                 </button>
               </form>
 

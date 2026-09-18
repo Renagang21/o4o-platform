@@ -2,6 +2,7 @@
  * LoginModal - K-Cosmetics 로그인 모달
  * WO-O4O-AUTH-MODAL-LOGIN-AND-ACCOUNT-STANDARD-V1
  * WO-O4O-LOGIN-STANDARDIZATION-V1: 전체 서비스 로그인 표준화
+ * WO-O4O-GOOGLE-ONLY-SIGNUP-LOGIN-V1: Google 로 계속하기 = 기본 진입 · email/password = 임시 테스트/전환용
  *
  * 중앙화된 로그인 모달 컴포넌트
  * - 이메일/비밀번호 로그인
@@ -18,14 +19,15 @@
 
 import { useState, useEffect, FormEvent } from 'react';
 import { Link } from 'react-router-dom';
-import { Sparkles, X, AlertCircle, Mail, Lock, Eye, EyeOff, Store } from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
+import { Sparkles, X, AlertCircle, Mail, Lock, Eye, EyeOff } from 'lucide-react';
+import { GoogleContinue } from '@o4o/auth-react';
+import { useAuth, type User } from '@/contexts/AuthContext';
 import { useLoginModal } from '@/contexts/LoginModalContext';
 
 const REMEMBER_EMAIL_KEY = 'kcosmetics_remember_email';
 
 export default function LoginModal() {
-  const { login } = useAuth();
+  const { login, loginWithGoogle, signupWithGoogle, getGoogleAuthConfig } = useAuth();
   const { isLoginModalOpen, closeLoginModal, onLoginSuccess } = useLoginModal();
 
   const [email, setEmail] = useState('');
@@ -66,18 +68,21 @@ export default function LoginModal() {
         localStorage.removeItem(REMEMBER_EMAIL_KEY);
       }
 
-      // 로그인 성공
-      setEmail('');
-      setPassword('');
-      closeLoginModal();
-
-      // WO-O4O-POSTLOGINREDIRECT-CANONICALIZATION-V1: 역할 기반 redirect는 App.tsx PostLoginRedirect 담당.
-      onLoginSuccess?.();
+      finishLogin();
     } catch (err: any) {
       setError(err.message || '이메일 또는 비밀번호가 올바르지 않습니다.');
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  /** 로그인 성공 공통 후처리(password · Google 동일). */
+  const finishLogin = () => {
+    setEmail('');
+    setPassword('');
+    closeLoginModal();
+    // WO-O4O-POSTLOGINREDIRECT-CANONICALIZATION-V1: 역할 기반 redirect는 App.tsx PostLoginRedirect 담당.
+    onLoginSuccess?.();
   };
 
   const handleClose = () => {
@@ -106,7 +111,25 @@ export default function LoginModal() {
           </button>
         </div>
 
-        {/* Form */}
+        {/* WO-O4O-GOOGLE-ONLY-SIGNUP-LOGIN-V1: Google 로 계속하기(기본) — 미등록이면 약관 동의 → 계정 생성 */}
+        <div style={{ marginBottom: 20 }}>
+          <GoogleContinue<User>
+            getConfig={getGoogleAuthConfig}
+            loginWithGoogle={loginWithGoogle}
+            signupWithGoogle={signupWithGoogle}
+            onSuccess={() => { setError(''); finishLogin(); }}
+            onError={(e) => setError(e.message)}
+            termsHref="/terms"
+            privacyHref="/privacy"
+          />
+        </div>
+        <div style={styles.divider}>
+          <span style={styles.dividerLine} />
+          <span style={styles.dividerText}>임시 테스트 · 전환용 이메일 로그인</span>
+          <span style={styles.dividerLine} />
+        </div>
+
+        {/* Form (legacy email/password — 임시 유지) */}
         <form onSubmit={handleSubmit} style={styles.form}>
           {error && (
             <div style={styles.error}>
@@ -188,20 +211,10 @@ export default function LoginModal() {
                 로그인 중...
               </>
             ) : (
-              '로그인'
+              '이메일로 로그인 (임시)'
             )}
           </button>
         </form>
-
-        {/* 체험용 공용 계정 자동입력 (WO-O4O-HOME-TEMP-EXPERIENCE-ACCOUNT-NOTICE-V1) — 추후 제거 예정 */}
-        <button
-          type="button"
-          onClick={() => { setEmail('renagang21@gmail.com'); setPassword('3Lz157727791!'); setError(''); }}
-          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, width: '100%', marginTop: 12, padding: '10px', fontSize: 13, fontWeight: 600, color: '#047857', background: '#ecfdf5', border: '1px solid #a7f3d0', borderRadius: 10, cursor: 'pointer' }}
-        >
-          <Store size={16} aria-hidden="true" />
-          체험용 매장 경영자 계정
-        </button>
 
         {/* Footer Links */}
         <div style={styles.footer}>
@@ -297,6 +310,22 @@ const styles: Record<string, React.CSSProperties> = {
     display: 'flex',
     flexDirection: 'column',
     gap: '20px',
+  },
+  divider: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '12px',
+    marginBottom: '16px',
+  },
+  dividerLine: {
+    flex: 1,
+    height: '1px',
+    backgroundColor: '#e2e8f0',
+  },
+  dividerText: {
+    fontSize: '12px',
+    color: '#94a3b8',
+    whiteSpace: 'nowrap',
   },
   error: {
     display: 'flex',

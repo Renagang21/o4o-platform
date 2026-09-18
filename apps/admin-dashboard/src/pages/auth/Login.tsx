@@ -1,8 +1,15 @@
-import { FC, FormEvent, useEffect, useState } from 'react';
+/**
+ * WO-O4O-GOOGLE-ONLY-SIGNUP-LOGIN-V1: Google 로 계속하기 = 기본 진입 · email/password = 임시 테스트/전환용.
+ * Admin 은 가입을 제공하지 않는다 — 미등록 Google 계정(GOOGLE_SIGNUP_REQUIRED)은 서비스 화면 가입 안내만.
+ */
+import { FC, FormEvent, useEffect, useRef, useState } from 'react';
 import { Navigate, useLocation, useSearchParams, Link } from 'react-router-dom';
 import { Eye, EyeOff, Lock, AlertTriangle } from 'lucide-react';
 import { useAuth } from '@o4o/auth-context';
+import { renderGoogleButton } from '@o4o/auth-client';
 import toast from 'react-hot-toast';
+
+type GoogleStage = 'loading' | 'disabled' | 'ready';
 
 const Login: FC = () => {
   const [email, setEmail] = useState('');
@@ -10,9 +17,40 @@ const Login: FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   
-  const { login, isAuthenticated, isLoading, error, clearError, isAdmin } = useAuth();
+  const { login, loginWithGoogle, getGoogleAuthConfig, isAuthenticated, isLoading, error, clearError, isAdmin } = useAuth();
   const location = useLocation();
   const [searchParams] = useSearchParams();
+
+  // Google 진입: config → GIS 버튼 → ID token → loginWithGoogle (로그인만)
+  const [googleStage, setGoogleStage] = useState<GoogleStage>('loading');
+  const [googleClientId, setGoogleClientId] = useState<string | null>(null);
+  const googleContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    let alive = true;
+    getGoogleAuthConfig()
+      .then((cfg) => {
+        if (!alive) return;
+        setGoogleClientId(cfg.enabled ? cfg.clientId : null);
+        setGoogleStage(cfg.enabled && cfg.clientId ? 'ready' : 'disabled');
+      })
+      .catch(() => { if (alive) setGoogleStage('disabled'); });
+    return () => { alive = false; };
+  }, [getGoogleAuthConfig]);
+
+  useEffect(() => {
+    if (googleStage !== 'ready' || !googleClientId || !googleContainerRef.current) return;
+    let cleanup: (() => void) | undefined;
+    let disposed = false;
+    void renderGoogleButton({
+      clientId: googleClientId,
+      container: googleContainerRef.current,
+      onCredential: (idToken) => { void handleGoogleCredential(idToken); },
+      onError: (err) => toast.error(err.message || 'Google 버튼을 불러오지 못했습니다.'),
+    }).then((fn) => { if (disposed) fn(); else cleanup = fn; });
+    return () => { disposed = true; cleanup?.(); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [googleStage, googleClientId]);
 
   // 리다이렉트 URL 처리
   const redirectUrl = searchParams.get('redirect') || '/admin';
@@ -57,6 +95,31 @@ const Login: FC = () => {
       );
     }
   }
+
+  const handleGoogleCredential = async (idToken: string) => {
+    clearError();
+    try {
+      await loginWithGoogle(idToken, 'neture');
+      toast.success('관리자 로그인 성공!');
+    } catch (error: any) {
+      const errorCode = error?.response?.data?.code;
+      const serverMessage = error?.response?.data?.error;
+      let errorMessage = 'Google 로그인에 실패했습니다.';
+      if (errorCode === 'GOOGLE_SIGNUP_REQUIRED') {
+        errorMessage = '이 Google 계정은 아직 O4O 에 등록되지 않았습니다. 서비스 화면에서 먼저 계정을 만들어 주세요.';
+      } else if (errorCode === 'ACCOUNT_NOT_ACTIVE') {
+        errorMessage = '계정이 비활성화되었습니다. 관리자에게 문의하세요.';
+      } else if (errorCode === 'GOOGLE_ID_TOKEN_INVALID') {
+        errorMessage = 'Google 인증에 실패했습니다. 다시 시도해 주세요.';
+      } else if (error?.response?.status === 429) {
+        errorMessage = '로그인 시도가 너무 많습니다. 잠시 후 다시 시도해주세요.';
+      } else if (serverMessage) {
+        errorMessage = serverMessage;
+      }
+      toast.error(errorMessage);
+      clearError();
+    }
+  };
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -126,6 +189,23 @@ const Login: FC = () => {
 
         {/* 로그인 폼 */}
         <form className="bg-white/10 backdrop-blur-md rounded-2xl p-8 shadow-2xl border border-white/20" onSubmit={handleSubmit}>
+          {/* Google 로 계속하기 — 기본 진입 */}
+          <div className="mb-6">
+            {googleStage === 'loading' && (
+              <p className="text-center text-sm text-blue-200">Google 로그인을 준비하고 있습니다…</p>
+            )}
+            {googleStage === 'disabled' && (
+              <p className="text-center text-sm text-blue-200" data-testid="google-continue-disabled">Google 로그인은 준비 중입니다.</p>
+            )}
+            {googleStage === 'ready' && (
+              <div ref={googleContainerRef} className="flex justify-center min-h-[44px]" data-testid="google-continue-button" />
+            )}
+          </div>
+          <div className="flex items-center gap-3 mb-6">
+            <div className="flex-1 h-px bg-white/20" />
+            <span className="text-xs text-blue-200">임시 테스트 · 전환용 이메일 로그인</span>
+            <div className="flex-1 h-px bg-white/20" />
+          </div>
           <div className="space-y-5">
             {/* 이메일 입력 */}
             <div>
@@ -215,7 +295,7 @@ const Login: FC = () => {
                 로그인 중...
               </>
             ) : (
-              '로그인'
+              '이메일로 로그인 (임시)'
             )}
           </button>
         </form>

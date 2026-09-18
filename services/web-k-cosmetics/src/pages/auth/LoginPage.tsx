@@ -1,18 +1,20 @@
 /**
  * LoginPage - K-Cosmetics
  * WO-O4O-KCOS-AUTH-DESIGN-POLISH-V1: inline style → Tailwind, hex → theme, Card/Button 적용
+ * WO-O4O-GOOGLE-ONLY-SIGNUP-LOGIN-V1: Google 로 계속하기 = 기본 진입 · email/password = 임시 테스트/전환용
  */
 
 import { useState } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { Sparkles } from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
+import { GoogleContinue } from '@o4o/auth-react';
+import { useAuth, type User } from '@/contexts/AuthContext';
 import { Card, Button } from '@o4o/ui';
 
 export default function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { login } = useAuth();
+  const { login, loginWithGoogle, signupWithGoogle, getGoogleAuthConfig } = useAuth();
   const returnUrl = (location.state as any)?.from;
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -59,6 +61,24 @@ export default function LoginPage() {
         </div>
         <h1 className="text-2xl font-bold text-slate-800 mb-2 mt-0">로그인</h1>
         <p className="text-sm text-slate-500 mb-8 mt-0">K-Cosmetics에 오신 것을 환영합니다</p>
+
+        {/* WO-O4O-GOOGLE-ONLY-SIGNUP-LOGIN-V1: Google 로 계속하기(기본) — 미등록이면 약관 동의 → 계정 생성 */}
+        <div className="mb-6 text-left">
+          <GoogleContinue<User>
+            getConfig={getGoogleAuthConfig}
+            loginWithGoogle={loginWithGoogle}
+            signupWithGoogle={signupWithGoogle}
+            onSuccess={() => { setError(null); setIsNotMember(false); if (returnUrl) navigate(returnUrl); }}
+            onError={(e) => { setIsNotMember(false); setError(e.message); }}
+            termsHref="/terms"
+            privacyHref="/privacy"
+          />
+        </div>
+        <div className="flex items-center gap-3 mb-4">
+          <span className="flex-1 h-px bg-slate-200" />
+          <span className="text-xs text-slate-400">임시 테스트 · 전환용 이메일 로그인</span>
+          <span className="flex-1 h-px bg-slate-200" />
+        </div>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4 text-left">
           {error && !isNotMember && (
@@ -139,7 +159,7 @@ export default function LoginPage() {
             className="w-full h-12 text-base mt-2"
             disabled={loading}
           >
-            {loading ? '로그인 중...' : '로그인'}
+            {loading ? '로그인 중...' : '이메일로 로그인 (임시)'}
           </Button>
         </form>
 

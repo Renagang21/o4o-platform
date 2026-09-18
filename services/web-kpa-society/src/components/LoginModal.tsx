@@ -4,6 +4,7 @@
  * WO-O4O-AUTH-MODAL-LOGIN-AND-ACCOUNT-STANDARD-V1
  * WO-O4O-AUTH-MODAL-REGISTER-STANDARD-V1
  * WO-O4O-LOGIN-STANDARDIZATION-V1: 전체 서비스 로그인 표준화
+ * WO-O4O-GOOGLE-ONLY-SIGNUP-LOGIN-V1: Google 로 계속하기 = 기본 진입 · email/password = 임시 테스트/전환용
  *
  * 원칙:
  * - 로그인은 항상 모달로만 수행
@@ -21,7 +22,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { X, Eye, EyeOff } from 'lucide-react';
-import { useAuth } from '../contexts/AuthContext';
+import { GoogleContinue } from '@o4o/auth-react';
+import { useAuth, type User } from '../contexts/AuthContext';
 import { useAuthModal } from '../contexts/AuthModalContext';
 import { getKpaPostLoginRoute } from '../config/dashboard';
 
@@ -60,7 +62,7 @@ function resolveLoginErrorMessage(
 
 export default function LoginModal() {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, loginWithGoogle, signupWithGoogle, getGoogleAuthConfig } = useAuth();
   const { activeModal, closeModal, openRegisterModal, onLoginSuccess } = useAuthModal();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -134,6 +136,19 @@ export default function LoginModal() {
         localStorage.removeItem(REMEMBER_EMAIL_KEY);
       }
 
+      finishLogin(loggedInUser);
+    } catch (err: unknown) {
+      // login() 은 더 이상 throw 하지 않는다 — 여기 도달하면 로그인 이후 처리(리다이렉트 등) 오류다.
+      console.error('[Login] Post-login error:', err);
+      setError('로그인 처리 중 오류가 발생했습니다. 다시 시도해주세요.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  /** 로그인 성공 공통 후처리(password · Google 동일): 모달 닫기 → 콜백 또는 역할 기반 진입 화면. */
+  const finishLogin = (loggedInUser: User) => {
+    try {
       // 로그인 성공: 모달 닫기
       closeModal();
 
@@ -155,11 +170,8 @@ export default function LoginModal() {
         }
       }
     } catch (err: unknown) {
-      // login() 은 더 이상 throw 하지 않는다 — 여기 도달하면 로그인 이후 처리(리다이렉트 등) 오류다.
       console.error('[Login] Post-login error:', err);
       setError('로그인 처리 중 오류가 발생했습니다. 다시 시도해주세요.');
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -211,7 +223,27 @@ export default function LoginModal() {
         </div>
 
         <div className="p-6">
-          {/* 로그인 폼 */}
+          {/* WO-O4O-GOOGLE-ONLY-SIGNUP-LOGIN-V1: Google 로 계속하기(기본) — 미등록이면 약관 동의 → 계정 생성 */}
+          <div className="mb-6">
+            <GoogleContinue<User>
+              getConfig={getGoogleAuthConfig}
+              loginWithGoogle={loginWithGoogle}
+              signupWithGoogle={signupWithGoogle}
+              onSuccess={({ user: loggedInUser }) => { setError(null); setIsNotMember(false); finishLogin(loggedInUser); }}
+              onError={(e) => { setIsNotMember(false); setError(e.message); }}
+              termsHref="/policy"
+              privacyHref="/privacy"
+            />
+          </div>
+
+          {/* 구분선 */}
+          <div className="flex items-center gap-4 mb-4">
+            <div className="flex-1 h-px bg-gray-200" />
+            <span className="text-xs text-gray-400">임시 테스트 · 전환용 이메일 로그인</span>
+            <div className="flex-1 h-px bg-gray-200" />
+          </div>
+
+          {/* 로그인 폼(legacy email/password — 임시 유지) */}
           <form onSubmit={handleSubmit} className="space-y-4">
             {error && !isNotMember && (
               <div className="p-3 rounded-lg border bg-red-50 border-red-200">
@@ -290,25 +322,9 @@ export default function LoginModal() {
               disabled={loading}
               className="w-full py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? '로그인 중...' : '로그인'}
+              {loading ? '로그인 중...' : '이메일로 로그인 (임시)'}
             </button>
           </form>
-
-          {/* 체험용 공용 계정 자동입력 (WO-O4O-HOME-TEMP-EXPERIENCE-ACCOUNT-NOTICE-V1) — 약국 경영자만 노출 */}
-          <div className="mt-4 flex justify-center">
-            {[
-              { label: '🧪 체험용 약국 경영자 계정', email: 'renagang21@gmail.com', password: '3Lz157727791!' },
-            ].map((acct) => (
-              <button
-                key={acct.email}
-                type="button"
-                onClick={() => { setEmail(acct.email); setPassword(acct.password); setError(null); }}
-                className="px-4 py-1.5 text-xs font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors"
-              >
-                {acct.label}
-              </button>
-            ))}
-          </div>
 
           {/* 아이디·비밀번호 찾기 */}
           <div className="mt-4 text-center">

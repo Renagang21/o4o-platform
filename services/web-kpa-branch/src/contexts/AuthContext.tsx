@@ -17,8 +17,8 @@ import {
   extractRoles,
   type UserLike,
 } from '@o4o/auth-utils';
-import { getAccessToken } from '@o4o/auth-client';
-import { useServiceAuth, type AuthLoginResult } from '@o4o/auth-react';
+import { getAccessToken, type GoogleAuthConfig } from '@o4o/auth-client';
+import { useServiceAuth, type AuthLoginResult, type GoogleSignupConsents } from '@o4o/auth-react';
 import { authClient } from '../lib/apiClient';
 import { SERVICE_KEY } from '../config/service';
 
@@ -33,6 +33,10 @@ interface AuthContextValue {
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<AuthLoginResult<BranchUser>>;
+  /** WO-O4O-GOOGLE-ONLY-SIGNUP-LOGIN-V1: Google 기본 진입(email/password 는 임시 테스트/전환용). */
+  loginWithGoogle: (idToken: string) => Promise<AuthLoginResult<BranchUser>>;
+  signupWithGoogle: (idToken: string, consents: GoogleSignupConsents) => Promise<AuthLoginResult<BranchUser>>;
+  getGoogleAuthConfig: () => Promise<GoogleAuthConfig>;
   logout: () => void;
 }
 
@@ -67,6 +71,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isAuthenticated: core.isAuthenticated,
         isLoading: core.isLoading,
         login: core.login,
+        loginWithGoogle: core.loginWithGoogle,
+        signupWithGoogle: core.signupWithGoogle,
+        getGoogleAuthConfig: () => authClient.getGoogleAuthConfig(),
         logout: () => {
           void core.logout();
         },

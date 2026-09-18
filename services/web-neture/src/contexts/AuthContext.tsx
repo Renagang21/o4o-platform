@@ -12,8 +12,8 @@
 
 import { createContext, useContext, useEffect, useMemo, ReactNode } from 'react';
 import { buildPlatformUser } from '@o4o/auth-utils';
-import { getAccessToken } from '@o4o/auth-client';
-import { useServiceAuth, useRoleSelection, type AuthLoginResult, type PendingPolicyAcceptance, type PolicyAcceptanceResult } from '@o4o/auth-react';
+import { getAccessToken, type GoogleAuthConfig } from '@o4o/auth-client';
+import { useServiceAuth, useRoleSelection, type AuthLoginResult, type GoogleSignupConsents, type PendingPolicyAcceptance, type PolicyAcceptanceResult } from '@o4o/auth-react';
 import { authClient } from '../lib/apiClient';
 
 // Re-export for consumers that import getAccessToken from AuthContext
@@ -44,6 +44,10 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<NetureLoginResult>;
+  /** WO-O4O-GOOGLE-ONLY-SIGNUP-LOGIN-V1: Google 기본 진입(email/password 는 임시 테스트/전환용). */
+  loginWithGoogle: (idToken: string) => Promise<AuthLoginResult<User>>;
+  signupWithGoogle: (idToken: string, consents: GoogleSignupConsents) => Promise<AuthLoginResult<User>>;
+  getGoogleAuthConfig: () => Promise<GoogleAuthConfig>;
   logout: () => void;
   logoutAll: () => Promise<void>;
   switchRole: (role: UserRole) => void;
@@ -129,6 +133,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isAuthenticated: core.isAuthenticated,
         isLoading: core.isLoading,
         login,
+        loginWithGoogle: core.loginWithGoogle,
+        signupWithGoogle: core.signupWithGoogle,
+        getGoogleAuthConfig: () => authClient.getGoogleAuthConfig(),
         logout: core.logout,
         logoutAll: core.logoutAll,
         switchRole,

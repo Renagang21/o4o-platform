@@ -2,6 +2,7 @@
  * LoginPage — Pharmacy-Hub Foundation
  *
  * WO-PHARMACY-HUB-NEW-SERVICE-FOUNDATION-V1
+ * WO-O4O-GOOGLE-ONLY-SIGNUP-LOGIN-V1: Google 로 계속하기 = 기본 진입 · email/password = 임시 테스트/전환용
  *
  * 공통 users 인증을 재사용하고 serviceKey='pharmacy-hub' 를 명시한다.
  * Pharmacy-Hub 미가입자는 backend 에서 401 SERVICE_NOT_MEMBER 로 차단된다
@@ -10,22 +11,12 @@
 
 import { useState } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+import { GoogleContinue } from '@o4o/auth-react';
+import { useAuth, type PharmacyHubUser } from '../contexts/AuthContext';
 import { BRAND } from '../config/service';
 
-/**
- * 공개 데모용 테스트 계정 (매장 경영자).
- * O4O 를 처음 접하는 참여자가 바로 체험할 수 있도록 의도적으로 공개한 공용 계정이며,
- * 실제 운영 계정이 아니다. 값 변경 시 docs/local/TEST-ACCOUNTS.local.md (SSOT) 도 함께 갱신한다.
- */
-const DEMO_ACCOUNT = {
-  label: '테스트 매장 경영자',
-  email: 'renagang21@gmail.com',
-  password: 'o4otestID',
-} as const;
-
 export default function LoginPage() {
-  const { login } = useAuth();
+  const { login, loginWithGoogle, signupWithGoogle, getGoogleAuthConfig } = useAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -52,15 +43,7 @@ export default function LoginPage() {
         );
         return;
       }
-      // WO-O4O-RESTRICTED-LOGIN-FOR-PENDING-REJECTED-V1 §5-F:
-      //   제한 로그인 계정(users.status=pending)은 가입 상태 확인 화면으로만 보낸다.
-      //   상품·주문·콘텐츠 진입점은 노출하지 않는다.
-      const accountAccess = (result.user as { accountAccess?: string } | undefined)?.accountAccess;
-      if (accountAccess === 'restricted') {
-        navigate('/join/status');
-      } else {
-        navigate(returnUrl || '/');
-      }
+      finishLogin(result.user);
     } catch (err) {
       console.error('[Login] Post-login error:', err);
       setError('로그인 처리 중 오류가 발생했습니다. 다시 시도해주세요.');
@@ -69,10 +52,41 @@ export default function LoginPage() {
     }
   };
 
+  /** 로그인 성공 공통 후처리(password · Google 동일). */
+  const finishLogin = (user: PharmacyHubUser | undefined) => {
+    // WO-O4O-RESTRICTED-LOGIN-FOR-PENDING-REJECTED-V1 §5-F:
+    //   제한 로그인 계정(users.status=pending)은 가입 상태 확인 화면으로만 보낸다.
+    //   상품·주문·콘텐츠 진입점은 노출하지 않는다.
+    const accountAccess = (user as { accountAccess?: string } | undefined)?.accountAccess;
+    if (accountAccess === 'restricted') {
+      navigate('/join/status');
+    } else {
+      navigate(returnUrl || '/');
+    }
+  };
+
   return (
     <div className="mx-auto max-w-sm px-4 py-12">
       <h1 className="mb-1 text-xl font-bold">{BRAND.name} 로그인</h1>
       <p className="mb-6 text-sm text-gray-500">{BRAND.nameKo}</p>
+
+      {/* WO-O4O-GOOGLE-ONLY-SIGNUP-LOGIN-V1: Google 로 계속하기(기본) — 미등록이면 약관 동의 → 계정 생성 */}
+      <div className="mb-4 rounded-lg border border-gray-200 bg-white p-5">
+        <GoogleContinue<PharmacyHubUser>
+          getConfig={getGoogleAuthConfig}
+          loginWithGoogle={loginWithGoogle}
+          signupWithGoogle={signupWithGoogle}
+          onSuccess={({ user }) => { setError(null); finishLogin(user); }}
+          onError={(e) => setError(e.message)}
+          termsHref="/terms"
+          privacyHref="/privacy"
+        />
+      </div>
+      <div className="mb-3 flex items-center gap-3">
+        <span className="h-px flex-1 bg-gray-200" />
+        <span className="text-xs text-gray-400">임시 테스트 · 전환용 이메일 로그인</span>
+        <span className="h-px flex-1 bg-gray-200" />
+      </div>
 
       <form onSubmit={onSubmit} className="space-y-3 rounded-lg border border-gray-200 bg-white p-5">
         <label className="block text-sm">
@@ -124,27 +138,8 @@ export default function LoginPage() {
           disabled={submitting}
           className="w-full rounded bg-primary-600 px-3 py-2 text-white disabled:opacity-50"
         >
-          {submitting ? '로그인 중…' : '로그인'}
+          {submitting ? '로그인 중…' : '이메일로 로그인 (임시)'}
         </button>
-
-        {/* 체험용 계정 자동 입력 — 클릭하면 이메일·비밀번호가 위 입력란에 채워진다. */}
-        <div className="border-t border-gray-100 pt-3">
-          <button
-            type="button"
-            onClick={() => {
-              setEmail(DEMO_ACCOUNT.email);
-              setPassword(DEMO_ACCOUNT.password);
-              setShowPassword(true);
-              setError(null);
-            }}
-            className="w-full rounded border border-dashed border-primary-100 px-3 py-2 text-sm text-primary-700 hover:bg-primary-50"
-          >
-            {DEMO_ACCOUNT.label} 계정으로 채우기
-          </button>
-          <p className="mt-2 text-center text-xs text-gray-400">
-            체험용 공용 계정입니다. 입력 후 로그인 버튼을 눌러 주세요.
-          </p>
-        </div>
       </form>
 
       <p className="mt-4 text-center text-sm">
