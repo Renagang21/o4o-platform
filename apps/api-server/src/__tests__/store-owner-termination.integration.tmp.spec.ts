@@ -7,6 +7,10 @@ const ORG='22222222-2222-4222-8222-222222222222';
 const ORG2='22222222-2222-4222-8222-222222222223';
 
 async function seedIdentity(ds:any,userId:string,email:string,orgId:string,code:string,service:string,role:string,extraService?:string) {
+  await ds.query(`INSERT INTO platform_services (code,name) VALUES ($1,$2) ON CONFLICT (code) DO NOTHING`,[service,`Fixture ${service}`]);
+  if(extraService) {
+    await ds.query(`INSERT INTO platform_services (code,name) VALUES ($1,$2) ON CONFLICT (code) DO NOTHING`,[extraService,`Fixture ${extraService}`]);
+  }
   await ds.query(`INSERT INTO users (id,email) VALUES ($1,$2)`,[userId,email]);
   await ds.query(
     `INSERT INTO organizations (id,name,code,type,path,business_number,address,phone)
