@@ -84,6 +84,17 @@ export interface StoreBlogManageViewProps {
   /** 가이드 back-link 목적지 */
   guideLinkTo?: string;
   guideLinkLabel?: string;
+  /**
+   * WO-O4O-STORE-PRODUCTION-EXTERNAL-LLM-REALIGNMENT-V1 §16:
+   *   외부 LLM 보조 slot — StoreBlogEditorPanel 의 beforeEditor 자리에 렌더된다.
+   *   서비스 wrapper 가 LlmAssistPanel + Prompt Core(task='blog') 를 주입한다. 미주입 시 동작 불변.
+   */
+  renderAssist?: (ctx: {
+    title: string;
+    excerpt: string;
+    value: string;
+    onApplyHtml: (html: string) => void;
+  }) => ReactNode;
 }
 
 type ViewMode = 'list' | 'editor' | 'settings';
@@ -92,6 +103,7 @@ export function StoreBlogManageView({
   api,
   labels,
   renderEditor,
+  renderAssist,
   guideLinkTo = '/guide/features/blog',
   guideLinkLabel = '블로그 작성 방법',
 }: StoreBlogManageViewProps) {
@@ -341,6 +353,16 @@ export function StoreBlogManageView({
         canSave={!!editorTitle.trim() && !!editorContent.trim()}
         onSave={handleSave}
         onCancel={() => setMode('list')}
+        beforeEditor={
+          renderAssist
+            ? renderAssist({
+                title: editorTitle,
+                excerpt: editorExcerpt,
+                value: editorContent,
+                onApplyHtml: setEditorContent,
+              })
+            : undefined
+        }
         renderEditor={() =>
           renderEditor({
             value: editorContent,

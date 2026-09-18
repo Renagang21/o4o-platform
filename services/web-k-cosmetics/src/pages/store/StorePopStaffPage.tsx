@@ -11,8 +11,13 @@
  * 범위 외: 매장 직접 POP 작성 / publish·archive / POP PDF 출력(StorePopPage 별도) / builder 연결.
  */
 
-import { StorePopStaffView, type StorePopStaffApi } from '@o4o/store-ui-core';
-import { RichTextEditor } from '@o4o/content-editor';
+import {
+  StorePopStaffView,
+  type StorePopStaffApi,
+  buildStoreContentAuthoringPrompt,
+  STORE_LLM_ASSIST_LABEL,
+} from '@o4o/store-ui-core';
+import { RichTextEditor, LlmAssistPanel } from '@o4o/content-editor';
 import {
   fetchStaffPopPosts,
   updateStaffPopPost,
@@ -32,6 +37,18 @@ export default function StorePopStaffPage() {
     <StorePopStaffView
       api={popStaffApi}
       storeNoun="매장"
+      /* WO-O4O-STORE-PRODUCTION-EXTERNAL-LLM-REALIGNMENT-V1 §17: 외부 LLM POP 문안 작업 — Prompt 는 store-ui-core(task='pop'). POP V2/PDF 는 무변경 */
+      renderAssist={({ title, excerpt, value, onApplyHtml }) => (
+        <LlmAssistPanel
+          label={STORE_LLM_ASSIST_LABEL}
+          contextLabel="매장 POP 문안 — 짧게 읽히는 POP 문안으로 작성·재구성합니다"
+          guideText={({ additionalInstruction }) =>
+            buildStoreContentAuthoringPrompt({ task: 'pop', title, currentHtml: value, referenceText: excerpt, additionalInstruction })
+          }
+          currentHtml={value}
+          onApplyHtml={onApplyHtml}
+        />
+      )}
       renderEditor={({ value, onChange, disabled }) => (
         <RichTextEditor showInternalAi={false}
           value={value}

@@ -29,11 +29,16 @@ import {
 } from '../../api/localProducts';
 import type { LocalProduct, LocalProductInput, BadgeType } from '../../api/localProducts';
 // WO-KPA-STORE-LOCAL-PRODUCT-RICHTEXT-INTEGRATION-V1: AI 정리 기능 활성화
-import { RichTextEditor } from '@o4o/content-editor';
+import { RichTextEditor, LlmAssistPanel } from '@o4o/content-editor';
 // WO-O4O-MY-STORE-LOCAL-PRODUCTS-COMMON-COMPONENT-EXTRACTION-V1: 공통 배지/옵션
 import { LOCAL_PRODUCT_BADGE_OPTIONS as BADGE_OPTIONS } from '@o4o/store-ui-core';
 // WO-O4O-MY-STORE-LOCAL-PRODUCTS-CROSSSERVICE-COMMONIZATION-V1: 공통 목록 manager
-import { StoreLocalProductsManager, type StoreLocalProductsExtraColumn } from '@o4o/store-ui-core';
+import {
+  StoreLocalProductsManager,
+  type StoreLocalProductsExtraColumn,
+  buildStoreContentAuthoringPrompt,
+  STORE_LLM_ASSIST_LABEL,
+} from '@o4o/store-ui-core';
 // WO-O4O-KPA-STORE-PRODUCT-MULTILINGUAL-BADGES-PILOT-V1: 다국어 콘텐츠 연결 상태 배지
 import { getMlcSummaryMap, type StoreMlcSummaryItem } from '../../api/multilingualProductContentStore';
 import { MultilingualContentBadge, localeLabel } from '../../components/MultilingualContentBadge';
@@ -334,16 +339,42 @@ function ProductFormModal({
 
           {/* 5. 설명 표준 편집기 (+ 콘텐츠에서 가져오기 보조 기능) */}
           <div>
-            <div className="flex items-center justify-between mb-1">
+            <div className="flex items-center justify-between mb-1 gap-2">
               <label className="block text-sm font-medium text-slate-700">설명</label>
-              <button
-                type="button"
-                onClick={() => setShowContentImport(true)}
-                className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-teal-700 bg-teal-50 rounded-lg hover:bg-teal-100"
-              >
-                <FileDown className="w-3.5 h-3.5" />
-                콘텐츠에서 가져오기
-              </button>
+              <div className="flex items-center gap-2">
+                {/* WO-O4O-STORE-PRODUCTION-EXTERNAL-LLM-REALIGNMENT-V1 §21: 자체 상품 상세 HTML 도 task='product-description' 단일 계약.
+                    Context = 폼에 명시된 정보(제품명 · 카테고리 · 요약 · 현재 상세 HTML)만. 별도 local-product task 없음. */}
+                <LlmAssistPanel
+                  label={STORE_LLM_ASSIST_LABEL}
+                  contextLabel="자체 상품 상세 설명 — 폼에 입력된 제품 정보만으로 작성·정리합니다"
+                  guideText={({ additionalInstruction }) =>
+                    buildStoreContentAuthoringPrompt({
+                      task: 'product-description',
+                      productName: name,
+                      currentHtml: description,
+                      referenceText: [
+                        category.trim() ? `카테고리: ${category.trim()}` : '',
+                        summary.trim() ? `요약: ${summary.trim()}` : '',
+                      ].filter(Boolean).join('\n'),
+                      additionalInstruction,
+                    })
+                  }
+                  currentHtml={description}
+                  onApplyHtml={(html) => {
+                    // 콘텐츠 가져오기와 동일하게 재마운트로 확실히 반영. 저장은 기존 폼 저장 버튼.
+                    setDescription(html);
+                    setEditorKey((k) => k + 1);
+                  }}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowContentImport(true)}
+                  className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-teal-700 bg-teal-50 rounded-lg hover:bg-teal-100"
+                >
+                  <FileDown className="w-3.5 h-3.5" />
+                  콘텐츠에서 가져오기
+                </button>
+              </div>
             </div>
             <RichTextEditor showInternalAi={false}
               key={editorKey}

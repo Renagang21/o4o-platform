@@ -25,7 +25,8 @@ import {
 import { useLocation } from 'react-router-dom';
 import { getStoreSlug } from '../../api/pharmacyInfo';
 // WO-O4O-KPA-STORE-BLOG-CONTENT-RICHTEXT-V1: canonical RichTextEditor 사용
-import { RichTextEditor } from '@o4o/content-editor';
+import { RichTextEditor, LlmAssistPanel } from '@o4o/content-editor';
+import { buildStoreContentAuthoringPrompt, STORE_LLM_ASSIST_LABEL } from '@o4o/store-ui-core';
 import { mediaApi } from '../../api/media';
 import { getAccessToken } from '../../contexts/AuthContext';
 // WO-O4O-BLOG-TEMPLATE-WORKFLOW-V1: 블로그 템플릿 연결
@@ -445,9 +446,30 @@ export function PharmacyBlogPage({ service }: { service?: string }) {
         /* WO-O4O-KPA-BLOG-AI-STEP-REMOVE-V1: 블로그 초안 AI 생성 진입점 제거(초안 생성 AI 제거 정책).
            외부 AI 도구에서 작성한 글을 본문에 붙여넣어 편집한다. (본문 편집기 Toolbar "AI 정리"는 유지.) */
         beforeEditor={(
-          <p style={blogGuideHint}>
-            외부 AI 도구(ChatGPT·Claude·Gemini 등)나 문서에서 작성한 글을 아래 본문에 붙여넣고 편집하세요.
-          </p>
+          <div>
+            {/* WO-O4O-STORE-PRODUCTION-EXTERNAL-LLM-REALIGNMENT-V1 §16: 외부 LLM 블로그 본문 작업 — Prompt 는 store-ui-core(task='blog').
+                자료함에서 넘어온 원본(pendingSourceItems) 제목이 있으면 Source Context 로만 첨부한다. */}
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 6 }}>
+              <LlmAssistPanel
+                label={STORE_LLM_ASSIST_LABEL}
+                contextLabel="매장 블로그 본문 — 새로 작성하거나 현재 글을 다듬습니다"
+                guideText={({ additionalInstruction }) =>
+                  buildStoreContentAuthoringPrompt({
+                    task: 'blog',
+                    title: editorTitle,
+                    currentHtml: editorContent,
+                    sourceTitle: pendingSourceItems[0]?.title ?? null,
+                    additionalInstruction,
+                  })
+                }
+                currentHtml={editorContent}
+                onApplyHtml={(html) => setEditorContent(html)}
+              />
+            </div>
+            <p style={blogGuideHint}>
+              외부 AI 도구(ChatGPT·Claude·Gemini 등)나 문서에서 작성한 글을 아래 본문에 붙여넣고 편집하세요.
+            </p>
+          </div>
         )}
         /* WO-O4O-KPA-STORE-BLOG-CONTENT-RICHTEXT-V1: canonical RichTextEditor (preset=full).
            기존 plain-text 게시글은 RichTextEditor 가 setContent 시 자동으로 paragraph 로 감싸서 호환. */

@@ -13,12 +13,21 @@
  *   5. 콘텐츠 저장 성공 후 QR 저장 실패 시 콘텐츠 ID 를 유지하고 QR 재시도 제공.
  *
  * 코너 모드(다품목)는 같은 페이지에 후속 단계로 추가. 본 단계는 단일 상품 E2E.
+ *
+ * WO-O4O-STORE-PRODUCTION-EXTERNAL-LLM-REALIGNMENT-V1 §24~§30:
+ *   외부 LLM(ChatGPT 등) 경로 추가 — 사용자가 입력한 상품명/코너명/강조점/항목만 Source Context 로 Prompt 를 만들고,
+ *   결과 HTML 을 편집기에 넣은 뒤 기존 "콘텐츠 저장 → QR 생성" 흐름을 그대로 탄다(자동 저장·자동 QR 없음).
+ *   legacy 내부 AI(handleGenerate → POST /api/ai/qr-description) 는 이번 WO 에서 삭제하지 않는다(WO 4).
+ *   provenance: 외부 경로 결과에는 generatedBy='gemini-qr-description' · model · generatedAt 을 기록하지 않고,
+ *   provider-specific 신규 값(generatedBy='chatgpt')도 만들지 않는다. content_json.aiDescription 에는
+ *   화면 구조 정보(mode · productName/cornerName · emphasis · items[name/emphasis]) 만 남긴다 — QR 목록/자료함 필터 SSOT.
  */
 
 import { useCallback, useEffect, useMemo, useState, type CSSProperties } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Sparkles, ArrowLeft, QrCode, ExternalLink, Trash2, Plus } from 'lucide-react';
-import { RichTextEditor, ContentRenderer, type EditorContent } from '@o4o/content-editor';
+import { RichTextEditor, ContentRenderer, LlmAssistPanel, type EditorContent } from '@o4o/content-editor';
+import { buildStoreContentAuthoringPrompt, STORE_LLM_ASSIST_LABEL } from '@o4o/store-ui-core';
 import { toast } from '@o4o/error-handling';
 import { apiClient } from '../../api/client';
 import { createStoreQrCode } from '../../api/storeQr';
@@ -95,6 +104,8 @@ export default function StoreQrAiDescriptionPage() {
   const [editorSeed, setEditorSeed] = useState('');
   const [editorContent, setEditorContent] = useState<EditorContent>({ html: '' });
   const [aiMeta, setAiMeta] = useState<AiDescriptionMeta | null>(null);
+  // WO-O4O-STORE-PRODUCTION-EXTERNAL-LLM-REALIGNMENT-V1 §29: 마지막으로 편집기에 들어온 본문의 출처. 'external' 이면 저장 시 Gemini provenance 를 쓰지 않는다.
+  const [authoredBy, setAuthoredBy] = useState<'internal' | 'external' | null>(null);
 
   // 저장
   const [slug, setSlug] = useState('');
@@ -212,6 +223,7 @@ export default function StoreQrAiDescriptionPage() {
       setTitle(aiTitle);
       setSlug(slugify(aiTitle));
       setAiMeta(data.aiDescription || null);
+      setAuthoredBy('internal');
       setGenerated(true);
       if (data.usageWarning?.detected) {
         toast.warning('표현에 주의가 필요한 문구가 감지되었습니다. 저장 전 확인해 주세요.');
@@ -222,6 +234,59 @@ export default function StoreQrAiDescriptionPage() {
       setGenerating(false);
     }
   }, [mode, productName, emphasis, cornerName, validCornerItems]);
+
+  // ── WO-O4O-STORE-PRODUCTION-EXTERNAL-LLM-REALIGNMENT-V1 §25~§27: 외부 LLM 경로 ──────────────────────────────
+  // Prompt Context = 사용자가 이미 입력한 값만(single: 상품명·강조점 / corner: 코너명·강조점·항목명·항목 강조점).
+  const externalReferenceText = useMemo(() => {
+    if (mode === 'single') return emphasis.trim();
+    const lines: string[] = [];
+    if (emphasis.trim()) lines.push(`코너 강조점: ${emphasis.trim()}`);
+    validCornerItems.forEach((it, idx) => {
+      lines.push(`상품 ${idx + 1}: ${it.name.trim()}${it.emphasis.trim() ? ` / 강조점: ${it.emphasis.trim()}` : ''}`);
+    });
+    return lines.join('\n');
+  }, [mode, emphasis, validCornerItems]);
+
+  const buildExternalPrompt = useCallback(
+    ({ additionalInstruction }: { additionalInstruction: string }) =>
+      buildStoreContentAuthoringPrompt({
+        task: 'qr',
+        title: mode === 'corner' ? cornerName.trim() : title.trim() || null,
+        productName: mode === 'single' ? productName.trim() : null,
+        currentHtml: generated ? editorContent.html : null,
+        referenceText: externalReferenceText,
+        additionalInstruction,
+      }),
+    [mode, cornerName, title, productName, generated, editorContent, externalReferenceText],
+  );
+
+  // 결과 HTML → 편집기(editorSeed + editorContent 동시 갱신). 저장·QR 생성은 하지 않는다(사용자가 기존 버튼을 누른다).
+  //   aiDescription 은 화면 구조 정보만(provider·model·generatedAt 없음). 코너 항목의 per-item descriptionHtml 은 만들지 않는다
+  //   (본문 하나에 상품별 소제목으로 들어간다) — 공개 landing 아코디언은 descriptionHtml 이 있는 항목만 그리므로 영향 없음.
+  const handleExternalApply = useCallback(
+    (html: string) => {
+      const nextTitle =
+        title.trim() || (mode === 'single' ? productName.trim() : cornerName.trim()) || 'QR 안내';
+      setEditorSeed(html);
+      setEditorContent({ html });
+      setTitle(nextTitle);
+      if (!isEdit && !slug.trim()) setSlug(slugify(nextTitle));
+      setAiMeta({
+        version: 1,
+        mode,
+        productName: mode === 'single' ? productName.trim() || undefined : undefined,
+        cornerName: mode === 'corner' ? cornerName.trim() || undefined : undefined,
+        emphasis: emphasis.trim() || undefined,
+        items:
+          mode === 'corner'
+            ? validCornerItems.map((it) => ({ key: it.key, name: it.name.trim(), emphasis: it.emphasis.trim() || undefined }))
+            : undefined,
+      });
+      setAuthoredBy('external');
+      setGenerated(true);
+    },
+    [title, mode, productName, cornerName, emphasis, validCornerItems, isEdit, slug],
+  );
 
   // 콘텐츠 저장(없으면 생성) → 저장된 콘텐츠 ID 반환
   const ensureContentSaved = useCallback(async (): Promise<string | null> => {
@@ -236,14 +301,15 @@ export default function StoreQrAiDescriptionPage() {
       tags: ['AI 설명'],
       contentJson: {
         html,
-        generatedBy: 'gemini-qr-description',
+        // §29: 외부 LLM 경로 결과에는 Gemini provenance 를 기록하지 않는다(undefined → JSON 직렬화 시 키 제거).
+        generatedBy: authoredBy === 'external' ? undefined : 'gemini-qr-description',
         aiDescription: aiMeta ?? undefined,
       },
     });
     const id = res?.data?.id ?? null;
     if (id) setSavedContentId(id);
     return id;
-  }, [savedContentId, editorContent, title, productName, aiMeta]);
+  }, [savedContentId, editorContent, title, productName, aiMeta, authoredBy]);
 
   // QR 생성 (콘텐츠는 이미 저장됨)
   const createQr = useCallback(
@@ -317,7 +383,8 @@ export default function StoreQrAiDescriptionPage() {
         contentJson: {
           ...curJson,
           html,
-          generatedBy: 'gemini-qr-description',
+          // §29: 외부 LLM 결과로 갱신하면 기존 Gemini provenance 도 남기지 않는다(undefined → 키 제거).
+          generatedBy: authoredBy === 'external' ? undefined : 'gemini-qr-description',
           aiDescription: aiMeta ?? (curJson.aiDescription as unknown),
         },
         tags: ['AI 설명'],
@@ -330,7 +397,7 @@ export default function StoreQrAiDescriptionPage() {
     } finally {
       setSaving(false);
     }
-  }, [editContentId, editorContent, title, productName, cornerName, aiMeta]);
+  }, [editContentId, editorContent, title, productName, cornerName, aiMeta, authoredBy]);
 
   // 공개 QR 페이지는 웹 호스트(현재 origin)의 /qr/:slug 라우트(QrLandingPage)에서 렌더된다 — API 호스트 아님.
   const publicSlug = createdSlug || editQrSlug;
@@ -475,18 +542,34 @@ export default function StoreQrAiDescriptionPage() {
               </>
             )}
 
-            {!generated && (
-              <button type="button" onClick={handleGenerate} disabled={!canGenerate} style={styles.generateBtn}>
-                <Sparkles size={14} />
-                {generating ? 'AI가 작성 중…' : 'AI로 설명 만들기'}
-              </button>
-            )}
-            {generated && (
-              <button type="button" onClick={handleGenerate} disabled={generating} style={styles.regenBtn}>
-                <Sparkles size={14} />
-                {generating ? '다시 작성 중…' : 'AI 다시 만들기'}
-              </button>
-            )}
+            <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '8px', marginTop: '12px' }}>
+              {/* §25: 외부 LLM 경로 — 입력이 갖춰졌을 때만 노출(빈 Context 로 사실을 만들게 하지 않는다) */}
+              {(mode === 'single' ? productName.trim().length > 0 : cornerName.trim().length > 0 && validCornerItems.length > 0) && (
+                <LlmAssistPanel
+                  label={STORE_LLM_ASSIST_LABEL}
+                  contextLabel={
+                    mode === 'single'
+                      ? 'QR 안내 콘텐츠 — 입력한 상품명·강조점만으로 작성합니다'
+                      : 'QR 코너 안내 콘텐츠 — 입력한 코너명·상품 항목·강조점만으로 작성합니다'
+                  }
+                  guideText={buildExternalPrompt}
+                  currentHtml={generated ? editorContent.html : undefined}
+                  onApplyHtml={handleExternalApply}
+                />
+              )}
+              {!generated && (
+                <button type="button" onClick={handleGenerate} disabled={!canGenerate} style={{ ...styles.generateBtn, marginTop: 0 }}>
+                  <Sparkles size={14} />
+                  {generating ? 'AI가 작성 중…' : 'AI로 설명 만들기'}
+                </button>
+              )}
+              {generated && (
+                <button type="button" onClick={handleGenerate} disabled={generating} style={{ ...styles.regenBtn, marginTop: 0 }}>
+                  <Sparkles size={14} />
+                  {generating ? '다시 작성 중…' : 'AI 다시 만들기'}
+                </button>
+              )}
+            </div>
           </div>
 
           {/* 2단계: 확인·수정·저장 */}
@@ -496,7 +579,9 @@ export default function StoreQrAiDescriptionPage() {
               <p style={styles.helper}>
                 {isEdit
                   ? '내용을 확인하고 필요하면 수정한 뒤 저장하세요. 같은 콘텐츠를 갱신하므로 연결된 QR(주소·landingTarget)은 그대로 유지됩니다.'
-                  : 'AI 초안입니다. 내용을 확인하고 필요하면 수정한 뒤 저장하세요. 저장하면 내 자료함 콘텐츠로 보관되고 QR이 생성됩니다.'}
+                  : authoredBy === 'external'
+                    ? '외부 AI 결과를 편집기에 넣었습니다. 내용을 확인하고 필요하면 수정한 뒤 저장하세요. 저장하면 내 자료함 콘텐츠로 보관되고 QR이 생성됩니다.'
+                    : 'AI 초안입니다. 내용을 확인하고 필요하면 수정한 뒤 저장하세요. 저장하면 내 자료함 콘텐츠로 보관되고 QR이 생성됩니다.'}
               </p>
               <label style={styles.label}>제목</label>
               <input

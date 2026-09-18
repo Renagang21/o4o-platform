@@ -14,7 +14,8 @@
  */
 
 import { useCallback, useEffect, useState } from 'react';
-import { RichTextEditor, ContentRenderer } from '@o4o/content-editor';
+import { RichTextEditor, ContentRenderer, LlmAssistPanel } from '@o4o/content-editor';
+import { buildStoreContentAuthoringPrompt, STORE_LLM_ASSIST_LABEL } from '@o4o/store-ui-core';
 import {
   fetchStorePops,
   fetchPopHubSources,
@@ -378,7 +379,19 @@ function PopForm({
         </div>
 
         <div>
-          <label className="mb-1 block text-xs font-semibold text-gray-500">내용</label>
+          <div className="mb-1 flex items-center justify-between gap-2">
+            <label className="block text-xs font-semibold text-gray-500">내용</label>
+            {/* WO-O4O-STORE-PRODUCTION-EXTERNAL-LLM-REALIGNMENT-V1 §17: 외부 LLM POP 문안 작업 — KPA/KCos 와 동일 Prompt Core(task='pop') */}
+            <LlmAssistPanel
+              label={STORE_LLM_ASSIST_LABEL}
+              contextLabel="매장 POP 문안 — 짧게 읽히는 POP 문안으로 작성·재구성합니다"
+              guideText={({ additionalInstruction }) =>
+                buildStoreContentAuthoringPrompt({ task: 'pop', title, currentHtml: content, referenceText: excerpt, additionalInstruction })
+              }
+              currentHtml={content}
+              onApplyHtml={(html) => setContent(html)}
+            />
+          </div>
           <div className="overflow-hidden rounded-lg border border-gray-200">
             <RichTextEditor showInternalAi={false}
               value={content}

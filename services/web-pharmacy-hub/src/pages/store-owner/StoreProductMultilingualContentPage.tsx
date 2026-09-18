@@ -14,7 +14,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { Loader2, AlertCircle, Save, ArrowLeft, Send, Globe } from 'lucide-react';
-import { RichTextEditor } from '@o4o/content-editor';
+import { RichTextEditor, LlmAssistPanel } from '@o4o/content-editor';
+import { buildStoreContentAuthoringPrompt, STORE_LLM_ASSIST_LABEL } from '@o4o/store-ui-core';
 import { toast } from '@o4o/error-handling';
 import {
   getMlcGroup,
@@ -127,6 +128,18 @@ export default function StoreProductMultilingualContentPage() {
   const activeDraft = drafts[activeLocale] ?? draftFromPage();
   const setActiveDraft = (patch: Partial<PageDraft>) =>
     setDrafts((prev) => ({ ...prev, [activeLocale]: { ...(prev[activeLocale] ?? draftFromPage()), ...patch } }));
+
+  // WO-O4O-STORE-PRODUCTION-EXTERNAL-LLM-REALIGNMENT-V1 §14: 외부 LLM 번역 기준 본문 선택 — 메모리의 locale draft 만 사용(새 fetch 없음).
+  //   target locale 본문은 currentHtml(참고해 다듬기) · 기준 source = defaultLocale 본문 → 없으면 한국어 본문 → 없으면 없음.
+  //   기준 본문이 하나도 없으면 referenceHtml 이 비어 Prompt 는 제품명만으로 사실을 만들지 않도록 지시한다.
+  const translateSource = (() => {
+    const pick = (loc: string) => {
+      if (loc === activeLocale) return null;
+      const html = drafts[loc]?.html ?? '';
+      return html.trim() && html.trim() !== '<p></p>' ? { locale: loc, html } : null;
+    };
+    return pick(defaultLocale) ?? pick('ko');
+  })();
 
   const localesWithContent = useMemo(() => {
     const set = new Set<string>();
@@ -400,7 +413,29 @@ export default function StoreProductMultilingualContentPage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1.5">본문 (HTML)</label>
+              <div className="flex items-center justify-between gap-2 mb-1.5">
+                <label className="block text-sm font-medium text-slate-700">본문 (HTML)</label>
+                {/* WO-O4O-STORE-PRODUCTION-EXTERNAL-LLM-REALIGNMENT-V1 §22~§23: 외부 LLM 번역/현지화(task='translate'). 결과는 이 언어 draft.html 에만 반영 —
+                    자동 임시저장·발행·QR 생성 없음(기존 버튼을 사용자가 누른다). */}
+                <LlmAssistPanel
+                  label={STORE_LLM_ASSIST_LABEL}
+                  contextLabel={`${MLC_LOCALE_LABELS[activeLocale]} 본문 — 기준 본문을 이 언어로 옮기거나 현재 본문을 다듬습니다`}
+                  guideText={({ additionalInstruction }) =>
+                    buildStoreContentAuthoringPrompt({
+                      task: 'translate',
+                      title: activeDraft.title || title,
+                      productName,
+                      currentHtml: activeDraft.html,
+                      referenceHtml: translateSource?.html ?? null,
+                      sourceLocale: translateSource?.locale ?? null,
+                      targetLocale: activeLocale,
+                      additionalInstruction,
+                    })
+                  }
+                  currentHtml={activeDraft.html}
+                  onApplyHtml={(html) => setActiveDraft({ html })}
+                />
+              </div>
               <RichTextEditor showInternalAi={false}
                 key={activeLocale}
                 value={activeDraft.html}
