@@ -78,7 +78,8 @@ admin-dashboard: 응답 shape 불변이라 코드 변경 0. 단 `CANDIDATE_FIELD
 
 ### 5-1 api-server 전체 jest
 
-백그라운드 실행(600초 초과) — 결과는 완료 보고에 기록한다. 실패가 있으면 이 WO 와의 관련 여부를 명시한다. 이 WO 가 접촉한 모듈(`promotion/**` · P2 서비스 · P1 인접)의 테스트는 위 행에서 별도 확인 완료.
+결과: **FAIL 13 suites — 전부 이 WO 와 무관**(중지 조건 G → 보고만). 실패 suite: `store-owner-*` 4 · `store-policy-ownership-axis` · `store-tablet-*`/`kpa-my-store-tablet-*`/`cross-service-my-store-tablet-*` 3 · `store-hub-product-apply-gate` · `store-local-products-service-scoped-org` · `kpa-me-context-store-owner-contract` · `main-site-full-source-deletion` · `MembershipApprovalService.{rejection,bareRoleContract}`.
+표본 원인 2종: `StoreOwnerBusinessInfoRequiredError: 매장 경영자 승인에 필요한 사업자정보가 누락되었습니다`(매장 경영자 승인 게이트 — 이용계약 선행조건 작업 영역) · `TypeError: Cannot read properties of undefined (reading 'map')`(store-policy ownership). 어느 suite 도 `promotion/**` · P2 서비스 · 컨트롤러를 import 하지 않으며, 이 WO 변경 전 `origin/main` 에서도 동일 코드 경로. 이 WO 접촉 모듈(`promotion/**` · P2 · P1 인접 drug-import)은 위 행 16 suites 255/255 PASS 로 별도 확인.
 
 ## 6. P1 · P3 · drug-import 무접촉
 
@@ -111,7 +112,7 @@ DDL · migration · package.json · lockfile 변경: 0.
 | D P1/P3/drug-import 수정 | 아니오 | §6 |
 | E dashboard 응답 변경 필요 | 아니오 | shape 불변 · 라벨 미표시만 §4 기록 |
 | F 이름+제조사 오탐 실데이터 | 미확인 | 현행 P2 도 같은 축을 쓰고 있었음(TRIM 만 추가) · hint 로 끌 수 있음 |
-| G 무관한 build/test 실패 | §5-1 | — |
+| G 무관한 build/test 실패 | 예(보고만) | §5-1 — 13 suites · 이 WO 미접촉 영역 · 수정하지 않음 |
 
 ## 9. 후속 ② Supplier 단건 Candidate Intake 가 이 Core 를 쓰기 위한 요건
 
