@@ -19,6 +19,24 @@ on:
       - 'services/web-k-cosmetics/**'
       - 'services/web-pharmacy-hub/**'
       - '.github/workflows/wo-store-owner-migration-fingerprint.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'apps/api-server/src/database/migrations/1789695000000-CreateStoreOwnerTerminationCases.ts'
+      - 'apps/api-server/src/database/incremental/manifest.ts'
+      - 'apps/api-server/src/database/incremental/expected-schema-states.ts'
+      - 'apps/api-server/src/services/**'
+      - 'apps/api-server/src/routes/**'
+      - 'apps/api-server/src/modules/**'
+      - 'apps/api-server/src/common/**'
+      - 'apps/api-server/src/auth/**'
+      - 'apps/api-server/src/utils/**'
+      - 'packages/shared-space-ui/**'
+      - 'services/web-kpa-society/**'
+      - 'services/web-k-cosmetics/**'
+      - 'services/web-pharmacy-hub/**'
+      - '.github/workflows/wo-store-owner-migration-fingerprint.yml'
 
 jobs:
   verify-and-fingerprint:
