@@ -45,18 +45,21 @@ export function StoreOwnerAgreementGate({
 }: StoreOwnerAgreementGateProps) {
   const [pending, setPending] = useState<PendingPolicyAcceptanceLike[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   const refresh = useCallback(async () => {
     setLoading(true);
+    setLoadError(null);
     try {
       const res = await api.get(
         `/auth/policy-acceptances?documentType=${DOCUMENT_TYPE}&serviceKey=${encodeURIComponent(serviceKey)}`,
       );
       setPending(readPending(res.data));
     } catch {
-      // 서버가 계약 상태를 판정하지 못하면 보호 API 가 fail-closed 한다.
-      // UI 는 임의 acceptance 를 합성하지 않는다.
+      // 계약 상태를 확인하지 못한 경우 children 을 열지 않는다.
+      // server-side 428 gate 와 같은 fail-closed UX를 유지한다.
       setPending([]);
+      setLoadError('매장 이용계약 상태를 확인하지 못했습니다. 다시 시도해 주세요.');
     } finally {
       setLoading(false);
     }
@@ -103,6 +106,20 @@ export function StoreOwnerAgreementGate({
     return (
       <div style={{ minHeight: 320, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#64748b' }}>
         매장 이용계약을 확인하는 중...
+      </div>
+    );
+  }
+
+  if (loadError) {
+    return (
+      <div style={{ minHeight: 320, display: 'grid', placeItems: 'center', padding: 24 }}>
+        <div style={{ textAlign: 'center', maxWidth: 520 }}>
+          <p style={{ marginBottom: 16, color: '#b91c1c' }}>{loadError}</p>
+          <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
+            <button type="button" onClick={() => void refresh()}>다시 시도</button>
+            <button type="button" onClick={() => void onLogout()}>로그아웃</button>
+          </div>
+        </div>
       </div>
     );
   }
