@@ -8,6 +8,7 @@ import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation, usePa
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider, useAuth, getKCosmeticsDashboardRoute } from '@/contexts/AuthContext';
 import { TermsAcceptanceGate } from '@/components/auth/TermsAcceptanceGate';
+import { StoreOwnerAgreementGate } from '@/components/auth/StoreOwnerAgreementGate';
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { refetchOnWindowFocus: false, retry: 1 } },
@@ -374,7 +375,7 @@ function StoreOwnerRoute({ children }: { children: React.ReactNode }) {
       renderDenied={<AccessDenied message="내 매장은 매장 경영자 계정만 이용할 수 있습니다." />}
       membershipGate={MembershipGate}
     >
-      {children}
+      <StoreOwnerAgreementGate>{children}</StoreOwnerAgreementGate>
     </StoreOwnerGuard>
   );
 }
