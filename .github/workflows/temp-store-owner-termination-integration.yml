@@ -36,5 +36,7 @@ jobs:
         run: |
           pnpm --filter '@o4o/types' run build
           pnpm --filter '@o4o/utils' run build
+      - name: Run lifecycle unit regression
+        run: pnpm --filter '@o4o/api-server' exec jest src/__tests__/store-owner-termination.service.spec.ts --runInBand
       - name: Run isolated lifecycle fixture
         run: pnpm --filter '@o4o/api-server' exec jest src/__tests__/store-owner-termination.integration.spec.ts --runInBand
