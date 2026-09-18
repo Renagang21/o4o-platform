@@ -71,6 +71,9 @@ export const TERMS_PENDING_ALLOWLIST: ReadonlySet<string> = new Set([
   // ── 약관 acceptance 자체 (pending 조회 · 승낙 제출) ──
   'GET /api/v1/auth/policy-acceptances',
   'POST /api/v1/auth/policy-acceptances',
+  // 매장 경영자 계약 승낙도 terms 재동의 화면에서 접근 가능해야 한다.
+  'GET /api/v1/auth/policy-acceptances/store-owner',
+  'POST /api/v1/auth/policy-acceptances/store-owner',
   // ── 서비스별 가입 상태 조회 (제한 로그인 allowlist 와 동일 — 승인 대기 화면 유지) ──
   'GET /api/v1/pharmacy-hub/join/status',
   'GET /api/v1/pharmacy-hub/me/access',
