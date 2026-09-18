@@ -87,6 +87,7 @@ import operatorNotificationRoutes from '../routes/operator-notification.routes.j
 import operatorMembershipRoutes from '../routes/operator/membership.routes.js';
 import operatorProductRoutes from '../routes/operator/products.routes.js';
 import operatorStoreRoutes from '../routes/operator/stores.routes.js';
+import operatorStoreOwnerTerminationRoutes from '../routes/operator/store-owner-terminations.routes.js';
 import operatorRoleRoutes from '../routes/operator/roles.routes.js';
 import { createOperatorAnalyticsRoutes } from '../routes/operator/analytics.routes.js';
 import { createCosmeticsRoutes } from '../routes/cosmetics/cosmetics.routes.js';
@@ -646,6 +647,11 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
     // 24-f. Register Operator Store Console routes (WO-O4O-STORE-CONSOLE-V1)
     app.use('/api/v1/operator/stores', operatorStoreRoutes);
     logger.info('✅ Operator Store Console routes registered at /api/v1/operator/stores');
+
+    // WO-O4O-STORE-OWNER-AGREEMENT-PUBLISH-PREREQUISITES-V1 §5:
+    // 매장 경영자 계약 종료·반환·7일 파기 운영 원장.
+    app.use('/api/v1/operator/store-owner-terminations', operatorStoreOwnerTerminationRoutes);
+    logger.info('✅ Store Owner Termination routes registered at /api/v1/operator/store-owner-terminations');
 
     // 24-g. Register Operator Role Catalog routes (WO-O4O-ROLE-SYSTEM-DB-DESIGN-V1)
     app.use('/api/v1/operator/roles', operatorRoleRoutes);
