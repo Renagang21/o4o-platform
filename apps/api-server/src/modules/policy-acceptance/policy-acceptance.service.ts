@@ -149,7 +149,8 @@ export class PolicyAcceptanceService {
     const now = Date.now();
     let cached = this.publishedAgreementCache.get(STORE_OWNER_AGREEMENT_DOCUMENT_TYPE);
     if (!cached || now - cached.at >= PUBLISHED_TTL_MS) {
-      const rows = (await q.query(PUBLISHED_TERMS_SQL, [STORE_OWNER_AGREEMENT_DOCUMENT_TYPE])) as PublishedRow[];
+      // 호출자가 준 Queryable 을 쓴다 — isStoreOwner(dataSource) 의 DataSource 주입 계약을 따른다.
+      const rows = ((await q.query(PUBLISHED_TERMS_SQL, [STORE_OWNER_AGREEMENT_DOCUMENT_TYPE])) ?? []) as PublishedRow[];
       cached = { at: now, docs: rows.map(toPublished) };
       this.publishedAgreementCache.set(STORE_OWNER_AGREEMENT_DOCUMENT_TYPE, cached);
     }
