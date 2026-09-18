@@ -71,10 +71,12 @@ bare 값을 여전히 인정하므로, 값이 존재하면 그대로 동작한�
 | `glucoseview:` | 글루코스뷰 | `glucoseview:admin`, `glucoseview:operator` |
 | `cosmetics:` | K-화장품 | `cosmetics:admin`, `cosmetics:operator` |
 | `pharmacy-hub:` | 파머시 허브 | `pharmacy-hub:admin`, `pharmacy-hub:operator`, `pharmacy-hub:store_owner` |
+| `lecture:` | O4O 강의 | `lecture:admin`, `lecture:operator`, `lecture:instructor` — 일반 학습자는 role 없이 `service_memberships('lecture')` |
 
 #### Admin ⊃ Operator 계층
 
-KPA · Neture · K-Cosmetics · Pharmacy-Hub 는 동일 계층을 `scopeRoleMapping` 으로 **명시**한다.
+KPA · Neture · K-Cosmetics · Pharmacy-Hub · Lecture 는 admin ⊃ operator 계층을 `scopeRoleMapping` 으로 **명시**한다.
+Lecture의 `instructor`는 운영 계층과 별도 capability이며 admin/operator가 대신하지 않는다.
 
 ```text
 {service}:admin    요구 → admin 만 허용
@@ -89,6 +91,8 @@ KPA · Neture · K-Cosmetics · Pharmacy-Hub 는 동일 계층을 `scopeRoleMapp
   [`docs/baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md`](../baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md).
 - Pharmacy-Hub scope config 위치는 `apps/api-server/src/middleware/pharmacy-hub-scope.middleware.ts` 다.
   `security-core` 가 F1 Freeze 대상이라 의도적으로 로컬에 둔 것이며, 아래 §5 절차 2번의 예외다.
+- Lecture scope config도 같은 Freeze 원칙으로 `apps/api-server/src/middleware/lecture-scope.middleware.ts`에 둔다.
+  `packages/security-core/src/types.ts`에는 self-map serviceKey의 type-only 확장만 추가한다.
 
 ---
 

@@ -59,11 +59,14 @@ export const getAllowedOrigins = (): string[] => {
     //   canonical 도메인은 platform_services.entry_url / Dockerfile VITE_SERVICE_URL 과 동일.
     //   DNS 연결 전이라도 등록해 두면 이후 DNS 작업에서 API 재배포가 불필요하다.
     "https://pharmacyhub.co.kr", "https://www.pharmacyhub.co.kr",
+    // WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 1
+    "https://study.neture.co.kr",
     // Cloud Run service URLs (GCP asia-northeast3)
     "https://neture-web-3e3aws7zqa-du.a.run.app",
     "https://kpa-society-web-3e3aws7zqa-du.a.run.app",
     "https://k-cosmetics-web-3e3aws7zqa-du.a.run.app",
     "https://pharmacy-hub-web-3e3aws7zqa-du.a.run.app",
+    "https://lecture-web-3e3aws7zqa-du.a.run.app",
     // WO-O4O-KPA-BRANCH-DEPLOY-AND-RUNTIME-SMOKE-V1:
     //   분회 서비스의 공용 플랫폼 호스트 + Cloud Run URL.
     //   분회 자체 도메인(branch_domains)은 여기 정적 목록으로 관리하지 않는다 —
