@@ -25,6 +25,7 @@
 import type { Request, Response } from 'express';
 import { AppDataSource } from '../../database/connection.js';
 import { MembershipApprovalService } from '../../services/approval/MembershipApprovalService.js';
+import { StoreOwnerBusinessInfoRequiredError } from '../../services/approval/store-owner-business-info.js';
 import { SERVICE_KEYS } from '../../constants/service-keys.js';
 import { ActionLogService } from '@o4o/action-log-core';
 // WO-PHARMACY-HUB-STORE-SUBJECT-PROVISIONING-V1: 승인 후 매장 주체(organization/owner/slug) 보장
@@ -281,6 +282,14 @@ export class PharmacyHubMembershipConsoleController {
         },
       });
     } catch (error) {
+      if (error instanceof StoreOwnerBusinessInfoRequiredError) {
+        return res.status(error.httpStatus).json({
+          success: false,
+          error: error.message,
+          code: error.code,
+          missingFields: error.missingFields,
+        });
+      }
       logger.error('[PharmacyHubMembershipConsole] approve error', {
         membershipId,
         error: error instanceof Error ? error.message : String(error),
