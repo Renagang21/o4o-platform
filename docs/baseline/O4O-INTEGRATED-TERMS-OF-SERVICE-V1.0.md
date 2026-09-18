@@ -1,8 +1,9 @@
-> **상태**: DRAFT — **정책결정 완료(10/10 · 2026-09-17 사용자 확정), 게시 선행조건 미완료** · **문서 종류**: 게시 원문(O4O 통합 서비스 이용약관 v1.0) · **작성일**: 2026-09-17
-> **게시 전 선행조건** (완료 시 DRAFT → ACTIVE 전환 · `service_policy_documents` 4 서비스 `terms` v1 게시 · `CANONICAL-INDEX` §7 등록):
+> **상태**: ACTIVE · **문서 종류**: 게시 원문(O4O 통합 서비스 이용약관 v1.0) · **확정일**: 2026-09-17 (시행일·공고일 2026-09-17 사용자 확정 2026-09-18 · 정책결정 10/10 확정 2026-09-17)
+> **게시 선행조건** (완료 · 2026-09-17):
 > 1. PharmacyHub · K-Cosmetics 가입화면 약관 명시·동의 정비 — PH `JoinPage.tsx` 의 `tos: true` · `privacyAccepted: true` 하드코딩 제거 + 열람 링크 + 필수 체크박스 / KCos `RegisterPage.tsx` 체크박스에 `/terms` · `/privacy` 실제 링크
 > 2. 약관 동의 버전 추적(최소 `policy_document_id/version + accepted_at` · 처리방침 등 재사용 가능한 공통 consent history 구조) + 기존 회원 v1 명시적 재동의 흐름
-> — 두 항목은 [`WO-O4O-INTEGRATED-TERMS-ACCEPTANCE-AND-SIGNUP-ALIGNMENT-V1`](../work-orders/WO-O4O-INTEGRATED-TERMS-ACCEPTANCE-AND-SIGNUP-ALIGNMENT-V1.md) 로 **완료(2026-09-17 · `c9ca615c0` · production migration SUCCESS)**. 남은 것은 시행일 확정 → ACTIVE → 4 서비스 `terms` v1 publish 뿐.
+> — 두 항목은 [`WO-O4O-INTEGRATED-TERMS-ACCEPTANCE-AND-SIGNUP-ALIGNMENT-V1`](../work-orders/WO-O4O-INTEGRATED-TERMS-ACCEPTANCE-AND-SIGNUP-ALIGNMENT-V1.md) 로 **완료(2026-09-17 · `c9ca615c0` · production migration SUCCESS)**. 시행일·공고일 = 2026-09-17 확정(최초 통합약관 + 기존 회원 명시적 재동의 구조이므로 제3조 ④·⑤ 의 7일/30일 사전 게시는 v1 **이후 변경**부터 적용 · 최초 v1 게시에는 적용하지 않음).
+> **게시 결과** (2026-09-18 00:11 UTC · admin policy API draft→publish · `terms` v1 · 시행 2026-09-17): kpa-society `ef46ab16…` · k-cosmetics `d67fb7bd…` · neture `f8b35104…` · pharmacy-hub `dd03e670…` (4 row 모두 `published`, 서비스별 별도 row/id 가 정상) · 게시 본문 = 이 파일을 `scripts/legal/render-policy-plain.mjs` 로 변환한 10,320자 · content sha256 `3304acb3c071f001…` 4/4 동일(public API `contentHash` 일치). 검증: [`CHECK-O4O-INTEGRATED-TERMS-V1-PUBLISH-AND-ACCEPTANCE-SMOKE-V1`](../checks/CHECK-O4O-INTEGRATED-TERMS-V1-PUBLISH-AND-ACCEPTANCE-SMOKE-V1.md)
 > **런타임 SSOT**: 게시 후 본문의 실제 공개 출처는 `service_policy_documents`(document_type=`terms`, status=`published`) 이며 각 서비스 약관 페이지(Neture `/terms` · KPA Society `/policy` · K-Cosmetics `terms` · PharmacyHub `/terms`)는 그 API 만 읽는다. 이 파일은 등록·게시에 사용하는 **원문 사본**이다 — 본문 변경은 이 파일 개정 → `service_policy_documents` 신규 version 게시 순으로 한다(코드 하드코딩 금지). 게시 시 [`scripts/legal/render-policy-plain.mjs`](../../scripts/legal/render-policy-plain.mjs) 로 서식 토큰 제거.
 > **사실 근거**: [`IR-O4O-INTEGRATED-TERMS-RUNTIME-CONTRACT-CENSUS-V1`](../investigations/IR-O4O-INTEGRATED-TERMS-RUNTIME-CONTRACT-CENSUS-V1.md) — §20 조문 구조 · §21 CONFIRMED 13건 반영. 소비자 주문·결제·환불·청약철회·유료 콘텐츠·구독은 현재 기능이 아니므로(IR §7) 공정위 전자상거래 표준약관(제10023호)의 구매·배송·환불 조와 콘텐츠산업진흥법 §28 거래 조는 **채택하지 않고** 제13조 트리거 조 1개로만 둔다.
 > **기존 회원 적용(확정)**: 명시적 재동의 방식. "계속 이용 = 동의 간주" 방식은 사용하지 않는다(최초 유효 통합약관이라 증빙 불확실 · 공정위 상담사례상 기존 계약의 약관 변경은 일방 공지만으로 부족할 수 있음).
@@ -16,7 +17,7 @@
 # O4O 통합 서비스 이용약관
 
 **버전: v1.0**
-**시행일: [게시 선행조건 완료 후 확정]**
+**시행일: 2026년 9월 17일**
 
 주식회사 쓰리라이프존(이하 "회사")이 운영하는 O4O 서비스의 공통 이용조건을 다음과 같이 정합니다.
 
@@ -442,7 +443,7 @@
 
 ### 제1조 시행일
 
-이 약관은 **[시행일 확정 필요]**부터 시행합니다.
+이 약관은 **2026년 9월 17일**부터 시행합니다.
 
 ### 제2조 최초 시행 및 기존 회원에 대한 적용
 
@@ -456,8 +457,8 @@
 
 ---
 
-**공고일: [게시 선행조건 완료 후 확정]**
-**시행일: [게시 선행조건 완료 후 확정]**
+**공고일: 2026년 9월 17일**
+**시행일: 2026년 9월 17일**
 
 > **게시 본문 끝** — 아래 부록은 `> ` 블록이므로 게시본에서 제외된다.
 >
