@@ -1,6 +1,6 @@
 # CHECK-O4O-STORE-INTERNAL-AI-RETIREMENT-V1
 
-> **WO**: [`WO-O4O-STORE-INTERNAL-AI-RETIREMENT-V1`](../work-orders/WO-O4O-STORE-INTERNAL-AI-RETIREMENT-V1.md) · **실행일**: 2026-09-19 · **base**: `origin/main` `f51d5a362`(접수) → WO `6a0bdf5c0` → 코드 commit `366e5965b`
+> **WO**: [`WO-O4O-STORE-INTERNAL-AI-RETIREMENT-V1`](../work-orders/WO-O4O-STORE-INTERNAL-AI-RETIREMENT-V1.md) · **실행일**: 2026-09-19 · **base**: `origin/main` `f51d5a362`(접수) → WO `6a0bdf5c0` → 코드 commit `366e5965b` → lint fix `e1cc661ee`
 > **판정**: **COMPLETE_WITH_SMOKE_PENDING** — Store dead AI wiring 0 · QR legacy Gemini 생성 은퇴 · backend `/api/ai/qr-description` 제거(운영 404 확인) · spec 4 suites 202 PASS · 4 build · 배포 3 서비스 + API success · bundle 반영 확인 · CI green(`35406187412`, lint ratchet 1건 수정 후) · 브라우저 smoke = store-owner 계정 blocker 지속 → PENDING_USER_VERIFICATION(§7)
 
 ## 1. Fresh Census — Store / non-Store 재분류 (route 근거)
