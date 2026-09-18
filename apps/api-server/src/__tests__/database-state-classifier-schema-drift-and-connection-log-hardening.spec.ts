@@ -23,6 +23,7 @@
 import fs from 'fs';
 import path from 'path';
 import { spawnSync } from 'child_process';
+import { createHash } from 'crypto';
 import { EXPECTED_SCHEMA_STATES, expectedSchemaStateFor, expectedSchemaStateLabel } from '../database/incremental/expected-schema-states.js';
 import { LEGACY_HISTORY_BASELINE } from '../database/incremental/legacy-history-baseline.js';
 import { incrementalMigrationNames } from '../database/incremental/manifest.js';
@@ -187,7 +188,7 @@ describe('ordered history fingerprint (legacy production history provenance)', (
     expect(hashOrderedHistoryNames([])).toBe('e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855');
     // sha256("A1700000000001\nB1700000000002\n")
     expect(hashOrderedHistoryNames(['A1700000000001', 'B1700000000002'])).toBe(
-      require('crypto').createHash('sha256').update('A1700000000001\nB1700000000002\n', 'utf8').digest('hex'),
+      createHash('sha256').update('A1700000000001\nB1700000000002\n', 'utf8').digest('hex'),
     );
     expect(hashOrderedHistoryNames(['A1700000000001', 'B1700000000002'])).not.toBe(hashOrderedHistoryNames(['B1700000000002', 'A1700000000001']));
     expect(hashOrderedHistoryNames(['X', 'X'])).not.toBe(hashOrderedHistoryNames(['X']));
