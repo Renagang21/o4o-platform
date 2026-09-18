@@ -234,7 +234,7 @@ export class StoreOwnerTerminationService {
       [c.organizationId],
     );
     const pops = await q.query(
-      `SELECT id, service_key, title, slug, excerpt, content, status, copied_from_id, created_at, updated_at
+      `SELECT id, service_key, title, slug, excerpt, content, status, created_at, updated_at
          FROM store_pops
         WHERE store_id=$1 AND service_key=ANY($2::text[]) AND author_role='store'
         ORDER BY created_at, id`,
@@ -243,6 +243,13 @@ export class StoreOwnerTerminationService {
     const blogs = await q.query(
       `SELECT id, service_key, title, slug, excerpt, content, status, created_at, updated_at
          FROM store_blog_posts
+        WHERE store_id=$1 AND service_key=ANY($2::text[]) AND author_role='store'
+        ORDER BY created_at, id`,
+      [c.organizationId, cfg.contentKeys],
+    );
+    const videos = await q.query(
+      `SELECT id, service_key, title, slug, description, video_url, status, copied_from_id, created_at, updated_at
+         FROM store_videos
         WHERE store_id=$1 AND service_key=ANY($2::text[]) AND author_role='store'
         ORDER BY created_at, id`,
       [c.organizationId, cfg.contentKeys],
@@ -286,6 +293,7 @@ export class StoreOwnerTerminationService {
         executionAssets,
         storePops: pops,
         storeBlogPosts: blogs,
+        storeVideos: videos,
         qrCodes: qr,
         multilingual: { groups: multilingualGroups, pages: multilingualPages },
       },
@@ -654,9 +662,13 @@ export class StoreOwnerTerminationService {
     return this.previewPurge(caseId);
   }
 
-  async runDueCases(now = new Date()): Promise<{ terminated: number; purged: number; failed: number }> {
+  /**
+   * Scheduler owns termination + overdue detection only.
+   * Destructive purge requires the admin API's explicit {mode:'apply'} operation.
+   * This prevents a newly-created production case from turning into an unattended delete job.
+   */
+  async runDueCases(now = new Date()): Promise<{ terminated: number; overduePurges: number; failed: number }> {
     let terminated = 0;
-    let purged = 0;
     let failed = 0;
 
     const dueTermination = await this.dataSource.query(
@@ -680,11 +692,12 @@ export class StoreOwnerTerminationService {
         ORDER BY purge_due_at, id LIMIT 50`,
       [now.toISOString()],
     );
-    for (const row of duePurge) {
-      try { await this.purgeCase(row.id, { dryRun:false, now }); purged++; }
-      catch (error) { failed++; logger.error('[store-owner-termination] scheduled purge incomplete', { caseId: row.id, error: error instanceof Error ? error.message : String(error) }); }
+    if (duePurge.length > 0) {
+      logger.warn('[store-owner-termination] purge approval required', {
+        overdueCases: duePurge.length,
+      });
     }
-    return { terminated, purged, failed };
+    return { terminated, overduePurges: duePurge.length, failed };
   }
 }
 
