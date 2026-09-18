@@ -2,7 +2,7 @@
 
 > **종류**: Service Separation / Runtime Ownership Migration / LMS Adoption
 > **상태**: READY FOR EXECUTION (핸드오프 전용 · 명시 지시 전 실행 금지)
-> **도메인 확정**: `LECTURE_DOMAIN = lecture.neture.co.kr` (2026-09-18 확정)
+> **도메인 확정**: `LECTURE_DOMAIN = study.neture.co.kr` (2026-09-18 확정)
 > **실행 전제**: [`IR-O4O-LECTURE-INDEPENDENT-SERVICE-PRODUCTION-DATA-CENSUS-V1`](../investigations/IR-O4O-LECTURE-INDEPENDENT-SERVICE-PRODUCTION-DATA-CENSUS-V1.md) `= PASS` (2026-09-18 · `5ba9481af`)
 > **작성 기준일**: 2026-09-18
 > **본 문서 성격**: 구현 지시용 WO. 본 문서 작성 자체로 코드·DB·배포를 변경하지 않는다.
@@ -59,7 +59,7 @@ LECTURE_ROLE_PREFIX = lecture
 
 LECTURE_WEB_APP_DIRECTORY = services/web-lecture
 LECTURE_CLOUD_RUN_SERVICE = lecture-web
-LECTURE_DOMAIN = lecture.neture.co.kr
+LECTURE_DOMAIN = study.neture.co.kr
 ```
 
 Role:
@@ -96,7 +96,7 @@ Identity
 `LECTURE_DOMAIN`은 다음으로 확정한다 (2026-09-18).
 
 ```text
-LECTURE_DOMAIN = lecture.neture.co.kr
+LECTURE_DOMAIN = study.neture.co.kr
 ```
 
 * 호스트명이 `neture.co.kr` 하위라는 사실은 DNS 배치일 뿐이다. Lecture 는 Neture 의 하위 기능이 아니며 Neture membership · role · runtime 에 의존하지 않는다 (§3.4 · §7.3).
@@ -1003,7 +1003,7 @@ Core 패키지 자체는 유지한다.
     role prefix = lecture
     web app = services/web-lecture
     Cloud Run = lecture-web
-    domain = lecture.neture.co.kr
+    domain = study.neture.co.kr
 
 03. Lecture Service Foundation
     catalog / service key / roles / legal / deploy / CORS
