@@ -46,6 +46,28 @@ export interface ApproveResult {
   rejection_reason?: string | null;
 }
 
+export class StoreOwnerBusinessInfoRequiredError extends Error {
+  readonly code = 'STORE_OWNER_BUSINESS_INFO_REQUIRED';
+  readonly httpStatus = 400;
+  constructor(readonly missingFields: string[]) {
+    super('매장 경영자 활성화에 필요한 사업자정보가 누락되었습니다.');
+    this.name = 'StoreOwnerBusinessInfoRequiredError';
+  }
+}
+
+const STORE_OWNER_BUSINESS_INFO_FIELDS = [
+  'businessName',
+  'representativeName',
+  'businessNumber',
+  'businessAddress',
+  'businessPhone',
+] as const;
+
+function findMissingStoreOwnerBusinessInfo(raw: unknown): string[] {
+  const info = raw && typeof raw === 'object' ? raw as Record<string, unknown> : {};
+  return STORE_OWNER_BUSINESS_INFO_FIELDS.filter((key) => String(info[key] ?? '').trim() === '');
+}
+
 /**
  * WO-O4O-MEMBERSHIP-REJECTION-CORE-CORRECTNESS-V1
  *
@@ -375,6 +397,27 @@ export class MembershipApprovalService {
         throw new Error(`CRITICAL: service_memberships.user_id is null for id=${membershipId}`);
       }
 
+      const memberRole = resolveGrantedRole(membership.service_key, membership.role || 'member')!;
+      if (
+        memberRole === 'cosmetics:store_owner' ||
+        memberRole === 'pharmacy-hub:store_owner'
+      ) {
+        const [userRow] = await queryRunner.query(
+          `SELECT "businessInfo" FROM users WHERE id = $1 LIMIT 1`,
+          [userId],
+        );
+        const missingFields = findMissingStoreOwnerBusinessInfo(userRow?.businessInfo);
+        if (missingFields.length > 0) {
+          logger.warn('[APPROVAL][BUSINESS-INFO] store_owner activation blocked', {
+            membershipId,
+            userId,
+            serviceKey: membership.service_key,
+            missingFields,
+          });
+          throw new StoreOwnerBusinessInfoRequiredError(missingFields);
+        }
+      }
+
       // STEP1: Activate membership
       logger.info('[APPROVAL][STEP1] membership UPDATE', { membershipId });
 
@@ -396,7 +439,6 @@ export class MembershipApprovalService {
       );
 
       // STEP3: Ensure role_assignment exists (idempotent — ON CONFLICT updates timestamp)
-      const memberRole = resolveGrantedRole(membership.service_key, membership.role || 'member')!;
       if (isBareAdminTierRole(memberRole)) {
         logger.warn('[APPROVAL][STEP3] bare admin-tier role grant SKIPPED', {
           userId,

@@ -15,7 +15,7 @@ import { hashPassword } from '../../utils/auth.utils.js';
 import logger from '../../utils/logger.js';
 // WO-O4O-KPA-PROFILE-WRITE-JSONB-CONCAT-CONVERGENCE-V1: businessInfo 부분 갱신 (스냅샷 되쓰기 제거)
 import { buildBusinessInfoUpdate } from '../../utils/business-info-write.js';
-import { MembershipApprovalService } from '../../services/approval/MembershipApprovalService.js';
+import { MembershipApprovalService, StoreOwnerBusinessInfoRequiredError } from '../../services/approval/MembershipApprovalService.js';
 import { roleAssignmentService } from '../../modules/auth/services/role-assignment.service.js';
 import { roleService } from '../../modules/auth/services/role.service.js';
 import { isOperationalRole } from '../../types/roles.js';
@@ -663,6 +663,15 @@ export class MembershipConsoleController {
       }).catch(() => {});
       res.json({ success: true, message: 'Membership approved', membership });
     } catch (error) {
+      if (error instanceof StoreOwnerBusinessInfoRequiredError) {
+        res.status(error.httpStatus).json({
+          success: false,
+          error: error.message,
+          code: error.code,
+          missingFields: error.missingFields,
+        });
+        return;
+      }
       logger.error('[MembershipConsole] approveMembership error', {
         membershipId: req.params.membershipId,
         error: error instanceof Error ? error.message : String(error),
