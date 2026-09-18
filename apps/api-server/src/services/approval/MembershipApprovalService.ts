@@ -17,6 +17,11 @@ import { AppDataSource } from '../../database/connection.js';
 import logger from '../../utils/logger.js';
 import { resolveRolePrefixFromCanonicalServiceKey } from '@o4o/security-core';
 import { isAdminTierRoleName } from '../../utils/role-revoke-safety.js';
+import {
+  missingStoreOwnerBusinessFields,
+  requiresStoreOwnerBusinessGate,
+  StoreOwnerBusinessInfoRequiredError,
+} from './store-owner-business-info.js';
 
 /**
  * WO-O4O-KPA-MEMBERSHIP-STATUS-SINGLE-TRANSACTION-CONVERGENCE-V1
@@ -375,6 +380,28 @@ export class MembershipApprovalService {
         throw new Error(`CRITICAL: service_memberships.user_id is null for id=${membershipId}`);
       }
 
+      // WO-O4O-STORE-OWNER-AGREEMENT-PUBLISH-PREREQUISITES-V1 §4:
+      // K-Cosmetics / PharmacyHub store_owner 는 active membership/role 을 만들기 전에
+      // 최소 사업자정보 5항목을 서버에서 재검증한다. 프론트 validation 우회 방지.
+      const proposedRole = resolveGrantedRole(membership.service_key, membership.role || 'member')!;
+      if (requiresStoreOwnerBusinessGate(membership.service_key, proposedRole)) {
+        const businessRows = await queryRunner.query(
+          `SELECT "businessInfo" FROM users WHERE id = $1 LIMIT 1`,
+          [userId],
+        );
+        const missingFields = missingStoreOwnerBusinessFields(businessRows?.[0]?.businessInfo);
+        if (missingFields.length > 0) {
+          logger.warn('[APPROVAL][BUSINESS_INFO] store owner approval blocked', {
+            membershipId,
+            userId,
+            serviceKey: membership.service_key,
+            missingFields,
+          });
+          await queryRunner.rollbackTransaction();
+          throw new StoreOwnerBusinessInfoRequiredError(missingFields);
+        }
+      }
+
       // STEP1: Activate membership
       logger.info('[APPROVAL][STEP1] membership UPDATE', { membershipId });
 
@@ -396,7 +423,7 @@ export class MembershipApprovalService {
       );
 
       // STEP3: Ensure role_assignment exists (idempotent — ON CONFLICT updates timestamp)
-      const memberRole = resolveGrantedRole(membership.service_key, membership.role || 'member')!;
+      const memberRole = proposedRole;
       if (isBareAdminTierRole(memberRole)) {
         logger.warn('[APPROVAL][STEP3] bare admin-tier role grant SKIPPED', {
           userId,
