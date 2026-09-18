@@ -34,3 +34,7 @@ export function TermsPage() {
 export function PrivacyPage() {
   return <PolicyDocumentViewer serviceKey={SERVICE_KEY} documentType="privacy" heading="개인정보처리방침" loadPolicy={loadPolicy} />;
 }
+
+export function StoreOwnerAgreementPage() {
+  return <PolicyDocumentViewer serviceKey={SERVICE_KEY} documentType="store_owner_agreement" heading="매장 경영자 이용계약" loadPolicy={loadPolicy} />;
+}
