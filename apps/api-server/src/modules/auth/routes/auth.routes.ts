@@ -14,6 +14,7 @@ import {
   VerificationController,
 } from '../controllers/index.js';
 import { HandoffController } from '../controllers/handoff.controller.js';
+import { GoogleAuthController } from '../controllers/google-auth.controller.js';
 import {
   validateDto,
 } from '../../../common/middleware/validation.middleware.js';
@@ -28,6 +29,8 @@ import {
   PasswordResetRequestDto,
   PasswordResetDto,
   EmailVerificationDto,
+  GoogleLoginRequestDto,
+  GoogleSignupRequestDto,
 } from '../dto/index.js';
 import { asyncHandler } from '../../../middleware/error-handler.js';
 
@@ -58,6 +61,22 @@ router.post(
   '/signup',
   validateDto(RegisterRequestDto),
   asyncHandler(AuthRegisterController.register)
+);
+
+// WO-O4O-GOOGLE-ONLY-SIGNUP-LOGIN-V1 (WO-2D): Google-only Signup/Login
+// GET  /api/v1/auth/google/config  - 공개 Client ID + enabled (secret 없음)
+// POST /api/v1/auth/google/login   - { idToken, serviceKey? } → 세션 | 404 GOOGLE_SIGNUP_REQUIRED
+// POST /api/v1/auth/google/signup  - { idToken, consents } → users + linked_accounts → 세션
+router.get('/google/config', asyncHandler(GoogleAuthController.config));
+router.post(
+  '/google/login',
+  validateDto(GoogleLoginRequestDto),
+  asyncHandler(GoogleAuthController.login)
+);
+router.post(
+  '/google/signup',
+  validateDto(GoogleSignupRequestDto),
+  asyncHandler(GoogleAuthController.signup)
 );
 
 // POST /api/v1/auth/check-email - Check email existence (multi-service registration UX)
