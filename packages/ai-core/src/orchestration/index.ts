@@ -36,6 +36,7 @@ export type {
   AIProvider,
   AIProviderConfig,
   AIProviderResponse,
+  AIGroundingMetadata,
   AIStreamChunk,
   AIStreamProvider,
   AIContext,

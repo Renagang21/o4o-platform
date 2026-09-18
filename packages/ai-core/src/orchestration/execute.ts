@@ -16,7 +16,7 @@
  */
 
 import { randomUUID } from 'crypto';
-import type { AIProviderConfig, AIProviderResponse, AIProvider as AIProviderInterface } from './types.js';
+import type { AIGroundingMetadata, AIProviderConfig, AIProviderResponse, AIProvider as AIProviderInterface } from './types.js';
 import { GeminiProvider } from './providers/gemini.provider.js';
 import { OpenAIProvider } from './providers/openai.provider.js';
 
@@ -36,6 +36,12 @@ export interface ExecuteRequest {
   provider?: AIExecuteProviderId;
   /** 응답 모드: 'json' (기본) 또는 'text' (free-text) */
   responseMode?: ResponseMode;
+  /**
+   * true 면 Gemini 네이티브 Google Search grounding(범용 Web Research) 활성화.
+   * gemini provider 전용 · grounding 시 응답 모드는 text 로 분리된다(JSON 강제와 병용 불가).
+   * 명시하지 않으면 기존 동작 그대로.
+   */
+  grounding?: boolean;
   /** 설정 — 직접 객체 또는 async resolver callback */
   config: AIProviderConfig | (() => Promise<AIProviderConfig>);
   /** Retry 설정 override */
@@ -65,6 +71,8 @@ export interface ExecuteResult {
   durationMs: number;
   /** 요청 고유 ID */
   requestId: string;
+  /** grounding(Web Research) 요청 시 근거 메타데이터 (additive · 비-grounding 응답엔 없음) */
+  grounding?: AIGroundingMetadata;
 }
 
 // ─────────────────────────────────────────────────────
@@ -116,11 +124,21 @@ export async function execute(request: ExecuteRequest): Promise<ExecuteResult> {
     throw new Error(`AI_NOT_CONFIGURED: ${providerId} API key missing`);
   }
 
+  // ── Grounding 해결 ── grounding 은 gemini 전용이다.
+  const grounding = request.grounding ?? config.grounding;
+  if (grounding && providerId !== 'gemini') {
+    throw new Error(
+      `INVALID_ARGUMENT: grounding is only supported by the gemini provider (got '${providerId}')`,
+    );
+  }
+
   // ── Provider config 조립 ──
+  // grounding 이면 응답 모드 기본값을 'text' 로 분리한다(JSON 강제와 병용 불가).
   const providerConfig: AIProviderConfig = {
     ...config,
-    responseMode: request.responseMode ?? config.responseMode ?? 'json',
+    responseMode: request.responseMode ?? config.responseMode ?? (grounding ? 'text' : 'json'),
     timeoutMs: request.timeoutMs ?? config.timeoutMs,
+    ...(grounding !== undefined ? { grounding } : {}),
   };
 
   // ── Retry loop ──
@@ -143,6 +161,7 @@ export async function execute(request: ExecuteRequest): Promise<ExecuteResult> {
         completionTokens: response.completionTokens,
         durationMs: Date.now() - start,
         requestId,
+        ...(response.grounding !== undefined ? { grounding: response.grounding } : {}),
       };
     } catch (err) {
       lastError = err;
