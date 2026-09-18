@@ -20,6 +20,7 @@ import { ActionLogService } from '@o4o/action-log-core';
 // Controllers
 import { createSupplierManagementController } from './controllers/supplier-management.controller.js';
 import { createSupplierProductController } from './controllers/supplier-product.controller.js';
+import { createSupplierProductCandidateController } from './controllers/supplier-product-candidate.controller.js';
 // WO-O4O-PHARMACYHUB-SERVICE-MODEL-REALIGNMENT-AND-SUPPLIER-ROLE-REMOVAL-V1:
 // 공급자 직접 opt-in 서비스(운영자 승인 없음) 제공 설정·주문 처리 — Pharmacy-Hub 에서 이전.
 import { createSupplierServiceDeliveryController } from './controllers/supplier-service-delivery.controller.js';
@@ -83,6 +84,8 @@ export default function createNetureModuleRoutes(dataSource: DataSource): Expres
   router.use('/supplier/services', createSupplierServiceDeliveryController(dataSource));
   router.use('/supplier', createSupplierManagementController(dataSource));
   router.use('/supplier', createSupplierProductController(dataSource));
+  // WO-O4O-SUPPLIER-SINGLE-PRODUCT-CANDIDATE-INTAKE-V1: 공급자 단건 제품 후보 intake (ProductCandidate 만 · Master/Offer 0)
+  router.use('/supplier', createSupplierProductCandidateController(dataSource));
   // WO-O4O-NETURE-SUPPLIER-STORE-DESCRIPTION-DRAFT-SAVE-AND-REVIEW-QUEUE-V1: 공급자 매장용(STORE) 설명서 저작/저장
   router.use('/supplier', createSupplierStoreDescriptionController(dataSource));
   router.use('/supplier', createSupplierOrderController(dataSource));
