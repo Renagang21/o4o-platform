@@ -39,6 +39,10 @@ const FIELD_LABEL: Record<string, string> = {
   name: '이름',
   phone: '연락처',
   businessName: '약국명',
+  representativeName: '대표자명',
+  businessNumber: '사업자등록번호',
+  businessAddress: '사업장 주소',
+  businessPhone: '사업장 연락처',
   email: '이메일',
   password: '비밀번호',
 };
@@ -52,6 +56,10 @@ export default function JoinPage() {
     name: '',
     phone: '',
     businessName: '',
+    representativeName: '',
+    businessNumber: '',
+    businessAddress: '',
+    businessPhone: '',
   });
   const [error, setError] = useState<string | null>(null);
   const [missing, setMissing] = useState<string[]>([]);
@@ -83,7 +91,15 @@ export default function JoinPage() {
         name: form.name,
         phone: form.phone,
         // 약국명은 약국 경영자 신청에만 보낸다 (백엔드 검증 축과 같은 표).
-        ...(roleType === 'store_owner' ? { businessName: form.businessName } : {}),
+        ...(roleType === 'store_owner'
+          ? {
+              businessName: form.businessName,
+              representativeName: form.representativeName,
+              businessNumber: form.businessNumber,
+              businessAddress: form.businessAddress,
+              businessPhone: form.businessPhone.replace(/\D/g, ''),
+            }
+          : {}),
         tos: agreeTerms,
         privacyAccepted: agreePrivacy,
         // published 이용약관 식별자 (게시 전에는 비어 있고 서버도 요구하지 않는다)
@@ -179,15 +195,55 @@ export default function JoinPage() {
           </label>
 
           {roleType === 'store_owner' && (
-            <label className="block text-sm">
-              약국명
-              <input
-                value={form.businessName}
-                onChange={set('businessName')}
-                required
-                className="mt-1 w-full rounded border border-gray-300 px-3 py-2"
-              />
-            </label>
+            <div className="space-y-3 rounded border border-gray-200 bg-gray-50 p-3">
+              <label className="block text-sm">
+                약국명 / 상호
+                <input
+                  value={form.businessName}
+                  onChange={set('businessName')}
+                  required
+                  className="mt-1 w-full rounded border border-gray-300 bg-white px-3 py-2"
+                />
+              </label>
+              <label className="block text-sm">
+                대표자명
+                <input
+                  value={form.representativeName}
+                  onChange={set('representativeName')}
+                  required
+                  className="mt-1 w-full rounded border border-gray-300 bg-white px-3 py-2"
+                />
+              </label>
+              <label className="block text-sm">
+                사업자등록번호
+                <input
+                  value={form.businessNumber}
+                  onChange={set('businessNumber')}
+                  required
+                  placeholder="000-00-00000"
+                  className="mt-1 w-full rounded border border-gray-300 bg-white px-3 py-2"
+                />
+              </label>
+              <label className="block text-sm">
+                사업장 주소
+                <input
+                  value={form.businessAddress}
+                  onChange={set('businessAddress')}
+                  required
+                  className="mt-1 w-full rounded border border-gray-300 bg-white px-3 py-2"
+                />
+              </label>
+              <label className="block text-sm">
+                사업장 연락처
+                <input
+                  value={form.businessPhone}
+                  onChange={set('businessPhone')}
+                  required
+                  placeholder="숫자만 입력"
+                  className="mt-1 w-full rounded border border-gray-300 bg-white px-3 py-2"
+                />
+              </label>
+            </div>
           )}
 
           <fieldset className="space-y-2 rounded border border-gray-200 p-3">
