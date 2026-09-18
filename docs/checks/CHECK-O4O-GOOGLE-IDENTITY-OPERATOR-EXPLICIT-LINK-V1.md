@@ -39,6 +39,8 @@ baseline(2026-09-18 14:02Z): users 2 · linked_accounts 1(테스트 계정) · �
 
 **⚠️ 발견(2026-09-18 21:55Z read-only · 범위 밖 · 보고만):** 운영자 계정(`cfd2a5e7`)이 **E2E Auth Runtime 워크플로에 의해 push 마다 잠긴다.** `account_activities` `login_email` 실패가 09-17 05:00Z 이후 매 시간대 33~39건씩 묶여 있고(총 10회), 각 묶음이 `e2e-auth-runtime.yml` 실행 시각(09-17 05:15·06:57·13:42Z, 09-18 02:07·04:52·05:51·14:22Z)과 일치한다. 워크플로는 `packages/auth-client/src/**`·`auth-react/src/**` 변경 push 에 자동 실행되며 `E2E_{KPA|KCOS|NETURE}_ADMIN_*` secret(WO-2C reset 이후 stale)으로 3 서비스 × 반복 로그인 → 같은 users row 에 `loginAttempts` 누적 → 5회 이상에서 **30분 잠금**(`handleFailedLogin`). 이번 커밋 `35548dd65` 도 auth 패키지를 건드려 14:22~14:28Z 잠금을 유발했다. 14:04:54Z 의 `invalid_password` 1건 + 14:05Z `account_locked` 4건은 사용자 시도로 보인다. 현재: `lockedUntil` 14:34:54Z 만료(잠금 해제) · **`loginAttempts=8` 잔존 → 다음 password 실패 1회에 즉시 30분 재잠금**, 성공 로그인 시 0 리셋. **제안(별도 승인):** ① `e2e-auth-runtime.yml` push 트리거 제거 또는 워크플로 비활성(WO-2F 에서 Google 경로 기준 재정의 전까지) — CI 변경 = 중지 조건 · ② `loginAttempts` 1행 리셋은 UPDATE 이므로 사용자 명시 승인 시에만.
 
+**조치(2026-09-19 · 사용자 승인 2건):** ① `f51d5a362` — `e2e-auth-runtime.yml` `on.push` 블록만 제거, `workflow_dispatch` 유지 · secret 미삭제 · 이 push 에서 E2E 미실행 확인(CI Pipeline · CodeQL 만). 직전 21:55:58Z 에 다른 PC 의 PR #223 merge(`3e56425b7`)가 마지막으로 한 번 더 실행돼 34회 실패 추가(잠금 23:15Z 까지 · loginAttempts 10). ② 22:58Z 운영자 1행 `UPDATE users SET "loginAttempts"=0, "lockedUntil"=NULL WHERE id=(SELECT … password IS NOT NULL AND id LIKE 'cfd2a5e7%')` — `UPDATE 1` · after: loginAttempts 0 · lockedUntil NULL · password/status 불변 · counts users 2 / linked 1 / creds 5 / memb 5 / roles 11 불변 · 테스트 계정 무접촉. 이후 auth 패키지 push 로 인한 재잠금 경로는 닫혔다.
+
 **주의(WO §3):** 이메일 로그인은 service_credentials 해시를 우선 쓰므로 평소 비밀번호가 `users.password` 와 다를 수 있다. Smoke 1 에서 `INVALID_PASSWORD` 가 나오면 `PUT /users/password`(serviceKey 없이) 로 `users.password` 를 먼저 정렬한 뒤 재시도한다 — 값은 추측·조회하지 않는다.
 
 ## 4. Git
@@ -47,6 +49,9 @@ baseline(2026-09-18 14:02Z): users 2 · linked_accounts 1(테스트 계정) · �
 |---|---|
 | `5a07042cf` | WO 접수 · 선행 CHECK COMPLETE |
 | `35548dd65` | 서버 · 패키지 · neture 화면 · 테스트 |
-| (본 커밋) | CHECK 초안 |
+| `706f82108` | CHECK 초안 |
+| `d5be1eb31` | 잠금 원인 기록 |
+| `f51d5a362` | e2e-auth-runtime push 트리거 제거 |
+| (본 커밋) | 잠금 reset 기록 |
 
-문서 정합: 발견 0건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 1건(E2E Auth Runtime 워크플로 = 운영자 계정 잠금 유발 · push 트리거 제거/비활성)
+문서 정합: 발견 0건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 1건(E2E Auth Runtime 워크플로 Google-only 재정의 = WO-2F · push 트리거는 제거 완료)
