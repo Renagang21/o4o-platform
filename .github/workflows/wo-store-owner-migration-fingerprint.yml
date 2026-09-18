@@ -1,0 +1,82 @@
+name: WO Store Owner Migration Fingerprint
+
+on:
+  push:
+    branches:
+      - wo/store-owner-agreement-prereq-v1
+    paths:
+      - 'apps/api-server/src/database/migrations/1789695000000-CreateStoreOwnerTerminationCases.ts'
+      - 'apps/api-server/src/database/incremental/manifest.ts'
+      - 'apps/api-server/src/database/incremental/expected-schema-states.ts'
+      - 'apps/api-server/src/services/**'
+      - 'apps/api-server/src/routes/**'
+      - 'apps/api-server/src/modules/**'
+      - 'apps/api-server/src/common/**'
+      - 'apps/api-server/src/auth/**'
+      - 'apps/api-server/src/utils/**'
+      - 'packages/shared-space-ui/**'
+      - 'services/web-kpa-society/**'
+      - 'services/web-k-cosmetics/**'
+      - 'services/web-pharmacy-hub/**'
+      - '.github/workflows/wo-store-owner-migration-fingerprint.yml'
+
+jobs:
+  verify-and-fingerprint:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: o4o
+          POSTGRES_PASSWORD: o4o
+          POSTGRES_DB: o4o_store_owner_wo
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U o4o -d o4o_store_owner_wo"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+
+    env:
+      NODE_ENV: test
+      DB_HOST: 127.0.0.1
+      DB_PORT: '5432'
+      DB_USERNAME: o4o
+      DB_PASSWORD: o4o
+      DB_NAME: o4o_store_owner_wo
+      DB_SSL: 'false'
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup build environment
+        uses: ./.github/actions/setup-build-env
+        with:
+          node-version: '22.18.0'
+          strict-lockfile: 'true'
+
+      - name: API typecheck
+        run: pnpm --filter @o4o/api-server type-check
+
+      - name: Store frontends typecheck
+        run: |
+          pnpm --filter @o4o/shared-space-ui build
+          pnpm --filter @o4o/web-kpa-society exec tsc -b
+          pnpm --filter @o4o/web-k-cosmetics exec tsc -b
+          pnpm --filter @o4o/web-pharmacy-hub exec tsc -b
+
+      - name: Capture unregistered expected fingerprint
+        shell: bash
+        run: |
+          set +e
+          output="$(pnpm --filter @o4o/api-server migration:run 2>&1)"
+          status=$?
+          set -e
+          printf '%s\n' "$output"
+          printf '%s\n' "$output" | grep 'LIVE_FINGERPRINT'
+          printf '%s\n' "$output" | grep 'POST_MIGRATION_SCHEMA_ASSERTION = FAILED'
+          if [ "$status" -eq 0 ]; then
+            echo "Expected first pass to fail because M7 state is not registered yet"
+            exit 1
+          fi
