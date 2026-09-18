@@ -107,7 +107,52 @@ production history 재작성 0 · production business data 정리 0 · checkout 
 
 ## 10. PR-CI · DEPLOY · POST-CHECK
 
-(머지 · 배포 후 기입)
+### 10-1. 브랜치 · PR
+
+| 항목 | 값 |
+|---|---|
+| 브랜치 | `work/retired-service-migration-history-final-closure-v1` |
+| 커밋 | `d51e1e694` (WO 본 커밋 · 134 files +1039/−13593) → `ee3efe48f` (merge `8eb16083b`) → `3f9b8065d` (ESLint ratchet 47>46 해소: 신규 spec 의 `require('crypto')` → ESM `import { createHash }`) → `18b4db6f0` (Sonar S4158 `INCREMENTAL_MIGRATIONS=[]` map 경고 — append-only registry 주석 + `NOSONAR`) → `d248d2433` (merge `89ef8f68b`) → `032d91528` (merge `33c75d925`) |
+| 머지 전 반복 검증 (커밋마다) | census `git grep -niE` 0 · 파일명 0 · `check-migration-contract.mjs` 21 pass/0 fail · `tsc --noEmit` exit 0 · `git merge-base --is-ancestor origin/main HEAD` true |
+| PR | **#221** → main **`25e0f4bf7`** (머지 커밋 · 직접 push 없음) |
+
+### 10-2. CI
+
+| run | HEAD | 결과 |
+|---|---|---|
+| `35306448671` | `d51e1e694`/`ee3efe48f` | Code Quality **fail** (ESLint ratchet 47 > baseline 46 · 원인 = 내 신규 spec 의 `require`) · Jest pass · CodeQL pass |
+| `35307237216` | `3f9b8065d` | Code Quality pass · API Server Jest pass · Build pass · CodeQL pass · SonarCloud fail |
+| `35308268643` | `18b4db6f0` | 동일 (Sonar reliability B → OK · duplication 만 잔존) |
+| `35309273914` | `d248d2433` | **API Server Jest fail 12 suites** (`store-owner*` · `policy-acceptance` · `MembershipApprovalService.*`) — main `55c60e081`(타 세션) 이 main 자체에서 동일 실패. 본 WO 무관 = 중지 조건 → 사용자 판단 **"main 이 녹색이 될 때까지 대기"** |
+| main 복구 | `da357c9cc`(→2 suites) · `33c75d925`(GREEN · run `35318309891`) — 타 세션 |
+| `35319555079` | `032d91528` | API Server Jest pass · Code Quality pass · Build pass · CodeQL pass · Analyze pass · **SonarCloud fail** |
+
+SonarCloud (merge blocker 아님 · `main` 비보호): `new_duplicated_lines_density` 18.6% > 3% — 전량 생성물 `apps/api-server/src/database/bootstrap/canonical-schema-baseline.ts`(163 dup lines · `pg_dump` 기반 DDL 문자열). CPD 제외(`sonar.cpd.exclusions`)는 CI 인프라 변경 = 중지 조건 → 미수정 · 보고만.
+
+### 10-3. DEPLOY (`25e0f4bf7`)
+
+| 항목 | 값 |
+|---|---|
+| Deploy API Server (Cloud Run) | run `35320745216` · completed **success** · job build-and-deploy success |
+| Migration Job 실행 | `o4o-api-migrations-nz25p` · successfully completed |
+| Job 로그 (Cloud Run Job execution log) | `Incremental manifest: 0 migration(s) after baseline 2026-09-18-id685` · `DATABASE_STATE = LEGACY_ESTABLISHED` · reason `typeorm_migrations 684 rows; legacy history fingerprint (684 rows) == baseline, core tables present, no marker; incremental prefix 0 (pending 0); live fingerprint == expected` · `o4o_schema_baselines: absent` · `CURRENT_INCREMENTAL_PREFIX = 0 / 0` · `EXPECTED_FINGERPRINT = 0ca1a71b…54df70 (5745 lines)` · `LIVE_FINGERPRINT = 0ca1a71b…54df70 (5745 lines)` · **`LEGACY_HISTORY_FINGERPRINT = MATCH`** · `PRE_MIGRATION_SCHEMA_ASSERTION = PASS` · **`BOOTSTRAP_EXECUTION = SKIPPED`** · **`HISTORICAL_REPLAY = ZERO`** · **`INCREMENTAL_PENDING = 0`** · **`INCREMENTAL_EXECUTED = 0`** · `POST_MIGRATION_SCHEMA_ASSERTION = PASS` · **`MIGRATION_JOB = SUCCESS`** |
+| Cloud Run service | `o4o-core-api` latest ready revision `o4o-core-api-03710-k2f` · traffic 100% |
+| Health | `https://api.neture.co.kr/health` **200** · `/health/ready` **200** (READY + DB `SELECT 1`) |
+
+### 10-4. 운영 사후 점검 (SELECT only · `default_transaction_read_only = on` · 배포 후)
+
+| 항목 | 값 | 판정 |
+|---|---|---|
+| `typeorm_migrations` | 684 rows · max id 685 · distinct name 681 | §3 과 동일 · **불변** |
+| `o4o_schema_baselines` | 테이블 없음 | 새 baseline 운영 재적용 없음 · marker 없음 |
+| live schema fingerprint | `0ca1a71b9a511f0147583c919eb37814b1ad28f1ba042ceba1038393bb54df70` (5745) — Job 로그 LIVE == EXPECTED | 스키마 변경 0 |
+| `checkout_orders` | 23 | 불변 |
+| 은퇴 서비스 스키마 객체 (table · column · type · enum label) | 0 | `DB_SCHEMA_RESIDUAL = 0` |
+| `typeorm_migrations` 은퇴 문자열 name | 31 | KEEP `HISTORICAL_DB_AUDIT_RECORDS` (불변 감사 기록) |
+| `checkout_orders.metadata.serviceKey` | 4 | KEEP `DB_HISTORICAL_ORDER_METADATA = 4` |
+| `organizations.name` 1 · `store_playlists.name` 1 · `users.name` 0 | 2 | KEEP `DB_FREE_TEXT_USER_DATA = 2` |
+
+운영 write 0 · DDL 0 · `typeorm_migrations` DELETE/UPDATE 0.
 
 ## 11. FINAL
 
