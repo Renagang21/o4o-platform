@@ -2,7 +2,7 @@
 
 > **WO**: [`WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1`](../work-orders/WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1.md)
 > **범위**: **Phase 1 — Lecture Service Foundation** (WO §6.1 step 01~04). step 05 이후(LMS Core 정리 · surface 구축 · course migration · 기존 서비스 LMS 제거)는 **NOT_STARTED**.
-> **상태**: Phase 1 코드 완료 · PR #223 (`work/lecture-service-foundation-v1-20260918`) — CI green 확인 후 merge. **운영 reference seed 는 미실행(PENDING_PRODUCTION_EXECUTION)**.
+> **상태**: Phase 1 코드 완료 · PR #223 (`work/lecture-service-foundation-v1-20260918`) head `af35070c0` **CI Pipeline = success**(run `35357077686`) — merge 대기. **운영 reference seed 는 미실행(PENDING_PRODUCTION_EXECUTION)**.
 > **날짜**: 2026-09-18 · **작성**: Claude Code (Opus 5) — ChatGPT 세션이 만든 PR 을 이어받아 정리 · 검증
 > **원칙**: 검증하지 않은 것을 PASS 로 쓰지 않는다. 접속값 · 자격증명 출력 0.
 
@@ -34,7 +34,8 @@
 | 1 | `service-catalog.ts` tail 삭제 | `3b6a2f67e` 표시명 수정 중 `getServiceOrigins()` · `getServiceOrigin()` 포함 27줄이 실수로 삭제(빌드 · 비밀번호 재설정 URL · CORS origin 소비처 파손) | `0a3572b18` 버전으로 전체 복원 + 표시명 `'O4O 강의'` 만 유지 + 개행. **origin/main 대비 diff = lecture entry 17줄 추가뿐** | `778bc3fde` |
 | 2 | `lecture-web` type-check TS2339(`import.meta.env`) · TS2307(`./index.css`) | Vite client 타입 선언 부재 | `services/web-lecture/src/vite-env.d.ts` = `/// <reference types="vite/client" />` 한 줄(pharmacy-hub · kpa-branch 와 동일 선례) | `b1e888059` |
 | 3 | `service-legal-scope.spec` "정확히 4개" | lecture 추가로 집합 5개 | lecture accept 케이스 추가 + **정확 집합 5개**(`k-cosmetics · kpa-society · lecture · neture · pharmacy-hub`) 검증 유지. length 완화 0 | `b1e888059` |
-| 4 | `[C10] 20270414000000-SeedLectureServiceAndRoles.ts neither historical nor registered` (`canonical-database-bootstrap-…` · `database-state-classifier-…` 2 suites) | **아래 §4** — 등록 누락이 아니라 data-only migration 이 현행 계약에 등록 불가 | migration 제거 → CLI reference seed 로 전환 | 본 커밋 |
+| 4 | `[C10] 20270414000000-SeedLectureServiceAndRoles.ts neither historical nor registered` (`canonical-database-bootstrap-…` · `database-state-classifier-…` 2 suites) | **아래 §4** — 등록 누락이 아니라 data-only migration 이 현행 계약에 등록 불가 | migration 제거 → CLI reference seed 로 전환 | `687e28e8e` |
+| 5 | (1차 CI 에서 새로 드러남) api-server type-check `src/scripts/audit-roles.ts` TS2741 ×2 | `ServiceKey` union 에 `lecture` 가 추가되며 `Record<ServiceKey\|'none', number>` 리터럴 2곳에 키 누락 — PR 유발 회귀 | `lecture: 0` 추가(카운터 초기화만 · 동작 변경 0) · api-server 전체 `tsc --noEmit` PASS | `dbd575236` |
 
 ## 4. 판정 — Lecture reference seed 는 migration 이 아니라 CLI
 
@@ -87,7 +88,20 @@ LECTURE_REFERENCE_SEED = PENDING_PRODUCTION_EXECUTION
 ### 5.1 전체 API Jest (로컬)
 
 - 1차(기본 병렬 worker): 16 suites PASS 후 **`FATAL ERROR: Reached heap limit … heap out of memory`** — 로컬 환경 한계(CI 는 `--maxWorkers=1`). 테스트 실패 아님 · 결과 미확정.
-- 2차(`--maxWorkers=1` · heap 6GB · CI 동일 방식): 실행 중 — 결과는 PR CI 완주 후 후속 docs 커밋으로 기입(코드 CI 를 docs push 로 cancel 시키지 않기 위해 순서 분리).
+- 2차(`--maxWorkers=1` · heap 6GB · CI 동일 방식): **Test Suites 320 passed / 4 skipped (324) · Tests 5,192 passed / 32 skipped (5,224) · 실패 0**.
+
+### 5.2 PR CI (GitHub Actions)
+
+| head | CI Pipeline | 내용 |
+|---|---|---|
+| `b70c929a7` | failure | API Server Jest **pass** · Code Quality Check fail = `audit-roles.ts` TS2741(§3 #5) 1건뿐 |
+| `af35070c0` | **success** (run `35357077686`) | Code Quality Check pass(7m32s) · API Server Jest pass(10m46s) · Build Applications pass · Guard Static Analysis pass · CodeQL pass |
+
+SonarCloud Code Analysis = fail(`new_security_rating` E · 11건) — **필수 체크 아님 · main branch protection 없음**. 내용: ① `HandoffPage.tsx` L34 "Client-Side Open Redirect" BLOCKER — `resolveReturnTo` 는 pharmacy-hub `HandoffPage` 와 동일한 가드(`/` 로 시작 · `//` · `/\` 거부 → 그 외 `/`)라 taint 오탐 ② `Dockerfile` `npm install -g pnpm`/`serve` · `npx vite build` · root user · 워크플로 action `@v3`/`@v2` 태그 pin — 이미 merge 된 pharmacy-hub Dockerfile · 동일 워크플로의 다른 job 과 동일 패턴(`pnpm install --ignore-scripts` 는 적용돼 있음). 인프라 패턴 변경은 Phase 1 범위 밖 → 보고만.
+
+### 5.3 Deploy foundation 실측
+
+`docker build -f services/web-lecture/Dockerfile` 로컬 빌드 **성공**(vite `✓ built in 6.39s`) → 컨테이너 기동 `GET /` 200 · `GET /handoff`(SPA fallback) 200 · `<title>O4O 강의 | Neture</title>` → 컨테이너 · 이미지 삭제. Cloud Run 실배포는 merge 후 `deploy-web-services.yml` `deploy-lecture` 가 수행(미실행).
 
 ## 6. Phase 1 비범위 (NOT_STARTED · 확인)
 
@@ -106,13 +120,15 @@ LECTURE_ROLE_FOUNDATION = PASS            (lecture:admin · operator · instruct
 LECTURE_MEMBERSHIP_BOUNDARY_FOUNDATION = PASS
 LECTURE_LEGAL_FOUNDATION = PASS           (scope 등록만 · 실값 seed 0)
 LECTURE_WEB_SKELETON = PASS
-LECTURE_DEPLOY_FOUNDATION = PASS          (workflow · Dockerfile · CORS)
+LECTURE_DEPLOY_FOUNDATION = PASS          (workflow · Dockerfile 로컬 빌드+서빙 실측 · CORS · Cloud Run 실배포는 merge 후)
 
 LECTURE_INCREMENTAL_MIGRATION_CONTRACT = PASS   (신규 incremental 0 · C10/C22 PASS · guard 변경 0)
 LECTURE_REFERENCE_SEED = PENDING_PRODUCTION_EXECUTION   (CLI · 격리 PG15 idempotent 검증 완료)
 LECTURE_FRONTEND_TYPECHECK = PASS
 LECTURE_FRONTEND_BUILD = PASS
 LECTURE_ADDED_TEST_REGRESSION = 0
+PR_CI_PIPELINE = success (af35070c0)
+SONARCLOUD = fail (비필수 · 선례 동일 패턴 + taint 오탐 · 보고만)
 
 MAIN_BASELINE_API_JEST_FAILURES = 0 (PR #222 로 해소 · main CI success)
 
@@ -122,5 +138,5 @@ EXISTING_SERVICE_LMS_REMOVAL = NOT_STARTED
 
 ## 8. Git
 
-- 커밋(모두 path-specific · `git add .` 0 · force 0): `778bc3fde` · `b1e888059` · 본 커밋(seed 전환 + CHECK). main 병합 커밋 `1ecb25951` · `7d93150f3` · (최종).
+- 커밋(모두 path-specific · `git add .` 0 · force 0): `778bc3fde`(catalog tail 복구) · `b1e888059`(vite-env + legal test) · `687e28e8e`(seed CLI 전환 + CHECK) · `dbd575236`(audit-roles) · 본 docs 커밋. main 병합 커밋 `1ecb25951` · `7d93150f3` · `b70c929a7` · `af35070c0`(각 교집합 0).
 - 문서 정합: 발견 0건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 **1건** — `PRODUCTION-MIGRATION-STANDARD` 에 "data-only reference seed 는 incremental migration 으로 등록하지 않는다(C22 fingerprint 중복) · CLI seed 경로" 를 명문화하는 문서 보강(기준 문서라 인라인 수정 안 함 · 보고만).
