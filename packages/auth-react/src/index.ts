@@ -16,9 +16,12 @@
 export { useServiceAuth } from './useServiceAuth';
 export { createRouteGuard } from './createRouteGuard';
 export { useRoleSelection } from './useRoleSelection';
+export { GoogleContinue } from './GoogleContinue';
+export type { GoogleContinueProps } from './GoogleContinue';
 export type {
   AuthLoginResult,
   AuthClientLike,
+  GoogleSignupConsents,
   ServiceAuthConfig,
   ServiceAuthCore,
   PendingPolicyAcceptance,

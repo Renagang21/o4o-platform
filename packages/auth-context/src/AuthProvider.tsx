@@ -190,59 +190,66 @@ export const AuthProvider: FC<AuthProviderProps> = ({
     checkInitialAuth();
   }, [authClient, ssoClient, strategy]);
 
+  /**
+   * 로그인 응답 → 세션 채택(password · Google 공통).
+   * WO-O4O-GOOGLE-ONLY-SIGNUP-LOGIN-V1: `login` 의 본문을 그대로 분리했다 — 동작 변경 없음.
+   */
+  const adoptLoginResponse = (response: unknown) => {
+    // API 응답 구조: { success, data: { user, accessToken, refreshToken } }
+    const loginData = (response as any).data || response;
+    const userData = loginData.user;
+    const token = loginData.accessToken || loginData.token;
+    const refreshToken = loginData.refreshToken;
+
+    const userWithDates = {
+      ...userData,
+      createdAt: userData?.createdAt || new Date().toISOString(),
+      updatedAt: userData?.updatedAt || new Date().toISOString()
+    };
+    setUser(userWithDates as any);
+
+    // Phase 6-7: Token storage depends on strategy
+    // - Cookie strategy: Server sets httpOnly cookies, no localStorage needed
+    // - localStorage strategy: Store tokens in localStorage
+    if (strategy === 'localStorage' && token) {
+      // Use SSOT token storage - single key only
+      setAccessToken(token);
+
+      if (refreshToken) {
+        setRefreshToken(refreshToken);
+      }
+
+      // admin-auth-storage 구조도 업데이트 (apiClient 호환성을 위해)
+      const authStorage = {
+        state: {
+          user: userWithDates,
+          token: token,
+          accessToken: token,
+          refreshToken: refreshToken,
+          isAuthenticated: true
+        }
+      };
+      localStorage.setItem('admin-auth-storage', JSON.stringify(authStorage));
+    } else if (strategy === 'cookie') {
+      // Phase 6-7: Cookie strategy - only store user info for UI
+      // Tokens are in httpOnly cookies
+      const authStorage = {
+        state: {
+          user: userWithDates,
+          isAuthenticated: true
+          // No tokens stored in localStorage for cookie strategy
+        }
+      };
+      localStorage.setItem('admin-auth-storage', JSON.stringify(authStorage));
+    }
+  };
+
   const login = async (credentials: { email: string; password: string; serviceKey?: string }) => {
     try {
       setIsLoading(true);
       setError(null);
       const response = await authClient.login(credentials);
-
-      // API 응답 구조: { success, data: { user, accessToken, refreshToken } }
-      const loginData = (response as any).data || response;
-      const userData = loginData.user;
-      const token = loginData.accessToken || loginData.token;
-      const refreshToken = loginData.refreshToken;
-
-      const userWithDates = {
-        ...userData,
-        createdAt: userData?.createdAt || new Date().toISOString(),
-        updatedAt: userData?.updatedAt || new Date().toISOString()
-      };
-      setUser(userWithDates as any);
-
-      // Phase 6-7: Token storage depends on strategy
-      // - Cookie strategy: Server sets httpOnly cookies, no localStorage needed
-      // - localStorage strategy: Store tokens in localStorage
-      if (strategy === 'localStorage' && token) {
-        // Use SSOT token storage - single key only
-        setAccessToken(token);
-
-        if (refreshToken) {
-          setRefreshToken(refreshToken);
-        }
-
-        // admin-auth-storage 구조도 업데이트 (apiClient 호환성을 위해)
-        const authStorage = {
-          state: {
-            user: userWithDates,
-            token: token,
-            accessToken: token,
-            refreshToken: refreshToken,
-            isAuthenticated: true
-          }
-        };
-        localStorage.setItem('admin-auth-storage', JSON.stringify(authStorage));
-      } else if (strategy === 'cookie') {
-        // Phase 6-7: Cookie strategy - only store user info for UI
-        // Tokens are in httpOnly cookies
-        const authStorage = {
-          state: {
-            user: userWithDates,
-            isAuthenticated: true
-            // No tokens stored in localStorage for cookie strategy
-          }
-        };
-        localStorage.setItem('admin-auth-storage', JSON.stringify(authStorage));
-      }
+      adoptLoginResponse(response);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Login failed';
       setError(errorMessage);
@@ -252,6 +259,29 @@ export const AuthProvider: FC<AuthProviderProps> = ({
       setIsLoading(false);
     }
   };
+
+  /**
+   * WO-O4O-GOOGLE-ONLY-SIGNUP-LOGIN-V1: Google ID token 로그인(admin 은 로그인만 — 가입은 서비스 화면에서).
+   * 실패는 throw 로 전파한다(기존 login 계약과 동일). 호출부는 `err.response.data.code`
+   * (GOOGLE_SIGNUP_REQUIRED · ACCOUNT_NOT_ACTIVE 등)로 안내를 나눈다.
+   */
+  const loginWithGoogle = async (idToken: string, serviceKey?: string) => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const response = await authClient.loginWithGoogle(idToken, serviceKey ? { serviceKey } : undefined);
+      adoptLoginResponse(response);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Login failed';
+      setError(errorMessage);
+      onAuthError?.(errorMessage);
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const getGoogleAuthConfig = () => authClient.getGoogleAuthConfig();
 
   const logout = () => {
     authClient.logout();
@@ -335,6 +365,8 @@ export const AuthProvider: FC<AuthProviderProps> = ({
     isAdmin,
     authClient, // Expose authClient for API calls
     login,
+    loginWithGoogle,
+    getGoogleAuthConfig,
     logout,
     logoutAll,
     clearError,

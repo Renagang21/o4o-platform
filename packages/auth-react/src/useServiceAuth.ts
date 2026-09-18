@@ -118,16 +118,16 @@ export function useServiceAuth<TUser>(config: ServiceAuthConfig<TUser>): Service
   }, []);
 
   /**
-   * 로그인 — **항상 result object 를 반환하고 throw 하지 않는다.**
-   * 서버 응답 `code`(예: `SERVICE_NOT_MEMBER`)를 그대로 전달해 서비스별 안내 UX 가 분기할 수 있게 한다.
+   * 세션 채택 공통 — /auth/login · /auth/google/login · /auth/google/signup.
+   * **항상 result object 를 반환하고 throw 하지 않는다.**
+   * 서버 응답 `code`(예: `SERVICE_NOT_MEMBER` · `GOOGLE_SIGNUP_REQUIRED`)를 그대로 전달해
+   * 서비스별 안내 UX 가 분기할 수 있게 한다.
    */
-  const login = useCallback(
-    async (email: string, password: string): Promise<AuthLoginResult<TUser>> => {
+  const adoptSession = useCallback(
+    async (request: () => Promise<unknown>, failMessage: string): Promise<AuthLoginResult<TUser>> => {
       setIsLoading(true);
       try {
-        const result = (await authClient.login({ email, password, serviceKey })) as {
-          user?: unknown;
-        };
+        const result = (await request()) as { user?: unknown };
         const apiUser = result?.user as Record<string, unknown> | undefined;
         if (!apiUser) {
           return { success: false, error: '로그인 응답이 올바르지 않습니다.' };
@@ -155,12 +155,36 @@ export function useServiceAuth<TUser>(config: ServiceAuthConfig<TUser>): Service
         if (error instanceof TypeError || e?.code === 'ERR_NETWORK') {
           return { success: false, error: '서버에 연결할 수 없습니다. 잠시 후 다시 시도해주세요.' };
         }
-        return { success: false, error: '로그인에 실패했습니다.' };
+        return { success: false, error: failMessage };
       } finally {
         setIsLoading(false);
       }
     },
-    [authClient, serviceKey, toUser, onAuthenticated],
+    [toUser, onAuthenticated],
+  );
+
+  /** 로그인(email/password — 임시 테스트/전환용). */
+  const login = useCallback(
+    (email: string, password: string): Promise<AuthLoginResult<TUser>> =>
+      adoptSession(() => authClient.login({ email, password, serviceKey }), '로그인에 실패했습니다.'),
+    [adoptSession, authClient, serviceKey],
+  );
+
+  /**
+   * WO-O4O-GOOGLE-ONLY-SIGNUP-LOGIN-V1 (WO-2D): Google ID token 으로 로그인.
+   * 미등록 Google 계정이면 `code === 'GOOGLE_SIGNUP_REQUIRED'` — 호출부는 동의 화면 → `signupWithGoogle` 로 잇는다.
+   */
+  const loginWithGoogle = useCallback(
+    (idToken: string): Promise<AuthLoginResult<TUser>> =>
+      adoptSession(() => authClient.loginWithGoogle(idToken, { serviceKey }), 'Google 로그인에 실패했습니다.'),
+    [adoptSession, authClient, serviceKey],
+  );
+
+  /** WO-2D: 약관/개인정보(+마케팅) 동의 후 Google 계정으로 계정 생성 + 세션. */
+  const signupWithGoogle = useCallback(
+    (idToken: string, consents: { terms: boolean; privacy: boolean; marketing?: boolean }): Promise<AuthLoginResult<TUser>> =>
+      adoptSession(() => authClient.signupWithGoogle(idToken, consents), 'Google 계정 생성에 실패했습니다.'),
+    [adoptSession, authClient],
   );
 
   const logout = useCallback(async () => {
@@ -222,6 +246,8 @@ export function useServiceAuth<TUser>(config: ServiceAuthConfig<TUser>): Service
     pendingPolicyAcceptances,
     acceptPendingPolicies,
     login,
+    loginWithGoogle,
+    signupWithGoogle,
     logout,
     logoutAll,
     refresh,

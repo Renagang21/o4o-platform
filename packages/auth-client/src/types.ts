@@ -91,3 +91,27 @@ export interface EnrollmentListResponse {
     totalPages: number;
   };
 }
+
+// ── WO-O4O-GOOGLE-ONLY-SIGNUP-LOGIN-V1 (WO-2D): Google-only Signup/Login ──────────────
+
+/** POST /auth/google/signup 동의 항목 — terms/privacy 필수, marketing 선택. */
+export interface GoogleSignupConsents {
+  terms: boolean;
+  privacy: boolean;
+  marketing?: boolean;
+}
+
+/** GET /auth/google/config — 공개 Client ID(secret 아님). enabled=false 면 Google 버튼을 "준비 중"으로 표시. */
+export interface GoogleAuthConfig {
+  enabled: boolean;
+  clientId: string | null;
+}
+
+/** Google login/signup 응답 — /auth/login 과 같은 세션 형태 + 가입 여부 · (serviceKey 요청 시) membership 상태. */
+export interface GoogleAuthResponse extends AuthResponse {
+  isNewUser?: boolean;
+  serviceMembership?: { serviceKey: string; status: string | null };
+}
+
+/** 서버가 미등록 Google 계정에 돌려주는 코드 — 호출부는 이 코드로 가입(동의) 흐름으로 분기한다. */
+export const GOOGLE_SIGNUP_REQUIRED_CODE = 'GOOGLE_SIGNUP_REQUIRED';

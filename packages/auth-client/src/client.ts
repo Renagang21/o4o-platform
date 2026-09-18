@@ -1,5 +1,5 @@
 import axios, { AxiosInstance, AxiosError } from 'axios';
-import type { LoginCredentials, AuthResponse } from './types.js';
+import type { LoginCredentials, AuthResponse, GoogleAuthResponse, GoogleAuthConfig, GoogleSignupConsents } from './types.js';
 import {
   getAccessToken,
   setAccessToken,
@@ -119,7 +119,9 @@ export class AuthClient {
           const requestUrl = originalRequest?.url || '';
           if (requestUrl.includes('/auth/login') ||
               requestUrl.includes('/auth/register') ||
-              requestUrl.includes('/auth/refresh')) {
+              requestUrl.includes('/auth/refresh') ||
+              // WO-O4O-GOOGLE-ONLY-SIGNUP-LOGIN-V1: Google login/signup 401 은 ID token 거절이다.
+              requestUrl.includes('/auth/google/')) {
             return Promise.reject(error);
           }
 
@@ -273,8 +275,53 @@ export class AuthClient {
       : credentials;
 
     const response = await this.api.post('/auth/login', payload);
-    const rawData = response.data as { success?: boolean; data?: any };
+    return this.adoptSessionResponse(response.data as { success?: boolean; data?: any });
+  }
 
+  /**
+   * WO-O4O-GOOGLE-ONLY-SIGNUP-LOGIN-V1 (WO-2D)
+   * Google ID token → POST /auth/google/login. 등록된 Google 계정이면 /auth/login 과 같은 세션을 연다.
+   * 미등록이면 서버가 404 `GOOGLE_SIGNUP_REQUIRED` 를 돌려주고 axios 오류로 전파된다(호출부가 가입 흐름으로 분기).
+   * 클라이언트는 idToken(+serviceKey) 외에 어떤 identity 필드도 보내지 않는다.
+   */
+  async loginWithGoogle(idToken: string, options: { serviceKey?: string } = {}): Promise<GoogleAuthResponse> {
+    const response = await this.api.post('/auth/google/login', {
+      idToken,
+      ...(options.serviceKey && { serviceKey: options.serviceKey }),
+      ...(this.strategy === 'localStorage' && { includeLegacyTokens: true }),
+    });
+    return this.adoptSessionResponse(response.data as { success?: boolean; data?: any });
+  }
+
+  /**
+   * WO-O4O-GOOGLE-ONLY-SIGNUP-LOGIN-V1 (WO-2D)
+   * Google ID token + 약관/개인정보(+마케팅) 동의 → POST /auth/google/signup → 계정 생성 + 세션.
+   */
+  async signupWithGoogle(idToken: string, consents: GoogleSignupConsents): Promise<GoogleAuthResponse> {
+    const response = await this.api.post('/auth/google/signup', {
+      idToken,
+      consents,
+      ...(this.strategy === 'localStorage' && { includeLegacyTokens: true }),
+    });
+    return this.adoptSessionResponse(response.data as { success?: boolean; data?: any });
+  }
+
+  /** GET /auth/google/config — 공개 Client ID(secret 아님). 실패·미설정은 `{ enabled: false, clientId: null }`. */
+  async getGoogleAuthConfig(): Promise<GoogleAuthConfig> {
+    try {
+      const response = await this.api.get('/auth/google/config');
+      const data = (response.data as { data?: Partial<GoogleAuthConfig> })?.data;
+      return { enabled: data?.enabled === true && !!data?.clientId, clientId: data?.clientId ?? null };
+    } catch {
+      return { enabled: false, clientId: null };
+    }
+  }
+
+  /**
+   * 세션 응답 채택 — /auth/login · /auth/google/login · /auth/google/signup 공통.
+   * Server response format: { success: true, data: { user, tokens: { accessToken, refreshToken } } }
+   */
+  private adoptSessionResponse(rawData: { success?: boolean; data?: any }): GoogleAuthResponse {
     // WO-NETURE-AUTH-TOKEN-FAMILY-MISMATCH-FIX-V1:
     // Use shared helper for consistent token extraction
     const { accessToken, refreshToken } = extractTokensFromResponse(rawData);
@@ -307,6 +354,8 @@ export class AuthClient {
       refreshToken,
       user,
       expiresIn,
+      ...(typeof rawData.data?.isNewUser === 'boolean' && { isNewUser: rawData.data.isNewUser }),
+      ...(rawData.data?.serviceMembership && { serviceMembership: rawData.data.serviceMembership }),
     };
   }
 

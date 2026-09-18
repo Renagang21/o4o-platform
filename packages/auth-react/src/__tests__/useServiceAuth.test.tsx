@@ -166,6 +166,103 @@ describe('useServiceAuth — login 반환 계약', () => {
   });
 });
 
+describe('useServiceAuth — Google 로그인/가입 (WO-O4O-GOOGLE-ONLY-SIGNUP-LOGIN-V1)', () => {
+  it('loginWithGoogle: idToken + serviceKey 만 보내고 성공 시 세션을 채택한다', async () => {
+    const loginWithGoogle = vi.fn(async () => ({ user: API_USER, isNewUser: false }));
+    const client = makeClient({ loginWithGoogle } as never);
+    const { hook } = setup({ token: null, client });
+    await waitFor(() => expect(hook.result.current.isLoading).toBe(false));
+
+    let result!: Awaited<ReturnType<typeof hook.result.current.loginWithGoogle>>;
+    await act(async () => {
+      result = await hook.result.current.loginWithGoogle('id-token');
+    });
+
+    expect(result.success).toBe(true);
+    expect(hook.result.current.isAuthenticated).toBe(true);
+    // 클라이언트는 identity 필드(email/sub/userId)를 보내지 않는다 — ID token 하나뿐.
+    expect(loginWithGoogle).toHaveBeenCalledWith('id-token', { serviceKey: 'neture' });
+    expect(client.login).not.toHaveBeenCalled();
+  });
+
+  it('loginWithGoogle: 미등록 sub 는 404 GOOGLE_SIGNUP_REQUIRED 를 code 로 올려보낸다 (동의 화면 분기 근거)', async () => {
+    const client = makeClient({
+      loginWithGoogle: vi.fn(async () => {
+        throw { response: { status: 404, data: { code: 'GOOGLE_SIGNUP_REQUIRED', error: '가입이 필요합니다.' } } };
+      }),
+    } as never);
+    const { hook } = setup({ token: null, client });
+    await waitFor(() => expect(hook.result.current.isLoading).toBe(false));
+
+    let result!: Awaited<ReturnType<typeof hook.result.current.loginWithGoogle>>;
+    await act(async () => {
+      result = await hook.result.current.loginWithGoogle('id-token');
+    });
+
+    expect(result.success).toBe(false);
+    expect(result.code).toBe('GOOGLE_SIGNUP_REQUIRED');
+    expect(result.status).toBe(404);
+    expect(hook.result.current.isAuthenticated).toBe(false);
+  });
+
+  it('loginWithGoogle: 차단 계정은 ACCOUNT_NOT_ACTIVE + accountStatus 를 그대로 전달한다', async () => {
+    const client = makeClient({
+      loginWithGoogle: vi.fn(async () => {
+        throw { response: { status: 403, data: { code: 'ACCOUNT_NOT_ACTIVE', accountStatus: 'suspended', error: 'x' } } };
+      }),
+    } as never);
+    const { hook } = setup({ token: null, client });
+    await waitFor(() => expect(hook.result.current.isLoading).toBe(false));
+
+    let result!: Awaited<ReturnType<typeof hook.result.current.loginWithGoogle>>;
+    await act(async () => {
+      result = await hook.result.current.loginWithGoogle('id-token');
+    });
+
+    expect(result.success).toBe(false);
+    expect(result.code).toBe('ACCOUNT_NOT_ACTIVE');
+    expect(result.accountStatus).toBe('suspended');
+  });
+
+  it('signupWithGoogle: 동의 3항목을 그대로 전달하고 성공 시 세션을 채택한다', async () => {
+    const signupWithGoogle = vi.fn(async () => ({ user: API_USER, isNewUser: true }));
+    const client = makeClient({ signupWithGoogle } as never);
+    const onAuthenticated = vi.fn();
+    const { hook } = setup({ token: null, client, onAuthenticated });
+    await waitFor(() => expect(hook.result.current.isLoading).toBe(false));
+
+    let result!: Awaited<ReturnType<typeof hook.result.current.signupWithGoogle>>;
+    await act(async () => {
+      result = await hook.result.current.signupWithGoogle('id-token', { terms: true, privacy: true, marketing: false });
+    });
+
+    expect(result.success).toBe(true);
+    expect(signupWithGoogle).toHaveBeenCalledWith('id-token', { terms: true, privacy: true, marketing: false });
+    expect(hook.result.current.isAuthenticated).toBe(true);
+    expect(onAuthenticated).toHaveBeenCalledTimes(1);
+  });
+
+  it('signupWithGoogle: EMAIL_IN_USE(409) 는 자동 연결 없이 실패 result 로 떨어진다', async () => {
+    const client = makeClient({
+      signupWithGoogle: vi.fn(async () => {
+        throw { response: { status: 409, data: { code: 'EMAIL_IN_USE', error: '이미 사용 중인 이메일입니다.' } } };
+      }),
+    } as never);
+    const { hook } = setup({ token: null, client });
+    await waitFor(() => expect(hook.result.current.isLoading).toBe(false));
+
+    let result!: Awaited<ReturnType<typeof hook.result.current.signupWithGoogle>>;
+    await act(async () => {
+      result = await hook.result.current.signupWithGoogle('id-token', { terms: true, privacy: true });
+    });
+
+    expect(result.success).toBe(false);
+    expect(result.code).toBe('EMAIL_IN_USE');
+    expect(result.status).toBe(409);
+    expect(hook.result.current.isAuthenticated).toBe(false);
+  });
+});
+
 describe('useServiceAuth — 로그인 실패와 오류 코드 전달', () => {
   it('SERVICE_NOT_MEMBER 를 code 로 그대로 올려보낸다 (서비스별 가입 안내 UX 분기 근거)', async () => {
     const client = makeClient({

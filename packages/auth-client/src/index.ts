@@ -3,6 +3,8 @@ export * from './types.js';
 export * from './client.js';
 export * from './cookie-client.js';
 export * from './sso-client.js';
+// Google Identity Services loader (WO-O4O-GOOGLE-ONLY-SIGNUP-LOGIN-V1)
+export * from './google-identity.js';
 
 // Token storage utilities (for localStorage strategy)
 export {
