@@ -16,11 +16,14 @@
  *   (선택) ASTRA_MODEL=gpt-6-astra  (기본값)
  *   (선택) 실제 스크린샷으로도 확인:  ... scripts/ai/astra-image-smoke.mts <이미지경로.png>
  *
- * 판정:
- *   - image 호출 성공 + 답에 fixture 색이 3개 이상 등장(픽셀 근거) → ASTRA_IMAGE_INPUT PASS(exit 0).
- *   - text-only 대조 답에는 그 색들이 (거의) 없어야 한다 → fallback 아님 확인.
- *   - API 가 이미지를 거부(4xx)하면 FAIL(exit 1) — 원인 출력.
- *   - 키 부재면 실행하지 않고 PENDING(exit 2). PASS 로 보고하지 않는다.
+ * 판정 — **capability 부재와 환경(계정) 차단을 반드시 구분한다**:
+ *   - image 호출 성공 + fixture 색 3개 이상 정확 + text-only 대조와 차이 → ASTRA_IMAGE_INPUT=PASS(exit 0).
+ *   - 정상 응답했으나 fixture 색을 못 읽음 → capability FAIL(exit 1).
+ *   - 진짜 capability 거절(이미지 미수용 · 잘못된 image content type · multimodal 미지원) → FAIL(exit 1).
+ *   - 계정 quota/billing(insufficient_quota · credit_balance_exhausted) · auth/key · rate limit · 네트워크
+ *     → capability FAIL 아님. [BLOCKED]/PENDING(exit 2) · ASTRA_REAL_SMOKE=BLOCKED_BY_*.
+ *   - 키 부재도 PENDING(exit 2). **환경 차단을 절대 FAIL 로 기록하지 않는다.**
+ *   분류 규칙: AUTH/QUOTA/BILLING/RATE/네트워크 = 환경 차단 · MODEL/INPUT UNSUPPORTED = capability FAIL.
  *
  * 이 스크립트는 어떤 O4O 코드도 변경하지 않는다(순수 실측). PASS 여야 B1 구현으로 넘어간다.
  */
@@ -39,7 +42,8 @@ if (!apiKey) {
 }
 
 const model = process.env.ASTRA_MODEL || 'gpt-6-astra';
-const OPENAI_URL = 'https://api.openai.com/v1/chat/completions';
+// 기본은 OpenAI 실서버. OPENAI_URL 로만 override(로컬 mock 테스트용) — 미설정 시 프로덕션 동작 불변.
+const OPENAI_URL = process.env.OPENAI_URL || 'https://api.openai.com/v1/chat/completions';
 
 // ── PNG 인코더(무의존) — fixture 를 코드로 재생성해 opaque base64 를 커밋하지 않는다. ──
 function crc32(buf: Buffer): number {
@@ -120,7 +124,16 @@ const FIXTURE_QUESTION =
 const SCREENSHOT_QUESTION = '이 이미지에서 보이는 주요 UI 요소를 설명하라. 버튼·입력창·제목 등 구체적으로.';
 const question = usingFixture ? FIXTURE_QUESTION : SCREENSHOT_QUESTION;
 
-async function callOpenAI(withImage: boolean, timeoutMs = 40_000): Promise<{ ok: boolean; status: number; content: string; error?: string }> {
+interface CallResult {
+  ok: boolean;
+  status: number;
+  content: string;
+  error?: string;
+  errType?: string; // OpenAI error.type (예: insufficient_quota, invalid_request_error)
+  errCode?: string; // OpenAI error.code (예: credit_balance_exhausted, invalid_api_key)
+}
+
+async function callOpenAI(withImage: boolean, timeoutMs = 40_000): Promise<CallResult> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   try {
@@ -144,14 +157,79 @@ async function callOpenAI(withImage: boolean, timeoutMs = 40_000): Promise<{ ok:
       signal: controller.signal,
     });
     const bodyText = await res.text();
-    if (!res.ok) return { ok: false, status: res.status, content: '', error: bodyText.slice(0, 300) };
+    if (!res.ok) {
+      // OpenAI 오류 바디 { error: { message, type, code } } 를 파싱해 분류에 쓴다.
+      let error = bodyText.slice(0, 400);
+      let errType: string | undefined;
+      let errCode: string | undefined;
+      try {
+        const j = JSON.parse(bodyText) as { error?: { message?: string; type?: string; code?: string } };
+        if (j?.error) {
+          error = j.error.message ?? error;
+          errType = j.error.type;
+          errCode = j.error.code;
+        }
+      } catch {
+        /* non-JSON body — raw slice 유지 */
+      }
+      return { ok: false, status: res.status, content: '', error, errType, errCode };
+    }
     const data = JSON.parse(bodyText) as { choices?: { message?: { content?: string } }[] };
     return { ok: true, status: res.status, content: data.choices?.[0]?.message?.content ?? '' };
   } catch (e) {
+    // 네트워크/타임아웃 = 환경 차단(capability 아님).
     return { ok: false, status: 0, content: '', error: e instanceof Error ? e.message : String(e) };
   } finally {
     clearTimeout(timer);
   }
+}
+
+/**
+ * 실패를 **환경 차단(capability 아님)** 과 **진짜 capability 거절** 로 분류한다.
+ * 환경 차단(AUTH/QUOTA/BILLING/RATE/네트워크)은 절대 FAIL 로 기록하지 않는다.
+ */
+type FailureClass = 'quota' | 'auth' | 'rate' | 'capability' | 'unknown';
+function classifyFailure(r: CallResult): FailureClass {
+  const t = (r.errType ?? '').toLowerCase();
+  const c = (r.errCode ?? '').toLowerCase();
+  const m = (r.error ?? '').toLowerCase();
+
+  // 1) quota / billing — 크레딧 소진. (예: 429 insufficient_quota / credit_balance_exhausted)
+  if (
+    t.includes('insufficient_quota') ||
+    c.includes('insufficient_quota') ||
+    c.includes('credit') ||
+    c.includes('billing') ||
+    m.includes('quota') ||
+    m.includes('credit balance') ||
+    m.includes('billing')
+  ) {
+    return 'quota';
+  }
+  // 2) auth / key — 잘못된·누락 키, 권한.
+  if (
+    r.status === 401 ||
+    r.status === 403 ||
+    t.includes('authentication') ||
+    c.includes('invalid_api_key') ||
+    c.includes('api_key') ||
+    m.includes('api key') ||
+    m.includes('authentication')
+  ) {
+    return 'auth';
+  }
+  // 3) rate limit — 일시적. (quota 가 아닌 429)
+  if (r.status === 429 || t.includes('rate_limit') || c.includes('rate_limit') || m.includes('rate limit')) {
+    return 'rate';
+  }
+  // 4) capability 거절 — 이미지/멀티모달 미수용. 이것만 진짜 FAIL.
+  const imageSignal = m.includes('image') || m.includes('multimodal') || m.includes('vision') || c.includes('image');
+  const unsupported = m.includes('does not support') || m.includes('unsupported') || m.includes('not supported') || m.includes('invalid');
+  if (imageSignal && (r.status === 400 || r.status === 415 || t.includes('invalid_request') || unsupported)) {
+    return 'capability';
+  }
+  // 5) 그 외(네트워크·status 0·미분류 4xx/5xx) — 안전하게 환경 차단으로 본다(거짓 FAIL 금지).
+  return 'unknown';
 }
 
 /** 답에 fixture 색이 몇 개 언급됐는지(한/영). */
@@ -176,9 +254,40 @@ async function main() {
   // 1) 이미지 포함 호출
   const img = await callOpenAI(true);
   if (!img.ok) {
-    console.error(`\n[FAIL] 이미지 호출 실패 (status ${img.status}): ${img.error ?? ''}`);
-    console.error('ASTRA_IMAGE_INPUT = FAIL — API 가 이미지 입력을 수용하지 않거나 모델이 거부.');
-    process.exit(1);
+    const cls = classifyFailure(img);
+    const detail = `status ${img.status}${img.errType ? ` · type=${img.errType}` : ''}${img.errCode ? ` · code=${img.errCode}` : ''}: ${img.error ?? ''}`;
+
+    if (cls === 'capability') {
+      // 진짜 capability 거절만 FAIL.
+      console.error(`\n[FAIL] 모델이 이미지 입력을 거절 — ${detail}`);
+      console.error('ASTRA_IMAGE_INPUT = FAIL — gpt-6-astra 가 이미지/멀티모달 입력을 수용하지 않음(capability 부재).');
+      console.error('ASTRA_SCREEN_UNDERSTANDING = FAIL');
+      console.error('ASTRA_REAL_SMOKE = CAPABILITY_FAIL');
+      process.exit(1);
+    }
+
+    // 환경 차단(quota/auth/rate/네트워크) — capability 판정 이전에 막힘. FAIL 아님, PENDING.
+    const reason: Record<FailureClass, string> = {
+      quota: 'BLOCKED_BY_QUOTA',
+      auth: 'BLOCKED_BY_AUTH',
+      rate: 'BLOCKED_BY_RATE_LIMIT',
+      unknown: 'BLOCKED_ENV_UNCLASSIFIED',
+      capability: 'CAPABILITY_FAIL', // 도달 안 함
+    };
+    const hint: Record<FailureClass, string> = {
+      quota: 'OpenAI 계정 크레딧을 충전한 뒤 같은 smoke 를 재실행하세요.',
+      auth: 'OPENAI_API_KEY 값·권한을 확인한 뒤 재실행하세요.',
+      rate: '잠시 후(rate limit 해제 후) 재실행하세요.',
+      unknown: '네트워크/일시 오류 가능 — 잠시 후 재실행하세요.',
+      capability: '',
+    };
+    console.error(`\n[BLOCKED] capability 판정 이전에 환경에서 차단됨 — ${detail}`);
+    console.error('이는 이미지 입력/모델 capability FAIL 이 아니다(환경 차단).');
+    console.error('ASTRA_IMAGE_INPUT = PENDING');
+    console.error('ASTRA_SCREEN_UNDERSTANDING = PENDING');
+    console.error(`ASTRA_REAL_SMOKE = ${reason[cls]}`);
+    console.error(`→ ${hint[cls]}`);
+    process.exit(2);
   }
   console.log('\n[image 답변]\n' + img.content);
 
@@ -195,10 +304,14 @@ async function main() {
       console.log('\n[PASS] gpt-6-astra 가 실제 픽셀을 근거로 색/배치를 답함(text-only 대조보다 우월).');
       console.log('ASTRA_IMAGE_INPUT = PASS');
       console.log('ASTRA_SCREEN_UNDERSTANDING = PASS (사분면 색 인지)');
+      console.log('ASTRA_REAL_SMOKE = PASS');
       process.exit(0);
     }
-    console.error('\n[FAIL] 이미지 근거가 약함 — fixture 색을 3개 이상 정확히 인지하지 못함(또는 text-only 와 동급).');
-    console.error('ASTRA_IMAGE_INPUT = 확인 불가 / 의심 — 실제 스크린샷 인자로 재확인 권장.');
+    console.error('\n[FAIL] 정상 응답했으나 fixture 색을 3개 이상 정확히 인지하지 못함(또는 text-only 와 동급) — 픽셀을 실제로 읽지 못함.');
+    console.error('ASTRA_IMAGE_INPUT = FAIL (capability — 이미지 내용 미독해)');
+    console.error('ASTRA_SCREEN_UNDERSTANDING = FAIL');
+    console.error('ASTRA_REAL_SMOKE = CAPABILITY_FAIL');
+    console.error('→ 실제 스크린샷 인자로 재확인 권장(모델이 단순 색 fixture 를 무시했을 가능성).');
     process.exit(1);
   }
 
