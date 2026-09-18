@@ -1,6 +1,6 @@
-> **상태**: DRAFT · **문서 종류**: 게시 원문(O4O 매장 경영자 이용계약 v1.0) · **초안 확정일**: 2026-09-18 (정책결정 8/8 반영 · 게시 선행조건 미완료 · 시행일 미확정)
+> **상태**: DRAFT — 게시 선행조건 완료, 게시 대기 (2026-09-18 · [`CHECK-O4O-STORE-OWNER-AGREEMENT-PUBLISH-PREREQUISITES-V1`](../checks/CHECK-O4O-STORE-OWNER-AGREEMENT-PUBLISH-PREREQUISITES-V1.md)) · **문서 종류**: 게시 원문(O4O 매장 경영자 이용계약 v1.0) · **초안 확정일**: 2026-09-18 (정책결정 8/8 반영 · 시행일 미확정 · ACTIVE 전환·publish 는 후속 게시 WO)
 > **골격**: 클라우드컴퓨팅법 §24 「클라우드컴퓨팅서비스 공급사업자–이용사업자 간 표준계약서(B2B)」(미래창조과학부 2016-12 · 26조) 구조 준용 — 요금 3조·청약철회는 제외(무료), SLA 는 별표 4 예약. 본 계약은 O4O 가 클라우드컴퓨팅법상 클라우드컴퓨팅서비스에 해당한다고 법률적으로 선언하지 않으며, SaaS 형 서비스의 이용자 보호를 위해 표준계약서 원칙을 자발적으로 준용한다(IR §5 CLOUD_LIKE_SAAS).
-> **게시 선행조건** (미완료 · 하나의 구현 WO 로 정비 후 ACTIVE 전환):
+> **게시 선행조건** (**완료 2026-09-18** — `WO-O4O-STORE-OWNER-AGREEMENT-PUBLISH-PREREQUISITES-V1` CLOSED · 원래 조건 4건):
 > 1. `service_policy_documents` 허용 document_type 에 `store_owner_agreement` 추가 + `policyAcceptanceService` 의 terms 전용 제약 완화(agreement acceptance 지원) — 현행 `service-legal-scope.ts` 허용 목록에 없음 · `policy-acceptance.service.ts` 는 `terms` 만 accept
 > 2. Store Workspace 진입 시 계약 미동의 게이트(기존 회원 명시적 동의 · 부칙 제2조)
 > 3. K-Cosmetics · PharmacyHub 의 `store_owner` 사업자정보 필수 확인(PH join 은 약국명만 수집 · KCos 는 프론트 검증만) — 제5조 ③ · 별표 2

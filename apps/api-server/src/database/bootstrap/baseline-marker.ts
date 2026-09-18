@@ -19,7 +19,7 @@ export const BASELINE_MARKER_TABLE_DDL = `CREATE TABLE public.${BASELINE_MARKER_
   baseline_version character varying(64) NOT NULL UNIQUE,
   schema_fingerprint character(64) NOT NULL,
   fingerprint_line_count integer NOT NULL,
-  last_historical_migration character varying(255) NOT NULL,
+  supersedes_baseline_version character varying(64) NOT NULL,
   bootstrap_tool_version character varying(32) NOT NULL,
   applied_at timestamp with time zone NOT NULL DEFAULT now()
 )`;
@@ -29,7 +29,7 @@ export interface BaselineMarkerRow {
   readonly baseline_version: string;
   readonly schema_fingerprint: string;
   readonly fingerprint_line_count: number;
-  readonly last_historical_migration: string;
+  readonly supersedes_baseline_version: string;
   readonly bootstrap_tool_version: string;
   readonly applied_at: Date;
 }
@@ -45,7 +45,7 @@ export async function baselineMarkerTableExists(queryRunner: QueryRunner): Promi
 
 export async function readBaselineMarkers(queryRunner: QueryRunner): Promise<BaselineMarkerRow[]> {
   return (await queryRunner.query(
-    `SELECT id, baseline_version, schema_fingerprint, fingerprint_line_count, last_historical_migration,
+    `SELECT id, baseline_version, schema_fingerprint, fingerprint_line_count, supersedes_baseline_version,
             bootstrap_tool_version, applied_at
      FROM public.${BASELINE_MARKER_TABLE} ORDER BY id`,
   )) as BaselineMarkerRow[];
@@ -61,13 +61,13 @@ export async function insertBaselineMarker(
 ): Promise<void> {
   await queryRunner.query(
     `INSERT INTO public.${BASELINE_MARKER_TABLE}
-       (baseline_version, schema_fingerprint, fingerprint_line_count, last_historical_migration, bootstrap_tool_version)
+       (baseline_version, schema_fingerprint, fingerprint_line_count, supersedes_baseline_version, bootstrap_tool_version)
      VALUES ($1, $2, $3, $4, $5)`,
     [
       marker.baseline_version,
       marker.schema_fingerprint,
       marker.fingerprint_line_count,
-      marker.last_historical_migration,
+      marker.supersedes_baseline_version,
       marker.bootstrap_tool_version,
     ],
   );

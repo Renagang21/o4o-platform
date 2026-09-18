@@ -12,7 +12,7 @@
  */
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync, readdirSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join, resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseMigrationIdentity, MigrationIdentityError } from '../migration-identity.mjs';
@@ -20,7 +20,7 @@ import { parseMigrationIdentity, MigrationIdentityError } from '../migration-ide
 const REPO = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
 const MIGRATIONS_DIR = join(REPO, 'apps', 'api-server', 'src', 'database', 'migrations');
 const MANIFEST = join(REPO, 'apps', 'api-server', 'src', 'database', 'incremental', 'historical-migrations.manifest.json');
-const NAMES_TS = join(REPO, 'apps', 'api-server', 'src', 'database', 'incremental', 'historical-migration-names.ts');
+const INCREMENTAL_DIR = join(REPO, 'apps', 'api-server', 'src', 'database', 'incremental');
 const INCREMENTAL_MANIFEST = join(REPO, 'apps', 'api-server', 'src', 'database', 'incremental', 'manifest.ts');
 
 const parse = (src, file = 'fixture.ts') => parseMigrationIdentity(src, file);
@@ -143,7 +143,8 @@ test('non-identifier declared name fails', () => {
 // ---- real repository cross-check (§6.3 single parser · §13.1)
 test('every migration file in the repository yields a static identity; file / class / runtime name are unique', () => {
   const files = readdirSync(MIGRATIONS_DIR).filter((f) => f.endsWith('.ts')).sort();
-  assert.ok(files.length > 600);
+  // 544 historical sources retained after the 2026-09-18-id685 baseline rollover (+ any incremental)
+  assert.ok(files.length >= 544, `expected >= 544 migration files, found ${files.length}`);
   const classes = new Set();
   const runtime = new Set();
   for (const f of files) {
@@ -156,7 +157,7 @@ test('every migration file in the repository yields a static identity; file / cl
   }
 });
 
-test('frozen historical manifest == parser output for every entry; runtime name list in lockstep; historical ∩ incremental = ∅', () => {
+test('frozen historical manifest == parser output for every retained entry; no plaintext name list; historical ∩ incremental = ∅', () => {
   const manifest = JSON.parse(readFileSync(MANIFEST, 'utf8'));
   assert.equal(manifest.count, manifest.entries.length);
   const runtimeNames = [];
@@ -165,9 +166,12 @@ test('frozen historical manifest == parser output for every entry; runtime name 
     assert.deepEqual({ className: e.className, declaredName: e.declaredName, name: e.name }, { className: r.className, declaredName: r.declaredName, name: r.runtimeName }, e.file);
     runtimeNames.push(r.runtimeName);
   }
-  const namesTs = readFileSync(NAMES_TS, 'utf8');
-  const listed = [...namesTs.matchAll(/^\s+'([A-Za-z0-9_]+)',$/gm)].map((m) => m[1]);
-  assert.deepEqual(listed, runtimeNames);
+  // the historical manifest freezes exactly the retained source files (identity only, never runtime provenance)
+  const onDisk = readdirSync(MIGRATIONS_DIR).filter((f) => f.endsWith('.ts')).sort();
+  const incrementalFiles = new Set([...readFileSync(INCREMENTAL_MANIFEST, 'utf8').matchAll(/from\s+['"]\.\.\/migrations\/([^'"]+?)(?:\.js)?['"]/g)].map((m) => `${m[1]}.ts`));
+  assert.deepEqual(manifest.entries.map((e) => e.file), onDisk.filter((f) => !incrementalFiles.has(f)));
+  // no plaintext legacy-history name module may come back
+  for (const f of ['historical-migration-names.ts', 'legacy-history.facts.ts']) assert.ok(!existsSync(join(INCREMENTAL_DIR, f)), `${f} must not exist`);
   const incremental = new Set([...readFileSync(INCREMENTAL_MANIFEST, 'utf8').matchAll(/from\s+['"]\.\.\/migrations\/([^'"]+?)(?:\.js)?['"]/g)].map((m) => `${m[1]}.ts`));
   for (const e of manifest.entries) assert.ok(!incremental.has(e.file), `${e.file} is historical AND incremental`);
   const incRuntime = [...incremental].map((f) => parseMigrationIdentity(readFileSync(join(MIGRATIONS_DIR, f), 'utf8'), f).runtimeName);

@@ -70,6 +70,11 @@ function runQuery(sql: string, params: any[] = []): any {
     return driverShape(s, [{ id: row.id }]);
   }
 
+  // WO-O4O-STORE-OWNER-AGREEMENT-PUBLISH-PREREQUISITES-V1 §4: 승인 직전 사업자정보 5항목 재검증
+  if (has(s, 'SELECT "businessInfo" FROM users')) {
+    return driverShape(s, db.users.filter((u) => u.id === params[0]).map((u) => ({ businessInfo: u.businessInfo ?? null })));
+  }
+
   // ---- service_memberships ----
   if (has(s, 'SELECT', 'FROM service_memberships')) {
     if (has(s, 'sm.id = $1') || has(s, 'WHERE id = $1')) {
@@ -120,6 +125,14 @@ import { MembershipApprovalService } from '../MembershipApprovalService.js';
 
 const service = new MembershipApprovalService();
 
+const COMPLETE_BUSINESS_INFO = {
+  businessName: '테스트약국',
+  representativeName: '홍길동',
+  businessNumber: '123-45-67890',
+  businessAddress: '서울시 강남구 1',
+  businessPhone: '02-000-0000',
+};
+
 /** 5개 서비스 canonical service_key → 기대 role prefix (security-core SSOT 와 같아야 한다) */
 const SERVICES: Array<{ serviceKey: string; prefix: string }> = [
   { serviceKey: 'kpa-society', prefix: 'kpa' },
@@ -148,7 +161,15 @@ function seed(
   db = {
     memberships: [{ id: 'm-1', user_id: 'u1', service_key: serviceKey, role: membershipRole, status }],
     roles,
-    users: [{ id: 'u1', status: status === 'suspended' ? 'suspended' : 'pending', isActive: false }],
+    users: [
+      {
+        id: 'u1',
+        status: status === 'suspended' ? 'suspended' : 'pending',
+        isActive: false,
+        // store_owner 승인 게이트(사업자정보 5항목)를 통과하는 완비 픽스처 — 이 테스트의 관심사는 role prefix 뿐이다.
+        businessInfo: COMPLETE_BUSINESS_INFO,
+      },
+    ],
   };
   queries.length = 0;
   jest.clearAllMocks();

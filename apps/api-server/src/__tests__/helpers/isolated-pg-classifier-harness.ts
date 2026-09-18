@@ -1,32 +1,41 @@
 /**
  * Isolated-PostgreSQL classifier harness
- * (WO-O4O-DATABASE-STATE-CLASSIFIER-SCHEMA-DRIFT-AND-CONNECTION-LOG-HARDENING-V1 §8.2)
+ * (WO-O4O-DATABASE-STATE-CLASSIFIER-SCHEMA-DRIFT-AND-CONNECTION-LOG-HARDENING-V1 §8.2,
+ *  rewritten for the ordered history fingerprint by
+ *  WO-O4O-RETIRED-SERVICE-MIGRATION-HISTORY-SQUASH-AND-BASELINE-FINAL-CLOSURE-V1 §37)
  *
  * Builds real database states in a throw-away PostgreSQL instance and runs the classifier
  * against each of them. Never points at production: the target comes ONLY from
  * `O4O_ISOLATED_PG_URL` (a local/docker superuser-ish connection, e.g. postgres:15) and every
  * database created here is prefixed `o4o_hz_`. The URL is never logged.
  *
- * Two templates are built once (canonical bootstrap · bootstrap + every incremental migration)
- * and each scenario is `CREATE DATABASE … TEMPLATE …` + a mutation, so the whole table runs in
- * well under a minute. The `classify` function is injectable so the same scenarios can be run
- * against a previous classifier (BEFORE) and the current one (AFTER).
+ * One template is built once (canonical bootstrap; the incremental manifest is empty since the
+ * 2026-09-18-id685 rollover) and each scenario is `CREATE DATABASE … TEMPLATE …` + a mutation.
+ *
+ * History provenance is synthetic by design: the repository holds no plaintext legacy migration
+ * names, so legacy scenarios insert a SYNTHETIC legacy history and inject a matching
+ * `legacyBaseline` (hashed by the ONE canonical helper) through the classifier contract.
+ * Incremental-prefix scenarios likewise inject a synthetic 3-name manifest whose migrations
+ * change nothing, so every synthetic expected state reuses the baseline fingerprint.
+ *
+ * The production-equivalent legacy check (real 684-row history, real LEGACY_HISTORY_BASELINE) is
+ * opt-in: `O4O_LEGACY_HISTORY_FILE` points at a local, untracked, newline-separated name list
+ * captured read-only from production. It is never committed.
  */
 
+import fs from 'fs';
 import { Client } from 'pg';
 import { DataSource, type QueryRunner } from 'typeorm';
 import { runCanonicalBootstrap } from '../../database/bootstrap/bootstrap-runner.js';
 import { computeSchemaFingerprint } from '../../database/bootstrap/schema-fingerprint.js';
 import { BASELINE_MARKER_TABLE } from '../../database/bootstrap/baseline-marker.js';
-import { INCREMENTAL_MIGRATIONS, incrementalMigrationNames } from '../../database/incremental/manifest.js';
-import { HISTORICAL_MIGRATION_NAMES } from '../../database/incremental/historical-migration-names.js';
-import {
-  LEGACY_HISTORY_KNOWN_DUPLICATES,
-  LEGACY_HISTORY_RETIRED_NAMES,
-} from '../../database/incremental/legacy-history.facts.js';
-import type { ExpectedSchemaState } from '../../database/incremental/expected-schema-states.js';
+import { hashOrderedHistoryNames } from '../../database/bootstrap/legacy-history-fingerprint.js';
+import { INCREMENTAL_MIGRATIONS } from '../../database/incremental/manifest.js';
+import { EXPECTED_SCHEMA_STATES, type ExpectedSchemaState } from '../../database/incremental/expected-schema-states.js';
+import type { LegacyHistoryBaseline } from '../../database/incremental/legacy-history-baseline.js';
 
 export const ISOLATED_PG_ENV = 'O4O_ISOLATED_PG_URL';
+export const LEGACY_HISTORY_FILE_ENV = 'O4O_LEGACY_HISTORY_FILE';
 export const HARNESS_DB_PREFIX = 'o4o_hz_';
 
 export interface ClassifyOutcome {
@@ -38,6 +47,7 @@ export interface ClassifyOutcome {
 export interface ClassifierContractOverride {
   readonly manifestNames?: readonly string[];
   readonly expectedStates?: readonly ExpectedSchemaState[];
+  readonly legacyBaseline?: LegacyHistoryBaseline;
 }
 
 export type ClassifyFn = (queryRunner: QueryRunner, contract?: ClassifierContractOverride) => Promise<ClassifyOutcome>;
@@ -46,10 +56,10 @@ export interface Scenario {
   readonly id: string;
   readonly description: string;
   /** 'fresh' = empty database; otherwise a template name. */
-  readonly base: 'fresh' | 'bootstrap' | 'bootstrap_inc';
+  readonly base: 'fresh' | 'bootstrap';
   /** SQL statements applied after cloning (each in autocommit). */
   readonly mutate?: readonly string[];
-  /** Synthetic contract for gap / reversal scenarios. */
+  /** Synthetic contract (manifest / expected states / legacy baseline). */
   readonly contract?: ClassifierContractOverride;
   readonly expect: string;
 }
@@ -82,20 +92,63 @@ export function isolatedPgUrl(): string | undefined {
   return v && v.trim() ? v.trim() : undefined;
 }
 
-/** Legacy history rows in the shape production carries: historical names, retired facts, duplicates, then the incremental prefix. */
-export function legacyHistoryFixture(incrementalPrefix: readonly string[]): readonly string[] {
+/** Local, untracked production history capture (id order, one name per line); undefined when absent. */
+export function realLegacyHistoryNames(): readonly string[] | undefined {
+  const p = process.env[LEGACY_HISTORY_FILE_ENV];
+  if (!p || !p.trim() || !fs.existsSync(p.trim())) return undefined;
+  return fs.readFileSync(p.trim(), 'utf8').split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+}
+
+// ───────────────────────────── synthetic fixtures
+
+/** Synthetic legacy history: `size` rows in id order, the names at `duplicateAt` recorded twice (production has 3 such duplicates). */
+export function syntheticLegacyHistory(size = 100, duplicateAt: readonly number[] = [7, 40, 71]): readonly string[] {
   const rows: string[] = [];
-  for (const n of HISTORICAL_MIGRATION_NAMES) {
-    rows.push(n);
-    if (LEGACY_HISTORY_KNOWN_DUPLICATES.includes(n)) rows.push(n);
+  let i = 0;
+  while (rows.length < size) {
+    const name = `HarnessLegacy${String(i).padStart(4, '0')}${1600000000000 + i}`;
+    rows.push(name);
+    if (duplicateAt.includes(i) && rows.length < size) rows.push(name);
+    i += 1;
   }
-  rows.push(...LEGACY_HISTORY_RETIRED_NAMES);
-  rows.push(...incrementalPrefix);
   return rows;
 }
 
+/** Baseline derived from a fixture with the canonical hash helper (the classifier uses the same function). */
+export function legacyBaselineOf(names: readonly string[], capturedAt = '2026-09-18'): LegacyHistoryBaseline {
+  return {
+    rowCount: names.length,
+    distinctNameCount: new Set(names).size,
+    orderedNameSequenceSha256: hashOrderedHistoryNames(names),
+    capturedThroughId: names.length,
+    capturedAt,
+  };
+}
+
+/** Synthetic incremental manifest whose migrations change no schema object. */
+export const SYNTHETIC_MANIFEST: readonly string[] = [
+  'HarnessSyntheticFirst1800000000001',
+  'HarnessSyntheticSecond1800000000002',
+  'HarnessSyntheticThird1800000000003',
+];
+
+/**
+ * Expected states for SYNTHETIC_MANIFEST: every prefix reuses the TEMPLATE fingerprint (no-op migrations).
+ * The bootstrap template has every REAL incremental migration applied (buildTemplatesOnce), so its schema is
+ * EXPECTED_SCHEMA_STATES[INCREMENTAL_MIGRATIONS.length] — not [0] once the first post-rollover incremental lands
+ * (WO-O4O-STORE-OWNER-AGREEMENT-PUBLISH-PREREQUISITES-CLOSURE-HANDOFF-V1: S05/S07/S08 were false UNKNOWN_PARTIAL).
+ */
+export function syntheticExpectedStates(
+  baseline: ExpectedSchemaState = EXPECTED_SCHEMA_STATES[INCREMENTAL_MIGRATIONS.length] ?? EXPECTED_SCHEMA_STATES[0],
+): readonly ExpectedSchemaState[] {
+  return [baseline, ...SYNTHETIC_MANIFEST.map((name) => ({ appliedThrough: name, fingerprint: baseline.fingerprint, fingerprintLineCount: baseline.fingerprintLineCount }))];
+}
+
+/** TypeORM's own history table shape (created lazily by runMigrations; a bootstrap-only template has none yet). */
+export const HISTORY_TABLE_SQL = 'CREATE TABLE IF NOT EXISTS public.typeorm_migrations (id SERIAL PRIMARY KEY, "timestamp" bigint NOT NULL, name character varying NOT NULL)';
+
 export function historyInsertSql(names: readonly string[]): string[] {
-  const out: string[] = [`DELETE FROM public.typeorm_migrations`];
+  const out: string[] = [HISTORY_TABLE_SQL, `DELETE FROM public.typeorm_migrations`];
   names.forEach((n, i) => {
     if (!/^[A-Za-z0-9_]+$/.test(n)) throw new Error(`unsafe history name in fixture: ${n}`);
     out.push(`INSERT INTO public.typeorm_migrations (timestamp, name) VALUES (${1700000000000 + i}, '${n}')`);
@@ -103,32 +156,60 @@ export function historyInsertSql(names: readonly string[]): string[] {
   return out;
 }
 
-/** The §8.2 scenario table. `M` = incremental manifest names. */
+/** History mutations that must each break the ordered fingerprint (§37 negatives). */
+export function mutatedLegacyHistories(legacy: readonly string[]): Record<'renamed' | 'missing' | 'reordered' | 'inserted' | 'truncated' | 'thirdDuplicate', readonly string[]> {
+  const mid = Math.floor(legacy.length / 2);
+  const dupIndex = legacy.findIndex((n, i) => legacy[i + 1] === n);
+  return {
+    renamed: legacy.map((n, i) => (i === mid ? `${n}Renamed` : n)),
+    missing: legacy.filter((_, i) => i !== mid),
+    reordered: legacy.map((n, i) => (i === mid ? legacy[mid + 1] : i === mid + 1 ? legacy[mid] : n)),
+    inserted: [...legacy.slice(0, mid), 'HarnessInsertedRow1799999999990', ...legacy.slice(mid)],
+    truncated: legacy.slice(0, mid),
+    thirdDuplicate: [...legacy.slice(0, dupIndex + 2), legacy[dupIndex], ...legacy.slice(dupIndex + 2)],
+  };
+}
+
+/** The scenario table (§8.2 + §37). `M` = synthetic manifest names, `L` = synthetic legacy history. */
 export function standardScenarios(): Scenario[] {
-  const M = incrementalMigrationNames();
-  const M1 = M[0];
-  const legacyRows = legacyHistoryFixture(M);
-  const legacyBase = [`DROP TABLE public.${BASELINE_MARKER_TABLE}`, ...historyInsertSql(legacyRows)];
   const marker = BASELINE_MARKER_TABLE;
-  // synthetic 3-entry manifest for prefix-rule scenarios (only M1 has a real expected state)
-  const synthetic = [M1, 'HarnessSyntheticSecond1800000000002', 'HarnessSyntheticThird1800000000003'];
+  const M = SYNTHETIC_MANIFEST;
+  const states = syntheticExpectedStates();
+  const L = syntheticLegacyHistory();
+  const legacyBaseline = legacyBaselineOf(L);
+  const bad = mutatedLegacyHistories(L);
+  const inc = { manifestNames: M, expectedStates: states };
+  const leg = { legacyBaseline };
+  const legInc = { ...inc, ...leg };
+  const dropMarker = `DROP TABLE public.${marker}`;
+  const legacy = (rows: readonly string[]) => [dropMarker, ...historyInsertSql(rows)];
   return [
     { id: 'S01', description: 'fresh empty database', base: 'fresh', expect: 'FRESH_EMPTY' },
     { id: 'S02', description: 'bootstrap only (marker, no incremental)', base: 'bootstrap', expect: 'BOOTSTRAPPED' },
     { id: 'S03', description: 'bootstrap, non-core column dropped', base: 'bootstrap', mutate: ['ALTER TABLE public.store_tablet_screen_sets DROP COLUMN updated_at'], expect: 'UNKNOWN_PARTIAL' },
     { id: 'S04', description: 'bootstrap, extra table added', base: 'bootstrap', mutate: ['CREATE TABLE public.harness_extra_table (id integer)'], expect: 'UNKNOWN_PARTIAL' },
-    { id: 'S05', description: 'bootstrap + incremental 1 applied normally', base: 'bootstrap_inc', expect: 'BOOTSTRAPPED' },
-    { id: 'S06', description: 'bootstrap + incremental 1, then non-core column dropped', base: 'bootstrap_inc', mutate: ['ALTER TABLE public.store_tablet_devices DROP COLUMN last_seen_at'], expect: 'UNKNOWN_PARTIAL' },
-    { id: 'S07', description: 'legacy established (history 678-shaped, no marker) + incremental 1', base: 'bootstrap_inc', mutate: legacyBase, expect: 'LEGACY_ESTABLISHED' },
-    { id: 'S08', description: 'legacy, non-core constraint dropped', base: 'bootstrap_inc', mutate: [...legacyBase, 'ALTER TABLE public.store_tablet_devices DROP CONSTRAINT "FK_std_current_location"'], expect: 'UNKNOWN_PARTIAL' },
-    { id: 'S09', description: 'legacy, incremental history gap [M2] (M1 missing)', base: 'bootstrap_inc', mutate: [`DROP TABLE public.${marker}`, ...historyInsertSql([...legacyHistoryFixture([]), synthetic[1]])], contract: { manifestNames: synthetic }, expect: 'UNKNOWN_PARTIAL' },
-    { id: 'S10', description: 'legacy, incremental history skip [M1, M3]', base: 'bootstrap_inc', mutate: [`DROP TABLE public.${marker}`, ...historyInsertSql([...legacyHistoryFixture([]), synthetic[0], synthetic[2]])], contract: { manifestNames: synthetic }, expect: 'UNKNOWN_PARTIAL' },
-    { id: 'S11', description: 'legacy, incremental history reversal [M2, M1]', base: 'bootstrap_inc', mutate: [`DROP TABLE public.${marker}`, ...historyInsertSql([...legacyHistoryFixture([]), synthetic[1], synthetic[0]])], contract: { manifestNames: synthetic }, expect: 'UNKNOWN_PARTIAL' },
-    { id: 'S12', description: 'legacy, history name outside manifest / historical / retired facts', base: 'bootstrap_inc', mutate: [...legacyBase, `INSERT INTO public.typeorm_migrations (timestamp, name) VALUES (1799999999999, 'HarnessUnknownName1799999999999')`], expect: 'UNKNOWN_PARTIAL' },
-    { id: 'S13', description: 'marker AND legacy anchors coexist', base: 'bootstrap_inc', mutate: historyInsertSql(legacyRows), expect: 'UNKNOWN_PARTIAL' },
-    { id: 'S14', description: 'bootstrap + incremental 1, M1 recorded twice', base: 'bootstrap_inc', mutate: [`INSERT INTO public.typeorm_migrations (timestamp, name) VALUES (1799999999998, '${M1}')`], expect: 'UNKNOWN_PARTIAL' },
-    { id: 'S15', description: 'legacy, known duplicate recorded a third time', base: 'bootstrap_inc', mutate: [...legacyBase, `INSERT INTO public.typeorm_migrations (timestamp, name) VALUES (1799999999997, '${LEGACY_HISTORY_KNOWN_DUPLICATES[0]}')`], expect: 'UNKNOWN_PARTIAL' },
-    { id: 'S16', description: 'legacy, anchors present but last historical migration row missing', base: 'bootstrap_inc', mutate: [...legacyBase, `DELETE FROM public.typeorm_migrations WHERE name = 'BaselineRbacAndAccountTables20270413000000'`], expect: 'UNKNOWN_PARTIAL' },
+    { id: 'S05', description: 'bootstrap + incremental [M1] recorded (no-op migration)', base: 'bootstrap', mutate: historyInsertSql([M[0]]), contract: inc, expect: 'BOOTSTRAPPED' },
+    { id: 'S06', description: 'bootstrap + incremental [M1], then non-core column dropped', base: 'bootstrap', mutate: [...historyInsertSql([M[0]]), 'ALTER TABLE public.store_tablet_devices DROP COLUMN last_seen_at'], contract: inc, expect: 'UNKNOWN_PARTIAL' },
+    // S07 compares the template schema at incremental prefix 0, so it must read the synthetic (template) expected
+    // states — the real registry's [0] is the bare baseline, which the template no longer equals once a real
+    // incremental exists (see syntheticExpectedStates).
+    { id: 'S07', description: 'legacy established (synthetic ordered history == injected baseline, no marker)', base: 'bootstrap', mutate: legacy(L), contract: { ...leg, expectedStates: states }, expect: 'LEGACY_ESTABLISHED' },
+    { id: 'S08', description: 'legacy + incremental [M1] after the legacy prefix', base: 'bootstrap', mutate: legacy([...L, M[0]]), contract: legInc, expect: 'LEGACY_ESTABLISHED' },
+    { id: 'S09', description: 'legacy, non-core constraint dropped (schema drift)', base: 'bootstrap', mutate: [...legacy(L), 'ALTER TABLE public.store_tablet_devices DROP CONSTRAINT "FK_std_current_location"'], contract: leg, expect: 'UNKNOWN_PARTIAL' },
+    { id: 'S10', description: 'legacy, incremental history gap [M2] (M1 missing)', base: 'bootstrap', mutate: legacy([...L, M[1]]), contract: legInc, expect: 'UNKNOWN_PARTIAL' },
+    { id: 'S11', description: 'legacy, incremental history skip [M1, M3]', base: 'bootstrap', mutate: legacy([...L, M[0], M[2]]), contract: legInc, expect: 'UNKNOWN_PARTIAL' },
+    { id: 'S12', description: 'legacy, incremental history reversal [M2, M1]', base: 'bootstrap', mutate: legacy([...L, M[1], M[0]]), contract: legInc, expect: 'UNKNOWN_PARTIAL' },
+    { id: 'S13', description: 'legacy, foreign row after the legacy prefix (not a manifest name)', base: 'bootstrap', mutate: legacy([...L, 'HarnessUnknownName1799999999999']), contract: legInc, expect: 'UNKNOWN_PARTIAL' },
+    { id: 'S14', description: 'marker AND legacy history fingerprint coexist', base: 'bootstrap', mutate: historyInsertSql(L), contract: leg, expect: 'UNKNOWN_PARTIAL' },
+    { id: 'S15', description: 'bootstrap + incremental [M1] recorded twice', base: 'bootstrap', mutate: historyInsertSql([M[0], M[0]]), contract: inc, expect: 'UNKNOWN_PARTIAL' },
+    { id: 'S16', description: 'legacy, one history row renamed', base: 'bootstrap', mutate: legacy(bad.renamed), contract: leg, expect: 'UNKNOWN_PARTIAL' },
+    { id: 'S17', description: 'legacy, one history row missing', base: 'bootstrap', mutate: legacy(bad.missing), contract: leg, expect: 'UNKNOWN_PARTIAL' },
+    { id: 'S18', description: 'legacy, two adjacent history rows reordered', base: 'bootstrap', mutate: legacy(bad.reordered), contract: leg, expect: 'UNKNOWN_PARTIAL' },
+    { id: 'S19', description: 'legacy, extra row inserted inside the legacy prefix', base: 'bootstrap', mutate: legacy(bad.inserted), contract: leg, expect: 'UNKNOWN_PARTIAL' },
+    { id: 'S20', description: 'legacy, history truncated (fewer rows than the baseline)', base: 'bootstrap', mutate: legacy(bad.truncated), contract: leg, expect: 'UNKNOWN_PARTIAL' },
+    { id: 'S21', description: 'legacy, known duplicate recorded a third time inside the prefix', base: 'bootstrap', mutate: legacy(bad.thirdDuplicate), contract: leg, expect: 'UNKNOWN_PARTIAL' },
+    { id: 'S22', description: 'legacy, incremental [M1] recorded inside the prefix (prefix shifted)', base: 'bootstrap', mutate: legacy([...L.slice(0, -1), M[0], L[L.length - 1]]), contract: legInc, expect: 'UNKNOWN_PARTIAL' },
+    { id: 'S23', description: 'legacy, prefix intact but no expected state for incremental prefix 3+', base: 'bootstrap', mutate: legacy([...L, M[0], M[1], M[2]]), contract: { ...legInc, expectedStates: states.slice(0, 3) }, expect: 'UNKNOWN_PARTIAL' },
   ];
 }
 
@@ -248,16 +329,16 @@ export class IsolatedPgHarness {
     }
   }
 
-  /** Templates: canonical bootstrap; bootstrap + every incremental migration. */
-  private templates: Promise<{ bootstrap: string; bootstrap_inc: string }> | null = null;
+  /** Templates: canonical bootstrap (+ every incremental migration of the manifest, currently none). */
+  private templates: Promise<{ bootstrap: string }> | null = null;
 
   /** Memoized: templates are built once per harness instance. */
-  buildTemplates(): Promise<{ bootstrap: string; bootstrap_inc: string }> {
+  buildTemplates(): Promise<{ bootstrap: string }> {
     if (!this.templates) this.templates = this.buildTemplatesOnce();
     return this.templates;
   }
 
-  private async buildTemplatesOnce(): Promise<{ bootstrap: string; bootstrap_inc: string }> {
+  private async buildTemplatesOnce(): Promise<{ bootstrap: string }> {
     await this.assertLocalIsolated();
     const bootstrap = await this.createDatabase('tpl_bootstrap');
     await this.withQueryRunner(bootstrap, async (qr) => {
@@ -265,16 +346,17 @@ export class IsolatedPgHarness {
       await runCanonicalBootstrap(qr, silentLog);
       await qr.commitTransaction();
     });
-    const bootstrapInc = await this.createDatabase('tpl_bootstrap_inc', bootstrap);
-    const ds = this.dataSource(bootstrapInc, true);
-    await ds.initialize();
-    try {
-      const executed = await ds.runMigrations({ transaction: 'each' });
-      if (executed.length !== INCREMENTAL_MIGRATIONS.length) throw new Error(`template applied ${executed.length}/${INCREMENTAL_MIGRATIONS.length} incremental migrations`);
-    } finally {
-      await ds.destroy();
+    if (INCREMENTAL_MIGRATIONS.length > 0) {
+      const ds = this.dataSource(bootstrap, true);
+      await ds.initialize();
+      try {
+        const executed = await ds.runMigrations({ transaction: 'each' });
+        if (executed.length !== INCREMENTAL_MIGRATIONS.length) throw new Error(`template applied ${executed.length}/${INCREMENTAL_MIGRATIONS.length} incremental migrations`);
+      } finally {
+        await ds.destroy();
+      }
     }
-    return { bootstrap, bootstrap_inc: bootstrapInc };
+    return { bootstrap };
   }
 
   async runScenarios(classify: ClassifyFn, scenarios: readonly Scenario[] = standardScenarios()): Promise<ScenarioResult[]> {

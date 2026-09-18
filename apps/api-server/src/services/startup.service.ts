@@ -5,6 +5,7 @@ import { backupService } from './BackupService.js';
 import { errorAlertService } from './ErrorAlertService.js';
 import { marketTrialLifecycleJob } from '../jobs/market-trial-lifecycle.job.js';
 import { privacyRetentionJob } from '../jobs/privacy-retention.job.js';
+import { storeOwnerTerminationJob } from '../jobs/store-owner-termination.job.js';
 import { spdRevisionExpiryJob } from '../jobs/spd-revision-expiry.job.js';
 import { videoTempOutputExpiryJob } from '../jobs/video-temp-output-expiry.job.js';
 import { env } from '../utils/env-validator.js';
@@ -217,6 +218,11 @@ export class StartupService {
       // 개인정보 보유기간 집행(6 테이블 · 부팅+24h). PRIVACY_RETENTION_MODE=apply 일 때만 실삭제, 기본 dry-run.
       privacyRetentionJob.start();
       logger.info('✅ Privacy Retention Job started');
+
+      // WO-O4O-STORE-OWNER-AGREEMENT-PUBLISH-PREREQUISITES-V1
+      // 종료일 도래 시 Store 공개표면 중단, 종료+7일 도래 시 반환 완료 건 파기 재시도.
+      storeOwnerTerminationJob.start();
+      logger.info('✅ Store Owner Termination Job started');
     } catch (schedulerError) {
       logger.warn('Scheduler initialization failed (non-critical):', schedulerError);
     }
@@ -301,6 +307,7 @@ export class StartupService {
       spdRevisionExpiryJob.stop();
       videoTempOutputExpiryJob.stop();
       privacyRetentionJob.stop();
+      storeOwnerTerminationJob.stop();
       logger.info('✅ Schedulers stopped');
     } catch (error) {
       logger.error('Error during shutdown:', error);

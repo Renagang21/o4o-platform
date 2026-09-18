@@ -157,84 +157,8 @@ describe('cosmetics product schema migration', () => {
     'certification_ids', 'usage_info', 'caution_info', 'sku', 'barcodes',
   ];
 
-  /**
-   * 실제 migration 을 recording mock QueryRunner 로 실행한다.
-   * `existingColumns` 로 "컬럼이 전혀 없는 / 일부 있는 / 전부 있는" 스키마를 흉내낸다.
-   * (ADD COLUMN IF NOT EXISTS 가 멱등이므로 어느 경우에도 동일 SQL 이 안전하게 실행된다.)
-   */
-  async function runUp(opts: { hasTable?: boolean; columnsAfter?: string[] } = {}) {
-    const { AddCosmeticsProductInfoColumns20270220000000 } = await import(
-      '../database/migrations/20270220000000-AddCosmeticsProductInfoColumns.js'
-    );
-    const queries: string[] = [];
-    const qr: any = {
-      hasTable: async () => opts.hasTable ?? true,
-      query: async (sql: string) => {
-        queries.push(sql);
-        if (/information_schema/i.test(sql)) {
-          return (opts.columnsAfter ?? REQUIRED).map((column_name) => ({ column_name }));
-        }
-        return [];
-      },
-    };
-    await new AddCosmeticsProductInfoColumns20270220000000().up(qr);
-    return queries;
-  }
-
-  const ddl = (queries: string[]) => queries.filter((q) => !/information_schema/i.test(q)).join('\n');
-
-  it('adds every column the entity declares but production lacked', async () => {
-    const sql = ddl(await runUp());
-    for (const col of REQUIRED) {
-      expect(sql).toMatch(new RegExp(`ADD COLUMN IF NOT EXISTS ${col}\\b`));
-    }
-  });
-
-  it('is idempotent: every ADD COLUMN / CREATE INDEX guarded by IF NOT EXISTS', async () => {
-    const sql = ddl(await runUp());
-    const adds = sql.match(/ADD COLUMN[^,\n]*/g) ?? [];
-    expect(adds).toHaveLength(REQUIRED.length);
-    for (const a of adds) expect(a).toContain('IF NOT EXISTS');
-    expect(sql).toMatch(/CREATE UNIQUE INDEX IF NOT EXISTS/);
-  });
-
-  it.each([
-    ['no columns present', [] as string[]],
-    ['some columns present', ['subtitle', 'sku']],
-    ['all columns present', REQUIRED],
-  ])('applies safely when %s', async (_label, existing) => {
-    // 사후 검증은 적용 후 상태를 보므로, 어느 출발 상태든 최종적으로 전부 존재하면 통과해야 한다
-    void existing;
-    await expect(runUp({ columnsAfter: REQUIRED })).resolves.toBeDefined();
-  });
-
-  it('aborts (rolls back) if a column is still missing after apply', async () => {
-    await expect(runUp({ columnsAfter: REQUIRED.filter((c) => c !== 'sku') })).rejects.toThrow(/sku/);
-  });
-
-  it('aborts when the target table does not exist', async () => {
-    await expect(runUp({ hasTable: false })).rejects.toThrow(/cosmetics_products/);
-  });
-
-  it('touches only cosmetics_products, nothing destructive, no other service tables', async () => {
-    const sql = ddl(await runUp());
-    const alters = sql.match(/ALTER TABLE\s+\S+/g) ?? [];
-    expect(alters.length).toBeGreaterThan(0);
-    for (const a of alters) expect(a).toContain('cosmetics.cosmetics_products');
-    expect(sql).not.toMatch(/DROP\s+(TABLE|COLUMN)/i);
-    expect(sql).not.toMatch(/CASCADE/i);
-    expect(sql).not.toMatch(/neture\./i);
-  });
-
-  it('down is a no-op (rollback would re-break product listing)', async () => {
-    const { AddCosmeticsProductInfoColumns20270220000000 } = await import(
-      '../database/migrations/20270220000000-AddCosmeticsProductInfoColumns.js'
-    );
-    const qr: any = { query: jest.fn(), hasTable: jest.fn() };
-    await new AddCosmeticsProductInfoColumns20270220000000().down();
-    expect(qr.query).not.toHaveBeenCalled();
-  });
-
+  // The migration that introduced these columns was absorbed into the canonical schema baseline
+  // (its source file is no longer in the repository); only the entity ↔ schema agreement remains testable here.
   it('entity declares all of them (schema and entity agree after apply)', () => {
     const meta = ds.getMetadata(CosmeticsProduct);
     const dbCols = new Set(meta.columns.map((c) => c.databaseName));

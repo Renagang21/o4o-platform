@@ -80,6 +80,7 @@ interface ProductPromotionPlan {
   identifiers: Array<{
     type: ProductIdentifierType; value: string; isPrimary: boolean;
     identityKey: boolean;        // true = Master dedup/link/conflict 판정에 사용 · false = 대상 Master 에 멱등 추가만(타 Master 중복 허용 · conflict 아님)
+                                 // Adapter 가 데이터셋 의미에 따라 명시적으로 정한다. Core 가 type(MFDS_CODE·UNKNOWN 등)으로 추론·하드코딩하지 않는다
     sourceType: string; sourceLabel: string | null; verificationStatus: string;
   }>;
   dedupHints: { nameManufacturerExact: boolean };   // 이름+제조사 정확일치 dedup 사용 여부(기본 true)

@@ -7,13 +7,11 @@
  *   manifest[0..k-1] for some k. Gaps ([M2]), skips ([M1, M3]), reversals ([M3, M2]) and
  *   duplicates are rejected — the classifier turns any violation into UNKNOWN_PARTIAL.
  *
- * Legacy history name rule
- *   A LEGACY_ESTABLISHED history may contain only historical names, the explicit retired-name
- *   facts, and the incremental prefix. Each name at most once (known duplicates: at most twice).
+ * Legacy history rule
+ *   Lives in legacy-history-fingerprint.ts: the first `rowCount` rows of a LEGACY_ESTABLISHED
+ *   history must hash to the ordered history fingerprint; the remainder must be exactly the
+ *   contiguous incremental prefix above. No migration name is consulted.
  */
-
-import { HISTORICAL_MIGRATION_NAMES } from '../incremental/historical-migration-names.js';
-import { LEGACY_HISTORY_KNOWN_DUPLICATES, LEGACY_HISTORY_RETIRED_NAMES } from '../incremental/legacy-history.facts.js';
 
 export interface IncrementalPrefixResult {
   /** Number of manifest migrations applied as a contiguous prefix (valid only when `contiguous`). */
@@ -65,38 +63,4 @@ export function resolveIncrementalPrefix(
   const applied = contiguous ? distinct : [];
   const pending = contiguous ? manifestNames.slice(distinct.length) : [];
   return { prefixLength, contiguous, appliedSequence, applied, pending, problems };
-}
-
-export interface LegacyHistoryNameResult {
-  /** Names that are neither historical, retired-fact nor incremental manifest names. */
-  readonly unknown: readonly string[];
-  /** Names recorded more often than the historical facts allow. */
-  readonly duplicateProblems: readonly string[];
-}
-
-export function validateLegacyHistoryNames(
-  historyNames: readonly string[],
-  manifestNames: readonly string[],
-  facts: {
-    historical?: readonly string[];
-    retired?: readonly string[];
-    knownDuplicates?: readonly string[];
-  } = {},
-): LegacyHistoryNameResult {
-  const historical = new Set(facts.historical ?? HISTORICAL_MIGRATION_NAMES);
-  const retired = new Set(facts.retired ?? LEGACY_HISTORY_RETIRED_NAMES);
-  const knownDuplicates = new Set(facts.knownDuplicates ?? LEGACY_HISTORY_KNOWN_DUPLICATES);
-  const manifest = new Set(manifestNames);
-
-  const counts = new Map<string, number>();
-  for (const n of historyNames) counts.set(n, (counts.get(n) ?? 0) + 1);
-
-  const unknown: string[] = [];
-  const duplicateProblems: string[] = [];
-  for (const [n, c] of counts) {
-    if (!historical.has(n) && !retired.has(n) && !manifest.has(n)) unknown.push(n);
-    const allowed = knownDuplicates.has(n) ? 2 : 1;
-    if (c > allowed && !manifest.has(n)) duplicateProblems.push(`'${n}' recorded ${c} times (allowed ${allowed})`);
-  }
-  return { unknown, duplicateProblems };
 }

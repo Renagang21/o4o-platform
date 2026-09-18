@@ -7,53 +7,32 @@
  * 기존 candidate 콘솔 코어(ProductCandidateService)는 수정하지 않는다. 본 서비스는 store_web 요청
  * 전용 액션(기존 연결 / 신규 승인 / 보완 요청 / 등록 불가)만 additive 로 제공한다.
  *
- * 신규 master 승인(A안): 의약품 promotion 게이트(promoteOne, DRUG 하드코딩)를 사용하지 않고,
- *   store_web 전용 최소 ProductMaster(+선택 ProductIdentifier) 생성 경로를 별도 트랜잭션으로 구현.
- *   합성 바코드 생성 금지(WO-...-BARCODE-NULLABLE-AND-INTERNAL-CODE-GENERATION-STOP-V1):
- *   바코드 없으면 barcode=NULL, 정체성=ProductMaster.id(UUID).
+ * 신규 master 승인: WO-O4O-PRODUCT-CANDIDATE-GENERAL-PROMOTION-CORE-FOUNDATION-V1 부터
+ *   소스 중립 Promotion Core(`ProductPromotionCore.promoteWithin`) 로 위임한다.
+ *   - Plan 생성·에러 매핑은 store_web Adapter(`promotion/adapters/store-web-promotion.adapter.ts`)
+ *   - 매장 listing/profile · 알림은 Store 도메인(여기) 에 남긴다
+ *   - 합성 바코드/이름/제조사 생성 금지: 바코드 없으면 barcode=NULL(정체성=UUID), 이름·제조사 없으면 CANDIDATE_FIELD_MISSING
  *
- * 원자성: ProductMaster 생성/기존 연결 + candidate 상태 전이 + organization listing 생성을
- *   단일 dataSource.transaction 으로 처리.
+ * 원자성: Core 승격(Master+Identifier+candidate 전이) + organization listing 생성을
+ *   **이 서비스가 여는** 단일 dataSource.transaction 으로 처리한다 (§2.2 (a) — `promote()` 는 쓰지 않는다).
+ *   link / conflict / hold 는 Adapter 가 throw → 롤백 → candidate 불변.
  */
 
 import type { DataSource, EntityManager } from 'typeorm';
 import { ProductCandidate } from '../entities/ProductCandidate.entity.js';
-import {
-  inferIdentifierTypeFromBarcode,
-  normalizeIdentifier,
-  isGtinLike,
-  sanitizeIdentifierValue,
-} from '../utils/product-identifier.util.js';
-import type { ProductClassification } from '../utils/product-type.util.js';
-// WO-O4O-PRODUCT-LANDING-FULL-BACKFILL-AND-ON-CREATE-COVERAGE-CLOSURE-V1
-import { ensureProductLandingForMaster } from './product-landing.service.js';
+import { sanitizeIdentifierValue } from '../utils/product-identifier.util.js';
 import logger from '../../../utils/logger.js';
 import { resolveCanonicalServiceKey } from '@o4o/security-core';
+import { ProductPromotionCore } from '../promotion/product-promotion-core.service.js';
+import {
+  STORE_REQUEST_SOURCE_LABEL,
+  assertStoreWebCreate,
+  buildStoreWebPromotionPlan,
+} from '../promotion/adapters/store-web-promotion.adapter.js';
 
-const STORE_REQUEST_SOURCE_LABEL = 'kpa-store-product-request';
-
-/** 표준 분류 코드 → (regulatory_type, drug_category). classificationToFilter 의 역방향. */
-function classificationToRegulatory(code: string | null): { regulatoryType: string; drugCategory: string | null } {
-  switch (code) {
-    case 'otc': return { regulatoryType: 'DRUG', drugCategory: 'otc' };
-    case 'rx': return { regulatoryType: 'DRUG', drugCategory: 'rx' };
-    case 'drug': return { regulatoryType: 'DRUG', drugCategory: null };
-    case 'quasi': return { regulatoryType: 'QUASI_DRUG', drugCategory: null };
-    case 'health_functional': return { regulatoryType: 'HEALTH_FUNCTIONAL', drugCategory: null };
-    case 'medical_device': return { regulatoryType: 'MEDICAL_DEVICE', drugCategory: null };
-    case 'cosmetic': return { regulatoryType: 'COSMETIC', drugCategory: null };
-    case 'general': return { regulatoryType: 'GENERAL', drugCategory: null };
-    default: return { regulatoryType: 'GENERAL', drugCategory: null };
-  }
-}
-
-export interface StoreRequestDuplicate {
-  id: string;
-  name: string | null;
-  barcode: string | null;
-  manufacturerName: string | null;
-  matchType: 'barcode' | 'name_manufacturer';
-}
+// 컨트롤러가 이 모듈에서 import 한다 — 정의는 Adapter 로 이동, 여기서는 re-export 로 계약 유지
+export type { StoreRequestDuplicate } from '../promotion/adapters/store-web-promotion.adapter.js';
+import type { StoreRequestDuplicate } from '../promotion/adapters/store-web-promotion.adapter.js';
 
 /** 액션 결과 — 컨트롤러가 커밋 후 제출자 알림에 사용할 필드 포함 */
 export interface StoreRequestActionResult {
@@ -217,9 +196,19 @@ export class StoreProductRequestAdminService {
   }
 
   /**
-   * 신규 ProductMaster 승인 (store_web 전용, A안). drug promotion 게이트 미사용.
-   * 중복 재검사(바코드 / 상품명+제조사) → 존재 시 CONFLICT(기존 연결 유도).
-   * ProductMaster(+선택 Identifier) 생성 + 매장 listing + candidate_status='approved_new_master'. 단일 TX.
+   * 신규 ProductMaster 승인 (store_web) — Promotion Core 위임.
+   *
+   * 흐름 (WO-O4O-PRODUCT-CANDIDATE-GENERAL-PROMOTION-CORE-FOUNDATION-V1 §2.2):
+   *   loadStoreRequest → org/serviceKey 검사(Store 책임) → Adapter Plan
+   *   → dataSource.transaction(m):
+   *        core.promoteWithin(m, plan)          // Master + Identifier + candidate 전이 (같은 TX)
+   *        assertStoreWebCreate(outcome)        // link/conflict/hold → throw → 롤백 (candidate 불변)
+   *        upsertOrganizationListing(m, …)      // Store 도메인
+   *        raw_payload.approval.listingId 보강
+   *   → 커밋 후 core.afterCommit(plan, outcome) // DRUG extension(Adapter 선언 시) + Landing, best-effort
+   *
+   * `core.promote()` 는 사용하지 않는다 — Master 와 listing 이 다른 TX 로 갈라지면
+   * DUPLICATE_MASTER_EXISTS 로 되돌릴 때 candidate 가 이미 matched 로 남는다.
    */
   async approveAsNewMaster(
     candidateId: string,
@@ -234,103 +223,43 @@ export class StoreProductRequestAdminService {
     const serviceKey = candidate.serviceKey;
     if (!serviceKey) throw new Error('CANDIDATE_SERVICE_KEY_MISSING');
 
-    const classificationCode = (candidate.candidateCategory
-      || (candidate.rawPayload?.classification as string | undefined)
-      || 'general') as ProductClassification;
-    const { regulatoryType, drugCategory } = classificationToRegulatory(classificationCode);
-    // Rx 신규 상품은 매장 요청 대상이 아니다 (매장 listing 불가 정책과 일관).
-    if (regulatoryType === 'DRUG' && drugCategory === 'rx') throw new Error('RX_NEW_MASTER_BLOCKED');
+    const plan = buildStoreWebPromotionPlan(candidate, { reviewedBy: input.reviewedBy, note: input.note });
+    const core = new ProductPromotionCore(this.dataSource);
 
-    // 중복 재검사 (TX 밖 read — 확정은 barcode UNIQUE 로도 방어)
-    const dups = await this.findDuplicates(candidateId);
-    if (dups.length > 0) {
-      const err = new Error('DUPLICATE_MASTER_EXISTS') as Error & { duplicates?: StoreRequestDuplicate[] };
-      err.duplicates = dups;
-      throw err;
-    }
+    const { result, outcome } = await this.dataSource.transaction(async (m) => {
+      const outcome = await core.promoteWithin(m, plan);
+      assertStoreWebCreate(outcome); // create 이외는 throw → 이 TX 전체 롤백
 
-    // 바코드 정규화 (있을 때만)
-    const rawBarcode = candidate.identifierValue ? sanitizeIdentifierValue(candidate.identifierValue) : '';
-    const idType = rawBarcode ? inferIdentifierTypeFromBarcode(rawBarcode) : null;
-    const normalized = rawBarcode && idType ? normalizeIdentifier(idType as any, rawBarcode) : '';
-    // product_masters.barcode 는 GTIN(8~14자리)만. 그 외는 NULL (합성 금지) — 식별자로만 보관.
-    const masterBarcode = rawBarcode && isGtinLike(rawBarcode) ? rawBarcode : null;
-
-    const name = (candidate.candidateName ?? '').trim() || '(이름 미상)';
-    const manufacturer = (candidate.candidateManufacturer ?? '').trim() || '미상';
-    const specParts = [candidate.candidateSpec, candidate.candidateUnit].map((s) => (s ?? '').trim()).filter(Boolean);
-    const specification = specParts.length > 0 ? specParts.join(' ') : null;
-
-    const result = await this.dataSource.transaction(async (m) => {
-      // TX 내 바코드 재확인 (동시 생성 방어)
-      if (masterBarcode) {
-        const clash: Array<{ id: string }> = await m.query(
-          `SELECT id FROM product_masters WHERE barcode = $1 LIMIT 1`, [masterBarcode],
-        );
-        if (clash.length > 0) {
-          const err = new Error('DUPLICATE_MASTER_EXISTS') as Error & { duplicates?: StoreRequestDuplicate[] };
-          err.duplicates = [{ id: clash[0].id, name: null, barcode: masterBarcode, manufacturerName: null, matchType: 'barcode' }];
-          throw err;
-        }
-      }
-
-      // ProductMaster 생성 (store_web: is_mfds_verified=false, mfds_* NULL, 정체성=UUID)
-      const masterRows: Array<{ id: string }> = await m.query(
-        `INSERT INTO product_masters
-           (id, barcode, regulatory_type, drug_category, regulatory_name, name, manufacturer_name,
-            specification, is_mfds_verified, status, tags, created_at, updated_at)
-         VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, false, 'ACTIVE', '[]'::jsonb, NOW(), NOW())
-         RETURNING id`,
-        [masterBarcode, regulatoryType, drugCategory, name, name, manufacturer, specification],
-      );
-      const masterId = masterRows[0].id;
-
-      // ProductIdentifier (바코드가 있을 때만; primary = master.barcode mirror 여부)
-      let identifierCreated = false;
-      if (rawBarcode && idType) {
-        await m.query(
-          `INSERT INTO product_identifiers
-             (id, product_master_id, identifier_type, identifier_value, normalized_value,
-              source_type, source_label, is_primary, verification_status, created_at, updated_at)
-           VALUES (gen_random_uuid(), $1, $2, $3, $4, 'store_web_request', $5, $6, 'pharmacy_provided', NOW(), NOW())`,
-          [masterId, idType, candidate.identifierValue, normalized || rawBarcode, STORE_REQUEST_SOURCE_LABEL, masterBarcode !== null],
-        );
-        identifierCreated = true;
-      }
-
-      // 매장 listing + profile
+      // 매장 listing + profile (Store 도메인 — Core 밖)
       const { listingId } = await this.upsertOrganizationListing(m, {
         organizationId: candidate.organizationId!,
         serviceKey,
-        masterId,
-        displayName: name,
+        masterId: outcome.masterId,
+        displayName: plan.master.name,
       });
-
-      // candidate 상태 전이
+      // 기존 응답/감사 계약 유지: approval.listingId · identifierCreated
       await m.query(
         `UPDATE product_candidates
-           SET matched_product_master_id = $2, candidate_status = 'approved_new_master',
-               reviewed_by = $3, reviewed_at = NOW(),
-               raw_payload = COALESCE(raw_payload, '{}'::jsonb) || $4::jsonb, updated_at = NOW()
+           SET raw_payload = jsonb_set(
+                 COALESCE(raw_payload, '{}'::jsonb), '{approval}',
+                 COALESCE(raw_payload -> 'approval', '{}'::jsonb) || $2::jsonb, true),
+               updated_at = NOW()
          WHERE id = $1`,
-        [candidateId, masterId, input.reviewedBy ?? null,
-         JSON.stringify({ approval: { kind: 'new_master', masterId, listingId, identifierCreated, note: input.note ?? null } })],
+        [candidateId, JSON.stringify({ listingId, identifierCreated: outcome.identifiersCreated > 0 })],
       );
 
-      logger.info(`[StoreRequestAdmin] approved new master candidate=${candidateId} -> master=${masterId} listing=${listingId} id=${identifierCreated}`);
-      return {
-        masterId, listingId, identifierCreated, candidateStatus: 'approved_new_master',
+      logger.info(`[StoreRequestAdmin] approved new master candidate=${candidateId} -> master=${outcome.masterId} listing=${listingId} id=${outcome.identifiersCreated}`);
+      const result: StoreRequestActionResult & { identifierCreated: boolean } = {
+        masterId: outcome.masterId, listingId, identifierCreated: outcome.identifiersCreated > 0,
+        candidateStatus: 'approved_new_master',
         submittedBy: candidate.submittedBy, serviceKey: candidate.serviceKey,
         organizationId: candidate.organizationId, productName: candidate.candidateName,
       };
+      return { result, outcome };
     });
 
-    // WO-O4O-PRODUCT-LANDING-FULL-BACKFILL-AND-ON-CREATE-COVERAGE-CLOSURE-V1
-    //   신규 master 는 대표 QR 진입점(Landing)을 갖는다. TX **커밋 후** 발급한다 —
-    //   승인이 롤백되면 이 줄에 도달하지 않으므로 orphan Landing 이 남지 않는다. 멱등·best-effort.
-    if (result.masterId) {
-      await ensureProductLandingForMaster(this.dataSource, result.masterId, 'store-request-new-master');
-    }
+    // 커밋 **후** 효과 (DRUG extension · Landing). 롤백 시 여기 도달하지 않으므로 orphan 이 남지 않는다.
+    await core.afterCommit(plan, outcome);
     return result;
   }
 

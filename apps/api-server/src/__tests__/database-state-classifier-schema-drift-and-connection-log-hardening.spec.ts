@@ -1,40 +1,49 @@
 /**
  * DB 상태 분류기 schema drift 강화 · 접속 로그 비노출 회귀 테스트
- * (WO-O4O-DATABASE-STATE-CLASSIFIER-SCHEMA-DRIFT-AND-CONNECTION-LOG-HARDENING-V1)
+ * (WO-O4O-DATABASE-STATE-CLASSIFIER-SCHEMA-DRIFT-AND-CONNECTION-LOG-HARDENING-V1,
+ *  ordered history fingerprint: WO-O4O-RETIRED-SERVICE-MIGRATION-HISTORY-SQUASH-AND-BASELINE-FINAL-CLOSURE-V1)
  *
  * 네 층으로 나뉜다.
  *   1. 정적 계약 — expected schema state registry ↔ incremental manifest lockstep,
- *      historical name 목록 ↔ frozen JSON manifest lockstep, legacy history facts 무결성,
+ *      frozen historical JSON manifest 무결성(보존된 source 파일의 identity freeze 일 뿐 runtime
+ *      provenance 가 아님), legacy history baseline(ordered fingerprint, 평문 이름 없음),
  *      migrate.ts 소스에 접속 정보 문자열 보간 없음.
- *   2. 순수 단위 — contiguous prefix 규칙(gap / skip / reversal / duplicate), legacy name 검증,
+ *   2. 순수 단위 — contiguous prefix 규칙(gap / skip / reversal / duplicate), ordered history
+ *      fingerprint(§37 negatives: rename / missing / reorder / insert / truncate / third duplicate),
  *      에러 요약 redaction.
  *   3. 로그 비노출(§8.3) — 가짜 자격정보로 `migrate.ts --status` 를 실제 실행해 stdout/stderr 에
  *      host / database / user / password 가 한 번도 나타나지 않음을 확인한다.
- *   4. 격리 PostgreSQL(§8.2) — `O4O_ISOLATED_PG_URL` 이 있을 때만: 실제 DB 상태 16종을 만들어
- *      분류기 판정을 검증하고, `--status` 가 DB 에 쓰기 0건임을 pg_stat 카운터로 확인하며,
- *      빈 DB 에서 bootstrap → incremental → POST 단언 전체 시퀀스를 실행한다.
+ *   4. 격리 PostgreSQL(§8.2) — `O4O_ISOLATED_PG_URL` 이 있을 때만: 실제 DB 상태 23종을 만들어
+ *      분류기 판정을 검증하고, 빈 DB 에서 bootstrap → incremental 0 → POST 단언 전체 시퀀스를
+ *      실행하며, `O4O_LEGACY_HISTORY_FILE`(untracked, 운영 history 캡처)이 함께 있을 때만
+ *      운영 동등 legacy DB 에서 `--status` 가 LEGACY_ESTABLISHED · 쓰기 0건임을 확인한다.
  *      env 가 없으면 명시적으로 skip 을 출력한다(조용히 PASS 로 위장하지 않는다).
  */
 
 import fs from 'fs';
 import path from 'path';
 import { spawnSync } from 'child_process';
+import { createHash } from 'crypto';
 import { EXPECTED_SCHEMA_STATES, expectedSchemaStateFor, expectedSchemaStateLabel } from '../database/incremental/expected-schema-states.js';
-import { HISTORICAL_MIGRATION_NAMES } from '../database/incremental/historical-migration-names.js';
-import { LEGACY_HISTORY_KNOWN_DUPLICATES, LEGACY_HISTORY_RETIRED_NAMES } from '../database/incremental/legacy-history.facts.js';
+import { LEGACY_HISTORY_BASELINE } from '../database/incremental/legacy-history-baseline.js';
 import { incrementalMigrationNames } from '../database/incremental/manifest.js';
 import { CANONICAL_SCHEMA_BASELINE_META } from '../database/bootstrap/canonical-schema-baseline.meta.js';
-import { resolveIncrementalPrefix, validateLegacyHistoryNames } from '../database/bootstrap/incremental-history.js';
+import { resolveIncrementalPrefix } from '../database/bootstrap/incremental-history.js';
+import { hashOrderedHistoryNames, verifyLegacyHistoryPrefix } from '../database/bootstrap/legacy-history-fingerprint.js';
 import { formatSafeErrorSummary, redactDatabaseDetails, summarizeDatabaseError } from '../database/bootstrap/safe-db-error.js';
 import { classifyDatabaseState } from '../database/bootstrap/database-state.js';
 import {
   ISOLATED_PG_ENV,
   IsolatedPgHarness,
   isolatedPgUrl,
-  legacyHistoryFixture,
+  LEGACY_HISTORY_FILE_ENV,
   historyInsertSql,
+  legacyBaselineOf,
+  mutatedLegacyHistories,
+  realLegacyHistoryNames,
   renderScenarioTable,
   standardScenarios,
+  syntheticLegacyHistory,
 } from './helpers/isolated-pg-classifier-harness.js';
 
 const API_ROOT = path.resolve(__dirname, '..', '..');
@@ -67,7 +76,7 @@ describe('expected schema state registry ↔ incremental manifest lockstep', () 
     expect(EXPECTED_SCHEMA_STATES[0].fingerprint).toBe(CANONICAL_SCHEMA_BASELINE_META.expectedFingerprint);
     expect(EXPECTED_SCHEMA_STATES[0].fingerprintLineCount).toBe(CANONICAL_SCHEMA_BASELINE_META.expectedFingerprintLineCount);
     manifest.forEach((name, i) => expect(EXPECTED_SCHEMA_STATES[i + 1].appliedThrough).toBe(name));
-    expect(EXPECTED_SCHEMA_STATES[EXPECTED_SCHEMA_STATES.length - 1].appliedThrough).toBe(manifest[manifest.length - 1]);
+    expect(EXPECTED_SCHEMA_STATES[EXPECTED_SCHEMA_STATES.length - 1].appliedThrough).toBe(manifest.length > 0 ? manifest[manifest.length - 1] : null);
   });
 
   it('every entry carries a 64-hex sha256 and a positive line count; fingerprints are distinct', () => {
@@ -88,32 +97,31 @@ describe('expected schema state registry ↔ incremental manifest lockstep', () 
   });
 });
 
-describe('historical migration names ↔ frozen JSON manifest lockstep', () => {
-  it('generated name list equals the runtime name (declaredName ?? className) of every historical entry, manifest order', () => {
-    const derived: string[] = [];
-    const seen = new Set<string>();
-    for (const e of historical.entries) if (e.name && !seen.has(e.name)) { seen.add(e.name); derived.push(e.name); }
-    expect([...HISTORICAL_MIGRATION_NAMES]).toEqual(derived);
+describe('frozen historical JSON manifest integrity (identity freeze of retained sources, not runtime provenance)', () => {
+  it('count equals entries, every entry names an existing file and a migration identifier, incremental names are disjoint', () => {
     expect(historical.count).toBe(historical.entries.length);
+    const inc = new Set(manifest);
+    const names = new Set<string>();
     for (const e of historical.entries) {
       expect(e.name).toBe(e.declaredName ?? e.className);
       // identity is a migration identifier, never a role / SQL literal (the pre-V1 parser false positive)
       expect(e.name).toMatch(/^[A-Z][A-Za-z0-9_]*\d{13,14}$/);
+      expect(fs.existsSync(path.join(SRC, 'database', 'migrations', e.file))).toBe(true);
+      expect(inc.has(e.name)).toBe(false);
+      names.add(e.name);
     }
+    expect(names.size).toBe(historical.entries.length);
   });
 
-  it('historical names, retired facts and incremental names are pairwise disjoint; duplicates are historical; retired names have no file', () => {
-    const hist = new Set(HISTORICAL_MIGRATION_NAMES);
-    const inc = new Set(manifest);
-    for (const n of LEGACY_HISTORY_RETIRED_NAMES) {
-      expect(hist.has(n)).toBe(false);
-      expect(inc.has(n)).toBe(false);
+  it('legacy history baseline is a well-formed ordered fingerprint and the repository holds no plaintext legacy name list', () => {
+    expect(LEGACY_HISTORY_BASELINE.orderedNameSequenceSha256).toMatch(/^[0-9a-f]{64}$/);
+    expect(LEGACY_HISTORY_BASELINE.rowCount).toBeGreaterThan(historical.count);
+    expect(LEGACY_HISTORY_BASELINE.distinctNameCount).toBeLessThanOrEqual(LEGACY_HISTORY_BASELINE.rowCount);
+    expect(LEGACY_HISTORY_BASELINE.capturedThroughId).toBeGreaterThanOrEqual(LEGACY_HISTORY_BASELINE.rowCount);
+    expect(LEGACY_HISTORY_BASELINE.capturedAt).toBe(CANONICAL_SCHEMA_BASELINE_META.sourceCapturedAt);
+    for (const f of ['historical-migration-names.ts', 'legacy-history.facts.ts']) {
+      expect(fs.existsSync(path.join(SRC, 'database', 'incremental', f))).toBe(false);
     }
-    for (const n of manifest) expect(hist.has(n)).toBe(false);
-    for (const n of LEGACY_HISTORY_KNOWN_DUPLICATES) expect(hist.has(n)).toBe(true);
-    expect(new Set(LEGACY_HISTORY_RETIRED_NAMES).size).toBe(LEGACY_HISTORY_RETIRED_NAMES.length);
-    const migrationSrc = fs.readdirSync(path.join(SRC, 'database', 'migrations')).map((f) => read(`database/migrations/${f}`)).join('\n');
-    for (const n of LEGACY_HISTORY_RETIRED_NAMES) expect(migrationSrc.includes(`class ${n}`)).toBe(false);
   });
 });
 
@@ -131,7 +139,7 @@ describe('migrate.ts source: no connection detail logging', () => {
       "Database transport: ${isCloudSQLSocket ? 'CLOUD_SQL_SOCKET' : 'TCP'}", 'Database configuration: COMPLETE', 'Database connection: SUCCESS',
       "'CLASSIFICATION'", "'CURRENT_INCREMENTAL_PREFIX'", "'EXPECTED_SCHEMA_STATE'", "'EXPECTED_FINGERPRINT'", "'LIVE_FINGERPRINT'",
       "'PRE_MIGRATION_SCHEMA_ASSERTION'", "'POST_MIGRATION_SCHEMA_ASSERTION'", "'MANUAL_INVESTIGATION_REQUIRED', 'YES'",
-      "'EXPECTED_LIVE_FINGERPRINT_MATCH'", "'UNKNOWN_HISTORY_NAMES'", "'DB_WRITES', 0", 'summarizeDatabaseError(', 'formatSafeErrorSummary(',
+      "'EXPECTED_LIVE_FINGERPRINT_MATCH'", "'LEGACY_HISTORY_FINGERPRINT'", "'DB_WRITES', 0", 'summarizeDatabaseError(', 'formatSafeErrorSummary(',
       "case 'UNKNOWN_PARTIAL'", "'HISTORICAL_REPLAY', 'ZERO'", "transaction: 'each'", 'process.exit(1)',
     ]) expect(src).toContain(lit);
   });
@@ -172,21 +180,44 @@ describe('incremental prefix rule', () => {
   });
 });
 
-describe('legacy history name validation', () => {
-  const facts = { historical: ['H1', 'H2', 'DUP'], retired: ['R1'], knownDuplicates: ['DUP'] };
-  it('accepts historical ∪ retired ∪ manifest with known duplicates at most twice', () => {
-    expect(validateLegacyHistoryNames(['H1', 'DUP', 'DUP', 'R1', 'H2', 'M1'], ['M1'], facts)).toEqual({ unknown: [], duplicateProblems: [] });
+describe('ordered history fingerprint (legacy production history provenance)', () => {
+  const legacy = syntheticLegacyHistory();
+  const baseline = legacyBaselineOf(legacy);
+
+  it('hash rule: sha256 of every name followed by \\n, UTF-8, lowercase hex — known vector, order sensitive', () => {
+    expect(hashOrderedHistoryNames([])).toBe('e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855');
+    // sha256("A1700000000001\nB1700000000002\n")
+    expect(hashOrderedHistoryNames(['A1700000000001', 'B1700000000002'])).toBe(
+      createHash('sha256').update('A1700000000001\nB1700000000002\n', 'utf8').digest('hex'),
+    );
+    expect(hashOrderedHistoryNames(['A1700000000001', 'B1700000000002'])).not.toBe(hashOrderedHistoryNames(['B1700000000002', 'A1700000000001']));
+    expect(hashOrderedHistoryNames(['X', 'X'])).not.toBe(hashOrderedHistoryNames(['X']));
   });
-  it('flags unknown names, a third duplicate and a repeated ordinary name', () => {
-    const r = validateLegacyHistoryNames(['H1', 'H1', 'DUP', 'DUP', 'DUP', 'X9'], ['M1'], facts);
-    expect(r.unknown).toEqual(['X9']);
-    expect(r.duplicateProblems).toHaveLength(2);
+
+  it('accepts the exact legacy prefix and returns the remainder untouched', () => {
+    const exact = verifyLegacyHistoryPrefix(legacy, baseline);
+    expect(exact).toEqual(expect.objectContaining({ match: true, rowCount: legacy.length, distinctNameCount: baseline.distinctNameCount, orderedNameSequenceSha256: baseline.orderedNameSequenceSha256, remainder: [], problems: [] }));
+    const withPrefix = verifyLegacyHistoryPrefix([...legacy, 'M1', 'M2'], baseline);
+    expect(withPrefix.match).toBe(true);
+    expect(withPrefix.remainder).toEqual(['M1', 'M2']);
+    expect(resolveIncrementalPrefix(withPrefix.remainder, ['M1', 'M2', 'M3']).prefixLength).toBe(2);
+    expect(historyInsertSql(legacy)[1]).toMatch(/^DELETE FROM public\.typeorm_migrations$/);
   });
-  it('production-shaped fixture (historical + retired + duplicates + prefix) is fully known with the real facts', () => {
-    const rows = legacyHistoryFixture(manifest);
-    expect(validateLegacyHistoryNames(rows, manifest)).toEqual({ unknown: [], duplicateProblems: [] });
-    expect(resolveIncrementalPrefix(rows, manifest).prefixLength).toBe(manifest.length);
-    expect(historyInsertSql(rows)[0]).toMatch(/^DELETE FROM public\.typeorm_migrations$/);
+
+  it.each(Object.entries(mutatedLegacyHistories(legacy)))('rejects a %s history (fail-closed)', (_kind, rows) => {
+    const r = verifyLegacyHistoryPrefix(rows, baseline);
+    expect(r.match).toBe(false);
+    expect(r.problems.length).toBeGreaterThan(0);
+  });
+
+  it('a row inserted inside the prefix is rejected even when the total row count is restored by a valid incremental name', () => {
+    const rows = [...legacy.slice(0, 10), 'M1', ...legacy.slice(10, legacy.length - 1)];
+    expect(rows.length).toBe(legacy.length);
+    expect(verifyLegacyHistoryPrefix(rows, baseline).match).toBe(false);
+  });
+
+  it('the real baseline never matches a synthetic history (no accidental acceptance)', () => {
+    expect(verifyLegacyHistoryPrefix(syntheticLegacyHistory(LEGACY_HISTORY_BASELINE.rowCount), LEGACY_HISTORY_BASELINE).match).toBe(false);
   });
 });
 
@@ -261,10 +292,19 @@ describeIsolated('isolated PostgreSQL classifier scenarios (§8.2)', () => {
     expect(results.map((r) => `${r.id} ${r.actual}`)).toEqual(standardScenarios().map((s) => `${s.id} ${s.expect}`));
   }, 600_000);
 
-  it('--status on a legacy-established database: LEGACY_ESTABLISHED, PRE assertion PASS, zero writes, no connection details in the log', async () => {
+  const realLegacy = realLegacyHistoryNames();
+  const itLegacy = realLegacy ? it : it.skip;
+  if (!realLegacy) {
+    console.warn(`[classifier-harness] ${LEGACY_HISTORY_FILE_ENV} not set — production-equivalent legacy --status scenario SKIPPED (not passed).`);
+  }
+
+  itLegacy('--status on a production-equivalent legacy database: LEGACY_ESTABLISHED, fingerprint MATCH, PRE assertion PASS, zero writes, no connection details in the log', async () => {
+    const legacyRows = realLegacy ?? [];
+    expect(legacyRows.length).toBe(LEGACY_HISTORY_BASELINE.rowCount);
+    expect(hashOrderedHistoryNames(legacyRows)).toBe(LEGACY_HISTORY_BASELINE.orderedNameSequenceSha256);
     const templates = await harness.buildTemplates();
-    const db = await harness.createDatabase('status_zero_writes', templates.bootstrap_inc);
-    await harness.execute(db, ['DROP TABLE public.o4o_schema_baselines', ...historyInsertSql(legacyHistoryFixture(manifest))]);
+    const db = await harness.createDatabase('status_zero_writes', templates.bootstrap);
+    await harness.execute(db, ['DROP TABLE public.o4o_schema_baselines', ...historyInsertSql(legacyRows)]);
     const stat = async () => (await harness.query<{ ins: string; upd: string; del: string }>(db, `SELECT tup_inserted::text AS ins, tup_updated::text AS upd, tup_deleted::text AS del FROM pg_stat_database WHERE datname = current_database()`))[0];
     const snapshot = async () => ({
       stat: await stat(),
@@ -281,7 +321,7 @@ describeIsolated('isolated PostgreSQL classifier scenarios (§8.2)', () => {
     expect(reported(out, 'EXPECTED_LIVE_FINGERPRINT_MATCH')).toBe('YES');
     expect(reported(out, 'CURRENT_INCREMENTAL_PREFIX')).toBe(`${manifest.length} / ${manifest.length}`);
     expect(reported(out, 'INCREMENTAL_PENDING')).toBe('0');
-    expect(reported(out, 'UNKNOWN_HISTORY_NAMES')).toBe('0');
+    expect(reported(out, 'LEGACY_HISTORY_FINGERPRINT')).toBe('MATCH');
     expect(reported(out, 'DB_WRITES')).toBe('0');
     expect(reported(out, 'MIGRATION_JOB')).toBe('STATUS_ONLY');
     expect(after).toEqual(before);
@@ -290,7 +330,7 @@ describeIsolated('isolated PostgreSQL classifier scenarios (§8.2)', () => {
     expect(out).toContain('Database connection: SUCCESS');
   }, 600_000);
 
-  it('fresh database full sequence: FRESH_EMPTY → bootstrap → incremental → POST assertion PASS (§9)', async () => {
+  it('fresh database full sequence: FRESH_EMPTY → bootstrap → incremental (pending 0 after rollover) → POST assertion PASS (§9)', async () => {
     const db = await harness.createDatabase('fresh_full_sequence');
     const c = harness.connection(db);
     const env = { DB_HOST: c.host, DB_PORT: String(c.port), DB_USERNAME: c.user, DB_PASSWORD: c.password, DB_NAME: c.database };
@@ -300,8 +340,11 @@ describeIsolated('isolated PostgreSQL classifier scenarios (§8.2)', () => {
     expect(reported(first.out, 'PRE_MIGRATION_SCHEMA_ASSERTION')).toBe('NOT_APPLICABLE');
     expect(reported(first.out, 'BOOTSTRAP_EXECUTION')).toBe('EXECUTED');
     expect(reported(first.out, 'INCREMENTAL_EXECUTED')).toBe(String(manifest.length));
+    expect(reported(first.out, 'HISTORICAL_REPLAY')).toBe('ZERO');
+    expect(reported(first.out, 'LEGACY_HISTORY_FINGERPRINT')).toBe('NOT_APPLICABLE');
     expect(reported(first.out, 'POST_MIGRATION_SCHEMA_ASSERTION')).toBe('PASS');
     expect(reported(first.out, 'MIGRATION_JOB')).toBe('SUCCESS');
+    expect((await harness.query<{ v: string }>(db, 'SELECT baseline_version AS v FROM public.o4o_schema_baselines'))[0].v).toBe(CANONICAL_SCHEMA_BASELINE_META.baselineVersion);
     const finalState = EXPECTED_SCHEMA_STATES[manifest.length];
     expect(await harness.fingerprintOf(db)).toEqual({ hash: finalState.fingerprint, lineCount: finalState.fingerprintLineCount });
     // second run is a verified no-op
@@ -316,7 +359,7 @@ describeIsolated('isolated PostgreSQL classifier scenarios (§8.2)', () => {
 
   it('drifted database: PRE assertion FAILED → UNKNOWN_PARTIAL, nothing executed, MANUAL_INVESTIGATION_REQUIRED', async () => {
     const templates = await harness.buildTemplates();
-    const db = await harness.createDatabase('drift_refused', templates.bootstrap_inc);
+    const db = await harness.createDatabase('drift_refused', templates.bootstrap);
     await harness.execute(db, ['ALTER TABLE public.store_tablet_devices DROP COLUMN last_seen_at']);
     const before = await harness.fingerprintOf(db);
     const c = harness.connection(db);

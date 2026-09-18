@@ -32,72 +32,22 @@ export interface ExpectedSchemaState {
 
 /** Append only. Entry k MUST correspond to INCREMENTAL_MIGRATIONS[k-1]. */
 export const EXPECTED_SCHEMA_STATES: readonly ExpectedSchemaState[] = [
+  // Canonical baseline 2026-09-18-id685 — generated from an isolated PostgreSQL 15.17 built by the
+  // previous baseline (2026-09-15-id678) + its 7 incremental migrations, verified read-only equal to the
+  // production live fingerprint on 2026-09-18 (WO-O4O-RETIRED-SERVICE-MIGRATION-HISTORY-SQUASH-AND-BASELINE-FINAL-CLOSURE-V1).
+  // The 7 former entries were absorbed into this baseline; new incremental states are appended below.
   {
     appliedThrough: null,
     fingerprint: CANONICAL_SCHEMA_BASELINE_META.expectedFingerprint,
     fingerprintLineCount: CANONICAL_SCHEMA_BASELINE_META.expectedFingerprintLineCount,
   },
-  // WO-O4O-STORE-TABLET-LOCATION-CONTENT-RUNTIME-MANAGEMENT-V1 — computed in an isolated
-  // PostgreSQL 15 (bootstrap + migration 1) and cross-checked read-only against production
-  // (typeorm_migrations id 679) on 2026-09-15: identical hash and line count.
+  // WO-O4O-STORE-OWNER-AGREEMENT-PUBLISH-PREREQUISITES-V1 — store_owner_termination_cases.
+  // baseline 2026-09-18-id685 fresh bootstrap + incremental 1 을 격리 PostgreSQL 15 에서
+  // 산출(baseline id678 + incrementals 1..8 과 동일 최종 스키마): 운영 DB fingerprint 채택 아님.
   {
-    appliedThrough: 'CreateStoreTabletDevicesAndScreenSetDescription1789435443554',
-    fingerprint: 'bbef95607b3f24ae61796f4e2042b01e171e1cb7ec6a8470f6c6f3963306d816',
-    fingerprintLineCount: 5895,
-  },
-  // WO-O4O-LEGACY-PARTNER-PHYSICAL-SCHEMA-AND-DEPENDENCY-CLEANUP-V1 (Phase 1 · expand) — computed in
-  // an isolated PostgreSQL 15.17 (bootstrap + migrations 1..2) on 2026-09-16. Legacy Partner tables 11 ·
-  // enums 3 · columns 3 dropped; Seller Recruitment renamed (seller_recruitments ·
-  // seller_recruitment_applications) with 2 TEMP_COMPAT deploy-window views under the old names.
-  {
-    appliedThrough: 'RetireLegacyPartnerPhysicalSchemaAndRenameSellerRecruitment1789523426775',
-    fingerprint: 'd145d68a68ceeb41a46a913ee08fdc1075fc25e44687a774af6e7d317999b33c',
-    fingerprintLineCount: 5713,
-  },
-  // WO-O4O-LEGACY-PARTNER-PHYSICAL-SCHEMA-AND-DEPENDENCY-CLEANUP-V1 (Phase 2 · contract) — computed in
-  // an isolated PostgreSQL 15.17 (bootstrap + migrations 1..3) on 2026-09-16. TEMP_COMPAT views 2 dropped ·
-  // market_trial_decisions."selectedSellerIds" dropped. Legacy Partner physical schema = 0.
-  {
-    appliedThrough: 'DropSellerRecruitmentCompatViewsAndSelectedSellerIds1789525702200',
-    fingerprint: 'd0a8d491e188be39df38fa50b708eea6617a6f38e188d781f7c4c2455e0d8535',
-    fingerprintLineCount: 5708,
-  },
-  // WO-O4O-WEB-AUTOMATION-USER-GUIDED-RESUME-AND-WORKFLOW-CANDIDATE-REPLAY-V1 PHASE 1 (same-run) — the
-  // migration landed in d9b11d204 WITHOUT this entry, so every production migration Job since then ended in
-  // UNKNOWN_PARTIAL / POST_MIGRATION_SCHEMA_ASSERTION=FAILED. Registered by
-  // WO-O4O-PHASE1-SAME-RUN-CI-AND-MIGRATION-EXPECTED-STATE-REPAIR-V1 on 2026-09-16: computed in an isolated
-  // PostgreSQL 15.19 (fresh bootstrap + migrations 1..4 via migrate.ts) and cross-checked READ-ONLY against
-  // production, where the migration had already been applied by the failed Job (typeorm_migrations row
-  // CreateWorkRunCoordination1789540958496 · table work_run_coordination present): identical hash and line count.
-  {
-    appliedThrough: 'CreateWorkRunCoordination1789540958496',
-    fingerprint: '8b5be7bdad427bea966dedd13dd8ef86c4923e981ba6ccb2f9976a611d600f5b',
-    fingerprintLineCount: 5722,
-  },
-  // WO-O4O-GOOGLE-IDENTITY-PREREQUISITES-V1 (Identity V3 Phase 2-A · F10 exception) — computed in an isolated
-  // PostgreSQL 15.19 (fresh bootstrap + migrations 1..5 via migrate.ts) on 2026-09-17. linked_accounts: FK userId→users
-  // ON DELETE CASCADE · UNIQUE (provider,"providerId") WHERE "providerId" IS NOT NULL · UNIQUE ("userId") WHERE
-  // provider='google'. users: password DROP NOT NULL · name DROP NOT NULL · name DROP DEFAULT. No table created, no data changed.
-  {
-    appliedThrough: 'PrepareGoogleIdentityLinkedAccountsAndUsersConstraints1789648511051',
-    fingerprint: '24c5941710706267d92cdbf52981aae3fdf5bb81a1c299faa5c03c1d10d25da6',
-    fingerprintLineCount: 5725,
-  },
-  // WO-O4O-INTEGRATED-TERMS-ACCEPTANCE-AND-SIGNUP-ALIGNMENT-V1 — user_policy_acceptances (이용약관 acceptance 이력 ·
-  // unique user+service+document · FK users / service_policy_documents RESTRICT · index 2). Computed in an isolated
-  // PostgreSQL 15.19 (fresh bootstrap + migrations 1..6 via migrate.ts) on 2026-09-17.
-  {
-    appliedThrough: 'CreateUserPolicyAcceptances1789649959243',
-    fingerprint: 'dfc42b8e72e3672b132bf5cb8106d6707d15de3d7a4f3961d5a876475ecddbd4',
-    fingerprintLineCount: 5745,
-  },
-  // WO-O4O-RETIRED-SERVICE-SCHEMA-ENUM-CLEANUP-V1 — checkout_orders_order_type_enum 에서 retired enum label 1개 제거
-  // (label 5 → 4 · column default/NOT NULL/index 불변 · ENUM fingerprint line 1개만 변경, line count 동일). Computed in an
-  // isolated PostgreSQL 15.17 (fresh bootstrap + migrations 1..7 via migrate.ts) on 2026-09-18.
-  {
-    appliedThrough: 'RemoveRetiredCheckoutOrderTypeEnumValue1789690338675',
-    fingerprint: '0ca1a71b9a511f0147583c919eb37814b1ad28f1ba042ceba1038393bb54df70',
-    fingerprintLineCount: 5745,
+    appliedThrough: 'CreateStoreOwnerTerminationCases1789701000000',
+    fingerprint: '73d74984bd0448560639742fcce3c8922295f6b967f8bd71dd28f352552756d0',
+    fingerprintLineCount: 5771,
   },
 ] as const;
 
