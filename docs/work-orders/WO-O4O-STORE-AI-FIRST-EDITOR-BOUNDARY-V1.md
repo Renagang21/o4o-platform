@@ -1,6 +1,6 @@
 # WO-O4O-STORE-AI-FIRST-EDITOR-BOUNDARY-V1
 
-> **상태**: CLOSED · **접수**: 2026-09-18 · **CHECK**: [`CHECK-O4O-STORE-AI-FIRST-EDITOR-BOUNDARY-V1`](../checks/CHECK-O4O-STORE-AI-FIRST-EDITOR-BOUNDARY-V1.md)
+> **상태**: CLOSED_WITH_SMOKE_PENDING(브라우저 smoke = 테스트 계정 로그인 불가 · CHECK §6-1) · **접수**: 2026-09-18 · **CHECK**: [`CHECK-O4O-STORE-AI-FIRST-EDITOR-BOUNDARY-V1`](../checks/CHECK-O4O-STORE-AI-FIRST-EDITOR-BOUNDARY-V1.md)
 > 내 매장 AI First 리팩터링의 **첫 번째 실행 WO**. ChatGPT 기능 추가도, 기존 AI API 삭제도 하지 않는다.
 
 ## 1. 목적

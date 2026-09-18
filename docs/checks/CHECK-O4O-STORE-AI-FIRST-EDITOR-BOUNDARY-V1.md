@@ -2,7 +2,7 @@
 
 > **WO**: [`WO-O4O-STORE-AI-FIRST-EDITOR-BOUNDARY-V1`](../work-orders/WO-O4O-STORE-AI-FIRST-EDITOR-BOUNDARY-V1.md)
 > **작업일**: 2026-09-18 · **작업 기준**: `origin/main` `1af2abdc4` (WO 조사 시점 HEAD `acb449b4c` 이후 5 커밋 진행 — 작업 시점 최신 사용)
-> **판정**: COMPLETE (source-contract·build PASS · 브라우저 smoke 는 §6 참조)
+> **판정**: COMPLETE_WITH_SMOKE_PENDING (source-contract·build·배포 PASS · 브라우저 smoke 는 테스트 계정 로그인 불가로 PENDING_USER_VERIFICATION — §6-1)
 
 ## 1. 요약
 
@@ -98,17 +98,29 @@ NON_STORE_CONSUMERS (prop 미지정)          = 23 파일 · 기본 true 유지
 
 ### 6-1 결과
 
-(배포 완료 후 갱신)
+**배포**: `deploy-web-services.yml` run `35299320733`(commit `6d5494f8f`) — `deploy-kpa-society` · `deploy-k-cosmetics` · `deploy-pharmacy-hub` 모두 success. 배포 bundle 확인(cache-bust fetch): `kpa-society.co.kr` `index-BsJhBpw2.js` · `k-cosmetics.site` `index-CvedLMsr.js` · `pharmacyhub.co.kr` `index-BTU3r-HL.js` 모두 `showInternalAi` 식별자 포함 → 본 WO 변경이 운영에 반영됨.
+
+**판정: `PENDING_USER_VERIFICATION` — 테스트 계정 로그인 불가로 Store 편집 화면 smoke 미수행.**
+
+| 시도 | 계정(SSOT `docs/local/TEST-ACCOUNTS.local.md`) | 결과 |
+|---|---|---|
+| `kpa-society.co.kr/login` | `kpa-society:store_owner` `renagang21@gmail.com` | `POST /api/v1/auth/login` **401** `INVALID_USER`("User account not found or has been deactivated" · UI "등록되지 않은 이메일입니다") |
+| `kpa-society.co.kr/login` | `sohae2100@gmail.com`(KPA 행) | **403** "로그인 시도가 너무 많아 계정이 일시적으로 잠겼습니다"(lockout) — 추가 시도 중단 |
+| `pharmacyhub.co.kr/login` | `pharmacy-hub:store_owner` `renagang21@gmail.com` | **401** `INVALID_USER`(동일) |
+
+- `renagang21@gmail.com` 이 두 서비스 모두 `INVALID_USER` → 계정 상태(비활성/삭제) 또는 최근 배포된 auth 변경(WO-2A/2B email+password 로그인 경로 — 메모 상 "운영 email/password 200 login smoke" 가 WO-2C 게이트로 PENDING) 의 영향으로 추정. **본 WO 변경(프론트 prop 추가)과 무관한 실패 → 중지 조건(현재 변경과 무관한 실패) 적용, 보고만.**
+- 미수행 항목: Store 편집 화면 "AI 정리" 버튼 부재 · 편집 가능 · HTML 탭 · 미리보기 · 템플릿 · 저장 성공 / 비Store 화면 "AI 정리" 유지. 이 항목들은 source-contract 34/34 + 3 서비스 tsc/vite build 로만 보증된 상태.
+- 재개 방법: 운영 로그인 정상화("운영 로그인 정상 확인" 통보) 후 `/store/blog`(KPA) 또는 `/store-owner/blog`(PH) 에서 위 항목 확인 → 본 절과 §7 갱신.
 
 ## 7. 완료 기준 판정
 
 ```text
 CONTENT_EDITOR_AI_BOUNDARY   = PASS
 STORE_RICHTEXT_INTERNAL_AI   = 0
-STORE_EDITOR_SAVE_REGRESSION = (§6-1)
-STORE_EDITOR_HTML_TAB        = (§6-1)
-STORE_EDITOR_PREVIEW         = (§6-1)
-STORE_EDITOR_TEMPLATE        = (§6-1)
+STORE_EDITOR_SAVE_REGRESSION = PENDING (§6-1 로그인 불가 · 정적 계약상 Save 경로 미변경)
+STORE_EDITOR_HTML_TAB        = PENDING (§6-1 · Toolbar HTML 탭 코드 미변경)
+STORE_EDITOR_PREVIEW         = PENDING (§6-1 · Preview 코드 미변경)
+STORE_EDITOR_TEMPLATE        = PENDING (§6-1 · Template 코드 미변경)
 NON_STORE_DEFAULT_BEHAVIOR   = PRESERVED (contract C 7/7 + 기본값 true)
 BACKEND_CHANGE               = 0
 DB_MIGRATION                 = 0
