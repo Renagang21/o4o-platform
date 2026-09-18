@@ -167,8 +167,9 @@ Cloud SQL Auth Proxy(loopback) · `SELECT` 만. DB timezone UTC.
 | 테스트 `ren***` | 0 | — | no | 2026-09-18 13:40 |
 
 - 정책(`auth-login.service.ts`): 실패 5회 이상 → 30분 잠금 · 실패마다 30분 연장 · 성공 시 0 리셋.
-- 타 세션 기록 시점(`d5be1eb31`, 잔존 8)보다 **2회 더 누적**. 마지막 실패 ≈ 22:45Z(KST 07:45). Lecture merge 가 유발한 E2E Auth Runtime 실행은 21:55~22:00Z 에 끝났으므로 **최근 2회는 E2E 가 아닌 다른 로그인 시도**(사용자 또는 다른 세션 smoke).
-- 지시대로 해제 · 리셋 · 어떤 write 도 하지 않음. 정비는 Google Identity/Auth 트랙.
+- **정정(타 세션 `1846bf355` 대조):** 21:55Z 에 시작된 E2E Auth Runtime 실행(PR #223 merge 의 `packages/security-core/src/**` 경로 트리거)이 **34회 실패를 추가**해 loginAttempts 10 · 23:15Z 잠금을 만들었다(실행이 22:45Z 까지 이어짐 — 위 "E2E 아님" 추정은 오류). 타 세션이 22:58Z 사용자 승인 하에 운영자 1행 reset(`UPDATE 1`) · `f51d5a362` 로 `on.push` 트리거 제거(workflow_dispatch 만 유지). 본 세션의 22:59Z 조회는 reset 직전 값.
+- **재확인 23:09Z(read-only):** 운영자 `soh***` loginAttempts **3** · lockedUntil NULL · 잠금 없음 / 테스트 `ren***` 0. ⚠️ reset(22:58Z) 후 ~11분 사이 실패 3회가 **새로 누적** — E2E 트리거가 제거된 뒤이므로 **다른 실패 로그인 소스가 아직 존재**(다른 세션 smoke · 브라우저 재시도 · 수동 입력 중 하나). 2회 더 실패하면 재잠금. **STOP — 수정 0 · 원인 추적은 Auth 트랙.**
+- 지시대로 해제 · 리셋 · 어떤 write 도 하지 않음.
 
 ### 10.2 Lecture reference seed — APPLIED
 
