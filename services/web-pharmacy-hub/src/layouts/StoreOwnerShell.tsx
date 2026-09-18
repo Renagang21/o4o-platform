@@ -40,6 +40,7 @@ import { AccessDenied } from '@o4o/ui';
 import { getUserDisplayName } from '@o4o/account-ui';
 import { useAuth } from '../contexts/AuthContext';
 import { MembershipGate } from '../components/MembershipGate';
+import { StoreOwnerAgreementGate } from '../components/StoreOwnerAgreementGate';
 import { BRAND } from '../config/service';
 
 /** WO-O4O-STORE-WORKSPACE-INTEGRATION-AND-MY-SERVICES-V1: Store Workspace 경로 (basePath `/store-owner` 파생 — PG callback 경로 불변) */
@@ -146,7 +147,7 @@ export function StoreOwnerShell({
       renderDenied={<AccessDenied message="약국 경영 화면은 약국 경영자 계정만 이용할 수 있습니다." />}
       membershipGate={MembershipGate}
     >
-      <ShellLayout />
+      <StoreOwnerAgreementGate><ShellLayout /></StoreOwnerAgreementGate>
     </StoreOwnerGuard>
   );
 }
@@ -174,7 +175,7 @@ export function StoreOwnerChromeFreeGuard({ children }: { children: ReactNode })
       renderDenied={<AccessDenied message="약국 경영 화면은 약국 경영자 계정만 이용할 수 있습니다." />}
       membershipGate={MembershipGate}
     >
-      {children}
+      <StoreOwnerAgreementGate>{children}</StoreOwnerAgreementGate>
     </StoreOwnerGuard>
   );
 }
