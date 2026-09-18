@@ -388,6 +388,8 @@ jobs:
           --set-env-vars="TOSS_PAYMENTS_SECRET_KEY=${{ secrets.TOSS_PAYMENTS_SECRET_KEY }}" \
           --set-env-vars="CAFE24_REDIRECT_URI=https://api.neture.co.kr/api/v1/admin/cafe24/callback" \
           --set-env-vars="PRIVACY_RETENTION_MODE=apply" \
+          --set-env-vars="GOOGLE_ALLOWED_CLIENT_IDS=${{ vars.GOOGLE_WEB_CLIENT_ID }}" \
+          --set-env-vars="GOOGLE_WEB_CLIENT_ID=${{ vars.GOOGLE_WEB_CLIENT_ID }}" \
           --clear-vpc-connector \
           --add-cloudsql-instances=netureyoutube:asia-northeast3:o4o-platform-db
 

@@ -1,7 +1,8 @@
 # WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1
 
 > **종류**: Service Separation / Runtime Ownership Migration / LMS Adoption
-> **상태**: READY FOR EXECUTION (핸드오프 전용 · 명시 지시 전 실행 금지 · `LECTURE_DOMAIN` 확정 필요)
+> **상태**: READY FOR EXECUTION (핸드오프 전용 · 명시 지시 전 실행 금지)
+> **도메인 확정**: `LECTURE_DOMAIN = study.neture.co.kr` (2026-09-18 확정)
 > **실행 전제**: [`IR-O4O-LECTURE-INDEPENDENT-SERVICE-PRODUCTION-DATA-CENSUS-V1`](../investigations/IR-O4O-LECTURE-INDEPENDENT-SERVICE-PRODUCTION-DATA-CENSUS-V1.md) `= PASS` (2026-09-18 · `5ba9481af`)
 > **작성 기준일**: 2026-09-18
 > **본 문서 성격**: 구현 지시용 WO. 본 문서 작성 자체로 코드·DB·배포를 변경하지 않는다.
@@ -58,6 +59,7 @@ LECTURE_ROLE_PREFIX = lecture
 
 LECTURE_WEB_APP_DIRECTORY = services/web-lecture
 LECTURE_CLOUD_RUN_SERVICE = lecture-web
+LECTURE_DOMAIN = study.neture.co.kr
 ```
 
 Role:
@@ -91,14 +93,16 @@ Identity
 
 ## 1.3 Domain
 
-`LECTURE_DOMAIN`은 별도 독립 도메인으로 한다.
+`LECTURE_DOMAIN`은 다음으로 확정한다 (2026-09-18).
 
-본 WO 실행 초기에 실제 도메인을 확정하되:
+```text
+LECTURE_DOMAIN = study.neture.co.kr
+```
 
-* Neture 하위 기능처럼 보이는 종속형 도메인을 기본안으로 삼지 않는다.
-* canonical domain은 `O4O_SERVICES[]`의 `domain`을 정본으로 한다.
+* 호스트명이 `neture.co.kr` 하위라는 사실은 DNS 배치일 뿐이다. Lecture 는 Neture 의 하위 기능이 아니며 Neture membership · role · runtime 에 의존하지 않는다 (§3.4 · §7.3).
+* canonical domain은 `O4O_SERVICES[]`의 `domain`을 정본으로 한다. 값은 이 한 곳에서만 바꾼다.
 * workflow의 `VITE_SERVICE_URL_*` 값은 이 정본을 mirror한다.
-* 도메인 확정 전 production 배포 및 certificate URL cutover를 하지 않는다.
+* certificate verification host · notification targetUrl 은 이 값을 기준으로 한다 (§4.8 · §5.3).
 
 ---
 
@@ -999,7 +1003,7 @@ Core 패키지 자체는 유지한다.
     role prefix = lecture
     web app = services/web-lecture
     Cloud Run = lecture-web
-    domain 확정
+    domain = study.neture.co.kr
 
 03. Lecture Service Foundation
     catalog / service key / roles / legal / deploy / CORS
@@ -1102,7 +1106,6 @@ Identity 전환 세션과 동일 핵심 파일 충돌
 ### Deployment
 
 ```text
-LECTURE_DOMAIN 미확정
 certificate verification URL 미확정
 Cloud Run / CORS / handoff route 불완전
 ```

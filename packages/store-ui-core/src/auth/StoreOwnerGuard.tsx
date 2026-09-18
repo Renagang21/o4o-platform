@@ -153,6 +153,8 @@ export interface StoreOwnerGuardProps {
    * 제공되지 않으면 children 직접 렌더.
    */
   membershipGate?: ComponentType<{ children: ReactNode }>;
+  /** 접근 grant 뒤 Store Workspace 전용 계약 gate. */
+  agreementGate?: ComponentType<{ children: ReactNode }>;
 }
 
 // ─── Component ────────────────────────────────────────────────────────────
@@ -177,6 +179,7 @@ export function StoreOwnerGuard(props: StoreOwnerGuardProps) {
     loadingNode = DefaultLoading,
     staleRecovery,
     membershipGate: MembershipGate,
+    agreementGate: AgreementGate,
   } = props;
 
   const location = useLocation();
@@ -279,7 +282,8 @@ export function StoreOwnerGuard(props: StoreOwnerGuardProps) {
   }
 
   if (hasDirectAccess) {
-    return MembershipGate ? <MembershipGate>{children}</MembershipGate> : <>{children}</>;
+    const agreed = AgreementGate ? <AgreementGate>{children}</AgreementGate> : <>{children}</>;
+    return MembershipGate ? <MembershipGate>{agreed}</MembershipGate> : agreed;
   }
 
   if (staleRecovery) {

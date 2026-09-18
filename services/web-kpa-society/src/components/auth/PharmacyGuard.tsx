@@ -20,12 +20,27 @@
 import { Navigate, useLocation } from 'react-router-dom';
 import { StoreOwnerGuard } from '@o4o/store-ui-core';
 import { AccessDenied } from '@o4o/ui';
-import { useAuth } from '../../contexts/AuthContext';
+import { StoreOwnerAgreementGate } from '@o4o/shared-space-ui';
+import { authClient, useAuth } from '../../contexts/AuthContext';
 import { hasAnyRole, PLATFORM_ROLES, STORE_OWNER_ROLES } from '../../lib/role-constants';
 import { MembershipGate } from './MembershipGate';
 
 interface PharmacyGuardProps {
   children: React.ReactNode;
+}
+
+function KpaStoreOwnerAgreementGate({ children }: { children: React.ReactNode }) {
+  const { logout } = useAuth();
+  return (
+    <StoreOwnerAgreementGate
+      serviceKey="kpa-society"
+      serviceName="KPA Society"
+      api={authClient.api}
+      onLogout={logout}
+    >
+      {children}
+    </StoreOwnerAgreementGate>
+  );
 }
 
 const Loading = (
@@ -85,6 +100,7 @@ export function PharmacyGuard({ children }: PharmacyGuardProps) {
         />
       }
       membershipGate={MembershipGate}
+      agreementGate={KpaStoreOwnerAgreementGate}
     >
       {children}
     </StoreOwnerGuard>
