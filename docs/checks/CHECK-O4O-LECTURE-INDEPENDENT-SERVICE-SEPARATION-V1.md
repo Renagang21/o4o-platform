@@ -2,7 +2,7 @@
 
 > **WO**: [`WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1`](../work-orders/WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1.md)
 > **범위**: **Phase 1 — Lecture Service Foundation** (WO §6.1 step 01~04). step 05 이후(LMS Core 정리 · surface 구축 · course migration · 기존 서비스 LMS 제거)는 **NOT_STARTED**.
-> **상태**: **Phase 1 MERGED** — PR #223 → main `3e56425b7` (2026-09-19 · merge commit) · `lecture-web` Cloud Run 첫 revision 배포 성공. **운영 reference seed 는 미실행(PENDING_PRODUCTION_EXECUTION)** · `study.neture.co.kr` DNS/도메인 매핑 미설정(§9).
+> **상태**: **Phase 1 MERGED** — PR #223 → main `3e56425b7` (2026-09-19 · merge commit) · `lecture-web` Cloud Run 첫 revision 배포 성공. **운영 reference seed APPLIED(§10.2 · 2026-09-19)** · `study.neture.co.kr` 도메인 매핑 진행 중(§10.3 · GCP NEG 까지 · 나머지 분류기 차단 + Gabia DNS 사용자 작업).
 > **날짜**: 2026-09-18 · **작성**: Claude Code (Opus 5) — ChatGPT 세션이 만든 PR 을 이어받아 정리 · 검증
 > **원칙**: 검증하지 않은 것을 PASS 로 쓰지 않는다. 접속값 · 자격증명 출력 0.
 
@@ -66,10 +66,10 @@
 ### 4.2 운영 실행 — 미실행
 
 ```text
-LECTURE_REFERENCE_SEED = PENDING_PRODUCTION_EXECUTION
+LECTURE_REFERENCE_SEED = APPLIED (2026-09-19 · §10.2)
 ```
 
-이번 PR 은 운영 DB 에 쓰지 않는다. merge 후 별도 승인 하에 SETUP.md 절차(Auth Proxy)로 `dry-run → apply` 1회. 그 전까지 운영에는 `platform_services.lecture` · `lecture:*` role 행이 없으므로 Admin RoleManagement 에서 lecture role 부여 · Account 서비스 목록 노출은 되지 않는다(Phase 1 은 `joinEnabled=false` · skeleton 이라 기능 영향 0).
+PR 자체는 운영 DB 에 쓰지 않았고, merge 후 별도 승인으로 1회 실행했다(§10.2). (아래 원문 유지) merge 후 별도 승인 하에 SETUP.md 절차(Auth Proxy)로 `dry-run → apply` 1회. 그 전까지 운영에는 `platform_services.lecture` · `lecture:*` role 행이 없으므로 Admin RoleManagement 에서 lecture role 부여 · Account 서비스 목록 노출은 되지 않는다(Phase 1 은 `joinEnabled=false` · skeleton 이라 기능 영향 0).
 
 ## 5. 검증
 
@@ -154,3 +154,45 @@ EXISTING_SERVICE_LMS_REMOVAL = NOT_STARTED
 | E2E — Auth Runtime Regression | **failure** — PR 이 `packages/security-core/src/types.ts` 를 건드려 path 트리거로 자동 실행. 실패 자체는 09-17 이후 연속 red(stale E2E secret · `d5be1eb31` 기록). ⚠️ 부작용: 이 워크플로는 3서비스 반복 로그인으로 운영자 계정 `loginAttempts` 를 누적시킨다(타 세션 기록 "잔존 8 · 실패 1회면 재잠금") → 본 merge 가 유발한 실행이 **운영자 계정을 재잠금했을 수 있음**. 확인 · 해제 · 워크플로 트리거 정비는 `WO-O4O-GOOGLE-IDENTITY-OPERATOR-EXPLICIT-LINK-V1` 트랙(별도 승인)에서 |
 
 남은 순서: ① 운영자 계정 잠금 상태 확인(read-only) → ② 승인 후 `seed-lecture-service-and-roles.ts` dry-run → apply 1회 → §4.2 갱신 → ③ 도메인 매핑(인프라 승인) → ④ Phase 2 (WO §6.1 step 05~).
+
+## 10. 운영 반영 (2026-09-19 · 사용자 승인 후)
+
+### 10.1 운영자 계정 잠금 상태 — read-only 확인 · **STOP(수정 0)**
+
+Cloud SQL Auth Proxy(loopback) · `SELECT` 만. DB timezone UTC.
+
+| 계정 | loginAttempts | lockedUntil (UTC) | 잠금 중 | lastLoginAt (UTC) |
+|---|---|---|---|---|
+| 운영자 `soh***` | **10** | **2026-09-18 23:15:21** | **YES**(조회 시각 22:59Z · KST 08:15 까지) | 2026-09-18 00:11 |
+| 테스트 `ren***` | 0 | — | no | 2026-09-18 13:40 |
+
+- 정책(`auth-login.service.ts`): 실패 5회 이상 → 30분 잠금 · 실패마다 30분 연장 · 성공 시 0 리셋.
+- 타 세션 기록 시점(`d5be1eb31`, 잔존 8)보다 **2회 더 누적**. 마지막 실패 ≈ 22:45Z(KST 07:45). Lecture merge 가 유발한 E2E Auth Runtime 실행은 21:55~22:00Z 에 끝났으므로 **최근 2회는 E2E 가 아닌 다른 로그인 시도**(사용자 또는 다른 세션 smoke).
+- 지시대로 해제 · 리셋 · 어떤 write 도 하지 않음. 정비는 Google Identity/Auth 트랙.
+
+### 10.2 Lecture reference seed — APPLIED
+
+| 단계 | 결과 |
+|---|---|
+| baseline(read-only) | platform_services 9 · ps_lecture 0 · roles 41 · roles_lecture 0 · lecture:member 0 · service_memberships 5 · role_assignments 11 · lms_courses 11 (max updatedAt 2026-08-26 · id/service_key hash `1ddf1adb…`) |
+| dry-run | 4 대상 MISSING · `DB_WRITES = 0` |
+| `--apply` + `LECTURE_REFERENCE_SEED_CONFIRM=YES` | `POST_SEED_ASSERTION = PASS` · platform_services upserted 1 · roles upserted 3 · lecture:member 0 |
+| read-only 재조회 | platform_services 10 · **ps_lecture 1** · roles 44 · **roles_lecture 3**(admin `is_admin_role=t` · operator · instructor) · **lecture:member 0** · **service_memberships 5(=)** · **role_assignments 11(=)** · **lms_courses 11 · hash 동일(=)** |
+| 동일 명령 재실행 | 4 대상 `present · drift=none` · 행 내용 md5(`be8b45cb…`/`7241dbb3…` = 격리 PG 검증값과 동일) + count 전부 동일 → **IDEMPOTENT = YES** |
+
+기대값 대비: `platform_services.code='lecture' = 1 · lecture:admin/operator/instructor = 1/1/1 · lecture:member = 0 · service_memberships 신규 0 · role_assignments 신규 0 · lms_courses 변경 0` — **전부 일치**.
+
+### 10.3 `study.neture.co.kr` 도메인 매핑 — 진행 중 (인프라 · 코드 변경 0)
+
+구조 확인: 기존 웹 서비스는 Cloud Run domain mapping 이 아니라 **Global External HTTPS LB `o4o-global-lb`(IP `136.110.132.35`) + serverless NEG + Certificate Manager map `o4o-main-cert-map`**, DNS 는 **Gabia** 네임서버(Cloud DNS 없음). 선례 = pharmacyhub(`neg-pharmacy-hub-web` → `backend-pharmacy-hub-web`(HTTPS · EXTERNAL_MANAGED) → host rule → `cm-cert-pharmacyhub` + `cm-entry-pharmacyhub-*`).
+
+| 단계 | 상태 |
+|---|---|
+| ① serverless NEG `neg-lecture-web`(asia-northeast3 → lecture-web) | **DONE** |
+| ② backend service `backend-lecture-web` + NEG 연결 | **BLOCKED** — Claude Code auto-mode 분류기 "Modify Shared Resources" 차단(공유 LB). 우회하지 않음 |
+| ③ URL map `o4o-global-lb` host rule `study.neture.co.kr` → `path-matcher-lecture` | 대기(②) — 변경 전 스냅샷 `C:/tmp/lecture-lb-urlmap-before.yaml` 확보 |
+| ④ 인증서 `cm-cert-lecture`(LB 인증 · A 레코드만 필요) + `cm-entry-lecture-study` | 대기 |
+| ⑤ DNS `study.neture.co.kr A 136.110.132.35` | **사용자 작업(Gabia 콘솔)** — GCP 에서 불가 |
+| smoke(`/` 200 · SPA fallback · title · HTTPS · CORS · /terms /privacy) | ①~⑤ 후 |
+
+`LECTURE_DOMAIN_MAPPING = IN_PROGRESS` (NEG 1/5).
