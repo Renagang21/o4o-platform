@@ -26,6 +26,8 @@
  */
 
 import type { MigrationInterface } from 'typeorm';
+// WO-O4O-STORE-OWNER-AGREEMENT-PUBLISH-PREREQUISITES-V1 (종료·반환·7일 파기 case SSOT)
+import { CreateStoreOwnerTerminationCases1789701000000 } from '../migrations/1789701000000-CreateStoreOwnerTerminationCases.js';
 
 export const INCREMENTAL_MIGRATION_CUTOFF = {
   baselineVersion: '2026-09-18-id685',
@@ -38,8 +40,10 @@ export const INCREMENTAL_MIGRATION_CUTOFF = {
 
 export type MigrationClass = new () => MigrationInterface;
 
-/** Append only. Order must match ascending epoch. Empty since the 2026-09-18-id685 rollover. */
-export const INCREMENTAL_MIGRATIONS: readonly MigrationClass[] = [];
+/** Append only. Order must match ascending epoch. */
+export const INCREMENTAL_MIGRATIONS: readonly MigrationClass[] = [
+  CreateStoreOwnerTerminationCases1789701000000,
+];
 
 export function incrementalMigrationNames(): string[] {
   // Append-only registry: empty right after a baseline rollover, populated by the next incremental

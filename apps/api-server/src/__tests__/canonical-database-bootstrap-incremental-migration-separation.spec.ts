@@ -190,6 +190,11 @@ describe('historical migrations are frozen and never loaded', () => {
   });
 
   it('no runtime module imports a historical migration source (they are never runtime provenance)', () => {
+    // WO-O4O-STORE-OWNER-AGREEMENT-PUBLISH-PREREQUISITES-CLOSURE-HANDOFF-V1: only HISTORICAL sources are
+    // forbidden. incremental/manifest.ts MUST import the incremental migrations it registers (manifest step 5),
+    // so a bare `/migrations/<epoch>-` match is a false positive the moment the first post-rollover incremental
+    // lands — the match is resolved against the frozen historical manifest instead.
+    const historicalFiles = new Set(historical.entries.map((e) => e.file));
     const offenders: string[] = [];
     const walk = (dir: string) => {
       for (const ent of fs.readdirSync(dir, { withFileTypes: true })) {
@@ -197,11 +202,28 @@ describe('historical migrations are frozen and never loaded', () => {
         if (ent.isDirectory()) { if (!/__tests__|migrations$/.test(ent.name)) walk(p); continue; }
         if (!ent.name.endsWith('.ts')) continue;
         const stripped = fs.readFileSync(p, 'utf8').replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
-        if (/\/migrations\/\d{13,14}-/.test(stripped)) offenders.push(path.relative(SRC, p));
+        for (const m of stripped.matchAll(/\/migrations\/(\d{13,14}-[\w-]+?)(?:\.js|\.ts)?['"]/g)) {
+          if (historicalFiles.has(`${m[1]}.ts`)) offenders.push(`${path.relative(SRC, p)} → ${m[1]}`);
+        }
       }
     };
     walk(SRC);
     expect(offenders).toEqual([]);
+  });
+
+  it('the historical-import guard still catches a historical source import (guard is not vacuous)', () => {
+    const sample = historical.entries[0];
+    const historicalFiles = new Set(historical.entries.map((e) => e.file));
+    const fake = `import { X } from '../migrations/${sample.file.replace(/\.ts$/, '')}.js';`;
+    const hits = [...fake.matchAll(/\/migrations\/(\d{13,14}-[\w-]+?)(?:\.js|\.ts)?['"]/g)].filter((m) => historicalFiles.has(`${m[1]}.ts`));
+    expect(hits).toHaveLength(1);
+    // and the registered incremental import is NOT a hit
+    const inc = incrementalFilesOf();
+    for (const f of inc) {
+      const line = `import { Y } from '../migrations/${f.replace(/\.ts$/, '')}.js';`;
+      const h = [...line.matchAll(/\/migrations\/(\d{13,14}-[\w-]+?)(?:\.js|\.ts)?['"]/g)].filter((m) => historicalFiles.has(`${m[1]}.ts`));
+      expect(h).toHaveLength(0);
+    }
   });
 });
 

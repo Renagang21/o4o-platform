@@ -132,8 +132,15 @@ export const SYNTHETIC_MANIFEST: readonly string[] = [
   'HarnessSyntheticThird1800000000003',
 ];
 
-/** Expected states for SYNTHETIC_MANIFEST: every prefix reuses the baseline fingerprint (no-op migrations). */
-export function syntheticExpectedStates(baseline: ExpectedSchemaState = EXPECTED_SCHEMA_STATES[0]): readonly ExpectedSchemaState[] {
+/**
+ * Expected states for SYNTHETIC_MANIFEST: every prefix reuses the TEMPLATE fingerprint (no-op migrations).
+ * The bootstrap template has every REAL incremental migration applied (buildTemplatesOnce), so its schema is
+ * EXPECTED_SCHEMA_STATES[INCREMENTAL_MIGRATIONS.length] — not [0] once the first post-rollover incremental lands
+ * (WO-O4O-STORE-OWNER-AGREEMENT-PUBLISH-PREREQUISITES-CLOSURE-HANDOFF-V1: S05/S07/S08 were false UNKNOWN_PARTIAL).
+ */
+export function syntheticExpectedStates(
+  baseline: ExpectedSchemaState = EXPECTED_SCHEMA_STATES[INCREMENTAL_MIGRATIONS.length] ?? EXPECTED_SCHEMA_STATES[0],
+): readonly ExpectedSchemaState[] {
   return [baseline, ...SYNTHETIC_MANIFEST.map((name) => ({ appliedThrough: name, fingerprint: baseline.fingerprint, fingerprintLineCount: baseline.fingerprintLineCount }))];
 }
 
@@ -183,7 +190,10 @@ export function standardScenarios(): Scenario[] {
     { id: 'S04', description: 'bootstrap, extra table added', base: 'bootstrap', mutate: ['CREATE TABLE public.harness_extra_table (id integer)'], expect: 'UNKNOWN_PARTIAL' },
     { id: 'S05', description: 'bootstrap + incremental [M1] recorded (no-op migration)', base: 'bootstrap', mutate: historyInsertSql([M[0]]), contract: inc, expect: 'BOOTSTRAPPED' },
     { id: 'S06', description: 'bootstrap + incremental [M1], then non-core column dropped', base: 'bootstrap', mutate: [...historyInsertSql([M[0]]), 'ALTER TABLE public.store_tablet_devices DROP COLUMN last_seen_at'], contract: inc, expect: 'UNKNOWN_PARTIAL' },
-    { id: 'S07', description: 'legacy established (synthetic ordered history == injected baseline, no marker)', base: 'bootstrap', mutate: legacy(L), contract: leg, expect: 'LEGACY_ESTABLISHED' },
+    // S07 compares the template schema at incremental prefix 0, so it must read the synthetic (template) expected
+    // states — the real registry's [0] is the bare baseline, which the template no longer equals once a real
+    // incremental exists (see syntheticExpectedStates).
+    { id: 'S07', description: 'legacy established (synthetic ordered history == injected baseline, no marker)', base: 'bootstrap', mutate: legacy(L), contract: { ...leg, expectedStates: states }, expect: 'LEGACY_ESTABLISHED' },
     { id: 'S08', description: 'legacy + incremental [M1] after the legacy prefix', base: 'bootstrap', mutate: legacy([...L, M[0]]), contract: legInc, expect: 'LEGACY_ESTABLISHED' },
     { id: 'S09', description: 'legacy, non-core constraint dropped (schema drift)', base: 'bootstrap', mutate: [...legacy(L), 'ALTER TABLE public.store_tablet_devices DROP CONSTRAINT "FK_std_current_location"'], contract: leg, expect: 'UNKNOWN_PARTIAL' },
     { id: 'S10', description: 'legacy, incremental history gap [M2] (M1 missing)', base: 'bootstrap', mutate: legacy([...L, M[1]]), contract: legInc, expect: 'UNKNOWN_PARTIAL' },

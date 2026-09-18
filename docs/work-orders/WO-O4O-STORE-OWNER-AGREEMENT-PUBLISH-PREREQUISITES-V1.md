@@ -1,6 +1,6 @@
 # WO-O4O-STORE-OWNER-AGREEMENT-PUBLISH-PREREQUISITES-V1
 
-> **상태:** DRAFT · HANDOFF ONLY · 실행 전용 WO (등록일 2026-09-18 · 실행 착수는 별도 명시 지시)
+> **상태:** IN_PROGRESS · 실행 승인 2026-09-18 · 구현/검증 진행 (등록일 2026-09-18 · 실행 착수는 별도 명시 지시)
 > **대상 계약:** [`docs/baseline/O4O-STORE-OWNER-SERVICE-AGREEMENT-V1.0.md`](../baseline/O4O-STORE-OWNER-SERVICE-AGREEMENT-V1.0.md) (DRAFT · 975ddc217)
 > **목적:** 매장 경영자 이용계약 v1.0의 게시 선행조건 4건을 실제 런타임과 정렬
 > **적용 서비스:** `kpa-society` · `k-cosmetics` · `pharmacy-hub`
