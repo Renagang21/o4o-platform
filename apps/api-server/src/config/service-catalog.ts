@@ -142,7 +142,7 @@ export const O4O_SERVICES: O4OService[] = [
    */
   {
     key: 'lecture',
-    name: 'O4O Lecture',
+    name: 'O4O 강의',
     nameKo: 'O4O 강의',
     domain: 'study.neture.co.kr',
     description: '강의·학습·평가·수료를 제공하는 O4O 학습 서비스',
@@ -237,31 +237,4 @@ export function getJoinableServices(): O4OService[] {
 /** 모든 서비스 키 목록 */
 export function getAllServiceKeys(): string[] {
   return O4O_SERVICES.map(s => s.key);
-}
-
-/**
- * 모든 서비스의 공식 origin (https://domain) 목록 — WO-O4O-DOMAIN-SSOT-CANONICALIZATION-V1
- *
- * origin 은 scheme+host 다. basePath 는 origin 의 일부가 아니므로 여기에 붙이지 않는다
- * (CORS / 화이트리스트 판정 축). base URL 이 필요하면 `getServiceOrigin` 을 쓴다.
- */
-export function getServiceOrigins(): string[] {
-  return Array.from(new Set(O4O_SERVICES.map(s => `https://${s.domain}`)));
-}
-
-/**
- * 서비스 키 → 공식 origin (`https://{domain}`).
- * 모르는 키면 undefined.
- *
- * WO-O4O-PASSWORD-RESET-EMAIL-LINK-PRODUCTION-URL-FIX-V1:
- *   비밀번호 재설정 이메일의 base URL 을 server 측에서 serviceKey 로 결정하기 위한 helper.
- *   클라이언트가 serviceUrl 을 제공하지 않더라도 production URL 이 보장된다.
- */
-export function getServiceOrigin(key: string): string | undefined {
-  const svc = serviceMap.get(key);
-  if (!svc) return undefined;
-  // WO-O4O-KPA-BRANCH-PUBLIC-PATH-ROUTING-AND-CUSTOM-DOMAIN-BASELINE-V1:
-  //   basePath 를 가진 서비스(kpa-branch)는 host 루트가 다른 서비스이므로
-  //   base URL 에 prefix 를 포함해야 링크가 자기 앱으로 떨어진다.
-  return `https://${svc.domain}${svc.basePath ?? ''}`;
 }
