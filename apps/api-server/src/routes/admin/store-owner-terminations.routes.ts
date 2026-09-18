@@ -53,8 +53,12 @@ router.get('/:caseId', async (req: Request, res: Response) => {
 });
 
 router.get('/:caseId/return-package', async (req: Request, res: Response) => {
-  try { res.json({ success:true, data:await storeOwnerTerminationService.buildReturnPackage(req.params.caseId) }); }
-  catch (e) { fail(res,e); }
+  try {
+    // 반환 패키지는 사업자/매장 정보가 포함될 수 있으므로 intermediary/browser cache 금지.
+    res.setHeader('Cache-Control', 'no-store, max-age=0');
+    res.setHeader('Pragma', 'no-cache');
+    res.json({ success:true, data:await storeOwnerTerminationService.buildReturnPackage(req.params.caseId) });
+  } catch (e) { fail(res,e); }
 });
 
 router.post('/:caseId/return-completed', async (req: Request, res: Response) => {
