@@ -1,6 +1,6 @@
 # WO-O4O-STORE-OWNER-AGREEMENT-PUBLISH-PREREQUISITES-V1
 
-> **상태:** IN_PROGRESS · 실행 승인 2026-09-18 · 구현/검증 진행 (등록일 2026-09-18 · 실행 착수는 별도 명시 지시)
+> **상태:** CLOSED (2026-09-18) — 선행조건 ①~④ main 반영(`ded496f17` · `75058fc0c` · `55c60e081` · PR #222 merge `d8edbf95a`) · production migration `CreateStoreOwnerTerminationCases1789701000000` SUCCESS(Job `lrkfj`) · 실운영 DELETE 0 · acceptance backfill 0 · **계약 자체는 미게시(DRAFT)** — CHECK [`CHECK-O4O-STORE-OWNER-AGREEMENT-PUBLISH-PREREQUISITES-V1`](../checks/CHECK-O4O-STORE-OWNER-AGREEMENT-PUBLISH-PREREQUISITES-V1.md)
 > **대상 계약:** [`docs/baseline/O4O-STORE-OWNER-SERVICE-AGREEMENT-V1.0.md`](../baseline/O4O-STORE-OWNER-SERVICE-AGREEMENT-V1.0.md) (DRAFT · 975ddc217)
 > **목적:** 매장 경영자 이용계약 v1.0의 게시 선행조건 4건을 실제 런타임과 정렬
 > **적용 서비스:** `kpa-society` · `k-cosmetics` · `pharmacy-hub`

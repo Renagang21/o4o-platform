@@ -1,6 +1,6 @@
 # WO-O4O-STORE-OWNER-AGREEMENT-PUBLISH-PREREQUISITES-CLOSURE-HANDOFF-V1
 
-> **상태:** READY FOR CLAUDE CODE · HANDOFF ONLY  
+> **상태:** CLOSED (2026-09-18 · Claude Code) — PR #222 `c5ae05ca5`(rollover 오탐 test 2건 수정) → merge `d8edbf95a` · Job `o4o-api-migrations-lrkfj` SUCCESS · CHECK [`CHECK-O4O-STORE-OWNER-AGREEMENT-PUBLISH-PREREQUISITES-V1`](../checks/CHECK-O4O-STORE-OWNER-AGREEMENT-PUBLISH-PREREQUISITES-V1.md)  
 > **상위 WO:** `docs/work-orders/WO-O4O-STORE-OWNER-AGREEMENT-PUBLISH-PREREQUISITES-V1.md`  
 > **대상 계약:** `docs/baseline/O4O-STORE-OWNER-SERVICE-AGREEMENT-V1.0.md` (DRAFT)  
 > **기존 PR:** #222 — `work/store-owner-termination-lifecycle-v1`  
