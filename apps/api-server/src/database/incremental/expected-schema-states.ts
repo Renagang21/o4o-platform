@@ -99,6 +99,14 @@ export const EXPECTED_SCHEMA_STATES: readonly ExpectedSchemaState[] = [
     fingerprint: '0ca1a71b9a511f0147583c919eb37814b1ad28f1ba042ceba1038393bb54df70',
     fingerprintLineCount: 5745,
   },
+  // WO-O4O-STORE-OWNER-AGREEMENT-PUBLISH-PREREQUISITES-V1 — store_owner_termination_cases.
+  // GitHub Actions 격리 PostgreSQL 15 fresh bootstrap + incrementals 1..8 에서 산출
+  // (TEMP validation run 35308979690): 운영 DB fingerprint 채택 아님.
+  {
+    appliedThrough: 'CreateStoreOwnerTerminationCases1789701000000',
+    fingerprint: '73d74984bd0448560639742fcce3c8922295f6b967f8bd71dd28f352552756d0',
+    fingerprintLineCount: 5771,
+  },
 ] as const;
 
 /** Expected state after `prefixLength` incremental migrations; undefined when not registered. */

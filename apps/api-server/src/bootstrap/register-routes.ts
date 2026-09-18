@@ -48,6 +48,8 @@ import adminPlatformAccountsRoutes from '../routes/admin/platform-accounts.route
 import adminPlatformUsersRoutes from '../routes/admin/platform-users.routes.js';
 // WO-O4O-SECURITY-IP-BLOCK-TTL-AND-UNBLOCK-V1
 import adminSecurityBlockedIpsRoutes from '../routes/admin/security-blocked-ips.routes.js';
+// WO-O4O-STORE-OWNER-AGREEMENT-PUBLISH-PREREQUISITES-V1: 계약 종료·반환·7일 파기 운영 API
+import storeOwnerTerminationRoutes from '../routes/admin/store-owner-terminations.routes.js';
 
 // ============================================================================
 // DOMAIN ROUTE IMPORTS (registered after DB init)
@@ -332,6 +334,9 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
     // 8.9. Register Physical Store Linking routes (WO-O4O-CROSS-SERVICE-STORE-LINKING-V1)
     app.use('/api/v1/admin/physical-stores', createPhysicalStoreRoutes(dataSource));
     logger.info('✅ Physical Store routes registered at /api/v1/admin/physical-stores');
+
+    app.use('/api/v1/admin/store-owner-terminations', storeOwnerTerminationRoutes);
+    logger.info('✅ Store Owner Termination routes registered at /api/v1/admin/store-owner-terminations');
 
     // 8.10. Register Platform Slug Check routes (WO-CORE-STORE-REQUESTED-SLUG-V1)
     app.use('/api/v1/platform/slug', createSlugRoutes(dataSource));

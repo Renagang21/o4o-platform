@@ -31,6 +31,8 @@ import { PrepareGoogleIdentityLinkedAccountsAndUsersConstraints1789648511051 } f
 import { CreateUserPolicyAcceptances1789649959243 } from '../migrations/1789649959243-CreateUserPolicyAcceptances.js';
 // WO-O4O-RETIRED-SERVICE-SCHEMA-ENUM-CLEANUP-V1 (retired enum label 제거 · DB_SCHEMA_RESIDUAL 1 → 0)
 import { RemoveRetiredCheckoutOrderTypeEnumValue1789690338675 } from '../migrations/1789690338675-RemoveRetiredCheckoutOrderTypeEnumValue.js';
+// WO-O4O-STORE-OWNER-AGREEMENT-PUBLISH-PREREQUISITES-V1 (종료·반환·7일 파기 case SSOT)
+import { CreateStoreOwnerTerminationCases1789701000000 } from '../migrations/1789701000000-CreateStoreOwnerTerminationCases.js';
 
 export const INCREMENTAL_MIGRATION_CUTOFF = {
   baselineVersion: '2026-09-15-id678',
@@ -53,6 +55,7 @@ export const INCREMENTAL_MIGRATIONS: readonly MigrationClass[] = [
   PrepareGoogleIdentityLinkedAccountsAndUsersConstraints1789648511051,
   CreateUserPolicyAcceptances1789649959243,
   RemoveRetiredCheckoutOrderTypeEnumValue1789690338675,
+  CreateStoreOwnerTerminationCases1789701000000,
 ];
 
 export function incrementalMigrationNames(): string[] {
