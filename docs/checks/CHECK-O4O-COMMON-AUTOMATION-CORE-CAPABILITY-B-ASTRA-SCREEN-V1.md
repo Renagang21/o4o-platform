@@ -52,12 +52,12 @@ ASTRA_REAL_SMOKE         = PASS
 
 | # | 항목 | 상태 |
 |---|---|---|
-| 1 | 운영 경로 실측 — Work Agent 이미지 첨부/화면 캡처가 **openai provider 설정**(`AI_DEFAULT_PROVIDER=openai` 또는 관리자 정책)에서 Astra 분기로 실제 계획을 내는지 | PENDING — 현재 운영 기본 provider 는 gemini 라 이 분기는 설정 전환 시에만 탄다. 전환은 운영 정책 결정(승인 게이트) |
+| 1 | 운영 경로 실측 — Work Agent 이미지 첨부/화면 캡처가 Astra 분기로 실제 계획을 내는지 | PENDING(agent 연결 환경). **정정(2026-09-19)**: 전역 provider 전환은 하지 않는다 — Capability C 가 screen modality 에 `requestedProvider='openai'` 를 per-task 로 명시해 이 분기로 보낸다([Capability C CHECK](CHECK-O4O-COMMON-AUTOMATION-CORE-CAPABILITY-C-TASK-MODALITY-ROUTER-V1.md)) |
 | 2 | home-chat 첨부(multimodal-chat) 의 openai inline 채택 | 후속(같은 헬퍼 재사용 · 별도 WO) |
 | 3 | Capability C(Router) → `/hospital-drug` 재연결(단계 D) | Capability A CHECK §6 순서대로 다음 |
 
 ```text
 ASTRA_B0_GATE   = PASS (사용자 실측 4/4 vs 0/4)
 ASTRA_B1_IMPL   = DONE (planner openai vision 분기 · Gemini 존치 · 단위 계약 고정)
-ASTRA_PROD_PATH = PENDING (provider 전환 정책 필요)
+ASTRA_PROD_PATH = PENDING (Capability C per-task 배선 완료 · agent 연결 환경 실측 대기)
 ```

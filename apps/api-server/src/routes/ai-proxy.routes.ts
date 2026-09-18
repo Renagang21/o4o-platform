@@ -37,7 +37,9 @@ import { isYouTubeUrl, fetchYouTubeContent, fetchYouTubeOEmbed } from './ai-prox
 // WO-O4O-COMMON-HOME-AI-INPUT-V0: O4O 공통 Home 중앙 입력 — 텍스트 질의응답 전용
 import { execute } from '@o4o/ai-core';
 import { dynamicLimiter } from '../middleware/rateLimiter.js';
-import { createLlmPlanner, createStrongLlmPlanner, runWorkAgent } from '../services/ai-tools/work-agent-runtime.js';
+import { createLlmPlanner, createStrongLlmPlanner, createLlmPlannerForProvider, createStrongLlmPlannerForProvider, runWorkAgent } from '../services/ai-tools/work-agent-runtime.js';
+// WO-O4O-COMMON-AUTOMATION-CORE-CAPABILITY-C-TASK-MODALITY-ROUTER-V1 — per-task provider 선택(전역 provider 불변)
+import { classifyTaskModality } from '../services/ai-tools/task-modality-router.js';
 // WO-O4O-AI-COMPOSER-UNIFIED-REQUEST-AND-ATTACHMENT-UX-V1 — 단일 요청 라우터 · 첨부 계약 · 첨부 리더 · multimodal 호출
 import {
   validateUnifiedAttachments,
@@ -284,6 +286,17 @@ async function performWorkAgentRun(userId: string, body: Record<string, unknown>
     return { status: 403, body: { success: false, error: '이 PC 의 O4O 확장이 연결되어 있어야 합니다.', code: 'WORK_AGENT_NOT_AVAILABLE', reason: authz.reason } };
   }
 
+  // Capability C(Task Modality Router) — per-task provider. Work Agent 로 온 Goal 은 실행 표면(등재 대상 · 화면 캡처 · UI 어휘)이
+  // 있으면 screen 이고, screen 은 openai(Astra vision planner · Capability B)로 간다. 전역 AI_DEFAULT_PROVIDER 는 그대로(gemini).
+  // 판정에 AI 호출 0 · 로그에는 modality/reason 만(문장 · 이미지 없음).
+  const modality = classifyTaskModality({
+    request: String(body.request),
+    targetHint: typeof body.targetHint === 'string' ? body.targetHint : undefined,
+    image: body.image && typeof body.image === 'object' ? { provenance: 'user_image' } : null,
+  });
+  logger.info('work-agent task modality', { userId, modality: modality.modality, reason: modality.reason, provider: modality.provider });
+  const plannerProvider = modality.modality === 'screen' && modality.provider ? modality.provider : null;
+
   const result = await runWorkAgent(
     AppDataSource,
     toolCtx,
@@ -295,9 +308,9 @@ async function performWorkAgentRun(userId: string, body: Record<string, unknown>
       // 실패 인계 뒤 사용자가 다시 요청하며 준 힌트(§64·§65). runtime 이 sanitize 한다.
       recoveryHint: typeof body.recoveryHint === 'string' ? body.recoveryHint : undefined,
     },
-    createLlmPlanner(AppDataSource),
+    plannerProvider ? createLlmPlannerForProvider(AppDataSource, plannerProvider) : createLlmPlanner(AppDataSource),
     // 복구 계층의 strong 추론 경로(§11·§12) — 같은 provider·키, 더 강한 모델. 새 stack 아님.
-    { strongPlanner: createStrongLlmPlanner(AppDataSource) },
+    { strongPlanner: plannerProvider ? createStrongLlmPlannerForProvider(AppDataSource, plannerProvider) : createStrongLlmPlanner(AppDataSource) },
   );
   // history 에는 행동 종류 · ref · 상태만 있고 입력 텍스트는 뺀다(응답에도 검색어를 되돌리지 않는다).
   const history = result.history.map((h) => ({ step: h.step, kind: h.action.kind, status: h.status, errorCode: h.errorCode ?? null, navigated: h.navigated === true }));

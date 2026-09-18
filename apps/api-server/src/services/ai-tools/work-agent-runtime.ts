@@ -240,6 +240,31 @@ const strongTargetResolver: PlannerTargetResolver = async (dataSource) => {
   return resolveStrongAiTarget(dataSource, undefined);
 };
 
+/**
+ * Capability C(Task Modality Router) — **per-task provider** planner 쌍.
+ *   전역 `AI_DEFAULT_PROVIDER` 를 바꾸지 않고, screen modality 의 Goal 에만 `requestedProvider` 를 명시해 B1(Astra vision) 경로로
+ *   보낸다. 키가 없는 provider 를 요청받으면 planner 를 죽이지 않고 **전역 기본 provider 로 fallback** 하며 경고만 남긴다
+ *   (운영 설정 부재가 Work Agent 전체 중단으로 번지지 않게).
+ */
+export function createPlannerTargetResolverForProvider(provider: 'gemini' | 'openai', strong = false): PlannerTargetResolver {
+  return async (dataSource) => {
+    const { resolveAiTarget, resolveStrongAiTarget } = await import('../../utils/ai-provider-runtime.js');
+    const pick = strong ? resolveStrongAiTarget : resolveAiTarget;
+    const target = await pick(dataSource, provider);
+    if (target.apiKey) return target;
+    logger.warn('[WorkAgent] requested provider has no API key — falling back to default provider', { requested: provider, strong });
+    return pick(dataSource, undefined);
+  };
+}
+
+export function createLlmPlannerForProvider(dataSource: DataSource, provider: 'gemini' | 'openai', fetchImpl: typeof fetch = fetch): WorkPlanner {
+  return createLlmPlanner(dataSource, fetchImpl, createPlannerTargetResolverForProvider(provider, false));
+}
+
+export function createStrongLlmPlannerForProvider(dataSource: DataSource, provider: 'gemini' | 'openai', fetchImpl: typeof fetch = fetch): WorkPlanner {
+  return createLlmPlanner(dataSource, fetchImpl, createPlannerTargetResolverForProvider(provider, true));
+}
+
 /** Capability B(Astra Screen) B1 — openai vision 호출 형태. planner 와(후속) multimodal-chat 이 같은 형태를 쓴다. */
 export const OPENAI_CHAT_COMPLETIONS_URL = 'https://api.openai.com/v1/chat/completions';
 

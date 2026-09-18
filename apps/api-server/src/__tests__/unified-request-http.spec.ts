@@ -50,10 +50,14 @@ jest.mock('../utils/ai-provider-runtime.js', () => {
   return { ...actual, resolveAiTarget: jest.fn(async () => ({ provider: 'gemini', model: 'gemini-test', apiKey: 'k' })) };
 });
 jest.mock('@o4o/ai-core', () => ({ __esModule: true, execute: (...a: unknown[]) => executeMock(...a) }));
+const plannerFactoryCalls: string[] = [];
 jest.mock('../services/ai-tools/work-agent-runtime.js', () => ({
   runWorkAgent: (...a: unknown[]) => runWorkAgentMock(...a),
-  createLlmPlanner: () => ({ kind: 'llm', plan: jest.fn() }),
-  createStrongLlmPlanner: () => ({ kind: 'llm', plan: jest.fn() }),
+  createLlmPlanner: () => { plannerFactoryCalls.push('default'); return { kind: 'llm', plan: jest.fn() }; },
+  createStrongLlmPlanner: () => { plannerFactoryCalls.push('default-strong'); return { kind: 'llm', plan: jest.fn() }; },
+  // Capability C — per-task provider planner 쌍(전역 provider 불변).
+  createLlmPlannerForProvider: (_ds: unknown, provider: string) => { plannerFactoryCalls.push(`provider:${provider}`); return { kind: 'llm', plan: jest.fn() }; },
+  createStrongLlmPlannerForProvider: (_ds: unknown, provider: string) => { plannerFactoryCalls.push(`provider-strong:${provider}`); return { kind: 'llm', plan: jest.fn() }; },
 }));
 // ai-proxy.service 는 DB entity 를 끌고 온다 — 이 spec 이 쓰는 두 경로는 그것을 쓰지 않는다.
 jest.mock('../services/ai-proxy.service.js', () => ({ aiProxyService: {} }));
@@ -135,6 +139,18 @@ describe('POST /api/ai/request', () => {
     expect(executeMock).toHaveBeenCalledTimes(1);
     expect(runWorkAgentMock).not.toHaveBeenCalled();
     expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  // WO-O4O-COMMON-AUTOMATION-CORE-CAPABILITY-C-TASK-MODALITY-ROUTER-V1 (E) — work 로 온 Goal 은 screen modality 이므로
+  // planner 쌍이 openai(Astra vision · Capability B) 로 만들어진다. 전역 AI_DEFAULT_PROVIDER 는 건드리지 않는다.
+  it('②-C. work 경로의 Goal(등재 대상) → planner 쌍이 per-task provider openai 로 생성된다 · 전역 provider env 불변', async () => {
+    plannerFactoryCalls.length = 0;
+    const before = process.env.AI_DEFAULT_PROVIDER;
+    const r = await request(app).post('/api/ai/request').send({ text: '약학정보원에서 타이레놀 검색해줘' });
+    expect(r.body.data.kind).toBe('work');
+    expect(plannerFactoryCalls).toEqual(['provider:openai', 'provider-strong:openai']);
+    expect(process.env.AI_DEFAULT_PROVIDER).toBe(before);
+    expect(logInfo.mock.calls.find((c) => c[0] === 'work-agent task modality')?.[1]).toEqual(expect.objectContaining({ modality: 'screen', provider: 'openai' }));
   });
 
   it('② text-only 웹 작업(결합 아님) → work (execute 미호출 · runId/resumable 통과)', async () => {
