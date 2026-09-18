@@ -30,11 +30,13 @@ import {
   type PendingPolicyAcceptance,
   type PublishedTermsDocument,
 } from '../../common/auth/terms-acceptance.policy.js';
+import { STORE_OWNER_AGREEMENT_DOCUMENT_TYPE } from '../../common/auth/store-owner-agreement.policy.js';
 
 type Queryable = Pick<DataSource, 'query'> | Pick<EntityManager, 'query'>;
 
 const PUBLISHED_TTL_MS = 60_000;
 const USER_OK_TTL_MS = 60_000;
+const REQUIRED_AGREEMENT_DOCUMENT_TYPES = new Set<string>([REQUIRED_POLICY_DOCUMENT_TYPE, STORE_OWNER_AGREEMENT_DOCUMENT_TYPE]);
 
 /** 승낙 당시 본문 동일성 검증용 안정 hash (WO §5). 게시 도구 sha256 과 같은 입력(원문 그대로). */
 export function computePolicyContentHash(content: string): string {
@@ -106,13 +108,62 @@ export class PolicyAcceptanceService {
     return docs;
   }
 
-  /** 특정 서비스의 현재 published terms (없으면 null). 가입 검증은 항상 DB 를 다시 읽는다. */
-  async getPublishedTermsForService(serviceKey: string, q: Queryable = this.db()): Promise<PublishedTermsDocument | null> {
+  /** 특정 서비스의 현재 published 문서 1건. */
+  async getPublishedDocumentForService(
+    serviceKey: string,
+    documentType: string,
+    q: Queryable = this.db(),
+  ): Promise<PublishedTermsDocument | null> {
     const rows = (await q.query(
-      `${PUBLISHED_TERMS_SQL.replace('WHERE document_type = $1', 'WHERE document_type = $1 AND service_key = $2')}`,
-      [REQUIRED_POLICY_DOCUMENT_TYPE, serviceKey],
+      `SELECT id, service_key, document_type, version, title, content
+         FROM service_policy_documents
+        WHERE document_type = $1 AND service_key = $2 AND status = 'published'
+        ORDER BY published_at DESC NULLS LAST, version DESC
+        LIMIT 1`,
+      [documentType, serviceKey],
     )) as PublishedRow[];
     return rows[0] ? toPublished(rows[0]) : null;
+  }
+
+  /** 특정 서비스의 현재 published terms (없으면 null). 가입 검증은 항상 DB 를 다시 읽는다. */
+  async getPublishedTermsForService(serviceKey: string, q: Queryable = this.db()): Promise<PublishedTermsDocument | null> {
+    return this.getPublishedDocumentForService(serviceKey, REQUIRED_POLICY_DOCUMENT_TYPE, q);
+  }
+
+  /**
+   * 명시한 서비스 집합에 대한 별도 필수 계약 pending 판정.
+   * terms 전역 게이트와 섞지 않는다. published 문서가 없는 서비스는 요구하지 않는다.
+   */
+  async getPendingRequiredAgreements(
+    userId: string,
+    documentType: string,
+    serviceKeys: readonly string[],
+  ): Promise<PendingPolicyAcceptance[]> {
+    if (!userId || serviceKeys.length === 0) return [];
+    if (!REQUIRED_AGREEMENT_DOCUMENT_TYPES.has(documentType)) {
+      throw new PolicyAcceptanceError('POLICY_TYPE_MISMATCH', '지원하지 않는 필수 계약 유형입니다.', 409);
+    }
+    const q = this.db();
+    const uniqueKeys = Array.from(new Set(serviceKeys));
+    const docs = (await Promise.all(uniqueKeys.map((sk) => this.getPublishedDocumentForService(sk, documentType, q))))
+      .filter((doc): doc is PublishedTermsDocument => !!doc);
+    if (docs.length === 0) return [];
+
+    const rows = (await q.query(
+      `SELECT policy_document_id AS id FROM user_policy_acceptances
+        WHERE user_id = $1 AND policy_document_id = ANY($2::uuid[])`,
+      [userId, docs.map((d) => d.id)],
+    )) as { id: string }[];
+    const accepted = new Set(rows.map((r) => r.id));
+    return docs
+      .filter((doc) => !accepted.has(doc.id))
+      .map((doc) => ({
+        serviceKey: doc.serviceKey,
+        documentType: doc.documentType,
+        policyDocumentId: doc.id,
+        version: doc.version,
+        title: doc.title,
+      }));
   }
 
   /** 사용자의 pending 목록 (WO §15 · §16). published terms 0 → 즉시 [] (테이블 미조회). */
@@ -161,10 +212,14 @@ export class PolicyAcceptanceService {
    * 이미 같은 문서를 승낙했으면 멱등(중복 row 없음, WO §4 unique).
    */
   async recordAcceptance(
-    input: { userId: string; serviceKey: string; policyDocumentId: string; version?: number | null },
+    input: { userId: string; serviceKey: string; policyDocumentId: string; version?: number | null; documentType?: string | null },
     q: Queryable = this.db(),
   ): Promise<{ created: boolean; document: PublishedTermsDocument }> {
     const { userId, serviceKey, policyDocumentId } = input;
+    const requiredDocumentType = input.documentType || REQUIRED_POLICY_DOCUMENT_TYPE;
+    if (!REQUIRED_AGREEMENT_DOCUMENT_TYPES.has(requiredDocumentType)) {
+      throw new PolicyAcceptanceError('POLICY_TYPE_MISMATCH', '지원하지 않는 필수 계약 유형입니다.', 409);
+    }
     if (!userId) throw new PolicyAcceptanceError('AUTH_REQUIRED', '인증이 필요합니다.', 401);
     if (typeof policyDocumentId !== 'string' || !/^[0-9a-f-]{36}$/i.test(policyDocumentId)) {
       throw new PolicyAcceptanceError('VALIDATION_ERROR', 'policyDocumentId 가 필요합니다.', 400);
@@ -180,8 +235,8 @@ export class PolicyAcceptanceService {
     )) as (PublishedRow & { status: string })[];
     const row = rows[0];
     if (!row) throw new PolicyAcceptanceError('POLICY_NOT_FOUND', '약관 문서를 찾을 수 없습니다.', 404);
-    if (row.document_type !== REQUIRED_POLICY_DOCUMENT_TYPE) {
-      throw new PolicyAcceptanceError('POLICY_TYPE_MISMATCH', '이용약관 문서가 아닙니다.', 409);
+    if (row.document_type !== requiredDocumentType) {
+      throw new PolicyAcceptanceError('POLICY_TYPE_MISMATCH', '요청한 계약 문서 유형과 일치하지 않습니다.', 409);
     }
     if (row.status !== 'published') {
       throw new PolicyAcceptanceError('POLICY_NOT_PUBLISHED', '게시 중인 약관만 승낙할 수 있습니다.', 409);
@@ -191,7 +246,7 @@ export class PolicyAcceptanceService {
     }
     // 같은 서비스의 "현재 적용 약관" 이어야 한다 (구 published 는 publish 시 draft 로 내려가므로
     // status 검사로 대부분 걸러지지만, 정렬 기준으로 한 번 더 확정한다).
-    const current = await this.getPublishedTermsForService(serviceKey, q);
+    const current = await this.getPublishedDocumentForService(serviceKey, requiredDocumentType, q);
     if (!current || current.id !== row.id) {
       throw new PolicyAcceptanceError('POLICY_NOT_CURRENT', '현재 적용 중인 약관이 아닙니다.', 409);
     }
@@ -209,8 +264,8 @@ export class PolicyAcceptanceService {
       [userId, serviceKey, row.id, row.document_type, row.version, document.contentHash, ACCEPTANCE_KIND_AGREEMENT],
     )) as { id: string }[];
     const created = inserted.length > 0;
-    if (created) {
-      // WO §6: legacy snapshot 갱신 (SSOT 아님 · 판정에 쓰지 않음).
+    if (created && requiredDocumentType === REQUIRED_POLICY_DOCUMENT_TYPE) {
+      // 통합 이용약관만 legacy tos snapshot 을 갱신한다. 별도 매장 계약은 절대 섞지 않는다.
       await q.query(`UPDATE users SET tos_accepted_at = NOW() WHERE id = $1`, [userId]);
     }
     this.invalidateUser(userId);

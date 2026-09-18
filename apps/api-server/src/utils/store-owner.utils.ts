@@ -36,6 +36,7 @@ import type { Request, Response, NextFunction } from 'express';
 import type { AuthContext } from '../auth/auth-context.js';
 import { resolveCanonicalServiceKey } from '@o4o/security-core';
 import { getServiceWorkspaceCapability } from '../config/service-catalog.js';
+import { enforceStoreOwnerAgreement } from '../common/middleware/store-owner-agreement.middleware.js';
 import {
   resolveStoreOrganization,
   type StoreOrganizationResolution,
@@ -294,6 +295,10 @@ export function createRequireStoreOwner(
       });
       return;
     }
+
+    // WO-O4O-STORE-OWNER-AGREEMENT-PUBLISH-PREREQUISITES-V1: Store Workspace 별도 계약.
+    // published 계약이 없으면 no-op, 게시 후 미동의면 428. 서비스 중립 경로는 active store_owner 서비스를 모두 판정한다.
+    if (await enforceStoreOwnerAgreement(req, res, dataSource, serviceKey)) return;
 
     req.organizationId = organizationId as any;
     req.authContext = {

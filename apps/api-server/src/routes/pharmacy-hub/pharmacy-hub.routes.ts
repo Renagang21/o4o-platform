@@ -86,6 +86,7 @@ import { PharmacyHubPaymentController } from '../../controllers/pharmacy-hub/Pha
 import { PharmacyHubOperatorFulfillmentController } from '../../controllers/pharmacy-hub/PharmacyHubOperatorFulfillmentController.js';
 import { AppDataSource } from '../../database/connection.js';
 import { resolveAccountAccess } from '../../common/auth/account-access.policy.js';
+import { createRequireStoreOwnerAgreement } from '../../common/middleware/store-owner-agreement.middleware.js';
 
 const SERVICE_KEY = SERVICE_KEYS.PHARMACY_HUB;
 
@@ -218,7 +219,11 @@ export function createPharmacyHubRoutes(): Router {
   //   Pharmacy-Hub 제공 대상 + 공통 안전 게이트를 통과한 상품만 노출한다.
   //   담기·주문·취급등록 액션은 이번 WO 범위 밖 (§9).
   // ───────────────────────────────────────────────────────────────────────────
-  const storeOwnerGuards = [requireAuth as any, requirePharmacyHubScope(`${SERVICE_KEY}:store_owner`)];
+  const storeOwnerGuards = [
+  requireAuth as any,
+  requirePharmacyHubScope(`${SERVICE_KEY}:store_owner`),
+  createRequireStoreOwnerAgreement(AppDataSource, SERVICE_KEY),
+];
 
   router.get('/store-owner/products', ...storeOwnerGuards, PharmacyHubStoreProductController.list);
   router.get('/store-owner/products/:offerId', ...storeOwnerGuards, PharmacyHubStoreProductController.detail);

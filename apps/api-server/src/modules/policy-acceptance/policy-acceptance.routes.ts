@@ -16,11 +16,33 @@ import { Router, type IRouter, type Request, type Response } from 'express';
 import { requireAuth } from '../../common/middleware/auth.middleware.js';
 import { asyncHandler } from '../../middleware/error-handler.js';
 import { AppDataSource } from '../../database/connection.js';
-import { REQUIRED_MEMBERSHIP_STATUSES } from '../../common/auth/terms-acceptance.policy.js';
+import { REQUIRED_MEMBERSHIP_STATUSES, REQUIRED_POLICY_DOCUMENT_TYPE } from '../../common/auth/terms-acceptance.policy.js';
+import {
+  STORE_OWNER_AGREEMENT_DOCUMENT_TYPE,
+  STORE_OWNER_AGREEMENT_ROLE_BY_SERVICE,
+  isStoreOwnerAgreementServiceKey,
+} from '../../common/auth/store-owner-agreement.policy.js';
 import { PolicyAcceptanceError, policyAcceptanceService } from './policy-acceptance.service.js';
 import logger from '../../utils/logger.js';
 
 const router: IRouter = Router();
+
+async function assertStoreOwnerAgreementEligibility(userId: string, serviceKey: string): Promise<{ ok: boolean; code?: string }> {
+  if (!isStoreOwnerAgreementServiceKey(serviceKey)) return { ok: false, code: 'POLICY_SERVICE_MISMATCH' };
+  const rows = await AppDataSource.query(
+    `SELECT 1
+       FROM service_memberships sm
+       JOIN role_assignments ra ON ra.user_id = sm.user_id
+      WHERE sm.user_id = $1
+        AND sm.service_key = $2
+        AND sm.status = 'active'
+        AND ra.role = $3
+        AND ra.is_active = true
+      LIMIT 1`,
+    [userId, serviceKey, STORE_OWNER_AGREEMENT_ROLE_BY_SERVICE[serviceKey]],
+  );
+  return rows.length > 0 ? { ok: true } : { ok: false, code: 'STORE_OWNER_REQUIRED' };
+}
 
 router.get(
   '/',
@@ -28,6 +50,25 @@ router.get(
   asyncHandler(async (req: Request, res: Response) => {
     const userId = (req as any).user?.id as string | undefined;
     if (!userId) return res.status(401).json({ success: false, error: 'Authentication required', code: 'AUTH_REQUIRED' });
+    const documentType = typeof req.query.documentType === 'string'
+      ? req.query.documentType.trim()
+      : REQUIRED_POLICY_DOCUMENT_TYPE;
+    if (documentType === STORE_OWNER_AGREEMENT_DOCUMENT_TYPE) {
+      const serviceKey = typeof req.query.serviceKey === 'string' ? req.query.serviceKey.trim() : '';
+      if (!serviceKey) {
+        return res.status(400).json({ success: false, error: 'serviceKey 가 필요합니다.', code: 'VALIDATION_ERROR' });
+      }
+      const eligible = await assertStoreOwnerAgreementEligibility(userId, serviceKey);
+      if (!eligible.ok) {
+        return res.status(403).json({ success: false, error: '매장 경영자 자격이 필요합니다.', code: eligible.code });
+      }
+      const pending = await policyAcceptanceService.getPendingRequiredAgreements(
+        userId,
+        STORE_OWNER_AGREEMENT_DOCUMENT_TYPE,
+        [serviceKey],
+      );
+      return res.json({ success: true, data: { pending } });
+    }
     const pending = await policyAcceptanceService.getPendingForUser(userId);
     return res.json({ success: true, data: { pending } });
   }),
@@ -44,6 +85,9 @@ router.post(
     const serviceKey = typeof body.serviceKey === 'string' ? body.serviceKey.trim() : '';
     const policyDocumentId = typeof body.policyDocumentId === 'string' ? body.policyDocumentId.trim() : '';
     const version = body.version === undefined || body.version === null ? undefined : Number(body.version);
+    const documentType = typeof body.documentType === 'string' && body.documentType.trim()
+      ? body.documentType.trim()
+      : REQUIRED_POLICY_DOCUMENT_TYPE;
     if (!serviceKey || !policyDocumentId || (version !== undefined && !Number.isInteger(version))) {
       return res.status(400).json({
         success: false,
@@ -53,23 +97,36 @@ router.post(
     }
 
     try {
-      // WO §20: 활성/허용된 service membership 보유자만 그 서비스 약관을 승낙할 수 있다.
-      const rows = (await AppDataSource.query(
-        `SELECT status FROM service_memberships WHERE user_id = $1 AND service_key = $2 LIMIT 1`,
-        [userId, serviceKey],
-      )) as { status: string }[];
-      const status = rows[0]?.status;
-      if (!status || !REQUIRED_MEMBERSHIP_STATUSES.has(status)) {
-        return res.status(403).json({
-          success: false,
-          error: '해당 서비스의 회원만 약관을 승낙할 수 있습니다.',
-          code: status ? 'MEMBERSHIP_NOT_ACTIVE' : 'MEMBERSHIP_NOT_FOUND',
-        });
+      if (documentType === STORE_OWNER_AGREEMENT_DOCUMENT_TYPE) {
+        const eligible = await assertStoreOwnerAgreementEligibility(userId, serviceKey);
+        if (!eligible.ok) {
+          return res.status(403).json({ success: false, error: '매장 경영자 자격이 필요합니다.', code: eligible.code });
+        }
+      } else if (documentType === REQUIRED_POLICY_DOCUMENT_TYPE) {
+        // 통합 이용약관: active|pending membership 이면 승낙 가능.
+        const rows = (await AppDataSource.query(
+          `SELECT status FROM service_memberships WHERE user_id = $1 AND service_key = $2 LIMIT 1`,
+          [userId, serviceKey],
+        )) as { status: string }[];
+        const status = rows[0]?.status;
+        if (!status || !REQUIRED_MEMBERSHIP_STATUSES.has(status)) {
+          return res.status(403).json({
+            success: false,
+            error: '해당 서비스의 회원만 약관을 승낙할 수 있습니다.',
+            code: status ? 'MEMBERSHIP_NOT_ACTIVE' : 'MEMBERSHIP_NOT_FOUND',
+          });
+        }
+      } else {
+        return res.status(409).json({ success: false, error: '지원하지 않는 계약 문서 유형입니다.', code: 'POLICY_TYPE_MISMATCH' });
       }
 
-      const result = await policyAcceptanceService.recordAcceptance({ userId, serviceKey, policyDocumentId, version });
-      const pending = await policyAcceptanceService.getPendingForUser(userId);
-      logger.info('[PolicyAcceptance] terms accepted', {
+      const result = await policyAcceptanceService.recordAcceptance({
+        userId, serviceKey, policyDocumentId, version, documentType,
+      });
+      const pending = documentType === STORE_OWNER_AGREEMENT_DOCUMENT_TYPE
+        ? await policyAcceptanceService.getPendingRequiredAgreements(userId, documentType, [serviceKey])
+        : await policyAcceptanceService.getPendingForUser(userId);
+      logger.info('[PolicyAcceptance] agreement accepted', {
         userId,
         serviceKey,
         policyDocumentId: result.document.id,
