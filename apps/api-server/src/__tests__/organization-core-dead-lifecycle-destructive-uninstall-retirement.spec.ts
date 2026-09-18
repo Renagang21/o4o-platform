@@ -17,11 +17,12 @@
 
 import { readFileSync, existsSync, readdirSync, statSync } from 'fs';
 import { join } from 'path';
+import { CANONICAL_SCHEMA_BASELINE_STATEMENTS } from '../database/bootstrap/canonical-schema-baseline.js';
+import { CORE_TABLES } from '../database/bootstrap/canonical-schema-baseline.meta.js';
 
 const SRC = join(__dirname, '..');
 const REPO = join(SRC, '..', '..', '..');
 const ORG_CORE = join(REPO, 'packages', 'organization-core', 'src');
-const MIGRATIONS = join(SRC, 'database', 'migrations');
 
 const read = (p: string) => readFileSync(p, 'utf8');
 const codeLines = (p: string) =>
@@ -95,10 +96,14 @@ describe('organization-core dead lifecycle · 파괴적 uninstall 은퇴', () =>
       expect(read(join(SRC, 'database', 'entities.ts'))).toMatch(/@o4o\/organization-core\/entities/);
     });
 
-    it('organizations · organization_members 의 정본 migration 이 존재한다', () => {
-      const names = readdirSync(MIGRATIONS);
-      expect(names.some((n) => /OrgServiceModelNormalizationPhaseA/.test(n))).toBe(true);
-      expect(names.some((n) => /CosmeticsStoreOrgBridge/.test(n))).toBe(true);
+    it('organizations · organization_members 의 정본 schema 가 canonical baseline 에 존재한다', () => {
+      // historical migration source 는 runtime provenance 가 아니다(PRODUCTION-MIGRATION-STANDARD v2.3).
+      // 정본 schema 는 canonical schema baseline 이 보존하고 CORE_TABLES 가 그 존재를 고정한다.
+      for (const table of ['organizations', 'organization_members']) {
+        expect(CORE_TABLES.some((t) => t.schema === 'public' && t.table === table)).toBe(true);
+        const re = new RegExp('^CREATE TABLE public\\.' + table + ' \\(');
+        expect(CANONICAL_SCHEMA_BASELINE_STATEMENTS.some((stmt) => re.test(stmt))).toBe(true);
+      }
     });
 
     it('api-server 의 OrganizationService 소비 경로가 유지된다', () => {

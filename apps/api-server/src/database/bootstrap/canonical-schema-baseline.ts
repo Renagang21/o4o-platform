@@ -9,19 +9,20 @@
 
 export const CANONICAL_SCHEMA_BASELINE_CENSUS = {
   "schemas": 2,
-  "enums": 37,
-  "tables": 287,
+  "enums": 34,
+  "tables": 279,
   "sequences": 9,
-  "indexes": 770,
-  "alterTable": 535,
+  "indexes": 752,
+  "alterTable": 528,
   "alterSequence": 9,
-  "comments": 21,
-  "total": 1670
+  "comments": 22,
+  "total": 1635
 } as const;
 
 export const CANONICAL_SCHEMA_BASELINE_STATEMENTS: readonly string[] = [
   `CREATE SCHEMA cosmetics;`,
   `CREATE SCHEMA neture;`,
+  `COMMENT ON SCHEMA public IS 'standard public schema';`,
   `CREATE TYPE public.ai_provider_enum AS ENUM (
     'openai',
     'gemini',
@@ -63,7 +64,6 @@ export const CANONICAL_SCHEMA_BASELINE_STATEMENTS: readonly string[] = [
   `CREATE TYPE public.checkout_orders_order_type_enum AS ENUM (
     'GENERIC',
     'DROPSHIPPING',
-    'GLYCOPHARM',
     'COSMETICS',
     'TOURISM'
 );`,
@@ -108,35 +108,6 @@ export const CANONICAL_SCHEMA_BASELINE_STATEMENTS: readonly string[] = [
     'image',
     'banner',
     'guide'
-);`,
-  `CREATE TYPE public.neture_contract_status_enum AS ENUM (
-    'active',
-    'terminated',
-    'expired'
-);`,
-  `CREATE TYPE public.neture_contract_terminated_by_enum AS ENUM (
-    'seller',
-    'partner'
-);`,
-  `CREATE TYPE public.neture_partner_application_status_enum AS ENUM (
-    'pending',
-    'approved',
-    'rejected',
-    'cancelled'
-);`,
-  `CREATE TYPE public.neture_partner_recruitment_exposure_status_enum AS ENUM (
-    'pending',
-    'approved',
-    'rejected'
-);`,
-  `CREATE TYPE public.neture_partner_recruitment_status_enum AS ENUM (
-    'recruiting',
-    'closed'
-);`,
-  `CREATE TYPE public.neture_partnership_status_enum AS ENUM (
-    'OPEN',
-    'MATCHED',
-    'CLOSED'
 );`,
   `CREATE TYPE public.neture_product_purpose_enum AS ENUM (
     'CATALOG',
@@ -187,6 +158,21 @@ export const CANONICAL_SCHEMA_BASELINE_STATEMENTS: readonly string[] = [
   `CREATE TYPE public.product_approval_type_enum AS ENUM (
     'service',
     'private'
+);`,
+  `CREATE TYPE public.seller_recruitment_application_status_enum AS ENUM (
+    'pending',
+    'approved',
+    'rejected',
+    'cancelled'
+);`,
+  `CREATE TYPE public.seller_recruitment_exposure_status_enum AS ENUM (
+    'pending',
+    'approved',
+    'rejected'
+);`,
+  `CREATE TYPE public.seller_recruitment_status_enum AS ENUM (
+    'recruiting',
+    'closed'
 );`,
   `CREATE TYPE public.store_local_product_badge_type_enum AS ENUM (
     'none',
@@ -397,25 +383,6 @@ export const CANONICAL_SCHEMA_BASELINE_STATEMENTS: readonly string[] = [
     options jsonb,
     created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
 );`,
-  `CREATE TABLE neture.neture_partners (
-    id uuid DEFAULT gen_random_uuid() NOT NULL,
-    name character varying(200) NOT NULL,
-    business_name character varying(200),
-    business_number character varying(50),
-    type character varying(20) DEFAULT 'partner'::character varying NOT NULL,
-    status character varying(20) DEFAULT 'pending'::character varying NOT NULL,
-    description text,
-    logo character varying(500),
-    website character varying(255),
-    contact jsonb,
-    address jsonb,
-    metadata jsonb,
-    user_id uuid,
-    created_by uuid,
-    updated_by uuid,
-    created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
-);`,
   `CREATE TABLE neture.neture_product_logs (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
     product_id uuid NOT NULL,
@@ -429,7 +396,6 @@ export const CANONICAL_SCHEMA_BASELINE_STATEMENTS: readonly string[] = [
 );`,
   `CREATE TABLE neture.neture_products (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
-    partner_id uuid,
     name character varying(200) NOT NULL,
     subtitle character varying(500),
     description text,
@@ -491,7 +457,7 @@ export const CANONICAL_SCHEMA_BASELINE_STATEMENTS: readonly string[] = [
     error_message text,
     meta jsonb,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
-    CONSTRAINT chk_action_logs_status CHECK (((status)::text = ANY ((ARRAY['success'::character varying, 'failed'::character varying])::text[])))
+    CONSTRAINT chk_action_logs_status CHECK (((status)::text = ANY (ARRAY[('success'::character varying)::text, ('failed'::character varying)::text])))
 );`,
   `CREATE TABLE public.ai_billing_summary (
     id integer NOT NULL,
@@ -676,7 +642,7 @@ export const CANONICAL_SCHEMA_BASELINE_STATEMENTS: readonly string[] = [
     updated_at timestamp with time zone DEFAULT now() NOT NULL,
     reference_years jsonb NOT NULL,
     CONSTRAINT "CHK_annual_report_templates_period" CHECK (((period_start IS NULL) OR (period_end IS NULL) OR (period_start <= period_end))),
-    CONSTRAINT "CHK_annual_report_templates_status" CHECK (((status)::text = ANY ((ARRAY['draft'::character varying, 'active'::character varying, 'archived'::character varying])::text[]))),
+    CONSTRAINT "CHK_annual_report_templates_status" CHECK (((status)::text = ANY (ARRAY[('draft'::character varying)::text, ('active'::character varying)::text, ('archived'::character varying)::text]))),
     CONSTRAINT "CHK_annual_report_templates_version" CHECK ((version >= 1)),
     CONSTRAINT "CHK_annual_report_templates_year" CHECK (((year >= 2000) AND (year <= 2100)))
 );`,
@@ -701,7 +667,7 @@ export const CANONICAL_SCHEMA_BASELINE_STATEMENTS: readonly string[] = [
     approved_by uuid,
     revision_history jsonb DEFAULT '[]'::jsonb NOT NULL,
     CONSTRAINT "CHK_annual_reports_review_fields" CHECK (((((status)::text <> 'approved'::text) OR ((approved_at IS NOT NULL) AND (approved_by IS NOT NULL))) AND (((status)::text <> 'revision_requested'::text) OR ((revision_requested_at IS NOT NULL) AND (revision_requested_by IS NOT NULL))))),
-    CONSTRAINT "CHK_annual_reports_status" CHECK (((status)::text = ANY ((ARRAY['draft'::character varying, 'submitted'::character varying, 'revision_requested'::character varying, 'approved'::character varying])::text[]))),
+    CONSTRAINT "CHK_annual_reports_status" CHECK (((status)::text = ANY (ARRAY[('draft'::character varying)::text, ('submitted'::character varying)::text, ('revision_requested'::character varying)::text, ('approved'::character varying)::text]))),
     CONSTRAINT "CHK_annual_reports_submitted_at" CHECK (((((status)::text = 'draft'::text) AND (submitted_at IS NULL)) OR (((status)::text <> 'draft'::text) AND (submitted_at IS NOT NULL)))),
     CONSTRAINT "CHK_annual_reports_synced_approved" CHECK (((synced_to_membership = false) OR ((status)::text = 'approved'::text))),
     CONSTRAINT "CHK_annual_reports_synced_changes" CHECK (((synced_to_membership = false) OR (synced_changes IS NOT NULL))),
@@ -806,11 +772,11 @@ export const CANONICAL_SCHEMA_BASELINE_STATEMENTS: readonly string[] = [
     temp_output_uploaded_at timestamp with time zone,
     temp_output_expires_at timestamp with time zone,
     temp_output_cleanup_status character varying(20),
-    CONSTRAINT automation_jobs_cleanup_decision_check CHECK (((cleanup_decision)::text = ANY ((ARRAY['KEEP_ALL'::character varying, 'KEEP_OUTPUTS'::character varying, 'KEEP_SELECTED'::character varying, 'DECIDE_LATER'::character varying])::text[]))),
+    CONSTRAINT automation_jobs_cleanup_decision_check CHECK (((cleanup_decision)::text = ANY (ARRAY[('KEEP_ALL'::character varying)::text, ('KEEP_OUTPUTS'::character varying)::text, ('KEEP_SELECTED'::character varying)::text, ('DECIDE_LATER'::character varying)::text]))),
     CONSTRAINT automation_jobs_completed_check CHECK ((((status)::text = 'COMPLETED'::text) = (completed_at IS NOT NULL))),
-    CONSTRAINT automation_jobs_status_check CHECK (((status)::text = ANY ((ARRAY['DRAFT'::character varying, 'IN_PROGRESS'::character varying, 'WAITING'::character varying, 'COMPLETED'::character varying, 'CANCELLED'::character varying])::text[]))),
+    CONSTRAINT automation_jobs_status_check CHECK (((status)::text = ANY (ARRAY[('DRAFT'::character varying)::text, ('IN_PROGRESS'::character varying)::text, ('WAITING'::character varying)::text, ('COMPLETED'::character varying)::text, ('CANCELLED'::character varying)::text]))),
     CONSTRAINT automation_jobs_temp_output_check CHECK ((((temp_output_object_key IS NULL) = (temp_output_cleanup_status IS NULL)) AND ((temp_output_object_key IS NULL) = (temp_output_expires_at IS NULL)))),
-    CONSTRAINT automation_jobs_temp_output_cleanup_status_check CHECK (((temp_output_cleanup_status)::text = ANY ((ARRAY['AVAILABLE'::character varying, 'EXPIRED'::character varying, 'DELETE_FAILED'::character varying])::text[]))),
+    CONSTRAINT automation_jobs_temp_output_cleanup_status_check CHECK (((temp_output_cleanup_status)::text = ANY (ARRAY[('AVAILABLE'::character varying)::text, ('EXPIRED'::character varying)::text, ('DELETE_FAILED'::character varying)::text]))),
     CONSTRAINT automation_jobs_type_check CHECK (((type)::text = 'VIDEO'::text))
 );`,
   `CREATE TABLE public.branch_domains (
@@ -824,7 +790,7 @@ export const CANONICAL_SCHEMA_BASELINE_STATEMENTS: readonly string[] = [
     created_at timestamp with time zone DEFAULT now() NOT NULL,
     updated_at timestamp with time zone DEFAULT now() NOT NULL,
     CONSTRAINT "CHK_branch_domains_hostname_lower" CHECK (((hostname)::text = lower((hostname)::text))),
-    CONSTRAINT "CHK_branch_domains_status" CHECK (((status)::text = ANY ((ARRAY['pending'::character varying, 'verifying'::character varying, 'active'::character varying, 'failed'::character varying, 'disabled'::character varying])::text[])))
+    CONSTRAINT "CHK_branch_domains_status" CHECK (((status)::text = ANY (ARRAY[('pending'::character varying)::text, ('verifying'::character varying)::text, ('active'::character varying)::text, ('failed'::character varying)::text, ('disabled'::character varying)::text])))
 );`,
   `CREATE TABLE public.branch_education_credit_ledgers (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
@@ -845,7 +811,7 @@ END) STORED NOT NULL,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
     updated_at timestamp with time zone DEFAULT now() NOT NULL,
     CONSTRAINT "CHK_branch_edu_credits_amounts" CHECK (((required_credits >= (0)::numeric) AND (completed_credits >= (0)::numeric))),
-    CONSTRAINT "CHK_branch_edu_credits_exemption_type" CHECK (((exemption_type IS NULL) OR ((exemption_type)::text = ANY ((ARRAY['exempt'::character varying, 'deferred'::character varying])::text[])))),
+    CONSTRAINT "CHK_branch_edu_credits_exemption_type" CHECK (((exemption_type IS NULL) OR ((exemption_type)::text = ANY (ARRAY[('exempt'::character varying)::text, ('deferred'::character varying)::text])))),
     CONSTRAINT "CHK_branch_edu_credits_required" CHECK (((exemption_type IS NOT NULL) OR (required_credits > (0)::numeric)))
 );`,
   `CREATE TABLE public.branch_event_rsvps (
@@ -857,7 +823,7 @@ END) STORED NOT NULL,
     responded_at timestamp with time zone DEFAULT now() NOT NULL,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
     updated_at timestamp with time zone DEFAULT now() NOT NULL,
-    CONSTRAINT "CHK_branch_event_rsvps_status" CHECK (((status)::text = ANY ((ARRAY['attending'::character varying, 'not_attending'::character varying])::text[])))
+    CONSTRAINT "CHK_branch_event_rsvps_status" CHECK (((status)::text = ANY (ARRAY[('attending'::character varying)::text, ('not_attending'::character varying)::text])))
 );`,
   `CREATE TABLE public.branch_events (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
@@ -877,9 +843,9 @@ END) STORED NOT NULL,
     updated_at timestamp with time zone DEFAULT now() NOT NULL,
     CONSTRAINT "CHK_branch_events_period" CHECK (((ends_at IS NULL) OR (ends_at >= starts_at))),
     CONSTRAINT "CHK_branch_events_rsvp_deadline" CHECK (((rsvp_deadline IS NULL) OR (rsvp_enabled = true))),
-    CONSTRAINT "CHK_branch_events_status" CHECK (((status)::text = ANY ((ARRAY['draft'::character varying, 'published'::character varying, 'cancelled'::character varying])::text[]))),
+    CONSTRAINT "CHK_branch_events_status" CHECK (((status)::text = ANY (ARRAY[('draft'::character varying)::text, ('published'::character varying)::text, ('cancelled'::character varying)::text]))),
     CONSTRAINT "CHK_branch_events_title" CHECK ((btrim((title)::text) <> ''::text)),
-    CONSTRAINT "CHK_branch_events_visibility" CHECK (((visibility)::text = ANY ((ARRAY['public'::character varying, 'members_only'::character varying])::text[])))
+    CONSTRAINT "CHK_branch_events_visibility" CHECK (((visibility)::text = ANY (ARRAY[('public'::character varying)::text, ('members_only'::character varying)::text])))
 );`,
   `CREATE TABLE public.branch_fee_ledgers (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
@@ -900,7 +866,7 @@ END) STORED NOT NULL,
     CONSTRAINT "CHK_branch_fee_ledgers_amounts" CHECK (((assessed_amount >= 0) AND (paid_amount >= 0))),
     CONSTRAINT "CHK_branch_fee_ledgers_exemption_reason" CHECK (((((exemption_type)::text = 'other'::text) AND (exemption_reason IS NOT NULL) AND (btrim(exemption_reason) <> ''::text)) OR (((exemption_type)::text IS DISTINCT FROM 'other'::text) AND (exemption_reason IS NULL)))),
     CONSTRAINT "CHK_branch_fee_ledgers_exemption_status" CHECK (((((status)::text = 'exempt'::text) AND (exemption_type IS NOT NULL)) OR (((status)::text <> 'exempt'::text) AND (exemption_type IS NULL) AND (exemption_reason IS NULL)))),
-    CONSTRAINT "CHK_branch_fee_ledgers_exemption_type" CHECK (((exemption_type IS NULL) OR ((exemption_type)::text = ANY ((ARRAY['unemployed'::character varying, 'exempted'::character varying, 'other'::character varying])::text[])))),
+    CONSTRAINT "CHK_branch_fee_ledgers_exemption_type" CHECK (((exemption_type IS NULL) OR ((exemption_type)::text = ANY (ARRAY[('unemployed'::character varying)::text, ('exempted'::character varying)::text, ('other'::character varying)::text])))),
     CONSTRAINT "CHK_branch_fee_ledgers_paid_at" CHECK ((((paid_amount > 0) AND (paid_at IS NOT NULL)) OR ((paid_amount = 0) AND (paid_at IS NULL)))),
     CONSTRAINT "CHK_branch_fee_ledgers_status" CHECK (((((status)::text = 'exempt'::text) AND (paid_amount = 0)) OR (((status)::text = 'unpaid'::text) AND (assessed_amount > 0) AND (paid_amount = 0)) OR (((status)::text = 'partial'::text) AND (assessed_amount > 0) AND (paid_amount > 0) AND (paid_amount < assessed_amount)) OR (((status)::text = 'paid'::text) AND (assessed_amount > 0) AND (paid_amount >= assessed_amount))))
 );`,
@@ -930,7 +896,7 @@ END) STORED NOT NULL,
     workplace_name character varying(200),
     workplace_address character varying(300),
     CONSTRAINT "CHK_branch_memberships_left_at" CHECK (((((status)::text = 'active'::text) AND (left_at IS NULL)) OR (((status)::text = 'left'::text) AND (left_at IS NOT NULL)))),
-    CONSTRAINT "CHK_branch_memberships_status" CHECK (((status)::text = ANY ((ARRAY['active'::character varying, 'left'::character varying])::text[])))
+    CONSTRAINT "CHK_branch_memberships_status" CHECK (((status)::text = ANY (ARRAY[('active'::character varying)::text, ('left'::character varying)::text])))
 );`,
   `COMMENT ON COLUMN public.branch_memberships.fee_category IS '분회 회비구분 (branch_fee_policies.fee_category 코드계)';`,
   `COMMENT ON COLUMN public.branch_memberships.workplace_name IS '근무처명 — 신상신고 sync 대상';`,
@@ -951,9 +917,9 @@ END) STORED NOT NULL,
     updated_at timestamp with time zone DEFAULT now() NOT NULL,
     CONSTRAINT "CHK_branch_officers_ended" CHECK ((((status)::text <> 'ended'::text) OR (term_end IS NOT NULL))),
     CONSTRAINT "CHK_branch_officers_identity" CHECK (((btrim((name)::text) <> ''::text) AND (btrim(("position")::text) <> ''::text))),
-    CONSTRAINT "CHK_branch_officers_status" CHECK (((status)::text = ANY ((ARRAY['active'::character varying, 'ended'::character varying])::text[]))),
+    CONSTRAINT "CHK_branch_officers_status" CHECK (((status)::text = ANY (ARRAY[('active'::character varying)::text, ('ended'::character varying)::text]))),
     CONSTRAINT "CHK_branch_officers_term" CHECK (((term_end IS NULL) OR (term_end >= term_start))),
-    CONSTRAINT "CHK_branch_officers_visibility" CHECK (((visibility)::text = ANY ((ARRAY['public'::character varying, 'members_only'::character varying])::text[])))
+    CONSTRAINT "CHK_branch_officers_visibility" CHECK (((visibility)::text = ANY (ARRAY[('public'::character varying)::text, ('members_only'::character varying)::text])))
 );`,
   `CREATE TABLE public.branch_posts (
     id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
@@ -970,8 +936,8 @@ END) STORED NOT NULL,
     deleted_at timestamp with time zone,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
     updated_at timestamp with time zone DEFAULT now() NOT NULL,
-    CONSTRAINT "CHK_branch_posts_category" CHECK (((category)::text = ANY ((ARRAY['notice'::character varying, 'resource'::character varying, 'meeting'::character varying])::text[]))),
-    CONSTRAINT "CHK_branch_posts_status" CHECK (((status)::text = ANY ((ARRAY['draft'::character varying, 'published'::character varying])::text[])))
+    CONSTRAINT "CHK_branch_posts_category" CHECK (((category)::text = ANY (ARRAY[('notice'::character varying)::text, ('resource'::character varying)::text, ('meeting'::character varying)::text]))),
+    CONSTRAINT "CHK_branch_posts_status" CHECK (((status)::text = ANY (ARRAY[('draft'::character varying)::text, ('published'::character varying)::text])))
 );`,
   `CREATE TABLE public.branch_sites (
     id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
@@ -1012,7 +978,7 @@ END) STORED NOT NULL,
     connected_by_user_id uuid,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
     updated_at timestamp with time zone DEFAULT now() NOT NULL,
-    CONSTRAINT "CHK_cafe24_connections_status" CHECK (((status)::text = ANY ((ARRAY['ACTIVE'::character varying, 'EXPIRED'::character varying, 'DISCONNECTED'::character varying, 'ERROR'::character varying])::text[])))
+    CONSTRAINT "CHK_cafe24_connections_status" CHECK (((status)::text = ANY (ARRAY[('ACTIVE'::character varying)::text, ('EXPIRED'::character varying)::text, ('DISCONNECTED'::character varying)::text, ('ERROR'::character varying)::text])))
 );`,
   `CREATE TABLE public.cafe24_member_links (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
@@ -1026,7 +992,7 @@ END) STORED NOT NULL,
     last_login_at timestamp with time zone,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
     updated_at timestamp with time zone DEFAULT now() NOT NULL,
-    CONSTRAINT "CHK_cafe24_member_links_status" CHECK (((status)::text = ANY ((ARRAY['ACTIVE'::character varying, 'INACTIVE'::character varying])::text[])))
+    CONSTRAINT "CHK_cafe24_member_links_status" CHECK (((status)::text = ANY (ARRAY[('ACTIVE'::character varying)::text, ('INACTIVE'::character varying)::text])))
 );`,
   `CREATE TABLE public.catalog_import_jobs (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
@@ -1136,9 +1102,9 @@ END) STORED NOT NULL,
     "createdBy" uuid,
     "createdAt" timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT chk_channels_orientation CHECK (((orientation)::text = ANY ((ARRAY['landscape'::character varying, 'portrait'::character varying])::text[]))),
-    CONSTRAINT chk_channels_status CHECK (((status)::text = ANY ((ARRAY['active'::character varying, 'inactive'::character varying, 'maintenance'::character varying])::text[]))),
-    CONSTRAINT chk_channels_type CHECK (((type)::text = ANY ((ARRAY['tv'::character varying, 'kiosk'::character varying, 'signage'::character varying, 'web'::character varying])::text[])))
+    CONSTRAINT chk_channels_orientation CHECK (((orientation)::text = ANY (ARRAY[('landscape'::character varying)::text, ('portrait'::character varying)::text]))),
+    CONSTRAINT chk_channels_status CHECK (((status)::text = ANY (ARRAY[('active'::character varying)::text, ('inactive'::character varying)::text, ('maintenance'::character varying)::text]))),
+    CONSTRAINT chk_channels_type CHECK (((type)::text = ANY (ARRAY[('tv'::character varying)::text, ('kiosk'::character varying)::text, ('signage'::character varying)::text, ('web'::character varying)::text])))
 );`,
   `CREATE TABLE public.checkout_order_logs (
     id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
@@ -1159,7 +1125,6 @@ END) STORED NOT NULL,
     "sellerId" character varying(100) NOT NULL,
     "supplierId" character varying(100),
     "sellerOrganizationId" uuid,
-    "partnerId" character varying(100),
     subtotal numeric(12,2) DEFAULT 0 NOT NULL,
     "shippingFee" numeric(10,2) DEFAULT 0 NOT NULL,
     discount numeric(10,2) DEFAULT 0 NOT NULL,
@@ -1224,7 +1189,7 @@ END) STORED NOT NULL,
     "lockedBy" character varying(20),
     "lockedReason" text,
     "lockedUntil" timestamp without time zone,
-    CONSTRAINT "CHK_slot_locked_by" CHECK (((locked_by IS NULL) OR ((locked_by)::text = ANY ((ARRAY['platform'::character varying, 'contract'::character varying])::text[]))))
+    CONSTRAINT "CHK_slot_locked_by" CHECK (((locked_by IS NULL) OR ((locked_by)::text = ANY (ARRAY[('platform'::character varying)::text, ('contract'::character varying)::text]))))
 );`,
   `COMMENT ON COLUMN public.cms_content_slots.is_locked IS 'When true, store cannot edit this slot (WO-P7-CMS-SLOT-LOCK-P1)';`,
   `COMMENT ON COLUMN public.cms_content_slots.locked_by IS 'Who locked the slot: platform or contract';`,
@@ -1257,7 +1222,7 @@ END) STORED NOT NULL,
     "bodyBlocks" jsonb,
     attachments jsonb,
     "likeCount" integer DEFAULT 0 NOT NULL,
-    CONSTRAINT chk_cms_content_status CHECK (((status)::text = ANY ((ARRAY['draft'::character varying, 'pending'::character varying, 'published'::character varying, 'archived'::character varying])::text[])))
+    CONSTRAINT chk_cms_content_status CHECK (((status)::text = ANY (ARRAY[('draft'::character varying)::text, ('pending'::character varying)::text, ('published'::character varying)::text, ('archived'::character varying)::text])))
 );`,
   `CREATE TABLE public.community_ads (
     id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
@@ -1387,8 +1352,8 @@ END) STORED NOT NULL,
     created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     deleted_at timestamp without time zone,
-    CONSTRAINT ck_cosmetics_members_status CHECK (((status)::text = ANY ((ARRAY['active'::character varying, 'suspended'::character varying, 'withdrawn'::character varying])::text[]))),
-    CONSTRAINT ck_cosmetics_members_sub_role CHECK (((sub_role IS NULL) OR ((sub_role)::text = ANY ((ARRAY['store_owner'::character varying, 'store_staff'::character varying])::text[]))))
+    CONSTRAINT ck_cosmetics_members_status CHECK (((status)::text = ANY (ARRAY[('active'::character varying)::text, ('suspended'::character varying)::text, ('withdrawn'::character varying)::text]))),
+    CONSTRAINT ck_cosmetics_members_sub_role CHECK (((sub_role IS NULL) OR ((sub_role)::text = ANY (ARRAY[('store_owner'::character varying)::text, ('store_staff'::character varying)::text]))))
 );`,
   `CREATE TABLE public.course_completions (
     id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
@@ -1470,9 +1435,9 @@ END) STORED NOT NULL,
     last_error text,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
     updated_at timestamp with time zone DEFAULT now() NOT NULL,
-    CONSTRAINT "CHK_ecpl_channel_code" CHECK (((channel_code)::text = ANY ((ARRAY['NAVER'::character varying, 'COUPANG'::character varying])::text[]))),
+    CONSTRAINT "CHK_ecpl_channel_code" CHECK (((channel_code)::text = ANY (ARRAY[('NAVER'::character varying)::text, ('COUPANG'::character varying)::text]))),
     CONSTRAINT "CHK_ecpl_linked_requires_external_id" CHECK ((((sync_status)::text <> 'LINKED'::text) OR (external_channel_product_id IS NOT NULL))),
-    CONSTRAINT "CHK_ecpl_sync_status" CHECK (((sync_status)::text = ANY ((ARRAY['NOT_LINKED'::character varying, 'PENDING'::character varying, 'LINKED'::character varying, 'FAILED'::character varying, 'UNLINKED'::character varying])::text[])))
+    CONSTRAINT "CHK_ecpl_sync_status" CHECK (((sync_status)::text = ANY (ARRAY[('NOT_LINKED'::character varying)::text, ('PENDING'::character varying)::text, ('LINKED'::character varying)::text, ('FAILED'::character varying)::text, ('UNLINKED'::character varying)::text])))
 );`,
   `CREATE TABLE public.foreign_visitor_partner_qr_codes (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
@@ -1589,7 +1554,7 @@ END) STORED NOT NULL,
     "deletionReason" text,
     created_at timestamp without time zone DEFAULT now(),
     updated_at timestamp without time zone DEFAULT now(),
-    CONSTRAINT forum_comment_status_check CHECK (((status)::text = ANY ((ARRAY['publish'::character varying, 'pending'::character varying, 'deleted'::character varying])::text[])))
+    CONSTRAINT forum_comment_status_check CHECK (((status)::text = ANY (ARRAY[('publish'::character varying)::text, ('pending'::character varying)::text, ('deleted'::character varying)::text])))
 );`,
   `CREATE TABLE public.forum_join_requests (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
@@ -1602,7 +1567,7 @@ END) STORED NOT NULL,
     reviewed_at timestamp with time zone,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
     updated_at timestamp with time zone DEFAULT now() NOT NULL,
-    CONSTRAINT forum_join_requests_status_check CHECK (((status)::text = ANY ((ARRAY['pending'::character varying, 'approved'::character varying, 'rejected'::character varying, 'cancelled'::character varying])::text[])))
+    CONSTRAINT forum_join_requests_status_check CHECK (((status)::text = ANY (ARRAY[('pending'::character varying)::text, ('approved'::character varying)::text, ('rejected'::character varying)::text, ('cancelled'::character varying)::text])))
 );`,
   `CREATE TABLE public.forum_like (
     id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
@@ -1610,7 +1575,7 @@ END) STORED NOT NULL,
     "targetType" character varying(20) NOT NULL,
     "targetId" uuid NOT NULL,
     created_at timestamp without time zone DEFAULT now(),
-    CONSTRAINT "forum_like_targetType_check" CHECK ((("targetType")::text = ANY ((ARRAY['post'::character varying, 'comment'::character varying])::text[])))
+    CONSTRAINT "forum_like_targetType_check" CHECK ((("targetType")::text = ANY (ARRAY[('post'::character varying)::text, ('comment'::character varying)::text])))
 );`,
   `CREATE TABLE public.forum_notifications (
     id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
@@ -1652,8 +1617,8 @@ END) STORED NOT NULL,
     created_at timestamp without time zone DEFAULT now(),
     updated_at timestamp without time zone DEFAULT now(),
     forum_id uuid,
-    CONSTRAINT forum_post_status_check CHECK (((status)::text = ANY ((ARRAY['draft'::character varying, 'publish'::character varying, 'pending'::character varying, 'rejected'::character varying, 'archived'::character varying])::text[]))),
-    CONSTRAINT forum_post_type_check CHECK (((type)::text = ANY ((ARRAY['discussion'::character varying, 'question'::character varying, 'announcement'::character varying, 'poll'::character varying, 'guide'::character varying])::text[])))
+    CONSTRAINT forum_post_status_check CHECK (((status)::text = ANY (ARRAY[('draft'::character varying)::text, ('publish'::character varying)::text, ('pending'::character varying)::text, ('rejected'::character varying)::text, ('archived'::character varying)::text]))),
+    CONSTRAINT forum_post_type_check CHECK (((type)::text = ANY (ARRAY[('discussion'::character varying)::text, ('question'::character varying)::text, ('announcement'::character varying)::text, ('poll'::character varying)::text, ('guide'::character varying)::text])))
 );`,
   `CREATE TABLE public.forum_post_like (
     id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
@@ -1895,7 +1860,7 @@ END) STORED NOT NULL,
     link_type character varying(30) DEFAULT 'product_description'::character varying NOT NULL,
     created_at timestamp without time zone DEFAULT now() NOT NULL,
     updated_at timestamp without time zone DEFAULT now() NOT NULL,
-    CONSTRAINT chk_kspcl_source_type CHECK (((product_source_type)::text = ANY ((ARRAY['listing'::character varying, 'local'::character varying])::text[])))
+    CONSTRAINT chk_kspcl_source_type CHECK (((product_source_type)::text = ANY (ARRAY[('listing'::character varying)::text, ('local'::character varying)::text])))
 );`,
   `CREATE TABLE public.kpa_store_contents (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
@@ -1915,9 +1880,9 @@ END) STORED NOT NULL,
     source_metadata jsonb DEFAULT '{}'::jsonb NOT NULL,
     workspace_status character varying(30) DEFAULT 'draft'::character varying NOT NULL,
     tags jsonb DEFAULT '[]'::jsonb NOT NULL,
-    CONSTRAINT "CHK_kpa_store_contents_author_role" CHECK (((author_role)::text = ANY ((ARRAY['operator'::character varying, 'store'::character varying])::text[]))),
+    CONSTRAINT "CHK_kpa_store_contents_author_role" CHECK (((author_role)::text = ANY (ARRAY[('operator'::character varying)::text, ('store'::character varying)::text]))),
     CONSTRAINT "CHK_kpa_store_contents_visibility_scope" CHECK (((visibility_scope)::text = 'organization'::text)),
-    CONSTRAINT "CHK_kpa_store_contents_workspace_status" CHECK (((workspace_status)::text = ANY ((ARRAY['draft'::character varying, 'pending_ai'::character varying, 'ai_processed'::character varying, 'ready_curation'::character varying, 'archived'::character varying])::text[])))
+    CONSTRAINT "CHK_kpa_store_contents_workspace_status" CHECK (((workspace_status)::text = ANY (ARRAY[('draft'::character varying)::text, ('pending_ai'::character varying)::text, ('ai_processed'::character varying)::text, ('ready_curation'::character varying)::text, ('archived'::character varying)::text])))
 );`,
   `CREATE TABLE public.kpa_student_profiles (
     id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
@@ -2320,7 +2285,6 @@ END) STORED NOT NULL,
     "participantId" uuid NOT NULL,
     "participantType" character varying(20) NOT NULL,
     decision character varying(20) NOT NULL,
-    "selectedSellerIds" text,
     "createdAt" timestamp without time zone DEFAULT now() NOT NULL
 );`,
   `CREATE TABLE public.market_trial_forum_sync_failures (
@@ -2446,12 +2410,12 @@ END) STORED NOT NULL,
     commercial_use_allowed boolean,
     source_url text,
     attribution_required boolean,
-    CONSTRAINT media_accuracy_check CHECK (((product_accuracy_level)::text = ANY ((ARRAY['EXACT'::character varying, 'ACCEPTABLE'::character varying, 'SUPPORT_ONLY'::character varying, 'REJECTED'::character varying])::text[]))),
-    CONSTRAINT media_origin_check CHECK (((origin_type)::text = ANY ((ARRAY['original'::character varying, 'edited'::character varying, 'ai_generated'::character varying, 'external'::character varying])::text[]))),
+    CONSTRAINT media_accuracy_check CHECK (((product_accuracy_level)::text = ANY (ARRAY[('EXACT'::character varying)::text, ('ACCEPTABLE'::character varying)::text, ('SUPPORT_ONLY'::character varying)::text, ('REJECTED'::character varying)::text]))),
+    CONSTRAINT media_origin_check CHECK (((origin_type)::text = ANY (ARRAY[('original'::character varying)::text, ('edited'::character varying)::text, ('ai_generated'::character varying)::text, ('external'::character varying)::text]))),
     CONSTRAINT media_parent_check CHECK ((parent_asset_id IS DISTINCT FROM id)),
-    CONSTRAINT media_qa_check CHECK (((qa_status)::text = ANY ((ARRAY['PENDING'::character varying, 'APPROVED'::character varying, 'REJECTED'::character varying])::text[]))),
+    CONSTRAINT media_qa_check CHECK (((qa_status)::text = ANY (ARRAY[('PENDING'::character varying)::text, ('APPROVED'::character varying)::text, ('REJECTED'::character varying)::text]))),
     CONSTRAINT media_root_check CHECK ((root_asset_id IS DISTINCT FROM id)),
-    CONSTRAINT media_storage_check CHECK (((((storage_type)::text = 'internal'::text) AND ((provider)::text = 'gcs'::text) AND (gcs_path IS NOT NULL) AND (external_url IS NULL)) OR (((storage_type)::text = 'external'::text) AND ((provider)::text = ANY ((ARRAY['youtube'::character varying, 'o4o'::character varying])::text[])) AND (gcs_path IS NULL) AND (external_url IS NOT NULL))))
+    CONSTRAINT media_storage_check CHECK (((((storage_type)::text = 'internal'::text) AND ((provider)::text = 'gcs'::text) AND (gcs_path IS NOT NULL) AND (external_url IS NULL)) OR (((storage_type)::text = 'external'::text) AND ((provider)::text = ANY (ARRAY[('youtube'::character varying)::text, ('o4o'::character varying)::text])) AND (gcs_path IS NULL) AND (external_url IS NOT NULL))))
 );`,
   `CREATE TABLE public.media_entity_links (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
@@ -2460,7 +2424,7 @@ END) STORED NOT NULL,
     entity_id character varying(200) NOT NULL,
     purpose character varying(100) NOT NULL,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
-    CONSTRAINT media_entity_links_entity_type_check CHECK (((entity_type)::text = ANY ((ARRAY['product'::character varying, 'brand'::character varying, 'content'::character varying, 'service'::character varying, 'video-production-job'::character varying])::text[])))
+    CONSTRAINT media_entity_links_entity_type_check CHECK (((entity_type)::text = ANY (ARRAY[('product'::character varying)::text, ('brand'::character varying)::text, ('content'::character varying)::text, ('service'::character varying)::text, ('video-production-job'::character varying)::text])))
 );`,
   `CREATE TABLE public.member_qualifications (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
@@ -2550,101 +2514,6 @@ END) STORED NOT NULL,
     created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     service_key character varying(50) DEFAULT 'neture'::character varying NOT NULL
-);`,
-  `CREATE TABLE public.neture_partner_applications (
-    id uuid DEFAULT gen_random_uuid() NOT NULL,
-    recruitment_id uuid NOT NULL,
-    partner_id character varying NOT NULL,
-    partner_name character varying,
-    status public.neture_partner_application_status_enum DEFAULT 'pending'::public.neture_partner_application_status_enum NOT NULL,
-    applied_at timestamp without time zone DEFAULT now() NOT NULL,
-    decided_at timestamp without time zone,
-    decided_by character varying,
-    reason text,
-    created_at timestamp without time zone DEFAULT now() NOT NULL,
-    updated_at timestamp without time zone DEFAULT now() NOT NULL
-);`,
-  `CREATE TABLE public.neture_partner_dashboard_item_contents (
-    id uuid DEFAULT gen_random_uuid() NOT NULL,
-    dashboard_item_id uuid NOT NULL,
-    content_id uuid NOT NULL,
-    content_source character varying(20) DEFAULT 'cms'::character varying NOT NULL,
-    created_at timestamp without time zone DEFAULT now(),
-    sort_order integer DEFAULT 0 NOT NULL,
-    is_primary boolean DEFAULT false NOT NULL
-);`,
-  `CREATE TABLE public.neture_partner_dashboard_items (
-    id uuid DEFAULT gen_random_uuid() NOT NULL,
-    partner_user_id uuid NOT NULL,
-    product_id uuid NOT NULL,
-    service_id character varying(50) DEFAULT 'glycopharm'::character varying NOT NULL,
-    status character varying(20) DEFAULT 'active'::character varying NOT NULL,
-    created_at timestamp without time zone DEFAULT now(),
-    updated_at timestamp without time zone DEFAULT now()
-);`,
-  `CREATE TABLE public.neture_partner_recruitments (
-    id uuid DEFAULT gen_random_uuid() NOT NULL,
-    product_id character varying NOT NULL,
-    product_name character varying NOT NULL,
-    manufacturer character varying,
-    consumer_price numeric(10,0) DEFAULT 0 NOT NULL,
-    commission_rate numeric(5,2) DEFAULT 0 NOT NULL,
-    seller_id character varying NOT NULL,
-    seller_name character varying NOT NULL,
-    shop_url text,
-    service_name character varying,
-    service_id character varying,
-    image_url text,
-    status public.neture_partner_recruitment_status_enum DEFAULT 'recruiting'::public.neture_partner_recruitment_status_enum NOT NULL,
-    created_at timestamp without time zone DEFAULT now() NOT NULL,
-    updated_at timestamp without time zone DEFAULT now() NOT NULL,
-    exposure_status public.neture_partner_recruitment_exposure_status_enum DEFAULT 'pending'::public.neture_partner_recruitment_exposure_status_enum NOT NULL,
-    exposure_reviewed_at timestamp without time zone,
-    exposure_reviewed_by uuid,
-    exposure_review_note text
-);`,
-  `CREATE TABLE public.neture_partnership_products (
-    id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
-    partnership_request_id uuid NOT NULL,
-    name character varying NOT NULL,
-    category character varying
-);`,
-  `CREATE TABLE public.neture_partnership_requests (
-    id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
-    seller_id character varying NOT NULL,
-    seller_name character varying NOT NULL,
-    seller_service_type character varying,
-    seller_store_url text,
-    product_count integer DEFAULT 0 NOT NULL,
-    period_start date,
-    period_end date,
-    revenue_structure text,
-    status public.neture_partnership_status_enum DEFAULT 'OPEN'::public.neture_partnership_status_enum NOT NULL,
-    promotion_sns boolean DEFAULT false NOT NULL,
-    promotion_content boolean DEFAULT false NOT NULL,
-    promotion_banner boolean DEFAULT false NOT NULL,
-    promotion_other text,
-    contact_email character varying,
-    contact_phone character varying,
-    contact_kakao text,
-    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    matched_at timestamp without time zone,
-    metadata jsonb
-);`,
-  `CREATE TABLE public.neture_seller_partner_contracts (
-    id uuid DEFAULT gen_random_uuid() NOT NULL,
-    seller_id character varying NOT NULL,
-    partner_id character varying NOT NULL,
-    recruitment_id uuid NOT NULL,
-    application_id uuid NOT NULL,
-    commission_rate numeric(5,2) DEFAULT 0 NOT NULL,
-    contract_status public.neture_contract_status_enum DEFAULT 'active'::public.neture_contract_status_enum NOT NULL,
-    started_at timestamp without time zone DEFAULT now() NOT NULL,
-    expires_at timestamp without time zone,
-    ended_at timestamp without time zone,
-    terminated_by public.neture_contract_terminated_by_enum,
-    created_at timestamp without time zone DEFAULT now() NOT NULL,
-    updated_at timestamp without time zone DEFAULT now() NOT NULL
 );`,
   `CREATE TABLE public.neture_settlement_orders (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
@@ -2887,7 +2756,7 @@ END) STORED NOT NULL,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
     updated_at timestamp with time zone DEFAULT now() NOT NULL,
     CONSTRAINT chk_operator_multilingual_product_content_groups_author_role CHECK (((author_role)::text = 'operator'::text)),
-    CONSTRAINT chk_operator_multilingual_product_content_groups_status CHECK (((status)::text = ANY ((ARRAY['draft'::character varying, 'published'::character varying, 'archived'::character varying])::text[])))
+    CONSTRAINT chk_operator_multilingual_product_content_groups_status CHECK (((status)::text = ANY (ARRAY[('draft'::character varying)::text, ('published'::character varying)::text, ('archived'::character varying)::text])))
 );`,
   `CREATE TABLE public.operator_multilingual_product_content_pages (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
@@ -2906,9 +2775,9 @@ END) STORED NOT NULL,
     created_by_user_id uuid,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
     updated_at timestamp with time zone DEFAULT now() NOT NULL,
-    CONSTRAINT chk_operator_multilingual_product_content_pages_content_format CHECK (((content_format)::text = ANY ((ARRAY['blocks'::character varying, 'html'::character varying, 'image_sequence'::character varying, 'json'::character varying])::text[]))),
-    CONSTRAINT chk_operator_multilingual_product_content_pages_locale CHECK (((locale)::text = ANY ((ARRAY['ko'::character varying, 'en'::character varying, 'zh'::character varying, 'ja'::character varying, 'vi'::character varying, 'th'::character varying, 'id'::character varying])::text[]))),
-    CONSTRAINT chk_operator_multilingual_product_content_pages_status CHECK (((status)::text = ANY ((ARRAY['draft'::character varying, 'published'::character varying, 'archived'::character varying])::text[])))
+    CONSTRAINT chk_operator_multilingual_product_content_pages_content_format CHECK (((content_format)::text = ANY (ARRAY[('blocks'::character varying)::text, ('html'::character varying)::text, ('image_sequence'::character varying)::text, ('json'::character varying)::text]))),
+    CONSTRAINT chk_operator_multilingual_product_content_pages_locale CHECK (((locale)::text = ANY (ARRAY[('ko'::character varying)::text, ('en'::character varying)::text, ('zh'::character varying)::text, ('ja'::character varying)::text, ('vi'::character varying)::text, ('th'::character varying)::text, ('id'::character varying)::text]))),
+    CONSTRAINT chk_operator_multilingual_product_content_pages_status CHECK (((status)::text = ANY (ARRAY[('draft'::character varying)::text, ('published'::character varying)::text, ('archived'::character varying)::text])))
 );`,
   `CREATE TABLE public.operator_notification_settings (
     id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
@@ -2937,9 +2806,9 @@ END) STORED NOT NULL,
     created_at timestamp without time zone DEFAULT now() NOT NULL,
     updated_at timestamp without time zone DEFAULT now() NOT NULL,
     CONSTRAINT "CHK_operator_qr_templates_author_role" CHECK (((author_role)::text = 'operator'::text)),
-    CONSTRAINT "CHK_operator_qr_templates_status" CHECK (((status)::text = ANY ((ARRAY['draft'::character varying, 'published'::character varying, 'archived'::character varying])::text[]))),
+    CONSTRAINT "CHK_operator_qr_templates_status" CHECK (((status)::text = ANY (ARRAY[('draft'::character varying)::text, ('published'::character varying)::text, ('archived'::character varying)::text]))),
     CONSTRAINT "CHK_operator_qr_templates_target_consistency" CHECK (((((target_type)::text = 'url'::text) AND (target_url IS NOT NULL) AND (target_content_kind IS NULL) AND (target_content_ref IS NULL)) OR (((target_type)::text = 'content'::text) AND (target_content_kind IS NOT NULL) AND (target_content_ref IS NOT NULL) AND (target_url IS NULL)))),
-    CONSTRAINT "CHK_operator_qr_templates_target_type" CHECK (((target_type)::text = ANY ((ARRAY['url'::character varying, 'content'::character varying])::text[])))
+    CONSTRAINT "CHK_operator_qr_templates_target_type" CHECK (((target_type)::text = ANY (ARRAY[('url'::character varying)::text, ('content'::character varying)::text])))
 );`,
   `CREATE TABLE public.organization_channels (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
@@ -3031,54 +2900,6 @@ END) STORED NOT NULL,
     template_profile character varying(30) DEFAULT 'BASIC'::character varying,
     storefront_blocks jsonb,
     address_detail jsonb
-);`,
-  `CREATE TABLE public.partner_commissions (
-    id uuid DEFAULT gen_random_uuid() NOT NULL,
-    partner_id uuid NOT NULL,
-    supplier_id uuid NOT NULL,
-    order_id uuid NOT NULL,
-    order_number character varying(50),
-    contract_id uuid NOT NULL,
-    commission_rate numeric(5,2) DEFAULT 0 NOT NULL,
-    order_amount integer DEFAULT 0 NOT NULL,
-    commission_amount integer DEFAULT 0 NOT NULL,
-    status character varying(30) DEFAULT 'pending'::character varying NOT NULL,
-    period_start date,
-    period_end date,
-    approved_at timestamp with time zone,
-    paid_at timestamp with time zone,
-    notes text,
-    created_at timestamp with time zone DEFAULT now() NOT NULL,
-    updated_at timestamp with time zone DEFAULT now() NOT NULL,
-    product_id uuid,
-    store_id uuid,
-    quantity integer,
-    commission_per_unit integer,
-    referral_token character varying(20)
-);`,
-  `CREATE TABLE public.partner_referrals (
-    id uuid DEFAULT gen_random_uuid() NOT NULL,
-    partner_id uuid NOT NULL,
-    store_id uuid,
-    product_id uuid NOT NULL,
-    referral_token character varying(20) NOT NULL,
-    created_at timestamp with time zone DEFAULT now() NOT NULL
-);`,
-  `CREATE TABLE public.partner_settlement_items (
-    id uuid DEFAULT gen_random_uuid() NOT NULL,
-    settlement_id uuid NOT NULL,
-    commission_id uuid NOT NULL,
-    commission_amount integer DEFAULT 0 NOT NULL,
-    created_at timestamp with time zone DEFAULT now() NOT NULL
-);`,
-  `CREATE TABLE public.partner_settlements (
-    id uuid DEFAULT gen_random_uuid() NOT NULL,
-    partner_id uuid NOT NULL,
-    total_commission integer DEFAULT 0 NOT NULL,
-    commission_count integer DEFAULT 0 NOT NULL,
-    status character varying(30) DEFAULT 'pending'::character varying NOT NULL,
-    created_at timestamp with time zone DEFAULT now() NOT NULL,
-    paid_at timestamp with time zone
 );`,
   `CREATE TABLE public.password_reset_tokens (
     id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
@@ -3612,6 +3433,40 @@ END) STORED NOT NULL,
     created_at timestamp with time zone DEFAULT now(),
     updated_at timestamp with time zone DEFAULT now()
 );`,
+  `CREATE TABLE public.seller_recruitment_applications (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    recruitment_id uuid NOT NULL,
+    applicant_id character varying NOT NULL,
+    applicant_name character varying,
+    status public.seller_recruitment_application_status_enum DEFAULT 'pending'::public.seller_recruitment_application_status_enum NOT NULL,
+    applied_at timestamp without time zone DEFAULT now() NOT NULL,
+    decided_at timestamp without time zone,
+    decided_by character varying,
+    reason text,
+    created_at timestamp without time zone DEFAULT now() NOT NULL,
+    updated_at timestamp without time zone DEFAULT now() NOT NULL
+);`,
+  `CREATE TABLE public.seller_recruitments (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    product_id character varying NOT NULL,
+    product_name character varying NOT NULL,
+    manufacturer character varying,
+    consumer_price numeric(10,0) DEFAULT 0 NOT NULL,
+    commission_rate numeric(5,2) DEFAULT 0 NOT NULL,
+    seller_id character varying NOT NULL,
+    seller_name character varying NOT NULL,
+    shop_url text,
+    service_name character varying,
+    service_id character varying,
+    image_url text,
+    status public.seller_recruitment_status_enum DEFAULT 'recruiting'::public.seller_recruitment_status_enum NOT NULL,
+    created_at timestamp without time zone DEFAULT now() NOT NULL,
+    updated_at timestamp without time zone DEFAULT now() NOT NULL,
+    exposure_status public.seller_recruitment_exposure_status_enum DEFAULT 'pending'::public.seller_recruitment_exposure_status_enum NOT NULL,
+    exposure_reviewed_at timestamp without time zone,
+    exposure_reviewed_by uuid,
+    exposure_review_note text
+);`,
   `CREATE TABLE public.service_audience_policies (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
     service_key character varying(50) NOT NULL,
@@ -3693,7 +3548,7 @@ END) STORED NOT NULL,
     description character varying(500),
     operator_id uuid,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
-    CONSTRAINT "CHK_spbt_tx_type" CHECK (((tx_type)::text = ANY ((ARRAY['allocate'::character varying, 'deduct'::character varying])::text[])))
+    CONSTRAINT "CHK_spbt_tx_type" CHECK (((tx_type)::text = ANY (ARRAY[('allocate'::character varying)::text, ('deduct'::character varying)::text])))
 );`,
   `CREATE TABLE public.service_point_budgets (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
@@ -3896,7 +3751,7 @@ END) STORED NOT NULL,
     source character varying(20) DEFAULT 'store'::character varying,
     scope character varying(20) DEFAULT 'store'::character varying,
     "parentMediaId" uuid,
-    CONSTRAINT chk_signage_media_status CHECK (((status)::text = ANY ((ARRAY['draft'::character varying, 'pending'::character varying, 'active'::character varying, 'archived'::character varying])::text[])))
+    CONSTRAINT chk_signage_media_status CHECK (((status)::text = ANY (ARRAY[('draft'::character varying)::text, ('pending'::character varying)::text, ('active'::character varying)::text, ('archived'::character varying)::text])))
 );`,
   `CREATE TABLE public.signage_playback_logs (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
@@ -3947,7 +3802,7 @@ END) STORED NOT NULL,
     scope character varying(20) DEFAULT 'store'::character varying,
     "parentPlaylistId" uuid,
     tags text[] DEFAULT '{}'::text[] NOT NULL,
-    CONSTRAINT chk_signage_playlists_status CHECK (((status)::text = ANY ((ARRAY['draft'::character varying, 'pending'::character varying, 'active'::character varying, 'archived'::character varying])::text[])))
+    CONSTRAINT chk_signage_playlists_status CHECK (((status)::text = ANY (ARRAY[('draft'::character varying)::text, ('pending'::character varying)::text, ('active'::character varying)::text, ('archived'::character varying)::text])))
 );`,
   `CREATE TABLE public.signage_schedules (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
@@ -4097,7 +3952,7 @@ END) STORED NOT NULL,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
     updated_at timestamp with time zone DEFAULT now() NOT NULL,
     author_role character varying(30) DEFAULT 'store'::character varying NOT NULL,
-    CONSTRAINT "CHK_store_blog_posts_author_role" CHECK (((author_role)::text = ANY ((ARRAY['operator'::character varying, 'store'::character varying])::text[]))),
+    CONSTRAINT "CHK_store_blog_posts_author_role" CHECK (((author_role)::text = ANY (ARRAY[('operator'::character varying)::text, ('store'::character varying)::text]))),
     CONSTRAINT "CHK_store_blog_posts_author_role_store_id" CHECK (((((author_role)::text = 'operator'::text) AND (store_id IS NULL)) OR (((author_role)::text = 'store'::text) AND (store_id IS NOT NULL))))
 );`,
   `CREATE TABLE public.store_blog_settings (
@@ -4198,9 +4053,9 @@ END) STORED NOT NULL,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
     updated_at timestamp with time zone DEFAULT now() NOT NULL,
     public_key character varying(40),
-    CONSTRAINT chk_store_multilingual_product_content_groups_source_type CHECK (((source_type)::text = ANY ((ARRAY['store_created'::character varying, 'operator_hub'::character varying, 'supplier_offline_imported'::character varying])::text[]))),
-    CONSTRAINT chk_store_multilingual_product_content_groups_status CHECK (((status)::text = ANY ((ARRAY['draft'::character varying, 'published'::character varying, 'archived'::character varying])::text[]))),
-    CONSTRAINT chk_store_multilingual_product_content_groups_target_kind CHECK (((target_kind)::text = ANY ((ARRAY['local'::character varying, 'listing'::character varying])::text[])))
+    CONSTRAINT chk_store_multilingual_product_content_groups_source_type CHECK (((source_type)::text = ANY (ARRAY[('store_created'::character varying)::text, ('operator_hub'::character varying)::text, ('supplier_offline_imported'::character varying)::text]))),
+    CONSTRAINT chk_store_multilingual_product_content_groups_status CHECK (((status)::text = ANY (ARRAY[('draft'::character varying)::text, ('published'::character varying)::text, ('archived'::character varying)::text]))),
+    CONSTRAINT chk_store_multilingual_product_content_groups_target_kind CHECK (((target_kind)::text = ANY (ARRAY[('local'::character varying)::text, ('listing'::character varying)::text])))
 );`,
   `CREATE TABLE public.store_multilingual_product_content_pages (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
@@ -4219,9 +4074,9 @@ END) STORED NOT NULL,
     created_by_user_id uuid,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
     updated_at timestamp with time zone DEFAULT now() NOT NULL,
-    CONSTRAINT chk_store_multilingual_product_content_pages_content_format CHECK (((content_format)::text = ANY ((ARRAY['blocks'::character varying, 'html'::character varying, 'image_sequence'::character varying, 'json'::character varying])::text[]))),
-    CONSTRAINT chk_store_multilingual_product_content_pages_locale CHECK (((locale)::text = ANY ((ARRAY['ko'::character varying, 'en'::character varying, 'zh'::character varying, 'ja'::character varying, 'vi'::character varying, 'th'::character varying, 'id'::character varying])::text[]))),
-    CONSTRAINT chk_store_multilingual_product_content_pages_status CHECK (((status)::text = ANY ((ARRAY['draft'::character varying, 'published'::character varying, 'archived'::character varying])::text[])))
+    CONSTRAINT chk_store_multilingual_product_content_pages_content_format CHECK (((content_format)::text = ANY (ARRAY[('blocks'::character varying)::text, ('html'::character varying)::text, ('image_sequence'::character varying)::text, ('json'::character varying)::text]))),
+    CONSTRAINT chk_store_multilingual_product_content_pages_locale CHECK (((locale)::text = ANY (ARRAY[('ko'::character varying)::text, ('en'::character varying)::text, ('zh'::character varying)::text, ('ja'::character varying)::text, ('vi'::character varying)::text, ('th'::character varying)::text, ('id'::character varying)::text]))),
+    CONSTRAINT chk_store_multilingual_product_content_pages_status CHECK (((status)::text = ANY (ARRAY[('draft'::character varying)::text, ('published'::character varying)::text, ('archived'::character varying)::text])))
 );`,
   `CREATE TABLE public.store_paid_feature_entitlements (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
@@ -4276,10 +4131,10 @@ END) STORED NOT NULL,
     created_by uuid,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
     updated_at timestamp with time zone DEFAULT now() NOT NULL,
-    CONSTRAINT chk_spd_kind CHECK (((pop_kind)::text = ANY ((ARRAY['product'::character varying, 'content'::character varying])::text[]))),
-    CONSTRAINT chk_spd_layout CHECK (((layout)::text = ANY ((ARRAY['A4'::character varying, 'A5'::character varying])::text[]))),
+    CONSTRAINT chk_spd_kind CHECK (((pop_kind)::text = ANY (ARRAY[('product'::character varying)::text, ('content'::character varying)::text]))),
+    CONSTRAINT chk_spd_layout CHECK (((layout)::text = ANY (ARRAY[('A4'::character varying)::text, ('A5'::character varying)::text]))),
     CONSTRAINT chk_spd_sources_nonempty CHECK (((jsonb_typeof(sources) = 'array'::text) AND (jsonb_array_length(sources) >= 1))),
-    CONSTRAINT chk_spd_status CHECK (((status)::text = ANY ((ARRAY['draft'::character varying, 'ready'::character varying, 'archived'::character varying])::text[])))
+    CONSTRAINT chk_spd_status CHECK (((status)::text = ANY (ARRAY[('draft'::character varying)::text, ('ready'::character varying)::text, ('archived'::character varying)::text])))
 );`,
   `COMMENT ON TABLE public.store_pop_documents IS 'POP V2 저작 문서 원장(canonical). store_pops(발행 아티클)와 다른 축. 출력물 이력은 store_execution_assets(usage_type=pop).';`,
   `COMMENT ON COLUMN public.store_pop_documents.service_key IS '표시·라우팅용 adapter 축. 경계 판정에 쓰지 않는다 — Store Ops 경계는 organization_id (CLAUDE.md §7).';`,
@@ -4298,7 +4153,7 @@ END) STORED NOT NULL,
     published_at timestamp with time zone,
     created_at timestamp without time zone DEFAULT now() NOT NULL,
     updated_at timestamp without time zone DEFAULT now() NOT NULL,
-    CONSTRAINT "CHK_store_pops_author_role" CHECK (((author_role)::text = ANY ((ARRAY['operator'::character varying, 'store'::character varying])::text[]))),
+    CONSTRAINT "CHK_store_pops_author_role" CHECK (((author_role)::text = ANY (ARRAY[('operator'::character varying)::text, ('store'::character varying)::text]))),
     CONSTRAINT "CHK_store_pops_author_role_store_id" CHECK (((((author_role)::text = 'operator'::text) AND (store_id IS NULL)) OR (((author_role)::text = 'store'::text) AND (store_id IS NOT NULL))))
 );`,
   `CREATE TABLE public.store_product_description_selections (
@@ -4334,7 +4189,6 @@ END) STORED NOT NULL,
     short_description text,
     description text,
     is_featured boolean DEFAULT false NOT NULL,
-    is_partner_recruiting boolean DEFAULT false NOT NULL,
     is_active boolean DEFAULT true NOT NULL,
     created_by uuid NOT NULL,
     created_at timestamp without time zone DEFAULT now() NOT NULL,
@@ -4395,6 +4249,19 @@ END) STORED NOT NULL,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
     updated_at timestamp with time zone DEFAULT now() NOT NULL
 );`,
+  `CREATE TABLE public.store_tablet_devices (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    organization_id uuid NOT NULL,
+    name character varying(100) DEFAULT ''::character varying NOT NULL,
+    current_location_id uuid,
+    device_token_hash character varying(64),
+    pairing_code character varying(6),
+    pairing_expires_at timestamp with time zone,
+    last_seen_at timestamp with time zone,
+    is_active boolean DEFAULT true NOT NULL,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    updated_at timestamp with time zone DEFAULT now() NOT NULL
+);`,
   `CREATE TABLE public.store_tablet_display_settings (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
     organization_id uuid NOT NULL,
@@ -4437,7 +4304,7 @@ END) STORED NOT NULL,
     config jsonb DEFAULT '{}'::jsonb NOT NULL,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
     updated_at timestamp with time zone DEFAULT now() NOT NULL,
-    CONSTRAINT "CHK_store_tablet_screen_blocks_type" CHECK (((block_type)::text = ANY ((ARRAY['idle_media'::character varying, 'product_list'::character varying, 'corner_description'::character varying, 'health_info'::character varying, 'staff_inquiry'::character varying, 'qr_guide'::character varying, 'content_list'::character varying])::text[])))
+    CONSTRAINT "CHK_store_tablet_screen_blocks_type" CHECK (((block_type)::text = ANY (ARRAY[('idle_media'::character varying)::text, ('product_list'::character varying)::text, ('corner_description'::character varying)::text, ('health_info'::character varying)::text, ('staff_inquiry'::character varying)::text, ('qr_guide'::character varying)::text, ('content_list'::character varying)::text])))
 );`,
   `CREATE TABLE public.store_tablet_screen_sets (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
@@ -4455,9 +4322,10 @@ END) STORED NOT NULL,
     public_qr_slug character varying(200),
     supplier_id uuid,
     hub_target_store_type character varying(20),
-    CONSTRAINT "CHK_store_tablet_screen_sets_origin" CHECK (((origin)::text = ANY ((ARRAY['store'::character varying, 'operator'::character varying, 'supplier'::character varying])::text[]))),
-    CONSTRAINT "CHK_store_tablet_screen_sets_status" CHECK (((status)::text = ANY ((ARRAY['draft'::character varying, 'active'::character varying, 'archived'::character varying, 'operator_template'::character varying])::text[]))),
-    CONSTRAINT "CHK_stss_hub_target" CHECK ((((hub_target_store_type IS NULL) OR (((origin)::text = 'supplier'::text) AND ((hub_target_store_type)::text = ANY ((ARRAY['pharmacy'::character varying, 'non_pharmacy'::character varying, 'all'::character varying])::text[])))) AND (((origin)::text <> 'supplier'::text) OR ((status)::text <> 'active'::text) OR (hub_target_store_type IS NOT NULL)))),
+    description text,
+    CONSTRAINT "CHK_store_tablet_screen_sets_origin" CHECK (((origin)::text = ANY (ARRAY[('store'::character varying)::text, ('operator'::character varying)::text, ('supplier'::character varying)::text]))),
+    CONSTRAINT "CHK_store_tablet_screen_sets_status" CHECK (((status)::text = ANY (ARRAY[('draft'::character varying)::text, ('active'::character varying)::text, ('archived'::character varying)::text, ('operator_template'::character varying)::text]))),
+    CONSTRAINT "CHK_stss_hub_target" CHECK ((((hub_target_store_type IS NULL) OR (((origin)::text = 'supplier'::text) AND ((hub_target_store_type)::text = ANY (ARRAY[('pharmacy'::character varying)::text, ('non_pharmacy'::character varying)::text, ('all'::character varying)::text])))) AND (((origin)::text <> 'supplier'::text) OR ((status)::text <> 'active'::text) OR (hub_target_store_type IS NOT NULL)))),
     CONSTRAINT "CHK_stss_owner_scope" CHECK (((((origin)::text = 'store'::text) AND (organization_id IS NOT NULL) AND (supplier_id IS NULL)) OR (((origin)::text = 'operator'::text) AND (organization_id IS NULL) AND (supplier_id IS NULL) AND (service_key IS NOT NULL) AND (created_by_user_id IS NOT NULL)) OR (((origin)::text = 'supplier'::text) AND (organization_id IS NULL) AND (supplier_id IS NOT NULL) AND (service_key IS NOT NULL))))
 );`,
   `CREATE TABLE public.store_tablets (
@@ -4484,7 +4352,7 @@ END) STORED NOT NULL,
     copied_from_id uuid,
     created_at timestamp without time zone DEFAULT now() NOT NULL,
     updated_at timestamp without time zone DEFAULT now() NOT NULL,
-    CONSTRAINT "CHK_store_videos_author_role" CHECK (((author_role)::text = ANY ((ARRAY['operator'::character varying, 'store'::character varying])::text[]))),
+    CONSTRAINT "CHK_store_videos_author_role" CHECK (((author_role)::text = ANY (ARRAY[('operator'::character varying)::text, ('store'::character varying)::text]))),
     CONSTRAINT "CHK_store_videos_author_role_store_id" CHECK (((((author_role)::text = 'operator'::text) AND (store_id IS NULL)) OR (((author_role)::text = 'store'::text) AND (store_id IS NOT NULL))))
 );`,
   `CREATE TABLE public.supplier_csv_import_batches (
@@ -4517,14 +4385,6 @@ END) STORED NOT NULL,
     apply_status character varying(10),
     apply_error text,
     offer_id uuid
-);`,
-  `CREATE TABLE public.supplier_partner_commissions (
-    id uuid DEFAULT gen_random_uuid() NOT NULL,
-    supplier_product_id uuid NOT NULL,
-    commission_per_unit integer DEFAULT 0 NOT NULL,
-    start_date date DEFAULT CURRENT_DATE NOT NULL,
-    end_date date,
-    created_at timestamp with time zone DEFAULT now() NOT NULL
 );`,
   `CREATE TABLE public.supplier_product_offers (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
@@ -4570,13 +4430,26 @@ END) STORED NOT NULL,
     completed_at timestamp without time zone,
     cancelled_at timestamp without time zone
 );`,
+  `CREATE TABLE public.user_policy_acceptances (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    user_id uuid NOT NULL,
+    service_key character varying(50) NOT NULL,
+    policy_document_id uuid NOT NULL,
+    document_type character varying(50) NOT NULL,
+    version integer NOT NULL,
+    content_hash character(64) NOT NULL,
+    acceptance_kind character varying(20) DEFAULT 'agreement'::character varying NOT NULL,
+    accepted_at timestamp with time zone DEFAULT now() NOT NULL,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    CONSTRAINT "CHK_user_policy_acceptances_kind" CHECK (((acceptance_kind)::text = ANY ((ARRAY['agreement'::character varying, 'acknowledgement'::character varying, 'consent'::character varying])::text[])))
+);`,
   `CREATE TABLE public.users (
     id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
     email character varying(255) NOT NULL,
-    password character varying(255) NOT NULL,
+    password character varying(255),
     "firstName" character varying(100),
     "lastName" character varying(100),
-    name character varying(200) DEFAULT '운영자'::character varying NOT NULL,
+    name character varying(200),
     avatar character varying(500),
     status character varying DEFAULT 'pending'::character varying NOT NULL,
     "businessInfo" json,
@@ -4609,6 +4482,17 @@ END) STORED NOT NULL,
     tos_accepted_at timestamp without time zone,
     privacy_accepted_at timestamp without time zone,
     marketing_accepted boolean DEFAULT false
+);`,
+  `CREATE TABLE public.work_run_coordination (
+    run_id character varying(64) NOT NULL,
+    user_id uuid NOT NULL,
+    device_id uuid,
+    status character varying(32) DEFAULT 'active'::character varying NOT NULL,
+    version integer DEFAULT 1 NOT NULL,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    updated_at timestamp with time zone DEFAULT now() NOT NULL,
+    expires_at timestamp with time zone NOT NULL,
+    CONSTRAINT "CHK_wrc_status" CHECK (((status)::text = ANY ((ARRAY['active'::character varying, 'waiting_for_user'::character varying, 'completed'::character varying, 'taken_over'::character varying, 'expired'::character varying])::text[])))
 );`,
   `CREATE TABLE public.yaksa_categories (
     id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
@@ -4790,8 +4674,6 @@ END) STORED NOT NULL,
     ADD CONSTRAINT uq_csm_store_user UNIQUE (store_id, user_id);`,
   `ALTER TABLE ONLY neture.neture_order_items
     ADD CONSTRAINT neture_order_items_pkey PRIMARY KEY (id);`,
-  `ALTER TABLE ONLY neture.neture_partners
-    ADD CONSTRAINT neture_partners_pkey PRIMARY KEY (id);`,
   `ALTER TABLE ONLY neture.neture_product_logs
     ADD CONSTRAINT neture_product_logs_pkey PRIMARY KEY (id);`,
   `ALTER TABLE ONLY neture.neture_products
@@ -4816,8 +4698,6 @@ END) STORED NOT NULL,
     ADD CONSTRAINT "PK_337be3dc9dced4e92472735ea4c" PRIMARY KEY (id);`,
   `ALTER TABLE ONLY public.yaksa_members
     ADD CONSTRAINT "PK_40a37b8ecbea623faffc6b283c9" PRIMARY KEY (id);`,
-  `ALTER TABLE ONLY public.neture_partnership_products
-    ADD CONSTRAINT "PK_43da345089a2cc08f77fccf7776" PRIMARY KEY (id);`,
   `ALTER TABLE ONLY public.neture_suppliers
     ADD CONSTRAINT "PK_4eaa1bf1754a7fe8b689cf59c83" PRIMARY KEY (id);`,
   `ALTER TABLE ONLY public.forum_notifications
@@ -4836,12 +4716,8 @@ END) STORED NOT NULL,
     ADD CONSTRAINT "PK_95d5162754186f3771235aa7372" PRIMARY KEY (id);`,
   `ALTER TABLE ONLY public.forum_post_like
     ADD CONSTRAINT "PK_96526bf931e1404345f337e132b" PRIMARY KEY (id);`,
-  `ALTER TABLE ONLY public.neture_partner_applications
-    ADD CONSTRAINT "PK_a341fc8bc08cb4d5ab068e4b825" PRIMARY KEY (id);`,
   `ALTER TABLE ONLY public.credit_transactions
     ADD CONSTRAINT "PK_a408319811d1ab32832ec86fc2c" PRIMARY KEY (id);`,
-  `ALTER TABLE ONLY public.neture_partnership_requests
-    ADD CONSTRAINT "PK_a53b8f4ec24c01653dbd9333da1" PRIMARY KEY (id);`,
   `ALTER TABLE ONLY public.signage_layout_presets
     ADD CONSTRAINT "PK_a668ae2c595e8a9bf5a138c7b28" PRIMARY KEY (id);`,
   `ALTER TABLE ONLY public.signage_content_blocks
@@ -4878,14 +4754,10 @@ END) STORED NOT NULL,
     ADD CONSTRAINT "PK_branch_posts" PRIMARY KEY (id);`,
   `ALTER TABLE ONLY public.branch_sites
     ADD CONSTRAINT "PK_branch_sites" PRIMARY KEY (id);`,
-  `ALTER TABLE ONLY public.neture_seller_partner_contracts
-    ADD CONSTRAINT "PK_c1b6543bc6cde24cee52b2914d3" PRIMARY KEY (id);`,
   `ALTER TABLE ONLY public.operator_notification_settings
     ADD CONSTRAINT "PK_c345fc1e4e253ebae8325a4c1ee" PRIMARY KEY (id);`,
   `ALTER TABLE ONLY public.platform_inquiries
     ADD CONSTRAINT "PK_cad6625222d392ca395384dc182" PRIMARY KEY (id);`,
-  `ALTER TABLE ONLY public.neture_partner_recruitments
-    ADD CONSTRAINT "PK_caf78e734a6d909c033601c0cc1" PRIMARY KEY (id);`,
   `ALTER TABLE ONLY public.cafe24_connections
     ADD CONSTRAINT "PK_cafe24_connections" PRIMARY KEY (id);`,
   `ALTER TABLE ONLY public.product_approvals
@@ -4960,6 +4832,10 @@ END) STORED NOT NULL,
     ADD CONSTRAINT "PK_role_permissions" PRIMARY KEY (role_id, permission_id);`,
   `ALTER TABLE ONLY public.roles
     ADD CONSTRAINT "PK_roles" PRIMARY KEY (id);`,
+  `ALTER TABLE ONLY public.seller_recruitment_applications
+    ADD CONSTRAINT "PK_seller_recruitment_applications" PRIMARY KEY (id);`,
+  `ALTER TABLE ONLY public.seller_recruitments
+    ADD CONSTRAINT "PK_seller_recruitments" PRIMARY KEY (id);`,
   `ALTER TABLE ONLY public.service_credentials
     ADD CONSTRAINT "PK_service_credentials" PRIMARY KEY (id);`,
   `ALTER TABLE ONLY public.service_point_budget_transactions
@@ -4982,8 +4858,6 @@ END) STORED NOT NULL,
     ADD CONSTRAINT "PK_store_tablets" PRIMARY KEY (id);`,
   `ALTER TABLE ONLY public.users
     ADD CONSTRAINT "PK_users" PRIMARY KEY (id);`,
-  `ALTER TABLE ONLY public.neture_partner_applications
-    ADD CONSTRAINT "UQ_00c3de3e13e337373e0c6833f0e" UNIQUE (recruitment_id, partner_id);`,
   `ALTER TABLE ONLY public.yaksa_members
     ADD CONSTRAINT "UQ_118d1ae7cb35d8a60861eb15cba" UNIQUE ("userId");`,
   `ALTER TABLE ONLY public.yaksa_members
@@ -5040,6 +4914,8 @@ END) STORED NOT NULL,
     ADD CONSTRAINT "UQ_platform_services_code" UNIQUE (code);`,
   `ALTER TABLE ONLY public.roles
     ADD CONSTRAINT "UQ_roles_name" UNIQUE (name);`,
+  `ALTER TABLE ONLY public.seller_recruitment_applications
+    ADD CONSTRAINT "UQ_seller_recruitment_applications_recruitment_applicant" UNIQUE (recruitment_id, applicant_id);`,
   `ALTER TABLE ONLY public.service_audience_policies
     ADD CONSTRAINT "UQ_service_audience_policies_service_key" UNIQUE (service_key);`,
   `ALTER TABLE ONLY public.service_point_budgets
@@ -5052,6 +4928,8 @@ END) STORED NOT NULL,
     ADD CONSTRAINT "UQ_store_capability_org_key" UNIQUE (organization_id, capability_key);`,
   `ALTER TABLE ONLY public.neture_supplier_regulated_categories
     ADD CONSTRAINT "UQ_supplier_regulated_category" UNIQUE (supplier_id, category);`,
+  `ALTER TABLE ONLY public.user_policy_acceptances
+    ADD CONSTRAINT "UQ_user_policy_acceptances_user_service_document" UNIQUE (user_id, service_key, policy_document_id);`,
   `ALTER TABLE ONLY public.ai_billing_summary
     ADD CONSTRAINT ai_billing_summary_pkey PRIMARY KEY (id);`,
   `ALTER TABLE ONLY public.ai_engines
@@ -5232,14 +5110,6 @@ END) STORED NOT NULL,
     ADD CONSTRAINT neture_orders_order_number_key UNIQUE (order_number);`,
   `ALTER TABLE ONLY public.neture_orders
     ADD CONSTRAINT neture_orders_pkey PRIMARY KEY (id);`,
-  `ALTER TABLE ONLY public.neture_partner_dashboard_item_contents
-    ADD CONSTRAINT neture_partner_dashboard_item_contents_pkey PRIMARY KEY (id);`,
-  `ALTER TABLE ONLY public.neture_partner_dashboard_item_contents
-    ADD CONSTRAINT neture_partner_dashboard_item_dashboard_item_id_content_id__key UNIQUE (dashboard_item_id, content_id, content_source);`,
-  `ALTER TABLE ONLY public.neture_partner_dashboard_items
-    ADD CONSTRAINT neture_partner_dashboard_items_partner_user_id_product_id_key UNIQUE (partner_user_id, product_id);`,
-  `ALTER TABLE ONLY public.neture_partner_dashboard_items
-    ADD CONSTRAINT neture_partner_dashboard_items_pkey PRIMARY KEY (id);`,
   `ALTER TABLE ONLY public.neture_settlement_orders
     ADD CONSTRAINT neture_settlement_orders_pkey PRIMARY KEY (id);`,
   `ALTER TABLE ONLY public.neture_settlements
@@ -5290,14 +5160,6 @@ END) STORED NOT NULL,
     ADD CONSTRAINT organizations_code_key UNIQUE (code);`,
   `ALTER TABLE ONLY public.organizations
     ADD CONSTRAINT organizations_pkey PRIMARY KEY (id);`,
-  `ALTER TABLE ONLY public.partner_commissions
-    ADD CONSTRAINT partner_commissions_pkey PRIMARY KEY (id);`,
-  `ALTER TABLE ONLY public.partner_referrals
-    ADD CONSTRAINT partner_referrals_pkey PRIMARY KEY (id);`,
-  `ALTER TABLE ONLY public.partner_settlement_items
-    ADD CONSTRAINT partner_settlement_items_pkey PRIMARY KEY (id);`,
-  `ALTER TABLE ONLY public.partner_settlements
-    ADD CONSTRAINT partner_settlements_pkey PRIMARY KEY (id);`,
   `ALTER TABLE ONLY public.physical_store_links
     ADD CONSTRAINT physical_store_links_pkey PRIMARY KEY (id);`,
   `ALTER TABLE ONLY public.physical_store_links
@@ -5442,6 +5304,8 @@ END) STORED NOT NULL,
     ADD CONSTRAINT store_qr_scan_events_pkey PRIMARY KEY (id);`,
   `ALTER TABLE ONLY public.store_tablet_corner_contents
     ADD CONSTRAINT store_tablet_corner_contents_pkey PRIMARY KEY (id);`,
+  `ALTER TABLE ONLY public.store_tablet_devices
+    ADD CONSTRAINT store_tablet_devices_pkey PRIMARY KEY (id);`,
   `ALTER TABLE ONLY public.store_tablet_display_settings
     ADD CONSTRAINT store_tablet_display_settings_pkey PRIMARY KEY (id);`,
   `ALTER TABLE ONLY public.store_tablet_operator_idle_selections
@@ -5456,8 +5320,6 @@ END) STORED NOT NULL,
     ADD CONSTRAINT supplier_csv_import_batches_pkey PRIMARY KEY (id);`,
   `ALTER TABLE ONLY public.supplier_csv_import_rows
     ADD CONSTRAINT supplier_csv_import_rows_pkey PRIMARY KEY (id);`,
-  `ALTER TABLE ONLY public.supplier_partner_commissions
-    ADD CONSTRAINT supplier_partner_commissions_pkey PRIMARY KEY (id);`,
   `ALTER TABLE ONLY public.supplier_product_offers
     ADD CONSTRAINT supplier_product_offers_pkey PRIMARY KEY (id);`,
   `ALTER TABLE ONLY public.tablet_interest_requests
@@ -5482,14 +5344,14 @@ END) STORED NOT NULL,
     ADD CONSTRAINT uq_kpa_content_rec_user UNIQUE (content_id, user_id);`,
   `ALTER TABLE ONLY public.member_qualifications
     ADD CONSTRAINT uq_member_qualification UNIQUE (user_id, qualification_type);`,
-  `ALTER TABLE ONLY public.neture_partner_recruitments
-    ADD CONSTRAINT uq_neture_partner_recruitments_product_seller_service UNIQUE (product_id, seller_id, service_id);`,
   `ALTER TABLE ONLY public.neture_suppliers
     ADD CONSTRAINT uq_neture_suppliers_user_id UNIQUE (user_id);`,
   `ALTER TABLE ONLY public.product_categories
     ADD CONSTRAINT uq_product_categories_slug UNIQUE (slug);`,
   `ALTER TABLE ONLY public.product_masters
     ADD CONSTRAINT uq_product_masters_mfds_product_id UNIQUE (mfds_product_id);`,
+  `ALTER TABLE ONLY public.seller_recruitments
+    ADD CONSTRAINT uq_seller_recruitments_product_seller_service UNIQUE (product_id, seller_id, service_id);`,
   `ALTER TABLE ONLY public.service_credentials
     ADD CONSTRAINT uq_service_credentials_user_service UNIQUE (user_id, service_key);`,
   `ALTER TABLE ONLY public.signage_forced_content_positions
@@ -5504,6 +5366,10 @@ END) STORED NOT NULL,
     ADD CONSTRAINT uq_store_tablet_display_settings_org UNIQUE (organization_id);`,
   `ALTER TABLE ONLY public.supplier_product_offers
     ADD CONSTRAINT uq_supplier_product_offers_master_supplier UNIQUE (master_id, supplier_id);`,
+  `ALTER TABLE ONLY public.user_policy_acceptances
+    ADD CONSTRAINT user_policy_acceptances_pkey PRIMARY KEY (id);`,
+  `ALTER TABLE ONLY public.work_run_coordination
+    ADD CONSTRAINT work_run_coordination_pkey PRIMARY KEY (run_id);`,
   `ALTER TABLE ONLY public.yaksa_categories
     ADD CONSTRAINT yaksa_categories_pkey PRIMARY KEY (id);`,
   `ALTER TABLE ONLY public.yaksa_categories
@@ -5545,15 +5411,10 @@ END) STORED NOT NULL,
   `CREATE INDEX idx_cspi_playlist_sort ON cosmetics.cosmetics_store_playlist_items USING btree (playlist_id, sort_order);`,
   `CREATE INDEX idx_neture_order_items_order_id ON neture.neture_order_items USING btree (order_id);`,
   `CREATE INDEX idx_neture_order_items_product_id ON neture.neture_order_items USING btree (product_id);`,
-  `CREATE INDEX idx_neture_partners_business_number ON neture.neture_partners USING btree (business_number);`,
-  `CREATE INDEX idx_neture_partners_name ON neture.neture_partners USING btree (name);`,
-  `CREATE INDEX idx_neture_partners_status ON neture.neture_partners USING btree (status);`,
-  `CREATE INDEX idx_neture_partners_type ON neture.neture_partners USING btree (type);`,
   `CREATE INDEX idx_neture_product_logs_action ON neture.neture_product_logs USING btree (action);`,
   `CREATE INDEX idx_neture_product_logs_product_id ON neture.neture_product_logs USING btree (product_id);`,
   `CREATE INDEX idx_neture_products_category ON neture.neture_products USING btree (category);`,
   `CREATE INDEX idx_neture_products_name ON neture.neture_products USING btree (name);`,
-  `CREATE INDEX idx_neture_products_partner_id ON neture.neture_products USING btree (partner_id);`,
   `CREATE INDEX idx_neture_products_status ON neture.neture_products USING btree (status);`,
   `CREATE INDEX "IDX_0332fdb24ad4450c56260d89c2" ON public.cms_content_recommendations USING btree (user_id);`,
   `CREATE INDEX "IDX_050be899b13fa215727fa490ea" ON public.users USING btree ("isActive");`,
@@ -5606,7 +5467,7 @@ END) STORED NOT NULL,
   `CREATE INDEX "IDX_branch_events_published" ON public.branch_events USING btree (organization_id, starts_at) WHERE ((status)::text = 'published'::text);`,
   `CREATE INDEX "IDX_branch_fee_ledgers_exemption" ON public.branch_fee_ledgers USING btree (organization_id, year, exemption_type) WHERE ((status)::text = 'exempt'::text);`,
   `CREATE INDEX "IDX_branch_fee_ledgers_org_year" ON public.branch_fee_ledgers USING btree (organization_id, year);`,
-  `CREATE INDEX "IDX_branch_fee_ledgers_outstanding" ON public.branch_fee_ledgers USING btree (organization_id, year) WHERE ((status)::text = ANY ((ARRAY['unpaid'::character varying, 'partial'::character varying])::text[]));`,
+  `CREATE INDEX "IDX_branch_fee_ledgers_outstanding" ON public.branch_fee_ledgers USING btree (organization_id, year) WHERE ((status)::text = ANY (ARRAY[('unpaid'::character varying)::text, ('partial'::character varying)::text]));`,
   `CREATE INDEX "IDX_branch_fee_ledgers_user_org" ON public.branch_fee_ledgers USING btree (user_id, organization_id);`,
   `CREATE INDEX "IDX_branch_fee_policies_org_year" ON public.branch_fee_policies USING btree (organization_id, year);`,
   `CREATE INDEX "IDX_branch_memberships_org_status" ON public.branch_memberships USING btree (organization_id, status);`,
@@ -5625,7 +5486,6 @@ END) STORED NOT NULL,
   `CREATE INDEX "IDX_checkout_orders_buyerId" ON public.checkout_orders USING btree ("buyerId");`,
   `CREATE UNIQUE INDEX "IDX_checkout_orders_orderNumber" ON public.checkout_orders USING btree ("orderNumber");`,
   `CREATE INDEX "IDX_checkout_orders_order_type" ON public.checkout_orders USING btree (order_type);`,
-  `CREATE INDEX "IDX_checkout_orders_partnerId" ON public.checkout_orders USING btree ("partnerId");`,
   `CREATE INDEX "IDX_checkout_orders_paymentStatus" ON public.checkout_orders USING btree ("paymentStatus");`,
   `CREATE INDEX "IDX_checkout_orders_seller_org_id" ON public.checkout_orders USING btree ("sellerOrganizationId");`,
   `CREATE INDEX "IDX_checkout_orders_status" ON public.checkout_orders USING btree (status);`,
@@ -5652,7 +5512,7 @@ END) STORED NOT NULL,
   `CREATE INDEX "IDX_credit_transactions_user_created" ON public.credit_transactions USING btree ("userId", created_at);`,
   `CREATE INDEX "IDX_dc245d2daf7308dc9ddf4e362b" ON public.forum_post_like USING btree (post_id);`,
   `CREATE INDEX "IDX_ecpl_org_channel" ON public.external_channel_product_links USING btree (organization_id, channel_code);`,
-  `CREATE INDEX "IDX_ecpl_sync_status" ON public.external_channel_product_links USING btree (sync_status) WHERE ((sync_status)::text = ANY ((ARRAY['PENDING'::character varying, 'FAILED'::character varying])::text[]));`,
+  `CREATE INDEX "IDX_ecpl_sync_status" ON public.external_channel_product_links USING btree (sync_status) WHERE ((sync_status)::text = ANY (ARRAY[('PENDING'::character varying)::text, ('FAILED'::character varying)::text]));`,
   `CREATE INDEX "IDX_email_logs_recipient" ON public.email_logs USING btree (recipient);`,
   `CREATE INDEX "IDX_email_logs_status_createdAt" ON public.email_logs USING btree (status, "createdAt");`,
   `CREATE INDEX "IDX_email_verification_tokens_userId_createdAt" ON public.email_verification_tokens USING btree ("userId", "createdAt");`,
@@ -5728,24 +5588,12 @@ END) STORED NOT NULL,
   `CREATE INDEX "IDX_neture_contact_messages_email" ON public.neture_contact_messages USING btree (email);`,
   `CREATE INDEX "IDX_neture_contact_messages_status_createdAt" ON public.neture_contact_messages USING btree (status, "createdAt");`,
   `CREATE INDEX "IDX_neture_contact_messages_type_status" ON public.neture_contact_messages USING btree ("contactType", status);`,
-  `CREATE INDEX "IDX_neture_contracts_partner" ON public.neture_seller_partner_contracts USING btree (partner_id);`,
-  `CREATE INDEX "IDX_neture_contracts_seller" ON public.neture_seller_partner_contracts USING btree (seller_id);`,
-  `CREATE INDEX "IDX_neture_contracts_status" ON public.neture_seller_partner_contracts USING btree (contract_status);`,
-  `CREATE INDEX "IDX_neture_partner_applications_partner_id" ON public.neture_partner_applications USING btree (partner_id);`,
-  `CREATE INDEX "IDX_neture_partner_applications_recruitment_id" ON public.neture_partner_applications USING btree (recruitment_id);`,
-  `CREATE INDEX "IDX_neture_partner_applications_status" ON public.neture_partner_applications USING btree (status);`,
-  `CREATE INDEX "IDX_neture_partner_recruitments_exposure_status" ON public.neture_partner_recruitments USING btree (exposure_status);`,
-  `CREATE INDEX "IDX_neture_partner_recruitments_status" ON public.neture_partner_recruitments USING btree (status);`,
-  `CREATE INDEX "IDX_neture_partnership_products_request_id" ON public.neture_partnership_products USING btree (partnership_request_id);`,
-  `CREATE INDEX "IDX_neture_partnership_requests_status" ON public.neture_partnership_requests USING btree (status);`,
-  `CREATE INDEX "IDX_neture_pdi_partner" ON public.neture_partner_dashboard_items USING btree (partner_user_id);`,
   `CREATE INDEX "IDX_neture_suppliers_category" ON public.neture_suppliers USING btree (category);`,
   `CREATE INDEX "IDX_neture_suppliers_status" ON public.neture_suppliers USING btree (status);`,
   `CREATE INDEX "IDX_notifications_organizationId_createdAt" ON public.notifications USING btree ("organizationId", "createdAt");`,
   `CREATE INDEX "IDX_notifications_serviceKey_user_createdAt" ON public.notifications USING btree ("serviceKey", "userId", "createdAt");`,
   `CREATE INDEX "IDX_notifications_type_createdAt" ON public.notifications USING btree (type, "createdAt");`,
   `CREATE INDEX "IDX_notifications_user_isRead_createdAt" ON public.notifications USING btree ("userId", "isRead", "createdAt");`,
-  `CREATE INDEX "IDX_npdic_dashboard_item" ON public.neture_partner_dashboard_item_contents USING btree (dashboard_item_id);`,
   `CREATE INDEX "IDX_o4o_payments_orderId" ON public.o4o_payments USING btree ("orderId");`,
   `CREATE UNIQUE INDEX "IDX_o4o_payments_paymentKey_unique" ON public.o4o_payments USING btree ("paymentKey") WHERE ("paymentKey" IS NOT NULL);`,
   `CREATE INDEX "IDX_o4o_payments_sourceService" ON public.o4o_payments USING btree ("sourceService");`,
@@ -5801,6 +5649,11 @@ END) STORED NOT NULL,
   `CREATE INDEX "IDX_role_assignments_user_role" ON public.role_assignments USING btree (user_id, role);`,
   `CREATE INDEX "IDX_role_permissions_permission_id" ON public.role_permissions USING btree (permission_id);`,
   `CREATE INDEX "IDX_role_permissions_role_id" ON public.role_permissions USING btree (role_id);`,
+  `CREATE INDEX "IDX_seller_recruitment_applications_applicant_id" ON public.seller_recruitment_applications USING btree (applicant_id);`,
+  `CREATE INDEX "IDX_seller_recruitment_applications_recruitment_id" ON public.seller_recruitment_applications USING btree (recruitment_id);`,
+  `CREATE INDEX "IDX_seller_recruitment_applications_status" ON public.seller_recruitment_applications USING btree (status);`,
+  `CREATE INDEX "IDX_seller_recruitments_exposure_status" ON public.seller_recruitments USING btree (exposure_status);`,
+  `CREATE INDEX "IDX_seller_recruitments_status" ON public.seller_recruitments USING btree (status);`,
   `CREATE INDEX "IDX_service_point_budgets_service_key" ON public.service_point_budgets USING btree (service_key);`,
   `CREATE INDEX "IDX_service_products_offer" ON public.service_products USING btree (offer_id);`,
   `CREATE INDEX "IDX_service_products_service_status" ON public.service_products USING btree (service_key, status);`,
@@ -5891,6 +5744,8 @@ END) STORED NOT NULL,
   `CREATE INDEX "IDX_store_videos_store_id_published_at" ON public.store_videos USING btree (store_id, published_at);`,
   `CREATE INDEX "IDX_store_videos_store_id_status" ON public.store_videos USING btree (store_id, status);`,
   `CREATE INDEX "IDX_user_email_active" ON public.users USING btree (email, status) WHERE ((status)::text = 'approved'::text);`,
+  `CREATE INDEX "IDX_user_policy_acceptances_policy_document" ON public.user_policy_acceptances USING btree (policy_document_id);`,
+  `CREATE INDEX "IDX_user_policy_acceptances_user" ON public.user_policy_acceptances USING btree (user_id);`,
   `CREATE UNIQUE INDEX "IDX_users_email" ON public.users USING btree (email);`,
   `CREATE INDEX "IDX_users_isActive" ON public.users USING btree ("isActive");`,
   `CREATE INDEX "IDX_yaksa_member_affiliations_isPrimary" ON public.yaksa_member_affiliations USING btree ("isPrimary");`,
@@ -5930,14 +5785,15 @@ END) STORED NOT NULL,
   `CREATE UNIQUE INDEX "UQ_ecpl_org_master_channel" ON public.external_channel_product_links USING btree (organization_id, master_id, channel_code);`,
   `CREATE UNIQUE INDEX "UQ_kpa_organizations_slug" ON public.kpa_organizations USING btree (slug) WHERE (slug IS NOT NULL);`,
   `CREATE UNIQUE INDEX "UQ_kpa_store_contents_snap_org_partial" ON public.kpa_store_contents USING btree (snapshot_id, organization_id) WHERE (snapshot_id IS NOT NULL);`,
-  `CREATE UNIQUE INDEX "UQ_neture_contracts_active_pair" ON public.neture_seller_partner_contracts USING btree (seller_id, partner_id) WHERE (contract_status = 'active'::public.neture_contract_status_enum);`,
+  `CREATE UNIQUE INDEX "UQ_linked_accounts_google_user" ON public.linked_accounts USING btree ("userId") WHERE ((provider)::text = 'google'::text);`,
+  `CREATE UNIQUE INDEX "UQ_linked_accounts_provider_providerId" ON public.linked_accounts USING btree (provider, "providerId") WHERE ("providerId" IS NOT NULL);`,
   `CREATE UNIQUE INDEX "UQ_pma_product_asset" ON public.product_marketing_assets USING btree (product_id, asset_type, asset_id);`,
   `CREATE UNIQUE INDEX "UQ_product_ai_contents_product_type" ON public.product_ai_contents USING btree (product_id, content_type);`,
   `CREATE UNIQUE INDEX "UQ_service_products_service_offer" ON public.service_products USING btree (service_key, offer_id);`,
   `CREATE UNIQUE INDEX "UQ_store_asset_derivations_relation" ON public.store_asset_derivations USING btree (service_key, organization_id, source_kind, source_id, derived_kind, derived_id);`,
   `CREATE UNIQUE INDEX "UQ_store_pops_store_id_slug" ON public.store_pops USING btree (store_id, slug);`,
   `CREATE UNIQUE INDEX "UQ_store_videos_store_id_slug" ON public.store_videos USING btree (store_id, slug);`,
-  `CREATE INDEX automation_jobs_temp_output_due_idx ON public.automation_jobs USING btree (temp_output_expires_at) WHERE ((temp_output_cleanup_status)::text = ANY ((ARRAY['AVAILABLE'::character varying, 'DELETE_FAILED'::character varying])::text[]));`,
+  `CREATE INDEX automation_jobs_temp_output_due_idx ON public.automation_jobs USING btree (temp_output_expires_at) WHERE ((temp_output_cleanup_status)::text = ANY (ARRAY[('AVAILABLE'::character varying)::text, ('DELETE_FAILED'::character varying)::text]));`,
   `CREATE INDEX automation_jobs_type_status_idx ON public.automation_jobs USING btree (type, status, updated_at DESC);`,
   `CREATE INDEX idx_action_dismissals_user_service ON public.operator_action_dismissals USING btree (user_id, service_key);`,
   `CREATE INDEX idx_ai_billing_period ON public.ai_billing_summary USING btree (period);`,
@@ -6090,15 +5946,6 @@ END) STORED NOT NULL,
   `CREATE INDEX idx_osa_status ON public.offer_service_approvals USING btree (approval_status);`,
   `CREATE INDEX idx_osp_offer ON public.offer_service_prices USING btree (offer_id);`,
   `CREATE INDEX idx_osp_service_key ON public.offer_service_prices USING btree (service_key);`,
-  `CREATE INDEX idx_partner_commissions_order_id ON public.partner_commissions USING btree (order_id);`,
-  `CREATE INDEX idx_partner_commissions_partner_id ON public.partner_commissions USING btree (partner_id);`,
-  `CREATE UNIQUE INDEX idx_partner_commissions_partner_order_unique ON public.partner_commissions USING btree (partner_id, order_id) WHERE ((status)::text <> 'cancelled'::text);`,
-  `CREATE INDEX idx_partner_commissions_period ON public.partner_commissions USING btree (period_start, period_end);`,
-  `CREATE INDEX idx_partner_commissions_status ON public.partner_commissions USING btree (status);`,
-  `CREATE UNIQUE INDEX idx_partner_settlement_items_commission_unique ON public.partner_settlement_items USING btree (commission_id);`,
-  `CREATE INDEX idx_partner_settlement_items_settlement_id ON public.partner_settlement_items USING btree (settlement_id);`,
-  `CREATE INDEX idx_partner_settlements_partner_id ON public.partner_settlements USING btree (partner_id);`,
-  `CREATE INDEX idx_partner_settlements_status ON public.partner_settlements USING btree (status);`,
   `CREATE INDEX idx_pcca_candidate_id ON public.product_candidate_cleanup_audits USING btree (candidate_id);`,
   `CREATE INDEX idx_pcca_cleanup_key ON public.product_candidate_cleanup_audits USING btree (cleanup_key);`,
   `CREATE INDEX idx_pccs_key_candidate ON public.product_candidate_cleanup_snapshots USING btree (cleanup_key, product_candidate_id);`,
@@ -6118,8 +5965,6 @@ END) STORED NOT NULL,
   `CREATE INDEX idx_pmca_cleanup_key_action ON public.product_master_cleanup_audits USING btree (cleanup_key, action);`,
   `CREATE INDEX idx_pmca_master ON public.product_master_cleanup_audits USING btree (product_master_id);`,
   `CREATE INDEX idx_pmn_master_created ON public.product_master_notes USING btree (product_master_id, created_at DESC) WHERE (deleted_at IS NULL);`,
-  `CREATE INDEX idx_pr_partner ON public.partner_referrals USING btree (partner_id);`,
-  `CREATE UNIQUE INDEX idx_pr_token ON public.partner_referrals USING btree (referral_token);`,
   `CREATE INDEX idx_product_ai_tags_product ON public.product_ai_tags USING btree (product_id);`,
   `CREATE INDEX idx_product_ai_tags_tag ON public.product_ai_tags USING btree (tag);`,
   `CREATE INDEX idx_product_alias_master ON public.product_aliases USING btree (product_master_id);`,
@@ -6192,8 +6037,6 @@ END) STORED NOT NULL,
   `CREATE INDEX idx_sp_logs_media ON public.signage_playback_logs USING btree (media_id);`,
   `CREATE INDEX idx_sp_logs_playlist ON public.signage_playback_logs USING btree (playlist_id) WHERE (playlist_id IS NOT NULL);`,
   `CREATE INDEX idx_sp_logs_service_time ON public.signage_playback_logs USING btree (service_key, played_at DESC);`,
-  `CREATE INDEX idx_spc_dates ON public.supplier_partner_commissions USING btree (start_date, end_date);`,
-  `CREATE INDEX idx_spc_product ON public.supplier_partner_commissions USING btree (supplier_product_id);`,
   `CREATE INDEX idx_spd_audit_master_type_lang_at ON public.shared_product_description_audit_logs USING btree (master_id, description_type, language, performed_at DESC);`,
   `CREATE INDEX idx_spd_audit_new ON public.shared_product_description_audit_logs USING btree (new_description_id);`,
   `CREATE INDEX idx_spd_audit_previous ON public.shared_product_description_audit_logs USING btree (previous_description_id);`,
@@ -6206,6 +6049,8 @@ END) STORED NOT NULL,
   `CREATE INDEX idx_sqc_screen_set_target ON public.store_qr_codes USING btree (organization_id, landing_type, landing_target_id) WHERE ((landing_type)::text = 'screen_set'::text);`,
   `CREATE INDEX idx_stcc_org_tablet ON public.store_tablet_corner_contents USING btree (organization_id, tablet_id);`,
   `CREATE INDEX idx_stcc_screen_set ON public.store_tablet_corner_contents USING btree (screen_set_id);`,
+  `CREATE INDEX idx_std_org_location ON public.store_tablet_devices USING btree (organization_id, current_location_id);`,
+  `CREATE INDEX idx_std_pairing_code ON public.store_tablet_devices USING btree (pairing_code) WHERE (pairing_code IS NOT NULL);`,
   `CREATE INDEX idx_stois_org ON public.store_tablet_operator_idle_selections USING btree (organization_id);`,
   `CREATE INDEX idx_store_ai_insights_org_id ON public.store_ai_insights USING btree (organization_id);`,
   `CREATE INDEX idx_store_ai_insights_snapshot_id ON public.store_ai_insights USING btree (snapshot_id);`,
@@ -6247,6 +6092,8 @@ END) STORED NOT NULL,
   `CREATE INDEX idx_usage_scope ON public.ai_usage_logs USING btree (scope, "createdAt");`,
   `CREATE INDEX idx_usage_status ON public.ai_usage_logs USING btree (status, "createdAt");`,
   `CREATE INDEX idx_users_service_key ON public.users USING btree (service_key);`,
+  `CREATE INDEX idx_wrc_expires_at ON public.work_run_coordination USING btree (expires_at);`,
+  `CREATE INDEX idx_wrc_user_status ON public.work_run_coordination USING btree (user_id, status);`,
   `CREATE INDEX idx_yaksa_categories_slug ON public.yaksa_categories USING btree (slug);`,
   `CREATE INDEX idx_yaksa_categories_status ON public.yaksa_categories USING btree (status);`,
   `CREATE INDEX idx_yaksa_post_logs_created_at ON public.yaksa_post_logs USING btree (created_at DESC);`,
@@ -6277,6 +6124,7 @@ END) STORED NOT NULL,
   `CREATE UNIQUE INDEX uq_product_images_active_primary ON public.product_images USING btree (master_id) WHERE ((is_primary = true) AND (deleted_at IS NULL));`,
   `CREATE UNIQUE INDEX uq_product_masters_barcode ON public.product_masters USING btree (barcode) WHERE (barcode IS NOT NULL);`,
   `CREATE UNIQUE INDEX uq_sqc_screen_set_target ON public.store_qr_codes USING btree (organization_id, landing_target_id) WHERE ((landing_type)::text = 'screen_set'::text);`,
+  `CREATE UNIQUE INDEX uq_std_device_token_hash ON public.store_tablet_devices USING btree (device_token_hash) WHERE (device_token_hash IS NOT NULL);`,
   `CREATE UNIQUE INDEX uq_stois_active_per_tablet ON public.store_tablet_operator_idle_selections USING btree (tablet_id) WHERE (cleared_at IS NULL);`,
   `CREATE UNIQUE INDEX uq_store_multilingual_product_content_group_public_key ON public.store_multilingual_product_content_groups USING btree (public_key) WHERE (public_key IS NOT NULL);`,
   `CREATE UNIQUE INDEX uq_store_multilingual_product_content_group_target_key ON public.store_multilingual_product_content_groups USING btree (organization_id, target_kind, target_id, content_key);`,
@@ -6296,12 +6144,8 @@ END) STORED NOT NULL,
     ADD CONSTRAINT "FK_386ad9b299fcde9d9460b26afaa" FOREIGN KEY ("quizId") REFERENCES public.lms_quizzes(id) ON DELETE CASCADE;`,
   `ALTER TABLE ONLY public.forum_notifications
     ADD CONSTRAINT "FK_41a97b76b5acf2a5527a5142f34" FOREIGN KEY ("actorId") REFERENCES public.users(id) ON DELETE SET NULL;`,
-  `ALTER TABLE ONLY public.neture_partner_applications
-    ADD CONSTRAINT "FK_4c697b576bc49c23613cd0d1c52" FOREIGN KEY (recruitment_id) REFERENCES public.neture_partner_recruitments(id) ON DELETE CASCADE;`,
   `ALTER TABLE ONLY public.lms_quizzes
     ADD CONSTRAINT "FK_a981173286055652e7ef7738add" FOREIGN KEY ("lessonId") REFERENCES public.lms_lessons(id) ON DELETE SET NULL;`,
-  `ALTER TABLE ONLY public.neture_partnership_products
-    ADD CONSTRAINT "FK_aba21e54351e5fea72883f5beee" FOREIGN KEY (partnership_request_id) REFERENCES public.neture_partnership_requests(id) ON DELETE CASCADE;`,
   `ALTER TABLE ONLY public.annual_reports
     ADD CONSTRAINT "FK_annual_reports_organization" FOREIGN KEY (organization_id) REFERENCES public.kpa_organizations(id) ON UPDATE CASCADE ON DELETE RESTRICT;`,
   `ALTER TABLE ONLY public.annual_reports
@@ -6340,6 +6184,8 @@ END) STORED NOT NULL,
     ADD CONSTRAINT "FK_kyc_documents_user" FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;`,
   `ALTER TABLE ONLY public.kyc_documents
     ADD CONSTRAINT "FK_kyc_documents_verified_by" FOREIGN KEY (verified_by) REFERENCES public.users(id) ON DELETE SET NULL;`,
+  `ALTER TABLE ONLY public.linked_accounts
+    ADD CONSTRAINT "FK_linked_accounts_user" FOREIGN KEY ("userId") REFERENCES public.users(id) ON DELETE CASCADE;`,
   `ALTER TABLE ONLY public.organization_product_listings
     ADD CONSTRAINT "FK_listing_organization" FOREIGN KEY (organization_id) REFERENCES public.organizations(id) ON UPDATE CASCADE ON DELETE RESTRICT;`,
   `ALTER TABLE ONLY public.neture_suppliers
@@ -6366,6 +6212,8 @@ END) STORED NOT NULL,
     ADD CONSTRAINT "FK_role_permissions_permission" FOREIGN KEY (permission_id) REFERENCES public.permissions(id) ON DELETE CASCADE;`,
   `ALTER TABLE ONLY public.role_permissions
     ADD CONSTRAINT "FK_role_permissions_role" FOREIGN KEY (role_id) REFERENCES public.roles(id) ON DELETE CASCADE;`,
+  `ALTER TABLE ONLY public.seller_recruitment_applications
+    ADD CONSTRAINT "FK_seller_recruitment_applications_recruitment" FOREIGN KEY (recruitment_id) REFERENCES public.seller_recruitments(id) ON DELETE CASCADE;`,
   `ALTER TABLE ONLY public.service_credentials
     ADD CONSTRAINT "FK_service_credentials_user" FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;`,
   `ALTER TABLE ONLY public.signage_playlist_items
@@ -6380,6 +6228,8 @@ END) STORED NOT NULL,
     ADD CONSTRAINT "FK_stcc_screen_set" FOREIGN KEY (screen_set_id) REFERENCES public.store_tablet_screen_sets(id) ON DELETE CASCADE;`,
   `ALTER TABLE ONLY public.store_tablet_corner_contents
     ADD CONSTRAINT "FK_stcc_tablet" FOREIGN KEY (tablet_id) REFERENCES public.store_tablets(id) ON DELETE CASCADE;`,
+  `ALTER TABLE ONLY public.store_tablet_devices
+    ADD CONSTRAINT "FK_std_current_location" FOREIGN KEY (current_location_id) REFERENCES public.store_tablets(id) ON DELETE SET NULL;`,
   `ALTER TABLE ONLY public.store_capabilities
     ADD CONSTRAINT "FK_store_capability_org" FOREIGN KEY (organization_id) REFERENCES public.organizations(id) ON DELETE CASCADE;`,
   `ALTER TABLE ONLY public.store_local_products
@@ -6398,6 +6248,10 @@ END) STORED NOT NULL,
     ADD CONSTRAINT "FK_supplier_regulated_category_evidence_document" FOREIGN KEY (evidence_document_id) REFERENCES public.kyc_documents(id) ON DELETE SET NULL;`,
   `ALTER TABLE ONLY public.neture_supplier_regulated_categories
     ADD CONSTRAINT "FK_supplier_regulated_category_supplier" FOREIGN KEY (supplier_id) REFERENCES public.neture_suppliers(id) ON DELETE CASCADE;`,
+  `ALTER TABLE ONLY public.user_policy_acceptances
+    ADD CONSTRAINT "FK_user_policy_acceptances_policy_document" FOREIGN KEY (policy_document_id) REFERENCES public.service_policy_documents(id);`,
+  `ALTER TABLE ONLY public.user_policy_acceptances
+    ADD CONSTRAINT "FK_user_policy_acceptances_user" FOREIGN KEY (user_id) REFERENCES public.users(id);`,
   `ALTER TABLE ONLY public.catalog_import_jobs
     ADD CONSTRAINT catalog_import_jobs_supplier_id_fkey FOREIGN KEY (supplier_id) REFERENCES public.neture_suppliers(id) ON DELETE CASCADE;`,
   `ALTER TABLE ONLY public.catalog_import_rows
@@ -6502,8 +6356,6 @@ END) STORED NOT NULL,
     ADD CONSTRAINT media_entity_links_media_asset_id_fkey FOREIGN KEY (media_asset_id) REFERENCES public.media_assets(id) ON DELETE RESTRICT;`,
   `ALTER TABLE ONLY public.mobile_product_drafts
     ADD CONSTRAINT mobile_product_drafts_candidate_id_fkey FOREIGN KEY (candidate_id) REFERENCES public.product_candidates(id) ON DELETE SET NULL;`,
-  `ALTER TABLE ONLY public.neture_partner_dashboard_item_contents
-    ADD CONSTRAINT neture_partner_dashboard_item_contents_dashboard_item_id_fkey FOREIGN KEY (dashboard_item_id) REFERENCES public.neture_partner_dashboard_items(id) ON DELETE CASCADE;`,
   `ALTER TABLE ONLY public.neture_supplier_library_items
     ADD CONSTRAINT neture_supplier_library_items_supplier_id_fkey FOREIGN KEY (supplier_id) REFERENCES public.neture_suppliers(id) ON DELETE CASCADE;`,
   `ALTER TABLE ONLY public.offer_service_approvals

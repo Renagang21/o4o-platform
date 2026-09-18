@@ -35,7 +35,7 @@ describe('store-owner termination isolated PostgreSQL lifecycle',()=>{
 
   beforeAll(async()=>{
     const templates=await harness.buildTemplates();
-    db=await harness.createDatabase('store_term_int',templates.bootstrap_inc);
+    db=await harness.createDatabase('store_term_int',templates.bootstrap);
     ds=harness.dataSource(db);
     await ds.initialize();
   },120_000);
