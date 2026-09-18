@@ -143,12 +143,13 @@ export class PolicyAcceptanceService {
   async getPendingStoreOwnerAgreementsForUser(
     userId: string,
     serviceKey?: string,
+    q: Queryable = this.db(),
   ): Promise<PendingPolicyAcceptance[]> {
     if (!userId) return [];
     const now = Date.now();
     let cached = this.publishedAgreementCache.get(STORE_OWNER_AGREEMENT_DOCUMENT_TYPE);
     if (!cached || now - cached.at >= PUBLISHED_TTL_MS) {
-      const rows = (await this.db().query(PUBLISHED_TERMS_SQL, [STORE_OWNER_AGREEMENT_DOCUMENT_TYPE])) as PublishedRow[];
+      const rows = (await q.query(PUBLISHED_TERMS_SQL, [STORE_OWNER_AGREEMENT_DOCUMENT_TYPE])) as PublishedRow[];
       cached = { at: now, docs: rows.map(toPublished) };
       this.publishedAgreementCache.set(STORE_OWNER_AGREEMENT_DOCUMENT_TYPE, cached);
     }
@@ -156,7 +157,6 @@ export class PolicyAcceptanceService {
     if (serviceKey) published = published.filter((d) => d.serviceKey === serviceKey);
     if (published.length === 0) return [];
 
-    const q = this.db();
     const memberships = (await q.query(
       `SELECT service_key AS "serviceKey", status FROM service_memberships
        WHERE user_id = $1 AND status = 'active'`,
