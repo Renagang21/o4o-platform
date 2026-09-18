@@ -1,6 +1,6 @@
 # WO-O4O-PRODUCT-CANDIDATE-GENERAL-PROMOTION-CORE-FOUNDATION-V1
 
-> **상태:** DRAFT · HANDOFF ONLY · 구현 WO (등록일 2026-09-18 · 실행 착수는 별도 명시 지시)
+> **상태:** READY FOR EXECUTION · HANDOFF ONLY · 구현 WO (등록일 2026-09-18 · 보강 2026-09-18: P2 TX 경계 (a) 고정 · `identityKey` · effects 선언 · 실행 착수는 별도 명시 지시)
 > **기준 코드:** `origin/main` `89ef8f68b` 이후
 > **목적:** `ProductCandidate → ProductMaster / ProductIdentifier` 승격의 **소스 중립 공통 Core(Promotion Core)** 를 만들고, 기존 `store_web` 승격 경로 1개를 그 위로 옮겨 동작 보존을 증명한다
 > **선행:** [`IR-O4O-PRODUCT-CANDIDATE-GENERAL-PROMOTION-BOUNDARY-V1`](../investigations/IR-O4O-PRODUCT-CANDIDATE-GENERAL-PROMOTION-BOUNDARY-V1.md)(89ef8f68b) — 승격 경로 P1/P2/P3 전수 · dedup 3종 · 유형별 최소 필드 · 첫 WO 최소 경계(§7)
@@ -47,7 +47,8 @@ ProductMaster · ProductIdentifier · Candidate(matchedProductMasterId · 상태
 
 ## 1.3 원칙
 
-- **Core 는 제품군을 판단하지 않는다.** "의약품인가 · 허가가 유효한가 · 신고번호가 맞는가 · 이 자료를 믿을 수 있는가" 는 Adapter 책임이다. Core 는 Adapter 가 넘긴 `PromotionPlan` 을 **구조적으로만** 검증한다(최소 필드 · 영문 `regulatory_type` 코드 · Rx 차단 · 식별자 형식).
+- **Core 는 제품군의 적격성을 판단하지 않는다.** "의약품인가 · 허가가 유효한가 · 신고번호가 맞는가 · 이 자료를 믿을 수 있는가" 는 Adapter 책임이다. Core 는 Adapter 가 넘긴 `PromotionPlan` 을 **구조적으로만** 검증한다(최소 필드 · 영문 `regulatory_type` 코드 · Rx 차단 · 식별자 형식). 제품군에 따른 **생성 후 불변식**(예: DRUG 신규 Master 의 `ProductDrugExtension` 보장)은 Adapter 가 `effects` 로 **선언**하고 Core 가 **실행**한다 — Core 코드에 `if (regulatoryType === 'DRUG')` 류 분기를 두지 않는다(§2.1 #8).
+- **식별자는 두 부류다.** `identityKey=true` 인 식별자만 Master dedup/link/conflict 판정에 쓴다. `identityKey=false` 식별자(MFDS 코드 · 보험코드 · ATC · 공급자 자체 코드 · `UNKNOWN` 등 — 여러 포장단위 Master 가 같은 값을 가질 수 있는 것)는 대상 Master 에 멱등 추가만 하고, 다른 Master 에 같은 값이 있어도 conflict 를 내지 않는다.
 - **P1 을 파라미터화하지 않는다.** 결정 골격(port + 순수 결정 계층 + outcome + TX)만 빌리고 코드는 새로 둔다. P1 파일은 열지 않는다.
 - **기존 Master 연결 시 불변 필드를 수정하지 않는다.** 차이는 `existingMasterDiff` 로 report 만 한다.
 - `product_identifiers (type, normalized)` 는 **여러 Master 에 존재할 수 있는 현재 구조를 유지**한다. 전역 UNIQUE 를 만들지 않는다. 같은 Master 안의 멱등만 보장한다.
@@ -76,8 +77,13 @@ interface ProductPromotionPlan {
     specification: string | null;
     barcode: string | null;      // GTIN-like 일 때만 · 아니면 null(합성 금지)
   };
-  identifiers: Array<{ type: ProductIdentifierType; value: string; isPrimary: boolean; sourceType: string; sourceLabel: string | null; verificationStatus: string }>;
+  identifiers: Array<{
+    type: ProductIdentifierType; value: string; isPrimary: boolean;
+    identityKey: boolean;        // true = Master dedup/link/conflict 판정에 사용 · false = 대상 Master 에 멱등 추가만(타 Master 중복 허용 · conflict 아님)
+    sourceType: string; sourceLabel: string | null; verificationStatus: string;
+  }>;
   dedupHints: { nameManufacturerExact: boolean };   // 이름+제조사 정확일치 dedup 사용 여부(기본 true)
+  effects: { ensureDrugExtension: boolean };         // Adapter 가 선언하는 생성 후 불변식. Core 는 제품군을 보지 않고 이 플래그만 실행한다(확장 시 필드 추가 · Core 분기 추가 금지)
   reviewedBy: string | null;
   note: string | null;
   approvalMeta: Record<string, unknown>;             // candidate.raw_payload.approval 에 병합될 Adapter 고유 정보
@@ -96,18 +102,18 @@ type PromotionOutcome =
 |---|---|---|
 | 1 | Plan 구조 검증 → `hold` | IR §4 최소 필드 = 이름+제조사 · 영문 코드만 · DRUG 는 `drugCategory` 필수 · Rx 는 범용 승격 불가(baseline §10) |
 | 2 | candidate 상태 검증(`pending`/`reviewing` 만 · `matchedProductMasterId` 비어 있어야) → `hold` | P2 현행 |
-| 3 | dedup 3종을 **한 곳에서** 실행: ① `product_masters.barcode` 정확 ② `product_identifiers (identifier_type, normalized_value)` 정확 ③ `LOWER(TRIM(name))+LOWER(TRIM(manufacturer_name))` 정확(hint 가 true 일 때) | IR §3-1 · 유사도 매칭 금지 |
-| 4 | dedup 결과 판정: 0건 → `create` / 정확히 1 Master → `link` / 2 Master 이상 또는 identifier 가 다른 Master 소속 → `conflict` | P1 골격 |
+| 3 | dedup 3종을 **한 곳에서** 실행: ① `product_masters.barcode` 정확 ② `product_identifiers (identifier_type, normalized_value)` 정확 — **`identityKey=true` 인 식별자만** ③ `LOWER(TRIM(name))+LOWER(TRIM(manufacturer_name))` 정확(hint 가 true 일 때) | IR §3-1 · 유사도 매칭 금지 · `identityKey=false` 는 dedup 축이 아님 |
+| 4 | dedup 결과 판정: 0건 → `create` / 정확히 1 Master → `link` / 2 Master 이상 또는 `identityKey=true` identifier 가 다른 Master 소속 → `conflict` | P1 골격 |
 | 5 | `create`: `product_masters` INSERT(`is_mfds_verified=false` 명시 · `status='ACTIVE'` · `regulatory_name=name`) | P2 현행 |
 | 6 | `link`: 기존 Master 불변 · `existingMasterDiff` 계산만 | P1 `link` 의미 |
-| 7 | Identifier 멱등 생성: 대상 Master 에 (type, normalized) 가 이미 있으면 skip, 없으면 INSERT | P1 `ensureIdentifiers` |
-| 8 | `regulatoryType='DRUG'` 이고 `create` 이면 `ProductDrugExtensionService.ensureForProductMaster()` 호출 | IR §3-2 결함 보완 · 같은 TX 또는 커밋 직후(실행자 판단 · 실패 시 로그) |
+| 7 | Identifier 멱등 생성(`identityKey` 무관 · 전부): 대상 Master 에 (type, normalized) 가 이미 있으면 skip, 없으면 INSERT. `identityKey=false` 식별자가 다른 Master 에도 있는 것은 정상이며 검사하지 않는다 | P1 `ensureIdentifiers` · 전역 UNIQUE 없음 |
+| 8 | `plan.effects.ensureDrugExtension === true` 이고 `create` 이면 `ProductDrugExtensionService.ensureForProductMaster()` 호출. Core 는 `regulatoryType` 을 보고 이를 결정하지 않는다 — store_web Adapter 가 DRUG 일 때 `true` 로 선언한다 | IR §3-2 결함 보완 · Adapter-declared effect · 같은 TX 또는 커밋 직후(실행자 판단 · 실패 시 로그) |
 | 9 | candidate UPDATE: `matched_product_master_id` · `candidate_status`(`create`→`approved_new_master` / `link`→`matched`) · `reviewed_by/at` · `raw_payload.approval` 병합 | P2 현행 (P2 의 `linked` 는 §2.2 참조) |
 | 10 | 3~9 를 **하나의 `dataSource.transaction`** 안에서 · TX 안 barcode 재확인(동시 생성 방어) | P2 현행 |
 | 11 | 커밋 후 `ensureProductLandingForMaster()` best-effort (`create` 일 때만) | P2 현행 |
 | 12 | `conflict` · `hold` 는 **아무것도 쓰지 않는다** (candidate 상태 불변) | 안전 |
 
-**Core 가 하지 않는 것**: Offer 생성 · 매장 listing · 알림 · 권한 검사(`allowedServiceKeys`) · 제품군 정책 판단 · 유사도 매칭 · `raw_payload` 해석(Adapter 가 한다).
+**Core 가 하지 않는 것**: Offer 생성 · 매장 listing · 알림 · 권한 검사(`allowedServiceKeys`) · 제품군 적격성 판단 · `regulatoryType` 기반 분기(effects 는 Adapter 선언) · `identityKey=false` 식별자의 타 Master 중복 검사 · 유사도 매칭 · `raw_payload` 해석(Adapter 가 한다).
 
 **port**: read(`findMastersByBarcode` · `findMastersByIdentifier` · `findMastersByNameManufacturer` · `findIdentifiersOfMaster` · `loadCandidate`) / write(`createMaster` · `createIdentifier` · `updateCandidate`). DB 구현 1 + InMemory 구현 1(테스트).
 
@@ -120,7 +126,19 @@ type PromotionOutcome =
   - `hold` → 기존 에러 코드로 역매핑(`rx_not_promotable`→`RX_NEW_MASTER_BLOCKED` · `candidate_not_reviewable`→`STATUS_NOT_REVIEWABLE` · `candidate_already_linked`→`ALREADY_LINKED`). `name_missing`/`manufacturer_missing` 은 **현행이 `'(이름 미상)'`/`'미상'` 합성으로 통과시키던 구간** — 새 코드 `CANDIDATE_FIELD_MISSING` 로 400 반환. 이는 의도된 행동 변경이며 §7 보고에 명시한다.
 - `linkToExistingMaster()`: **이번 WO 접촉 안 함**(운영자가 masterId 를 명시하는 별도 액션 · 후속 ④ 에서 "검증된 Existing Master 연결 전용" 으로 함께 정리).
 - `findDuplicates()`: Core 의 dedup 조회(read port)를 재사용하도록 바꿔도 되고 두어도 된다. 응답 shape(`StoreRequestDuplicate[]`) 불변.
-- **TX 경계 결정**: listing 을 Core TX 안에 넣으려면 Core 가 "커밋 전 hook" 을 받아야 한다. 허용되는 두 안 — (a) Core 가 `EntityManager` 를 받는 `promoteWithin(m, plan)` + 외피 `promote(plan)` 두 진입점을 제공하고 P2 는 자기 TX 안에서 `promoteWithin` 을 부른다 (권장 · Master+listing 원자성 유지) / (b) Core TX 커밋 후 listing 별도 TX. (b) 를 고르면 Master 는 생기고 listing 은 실패하는 반쪽 상태가 가능하므로 §7 에 이유를 적는다.
+- **TX 경계 — (a) 로 고정. P2 에서 (b) 금지.** Core 는 두 진입점을 제공한다: `promoteWithin(m: EntityManager, plan)`(호출자 TX 안에서 실행 · 커밋하지 않음) + 외피 `promote(plan)`(자체 `dataSource.transaction` · 향후 Supplier 등 다른 호출자용). **P2 Adapter 는 반드시 `promoteWithin` 만 사용**한다:
+
+  ```text
+  P2 approveAsNewMaster()
+    ↓ dataSource.transaction(m)
+    ↓ core.promoteWithin(m, plan)
+    ↓ link / conflict → throw DUPLICATE_MASTER_EXISTS  (TX 롤백 → candidate 불변)
+    ↓ hold            → throw 매핑 에러코드            (TX 롤백)
+    ↓ create          → upsertOrganizationListing(m, …)
+    ↓ 전체 commit → 커밋 후 ensureProductLandingForMaster (best-effort)
+  ```
+
+  이유: ① Core 가 자체 TX 를 커밋해 candidate 를 `matched` 로 바꾼 뒤 Adapter 가 `DUPLICATE_MASTER_EXISTS` 를 던지면 "중복이라 실패" 응답과 "이미 연결됨" 상태가 동시에 남는다 ② `create` 커밋 후 listing 실패 = 현행 P2 의 Master+listing+candidate 원자성 파괴. Landing 발급(#11)은 P2 TX 커밋 후 P2 가 호출한다(현행 위치 유지).
 
 ## 2.3 허용되는 부수 작업
 
@@ -181,7 +199,7 @@ type PromotionOutcome =
 
 | 항목 | 방법 | PASS 기준 |
 |---|---|---|
-| Core 단위테스트 | jest · InMemory store | create/link/conflict/hold 각 1+ · identifier 멱등(같은 Master 2회 → 1건) · Rx→hold · DRUG create→extension 호출 1회 · 이름+제조사 hint off 시 dedup ③ 미실행 · conflict/hold 시 write 0 |
+| Core 단위테스트 | jest · InMemory store | create/link/conflict/hold 각 1+ · identifier 멱등(같은 Master 2회 → 1건) · Rx→hold · `effects.ensureDrugExtension=true`+create→extension 호출 1회 / `false` 면 0회(regulatoryType 이 DRUG 여도) · `identityKey=false` 식별자가 타 Master 에 있어도 create 진행+conflict 아님 · `identityKey=true` 동일 케이스는 conflict · 이름+제조사 hint off 시 dedup ③ 미실행 · conflict/hold 시 write 0 · `promoteWithin` 안에서 throw 시 호출자 TX 롤백으로 candidate 불변 |
 | P2 Adapter 매핑 | jest | Core 결과 → 기존 에러코드 · `identifierCreated` · `listingId` 매핑 |
 | P2 회귀 | `git diff` + controller 타입 | route · 응답 shape · 에러코드 집합 불변(추가 `CANDIDATE_FIELD_MISSING` 만) |
 | P1 무접촉 | `git diff --stat origin/main -- apps/api-server/src/modules/neture/drug-import` | 0 files |
@@ -203,7 +221,7 @@ WO 제목을 첫 줄에 두고 한국어로. 다음 항목을 **전부** 포함�
 
 1. Core 파일 목록 · public 계약(`ProductPromotionPlan` · `PromotionOutcome` · port) 최종 이름
 2. Core 가 **하지 않는 것** 목록이 §2.1 과 일치하는지 (달라졌으면 무엇이 왜)
-3. P2 치환 결과: 남은 코드 / Core 로 간 코드 / TX 경계 선택(§2.2 (a)·(b) 중 무엇 · 이유)
+3. P2 치환 결과: 남은 코드 / Core 로 간 코드 / P2 가 `promoteWithin` 만 사용함을 코드 위치로 증명(`promote()` 외피 호출 0)
 4. 행동 변경 목록 — 최소 `CANDIDATE_FIELD_MISSING` 도입(이름·제조사 합성 폐지) · 그 외 있으면 전부
 5. 테스트 결과: Core / Adapter / P1 4종 그대로 통과 여부 · 실행 명령 · 실패·건너뜀 있으면 원문
 6. P1 · P3 · `drug-import/**` 무접촉 증명(`git diff --stat`)
