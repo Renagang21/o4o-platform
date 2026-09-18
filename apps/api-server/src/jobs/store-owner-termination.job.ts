@@ -2,6 +2,7 @@ import logger from '../utils/logger.js';
 import { storeOwnerTerminationService } from '../services/store-owner-termination.service.js';
 
 const INTERVAL_MS = 60 * 60 * 1000;
+// 실삭제는 이 job의 책임이 아니다. admin mode=apply 경로만 destructive authority를 가진다.
 
 class StoreOwnerTerminationJob {
   private timer: NodeJS.Timeout | null = null;
