@@ -21,6 +21,14 @@ import type { Request, Response, NextFunction } from 'express';
 import type { DataSource } from 'typeorm';
 import type { AuthContext } from './auth-context.js';
 import { isStoreOwner, type StoreOwnerServiceKey } from '../utils/store-owner.utils.js';
+import { resolveCanonicalServiceKey } from '@o4o/security-core';
+import { policyAcceptanceService } from '../modules/policy-acceptance/policy-acceptance.service.js';
+import {
+  STORE_OWNER_AGREEMENT_REQUIRED_CODE,
+  STORE_OWNER_AGREEMENT_REQUIRED_MESSAGE,
+  STORE_OWNER_AGREEMENT_REQUIRED_STATUS,
+} from '../common/auth/store-owner-agreement.policy.js';
+import logger from '../utils/logger.js';
 
 /**
  * org 필수 미들웨어. user 없으면 401, org 없으면 403.
@@ -57,6 +65,26 @@ export function requireStoreAuth(dataSource: DataSource, serviceKey?: StoreOwner
         code: 'STORE_OWNER_REQUIRED',
       });
       return;
+    }
+
+    try {
+      const canonicalServiceKey = serviceKey ? resolveCanonicalServiceKey(serviceKey) : undefined;
+      const pending = await policyAcceptanceService.getPendingStoreOwnerAgreements(user.id, canonicalServiceKey);
+      if (pending.length > 0) {
+        res.status(STORE_OWNER_AGREEMENT_REQUIRED_STATUS).json({
+          success: false,
+          error: STORE_OWNER_AGREEMENT_REQUIRED_MESSAGE,
+          code: STORE_OWNER_AGREEMENT_REQUIRED_CODE,
+          pendingPolicyAcceptances: pending,
+        });
+        return;
+      }
+    } catch (error) {
+      logger.warn('[storeOwnerAgreement] requireStoreAuth pending check failed (fail-open)', {
+        userId: user.id,
+        serviceKey: serviceKey ?? null,
+        error: error instanceof Error ? error.message : String(error),
+      });
     }
 
     const authContext: AuthContext = {
