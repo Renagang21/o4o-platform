@@ -15,7 +15,8 @@
  *
  * Consumers: scripts/db/check-migration-contract.mjs (CI guard + manifest maintenance) and
  * scripts/db/__tests__/migration-identity.test.mjs. The runtime classifier never imports this
- * module — it reads the generated historical-migration-names.ts, which CI keeps in lockstep.
+ * module and consults no historical migration name: legacy production history is verified by the
+ * ordered history fingerprint (incremental/legacy-history-baseline.ts).
  */
 import ts from 'typescript';
 

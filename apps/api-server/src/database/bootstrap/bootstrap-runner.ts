@@ -114,7 +114,7 @@ export async function runCanonicalBootstrap(
     baseline_version: meta.baselineVersion,
     schema_fingerprint: fp.hash,
     fingerprint_line_count: fp.lineCount,
-    last_historical_migration: meta.lastHistoricalMigration,
+    supersedes_baseline_version: meta.supersedesBaselineVersion,
     bootstrap_tool_version: meta.bootstrapToolVersion,
   });
   log.info(`bootstrap marker written: o4o_schema_baselines(${meta.baselineVersion})`);

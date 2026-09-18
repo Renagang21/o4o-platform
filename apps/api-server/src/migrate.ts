@@ -19,7 +19,8 @@
  *      BOOTSTRAPPED /
  *      LEGACY_ESTABLISHED → bootstrap SKIPPED
  *      UNKNOWN_PARTIAL    → fail-fast (exit 1), no repair, no fallback
- *   3. HISTORICAL_REPLAY = ZERO   the 644 historical migrations are never loaded
+ *   3. HISTORICAL_REPLAY = ZERO   historical migration source files are never loaded; legacy
+ *      production history is verified by the ordered history fingerprint (LEGACY_HISTORY_FINGERPRINT)
  *   4. incremental migrations from src/database/incremental/manifest.ts only,
  *      each in its own transaction, recorded in typeorm_migrations
  *   5. POST_MIGRATION_SCHEMA_ASSERTION  re-fingerprint == expected final state, else FAILED
@@ -118,17 +119,20 @@ function logClassification(result: DatabaseStateResult): void {
   report('CLASSIFICATION', result.state);
   for (const r of result.reasons) log.info(`  reason: ${r}`);
   log.info(`  schemas: [${f.userSchemas.join(', ')}] · user objects: ${f.userObjectCount}`);
-  log.info(`  typeorm_migrations: ${f.historyTableExists ? `${f.historyRowCount} rows` : 'absent'} · anchors ${f.anchorsPresent.length}/${f.anchorsPresent.length + f.anchorsMissing.length}`);
+  log.info(`  typeorm_migrations: ${f.historyTableExists ? `${f.historyRowCount} rows` : 'absent'} · legacy history fingerprint ${f.legacyHistoryFingerprintMatch ? 'MATCH' : 'no match'}`);
   log.info(`  o4o_schema_baselines: ${f.markerTableExists ? f.markers.map((m) => `${m.baseline_version}@${m.schema_fingerprint.slice(0, 12)}`).join(', ') || 'empty' : 'absent'}`);
   log.info(`  baseline ${CANONICAL_SCHEMA_BASELINE_META.baselineVersion} fingerprint: ${CANONICAL_SCHEMA_BASELINE_META.expectedFingerprint}`);
   if (f.coreTablesMissing.length > 0) log.info(`  core tables missing: ${f.coreTablesMissing.join(', ')}`);
   if (f.incrementalHistoryProblems.length > 0) for (const p of f.incrementalHistoryProblems) log.info(`  history problem: ${p}`);
+  if (f.historyTableExists && !f.legacyHistoryFingerprintMatch) for (const p of f.legacyHistoryProblems) log.info(`  legacy history: ${p}`);
 
   report('CURRENT_INCREMENTAL_PREFIX', f.incrementalHistoryContiguous ? `${f.incrementalPrefixLength} / ${INCREMENTAL_MIGRATIONS.length}` : 'INVALID');
   report('EXPECTED_SCHEMA_STATE', expectedSchemaStateLabel(f.expectedSchemaState));
   report('EXPECTED_FINGERPRINT', f.expectedSchemaState ? `${f.expectedSchemaState.fingerprint} (${f.expectedSchemaState.fingerprintLineCount} lines)` : 'UNREGISTERED');
   report('LIVE_FINGERPRINT', f.liveFingerprint ? `${f.liveFingerprint} (${f.liveFingerprintLineCount} lines)` : 'NONE');
-  report('UNKNOWN_HISTORY_NAMES', f.historyNamesUnknown.length);
+  // MATCH: history starts with the legacy production prefix · NOT_APPLICABLE: no legacy prefix
+  // (fresh / bootstrapped database) · MISMATCH: history table present but the prefix does not reproduce
+  report('LEGACY_HISTORY_FINGERPRINT', f.legacyHistoryFingerprintMatch ? 'MATCH' : f.historyTableExists && !f.markerTableExists ? 'MISMATCH' : 'NOT_APPLICABLE');
   const preAssertion = result.state === 'FRESH_EMPTY' ? 'NOT_APPLICABLE' : f.fingerprintMatch === true ? 'PASS' : 'FAILED';
   report('PRE_MIGRATION_SCHEMA_ASSERTION', preAssertion);
 }
@@ -165,7 +169,7 @@ async function runMigrationJob(): Promise<void> {
     dataSource = createMigrationDataSource();
     await dataSource.initialize();
     log.info('Database connection: SUCCESS');
-    log.info(`Incremental manifest: ${INCREMENTAL_MIGRATIONS.length} migration(s) after cutoff ${INCREMENTAL_MIGRATION_CUTOFF.lastHistoricalMigration} · expected schema states: ${EXPECTED_SCHEMA_STATES.length}`);
+    log.info(`Incremental manifest: ${INCREMENTAL_MIGRATIONS.length} migration(s) after baseline ${INCREMENTAL_MIGRATION_CUTOFF.baselineVersion} · expected schema states: ${EXPECTED_SCHEMA_STATES.length}`);
 
     // Step 2: classify (+ bootstrap) inside ONE transaction
     log.info('Step 2: Classifying database state...');

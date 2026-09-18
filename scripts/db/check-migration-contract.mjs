@@ -13,6 +13,10 @@
  *
  *   - migration identity (class · declared `name` · runtime name) is taken from the TypeScript AST
  *     (scripts/db/migration-identity.mjs) — never from a repository-wide regex
+ *   - historical source files are NOT runtime provenance: legacy production history is verified by
+ *     the ordered history fingerprint (incremental/legacy-history-baseline.ts); the repository keeps
+ *     no plaintext list of legacy migration names
+ *     (WO-O4O-RETIRED-SERVICE-MIGRATION-HISTORY-SQUASH-AND-BASELINE-FINAL-CLOSURE-V1)
  *
  * Usage:
  *   node scripts/db/check-migration-contract.mjs                 check (exit 1 on violation)
@@ -21,8 +25,14 @@
  *       identity fields differ from the JSON manifest (exit 1 when any differ). Writes nothing.
  *   node scripts/db/check-migration-contract.mjs --write-historical --maintenance
  *       explicit maintenance mode (WO only, refused when CI is set): corrects identity fields of
- *       EXISTING historical entries only — never adds, removes or absorbs an incremental migration —
- *       and regenerates historical-migration-names.ts.
+ *       EXISTING historical entries only — never adds, removes or absorbs an incremental migration.
+ *   node scripts/db/check-migration-contract.mjs --write-historical --maintenance --baseline-rollover
+ *       baseline rollover mode (WO only, refused when CI is set): the ONLY mode in which the
+ *       historical set may shrink. Removed source files are accepted only when the new baseline
+ *       meta / cutoff / expected states are consistent, no runtime module imports a removed file,
+ *       a well-formed legacy history baseline covers the deleted runtime identities, and the
+ *       contract checks that follow all pass. Files are never added here (register new
+ *       migrations in incremental/manifest.ts).
  */
 import { readFileSync, readdirSync, existsSync, writeFileSync } from 'node:fs';
 import { resolve, join } from 'node:path';
@@ -35,9 +45,12 @@ const MIGRATIONS_DIR = join(API, 'src', 'database', 'migrations');
 const INCREMENTAL_MANIFEST = join(API, 'src', 'database', 'incremental', 'manifest.ts');
 const HISTORICAL_MANIFEST = join(API, 'src', 'database', 'incremental', 'historical-migrations.manifest.json');
 const BOOTSTRAP_DIR = join(API, 'src', 'database', 'bootstrap');
-const HISTORICAL_NAMES_TS = join(API, 'src', 'database', 'incremental', 'historical-migration-names.ts');
-const EXPECTED_STATES_TS = join(API, 'src', 'database', 'incremental', 'expected-schema-states.ts');
-const LEGACY_FACTS_TS = join(API, 'src', 'database', 'incremental', 'legacy-history.facts.ts');
+const INCREMENTAL_DIR = join(API, 'src', 'database', 'incremental');
+const EXPECTED_STATES_TS = join(INCREMENTAL_DIR, 'expected-schema-states.ts');
+const LEGACY_BASELINE_TS = join(INCREMENTAL_DIR, 'legacy-history-baseline.ts');
+const LEGACY_FINGERPRINT_TS = join(BOOTSTRAP_DIR, 'legacy-history-fingerprint.ts');
+/** Plaintext legacy-history-name modules retired by the 2026-09-18-id685 rollover; they must never come back. */
+const FORBIDDEN_PLAINTEXT_HISTORY_FILES = ['historical-migration-names.ts', 'legacy-history.facts.ts'];
 
 const read = (p) => readFileSync(p, 'utf8').replace(/\r\n/g, '\n');
 const stripComments = (s) => s.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
@@ -65,80 +78,107 @@ function tryParseMigrationFile(id, file) {
 
 const files = readdirSync(MIGRATIONS_DIR).filter((f) => f.endsWith('.ts')).sort();
 
-/** Historical names exactly as TypeORM recorded them: the runtime name of every frozen entry, manifest order. */
-function historicalNamesFromEntries(entries) {
-  const out = [];
-  const seen = new Set();
-  for (const e of entries) if (e.name && !seen.has(e.name)) { seen.add(e.name); out.push(e.name); }
+const walkSrc = (dir, out = []) => {
+  for (const e of readdirSync(dir, { withFileTypes: true })) {
+    const p = join(dir, e.name);
+    if (e.isDirectory()) { if (e.name !== '__tests__' && e.name !== 'migrations') walkSrc(p, out); }
+    else if (/\.(ts|mts|cts|js|mjs)$/.test(e.name) && !/\.(spec|test)\./.test(e.name)) out.push(p);
+  }
   return out;
+};
+/** Runtime (non-test) modules that import a given migration file basename. */
+function runtimeImportersOf(migrationFile) {
+  const base = migrationFile.replace(/\.ts$/, '');
+  return walkSrc(join(API, 'src')).filter((p) => stripComments(read(p)).includes(`/migrations/${base}`)).map((p) => p.replace(REPO, ''));
 }
-function renderHistoricalNamesTs(names, entryCount) {
-  return `/**
- * Historical migration names — GENERATED, do not edit by hand.
- * (WO-O4O-DATABASE-STATE-CLASSIFIER-SCHEMA-DRIFT-AND-CONNECTION-LOG-HARDENING-V1)
- *
- * Source: historical-migrations.manifest.json (${entryCount} frozen entries). One name per entry: the
- * TypeORM runtime name (\`declaredName ?? className\`), taken from the migration AST by
- * scripts/db/migration-identity.mjs — exactly the identifier recorded in typeorm_migrations.
- *
- * Used ONLY by the database state classifier to validate LEGACY_ESTABLISHED history names.
- * Never loaded as migrations, never replayed, never bulk-inserted.
- *
- * Regenerate: node scripts/db/check-migration-contract.mjs --write-historical
- * CI guard C21 fails when this file and the JSON manifest disagree.
- */
-
-export const HISTORICAL_MIGRATION_NAMES: readonly string[] = [
-${names.map((n) => `  '${n}',`).join('\n')}
-] as const;
-`;
+function parseLegacyBaseline() {
+  if (!existsSync(LEGACY_BASELINE_TS)) return null;
+  const src = stripComments(read(LEGACY_BASELINE_TS));
+  const num = (k) => Number(new RegExp(`${k}\\s*:\\s*(\\d+)`).exec(src)?.[1]);
+  return {
+    rowCount: num('rowCount'),
+    distinctNameCount: num('distinctNameCount'),
+    sha256: /orderedNameSequenceSha256\s*:\s*'([0-9a-f]{64})'/.exec(src)?.[1] ?? null,
+    capturedThroughId: num('capturedThroughId'),
+    capturedAt: /capturedAt\s*:\s*'(\d{4}-\d{2}-\d{2})'/.exec(src)?.[1] ?? null,
+    plaintextNames: [...src.matchAll(/'([A-Z][A-Za-z0-9_]*\d{13,14})'/g)].map((m) => m[1]),
+  };
 }
-
 
 // ---- --write-historical (verify-only by default; --maintenance corrects existing entries only)
+let writeHistoricalContinued = false;
 if (process.argv.includes('--write-historical')) {
   const maintenance = process.argv.includes('--maintenance');
+  const rollover = process.argv.includes('--baseline-rollover');
   if (maintenance && process.env.CI) { console.error('refused: --maintenance never runs in CI'); process.exit(1); }
+  if (rollover && !maintenance) { console.error('refused: --baseline-rollover requires --maintenance (explicit WO)'); process.exit(1); }
   if (!existsSync(HISTORICAL_MANIFEST)) { console.error('historical-migrations.manifest.json missing — it is created only under an explicit WO, not regenerated here'); process.exit(1); }
   const current = JSON.parse(read(HISTORICAL_MANIFEST));
-  const incrementalFilesNow = new Set([...stripComments(read(INCREMENTAL_MANIFEST)).matchAll(/from\s+['"]\.\.\/migrations\/([^'"]+?)(?:\.js)?['"]/g)].map((m) => `${m[1]}.ts`));
+  const manifestNow = stripComments(read(INCREMENTAL_MANIFEST));
+  const incrementalFilesNow = new Set([...manifestNow.matchAll(/from\s+['"]\.\.\/migrations\/([^'"]+?)(?:\.js)?['"]/g)].map((m) => `${m[1]}.ts`));
   const currentFiles = new Set(current.entries.map((e) => e.file));
   const added = files.filter((f) => !currentFiles.has(f) && !incrementalFilesNow.has(f));
   const removed = [...currentFiles].filter((f) => !files.includes(f));
   const absorbed = [...currentFiles].filter((f) => incrementalFilesNow.has(f));
-  if (added.length || removed.length || absorbed.length) {
+  if (added.length || absorbed.length || (removed.length && !rollover)) {
     console.error(`refused: the historical set itself must not change here (new unregistered ${added.length}, missing ${removed.length}, incremental∩historical ${absorbed.length})`);
     for (const f of added) console.error(`  unregistered migration file (register it in incremental/manifest.ts): ${f}`);
-    for (const f of removed) console.error(`  historical file missing: ${f}`);
+    for (const f of removed) console.error(`  historical file missing${rollover ? '' : ' (only --maintenance --baseline-rollover may drop historical sources)'}: ${f}`);
     for (const f of absorbed) console.error(`  historical AND incremental: ${f}`);
     process.exit(1);
   }
+  if (rollover) {
+    // ---- baseline rollover gate: historical sources may be dropped only behind a consistent new baseline
+    const gate = [];
+    const metaNow = read(join(BOOTSTRAP_DIR, 'canonical-schema-baseline.meta.ts'));
+    const metaVersion = /baselineVersion\s*:\s*'([^']+)'/.exec(metaNow)?.[1];
+    const metaSupersedes = /supersedesBaselineVersion\s*:\s*'([^']+)'/.exec(metaNow)?.[1];
+    const cutoffVersion = /baselineVersion\s*:\s*'([^']+)'/.exec(manifestNow)?.[1];
+    if (!metaVersion || !/^\d{4}-\d{2}-\d{2}-id\d+$/.test(metaVersion)) gate.push('new baseline meta: baselineVersion missing or not YYYY-MM-DD-id<N>');
+    if (!metaSupersedes || metaSupersedes === metaVersion) gate.push('new baseline meta: supersedesBaselineVersion missing or equal to baselineVersion (no rollover happened)');
+    if (metaVersion !== cutoffVersion) gate.push(`incremental cutoff baselineVersion '${cutoffVersion}' != meta '${metaVersion}'`);
+    const listedNow = (/INCREMENTAL_MIGRATIONS\s*:\s*readonly\s+MigrationClass\[\]\s*=\s*\[([\s\S]*?)\];/.exec(manifestNow)?.[1] ?? '').split(',').map((x) => x.trim()).filter(Boolean);
+    if (listedNow.length !== incrementalFilesNow.size) gate.push('incremental manifest: listed classes != imported files');
+    const statesNow = ((/EXPECTED_SCHEMA_STATES\s*:\s*readonly\s+ExpectedSchemaState\[\]\s*=\s*\[([\s\S]*?)\]\s*as const;/.exec(stripComments(read(EXPECTED_STATES_TS)))?.[1] ?? '').match(/appliedThrough\s*:/g) || []).length;
+    if (statesNow !== listedNow.length + 1) gate.push(`expected schema states ${statesNow} != incremental ${listedNow.length} + 1`);
+    const lb = parseLegacyBaseline();
+    if (!lb || !lb.sha256 || !(lb.rowCount > 0) || !(lb.distinctNameCount > 0) || lb.distinctNameCount > lb.rowCount || !(lb.capturedThroughId >= lb.rowCount) || !lb.capturedAt) gate.push('legacy history baseline missing or malformed (rowCount / distinctNameCount / 64-hex sha256 / capturedThroughId / capturedAt)');
+    if (lb && lb.plaintextNames.length) gate.push(`legacy history baseline carries ${lb.plaintextNames.length} plaintext migration name(s)`);
+    for (const f of removed) {
+      const importers = runtimeImportersOf(f);
+      if (importers.length) gate.push(`removed historical source ${f} is still imported by runtime module(s): ${importers.join(', ')}`);
+    }
+    const removedIdentities = removed.map((f) => current.entries.find((e) => e.file === f)?.name).filter(Boolean);
+    console.log(`baseline rollover ${metaSupersedes ?? '?'} -> ${metaVersion ?? '?'}: dropping ${removed.length} historical source(s) / ${removedIdentities.length} runtime identities, covered by legacy history fingerprint (${lb?.rowCount ?? '?'} rows, ${lb?.sha256?.slice(0, 12) ?? '?'}…)`);
+    if (gate.length) {
+      console.error('refused: baseline rollover gate failed');
+      for (const g of gate) console.error(`  ${g}`);
+      process.exit(1);
+    }
+  }
   const FIELDS = ['className', 'declaredName', 'name'];
   const corrected = [];
-  const entries = current.entries.map((e) => {
+  const retainedEntries = current.entries.filter((e) => files.includes(e.file));
+  const entries = retainedEntries.map((e) => {
     const p = parseMigrationFile(e.file); // throws on dynamic / ambiguous identity — never guessed
     const diffs = FIELDS.filter((k) => (e[k] ?? null) !== p[k]);
     if (diffs.length) corrected.push({ file: e.file, diffs: diffs.map((k) => `${k}: ${JSON.stringify(e[k] ?? null)} -> ${JSON.stringify(p[k])}`) });
     return { file: e.file, className: p.className, declaredName: p.declaredName, name: p.name };
   });
   for (const c of corrected) console.log(`${maintenance ? 'correct' : 'would correct'} ${c.file}\n    ${c.diffs.join('\n    ')}`);
-  const names = historicalNamesFromEntries(entries);
-  const namesTs = renderHistoricalNamesTs(names, entries.length);
-  const namesDiffer = !existsSync(HISTORICAL_NAMES_TS) || read(HISTORICAL_NAMES_TS) !== namesTs;
-  console.log(`historical entries ${entries.length} · identity corrections ${corrected.length} · historical-migration-names.ts ${namesDiffer ? 'DIFFERS' : 'in lockstep'}`);
+  console.log(`historical entries ${entries.length} · identity corrections ${corrected.length} · removed ${removed.length}`);
   if (!maintenance) {
-    if (corrected.length || namesDiffer) { console.error('verify-only: nothing written (re-run with --maintenance under an explicit WO)'); process.exit(1); }
+    if (corrected.length) { console.error('verify-only: nothing written (re-run with --maintenance under an explicit WO)'); process.exit(1); }
     process.exit(0);
   }
   writeFileSync(HISTORICAL_MANIFEST, JSON.stringify({
-    $comment: 'GENERATED by scripts/db/check-migration-contract.mjs --write-historical --maintenance (identity from the TypeScript AST, scripts/db/migration-identity.mjs). Historical migrations before the canonical baseline cutoff: never replayed, never bulk-inserted, never renamed. `name` = TypeORM runtime name (declaredName ?? className). Entries are only ever corrected, never added/removed, under an explicit WO.',
+    $comment: 'GENERATED by scripts/db/check-migration-contract.mjs --write-historical --maintenance (identity from the TypeScript AST, scripts/db/migration-identity.mjs). Identity freeze of the RETAINED historical migration source files only: never replayed, never bulk-inserted, never renamed, never runtime provenance (legacy production history is verified by the ordered history fingerprint in legacy-history-baseline.ts). Entries are only ever corrected under an explicit WO; the set shrinks only through --baseline-rollover.',
     count: entries.length,
     entries,
   }, null, 2) + '\n');
   console.log(`wrote ${HISTORICAL_MANIFEST} (${entries.length} entries)`);
-  writeFileSync(HISTORICAL_NAMES_TS, namesTs);
-  console.log(`wrote ${HISTORICAL_NAMES_TS} (${names.length} names)`);
-  process.exit(0);
+  // maintenance writes are only complete when the contract below passes on the written state
+  writeHistoricalContinued = true;
 }
 
 // ---- C01 historical manifest exists and is well-formed
@@ -172,11 +212,11 @@ const imports = [...manifestSrc.matchAll(/import\s+\{\s*([A-Za-z0-9_]+)\s*\}\s+f
 const arrayMatch = /INCREMENTAL_MIGRATIONS\s*:\s*readonly\s+MigrationClass\[\]\s*=\s*\[([\s\S]*?)\];/.exec(manifestSrc);
 if (!arrayMatch) fail('C03', 'INCREMENTAL_MIGRATIONS array not found in manifest.ts');
 const listed = arrayMatch ? arrayMatch[1].split(',').map((s) => s.trim()).filter(Boolean) : [];
-const cutoffKey = Number(/lastHistoricalSortKey\s*:\s*(\d+)/.exec(manifestSrc)?.[1]);
 const minEpoch = Number(/minimumEpoch13\s*:\s*(\d+)/.exec(manifestSrc)?.[1]);
 const manifestBaseline = /baselineVersion\s*:\s*'([^']+)'/.exec(manifestSrc)?.[1];
-const manifestLast = /lastHistoricalMigration\s*:\s*'([^']+)'/.exec(manifestSrc)?.[1];
-if (arrayMatch && Number.isFinite(cutoffKey) && Number.isFinite(minEpoch)) pass('C03', `incremental manifest parsed: ${listed.length} listed, ${imports.length} imported`);
+if (!Number.isFinite(minEpoch) || String(minEpoch).length !== 13) fail('C03', 'INCREMENTAL_MIGRATION_CUTOFF.minimumEpoch13 missing or not 13 digits');
+if (!manifestBaseline) fail('C03', 'INCREMENTAL_MIGRATION_CUTOFF.baselineVersion missing');
+if (arrayMatch && Number.isFinite(minEpoch) && manifestBaseline) pass('C03', `incremental manifest parsed: ${listed.length} listed, ${imports.length} imported, cutoff ${manifestBaseline}`);
 
 // ---- C04 array entries == imports, same order, no duplicates
 const importedNames = imports.map((i) => i.className);
@@ -198,7 +238,6 @@ for (const inc of imports) {
   if (p.className !== inc.className) fail('C06', `${inc.file}: imported '${inc.className}' != class '${p.className}'`);
   if (p.name !== p.className) fail('C07', `${inc.file}: name '${p.name}' must equal class '${p.className}'`);
   if (epoch < minEpoch) fail('C08', `${inc.file}: epoch ${epoch} < minimumEpoch13 ${minEpoch}`);
-  if (epoch <= cutoffKey) fail('C08', `${inc.file}: epoch ${epoch} sorts before the historical cutoff key ${cutoffKey}`);
   if (epoch <= prevEpoch) fail('C09', `${inc.file}: epoch ${epoch} not strictly greater than previous ${prevEpoch}`);
   prevEpoch = epoch;
   if (historicalByFile.has(inc.file)) fail('C10', `${inc.file} is historical AND incremental`);
@@ -215,16 +254,17 @@ else pass('C10', `all ${files.length} migration files are historical (${historic
 // ---- C11 meta ↔ manifest cutoff agreement; last historical is the last manifest entry
 const metaSrc = read(join(BOOTSTRAP_DIR, 'canonical-schema-baseline.meta.ts'));
 const metaBaseline = /baselineVersion\s*:\s*'([^']+)'/.exec(metaSrc)?.[1];
-const metaLast = /lastHistoricalMigration\s*:\s*'([^']+)'/.exec(metaSrc)?.[1];
+const metaSupersedes = /supersedesBaselineVersion\s*:\s*'([^']+)'/.exec(metaSrc)?.[1];
 const metaFp = /expectedFingerprint\s*:\s*'([0-9a-f]{64})'/.exec(metaSrc)?.[1];
-const metaHistCount = Number(/historicalMigrationFileCount\s*:\s*(\d+)/.exec(metaSrc)?.[1]);
-if (metaBaseline !== manifestBaseline) fail('C11', `baselineVersion meta '${metaBaseline}' != manifest '${manifestBaseline}'`);
-if (metaLast !== manifestLast) fail('C11', `lastHistoricalMigration meta '${metaLast}' != manifest '${manifestLast}'`);
-const histNames = new Set(historical.entries.map((e) => e.name));
-if (!histNames.has(metaLast)) fail('C11', `meta lastHistoricalMigration '${metaLast}' is not a historical entry`);
-if (metaHistCount !== historical.entries.length) fail('C11', `meta historicalMigrationFileCount ${metaHistCount} != ${historical.entries.length}`);
-if (!metaFp) fail('C11', 'expectedFingerprint is not a 64-hex sha256');
-if (metaBaseline === manifestBaseline && metaLast === manifestLast && histNames.has(metaLast) && metaFp) pass('C11', `cutoff ${metaBaseline} / ${metaLast} consistent`);
+const metaAbsorbed = Number(/absorbedIncrementalMigrationCount\s*:\s*(\d+)/.exec(metaSrc)?.[1]);
+let c11ok = true;
+if (!metaBaseline || !/^\d{4}-\d{2}-\d{2}-id\d+$/.test(metaBaseline)) { fail('C11', `meta baselineVersion '${metaBaseline}' is not YYYY-MM-DD-id<N>`); c11ok = false; }
+if (metaBaseline !== manifestBaseline) { fail('C11', `baselineVersion meta '${metaBaseline}' != manifest cutoff '${manifestBaseline}'`); c11ok = false; }
+if (!metaSupersedes || metaSupersedes === metaBaseline) { fail('C11', 'meta supersedesBaselineVersion missing or equal to baselineVersion'); c11ok = false; }
+if (!Number.isInteger(metaAbsorbed) || metaAbsorbed < 0) { fail('C11', 'meta absorbedIncrementalMigrationCount missing'); c11ok = false; }
+if (/lastHistoricalMigration|historicalMigrationFileCount|LEGACY_HISTORY_ANCHORS/.test(stripComments(metaSrc))) { fail('C11', 'meta still carries historical-name cutoff fields (lastHistoricalMigration / historicalMigrationFileCount / LEGACY_HISTORY_ANCHORS)'); c11ok = false; }
+if (!metaFp) { fail('C11', 'expectedFingerprint is not a 64-hex sha256'); c11ok = false; }
+if (c11ok) pass('C11', `baseline ${metaBaseline} (supersedes ${metaSupersedes}, absorbed ${metaAbsorbed}) == incremental cutoff`);
 
 // ---- C12 canonical baseline snapshot: schema only
 const baselineSrc = read(join(BOOTSTRAP_DIR, 'canonical-schema-baseline.ts'));
@@ -258,6 +298,7 @@ const retired = [
   /\bcms_acf_/, /\bcms_cpt_/, /\bcms_menus\b/, /\bcms_menu_items\b/, /\bcms_menu_locations\b/, /\bcms_settings\b/,
   /\bcms_templates\b/, /\bcms_template_parts\b/, /\bcms_views\b/, /\bcms_pages\b/, /\bcms_fields\b/,
   /\bcustom_fields\b/, /\bcustom_media\b/, /\bcustom_post_types\b/, /\bcustom_posts\b/,
+  /\bneture_partner/, /\bneture_partnership_/, /\bneture_seller_partner_contracts\b/, /CREATE TABLE public\.partner_/, /\bsupplier_partner_commissions\b/,
 ];
 const resurrected = retired.filter((re) => re.test(stmtBody)).map(String);
 if (resurrected.length > 0) fail('C13', `snapshot resurrects retired objects: ${resurrected.join(', ')}`);
@@ -296,6 +337,7 @@ const need = [
   [/'BOOTSTRAP_EXECUTION'/, 'reports BOOTSTRAP_EXECUTION'],
   [/'HISTORICAL_REPLAY',\s*'ZERO'/, 'reports HISTORICAL_REPLAY = ZERO'],
   [/'INCREMENTAL_PENDING'/, 'reports INCREMENTAL_PENDING'],
+  [/'LEGACY_HISTORY_FINGERPRINT'/, 'reports LEGACY_HISTORY_FINGERPRINT'],
   [/'MIGRATION_JOB'/, 'reports MIGRATION_JOB'],
 ];
 for (const [re, label] of need) if (!re.test(migrateSrc)) { fail('C15', `migrate.ts: missing ${label}`); c15ok = false; }
@@ -371,11 +413,40 @@ if (existsSync(routesDir)) {
 }
 if (c20ok) pass('C20', 'no standalone runner, no HTTP bootstrap/migration route');
 
-// ---- C21 historical-migration-names.ts == names derived from the frozen JSON manifest
-const expectedNamesTs = renderHistoricalNamesTs(historicalNamesFromEntries(historical.entries), historical.entries.length);
-if (!existsSync(HISTORICAL_NAMES_TS)) fail('C21', 'historical-migration-names.ts missing (run --write-historical)');
-else if (read(HISTORICAL_NAMES_TS) !== expectedNamesTs) fail('C21', 'historical-migration-names.ts differs from the JSON manifest (run --write-historical under an explicit WO)');
-else pass('C21', `historical-migration-names.ts in lockstep with the JSON manifest (${historicalNamesFromEntries(historical.entries).length} names)`);
+// ---- C21 legacy history provenance = ordered history fingerprint; no plaintext legacy names anywhere
+{
+  let c21ok = true;
+  const lb = parseLegacyBaseline();
+  if (!lb) { fail('C21', 'legacy-history-baseline.ts missing'); c21ok = false; }
+  else {
+    if (!lb.sha256) { fail('C21', 'legacy baseline orderedNameSequenceSha256 is not a 64-hex sha256'); c21ok = false; }
+    if (!(lb.rowCount > 0) || !(lb.distinctNameCount > 0) || lb.distinctNameCount > lb.rowCount) { fail('C21', `legacy baseline counts malformed (rowCount ${lb.rowCount}, distinct ${lb.distinctNameCount})`); c21ok = false; }
+    if (!(lb.capturedThroughId >= lb.rowCount)) { fail('C21', `legacy baseline capturedThroughId ${lb.capturedThroughId} < rowCount ${lb.rowCount}`); c21ok = false; }
+    if (!lb.capturedAt) { fail('C21', 'legacy baseline capturedAt missing (YYYY-MM-DD)'); c21ok = false; }
+    if (lb.plaintextNames.length) { fail('C21', `legacy baseline carries plaintext migration name(s): ${lb.plaintextNames.slice(0, 3).join(', ')}`); c21ok = false; }
+  }
+  for (const f of FORBIDDEN_PLAINTEXT_HISTORY_FILES) {
+    if (existsSync(join(INCREMENTAL_DIR, f))) { fail('C21', `plaintext legacy history module resurrected: incremental/${f}`); c21ok = false; }
+  }
+  const incrementalFiles = readdirSync(INCREMENTAL_DIR).sort();
+  const allowedIncrementalFiles = ['expected-schema-states.ts', 'historical-migrations.manifest.json', 'legacy-history-baseline.ts', 'manifest.ts'];
+  for (const f of incrementalFiles) if (!allowedIncrementalFiles.includes(f)) { fail('C21', `unexpected file in incremental/: ${f} (no plaintext history lists)`); c21ok = false; }
+  if (!existsSync(LEGACY_FINGERPRINT_TS)) { fail('C21', 'bootstrap/legacy-history-fingerprint.ts missing'); c21ok = false; }
+  else {
+    const fpSrc = stripComments(read(LEGACY_FINGERPRINT_TS));
+    if (!/export function hashOrderedHistoryNames\(/.test(fpSrc) || !/export function verifyLegacyHistoryPrefix\(/.test(fpSrc)) { fail('C21', 'legacy-history-fingerprint.ts must export hashOrderedHistoryNames and verifyLegacyHistoryPrefix'); c21ok = false; }
+    if (!/createHash\('sha256'\)/.test(fpSrc) || !/`\$\{n\}\\n`/.test(fpSrc)) { fail('C21', "hash rule must be sha256 over name + '\\n' per row"); c21ok = false; }
+  }
+  // ONE hash implementation: no other runtime module hashes history names
+  for (const p of walkSrc(join(API, 'src'))) {
+    if (p === LEGACY_FINGERPRINT_TS) continue;
+    const src = stripComments(read(p));
+    if (/hashOrderedHistoryNames|verifyLegacyHistoryPrefix/.test(src) && !/from\s+['"][^'"]*legacy-history-fingerprint\.js['"]/.test(src)) { fail('C21', `${p.replace(REPO, '')} re-implements the history hash instead of importing legacy-history-fingerprint.ts`); c21ok = false; }
+    if (/historical-migration-names|legacy-history\.facts|HISTORICAL_MIGRATION_NAMES|LEGACY_HISTORY_RETIRED_NAMES|LEGACY_HISTORY_KNOWN_DUPLICATES|LEGACY_HISTORY_ANCHORS|validateLegacyHistoryNames/.test(src)) { fail('C21', `${p.replace(REPO, '')} references a retired plaintext-history symbol`); c21ok = false; }
+  }
+  if (!/verifyLegacyHistoryPrefix\(/.test(stateSrc) || !/LEGACY_HISTORY_BASELINE/.test(stateSrc)) { fail('C21', 'database-state.ts must verify the legacy prefix with verifyLegacyHistoryPrefix(LEGACY_HISTORY_BASELINE)'); c21ok = false; }
+  if (c21ok) pass('C21', `legacy history provenance = ordered fingerprint (${lb.rowCount} rows, ${lb.distinctNameCount} distinct, captured ${lb.capturedAt}); no plaintext legacy names; one hash implementation`);
+}
 
 // ---- C22 expected schema states: one per reachable state, in manifest order, well-formed
 const statesSrc = stripComments(read(EXPECTED_STATES_TS));
@@ -398,21 +469,16 @@ const stateFps = stateEntries.slice(1).map((e) => e.fingerprint);
 if (stateFps.length !== new Set(stateFps).size) { fail('C22', 'duplicate fingerprint in EXPECTED_SCHEMA_STATES'); c22ok = false; }
 if (c22ok) pass('C22', `EXPECTED_SCHEMA_STATES: baseline + ${stateEntries.length - 1} incremental state(s) in manifest order`);
 
-// ---- C23 legacy history facts: retired names are not historical/incremental and have no file
-const factsSrc = stripComments(read(LEGACY_FACTS_TS));
-const factList = (id) => [...(new RegExp(`${id}\\s*:\\s*readonly\\s+string\\[\\]\\s*=\\s*\\[([\\s\\S]*?)\\]`).exec(factsSrc)?.[1] ?? '').matchAll(/'([A-Za-z0-9_]+)'/g)].map((m) => m[1]);
-const retiredNames = factList('LEGACY_HISTORY_RETIRED_NAMES');
-const knownDup = factList('LEGACY_HISTORY_KNOWN_DUPLICATES');
-const allHistoricalNames = new Set(historicalNamesFromEntries(historical.entries));
-let c23ok = true;
-if (retiredNames.length !== new Set(retiredNames).size) { fail('C23', 'duplicate name in LEGACY_HISTORY_RETIRED_NAMES'); c23ok = false; }
-for (const n of retiredNames) {
-  if (allHistoricalNames.has(n)) { fail('C23', `retired name '${n}' is also a historical manifest name`); c23ok = false; }
-  if (listed.includes(n)) { fail('C23', `retired name '${n}' is an incremental migration`); c23ok = false; }
-  if (files.some((f) => stripComments(read(join(MIGRATIONS_DIR, f))).includes(`class ${n}`))) { fail('C23', `retired name '${n}' still has a migration file`); c23ok = false; }
+// ---- C23 historical manifest = identity freeze of RETAINED source files only; no migration source resurrects a retired object
+{
+  let c23ok = true;
+  const retainedSet = new Set(files);
+  const stale = historical.entries.filter((e) => !retainedSet.has(e.file)).map((e) => e.file);
+  if (stale.length) { fail('C23', `historical manifest lists ${stale.length} file(s) that no longer exist (run --write-historical --maintenance --baseline-rollover under an explicit WO): ${stale.slice(0, 3).join(', ')}`); c23ok = false; }
+  if (historical.entries.some((e) => !e.file || !e.className || !e.name)) { fail('C23', 'historical manifest entry lacks file / className / name'); c23ok = false; }
+  if (!/RETAINED historical migration source files only/.test(historical.$comment ?? '')) { fail('C23', 'historical manifest $comment must state it freezes the retained source files only (not runtime provenance)'); c23ok = false; }
+  if (c23ok) pass('C23', `historical manifest freezes ${historical.entries.length} retained source files (identity only, never runtime provenance)`);
 }
-for (const n of knownDup) if (!allHistoricalNames.has(n)) { fail('C23', `known duplicate '${n}' is not a historical manifest name`); c23ok = false; }
-if (c23ok) pass('C23', `legacy history facts: ${retiredNames.length} retired names (no file, not historical/incremental), ${knownDup.length} known duplicates`);
 
 // ---- C24 migrate.ts never logs connection details; assertion + transport literals present
 let c24ok = true;
@@ -465,4 +531,5 @@ if (c24ok) pass('C24', 'migrate.ts: no connection detail logging, safe error sum
 for (const p of passes) console.log(`PASS ${p}`);
 for (const f of failures) console.error(`FAIL ${f}`);
 console.log(`migration contract: ${passes.length} pass / ${failures.length} fail`);
+if (writeHistoricalContinued) console.log(failures.length > 0 ? 'maintenance write completed but the contract FAILS on the written state — fix before commit' : 'maintenance write completed and the contract passes');
 process.exit(failures.length > 0 ? 1 : 0);

@@ -12,6 +12,8 @@
  *     `SELECT pg_catalog.set_config(...)`, and every `--` comment line
  *   - drop `CREATE EXTENSION` / `COMMENT ON EXTENSION` — extensions are
  *     ENVIRONMENT_MANAGED and handled by the bootstrap runner preflight
+ *   - drop `CREATE SCHEMA public` — the public schema pre-exists in every PostgreSQL
+ *     database; pg_dump ≥ 15 emits it whenever the schema is owned by pg_database_owner
  *   - split into one statement per `;` at end of line
  * Refuses to emit if the dump contains data / privilege / ownership statements.
  *
@@ -71,6 +73,7 @@ for (const line of kept.split('\n')) {
     const stmt = buf.join('\n').trim();
     buf = [];
     if (/^CREATE EXTENSION\b/.test(stmt) || /^COMMENT ON EXTENSION\b/.test(stmt)) continue;
+    if (/^CREATE SCHEMA public;$/.test(stmt)) continue;
     statements.push(stmt);
   }
 }
