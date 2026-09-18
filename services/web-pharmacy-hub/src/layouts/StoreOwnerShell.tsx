@@ -37,10 +37,26 @@ import {
 } from '@o4o/store-ui-core';
 import type { StoreOwnerGuardUser } from '@o4o/store-ui-core';
 import { AccessDenied } from '@o4o/ui';
+import { StoreOwnerAgreementGate } from '@o4o/shared-space-ui';
+import { api } from '../lib/apiClient';
+import { loadPolicy } from '../pages/legal/PolicyDocumentPage';
 import { getUserDisplayName } from '@o4o/account-ui';
 import { useAuth } from '../contexts/AuthContext';
 import { MembershipGate } from '../components/MembershipGate';
 import { BRAND } from '../config/service';
+
+async function loadStoreOwnerAgreementPending(api: { get: (url: string) => Promise<any> }, serviceKey: string) {
+  const res = await api.get(`/auth/policy-acceptances/store-owner?serviceKey=${encodeURIComponent(serviceKey)}`);
+  return res.data?.data?.pending ?? [];
+}
+
+async function acceptStoreOwnerAgreement(api: { post: (url: string, body: unknown) => Promise<any> }, item: { serviceKey: string; policyDocumentId: string; version: number }) {
+  await api.post('/auth/policy-acceptances/store-owner', {
+    serviceKey: item.serviceKey,
+    policyDocumentId: item.policyDocumentId,
+    version: item.version,
+  });
+}
 
 /** WO-O4O-STORE-WORKSPACE-INTEGRATION-AND-MY-SERVICES-V1: Store Workspace 경로 (basePath `/store-owner` 파생 — PG callback 경로 불변) */
 export const PHARMACY_HUB_STORE_WORKSPACE_PATHS = resolveStoreWorkspacePaths(PHARMACY_HUB_STORE_CONFIG);
@@ -120,7 +136,7 @@ export function StoreOwnerShell({
 }: {
   requireStoreOwnerRole?: boolean;
 }) {
-  const { user, isAuthenticated, isLoading } = useAuth();
+  const { user, isAuthenticated, isLoading, logout } = useAuth();
 
   // @o4o/auth-utils 의 memberships 는 null 을 허용하지만 Guard 계약은 undefined 만 허용한다.
   // 공통 패키지 타입을 넓히는 대신 서비스 wrapper 에서 좁혀 전달한다(공통 계약 무변경).
@@ -146,7 +162,16 @@ export function StoreOwnerShell({
       renderDenied={<AccessDenied message="약국 경영 화면은 약국 경영자 계정만 이용할 수 있습니다." />}
       membershipGate={MembershipGate}
     >
-      <ShellLayout />
+      <StoreOwnerAgreementGate
+        serviceKey="pharmacy-hub"
+        serviceName="PharmacyHub"
+        loadPolicy={loadPolicy}
+        loadPending={(serviceKey) => loadStoreOwnerAgreementPending(api, serviceKey)}
+        acceptAgreement={(item) => acceptStoreOwnerAgreement(api, item)}
+        onLogout={logout}
+      >
+        <ShellLayout />
+      </StoreOwnerAgreementGate>
     </StoreOwnerGuard>
   );
 }
@@ -174,7 +199,16 @@ export function StoreOwnerChromeFreeGuard({ children }: { children: ReactNode })
       renderDenied={<AccessDenied message="약국 경영 화면은 약국 경영자 계정만 이용할 수 있습니다." />}
       membershipGate={MembershipGate}
     >
-      {children}
+      <StoreOwnerAgreementGate
+        serviceKey="pharmacy-hub"
+        serviceName="PharmacyHub"
+        loadPolicy={loadPolicy}
+        loadPending={(serviceKey) => loadStoreOwnerAgreementPending(api, serviceKey)}
+        acceptAgreement={(item) => acceptStoreOwnerAgreement(api, item)}
+        onLogout={logout}
+      >
+        {children}
+      </StoreOwnerAgreementGate>
     </StoreOwnerGuard>
   );
 }
