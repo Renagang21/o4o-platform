@@ -13,12 +13,21 @@ import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import { Strategy as KakaoStrategy } from 'passport-kakao';
 import { Strategy as NaverStrategy } from 'passport-naver-v2';
 import { AppDataSource } from '../database/connection.js';
-import { User, UserRole, UserStatus } from '../entities/User.js';
-import { emailService } from '../services/email.service.js';
+import { User } from '../entities/User.js';
 import { Settings as Setting } from '../entities/Settings.js';
 import { decrypt } from '../utils/crypto.js';
 import logger from '../utils/logger.js';
-import { SocialAuthService } from '../services/socialAuthService.js';
+// WO-O4O-GOOGLE-IDENTITY-AUTOMATIC-EMAIL-MERGE-REMOVAL-V1 (WO-2B):
+//   `SocialAuthService.handleSocialAuth`(이메일 OR provider_id 로 users 조회 → 자동 병합) 를 삭제했다.
+//   passport strategy 등록 자체는 유지하되(passport 제거 = WO-2G), verify callback 은 어떤 경우에도
+//   user 를 생성·병합·로그인시키지 않는다. Google Identity 정본은 linked_accounts(provider='google',
+//   providerId=sub) 이며 users.provider/provider_id 는 정본이 아니다 (O4O-IDENTITY-ARCHITECTURE-V3 §3).
+const LEGACY_SOCIAL_AUTH_DISABLED = 'LEGACY_SOCIAL_AUTH_DISABLED';
+
+const rejectLegacySocialProfile = (provider: 'google' | 'kakao' | 'naver'): Error => {
+  logger.warn('[passportDynamic] legacy social verify callback reached — auto-merge removed (WO-2B)', { provider });
+  return new Error(LEGACY_SOCIAL_AUTH_DISABLED);
+};
 
 interface OAuthConfig {
   provider: string;
@@ -251,24 +260,8 @@ class PassportManager {
       clientSecret: config.clientSecret,
       callbackURL: config.callbackUrl,
       scope: config.scope
-    }, async (accessToken, refreshToken, profile, done) => {
-      try {
-        // Use SocialAuthService to handle user creation/login
-        const result = await SocialAuthService.handleSocialAuth({
-          provider: 'google',
-          providerId: profile.id,
-          email: profile.emails?.[0]?.value || '',
-          name: profile.displayName,
-          firstName: profile.name?.givenName,
-          lastName: profile.name?.familyName,
-          avatar: profile.photos?.[0]?.value
-        });
-
-        // Return both user and isNewUser flag
-        done(null, result as any);
-      } catch (error: any) {
-        done(error as Error, undefined);
-      }
+    }, (_accessToken, _refreshToken, _profile, done) => {
+      done(rejectLegacySocialProfile('google'), undefined);
     }) as any);
 
     this.activeStrategies.add('google');
@@ -279,28 +272,8 @@ class PassportManager {
       clientID: config.clientId,
       clientSecret: config.clientSecret || '',
       callbackURL: config.callbackUrl
-    }, async (accessToken: string, refreshToken: string, profile: any, done: any) => {
-      try {
-        const email = profile._json.kakao_account?.email;
-
-        if (!email) {
-          return done(new Error('Email not provided by Kakao'), undefined);
-        }
-
-        // Use SocialAuthService to handle user creation/login
-        const result = await SocialAuthService.handleSocialAuth({
-          provider: 'kakao',
-          providerId: String(profile.id),
-          email,
-          name: profile.displayName || profile.username || profile._json?.properties?.nickname || '',
-          avatar: profile._json?.kakao_account?.profile?.thumbnail_image_url
-        });
-
-        // Return both user and isNewUser flag
-        done(null, result as any);
-      } catch (error: any) {
-        done(error as Error, undefined);
-      }
+    }, (_accessToken: string, _refreshToken: string, _profile: any, done: any) => {
+      done(rejectLegacySocialProfile('kakao'), undefined);
     }));
 
     this.activeStrategies.add('kakao');
@@ -311,28 +284,8 @@ class PassportManager {
       clientID: config.clientId,
       clientSecret: config.clientSecret,
       callbackURL: config.callbackUrl
-    }, async (accessToken: string, refreshToken: string, profile: any, done: any) => {
-      try {
-        const email = profile.email;
-
-        if (!email) {
-          return done(new Error('Email not provided by Naver'), undefined);
-        }
-
-        // Use SocialAuthService to handle user creation/login
-        const result = await SocialAuthService.handleSocialAuth({
-          provider: 'naver',
-          providerId: profile.id,
-          email,
-          name: profile.displayName || profile.nickname,
-          avatar: profile.profileImage
-        });
-
-        // Return both user and isNewUser flag
-        done(null, result as any);
-      } catch (error: any) {
-        done(error as Error, undefined);
-      }
+    }, (_accessToken: string, _refreshToken: string, _profile: any, done: any) => {
+      done(rejectLegacySocialProfile('naver'), undefined);
     }));
 
     this.activeStrategies.add('naver');

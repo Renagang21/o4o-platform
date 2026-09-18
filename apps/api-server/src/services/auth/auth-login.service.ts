@@ -6,15 +6,13 @@ import { AccountActivity } from '../../entities/AccountActivity.js';
 import { ServiceMembership } from '../../modules/auth/entities/ServiceMembership.js';
 // WO-O4O-IDENTITY-V2-PHASE1-REGISTER-LOGIN-V1: Identity V2 L2 Credential dual-read
 import { ServiceCredential } from '../../modules/auth/entities/ServiceCredential.js';
-import { UserRole, UserStatus } from '../../types/auth.js';
 import {
   AuthProvider,
-  OAuthProfile,
   UnifiedLoginRequest,
   UnifiedLoginResponse,
 } from '../../types/account-linking.js';
 import * as tokenUtils from '../../utils/token.utils.js';
-import { hashPassword, comparePassword, generateRandomToken } from '../../utils/auth.utils.js';
+import { comparePassword } from '../../utils/auth.utils.js';
 import {
   InvalidCredentialsError,
   AccountInactiveError,
@@ -28,7 +26,6 @@ import { AccountLinkingService } from '../account-linking.service.js';
 import { roleAssignmentService } from '../../modules/auth/services/role-assignment.service.js';
 import {
   generateTokensWithContext,
-  persistRefreshTokenFamily,
   injectRolesIntoPublicData,
 } from './auth-context.helper.js';
 import { ActionLogService } from '@o4o/action-log-core';
@@ -39,7 +36,13 @@ import logger from '../../utils/logger.js';
 /**
  * AuthLoginService
  *
- * Platform login flows — email/password and OAuth authentication.
+ * Platform login flows — email/password authentication.
+ *
+ * WO-O4O-GOOGLE-IDENTITY-AUTOMATIC-EMAIL-MERGE-REMOVAL-V1 (WO-2B):
+ *   OAuth 경로(`handleOAuthLogin` — providerId miss 시 users.email 로 기존 사용자를 찾아
+ *   linked_accounts 를 자동 insert 하던 자동 병합 #2)를 삭제했다. `login()` 은 `provider: 'email'`
+ *   전용이다. Google Identity 는 `services/auth/google-identity.service.ts` 가 Google `sub` 로만
+ *   해석하며(이메일은 조회 키가 아니다), 로그인/연결 endpoint 는 WO-2C 이후에 추가된다.
  *
  * Extracted from AuthenticationService (WO-O4O-AUTHENTICATION-SERVICE-SPLIT-V1).
  */
@@ -79,25 +82,18 @@ export class AuthLoginService {
   }
 
   /**
-   * Unified login method
+   * Unified login method — email/password 전용.
    *
-   * Handles both email/password and OAuth login.
+   * WO-2B: `provider !== 'email'` 은 어떤 프로필이 실려 와도 거절한다(OAuth 자동 병합 경로 삭제).
    */
   async login(request: UnifiedLoginRequest): Promise<UnifiedLoginResponse> {
-    const { provider, credentials, oauthProfile, ipAddress, userAgent } = request;
+    const { provider, credentials, ipAddress, userAgent } = request;
 
     try {
-      if (provider === 'email') {
-        if (!credentials) {
-          throw new InvalidCredentialsError();
-        }
-        return await this.handleEmailLogin(credentials, ipAddress, userAgent, credentials.serviceKey);
-      } else {
-        if (!oauthProfile) {
-          throw new InvalidCredentialsError();
-        }
-        return await this.handleOAuthLogin(provider, oauthProfile, ipAddress, userAgent);
+      if (provider !== 'email' || !credentials) {
+        throw new InvalidCredentialsError();
       }
+      return await this.handleEmailLogin(credentials, ipAddress, userAgent, credentials.serviceKey);
     } catch (error) {
       logger.error('Login error:', error);
       throw error;
@@ -306,215 +302,6 @@ export class AuthLoginService {
       },
       linkedAccounts: mergedProfile?.linkedAccounts || [],
       isNewUser: false,
-    };
-  }
-
-  /**
-   * Handle OAuth login
-   */
-  private async handleOAuthLogin(
-    provider: AuthProvider,
-    profile: OAuthProfile,
-    ipAddress: string,
-    userAgent: string,
-  ): Promise<UnifiedLoginResponse> {
-    // Find existing linked account
-    const existingLinkedAccount = await this.linkedAccountRepository.findOne({
-      where: {
-        providerId: profile.id,
-      },
-      relations: ['user', 'user.linkedAccounts'],
-    });
-
-    if (existingLinkedAccount) {
-      // Existing user login
-      const user = existingLinkedAccount.user;
-
-      // Check account status
-      // WO-O4O-RESTRICTED-LOGIN-FOR-PENDING-REJECTED-V1: OAuth 경로도 동일 정책
-      //   (pending → 제한 로그인, blocked → 차단).
-      if (resolveAccountAccess(user.status) === 'blocked') {
-        throw new AccountInactiveError(user.status);
-      }
-
-      // Update profile info if changed
-      if (
-        profile.displayName !== existingLinkedAccount.displayName ||
-        profile.avatar !== existingLinkedAccount.profileImage
-      ) {
-        existingLinkedAccount.displayName = profile.displayName;
-        existingLinkedAccount.profileImage = profile.avatar;
-        existingLinkedAccount.lastUsedAt = new Date();
-        await this.linkedAccountRepository.save(existingLinkedAccount);
-      }
-
-      // Generate tokens
-      const { tokens, roles } = await generateTokensWithContext(user);
-
-      // WO-O4O-LOGOUT-ALL-TOKEN-INVALIDATION-V1: 발급한 family 를 반드시 기록한다
-      await persistRefreshTokenFamily(user.id, tokens.refreshToken);
-
-      // Log successful login
-      await this.logLoginAttempt(
-        user.id,
-        profile.email,
-        ipAddress,
-        userAgent,
-        true,
-        undefined,
-        provider,
-      );
-
-      // Get merged profile
-      const mergedProfile = await AccountLinkingService.getMergedProfile(user.id);
-
-      // Phase3-E Fix: Inject roles from RoleAssignment
-      const publicData0 = user.toPublicData();
-      injectRolesIntoPublicData(publicData0 as Record<string, unknown>, roles);
-
-      return {
-        success: true,
-        user: publicData0,
-        tokens: {
-          accessToken: tokens.accessToken,
-          refreshToken: tokens.refreshToken,
-          expiresIn: tokens.expiresIn || 900, // 15 minutes
-        },
-        linkedAccounts: mergedProfile?.linkedAccounts || [],
-        isNewUser: false,
-      };
-    }
-
-    // Check if email is already used by another account
-    const existingUserByEmail = await this.userRepository.findOne({
-      where: { email: profile.email },
-      relations: ['linkedAccounts'],
-    });
-
-    if (existingUserByEmail) {
-      // Auto-link if same email
-      const linkResult = await AccountLinkingService.linkOAuthAccount(
-        existingUserByEmail.id,
-        provider,
-        {
-          providerId: profile.id,
-          email: profile.email,
-          displayName: profile.displayName,
-          profileImage: profile.avatar,
-        },
-      );
-
-      if (!linkResult.success) {
-        throw new Error(linkResult.message);
-      }
-
-      // Generate tokens
-      const { tokens, roles } = await generateTokensWithContext(existingUserByEmail);
-
-      // WO-O4O-LOGOUT-ALL-TOKEN-INVALIDATION-V1: 발급한 family 를 반드시 기록한다
-      await persistRefreshTokenFamily(existingUserByEmail.id, tokens.refreshToken);
-
-      // Log successful login
-      await this.logLoginAttempt(
-        existingUserByEmail.id,
-        profile.email,
-        ipAddress,
-        userAgent,
-        true,
-        undefined,
-        provider,
-      );
-
-      // Get merged profile
-      const mergedProfile = await AccountLinkingService.getMergedProfile(existingUserByEmail.id);
-
-      // Phase3-E Fix: Inject roles from RoleAssignment
-      const publicDataExisting = existingUserByEmail.toPublicData();
-      injectRolesIntoPublicData(publicDataExisting as Record<string, unknown>, roles);
-
-      return {
-        success: true,
-        user: publicDataExisting,
-        tokens: {
-          accessToken: tokens.accessToken,
-          refreshToken: tokens.refreshToken,
-          expiresIn: tokens.expiresIn || 900, // 15 minutes
-        },
-        linkedAccounts: mergedProfile?.linkedAccounts || [],
-        isNewUser: false,
-        autoLinked: true,
-      };
-    }
-
-    // Create new user
-    const newUser = this.userRepository.create({
-      email: profile.email,
-      name: profile.displayName,
-      firstName: profile.firstName,
-      lastName: profile.lastName,
-      avatar: profile.avatar,
-      password: await hashPassword(generateRandomToken()), // Random password for OAuth users
-      status: UserStatus.ACTIVE,
-      isEmailVerified: profile.emailVerified || false,
-      provider: provider,
-      provider_id: profile.id,
-    });
-
-    await this.userRepository.save(newUser);
-
-    // Write to role_assignments (SSOT)
-    await roleAssignmentService.assignRole({
-      userId: newUser.id,
-      role: UserRole.USER,
-    });
-
-    // Create linked account
-    const linkedAccount = this.linkedAccountRepository.create({
-      userId: newUser.id,
-      user: newUser,
-      provider: provider,
-      providerId: profile.id,
-      email: profile.email,
-      displayName: profile.displayName,
-      profileImage: profile.avatar,
-      isVerified: profile.emailVerified || false,
-      isPrimary: true,
-      lastUsedAt: new Date(),
-    });
-
-    await this.linkedAccountRepository.save(linkedAccount);
-
-    // Generate tokens
-    const { tokens, roles } = await generateTokensWithContext(newUser);
-
-    // WO-O4O-LOGOUT-ALL-TOKEN-INVALIDATION-V1: 발급한 family 를 반드시 기록한다
-    await persistRefreshTokenFamily(newUser.id, tokens.refreshToken);
-
-    // Log new user creation and login
-    await this.logLoginAttempt(
-      newUser.id,
-      profile.email,
-      ipAddress,
-      userAgent,
-      true,
-      undefined,
-      provider,
-    );
-
-    // Phase3-E Fix: Inject roles from RoleAssignment
-    const publicDataNew = newUser.toPublicData();
-    injectRolesIntoPublicData(publicDataNew as Record<string, unknown>, roles);
-
-    return {
-      success: true,
-      user: publicDataNew,
-      tokens: {
-        accessToken: tokens.accessToken,
-        refreshToken: tokens.refreshToken,
-        expiresIn: tokens.expiresIn || 900, // 15 minutes
-      },
-      linkedAccounts: [linkedAccount],
-      isNewUser: true,
     };
   }
 

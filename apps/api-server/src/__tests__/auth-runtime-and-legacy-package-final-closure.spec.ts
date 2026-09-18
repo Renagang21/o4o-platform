@@ -102,10 +102,15 @@ describe('WO-O4O-AUTH-RUNTIME-AND-LEGACY-PACKAGE-FINAL-CLOSURE-V1', () => {
       expect(src).not.toContain('mergeFields.permissions');
     });
 
-    it('account-linking 의 다른 identity field 병합은 유지된다', () => {
+    // WO-O4O-GOOGLE-IDENTITY-AUTOMATIC-EMAIL-MERGE-REMOVAL-V1 (WO-2B):
+    //   `mergeAccounts` 자체가 caller 0 확인 후 은퇴했다(V3 §3 자동 병합 금지). 종전 "다른 identity field
+    //   병합은 유지된다" 계약은 "계정 병합 경로가 다시 생기지 않는다"로 뒤집혔다. permissions 스냅샷 write 경로
+    //   부재(D축)는 그대로 성립한다.
+    it('account-linking 에 계정 병합(mergeAccounts) 경로가 없다 — WO-2B 은퇴', () => {
       const src = read('services', 'account-linking.service.ts');
-      expect(src).toContain('mergeFields.businessInfo');
-      expect(src).toContain('mergeFields.roles');
+      expect(src).not.toMatch(/static async mergeAccounts\(/);
+      expect(src).not.toContain('mergeFields.businessInfo');
+      expect(src).not.toContain('mergeFields.roles');
     });
 
     // WO-O4O-LEGACY-PRODUCTION-SCHEMA-AND-LOCAL-HOUSEKEEPING-FINAL-CLOSURE-V1 (A/B축)

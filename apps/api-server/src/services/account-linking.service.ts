@@ -3,7 +3,6 @@ import { User } from '../modules/auth/entities/User.js';
 import { LinkedAccount } from '../entities/LinkedAccount.js';
 import { LinkingSession } from '../modules/auth/entities/LinkingSession.js';
 import { AccountActivity } from '../entities/AccountActivity.js';
-import { roleAssignmentService } from '../modules/auth/services/role-assignment.service.js';
 import { 
   AuthProvider, 
   LinkAccountRequest, 
@@ -13,8 +12,6 @@ import {
   LinkingStatus,
   ProfileMergeOptions,
   MergedProfile,
-  AccountMergeRequest,
-  AccountMergeResult,
   SecurityVerification
 } from '../types/account-linking.js';
 import { emailService } from './email.service.js';
@@ -490,122 +487,10 @@ export class AccountLinkingService {
     }
   }
 
-  /**
-   * Merge two user accounts
-   */
-  static async mergeAccounts(
-    request: AccountMergeRequest
-  ): Promise<AccountMergeResult> {
-    const queryRunner = AppDataSource.createQueryRunner();
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
-
-    try {
-      const userRepo = queryRunner.manager.getRepository(User);
-      const linkedAccountRepo = queryRunner.manager.getRepository(LinkedAccount);
-
-      // Get both users
-      const [sourceUser, targetUser] = await Promise.all([
-        userRepo.findOne({
-          where: { id: request.sourceUserId },
-          relations: ['linkedAccounts']
-        }),
-        userRepo.findOne({
-          where: { id: request.targetUserId },
-          relations: ['linkedAccounts']
-        })
-      ]);
-
-      if (!sourceUser || !targetUser) {
-        throw new Error('One or both users not found');
-      }
-
-      // Move all linked accounts from source to target
-      for (const account of sourceUser.linkedAccounts) {
-        account.userId = targetUser.id;
-        account.user = targetUser;
-        await linkedAccountRepo.save(account);
-      }
-
-      // Merge profile data based on options
-      if (request.mergeOptions.mergeFields) {
-        const { mergeFields } = request.mergeOptions;
-        
-        // Merge name
-        if (mergeFields.name && sourceUser.name && !targetUser.name) {
-          targetUser.name = sourceUser.name;
-        }
-        
-        // Merge firstName and lastName
-        if (mergeFields.name) {
-          if (sourceUser.firstName && !targetUser.firstName) {
-            targetUser.firstName = sourceUser.firstName;
-          }
-          if (sourceUser.lastName && !targetUser.lastName) {
-            targetUser.lastName = sourceUser.lastName;
-          }
-        }
-        
-        // Merge avatar/profile image
-        if (mergeFields.profileImage && sourceUser.avatar && !targetUser.avatar) {
-          targetUser.avatar = sourceUser.avatar;
-        }
-        
-        // Merge business info
-        if (mergeFields.businessInfo && sourceUser.businessInfo) {
-          targetUser.businessInfo = {
-            ...(targetUser.businessInfo || {}),
-            ...sourceUser.businessInfo
-          };
-        }
-        
-        // WO-O4O-AUTH-RUNTIME-AND-LEGACY-PACKAGE-FINAL-CLOSURE-V1 (D축):
-        //   legacy permissions 스냅샷 병합 제거. users.permissions 는 권한 SSOT 가
-        //   아니며(SSOT = role_assignments) 계정 병합으로 권한이 증가하는 유일한
-        //   write 경로였다. 아래 roles 병합(role_assignments)이 canonical 이다.
-        //   다른 identity field 병합은 변경하지 않는다.
-
-        // Merge roles via role_assignments (SSOT)
-        if (mergeFields.roles) {
-          const sourceRoles = await roleAssignmentService.getRoleNames(sourceUser.id);
-          for (const role of sourceRoles) {
-            await roleAssignmentService.assignRole({
-              userId: targetUser.id, role, assignedBy: 'system:account-link'
-            });
-          }
-        }
-      }
-
-      // Update verification status if source is verified
-      if (sourceUser.isEmailVerified && !targetUser.isEmailVerified) {
-        targetUser.isEmailVerified = true;
-      }
-
-      // Save target user
-      await userRepo.save(targetUser);
-
-      // Delete source user
-      await userRepo.remove(sourceUser);
-
-      await queryRunner.commitTransaction();
-
-      // Get merged profile
-      const mergedProfile = await this.getMergedProfile(targetUser.id, request.mergeOptions);
-
-      return {
-        success: true,
-        mergedUserId: targetUser.id,
-        mergedProfile: mergedProfile!,
-        deletedUserId: request.sourceUserId
-      };
-    } catch (error) {
-      await queryRunner.rollbackTransaction();
-      logger.error('Account merge error:', error);
-      throw error;
-    } finally {
-      await queryRunner.release();
-    }
-  }
+  // WO-O4O-GOOGLE-IDENTITY-AUTOMATIC-EMAIL-MERGE-REMOVAL-V1 (WO-2B):
+  //   `mergeAccounts`(source user 의 linked_accounts 를 target 으로 옮기고 source 를 삭제하는 계정 병합)
+  //   를 caller 0 확인 후 은퇴시켰다. 계정 병합 기능은 새로 만들지 않는다(V3 §3 자동 병합 금지).
+  //   `linkOAuthAccount` 는 WO-2C 명시 연결 골격으로 유지한다.
 
   /**
    * Check if account can be linked

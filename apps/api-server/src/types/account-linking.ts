@@ -103,22 +103,6 @@ export interface OAuthLinkingState {
   sessionId: string;
 }
 
-// Account merge request
-export interface AccountMergeRequest {
-  sourceUserId: string;
-  targetUserId: string;
-  mergeOptions: ProfileMergeOptions;
-}
-
-// Account merge result
-export interface AccountMergeResult {
-  success: boolean;
-  mergedUserId: string;
-  mergedProfile: MergedProfile;
-  deletedUserId?: string;
-  warnings?: string[];
-}
-
 // Security verification for sensitive operations
 export interface SecurityVerification {
   method: 'password' | 'email' | 'sms';
@@ -154,6 +138,8 @@ export enum AccountLinkingError {
 }
 
 // Unified login request
+// WO-O4O-GOOGLE-IDENTITY-AUTOMATIC-EMAIL-MERGE-REMOVAL-V1 (WO-2B): email/password 전용.
+//   oauthProfile · autoLinked · OAuthProfile · AccountMerge* 는 자동 병합 경로와 함께 제거했다.
 export interface UnifiedLoginRequest {
   provider: AuthProvider;
   credentials?: {
@@ -162,21 +148,8 @@ export interface UnifiedLoginRequest {
     /** WO-O4O-LOGIN-SERVICEKEY-PARAMETER-V1: 서비스 독립 인증 기반. 미제공 시 global fallback. */
     serviceKey?: string;
   };
-  oauthProfile?: OAuthProfile;
   ipAddress: string;
   userAgent: string;
-}
-
-// OAuth profile from provider
-export interface OAuthProfile {
-  id: string;
-  email: string;
-  displayName?: string;
-  firstName?: string;
-  lastName?: string;
-  avatar?: string;
-  emailVerified?: boolean;
-  metadata?: Record<string, any>;
 }
 
 // Unified login response
@@ -190,7 +163,6 @@ export interface UnifiedLoginResponse {
   };
   linkedAccounts: LinkedAccount[];
   isNewUser: boolean;
-  autoLinked?: boolean;
 }
 
 // ============================================================================
