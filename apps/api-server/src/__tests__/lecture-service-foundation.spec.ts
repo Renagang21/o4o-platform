@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
-const ROOT = resolve(__dirname, '../..');
+const ROOT = resolve(__dirname, '..');
 const read = (p: string) => readFileSync(resolve(ROOT, p), 'utf8');
 
 describe('Lecture Service Foundation', () => {
