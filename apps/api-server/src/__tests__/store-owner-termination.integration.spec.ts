@@ -53,6 +53,10 @@ describe('store-owner termination isolated PostgreSQL lifecycle',()=>{
     const service=new StoreOwnerTerminationService(ds);
     const now=new Date('2026-09-18T00:00:00Z');
     const c=await service.createCase({serviceKey:'kpa-society',organizationId:ORG,userId:USER,returnRequested:false,terminationEffectiveAt:now.toISOString()});
+    const returned:any=await service.buildReturnPackage(c.id);
+    expect(returned.format).toBe('O4O_STORE_OWNER_DATA_RETURN_V1');
+    expect(returned.serviceKey).toBe('kpa-society');
+    expect(returned.manifestHash).toMatch(/^[a-f0-9]{64}$/);
     await service.terminateCase(c.id,now);
     const preview=await service.previewPurge(c.id);
     expect(preview.hasOtherActiveStoreService).toBe(true);
@@ -71,6 +75,9 @@ describe('store-owner termination isolated PostgreSQL lifecycle',()=>{
     const service=new StoreOwnerTerminationService(ds);
     const now=new Date('2026-09-18T00:00:00Z');
     const c=await service.createCase({serviceKey:'pharmacy-hub',organizationId:ORG2,userId:USER2,returnRequested:false,terminationEffectiveAt:now.toISOString()});
+    const returned:any=await service.buildReturnPackage(c.id);
+    expect(returned.format).toBe('O4O_STORE_OWNER_DATA_RETURN_V1');
+    expect(returned.serviceKey).toBe('pharmacy-hub');
     await service.terminateCase(c.id,now);
     const preview=await service.previewPurge(c.id);
     expect(preview.hasOtherActiveStoreService).toBe(false);

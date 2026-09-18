@@ -70,24 +70,3 @@ jobs:
         category: "/language:${{matrix.language}}"
         ram: 6000
         threads: 2
-        output: codeql-sarif
-
-    - name: TEMP print CodeQL findings for PR222
-      if: always()
-      shell: bash
-      run: |
-        python - <<'PY'
-        import glob,json
-        for p in glob.glob('codeql-sarif/*.sarif'):
-            d=json.load(open(p,encoding='utf-8'))
-            for run in d.get('runs',[]):
-                rules={r.get('id'):r for r in run.get('tool',{}).get('driver',{}).get('rules',[])}
-                for x in run.get('results',[]):
-                    loc=((x.get('locations') or [{}])[0].get('physicalLocation') or {})
-                    art=(loc.get('artifactLocation') or {}).get('uri')
-                    reg=loc.get('region') or {}
-                    rid=x.get('ruleId')
-                    msg=(x.get('message') or {}).get('text')
-                    props=rules.get(rid,{}).get('properties') or {}
-                    print(json.dumps({'ruleId':rid,'securitySeverity':props.get('security-severity'),'message':msg,'file':art,'line':reg.get('startLine')},ensure_ascii=False))
-        PY
