@@ -1,7 +1,7 @@
 # CHECK-O4O-STORE-EXTERNAL-LLM-CONTENT-AUTHORING-V1
 
 > **WO**: [`WO-O4O-STORE-EXTERNAL-LLM-CONTENT-AUTHORING-V1`](../work-orders/WO-O4O-STORE-EXTERNAL-LLM-CONTENT-AUTHORING-V1.md) · **실행일**: 2026-09-18 · **base**: `origin/main` `a5d56fd04`
-> **판정**: COMPLETE_WITH_SMOKE_PENDING — 구현·단위/계약 테스트·5 빌드 PASS · 브라우저 smoke = 테스트 계정 로그인 불가(§6)
+> **판정**: COMPLETE_WITH_SMOKE_PENDING — 구현·단위/계약 테스트·5 빌드 PASS · 배포 `35302730513` 3 서비스 success · bundle 반영 확인 · 브라우저 smoke = 테스트 계정 로그인 불가 → PENDING_USER_VERIFICATION(§6)
 
 ## 1. Fresh Census — Store 콘텐츠 제작 화면 분류
 
@@ -59,7 +59,29 @@ KCos 에는 일반 콘텐츠 제작 화면이 없다(제작 자료 셸만) → K
 
 ## 6. 배포 · 브라우저 smoke
 
-_(commit·deploy 후 갱신)_
+### 6-1 배포 (commit `5a91a3970` → `origin/main`)
+
+| run | 결과 |
+|---|---|
+| Deploy Web Services `35302730513` | **success** — `deploy-kpa-society` · `deploy-k-cosmetics` · `deploy-pharmacy-hub` 전부 success (detect-changes 로 `kpa-branch`·`neture`·`signage-player` 도 함께 재배포, success) |
+| Deploy API Server `35302730581` | success (런타임 변경 0 · spec 1건만) |
+| Admin Dashboard `35302730589` | success |
+| CI Pipeline `35302730570` | Code Quality Check success · API Server Jest success · Build Applications success — **success** (신규 spec 35 포함) |
+
+### 6-2 배포 bundle 반영 확인 (cache-bust fetch, 2026-09-18)
+
+| 서비스 | 확인 |
+|---|---|
+| `kpa-society.co.kr` | main `index-BRSdY-Lw.js` 가 참조하는 263 chunk 스캔 → `storeContentAuthoringPrompt-CDX9p_m-.js` 에 `ChatGPT로 작업` 포함. importer chunk 4 = `ProductionMaterialEditorPage-2zAPjU12` · `StoreContentEditPage-DuOhPCPF` · `StoreDirectContentPage-rEhRV0Nx` · `StoreLibraryContentsPage-DASDKa8H`(= `CreateContentFromResourcesModal`) — 적용 4 화면 전부 · main bundle 에 패널 "추가 요청" textarea placeholder 포함 |
+| `k-cosmetics.site` | `ProductionMaterialEditorPage-yt4w7RzN.js` 에 `ChatGPT로 작업` · `매장 제작 자료 편집` · 새 placeholder(`ChatGPT 등 외부 AI에서 만든 내용을 붙여넣으세요`) 포함 · main `index-Dgh49oOo.js` 에 패널 textarea placeholder 포함 |
+| `pharmacyhub.co.kr` | main `index-l5I00Hiy.js` 에 `ChatGPT로 작업` · 패널 textarea placeholder 포함 |
+
+### 6-3 브라우저 smoke — **PENDING_USER_VERIFICATION**
+
+- WO §검증의 smoke(“ChatGPT로 작업” → 안내 복사 → 붙여넣기 → 편집기 반영 → 저장)는 **매장 경영자 로그인이 전제**다.
+- 같은 날 WO1 CHECK §6 에서 `docs/local/TEST-ACCOUNTS.local.md` 의 store-owner 계정으로 KPA·PH 로그인 API 가 `401 INVALID_USER`, 보조 계정은 KPA `403` lockout 으로 실패했고(WO1 CHECK `c996691c0`), 이 WO 는 auth 를 고치지 않는 범위이며 재시도는 lockout 위험만 키우므로 **추가 로그인 시도 없이** 미검증으로 둔다.
+- 재개 방법: 유효한 store-owner 계정으로 KPA `/pharmacy/store/contents/direct/new`(직접 작성) · 자료함 “가져와서 만들기” 모달 · PH `/store-owner/content` · KCos 제작 자료 편집 화면에서 ① 패널 라벨 `ChatGPT로 작업` ② 추가 요청 입력 후 “안내 복사” → 클립보드에 `[결과 조건]` 포함 ③ HTML 붙여넣기 → 편집기 본문 즉시 반영 ④ 기존 저장 버튼 저장 → 저장값 = 붙여넣은 HTML 을 확인하면 §7 `STORE_LLM_RESULT_TO_EDITOR` 브라우저 열을 PASS 로 갱신한다.
+- 로그인이 필요 없는 확인(배포 bundle 문자열)은 6-2 로 대체했다. 빌드·bundle 확인만으로 UI 동작을 PASS 로 적지 않는다.
 
 ## 7. 완료 기준
 
@@ -69,7 +91,7 @@ _(commit·deploy 후 갱신)_
 | STORE_GENERAL_CONTENT_CHATGPT_ENTRY | PASS | GENERAL_AUTHORING 4 화면 `label={STORE_LLM_ASSIST_LABEL}` (spec C) |
 | STORE_PROMPT_CORE | PASS | 순수 함수 · import 0 (spec B) |
 | STORE_CREATE_PROMPT / STORE_REVISE_PROMPT | PASS | vitest CREATE/REVISE 블록 |
-| STORE_LLM_RESULT_TO_EDITOR | PASS(source) / 브라우저 PENDING | §3 · §6 |
+| STORE_LLM_RESULT_TO_EDITOR | PASS(source) / 브라우저 PENDING_USER_VERIFICATION | §3 · §6-3 |
 | STORE_INTERNAL_AI_REINTRODUCED | 0 | spec C (`showInternalAi={false}` 유지 · AiContentModal/`/api/ai/content` 0) |
 | STORE_AUTO_SAVE_FROM_LLM / STORE_AUTO_PUBLISH_FROM_LLM | 0 | onApplyHtml = 상태 갱신만 |
 | STORE_CONTENT_STORAGE_SCHEMA_CHANGE / NEW_LLM_BACKEND_API / DB_MIGRATION | 0 | api-server 변경 = spec 1건 |
