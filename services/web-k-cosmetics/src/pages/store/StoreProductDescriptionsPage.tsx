@@ -29,7 +29,7 @@ export default function StoreProductDescriptionsPage() {
       storeNoun="매장"
       findTemplate={(id) => findTemplate(id) ?? null}
       renderEditor={({ editorKey, value, onChange, placeholder }) => (
-        <RichTextEditor
+        <RichTextEditor showInternalAi={false}
           key={editorKey}
           value={value}
           onChange={(c) => onChange(c.html)}

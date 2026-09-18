@@ -145,6 +145,8 @@ export default function StoreOwnerTabletsPage() {
           initialDetail={editing.detail}
           api={pharmacyHubScreenSetApi}
           fetchProductPool={fetchScreenSetProductPool}
+          // WO-O4O-STORE-AI-FIRST-EDITOR-BOUNDARY-V1: 내 매장 = 내부 AI OFF
+          showInternalAi={false}
           onCancel={() => setEditing(null)}
           onSaved={() => {
             setEditing(null);

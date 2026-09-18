@@ -348,7 +348,7 @@ export default function StoreDirectContentPage() {
         // WO-O4O-KPA-STORE-LIBRARY-CONTENTS-DIRECT-EDITOR-UNIFY-V1:
         //   o4o 표준 RichTextEditor(편집/HTML/미리보기 탭) — 제작 자료 편집기와 동일 모듈. 유형 구분 없음.
         <div className="bg-white border border-slate-200 rounded-lg p-2 mb-4">
-          <RichTextEditor
+          <RichTextEditor showInternalAi={false}
             value={editorInitialHtml}
             onChange={(c) => setEditorContent(c)}
             placeholder="본문 내용을 입력하세요"

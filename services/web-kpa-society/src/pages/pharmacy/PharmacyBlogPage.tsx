@@ -452,7 +452,7 @@ export function PharmacyBlogPage({ service }: { service?: string }) {
         /* WO-O4O-KPA-STORE-BLOG-CONTENT-RICHTEXT-V1: canonical RichTextEditor (preset=full).
            기존 plain-text 게시글은 RichTextEditor 가 setContent 시 자동으로 paragraph 로 감싸서 호환. */
         renderEditor={() => (
-          <RichTextEditor
+          <RichTextEditor showInternalAi={false}
             value={editorContent}
             onChange={(c) => setEditorContent(c.html)}
             onImageUpload={handleImageUpload}

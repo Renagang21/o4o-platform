@@ -279,7 +279,7 @@ export function PharmacyPopPage() {
 
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1.5">본문</label>
-            <RichTextEditor
+            <RichTextEditor showInternalAi={false}
               value={editContent}
               onChange={(c) => setEditContent(c.html)}
               placeholder="POP 본문을 작성하세요"

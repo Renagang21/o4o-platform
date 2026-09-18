@@ -333,7 +333,7 @@ export default function StoreContentEditPage() {
       <div className="mb-8">
         <label className="block text-sm font-medium text-slate-700 mb-2">본문</label>
         <div className="bg-white border border-slate-200 rounded-lg p-2">
-          <RichTextEditor
+          <RichTextEditor showInternalAi={false}
             value={editorInitialHtml}
             onChange={(c) => setEditorContent(c)}
             placeholder="본문 내용을 입력하세요"

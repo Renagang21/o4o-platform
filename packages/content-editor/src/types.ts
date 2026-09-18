@@ -25,11 +25,14 @@ export interface MediaInsert {
 
 /**
  * Toolbar preset — 용도별 버튼 구성
- * - full: 표준 편집기 (기본값) — 모든 기능 포함 (AI, 이미지, 동영상, 서식, HTML 탭)
+ * - full: 표준 편집기 (기본값) — 전체 편집 기능 (서식, 이미지, 동영상, 표, HTML 탭, 미리보기, 템플릿)
  * - compact: 경량 입력 전용 (포럼 댓글 등) — 기본 서식만, HTML 탭 없음
  *
  * 용도별(guide/lesson/store/blog 등) 분리 preset은 사용하지 않는다.
  * 기능 차이는 저장 대상·AI context·props로 구분한다.
+ *
+ * WO-O4O-STORE-AI-FIRST-EDITOR-BOUNDARY-V1: preset ≠ 내부 AI 사용 여부.
+ *   O4O 내부 AI("AI 정리" + AiContentModal) capability 는 `showInternalAi` 로 별도 제어한다.
  */
 export type EditorPreset = 'full' | 'compact';
 
@@ -102,6 +105,16 @@ export interface ContentEditorProps {
    * - API 403 시 오류 메시지 표시 (store owner가 아닌 경우)
    */
   showStoreSave?: boolean;
+  /**
+   * WO-O4O-STORE-AI-FIRST-EDITOR-BOUNDARY-V1: O4O 내부 AI capability 스위치.
+   * - true(기본): 기존 동작 — full preset 에서 "AI 정리" 버튼 + AiContentModal 사용 가능
+   * - false: 내부 AI 진입 UI 를 렌더하지 않고 AiContentModal 도 mount 하지 않는다
+   *   (Toolbar 경로에서 /api/ai/content 호출 가능 경로 0). 편집·HTML·미리보기·템플릿 등
+   *   나머지 full 기능은 그대로.
+   * 내 매장(Store) 소비처는 명시적으로 false 를 전달한다(AI First — 외부 LLM 결과를 HTML 탭으로 반입).
+   * 기본값을 false 로 뒤집지 않는다 — 커뮤니티·공급자·운영자 전환은 별도 WO.
+   */
+  showInternalAi?: boolean;
 }
 
 export interface ToolbarProps {

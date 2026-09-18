@@ -97,7 +97,7 @@ export default function StoreProductDescriptionsPage() {
         placeholderFallback: '상품 상세설명을 작성하세요.',
       }}
       renderEditor={({ editorKey, value, onChange, placeholder }) => (
-        <RichTextEditor
+        <RichTextEditor showInternalAi={false}
           key={editorKey}
           value={value}
           onChange={(c) => onChange(c.html)}

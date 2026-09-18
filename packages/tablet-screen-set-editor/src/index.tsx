@@ -1006,7 +1006,7 @@ function EditorSection({ title, note, children }: { title: string; note?: string
 export function TabletContentStepBuilder({
   initialDetail, onCancel, onSaved, onToast, previewApi, storeSlug, api,
   contentSources = DEFAULT_CONTENT_SOURCES, fetchProductPool, fetchStoreQrCodes, onImageUpload, onMediaLibraryPick,
-  renderMobilePreview,
+  renderMobilePreview, showInternalAi,
 }: {
   initialDetail: ScreenSetDetail | null;
   onCancel: () => void;
@@ -1043,6 +1043,12 @@ export function TabletContentStepBuilder({
    *   소비처가 렌더러를 주입한다. 미주입 소비처(운영자·공급자 제작기)는 기존 kiosk 렌더 그대로.
    */
   renderMobilePreview?: (screen: TabletScreenResponse) => ReactNode;
+  /**
+   * WO-O4O-STORE-AI-FIRST-EDITOR-BOUNDARY-V1: 코너 설명 편집기의 O4O 내부 AI("AI 정리") 스위치.
+   *   표준 편집기 prop 을 그대로 전달한다. 미주입이면 편집기 기본값(true) — 운영자·공급자 제작기 기존 동작 그대로.
+   *   내 매장 소비처(KPA TabletScreenSetManager · PharmacyHub TabletsPage)는 false 를 전달한다.
+   */
+  showInternalAi?: boolean;
 }) {
   const isEdit = !!initialDetail;
   const [name, setName] = useState(initialDetail?.name ?? '');
@@ -1330,6 +1336,7 @@ export function TabletContentStepBuilder({
               minHeight="320px"
               onImageUpload={onImageUpload}
               onMediaLibraryPick={onMediaLibraryPick}
+              showInternalAi={showInternalAi}
             />
           </div>
           <p className="text-[11px] text-slate-400 mt-1">

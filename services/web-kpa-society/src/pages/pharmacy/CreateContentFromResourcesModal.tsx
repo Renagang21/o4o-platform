@@ -169,7 +169,7 @@ export function CreateContentFromResourcesModal({ open, onClose, onCreated, prod
           <div style={styles.composeRow}>
             <label style={styles.label}>매장 콘텐츠 본문</label>
             <div style={styles.editorWrap}>
-              <RichTextEditor
+              <RichTextEditor showInternalAi={false}
                 value={editorHtml}
                 onChange={handleEditorChange}
                 placeholder="본문을 직접 작성하거나, 외부 AI에서 만든 초안을 붙여넣은 뒤 편집하세요."

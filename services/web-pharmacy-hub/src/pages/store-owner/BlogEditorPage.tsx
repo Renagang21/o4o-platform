@@ -138,7 +138,7 @@ export default function StoreOwnerBlogEditorPage() {
           </div>
 
           <div className="overflow-hidden rounded-lg border border-gray-200">
-            <RichTextEditor
+            <RichTextEditor showInternalAi={false}
               value={content}
               onChange={(c) => setContent(c.html)}
               placeholder="글 내용을 입력하세요."

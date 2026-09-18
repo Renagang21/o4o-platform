@@ -27,7 +27,7 @@ export default function ProductDescriptionsPage() {
         library: '/store-owner/library',
       }}
       renderEditor={({ editorKey, value, onChange, placeholder }) => (
-        <RichTextEditor
+        <RichTextEditor showInternalAi={false}
           key={editorKey}
           value={value}
           onChange={(c) => onChange(c.html)}

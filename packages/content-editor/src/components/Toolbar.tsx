@@ -55,9 +55,11 @@ interface ToolbarProps {
   showCommunitySave?: boolean;
   /** WO-O4O-AI-STORE-CONTENT-DIRECT-SAVE-V1: AI 결과를 내 매장 콘텐츠로 저장 버튼 표시 */
   showStoreSave?: boolean;
+  /** WO-O4O-STORE-AI-FIRST-EDITOR-BOUNDARY-V1: 내부 AI("AI 정리" + AiContentModal) 노출 여부. 기본 true(하위호환). false 면 버튼·모달 모두 미렌더. */
+  showInternalAi?: boolean;
 }
 
-export function Toolbar({ editor, onImageUpload, existingImages, preset = 'full', onMediaLibraryPick, onRequestImageInsert, aiRequestHeaders, showCommunitySave, showStoreSave }: ToolbarProps) {
+export function Toolbar({ editor, onImageUpload, existingImages, preset = 'full', onMediaLibraryPick, onRequestImageInsert, aiRequestHeaders, showCommunitySave, showStoreSave, showInternalAi = true }: ToolbarProps) {
   // WO-O4O-STANDARD-EDITOR-IMAGE-DISPLAY-WIDTH-V1: 삽입 설정 모달 경유(있으면), 없으면 즉시 삽입(back-compat)
   const insertImg = (url: string) => {
     if (onRequestImageInsert) onRequestImageInsert(url);
@@ -602,8 +604,9 @@ export function Toolbar({ editor, onImageUpload, existingImages, preset = 'full'
 
       {/* AI 정리 버튼 (full only) — WO-AI-CONTENT-TRANSFORM-IMPLEMENTATION-V1
           WO-O4O-AI-CONTENT-AUTOMATION-SCOPE-CLEANUP-V1:
-          "매장 활용" 버튼은 콘텐츠 제작 자동화 흐름과 분리하여 후속 WO에서 복원. StoreUseModal 컴포넌트와 백엔드 API는 유지. */}
-      {preset === 'full' && (
+          "매장 활용" 버튼은 콘텐츠 제작 자동화 흐름과 분리하여 후속 WO에서 복원. StoreUseModal 컴포넌트와 백엔드 API는 유지.
+          WO-O4O-STORE-AI-FIRST-EDITOR-BOUNDARY-V1: preset 과 별개로 showInternalAi=false 면 미렌더(내 매장 = 내부 AI OFF). */}
+      {preset === 'full' && showInternalAi && (
         <>
           <Divider />
           <button
@@ -776,15 +779,17 @@ export function Toolbar({ editor, onImageUpload, existingImages, preset = 'full'
       )}
     </div>
 
-    {/* AI 콘텐츠 변환 모달 */}
-    <AiContentModal
-      open={showAiModal}
-      onClose={() => setShowAiModal(false)}
-      editor={editor}
-      aiRequestHeaders={aiRequestHeaders}
-      showCommunitySave={showCommunitySave}
-      showStoreSave={showStoreSave}
-    />
+    {/* AI 콘텐츠 변환 모달 — WO-O4O-STORE-AI-FIRST-EDITOR-BOUNDARY-V1: showInternalAi=false 면 mount 자체를 하지 않는다(버튼만 숨기지 않음). */}
+    {showInternalAi && (
+      <AiContentModal
+        open={showAiModal}
+        onClose={() => setShowAiModal(false)}
+        editor={editor}
+        aiRequestHeaders={aiRequestHeaders}
+        showCommunitySave={showCommunitySave}
+        showStoreSave={showStoreSave}
+      />
+    )}
     {/* WO-O4O-AI-CONTENT-AUTOMATION-SCOPE-CLEANUP-V1:
         StoreUseModal 마운트 제거. 후속 WO에서 매장 활용 흐름을 복원할 때 다시 연결. */}
     </>

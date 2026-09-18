@@ -33,7 +33,7 @@ export default function StorePopStaffPage() {
       api={popStaffApi}
       storeNoun="매장"
       renderEditor={({ value, onChange, disabled }) => (
-        <RichTextEditor
+        <RichTextEditor showInternalAi={false}
           value={value}
           onChange={(c) => onChange(c.html)}
           placeholder="POP 본문을 작성하세요"

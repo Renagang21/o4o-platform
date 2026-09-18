@@ -230,6 +230,8 @@ export default function TabletScreenSetManager({ onToast, tablets, previewApi, s
           onMediaLibraryPick={(insertMedia) => setMediaPickerTarget(() => insertMedia)}
           // WO-O4O-KPA-STORE-QR-SCREENSET-STATE-ALIGNMENT-V1 §4: 실제 /qr/:slug 뷰어 주입.
           renderMobilePreview={renderQrMobilePreview}
+          // WO-O4O-STORE-AI-FIRST-EDITOR-BOUNDARY-V1: 내 매장 = 내부 AI OFF
+          showInternalAi={false}
         />
         <MediaPickerModal
           open={!!mediaPickerTarget}

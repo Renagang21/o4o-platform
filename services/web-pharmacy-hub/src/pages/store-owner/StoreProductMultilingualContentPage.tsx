@@ -401,7 +401,7 @@ export default function StoreProductMultilingualContentPage() {
             </div>
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1.5">본문 (HTML)</label>
-              <RichTextEditor
+              <RichTextEditor showInternalAi={false}
                 key={activeLocale}
                 value={activeDraft.html}
                 onChange={(c) => setActiveDraft({ html: c.html })}

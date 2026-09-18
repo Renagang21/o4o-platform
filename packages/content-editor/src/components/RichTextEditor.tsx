@@ -75,6 +75,7 @@ export function RichTextEditor({
   aiRequestHeaders,
   showCommunitySave,
   showStoreSave,
+  showInternalAi = true,
 }: ContentEditorProps) {
   const [templateModalOpen, setTemplateModalOpen] = useState(false);
   const [saveModalOpen, setSaveModalOpen] = useState(false);
@@ -429,7 +430,7 @@ export function RichTextEditor({
 
       {/* 툴바 — 편집 탭에서만 표시 */}
       {editable && activeTab === 'edit' && (
-        <Toolbar editor={editor} preset={preset} onImageUpload={onImageUpload} existingImages={existingImages} onMediaLibraryPick={onMediaLibraryPick} onRequestImageInsert={requestImageInsert} aiRequestHeaders={aiRequestHeaders} showCommunitySave={showCommunitySave} showStoreSave={showStoreSave} />
+        <Toolbar editor={editor} preset={preset} onImageUpload={onImageUpload} existingImages={existingImages} onMediaLibraryPick={onMediaLibraryPick} onRequestImageInsert={requestImageInsert} aiRequestHeaders={aiRequestHeaders} showCommunitySave={showCommunitySave} showStoreSave={showStoreSave} showInternalAi={showInternalAi} />
       )}
 
       {/* 편집 탭 — 항상 마운트, 다른 탭에서는 숨김 (에디터 상태 유지) */}

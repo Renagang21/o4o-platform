@@ -67,7 +67,7 @@ export default function StoreBlogManagePage() {
         },
       }}
       renderEditor={({ value, onChange, placeholder }) => (
-        <RichTextEditor
+        <RichTextEditor showInternalAi={false}
           value={value}
           onChange={(c) => onChange(c.html)}
           placeholder={placeholder}

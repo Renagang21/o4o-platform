@@ -345,7 +345,7 @@ function ProductFormModal({
                 콘텐츠에서 가져오기
               </button>
             </div>
-            <RichTextEditor
+            <RichTextEditor showInternalAi={false}
               key={editorKey}
               value={description}
               onChange={({ html }) => setDescription(html)}

@@ -276,7 +276,7 @@ function ContentEditor({
             className="mb-4 w-full rounded-md border border-gray-200 px-3 py-2 text-sm"
           />
           <div className="overflow-hidden rounded-lg border border-gray-200">
-            <RichTextEditor
+            <RichTextEditor showInternalAi={false}
               value={html}
               onChange={(content) => setHtml(content.html)}
               placeholder="매장에서 활용할 내용을 입력하세요."

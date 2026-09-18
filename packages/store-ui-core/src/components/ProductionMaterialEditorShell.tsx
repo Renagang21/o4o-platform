@@ -50,6 +50,8 @@ interface InjectedEditorProps {
   minHeight?: string;
   preset?: 'full' | 'compact';
   aiRequestHeaders?: Record<string, string>;
+  /** WO-O4O-STORE-AI-FIRST-EDITOR-BOUNDARY-V1: 내부 AI 스위치(내 매장 셸은 항상 false 전달) */
+  showInternalAi?: boolean;
   // WO-O4O-CONTENT-ASSET-MEDIA-LIBRARY-STANDARDIZATION-V1 §6: 미디어 라이브러리/업로드 주입
   onImageUpload?: (file: File) => Promise<string>;
   onMediaLibraryPick?: (insertMedia: (media: InjectedMediaInsert) => void) => void;
@@ -246,6 +248,7 @@ export function ProductionMaterialEditorShell({
           placeholder="AI가 정리한 내용을 편집하거나, 직접 내용을 입력하세요."
           minHeight="520px"
           preset="full"
+          showInternalAi={false}
           aiRequestHeaders={aiHeaders()}
           onImageUpload={onImageUpload}
           onMediaLibraryPick={onMediaLibraryPick}

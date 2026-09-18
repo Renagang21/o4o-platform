@@ -299,7 +299,7 @@ export default function ProductionMaterialEditorPage() {
 
       {/* Editor */}
       <div style={styles.editorWrap}>
-        <RichTextEditor
+        <RichTextEditor showInternalAi={false}
           value={editorInitialHtml}
           onChange={handleChange}
           placeholder="AI가 정리한 내용을 편집하거나, 직접 내용을 입력하세요."

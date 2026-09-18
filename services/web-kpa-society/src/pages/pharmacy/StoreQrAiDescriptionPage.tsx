@@ -507,7 +507,7 @@ export default function StoreQrAiDescriptionPage() {
               />
               <label style={styles.label}>{mode === 'corner' ? '코너 소개 본문' : '본문'}</label>
               <div style={styles.editorWrap}>
-                <RichTextEditor value={editorSeed} onChange={setEditorContent} preset="full" />
+                <RichTextEditor showInternalAi={false} value={editorSeed} onChange={setEditorContent} preset="full" />
               </div>
 
               {/* 코너 모드: 생성된 상품별 설명 미리보기(공개 QR 아코디언과 동일 정제 — ContentRenderer). */}

@@ -367,7 +367,7 @@ function AssetForm({
           <div>
             <label className="mb-1 block text-xs font-semibold text-gray-500">내용</label>
             <div className="overflow-hidden rounded-lg border border-gray-200">
-              <RichTextEditor
+              <RichTextEditor showInternalAi={false}
                 value={htmlContent}
                 onChange={(content) => setHtmlContent(content.html)}
                 placeholder="자료 내용을 입력하세요."

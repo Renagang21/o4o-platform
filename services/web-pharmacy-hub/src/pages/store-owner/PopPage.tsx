@@ -380,7 +380,7 @@ function PopForm({
         <div>
           <label className="mb-1 block text-xs font-semibold text-gray-500">내용</label>
           <div className="overflow-hidden rounded-lg border border-gray-200">
-            <RichTextEditor
+            <RichTextEditor showInternalAi={false}
               value={content}
               onChange={(c) => setContent(c.html)}
               placeholder="POP 에 넣을 내용을 입력하세요."
