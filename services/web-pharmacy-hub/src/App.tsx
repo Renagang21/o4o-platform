@@ -82,7 +82,7 @@ import { OperatorLayoutWrapper } from './layouts/OperatorLayoutWrapper';
 import { AdminLayoutWrapper } from './layouts/AdminLayoutWrapper';
 // WO-O4O-CROSSSERVICE-HEADER-MENU-FOOTER-UI-COMPLETION-V1 — 공개 영역 공통 셸(헤더·푸터)
 import { PublicLayout } from './layouts/PublicLayout';
-import { TermsPage, PrivacyPage } from './pages/legal/PolicyDocumentPage';
+import { TermsPage, PrivacyPage, StoreOwnerAgreementPage } from './pages/legal/PolicyDocumentPage';
 // WO-O4O-PHARMACYHUB-GUIDE-ADOPTION-V1
 // 공통 Guide View(@o4o/shared-space-ui) 를 그대로 채택한다. PharmacyHub 전용 Guide page 파일은 만들지 않는다.
 import {
@@ -368,6 +368,7 @@ export default function App() {
               만들지 않는다. */}
           <Route path="/terms" element={<TermsPage />} />
           <Route path="/privacy" element={<PrivacyPage />} />
+          <Route path="/store-owner-agreement" element={<StoreOwnerAgreementPage />} />
 
           {/*
             WO-O4O-PHARMACYHUB-GUIDE-ADOPTION-V1
