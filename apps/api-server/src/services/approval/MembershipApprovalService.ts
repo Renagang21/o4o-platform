@@ -213,6 +213,67 @@ function isBareAdminTierRole(role: string): boolean {
   return !role.includes(':') && isAdminTierRoleName(role);
 }
 
+export class StoreOwnerBusinessInfoRequiredError extends Error {
+  readonly code = 'STORE_OWNER_BUSINESS_INFO_REQUIRED';
+  readonly httpStatus = 409;
+  constructor(public readonly missingFields: string[]) {
+    super('매장 경영자 승인에 필요한 사업자정보가 누락되었습니다.');
+    this.name = 'StoreOwnerBusinessInfoRequiredError';
+  }
+}
+
+const STORE_OWNER_BUSINESS_ROLE_BY_SERVICE: Readonly<Record<string, string>> = {
+  'k-cosmetics': 'cosmetics:store_owner',
+  'pharmacy-hub': 'pharmacy-hub:store_owner',
+};
+const STORE_OWNER_REQUIRED_BUSINESS_FIELDS = [
+  'businessName',
+  'representativeName',
+  'businessNumber',
+  'businessAddress',
+  'businessPhone',
+] as const;
+
+function normalizeBusinessInfo(raw: unknown): Record<string, unknown> {
+  if (!raw) return {};
+  if (typeof raw === 'string') {
+    try { return JSON.parse(raw) as Record<string, unknown>; } catch { return {}; }
+  }
+  return typeof raw === 'object' ? raw as Record<string, unknown> : {};
+}
+
+async function assertStoreOwnerBusinessInfo(
+  queryRunner: MembershipTxExecutor,
+  membership: ApproveResult,
+): Promise<void> {
+  const requiredRole = STORE_OWNER_BUSINESS_ROLE_BY_SERVICE[membership.service_key];
+  if (!requiredRole) return;
+  const grantedRole = resolveGrantedRole(membership.service_key, membership.role);
+  if (grantedRole !== requiredRole) return;
+
+  const rows = await queryRunner.query(
+    `SELECT "businessInfo" FROM users WHERE id = $1 LIMIT 1`,
+    [membership.user_id],
+  );
+  const biz = normalizeBusinessInfo(rows?.[0]?.businessInfo ?? rows?.[0]?.businessinfo);
+  const value = (key: string): string => {
+    const aliases: Record<string, string[]> = {
+      businessName: ['businessName', 'pharmacyName', 'companyName'],
+      representativeName: ['representativeName', 'ceoName'],
+      businessNumber: ['businessNumber'],
+      businessAddress: ['businessAddress', 'address1'],
+      businessPhone: ['businessPhone'],
+    };
+    for (const candidate of aliases[key] ?? [key]) {
+      const v = String(biz[candidate] ?? '').trim();
+      if (v) return v;
+    }
+    return '';
+  };
+  const missing = STORE_OWNER_REQUIRED_BUSINESS_FIELDS.filter((key) => !value(key));
+  if (missing.length > 0) throw new StoreOwnerBusinessInfoRequiredError([...missing]);
+}
+
 export class MembershipApprovalService {
 
   /**
@@ -374,6 +435,11 @@ export class MembershipApprovalService {
         await queryRunner.rollbackTransaction();
         throw new Error(`CRITICAL: service_memberships.user_id is null for id=${membershipId}`);
       }
+
+      // WO-O4O-STORE-OWNER-AGREEMENT-PUBLISH-PREREQUISITES-V1 §4:
+      // K-Cosmetics / PharmacyHub store_owner 는 활성화 직전 사업자정보 5항목을 서버에서 재검증한다.
+      // pending 신청 자체는 허용하되 불완전한 정보로 active role 이 부여되는 경로는 차단한다.
+      await assertStoreOwnerBusinessInfo(queryRunner, membership);
 
       // STEP1: Activate membership
       logger.info('[APPROVAL][STEP1] membership UPDATE', { membershipId });
