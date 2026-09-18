@@ -8,7 +8,9 @@ import { loadPolicy } from '../pages/legal/PolicyDocumentPage';
 const DOCUMENT_TYPE = 'store_owner_agreement';
 
 export function StoreOwnerAgreementGate({ children }: { children: ReactNode }) {
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
+  const isContractStoreOwner = !!user?.roles?.includes('pharmacy-hub:store_owner');
+  if (!isContractStoreOwner) return <>{children}</>;
   return (
     <RequiredAgreementGate
       serviceKey={SERVICE_KEY}
