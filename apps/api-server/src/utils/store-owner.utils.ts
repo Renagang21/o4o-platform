@@ -37,6 +37,7 @@ import type { AuthContext } from '../auth/auth-context.js';
 import { resolveCanonicalServiceKey } from '@o4o/security-core';
 import { getServiceWorkspaceCapability } from '../config/service-catalog.js';
 import { enforceStoreOwnerAgreement } from '../modules/policy-acceptance/store-owner-agreement.middleware.js';
+import { policyAcceptanceService } from '../modules/policy-acceptance/policy-acceptance.service.js';
 import {
   resolveStoreOrganization,
   type StoreOrganizationResolution,
@@ -328,6 +329,22 @@ export async function resolveStoreAccess(
 ): Promise<string | null> {
   // ambiguous 는 organizationId 가 null 이므로 자연히 차단된다(임의 선택 없음).
   const { isOwner, organizationId } = await isStoreOwner(dataSource, userId, serviceKey);
-  if (isOwner) return organizationId;
-  return null;
+  if (!isOwner || !organizationId) return null;
+
+  // WO-O4O-STORE-OWNER-AGREEMENT-PUBLISH-PREREQUISITES-V1:
+  // 일부 legacy Store API 는 createRequireStoreOwner 미들웨어 없이 이 helper 를 직접 쓴다.
+  // 서비스 스코프가 있는 경우 published 매장 계약 미동의를 조직 접근 불가로 처리하여
+  // 직접 API 호출로 계약 gate 를 우회할 수 없게 한다. 계약 미게시/조회 오류는 기존 접근 유지.
+  if (serviceKey) {
+    try {
+      const requirement = await policyAcceptanceService.getStoreOwnerAgreementRequirement(
+        userId,
+        resolveCanonicalServiceKey(serviceKey),
+      );
+      if (requirement.required && !requirement.accepted) return null;
+    } catch {
+      // 인증/조직 판정 자체의 가용성을 해치지 않는다. canonical middleware 경로가 최종 428 표면.
+    }
+  }
+  return organizationId;
 }
