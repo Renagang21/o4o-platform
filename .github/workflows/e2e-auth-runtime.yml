@@ -2,8 +2,13 @@ name: E2E — Auth Runtime Regression
 
 # 3개 배포 서비스(Neture / KPA-Society / K-Cosmetics) auth runtime 검증
 # 실제 운영 URL을 대상으로 하므로 과도한 자동 실행 방지:
-#   - workflow_dispatch: 주 실행 방법 (배포 후 수동 검증)
-#   - push to main (e2e/auth-runtime/** 변경 시): E2E 코드 자체 변경에 한해 자동 실행
+#   - workflow_dispatch: 유일한 실행 경로 (배포 후 수동 검증)
+#
+# WO-O4O-GOOGLE-IDENTITY-OPERATOR-EXPLICIT-LINK-V1 (2026-09-19, 사용자 승인):
+#   push 자동 트리거를 임시 제거했다. legacy password E2E 계정이 WO-2C reset 으로 사라진 뒤
+#   stale E2E_*_ADMIN_* secret 으로 3서비스 반복 로그인 → 운영자 계정 loginAttempts 누적 → 30분 잠금이
+#   auth 패키지 push 마다 재발했기 때문이다(09-17~18, 10회). secret 은 삭제하지 않는다.
+#   Google-only 인증 기준 E2E 재정의는 WO-2F 에서 수행하며, 그때까지 수동 실행만 허용한다.
 
 on:
   workflow_dispatch:
@@ -12,27 +17,6 @@ on:
         description: '실행 사유 (예: auth 배포 후 검증, 회귀 확인)'
         required: false
         default: '수동 검증'
-
-  push:
-    branches:
-      - main
-    paths:
-      # E2E 테스트 코드 자체
-      - 'e2e/auth-runtime/**'
-      # Auth 공통 패키지 (src만 — dist는 자동 생성이므로 제외)
-      - 'packages/auth-utils/src/**'
-      - 'packages/auth-client/src/**'
-      - 'packages/auth-react/src/**'
-      - 'packages/security-core/src/**'
-      # 서비스별 AuthContext (login/token 흐름 직접 제어)
-      - 'services/web-kpa-society/src/contexts/AuthContext.tsx'
-      - 'services/web-neture/src/contexts/AuthContext.tsx'
-      - 'services/web-k-cosmetics/src/contexts/AuthContext.tsx'
-      # Auth guard 컴포넌트 (RoleGuard, MembershipGate, AuthGate 등)
-      - 'services/web-*/src/components/auth/**'
-      # 서비스별 membership/role 로직
-      - 'services/web-*/src/lib/membershipGate.ts'
-      - 'services/web-*/src/lib/role-constants.ts'
 
 concurrency:
   group: e2e-auth-runtime-${{ github.ref }}
