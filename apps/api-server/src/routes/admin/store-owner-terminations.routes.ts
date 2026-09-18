@@ -6,8 +6,11 @@ import {
   type StoreOwnerContractServiceKey,
 } from '../../services/store-owner-termination.service.js';
 import logger from '../../utils/logger.js';
+import { standardLimiter } from '../../config/rate-limiters.config.js';
 
 const router = Router();
+// destructive/PII-return admin workflow — centralized authenticated-endpoint limiter first.
+router.use(standardLimiter);
 router.use(authenticate);
 router.use(requireAdmin);
 
