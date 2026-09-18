@@ -92,6 +92,12 @@ function runQuery(sql: string, params: any[] = []): any {
     return driverShape(s, affected.map((m) => ({ id: m.id })));
   }
 
+  // store_owner 승인 계약: KCos/PH 는 활성화 직전 사업자정보 5항목을 재검증한다.
+  if (has(s, 'SELECT', 'FROM users') && s.includes('"businessInfo"')) {
+    const row = db.users.find((u) => u.id === params[0]);
+    return driverShape(s, row ? [{ businessInfo: row.businessInfo }] : []);
+  }
+
   return driverShape(s, []);
 }
 
@@ -148,7 +154,7 @@ function seed(
   db = {
     memberships: [{ id: 'm-1', user_id: 'u1', service_key: serviceKey, role: membershipRole, status }],
     roles,
-    users: [{ id: 'u1', status: status === 'suspended' ? 'suspended' : 'pending', isActive: false }],
+    users: [{ id: 'u1', status: status === 'suspended' ? 'suspended' : 'pending', isActive: false, businessInfo: { businessName:'테스트 매장', representativeName:'대표자', businessNumber:'123-45-67890', businessAddress:'서울 테스트 주소', businessPhone:'02-1234-5678' } }],
   };
   queries.length = 0;
   jest.clearAllMocks();

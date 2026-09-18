@@ -123,6 +123,10 @@ function runQuery(sql: string, params: any[] = []): any {
   }
 
   // ---- users / kpa_members / cosmetics_members ----
+  if (has(s, 'SELECT', 'FROM users') && s.includes('"businessInfo"')) {
+    const row = db.users.find((u) => u.id === params[0]);
+    return driverShape(s, row ? [{ businessInfo: row.businessInfo }] : []);
+  }
   if (has(s, 'UPDATE users')) return driverShape(s, []);
   if (has(s, 'UPDATE kpa_members')) {
     const userId = params[0];
@@ -193,7 +197,7 @@ beforeEach(() => {
       { id: 'ra-neture', user_id: 'u1', role: 'neture:supplier', is_active: true },
     ],
     kpaMembers: [{ user_id: 'u1', status: 'active' }],
-    users: [{ id: 'u1', status: 'pending' }],
+    users: [{ id: 'u1', status: 'pending', businessInfo: { businessName:'테스트 매장', representativeName:'대표자', businessNumber:'123-45-67890', businessAddress:'서울 테스트 주소', businessPhone:'02-1234-5678' } }],
     cosmeticsMembers: [],
   };
   jest.clearAllMocks();
