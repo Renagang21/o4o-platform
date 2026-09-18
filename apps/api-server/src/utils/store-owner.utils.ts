@@ -185,7 +185,7 @@ export async function isStoreOwner(
   //   조직만 후보이며, 2개 이상이면 organizationId 를 주지 않는다(임의 선택 금지).
   const resolution = await resolveStoreOrganization(dataSource, userId, serviceKey);
   const agreementServiceKey = serviceKey ? resolveCanonicalServiceKey(serviceKey) : undefined;
-  const pendingAgreements = await policyAcceptanceService.getPendingStoreOwnerAgreementsForUser(userId, agreementServiceKey);
+  const pendingAgreements = await policyAcceptanceService.getPendingStoreOwnerAgreementsForUser(userId, agreementServiceKey, dataSource);
   const pendingAgreement = pendingAgreements[0] ?? null;
   return {
     // 다른 직접 호출(resolveStoreAccess/requireStoreAuth)도 계약 미승낙을 우회하지 못한다.
