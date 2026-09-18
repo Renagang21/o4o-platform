@@ -240,6 +240,45 @@ const strongTargetResolver: PlannerTargetResolver = async (dataSource) => {
   return resolveStrongAiTarget(dataSource, undefined);
 };
 
+/** Capability B(Astra Screen) B1 — openai vision 호출 형태. planner 와(후속) multimodal-chat 이 같은 형태를 쓴다. */
+export const OPENAI_CHAT_COMPLETIONS_URL = 'https://api.openai.com/v1/chat/completions';
+
+/**
+ * openai chat/completions 의 vision 요청 본문. 이미지는 `image_url`(data URI) 한 자리로만 싣고 프롬프트 텍스트에는
+ * base64 가 들어가지 않는다. gpt-5.x/6.x/o-series 는 `max_completion_tokens` + temperature 생략(ai-core openai provider 규칙).
+ */
+export function buildOpenAiVisionBody(
+  model: string,
+  systemPrompt: string,
+  userPrompt: string,
+  image: { mimeType: string; base64: string },
+  maxTokens = 800,
+): Record<string, unknown> {
+  const reasoningGeneration = /^(gpt-[56]|o[1-9])/i.test(model.trim());
+  return {
+    model,
+    messages: [
+      { role: 'system', content: systemPrompt },
+      {
+        role: 'user',
+        content: [
+          { type: 'text', text: userPrompt },
+          { type: 'image_url', image_url: { url: `data:${image.mimeType};base64,${image.base64}` } },
+        ],
+      },
+    ],
+    ...(reasoningGeneration ? { max_completion_tokens: maxTokens } : { max_tokens: maxTokens, temperature: 0.2 }),
+    response_format: { type: 'json_object' },
+  };
+}
+
+/** chat/completions 응답의 message.content — 문자열 또는 part 배열(text 만 모은다). */
+export function openAiMessageText(content: unknown): string {
+  if (typeof content === 'string') return content;
+  if (Array.isArray(content)) return content.map((p) => (p && typeof p === 'object' && typeof (p as { text?: unknown }).text === 'string' ? (p as { text: string }).text : '')).join('');
+  return '';
+}
+
 export function createLlmPlanner(
   dataSource: DataSource,
   fetchImpl: typeof fetch = fetch,
@@ -268,6 +307,28 @@ export function createLlmPlanner(
           if (!response.ok) throw new Error(`planner provider ${response.status}`);
           const data = (await response.json()) as { candidates?: { content?: { parts?: { text?: string }[] } }[] };
           return extractJson(data?.candidates?.[0]?.content?.parts?.map((p) => p.text ?? '').join('') ?? '');
+        } finally {
+          clearTimeout(timer);
+        }
+      }
+      // Capability B(Astra Screen) B1 — WO-O4O-COMMON-AUTOMATION-CORE-CAPABILITY-A §6 후속.
+      //   B0 실측(2026-09-19, gpt-6-astra · 사분면 fixture 4/4 · text-only 대조 0/4) PASS 뒤에만 연 분기다.
+      //   openai 도 이미지를 **본다** — 기존 Gemini vision 은 그대로 두고 provider 만 갈린다. chat/completions 의
+      //   image_url(data URI) 한 자리 · 키는 Authorization 헤더에만(URL · 로그 · 프롬프트에 base64/키 없음) ·
+      //   reasoning 세대(gpt-6.x)라 temperature 없이 max_completion_tokens · JSON 응답 모드(ai-core openai provider 와 동일 규칙).
+      if (input.image && provider === 'openai') {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), 40_000);
+        try {
+          const response = await fetchImpl(OPENAI_CHAT_COMPLETIONS_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` },
+            body: JSON.stringify(buildOpenAiVisionBody(model, WORK_PLANNER_SYSTEM_PROMPT, userPrompt, input.image)),
+            signal: controller.signal,
+          });
+          if (!response.ok) throw new Error(`planner provider ${response.status}`);
+          const data = (await response.json()) as { choices?: { message?: { content?: string | { type?: string; text?: string }[] } }[] };
+          return extractJson(openAiMessageText(data?.choices?.[0]?.message?.content));
         } finally {
           clearTimeout(timer);
         }

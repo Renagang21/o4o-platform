@@ -25,9 +25,12 @@ import { LOCAL_AGENT_ERROR, parseLocalAction } from '../services/local-agent/loc
 import { pickSafeDomInfo } from '../services/local-agent/browser-dom-contract.js';
 import { WORK_LOOP_LIMITS, validateWorkProposal, type WorkObservation } from '../services/ai-tools/work-agent-contract.js';
 import {
+  OPENAI_CHAT_COMPLETIONS_URL,
   WORK_PLANNER_SYSTEM_PROMPT,
+  buildOpenAiVisionBody,
   buildPlannerUserPrompt,
   createLlmPlanner,
+  openAiMessageText,
   runWorkAgent,
   type PlannerInput,
   type WorkPlanner,
@@ -138,6 +141,63 @@ describe('Planner — real provider call contract (§10·§12·§25·§26·§27)
     // 프롬프트에 이미지 바이트가 텍스트로 들어가지 않는다 — inline_data 한 자리뿐.
     const body = JSON.parse(fetchImpl.mock.calls[0][1].body);
     expect(JSON.stringify(body.contents[0].parts[0])).not.toContain('QUJD');
+  });
+
+  // Capability B(Astra Screen) B1 — B0 실측 PASS(gpt-6-astra 사분면 fixture 4/4) 뒤 연 분기. Gemini vision 은 위 테스트 그대로.
+  it('openai(Astra) + 이미지: chat/completions · Bearer 헤더(URL 에 키 0) · [text, image_url data URI] · max_completion_tokens(temperature 0) · json_object — 이미지 바이트는 프롬프트 텍스트에 없다', async () => {
+    const fetchImpl = jest.fn(async (url: string, init: any) => {
+      expect(url).toBe(OPENAI_CHAT_COMPLETIONS_URL);
+      expect(url).not.toContain('k-astra');
+      expect(init.headers.Authorization).toBe('Bearer k-astra');
+      const body = JSON.parse(init.body);
+      expect(body.model).toBe('gpt-6-astra');
+      expect(body.messages[0]).toEqual({ role: 'system', content: WORK_PLANNER_SYSTEM_PROMPT });
+      expect(body.messages[1].role).toBe('user');
+      expect(body.messages[1].content[0].type).toBe('text');
+      expect(body.messages[1].content[0].text).toContain('## 사용자 목적');
+      expect(body.messages[1].content[0].text).not.toContain('QUJD');
+      expect(body.messages[1].content[0].text).not.toContain('이미지를 볼 수 없다');
+      expect(body.messages[1].content[1]).toEqual({ type: 'image_url', image_url: { url: expect.stringMatching(/^data:image\/(png|jpeg);base64,QUJD$/) } });
+      expect(body.max_completion_tokens).toBeGreaterThanOrEqual(800);
+      expect(body.temperature).toBeUndefined();
+      expect(body.response_format).toEqual({ type: 'json_object' });
+      return { ok: true, status: 200, json: async () => ({ choices: [{ message: { content: JSON.stringify({ assessment: 'progress', action: { kind: 'set_input', elementRef: 'e_2', text: 'AMD 5' }, rationale: '식별문자' }) } }] }) } as any;
+    });
+    const resolveAstra = async () => ({ provider: 'openai' as const, model: 'gpt-6-astra', apiKey: 'k-astra' });
+    const planner = createLlmPlanner({} as any, fetchImpl as any, resolveAstra);
+    const raw = await planner.plan({ goal: { goalId: 'g', request: '사진의 약', status: 'active' }, siteDisplayName: '약학정보원', observation: OBS, history: [], lastRead: null, image: { mimeType: 'image/png', base64: 'QUJD', provenance: 'user_image' }, stepsLeft: 10 });
+    expect(raw).toMatchObject({ action: { kind: 'set_input', elementRef: 'e_2', text: 'AMD 5' } });
+    expect(validateWorkProposal(raw, OBS).ok).toBe(true);
+    expect(fetchImpl).toHaveBeenCalledTimes(1);
+    // 화면 캡처(screen_capture) 도 같은 분기 — provenance 는 planner 프롬프트 문구만 가른다.
+    const raw2 = await planner.plan({ goal: { goalId: 'g', request: 'x', status: 'active' }, siteDisplayName: 's', observation: OBS, history: [], lastRead: null, image: { mimeType: 'image/jpeg', base64: 'QUJD', provenance: 'screen_capture' }, stepsLeft: 5 });
+    expect(raw2).toMatchObject({ assessment: 'progress' });
+    expect(fetchImpl).toHaveBeenCalledTimes(2);
+    // 응답 part 배열 형태도 읽는다 · non-reasoning 모델은 max_tokens+temperature.
+    expect(openAiMessageText([{ type: 'text', text: '{"a":' }, { type: 'text', text: '1}' }])).toBe('{"a":1}');
+    expect(openAiMessageText(undefined)).toBe('');
+    const legacy = buildOpenAiVisionBody('gpt-4o', 'S', 'U', { mimeType: 'image/png', base64: 'QUJD' });
+    expect(legacy).toMatchObject({ max_tokens: 800, temperature: 0.2 });
+    expect((legacy as any).max_completion_tokens).toBeUndefined();
+  });
+
+  it('openai(Astra) + 이미지: provider 오류 · timeout 은 planner throw (키 · 이미지 바이트가 오류 메시지에 없다)', async () => {
+    const resolveAstra = async () => ({ provider: 'openai' as const, model: 'gpt-6-astra', apiKey: 'k-astra' });
+    for (const c of [
+      async () => ({ ok: false, status: 429, json: async () => ({}) }),
+      async () => { throw Object.assign(new Error('aborted'), { name: 'AbortError' }); },
+    ]) {
+      const planner = createLlmPlanner({} as any, (async () => c()) as any, resolveAstra);
+      let thrown: Error | null = null;
+      try {
+        await planner.plan({ goal: { goalId: 'g', request: 'x', status: 'active' }, siteDisplayName: 's', observation: OBS, history: [], lastRead: null, image: { mimeType: 'image/png', base64: 'QUJD', provenance: 'user_image' }, stepsLeft: 5 });
+      } catch (e) {
+        thrown = e as Error;
+      }
+      expect(thrown).toBeTruthy();
+      expect(thrown!.message).not.toContain('k-astra');
+      expect(thrown!.message).not.toContain('QUJD');
+    }
   });
 
   it('invalid JSON · empty · provider error · timeout 은 planner throw → loop 가 planner_unavailable 로 인계(명령 0 추가)', async () => {
