@@ -118,6 +118,7 @@ export default function LoginModal() {
             loginWithGoogle={loginWithGoogle}
             signupWithGoogle={signupWithGoogle}
             onSuccess={() => { setError(''); finishLogin(); }}
+            onStart={() => setError('')}
             onError={(e) => setError(e.message)}
             termsHref="/terms"
             privacyHref="/privacy"

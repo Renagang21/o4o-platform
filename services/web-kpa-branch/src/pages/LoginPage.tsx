@@ -53,6 +53,7 @@ export default function LoginPage() {
           loginWithGoogle={loginWithGoogle}
           signupWithGoogle={signupWithGoogle}
           onSuccess={() => { setError(null); navigate('/me'); }}
+          onStart={() => setError(null)}
           onError={(e) => setError(e.message)}
           termsHref={PLATFORM_TERMS_URL}
           privacyHref={PLATFORM_PRIVACY_URL}

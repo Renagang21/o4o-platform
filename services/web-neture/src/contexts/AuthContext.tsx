@@ -60,6 +60,12 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+/**
+ * WO-O4O-GOOGLE-IDENTITY-PRODUCTION-ACTIVATION-AND-SMOKE-V1: 모듈 수준 상수 — render 마다 새 참조를 만들지 않는다.
+ * (<GoogleContinue /> 는 자체 ref 로도 방어하지만, provider 가 안정된 참조를 넘기는 것이 2차 방어다.)
+ */
+const getGoogleAuthConfig = () => authClient.getGoogleAuthConfig();
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   // WO-...-COMMONIZATION-V1: Core 는 공통 인증 상태·행동만. Neture 차이는 아래 주입값이 전부다.
   const core = useServiceAuth<User>(
@@ -135,7 +141,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         login,
         loginWithGoogle: core.loginWithGoogle,
         signupWithGoogle: core.signupWithGoogle,
-        getGoogleAuthConfig: () => authClient.getGoogleAuthConfig(),
+        getGoogleAuthConfig,
         logout: core.logout,
         logoutAll: core.logoutAll,
         switchRole,

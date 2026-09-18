@@ -165,6 +165,7 @@ export default function LoginModal({ isOpen, onClose, returnUrl }: LoginModalPro
                   loginWithGoogle={loginWithGoogle}
                   signupWithGoogle={signupWithGoogle}
                   onSuccess={() => { setError(null); setIsNotMember(false); handleLoginSuccess(false); }}
+                  onStart={() => { setError(null); setIsNotMember(false); }}
                   onError={(e) => { setIsNotMember(false); setError(e.message); }}
                   termsHref="/terms"
                   privacyHref="/privacy"
