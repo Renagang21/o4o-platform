@@ -19,6 +19,9 @@ export { PolicyAcceptanceGate } from './legal/PolicyAcceptanceGate';
 export type { PolicyAcceptanceGateProps, PendingPolicyAcceptanceLike } from './legal/PolicyAcceptanceGate';
 export { usePublishedPolicyDocument } from './legal/usePublishedPolicyDocument';
 export type { PublishedPolicyDocument, PublishedPolicyDocumentState } from './legal/usePublishedPolicyDocument';
+// WO-O4O-STORE-OWNER-AGREEMENT-PUBLISH-PREREQUISITES-V1: Store Workspace 전용 계약 게이트
+export { StoreOwnerAgreementGate } from './legal/StoreOwnerAgreementGate';
+export type { StoreOwnerAgreementGateProps } from './legal/StoreOwnerAgreementGate';
 
 // WO-O4O-CROSSSERVICE-DYNAMIC-LEGAL-FOOTER-V1: 공개 푸터 동적 법정정보
 export { PublicLegalFooterInfo } from './legal/PublicLegalFooterInfo';
