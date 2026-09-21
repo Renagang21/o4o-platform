@@ -14,18 +14,39 @@
  *
  * 단일 사용 보장은 조건부 UPDATE ... RETURNING 의 원자성으로 확보한다.
  * (Redis GET + DEL 2-step 대비 경쟁 조건에 강하다.)
+ *
+ * WO-O4O-UNIFIED-STORE-WORKSPACE-FOUNDATION-V1 §8-2 (2026-09-21):
+ *   토큰은 두 형태 중 정확히 하나다 (DB CHECK 가 강제).
+ *     SERVICE   HANDOFF: targetServiceKey (catalog 서비스) — 기존 동작 불변
+ *     WORKSPACE HANDOFF: targetWorkspace = 'store' (store.neture.co.kr · 서비스 아님 · 가짜 serviceKey 0)
+ *   별도 토큰 시스템을 만들지 않고 같은 행·같은 원자 consume 을 재사용한다.
  */
 
 import { AppDataSource } from '../database/connection.js';
 import { getService } from '../config/service-catalog.js';
 import logger from '../utils/logger.js';
 
+/** 현재 허용되는 workspace handoff 대상. DB CHECK(`CHK_handoff_tokens_target_kind`)와 1:1. */
+export const HANDOFF_WORKSPACES = ['store'] as const;
+export type HandoffWorkspace = (typeof HANDOFF_WORKSPACES)[number];
+
+export function isHandoffWorkspace(value: unknown): value is HandoffWorkspace {
+  return typeof value === 'string' && (HANDOFF_WORKSPACES as readonly string[]).includes(value);
+}
+
 export interface HandoffTokenPayload {
   userId: string;
   sourceServiceKey: string;
-  targetServiceKey: string;
+  /** SERVICE HANDOFF 일 때만 존재 */
+  targetServiceKey?: string;
+  /** WORKSPACE HANDOFF 일 때만 존재 */
+  targetWorkspace?: HandoffWorkspace;
   createdAt: string;
 }
+
+export type HandoffTarget =
+  | { kind: 'service'; targetServiceKey: string }
+  | { kind: 'workspace'; targetWorkspace: HandoffWorkspace };
 
 class HandoffTokenService {
   private static instance: HandoffTokenService;
@@ -43,26 +64,39 @@ class HandoffTokenService {
    *
    * @param userId - User ID requesting the handoff
    * @param sourceServiceKey - Service key the user is coming from
-   * @param targetServiceKey - Service key the user wants to navigate to
+   * @param target - 대상: catalog serviceKey(문자열 · 기존 호출 호환) 또는 HandoffTarget
    * @returns Token string (UUID)
    */
   async generateToken(
     userId: string,
     sourceServiceKey: string,
-    targetServiceKey: string,
+    target: string | HandoffTarget,
   ): Promise<string> {
-    // Validate target service exists in catalog
-    const targetService = getService(targetServiceKey);
-    if (!targetService) {
-      throw new Error(`Unknown target service: ${targetServiceKey}`);
+    const resolved: HandoffTarget =
+      typeof target === 'string' ? { kind: 'service', targetServiceKey: target } : target;
+
+    let targetServiceKey: string | null = null;
+    let targetWorkspace: HandoffWorkspace | null = null;
+    if (resolved.kind === 'service') {
+      // Validate target service exists in catalog
+      const targetService = getService(resolved.targetServiceKey);
+      if (!targetService) {
+        throw new Error(`Unknown target service: ${resolved.targetServiceKey}`);
+      }
+      targetServiceKey = resolved.targetServiceKey;
+    } else {
+      if (!isHandoffWorkspace(resolved.targetWorkspace)) {
+        throw new Error(`Unknown target workspace: ${String(resolved.targetWorkspace)}`);
+      }
+      targetWorkspace = resolved.targetWorkspace;
     }
 
     const rows: Array<{ id: string }> = await AppDataSource.query(
       `INSERT INTO handoff_tokens
-         (user_id, source_service_key, target_service_key, expires_at)
-       VALUES ($1, $2, $3, now() + ($4 || ' seconds')::interval)
+         (user_id, source_service_key, target_service_key, target_workspace, expires_at)
+       VALUES ($1, $2, $3, $4, now() + ($5 || ' seconds')::interval)
        RETURNING id`,
-      [userId, sourceServiceKey, targetServiceKey, String(this.TOKEN_TTL)],
+      [userId, sourceServiceKey, targetServiceKey, targetWorkspace, String(this.TOKEN_TTL)],
     );
 
     const tokenId = rows?.[0]?.id;
@@ -78,6 +112,7 @@ class HandoffTokenService {
       userId,
       sourceServiceKey,
       targetServiceKey,
+      targetWorkspace,
       ttl: this.TOKEN_TTL,
     });
 
@@ -104,7 +139,7 @@ class HandoffTokenService {
         WHERE id = $1
           AND consumed_at IS NULL
           AND expires_at > now()
-        RETURNING user_id, source_service_key, target_service_key, created_at`,
+        RETURNING user_id, source_service_key, target_service_key, target_workspace, created_at`,
       [tokenId],
     );
 
@@ -120,17 +155,26 @@ class HandoffTokenService {
     const payload: HandoffTokenPayload = {
       userId: row.user_id,
       sourceServiceKey: row.source_service_key,
-      targetServiceKey: row.target_service_key,
       createdAt:
         row.created_at instanceof Date
           ? row.created_at.toISOString()
           : String(row.created_at),
     };
+    // 두 형태 중 정확히 하나 (DB CHECK) — 행 그대로 payload 에 반영한다
+    if (row.target_service_key) {
+      payload.targetServiceKey = row.target_service_key;
+    } else if (isHandoffWorkspace(row.target_workspace)) {
+      payload.targetWorkspace = row.target_workspace;
+    } else {
+      logger.warn('[Handoff] Token row has no valid target kind', { tokenId });
+      return null;
+    }
 
     logger.info('[Handoff] Token exchanged', {
       tokenId,
       userId: payload.userId,
       targetServiceKey: payload.targetServiceKey,
+      targetWorkspace: payload.targetWorkspace,
     });
 
     return payload;

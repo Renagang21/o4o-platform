@@ -11,6 +11,11 @@
  *   대상 서비스 인증 토큰을 우회 획득하는 경로를 차단 (Service Join API 의
  *   pending 정책과 짝을 이루는 V2 정합 보강).
  *
+ * WO-O4O-UNIFIED-STORE-WORKSPACE-FOUNDATION-V1 §8-2 (2026-09-21):
+ *   handoff 대상은 두 종류 — SERVICE(targetServiceKey · 기존 로직 불변) / WORKSPACE(targetWorkspace='store').
+ *   Store workspace handoff 는 특정 서비스 membership 이 아니라 "Store 접근 가능 organization ≥ 1" 로 판단하고,
+ *   exchange 는 store.neture.co.kr origin 에서만 허용한다. 가짜 serviceKey('store') 는 쓰지 않는다.
+ *
  * Endpoints:
  * - POST /api/v1/auth/handoff         — Generate handoff token (requireAuth)
  * - POST /api/v1/auth/handoff/exchange — Exchange token for auth (public)
@@ -28,6 +33,9 @@ import * as tokenUtils from '../../../utils/token.utils.js';
 import { persistRefreshTokenFamily } from '../../../services/auth/auth-context.helper.js';
 import { setAuthCookies } from '../../../utils/cookie.utils.js';
 import { getService, getServiceOrigin, O4O_SERVICES } from '../../../config/service-catalog.js';
+import { STORE_WORKSPACE_KEY, STORE_WORKSPACE_ORIGIN, isStoreWorkspaceExchangeOrigin } from '../../../config/store-workspace.js';
+import { resolveAccessibleStores } from '../../../utils/service-tenant.resolver.js';
+import { isHandoffWorkspace } from '../../../services/handoff-token.service.js';
 import logger from '../../../utils/logger.js';
 
 /**
@@ -44,6 +52,24 @@ function isSafeReturnPath(value: unknown): value is string {
   return true;
 }
 
+/**
+ * Detect source service from the exact Origin hostname.
+ * WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1:
+ *   study.neture.co.kr includes the string "neture.co.kr", so substring matching would
+ *   misclassify the independent Lecture service as Neture. Origin is host-level data;
+ *   compare hostnames exactly. Services sharing one host (e.g. basePath tenants) keep
+ *   the catalog's first-host match because Origin headers do not carry a path.
+ */
+function detectSourceServiceKey(origin: string): string {
+  try {
+    const originHost = new URL(origin).hostname.toLowerCase();
+    const sourceService = O4O_SERVICES.find((svc) => svc.domain.toLowerCase() === originHost);
+    return sourceService?.key ?? 'unknown';
+  } catch {
+    return 'unknown';
+  }
+}
+
 export class HandoffController extends BaseController {
   /**
    * POST /api/v1/auth/handoff
@@ -52,15 +78,24 @@ export class HandoffController extends BaseController {
    * Requires authentication. The token is stored in Redis (60s TTL, single-use).
    */
   static async generateHandoff(req: Request, res: Response): Promise<any> {
-    const { targetServiceKey, returnPath } = req.body;
+    const { targetServiceKey, targetWorkspace, returnPath } = req.body;
     const user = (req as AuthRequest).user;
 
     if (!user) {
       return BaseController.error(res, 'Authentication required', 401, 'AUTH_REQUIRED');
     }
 
-    if (!targetServiceKey) {
+    // §8-2: 대상 종류는 정확히 하나 — targetServiceKey(SERVICE) 또는 targetWorkspace(WORKSPACE)
+    const hasServiceTarget = targetServiceKey !== undefined && targetServiceKey !== null && targetServiceKey !== '';
+    const hasWorkspaceTarget = targetWorkspace !== undefined && targetWorkspace !== null && targetWorkspace !== '';
+    if (hasServiceTarget && hasWorkspaceTarget) {
+      return BaseController.error(res, 'targetServiceKey and targetWorkspace are mutually exclusive', 400, 'VALIDATION_ERROR');
+    }
+    if (!hasServiceTarget && !hasWorkspaceTarget) {
       return BaseController.error(res, 'targetServiceKey is required', 400, 'VALIDATION_ERROR');
+    }
+    if (hasWorkspaceTarget && !isHandoffWorkspace(targetWorkspace)) {
+      return BaseController.error(res, `Unknown workspace: ${String(targetWorkspace)}`, 400, 'INVALID_WORKSPACE');
     }
 
     // WO-O4O-NETURE-UNIFIED-ENTRY-UI-PHASE1-V1: optional returnPath
@@ -75,6 +110,41 @@ export class HandoffController extends BaseController {
       safeReturnPath = returnPath;
     }
 
+    // ── WORKSPACE HANDOFF (store.neture.co.kr) ──────────────────────────────
+    //   서비스 membership 이 아니라 Store 접근 가능 organization 으로 판단한다 (organization-first).
+    if (hasWorkspaceTarget) {
+      try {
+        const stores = await resolveAccessibleStores(AppDataSource, user.id);
+        if (stores.length === 0) {
+          logger.warn('[Handoff] Blocked generation — no accessible store organization', {
+            userId: user.id,
+            targetWorkspace: STORE_WORKSPACE_KEY,
+            reason: 'no_store',
+          });
+          return BaseController.error(res, '접근 가능한 매장이 없습니다.', 403, 'HANDOFF_TARGET_NO_MEMBERSHIP');
+        }
+
+        const sourceServiceKey = detectSourceServiceKey(req.get('origin') || '');
+        const handoffToken = await handoffTokenService.generateToken(user.id, sourceServiceKey, {
+          kind: 'workspace',
+          targetWorkspace: STORE_WORKSPACE_KEY,
+        });
+        const targetUrl =
+          `${STORE_WORKSPACE_ORIGIN}/handoff?token=${handoffToken}` +
+          (safeReturnPath ? `&returnTo=${encodeURIComponent(safeReturnPath)}` : '');
+
+        return BaseController.ok(res, {
+          handoffToken,
+          targetUrl,
+          targetWorkspace: STORE_WORKSPACE_KEY,
+        });
+      } catch (err: any) {
+        logger.error('[Handoff] Workspace token generation failed', err);
+        return BaseController.error(res, 'Failed to generate handoff token', 500, 'HANDOFF_GENERATION_FAILED');
+      }
+    }
+
+    // ── SERVICE HANDOFF (기존 로직 불변) ─────────────────────────────────────
     // Validate target service exists
     const targetService = getService(targetServiceKey);
     if (!targetService) {
@@ -137,23 +207,7 @@ export class HandoffController extends BaseController {
         );
       }
 
-      // Detect source service from the exact Origin hostname.
-      // WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1:
-      //   study.neture.co.kr includes the string "neture.co.kr", so substring matching would
-      //   misclassify the independent Lecture service as Neture. Origin is host-level data;
-      //   compare hostnames exactly. Services sharing one host (e.g. basePath tenants) keep
-      //   the catalog's first-host match because Origin headers do not carry a path.
-      const origin = req.get('origin') || '';
-      let sourceServiceKey = 'unknown';
-      try {
-        const originHost = new URL(origin).hostname.toLowerCase();
-        const sourceService = O4O_SERVICES.find(
-          (svc) => svc.domain.toLowerCase() === originHost,
-        );
-        sourceServiceKey = sourceService?.key ?? 'unknown';
-      } catch {
-        sourceServiceKey = 'unknown';
-      }
+      const sourceServiceKey = detectSourceServiceKey(req.get('origin') || '');
 
       const handoffToken = await handoffTokenService.generateToken(
         user.id,
@@ -229,6 +283,32 @@ export class HandoffController extends BaseController {
           [user.id],
         );
 
+      // §8-2: 대상 종류 판정 — WORKSPACE(store) 면 organization 축으로 재검증하고 origin 을 고정한다.
+      //   토큰은 이미 원자적으로 소비됐으므로(단일 사용) 여기서 거부되면 재사용될 수 없다.
+      if (payload.targetWorkspace !== undefined) {
+        if (!isStoreWorkspaceExchangeOrigin(req.get('origin'))) {
+          logger.warn('[Handoff] Blocked exchange — workspace token from non-store origin', {
+            userId: user.id,
+            targetWorkspace: payload.targetWorkspace,
+            reason: 'origin_mismatch',
+          });
+          return BaseController.error(res, 'Handoff token is invalid or expired', 401, 'HANDOFF_TOKEN_INVALID');
+        }
+        const stores = await resolveAccessibleStores(AppDataSource, user.id);
+        if (stores.length === 0) {
+          logger.warn('[Handoff] Blocked exchange — no accessible store organization', {
+            userId: user.id,
+            targetWorkspace: payload.targetWorkspace,
+            reason: 'no_store',
+          });
+          return BaseController.error(res, '접근 가능한 매장이 없습니다.', 403, 'HANDOFF_TARGET_NO_MEMBERSHIP');
+        }
+        return HandoffController.issueHandoffSession(req, res, user, roles, memberships, {
+          targetWorkspace: payload.targetWorkspace,
+        });
+      }
+
+      // ── SERVICE HANDOFF (기존 로직 불변) ────────────────────────────────────
       // WO-O4O-AUTH-HANDOFF-ACTIVE-MEMBERSHIP-VERIFICATION-V1:
       //   target service active membership 재검증 (exchange 시점).
       //   generation 시점에 active 였더라도 60s TTL 사이에 status 가 변경됐을 수 있으므로
@@ -281,44 +361,60 @@ export class HandoffController extends BaseController {
         );
       }
 
-      // 5. Generate auth tokens
-      // WO-O4O-LOGOUT-ALL-TOKEN-INVALIDATION-V1:
-      //   handoff 는 새 로그인이 아니라 기존 세션의 교차 서비스 승계다.
-      //   새 family 를 발급하면 원 서비스 세션이 family mismatch 로 죽는다 → 기존 family 를 승계한다.
-      //   (기존 family 가 없으면 새로 발급하고 아래에서 기록한다.)
-      const tokens = tokenUtils.generateTokens(
-        user,
-        roles,
-        'neture.co.kr',
-        memberships,
-        user.refreshTokenFamily ?? null,
-      );
-      await persistRefreshTokenFamily(user.id, tokens.refreshToken);
-
-      // 6. Set cookies (domain auto-detected from Origin header via getCookieDomainFromOrigin)
-      setAuthCookies(req, res, tokens);
-
-      // 7. Always include tokens in body (for localStorage-strategy services)
-      return BaseController.ok(res, {
-        message: 'Handoff successful',
-        user: {
-          id: user.id,
-          email: user.email,
-          name: user.name || user.firstName || '',
-          roles,
-          memberships,
-        },
-        tokens: {
-          accessToken: tokens.accessToken,
-          refreshToken: tokens.refreshToken,
-          expiresIn: tokens.expiresIn,
-        },
+      return HandoffController.issueHandoffSession(req, res, user, roles, memberships, {
         targetServiceKey: payload.targetServiceKey,
       });
     } catch (err: any) {
       logger.error('[Handoff] Token exchange failed', err);
       return BaseController.error(res, 'Handoff exchange failed', 500, 'HANDOFF_EXCHANGE_FAILED');
     }
+  }
+
+  /**
+   * exchange 공통 후반부 (SERVICE / WORKSPACE 동일): 토큰 발급 · family 승계 · 쿠키 · body.
+   */
+  private static async issueHandoffSession(
+    req: Request,
+    res: Response,
+    user: User,
+    roles: string[],
+    memberships: { serviceKey: string; status: string }[],
+    target: { targetServiceKey?: string; targetWorkspace?: string },
+  ): Promise<any> {
+    // 5. Generate auth tokens
+    // WO-O4O-LOGOUT-ALL-TOKEN-INVALIDATION-V1:
+    //   handoff 는 새 로그인이 아니라 기존 세션의 교차 서비스 승계다.
+    //   새 family 를 발급하면 원 서비스 세션이 family mismatch 로 죽는다 → 기존 family 를 승계한다.
+    //   (기존 family 가 없으면 새로 발급하고 아래에서 기록한다.)
+    const tokens = tokenUtils.generateTokens(
+      user,
+      roles,
+      'neture.co.kr',
+      memberships,
+      user.refreshTokenFamily ?? null,
+    );
+    await persistRefreshTokenFamily(user.id, tokens.refreshToken);
+
+    // 6. Set cookies (domain auto-detected from Origin header via getCookieDomainFromOrigin)
+    setAuthCookies(req, res, tokens);
+
+    // 7. Always include tokens in body (for localStorage-strategy services)
+    return BaseController.ok(res, {
+      message: 'Handoff successful',
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name || user.firstName || '',
+        roles,
+        memberships,
+      },
+      tokens: {
+        accessToken: tokens.accessToken,
+        refreshToken: tokens.refreshToken,
+        expiresIn: tokens.expiresIn,
+      },
+      ...target,
+    });
   }
 
   /**

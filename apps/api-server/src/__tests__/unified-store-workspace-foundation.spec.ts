@@ -123,14 +123,19 @@ describe('Store Workspace 는 서비스가 아니다 (IR §13)', () => {
     expect(read('config/service-catalog.ts')).not.toMatch(/key:\s*'store'/);
   });
 
-  it('service handoff 라우트 · handoff_tokens.target_service_key NOT NULL 은 이번 WO 에서 바뀌지 않았다 (DDL 0 · STOP 보고)', () => {
+  it('handoff 라우트는 그대로(신규 라우트 0) · workspace handoff 는 §8 DDL 승인 후 같은 엔드포인트의 target 종류 분기다 (가짜 serviceKey 0)', () => {
     const authRoutes = read('modules/auth/routes/auth.routes.ts');
     expect(authRoutes).toMatch(/router\.post\(\s*'\/handoff',\s*requireAuth,/);
     expect(authRoutes).toMatch(/router\.post\(\s*'\/handoff\/exchange',\s*asyncHandler/);
-    expect(read('database/migrations/20270311000000-CreateHandoffTokens.ts')).toContain('"target_service_key" varchar(64) NOT NULL');
+    expect(authRoutes).not.toContain('/handoff/store');
     const handoff = read('modules/auth/controllers/handoff.controller.ts');
-    expect(handoff).not.toContain('targetWorkspace');
-    expect(handoff).not.toContain("'store'");
+    // 'store' 리터럴은 STORE_WORKSPACE_KEY 상수 뒤에 숨긴다 — controller 코드(주석 제외)에 'store' 문자열이 없다
+    const code = handoff.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
+    expect(code).not.toContain("'store'");
+    expect(handoff).not.toMatch(/getService\(\s*STORE_WORKSPACE_KEY/);
+    expect(handoff).toContain('resolveAccessibleStores(AppDataSource, user.id)');
+    expect(handoff).toContain('isStoreWorkspaceExchangeOrigin(req.get(');
+    // 상세 계약은 unified-store-workspace-handoff.spec.ts
   });
 
   it('CORS 는 store.neture.co.kr 정확 origin 1개만 추가한다 (와일드카드 0)', () => {
