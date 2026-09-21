@@ -1,0 +1,195 @@
+/**
+ * StoreLibraryContentsPage — 내 자료함 / 콘텐츠
+ *
+ * WO-O4O-STORE-LIBRARY-CONTENTS-TAB-RESTRUCTURE-V1
+ *   - (이전) 상위 탭: [콘텐츠] [강의]
+ *
+ * WO-O4O-KPA-STORE-LIBRARY-CONTENT-ONLY-SELECTOR-V1:
+ *   콘텐츠/강의 상위 전환을 제거하고 콘텐츠 목록을 바로 표시한다(콘텐츠 전용). 강의 선택 UI 미노출.
+ *
+ * 이전 WO 흐름 보존:
+ *   WO-O4O-STORE-LIBRARY-CONTENTS-CANONICAL-TABLE-SPLIT-V1
+ *   WO-O4O-STORE-LIBRARY-SERVER-PAGINATION-V1: server-side pagination + search
+ *   WO-O4O-CONTENT-HUB-ASSET-SNAPSHOT-WIRING-V1: 가상 type='document' = cms+content 통합
+ *   WO-O4O-LMS-STORE-LIBRARY-UX-WIRING-V1: lesson Reference Metadata 노출
+ *   WO-O4O-KPA-STORE-LIBRARY-CONTENTS-REMOVE-FLOW-FIX-V1
+ *   WO-O4O-STORE-LIBRARY-COPY-INDEPENDENCE-ALIGN-V1: duplicate 허용 유지
+ *
+ * WO-O4O-KPA-CONTENT-CREATION-AI-ENTRY-REMOVE-V1:
+ *   페이지형 AI 진입 제거 — StartProductionModal 의 AI 카드(onAiAction 미전달로 숨김) +
+ *   in-page AiContentModal("AI 매장 제작 자료 초안") 제거. 콘텐츠 선택·복사, 제작 시작(POP/QR/
+ *   블로그/상품설명), 빈 편집기 콘텐츠 제작(CreateContentFromResourcesModal)은 보존.
+ *   공통 StartProductionModal(@o4o/store-ui-core)은 미변경 — KCos 무영향.
+ *
+ * WO-O4O-STORE-PRODUCTION-MATERIALS-CONTENT-SELECTOR-MODAL-V1:
+ *   기존 페이지 내부에 직접 정의되어 있던 TopTabBar / SubTabBar / DocumentsSection /
+ *   LessonsSection 을 StoreContentsSelector 로 추출. 본 페이지와 production-materials
+ *   모달이 같은 canonical selector 를 공유한다. 페이지 동작/UX 변경 없음.
+ *
+ * WO-O4O-MY-STORE-REMAINING-FEATURE-VIEW-COMMONIZATION-V1 §5-A:
+ *   손으로 짜던 breadcrumb·제목·부제·헤더 액션과 그 style map 을 공통 StorePageShell 로 이관.
+ *   본문(StoreContentsSelector)·모달·동작은 무변경.
+ */
+
+import { useState, useCallback, useEffect, useMemo, type CSSProperties } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { BookOpen, PenSquare, Lightbulb } from 'lucide-react';
+// WO-O4O-KPA-STORE-LIBRARY-CONTENT-CREATION-GUIDE-MODAL-V1: 콘텐츠 제작 가이드(안내 UI)
+import { ContentCreationGuideModal } from './ContentCreationGuideModal';
+import { StorePageShell } from '@o4o/store-ui-core';
+import { storeAssetControlApi } from '../../api/assetSnapshot';
+import { colors } from '../../styles/theme';
+import { StartProductionModal, type ProductionSource, type ProductionSourceItem } from './StartProductionModal';
+import { CreateContentFromResourcesModal, type CreateContentProductContext } from './CreateContentFromResourcesModal';
+import { StoreContentsSelector } from './StoreContentsSelector';
+
+export default function StoreLibraryContentsPage() {
+  const [reloadKey, setReloadKey] = useState(0);
+  const reload = useCallback(() => setReloadKey((k) => k + 1), []);
+
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalSource, setModalSource] = useState<ProductionSource | null>(null);
+  const [createFromResourcesOpen, setCreateFromResourcesOpen] = useState(false);
+  // WO-O4O-KPA-STORE-LIBRARY-CONTENT-CREATION-GUIDE-MODAL-V1
+  const [guideOpen, setGuideOpen] = useState(false);
+
+  // WO-O4O-KPA-STORE-HANDLED-PRODUCTS-CONTENT-ACTIONS-V1:
+  //   매장 취급제품 화면의 "콘텐츠 만들기"에서 URL 파라미터로 진입 → 작성 모달을 제품 연결 컨텍스트와 함께 자동 오픈.
+  //   (URL 기반 전달 → 새로고침 후에도 연결 대상 유실 없음)
+  const [searchParams, setSearchParams] = useSearchParams();
+  const productCtx = useMemo<CreateContentProductContext | null>(() => {
+    if (searchParams.get('create') !== '1') return null;
+    const pType = searchParams.get('pType');
+    const pId = searchParams.get('pId');
+    const pName = searchParams.get('pName');
+    if ((pType === 'listing' || pType === 'local') && pId) {
+      return { sourceType: pType, sourceId: pId, name: pName || '선택한 제품' };
+    }
+    return null;
+  }, [searchParams]);
+
+  useEffect(() => {
+    if (productCtx) setCreateFromResourcesOpen(true);
+  }, [productCtx]);
+
+  const closeCreateModal = useCallback(() => {
+    setCreateFromResourcesOpen(false);
+    // 제품 진입 파라미터 정리 — 닫은 뒤 새로고침해도 재오픈되지 않게.
+    if (searchParams.get('create')) {
+      setSearchParams(
+        (prev) => {
+          const p = new URLSearchParams(prev);
+          ['create', 'pType', 'pId', 'pName'].forEach((k) => p.delete(k));
+          return p;
+        },
+        { replace: true },
+      );
+    }
+  }, [searchParams, setSearchParams]);
+
+  const openProduction = useCallback((items: ProductionSourceItem[]) => {
+    if (items.length === 0) return;
+    setModalSource({ fromLibrary: 'contents', items });
+    setModalOpen(true);
+  }, []);
+
+  const removeSnapshots = useCallback(async (snapshotIds: string[]): Promise<number> => {
+    if (snapshotIds.length === 0) return 0;
+    await Promise.all(snapshotIds.map((id) => storeAssetControlApi.updatePublishStatus(id, 'hidden')));
+    return snapshotIds.length;
+  }, []);
+
+  return (
+    <StorePageShell
+      labels={{
+        // WO-O4O-KPA-MY-STORE-FINAL-CLEANUP-AND-CLOSEOUT-V1:
+        //   실제 사이드바 그룹명은 '약국 자료함' — breadcrumb 을 일치시킨다.
+        breadcrumbRoot: '약국 자료함',
+        pageTitle: '콘텐츠',
+        subtitle:
+          '매장 콘텐츠를 관리합니다. 콘텐츠를 선택하면 하단 작업막대에서 QR·POP·인쇄용 PDF 등 제작 기능을 사용할 수 있습니다.',
+      }}
+      Icon={BookOpen}
+      iconColor={colors.primary}
+      maxWidth={1100}
+      onReload={reload}
+      headerActions={
+        <>
+          <button
+            type="button"
+            onClick={() => setCreateFromResourcesOpen(true)}
+            style={styles.createBtn}
+          >
+            <PenSquare size={14} />
+            콘텐츠 제작
+          </button>
+          {/* WO-O4O-KPA-STORE-LIBRARY-CONTENT-CREATION-GUIDE-MODAL-V1: 보조 버튼(가이드 모달) */}
+          <button type="button" onClick={() => setGuideOpen(true)} style={styles.guideBtn}>
+            <Lightbulb size={14} />
+            콘텐츠 제작 가이드
+          </button>
+        </>
+      }
+    >
+      {/* WO-O4O-STORE-PRODUCTION-MATERIALS-CONTENT-SELECTOR-MODAL-V1:
+          공통 selector 를 'page' 모드로 mount — 콘텐츠 목록 + 검색 + 선택 + 제작 시작 + 선택 제거 */}
+      <StoreContentsSelector
+        reloadKey={reloadKey}
+        onStartProduction={openProduction}
+        onRemoveSnapshots={removeSnapshots}
+        onAfterRemove={reload}
+        mode="page"
+        // WO-O4O-KPA-STORE-LIBRARY-CONTENTS-PDF-EXPORT-OPTIONS-V1: 선택 작업 영역에 인쇄용 PDF 만들기
+        enablePdfExport
+      />
+
+      <StartProductionModal
+        open={modalOpen}
+        source={modalSource}
+        onClose={() => setModalOpen(false)}
+      />
+
+      <CreateContentFromResourcesModal
+        open={createFromResourcesOpen}
+        onClose={closeCreateModal}
+        onCreated={reload}
+        product={productCtx}
+      />
+
+      {/* WO-O4O-KPA-STORE-LIBRARY-CONTENT-CREATION-GUIDE-MODAL-V1 */}
+      <ContentCreationGuideModal open={guideOpen} onClose={() => setGuideOpen(false)} />
+    </StorePageShell>
+  );
+}
+
+// ─── Styles ──────────────────────────────────────────────────────────────────
+
+const styles: Record<string, CSSProperties> = {
+  createBtn: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '6px',
+    padding: '6px 14px',
+    background: colors.primary,
+    border: 'none',
+    borderRadius: '6px',
+    fontSize: '13px',
+    fontWeight: 500,
+    color: colors.white,
+    cursor: 'pointer',
+  },
+  // WO-O4O-KPA-STORE-LIBRARY-CONTENT-CREATION-GUIDE-MODAL-V1: 보조(outline) 버튼
+  guideBtn: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '6px',
+    padding: '6px 12px',
+    background: colors.white,
+    border: `1px solid ${colors.primary}`,
+    borderRadius: '6px',
+    fontSize: '13px',
+    fontWeight: 500,
+    color: colors.primary,
+    cursor: 'pointer',
+  },
+};

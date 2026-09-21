@@ -1,0 +1,90 @@
+/**
+ * Event Offer API 서비스
+ */
+
+import { apiClient } from './client';
+import type {
+  LegacyEventOffer,
+  EventOfferProduct,
+  EventOfferStats,
+  EventOfferParticipation,
+  EventOfferItem,
+  PaginatedResponse,
+  ApiResponse,
+} from '../types';
+
+export const eventOfferApi = {
+  // 이벤트 상품 목록 (product listing 기반, WO-KPA-GROUPBUY-PAGE-V1)
+  getEventOfferProducts: (params?: {
+    page?: number;
+    limit?: number;
+  }) =>
+    apiClient.get<{
+      success: boolean;
+      data: EventOfferProduct[];
+      pagination: { page: number; limit: number; total: number; totalPages: number };
+    }>('/groupbuy', params),
+
+  // 이벤트 상품 상세 — enriched (productName/unitPrice 포함)
+  getEventOfferProduct: (id: string) =>
+    apiClient.get<{ success: boolean; data: EventOfferItem }>(`/groupbuy/${id}`),
+
+  // 이벤트 운영 통계 (WO-KPA-GROUPBUY-STATS-V1)
+  getEventOfferStats: () =>
+    apiClient.get<{ success: boolean; data: EventOfferStats }>('/groupbuy/stats'),
+
+  // 이벤트 상품 목록 (enriched, WO-EVENT-OFFER-HUB-TABLE-AND-DIRECT-ORDER-REFINE-V1)
+  // WO-EVENT-OFFER-HUB-TIME-WINDOW-FILTER-HOTFIX-V1: status 필터 추가
+  // WO-O4O-EVENT-OFFER-DATA-LIFECYCLE-COMPLETION-V1: 'upcoming' 추가
+  getEnrichedOffers: (params?: {
+    page?: number;
+    limit?: number;
+    status?: 'upcoming' | 'active' | 'ended' | 'all';
+  }) =>
+    apiClient.get<{
+      success: boolean;
+      data: EventOfferItem[];
+      pagination: { page: number; limit: number; total: number; totalPages: number };
+    }>('/groupbuy/enriched', params),
+
+  // 이벤트 목록 (legacy campaign)
+  getOffers: (params?: {
+    status?: 'upcoming' | 'active' | 'ended';
+    category?: string;
+    page?: number;
+    limit?: number;
+    search?: string;
+  }) =>
+    apiClient.get<PaginatedResponse<LegacyEventOffer>>('/groupbuy', params),
+
+  // 이벤트 상세
+  getOffer: (id: string) =>
+    apiClient.get<ApiResponse<LegacyEventOffer>>(`/groupbuy/${id}`),
+
+  /**
+   * @deprecated WO-O4O-EVENT-OFFER-PARTICIPATE-LEGACY-DEMOTION-V1
+   * Buyer 주문 진입은 canonical Store Cart 흐름으로 이전됨:
+   *   장바구니 담기 → /store-hub/cart → checkout-confirm.
+   * 이 method 는 legacy/internal 호환용으로만 유지한다 (buyer UI 직접 호출 0건).
+   */
+  participate: (id: string, quantity: number) =>
+    apiClient.post<ApiResponse<EventOfferParticipation>>(`/groupbuy/${id}/participate`, {
+      quantity,
+    }),
+
+  // 참여 취소
+  cancelParticipation: (id: string) =>
+    apiClient.delete<ApiResponse<void>>(`/groupbuy/${id}/participate`),
+
+  // 내 참여 내역
+  getMyParticipations: (params?: {
+    status?: string;
+    page?: number;
+    limit?: number;
+  }) =>
+    apiClient.get<PaginatedResponse<EventOfferParticipation>>('/groupbuy/my-participations', params),
+
+  // 참여 상세
+  getParticipation: (offerId: string) =>
+    apiClient.get<ApiResponse<EventOfferParticipation>>(`/groupbuy/${offerId}/my-participation`),
+};

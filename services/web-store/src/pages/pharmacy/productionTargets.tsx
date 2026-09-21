@@ -1,0 +1,190 @@
+/**
+ * productionTargets — 제작 진입 카탈로그 (Single Source of Truth)
+ *
+ * WO-O4O-KPA-STORE-PRODUCTION-ENTRY-UNIFY-V1
+ *
+ * "내 자료함" 제작 진입이 공유하는 카탈로그:
+ *   - StartProductionModal — 자료 선택 후 진입 (source.items 채워짐)
+ *
+ * target/route 정의 중복을 제거하고, router state payload 를 표준화한다.
+ *
+ * WO-O4O-MY-STORE-FINAL-CLEANUP-AND-CLOSEOUT-V1 (범위 C):
+ *   자료 없이 유형만 고르던 ProductionTypeSelectorModal 은 활성 진입점 0 으로 삭제되었다.
+ *   제작 시작 진입은 "자료함 > 콘텐츠에서 자료 선택 후 시작" 단일 흐름으로 수렴한다.
+ *
+ * 4유형 화이트리스트 고정: POP / QR 코드 / 블로그 / 상품 상세설명
+ * 디지털 사이니지는 의도적 제외 (KPA Signage 구조 freeze 보호).
+ *
+ * Router state 표준:
+ *   navigate(meta.route, { state: buildProductionState({ target, source?, selectedTemplateId? }) })
+ *
+ * 수신측(StorePopPage / StoreQRPage / StoreProductDescriptionsPage / PharmacyBlogPage)은
+ * source.items.length === 0 일 때 메뉴 직접 진입과 동일하게 동작 (early return 처리됨).
+ *
+ * WO-O4O-KPA-STORE-PRODUCTION-MATERIALS-AI-FLOW-V1:
+ *   AiContentModal 진입용 default AiMode 매핑(productionTargetToAiMode) 추가.
+ *   AiContentModal 의 MODE_CONFIG 와 동기 — 추가 시 양쪽 갱신 필요.
+ *
+ * WO-O4O-STORE-PRODUCTION-TEMPLATE-REGISTRY-V1:
+ *   ProductionTargetMeta에 templateCategory, outputConstraints, supportsTemplates, defaultTemplateId 추가.
+ *   ProductionRouterState에 selectedTemplateId 추가.
+ *   buildProductionState()에 selectedTemplateId 인자 추가.
+ */
+
+import { Megaphone, QrCode, BookOpen, FileText, type LucideIcon } from 'lucide-react';
+// WO-O4O-PRODUCTION-TEMPLATE-REGISTRY-CROSSSERVICE-PHASE2-J-V1:
+//   ProductionOutputConstraints 는 @o4o/types/production-template canonical.
+//   productionTemplates.ts 는 re-export 를 유지하므로 경로 변경 불필요.
+import type { ProductionOutputConstraints } from './productionTemplates';
+// WO-O4O-STORE-PRODUCTION-TYPES-COMMONIZATION-PHASE2-F-V1:
+//   4 개 router state 타입의 canonical 출처는 @o4o/types/production.
+//   기존 사용처 (이 파일에서 import 하던 코드들) 호환을 위해 re-export 유지.
+import type {
+  ProductionTarget,
+  ProductionSourceItem,
+  ProductionSource,
+  ProductionRouterState,
+} from '@o4o/types/production';
+// WO-O4O-STORE-PRODUCTION-ROUTER-UTILS-COMMONIZATION-PHASE2-G-V1:
+//   buildProductionState / composeSourceTextFromItems 공통화 → @o4o/store-ui-core.
+//   본 모듈에서는 호환을 위해 re-export 유지.
+import {
+  buildProductionState as _buildProductionState,
+  composeSourceTextFromItems as _composeSourceTextFromItems,
+} from '@o4o/store-ui-core';
+
+// ─── Types ────────────────────────────────────────────────────────────────────
+
+// WO-O4O-STORE-PRODUCTION-TYPES-COMMONIZATION-PHASE2-F-V1:
+//   ProductionTarget / ProductionSourceItem / ProductionSource / ProductionRouterState
+//   정의를 @o4o/types/production 으로 이동 (canonical). 본 모듈에서는 호환을 위해 re-export.
+export type { ProductionTarget, ProductionSourceItem, ProductionSource, ProductionRouterState };
+
+export interface ProductionTargetMeta {
+  key: ProductionTarget;
+  label: string;
+  /** 1-line description (유형 선택 모달용) */
+  description: string;
+  Icon: LucideIcon;
+  /** Hex color for icon tint */
+  iconColor: string;
+  route: string;
+  /**
+   * WO-O4O-STORE-PRODUCTION-TEMPLATE-REGISTRY-V1:
+   * template registry에서 이 target에 해당하는 category 키.
+   * getTemplatesForTarget(templateCategory) 로 template 목록을 가져온다.
+   */
+  templateCategory: ProductionTarget;
+  /**
+   * template 선택 흐름 지원 여부.
+   * true: StartProductionModal에서 template picker step 표시
+   * false: template 선택 없이 바로 진입 (기존 동작 유지)
+   */
+  supportsTemplates: boolean;
+  /**
+   * 기본 template id (registry 첫 번째 항목과 동기).
+   * template-less fallback 기본값(제작 시작 시 template 미선택이면 이 id 를 쓴다).
+   */
+  defaultTemplateId: string;
+  /**
+   * target 수준 출력 제약 (template 미선택 시 적용되는 기본값).
+   * template 선택 시 template.outputConstraints가 우선한다.
+   */
+  outputConstraints?: ProductionOutputConstraints;
+  /**
+   * WO-O4O-POP-HUB-LIBRARY-HANDOFF-TO-V2-CANONICAL-V1:
+   * true 면 legacy ProductionRouterState 대신 POP V2 handoff 계약으로 진입한다.
+   * 공통 StartProductionModal 의 StartProductionTargetConfig 와 구조 호환.
+   */
+  handoffToPopV2?: boolean;
+}
+
+// ─── Catalog ──────────────────────────────────────────────────────────────────
+
+export const PRODUCTION_TARGET_CATALOG: ProductionTargetMeta[] = [
+  {
+    key: 'pop',
+    label: 'POP',
+    description: '매장 내 게시용 인쇄물 (PDF)',
+    Icon: Megaphone,
+    iconColor: '#f59e0b',
+    // WO-O4O-POP-HUB-LIBRARY-HANDOFF-TO-V2-CANONICAL-V1: 자료함 → POP 제작은 V2 canonical 로 간다.
+    //   템플릿은 V2 편집기가 직접 고르므로 이 모달의 template step 을 쓰지 않는다.
+    route: '/store/marketing/pop-v2',
+    handoffToPopV2: true,
+    templateCategory: 'pop',
+    supportsTemplates: false,
+    defaultTemplateId: 'pop-modern',
+    outputConstraints: {
+      maxBodyLength: 300,
+      allowedLengths: ['short', 'medium'],
+      requiredFields: ['title', 'bullets', 'shortText'],
+    },
+  },
+  {
+    key: 'qr',
+    label: 'QR 코드',
+    description: '매장 입구·제품 옆 부착용 QR',
+    Icon: QrCode,
+    iconColor: '#0ea5e9',
+    route: '/store/marketing/qr',
+    templateCategory: 'qr',
+    supportsTemplates: true,
+    defaultTemplateId: 'qr-product-intro',
+    outputConstraints: {
+      maxBodyLength: 150,
+      allowedLengths: ['short'],
+      requiredFields: ['title', 'shortText'],
+    },
+  },
+  {
+    key: 'blog',
+    label: '블로그',
+    description: '공개 콘텐츠 게시물',
+    Icon: BookOpen,
+    iconColor: '#16a34a',
+    route: '/store/content/blog',
+    templateCategory: 'blog',
+    supportsTemplates: true,
+    defaultTemplateId: 'blog-health-professional',
+    outputConstraints: {
+      requiredFields: ['html', 'title', 'summary'],
+    },
+  },
+  {
+    key: 'product-description',
+    label: '상품 상세설명',
+    description: '상품 카드/상세 페이지용 본문',
+    Icon: FileText,
+    iconColor: '#2563EB',
+    route: '/store/marketing/product-descriptions',
+    templateCategory: 'product-description',
+    supportsTemplates: true,
+    defaultTemplateId: 'desc-b2c-persuasion',
+    outputConstraints: {
+      requiredFields: ['html', 'title', 'bullets'],
+    },
+  },
+];
+
+export function findProductionTarget(key: ProductionTarget): ProductionTargetMeta | undefined {
+  return PRODUCTION_TARGET_CATALOG.find((t) => t.key === key);
+}
+
+// ─── Router state helper ─────────────────────────────────────────────────────
+
+// WO-O4O-STORE-PRODUCTION-ROUTER-UTILS-COMMONIZATION-PHASE2-G-V1:
+//   buildProductionState 정의는 @o4o/store-ui-core/productionUtils canonical.
+//   기존 사용처 호환을 위해 re-export.
+export const buildProductionState = _buildProductionState;
+
+// WO-O4O-STORE-INTERNAL-AI-RETIREMENT-V1: AiContentModal 진입용 매핑(AiModeForProduction · PRODUCTION_TARGET_TO_AI_MODE)은
+//   consumer 0 으로 확인돼 제거. 제작 시작은 template registry + 외부 LLM(ChatGPT로 작업) 경로만 쓴다.
+
+// ─── composeSourceTextFromItems ─────────────────────────────────────────────
+
+// WO-O4O-STORE-PRODUCTION-ROUTER-UTILS-COMMONIZATION-PHASE2-G-V1:
+//   composeSourceTextFromItems 정의는 @o4o/store-ui-core/productionUtils canonical.
+//   기존 사용처 호환을 위해 re-export.
+export const composeSourceTextFromItems = _composeSourceTextFromItems;
+
