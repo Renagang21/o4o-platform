@@ -305,39 +305,9 @@ export class NetureService {
     return this.offerService.submitForApproval(supplierId, offerIds);
   }
 
-  async createSupplierOffer(
-    supplierId: string,
-    data: {
-      barcode?: string;
-      name?: string;
-      categoryId?: string;
-      brandName?: string;
-      manualData?: {
-        regulatoryType?: string;
-        regulatoryName?: string;
-        manufacturerName?: string;
-        name?: string;
-        mfdsPermitNumber?: string | null;
-        categoryId?: string | null;
-        brandId?: string | null;
-        specification?: string | null;
-        originCountry?: string | null;
-        tags?: string[];
-      };
-      distributionType?: OfferDistributionType;
-      serviceKeys?: string[];
-      priceGeneral?: number;
-      priceGold?: number | null;
-      pricePlatinum?: number | null;
-      consumerReferencePrice?: number | null;
-      consumerShortDescription?: string | null;
-      consumerDetailDescription?: string | null;
-      // WO-KPA-RECOMMENDED-TAB-REPLACE-CURATION-WITH-SUPPLIER-HIGHLIGHT-V1
-      isFeatured?: boolean;
-    }
-  ) {
-    return this.offerService.createSupplierOffer(supplierId, data);
-  }
+  // createSupplierOffer(레거시 barcode/name → resolveOrCreateMaster 위임) 은
+  // WO-O4O-SUPPLIER-PRODUCT-REGISTRATION-AI-FIRST-CUTOVER-AND-LEGACY-MASTER-RESOLUTION-RETIREMENT-V1 로 은퇴.
+  // 공급자 Offer 생성 = createSupplierOfferFromExistingMaster 만.
 
   /** WO-O4O-SUPPLIER-EXISTING-MASTER-DIRECT-OFFER-LINK-V1: 검증된 기존 Master → Offer 직접 연결 */
   async createSupplierOfferFromExistingMaster(supplierId: string, rawBody: Record<string, unknown>) {

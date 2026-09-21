@@ -40,6 +40,30 @@ export interface PromotionMasterFields {
   specification: string | null;
   /** product_masters.barcode — GTIN-like 일 때만. 아니면 null(합성 금지) */
   barcode: string | null;
+  /**
+   * optional canonical metadata — create 시 INSERT 컬럼으로만 쓴다. link(기존 Master) 에서는 무시한다(UPDATE 0).
+   * 값의 정합(카테고리/브랜드 존재 여부)은 Adapter 책임 — Core 는 검증·조회하지 않는다.
+   * WO-O4O-SUPPLIER-PRODUCT-REGISTRATION-AI-FIRST-CUTOVER-AND-LEGACY-MASTER-RESOLUTION-RETIREMENT-V1 §2.5
+   */
+  metadata?: PromotionMasterMetadata | null;
+}
+
+/** create 전용 optional metadata. 모두 nullable — 없으면 컬럼 NULL. regulatoryName 이 없으면 name 을 쓴다(기존 규칙). */
+export interface PromotionMasterMetadata {
+  categoryId?: string | null;
+  brandId?: string | null;
+  originCountry?: string | null;
+  regulatoryName?: string | null;
+}
+
+export const PROMOTION_IMAGE_TYPES = ['thumbnail', 'content', 'detail'] as const;
+export type PromotionImageType = (typeof PROMOTION_IMAGE_TYPES)[number];
+
+/** create 후 Master 에 연결할 이미지(이미 media asset 으로 업로드된 URL). ProductImage 는 Master 생성 전에 쓰지 않는다. */
+export interface PromotionImageInput {
+  url: string;
+  type: PromotionImageType;
+  sortOrder: number;
 }
 
 export interface PromotionIdentifierInput {
@@ -61,6 +85,8 @@ export interface PromotionIdentifierInput {
 export interface PromotionEffects {
   /** create 시 ProductDrugExtension 보장. Adapter 가 선언 — Core 는 regulatoryType 을 보지 않는다 */
   ensureDrugExtension: boolean;
+  /** create 시(커밋 후) ProductImage 로 연결할 이미지. link 에서는 무시(기존 Master 이미지 불변). 없으면 no-op */
+  images?: PromotionImageInput[];
 }
 
 export interface ProductPromotionPlan {

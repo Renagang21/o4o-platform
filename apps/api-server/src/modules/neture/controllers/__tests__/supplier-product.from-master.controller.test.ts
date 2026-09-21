@@ -2,15 +2,17 @@
  * Route tests — POST /api/v1/neture/supplier/products/from-master
  * WO-O4O-SUPPLIER-EXISTING-MASTER-DIRECT-OFFER-LINK-V1 §2.1 · §6.1
  *
- * requireAuth / requireActiveSupplier 는 stub(헤더로 인증·공급자 상태 주입),
- * NetureService 는 mock. 같은 앱에서 기존 POST /products 가 그대로임(masterId 미전달)을 확인한다.
+ * requireAuth / requireActiveSupplier 는 stub(헤더로 인증·공급자 상태 주입), NetureService 는 mock.
+ *
+ * WO-O4O-SUPPLIER-PRODUCT-REGISTRATION-AI-FIRST-CUTOVER-AND-LEGACY-MASTER-RESOLUTION-RETIREMENT-V1 §2.4:
+ *   레거시 POST /products(createSupplierOffer) 는 제거되었다 — "기존 POST /products 불변" 기대는 은퇴 계약으로 뒤집었다.
+ *   공급자 Offer 생성 = from-master 하나뿐. NetureService mock 에도 createSupplierOffer 는 두지 않는다.
  */
 import express from 'express';
 import request from 'supertest';
 import type { DataSource } from 'typeorm';
 
 const mockFromMaster = jest.fn();
-const mockCreate = jest.fn();
 
 jest.mock('../../../../middleware/auth.middleware.js', () => ({
   requireAuth: (req: express.Request, res: express.Response, next: express.NextFunction) => {
@@ -35,7 +37,6 @@ jest.mock('../../middleware/neture-identity.middleware.js', () => ({
 jest.mock('../../neture.service.js', () => ({
   NetureService: jest.fn().mockImplementation(() => ({
     createSupplierOfferFromExistingMaster: mockFromMaster,
-    createSupplierOffer: mockCreate,
   })),
 }));
 jest.mock('../../services/csv-import.service.js', () => ({ CsvImportService: jest.fn().mockImplementation(() => ({})) }));
@@ -64,7 +65,7 @@ function makeApp() {
 
 const asActiveSupplier = (r: request.Test) => r.set('x-test-user', 'u1').set('x-test-supplier-status', 'ACTIVE');
 
-beforeEach(() => { mockFromMaster.mockReset(); mockCreate.mockReset(); });
+beforeEach(() => { mockFromMaster.mockReset(); });
 
 describe('guard 체인 — requireAuth → requireActiveSupplier', () => {
   it('미인증 → 401 · 서비스 미호출', async () => {
@@ -138,22 +139,15 @@ describe('오류 코드 → HTTP status 매핑 (WO §2.2)', () => {
   });
 });
 
-describe('기존 POST /products 불변', () => {
-  it('body.masterId 는 기존 핸들러에서 서비스로 전달되지 않는다 (destructure 화이트리스트)', async () => {
-    mockCreate.mockResolvedValue({ success: true, data: { id: 'o2' } });
-    const res = await asActiveSupplier(request(makeApp()).post(LEGACY_URL)).send({ masterId: MASTER_ID, barcode: '880', name: 'x' });
-    expect(res.status).toBe(201);
-    expect(mockCreate).toHaveBeenCalledTimes(1);
-    const payload = mockCreate.mock.calls[0][1] as Record<string, unknown>;
-    expect(payload).not.toHaveProperty('masterId');
+describe('(은퇴) 레거시 POST /products — 라우트 없음 · 어떤 서비스도 호출되지 않음', () => {
+  it('활성 공급자가 레거시 body 로 POST /products 해도 404 (express 기본) · from-master 서비스 미호출', async () => {
+    const res = await asActiveSupplier(request(makeApp()).post(LEGACY_URL)).send({ barcode: '880', name: 'x', manufacturerName: 'm', priceGeneral: 1000 });
+    expect(res.status).toBe(404);
     expect(mockFromMaster).not.toHaveBeenCalled();
   });
 
-  it('기존 경로의 상태 매핑은 그대로 (OFFER_ALREADY_EXISTS 409 · SUPPLIER_NOT_ACTIVE 403 · 기타 400)', async () => {
-    for (const [code, status] of [['OFFER_ALREADY_EXISTS', 409], ['SUPPLIER_NOT_ACTIVE', 403], ['VALIDATION_ERROR', 400]] as const) {
-      mockCreate.mockResolvedValueOnce({ success: false, error: code });
-      const res = await asActiveSupplier(request(makeApp()).post(LEGACY_URL)).send({ barcode: '880', name: 'x' });
-      expect(res.status).toBe(status);
-    }
+  it('미인증 POST /products 도 404 (guard 체인 이전에 라우트 자체가 없다)', async () => {
+    const res = await request(makeApp()).post(LEGACY_URL).send({ barcode: '880', name: 'x' });
+    expect(res.status).toBe(404);
   });
 });

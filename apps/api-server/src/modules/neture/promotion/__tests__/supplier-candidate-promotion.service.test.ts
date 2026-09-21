@@ -7,6 +7,10 @@
  *   regulated create → Core 가 Master/Identifier/candidate 를 쓴 뒤 정책 throw → 롤백
  *     → ProductMaster +0 · ProductIdentifier +0 · candidate pending · matchedProductMasterId null · afterCommit 0
  *   GENERAL create → commit → Master +1 · candidate approved_new_master · afterCommit 1
+ *
+ * WO-O4O-SUPPLIER-PRODUCT-REGISTRATION-AI-FIRST-CUTOVER-AND-LEGACY-MASTER-RESOLUTION-RETIREMENT-V1 §2.2 · §2.5:
+ *   resolveRefs(read-only SELECT · TX 밖) 가 존재 확인한 categoryId/brandId 만 plan.master.metadata 로 Core create 에 도달하고,
+ *   확인 실패 참조는 droppedRefs 로 approval 에 남는다. Adapter 가 product_masters 를 UPDATE 하는 경로는 없다.
  */
 
 jest.mock('../../../../utils/logger.js', () => ({
@@ -30,6 +34,8 @@ import { InMemoryPromotionStore, type MemCandidate } from './in-memory-promotion
 const GTIN = '8801234567893';
 const SUPPLIER_ID = '11111111-1111-4111-8111-111111111111';
 const CID = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
+const CATEGORY_ID = '22222222-2222-4222-8222-222222222222';
+const BRAND_ID = '33333333-3333-4333-8333-333333333333';
 
 interface Snapshot { masters: string; identifiers: string; candidates: string; writes: string }
 
@@ -63,7 +69,19 @@ class TxRollbackHarness {
     },
   } as unknown as EntityManager;
 
+  /** resolveRefsFromDb 가 보는 활성 참조 테이블 (read-only SELECT 만 허용) */
+  activeCategoryIds = new Set<string>();
+  activeBrandIds = new Set<string>();
+  refQueries: Array<{ sql: string; params: unknown[] }> = [];
+
   readonly dataSource = {
+    query: async (sql: string, params: unknown[] = []) => {
+      this.refQueries.push({ sql, params });
+      if (!/^\s*SELECT/i.test(sql)) throw new Error(`Adapter 는 read-only 여야 한다: ${sql}`);
+      if (/FROM product_categories/.test(sql)) return this.activeCategoryIds.has(String(params[0])) ? [{ id: params[0] }] : [];
+      if (/FROM brands/.test(sql)) return this.activeBrandIds.has(String(params[0])) ? [{ id: params[0] }] : [];
+      throw new Error(`unexpected dataSource.query: ${sql}`);
+    },
     transaction: async <T,>(fn: (m: EntityManager) => Promise<T>): Promise<T> => {
       this.tx.begun += 1;
       const snap = this.snapshot();
@@ -211,6 +229,51 @@ describe('SupplierCandidatePromotionService — TX 롤백 실증', () => {
     expect(r.outcome).toEqual({ kind: 'hold', reason: 'rx_not_promotable' });
     expect(h.store.writeCount).toBe(0);
     expect(pending(h).candidateStatus).toBe('pending');
+  });
+
+  it('metadata 보존: 활성 categoryId/brandId 는 metadata 로 Core create 에 도달 · originCountry/regulatoryName 은 그대로 · 이미지는 effects.images', async () => {
+    const h = new TxRollbackHarness();
+    h.activeCategoryIds.add(CATEGORY_ID);
+    h.activeBrandIds.add(BRAND_ID);
+    h.seedSingle('GENERAL', {}, {
+      categoryId: CATEGORY_ID, brandId: BRAND_ID, brandName: '브랜드', originCountry: 'KR', regulatoryName: '규제명',
+      images: [{ url: 'https://cdn.example.com/t.jpg', type: 'thumbnail' }, { url: 'https://cdn.example.com/c.jpg', type: 'content' }],
+    });
+    const r = await h.service.promote(CID, { reviewedBy: 'u-1' });
+    expect(r.outcome.kind).toBe('create');
+    expect(h.store.masters[0].metadata).toEqual({ categoryId: CATEGORY_ID, brandId: BRAND_ID, originCountry: 'KR', regulatoryName: '규제명' });
+    expect(h.afterCommitCalls[0].plan.effects.images).toEqual([
+      { url: 'https://cdn.example.com/t.jpg', type: 'thumbnail', sortOrder: 0 },
+      { url: 'https://cdn.example.com/c.jpg', type: 'content', sortOrder: 1 },
+    ]);
+    expect(pending(h).approval).toMatchObject({ imageCount: 2, evidence: { brandName: '브랜드', brandId: BRAND_ID, categoryId: CATEGORY_ID } });
+    expect(pending(h).approval).not.toHaveProperty('droppedRefs');
+    // read-only SELECT 2회 · 모두 TX 밖(begun 이전에 호출됨을 순서로 확인)
+    expect(h.refQueries).toHaveLength(2);
+    expect(h.refQueries.every((q) => /^\s*SELECT id FROM (product_categories|brands) WHERE id = \$1 AND is_active = true/.test(q.sql))).toBe(true);
+  });
+
+  it('metadata 보존: 비활성/없는 참조는 metadata 에서 빠지고 droppedRefs 로 남는다 · evidence 원본 유지 · Master UPDATE 0', async () => {
+    const h = new TxRollbackHarness();
+    h.activeCategoryIds.add(CATEGORY_ID); // brand 는 없음
+    h.seedSingle('GENERAL', {}, { categoryId: CATEGORY_ID, brandId: BRAND_ID, brandName: '브랜드' });
+    const r = await h.service.promote(CID, { reviewedBy: 'u-1' });
+    expect(r.outcome.kind).toBe('create');
+    expect(h.store.masters[0].metadata).toEqual({ categoryId: CATEGORY_ID, brandId: null, originCountry: null, regulatoryName: null });
+    expect(pending(h).approval).toMatchObject({ droppedRefs: ['brandId'], evidence: { brandId: BRAND_ID, brandName: '브랜드' } });
+  });
+
+  it('link 승격에서는 refs 를 확인해도 기존 Master metadata 를 쓰지 않는다 (Adapter UPDATE 0)', async () => {
+    const h = new TxRollbackHarness();
+    h.activeCategoryIds.add(CATEGORY_ID);
+    h.store.addMaster({ id: 'm-gen', barcode: GTIN, name: '롤백 상품', manufacturerName: '롤백 제조', regulatoryType: 'GENERAL' });
+    h.seedSingle('GENERAL', {}, { categoryId: CATEGORY_ID, images: [{ url: 'https://cdn.example.com/t.jpg', type: 'thumbnail' }] });
+    const r = await h.service.promote(CID, { reviewedBy: 'u-1' });
+    expect(r.outcome.kind).toBe('link');
+    expect(h.store.masters).toHaveLength(1);
+    expect(h.store.masters[0]).not.toHaveProperty('metadata');
+    expect(h.store.writes.createMaster).toBe(0);
+    expect(h.refQueries.every((q) => /^\s*SELECT/.test(q.sql))).toBe(true);
   });
 
   it('후보 없음 → SupplierPromotionNotFoundError · TX 0 · 비공급자 소스 → SupplierNormalizationError · TX 0', async () => {

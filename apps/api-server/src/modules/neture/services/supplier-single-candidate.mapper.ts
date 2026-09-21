@@ -66,6 +66,8 @@ export type SupplierSingleCandidateErrorCode =
   | 'INVALID_PRICE'
   | 'INVALID_URL'
   | 'INVALID_CATEGORY_ID'
+  | 'INVALID_BRAND_ID'
+  | 'TOO_MANY_IMAGES'
   | 'FORBIDDEN_FIELD'
   | 'FIELD_TOO_LONG';
 
@@ -77,14 +79,33 @@ export interface SupplierSingleCandidateOfferDraft {
   isFeatured: boolean;
 }
 
+/**
+ * 후보 단계 이미지 보존 형식 (rawPayload.images). ProductImage 는 Master 생성 전에 쓰지 않는다 —
+ * URL 은 이미 media asset(공용 미디어 라이브러리 등)에 올라간 참조. 승격 create 시 Core effects.images 로 연결한다.
+ * WO-O4O-SUPPLIER-PRODUCT-REGISTRATION-AI-FIRST-CUTOVER-AND-LEGACY-MASTER-RESOLUTION-RETIREMENT-V1 §2.5
+ */
+export interface SupplierCandidateImage {
+  url: string;
+  type: 'thumbnail' | 'content';
+  sortOrder: number;
+}
+
+/** content 이미지 최대 장수 (rawPayload 크기 상한) */
+export const SUPPLIER_CANDIDATE_MAX_CONTENT_IMAGES = 20;
+
 export interface ValidatedSupplierSingleCandidate {
   name: string;
   barcode: string | null;
   brandName: string | null;
+  /** 기존 brands.id 를 아는 경우만(선택). 존재 여부 검증은 ③ Adapter 승격 시점 — 여기서는 형식만 */
+  brandId: string | null;
   manufacturerName: string | null;
   specification: string | null;
   categoryId: string | null;
+  /** 대표 이미지 URL (rawPayload.images[type=thumbnail] 과 같은 값) */
   imageUrl: string | null;
+  /** 상세/성분 이미지 URL 들 — 순서 보존 */
+  contentImageUrls: string[];
   regulatoryType: SupplierCandidateRegulatoryType;
   drugCategory: SupplierCandidateDrugCategory | null;
   regulatoryName: string | null;
@@ -116,6 +137,7 @@ const LIMITS = {
   name: 200,
   barcode: 64,
   categoryId: 64,
+  brandId: 64,
   brandName: 200,
   manufacturerName: 200,
   specification: 500,
@@ -172,6 +194,23 @@ function compactBarcode(raw: string | null): string | null {
   if (!sanitized) return null;
   const compact = sanitized.replace(/[\s-]/g, '');
   return /^\d+$/.test(compact) ? compact : sanitized;
+}
+
+function isHttpUrl(s: string): boolean {
+  try {
+    const u = new URL(s);
+    return u.protocol === 'http:' || u.protocol === 'https:';
+  } catch {
+    return false;
+  }
+}
+
+/** rawPayload.images — 대표(thumbnail) 1장 먼저, content 는 입력 순서. 없으면 빈 배열 */
+export function buildSupplierCandidateImages(value: Pick<ValidatedSupplierSingleCandidate, 'imageUrl' | 'contentImageUrls'>): SupplierCandidateImage[] {
+  const images: SupplierCandidateImage[] = [];
+  if (value.imageUrl) images.push({ url: value.imageUrl, type: 'thumbnail', sortOrder: 0 });
+  for (const url of value.contentImageUrls) images.push({ url, type: 'content', sortOrder: images.length });
+  return images;
 }
 
 function findForbiddenKey(obj: Record<string, unknown>): string | null {
@@ -241,16 +280,32 @@ export function validateSupplierSingleCandidateBody(body: unknown): SupplierSing
       throw new ValidationFailure('INVALID_CATEGORY_ID', 'categoryId 형식이 올바르지 않습니다.');
     }
 
+    const brandId = optStr(b.brandId, 'brandId');
+    if (brandId && !UUID_RE.test(brandId)) {
+      throw new ValidationFailure('INVALID_BRAND_ID', 'brandId 형식이 올바르지 않습니다.');
+    }
+
     const imageUrl = optStr(b.imageUrl, 'imageUrl');
-    if (imageUrl) {
-      let ok = false;
-      try {
-        const u = new URL(imageUrl);
-        ok = u.protocol === 'http:' || u.protocol === 'https:';
-      } catch {
-        ok = false;
+    if (imageUrl && !isHttpUrl(imageUrl)) {
+      throw new ValidationFailure('INVALID_URL', 'imageUrl 은 http(s) URL 이어야 합니다.');
+    }
+
+    // contentImageUrls: 배열만 허용(문자열 단건 · 객체 불허) · 공백/중복 제거 · 순서 보존 · 상한
+    const contentImageUrls: string[] = [];
+    if (b.contentImageUrls != null) {
+      if (!Array.isArray(b.contentImageUrls)) {
+        throw new ValidationFailure('INVALID_URL', 'contentImageUrls 는 URL 문자열 배열이어야 합니다.');
       }
-      if (!ok) throw new ValidationFailure('INVALID_URL', 'imageUrl 은 http(s) URL 이어야 합니다.');
+      for (const raw of b.contentImageUrls) {
+        const u = optStr(raw, 'imageUrl');
+        if (!u) continue;
+        if (!isHttpUrl(u)) throw new ValidationFailure('INVALID_URL', 'contentImageUrls 항목은 http(s) URL 이어야 합니다.');
+        if (u === imageUrl || contentImageUrls.includes(u)) continue;
+        contentImageUrls.push(u);
+      }
+      if (contentImageUrls.length > SUPPLIER_CANDIDATE_MAX_CONTENT_IMAGES) {
+        throw new ValidationFailure('TOO_MANY_IMAGES', `상세 이미지는 최대 ${SUPPLIER_CANDIDATE_MAX_CONTENT_IMAGES}장까지 등록할 수 있습니다.`);
+      }
     }
 
     const barcode = compactBarcode(optStr(b.barcode, 'barcode'));
@@ -259,10 +314,12 @@ export function validateSupplierSingleCandidateBody(body: unknown): SupplierSing
       name,
       barcode,
       brandName: optStr(b.brandName, 'brandName'),
+      brandId,
       manufacturerName: optStr(b.manufacturerName, 'manufacturerName'),
       specification: optStr(b.specification, 'specification'),
       categoryId,
       imageUrl,
+      contentImageUrls,
       regulatoryType,
       drugCategory,
       regulatoryName: optStr(b.regulatoryName, 'regulatoryName'),
@@ -332,6 +389,8 @@ export function buildSupplierSingleCandidateInput(
       rx: value.drugCategory === 'rx',
       categoryId: value.categoryId,
       brandName: value.brandName,
+      brandId: value.brandId,
+      images: buildSupplierCandidateImages(value),
       regulatoryName: value.regulatoryName,
       mfdsPermitNumber: value.mfdsPermitNumber,
       originCountry: value.originCountry,

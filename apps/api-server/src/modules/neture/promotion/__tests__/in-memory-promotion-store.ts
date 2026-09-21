@@ -11,11 +11,13 @@ import {
   type NormalizedIdentifier,
   type PromotionCandidateState,
   type PromotionMasterFields,
+  type PromotionMasterMetadata,
   type PromotionMasterRef,
   type PromotionStore,
 } from '../product-promotion.types.js';
 
-export type MemMaster = PromotionMasterRef;
+/** create 시 전달된 optional metadata 를 그대로 보관한다 (link 에서는 절대 갱신되지 않아야 함) */
+export type MemMaster = PromotionMasterRef & { metadata?: PromotionMasterMetadata | null };
 export interface MemIdentifier { masterId: string; type: string; normalized: string; value: string; isPrimary: boolean }
 export interface MemCandidate extends PromotionCandidateState { reviewedBy?: string | null; approval?: Record<string, unknown> }
 
@@ -83,6 +85,7 @@ export class InMemoryPromotionStore implements PromotionStore {
     this.masters.push({
       id, name: f.name, barcode: f.barcode, manufacturerName: f.manufacturerName, specification: f.specification,
       regulatoryType: f.regulatoryType, drugCategory: f.drugCategory,
+      metadata: f.metadata ?? null,
     });
     return id;
   }

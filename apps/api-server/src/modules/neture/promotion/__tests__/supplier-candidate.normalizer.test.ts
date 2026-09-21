@@ -2,6 +2,9 @@
  * Unit tests — Supplier Normalizer (WO-O4O-SUPPLIER-PRODUCT-CANDIDATE-PROMOTION-ADAPTER-V1 §2.1 · §6.1)
  *
  * 단건 · bulk 인식 3조건 · 식별자 규칙표 · evidence 보존 · 실패 코드.
+ *
+ * WO-O4O-SUPPLIER-PRODUCT-REGISTRATION-AI-FIRST-CUTOVER-AND-LEGACY-MASTER-RESOLUTION-RETIREMENT-V1 §2.2:
+ *   evidence.brandId(UUID 만) · images(rawPayload.images 순서 보존 · 없으면 candidate_image_url 1장) 추가.
  */
 
 import { canonicalizeRegulatoryType } from '../adapters/supplier/supplier-regulatory-type.js';
@@ -108,19 +111,51 @@ describe('normalizeSingleSupplierCandidate — 식별자 · evidence', () => {
     expect(n.barcode).toBeNull();
   });
 
-  it('mfdsPermitNumber · regulatoryName · brandName · originCountry · categoryId 는 evidence 로만 (식별자 아님)', () => {
+  it('mfdsPermitNumber · regulatoryName · brandName · brandId · originCountry · categoryId 는 evidence 로만 (식별자 아님)', () => {
     const n = normalizeSingleSupplierCandidate(single({ candidateBrand: '컬럼브랜드' }, {
       regulatoryType: 'HEALTH_FUNCTIONAL', mfdsPermitNumber: '2020-123', regulatoryName: '규제명', brandName: '브랜드',
+      brandId: '33333333-3333-4333-8333-333333333333',
       originCountry: 'KR', categoryId: '22222222-2222-4222-8222-222222222222',
     }))!;
     expect(n.identifiers).toEqual([]);
     expect(n.evidence).toEqual({
       regulatoryName: '규제명', mfdsPermitNumber: '2020-123', reportNo: null, supplierSku: null,
-      brandName: '브랜드', originCountry: 'KR', categoryId: '22222222-2222-4222-8222-222222222222',
+      brandName: '브랜드', brandId: '33333333-3333-4333-8333-333333333333',
+      originCountry: 'KR', categoryId: '22222222-2222-4222-8222-222222222222',
     });
     expect(n.origin).toBe('single');
     expect(n.supplierId).toBe(SUPPLIER_ID);
     expect(n.regulatoryType).toBe('HEALTH_FUNCTIONAL');
+  });
+
+  it('brandId · categoryId 는 UUID 형식만 인정 (그 외 null · throw 없음)', () => {
+    const n = normalizeSingleSupplierCandidate(single({}, { brandId: 'not-a-uuid', categoryId: 'cat-1' }))!;
+    expect(n.evidence.brandId).toBeNull();
+    expect(n.evidence.categoryId).toBeNull();
+  });
+
+  it('images: rawPayload.images 순서 보존 · thumbnail 은 1장만 · http(s) 아닌 항목 · 중복 URL 은 버림', () => {
+    const n = normalizeSingleSupplierCandidate(single({}, {
+      images: [
+        { url: 'https://cdn.example.com/t.jpg', type: 'thumbnail' },
+        { url: 'https://cdn.example.com/c1.jpg', type: 'content' },
+        { url: 'https://cdn.example.com/t2.jpg', type: 'thumbnail' },
+        { url: 'ftp://bad/x.jpg', type: 'content' },
+        { url: 'https://cdn.example.com/c1.jpg', type: 'content' },
+        'garbage',
+      ],
+    }))!;
+    expect(n.images).toEqual([
+      { url: 'https://cdn.example.com/t.jpg', type: 'thumbnail', sortOrder: 0 },
+      { url: 'https://cdn.example.com/c1.jpg', type: 'content', sortOrder: 1 },
+      { url: 'https://cdn.example.com/t2.jpg', type: 'content', sortOrder: 2 },
+    ]);
+  });
+
+  it('images 배열이 없으면(② 확장 이전 후보) candidateImageUrl 1장을 thumbnail 로 · 그것도 없으면 []', () => {
+    const withUrl = normalizeSingleSupplierCandidate(single({ candidateImageUrl: 'https://cdn.example.com/legacy.jpg' }))!;
+    expect(withUrl.images).toEqual([{ url: 'https://cdn.example.com/legacy.jpg', type: 'thumbnail', sortOrder: 0 }]);
+    expect(normalizeSingleSupplierCandidate(single())!.images).toEqual([]);
   });
 
   it('이름 · 제조사 비면 null (합성 없음) · spec 은 spec+unit 결합', () => {
@@ -224,8 +259,9 @@ describe('normalizeBulkSupplierCandidate — 식별자 규칙표', () => {
     expect(n.identifiers).toEqual([]);
     expect(n.evidence).toEqual({
       regulatoryName: null, mfdsPermitNumber: null, reportNo: '제2020-1호', supplierSku: 'SUP-001',
-      brandName: '브', originCountry: null, categoryId: null,
+      brandName: '브', brandId: null, originCountry: null, categoryId: null,
     });
+    expect(n.images).toEqual([]); // CSV 에 이미지 없음
   });
 
   it('(type, normalized) 중복은 한 번만 · 컬럼 식별자가 fields 보다 우선', () => {

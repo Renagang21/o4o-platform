@@ -52,8 +52,16 @@ export interface SupplierCandidateEvidence {
   reportNo: string | null;
   supplierSku: string | null;
   brandName: string | null;
+  brandId: string | null;
   originCountry: string | null;
   categoryId: string | null;
+}
+
+/** 후보 단계에 보존된 이미지 (② mapper rawPayload.images 와 같은 형식). create 승격 시 Core effects.images 로 넘긴다 */
+export interface NormalizedSupplierImage {
+  url: string;
+  type: 'thumbnail' | 'content';
+  sortOrder: number;
 }
 
 export interface NormalizedSupplierCandidate {
@@ -69,6 +77,8 @@ export interface NormalizedSupplierCandidate {
   barcode: string | null;
   identifiers: NormalizedSupplierIdentifier[];
   evidence: SupplierCandidateEvidence;
+  /** 순서 보존. bulk 는 항상 빈 배열(CSV 에 이미지 없음) */
+  images: NormalizedSupplierImage[];
 }
 
 export type SupplierNormalizationErrorCode =
@@ -85,7 +95,8 @@ export class SupplierNormalizationError extends Error {
 
 export type SupplierCandidateRecord = Pick<ProductCandidate,
   'id' | 'sourceType' | 'sourceLabel' | 'rawPayload' | 'identifierType' | 'identifierValue'
-  | 'candidateName' | 'candidateBrand' | 'candidateManufacturer' | 'candidateSpec' | 'candidateUnit'>;
+  | 'candidateName' | 'candidateBrand' | 'candidateManufacturer' | 'candidateSpec' | 'candidateUnit'>
+  & Partial<Pick<ProductCandidate, 'candidateImageUrl'>>;
 
 const BARCODE_TYPES: ReadonlySet<string> = new Set(['EAN13', 'GTIN', 'UPC', 'JAN']);
 
@@ -127,6 +138,47 @@ function compactCode(raw: string | null): string | null {
   if (!sanitized) return null;
   const compact = sanitized.replace(/[\s-]/g, '');
   return /^\d+$/.test(compact) ? compact : sanitized;
+}
+
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+function uuidOrNull(v: unknown): string | null {
+  const s = str(v);
+  return s && UUID_RE.test(s) ? s : null;
+}
+
+function isHttpUrl(s: string): boolean {
+  try {
+    const u = new URL(s);
+    return u.protocol === 'http:' || u.protocol === 'https:';
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * rawPayload.images(② 형식) → NormalizedSupplierImage[].
+ * 배열이 없으면(② 확장 이전 후보) candidate_image_url 1장을 thumbnail 로 본다. 형식이 깨진 항목은 버린다(throw 하지 않음).
+ */
+function normalizeImages(raw: Record<string, unknown>, c: SupplierCandidateRecord): NormalizedSupplierImage[] {
+  const out: NormalizedSupplierImage[] = [];
+  const seen = new Set<string>();
+  const push = (url: string | null, type: 'thumbnail' | 'content') => {
+    if (!url || !isHttpUrl(url) || seen.has(url)) return;
+    if (type === 'thumbnail' && out.some((i) => i.type === 'thumbnail')) type = 'content';
+    seen.add(url);
+    out.push({ url, type, sortOrder: out.length });
+  };
+  if (Array.isArray(raw.images)) {
+    for (const item of raw.images) {
+      const r = record(item);
+      const type = str(r.type) === 'thumbnail' ? 'thumbnail' : 'content';
+      push(str(r.url), type);
+    }
+  } else {
+    push(str(c.candidateImageUrl), 'thumbnail');
+  }
+  return out;
 }
 
 function joinSpec(parts: Array<string | null | undefined>): string | null {
@@ -232,9 +284,11 @@ export function normalizeSingleSupplierCandidate(c: SupplierCandidateRecord): No
       reportNo: null,
       supplierSku: null,
       brandName: str(raw.brandName) ?? str(c.candidateBrand),
+      brandId: uuidOrNull(raw.brandId),
       originCountry: str(raw.originCountry),
-      categoryId: str(raw.categoryId),
+      categoryId: uuidOrNull(raw.categoryId),
     },
+    images: normalizeImages(raw, c),
   };
 }
 
@@ -291,9 +345,11 @@ export function normalizeBulkSupplierCandidate(c: SupplierCandidateRecord): Norm
       reportNo: fields['품목신고번호'] ?? null,
       supplierSku: fields['공급자상품코드'] ?? null,
       brandName: str(c.candidateBrand) ?? fields['브랜드'] ?? null,
+      brandId: null,
       originCountry: null,
       categoryId: null,
     },
+    images: [],
   };
 }
 

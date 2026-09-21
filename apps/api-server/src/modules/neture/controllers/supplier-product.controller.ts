@@ -71,43 +71,15 @@ export function createSupplierProductController(dataSource: DataSource): Router 
   const requireActiveSupplier = createRequireActiveSupplier(dataSource);
   const requireLinkedSupplier = createRequireLinkedSupplier(dataSource);
 
-  // POST /supplier/products
-  router.post('/products', requireAuth, requireActiveSupplier as RequestHandler, async (req: AuthenticatedRequest, res: Response) => {
-    try {
-      const supplierId = (req as SupplierRequest).supplierId;
-      const { barcode, name, categoryId, brandName,
-              distributionType, manualData, priceGeneral, priceGold, pricePlatinum,
-              consumerReferencePrice,
-              consumerShortDescription, consumerDetailDescription, serviceKeys,
-              // WO-KPA-RECOMMENDED-TAB-REPLACE-CURATION-WITH-SUPPLIER-HIGHLIGHT-V1
-              isFeatured } = req.body;
-      const result = await netureService.createSupplierOffer(supplierId, {
-        barcode, name, categoryId, brandName,
-        manualData, distributionType, serviceKeys,
-        priceGeneral, priceGold, pricePlatinum, consumerReferencePrice,
-        consumerShortDescription, consumerDetailDescription,
-        isFeatured,
-      });
-      if (!result.success) {
-        // WO-O4O-SUPPLIER-PRODUCT-OFFER-DUPLICATE-ERROR-CONTRACT-V1:
-        //   OFFER_IN_RECYCLE_BIN 추가 — 동일 상품이 휴지통에 남아 unique 슬롯을 점유하는 경우.
-        //   사용자 조치가 "기존 상품 수정" 이 아니라 "복원 또는 완전 삭제 후 등록" 이라 코드를 분리했다.
-        const statusCode = result.error === 'SUPPLIER_NOT_ACTIVE' ? 403
-          : result.error === 'OFFER_ALREADY_EXISTS' ? 409
-          : result.error === 'OFFER_IN_RECYCLE_BIN' ? 409
-          : 400;
-        return res.status(statusCode).json(result);
-      }
-      res.status(201).json(result);
-    } catch (error) {
-      logger.error('[Neture API] Error creating supplier product:', error);
-      res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to create supplier product' });
-    }
-  });
+  // (은퇴) POST /supplier/products — barcode/name → resolveOrCreateMaster 경유 레거시 Offer 생성
+  //   WO-O4O-SUPPLIER-PRODUCT-REGISTRATION-AI-FIRST-CUTOVER-AND-LEGACY-MASTER-RESOLUTION-RETIREMENT-V1 §2.4
+  //   저장소 census(web-neture 단일 소비자 → from-master / product-candidates 로 전환 완료) + Cloud Run 30일 access log
+  //   (외부 호출 0) 확인 후 라우트를 제거했다. 공급자가 ProductMaster 를 만드는 HTTP 경로는 더 이상 없다.
+  //   신규/미매칭 제품 = POST /product-candidates · 기존 Master = POST /products/from-master · 대량 = POST /products/bulk-candidates.
 
   // POST /supplier/products/from-master (WO-O4O-SUPPLIER-EXISTING-MASTER-DIRECT-OFFER-LINK-V1)
   //   Product Library 에서 고른 기존 ProductMaster 에 Offer 를 직접 연결한다.
-  //   masterId 를 받는 유일한 경로 — POST /products 의 MASTER_ID_DIRECT_INJECTION_NOT_ALLOWED 는 그대로다.
+  //   공급자가 masterId 로 Offer 를 만드는 유일한 경로 (레거시 POST /products 는 은퇴).
   //   supplierId 는 requireActiveSupplier 확정값만 쓴다(body 의 supplierId 는 서비스가 400 으로 거부).
   router.post('/products/from-master', requireAuth, requireActiveSupplier as RequestHandler, async (req: AuthenticatedRequest, res: Response) => {
     try {

@@ -96,14 +96,20 @@ export class DbPromotionStore implements PromotionStore {
   }
 
   async createMaster(f: PromotionMasterFields): Promise<string> {
-    // is_mfds_verified=false 명시 · regulatory_name=name · 정체성=UUID (P2 와 동일)
+    // is_mfds_verified=false 명시 · regulatory_name=metadata.regulatoryName ?? name · 정체성=UUID (P2 와 동일)
+    // optional metadata(category_id · brand_id · origin_country) 는 create INSERT 에서만 쓴다 — link 시 UPDATE 없음
+    const meta = f.metadata ?? {};
+    const regulatoryName = (meta.regulatoryName ?? '').trim() || f.name.trim();
     const rows: Array<{ id: string }> = await this.m.query(
       `INSERT INTO product_masters
          (id, barcode, regulatory_type, drug_category, regulatory_name, name, manufacturer_name,
-          specification, is_mfds_verified, status, tags, created_at, updated_at)
-       VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, false, 'ACTIVE', '[]'::jsonb, NOW(), NOW())
+          specification, category_id, brand_id, origin_country, is_mfds_verified, status, tags, created_at, updated_at)
+       VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, false, 'ACTIVE', '[]'::jsonb, NOW(), NOW())
        RETURNING id`,
-      [f.barcode, f.regulatoryType, f.drugCategory, f.name.trim(), f.name.trim(), f.manufacturerName.trim(), f.specification],
+      [
+        f.barcode, f.regulatoryType, f.drugCategory, regulatoryName, f.name.trim(), f.manufacturerName.trim(), f.specification,
+        meta.categoryId ?? null, meta.brandId ?? null, meta.originCountry ?? null,
+      ],
     );
     return rows[0].id;
   }

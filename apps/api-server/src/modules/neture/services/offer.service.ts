@@ -10,7 +10,6 @@ import {
 import { autoExpandPublicProduct } from '../../../utils/auto-listing.utils.js';
 import logger from '../../../utils/logger.js';
 import { ProductCategory, ProductMaster } from '../entities/index.js';
-import { ProductImportCommonService } from './product-import-common.service.js';
 import { OfferServiceApprovalService } from './offer-service-approval.service.js';
 import type { NetureCatalogService } from './catalog.service.js';
 // WO-O4O-SUPPLIER-EXISTING-PRODUCTMASTER-NON-DESTRUCTIVE-LINK-V1: 기존 master 비파괴 연결 계약
@@ -70,28 +69,6 @@ export interface CreateOfferFromExistingMasterInput {
   isPublic?: boolean;
   distributionType?: OfferDistributionType;
   serviceKeys?: string[];
-}
-
-/**
- * WO-NETURE-REGULATORY-POLICY-ENFORCEMENT-V1: 허용 규제 유형 (코드 레벨 enum, DB VARCHAR 유지)
- */
-const REGULATORY_TYPES = ['DRUG', 'HEALTH_FUNCTIONAL', 'QUASI_DRUG', 'COSMETIC', 'GENERAL'] as const;
-type RegulatoryType = (typeof REGULATORY_TYPES)[number];
-
-/** 한글 입력 → 영문 코드 매핑 (하위호환) */
-const REGULATORY_TYPE_ALIAS: Record<string, RegulatoryType> = {
-  '의약품': 'DRUG',
-  '건강기능식품': 'HEALTH_FUNCTIONAL',
-  '의약외품': 'QUASI_DRUG',
-  '화장품': 'COSMETIC',
-  '일반': 'GENERAL',
-};
-
-function resolveRegulatoryType(raw?: string): RegulatoryType | null {
-  if (!raw) return null;
-  const trimmed = raw.trim();
-  if ((REGULATORY_TYPES as readonly string[]).includes(trimmed)) return trimmed as RegulatoryType;
-  return REGULATORY_TYPE_ALIAS[trimmed] || null;
 }
 
 /**
@@ -812,136 +789,16 @@ export class NetureOfferService {
     }
   }
 
-  /**
-   * POST /supplier/products - 공급자 Offer 생성
-   *
-   * WO-NETURE-LAYER2-MASTER-PIPELINE-ENFORCEMENT-V1
-   * masterId 외부 주입 금지 — barcode 기반 resolveOrCreateMaster() 강제 경유
-   */
-  // ==================== createSupplierOffer sub-methods (Phase3A) ====================
+  // ==================== (은퇴) createSupplierOffer / validateCreateInput / resolveProductMetadata ====================
+  //
+  // WO-O4O-SUPPLIER-PRODUCT-REGISTRATION-AI-FIRST-CUTOVER-AND-LEGACY-MASTER-RESOLUTION-RETIREMENT-V1 §2.3 (P3 은퇴)
+  //   공급자 Offer 경로에서 barcode/name 기반 resolveOrCreateMaster() 경유 · 신규 Master updateProductMaster() ·
+  //   공급자 입력 permit 판정 · 카테고리/브랜드 해석 · 브랜드 생성(resolveBrandId) 을 모두 제거했다.
+  //   공급자 Offer 는 ProductMaster 에 INSERT/UPDATE 하지 않는다. Master 생성은 Candidate → Promotion Core 만 담당한다.
+  //   남은 공급자 Offer 생성 경로 = createSupplierOfferFromExistingMaster() → persistOfferForResolvedMaster() 뿐.
+  //   CatalogService.resolveOrCreateMaster() 자체는 Admin/system 경로(catalog-import-resolver · admin.controller ·
+  //   product-master-create.controller · neture.service resolveOrCreateMaster 위임)가 계속 쓰므로 삭제하지 않는다.
 
-  /** 입력 검증: 바코드 생성, 유통타입 검증, 보안 체크, 공급자 상태 */
-  private async validateCreateInput(
-    data: { barcode?: string; isPublic?: boolean; distributionType?: OfferDistributionType; serviceKeys?: string[]; consumerShortDescription?: string | null },
-    supplierId: string,
-  ): Promise<{ success: false; error: string; message?: string } | { success: true; data: { barcode: string } }> {
-    // WO-O4O-PRODUCT-BARCODE-NULLABLE-AND-INTERNAL-CODE-GENERATION-STOP-V1:
-    //   바코드 미입력 시 합성 내부코드(200…)를 만들지 않는다. 빈 값으로 전달하면
-    //   resolveOrCreateMaster 가 barcode=NULL 로 Master 를 생성한다(정체성=UUID).
-    const barcode = data.barcode?.trim() || '';
-
-    // WO-NETURE-DISTRIBUTION-MODEL-SPLIT-PUBLIC-AND-SERVICE-SUPPLY-V1: 두 축 분리 검증
-    // isPublic과 serviceKeys는 독립적 — 동시 설정 가능
-    const isPublic = data.isPublic ?? (data.distributionType === OfferDistributionType.PUBLIC);
-    if (isPublic && !data.consumerShortDescription?.trim()) {
-      return { success: false, error: 'PUBLIC_REQUIRES_DESCRIPTION' };
-    }
-
-    if ('masterId' in (data as any)) {
-      return { success: false, error: 'MASTER_ID_DIRECT_INJECTION_NOT_ALLOWED' };
-    }
-
-    const supplier = await this.supplierRepo.findOne({ where: { id: supplierId }, select: ['id', 'status'] });
-    if (!supplier || supplier.status !== SupplierStatus.ACTIVE) {
-      return { success: false, error: 'SUPPLIER_NOT_ACTIVE' };
-    }
-
-    return { success: true, data: { barcode } };
-  }
-
-  /** 카테고리/규제/브랜드 해석 → Master 파이프라인 → 확장 필드 적용 */
-  private async resolveProductMetadata(
-    rawManualData: Record<string, any> | undefined,
-    barcode: string,
-    name: string,
-    categoryId: string | null,
-    brandName: string | undefined,
-  ): Promise<{ success: false; error: string; message?: string } | { success: true; data: { masterId: string; masterBarcode: string; manualData: Record<string, any>; isRegulated: boolean; masterCreated: boolean } }> {
-    const resolvedCategoryId: string | null = categoryId || rawManualData?.categoryId || null;
-    let isRegulated = false;
-    if (resolvedCategoryId) {
-      const categoryRepo = AppDataSource.getRepository(ProductCategory);
-      const category = await categoryRepo.findOne({ where: { id: resolvedCategoryId } });
-      if (!category) return { success: false, error: 'INVALID_CATEGORY' };
-      isRegulated = category.isRegulated;
-    }
-
-    const manualData = { ...rawManualData };
-    const resolvedName = name || manualData.name || '';
-
-    if (isRegulated) {
-      if (!manualData.regulatoryType || !manualData.regulatoryName) {
-        return { success: false, error: 'REGULATED_FIELDS_REQUIRED' };
-      }
-      const resolved = resolveRegulatoryType(manualData.regulatoryType);
-      if (!resolved) {
-        return { success: false, error: 'INVALID_REGULATORY_TYPE', message: `허용 규제 유형: ${REGULATORY_TYPES.join(', ')}` };
-      }
-      manualData.regulatoryType = resolved;
-    } else {
-      const resolved = resolveRegulatoryType(manualData.regulatoryType);
-      manualData.regulatoryType = resolved || 'GENERAL';
-      manualData.regulatoryName = manualData.regulatoryName || resolvedName || 'UNKNOWN';
-    }
-    if (resolvedName) manualData.name = resolvedName;
-
-    let resolvedBrandId: string | null = manualData.brandId || null;
-    if (!resolvedBrandId && brandName?.trim()) {
-      const importCommon = new ProductImportCommonService(AppDataSource);
-      resolvedBrandId = await importCommon.resolveBrandId(AppDataSource.manager, brandName.trim(), manualData.manufacturerName);
-    }
-    if (resolvedCategoryId) manualData.categoryId = resolvedCategoryId;
-    if (resolvedBrandId) manualData.brandId = resolvedBrandId;
-
-    const masterResult = await this.catalogService.resolveOrCreateMaster(barcode, manualData);
-    if (!masterResult.success || !masterResult.data) {
-      return { success: false, error: masterResult.error || 'MASTER_RESOLVE_FAILED' };
-    }
-
-    // WO-O4O-REGULATED-PRODUCT-GATE-CONSOLIDATION-V1: 공통 헬퍼(assertRegulatedPermit)로 흡수 — 동작 변경 없음
-    const registrationPermitError = assertRegulatedPermit({
-      isRegulated,
-      mfdsPermitNumber: manualData.mfdsPermitNumber,
-      isMfdsVerified: masterResult.data.isMfdsVerified,
-      mode: 'registration',
-    });
-    if (registrationPermitError) {
-      return { success: false, error: registrationPermitError, message: '규제 상품은 MFDS 검증이 없는 경우 허가번호가 필수입니다.' };
-    }
-
-    // WO-O4O-SUPPLIER-EXISTING-PRODUCTMASTER-NON-DESTRUCTIVE-LINK-V1
-    //   기존 ProductMaster 에 연결하는 경우 공급자 입력으로 기준정보를 덮어쓰지 않는다.
-    //   확장 필드는 이번 요청이 master 를 실제로 생성한 경우(신규 등록)에만 적용한다.
-    //   제품군 예외 없음 — DRUG / HEALTH_FUNCTIONAL / QUASI_DRUG / MEDICAL_DEVICE / COSMETIC / GENERAL 동일.
-    const linkDecision = resolveMasterWriteFields(masterResult.created, manualData);
-    if (Object.keys(linkDecision.masterFieldUpdates).length > 0) {
-      await this.catalogService.updateProductMaster(masterResult.data.id, linkDecision.masterFieldUpdates);
-    } else if (linkDecision.ignoredFields.length > 0) {
-      logger.info(
-        `[NetureOfferService] Existing master ${masterResult.data.id} linked without modification ` +
-          `(ignored supplier fields: ${linkDecision.ignoredFields.join(', ')})`,
-      );
-    }
-
-    return {
-      success: true,
-      data: {
-        masterId: masterResult.data.id,
-        masterBarcode: masterResult.data.barcode || masterResult.data.id,
-        manualData,
-        isRegulated,
-        masterCreated: linkDecision.mode === 'new',
-      },
-    };
-  }
-
-  // ==================== createSupplierOffer (orchestrator) ====================
-
-  /**
-   * POST /supplier/products — 공급자 상품 등록
-   *
-   * masterId 외부 주입 금지 — barcode 기반 resolveOrCreateMaster() 강제 경유
-   */
   /**
    * WO-O4O-SUPPLIER-PRODUCT-OFFER-DUPLICATE-ERROR-CONTRACT-V1
    *
@@ -1003,17 +860,17 @@ export class NetureOfferService {
    * WO-O4O-SUPPLIER-EXISTING-MASTER-DIRECT-OFFER-LINK-V1
    *
    * Master identity 가 **이미 확정된** 뒤의 중립적 Offer persistence.
-   * createSupplierOffer(레거시: resolveOrCreateMaster 경유) 와
-   * createSupplierOfferFromExistingMaster(검증된 masterId 직접 연결) 가 같은 구간을 공유한다.
+   * 공급자 Offer 생성의 유일한 persistence 원형이다 — 호출자는 createSupplierOfferFromExistingMaster 뿐
+   * (레거시 createSupplierOffer 는 WO-O4O-SUPPLIER-PRODUCT-REGISTRATION-AI-FIRST-CUTOVER-AND-LEGACY-MASTER-RESOLUTION-RETIREMENT-V1 로 은퇴).
    *
-   * 맡는 것(기존 createSupplierOffer 본문에서 옮김 — 순서·코드·로그 불변):
+   * 맡는 것(순서·코드·로그 불변):
    *   slug/serviceKeys 정제 → 규제 상품 약국 전용 검사 → DRUG gate → Offer 구성 →
    *   (supplier, master) 중복 사전검사 → save + 23505 fallback → service approval 생성 → 응답.
    *
    * 맡지 않는 것: Master resolve/create · 입력 검증 · permit 판정 · ProductMaster write.
    * ProductMaster / ProductIdentifier / ProductCandidate 에는 어떤 write 도 하지 않는다.
    *
-   * ⑤(createSupplierOffer 에서 resolveOrCreateMaster 제거) 는 이 primitive 를 그대로 재사용한다.
+   * 신규 Master 가 필요한 등록은 이 파일이 아니라 Candidate(POST /supplier/product-candidates) → Promotion Core 로 간다.
    */
   private async persistOfferForResolvedMaster(
     supplierId: string,
@@ -1163,77 +1020,6 @@ export class NetureOfferService {
     };
   }
 
-  async createSupplierOffer(
-    supplierId: string,
-    data: {
-      barcode?: string;
-      name?: string;
-      categoryId?: string;
-      brandName?: string;
-      manualData?: {
-        regulatoryType?: string;
-        regulatoryName?: string;
-        manufacturerName?: string;
-        name?: string;
-        mfdsPermitNumber?: string | null;
-        categoryId?: string | null;
-        brandId?: string | null;
-        specification?: string | null;
-        originCountry?: string | null;
-        tags?: string[];
-        stockQty?: number | string | null;
-      };
-      isPublic?: boolean;
-      distributionType?: OfferDistributionType;
-      serviceKeys?: string[];
-      priceGeneral?: number;
-      priceGold?: number | null;
-      pricePlatinum?: number | null;
-      consumerReferencePrice?: number | null;
-      consumerShortDescription?: string | null;
-      consumerDetailDescription?: string | null;
-      // WO-KPA-RECOMMENDED-TAB-REPLACE-CURATION-WITH-SUPPLIER-HIGHLIGHT-V1
-      isFeatured?: boolean;
-    }
-  ) {
-    try {
-      const validation = await this.validateCreateInput(data, supplierId);
-      if ('error' in validation) return { success: false, error: validation.error, message: validation.message };
-      const { barcode } = validation.data;
-
-      const name = data.name || data.manualData?.name || '';
-      const categoryId = data.categoryId || data.manualData?.categoryId || null;
-
-      const metadata = await this.resolveProductMetadata(data.manualData, barcode, name, categoryId, data.brandName);
-      if ('error' in metadata) return { success: false, error: metadata.error, message: metadata.message };
-
-      const { masterId, masterBarcode, manualData, isRegulated } = metadata.data;
-
-      // WO-O4O-SUPPLIER-EXISTING-MASTER-DIRECT-OFFER-LINK-V1:
-      //   Master identity 가 확정된 이후의 Offer persistence 는 공통 primitive 로 위임한다.
-      //   (아래 구간을 옮기기만 했다 — 순서·오류 코드·로그 문자열 불변)
-      return await this.persistOfferForResolvedMaster(supplierId, {
-        masterId,
-        masterBarcode,
-        isRegulated,
-        stockQuantity: manualData.stockQty != null ? Number(manualData.stockQty) : 0,
-        isPublic: data.isPublic,
-        distributionType: data.distributionType,
-        serviceKeys: data.serviceKeys,
-        priceGeneral: data.priceGeneral,
-        priceGold: data.priceGold,
-        pricePlatinum: data.pricePlatinum,
-        consumerReferencePrice: data.consumerReferencePrice,
-        consumerShortDescription: data.consumerShortDescription,
-        consumerDetailDescription: data.consumerDetailDescription,
-        isFeatured: data.isFeatured,
-      });
-    } catch (error) {
-      logger.error('[NetureOfferService] Error creating supplier offer:', error);
-      throw error;
-    }
-  }
-
   // ==================== createSupplierOfferFromExistingMaster (WO-O4O-SUPPLIER-EXISTING-MASTER-DIRECT-OFFER-LINK-V1) ====================
 
   /**
@@ -1244,7 +1030,7 @@ export class NetureOfferService {
    * - Master 를 재추론하지 않는다 (resolveOrCreateMaster 미경유 · barcode/name 재탐색 0).
    * - ProductMaster / ProductIdentifier / ProductCandidate write 0. 생성되는 것은 Offer(+service approval)뿐.
    * - 규제 정보는 기존 Master 가 SSOT — 공급자에게 regulatoryType/mfdsPermitNumber 를 다시 받지 않는다.
-   * - 기존 POST /supplier/products 의 MASTER_ID_DIRECT_INJECTION_NOT_ALLOWED 는 그대로다. masterId 를 받는 곳은 여기뿐.
+   * - 레거시 POST /supplier/products(barcode/name → Master 재추론)는 은퇴했다. 공급자가 masterId 로 Offer 를 만드는 곳은 여기뿐.
    * - DRUG gate(assertDrugOfferAllowed) · Offer 유일성 계약은 persistOfferForResolvedMaster 가 기존 그대로 적용한다.
    *
    * @param rawBody 요청 body 원문 — 허용 키 검사를 여기서 한다(라우트가 아니라 서비스 계약).
@@ -1331,7 +1117,7 @@ export class NetureOfferService {
         };
       }
 
-      // 6. 공통 persistence (DRUG gate · 중복 · save · approval) — createSupplierOffer 와 같은 primitive
+      // 6. 공통 persistence (DRUG gate · 중복 · save · approval) — 공급자 Offer 의 유일한 persistence primitive
       const rawStock = input.stockQuantity;
       const parsedStock = rawStock != null && rawStock !== '' ? Number(rawStock) : 0;
       return await this.persistOfferForResolvedMaster(supplierId, {
@@ -1486,8 +1272,8 @@ export class NetureOfferService {
       // §PRIVATE 게이트 — WO-O4O-NETURE-SUPPLIER-OFFER-UPDATE-PRIVATE-GATE-FIX-V1
       //
       // 이전 구현은 "PRIVATE + sellerIds 비어있음" 이면 **모든** 수정을 거부했다.
-      // 그런데 createSupplierOffer 는 신규 등록을 항상 isPublic:false + serviceKeys:[] +
-      // allowedSellerIds:[] (= PRIVATE, UI 의 "내부 상품") 로 만든다. 결과적으로 신규 등록 상품은
+      // 그런데 (당시의) createSupplierOffer 는 신규 등록을 항상 isPublic:false + serviceKeys:[] +
+      // allowedSellerIds:[] (= PRIVATE, UI 의 "내부 상품") 로 만들었다. 결과적으로 신규 등록 상품은
       // 공급 방식을 설정하기 전까지 가격·설명·재고 등 어떤 정보도 저장할 수 없었다 (실사용 차단).
       //
       // 노출·거래 안전성은 이 게이트가 아니라 소비 경로가 이미 보장한다 —
@@ -1676,7 +1462,7 @@ export class NetureOfferService {
    *   - Offer 삭제 없음.
    *
    * 규제 상품 게이트: 대상 서비스가 `service_audience_policies.is_pharmacy_target_service`
-   *   가 아니면 규제 상품 연결을 거부한다 (createSupplierOffer / submitForApproval 와 동일 술어).
+   *   가 아니면 규제 상품 연결을 거부한다 (createSupplierOfferFromExistingMaster / submitForApproval 와 동일 술어).
    */
   async setServiceDelivery(
     offerId: string,
