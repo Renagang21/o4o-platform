@@ -339,6 +339,11 @@ export class NetureService {
     return this.offerService.createSupplierOffer(supplierId, data);
   }
 
+  /** WO-O4O-SUPPLIER-EXISTING-MASTER-DIRECT-OFFER-LINK-V1: 검증된 기존 Master → Offer 직접 연결 */
+  async createSupplierOfferFromExistingMaster(supplierId: string, rawBody: Record<string, unknown>) {
+    return this.offerService.createSupplierOfferFromExistingMaster(supplierId, rawBody);
+  }
+
   async updateSupplierOffer(
     offerId: string,
     supplierId: string,

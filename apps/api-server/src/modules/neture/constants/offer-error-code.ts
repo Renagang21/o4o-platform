@@ -41,6 +41,22 @@ export enum OfferErrorCode {
   // --- 보안 ---
   MASTER_ID_DIRECT_INJECTION_NOT_ALLOWED = 'MASTER_ID_DIRECT_INJECTION_NOT_ALLOWED',
 
+  // --- 기존 Master 직접 연결 (WO-O4O-SUPPLIER-EXISTING-MASTER-DIRECT-OFFER-LINK-V1) ---
+  /** masterId 가 UUID 형식이 아님 → 400 */
+  INVALID_MASTER_ID = 'INVALID_MASTER_ID',
+  /** product_masters 에 없음 → 404 */
+  MASTER_NOT_FOUND = 'MASTER_NOT_FOUND',
+  /** status ≠ ACTIVE(SUSPENDED/ARCHIVED) → 409 */
+  MASTER_NOT_ACTIVE = 'MASTER_NOT_ACTIVE',
+  /** regulatory_type 을 O4O canonical 로 해석할 수 없음 → 409 */
+  MASTER_REGULATORY_TYPE_UNSUPPORTED = 'MASTER_REGULATORY_TYPE_UNSUPPORTED',
+  /** body 에 Master 기준정보 필드(barcode/name/regulatoryType …)가 포함됨 → 400 */
+  MASTER_FIELD_NOT_ALLOWED = 'MASTER_FIELD_NOT_ALLOWED',
+  /** body 에 supplierId 가 포함됨(middleware 확정값만 사용) → 400 */
+  SUPPLIER_ID_NOT_ALLOWED = 'SUPPLIER_ID_NOT_ALLOWED',
+  /** 허용 목록 밖의 body 키 → 400 */
+  UNSUPPORTED_FIELD = 'UNSUPPORTED_FIELD',
+
   // --- 시스템 ---
   MASTER_RESOLVE_FAILED = 'MASTER_RESOLVE_FAILED',
   INTERNAL_ERROR = 'INTERNAL_ERROR',

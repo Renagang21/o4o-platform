@@ -105,6 +105,31 @@ export function createSupplierProductController(dataSource: DataSource): Router 
     }
   });
 
+  // POST /supplier/products/from-master (WO-O4O-SUPPLIER-EXISTING-MASTER-DIRECT-OFFER-LINK-V1)
+  //   Product Library 에서 고른 기존 ProductMaster 에 Offer 를 직접 연결한다.
+  //   masterId 를 받는 유일한 경로 — POST /products 의 MASTER_ID_DIRECT_INJECTION_NOT_ALLOWED 는 그대로다.
+  //   supplierId 는 requireActiveSupplier 확정값만 쓴다(body 의 supplierId 는 서비스가 400 으로 거부).
+  router.post('/products/from-master', requireAuth, requireActiveSupplier as RequestHandler, async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const supplierId = (req as SupplierRequest).supplierId;
+      const result = await netureService.createSupplierOfferFromExistingMaster(supplierId, req.body ?? {});
+      if (!result.success) {
+        const statusCode = result.error === OfferErrorCode.SUPPLIER_NOT_ACTIVE ? 403
+          : result.error === OfferErrorCode.MASTER_NOT_FOUND ? 404
+          : result.error === OfferErrorCode.MASTER_NOT_ACTIVE ? 409
+          : result.error === OfferErrorCode.MASTER_REGULATORY_TYPE_UNSUPPORTED ? 409
+          : result.error === 'OFFER_ALREADY_EXISTS' ? 409
+          : result.error === 'OFFER_IN_RECYCLE_BIN' ? 409
+          : 400;
+        return res.status(statusCode).json(result);
+      }
+      res.status(201).json(result);
+    } catch (error) {
+      logger.error('[Neture API] Error creating supplier product from existing master:', error);
+      res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to create supplier product from existing master' });
+    }
+  });
+
   // GET /supplier/products (WO-NETURE-SUPPLIER-EXCEL-LIST-V1: pagination/search/filter 지원)
   router.get('/products', requireAuth, requireLinkedSupplier as RequestHandler, async (req: AuthenticatedRequest, res: Response) => {
     try {
