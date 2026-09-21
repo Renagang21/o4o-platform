@@ -233,6 +233,57 @@ export async function resolveStoreServices(
   };
 }
 
+// ─── Accessible Stores (Unified Store Workspace · Store Selector) ────────────
+
+/**
+ * WO-O4O-UNIFIED-STORE-WORKSPACE-FOUNDATION-V1 — Store Selector 입력 1건.
+ *
+ * `organizations` 의 표시명만 붙인다(§15 최소 필드 — 사업자번호·주소·대표자·전화 금지).
+ * `memberRole` 은 organization_members 의 매장 역할(owner/admin/manager) 그대로이며 권한 SSOT 가 아니다.
+ */
+export interface AccessibleStore {
+  organizationId: string;
+  organizationName: string;
+  memberRole: string;
+}
+
+/**
+ * 요청자가 접근 가능한 매장 조직 전부 (Store Selector · `내 매장: ○○ ▼`).
+ *
+ * `resolveStoreServices` 와 **같은 후보 집합**(`findAnyServiceStoreOrganizationCandidates` — 서비스 조건 없음)을
+ * 이름만 붙여 돌려준다. 자동 선택은 하지 않는다 — 1개면 호출부가 자동 진입하고, 2개 이상이면 사용자가 고른다.
+ * 선택값은 서버에 저장되지 않으며, 이후 `resolveStoreServices(organizationId)` 가 매 요청 소유권을 다시 판정한다.
+ * 순서는 organizationName → organizationId 오름차순으로 결정적이다.
+ */
+export async function resolveAccessibleStores(
+  dataSource: DataSource,
+  userId: string,
+): Promise<AccessibleStore[]> {
+  if (!userId) return [];
+  const candidates = await findAnyServiceStoreOrganizationCandidates(dataSource, userId);
+  if (candidates.length === 0) return [];
+
+  const ids = candidates.map((c) => c.organizationId);
+  const rows = (await dataSource.query(
+    `SELECT id, name
+       FROM organizations
+      WHERE id = ANY($1::uuid[])`,
+    [ids],
+  )) as Array<{ id: string; name: string | null }>;
+  const nameById = new Map(rows.map((r) => [r.id, r.name ?? '']));
+
+  return candidates
+    .map((c) => ({
+      organizationId: c.organizationId,
+      organizationName: nameById.get(c.organizationId) ?? '',
+      memberRole: c.memberRole,
+    }))
+    .sort((a, b) =>
+      a.organizationName < b.organizationName ? -1 : a.organizationName > b.organizationName ? 1
+        : a.organizationId < b.organizationId ? -1 : a.organizationId > b.organizationId ? 1 : 0,
+    );
+}
+
 /**
  * 한 서비스에 가입한 매장 조직 id 목록 (1 Service : N Stores) — 운영자·admin 용 역방향 조회.
  *

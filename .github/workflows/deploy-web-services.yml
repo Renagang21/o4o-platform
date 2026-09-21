@@ -19,6 +19,8 @@ on:
       - 'services/web-kpa-society/**'
       - 'services/web-pharmacy-hub/**'
       - 'services/web-lecture/**'
+      # WO-O4O-UNIFIED-STORE-WORKSPACE-FOUNDATION-V1 — store.neture.co.kr (Unified Store Workspace)
+      - 'services/web-store/**'
       - 'services/web-kpa-branch/**'
       # WO-O4O-SIGNAGE-PLAYER-WEB-DEPLOYMENT-ADOPTION-AND-PRODUCTION-SMOKE-V1
       - 'services/signage-player-web/**'
@@ -27,7 +29,7 @@ on:
   workflow_dispatch:
     inputs:
       service:
-        description: 'Service to deploy (all, neture, k-cosmetics, kpa-society, pharmacy-hub, lecture, kpa-branch, signage-player)'
+        description: 'Service to deploy (all, neture, k-cosmetics, kpa-society, pharmacy-hub, lecture, store, kpa-branch, signage-player)'
         required: false
         default: 'all'
 
@@ -50,6 +52,8 @@ env:
   VITE_SERVICE_URL_PHARMACY_HUB: https://pharmacyhub.co.kr
   VITE_API_URL_LECTURE: https://api.neture.co.kr
   VITE_SERVICE_URL_LECTURE: https://study.neture.co.kr
+  VITE_API_URL_STORE: https://api.neture.co.kr
+  VITE_SERVICE_URL_STORE: https://store.neture.co.kr
   # WO-O4O-KPA-BRANCH-DEPLOY-AND-RUNTIME-SMOKE-V1
   # 분회 서비스는 단일 web service 하나만 운영한다 (분회별 Cloud Run 서비스 생성 금지).
   # 분회 tenant 는 URL segment(/{slug}) 또는 Host(branch_domains) 로만 해석된다.
@@ -68,6 +72,7 @@ jobs:
       kpa-society: ${{ steps.changes.outputs.kpa-society }}
       pharmacy-hub: ${{ steps.changes.outputs.pharmacy-hub }}
       lecture: ${{ steps.changes.outputs.lecture }}
+      store: ${{ steps.changes.outputs.store }}
       kpa-branch: ${{ steps.changes.outputs.kpa-branch }}
       signage-player: ${{ steps.changes.outputs.signage-player }}
     steps:
@@ -90,6 +95,7 @@ jobs:
               echo "kpa-society=true" >> $GITHUB_OUTPUT
               echo "pharmacy-hub=true" >> $GITHUB_OUTPUT
               echo "lecture=true" >> $GITHUB_OUTPUT
+              echo "store=true" >> $GITHUB_OUTPUT
               echo "kpa-branch=true" >> $GITHUB_OUTPUT
               echo "signage-player=true" >> $GITHUB_OUTPUT
             else
@@ -98,6 +104,7 @@ jobs:
               echo "kpa-society=$( [ "$SERVICE" = 'kpa-society' ] && echo 'true' || echo 'false' )" >> $GITHUB_OUTPUT
               echo "pharmacy-hub=$( [ "$SERVICE" = 'pharmacy-hub' ] && echo 'true' || echo 'false' )" >> $GITHUB_OUTPUT
               echo "lecture=$( [ "$SERVICE" = 'lecture' ] && echo 'true' || echo 'false' )" >> $GITHUB_OUTPUT
+              echo "store=$( [ "$SERVICE" = 'store' ] && echo 'true' || echo 'false' )" >> $GITHUB_OUTPUT
               echo "kpa-branch=$( [ "$SERVICE" = 'kpa-branch' ] && echo 'true' || echo 'false' )" >> $GITHUB_OUTPUT
               echo "signage-player=$( [ "$SERVICE" = 'signage-player' ] && echo 'true' || echo 'false' )" >> $GITHUB_OUTPUT
             fi
@@ -141,6 +148,7 @@ jobs:
             echo "kpa-society=true" >> $GITHUB_OUTPUT
             echo "pharmacy-hub=true" >> $GITHUB_OUTPUT
             echo "lecture=true" >> $GITHUB_OUTPUT
+            echo "store=true" >> $GITHUB_OUTPUT
             echo "kpa-branch=true" >> $GITHUB_OUTPUT
             echo "signage-player=true" >> $GITHUB_OUTPUT
             exit 0
@@ -162,6 +170,7 @@ jobs:
           decide "kpa-society" "services/web-kpa-society/"
           decide "pharmacy-hub" "services/web-pharmacy-hub/"
           decide "lecture" "services/web-lecture/"
+          decide "store" "services/web-store/"
           decide "kpa-branch" "services/web-kpa-branch/"
           decide "signage-player" "services/signage-player-web/"
 
@@ -499,6 +508,59 @@ jobs:
       - name: Verify deployment
         run: |
           gcloud run services describe lecture-web \
+            --region=${{ env.REGION }} \
+            --project=${{ env.PROJECT_ID }} \
+            --format="value(status.url)"
+
+  deploy-store:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.store == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v3
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ env.PROJECT_ID }}
+      - name: Configure Docker for GCR
+        run: gcloud auth configure-docker gcr.io --quiet
+      - name: Build and push Docker image
+        run: |
+          IMAGE_TAG="${{ github.sha }}"
+          docker build \
+            --platform linux/amd64 \
+            --build-arg VITE_API_BASE_URL=${{ env.VITE_API_URL_STORE }} \
+            --build-arg VITE_SERVICE_URL=${{ env.VITE_SERVICE_URL_STORE }} \
+            -f services/web-store/Dockerfile \
+            -t gcr.io/${{ env.PROJECT_ID }}/store-web:${IMAGE_TAG} \
+            -t gcr.io/${{ env.PROJECT_ID }}/store-web:latest \
+            .
+          docker push gcr.io/${{ env.PROJECT_ID }}/store-web:${IMAGE_TAG}
+          docker push gcr.io/${{ env.PROJECT_ID }}/store-web:latest
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud run deploy store-web \
+            --image=gcr.io/${{ env.PROJECT_ID }}/store-web:${{ github.sha }} \
+            --region=${{ env.REGION }} \
+            --project=${{ env.PROJECT_ID }} \
+            --platform=managed \
+            --allow-unauthenticated \
+            --port=8080 \
+            --memory=256Mi \
+            --cpu=1 \
+            --min-instances=0 \
+            --max-instances=5
+      - name: Verify deployment
+        run: |
+          gcloud run services describe store-web \
             --region=${{ env.REGION }} \
             --project=${{ env.PROJECT_ID }} \
             --format="value(status.url)"

@@ -65,8 +65,12 @@ export interface ServiceAuthConfig<TUser> {
    * role prefix(`kpa`,`cosmetics`)가 아니라 canonical(`kpa-society`,`k-cosmetics`)을 넘긴다.
    * 변환이 필요하면 `@o4o/security-core`의 `resolveCanonicalServiceKey()` 를 쓴다 —
    * **이 패키지 안에 서비스명 조건문을 두지 않는다.**
+   *
+   * WO-O4O-UNIFIED-STORE-WORKSPACE-FOUNDATION-V1: 생략 가능. 서비스가 아닌 공통 Workspace(store.neture.co.kr)는
+   * serviceKey 없이 로그인한다 — `/auth/login` · `/auth/google/login` 모두 serviceKey 가 선택 항목이며
+   * auth-client 는 falsy 값을 body 에서 생략한다. 기존 서비스 소비처는 계속 canonical key 를 넘긴다(계약 무변경).
    */
-  serviceKey: string;
+  serviceKey?: string;
   /** 서비스별 authClient 인스턴스(KPA 는 localStorage 전략 전용 인스턴스를 쓴다). */
   authClient: AuthClientLike;
   /** API 사용자 payload → 서비스 User 타입. 서비스별 필드 확장은 여기서 한다. */

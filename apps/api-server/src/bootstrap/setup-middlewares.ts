@@ -61,6 +61,9 @@ export const getAllowedOrigins = (): string[] => {
     "https://pharmacyhub.co.kr", "https://www.pharmacyhub.co.kr",
     // WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 1
     "https://study.neture.co.kr",
+    // WO-O4O-UNIFIED-STORE-WORKSPACE-FOUNDATION-V1:
+    //   store.neture.co.kr = O4O 공통 Store Workspace(서비스가 아님 · serviceKey 없음). 정확한 origin 만, wildcard 금지.
+    "https://store.neture.co.kr",
     // Cloud Run service URLs (GCP asia-northeast3)
     "https://neture-web-3e3aws7zqa-du.a.run.app",
     "https://kpa-society-web-3e3aws7zqa-du.a.run.app",

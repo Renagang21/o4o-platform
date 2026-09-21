@@ -6,6 +6,7 @@
  *   GET /api/v1/work-scope/store-resolution?serviceKey=<canonical>&workspace=store
  *   GET /api/v1/work-scope/store-services[?organizationId=<uuid>]   — WO-O4O-SERVICE-TENANT-FOUNDATION-V1
  *   GET /api/v1/work-scope/operator-services                        — WO-O4O-SERVICE-TENANT-FOUNDATION-V1
+ *   GET /api/v1/work-scope/accessible-stores                        — WO-O4O-UNIFIED-STORE-WORKSPACE-FOUNDATION-V1
  *
  * 프런트엔드 Work Scope 가 `organizationId` / `storeId` 를 **추측하지 않도록**
  * 서버가 기존 membership · resolver 로 확정해 돌려주는 유일한 경로다.
@@ -31,7 +32,7 @@ import type { DataSource } from 'typeorm';
 import { asyncHandler } from '../middleware/error-handler.js';
 import type { AuthRequest } from '../types/auth.js';
 import { resolveWorkScopeStore } from '../utils/work-scope-store-resolution.js';
-import { resolveOperatorServices, resolveStoreServices } from '../utils/service-tenant.resolver.js';
+import { resolveAccessibleStores, resolveOperatorServices, resolveStoreServices } from '../utils/service-tenant.resolver.js';
 
 export function createWorkScopeRoutes(dataSource: DataSource, requireAuth: RequestHandler): Router {
   const router = Router();
@@ -79,6 +80,27 @@ export function createWorkScopeRoutes(dataSource: DataSource, requireAuth: Reque
 
       const data = await resolveStoreServices(dataSource, { userId, organizationId });
       res.json({ success: true, data });
+    }),
+  );
+
+  /**
+   * WO-O4O-UNIFIED-STORE-WORKSPACE-FOUNDATION-V1 — 접근 가능한 매장 조직 목록 (Store Selector 입력).
+   *
+   *   - `store-services` 와 같은 후보 집합(organization_members 활성 매장 역할 · 서비스 조건 없음)에 표시명만 붙인다.
+   *   - 자동 선택 없음 · 서버 저장 없음. 선택된 organizationId 는 이후 `store-services?organizationId=` 가 매 요청 재검증한다.
+   *   - 기존 `store-services` 응답 형태는 바꾸지 않는다(additive 경로).
+   */
+  router.get(
+    '/accessible-stores',
+    requireAuth,
+    asyncHandler(async (req, res) => {
+      const userId = (req as AuthRequest).user?.id;
+      if (!userId) {
+        res.status(401).json({ success: false, error: 'Authentication required', code: 'UNAUTHENTICATED' });
+        return;
+      }
+      const stores = await resolveAccessibleStores(dataSource, userId);
+      res.json({ success: true, data: { stores } });
     }),
   );
 

@@ -1,6 +1,6 @@
 # WO-O4O-UNIFIED-STORE-WORKSPACE-FOUNDATION-V1
 
-> **종류**: 구현 WO · **상태**: **HANDOFF ONLY — 명시 실행 지시 전 실행 금지** · **작성 기준일**: 2026-09-21 (`origin/main` `b4b0f70f8`) · **CHECK**: (실행 후 `docs/checks/CHECK-O4O-UNIFIED-STORE-WORKSPACE-FOUNDATION-V1.md`)
+> **종류**: 구현 WO · **상태**: **CLOSED_WITH_HANDOFF_STOP (2026-09-21)** — Foundation 완료 · §3-④ 발급 측은 DDL 판단 대기 · **작성 기준일**: 2026-09-21 (`origin/main` `b4b0f70f8`) · **CHECK**: [`CHECK-O4O-UNIFIED-STORE-WORKSPACE-FOUNDATION-V1`](../checks/CHECK-O4O-UNIFIED-STORE-WORKSPACE-FOUNDATION-V1.md)
 > **실행 전제 IR**: [`IR-O4O-UNIFIED-STORE-WORKSPACE-SUBDOMAIN-AND-CROSSSERVICE-ROUTING-V1`](../investigations/IR-O4O-UNIFIED-STORE-WORKSPACE-SUBDOMAIN-AND-CROSSSERVICE-ROUTING-V1.md) — 판정 `UNIFIED_STORE_WORKSPACE=FEASIBLE`. 3 덩어리(IR §35) 중 **WO A(첫 번째)**. 후속 WO B(Cross-Service Capability Adoption) · WO C(Domain Cutover & Legacy Entry Closure)는 본 WO 종료 후 별도 작성.
 > **도메인 확정**: canonical `https://store.neture.co.kr` · 화면명 `내 매장`. **Store ≠ 서비스** — `serviceKey='store'` · store membership · store role · Store-Service 신규 테이블은 만들지 않는다(IR §34·§36).
 > **관련 정본**: [`O4O-ROLE-WORKSPACE-ARCHITECTURE-V1`](../baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md)(1 Store : N Services) · [`STORE-LAYER-ARCHITECTURE`](../architecture/STORE-LAYER-ARCHITECTURE.md)(F3 · 구조 변경은 본 WO 가 명시적 WO) · [`O4O-BOUNDARY-POLICY-V1`](../architecture/O4O-BOUNDARY-POLICY-V1.md)(Store Ops = `organizationId`) · serviceKey SSOT = `apps/api-server/src/config/service-catalog.ts`(본 WO 에서 **변경 없음**).
