@@ -74,6 +74,82 @@ describe('parseDrugFile — 브라우저 파싱·정규화', () => {
   });
 });
 
+describe('parseDrugFile — 실제 현업 Excel 형태(헤더 자동 탐색·괄호/슬래시 헤더)', () => {
+  it('A. 첫 행 헤더(제품명/성분/함량)', async () => {
+    const csv = ['제품명,성분,함량', '타이레놀정,아세트아미노펜,500mg'].join('\n');
+    const out = await parseDrugFile(csvFile('A.csv', csv));
+    expect(out.missingNameColumn).toBe(false);
+    expect(out.headerRowIndex).toBe(0);
+    expect(out.rows[0]).toEqual({ product_name: '타이레놀정', ingredient: '아세트아미노펜', strength: '500mg' });
+  });
+
+  it('B. 앞에 제목/작성일 행이 있고 헤더가 4행째', async () => {
+    const csv = [
+      '○○병원 원내 약품 목록',
+      '작성일: 2026-09-21',
+      '약제부',
+      '제품명,성분,함량,제조사',
+      '타이레놀정,아세트아미노펜,500mg,한국얀센',
+      '아목시실린캡슐,아목시실린,250mg,종근당',
+    ].join('\n');
+    const out = await parseDrugFile(csvFile('B.csv', csv));
+    expect(out.missingNameColumn).toBe(false);
+    expect(out.headerRowIndex).toBe(3);
+    expect(out.rows).toHaveLength(2);
+    expect(out.rows[0].product_name).toBe('타이레놀정');
+  });
+
+  it('C. 괄호가 붙은 헤더 제품명(약품명)', async () => {
+    const csv = ['제품명(약품명),성분,함량', '타이레놀정,아세트아미노펜,500mg'].join('\n');
+    const out = await parseDrugFile(csvFile('C.csv', csv));
+    expect(out.missingNameColumn).toBe(false);
+    expect(out.rows[0].product_name).toBe('타이레놀정');
+  });
+
+  it('D. 다른 별칭 헤더(약품명/성분명/규격/제조원)', async () => {
+    const csv = ['약품명,성분명,규격,제조원', '세토펜정,아세트아미노펜,650mg,삼남'].join('\n');
+    const out = await parseDrugFile(csvFile('D.csv', csv));
+    expect(out.missingNameColumn).toBe(false);
+    expect(out.rows[0]).toEqual({
+      product_name: '세토펜정',
+      ingredient: '아세트아미노펜',
+      strength: '650mg',
+      manufacturer: '삼남',
+    });
+  });
+
+  it('C2. 한 셀 안에 슬래시로 별칭이 붙은 헤더도 인식(성분/함량)', async () => {
+    const csv = ['"제품명","성분/함량"', '"타이레놀정","아세트아미노펜"'].join('\n');
+    const out = await parseDrugFile(csvFile('C2.csv', csv));
+    expect(out.missingNameColumn).toBe(false);
+    expect(out.rows[0].product_name).toBe('타이레놀정');
+    // '성분/함량' → 첫 토큰 성분(ingredient) 으로 매핑
+    expect(out.rows[0].ingredient).toBe('아세트아미노펜');
+  });
+
+  it('E. product_name 단일 컬럼도 지원', async () => {
+    const csv = ['품목명', '타이레놀정', '아목시실린캡슐'].join('\n');
+    const out = await parseDrugFile(csvFile('E.csv', csv));
+    expect(out.missingNameColumn).toBe(false);
+    expect(out.rows).toHaveLength(2);
+    expect(out.rows[0].product_name).toBe('타이레놀정');
+  });
+
+  it('F. 약품명 열이 없는 파일은 명확히 거부하고 인식한 열 제목을 돌려준다', async () => {
+    const csv = ['성분,함량,제조사', '아세트아미노펜,500mg,한국얀센'].join('\n');
+    const out = await parseDrugFile(csvFile('F.csv', csv));
+    expect(out.missingNameColumn).toBe(true);
+    expect(out.rows).toHaveLength(0);
+    expect(out.detectedHeaders).toEqual(['성분', '함량', '제조사']);
+  });
+
+  it('F2. 문장형 제목 행(제품명 단어 포함)만으로는 헤더로 오인하지 않는다', async () => {
+    const csv = ['본 목록은 원내 제품명 기준입니다', '성분,함량', '아세트아미노펜,500mg'].join('\n');
+    const out = await parseDrugFile(csvFile('F2.csv', csv));
+    expect(out.missingNameColumn).toBe(true);
+  });
+});
+
 describe('localStorage 저장·복원', () => {
   it('저장한 데이터셋을 그대로 복원한다(새로고침 후 유지)', () => {
     const rows: LocalDrugRow[] = [{ product_name: '타이레놀정', ingredient: '아세트아미노펜', strength: '500mg' }];

@@ -184,7 +184,10 @@ export default function HospitalDrugPage() {
     try {
       const outcome = await parseDrugFile(file);
       if (outcome.missingNameColumn) {
-        setLocalError('제품명(약품명) 열을 찾지 못했습니다. 첫 행에 제품명·성분·함량 등 열 제목이 있는 파일인지 확인해 주세요.');
+        const seen = outcome.detectedHeaders.length > 0 ? `\n이 파일에서 인식한 열 제목: ${outcome.detectedHeaders.join(', ')}` : '';
+        setLocalError(
+          `약품명 열을 찾지 못했습니다. 제품명 · 약품명 · 품목명 등 약품 이름 열이 있는 파일인지 확인해 주세요.${seen}`,
+        );
         return;
       }
       if (outcome.rows.length === 0) {
@@ -324,7 +327,7 @@ export default function HospitalDrugPage() {
         </div>
         {localError && (
           <div className="mx-auto mt-2 max-w-3xl">
-            <p className="m-0 text-xs text-red-600" data-testid="hospital-drug-local-data-error">
+            <p className="m-0 whitespace-pre-line text-xs text-red-600" data-testid="hospital-drug-local-data-error">
               {localError}
             </p>
           </div>
