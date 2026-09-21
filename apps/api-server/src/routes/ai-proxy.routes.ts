@@ -2106,7 +2106,7 @@ router.post('/home-chat', authenticate, dynamicLimiter('free'), async (req, res:
  */
 async function performHospitalDrugRequest(
   userId: string,
-  reqBody: { text: string; workScope?: unknown; attachments: UnifiedAttachment[] },
+  reqBody: { text: string; workScope?: unknown; attachments: UnifiedAttachment[]; localSource?: 'client' },
 ): Promise<{ reply: RouteReply; kind: 'work' | 'chat'; reason: string }> {
   const message = reqBody.text;
   const image = firstImageAttachment(reqBody.attachments);
@@ -2146,6 +2146,7 @@ async function performHospitalDrugRequest(
       },
       message,
       modality.modality,
+      reqBody.localSource === 'client',
     );
 
     // §9 안전 로그 — plan · 경로 요약만. 제품명·성분·값 원문·raw row·모델 응답 본문은 남기지 않는다.
@@ -2157,6 +2158,7 @@ async function performHospitalDrugRequest(
       groundingUsed: result.groundingUsed ?? null,
       localOutcome: result.localOutcome ?? null,
       localAgentStatus: toolCtx.localAgentStatus,
+      localSource: reqBody.localSource ?? null,
     });
 
     return {
@@ -2220,7 +2222,8 @@ router.post('/request', authenticate, dynamicLimiter('free'), async (req, res: R
   // research=runWebResearch / screen=Work Agent(Astra) / local context / question 는 hospital-drug-surface 가 조립한다
   // (WO-O4O-HOSPITAL-DRUG-GOAL-DRIVEN-AI-COMPOSER-REALIGNMENT-V1 §1·§4·§5). runId 재개는 이보다 우선한다(같은-run Work resume).
   if (!runId && body.surface === 'hospital-drug') {
-    const { reply, kind, reason } = await performHospitalDrugRequest(userId, { text, workScope: body.workScope, attachments });
+    const localSource = body.localSource === 'client' ? 'client' : undefined;
+    const { reply, kind, reason } = await performHospitalDrugRequest(userId, { text, workScope: body.workScope, attachments, localSource });
     logger.info('ai unified request routed', {
       userId,
       route: 'hospital-drug',

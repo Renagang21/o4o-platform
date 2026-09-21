@@ -2,27 +2,37 @@
  * HospitalDrugPage — 원내 약품 안내 (병동 PC 공용 · 무로그인)
  *
  * WO-O4O-HOSPITAL-DRUG-LOCAL-AUTOMATION-PILOT-V1 (게이트1 = 옵션 C)
+ * WO-O4O-HOSPITAL-DRUG-BROWSER-LOCAL-DATA-CONNECT-V1 (원내 자료 = 브라우저 Local Data)
  *
  * ─────────────────────────────────────────────────────────────────────────────
- * 이 화면이 다른 화면과 다른 점
+ * 두 개의 "연결" 은 의미가 다르다 — 절대 같게 취급하지 않는다.
  *
- *   병동 PC 앞의 누구나 **로그인 없이** 원내 약품(재고·가격·정보)과 약학정보원
- *   조회를 쓰게 하는 파일럿 진입점이다. 그러나 trust boundary 를 넓히지 않는다:
+ *   ① 원내 자료(Data Context) — [약품파일 연결]. 사용자가 원내 약품 Excel/CSV 를 고르면
+ *      **브라우저에서** 파싱·정규화해 localStorage 에 담는다(localDataset.ts). 서버로 올리지 않고,
+ *      새 서버 저장소도 만들지 않으며, Local Agent 도 요구하지 않는다. 원내 조회("원내에 이 약 있어?")는
+ *      이 데이터로 **브라우저에서** 답한다 — 로그인·PC 연결이 없어도 된다.
  *
- *     · 설치 시 1회, 관리자가 로그인 + Local Agent pairing 을 끝낸다(옵션 C).
- *     · 그 뒤 병동 사용자는 저장된 세션 토큰(o4o_accessToken)을 **그대로 타고**
- *       AI 요청을 보낸다 — 이 화면은 로그인 UI 를 두지 않는다.
- *     · 세션이 만료되거나 PC 가 초기화되면 요청이 401 로 떨어진다. 그때
- *       로그인 모달을 열거나 /login 으로 보내지 않는다(O4OHomePage 와 다른 점).
- *       대신 "재연결 필요" 를 안내한다 — 재로그인·재pairing 은 **설치자**의 몫이다.
- *       (Pilot limitation. 계약 완화가 아니라 기존 경계를 그대로 둔 결과다.)
+ *   ② PC 자동화(Local Agent) — 화면/업무 자동화 실행 환경. probeLocalAgent()(무인증 /health)로 상태만
+ *      읽는다(pairing 은 설치 시 관리자가 끝냈다). 이건 **자료가 아니라 실행기**다. 원내 자료 연결과 무관하다.
  *
- * Local Agent 상태는 probeLocalAgent()(무인증 /health)로 **읽기만** 한다. 이
- * 화면에서 pairing 을 실행하지 않는다 — pairing 은 설치 시 관리자가 이미 했다.
+ * 설치 시 1회 관리자가 로그인 + Local Agent pairing(옵션 C) 을 끝낸다. 병동 사용자는 저장된 세션을 타고
+ * research(효능 조사·Gemini)·screen(화면 조작·Astra) 요청을 보낸다. 세션 만료(401)면 로그인 모달을 열지
+ * 않고 "재연결 필요"(설치자 몫)만 알린다. 원내 자료 조회는 이 세션과도 무관하게 브라우저에서 동작한다.
  */
 
-import { useCallback, useEffect, useState, type FormEvent } from 'react';
-import { ChevronDown, HardDrive, Loader2, MonitorSmartphone, Send, Wifi, WifiOff } from 'lucide-react';
+import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
+import {
+  AlertCircle,
+  CheckCircle2,
+  ChevronDown,
+  FileSpreadsheet,
+  HardDrive,
+  Loader2,
+  MonitorSmartphone,
+  Send,
+  Wifi,
+  WifiOff,
+} from 'lucide-react';
 import { useWorkScope } from '../contexts';
 import {
   sendUnifiedRequest,
@@ -34,6 +44,24 @@ import {
   probeLocalAgent,
   type LocalAgentUnavailableReason,
 } from '../api/localAgent';
+import {
+  LOCAL_DRUG_ACCEPT,
+  clearLocalDataset,
+  loadLocalDataset,
+  makeDataset,
+  matchLocalByResearchIngredients,
+  parseDrugFile,
+  queryLocalRows,
+  renderLocalContextBlock,
+  saveLocalDataset,
+  type LocalDrugDataset,
+  type LocalDrugRow,
+} from '../lib/hospital-drug/localDataset';
+import {
+  classifyLocalQuery,
+  extractQueryTerms,
+  extractStrength,
+} from '../lib/hospital-drug/localIntent';
 
 /**
  * 병동 사용자가 바로 누를 수 있는 예시 질의. 자주 쓰는 업무를 문장으로 제안한다.
@@ -72,6 +100,19 @@ const WARD_MANIFEST = {
   ],
 };
 
+/** 같은 제품·함량 행 중복 제거(제품 토큰 매칭 ∪ 성분 매칭 결합 시). */
+function dedupeRows(rows: LocalDrugRow[]): LocalDrugRow[] {
+  const seen = new Set<string>();
+  const out: LocalDrugRow[] = [];
+  for (const r of rows) {
+    const key = `${r.product_name}${r.strength ?? ''}${r.manufacturer ?? ''}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push(r);
+  }
+  return out;
+}
+
 export default function HospitalDrugPage() {
   const { workScope, isResolvingStore } = useWorkScope();
 
@@ -86,6 +127,12 @@ export default function HospitalDrugPage() {
   const [reconnectNeeded, setReconnectNeeded] = useState(false);
   const [agent, setAgent] = useState<AgentStatus>({ state: 'checking' });
   const [helpOpen, setHelpOpen] = useState(false);
+
+  // ① 원내 자료(Data Context) — 브라우저 localStorage. Local Agent 와 독립.
+  const [dataset, setDataset] = useState<LocalDrugDataset | null>(null);
+  const [localBusy, setLocalBusy] = useState(false);
+  const [localError, setLocalError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   // §11 — 이 화면에 있는 동안만 전용 manifest 를 끼운다. 떠나면 원상복구.
   useEffect(() => {
@@ -106,6 +153,11 @@ export default function HospitalDrugPage() {
     };
   }, []);
 
+  // 새로고침 후에도 유지되는 원내 데이터셋 복원(criterion D).
+  useEffect(() => {
+    setDataset(loadLocalDataset());
+  }, []);
+
   const refreshAgent = useCallback(async () => {
     setAgent({ state: 'checking' });
     const outcome = await probeLocalAgent();
@@ -115,6 +167,53 @@ export default function HospitalDrugPage() {
   useEffect(() => {
     void refreshAgent();
   }, [refreshAgent]);
+
+  /** [약품파일 연결]/[약품파일 변경] → 실제 파일 선택창. */
+  const openFilePicker = useCallback(() => {
+    setLocalError(null);
+    fileInputRef.current?.click();
+  }, []);
+
+  const onFileChange = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    // 같은 파일 재선택도 onChange 가 나도록 값 비우기.
+    e.target.value = '';
+    if (!file) return;
+    setLocalBusy(true);
+    setLocalError(null);
+    try {
+      const outcome = await parseDrugFile(file);
+      if (outcome.missingNameColumn) {
+        setLocalError('제품명(약품명) 열을 찾지 못했습니다. 첫 행에 제품명·성분·함량 등 열 제목이 있는 파일인지 확인해 주세요.');
+        return;
+      }
+      if (outcome.rows.length === 0) {
+        setLocalError('약품 행을 찾지 못했습니다. 파일 내용을 확인해 주세요.');
+        return;
+      }
+      const next = makeDataset(file.name, outcome.rows);
+      const saved = saveLocalDataset(next);
+      if (!saved.ok) {
+        setLocalError(
+          saved.reason === 'quota'
+            ? '이 브라우저의 저장 공간이 부족해 원내 자료를 저장하지 못했습니다. 항목 수가 더 적은 파일로 시도해 주세요.'
+            : '원내 자료를 이 브라우저에 저장하지 못했습니다.',
+        );
+        return;
+      }
+      setDataset(next); // 즉시 상태 갱신(criterion B·C).
+    } catch {
+      setLocalError('파일을 읽지 못했습니다. xlsx · xls · csv 형식인지 확인해 주세요.');
+    } finally {
+      setLocalBusy(false);
+    }
+  }, []);
+
+  const disconnectLocal = useCallback(() => {
+    clearLocalDataset();
+    setDataset(null);
+    setLocalError(null);
+  }, []);
 
   const trimmed = input.trim();
   const blocked = pending || isResolvingStore;
@@ -130,9 +229,31 @@ export default function HospitalDrugPage() {
       setWorkResult(null);
       setConfirm(null);
       try {
-        // surface='hospital-drug' — 이 화면 요청만 공통 Goal-driven Core 로 흘러간다(§1). 서버가 modality 를
-        // 골라 research(조사)·screen(화면 조작)·원내 Context·되묻기 중 하나로 답한다. 소스는 고정하지 않는다.
-        const result = await sendUnifiedRequest({ text, attachments: [], workScope, routeHint, surface: 'hospital-drug' });
+        const localKind = dataset ? classifyLocalQuery(text) : 'none';
+
+        // ── 원내 보유 조회(local_only) — 브라우저 데이터로 **완전히** 답한다. 서버·Local Agent 불요. ──
+        // criterion E·F: "우리 원내에 아세트아미노펜 있어?" 를 로그인·PC 연결 없이 처리.
+        if (dataset && localKind === 'local_only') {
+          const terms = extractQueryTerms(text);
+          const strength = extractStrength(text);
+          const needles = terms.length > 0 ? terms : [text];
+          const matches = queryLocalRows(dataset.rows, needles, { limit: 50 });
+          const label = terms.length > 0 ? terms.join(' · ') : text.trim();
+          setInput('');
+          setAnswer(`'${label}' 의 원내 보유 여부를 확인했습니다.\n\n${renderLocalContextBlock(matches, strength)}`);
+          return;
+        }
+
+        // ── 그 밖 — 서버 공통 Core. 원내 데이터가 연결돼 있으면 localSource='client' 로 알려
+        //    서버는 자기 원내 조회(Local Agent)를 열지 않는다. research(조사)·screen(화면)·question 만.
+        const result = await sendUnifiedRequest({
+          text,
+          attachments: [],
+          workScope,
+          routeHint,
+          surface: 'hospital-drug',
+          ...(dataset ? { localSource: 'client' as const } : {}),
+        });
         if (result.kind === 'confirm') {
           // 실행하지 않았다. [진행] 을 기다린다.
           setConfirm({ text, message: result.confirm.message });
@@ -143,13 +264,22 @@ export default function HospitalDrugPage() {
           setWorkResult(result);
           return;
         }
-        // 공통 Core 의 텍스트 답(research·원내 Context·되묻기)은 chat.message 로 온다.
+        // 공통 Core 의 텍스트 답(research·되묻기)은 chat.message 로 온다.
         // composite 는 은퇴했으나 구버전 서버 호환을 위해 분기만 남긴다(현행 서버는 내려보내지 않는다).
-        if (result.kind === 'composite') {
-          setAnswer(result.composite.message);
-          return;
+        let text_answer = result.kind === 'composite' ? result.composite.message : result.chat.message;
+
+        // ── 동일성분(research_and_local) 결합 — 서버 research 위에 원내 Context 를 **브라우저에서** 얹는다.
+        //    제품 토큰 매칭 ∪ research 본문에 등장한 성분과 같은 성분의 원내 행.
+        if (dataset && localKind === 'research_and_local') {
+          const strength = extractStrength(text);
+          const terms = extractQueryTerms(text);
+          const byTerms = terms.length > 0 ? queryLocalRows(dataset.rows, terms, { limit: 50 }) : [];
+          const byIngredient = matchLocalByResearchIngredients(dataset.rows, text_answer, 50);
+          const merged = dedupeRows([...byTerms, ...byIngredient]);
+          text_answer = `${text_answer}\n\n[원내 약품] 같은 성분 원내 보유 현황\n${renderLocalContextBlock(merged, strength)}`;
         }
-        setAnswer(result.chat.message);
+
+        setAnswer(text_answer);
       } catch (err) {
         // 저장된 세션이 만료·소실됐다. 로그인 모달을 열지 않는다(옵션 C):
         // 재로그인·재pairing 은 설치자가 한다. 여기서는 그 사실만 알린다.
@@ -162,7 +292,7 @@ export default function HospitalDrugPage() {
         setPending(false);
       }
     },
-    [blocked, workScope],
+    [blocked, workScope, dataset],
   );
 
   const handleSubmit = (e: FormEvent) => {
@@ -175,15 +305,39 @@ export default function HospitalDrugPage() {
 
   return (
     <div className="flex min-h-screen flex-col bg-slate-50">
-      {/* 헤더 — 계정/네비게이션 없음. 화면 정체성만. */}
+      {/* 헤더 — 계정/네비게이션 없음. 화면 정체성 + 두 연결(원내 자료 · PC 자동화)만. */}
       <header className="border-b border-slate-200 bg-white px-4 py-4 sm:px-6">
-        <div className="mx-auto flex max-w-3xl items-center justify-between gap-3">
+        <div className="mx-auto flex max-w-3xl flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div>
             <h1 className="m-0 text-lg font-semibold text-slate-900">원내 약품 안내</h1>
             <p className="m-0 mt-0.5 text-xs text-slate-500">원내 보유 약품 조회 · 약학정보원 안내</p>
           </div>
-          <AgentBadge agent={agent} onRetry={refreshAgent} />
+          <div className="flex flex-col items-start gap-2 sm:items-end">
+            <LocalDataConnector
+              dataset={dataset}
+              busy={localBusy}
+              onConnect={openFilePicker}
+              onDisconnect={disconnectLocal}
+            />
+            <AgentBadge agent={agent} onRetry={refreshAgent} />
+          </div>
         </div>
+        {localError && (
+          <div className="mx-auto mt-2 max-w-3xl">
+            <p className="m-0 text-xs text-red-600" data-testid="hospital-drug-local-data-error">
+              {localError}
+            </p>
+          </div>
+        )}
+        {/* 실제 파일 선택창 — 숨김 input. accept 는 xlsx/xls/csv. */}
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept={LOCAL_DRUG_ACCEPT}
+          onChange={onFileChange}
+          className="hidden"
+          data-testid="hospital-drug-local-data-input"
+        />
       </header>
 
       <main className="flex flex-1 flex-col items-center px-4 py-8 sm:px-6">
@@ -338,13 +492,78 @@ export default function HospitalDrugPage() {
   );
 }
 
-/** 이 PC 의 Local Agent 연결 상태를 읽기 전용으로 보여준다. pairing 은 하지 않는다. */
+/**
+ * ① 원내 자료(Data Context) 연결 — 브라우저 Local Data. 파일을 서버로 올리지 않는다.
+ * 미연결: [원내 자료 미연결] + [약품파일 연결]. 연결됨: [원내 자료 연결됨 · N개 품목] + [약품파일 변경].
+ * PC 자동화(Local Agent)와 **의미가 다르다** — 여기서는 자료만 다룬다.
+ */
+function LocalDataConnector({
+  dataset,
+  busy,
+  onConnect,
+  onDisconnect,
+}: {
+  dataset: LocalDrugDataset | null;
+  busy: boolean;
+  onConnect: () => void;
+  onDisconnect: () => void;
+}) {
+  return (
+    <div className="flex items-center gap-2">
+      {dataset ? (
+        <span
+          className="flex items-center gap-1.5 text-xs font-medium text-emerald-600"
+          data-testid="hospital-drug-local-data-status"
+          title={`${dataset.fileName} · ${dataset.count}개 품목`}
+        >
+          <CheckCircle2 className="h-3.5 w-3.5" />
+          원내 자료 연결됨 · {dataset.count}개 품목
+        </span>
+      ) : (
+        <span
+          className="flex items-center gap-1.5 text-xs text-slate-500"
+          data-testid="hospital-drug-local-data-status"
+          title="원내 약품 파일(Excel · CSV)을 연결하면 원내 보유 조회를 쓸 수 있습니다"
+        >
+          <AlertCircle className="h-3.5 w-3.5 text-amber-500" />
+          원내 자료 미연결
+        </span>
+      )}
+      <button
+        type="button"
+        onClick={onConnect}
+        disabled={busy}
+        data-testid="hospital-drug-local-data-connect"
+        className="flex items-center gap-1 rounded-md border border-slate-300 bg-white px-2 py-1 text-xs font-medium text-slate-700 hover:border-slate-400 hover:text-slate-900 disabled:opacity-50"
+      >
+        {busy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <FileSpreadsheet className="h-3.5 w-3.5" />}
+        {busy ? '불러오는 중' : dataset ? '약품파일 변경' : '약품파일 연결'}
+      </button>
+      {dataset && !busy && (
+        <button
+          type="button"
+          onClick={onDisconnect}
+          data-testid="hospital-drug-local-data-disconnect"
+          className="text-xs text-slate-400 hover:text-slate-600"
+          title="연결 해제"
+        >
+          해제
+        </button>
+      )}
+    </div>
+  );
+}
+
+/**
+ * ② PC 자동화(Local Agent) 연결 상태 — 읽기 전용. pairing 은 하지 않는다.
+ * 이건 화면/업무 자동화 실행기 상태다 — 원내 자료(Data Context)와 다르다.
+ */
 function AgentBadge({ agent, onRetry }: { agent: AgentStatus; onRetry: () => void }) {
   if (agent.state === 'checking') {
     return (
       <span className="flex items-center gap-1.5 text-xs text-slate-400" data-testid="hospital-drug-agent-status">
         <Loader2 className="h-3.5 w-3.5 animate-spin" />
-        연결 확인 중
+        PC 자동화 확인 중
       </span>
     );
   }
@@ -353,10 +572,10 @@ function AgentBadge({ agent, onRetry }: { agent: AgentStatus; onRetry: () => voi
       <span
         className="flex items-center gap-1.5 text-xs font-medium text-emerald-600"
         data-testid="hospital-drug-agent-status"
-        title="이 PC 가 원내 자료에 연결되어 있습니다"
+        title="이 PC 의 자동화(화면/업무 실행) 환경이 연결되어 있습니다"
       >
         <Wifi className="h-3.5 w-3.5" />
-        연결됨
+        PC 자동화 연결됨
       </span>
     );
   }
@@ -373,7 +592,7 @@ function AgentBadge({ agent, onRetry }: { agent: AgentStatus; onRetry: () => voi
       ) : (
         <HardDrive className="h-3.5 w-3.5" />
       )}
-      원내 자료 미연결
+      PC 자동화 미연결
     </button>
   );
 }

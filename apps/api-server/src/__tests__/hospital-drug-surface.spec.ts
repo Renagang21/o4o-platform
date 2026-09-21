@@ -144,6 +144,39 @@ describe('§8-C research_and_local — 조사 + 원내 Context 결합(Source 강
   });
 });
 
+describe('suppressLocal — 원내를 클라이언트가 처리(localSource=client) · 서버 원내 조회 생략', () => {
+  test('plan: 원내(local_only)·동일성분(research_and_local)이 research/공통판정으로 접힌다', () => {
+    // B 원내 보유 → suppressLocal 이면 서버 local 없이 공통 판정(제품만 있으니 research).
+    expect(decideHospitalDrugSurfacePlan(B, 'question', true)).toBe('research');
+    // C 동일성분 → 서버는 조사만(원내 결합은 클라이언트).
+    expect(decideHospitalDrugSurfacePlan(C, 'question', true)).toBe('research');
+    // 조사 요청은 suppressLocal 과 무관하게 그대로 research.
+    expect(decideHospitalDrugSurfacePlan(A, 'research', true)).toBe('research');
+    // 단서 없으면 여전히 question.
+    expect(decideHospitalDrugSurfacePlan('안녕하세요', 'question', true)).toBe('question');
+  });
+
+  test('run: 동일성분이라도 local(queryLocal) 을 부르지 않고 research 만', async () => {
+    const { deps, localCalls, researchCalls } = fakeDeps({
+      local: LOCAL_ROWS,
+      research: { content: '동일성분 조사 결과입니다.', model: 'gemini-3.8-flash', grounding: { used: true, sources: [{}] } as never },
+    });
+    const r = await runHospitalDrugSurface(deps, C, 'question', true);
+    expect(r.plan).toBe('research');
+    expect(r.usedResearch).toBe(true);
+    expect(r.usedLocal).toBe(false);
+    expect(researchCalls).toEqual([C]);
+    expect(localCalls).toEqual([]); // 원내 파일은 서버로 오지 않는다.
+  });
+
+  test('run: 원내 보유(B) 도 서버 local 없이 처리(공통 판정 → research)', async () => {
+    const { deps, localCalls } = fakeDeps({ local: LOCAL_ROWS });
+    const r = await runHospitalDrugSurface(deps, B, 'question', true);
+    expect(r.usedLocal).toBe(false);
+    expect(localCalls).toEqual([]);
+  });
+});
+
 describe('question — 되묻기(공통 question modality 보존)', () => {
   test('단서 없음 → research·local 모두 미호출', async () => {
     const { deps, localCalls, researchCalls } = fakeDeps({});

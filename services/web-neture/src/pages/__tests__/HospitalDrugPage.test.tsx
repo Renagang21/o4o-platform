@@ -57,6 +57,11 @@ afterEach(() => {
   cleanup();
   sendUnifiedRequest.mockReset();
   probeLocalAgent.mockReset();
+  try {
+    localStorage.clear();
+  } catch {
+    /* jsdom localStorage 미가용 — 무시. */
+  }
 });
 
 const chatResult = (message: string) => ({ kind: 'chat', route: 'chat', reason: 'ok', chat: { message } });
@@ -126,13 +131,91 @@ describe('원내 약품 안내 — 게이트1 옵션 C', () => {
     expect(screen.queryByTestId('hospital-drug-error')).toBeNull();
   });
 
-  it('Agent 미연결이면 상태 배지가 「원내 자료 미연결」을 보여준다', async () => {
+  it('PC 자동화(Local Agent) 미연결이면 상태 배지가 「PC 자동화 미연결」을 보여준다', async () => {
     probeLocalAgent.mockResolvedValue({ ok: false, reason: 'AGENT_NOT_RUNNING', permission: 'granted' });
     render(<HospitalDrugPage />);
 
     await waitFor(() => {
-      expect(screen.getByTestId('hospital-drug-agent-status').textContent).toContain('원내 자료 미연결');
+      expect(screen.getByTestId('hospital-drug-agent-status').textContent).toContain('PC 자동화 미연결');
     });
+  });
+
+  it('원내 자료(Data Context)와 PC 자동화(Local Agent)를 별개 배지로 보여준다', async () => {
+    // Local Agent 는 연결됐지만 원내 파일은 아직 안 붙였다 — 둘은 의미가 다르다.
+    probeLocalAgent.mockResolvedValue({ ok: true, health: { agentVersion: '0.1.0', connected: true, nonce: 'n' } });
+    render(<HospitalDrugPage />);
+
+    const local = await screen.findByTestId('hospital-drug-local-data-status');
+    expect(local.textContent).toContain('원내 자료 미연결');
+    // 파일 선택 버튼([약품파일 연결])과 실제 파일 input 이 있다.
+    expect(screen.getByTestId('hospital-drug-local-data-connect').textContent).toContain('약품파일 연결');
+    const fileInput = screen.getByTestId('hospital-drug-local-data-input') as HTMLInputElement;
+    expect(fileInput.getAttribute('accept')).toContain('.xlsx');
+
+    await waitFor(() => {
+      expect(screen.getByTestId('hospital-drug-agent-status').textContent).toContain('PC 자동화 연결됨');
+    });
+  });
+
+  it('원내 자료가 연결돼 있으면 「원내 보유 조회」를 브라우저에서 답하고 서버를 부르지 않는다', async () => {
+    probeLocalAgent.mockResolvedValue({ ok: false, reason: 'AGENT_NOT_RUNNING', permission: 'granted' });
+    // 저장된 원내 데이터셋(criterion D — 새로고침 후 유지)을 흉내낸다.
+    localStorage.setItem(
+      'neture:hospital-drug:local-dataset:v1',
+      JSON.stringify({
+        v: 1,
+        fileName: '원내약품.xlsx',
+        connectedAt: new Date().toISOString(),
+        count: 2,
+        rows: [
+          { product_name: '타이레놀정500mg', ingredient: '아세트아미노펜', strength: '500mg' },
+          { product_name: '아목시실린캡슐250mg', ingredient: '아목시실린', strength: '250mg' },
+        ],
+      }),
+    );
+    render(<HospitalDrugPage />);
+
+    // 연결 상태가 "연결됨 · N개 품목" 으로 보인다(criterion B).
+    await waitFor(() => {
+      expect(screen.getByTestId('hospital-drug-local-data-status').textContent).toContain('원내 자료 연결됨');
+    });
+
+    // 원내 보유 질문 — Local Agent 없이 브라우저 데이터로만 답한다(criterion E·F).
+    await userEvent.type(screen.getByTestId('hospital-drug-input'), '우리 원내에 아세트아미노펜 있어?');
+    await userEvent.click(screen.getByTestId('hospital-drug-submit'));
+
+    const answer = await screen.findByTestId('hospital-drug-answer');
+    expect(answer.textContent).toContain('아세트아미노펜');
+    expect(answer.textContent).toContain('[원내 약품]');
+    // 원내 보유 조회는 서버를 부르지 않는다.
+    expect(sendUnifiedRequest).not.toHaveBeenCalled();
+  });
+
+  it('원내 자료가 연결돼 있으면 research 요청에 localSource=client 를 실어 보낸다', async () => {
+    probeLocalAgent.mockResolvedValue({ ok: false, reason: 'AGENT_NOT_RUNNING', permission: 'granted' });
+    localStorage.setItem(
+      'neture:hospital-drug:local-dataset:v1',
+      JSON.stringify({
+        v: 1,
+        fileName: '원내약품.xlsx',
+        connectedAt: new Date().toISOString(),
+        count: 1,
+        rows: [{ product_name: '타이레놀정500mg', ingredient: '아세트아미노펜', strength: '500mg' }],
+      }),
+    );
+    sendUnifiedRequest.mockResolvedValue(chatResult('타이레놀정의 효능은 해열·진통입니다.'));
+    render(<HospitalDrugPage />);
+
+    await waitFor(() => {
+      expect(screen.getByTestId('hospital-drug-local-data-status').textContent).toContain('원내 자료 연결됨');
+    });
+
+    await userEvent.type(screen.getByTestId('hospital-drug-input'), '타이레놀정의 효능을 조사해줘');
+    await userEvent.click(screen.getByTestId('hospital-drug-submit'));
+
+    await screen.findByTestId('hospital-drug-answer');
+    expect(sendUnifiedRequest).toHaveBeenCalledTimes(1);
+    expect(sendUnifiedRequest.mock.calls[0][0]).toMatchObject({ surface: 'hospital-drug', localSource: 'client' });
   });
 
   it('바탕화면 추가 안내(§11)를 펼칠 수 있다', async () => {

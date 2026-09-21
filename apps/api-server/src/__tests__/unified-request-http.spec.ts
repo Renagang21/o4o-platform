@@ -203,6 +203,22 @@ describe('POST /api/ai/request', () => {
     expect(runSurfaceMock).not.toHaveBeenCalled();
   });
 
+  // WO-O4O-HOSPITAL-DRUG-BROWSER-LOCAL-DATA-CONNECT-V1 — 원내 자료를 클라이언트가 브라우저에서 처리하면
+  // body.localSource='client' 로 온다. 라우터는 이를 surface 의 suppressLocal(4번째 인자)로 넘겨 서버 원내 조회를
+  // 생략시킨다. 값이 없으면 false. surface 본체는 mock 이므로 여기서는 전달만 고정한다(생략 로직은 surface.spec).
+  it('②-b3 surface=hospital-drug + localSource=client → surface 에 suppressLocal=true 로 전달 (없으면 false)', async () => {
+    await request(app).post('/api/ai/request').send({ text: '우루사정과 같은 성분의 원내약 있어?', surface: 'hospital-drug', localSource: 'client' });
+    expect(runSurfaceMock).toHaveBeenCalledTimes(1);
+    expect(runSurfaceMock.mock.calls[0][3]).toBe(true);
+    const routed = logInfo.mock.calls.find((c) => c[0] === 'ai unified request routed');
+    expect(routed?.[1]?.route).toBe('hospital-drug');
+
+    jest.clearAllMocks();
+    runSurfaceMock.mockResolvedValue({ answer: 'x', plan: 'research', product: null, usedResearch: true, usedLocal: false });
+    await request(app).post('/api/ai/request').send({ text: '타이레놀정의 효능을 조사해줘', surface: 'hospital-drug' });
+    expect(runSurfaceMock.mock.calls[0][3]).toBe(false);
+  });
+
   // §1·§10 — 전역 Router 는 병원 특수 규칙을 갖지 않는다. surface 가 없으면(메인 홈 Composer) 같은 문장도
   // hospital-drug 경로로 가지 않는다 — 등재 대상·업무어가 없어 일반 chat 으로 떨어지고, surface 조립기는 호출되지 않는다.
   it('②-c surface 가 없으면 hospital-drug 경로로 라우팅되지 않는다(오염 제거)', async () => {

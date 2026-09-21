@@ -189,6 +189,13 @@ export interface UnifiedRequestInput {
    * (WO-O4O-HOSPITAL-DRUG-GOAL-DRIVEN-AI-COMPOSER-REALIGNMENT-V1 §16). 일반 홈 Composer 는 보내지 않는다.
    */
   surface?: 'hospital-drug';
+  /**
+   * 원내(Local) 자료를 **클라이언트가** 이미 브라우저에서 처리했음을 알린다
+   * (WO-O4O-HOSPITAL-DRUG-BROWSER-LOCAL-DATA-CONNECT-V1). 'client' 이면 서버는 자신의 원내 조회
+   * (queryLocal · Local Agent 경유)를 건너뛰고 research/question 으로만 답한다 — 원내 파일은 서버로
+   * 올라오지 않는다. screen(화면 조작) 경로는 이 값과 무관하게 그대로 판정된다.
+   */
+  localSource?: 'client';
 }
 
 /**
@@ -213,6 +220,7 @@ export async function sendUnifiedRequest(input: UnifiedRequestInput): Promise<Un
       ...(input.runId ? { runId: input.runId } : {}),
       ...(input.routeHint ? { routeHint: input.routeHint } : {}),
       ...(input.surface ? { surface: input.surface } : {}),
+      ...(input.localSource ? { localSource: input.localSource } : {}),
       workScope: toHomeChatScope(input.workScope),
     });
     const data = res?.data?.data as UnifiedRequestResult | undefined;

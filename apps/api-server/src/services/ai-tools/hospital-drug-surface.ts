@@ -97,14 +97,28 @@ export interface HospitalDrugSurfaceResult {
  *     - 아무 단서도 없으면 → question
  *
  * 도메인 어휘(원내·동일성분)는 여기서만 판정한다 — 공통 Task Modality Router 는 오염시키지 않는다(§5·§10).
+ *
+ * suppressLocal=true (WO-O4O-HOSPITAL-DRUG-BROWSER-LOCAL-DATA-CONNECT-V1): 원내(Local) 자료를
+ * **클라이언트가 브라우저에서** 처리했다는 신호(요청 body localSource='client'). 이때 서버는 원내
+ * 조회를 열지 않고 research/question 으로만 답한다 — 동일성분은 research(성분/효능 근거)만 내려보내고
+ * 원내 결합은 클라이언트가 자기 로컬 데이터로 한다. 원내 파일은 서버로 올라오지 않는다.
  */
-export function decideHospitalDrugSurfacePlan(message: string, modality: TaskModality): HospitalDrugSurfacePlan {
+export function decideHospitalDrugSurfacePlan(
+  message: string,
+  modality: TaskModality,
+  suppressLocal = false,
+): HospitalDrugSurfacePlan {
   const product = extractProduct(message);
   const hospital = mentionsHospital(message);
   const sameIngredient = mentionsSameIngredient(message);
 
-  if (product && sameIngredient) return 'research_and_local';
-  if (product && hospital) return 'local_only';
+  if (!suppressLocal) {
+    if (product && sameIngredient) return 'research_and_local';
+    if (product && hospital) return 'local_only';
+  } else if (product && sameIngredient) {
+    // 동일성분: 서버는 조사만, 원내 결합은 클라이언트(§client-local).
+    return 'research';
+  }
   if (modality === 'research') return 'research';
   if (product) return 'research';
   return 'question';
@@ -128,15 +142,17 @@ function summarizeLocal(block: { unavailable: boolean; rowCount: number }, ok: b
  * @param deps 주입된 executor(원내 조회)·research fn(runWebResearch)
  * @param message 사용자 자연어
  * @param modality 공통 `classifyTaskModality` 판정의 modality (screen 제외)
+ * @param suppressLocal 원내를 클라이언트가 처리함(localSource='client') — 서버 원내 조회 생략
  */
 export async function runHospitalDrugSurface(
   deps: HospitalDrugSurfaceDeps,
   message: string,
   modality: TaskModality,
+  suppressLocal = false,
 ): Promise<HospitalDrugSurfaceResult> {
   const product = extractProduct(message);
   const strength = extractStrength(message);
-  const plan = decideHospitalDrugSurfacePlan(message, modality);
+  const plan = decideHospitalDrugSurfacePlan(message, modality, suppressLocal);
 
   // ── question — 되묻는다(공통 question modality 보존). ──────────────────────────
   if (plan === 'question') {
