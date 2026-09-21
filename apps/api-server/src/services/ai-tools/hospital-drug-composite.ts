@@ -5,6 +5,17 @@
  * WO-O4O-HOSPITAL-DRUG-COMPOSITE-QUERY-ORCHESTRATION-V1 §2·§7·§9·§10
  *
  * ─────────────────────────────────────────────────────────────────────────────
+ * 상태(2026-09-21): 이 결합 오케스트레이션(health.kr web + Local SQLite 고정 결합)은
+ *   canonical active path 에서 **은퇴**했다(SUPERSEDED). /hospital-drug 는 이제 공통
+ *   Goal-driven Core(Task Modality Router → research=runWebResearch / screen=Astra / local
+ *   context / question)를 소비한다 — `hospital-drug-surface.ts`.
+ *   근거: WO-O4O-HOSPITAL-DRUG-GOAL-DRIVEN-AI-COMPOSER-REALIGNMENT-V1 §3(health.kr+SQLite
+ *   고정 결합을 active path 에서 제거). 이 파일은 이력 보존을 위해 남겨 두며, Local 렌더
+ *   헬퍼(`queryLocal`·`renderLocalBlock`)만 surface 가 재사용한다. `runHospitalDrugComposite`
+ *   는 어느 route 에도 배선되지 않는다.
+ * ─────────────────────────────────────────────────────────────────────────────
+ *
+ * ─────────────────────────────────────────────────────────────────────────────
  * 이 모듈이 하는 일 / 하지 않는 일
  *
  *   §9 — "우루사정 200mg 과 같은 성분의 원내약 있어?" 같은 **한 요청**을 받아
@@ -180,8 +191,12 @@ function renderRow(row: LocalRow): string {
   return `- ${parts.join(' · ') || '(표시 가능한 항목 없음)'}`;
 }
 
-/** 원내 조회 결과 블록(§7·§10). 반환: { text, ok, unavailable, rowCount }. */
-function renderLocalBlock(
+/**
+ * 원내 조회 결과 블록(§7·§10). 반환: { text, ok, unavailable, rowCount }.
+ * 단계 D(hospital-drug surface)가 Local Context 렌더링을 재사용한다 — export 는 additive,
+ * 동작 불변(WO-O4O-HOSPITAL-DRUG-GOAL-DRIVEN-AI-COMPOSER-REALIGNMENT-V1 §6 기존 Local 경로 재사용).
+ */
+export function renderLocalBlock(
   data: Record<string, unknown> | undefined,
   strength: string | null,
 ): { text: string; unavailable: boolean; rowCount: number } {
@@ -224,7 +239,11 @@ const LOCAL_DATASET = LOCAL_DATASET_NAMES[0];
 const SAME_INGREDIENT_ENTRYPOINT = 'healthkr.same_ingredient';
 const DRUG_SEARCH_ENTRYPOINT = 'healthkr.drug_search';
 
-async function queryLocal(
+/**
+ * 원내(Local SQLite) 조회 — dataset·match·limit 고정. 단계 D surface 가 재사용한다
+ * (export additive · 동작 불변 · §6 기존 Local 경로 재사용).
+ */
+export async function queryLocal(
   exec: CompositeToolExecutor,
   field: string,
   value: string,

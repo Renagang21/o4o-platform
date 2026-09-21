@@ -48,7 +48,10 @@ import {
   type UnifiedAttachment,
 } from '../services/ai-tools/unified-request-contract.js';
 import { classifyUnifiedRequest, confirmWorkMessage } from '../services/ai-tools/unified-request-router.js';
-import { runHospitalDrugComposite, isCompositeHospitalDrugRequest } from '../services/ai-tools/hospital-drug-composite.js';
+// WO-O4O-HOSPITAL-DRUG-GOAL-DRIVEN-AI-COMPOSER-REALIGNMENT-V1 — /hospital-drug 를 공통 Goal-driven Core 로 연결
+// (research=runWebResearch · screen=Work Agent/Astra · local context · question). 구 composite(health.kr+SQLite 고정 결합)은 은퇴.
+import { runHospitalDrugSurface } from '../services/ai-tools/hospital-drug-surface.js';
+import { runWebResearch } from '../services/ai/web-research.service.js';
 import { readAttachments, renderAttachmentTextBlocks } from '../services/ai-tools/attachment-reader.js';
 import { executeMultimodalChat } from '../services/ai-tools/multimodal-chat.js';
 import { resolveWorkScopeStore, STORE_SCOPED_WORKSPACES } from '../utils/work-scope-store-resolution.js';
@@ -2088,61 +2091,86 @@ router.post('/home-chat', authenticate, dynamicLimiter('free'), async (req, res:
 });
 
 /**
- * 원내약 + 약학정보원 결합 요청 본체(WO-O4O-HOSPITAL-DRUG-COMPOSITE-QUERY-ORCHESTRATION-V1 §9).
+ * /hospital-drug 요청 본체 — 공통 Goal-driven Core 를 소비하는 첫 contextual surface.
  *
- *   한 요청을 두 소스(health.kr web · Local SQLite)로 내부 분해해 하나의 답으로 합친다.
- *   각 단계는 `executeAiTool`(권한·인자 게이트)을 그대로 지난다 — 이 경로는 권한을 넓히지 않는다.
- *   local device 는 서버가 확정한다(클라이언트 값은 권한 근거가 아니다). 조회 tool 은 READ 라
- *   COMMIT·never-escalate 판정 대상이 아니지만, 게이트는 단계마다 다시 걸린다.
+ * WO-O4O-HOSPITAL-DRUG-GOAL-DRIVEN-AI-COMPOSER-REALIGNMENT-V1 §1·§4·§5·§6
+ *
+ *   별도 AI 엔진을 만들지 않는다. 공통 `classifyTaskModality`(Capability C)로 modality 를 고르고:
+ *     - screen  → 공통 Work Agent(performWorkAgentRun → provider=openai → Astra vision) 로 위임.
+ *     - 그 밖(research/local/question) → `runHospitalDrugSurface` 가 공통 `runWebResearch`(Gemini
+ *       grounding · admin 모델 SSOT)와 기존 Local SQLite 경로만 조립한다.
+ *   구 composite(health.kr + SQLite 고정 결합)은 active path 에서 은퇴했다(§3). Source 는 고정하지 않고,
+ *   원내 데이터는 질문이 요구할 때만 Context 로 얹는다(§2). 전역 provider 는 바꾸지 않는다(§5·§10).
+ *   조회 tool 은 `executeAiTool`(권한 게이트)을 그대로 지난다 — 이 경로는 권한을 넓히지 않는다.
+ *   반환 kind: screen=work / 그 밖=chat.
  */
-async function performHospitalDrugComposite(userId: string, reqBody: Record<string, unknown>): Promise<RouteReply> {
-  const validation = validateHomeChatMessage(reqBody.text);
-  if (!validation.ok || !validation.message) {
-    const code = validation.error ?? 'INVALID_MESSAGE';
-    return { status: 400, body: { success: false, error: homeChatValidationMessage(code), code } };
+async function performHospitalDrugRequest(
+  userId: string,
+  reqBody: { text: string; workScope?: unknown; attachments: UnifiedAttachment[] },
+): Promise<{ reply: RouteReply; kind: 'work' | 'chat'; reason: string }> {
+  const message = reqBody.text;
+  const image = firstImageAttachment(reqBody.attachments);
+
+  // 공통 Task Modality Router — 판정에 AI 호출 0. 이미지 동반 화면 요청은 screen.
+  const modality = classifyTaskModality({
+    request: message,
+    image: image ? { provenance: 'user_image' } : null,
+  });
+  logger.info('hospital-drug surface routed', { userId, modality: modality.modality, reason: modality.reason });
+
+  // §5 — screen 은 공통 Work Agent 로 위임(provider=openai → Astra). hospital-drug 전용 provider 없음.
+  if (modality.modality === 'screen') {
+    const workBody: Record<string, unknown> = { request: message };
+    if (image) workBody.image = image;
+    const reply = await performWorkAgentRun(userId, workBody);
+    return { reply, kind: 'work', reason: 'screen' };
   }
-  const message = validation.message;
 
   const clientScope = (reqBody.workScope ?? {}) as Record<string, unknown>;
   const workspace = typeof clientScope.workspace === 'string' ? clientScope.workspace : 'home';
 
   try {
-    // 서버가 확정한 사실만 담는다(home-chat 과 같은 규칙).
+    // 서버가 확정한 사실만 담는다(home-chat 과 같은 규칙). Local 조회는 이 컨텍스트로 게이트된다.
     const toolCtx: VerifiedToolContext = { userId, workspace };
     const deviceResolution = await resolveTargetDevice(AppDataSource, userId);
     toolCtx.localAgentStatus = deviceResolution.status === 'ok' ? 'connected' : deviceResolution.status;
     if (deviceResolution.status === 'ok') toolCtx.localDeviceId = deviceResolution.device.id;
 
-    const result = await runHospitalDrugComposite(
-      (name, args) => executeAiTool(AppDataSource, name, args, toolCtx),
+    const result = await runHospitalDrugSurface(
+      {
+        exec: (name, args) => executeAiTool(AppDataSource, name, args, toolCtx),
+        research: async (query) => {
+          const r = await runWebResearch({ query });
+          return { content: r.content, model: r.model, grounding: r.grounding };
+        },
+      },
       message,
+      modality.modality,
     );
 
-    // §20 안전 로그 — plan · 단계 결과만. 제품명·성분·값 원문·raw row 는 남기지 않는다.
-    logger.info('hospital-drug composite', {
+    // §9 안전 로그 — plan · 경로 요약만. 제품명·성분·값 원문·raw row·모델 응답 본문은 남기지 않는다.
+    logger.info('hospital-drug surface', {
       userId,
       plan: result.plan,
-      steps: result.steps.map((s) => `${s.source}:${s.outcome}`),
+      usedResearch: result.usedResearch,
+      usedLocal: result.usedLocal,
+      groundingUsed: result.groundingUsed ?? null,
+      localOutcome: result.localOutcome ?? null,
       localAgentStatus: toolCtx.localAgentStatus,
     });
 
     return {
-      status: 200,
-      body: {
-        success: true,
-        data: {
-          message: result.answer,
-          plan: result.plan,
-          steps: result.steps,
-        },
-      },
+      reply: { status: 200, body: { success: true, data: { message: result.answer, plan: result.plan } } },
+      kind: 'chat',
+      reason: result.plan,
     };
   } catch (error: unknown) {
-    logger.error('hospital-drug composite error', {
-      userId,
-      error: (error as { message?: string })?.message,
-    });
-    return { status: 502, body: { success: false, error: '응답을 생성하지 못했습니다. 다시 시도해 주세요.', code: 'AI_ERROR' } };
+    logger.error('hospital-drug surface error', { userId, error: (error as { message?: string })?.message });
+    return {
+      reply: { status: 502, body: { success: false, error: '응답을 생성하지 못했습니다. 다시 시도해 주세요.', code: 'AI_ERROR' } },
+      kind: 'chat',
+      reason: 'error',
+    };
   }
 }
 
@@ -2186,21 +2214,25 @@ router.post('/request', authenticate, dynamicLimiter('free'), async (req, res: R
   const runId = typeof body.runId === 'string' && body.runId.length > 0 ? body.runId : undefined;
   const routeHint = body.routeHint === 'work' ? 'work' : undefined;
 
-  // /hospital-drug 전용 경계 — 이 화면(surface)에서 온 원내약+약학정보원 결합 요청만 composite 로 분해한다.
-  // 전역 Router 는 병원 특수 규칙을 갖지 않는다: composite 결정은 오직 여기(HTTP 계층 · surface 명시)에서만 내려
-  // 메인 자동화(홈 Composer)로 새지 않는다 (WO-O4O-HOSPITAL-DRUG-GOAL-DRIVEN-AI-COMPOSER-REALIGNMENT-V1 §16).
-  // runId 재개는 composite 보다 우선한다(같은-run Work resume).
-  if (!runId && body.surface === 'hospital-drug' && isCompositeHospitalDrugRequest(text)) {
+  // /hospital-drug 전용 경계 — 이 화면(surface)에서 온 요청만 공통 Goal-driven Core 로 흘려보낸다.
+  // 전역 Router 는 병원 특수 규칙을 갖지 않는다: hospital-drug 판정은 오직 여기(HTTP 계층 · surface 명시)에서만
+  // 내려 메인 자동화(홈 Composer)로 새지 않는다. modality 판정은 공통 Task Modality Router,
+  // research=runWebResearch / screen=Work Agent(Astra) / local context / question 는 hospital-drug-surface 가 조립한다
+  // (WO-O4O-HOSPITAL-DRUG-GOAL-DRIVEN-AI-COMPOSER-REALIGNMENT-V1 §1·§4·§5). runId 재개는 이보다 우선한다(같은-run Work resume).
+  if (!runId && body.surface === 'hospital-drug') {
+    const { reply, kind, reason } = await performHospitalDrugRequest(userId, { text, workScope: body.workScope, attachments });
     logger.info('ai unified request routed', {
       userId,
-      route: 'composite',
-      reason: 'hospital_drug_composite',
+      route: 'hospital-drug',
+      reason,
       targetType: null,
       attachmentCount: attachments.length,
     });
-    const reply = await performHospitalDrugComposite(userId, { text, workScope: body.workScope });
     if (reply.status !== 200) return res.status(reply.status).json(reply.body);
-    return res.json({ success: true, data: { kind: 'composite', route: 'composite', reason: 'hospital_drug_composite', composite: reply.body.data } });
+    const payload = kind === 'work'
+      ? { kind: 'work', route: 'hospital-drug', reason, work: reply.body.data }
+      : { kind: 'chat', route: 'hospital-drug', reason, chat: reply.body.data };
+    return res.json({ success: true, data: payload });
   }
 
   const decision = classifyUnifiedRequest(text, {

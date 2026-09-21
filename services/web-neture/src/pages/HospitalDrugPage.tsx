@@ -35,11 +35,15 @@ import {
   type LocalAgentUnavailableReason,
 } from '../api/localAgent';
 
-/** 병동 사용자가 바로 누를 수 있는 예시 질의. 자주 쓰는 업무를 문장으로 제안한다. */
+/**
+ * 병동 사용자가 바로 누를 수 있는 예시 질의. 자주 쓰는 업무를 문장으로 제안한다.
+ * 소스 이름(약학정보원 등)은 노출하지 않는다 — 목적만 문장으로 둔다(§7).
+ * 조사(효능)·원내 결합(동일성분+원내)·원내 보유 세 패턴을 보여 준다.
+ */
 const EXAMPLE_QUERIES: readonly string[] = [
-  '타이레놀정 재고와 가격 알려줘',
+  '타이레놀정의 효능을 조사해줘',
+  '타이레놀정과 같은 성분의 원내약 있어?',
   '아목시실린 원내 보유 여부 확인해줘',
-  '리피토정과 동일성분 의약품 찾아줘',
 ];
 
 type AgentStatus =
@@ -126,7 +130,8 @@ export default function HospitalDrugPage() {
       setWorkResult(null);
       setConfirm(null);
       try {
-        // surface='hospital-drug' — 이 화면에서만 원내약+약학정보원 결합(composite) 경계가 열린다(§16).
+        // surface='hospital-drug' — 이 화면 요청만 공통 Goal-driven Core 로 흘러간다(§1). 서버가 modality 를
+        // 골라 research(조사)·screen(화면 조작)·원내 Context·되묻기 중 하나로 답한다. 소스는 고정하지 않는다.
         const result = await sendUnifiedRequest({ text, attachments: [], workScope, routeHint, surface: 'hospital-drug' });
         if (result.kind === 'confirm') {
           // 실행하지 않았다. [진행] 을 기다린다.
@@ -138,7 +143,8 @@ export default function HospitalDrugPage() {
           setWorkResult(result);
           return;
         }
-        // §9 — 원내약 + 약학정보원 결합 응답. 이미 하나로 합쳐진 한국어 답을 그대로 보여 준다.
+        // 공통 Core 의 텍스트 답(research·원내 Context·되묻기)은 chat.message 로 온다.
+        // composite 는 은퇴했으나 구버전 서버 호환을 위해 분기만 남긴다(현행 서버는 내려보내지 않는다).
         if (result.kind === 'composite') {
           setAnswer(result.composite.message);
           return;
