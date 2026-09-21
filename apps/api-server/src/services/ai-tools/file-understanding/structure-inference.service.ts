@@ -16,9 +16,6 @@
  */
 
 import { execute } from '@o4o/ai-core';
-import { AppDataSource } from '../../../database/connection.js';
-import { resolveEditingModel } from '../../../utils/ai-editing-model-resolver.js';
-import { resolveAiApiKey } from '../../../utils/ai-key.util.js';
 
 import {
   parseInferenceJson,
@@ -32,12 +29,40 @@ export interface InferFileStructureRequest {
   profile: StructureProfile;
   targetSchema: TargetSchema;
   timeoutMs?: number;
+  /**
+   * 선택적 resolver 주입. **프로덕션은 생략한다** — 생략 시 기본값이 실 resolver
+   * (admin SSOT → resolveEditingModel · ai_settings→env → resolveAiApiKey)를 그대로 호출한다.
+   * DB 를 초기화하지 않는 standalone 컨텍스트(예: tsx 스모크 — esbuild 는 TypeORM 엔티티
+   * decorator metadata 를 방출하지 못해 connection.js 로드가 불가)에서만, 엔티티 그래프를
+   * 끌어오지 않도록 model/key 해석을 주입한다. 반환 계약·정규화는 동일하다.
+   */
+  resolveModel?: () => Promise<string> | string;
+  resolveApiKey?: () => Promise<string> | string;
 }
 
 export interface InferFileStructureResult {
   inference: FileStructureInference;
   model: string;
   requestId: string;
+}
+
+/**
+ * 기본 model resolver — admin SSOT(AiQueryPolicy.defaultModel) → env → gemini canonical.
+ * 동적 import 로 connection.js(엔티티 그래프·import 시 DB 초기화)를 **호출 시점**까지 지연한다.
+ * 프로덕션 동작은 정적 import 시절과 동일(모듈은 앱 부팅 때 이미 초기화됨).
+ */
+async function defaultResolveModel(): Promise<string> {
+  const { resolveEditingModel } = await import('../../../utils/ai-editing-model-resolver.js');
+  return resolveEditingModel();
+}
+
+/** 기본 key resolver — ai_settings(DB 초기화 시) → env(GEMINI_API_KEY 등). */
+async function defaultResolveApiKey(): Promise<string> {
+  const [{ AppDataSource }, { resolveAiApiKey }] = await Promise.all([
+    import('../../../database/connection.js'),
+    import('../../../utils/ai-key.util.js'),
+  ]);
+  return resolveAiApiKey(AppDataSource, 'gemini');
 }
 
 const SYSTEM_PROMPT = [
@@ -131,8 +156,8 @@ function buildUserPrompt(profile: StructureProfile, schema: TargetSchema): strin
  * @throws execute()/JSON.parse 실패를 전파 — 호출측이 재시도·QUESTION 전략을 결정.
  */
 export async function inferFileStructure(request: InferFileStructureRequest): Promise<InferFileStructureResult> {
-  const model = await resolveEditingModel();
-  const apiKey = await resolveAiApiKey(AppDataSource, 'gemini');
+  const model = await (request.resolveModel ? request.resolveModel() : defaultResolveModel());
+  const apiKey = await (request.resolveApiKey ? request.resolveApiKey() : defaultResolveApiKey());
 
   const result = await execute({
     systemPrompt: SYSTEM_PROMPT,
