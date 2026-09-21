@@ -41,6 +41,9 @@ export interface ProductFormProps {
    *  상품명은 ProductMaster 기준정보다. 공급자 편집 화면에서는 읽기 전용으로 표시한다
    *  (연결 ≠ master 편집). 기준정보 수정은 운영자/관리자 경로가 담당한다. */
   masterNameReadOnly?: boolean;
+  /** WO-O4O-SUPPLIER-PRODUCT-REGISTRATION-AI-FIRST-CUTOVER-AND-LEGACY-MASTER-RESOLUTION-RETIREMENT-V1:
+   *  Candidate 제출 흐름은 재고를 받지 않는다(서버 FORBIDDEN_FIELD). 재고 입력 UI 를 숨긴다. */
+  hideStock?: boolean;
 }
 
 // ─── Validation (exported) ───
@@ -74,7 +77,8 @@ export function deriveDistributionType(isPublic: boolean, serviceKeys: string[])
 
 // ─── Constants ───
 
-const AVAILABLE_SERVICES = [
+/** 공급 대상 서비스 목록 (from-master 화면이 DRUG 규칙과 함께 재사용) */
+export const AVAILABLE_SERVICES = [
   { key: 'kpa-society', name: 'KPA Society' },
   { key: 'k-cosmetics', name: 'K-Cosmetics' },
 ];
@@ -146,7 +150,7 @@ const DEFAULT_DATA: ProductFormData = {
 
 // ─── Component ───
 
-export default function ProductForm({ mode, initialData, onChange, disabled = false, hideDistribution = false, masterNameReadOnly = false }: ProductFormProps) {
+export default function ProductForm({ mode, initialData, onChange, disabled = false, hideDistribution = false, masterNameReadOnly = false, hideStock = false }: ProductFormProps) {
   const [data, setData] = useState<ProductFormData>(() => ({
     ...DEFAULT_DATA,
     ...initialData,
@@ -282,6 +286,7 @@ export default function ProductForm({ mode, initialData, onChange, disabled = fa
       </div>
 
       {/* ── 재고 ── */}
+      {!hideStock && (
       <div>
         <FieldLabel>
           재고 수량 {mode === 'create' && <span className="text-xs text-slate-400 font-normal">(선택)</span>}
@@ -295,6 +300,7 @@ export default function ProductForm({ mode, initialData, onChange, disabled = fa
           <p className="mt-1 text-xs text-slate-400">미입력 시 0으로 처리됩니다</p>
         )}
       </div>
+      )}
 
       {/* ── Edit mode: 활성 상태 ── */}
       {mode === 'edit' && (

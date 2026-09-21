@@ -4,7 +4,7 @@
  * WO-O4O-GLOBAL-PRODUCT-LIBRARY-SEARCH-V1
  * - ProductMaster 텍스트 검색 (이름/바코드/제조사)
  * - 카테고리/브랜드 필터
- * - 선택 시 상품등록 페이지로 barcode 전달
+ * - 선택 시 from-master(기존 제품 공급 연결) 페이지로 masterId 전달
  */
 
 import { useState, useEffect, useCallback } from 'react';
@@ -106,28 +106,13 @@ export default function SupplierProductLibraryPage() {
   };
 
   /**
-   * WO-O4O-COSMETICS-SUPPLIER-PRODUCT-REGISTER-AND-EDIT-BROWSER-SMOKE-V1
+   * WO-O4O-SUPPLIER-PRODUCT-REGISTRATION-AI-FIRST-CUTOVER-AND-LEGACY-MASTER-RESOLUTION-RETIREMENT-V1
    *
-   * 기존 barcode 단독 전달은 barcode 가 없는 master 에서 깨진다.
-   * `encodeURIComponent(null)` 이 문자열 "null" 이 되어 등록 화면이 그 값을 바코드로 조회하고,
-   * 등록 시 GTIN 검증(INVALID_GTIN)에서 막힌다. 화장품 master 는 전량 barcode = NULL 이다.
-   *
-   * 바코드가 없으면 이름·브랜드·제조사·카테고리를 넘긴다. 등록 화면이 같은 값으로 제출하면
-   * 서버의 `createMasterWithoutBarcode` 가 (이름, 제조사) 로 기존 master 를 찾아 연결한다
-   * (masterId 직접 주입은 금지 계약이므로 우회하지 않는다).
+   * 선택한 master 는 masterId 로 from-master 화면에 넘긴다 (barcode/name 재추론 없음).
+   * 공급자용 get-master-by-id API 가 없으므로 표시용 master 정보는 navigation state 로 함께 전달한다.
    */
   const handleSelect = (master: MasterSearchResult) => {
-    const params = new URLSearchParams();
-    if (master.barcode) {
-      params.set('barcode', master.barcode);
-    } else {
-      params.set('name', master.name || master.regulatoryName || '');
-      if (master.brand?.name) params.set('brandName', master.brand.name);
-      if (master.manufacturerName) params.set('manufacturerName', master.manufacturerName);
-      if (master.category?.id) params.set('categoryId', master.category.id);
-      if (master.regulatoryType) params.set('regulatoryType', master.regulatoryType);
-    }
-    navigate(`/supplier/products/new?${params.toString()}`);
+    navigate(`/supplier/products/from-master?masterId=${encodeURIComponent(master.id)}`, { state: { master } });
   };
 
   return (

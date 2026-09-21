@@ -226,6 +226,7 @@ const SupplierProductImportPage = lazy(() => import('./pages/supplier/SupplierPr
 
 // Supplier Product Library (WO-O4O-GLOBAL-PRODUCT-LIBRARY-SEARCH-V1)
 const SupplierProductLibraryPage = lazy(() => import('./pages/supplier/SupplierProductLibraryPage'));
+const SupplierProductFromMasterPage = lazy(() => import('./pages/supplier/SupplierProductFromMasterPage'));
 
 // Supplier Account
 // WO-O4O-NETURE-SUPPLIER-LEGACY-DASHBOARD-AND-ACCOUNT-SHELL-RETIREMENT-V1:
@@ -810,6 +811,7 @@ function App() {
               <Route path="/supplier/dashboard" element={<SupplierDashboardPage />} />
               <Route path="/supplier/products" element={<SupplierProductsPage />} />
               <Route path="/supplier/products/library" element={<SupplierProductLibraryPage />} />
+              <Route path="/supplier/products/from-master" element={<SupplierProductFromMasterPage />} />
               <Route path="/supplier/products/import-assistant" element={<SupplierProductImportPage />} />
               <Route path="/supplier/products/new" element={<SupplierProductCreatePage />} />
               {/* WO-O4O-NETURE-SUPPLIER-PRODUCT-REGISTRATION-IA-V1 */}

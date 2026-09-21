@@ -1,5 +1,8 @@
 /**
- * SupplierProductRegisterEntryPage — 제품 등록 진입 (의약품/비의약품 2분기 → 등록 방식)
+ * SupplierProductRegisterEntryPage — 신규 제품 검토 요청 진입 (의약품/비의약품 2분기 → 요청 방식)
+ *
+ * WO-O4O-SUPPLIER-PRODUCT-REGISTRATION-AI-FIRST-CUTOVER-AND-LEGACY-MASTER-RESOLUTION-RETIREMENT-V1:
+ *   단일·대량 모두 Candidate 제출이다(ProductMaster/Offer 즉시 생성 없음). 기존 표준 제품은 Product Library → from-master.
  *
  * WO-O4O-SUPPLIER-PRODUCT-REGISTRATION-ENTRY-FLOW-POLICY-V1
  *   선행: WO-O4O-NETURE-SUPPLIER-PRODUCT-REGISTRATION-IA-V1 (5유형 카드 → 본 WO 에서 2분기로 단순화)
@@ -158,8 +161,8 @@ export default function SupplierProductRegisterEntryPage() {
               <span className="flex items-center gap-2">
                 <Package className="w-5 h-5 text-blue-600" />
                 <span>
-                  <span className="block font-medium text-slate-800">하나씩 등록</span>
-                  <span className="block text-xs text-slate-500">단일 제품을 단계별로 입력</span>
+                  <span className="block font-medium text-slate-800">하나씩 검토 요청</span>
+                  <span className="block text-xs text-slate-500">신규 제품 정보를 단계별로 입력해 검토 요청</span>
                 </span>
               </span>
               <ArrowRight className="w-4 h-4 text-slate-400" />
@@ -172,8 +175,8 @@ export default function SupplierProductRegisterEntryPage() {
               <span className="flex items-center gap-2">
                 <Layers className="w-5 h-5 text-blue-600" />
                 <span>
-                  <span className="block font-medium text-slate-800">대량 등록</span>
-                  <span className="block text-xs text-slate-500">유형별 템플릿으로 여러 제품 등록</span>
+                  <span className="block font-medium text-slate-800">대량 검토 요청</span>
+                  <span className="block text-xs text-slate-500">유형별 템플릿으로 여러 제품을 한 번에 검토 요청</span>
                 </span>
               </span>
               <ArrowRight className="w-4 h-4 text-slate-400" />
@@ -191,8 +194,10 @@ export default function SupplierProductRegisterEntryPage() {
       {/* 하단: 제품 등록 후 연결 메뉴 안내 */}
       <div className="mt-6 rounded-lg bg-slate-50 border border-slate-200 p-4">
         <p className="text-xs text-slate-500 leading-relaxed">
-          <strong>B2B 등록, 서비스 운영자 승인 제품 등록, 판매자 모집, 이벤트 오퍼, 유통참여형 펀딩</strong>은
-          제품 등록 후 <strong>제품 목록</strong>에서 연결할 수 있습니다. 제품을 먼저 등록한 뒤 활용하세요.
+          여기서 제출한 제품 정보는 <strong>운영자 검토 후 표준 제품으로 확정</strong>되며, 그 뒤 <strong>제품 라이브러리</strong>에서
+          선택해 공급가·공급 방식을 설정하면 공급 상품이 됩니다. 이미 표준 제품에 있는 제품은 제품 라이브러리에서 바로 공급 연결하세요.
+          <strong>B2B 등록, 서비스 운영자 승인 제품 등록, 판매자 모집, 이벤트 오퍼, 유통참여형 펀딩</strong>은 공급 상품 등록 후
+          <strong>제품 목록</strong>에서 연결할 수 있습니다.
         </p>
       </div>
     </div>

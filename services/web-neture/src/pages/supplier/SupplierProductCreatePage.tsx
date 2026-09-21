@@ -1,11 +1,18 @@
 /**
- * SupplierProductCreatePage - 공급자 상품 등록 (3-Step Wizard)
+ * SupplierProductCreatePage - 공급자 신규 제품 검토 요청 (3-Step Wizard · Candidate 제출)
  *
  * WO-NETURE-PRODUCT-REGISTRATION-REFACTOR-AND-AI-TAGGING-V1
  *
  * Step 1: 기본 정보 (상품명, 카테고리, 브랜드, 제조사, 바코드 optional, 규제)
- * Step 2: 가격/유통/서비스 (공급가, 소비자참고가, 유통정책, 서비스선택)
- * Step 3: 이미지/설명/등록
+ * Step 2: 기본 공급가 초안 (offerDraft — 승격 후 Offer 생성 시 참고)
+ * Step 3: 이미지/설명/검토 요청
+ *
+ * WO-O4O-SUPPLIER-PRODUCT-REGISTRATION-AI-FIRST-CUTOVER-AND-LEGACY-MASTER-RESOLUTION-RETIREMENT-V1:
+ *   이 화면은 더 이상 ProductMaster/Offer 를 만들지 않는다. 제출 = POST /supplier/product-candidates (Candidate).
+ *   운영자 검토·승격(Promotion Core) 후 Master 가 생성되고, 공급자는 그 Master 에 from-master 로 Offer 를 연결한다.
+ *   이미지는 미디어 라이브러리(master-less 업로드)에 올린 URL 만 Candidate 에 보존한다 — Master 확정 전 ProductImage write 0.
+ *   바코드 조회에서 기존 Master 가 발견되면 Candidate 를 만들지 않고 from-master 화면으로 보낸다.
+ *   Import Assistant(상세페이지 소스 자동 입력) 초안도 같은 Candidate 흐름으로 제출된다.
  *
  * WO-NETURE-SUPPLIER-CREATE-IMAGE-LIBRARY-ALIGNMENT-V1:
  *   상세/성분 이미지 라이브러리 선택 + 에디터 이미지 기능 연결
@@ -34,8 +41,8 @@ import { fetchGuidePageContent } from '../../api/guideContent';
 const GUIDE_PAGE_KEY = 'supplier.product.editor';
 const SERVICE_KEY = 'neture';
 
-// WO-O4O-NETURE-SUPPLIER-PRODUCT-CREATE-INFO-FIRST-V1: 정보-우선 — 공급 방식은 등록 후 별도 설정
-const STEPS = ['기본 정보', '기본 공급가', '이미지 / 설명'];
+// WO-O4O-NETURE-SUPPLIER-PRODUCT-CREATE-INFO-FIRST-V1: 정보-우선 — 공급 방식은 승격 후 Offer 연결 시 설정
+const STEPS = ['기본 정보', '기본 공급가(초안)', '이미지 / 설명'];
 
 interface FormData {
   barcode: string;
@@ -74,24 +81,29 @@ function flattenCategories(
 
 /**
  * WO-O4O-NETURE-SUPPLIER-PRODUCT-AUTHORING-EXPANSION-CLOSEOUT-BATCH-V1:
- * 등록 실패 시 백엔드 error code 를 그대로 노출하던 것을 조치 가능한 한국어 안내로 바꾼다.
- * 매핑에 없는 코드는 코드 원문을 유지한다(진단 가능성 보존).
+ * 실패 시 백엔드 error code 를 조치 가능한 한국어 안내로 바꾼다. 매핑에 없는 코드는 원문을 유지한다.
+ * WO-O4O-SUPPLIER-PRODUCT-REGISTRATION-AI-FIRST-CUTOVER-AND-LEGACY-MASTER-RESOLUTION-RETIREMENT-V1:
+ *   Candidate 제출(POST /supplier/product-candidates) 오류 코드 기준으로 갱신.
  */
 const CREATE_ERROR_MESSAGE: Record<string, string> = {
-  OFFER_ALREADY_EXISTS: '이미 등록한 상품입니다. 제품 목록에서 해당 상품을 수정해 주세요.',
-  OFFER_IN_RECYCLE_BIN: '같은 상품이 삭제 대기(휴지통) 상태입니다. 운영자에게 복원 또는 완전 삭제를 요청한 뒤 다시 등록해 주세요.',
-  SUPPLIER_NOT_ACTIVE: '공급자 계정이 아직 활성화되지 않았습니다. 승인 완료 후 등록할 수 있습니다.',
-  INVALID_CATEGORY: '카테고리를 다시 선택해 주세요.',
-  REGULATED_FIELDS_REQUIRED: '규제 상품은 규제 유형·인허가 번호 등 필수 항목을 모두 입력해야 합니다.',
+  SUPPLIER_NOT_ACTIVE: '공급자 계정이 아직 활성화되지 않았습니다. 승인 완료 후 요청할 수 있습니다.',
+  SUPPLIER_NOT_FOUND: '공급자 정보를 찾을 수 없습니다. 공급자 등록 상태를 확인해 주세요.',
+  CANDIDATE_NAME_REQUIRED: '상품명을 입력해 주세요.',
   INVALID_REGULATORY_TYPE: '선택한 규제 유형이 올바르지 않습니다.',
-  PUBLIC_REQUIRES_DESCRIPTION: '공개 공급으로 등록하려면 소비자용 설명이 필요합니다.',
-  MASTER_ID_DIRECT_INJECTION_NOT_ALLOWED: '허용되지 않은 요청입니다. 화면을 새로고침한 뒤 다시 시도해 주세요.',
-  INTERNAL_ERROR: '서버 오류로 등록하지 못했습니다. 잠시 후 다시 시도해 주세요.',
+  DRUG_CATEGORY_REQUIRED: '의약품은 일반의약품/전문의약품 구분이 필요합니다. 제품 유형을 다시 선택해 주세요.',
+  INVALID_CATEGORY_ID: '카테고리를 다시 선택해 주세요.',
+  INVALID_BRAND_ID: '브랜드 정보가 올바르지 않습니다. 브랜드명을 다시 입력해 주세요.',
+  INVALID_PRICE: '공급가/소비자 참고가는 0 이상의 숫자여야 합니다.',
+  INVALID_URL: '이미지 주소가 올바르지 않습니다. 이미지를 다시 선택해 주세요.',
+  TOO_MANY_IMAGES: '상세 이미지는 최대 20장까지 등록할 수 있습니다.',
+  FIELD_TOO_LONG: '입력값이 허용 길이를 초과했습니다. 상품명·설명 길이를 줄여 주세요.',
+  FORBIDDEN_FIELD: '허용되지 않은 항목이 포함되어 있습니다. 화면을 새로고침한 뒤 다시 시도해 주세요.',
+  INTERNAL_ERROR: '서버 오류로 요청하지 못했습니다. 잠시 후 다시 시도해 주세요.',
 };
 
-function createErrorMessage(code: string | null | undefined): string {
-  if (!code) return '상품 등록에 실패했습니다.';
-  return CREATE_ERROR_MESSAGE[code] ?? `상품 등록에 실패했습니다. (${code})`;
+function createErrorMessage(code: string | null | undefined, message?: string | null): string {
+  if (!code) return '제품 정보 검토 요청에 실패했습니다.';
+  return CREATE_ERROR_MESSAGE[code] ?? (message ? `${message} (${code})` : `제품 정보 검토 요청에 실패했습니다. (${code})`);
 }
 
 export default function SupplierProductCreatePage() {
@@ -106,16 +118,14 @@ export default function SupplierProductCreatePage() {
   const productType = useMemo(() => getSupplierProductType(searchParams.get('productType')), [searchParams]);
   // 의약품류(약국 대상) 또는 미분류 → 검토 중심(자동 공급오퍼/이벤트/펀딩 연결 제외)
   const isReviewOriented = !!productType && (productType.pharmacyTarget === true || productType.key === 'unclassified');
-  // 등록 완료 상태 (성공 시 유형별 다음-작업 패널 표시)
-  const [registered, setRegistered] = useState<{ name: string; masterId?: string | null } | null>(null);
+  // 검토 요청 완료 상태 (성공 시 Candidate 안내 패널 표시 — Master/Offer 는 아직 없다)
+  const [registered, setRegistered] = useState<{ name: string; candidateId: string | null; identifierValue: string | null } | null>(null);
 
   const [currentStep, setCurrentStep] = useState(1);
   const [form, setForm] = useState<FormData>({
     barcode: '',
     packagingName: '',
-    // WO-O4O-COSMETICS-SUPPLIER-PRODUCT-REGISTER-AND-EDIT-BROWSER-SMOKE-V1:
-    //   상품 라이브러리에서 바코드 없는 기존 master 를 선택하면 이름/브랜드/제조사/카테고리로 넘어온다.
-    //   같은 값으로 제출해야 서버가 (이름, 제조사) 로 기존 master 를 찾아 연결한다(신규 생성 아님).
+    // (query prefill 은 유지 — 기존 Master 선택은 이제 Product Library → from-master 화면이 담당한다)
     marketingName: importDraft?.marketingName ?? searchParams.get('name') ?? '',
     // WO-O4O-SUPPLIER-IMPORT-O4O-SETTINGS-STEP-V1: O4O 등록 설정 pre-fill
     categoryId: importDraft?.categoryId ?? searchParams.get('categoryId') ?? '',
@@ -335,78 +345,96 @@ export default function SupplierProductCreatePage() {
     setCurrentStep((s) => Math.max(s - 1, 1));
   };
 
-  // Submit
+  // 기존 Master 발견 시 — Candidate 대신 from-master(Offer 직접 연결)로 이동
+  const goToFromMaster = () => {
+    if (!master) return;
+    navigate(`/supplier/products/from-master?masterId=${encodeURIComponent(master.id)}`, {
+      state: {
+        master: {
+          id: master.id,
+          barcode: master.barcode ?? null,
+          name: master.marketingName || master.name || master.regulatoryName || '',
+          regulatoryName: master.regulatoryName ?? '',
+          regulatoryType: master.regulatoryType ?? null,
+          manufacturerName: master.manufacturerName ?? '',
+          specification: master.specification ?? null,
+          category: master.categoryId ? { id: master.categoryId, name: selectedCategory?.name ?? '' } : null,
+          brand: master.brandId ? { id: master.brandId, name: master.brandName ?? '' } : null,
+          primaryImageUrl: null,
+        },
+      },
+    });
+  };
+
+  // Submit — Candidate 제출 (Master/Offer 생성 없음)
   const handleSubmit = async () => {
-    // Final validation
-    if (form.distributionType === 'PUBLIC' && !consumerShortDesc.trim()) {
-      setSubmitError('공개(PUBLIC) 유통 시 소비자용 간이 설명이 필수입니다.');
+    if (barcodeChecked && master) {
+      setSubmitError('이미 등록된 제품입니다. [기존 제품에 공급 연결]로 진행해 주세요.');
       return;
     }
-
     setSubmitting(true);
     setSubmitError('');
 
-    const manualData: Record<string, any> = {};
-    if (form.packagingName) manualData.regulatoryName = form.packagingName;
-    // regulatoryType은 항상 저장
-    manualData.regulatoryType = form.regulatoryType || 'GENERAL';
-    if (isRegulated) {
-      manualData.regulatoryName = form.regulatoryName;
-      manualData.mfdsPermitNumber = form.mfdsPermitNumber || null;
+    // 1) 이미지: 파일은 미디어 라이브러리(master-less)에 먼저 업로드해 URL 로 바꾼다. 라이브러리 항목은 URL 그대로.
+    //    실패한 파일은 Candidate 에서 제외하고 안내한다(제출 자체는 계속).
+    let imageFailures = 0;
+    let imageUrl: string | null = null;
+    if (thumbnailSource?.kind === 'file') {
+      const up = await mediaApi.upload(thumbnailSource.file, true, undefined, 'product-thumbnail');
+      if (up.success && up.data?.url) imageUrl = up.data.url; else imageFailures += 1;
+    } else if (thumbnailSource?.kind === 'library') {
+      imageUrl = thumbnailSource.url;
     }
-    if (form.manufacturerName) manualData.manufacturerName = form.manufacturerName;
-    if (form.specification) manualData.specification = form.specification;
-    if (form.originCountry) manualData.originCountry = form.originCountry;
-    if (form.stockQty) manualData.stockQty = Number(form.stockQty);
+    const contentImageUrls: string[] = [];
+    for (const item of contentItems) {
+      if (item.kind === 'library') { contentImageUrls.push(item.url); continue; }
+      const up = await mediaApi.upload(item.file, true, undefined, 'description');
+      if (up.success && up.data?.url) contentImageUrls.push(up.data.url); else imageFailures += 1;
+    }
 
-    const result = await supplierApi.createProduct({
-      barcode: form.barcode.trim() || undefined,
+    // 2) 규제 정보: 제품 유형(진입 선택) → regulatoryType/drugCategory. 규제 카테고리면 규제명·허가번호 포함.
+    const regulatoryType = (productType?.regulatoryType || form.regulatoryType || 'GENERAL') as
+      'GENERAL' | 'COSMETIC' | 'HEALTH_FUNCTIONAL' | 'QUASI_DRUG' | 'MEDICAL_DEVICE' | 'DRUG';
+    const drugCategory = regulatoryType === 'DRUG' ? (productType?.drugCategory ?? 'otc') : null;
+    const regulatoryName = (isRegulated ? form.regulatoryName : form.packagingName).trim() || null;
+
+    const result = await supplierApi.submitProductCandidate({
       name: form.marketingName.trim(),
-      categoryId: form.categoryId,
-      brandName: form.brandName.trim() || undefined,
-      distributionType: form.distributionType,
-      serviceKeys: form.serviceKeys.length > 0 ? form.serviceKeys : undefined,
-      manualData: Object.keys(manualData).length > 0 ? manualData : undefined,
-      priceGeneral: Number(form.priceGeneral),
-      consumerReferencePrice: form.consumerReferencePrice ? Number(form.consumerReferencePrice) : null,
-      consumerShortDescription: consumerShortDesc || null,
-      // WO-KPA-RECOMMENDED-TAB-REPLACE-CURATION-WITH-SUPPLIER-HIGHLIGHT-V1
-      isFeatured: form.isFeatured,
+      barcode: form.barcode.trim() || null,
+      categoryId: form.categoryId || null,
+      brandName: form.brandName.trim() || null,
+      manufacturerName: form.manufacturerName.trim() || null,
+      specification: form.specification.trim() || null,
+      originCountry: form.originCountry.trim() || null,
+      regulatoryType,
+      drugCategory,
+      regulatoryName,
+      mfdsPermitNumber: isRegulated ? (form.mfdsPermitNumber.trim() || null) : null,
+      imageUrl,
+      contentImageUrls,
+      offerDraft: {
+        priceGeneral: form.priceGeneral ? Number(form.priceGeneral) : null,
+        consumerReferencePrice: form.consumerReferencePrice ? Number(form.consumerReferencePrice) : null,
+        consumerShortDescription: consumerShortDesc || null,
+        // WO-KPA-RECOMMENDED-TAB-REPLACE-CURATION-WITH-SUPPLIER-HIGHLIGHT-V1
+        isFeatured: form.isFeatured,
+      },
     });
     setSubmitting(false);
 
     if (result.success) {
-      const masterId = result.data?.masterId;
-      // WO-O4O-NETURE-SUPPLIER-PRODUCT-AUTHORING-EXPANSION-CLOSEOUT-BATCH-V1:
-      //   이미지 API 는 실패해도 예외를 던지지 않고 { success:false } 를 돌려준다.
-      //   이전 구현은 결과를 확인하지 않아 이미지가 하나도 안 올라가도 '등록 완료'로 보였다.
-      let imageFailures = 0;
-      if (masterId) {
-        // 대표 이미지: 파일 업로드 또는 라이브러리 URL 등록
-        if (thumbnailSource?.kind === 'file') {
-          const r = await productApi.uploadProductImage(masterId, thumbnailSource.file, 'thumbnail');
-          if (!r.success) imageFailures += 1;
-        } else if (thumbnailSource?.kind === 'library') {
-          const r = await productApi.registerImageFromUrl(masterId, thumbnailSource.url, 'thumbnail');
-          if (!r.success) imageFailures += 1;
-        }
-        // WO-NETURE-SUPPLIER-CREATE-IMAGE-LIBRARY-ALIGNMENT-V1: file/library 분기
-        for (const item of contentItems) {
-          const r = item.kind === 'file'
-            ? await productApi.uploadProductImage(masterId, item.file, 'content')
-            : await productApi.registerImageFromUrl(masterId, item.url, 'content');
-          if (!r.success) imageFailures += 1;
-        }
-      }
       if (imageFailures > 0) {
-        toast.error(`상품은 등록됐지만 이미지 ${imageFailures}건이 등록되지 않았습니다. 제품 목록에서 이미지를 다시 등록해 주세요.`);
+        toast.error(`검토 요청은 접수됐지만 이미지 ${imageFailures}건은 업로드되지 않아 제외됐습니다.`);
       }
       if (thumbnailSource?.kind === 'file') URL.revokeObjectURL(thumbnailSource.preview);
       contentItems.forEach((item) => { if (item.kind === 'file') URL.revokeObjectURL(item.preview); });
-      // WO-O4O-NETURE-SUPPLIER-PRODUCT-REGISTRATION-WIZARD-V2: 유형별 다음-작업 패널로 전환
-      setRegistered({ name: form.marketingName.trim(), masterId: result.data?.masterId ?? null });
+      setRegistered({
+        name: form.marketingName.trim(),
+        candidateId: result.data?.candidateId ?? null,
+        identifierValue: result.data?.identifierValue ?? null,
+      });
     } else {
-      setSubmitError(createErrorMessage(result.error));
+      setSubmitError(createErrorMessage(result.error, result.message));
     }
   };
 
@@ -462,70 +490,43 @@ export default function SupplierProductCreatePage() {
     throw new Error(res.error || '이미지 업로드 실패');
   }, []);
 
-  // WO-O4O-NETURE-SUPPLIER-PRODUCT-REGISTRATION-WIZARD-V2: 등록 완료 — 유형별 다음 작업 안내
+  // 검토 요청 완료 — Candidate 상태임을 분명히 한다 (Master/Offer 아직 없음 · HUB 미노출)
   if (registered) {
-    const reviewOnly = isReviewOriented;
     return (
       <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
-        <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-5">
-          <h1 className="text-xl font-bold text-emerald-800">제품 등록 완료</h1>
-          <p className="text-sm text-emerald-700 mt-1">
-            <strong>{registered.name || '제품'}</strong>이(가) 등록되었습니다
+        <div className="rounded-lg border border-blue-200 bg-blue-50 p-5">
+          <h1 className="text-xl font-bold text-blue-800">제품 정보 검토 요청 완료</h1>
+          <p className="text-sm text-blue-700 mt-1">
+            <strong>{registered.name || '제품'}</strong>의 제품 정보가 검토 대기열에 접수되었습니다
             {productType ? ` (유형: ${productType.label})` : ''}.
           </p>
-          {reviewOnly && (
-            <p className="text-xs text-emerald-700/80 mt-2">
-              {productType?.rx
-                ? '처방의약품은 운영자 검토 후 약국 대상 유통 정보 단위로만 관리됩니다. 일반 판매·고객 노출·이벤트 오퍼·유통참여형 펀딩으로 자동 연결되지 않습니다.'
-                : '약국 대상 의약품류/미분류 제품은 운영자 검토 후 노출 범위가 결정됩니다.'}
+          <p className="text-xs text-blue-700/80 mt-2">
+            아직 <strong>공급 상품(Offer)으로 등록된 것은 아닙니다.</strong> 운영자가 제품 정보를 검토해 표준 제품(ProductMaster)으로
+            확정하면, 제품 라이브러리에서 해당 제품을 선택해 공급가·공급 방식을 설정하고 공급을 시작할 수 있습니다.
+            {productType?.rx && ' 처방의약품은 승격 후에도 약국 대상 서비스 공급으로만 연결됩니다.'}
+          </p>
+          {(registered.candidateId || registered.identifierValue) && (
+            <p className="mt-2 text-[11px] text-blue-600/70 font-mono">
+              {registered.identifierValue ? `식별자 ${registered.identifierValue} · ` : ''}요청 ID {registered.candidateId ?? '-'}
             </p>
           )}
         </div>
 
-        {/* WO-O4O-NETURE-SUPPLIER-PRODUCT-CREATE-INFO-FIRST-V1: 정보-우선 — 등록 직후 내부/미노출 안내 + 공급 방식 설정 경로 */}
-        {!reviewOnly && (
-          <div className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-xs text-slate-600">
-            현재 이 상품은 <strong>내부 상품(공급 방식 미설정)</strong> 상태로 HUB에 노출되지 않습니다.
-            B2B 전체 공급이나 서비스 공급을 시작하려면 <strong>제품 목록 → 상품 상세의 [공급 방식 변경]</strong>에서 공급 방식을 설정하세요.
-          </div>
-        )}
-
         <div>
           <div className="text-xs font-semibold text-slate-500 mb-2">다음 작업</div>
           <div className="grid sm:grid-cols-2 gap-2">
-            <button onClick={() => navigate('/supplier/products')} className="rounded-lg border border-slate-200 bg-white px-4 py-3 text-left text-sm font-medium text-slate-800 hover:border-blue-400 hover:bg-blue-50">
-              제품 목록으로 이동
-            </button>
             <button onClick={() => navigate('/supplier/products/register')} className="rounded-lg border border-slate-200 bg-white px-4 py-3 text-left text-sm font-medium text-slate-800 hover:border-blue-400 hover:bg-blue-50">
-              다른 제품 등록
+              다른 제품 검토 요청
             </button>
-            {reviewOnly ? (
-              <button onClick={() => navigate('/supplier/products')} className="rounded-lg border border-slate-200 bg-white px-4 py-3 text-left text-sm font-medium text-slate-800 hover:border-blue-400 hover:bg-blue-50">
-                운영자 검토 상태 확인
-              </button>
-            ) : (
-              <>
-                <button onClick={() => navigate('/supplier/supply-offers')} className="rounded-lg border border-slate-200 bg-white px-4 py-3 text-left text-sm font-medium text-slate-800 hover:border-blue-400 hover:bg-blue-50">
-                  일반 공급 오퍼 만들기
-                </button>
-                <button onClick={() => navigate('/supplier/event-offers')} className="rounded-lg border border-slate-200 bg-white px-4 py-3 text-left text-sm font-medium text-slate-800 hover:border-blue-400 hover:bg-blue-50">
-                  이벤트 오퍼 만들기
-                </button>
-                <button onClick={() => navigate('/supplier/market-trial/new')} className="rounded-lg border border-slate-200 bg-white px-4 py-3 text-left text-sm font-medium text-slate-800 hover:border-blue-400 hover:bg-blue-50">
-                  유통참여형 펀딩 후보로 사용
-                </button>
-                {/* WO-O4O-NETURE-SUPPLIER-PRODUCT-AND-STORE-DESCRIPTION-WORKFLOW-SMOKE-BATCH-V1:
-                    등록 직후 매장용 설명서 작성으로 가는 이동선. 공급 활동(오퍼·펀딩)과 축이 다르므로
-                    안내 문구로 구분한다. 운영자 검토 대상(의약품)은 노출 범위가 미확정이라 제외. */}
-                <button onClick={() => navigate(registered.masterId ? `/supplier/store-descriptions?masterId=${encodeURIComponent(registered.masterId)}` : '/supplier/store-descriptions')} className="rounded-lg border border-slate-200 bg-white px-4 py-3 text-left text-sm font-medium text-slate-800 hover:border-blue-400 hover:bg-blue-50">
-                  매장용 상품 설명서 작성
-                </button>
-              </>
-            )}
+            <button onClick={() => navigate('/supplier/products/library')} className="rounded-lg border border-slate-200 bg-white px-4 py-3 text-left text-sm font-medium text-slate-800 hover:border-blue-400 hover:bg-blue-50">
+              제품 라이브러리에서 기존 제품 공급 연결
+            </button>
+            <button onClick={() => navigate('/supplier/products')} className="rounded-lg border border-slate-200 bg-white px-4 py-3 text-left text-sm font-medium text-slate-800 hover:border-blue-400 hover:bg-blue-50">
+              내 공급 상품 목록
+            </button>
           </div>
           <p className="mt-3 text-xs text-slate-400">
-            공급 오퍼·이벤트 오퍼·유통참여형 펀딩은 등록된 제품을 활용하는 별도 활동입니다.
-            매장용 상품 설명서는 운영자 검수를 거쳐 매장에 노출되는 자료로, 공급 활동과는 별개입니다.
+            검토 결과는 운영자 승격 후 제품 라이브러리 검색에 반영됩니다. 공급 오퍼·이벤트 오퍼·펀딩은 공급 상품 등록 후의 별도 활동입니다.
           </p>
         </div>
       </div>
@@ -561,8 +562,8 @@ export default function SupplierProductCreatePage() {
     <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800">상품 등록</h1>
-          <p className="text-slate-500 mt-1">상품 정보를 입력하여 새 상품을 등록합니다</p>
+          <h1 className="text-2xl font-bold text-slate-800">신규 제품 검토 요청</h1>
+          <p className="text-slate-500 mt-1">아직 표준 제품에 없는 제품 정보를 제출합니다. 운영자 검토 후 공급 연결이 가능합니다.</p>
         </div>
         {/* WO-O4O-NETURE-SUPPLIER-PRODUCT-SOURCE-IMPORT-ENTRY-AUDIT-V1: 소스 자동 입력 진입 복원 */}
         <button
@@ -578,12 +579,12 @@ export default function SupplierProductCreatePage() {
       {/* GuideBlock */}
       <GuideBlock
         variant="info"
-        title={guideTitle ?? '상품 정보를 먼저 등록합니다.'}
-        description={guideDesc ?? '상품 기본 정보와 기본 공급가를 저장합니다. 공급 방식(전체 공개 / 서비스 공급)은 저장 후 상품 상세의 [공급 방식 변경]에서 설정하며, 설정 전까지 HUB에 노출되지 않습니다.'}
+        title={guideTitle ?? '제품 정보를 검토 요청으로 제출합니다.'}
+        description={guideDesc ?? '이 화면은 공급 상품을 바로 만들지 않습니다. 제출한 제품 정보는 운영자 검토 후 표준 제품으로 확정되며, 그 뒤 제품 라이브러리에서 선택해 공급가·공급 방식을 설정합니다. 이미 표준 제품에 있는 제품은 제품 라이브러리에서 바로 공급 연결하세요.'}
         steps={guideSteps ?? [
-          'Step 1: 상품명, 카테고리, 브랜드, 규제 정보를 입력합니다',
-          'Step 2: 기본 공급가를 입력합니다 (공급 방식은 저장 후 별도 설정)',
-          'Step 3: 대표 이미지와 상세 설명을 작성하고 등록합니다',
+          'Step 1: 상품명, 카테고리, 브랜드, 규제 정보를 입력합니다 (바코드가 있으면 조회해 기존 제품 여부를 확인)',
+          'Step 2: 기본 공급가 초안을 입력합니다 (승격 후 Offer 연결 시 참고값)',
+          'Step 3: 대표 이미지와 상세 설명을 첨부하고 검토 요청을 제출합니다',
         ]}
         compact
       />
@@ -800,19 +801,29 @@ export default function SupplierProductCreatePage() {
                 </button>
               </div>
               {barcodeChecked && master && (
-                <p className="mt-1 text-sm text-emerald-600">
-                  기존 Master 발견: {master.marketingName || master.regulatoryName}
-                  {master.isMfdsVerified && ' (MFDS 검증됨)'}
-                </p>
+                <div className="mt-2 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2">
+                  <p className="text-sm text-emerald-700">
+                    이미 등록된 제품입니다: <strong>{master.marketingName || master.name || master.regulatoryName}</strong>
+                    {master.isMfdsVerified && ' (MFDS 검증됨)'}
+                  </p>
+                  <p className="text-xs text-emerald-700/80 mt-1">검토 요청 대신 기존 제품에 바로 공급을 연결하세요.</p>
+                  <button
+                    type="button"
+                    onClick={goToFromMaster}
+                    className="mt-2 rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-emerald-700"
+                  >
+                    기존 제품에 공급 연결 →
+                  </button>
+                </div>
               )}
               {barcodeChecked && !master && (
-                <p className="mt-1 text-sm text-amber-600">
-                  새 상품 — Master가 자동 생성됩니다
+                <p className="mt-1 text-sm text-blue-600">
+                  표준 제품에 없는 바코드입니다 — 검토 요청으로 접수됩니다
                 </p>
               )}
               {!form.barcode.trim() && (
                 <p className="mt-1 text-xs text-slate-400">
-                  바코드를 입력하지 않으면 내부 코드가 자동 생성됩니다
+                  바코드가 없어도 요청할 수 있습니다 (운영자 검토에서 식별자가 확정됩니다)
                 </p>
               )}
             </div>
@@ -877,16 +888,17 @@ export default function SupplierProductCreatePage() {
            정보-우선: 등록 단계에서는 기본 공급가만 입력하고, 공급 방식(전체 공개/서비스 공급)은 등록 후 별도 설정한다. */}
       {currentStep === 2 && (
         <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-6">
-          <h3 className="text-lg font-semibold text-slate-800 mb-2">기본 공급가</h3>
+          <h3 className="text-lg font-semibold text-slate-800 mb-2">기본 공급가 (초안)</h3>
           <p className="text-xs text-slate-500 mb-5">
-            공급 방식(전체 공개 / 서비스 공급)은 등록 후 상품 상세의 <strong>[공급 방식 변경]</strong>에서 설정합니다.
-            지금 저장하면 <strong>내부 상품(미노출)</strong>으로 등록됩니다.
+            검토 요청에 함께 보관되는 <strong>참고 초안</strong>입니다. 실제 공급가·공급 방식·재고는 운영자 승격 후
+            제품 라이브러리에서 공급 연결할 때 확정합니다.
           </p>
           <ProductForm
             mode="create"
             initialData={productFormInitialData}
             onChange={handleProductFormChange}
             hideDistribution
+            hideStock
           />
         </div>
       )}
@@ -970,9 +982,7 @@ export default function SupplierProductCreatePage() {
           {/* Descriptions */}
           <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-6 space-y-5">
             <h3 className="text-lg font-semibold text-slate-800">소비자용 상품 설명</h3>
-            {form.distributionType === 'PUBLIC' && (
-              <p className="text-sm text-amber-600">공개(PUBLIC) 유통 시 간이 설명은 필수입니다</p>
-            )}
+            <p className="text-xs text-slate-500">검토 요청과 함께 보관되며, 승격 후 Offer 연결 시 소비자용 설명 초안으로 사용됩니다.</p>
 
             {/* WO-NETURE-SUPPLIER-CREATE-IMAGE-LIBRARY-ALIGNMENT-V1: 에디터 이미지 기능 연결 */}
             <div>
@@ -1057,7 +1067,7 @@ export default function SupplierProductCreatePage() {
             disabled={submitting}
             className="flex-1 px-6 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 disabled:opacity-50 font-medium"
           >
-            {submitting ? '등록중...' : '상품 등록'}
+            {submitting ? '요청 중...' : '제품 정보 검토 요청'}
           </button>
         )}
       </div>

@@ -706,30 +706,75 @@ export const supplierApi = {
     }
   },
 
-  async createProduct(data: {
-    barcode?: string;
-    name?: string;
-    categoryId?: string;
-    brandName?: string;
-    distributionType?: string;
-    serviceKeys?: string[];
-    manualData?: Record<string, any>;
+  /**
+   * WO-O4O-SUPPLIER-PRODUCT-REGISTRATION-AI-FIRST-CUTOVER-AND-LEGACY-MASTER-RESOLUTION-RETIREMENT-V1
+   *
+   * 기존 ProductMaster(Product Library 에서 선택한 masterId)에 Offer 를 직접 연결한다.
+   * Master 기준정보(name/barcode/category/brand/규제)는 보내지 않는다 — 서버가 MASTER_FIELD_NOT_ALLOWED 로 거부한다.
+   * 레거시 createProduct(POST /neture/supplier/products · barcode/name 재추론)는 은퇴했다.
+   */
+  async createOfferFromMaster(data: {
+    masterId: string;
     priceGeneral?: number;
     priceGold?: number | null;
+    pricePlatinum?: number | null;
     consumerReferencePrice?: number | null;
-    // WO-NETURE-PRODUCT-DESCRIPTION-FIELDS-V1
     consumerShortDescription?: string | null;
     consumerDetailDescription?: string | null;
-    businessShortDescription?: string | null;
-    businessDetailDescription?: string | null;
-    // WO-KPA-RECOMMENDED-TAB-REPLACE-CURATION-WITH-SUPPLIER-HIGHLIGHT-V1
+    stockQuantity?: number;
     isFeatured?: boolean;
-  }): Promise<{ success: boolean; error?: string; data?: any }> {
+    isPublic?: boolean;
+    serviceKeys?: string[];
+  }): Promise<{ success: boolean; error?: string; message?: string; data?: { id: string; masterId: string; approvalStatus?: string } }> {
     try {
-      const response = await api.post('/neture/supplier/products', data);
+      const response = await api.post('/neture/supplier/products/from-master', data);
       return response.data;
     } catch (error) {
-      return { success: false, error: extractApiError(error) };
+      return { success: false, error: extractApiError(error), message: (error as any)?.response?.data?.message };
+    }
+  },
+
+  /**
+   * WO-O4O-SUPPLIER-PRODUCT-REGISTRATION-AI-FIRST-CUTOVER-AND-LEGACY-MASTER-RESOLUTION-RETIREMENT-V1
+   *
+   * 신규/미매칭 제품 → ProductCandidate 제출(Offer · ProductMaster 생성 없음).
+   * 운영자 검토·승격(Promotion Core) 후 Master 가 만들어진다. 이미지는 미디어 라이브러리에 먼저 올린 URL 만 보낸다
+   * (Master 확정 전에는 ProductImage 에 쓰지 않는다 — Candidate rawPayload 에 보존).
+   * 금지 키(서버 FORBIDDEN_FIELD): supplierId · distributionType · serviceKeys · stockQty/stockQuantity · lot/expiry 등.
+   */
+  async submitProductCandidate(data: {
+    name: string;
+    barcode?: string | null;
+    categoryId?: string | null;
+    brandId?: string | null;
+    brandName?: string | null;
+    manufacturerName?: string | null;
+    specification?: string | null;
+    originCountry?: string | null;
+    regulatoryType?: 'GENERAL' | 'COSMETIC' | 'HEALTH_FUNCTIONAL' | 'QUASI_DRUG' | 'MEDICAL_DEVICE' | 'DRUG';
+    drugCategory?: 'otc' | 'rx' | null;
+    regulatoryName?: string | null;
+    mfdsPermitNumber?: string | null;
+    imageUrl?: string | null;
+    contentImageUrls?: string[];
+    offerDraft?: {
+      priceGeneral?: number | null;
+      consumerReferencePrice?: number | null;
+      consumerShortDescription?: string | null;
+      consumerDetailDescription?: string | null;
+      isFeatured?: boolean;
+    };
+  }): Promise<{
+    success: boolean;
+    error?: string;
+    message?: string;
+    data?: { candidateId: string; candidateStatus: string; identifierType: string | null; identifierValue: string | null };
+  }> {
+    try {
+      const response = await api.post('/neture/supplier/product-candidates', data);
+      return response.data;
+    } catch (error) {
+      return { success: false, error: extractApiError(error), message: (error as any)?.response?.data?.message };
     }
   },
 
