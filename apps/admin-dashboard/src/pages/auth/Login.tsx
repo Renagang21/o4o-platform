@@ -1,6 +1,9 @@
 /**
  * WO-O4O-GOOGLE-ONLY-SIGNUP-LOGIN-V1: Google 로 계속하기 = 기본 진입 · email/password = 임시 테스트/전환용.
  * Admin 은 가입을 제공하지 않는다 — 미등록 Google 계정(GOOGLE_SIGNUP_REQUIRED)은 서비스 화면 가입 안내만.
+ * WO-O4O-GOOGLE-IDENTITY-OPERATOR-EXPLICIT-LINK-V1: email/password 로그인은 serviceKey 없이 호출한다.
+ *   Admin 은 platform surface 이므로 검증 근거는 users.password + platform role 이며, Neture
+ *   service_credentials 는 플랫폼 관리자 인증 근거가 아니다(전환기 비상 로그인 경로).
  */
 import { FC, FormEvent, useEffect, useRef, useState } from 'react';
 import { Navigate, useLocation, useSearchParams, Link } from 'react-router-dom';
@@ -131,7 +134,7 @@ const Login: FC = () => {
     }
 
     try {
-      await login({ email, password, serviceKey: 'neture' });
+      await login({ email, password });
       
       toast.success('관리자 로그인 성공!');
     } catch (error: any) {

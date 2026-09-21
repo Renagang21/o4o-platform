@@ -1,6 +1,7 @@
 
 import { useState, useEffect, FC } from 'react';
 import { Menu, Bell, User, LogOut, Settings as SettingsIcon, Shield, Clock } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@o4o/auth-context';
 import toast from 'react-hot-toast';
 import {
@@ -18,6 +19,7 @@ interface AdminHeaderProps {
 
 const AdminHeader: FC<AdminHeaderProps> = ({ onMenuClick }) => {
   const { user, logout, logoutAll, getSessionStatus } = useAuth();
+  const navigate = useNavigate();
   const [sessionStatus, setSessionStatus] = useState(getSessionStatus());
 
   // 세션 상태 업데이트
@@ -188,7 +190,8 @@ const AdminHeader: FC<AdminHeaderProps> = ({ onMenuClick }) => {
               </DropdownMenuItem>
               
               <DropdownMenuItem onClick={() => {
-                // 계정 설정 페이지로 이동
+                // WO-O4O-GOOGLE-IDENTITY-OPERATOR-EXPLICIT-LINK-V1: 내 계정(Google 연결) 탭으로 이동
+                navigate('/settings/my-account');
               }}>
                 <SettingsIcon className="mr-2 h-4 w-4" />
                 계정 설정

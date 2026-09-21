@@ -93,6 +93,16 @@ Google   연결되지 않음   [ Google 계정 연결 ]
 
 공통 컴포넌트 `<GoogleAccountLink />`(`@o4o/auth-react`, 콜백 props 방식 = `<GoogleContinue />` 와 동일 패턴) + `@o4o/auth-client` `linkGoogle(idToken, currentPassword)` · `getGoogleLinkStatus()`. Google email 은 화면에 표시하지 않는다.
 
+### 8-A. 범위 확장(2026-09-21 · B smoke 결함 처리 · 사용자 지시)
+
+B smoke 에서 `admin.neture.co.kr` 이메일 로그인이 `serviceKey:'neture'` 로 호출되어 **Neture `service_credentials` 해시를 먼저 검증**하는 Admin 인증 계약 불일치가 드러났다(재설정한 `users.password` 는 보지 않음 → "비밀번호가 올바르지 않습니다"는 입력 오류가 아님). 별도 WO 로 쪼개지 않고 **본 WO 의 결함**으로 같이 닫는다.
+
+1. **Admin 이메일 로그인 계약 정정** — `apps/admin-dashboard/src/pages/auth/Login.tsx` 에서 `serviceKey:'neture'` 제거. Admin 은 platform surface 이므로 `users.password` + platform role 로 검증한다(서버 dual-read: serviceKey 없음 → `users.password`, 서버 변경 0). Neture credential 은 플랫폼 관리자 인증 근거가 아니다.
+2. **Admin Google 연결 UI** — `/settings/my-account`(내 계정 탭 · 헤더 "계정 설정" 진입) 에 기존 `<GoogleAccountLink />` 재사용. 기존 `GET /auth/google/link/status` · `POST /auth/google/link` · `verifyGoogleIdToken` 그대로. 신규 연결 로직 0. admin-dashboard 에 `@o4o/auth-react` workspace 의존성 1줄 추가(사용자 승인).
+3. 연결 = 기존 `platform:super_admin` users.id 에 Google sub 1행 추가(linked_accounts 1→2). production DB 직접 UPDATE 로 연결하지 않는다.
+4. Google 로그인과 password 로그인 **병행 유지**. `service_credentials` 재설정/정렬 · password 제거 · role/membership 변경 · user 생성 · 테스트 계정 변경 · 운영자 초대 구조 변경은 하지 않는다.
+5. 배포 → 사용자 브라우저 smoke(§10 정정판은 CHECK §3) → read-only 검증 → CHECK COMPLETE 까지 본 WO 안에서 완료한다.
+
 ## 9. 테스트 계정(Google-only)에는 영향 없음
 
 `passwordSet=false` 면 "Google 연결됨 ✓" 만 표시하고 비밀번호 입력 UI 를 보이지 않는다.

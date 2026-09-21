@@ -287,6 +287,9 @@ importers:
       '@o4o/auth-context':
         specifier: workspace:*
         version: link:../../packages/auth-context
+      '@o4o/auth-react':
+        specifier: workspace:*
+        version: link:../../packages/auth-react
       '@o4o/block-renderer':
         specifier: workspace:*
         version: link:../../packages/block-renderer
