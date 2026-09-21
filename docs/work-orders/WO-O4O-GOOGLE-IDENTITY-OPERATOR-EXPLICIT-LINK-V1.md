@@ -6,6 +6,14 @@
 > **접수:** 2026-09-18 · 사용자 지시 원문 기반
 > **용어 고정:** **운영자 계정 = `sohae2100`** · **테스트 계정 = `renagang21`**(Google-only). `cleanup user` 표현은 더 쓰지 않는다.
 
+> **전제 정정(2026-09-21 · 사용자 확정 · 전환기 정책):** 위 "운영자 계정 = `sohae2100`" 은 **"현재 `platform:super_admin` 을 보유한 기존 `users.id`"** 로 읽는다. 이 user 의 **관리자용 내부 email 은 `renariver21@gmail.com`** 으로 정정됐다(2026-09-21 · `users.email` 1행 UPDATE · users.id·role·membership·credential·password 전부 불변 · 사용자 명시 승인). 이후 본문의 `sohae2100` 은 이 **동일 users.id** 를 가리키는 옛 handle 표기다.
+> - canonical platform admin user = 기존 super_admin `users.id`(email `renariver21@gmail.com`) · `platform:super_admin` 유지
+> - 기존 이메일/비밀번호 로그인 **당분간 유지**(`renariver21@gmail.com` + 기존 비밀번호) · Google 로그인과 **병행**
+> - Google Identity 는 `users.email` 과 **별개**. 실제 사용할 Google 계정의 검증된 `sub` 를 같은 admin users.id 에 연결한다. **email 일치를 연결 근거로 쓰지 않는다**(Google 계정 email ≠ users.email 허용)
+> - users 신규 생성·삭제·users.id 변경 금지 · role/membership 변경 금지 · password/`service_credentials` 제거 금지 · **추가 password reset·credential 정렬 작업 중단**
+> - `renagang21` = Google-only 테스트 계정, 변경 없음
+> - password 로그인 제거는 **별도 승인**(WO-2F)
+
 ---
 
 ## 1. 목표와 배경
@@ -93,8 +101,8 @@ Google   연결되지 않음   [ Google 계정 연결 ]
 
 | # | Smoke | 기대 |
 |---|---|---|
-| 1 | `sohae2100` password 로그인 → `/mypage/settings` → Google 계정 연결 → currentPassword → sohae Google 계정 선택 | 성공. **users 2(불변)** · linked_accounts 1→2 · 운영자 password/credentials 5/memberships 5/roles 11 유지 |
-| 2 | 로그아웃 → `[Google로 계속하기]` → sohae Google 계정 | signup 화면 없음 → **기존 sohae users.id** 로그인 |
+| 1 | 관리자 user(email `renariver21@gmail.com`) password 로그인 → `/mypage/settings` → Google 계정 연결 → currentPassword(= `users.password`) → **연결 확정한 Google 계정** 선택 | 성공. **users 2(불변)** · linked_accounts 1→2 · 관리자 password/credentials 5/memberships 5/roles 11 유지 |
+| 2 | 로그아웃 → `[Google로 계속하기]` → 같은 Google 계정 | signup 화면 없음 → **기존 admin users.id** 로그인 |
 | 3 | `https://admin.neture.co.kr` | Admin 정상 진입. 테스트 계정은 계속 접근 불가 |
 
 ## 11. Negative Test
@@ -105,12 +113,12 @@ Google   연결되지 않음   [ Google 계정 연결 ]
 
 ## 12. 이번 WO 에서 하지 않는 것
 
-Google 계정 변경 · 연결 해제 · 계정 병합 · email 자동 연결 · `users.email` 변경 · password 삭제 · `service_credentials` 삭제 · role/membership 변경 · 테스트 데이터 재배정 · 테스트 계정 권한 변경 · Mobile.
+Google 계정 변경 · 연결 해제 · 계정 병합 · email 자동 연결 · `users.email` 변경(※ 2026-09-21 관리자 내부 email 정정 1행은 사용자 명시 승인으로 예외 수행 — 위 전제 정정 참조) · password 삭제 · `service_credentials` 삭제 · role/membership 변경 · 테스트 데이터 재배정 · 테스트 계정 권한 변경 · Mobile.
 
 ## 13. 완료 조건
 
 ```text
-sohae2100  users.id=기존 · Google linked=YES · platform:super_admin 유지 · password 유지
+admin user(email renariver21) users.id=기존 · Google linked=YES · platform:super_admin 유지 · password 유지
 renagang21 users.id=기존(Google 신규) · Google linked=YES · admin role 없음
 DB: users=2 · linked_accounts=2   /   Google 로그인: sohae → Admin 가능 · renagang → Admin 불가
 ```

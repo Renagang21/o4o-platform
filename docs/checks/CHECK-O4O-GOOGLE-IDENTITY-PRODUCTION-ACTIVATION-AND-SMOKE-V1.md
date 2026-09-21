@@ -58,6 +58,7 @@
 - **인증 트랙 다음 작업 = `sohae2100`(실제 운영자 · 기존 password 인증) 에 Google Identity 를 명시적으로 연결.** 이메일 일치 자동 연결이 아니라, **이미 로그인된 운영자 본인이 "이 Google 계정을 내 기존 O4O 계정에 연결한다" 를 명시 수행** → `linked_accounts(provider=google, providerId=검증된 Google sub, userId=기존 sohae users.id)` → Google 로그인으로 **같은 기존 user · `platform:super_admin` 그대로** → 이후 legacy password/auth 제거. (자동 병합 방지 409 는 그대로 유지.)
 - **별도 정리 트랙(인증 작업과 섞지 않음):** `sohae2100` 에 임시로 모아둔 테스트 데이터를 `renagang21` 로 화면 보며 하나씩 재배정.
 - `renagang21` 과 같은 email 문제(2-pre 의 409)는 위 재배정/정리 후 별도 결정. `sohae2100` 의 email 변경·삭제는 하지 않는다(사용자 결정 2026-09-18).
+  - **정정(2026-09-21 · 사용자 확정):** 전환기 정책에 따라 이 user(현재 `platform:super_admin` users.id · 삭제·재생성 없음)의 **관리자용 내부 email 을 `renariver21@gmail.com` 으로 1행 UPDATE** 했다(명시 승인). 본 문서의 `sohae2100` 은 동일 users.id 의 옛 handle 표기. 상세: [CHECK-…-OPERATOR-EXPLICIT-LINK-V1 §3-A](CHECK-O4O-GOOGLE-IDENTITY-OPERATOR-EXPLICIT-LINK-V1.md).
 
 | 커밋 | 범위 |
 |---|---|
