@@ -14,6 +14,7 @@ import { decodeWorkbook } from '../services/ai-tools/file-understanding/decode.j
 import { profileWorkbook } from '../services/ai-tools/file-understanding/profile.js';
 import { computeStructureFingerprint } from '../services/ai-tools/file-understanding/fingerprint.js';
 import {
+  buildFileConfidenceQuestion,
   evaluateConfidence,
   normalizeRows,
 } from '../services/ai-tools/file-understanding/normalize.js';
@@ -195,6 +196,45 @@ describe('evaluateConfidence (계약 E)', () => {
     const verdict = evaluateConfidence(inf, SCHEMA, 0.6);
     expect(verdict.missingRequired).toContain('code');
     expect(verdict.ok).toBe(false);
+  });
+});
+
+// WO-O4O-COMMON-AUTOMATION-CORE-USER-COLLABORATION-AND-QUESTION-FLOW-V1 §3·§4 — confidence → QUESTION.
+describe('buildFileConfidenceQuestion (§3 파일 새 작업 · 낮은 항목만 확인)', () => {
+  it('ok 면 null — 질문 없이 그대로 진행한다', () => {
+    const verdict = evaluateConfidence(twoSectionInference(), SCHEMA, 0.6);
+    expect(verdict.ok).toBe(true);
+    expect(buildFileConfidenceQuestion(verdict, SCHEMA)).toBeNull();
+  });
+
+  it('낮은 열만 골라 사람 라벨(description)로 확인을 요청한다 — 전부 다시 묻지 않는다', () => {
+    const inf = twoSectionInference();
+    inf.sheets[0].regions[0].columns[1].confidence = 0.3; // label 열만 낮춤
+    const verdict = evaluateConfidence(inf, SCHEMA, 0.6);
+    const q = buildFileConfidenceQuestion(verdict, SCHEMA);
+    expect(q).not.toBeNull();
+    expect(q).toContain('항목 이름'); // label 의 description
+    expect(q).not.toContain('항목 코드'); // 정상 열은 되묻지 않는다
+  });
+
+  it('required 미매핑은 "어느 열에서 찾을지" 로 묻고, schema 없으면 key 로 대체한다', () => {
+    const inf = twoSectionInference();
+    for (const region of inf.sheets[0].regions) {
+      region.columns = region.columns.filter((c) => c.targetField !== 'code');
+    }
+    const verdict = evaluateConfidence(inf, SCHEMA, 0.6);
+    expect(buildFileConfidenceQuestion(verdict, SCHEMA)).toContain('항목 코드');
+    expect(buildFileConfidenceQuestion(verdict)).toContain('code'); // schema 미제공 → key fallback
+  });
+
+  it('전체 신뢰도만 낮으면(세부 항목 없음) 일반 확인 문구로 되돌린다', () => {
+    const inf = twoSectionInference();
+    inf.confidence = 0.2; // 전체만 낮춤 — 열·구역·required 는 모두 정상
+    const verdict = evaluateConfidence(inf, SCHEMA, 0.6);
+    expect(verdict.ok).toBe(false);
+    expect(verdict.lowConfidenceColumns).toHaveLength(0);
+    const q = buildFileConfidenceQuestion(verdict, SCHEMA);
+    expect(q).toContain('파일 구조를 확실히 읽지 못했습니다');
   });
 });
 
