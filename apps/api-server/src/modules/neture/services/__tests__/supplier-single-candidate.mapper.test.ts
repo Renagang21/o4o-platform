@@ -6,6 +6,7 @@ import {
   buildSupplierSingleCandidateInput,
   deriveSupplierCandidateProductType,
   SUPPLIER_SINGLE_CANDIDATE_SOURCE_LABEL,
+  SUPPLIER_CANDIDATE_DRUG_CATEGORIES,
   type ValidatedSupplierSingleCandidate,
 } from '../supplier-single-candidate.mapper.js';
 
@@ -47,6 +48,16 @@ describe('validateSupplierSingleCandidateBody', () => {
     expect(valid({ name: 'A', regulatoryType: 'DRUG', drugCategory: 'OTC' }).drugCategory).toBe('otc');
     expect(valid({ name: 'A', regulatoryType: 'GENERAL', drugCategory: 'otc' }).drugCategory).toBeNull();
     expect(valid({ name: 'A', regulatoryType: 'QUASI_DRUG', drugCategory: 'quasi_drug' }).drugCategory).toBeNull();
+  });
+
+  it('DRUG + drugCategory=quasi_drug → DRUG_CATEGORY_REQUIRED (의약외품은 regulatoryType=QUASI_DRUG · ③ WO §2.4)', () => {
+    const r = validateSupplierSingleCandidateBody({ name: 'A', regulatoryType: 'DRUG', drugCategory: 'quasi_drug' });
+    expect(r.ok).toBe(false);
+    if (r.ok === false) {
+      expect(r.code).toBe('DRUG_CATEGORY_REQUIRED');
+      expect(r.message).toContain('QUASI_DRUG');
+    }
+    expect([...SUPPLIER_CANDIDATE_DRUG_CATEGORIES]).toEqual(['otc', 'rx']);
   });
 
   it('priceGeneral 음수/문자 → INVALID_PRICE · 콤마·원 문자열은 숫자로 · 빈 값은 null', () => {
@@ -182,8 +193,8 @@ describe('buildSupplierSingleCandidateInput', () => {
   it.each([
     ['GENERAL', null, 'non_drug', null, false],
     ['COSMETIC', null, 'non_drug', null, false],
-    ['HEALTH_FUNCTIONAL', null, 'non_drug', null, false],
-    ['MEDICAL_DEVICE', null, 'non_drug', null, false],
+    ['HEALTH_FUNCTIONAL', null, 'health_functional', null, false],
+    ['MEDICAL_DEVICE', null, null, null, false],
     ['QUASI_DRUG', null, 'quasi_drug', 'quasi_drug', false],
     ['DRUG', 'otc', 'otc_drug', 'otc', false],
     ['DRUG', 'rx', 'rx_drug', 'rx', true],

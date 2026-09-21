@@ -151,7 +151,7 @@ describe('POST /api/v1/neture/supplier/product-candidates', () => {
       source: 'supplier_single',
       supplierId: SUPPLIER_ID,
       regulatoryType: 'HEALTH_FUNCTIONAL',
-      product_type: 'non_drug',
+      product_type: 'health_functional',
       offerDraft: { priceGeneral: 9000, isFeatured: true },
     });
   });

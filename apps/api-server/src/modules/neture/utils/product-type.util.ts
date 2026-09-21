@@ -109,6 +109,11 @@ function fromDrugCategory(raw: string): ProductTypeClass | null {
       return 'drug_unspecified';
     case 'non_drug':
       return 'non_drug';
+    // WO-O4O-SUPPLIER-PRODUCT-CANDIDATE-PROMOTION-ADAPTER-V1 §2.4(b) additive:
+    // 공급자 단건 intake 가 rawPayload.product_type='health_functional' 을 쓴다. 기존 값(bulk BULK_TYPE_MAP ·
+    // product_masters.drug_category)에는 이 문자열이 없으므로 기존 분류 결과는 바뀌지 않는다.
+    case 'health_functional':
+      return 'health_functional';
     default:
       return null;
   }

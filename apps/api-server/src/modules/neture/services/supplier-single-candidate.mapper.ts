@@ -31,7 +31,8 @@ export const SUPPLIER_CANDIDATE_REGULATORY_TYPES = [
 ] as const;
 export type SupplierCandidateRegulatoryType = (typeof SUPPLIER_CANDIDATE_REGULATORY_TYPES)[number];
 
-export const SUPPLIER_CANDIDATE_DRUG_CATEGORIES = ['otc', 'rx', 'quasi_drug'] as const;
+/** DRUG 의 하위 분류만. 의약외품은 regulatoryType=QUASI_DRUG 로 받는다 (③ WO §2.4 · 'quasi_drug' 제거) */
+export const SUPPLIER_CANDIDATE_DRUG_CATEGORIES = ['otc', 'rx'] as const;
 export type SupplierCandidateDrugCategory = (typeof SUPPLIER_CANDIDATE_DRUG_CATEGORIES)[number];
 
 /**
@@ -104,8 +105,12 @@ export interface SupplierSingleCandidateContext {
   now?: Date;
 }
 
-/** rawPayload.product_type — bulk 의 BULK_TYPE_MAP 역방향 (운영자 콘솔 classifyProductType 호환) */
-export type SupplierCandidateProductTypeKey = 'non_drug' | 'quasi_drug' | 'otc_drug' | 'rx_drug';
+/**
+ * rawPayload.product_type — bulk 의 BULK_TYPE_MAP 역방향 (운영자 콘솔 classifyProductType 호환).
+ * ③ WO §2.4(b): HEALTH_FUNCTIONAL 은 'health_functional'(classifyProductType 이 additive 로 인식) ·
+ * MEDICAL_DEVICE 는 null(ProductTypeClass 에 해당 값 없음 → 'unknown' 유지 · non_drug 임의 변환 금지).
+ */
+export type SupplierCandidateProductTypeKey = 'non_drug' | 'quasi_drug' | 'otc_drug' | 'rx_drug' | 'health_functional';
 
 const LIMITS = {
   name: 200,
@@ -179,9 +184,11 @@ function findForbiddenKey(obj: Record<string, unknown>): string | null {
 export function deriveSupplierCandidateProductType(
   regulatoryType: SupplierCandidateRegulatoryType,
   drugCategory: SupplierCandidateDrugCategory | null,
-): SupplierCandidateProductTypeKey {
+): SupplierCandidateProductTypeKey | null {
   if (regulatoryType === 'DRUG') return drugCategory === 'rx' ? 'rx_drug' : 'otc_drug';
   if (regulatoryType === 'QUASI_DRUG') return 'quasi_drug';
+  if (regulatoryType === 'HEALTH_FUNCTIONAL') return 'health_functional';
+  if (regulatoryType === 'MEDICAL_DEVICE') return null;
   return 'non_drug';
 }
 
@@ -223,7 +230,7 @@ export function validateSupplierSingleCandidateBody(body: unknown): SupplierSing
       if (!(SUPPLIER_CANDIDATE_DRUG_CATEGORIES as readonly string[]).includes(dc)) {
         throw new ValidationFailure(
           'DRUG_CATEGORY_REQUIRED',
-          `의약품은 drugCategory(${SUPPLIER_CANDIDATE_DRUG_CATEGORIES.join(' | ')}) 가 필요합니다.`,
+          `의약품은 drugCategory(${SUPPLIER_CANDIDATE_DRUG_CATEGORIES.join(' | ')}) 가 필요합니다. 의약외품은 regulatoryType=QUASI_DRUG 로 등록해 주세요.`,
         );
       }
       drugCategory = dc as SupplierCandidateDrugCategory;

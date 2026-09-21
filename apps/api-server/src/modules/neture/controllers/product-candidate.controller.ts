@@ -22,6 +22,12 @@ import type {
 import type { ProductIdentifierType } from '../entities/ProductIdentifier.entity.js';
 import logger from '../../../utils/logger.js';
 import { requireProductDbWrite } from './product-db-write-authority.js';
+import {
+  SupplierCandidatePromotionService,
+  SupplierPromotionNotFoundError,
+} from '../promotion/adapters/supplier/supplier-candidate-promotion.service.js';
+import { SupplierNormalizationError } from '../promotion/adapters/supplier/supplier-candidate.normalizer.js';
+import { SupplierPolicyError } from '../promotion/adapters/supplier/supplier-promotion.policy.js';
 
 /**
  * WO-O4O-ADMIN-PRODUCT-CANDIDATE-STATUS-SIMPLIFY-V2
@@ -55,6 +61,7 @@ function userId(req: Request): string | null {
 export function createProductCandidateController(dataSource: DataSource): Router {
   const router = Router();
   const service = new ProductCandidateService(dataSource);
+  const supplierPromotion = new SupplierCandidatePromotionService(dataSource);
 
   // operator/admin guard + service scope (operator product console 과 동일 모델)
   router.use(authenticate);
@@ -189,6 +196,44 @@ export function createProductCandidateController(dataSource: DataSource): Router
         return res.status(400).json({ success: false, error: msg });
       }
       return handleMutationError(res, error, 'promote-master');
+    }
+  }) as RequestHandler);
+
+  // POST /:id/promote-supplier — 공급자 후보(단건 intake · 공급자 대량 등록) → Promotion Core 승격
+  // WO-O4O-SUPPLIER-PRODUCT-CANDIDATE-PROMOTION-ADAPTER-V1 §2.3. promote-master(drug seed) 와 별개 route.
+  //   200 { outcome:'create'|'link', masterId, identifiersCreated, matchType?, existingMasterDiff? }
+  //   200 { outcome:'conflict', reason, masters } · 200 { outcome:'hold', reason }   (Core 가 쓴 것 없음)
+  //   409 SUPPLIER_REGULATED_CREATE_BLOCKED | SUPPLIER_REGULATORY_TYPE_MISMATCH | SUPPLIER_RX_LINK_BLOCKED (TX 롤백됨)
+  //   400 SUPPLIER_CANDIDATE_NOT_SUPPLIER_SOURCE | SUPPLIER_PRODUCT_TYPE_UNCLASSIFIED | SUPPLIER_ID_MISSING
+  //   404 CANDIDATE_NOT_FOUND
+  router.post('/:id/promote-supplier', requireProductDbWrite, (async (req: Request, res: Response) => {
+    try {
+      const note = typeof req.body?.note === 'string' && req.body.note.trim() ? String(req.body.note).trim() : null;
+      const { outcome } = await supplierPromotion.promote(req.params.id, { reviewedBy: userId(req), note });
+      switch (outcome.kind) {
+        case 'create':
+          return res.json({ success: true, data: { outcome: 'create', masterId: outcome.masterId, identifiersCreated: outcome.identifiersCreated } });
+        case 'link':
+          return res.json({ success: true, data: {
+            outcome: 'link', masterId: outcome.masterId, identifiersCreated: outcome.identifiersCreated,
+            matchType: outcome.matchType, existingMasterDiff: outcome.existingMasterDiff,
+          } });
+        case 'conflict':
+          return res.json({ success: true, data: { outcome: 'conflict', reason: outcome.reason, masters: outcome.masters } });
+        case 'hold':
+          return res.json({ success: true, data: { outcome: 'hold', reason: outcome.reason } });
+      }
+    } catch (error) {
+      if (error instanceof SupplierPromotionNotFoundError) {
+        return res.status(404).json({ success: false, error: 'CANDIDATE_NOT_FOUND' });
+      }
+      if (error instanceof SupplierNormalizationError) {
+        return res.status(400).json({ success: false, error: error.code, message: error.message });
+      }
+      if (error instanceof SupplierPolicyError) {
+        return res.status(409).json({ success: false, error: error.code, data: error.data });
+      }
+      return handleMutationError(res, error, 'promote-supplier');
     }
   }) as RequestHandler);
 
