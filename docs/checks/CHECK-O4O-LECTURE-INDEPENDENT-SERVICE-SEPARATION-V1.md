@@ -2,7 +2,7 @@
 
 > **WO**: [`WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1`](../work-orders/WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1.md)
 > **범위**: **Phase 1 — Lecture Service Foundation** (WO §6.1 step 01~04). step 05 이후(LMS Core 정리 · surface 구축 · course migration · 기존 서비스 LMS 제거)는 **NOT_STARTED**.
-> **상태**: **Phase 1 MERGED** — PR #223 → main `3e56425b7` (2026-09-19 · merge commit) · `lecture-web` Cloud Run 첫 revision 배포 성공. **운영 reference seed APPLIED(§10.2 · 2026-09-19)** · `study.neture.co.kr` 도메인 매핑 진행 중(§10.3 · GCP NEG 까지 · 나머지 분류기 차단 + Gabia DNS 사용자 작업).
+> **상태**: **Phase 1 MERGED** — PR #223 → main `3e56425b7` (2026-09-19 · merge commit) · `lecture-web` Cloud Run 첫 revision 배포 성공. **운영 reference seed APPLIED(§10.2 · 2026-09-19)** · **`study.neture.co.kr` 도메인 매핑 PASS(§10.3 · 2026-09-21 · HTTPS smoke 전부 PASS) → Phase 1 CLOSED.**
 > **날짜**: 2026-09-18 · **작성**: Claude Code (Opus 5) — ChatGPT 세션이 만든 PR 을 이어받아 정리 · 검증
 > **원칙**: 검증하지 않은 것을 PASS 로 쓰지 않는다. 접속값 · 자격증명 출력 0.
 
@@ -123,7 +123,8 @@ LECTURE_WEB_SKELETON = PASS
 LECTURE_DEPLOY_FOUNDATION = PASS          (workflow · Dockerfile 로컬 빌드+서빙 실측 · CORS · Cloud Run 실배포는 merge 후)
 
 LECTURE_INCREMENTAL_MIGRATION_CONTRACT = PASS   (신규 incremental 0 · C10/C22 PASS · guard 변경 0)
-LECTURE_REFERENCE_SEED = PENDING_PRODUCTION_EXECUTION   (CLI · 격리 PG15 idempotent 검증 완료)
+LECTURE_REFERENCE_SEED = APPLIED                  (§10.2 · 2026-09-19 · idempotent 재실행 확인)
+LECTURE_DOMAIN_MAPPING = PASS                     (§10.3 · 2026-09-21 · HTTPS/SPA/legal/CORS smoke)
 LECTURE_FRONTEND_TYPECHECK = PASS
 LECTURE_FRONTEND_BUILD = PASS
 LECTURE_ADDED_TEST_REGRESSION = 0
@@ -183,17 +184,34 @@ Cloud SQL Auth Proxy(loopback) · `SELECT` 만. DB timezone UTC.
 
 기대값 대비: `platform_services.code='lecture' = 1 · lecture:admin/operator/instructor = 1/1/1 · lecture:member = 0 · service_memberships 신규 0 · role_assignments 신규 0 · lms_courses 변경 0` — **전부 일치**.
 
-### 10.3 `study.neture.co.kr` 도메인 매핑 — 진행 중 (인프라 · 코드 변경 0)
+### 10.3 `study.neture.co.kr` 도메인 매핑 — **PASS** (2026-09-21 · 인프라 · 코드 변경 0)
 
 구조 확인: 기존 웹 서비스는 Cloud Run domain mapping 이 아니라 **Global External HTTPS LB `o4o-global-lb`(IP `136.110.132.35`) + serverless NEG + Certificate Manager map `o4o-main-cert-map`**, DNS 는 **Gabia** 네임서버(Cloud DNS 없음). 선례 = pharmacyhub(`neg-pharmacy-hub-web` → `backend-pharmacy-hub-web`(HTTPS · EXTERNAL_MANAGED) → host rule → `cm-cert-pharmacyhub` + `cm-entry-pharmacyhub-*`).
 
-| 단계 | 상태 |
-|---|---|
-| ① serverless NEG `neg-lecture-web`(asia-northeast3 → lecture-web) | **DONE** |
-| ② backend service `backend-lecture-web` + NEG 연결 | **BLOCKED** — Claude Code auto-mode 분류기 "Modify Shared Resources" 차단(공유 LB). 우회하지 않음 |
-| ③ URL map `o4o-global-lb` host rule `study.neture.co.kr` → `path-matcher-lecture` | 대기(②) — 변경 전 스냅샷 `C:/tmp/lecture-lb-urlmap-before.yaml` 확보 |
-| ④ 인증서 `cm-cert-lecture`(LB 인증 · A 레코드만 필요) + `cm-entry-lecture-study` | 대기 |
-| ⑤ DNS `study.neture.co.kr A 136.110.132.35` | **사용자 작업(Gabia 콘솔)** — GCP 에서 불가 |
-| smoke(`/` 200 · SPA fallback · title · HTTPS · CORS · /terms /privacy) | ①~⑤ 후 |
+| 단계 | 상태 | 비고 |
+|---|---|---|
+| ① serverless NEG `neg-lecture-web`(asia-northeast3 → lecture-web) | DONE (9/19) | |
+| ② backend service `backend-lecture-web` | DONE (9/21) | 분류기 차단 → **사용자가 터미널에서 직접 생성**(EXTERNAL_MANAGED · HTTPS · port-name http · timeout 30 · CDN off = `backend-pharmacy-hub-web` 과 동일, describe 로 확인). add-backend `neg-lecture-web` 은 Claude Code |
+| ③ URL map `o4o-global-lb` | DONE (9/21) | `add-path-matcher path-matcher-lecture --default-service=backend-lecture-web --new-hosts=study.neture.co.kr`. 전후 스냅샷(`C:/tmp/lecture-lb-urlmap-before-2.yaml` / `-after.yaml`) diff = fingerprint + 추가 5줄 → **기존 9 host rule · 7 path matcher 변경 0** |
+| ④ 인증서 | DONE (9/21) | 기존 `cm-cert-lecture`(9/18 생성)는 DNS 완전 전파 후에도 마지막 인증 시도가 02:49Z(DNS 등록 전) 에 머물러 1.5h 재시도 없음(backoff). 사용자 승인 하에 **dual-cert 전환**: `cm-cert-lecture-v2` 생성 → entry `cm-entry-lecture-study` 에 old+v2 병행 → v2 AUTHORIZING → **ACTIVE(7분)** → v2 단독 → smoke PASS 후 old 삭제. 다른 17 entry 무접촉(전부 ACTIVE) |
+| ⑤ DNS `study A 136.110.132.35 TTL 600` | DONE (9/21) | 사용자 Gabia 작업. Gabia 권한 서버 · 8.8.8.8 · 1.1.1.1 · 로컬 전부 해석 |
 
-`LECTURE_DOMAIN_MAPPING = IN_PROGRESS` (NEG 1/5).
+smoke (2026-09-21 15:28~ KST · 공개 URL · 로그인 0):
+
+```text
+TLS            CN=study.neture.co.kr · Google Trust Services WR3 · 2026-09-21 ~ 2026-12-20
+GET /          200 text/html · <title>O4O 강의 | Neture</title>
+SPA fallback   /courses/abc 200
+GET /terms     200
+GET /privacy   200
+HTTP :80       301 → https://study.neture.co.kr/
+정적 asset     /assets/index-*.js 200 application/javascript
+API CORS       OPTIONS api.neture.co.kr Origin=https://study.neture.co.kr → 204 · access-control-allow-origin: https://study.neture.co.kr
+대조군         pharmacyhub.co.kr · neture.co.kr · kpa-society.co.kr · k-cosmetics.site 전부 200 (LB 변경 영향 0)
+```
+
+관찰(수정 0 · 범위 밖): `<title>` 접미 `| Neture` — web-lecture shell 의 기본 title 템플릿. Phase 2 surface 구축 시 `O4O 강의` 단독으로 정리 대상.
+
+운영자 로그인은 §10.1 대로 계속 보류(도메인 매핑 · 공개 smoke 에 불필요).
+
+`LECTURE_DOMAIN_MAPPING = PASS` (5/5) · **Phase 1 CLOSED**. 다음 = Phase 2 (WO §6.1 step 05~ · 별도 지시).
