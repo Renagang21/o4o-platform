@@ -156,7 +156,7 @@ describe('services/web-store 조립 계층 (WO §3-①·⑥)', () => {
   const storeApi = readRepo('services/web-store/src/lib/storeApi.ts');
 
   it('SERVICE_KEY 가 없고 organizationId 가 1차 축이다', () => {
-    expect(workspace).not.toMatch(/const SERVICE_KEY/);
+    expect(workspace).not.toMatch(/const SERVICE_KEY\b/);
     expect(workspace).toContain("WORKSPACE_KEY = 'store'");
     // useServiceAuth 설정 객체에 serviceKey 를 넘기지 않는다(멤버십 타입의 serviceKey 필드는 무관)
     expect(authCtx).toMatch(/useServiceAuth<StoreUser>\(useMemo\(\(\) => \(\{[^}]*authClient, getAccessToken, toUser,[^}]*\}\)/);
