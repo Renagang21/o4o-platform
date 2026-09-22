@@ -1,0 +1,14 @@
+{
+  "name": "@o4o/hospital-pharmacy-core",
+  "version": "1.0.0",
+  "description": "Hospital Pharmacy 전용 얇은 Domain Core — 병원약국 필드(product_name·ingredient·strength·dosage_form·manufacturer·status) 정의, 공통 Generic File Understanding 에 주입할 TargetSchema, NormalizedRecord→HospitalDrugRecord adapter, 원내 Local Context 조회/표시(queryLocalRows·matchLocalByResearchIngredients·renderLocalContextBlock), 자연어 파싱(제품/함량/원내/동일성분), surface 실행 계획. O4O Main Automation Core 를 소비만 하고 재구현하지 않는다(단방향 의존 Hospital→Core). React/DOM/DB/네트워크/xlsx 의존 없음 — 브라우저·서버·테스트 공용 순수 계층.",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "devDependencies": {
+    "typescript": "5.4.5"
+  }
+}
