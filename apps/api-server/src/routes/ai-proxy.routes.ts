@@ -40,6 +40,11 @@ import { dynamicLimiter } from '../middleware/rateLimiter.js';
 import { createLlmPlanner, createStrongLlmPlanner, createLlmPlannerForProvider, createStrongLlmPlannerForProvider, runWorkAgent } from '../services/ai-tools/work-agent-runtime.js';
 // WO-O4O-COMMON-AUTOMATION-CORE-CAPABILITY-C-TASK-MODALITY-ROUTER-V1 — per-task provider 선택(전역 provider 불변)
 import { classifyTaskModality } from '../services/ai-tools/task-modality-router.js';
+// WO-O4O-HOSPITAL-PHARMACY-SERVICE-FOUNDATION-V1 §3 — 공통 GFU(구조 이해) 소비 러너 + Gemini 구조 추론.
+//   api-server 는 병원 도메인 어휘를 갖지 않는다: targetSchema 는 surface(클라이언트)가 주입한다.
+import { runStructuredFileUnderstanding } from '../services/ai-tools/structured-file-understanding.js';
+import { inferFileStructure } from '../services/ai-tools/file-understanding/structure-inference.service.js';
+import type { TargetField, TargetSchema } from '../services/ai-tools/file-understanding/contract.js';
 // WO-O4O-AI-COMPOSER-UNIFIED-REQUEST-AND-ATTACHMENT-UX-V1 — 단일 요청 라우터 · 첨부 계약 · 첨부 리더 · multimodal 호출
 import {
   validateUnifiedAttachments,
@@ -2280,6 +2285,113 @@ router.post('/request', authenticate, dynamicLimiter('free'), async (req, res: R
   const reply = await performHomeChat(userId, { message: text, workScope: body.workScope, provider: body.provider }, attachments);
   if (reply.status !== 200) return res.status(reply.status).json(reply.body);
   return res.json({ success: true, data: { kind: 'chat', route: decision.route, reason: decision.reason, chat: reply.body.data } });
+});
+
+// WO-O4O-HOSPITAL-PHARMACY-SERVICE-FOUNDATION-V1 §3 — POST /api/ai/file-understanding
+//   원내 목록 등 임의 표 파일 → 공통 GFU 구조 이해(도메인 중립).
+//   surface(병원약국 약제부 등)가 targetSchema 를 주입한다 — api-server 는 병원·약품 어휘를 갖지 않고
+//   공통 Core(decode→profile→infer→normalize→confidence)만 소비한다. 파일은 저장하지 않는다(§7 첨부≠지식):
+//   bytes 는 in-memory 로만 다루고, Gemini 에는 상단 표본만 가며, 로그에 값 원문을 남기지 않는다(계수·판정만).
+//   반환은 generic NormalizedRecord — 도메인 타입 변환은 클라이언트 adapter(@o4o/hospital-pharmacy-core) 몫이다.
+const FILE_UNDERSTANDING_MAX_BASE64 = 15 * 1024 * 1024; // base64 ≈ 원본 11MB
+
+// strictNullChecks off(api-server) 에서는 { ok:true } | { ok:false } discriminated union 의
+// 부정 내로잉이 동작하지 않는다(ref-api-server-strictnullchecks-no-negation-narrowing). 두 속성을 항상
+// 함께 반환하고 schema==null 로 판정한다.
+function validateInjectedTargetSchema(value: unknown): { schema: TargetSchema | null; code: string | null } {
+  if (!value || typeof value !== 'object') return { schema: null, code: 'TARGET_SCHEMA_REQUIRED' };
+  const v = value as Record<string, unknown>;
+  if (typeof v.id !== 'string' || v.id.trim() === '') return { schema: null, code: 'TARGET_SCHEMA_ID_INVALID' };
+  if (!Array.isArray(v.fields) || v.fields.length === 0) return { schema: null, code: 'TARGET_SCHEMA_FIELDS_INVALID' };
+  const fields: TargetField[] = [];
+  for (const f of v.fields) {
+    if (!f || typeof f !== 'object') return { schema: null, code: 'TARGET_SCHEMA_FIELD_INVALID' };
+    const fo = f as Record<string, unknown>;
+    if (typeof fo.key !== 'string' || fo.key.trim() === '') return { schema: null, code: 'TARGET_SCHEMA_FIELD_KEY_INVALID' };
+    if (typeof fo.description !== 'string' || fo.description.trim() === '')
+      return { schema: null, code: 'TARGET_SCHEMA_FIELD_DESC_INVALID' };
+    if (typeof fo.required !== 'boolean') return { schema: null, code: 'TARGET_SCHEMA_FIELD_REQUIRED_INVALID' };
+    const examples = Array.isArray(fo.examples)
+      ? fo.examples.filter((e): e is string => typeof e === 'string')
+      : undefined;
+    fields.push({ key: fo.key, description: fo.description, required: fo.required, examples });
+  }
+  if (!fields.some((f) => f.required)) return { schema: null, code: 'TARGET_SCHEMA_NO_REQUIRED' };
+  return { schema: { id: v.id, fields }, code: null };
+}
+
+router.post('/file-understanding', authenticate, dynamicLimiter('free'), async (req, res: Response) => {
+  const authReq = req as AuthRequest;
+  const userId = authReq.user?.id;
+  if (!userId) {
+    return res.status(401).json({ success: false, error: '로그인이 필요합니다.', code: 'UNAUTHENTICATED' });
+  }
+
+  const body = (req.body ?? {}) as Record<string, unknown>;
+  const fileBase64 = typeof body.fileBase64 === 'string' ? body.fileBase64 : '';
+  if (fileBase64.trim() === '') {
+    return res.status(400).json({ success: false, error: '파일이 필요합니다.', code: 'FILE_REQUIRED' });
+  }
+  if (fileBase64.length > FILE_UNDERSTANDING_MAX_BASE64) {
+    return res.status(413).json({ success: false, error: '파일이 너무 큽니다.', code: 'FILE_TOO_LARGE' });
+  }
+
+  const schemaCheck = validateInjectedTargetSchema(body.targetSchema);
+  const targetSchema = schemaCheck.schema;
+  if (!targetSchema) {
+    return res.status(400).json({
+      success: false,
+      error: '대상 스키마가 올바르지 않습니다.',
+      code: schemaCheck.code ?? 'TARGET_SCHEMA_INVALID',
+    });
+  }
+
+  let bytes: Uint8Array;
+  try {
+    bytes = new Uint8Array(Buffer.from(fileBase64, 'base64'));
+  } catch {
+    return res.status(400).json({ success: false, error: '파일을 해석할 수 없습니다.', code: 'FILE_DECODE_FAILED' });
+  }
+  if (bytes.length === 0) {
+    return res.status(400).json({ success: false, error: '빈 파일입니다.', code: 'FILE_EMPTY' });
+  }
+
+  try {
+    const result = await runStructuredFileUnderstanding(bytes, targetSchema, {
+      infer: async (profile, injected) => {
+        const r = await inferFileStructure({ profile, targetSchema: injected });
+        return { inference: r.inference, model: r.model };
+      },
+    });
+    // 값 원문은 남기지 않는다 — 계수·판정만.
+    logger.info('ai file-understanding', {
+      userId,
+      schemaId: targetSchema.id,
+      totalRows: result.totalRows,
+      skipped: result.skipped,
+      recordCount: result.records.length,
+      verdictOk: result.verdict.ok,
+      model: result.model,
+    });
+    return res.json({
+      success: true,
+      data: {
+        records: result.records,
+        verdict: result.verdict,
+        question: result.question,
+        totalRows: result.totalRows,
+        skipped: result.skipped,
+        model: result.model,
+      },
+    });
+  } catch (error) {
+    logger.error('ai file-understanding failed', {
+      userId,
+      schemaId: targetSchema.id,
+      error: error instanceof Error ? error.message : String(error),
+    });
+    return res.status(502).json({ success: false, error: '파일 구조를 해석하지 못했습니다.', code: 'FILE_UNDERSTANDING_FAILED' });
+  }
 });
 
 export default router;
