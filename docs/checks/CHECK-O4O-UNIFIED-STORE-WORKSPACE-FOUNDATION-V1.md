@@ -2,7 +2,7 @@
 
 > **WO**: [`WO-O4O-UNIFIED-STORE-WORKSPACE-FOUNDATION-V1`](../work-orders/WO-O4O-UNIFIED-STORE-WORKSPACE-FOUNDATION-V1.md) · **IR**: [`IR-O4O-UNIFIED-STORE-WORKSPACE-SUBDOMAIN-AND-CROSSSERVICE-ROUTING-V1`](../investigations/IR-O4O-UNIFIED-STORE-WORKSPACE-SUBDOMAIN-AND-CROSSSERVICE-ROUTING-V1.md)
 > **실행일**: 2026-09-21 · **기준 `origin/main`**: `1f4538d42` · **상태**: **CLOSED_WITH_HANDOFF_STOP** — Foundation(①②③⑤⑥ + 수신 페이지) 완료 · **④ workspace handoff 발급 측은 STOP(DDL 판단 요청)** · 브라우저 인증 smoke `PENDING_USER_VERIFICATION`
-> **Scope Extension(§8 · 2026-09-21~22 REOPEN)**: **Phase 1~5 COMPLETE · Phase 6 = `PENDING_USER_ACTION`(cert map entry · Gabia DNS · Google origin · cutover flip) + `PENDING_USER_VERIFICATION`(store_owner 브라우저 E2E)** — 상세 §11. 세 서비스 프로덕션은 플래그 OFF 로 배포되어 기존 매장 화면 그대로다.
+> **Scope Extension(§8 · 2026-09-21~22 REOPEN)**: **Phase 1~5 COMPLETE · Phase 6 = `PENDING_USER_ACTION`(Google origin · cutover flip) + `PENDING_USER_VERIFICATION`(store_owner 브라우저 E2E)** — cert map entry · Gabia DNS 는 2026-09-23 완료 확인(§11-7) — 상세 §11. 세 서비스 프로덕션은 플래그 OFF 로 배포되어 기존 매장 화면 그대로다.
 > **실행 지시(사용자 · 2026-09-21)**: WO A 실행 승인 · handoff 우선안 ③(DDL 0) · 동등 보안 불가 시 STOP 보고 · `services/web-store` 신설에 따른 workspace/lockfile · Dockerfile · `deploy-web-services.yml` 변경은 정상 범위로 승인 · 세 서비스 실제 기능 이전 없음.
 
 ## 1. 결과 요약
@@ -178,8 +178,8 @@ LEGACY_COMPAT: KPA/KCos/PH 프로덕션 배포(082f5887f run 35670783101 · 3 �
 
 | # | 조작 | 값 |
 |---|---|---|
-| 1 | cert map entry 생성 (자동 분류기 차단 — 터미널 직접) | `gcloud certificate-manager maps entries create cm-entry-store --project netureyoutube --map o4o-main-cert-map --hostname store.neture.co.kr --certificates cm-cert-store-v1` |
-| 2 | Gabia DNS | `store.neture.co.kr` A → `136.110.132.35` (study.neture.co.kr 과 동일 LB). 등록 후 cert `cm-cert-store-v1` PROVISIONING → ACTIVE 확인. 오래 실패한 cert 는 backoff 로 안 움직임 → lecture 선례처럼 새 cert(`cm-cert-store-v2`) 병행 연결(dual-cert) |
+| 1 | ~~cert map entry 생성~~ **DONE 2026-09-23** (`cm-entry-store` ACTIVE) | `gcloud certificate-manager maps entries create cm-entry-store --project netureyoutube --map o4o-main-cert-map --hostname store.neture.co.kr --certificates cm-cert-store-v1` |
+| 2 | ~~Gabia DNS~~ **DONE 2026-09-23** (A 레코드 전파 확인 · `cm-cert-store-v1` = ACTIVE/AUTHORIZED) | `store.neture.co.kr` A → `136.110.132.35` (study.neture.co.kr 과 동일 LB). 등록 후 cert `cm-cert-store-v1` PROVISIONING → ACTIVE 확인. 오래 실패한 cert 는 backoff 로 안 움직임 → lecture 선례처럼 새 cert(`cm-cert-store-v2`) 병행 연결(dual-cert) |
 | 3 | Google Cloud Console OAuth authorized JavaScript origins | `https://store.neture.co.kr` (+ 로컬 검증용 `http://localhost:4210`) |
 | 4 | cutover flip | `.github/workflows/deploy-web-services.yml` `VITE_UNIFIED_STORE_HANDOFF: 'false'` → `'true'` 1줄 (1~3 완료 + 브라우저 E2E PASS 후). 되돌리기 = 같은 줄 `'false'` |
 | 5 | 브라우저 E2E | store_owner 계정으로 `https://kpa-society.co.kr/store` 진입 → (flip 후) `store.neture.co.kr` 착지 · 매장 선택 · `/store` · `/work/kpa-society` · `/hub` 확인 |
@@ -195,3 +195,20 @@ LEGACY_COMPAT: KPA/KCos/PH 프로덕션 배포(082f5887f run 35670783101 · 3 �
 - `packages/store-ui-core/src/workspace/__tests__/storeWorkspace.test.tsx` tsc 사전 존재 3건(vi.fn 제네릭). vitest 는 PASS. 별도 정리 대상(BACKLOG).
 - PH backend 는 `/store-owner/*` 경로 API · 통합 Workspace 는 서비스 prefix 동적 serviceContext 로 호출 — 실 store_owner E2E 에서 428/403 발생 지점은 E2E 후 확정.
 - KCos `channels|sales-channels` · `foreign-visitor` 는 통합 KCos 업무에 대응 화면 없음 → `/work/k-cosmetics` 홈 착지(매핑 규칙에 명시).
+
+### 11-7. 인프라 완료 확인 (2026-09-23 · read-only)
+
+사용자 조작 ①② 완료 후 재확인. 코드 변경 0 · 인프라 변경 0(조회만).
+
+```text
+CERT            cm-cert-store-v1 = ACTIVE / AUTHORIZED
+CERT_MAP_ENTRY  cm-entry-store (o4o-main-cert-map) = ACTIVE · hostname store.neture.co.kr
+DNS             store.neture.co.kr A = 136.110.132.35 (8.8.8.8 기준)
+HTTPS           GET https://store.neture.co.kr/         = 200 (html data-workspace="store")
+HTTPS           GET https://store.neture.co.kr/handoff  = 200
+CORS            OPTIONS https://api.neture.co.kr/api/v1/auth/handoff
+                Origin: https://store.neture.co.kr → 204 · allow-origin 정확 일치 · allow-credentials true
+```
+
+남은 것은 ③ Google authorized origin · ④ cutover flip(`'true'`) · ⑤ store_owner 브라우저 E2E 뿐이다.
+플래그가 OFF 인 동안 세 서비스 기존 매장 화면은 그대로이며, `store.neture.co.kr` 은 직접 접속으로만 도달한다.
