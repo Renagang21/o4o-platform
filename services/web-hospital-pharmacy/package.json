@@ -11,6 +11,8 @@
   },
   "dependencies": {
     "@o4o/auth-client": "workspace:*",
+    "@o4o/auth-react": "workspace:*",
+    "@o4o/auth-utils": "workspace:*",
     "@o4o/hospital-pharmacy-core": "workspace:*",
     "react": "19.2.0",
     "react-dom": "19.2.0",
