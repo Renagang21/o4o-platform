@@ -89,6 +89,13 @@ export const getAllowedOrigins = (): string[] => {
     //   wildcard / credentials 완화 / reflect-origin 은 도입하지 않는다.
     //   "https://signage.neture.co.kr" 은 이미 위에 등록돼 있으나 DNS 는 아직 없다(NXDOMAIN).
     "https://signage-player-web-3e3aws7zqa-du.a.run.app",
+    // WO-O4O-HOSPITAL-PHARMACY-SERVICE-FOUNDATION-V1:
+    //   web-hospital-pharmacy(Cloud Run) 는 /api/ai/* (파일 이해·조사) 를 cross-origin 호출한다.
+    //   canonical 도메인(hospital.neture.co.kr)은 DNS 연결 전이라도 등록해 두면 이후 DNS 작업에서
+    //   API 재배포가 불필요하다(pharmacyhub 선례). Cloud Run URL 은 DNS 이전 브라우저 smoke 용.
+    //   정확한 origin 만 — wildcard / credentials 완화 / reflect-origin 은 도입하지 않는다.
+    "https://hospital.neture.co.kr",
+    "https://hospital-pharmacy-web-3e3aws7zqa-du.a.run.app",
   ];
 
   return [...devOrigins, ...ipOrigins, ...prodOrigins, ...envOrigins];

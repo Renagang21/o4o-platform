@@ -6,6 +6,18 @@ on:
   pull_request:
     branches: [ main ]
   workflow_dispatch:
+    # WO-O4O-ADMIN-CI-CD-AFFECTED-SCOPE-AND-DUPLICATE-WORK-REDUCTION-V1
+    # affected 판정을 **실제 GitHub Actions 에서** 재현하기 위한 입력.
+    # 비우면 기존 동작(판정 불가 → full CI)이다.
+    inputs:
+      base_sha:
+        description: '판정 기준 base SHA (비우면 안전 fallback = full CI)'
+        required: false
+        default: ''
+      head_sha:
+        description: '판정 기준 head SHA (비우면 현재 SHA)'
+        required: false
+        default: ''
 
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -15,11 +27,49 @@ env:
   NODE_VERSION: '22.18.0'
 
 jobs:
+  # 0. Affected scope 판정
+  #
+  # WO-O4O-ADMIN-CI-CD-AFFECTED-SCOPE-AND-DUPLICATE-WORK-REDUCTION-V1
+  #   Admin-only 변경(실측: 소스 1 파일 + 문서)에서도 API Server 전체 Jest(약 9분)가
+  #   critical path 였다. 판정은 `scripts/ci/detect-affected.mjs` 단일 지점이며
+  #   deploy-admin.yml 도 같은 스크립트를 쓴다 — workflow 두 곳에 glob 을 손으로
+  #   유지하지 않는다.
+  #
+  #   판정기는 **의심스러우면 전부 실행**한다. base SHA 이상 · force push ·
+  #   shallow history · 매핑 불가 경로 · root manifest · CI 인프라 변경은 모두
+  #   global fallback 이라 아래 full CI 경로가 그대로 돈다.
+  #   `fetch-depth: 0` 은 multi-commit push batch(`event.before..sha`) 를 통째로
+  #   보기 위한 것이다 — `HEAD~1` 비교는 앞쪽 commit 의 변경을 놓친다.
+  detect:
+    name: Detect affected scope
+    runs-on: ubuntu-latest
+    outputs:
+      admin_affected: ${{ steps.scope.outputs.admin_affected }}
+      admin_only: ${{ steps.scope.outputs.admin_only }}
+      api_affected: ${{ steps.scope.outputs.api_affected }}
+      global_or_unknown: ${{ steps.scope.outputs.global_or_unknown }}
+      fallback: ${{ steps.scope.outputs.fallback }}
+
+    steps:
+    - uses: actions/checkout@v6
+      with:
+        fetch-depth: 0
+
+    - name: Classify changed scope
+      id: scope
+      env:
+        BASE_SHA: ${{ github.event.inputs.base_sha || (github.event_name == 'pull_request' && github.event.pull_request.base.sha) || github.event.before }}
+        HEAD_SHA: ${{ github.event.inputs.head_sha || (github.event_name == 'pull_request' && github.event.pull_request.head.sha) || github.sha }}
+      run: node scripts/ci/detect-affected.mjs
+
   # 1. Code Quality Checks
   quality-check:
     name: Code Quality Check
     runs-on: ubuntu-latest
-    
+    needs: [detect]
+    # Admin-only 변경은 아래 admin-fast-* 두 잡이 대체한다. 그 외에는 전부 여기로 온다.
+    if: needs.detect.outputs.admin_only != 'true'
+
     steps:
     - uses: actions/checkout@v6
 
@@ -112,36 +162,21 @@ jobs:
         node --test scripts/db/__tests__/migration-identity.test.mjs
         node --test scripts/db/__tests__/setup-local-db-credential-log.test.mjs
 
+    # WO-O4O-ADMIN-CI-CD-AFFECTED-SCOPE-AND-DUPLICATE-WORK-REDUCTION-V1
+    # 검사 내용은 무수정으로 scripts/ci/check-console-log.sh 로 옮겼다.
+    # Admin-only fast path 가 같은 게이트를 `apps/admin-dashboard/` 범위로 재사용한다 —
+    # 같은 grep 을 YAML 두 곳에 복사해 두면 한쪽만 고쳐지는 drift 가 생긴다.
     - name: Check for console.log statements
-      run: |
-        # Find all console.log statements, excluding comments, test files, CLI scripts, config files, migrations, and logger utilities
-        # Also exclude main.tsx/main.ts files (entry points with startup logs)
-        CONSOLE_LOGS=$(grep -r "console\.log" apps/ --include="*.ts" --include="*.tsx" \
-          --exclude-dir=node_modules --exclude-dir=dist \
-          --exclude-dir=test --exclude-dir=e2e \
-          --exclude-dir=scripts \
-          --exclude-dir=cli \
-          --exclude-dir=vscode-extension \
-          --exclude="*test*" --exclude="*spec*" \
-          --exclude="vite.config.ts" --exclude="*.config.ts" \
-          --exclude="logger.ts" --exclude="*logger*.ts" \
-          --exclude="cli.ts" \
-          --exclude="*-job.ts" \
-          --exclude="main.tsx" \
-          --exclude="main.ts" \
-          --exclude="migrate.ts" \
-          | grep -v "//.*console\.log" \
-          | grep -v "^\s*//" \
-          | grep -v "\*.*console\.log" \
-          | grep -v "database/migrations/" || true)
+      run: bash scripts/ci/check-console-log.sh apps/
 
-        if [ -n "$CONSOLE_LOGS" ]; then
-          echo "❌ Found console.log statements in production code:"
-          echo "$CONSOLE_LOGS"
-          exit 1
-        else
-          echo "✅ No console.log statements found in production code"
-        fi
+    # WO-O4O-ADMIN-CI-CD-AFFECTED-SCOPE-AND-DUPLICATE-WORK-REDUCTION-V1
+    # affected scope 판정기(`scripts/ci/detect-affected.mjs`) 회귀 시험. blocking.
+    # Admin closure 가 graph 에서 나오는지 · 무관 package 가 Admin 을 깨우지 않는지 ·
+    # 판정 불가 입력이 전부 full CI 로 fallback 하는지 · multi-commit push batch 를
+    # 놓치지 않는지를 고정한다. 의존성 · DB · secret 0 (Node 22 내장 runner).
+    # `scripts/**` 변경은 판정기가 global 로 취급하므로 이 단계는 항상 이 잡에서 돈다.
+    - name: Run tests (CI affected-scope detector node:test)
+      run: node --test scripts/ci/__tests__/detect-affected.test.mjs
 
     # WO-O4O-LOCAL-DATA-TOOL-BRIDGE-CLOSURE-V1 §22
     # Local Work Agent 는 런타임 의존성 0(package.json 없음)이라 jest 대상이 아니다.
@@ -239,6 +274,10 @@ jobs:
   api-tests:
     name: API Server Jest
     runs-on: ubuntu-latest
+    needs: [detect]
+    # Admin-only 변경에서는 전체 suite 대신 admin-fast-guards 가
+    # **Admin 소스를 읽는 정적 guard spec** 만 선별해 돌린다(범위 축소가 아니라 선별).
+    if: needs.detect.outputs.admin_only != 'true'
 
     steps:
     - uses: actions/checkout@v6
@@ -260,8 +299,9 @@ jobs:
   build:
     name: Build Applications
     runs-on: ubuntu-latest
-    needs: [quality-check, api-tests]
-    
+    needs: [detect, quality-check, api-tests]
+    if: needs.detect.outputs.admin_only != 'true'
+
     # build matrix 대상은 배포되는 앱만 유지한다.
     # WO-O4O-MAIN-SITE-FULL-SOURCE-DELETION-V1 에서 은퇴 앱이 소스째 삭제되어
     # 기존 matrix 제외 근거 주석도 함께 제거했다.
@@ -287,9 +327,16 @@ jobs:
         pnpm --filter '@o4o/admin-dashboard^...' run build
         echo "✅ Admin Dashboard dependency closure built successfully"
 
+    # WO-O4O-ADMIN-CI-CD-AFFECTED-SCOPE-AND-DUPLICATE-WORK-REDUCTION-V1
+    # 이 잡은 위에서 이미 frozen install + Admin dependency closure build 를 끝냈다.
+    # 표식이 없던 기존 경로에서는 이 스크립트가 **build:packages 전체 + install 을
+    # 다시** 실행했다 (같은 runner 안의 중복). 표식을 넘겨 재실행을 막는다 —
+    # 스크립트의 standalone 동작(로컬 · 수동)은 그대로다.
     - name: Build ${{ matrix.app }}
+      env:
+        O4O_PACKAGES_PREBUILT: '1'
       run: bash scripts/ci-build-app.sh ${{ matrix.app }}
-    
+
     # WO-O4O-CI-BLOCKING-GATE-FINALIZATION-V1
     # 이 continue-on-error 는 **의도적으로 유지**한다.
     # 검증이 아니라 산출물 업로드이며(빌드는 이미 위에서 성공), 업로드 실패는
@@ -303,3 +350,133 @@ jobs:
           apps/${{ matrix.app }}/dist
           apps/${{ matrix.app }}/build
         retention-days: 7
+
+  # ===========================================================================
+  # 4. Admin-only fast path
+  #
+  # WO-O4O-ADMIN-CI-CD-AFFECTED-SCOPE-AND-DUPLICATE-WORK-REDUCTION-V1
+  #
+  # 코드 변경이 `apps/admin-dashboard/**` 에만 있고 나머지가 문서 추가·수정뿐일 때만
+  # 실행된다(판정: detect). 아래 두 잡은 **병렬**이며 quality-check / api-tests /
+  # build 를 대체한다.
+  #
+  # 무엇을 **줄이지 않았는지** 명시한다:
+  #   - Admin 의 type-check · ESLint · Vitest · production build 는 전부 유지
+  #   - ESLint 범위는 오히려 넓어졌다: 기존 `admin-dashboard` 의 lint script 는
+  #     `src` 만 봤고, 여기서는 워크스페이스 전체(`apps/admin-dashboard`)를 본다.
+  #     error 1건이면 즉시 실패, warning 기준선은 기존과 같은 500 이다.
+  #   - console.log 게이트는 같은 스크립트를 Admin 범위로 실행
+  #   - **Admin 소스를 raw text 로 읽는 api-server 정적 guard spec** 은
+  #     admin-fast-guards 가 선별해 그대로 돌린다 (은퇴 패턴 재유입 차단 유지)
+  #
+  # 건너뛰는 것은 Admin-only 변경이 **닿을 수 없는** 축뿐이다:
+  #   api-server type-check / entity · migration · route guard / multi-tenant ·
+  #   KPA · Neture · Admin closure 밖 package 테스트 / local-agent node:test.
+  admin-fast-validate:
+    name: Admin Fast — validate & build
+    runs-on: ubuntu-latest
+    needs: [detect]
+    if: needs.detect.outputs.admin_only == 'true'
+
+    steps:
+    - uses: actions/checkout@v6
+
+    - name: Setup build environment
+      uses: ./.github/actions/setup-build-env
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        strict-lockfile: 'true'
+        # 저장소 전체 build:packages 대신 아래에서 Admin closure 만 빌드한다.
+        build-packages: 'false'
+
+    - name: Build admin workspace dependencies
+      run: |
+        echo "🔨 Building Admin Dashboard workspace dependencies..."
+        pnpm --filter '@o4o/admin-dashboard^...' run build
+        echo "✅ Admin Dashboard dependency closure built successfully"
+
+    # WO-O4O-TYPES-AUTO-BUILD-GUARD-V1 과 동일한 stale dist 가드.
+    - name: Verify types dist freshness
+      run: |
+        test -f packages/types/dist/index.d.ts || (echo "❌ packages/types/dist/index.d.ts missing" && exit 1)
+        test -f packages/types/dist/forum.d.ts || (echo "❌ packages/types/dist/forum.d.ts missing" && exit 1)
+        echo "✅ packages/types/dist freshness verified"
+
+    - name: Run TypeScript check (admin-dashboard)
+      run: pnpm --filter @o4o/admin-dashboard run type-check
+
+    # 기존 `@o4o/admin-dashboard` lint script 와 동일한 config · 동일한 warning
+    # 기준선(500)이며 검사 범위만 `src` → 워크스페이스 전체로 넓혔다.
+    # ESLint 는 error 가 1건이라도 있으면 --max-warnings 와 무관하게 exit 1 이다.
+    - name: Run ESLint (admin workspace, error 0 + warning ratchet)
+      run: npx eslint apps/admin-dashboard --report-unused-disable-directives --max-warnings 500
+
+    - name: Check for console.log statements (admin-dashboard)
+      run: bash scripts/ci/check-console-log.sh apps/admin-dashboard/
+
+    - name: Run tests (admin-dashboard Vitest, serial to prevent OOM)
+      run: cd apps/admin-dashboard && npx vitest run --passWithNoTests --pool=forks --poolOptions.forks.maxForks=1
+
+    # install 1회 · dependency closure build 1회 · Admin build 1회.
+    # 표식이 없으면 스크립트가 build:packages 전체와 install 을 다시 돌린다.
+    - name: Build admin-dashboard
+      env:
+        O4O_PACKAGES_PREBUILT: '1'
+      run: bash scripts/ci-build-app.sh admin-dashboard
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v7
+      continue-on-error: true
+      with:
+        name: admin-dashboard-dist
+        path: |
+          apps/admin-dashboard/dist
+          apps/admin-dashboard/build
+        retention-days: 7
+
+  # api-server 의 정적 guard spec 중 **이번 변경 경로를 raw text 로 읽는 것**만 선별해
+  # 돌린다. 이 spec 들은 import 가 아니라 `fs.readFileSync('apps/admin-dashboard/...')`
+  # 로 남의 워크스페이스 소스를 훑어 은퇴 패턴 재유입을 막는다 —
+  # jest `--findRelatedTests` 는 모듈 그래프만 보므로 이 축을 전부 놓친다.
+  # 선별이 비면(판정 실패) 전체 suite 로 되돌린다.
+  admin-fast-guards:
+    name: Admin Fast — repo static guards
+    runs-on: ubuntu-latest
+    needs: [detect]
+    if: needs.detect.outputs.admin_only == 'true'
+
+    steps:
+    - uses: actions/checkout@v6
+      with:
+        fetch-depth: 0
+
+    - name: Setup build environment
+      uses: ./.github/actions/setup-build-env
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        strict-lockfile: 'true'
+        build-packages: 'false'
+
+    - name: Select api-server static guard specs
+      id: select
+      env:
+        BASE_SHA: ${{ github.event.inputs.base_sha || (github.event_name == 'pull_request' && github.event.pull_request.base.sha) || github.event.before }}
+        HEAD_SHA: ${{ github.event.inputs.head_sha || (github.event_name == 'pull_request' && github.event.pull_request.head.sha) || github.sha }}
+      run: |
+        SPECS=$(node scripts/ci/detect-affected.mjs --mode=guard-specs)
+        echo "선별된 spec: ${SPECS:-<없음 — 전체 suite 로 fallback>}"
+        echo "specs=${SPECS}" >> "$GITHUB_OUTPUT"
+
+    # 실행 모델은 기존 API Jest 게이트와 동일하다 (--maxWorkers=1, OOM 보호 유지).
+    - name: Run api-server static guard specs
+      env:
+        SPECS: ${{ steps.select.outputs.specs }}
+        NODE_OPTIONS: --max-old-space-size=6144
+      run: |
+        if [ -z "${SPECS// /}" ]; then
+          echo "⚠️ spec 선별 실패 — 안전하게 전체 suite 를 실행합니다"
+          pnpm --filter '@o4o/api-server^...' run build
+          cd apps/api-server && npx jest --maxWorkers=1
+        else
+          cd apps/api-server && npx jest --maxWorkers=1 $SPECS
+        fi

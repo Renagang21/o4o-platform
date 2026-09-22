@@ -15,7 +15,13 @@ const ForgotPassword = () => {
     setIsLoading(true);
 
     try {
-      const response = await authClient.api.post('/auth/forgot-password', { email });
+      // WO-O4O-GOOGLE-IDENTITY-OPERATOR-EXPLICIT-LINK-V1 §8-C: 플랫폼 관리자 reset 은 처음부터 끝까지
+      // Admin origin 이어야 한다. serviceUrl 을 보내지 않으면 서버(mail-core) fallback 이 https://neture.co.kr 로
+      // 링크를 발송한다. serviceKey 는 보내지 않는다 — Admin 은 users.password reset(토큰 service_key NULL).
+      const response = await authClient.api.post('/auth/forgot-password', {
+        email,
+        serviceUrl: window.location.origin,
+      });
 
       if (response.data.success) {
         setIsSubmitted(true);

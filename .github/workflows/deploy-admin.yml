@@ -7,19 +7,43 @@ concurrency:
   group: deploy-admin-${{ github.ref }}
   cancel-in-progress: false
 
+# WO-O4O-ADMIN-CI-CD-AFFECTED-SCOPE-AND-DUPLICATE-WORK-REDUCTION-V1
+#
+# trigger 는 **넓게**, 실행은 **좁게**.
+#   - `on.paths` 에서 `packages/**` 를 지우지 않는다. 지우면 Admin 의존성 package 변경이
+#     조용히 배포되지 않는 false negative 가 된다.
+#   - 대신 `detect` 잡이 Admin 의 실제 transitive dependency closure 를 계산해
+#     무관한 package 변경이면 install · build · Docker · Cloud Run 을 전부 건너뛴다.
+#     (실측: `packages/hospital-pharmacy-core` 만 바뀐 변경이 Admin 을 3분 01초 재배포)
+#   - root manifest / lockfile / setup-build-env 는 Admin build 결과를 실제로 바꾸는데도
+#     trigger 에 없어 배포되지 않았다(false negative). census 근거로 추가한다.
 on:
   push:
     branches: [ main, develop ]
     paths:
       - 'apps/admin-dashboard/**'
       - 'packages/**'
+      # root 의존성 · 설치 · 빌드 환경 — Admin 산출물에 직접 영향을 준다.
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'pnpm-workspace.yaml'
+      - '.npmrc'
+      - '.github/actions/setup-build-env/**'
       - '.github/workflows/deploy-admin.yml'
   workflow_dispatch:
     inputs:
       force_deploy:
-        description: 'Force deployment'
+        description: 'Force deployment (affected 판정을 무시하고 배포)'
         required: false
         default: 'false'
+      base_sha:
+        description: '판정 기준 base SHA (비우면 안전 fallback = 배포)'
+        required: false
+        default: ''
+      head_sha:
+        description: '판정 기준 head SHA (비우면 현재 SHA)'
+        required: false
+        default: ''
 
 env:
   PROJECT_ID: netureyoutube
@@ -27,8 +51,36 @@ env:
   REPOSITORY_NAME: o4o-api
 
 jobs:
+  # 판정 전용 경량 잡 — checkout + node 만 쓴다. pnpm install · GCP 인증 없음.
+  # 판정기는 `scripts/ci/detect-affected.mjs` 로 CI Pipeline 과 **같은 단일 지점**이다.
+  # base SHA 이상 · force push · shallow history · 매핑 불가 경로는 모두
+  # `admin_affected=true` 로 fallback 한다 (배포 누락보다 1회 더 배포).
+  detect:
+    name: Detect admin impact
+    runs-on: ubuntu-latest
+    outputs:
+      admin_affected: ${{ steps.scope.outputs.admin_affected }}
+      fallback: ${{ steps.scope.outputs.fallback }}
+
+    steps:
+    - uses: actions/checkout@v6
+      with:
+        # multi-commit push batch(`event.before..sha`) 를 통째로 보기 위해 필요하다.
+        fetch-depth: 0
+
+    - name: Classify changed scope
+      id: scope
+      env:
+        BASE_SHA: ${{ github.event.inputs.base_sha || github.event.before }}
+        HEAD_SHA: ${{ github.event.inputs.head_sha || github.sha }}
+      run: node scripts/ci/detect-affected.mjs
+
   deploy:
     runs-on: ubuntu-latest
+    needs: [detect]
+    # Admin 과 무관한 변경에서는 install / build / Docker push / Cloud Run deploy 가
+    # 한 줄도 실행되지 않는다. 수동 강제 배포는 force_deploy 로 계속 가능하다.
+    if: needs.detect.outputs.admin_affected == 'true' || github.event.inputs.force_deploy == 'true'
 
     permissions:
       contents: read
