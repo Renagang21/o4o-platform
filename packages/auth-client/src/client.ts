@@ -337,6 +337,17 @@ export class AuthClient {
     return { linked: true, alreadyLinked: data?.alreadyLinked === true };
   }
 
+  /**
+   * WO-O4O-GOOGLE-IDENTITY-OPERATOR-EXPLICIT-LINK-V1 §9 — 전환기 1회용 Admin Google Bootstrap.
+   * 세션 없이 호출한다. 서버가 env 플래그 + 일회용 코드를 확인하고 `platform:super_admin` users.id 에 연결한다.
+   * 실패(404 비활성 · 401 코드 오류 · 409 이미 연결/다른 사용자)는 axios 오류로 전파된다.
+   */
+  async bootstrapAdminGoogle(idToken: string, bootstrapCode: string): Promise<{ linked: boolean }> {
+    const response = await this.api.post('/auth/google/bootstrap-admin', { idToken, bootstrapCode });
+    const data = (response.data as { data?: { linked?: boolean } })?.data;
+    return { linked: data?.linked === true };
+  }
+
   /** GET /auth/google/link/status — `{ linked, passwordSet }`. 실패 시 null(화면은 카드를 숨긴다). */
   async getGoogleLinkStatus(): Promise<GoogleLinkStatus | null> {
     try {
