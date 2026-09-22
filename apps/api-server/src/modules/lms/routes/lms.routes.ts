@@ -117,7 +117,8 @@ router.get('/instructor/lessons/:lessonId/quiz', requireAuth, requireInstructor,
 router.post('/quizzes', requireAuth, requireInstructor, asyncHandler(QuizController.createQuiz));
 
 // POST /api/v1/lms/quizzes/:quizId/submit - Submit Quiz Answers
-router.post('/quizzes/:quizId/submit', requireAuth, requireLectureLearner, asyncHandler(QuizController.submitQuiz));
+//   4차 P1-15: membership 만으로는 유료·승인 강의의 attempt(보상 포함)를 쓸 수 없다 — 동일한 enrollment 정책 적용.
+router.post('/quizzes/:quizId/submit', requireAuth, requireLectureLearner, requireEnrollment({ checkQuiz: true }), asyncHandler(QuizController.submitQuiz));
 
 // GET /api/v1/lms/quizzes/:quizId/attempts - Get User's Attempts
 router.get('/quizzes/:quizId/attempts', requireAuth, requireLectureLearner, asyncHandler(QuizController.getAttempts));
@@ -136,7 +137,8 @@ router.get('/lessons/:lessonId/assignment', requireAuth, asyncHandler(Assignment
 router.post('/assignments', requireAuth, requireInstructor, asyncHandler(AssignmentController.upsertAssignment));
 
 // POST /api/v1/lms/assignments/:assignmentId/submit - Submit assignment (Learner)
-router.post('/assignments/:assignmentId/submit', requireAuth, requireLectureLearner, asyncHandler(AssignmentController.submitAssignment));
+//   4차 P1-15: quiz submit 과 같은 정책 — 제출을 저장하기 전에 enrollment 를 판정한다.
+router.post('/assignments/:assignmentId/submit', requireAuth, requireLectureLearner, requireEnrollment({ checkAssignment: true }), asyncHandler(AssignmentController.submitAssignment));
 
 // GET /api/v1/lms/assignments/:assignmentId/my - Get current user's submission
 router.get('/assignments/:assignmentId/my', requireAuth, requireLectureLearner, asyncHandler(AssignmentController.getMySubmission));

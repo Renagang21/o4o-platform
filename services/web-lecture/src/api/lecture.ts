@@ -98,6 +98,12 @@ export interface LectureCertificate {
 }
 
 export interface QuizQuestionDraft {
+  /**
+   * 4차 P1-14: 기존 문항의 id 는 편집·저장 왕복에서 반드시 보존한다.
+   * 채점은 attempt 의 questionId ↔ quiz.questions[].id 매칭이고 updateQuiz 는 배열을 그대로 저장하므로,
+   * id 를 빼고 저장하면 기존 제출이 전부 오답 처리된다. 새 문항만 id 없이 보낸다(서버가 발급).
+   */
+  id?: string;
   question: string;
   type: 'single' | 'multi' | 'text';
   options: string[];

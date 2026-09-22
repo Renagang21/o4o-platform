@@ -16,6 +16,8 @@
  *  3차 P1-12 submission 조회   : 강사 submission 경로도 lecture course 만 (admin override 이전에 scope)
  *  3차 P2-2  progress 목록     : MyEnrollmentsPage 도 progressPercentage 를 읽는다
  *  4차 P1-13 quiz 생성 귀속    : courseId 를 생략하고 lessonId 만 보내도 귀속될 course 로 scope·소유권 검사 (우회 차단)
+ *  4차 P1-14 문항 id 보존     : 편집기·updateQuiz 가 questions[].id 를 유지한다 (채점 매칭 유실 방지)
+ *  4차 P1-15 제출 enrollment  : quiz/assignment 제출은 membership 위에 enrollment 정책까지 통과해야 한다
  *
  * DB 없이 controller/service 를 실제로 실행한다: TypeORM entity 그래프는 virtual mock,
  * DataSource 는 service_memberships / lms_lessons 조회만 흉내낸다.
@@ -499,6 +501,47 @@ describe('4차 P1-13 POST /quizzes — 귀속될 course 를 확정해 검사한�
     expect(savedQuiz.courseId).toBe('lec-pub');
   });
 
+  it('4차 P1-14: PATCH 에서 문항 id 가 빠져도 기존 id 를 승계한다 (채점 매칭 보존)', async () => {
+    quizzes['q9'] = {
+      id: 'q9', lessonId: 'les-1', courseId: 'lec-pub', title: 'Q', passingScore: 60, isPublished: true,
+      questions: [
+        { id: 'qid-1', question: 'a', type: 'single', options: ['1', '2'], answer: '1', points: 10, order: 1 },
+        { id: 'qid-2', question: 'b', type: 'single', options: ['1', '2'], answer: '2', points: 10, order: 2 },
+      ],
+    };
+    const res = makeRes();
+    await QuizController.updateQuiz(makeReq({
+      id: 'inst', roles: ['lecture:instructor'], member: true, params: { quizId: 'q9' },
+      body: { title: 'Q2', questions: [
+        { question: 'a (수정)', type: 'single', options: ['1', '2'], answer: '1', points: 10, order: 1 },
+        { question: 'b', type: 'single', options: ['1', '2'], answer: '2', points: 10, order: 2 },
+      ] },
+    }), res);
+    expect(res.statusCode).toBe(200);
+    expect(savedQuiz.questions.map((q: any) => q.id)).toEqual(['qid-1', 'qid-2']);
+    expect(savedQuiz.questions[0].question).toBe('a (수정)');
+  });
+
+  it('4차 P1-14: 새 문항은 새 id 를 받고 기존 id 와 충돌하지 않는다', async () => {
+    quizzes['q10'] = {
+      id: 'q10', lessonId: 'les-1', courseId: 'lec-pub', title: 'Q', passingScore: 60, isPublished: true,
+      questions: [{ id: 'qid-1', question: 'a', type: 'single', options: ['1', '2'], answer: '1', points: 10, order: 1 }],
+    };
+    const res = makeRes();
+    await QuizController.updateQuiz(makeReq({
+      id: 'inst', roles: ['lecture:instructor'], member: true, params: { quizId: 'q10' },
+      body: { questions: [
+        { question: 'a', type: 'single', options: ['1', '2'], answer: '1', points: 10, order: 1 },
+        { question: '신규', type: 'single', options: ['1', '2'], answer: '2', points: 10, order: 2 },
+      ] },
+    }), res);
+    expect(res.statusCode).toBe(200);
+    const ids = savedQuiz.questions.map((q: any) => q.id);
+    expect(ids[0]).toBe('qid-1');
+    expect(ids[1]).toBeTruthy();
+    expect(ids[1]).not.toBe('qid-1');
+  });
+
   it('lecture:admin 은 타 강사 lecture lesson 에도 생성 가능 · legacy 는 여전히 404', async () => {
     const ok = makeRes();
     await QuizController.createQuiz(makeReq({ id: 'adm', roles: ['lecture:admin'], member: true, body: body({ lessonId: 'les-other' }) }), ok);
@@ -763,5 +806,24 @@ describe('정적 계약', () => {
     const svc = read('apps/api-server/src/modules/lms/services/CourseService.ts');
     expect(svc).toContain('const data = pickUpdatableCourseFields(rawData);');
     expect(svc).not.toContain("'serviceKey'");
+  });
+  it('4차 P1-14: 강사 편집기는 문항 id 를 버리지 않는다', () => {
+    const page = read('services/web-lecture/src/pages/instructor/InstructorCourseEditPage.tsx');
+    expect(page).not.toContain('q.questions.map(({ id: _id, ...rest }) => rest)');
+    expect(page).toContain('setQuestions(q.questions.map((qq) => ({ ...qq })));');
+    const api = read('services/web-lecture/src/api/lecture.ts');
+    // 새 문항은 id 없이(서버 발급), 기존 문항은 id 를 실어 보낼 수 있어야 한다
+    expect(api).toMatch(/export interface QuizQuestionDraft \{[\s\S]*?id\?: string;/);
+  });
+  it('4차 P1-15: 평가 제출 라우트는 enrollment 정책을 통과해야 한다', () => {
+    const routes = read('apps/api-server/src/modules/lms/routes/lms.routes.ts');
+    expect(routes).toMatch(/router\.post\('\/quizzes\/:quizId\/submit', requireAuth, requireLectureLearner, requireEnrollment\(\{ checkQuiz: true \}\)/);
+    expect(routes).toMatch(/router\.post\('\/assignments\/:assignmentId\/submit', requireAuth, requireLectureLearner, requireEnrollment\(\{ checkAssignment: true \}\)/);
+    const mw = read('apps/api-server/src/modules/lms/middleware/requireEnrollment.ts');
+    // quiz/assignment → course 역추적은 parameter binding 만 사용한다 (Guard Rule 2)
+    expect(mw).toContain('checkQuiz?: boolean;');
+    expect(mw).toContain('checkAssignment?: boolean;');
+    expect(mw).toContain('WHERE q.id = $1');
+    expect(mw).toContain('WHERE a.id = $1');
   });
 });

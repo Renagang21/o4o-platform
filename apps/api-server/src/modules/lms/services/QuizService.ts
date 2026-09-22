@@ -510,6 +510,24 @@ export class QuizService {
     for (const key of ['title', 'description', 'questions', 'passingScore', 'isPublished'] as const) {
       if (data[key] !== undefined) picked[key] = data[key];
     }
+
+    // 4차 P1-14: 채점은 attempt.questionId ↔ questions[].id 매칭이다. id 없는 문항을 그대로 저장하면
+    // 기존 제출이 전부 매칭 불가가 된다. 클라이언트가 id 를 빠뜨리면 같은 자리(order/index)의 기존 id 를
+    // 승계하고, 그래도 없으면 새로 발급한다 (createQuiz 와 동일 규칙).
+    if (picked.questions !== undefined && Array.isArray(picked.questions)) {
+      const previous: QuizQuestion[] = Array.isArray(quiz.questions) ? quiz.questions : [];
+      const usedIds = new Set<string>();
+      picked.questions = (picked.questions as QuizQuestion[]).map((q, index) => {
+        if (q?.id) { usedIds.add(q.id); return q; }
+        const inherited = previous.find(
+          (p) => p?.id && !usedIds.has(p.id) && (q?.order !== undefined ? p.order === q.order : false),
+        ) ?? (previous[index]?.id && !usedIds.has(previous[index].id) ? previous[index] : undefined);
+        const id = inherited?.id ?? crypto.randomUUID();
+        usedIds.add(id);
+        return { ...q, id };
+      });
+    }
+
     Object.assign(quiz, picked);
 
     if (mergedMetadata !== undefined) {

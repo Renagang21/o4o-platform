@@ -193,7 +193,9 @@ export function InstructorQuizPage() {
         if (!alive) return;
         if (q) {
           setQuiz(q); setTitle(q.title); setPassingScore(q.passingScore);
-          setQuestions(q.questions.map(({ id: _id, ...rest }) => rest));
+          // 4차 P1-14: 문항 id 를 유지한다 — 저장 왕복에서 id 가 사라지면 기존 attempt 의 questionId 가
+          // 매칭되지 않아 제출 답안이 전부 오답이 된다(채점은 quiz.questions[].id 기준).
+          setQuestions(q.questions.map((qq) => ({ ...qq })));
         }
       } catch { /* 없으면 새로 만든다 */ }
       finally { if (alive) setLoading(false); }

@@ -31,7 +31,30 @@ import { resolveLectureMembershipStatus, isPlatformSuperAdmin } from './lecture-
 interface RequireEnrollmentOptions {
   /** lesson 라우트에서 lessonId → courseId 역추적 */
   checkLesson?: boolean;
+  /**
+   * 4차 P1-15: 평가 제출(quiz submit / assignment submit) 라우트에서
+   * quizId · assignmentId → course 역추적. membership 만으로 유료·승인 강의의
+   * attempt/submission 을 쓸 수 없게 동일한 enrollment 정책을 적용한다.
+   */
+  checkQuiz?: boolean;
+  checkAssignment?: boolean;
 }
+
+/** quiz → (lesson) → course. lessonId 가 없으면 quiz.courseId 를 쓴다. */
+const QUIZ_COURSE_SQL = `
+  SELECT COALESCE(l."courseId", q."courseId") AS course_id
+    FROM lms_quizzes q
+    LEFT JOIN lms_lessons l ON l.id = q."lessonId"
+   WHERE q.id = $1
+   LIMIT 1`;
+
+/** assignment → lesson → course. */
+const ASSIGNMENT_COURSE_SQL = `
+  SELECT l."courseId" AS course_id
+    FROM lms_assignments a
+    JOIN lms_lessons l ON l.id = a."lessonId"
+   WHERE a.id = $1
+   LIMIT 1`;
 
 export function requireEnrollment(options?: RequireEnrollmentOptions) {
   return async (req: Request, res: Response, next: NextFunction) => {
@@ -54,6 +77,25 @@ export function requireEnrollment(options?: RequireEnrollmentOptions) {
         return res.status(404).json({ success: false, error: 'Lesson not found' });
       }
       courseId = (lesson as any).courseId;
+    }
+
+    // 평가 제출 경로: quizId · assignmentId → courseId 역추적 (Raw SQL parameter binding — CLAUDE.md §7 Guard Rule 2)
+    if (!courseId && (options?.checkQuiz || options?.checkAssignment)) {
+      const isQuiz = Boolean(options?.checkQuiz);
+      const id = isQuiz ? req.params.quizId : req.params.assignmentId;
+      const notFound = isQuiz ? 'Quiz not found' : 'Assignment not found';
+      if (!id) {
+        return res.status(404).json({ success: false, error: notFound });
+      }
+      const rows: Array<{ course_id: string | null }> = await AppDataSource.query(
+        isQuiz ? QUIZ_COURSE_SQL : ASSIGNMENT_COURSE_SQL,
+        [id],
+      );
+      const resolved = rows?.[0]?.course_id;
+      if (!resolved) {
+        return res.status(404).json({ success: false, error: notFound });
+      }
+      courseId = resolved;
     }
 
     if (!courseId) {
