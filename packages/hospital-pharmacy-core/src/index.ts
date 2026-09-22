@@ -17,13 +17,13 @@ export {
   HOSPITAL_DRUG_FILE_ACCEPT,
   makeHospitalDrugDataset,
   isHospitalDrugDataset,
-} from './domain.js';
+} from './domain';
 
 export {
   type HospitalTargetField,
   type HospitalTargetSchema,
   HOSPITAL_DRUG_TARGET_SCHEMA,
-} from './target-schema.js';
+} from './target-schema';
 
 export {
   mentionsHospital,
@@ -31,23 +31,23 @@ export {
   extractDrugNameToken,
   extractProduct,
   extractStrength,
-} from './nl.js';
+} from './nl';
 
 export {
   queryLocalRows,
   matchLocalByResearchIngredients,
   renderLocalContextBlock,
-} from './local-context.js';
+} from './local-context';
 
 export {
   type NormalizedRecordLike,
   type HospitalRowsFromRecords,
   normalizedRecordToHospitalRow,
   normalizedRecordsToHospitalRows,
-} from './adapter.js';
+} from './adapter';
 
 export {
   type HospitalSurfacePlan,
   decideHospitalSurfacePlan,
   HOSPITAL_QUESTION_ANSWER,
-} from './plan.js';
+} from './plan';

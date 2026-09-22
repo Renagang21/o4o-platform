@@ -10,7 +10,7 @@
  * Core 를 import 하지 않기 위해, 입력은 GFU NormalizedRecord 와 구조적으로 호환되는 최소 shape 로만 받는다.
  */
 
-import type { HospitalDrugField, HospitalDrugRecord } from './domain.js';
+import type { HospitalDrugField, HospitalDrugRecord } from './domain';
 
 /** GFU NormalizedRecord 와 구조적으로 호환되는 최소 입력 shape. */
 export interface NormalizedRecordLike {

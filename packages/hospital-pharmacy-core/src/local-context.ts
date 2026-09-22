@@ -10,7 +10,7 @@
  * 기존 web-neture localDataset.ts 의 조회/표시 로직을 그대로 옮겨 온 것이다(파서는 GFU 로 대체, D1).
  */
 
-import type { HospitalDrugField, HospitalDrugRecord } from './domain.js';
+import type { HospitalDrugField, HospitalDrugRecord } from './domain';
 
 /** 값 정규화(공백·소문자 제거) — 검색 매칭 축. 한글은 정규식 리터럴 대신 문자열 연산. */
 function compact(s: unknown): string {

@@ -2651,6 +2651,43 @@ importers:
         specifier: ^5.0.0
         version: 5.4.19(@types/node@24.10.1)(lightningcss@1.30.2)(terser@5.44.1)
 
+  services/web-hospital-pharmacy:
+    dependencies:
+      '@o4o/auth-client':
+        specifier: workspace:*
+        version: link:../../packages/auth-client
+      '@o4o/hospital-pharmacy-core':
+        specifier: workspace:*
+        version: link:../../packages/hospital-pharmacy-core
+      react:
+        specifier: 19.2.0
+        version: 19.2.0
+      react-dom:
+        specifier: 19.2.0
+        version: 19.2.0(react@19.2.0)
+      react-router-dom:
+        specifier: ^7.9.6
+        version: 7.9.6(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+    devDependencies:
+      '@types/node':
+        specifier: ^24.10.1
+        version: 24.10.1
+      '@types/react':
+        specifier: 19.2.7
+        version: 19.2.7
+      '@types/react-dom':
+        specifier: 19.2.3
+        version: 19.2.3(@types/react@19.2.7)
+      '@vitejs/plugin-react':
+        specifier: ^5.1.1
+        version: 5.1.1(vite@7.2.4(@types/node@24.10.1)(jiti@1.21.7)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2))
+      typescript:
+        specifier: ~5.9.3
+        version: 5.9.3
+      vite:
+        specifier: ^7.2.4
+        version: 7.2.4(@types/node@24.10.1)(jiti@1.21.7)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2)
+
   services/web-lecture:
     dependencies:
       '@o4o/auth-client':
