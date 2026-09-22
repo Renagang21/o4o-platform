@@ -3,7 +3,7 @@ import { BaseController } from '../../../common/base.controller.js';
 import { AppDataSource } from '../../../database/connection.js';
 import { InstructorApplication, Enrollment, EnrollmentStatus, Course, ContentKind } from '@o4o/lms-core';
 import { roleAssignmentService } from '../../auth/services/role-assignment.service.js';
-import { hasLectureAdminRole, LECTURE_INSTRUCTOR_ROLE } from '../middleware/lecture-access.js';
+import { hasLectureAdminRole, isLectureCourse, LECTURE_INSTRUCTOR_ROLE } from '../middleware/lecture-access.js';
 import { applyCourseScopeToQuery, resolveScopeOrRespond } from '../utils/lms-scope-guard.js';
 import logger from '../../../utils/logger.js';
 // WO-O4O-LMS-ASSIGNMENT-GRADING-V1
@@ -337,6 +337,7 @@ export class InstructorController extends BaseController {
       const courseRepo = AppDataSource.getRepository(Course);
       const course = await courseRepo.findOne({ where: { id: courseId } });
       if (!course) return BaseController.notFound(res, 'Course not found');
+      if (!isLectureCourse(course.serviceKey)) return BaseController.notFound(res, 'Course not found');
       if (course.instructorId !== userId && !hasLectureAdminRole(req)) {
         return BaseController.forbidden(res, '본인 강의의 통계만 조회할 수 있습니다');
       }
@@ -499,8 +500,9 @@ export class InstructorController extends BaseController {
 
       // 소유권 확인 (dashboardStats와 동일 패턴)
       const courseRepo = AppDataSource.getRepository(Course);
-      const course = await courseRepo.findOne({ where: { id: courseId }, select: ['id', 'title', 'credits', 'instructorId'] });
+      const course = await courseRepo.findOne({ where: { id: courseId }, select: ['id', 'title', 'credits', 'instructorId', 'serviceKey'] });
       if (!course) return BaseController.notFound(res, 'Course not found');
+      if (!isLectureCourse(course.serviceKey)) return BaseController.notFound(res, 'Course not found');
       if (course.instructorId !== userId && !hasLectureAdminRole(req)) {
         return BaseController.forbidden(res, '본인 콘텐츠의 참여자만 조회할 수 있습니다');
       }
@@ -644,8 +646,9 @@ export class InstructorController extends BaseController {
       const userId = (req as any).user?.id;
 
       const courseRepo = AppDataSource.getRepository(Course);
-      const course = await courseRepo.findOne({ where: { id: courseId }, select: ['id', 'title', 'instructorId'] });
+      const course = await courseRepo.findOne({ where: { id: courseId }, select: ['id', 'title', 'instructorId', 'serviceKey'] });
       if (!course) return BaseController.notFound(res, 'Course not found');
+      if (!isLectureCourse(course.serviceKey)) return BaseController.notFound(res, 'Course not found');
       if (course.instructorId !== userId && !hasLectureAdminRole(req)) {
         return BaseController.forbidden(res, '본인 콘텐츠의 통계만 조회할 수 있습니다');
       }
@@ -715,8 +718,9 @@ export class InstructorController extends BaseController {
       const userId = (req as any).user?.id;
 
       const courseRepo = AppDataSource.getRepository(Course);
-      const course = await courseRepo.findOne({ where: { id: courseId }, select: ['id', 'title', 'instructorId'] });
+      const course = await courseRepo.findOne({ where: { id: courseId }, select: ['id', 'title', 'instructorId', 'serviceKey'] });
       if (!course) return BaseController.notFound(res, 'Course not found');
+      if (!isLectureCourse(course.serviceKey)) return BaseController.notFound(res, 'Course not found');
       if (course.instructorId !== userId && !hasLectureAdminRole(req)) {
         return BaseController.forbidden(res, '본인 콘텐츠만 내보낼 수 있습니다');
       }
@@ -847,6 +851,11 @@ export class InstructorController extends BaseController {
         return BaseController.notFound(res, '수강 정보를 찾을 수 없습니다');
       }
 
+      // 재검토 P1-11: legacy(KPA/PH) 강의의 수강은 Lecture 경로에서 존재하지 않는다 (ownership 보다 먼저 · 404).
+      if (!isLectureCourse(enrollment.course?.serviceKey)) {
+        return BaseController.notFound(res, '수강 정보를 찾을 수 없습니다');
+      }
+
       // 강좌 소유권 확인 (override = lecture:admin)
       if (enrollment.course.instructorId !== userId) {
         if (!hasLectureAdminRole(req)) {
@@ -895,6 +904,11 @@ export class InstructorController extends BaseController {
         return BaseController.notFound(res, '수강 정보를 찾을 수 없습니다');
       }
 
+      // 재검토 P1-11: legacy(KPA/PH) 강의의 수강은 Lecture 경로에서 존재하지 않는다 (ownership 보다 먼저 · 404).
+      if (!isLectureCourse(enrollment.course?.serviceKey)) {
+        return BaseController.notFound(res, '수강 정보를 찾을 수 없습니다');
+      }
+
       // 강좌 소유권 확인 (override = lecture:admin)
       if (enrollment.course.instructorId !== userId) {
         if (!hasLectureAdminRole(req)) {
@@ -929,6 +943,7 @@ export class InstructorController extends BaseController {
 
   /**
    * 강사 강의 ownership 체크 (lecture:admin 만 우회 — Phase 2 §5/§6, kpa:admin bypass 0).
+   * 재검토 P1-12: 대상 lesson 의 course 가 lecture 가 아니면 admin 도 404 (scope 가 override 보다 먼저).
    */
   private static async checkLessonOwnership(
     lessonId: string,
@@ -938,10 +953,10 @@ export class InstructorController extends BaseController {
     const lesson = await LessonService.getInstance().getLesson(lessonId);
     if (!lesson) return { allowed: false, notFound: true };
 
-    if (isAdmin) return { allowed: true, notFound: false, courseId: lesson.courseId };
-
     const course = await CourseService.getInstance().getCourse(lesson.courseId);
-    if (!course) return { allowed: false, notFound: true };
+    if (!course || !isLectureCourse(course.serviceKey)) return { allowed: false, notFound: true };
+
+    if (isAdmin) return { allowed: true, notFound: false, courseId: lesson.courseId };
 
     return {
       allowed: course.instructorId === userId,
@@ -1059,8 +1074,9 @@ export class InstructorController extends BaseController {
       const userId = (req as any).user?.id;
 
       const courseRepo = AppDataSource.getRepository(Course);
-      const course = await courseRepo.findOne({ where: { id: courseId }, select: ['id', 'instructorId'] });
+      const course = await courseRepo.findOne({ where: { id: courseId }, select: ['id', 'instructorId', 'serviceKey'] });
       if (!course) return BaseController.notFound(res, 'Course not found');
+      if (!isLectureCourse(course.serviceKey)) return BaseController.notFound(res, 'Course not found');
 
       if (course.instructorId !== userId && !hasLectureAdminRole(req)) {
         return BaseController.forbidden(res, '본인 강의의 레슨만 조회할 수 있습니다');
@@ -1101,9 +1117,10 @@ export class InstructorController extends BaseController {
       const courseRepo = AppDataSource.getRepository(Course);
       const course = await courseRepo.findOne({
         where: { id: courseId },
-        select: ['id', 'instructorId'],
+        select: ['id', 'instructorId', 'serviceKey'],
       });
       if (!course) return BaseController.notFound(res, 'Course not found');
+      if (!isLectureCourse(course.serviceKey)) return BaseController.notFound(res, 'Course not found');
 
       if (course.instructorId !== userId && !hasLectureAdminRole(req)) {
         return BaseController.forbidden(res, '본인 콘텐츠의 포인트 현황만 조회할 수 있습니다');

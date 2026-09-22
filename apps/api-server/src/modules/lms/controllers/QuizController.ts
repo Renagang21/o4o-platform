@@ -180,7 +180,8 @@ export class QuizController extends BaseController {
       if (courseId) {
         const courseService = CourseService.getInstance();
         const course = await courseService.getCourse(courseId);
-        if (!course) {
+        // 재검토 sweep: legacy(KPA/PH) course 에는 quiz 를 만들 수 없다 (non-disclosure 404).
+        if (!course || !isLectureCourse(course.serviceKey)) {
           return BaseController.notFound(res, 'Course not found');
         }
         if (course.instructorId !== userId && !rolesIncludeLectureAdmin(userRoles)) {

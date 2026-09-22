@@ -9,6 +9,12 @@
  *  재검토 P1-6 lesson mutation : 강사·lecture:admin 의 lesson create/update/delete/reorder 는 대상 course 가 lecture 일 때만 (legacy → 404)
  *  재검토 P1-7 certificate issue: POST /certificates/issue 는 courseId 가 lecture scope 일 때만 (legacy → 404)
  *  재검토 P2-1 progress 필드   : web-lecture 어댑터는 서버 영속 필드 progressPercentage 를 읽는다
+ *  3차 P1-8  status allowlist  : 강사 PATCH 로 status(published 등) 를 바꿀 수 없다 — 상태 전이는 전용 endpoint 만
+ *  3차 P1-9  certificate 변경  : update/revoke/renew 는 lecture course 의 certificate 만 (legacy → 404)
+ *  3차 P1-10 assignment upsert : 대상 lesson 의 course 가 lecture 가 아니면 lecture:admin 도 404
+ *  3차 P1-11 enrollment 승인   : approve/reject 는 lecture course 의 수강만 (legacy → 404 · write 0)
+ *  3차 P1-12 submission 조회   : 강사 submission 경로도 lecture course 만 (admin override 이전에 scope)
+ *  3차 P2-2  progress 목록     : MyEnrollmentsPage 도 progressPercentage 를 읽는다
  *
  * DB 없이 controller/service 를 실제로 실행한다: TypeORM entity 그래프는 virtual mock,
  * DataSource 는 service_memberships / lms_lessons 조회만 흉내낸다.
@@ -27,18 +33,21 @@ jest.mock(
     Progress: class {},
     Enrollment: class {},
     Certificate: class {},
+    InstructorApplication: class {},
     CourseStatus: { DRAFT: 'draft', PENDING_REVIEW: 'pending_review', PUBLISHED: 'published', REJECTED: 'rejected', ARCHIVED: 'archived' },
     ContentKind: { LECTURE: 'lecture', COURSE_MATERIAL: 'course_material' },
     CourseVisibility: { PUBLIC: 'public', MEMBERS: 'members' },
     CourseReusablePolicy: { RESTRICTED: 'restricted', PLATFORM: 'platform' },
-    AttemptStatus: {}, LessonType: {}, ProgressStatus: {}, EnrollmentStatus: {},
+    AttemptStatus: {}, LessonType: {}, ProgressStatus: {},
+    EnrollmentStatus: { PENDING: 'pending', APPROVED: 'approved', REJECTED: 'rejected' },
   }),
   { virtual: true },
 );
 jest.mock('../database/connection.js', () => ({
   AppDataSource: {
     get isInitialized() { return true; },
-    getRepository: () => ({}),
+    // InstructorController 는 Enrollment repository 를 직접 쓴다 — 그 외 repository 는 사용하지 않는다.
+    getRepository: (entity: any) => (entity?.name === 'Enrollment' ? enrollmentRepo : {}),
     query: jest.fn(async (sql: string, params: any[] = []) => {
       if (sql.includes('FROM lms_lessons WHERE id')) {
         const l = lessons[params[0]];
@@ -77,15 +86,34 @@ jest.mock('../modules/credit/entities/CreditTransaction.js', () => ({ CreditSour
 jest.mock('../modules/credit/credit-constants.js', () => ({ CREDIT_DESCRIPTIONS: {} }));
 jest.mock('../modules/lms/utils/certificatePdf.js', () => ({ generateCertificatePdf: jest.fn() }));
 jest.mock('../modules/lms/services/EnrollmentService.js', () => ({ EnrollmentService: { getInstance: () => ({}) } }));
+jest.mock('../modules/lms/services/AssignmentService.js', () => ({ AssignmentService: { getInstance: () => assignmentSvc } }));
+jest.mock('../modules/auth/services/role-assignment.service.js', () => ({ roleAssignmentService: {} }));
 
 import { CourseController } from '../modules/lms/controllers/CourseController.js';
 import { QuizController } from '../modules/lms/controllers/QuizController.js';
-import { CourseService, pickUpdatableCourseFields } from '../modules/lms/services/CourseService.js';
+import { CourseService, pickUpdatableCourseFields, UPDATABLE_COURSE_FIELDS } from '../modules/lms/services/CourseService.js';
 import { QuizService } from '../modules/lms/services/QuizService.js';
 import { LessonController } from '../modules/lms/controllers/LessonController.js';
 import { LessonService } from '../modules/lms/services/LessonService.js';
 import { CertificateController } from '../modules/lms/controllers/CertificateController.js';
 import { CertificateService } from '../modules/lms/services/CertificateService.js';
+import { AssignmentController } from '../modules/lms/controllers/AssignmentController.js';
+import { InstructorController } from '../modules/lms/controllers/InstructorController.js';
+
+const enrollments: Record<string, { id: string; courseId: string; userId: string; status: string }> = {};
+let enrollmentSaves: string[] = [];
+const enrollmentRepo = {
+  findOne: async ({ where }: any) => {
+    const e = enrollments[where.id];
+    return e ? { ...e, course: courses[e.courseId] ? { ...courses[e.courseId] } : null } : null;
+  },
+  save: async (e: any) => { enrollmentSaves.push(e.id); return e; },
+};
+let assignmentWrites: string[] = [];
+const assignmentSvc: any = {
+  upsertAssignment: async (d: any) => { assignmentWrites.push(d.lessonId); return { id: 'as', ...d }; },
+  listSubmissionsForLesson: async () => [],
+};
 
 type CourseRow = { id: string; serviceKey: string | null; visibility: string; instructorId: string; status: string; title: string; isPaid?: boolean; tags?: string[] };
 const courses: Record<string, CourseRow> = {};
@@ -160,7 +188,22 @@ beforeEach(() => {
   const certs: any = CertificateService.getInstance();
   certs.issueCertificate = jest.fn(async (d: any) => { certIssues.push(d.courseId); return { id: 'cert', ...d }; });
   certIssues = [];
+  // 3차 P1-9: certificate → course 관계를 in-memory 로 (update/revoke/renew 는 service 를 stub · write 기록만)
+  certs.getCertificate = jest.fn(async (id: string) => {
+    const c = certificates[id];
+    return c ? { id, userId: c.userId, course: courses[c.courseId] ? { ...courses[c.courseId] } : null } : null;
+  });
+  certs.updateCertificate = jest.fn(async (id: string) => { certMutations.push(['update', id]); return { id }; });
+  certs.revokeCertificate = jest.fn(async (id: string) => { certMutations.push(['revoke', id]); return { id }; });
+  certs.renewCertificate = jest.fn(async (id: string) => { certMutations.push(['renew', id]); return { id }; });
+  certMutations = [];
+  for (const k of Object.keys(certificates)) delete certificates[k];
+  for (const k of Object.keys(enrollments)) delete enrollments[k];
+  enrollmentSaves = [];
+  assignmentWrites = [];
 });
+const certificates: Record<string, { userId: string; courseId: string }> = {};
+let certMutations: [string, string][] = [];
 let lessonWrites: [string, string][] = [];
 let certIssues: string[] = [];
 
@@ -460,6 +503,149 @@ describe('재검토 P1-7 POST /certificates/issue 는 lecture 강의만', () => 
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
+// 3차 P1-8 status allowlist — 강사 PATCH 로 published 자가 승인 금지
+// ─────────────────────────────────────────────────────────────────────────────
+describe('3차 P1-8 PATCH /courses/:id 는 status 를 바꾸지 않는다', () => {
+  it('pickUpdatableCourseFields 는 status 를 버린다', () => {
+    expect(pickUpdatableCourseFields({ title: 't', status: 'published' } as any)).toEqual({ title: 't' });
+    expect(UPDATABLE_COURSE_FIELDS).not.toContain('status');
+  });
+  it('소유 강사가 PATCH { status: published } → 저장된 status 는 draft 그대로', async () => {
+    const res = makeRes();
+    await CourseController.updateCourse(makeReq({ id: 'inst', roles: ['lecture:instructor'], member: true, params: { id: 'lec-pub' }, body: { title: 'renamed', status: 'published' } }), res);
+    expect(res.statusCode).toBe(200);
+    expect(courses['lec-pub'].status).toBe('draft');
+    expect(courses['lec-pub'].title).toBe('renamed');
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 3차 P1-9 certificate update/revoke/renew — lecture course 의 certificate 만
+// ─────────────────────────────────────────────────────────────────────────────
+describe('3차 P1-9 certificate update/revoke/renew 는 lecture 강의 수료증만', () => {
+  beforeEach(() => {
+    certificates['c-lec'] = { userId: 'u', courseId: 'lec-pub' };
+    certificates['c-kpa'] = { userId: 'u', courseId: 'kpa-old' };
+    certificates['c-null'] = { userId: 'u', courseId: 'null-old' };
+  });
+  const op = (extra: any) => makeReq({ id: 'op', roles: ['lecture:operator'], member: true, ...extra });
+
+  it('legacy(kpa-society / null) · 미존재 certificate → 404 · write 0', async () => {
+    for (const id of ['c-kpa', 'c-null', 'ghost']) {
+      let res = makeRes();
+      await CertificateController.updateCertificate(op({ params: { id }, body: { issuerName: 'x' } }), res);
+      expect(res.statusCode).toBe(404);
+      res = makeRes();
+      await CertificateController.revokeCertificate(op({ params: { id } }), res);
+      expect(res.statusCode).toBe(404);
+      res = makeRes();
+      await CertificateController.renewCertificate(op({ params: { id }, body: { months: 12 } }), res);
+      expect(res.statusCode).toBe(404);
+    }
+    expect(certMutations).toEqual([]);
+  });
+  it('lecture certificate → update/revoke/renew 200', async () => {
+    let res = makeRes();
+    await CertificateController.updateCertificate(op({ params: { id: 'c-lec' }, body: { issuerName: 'x' } }), res);
+    expect(res.statusCode).toBe(200);
+    res = makeRes();
+    await CertificateController.revokeCertificate(op({ params: { id: 'c-lec' } }), res);
+    expect(res.statusCode).toBe(200);
+    res = makeRes();
+    await CertificateController.renewCertificate(op({ params: { id: 'c-lec' }, body: { months: 6 } }), res);
+    expect(res.statusCode).toBe(200);
+    expect(certMutations).toEqual([['update', 'c-lec'], ['revoke', 'c-lec'], ['renew', 'c-lec']]);
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 3차 P1-10 assignment upsert — scope 가 admin override 보다 먼저
+// ─────────────────────────────────────────────────────────────────────────────
+describe('3차 P1-10 POST /assignments 는 lecture 강의의 lesson 만', () => {
+  beforeEach(() => {
+    lessons['les-lec'] = { courseId: 'lec-pub' };
+    lessons['les-kpa'] = { courseId: 'kpa-old' };
+    lessons['les-null'] = { courseId: 'null-old' };
+  });
+  it('lecture:admin 도 legacy lesson 에 assignment 를 만들 수 없다 → 404 · write 0', async () => {
+    for (const lessonId of ['les-kpa', 'les-null', 'ghost']) {
+      const res = makeRes();
+      await AssignmentController.upsertAssignment(makeReq({ id: 'adm', roles: ['lecture:admin'], member: true, body: { lessonId, instructions: 'x' } }), res);
+      expect(res.statusCode).toBe(404);
+    }
+    expect(assignmentWrites).toEqual([]);
+  });
+  it('lecture lesson: 소유자 200 · 타 강사 403 · admin 200', async () => {
+    let res = makeRes();
+    await AssignmentController.upsertAssignment(makeReq({ id: 'inst', roles: ['lecture:instructor'], member: true, body: { lessonId: 'les-lec' } }), res);
+    expect(res.statusCode).toBe(200);
+    res = makeRes();
+    await AssignmentController.upsertAssignment(makeReq({ id: 'other', roles: ['lecture:instructor'], member: true, body: { lessonId: 'les-lec' } }), res);
+    expect(res.statusCode).toBe(403);
+    res = makeRes();
+    await AssignmentController.upsertAssignment(makeReq({ id: 'adm', roles: ['lecture:admin'], member: true, body: { lessonId: 'les-lec' } }), res);
+    expect(res.statusCode).toBe(200);
+    expect(assignmentWrites).toEqual(['les-lec', 'les-lec']);
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 3차 P1-11 enrollment approve/reject — lecture course 의 수강만
+// ─────────────────────────────────────────────────────────────────────────────
+describe('3차 P1-11 POST /instructor/enrollments/:id/approve|reject 는 lecture 강의만', () => {
+  beforeEach(() => {
+    enrollments['en-lec'] = { id: 'en-lec', courseId: 'lec-pub', userId: 'stu', status: 'pending' };
+    enrollments['en-kpa'] = { id: 'en-kpa', courseId: 'kpa-old', userId: 'stu', status: 'pending' };
+    enrollments['en-null'] = { id: 'en-null', courseId: 'null-old', userId: 'stu', status: 'pending' };
+  });
+  it('legacy 수강은 소유 강사·lecture:admin 모두 404 · save 0', async () => {
+    for (const id of ['en-kpa', 'en-null']) {
+      for (const who of [{ id: 'inst', roles: ['lecture:instructor'] }, { id: 'adm', roles: ['lecture:admin'] }]) {
+        let res = makeRes();
+        await InstructorController.approveEnrollment(makeReq({ ...who, member: true, params: { id } }), res);
+        expect(res.statusCode).toBe(404);
+        res = makeRes();
+        await InstructorController.rejectEnrollment(makeReq({ ...who, member: true, params: { id }, body: { reason: 'r' } }), res);
+        expect(res.statusCode).toBe(404);
+      }
+    }
+    expect(enrollmentSaves).toEqual([]);
+  });
+  it('lecture 수강: 타 강사 403 · 소유자 approve 200 (저장 1)', async () => {
+    let res = makeRes();
+    await InstructorController.approveEnrollment(makeReq({ id: 'other', roles: ['lecture:instructor'], member: true, params: { id: 'en-lec' } }), res);
+    expect(res.statusCode).toBe(403);
+    res = makeRes();
+    await InstructorController.approveEnrollment(makeReq({ id: 'inst', roles: ['lecture:instructor'], member: true, params: { id: 'en-lec' } }), res);
+    expect(res.statusCode).toBe(200);
+    expect(enrollmentSaves).toEqual(['en-lec']);
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 3차 P1-12 instructor submission 조회 — admin override 이전에 scope
+// ─────────────────────────────────────────────────────────────────────────────
+describe('3차 P1-12 GET /instructor/lessons/:lessonId/submissions 는 lecture 강의만', () => {
+  beforeEach(() => {
+    lessons['les-lec'] = { courseId: 'lec-pub' };
+    lessons['les-kpa'] = { courseId: 'kpa-old' };
+  });
+  it('lecture:admin 도 legacy lesson 의 submission 을 볼 수 없다 → 404', async () => {
+    const res = makeRes();
+    await InstructorController.listLessonSubmissions(makeReq({ id: 'adm', roles: ['lecture:admin'], member: true, params: { lessonId: 'les-kpa' } }), res);
+    expect(res.statusCode).toBe(404);
+  });
+  it('lecture lesson: 타 강사 403 · admin 200', async () => {
+    let res = makeRes();
+    await InstructorController.listLessonSubmissions(makeReq({ id: 'other', roles: ['lecture:instructor'], member: true, params: { lessonId: 'les-lec' } }), res);
+    expect(res.statusCode).toBe(403);
+    res = makeRes();
+    await InstructorController.listLessonSubmissions(makeReq({ id: 'adm', roles: ['lecture:admin'], member: true, params: { lessonId: 'les-lec' } }), res);
+    expect(res.statusCode).toBe(200);
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
 // 정적 계약 — 프런트 편집기 경로 / 라우트 등록
 // ─────────────────────────────────────────────────────────────────────────────
 import * as fs from 'fs';
@@ -485,6 +671,9 @@ describe('정적 계약', () => {
   it('web-lecture 어댑터는 서버 영속 필드 progressPercentage 를 읽는다 (재검토 P2-1)', () => {
     const adapter = read('services/web-lecture/src/lib/lmsViewAdapter.ts');
     expect(adapter).toContain('progress: e.progressPercentage ?? e.progress ?? 0,');
+    // 3차 P2-2: 목록 화면도 영속 필드를 직접 읽는다
+    const page = read('services/web-lecture/src/pages/learner/MyEnrollmentsPage.tsx');
+    expect(page).toContain('percent={e.progressPercentage ?? e.progress ?? 0}');
     const svc = read('apps/api-server/src/modules/lms/services/EnrollmentService.ts');
     expect(svc).toContain('progressPercentage');
   });

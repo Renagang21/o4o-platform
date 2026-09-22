@@ -66,8 +66,10 @@ export const UPDATABLE_COURSE_FIELDS: ReadonlyArray<keyof UpdateCourseRequest> =
   'title', 'description', 'thumbnail', 'duration',
   'organizationId', 'isOrganizationExclusive', 'isRequired', 'requiresApproval', 'maxEnrollments',
   'startAt', 'endAt', 'credits', 'metadata', 'tags', 'isPaid', 'price',
-  'contentKind', 'visibility', 'reusablePolicy', 'status',
+  'contentKind', 'visibility', 'reusablePolicy',
 ];
+// `status` 는 allowlist 에 없다 — 상태 전이는 전용 endpoint(submit-review / publish / unpublish / archive ·
+// operator approve/reject) 로만 일어난다 (재검토 P1-8: 강사가 PATCH 로 published 자가 승인 금지).
 
 export function pickUpdatableCourseFields(data: UpdateCourseRequest): UpdateCourseRequest {
   const picked: Record<string, unknown> = {};

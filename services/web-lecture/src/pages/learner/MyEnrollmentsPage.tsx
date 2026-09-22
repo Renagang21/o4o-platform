@@ -38,7 +38,7 @@ export default function MyEnrollmentsPage() {
           <Link to={coursePath(e.courseId)} className="list-title">{e.course?.title ?? '강의'}</Link>
           <span className={`badge badge-${e.status}`}>{STATUS_LABEL[e.status] ?? e.status}</span>
         </div>
-        <CourseProgressBar percent={e.progress ?? 0} />
+        <CourseProgressBar percent={e.progressPercentage ?? e.progress ?? 0} />
         <div className="list-meta muted">완료 {e.completedLessons ?? 0}/{e.course?.lessonCount ?? '-'} 레슨</div>
       </li>)}
     </ul>

@@ -187,11 +187,31 @@ export class CertificateController extends BaseController {
     }
   }
 
+  /**
+   * PR #225 merge-gate 재검토 P1-9: update/revoke/renew 대상 certificate 는 lecture course 의 것만.
+   * legacy(KPA/PH) certificate 는 non-disclosure 404 · write 0. `null` 이면 이미 응답된 상태다.
+   */
+  private static async loadLectureCertificateOr404(req: Request, res: Response, id: string | undefined) {
+    if (!id) {
+      BaseController.notFound(res, 'Certificate not found');
+      return null;
+    }
+    const certificate = await CertificateService.getInstance().getCertificate(id);
+    if (!certificate) {
+      BaseController.notFound(res, 'Certificate not found');
+      return null;
+    }
+    if (!guardLoadedCourseScope(req, res, certificate.course?.serviceKey, 'Certificate not found')) return null;
+    return certificate;
+  }
+
   static async updateCertificate(req: Request, res: Response): Promise<any> {
     try {
       const { id } = req.params;
       const data = req.body;
       const service = CertificateService.getInstance();
+
+      if (!(await CertificateController.loadLectureCertificateOr404(req, res, id))) return;
 
       const certificate = await service.updateCertificate(id, data);
 
@@ -212,6 +232,8 @@ export class CertificateController extends BaseController {
       const { id } = req.params;
       const service = CertificateService.getInstance();
 
+      if (!(await CertificateController.loadLectureCertificateOr404(req, res, id))) return;
+
       const certificate = await service.revokeCertificate(id);
 
       return BaseController.ok(res, { certificate, message: 'Certificate revoked successfully' });
@@ -231,6 +253,8 @@ export class CertificateController extends BaseController {
       const { id } = req.params;
       const { months } = req.body;
       const service = CertificateService.getInstance();
+
+      if (!(await CertificateController.loadLectureCertificateOr404(req, res, id))) return;
 
       const certificate = await service.renewCertificate(id, months);
 

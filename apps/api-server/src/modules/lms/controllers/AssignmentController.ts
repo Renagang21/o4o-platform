@@ -6,7 +6,7 @@ import { CourseService } from '../services/CourseService.js';
 import logger from '../../../utils/logger.js';
 // WO-O4O-LMS-CROSSSERVICE-READ-WRITE-BOUNDARY-COMPLETION-V1 §5
 import { guardLessonScope, guardAssignmentScope } from '../utils/lms-scope-guard.js';
-import { rolesIncludeLectureAdmin } from '../middleware/lecture-access.js';
+import { rolesIncludeLectureAdmin, isLectureCourse } from '../middleware/lecture-access.js';
 
 /**
  * AssignmentController
@@ -16,23 +16,21 @@ import { rolesIncludeLectureAdmin } from '../middleware/lecture-access.js';
 export class AssignmentController extends BaseController {
   /**
    * Verify the requesting user owns the course (or is lecture:admin).
+   * PR #225 merge-gate 재검토 P1-10: 대상 lesson 의 course 가 lecture 가 아니면 lecture:admin 도
+   * non-disclosure 404 — scope 판정이 ownership override 보다 항상 먼저다.
    */
   private static async checkLessonOwnership(
     lessonId: string,
     userId: string,
     userRoles: string[],
   ): Promise<{ allowed: boolean; notFound: boolean; courseId?: string }> {
-    if (rolesIncludeLectureAdmin(userRoles)) {
-      const lesson = await LessonService.getInstance().getLesson(lessonId);
-      if (!lesson) return { allowed: false, notFound: true };
-      return { allowed: true, notFound: false, courseId: lesson.courseId };
-    }
-
     const lesson = await LessonService.getInstance().getLesson(lessonId);
     if (!lesson) return { allowed: false, notFound: true };
 
     const course = await CourseService.getInstance().getCourse(lesson.courseId);
-    if (!course) return { allowed: false, notFound: true };
+    if (!course || !isLectureCourse(course.serviceKey)) return { allowed: false, notFound: true };
+
+    if (rolesIncludeLectureAdmin(userRoles)) return { allowed: true, notFound: false, courseId: lesson.courseId };
 
     return { allowed: course.instructorId === userId, notFound: false, courseId: lesson.courseId };
   }

@@ -363,6 +363,23 @@ spec 추가: 재검토 P1-6 4건(legacy create/update/delete/reorder 404 · writ
 - 처리: 저장소 선례(`notifications.routes.ts` · `store-owner-terminations.routes.ts`)와 동일하게 `middleware/rateLimiter` 의 `apiLimiter`(분당 60 · key=(ip,userId)) 를 LMS 라우터 전체에 `router.use(apiLimiter)` 로 적용. 새 limiter 정의 0 · 의존성 0.
 - `setup-middlewares.ts:240` 은 범위 외(pre-existing · 미접촉) — 보고만. CodeQL 이 이를 계속 "new" 로 집계하면 팀장 판정 사항.
 
+### 17-3-d. Codex 3차 재검토(`6d1c89576` 대상) — 신규 지적 처리표 + 동일 계열 일괄 정리
+
+3차 지적은 전부 **"legacy course 가 ID 로 Lecture runtime 의 write/ownership 경로에 도달"** 하는 동일 계열이다. 지적 6건만 고치지 않고 LMS controller 의 course/lesson/enrollment 로딩 지점을 전수 sweep 해 **scope 판정을 ownership override(`lecture:admin`) 보다 항상 먼저** 두는 규칙으로 통일했다.
+
+| # | 등급 | 지적 | 처리 | 판정 |
+|---|---|---|---|---|
+| 9 | P1 | `UPDATABLE_COURSE_FIELDS` 에 `status` 가 남아 강사가 PATCH 로 `published` 자가 승인 가능 | `status` 를 allowlist 에서 제거 — 상태 전이는 전용 endpoint(submit-review / publish / unpublish / archive · operator approve/reject) 만. web-lecture `CourseInput` 은 status 를 보내지 않음(소비처 영향 0) | **FIXED** |
+| 10 | P1 | `PATCH/POST /certificates/:id(update·revoke·renew)` 가 certificate 의 course scope 를 검사하지 않음 | `CertificateController.loadLectureCertificateOr404` — certificate→course 를 로드해 `guardLoadedCourseScope` 로 lecture 만 통과 · legacy/미존재 404 · write 0 | **FIXED** |
+| 11 | P1 | `AssignmentController.checkLessonOwnership` 가 lecture:admin 이면 lesson 만 보고 허용 → legacy lesson 에 assignment upsert 가능 | lesson→course 를 항상 로드 · `isLectureCourse` 아니면 admin 이라도 404 · 그 뒤 admin override | **FIXED** |
+| 12 | P1 | `InstructorController.approveEnrollment / rejectEnrollment` 가 enrollment.course 의 serviceKey 를 검사하지 않음 | ownership 이전에 `isLectureCourse(enrollment.course?.serviceKey)` — legacy 수강은 404 · save 0 | **FIXED** |
+| 13 | P1 | `InstructorController.checkLessonOwnership` 가 admin 이면 course 로드 없이 허용 → legacy submission 열람/채점 가능 | course 로드 + lecture 검사를 admin early-return 앞으로 이동 | **FIXED** |
+| 14 | P2 | `MyEnrollmentsPage` 가 `e.progress` 만 읽어 목록 진행률 0% | `progressPercentage ?? progress ?? 0` | **FIXED** |
+
+sweep(지적 외 · 동일 계열): `InstructorController` `dashboardStats · participants · participantsSummary · participantsExport · courseLessons · coursePoints` 6곳 — `select` 에 `serviceKey` 추가 + `isLectureCourse` 아니면 404. `QuizController.createQuiz` 의 courseId 소유권 검사도 legacy course 404. (`QuizController` 나머지 · `LessonController` · `CourseController` · `EnrollmentController` 는 2차까지 이미 scope-first.)
+
+spec 추가(3차): P1-8 2건 · P1-9 2건 · P1-10 2건 · P1-11 2건 · P1-12 2건 · P2-2 정적 1건 → merge-gate spec **56/56**.
+
 
 ### 17-4. 검증 (merge-gate)
 
@@ -371,6 +388,7 @@ spec 추가: 재검토 P1-6 4건(legacy create/update/delete/reorder 404 · writ
 | shared-space-ui vitest | 8 files / 100 PASS |
 | api-server tsc | 0 |
 | api-server jest 전체 (1차 f3b8c8ca5) | 전체 실행 345 suites(4 skipped) — 344 PASS + `lms-operator-multi-service-scope` 1 FAIL(정적 계약이 `isLectureCourse` 정의를 routes 파일에서 찾음 → lecture-access.ts 로 승격된 위치로 assertion 갱신 · 완화 0) → 재실행 PASS. 최종 345/345 · 5799 tests PASS(32 skipped) · 0 FAIL |
+| 3차(재검토 반영 · §17-3-d) | api-server tsc 0 · web-lecture tsc 0 · vite build PASS · merge-gate spec 56/56 · api-server jest 전체 345/345 suites(4 skipped) · 5817 tests PASS(32 skipped) |
 | 2차(재검토 반영) | api-server tsc 0 · web-lecture tsc 0 · lecture 3 suites 71/71 · api-server jest 전체 345/345 suites · 5807 tests PASS(32 skipped · 0 FAIL — P1-6/7/P2 반영본 · apiLimiter 1줄은 tsc+lecture 3 suites 로 로컬 확인, 전체는 CI jest) |
 | web-lecture tsc · vite build | 0 · PASS |
 | shared-space-ui · web-kpa-society · web-k-cosmetics · web-pharmacy-hub · admin-dashboard tsc | 전부 0 |
