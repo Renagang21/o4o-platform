@@ -17,8 +17,13 @@ import InitialRedirect from '@/components/InitialRedirect';
  * CMS V2 미리보기 축인 `/preview/:slug` + `ViewPreview` 는 그대로 보존한다.
  */
 const Login = lazy(() => import('@/pages/auth/Login'));
-const ForgotPassword = lazy(() => import('@/pages/auth/ForgotPassword'));
-const ResetPassword = lazy(() => import('@/pages/auth/ResetPassword'));
+/**
+ * WO-O4O-GOOGLE-IDENTITY-OPERATOR-EXPLICIT-LINK-V1 §15-4 (2026-09-22)
+ *   Admin 로그인 수단을 Google 하나로 고정하면서 `/forgot-password` · `/reset-password` **route 등록을 제거**했다.
+ *   관리자 user 의 `users.password` 는 NULL 이라 재설정 대상이 없고, 새 reset 링크를 발급할 진입점도 없다.
+ *   화면 파일(`pages/auth/ForgotPassword.tsx` · `ResetPassword.tsx`)은 삭제하지 않는다 — 다른 서비스 surface 의
+ *   password 경로가 남아 있고, legacy 은퇴(WO-2F)에서 일괄 판단한다.
+ */
 const ViewPreview = lazy(() => import('@/pages/preview/ViewPreview'));
 // WO-O4O-ADMIN-DASHBOARD-LEGACY-ROUTE-API-AND-NAVIGATION-CLOSURE-V1:
 //   /storefront/* (pages/storefront, Phase 7-I 소비자 storefront) 는 O4O 자체 소비자
@@ -47,19 +52,6 @@ export function PublicRoutes() {
     <Route key="/login" path="/login" element={
       <Suspense fallback={<PageLoader />}>
         <Login />
-      </Suspense>
-    } />,
-
-    // 비밀번호 재설정 페이지
-    <Route key="/forgot-password" path="/forgot-password" element={
-      <Suspense fallback={<PageLoader />}>
-        <ForgotPassword />
-      </Suspense>
-    } />,
-
-    <Route key="/reset-password" path="/reset-password" element={
-      <Suspense fallback={<PageLoader />}>
-        <ResetPassword />
       </Suspense>
     } />,
 

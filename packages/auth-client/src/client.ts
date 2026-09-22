@@ -338,7 +338,7 @@ export class AuthClient {
   }
 
   /**
-   * WO-O4O-GOOGLE-IDENTITY-OPERATOR-EXPLICIT-LINK-V1 §9 — 전환기 1회용 Admin Google Bootstrap.
+   * WO-O4O-GOOGLE-IDENTITY-OPERATOR-EXPLICIT-LINK-V1 §15 — 전환기 1회용 Admin Google Bootstrap.
    * 세션 없이 호출한다. 서버가 env 플래그 + 일회용 코드를 확인하고 `platform:super_admin` users.id 에 연결한다.
    * 실패(404 비활성 · 401 코드 오류 · 409 이미 연결/다른 사용자)는 axios 오류로 전파된다.
    */

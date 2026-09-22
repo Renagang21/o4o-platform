@@ -172,7 +172,7 @@ export const playbackLogLimiter = rateLimit({
 
 // Export all limiters as an object for convenience
 /**
- * Admin Google Bootstrap (WO-O4O-GOOGLE-IDENTITY-OPERATOR-EXPLICIT-LINK-V1 §9)
+ * Admin Google Bootstrap (WO-O4O-GOOGLE-IDENTITY-OPERATOR-EXPLICIT-LINK-V1 §15)
  * 전환기 1회용 경로 — 코드 추측을 막기 위해 IP 당 시간당 10회로 강하게 제한한다.
  */
 export const googleAdminBootstrapLimiter = rateLimit({

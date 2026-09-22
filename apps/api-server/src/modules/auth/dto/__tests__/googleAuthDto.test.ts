@@ -46,7 +46,7 @@ describe('Google auth DTO — 입력 계약', () => {
       expect(errors.some((e) => e.property === field && e.constraints?.whitelistValidation)).toBe(true);
     }
   });
-  it('bootstrap-admin: { idToken, bootstrapCode } 만 허용 — 대상 지정 필드는 400 (WO §9)', async () => {
+  it('bootstrap-admin: { idToken, bootstrapCode } 만 허용 — 대상 지정 필드는 400 (WO §15)', async () => {
     expect(await run(GoogleAdminBootstrapRequestDto, { idToken: 't', bootstrapCode: 'c' })).toHaveLength(0);
     expect((await run(GoogleAdminBootstrapRequestDto, { idToken: 't' })).length).toBeGreaterThan(0);
     expect((await run(GoogleAdminBootstrapRequestDto, { bootstrapCode: 'c' })).length).toBeGreaterThan(0);

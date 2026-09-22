@@ -1,5 +1,5 @@
 /**
- * WO-O4O-GOOGLE-IDENTITY-OPERATOR-EXPLICIT-LINK-V1 §9 — Admin Google Bootstrap(전환기 1회용) 계약
+ * WO-O4O-GOOGLE-IDENTITY-OPERATOR-EXPLICIT-LINK-V1 §15 — Admin Google Bootstrap(전환기 1회용) 계약
  *
  * 이 경로는 세션도 비밀번호도 요구할 수 없는 유일한 연결 경로이므로 게이트를 테스트로 고정한다.
  *  - 플래그/코드가 없으면 `GOOGLE_ADMIN_BOOTSTRAP_DISABLED`(404) — ID token 검증조차 하지 않는다.

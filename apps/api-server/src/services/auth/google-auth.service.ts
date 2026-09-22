@@ -409,7 +409,7 @@ export class GoogleAuthService {
   }
 
   /**
-   * POST /auth/google/bootstrap-admin (WO-O4O-GOOGLE-IDENTITY-OPERATOR-EXPLICIT-LINK-V1 §9)
+   * POST /auth/google/bootstrap-admin (WO-O4O-GOOGLE-IDENTITY-OPERATOR-EXPLICIT-LINK-V1 §15)
    * 전환기 1회용: 세션·비밀번호 없이 기존 `platform:super_admin` users.id 에 검증된 Google sub 를 연결한다.
    * 순서: 플래그 → 일회용 코드 → ID token 검증 → (트랜잭션) 대상 판정 · 충돌 검사 · INSERT.
    * users 신설 0 · users.email/password/role/membership/service_credentials 변경 0 · 세션 발급 0.
