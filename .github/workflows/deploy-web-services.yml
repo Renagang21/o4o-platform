@@ -24,7 +24,7 @@ on:
       - 'services/web-kpa-branch/**'
       # WO-O4O-SIGNAGE-PLAYER-WEB-DEPLOYMENT-ADOPTION-AND-PRODUCTION-SMOKE-V1
       - 'services/signage-player-web/**'
-      # WO-O4O-HOSPITAL-PHARMACY-SERVICE-FOUNDATION-V1 — hospital.neture.co.kr (병원약국 전문 서비스)
+      # WO-O4O-HOSPITAL-PHARMACY-SERVICE-FOUNDATION-V1 — neture.co.kr/hospital (병원약국 · 임시 서비스 · 서브디렉토리)
       - 'services/web-hospital-pharmacy/**'
       - 'packages/**'
       - '.github/workflows/deploy-web-services.yml'
@@ -71,7 +71,7 @@ env:
   # 병원약국 전문 서비스. 원내 목록은 브라우저 localStorage 에만 저장(D2) — API base 만 주입한다.
   # DNS·인증서(hospital.neture.co.kr) 는 Foundation 범위 밖(사용자측 · signage-player·pharmacy-hub 선례).
   VITE_API_URL_HOSPITAL_PHARMACY: https://api.neture.co.kr
-  VITE_SERVICE_URL_HOSPITAL_PHARMACY: https://hospital.neture.co.kr
+  VITE_SERVICE_URL_HOSPITAL_PHARMACY: https://neture.co.kr/hospital
 
 jobs:
   detect-changes:

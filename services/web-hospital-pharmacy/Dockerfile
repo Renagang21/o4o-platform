@@ -32,6 +32,10 @@ FROM node:20-alpine AS runner
 WORKDIR /app
 RUN npm install -g serve
 COPY --from=builder /app/services/web-hospital-pharmacy/dist ./dist
+# 정본 진입은 neture.co.kr/hospital (LB 가 `/hospital/...` 을 그대로 전달) · Cloud Run 직접 URL 은 root 진입.
+# 같은 이미지가 두 진입을 서빙해야 하므로 dist 를 `/hospital` 아래에도 둔다(kpa-branch `/kpa` 선례).
+# HTML 은 `serve -s` 의 SPA fallback(dist/index.html)이 두 경우 모두 처리한다.
+RUN cp -r ./dist ./dist-base && mv ./dist-base ./dist/hospital
 ENV PORT=8080
 EXPOSE 8080
 CMD ["serve", "-s", "dist", "-l", "8080"]
