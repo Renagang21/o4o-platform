@@ -1,102 +1,157 @@
 # WO-O4O-STORE-AI-FIRST-E2E-CLOSURE-V1
 
-> **상태**: **HANDOFF / BLOCKED_BY_STORE_OWNER_ACCOUNT** — 접수만. **Gate 0(유효 store_owner smoke 계정) 확인 전 실행 금지.** 계정 준비가 확인되면 팀장 즉시 실행 승인 예정 · **접수**: 2026-09-21 · **CHECK**: (실행 후 `docs/checks/CHECK-O4O-STORE-AI-FIRST-E2E-CLOSURE-V1.md`)
-> 내 매장 AI First 리팩터링 **5단계(마지막)**. 선행 WO1 [`…-AI-FIRST-EDITOR-BOUNDARY-V1`](WO-O4O-STORE-AI-FIRST-EDITOR-BOUNDARY-V1.md) · WO2 [`…-EXTERNAL-LLM-CONTENT-AUTHORING-V1`](WO-O4O-STORE-EXTERNAL-LLM-CONTENT-AUTHORING-V1.md) · WO3 [`…-PRODUCTION-EXTERNAL-LLM-REALIGNMENT-V1`](WO-O4O-STORE-PRODUCTION-EXTERNAL-LLM-REALIGNMENT-V1.md) · WO4 [`…-INTERNAL-AI-RETIREMENT-V1`](WO-O4O-STORE-INTERNAL-AI-RETIREMENT-V1.md) 은 전부 `COMPLETE_WITH_SMOKE_PENDING` — 코드·계약 테스트·빌드·배포·bundle 은 PASS 이나 **실제 브라우저 Store smoke 가 store-owner 로그인 불가로 4건 모두 `PENDING_USER_VERIFICATION`** 이다. 이 WO 는 그 4건을 실제 사용자 흐름으로 닫는다.
->
-> 실행 시 최신 `origin/main` 에서 다시 census 하고, 동일 파일에 다른 세션 WIP 가 있으면 즉시 보고 · 중지한다.
+> **상태**: HANDOFF ONLY — **차단: 유효한 store-owner 테스트 계정**. 계정 확보 전에는 착수하지 않는다. · **접수**: 2026-09-22 · **CHECK**: (실행 후 `docs/checks/CHECK-O4O-STORE-AI-FIRST-E2E-CLOSURE-V1.md`)
+> 내 매장 AI First 리팩터링 **5단계(마지막)**. WO1 [`EDITOR-BOUNDARY`](WO-O4O-STORE-AI-FIRST-EDITOR-BOUNDARY-V1.md) · WO2 [`EXTERNAL-LLM-CONTENT-AUTHORING`](WO-O4O-STORE-EXTERNAL-LLM-CONTENT-AUTHORING-V1.md) · WO3 [`PRODUCTION-EXTERNAL-LLM-REALIGNMENT`](WO-O4O-STORE-PRODUCTION-EXTERNAL-LLM-REALIGNMENT-V1.md) · WO4 [`INTERNAL-AI-RETIREMENT`](WO-O4O-STORE-INTERNAL-AI-RETIREMENT-V1.md) 가 남긴 **브라우저 smoke PENDING_USER_VERIFICATION 을 일괄 실측**해 트랙을 닫는다. 새 기능·리팩터링은 하지 않는다.
 
-## 1. 목적
+## 0. 현재 상태 (접수 시점)
 
-```text
-WO1  showInternalAi={false}          → 브라우저 확인 PENDING
-WO2  ChatGPT로 작업 · 일반 콘텐츠/제작자료 → 브라우저 확인 PENDING
-WO3  Blog · POP · 상품설명 · 다국어 · QR   → 브라우저 확인 PENDING
-WO4  Store 내부 AI 잔존 0                → 브라우저 확인 PENDING
-WO5  (이번) 정상 인증된 실제 store_owner 문맥에서 위 4건을 실 브라우저로 일괄 검증
-     · 발견된 회귀는 최소 수정 · WO1~4 CHECK 의 PENDING 열을 PASS/FAIL 로 확정
-```
+| WO | 코드 | 판정 | 남은 것 |
+|---|---|---|---|
+| WO1 | `c996691c0` 외 | COMPLETE_WITH_SMOKE_PENDING | 브라우저 smoke |
+| WO2 | `5a91a3970` | COMPLETE_WITH_SMOKE_PENDING | 브라우저 smoke |
+| WO3 | `3a41a04fe` | COMPLETE_WITH_SMOKE_PENDING | 브라우저 smoke |
+| WO4 | `366e5965b` · `e1cc661ee` | COMPLETE_WITH_SMOKE_PENDING | 브라우저 smoke |
 
-이 WO 는 **새 기능을 만들지 않는다.** 산출물은 ① 실사용 흐름 검증 결과 ② 회귀 최소 수정(있을 때만) ③ WO1~4 smoke closure 이다.
+코드·계약·빌드·배포·bundle·운영 API(`/api/ai/qr-description` 404 · `/api/ai/content` 401)는 이미 검증됐다. 2026-09-22 최신 main(`3960af039`) 재실행: api-server 4 spec **202/202** · store-ui-core vitest **125/125** PASS(회귀 0).
 
-## 2. Gate 0 — 유효 store_owner smoke 계정 (실행 전제)
+## 1. 선행 조건 (차단 해소 전 착수 금지)
 
-현재 증거: `STORE_OWNER_SMOKE_ACCOUNT = NOT_READY / NOT_VERIFIED`.
+로그인 가능한 **store-owner(매장 경영자) 계정**이 필요하다. 현재 불가 사유:
 
-| 확인된 사실 | 출처 |
-|---|---|
-| `docs/local/TEST-ACCOUNTS.local.md` 의 store_owner 계정(`renagang21`) — KPA·PH 로그인 API `401 INVALID_USER` | WO1 CHECK §6-1 |
-| 보조 계정 KPA `403` lockout(로그인 시도 과다) | WO1 CHECK §6-1 |
-| `renagang21` 은 이후 Google Identity 트랙에서 **Google-only 신규 user(password NULL · role/membership 0)** 로 재정의됨 — password 로그인 경로 아님 | Google Identity CHECK smoke 2~4 |
-| WO2·3·4 는 lockout 위험으로 **추가 로그인 시도 없이** PENDING 유지 | 각 CHECK §6/§7 |
+- `docs/local/TEST-ACCOUNTS.local.md` §7 내 매장 smoke 전용 계정 2개 = `suspended`(smoke 종료 후 비활성화, 2026-08-13).
+- `renagang21` = Google-only 계정(`users.password` NULL) → 폼 로그인 불가.
+- WO1 CHECK 실측: store-owner 계정 KPA·PH `401 INVALID_USER`, 보조 계정 KPA `403` lockout. 이후 users reset 으로 테스트 계정 0.
 
-**Gate 0 PASS 조건** (전부 충족):
-
-1. **정상 인증 경로**로 로그인되는 계정 — 현행 인증 방향에 맞춰 **Google 로그인 우선**. 과거 email/password 테스트 계정 복구 · 새 seed 계정 · DB 직접 role/membership INSERT · lockout 해제 조작은 **모두 금지**(§6).
-2. 그 user 가 대상 서비스에서 **`store_owner` 역할 + 매장(organization) 연결**을 정상 경로(서비스 가입 → 운영자 승인 · 사업자정보 5항목 gate 포함)로 갖는다. 서비스별로 나눠도 된다 — KPA / K-Cosmetics / PharmacyHub 중 **실제 Store Workspace 가 있는 서비스 최소 1개** 이상.
-3. `store_owner_agreement` 가 실행 시점에 게시(ACTIVE)돼 있으면 Store Workspace 진입 시 `428 STORE_OWNER_AGREEMENT_REQUIRED` 가 정상이다 — 이 경우 **명시적 동의 1회**가 Gate 1 에 포함된다(현재는 DRAFT · 미게시 = gate no-op).
-4. 계정 식별자 · 자격정보는 `docs/local/TEST-ACCOUNTS.local.md`(git 미추적) 에만 갱신. CHECK · 커밋 · 로그에 기록하지 않는다.
-
-Gate 0 는 **사용자/운영자가 준비하고 확인을 알려주는 것**이며, 이 WO 실행자가 만들지 않는다. 확인 전에는 로그인 시도 자체를 하지 않는다(lockout 재발 방지).
-
-## 3. Gate 구조 · 검증 항목
+해소 경로(사용자 선택):
 
 ```text
-Gate 0  Valid Store Owner Account (§2)                       ← 사용자 확인
-   ↓ PASS
-Gate 1  로그인 → Store Workspace 진입(서비스별 최소 1) · (게시 시) 계약 동의 1회
-   ↓
-Gate 2  일반 콘텐츠 · 제작 자료 — ChatGPT로 작업 → 안내 복사 → 붙여넣기 → 편집기 반영 → 기존 저장 → 재조회
-   ↓
-Gate 3  Blog / POP / 상품 설명 / 다국어 / QR — 각 1회 동일 흐름 + 목적별 조건 문구 확인
-   ↓
-Gate 4  기존 실행 회귀 — 태블릿 · 사이니지 · PDF · QR 목록 "AI 설명" 탭 · legacy QR 콘텐츠 편집 진입
-   ↓
-Gate 5  Store internal AI = 0 재확인 — 툴바 AI 버튼 없음 · "AI로 설명 만들기" 없음 · 저장 row generatedBy 키 부재
-   ↓
-WO1~4 CHECK 의 PENDING 열 → PASS / FAIL 확정
+(a) §7 smoke 계정 재활성화 + L2 service_credential 재발급 (승인 필요 — write)
+(b) 새 store-owner 테스트 계정 생성 + 매장 org 멤버십 부여 (승인 필요 — write)
+(c) 사용자가 직접 로그인한 브라우저에서 §3 스크립트를 수행하고 결과를 전달
 ```
 
-세부 확인 목록은 각 CHECK 의 "재개 절차"를 그대로 따른다 — WO1 CHECK §6-1(미수행 항목) · WO2 CHECK §6-3 · WO3 CHECK §7(서비스별 route 목록 · 목적별 조건 문구 5종) · WO4 CHECK §7(QR 은퇴 확인 6항목). 여기에 복제하지 않는다.
+**계정 write(생성·재활성화·권한 부여)는 중지 조건**이다. 사용자 명시 승인 없이 수행하지 않는다. 로그인 재시도도 lockout 위험 때문에 승인 전 금지.
 
-- Gate 2·3 의 "ChatGPT" 단계는 **사용자 자신의 외부 LLM 계정**으로 수행하거나, 붙여넣을 HTML 을 실행자가 임의 작성해도 무방하다(검증 대상은 O4O 쪽 안내 복사 → 붙여넣기 → 저장 계약이지 LLM 출력 품질이 아님).
-- 서비스별 분담 허용: 한 계정으로 3 서비스를 억지로 검증하지 않는다. 서비스별 Store Workspace 가 있는 계정 범위 안에서 **대표 smoke** 를 나누고, 검증 못 한 서비스는 CHECK 에 `NOT_COVERED(계정 없음)` 로 남긴다.
-- 실 브라우저로 한다(bundle grep · API 응답만으로 PASS 처리 금지). 저장 결과 확인은 화면 재조회 + 필요 시 read-only DB 조회.
+## 2. 범위
 
-## 4. 회귀 발견 시 처리
+- **한다**: WO1~4 가 만든 Store 제작 흐름의 브라우저 실측 · 저장 결과 read-only 확인 · 4개 CHECK 의 smoke 열 갱신 · 트랙 종결 선언.
+- **하지 않는다**: 코드 수정(실측 중 발견한 버그는 보고 후 별도 WO) · auth 수정 · 범위 ②(`content-editor` 공통 AI 처분) · 데이터 정리 · 스키마 rename.
+- 실측 중 **회귀가 발견되면** 해당 항목만 FAIL 로 기록하고 원인·재현 절차를 CHECK 에 남긴 뒤 수정은 별도 WO 로 분리한다.
+
+## 3. Smoke 스크립트 (그룹 5 + 경계 3)
+
+공통 원칙: **저장까지 실제로 수행**하고 재조회로 확인한다(원복 금지). toast + API 응답을 함께 본다. 콘솔 0 만으로 PASS 로 적지 않는다.
+
+### 3-1 BLOG
 
 ```text
-본 트랙(WO1~4) 변경이 원인      → 최소 수정 · 같은 WO 안에서 재검증 · CHECK 에 기록
-본 트랙과 무관한 기존 결함       → 수정하지 않음 · CHECK 에 보고 · 별도 WO 제안
-auth · 권한 · 계정 · 정책 문제   → 수정하지 않음 · 중지 조건 · 보고
+KPA  /store/content/blog → 글쓰기
+KCos /store/content/blog → 글쓰기
+PH   /store-owner/blog → 새 글
 ```
+
+1. 편집기 툴바에 내부 AI 버튼 없음(WO1)
+2. `[ChatGPT로 작업]` 노출 → "작업 안내 복사" → 클립보드에 `h1 은 사용하지 마세요` · `[결과 조건]` 포함(WO3 blog task)
+3. 임의 HTML 붙여넣기 → "편집기에 넣기" → 본문 즉시 반영
+4. 제목 입력 → 저장 → 목록 재조회 시 본문 = 붙여넣은 HTML
+
+### 3-2 POP
+
+```text
+KPA  /store/pop (사본 수정)
+KCos /store/pop/staff
+PH   /store-owner/pop
+```
+
+1~4 동일. 안내문에 `짧은 포인트 2~5개` · `POP 디자인·PDF 는 O4O 가 만듭니다` 포함. 저장 후 **POP V2 출력(PDF)** 경로 회귀 없음도 1회 확인.
+
+### 3-3 상품 설명
+
+```text
+KPA  /store/commerce/product-descriptions · /store/commerce/local-products(등록 모달)
+KCos 상품 설명
+PH   /store-owner/product-descriptions
+```
+
+안내문에 `제품명만 보고 성분·효능·원산지 등을 추측해 쓰지 마세요` 포함. 저장 → 다른 상품 선택 → 재선택 시 내용 유지.
+
+### 3-4 다국어
+
+```text
+KPA /store/products/multilingual/:kind/:id
+PH  /store-owner/products/multilingual/:kind/:id
+```
+
+1. 한국어 본문이 있는 상품에서 English 탭 진입
+2. `[ChatGPT로 작업]` → 안내문에 `기준 본문 언어: 한국어` · `English 로만 작성하세요` · `[기준 본문 HTML — 한국어]` 포함
+3. 결과 적용 → **자동 저장·자동 발행 없음** 확인(상태 배지 '초안' 유지)
+4. "임시 저장" 클릭 → 재조회 유지
+
+### 3-5 QR (WO4 은퇴 확인 포함)
+
+```text
+KPA /store/marketing/qr/ai-description
+```
+
+1. **"AI로 설명 만들기" · "AI 다시 만들기" 버튼 부재**(WO4)
+2. 상품명 입력 전에는 안내 문구, 입력 후 `[ChatGPT로 작업]` 노출
+3. 안내문에 `QR 주소·slug·링크는 만들지 마세요` 포함
+4. 결과 적용 → 제목·slug 확인 → "콘텐츠로 저장하고 QR 만들기"
+5. 공개 `/qr/:slug` 랜딩 정상 렌더
+6. 코너 모드 1회: 항목 2개 입력 → 결과 적용 → 저장 → 랜딩 확인
+7. **기존 legacy QR 콘텐츠**(Gemini 시절, `aiDescription.items[].descriptionHtml` 보유) 편집 진입 → 화면 오류 없음 · 상품별 설명 읽기 전용 미리보기 표시
+
+### 3-6 경계 확인 3
+
+```text
+E1 자료함 → 제작 시작 → 각 유형 진입(WO2/WO3 Source Context 전달)
+E2 태블릿 Screen Set 코너 편집기 LlmAssistPanel 회귀 없음(string guideText 소비처)
+E3 Community 글쓰기(/content/documents/new) 편집기 내부 AI 정상 동작 — 비-Store 불변(WO4 §E)
+```
+
+## 4. 저장 결과 read-only 확인 (승인된 채널)
+
+브라우저 smoke 후 운영 DB **SELECT 만**:
+
+```text
+QR 신규 저장 콘텐츠 content_json 에 generatedBy 키 부재 (WO4 R6)
+                               aiDescription.mode 존재 (목록/필터 SSOT)
+블로그·POP·상품설명·다국어 저장 row 의 본문 = 붙여넣은 HTML
+```
+
+UPDATE/DELETE/DDL 금지. 민감정보 마스킹. 접속 절차는 `SETUP.md`.
 
 ## 5. 완료 기준
 
-`STORE_OWNER_SMOKE_ACCOUNT=VERIFIED` · `GATE_1..5=PASS`(NOT_COVERED 서비스는 명시) · `WO1_SMOKE=CLOSED` · `WO2_SMOKE=CLOSED` · `WO3_SMOKE=CLOSED` · `WO4_SMOKE=CLOSED` · `STORE_INTERNAL_AI_RUNTIME=0` · `NEW_FEATURE=0` · `AUTH_CHANGE=0` · `DB_MIGRATION=0` · `SEED_ACCOUNT_CREATED=0` · `CREDENTIAL_IN_REPO=0`.
-
-트랙 종결 표기: WO1~4 CHECK 헤더 판정을 `COMPLETE_WITH_SMOKE_PENDING` → `CLOSED`(또는 FAIL 항목이 남으면 `CLOSED_WITH_REGRESSION_WO`) 로 갱신하고, 메모리/트랙 상태를 `STORE_AI_FIRST=CLOSED` 로 올린다.
-
-## 6. 금지
-
 ```text
-새 기능 · 화면 · Prompt task 추가          (회귀 최소 수정만)
-seed 계정 생성 · legacy password 계정 복구 · DB 직접 role/membership/organization INSERT
-lockout 해제 · 로그인 실패 반복 시도 · auth/guard 코드 수정
-자격정보 · 계정 email 을 CHECK/커밋/로그에 기록
-showInternalAi={true} · AiContentModal / /api/ai/content Store 재연결
-content-editor 공통 AI · non-Store 화면 변경
-DB migration · 데이터 삭제/백필
+STORE_BLOG_SMOKE=PASS
+STORE_POP_SMOKE=PASS
+STORE_PRODUCT_DESCRIPTION_SMOKE=PASS
+STORE_MULTILINGUAL_SMOKE=PASS
+STORE_QR_SMOKE=PASS
+
+STORE_INTERNAL_AI_VISIBLE=0          (편집기 툴바·페이지 어디에도 내부 AI 진입점 없음)
+QR_LEGACY_GENERATE_BUTTON=0
+AUTO_SAVE_FROM_LLM=0 · AUTO_PUBLISH_FROM_LLM=0 · AUTO_QR_CREATE_FROM_LLM=0
+QR_NEW_ROW_GENERATED_BY=0
+LEGACY_QR_CONTENT_EDIT_REGRESSION=0
+NON_STORE_AI_REGRESSION=0
+TABLET_LLM_ASSIST_REGRESSION=0
+POP_V2_PDF_REGRESSION=0
 ```
 
-## 7. 실행 순서 · Git
+전부 PASS 시 WO1~4 CHECK 의 smoke 열을 PASS 로 갱신하고 각 판정을 `COMPLETE` 로 올린다(본 WO CHECK 에서 일괄, 원문 결론은 바꾸지 않고 smoke 행만 갱신 + 근거 링크).
+
+## 6. 산출물
 
 ```text
-0. Gate 0 확인 통지 수신 (없으면 시작하지 않음)
-A. git fetch → status → 최신 main 에서 WO1~4 변경 파일 census (다른 세션 WIP 충돌 확인)
-B. Gate 1~5 실 브라우저 수행 · 항목별 PASS/FAIL/NOT_COVERED 기록(캡처는 민감정보 마스킹)
-C. 회귀 최소 수정(있을 때만) → 기존 spec 4 suites + 관련 build → 배포 → bundle 확인 → 해당 Gate 재검증
-D. CHECK 작성 + WO1~4 CHECK 헤더 판정 갱신(4 파일) + 본 WO 상태 갱신
-E. path-specific stage → node scripts/git/check-staged-scope.mjs <paths> → git commit -m "…" -- <paths> → push
+docs/checks/CHECK-O4O-STORE-AI-FIRST-E2E-CLOSURE-V1.md   (신규)
+WO1~4 CHECK 의 smoke 행 갱신 (4 파일 · 최소 diff)
 ```
 
-관련 파일만 stage 한다. 다른 세션의 수정·미추적 파일 불가침. 보고에 `문서 정합` 한 줄 포함.
+코드 변경 0 이 기본. path-specific stage/commit. 다른 세션 WIP 불가침.
+
+## 7. 후속 (본 WO 범위 외)
+
+- 범위 ② `content-editor` 공통 AI(`AiContentModal` · `/api/ai/content` · `StoreUseModal`) 처분 — non-Store 소비자 census 선행.
+- `aiDescription` 스키마 이름 · `/store/marketing/qr/ai-description` route 명 · `tags=['AI 설명']` 라벨 정리.
