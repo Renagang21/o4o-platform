@@ -11,60 +11,38 @@ import { QuizController } from '../controllers/QuizController.js';
 import { AssignmentController } from '../controllers/AssignmentController.js';
 // WO-O4O-COMPLETION-V1
 import { CompletionController } from '../controllers/CompletionController.js';
-import { requireAuth, optionalAuth, requireRole } from '../../../common/middleware/auth.middleware.js';
+import { requireAuth, optionalAuth } from '../../../common/middleware/auth.middleware.js';
 import { asyncHandler } from '../../../middleware/error-handler.js';
 import { requireEnrollment } from '../middleware/requireEnrollment.js';
 import { requireInstructor } from '../middleware/requireInstructor.js';
-// WO-KPA-A-GUARD-STANDARDIZATION-FINAL-V1: KPA scope guard replaces legacy requireKpaAdmin
-import { KPA_SCOPE_CONFIG, resolveCanonicalServiceKey } from '@o4o/security-core';
-import { createMembershipScopeGuard } from '../../../common/middleware/membership-guard.middleware.js';
+// WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2: Lecture 접근 계약 (KPA guard · 서비스 allowlist 제거)
+import { requireLectureLearner, requireLectureOperator } from '../middleware/lecture-access.js';
+import { lmsContextMiddleware } from '../utils/lms-service-scope.js';
+import { SERVICE_KEYS } from '../../../constants/service-keys.js';
 // WO-O4O-LMS-GLOBAL-OPERATOR-ROUTES-V1
 import { CourseService } from '../services/CourseService.js';
 import { AppDataSource } from '../../../database/connection.js';
 import logger from '../../../utils/logger.js';
-const requireKpaAdmin = createMembershipScopeGuard(KPA_SCOPE_CONFIG)('kpa:admin');
-
-// WO-O4O-LMS-GLOBAL-OPERATOR-ROUTES-V1: Global LMS operator guard.
-// Accepts platform-level admins + non-KPA service operators (cosmetics).
-// KPA operators use /api/v1/kpa/lms/operator/* (KPA-specific scope guard).
-// This natural separation enforces kpa:operator cannot approve via the global route.
-// Cross-service isolation between non-KPA operators requires Course.serviceKey — WO-O4O-LMS-COURSE-SERVICEKEY-V1.
-// WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 4 (#95):
-//   Pharmacy-Hub 를 allowlist 에 추가만 한다 (분기·복제 없음). 서비스 간 격리는 아래
-//   isCourseAccessibleByOperator 가 course.serviceKey 로 계속 강제한다 —
-//   'pharmacy-hub' 는 self-map 이므로 resolveCanonicalServiceKey 로 그대로 해석된다.
-//   기존 3서비스의 허용 role 집합·동작은 불변.
-const requireLmsOperator = requireRole([
-  'admin', 'super_admin', 'platform:super_admin',
-  'cosmetics:admin', 'cosmetics:operator',
-  'pharmacy-hub:admin', 'pharmacy-hub:operator',
-]);
-
-// WO-O4O-LMS-COURSE-SERVICEKEY-V1: Service-scope check for operator course actions.
-// Returns true if the operator's service matches the course's serviceKey.
-// Platform admins bypass. Courses with null serviceKey allow all operators (legacy compat).
-const PLATFORM_ADMIN_ROLES = new Set(['admin', 'super_admin', 'platform:super_admin']);
-function isCourseAccessibleByOperator(roles: string[], courseServiceKey: string | null | undefined): boolean {
-  if (roles.some(r => PLATFORM_ADMIN_ROLES.has(r))) return true;
-  if (!courseServiceKey) return true; // legacy/unscoped course: backward compat
-  // WO-O4O-KPA-PHARMACYHUB-COMMUNITY-MY-STORE-PRODUCTION-CLOSURE-V1 §15:
-  //   기존 구현은 **첫 서비스 역할 하나만** 보고 즉시 판정해서, 여러 서비스를 운영하는
-  //   운영자(예: kpa:store_owner 가 목록 앞에 있는 pharmacy-hub:operator)가 자기 서비스
-  //   강의조차 승인하지 못했다 (403 SERVICE_SCOPE_VIOLATION — operator 콘솔의 dead CTA).
-  //   역할 목록 전체를 확인하되, 매칭 대상은 운영 역할(admin·operator)로 제한한다
-  //   (store_owner 같은 비운영 역할이 다른 서비스 강의 권한을 만들지 않도록).
-  return roles.some((role) => {
-    const colon = role.indexOf(':');
-    if (colon <= 0) return false;
-    const prefix = role.slice(0, colon);
-    const suffix = role.slice(colon + 1);
-    if (prefix === 'lms' || prefix === 'platform') return false;
-    if (suffix !== 'admin' && suffix !== 'operator') return false;
-    return resolveCanonicalServiceKey(prefix) === courseServiceKey;
-  });
-}
 
 const router: Router = Router();
+
+// ========================================
+// WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2 — 접근 계약
+//
+//   `/api/v1/lms/*` 는 이제 O4O 강의(lecture) 서비스 전용 runtime 이다.
+//   - 모든 요청의 LMS service scope 는 서버가 `lecture` 로 고정한다. 클라이언트 `?serviceKey`
+//     는 무시된다 (route context 가 우선 — lms-service-scope.ts 우선순위 1).
+//   - Learner   : requireAuth + requireLectureLearner  (active lecture membership · role 불요)
+//   - Instructor: requireAuth + requireInstructor      (membership + lecture:instructor)
+//   - Operator  : requireAuth + requireLectureOperator (membership + lecture:operator ⊂ lecture:admin)
+//   - kpa:admin / cosmetics:* / pharmacy-hub:* / legacy lms:instructor 는 어떤 경로도 통과하지 못한다.
+//   - 운영 대상 강의는 course.serviceKey === 'lecture' 만. 그 외는 non-disclosure 404.
+// ========================================
+router.use(lmsContextMiddleware({ serviceCode: SERVICE_KEYS.LECTURE }));
+
+function isLectureCourse(courseServiceKey: string | null | undefined): boolean {
+  return courseServiceKey === SERVICE_KEYS.LECTURE;
+}
 
 // ========================================
 // COURSE ROUTES
@@ -88,9 +66,9 @@ router.patch('/courses/:id', requireAuth, requireInstructor, asyncHandler(Course
 // DELETE /api/v1/lms/courses/:id - Archive Course
 router.delete('/courses/:id', requireAuth, requireInstructor, asyncHandler(CourseController.deleteCourse));
 
-// POST /api/v1/lms/courses/:id/publish - Publish Course (kpa:admin override만)
-// WO-O4O-LMS-COURSE-APPROVAL-FLOW-V1: 강사 직접 publish 금지, controller에서 403 반환
-router.post('/courses/:id/publish', requireAuth, requireInstructor, asyncHandler(CourseController.publishCourse));
+// POST /api/v1/lms/courses/:id/publish - Publish Course (Lecture 운영자 override 경로)
+// WO-O4O-LMS-COURSE-APPROVAL-FLOW-V1: 강사 직접 publish 금지 — submit-review 사용
+router.post('/courses/:id/publish', requireAuth, requireLectureOperator, asyncHandler(CourseController.publishCourse));
 
 // POST /api/v1/lms/courses/:id/submit-review - 강사 승인 요청
 // WO-O4O-LMS-COURSE-APPROVAL-FLOW-V1: DRAFT 또는 REJECTED → PENDING_REVIEW
@@ -135,10 +113,10 @@ router.get('/lessons/:lessonId/quiz', requireAuth, asyncHandler(QuizController.g
 router.post('/quizzes', requireAuth, requireInstructor, asyncHandler(QuizController.createQuiz));
 
 // POST /api/v1/lms/quizzes/:quizId/submit - Submit Quiz Answers
-router.post('/quizzes/:quizId/submit', requireAuth, asyncHandler(QuizController.submitQuiz));
+router.post('/quizzes/:quizId/submit', requireAuth, requireLectureLearner, asyncHandler(QuizController.submitQuiz));
 
 // GET /api/v1/lms/quizzes/:quizId/attempts - Get User's Attempts
-router.get('/quizzes/:quizId/attempts', requireAuth, asyncHandler(QuizController.getAttempts));
+router.get('/quizzes/:quizId/attempts', requireAuth, requireLectureLearner, asyncHandler(QuizController.getAttempts));
 
 // PATCH /api/v1/lms/quizzes/:quizId - Update Quiz (Instructor)
 router.patch('/quizzes/:quizId', requireAuth, requireInstructor, asyncHandler(QuizController.updateQuiz));
@@ -154,104 +132,104 @@ router.get('/lessons/:lessonId/assignment', requireAuth, asyncHandler(Assignment
 router.post('/assignments', requireAuth, requireInstructor, asyncHandler(AssignmentController.upsertAssignment));
 
 // POST /api/v1/lms/assignments/:assignmentId/submit - Submit assignment (Learner)
-router.post('/assignments/:assignmentId/submit', requireAuth, asyncHandler(AssignmentController.submitAssignment));
+router.post('/assignments/:assignmentId/submit', requireAuth, requireLectureLearner, asyncHandler(AssignmentController.submitAssignment));
 
 // GET /api/v1/lms/assignments/:assignmentId/my - Get current user's submission
-router.get('/assignments/:assignmentId/my', requireAuth, asyncHandler(AssignmentController.getMySubmission));
+router.get('/assignments/:assignmentId/my', requireAuth, requireLectureLearner, asyncHandler(AssignmentController.getMySubmission));
 
 // ========================================
 // COMPLETION ROUTES (WO-O4O-COMPLETION-V1)
 // ========================================
 
 // GET /api/v1/lms/completions/me - Get My Completions
-router.get('/completions/me', requireAuth, asyncHandler(CompletionController.getMyCompletions));
+router.get('/completions/me', requireAuth, requireLectureLearner, asyncHandler(CompletionController.getMyCompletions));
 
 // ========================================
 // ENROLLMENT ROUTES
 // ========================================
 
 // POST /api/v1/lms/courses/:courseId/enroll - Enroll in Course
-router.post('/courses/:courseId/enroll', requireAuth, asyncHandler(EnrollmentController.enrollCourse));
+router.post('/courses/:courseId/enroll', requireAuth, requireLectureLearner, asyncHandler(EnrollmentController.enrollCourse));
 
 // GET /api/v1/lms/enrollments - List Enrollments
-router.get('/enrollments', requireAuth, asyncHandler(EnrollmentController.listEnrollments));
+router.get('/enrollments', requireAuth, requireLectureLearner, asyncHandler(EnrollmentController.listEnrollments));
 
 // GET /api/v1/lms/enrollments/me - Get My Enrollments
-router.get('/enrollments/me', requireAuth, asyncHandler(EnrollmentController.getMyEnrollments));
+router.get('/enrollments/me', requireAuth, requireLectureLearner, asyncHandler(EnrollmentController.getMyEnrollments));
 
 // GET /api/v1/lms/enrollments/:id - Get Enrollment by ID
-router.get('/enrollments/:id', requireAuth, asyncHandler(EnrollmentController.getEnrollment));
+router.get('/enrollments/:id', requireAuth, requireLectureLearner, asyncHandler(EnrollmentController.getEnrollment));
 
 // PATCH /api/v1/lms/enrollments/:id - Update Enrollment
-router.patch('/enrollments/:id', requireAuth, asyncHandler(EnrollmentController.updateEnrollment));
+router.patch('/enrollments/:id', requireAuth, requireLectureLearner, asyncHandler(EnrollmentController.updateEnrollment));
 
 // POST /api/v1/lms/enrollments/:id/start - Start Enrollment
-router.post('/enrollments/:id/start', requireAuth, asyncHandler(EnrollmentController.startEnrollment));
+router.post('/enrollments/:id/start', requireAuth, requireLectureLearner, asyncHandler(EnrollmentController.startEnrollment));
 
 // POST /api/v1/lms/enrollments/:id/complete - Complete Enrollment
-router.post('/enrollments/:id/complete', requireAuth, asyncHandler(EnrollmentController.completeEnrollment));
+router.post('/enrollments/:id/complete', requireAuth, requireLectureLearner, asyncHandler(EnrollmentController.completeEnrollment));
 
 // POST /api/v1/lms/enrollments/:id/cancel - Cancel Enrollment
-router.post('/enrollments/:id/cancel', requireAuth, asyncHandler(EnrollmentController.cancelEnrollment));
+router.post('/enrollments/:id/cancel', requireAuth, requireLectureLearner, asyncHandler(EnrollmentController.cancelEnrollment));
 
 // GET /api/v1/lms/enrollments/me/course/:courseId - Get My Enrollment for a Course (WO-O4O-LMS-ROUTING-INTEGRATION-FIX-V1)
-router.get('/enrollments/me/course/:courseId', requireAuth, asyncHandler(EnrollmentController.getMyEnrollmentForCourse));
+router.get('/enrollments/me/course/:courseId', requireAuth, requireLectureLearner, asyncHandler(EnrollmentController.getMyEnrollmentForCourse));
 
 // POST /api/v1/lms/enrollments/:courseId/progress - Update Lesson Progress (WO-O4O-LMS-ROUTING-INTEGRATION-FIX-V1)
-router.post('/enrollments/:courseId/progress', requireAuth, asyncHandler(EnrollmentController.updateLessonProgress));
+router.post('/enrollments/:courseId/progress', requireAuth, requireLectureLearner, asyncHandler(EnrollmentController.updateLessonProgress));
 
 // ========================================
 // CERTIFICATE ROUTES
 // ========================================
 
 // POST /api/v1/lms/certificates/issue - Issue Certificate
-router.post('/certificates/issue', requireAuth, requireKpaAdmin, asyncHandler(CertificateController.issueCertificate));
+router.post('/certificates/issue', requireAuth, requireLectureOperator, asyncHandler(CertificateController.issueCertificate));
 
 // GET /api/v1/lms/certificates - List Certificates
-router.get('/certificates', requireAuth, asyncHandler(CertificateController.listCertificates));
+router.get('/certificates', requireAuth, requireLectureLearner, asyncHandler(CertificateController.listCertificates));
 
 // GET /api/v1/lms/certificates/me - Get My Certificates
-router.get('/certificates/me', requireAuth, asyncHandler(CertificateController.getMyCertificates));
+router.get('/certificates/me', requireAuth, requireLectureLearner, asyncHandler(CertificateController.getMyCertificates));
 
 // GET /api/v1/lms/certificates/verify/:verificationCode - Verify Certificate (Public)
 router.get('/certificates/verify/:verificationCode', asyncHandler(CertificateController.verifyCertificate));
 
 // GET /api/v1/lms/certificates/number/:certificateNumber - Get Certificate by Number
-router.get('/certificates/number/:certificateNumber', requireAuth, asyncHandler(CertificateController.getCertificateByNumber));
+router.get('/certificates/number/:certificateNumber', requireAuth, requireLectureLearner, asyncHandler(CertificateController.getCertificateByNumber));
 
 // GET /api/v1/lms/certificates/:id/pdf - Download Certificate PDF (WO-O4O-LMS-CERTIFICATE-PDF-V1)
-router.get('/certificates/:id/pdf', requireAuth, asyncHandler(CertificateController.downloadPdf));
+router.get('/certificates/:id/pdf', requireAuth, requireLectureLearner, asyncHandler(CertificateController.downloadPdf));
 
 // GET /api/v1/lms/certificates/:id/verify - Public Certificate Verification (WO-O4O-LMS-CERTIFICATE-VERIFICATION-V1)
 router.get('/certificates/:id/verify', asyncHandler(CertificateController.verifyPublic));
 
 // GET /api/v1/lms/certificates/:id - Get Certificate by ID
-router.get('/certificates/:id', requireAuth, asyncHandler(CertificateController.getCertificate));
+router.get('/certificates/:id', requireAuth, requireLectureLearner, asyncHandler(CertificateController.getCertificate));
 
 // PATCH /api/v1/lms/certificates/:id - Update Certificate
-router.patch('/certificates/:id', requireAuth, requireKpaAdmin, asyncHandler(CertificateController.updateCertificate));
+router.patch('/certificates/:id', requireAuth, requireLectureOperator, asyncHandler(CertificateController.updateCertificate));
 
 // POST /api/v1/lms/certificates/:id/revoke - Revoke Certificate
-router.post('/certificates/:id/revoke', requireAuth, requireKpaAdmin, asyncHandler(CertificateController.revokeCertificate));
+router.post('/certificates/:id/revoke', requireAuth, requireLectureOperator, asyncHandler(CertificateController.revokeCertificate));
 
 // POST /api/v1/lms/certificates/:id/renew - Renew Certificate
-router.post('/certificates/:id/renew', requireAuth, requireKpaAdmin, asyncHandler(CertificateController.renewCertificate));
+router.post('/certificates/:id/renew', requireAuth, requireLectureOperator, asyncHandler(CertificateController.renewCertificate));
 
 // ========================================
 // INSTRUCTOR ROUTES (WO-LMS-INSTRUCTOR-ROLE-V1)
 // ========================================
 
 // POST /api/v1/lms/instructor/apply - Apply for Instructor Role
-router.post('/instructor/apply', requireAuth, asyncHandler(InstructorController.apply));
+router.post('/instructor/apply', requireAuth, requireLectureLearner, asyncHandler(InstructorController.apply));
 
 // GET /api/v1/lms/instructor/applications - List Instructor Applications (Admin)
-router.get('/instructor/applications', requireKpaAdmin, asyncHandler(InstructorController.listApplications));
+router.get('/instructor/applications', requireAuth, requireLectureOperator, asyncHandler(InstructorController.listApplications));
 
 // POST /api/v1/lms/instructor/applications/:id/approve - Approve Application (Admin)
-router.post('/instructor/applications/:id/approve', requireKpaAdmin, asyncHandler(InstructorController.approveApplication));
+router.post('/instructor/applications/:id/approve', requireAuth, requireLectureOperator, asyncHandler(InstructorController.approveApplication));
 
 // POST /api/v1/lms/instructor/applications/:id/reject - Reject Application (Admin)
-router.post('/instructor/applications/:id/reject', requireKpaAdmin, asyncHandler(InstructorController.rejectApplication));
+router.post('/instructor/applications/:id/reject', requireAuth, requireLectureOperator, asyncHandler(InstructorController.rejectApplication));
 
 // GET /api/v1/lms/instructor/courses - My Courses (Instructor)
 router.get('/instructor/courses', requireAuth, requireInstructor, asyncHandler(InstructorController.myCourses));
@@ -299,19 +277,20 @@ router.post('/instructor/submissions/:submissionId/grade', requireAuth, requireI
 
 // ========================================
 // OPERATOR COURSE ACTION ROUTES (WO-O4O-LMS-GLOBAL-OPERATOR-ROUTES-V1)
-// Global operator endpoints for K-Cosmetics, and platform admins.
-// KPA operators use /api/v1/kpa/lms/operator/* with requireKpaScope — not duplicated here.
+// WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2: Lecture Operator 전용.
+//   guard = requireLectureOperator, 대상 = course.serviceKey === 'lecture' (그 외 404).
 // ========================================
 
+// GET /api/v1/lms/operator/courses — 운영 목록 (status/contentKind/search 필터는 listCourses 계약 그대로)
+router.get('/operator/courses', requireAuth, requireLectureOperator, asyncHandler(CourseController.listCourses));
+
 // POST /api/v1/lms/operator/courses/:id/approve — PENDING_REVIEW → PUBLISHED
-router.post('/operator/courses/:id/approve', requireAuth, requireLmsOperator, asyncHandler(async (req: Request, res: Response) => {
+router.post('/operator/courses/:id/approve', requireAuth, requireLectureOperator, asyncHandler(async (req: Request, res: Response) => {
   const service = CourseService.getInstance();
   const course = await service.getCourse(req.params.id);
   if (!course) { return res.status(404).json({ success: false, error: '강의를 찾을 수 없습니다' }); }
+  if (!isLectureCourse(course.serviceKey)) { return res.status(404).json({ success: false, error: '강의를 찾을 수 없습니다' }); }
   const userRoles: string[] = (req as any).user?.roles || [];
-  if (!isCourseAccessibleByOperator(userRoles, course.serviceKey)) {
-    return res.status(403).json({ success: false, error: '해당 서비스의 강의에 접근할 권한이 없습니다.', code: 'SERVICE_SCOPE_VIOLATION' });
-  }
   try {
     const updated = await service.approveCourse(req.params.id, {
       id: (req as any).user?.id,
@@ -327,14 +306,12 @@ router.post('/operator/courses/:id/approve', requireAuth, requireLmsOperator, as
 }));
 
 // POST /api/v1/lms/operator/courses/:id/reject — PENDING_REVIEW → REJECTED + rejectionReason
-router.post('/operator/courses/:id/reject', requireAuth, requireLmsOperator, asyncHandler(async (req: Request, res: Response) => {
+router.post('/operator/courses/:id/reject', requireAuth, requireLectureOperator, asyncHandler(async (req: Request, res: Response) => {
   const service = CourseService.getInstance();
   const course = await service.getCourse(req.params.id);
   if (!course) { return res.status(404).json({ success: false, error: '강의를 찾을 수 없습니다' }); }
+  if (!isLectureCourse(course.serviceKey)) { return res.status(404).json({ success: false, error: '강의를 찾을 수 없습니다' }); }
   const userRoles: string[] = (req as any).user?.roles || [];
-  if (!isCourseAccessibleByOperator(userRoles, course.serviceKey)) {
-    return res.status(403).json({ success: false, error: '해당 서비스의 강의에 접근할 권한이 없습니다.', code: 'SERVICE_SCOPE_VIOLATION' });
-  }
   const reason = typeof req.body?.reason === 'string' ? req.body.reason : '';
   try {
     const updated = await service.rejectCourse(req.params.id, reason, {
@@ -354,40 +331,34 @@ router.post('/operator/courses/:id/reject', requireAuth, requireLmsOperator, asy
 }));
 
 // POST /api/v1/lms/operator/courses/:id/unpublish — PUBLISHED → DRAFT
-router.post('/operator/courses/:id/unpublish', requireAuth, requireLmsOperator, asyncHandler(async (req: Request, res: Response) => {
+router.post('/operator/courses/:id/unpublish', requireAuth, requireLectureOperator, asyncHandler(async (req: Request, res: Response) => {
   const service = CourseService.getInstance();
   const course = await service.getCourse(req.params.id);
   if (!course) { return res.status(404).json({ success: false, error: '강의를 찾을 수 없습니다' }); }
+  if (!isLectureCourse(course.serviceKey)) { return res.status(404).json({ success: false, error: '강의를 찾을 수 없습니다' }); }
   const userRoles: string[] = (req as any).user?.roles || [];
-  if (!isCourseAccessibleByOperator(userRoles, course.serviceKey)) {
-    return res.status(403).json({ success: false, error: '해당 서비스의 강의에 접근할 권한이 없습니다.', code: 'SERVICE_SCOPE_VIOLATION' });
-  }
   const updated = await service.unpublishCourse(req.params.id);
   return res.json({ success: true, data: { course: updated } });
 }));
 
 // POST /api/v1/lms/operator/courses/:id/archive — any status → ARCHIVED
-router.post('/operator/courses/:id/archive', requireAuth, requireLmsOperator, asyncHandler(async (req: Request, res: Response) => {
+router.post('/operator/courses/:id/archive', requireAuth, requireLectureOperator, asyncHandler(async (req: Request, res: Response) => {
   const service = CourseService.getInstance();
   const course = await service.getCourse(req.params.id);
   if (!course) { return res.status(404).json({ success: false, error: '강의를 찾을 수 없습니다' }); }
+  if (!isLectureCourse(course.serviceKey)) { return res.status(404).json({ success: false, error: '강의를 찾을 수 없습니다' }); }
   const userRoles: string[] = (req as any).user?.roles || [];
-  if (!isCourseAccessibleByOperator(userRoles, course.serviceKey)) {
-    return res.status(403).json({ success: false, error: '해당 서비스의 강의에 접근할 권한이 없습니다.', code: 'SERVICE_SCOPE_VIOLATION' });
-  }
   const updated = await service.archiveCourse(req.params.id);
   return res.json({ success: true, data: { course: updated } });
 }));
 
 // DELETE /api/v1/lms/operator/courses/:id/hard — ARCHIVED only, cascaded hard delete
-router.delete('/operator/courses/:id/hard', requireAuth, requireLmsOperator, asyncHandler(async (req: Request, res: Response) => {
+router.delete('/operator/courses/:id/hard', requireAuth, requireLectureOperator, asyncHandler(async (req: Request, res: Response) => {
   const service = CourseService.getInstance();
   const course = await service.getCourse(req.params.id);
   if (!course) { return res.status(404).json({ success: false, error: '강의를 찾을 수 없습니다' }); }
+  if (!isLectureCourse(course.serviceKey)) { return res.status(404).json({ success: false, error: '강의를 찾을 수 없습니다' }); }
   const userRoles: string[] = (req as any).user?.roles || [];
-  if (!isCourseAccessibleByOperator(userRoles, course.serviceKey)) {
-    return res.status(403).json({ success: false, error: '해당 서비스의 강의에 접근할 권한이 없습니다.', code: 'SERVICE_SCOPE_VIOLATION' });
-  }
   if (course.status !== 'archived') {
     return res.status(400).json({ success: false, error: '종료(보관) 상태의 강의만 완전 삭제할 수 있습니다.' });
   }

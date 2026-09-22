@@ -16,6 +16,7 @@ import { CourseService } from './CourseService.js';
 import { CreditSourceType } from '../../credit/entities/CreditTransaction.js';
 import { CREDIT_DESCRIPTIONS } from '../../credit/credit-constants.js';
 import { resolveRewardAmount, grantRewardIfConfigured } from './RewardPolicyService.js';
+import { SERVICE_KEYS } from '../../../constants/service-keys.js';
 
 /**
  * AssignmentService
@@ -315,7 +316,7 @@ export class AssignmentService {
     // WO-O4O-LMS-COMPLETION-REWARD-POLICY-SEPARATION-V1:
     // reward 정책 해석을 위한 course/lesson 컨텍스트(serviceKey 포함). reward 는 정책 설정 시에만 지급.
     const assignmentCourse: any = await CourseService.getInstance().getCourse(courseId);
-    const assignmentServiceKey: string = assignmentCourse?.serviceKey ?? 'kpa-society';
+    const assignmentServiceKey: string = assignmentCourse?.serviceKey ?? SERVICE_KEYS.LECTURE;
     const assignmentLesson = await this.lessonRepository.findOne({ where: { id: lessonId } });
 
     // lesson_complete reward (정책 설정 시에만)

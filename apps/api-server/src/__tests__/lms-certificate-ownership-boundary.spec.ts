@@ -12,7 +12,7 @@
  * 계약:
  *   private read  → 본인 200 / 같은 서비스 타인 404 / 타 서비스 404 / 없는 id 404
  *   public verify → 기존 공개 계약 유지 (owner guard 미적용) + 최소 필드만 반환
- *   management    → 기존 requireKpaAdmin 계약 유지 (user-facing 에 bypass 추가 금지)
+ *   management    → Lecture Operator 계약 (requireLectureOperator — WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2)
  */
 
 import * as fs from 'fs';
@@ -400,7 +400,7 @@ describe('정적 회귀 가드', () => {
     }
   });
 
-  it('management 라우트는 기존 requireKpaAdmin 계약을 유지한다', () => {
+  it('management 라우트는 Lecture Operator 계약(requireLectureOperator)이다 — kpa:admin 경로 0', () => {
     const routes = read(ROUTES).split('\n');
     for (const p of [
       "router.post('/certificates/issue'",
@@ -410,7 +410,8 @@ describe('정적 회귀 가드', () => {
     ]) {
       const line = routes.find((l) => l.includes(p));
       expect(line).toBeDefined();
-      expect(line).toContain('requireKpaAdmin');
+      expect(line).toContain('requireLectureOperator');
+      expect(line).not.toContain('requireKpaAdmin');
     }
   });
 

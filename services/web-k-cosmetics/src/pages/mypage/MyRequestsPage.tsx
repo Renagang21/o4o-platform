@@ -4,7 +4,6 @@
  *
  * Frontend aggregation:
  *   1) GET /cosmetics/stores/application/me — 매장 입점 신청 (store_application)
- *   2) GET /lms/enrollments/me             — LMS 수강 신청 (course_enrollment)
  */
 
 import { useState, useEffect, useCallback } from 'react';
@@ -16,7 +15,6 @@ import { kcosMyRequestsApi } from '@/api/mypage';
 const TYPE_FILTERS = [
   { key: '', label: '전체' },
   { key: 'store_application', label: '매장 신청' },
-  { key: 'course_enrollment', label: '수강 신청' },
   // WO-O4O-CROSS-SERVICE-MYPAGE-REQUESTS-COMMONIZATION-V1 §5
   { key: 'forum_category', label: '포럼 신청' },
 ];

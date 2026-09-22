@@ -639,7 +639,6 @@ function buildConfig(
     { id: 'qa-content', label: '콘텐츠 관리', link: '/operator/content', icon: 'file-text' },
     { id: 'qa-community', label: 'Home 편집', link: '/operator/community', icon: 'home' },
     { id: 'qa-content-hub', label: '콘텐츠 허브 관리', link: '/operator/docs', icon: 'package' },
-    { id: 'qa-lms', label: '강의 관리', link: '/operator/lms', icon: 'clipboard-list' },
     { id: 'qa-signage', label: '사이니지', link: '/operator/signage/hq-media', icon: 'monitor-play' },
     { id: 'qa-stores', label: '매장 관리', link: '/operator/stores', icon: 'store' },
     ...(isAdmin

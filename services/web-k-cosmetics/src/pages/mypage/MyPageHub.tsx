@@ -12,7 +12,7 @@ import {
   KCOSMETICS_ROLE_PRIORITY,
   getKCosmeticsDashboardRoute,
 } from '@/contexts/AuthContext';
-import { Mail, Phone, Shield, BookOpen, Award, Coins, ClipboardList } from 'lucide-react';
+import { Mail, Phone, Shield, Coins, ClipboardList } from 'lucide-react';
 import {
   MyPageLayout,
   QuickActionsSection,
@@ -127,9 +127,7 @@ export default function MyPageHub() {
       {/* 진입 카드 — 공통 MyPageEntryCardGrid (프로필/설정은 상단 탭·수정 버튼으로 일원화) */}
       <MyPageEntryCardGrid
         items={[
-          // LMS MyPage (WO-O4O-KCOS-LMS-MYPAGE-CANONICAL-ALIGNMENT-V1)
-          { key: 'enrollments', title: '내 수강', href: '/mypage/enrollments', icon: <BookOpen className="w-5 h-5" /> },
-          { key: 'certificates', title: '학습 결과', href: '/mypage/certificates', icon: <Award className="w-5 h-5" /> },
+          // 내 수강 · 학습 결과 — Phase 2 §14 (WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1): 독립 강의 서비스 소유 — 제거
           { key: 'credits', title: '내 크레딧', href: '/mypage/credits', icon: <Coins className="w-5 h-5" /> },
           { key: 'my-requests', title: '내 신청', href: '/mypage/my-requests', icon: <ClipboardList className="w-5 h-5" /> },
         ]}

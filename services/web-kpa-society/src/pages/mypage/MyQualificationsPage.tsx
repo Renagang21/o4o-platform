@@ -5,7 +5,6 @@
  */
 
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { MyPageLayout } from '../../layouts/MyPageLayout';
 import {
   qualificationApi,
@@ -41,7 +40,6 @@ const STATUS_COLORS: Record<string, string> = {
 // ─── Component ───────────────────────────────────────────────
 
 export function MyQualificationsPage() {
-  const navigate = useNavigate();
   const [qualifications, setQualifications] = useState<MemberQualification[]>([]);
   const [requests, setRequests] = useState<QualificationRequest[]>([]);
   const [loading, setLoading] = useState(true);
@@ -161,14 +159,7 @@ export function MyQualificationsPage() {
                     승인일: {new Date(q.approved_at).toLocaleDateString('ko-KR')}
                   </span>
                 )}
-                {q.qualification_type === 'lms_creator' && q.status === 'approved' && (
-                  <button
-                    style={styles.dashboardBtn}
-                    onClick={() => navigate('/instructor')}
-                  >
-                    강사 대시보드 →
-                  </button>
-                )}
+                {/* WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2 §12: KPA 자격은 Lecture 강사 권한으로 승계되지 않는다 — 강사 대시보드 진입 버튼 제거 */}
               </div>
             ))}
           </div>

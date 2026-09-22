@@ -13,6 +13,7 @@ import { resolveRewardAmount, grantRewardIfConfigured } from './RewardPolicyServ
 import { CompletionService } from './CompletionService.js';
 // WO-O4O-LMS-COURSE-REAPPROVAL-FLOW-V1
 import { CourseService } from './CourseService.js';
+import { SERVICE_KEYS } from '../../../constants/service-keys.js';
 
 export interface SubmitQuizRequest {
   answers: Array<{ questionId: string; answer: string | string[] }>;
@@ -165,7 +166,7 @@ export class QuizService {
 
     // WO-O4O-CREDIT-SYSTEM-V1 / WO-O4O-POINT-CORE-SEPARATION-V1: 포인트 지급 (PointService facade)
     // WO-O4O-LMS-SERVICEKEY-CONTEXT-V1: resolve course.serviceKey to prevent cross-service budget drain
-    // null serviceKey = legacy course → fallback to 'kpa-society' for backward compat
+    // null serviceKey → Lecture 고정 (WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 §17 — KPA fallback 제거)
     let courseServiceKey: string | null = null;
     let quizCourse: any = null;
     if (quiz.courseId) {
@@ -185,7 +186,7 @@ export class QuizService {
         sourceId: quizId,
         referenceKey: `quiz_pass:${userId}:${quizId}`,
         description: CREDIT_DESCRIPTIONS.QUIZ_PASS,
-        serviceKey: courseServiceKey ?? 'kpa-society',
+        serviceKey: courseServiceKey ?? SERVICE_KEYS.LECTURE,
       });
       if (granted) creditsEarned += quizPassAmount;
     }
@@ -320,7 +321,7 @@ export class QuizService {
       sourceId: lessonId,
       referenceKey: `lesson_complete:${userId}:${lessonId}`,
       description: CREDIT_DESCRIPTIONS.LESSON_COMPLETE,
-      serviceKey: lessonCourseServiceKey ?? 'kpa-society',
+      serviceKey: lessonCourseServiceKey ?? SERVICE_KEYS.LECTURE,
     });
 
     // Update enrollment progress
@@ -373,7 +374,7 @@ export class QuizService {
       // WO-O4O-LMS-COMPLETION-REWARD-POLICY-SEPARATION-V1:
       // course_complete reward 는 course 의 rewardPolicy.courseComplete 가 설정된 경우에만 1회 지급.
       // referenceKey UNIQUE + dedup 으로 재완료 재지급 차단. 미설정 → 미지급(오류 아님).
-      // serviceKey: null = legacy course → fallback 'kpa-society'.
+      // serviceKey: null → Lecture 고정 (KPA fallback 제거).
       const courseCompleteAmount = resolveRewardAmount('course_complete', { course: lessonCourse });
       await grantRewardIfConfigured({
         event: 'course_complete',
@@ -383,7 +384,7 @@ export class QuizService {
         sourceId: courseId,
         referenceKey: `course_complete:${userId}:${courseId}`,
         description: CREDIT_DESCRIPTIONS.COURSE_COMPLETE,
-        serviceKey: lessonCourseServiceKey ?? 'kpa-society',
+        serviceKey: lessonCourseServiceKey ?? SERVICE_KEYS.LECTURE,
       });
 
       // WO-O4O-COMPLETION-V1: Auto-create completion record + certificate

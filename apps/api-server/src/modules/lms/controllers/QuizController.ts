@@ -6,6 +6,7 @@ import logger from '../../../utils/logger.js';
 // WO-O4O-LMS-CROSSSERVICE-READ-WRITE-BOUNDARY-COMPLETION-V1 §5
 // quiz/assignment 신규 기능 구현이 아니라, lesson→course 역추적 service boundary 만 적용한다.
 import { guardLessonScope, guardQuizScope } from '../utils/lms-scope-guard.js';
+import { rolesIncludeLectureAdmin } from '../middleware/lecture-access.js';
 
 /**
  * QuizController
@@ -130,7 +131,7 @@ export class QuizController extends BaseController {
         if (!course) {
           return BaseController.notFound(res, 'Course not found');
         }
-        if (course.instructorId !== userId && !userRoles.includes('kpa:admin')) {
+        if (course.instructorId !== userId && !rolesIncludeLectureAdmin(userRoles)) {
           return BaseController.forbidden(res, 'You can only create quizzes for your own courses');
         }
       }

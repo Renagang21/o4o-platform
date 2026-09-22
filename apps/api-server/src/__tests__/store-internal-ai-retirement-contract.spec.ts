@@ -55,8 +55,8 @@ const STORE_FILES = [
 const NON_STORE_AI_FILES = [
   'services/web-kpa-society/src/pages/contents/ContentWritePage.tsx', // Community(/content/*) — 이름만 Store 아님
   'services/web-kpa-society/src/pages/forum/ForumWritePage.tsx',
-  'services/web-kpa-society/src/pages/instructor/courses/CourseEditPage.tsx',
-  'services/web-pharmacy-hub/src/pages/instructor/InstructorCourseEditPage.tsx',
+  // WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2 §14: KPA/PH 강사 화면 은퇴 → Lecture 강사 화면(공통 편집기 기본 AI 유지)
+  'services/web-lecture/src/pages/instructor/InstructorCourseEditPage.tsx',
 ];
 
 const QR_PAGE = 'services/web-kpa-society/src/pages/pharmacy/StoreQrAiDescriptionPage.tsx';
@@ -179,7 +179,9 @@ describe('WO-O4O-STORE-INTERNAL-AI-RETIREMENT-V1 — (E) non-Store · content-ed
   it('non-Store AI 소비처는 이번 WO 에서 변경되지 않았다 — aiRequestHeaders/AiContentModal 연결 유지', () => {
     for (const rel of NON_STORE_AI_FILES) {
       const src = read(rel);
-      expect(src).toMatch(/aiRequestHeaders|AiContentModal/);
+      // 공통 편집기(RichTextEditor) 의 내부 AI 는 showInternalAi 미지정(기본 true) 이면 유지된다.
+      expect(src).toMatch(/aiRequestHeaders|AiContentModal|<RichTextEditor\b/);
+      expect(src).not.toContain('showInternalAi={false}');
     }
   });
   it('ContentWritePage 는 Community 화면(/content/* · CommunityContentWriteShell)이라 Store 대상이 아니다', () => {

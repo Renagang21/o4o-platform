@@ -613,8 +613,7 @@ export function createPharmacyHubRoutes(): Router {
   //
   //   공통 LatestActivitySection 계약({type,id,title,authorName,createdAt,href}) 을
   //   그대로 사용한다.
-  //   forum 은 forum_category_requests.service_code, course 는 lms_courses.service_key
-  //   로 서비스 경계를 건다.
+  //   forum 은 forum_category_requests.service_code 로 서비스 경계를 건다.
   //
   // WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §2:
   //   Content/Resources 가 실재하게 됐으므로 content / resource 두 축을 추가한다.
@@ -677,34 +676,7 @@ export function createPharmacyHubRoutes(): Router {
         );
       }
 
-      if (filterType === 'all' || filterType === 'course') {
-        tasks.push(
-          (async () => {
-            const rows: any[] = await AppDataSource.query(
-              // lms_courses 는 quoted camelCase 컬럼("instructorId"/"createdAt")이고
-              // service_key 만 snake_case 다 (20261101000000-AddServiceKeyToLmsCourses).
-              `SELECT c.id, c.title, c."createdAt" AS created_at, u.name AS author_name
-                 FROM lms_courses c
-                 LEFT JOIN users u ON c."instructorId" = u.id
-                WHERE c.status = 'published'
-                  AND c.service_key = $1
-                ORDER BY c."createdAt" DESC
-                LIMIT $2`,
-              [SERVICE_KEY, perLimit],
-            );
-            for (const r of rows) {
-              items.push({
-                type: 'course',
-                id: r.id,
-                title: r.title,
-                authorName: r.author_name ?? undefined,
-                createdAt: new Date(r.created_at).toISOString(),
-                href: `/education/course/${r.id}`,
-              });
-            }
-          })(),
-        );
-      }
+      // WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2: 'course' 축 제거 — LMS runtime 은 O4O 강의(lecture) 서비스 전용이다.
 
       // Content / Resources — 같은 cms_contents 원장, subType 으로만 갈린다.
       const cmsAxes: Array<{ axis: string; subType: string; hrefFor: (id: string) => string }> = [

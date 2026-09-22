@@ -101,11 +101,10 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
   resources: [
     { label: '자료실 관리', path: '/operator/resources' },
   ],
-  // WO-KPA-LMS-INSTRUCTOR-APPROVAL-RELOCATE-V1: 강의 독립 그룹 (강의 관리 + 강사 승인)
-  // WO-O4O-GUIDE-CONTENT-EDITOR-UI-V1: 안내 문구 관리 추가 (LMS 레슨 작성 화면)
+  // WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2 §14: '강의 관리'(/operator/lms) 제거 — LMS 운영은 O4O 강의 Operator 소유.
+  //   자격 요청(KPA 약사 자격, §12)·안내 문구 관리는 KPA 소유로 유지.
   lms: [
-    { label: '강의 관리', path: '/operator/lms' },
-    { label: '강사 승인', path: '/operator/qualification-requests' },
+    { label: '자격 요청', path: '/operator/qualification-requests' },
     { label: '안내 문구 관리', path: '/operator/guide-contents' },
   ],
   signage: [

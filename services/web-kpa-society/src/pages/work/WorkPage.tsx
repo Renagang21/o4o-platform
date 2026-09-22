@@ -12,6 +12,7 @@
  */
 
 import { Link } from 'react-router-dom';
+import { LECTURE_SERVICE_URL } from '../../config/navigation';
 import { colors, shadows, borderRadius } from '../../styles/theme';
 import { useAuth, TestUser } from '../../contexts/AuthContext';
 
@@ -24,16 +25,6 @@ const mockWorkData = {
       { id: 't3', title: '고객 상담 기록 정리', done: false },
     ],
     pharmacyRef: '강남중앙약국', // 참고 정보로만
-  },
-  learning: {
-    inProgress: [
-      { id: 'l1', title: '2025 약사 보수교육', progress: 65 },
-      { id: 'l2', title: '복약지도 심화과정', progress: 30 },
-    ],
-    completed: 12,
-    recommended: [
-      { id: 'r1', title: '당뇨병 환자 관리' },
-    ],
   },
   signage: {
     displays: [
@@ -127,50 +118,20 @@ export function WorkPage() {
           </div>
         </div>
 
-        {/* 카드 2: 학습/교육 */}
+        {/* 카드 2: 학습/교육 — WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2 §14·§15:
+            KPA 는 학습 runtime 을 소유하지 않는다. 독립 강의 서비스로 외부 이동(public link)만 제공한다. */}
         <div style={styles.card}>
           <div style={styles.cardHeader}>
             <span style={styles.cardIcon}>📚</span>
             <h2 style={styles.cardTitle}>학습 / 교육</h2>
           </div>
           <div style={styles.cardBody}>
-            <div style={styles.learningStats}>
-              <div style={styles.statItem}>
-                <span style={styles.statValue}>{data.learning.inProgress.length}</span>
-                <span style={styles.statLabel}>진행중</span>
-              </div>
-              <div style={styles.statItem}>
-                <span style={styles.statValue}>{data.learning.completed}</span>
-                <span style={styles.statLabel}>수료</span>
-              </div>
-            </div>
-            <div style={styles.courseList}>
-              {data.learning.inProgress.map(course => (
-                <div key={course.id} style={styles.courseItem}>
-                  <span style={styles.courseName}>{course.title}</span>
-                  <div style={styles.progressBar}>
-                    <div style={{
-                      ...styles.progressFill,
-                      width: `${course.progress}%`,
-                    }} />
-                  </div>
-                  <span style={styles.progressText}>{course.progress}%</span>
-                </div>
-              ))}
-            </div>
-            {data.learning.recommended.length > 0 && (
-              <div style={styles.recommendedSection}>
-                <span style={styles.recommendedLabel}>추천 콘텐츠</span>
-                <span style={styles.recommendedTitle}>
-                  {data.learning.recommended[0].title}
-                </span>
-              </div>
-            )}
+            <p style={styles.recommendedLabel}>강의 · 수강 · 수료증은 O4O 강의 서비스에서 이용합니다.</p>
           </div>
           <div style={styles.cardFooter}>
-            <Link to="/work/learning" style={styles.cardLink}>
-              학습 현황 →
-            </Link>
+            <a href={LECTURE_SERVICE_URL} style={styles.cardLink} target="_blank" rel="noopener noreferrer">
+              O4O 강의 바로가기 ↗
+            </a>
           </div>
         </div>
 

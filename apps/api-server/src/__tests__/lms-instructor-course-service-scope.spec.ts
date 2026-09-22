@@ -23,9 +23,9 @@ const REPO_ROOT = path.resolve(__dirname, '../../../..');
 const read = (rel: string) => fs.readFileSync(path.join(REPO_ROOT, rel), 'utf-8');
 
 const controller = read('apps/api-server/src/modules/lms/controllers/InstructorController.ts');
+// WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2 §11/§14: LMS 화면은 services/web-lecture 단일 소유.
 const lmsClient = read('packages/lms-client/src/index.ts');
-const phLms = read('services/web-pharmacy-hub/src/api/lms.ts');
-const kpaLms = read('services/web-kpa-society/src/api/lms-instructor.ts');
+const lectureApi = read('services/web-lecture/src/api/lecture.ts');
 
 describe('LMS instructor 목록 — service scope (§10/§13)', () => {
   describe('(A) 백엔드 — 공통 scope util 경유', () => {
@@ -59,33 +59,22 @@ describe('LMS instructor 목록 — service scope (§10/§13)', () => {
       expect(lmsClient).toContain("http.get<LmsApiResponse<T[]>>('/lms/instructor/courses', scopeParams)");
     });
 
-    it('Pharmacy-Hub 가 canonical serviceKey 를 전달한다 (3개 목록)', () => {
-      expect(phLms).toContain(
-        "lmsHttp.get<ApiResponse<LmsCourse[]>>('/lms/instructor/courses', { serviceKey: PH_SERVICE_KEY })",
-      );
-      expect(phLms).toContain("api.get<any>('/lms/instructor/dashboard/courses', {");
-      expect(phLms).toContain("params: { status: 'pending', serviceKey: PH_SERVICE_KEY }");
-      expect(phLms).toContain("export const PH_SERVICE_KEY = 'pharmacy-hub'");
+    it('Lecture 강사 client 는 serviceKey 를 보내지 않는다 — 서버가 lecture 로 고정 (§8)', () => {
+      expect(lectureApi).toContain("lmsHttp.get<Paginated<LectureCourse>>('/lms/instructor/courses', params)");
+      expect(lectureApi).not.toMatch(/serviceKey:\s*['"]/);
     });
 
-    it('KPA 가 canonical serviceKey 를 전달한다 (3개 목록)', () => {
-      expect(kpaLms).toContain("const KPA_SERVICE_KEY = 'kpa-society'");
-      expect(kpaLms).toContain('serviceKey: KPA_SERVICE_KEY');
-      expect(kpaLms).toContain('/lms/instructor/dashboard/courses?serviceKey=${KPA_SERVICE_KEY}');
-      expect(kpaLms).toContain('new URLSearchParams({ serviceKey: KPA_SERVICE_KEY })');
-    });
-
-    it('PH 강사 대시보드가 backend envelope(`data.courses`)을 그대로 해석한다', () => {
-      // 배열로 가정하면 언제나 빈 목록이 되어 `총 강의 0` 이 고정된다 (production 실측 결함).
-      expect(phLms).toContain('const list = Array.isArray(payload) ? payload : (payload?.courses ?? []);');
-      expect(phLms).toContain('id: c.id ?? c.courseId');
-      expect(phLms).toContain('enrolledCount: c.enrolledCount ?? c.totalEnrollments');
+    it('PH / KPA 강사 client 는 삭제되었다 (§14)', () => {
+      for (const rel of [
+        'services/web-pharmacy-hub/src/api/lms.ts',
+        'services/web-kpa-society/src/api/lms-instructor.ts',
+      ]) {
+        expect(fs.existsSync(path.join(REPO_ROOT, rel))).toBe(false);
+      }
     });
 
     it('응답을 프런트에서 걸러내지 않는다 (client-side filtering 금지)', () => {
-      for (const src of [phLms, kpaLms]) {
-        expect(src).not.toMatch(/\.filter\([^)]*serviceKey/);
-      }
+      expect(lectureApi).not.toMatch(/\.filter\([^)]*serviceKey/);
     });
   });
 });

@@ -3,6 +3,7 @@ import { BaseController } from '../../../common/base.controller.js';
 import { AppDataSource } from '../../../database/connection.js';
 import { InstructorApplication, Enrollment, EnrollmentStatus, Course, ContentKind } from '@o4o/lms-core';
 import { roleAssignmentService } from '../../auth/services/role-assignment.service.js';
+import { hasLectureAdminRole, LECTURE_INSTRUCTOR_ROLE } from '../middleware/lecture-access.js';
 import { applyCourseScopeToQuery, resolveScopeOrRespond } from '../utils/lms-scope-guard.js';
 import logger from '../../../utils/logger.js';
 // WO-O4O-LMS-ASSIGNMENT-GRADING-V1
@@ -162,10 +163,11 @@ export class InstructorController extends BaseController {
       application.reviewedAt = new Date();
       await repo.save(application);
 
-      // 2. lms:instructor 역할 부여
+      // 2. lecture:instructor 역할 부여 (WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2 —
+      //    legacy lms:instructor 부여 중단. KPA 자격 요건은 Lecture 강사 승인에 요구하지 않는다 §12)
       await roleAssignmentService.assignRole({
         userId: application.userId,
-        role: 'lms:instructor',
+        role: LECTURE_INSTRUCTOR_ROLE,
         assignedBy: adminId,
       });
 
@@ -335,8 +337,7 @@ export class InstructorController extends BaseController {
       const courseRepo = AppDataSource.getRepository(Course);
       const course = await courseRepo.findOne({ where: { id: courseId } });
       if (!course) return BaseController.notFound(res, 'Course not found');
-      const isKpaAdmin = await roleAssignmentService.hasAnyRole(userId, ['kpa:admin']);
-      if (course.instructorId !== userId && !isKpaAdmin) {
+      if (course.instructorId !== userId && !hasLectureAdminRole(req)) {
         return BaseController.forbidden(res, '본인 강의의 통계만 조회할 수 있습니다');
       }
 
@@ -500,8 +501,7 @@ export class InstructorController extends BaseController {
       const courseRepo = AppDataSource.getRepository(Course);
       const course = await courseRepo.findOne({ where: { id: courseId }, select: ['id', 'title', 'credits', 'instructorId'] });
       if (!course) return BaseController.notFound(res, 'Course not found');
-      const isKpaAdmin = await roleAssignmentService.hasAnyRole(userId, ['kpa:admin']);
-      if (course.instructorId !== userId && !isKpaAdmin) {
+      if (course.instructorId !== userId && !hasLectureAdminRole(req)) {
         return BaseController.forbidden(res, '본인 콘텐츠의 참여자만 조회할 수 있습니다');
       }
 
@@ -646,8 +646,7 @@ export class InstructorController extends BaseController {
       const courseRepo = AppDataSource.getRepository(Course);
       const course = await courseRepo.findOne({ where: { id: courseId }, select: ['id', 'title', 'instructorId'] });
       if (!course) return BaseController.notFound(res, 'Course not found');
-      const isKpaAdmin = await roleAssignmentService.hasAnyRole(userId, ['kpa:admin']);
-      if (course.instructorId !== userId && !isKpaAdmin) {
+      if (course.instructorId !== userId && !hasLectureAdminRole(req)) {
         return BaseController.forbidden(res, '본인 콘텐츠의 통계만 조회할 수 있습니다');
       }
 
@@ -718,8 +717,7 @@ export class InstructorController extends BaseController {
       const courseRepo = AppDataSource.getRepository(Course);
       const course = await courseRepo.findOne({ where: { id: courseId }, select: ['id', 'title', 'instructorId'] });
       if (!course) return BaseController.notFound(res, 'Course not found');
-      const isKpaAdmin = await roleAssignmentService.hasAnyRole(userId, ['kpa:admin']);
-      if (course.instructorId !== userId && !isKpaAdmin) {
+      if (course.instructorId !== userId && !hasLectureAdminRole(req)) {
         return BaseController.forbidden(res, '본인 콘텐츠만 내보낼 수 있습니다');
       }
 
@@ -849,13 +847,9 @@ export class InstructorController extends BaseController {
         return BaseController.notFound(res, '수강 정보를 찾을 수 없습니다');
       }
 
-      // 강좌 소유권 확인
-      // WO-KPA-A-GUARD-STANDARDIZATION-FINAL-V1: platform:* → kpa:admin
+      // 강좌 소유권 확인 (override = lecture:admin)
       if (enrollment.course.instructorId !== userId) {
-        const isKpaAdmin = await roleAssignmentService.hasAnyRole(userId, [
-          'kpa:admin',
-        ]);
-        if (!isKpaAdmin) {
+        if (!hasLectureAdminRole(req)) {
           return BaseController.forbidden(res, '본인 강좌의 수강만 승인할 수 있습니다');
         }
       }
@@ -901,13 +895,9 @@ export class InstructorController extends BaseController {
         return BaseController.notFound(res, '수강 정보를 찾을 수 없습니다');
       }
 
-      // 강좌 소유권 확인
-      // WO-KPA-A-GUARD-STANDARDIZATION-FINAL-V1: platform:* → kpa:admin
+      // 강좌 소유권 확인 (override = lecture:admin)
       if (enrollment.course.instructorId !== userId) {
-        const isKpaAdmin = await roleAssignmentService.hasAnyRole(userId, [
-          'kpa:admin',
-        ]);
-        if (!isKpaAdmin) {
+        if (!hasLectureAdminRole(req)) {
           return BaseController.forbidden(res, '본인 강좌의 수강만 거절할 수 있습니다');
         }
       }
@@ -938,17 +928,17 @@ export class InstructorController extends BaseController {
   // ========================================
 
   /**
-   * 강사 강의 ownership 체크 (kpa:admin 우회 허용).
+   * 강사 강의 ownership 체크 (lecture:admin 만 우회 — Phase 2 §5/§6, kpa:admin bypass 0).
    */
   private static async checkLessonOwnership(
     lessonId: string,
     userId: string,
+    isAdmin: boolean,
   ): Promise<{ allowed: boolean; notFound: boolean; courseId?: string }> {
     const lesson = await LessonService.getInstance().getLesson(lessonId);
     if (!lesson) return { allowed: false, notFound: true };
 
-    const isKpaAdmin = await roleAssignmentService.hasAnyRole(userId, ['kpa:admin']);
-    if (isKpaAdmin) return { allowed: true, notFound: false, courseId: lesson.courseId };
+    if (isAdmin) return { allowed: true, notFound: false, courseId: lesson.courseId };
 
     const course = await CourseService.getInstance().getCourse(lesson.courseId);
     if (!course) return { allowed: false, notFound: true };
@@ -970,7 +960,7 @@ export class InstructorController extends BaseController {
       const userId = (req as any).user?.id;
       if (!userId) return BaseController.unauthorized(res, 'User not authenticated');
 
-      const own = await InstructorController.checkLessonOwnership(lessonId, userId);
+      const own = await InstructorController.checkLessonOwnership(lessonId, userId, hasLectureAdminRole(req));
       if (own.notFound) return BaseController.notFound(res, 'Lesson not found');
       if (!own.allowed) {
         return BaseController.forbidden(res, '본인 강의의 제출물만 조회할 수 있습니다.');
@@ -1008,7 +998,7 @@ export class InstructorController extends BaseController {
    * Body: { gradingStatus: 'graded' | 'returned', score?, feedback? }
    *
    * 정책 (WO-O4O-LMS-ASSIGNMENT-GRADING-V1):
-   *   - 본인 강의의 submission만 채점 가능 (kpa:admin 우회 허용)
+   *   - 본인 강의의 submission만 채점 가능 (lecture:admin 만 우회 — kpa:admin bypass 0)
    *   - 기존 lesson 진도/Credit/수료/인증서 흐름은 변경하지 않음
    */
   static async gradeSubmission(req: Request, res: Response): Promise<any> {
@@ -1024,7 +1014,7 @@ export class InstructorController extends BaseController {
       const submission: any = await submissionRepo.findOne({ where: { id: submissionId } });
       if (!submission) return BaseController.notFound(res, 'Submission not found');
 
-      const own = await InstructorController.checkLessonOwnership(submission.lessonId, userId);
+      const own = await InstructorController.checkLessonOwnership(submission.lessonId, userId, hasLectureAdminRole(req));
       if (own.notFound) return BaseController.notFound(res, 'Lesson not found');
       if (!own.allowed) {
         return BaseController.forbidden(res, '본인 강의의 제출물만 채점할 수 있습니다.');
@@ -1072,8 +1062,7 @@ export class InstructorController extends BaseController {
       const course = await courseRepo.findOne({ where: { id: courseId }, select: ['id', 'instructorId'] });
       if (!course) return BaseController.notFound(res, 'Course not found');
 
-      const isKpaAdmin = await roleAssignmentService.hasAnyRole(userId, ['kpa:admin']);
-      if (course.instructorId !== userId && !isKpaAdmin) {
+      if (course.instructorId !== userId && !hasLectureAdminRole(req)) {
         return BaseController.forbidden(res, '본인 강의의 레슨만 조회할 수 있습니다');
       }
 
@@ -1116,8 +1105,7 @@ export class InstructorController extends BaseController {
       });
       if (!course) return BaseController.notFound(res, 'Course not found');
 
-      const isKpaAdmin = await roleAssignmentService.hasAnyRole(userId, ['kpa:admin']);
-      if (course.instructorId !== userId && !isKpaAdmin) {
+      if (course.instructorId !== userId && !hasLectureAdminRole(req)) {
         return BaseController.forbidden(res, '본인 콘텐츠의 포인트 현황만 조회할 수 있습니다');
       }
 

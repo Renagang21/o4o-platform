@@ -6,10 +6,13 @@
  * 강의 visibility + enrollment 통합 접근 제어 미들웨어.
  *
  * PUBLIC  강의 → enrollment 없이 통과
- * MEMBERS 강의 → 아래 정책 순서대로 적용:
+ * MEMBERS 강의 → active lecture membership 필수 (WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 §7)
+ *   그 위에 아래 정책 순서대로 적용:
  *   1. isPaid=true        → 승인된 Enrollment 필수 (결제 강의)
  *   2. requiresApproval=true → 승인된 Enrollment 필수 (강사 승인 강의)
- *   3. 그 외              → 로그인만으로 통과 (무료·승인불필요 회원제)
+ *   3. 그 외              → membership 만으로 통과 (무료·승인불필요 회원제)
+ *
+ * 종전 "MEMBERS = 로그인만" 판정은 Lecture membership boundary 결함이라 제거했다.
  */
 
 import type { Request, Response, NextFunction } from 'express';
@@ -23,6 +26,7 @@ import {
   InvalidLmsServiceKeyError,
   INVALID_SERVICE_KEY_CODE,
 } from '../utils/lms-service-scope.js';
+import { resolveLectureMembershipStatus, isPlatformSuperAdmin } from './lecture-access.js';
 
 interface RequireEnrollmentOptions {
   /** lesson 라우트에서 lessonId → courseId 역추적 */
@@ -92,11 +96,30 @@ export function requireEnrollment(options?: RequireEnrollmentOptions) {
       return next();
     }
 
-    // MEMBERS 강의: enrollment 체크가 필요한지 판단
+    // MEMBERS 강의: active lecture membership 이 선행 조건이다 (role 불요 · break-glass 만 예외).
+    if (!isPlatformSuperAdmin(req)) {
+      const membershipStatus = await resolveLectureMembershipStatus(req);
+      if (membershipStatus === 'not_found') {
+        return res.status(403).json({
+          success: false,
+          error: '회원 전용 강의입니다. O4O 강의 서비스 가입이 필요합니다.',
+          code: 'MEMBERSHIP_NOT_FOUND',
+        });
+      }
+      if (membershipStatus === 'inactive') {
+        return res.status(403).json({
+          success: false,
+          error: '서비스 멤버십이 활성 상태가 아닙니다.',
+          code: 'MEMBERSHIP_NOT_ACTIVE',
+        });
+      }
+    }
+
+    // enrollment 체크가 필요한지 판단
     const needsEnrollmentCheck = course.isPaid || course.requiresApproval;
 
     if (!needsEnrollmentCheck) {
-      // 무료·승인불필요 회원제 강의 → 로그인만으로 통과
+      // 무료·승인불필요 회원제 강의 → membership 만으로 통과
       return next();
     }
 

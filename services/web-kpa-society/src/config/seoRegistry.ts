@@ -36,11 +36,6 @@ export const kpaSeoRegistry: SeoRegistry = {
     description: '모든 포럼 게시글 목록.',
     ogType: 'website',
   },
-  '/lms': {
-    title: '강의 — KPA Society',
-    description: '약사를 위한 전문 교육 및 온라인 강의.',
-    ogType: 'website',
-  },
   '/resources': {
     title: '자료실 — KPA Society',
     description: '약국 운영에 필요한 자료 모음.',

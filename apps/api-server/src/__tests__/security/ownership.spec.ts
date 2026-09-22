@@ -58,8 +58,9 @@ describe('LMS Ownership Guards', () => {
 
     expect(content).toContain('isOwnerOrAdmin');
     expect(content).toContain('instructorId');
-    // Admin bypass
-    expect(content).toContain("kpa:admin");
+    // Admin bypass — WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2 §5: lecture:admin 만 (kpa:admin bypass 0)
+    expect(content).toContain('hasLectureAdminRole(req)');
+    expect(content).not.toMatch(/['"]kpa:admin['"]/);
   });
 
   it('LessonController has checkCourseOwnership', () => {
@@ -71,7 +72,9 @@ describe('LMS Ownership Guards', () => {
 
     expect(content).toContain('checkCourseOwnership');
     expect(content).toContain('instructorId');
-    expect(content).toContain("kpa:admin");
+    // WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2 §5: lecture:admin 만 (kpa:admin bypass 0)
+    expect(content).toContain('rolesIncludeLectureAdmin(userRoles)');
+    expect(content).not.toMatch(/['"]kpa:admin['"]/);
   });
 
 });

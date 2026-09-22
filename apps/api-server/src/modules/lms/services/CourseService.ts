@@ -9,8 +9,6 @@ import logger from '../../../utils/logger.js';
 // WO-O4O-LMS-PUBLIC-COURSE-LIST-SERVICE-SCOPE-V1: canonical service key SSOT
 import { SERVICE_KEYS } from '../../../constants/service-keys.js';
 
-const KPA_SOCIETY_SERVICE_KEY: string = SERVICE_KEYS.KPA_SOCIETY;
-
 /** WO-O4O-GLOBAL-EVENT-LOG-MINIMAL-V1: actor passed from controller for audit trail */
 type EventActor = { id: string; role: string | null };
 
@@ -180,14 +178,10 @@ export class CourseService extends BaseService<Course> {
     }
 
     // WO-O4O-LMS-PUBLIC-COURSE-LIST-SERVICE-SCOPE-V1: service boundary.
-    // 미전달 시 무필터(현행) — generic/admin 경로 호환. KPA scope 는 legacy null 강의를
-    // 함께 포함한다 (기존 `serviceKey ?? 'kpa-society'` fallback 과 동일 판단).
+    // 미전달 시 무필터 — admin 카탈로그 호환. legacy NULL 을 KPA 에 포함시키던 분기는
+    // WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2 §8 에서 제거.
     if (serviceKey) {
-      if (serviceKey === KPA_SOCIETY_SERVICE_KEY) {
-        query.andWhere('(course.serviceKey = :svcKey OR course.serviceKey IS NULL)', { svcKey: serviceKey });
-      } else {
-        query.andWhere('course.serviceKey = :svcKey', { svcKey: serviceKey });
-      }
+      query.andWhere('course.serviceKey = :svcKey', { svcKey: serviceKey });
     }
 
     // Filters
@@ -388,9 +382,9 @@ export class CourseService extends BaseService<Course> {
     });
 
     // WO-O4O-GLOBAL-EVENT-LOG-MINIMAL-V1
-    // WO-O4O-LMS-SERVICEKEY-CONTEXT-V1: use course.serviceKey; null = legacy KPA fallback
+    // WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 §17: event serviceKey 는 Lecture 고정 (KPA fallback 제거)
     await logEvent({
-      serviceKey: updated.serviceKey ?? 'kpa-society',
+      serviceKey: updated.serviceKey ?? SERVICE_KEYS.LECTURE,
       entityType: 'course',
       entityId: updated.id,
       action: 'course.submitted',
@@ -442,9 +436,9 @@ export class CourseService extends BaseService<Course> {
     });
 
     // WO-O4O-GLOBAL-EVENT-LOG-MINIMAL-V1
-    // WO-O4O-LMS-SERVICEKEY-CONTEXT-V1: use course.serviceKey; null = legacy KPA fallback
+    // WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 §17: event serviceKey 는 Lecture 고정 (KPA fallback 제거)
     await logEvent({
-      serviceKey: updated.serviceKey ?? 'kpa-society',
+      serviceKey: updated.serviceKey ?? SERVICE_KEYS.LECTURE,
       entityType: 'course',
       entityId: updated.id,
       action: 'course.approved',
@@ -502,9 +496,9 @@ export class CourseService extends BaseService<Course> {
     });
 
     // WO-O4O-GLOBAL-EVENT-LOG-MINIMAL-V1
-    // WO-O4O-LMS-SERVICEKEY-CONTEXT-V1: use course.serviceKey; null = legacy KPA fallback
+    // WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 §17: event serviceKey 는 Lecture 고정 (KPA fallback 제거)
     await logEvent({
-      serviceKey: updated.serviceKey ?? 'kpa-society',
+      serviceKey: updated.serviceKey ?? SERVICE_KEYS.LECTURE,
       entityType: 'course',
       entityId: updated.id,
       action: 'course.rejected',

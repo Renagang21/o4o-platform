@@ -20,7 +20,7 @@
  */
 
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { OperatorAiReportPage, ForumRequestsManagementPage, ForumCategoriesManagementPage, ForumDeleteRequestsPage, ForumAnalyticsDashboard, ContentManagementPage, AuditLogPage, MemberManagementPage, ProductApplicationManagementPage, CommunityManagementPage, QualificationRequestsPage, OperatorLmsCoursesPage, OperatorResourcesPage, OperatorProductsPage, OperatorOrdersPage } from '../pages/operator';
+import { OperatorAiReportPage, ForumRequestsManagementPage, ForumCategoriesManagementPage, ForumDeleteRequestsPage, ForumAnalyticsDashboard, ContentManagementPage, AuditLogPage, MemberManagementPage, ProductApplicationManagementPage, CommunityManagementPage, QualificationRequestsPage, OperatorResourcesPage, OperatorProductsPage, OperatorOrdersPage } from '../pages/operator';
 // WO-KPA-A-OPERATOR-DASHBOARD-FIRST-STABILIZATION-V1: UsersPage → /operator/members redirect
 import UserDetailPage from '../pages/operator/UserDetailPage';
 import RoleManagementPage from '../pages/operator/RoleManagementPage';
@@ -187,9 +187,7 @@ export function OperatorRoutes() {
           {/* 자격 신청 관리 (WO-O4O-QUALIFICATION-SYSTEM-V1) */}
           <Route path="qualification-requests" element={<QualificationRequestsPage />} />
 
-          {/* LMS 강의 관리 (WO-KPA-OPERATOR-LMS-ROUTE-CANONICAL-FIX-V1: /operator/lms를 canonical route로 변경) */}
-          <Route path="lms" element={<OperatorLmsCoursesPage />} />
-          <Route path="lms/courses" element={<Navigate to="/operator/lms" replace />} />
+          {/* /operator/lms 제거 — WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2 §14 (LMS 운영은 O4O 강의 Operator) */}
 
           {/* 안내 문구 관리 (WO-O4O-GUIDE-CONTENT-EDITOR-UI-V1) */}
           <Route path="guide-contents" element={<OperatorGuideContentsPage />} />

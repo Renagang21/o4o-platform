@@ -3,14 +3,18 @@ import { PublicLegalFooterInfo } from '@o4o/shared-space-ui';
 import { BRAND, SERVICE_KEY } from '../config/service';
 import { loadFooterLegal } from '../lib/footerLegal';
 import { useAuth } from '../contexts/AuthContext';
+import { canAccess } from './AccessGate';
 
 export default function SiteShell() {
-  const { isAuthenticated, logout } = useAuth();
+  const { user, isAuthenticated, logout } = useAuth();
   return <div className="site">
     <header className="header">
       <Link className="brand" to="/">{BRAND.name}</Link>
       <nav className="nav">
-        <Link to="/">홈</Link><Link to="/instructor">강사</Link><Link to="/operator">운영</Link>
+        <Link to="/courses">강의</Link>
+        {isAuthenticated && <Link to="/my/enrollments">내 학습</Link>}
+        {canAccess('instructor', user) && <Link to="/instructor">강사</Link>}
+        {canAccess('operator', user) && <Link to="/operator">운영</Link>}
         {isAuthenticated ? <button className="link-button" type="button" onClick={logout}>로그아웃</button> : <Link to="/login">로그인</Link>}
       </nav>
     </header>

@@ -6,6 +6,7 @@ import { CourseService } from '../services/CourseService.js';
 import logger from '../../../utils/logger.js';
 // WO-O4O-LMS-CROSSSERVICE-READ-WRITE-BOUNDARY-COMPLETION-V1 §5
 import { guardLessonScope, guardAssignmentScope } from '../utils/lms-scope-guard.js';
+import { rolesIncludeLectureAdmin } from '../middleware/lecture-access.js';
 
 /**
  * AssignmentController
@@ -14,14 +15,14 @@ import { guardLessonScope, guardAssignmentScope } from '../utils/lms-scope-guard
  */
 export class AssignmentController extends BaseController {
   /**
-   * Verify the requesting user owns the course (or is kpa:admin).
+   * Verify the requesting user owns the course (or is lecture:admin).
    */
   private static async checkLessonOwnership(
     lessonId: string,
     userId: string,
     userRoles: string[],
   ): Promise<{ allowed: boolean; notFound: boolean; courseId?: string }> {
-    if (userRoles.includes('kpa:admin')) {
+    if (rolesIncludeLectureAdmin(userRoles)) {
       const lesson = await LessonService.getInstance().getLesson(lessonId);
       if (!lesson) return { allowed: false, notFound: true };
       return { allowed: true, notFound: false, courseId: lesson.courseId };

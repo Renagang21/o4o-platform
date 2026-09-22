@@ -1,8 +1,8 @@
 # CHECK-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1
 
 > **WO**: [`WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1`](../work-orders/WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1.md)
-> **범위**: **Phase 1 — Lecture Service Foundation** (WO §6.1 step 01~04). step 05 이후(LMS Core 정리 · surface 구축 · course migration · 기존 서비스 LMS 제거)는 **NOT_STARTED**.
-> **상태**: **Phase 1 MERGED** — PR #223 → main `3e56425b7` (2026-09-19 · merge commit) · `lecture-web` Cloud Run 첫 revision 배포 성공. **운영 reference seed APPLIED(§10.2 · 2026-09-19)** · **`study.neture.co.kr` 도메인 매핑 PASS(§10.3 · 2026-09-21 · HTTPS smoke 전부 PASS) → Phase 1 CLOSED.**
+> **범위**: **Phase 1 — Lecture Service Foundation** (WO §6.1 step 01~04 · §1~§10) + **Phase 2 — LMS Core 독립화 · Membership Boundary · Lecture Surface · 기존 서비스 LMS 제거** (§11~§16 · 2026-09-22). production LMS 데이터 cutover(course rekey · membership 생성)는 **NOT_STARTED** (§16).
+> **상태**: **Phase 1 MERGED** — PR #223 → main `3e56425b7` (2026-09-19 · merge commit) · `lecture-web` Cloud Run 첫 revision 배포 성공. **운영 reference seed APPLIED(§10.2 · 2026-09-19)** · **`study.neture.co.kr` 도메인 매핑 PASS(§10.3 · 2026-09-21 · HTTPS smoke 전부 PASS) → Phase 1 CLOSED.** · **Phase 2 COMPLETE(2026-09-22 · branch `work/lecture-phase2-v1` · production write 0 · `READY_FOR_LECTURE_DATA_CUTOVER=YES` · 운영자 로그인 E2E 보류) — §15 판정표.**
 > **날짜**: 2026-09-18 · **작성**: Claude Code (Opus 5) — ChatGPT 세션이 만든 PR 을 이어받아 정리 · 검증
 > **원칙**: 검증하지 않은 것을 PASS 로 쓰지 않는다. 접속값 · 자격증명 출력 0.
 
@@ -215,3 +215,108 @@ API CORS       OPTIONS api.neture.co.kr Origin=https://study.neture.co.kr → 20
 운영자 로그인은 §10.1 대로 계속 보류(도메인 매핑 · 공개 smoke 에 불필요).
 
 `LECTURE_DOMAIN_MAPPING = PASS` (5/5) · **Phase 1 CLOSED**. 다음 = Phase 2 (WO §6.1 step 05~ · 별도 지시).
+
+---
+
+# Phase 2 — LMS Core 독립화 · Lecture Membership Boundary · Lecture Surface 구축 (2026-09-22)
+
+> worktree `C:\tmp\o4o-lecture-phase2` · branch `work/lecture-phase2-v1` (base `2744ea809`) · 한 단위 실행.
+> production 무접촉: **DB write 0 · migration 0 · DDL 0 · role_assignment write 0** (§18 · §20 · 팀장 STOP 조건 전부 미발동).
+
+## 11. 신규 census (§4) — Phase 2 착수 시점
+
+| class | 발견 | 처분 |
+|---|---|---|
+| `KPA_RUNTIME_COUPLING` | `middleware/kpa-lms-scope-guard.ts` · `register-routes.ts` 의 `/api/v1/lms` 에 kpaLmsScopeGuard 결합 · KPA `course-request.controller/service` · KPA `instructor.service` · `mypage.controller` · `qualification.controller` · `operator-dashboard.service` 의 lms 집계 · PH `/home/latest` course 축 · cosmetics routes lms 위임 | 전부 제거 (`git rm` 3 · 수정 8) |
+| `LEGACY_LMS_ROLE` | `requireInstructor.ts` `lms:instructor` · `types/roles.ts` 선언 · migration `20260700200000-MigrateLmsCreatorQualification.ts` | runtime 소비 0 으로 (requireInstructor → `lecture:instructor`). `types/roles.ts` 의 `'lms:instructor'` 타입·표 항목은 **legacy 선언만 유지**(data cutover 전 제거 시 기존 role_assignment 해석 불능 위험 · §13 read-only) · migration 은 §13 불변 |
+| `SERVICE_SCOPE_INFERENCE` | `lms-service-scope.ts` 가 프런트 `serviceKey` query/header 로 스코프 추론 · KCos `apiClient` interceptor `/lms/*` serviceKey 부착 | 서버 고정 `lecture` (요청값 무시) · KCos interceptor 제거 |
+| `PLATFORM_ADMIN_SURFACE` | admin-dashboard `pages/lms-instructor/*` · `lib/api/lmsInstructor.ts` | 삭제 → Lecture Operator `/operator/instructors` 로 이관 (§11) |
+| `COURSE_SERVICEKEY_FALLBACK` | `CourseService.createCourse` 는 Phase 1 에서 이미 `lecture` 고정 · update 경로·목록 조회의 serviceKey fallback | update 에서 serviceKey 변경 불가 · 조회는 `lecture` 단일 (§8) |
+| `SAFE_SHARED_LMS_CORE` | `@o4o/lms-core` · `@o4o/lms-client` · `@o4o/lms-ui` · `packages/content-editor` · lms entity/service 계층 | **재사용 · 구조 변경 0** (§10). `packages/organization-lms` 부활 없음 |
+
+## 12. 구현 요약
+
+### 12-1. backend (`apps/api-server`)
+- **신설** `modules/lms/middleware/lecture-access.ts` — `requireLectureLearner / Instructor / Operator / Admin` · `hasLectureAdminRole(req)` · `hasLectureOperatorRole` · `rolesIncludeLectureAdmin(roles)`. 계약: `lecture:admin ⊇ lecture:operator` · admin/operator ≠ instructor · `platform:super_admin` break-glass (§6). Learner = `service_memberships(service_key='lecture', status='active')` (§7) — role 만 있고 membership 없으면 deny.
+- **삭제** `middleware/kpa-lms-scope-guard.ts` · KPA `course-request.controller.ts` · `course-request.service.ts`.
+- Course/Lesson/Quiz/Assignment/Certificate/Instructor controller 의 ownership bypass → `lecture:admin` 만 (`kpa:admin` role-literal 0). `requireInstructor` → `lecture:instructor`. `requireEnrollment` · `lms-enrollment-owner-guard` · `lms-scope-guard` 는 Lecture 경계로 정렬.
+- `CourseService` update 에서 `serviceKey` 변경 불가 · `content_kind` 와 `service_key` 분리 유지 (§9).
+- **수료증 검증 base** (§17): `certificate-verification-base.ts` → `LECTURE_FRONTEND_URL || https://study.neture.co.kr` 단일. **KPA fallback 없음**. Reward = OFF (변경 0 · courses/lessons metadata rewardPolicy 0 — §14 재확인).
+- KPA `/api/ai/course-structure` · `/api/ai/lesson-body` (`ai-proxy.routes.ts`): **프런트 소비자 0** 확인 — 기록만, 삭제 안 함 (§16 · 공용 `/api/ai/content` 무접촉).
+- PH `pharmacy-hub.routes.ts` `/home/latest` 의 course 축 제거 · cosmetics routes 의 lms 위임 제거.
+
+### 12-2. Lecture surface (`services/web-lecture`) — §11
+| 축 | 화면 | 재사용 |
+|---|---|---|
+| Learner | `/courses` · `/courses/:id` · `/courses/:id/lesson/:lessonId` · `/my/enrollments` · `/my/certificates` · `/my/instructor-apply` · `/certificates/verify/:code` · `/certificate/verify/:id`(PDF QR · 기존 서비스 외부 이동 alias, id 기반 `GET /lms/certificates/:id/verify` fallback) | `@o4o/lms-client` (`createLmsLearnerClient(lmsHttp)` · serviceKey 미부착) · `@o4o/lms-ui` (`CourseListView` · `LmsHubTemplate` · `LmsLoading`) |
+| Instructor | `/instructor` · `/instructor/courses/new` · `/instructor/courses/:id/edit`(태그 1개 이상 필수 — 서버 `sanitizeCourseTags` 계약 반영) · `/instructor/enrollments` · `/instructor/lessons/:id/quiz` · `/assignment` · `/submissions` | `@o4o/content-editor` RichTextEditor(내부 AI 기본값 유지 · 강의 자동 생성 없음 §16) |
+| Operator | `/operator`(강의) · `/operator/instructors`(Platform Admin 에서 이관 · KPA 약사 자격 요구 없음 §12) · `/operator/certificates` | `AccessGate`(role + membership 경계) |
+- `RoleBoundaryPage.tsx`(Phase 1 임시) 삭제. KPA/KCos/PH 화면 **복사 0** (신규 작성).
+- `package.json` 에 `@o4o/lms-client` · `@o4o/lms-ui` · `@o4o/content-editor` workspace 의존 추가 → `pnpm-lock.yaml` importer 링크 9줄(외부 패키지 추가 0) · `Dockerfile` 선별 COPY + `lms-client build` 추가.
+
+### 12-3. 기존 서비스 LMS surface 제거 (§14 · §15)
+| 서비스 | 삭제 | 남긴 것 |
+|---|---|---|
+| KPA (`web-kpa-society`) | `api/lms.ts` · `api/instructor.ts` · `api/lms-instructor.ts` · `api/ai.ts` · `pages/courses/*` · `pages/instructors/*` · `pages/lms/*` · `pages/instructor/**` · `pages/mypage/My{Enrollments,Certificates}Page` · `pages/operator/OperatorLmsCoursesPage` · `pages/services/LmsServicePage` · `pages/work/WorkLearningPage` · `pages/guide/GuideFeatureLmsPage` · `components/instructor/InstructorLayout` (31) | `/lms/*` · `/courses/*` · `/instructor/*` · `/mypage/enrollments`·`certificates` · `/certificate/verify/:id` → `LectureExternalRedirect`(study.neture.co.kr) · operator 메뉴 `/operator/lms` 제거 |
+| K-Cosmetics | `api/lms.ts` · `api/ai.ts` · `pages/lms/*` · `pages/instructor/*` · `pages/mypage/My*` · `pages/operator/OperatorLmsCoursesPage` (11) · `apiClient` serviceKey interceptor | 동일 외부 이동 |
+| PharmacyHub | `api/lms.ts` · `api/ai.ts` · `pages/education/*` · `pages/instructor/*` · `pages/account/My{Enrollments,Certificates}Page` · `pages/operator/OperatorLmsCoursesPage` (17) | `/education/*` · `/instructor/*` · `/account/enrollments`·`certificates` · `/certificate/verify/:certificateId` 외부 이동 · `MyCreditsPage` 학습 CTA = 외부 링크 |
+| Platform Admin (`apps/admin-dashboard`) | `pages/lms-instructor/*` · `lib/api/lmsInstructor.ts` (3) | — |
+- KCos/PH `package.json` 의 `@o4o/lms-client` · `@o4o/lms-ui` 의존 선언은 **무접촉**(소비 import 0 · 의존성 변경 = 중지 조건 → 별도 정리 제안).
+
+## 13. 검증 (§22)
+
+| 항목 | 결과 |
+|---|---|
+| `apps/api-server` tsc | 0 |
+| `services/web-lecture` tsc · vite build | 0 · PASS |
+| `web-kpa-society` · `web-k-cosmetics` · `web-pharmacy-hub` · `admin-dashboard` tsc · vite build | 전부 0 · PASS (회귀) |
+| `lecture-phase2-access-contract.spec.ts` (신규 · negative 포함: membership 없는 role → deny · instructor 의 operator 경로 deny · learner 의 instructor 경로 deny · 타 serviceKey 요청 무시) | 20/20 PASS |
+| `certificate-verification-base.test.ts` (재작성 5) | 5/5 PASS |
+| 기존 spec 정합 갱신 12 (`lms-course-list-hub-view-commonization` · `lms-instructor-course-create-tags-contract` · `lms-instructor-course-service-scope` · `lms-kpa-frontend-api-contract-residue` · `lms-public-course-service-scope` · `lms-crossservice-read-write-boundary` · `store-ai-first-editor-boundary-contract` · `store-internal-ai-retirement-contract` · `security/ownership` · `service-operator-workspace-realignment` · `pharmacy-hub-community-baseline` · `pharmacy-hub-lms-learner-adoption`(은퇴 계약으로 재작성 · 파일명 유지)) | PASS |
+| **api-server jest 전체** | **338 suites PASS · 0 failed · 4 skipped / 5681 tests PASS · 32 skipped** |
+| 운영자 실 로그인 E2E | **보류** (§21 · Phase 1 §10.1 동일 — Auth 는 이 WO 에서 다루지 않음) |
+
+발견·수정한 실제 결함 2건(둘 다 Lecture 신규 surface 내부):
+1. 강사 강의 편집 화면에 태그 입력이 없어 서버 `태그 1개 이상` 계약으로 생성이 항상 실패 → 태그 입력 + 화면 선검증.
+2. PDF QR · 기존 서비스 외부 이동은 certificate **id** 로 `/certificate/verify/:id` 를 부르는데 Lecture 는 verificationCode 경로만 있었음 → alias route + id fallback(`verifyCertificateById`).
+
+## 14. Production 재-census (§18 · §19) — SELECT only · 2026-09-22
+
+read-only(`o4o_api_v2` · cloud-sql-proxy). 9/18 IR 대비 **이탈 0** — STOP 미발동.
+
+| 항목 | 값 |
+|---|---|
+| `lms_courses` | 11 (NULL service_key 0 · content_kind≠lecture 0 · org-scoped 0 · paid 0) |
+| service_key × status/visibility | kpa-society 8 (archived/members 2 · pending_review/members 1 · published/members 2 · published/public 3) · pharmacy-hub 3 (archived: members 2 · public 1) |
+| lessons / enrollments / progress / quizzes / assignments | 10 / 3 / 0 / 6 / 1 |
+| certificates / quiz_attempts / submissions / instructor_applications | 0 / 0 / 0 / 0 |
+| orphan lessons / enrollments | 0 / 0 |
+| `currentEnrollments` 불일치 | 7 (IR 동일 · §20 범위 밖 · 미수정) |
+| reward policy (courses/lessons metadata) | 0 |
+| `role_assignments` `lms%` / `lecture:%` | 0 / 0 (전체 11 · 전부 active) · `roles` `lecture:*` 3 (Phase 1 seed) |
+| `service_memberships` lecture active | 0 |
+| `platform_services` lecture | active · approval_required f |
+| users / service_memberships 전체 | 2 (IR 1 → +1 · Identity 트랙 정상 증가) / 5 |
+| 마지막 course 갱신 | 2026-08-26 (Phase 2 기간 write 0 확인) |
+
+## 15. 판정표 (§23)
+
+| 항목 | 판정 |
+|---|---|
+| `LECTURE_PHASE2` | **COMPLETE** (운영 배포 · 운영자 로그인 E2E 제외) |
+| `LMS_KPA_RUNTIME_COUPLING` | 0 (잔존 = `register-routes.ts:131` 주석 1) |
+| `KPA_LMS_SCOPE_GUARD` | REMOVED |
+| `KPA_ADMIN_LMS_BYPASS` | 0 |
+| `LECTURE_MEMBERSHIP_BOUNDARY` | ENFORCED (`lecture-access.ts` · spec 20) |
+| `LECTURE_COURSE_SERVICEKEY_FORCE` | ENFORCED (create · update · 조회) |
+| `LECTURE_LEARNER_SURFACE` / `LECTURE_INSTRUCTOR_SURFACE` / `LECTURE_OPERATOR_SURFACE` | BUILT / BUILT / BUILT |
+| `PLATFORM_ADMIN_LMS_INSTRUCTOR_SURFACE` | REMOVED_OR_MIGRATED (→ Lecture `/operator/instructors`) |
+| `LEGACY_LMS_INSTRUCTOR_RUNTIME_CONSUMERS` | 0 (`types/roles.ts` 선언 · historical migration 은 non-runtime 잔존) |
+| `KPA_LMS_RUNTIME_SURFACE` / `KCOS_LMS_RUNTIME_SURFACE` / `PHARMACY_HUB_LMS_RUNTIME_SURFACE` | 0 / 0 / 0 (외부 이동 route 만) |
+| `LMS_CORE_REUSED` / `NEW_LMS_CORE` | YES / NO |
+| `PRODUCTION_LMS_WRITE` | 0 |
+| `PRODUCTION_RE_CENSUS` | DONE (SELECT only · 이탈 0) |
+| `READY_FOR_LECTURE_DATA_CUTOVER` | **YES** — 선행: 본 PR merge · 배포 · 운영자 로그인 E2E(§21) |
+
+## 16. Phase 2 비범위 (§20 · 미착수 확인)
+production `service_key` migration(kpa-society 8 · pharmacy-hub 3 → lecture) · `currentEnrollments` 7 정정 · production membership 생성 · reward/credit/certificate/organization/paid 이관 · KCos/PH `package.json` lms 의존 선언 정리 · `types/roles.ts` `lms:instructor` 제거 · KPA AI route 2 삭제. 전부 **별도 WO**.

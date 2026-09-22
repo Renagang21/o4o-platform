@@ -12,6 +12,7 @@ import {
 } from '../utils/lms-service-scope.js';
 // WO-O4O-LMS-CROSSSERVICE-READ-WRITE-BOUNDARY-COMPLETION-V1
 import { guardLessonScope } from '../utils/lms-scope-guard.js';
+import { rolesIncludeLectureAdmin } from '../middleware/lecture-access.js';
 
 /**
  * LessonController
@@ -20,11 +21,11 @@ import { guardLessonScope } from '../utils/lms-scope-guard.js';
  *
  * WO-KPA-A-LMS-COURSE-OWNERSHIP-GUARD-V1:
  * - All write operations verify parent course.instructorId === userId
- * - kpa:admin bypasses ownership check
+ * - lecture:admin bypasses ownership check (WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2)
  */
 export class LessonController extends BaseController {
   private static async checkCourseOwnership(courseId: string, userId: string, userRoles: string[]): Promise<{ allowed: boolean; notFound: boolean }> {
-    if (userRoles.includes('kpa:admin')) return { allowed: true, notFound: false };
+    if (rolesIncludeLectureAdmin(userRoles)) return { allowed: true, notFound: false };
     const courseService = CourseService.getInstance();
     const course = await courseService.getCourse(courseId);
     if (!course) return { allowed: false, notFound: true };

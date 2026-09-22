@@ -279,7 +279,7 @@ export class CertificateController extends BaseController {
       const userName = (certificate.user as any)?.name || '수강자';
       const courseTitle = certificate.course?.title || '과정';
 
-      // WO-O4O-LMS-CERTIFICATE-DOMAIN-V1: serviceKey 기준 도메인 결정 (legacy null → KPA fallback)
+      // WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2 §17: 검증 링크는 Lecture(study.neture.co.kr) 단일 — KPA fallback 없음.
       const frontendBase = resolveVerificationBase(certificate.course?.serviceKey);
       const verificationUrl = `${frontendBase}/certificate/verify/${certificate.id}`;
 

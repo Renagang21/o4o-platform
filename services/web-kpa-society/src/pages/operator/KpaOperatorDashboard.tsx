@@ -190,7 +190,6 @@ function buildKpaAxesFromConfig(
         { key: 'members', label: '회원 관리', href: '/operator/members' },
         { key: 'stores', label: '매장 관리', href: '/operator/stores' },
         { key: 'forum', label: '포럼 운영', href: '/operator/forum' },
-        { key: 'lms', label: '강의 관리', href: '/operator/lms' },
         { key: 'supplier-contents', label: '제공받은 콘텐츠', href: '/operator/approvals' },
         { key: 'signage', label: '사이니지', href: '/operator/signage/hq-media' },
       ],

@@ -27,7 +27,6 @@ import aiRoutes from '../modules/ai/routes/ai.routes.js';
 import creditRoutes from '../modules/credit/routes/credit.routes.js';
 // WO-O4O-POINT-CORE-EXTENSION-V1
 import pointRoutes from '../modules/point/routes/point.routes.js';
-import { kpaLmsScopeGuard } from '../middleware/kpa-lms-scope-guard.js';
 import usersRoutes from '../routes/users.routes.js';
 import healthRoutes from '../routes/health.js';
 import forumRoutes from '../routes/forum/forum.routes.js';
@@ -128,8 +127,9 @@ export async function registerCoreRoutes(app: Application): Promise<void> {
   //   legitimate caller 0 · {id,email} JSON 만으로 tokenType:'service' JWT 가 발급되던 경로.
   // Phase 3: Guest 인증 (WO-AUTH-SERVICE-IDENTITY-PHASE3-QR-GUEST-DEVICE)
   app.use('/api/v1/auth/guest', guestAuthRoutes);
-  // LMS routes (WO-KPA-B-LMS-GUARD-BYPASS-AUDIT-AND-IMPLEMENTATION-V1: KPA org scope guard BEFORE lmsRoutes)
-  app.use('/api/v1/lms', kpaLmsScopeGuard);
+  // LMS routes — WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2:
+  //   `/api/v1/lms` 는 O4O 강의(lecture) 서비스 전용 runtime. KPA org scope guard(kpaLmsScopeGuard) 는
+  //   KPA runtime coupling 이라 제거했다. 접근 계약은 lms.routes 내부의 Lecture guard 가 담당한다.
   app.use('/api/v1/lms', lmsRoutes);
   // WO-O4O-LMS-AI-MINIMAL-V1
   app.use('/api/v1/ai', aiRoutes);

@@ -73,11 +73,8 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
     { label: '제공받은 콘텐츠', path: '/operator/supplier-contents' },
   ],
   resources: [{ label: '자료실 관리', path: '/operator/resources' }],
-  // WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §4 (#95):
-  //   강의 관리 = 공통 /api/v1/lms/operator/courses/*. backend allowlist 에
-  //   pharmacy-hub role 을 추가만 했고 분기·사본은 없다.
+  // WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2 §14: '강의 관리'(/operator/lms) 제거 — 독립 강의 서비스 소유
   lms: [
-    { label: '강의 관리', path: '/operator/lms' },
     // 동일 WO §4 (#96): 안내 문구 관리 = 공통 guide contents (serviceKey 경계).
     //   다른 서비스와 같은 lms 그룹에 둔다. KPA 의 '강사 승인'은
     //   KPA 전용 backend guard(requireKpaAdmin) 라 PH 에는 둘 수 없다(dead nav 금지).

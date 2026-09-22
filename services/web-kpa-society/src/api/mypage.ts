@@ -5,8 +5,6 @@
 import { apiClient } from './client';
 import { authClient } from '../contexts/AuthContext';
 import type {
-  Enrollment,
-  Certificate,
   EventOfferParticipation,
   ApiResponse,
   PaginatedResponse,
@@ -183,13 +181,7 @@ export const mypageApi = {
       groupbuyParticipations: number;
     }>>('/mypage/summary'),
 
-  // 내 수강
-  getMyEnrollments: (params?: { status?: string; page?: number; limit?: number }) =>
-    apiClient.get<PaginatedResponse<Enrollment>>('/mypage/enrollments', params),
-
-  // 내 수료증
-  getMyCertificates: (params?: { page?: number; limit?: number }) =>
-    apiClient.get<PaginatedResponse<Certificate>>('/mypage/certificates', params),
+  // 내 수강 · 내 수료증 — WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2 §14: 독립 강의 서비스 소유(backend 위임 제거) — 삭제
 
   // 내 이벤트 오퍼
   getMyEventOffers: (params?: { status?: string; page?: number; limit?: number }) =>

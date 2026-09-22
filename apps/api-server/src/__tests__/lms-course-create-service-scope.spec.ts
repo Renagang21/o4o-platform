@@ -1,15 +1,13 @@
 /**
- * WO-O4O-KPA-PHARMACYHUB-COMMUNITY-MY-STORE-PRODUCTION-CLOSURE-V1 §10 §15
+ * WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2 §8 — course serviceKey 강제
  *
- * production smoke 결함: pharmacyhub.co.kr 에서 생성한 강의가
- * `serviceKey: 'kpa-society'` 로 저장되어 PH operator/instructor/learner 목록에서 사라지고
- * KPA scope 를 오염시켰다.
+ * 종전(WO-O4O-KPA-PHARMACYHUB-COMMUNITY-MY-STORE-PRODUCTION-CLOSURE-V1 §10) 은 생성 시 소속 서비스를
+ * "요청 scope → 생성자의 첫 active membership" 순으로 유추했다. Phase 2 에서 LMS runtime 의
+ * Application Service 는 O4O 강의(lecture) 하나뿐이므로:
  *
- * 원인: `CourseController.createCourse` 가 요청의 LMS scope 를 보지 않고
- *      생성자의 첫 active `service_memberships` 행에서 serviceKey 를 유추했다.
- *      (PH client 는 생성 시 serviceKey 를 보내지 않았다.)
- *
- * 계약: 생성 시 소속 서비스는 **요청 scope** 가 결정한다. 무경계 요청에서만 membership 유래.
+ *   - 서버가 `course.serviceKey = 'lecture'` 로 고정한다.
+ *   - 클라이언트가 보낸 serviceKey 는 신뢰하지 않는다 (덮어쓴다).
+ *   - "첫 active membership" 유추(service_memberships SELECT) 는 제거한다.
  */
 import { readFileSync } from 'fs';
 import { join } from 'path';
@@ -17,48 +15,35 @@ import { join } from 'path';
 const ROOT = join(__dirname, '../../../..');
 const read = (p: string) => readFileSync(join(ROOT, p), 'utf-8');
 
-describe('LMS course create — service scope (WO-...-PRODUCTION-CLOSURE-V1 §10)', () => {
+describe('LMS course create — serviceKey 강제 (Lecture Phase 2 §8)', () => {
   const controller = read('apps/api-server/src/modules/lms/controllers/CourseController.ts');
+  const create = controller.slice(
+    controller.indexOf('static async createCourse'),
+    controller.indexOf('static async getCourse'),
+  );
 
-  it('createCourse 가 요청 scope 를 해석한다', () => {
-    const create = controller.slice(
-      controller.indexOf('static async createCourse'),
-      controller.indexOf('static async getCourse'),
-    );
-    expect(create).toContain('resolveLmsServiceScope(req)');
-    expect(create).toContain('data.serviceKey = createScope;');
+  it('createCourse 는 serviceKey 를 SERVICE_KEYS.LECTURE 로 고정한다', () => {
+    expect(create).toContain('data.serviceKey = SERVICE_KEYS.LECTURE;');
   });
 
-  it('알 수 없는 serviceKey 는 400 INVALID_SERVICE_KEY 로 거절한다', () => {
-    const create = controller.slice(
-      controller.indexOf('static async createCourse'),
-      controller.indexOf('static async getCourse'),
-    );
-    expect(create).toContain('InvalidLmsServiceKeyError');
-    expect(create).toContain('INVALID_SERVICE_KEY_CODE');
+  it('클라이언트 serviceKey / 요청 scope 로 소속을 결정하지 않는다', () => {
+    expect(create).not.toContain('data.serviceKey = createScope');
+    expect(create).not.toContain('resolveLmsServiceScope(req)');
+    expect(create).not.toContain('req.body.serviceKey');
   });
 
-  it('무경계 요청에서는 membership 유래 fallback 이 남아 있다', () => {
-    const create = controller.slice(
-      controller.indexOf('static async createCourse'),
-      controller.indexOf('static async getCourse'),
-    );
-    expect(create).toContain('FROM service_memberships');
-    // scope 해석이 membership fallback 보다 앞선다
-    expect(create.indexOf('resolveLmsServiceScope(req)')).toBeLessThan(
-      create.indexOf('FROM service_memberships'),
-    );
+  it('"첫 active membership" 추론(service_memberships SELECT)이 제거됐다', () => {
+    expect(create).not.toContain('FROM service_memberships');
+    expect(controller).not.toContain('FROM service_memberships');
   });
 
-  it('PH client 가 강의 생성 시 canonical serviceKey 를 붙인다', () => {
-    const phLms = read('services/web-pharmacy-hub/src/api/lms.ts');
-    const idx = phLms.indexOf("api.post<any>('/lms/courses'");
-    expect(idx).toBeGreaterThan(-1);
-    expect(phLms.slice(idx, idx + 200)).toContain('serviceKey: PH_SERVICE_KEY');
-  });
-
-  it('KPA client 도 강의 생성 시 canonical serviceKey 를 붙인다', () => {
-    const kpa = read('services/web-kpa-society/src/api/lms-instructor.ts');
-    expect(kpa).toContain("'/lms/courses?serviceKey=kpa-society'");
+  it('생성 자격 판정은 controller 가 아니라 라우트 guard(requireInstructor = Lecture 계약)가 한다', () => {
+    expect(create).not.toContain('hasAnyRole');
+    expect(create).not.toContain("'kpa:admin'");
+    expect(create).not.toContain("'lms:instructor'");
+    const routes = read('apps/api-server/src/modules/lms/routes/lms.routes.ts');
+    expect(routes).toMatch(/router\.post\('\/courses',\s*requireAuth,\s*requireInstructor/);
+    const requireInstructor = read('apps/api-server/src/modules/lms/middleware/requireInstructor.ts');
+    expect(requireInstructor).toContain('export const requireInstructor = requireLectureInstructor;');
   });
 });

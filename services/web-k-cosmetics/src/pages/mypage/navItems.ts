@@ -16,8 +16,7 @@ export const KCOS_MYPAGE_NAV_ITEMS: MyPageNavItem[] = [
   { label: '홈', path: '' },
   { label: '프로필', path: '/profile' },
   { label: '내 신청', path: '/my-requests' },
-  { label: '내 수강', path: '/enrollments' },
-  { label: '학습 결과', path: '/certificates' },
+  // Phase 2 §14 (WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1): 내 수강 · 학습 결과는 독립 강의 서비스 소유 — 제거
   { label: '크레딧', path: '/credits' },
   { label: '설정', path: '/settings' },
 ];
