@@ -190,3 +190,48 @@ describe('services/web-store 조립 계층 (WO §3-①·⑥)', () => {
     expect(wf).toContain('gcloud run deploy store-web');
   });
 });
+
+describe('§8-4 기존 서비스 매장 진입 → 통합 Store Workspace handoff (플래그 게이트 · 기본 OFF)', () => {
+  const kpa = readRepo('services/web-kpa-society/src/App.tsx');
+  const kcos = readRepo('services/web-k-cosmetics/src/App.tsx');
+  const phShell = readRepo('services/web-pharmacy-hub/src/layouts/StoreOwnerShell.tsx');
+  const ph = readRepo('services/web-pharmacy-hub/src/App.tsx');
+
+  it('세 서비스 모두 기존 가드 안쪽에 UnifiedStoreHandoffGate 를 두고 VITE_UNIFIED_STORE_HANDOFF 로만 켠다', () => {
+    for (const src of [kpa, kcos, phShell]) {
+      expect(src).toContain('UnifiedStoreHandoffGate');
+      expect(src).toContain('isUnifiedStoreHandoffEnabled(import.meta.env.VITE_UNIFIED_STORE_HANDOFF)');
+    }
+    expect(norm(kpa)).toContain('<PharmacyGuard><KpaUnifiedStoreHandoff><KpaStoreLayoutWrapper /></KpaUnifiedStoreHandoff></PharmacyGuard>');
+    expect(norm(kpa)).toContain('<HubGuard><KpaUnifiedStoreHandoff><PharmacyHubLayout /></KpaUnifiedStoreHandoff></HubGuard>');
+    expect(norm(kcos)).toContain('<StoreOwnerRoute> <KCosUnifiedStoreHandoff><StoreLayoutWrapper /></KCosUnifiedStoreHandoff> </StoreOwnerRoute>');
+    expect(norm(phShell)).toContain('<PharmacyHubUnifiedStoreHandoff> <ShellLayout /> </PharmacyHubUnifiedStoreHandoff> </StoreOwnerGuard>');
+  });
+
+  it('제외 표면: PH PG callback(/store-owner/payment · requireStoreOwnerRole=false) 과 송출 화면은 handoff 대상이 아니다', () => {
+    // requireStoreOwnerRole=false 분기는 MembershipGate → ShellLayout 직결(게이트 없음)
+    expect(norm(phShell)).toContain('<MembershipGate> <ShellLayout /> </MembershipGate>');
+    expect(ph).toContain('<Route path="/store-owner/payment" element={<StoreOwnerShell requireStoreOwnerRole={false} />}>');
+    // 송출 화면은 layout wrapper(=게이트 포함) 없이 가드만
+    expect(norm(kpa)).toContain('element={<PharmacyGuard><SignagePlaybackPage /></PharmacyGuard>}');
+    expect(norm(kcos)).toContain('element={<StoreOwnerRoute><SignagePlaybackPage /></StoreOwnerRoute>}');
+  });
+
+  it("빌드 플래그는 세 Dockerfile 과 workflow 에 기본 'false' 로 고정된다 (cutover = workflow 한 줄)", () => {
+    for (const svc of ['web-kpa-society', 'web-k-cosmetics', 'web-pharmacy-hub']) {
+      const df = readRepo(`services/${svc}/Dockerfile`);
+      expect(df).toContain('ARG VITE_UNIFIED_STORE_HANDOFF=false');
+      expect(df).toContain('ENV VITE_UNIFIED_STORE_HANDOFF=$VITE_UNIFIED_STORE_HANDOFF');
+    }
+    const wf = readRepo('.github/workflows/deploy-web-services.yml');
+    expect(wf).toContain("VITE_UNIFIED_STORE_HANDOFF: 'false'");
+    expect(wf.match(/--build-arg VITE_UNIFIED_STORE_HANDOFF=\$\{\{ env\.VITE_UNIFIED_STORE_HANDOFF \}\}/g)?.length).toBe(3);
+  });
+
+  it('handoff 발급은 같은 POST /auth/handoff 의 targetWorkspace=store 분기다 (신규 엔드포인트 0 · 가짜 serviceKey 0)', () => {
+    const api = readRepo('packages/store-ui-core/src/api/createStoreServicesApi.ts');
+    expect(api).toContain('resolveWorkspaceEntryUrl(returnPath: string): Promise<string>');
+    expect(norm(api)).toContain("targetWorkspace: STORE_WORKSPACE_KEY, returnPath,");
+    expect(api).not.toContain("targetServiceKey: 'store'");
+  });
+});

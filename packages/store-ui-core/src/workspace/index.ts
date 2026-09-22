@@ -22,3 +22,8 @@ export { MyServicesView } from './MyServicesView';
 export type { MyServicesViewProps } from './MyServicesView';
 export { useStoreServices } from './useStoreServices';
 export type { UseStoreServicesState } from './useStoreServices';
+// WO-O4O-UNIFIED-STORE-WORKSPACE-FOUNDATION-V1 §8-4: 기존 서비스 매장 진입 → 통합 Store Workspace handoff
+export { isUnifiedStoreHandoffEnabled, mapLegacyStorePathToUnified } from './unifiedStoreHandoff';
+export type { UnifiedStoreServiceKey } from './unifiedStoreHandoff';
+export { UnifiedStoreHandoffGate } from './UnifiedStoreHandoffGate';
+export type { UnifiedStoreHandoffGateProps } from './UnifiedStoreHandoffGate';

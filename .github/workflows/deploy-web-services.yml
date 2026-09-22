@@ -54,6 +54,9 @@ env:
   VITE_SERVICE_URL_LECTURE: https://study.neture.co.kr
   VITE_API_URL_STORE: https://api.neture.co.kr
   VITE_SERVICE_URL_STORE: https://store.neture.co.kr
+  # WO-O4O-UNIFIED-STORE-WORKSPACE-FOUNDATION-V1 §8-4: KPA·KCos·PH 매장 진입 → store.neture.co.kr handoff.
+  # cutover 전환 = 이 한 줄을 'true' 로 (DNS·cert·Google origin 준비 후). 기본 'false' = 기존 매장 화면 유지.
+  VITE_UNIFIED_STORE_HANDOFF: 'false'
   # WO-O4O-KPA-BRANCH-DEPLOY-AND-RUNTIME-SMOKE-V1
   # 분회 서비스는 단일 web service 하나만 운영한다 (분회별 Cloud Run 서비스 생성 금지).
   # 분회 tenant 는 URL segment(/{slug}) 또는 Host(branch_domains) 로만 해석된다.
@@ -283,6 +286,7 @@ jobs:
             --platform linux/amd64 \
             --build-arg VITE_API_BASE_URL=${{ env.VITE_API_URL_K_COSMETICS }} \
             --build-arg VITE_SERVICE_URL=${{ env.VITE_SERVICE_URL_K_COSMETICS }} \
+            --build-arg VITE_UNIFIED_STORE_HANDOFF=${{ env.VITE_UNIFIED_STORE_HANDOFF }} \
             -f services/web-k-cosmetics/Dockerfile \
             -t gcr.io/${{ env.PROJECT_ID }}/k-cosmetics-web:${IMAGE_TAG} \
             -t gcr.io/${{ env.PROJECT_ID }}/k-cosmetics-web:latest \
@@ -352,6 +356,7 @@ jobs:
             --platform linux/amd64 \
             --build-arg VITE_API_BASE_URL=${{ env.VITE_API_URL_KPA_SOCIETY }} \
             --build-arg VITE_SERVICE_URL=${{ env.VITE_SERVICE_URL_KPA_SOCIETY }} \
+            --build-arg VITE_UNIFIED_STORE_HANDOFF=${{ env.VITE_UNIFIED_STORE_HANDOFF }} \
             -f services/web-kpa-society/Dockerfile \
             -t gcr.io/${{ env.PROJECT_ID }}/kpa-society-web:${IMAGE_TAG} \
             -t gcr.io/${{ env.PROJECT_ID }}/kpa-society-web:latest \
@@ -424,6 +429,7 @@ jobs:
             --platform linux/amd64 \
             --build-arg VITE_API_BASE_URL=${{ env.VITE_API_URL_PHARMACY_HUB }} \
             --build-arg VITE_SERVICE_URL=${{ env.VITE_SERVICE_URL_PHARMACY_HUB }} \
+            --build-arg VITE_UNIFIED_STORE_HANDOFF=${{ env.VITE_UNIFIED_STORE_HANDOFF }} \
             -f services/web-pharmacy-hub/Dockerfile \
             -t gcr.io/${{ env.PROJECT_ID }}/pharmacy-hub-web:${IMAGE_TAG} \
             -t gcr.io/${{ env.PROJECT_ID }}/pharmacy-hub-web:latest \

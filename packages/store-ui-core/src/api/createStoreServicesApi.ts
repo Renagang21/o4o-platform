@@ -86,6 +86,18 @@ export interface StoreServicesApi {
   fetchStoreServices(organizationId?: string | null): Promise<StoreServiceResolution>;
   /** 다른 서비스 진입 URL (https) — 이동은 호출부가 한다 */
   resolveServiceEntryUrl(serviceKey: string, returnPath: string): Promise<string>;
+  /**
+   * 통합 Store Workspace(store.neture.co.kr) 진입 URL — WO-O4O-UNIFIED-STORE-WORKSPACE-FOUNDATION-V1 §8-4.
+   * 같은 `POST /auth/handoff` 의 target 종류 분기(targetWorkspace='store' · targetServiceKey 없음). 이동은 호출부가 한다.
+   */
+  resolveWorkspaceEntryUrl(returnPath: string): Promise<string>;
+}
+
+const STORE_WORKSPACE_KEY = 'store';
+
+function assertHttpsUrl(url: string | undefined, message: string): string {
+  if (!url || !/^https:\/\//.test(url)) throw new Error(message);
+  return url;
 }
 
 export function createStoreServicesApi(http: StoreServicesHttp): StoreServicesApi {
@@ -100,11 +112,14 @@ export function createStoreServicesApi(http: StoreServicesHttp): StoreServicesAp
         targetServiceKey: serviceKey,
         returnPath,
       });
-      const url = res.data?.targetUrl;
-      if (!url || !/^https:\/\//.test(url)) {
-        throw new Error('서비스 이동 주소를 확인하지 못했습니다.');
-      }
-      return url;
+      return assertHttpsUrl(res.data?.targetUrl, '서비스 이동 주소를 확인하지 못했습니다.');
+    },
+    async resolveWorkspaceEntryUrl(returnPath) {
+      const res = await http.post<Envelope<{ targetUrl?: string }>>('/auth/handoff', {
+        targetWorkspace: STORE_WORKSPACE_KEY,
+        returnPath,
+      });
+      return assertHttpsUrl(res.data?.targetUrl, '매장 업무공간 이동 주소를 확인하지 못했습니다.');
     },
   };
 }

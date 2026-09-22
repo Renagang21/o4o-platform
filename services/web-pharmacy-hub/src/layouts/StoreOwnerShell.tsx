@@ -34,6 +34,10 @@ import {
   StoreWorkspaceNav,
   StoreWorkspaceShell,
   resolveStoreWorkspacePaths,
+  // WO-O4O-UNIFIED-STORE-WORKSPACE-FOUNDATION-V1 §8-4: 매장 진입 → 통합 Store Workspace handoff (빌드 플래그, 기본 OFF)
+  UnifiedStoreHandoffGate,
+  createStoreServicesApi,
+  isUnifiedStoreHandoffEnabled,
 } from '@o4o/store-ui-core';
 import type { StoreOwnerGuardUser } from '@o4o/store-ui-core';
 import { AccessDenied } from '@o4o/ui';
@@ -122,11 +126,32 @@ function WorkspaceShellLayout() {
   );
 }
 
+/**
+ * WO-O4O-UNIFIED-STORE-WORKSPACE-FOUNDATION-V1 §8-4: `/store-owner` · `/store-hub` · workspace/services 진입을
+ * store.neture.co.kr 통합 Store Workspace 로 handoff. `VITE_UNIFIED_STORE_HANDOFF` 빌드 플래그(기본 OFF).
+ * StoreOwnerGuard 안쪽(역할·가입·이용계약 판정 통과 후)에만 두며 실패 시 기존 셸로 fallback.
+ * 대상 아님: PG callback `/store-owner/payment/*`(requireStoreOwnerRole=false 분기) · 송출 화면(StoreOwnerChromeFreeGuard).
+ */
+const UNIFIED_STORE_HANDOFF_ENABLED = isUnifiedStoreHandoffEnabled(import.meta.env.VITE_UNIFIED_STORE_HANDOFF);
+const unifiedStoreHandoffApi = createStoreServicesApi({
+  get: async (url) => (await api.get(url)).data,
+  post: async (url, body) => (await api.post(url, body)).data,
+});
+function PharmacyHubUnifiedStoreHandoff({ children }: { children: ReactNode }) {
+  return (
+    <UnifiedStoreHandoffGate enabled={UNIFIED_STORE_HANDOFF_ENABLED} serviceKey="pharmacy-hub" api={unifiedStoreHandoffApi}>
+      {children}
+    </UnifiedStoreHandoffGate>
+  );
+}
+
 /** Store Workspace Home · My Services 용 — 가드는 StoreOwnerShell 과 동일 (StoreOwnerGuard + MembershipGate) */
 export function StoreOwnerWorkspaceShell() {
   return (
     <StoreOwnerChromeFreeGuard>
-      <WorkspaceShellLayout />
+      <PharmacyHubUnifiedStoreHandoff>
+        <WorkspaceShellLayout />
+      </PharmacyHubUnifiedStoreHandoff>
     </StoreOwnerChromeFreeGuard>
   );
 }
@@ -163,7 +188,9 @@ export function StoreOwnerShell({
       membershipGate={MembershipGate}
       agreementGate={PharmacyHubStoreOwnerAgreementGate}
     >
-      <ShellLayout />
+      <PharmacyHubUnifiedStoreHandoff>
+        <ShellLayout />
+      </PharmacyHubUnifiedStoreHandoff>
     </StoreOwnerGuard>
   );
 }

@@ -290,6 +290,9 @@ import {
   MyServicesView,
   createStoreServicesApi,
   resolveStoreWorkspacePaths,
+  // WO-O4O-UNIFIED-STORE-WORKSPACE-FOUNDATION-V1 §8-4: 매장 진입 → 통합 Store Workspace handoff (빌드 플래그, 기본 OFF)
+  UnifiedStoreHandoffGate,
+  isUnifiedStoreHandoffEnabled,
 } from '@o4o/store-ui-core';
 import { coreApiClient } from './api/client';
 import { fetchStoreCapabilities } from './api/storeHub';
@@ -548,6 +551,21 @@ const kpaStoreServicesApi = createStoreServicesApi({
   get: (url) => coreApiClient.get(url),
   post: (url, body) => coreApiClient.post(url, body),
 });
+
+/**
+ * WO-O4O-UNIFIED-STORE-WORKSPACE-FOUNDATION-V1 §8-4: 기존 /store · /store-hub · workspace/services 진입을
+ * store.neture.co.kr 통합 Store Workspace 로 handoff. `VITE_UNIFIED_STORE_HANDOFF` 빌드 플래그(기본 OFF)로
+ * cutover 를 한 줄로 전환한다. 기존 가드(PharmacyGuard · HubGuard) 안쪽에 두어 인증·역할 판정은 그대로 통과한다.
+ * handoff 실패 시 기존 화면으로 fallback — 송출 화면(/store/marketing/signage/play/*)은 대상 아님.
+ */
+const UNIFIED_STORE_HANDOFF_ENABLED = isUnifiedStoreHandoffEnabled(import.meta.env.VITE_UNIFIED_STORE_HANDOFF);
+function KpaUnifiedStoreHandoff({ children }: { children: ReactNode }) {
+  return (
+    <UnifiedStoreHandoffGate enabled={UNIFIED_STORE_HANDOFF_ENABLED} serviceKey="kpa-society" api={kpaStoreServicesApi}>
+      {children}
+    </UnifiedStoreHandoffGate>
+  );
+}
 
 function KpaStoreFooter() {
   return (
@@ -815,7 +833,7 @@ function App() {
           {/* WO-O4O-HUB-TO-STORE-HUB-RENAMING-V1: /hub → /store-hub */}
           <Route path="/hub" element={<Navigate to="/store-hub" replace />} />
           <Route path="/hub/*" element={<Navigate to="/store-hub" replace />} />
-          <Route path="/store-hub" element={<Layout serviceName={SERVICE_NAME}><HubGuard><PharmacyHubLayout /></HubGuard></Layout>}>
+          <Route path="/store-hub" element={<Layout serviceName={SERVICE_NAME}><HubGuard><KpaUnifiedStoreHandoff><PharmacyHubLayout /></KpaUnifiedStoreHandoff></HubGuard></Layout>}>
             <Route index element={<StoreHubPage />} />
             <Route path="b2b" element={<HubB2BCatalogPage />} />
             <Route path="signage" element={<HubSignageLibraryPage />} />
@@ -1044,11 +1062,11 @@ function App() {
           />
           {/* WO-O4O-STORE-WORKSPACE-INTEGRATION-AND-MY-SERVICES-V1 §6:
               Store Workspace Home · My Services — 사이드바 없는 두 표면. 가드는 /store 와 동일(PharmacyGuard). */}
-          <Route element={<PharmacyGuard><KpaStoreWorkspaceWrapper /></PharmacyGuard>}>
+          <Route element={<PharmacyGuard><KpaUnifiedStoreHandoff><KpaStoreWorkspaceWrapper /></KpaUnifiedStoreHandoff></PharmacyGuard>}>
             <Route path="/store/workspace" element={<KpaStoreWorkspaceHomePage />} />
             <Route path="/store/services" element={<KpaMyServicesPage />} />
           </Route>
-          <Route path="/store" element={<PharmacyGuard><KpaStoreLayoutWrapper /></PharmacyGuard>}>
+          <Route path="/store" element={<PharmacyGuard><KpaUnifiedStoreHandoff><KpaStoreLayoutWrapper /></KpaUnifiedStoreHandoff></PharmacyGuard>}>
             {/* Home (WO-KPA-A-STORE-HOME-AND-SIDEBAR-RESTRUCTURE-V1) */}
             <Route index element={<StoreHomePage />} />
             {/* 레거시 /store/dashboard → /store 리다이렉트 */}
