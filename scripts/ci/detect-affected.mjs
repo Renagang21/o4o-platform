@@ -464,7 +464,9 @@ function main() {
     verdict = classify(read.files, graph);
   }
 
-  const reason = verdict.reasons.slice(0, 12).join(' | ') || '변경 없음';
+  // 중립 변경(docs 추가·수정)만 있으면 사유 줄이 비는 것이 정상이다 —
+  // "변경 없음" 으로 적으면 변경 파일이 있었다는 사실이 가려진다.
+  const reason = verdict.reasons.slice(0, 12).join(' | ') || '영향 축 없음 (중립 변경만 — 문서 추가·수정)';
 
   console.log(`source          : ${read.source ?? 'n/a'}`);
   console.log(`changed files   : ${read.ok ? read.files.length : 'n/a'}`);
