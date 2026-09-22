@@ -11,6 +11,7 @@ COPY packages/auth-client/package.json ./packages/auth-client/
 COPY packages/auth-react/package.json ./packages/auth-react/
 COPY packages/ui/package.json ./packages/ui/
 COPY packages/slide-app/package.json ./packages/slide-app/
+COPY packages/content-core/package.json ./packages/content-core/
 COPY packages/block-renderer/package.json ./packages/block-renderer/
 COPY packages/content-editor/package.json ./packages/content-editor/
 COPY packages/error-handling/package.json ./packages/error-handling/
@@ -32,6 +33,7 @@ COPY packages/auth-client/ ./packages/auth-client/
 COPY packages/auth-react/ ./packages/auth-react/
 COPY packages/ui/ ./packages/ui/
 COPY packages/slide-app/ ./packages/slide-app/
+COPY packages/content-core/ ./packages/content-core/
 COPY packages/block-renderer/ ./packages/block-renderer/
 COPY packages/content-editor/ ./packages/content-editor/
 COPY packages/error-handling/ ./packages/error-handling/
