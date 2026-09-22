@@ -4,7 +4,7 @@
 > (`@o4o/hospital-pharmacy-core`) + web 서비스(`services/web-hospital-pharmacy` · 병동/약제부) +
 > 공통 GFU 소비 HTTP 표면(`/api/ai/file-understanding`). 단방향 의존 Hospital → Core, Core 수정 0.
 
-- **상태**: FOUNDATION COMPLETE · **인증 진입(§7) 구현·배포 완료** · 정본 도메인 GCP 준비 완료(DNS 레코드만 사용자 대기) · 조사/GFU 운영 smoke 는 DNS·Google origin 등록 후
+- **상태**: FOUNDATION COMPLETE · **인증 진입(§7) 구현·배포 완료** · **정본 진입 = `https://neture.co.kr/hospital`(서브디렉토리 · 운영 실측 PASS)** · 실제 Google 로그인 이후 구간(조사·GFU) 은 사용자 smoke 대기
 - **표기일**: 2026-09-22
 - **결정론 검증**: jest 3 suites / 21 tests PASS · web tsc 0 · vite build PASS
 - **운영 배포**: deploy-web-services run 35694403812 SUCCESS(`deploy-hospital-pharmacy` job 포함) · Cloud Run `hospital-pharmacy-web` LIVE
@@ -156,11 +156,51 @@ password 진입 · 계정 병합 · 새 auth 방식 **0**. 서버 Identity 계�
 
 LB IP `136.110.132.35` 는 기존 `neture.co.kr`·`study.neture.co.kr`·`store.neture.co.kr` 과 같은 값(실측).
 
+### 7-D-2. **정본 진입 변경 — 서브디렉토리 `https://neture.co.kr/hospital`** (사용자 결정 2026-09-22 · commit `f4e9d5854`)
+
+병원약국은 **당분간 임시 서비스**이므로 전용 도메인을 만들지 않고 기존 `neture.co.kr` 오리진에 얹는다.
+`kpa-society.co.kr/kpa/*` → `kpa-branch-web` 과 **같은 패턴**(이 저장소의 기존 선례).
+
+얻은 것 — 7-D 의 사용자 PENDING 2건이 **소멸**:
+
+| 서브도메인이었다면 | 서브디렉토리에서는 |
+|---|---|
+| DNS A 레코드 등록(등록기관) | 불필요 — `neture.co.kr` 이 이미 LB 를 가리킴 |
+| 인증서 발급 대기 | 불필요 — 기존 `neture.co.kr` 인증서 |
+| Google authorized origin 신규 등록 | 불필요 — `https://neture.co.kr` 이미 등록됨 → **운영에서 Google 버튼 실제 렌더 확인** |
+| 별도 로그인 | Neture 와 같은 오리진 = 세션(localStorage) 공유 |
+
+코드(kpa-branch 레시피):
+- `vite.config.ts` `base: '/hospital/'` — asset 이 `/hospital/assets/*` 로 발행돼야 한다(root 면 같은 host 의 default backend(web-neture)로 새어 404).
+- `src/lib/basename.ts` + `BrowserRouter basename` — `neture.co.kr`(또는 www)의 `/hospital` 진입만 `'/hospital'`, Cloud Run root·dev 는 `''`.
+- `Dockerfile` runner: `dist` 를 `/hospital` 아래에도 복사(두 진입 동시 서빙 · SPA fallback 은 `serve -s`).
+- `BRAND.domain` · `VITE_SERVICE_URL_HOSPITAL_PHARMACY` = `https://neture.co.kr/hospital`.
+
+LB(additive):
+- `neture.co.kr` host rule → `path-matcher-neture-hospital`(default `backend-neture-web-http` 유지 + pathRules `['/hospital','/hospital/*']` → `backend-hospital-pharmacy-web`). 나머지 host rule 11개 전수 불변.
+- 7-D 에서 만든 NEG·backend 는 **그대로 재사용**. 서브도메인 전용이던 cert `cm-cert-hospital` · map entry `cm-entry-hospital` 은 **삭제**.
+- **잔여**: `hospital.neture.co.kr` host rule + `path-matcher-hospital` 은 남아 있다 — `remove-host-rule` 이 무관한 `path-matcher-store` 를 고아로 판정하는 gcloud 경고를 내어 **적용하지 않고 중단**했다(안전 우선). DNS 레코드가 없으므로 트래픽 0·무해. 나중에 `url-maps export/import` 로 정리하거나, 서브도메인으로 되돌릴 때 재사용한다.
+- Cloud CDN(`backend-neture-web-http` `CACHE_ALL_STATIC`) 때문에 전환 직후 `/hospital` 이 이전 캐시(web-neture)로 응답했다 → `invalidate-cdn-cache --host=neture.co.kr --path=/hospital`·`/hospital/*` 로 해소. **다음에 같은 전환을 하면 반드시 invalidate 를 함께 한다.**
+
+### 7-D-3. 운영 실측 (2026-09-22 · `https://neture.co.kr/hospital`)
+
+| 항목 | 결과 |
+|---|---|
+| `/hospital` · `/hospital/ward` · `/hospital/pharmacy` · `/hospital/login` | 200 · `<title>병원약국 | Neture</title>` (SPA deep link 포함) |
+| asset | `/hospital/assets/index-*.js` 200 · `application/javascript` |
+| 기존 회귀 | `neture.co.kr/` · `neture.co.kr/hospital-drug` 모두 web-neture 그대로(제목 불변) |
+| 로그인 전 원내 보유 조회 | **API 호출 0건**으로 정상 응답(브라우저 localStorage 만 사용) |
+| 서버 조사(401) | 제자리 안내 + **Google 버튼 실렌더(iframe 1)** · textarea·질문·원내 연결 보존 |
+| 약제부 파일(401) | 제자리 안내 + 고른 파일명(`ward-list.csv`) 보존 문구 |
+| `/hospital/login` | LoginPanel 렌더 |
+| 콘솔 오류 | 401 2건(의도된 미인증 호출)뿐 |
+
 ### 7-E. 남은 PENDING
-1. **DNS 레코드**(7-D 5) — 사용자.
-2. **Google authorized JavaScript origins** 에 `https://hospital.neture.co.kr`(+ 필요하면 Cloud Run origin) 등록 — Google Cloud 콘솔 · 사용자. 등록 전에는 GIS 버튼이 뜨지 않는다.
-3. **운영 smoke(§D)**: ① 로그인 전 원내 조회 ② Google 로그인 ③ Gemini 조사 ④ 파일 이해(GFU) ⑤ 원내+조사 결합 — 1·2 완료 후 실측. 지금은 PASS 로 쓰지 않는다.
-4. `hospital-pharmacy` 를 `ServiceKey` union · `service_memberships` 에 등록할지 — 별도 판단(등록 시 AuthContext 에 `serviceKey` 한 줄).
+1. ~~DNS 레코드~~ · ~~Google authorized origin 등록~~ — **서브디렉토리 전환(7-D-2)으로 소멸.**
+2. **운영 smoke ②~⑤**: ② 실제 Google 로그인(사용자 브라우저) ③ Gemini 조사 ④ 파일 이해(GFU) ⑤ 원내+조사 결합 — 버튼 렌더까지는 PASS(7-D-3), 실제 계정 로그인 이후 구간은 **사용자 실행 대기**. PASS 로 쓰지 않는다.
+3. `hospital-pharmacy` 를 `ServiceKey` union · `service_memberships` 에 등록할지 — 별도 판단(등록 시 AuthContext 에 `serviceKey` 한 줄).
+4. `hospital.neture.co.kr` host rule/`path-matcher-hospital` 잔여 정리(7-D-2) — 무해 · 별도 판단.
+5. web-neture 의 기존 `/hospital-drug`(무로그인 병동 파일럿)와 `/hospital`(정식 서비스) 공존 — 경로 충돌은 없으나 **사용자 혼동 가능**. 흡수/리다이렉트 여부는 별도 판단(이 WO 에서 건드리지 않음).
 
 ---
 
