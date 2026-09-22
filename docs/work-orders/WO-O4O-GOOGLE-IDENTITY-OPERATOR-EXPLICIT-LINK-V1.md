@@ -112,6 +112,15 @@ B smoke 에서 `admin.neture.co.kr` 이메일 로그인이 `serviceKey:'neture'`
 3. 코드 수정 → CI → 배포. 배포 후에도 production 관리자 행이 여전히 잠겨 있으면(`lockedUntil` 미래) **DB write 는 사용자 승인 전까지 하지 않고 보고**한다. stale 상태(과거)라면 다음 로그인 시도가 코드로 정상화한다.
 4. 그 다음에만 B smoke(CHECK §3)를 재개한다.
 
+### 8-C. 범위 확장 3(2026-09-22 · Admin password reset 링크 origin 결함 · 사용자 지시)
+
+§8-B 배포 후 관리자 `users.password` 1회 재설정(사용자 승인) 과정에서 Admin reset 동선 결함이 확인됐다. [`ForgotPassword.tsx`](../../apps/admin-dashboard/src/pages/auth/ForgotPassword.tsx) 가 `/auth/forgot-password` 에 `{ email }` 만 보내 `serviceUrl` 이 서버에 전달되지 않고, mail-core 의 serviceUrl 없는 production fallback 은 `https://neture.co.kr` 이다. 플랫폼 관리자 reset 은 처음부터 끝까지 `admin.neture.co.kr` origin 이어야 한다. 별도 WO 를 만들지 않고 본 WO 안에서 처리한다.
+
+1. **수정:** Admin ForgotPassword 요청에 `serviceUrl: window.location.origin` 추가. `serviceKey` 는 넣지 않는다(Admin 은 계속 `users.password` reset). 서버 whitelist 에 admin.neture.co.kr 이 이미 있으므로 신규 backend 계약 · DB 변경 없음. ResetPassword 성공 후 기존 `navigate('/login')` 유지.
+2. **검증:** forgot-password payload = email + serviceUrl(admin origin) · serviceKey 없음 → 발급 token `service_key IS NULL` → reset URL = `admin.neture.co.kr/reset-password` → reset 후 `admin.neture.co.kr/login` · tsc/build/test · deploy-admin.
+3. **오입력 복원:** 06:57Z 재설정이 테스트 계정 `renagang21` 에 적용돼 Google-only 계정에 password 가 생겼다. 배포와 함께 **사용자 승인 하에 테스트 user 1행만 `password=NULL` 로 복원**(B-(ii)). Claude Code 임의 실행 금지.
+4. **순서:** ① origin 수정 → ② 배포 → ③ renagang21 password=NULL 복원 → ④ admin.neture.co.kr 에서 renariver21 reset → ⑤ 메일 링크 host 확인 → ⑥ Admin 로그인 → ⑦ Google 연결(§10 smoke). **배포 완료 전 사용자는 추가 reset/login 시도를 하지 않는다.**
+
 ## 9. 테스트 계정(Google-only)에는 영향 없음
 
 `passwordSet=false` 면 "Google 연결됨 ✓" 만 표시하고 비밀번호 입력 UI 를 보이지 않는다.
