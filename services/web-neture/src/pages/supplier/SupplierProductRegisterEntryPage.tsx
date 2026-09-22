@@ -162,7 +162,7 @@ export default function SupplierProductRegisterEntryPage() {
                 <Package className="w-5 h-5 text-blue-600" />
                 <span>
                   <span className="block font-medium text-slate-800">하나씩 검토 요청</span>
-                  <span className="block text-xs text-slate-500">신규 제품 정보를 단계별로 입력해 검토 요청</span>
+                  <span className="block text-xs text-slate-500">직접 입력하거나 사진·PDF·URL 을 ChatGPT로 정리해 채운 뒤 검토 요청</span>
                 </span>
               </span>
               <ArrowRight className="w-4 h-4 text-slate-400" />
@@ -194,8 +194,10 @@ export default function SupplierProductRegisterEntryPage() {
       {/* 하단: 제품 등록 후 연결 메뉴 안내 */}
       <div className="mt-6 rounded-lg bg-slate-50 border border-slate-200 p-4">
         <p className="text-xs text-slate-500 leading-relaxed">
-          여기서 제출한 제품 정보는 <strong>운영자 검토 후 표준 제품으로 확정</strong>되며, 그 뒤 <strong>제품 라이브러리</strong>에서
-          선택해 공급가·공급 방식을 설정하면 공급 상품이 됩니다. 이미 표준 제품에 있는 제품은 제품 라이브러리에서 바로 공급 연결하세요.
+          제품이 <strong>이미 O4O 표준 제품에 있으면</strong> 제품 라이브러리에서 바로 <strong>공급 연결</strong>하세요.
+          없으면 여기서 <strong>직접 입력</strong>하거나 <strong>ChatGPT로 제품정보를 정리</strong>해 검토 요청을 제출합니다.
+          제출한 제품 정보는 <strong>운영자 검토 후 표준 제품으로 확정</strong>되며, 그 뒤 제품 라이브러리에서
+          선택해 공급가·공급 방식을 설정하면 공급 상품이 됩니다.
           <strong>B2B 등록, 서비스 운영자 승인 제품 등록, 판매자 모집, 이벤트 오퍼, 유통참여형 펀딩</strong>은 공급 상품 등록 후
           <strong>제품 목록</strong>에서 연결할 수 있습니다.
         </p>

@@ -8,14 +8,16 @@
  *   (서버가 MASTER_FIELD_NOT_ALLOWED 로 거부). barcode/name 재추론 없음 · ProductMaster write 0.
  * - 공급 방식은 같은 화면에서 정한다. DRUG Master 는 전체 공개(PUBLIC) 불가 · 서비스 ≥1 필수
  *   (서버 assertDrugOfferAllowed 가 최종 판정 — 약국 대상 서비스만 허용).
- * - Master 상세는 Library 가 navigation state 로 넘긴다. 공급자용 get-master-by-id API 는 없으므로
- *   state 없이(새로고침·직접 진입) 오면 Library 로 되돌려 다시 선택하게 한다.
+ * - Master 상세는 Library / CreatePage 가 navigation state 로 넘기면 즉시 표시하고,
+ *   state 가 없거나 masterId 와 다르면(새로고침·직접 진입) 기존 GET /neture/products/library/:id 로 복구한다
+ *   (WO-O4O-SUPPLIER-PRODUCT-AI-ASSISTED-CANDIDATE-AUTHORING-V1 §2.7 · 신규 서버 API 0).
+ *   404 면 안내 + Library 링크. Library 로 강제 되돌리지 않는다.
  */
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, Package, ShieldAlert } from 'lucide-react';
-import { supplierApi, type MasterSearchResult } from '../../lib/api';
+import { supplierApi, productApi, type MasterSearchResult } from '../../lib/api';
 import { ProductForm, validateProductForm, AVAILABLE_SERVICES, type ProductFormData } from '../../components/product';
 import SupplierActivationGate from '../../components/supplier/SupplierActivationGate';
 import { GuideBlock } from '@o4o/shared-space-ui';
@@ -62,12 +64,20 @@ export default function SupplierProductFromMasterPage() {
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const masterId = searchParams.get('masterId') ?? '';
-  const master = (location.state as FromMasterLocationState | null)?.master ?? null;
+  const stateMaster = (location.state as FromMasterLocationState | null)?.master ?? null;
+  const stateMatches = !!stateMaster && stateMaster.id === masterId;
+
+  // ── hydration: state 가 있으면 즉시, 없으면 GET /products/library/:id 로 복구 ──
+  const [master, setMaster] = useState<MasterSearchResult | null>(stateMatches ? stateMaster : null);
+  const [hydrating, setHydrating] = useState<boolean>(!!masterId && !stateMatches);
+  const [hydrateError, setHydrateError] = useState<'NOT_FOUND' | 'FAILED' | null>(null);
+  const [hydrateKey, setHydrateKey] = useState(0);
+
   const masterMatches = !!master && master.id === masterId;
   const isDrug = masterMatches && master?.regulatoryType === 'DRUG';
 
   const [form, setForm] = useState<ProductFormData>({
-    marketingName: master?.name ?? '',
+    marketingName: stateMatches ? stateMaster?.name ?? '' : '',
     priceGeneral: null,
     priceGold: null,
     consumerReferencePrice: null,
@@ -82,6 +92,24 @@ export default function SupplierProductFromMasterPage() {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState('');
   const [done, setDone] = useState<{ offerId: string; approvalStatus?: string } | null>(null);
+
+  useEffect(() => {
+    if (!masterId) { setHydrating(false); return; }
+    if (stateMatches) { setMaster(stateMaster); setHydrating(false); setHydrateError(null); return; }
+    let cancelled = false;
+    setHydrating(true);
+    setHydrateError(null);
+    productApi.getMasterById(masterId)
+      .then((m) => {
+        if (cancelled) return;
+        if (m) { setMaster(m); setForm((prev) => ({ ...prev, marketingName: prev.marketingName || m.name })); }
+        else setHydrateError('NOT_FOUND');
+      })
+      .catch(() => { if (!cancelled) setHydrateError('FAILED'); })
+      .finally(() => { if (!cancelled) setHydrating(false); });
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [masterId, stateMatches, hydrateKey]);
 
   const validation = useMemo(() => validateProductForm(form, 'create'), [form]);
   const drugRuleError = isDrug && serviceKeys.length === 0
@@ -115,21 +143,63 @@ export default function SupplierProductFromMasterPage() {
     }
   };
 
-  // ── masterId / state 없음 → Library 로 안내 ──
-  if (!masterId || !masterMatches || !master) {
+  // ── masterId 없음 → Library 안내 ──
+  if (!masterId) {
     return (
       <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-4">
         <div className="rounded-lg border border-amber-200 bg-amber-50 p-5">
-          <h1 className="text-lg font-bold text-amber-800">연결할 제품 정보가 없습니다</h1>
-          <p className="text-sm text-amber-700 mt-1">
-            이 화면은 제품 라이브러리에서 제품을 선택해 진입해야 합니다. 새로고침이나 직접 주소 입력으로는 제품 정보를 불러올 수 없습니다.
-          </p>
+          <h1 className="text-lg font-bold text-amber-800">연결할 제품이 지정되지 않았습니다</h1>
+          <p className="text-sm text-amber-700 mt-1">제품 라이브러리에서 공급 연결할 제품을 선택해 주세요.</p>
           <button
             onClick={() => navigate('/supplier/products/library')}
             className="mt-3 rounded-lg bg-amber-600 px-4 py-2 text-sm font-medium text-white hover:bg-amber-700"
           >
             제품 라이브러리로 이동
           </button>
+        </div>
+      </div>
+    );
+  }
+
+  // ── hydration 중 (새로고침 · 직접 진입) ──
+  if (hydrating) {
+    return (
+      <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="rounded-lg border border-slate-200 bg-white p-5 text-sm text-slate-500">제품 정보를 불러오는 중입니다…</div>
+      </div>
+    );
+  }
+
+  // ── 조회 실패 / 없음 ──
+  if (!masterMatches || !master) {
+    const notFound = hydrateError === 'NOT_FOUND';
+    return (
+      <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-4">
+        <div className="rounded-lg border border-amber-200 bg-amber-50 p-5">
+          <h1 className="text-lg font-bold text-amber-800">
+            {notFound ? '해당 제품을 찾을 수 없습니다' : '제품 정보를 불러오지 못했습니다'}
+          </h1>
+          <p className="text-sm text-amber-700 mt-1">
+            {notFound
+              ? '주소의 제품 ID 가 잘못되었거나 제품이 삭제되었습니다. 제품 라이브러리에서 다시 선택해 주세요.'
+              : '네트워크 또는 서버 오류입니다. 다시 시도하거나 제품 라이브러리에서 다시 선택해 주세요.'}
+          </p>
+          <div className="mt-3 flex gap-2">
+            {!notFound && (
+              <button
+                onClick={() => setHydrateKey((k) => k + 1)}
+                className="rounded-lg border border-amber-300 bg-white px-4 py-2 text-sm font-medium text-amber-800 hover:bg-amber-100"
+              >
+                다시 시도
+              </button>
+            )}
+            <button
+              onClick={() => navigate('/supplier/products/library')}
+              className="rounded-lg bg-amber-600 px-4 py-2 text-sm font-medium text-white hover:bg-amber-700"
+            >
+              제품 라이브러리로 이동
+            </button>
+          </div>
         </div>
       </div>
     );

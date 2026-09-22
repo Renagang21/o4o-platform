@@ -16,6 +16,12 @@
  *
  * WO-NETURE-SUPPLIER-CREATE-IMAGE-LIBRARY-ALIGNMENT-V1:
  *   상세/성분 이미지 라이브러리 선택 + 에디터 이미지 기능 연결
+ *
+ * WO-O4O-SUPPLIER-PRODUCT-AI-ASSISTED-CANDIDATE-AUTHORING-V1 (외부 LLM First):
+ *   직접 입력 · 사진 · PDF · URL · Import Assistant · ChatGPT 결과 → 모두 이 화면의 Draft 하나로 모인다.
+ *   "ChatGPT로 작업" 패널은 Prompt 복사 + 결과 JSON 적용(parse/validation → 폼 채움)만 하고 저장하지 않는다.
+ *   내부 AI endpoint 호출 0 · 적용 후에도 제출은 사용자의 [검토 요청] 뿐 · 적용된 바코드로 기존 Master 를 찾으면 from-master 로 안내.
+ *   브랜드는 O4O Brand 목록에서 직접 선택할 때만 brandId 를 보낸다(문자열 유사도 자동 매칭 · 자동 생성 없음).
  */
 
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
@@ -26,6 +32,7 @@ import {
   supplierApi,
   productApi,
   type AdminMaster,
+  type BrandItem,
   type CategoryTreeItem,
 } from '../../lib/api';
 import { mediaApi } from '../../lib/api/media';
@@ -37,6 +44,13 @@ import { GuideBlock } from '@o4o/shared-space-ui';
 // WO-O4O-NETURE-SUPPLIER-PRODUCT-REGISTRATION-WIZARD-V2
 import { getSupplierProductType } from '../../lib/supplierProductTypes';
 import { fetchGuidePageContent } from '../../api/guideContent';
+// WO-O4O-SUPPLIER-PRODUCT-AI-ASSISTED-CANDIDATE-AUTHORING-V1
+import SupplierProductLlmAssistPanel from '../../components/supplier/SupplierProductLlmAssistPanel';
+import {
+  applySupplierProductDraft,
+  type SupplierProductApplyMode,
+  type SupplierProductCandidateDraft,
+} from '../../lib/supplier-product-authoring';
 
 const GUIDE_PAGE_KEY = 'supplier.product.editor';
 const SERVICE_KEY = 'neture';
@@ -49,6 +63,8 @@ interface FormData {
   packagingName: string;
   marketingName: string;
   categoryId: string;
+  /** O4O Brand 를 목록에서 직접 선택했을 때만 채워진다(AI·문자열 매칭으로 채우지 않는다) */
+  brandId: string;
   brandName: string;
   manufacturerName: string;
   distributionType: string;
@@ -129,6 +145,7 @@ export default function SupplierProductCreatePage() {
     marketingName: importDraft?.marketingName ?? searchParams.get('name') ?? '',
     // WO-O4O-SUPPLIER-IMPORT-O4O-SETTINGS-STEP-V1: O4O 등록 설정 pre-fill
     categoryId: importDraft?.categoryId ?? searchParams.get('categoryId') ?? '',
+    brandId: '',
     brandName: importDraft?.brandName ?? searchParams.get('brandName') ?? '',
     manufacturerName: importDraft?.manufacturerName ?? searchParams.get('manufacturerName') ?? '',
     distributionType: importDraft?.isPublic
@@ -181,6 +198,8 @@ export default function SupplierProductCreatePage() {
   const [categoriesLoading, setCategoriesLoading] = useState(true);
   const [categoriesError, setCategoriesError] = useState(false);
   const [categoriesReloadKey, setCategoriesReloadKey] = useState(0);
+  // WO-O4O-SUPPLIER-PRODUCT-AI-ASSISTED-CANDIDATE-AUTHORING-V1 §2.10: 브랜드 선택 목록(실패 시 텍스트 입력만)
+  const [brands, setBrands] = useState<BrandItem[]>([]);
 
   // Description editor — WO-O4O-PRODUCT-IMPORT-ASSISTANT-V1: draft 초기값 지원
   const [consumerShortDesc, setConsumerShortDesc] = useState(
@@ -239,6 +258,12 @@ export default function SupplierProductCreatePage() {
     return () => { cancelled = true; };
   }, [categoriesReloadKey]);
 
+  useEffect(() => {
+    let cancelled = false;
+    productApi.getBrands().then((list) => { if (!cancelled) setBrands(list.filter((b) => b.isActive !== false)); });
+    return () => { cancelled = true; };
+  }, []);
+
   // Auto-search from URL barcode param
   useEffect(() => {
     const raw = searchParams.get('barcode');
@@ -286,6 +311,28 @@ export default function SupplierProductCreatePage() {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  // WO-O4O-SUPPLIER-PRODUCT-AI-ASSISTED-CANDIDATE-AUTHORING-V1 §2.3:
+  //   검증된 Draft → 폼(저장 없음). regulatoryType 은 진입 유형이 있으면 잠근다.
+  //   바코드가 새로 채워지면 기존 Master 조회 → 발견 시 [기존 제품에 공급 연결] 안내(Candidate 대신 from-master).
+  const handleApplyDraft = (draft: SupplierProductCandidateDraft, mode: SupplierProductApplyMode): string[] => {
+    const result = applySupplierProductDraft(form, draft, {
+      mode,
+      lockRegulatoryType: !!productType?.regulatoryType,
+      currentDescription: consumerShortDesc,
+    });
+    setForm(result.form);
+    if (result.description !== null) setConsumerShortDesc(result.description);
+    const notes = [...result.notes];
+    if (result.changedFields.includes('barcode') && result.form.barcode.trim()) {
+      setBarcodeChecked(false);
+      setMaster(null);
+      void searchBarcode(result.form.barcode);
+      notes.push('바코드로 기존 표준 제품 여부를 조회합니다. 이미 있는 제품이면 검토 요청 대신 공급 연결로 안내합니다.');
+    }
+    if (result.changedFields.length === 0) notes.push('적용할 새 값이 없습니다(빈 칸이 없거나 결과가 모두 null).');
+    return notes;
   };
 
   // WO-NETURE-SUPPLIER-PRODUCT-PRICE-INPUT-FIX-V1: stable initialData to prevent circular update
@@ -402,6 +449,7 @@ export default function SupplierProductCreatePage() {
       name: form.marketingName.trim(),
       barcode: form.barcode.trim() || null,
       categoryId: form.categoryId || null,
+      brandId: form.brandId || null,
       brandName: form.brandName.trim() || null,
       manufacturerName: form.manufacturerName.trim() || null,
       specification: form.specification.trim() || null,
@@ -580,9 +628,9 @@ export default function SupplierProductCreatePage() {
       <GuideBlock
         variant="info"
         title={guideTitle ?? '제품 정보를 검토 요청으로 제출합니다.'}
-        description={guideDesc ?? '이 화면은 공급 상품을 바로 만들지 않습니다. 제출한 제품 정보는 운영자 검토 후 표준 제품으로 확정되며, 그 뒤 제품 라이브러리에서 선택해 공급가·공급 방식을 설정합니다. 이미 표준 제품에 있는 제품은 제품 라이브러리에서 바로 공급 연결하세요.'}
+        description={guideDesc ?? '이 화면은 공급 상품을 바로 만들지 않습니다. 제출한 제품 정보는 운영자 검토 후 표준 제품으로 확정되며, 그 뒤 제품 라이브러리에서 선택해 공급가·공급 방식을 설정합니다. 이미 표준 제품에 있는 제품은 제품 라이브러리에서 바로 공급 연결하세요. 사진·PDF·URL 이 있으면 [ChatGPT로 작업]으로 제품정보를 정리해 입력란에 채운 뒤 확인·수정할 수 있습니다.'}
         steps={guideSteps ?? [
-          'Step 1: 상품명, 카테고리, 브랜드, 규제 정보를 입력합니다 (바코드가 있으면 조회해 기존 제품 여부를 확인)',
+          'Step 1: 상품명, 카테고리, 브랜드, 규제 정보를 입력합니다 (직접 입력 · 상세페이지 소스 · ChatGPT 결과 적용 중 편한 방법으로. 바코드가 있으면 조회해 기존 제품 여부를 확인)',
           'Step 2: 기본 공급가 초안을 입력합니다 (승격 후 Offer 연결 시 참고값)',
           'Step 3: 대표 이미지와 상세 설명을 첨부하고 검토 요청을 제출합니다',
         ]}
@@ -617,8 +665,38 @@ export default function SupplierProductCreatePage() {
       {/* WO-O4O-PRODUCT-IMPORT-ASSISTANT-V1: Import Assistant 초안 알림 */}
       {importDraft && (
         <div className="rounded-lg bg-emerald-50 border border-emerald-200 px-4 py-3 text-sm text-emerald-800">
-          Import Assistant에서 가져온 데이터입니다. 검토 후 등록해주세요.
+          상세페이지 소스에서 자동 추출한 초안입니다. 아래 입력란을 검토·수정한 뒤 검토 요청을 제출해 주세요. 누락·오류가 많으면 [ChatGPT로 작업]으로 보정할 수 있습니다.
         </div>
+      )}
+
+      {/* WO-O4O-SUPPLIER-PRODUCT-AI-ASSISTED-CANDIDATE-AUTHORING-V1: 외부 LLM 작업 패널(Prompt 복사 · 결과 JSON 적용 · 저장 없음) */}
+      {!registered && (
+        <SupplierProductLlmAssistPanel
+          fromImport={!!importDraft}
+          context={{
+            productTypeLabel: productType?.label ?? null,
+            regulatoryType: productType?.regulatoryType ?? form.regulatoryType ?? null,
+            currentDraft: {
+              name: form.marketingName || null,
+              barcode: form.barcode || null,
+              brandName: form.brandName || null,
+              manufacturerName: form.manufacturerName || null,
+              specification: form.specification || null,
+              originCountry: form.originCountry || null,
+              regulatoryName: form.regulatoryName || null,
+              mfdsPermitNumber: form.mfdsPermitNumber || null,
+              offerDraft: {
+                priceGeneral: form.priceGeneral ? Number(form.priceGeneral) : null,
+                consumerReferencePrice: form.consumerReferencePrice ? Number(form.consumerReferencePrice) : null,
+                consumerShortDescription: null,
+                consumerDetailDescription: null,
+                isFeatured: form.isFeatured,
+              },
+            },
+          }}
+          onApplyDraft={handleApplyDraft}
+          onNotify={(message, kind) => (kind === 'error' ? toast.error(message) : toast.success(message))}
+        />
       )}
 
       {/* ==================== Step Indicator ==================== */}
@@ -755,14 +833,31 @@ export default function SupplierProductCreatePage() {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">브랜드</label>
+                {/* WO-O4O-SUPPLIER-PRODUCT-AI-ASSISTED-CANDIDATE-AUTHORING-V1 §2.10:
+                    목록에서 고르면 brandId 를 보내고, 직접 입력하면 brandName 만 보낸다(자동 매칭·자동 생성 없음). */}
+                {brands.length > 0 && (
+                  <select
+                    name="brandId"
+                    value={form.brandId}
+                    onChange={(e) => {
+                      const picked = brands.find((b) => b.id === e.target.value);
+                      setForm((prev) => ({ ...prev, brandId: picked?.id ?? '', brandName: picked ? picked.name : prev.brandName }));
+                    }}
+                    className="w-full mb-2 px-3 py-2 border border-slate-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  >
+                    <option value="">O4O 브랜드에서 선택 (선택 사항)</option>
+                    {brands.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
+                  </select>
+                )}
                 <input
                   type="text"
                   name="brandName"
                   value={form.brandName}
-                  onChange={handleChange}
+                  onChange={(e) => setForm((prev) => ({ ...prev, brandName: e.target.value, brandId: '' }))}
                   className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                  placeholder="브랜드명 입력 (자동 매칭/생성)"
+                  placeholder="브랜드명 직접 입력 (목록에 없을 때)"
                 />
+                {form.brandId && <p className="mt-1 text-xs text-emerald-600">O4O 브랜드에 연결됨</p>}
               </div>
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">제조사</label>

@@ -82,7 +82,8 @@ const SUPPLIER_SIDEBAR_GROUPS: SidebarGroup[] = [
       { label: '상품 목록', path: '/supplier/products' },
       { label: '상품 등록', path: '/supplier/products/register' },
       { label: '대량 등록', path: '/supplier/products/bulk' },
-      { label: '등록 도우미', path: '/supplier/products/import-assistant' },
+      // WO-O4O-SUPPLIER-PRODUCT-AI-ASSISTED-CANDIDATE-AUTHORING-V1: 별도 체계가 아니라 '상품 등록' Draft 의 입력 방법 중 하나
+      { label: '소스 자동 입력', path: '/supplier/products/import-assistant' },
       { label: '거래 상품 정보', path: '/supplier/b2b-content' },
       { label: '공급 오퍼', path: '/supplier/supply-offers' },
       // WO-O4O-PHARMACYHUB-SERVICE-MODEL-REALIGNMENT-AND-SUPPLIER-ROLE-REMOVAL-V1:

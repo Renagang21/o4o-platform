@@ -231,7 +231,7 @@ export default function SupplierBulkRegisterPage() {
               to="/supplier/products/import-assistant"
               className="inline-flex items-center gap-2 px-3 py-2 bg-slate-100 text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-200"
             >
-              <FileSpreadsheet className="w-4 h-4" /> 등록 도우미
+              <FileSpreadsheet className="w-4 h-4" /> 소스 자동 입력
             </Link>
           </div>
           <p className="mt-3 text-[11px] text-slate-400">
