@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, Link, NavLink, useLocation } from 'react-router-dom';
+import { detectBasename } from './lib/basename';
 import { BRAND } from './config/service';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import HomePage from './pages/HomePage';
@@ -50,7 +51,7 @@ function Shell({ children }: { children: React.ReactNode }) {
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={detectBasename()}>
       <AuthProvider>
         <Shell>
           <Routes>

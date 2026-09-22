@@ -9,6 +9,7 @@ export const PLATFORM_ORIGIN = 'https://neture.co.kr';
 export const BRAND = {
   name: '병원약국',
   nameEn: 'Hospital Pharmacy',
-  domain: 'hospital.neture.co.kr',
+  /** 정본 진입 — 서브디렉토리(neture.co.kr/hospital). 임시 서비스라 전용 도메인을 만들지 않는다. */
+  domain: 'neture.co.kr/hospital',
   tagline: '원내 보유·동일성분·대체약·성분 조사를 한곳에서',
 } as const;

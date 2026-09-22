@@ -106,7 +106,7 @@ export class GoogleAuthController extends BaseController {
 
   /**
    * POST /api/v1/auth/google/bootstrap-admin — `{ idToken, bootstrapCode }` (세션 없음 · 전환기 1회용)
-   * WO-O4O-GOOGLE-IDENTITY-OPERATOR-EXPLICIT-LINK-V1 §9. 대상은 서버가 `platform:super_admin` 으로 결정하고,
+   * WO-O4O-GOOGLE-IDENTITY-OPERATOR-EXPLICIT-LINK-V1 §15. 대상은 서버가 `platform:super_admin` 으로 결정하고,
    * env 플래그 + 일회용 코드가 모두 맞을 때만 열린다. 세션은 발급하지 않는다(연결 후 Google 로 로그인).
    */
   static async bootstrapAdmin(req: Request, res: Response): Promise<any> {

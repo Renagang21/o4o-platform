@@ -1,6 +1,6 @@
 /**
  * Admin Google Bootstrap — 전환기 1회용 게이트 config
- * WO-O4O-GOOGLE-IDENTITY-OPERATOR-EXPLICIT-LINK-V1 §9 (사용자 지시 2026-09-22)
+ * WO-O4O-GOOGLE-IDENTITY-OPERATOR-EXPLICIT-LINK-V1 §15 (사용자 지시 2026-09-22)
  *
  * 기존 `platform:super_admin` users.id 에 검증된 Google `sub` 를 **1회** 연결하기 위한 경로의 게이트다.
  * 이 경로는 세션도 비밀번호도 요구할 수 없으므로(연결 전에는 그 계정으로 로그인할 수단이 없다),

@@ -1,6 +1,7 @@
 # CHECK — WO-O4O-GOOGLE-IDENTITY-OPERATOR-EXPLICIT-LINK-V1
 
-> **판정:** `GOOGLE IDENTITY OPERATOR EXPLICIT LINK: IN PROGRESS — 구현·배포 완료 · 운영 smoke(§10) 사용자 대기`
+> **판정:** `GOOGLE IDENTITY OPERATOR EXPLICIT LINK: COMPLETE`
+> **종결:** 2026-09-22 — 관리자 Google 연결(1회 bootstrap) 실행·검증 · 창 폐쇄 · Admin legacy password 폐기까지 완료(§3-F)
 > **일자:** 2026-09-18 · **WO:** [`WO-O4O-GOOGLE-IDENTITY-OPERATOR-EXPLICIT-LINK-V1`](../work-orders/WO-O4O-GOOGLE-IDENTITY-OPERATOR-EXPLICIT-LINK-V1.md)
 > **용어:** 운영자 계정 = `sohae2100` · 테스트 계정 = `renagang21`(Google-only)
 > **전제 정정(2026-09-21 · 사용자 확정):** "운영자 계정 = `sohae2100`" 은 **현재 `platform:super_admin` 을 보유한 기존 `users.id`** 를 뜻한다. 이 user 의 관리자용 내부 email 은 **`renariver21@gmail.com`** 으로 정정됐다(§3-A). 본문의 `sohae2100`·`cfd2a5e7` 은 모두 이 **동일 users.id** 다. Google Identity 는 email 과 별개(연결은 검증된 `sub` 기준 · email 일치 불요). 전환기 정책 전문은 [WO 상단 "전제 정정"](../work-orders/WO-O4O-GOOGLE-IDENTITY-OPERATOR-EXPLICIT-LINK-V1.md).
@@ -131,6 +132,46 @@
 
 **보안 판단(기록):** 이 경로는 세션을 요구할 수 없어 **일시적으로 무인증 링크 경로**가 된다. 그래서 ① env 플래그 ② 24자 이상 일회용 코드(timing-safe) ③ 시간당 10회 IP 제한 ④ 대상 role 유일성 ⑤ 이미 연결 시 거절 ⑥ 성공 후 env 제거 — 6중 제한을 걸었다. 코드값은 repository·문서·로그에 기록하지 않고 Cloud Run env 로만 주입하며, 사용자에게는 git 미추적 로컬 파일로 전달한다.
 
+## 3-F. 실행 결과 — 관리자 Google 연결 · 창 폐쇄 · password 폐기 (2026-09-22 · WO §15)
+
+### 3-F-1. 배포 · fail-closed 실측
+
+`60bf7b5db` CI 5종(CI Pipeline · Deploy API · Deploy Web · Deploy Admin · CodeQL) 전부 **success** — API `o4o-core-api-03740-8c5` · Admin `o4o-admin-dashboard-01302-rbv`. env 주입 **전** 실측: `POST /auth/google/bootstrap-admin` → **404 `GOOGLE_ADMIN_BOOTSTRAP_DISABLED`**(플래그·코드 부재 = fail-closed) · `userId` 를 섞은 요청 → **400**(DTO whitelist).
+
+### 3-F-2. 창 열기 · 게이트 실측
+
+`gcloud run services update o4o-core-api --update-env-vars GOOGLE_ADMIN_BOOTSTRAP_ENABLED=true,GOOGLE_ADMIN_BOOTSTRAP_CODE=…`(값 미기록 · revision `03741-vdf`). 실측: 잘못된 코드 → **401 `GOOGLE_ADMIN_BOOTSTRAP_CODE_INVALID`** · 정상 코드 + 더미 토큰 → **401 `GOOGLE_ID_TOKEN_INVALID`**(코드 게이트 통과 후 Google 검증 단계). 코드는 32자 랜덤으로 생성해 **git 미추적 로컬 파일**(`docs/local/*.local.md`)로만 사용자에게 전달했고 저장소·문서·로그에는 남기지 않았다.
+
+### 3-F-3. 사용자 연결 + read-only 검증 (12:59Z)
+
+| 항목 | 결과 |
+|---|---|
+| `linked_accounts` | 1 → **2** · 신규 row `userId` = **기존 admin users.id**(`cfd2a5e7…`) · provider google · isPrimary/isVerified true · **email 스냅샷 NULL** · linkedAt 12:59:05Z |
+| `users` | **2 유지**(신설 0) · 관리자 users.id 동일 |
+| 권한·서비스 | `role_assignments` **11** · `platform:super_admin` **1** · `service_credentials` **5**(k-cosmetics·kpa-branch·kpa-society·neture·pharmacy-hub) · `service_memberships` **5** — 전부 불변 |
+| activity | `link_google` / reason **`admin_bootstrap`** 1건(12:59:05Z · email NULL) |
+| **Google Admin 로그인(§15-3)** | 12:59:20Z `login_google` **success** · 같은 `cfd2a5e7…` · signup 화면 없음 · `lastLoginAt` 갱신 · 실패 로그인 카운터 0 으로 리셋 |
+| 테스트 계정 | `f707c74e…` 무접촉(linked row lastUsedAt 09-19 그대로 · password NULL 유지) |
+
+### 3-F-4. 창 폐쇄
+
+`--remove-env-vars GOOGLE_ADMIN_BOOTSTRAP_ENABLED,GOOGLE_ADMIN_BOOTSTRAP_CODE`(revision `03742-s74`). 실측: 같은 코드로 재시도 → **404 `GOOGLE_ADMIN_BOOTSTRAP_DISABLED`** · live revision 의 `GOOGLE*` env = `GOOGLE_ALLOWED_CLIENT_IDS` · `GOOGLE_WEB_CLIENT_ID` 2개뿐. 로컬 코드 파일 2개(안내·임시)도 삭제했다. 코드가 남아 있어도 대상에 Google 연결이 이미 있어 서버가 409 로 거절한다(1회성 이중 보장).
+
+### 3-F-5. Admin legacy password 폐기 (§15-4 · 커밋 `523d240df`)
+
+| 변경 | 내용 |
+|---|---|
+| [`Login.tsx`](../../apps/admin-dashboard/src/pages/auth/Login.tsx) | 이메일/비밀번호 입력·로그인 버튼·`로그인 상태 유지`·**[비밀번호 찾기] 링크** 제거 → Admin 의 유일한 로그인 수단 = Google. `handleSubmit`·password state·미사용 import 정리(`FormEvent`/`Link`/`Eye`/`EyeOff`/`login`/`isLoading`) |
+| [`public.routes.tsx`](../../apps/admin-dashboard/src/routes/public.routes.tsx) | `/forgot-password` · `/reset-password` **route 등록 제거**(화면 파일은 보존 — 다른 서비스 surface 의 password 경로가 남아 있어 WO-2F 에서 일괄 판단) |
+| production DB(승인 · 1행) | `UPDATE users SET password=NULL, "loginAttempts"=0, "lockedUntil"=NULL WHERE id IN (platform:super_admin 보유자) AND password IS NOT NULL AND id IN (google linked)` → **`UPDATE 1`** · 사후: 관리자 `password IS NULL` · users 2 · linked 2 · creds **5 유지**(삭제 0) · memb 5 · roles 11 · super_admin 1 |
+| 서버 | password 로그인 경로 자체는 **변경 0**(다른 surface 전환기 사용) · `service_credentials` 삭제 0 · `users.email` 변경 0(§15-5 대로 Phase 5 로 이월) |
+
+검증: admin `tsc --noEmit` 0 · `vite build` PASS · eslint 0(경고 0) · bootstrap jest 2 suites **24/24**.
+
+**배포 후 실측(2026-09-22 13:1xZ):** Deploy API `o4o-core-api-03743-lzd` · Deploy Admin `o4o-admin-dashboard-01303-4vq` · Deploy Web 전부 **success**. `523d240df` 의 CI Pipeline·CodeQL 은 직후 다른 세션 커밋(`f4e9d5854`→`23bfc4325`)에 의해 concurrency **cancelled** — 내 변경을 포함하는 tip `23bfc4325` 의 CI Pipeline 이 **success** 로 완주해 검증은 유지된다(ancestor 확인). 배포 번들 실측: `assets/Login-*.js` 에 `비밀번호 찾기`·`이메일로 로그인`·`비밀번호를 입력하세요`·`로그인 상태 유지` **0건** · `관리자 Google 최초 연결`/`일회용 연결 코드` 1건 · index 번들에서 `ForgotPassword`/`ResetPassword`/`reset-password` 참조 **0건**(chunk 제거) · `bootstrap-admin` endpoint 문자열 1건(서버 게이트로 404).
+
+**범위 사고 1건(자체 보고):** 소스 주석의 `WO §9` → `§15` 정정을 `sed -rn` 일괄 치환으로 실행해 **다른 WO 의 `§9` 표기를 가진 40개 파일**까지 수정했다. 즉시 diff 가 `§9↔§15` 한 줄뿐임을 확인하고 `git checkout --` 로 **40개 전부 원복**(커밋·push 0 · 다른 세션 dirty 파일 무접촉). 남은 변경은 본 WO 파일의 주석뿐. 교훈: 식별자 일괄 치환은 대상 파일을 먼저 확정한 뒤 파일별로 적용한다.
+
 ## 3. 운영 Smoke (§10 · WO §8-A 정정판 · 사용자 브라우저 + read-only count) — SUPERSEDED BY §15 (관리자 password 경로 중단 · bootstrap 으로 대체) (§3-D 정정 배포 · 테스트 계정 password 복원 · 관리자 reset 후 재개)
 
 baseline(2026-09-21 3-A 이후): users 2 · linked_accounts 1(테스트 계정) · 관리자 email renariver21 · password set · service_credentials 5 · service_memberships 5 · role_assignments 11.
@@ -165,6 +206,10 @@ baseline(2026-09-21 3-A 이후): users 2 · linked_accounts 1(테스트 계정) 
 | `58f655218` | §3-C lockout 계약 정정(stale lock 정상화) + 계약 테스트 6(WO §8-B) |
 | `1e69ef257` | §3-D Admin forgot-password `serviceUrl` 정정(WO §8-C) · CHECK 중복 블록 정리 |
 | `60bf7b5db` | §3-E 1회용 Admin Google Bootstrap 구현(서버·client·Admin UI·jest 13) |
-| (본 커밋) | WO §15 방향 변경 접수 · §3-E 기록 · 테스트 계정 password NULL 복원 기록 |
+| `01520fb75` | WO §15 방향 변경 접수 · §3-E 기록 · 테스트 계정 password NULL 복원 기록 |
+| `523d240df` | §15-4 Admin legacy password UI·reset route 폐기 |
+| (본 커밋) | §3-F 실행 결과(연결·검증·폐쇄·password 폐기) · 판정 COMPLETE |
 
-문서 정합: 발견 0건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 1건(E2E Auth Runtime 워크플로 Google-only 재정의 = WO-2F · push 트리거는 제거 완료)
+**후속(WO-2F 로 이월):** `service_credentials` 5행 은퇴 · 서비스 화면 password 로그인/회원가입 UI 은퇴 · `ForgotPassword.tsx`/`ResetPassword.tsx` 파일 처분 · E2E Auth Runtime 을 Google 기준으로 재정의(`e2e-auth-runtime.yml` push 트리거는 제거된 상태) · `users.email` optional 화는 Phase 5.
+
+문서 정합: 발견 0건 / SUPERSEDED 표기 1건 / 링크 수정 0건 / 별도 WO 제안 1건(E2E Auth Runtime 워크플로 Google-only 재정의 = WO-2F · push 트리거는 제거 완료)

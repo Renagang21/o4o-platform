@@ -1,19 +1,20 @@
 /**
- * WO-O4O-GOOGLE-ONLY-SIGNUP-LOGIN-V1: Google 로 계속하기 = 기본 진입 · email/password = 임시 테스트/전환용.
+ * WO-O4O-GOOGLE-ONLY-SIGNUP-LOGIN-V1: Google 로 계속하기 = 기본 진입.
  * Admin 은 가입을 제공하지 않는다 — 미등록 Google 계정(GOOGLE_SIGNUP_REQUIRED)은 서비스 화면 가입 안내만.
- * WO-O4O-GOOGLE-IDENTITY-OPERATOR-EXPLICIT-LINK-V1: email/password 로그인은 serviceKey 없이 호출한다.
- *   Admin 은 platform surface 이므로 검증 근거는 users.password + platform role 이며, Neture
- *   service_credentials 는 플랫폼 관리자 인증 근거가 아니다(전환기 비상 로그인 경로).
  *
- * WO §9 — 관리자 Google 최초 연결(1회): 연결 전에는 관리자 계정으로 로그인할 수단이 없으므로,
+ * WO §15-4(2026-09-22 · 관리자 Google 연결 완료 후): **이메일/비밀번호 로그인 UI 와 [비밀번호 찾기] 진입을 제거**했다.
+ *   Admin 의 로그인 수단은 Google 하나다. 서버의 password 로그인 경로 자체는 다른 surface 를 위해 남아 있고,
+ *   관리자 user 의 `users.password` 는 NULL 로 폐기했다(1행 · 사용자 승인).
+ *
+ * WO §15 — 관리자 Google 최초 연결(1회): 연결 전에는 관리자 계정으로 로그인할 수단이 없으므로,
  *   일회용 연결 코드를 입력한 상태에서 Google 계정을 선택하면 같은 ID token 이 로그인 대신
  *   `POST /auth/google/bootstrap-admin` 으로 간다. 대상 users.id 는 서버가 platform:super_admin 으로
  *   결정하며(클라이언트 지정 불가 · email 무관), 연결 성공 후에는 서버가 재사용을 거절한다.
  *   GIS 버튼은 하나만 둔다 — 같은 페이지에서 두 번 initialize 하면 마지막 callback 만 살아남는다.
  */
-import { FC, FormEvent, useEffect, useRef, useState } from 'react';
-import { Navigate, useLocation, useSearchParams, Link } from 'react-router-dom';
-import { Eye, EyeOff, Lock, AlertTriangle } from 'lucide-react';
+import { FC, useEffect, useRef, useState } from 'react';
+import { Navigate, useLocation, useSearchParams } from 'react-router-dom';
+import { Lock, AlertTriangle } from 'lucide-react';
 import { useAuth } from '@o4o/auth-context';
 import { renderGoogleButton } from '@o4o/auth-client';
 import { authClient } from '@/lib/api';
@@ -22,12 +23,8 @@ import toast from 'react-hot-toast';
 type GoogleStage = 'loading' | 'disabled' | 'ready';
 
 const Login: FC = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [rememberMe, setRememberMe] = useState(false);
   
-  const { login, loginWithGoogle, getGoogleAuthConfig, isAuthenticated, isLoading, error, clearError, isAdmin } = useAuth();
+  const { loginWithGoogle, getGoogleAuthConfig, isAuthenticated, error, clearError, isAdmin } = useAuth();
   const location = useLocation();
   const [searchParams] = useSearchParams();
 
@@ -36,7 +33,7 @@ const Login: FC = () => {
   const [googleClientId, setGoogleClientId] = useState<string | null>(null);
   const googleContainerRef = useRef<HTMLDivElement>(null);
 
-  // WO §9 — 관리자 Google 최초 연결(1회). 코드가 입력돼 있으면 credential 은 bootstrap 으로 간다.
+  // WO §15 — 관리자 Google 최초 연결(1회). 코드가 입력돼 있으면 credential 은 bootstrap 으로 간다.
   const [bootstrapOpen, setBootstrapOpen] = useState(false);
   const [bootstrapCode, setBootstrapCode] = useState('');
   // GIS callback 은 mount 시 고정되므로 최신 코드값은 ref 로 읽는다.
@@ -163,47 +160,6 @@ const Login: FC = () => {
     }
   };
 
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    clearError();
-
-    if (!email || !password) {
-      toast.error('이메일과 비밀번호를 입력해주세요.');
-      return;
-    }
-
-    try {
-      await login({ email, password });
-      
-      toast.success('관리자 로그인 성공!');
-    } catch (error: any) {
-      // 에러 코드 기반 한국어 메시지 표시
-      let errorMessage = '로그인에 실패했습니다.';
-      const errorCode = error?.response?.data?.code;
-      const serverMessage = error?.response?.data?.error;
-
-      if (errorCode === 'INVALID_USER') {
-        errorMessage = '등록되지 않은 이메일입니다.';
-      } else if (errorCode === 'INVALID_CREDENTIALS') {
-        errorMessage = '비밀번호가 올바르지 않습니다.';
-      } else if (errorCode === 'ACCOUNT_NOT_ACTIVE') {
-        errorMessage = '계정이 비활성화되었습니다. 관리자에게 문의하세요.';
-      } else if (errorCode === 'ACCOUNT_LOCKED') {
-        errorMessage = '계정이 임시로 잠겼습니다. 잠시 후 다시 시도하세요.';
-      } else if (error?.response?.status === 429) {
-        errorMessage = '로그인 시도가 너무 많습니다. 잠시 후 다시 시도해주세요.';
-      } else if (serverMessage) {
-        errorMessage = serverMessage;
-      } else if (error instanceof Error && error.message !== 'Request failed with status code 401') {
-        errorMessage = error.message;
-      }
-
-      toast.error(errorMessage);
-      // AuthProvider가 원시 Axios 메시지를 error state에 저장하므로 정리
-      clearError();
-    }
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="w-full max-w-md mx-auto space-y-6 relative">
@@ -230,7 +186,7 @@ const Login: FC = () => {
         </div>
 
         {/* 로그인 폼 */}
-        <form className="bg-white/10 backdrop-blur-md rounded-2xl p-8 shadow-2xl border border-white/20" onSubmit={handleSubmit}>
+        <div className="bg-white/10 backdrop-blur-md rounded-2xl p-8 shadow-2xl border border-white/20">
           {/* Google 로 계속하기 — 기본 진입 */}
           <div className="mb-6">
             {googleStage === 'loading' && (
@@ -242,7 +198,7 @@ const Login: FC = () => {
             {googleStage === 'ready' && (
               <div ref={googleContainerRef} className="flex justify-center min-h-[44px]" data-testid="google-continue-button" />
             )}
-            {/* WO §9 — 관리자 Google 최초 연결(1회). 코드 입력 후 위 Google 버튼으로 계정을 선택한다. */}
+            {/* WO §15 — 관리자 Google 최초 연결(1회). 코드 입력 후 위 Google 버튼으로 계정을 선택한다. */}
             {googleStage === 'ready' && (
               <div className="mt-3 text-center">
                 {!bootstrapOpen ? (
@@ -280,104 +236,9 @@ const Login: FC = () => {
               </div>
             )}
           </div>
-          <div className="flex items-center gap-3 mb-6">
-            <div className="flex-1 h-px bg-white/20" />
-            <span className="text-xs text-blue-200">임시 테스트 · 전환용 이메일 로그인</span>
-            <div className="flex-1 h-px bg-white/20" />
-          </div>
-          <div className="space-y-5">
-            {/* 이메일 입력 */}
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-blue-200 mb-2">
-                이메일 주소
-              </label>
-              <div className="relative">
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  required
-                  value={email}
-                  onChange={(e: any) => setEmail(e.target.value)}
-                  className="block w-full px-4 py-3 bg-white/90 border border-gray-300 rounded-lg focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 focus:outline-none transition-all duration-200 text-gray-900 placeholder-gray-500"
-                  placeholder="admin@neture.co.kr"
-                />
-              </div>
-            </div>
-
-            {/* 비밀번호 입력 */}
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-blue-200 mb-2">
-                비밀번호
-              </label>
-              <div className="relative">
-                <input
-                  id="password"
-                  name="password"
-                  type={showPassword ? 'text' : 'password'}
-                  autoComplete="current-password"
-                  required
-                  value={password}
-                  onChange={(e: any) => setPassword(e.target.value)}
-                  className="block w-full pl-4 pr-10 py-3 bg-white/90 border border-gray-300 rounded-lg focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 focus:outline-none transition-all duration-200 text-gray-900 placeholder-gray-500"
-                  placeholder="비밀번호를 입력하세요"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                >
-                  {showPassword ? (
-                    <EyeOff className="h-5 w-5 text-gray-600 hover:text-gray-900 transition-colors" />
-                  ) : (
-                    <Eye className="h-5 w-5 text-gray-600 hover:text-gray-900 transition-colors" />
-                  )}
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* 옵션 */}
-          <div className="mt-6 flex items-center justify-between">
-            <div className="flex items-center">
-              <input
-                id="remember-me"
-                name="remember-me"
-                type="checkbox"
-                checked={rememberMe}
-                onChange={(e: any) => setRememberMe(e.target.checked)}
-                className="h-4 w-4 text-blue-600 bg-white border-gray-300 rounded focus:ring-blue-500 focus:ring-offset-0"
-              />
-              <label htmlFor="remember-me" className="ml-2 text-sm text-blue-200">
-                로그인 상태 유지
-              </label>
-            </div>
-
-            <Link 
-              to="/forgot-password" 
-              className="text-sm text-blue-300 hover:text-white transition-colors"
-            >
-              비밀번호 찾기
-            </Link>
-          </div>
-
-          {/* 로그인 버튼 */}
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="w-full mt-6 py-3 px-4 text-sm font-medium rounded-lg text-white bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 focus:ring-offset-slate-900 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg"
-          >
-            {isLoading ? (
-              <>
-                <div className="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
-                로그인 중...
-              </>
-            ) : (
-              '이메일로 로그인 (임시)'
-            )}
-          </button>
-        </form>
+          {/* WO §15-4: 이메일/비밀번호 로그인 UI 제거 — Admin 의 유일한 로그인 수단은 Google 이다.
+              서버의 password 경로는 다른 surface(전환기 서비스 로그인)를 위해 남아 있으나 Admin 화면은 노출하지 않는다. */}
+        </div>
 
         {/* 에러 메시지 */}
         {error && (
