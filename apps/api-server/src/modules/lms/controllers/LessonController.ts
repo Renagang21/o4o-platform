@@ -12,7 +12,7 @@ import {
 } from '../utils/lms-service-scope.js';
 // WO-O4O-LMS-CROSSSERVICE-READ-WRITE-BOUNDARY-COMPLETION-V1
 import { guardLessonScope } from '../utils/lms-scope-guard.js';
-import { rolesIncludeLectureAdmin } from '../middleware/lecture-access.js';
+import { rolesIncludeLectureAdmin, isLectureCourse } from '../middleware/lecture-access.js';
 
 /**
  * LessonController
@@ -22,13 +22,15 @@ import { rolesIncludeLectureAdmin } from '../middleware/lecture-access.js';
  * WO-KPA-A-LMS-COURSE-OWNERSHIP-GUARD-V1:
  * - All write operations verify parent course.instructorId === userId
  * - lecture:admin bypasses ownership check (WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2)
+ * - PR #225 merge-gate: 대상 course 가 lecture 가 아니면(legacy KPA/PH) 소유자·lecture:admin 여부와 무관하게
+ *   non-disclosure 404 — Lecture runtime 이 타 서비스 강의를 ID 로 변경할 수 없다.
  */
 export class LessonController extends BaseController {
   private static async checkCourseOwnership(courseId: string, userId: string, userRoles: string[]): Promise<{ allowed: boolean; notFound: boolean }> {
-    if (rolesIncludeLectureAdmin(userRoles)) return { allowed: true, notFound: false };
     const courseService = CourseService.getInstance();
     const course = await courseService.getCourse(courseId);
-    if (!course) return { allowed: false, notFound: true };
+    if (!course || !isLectureCourse(course.serviceKey)) return { allowed: false, notFound: true };
+    if (rolesIncludeLectureAdmin(userRoles)) return { allowed: true, notFound: false };
     return { allowed: course.instructorId === userId, notFound: false };
   }
 
@@ -128,6 +130,7 @@ export class LessonController extends BaseController {
       if (!lesson) return BaseController.notFound(res, 'Lesson not found');
 
       const ownership = await LessonController.checkCourseOwnership(lesson.courseId, userId, userRoles);
+      if (ownership.notFound) return BaseController.notFound(res, 'Lesson not found');
       if (!ownership.allowed) return BaseController.forbidden(res, 'You can only modify lessons in your own courses');
 
       const updated = await service.updateLesson(id, data);
@@ -155,6 +158,7 @@ export class LessonController extends BaseController {
       if (!lesson) return BaseController.notFound(res, 'Lesson not found');
 
       const ownership = await LessonController.checkCourseOwnership(lesson.courseId, userId, userRoles);
+      if (ownership.notFound) return BaseController.notFound(res, 'Lesson not found');
       if (!ownership.allowed) return BaseController.forbidden(res, 'You can only delete lessons in your own courses');
 
       await service.deleteLesson(id);

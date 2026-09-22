@@ -36,7 +36,7 @@ function toEnrollment(e: LectureEnrollment | null | undefined) {
   return {
     id: e.id,
     status: e.status,
-    progress: e.progress ?? 0,
+    progress: e.progressPercentage ?? e.progress ?? 0,
     completedLessons: e.completedLessons ?? 0,
     completedLessonIds: e.metadata?.completedLessonIds ?? [],
   };

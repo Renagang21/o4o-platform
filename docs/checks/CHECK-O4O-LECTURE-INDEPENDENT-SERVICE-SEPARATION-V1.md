@@ -345,7 +345,24 @@ production `service_key` migration(kpa-society 8 · pharmacy-hub 3 → lecture) 
 | 4 | 강사 편집기가 learner sanitized quiz 응답 사용 → 저장 시 정답 유실 | 신규 `GET /lms/instructor/lessons/:lessonId/quiz`(requireInstructor · 소유자 또는 lecture:admin · lecture 강의만) = `QuizService.getQuizForLessonWithAnswers`(정답 포함 · 미공개 포함). learner `GET /lessons/:lessonId/quiz` 는 그대로 정답 제거. `PATCH /quizzes/:id` 에 scope guard + **소유권 검사** 추가 · body allowlist(lessonId/courseId/id 귀속 변경 불가). web-lecture `instructorApi.getQuizForLesson` → 강사 경로. 편집 왕복(제목만 변경) 정답 보존 + learner 응답 회귀 테스트. | **FIXED** |
 | 5 | pre-cutover legacy 강의 가용성(temporary KPA membership fallback 요구) | **runtime fallback · cross-service compatibility 추가 0**. 정책으로 고정: `PHASE2_MERGE != PHASE2_DEPLOY` — PR 은 merge 가능하되 Phase 2 runtime 은 production LMS course `service_key` rekey 전에 단독 배포하지 않는다(§17-5). 기존 KPA/PH membership → Lecture membership 자동 변환 0 · cleanup user 포함 auto membership creation 0. | **OPERATIONAL_GATE** |
 
-신규 spec `apps/api-server/src/__tests__/lecture-phase2-merge-gate-contract.spec.ts` — controller/service 를 in-memory repository 로 실행 · **38/38 PASS**(P1-1 10 · P1-2 8 · P1-3 10 · P1-4 8 · 정적 3).
+신규 spec `apps/api-server/src/__tests__/lecture-phase2-merge-gate-contract.spec.ts` — controller/service 를 in-memory repository 로 실행 · 1차 **38/38 PASS**(P1-1 10 · P1-2 8 · P1-3 10 · P1-4 8 · 정적 3) → 2차(§17-3-b) **46/46**.
+
+### 17-3-b. Codex 재검토(`f3b8c8ca5` 대상 · `@codex review`) — 신규 지적 처리표
+
+| # | 등급 | 지적 | 처리 | 판정 |
+|---|---|---|---|---|
+| 6 | P1 | `LessonController.checkCourseOwnership` 가 `lecture:admin` / 소유 강사에게 course.serviceKey 검사 없이 허용 → legacy course 의 lesson create/update/delete/reorder 가 ID 로 가능 | ownership override **이전에** `isLectureCourse(course.serviceKey)` 검사 — 비-lecture 는 404 non-disclosure(`notFound`) · update/delete 경로가 `notFound` 를 무시하던 결함도 함께 정정 | **FIXED** |
+| 7 | P1 | `POST /certificates/issue` 가 courseId 의 service scope 를 검사하지 않음 → Lecture 운영자가 타 서비스 강의 수료증 발급 가능 | `CertificateController.issueCertificate` 진입 시 `guardCourseScope(req, res, body.courseId)` — legacy/미존재/누락 courseId 는 404 · 발급 0 | **FIXED** |
+| 8 | P2 | web-lecture `lmsViewAdapter.toEnrollment` 가 `e.progress` 를 읽어 항상 0% (서버 영속 필드는 `progressPercentage`) | `progressPercentage ?? progress ?? 0` · `LectureEnrollment` 타입에 `progressPercentage` 추가 | **FIXED** |
+
+spec 추가: 재검토 P1-6 4건(legacy create/update/delete/reorder 404 · write 0 / lecture course 소유자 200·타 강사 403·admin 200) · P1-7 3건(legacy·null·미존재·누락 courseId 404 · 발급 0 / lecture 201) · P2-1 정적 1건.
+
+### 17-3-c. CodeQL (CI `CodeQL` check FAIL → 처리)
+
+- 1차 push 결과 `36 new alerts`: `js/missing-rate-limiting` **35건 전부 `lms.routes.ts`**(Phase 2 이전에도 main 에 동일 규칙으로 열려 있던 pre-existing 패턴 — 파일 재작성으로 위치가 바뀌어 "new" 로 집계 · `273fce582` 시점에도 35건 FAIL) + `js/missing-token-validation` `bootstrap/setup-middlewares.ts:240` 1건(**본 PR 미접촉 파일** · main 에 이미 open · CodeQL 이 "changes too large" 사유로 포함).
+- 처리: 저장소 선례(`notifications.routes.ts` · `store-owner-terminations.routes.ts`)와 동일하게 `middleware/rateLimiter` 의 `apiLimiter`(분당 60 · key=(ip,userId)) 를 LMS 라우터 전체에 `router.use(apiLimiter)` 로 적용. 새 limiter 정의 0 · 의존성 0.
+- `setup-middlewares.ts:240` 은 범위 외(pre-existing · 미접촉) — 보고만. CodeQL 이 이를 계속 "new" 로 집계하면 팀장 판정 사항.
+
 
 ### 17-4. 검증 (merge-gate)
 
@@ -353,7 +370,8 @@ production `service_key` migration(kpa-society 8 · pharmacy-hub 3 → lecture) 
 |---|---|
 | shared-space-ui vitest | 8 files / 100 PASS |
 | api-server tsc | 0 |
-| api-server jest 전체 | 전체 실행 345 suites(4 skipped) — 344 PASS + `lms-operator-multi-service-scope` 1 FAIL(정적 계약이 `isLectureCourse` 정의를 routes 파일에서 찾음 → lecture-access.ts 로 승격된 위치로 assertion 갱신 · 완화 0) → 재실행 PASS. 최종 345/345 · 5799 tests PASS(32 skipped) · 0 FAIL |
+| api-server jest 전체 (1차 f3b8c8ca5) | 전체 실행 345 suites(4 skipped) — 344 PASS + `lms-operator-multi-service-scope` 1 FAIL(정적 계약이 `isLectureCourse` 정의를 routes 파일에서 찾음 → lecture-access.ts 로 승격된 위치로 assertion 갱신 · 완화 0) → 재실행 PASS. 최종 345/345 · 5799 tests PASS(32 skipped) · 0 FAIL |
+| 2차(재검토 반영) | api-server tsc 0 · web-lecture tsc 0 · lecture 3 suites 71/71 · api-server jest 전체 345/345 suites · 5807 tests PASS(32 skipped · 0 FAIL — P1-6/7/P2 반영본 · apiLimiter 1줄은 tsc+lecture 3 suites 로 로컬 확인, 전체는 CI jest) |
 | web-lecture tsc · vite build | 0 · PASS |
 | shared-space-ui · web-kpa-society · web-k-cosmetics · web-pharmacy-hub · admin-dashboard tsc | 전부 0 |
 | production DB write / cutover / 운영자 로그인 | 0 / 미실행 / 보류 |

@@ -18,6 +18,7 @@ import { requireInstructor } from '../middleware/requireInstructor.js';
 // WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2: Lecture 접근 계약 (KPA guard · 서비스 allowlist 제거)
 import { requireLectureLearner, requireLectureOperator, isLectureCourse } from '../middleware/lecture-access.js';
 import { lmsContextMiddleware } from '../utils/lms-service-scope.js';
+import { apiLimiter } from '../../../middleware/rateLimiter.js';
 import { SERVICE_KEYS } from '../../../constants/service-keys.js';
 // WO-O4O-LMS-GLOBAL-OPERATOR-ROUTES-V1
 import { CourseService } from '../services/CourseService.js';
@@ -39,6 +40,9 @@ const router: Router = Router();
 //   - 운영 대상 강의는 course.serviceKey === 'lecture' 만. 그 외는 non-disclosure 404.
 // ========================================
 router.use(lmsContextMiddleware({ serviceCode: SERVICE_KEYS.LECTURE }));
+// PR #225 merge-gate(CodeQL js/missing-rate-limiting): notifications.routes / store-owner-terminations.routes 와 동일하게
+// middleware/rateLimiter 의 apiLimiter(분당 60 · key=(ip,userId)) 를 LMS 라우터 전체에 적용한다.
+router.use(apiLimiter);
 
 // ========================================
 // COURSE ROUTES

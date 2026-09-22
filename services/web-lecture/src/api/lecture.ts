@@ -74,6 +74,8 @@ export interface LectureEnrollment {
   courseId: string;
   userId: string;
   status: string;
+  /** 서버(Enrollment entity)의 영속 필드는 `progressPercentage`. `progress` 는 구 응답 호환용. */
+  progressPercentage?: number;
   progress?: number;
   completedLessons?: number;
   metadata?: { completedLessonIds?: string[] } | null;

@@ -5,7 +5,7 @@ import { generateCertificatePdf } from '../utils/certificatePdf.js';
 import logger from '../../../utils/logger.js';
 // WO-O4O-LMS-CROSSSERVICE-READ-WRITE-BOUNDARY-COMPLETION-V1 §7
 // 수료증 발급/UX 정책은 서비스별로 유지하고, service boundary 만 공통 보장한다.
-import { guardLoadedCourseScope, resolveScopeOrRespond } from '../utils/lms-scope-guard.js';
+import { guardCourseScope, guardLoadedCourseScope, resolveScopeOrRespond } from '../utils/lms-scope-guard.js';
 // WO-O4O-LMS-CERTIFICATE-OWNERSHIP-AND-READ-AUTHORIZATION-BOUNDARY-FIX-V1
 // private read 는 scope → ownership 순으로 공통 helper 가 판정한다.
 import {
@@ -49,6 +49,9 @@ export class CertificateController extends BaseController {
       const data = req.body;
       const issuedBy = (req as any).user?.id;
       const service = CertificateService.getInstance();
+
+      // PR #225 merge-gate: 발급 대상 course 는 lecture scope 만 (legacy KPA/PH courseId 는 non-disclosure 404).
+      if (!(await guardCourseScope(req, res, data?.courseId))) return;
 
       const certificate = await service.issueCertificate(data, issuedBy);
 
