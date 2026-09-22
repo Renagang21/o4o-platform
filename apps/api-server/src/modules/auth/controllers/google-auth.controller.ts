@@ -15,7 +15,12 @@ import { policyAcceptanceService } from '../../policy-acceptance/policy-acceptan
 import { googleAuthService, GoogleAuthError, type GoogleAuthSession } from '../../../services/auth/google-auth.service.js';
 import { GoogleIdTokenError } from '../../../services/auth/google-identity.service.js';
 import { googleIdentityConfig } from '../../../config/google-identity.config.js';
-import type { GoogleLinkRequestDto, GoogleLoginRequestDto, GoogleSignupRequestDto } from '../dto/index.js';
+import type {
+  GoogleAdminBootstrapRequestDto,
+  GoogleLinkRequestDto,
+  GoogleLoginRequestDto,
+  GoogleSignupRequestDto,
+} from '../dto/index.js';
 import logger from '../../../utils/logger.js';
 import { monitoringMetrics } from '../../../common/monitoring/metrics.service.js';
 import { isCrossOriginRequest } from './auth-helpers.js';
@@ -94,6 +99,27 @@ export class GoogleAuthController extends BaseController {
         userAgent: req.headers['user-agent'] || 'Unknown',
       });
       return BaseController.ok(res, result);
+    } catch (error) {
+      return GoogleAuthController.handleError(res, error, 'link');
+    }
+  }
+
+  /**
+   * POST /api/v1/auth/google/bootstrap-admin — `{ idToken, bootstrapCode }` (세션 없음 · 전환기 1회용)
+   * WO-O4O-GOOGLE-IDENTITY-OPERATOR-EXPLICIT-LINK-V1 §9. 대상은 서버가 `platform:super_admin` 으로 결정하고,
+   * env 플래그 + 일회용 코드가 모두 맞을 때만 열린다. 세션은 발급하지 않는다(연결 후 Google 로 로그인).
+   */
+  static async bootstrapAdmin(req: Request, res: Response): Promise<any> {
+    const { idToken, bootstrapCode } = req.body as GoogleAdminBootstrapRequestDto;
+    try {
+      const result = await googleAuthService.bootstrapAdminLink({
+        idToken,
+        bootstrapCode,
+        ipAddress: getTrustedClientIp(req),
+        userAgent: req.headers['user-agent'] || 'Unknown',
+      });
+      // userId 는 서버 판정 결과 확인용으로만 돌려준다(세션·토큰 없음).
+      return BaseController.ok(res, { linked: result.linked });
     } catch (error) {
       return GoogleAuthController.handleError(res, error, 'link');
     }

@@ -32,8 +32,10 @@ import {
   GoogleLoginRequestDto,
   GoogleSignupRequestDto,
   GoogleLinkRequestDto,
+  GoogleAdminBootstrapRequestDto,
 } from '../dto/index.js';
 import { asyncHandler } from '../../../middleware/error-handler.js';
+import { googleAdminBootstrapLimiter } from '../../../config/rate-limiters.config.js';
 
 const router: IRouter = Router();
 
@@ -93,6 +95,18 @@ router.get(
   '/google/link/status',
   requireAuth,
   asyncHandler(GoogleAuthController.linkStatus)
+);
+
+// WO-O4O-GOOGLE-IDENTITY-OPERATOR-EXPLICIT-LINK-V1 §9: 전환기 1회용 Admin Google Bootstrap
+// POST /api/v1/auth/google/bootstrap-admin - { idToken, bootstrapCode }
+//   세션을 요구할 수 없는 유일한 연결 경로(연결 전에는 그 계정으로 로그인 불가)이므로
+//   env 플래그 + 일회용 코드로만 열리고(없으면 404), 대상 users.id 는 서버가 platform:super_admin 으로 결정한다.
+//   성공 후에는 대상에 Google 연결이 존재하므로 재사용 불가(1회성). 세션 발급 없음.
+router.post(
+  '/google/bootstrap-admin',
+  googleAdminBootstrapLimiter,
+  validateDto(GoogleAdminBootstrapRequestDto),
+  asyncHandler(GoogleAuthController.bootstrapAdmin)
 );
 
 // POST /api/v1/auth/check-email - Check email existence (multi-service registration UX)

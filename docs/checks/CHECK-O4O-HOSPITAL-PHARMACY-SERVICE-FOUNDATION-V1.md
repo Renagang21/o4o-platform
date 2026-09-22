@@ -4,7 +4,7 @@
 > (`@o4o/hospital-pharmacy-core`) + web 서비스(`services/web-hospital-pharmacy` · 병동/약제부) +
 > 공통 GFU 소비 HTTP 표면(`/api/ai/file-understanding`). 단방향 의존 Hospital → Core, Core 수정 0.
 
-- **상태**: FOUNDATION COMPLETE · Cloud Run 배포·부분 브라우저 smoke PASS · 조사/GFU smoke는 api 재배포+인증 진입 후
+- **상태**: FOUNDATION COMPLETE · **인증 진입(§7) 구현·배포 완료** · 정본 도메인 GCP 준비 완료(DNS 레코드만 사용자 대기) · 조사/GFU 운영 smoke 는 DNS·Google origin 등록 후
 - **표기일**: 2026-09-22
 - **결정론 검증**: jest 3 suites / 21 tests PASS · web tsc 0 · vite build PASS
 - **운영 배포**: deploy-web-services run 35694403812 SUCCESS(`deploy-hospital-pharmacy` job 포함) · Cloud Run `hospital-pharmacy-web` LIVE
@@ -108,6 +108,59 @@ additive·정확 origin 으로 등록했다(신규 서비스 origin 등록 = dep
 - §5·§6 심화(약제부 확장·주문/재고 화면 자동화 실배선).
 - 병동 화면-국소 질의 파싱(`extractLocalNeedles`)은 서비스 표시용 최소 구현 — 향후 원내 needle 파싱을
   패키지로 승격할지는 별도 판단.
+
+---
+
+## 7. 후속 — O4O Identity 진입 + 정본 도메인 (2026-09-22 · commit `7a64d8739`)
+
+§6 의 "인증 진입 설계"·"DNS·cert·LB" 를 한 덩어리로 닫았다. **새 인증 시스템 0** — 기존 O4O Google 단일 로그인을 소비만 한다.
+
+### 7-A. census (읽기 전용) — 재사용할 현행 계약
+6개 서비스(neture · kpa-society · k-cosmetics · pharmacy-hub · kpa-branch · store)가 **예외 없이 같은 3종**을 쓴다:
+`@o4o/auth-react` `useServiceAuth` + `GoogleContinue` + `authClient.getGoogleAuthConfig()`. 개별 구현 · `index.html` GIS 스크립트 ·
+`VITE_GOOGLE_*` env 는 **0개**(`gsi/client` 문자열은 `packages/auth-client/src/google-identity.ts` 한 곳). clientId 는 서버
+`GET /api/v1/auth/google/config` 가 SSOT. 최신 선례 = web-store(2026-09-21~22) — `lib/apiClient.ts` 가 병원약국과 동일.
+
+### 7-B. 구현 (services/web-hospital-pharmacy)
+
+| 파일 | 내용 |
+|---|---|
+| `src/contexts/AuthContext.tsx` (신규) | `useServiceAuth<HospitalUser>({ authClient, getAccessToken, toUser })`. **serviceKey 생략** — `hospital-pharmacy` 는 `ServiceKey` union · `service_memberships` 미등록이라 가짜 키를 만들지 않는다(web-store 선례). Google 로그인은 serviceKey 로 차단되지 않으므로 동작에 지장 0 · 등록 후 한 줄만 추가 |
+| `src/components/LoginPanel.tsx` (신규) | `GoogleContinue` 단일 진입점. `getConfig` 는 **모듈 상수**(렌더마다 새 참조면 동의 화면이 초기화되는 공통 계층 기존 결함 회피) |
+| `src/pages/LoginPage.tsx` (신규) | `/login` + `returnTo`(state.from). 로그인돼 있으면 즉시 복귀 |
+| `src/App.tsx` | `AuthProvider` + 헤더 계정 영역(로그인 링크 / 이름·로그아웃). **route guard 없음** — 로그인 전 홈·원내 연결·원내 보유 조회는 그대로 열려 있다 |
+| `src/pages/WardPage.tsx` · `PharmacyDeptPage.tsx` | 401 을 "다시 로그인하세요" 문구 대신 `pendingAuthRequest`(문장) / `pendingAuthFile`(File) 로 보관 → **제자리** LoginPanel → `onSuccess` 에서 같은 요청·같은 파일을 자동 재개. 라우트 이동이 없어 입력·원내 연결·직전 답변 **손실 0**, 파일을 다시 고를 필요 없음 |
+| `Dockerfile` | `auth-utils`(main=dist → `pnpm --filter @o4o/auth-utils build` 필요) · `auth-react`(main=src → 빌드 불필요) COPY/빌드 추가(web-lecture 선례) |
+
+경계: 로그인 없이 = 홈 · 원내 파일 연결 · localStorage · 원내 보유 조회 / 로그인 필요 = 서버 AI(조사 · 파일 이해 · Work Agent).
+password 진입 · 계정 병합 · 새 auth 방식 **0**. 서버 Identity 계약 · CORS 목록 · O4O Main Core 변경 **0**.
+
+### 7-C. 검증
+`tsc --noEmit` 0 · `vite build` PASS · eslint 0 · 로컬 브라우저 smoke(Playwright · 서버 응답 stub):
+로그인 전 원내 보유 조회가 **API 호출 0건**으로 정상 응답 · 401 시 LoginPanel 렌더 + textarea/질문/원내 연결 보존 ·
+약제부는 고른 파일명 보존 문구 · `/login` 단독 화면 렌더. Deploy Web Services run = **success**(`hospital-pharmacy-web` 재배포,
+번들에 `auth/google/config` 포함 확인).
+
+> 로컬 dev origin(`http://localhost:4210`)은 서버 CORS 허용목록에 없어 로컬에서 **실제** API 호출은 불가하다(web-store 4210 ·
+> web-lecture 4209 도 같은 기존 갭). 운영 CORS 를 이 WO 에서 넓히지 않고 응답 stub 으로 배선만 검증했다. 실 AI smoke 는 배포본에서.
+
+### 7-D. 정본 도메인 `hospital.neture.co.kr` — GCP 선례 그대로(별도 인프라 재설계 0)
+
+| # | 작업 | 상태 |
+|---|---|---|
+| 1 | serverless NEG `neg-hospital-pharmacy-web` → Cloud Run `hospital-pharmacy-web` | **생성 완료** |
+| 2 | backend service `backend-hospital-pharmacy-web`(EXTERNAL_MANAGED · protocol HTTP · portName 없음 = `backend-lecture-web` 와 동일) + NEG 연결 | **생성 완료** |
+| 3 | `o4o-global-lb` url-map 에 host rule `hospital.neture.co.kr` → `path-matcher-hospital` **추가**(additive) | **완료** — 기존 11개 host rule 전수 불변 확인 |
+| 4 | Certificate Manager `cm-cert-hospital` + map entry `cm-entry-hospital`(`o4o-main-cert-map`) — lecture 와 같은 **LB 인증**(DNS authorization 없음) | **생성 완료** · 현재 `PROVISIONING` / entry `PENDING` |
+| 5 | **DNS A 레코드 `hospital.neture.co.kr → 136.110.132.35`** | **PENDING — 사용자 작업**(등록기관 콘솔 · Cloud DNS managed zone 없음). 이 레코드가 생기면 4번 인증서가 자동 발급되어 ACTIVE 가 되고 도메인이 열린다 |
+
+LB IP `136.110.132.35` 는 기존 `neture.co.kr`·`study.neture.co.kr`·`store.neture.co.kr` 과 같은 값(실측).
+
+### 7-E. 남은 PENDING
+1. **DNS 레코드**(7-D 5) — 사용자.
+2. **Google authorized JavaScript origins** 에 `https://hospital.neture.co.kr`(+ 필요하면 Cloud Run origin) 등록 — Google Cloud 콘솔 · 사용자. 등록 전에는 GIS 버튼이 뜨지 않는다.
+3. **운영 smoke(§D)**: ① 로그인 전 원내 조회 ② Google 로그인 ③ Gemini 조사 ④ 파일 이해(GFU) ⑤ 원내+조사 결합 — 1·2 완료 후 실측. 지금은 PASS 로 쓰지 않는다.
+4. `hospital-pharmacy` 를 `ServiceKey` union · `service_memberships` 에 등록할지 — 별도 판단(등록 시 AuthContext 에 `serviceKey` 한 줄).
 
 ---
 

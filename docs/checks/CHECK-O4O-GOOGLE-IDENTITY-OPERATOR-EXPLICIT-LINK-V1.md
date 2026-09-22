@@ -111,7 +111,27 @@
 
 **테스트 계정 password 복원(production write · 사용자 승인 B-(ii)):** `renagang21` 은 Google-only 테스트 계정이므로 오입력으로 생긴 `users.password` 를 **NULL 로 복원**한다 — 배포 후 사용자 승인 하에 정확히 1행 `UPDATE users SET password = NULL WHERE id LIKE 'f707c74e%' AND password IS NOT NULL`. 실행 결과는 아래에 기록. **PENDING**
 
-## 3. 운영 Smoke (§10 · WO §8-A 정정판 · 사용자 브라우저 + read-only count) — PENDING (§3-D 정정 배포 · 테스트 계정 password 복원 · 관리자 reset 후 재개)
+## 3-E. 방향 변경 — 관리자 Google 최초 연결 1회용 bootstrap (2026-09-22 · WO §15 · 사용자 지시)
+
+**배경:** §3-B~§3-D 정정 후에도 B smoke 1단계가 비밀번호에서 막혔고(09-22 04:31Z `invalid_password` · 관리자 `loginAttempts` 4 잔존 = 실패 1회면 재잠금), 어차피 관리자 password 인증을 폐기할 예정이므로 **연결 1회만 비밀번호 없이 통과**시키는 방향으로 전환했다. 이후 추가 reset·credential 정렬·재시도는 하지 않는다.
+
+**테스트 계정 password 복원(§3-D 잔여 · 사용자 승인 B-(ii) · production write):** 2026-09-22 12:3xZ `UPDATE users SET password=NULL, "updatedAt"=now() WHERE id LIKE 'f707c74e%' AND password IS NOT NULL AND id IN (SELECT "userId" FROM linked_accounts WHERE provider='google') AND id NOT IN (SELECT user_id FROM role_assignments WHERE is_active)` → **`UPDATE 1`** · COMMIT. 사후 read-only: 테스트 계정 `password IS NULL` 복원 · `loginAttempts` 0 · status active · 관리자 행 무접촉(password set · attempts 4) · counts users 2 / linked 1 / creds 5 / memb 5 / roles 11 / super_admin 1 불변.
+
+**구현(커밋 `60bf7b5db`):**
+
+| 계층 | 내용 |
+|---|---|
+| 게이트 config | [`google-admin-bootstrap.config.ts`](../../apps/api-server/src/config/google-admin-bootstrap.config.ts) (신규) — `GOOGLE_ADMIN_BOOTSTRAP_ENABLED==='true'` **AND** `GOOGLE_ADMIN_BOOTSTRAP_CODE` 24자 이상일 때만 활성(fail-closed) · `verifyCode` 는 길이 확인 후 `timingSafeEqual` · 대상 role 상수 `platform:super_admin` |
+| 서버 | [`google-auth.service.ts`](../../apps/api-server/src/services/auth/google-auth.service.ts) `bootstrapAdminLink()` — 플래그 → 코드 → `verifyGoogleIdToken` → (단일 트랜잭션) `SELECT DISTINCT user_id FROM role_assignments WHERE role=$1 AND is_active=true`(파라미터 바인딩 · Guard Rule 2) 보유자 1명 검사 → 대상 google row 있으면 `409 GOOGLE_ACCOUNT_ALREADY_LINKED`(1회성) → sub 가 타 user 면 `409 GOOGLE_IDENTITY_IN_USE` → `linked_accounts` INSERT(스냅샷 컬럼 0) · unique race 도 IN_USE · activity `link_google`/reason `admin_bootstrap`(email NULL) · **세션 발급 0** |
+| route/DTO | `POST /api/v1/auth/google/bootstrap-admin` — `googleAdminBootstrapLimiter`(IP 시간당 10회 · [`rate-limiters.config.ts`](../../apps/api-server/src/config/rate-limiters.config.ts)) + `validateDto(GoogleAdminBootstrapRequestDto{idToken,bootstrapCode})`. `userId/email/sub/providerId/role/serviceKey/currentPassword` 는 400 |
+| 패키지 | `@o4o/auth-client` `bootstrapAdminGoogle(idToken, bootstrapCode)` |
+| 화면 | [`Login.tsx`](../../apps/admin-dashboard/src/pages/auth/Login.tsx) — `[관리자 Google 최초 연결(1회)]` 패널(코드 입력 시 같은 GIS credential 이 로그인 대신 bootstrap 으로 · GIS 버튼은 1개 유지 · 성공 시 코드 비움 + Google 로그인 안내 · 404/401/409/429 메시지 분기) |
+
+**검증:** jest [`googleAdminBootstrap.test.ts`](../../apps/api-server/src/services/auth/__tests__/googleAdminBootstrap.test.ts) 신규 **13건**(config 게이트 2 · 성공/대상판정 · disabled · 코드 불일치 · token 변조 · 1회성(같은 sub·다른 sub) · 타 user sub · INSERT race · 보유자 0/2명 · is_active=false · 입력 계약) + DTO 1건 → Google auth 4 suites **57/57 PASS** · AST guard(email lookup 0) PASS · `api-server tsc` 0 · `admin-dashboard tsc`/`vite build` PASS · eslint 변경 파일 오류 0(신규 warning 0).
+
+**보안 판단(기록):** 이 경로는 세션을 요구할 수 없어 **일시적으로 무인증 링크 경로**가 된다. 그래서 ① env 플래그 ② 24자 이상 일회용 코드(timing-safe) ③ 시간당 10회 IP 제한 ④ 대상 role 유일성 ⑤ 이미 연결 시 거절 ⑥ 성공 후 env 제거 — 6중 제한을 걸었다. 코드값은 repository·문서·로그에 기록하지 않고 Cloud Run env 로만 주입하며, 사용자에게는 git 미추적 로컬 파일로 전달한다.
+
+## 3. 운영 Smoke (§10 · WO §8-A 정정판 · 사용자 브라우저 + read-only count) — SUPERSEDED BY §15 (관리자 password 경로 중단 · bootstrap 으로 대체) (§3-D 정정 배포 · 테스트 계정 password 복원 · 관리자 reset 후 재개)
 
 baseline(2026-09-21 3-A 이후): users 2 · linked_accounts 1(테스트 계정) · 관리자 email renariver21 · password set · service_credentials 5 · service_memberships 5 · role_assignments 11.
 
@@ -143,6 +163,8 @@ baseline(2026-09-21 3-A 이후): users 2 · linked_accounts 1(테스트 계정) 
 | `237ffd3df` | 잠금 reset 기록 · 3-A email 정정 · 전제 정정 |
 | `2744ea809` | §3-B Admin 인증 계약 정정 + Admin Google 연결 UI(WO §8-A) |
 | `58f655218` | §3-C lockout 계약 정정(stale lock 정상화) + 계약 테스트 6(WO §8-B) |
-| (본 커밋) | §3-D Admin forgot-password `serviceUrl` 정정(WO §8-C) · CHECK 중복 블록(58f655218 삽입 오류) 정리 |
+| `1e69ef257` | §3-D Admin forgot-password `serviceUrl` 정정(WO §8-C) · CHECK 중복 블록 정리 |
+| `60bf7b5db` | §3-E 1회용 Admin Google Bootstrap 구현(서버·client·Admin UI·jest 13) |
+| (본 커밋) | WO §15 방향 변경 접수 · §3-E 기록 · 테스트 계정 password NULL 복원 기록 |
 
 문서 정합: 발견 0건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 1건(E2E Auth Runtime 워크플로 Google-only 재정의 = WO-2F · push 트리거는 제거 완료)

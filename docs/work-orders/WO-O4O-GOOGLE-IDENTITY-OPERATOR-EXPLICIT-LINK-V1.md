@@ -156,3 +156,47 @@ DB: users=2 · linked_accounts=2   /   Google 로그인: sohae → Admin 가능 
 ## 14. 이후 순서
 
 Google Identity 안정화 → sohae Google admin 확인 → renagang Google test 확인 → **Legacy Password/Auth 제거(WO-2F)** → `service_credentials` 제거 → password 회원가입 UI 제거. 테스트 데이터 재배정(운영자 → 테스트 계정)은 인증 트랙과 별도로 진행한다.
+
+---
+
+## 15. 방향 변경 — 관리자 Google 최초 연결을 1회용 bootstrap 으로 (2026-09-22 · 사용자 지시)
+
+> **소스 주석 매핑:** 구현 파일의 `WO §9` 표기는 **본 절(§15)** 을 가리킨다(§9 는 기존 "테스트 계정에는 영향 없음" 절 — 번호 고정 원칙상 재사용하지 않는다). 주석 표기 정정은 §16 코드 커밋에서 일괄한다.
+
+**더 이상 `renariver21@gmail.com` + password 복구를 Google 연결의 선행조건으로 쓰지 않는다.** 관리자 비밀번호 인증 자체를 폐기하기로 했으므로, 전환 1회를 위해 비밀번호를 복구·정렬하는 작업은 방향이 반대다. §3-B~§3-D 로 Admin 인증·잠금·reset 링크 계약은 이미 정정됐고, 그 위에 **연결 1회만** 비밀번호 없이 통과시킨다.
+
+**목표:** 기존 `platform:super_admin` users.id 를 그대로 유지한 채 사용자의 실제 Google 계정을 1회 bootstrap 으로 연결하고, 이후 Admin 은 Google 로그인만 사용한다.
+
+**불변:** admin users.id 변경·삭제 금지 · role/membership 변경 금지 · `renagang21` 무접촉 · **email 일치 자동 병합 금지** · Google Identity Key = 검증된 `sub`.
+
+### 15-1. one-time Admin Google bootstrap
+
+- `POST /api/v1/auth/google/bootstrap-admin` — `{ idToken, bootstrapCode }`. 세션·비밀번호 없음(연결 전에는 그 계정으로 로그인할 수단이 없다).
+- 게이트 3중: ① env `GOOGLE_ADMIN_BOOTSTRAP_ENABLED='true'` ② env `GOOGLE_ADMIN_BOOTSTRAP_CODE`(24자 이상 일회용 코드 · timing-safe 비교 · repository 미기록) ③ IP 당 시간당 10회 rate limit. 플래그·코드가 없으면 **404**(존재하지 않는 것처럼 닫힘).
+- **대상은 서버가 결정한다** — `role_assignments.role='platform:super_admin' AND is_active` 보유자가 **정확히 1명**일 때만 진행(아니면 `409 ADMIN_TARGET_AMBIGUOUS`). 클라이언트는 대상을 지정할 수 없고 email 은 어디에도 쓰이지 않는다.
+- ID token 은 기존 `verifyGoogleIdToken()`(signature·issuer·exp·audience allowlist·sub) 으로만 검증한다. 검증된 `sub` 만 `linked_accounts(provider='google')` 1행으로 연결한다. users 신설 0 · users.email/password/role/membership/service_credentials 변경 0 · **세션 발급 0**.
+- **1회성 이중 보장:** 대상에 이미 Google 연결이 있으면 `409 GOOGLE_ACCOUNT_ALREADY_LINKED`(교체 기능 없음) → 성공 후 재사용 구조적 불가. 여기에 더해 연결 직후 env 2개를 제거해 경로를 폐쇄한다.
+- 일반 public 사용자 기능으로 열지 않는다 — 진입은 Admin 로그인 화면의 `[관리자 Google 최초 연결(1회)]` 패널뿐이며, 코드가 입력된 경우에만 같은 GIS credential 이 로그인 대신 bootstrap 으로 간다.
+- 다른 user 의 sub → `409 GOOGLE_IDENTITY_IN_USE`(이동·merge 0).
+
+### 15-2. 연결 직후 검증 (read-only)
+
+users **2 유지** · linked_accounts 1→**2** · Google row `userId` = 기존 admin users.id · `platform:super_admin` 유지 · roles **11** / creds **5** / memberships **5** 불변 · `renagang21` 무접촉 · `account_activities` `link_google`(reason `admin_bootstrap`) 1건.
+
+### 15-3. Google Admin smoke (사용자 브라우저)
+
+로그아웃 → `admin.neture.co.kr` → `[Google로 계속하기]` → 해당 Google 계정 → **signup 화면 없음** · 동일 기존 admin users.id · Admin 정상 진입.
+
+### 15-4. 성공 확인 후 Admin legacy password 폐기
+
+- admin-dashboard 이메일/password 로그인 form 제거 · `비밀번호 찾기`/reset 진입 제거 → Admin 의 기본·유일 로그인 UI = Google.
+- 해당 admin user 의 `users.password = NULL`(1행 · 사용자 승인 하 실행).
+- `service_credentials` 는 **이번 작업에서 삭제하지 않는다**(서비스 역할·후속 작업 잔존).
+
+### 15-5. users.email
+
+`renariver21@gmail.com` 은 현재 schema `NOT NULL UNIQUE` 때문에 이번 작업에서 NULL 로 만들지 않는다. Admin 인증에는 더 이상 사용하지 않고 UI 에서도 관리자 로그인 ID 로 노출하지 않는다. 컬럼 optional 화·NULL 정리는 Phase 5 개인정보 최소화에서 수행한다.
+
+### 15-6. 실행 순서
+
+① bootstrap 구현·배포(코드에는 코드값 0) → ② Cloud Run env 2개 주입(창 열기) → ③ 사용자 Admin 화면에서 1회 연결 → ④ read-only 검증(15-2) → ⑤ env 제거(창 폐쇄) → ⑥ Google Admin smoke(15-3) → ⑦ §15-4 password 폐기 → ⑧ CHECK COMPLETE.

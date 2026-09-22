@@ -64,3 +64,19 @@ export class GoogleLinkRequestDto {
   @IsNotEmpty()
   currentPassword!: string;
 }
+
+/**
+ * WO-O4O-GOOGLE-IDENTITY-OPERATOR-EXPLICIT-LINK-V1 §9 — Admin Google Bootstrap(전환기 1회용)
+ * 세션 없이 호출되는 경로이므로 입력은 `idToken` + 일회용 `bootstrapCode` 뿐이다.
+ * 연결 대상 users.id 는 서버가 `platform:super_admin` role 로 결정한다 — 클라이언트가 지정할 수 없다
+ * (userId/email/sub/providerId/role 은 whitelist 밖이라 400).
+ */
+export class GoogleAdminBootstrapRequestDto {
+  @IsString()
+  @IsNotEmpty()
+  idToken!: string;
+
+  @IsString()
+  @IsNotEmpty()
+  bootstrapCode!: string;
+}

@@ -4,12 +4,19 @@
  * WO-O4O-GOOGLE-IDENTITY-OPERATOR-EXPLICIT-LINK-V1: email/password 로그인은 serviceKey 없이 호출한다.
  *   Admin 은 platform surface 이므로 검증 근거는 users.password + platform role 이며, Neture
  *   service_credentials 는 플랫폼 관리자 인증 근거가 아니다(전환기 비상 로그인 경로).
+ *
+ * WO §9 — 관리자 Google 최초 연결(1회): 연결 전에는 관리자 계정으로 로그인할 수단이 없으므로,
+ *   일회용 연결 코드를 입력한 상태에서 Google 계정을 선택하면 같은 ID token 이 로그인 대신
+ *   `POST /auth/google/bootstrap-admin` 으로 간다. 대상 users.id 는 서버가 platform:super_admin 으로
+ *   결정하며(클라이언트 지정 불가 · email 무관), 연결 성공 후에는 서버가 재사용을 거절한다.
+ *   GIS 버튼은 하나만 둔다 — 같은 페이지에서 두 번 initialize 하면 마지막 callback 만 살아남는다.
  */
 import { FC, FormEvent, useEffect, useRef, useState } from 'react';
 import { Navigate, useLocation, useSearchParams, Link } from 'react-router-dom';
 import { Eye, EyeOff, Lock, AlertTriangle } from 'lucide-react';
 import { useAuth } from '@o4o/auth-context';
 import { renderGoogleButton } from '@o4o/auth-client';
+import { authClient } from '@/lib/api';
 import toast from 'react-hot-toast';
 
 type GoogleStage = 'loading' | 'disabled' | 'ready';
@@ -28,6 +35,13 @@ const Login: FC = () => {
   const [googleStage, setGoogleStage] = useState<GoogleStage>('loading');
   const [googleClientId, setGoogleClientId] = useState<string | null>(null);
   const googleContainerRef = useRef<HTMLDivElement>(null);
+
+  // WO §9 — 관리자 Google 최초 연결(1회). 코드가 입력돼 있으면 credential 은 bootstrap 으로 간다.
+  const [bootstrapOpen, setBootstrapOpen] = useState(false);
+  const [bootstrapCode, setBootstrapCode] = useState('');
+  // GIS callback 은 mount 시 고정되므로 최신 코드값은 ref 로 읽는다.
+  const bootstrapCodeRef = useRef('');
+  bootstrapCodeRef.current = bootstrapCode;
 
   useEffect(() => {
     let alive = true;
@@ -99,8 +113,33 @@ const Login: FC = () => {
     }
   }
 
+  /** 일회용 코드가 있으면 로그인 대신 연결(bootstrap). 성공 후 코드를 비우고 Google 로그인으로 안내한다. */
+  const handleBootstrapCredential = async (idToken: string, code: string) => {
+    try {
+      await authClient.bootstrapAdminGoogle(idToken, code);
+      setBootstrapCode('');
+      setBootstrapOpen(false);
+      toast.success('Google 계정이 관리자 계정에 연결되었습니다. 이제 [Google로 계속하기] 로 로그인하세요.');
+    } catch (error: any) {
+      const code2 = error?.response?.data?.code;
+      const message =
+        code2 === 'GOOGLE_ADMIN_BOOTSTRAP_CODE_INVALID' ? '연결 코드가 올바르지 않습니다.'
+        : code2 === 'GOOGLE_ACCOUNT_ALREADY_LINKED' ? '이미 Google 계정이 연결되어 있습니다. [Google로 계속하기] 로 로그인하세요.'
+        : code2 === 'GOOGLE_IDENTITY_IN_USE' ? '이 Google 계정은 이미 다른 사용자에게 연결되어 있습니다.'
+        : error?.response?.status === 404 ? '지금은 연결을 진행할 수 없습니다.'
+        : error?.response?.status === 429 ? '시도가 너무 많습니다. 잠시 후 다시 시도해주세요.'
+        : (error?.response?.data?.error || 'Google 계정 연결에 실패했습니다.');
+      toast.error(message);
+    }
+  };
+
   const handleGoogleCredential = async (idToken: string) => {
     clearError();
+    const code = bootstrapCodeRef.current.trim();
+    if (code) {
+      await handleBootstrapCredential(idToken, code);
+      return;
+    }
     try {
       await loginWithGoogle(idToken, 'neture');
       toast.success('관리자 로그인 성공!');
@@ -202,6 +241,43 @@ const Login: FC = () => {
             )}
             {googleStage === 'ready' && (
               <div ref={googleContainerRef} className="flex justify-center min-h-[44px]" data-testid="google-continue-button" />
+            )}
+            {/* WO §9 — 관리자 Google 최초 연결(1회). 코드 입력 후 위 Google 버튼으로 계정을 선택한다. */}
+            {googleStage === 'ready' && (
+              <div className="mt-3 text-center">
+                {!bootstrapOpen ? (
+                  <button
+                    type="button"
+                    onClick={() => setBootstrapOpen(true)}
+                    className="text-xs text-blue-200 underline hover:text-white"
+                    data-testid="admin-bootstrap-open"
+                  >
+                    관리자 Google 최초 연결(1회)
+                  </button>
+                ) : (
+                  <div className="space-y-2 text-left" data-testid="admin-bootstrap-panel">
+                    <p className="text-xs text-blue-200">
+                      일회용 연결 코드를 입력한 뒤 위 [Google로 계속하기] 에서 연결할 계정을 선택하세요.
+                    </p>
+                    <input
+                      type="text"
+                      value={bootstrapCode}
+                      onChange={(e) => setBootstrapCode(e.target.value)}
+                      placeholder="일회용 연결 코드"
+                      autoComplete="off"
+                      aria-label="일회용 연결 코드"
+                      className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-blue-200/60 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => { setBootstrapCode(''); setBootstrapOpen(false); }}
+                      className="text-xs text-blue-200 underline hover:text-white"
+                    >
+                      취소
+                    </button>
+                  </div>
+                )}
+              </div>
             )}
           </div>
           <div className="flex items-center gap-3 mb-6">
