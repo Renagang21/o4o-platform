@@ -18,6 +18,7 @@
  *  4차 P1-13 quiz 생성 귀속    : courseId 를 생략하고 lessonId 만 보내도 귀속될 course 로 scope·소유권 검사 (우회 차단)
  *  4차 P1-14 문항 id 보존     : 편집기·updateQuiz 가 questions[].id 를 유지한다 (채점 매칭 유실 방지)
  *  4차 P1-15 제출 enrollment  : quiz/assignment 제출은 membership 위에 enrollment 정책까지 통과해야 한다
+ *  6차 P1-16 퀴즈 저장 정합   : 정답 없는/보기에 없는 문항 저장 차단 · 보기 편집 시 정답 동기화 · 로드 실패를 미존재로 오인 금지(중복 퀴즈)
  *
  * DB 없이 controller/service 를 실제로 실행한다: TypeORM entity 그래프는 virtual mock,
  * DataSource 는 service_memberships / lms_lessons 조회만 흉내낸다.
@@ -814,6 +815,22 @@ describe('정적 계약', () => {
     const api = read('services/web-lecture/src/api/lecture.ts');
     // 새 문항은 id 없이(서버 발급), 기존 문항은 id 를 실어 보낼 수 있어야 한다
     expect(api).toMatch(/export interface QuizQuestionDraft \{[\s\S]*?id\?: string;/);
+  });
+  it('6차 P1-16: 퀴즈 저장은 문항별 정답을 요구하고, 보기 편집 시 정답을 동기화하며, 로드 실패를 미존재로 오인하지 않는다', () => {
+    const page = read('services/web-lecture/src/pages/instructor/InstructorCourseEditPage.tsx');
+    // 정답 없는 문항 / 보기에 없는 정답은 저장 차단 (채점 불능 · 합격 불가 방지)
+    expect(page).toContain('const invalid = cleaned.findIndex((q) => {');
+    expect(page).toContain('번 문항의 정답을 선택(입력)하세요.');
+    expect(page).toContain("q.type !== 'text' && answers.some((a) => !q.options.includes(a))");
+    // 보기 rename/삭제 시 answer 동기화
+    expect(page).toContain('if (patch.options && next.type !== \'text\') {');
+    expect(page).toContain('const remap = (a: string): string | null => {');
+    // 404 만 "새로 만들기" — 그 외 실패는 저장 차단(중복 퀴즈 생성 방지)
+    expect(page).toContain('if (errorStatus(err) !== 404) {');
+    expect(page).toContain('disabled={saving || Boolean(loadError)}');
+    expect(page).not.toContain('} catch { /* 없으면 새로 만든다 */ }');
+    const api = read('services/web-lecture/src/api/lecture.ts');
+    expect(api).toContain('export function errorStatus(err: unknown): number | undefined');
   });
   it('4차 P1-15: 평가 제출 라우트는 enrollment 정책을 통과해야 한다', () => {
     const routes = read('apps/api-server/src/modules/lms/routes/lms.routes.ts');

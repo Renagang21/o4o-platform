@@ -7,7 +7,7 @@ import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { CourseStatusBadge, LmsLoading } from '@o4o/lms-ui';
 import { RichTextEditor } from '@o4o/content-editor';
 import {
-  instructorApi, errorMessage,
+  instructorApi, errorMessage, errorStatus,
   type CourseInput, type LectureCourse, type LectureLesson, type LessonInput, type LessonType,
   type LectureQuiz, type QuizQuestionDraft, type LectureAssignment,
 } from '../../api/lecture';
@@ -183,6 +183,8 @@ export function InstructorQuizPage() {
   const [questions, setQuestions] = useState<QuizQuestionDraft[]>([{ ...EMPTY_Q }]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  // 6차 P2: 로드 실패(미존재 아님)는 화면에 드러내고 저장을 막는다 — 중복 퀴즈 생성 방지
+  const [loadError, setLoadError] = useState('');
 
   useEffect(() => {
     let alive = true;
@@ -197,20 +199,58 @@ export function InstructorQuizPage() {
           // 매칭되지 않아 제출 답안이 전부 오답이 된다(채점은 quiz.questions[].id 기준).
           setQuestions(q.questions.map((qq) => ({ ...qq })));
         }
-      } catch { /* 없으면 새로 만든다 */ }
+      } catch (err) {
+        if (!alive) return;
+        // 6차 P2: 404(퀴즈 없음)만 "새로 만들기" 로 본다. 5xx · 네트워크 · 권한 실패를 미존재로 오인하면
+        // 저장이 createQuiz 로 흘러 같은 lesson 에 퀴즈가 하나 더 생기고(lessonId 는 unique 아님)
+        // 이후 learner/강사 조회가 서로 다른 행을 읽는다.
+        if (errorStatus(err) !== 404) {
+          setLoadError(errorMessage(err, '퀴즈를 불러오지 못했습니다.'));
+        }
+      }
       finally { if (alive) setLoading(false); }
     })();
     return () => { alive = false; };
   }, [lessonId]);
 
   function patchQ(i: number, patch: Partial<QuizQuestionDraft>) {
-    setQuestions((qs) => qs.map((q, idx) => idx === i ? { ...q, ...patch } : q));
+    setQuestions((qs) => qs.map((q, idx) => {
+      if (idx !== i) return q;
+      const next = { ...q, ...patch };
+      // 5차 P2: 보기 텍스트를 고치거나 지우면 선택해 둔 정답이 보기 목록에 없는 값으로 남는다.
+      // 저장되면 채점에서 어떤 응답도 맞지 않으므로, 보기 변경 시 정답을 목록과 동기화한다.
+      if (patch.options && next.type !== 'text') {
+        const prevOptions = q.options ?? [];
+        const nextOptions = next.options ?? [];
+        const remap = (a: string): string | null => {
+          if (nextOptions.includes(a)) return a;
+          // 같은 자리의 보기가 이름만 바뀐 경우 → 새 이름으로 승계, 삭제된 경우 → 해제
+          const at = prevOptions.indexOf(a);
+          return at >= 0 && at < nextOptions.length && prevOptions.length === nextOptions.length
+            ? nextOptions[at]
+            : null;
+        };
+        next.answer = Array.isArray(next.answer)
+          ? next.answer.map(remap).filter((a): a is string => Boolean(a))
+          : (remap(typeof next.answer === 'string' ? next.answer : '') ?? '');
+      }
+      return next;
+    }));
   }
 
   async function save() {
+    if (loadError) { toast.error('퀴즈를 불러오지 못한 상태에서는 저장할 수 없습니다. 새로고침 후 다시 시도하세요.'); return; }
     if (!title.trim()) { toast.error('퀴즈 제목을 입력하세요.'); return; }
     const cleaned = questions.map((q, i) => ({ ...q, order: i + 1, options: q.type === 'text' ? [] : q.options.filter((o) => o.trim()) }));
     if (cleaned.some((q) => !q.question.trim())) { toast.error('문항 내용을 입력하세요.'); return; }
+    // 6차 P1-16: 정답 없는 문항은 채점에서 항상 오답이 되어 합격 자체가 불가능해진다.
+    // 선택형은 남아 있는 보기 중 하나여야 한다.
+    const invalid = cleaned.findIndex((q) => {
+      const answers = Array.isArray(q.answer) ? q.answer.filter((a) => a.trim()) : (typeof q.answer === 'string' && q.answer.trim() ? [q.answer] : []);
+      if (answers.length === 0) return true;
+      return q.type !== 'text' && answers.some((a) => !q.options.includes(a));
+    });
+    if (invalid >= 0) { toast.error(`${invalid + 1}번 문항의 정답을 선택(입력)하세요.`); return; }
     setSaving(true);
     try {
       const dto = { lessonId, courseId, title, passingScore, questions: cleaned };
@@ -224,6 +264,7 @@ export function InstructorQuizPage() {
   if (loading) return <main className="page"><LmsLoading message="불러오는 중..." /></main>;
   return <main className="page page-wide">
     <div className="page-head"><p className="muted"><Link to={courseId ? `/instructor/courses/${courseId}/edit` : '/instructor'}>강의 편집</Link> / 퀴즈</p><h1>퀴즈 구성</h1></div>
+    {loadError && <section className="panel"><p className="error">{loadError} 새로고침 후 다시 시도하세요. (저장은 막혀 있습니다)</p></section>}
     <section className="panel">
       <div className="field-row">
         <label className="field"><span>제목</span><input value={title} onChange={(e) => setTitle(e.target.value)} /></label>
@@ -256,7 +297,7 @@ export function InstructorQuizPage() {
       </div>)}
       <div className="row-actions">
         <button type="button" className="btn" onClick={() => setQuestions((qs) => [...qs, { ...EMPTY_Q, order: qs.length + 1 }])}>문항 추가</button>
-        <button type="button" className="btn btn-primary" disabled={saving} onClick={() => void save()}>저장</button>
+        <button type="button" className="btn btn-primary" disabled={saving || Boolean(loadError)} onClick={() => void save()}>저장</button>
       </div>
     </section>
   </main>;
@@ -274,6 +315,8 @@ export function InstructorAssignmentPage() {
   const [dueDate, setDueDate] = useState('');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  // 6차 P2(같은 계열): 로드 실패를 "과제 없음" 으로 오인하면 빈 안내문으로 기존 과제를 덮어쓴다(upsert).
+  const [loadError, setLoadError] = useState('');
 
   useEffect(() => {
     let alive = true;
@@ -282,13 +325,17 @@ export function InstructorAssignmentPage() {
         const res = await instructorApi.getAssignmentForLesson(lessonId);
         const a = res.data?.assignment ?? null;
         if (alive && a) { setAssignment(a); setInstructions(a.instructions ?? ''); setDueDate(a.dueDate ? a.dueDate.slice(0, 10) : ''); }
-      } catch { /* 없으면 새로 만든다 */ }
+      } catch (err) {
+        if (!alive) return;
+        if (errorStatus(err) !== 404) setLoadError(errorMessage(err, '과제를 불러오지 못했습니다.'));
+      }
       finally { if (alive) setLoading(false); }
     })();
     return () => { alive = false; };
   }, [lessonId]);
 
   async function save() {
+    if (loadError) { toast.error('과제를 불러오지 못한 상태에서는 저장할 수 없습니다. 새로고침 후 다시 시도하세요.'); return; }
     if (!instructions.trim()) { toast.error('과제 안내를 입력하세요.'); return; }
     setSaving(true);
     try {
@@ -302,11 +349,12 @@ export function InstructorAssignmentPage() {
   if (loading) return <main className="page"><LmsLoading message="불러오는 중..." /></main>;
   return <main className="page page-wide">
     <div className="page-head"><p className="muted"><Link to={courseId ? `/instructor/courses/${courseId}/edit` : '/instructor'}>강의 편집</Link> / 과제</p><h1>과제 구성</h1></div>
+    {loadError && <section className="panel"><p className="error">{loadError} 새로고침 후 다시 시도하세요. (저장은 막혀 있습니다)</p></section>}
     <section className="panel">
       <label className="field"><span>과제 안내</span><textarea rows={8} value={instructions} onChange={(e) => setInstructions(e.target.value)} /></label>
       <label className="field"><span>마감일</span><input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} /></label>
       <div className="row-actions">
-        <button type="button" className="btn btn-primary" disabled={saving} onClick={() => void save()}>{assignment ? '저장' : '과제 만들기'}</button>
+        <button type="button" className="btn btn-primary" disabled={saving || Boolean(loadError)} onClick={() => void save()}>{assignment ? '저장' : '과제 만들기'}</button>
         {assignment && <Link className="btn btn-ghost" to={`/instructor/lessons/${lessonId}/submissions`}>제출물 보기</Link>}
       </div>
     </section>

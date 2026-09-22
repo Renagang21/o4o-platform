@@ -282,3 +282,8 @@ export function errorMessage(err: unknown, fallback: string): string {
 export function errorCode(err: unknown): string | undefined {
   return (err as any)?.response?.data?.code;
 }
+/** HTTP status (없으면 undefined) — "미존재(404)" 와 그 외 실패를 구분해야 하는 화면에서 쓴다 (6차 P2). */
+export function errorStatus(err: unknown): number | undefined {
+  const s = (err as any)?.response?.status;
+  return typeof s === 'number' ? s : undefined;
+}
