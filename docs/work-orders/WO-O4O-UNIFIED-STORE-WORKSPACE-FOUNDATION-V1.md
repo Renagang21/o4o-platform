@@ -190,6 +190,8 @@ exchange  payload.targetServiceKey 있음 → 기존 service handoff 로직 불�
 | 5 | `store.neture.co.kr` Cloud Run / LB / DNS / cert / CORS / Google origin | 가능한 것은 실행 · 외부는 PENDING_USER_ACTION |
 | 6 | 전체 E2E + legacy compatibility | CHECK 갱신 · 재종결 |
 
+> **진행 상태(2026-09-22)**: Phase 1 `e69b571fb` · Phase 2+3 `6581dc821` · Phase 4 `082f5887f`(플래그 게이트 · 기본 OFF) · Phase 5 인프라 additive 생성(NEG · backend · URL map · cert) + `4d7213a72` · Phase 6 결정론 검증 PASS. 잔여 = cert map entry · DNS · Google origin · cutover flip · store_owner 브라우저 E2E → CHECK §11-4.
+
 ### 8-4. 기능 통합 원칙
 
 - 세 서비스의 Store 페이지를 **복사하지 않는다.** 공통 기능은 `내 매장 / 공통 매장 업무` 아래 **1회** 조립: 매장 경영활용 제품 · 매장 자체 상품 · 콘텐츠 · 자료 · 제작 자료 · 상품 설명 · 블로그 · POP · QR · 다국어 · 태블릿 · 사이니지 · 분석 · 매장 설정.
