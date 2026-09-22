@@ -2,7 +2,7 @@
 
 > **WO**: [`WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1`](../work-orders/WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1.md)
 > **범위**: **Phase 1 — Lecture Service Foundation** (WO §6.1 step 01~04 · §1~§10) + **Phase 2 — LMS Core 독립화 · Membership Boundary · Lecture Surface · 기존 서비스 LMS 제거** (§11~§16 · 2026-09-22). production LMS 데이터 cutover(course rekey · membership 생성)는 **NOT_STARTED** (§16).
-> **상태**: **Phase 1 MERGED** — PR #223 → main `3e56425b7` (2026-09-19 · merge commit) · `lecture-web` Cloud Run 첫 revision 배포 성공. **운영 reference seed APPLIED(§10.2 · 2026-09-19)** · **`study.neture.co.kr` 도메인 매핑 PASS(§10.3 · 2026-09-21 · HTTPS smoke 전부 PASS) → Phase 1 CLOSED.** · **Phase 2 COMPLETE(2026-09-22 · branch `work/lecture-phase2-v1` · production write 0 · `READY_FOR_LECTURE_DATA_CUTOVER=YES` · 운영자 로그인 E2E 보류) — §15 판정표.**
+> **상태**: **Phase 1 MERGED** — PR #223 → main `3e56425b7` (2026-09-19 · merge commit) · `lecture-web` Cloud Run 첫 revision 배포 성공. **운영 reference seed APPLIED(§10.2 · 2026-09-19)** · **`study.neture.co.kr` 도메인 매핑 PASS(§10.3 · 2026-09-21 · HTTPS smoke 전부 PASS) → Phase 1 CLOSED.** · **Phase 2 COMPLETE(2026-09-22 · branch `work/lecture-phase2-v1` · production write 0 · 운영자 로그인 E2E 보류) — §15 판정표.** · **PR #225 merge-gate repair(§17 · 2026-09-22): 최신 main 통합 · CI Guide 계약 수정 · Codex P1 5건 처리 → `PHASE2_MERGE != PHASE2_DEPLOY` — merge 후 단독 배포 금지 · coordinated deploy + data cutover 로만 운영 반영.**
 > **날짜**: 2026-09-18 · **작성**: Claude Code (Opus 5) — ChatGPT 세션이 만든 PR 을 이어받아 정리 · 검증
 > **원칙**: 검증하지 않은 것을 PASS 로 쓰지 않는다. 접속값 · 자격증명 출력 0.
 
@@ -307,8 +307,8 @@ read-only(`o4o_api_v2` · cloud-sql-proxy). 9/18 IR 대비 **이탈 0** — STOP
 | `LMS_KPA_RUNTIME_COUPLING` | 0 (잔존 = `register-routes.ts:131` 주석 1) |
 | `KPA_LMS_SCOPE_GUARD` | REMOVED |
 | `KPA_ADMIN_LMS_BYPASS` | 0 |
-| `LECTURE_MEMBERSHIP_BOUNDARY` | ENFORCED (`lecture-access.ts` · spec 20) |
-| `LECTURE_COURSE_SERVICEKEY_FORCE` | ENFORCED (create · update · 조회) |
+| `LECTURE_MEMBERSHIP_BOUNDARY` | ENFORCED (`lecture-access.ts` · spec 20 + **members 강의 목록·상세 gating(§17 · spec 38)**) |
+| `LECTURE_COURSE_SERVICEKEY_FORCE` | ENFORCED (create 서버 고정 · **update allowlist — PATCH serviceKey/instructorId 무시(§17)** · 조회 scope 고정) |
 | `LECTURE_LEARNER_SURFACE` / `LECTURE_INSTRUCTOR_SURFACE` / `LECTURE_OPERATOR_SURFACE` | BUILT / BUILT / BUILT |
 | `PLATFORM_ADMIN_LMS_INSTRUCTOR_SURFACE` | REMOVED_OR_MIGRATED (→ Lecture `/operator/instructors`) |
 | `LEGACY_LMS_INSTRUCTOR_RUNTIME_CONSUMERS` | 0 (`types/roles.ts` 선언 · historical migration 은 non-runtime 잔존) |
@@ -316,7 +316,55 @@ read-only(`o4o_api_v2` · cloud-sql-proxy). 9/18 IR 대비 **이탈 0** — STOP
 | `LMS_CORE_REUSED` / `NEW_LMS_CORE` | YES / NO |
 | `PRODUCTION_LMS_WRITE` | 0 |
 | `PRODUCTION_RE_CENSUS` | DONE (SELECT only · 이탈 0) |
-| `READY_FOR_LECTURE_DATA_CUTOVER` | **YES** — 선행: 본 PR merge · 배포 · 운영자 로그인 E2E(§21) |
+| `READY_FOR_LECTURE_DATA_CUTOVER` | **YES (coordinated)** — 실행 순서는 §17-5 로 확정: **merge → final production re-census → coordinated deploy + data cutover → public smoke → operator E2E(Auth gate 해소 시)**. Phase 2 runtime 단독 배포 금지(`PHASE2_MERGE != PHASE2_DEPLOY`) |
 
 ## 16. Phase 2 비범위 (§20 · 미착수 확인)
 production `service_key` migration(kpa-society 8 · pharmacy-hub 3 → lecture) · `currentEnrollments` 7 정정 · production membership 생성 · reward/credit/certificate/organization/paid 이관 · KCos/PH `package.json` lms 의존 선언 정리 · `types/roles.ts` `lms:instructor` 제거 · KPA AI route 2 삭제. 전부 **별도 WO**.
+
+## 17. PR #225 merge-gate repair (2026-09-22 · 같은 PR · 신규 WO/CHECK 0)
+
+팀장 판정: `LECTURE_PHASE2_IMPLEMENTATION=COMPLETE` · `PHASE2_MERGE_GATE_REPAIR=REQUIRED` · `PR_225_READY_TO_MERGE=NO`(CI FAIL · Codex P1 5건) · `PHASE2_PRODUCTION_DEPLOY=HOLD`. 제약: production DB write 0 · data cutover 미실행 · 운영자 로그인 보류 — 전부 준수(이 절의 작업은 코드 · 테스트 · 문서만).
+
+### 17-1. 최신 main 통합
+
+- `origin/main 5f463c95d`(hospital-pharmacy Foundation · auth lockout 정정 등 5커밋) → `work/lecture-phase2-v1` 일반 merge `d0e6a7f03`. **충돌 0** · reset/stash/`add .` 0 · 타 세션 파일 접촉 0.
+- `pnpm-lock.yaml`: origin/main 대비 diff = web-lecture importer 링크(`@o4o/content-editor` · `@o4o/lms-client` · `@o4o/lms-ui`) 만 · main 측 변경 유실 0 · 외부 패키지 추가 0 (재확인).
+
+### 17-2. CI 실패 — shared-space-ui Guide 계약 (test expectation 완화 0)
+
+원인: KPA/KCos Guide copy 가 Phase 2 에서 삭제된 LMS surface 경로(`/guide/features/lms` · `/lms/course/:id` · `/lms/course/:courseId/lesson/:lessonId` · `/instructor/courses` · `/operator/lms`)를 참조 → `guideRouteContract` FAIL.
+처리(copy/route 계약 자체를 Lecture 독립 구조에 맞춤): KPA·KCos "강의" 그룹 = **O4O 강의(study.neture.co.kr) 외부 진입 안내**로 교체(진입 route 는 실존 redirect `/lms` · KPA `/mypage/enrollments` 만) · `/guide/features/lms` 섹션과 `kpaGuideFeatureLmsProps` · `kCosmeticsGuideFeatureLmsProps` export 삭제(소비처 0 확인) · KPA 운영자 가이드 step 04 에서 `/operator/lms` 제거("강의 운영은 O4O 강의 운영자 화면"). → `vitest --config packages/shared-space-ui/vitest.config.mjs` **8 files / 100 tests PASS**.
+
+### 17-3. Codex P1 — 처리표
+
+| # | 지적 | 처리 | 판정 |
+|---|---|---|---|
+| 1 | members 강의가 로그인만으로 노출 | `isActiveLectureLearner(req)`(lecture-access) 신설. `GET /courses` — active lecture membership 없으면(비로그인 · 타 서비스 membership 포함) `visibility=public` 강제 → members 강의 목록 제외. `GET /courses/:id` — 비로그인 401 `MEMBERS_ONLY`(종전) · 로그인+membership 없음 **403 `LECTURE_MEMBERSHIP_REQUIRED`**(제목·설명 비노출) · active membership 200. | **FIXED** |
+| 2 | PATCH body `serviceKey` 가 `Object.assign` 으로 반영 | `CourseService.updateCourse` 를 **allowlist**(`UPDATABLE_COURSE_FIELDS` · `pickUpdatableCourseFields`) 로 전환 — `serviceKey` · `instructorId` · id/createdAt 등 비요청 필드 무시. `contentKind` 는 별개 축으로 계속 허용. Lecture 강의를 kpa-society/null/'' 로 옮기는 PATCH 4종 + controller 경유 1종 테스트. | **FIXED** |
+| 3 | 직접 publish 가 호출자 role 만 검사 | `isLectureCourse()` 를 lecture-access 로 승격(routes 로컬 정의 삭제) → `CourseController.loadLectureCourseOr404` 로 **publish · update · delete · submit-review · unpublish · archive** 전부 대상 `serviceKey==='lecture'` 검사, legacy(KPA/PH/NULL) 는 non-disclosure 404 (operator approve/reject/archive 와 동일 규칙 공유). | **FIXED** |
+| 4 | 강사 편집기가 learner sanitized quiz 응답 사용 → 저장 시 정답 유실 | 신규 `GET /lms/instructor/lessons/:lessonId/quiz`(requireInstructor · 소유자 또는 lecture:admin · lecture 강의만) = `QuizService.getQuizForLessonWithAnswers`(정답 포함 · 미공개 포함). learner `GET /lessons/:lessonId/quiz` 는 그대로 정답 제거. `PATCH /quizzes/:id` 에 scope guard + **소유권 검사** 추가 · body allowlist(lessonId/courseId/id 귀속 변경 불가). web-lecture `instructorApi.getQuizForLesson` → 강사 경로. 편집 왕복(제목만 변경) 정답 보존 + learner 응답 회귀 테스트. | **FIXED** |
+| 5 | pre-cutover legacy 강의 가용성(temporary KPA membership fallback 요구) | **runtime fallback · cross-service compatibility 추가 0**. 정책으로 고정: `PHASE2_MERGE != PHASE2_DEPLOY` — PR 은 merge 가능하되 Phase 2 runtime 은 production LMS course `service_key` rekey 전에 단독 배포하지 않는다(§17-5). 기존 KPA/PH membership → Lecture membership 자동 변환 0 · cleanup user 포함 auto membership creation 0. | **OPERATIONAL_GATE** |
+
+신규 spec `apps/api-server/src/__tests__/lecture-phase2-merge-gate-contract.spec.ts` — controller/service 를 in-memory repository 로 실행 · **38/38 PASS**(P1-1 10 · P1-2 8 · P1-3 10 · P1-4 8 · 정적 3).
+
+### 17-4. 검증 (merge-gate)
+
+| 항목 | 결과 |
+|---|---|
+| shared-space-ui vitest | 8 files / 100 PASS |
+| api-server tsc | 0 |
+| api-server jest 전체 | 전체 실행 345 suites(4 skipped) — 344 PASS + `lms-operator-multi-service-scope` 1 FAIL(정적 계약이 `isLectureCourse` 정의를 routes 파일에서 찾음 → lecture-access.ts 로 승격된 위치로 assertion 갱신 · 완화 0) → 재실행 PASS. 최종 345/345 · 5799 tests PASS(32 skipped) · 0 FAIL |
+| web-lecture tsc · vite build | 0 · PASS |
+| shared-space-ui · web-kpa-society · web-k-cosmetics · web-pharmacy-hub · admin-dashboard tsc | 전부 0 |
+| production DB write / cutover / 운영자 로그인 | 0 / 미실행 / 보류 |
+
+### 17-5. 실행 순서 (확정 · PR 설명 동기화)
+
+```
+merge(PR #225) → final production re-census(SELECT only)
+  → coordinated deploy + data cutover (api + web-lecture 배포와 lms_courses.service_key rekey 를 한 창에서 · 별도 WO)
+  → public smoke(study.neture.co.kr) → operator E2E (Auth gate 해소 시)
+```
+
+- Phase 2 runtime 만 먼저 배포하면 production 11 course(kpa-society 8 · pharmacy-hub 3) 가 Lecture 경로에서 404 가 되고 기존 서비스 URL 은 이미 Lecture 로 외부 이동한다 → 단독 배포 금지.
+- membership: `service_memberships(lecture)` 는 사용자 가입/운영자 지정으로만 생성. 자동 변환 0.

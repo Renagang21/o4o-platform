@@ -124,6 +124,26 @@ export const requireLectureLearner: RequestHandler = async (req: Request, res: R
   }
 };
 
+/**
+ * 요청자가 Lecture 학습자인가 (active lecture membership 또는 break-glass).
+ * PR #225 merge-gate(Codex P1 · members visibility):
+ *   로그인만으로는 members 강의를 열지 않는다 — 목록·상세 controller 가 이 판정으로 gating 한다.
+ */
+export async function isActiveLectureLearner(req: Request): Promise<boolean> {
+  if (!(req as any).user?.id) return false;
+  if (isPlatformSuperAdmin(req)) return true;
+  return (await resolveLectureMembershipStatus(req)) === 'active';
+}
+
+/**
+ * 운영·강사 write 대상 강의 판정 — `course.serviceKey === 'lecture'` 만 Lecture runtime 의 대상이다.
+ * approve/reject/unpublish/archive/hard-delete(routes) 와 publish/update/delete/submit-review(controller)
+ * 가 같은 규칙을 공유한다. legacy(KPA/PH/null) 강의는 non-disclosure 404 (data cutover 로만 해결).
+ */
+export function isLectureCourse(courseServiceKey: string | null | undefined): boolean {
+  return courseServiceKey === SERVICE_KEYS.LECTURE;
+}
+
 /** Instructor 층 = active membership + `lecture:instructor` (Foundation guard 재사용). */
 export const requireLectureInstructor: RequestHandler = requireLectureScope(LECTURE_INSTRUCTOR_ROLE);
 

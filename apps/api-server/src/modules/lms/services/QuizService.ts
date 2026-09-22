@@ -82,6 +82,15 @@ export class QuizService {
   }
 
   /**
+   * 강사 편집용 — 정답 포함 · 미공개 퀴즈 포함 (PR #225 merge-gate · Codex P1).
+   * controller 가 소유권(course.instructorId 또는 lecture:admin)을 먼저 판정한 뒤에만 호출한다.
+   * learner 경로(`getQuizForLesson`)는 그대로 정답을 제거한다.
+   */
+  async getQuizForLessonWithAnswers(lessonId: string): Promise<Quiz | null> {
+    return this.quizRepository.findOne({ where: { lessonId } as any });
+  }
+
+  /**
    * Submit quiz answers, grade, and update progress
    */
   async submitQuiz(
@@ -496,7 +505,12 @@ export class QuizService {
     const mergedMetadata =
       incomingMetadata !== undefined ? { ...(quiz.metadata ?? {}), ...incomingMetadata } : undefined;
 
-    Object.assign(quiz, data);
+    // PR #225 merge-gate: allowlist — lessonId/courseId(귀속) · id 등은 PATCH 로 바꿀 수 없다.
+    const picked: Record<string, unknown> = {};
+    for (const key of ['title', 'description', 'questions', 'passingScore', 'isPublished'] as const) {
+      if (data[key] !== undefined) picked[key] = data[key];
+    }
+    Object.assign(quiz, picked);
 
     if (mergedMetadata !== undefined) {
       quiz.metadata = mergedMetadata;

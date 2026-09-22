@@ -6,7 +6,8 @@ import logger from '../../../utils/logger.js';
 // WO-O4O-LMS-CROSSSERVICE-READ-WRITE-BOUNDARY-COMPLETION-V1 §5
 // quiz/assignment 신규 기능 구현이 아니라, lesson→course 역추적 service boundary 만 적용한다.
 import { guardLessonScope, guardQuizScope } from '../utils/lms-scope-guard.js';
-import { rolesIncludeLectureAdmin } from '../middleware/lecture-access.js';
+import { rolesIncludeLectureAdmin, isLectureCourse } from '../middleware/lecture-access.js';
+import { AppDataSource } from '../../../database/connection.js';
 
 /**
  * QuizController
@@ -16,6 +17,57 @@ import { rolesIncludeLectureAdmin } from '../middleware/lecture-access.js';
  * Handles quiz retrieval, submission, grading, and CRUD
  */
 export class QuizController extends BaseController {
+  /**
+   * 퀴즈/레슨이 속한 강의를 강사가 소유하는지 판정한다 (소유자 또는 lecture:admin).
+   * 대상 강의는 Lecture 소유(`serviceKey==='lecture'`)여야 한다 — 아니면 존재를 노출하지 않는다.
+   * 반환: 'ok' | 'not_found' | 'forbidden'
+   */
+  private static async resolveCourseOwnership(
+    req: Request,
+    courseId: string | null | undefined,
+  ): Promise<'ok' | 'not_found' | 'forbidden'> {
+    if (!courseId) return 'not_found';
+    const userId = (req as any).user?.id;
+    const userRoles: string[] = (req as any).user?.roles || [];
+    const course = await CourseService.getInstance().getCourse(courseId);
+    if (!course || !isLectureCourse(course.serviceKey)) return 'not_found';
+    if (course.instructorId !== userId && !rolesIncludeLectureAdmin(userRoles)) return 'forbidden';
+    return 'ok';
+  }
+
+  /**
+   * GET /api/v1/lms/instructor/lessons/:lessonId/quiz
+   * 강사 편집용 퀴즈 조회 — 정답 포함 (PR #225 merge-gate · Codex P1).
+   * 소유자(course.instructorId) 또는 lecture:admin 만. learner 경로와 분리되어 정답이 보존된다.
+   */
+  static async getQuizForLessonAsInstructor(req: Request, res: Response): Promise<any> {
+    try {
+      const { lessonId } = req.params;
+
+      if (!(await guardLessonScope(req, res, lessonId))) return;
+
+      const rows: Array<{ courseId: string }> = await AppDataSource.query(
+        'SELECT "courseId" FROM lms_lessons WHERE id = $1 LIMIT 1',
+        [lessonId],
+      );
+      const ownership = await QuizController.resolveCourseOwnership(req, rows?.[0]?.courseId);
+      if (ownership === 'not_found') return BaseController.notFound(res, 'Lesson not found');
+      if (ownership === 'forbidden') {
+        return BaseController.forbidden(res, 'You can only view quizzes of your own courses');
+      }
+
+      const quiz = await QuizService.getInstance().getQuizForLessonWithAnswers(lessonId);
+      if (!quiz) {
+        return BaseController.notFound(res, 'Quiz not found for this lesson');
+      }
+
+      return BaseController.ok(res, { quiz });
+    } catch (error: any) {
+      logger.error('[QuizController.getQuizForLessonAsInstructor] Error', { error: error.message });
+      return BaseController.error(res, error);
+    }
+  }
+
   /**
    * GET /api/v1/lms/lessons/:lessonId/quiz
    * Get quiz for a lesson (questions without correct answers)
@@ -163,7 +215,19 @@ export class QuizController extends BaseController {
       const { quizId } = req.params;
       const data = req.body;
 
+      if (!(await guardQuizScope(req, res, quizId))) return;
+
       const service = QuizService.getInstance();
+
+      // PR #225 merge-gate: 편집도 소유자(또는 lecture:admin) 만 — createQuiz 와 동일 규칙
+      const existing = await service.getQuiz(quizId);
+      if (!existing) return BaseController.notFound(res, 'Quiz not found');
+      const ownership = await QuizController.resolveCourseOwnership(req, existing.courseId);
+      if (ownership === 'not_found') return BaseController.notFound(res, 'Quiz not found');
+      if (ownership === 'forbidden') {
+        return BaseController.forbidden(res, 'You can only update quizzes of your own courses');
+      }
+
       const quiz = await service.updateQuiz(quizId, data);
 
       return BaseController.ok(res, { quiz });

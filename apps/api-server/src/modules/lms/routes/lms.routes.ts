@@ -16,7 +16,7 @@ import { asyncHandler } from '../../../middleware/error-handler.js';
 import { requireEnrollment } from '../middleware/requireEnrollment.js';
 import { requireInstructor } from '../middleware/requireInstructor.js';
 // WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2: Lecture 접근 계약 (KPA guard · 서비스 allowlist 제거)
-import { requireLectureLearner, requireLectureOperator } from '../middleware/lecture-access.js';
+import { requireLectureLearner, requireLectureOperator, isLectureCourse } from '../middleware/lecture-access.js';
 import { lmsContextMiddleware } from '../utils/lms-service-scope.js';
 import { SERVICE_KEYS } from '../../../constants/service-keys.js';
 // WO-O4O-LMS-GLOBAL-OPERATOR-ROUTES-V1
@@ -39,10 +39,6 @@ const router: Router = Router();
 //   - 운영 대상 강의는 course.serviceKey === 'lecture' 만. 그 외는 non-disclosure 404.
 // ========================================
 router.use(lmsContextMiddleware({ serviceCode: SERVICE_KEYS.LECTURE }));
-
-function isLectureCourse(courseServiceKey: string | null | undefined): boolean {
-  return courseServiceKey === SERVICE_KEYS.LECTURE;
-}
 
 // ========================================
 // COURSE ROUTES
@@ -108,6 +104,10 @@ router.post('/courses/:courseId/lessons/reorder', requireAuth, requireInstructor
 
 // GET /api/v1/lms/lessons/:lessonId/quiz - Get Quiz for Lesson
 router.get('/lessons/:lessonId/quiz', requireAuth, asyncHandler(QuizController.getQuizForLesson));
+
+// GET /api/v1/lms/instructor/lessons/:lessonId/quiz — 강사 편집용 (정답 포함 · 소유자 또는 lecture:admin)
+//   PR #225 merge-gate(Codex P1): 강사 편집기는 learner sanitized 응답을 쓰지 않는다 (정답 유실 방지).
+router.get('/instructor/lessons/:lessonId/quiz', requireAuth, requireInstructor, asyncHandler(QuizController.getQuizForLessonAsInstructor));
 
 // POST /api/v1/lms/quizzes - Create Quiz (Instructor)
 router.post('/quizzes', requireAuth, requireInstructor, asyncHandler(QuizController.createQuiz));

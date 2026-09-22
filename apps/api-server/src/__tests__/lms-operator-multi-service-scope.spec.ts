@@ -15,6 +15,8 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 
 const ROUTES = readFileSync(join(__dirname, '../modules/lms/routes/lms.routes.ts'), 'utf-8');
+// PR #225 merge-gate repair: isLectureCourse 는 lecture-access.ts 로 승격(CourseController 강사 write 경로와 공유)
+const ACCESS = readFileSync(join(__dirname, '../modules/lms/middleware/lecture-access.ts'), 'utf-8');
 
 describe('LMS operator route — Lecture 전용 (다중 서비스 allowlist 은퇴)', () => {
   it('서비스 allowlist 판정 함수와 KPA guard 가 남아 있지 않다', () => {
@@ -48,8 +50,10 @@ describe('LMS operator route — Lecture 전용 (다중 서비스 allowlist 은�
   });
 
   it('운영 대상은 course.serviceKey === lecture 만이며, 그 외는 404 (403 아님)', () => {
-    expect(ROUTES).toContain("function isLectureCourse(courseServiceKey: string | null | undefined): boolean");
-    expect(ROUTES).toContain('return courseServiceKey === SERVICE_KEYS.LECTURE;');
+    expect(ACCESS).toContain("export function isLectureCourse(courseServiceKey: string | null | undefined): boolean");
+    expect(ACCESS).toContain('return courseServiceKey === SERVICE_KEYS.LECTURE;');
+    expect(ROUTES).toContain("import { requireLectureLearner, requireLectureOperator, isLectureCourse } from '../middleware/lecture-access.js';");
+    expect(ROUTES).not.toContain('function isLectureCourse(');
     const checks = ROUTES.match(/if \(!isLectureCourse\(course\.serviceKey\)\) \{ return res\.status\(404\)/g) ?? [];
     expect(checks.length).toBe(5);
   });

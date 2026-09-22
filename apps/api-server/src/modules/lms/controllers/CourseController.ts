@@ -4,7 +4,7 @@ import { BaseController } from '../../../common/base.controller.js';
 import { CourseService } from '../services/CourseService.js';
 import logger from '../../../utils/logger.js';
 import { SERVICE_KEYS } from '../../../constants/service-keys.js';
-import { hasLectureAdminRole, hasLectureOperatorRole } from '../middleware/lecture-access.js';
+import { hasLectureAdminRole, hasLectureOperatorRole, isActiveLectureLearner, isLectureCourse } from '../middleware/lecture-access.js';
 // WO-O4O-LMS-PUBLIC-COURSE-LIST-SERVICE-SCOPE-V1
 import {
   resolveLmsServiceScope,
@@ -23,11 +23,26 @@ import {
  * WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2:
  * - 소유자 override 는 `lecture:admin` (break-glass 포함) 만. `kpa:admin` bypass 제거.
  * - 생성 강의의 serviceKey 는 서버가 `lecture` 로 강제한다 (클라이언트 값 · membership 추론 금지).
+ * PR #225 merge-gate (Codex P1):
+ * - members 강의는 active lecture membership 이 있어야 목록·상세에 노출된다 (로그인만으로는 불가).
+ * - 모든 write 대상은 `course.serviceKey === 'lecture'` 만 — legacy 강의는 non-disclosure 404
+ *   (operator routes 의 approve/reject/archive 와 동일 규칙, `isLectureCourse`).
+ * - serviceKey 는 PATCH 로 바꿀 수 없다 (CourseService.updateCourse allowlist).
  */
 export class CourseController extends BaseController {
   private static isOwnerOrAdmin(req: Request, userId: string, courseInstructorId: string): boolean {
     if (hasLectureAdminRole(req)) return true;
     return courseInstructorId === userId;
+  }
+
+  /** write 대상 강의를 로드한다. 없거나 Lecture 소유가 아니면 404 를 보내고 null 을 돌려준다. */
+  private static async loadLectureCourseOr404(res: Response, id: string) {
+    const course = await CourseService.getInstance().getCourse(id);
+    if (!course || !isLectureCourse(course.serviceKey)) {
+      BaseController.notFound(res, 'Course not found');
+      return null;
+    }
+    return course;
   }
 
   static async createCourse(req: Request, res: Response): Promise<any> {
@@ -88,9 +103,16 @@ export class CourseController extends BaseController {
 
       // WO-KPA-LMS-COURSE-VISIBILITY-ACCESS-POLICY-V1
       // 비로그인 사용자는 'public' 강의만 조회 가능. 'members'는 401(MEMBERS_ONLY).
-      const isAuthenticated = !!(req as any).user;
-      if (!isAuthenticated && course.visibility !== CourseVisibility.PUBLIC) {
-        return BaseController.unauthorized(res, '회원 전용 강의입니다. 로그인이 필요합니다.', 'MEMBERS_ONLY');
+      // PR #225 merge-gate(Codex P1): 로그인만으로는 members 강의를 열지 않는다 —
+      // active lecture membership 이 없으면 403 (제목·설명 등 본문 비노출).
+      if (course.visibility !== CourseVisibility.PUBLIC) {
+        const isAuthenticated = !!(req as any).user;
+        if (!isAuthenticated) {
+          return BaseController.unauthorized(res, '회원 전용 강의입니다. 로그인이 필요합니다.', 'MEMBERS_ONLY');
+        }
+        if (!(await isActiveLectureLearner(req))) {
+          return BaseController.forbidden(res, '회원 전용 강의입니다. O4O 강의 회원 가입이 필요합니다.', 'LECTURE_MEMBERSHIP_REQUIRED');
+        }
       }
 
       return BaseController.ok(res, { course });
@@ -118,8 +140,9 @@ export class CourseController extends BaseController {
 
       // WO-KPA-LMS-COURSE-VISIBILITY-ACCESS-POLICY-V1
       // 비로그인은 visibility='public' 강제. 클라이언트가 다른 값을 보내도 덮어씀.
-      const isAuthenticated = !!(req as any).user;
-      if (!isAuthenticated) {
+      // PR #225 merge-gate(Codex P1): 로그인했어도 active lecture membership 이 없으면 동일하게
+      // public 만 — members 강의는 목록에서도 제외한다.
+      if (!(await isActiveLectureLearner(req))) {
         filters.visibility = CourseVisibility.PUBLIC;
       }
 
@@ -154,10 +177,8 @@ export class CourseController extends BaseController {
       const userId = (req as any).user?.id;
       const service = CourseService.getInstance();
 
-      const course = await service.getCourse(id);
-      if (!course) {
-        return BaseController.notFound(res, 'Course not found');
-      }
+      const course = await CourseController.loadLectureCourseOr404(res, id);
+      if (!course) return;
       if (!CourseController.isOwnerOrAdmin(req, userId, course.instructorId)) {
         return BaseController.forbidden(res, 'You can only modify your own courses');
       }
@@ -182,10 +203,8 @@ export class CourseController extends BaseController {
       const userId = (req as any).user?.id;
       const service = CourseService.getInstance();
 
-      const course = await service.getCourse(id);
-      if (!course) {
-        return BaseController.notFound(res, 'Course not found');
-      }
+      const course = await CourseController.loadLectureCourseOr404(res, id);
+      if (!course) return;
       if (!CourseController.isOwnerOrAdmin(req, userId, course.instructorId)) {
         return BaseController.forbidden(res, 'You can only delete your own courses');
       }
@@ -208,16 +227,16 @@ export class CourseController extends BaseController {
    * WO-O4O-LMS-COURSE-APPROVAL-FLOW-V1
    * 직접 publish 는 Lecture 운영자(`lecture:operator` ⊂ `lecture:admin`) override 경로.
    * 일반 강사는 submit-review 를 사용해야 함 → 403.
+   * PR #225 merge-gate(Codex P1): 호출자 role 만이 아니라 대상 강의도 검사한다 —
+   * `course.serviceKey !== 'lecture'`(legacy KPA/PH/null) 는 approve/reject/archive 와 같이 404.
    */
   static async publishCourse(req: Request, res: Response): Promise<any> {
     try {
       const { id } = req.params;
       const service = CourseService.getInstance();
 
-      const course = await service.getCourse(id);
-      if (!course) {
-        return BaseController.notFound(res, 'Course not found');
-      }
+      const course = await CourseController.loadLectureCourseOr404(res, id);
+      if (!course) return;
 
       // 강사는 직접 publish 금지 — submit-review 사용
       if (!hasLectureOperatorRole(req)) {
@@ -254,10 +273,8 @@ export class CourseController extends BaseController {
       const userRoles: string[] = (req as any).user?.roles || [];
       const service = CourseService.getInstance();
 
-      const course = await service.getCourse(id);
-      if (!course) {
-        return BaseController.notFound(res, 'Course not found');
-      }
+      const course = await CourseController.loadLectureCourseOr404(res, id);
+      if (!course) return;
       if (!CourseController.isOwnerOrAdmin(req, userId, course.instructorId)) {
         return BaseController.forbidden(res, 'You can only submit your own courses for review');
       }
@@ -295,10 +312,8 @@ export class CourseController extends BaseController {
       const userId = (req as any).user?.id;
       const service = CourseService.getInstance();
 
-      const course = await service.getCourse(id);
-      if (!course) {
-        return BaseController.notFound(res, 'Course not found');
-      }
+      const course = await CourseController.loadLectureCourseOr404(res, id);
+      if (!course) return;
       if (!CourseController.isOwnerOrAdmin(req, userId, course.instructorId)) {
         return BaseController.forbidden(res, 'You can only unpublish your own courses');
       }
@@ -323,10 +338,8 @@ export class CourseController extends BaseController {
       const userId = (req as any).user?.id;
       const service = CourseService.getInstance();
 
-      const course = await service.getCourse(id);
-      if (!course) {
-        return BaseController.notFound(res, 'Course not found');
-      }
+      const course = await CourseController.loadLectureCourseOr404(res, id);
+      if (!course) return;
       if (!CourseController.isOwnerOrAdmin(req, userId, course.instructorId)) {
         return BaseController.forbidden(res, 'You can only archive your own courses');
       }

@@ -214,8 +214,9 @@ export const instructorApi = {
   reorderLessons: (courseId: string, lessonIds: string[]) =>
     lmsHttp.post<LmsApiResponse<unknown>>(`/lms/courses/${courseId}/lessons/reorder`, { lessonIds }),
 
+  /** 강사 편집용 — 정답 포함 (learner 경로 `/lms/lessons/:id/quiz` 는 정답이 제거되므로 편집에 쓰지 않는다) */
   getQuizForLesson: (lessonId: string) =>
-    lmsHttp.get<LmsApiResponse<{ quiz: LectureQuiz | null }>>(`/lms/lessons/${lessonId}/quiz`),
+    lmsHttp.get<LmsApiResponse<{ quiz: LectureQuiz | null }>>(`/lms/instructor/lessons/${lessonId}/quiz`),
   createQuiz: (dto: UpsertQuizDto) => lmsHttp.post<LmsApiResponse<{ quiz: LectureQuiz }>>('/lms/quizzes', dto),
   updateQuiz: (quizId: string, dto: Partial<UpsertQuizDto>) =>
     lmsHttp.patch<LmsApiResponse<{ quiz: LectureQuiz }>>(`/lms/quizzes/${quizId}`, dto),

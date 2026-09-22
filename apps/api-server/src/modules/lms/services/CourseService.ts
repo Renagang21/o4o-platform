@@ -56,6 +56,29 @@ export interface UpdateCourseRequest extends Partial<CreateCourseRequest> {
   status?: CourseStatus;
 }
 
+/**
+ * PR #225 merge-gate (Codex P1 · serviceKey immutable):
+ * PATCH 로 갱신 가능한 필드 allowlist. `serviceKey`(서비스 소유권) 와 `instructorId`(강의 소유자) 는
+ * 생성 시 서버가 고정하며 update 로 바꿀 수 없다. contentKind 는 별개 축이라 그대로 허용.
+ * (raw req.body 가 그대로 오므로 id/createdAt/enrollmentCount 등 비-요청 필드도 함께 차단된다.)
+ */
+export const UPDATABLE_COURSE_FIELDS: ReadonlyArray<keyof UpdateCourseRequest> = [
+  'title', 'description', 'thumbnail', 'duration',
+  'organizationId', 'isOrganizationExclusive', 'isRequired', 'requiresApproval', 'maxEnrollments',
+  'startAt', 'endAt', 'credits', 'metadata', 'tags', 'isPaid', 'price',
+  'contentKind', 'visibility', 'reusablePolicy', 'status',
+];
+
+export function pickUpdatableCourseFields(data: UpdateCourseRequest): UpdateCourseRequest {
+  const picked: Record<string, unknown> = {};
+  for (const key of UPDATABLE_COURSE_FIELDS) {
+    if (data && Object.prototype.hasOwnProperty.call(data, key) && data[key] !== undefined) {
+      picked[key as string] = data[key];
+    }
+  }
+  return picked as UpdateCourseRequest;
+}
+
 export interface CourseFilters {
   status?: CourseStatus;
   organizationId?: string;
@@ -231,11 +254,14 @@ export class CourseService extends BaseService<Course> {
     return { courses, total };
   }
 
-  async updateCourse(id: string, data: UpdateCourseRequest): Promise<Course> {
+  async updateCourse(id: string, rawData: UpdateCourseRequest): Promise<Course> {
     const course = await this.getCourse(id);
     if (!course) {
       throw new Error(`Course not found: ${id}`);
     }
+
+    // PR #225 merge-gate: allowlist — serviceKey / instructorId 등 소유권 필드는 무시된다.
+    const data = pickUpdatableCourseFields(rawData);
 
     // WO-LMS-PAID-COURSE-V1 + WO-LMS-INSTRUCTOR-ROLE-V1: 제약 검증 (변경 후 상태 기준)
     const willBePaid = data.isPaid ?? course.isPaid;

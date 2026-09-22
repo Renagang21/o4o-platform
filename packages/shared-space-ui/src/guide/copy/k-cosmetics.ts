@@ -8,7 +8,7 @@
  *
  * 링크 정합성 검증 (K-Cosmetics App.tsx 기준):
  *   /forum            ✅  ForumHubPage
- *   /lms              ✅  EducationPage
+ *   /lms              ✅  → O4O 강의(study.neture.co.kr) 외부 이동 (Phase 2 §14)
  *   /library/content  ✅  ContentLibraryPage  (NOT /content)
  *   /resources        ✅  ResourcesPage
  *   /store/marketing/signage/playlist ✅  StoreSignagePage (WO-O4O-MY-STORE-SIGNAGE-SUBMENU-ALIGNMENT-V1)
@@ -488,14 +488,16 @@ export const kCosmeticsGuideFeaturesProps: GuideFeaturesPageProps = {
       linkTo: '/guide/features/forum',
     },
     {
+      // WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2 §14·§15:
+      // 강의는 독립 서비스 O4O 강의(study.neture.co.kr)가 소유한다. /lms 는 외부 이동 진입점만 남는다.
       step: '02',
       title: '강의',
       primaryRoute: '/lms',
-      description: 'K-Beauty 교육 콘텐츠를 온라인으로 수강합니다.',
+      description: '교육 강의는 독립 서비스 「O4O 강의」에서 제공합니다. 진입 시 O4O 강의(study.neture.co.kr)로 이동합니다.',
       items: [
-        { label: '강의(LMS) 이용 방법', route: '/guide/features/lms' },
+        { label: 'O4O 강의로 이동', route: '/lms' },
       ],
-      linkTo: '/guide/features/lms',
+      linkTo: '/lms',
     },
     {
       step: '03',
@@ -657,74 +659,6 @@ export const kCosmeticsGuideFeatureForumProps: GuideFeatureManualPageProps = {
         { label: '사례 확인', detail: '동일 상황의 사례를 검색해 적용 방향을 정합니다.' },
         { label: '매장 운영 참고', detail: '진열·상담·판매에 적용할 노하우를 모읍니다.' },
         { label: '커뮤니티 정보 축적', detail: '경험과 답변이 매장 운영 자산으로 누적됩니다.' },
-      ],
-    },
-  ],
-  bottomNav: {
-    prev: { label: '← 기능별 이용 방법', to: '/guide/features' },
-    home: { label: '홈으로', to: '/' },
-  },
-};
-
-// ─── /guide/features/lms ───────────────────────────────────────────────
-
-export const kCosmeticsGuideFeatureLmsProps: GuideFeatureManualPageProps = {
-  hero: {
-    eyebrow: '기능별 이용 방법',
-    title: '강의(LMS) 이용 방법',
-    description: 'K-Beauty 교육 콘텐츠 온라인 수강',
-    primaryAction: { label: '강의로 이동 →', to: '/lms' },
-    flowBarTitle: '이용 흐름',
-    flowLabels: ['강의 이동', '강의 찾기', '수강 신청', '강의 수강', '활용 기준'],
-  },
-  sections: [
-    {
-      step: '01',
-      title: '강의 이동',
-      routeLabel: '/lms',
-      description: '강의 목록으로 진입해 카테고리·검색으로 과정을 탐색합니다.',
-      items: [
-        { label: '강의 진입', detail: '/lms 로 이동하면 수강 가능한 강의 목록이 표시됩니다.' },
-        { label: '강의 목록', detail: '카테고리별, 최신순으로 강의를 확인합니다.' },
-        { label: '검색 탐색', detail: '키워드 검색으로 원하는 강의를 찾습니다.' },
-      ],
-    },
-    {
-      step: '02',
-      title: '강의 찾기',
-      description: '키워드와 카테고리로 관심 강의를 빠르게 찾습니다.',
-      items: [
-        { label: '키워드 검색', detail: '강의명·강사명 키워드로 강의를 검색합니다.' },
-        { label: '카테고리 확인', detail: 'K-Beauty 분야별 카테고리로 관련 강의를 탐색합니다.' },
-        { label: '강의 상세 보기', detail: '강의 목표, 커리큘럼, 강사 정보를 확인합니다.' },
-      ],
-    },
-    {
-      step: '03',
-      title: '수강 신청',
-      description: '강의를 선택해 수강을 시작합니다.',
-      items: [
-        { label: '수강 신청', detail: '강의 상세 페이지에서 수강 신청 버튼을 클릭합니다.' },
-        { label: '수강 목록 확인', detail: '내 수강 목록에서 신청한 강의를 확인합니다.' },
-      ],
-    },
-    {
-      step: '04',
-      title: '강의 수강',
-      description: '동영상 강의를 온라인으로 수강합니다.',
-      items: [
-        { label: '레슨 재생', detail: '커리큘럼 순서에 따라 레슨을 재생합니다.' },
-        { label: '진도 확인', detail: '수강 진도와 완료 상태를 확인합니다.' },
-      ],
-    },
-    {
-      step: '05',
-      title: '활용 기준',
-      description: '강의 내용을 매장 운영과 고객 응대에 활용합니다.',
-      items: [
-        { label: '제품 지식 강화', detail: 'K-Beauty 제품 지식을 강화해 고객 설명 역량을 높입니다.' },
-        { label: '매장 응대 적용', detail: '강의에서 배운 내용을 고객 상담에 즉시 적용합니다.' },
-        { label: '매장 운영 참고', detail: '강의 자료를 매장 운영 매뉴얼 작성에 활용합니다.' },
       ],
     },
   ],
