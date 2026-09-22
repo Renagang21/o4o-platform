@@ -23,6 +23,12 @@ import {
   readSelectedOrganizationId,
   writeSelectedOrganizationId,
 } from '../lib/storeSelection';
+import {
+  isUnifiedServiceKey,
+  pickCommonServiceContext,
+  setActiveServiceContext,
+  type UnifiedServiceKey,
+} from '../lib/serviceContext';
 
 export type StoreContextStatus =
   | 'idle'          // 비로그인
@@ -39,6 +45,13 @@ export interface UnifiedStoreContextValue {
   organizationId: string | null;
   organizationName: string | null;
   services: StoreServiceMembership[];
+  /**
+   * §8-4 서비스 문맥(2차 축). 이 매장의 활성 enrollment 중 canonical 우선순위(KPA → KCos → PH)로 고른 공통 문맥.
+   * 내 매장(/store) · 매장 HUB(/hub) 의 백엔드 호출은 이 문맥으로 나간다. null = 이용 가능한 서비스 업무공간 없음.
+   */
+  commonServiceKey: UnifiedServiceKey | null;
+  /** 서비스 업무(/work/:serviceKey) 진입 가능한 enrollment 의 serviceKey 목록(활성 + workspace 제공) */
+  workServiceKeys: UnifiedServiceKey[];
   error: string | null;
   selectStore: (organizationId: string) => void;
   clearStore: () => void;
@@ -121,12 +134,25 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
   const current = effectiveId ? stores.find((s) => s.organizationId === effectiveId) ?? null : null;
 
+  const workServiceKeys = useMemo<UnifiedServiceKey[]>(
+    () => (services ?? [])
+      .filter((s) => s.enrollmentStatus === 'active' && s.workspaceAvailable)
+      .map((s) => s.serviceKey)
+      .filter(isUnifiedServiceKey),
+    [services],
+  );
+  const commonServiceKey = useMemo(() => pickCommonServiceContext(workServiceKeys), [workServiceKeys]);
+  // 모듈 전역 서비스 문맥의 SSOT — 매장이 바뀌면 공통 문맥도 바뀐다. (/work/:serviceKey 는 ServiceWorkLayout 이 덮어쓴다)
+  useEffect(() => { setActiveServiceContext(commonServiceKey); }, [commonServiceKey]);
+
   return <StoreContext.Provider value={{
     status,
     stores,
     organizationId: current?.organizationId ?? null,
     organizationName: current?.organizationName ?? null,
     services: services ?? [],
+    commonServiceKey,
+    workServiceKeys,
     error,
     selectStore,
     clearStore,

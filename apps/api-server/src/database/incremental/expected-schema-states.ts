@@ -49,6 +49,14 @@ export const EXPECTED_SCHEMA_STATES: readonly ExpectedSchemaState[] = [
     fingerprint: '73d74984bd0448560639742fcce3c8922295f6b967f8bd71dd28f352552756d0',
     fingerprintLineCount: 5771,
   },
+  // WO-O4O-UNIFIED-STORE-WORKSPACE-FOUNDATION-V1 §8-1 — handoff_tokens target_service_key NULL 허용 +
+  // target_workspace varchar(32) + CHK_handoff_tokens_target_kind. baseline 2026-09-18-id685 fresh bootstrap +
+  // incremental 1..2 를 격리 PostgreSQL 15 (docker postgres:15) 에서 산출: 운영 DB fingerprint 채택 아님.
+  {
+    appliedThrough: 'AlterHandoffTokensTargetWorkspace1789974015939',
+    fingerprint: 'a9af1ccebf6278a0878ec0490036ea06b6e491ef7b1c05ee23a63129ca88e76a',
+    fingerprintLineCount: 5773,
+  },
 ] as const;
 
 /** Expected state after `prefixLength` incremental migrations; undefined when not registered. */

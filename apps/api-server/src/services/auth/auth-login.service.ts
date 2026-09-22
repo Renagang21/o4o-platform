@@ -214,9 +214,18 @@ export class AuthLoginService {
     }
 
     // Check if account is locked
-    if (user.isLocked || (user.lockedUntil && user.lockedUntil > new Date())) {
+    // WO-O4O-GOOGLE-IDENTITY-OPERATOR-EXPLICIT-LINK-V1 (lockout 계약 정정):
+    //   종전에는 lockedUntil 이 지나도 loginAttempts(≥5) 가 그대로 남아, 만료 후 첫 실패 1회가
+    //   곧바로 6회째가 되어 다시 30분 잠기는 구조였다(잠금 만료 ≠ 실패 횟수 초기화).
+    //   정정: lockedUntil 이 **과거**면 stale lock 으로 보고 loginAttempts=0 · lockedUntil=NULL 로
+    //   정상화한 뒤 인증을 진행한다. ACCOUNT_LOCKED 는 lockedUntil 이 **미래**일 때만 던진다.
+    //   5회 실패 → 30분 잠금, 성공 시 0 reset 은 종전과 동일하다.
+    if (user.lockedUntil && user.lockedUntil > new Date()) {
       await this.logLoginAttempt(user.id, email, ipAddress, userAgent, false, 'account_locked');
-      throw new AccountLockedError(user.lockedUntil || undefined);
+      throw new AccountLockedError(user.lockedUntil);
+    }
+    if (user.lockedUntil) {
+      await this.clearStaleLock(user);
     }
 
     // Verify password — credential 우선, 없으면 users.password fallback
@@ -303,6 +312,16 @@ export class AuthLoginService {
       linkedAccounts: mergedProfile?.linkedAccounts || [],
       isNewUser: false,
     };
+  }
+
+  /**
+   * 만료된 잠금(lockedUntil 이 과거) 정상화 — 실패 카운터를 0 으로 되돌린다.
+   * 만료 후 첫 실패가 즉시 재잠금으로 이어지지 않도록 인증 전에 호출한다.
+   */
+  private async clearStaleLock(user: User): Promise<void> {
+    user.loginAttempts = 0;
+    user.lockedUntil = null;
+    await this.userRepository.save(user);
   }
 
   /**

@@ -103,6 +103,15 @@ B smoke 에서 `admin.neture.co.kr` 이메일 로그인이 `serviceKey:'neture'`
 4. Google 로그인과 password 로그인 **병행 유지**. `service_credentials` 재설정/정렬 · password 제거 · role/membership 변경 · user 생성 · 테스트 계정 변경 · 운영자 초대 구조 변경은 하지 않는다.
 5. 배포 → 사용자 브라우저 smoke(§10 정정판은 CHECK §3) → read-only 검증 → CHECK COMPLETE 까지 본 WO 안에서 완료한다.
 
+### 8-B. 범위 확장 2(2026-09-22 · 로그인 잠금(lockout) 계약 결함 · 사용자 지시)
+
+§8-A 배포 후 B smoke 1회차에서 관리자 계정이 잠겼고, 잠금 로직에 구조 결함이 확인됐다: `lockedUntil` 이 만료돼도 `loginAttempts`(≥5) 가 그대로 남아 **만료 후 첫 실패 1회가 곧바로 6회째 → 다시 30분 잠금**(잠금 만료 ≠ 실패 횟수 초기화 · 성공 로그인/password reset 만 0 으로 되돌림). 별도 WO 를 만들지 않고 본 WO 안에서 처리한다. **B smoke 는 이 정정 배포 전까지 보류**한다(사용자에게 비밀번호를 계속 시험하게 하지 않는다).
+
+1. **read-only 원인 확정**(production · count/시각/reason 만): 관리자 `loginAttempts` · `lockedUntil` · 9/21 reset 이후 `login_email` 성공/실패 시각과 reason(`invalid_password` · `account_locked`) · Cloud Run `/auth/login` 요청의 Origin/User-Agent 대조 · 사용자 마지막 클릭 1회 = 실제 POST 건수 · reset 이후 E2E/자동화 호출 유무. 결과는 CHECK §3-C.
+2. **lockout 계약 정정**(`auth-login.service.ts`): `lockedUntil` 이 **과거**면 stale lock 으로 간주 → `loginAttempts=0` · `lockedUntil=NULL` 로 정상화한 뒤 인증 진행. `ACCOUNT_LOCKED` 는 `lockedUntil` 이 **미래**일 때만. 성공 시 0 reset · 5회 실패 → 30분 잠금은 종전 유지. 단위/계약 테스트 추가.
+3. 코드 수정 → CI → 배포. 배포 후에도 production 관리자 행이 여전히 잠겨 있으면(`lockedUntil` 미래) **DB write 는 사용자 승인 전까지 하지 않고 보고**한다. stale 상태(과거)라면 다음 로그인 시도가 코드로 정상화한다.
+4. 그 다음에만 B smoke(CHECK §3)를 재개한다.
+
 ## 9. 테스트 계정(Google-only)에는 영향 없음
 
 `passwordSet=false` 면 "Google 연결됨 ✓" 만 표시하고 비밀번호 입력 UI 를 보이지 않는다.

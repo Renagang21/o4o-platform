@@ -20,7 +20,7 @@ export const PLATFORM_LEGAL_SERVICE_KEY = 'neture';
 
 /**
  * canonical path 초안(IR §21) — 상위 nav 6개. 하위 항목은 전부 placeholder(기능 이전 0 · 메뉴 합집합 금지).
- * 기능이 없는 경로는 `PlaceholderPage` 1개로 통일한다.
+ * 모든 경로는 실제 기능 화면으로 연결된다(§8 Scope Extension 이후 placeholder 0).
  */
 export const WORKSPACE_PATHS = {
   home: '/',

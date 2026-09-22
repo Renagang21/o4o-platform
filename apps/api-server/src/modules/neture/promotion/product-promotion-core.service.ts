@@ -14,6 +14,8 @@
  *     (이 서비스는 dataSource repository 로 Master 를 다시 읽으므로 미커밋 TX 안에서는 Master 를 못 본다.
  *      그래서 "같은 TX" 가 아니라 "커밋 직후" 를 택했다 — WO §2.1 #8 허용 범위)
  *   - Landing 발급 (P2 현행 위치와 동일하게 커밋 후)
+ *   - effects.images → ProductImage 연결 (create 만 · 커밋 후 · best-effort)
+ *     WO-O4O-SUPPLIER-PRODUCT-REGISTRATION-AI-FIRST-CUTOVER-AND-LEGACY-MASTER-RESOLUTION-RETIREMENT-V1 §2.5
  *
  * conflict / hold 는 아무것도 쓰지 않는다 (§2.1 #12).
  */
@@ -34,6 +36,7 @@ import {
   identifierKey,
   type NormalizedIdentifier,
   type ProductPromotionPlan,
+  type PromotionImageInput,
   type PromotionMasterRef,
   type PromotionOutcome,
   type PromotionStore,
@@ -64,8 +67,48 @@ export class ProductPromotionCore {
         logger.warn(`[PromotionCore] ensureDrugExtension failed master=${outcome.masterId}: ${(e as Error).message}`);
       }
     }
+    if (plan.effects.images && plan.effects.images.length > 0) {
+      try {
+        await linkPromotionImages(this.dataSource, outcome.masterId, plan.effects.images);
+      } catch (e) {
+        logger.warn(`[PromotionCore] linkImages failed master=${outcome.masterId}: ${(e as Error).message}`);
+      }
+    }
     await ensureProductLandingForMaster(this.dataSource, outcome.masterId, plan.landingSource ?? 'promotion-core');
   }
+}
+
+export const PROMOTION_IMAGE_SOURCE = 'candidate_promotion';
+
+/**
+ * create 된 Master 에 후보 이미지를 ProductImage 로 연결한다 (커밋 후 · create 전용).
+ * - URL 은 이미 media asset(공용 미디어 라이브러리 등)으로 올라간 외부 참조 → gcs_path='' (from-url 등록과 같은 규약).
+ * - thumbnail 은 1장만 is_primary=true. 나머지는 sort_order 순.
+ * - Master 가 방금 생성되었으므로 기존 이미지 교체 로직은 필요 없다.
+ */
+export async function linkPromotionImages(
+  dataSource: Pick<DataSource, 'query'>,
+  masterId: string,
+  images: PromotionImageInput[],
+): Promise<number> {
+  const sorted = [...images]
+    .filter((i) => typeof i.url === 'string' && i.url.trim())
+    .sort((a, b) => a.sortOrder - b.sortOrder);
+  let primaryAssigned = false;
+  let inserted = 0;
+  for (let i = 0; i < sorted.length; i += 1) {
+    const img = sorted[i];
+    const isPrimary = img.type === 'thumbnail' && !primaryAssigned;
+    if (isPrimary) primaryAssigned = true;
+    await dataSource.query(
+      `INSERT INTO product_images
+         (id, master_id, image_url, gcs_path, sort_order, is_primary, type, source, created_at, updated_at)
+       VALUES (gen_random_uuid(), $1, $2, '', $3, $4, $5, $6, NOW(), NOW())`,
+      [masterId, img.url.trim(), i, isPrimary, img.type, PROMOTION_IMAGE_SOURCE],
+    );
+    inserted += 1;
+  }
+  return inserted;
 }
 
 /**

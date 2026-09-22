@@ -13,7 +13,12 @@ import {
   type PendingPolicyAcceptance,
   type PolicyAcceptanceResult,
 } from '@o4o/auth-react';
+import { configureStoreProductsApi } from '@o4o/store-products-ui';
 import { authClient } from '../lib/apiClient';
+
+// KPA canonical 트리에서 이식된 api 모듈 · @o4o/store-products-ui 가 이 두 export 를 쓴다(KPA AuthContext 와 같은 계약).
+export { getAccessToken, authClient };
+configureStoreProductsApi(authClient.api);
 
 export interface StoreUser extends UserLike {
   id?: string;

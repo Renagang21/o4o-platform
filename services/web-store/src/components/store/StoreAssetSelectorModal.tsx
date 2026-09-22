@@ -1,0 +1,1086 @@
+/**
+ * StoreAssetSelectorModal — 매장 실행 자산 선택 모달
+ *
+ * WO-KPA-STORE-ASSET-STRUCTURE-REFACTOR-V1
+ * (renamed from StoreLibrarySelectorModal)
+ *
+ * 사용처: 사이니지, QR, POP, 배너 등
+ * usageType으로 용도별 필터링 지원
+ *
+ * Props:
+ *   open      — 모달 표시 여부
+ *   onSelect  — 자산 선택 완료 콜백
+ *   onClose   — 모달 닫기 콜백
+ *   usageType — 용도 필터 (pop | qr | signage | banner | notice | undefined=전체)
+ */
+
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { Search, X, FileText, Image, Film, ChevronLeft, ChevronRight, Plus, PenLine } from 'lucide-react';
+import { colors } from '../../styles/theme';
+import { getStoreExecutionAssets } from '../../api/storeExecutionAssets';
+import type { StoreExecutionAsset, UsageType } from '../../api/storeExecutionAssets';
+// WO-O4O-CONTENT-SAVE-MEANS-READY-GLOBAL-STANDARD-V1 §7.4:
+//   운영자 콘텐츠 허브(kpa_contents, status='ready') 를 QR 대상 소스로 추가(opt-in).
+import { listContentHubItems } from '../../api/contentHub';
+// WO-O4O-KPA-STORE-QR-TARGET-SCOPE-AUDIT-V1 (B안):
+//   내 매장 제작자료 중 블로그(store_blog_posts) 를 QR 대상 소스로 추가(opt-in).
+//   블로그는 공개 URL 이 있으므로 landingType='link' 로 연결(사본 복사 없음).
+import { fetchStaffBlogPosts } from '../../api/blogStaff';
+import type { StaffBlogPost } from '../../api/blogStaff';
+import { getStoreSlug } from '../../api/pharmacyInfo';
+// WO-O4O-KPA-QR-MULTILINGUAL-PRODUCT-LINK-SOURCE-V1:
+//   다국어 제품 콘텐츠(store_multilingual_product_content_*)를 QR 대상 소스로 추가(opt-in).
+//   선택 시 idempotent publicKey 발급 → 공개 landing URL 로 link 형 QR 연결(기존 다국어 화면 재사용).
+import { listMyMlcGroups, ensureMlcPublicKey } from '../../api/multilingualProductContentStore';
+import type { StoreMlcGroup, StoreMlcLocale } from '../../api/multilingualProductContentStore';
+// WO-O4O-KPA-QR-ASSET-PICKER-INCLUDE-DIRECT-CONTENTS-V1:
+//   '내 매장 자료' 탭에 매장 직접 작성 콘텐츠(kpa_store_contents direct)도 포함(opt-in).
+//   /store/library/contents 통합 feed 의 origin='direct' 항목 — 콘텐츠 목록과 동일 소스 정합.
+import { storeLibraryApi } from '../../api/assetSnapshot';
+import { LoadError } from '@o4o/ui';
+
+// ── 선택 결과 타입 ──
+
+export interface AssetSelectorResult {
+  id: string;
+  title: string;
+  category: string | null;
+  fileUrl: string | null;
+  assetType: string;
+  url: string | null;
+  htmlContent: string | null;
+  // WO-O4O-CONTENT-SAVE-MEANS-READY-GLOBAL-STANDARD-V1 §7.4:
+  //   'asset' = store_execution_assets(내 매장 자료/제작자료/가져온 콘텐츠),
+  //   'content-hub' = 운영자 콘텐츠 허브(kpa_contents) 참조(landingType='page', landingTargetId=id).
+  // WO-O4O-KPA-STORE-QR-TARGET-SCOPE-AUDIT-V1 (B안):
+  //   'blog' = 매장 블로그(store_blog_posts) 공개 URL 참조(landingType='link', landingTargetId=url).
+  // WO-O4O-KPA-QR-MULTILINGUAL-PRODUCT-LINK-SOURCE-V1:
+  //   'mlc' = 다국어 제품 콘텐츠 공개 landing URL 참조(landingType='link', landingTargetId=url).
+  // WO-O4O-KPA-QR-ASSET-PICKER-INCLUDE-DIRECT-CONTENTS-V1:
+  //   'direct-content' = 매장 직접 작성 콘텐츠(kpa_store_contents) 참조(landingType='page', landingTargetId=id).
+  source?: 'asset' | 'content-hub' | 'blog' | 'mlc' | 'direct-content';
+}
+
+/** @deprecated Use AssetSelectorResult */
+export type LibrarySelectorResult = AssetSelectorResult;
+
+// ── Props ──
+
+interface StoreAssetSelectorModalProps {
+  open: boolean;
+  onSelect: (item: AssetSelectorResult) => void;
+  onClose: () => void;
+  onCreateNew?: () => void;
+  /** 용도별 필터 — 지정 시 해당 usage_type 자산만 표시 */
+  usageType?: UsageType;
+  /**
+   * WO-O4O-CONTENT-SAVE-MEANS-READY-GLOBAL-STANDARD-V1 §7.4:
+   *   true 시 상단에 소스 전환("내 매장 자료" ↔ "운영자 콘텐츠")을 노출하고,
+   *   "운영자 콘텐츠" 탭은 운영자 콘텐츠 허브(kpa_contents, status='ready')를 보여준다.
+   *   미지정(기본) 시 기존 동작 그대로 — 다른 소비처(사이니지 등) 무영향.
+   */
+  enableContentHubSource?: boolean;
+  /**
+   * WO-O4O-KPA-STORE-QR-TARGET-SCOPE-AUDIT-V1 (B안):
+   *   true 시 "블로그" 소스 탭 추가 — 매장 블로그(store_blog_posts) 를 보여주고,
+   *   선택 시 공개 URL 로 연결하는 link 형 QR 을 만든다(landingType='link').
+   *   미지정(기본) 시 기존 동작 그대로 — 다른 소비처(사이니지 등) 무영향.
+   */
+  enableBlogSource?: boolean;
+  /**
+   * WO-O4O-KPA-QR-MULTILINGUAL-PRODUCT-LINK-SOURCE-V1:
+   *   true 시 "다국어 제품 콘텐츠" 소스 탭 추가 — 선택 시 publicKey 발급(idempotent) 후
+   *   공개 landing URL 로 연결하는 link 형 QR 을 만든다. 언어 선택/없는 언어 숨김/fallback 은
+   *   기존 다국어 공개 landing 이 처리(QR 측 다국어 UI 미구현). 미지정(기본) 시 무영향.
+   */
+  enableMlcSource?: boolean;
+  /**
+   * WO-O4O-KPA-QR-ASSET-PICKER-INCLUDE-DIRECT-CONTENTS-V1:
+   *   true 시 "내 매장 자료" 탭에 매장 직접 작성 콘텐츠(kpa_store_contents)도 함께 표시한다.
+   *   선택 시 landingType='page', landingTargetId=id 로 연결(공개 landing 이 본문 inline 렌더).
+   *   미지정(기본) 시 기존 동작 그대로 — 다른 소비처(사이니지 등) 무영향.
+   */
+  enableDirectContentSource?: boolean;
+}
+
+// WO-O4O-CONTENT-SAVE-MEANS-READY-GLOBAL-STANDARD-V1 §7.4 / QR-TARGET-SCOPE (B안) / MLC: 소스 종류
+type AssetSource = 'asset' | 'content' | 'blog' | 'mlc';
+
+// WO-O4O-KPA-QR-MULTILINGUAL-PRODUCT-LINK-SOURCE-V1: locale 배지 라벨
+const MLC_LOCALE_LABELS: Record<string, string> = {
+  ko: '한국어', en: 'English', zh: '中文', ja: '日本語', vi: 'Tiếng Việt', th: 'ไทย', id: 'Indonesia',
+};
+
+// ── 자산 타입 필터 ──
+
+const ASSET_TYPES = [
+  { key: 'all', label: '전체' },
+  { key: 'file', label: '파일' },
+  { key: 'content', label: '콘텐츠' },
+  { key: 'external-link', label: '링크' },
+] as const;
+
+const PAGE_SIZE = 20;
+
+// ── 컴포넌트 ──
+
+export function StoreAssetSelectorModal({
+  open,
+  onSelect,
+  onClose,
+  onCreateNew,
+  usageType,
+  enableContentHubSource = false,
+  enableBlogSource = false,
+  enableMlcSource = false,
+  enableDirectContentSource = false,
+}: StoreAssetSelectorModalProps) {
+  const [items, setItems] = useState<StoreExecutionAsset[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [loadError, setLoadError] = useState(false);
+  const [search, setSearch] = useState('');
+  const [assetTypeFilter, setAssetTypeFilter] = useState('all');
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(0);
+  // WO-O4O-CONTENT-SAVE-MEANS-READY-GLOBAL-STANDARD-V1 §7.4: 소스 전환 + 콘텐츠 허브 목록
+  const [source, setSource] = useState<AssetSource>('asset');
+  const [contentItems, setContentItems] = useState<{ id: string; title: string; summary: string | null; category: string | null }[]>([]);
+  // WO-O4O-KPA-STORE-QR-TARGET-SCOPE-AUDIT-V1 (B안): 블로그 결과물 + 공개 URL 조합용 store slug
+  const [blogItems, setBlogItems] = useState<StaffBlogPost[]>([]);
+  // WO-O4O-KPA-QR-MULTILINGUAL-PRODUCT-LINK-SOURCE-V1: 다국어 제품 콘텐츠 그룹 + 발급 진행 상태
+  const [mlcItems, setMlcItems] = useState<StoreMlcGroup[]>([]);
+  const [issuingMlc, setIssuingMlc] = useState(false);
+  // WO-O4O-KPA-QR-ASSET-PICKER-INCLUDE-DIRECT-CONTENTS-V1: '내 매장 자료' 탭 병합용 직접 작성 콘텐츠
+  const [directItems, setDirectItems] = useState<{ id: string; title: string }[]>([]);
+  const slugRef = useRef<string | null>(null);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+
+  // 모달 열릴 때 상태 초기화
+  useEffect(() => {
+    if (!open) return;
+    setSearch('');
+    setAssetTypeFilter('all');
+    setSelectedId(null);
+    setPage(1);
+    setTotal(0);
+    setSource('asset');
+    setContentItems([]);
+    setBlogItems([]);
+    setMlcItems([]);
+    setIssuingMlc(false);
+    setDirectItems([]);
+  }, [open]);
+
+  // 서버 데이터 로드 (page/source 변경 시 즉시)
+  useEffect(() => {
+    if (!open) return;
+    loadItems(page, search);
+  }, [open, page, source]);
+
+  // 검색어 디바운스
+  useEffect(() => {
+    if (!open) return;
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => {
+      setPage(1);
+      loadItems(1, search);
+    }, 300);
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+  }, [search]);
+
+  // WO-O4O-WEB-LOAD-ERROR-CONTRACT-STANDARDIZATION-BATCH-V1:
+  // 모든 소스(자료/콘텐츠/블로그/다국어)의 조회 실패를 silent 로 삼켜
+  // "사용 가능한 콘텐츠가 없습니다" 로 위장했다. 실패는 목록 위에 별도로 알린다.
+  const loadItems = async (p: number, q: string) => {
+    setLoadError(false);
+    try {
+      setLoading(true);
+      // WO-O4O-CONTENT-SAVE-MEANS-READY-GLOBAL-STANDARD-V1 §7.4:
+      //   '운영자 콘텐츠' 소스는 kpa_contents(status='ready')만 — 저장 즉시 사용 가능한 콘텐츠.
+      if (source === 'content') {
+        const res = await listContentHubItems({ page: p, limit: PAGE_SIZE, search: q.trim() || undefined, status: 'ready' });
+        setContentItems(res.items.map((it) => ({ id: it.id, title: it.title, summary: it.summary, category: it.category })));
+        setTotal(res.total);
+        return;
+      }
+      // WO-O4O-KPA-STORE-QR-TARGET-SCOPE-AUDIT-V1 (B안):
+      //   블로그 결과물(store_blog_posts) — 전체 노출. draft 도 연결 허용(QR=연결 대상 저장, 발행 시 작동).
+      //   페이지네이션은 클라이언트 검색 필터로 대체(목록 규모 작음).
+      if (source === 'blog') {
+        if (!slugRef.current) slugRef.current = await getStoreSlug().catch(() => null);
+        const slug = slugRef.current;
+        const res = slug ? await fetchStaffBlogPosts(slug, { limit: 100 }).catch(() => null) : null;
+        const all = (res?.data ?? []) as StaffBlogPost[];
+        const filtered = q.trim()
+          ? all.filter((b) => b.title.toLowerCase().includes(q.trim().toLowerCase()))
+          : all;
+        setBlogItems(filtered);
+        setTotal(filtered.length);
+        return;
+      }
+      // WO-O4O-KPA-QR-MULTILINGUAL-PRODUCT-LINK-SOURCE-V1:
+      //   다국어 제품 콘텐츠 그룹 — archived 제외, 본문(page) 1개 이상 보유한 것만 노출.
+      //   클라이언트 검색 필터(목록 규모 작음). 공개 가능 여부는 발급 시점에 published 승격됨.
+      if (source === 'mlc') {
+        const all = await listMyMlcGroups({ includeArchived: false }).catch(() => [] as StoreMlcGroup[]);
+        const usable = all.filter((g) => Array.isArray(g.pages) && g.pages.some((p) => p.status !== 'archived'));
+        const filtered = q.trim()
+          ? usable.filter((g) => g.title.toLowerCase().includes(q.trim().toLowerCase()))
+          : usable;
+        setMlcItems(filtered);
+        setTotal(filtered.length);
+        return;
+      }
+      // WO-O4O-KPA-QR-ASSET-PICKER-INCLUDE-DIRECT-CONTENTS-V1:
+      //   '내 매장 자료' 탭에 매장 직접 작성 콘텐츠(kpa_store_contents direct)도 병합(opt-in).
+      //   통합 feed(/store-library/contents)에서 origin='direct'만 추려 1페이지에 prepend.
+      //   목록 규모가 작아 50건 fetch 후 클라이언트 필터로 충분.
+      if (enableDirectContentSource && p === 1) {
+        try {
+          const feed = await storeLibraryApi.listContents({ page: 1, limit: 50, search: q.trim() || undefined, type: 'document' });
+          setDirectItems(
+            feed.data.items
+              .filter((it) => it.origin === 'direct')
+              .map((it) => ({ id: it.id, title: it.title })),
+          );
+        } catch {
+          setDirectItems([]);
+        }
+      } else if (p !== 1) {
+        setDirectItems([]);
+      }
+      const res = await getStoreExecutionAssets({
+        page: p,
+        limit: PAGE_SIZE,
+        search: q.trim() || undefined,
+        usageType: usageType,
+      });
+      if (res.success && res.data) {
+        setItems(res.data.items);
+        setTotal(res.data.total);
+      }
+    } catch {
+      setLoadError(true);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const switchSource = (next: AssetSource) => {
+    if (next === source) return;
+    setSource(next);
+    setSelectedId(null);
+    setSearch('');
+    setAssetTypeFilter('all');
+    setPage(1);
+    setTotal(0);
+    setDirectItems([]);
+  };
+
+  // 클라이언트 자산 타입 필터링 (asset 소스에만 적용)
+  const displayItems = items.filter((item) => {
+    if (assetTypeFilter === 'all') return true;
+    return (item.assetType || 'file') === assetTypeFilter;
+  });
+
+  const selectedItem = items.find((i) => i.id === selectedId) ?? null;
+  const selectedContent = contentItems.find((i) => i.id === selectedId) ?? null;
+  const selectedBlog = blogItems.find((i) => i.id === selectedId) ?? null;
+  const selectedMlc = mlcItems.find((i) => i.id === selectedId) ?? null;
+  // WO-O4O-KPA-QR-ASSET-PICKER-INCLUDE-DIRECT-CONTENTS-V1: '내 매장 자료' 탭의 직접 작성 콘텐츠
+  const selectedDirect = directItems.find((i) => i.id === selectedId) ?? null;
+  const showDirects = source === 'asset' && enableDirectContentSource && page === 1
+    && (assetTypeFilter === 'all' || assetTypeFilter === 'content');
+  const assetDirects = showDirects ? directItems : [];
+
+  const handleConfirm = useCallback(async () => {
+    // WO-O4O-KPA-QR-MULTILINGUAL-PRODUCT-LINK-SOURCE-V1:
+    //   다국어 제품 콘텐츠 — 선택 시 publicKey 발급(idempotent, 발급 시 draft→published 승격) 후
+    //   공개 landing 절대 URL 로 link 형 QR 연결. 언어 선택/없는 언어 숨김/fallback 은 기존 공개 landing 처리.
+    if (source === 'mlc') {
+      if (!selectedMlc || issuingMlc) return;
+      setIssuingMlc(true);
+      try {
+        const { url } = await ensureMlcPublicKey(selectedMlc.id);
+        onSelect({
+          id: selectedMlc.id,
+          title: selectedMlc.title,
+          category: null,
+          fileUrl: null,
+          assetType: 'mlc',
+          url,
+          htmlContent: null,
+          source: 'mlc',
+        });
+      } catch {
+        // 발급 실패 시 모달 유지 (사용자가 재시도)
+      } finally {
+        setIssuingMlc(false);
+      }
+      return;
+    }
+    // WO-O4O-CONTENT-SAVE-MEANS-READY-GLOBAL-STANDARD-V1 §7.4:
+    //   운영자 콘텐츠 선택 시 landingType='page', landingTargetId=content.id 를 보낸다.
+    // WO-O4O-KPA-QR-TARGET-COPY-GUARD-V1:
+    //   백엔드(ensureStoreCopyForPageTarget)가 content_hub 원본을 매장 사본(store_execution_assets)으로
+    //   치환하므로, 생성된 QR 은 원본이 아니라 매장 사본을 참조한다.
+    if (source === 'content') {
+      if (!selectedContent) return;
+      onSelect({
+        id: selectedContent.id,
+        title: selectedContent.title,
+        category: selectedContent.category,
+        fileUrl: null,
+        assetType: 'content',
+        url: null,
+        htmlContent: null,
+        source: 'content-hub',
+      });
+      return;
+    }
+    // WO-O4O-KPA-STORE-QR-TARGET-SCOPE-AUDIT-V1 (B안):
+    //   블로그는 공개 URL 참조형(landingType='link', landingTargetId=절대 URL) — 사본 복사 없음.
+    //   외부 스캔 안전을 위해 origin 포함 절대 URL 로 통일.
+    if (source === 'blog') {
+      if (!selectedBlog) return;
+      const url = slugRef.current
+        ? `${window.location.origin}/store/${slugRef.current}/blog/${selectedBlog.slug}`
+        : '';
+      onSelect({
+        id: selectedBlog.id,
+        title: selectedBlog.title,
+        category: null,
+        fileUrl: null,
+        assetType: 'blog',
+        url,
+        htmlContent: null,
+        source: 'blog',
+      });
+      return;
+    }
+    // WO-O4O-KPA-QR-ASSET-PICKER-INCLUDE-DIRECT-CONTENTS-V1:
+    //   매장 직접 작성 콘텐츠(kpa_store_contents) — page 참조형(landingType='page', landingTargetId=id).
+    //   사본 복사 없음, 공개 landing 이 본문 inline 렌더.
+    if (source === 'asset' && selectedDirect) {
+      onSelect({
+        id: selectedDirect.id,
+        title: selectedDirect.title,
+        category: null,
+        fileUrl: null,
+        assetType: 'content',
+        url: null,
+        htmlContent: null,
+        source: 'direct-content',
+      });
+      return;
+    }
+    if (!selectedItem) return;
+    onSelect({
+      id: selectedItem.id,
+      title: selectedItem.title,
+      category: selectedItem.category,
+      fileUrl: selectedItem.fileUrl,
+      assetType: selectedItem.assetType || 'file',
+      url: selectedItem.url ?? null,
+      htmlContent: selectedItem.htmlContent ?? null,
+      source: 'asset',
+    });
+  }, [source, selectedItem, selectedContent, selectedBlog, selectedMlc, selectedDirect, issuingMlc, onSelect]);
+
+  if (!open) return null;
+
+  const usageLabel = usageType
+    ? { pop: 'POP', qr: 'QR', signage: '사이니지', banner: '배너', notice: '공지' }[usageType] ?? usageType
+    : '전체';
+
+  return (
+    <div style={styles.overlay} onClick={onClose}>
+      <div style={styles.modal} onClick={(e) => e.stopPropagation()}>
+        {/* Header */}
+        <div style={styles.header}>
+          <h2 style={styles.title}>
+            자산 선택
+            {usageType && (
+              <span style={styles.usageBadge}>{usageLabel}</span>
+            )}
+          </h2>
+          <button onClick={onClose} style={styles.closeBtn} aria-label="닫기">
+            <X size={20} />
+          </button>
+        </div>
+
+        {/* WO-O4O-CONTENT-SAVE-MEANS-READY-GLOBAL-STANDARD-V1 §7.4 / QR-TARGET-SCOPE (B안) / MLC: 소스 전환 탭 */}
+        {(enableContentHubSource || enableBlogSource || enableMlcSource) && (
+          <div style={styles.sourceTabs}>
+            <button
+              onClick={() => switchSource('asset')}
+              style={{ ...styles.sourceTab, ...(source === 'asset' ? styles.sourceTabActive : {}) }}
+            >
+              내 매장 자료
+            </button>
+            {enableContentHubSource && (
+              <button
+                onClick={() => switchSource('content')}
+                style={{ ...styles.sourceTab, ...(source === 'content' ? styles.sourceTabActive : {}) }}
+              >
+                운영자 콘텐츠
+              </button>
+            )}
+            {enableBlogSource && (
+              <button
+                onClick={() => switchSource('blog')}
+                style={{ ...styles.sourceTab, ...(source === 'blog' ? styles.sourceTabActive : {}) }}
+              >
+                블로그
+              </button>
+            )}
+            {enableMlcSource && (
+              <button
+                onClick={() => switchSource('mlc')}
+                style={{ ...styles.sourceTab, ...(source === 'mlc' ? styles.sourceTabActive : {}) }}
+              >
+                다국어 제품 콘텐츠
+              </button>
+            )}
+          </div>
+        )}
+
+        {/* Search + Filter */}
+        <div style={styles.toolbar}>
+          <div style={styles.searchBox}>
+            <Search size={16} style={{ color: colors.neutral400, flexShrink: 0 }} />
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder={source === 'content' ? '콘텐츠 검색...' : source === 'blog' ? '블로그 검색...' : source === 'mlc' ? '다국어 제품 콘텐츠 검색...' : '자산 검색...'}
+              style={styles.searchInput}
+            />
+          </div>
+          {source === 'asset' && (
+            <div style={styles.filterRow}>
+              {ASSET_TYPES.map((at) => (
+                <button
+                  key={at.key}
+                  onClick={() => { setAssetTypeFilter(at.key); setSelectedId(null); }}
+                  style={{
+                    ...styles.filterChip,
+                    ...(assetTypeFilter === at.key ? styles.filterChipActive : {}),
+                  }}
+                >
+                  {at.label}
+                </button>
+              ))}
+            </div>
+          )}
+          {source === 'content' && (
+            <p style={styles.contentHint}>
+              운영자가 '완료' 상태로 저장한 콘텐츠입니다. 선택하면 매장 사본이 만들어지고 QR은 그 사본을 가리킵니다(이후 원본 수정은 반영되지 않으며, 매장에서 사본을 직접 편집할 수 있습니다).
+            </p>
+          )}
+          {source === 'blog' && (
+            <p style={styles.contentHint}>
+              매장 블로그 글입니다. 선택하면 공개 블로그 페이지로 연결되는 QR이 만들어집니다. 초안은 발행 후 정상 표시됩니다.
+            </p>
+          )}
+          {source === 'mlc' && (
+            <p style={styles.contentHint}>
+              다국어 제품 콘텐츠입니다. 선택하면 공개 링크가 발급되어 QR로 연결됩니다.
+              스캔 시 본문이 있는 언어만 선택지로 표시되며, 한 언어만 있으면 바로 표시됩니다(하나의 QR).
+            </p>
+          )}
+        </div>
+
+        {/* Card Grid */}
+        <div style={styles.body}>
+          {loadError && (
+            <LoadError compact onRetry={() => void loadItems(page, search)} />
+          )}
+          {source === 'mlc' ? (
+            loading ? (
+              <div style={styles.emptyState}>
+                <p style={{ color: colors.neutral500 }}>다국어 제품 콘텐츠를 불러오는 중...</p>
+              </div>
+            ) : mlcItems.length === 0 ? (
+              <div style={styles.emptyState}>
+                <p style={{ color: colors.neutral500 }}>
+                  {search.trim() ? '검색 결과가 없습니다' : '연결할 다국어 제품 콘텐츠가 없습니다'}
+                </p>
+              </div>
+            ) : (
+              <div style={styles.grid}>
+                {mlcItems.map((g) => {
+                  // 본문(page) 있는 언어만 배지로 노출 (archived 제외, 중복 제거)
+                  const locales = Array.from(
+                    new Set((g.pages ?? []).filter((p) => p.status !== 'archived').map((p) => p.locale)),
+                  ) as StoreMlcLocale[];
+                  return (
+                    <button
+                      key={g.id}
+                      onClick={() => setSelectedId(g.id)}
+                      style={{ ...styles.card, ...(selectedId === g.id ? styles.cardSelected : {}) }}
+                    >
+                      <div style={styles.cardPreview}>
+                        <FileText size={28} style={{ color: '#0e7490' }} />
+                      </div>
+                      <div style={styles.cardInfo}>
+                        <p style={styles.cardTitle}>{g.title}</p>
+                        <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' as const }}>
+                          {locales.map((loc) => (
+                            <span key={loc} style={styles.localeBadge}>{MLC_LOCALE_LABELS[loc] ?? loc}</span>
+                          ))}
+                        </div>
+                      </div>
+                      {selectedId === g.id && <div style={styles.selectedBadge}>선택됨</div>}
+                    </button>
+                  );
+                })}
+              </div>
+            )
+          ) : source === 'blog' ? (
+            loading ? (
+              <div style={styles.emptyState}>
+                <p style={{ color: colors.neutral500 }}>블로그를 불러오는 중...</p>
+              </div>
+            ) : blogItems.length === 0 ? (
+              <div style={styles.emptyState}>
+                <p style={{ color: colors.neutral500 }}>
+                  {search.trim() ? '검색 결과가 없습니다' : '작성한 블로그 글이 없습니다'}
+                </p>
+              </div>
+            ) : (
+              <div style={styles.grid}>
+                {blogItems.map((post) => {
+                  const statusLabel = post.status === 'published' ? '발행' : post.status === 'archived' ? '보관' : '초안';
+                  return (
+                    <button
+                      key={post.id}
+                      onClick={() => setSelectedId(post.id)}
+                      style={{ ...styles.card, ...(selectedId === post.id ? styles.cardSelected : {}) }}
+                    >
+                      <div style={styles.cardPreview}>
+                        <PenLine size={28} style={{ color: '#047857' }} />
+                      </div>
+                      <div style={styles.cardInfo}>
+                        <p style={styles.cardTitle}>{post.title}</p>
+                        <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' as const }}>
+                          <span style={styles.assetTypeBadge}>블로그</span>
+                          <span style={styles.cardCategory}>{statusLabel}</span>
+                        </div>
+                      </div>
+                      {selectedId === post.id && <div style={styles.selectedBadge}>선택됨</div>}
+                    </button>
+                  );
+                })}
+              </div>
+            )
+          ) : source === 'content' ? (
+            loading ? (
+              <div style={styles.emptyState}>
+                <p style={{ color: colors.neutral500 }}>콘텐츠를 불러오는 중...</p>
+              </div>
+            ) : contentItems.length === 0 ? (
+              <div style={styles.emptyState}>
+                <p style={{ color: colors.neutral500 }}>
+                  {search.trim() ? '검색 결과가 없습니다' : '사용 가능한 콘텐츠가 없습니다'}
+                </p>
+                {!search.trim() && (
+                  <p style={{ color: colors.neutral400, fontSize: '12px', textAlign: 'center', lineHeight: 1.6, maxWidth: 320 }}>
+                    운영자가 콘텐츠 허브에서 '완료' 상태로 저장한 콘텐츠가 여기에 표시됩니다.
+                    초안 상태 콘텐츠는 표시되지 않습니다.
+                  </p>
+                )}
+              </div>
+            ) : (
+              <div style={styles.grid}>
+                {contentItems.map((item) => (
+                  <button
+                    key={item.id}
+                    onClick={() => setSelectedId(item.id)}
+                    style={{ ...styles.card, ...(selectedId === item.id ? styles.cardSelected : {}) }}
+                  >
+                    <div style={styles.cardPreview}>
+                      <FileText size={28} style={{ color: '#8b5cf6' }} />
+                    </div>
+                    <div style={styles.cardInfo}>
+                      <p style={styles.cardTitle}>{item.title}</p>
+                      <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' as const }}>
+                        <span style={styles.assetTypeBadge}>콘텐츠</span>
+                        {item.category && <span style={styles.cardCategory}>{item.category}</span>}
+                      </div>
+                    </div>
+                    {selectedId === item.id && <div style={styles.selectedBadge}>선택됨</div>}
+                  </button>
+                ))}
+              </div>
+            )
+          ) : loading ? (
+            <div style={styles.emptyState}>
+              <p style={{ color: colors.neutral500 }}>자산을 불러오는 중...</p>
+            </div>
+          ) : (displayItems.length === 0 && assetDirects.length === 0) ? (
+            <div style={styles.emptyState}>
+              <p style={{ color: colors.neutral500 }}>
+                {search.trim() || assetTypeFilter !== 'all'
+                  ? '검색 결과가 없습니다'
+                  : '등록된 자산이 없습니다'}
+              </p>
+              {onCreateNew && items.length === 0 && !search.trim() && (
+                <button onClick={onCreateNew} style={styles.emptyCreateBtn}>
+                  <Plus size={14} />
+                  새 자산 만들기
+                </button>
+              )}
+            </div>
+          ) : (
+            <div style={styles.grid}>
+              {/* WO-O4O-KPA-QR-ASSET-PICKER-INCLUDE-DIRECT-CONTENTS-V1: 매장 직접 작성 콘텐츠(병합) */}
+              {assetDirects.map((d) => (
+                <button
+                  key={`direct-${d.id}`}
+                  onClick={() => setSelectedId(d.id)}
+                  style={{ ...styles.card, ...(selectedId === d.id ? styles.cardSelected : {}) }}
+                >
+                  <div style={styles.cardPreview}>
+                    <FileText size={28} style={{ color: '#8b5cf6' }} />
+                  </div>
+                  <div style={styles.cardInfo}>
+                    <p style={styles.cardTitle}>{d.title}</p>
+                    <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' as const }}>
+                      <span style={styles.assetTypeBadge}>콘텐츠</span>
+                      <span style={styles.cardCategory}>직접 작성</span>
+                    </div>
+                  </div>
+                  {selectedId === d.id && <div style={styles.selectedBadge}>선택됨</div>}
+                </button>
+              ))}
+              {displayItems.map((item) => (
+                <button
+                  key={item.id}
+                  onClick={() => setSelectedId(item.id)}
+                  style={{
+                    ...styles.card,
+                    ...(selectedId === item.id ? styles.cardSelected : {}),
+                  }}
+                >
+                  <div style={styles.cardPreview}>
+                    <FilePreview mimeType={item.mimeType} fileUrl={item.fileUrl} assetType={item.assetType} />
+                  </div>
+                  <div style={styles.cardInfo}>
+                    <p style={styles.cardTitle}>{item.title}</p>
+                    <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' as const }}>
+                      {item.assetType && item.assetType !== 'file' && (
+                        <span style={styles.assetTypeBadge}>
+                          {item.assetType === 'content' ? '콘텐츠' : item.assetType === 'external-link' ? '링크' : item.assetType}
+                        </span>
+                      )}
+                      {item.category && (
+                        <span style={styles.cardCategory}>{item.category}</span>
+                      )}
+                    </div>
+                  </div>
+                  {selectedId === item.id && (
+                    <div style={styles.selectedBadge}>선택됨</div>
+                  )}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div style={styles.pagination}>
+            <button
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={page <= 1}
+              style={{
+                ...styles.pageBtn,
+                opacity: page <= 1 ? 0.4 : 1,
+                cursor: page <= 1 ? 'not-allowed' : 'pointer',
+              }}
+            >
+              <ChevronLeft size={16} />
+            </button>
+            <span style={styles.pageInfo}>
+              {page} / {totalPages}
+            </span>
+            <button
+              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              disabled={page >= totalPages}
+              style={{
+                ...styles.pageBtn,
+                opacity: page >= totalPages ? 0.4 : 1,
+                cursor: page >= totalPages ? 'not-allowed' : 'pointer',
+              }}
+            >
+              <ChevronRight size={16} />
+            </button>
+            <span style={styles.totalInfo}>(총 {total}건)</span>
+          </div>
+        )}
+
+        {/* Footer */}
+        <div style={styles.footer}>
+          <button onClick={onClose} style={styles.cancelBtn}>취소</button>
+          <button
+            onClick={handleConfirm}
+            disabled={!selectedId || issuingMlc}
+            style={{
+              ...styles.confirmBtn,
+              opacity: selectedId && !issuingMlc ? 1 : 0.5,
+              cursor: selectedId && !issuingMlc ? 'pointer' : 'not-allowed',
+            }}
+          >
+            {issuingMlc ? '링크 발급 중…' : '선택 완료'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── 파일 미리보기 ──
+
+function FilePreview({
+  mimeType,
+  fileUrl,
+  assetType,
+}: {
+  mimeType: string | null;
+  fileUrl: string | null;
+  assetType?: string;
+}) {
+  if (assetType === 'content') {
+    return <FileText size={28} style={{ color: '#8b5cf6' }} />;
+  }
+
+  if (assetType === 'external-link') {
+    return <Search size={28} style={{ color: '#2563eb' }} />;
+  }
+
+  if (mimeType?.startsWith('image/') && fileUrl) {
+    return (
+      <img
+        src={fileUrl}
+        alt=""
+        style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '6px' }}
+        onError={(e) => {
+          (e.target as HTMLImageElement).style.display = 'none';
+          (e.target as HTMLImageElement).nextElementSibling?.removeAttribute('style');
+        }}
+      />
+    );
+  }
+
+  if (mimeType?.startsWith('video/')) {
+    return <Film size={28} style={{ color: colors.neutral400 }} />;
+  }
+
+  if (mimeType === 'application/pdf') {
+    return <FileText size={28} style={{ color: '#ef4444' }} />;
+  }
+
+  if (mimeType?.startsWith('image/')) {
+    return <Image size={28} style={{ color: colors.neutral400 }} />;
+  }
+
+  return <FileText size={28} style={{ color: colors.neutral400 }} />;
+}
+
+// ── 스타일 ──
+
+const styles: Record<string, React.CSSProperties> = {
+  overlay: {
+    position: 'fixed',
+    inset: 0,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 1000,
+  },
+  modal: {
+    width: '720px',
+    maxWidth: '95vw',
+    maxHeight: '85vh',
+    backgroundColor: '#fff',
+    borderRadius: '16px',
+    display: 'flex',
+    flexDirection: 'column',
+    boxShadow: '0 20px 60px rgba(0,0,0,0.2)',
+  },
+  header: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: '20px 24px 0',
+  },
+  title: {
+    fontSize: '18px',
+    fontWeight: 700,
+    color: colors.neutral800,
+    margin: 0,
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+  },
+  usageBadge: {
+    fontSize: '12px',
+    fontWeight: 500,
+    color: colors.primary,
+    backgroundColor: `${colors.primary}18`,
+    padding: '2px 8px',
+    borderRadius: '10px',
+  },
+  closeBtn: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '32px',
+    height: '32px',
+    border: 'none',
+    backgroundColor: 'transparent',
+    color: colors.neutral500,
+    cursor: 'pointer',
+    borderRadius: '6px',
+  },
+  // WO-O4O-CONTENT-SAVE-MEANS-READY-GLOBAL-STANDARD-V1 §7.4: 소스 전환 탭
+  sourceTabs: {
+    display: 'flex',
+    gap: '4px',
+    padding: '12px 24px 0',
+  },
+  sourceTab: {
+    padding: '8px 16px',
+    border: 'none',
+    borderBottom: `2px solid transparent`,
+    backgroundColor: 'transparent',
+    fontSize: '14px',
+    fontWeight: 500,
+    color: colors.neutral500,
+    cursor: 'pointer',
+  },
+  sourceTabActive: {
+    color: colors.primary,
+    borderBottomColor: colors.primary,
+  },
+  contentHint: {
+    fontSize: '12px',
+    color: colors.neutral400,
+    margin: 0,
+    lineHeight: 1.5,
+  },
+  toolbar: {
+    padding: '16px 24px',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '12px',
+  },
+  searchBox: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    padding: '8px 12px',
+    border: `1px solid ${colors.neutral200}`,
+    borderRadius: '8px',
+    backgroundColor: colors.neutral50,
+  },
+  searchInput: {
+    flex: 1,
+    border: 'none',
+    outline: 'none',
+    backgroundColor: 'transparent',
+    fontSize: '14px',
+    color: colors.neutral800,
+  },
+  filterRow: {
+    display: 'flex',
+    gap: '6px',
+    flexWrap: 'wrap',
+  },
+  filterChip: {
+    padding: '4px 12px',
+    borderRadius: '16px',
+    border: `1px solid ${colors.neutral200}`,
+    backgroundColor: '#fff',
+    fontSize: '13px',
+    color: colors.neutral600,
+    cursor: 'pointer',
+  },
+  filterChipActive: {
+    backgroundColor: colors.primary,
+    borderColor: colors.primary,
+    color: '#fff',
+  },
+  body: {
+    flex: 1,
+    overflow: 'auto',
+    padding: '0 24px',
+    minHeight: '300px',
+  },
+  emptyState: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: '200px',
+    gap: '12px',
+  },
+  emptyCreateBtn: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '6px',
+    padding: '8px 16px',
+    backgroundColor: colors.primary,
+    color: '#fff',
+    border: 'none',
+    borderRadius: '8px',
+    fontSize: '13px',
+    fontWeight: 500,
+    cursor: 'pointer',
+  },
+  grid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+    gap: '12px',
+    paddingBottom: '16px',
+  },
+  card: {
+    position: 'relative',
+    display: 'flex',
+    flexDirection: 'column',
+    border: `1px solid ${colors.neutral200}`,
+    borderRadius: '10px',
+    overflow: 'hidden',
+    cursor: 'pointer',
+    backgroundColor: '#fff',
+    textAlign: 'left',
+    padding: 0,
+    transition: 'border-color 0.15s',
+  },
+  cardSelected: {
+    borderColor: colors.primary,
+    boxShadow: `0 0 0 2px ${colors.primary}33`,
+  },
+  cardPreview: {
+    width: '100%',
+    height: '120px',
+    backgroundColor: colors.neutral100,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'hidden',
+  },
+  cardInfo: {
+    padding: '10px 12px',
+  },
+  cardTitle: {
+    fontSize: '13px',
+    fontWeight: 600,
+    color: colors.neutral800,
+    margin: 0,
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+  },
+  cardCategory: {
+    display: 'inline-block',
+    marginTop: '4px',
+    padding: '2px 8px',
+    borderRadius: '10px',
+    backgroundColor: colors.neutral100,
+    fontSize: '11px',
+    color: colors.neutral500,
+  },
+  assetTypeBadge: {
+    display: 'inline-block',
+    marginTop: '4px',
+    padding: '2px 8px',
+    borderRadius: '10px',
+    backgroundColor: '#f0fdf4',
+    color: '#16a34a',
+    fontSize: '11px',
+    fontWeight: 500,
+  },
+  // WO-O4O-KPA-QR-MULTILINGUAL-PRODUCT-LINK-SOURCE-V1: 다국어 locale 배지
+  localeBadge: {
+    display: 'inline-block',
+    marginTop: '4px',
+    padding: '2px 8px',
+    borderRadius: '10px',
+    backgroundColor: '#ecfeff',
+    color: '#0e7490',
+    fontSize: '11px',
+    fontWeight: 500,
+  },
+  selectedBadge: {
+    position: 'absolute',
+    top: '8px',
+    right: '8px',
+    padding: '2px 8px',
+    borderRadius: '10px',
+    backgroundColor: colors.primary,
+    color: '#fff',
+    fontSize: '11px',
+    fontWeight: 600,
+  },
+  pagination: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: '12px',
+    padding: '8px 24px',
+  },
+  pageBtn: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '28px',
+    height: '28px',
+    border: `1px solid ${colors.neutral200}`,
+    borderRadius: '6px',
+    backgroundColor: '#fff',
+    color: colors.neutral600,
+  },
+  pageInfo: {
+    fontSize: '13px',
+    color: colors.neutral600,
+    fontWeight: 500,
+  },
+  totalInfo: {
+    fontSize: '12px',
+    color: colors.neutral400,
+  },
+  footer: {
+    display: 'flex',
+    justifyContent: 'flex-end',
+    gap: '12px',
+    padding: '16px 24px',
+    borderTop: `1px solid ${colors.neutral200}`,
+  },
+  cancelBtn: {
+    padding: '8px 20px',
+    backgroundColor: '#fff',
+    border: `1px solid ${colors.neutral200}`,
+    borderRadius: '8px',
+    fontSize: '14px',
+    color: colors.neutral600,
+    cursor: 'pointer',
+  },
+  confirmBtn: {
+    padding: '8px 20px',
+    backgroundColor: colors.primary,
+    border: 'none',
+    borderRadius: '8px',
+    fontSize: '14px',
+    fontWeight: 500,
+    color: '#fff',
+    cursor: 'pointer',
+  },
+};

@@ -1365,7 +1365,7 @@ export default function SupplierProductsPage() {
             className="flex items-center gap-1.5 px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm font-medium hover:bg-emerald-700"
           >
             <Plus size={16} />
-            상품 등록
+            신규 제품 검토 요청
           </button>
           <button
             onClick={() => navigate('/supplier/products/import-assistant')}

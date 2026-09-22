@@ -1,0 +1,184 @@
+/**
+ * Blog Staff API Client — Authenticated
+ *
+ * WO-STORE-BLOG-CHANNEL-V1
+ * WO-KPA-STORE-CHANNEL-INTEGRATION-V1: service parameter for KPA reuse
+ *
+ * Calls staff-only blog endpoints with auth token.
+ */
+
+import { getAccessToken } from '../contexts/AuthContext';
+import { getActiveServicePrefix } from '../lib/serviceContext';
+
+function getApiBase(service: string = getActiveServicePrefix()): string {
+  const base = import.meta.env.VITE_API_BASE_URL || '';
+  return `${base}/api/v1/${service}`;
+}
+
+export interface StaffBlogPost {
+  id: string;
+  title: string;
+  slug: string;
+  excerpt?: string;
+  content: string;
+  status: 'draft' | 'published' | 'archived';
+  publishedAt?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+async function authFetch(url: string, options: RequestInit = {}): Promise<any> {
+  const token = getAccessToken();
+  const res = await fetch(url, {
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...(options.headers || {}),
+    },
+  });
+  const json = await res.json();
+  if (!json.success) throw new Error(json.error?.message || 'Request failed');
+  return json;
+}
+
+export async function fetchStaffBlogPosts(
+  slug: string,
+  params?: { page?: number; limit?: number; status?: string },
+  service?: string,
+): Promise<{ data: StaffBlogPost[]; meta: { page: number; limit: number; total: number; totalPages: number } }> {
+  const query = new URLSearchParams();
+  if (params?.page) query.set('page', String(params.page));
+  if (params?.limit) query.set('limit', String(params.limit));
+  if (params?.status) query.set('status', params.status);
+
+  const qs = query.toString();
+  const url = `${getApiBase(service)}/stores/${encodeURIComponent(slug)}/blog/staff${qs ? `?${qs}` : ''}`;
+  const json = await authFetch(url);
+  return { data: json.data, meta: json.meta };
+}
+
+export async function createBlogPost(
+  slug: string,
+  // WO-KPA-STORE-ASSET-DERIVATION-BLOG-WRITEPATH-V1: optional sourceItems (원본 관계 기록용)
+  body: {
+    title: string;
+    content: string;
+    excerpt?: string;
+    slug?: string;
+    sourceItems?: { kind: string; id: string; title?: string }[];
+  },
+  service?: string,
+): Promise<StaffBlogPost> {
+  const url = `${getApiBase(service)}/stores/${encodeURIComponent(slug)}/blog/staff`;
+  const json = await authFetch(url, { method: 'POST', body: JSON.stringify(body) });
+  return json.data;
+}
+
+export async function updateBlogPost(
+  slug: string,
+  postId: string,
+  body: { title?: string; content?: string; excerpt?: string; slug?: string },
+  service?: string,
+): Promise<StaffBlogPost> {
+  const url = `${getApiBase(service)}/stores/${encodeURIComponent(slug)}/blog/staff/${postId}`;
+  const json = await authFetch(url, { method: 'PUT', body: JSON.stringify(body) });
+  return json.data;
+}
+
+export async function publishBlogPost(slug: string, postId: string, service?: string): Promise<StaffBlogPost> {
+  const url = `${getApiBase(service)}/stores/${encodeURIComponent(slug)}/blog/staff/${postId}/publish`;
+  const json = await authFetch(url, { method: 'PATCH' });
+  return json.data;
+}
+
+export async function archiveBlogPost(slug: string, postId: string, service?: string): Promise<StaffBlogPost> {
+  const url = `${getApiBase(service)}/stores/${encodeURIComponent(slug)}/blog/staff/${postId}/archive`;
+  const json = await authFetch(url, { method: 'PATCH' });
+  return json.data;
+}
+
+export async function deleteBlogPost(slug: string, postId: string, service?: string): Promise<void> {
+  const url = `${getApiBase(service)}/stores/${encodeURIComponent(slug)}/blog/staff/${postId}`;
+  await authFetch(url, { method: 'DELETE' });
+}
+
+// ─────────────────────────────────────────────────────
+// Operator HUB Blog Import (WO-O4O-STORE-HUB-BLOG-CONTENT-IMPORT-V1)
+// ─────────────────────────────────────────────────────
+
+export interface ImportedOperatorBlogPost extends StaffBlogPost {
+  importSource: {
+    sourceBlogId: string;
+    sourceTitle: string;
+    sourceServiceKey: string;
+    sourceAuthorRole: string;
+    importedAt: string;
+  };
+}
+
+/**
+ * 운영자 HUB 게시 블로그를 매장 사본으로 가져오기.
+ *
+ * Backend 가 author_role='store' + storeId=매장id + service_key=서비스 + status='draft'
+ * 로 store_blog_posts INSERT. excerpt 앞에 "[운영자 자료 가져옴] " 접두어로 출처 표시.
+ *
+ * 권한: store_owner (verifyOwner backend 검증).
+ */
+export async function importOperatorBlog(
+  slug: string,
+  sourceBlogId: string,
+  service?: string,
+): Promise<ImportedOperatorBlogPost> {
+  const url = `${getApiBase(service)}/stores/${encodeURIComponent(slug)}/blog/staff/import`;
+  const json = await authFetch(url, {
+    method: 'POST',
+    body: JSON.stringify({ sourceBlogId }),
+  });
+  return json.data as ImportedOperatorBlogPost;
+}
+
+// ─────────────────────────────────────────────────────
+// Blog Settings (WO-O4O-KPA-STORE-BLOG-META-V1)
+// ─────────────────────────────────────────────────────
+
+export interface StaffBlogSettings {
+  id: string;
+  storeId: string;
+  serviceKey: string;
+  blogName: string | null;
+  description: string | null;
+  heroImage: string | null;
+  defaultTemplate: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface BlogSettingsInput {
+  blogName?: string | null;
+  description?: string | null;
+  heroImage?: string | null;
+  defaultTemplate?: string;
+}
+
+export async function fetchBlogSettings(
+  slug: string,
+  service?: string,
+): Promise<StaffBlogSettings | null> {
+  const url = `${getApiBase(service)}/stores/${encodeURIComponent(slug)}/blog/staff/settings`;
+  const json = await authFetch(url, { method: 'GET' });
+  return (json.data as StaffBlogSettings | null) ?? null;
+}
+
+export async function updateBlogSettings(
+  slug: string,
+  input: BlogSettingsInput,
+  service?: string,
+): Promise<StaffBlogSettings> {
+  const url = `${getApiBase(service)}/stores/${encodeURIComponent(slug)}/blog/staff/settings`;
+  const json = await authFetch(url, {
+    method: 'PUT',
+    body: JSON.stringify(input),
+  });
+  return json.data as StaffBlogSettings;
+}

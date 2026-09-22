@@ -138,6 +138,15 @@ describe('createStoreServicesApi', () => {
     const bad = createStoreServicesApi({ get: vi.fn() as any, post: vi.fn(async () => ({ success: true, data: { targetUrl: 'javascript:alert(1)' } })) });
     await expect(bad.resolveServiceEntryUrl('k-cosmetics', '/store')).rejects.toThrow();
   });
+
+  it('통합 Store Workspace handoff 는 targetWorkspace=store 로 발급하고 https 만 받아들인다 (§8-4)', async () => {
+    const post = vi.fn(async () => ({ success: true, data: { targetUrl: 'https://store.neture.co.kr/handoff?token=x' } }));
+    const api = createStoreServicesApi({ get: vi.fn() as any, post: post as any });
+    await expect(api.resolveWorkspaceEntryUrl('/work/kpa-society/commerce/orders')).resolves.toMatch(/^https:\/\/store\./);
+    expect(post).toHaveBeenCalledWith('/auth/handoff', { targetWorkspace: 'store', returnPath: '/work/kpa-society/commerce/orders' });
+    const bad = createStoreServicesApi({ get: vi.fn() as any, post: vi.fn(async () => ({ success: true, data: { targetUrl: 'http://store.neture.co.kr/handoff' } })) as any });
+    await expect(bad.resolveWorkspaceEntryUrl('/store')).rejects.toThrow();
+  });
 });
 
 describe('MyServicesView (매장 A · 현재 서비스 = KPA)', () => {
@@ -145,6 +154,7 @@ describe('MyServicesView (매장 A · 현재 서비스 = KPA)', () => {
     const api: StoreServicesApi = {
       fetchStoreServices: vi.fn(async () => resolution),
       resolveServiceEntryUrl: vi.fn(async () => 'https://k-cosmetics.site/auth/handoff'),
+      resolveWorkspaceEntryUrl: vi.fn(async () => 'https://store.neture.co.kr/handoff'),
     };
     render(
       <MemoryRouter>

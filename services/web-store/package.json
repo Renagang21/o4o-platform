@@ -10,12 +10,30 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@o4o/account-ui": "workspace:*",
     "@o4o/auth-client": "workspace:*",
     "@o4o/auth-react": "workspace:*",
     "@o4o/auth-utils": "workspace:*",
+    "@o4o/block-renderer": "workspace:*",
+    "@o4o/content-editor": "workspace:*",
+    "@o4o/error-handling": "workspace:*",
+    "@o4o/lms-client": "workspace:*",
+    "@o4o/operator-ux-core": "workspace:*",
+    "@o4o/screen-content-core": "workspace:*",
     "@o4o/shared-space-ui": "workspace:*",
+    "@o4o/store-asset-policy-core": "workspace:*",
+    "@o4o/store-products-ui": "workspace:*",
+    "@o4o/store-ui-core": "workspace:*",
+    "@o4o/tablet-kiosk-core": "workspace:*",
+    "@o4o/tablet-screen-set-editor": "workspace:*",
+    "@o4o/types": "workspace:*",
+    "@o4o/ui": "workspace:*",
+    "@tanstack/react-query": "^5.0.0",
+    "axios": "^1.10.0",
+    "lucide-react": "^0.523.0",
     "react": "19.2.0",
     "react-dom": "19.2.0",
+    "react-hot-toast": "^2.4.1",
     "react-router-dom": "^7.9.6"
   },
   "devDependencies": {
@@ -23,6 +41,9 @@
     "@types/react": "19.2.7",
     "@types/react-dom": "19.2.3",
     "@vitejs/plugin-react": "^5.1.1",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.38",
+    "tailwindcss": "^3.4.17",
     "typescript": "~5.9.3",
     "vite": "^7.2.4"
   }

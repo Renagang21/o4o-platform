@@ -24,12 +24,14 @@ on:
       - 'services/web-kpa-branch/**'
       # WO-O4O-SIGNAGE-PLAYER-WEB-DEPLOYMENT-ADOPTION-AND-PRODUCTION-SMOKE-V1
       - 'services/signage-player-web/**'
+      # WO-O4O-HOSPITAL-PHARMACY-SERVICE-FOUNDATION-V1 — hospital.neture.co.kr (병원약국 전문 서비스)
+      - 'services/web-hospital-pharmacy/**'
       - 'packages/**'
       - '.github/workflows/deploy-web-services.yml'
   workflow_dispatch:
     inputs:
       service:
-        description: 'Service to deploy (all, neture, k-cosmetics, kpa-society, pharmacy-hub, lecture, store, kpa-branch, signage-player)'
+        description: 'Service to deploy (all, neture, k-cosmetics, kpa-society, pharmacy-hub, lecture, store, kpa-branch, signage-player, hospital-pharmacy)'
         required: false
         default: 'all'
 
@@ -54,6 +56,9 @@ env:
   VITE_SERVICE_URL_LECTURE: https://study.neture.co.kr
   VITE_API_URL_STORE: https://api.neture.co.kr
   VITE_SERVICE_URL_STORE: https://store.neture.co.kr
+  # WO-O4O-UNIFIED-STORE-WORKSPACE-FOUNDATION-V1 §8-4: KPA·KCos·PH 매장 진입 → store.neture.co.kr handoff.
+  # cutover 전환 = 이 한 줄을 'true' 로 (DNS·cert·Google origin 준비 후). 기본 'false' = 기존 매장 화면 유지.
+  VITE_UNIFIED_STORE_HANDOFF: 'false'
   # WO-O4O-KPA-BRANCH-DEPLOY-AND-RUNTIME-SMOKE-V1
   # 분회 서비스는 단일 web service 하나만 운영한다 (분회별 Cloud Run 서비스 생성 금지).
   # 분회 tenant 는 URL segment(/{slug}) 또는 Host(branch_domains) 로만 해석된다.
@@ -62,6 +67,11 @@ env:
   # Signage Player 는 익명 단말 런타임이다. public runtime config(API base) 만 주입한다.
   # secret / service account key / DB credential 은 절대 주입하지 않는다.
   VITE_API_URL_SIGNAGE_PLAYER: https://api.neture.co.kr
+  # WO-O4O-HOSPITAL-PHARMACY-SERVICE-FOUNDATION-V1
+  # 병원약국 전문 서비스. 원내 목록은 브라우저 localStorage 에만 저장(D2) — API base 만 주입한다.
+  # DNS·인증서(hospital.neture.co.kr) 는 Foundation 범위 밖(사용자측 · signage-player·pharmacy-hub 선례).
+  VITE_API_URL_HOSPITAL_PHARMACY: https://api.neture.co.kr
+  VITE_SERVICE_URL_HOSPITAL_PHARMACY: https://hospital.neture.co.kr
 
 jobs:
   detect-changes:
@@ -75,6 +85,7 @@ jobs:
       store: ${{ steps.changes.outputs.store }}
       kpa-branch: ${{ steps.changes.outputs.kpa-branch }}
       signage-player: ${{ steps.changes.outputs.signage-player }}
+      hospital-pharmacy: ${{ steps.changes.outputs.hospital-pharmacy }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
@@ -98,6 +109,7 @@ jobs:
               echo "store=true" >> $GITHUB_OUTPUT
               echo "kpa-branch=true" >> $GITHUB_OUTPUT
               echo "signage-player=true" >> $GITHUB_OUTPUT
+              echo "hospital-pharmacy=true" >> $GITHUB_OUTPUT
             else
               echo "neture=$( [ "$SERVICE" = 'neture' ] && echo 'true' || echo 'false' )" >> $GITHUB_OUTPUT
               echo "k-cosmetics=$( [ "$SERVICE" = 'k-cosmetics' ] && echo 'true' || echo 'false' )" >> $GITHUB_OUTPUT
@@ -107,6 +119,7 @@ jobs:
               echo "store=$( [ "$SERVICE" = 'store' ] && echo 'true' || echo 'false' )" >> $GITHUB_OUTPUT
               echo "kpa-branch=$( [ "$SERVICE" = 'kpa-branch' ] && echo 'true' || echo 'false' )" >> $GITHUB_OUTPUT
               echo "signage-player=$( [ "$SERVICE" = 'signage-player' ] && echo 'true' || echo 'false' )" >> $GITHUB_OUTPUT
+              echo "hospital-pharmacy=$( [ "$SERVICE" = 'hospital-pharmacy' ] && echo 'true' || echo 'false' )" >> $GITHUB_OUTPUT
             fi
             exit 0
           fi
@@ -151,6 +164,7 @@ jobs:
             echo "store=true" >> $GITHUB_OUTPUT
             echo "kpa-branch=true" >> $GITHUB_OUTPUT
             echo "signage-player=true" >> $GITHUB_OUTPUT
+            echo "hospital-pharmacy=true" >> $GITHUB_OUTPUT
             exit 0
           fi
 
@@ -173,6 +187,7 @@ jobs:
           decide "store" "services/web-store/"
           decide "kpa-branch" "services/web-kpa-branch/"
           decide "signage-player" "services/signage-player-web/"
+          decide "hospital-pharmacy" "services/web-hospital-pharmacy/"
 
   deploy-neture:
     needs: detect-changes
@@ -283,6 +298,7 @@ jobs:
             --platform linux/amd64 \
             --build-arg VITE_API_BASE_URL=${{ env.VITE_API_URL_K_COSMETICS }} \
             --build-arg VITE_SERVICE_URL=${{ env.VITE_SERVICE_URL_K_COSMETICS }} \
+            --build-arg VITE_UNIFIED_STORE_HANDOFF=${{ env.VITE_UNIFIED_STORE_HANDOFF }} \
             -f services/web-k-cosmetics/Dockerfile \
             -t gcr.io/${{ env.PROJECT_ID }}/k-cosmetics-web:${IMAGE_TAG} \
             -t gcr.io/${{ env.PROJECT_ID }}/k-cosmetics-web:latest \
@@ -352,6 +368,7 @@ jobs:
             --platform linux/amd64 \
             --build-arg VITE_API_BASE_URL=${{ env.VITE_API_URL_KPA_SOCIETY }} \
             --build-arg VITE_SERVICE_URL=${{ env.VITE_SERVICE_URL_KPA_SOCIETY }} \
+            --build-arg VITE_UNIFIED_STORE_HANDOFF=${{ env.VITE_UNIFIED_STORE_HANDOFF }} \
             -f services/web-kpa-society/Dockerfile \
             -t gcr.io/${{ env.PROJECT_ID }}/kpa-society-web:${IMAGE_TAG} \
             -t gcr.io/${{ env.PROJECT_ID }}/kpa-society-web:latest \
@@ -424,6 +441,7 @@ jobs:
             --platform linux/amd64 \
             --build-arg VITE_API_BASE_URL=${{ env.VITE_API_URL_PHARMACY_HUB }} \
             --build-arg VITE_SERVICE_URL=${{ env.VITE_SERVICE_URL_PHARMACY_HUB }} \
+            --build-arg VITE_UNIFIED_STORE_HANDOFF=${{ env.VITE_UNIFIED_STORE_HANDOFF }} \
             -f services/web-pharmacy-hub/Dockerfile \
             -t gcr.io/${{ env.PROJECT_ID }}/pharmacy-hub-web:${IMAGE_TAG} \
             -t gcr.io/${{ env.PROJECT_ID }}/pharmacy-hub-web:latest \
@@ -508,6 +526,59 @@ jobs:
       - name: Verify deployment
         run: |
           gcloud run services describe lecture-web \
+            --region=${{ env.REGION }} \
+            --project=${{ env.PROJECT_ID }} \
+            --format="value(status.url)"
+
+  deploy-hospital-pharmacy:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.hospital-pharmacy == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v3
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ env.PROJECT_ID }}
+      - name: Configure Docker for GCR
+        run: gcloud auth configure-docker gcr.io --quiet
+      - name: Build and push Docker image
+        run: |
+          IMAGE_TAG="${{ github.sha }}"
+          docker build \
+            --platform linux/amd64 \
+            --build-arg VITE_API_BASE_URL=${{ env.VITE_API_URL_HOSPITAL_PHARMACY }} \
+            --build-arg VITE_SERVICE_URL=${{ env.VITE_SERVICE_URL_HOSPITAL_PHARMACY }} \
+            -f services/web-hospital-pharmacy/Dockerfile \
+            -t gcr.io/${{ env.PROJECT_ID }}/hospital-pharmacy-web:${IMAGE_TAG} \
+            -t gcr.io/${{ env.PROJECT_ID }}/hospital-pharmacy-web:latest \
+            .
+          docker push gcr.io/${{ env.PROJECT_ID }}/hospital-pharmacy-web:${IMAGE_TAG}
+          docker push gcr.io/${{ env.PROJECT_ID }}/hospital-pharmacy-web:latest
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud run deploy hospital-pharmacy-web \
+            --image=gcr.io/${{ env.PROJECT_ID }}/hospital-pharmacy-web:${{ github.sha }} \
+            --region=${{ env.REGION }} \
+            --project=${{ env.PROJECT_ID }} \
+            --platform=managed \
+            --allow-unauthenticated \
+            --port=8080 \
+            --memory=256Mi \
+            --cpu=1 \
+            --min-instances=0 \
+            --max-instances=5
+      - name: Verify deployment
+        run: |
+          gcloud run services describe hospital-pharmacy-web \
             --region=${{ env.REGION }} \
             --project=${{ env.PROJECT_ID }} \
             --format="value(status.url)"

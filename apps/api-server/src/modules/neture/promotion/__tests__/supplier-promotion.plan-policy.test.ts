@@ -3,6 +3,10 @@
  *
  * InMemoryPromotionStore 위에서 promoteWithStore 로 Core 결과를 받고 assertSupplierPolicy 를 적용한다.
  * (실 TX 롤백은 supplier-candidate-promotion.service.test.ts 가 검증한다)
+ *
+ * WO-O4O-SUPPLIER-PRODUCT-REGISTRATION-AI-FIRST-CUTOVER-AND-LEGACY-MASTER-RESOLUTION-RETIREMENT-V1 §2.2 · §2.5:
+ *   plan.master 에 metadata(categoryId · brandId · originCountry · regulatoryName) 가 추가되고 effects.images 가 생겼다.
+ *   categoryId/brandId 는 호출자가 존재 확인한 refs 만 metadata 로 들어간다 (기본 null · evidence 에는 원본 유지).
  */
 
 jest.mock('../../../../utils/logger.js', () => ({
@@ -30,13 +34,16 @@ import { InMemoryPromotionStore } from './in-memory-promotion-store.js';
 
 const GTIN = '8801234567893';
 const SUPPLIER_ID = '11111111-1111-4111-8111-111111111111';
+const CATEGORY_ID = '22222222-2222-4222-8222-222222222222';
+const BRAND_ID = '33333333-3333-4333-8333-333333333333';
 
 function normalized(over: Partial<NormalizedSupplierCandidate> = {}): NormalizedSupplierCandidate {
   return {
     candidateId: 'c-1', supplierId: SUPPLIER_ID, origin: 'single',
     regulatoryType: 'GENERAL', drugCategory: null,
     name: '테스트 상품', manufacturerName: '테스트 제조', specification: null, barcode: null, identifiers: [],
-    evidence: { regulatoryName: null, mfdsPermitNumber: null, reportNo: null, supplierSku: null, brandName: null, originCountry: null, categoryId: null },
+    evidence: { regulatoryName: null, mfdsPermitNumber: null, reportNo: null, supplierSku: null, brandName: null, brandId: null, originCountry: null, categoryId: null },
+    images: [],
     ...over,
   };
 }
@@ -78,26 +85,55 @@ describe('buildSupplierPromotionPlan', () => {
     const strip = (p: typeof s) => ({ ...p, identifiers: p.identifiers.map((i) => ({ ...i, sourceLabel: undefined })), approvalMeta: { ...p.approvalMeta, origin: undefined } });
     expect(strip(s)).toEqual(strip(b));
 
-    expect(s.master).toEqual({ regulatoryType: 'GENERAL', drugCategory: null, name: '테스트 상품', manufacturerName: '테스트 제조', specification: null, barcode: GTIN });
+    expect(s.master).toEqual({
+      regulatoryType: 'GENERAL', drugCategory: null, name: '테스트 상품', manufacturerName: '테스트 제조', specification: null, barcode: GTIN,
+      metadata: { categoryId: null, brandId: null, originCountry: null, regulatoryName: null },
+    });
     expect(s.identifiers[0]).toMatchObject({ type: 'EAN13', value: GTIN, isPrimary: true, identityKey: true, sourceType: SUPPLIER_IDENTIFIER_SOURCE_TYPE, verificationStatus: SUPPLIER_IDENTIFIER_VERIFICATION_STATUS });
     expect(s.dedupHints).toEqual({ nameManufacturerExact: true });
-    expect(s.effects).toEqual({ ensureDrugExtension: false });
+    expect(s.effects).toEqual({ ensureDrugExtension: false, images: [] });
+    expect(s.approvalMeta.imageCount).toBe(0);
+    expect(s.approvalMeta).not.toHaveProperty('droppedRefs');
     expect(s.landingSource).toBe(SUPPLIER_LANDING_SOURCE);
     expect(s.approvalMeta).toMatchObject({ kind: SUPPLIER_APPROVAL_KIND, supplierId: SUPPLIER_ID });
     expect(s.reviewedBy).toBe('u');
     expect(s.note).toBe('n');
   });
 
-  it('DRUG 면 ensureDrugExtension=true · evidence 는 approvalMeta 로만 전달 (master 필드 아님)', () => {
-    const p = buildSupplierPromotionPlan(normalized({
-      regulatoryType: 'DRUG', drugCategory: 'otc',
-      evidence: { regulatoryName: '규제명', mfdsPermitNumber: '2020-1', reportNo: null, supplierSku: 'SKU', brandName: '브', originCountry: 'KR', categoryId: 'cat' },
-    }), {});
+  it('DRUG 면 ensureDrugExtension=true · evidence 는 approvalMeta 로 전달 · refs 없이는 categoryId/brandId 가 metadata 에 오르지 않음', () => {
+    const evidence = { regulatoryName: '규제명', mfdsPermitNumber: '2020-1', reportNo: null, supplierSku: 'SKU', brandName: '브', brandId: BRAND_ID, originCountry: 'KR', categoryId: CATEGORY_ID };
+    const p = buildSupplierPromotionPlan(normalized({ regulatoryType: 'DRUG', drugCategory: 'otc', evidence }), {});
     expect(p.effects.ensureDrugExtension).toBe(true);
     expect(p.master.drugCategory).toBe('otc');
-    expect(Object.keys(p.master).sort()).toEqual(['barcode', 'drugCategory', 'manufacturerName', 'name', 'regulatoryType', 'specification']);
-    expect(p.approvalMeta.evidence).toEqual({ regulatoryName: '규제명', mfdsPermitNumber: '2020-1', reportNo: null, supplierSku: 'SKU', brandName: '브', originCountry: 'KR', categoryId: 'cat' });
+    expect(Object.keys(p.master).sort()).toEqual(['barcode', 'drugCategory', 'manufacturerName', 'metadata', 'name', 'regulatoryType', 'specification']);
+    // 존재 확인(refs) 없이 evidence 의 categoryId/brandId 를 그대로 Master 에 쓰지 않는다
+    expect(p.master.metadata).toEqual({ categoryId: null, brandId: null, originCountry: 'KR', regulatoryName: '규제명' });
+    expect(p.master).not.toHaveProperty('brandName');
+    expect(p.master).not.toHaveProperty('mfdsPermitNumber');
+    expect(p.approvalMeta.evidence).toEqual(evidence);
     expect(p.identifiers).toEqual([]); // mfdsPermitNumber · supplierSku 는 식별자가 아니다
+  });
+
+  it('refs 로 존재 확인된 categoryId/brandId 만 metadata 에 오르고, 탈락한 참조는 approvalMeta.droppedRefs 로 남는다', () => {
+    const evidence = { regulatoryName: null, mfdsPermitNumber: null, reportNo: null, supplierSku: null, brandName: '브', brandId: BRAND_ID, originCountry: null, categoryId: CATEGORY_ID };
+    const ok = buildSupplierPromotionPlan(normalized({ evidence }), { refs: { categoryId: CATEGORY_ID, brandId: BRAND_ID, dropped: [] } });
+    expect(ok.master.metadata).toEqual({ categoryId: CATEGORY_ID, brandId: BRAND_ID, originCountry: null, regulatoryName: null });
+    expect(ok.approvalMeta).not.toHaveProperty('droppedRefs');
+
+    const dropped = buildSupplierPromotionPlan(normalized({ evidence }), { refs: { categoryId: CATEGORY_ID, brandId: null, dropped: ['brandId'] } });
+    expect(dropped.master.metadata).toEqual({ categoryId: CATEGORY_ID, brandId: null, originCountry: null, regulatoryName: null });
+    expect(dropped.approvalMeta.droppedRefs).toEqual(['brandId']);
+    expect(dropped.approvalMeta.evidence.brandId).toBe(BRAND_ID); // evidence 원본은 보존
+  });
+
+  it('images 는 순서 그대로 effects.images 로 · imageCount 는 approvalMeta 에', () => {
+    const images = [
+      { url: 'https://cdn.example.com/t.jpg', type: 'thumbnail' as const, sortOrder: 0 },
+      { url: 'https://cdn.example.com/c1.jpg', type: 'content' as const, sortOrder: 1 },
+    ];
+    const p = buildSupplierPromotionPlan(normalized({ images }), {});
+    expect(p.effects.images).toEqual(images);
+    expect(p.approvalMeta.imageCount).toBe(2);
   });
 
   it('이름 · 제조사 null 은 빈 문자열로만 넘긴다 (합성 없음 → Core hold)', async () => {

@@ -10,6 +10,11 @@
  *
  * `core.promote()` 는 쓰지 않는다 — 정책 후검사가 Core 쓰기와 같은 TX 에 있어야 롤백이 성립한다.
  * Offer 는 만들지 않는다 (⑤ 범위). product_masters 직접 UPDATE 없음 (§2.2-A).
+ *
+ * WO-O4O-SUPPLIER-PRODUCT-REGISTRATION-AI-FIRST-CUTOVER-AND-LEGACY-MASTER-RESOLUTION-RETIREMENT-V1 §2.5:
+ *   evidence.categoryId / brandId 는 TX 앞에서 read-only SELECT 로 존재(활성)만 확인하고(`resolveRefs`),
+ *   확인된 값만 plan.master.metadata 로 넘긴다. 존재하지 않으면 버리고 approvalMeta.droppedRefs 에 남긴다(승격은 막지 않음).
+ *   Adapter 가 category/brand 를 생성하지 않는다 — 공급자 입력 brandName(문자열)→brand 생성은 Offer 경로와 함께 은퇴했다.
  */
 
 import type { DataSource, EntityManager } from 'typeorm';
@@ -22,7 +27,7 @@ import {
   type NormalizedSupplierCandidate,
   type SupplierCandidateRecord,
 } from './supplier-candidate.normalizer.js';
-import { buildSupplierPromotionPlan } from './supplier-promotion.plan.js';
+import { buildSupplierPromotionPlan, type SupplierResolvedRefs } from './supplier-promotion.plan.js';
 import { assertSupplierPolicy, type PolicyQueryRunner } from './supplier-promotion.policy.js';
 
 export class SupplierPromotionNotFoundError extends Error {
@@ -43,6 +48,8 @@ export interface SupplierPromotionCoreLike {
 export interface SupplierCandidatePromotionDeps {
   core?: SupplierPromotionCoreLike;
   loadCandidate?: (candidateId: string) => Promise<SupplierCandidateRecord | null>;
+  /** evidence.categoryId / brandId 존재 확인 (read-only). 기본 = product_categories / brands SELECT */
+  resolveRefs?: (n: NormalizedSupplierCandidate) => Promise<SupplierResolvedRefs>;
 }
 
 export interface SupplierPromotionContext {
@@ -60,10 +67,31 @@ const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
 export class SupplierCandidatePromotionService {
   private readonly core: SupplierPromotionCoreLike;
   private readonly loadCandidate: (candidateId: string) => Promise<SupplierCandidateRecord | null>;
+  private readonly resolveRefs: (n: NormalizedSupplierCandidate) => Promise<SupplierResolvedRefs>;
 
   constructor(private readonly dataSource: DataSource, deps: SupplierCandidatePromotionDeps = {}) {
     this.core = deps.core ?? new ProductPromotionCore(dataSource);
     this.loadCandidate = deps.loadCandidate ?? ((id) => this.loadFromDb(id));
+    this.resolveRefs = deps.resolveRefs ?? ((n) => this.resolveRefsFromDb(n));
+  }
+
+  /** read-only: 활성 category / brand 만 통과. 없거나 비활성 → dropped */
+  private async resolveRefsFromDb(n: NormalizedSupplierCandidate): Promise<SupplierResolvedRefs> {
+    const out: SupplierResolvedRefs = { categoryId: null, brandId: null, dropped: [] };
+    const { categoryId, brandId } = n.evidence;
+    if (categoryId) {
+      const rows = await this.dataSource.query(
+        'SELECT id FROM product_categories WHERE id = $1 AND is_active = true LIMIT 1', [categoryId],
+      ) as Array<{ id: string }>;
+      if (rows.length > 0) out.categoryId = categoryId; else out.dropped.push('categoryId');
+    }
+    if (brandId) {
+      const rows = await this.dataSource.query(
+        'SELECT id FROM brands WHERE id = $1 AND is_active = true LIMIT 1', [brandId],
+      ) as Array<{ id: string }>;
+      if (rows.length > 0) out.brandId = brandId; else out.dropped.push('brandId');
+    }
+    return out;
   }
 
   private async loadFromDb(candidateId: string): Promise<SupplierCandidateRecord | null> {
@@ -77,7 +105,11 @@ export class SupplierCandidatePromotionService {
     if (!candidate) throw new SupplierPromotionNotFoundError(candidateId);
 
     const normalized = normalizeSupplierCandidate(candidate); // SupplierNormalizationError → 호출자 400
-    const plan = buildSupplierPromotionPlan(normalized, { reviewedBy: ctx.reviewedBy, note: ctx.note ?? null });
+    const refs = await this.resolveRefs(normalized); // read-only · TX 밖
+    if (refs.dropped.length > 0) {
+      logger.warn(`[SupplierPromotion] candidate=${candidateId} dropped unresolved refs=${refs.dropped.join(',')}`);
+    }
+    const plan = buildSupplierPromotionPlan(normalized, { reviewedBy: ctx.reviewedBy, note: ctx.note ?? null, refs });
 
     const outcome = await this.dataSource.transaction(async (m) => {
       const o = await this.core.promoteWithin(m, plan);

@@ -1,7 +1,7 @@
 # WO-O4O-UNIFIED-STORE-WORKSPACE-FOUNDATION-V1
 
-> **종류**: 구현 WO · **상태**: **CLOSED_WITH_HANDOFF_STOP (2026-09-21)** — Foundation 완료 · §3-④ 발급 측은 DDL 판단 대기 · **작성 기준일**: 2026-09-21 (`origin/main` `b4b0f70f8`) · **CHECK**: [`CHECK-O4O-UNIFIED-STORE-WORKSPACE-FOUNDATION-V1`](../checks/CHECK-O4O-UNIFIED-STORE-WORKSPACE-FOUNDATION-V1.md)
-> **실행 전제 IR**: [`IR-O4O-UNIFIED-STORE-WORKSPACE-SUBDOMAIN-AND-CROSSSERVICE-ROUTING-V1`](../investigations/IR-O4O-UNIFIED-STORE-WORKSPACE-SUBDOMAIN-AND-CROSSSERVICE-ROUTING-V1.md) — 판정 `UNIFIED_STORE_WORKSPACE=FEASIBLE`. 3 덩어리(IR §35) 중 **WO A(첫 번째)**. 후속 WO B(Cross-Service Capability Adoption) · WO C(Domain Cutover & Legacy Entry Closure)는 본 WO 종료 후 별도 작성.
+> **종류**: 구현 WO · **상태**: **REOPENED / DDL_APPROVED (2026-09-21)** — Foundation 완료(`a2e89bf85`) · `CLOSED_WITH_HANDOFF_STOP → REOPENED` · 사용자 DDL 승인으로 §3-④ handoff 완성 + **§8 Scope Extension(Unified Store Migration Completion) 흡수** · 별도 WO B/C/handoff WO 없음 · **작성 기준일**: 2026-09-21 (`origin/main` `b4b0f70f8`) · **CHECK**: [`CHECK-O4O-UNIFIED-STORE-WORKSPACE-FOUNDATION-V1`](../checks/CHECK-O4O-UNIFIED-STORE-WORKSPACE-FOUNDATION-V1.md)
+> **실행 전제 IR**: [`IR-O4O-UNIFIED-STORE-WORKSPACE-SUBDOMAIN-AND-CROSSSERVICE-ROUTING-V1`](../investigations/IR-O4O-UNIFIED-STORE-WORKSPACE-SUBDOMAIN-AND-CROSSSERVICE-ROUTING-V1.md) — 판정 `UNIFIED_STORE_WORKSPACE=FEASIBLE`. 3 덩어리(IR §35) 중 **WO A(첫 번째)**. ~~후속 WO B · WO C 는 별도 작성~~ → **2026-09-21 판정: 별도 WO 로 쪼개지 않는다.** WO B/C 범위는 §8 Scope Extension 으로 본 WO 에 흡수.
 > **도메인 확정**: canonical `https://store.neture.co.kr` · 화면명 `내 매장`. **Store ≠ 서비스** — `serviceKey='store'` · store membership · store role · Store-Service 신규 테이블은 만들지 않는다(IR §34·§36).
 > **관련 정본**: [`O4O-ROLE-WORKSPACE-ARCHITECTURE-V1`](../baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md)(1 Store : N Services) · [`STORE-LAYER-ARCHITECTURE`](../architecture/STORE-LAYER-ARCHITECTURE.md)(F3 · 구조 변경은 본 WO 가 명시적 WO) · [`O4O-BOUNDARY-POLICY-V1`](../architecture/O4O-BOUNDARY-POLICY-V1.md)(Store Ops = `organizationId`) · serviceKey SSOT = `apps/api-server/src/config/service-catalog.ts`(본 WO 에서 **변경 없음**).
 >
@@ -147,3 +147,59 @@ G. path-specific stage → node scripts/git/check-staged-scope.mjs <paths> → g
 - CHECK 에 남길 것: 재사용/신규 구분표 · Selector 전달 방식 결정 근거 · handoff 결정(선택지·보안 속성 비교) · CI/DNS/Google origin 인계 항목(WO C 입력) · WO B 로 넘길 nav 하위 항목 목록.
 - **WO5(`WO-O4O-STORE-AI-FIRST-E2E-CLOSURE-V1`) 관계**: 개념적 blocker 가 `UNIFIED_STORE_WORKSPACE_MIGRATION + STORE_OWNER_ACCOUNT` 로 확장(IR §32~33). 본 WO 만으로는 해제되지 않으며 WO C 종료 후 상태 갱신 — 본 WO 에서 WO5 파일은 건드리지 않는다.
 - 자격정보 · 계정 email 을 CHECK/커밋/로그에 기록하지 않는다. 다른 세션의 수정·미추적 파일 불가침. 보고에 `문서 정합` 한 줄 포함.
+
+## 8. Scope Extension — Unified Store Migration Completion (2026-09-21 REOPEN)
+
+> 사용자 판정(2026-09-21): "Foundation 구현은 유효 · STOP 도 적절. 여기서 작업을 다시 잘게 나누지 않는다." CHECK §5 의 "별도 handoff WO 제안"은 **채택하지 않는다.** §4 의 "하지 않는 것" 중 WO B/C 항목은 이 절이 대체한다. **하나의 연속 작업**으로 진행하며 사용자 외부 조작이 필요한 단계만 `PENDING_USER_ACTION` 으로 남긴다.
+
+### 8-1. DDL 승인 (최소 · handoff_tokens)
+
+| 항목 | 승인 내용 |
+|---|---|
+| `target_service_key varchar(64)` | `NOT NULL` → **NULL 허용** |
+| `target_workspace varchar(32)` | **신규 · nullable** |
+| DB CHECK 제약 (**필수**) | 정확히 하나만 — SERVICE HANDOFF `target_service_key IS NOT NULL AND target_workspace IS NULL` / WORKSPACE HANDOFF `target_service_key IS NULL AND target_workspace IS NOT NULL` |
+| `target_workspace` 허용값 | **현재 `'store'` 만** (임의 문자열 금지 · CHECK 에 고정) |
+| 기존 행 | backfill 불필요 (모두 SERVICE HANDOFF 형태) |
+| 단일 사용 보장 | 기존 PostgreSQL 원자 `UPDATE … WHERE consumed_at IS NULL … RETURNING` 재사용. **별도 토큰 시스템 금지** |
+| 절차 | epoch13 migration + `incremental/manifest.ts` + `expected-schema-states.ts` lockstep · 배포 시 migration Job 먼저 |
+
+### 8-2. Handoff 계약 (기존 Service Handoff 회귀 금지)
+
+```text
+HandoffTokenPayload = { userId, sourceServiceKey, targetServiceKey?: string, targetWorkspace?: 'store', createdAt }
+
+generate  targetServiceKey 있음 → 기존 로직 그대로 (catalog + target service active membership)
+          targetWorkspace='store' → resolveAccessibleStores(userId) ≥ 1 (Store 접근 가능 organization) → targetUrl = https://store.neture.co.kr/handoff?token=…
+          둘 다 / 둘 다 없음 → 400
+exchange  payload.targetServiceKey 있음 → 기존 service handoff 로직 불변 (active membership 재검증)
+          payload.targetWorkspace='store' → 접근 가능 organization 존재 재검증 + **Origin host === store.neture.co.kr 인 경우에만 교환**
+```
+
+- Store handoff 는 특정 KPA/KCos/PH membership 을 target 으로 고르지 않는다 — **Store 접근 가능 organization** 으로 판단.
+- refresh family 승계 · setAuthCookies · 응답 body 토큰 — 기존과 동일.
+
+### 8-3. Phase 계획 (연속 진행)
+
+| Phase | 내용 | 산출 |
+|---|---|---|
+| 1 | Foundation(완료) + workspace handoff 마감 | migration · controller 분기 · spec · store-web `/handoff` |
+| 2 | KPA/KCos/PH Store 기능을 store-web 에 **통합 조립** (`store-ui-core` 채택 판단 포함) | `내 매장` 공통 화면 |
+| 3 | 공통 기능 1회 노출 + 서비스별 기능(service context) + 통합 Store HUB + 내 서비스 | `/store` · `/work` · `/hub` · `/services` |
+| 4 | 기존 서비스의 `/store` · `/store-owner` → 통합 Store 진입(`targetWorkspace:'store'` 발급) | 세 서비스 sender 측 |
+| 5 | `store.neture.co.kr` Cloud Run / LB / DNS / cert / CORS / Google origin | 가능한 것은 실행 · 외부는 PENDING_USER_ACTION |
+| 6 | 전체 E2E + legacy compatibility | CHECK 갱신 · 재종결 |
+
+> **진행 상태(2026-09-22)**: Phase 1 `e69b571fb` · Phase 2+3 `6581dc821` · Phase 4 `082f5887f`(플래그 게이트 · 기본 OFF) · Phase 5 인프라 additive 생성(NEG · backend · URL map · cert) + `4d7213a72` · Phase 6 결정론 검증 PASS. 잔여 = cert map entry · DNS · Google origin · cutover flip · store_owner 브라우저 E2E → CHECK §11-4.
+
+### 8-4. 기능 통합 원칙
+
+- 세 서비스의 Store 페이지를 **복사하지 않는다.** 공통 기능은 `내 매장 / 공통 매장 업무` 아래 **1회** 조립: 매장 경영활용 제품 · 매장 자체 상품 · 콘텐츠 · 자료 · 제작 자료 · 상품 설명 · 블로그 · POP · QR · 다국어 · 태블릿 · 사이니지 · 분석 · 매장 설정.
+- 서비스 의존 기능만 `서비스 업무` 아래: KPA Society(O4O 제품 · 주문/신청 · KPA 서비스 콘텐츠) / K-Cosmetics(화장품 상품/거래 · KCos 고유 기능) / PharmacyHub(공급 상품 · 장바구니 · 주문 · PH 고유 프로그램).
+- 같은 organization 이 3 서비스를 이용하면 **한 Workspace** 에 모두 보인다. 서비스 클릭은 **다른 도메인으로 handoff 하지 않고** in-workspace service context 전환이다.
+
+### 8-5. 외부 조작 · 금지
+
+- Google authorized origin(`https://store.neture.co.kr` · `http://localhost:4210`) · Gabia DNS → `PENDING_USER_ACTION` 기록 후 코드/빌드/테스트/Cloud Run 검증은 계속. 최종 production cutover 시점에만 사용자 확인.
+- `taskkill //IM node.exe` 류 전체 프로세스 종료 **금지** — 이 세션이 띄운 PID 만 종료.
+- WO5 AI First 는 계속 보류 → Unified Store 가 canonical `내 매장` 이 된 뒤 그 화면에서 1회 검증.

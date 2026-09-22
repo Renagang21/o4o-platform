@@ -2,9 +2,10 @@
  * Workspace handoff 수신 — WO-O4O-UNIFIED-STORE-WORKSPACE-FOUNDATION-V1 §3-④
  *
  * 기존 서비스 HandoffPage 패턴 그대로(토큰 교환 → per-origin localStorage 저장 · `useLayoutEffect clearStoredTokens` stale guard).
- * 교환 API 는 기존 `POST /auth/handoff/exchange` 를 그대로 부른다. 발급 측(targetWorkspace='store' 토큰)은
- * `handoff_tokens.target_service_key NOT NULL` 때문에 DDL 0 으로 동등 보안을 확보할 수 없어 이번 WO 에서 STOP —
- * 사용자 DDL 판단 전까지 이 페이지는 유효 토큰을 받을 수 없다(CHECK §handoff 참조). 가짜 serviceKey 로 우회하지 않는다.
+ * 교환 API 는 기존 `POST /auth/handoff/exchange` 를 그대로 부른다. 발급 측은 §8-2(DDL 승인 2026-09-21)로 완성:
+ * 세 서비스가 `POST /auth/handoff { targetWorkspace: 'store' }` 로 발급한 WORKSPACE 토큰을 이 페이지가 받는다.
+ * 서버는 이 origin(store.neture.co.kr)에서만 workspace 토큰을 교환하며, 판정 축은 서비스 membership 이 아니라
+ * "접근 가능한 매장(organization)" 이다. 가짜 serviceKey 로 우회하지 않는다.
  */
 import { useEffect, useLayoutEffect, useState } from 'react';
 import { clearStoredTokens, storeTokens } from '@o4o/auth-client';

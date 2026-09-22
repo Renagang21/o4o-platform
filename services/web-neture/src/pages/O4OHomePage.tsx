@@ -103,6 +103,10 @@ function EntryPill({ entry }: { entry: HomeEntry }) {
   );
 }
 
+// FIRST_USE_GUIDANCE — WO-O4O-COMMON-AUTOMATION-CORE-USER-COLLABORATION-AND-QUESTION-FLOW-V1 §2·§11.
+// 첫 사용 안내를 봤는지 한 칸만 기억한다. colon-namespaced·버전 포함. 백엔드 테이블·새 설정 없음.
+const AUTOMATION_INTRO_SEEN_KEY = 'neture:automation:intro-seen:v1';
+
 // ─── Page ────────────────────────────────────────────────────────────────────
 
 export default function O4OHomePage() {
@@ -149,6 +153,24 @@ export default function O4OHomePage() {
   const [attachmentsUsed, setAttachmentsUsed] = useState<{ name: string; kind: string; readable: boolean }[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const plusMenuRef = useRef<HTMLDivElement>(null);
+
+  // FIRST_USE_GUIDANCE — §2·§11. 첫 사용 시 한 번 가볍게 안내한다(튜토리얼·마법사 아님).
+  // 사이트/PC/파일 유형을 미리 고르게 하지 않는다 — 사용자는 목표만 적는다. 상태는 localStorage 한 칸.
+  const [introSeen, setIntroSeen] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem(AUTOMATION_INTRO_SEEN_KEY) === '1';
+    } catch {
+      return true; // 저장소 접근 불가(사생활 모드 등)면 안내를 강요하지 않는다.
+    }
+  });
+  const dismissIntro = () => {
+    setIntroSeen(true);
+    try {
+      localStorage.setItem(AUTOMATION_INTRO_SEEN_KEY, '1');
+    } catch {
+      /* best-effort — 저장 실패해도 이 세션 동안은 숨긴다. */
+    }
+  };
 
   /**
    * WO-O4O-NETURE-MAIN-ACCOUNT-AND-SUPPLIER-PARTNER-SERVICE-SEPARATION-V1 §4
@@ -378,6 +400,34 @@ export default function O4OHomePage() {
         <h1 className="m-0 text-5xl font-semibold tracking-tight text-slate-900 sm:text-6xl">O4O</h1>
 
         <p className="mt-6 mb-0 text-base text-slate-500">무엇을 도와드릴까요?</p>
+
+        {/*
+          FIRST_USE_GUIDANCE — WO-O4O-COMMON-AUTOMATION-CORE-USER-COLLABORATION-AND-QUESTION-FLOW-V1 §2·§4·§6.
+          첫 사용 시 한 번만·가볍게. 목표만 적으면 된다는 점, 진행 중 짧게 물어볼 수 있다는 점(질문=정상)만 알린다.
+          사이트/PC/파일 유형 선택 · 모델/도구/제공자 선택 UI 를 두지 않는다. Composer 는 그대로.
+        */}
+        {!introSeen && (
+          <div
+            data-testid="automation-intro"
+            className="mt-4 w-full max-w-xl rounded-2xl border border-slate-200 bg-slate-50/80 px-4 py-3 text-left text-sm text-slate-600"
+          >
+            <div className="flex items-start justify-between gap-3">
+              <p className="m-0 leading-relaxed">
+                하고 싶은 일을 한 문장으로 적어 주세요. O4O 가 할 수 있는 데까지 진행하고,
+                더 필요한 정보가 있으면 <span className="font-medium text-slate-800">짧게 물어봅니다</span> — 질문은 정상 진행이에요.
+              </p>
+              <button
+                type="button"
+                onClick={dismissIntro}
+                aria-label="안내 닫기"
+                data-testid="automation-intro-dismiss"
+                className="-mr-1 -mt-1 flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-slate-400 transition-colors hover:bg-slate-200 hover:text-slate-700"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+        )}
 
         {/*
           AI 입력 — WO-O4O-AI-COMPOSER-UNIFIED-REQUEST-AND-ATTACHMENT-UX-V1 §3·§8·§9.

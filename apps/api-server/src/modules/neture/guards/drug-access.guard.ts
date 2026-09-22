@@ -267,7 +267,7 @@ export async function filterPharmacyAudienceServiceKeys(
 }
 
 /**
- * Offer 축 공통 판정 — createSupplierOffer / updateSupplierOffer / updateDistribution /
+ * Offer 축 공통 판정 — createSupplierOfferFromExistingMaster(persistOfferForResolvedMaster) / updateSupplierOffer / updateDistribution /
  * setServiceDelivery 가 **같은 계약**을 쓰도록 한 곳에 모은다.
  *
  * 의약품 offer 규칙:

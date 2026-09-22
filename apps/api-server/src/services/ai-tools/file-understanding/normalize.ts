@@ -180,3 +180,41 @@ export function evaluateConfidence(
 
   return { ok, threshold, missingRequired, lowConfidenceColumns, lowConfidenceRegions };
 }
+
+/**
+ * 계약 E 후속 — confidence verdict 를 사용자 QUESTION 문구로 만든다(공통 Core).
+ *
+ * WO-O4O-COMMON-AUTOMATION-CORE-USER-COLLABORATION-AND-QUESTION-FLOW-V1 §3(파일 새 작업)·§4(질문 우선).
+ * ok 면 null(질문 없음 — 그대로 진행). 아니면 **낮은 항목만** 확인하는 짧은 질문을 만든다 — 전부 다시 묻지 않는다.
+ * 순수 함수다: 질문 텍스트만 만들고, waiting_for_user 상태 전이·재개 원장은 호출 측(runtime/surface) 몫이다.
+ * 새 파서·새 UI 를 만들지 않는다 — 기존 evaluateConfidence 결과를 사람이 읽는 한 문단으로 옮길 뿐이다.
+ */
+export function buildFileConfidenceQuestion(
+  verdict: ConfidenceVerdict,
+  targetSchema?: TargetSchema,
+): string | null {
+  if (verdict.ok) return null;
+  const labelOf = (key: string): string => {
+    const field = targetSchema?.fields.find((f) => f.key === key);
+    const desc = field?.description?.trim();
+    return desc && desc.length > 0 ? desc : key;
+  };
+  const dedupe = (values: string[]): string[] => [...new Set(values.filter((v) => v.length > 0))];
+
+  const parts: string[] = [];
+  if (verdict.missingRequired.length > 0) {
+    parts.push(`필수 항목을 어느 열에서 찾을지 알려 주세요: ${dedupe(verdict.missingRequired.map(labelOf)).join(', ')}`);
+  }
+  if (verdict.lowConfidenceColumns.length > 0) {
+    parts.push(`이 항목 해석이 맞는지 확인해 주세요: ${dedupe(verdict.lowConfidenceColumns.map((c) => labelOf(c.targetField))).join(', ')}`);
+  }
+  if (verdict.lowConfidenceRegions.length > 0) {
+    const regions = dedupe(verdict.lowConfidenceRegions.map((r) => (r.sectionLabel?.trim() || `${r.sheetName} 구역`)));
+    parts.push(`이 구역의 표 범위가 맞는지 확인해 주세요: ${regions.join(', ')}`);
+  }
+  // ok=false 인데 세부 항목이 비어 있으면(전체 신뢰도만 낮음) 일반 확인으로 되돌린다.
+  if (parts.length === 0) {
+    return '파일 구조를 확실히 읽지 못했습니다. 표의 제목 행이나 데이터가 시작하는 위치를 알려 주시겠어요?';
+  }
+  return parts.join('\n');
+}

@@ -23,7 +23,7 @@ const mockEnsureLanding = jest.fn(async () => undefined);
 
 import fs from 'fs';
 import path from 'path';
-import { ProductPromotionCore, promoteWithStore } from '../product-promotion-core.service.js';
+import { PROMOTION_IMAGE_SOURCE, ProductPromotionCore, linkPromotionImages, promoteWithStore } from '../product-promotion-core.service.js';
 import type { ProductPromotionPlan, PromotionIdentifierInput } from '../product-promotion.types.js';
 import { InMemoryPromotionStore } from './in-memory-promotion-store.js';
 
@@ -114,6 +114,34 @@ describe('promoteWithStore — create', () => {
     const out = await promoteWithStore(s, plan({ dedupHints: { nameManufacturerExact: false } }));
     expect(out.kind).toBe('create');
     expect(s.reads.byNameManufacturer).toBe(0);
+  });
+});
+
+describe('promoteWithStore — create metadata (Supplier cutover §2.2 · §2.5)', () => {
+  const metadata = { categoryId: 'cat-1', brandId: 'brand-1', originCountry: 'KR', regulatoryName: '규제명' };
+
+  it('plan.master.metadata 는 createMaster 로 그대로 전달된다 (Core 는 해석하지 않음)', async () => {
+    const store = storeWithCandidate();
+    const out = await promoteWithStore(store, plan({}, { barcode: GTIN, metadata }));
+    expect(out.kind).toBe('create');
+    expect(store.masters[0].metadata).toEqual(metadata);
+  });
+
+  it('metadata 없이도 create 는 그대로 동작한다 (optional · 하위호환)', async () => {
+    const store = storeWithCandidate();
+    const out = await promoteWithStore(store, plan({}, { barcode: GTIN }));
+    expect(out.kind).toBe('create');
+    expect(store.masters[0].metadata).toBeNull();
+  });
+
+  it('link 에서는 기존 Master 의 metadata 를 건드리지 않는다 (UPDATE 0)', async () => {
+    const store = storeWithCandidate();
+    store.addMaster({ id: 'm-existing', barcode: GTIN, name: '테스트 상품', manufacturerName: '테스트 제조' });
+    const out = await promoteWithStore(store, plan({ identifiers: [ident()] }, { barcode: GTIN, metadata }));
+    expect(out.kind).toBe('link');
+    expect(store.masters).toHaveLength(1);
+    expect(store.masters[0]).not.toHaveProperty('metadata');
+    expect(store.writes.createMaster).toBe(0);
   });
 });
 
@@ -278,6 +306,51 @@ describe('ProductPromotionCore.afterCommit — effects 는 Adapter 선언만 따
     mockEnsureDrugExt.mockRejectedValueOnce(new Error('boom'));
     await expect(core.afterCommit(plan({ effects: { ensureDrugExtension: true } }), { kind: 'create', masterId: 'm-1', identifiersCreated: 0 })).resolves.toBeUndefined();
     expect(mockEnsureLanding).toHaveBeenCalledTimes(1);
+  });
+
+  it('create + effects.images → product_images INSERT (커밋 후) · link 에서는 0 · 실패해도 landing 진행', async () => {
+    const query = jest.fn(async () => []);
+    const withImages = new ProductPromotionCore({ query } as never);
+    const images = [
+      { url: 'https://cdn.example.com/c1.jpg', type: 'content' as const, sortOrder: 1 },
+      { url: 'https://cdn.example.com/t.jpg', type: 'thumbnail' as const, sortOrder: 0 },
+    ];
+    await withImages.afterCommit(plan({ effects: { ensureDrugExtension: false, images } }), { kind: 'create', masterId: 'm-1', identifiersCreated: 0 });
+    expect(query).toHaveBeenCalledTimes(2);
+    expect(mockEnsureLanding).toHaveBeenCalledTimes(1);
+
+    query.mockClear();
+    mockEnsureLanding.mockClear();
+    await withImages.afterCommit(plan({ effects: { ensureDrugExtension: false, images } }), { kind: 'link', masterId: 'm-1', identifiersCreated: 0, matchType: 'barcode', existingMasterDiff: null });
+    expect(query).not.toHaveBeenCalled();
+
+    query.mockRejectedValueOnce(new Error('db down'));
+    await expect(withImages.afterCommit(plan({ effects: { ensureDrugExtension: false, images } }), { kind: 'create', masterId: 'm-1', identifiersCreated: 0 })).resolves.toBeUndefined();
+    expect(mockEnsureLanding).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('linkPromotionImages — sortOrder 정렬 · thumbnail 1장만 primary · source=candidate_promotion', () => {
+  it('INSERT 파라미터 계약', async () => {
+    const query = jest.fn(async () => []);
+    const n = await linkPromotionImages({ query } as never, 'm-9', [
+      { url: ' https://cdn.example.com/c1.jpg ', type: 'content', sortOrder: 2 },
+      { url: 'https://cdn.example.com/t1.jpg', type: 'thumbnail', sortOrder: 0 },
+      { url: 'https://cdn.example.com/t2.jpg', type: 'thumbnail', sortOrder: 1 },
+      { url: '   ', type: 'content', sortOrder: 3 },
+    ]);
+    expect(n).toBe(3);
+    expect(query).toHaveBeenCalledTimes(3);
+    const params = query.mock.calls.map((c: unknown[]) => c[1]);
+    expect(params).toEqual([
+      ['m-9', 'https://cdn.example.com/t1.jpg', 0, true, 'thumbnail', PROMOTION_IMAGE_SOURCE],
+      ['m-9', 'https://cdn.example.com/t2.jpg', 1, false, 'thumbnail', PROMOTION_IMAGE_SOURCE],
+      ['m-9', 'https://cdn.example.com/c1.jpg', 2, false, 'content', PROMOTION_IMAGE_SOURCE],
+    ]);
+    for (const c of query.mock.calls) {
+      expect(String(c[0])).toMatch(/INSERT INTO product_images/);
+      expect(String(c[0])).not.toMatch(/UPDATE|DELETE/);
+    }
   });
 });
 

@@ -38,8 +38,9 @@ export enum OfferErrorCode {
   /** 서비스 상품으로 연결돼 있어 삭제할 수 없다 */
   HAS_SERVICE_PRODUCTS = 'HAS_SERVICE_PRODUCTS',
 
-  // --- 보안 ---
-  MASTER_ID_DIRECT_INJECTION_NOT_ALLOWED = 'MASTER_ID_DIRECT_INJECTION_NOT_ALLOWED',
+  // (은퇴) MASTER_ID_DIRECT_INJECTION_NOT_ALLOWED — 레거시 POST /supplier/products 전용 보안 코드.
+  //   WO-O4O-SUPPLIER-PRODUCT-REGISTRATION-AI-FIRST-CUTOVER-AND-LEGACY-MASTER-RESOLUTION-RETIREMENT-V1 로
+  //   레거시 경로와 함께 제거. masterId 는 이제 /products/from-master 의 정식 입력이다.
 
   // --- 기존 Master 직접 연결 (WO-O4O-SUPPLIER-EXISTING-MASTER-DIRECT-OFFER-LINK-V1) ---
   /** masterId 가 UUID 형식이 아님 → 400 */

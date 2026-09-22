@@ -110,6 +110,9 @@ ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
 # WO-O4O-DOMAIN-SSOT-CANONICALIZATION-V1: canonical service URL for password reset & cross-service handoff
 ARG VITE_SERVICE_URL=https://kpa-society.co.kr
 ENV VITE_SERVICE_URL=$VITE_SERVICE_URL
+# WO-O4O-UNIFIED-STORE-WORKSPACE-FOUNDATION-V1 §8-4: 매장 진입 → store.neture.co.kr 통합 Store Workspace handoff (cutover 플래그 · 기본 OFF)
+ARG VITE_UNIFIED_STORE_HANDOFF=false
+ENV VITE_UNIFIED_STORE_HANDOFF=$VITE_UNIFIED_STORE_HANDOFF
 
 # Build the service (vite only — tsc는 CI/로컬에서 별도 수행)
 WORKDIR /app/services/web-kpa-society

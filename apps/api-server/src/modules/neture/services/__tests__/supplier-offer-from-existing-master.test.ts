@@ -338,25 +338,27 @@ describe('규제 permit — Master 값만 사용', () => {
   });
 });
 
-describe('기존 createSupplierOffer — masterId 주입 금지 유지 · 같은 primitive 사용', () => {
-  it('POST /products 경로에 masterId 를 넣으면 여전히 MASTER_ID_DIRECT_INJECTION_NOT_ALLOWED', async () => {
-    const { svc, catalogService } = build();
-    const r = await svc.createSupplierOffer(SUPPLIER_ID, { masterId: MASTER_ID, name: 'x' } as never);
-    expect(r).toMatchObject({ success: false, error: 'MASTER_ID_DIRECT_INJECTION_NOT_ALLOWED' });
-    expect(catalogService.resolveOrCreateMaster).not.toHaveBeenCalled();
-    expect(state.saved).toHaveLength(0);
+describe('(은퇴) 레거시 createSupplierOffer — 공급자 Offer 생성 primitive 는 from-master 하나뿐', () => {
+  /**
+   * WO-O4O-SUPPLIER-PRODUCT-REGISTRATION-AI-FIRST-CUTOVER-AND-LEGACY-MASTER-RESOLUTION-RETIREMENT-V1 §2.3 · §2.4
+   * 기존 기대("masterId 주입 → MASTER_ID_DIRECT_INJECTION_NOT_ALLOWED" · "resolveOrCreateMaster 경유")는
+   * 레거시 메서드 자체가 사라져 더 이상 유효하지 않다. 그 자리에 은퇴 계약을 둔다.
+   */
+  it('NetureOfferService 인스턴스에 createSupplierOffer / validateCreateInput / resolveProductMetadata 가 없다', () => {
+    const { svc } = build();
+    const anySvc = svc as unknown as Record<string, unknown>;
+    expect(typeof anySvc.createSupplierOffer).toBe('undefined');
+    expect(typeof anySvc.validateCreateInput).toBe('undefined');
+    expect(typeof anySvc.resolveProductMetadata).toBe('undefined');
+    expect(typeof anySvc.createSupplierOfferFromExistingMaster).toBe('function');
   });
 
-  it('기존 경로는 여전히 resolveOrCreateMaster 를 경유하고 persistence 결과는 동일 shape 이다', async () => {
+  it('공급자 Offer 생성 경로 전체에서 CatalogService.resolveOrCreateMaster / updateProductMaster 호출 0 (from-master 정상 생성 후에도)', async () => {
     const { svc, catalogService } = build();
-    catalogService.resolveOrCreateMaster.mockResolvedValue({
-      success: true, created: false, data: { id: MASTER_ID, barcode: '8801234567890', isMfdsVerified: false },
-    });
-    const r = await svc.createSupplierOffer(SUPPLIER_ID, { barcode: '8801234567890', name: 'x', manualData: { stockQty: '3' } });
+    const r = await svc.createSupplierOfferFromExistingMaster(SUPPLIER_ID, { masterId: MASTER_ID, priceGeneral: 1000 });
     expect(r.success).toBe(true);
-    expect(catalogService.resolveOrCreateMaster).toHaveBeenCalledTimes(1);
-    expect((state.saved[0] as Record<string, unknown>)).toMatchObject({ masterId: MASTER_ID, stockQuantity: 3, approvalStatus: 'PENDING' });
-    // DRUG gate 는 기존처럼 masterId 로 재조회한다(regulatoryType 을 넘기지 않음)
-    expect(state.queries.some((q) => /FROM product_masters WHERE id/.test(q.sql))).toBe(true);
+    expect(catalogService.resolveOrCreateMaster).not.toHaveBeenCalled();
+    expect(catalogService.updateProductMaster).not.toHaveBeenCalled();
+    expect(state.saved).toHaveLength(1);
   });
 });

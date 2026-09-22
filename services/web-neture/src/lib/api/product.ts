@@ -92,6 +92,38 @@ export const productApi = {
     }
   },
 
+  /**
+   * WO-O4O-SUPPLIER-PRODUCT-AI-ASSISTED-CANDIDATE-AUTHORING-V1 §2.7:
+   *   Master 단건 조회 — 기존 GET /neture/products/library/:id (requireAuth · 공급자도 호출 가능) 재사용.
+   *   from-master 화면의 새로고침·직접 진입 hydration 용. 응답을 MasterSearchResult 로 정규화한다.
+   *   404 → null (존재하지 않는 masterId). 그 외 오류는 throw (조회 실패를 '없음'으로 오인하지 않게).
+   */
+  async getMasterById(masterId: string): Promise<MasterSearchResult | null> {
+    try {
+      const response = await api.get(`/neture/products/library/${encodeURIComponent(masterId)}`);
+      const d = response.data?.data;
+      if (!d) return null;
+      const images: Array<{ imageUrl: string; isPrimary: boolean }> = Array.isArray(d.images) ? d.images : [];
+      const primary = images.find((img) => img.isPrimary) ?? images[0] ?? null;
+      return {
+        id: d.id,
+        barcode: d.barcode ?? null,
+        name: d.name ?? d.regulatoryName ?? '',
+        regulatoryName: d.regulatoryName ?? '',
+        regulatoryType: d.regulatoryType ?? null,
+        manufacturerName: d.manufacturerName ?? '',
+        specification: d.specification ?? null,
+        category: d.category ? { id: d.category.id, name: d.category.name } : null,
+        brand: d.brand ? { id: d.brand.id, name: d.brand.name } : null,
+        primaryImageUrl: primary?.imageUrl ?? null,
+      };
+    } catch (error) {
+      if ((error as any)?.response?.status === 404) return null;
+      console.warn('[Product API] Failed to fetch master by id:', error);
+      throw error;
+    }
+  },
+
   async getProductImages(masterId: string): Promise<ProductImage[]> {
     try {
       const response = await api.get(`/neture/products/${masterId}/images`);

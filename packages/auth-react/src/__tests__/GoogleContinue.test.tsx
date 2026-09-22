@@ -199,7 +199,8 @@ describe('GoogleContinue — 불안정한 콜백 prop 참조에 대한 안전성
     fireEvent.click(screen.getByText('취소'));
     await screen.findByTestId('google-continue-button');
     expect(p.getConfig).toHaveBeenCalledTimes(2);
-    expect(renderGoogleButton).toHaveBeenCalledTimes(2);
+    // GIS 렌더는 passive effect 라 button DOM 출현보다 한 틱 늦을 수 있다(CI 에서 race 관측) → waitFor
+    await waitFor(() => expect(renderGoogleButton).toHaveBeenCalledTimes(2));
   });
 
   it('등록된 sub 로그인 성공 흐름은 참조 교체 후에도 동일하게 동작한다 (회귀 없음)', async () => {

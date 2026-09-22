@@ -2,7 +2,7 @@
  * App - K-Cosmetics
  */
 
-import { lazy, Suspense, useRef, useEffect } from 'react';
+import { lazy, Suspense, useRef, useEffect, type ReactNode } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation, useParams } from 'react-router-dom';
 // WO-O4O-STORE-PRODUCTS-QUERYCLIENT-PROVIDER-ALIGN-V1
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -144,6 +144,9 @@ import {
   MyServicesView,
   createStoreServicesApi,
   resolveStoreWorkspacePaths,
+  // WO-O4O-UNIFIED-STORE-WORKSPACE-FOUNDATION-V1 §8-4: 매장 진입 → 통합 Store Workspace handoff (빌드 플래그, 기본 OFF)
+  UnifiedStoreHandoffGate,
+  isUnifiedStoreHandoffEnabled,
 } from '@o4o/store-ui-core';
 import { api as coreApi } from '@/lib/apiClient';
 import { MembershipGate } from './components/auth/MembershipGate';
@@ -414,6 +417,21 @@ const kcosStoreServicesApi = createStoreServicesApi({
   post: async (url, body) => (await coreApi.post(url, body)).data,
 });
 
+/**
+ * WO-O4O-UNIFIED-STORE-WORKSPACE-FOUNDATION-V1 §8-4: 기존 /store · /store-hub · workspace/services 진입을
+ * store.neture.co.kr 통합 Store Workspace 로 handoff. `VITE_UNIFIED_STORE_HANDOFF` 빌드 플래그(기본 OFF).
+ * 기존 가드(StoreOwnerRoute · RoleGuard) 안쪽 — 인증·역할 판정 그대로. 실패 시 기존 화면 fallback.
+ * 송출 화면(/store/marketing/signage/play/*)은 대상 아님.
+ */
+const UNIFIED_STORE_HANDOFF_ENABLED = isUnifiedStoreHandoffEnabled(import.meta.env.VITE_UNIFIED_STORE_HANDOFF);
+function KCosUnifiedStoreHandoff({ children }: { children: ReactNode }) {
+  return (
+    <UnifiedStoreHandoffGate enabled={UNIFIED_STORE_HANDOFF_ENABLED} serviceKey="k-cosmetics" api={kcosStoreServicesApi}>
+      {children}
+    </UnifiedStoreHandoffGate>
+  );
+}
+
 function KCosStoreFooter() {
   return (
     <StoreFacingFooter
@@ -680,7 +698,7 @@ function AppRoutes() {
           path="store-hub"
           element={
             <RoleGuard allowedRoles={['cosmetics:store_owner', 'cosmetics:operator', 'cosmetics:admin', 'platform:super_admin']}>
-              <KCosmeticsHubLayout />
+              <KCosUnifiedStoreHandoff><KCosmeticsHubLayout /></KCosUnifiedStoreHandoff>
             </RoleGuard>
           }
         >
@@ -858,7 +876,7 @@ function AppRoutes() {
         element={<StoreOwnerRoute><SignagePlaybackPage /></StoreOwnerRoute>}
       />
       {/* WO-O4O-STORE-WORKSPACE-INTEGRATION-AND-MY-SERVICES-V1 §6: Store Workspace Home · My Services (가드 동일) */}
-      <Route element={<StoreOwnerRoute><StoreWorkspaceWrapper /></StoreOwnerRoute>}>
+      <Route element={<StoreOwnerRoute><KCosUnifiedStoreHandoff><StoreWorkspaceWrapper /></KCosUnifiedStoreHandoff></StoreOwnerRoute>}>
         <Route path="store/workspace" element={<StoreWorkspaceHomePage />} />
         <Route path="store/services" element={<MyServicesPage />} />
       </Route>
@@ -866,7 +884,7 @@ function AppRoutes() {
         path="store"
         element={
           <StoreOwnerRoute>
-            <StoreLayoutWrapper />
+            <KCosUnifiedStoreHandoff><StoreLayoutWrapper /></KCosUnifiedStoreHandoff>
           </StoreOwnerRoute>
         }
       >

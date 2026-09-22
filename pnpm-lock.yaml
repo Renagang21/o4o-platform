@@ -1615,6 +1615,12 @@ importers:
         specifier: ^5.3.0
         version: 5.9.3
 
+  packages/hospital-pharmacy-core:
+    devDependencies:
+      typescript:
+        specifier: 5.4.5
+        version: 5.4.5
+
   packages/hub-core:
     dependencies:
       react:
@@ -2645,6 +2651,43 @@ importers:
         specifier: ^5.0.0
         version: 5.4.19(@types/node@24.10.1)(lightningcss@1.30.2)(terser@5.44.1)
 
+  services/web-hospital-pharmacy:
+    dependencies:
+      '@o4o/auth-client':
+        specifier: workspace:*
+        version: link:../../packages/auth-client
+      '@o4o/hospital-pharmacy-core':
+        specifier: workspace:*
+        version: link:../../packages/hospital-pharmacy-core
+      react:
+        specifier: 19.2.0
+        version: 19.2.0
+      react-dom:
+        specifier: 19.2.0
+        version: 19.2.0(react@19.2.0)
+      react-router-dom:
+        specifier: ^7.9.6
+        version: 7.9.6(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+    devDependencies:
+      '@types/node':
+        specifier: ^24.10.1
+        version: 24.10.1
+      '@types/react':
+        specifier: 19.2.7
+        version: 19.2.7
+      '@types/react-dom':
+        specifier: 19.2.3
+        version: 19.2.3(@types/react@19.2.7)
+      '@vitejs/plugin-react':
+        specifier: ^5.1.1
+        version: 5.1.1(vite@7.2.4(@types/node@24.10.1)(jiti@1.21.7)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2))
+      typescript:
+        specifier: ~5.9.3
+        version: 5.9.3
+      vite:
+        specifier: ^7.2.4
+        version: 7.2.4(@types/node@24.10.1)(jiti@1.21.7)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2)
+
   services/web-lecture:
     dependencies:
       '@o4o/auth-client':
@@ -2911,6 +2954,9 @@ importers:
 
   services/web-store:
     dependencies:
+      '@o4o/account-ui':
+        specifier: workspace:*
+        version: link:../../packages/account-ui
       '@o4o/auth-client':
         specifier: workspace:*
         version: link:../../packages/auth-client
@@ -2920,15 +2966,66 @@ importers:
       '@o4o/auth-utils':
         specifier: workspace:*
         version: link:../../packages/auth-utils
+      '@o4o/block-renderer':
+        specifier: workspace:*
+        version: link:../../packages/block-renderer
+      '@o4o/content-editor':
+        specifier: workspace:*
+        version: link:../../packages/content-editor
+      '@o4o/error-handling':
+        specifier: workspace:*
+        version: link:../../packages/error-handling
+      '@o4o/lms-client':
+        specifier: workspace:*
+        version: link:../../packages/lms-client
+      '@o4o/operator-ux-core':
+        specifier: workspace:*
+        version: link:../../packages/operator-ux-core
+      '@o4o/screen-content-core':
+        specifier: workspace:*
+        version: link:../../packages/screen-content-core
       '@o4o/shared-space-ui':
         specifier: workspace:*
         version: link:../../packages/shared-space-ui
+      '@o4o/store-asset-policy-core':
+        specifier: workspace:*
+        version: link:../../packages/store-asset-policy-core
+      '@o4o/store-products-ui':
+        specifier: workspace:*
+        version: link:../../packages/store-products-ui
+      '@o4o/store-ui-core':
+        specifier: workspace:*
+        version: link:../../packages/store-ui-core
+      '@o4o/tablet-kiosk-core':
+        specifier: workspace:*
+        version: link:../../packages/tablet-kiosk-core
+      '@o4o/tablet-screen-set-editor':
+        specifier: workspace:*
+        version: link:../../packages/tablet-screen-set-editor
+      '@o4o/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@o4o/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+      '@tanstack/react-query':
+        specifier: ^5.0.0
+        version: 5.90.11(react@19.2.0)
+      axios:
+        specifier: ^1.10.0
+        version: 1.13.2
+      lucide-react:
+        specifier: ^0.523.0
+        version: 0.523.0(react@19.2.0)
       react:
         specifier: 19.2.0
         version: 19.2.0
       react-dom:
         specifier: 19.2.0
         version: 19.2.0(react@19.2.0)
+      react-hot-toast:
+        specifier: ^2.4.1
+        version: 2.6.0(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       react-router-dom:
         specifier: ^7.9.6
         version: 7.9.6(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
@@ -2945,6 +3042,15 @@ importers:
       '@vitejs/plugin-react':
         specifier: ^5.1.1
         version: 5.1.1(vite@7.2.4(@types/node@24.10.1)(jiti@1.21.7)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2))
+      autoprefixer:
+        specifier: ^10.4.20
+        version: 10.4.22(postcss@8.5.6)
+      postcss:
+        specifier: ^8.4.38
+        version: 8.5.6
+      tailwindcss:
+        specifier: ^3.4.17
+        version: 3.4.17(ts-node@10.9.2(@swc/core@1.13.5(@swc/helpers@0.5.17))(@types/node@24.10.1)(typescript@5.9.3))
       typescript:
         specifier: ~5.9.3
         version: 5.9.3
