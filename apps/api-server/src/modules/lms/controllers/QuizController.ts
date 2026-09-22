@@ -164,7 +164,6 @@ export class QuizController extends BaseController {
   static async createQuiz(req: Request, res: Response): Promise<any> {
     try {
       const userId = (req as any).user?.id;
-      const userRoles: string[] = (req as any).user?.roles || [];
 
       if (!userId) {
         return BaseController.unauthorized(res, 'User not authenticated');
@@ -176,17 +175,36 @@ export class QuizController extends BaseController {
         return BaseController.error(res, 'title and questions array are required', 400);
       }
 
-      // Verify course ownership if courseId provided
-      if (courseId) {
-        const courseService = CourseService.getInstance();
-        const course = await courseService.getCourse(courseId);
-        // 재검토 sweep: legacy(KPA/PH) course 에는 quiz 를 만들 수 없다 (non-disclosure 404).
-        if (!course || !isLectureCourse(course.serviceKey)) {
-          return BaseController.notFound(res, 'Course not found');
+      // 4차 P1-13: 귀속 대상은 courseId 뿐 아니라 lessonId 로도 결정된다.
+      // lessonId 만 보내면 QuizService.createQuiz 가 lesson → courseId 를 역추적해 저장하므로,
+      // courseId 제공 여부와 무관하게 "실제 귀속될 course" 를 확정한 뒤 scope · 소유권을 검사한다.
+      if (!courseId && !lessonId) {
+        return BaseController.error(res, 'courseId or lessonId is required', 400);
+      }
+
+      let targetCourseId: string | undefined = courseId;
+      if (lessonId) {
+        if (!(await guardLessonScope(req, res, lessonId))) return;
+        const rows: Array<{ courseId: string }> = await AppDataSource.query(
+          'SELECT "courseId" FROM lms_lessons WHERE id = $1 LIMIT 1',
+          [lessonId],
+        );
+        const lessonCourseId = rows?.[0]?.courseId;
+        if (!lessonCourseId) return BaseController.notFound(res, 'Lesson not found');
+        // courseId 를 함께 보냈다면 lesson 의 실제 소속과 일치해야 한다 (타 강의 lesson 에 붙이기 차단).
+        if (courseId && courseId !== lessonCourseId) {
+          return BaseController.notFound(res, 'Lesson not found');
         }
-        if (course.instructorId !== userId && !rolesIncludeLectureAdmin(userRoles)) {
-          return BaseController.forbidden(res, 'You can only create quizzes for your own courses');
-        }
+        targetCourseId = lessonCourseId;
+      }
+
+      // legacy(KPA/PH) · 타 강사 course 에는 quiz 를 만들 수 없다 (non-disclosure 404 / 403).
+      const ownership = await QuizController.resolveCourseOwnership(req, targetCourseId);
+      if (ownership === 'not_found') {
+        return BaseController.notFound(res, lessonId ? 'Lesson not found' : 'Course not found');
+      }
+      if (ownership === 'forbidden') {
+        return BaseController.forbidden(res, 'You can only create quizzes for your own courses');
       }
 
       const service = QuizService.getInstance();
@@ -195,7 +213,7 @@ export class QuizController extends BaseController {
         description,
         questions,
         lessonId,
-        courseId,
+        courseId: targetCourseId,
         passingScore,
         createdBy: userId,
       });

@@ -15,6 +15,7 @@
  *  3차 P1-11 enrollment 승인   : approve/reject 는 lecture course 의 수강만 (legacy → 404 · write 0)
  *  3차 P1-12 submission 조회   : 강사 submission 경로도 lecture course 만 (admin override 이전에 scope)
  *  3차 P2-2  progress 목록     : MyEnrollmentsPage 도 progressPercentage 를 읽는다
+ *  4차 P1-13 quiz 생성 귀속    : courseId 를 생략하고 lessonId 만 보내도 귀속될 course 로 scope·소유권 검사 (우회 차단)
  *
  * DB 없이 controller/service 를 실제로 실행한다: TypeORM entity 그래프는 virtual mock,
  * DataSource 는 service_memberships / lms_lessons 조회만 흉내낸다.
@@ -428,6 +429,87 @@ describe('P1-4 instructor quiz — 편집 경로는 정답 포함·소유권 검
     expect(savedQuiz.courseId).toBe('lec-pub');
     expect(savedQuiz.lessonId).toBe('les-1');
     expect(savedQuiz.id).toBe('q1');
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 4차 P1-13 quiz 생성 — courseId 생략(lessonId 단독) 경로도 scope·소유권을 검사한다
+// ─────────────────────────────────────────────────────────────────────────────
+describe('4차 P1-13 POST /quizzes — 귀속될 course 를 확정해 검사한다 (courseId 생략 우회 차단)', () => {
+  const body = (extra: any) => ({ title: 'Q', questions: [{ question: '1+1', answer: '2' }], ...extra });
+
+  beforeEach(() => {
+    lessons['les-1'] = { courseId: 'lec-pub' };
+    lessons['les-kpa'] = { courseId: 'kpa-old' };
+    lessons['les-other'] = { courseId: 'lec-other' };
+    courses['lec-other'] = { id: 'lec-other', serviceKey: 'lecture', visibility: 'public', instructorId: 'other-inst', status: 'draft', title: 'L other', tags: [] };
+    // createQuiz 는 실제 service 경로(lesson→courseId 역추적 포함)를 타므로 두 repository 를 채운다.
+    const qs: any = QuizService.getInstance();
+    qs.quizRepository.create = (d: any) => ({ id: 'new-quiz', ...d });
+    qs.lessonRepository = {
+      findOne: async ({ where }: any) => (lessons[where.id] ? { id: where.id, courseId: lessons[where.id].courseId } : null),
+    };
+  });
+
+  it('lessonId 만 · legacy(kpa-society) lesson → 404 · 생성 0', async () => {
+    const res = makeRes();
+    await QuizController.createQuiz(makeReq({ id: 'inst', roles: ['lecture:instructor'], member: true, body: body({ lessonId: 'les-kpa' }) }), res);
+    expect(res.statusCode).toBe(404);
+    expect(savedQuiz).toBeNull();
+  });
+
+  it('lessonId 만 · 다른 강사의 lecture lesson → 403 · 생성 0', async () => {
+    const res = makeRes();
+    await QuizController.createQuiz(makeReq({ id: 'inst', roles: ['lecture:instructor'], member: true, body: body({ lessonId: 'les-other' }) }), res);
+    expect(res.statusCode).toBe(403);
+    expect(savedQuiz).toBeNull();
+  });
+
+  it('lessonId 만 · 소유 lesson → 201 · courseId 는 lesson 소속으로 확정', async () => {
+    const res = makeRes();
+    await QuizController.createQuiz(makeReq({ id: 'inst', roles: ['lecture:instructor'], member: true, body: body({ lessonId: 'les-1' }) }), res);
+    expect(res.statusCode).toBe(201);
+    expect(savedQuiz.courseId).toBe('lec-pub');
+    expect(savedQuiz.lessonId).toBe('les-1');
+  });
+
+  it('courseId 와 lessonId 소속이 다르면 404 · 생성 0 (내 강의 id 로 타 lesson 에 붙이기 차단)', async () => {
+    const res = makeRes();
+    await QuizController.createQuiz(makeReq({ id: 'inst', roles: ['lecture:instructor'], member: true, body: body({ courseId: 'lec-pub', lessonId: 'les-other' }) }), res);
+    expect(res.statusCode).toBe(404);
+    expect(savedQuiz).toBeNull();
+  });
+
+  it('courseId · lessonId 둘 다 없으면 400 · 생성 0 (무귀속 quiz 금지)', async () => {
+    const res = makeRes();
+    await QuizController.createQuiz(makeReq({ id: 'inst', roles: ['lecture:instructor'], member: true, body: body({}) }), res);
+    expect(res.statusCode).toBe(400);
+    expect(savedQuiz).toBeNull();
+  });
+
+  it('courseId 만 · legacy → 404 / 소유 lecture → 201 (종전 계약 유지)', async () => {
+    const bad = makeRes();
+    await QuizController.createQuiz(makeReq({ id: 'inst', roles: ['lecture:instructor'], member: true, body: body({ courseId: 'kpa-old' }) }), bad);
+    expect(bad.statusCode).toBe(404);
+    expect(savedQuiz).toBeNull();
+
+    const ok = makeRes();
+    await QuizController.createQuiz(makeReq({ id: 'inst', roles: ['lecture:instructor'], member: true, body: body({ courseId: 'lec-pub' }) }), ok);
+    expect(ok.statusCode).toBe(201);
+    expect(savedQuiz.courseId).toBe('lec-pub');
+  });
+
+  it('lecture:admin 은 타 강사 lecture lesson 에도 생성 가능 · legacy 는 여전히 404', async () => {
+    const ok = makeRes();
+    await QuizController.createQuiz(makeReq({ id: 'adm', roles: ['lecture:admin'], member: true, body: body({ lessonId: 'les-other' }) }), ok);
+    expect(ok.statusCode).toBe(201);
+    expect(savedQuiz.courseId).toBe('lec-other');
+
+    savedQuiz = null;
+    const bad = makeRes();
+    await QuizController.createQuiz(makeReq({ id: 'adm', roles: ['lecture:admin'], member: true, body: body({ lessonId: 'les-kpa' }) }), bad);
+    expect(bad.statusCode).toBe(404);
+    expect(savedQuiz).toBeNull();
   });
 });
 
