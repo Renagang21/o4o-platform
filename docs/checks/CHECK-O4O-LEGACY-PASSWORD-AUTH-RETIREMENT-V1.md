@@ -193,7 +193,13 @@ backend Phase A 2커밋(`010952f0d` · `c921f90b5`)과 프런트/공통 WIP(`4d7
   `b8ae53f4e` · `MAIN_RUNTIME_SAFE_FOR_GENERAL_DEPLOY = YES 조건부`). 본 CHECK 는 참조만 한다.
 - 이전 판단(§7 구판)에서 내가 적었던 "Lecture 처분 확정까지 배포 금지" 는 이 지시로 **해제**된다.
 
-### 7-2. 배포 대상 SHA 와 포함 변경 (2026-09-24 실측)
+### 7-2. 배포 대상 SHA 와 포함 변경 (2026-09-24 실측 · **대상 SHA 정정**)
+
+> **정정(2026-09-24 · Lecture 트랙 세션과 합의):** 배포 대상은 `b8ae53f4e` 가 **아니다**.
+> 대상 = **Phase A 를 main 에 병합한 직후의 최종 main SHA 하나**(merge 커밋)이며, 그 SHA 하나만 양쪽이 기록한다.
+> 병합 전 사전 대조는 끝났다 — 브랜치를 최신 `origin/main`(`fc2a2ca38`)에 동기화한 로컬 merge `195798f6c` 에서
+> **충돌 0** 이고, Lecture Phase 2 `9a3b402b9` · 배포 게이트 `3c7083be5` · `ebc7204ba` 3종이 모두 포함된다.
+> 따라서 병합만 되면 그 merge SHA 가 자동으로 세 marker 를 포함한다. 아래 표의 "현재 서빙" 실측은 유효하다.
 
 | 축 | 현재 서빙 revision (이미지 기준) | 그 revision 을 만든 SHA | 대상 SHA |
 |---|---|---|---|
@@ -214,7 +220,11 @@ workflow 결과가 success 여도 **revision 을 만들지 않았다** — fail-
 | Web | 145 | web-kpa-society 56 · web-pharmacy-hub 28 · web-k-cosmetics 27 · web-lecture 26 · shared-space-ui 4 · web-neture 2 · store-ui-core 1 |
 | Admin | 12 | admin-dashboard 4 · shared-space-ui 5 · store-ui-core 1 · pnpm-lock 1 · workflow 1 |
 
-**migration 실행 여부: 신규 migration 파일 0** (`git diff f651885ed..b8ae53f4e -- apps/api-server/src/database/migrations` 결과 없음).
+**migration 실행 여부: 신규 migration 파일 0** (`git diff f651885ed..b8ae53f4e -- apps/api-server/src/database/migrations` 결과 없음 ·
+최신 main `fc2a2ca38` 동기화 후에도 동일). Lecture 트랙 세션 독립 확인과 일치: incremental manifest **4건**
+(`CreateStoreOwnerTerminationCases1789701000000` · `AlterHandoffTokensTargetWorkspace1789974015939` ·
+`CreateOperatorInvitations1790125106065` · `CreateHospitalDeviceTables1790125390245`) · 운영 DB prefix **4/4** ·
+기대 상태 `CreateHospitalDeviceTables1790125390245` · fingerprint `bc27f5bc…(5826)`.
 API 배포의 migration Job 은 `build-and-deploy` 안에 있어 실행되더라도 적용 대상이 없으므로
 `INCREMENTAL_EXECUTED=0` 이 기대값이다(Lecture 트랙이 격리 PG15 에서 동일 지문 `bc27f5bc…/5826` 으로 선확인).
 
@@ -229,9 +239,10 @@ API 배포의 migration Job 은 `build-and-deploy` 안에 있어 실행되더라
 - **§43 destructive migration(Phase B)은 이번 배포에 포함하지 않는다** — `service_credentials` 5행 삭제 ·
   `users.password`/`loginAttempts`/`lockedUntil` · `password_reset_tokens` · `login_attempts` DROP 은
   **별도 판정·별도 승인** 대상으로 유지한다(§9-5).
-- Phase A 브랜치(`wo/legacy-password-auth-retirement` · 고유 11커밋)는 **아직 main 미병합**이다.
-  이 창에 Phase A 를 포함할지(= main merge 선행 여부)는 사용자 결정 사항이며, 포함하면 대상 SHA 가
-  merge 커밋으로 바뀌고 위 §7-2 표를 그 SHA 기준으로 다시 확정해야 한다.
+- Phase A 브랜치(`wo/legacy-password-auth-retirement`)는 **아직 main 미병합**이다. 병합은 **사용자 승인 사항**이며
+  피어 세션의 요청만으로는 실행하지 않는다(요청받았으나 거절하고 사용자 승인을 기다린다 · 2026-09-24).
+  승인되면 병합 → 최종 main SHA 를 Lecture 트랙 세션에 통보 → 그 세션이 marker 3종 대조 회신 →
+  같은 SHA 를 양쪽 CHECK 에 기록 → 통제된 배포 1회.
 
 ### 7-4. 배포 창 절차 (승인 시 이 순서로 실행)
 
@@ -239,13 +250,17 @@ API 배포의 migration Job 은 `build-and-deploy` 안에 있어 실행되더라
 ① 사용자 승인 + DEPLOY_ENABLED=true (사용자 타이밍)
 ② 3 워크플로 실행 → environment production 승인(required reviewer)
 ③ 새 revision 생성 확인 (api · web 4 · admin)  ← 아직 트래픽 전환 안 함
-④ 실제 HTTP 검증 (0% revision 의 태그 URL 또는 전환 직후 즉시 검증)
-   - Phase 2 API: 강의 목록 빈 배열 · 삭제된 강의 ID 404
-   - 로그인 surface: Google 진입 렌더 · password 입력 0
-   - password 은퇴 endpoint 404 (Phase A 를 포함한 경우)
-   - 관련 Web 화면 렌더
-⑤ 통과 → 트래픽 전환 → old revision traffic 0 확인
-   실패 → 전환하지 않고 기존 revision 서빙 유지(현 상태가 안전 상태)
+④ 실제 HTTP 검증 — Lecture 트랙 세션과 합의한 통합 목록
+   [Lecture]  GET /api/v1/lms/courses 200·빈 목록 · 삭제된 강의 ID 404 ·
+              study.neture.co.kr 200 · KPA/KCos/PH 화면 200
+   [Password] /auth/login · /auth/register · /auth/forgot-password · /auth/reset-password ·
+              /auth/find-id · PUT /users/password · /auth/google/link → 전부 404 ·
+              로그인 화면 password 입력 0 · Google 진입 렌더
+   [공통]     인증 경로 정상 · 다른 서비스 API 회귀 0 · migration INCREMENTAL_EXECUTED=0
+              (다르게 나오면 그 자체가 STOP 신호)
+⑤ 통과 → 명시적 `update-traffic` 으로 전환 → old revision traffic 0 확인
+   실패 → 전환하지 않는다. 트래픽이 특정 revision 에 pin 돼 있어 새 revision 은 배포돼도 0% 로 남으므로
+   **전환하지 않는 것이 곧 롤백 상태 유지**다(이 pin 이 사실상 안전장치).
 ⑥ 배포 후 production smoke: Google 로그인(관리자·테스트 계정) · 서비스 가입 flow
 ⑦ 그 다음에만 §43 destructive gate 보고 → 별도 승인
 ```
@@ -262,6 +277,8 @@ API 배포의 migration Job 은 `build-and-deploy` 안에 있어 실행되더라
 | eslint(변경/신규 파일) | **오류 0** |
 | production DB write | **0** (본 WO 에서 SELECT 조차 하지 않았다 — incident 검증 read-only 는 Lecture CHECK 소관) |
 | Git | 브랜치 `wo/legacy-password-auth-retirement` origin push 완료(배포 트리거 아님 — 3 워크플로 모두 `branches: main`/`develop` 한정 실측) · `main` 무접촉 |
+| 최신 main 동기화 재검증 (2026-09-24 · `fc2a2ca38` → merge `195798f6c`) | 충돌 **0** · `pnpm install --frozen-lockfile` · `build:packages` 성공 · auth 테스트+guard **10 suites 117/117** · api-server tsc **0** · admin-dashboard·web-neture·web-account·web-kpa-society tsc 각 **0** |
+| E2E 잠금 위험 소멸 | 09-23 사고(E2E 가 운영자 `loginAttempts` 누적 → 30분 잠금)는 **구조적으로 재발 불가** — 스위트가 password 자격증명을 전혀 쓰지 않고(§5 CI 재정의 · workflow 에 소비 0 회귀 검사), 로그인 시도 자체를 하지 않는다 |
 
 ## 9. 남은 작업 (재개 시)
 
