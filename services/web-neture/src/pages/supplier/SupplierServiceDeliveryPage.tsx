@@ -132,10 +132,10 @@ export default function SupplierServiceDeliveryPage() {
           K-Cosmetics 는 운영자 승인 축이므로 제품 목록의 유통 정책에서 신청합니다.
         </p>
         <Link
-          to="/supplier/supply-offers"
+          to="/supplier/products"
           className="mt-4 inline-block text-sm font-medium text-blue-600 hover:text-blue-700"
         >
-          공급 오퍼로 이동
+          제품 목록으로 이동
         </Link>
       </div>
     );

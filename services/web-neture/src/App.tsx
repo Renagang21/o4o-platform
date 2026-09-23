@@ -170,10 +170,9 @@ const SupplierLibraryFormPage = lazy(() =>
 // 레거시 CSV Import(SupplierCsvImportPage) 은퇴 — 프로덕션 배치 이력 0건·최근 사용 0·
 // canonical 대량 등록(/supplier/products/bulk)이 CSV 업로드→등록 경로를 완전 대체.
 // lazy import 제거, /supplier/csv-import 라우트는 Navigate redirect 로 전환(아래 라우트 참조).
-// WO-NETURE-B2B-CONTENT-MANAGEMENT-V1
-const SupplierB2BContentPage = lazy(() =>
-  import('./pages/supplier/SupplierB2BContentPage').then((m) => ({ default: m.default }))
-);
+// WO-O4O-SUPPLIER-POST-REGISTRATION-PRODUCT-MANAGEMENT-OFFER-FIRST-REALIGNMENT-V1 §D (2026-09-23):
+//   SupplierB2BContentPage / B2BContentDrawer 은퇴 — B2B 설명 편집은 상품 목록의 ProductDetailDrawer
+//   한 곳에서만 한다. /supplier/b2b-content 는 Navigate redirect 로 흡수(아래 라우트 참조).
 // WO-O4O-NETURE-SUPPLIER-STORE-DESCRIPTION-ENTRY-AND-ONBOARDING-V1
 const SupplierStoreDescriptionsPage = lazy(() =>
   import('./pages/supplier/SupplierStoreDescriptionsPage').then((m) => ({ default: m.default }))
@@ -212,7 +211,9 @@ const SupplierProductCreatePage = lazy(() => import('./pages/supplier/SupplierPr
 // WO-O4O-NETURE-SUPPLIER-PRODUCT-REGISTRATION-IA-V1
 const SupplierProductRegisterEntryPage = lazy(() => import('./pages/supplier/SupplierProductRegisterEntryPage'));
 const SupplierBulkRegisterPage = lazy(() => import('./pages/supplier/SupplierBulkRegisterPage'));
-const SupplierSupplyOffersPage = lazy(() => import('./pages/supplier/SupplierSupplyOffersPage'));
+// WO-O4O-SUPPLIER-POST-REGISTRATION-PRODUCT-MANAGEMENT-OFFER-FIRST-REALIGNMENT-V1 §C (2026-09-23):
+//   SupplierSupplyOffersPage(안내 허브) 은퇴 — 유통 정책·서비스 대상은 상품 목록/Drawer 에서 직접 본다.
+//   허브가 가리키던 서비스 제공 설정·판매자 모집·펀딩·이벤트 오퍼는 사이드바에 직접 항목이 있다.
 // WO-O4O-PHARMACYHUB-SERVICE-MODEL-REALIGNMENT-AND-SUPPLIER-ROLE-REMOVAL-V1:
 //   공급자 직접 opt-in 서비스(Pharmacy-Hub) 제공 설정 — Pharmacy-Hub 에는 공급자 shell 이 없다.
 const SupplierServiceDeliveryPage = lazy(() => import('./pages/supplier/SupplierServiceDeliveryPage'));
@@ -817,7 +818,8 @@ function App() {
               {/* WO-O4O-NETURE-SUPPLIER-PRODUCT-REGISTRATION-IA-V1 */}
               <Route path="/supplier/products/register" element={<SupplierProductRegisterEntryPage />} />
               <Route path="/supplier/products/bulk" element={<SupplierBulkRegisterPage />} />
-              <Route path="/supplier/supply-offers" element={<SupplierSupplyOffersPage />} />
+              {/* WO-O4O-SUPPLIER-POST-REGISTRATION-PRODUCT-MANAGEMENT-OFFER-FIRST-REALIGNMENT-V1 §C */}
+              <Route path="/supplier/supply-offers" element={<Navigate to="/supplier/products" replace />} />
               <Route path="/supplier/services/:serviceKey" element={<SupplierServiceDeliveryPage />} />
               {/* WO-O4O-SELLER-RECRUITMENT-SUPPLIER-STATUS-VIEW-V1 */}
               <Route path="/supplier/recruitments" element={<SupplierRecruitmentsPage />} />
@@ -838,8 +840,8 @@ function App() {
                   레거시 CSV Import 은퇴 → canonical 대량 등록으로 영구 redirect.
                   북마크·직접 URL·구 링크가 빈 화면/404 로 떨어지지 않도록 replace 로 흡수. */}
               <Route path="/supplier/csv-import" element={<Navigate to="/supplier/products/bulk" replace />} />
-              {/* WO-NETURE-B2B-CONTENT-MANAGEMENT-V1 */}
-              <Route path="/supplier/b2b-content" element={<SupplierB2BContentPage />} />
+              {/* WO-O4O-SUPPLIER-POST-REGISTRATION-PRODUCT-MANAGEMENT-OFFER-FIRST-REALIGNMENT-V1 §D */}
+              <Route path="/supplier/b2b-content" element={<Navigate to="/supplier/products" replace />} />
               {/* WO-O4O-NETURE-SUPPLIER-STORE-DESCRIPTION-ENTRY-AND-ONBOARDING-V1 */}
               <Route path="/supplier/store-descriptions" element={<SupplierStoreDescriptionsPage />} />
               {/* WO-O4O-SUPPLIER-SCREEN-SET-UI-STORE-HUB-INTEGRATION-V2C */}
