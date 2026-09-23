@@ -550,3 +550,65 @@ merge(PR #225) → final production re-census(SELECT only)
 - Phase 2 runtime 만 먼저 배포하면 production 11 course(kpa-society 8 · pharmacy-hub 3) 가 Lecture 경로에서 404 가 되고 기존 서비스 URL 은 이미 Lecture 로 외부 이동한다 → 단독 배포 금지.
 - membership: `service_memberships(lecture)` 는 사용자 가입/운영자 지정으로만 생성. 자동 변환 0.
 - **배포 전 확정 필요(7차 OPERATIONAL_GATE · §17-3-f #21)**: Lecture membership 부여 경로. 현재 `joinEnabled=false` 라 일반 사용자는 로그인 후에도 스스로 가입할 수 없다 — 운영자 지정으로 갈지 `joinEnabled` 를 켤지는 사용자 판단이며, 코드 기본값은 바꾸지 않았다.
+
+---
+
+## 18. PR #225 merge · 최종 production re-census (2026-09-23)
+
+### 18-1. merge
+
+세 조건을 실측으로 확인한 뒤 merge 했다(merge commit · rebase/force 0).
+
+| 조건 | 결과 |
+|---|---|
+| CI Pipeline | head `20290660c` **전부 SUCCESS** — API Server Jest 10m55s · Code Quality 7m56s · Build Applications · CodeQL · Guard Static Analysis · Detect affected scope · **SonarCloud pass** |
+| Codex 신규 P0/P1 | **0** — 14차 리뷰(2026-09-23 06:32Z) `Didn't find any major issues` · reviewed commit `c4dd2aa9c`. 그 위 head `20290660c` 는 **docs 1파일만** 변경(코드 diff 0)이라 리뷰 대상 동일 |
+| mergeable | `MERGEABLE` / `CLEAN` |
+
+→ **main `9a3b402b9`** (PR #225 merge). 7~13차 수정(P1 누적 다수)은 타 PC 세션이 진행했고, 본 세션은 4~6차 P1 4건(P1-13~16)과 같은 계열 P2 2건을 처리했다.
+
+### 18-2. ⚠️ merge 가 배포 워크플로를 자동 트리거 — 즉시 취소
+
+`main` push 는 `Deploy API Server` · `Deploy Web Services` · `Deploy Admin Dashboard` 를 자동 실행한다. §17-5 의 `PHASE2_MERGE != PHASE2_DEPLOY` 를 지키기 위해 merge 직후 **API · Web 배포 run 2건을 즉시 cancel** 했다(run `35855595361` · `35855595462`). 배포 직전 운영 revision 기준값: `o4o-core-api-03746-qlz` · `lecture-web-00012-rfj`.
+
+> **다음 merge 때도 같은 일이 일어난다.** cutover 전까지 Lecture runtime 이 운영에 나가면 안 되므로, coordinated deploy WO 는 "배포 워크플로를 의도적으로 실행" 하는 단계를 명시적으로 포함해야 한다.
+
+**취소 결과 실측**: `Deploy API Server` · `Deploy Web Services` = **cancelled**, Cloud Run revision 불변(`o4o-core-api-03746-qlz` · `lecture-web-00012-rfj`) → **Lecture runtime 은 운영에 나가지 않았다.**
+
+**단, `Deploy Admin Dashboard` 는 취소 전에 완주했다(success · revision `o4o-admin-dashboard-01306-qmv`).** 이 배포에 포함된 Phase 2 변경은 admin 4파일 뿐이고 전부 **제거**다: `/admin/lms-instructor/*` 콘솔(router · dashboard · lmsInstructor API client) 삭제 + route 등록 해제(+7/−518). 즉 **Platform Admin 의 LMS instructor 콘솔이 cutover 전에 먼저 사라졌다.** 운영 영향은 "Platform Admin 에서 강사·수강 승인 화면 진입 불가"이며, LMS 데이터·API·학습자 경로에는 영향이 없다(백엔드 미배포). 되돌리지 않고 기록만 한다 — cutover 창에서 Lecture Operator surface 가 이를 대체한다(§12-3).
+
+### 18-3. 최종 production re-census (SELECT only · Cloud SQL Auth Proxy)
+
+§14(2026-09-22) 대비 **LMS 축 이탈 0** — cutover 대상·분포·하위 데이터 전부 동일.
+
+| 항목 | 9/22 | 9/23 최종 | 판정 |
+|---|---|---|---|
+| `lms_courses` | 11 (NULL 0 · non-lecture kind 0) | **11 (NULL 0 · non-lecture kind 0)** | 동일 |
+| service_key × status × visibility | kpa-society 8 · pharmacy-hub 3 | **kpa-society 8**(published/public 3 · published/members 2 · archived/members 2 · pending_review/members 1) · **pharmacy-hub 3**(archived: members 2 · public 1) | 동일 |
+| lessons / enrollments / progress / quizzes / assignments | 10 / 3 / 0 / 6 / 1 | **10 / 3 / 0 / 6 / 1** | 동일 |
+| certificates / quiz_attempts | 0 / 0 | **0 / 0** | 동일 |
+| orphan lessons / enrollments | 0 / 0 | **0 / 0** | 동일 |
+| 마지막 course 갱신 | 2026-08-26 | **2026-08-26 03:52:55** | Phase 2 기간 LMS write 0 |
+| `currentEnrollments` 불일치 | 7 | **7** | 동일(§20 범위 밖 · 미수정) |
+| `roles` lecture:* / lms:* | 3 / 1 | **3 / 1** | 동일(legacy 선언 유지) |
+| `role_assignments` 전체 / lecture:* / lms:* | 11 / 0 / 0 | **11(전부 active) / 0 / 0** | 동일 |
+| `service_memberships` 전체 / lecture active | 5 / 0 | **5 / 0** | 동일 — 자동 생성 0 |
+| `platform_services` lecture | active | **active** | 동일 |
+| `users` | 2 | **1** | ⚠️ 감소 — Identity 트랙(테스트 계정 정리) 소관 · Lecture 축 무관 · 본 세션 write 0 |
+
+cutover 대상 11 course id 를 §18-3 실행 로그(`C:/tmp/p2-final-census-out.txt`)에 고정했다(kpa-society 8 · pharmacy-hub 3 · 전부 instructorId 보유).
+
+```text
+FINAL_RE_CENSUS = PASS (이탈 0 · STOP 미발동)
+PRODUCTION_DB_WRITES = 0
+LMS_DATA_CUTOVER = NOT_STARTED
+PHASE2_PRODUCTION_DEPLOY = HELD (merge 직후 자동 트리거 배포 취소)
+OPERATOR_LOGIN_E2E = 보류 (Auth 트랙)
+```
+
+### 18-4. 다음 (coordinated deploy + cutover WO 에서)
+
+1. Lecture membership 부여 경로 확정(§17-5 OPERATIONAL_GATE) — 운영자 지정 vs `joinEnabled=true`
+2. api + web-lecture 배포와 `lms_courses.service_key` rekey(11건)를 **한 창에서** 실행 · 기존 KPA/PH membership → Lecture membership 자동 생성 **금지**
+3. `currentEnrollments` 정합 복구(7건)는 cutover 직후 같은 창에서 판단
+4. public smoke(study.neture.co.kr) → operator E2E(Auth gate 해소 후)
