@@ -42,7 +42,12 @@ interface BridgeSourceDescriptor {
   sourceService: string;
 }
 
-const BRIDGE_SOURCES: Record<string, BridgeSourceDescriptor> = {
+/**
+ * WO-O4O-SUPPLIER-ORDER-PAYMENT-FULFILLMENT-SETTLEMENT-CANONICALIZATION-V1 §2-F:
+ *   recovery 가 "활성 payment-first producer 전부" 를 같은 기준으로 훑으려면 이 registry 가 SSOT 여야 한다.
+ *   export 로 공개하되 **값·동작은 불변**이다(읽기 전용 사용).
+ */
+export const BRIDGE_SOURCES: Record<string, BridgeSourceDescriptor> = {
   [NETURE_B2B_ORDER_SOURCE]: { sourceService: 'neture-b2b' },
   pharmacy_hub_cart: { sourceService: 'pharmacy-hub' },
   // WO-O4O-CROSSSERVICE-B2B-CHECKOUT-CONFIRM-SERVICE-AGNOSTIC-ADOPTION-V1:
