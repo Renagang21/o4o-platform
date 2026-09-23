@@ -4,7 +4,14 @@ import { BaseController } from '../../../common/base.controller.js';
 import { CourseService } from '../services/CourseService.js';
 import logger from '../../../utils/logger.js';
 import { SERVICE_KEYS } from '../../../constants/service-keys.js';
-import { hasLectureAdminRole, hasLectureOperatorRole, isActiveLectureLearner, isLectureCourse } from '../middleware/lecture-access.js';
+import {
+  hasLectureAdminRole,
+  hasLectureOperatorRole,
+  isActiveLectureLearner,
+  isLectureCourse,
+  isPlatformSuperAdmin,
+  resolveLectureMembershipStatus,
+} from '../middleware/lecture-access.js';
 // WO-O4O-LMS-PUBLIC-COURSE-LIST-SERVICE-SCOPE-V1
 import {
   resolveLmsServiceScope,
@@ -32,6 +39,9 @@ import {
  * - P1-17 학습자 목록·상세는 PUBLISHED 만 — 운영자 승인 전 초안은 비노출(404). 전체 상태가 필요한
  *   운영 목록은 `/operator/courses`(requireLectureOperator) 가 따로 있다.
  * - P2-7 생성 시 instructorId 는 serviceKey 와 같이 서버가 요청자로 고정한다(타인 명의 초안 금지).
+ * 8차 재검토(Codex):
+ * - P2-9 게시 전 강의 예외는 role·소유권만으로 주지 않는다 — 현재 active Lecture membership 을
+ *   함께 요구한다(정지·해지된 강사, stale operator/admin role 은 통과하지 못한다).
  */
 export class CourseController extends BaseController {
   private static isOwnerOrAdmin(req: Request, userId: string, courseInstructorId: string): boolean {
@@ -42,11 +52,19 @@ export class CourseController extends BaseController {
   /**
    * 7차 P1-17: 학습자 경로에서 게시 전 강의를 볼 수 있는 주체 — 소유 강사와 Lecture 운영자(admin 포함).
    * 그 외에는 상태를 드러내지 않고 404 로 답한다.
+   * 8차 P2-9: role·소유권은 필요조건일 뿐이다. 초안은 visibility 기본값이 public 이라 뒤의
+   * members 판정이 돌지 않으므로, 여기서 active Lecture membership 을 직접 확인한다 —
+   * membership 이 정지·해지된 강사나 stale role 토큰은 자기 초안이라도 열지 못한다.
+   * (`platform:super_admin` break-glass 만 예외.)
    */
-  private static canSeeUnpublished(req: Request, courseInstructorId: string): boolean {
-    if (hasLectureOperatorRole(req) || hasLectureAdminRole(req)) return true;
+  private static async canSeeUnpublished(req: Request, courseInstructorId: string): Promise<boolean> {
     const userId = (req as any).user?.id;
-    return !!userId && courseInstructorId === userId;
+    if (!userId) return false;
+    if (isPlatformSuperAdmin(req)) return true;
+    const isOwner = courseInstructorId === userId;
+    const isLectureStaff = hasLectureOperatorRole(req) || hasLectureAdminRole(req);
+    if (!isOwner && !isLectureStaff) return false;
+    return (await resolveLectureMembershipStatus(req)) === 'active';
   }
 
   /** write 대상 강의를 로드한다. 없거나 Lecture 소유가 아니면 404 를 보내고 null 을 돌려준다. */
@@ -116,7 +134,10 @@ export class CourseController extends BaseController {
 
       // 7차 P1-17: 학습자 상세는 게시된 강의만. 소유 강사·운영자만 게시 전 상태를 열람한다.
       // (비노출은 403 이 아니라 404 — 존재 자체를 드러내지 않는다.)
-      if (course.status !== CourseStatus.PUBLISHED && !CourseController.canSeeUnpublished(req, course.instructorId)) {
+      if (
+        course.status !== CourseStatus.PUBLISHED &&
+        !(await CourseController.canSeeUnpublished(req, course.instructorId))
+      ) {
         return BaseController.notFound(res, 'Course not found');
       }
 

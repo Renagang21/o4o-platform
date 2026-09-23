@@ -21,6 +21,7 @@
  *  6차 P1-16 퀴즈 저장 정합   : 정답 없는/보기에 없는 문항 저장 차단 · 보기 편집 시 정답 동기화 · 로드 실패를 미존재로 오인 금지(중복 퀴즈)
  *  7차 P1-17 학습자 노출 상태 : GET /courses · /courses/:id 는 PUBLISHED 만 (초안은 소유 강사·운영자에게만 · 그 외 404)
  *  7차 P2-7  생성 명의       : createCourse 의 instructorId 는 서버가 요청자로 고정한다
+ *  8차 P2-9  초안 예외 경계  : 게시 전 강의 예외는 role·소유권 + active Lecture membership 을 함께 요구한다
  *  7차 P2-8  평가 조회 정책  : lesson quiz/assignment 조회에도 visibility·membership·enrollment 정책 (소유 강사 예외)
  *
  * DB 없이 controller/service 를 실제로 실행한다: TypeORM entity 그래프는 virtual mock,
@@ -845,6 +846,33 @@ describe('7차 P1-17 학습자 목록·상세는 게시된 강의만', () => {
     const pub = makeRes();
     await CourseController.getCourse(makeReq({ params: { id: 'lec-pub' } }), pub);
     expect(pub.statusCode).toBe(200);
+  });
+});
+
+describe('8차 P2-9 게시 전 강의 예외는 active Lecture membership 을 함께 요구한다', () => {
+  it('membership 없는 소유 강사(role 만 남은 상태) → 자기 초안도 404', async () => {
+    const res = makeRes();
+    await CourseController.getCourse(makeReq({ id: 'inst', roles: ['lecture:instructor'], params: { id: 'lec-draft' } }), res);
+    expect(res.statusCode).toBe(404);
+    expect(JSON.stringify(res.body)).not.toContain('L draft');
+  });
+  it('membership 없는 stale lecture:operator → 404', async () => {
+    const res = makeRes();
+    await CourseController.getCourse(makeReq({ id: 'op', roles: ['lecture:operator'], params: { id: 'lec-draft' } }), res);
+    expect(res.statusCode).toBe(404);
+  });
+  it('membership 이 inactive 인 소유 강사 → 404', async () => {
+    const req = makeReq({ id: 'inst', roles: ['lecture:instructor'], params: { id: 'lec-draft' } });
+    req.user.memberships = [{ serviceKey: 'lecture', status: 'suspended' }];
+    memberships.push({ user_id: 'inst', service_key: 'lecture', status: 'suspended' });
+    const res = makeRes();
+    await CourseController.getCourse(req, res);
+    expect(res.statusCode).toBe(404);
+  });
+  it('platform:super_admin break-glass 는 membership 없이도 200', async () => {
+    const res = makeRes();
+    await CourseController.getCourse(makeReq({ id: 'sa', roles: ['platform:super_admin'], params: { id: 'lec-draft' } }), res);
+    expect(res.statusCode).toBe(200);
   });
 });
 

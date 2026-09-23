@@ -407,6 +407,16 @@ spec 추가(3차): P1-8 2건 · P1-9 2건 · P1-10 2건 · P1-11 2건 · P1-12 2
 
 spec 추가(7차): P1-17 8건 · P2-7 1건 · P2-8 5건 · 정적 계약 1건 → merge-gate spec **83/83**.
 
+### 17-3-g. Codex 8차 재검토(`d4b31848c` 대상) — 신규 지적 처리표
+
+P1·P0 지적 0건, P2 1건.
+
+| # | 등급 | 지적 | 처리 | 판정 |
+|---|---|---|---|---|
+| 25 | P2 | 7차에 넣은 "게시 전 강의 열람 예외" 가 `instructorId` 일치·role 만 보고 membership 을 확인하지 않는다 — 정지·해지된 강사나 stale `lecture:operator`/`admin` 토큰이 초안을 계속 읽는다. 초안은 visibility 기본값이 public 이라 뒤의 members 판정도 돌지 않는다 | `canSeeUnpublished` 를 async 로 바꾸고 role·소유권을 **필요조건**으로만 쓴다 — 그 위에 `resolveLectureMembershipStatus(req) === 'active'` 를 요구한다. `platform:super_admin` break-glass 만 예외 | **FIXED** |
+
+spec 추가(8차): '8차 P2-9' 4건(membership 없는 소유 강사 404 · stale operator 404 · inactive membership 404 · super_admin 200) → merge-gate spec **87/87**.
+
 ### 17-4. 검증 (merge-gate)
 
 | 항목 | 결과 |
@@ -414,6 +424,7 @@ spec 추가(7차): P1-17 8건 · P2-7 1건 · P2-8 5건 · 정적 계약 1건 �
 | shared-space-ui vitest | 8 files / 100 PASS |
 | api-server tsc | 0 |
 | api-server jest 전체 (1차 f3b8c8ca5) | 전체 실행 345 suites(4 skipped) — 344 PASS + `lms-operator-multi-service-scope` 1 FAIL(정적 계약이 `isLectureCourse` 정의를 routes 파일에서 찾음 → lecture-access.ts 로 승격된 위치로 assertion 갱신 · 완화 0) → 재실행 PASS. 최종 345/345 · 5799 tests PASS(32 skipped) · 0 FAIL |
+| 8차(재검토 반영 · §17-3-g) | api-server tsc 0 · merge-gate spec 87/87 · LMS 관련 jest 15 suites / 198 tests PASS |
 | 7차(재검토 반영 · §17-3-f) | api-server tsc 0 · web-lecture tsc 0 · vite build PASS · merge-gate spec 83/83 · api-server jest 전체 346/350 suites(4 skipped) · 5,858/5,890 tests PASS(32 skipped) |
 | 3차(재검토 반영 · §17-3-d) | api-server tsc 0 · web-lecture tsc 0 · vite build PASS · merge-gate spec 56/56 · api-server jest 전체 345/345 suites(4 skipped) · 5817 tests PASS(32 skipped) |
 | 2차(재검토 반영) | api-server tsc 0 · web-lecture tsc 0 · lecture 3 suites 71/71 · api-server jest 전체 345/345 suites · 5807 tests PASS(32 skipped · 0 FAIL — P1-6/7/P2 반영본 · apiLimiter 1줄은 tsc+lecture 3 suites 로 로컬 확인, 전체는 CI jest) |
