@@ -417,6 +417,18 @@ P1·P0 지적 0건, P2 1건.
 
 spec 추가(8차): '8차 P2-9' 4건(membership 없는 소유 강사 404 · stale operator 404 · inactive membership 404 · super_admin 200) → merge-gate spec **87/87**.
 
+### 17-3-h. Codex 9차 재검토(`eb15af32a` 대상) — 신규 지적 처리표
+
+| # | 등급 | 지적 | 처리 | 판정 |
+|---|---|---|---|---|
+| 26 | P1 | `requireEnrollment` 가 `visibility==='public'` 이면 `isPaid`·`requiresApproval` 판정 전에 통과시킨다. 편집기는 "공개 + 승인 필요" 강의를 허용하므로, 승인 enrollment 없는 회원이 quiz attempt·assignment submission 을 저장하고 합격 보상까지 받을 수 있다 | enrollment 요구를 visibility 와 분리했다 — PUBLIC 은 **membership 만** 면제하고, `isPaid \| requiresApproval` 이면 visibility 와 무관하게 승인 enrollment 를 요구한다. 조회·제출 라우트가 같은 미들웨어라 둘 다 닫힌다 | **FIXED** |
+| 27 | P2 | `allowCourseOwner` 면제가 `instructorId` 일치 또는 `lecture:admin` role 만 본다 — 정지된 회원·회수된 role 이 members 강의 평가를 계속 읽는다 | `canReadOwnCourseAssessments` 로 분리: 소유자 축은 **소유권 + 현재 `lecture:instructor`**, 그 외는 `lecture:admin`, 그리고 어느 쪽이든 **active membership** 필수. `platform:super_admin` 만 예외 | **FIXED** |
+| 28 | P2 | 8차의 초안 열람 예외에서 `isOwner` 가 여전히 `instructorId` 일치만 본다 — 강사 role 이 회수되어도 일반 membership 만 있으면 과거 자기 초안을 계속 읽는다 | `canSeeUnpublished` 의 소유자 축을 **소유권 + 현재 `lecture:instructor`** 로 좁혔다(operator/admin 축·membership 요구는 8차 그대로) | **FIXED** |
+
+판정 근거는 `lecture-access.ts` 머리말의 계약 그대로다 — *Instructor = active lecture membership + `lecture:instructor`*. 소유권은 role 을 대체하지 않는다.
+
+spec 추가(9차): P1-18 3건 · P2-10 4건 · P2-11 1건 → merge-gate spec **95/95**.
+
 ### 17-4. 검증 (merge-gate)
 
 | 항목 | 결과 |
@@ -424,6 +436,7 @@ spec 추가(8차): '8차 P2-9' 4건(membership 없는 소유 강사 404 · stale
 | shared-space-ui vitest | 8 files / 100 PASS |
 | api-server tsc | 0 |
 | api-server jest 전체 (1차 f3b8c8ca5) | 전체 실행 345 suites(4 skipped) — 344 PASS + `lms-operator-multi-service-scope` 1 FAIL(정적 계약이 `isLectureCourse` 정의를 routes 파일에서 찾음 → lecture-access.ts 로 승격된 위치로 assertion 갱신 · 완화 0) → 재실행 PASS. 최종 345/345 · 5799 tests PASS(32 skipped) · 0 FAIL |
+| 9차(재검토 반영 · §17-3-h) | api-server tsc 0 · merge-gate spec 95/95 · LMS·enrollment 관련 jest 16 suites / 207 tests PASS |
 | 8차(재검토 반영 · §17-3-g) | api-server tsc 0 · merge-gate spec 87/87 · LMS 관련 jest 15 suites / 198 tests PASS |
 | 7차(재검토 반영 · §17-3-f) | api-server tsc 0 · web-lecture tsc 0 · vite build PASS · merge-gate spec 83/83 · api-server jest 전체 346/350 suites(4 skipped) · 5,858/5,890 tests PASS(32 skipped) |
 | 3차(재검토 반영 · §17-3-d) | api-server tsc 0 · web-lecture tsc 0 · vite build PASS · merge-gate spec 56/56 · api-server jest 전체 345/345 suites(4 skipped) · 5817 tests PASS(32 skipped) |

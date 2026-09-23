@@ -5,7 +5,8 @@
  *
  * 강의 visibility + enrollment 통합 접근 제어 미들웨어.
  *
- * PUBLIC  강의 → enrollment 없이 통과
+ * PUBLIC  강의 → membership 불요. 단 isPaid·requiresApproval 이면 enrollment 는 여전히 필요하다
+ *                (9차 P1-18 — "공개 + 승인 필요" 강의의 무승인 제출 방지).
  * MEMBERS 강의 → active lecture membership 필수 (WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 §7)
  *   그 위에 아래 정책 순서대로 적용:
  *   1. isPaid=true        → 승인된 Enrollment 필수 (결제 강의)
@@ -26,7 +27,29 @@ import {
   InvalidLmsServiceKeyError,
   INVALID_SERVICE_KEY_CODE,
 } from '../utils/lms-service-scope.js';
-import { resolveLectureMembershipStatus, isPlatformSuperAdmin, hasLectureAdminRole } from './lecture-access.js';
+import {
+  resolveLectureMembershipStatus,
+  isPlatformSuperAdmin,
+  hasLectureAdminRole,
+  hasLectureInstructorRole,
+} from './lecture-access.js';
+
+/**
+ * 9차 P2-10: "소유 강사 예외" 는 소유권만으로 성립하지 않는다.
+ * 이 파일 머리말·lecture-access.ts 의 계약대로 **현재 role + active membership** 을 함께 요구한다 —
+ * 강사 role 이 회수되었거나 membership 이 정지된 사용자는 자기 강의의 평가도 이 경로로 읽지 못한다.
+ * `platform:super_admin` break-glass 만 예외.
+ */
+async function canReadOwnCourseAssessments(
+  req: Request,
+  userId: string,
+  courseInstructorId: string | null | undefined,
+): Promise<boolean> {
+  if (isPlatformSuperAdmin(req)) return true;
+  const isOwningInstructor = courseInstructorId === userId && hasLectureInstructorRole(req);
+  if (!isOwningInstructor && !hasLectureAdminRole(req)) return false;
+  return (await resolveLectureMembershipStatus(req)) === 'active';
+}
 
 interface RequireEnrollmentOptions {
   /** lesson 라우트에서 lessonId → courseId 역추적 */
@@ -139,18 +162,15 @@ export function requireEnrollment(options?: RequireEnrollmentOptions) {
       return res.status(404).json({ success: false, error: message });
     }
 
-    // 7차 P2-8: scope 판정 이후에만 — 소유 강사·lecture:admin 은 자기 강의의 평가를 수강 없이 읽는다.
-    if (options?.allowCourseOwner && ((course as any).instructorId === userId || hasLectureAdminRole(req))) {
-      return next();
-    }
-
-    // PUBLIC 강의: enrollment 없이 통과
-    if (course.visibility === CourseVisibility.PUBLIC) {
+    // 7차 P2-8 + 9차 P2-10: scope 판정 이후에만 — 소유 강사(현재 role + active membership)·
+    // lecture:admin 은 자기 강의의 평가를 수강 없이 읽는다.
+    if (options?.allowCourseOwner && (await canReadOwnCourseAssessments(req, userId, (course as any).instructorId))) {
       return next();
     }
 
     // MEMBERS 강의: active lecture membership 이 선행 조건이다 (role 불요 · break-glass 만 예외).
-    if (!isPlatformSuperAdmin(req)) {
+    // PUBLIC 강의는 membership 을 요구하지 않는다 — 다만 아래 enrollment 판정은 건너뛰지 않는다.
+    if (course.visibility !== CourseVisibility.PUBLIC && !isPlatformSuperAdmin(req)) {
       const membershipStatus = await resolveLectureMembershipStatus(req);
       if (membershipStatus === 'not_found') {
         return res.status(403).json({
@@ -168,11 +188,13 @@ export function requireEnrollment(options?: RequireEnrollmentOptions) {
       }
     }
 
-    // enrollment 체크가 필요한지 판단
+    // 9차 P1-18: 유료·승인 강의의 enrollment 요구는 visibility 와 독립이다.
+    // 종전에는 PUBLIC 이면 여기 오기 전에 통과시켜, "공개 + 승인 필요" 강의에서 승인 없이
+    // quiz attempt / assignment submission 이 저장되고 합격 보상까지 나갈 수 있었다.
     const needsEnrollmentCheck = course.isPaid || course.requiresApproval;
 
     if (!needsEnrollmentCheck) {
-      // 무료·승인불필요 회원제 강의 → membership 만으로 통과
+      // 무료·승인불필요 강의 → (PUBLIC) 또는 (MEMBERS + membership) 만으로 통과
       return next();
     }
 

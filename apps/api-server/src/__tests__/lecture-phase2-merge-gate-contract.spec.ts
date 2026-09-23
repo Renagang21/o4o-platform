@@ -22,6 +22,9 @@
  *  7차 P1-17 학습자 노출 상태 : GET /courses · /courses/:id 는 PUBLISHED 만 (초안은 소유 강사·운영자에게만 · 그 외 404)
  *  7차 P2-7  생성 명의       : createCourse 의 instructorId 는 서버가 요청자로 고정한다
  *  8차 P2-9  초안 예외 경계  : 게시 전 강의 예외는 role·소유권 + active Lecture membership 을 함께 요구한다
+ *  9차 P1-18 공개+승인 강의  : enrollment 요구는 visibility 와 독립 — PUBLIC 이어도 isPaid·requiresApproval 이면 승인 필요
+ *  9차 P2-10 평가 소유자 예외: requireEnrollment 의 소유자 면제도 현재 role + active membership 을 요구한다
+ *  9차 P2-11 초안 소유자 축  : 소유권 + 현재 `lecture:instructor` 가 함께 있어야 초안을 연다
  *  7차 P2-8  평가 조회 정책  : lesson quiz/assignment 조회에도 visibility·membership·enrollment 정책 (소유 강사 예외)
  *
  * DB 없이 controller/service 를 실제로 실행한다: TypeORM entity 그래프는 virtual mock,
@@ -873,6 +876,74 @@ describe('8차 P2-9 게시 전 강의 예외는 active Lecture membership 을 �
     const res = makeRes();
     await CourseController.getCourse(makeReq({ id: 'sa', roles: ['platform:super_admin'], params: { id: 'lec-draft' } }), res);
     expect(res.statusCode).toBe(200);
+  });
+});
+
+describe('9차 P2-11 초안 열람의 소유자 축은 소유권 + 현재 lecture:instructor', () => {
+  it('membership 은 active 이지만 강사 role 이 회수된 소유자 → 자기 초안 404', async () => {
+    const res = makeRes();
+    await CourseController.getCourse(makeReq({ id: 'inst', roles: [], member: true, params: { id: 'lec-draft' } }), res);
+    expect(res.statusCode).toBe(404);
+    expect(JSON.stringify(res.body)).not.toContain('L draft');
+  });
+});
+
+describe('9차 P1-18 유료·승인 강의의 enrollment 요구는 visibility 와 독립이다', () => {
+  const run = async (req: any) => {
+    const res = makeRes();
+    let passed = false;
+    await requireEnrollment({ checkLesson: true })(req, res, (() => { passed = true; }) as any);
+    return { res, passed };
+  };
+  beforeEach(() => {
+    courses['lec-pub-approval'] = { id: 'lec-pub-approval', serviceKey: 'lecture', visibility: 'public', instructorId: 'inst', status: 'published', title: 'pub approval', requiresApproval: true };
+    courses['lec-pub-paid'] = { id: 'lec-pub-paid', serviceKey: 'lecture', visibility: 'public', instructorId: 'inst', status: 'published', title: 'pub paid', isPaid: true };
+    lessons['les-pub-approval'] = { courseId: 'lec-pub-approval' };
+    lessons['les-pub-paid'] = { courseId: 'lec-pub-paid' };
+  });
+  it('공개 + 승인 필요 강의 · 승인 enrollment 없음 → 403 APPROVAL_REQUIRED (membership 은 묻지 않는다)', async () => {
+    const { res, passed } = await run(makeReq({ id: 'u-nomember', params: { lessonId: 'les-pub-approval' } }));
+    expect(passed).toBe(false);
+    expect(res.statusCode).toBe(403);
+    expect(res.body.code).toBe('APPROVAL_REQUIRED');
+  });
+  it('공개 + 유료 강의 · enrollment 없음 → 403 ENROLLMENT_REQUIRED', async () => {
+    const { res, passed } = await run(makeReq({ id: 'u-mem', member: true, params: { lessonId: 'les-pub-paid' } }));
+    expect(passed).toBe(false);
+    expect(res.body.code).toBe('ENROLLMENT_REQUIRED');
+  });
+  it('공개 + 무료·승인불필요 강의는 종전대로 통과 (membership 도 불요)', async () => {
+    lessons['les-pub2'] = { courseId: 'lec-pub' };
+    expect((await run(makeReq({ id: 'u-nomember', params: { lessonId: 'les-pub2' } }))).passed).toBe(true);
+  });
+});
+
+describe('9차 P2-10 평가 조회의 소유자 면제도 현재 role + active membership 을 요구한다', () => {
+  const run = async (req: any) => {
+    const res = makeRes();
+    let passed = false;
+    await requireEnrollment({ checkLesson: true, allowCourseOwner: true })(req, res, (() => { passed = true; }) as any);
+    return { res, passed };
+  };
+  beforeEach(() => {
+    courses['lec-paid'] = { id: 'lec-paid', serviceKey: 'lecture', visibility: 'members', instructorId: 'inst', status: 'published', title: 'paid', isPaid: true };
+    lessons['les-paid'] = { courseId: 'lec-paid' };
+  });
+  it('강사 role 이 회수된 소유자(membership active) → 면제 없음 · 403 ENROLLMENT_REQUIRED', async () => {
+    const { res, passed } = await run(makeReq({ id: 'inst', roles: [], member: true, params: { lessonId: 'les-paid' } }));
+    expect(passed).toBe(false);
+    expect(res.body.code).toBe('ENROLLMENT_REQUIRED');
+  });
+  it('membership 이 없는 소유 강사 → 면제 없음 · 403 MEMBERSHIP_NOT_FOUND', async () => {
+    const { res, passed } = await run(makeReq({ id: 'inst', roles: ['lecture:instructor'], params: { lessonId: 'les-paid' } }));
+    expect(passed).toBe(false);
+    expect(res.body.code).toBe('MEMBERSHIP_NOT_FOUND');
+  });
+  it('membership 없는 stale lecture:admin → 면제 없음', async () => {
+    expect((await run(makeReq({ id: 'adm', roles: ['lecture:admin'], params: { lessonId: 'les-paid' } }))).passed).toBe(false);
+  });
+  it('platform:super_admin break-glass 는 통과', async () => {
+    expect((await run(makeReq({ id: 'sa', roles: ['platform:super_admin'], params: { lessonId: 'les-paid' } }))).passed).toBe(true);
   });
 });
 

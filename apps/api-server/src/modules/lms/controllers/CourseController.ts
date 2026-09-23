@@ -8,6 +8,7 @@ import {
   hasLectureAdminRole,
   hasLectureOperatorRole,
   isActiveLectureLearner,
+  hasLectureInstructorRole,
   isLectureCourse,
   isPlatformSuperAdmin,
   resolveLectureMembershipStatus,
@@ -42,6 +43,9 @@ import {
  * 8차 재검토(Codex):
  * - P2-9 게시 전 강의 예외는 role·소유권만으로 주지 않는다 — 현재 active Lecture membership 을
  *   함께 요구한다(정지·해지된 강사, stale operator/admin role 은 통과하지 못한다).
+ * 9차 재검토(Codex):
+ * - P2-11 그 예외의 소유자 축은 `instructorId` 일치 + 현재 `lecture:instructor` 다
+ *   (role 회수 후 membership 만 남은 사용자는 과거 자기 초안도 열지 못한다).
  */
 export class CourseController extends BaseController {
   private static isOwnerOrAdmin(req: Request, userId: string, courseInstructorId: string): boolean {
@@ -61,9 +65,11 @@ export class CourseController extends BaseController {
     const userId = (req as any).user?.id;
     if (!userId) return false;
     if (isPlatformSuperAdmin(req)) return true;
-    const isOwner = courseInstructorId === userId;
+    // 9차 P2-11: 소유권만으로는 부족하다 — 현재 `lecture:instructor` 를 함께 요구한다.
+    // (강사 role 이 회수되어도 일반 membership 만 남으면 과거 자기 강의 초안이 계속 열리던 경로.)
+    const isOwningInstructor = courseInstructorId === userId && hasLectureInstructorRole(req);
     const isLectureStaff = hasLectureOperatorRole(req) || hasLectureAdminRole(req);
-    if (!isOwner && !isLectureStaff) return false;
+    if (!isOwningInstructor && !isLectureStaff) return false;
     return (await resolveLectureMembershipStatus(req)) === 'active';
   }
 
