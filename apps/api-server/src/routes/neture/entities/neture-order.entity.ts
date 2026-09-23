@@ -184,6 +184,10 @@ export class NetureOrder {
    *       collectionMethod?: 'invoice'|'operator_confirmed'|'manual_bank_transfer',
    *       collectionConfirmedAt?: string, collectionConfirmedBy?: string,
    *     }
+   *   **[SUPERSEDED WO-O4O-SUPPLIER-ORDER-PAYMENT-FULFILLMENT-SETTLEMENT-CANONICALIZATION-V1]** 아래 collectionStatus readiness 계약은 더 이상 runtime 에서
+   *   적용되지 않는다. 확정 사업정책: 모든 실제 전자상거래 주문은 payment-first 이며
+   *   후불·외상·인보이스·미결제 배송은 존재하지 않는다. metadata 필드는 과거 기록 보존을
+   *   위해 물리 삭제하지 않지만, fulfillment/settlement 판정에는 쓰지 않는다.
    *   collectionStatus='confirmed' 는 fulfillment(getFulfillmentReadiness)·settlement(calculateSettlements)
    *   guard 가 readiness 로 인정한다(paymentStatus='paid' 와 OR). 계약/헬퍼: `services/order-collection-status.ts`.
    */

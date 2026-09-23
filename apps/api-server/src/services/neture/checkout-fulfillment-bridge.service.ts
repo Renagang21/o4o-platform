@@ -50,6 +50,13 @@ const BRIDGE_SOURCES: Record<string, BridgeSourceDescriptor> = {
   //   등록하지 않으면 주문은 생성되고 결제까지 되지만 공급자에게 영원히 보이지 않는다
   //   (UNSUPPORTED_SOURCE 로 조용히 skip). 서비스 스코프는 metadata.serviceKey 가 담당한다.
   store_b2b_cart: { sourceService: 'store-b2b' },
+  // WO-O4O-SUPPLIER-ORDER-PAYMENT-FULFILLMENT-SETTLEMENT-CANONICALIZATION-V1 §2-C:
+  //   Event Offer(특가) cart checkout 이 심는 source. Event Offer 는 별도 주문/결제 시스템이
+  //   아니라 "특가 판매" 일 뿐이므로 같은 bridge 를 탄다. 등록 전에는 결제까지 되고도
+  //   UNSUPPORTED_SOURCE 로 skip 되어 공급자에게 영원히 보이지 않았다.
+  //   census(§1.1): metadata.source='store_cart_checkout' 를 심는 곳은
+  //   event-offer-cart-checkout.service.ts 한 곳뿐이다(다른 곳의 동명 문자열은 canonicalAction 로그 라벨).
+  store_cart_checkout: { sourceService: 'store-b2b' },
 };
 
 export interface BridgeResult {

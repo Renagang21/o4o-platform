@@ -19,6 +19,7 @@
 import type { ReactNode } from 'react';
 import { Loader2, ShoppingCart, Trash2, CheckCircle2, AlertTriangle } from 'lucide-react';
 import type { UseStoreCartResult } from './useStoreCart';
+import type { CheckoutConfirmResult } from './storeCartTypes';
 
 export type StoreCartAccent = 'pink' | 'teal' | 'violet';
 
@@ -33,6 +34,14 @@ export interface StoreCartViewProps {
   empty?: ReactNode;
   /** 최외곽 container class (폭·여백 차이) */
   containerClassName?: string;
+  /**
+   * WO-O4O-SUPPLIER-ORDER-PAYMENT-FULFILLMENT-SETTLEMENT-CANONICALIZATION-V1 §2-E-4:
+   *   주문 확정 직후 노출할 **결제 액션** slot (optional · additive).
+   *   payment-first 이므로 확정된 checkout_order 는 결제 전까지 공급자에게 전달되지 않는다.
+   *   주지 않으면 기존 동작 그대로(무회귀) — 결제 단계가 없는 서비스는 생략한다.
+   *   결제 UX 는 서비스가 소유한다(Event Offer 전용 UX 를 만들지 않는다 — 같은 slot 을 쓴다).
+   */
+  renderPaymentAction?: (result: CheckoutConfirmResult) => ReactNode;
 }
 
 // accent 별 정적 Tailwind class 맵 (동적 class 구성 금지).
@@ -63,6 +72,7 @@ export function StoreCartView({
   header,
   empty,
   containerClassName = 'space-y-6',
+  renderPaymentAction,
 }: StoreCartViewProps) {
   const ac = ACCENT_CLASSES[accent];
   const {
@@ -113,6 +123,10 @@ export function StoreCartView({
                 </div>
               ))}
             </div>
+          )}
+          {/* WO-O4O-SUPPLIER-ORDER-PAYMENT-FULFILLMENT-SETTLEMENT-CANONICALIZATION-V1 §2-E-4: 결제 액션(서비스 소유 · optional) */}
+          {renderPaymentAction && confirmResult.createdOrders.length > 0 && (
+            <div className="pt-1">{renderPaymentAction(confirmResult)}</div>
           )}
           {confirmResult.failedItems.length > 0 && (
             <div>

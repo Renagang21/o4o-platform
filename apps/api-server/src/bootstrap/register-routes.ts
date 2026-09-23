@@ -825,6 +825,16 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
       );
       initializeNetureB2bCheckoutPaymentHandler(dataSource);
       logger.info('✅ NetureB2bCheckoutPaymentEventHandler initialized');
+
+      // WO-O4O-SUPPLIER-ORDER-PAYMENT-FULFILLMENT-SETTLEMENT-CANONICALIZATION-V1 §2-E-3:
+      //   승인축 B2B(store_b2b_cart) + Event Offer 특가(store_cart_checkout) 공통 핸들러.
+      //   payment.completed(serviceKey='store-b2b') → checkout_order paid → FulfillmentBridge.
+      //   등록 전에는 결제를 해도 paid 전이를 할 주체가 없어 공급자에게 전달되지 않았다.
+      const { initializeStoreB2bCheckoutPaymentHandler } = await import(
+        '../services/payment/b2b/StoreB2bCheckoutPaymentEventHandler.js'
+      );
+      initializeStoreB2bCheckoutPaymentHandler(dataSource);
+      logger.info('✅ StoreB2bCheckoutPaymentEventHandler initialized (serviceKey=store-b2b)');
     } catch (netureError) {
       logger.error('Failed to register Neture routes:', netureError);
     }
