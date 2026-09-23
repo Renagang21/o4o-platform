@@ -1,7 +1,7 @@
 # WO-O4O-SUPPLIER-ORDER-PAYMENT-FULFILLMENT-SETTLEMENT-CANONICALIZATION-V1
 
-> **상태:** READY FOR EXECUTION · HANDOFF ONLY · 구현 WO (등록일 2026-09-23 · 실행 착수는 별도 명시 지시)
-> **기준 코드:** Delta 검증 시점 `origin/main` `bfb05c5f2`. **실행은 항상 최신 `origin/main` 에서 시작**하며 과거 커밋으로 reset/rebase 하지 않는다
+> **상태:** READY FOR EXECUTION · HANDOFF ONLY · 구현 WO (등록일 2026-09-23 · **보강 2026-09-23**: 결제 진입(prepare/confirm) + 결제 UI 를 구현 범위로 승격 · 중지 조건 B 교체 · Inventory 기존 원자 경계 보존 · 실행 착수는 별도 명시 지시)
+> **기준 코드:** Delta 검증 `bfb05c5f2` · 보강 검증 `3c7083be5`. **실행은 항상 최신 `origin/main` 에서 시작**하며 과거 커밋으로 reset/rebase 하지 않는다
 > **선행 조사:** [`IR-O4O-SUPPLIER-DOMAIN-FULL-ARCHITECTURE-AND-REMAINING-REFACTOR-CENSUS-V1`](../investigations/IR-O4O-SUPPLIER-DOMAIN-FULL-ARCHITECTURE-AND-REMAINING-REFACTOR-CENSUS-V1.md) — **§5 R1 의 "bridge 가 없다" 는 표현은 이 WO 가 정정한다**(§1.2). 별도 IR 을 새로 만들지 않고 이 WO 의 Delta 검증(§1)이 대체한다
 > **기준 문서:** [`O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1`](../baseline/O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1.md)(§5-1 정정 대상) · [`O4O-STORE-COMMERCE-BOUNDARY-V1`](../baseline/O4O-STORE-COMMERCE-BOUNDARY-V1.md) · `CLAUDE.md` §4
 > **한 문장:** **매장이 주문하고 결제하면 공급자에게 전달된다. 공급자는 직접 상품을 배송하고 O4O 에는 처리·배송 상태를 기록한다. 배송 완료 후 정산한다. Event Offer 는 단순한 특가 판매일 뿐이다.**
@@ -23,6 +23,9 @@ Event Offer = 특가. 그 이상도 이하도 아니다.
   참여 신청 · 구매 의향 · 예약 · 약정 · 참가자 모집 · 펀딩 · 참여 후 주문전환 = 존재하지 않는다
 
 배송 실행 주체 = Supplier. O4O 는 배송을 수행하지 않는다.
+
+결제는 기존 PaymentCore + Toss adapter 재사용. 서비스별 새 payment engine/table/PG/상태머신 금지.
+매장이 실제로 결제를 시작·완료할 수 있는 frontend flow 까지 이 WO 의 책임이다.
 ```
 
 **OUT_OF_SCOPE (어떤 경우에도 이 WO 가 여기로 확대되지 않는다):** 택배사 API 연동 · 택배사 자동 전송 · 집하 요청 · 배송기사 호출 · 자동 배차 · 운송장 자동 발급 · 택배사 자동 선택 · 배송/물류 대행 · 3PL · 배송비의 택배사 정산.
@@ -46,6 +49,21 @@ Event Offer = 특가. 그 이상도 이하도 아니다.
 > "등록하지 않으면 주문은 생성되고 결제까지 되지만 **공급자에게 영원히 보이지 않는다**(`UNSUPPORTED_SOURCE` 로 조용히 skip)."
 
 Event Offer 는 `store_cart_checkout` 을 쓰므로 정확히 이 상태다.
+
+## 1.1-A 보강 Delta — 결제 진입점 실측 (`3c7083be5`)
+
+| 서비스 | payment prepare/confirm 진입점 | 상태 |
+|---|---|---|
+| Neture B2B | `POST /api/v1/neture/b2b/payments/prepare` · `/confirm` (`neture-b2b-payment.controller.ts` · `PaymentCoreService` · `paymentGroupId` 다중공급자 지원) | ✅ 동작 |
+| Pharmacy-Hub | `/store-owner/payments/{prepare,confirm}` (`PharmacyHubPaymentController` · 같은 PaymentCore) | ✅ 동작 |
+| **KPA** | `routes/kpa/controllers/kpa-payment.controller.ts` — `POST /prepare` · `/confirm` · `GET /order/:orderId` 가 **전부 410 Gone** | ❌ 은퇴됨 |
+| **K-Cosmetics** | `routes/cosmetics/controllers/cosmetics-payment.controller.ts` — 동일하게 **410 Gone** | ❌ 은퇴됨 |
+
+**⚠️ 은퇴 사유를 반드시 구분한다.** 두 controller 가 410 이 된 것은 `WO-O4O-STORE-SALE-CHECKOUT-ROUTE-DEPRECATION-V1` 의 **소비자 매장 판매(store sale) 결제 은퇴** 때문이다. 즉 은퇴된 것은 **소비자 → 매장** commerce 결제이고, 이 WO 가 필요로 하는 것은 **매장 → 공급자 B2B** 결제로 **성격이 다른 축**이다.
+
+> **함정:** 기존 `/api/v1/kpa/payments/*` · `/api/v1/cosmetics/payments/*` 경로를 되살리면 **소비자 commerce 복구로 오인되거나 실제로 그 경계를 침범**한다([`O4O-STORE-COMMERCE-BOUNDARY-V1`](../baseline/O4O-STORE-COMMERCE-BOUNDARY-V1.md) · §7 금지 목록). **410 경로는 그대로 둔다.** 신규 B2B 결제 진입은 Neture 선례(`/neture/b2b/payments/*`)를 따라 **B2B 전용 네임스페이스**(예: `/kpa/b2b/payments/*` · `/cosmetics/b2b/payments/*`, 또는 §2-E-2 의 공통 B2B 경로)로 만든다.
+
+**프런트 결제 소비처 실측:** `netureB2bPayments.ts`(web-neture) · `pharmacyHubOrders.ts`(web-pharmacy-hub · web-store) **2축뿐**. KPA/K-Cosmetics 매장 화면에는 결제 호출 코드가 없다(`web-kpa-society` 는 `eventOffer.ts` · `StoreOrderWorktablePage` · `worktableCart` 까지만). → **backend handler 만 추가해서는 `payment.completed` 가 영원히 발생하지 않는다.**
 
 ## 1.2 선행 IR §5 R1 정정
 
@@ -97,11 +115,11 @@ IR 의 나머지 관찰(`neture_orders` 0건 · 공급자 처리/정산 코드�
 
 | 시점 | 현재 |
 |---|---|
-| reserve | `routes/neture/services/neture.service.ts:526` — **legacy neture_order 직접 생성 경로**에서 `trackInventory` 인 offer 에 `reserved_quantity += qty` |
-| cart add / checkout confirm / payment / bridge | reserve **없음** |
-| release(취소·결제실패) | 코드 경로 **확인 실패 — 착수 시 재확인 필요**(§2-I) |
+| 축 ①: `supplier_product_offers.reserved_quantity` | `routes/neture/services/neture.service.ts:526` — **legacy neture_order 직접 생성 경로**에서 `trackInventory` 인 offer 에 `reserved_quantity += qty`. cart add / checkout confirm / payment / bridge 에는 **없음** |
+| 축 ②: `organization_product_listings.total_quantity` (**Event Offer 한정수량**) | `event-offer.service.ts:759 reserveEventOfferListing()` — **checkout-confirm 시점에 `SELECT … FOR UPDATE` 로 listing 을 잠그고 `total_quantity` 를 원자 차감**. `per_order_limit` · `SOLD_OUT` · `INSUFFICIENT_QUANTITY` 검증 포함. 그룹 1트랜잭션(reserve→commit→createOrder · 트랜잭션 내 실패 시 보상 차감) |
+| release(결제 실패·취소·timeout) | **트랜잭션 내 실패 보상은 있으나, 결제가 나중에 실패/만료됐을 때의 release 경로는 확인되지 않음 — 착수 시 census 필수**(§2-I) |
 
-즉 **payment-first 경로(checkout → bridge)에는 재고 예약이 전혀 없고**, 예약은 legacy 직접 주문 경로에만 있다. 중복 차감 위험은 현재 없으나(경로가 하나뿐) **payment-first 축에 예약 기준점이 없다**는 것이 Delta다.
+**정정:** "payment-first 축에 재고 예약이 전혀 없다" 는 부정확했다. **Event Offer 는 이미 checkout-confirm 에서 한정수량을 원자적으로 확보**하고 있으며, 이것이 oversell 방지 장치다. 실제 Delta 는 (a) 두 재고 축이 서로 다른 테이블이고 (b) **결제 실패/취소 시 축 ② 의 차감을 되돌리는 경로가 불명확**하다는 점이다.
 
 ## 1.8 Settlement
 
@@ -123,6 +141,8 @@ IR 의 나머지 관찰(`neture_orders` 0건 · 공급자 처리/정산 코드�
 
 # 2. 구현 범위 A~M (한 묶음 · 작은 WO 로 나누지 않는다)
 
+> **보강 후 무게중심:** §E 가 이 WO 의 핵심이다 — 승인축 B2B 와 Event Offer 는 **결제 진입점(prepare/confirm)과 결제 UI 가 아예 없으므로**, backend 연결만으로는 첫 실주문이 성립하지 않는다. 결제 개시부터 정산까지 한 흐름으로 닫는다.
+
 ## A. 주문 producer / payment matrix 정렬
 - §1.1 표의 5 producer 를 착수 시 재확인(특히 **`glycopharm-event-offer` 4건의 출처**). `UNKNOWN` 0 유지.
 - 모든 producer 가 `checkout_orders` 로 수렴함을 source-contract 테스트로 고정. 신규 `*_orders` 0.
@@ -131,19 +151,77 @@ IR 의 나머지 관찰(`neture_orders` 0건 · 공급자 처리/정산 코드�
 - 참여/예약/의향/모집/펀딩 개념의 runtime **0** 임을 census 로 재확인하고 테스트로 고정(§14 `Event Offer 참여형 runtime = 0`).
 - UI 문구가 "참여/신청" 어휘를 쓰면 "구매/주문" 으로 정정(기능 변경 아님).
 
-## C. Event Offer payment-first 연결
-- `EventOfferCartCheckoutService` 의 `metadata.source` 를 bridge 가 인식하도록 한다. **두 선택지 중 실행자가 택하고 CHECK 에 근거 기록**:
+## C. Event Offer payment-first 연결 (bridge source)
+
+- `EventOfferCartCheckoutService` 의 `metadata.source='store_cart_checkout'` 을 bridge 가 인식하게 한다. **두 선택지 중 실행자가 택하고 CHECK 에 근거 기록**:
   - (C-1) `BRIDGE_SOURCES` 에 `store_cart_checkout` 추가 — 최소 변경. 단 이 tag 가 event offer 외 항목에도 쓰이는지 먼저 census.
-  - (C-2) Event Offer 전용 tag(`event_offer_cart`)로 바꾸고 registry 등록 — 의미가 명확하나 기존 주문 metadata 와 불일치 발생(기존 10건은 전부 cancelled 이므로 영향 0).
+  - (C-2) Event Offer 전용 tag(`event_offer_cart`)로 바꾸고 registry 등록 — 의미가 명확하나 기존 주문 metadata 와 불일치(기존 10건은 전부 cancelled 이므로 영향 0).
 - 어느 쪽이든 **기존 tag 3개는 건드리지 않는다**(무회귀).
+- **Event Offer 전용 결제 UX 를 만들지 않는다.** 특가 상품일 뿐이므로 일반 B2B cart/payment 흐름을 그대로 쓴다(§E).
 
 ## D. payment completed → paid 전이 통일
-- §1.4 결과 유지(서비스 컨트롤러 직접 paid 0). **추가 작업은 승인축/Event Offer 용 payment event handler 연결**(§E 와 한 몸).
-- Payment Core 재사용 — **금지: Event Offer 전용 결제 엔진 · 서비스별 새 payment table · 서비스별 새 결제 상태머신.** 서비스별 thin adapter 만 허용.
 
-## E. paid → FulfillmentBridge 전 producer 연결
-- 승인축 B2B(`store_b2b_cart`)와 Event Offer 가 결제 완료 시 bridge 를 타도록 handler 를 연결한다. 기존 두 handler(`NetureB2bCheckoutPaymentEventHandler` · `PharmacyHubPaymentEventHandler`)의 구조를 복제하지 말고 **공통화 가능한지 먼저 검토**(공통 handler + serviceKey 라우팅이 최소안이면 그것으로).
-- 불변식: `paid checkout_order → eventually exactly one neture_order`. 기존 `metadata.checkoutOrderId` dedup 계약 재사용.
+- §1.4 결과 유지 — 서비스 컨트롤러가 직접 `paid` 를 만드는 경로는 **0** 이며 그대로 둔다. 결제 완료 event 만이 `paid` 전이를 만든다(계약 B1).
+- 추가 작업은 §E 의 신규 결제 진입 + handler 연결이다.
+
+## E. **승인축 B2B · Event Offer 결제 진입 구현** (이 WO 의 핵심 · 보강으로 승격)
+
+§1.1-A 실측: KPA·K-Cosmetics 에는 `prepare/confirm` 진입점이 **410(은퇴)** 이고 프런트 결제 호출 코드도 없다. **handler 만 추가하면 아무 이벤트도 발생하지 않는다.** 따라서 이 WO 가 결제 진입까지 책임진다.
+
+목표 흐름(승인축 B2B · Event Offer 공통):
+
+```text
+Store Cart → checkout_orders(pending)
+  → 결제 화면 → PaymentCore.prepare → 기존 PG(Toss) → PaymentCore.confirm
+  → payment.completed → checkout_order paid
+  → CheckoutFulfillmentBridgeService → neture_order → Supplier 처리
+```
+
+### E-1 재사용 원칙 (강제)
+
+```text
+재사용: @o4o/payment-core PaymentCoreService(prepare/confirm/cancel/refund) + TossPaymentProviderAdapter
+금지:   Event Offer 전용 payment engine · 서비스별 새 payment table · 새 PG · 새 payment state machine
+허용:   서비스별 thin adapter / thin wrapper route
+```
+
+`Neture B2B`(`neture-b2b-payment.controller.ts`)와 `Pharmacy-Hub`(`PharmacyHubPaymentController`)의 기존 flow 는 **회귀 기준**이며 의미를 변경하지 않는다.
+
+### E-2 공통 B2B payment 계약 (권장 · 거대 framework 금지)
+
+승인축 B2B 와 Event Offer 가 **같은 계약**을 쓰도록 한다. Neture B2B 의 입력 축(`orderId` XOR `paymentGroupId` · `successUrl`/`failUrl` · buyer ownership 검증)을 그대로 따른다.
+
+```text
+checkoutOrderId / paymentGroupId + buyer ownership + serviceKey
+        ↓
+B2B Payment Core Adapter (공통 · 얇게)
+        ↓
+PaymentCoreService.prepare / confirm
+        ↓
+payment.completed  → checkout_order paid → FulfillmentBridge
+```
+
+- 공통화 범위는 **controller/service 계약 수준**까지다. 새 프레임워크·새 추상 계층을 만들지 않는다.
+- 서비스별로 route 가 필요하면 thin wrapper 만 둔다.
+- **경로 함정(§1.1-A):** 기존 `/api/v1/kpa/payments/*` · `/api/v1/cosmetics/payments/*` 의 **410 은 그대로 유지**한다(소비자 commerce 은퇴 상태). 신규 진입은 **B2B 전용 네임스페이스**로 만든다(`/kpa/b2b/payments/*` · `/cosmetics/b2b/payments/*` 또는 공통 경로 1개). 어느 쪽이든 소비자→매장 commerce 를 복구하는 것으로 읽히지 않아야 하며, 그 근거를 CHECK 에 적는다.
+
+### E-3 paid → bridge 연결
+
+- 승인축 B2B(`store_b2b_cart`)와 Event Offer(§C tag)가 결제 완료 시 bridge 를 타도록 handler 를 연결한다.
+- 기존 두 handler 를 복제하지 말고 **공통 handler + serviceKey 라우팅**이 최소안인지 먼저 검토한다.
+- 불변식: `paid checkout_order → eventually exactly one neture_order`. 기존 `metadata.checkoutOrderId` dedup 재사용.
+
+### E-4 **결제 UI (frontend) — 같은 WO 범위**
+
+매장 사용자가 실제로 결제를 시작·완료할 수 있어야 한다. KPA · K-Cosmetics 의 cart/checkout 화면에서:
+
+```text
+결제 버튼 → prepare 호출 → PG 결제창 → confirm 호출 → 성공/실패 화면
+```
+
+- 기존 프런트 선례(`services/web-neture/src/lib/api/netureB2bPayments.ts` · pharmacy-hub `pharmacyHubOrders.ts`)의 호출 패턴을 재사용한다. 공통 PaymentWidget 이 없으므로 **새 공통 위젯을 신설하지 않고** 각 서비스에 얇은 api client + 최소 화면 연결로 끝낸다(필요 최소).
+- Event Offer 는 **별도 결제 UX 없음** — 같은 cart/결제 화면을 탄다.
+- 착수 시 KPA/K-Cos 매장 cart·checkout 화면의 현재 진입점(`StoreOrderWorktablePage` · `worktableCart` 등)을 census 해 어디에 결제 단계를 붙일지 확정한다.
 
 ## F. bridge retry / recovery / reconciliation
 - 현재 Pharmacy-Hub 에만 있는 operator recovery 를 **전 producer 로 일반화**한다. 우선순위: ① idempotent retry ② operator recovery ③ 낮은 빈도 reconciliation.
@@ -160,10 +238,29 @@ IR 의 나머지 관찰(`neture_orders` 0건 · 공급자 처리/정산 코드�
 - `carrier` · `trackingNumber` 는 **공급자 수동 입력 참고정보**로 보존. 택배사 validation · 송장 조회 · 배송 추적 API **붙이지 않는다**.
 - **source-contract 테스트로 `external carrier API call = 0` 고정**(shipment service/controller 에 http client · carrier 도메인 문자열 0).
 
-## I. inventory reserve / release 정렬
-- §1.7 Delta: payment-first 축에 예약 지점이 없다. **reserve 기준점을 하나로 확정**한다(권장: 결제 완료/bridge 시점 1회 — checkout confirm 과 bridge 양쪽 reserve 금지).
-- release 경로(취소 · 결제 실패)를 착수 시 census 하고, 없으면 이 WO 범위에서 추가한다(불일치가 생기는 부분은 §28 상 범위 내).
-- 불변식: **중복 차감 0** · 취소/결제실패 시 예약 해제.
+## I. inventory reserve / release 정렬 — **기존 원자 경계 보존**
+
+> **무조건 "bridge 시점 reserve" 로 바꾸지 않는다.** §1.7 실측대로 Event Offer 는 이미 checkout-confirm 에서 `organization_product_listings` 를 `FOR UPDATE` 로 잠그고 `total_quantity` 를 원자 차감한다. 이것이 **한정수량 oversell 방지 장치**이므로 **보존**한다.
+
+착수 시 최신 main 에서 기존 원자 확보 로직(`reserveEventOfferListing` · `b2b-checkout-confirm.core` · legacy `neture.service.ts:526`)을 먼저 census 하고, 아래 경계를 **유지·정렬**한다:
+
+```text
+장바구니 담기          → 재고 차감 X
+주문/결제 세션 확정     → 필요하면 reservation (Event Offer 는 현행 원자 차감 유지)
+결제 성공              → reservation 을 실제 판매수량으로 확정
+결제 실패/취소/timeout → reservation release
+```
+
+불변식:
+
+| # | 내용 |
+|---|---|
+| I-1 | cart add 에서 차감 0 |
+| I-2 | 동일 주문에 reserve/consume **중복 0** (checkout-confirm 과 bridge 양쪽 reserve 금지) |
+| I-3 | 결제 실패·취소·timeout 시 **release** — §1.7 에서 이 경로가 불명확하므로 census 후 없으면 이 WO 범위에서 추가 |
+| I-4 | 결제 성공 후 실제 판매수량 일관성 유지 |
+| I-5 | **Event Offer 한정수량 oversell 방지** (현행 `FOR UPDATE` 원자성 훼손 금지) |
+| I-6 | 두 재고 축(`supplier_product_offers.reserved_quantity` · `organization_product_listings.total_quantity`)의 역할을 CHECK 에 표로 명시 |
 
 ## J. settlement eligibility / owner 정렬
 ```text
@@ -221,9 +318,14 @@ PAID  checkout → bridge 1회 · neture_order exactly 1
 같은 payment event 재수신 → neture_order 중복 0 (metadata.checkoutOrderId dedup)
 bridge 실패 → recovery 가능 (전 producer)
 
+[실제 payment initiation — 보강]
+KPA B2B      : cart → checkout → prepare → (PG) → confirm → paid → bridge → Supplier 노출
+KPA 특가     : 동일 경로 (Event Offer 전용 결제 UX 없음)
+K-Cosmetics B2B / 특가 : 동일
+payment confirm 없이 → bridge 0 · supplier fulfillment 0
+결제 진입 route 가 소비자 commerce 경로(/kpa/payments · /cosmetics/payments)를 되살리지 않음 = 410 유지 (source-contract)
+
 [Event Offer]
-KPA 특가 → cart → checkout → payment → paid → bridge → Supplier 처리
-K-Cosmetics 특가 → 동일
 Event Offer 참여/예약/구매의향 runtime = 0   (source-contract)
 
 [기존 축 무회귀]
@@ -258,7 +360,9 @@ reservation duplicate = 0 · cancel/payment failure → reservation release
 
 ```text
 택배사/물류사 API · 자동 송장 · 집하 · 배송대행 · 3PL
-새 payment engine · 새 settlement engine · 새 *_orders 테이블
+새 payment engine · 새 settlement engine · 새 *_orders 테이블 · 새 PG · 서비스별 새 payment table/상태머신
+Event Offer 전용 결제 UX · 새 공통 PaymentWidget framework
+기존 /kpa/payments · /cosmetics/payments 410 경로 부활 (소비자 commerce 복구 금지)
 checkout_orders 폐기 · neture_orders 를 Order SSOT 로 승격
 후불 · 외상 · invoice · 미결제 배송
 Event Offer 참여신청/구매의향/예약/펀딩
@@ -275,7 +379,7 @@ DB migration · 새 schema
 | # | 조건 |
 |---|---|
 | A | Event Offer 의 `store_cart_checkout` tag 가 event offer 외 항목에도 쓰여 registry 추가가 다른 축에 영향 |
-| B | 승인축/Event Offer 결제 완료 event 를 발행하는 **producer 자체가 없어** handler 연결만으로 paid 전이가 성립하지 않음 (= 결제 UI/PG 연동이 선행 필요) |
+| B | **(교체됨)** 결제 producer 부재는 STOP 사유가 아니라 **이 WO 의 구현 대상**이다(§2-E · §1.1-A 에서 확인된 사실). STOP 은 **기존 PaymentCore/Toss infrastructure 로 승인축·Event Offer 결제를 안전하게 연결할 수 없고, 새 PG · 새 payment engine · DB migration 이 반드시 필요할 때만** 발동한다 |
 | C | `collectionStatus` 제거가 현재 운영 중인 주문의 fulfillment/settlement 를 실제로 막음(실데이터 확인) |
 | D | 재고 예약 기준점 변경이 기존 legacy 주문 경로와 이중 차감을 만듦 |
 | E | `SupplierUnifiedOrderService` 삭제가 프런트 소비처를 깨뜨림 |
@@ -289,7 +393,7 @@ DB migration · 새 schema
 
 1. 실제 Supplier 주문 producer 는 몇 종류인가 · 2. 모두 `checkout_orders` 로 수렴하는가 · 3. 모두 payment-first 인가 · 4. Event Offer 의 무결제/참여형 잔재는 정확히 무엇이었나 · 5. 기존 bridge caller 는 어디인가 · 6. paid 인데 bridge 되지 않을 수 있는 경로는 · 7. recovery 를 어떻게 통일했나 · 8. Supplier 직접 배송 UI/API 는 무엇인가 · 9. `neture_shipments` 가 단순 기록 범위를 넘는가 · 10. inventory reserve/release 는 어디서 이뤄지는가 · 11. settlement 대상 서비스는 · 12. `collectionStatus` 를 어떻게 처분했나 · 13. `SupplierUnifiedOrderService` 를 유지했나 · 14. DB/migration 이 필요했나 · 15. canonical 문서를 어떻게 정정했나
 
-추가 필수: §3 owner matrix 실측 · §4 취소/환불 계약표 · 중지 조건 A~H 발동 여부 · 문서 정합 · commit hash · `HEAD == origin/main`.
+추가 필수: 승인축/Event Offer 결제 진입 최종 경로(소비자 commerce 410 유지 증명 포함) · 결제 UI 연결 지점 · 두 재고 축 역할표 · §3 owner matrix 실측 · §4 취소/환불 계약표 · 중지 조건 A~H 발동 여부 · 문서 정합 · commit hash · `HEAD == origin/main`.
 
 ---
 
