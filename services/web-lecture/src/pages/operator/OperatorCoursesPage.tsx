@@ -7,7 +7,6 @@ import { Link } from 'react-router-dom';
 import { CourseStatusBadge, LmsEmptyState, LmsLoading } from '@o4o/lms-ui';
 import { operatorApi, errorMessage, type CourseStatus, type LectureCourse } from '../../api/lecture';
 import { useToast } from '../../components/Toast';
-import { coursePath } from '../../lib/lmsViewAdapter';
 
 const STATUS_FILTERS: { key: '' | CourseStatus; label: string }[] = [
   { key: '', label: '전체' }, { key: 'pending_review', label: '검토 대기' }, { key: 'published', label: '게시 중' },
@@ -59,7 +58,7 @@ export default function OperatorCoursesPage() {
     {!loading && !error && items.length === 0 && <LmsEmptyState title="해당 상태의 강의가 없습니다" />}
     <ul className="list">
       {items.map((c) => <li key={c.id} className="list-item">
-        <div className="list-main"><Link className="list-title" to={coursePath(c.id)}>{c.title}</Link><CourseStatusBadge status={c.status} /></div>
+        <div className="list-main"><Link className="list-title" to={`/operator/courses/${c.id}/review`}>{c.title}</Link><CourseStatusBadge status={c.status} /></div>
         <div className="list-meta muted">강사 {c.instructorName ?? c.instructor?.name ?? c.instructorId} · 레슨 {c.lessonCount ?? 0} · 수강 {c.currentEnrollments ?? c.enrollmentCount ?? 0} · {c.visibility === 'members' ? '회원 전용' : '공개'}{c.rejectionReason ? ` · 반려 사유: ${c.rejectionReason}` : ''}</div>
         <div className="list-actions">
           {c.status === 'pending_review' && <>

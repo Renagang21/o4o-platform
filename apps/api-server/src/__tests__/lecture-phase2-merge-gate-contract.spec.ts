@@ -111,9 +111,10 @@ import { QuizController } from '../modules/lms/controllers/QuizController.js';
 import { CourseService, pickUpdatableCourseFields, UPDATABLE_COURSE_FIELDS } from '../modules/lms/services/CourseService.js';
 import { QuizService } from '../modules/lms/services/QuizService.js';
 import { LessonController } from '../modules/lms/controllers/LessonController.js';
-import { LessonService } from '../modules/lms/services/LessonService.js';
+import { LessonService, pickUpdatableLessonFields } from '../modules/lms/services/LessonService.js';
+import { requireLectureOperator } from '../modules/lms/middleware/lecture-access.js';
 import { CertificateController } from '../modules/lms/controllers/CertificateController.js';
-import { CertificateService } from '../modules/lms/services/CertificateService.js';
+import { CertificateService, pickUpdatableCertificateFields } from '../modules/lms/services/CertificateService.js';
 import { AssignmentController } from '../modules/lms/controllers/AssignmentController.js';
 import { InstructorController } from '../modules/lms/controllers/InstructorController.js';
 import { requireEnrollment } from '../modules/lms/middleware/requireEnrollment.js';
@@ -138,6 +139,8 @@ let assignmentWrites: string[] = [];
 const assignmentSvc: any = {
   upsertAssignment: async (d: any) => { assignmentWrites.push(d.lessonId); return { id: 'as', ...d }; },
   listSubmissionsForLesson: async () => [],
+  // 11차 P2: 운영자 검토 화면은 과제 "존재 여부"만 읽는다 (write 0)
+  getAssignmentByLesson: async (lessonId: string) => (lessonId === 'les-pub' ? { id: 'as-1', lessonId } : null),
 };
 
 type CourseRow = { id: string; serviceKey: string | null; visibility: string; instructorId: string; status: string; title: string; isPaid?: boolean; tags?: string[] };
@@ -983,6 +986,170 @@ describe('7차 P2-8 lesson quiz/assignment 조회에도 강의 접근 정책', (
   });
 });
 
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 11차 (Codex 8~10차 응답) — allowlist · 운영자 검토 · 초안 비노출
+// ─────────────────────────────────────────────────────────────────────────────
+describe('11차 P1-31 lesson 수정은 allowlist 밖 필드를 반영하지 않는다', () => {
+  it('courseId · id 는 버려지고 지원 필드만 남는다', () => {
+    const picked: any = pickUpdatableLessonFields({
+      title: 'new', courseId: 'lec-mem', id: 'les-x', isPublished: true, instructorId: 'other',
+    });
+    expect(picked).toEqual({ title: 'new', isPublished: true });
+    expect('courseId' in picked).toBe(false);
+  });
+  it('빈 입력·null 도 안전하다', () => {
+    expect(pickUpdatableLessonFields(null)).toEqual({});
+    expect(pickUpdatableLessonFields({ courseId: 'x' })).toEqual({});
+  });
+  it('LessonService.updateLesson 은 raw 입력을 Object.assign 하지 않는다', () => {
+    const svc = read('apps/api-server/src/modules/lms/services/LessonService.ts');
+    expect(svc).toContain('const data = pickUpdatableLessonFields(input);');
+    expect(svc).toContain('async updateLesson(id: string, input: UpdateLessonRequest)');
+  });
+});
+
+describe('11차 P1-32 certificate 수정은 지원 5필드만', () => {
+  it('courseId · userId · id 는 버려진다', () => {
+    const picked: any = pickUpdatableCertificateFields({
+      certificateUrl: 'u', isValid: false, courseId: 'lec-mem', userId: 'other', id: 'cert-x',
+    });
+    expect(picked).toEqual({ certificateUrl: 'u', isValid: false });
+  });
+  it('CertificateService.updateCertificate 는 allowlist 를 거친다', () => {
+    const svc = read('apps/api-server/src/modules/lms/services/CertificateService.ts');
+    expect(svc).toContain('const data = pickUpdatableCertificateFields(input);');
+  });
+});
+
+describe('11차 P2-33 운영자 검토 화면 — 읽기 전용 · enrollment 0', () => {
+  beforeEach(() => {
+    const ls: any = LessonService.getInstance();
+    ls.listLessonsByCourse = jest.fn(async (courseId: string) => ({
+      lessons: courseId === 'lec-pub'
+        ? [{ id: 'les-pub', courseId, title: 'L1', type: 'video', order: 1, isPublished: false, isFree: false, content: { html: 'x' } }]
+        : [],
+      total: courseId === 'lec-pub' ? 1 : 0,
+    }));
+  });
+
+  const call = async (courseId: string) => {
+    const req = makeReq({ id: 'op', roles: ['lecture:operator'], member: true, params: { courseId } });
+    const res = makeRes();
+    await CourseController.operatorCourseReview(req, res);
+    return res;
+  };
+
+  it('lecture 강의는 커리큘럼·평가 존재 여부를 읽기 전용으로 돌려준다', async () => {
+    const res = await call('lec-pub');
+    expect(res.statusCode).toBe(200);
+    expect(res.body.data.readOnly).toBe(true);
+    expect(res.body.data.course.id).toBe('lec-pub');
+    expect(res.body.data.curriculum).toHaveLength(1);
+    const l = res.body.data.curriculum[0];
+    expect(l.content).toEqual({ html: 'x' });       // 내용 확인 가능
+    expect(l.isPublished).toBe(false);              // 초안도 검토자에게는 보인다
+    expect(l.hasAssignment).toBe(true);             // 존재 여부만
+    expect(l.hasQuiz).toBe(false);
+    // 검토 자체로 수강 등록·write 가 일어나지 않는다
+    expect(enrollmentSaves).toEqual([]);
+    expect(lessonWrites).toEqual([]);
+    expect(assignmentWrites).toEqual([]);
+    expect(certMutations).toEqual([]);
+  });
+
+  it('legacy(KPA) 강의는 non-disclosure 404', async () => {
+    const res = await call('kpa-old');
+    expect(res.statusCode).toBe(404);
+  });
+
+  it('serviceKey 가 NULL 인 강의도 404', async () => {
+    const res = await call('null-old');
+    expect(res.statusCode).toBe(404);
+  });
+});
+
+describe('11차 P2-33 운영자 검토 권한 — role 만으로는 열리지 않는다', () => {
+  const guard = async (opts: any) => {
+    const req = makeReq(opts);
+    const res = makeRes();
+    let passed = false;
+    await requireLectureOperator(req, res, (() => { passed = true; }) as any);
+    return { res, passed };
+  };
+
+  it('operator + active membership → 통과', async () => {
+    const { passed } = await guard({ id: 'op', roles: ['lecture:operator'], member: true });
+    expect(passed).toBe(true);
+  });
+  it('lecture:admin + active membership → 통과 (operator ⊂ admin)', async () => {
+    const { passed } = await guard({ id: 'ad', roles: ['lecture:admin'], member: true });
+    expect(passed).toBe(true);
+  });
+  it('일반 학습자(membership 만) → 거부', async () => {
+    const { passed, res } = await guard({ id: 'learner', roles: [], member: true });
+    expect(passed).toBe(false);
+    expect(res.statusCode).toBe(403);
+  });
+  it('강사 role 만 → 거부 (instructor 는 운영자가 아니다)', async () => {
+    const { passed, res } = await guard({ id: 'inst', roles: ['lecture:instructor'], member: true });
+    expect(passed).toBe(false);
+    expect(res.statusCode).toBe(403);
+  });
+  it('operator role 인데 membership 이 없으면 → 거부', async () => {
+    const { passed, res } = await guard({ id: 'op2', roles: ['lecture:operator'], member: false });
+    expect(passed).toBe(false);
+    expect(res.statusCode).toBe(403);
+  });
+});
+
+describe('11차 P2-34 미발행 lesson 은 learner 에게 보이지 않는다', () => {
+  let listArgs: any[] = [];
+  beforeEach(() => {
+    listArgs = [];
+    const ls: any = LessonService.getInstance();
+    ls.listLessonsByCourse = jest.fn(async (courseId: string, filters: any) => {
+      listArgs.push([courseId, filters]);
+      return { lessons: [], total: 0 };
+    });
+    ls.getLesson = jest.fn(async (id: string) =>
+      (lessons[id] ? { id, courseId: lessons[id].courseId, title: 't', isPublished: id !== 'les-draft' } : null));
+    lessons['les-draft'] = { courseId: 'lec-pub' };
+  });
+
+  it('학습자 목록은 서버가 isPublished=true 로 고정한다 (query 위조 무시)', async () => {
+    const req = makeReq({ id: 'learner', member: true, params: { courseId: 'lec-pub' }, query: { isPublished: 'false' } });
+    await LessonController.listLessonsByCourse(req, makeRes());
+    expect(listArgs[0][1].isPublished).toBe(true);
+  });
+
+  it('소유 강사는 초안을 포함해 본다', async () => {
+    const req = makeReq({ id: 'inst', roles: ['lecture:instructor'], member: true, params: { courseId: 'lec-pub' } });
+    await LessonController.listLessonsByCourse(req, makeRes());
+    expect(listArgs[0][1].isPublished).toBeUndefined();
+  });
+
+  it('lecture:admin 도 초안을 본다', async () => {
+    const req = makeReq({ id: 'ad', roles: ['lecture:admin'], member: true, params: { courseId: 'lec-pub' } });
+    await LessonController.listLessonsByCourse(req, makeRes());
+    expect(listArgs[0][1].isPublished).toBeUndefined();
+  });
+
+  it('미발행 lesson 상세는 learner 에게 404', async () => {
+    const req = makeReq({ id: 'learner', member: true, params: { id: 'les-draft' } });
+    const res = makeRes();
+    await LessonController.getLesson(req, res);
+    expect(res.statusCode).toBe(404);
+  });
+
+  it('미발행 lesson 상세도 소유 강사에게는 열린다', async () => {
+    const req = makeReq({ id: 'inst', roles: ['lecture:instructor'], member: true, params: { id: 'les-draft' } });
+    const res = makeRes();
+    await LessonController.getLesson(req, res);
+    expect(res.statusCode).toBe(200);
+  });
+});
+
 describe('정적 계약', () => {
   it('web-lecture instructorApi.getQuizForLesson 은 강사 전용 경로를 쓴다', () => {
     const src = read('services/web-lecture/src/api/lecture.ts');
@@ -992,9 +1159,9 @@ describe('정적 계약', () => {
   });
   it('라우트: 강사 quiz 읽기는 requireInstructor · learner 읽기는 그대로', () => {
     const routes = read('apps/api-server/src/modules/lms/routes/lms.routes.ts');
-    expect(routes).toMatch(/router\.get\('\/instructor\/lessons\/:lessonId\/quiz', requireAuth, requireInstructor, asyncHandler\(QuizController\.getQuizForLessonAsInstructor\)\)/);
+    expect(routes).toMatch(/router\.get\('\/instructor\/lessons\/:lessonId\/quiz', requireAuth, apiLimiter, requireInstructor, asyncHandler\(QuizController\.getQuizForLessonAsInstructor\)\)/);
     // 7차 P2-8: learner 읽기에도 enrollment 정책이 붙었다 (controller 는 그대로)
-    expect(routes).toMatch(/router\.get\('\/lessons\/:lessonId\/quiz', requireAuth, requireEnrollment\(\{ checkLesson: true, allowCourseOwner: true \}\), asyncHandler\(QuizController\.getQuizForLesson\)\)/);
+    expect(routes).toMatch(/router\.get\('\/lessons\/:lessonId\/quiz', requireAuth, apiLimiter, requireEnrollment\(\{ checkLesson: true, allowCourseOwner: true \}\), asyncHandler\(QuizController\.getQuizForLesson\)\)/);
     // 대상 강의 판정은 lecture-access 의 단일 helper 를 공유한다 (routes 로컬 재정의 0)
     expect(routes).not.toMatch(/function isLectureCourse/);
     expect(routes).toContain('isLectureCourse } from \'../middleware/lecture-access.js\'');
@@ -1039,13 +1206,34 @@ describe('정적 계약', () => {
   });
   it('7차 P2-8: 평가 조회 라우트도 requireEnrollment 를 거친다', () => {
     const routes = read('apps/api-server/src/modules/lms/routes/lms.routes.ts');
-    expect(routes).toContain("router.get('/lessons/:lessonId/quiz', requireAuth, requireEnrollment({ checkLesson: true, allowCourseOwner: true })");
-    expect(routes).toContain("router.get('/lessons/:lessonId/assignment', requireAuth, requireEnrollment({ checkLesson: true, allowCourseOwner: true })");
+    expect(routes).toContain("router.get('/lessons/:lessonId/quiz', requireAuth, apiLimiter, requireEnrollment({ checkLesson: true, allowCourseOwner: true })");
+    expect(routes).toContain("router.get('/lessons/:lessonId/assignment', requireAuth, apiLimiter, requireEnrollment({ checkLesson: true, allowCourseOwner: true })");
+  });
+  it('11차 P2-33: 운영자 검토 route 는 requireLectureOperator 를 거치고, 운영 목록은 검토 화면으로 연결된다', () => {
+    const r = read('apps/api-server/src/modules/lms/routes/lms.routes.ts');
+    expect(r).toContain("router.get('/operator/courses/:courseId/review', requireAuth, apiLimiter, requireLectureOperator, asyncHandler(CourseController.operatorCourseReview))");
+    const page = read('services/web-lecture/src/pages/operator/OperatorCoursesPage.tsx');
+    expect(page).toContain('to={`/operator/courses/${c.id}/review`}');
+    expect(page).not.toContain('coursePath(c.id)');   // learner 경로로 보내지 않는다
+    const app = read('services/web-lecture/src/App.tsx');
+    expect(app).toContain('path="/operator/courses/:courseId/review"');
+    // 검토 화면은 편집 진입점을 두지 않는다
+    const review = read('services/web-lecture/src/pages/operator/OperatorCourseReviewPage.tsx');
+    expect(review).not.toContain('instructorApi');
+    expect(review).not.toContain('/instructor/courses/');
+  });
+  it('11차 P2-35: PharmacyHub 가이드·KPA 홈 피드에 내부 강의 안내가 남아 있지 않다', () => {
+    const ph = read('packages/shared-space-ui/src/guide/copy/pharmacy-hub.ts');
+    expect(ph).not.toContain('교육 콘텐츠는 PharmacyHub 에 등록된 강의만 표시됩니다.');
+    expect(ph).toContain('O4O 강의로 이동');
+    const home = read('services/web-kpa-society/src/pages/HomeLatestPage.tsx');
+    expect(home).not.toContain("{ key: 'course'");
+    expect(home).not.toContain("label: '강의'");
   });
   it('4차 P1-15: 평가 제출 라우트는 enrollment 정책을 통과해야 한다', () => {
     const routes = read('apps/api-server/src/modules/lms/routes/lms.routes.ts');
-    expect(routes).toMatch(/router\.post\('\/quizzes\/:quizId\/submit', requireAuth, requireLectureLearner, requireEnrollment\(\{ checkQuiz: true \}\)/);
-    expect(routes).toMatch(/router\.post\('\/assignments\/:assignmentId\/submit', requireAuth, requireLectureLearner, requireEnrollment\(\{ checkAssignment: true \}\)/);
+    expect(routes).toMatch(/router\.post\('\/quizzes\/:quizId\/submit', requireAuth, apiLimiter, requireLectureLearner, requireEnrollment\(\{ checkQuiz: true \}\)/);
+    expect(routes).toMatch(/router\.post\('\/assignments\/:assignmentId\/submit', requireAuth, apiLimiter, requireLectureLearner, requireEnrollment\(\{ checkAssignment: true \}\)/);
     const mw = read('apps/api-server/src/modules/lms/middleware/requireEnrollment.ts');
     // quiz/assignment → course 역추적은 parameter binding 만 사용한다 (Guard Rule 2)
     expect(mw).toContain('checkQuiz?: boolean;');

@@ -41,12 +41,13 @@ describe('LMS operator route — Lecture 전용 (다중 서비스 allowlist 은�
     ]) {
       const line = lines.find((l) => l.includes(p));
       expect(line).toBeDefined();
-      expect(line).toContain('requireAuth, requireLectureOperator');
+      // 11차 P1-30: apiLimiter 가 인증 뒤 · guard 앞에 온다 (키에 userId 가 실린다)
+      expect(line).toContain('requireAuth, apiLimiter, requireLectureOperator');
     }
   });
 
   it('운영 목록(GET /operator/courses)이 존재하며 requireLectureOperator 로 보호된다', () => {
-    expect(ROUTES).toMatch(/router\.get\('\/operator\/courses',\s*requireAuth,\s*requireLectureOperator/);
+    expect(ROUTES).toMatch(/router\.get\('\/operator\/courses',\s*requireAuth,\s*apiLimiter,\s*requireLectureOperator/);
   });
 
   it('운영 대상은 course.serviceKey === lecture 만이며, 그 외는 404 (403 아님)', () => {

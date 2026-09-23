@@ -20,6 +20,7 @@ import InstructorCourseEditPage, { InstructorAssignmentPage, InstructorQuizPage 
 import InstructorEnrollmentsPage from './pages/instructor/InstructorEnrollmentsPage';
 import InstructorSubmissionsPage from './pages/instructor/InstructorSubmissionsPage';
 import OperatorCoursesPage from './pages/operator/OperatorCoursesPage';
+import OperatorCourseReviewPage from './pages/operator/OperatorCourseReviewPage';
 import OperatorInstructorsPage from './pages/operator/OperatorInstructorsPage';
 import OperatorCertificatesPage from './pages/operator/OperatorCertificatesPage';
 
@@ -60,6 +61,8 @@ export default function App() {
       </Route>
       <Route element={<AccessGate area="operator" />}>
         <Route path="/operator" element={<OperatorCoursesPage />} />
+        {/* 11차 P2: 운영자 검토 전용 read-only 화면 (수강 등록·편집 권한 없음) */}
+        <Route path="/operator/courses/:courseId/review" element={<OperatorCourseReviewPage />} />
         <Route path="/operator/instructors" element={<OperatorInstructorsPage />} />
         <Route path="/operator/certificates" element={<OperatorCertificatesPage />} />
       </Route>

@@ -34,6 +34,22 @@ export class LessonController extends BaseController {
     return { allowed: course.instructorId === userId, notFound: false };
   }
 
+  /**
+   * PR #225 merge-gate 11차 P2: 미발행(draft) lesson 은 learner 에게 보이지 않는다.
+   *
+   * learner 경로(`/courses/:courseId/lessons`, `/lessons/:id`)는 `requireEnrollment` 만 통과하면
+   * `isPublished=false` 인 초안까지 그대로 돌려줬다. 강사 초안 접근은 별도 경로
+   * (`/instructor/courses/:courseId/lessons`)가 담당하지만, 소유자 · lecture:admin 이
+   * learner 경로로 들어온 경우까지 막지 않기 위해 여기서만 예외를 둔다.
+   * 소유권은 role 을 대체하지 않으므로, scope(lecture) 판정은 호출부가 이미 끝낸 뒤에만 쓴다.
+   */
+  private static canSeeUnpublishedLessons(req: Request, course: { instructorId?: string | null } | null | undefined): boolean {
+    const userId = (req as any).user?.id;
+    const userRoles: string[] = (req as any).user?.roles || [];
+    if (rolesIncludeLectureAdmin(userRoles)) return true;
+    return Boolean(userId) && course?.instructorId === userId;
+  }
+
   static async createLesson(req: Request, res: Response): Promise<any> {
     try {
       const { courseId } = req.params;
@@ -72,6 +88,14 @@ export class LessonController extends BaseController {
         return BaseController.notFound(res, 'Lesson not found');
       }
 
+      // 11차 P2: 미발행 lesson 은 소유자 · lecture:admin 이 아니면 존재를 알리지 않는다.
+      if (lesson.isPublished === false) {
+        const course = await CourseService.getInstance().getCourse(lesson.courseId);
+        if (!LessonController.canSeeUnpublishedLessons(req, course)) {
+          return BaseController.notFound(res, 'Lesson not found');
+        }
+      }
+
       return BaseController.ok(res, { lesson });
     } catch (error: any) {
       logger.error('[LessonController.getLesson] Error', { error: error.message });
@@ -96,14 +120,27 @@ export class LessonController extends BaseController {
         }
         throw e;
       }
+      let course: Awaited<ReturnType<CourseService['getCourse']>> | null = null;
       if (serviceScope) {
-        const course = await CourseService.getInstance().getCourse(courseId);
+        course = await CourseService.getInstance().getCourse(courseId);
         if (!course || !isCourseInServiceScope(course.serviceKey, serviceScope)) {
           return BaseController.notFound(res, 'Course not found');
         }
       }
 
-      const { lessons, total } = await service.listLessonsByCourse(courseId, filters as any);
+      // 11차 P2: learner 목록에는 발행된 lesson 만. 소유자 · lecture:admin 만 초안을 본다
+      // (요청의 isPublished 필터를 신뢰하지 않고 서버가 확정한다).
+      const effectiveFilters: Record<string, any> = { ...(filters as any) };
+      let canSeeDrafts = rolesIncludeLectureAdmin((req as any).user?.roles || []);
+      if (!canSeeDrafts) {
+        course = course ?? (await CourseService.getInstance().getCourse(courseId));
+        canSeeDrafts = LessonController.canSeeUnpublishedLessons(req, course);
+      }
+      if (!canSeeDrafts) {
+        effectiveFilters.isPublished = true;
+      }
+
+      const { lessons, total } = await service.listLessonsByCourse(courseId, effectiveFilters as any);
 
       return BaseController.okPaginated(res, lessons, {
         total,

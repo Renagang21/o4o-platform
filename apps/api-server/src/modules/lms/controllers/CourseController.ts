@@ -2,6 +2,9 @@ import { Request, Response } from 'express';
 import { CourseStatus, CourseVisibility } from '@o4o/lms-core';
 import { BaseController } from '../../../common/base.controller.js';
 import { CourseService } from '../services/CourseService.js';
+import { LessonService } from '../services/LessonService.js';
+import { QuizService } from '../services/QuizService.js';
+import { AssignmentService } from '../services/AssignmentService.js';
 import logger from '../../../utils/logger.js';
 import { SERVICE_KEYS } from '../../../constants/service-keys.js';
 import {
@@ -408,6 +411,84 @@ export class CourseController extends BaseController {
         return BaseController.notFound(res, error.message);
       }
 
+      return BaseController.error(res, error);
+    }
+  }
+
+  /**
+   * GET /api/v1/lms/operator/courses/:courseId/review — 운영자 검토 전용 read-only surface.
+   *
+   * PR #225 merge-gate 11차 P2: 운영자가 내용을 볼 수 없는 채로 승인·반려만 가능한 화면은
+   * 기능적으로 불완전하다. 다만 검토를 위해 learner enrollment 정책을 약화하거나
+   * 운영자를 자동 수강 등록하거나 instructor 권한을 주지 않는다 — 별도의 읽기 전용 경로를 둔다.
+   *
+   * 계약
+   * - guard: requireAuth + requireLectureOperator (active lecture membership + `lecture:operator` ⊂ `lecture:admin`,
+   *   `platform:super_admin` break-glass 유지). role 만으로는 통과하지 못한다.
+   * - scope: `course.serviceKey === 'lecture'` 만. legacy(KPA/PH/NULL) 는 non-disclosure 404.
+   *   scope 판정은 소유권·admin override 보다 먼저다.
+   * - 노출: 강의 정보 · 커리큘럼(lesson) · lesson 내용 · 평가(quiz/assignment) 존재 여부.
+   * - 금지: enrollment 생성 · 모든 write · 정답 노출 · 타 서비스 강의 접근. write 0.
+   */
+  static async operatorCourseReview(req: Request, res: Response): Promise<any> {
+    try {
+      const { courseId } = req.params;
+      const course = await CourseService.getInstance().getCourse(courseId);
+      // scope → 그 외 판단. 존재/부재를 구분하지 않는다.
+      if (!course || !isLectureCourse(course.serviceKey)) {
+        return BaseController.notFound(res, 'Course not found');
+      }
+
+      const { lessons } = await LessonService.getInstance().listLessonsByCourse(courseId, { limit: 500 } as any);
+      const quizService = QuizService.getInstance();
+      const assignmentService = AssignmentService.getInstance();
+
+      const curriculum = await Promise.all(
+        lessons.map(async (lesson: any) => {
+          const [quiz, assignment] = await Promise.all([
+            quizService.getQuizForLessonWithAnswers(lesson.id),
+            assignmentService.getAssignmentByLesson(lesson.id),
+          ]);
+          return {
+            id: lesson.id,
+            title: lesson.title,
+            description: lesson.description ?? null,
+            type: lesson.type,
+            order: lesson.order,
+            duration: lesson.duration ?? null,
+            isPublished: lesson.isPublished,
+            isFree: lesson.isFree,
+            videoUrl: lesson.videoUrl ?? null,
+            attachments: lesson.attachments ?? [],
+            content: lesson.content ?? null,
+            // 존재 여부만 — 문항·정답은 검토 화면에서 노출하지 않는다.
+            hasQuiz: Boolean(quiz),
+            quizQuestionCount: Array.isArray((quiz as any)?.questions) ? (quiz as any).questions.length : 0,
+            hasAssignment: Boolean(assignment),
+          };
+        })
+      );
+
+      return BaseController.ok(res, {
+        course: {
+          id: course.id,
+          title: course.title,
+          description: (course as any).description ?? null,
+          status: course.status,
+          visibility: course.visibility,
+          instructorId: course.instructorId,
+          isPaid: (course as any).isPaid ?? false,
+          requiresApproval: (course as any).requiresApproval ?? false,
+          rejectionReason: (course as any).rejectionReason ?? null,
+          thumbnail: (course as any).thumbnail ?? null,
+          createdAt: (course as any).createdAt ?? null,
+          updatedAt: (course as any).updatedAt ?? null,
+        },
+        curriculum,
+        readOnly: true as const,
+      });
+    } catch (error: any) {
+      logger.error('[CourseController.operatorCourseReview] Error', { error: error.message });
       return BaseController.error(res, error);
     }
   }

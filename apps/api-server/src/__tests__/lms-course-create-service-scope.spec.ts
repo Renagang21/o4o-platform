@@ -42,7 +42,7 @@ describe('LMS course create — serviceKey 강제 (Lecture Phase 2 §8)', () => 
     expect(create).not.toContain("'kpa:admin'");
     expect(create).not.toContain("'lms:instructor'");
     const routes = read('apps/api-server/src/modules/lms/routes/lms.routes.ts');
-    expect(routes).toMatch(/router\.post\('\/courses',\s*requireAuth,\s*requireInstructor/);
+    expect(routes).toMatch(/router\.post\('\/courses',\s*requireAuth,\s*apiLimiter,\s*requireInstructor/);
     const requireInstructor = read('apps/api-server/src/modules/lms/middleware/requireInstructor.ts');
     expect(requireInstructor).toContain('export const requireInstructor = requireLectureInstructor;');
   });

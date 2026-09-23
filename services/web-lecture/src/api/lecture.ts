@@ -249,9 +249,49 @@ export const instructorApi = {
 
 // ─── Operator (active membership + lecture:operator | lecture:admin) ─────────
 
+
+/** 운영자 검토 화면 응답 (GET /lms/operator/courses/:courseId/review) — read-only. */
+export interface OperatorCourseReviewLesson {
+  id: string;
+  title: string;
+  description: string | null;
+  type: string;
+  order: number;
+  duration: number | null;
+  isPublished: boolean;
+  isFree: boolean;
+  videoUrl: string | null;
+  attachments: Array<{ name: string; url: string; type: string; size: number }>;
+  content: Record<string, unknown> | null;
+  hasQuiz: boolean;
+  quizQuestionCount: number;
+  hasAssignment: boolean;
+}
+export interface OperatorCourseReview {
+  course: {
+    id: string;
+    title: string;
+    description: string | null;
+    status: CourseStatus;
+    visibility: string;
+    instructorId: string;
+    isPaid: boolean;
+    requiresApproval: boolean;
+    rejectionReason: string | null;
+    thumbnail: string | null;
+    createdAt: string | null;
+    updatedAt: string | null;
+  };
+  curriculum: OperatorCourseReviewLesson[];
+  readOnly: true;
+}
+
 export const operatorApi = {
   courses: (params?: { status?: string; search?: string; page?: number; limit?: number; contentKind?: string }) =>
     lmsHttp.get<Paginated<LectureCourse>>('/lms/operator/courses', { contentKind: 'all', ...(params ?? {}) }),
+  /** 운영자 검토 전용 read-only 조회 (11차 P2) — 수강 등록·write 없음. */
+  review: (id: string) =>
+    lmsHttp.get<LmsApiResponse<OperatorCourseReview>>(`/lms/operator/courses/${id}/review`),
   approve: (id: string) => lmsHttp.post<LmsApiResponse<unknown>>(`/lms/operator/courses/${id}/approve`),
   reject: (id: string, reason: string) =>
     lmsHttp.post<LmsApiResponse<unknown>>(`/lms/operator/courses/${id}/reject`, { reason }),

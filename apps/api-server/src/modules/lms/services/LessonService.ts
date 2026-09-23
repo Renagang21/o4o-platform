@@ -30,6 +30,44 @@ export interface CreateLessonRequest {
 
 export type UpdateLessonRequest = Partial<Omit<CreateLessonRequest, 'courseId'>>;
 
+/**
+ * PR #225 merge-gate 11차 P1: lesson 수정 가능 필드 allowlist.
+ *
+ * `updateLesson` 은 호출자가 넘긴 객체를 그대로 `Object.assign(lesson, data)` 했기 때문에
+ * 타입이 `courseId` 를 제외해도 런타임 `req.body` 는 `courseId` · `id` · 소유권 파생 필드를
+ * 실을 수 있었다. 소유권 검사(checkCourseOwnership)는 **수정 전 courseId** 기준으로만
+ * 수행되므로, 이를 허용하면 자기 강의의 lesson 을 타인 강의로 옮길 수 있다.
+ * 계약: 아래 목록 밖의 키는 조용히 버린다(400 으로 계약을 바꾸지 않는다).
+ */
+const UPDATABLE_LESSON_FIELDS = [
+  'title',
+  'description',
+  'type',
+  'content',
+  'videoUrl',
+  'videoThumbnail',
+  'videoDuration',
+  'attachments',
+  'order',
+  'duration',
+  'quizData',
+  'isPublished',
+  'isFree',
+  'requiresCompletion',
+  'metadata',
+] as const satisfies ReadonlyArray<keyof UpdateLessonRequest>;
+
+export function pickUpdatableLessonFields(input: unknown): UpdateLessonRequest {
+  const source = (input ?? {}) as Record<string, unknown>;
+  const picked: Record<string, unknown> = {};
+  for (const key of UPDATABLE_LESSON_FIELDS) {
+    if (Object.prototype.hasOwnProperty.call(source, key)) {
+      picked[key] = source[key];
+    }
+  }
+  return picked as UpdateLessonRequest;
+}
+
 export interface LessonFilters {
   type?: LessonType;
   isPublished?: boolean;
@@ -135,11 +173,14 @@ export class LessonService extends BaseService<Lesson> {
     return { lessons, total };
   }
 
-  async updateLesson(id: string, data: UpdateLessonRequest): Promise<Lesson> {
+  async updateLesson(id: string, input: UpdateLessonRequest): Promise<Lesson> {
     const lesson = await this.getLesson(id);
     if (!lesson) {
       throw new Error(`Lesson not found: ${id}`);
     }
+
+    // PR #225 merge-gate 11차 P1: allowlist 밖 키(courseId · id · 소유권 파생)는 여기서 제거한다.
+    const data = pickUpdatableLessonFields(input);
 
     // WO-O4O-LMS-LESSON-TYPE-NORMALIZATION-V1: enforce lowercase storage
     if (data.type) {
