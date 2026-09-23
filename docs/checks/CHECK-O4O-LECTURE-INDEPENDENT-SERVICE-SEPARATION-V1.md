@@ -499,6 +499,21 @@ spec 추가(12차): rate-limit-ordering spec **+1건**(401 로 끊긴 요청도 
 
 spec 추가(13차): merge-gate spec **+3건**(배치 2회 · 인자에 lessonId 전량 · 영상/첨부 실제 반환 및 `questions` 비노출 · 화면 정적 계약) → **122/122**. rate-limit-ordering spec 12/12 유지. 완화 0.
 
+### 17-3-m. 14차 — Codex 13차 리뷰 응답 3건 (P1 3) · 접근 경계 마감
+
+`9384bddfd` 리뷰(2026-09-23T05:44:36Z). **P1 3건 · P0 0 · P2 0.** 전부 authorization · 개인정보 노출 축이라 종료 기준상 지연 불가 — 3건 모두 반영했다.
+이 리뷰 시점의 PR CI 는 전부 green 이었다(§17-3-k 의 main drift 적색 2건 해소 — 같은 job 이 이번 run 에서 pass).
+
+| # | 등급 | 지적 | 처리 | 판정 |
+|---|---|---|---|---|
+| 41 | P1 | `requireEnrollment` 가 `course.status` 를 로드하지 않는다. 게시된 강의가 수정되거나 평가가 바뀌면 `CourseService` 가 `PENDING_REVIEW` 로 되돌리는데, 학습자는 그 사이에도 lesson · quiz · assignment 를 읽고 **승인 대기 중 본문에 대해 attempt/submission 까지 저장**한다 | select 에 `status` 추가 후 **scope 판정 다음 · 학습자 정책 앞**에서 게시 여부를 판정한다. 미게시면 403 이 아니라 **404 non-disclosure**(`CourseController.getCourse` 와 동일 계약 · lesson/quiz/assignment 경로별 메시지). 예외는 `canSeeUnpublishedCourse` — `CourseController.canSeeUnpublished` 와 같은 판정으로 **소유 강사 · lecture staff 이고 현재 role + active membership** 을 함께 요구하며 break-glass 만 무조건 통과. 학습자 enrollment 정책은 약화하지 않았고, 게시된 강의의 기존 접근은 불변(회귀 테스트 추가) | **FIXED** |
+| 42 | P1 | `isLmsElevatedManager` 가 강사를 elevated 로 인정해, learner-facing `GET /lms/enrollments` 에서 `userId` 축소가 풀린다 → **타 강사 강의의 수강생·학습자 정보까지 조회**된다 | 강사를 제외하고 **운영자 · 관리자 · break-glass** 만 남겼다. 강사의 수강 관리는 `course.instructorId` 술어가 이미 걸린 `/lms/instructor/enrollments` 가 담당한다(신규 경로 · 신규 bypass 0) | **FIXED** |
+| 43 | P1 | 강사 신청 목록 route 가 admin guard → `lecture:operator` 로 넓어졌는데 `listApplications` 는 `leftJoinAndSelect('app.user')` 로 User 엔티티를 통째로 반환한다 → **password hash · reset token · login metadata** 가 모든 Lecture 운영자에게 전달 | `leftJoin` + `addSelect(['user.id','user.name','user.email'])` 로 운영자 화면이 실제로 쓰는 최소 프로필만 투영. 화면(`OperatorInstructorsPage`)이 쓰는 필드는 `user.name`·`user.email` 뿐이라 UI 변경 0 | **FIXED** |
+
+기존 spec 갱신 1건: `lms-enrollment-ownership-boundary` 가 "lecture:instructor 도 전체 목록 계약을 가진다"를 단언하고 있었다 — #42 가 바로 그 계약을 결함으로 지적했으므로, 기대치를 **강화 방향**(운영자·관리자만 전체 목록 · 강사는 본인 목록으로 강제)으로 갱신했다. 완화 0.
+
+spec 추가(14차): merge-gate spec **+10건**(재검토 강의 learner 404 · 소유 강사/운영자 예외 · membership 없는 stale operator 차단 · 게시 강의 기존 접근 불변 · `isLmsElevatedManager` 역할별 판정 3건 · 정적 계약 2건) → **132/132**. 완화 0.
+
 ### 17-4. 검증 (merge-gate)
 
 | 항목 | 결과 |
@@ -506,6 +521,7 @@ spec 추가(13차): merge-gate spec **+3건**(배치 2회 · 인자에 lessonId 
 | shared-space-ui vitest | 8 files / 100 PASS |
 | api-server tsc | 0 |
 | api-server jest 전체 (1차 f3b8c8ca5) | 전체 실행 345 suites(4 skipped) — 344 PASS + `lms-operator-multi-service-scope` 1 FAIL(정적 계약이 `isLectureCourse` 정의를 routes 파일에서 찾음 → lecture-access.ts 로 승격된 위치로 assertion 갱신 · 완화 0) → 재실행 PASS. 최종 345/345 · 5799 tests PASS(32 skipped) · 0 FAIL |
+| 14차(Codex 13차 응답 3건 · §17-3-m) | api-server tsc 0 · **api-server full jest 347 suites / 5,920 tests PASS (fail 0 · 32 skipped)** · merge-gate spec **132/132** · rate-limit-ordering spec 12/12 · eslint(변경 3파일) error 0 |
 | 13차(Codex 12차 응답 2건 · §17-3-l) | api-server tsc 0 · web-lecture tsc 0 · web-lecture vite build PASS · **api-server full jest 347 suites / 5,909 tests PASS (fail 0 · 32 skipped)** · merge-gate spec **122/122** · rate-limit-ordering spec 12/12 · eslint(변경 5파일) error 0(기존 unused-vars warning 2 유지) |
 | 12차(Codex 11차 응답 2건 · §17-3-k) | api-server tsc 0 · web-lecture tsc 0 · web-lecture vite build PASS · **api-server full jest 347 suites / 5,906 tests PASS (fail 0 · 32 skipped)** · merge-gate spec **119/119** · rate-limit-ordering spec **12/12** · eslint(LessonController + 신규/수정 spec 2) error 0. PR CI 의 `API Server Jest` · `Code Quality Check` 적색 2건은 **main drift**(§17-3-k 하단) — 본 PR diff 밖 |
 | 11차(Codex 8~10차 응답 7건 · §17-3-j) | api-server tsc 0 · web-lecture tsc 0 · web-lecture vite build PASS · web-kpa-society build PASS · **api-server full jest 347 suites / 5,898 tests PASS (fail 0)** · merge-gate spec **115/115** · rate-limit-ordering spec **11/11** · eslint(LMS 모듈 + 신규 spec) 신규 error 0 · CodeQL `js/missing-rate-limiting` 0 |

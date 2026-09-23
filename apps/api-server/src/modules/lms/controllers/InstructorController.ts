@@ -119,7 +119,11 @@ export class InstructorController extends BaseController {
       const limitNum = Number(limit) || 20;
 
       query
-        .leftJoinAndSelect('app.user', 'user')
+        // 13차 Codex P1: user 엔티티를 통째로 실어 보내지 않는다 —
+        // password hash · reset token · login metadata 가 기본 select 대상이다.
+        // 운영자 화면이 쓰는 최소 프로필(id · name · email)만 투영한다.
+        .leftJoin('app.user', 'user')
+        .addSelect(['user.id', 'user.name', 'user.email'])
         .orderBy('app.createdAt', 'DESC')
         .skip((pageNum - 1) * limitNum)
         .take(limitNum);

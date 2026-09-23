@@ -24,7 +24,6 @@ import type { Enrollment } from '@o4o/lms-core';
 import { EnrollmentService } from '../services/EnrollmentService.js';
 import { guardLoadedCourseScope, resolveScopeOrRespond } from './lms-scope-guard.js';
 import {
-  hasLectureInstructorRole,
   hasLectureOperatorRole,
   LECTURE_ADMIN_ROLE,
   LECTURE_INSTRUCTOR_ROLE,
@@ -48,13 +47,17 @@ function respondNotFound(res: Response): void {
 }
 
 /**
- * Lecture 관리 역할(강사 · 운영자 · 관리자 · break-glass) 판정 — 토큰 roles 기준.
+ * Lecture 운영 역할(운영자 · 관리자 · break-glass) 판정 — 토큰 roles 기준.
  * enrollment 목록처럼 "본인 것만" 으로 좁힐지 결정할 때만 사용한다.
+ *
+ * 13차 Codex P1: **강사는 여기에 포함하지 않는다.** 강사가 learner-facing
+ * `GET /lms/enrollments` 에서 elevated 로 취급되면 타 강사 강의의 수강생까지 조회된다.
+ * 강사의 수강 관리는 `course.instructorId` 술어가 이미 걸린 `/lms/instructor/enrollments` 가 담당한다.
  */
 export async function isLmsElevatedManager(req: Request): Promise<boolean> {
   const userId = (req as any).user?.id;
   if (!userId) return false;
-  return hasLectureInstructorRole(req) || hasLectureOperatorRole(req);
+  return hasLectureOperatorRole(req);
 }
 
 /**

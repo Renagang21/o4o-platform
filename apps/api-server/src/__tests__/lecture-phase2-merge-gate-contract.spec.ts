@@ -118,6 +118,7 @@ import { CertificateService, pickUpdatableCertificateFields } from '../modules/l
 import { AssignmentController } from '../modules/lms/controllers/AssignmentController.js';
 import { InstructorController } from '../modules/lms/controllers/InstructorController.js';
 import { requireEnrollment } from '../modules/lms/middleware/requireEnrollment.js';
+import { isLmsElevatedManager } from '../modules/lms/utils/lms-enrollment-owner-guard.js';
 
 const enrollments: Record<string, { id: string; courseId: string; userId: string; status: string }> = {};
 let enrollmentSaves: string[] = [];
@@ -207,7 +208,9 @@ beforeEach(() => {
   courses['lec-paid'] = { id: 'lec-paid', serviceKey: 'lecture', visibility: 'members', instructorId: 'inst', status: 'published', title: 'paid', isPaid: true };
   courses['lec-pub-approval'] = { id: 'lec-pub-approval', serviceKey: 'lecture', visibility: 'public', instructorId: 'inst', status: 'published', title: 'pub approval', requiresApproval: true };
   courses['lec-pub-paid'] = { id: 'lec-pub-paid', serviceKey: 'lecture', visibility: 'public', instructorId: 'inst', status: 'published', title: 'pub paid', isPaid: true };
-  Object.assign(lessons, { 'les-paid': { courseId: 'lec-paid' }, 'les-kpa': { courseId: 'kpa-old' }, 'les-pub': { courseId: 'lec-pub' }, 'les-pub-approval': { courseId: 'lec-pub-approval' }, 'les-pub-paid': { courseId: 'lec-pub-paid' } });
+  Object.assign(lessons, { 'les-paid': { courseId: 'lec-paid' }, 'les-kpa': { courseId: 'kpa-old' }, 'les-pub': { courseId: 'lec-pub' }, 'les-pub-approval': { courseId: 'lec-pub-approval' }, 'les-pub-paid': { courseId: 'lec-pub-paid' }, 'les-rereview': { courseId: 'lec-rereview' } });
+  // 13차 Codex P1: 게시 후 수정되어 재검토(PENDING_REVIEW)로 되돌아간 공개·무료 강의
+  courses['lec-rereview'] = { id: 'lec-rereview', serviceKey: 'lecture', visibility: 'public', instructorId: 'inst', status: 'pending_review', title: 're-review' };
   courses['kpa-old'] = { id: 'kpa-old', serviceKey: 'kpa-society', visibility: 'members', instructorId: 'inst', status: 'pending_review', title: 'legacy', tags: ['a'] };
   courses['null-old'] = { id: 'null-old', serviceKey: null, visibility: 'public', instructorId: 'inst', status: 'draft', title: 'legacy null', tags: ['a'] };
 
@@ -960,6 +963,50 @@ describe('9차 P2-10 평가 조회의 소유자 면제도 현재 role + active m
   });
 });
 
+describe('13차 P1 재검토(미게시) 강의는 학습자 경로에서 열리지 않는다', () => {
+  // 공개·무료라서 종전 정책으로는 membership·enrollment 없이 통과하던 경로다.
+  const run = (req: any) => runEnrollment(req, { checkLesson: true });
+
+  it('학습자는 재검토 중 강의의 lesson 을 읽지 못한다 → 404 non-disclosure', async () => {
+    const { res, passed } = await run(makeReq({ id: 'u-mem', member: true, params: { lessonId: 'les-rereview' } }));
+    expect(passed).toBe(false);
+    expect(res.statusCode).toBe(404);
+    expect(res.body.error).toBe('Lesson not found');
+  });
+
+  it('소유 강사(현재 role + active membership)는 검토를 위해 열 수 있다', async () => {
+    expect((await run(makeReq({ id: 'inst', roles: ['lecture:instructor'], member: true, params: { lessonId: 'les-rereview' } }))).passed).toBe(true);
+  });
+
+  it('active membership 운영자도 열 수 있다', async () => {
+    expect((await run(makeReq({ id: 'op', roles: ['lecture:operator'], member: true, params: { lessonId: 'les-rereview' } }))).passed).toBe(true);
+  });
+
+  it('membership 없는 stale lecture:operator 는 열지 못한다', async () => {
+    const { res, passed } = await run(makeReq({ id: 'op2', roles: ['lecture:operator'], params: { lessonId: 'les-rereview' } }));
+    expect(passed).toBe(false);
+    expect(res.statusCode).toBe(404);
+  });
+
+  it('게시된 공개·무료 강의는 종전대로 통과한다 (기존 접근 불변)', async () => {
+    expect((await run(makeReq({ id: 'u-nomember', params: { lessonId: 'les-pub' } }))).passed).toBe(true);
+  });
+});
+
+describe('13차 P1 강사는 learner-facing enrollment 목록에서 elevated 가 아니다', () => {
+  it('lecture:instructor → false (본인 것으로 축소 · 타 강사 수강생 비노출)', async () => {
+    expect(await isLmsElevatedManager(makeReq({ id: 'inst', roles: ['lecture:instructor'], member: true }))).toBe(false);
+  });
+  it('lecture:operator · lecture:admin · break-glass → true', async () => {
+    expect(await isLmsElevatedManager(makeReq({ id: 'op', roles: ['lecture:operator'] }))).toBe(true);
+    expect(await isLmsElevatedManager(makeReq({ id: 'adm', roles: ['lecture:admin'] }))).toBe(true);
+    expect(await isLmsElevatedManager(makeReq({ id: 'sa', roles: ['platform:super_admin'] }))).toBe(true);
+  });
+  it('비로그인 → false', async () => {
+    expect(await isLmsElevatedManager(makeReq({}))).toBe(false);
+  });
+});
+
 describe('7차 P2-7 createCourse 의 instructorId 는 서버가 요청자로 고정한다', () => {
   it('body 의 instructorId(타인) 는 무시된다 · serviceKey 도 lecture 고정', async () => {
     const res = makeRes();
@@ -1281,6 +1328,20 @@ describe('정적 계약', () => {
     const api = read('services/web-lecture/src/api/lecture.ts');
     expect(api).toContain('export function errorStatus(err: unknown): number | undefined');
   });
+  it('13차 P1: 강사 신청 목록은 user 엔티티를 통째로 싣지 않는다 (프로필 3필드 투영)', () => {
+    const c = read('apps/api-server/src/modules/lms/controllers/InstructorController.ts');
+    expect(c).not.toContain("leftJoinAndSelect('app.user'");
+    expect(c).toContain("leftJoin('app.user', 'user')");
+    expect(c).toContain("addSelect(['user.id', 'user.name', 'user.email'])");
+  });
+
+  it('13차 P1: requireEnrollment 는 course.status 를 로드해 게시 여부를 판정한다', () => {
+    const mw = read('apps/api-server/src/modules/lms/middleware/requireEnrollment.ts');
+    expect(mw).toContain("'instructorId', 'status'");
+    expect(mw).toContain('CourseStatus.PUBLISHED');
+    expect(mw).toContain('canSeeUnpublishedCourse');
+  });
+
   it('7차 P2-8: 평가 조회 라우트도 requireEnrollment 를 거친다', () => {
     const routes = read('apps/api-server/src/modules/lms/routes/lms.routes.ts');
     expect(routes).toContain("router.get('/lessons/:lessonId/quiz', ipBurstLimiter, requireAuth, apiLimiter, requireEnrollment({ checkLesson: true, allowCourseOwner: true })");

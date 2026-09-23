@@ -18,7 +18,7 @@
 
 import type { Request, Response, NextFunction } from 'express';
 import { AppDataSource } from '../../../database/connection.js';
-import { Course, CourseVisibility, Enrollment, EnrollmentStatus } from '@o4o/lms-core';
+import { Course, CourseStatus, CourseVisibility, Enrollment, EnrollmentStatus } from '@o4o/lms-core';
 import { In } from 'typeorm';
 // WO-O4O-LMS-CROSSSERVICE-READ-WRITE-BOUNDARY-COMPLETION-V1
 import {
@@ -32,6 +32,7 @@ import {
   isPlatformSuperAdmin,
   hasLectureAdminRole,
   hasLectureInstructorRole,
+  hasLectureOperatorRole,
 } from './lecture-access.js';
 
 /**
@@ -48,6 +49,26 @@ async function canReadOwnCourseAssessments(
   if (isPlatformSuperAdmin(req)) return true;
   const isOwningInstructor = courseInstructorId === userId && hasLectureInstructorRole(req);
   if (!isOwningInstructor && !hasLectureAdminRole(req)) return false;
+  return (await resolveLectureMembershipStatus(req)) === 'active';
+}
+
+/**
+ * 13차 Codex P1: **미게시 강의는 학습자 경로에서 열리지 않는다.**
+ * PUBLISHED 강의가 수정되면 CourseService 가 PENDING_REVIEW 로 되돌리는데, 이 미들웨어가
+ * status 를 보지 않아 승인 대기 중인 본문을 계속 읽고 평가 attempt/submission 까지 저장됐다.
+ * 예외는 `CourseController.canSeeUnpublished` 와 동일 판정 — 소유 강사 · lecture staff 이고
+ * 둘 다 현재 role + active membership 을 요구한다. break-glass 만 무조건 통과.
+ */
+async function canSeeUnpublishedCourse(
+  req: Request,
+  userId: string,
+  courseInstructorId: string | null | undefined,
+): Promise<boolean> {
+  if (isPlatformSuperAdmin(req)) return true;
+  const isOwningInstructor =
+    Boolean(courseInstructorId) && courseInstructorId === userId && hasLectureInstructorRole(req);
+  const isLectureStaff = hasLectureOperatorRole(req) || hasLectureAdminRole(req);
+  if (!isOwningInstructor && !isLectureStaff) return false;
   return (await resolveLectureMembershipStatus(req)) === 'active';
 }
 
@@ -135,7 +156,7 @@ export function requireEnrollment(options?: RequireEnrollmentOptions) {
     const courseRepo = AppDataSource.getRepository(Course);
     const course = await courseRepo.findOne({
       where: { id: courseId },
-      select: ['id', 'visibility', 'isPaid', 'requiresApproval', 'serviceKey', 'instructorId'],
+      select: ['id', 'visibility', 'isPaid', 'requiresApproval', 'serviceKey', 'instructorId', 'status'],
     });
 
     if (!course) {
@@ -159,6 +180,22 @@ export function requireEnrollment(options?: RequireEnrollmentOptions) {
     if (!isCourseInServiceScope(course.serviceKey, serviceScope)) {
       // non-disclosure — scope 밖 resource 는 존재를 드러내지 않는다
       const message = options?.checkLesson ? 'Lesson not found' : 'Course not found';
+      return res.status(404).json({ success: false, error: message });
+    }
+
+    // 13차 Codex P1: scope 다음, 학습자 정책보다 먼저 — 게시 상태 판정.
+    // 비노출은 403 이 아니라 404 (CourseController.getCourse 와 동일한 non-disclosure).
+    if (
+      (course as any).status !== CourseStatus.PUBLISHED &&
+      !(await canSeeUnpublishedCourse(req, userId, (course as any).instructorId))
+    ) {
+      const message = options?.checkLesson
+        ? 'Lesson not found'
+        : options?.checkQuiz
+          ? 'Quiz not found'
+          : options?.checkAssignment
+            ? 'Assignment not found'
+            : 'Course not found';
       return res.status(404).json({ success: false, error: message });
     }
 
