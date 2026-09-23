@@ -5,7 +5,7 @@
  *  P1-2 serviceKey immutable: PATCH body 의 serviceKey/instructorId 는 CourseService.updateCourse 에 반영되지 않는다
  *  P1-3 publish target scope: POST /courses/:id/publish 는 course.serviceKey==='lecture' 만 (legacy → 404)
  *  P1-4 instructor quiz     : 강사 편집 경로는 정답을 포함하고 소유권을 검사한다 · learner 경로는 정답을 제거한다
- *  (P1-5 pre-cutover 가용성은 운영 게이트 — CHECK §15 / PR 설명의 실행 순서로 고정, runtime fallback 0)
+ *  (P1-5 pre-cutover 가용성 게이트는 §21 에서 해소 — legacy 강의가 삭제돼 보존할 가용성이 없다. runtime fallback 0 은 그대로)
  *  재검토 P1-6 lesson mutation : 강사·lecture:admin 의 lesson create/update/delete/reorder 는 대상 course 가 lecture 일 때만 (legacy → 404)
  *  재검토 P1-7 certificate issue: POST /certificates/issue 는 courseId 가 lecture scope 일 때만 (legacy → 404)
  *  재검토 P2-1 progress 필드   : web-lecture 어댑터는 서버 영속 필드 progressPercentage 를 읽는다

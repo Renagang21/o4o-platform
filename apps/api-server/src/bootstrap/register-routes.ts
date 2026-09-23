@@ -43,6 +43,8 @@ import appAvailabilityRoutes from '../routes/app-availability.routes.js';
 import adminUsersRoutes from '../routes/admin/users.routes.js';
 // WO-O4O-ADMIN-OPERATOR-GOOGLE-INVITATION-AND-ASSIGNMENT-CUTOVER-V1
 import adminOperatorAssignmentsRoutes from '../routes/admin/operator-assignments.routes.js';
+// WO-O4O-SUPPLIER-ORDER-PAYMENT-FULFILLMENT-SETTLEMENT-CANONICALIZATION-V1 2-F: paid-but-unbridged 복구
+import { createAdminFulfillmentRecoveryRoutes } from '../routes/admin/admin-fulfillment-recovery.routes.js';
 import adminOperatorInvitationsRoutes from '../routes/admin/operator-invitations.routes.js';
 import operatorInvitationPublicRoutes from '../routes/operator-invitations.routes.js';
 // WO-O4O-ADMIN-PLATFORM-SETTINGS-SUPER-ADMIN-ACCOUNT-MANAGEMENT-V1: 관리자 계정 안전 유지관리(additive)
@@ -178,6 +180,10 @@ export async function registerCoreRoutes(app: Application): Promise<void> {
   app.use('/api/v1/admin/operator-invitations', adminOperatorInvitationsRoutes);
   //   초대 수락은 계정이 없을 수 있는 사람이 쓰므로 공개 경로다(토큰 + Google 검증이 조건).
   app.use('/api/v1/operator-invitations', operatorInvitationPublicRoutes);
+  // WO-O4O-SUPPLIER-ORDER-PAYMENT-FULFILLMENT-SETTLEMENT-CANONICALIZATION-V1 2-F:
+  //   결제됐으나 공급자에게 전달되지 않은(paid-but-unbridged) 주문 탐지·복구 — 전 producer 공통.
+  //   기존 Pharmacy-Hub 전용 recovery 는 그대로 유지한다(무회귀).
+  app.use('/api/v1/admin/fulfillment', createAdminFulfillmentRecoveryRoutes());
   app.use('/api/v1/admin/platform-accounts', adminPlatformAccountsRoutes);
   app.use('/api/v1/admin/platform-users', adminPlatformUsersRoutes);
   app.use('/api/v1/admin/security', adminSecurityBlockedIpsRoutes);
