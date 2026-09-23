@@ -161,9 +161,8 @@ async function startServer() {
     await AppDataSource.initialize();
     logger.info('✅ Database connected successfully');
 
-    // Start scheduled jobs
-    const { cleanupLoginAttemptsJob } = await import('./jobs/cleanupLoginAttempts.js');
-    cleanupLoginAttemptsJob.start();
+    // WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1:
+    //   cleanupLoginAttempts 잡은 은퇴했다. password 로그인 실패 기록이 더는 쌓이지 않는다.
 
     // 서버 시작
     app.listen(PORT, () => {

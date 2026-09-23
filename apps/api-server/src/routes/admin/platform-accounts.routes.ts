@@ -3,9 +3,11 @@
  * WO-O4O-ADMIN-PLATFORM-SETTINGS-SUPER-ADMIN-ACCOUNT-MANAGEMENT-V1
  *
  * frozen AdminUserController / users.routes (WO-O4O-CORE-FREEZE-V1) 를 수정하지 않고,
- * admin 계정의 목록 조회 · 비밀번호 재설정 · 활성 토글만 격리 제공한다.
+ * admin 계정의 목록 조회 · 활성 토글만 격리 제공한다.
  *
- * 재사용(중복 0): User 엔티티, hashPassword(auth.utils), roleAssignmentService(RBAC SSOT).
+ * WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: 비밀번호 재설정 경로는 은퇴했다.
+ *
+ * 재사용(중복 0): User 엔티티, roleAssignmentService(RBAC SSOT).
  * 서버측 보호(frontend 차단에 의존하지 않음):
  *   - 본인 계정 비활성 차단(SELF_LOCK)
  *   - 마지막 활성 super_admin 비활성 차단(LAST_SUPER_ADMIN)
@@ -17,12 +19,9 @@ import { Router, type Request, type Response } from 'express';
 import { In } from 'typeorm';
 import { AppDataSource } from '../../database/connection.js';
 import { User } from '../../modules/auth/entities/User.js';
-import { hashPassword } from '../../utils/auth.utils.js';
 import { roleAssignmentService } from '../../modules/auth/services/role-assignment.service.js';
 import { authenticate, requireRole } from '../../middleware/auth.middleware.js';
 import logger from '../../utils/logger.js';
-// WO-O4O-ADMIN-PASSWORD-RESET-SERVICE-CREDENTIAL-SCOPE-CLARIFY-V1: 재설정 적용 범위 안내(read-only)
-import { resolveAdminPasswordResetScope } from '../../services/auth/admin-password-reset-scope.service.js';
 
 const router: Router = Router();
 
@@ -31,7 +30,6 @@ const ADMIN_ACCESS_ROLES = ['platform:super_admin'];
 // 목록에 표시할 관리자성 역할
 const ADMIN_ACCOUNT_ROLES = ['platform:super_admin', 'neture:admin', 'neture:operator'];
 const SUPER_ADMIN_ROLE = 'platform:super_admin';
-const MIN_PASSWORD_LENGTH = 8;
 
 router.use(authenticate);
 
@@ -96,42 +94,10 @@ router.get('/', requireRole(ADMIN_ACCESS_ROLES), async (_req: Request, res: Resp
   }
 });
 
-// PATCH /api/v1/admin/platform-accounts/:id/password — 새 비밀번호 설정(기존 비번 노출/조회 없음)
-router.patch('/:id/password', requireRole(ADMIN_ACCESS_ROLES), async (req: Request, res: Response) => {
-  try {
-    const { id } = req.params;
-    const { newPassword } = req.body ?? {};
-    if (typeof newPassword !== 'string' || newPassword.length < MIN_PASSWORD_LENGTH) {
-      res.status(400).json({ success: false, error: `비밀번호는 최소 ${MIN_PASSWORD_LENGTH}자 이상이어야 합니다.`, code: 'WEAK_PASSWORD' });
-      return;
-    }
-    const repo = AppDataSource.getRepository(User);
-    const user = await repo.findOne({ where: { id } });
-    if (!user) {
-      res.status(404).json({ success: false, error: '계정을 찾을 수 없습니다.', code: 'NOT_FOUND' });
-      return;
-    }
-    if (await blockedBySuperAdminGuard(id, req.user?.id, res)) return;
+// WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1:
+//   PATCH /:id/password 는 은퇴했다. 관리자가 남의 비밀번호를 설정하는 경로 자체가 사라졌다.
+//   운영자 계정은 Google 초대(operator invitation) → Google 로그인으로만 만들어진다.
 
-    user.password = await hashPassword(newPassword); // 기존 해싱 정책 재사용
-    await repo.save(user);
-
-    // WO-O4O-ADMIN-PASSWORD-RESET-SERVICE-CREDENTIAL-SCOPE-CLARIFY-V1:
-    //   이 경로는 users.password(L1) 만 갱신한다. service_credentials(L2) 를 가진 서비스의
-    //   로그인 비밀번호는 바뀌지 않으므로(사일런트 무효), 적용 범위를 응답에 명시한다.
-    //   credential 은 변경하지 않는다(결정 A — 서비스별 자격 분리 유지).
-    const scope = await resolveAdminPasswordResetScope(id);
-    res.json({
-      success: true,
-      message: '비밀번호가 재설정되었습니다.',
-      data: scope,
-      ...(scope.notice ? { notice: scope.notice } : {}),
-    });
-  } catch (error) {
-    logger.error('[platform-accounts] password reset failed:', error);
-    res.status(500).json({ success: false, error: '비밀번호 재설정 실패', code: 'PASSWORD_RESET_FAILED' });
-  }
-});
 
 // PATCH /api/v1/admin/platform-accounts/:id/status — 활성/비활성 토글
 router.patch('/:id/status', requireRole(ADMIN_ACCESS_ROLES), async (req: Request, res: Response) => {

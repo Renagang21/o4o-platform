@@ -1,12 +1,9 @@
 import { Request, Response } from 'express';
-import { hashPassword, comparePassword } from '../../../utils/auth.utils.js';
 import { BaseController } from '../../../common/base.controller.js';
 import type { AuthRequest } from '../../../common/middleware/auth.middleware.js';
 import { AppDataSource } from '../../../database/connection.js';
 import { User } from '../../auth/entities/User.js';
-// WO-O4O-IDENTITY-V2-PHASE2-CHANGE-PASSWORD-SERVICE-SCOPE-V1
-import { ServiceCredential } from '../../auth/entities/ServiceCredential.js';
-import { UpdateProfileDto, ChangePasswordDto } from '../dto/index.js';
+import { UpdateProfileDto } from '../dto/index.js';
 import logger from '../../../utils/logger.js';
 import { env } from '../../../utils/env-validator.js';
 
@@ -134,111 +131,9 @@ export class UserController extends BaseController {
     }
   }
 
-  /**
-   * PUT /api/v1/users/password
-   * Change password
-   *
-   * WO-O4O-IDENTITY-V2-PHASE2-CHANGE-PASSWORD-SERVICE-SCOPE-V1:
-   *   serviceKey 제공 시:
-   *     1. 해당 서비스 membership 존재 검증 (없으면 SERVICE_NOT_MEMBER 403)
-   *     2. service_credentials 의 credential 우선, 없으면 users.password fallback 으로 currentPassword 검증
-   *     3. service_credentials.passwordHash 만 갱신 (users.password 무영향)
-   *   미제공 시:
-   *     기존 V1 흐름 유지 — users.password 검증 + users.password 갱신
-   */
-  static async changePassword(req: AuthRequest, res: Response): Promise<any> {
-    if (!req.user) {
-      return BaseController.unauthorized(res, 'Not authenticated');
-    }
-
-    const data = req.body as ChangePasswordDto;
-
-    try {
-      // Check password confirmation
-      if (data.newPassword !== data.newPasswordConfirm) {
-        return BaseController.error(res, 'Passwords do not match', 400);
-      }
-
-      const userRepository = AppDataSource.getRepository(User);
-      const user = await userRepository.findOne({
-        where: { id: req.user.id },
-        select: ['id', 'password'],
-      });
-
-      if (!user) {
-        return BaseController.notFound(res, 'User not found');
-      }
-
-      const newPasswordHash = await hashPassword(data.newPassword);
-      const serviceKey = data.serviceKey;
-
-      if (serviceKey) {
-        // ── V2 path: service-scoped credential change ──
-        const membershipRows = await AppDataSource.query(
-          `SELECT 1 FROM service_memberships WHERE user_id = $1 AND service_key = $2 LIMIT 1`,
-          [user.id, serviceKey],
-        );
-        if (membershipRows.length === 0) {
-          return BaseController.error(
-            res,
-            '해당 서비스 멤버십이 없습니다.',
-            403,
-            'SERVICE_NOT_MEMBER',
-          );
-        }
-
-        const credRepo = AppDataSource.getRepository(ServiceCredential);
-        const credential = await credRepo.findOne({
-          where: { userId: user.id, serviceKey },
-        });
-
-        // credential 우선, 없으면 users.password fallback (Phase 1 G-B 정책 일관)
-        const targetHash = credential?.passwordHash ?? user.password;
-        if (!targetHash) {
-          return BaseController.error(res, 'Current password is incorrect', 400);
-        }
-
-        const isValidPassword = await comparePassword(data.currentPassword, targetHash);
-        if (!isValidPassword) {
-          return BaseController.error(res, 'Current password is incorrect', 400);
-        }
-
-        // service_credentials 만 갱신 — users.password 는 건드리지 않는다
-        await credRepo.upsert(
-          { userId: user.id, serviceKey, passwordHash: newPasswordHash },
-          ['userId', 'serviceKey'],
-        );
-
-        return BaseController.ok(res, {
-          message: 'Password changed successfully',
-        });
-      }
-
-      // ── V1 fallback: legacy global change ──
-      if (!user.password) {
-        return BaseController.notFound(res, 'User not found');
-      }
-
-      const isValidPassword = await comparePassword(data.currentPassword, user.password);
-      if (!isValidPassword) {
-        return BaseController.error(res, 'Current password is incorrect', 400);
-      }
-
-      user.password = newPasswordHash;
-      user.updatedAt = new Date();
-      await userRepository.save(user);
-
-      return BaseController.ok(res, {
-        message: 'Password changed successfully',
-      });
-    } catch (error: any) {
-      logger.error('[UserController.changePassword] Error', {
-        error: error.message,
-        userId: req.user.id,
-      });
-      return BaseController.error(res, 'Failed to change password');
-    }
-  }
+  // WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1:
+  //   changePassword 는 은퇴했다. users.password / service_credentials 축이 사라졌고,
+  //   계정 접근 복구는 Google 계정 복구가 담당한다.
 
   /**
    * GET /api/v1/users/sessions

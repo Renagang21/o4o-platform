@@ -1,16 +1,18 @@
 /**
  * @core O4O_PLATFORM_CORE — Auth
- * Core Routes: login, register, refresh, status, logout
+ * Core Routes: google login/signup/link, refresh, status, logout, handoff
  * Do not modify without CORE_CHANGE approval.
  * Freeze: WO-O4O-CORE-FREEZE-V1 (2026-03-11)
+ *
+ * CORE_CHANGE: WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1 (2026-09-23)
+ *   password 인증 경로(/login · /register · /signup · /check-email ·
+ *   /forgot-password · /reset-password · /find-id)를 제거했다.
+ *   인증 정본은 Google sub → users.id 하나다. email 은 인증 키가 아니다.
  */
 import { Router, type IRouter } from 'express';
 import {
-  AuthLoginController,
-  AuthRegisterController,
   AuthSessionController,
   AuthAccountController,
-  PasswordController,
   VerificationController,
 } from '../controllers/index.js';
 import { HandoffController } from '../controllers/handoff.controller.js';
@@ -23,11 +25,7 @@ import {
   optionalAuth,
 } from '../../../common/middleware/auth.middleware.js';
 import {
-  LoginRequestDto,
-  RegisterRequestDto,
   RefreshTokenRequestDto,
-  PasswordResetRequestDto,
-  PasswordResetDto,
   EmailVerificationDto,
   GoogleLoginRequestDto,
   GoogleSignupRequestDto,
@@ -45,26 +43,9 @@ const router: IRouter = Router();
  * ========================================
  */
 
-// POST /api/v1/auth/login - Login with email/password
-router.post(
-  '/login',
-  validateDto(LoginRequestDto),
-  asyncHandler(AuthLoginController.login)
-);
-
-// POST /api/v1/auth/register - Register new user
-router.post(
-  '/register',
-  validateDto(RegisterRequestDto),
-  asyncHandler(AuthRegisterController.register)
-);
-
-// POST /api/v1/auth/signup - Alias for register (backward compatibility)
-router.post(
-  '/signup',
-  validateDto(RegisterRequestDto),
-  asyncHandler(AuthRegisterController.register)
-);
+// WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1:
+//   POST /login · /register · /signup 은 은퇴했다. 로그인과 가입은 아래 Google 경로 하나다.
+//   서비스 가입(membership)은 POST /auth/services/:serviceKey/join 이 담당한다.
 
 // WO-O4O-GOOGLE-ONLY-SIGNUP-LOGIN-V1 (WO-2D): Google-only Signup/Login
 // GET  /api/v1/auth/google/config  - 공개 Client ID + enabled (secret 없음)
@@ -107,13 +88,6 @@ router.post(
   googleAdminBootstrapLimiter,
   validateDto(GoogleAdminBootstrapRequestDto),
   asyncHandler(GoogleAuthController.bootstrapAdmin)
-);
-
-// POST /api/v1/auth/check-email - Check email existence (multi-service registration UX)
-// WO-O4O-AUTH-REGISTER-UX-IMPROVEMENT-V1
-router.post(
-  '/check-email',
-  asyncHandler(AuthRegisterController.checkEmail)
 );
 
 // POST /api/v1/auth/refresh - Refresh access token
@@ -192,31 +166,9 @@ router.post(
   asyncHandler(HandoffController.joinService)
 );
 
-/**
- * ========================================
- * Password Management Routes (Public)
- * ========================================
- */
-
-// POST /api/v1/auth/forgot-password - Request password reset
-router.post(
-  '/forgot-password',
-  validateDto(PasswordResetRequestDto),
-  asyncHandler(PasswordController.forgotPassword)
-);
-
-// POST /api/v1/auth/reset-password - Reset password with token
-router.post(
-  '/reset-password',
-  validateDto(PasswordResetDto),
-  asyncHandler(PasswordController.resetPassword)
-);
-
-// POST /api/v1/auth/find-id - Find account by phone
-router.post(
-  '/find-id',
-  asyncHandler(PasswordController.findId)
-);
+// WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1:
+//   Password Management Routes(/forgot-password · /reset-password · /find-id)는 은퇴했다.
+//   복구할 password 가 없고, 계정 접근 복구는 Google 계정 복구가 담당한다.
 
 /**
  * ========================================

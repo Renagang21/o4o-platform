@@ -6,8 +6,6 @@ import { UserRole } from '../types/auth.js';
 import { asyncHandler } from '../middleware/error-handler.js';
 import { validationResult } from 'express-validator';
 import { body, param, query } from 'express-validator';
-// WO-O4O-PASSWORD-COMPLEXITY-POLICY-UNIFY-V1: 비밀번호 정책 정본
-import { passwordPolicyBodyValidator } from '../utils/password-policy.js';
 
 const router: Router = Router();
 const userController = new UserManagementController();
@@ -15,8 +13,6 @@ const userController = new UserManagementController();
 // Validation rules
 const createUserValidation = [
   body('email').isEmail().normalizeEmail(),
-  // WO-O4O-PASSWORD-COMPLEXITY-POLICY-UNIFY-V1: 새로 설정되는 비밀번호는 동일 정책 적용
-  passwordPolicyBodyValidator('password'),
   body('firstName').optional().trim().notEmpty(),
   body('lastName').optional().trim().notEmpty(),
   body('role').optional().isIn(Object.values(UserRole)),
@@ -90,24 +86,9 @@ router.patch(
   }),
 );
 
-// WO-O4O-IDENTITY-V2-PHASE2-CHANGE-PASSWORD-SERVICE-SCOPE-V1
-// PUT /api/v1/users/password — 사용자 자신의 비밀번호 변경
-//   serviceKey 제공 시 service_credentials 만 갱신 (V2 path)
-//   미제공 시 기존 users.password 흐름 (V1 fallback)
-// requireAdmin 적용 전에 등록 — 일반 사용자가 호출 가능해야 함.
-router.put(
-  '/password',
-  [
-    body('currentPassword').isString().isLength({ min: 6 }),
-    // WO-O4O-PASSWORD-COMPLEXITY-POLICY-UNIFY-V1: 최소 길이 + 영문·숫자 필수 (특수문자 선택)
-    passwordPolicyBodyValidator('newPassword'),
-    body('newPasswordConfirm').isString(),
-    body('serviceKey').optional().isString(),
-  ],
-  asyncHandler(async (req: AuthRequest, res: Response) => {
-    return UserController.changePassword(req, res);
-  }),
-);
+// WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1:
+//   PUT /api/v1/users/password 는 은퇴했다. 바꿀 비밀번호가 없다.
+//   계정 보안 설정은 연결된 Google identity 표시로 대체된다.
 
 // Validation middleware
 const validateRequest = (req: any, res: any, next: any) => {

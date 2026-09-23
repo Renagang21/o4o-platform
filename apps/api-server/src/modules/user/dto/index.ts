@@ -8,4 +8,3 @@
 export * from './update-profile.dto.js';
 
 // Password DTOs
-export * from './change-password.dto.js';

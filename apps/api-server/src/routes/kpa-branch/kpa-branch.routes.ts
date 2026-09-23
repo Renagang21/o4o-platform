@@ -212,7 +212,7 @@ export function createKpaBranchRoutes(): Router {
   //
   // service-catalog 의 joinEnabled 는 false 로 유지한다. 공통 handoff join 은
   // credential 없이 membership 만 만들기 때문에 이 서비스에서는 사용하지 않는다.
-  router.post('/join', wrap(BranchJoinController.apply));
+  router.post('/join', requireAuth as any, wrap(BranchJoinController.apply));
   router.get('/join/status', requireAuth as any, wrap(BranchJoinController.myStatus));
 
   // ── auth (본인 축) ────────────────────────────────────────────────────────
