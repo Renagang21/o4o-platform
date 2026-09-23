@@ -439,6 +439,12 @@ spec 추가(9차): P1-18 3건 · P2-10 4건 · P2-11 1건 → merge-gate spec **
 
 **계약·단언 변경 0** — 테스트 수·단언은 그대로이고(95/95 동일) 중복된 보일러플레이트만 제거했다. test expectation 완화 0.
 
+**10차 CI 결과(head `6850cb6fb`)**: API Server Jest · Code Quality Check · **SonarCloud Code Analysis(Quality Gate passed)** · CodeQL · Analyze (typescript) · Build Applications(admin-dashboard) · Guard Static Analysis · Detect affected scope · Apply Size Labels 전부 PASS. Admin Fast 2 · Docs Fast 1 은 `detect-affected` fast path 로 skipping. `mergeable=MERGEABLE` · `mergeStateStatus=CLEAN`.
+
+> 01:06Z 의 `sonarqubecloud[bot]` "The last analysis has failed" 코멘트는 **직전에 취소된 run(`c98d0539b`)의 중복 분석**이다. head check-run 은 `conclusion=success` · `Quality Gate passed` 로 확인했다.
+
+**Codex 10차 재검토 = 미응답(2026-09-23 02:43Z 기준)**. `@codex review` 를 00:38Z(`a4b5a3c4b`) · 00:55Z(`6850cb6fb`) · 02:13Z(10차 변경 내용 명시) 세 차례 요청했으나 약 2시간 동안 리뷰가 올라오지 않았다(1~9차는 모두 10분 내 응답). connector 지연·쿼터로 보이며, 세션이 대신 판정하지 않는다 — **merge 전 Codex 10차 응답 확인은 팀장 판정 항목으로 남긴다.** 9차까지의 지적은 전부 FIXED / OPERATIONAL_GATE 로 처리 완료이고, 10차 커밋은 런타임 코드 변경 0(spec 중복 제거 + CHECK 기록)이다.
+
 ### 17-4. 검증 (merge-gate)
 
 | 항목 | 결과 |
