@@ -265,6 +265,54 @@ API 배포의 migration Job 은 `build-and-deploy` 안에 있어 실행되더라
 ⑦ 그 다음에만 §43 destructive gate 보고 → 별도 승인
 ```
 
+### 7-5. "Phase A 단독 배포(Lecture 제외)" 경로 — 조사 완료 후 철회 (2026-09-24)
+
+사용자가 "Phase A 를 반영할 때 Lecture Phase 2 를 함께 서빙하지 않는 방법" 을 조사하라고 지시해 **실증까지 마쳤고,
+그 뒤 같은 사용자 판단으로 이 경로는 철회**됐다(불필요한 대기를 만든다 · 별도 배포용 코드가 필요하다).
+조사 결과는 다음 번 같은 요구가 생길 때 재사용할 수 있으므로 사실만 남긴다.
+
+**결론: 기술적으로 가능했다.** Phase A 커밋 11개는 Lecture 경로(`services/web-lecture` · `modules/lms` ·
+`modules/lecture`)를 **0파일** 건드리므로 pre-Phase2 base 위로 그대로 옮겨진다.
+
+| 실증 항목 | 결과 (로컬 전용 · push 0 · 시험 브랜치 삭제) |
+|---|---|
+| 구성 | 현재 API 서빙 SHA `f651885ed`(pre-Phase2) + 배포 게이트 2커밋 + Phase A 11커밋 cherry-pick → ref `8cdd0b2ac` |
+| cherry-pick | **충돌 0** (11+2 커밋 전부) |
+| Lecture Phase 2 `9a3b402b9` | **미포함** |
+| 검증 | auth+guard **10 suites 117/117** · api-server tsc **0** · install/build:packages 성공 |
+| 서빙 web SHA(`63c9b602f`) 대비 추가 변경 | web-neture **2파일뿐** |
+
+**⚠️ 이 조사에서 찾은 위험(경로를 쓰지 않아도 유효한 사실):**
+워크플로는 **dispatch 한 ref 의 파일로 실행**된다. pre-Phase2 base 에는 배포 게이트 2종
+(`3c7083be5` fail-closed `DEPLOY_ENABLED` · `f2fdead81` environment 승인)이 **없으므로**, 게이트 커밋을
+함께 얹지 않고 그 ref 로 배포하면 **게이트가 둘 다 무력화**된다. 과거 ref 로 배포하는 모든 작업에 적용되는 함정이다.
+
+### 7-6. 확정된 배포 계획 (사용자 지시 2026-09-24 · 전달 경유)
+
+- 배포 대상 = **Phase A 를 main 에 병합한 직후의 최종 main SHA 하나**. 이 배포에는 **Lecture Phase 2 도 함께 운영에 올라간다**
+  (전제: LMS 데이터가 비어 있고 Lecture 트랙이 재판정 `MAIN_RUNTIME_SAFE_FOR_GENERAL_DEPLOY = YES(조건부)` 를 기록).
+  rekey·이관은 배포 조건이 아니다.
+- 배포 창: **다른 main push 중지** → `DEPLOY_ENABLED` 개방(사용자) → production environment 승인 →
+  대상 SHA 의 API · 필요한 Web · Admin 배포.
+- **API migration 결과가 기대(`INCREMENTAL_EXECUTED=0`)와 다르면 중지.**
+- 새 revision 과 현재 트래픽 확인 → **명시적 `update-traffic` 으로 전환** → 즉시 smoke
+  (Lecture 빈 목록 · 인증 · Password Phase A 경로).
+- 실패 시 **기존 revision 으로 트래픽 되돌리고 게이트를 닫는다**.
+- **§43 파괴적 migration 은 포함하지 않는다.**
+
+실행 전 실측(타 세션 확인 + 본 세션 확인 일치):
+- 대상 SHA 에 **컨테이너 이미지가 없다** — 13:21:59Z 이후 배포는 게이트로 job 전체 skip(빌드 0).
+  따라서 배포 창은 build → migration job → deploy 전 과정이 필요하다.
+- 트래픽은 6축 모두 특정 revision 에 **pin** 되어 있어 새 revision 은 배포돼도 **0%** 로 남는다.
+  전환·롤백 모두 명시적 `update-traffic` 이며, 이 pin 이 사실상 안전장치다.
+  현재 서빙: `o4o-core-api-03746-qlz` · `lecture-web-00011-drs` · `kpa-society-web-01993-6z9` ·
+  `k-cosmetics-web-01161-lw5` · `pharmacy-hub-web-00251-49n` · `o4o-admin-dashboard-01305-z8l`.
+
+**본 세션의 병합 승인 상태: 대기.** 피어 세션이 사용자 발언을 전달했으나(두 차례), 피어 메시지는 본 세션의
+보류 중 승인을 대신하지 못한다 — 피어 자신도 같은 판단을 확인했다. 사용자 확인 한 줄을 받으면 즉시
+`origin/main` 재동기화 → 병합 → 최종 SHA·CI 보고 순으로 진행한다. 그때까지 main 무접촉 ·
+`DEPLOY_ENABLED` 무접촉 · 트래픽 전환 0.
+
 ## 8. 검증 (2026-09-23 · 격리 worktree `C:/tmp/o4o-legacy-password-retirement`)
 
 | 항목 | 결과 |
