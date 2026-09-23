@@ -101,6 +101,24 @@ store-owner 테스트 계정 blocker(401 INVALID_USER / 403 lockout) 가 WO1~3 �
 | `CONTENT_EDITOR_COMMON_AI_UNCHANGED` | **PASS** — AiContentModal/StoreUseModal/RichTextEditor props 존재(spec E) · 패키지 diff 0 |
 | `DB_MIGRATION` | **0** |
 
+## 8-A. 추가 (2026-09-23) — 통합 내 매장(`services/web-store`) 표면 가드
+
+WO4 종료 후 Unified Store Workspace 트랙이 Store 화면을 `services/web-store` 로 복제했다. 이 표면에 대해 census 재실행:
+
+| 항목 | 결과 |
+|---|---|
+| 편집기 렌더 화면 | **10** (CreateContentFromResources · PharmacyBlog · PharmacyPop · ProductionMaterialEditor · StoreContentEdit · StoreDirectContent · StoreLocalProducts · StoreProductDescriptions · StoreProductMultilingualContent · StoreQrAiDescription) |
+| `aiRequestHeaders` prop · `aiHeaders` helper | **0** (WO4 주석만 이월) |
+| `showInternalAi={false}` | 10/10 · `{true}` **0** |
+| `AiContentModal` import/JSX · `/api/ai/*` 문자열 · `gemini-qr-description` | **0** |
+| 외부 LLM 진입점(`LlmAssistPanel` + Prompt Core + `STORE_LLM_ASSIST_LABEL`) | 10/10 · task 리터럴 = blog · pop · product-description ×2 · translate · qr (일반 콘텐츠 4 는 `resolveStoreContentLlmTask`) |
+
+→ **복제 시점이 WO4 이후라 계약 위반 0.** 다만 WO4 spec 의 `STORE_FILES` 가 3 서비스 하드코딩이어서 이 표면은 **가드 사각지대**였다.
+
+**조치(`209efd3ff`)**: spec 에 `(F) 통합 내 매장 표면 전체` describe 추가. 파일 목록을 하드코딩하지 않고 `services/web-store/src` 에서 `<RichTextEditor` 를 렌더하는 파일을 전수 스캔해 ① 내부 AI 0 ② 외부 LLM 진입점 존재 ③ Prompt 전문 복사본 0 을 고정한다(신규 화면 추가 시 자동 커버, 스캔 결과가 0이면 가드 무력화로 간주해 실패). **런타임 코드 변경 0** · spec 63 PASS(신규 3) · 4 suites **205/205**.
+
+`web-store` 는 Store 전용 workspace(forum/instructor/community 화면 없음)라 표면 전체 blanket 규칙이 성립한다. 3 서비스는 비-Store 화면이 섞여 있으므로 기존 명시 목록을 유지한다.
+
 ## 9. 후속
 
 - WO5 `WO-O4O-STORE-AI-FIRST-E2E-CLOSURE-V1` — WO1~4 브라우저 smoke 일괄(유효 store-owner 계정 전제).
@@ -108,6 +126,6 @@ store-owner 테스트 계정 blocker(401 INVALID_USER / 403 lockout) 가 WO1~3 �
 
 ## 10. Git
 
-코드 `366e5965b`(15 files) + lint fix `e1cc661ee`(1 file) → `origin/main`. path-specific stage · `check-staged-scope` 15/15 · pathspec commit. 타 세션 수정 파일 3건(`docs/baseline/O4O-STORE-OWNER-SERVICE-AGREEMENT-V1.0.md` · `apps/api-server/src/__tests__/work-agent-llm-closure.spec.ts` · `apps/api-server/src/services/ai-tools/work-agent-runtime.ts`) 미접촉.
+코드 `366e5965b`(15 files) + lint fix `e1cc661ee`(1 file) + web-store 가드 `209efd3ff`(spec 1 file · 2026-09-23) → `origin/main`. path-specific stage · `check-staged-scope` 15/15 · pathspec commit. 타 세션 수정 파일 3건(`docs/baseline/O4O-STORE-OWNER-SERVICE-AGREEMENT-V1.0.md` · `apps/api-server/src/__tests__/work-agent-llm-closure.spec.ts` · `apps/api-server/src/services/ai-tools/work-agent-runtime.ts`) 미접촉.
 
 문서 정합: 발견 0건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 1건(범위 ② content-editor 공통 AI 처분 — §9) .
