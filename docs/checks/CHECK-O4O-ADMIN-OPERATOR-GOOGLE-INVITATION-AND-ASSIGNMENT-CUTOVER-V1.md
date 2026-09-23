@@ -1,7 +1,7 @@
 # CHECK-O4O-ADMIN-OPERATOR-GOOGLE-INVITATION-AND-ASSIGNMENT-CUTOVER-V1
 
 > WO: [`WO-O4O-ADMIN-OPERATOR-GOOGLE-INVITATION-AND-ASSIGNMENT-CUTOVER-V1`](../work-orders/WO-O4O-ADMIN-OPERATOR-GOOGLE-INVITATION-AND-ASSIGNMENT-CUTOVER-V1.md)
-> 작성일: 2026-09-23 · 상태: **IMPLEMENTATION_COMPLETE · DEPLOY/SMOKE PENDING**
+> 작성일: 2026-09-23 · 상태: **DEPLOYED — SMOKE A/B PENDING_USER_ACTION**
 
 ---
 
@@ -174,18 +174,48 @@ path-specific 커밋으로 main 에 올렸다. 다른 세션의 수정 · 미추
 
 ## 7. 배포 · census · smoke
 
-| 단계 | 상태 |
+commit `1e30e24ee` → `origin/main`.
+
+| 단계 | 결과 |
 |---|---|
-| migration Job (deploy 이전) | **PENDING** |
-| API `o4o-core-api` 배포 | **PENDING** |
-| admin-dashboard · web-neture 배포 | **PENDING** |
-| 배포 전/후 read-only census (users · linked_accounts · service_credentials · service_memberships · role_assignments count / 관리자 users.id · `platform:super_admin` 불변) | **PENDING** |
-| Smoke A — 기존 Google 사용자 직접 지정 | **PENDING** (실제 role write 는 사용자 승인 후. `renagang21` 을 임의로 operator 로 만들지 않는다) |
-| Smoke B — 초대 E2E (메일 → Google 수락 → 권한 부여, 비밀번호 입력 없음) | **PENDING_USER_ACTION** — Google 계정 선택 · 동의는 사용자가 직접 수행 |
+| migration Job (deploy **이전** 실행) | **SUCCESS** — `o4o-api-migrations` execution `o4o-api-migrations-cdxql` |
+| API `o4o-core-api` 배포 | **SUCCESS** — revision `o4o-core-api-03744-79m` (100% traffic) |
+| Deploy Admin Dashboard (Cloud Run) | **SUCCESS** |
+| Deploy Web Services (Cloud Run) | **SUCCESS** |
+| CodeQL Security Analysis | **SUCCESS** |
 
-배포·smoke 완료 전까지 이 WO 는 COMPLETE 가 아니다.
+### 7-1. read-only census (count · boolean 만 · 개인정보 실값 조회 없음)
 
----
+| 항목 | 배포 전 | 배포 후 | 판정 |
+|---|---|---|---|
+| `users` | 2 | 2 | 불변 |
+| `linked_accounts (provider='google')` | 2 | 2 | 불변 |
+| **`service_credentials`** | **5** | **5** | **증가 0 · 삭제 0** |
+| `service_memberships` | 5 | 5 | 불변 |
+| `role_assignments` | 11 | 11 | 불변 |
+| `role_assignments (platform:super_admin)` | 1 | 1 | 불변 |
+| `users.password IS NOT NULL` | 0 | 0 | 불변 |
+| `operator_invitations` 테이블 | 없음 | 있음 | migration 적용 |
+| `operator_invitations` rows | – | 0 | 초대 미생성 |
+| `operator_invitations` 인덱스 | – | 5 | PK + token_hash UNIQUE + pending partial UNIQUE + service_key + status |
+
+컬럼 실측: `id · invited_email · service_key · role · token_hash · status · expires_at ·
+invited_by_user_id · accepted_user_id · created_at · updated_at · accepted_at · cancelled_at`
+→ **raw token 컬럼 없음**(§8 계약 충족).
+
+### 7-2. 프로덕션 smoke
+
+| 항목 | 결과 |
+|---|---|
+| `GET /api/v1/operator-invitations/preview?token=<invalid>` | **PASS** — 404 `{"success":false,"code":"INVITATION_NOT_FOUND"}` (공개 경로 · 정보 누출 없음) |
+| `POST /api/v1/admin/operator-assignments` (비인증) | **PASS** — 401 |
+| `GET /api/v1/admin/operator-invitations` (비인증) | **PASS** — 401 |
+| `https://neture.co.kr/operator-invitations/accept?token=<invalid>` 실브라우저 | **PASS** — 수락 화면 렌더 · "유효하지 않은 초대 링크입니다." 안내 · **비밀번호 입력 없음** · 외부 이동 없음 |
+| **Smoke A — 기존 Google 사용자 직접 지정 (실 role write)** | **PENDING_USER_ACTION** — 관리자 로그인이 Google 인증이라 사용자가 직접 수행해야 하고, 실제 권한 부여 write 는 사용자 승인 대상이다. `renagang21` 을 임의로 operator 로 만들지 않았다 |
+| **Smoke B — 초대 E2E (메일 → Google 수락 → 권한 부여)** | **PENDING_USER_ACTION** — Google 계정 선택 · 동의는 사용자가 직접 수행 |
+
+→ 본 WO 는 **구현 · 배포 · 인증 가드 · schema · census 까지 확인 완료**이며,
+role write 가 실제로 일어나는 Smoke A · B 가 남아 **COMPLETE 가 아니다**.
 
 ## 8. 미해결 · 후속 인계
 
