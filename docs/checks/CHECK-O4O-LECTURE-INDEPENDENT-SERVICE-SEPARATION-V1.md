@@ -514,6 +514,10 @@ spec 추가(13차): merge-gate spec **+3건**(배치 2회 · 인자에 lessonId 
 
 spec 추가(14차): merge-gate spec **+10건**(재검토 강의 learner 404 · 소유 강사/운영자 예외 · membership 없는 stale operator 차단 · 게시 강의 기존 접근 불변 · `isLmsElevatedManager` 역할별 판정 3건 · 정적 계약 2건) → **132/132**. 완화 0.
 
+**Codex 재리뷰(`c4dd2aa9c` · 2026-09-23T06:32:46Z): "Didn't find any major issues." — 신규 finding 0.**
+종료 기준 충족: 신규 P0/P1 = 0 · data integrity / authorization / service scope / cutover continuity / 기존 사용자 접근을 깨는 P2 = 0. 잔존 DEFERRED 는 §17-3-l #39 의 "검토 화면 퀴즈 문항·정답 노출"(순수 범위 판단 · 별도 지시 사항) 1건뿐이다.
+이 head 의 PR CI 는 전부 green — API Server Jest · Code Quality Check · CodeQL · Analyze(typescript) · SonarCloud Quality Gate · Build Applications · Guard Static Analysis 전부 pass, `mergeable=MERGEABLE` · `mergeStateStatus=CLEAN`.
+
 ### 17-4. 검증 (merge-gate)
 
 | 항목 | 결과 |
