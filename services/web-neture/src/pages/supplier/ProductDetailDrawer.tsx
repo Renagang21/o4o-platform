@@ -13,17 +13,22 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { X, Pencil, Trash2, ImagePlus, Loader2, ChevronDown, ChevronRight } from 'lucide-react';
+import { X, Pencil, Loader2 } from 'lucide-react';
 import { supplierApi, type SupplierProduct, productApi, type ProductImage, type CategoryTreeItem, type BrandItem, type SpotPricePolicy } from '../../lib/api';
 import { SUPPLIER_SPOT_POLICIES_FORBIDDEN } from '../../lib/api/supplier';
-import { ProductForm, type ProductFormData } from '../../components/product';
-import { RichTextEditor, ContentRenderer, type MediaInsert } from '@o4o/content-editor';
+import { type ProductFormData } from '../../components/product';
+import { ContentRenderer, type MediaInsert } from '@o4o/content-editor';
 // WO-NETURE-PRODUCT-DRAWER-FORM-STANDARD-COMPLIANCE-V1: O4O Form Standard primitives
-import { Section, InfoRow, FormField } from '@o4o/operator-ux-core';
+import { Section, InfoRow } from '@o4o/operator-ux-core';
 import { toast } from '@o4o/error-handling';
 import { useContentTemplates } from '../../hooks/useContentTemplates';
 import { useAuth } from '../../contexts';
 import MediaPickerModal from '../../components/common/MediaPickerModal';
+// WO-O4O-SUPPLIER-POST-REGISTRATION-PRODUCT-MANAGEMENT-OFFER-FIRST-REALIGNMENT-V1 §A: Drawer 분해
+import SupplierImageSection from './product-detail/SupplierImageSection';
+import MasterReadOnlySection from './product-detail/MasterReadOnlySection';
+import OfferDistributionSection from './product-detail/OfferDistributionSection';
+import OfferEditSection from './product-detail/OfferEditSection';
 import {
   DISTRIBUTION_TYPE_BADGE,
   REGULATORY_TYPE_LABELS,
@@ -131,7 +136,6 @@ function toFormData(p: SupplierProduct): Partial<ProductFormData> {
 
 // ─── Component ───
 
-const ACCEPTED_IMAGE_TYPES = 'image/jpeg,image/png,image/webp';
 
 // WO-NETURE-PRODUCT-DRAWER-FORM-STANDARD-COMPLIANCE-V1: 공통 input 스타일
 const INPUT_CLASS =
@@ -477,9 +481,6 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
     }
   };
 
-  // WO-NETURE-SUPPLIER-TAG-AI-B2C-ALIGNMENT-V1: AI tag handlers
-  // WO-NETURE-AI-TAG-EDITING-OVERRIDE-INPUT-V1: 편집 중 값을 override로 전달
-  // WO-NETURE-B2C-B2B-TAG-RECOMMENDATION-STRATEGY-V1: purpose별 AI 태그 추천
   // Image handlers
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -538,9 +539,6 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
     setUploading(false);
   };
 
-  const thumbnail = images.find((i) => i.type === 'thumbnail');
-  const detailImages = images.filter((i) => i.type === 'detail');
-  const contentImages = images.filter((i) => i.type === 'content');
 
   if (!open || !product) return null;
 
@@ -817,356 +815,54 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
             );
           })()}
 
-          {/* ── 편집 모드 배너 (WO-NETURE-PRODUCT-DRAWER-DUAL-EDIT-ENTRY-V1) ── */}
-          {isEditing && (
-            <div className={`mb-4 px-3 py-2 rounded-lg text-sm font-medium flex items-center gap-2 ${
-              editMode === 'b2c' ? 'bg-blue-50 text-blue-700' : 'bg-teal-50 text-teal-700'
-            }`}>
-              <Pencil size={14} />
-              {editMode === 'b2c' ? 'B2C 편집 모드' : 'B2B 편집 모드'}
-            </div>
+          {/* WO-O4O-SUPPLIER-POST-REGISTRATION-PRODUCT-MANAGEMENT-OFFER-FIRST-REALIGNMENT-V1 §A: Offer 편집 본문 분리 */}
+          {product && (
+            <OfferEditSection
+              product={product}
+              isEditing={isEditing}
+              editMode={editMode}
+              showSecondaryEdit={showSecondaryEdit}
+              setShowSecondaryEdit={setShowSecondaryEdit}
+              saving={saving}
+              b2bEditRef={b2bEditRef}
+              images={images}
+              categories={categories}
+              brands={brands}
+              editCategory={editCategory}
+              editBrand={editBrand}
+              editSpec={editSpec}
+              editOrigin={editOrigin}
+              editBizShort={editBizShort}
+              setEditBizShort={setEditBizShort}
+              editBizDetail={editBizDetail}
+              setEditBizDetail={setEditBizDetail}
+              editConsumerShort={editConsumerShort}
+              setEditConsumerShort={setEditConsumerShort}
+              editConsumerDetail={editConsumerDetail}
+              setEditConsumerDetail={setEditConsumerDetail}
+              editorImageUpload={editorImageUpload}
+              setMediaPickerTarget={setMediaPickerTarget}
+              tpl={tpl}
+              canCreatePublicTemplate={canCreatePublicTemplate}
+              toFormData={toFormData}
+              handleFormChange={handleFormChange}
+              INPUT_CLASS={INPUT_CLASS}
+            />
           )}
 
-          {/* ── B2B 모드: B2B 설명 우선 표시 ── */}
-          {isEditing && editMode === 'b2b' && (
-            <div ref={b2bEditRef} className="mb-5 p-4 bg-teal-50/40 border border-teal-200 rounded-xl space-y-4">
-              <h4 className="text-xs font-semibold text-teal-600 uppercase tracking-wider">판매자 지원 설명 (B2B)</h4>
-
-              <FormField label="B2B 간단 소개">
-                <RichTextEditor
-                  value={editBizShort}
-                  onChange={(c) => setEditBizShort(c.html)}
-                  editable={!saving}
-                  placeholder="거래처용 간단 소개"
-                  minHeight="80px"
-                  onImageUpload={editorImageUpload}
-                  onMediaLibraryPick={(insertMedia) => setMediaPickerTarget(() => insertMedia)}
-                  existingImages={images.filter((i) => i.type !== 'thumbnail').map((i) => ({ id: i.id, url: i.imageUrl }))}
-                />
-              </FormField>
-
-              <FormField label="B2B 상세 설명">
-                <RichTextEditor
-                  value={editBizDetail}
-                  onChange={(c) => setEditBizDetail(c.html)}
-                  editable={!saving}
-                  placeholder="거래처용 상세 설명"
-                  minHeight="150px"
-                  onImageUpload={editorImageUpload}
-                  onMediaLibraryPick={(insertMedia) => setMediaPickerTarget(() => insertMedia)}
-                  existingImages={images.filter((i) => i.type !== 'thumbnail').map((i) => ({ id: i.id, url: i.imageUrl }))}
-                  showTemplateActions
-                  templateCategory="product"
-                  templates={tpl.templates}
-                  templatesLoading={tpl.loading}
-                  templatesSaving={tpl.saving}
-                  onLoadTemplates={tpl.loadTemplates}
-                  onSaveAsTemplate={(name, category, isPublic) =>
-                    tpl.saveTemplate(editBizDetail, name, category, isPublic)
-                  }
-                  onUseTemplate={tpl.recordUse}
-                  canCreatePublicTemplate={canCreatePublicTemplate}
-                />
-              </FormField>
-            </div>
-          )}
-
-          {/* ── 보조 섹션 토글 ── */}
-          {isEditing && (
-            <button
-              onClick={() => setShowSecondaryEdit(!showSecondaryEdit)}
-              className="mb-4 flex items-center gap-1 text-xs font-medium text-slate-500 hover:text-slate-700 transition-colors"
-            >
-              {showSecondaryEdit ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
-              {editMode === 'b2c' ? 'B2B 설명도 편집' : '기본 정보 / B2C도 편집'}
-            </button>
-          )}
-
-          {/* ── 수정 모드: 공통 기본 정보 (WO-NETURE-SUPPLIER-PRODUCT-DRAWER-EDIT-ORDER-V1) ── */}
-          {isEditing && (editMode === 'b2c' || showSecondaryEdit) && (
-            <div className="mb-5 p-4 bg-slate-50/60 border border-slate-200 rounded-xl space-y-4">
-              <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wider">기본 정보 (O4O 기준정보 · 읽기 전용)</h4>
-
-              {/*
-                WO-O4O-SUPPLIER-EXISTING-PRODUCTMASTER-NON-DESTRUCTIVE-LINK-V1
-                카테고리·브랜드·사양·원산지는 ProductMaster 기준정보다. 같은 master 에 연결된
-                다른 공급자·다른 서비스가 함께 쓰는 값이라 공급자 화면에서 덮어쓰지 않는다.
-                입력을 남겨두면 저장된 것처럼 보이므로 읽기 전용으로 표시한다.
-              */}
-              <p className="text-xs text-slate-500">
-                O4O 기준 상품정보입니다. 공급자 화면에서는 수정되지 않습니다 — 수정이 필요하면 운영자에게 요청하세요.
-              </p>
-
-              <FormField label="카테고리">
-                <input
-                  type="text"
-                  value={categories.find((c) => c.id === editCategory)?.name || '미지정'}
-                  disabled
-                  readOnly
-                  className={INPUT_CLASS}
-                />
-              </FormField>
-
-              <FormField label="브랜드">
-                <input
-                  type="text"
-                  value={brands.find((b) => b.id === editBrand)?.name || '미지정'}
-                  disabled
-                  readOnly
-                  className={INPUT_CLASS}
-                />
-              </FormField>
-
-              <FormField label="사양">
-                <input type="text" value={editSpec || '미지정'} disabled readOnly className={INPUT_CLASS} />
-              </FormField>
-
-              <FormField label="원산지">
-                <input type="text" value={editOrigin || '미지정'} disabled readOnly className={INPUT_CLASS} />
-              </FormField>
-            </div>
-          )}
-
-          {/* ── 수정 모드: ProductForm (상품명 · 가격 · 재고 · 노출 설정) ── */}
-          {isEditing && (editMode === 'b2c' || showSecondaryEdit) && (
-            <div className="mb-5 p-4 bg-amber-50/40 border border-amber-200 rounded-xl">
-              <h4 className="text-xs font-semibold text-amber-600 uppercase tracking-wider mb-3">상품명 · 가격 · 재고 · 노출 설정</h4>
-              <ProductForm
-                mode="edit"
-                initialData={toFormData(product)}
-                onChange={handleFormChange}
-                disabled={saving}
-                hideDistribution
-                masterNameReadOnly
-              />
-            </div>
-          )}
-
-          {/* ── 수정 모드: 소비자 공개 설명 (B2C) ── */}
-          {isEditing && (editMode === 'b2c' || showSecondaryEdit) && (
-            <div className="mb-5 p-4 bg-emerald-50/40 border border-emerald-200 rounded-xl space-y-4">
-              <h4 className="text-xs font-semibold text-emerald-600 uppercase tracking-wider">소비자 공개 설명 (B2C)</h4>
-
-              <FormField label="소비자 간단 소개">
-                <RichTextEditor
-                  value={editConsumerShort}
-                  onChange={(c) => setEditConsumerShort(c.html)}
-                  editable={!saving}
-                  placeholder="소비자에게 보이는 간단 소개"
-                  minHeight="80px"
-                  onImageUpload={editorImageUpload}
-                  onMediaLibraryPick={(insertMedia) => setMediaPickerTarget(() => insertMedia)}
-                  existingImages={images.filter((i) => i.type !== 'thumbnail').map((i) => ({ id: i.id, url: i.imageUrl }))}
-                />
-              </FormField>
-
-              <FormField label="소비자 상세 설명">
-                <RichTextEditor
-                  value={editConsumerDetail}
-                  onChange={(c) => setEditConsumerDetail(c.html)}
-                  editable={!saving}
-                  placeholder="소비자에게 보이는 상세 설명"
-                  minHeight="150px"
-                  onImageUpload={editorImageUpload}
-                  onMediaLibraryPick={(insertMedia) => setMediaPickerTarget(() => insertMedia)}
-                  existingImages={images.filter((i) => i.type !== 'thumbnail').map((i) => ({ id: i.id, url: i.imageUrl }))}
-                  showTemplateActions
-                  templateCategory="product"
-                  templates={tpl.templates}
-                  templatesLoading={tpl.loading}
-                  templatesSaving={tpl.saving}
-                  onLoadTemplates={tpl.loadTemplates}
-                  onSaveAsTemplate={(name, category, isPublic) =>
-                    tpl.saveTemplate(editConsumerDetail, name, category, isPublic)
-                  }
-                  onUseTemplate={tpl.recordUse}
-                  canCreatePublicTemplate={canCreatePublicTemplate}
-                />
-              </FormField>
-            </div>
-          )}
-
-          {/* ── 수정 모드: 판매자 지원 설명 (B2B) — B2C 모드의 보조 섹션으로만 표시 (B2B 모드는 위에서 우선 렌더링) ── */}
-          {isEditing && editMode === 'b2c' && showSecondaryEdit && (
-            <div className="mb-5 p-4 bg-slate-50/60 border border-slate-200 rounded-xl space-y-4">
-              <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wider">판매자 지원 설명 (B2B)</h4>
-
-              <FormField label="B2B 간단 소개">
-                <RichTextEditor
-                  value={editBizShort}
-                  onChange={(c) => setEditBizShort(c.html)}
-                  editable={!saving}
-                  placeholder="거래처용 간단 소개"
-                  minHeight="80px"
-                  onImageUpload={editorImageUpload}
-                  onMediaLibraryPick={(insertMedia) => setMediaPickerTarget(() => insertMedia)}
-                  existingImages={images.filter((i) => i.type !== 'thumbnail').map((i) => ({ id: i.id, url: i.imageUrl }))}
-                />
-              </FormField>
-
-              <FormField label="B2B 상세 설명">
-                <RichTextEditor
-                  value={editBizDetail}
-                  onChange={(c) => setEditBizDetail(c.html)}
-                  editable={!saving}
-                  placeholder="거래처용 상세 설명"
-                  minHeight="150px"
-                  onImageUpload={editorImageUpload}
-                  onMediaLibraryPick={(insertMedia) => setMediaPickerTarget(() => insertMedia)}
-                  existingImages={images.filter((i) => i.type !== 'thumbnail').map((i) => ({ id: i.id, url: i.imageUrl }))}
-                  showTemplateActions
-                  templateCategory="product"
-                  templates={tpl.templates}
-                  templatesLoading={tpl.loading}
-                  templatesSaving={tpl.saving}
-                  onLoadTemplates={tpl.loadTemplates}
-                  onSaveAsTemplate={(name, category, isPublic) =>
-                    tpl.saveTemplate(editBizDetail, name, category, isPublic)
-                  }
-                  onUseTemplate={tpl.recordUse}
-                  canCreatePublicTemplate={canCreatePublicTemplate}
-                />
-              </FormField>
-            </div>
-          )}
-
-          {/* ── 이미지 섹션 ── */}
-          <Section title="이미지">
-            {loadingImages ? (
-              <div className="flex items-center justify-center py-4">
-                <Loader2 size={20} className="animate-spin text-slate-400" />
-              </div>
-            ) : images.length === 0 && !isEditing ? (
-              <p className="text-sm text-slate-400">등록된 이미지가 없습니다</p>
-            ) : (
-              <div className="space-y-3">
-                {/* 썸네일 */}
-                {thumbnail && (
-                  <div className="relative group">
-                    <img
-                      src={thumbnail.imageUrl}
-                      alt="대표 이미지"
-                      className="w-full rounded-lg object-cover max-h-[240px]"
-                    />
-                    <span className="absolute top-2 left-2 px-1.5 py-0.5 bg-black/50 text-white text-[10px] font-medium rounded">
-                      대표
-                    </span>
-                    {isEditing && (
-                      <button
-                        onClick={() => handleImageDelete(thumbnail.id)}
-                        className="absolute top-2 right-2 p-1 bg-red-600 text-white rounded opacity-0 group-hover:opacity-100 transition-opacity"
-                        title="삭제"
-                      >
-                        <Trash2 size={12} />
-                      </button>
-                    )}
-                  </div>
-                )}
-
-                {/* 상세 이미지 */}
-                {detailImages.length > 0 && (
-                  <div>
-                    <span className="text-xs text-slate-400 block mb-1.5">상세 이미지</span>
-                    <div className="grid grid-cols-3 gap-2">
-                      {detailImages.map((img) => (
-                        <div key={img.id} className="relative group">
-                          <img
-                            src={img.imageUrl}
-                            alt="상세"
-                            className="rounded-lg aspect-square object-cover w-full"
-                          />
-                          {isEditing && (
-                            <button
-                              onClick={() => handleImageDelete(img.id)}
-                              className="absolute top-1 right-1 p-0.5 bg-red-600 text-white rounded opacity-0 group-hover:opacity-100 transition-opacity"
-                              title="삭제"
-                            >
-                              <Trash2 size={10} />
-                            </button>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* 콘텐츠 이미지 */}
-                {contentImages.length > 0 && (
-                  <div>
-                    <span className="text-xs text-slate-400 block mb-1.5">콘텐츠 이미지</span>
-                    <div className="grid grid-cols-3 gap-2">
-                      {contentImages.map((img) => (
-                        <div key={img.id} className="relative group">
-                          <img
-                            src={img.imageUrl}
-                            alt="콘텐츠"
-                            className="rounded-lg aspect-square object-cover w-full"
-                          />
-                          {isEditing && (
-                            <button
-                              onClick={() => handleImageDelete(img.id)}
-                              className="absolute top-1 right-1 p-0.5 bg-red-600 text-white rounded opacity-0 group-hover:opacity-100 transition-opacity"
-                              title="삭제"
-                            >
-                              <Trash2 size={10} />
-                            </button>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* 수정 모드: 이미지 추가 */}
-            {isEditing && (
-              <div className="mt-3 pt-3 border-t border-slate-100">
-                <div className="flex items-center gap-2 mb-2">
-                  <select
-                    value={uploadType}
-                    onChange={(e) => setUploadType(e.target.value as 'thumbnail' | 'detail' | 'content')}
-                    className="text-xs border border-slate-200 rounded px-2 py-1 bg-white"
-                    disabled={uploading}
-                  >
-                    <option value="thumbnail">대표 이미지</option>
-                    <option value="detail">상세 이미지</option>
-                    <option value="content">콘텐츠 이미지</option>
-                  </select>
-                  <button
-                    onClick={() => fileInputRef.current?.click()}
-                    disabled={uploading}
-                    className="flex items-center gap-1 px-3 py-1 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded disabled:opacity-50"
-                  >
-                    {uploading ? (
-                      <Loader2 size={12} className="animate-spin" />
-                    ) : (
-                      <ImagePlus size={12} />
-                    )}
-                    {uploading ? '업로드 중...' : '추가'}
-                  </button>
-                  <button
-                    onClick={() => setShowImagePicker(true)}
-                    disabled={uploading}
-                    className="flex items-center gap-1 px-3 py-1 text-xs font-medium text-emerald-600 bg-emerald-50 hover:bg-emerald-100 rounded disabled:opacity-50"
-                  >
-                    <ImagePlus size={12} />
-                    라이브러리
-                  </button>
-                </div>
-                {uploadType === 'thumbnail' && thumbnail && (
-                  <p className="text-[11px] text-amber-600">기존 대표 이미지가 교체됩니다</p>
-                )}
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept={ACCEPTED_IMAGE_TYPES}
-                  onChange={handleImageUpload}
-                  className="hidden"
-                />
-              </div>
-            )}
-          </Section>
+          {/* WO-O4O-SUPPLIER-POST-REGISTRATION-PRODUCT-MANAGEMENT-OFFER-FIRST-REALIGNMENT-V1 §A: 이미지 관리 섹션 분리 */}
+          <SupplierImageSection
+            images={images}
+            loadingImages={loadingImages}
+            isEditing={isEditing}
+            uploading={uploading}
+            uploadType={uploadType}
+            setUploadType={setUploadType}
+            fileInputRef={fileInputRef}
+            handleImageUpload={handleImageUpload}
+            handleImageDelete={handleImageDelete}
+            setShowImagePicker={setShowImagePicker}
+          />
 
           {/* ── 후편집 체크리스트 (WO-NETURE-BULK-PRODUCT-POST-IMPORT-CURATION-FLOW-V1) ── */}
           {(() => {
@@ -1252,188 +948,35 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
             );
           })()}
 
-          {/* ── 기본 정보 (read-only) ── */}
+          {/* WO-O4O-SUPPLIER-POST-REGISTRATION-PRODUCT-MANAGEMENT-OFFER-FIRST-REALIGNMENT-V1 §A: Master 기준정보 read-only */}
           {!isEditing && (
-            <Section title="상품 정보">
-              <InfoRow label="바코드"><span className="font-mono">{product.barcode}</span></InfoRow>
-              <InfoRow label="상품명">{product.name || product.masterName || '-'}</InfoRow>
-              {product.regulatoryName && product.regulatoryName !== product.name && (
-                <InfoRow label="규제명">{product.regulatoryName}</InfoRow>
-              )}
-              <InfoRow label="브랜드">{product.brandName || '-'}</InfoRow>
-              <InfoRow label="카테고리">
-                {product.categoryName || <span className="text-amber-600 font-medium">미지정</span>}
-              </InfoRow>
-              {product.specification && (
-                <InfoRow label="사양">{product.specification}</InfoRow>
-              )}
-              {product.originCountry && (
-                <InfoRow label="원산지">{product.originCountry}</InfoRow>
-              )}
-              <InfoRow label="규제 유형">
-                <Badge className={regBadgeCls}>{regLabel}</Badge>
-              </InfoRow>
-              {regType !== 'GENERAL' && (
-                <>
-                  <InfoRow label="MFDS 허가번호">
-                    <span className="font-mono">{product.mfdsPermitNumber || '-'}</span>
-                  </InfoRow>
-                  {product.manufacturerName && (
-                    <InfoRow label="제조사">{product.manufacturerName}</InfoRow>
-                  )}
-                </>
-              )}
-            </Section>
+            <MasterReadOnlySection
+              product={product}
+              regType={regType}
+              regLabel={regLabel}
+              regBadgeCls={regBadgeCls}
+              Badge={Badge}
+            />
           )}
 
-          {/* ── 공급 방식 요약 (WO-O4O-NETURE-SUPPLIER-PRODUCT-INFO-DISTRIBUTION-SUMMARY-V1) ──
-               상품 정보와 분리하여 "이 상품을 어디에 어떤 상태로 공급하는가"를 평이한 라벨로 표시.
-               distributionType(내부 용어)은 노출하지 않고 isPublic+serviceKeys 파생 라벨 사용. 표시 전용. */}
-          {!isEditing && (() => {
-            const supplyKeys = (product.serviceKeys || []).filter((k) => k !== 'neture');
-            const isPub = (product as any).isPublic ?? (product.distributionType === 'PUBLIC');
-            let supplyLabel: string, supplyDesc: string, supplyCls: string;
-            if (isPub) {
-              supplyLabel = 'B2B 전체 공급';
-              supplyDesc = '서비스 운영자 승인 없이 HUB에 노출될 수 있습니다.';
-              supplyCls = 'bg-blue-50 text-blue-700';
-            } else if (supplyKeys.length > 0) {
-              supplyLabel = '서비스 공급';
-              supplyDesc = '선택한 서비스 운영자의 승인 후 해당 서비스 HUB에 노출됩니다.';
-              supplyCls = 'bg-purple-50 text-purple-700';
-            } else {
-              supplyLabel = '내부 상품';
-              supplyDesc = '아직 공급 방식이 설정되지 않아 HUB에 노출되지 않습니다.';
-              supplyCls = 'bg-slate-100 text-slate-600';
-            }
-            return (
-              <Section title="공급 방식">
-                <InfoRow label="현재 공급 방식"><Badge className={supplyCls}>{supplyLabel}</Badge></InfoRow>
-                <p className="text-[11px] text-slate-400 -mt-1 mb-1">{supplyDesc}</p>
-                <InfoRow label="기본 B2B 공급가">{formatPrice(product.priceGeneral)}</InfoRow>
-                <InfoRow label="노출 상태">
-                  <Badge className={product.isActive ? 'bg-green-50 text-green-700' : 'bg-slate-100 text-slate-600'}>
-                    {product.isActive ? '노출 활성' : '미노출'}
-                  </Badge>
-                </InfoRow>
-                {supplyKeys.length > 0 && (
-                  <div className="space-y-1 mt-1">
-                    <span className="text-xs text-slate-500">서비스별 승인</span>
-                    {supplyKeys.map((sk) => {
-                      const sa = (product.serviceApprovals || []).find((a) => a.serviceKey === sk);
-                      const st = sa?.status;
-                      return (
-                        <div key={sk} className="flex items-center justify-between pl-3">
-                          <span className="text-xs text-slate-600">{sk}</span>
-                          <Badge className={
-                            st === 'approved' ? 'bg-green-50 text-green-700'
-                              : st === 'pending' ? 'bg-amber-50 text-amber-700'
-                              : st === 'rejected' ? 'bg-red-50 text-red-700'
-                              : st === 'cancelled' ? 'bg-slate-200 text-slate-600'
-                              : 'bg-slate-100 text-slate-500'
-                          }>
-                            {st === 'approved' ? '승인됨' : st === 'pending' ? '승인대기' : st === 'rejected' ? '반려됨' : st === 'cancelled' ? '철회됨' : '미신청'}
-                          </Badge>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-                {/* WO-O4O-NETURE-SUPPLIER-PRODUCT-SERVICE-SPECIFIC-PRICING-FLOW-V1: 서비스별 공급가 */}
-                {supplyKeys.length > 0 && (
-                  <div className="space-y-1 mt-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs text-slate-500">서비스별 공급가</span>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const form: Record<string, string> = {};
-                          (svcPrices?.prices || []).forEach((p) => { form[p.serviceKey] = String(p.unitPrice); });
-                          setSvcPriceForm(form);
-                          setSvcPriceOpen(true);
-                        }}
-                        className="text-[11px] font-medium text-emerald-700 hover:text-emerald-800"
-                      >설정</button>
-                    </div>
-                    {supplyKeys.map((sk) => {
-                      const sp = (svcPrices?.prices || []).find((p) => p.serviceKey === sk);
-                      return (
-                        <div key={sk} className="flex items-center justify-between pl-3">
-                          <span className="text-xs text-slate-600">{sk}</span>
-                          <span className="text-xs text-slate-700">{sp ? formatPrice(sp.unitPrice) : <span className="text-slate-400">기본가 적용</span>}</span>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-                <p className="text-[11px] text-slate-400 mt-2">이벤트 오퍼는 공급 방식 변경이 아니라 별도로 생성합니다.</p>
-
-                {/* WO-O4O-NETURE-SUPPLIER-PRODUCT-DISTRIBUTION-MANAGEMENT-FLOW-V1: 공급 방식 변경 진입 */}
-                {!isEditing && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setDistForm({ isPublic: isPub, serviceKeys: [...supplyKeys] });
-                      setDistConfirmRemove(null);
-                      setDistMgmtOpen(true);
-                    }}
-                    className="mt-3 w-full py-2 text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg"
-                  >
-                    공급 방식 변경
-                  </button>
-                )}
-
-                {/* WO-O4O-NETURE-SUPPLIER-PRODUCT-DISTRIBUTION-MANAGEMENT-ENTRY-V1:
-                    공급 방식 관리 진입 + 정책 안내(읽기 전용). */}
-                <div className="mt-3 pt-3 border-t border-slate-100">
-                  <button
-                    type="button"
-                    onClick={() => setShowSupplyGuide((v) => !v)}
-                    className="flex items-center gap-1 text-xs font-medium text-emerald-700 hover:text-emerald-800"
-                    aria-expanded={showSupplyGuide}
-                  >
-                    {showSupplyGuide ? '▾' : '▸'} 공급 방식 관리 · 정책 안내
-                  </button>
-                  {showSupplyGuide && (
-                    <div className="mt-2 space-y-2 rounded-lg bg-slate-50 border border-slate-100 p-3">
-                      <div>
-                        <p className="text-xs font-semibold text-slate-700">B2B 전체 공급</p>
-                        <p className="text-[11px] text-slate-500">서비스 운영자 승인 없이 HUB에 노출됩니다.</p>
-                      </div>
-                      <div>
-                        <p className="text-xs font-semibold text-slate-700">서비스 공급</p>
-                        <p className="text-[11px] text-slate-500">선택한 서비스 운영자의 승인 후 해당 서비스 HUB에 노출됩니다.</p>
-                      </div>
-                      <div>
-                        <p className="text-xs font-semibold text-slate-700">내부 상품</p>
-                        <p className="text-[11px] text-slate-500">공급 방식이 설정되지 않아 HUB에 노출되지 않습니다.</p>
-                      </div>
-                      <p className="text-[11px] text-slate-400 pt-1 border-t border-slate-100">
-                        공급 방식은 상품 편집에서 전체 공개 여부와 서비스 공급 대상을 조정합니다. 공급 방식별 안내는 공급 오퍼 화면에서 확인할 수 있습니다.
-                      </p>
-                    </div>
-                  )}
-                </div>
-
-                {/* WO-O4O-NETURE-SUPPLIER-PRODUCT-TO-EVENT-OFFER-ENTRY-V1: 이벤트 오퍼 진입 (공급 방식 변경 아님) */}
-                {!isEditing && (
-                  <div className="mt-3 pt-3 border-t border-slate-100">
-                    <p className="text-xs font-semibold text-slate-700 mb-0.5">이벤트 오퍼</p>
-                    <p className="text-[11px] text-slate-500 mb-2">
-                      이벤트 오퍼는 상품의 공급 방식을 바꾸지 않습니다. 기존 상품을 기준으로 대상 서비스·이벤트 가격·기간·수량 조건을 별도로 설정합니다.
-                    </p>
-                    <button
-                      type="button"
-                      onClick={() => navigate(`/supplier/event-offers?supplierProductId=${product.id}&masterId=${product.masterId}&name=${encodeURIComponent(product.name || product.masterName || '')}&priceGeneral=${product.priceGeneral ?? ''}`)}
-                      className="w-full py-2 text-sm font-medium text-purple-700 bg-purple-50 hover:bg-purple-100 rounded-lg border border-purple-200"
-                    >
-                      이 상품으로 이벤트 오퍼 만들기
-                    </button>
-                  </div>
-                )}
-              </Section>
-            );
-          })()}
+          {/* WO-O4O-SUPPLIER-POST-REGISTRATION-PRODUCT-MANAGEMENT-OFFER-FIRST-REALIGNMENT-V1 §A: Offer 배포 설정 분리 */}
+          {!isEditing && (
+            <OfferDistributionSection
+              product={product}
+              navigate={navigate}
+              svcPrices={svcPrices}
+              setSvcPriceForm={setSvcPriceForm}
+              setSvcPriceOpen={setSvcPriceOpen}
+              showSupplyGuide={showSupplyGuide}
+              setShowSupplyGuide={setShowSupplyGuide}
+              isEditing={isEditing}
+              setDistForm={setDistForm}
+              setDistConfirmRemove={setDistConfirmRemove}
+              setDistMgmtOpen={setDistMgmtOpen}
+              formatPrice={formatPrice}
+              Badge={Badge}
+            />
+          )}
 
           {/* ── 소비자 공개 설명 (B2C) ── */}
           {!isEditing && (

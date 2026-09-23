@@ -24,12 +24,11 @@ import {
   Pagination,
 } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
-import { supplierApi, productApi, type SupplierProduct, type SupplierProductPurpose } from '../../lib/api';
+import { supplierApi, type SupplierProduct, type SupplierProductPurpose } from '../../lib/api';
 import type { SupplierApprovalCounts } from '../../lib/api/supplier';
 import ProductDetailDrawer from './ProductDetailDrawer';
 // WO-O4O-NETURE-SUPPLIER-OFFER-MODE-SELECTION-V1
 import { getAllowedOfferActions, getDrugSupplyGate, getSupplierProductTypeLabel, SUPPLIER_OFFER_ACTION_META, buildOfferActionUrl, type SupplierOfferAction } from '../../lib/supplierProductTypes';
-import MediaPickerModal from '../../components/common/MediaPickerModal';
 // WO-O4O-SELLER-RECRUITMENT-CREATION-FLOW-V1
 import RecruitmentCreateModal from '../../components/supplier/RecruitmentCreateModal';
 import {
@@ -49,14 +48,6 @@ const PURPOSE_CONFIG: Record<SupplierProductPurpose, { label: string; bg: string
   ACTIVE_SALES: { label: '판매 중', bg: 'bg-green-50', text: 'text-green-700' },
 };
 
-// ─── Image type options (WO-NETURE-SUPPLIER-EDIT-UI-CONSISTENCY-FIX-V1) ───
-
-const IMAGE_TYPE_OPTIONS: { value: 'thumbnail' | 'detail' | 'content'; label: string; desc: string }[] = [
-  { value: 'thumbnail', label: '대표 이미지', desc: '목록/카드에 표시' },
-  { value: 'detail', label: '상세 이미지', desc: '상품 상세 페이지' },
-  { value: 'content', label: '콘텐츠 이미지', desc: '설명/성분 등 보조' },
-];
-
 // ─── Filter Chip ───
 
 function FilterChip({ label, active, onClick }: { label: string; active: boolean; onClick: () => void }) {
@@ -74,142 +65,9 @@ function FilterChip({ label, active, onClick }: { label: string; active: boolean
   );
 }
 
-// ─── Image Upload Modal (WO-NETURE-SUPPLIER-EDIT-UI-CONSISTENCY-FIX-V1: 3타입 지원) ───
-
-function ImageUploadModal({
-  masterId,
-  onClose,
-  onUploaded,
-}: {
-  masterId: string;
-  onClose: () => void;
-  onUploaded: () => void;
-}) {
-  const [file, setFile] = useState<File | null>(null);
-  const [preview, setPreview] = useState<string | null>(null);
-  const [imageType, setImageType] = useState<'thumbnail' | 'detail' | 'content'>('thumbnail');
-  const [uploading, setUploading] = useState(false);
-  const [showLibrary, setShowLibrary] = useState(false);
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const f = e.target.files?.[0];
-    if (!f) return;
-    setFile(f);
-    setPreview(URL.createObjectURL(f));
-  };
-
-  const handleUpload = async () => {
-    if (!file) return;
-    setUploading(true);
-    // WO-O4O-NETURE-SUPPLIER-PRODUCT-AUTHORING-EXPANSION-CLOSEOUT-BATCH-V1:
-    //   productApi 는 실패해도 예외를 던지지 않고 { success:false } 를 돌려준다.
-    //   catch 가 절대 실행되지 않아 업로드 실패가 성공으로 보였다.
-    try {
-      const res = await productApi.uploadProductImage(masterId, file, imageType);
-      if (!res.success) {
-        alert(`이미지 업로드에 실패했습니다. (${res.error ?? 'UNKNOWN'})`);
-        return;
-      }
-      onUploaded();
-    } catch {
-      alert('이미지 업로드 실패');
-    } finally {
-      setUploading(false);
-    }
-  };
-
-  // WO-NETURE-SUPPLIER-IMAGE-UPLOAD-MODAL-MEDIA-PICKER-ALIGNMENT-V1: 라이브러리 선택
-  const handleLibrarySelect = async (asset: { url: string }) => {
-    setShowLibrary(false);
-    setUploading(true);
-    try {
-      const res = await productApi.registerImageFromUrl(masterId, asset.url, imageType);
-      if (!res.success) {
-        alert(`이미지 등록에 실패했습니다. (${res.error ?? 'UNKNOWN'})`);
-        return;
-      }
-      onUploaded();
-    } catch {
-      alert('이미지 등록 실패');
-    } finally {
-      setUploading(false);
-    }
-  };
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-      <div className="bg-white rounded-xl shadow-xl p-6 w-[400px]">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-bold text-slate-900">이미지 업로드</h3>
-          <button onClick={onClose} className="p-1 hover:bg-slate-100 rounded"><X size={18} /></button>
-        </div>
-
-        {/* Image type selector */}
-        <div className="flex gap-1.5 mb-4">
-          {IMAGE_TYPE_OPTIONS.map((opt) => (
-            <button
-              key={opt.value}
-              onClick={() => setImageType(opt.value)}
-              className={`flex-1 px-2 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-                imageType === opt.value
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-              }`}
-              title={opt.desc}
-            >
-              {opt.label}
-            </button>
-          ))}
-        </div>
-
-        {preview ? (
-          <div className="mb-4 flex justify-center">
-            <img src={preview} alt="미리보기" className="max-h-48 rounded-lg object-contain" />
-          </div>
-        ) : (
-          <div
-            onClick={() => inputRef.current?.click()}
-            className="mb-4 border-2 border-dashed border-slate-300 rounded-lg p-8 text-center cursor-pointer hover:border-blue-400"
-          >
-            <ImagePlus size={32} className="mx-auto text-slate-400 mb-2" />
-            <p className="text-sm text-slate-500">클릭하여 이미지 선택</p>
-            <p className="text-[10px] text-slate-400 mt-1">{IMAGE_TYPE_OPTIONS.find(o => o.value === imageType)?.desc}</p>
-          </div>
-        )}
-
-        <input ref={inputRef} type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
-
-        {/* WO-NETURE-SUPPLIER-IMAGE-UPLOAD-MODAL-MEDIA-PICKER-ALIGNMENT-V1: 라이브러리 선택 버튼 */}
-        <button
-          onClick={() => setShowLibrary(true)}
-          disabled={uploading}
-          className="w-full mb-4 px-4 py-2 text-sm font-medium text-emerald-600 bg-emerald-50 border border-emerald-200 rounded-lg hover:bg-emerald-100 disabled:opacity-50"
-        >
-          라이브러리에서 선택
-        </button>
-
-        <div className="flex justify-end gap-2">
-          <button onClick={onClose} disabled={uploading} className="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg">취소</button>
-          <button
-            onClick={handleUpload}
-            disabled={!file || uploading}
-            className="px-4 py-2 text-sm text-white bg-blue-600 hover:bg-blue-700 rounded-lg disabled:opacity-50"
-          >
-            {uploading ? '업로드 중...' : '업로드'}
-          </button>
-        </div>
-      </div>
-      <MediaPickerModal
-        open={showLibrary}
-        onClose={() => setShowLibrary(false)}
-        onSelect={handleLibrarySelect}
-        title="상품 이미지 선택"
-        defaultFolder={imageType === 'thumbnail' ? 'product-thumbnail' : 'description'}
-      />
-    </div>
-  );
-}
+// WO-O4O-SUPPLIER-POST-REGISTRATION-PRODUCT-MANAGEMENT-OFFER-FIRST-REALIGNMENT-V1 §B (2026-09-23):
+//   목록의 ImageUploadModal 은 제거됐다 — 이미지 관리는 ProductDetailDrawer 한 곳에서만 한다.
+//   Drawer 가 동일 3타입(thumbnail·detail·content) 업로드·라이브러리 선택·삭제·대표 지정을 모두 제공한다.
 
 // ─── Regulatory Info Modal (WO-NETURE-SUPPLIER-EDIT-UI-CONSISTENCY-FIX-V1) ───
 
@@ -700,7 +558,6 @@ export default function SupplierProductsPage() {
   const [countsError, setCountsError] = useState(false);
 
   // Modal state
-  const [imageUploadMasterId, setImageUploadMasterId] = useState<string | null>(null);
   const [regulatoryProduct, setRegulatoryProduct] = useState<SupplierProduct | null>(null);
   const [previewProduct, setPreviewProduct] = useState<SupplierProduct | null>(null);
 
@@ -792,7 +649,7 @@ export default function SupplierProductsPage() {
           <img src={v} alt="" className="w-10 h-10 rounded object-cover mx-auto" />
         ) : (
           <button
-            onClick={(e) => { e.stopPropagation(); setImageUploadMasterId(row.masterId); }}
+            onClick={(e) => { e.stopPropagation(); setDrawerProduct(row); }}
             className="p-1 rounded hover:bg-blue-50 text-slate-400 hover:text-blue-600"
             title="이미지 추가"
           >
@@ -898,7 +755,7 @@ export default function SupplierProductsPage() {
             const bgColor = score >= 80 ? 'bg-green-500' : score >= 40 ? 'bg-amber-500' : 'bg-red-500';
             type MissingItem = { label: string; action: () => void };
             const missing: MissingItem[] = [];
-            if (!row.primaryImageUrl) missing.push({ label: '이미지', action: () => setImageUploadMasterId(row.masterId) });
+            if (!row.primaryImageUrl) missing.push({ label: '이미지', action: () => setDrawerProduct(row) });
             if (!row.priceGeneral || row.priceGeneral <= 0) missing.push({ label: '가격', action: () => showToast('공급가 셀을 클릭하여 편집하세요') });
             if (!row.consumerShortDescription) missing.push({ label: '간단 소개', action: () => setDrawerProduct(row) });
             if (!row.consumerDetailDescription) missing.push({ label: '상세 설명', action: () => setDrawerProduct(row) });
@@ -1210,7 +1067,7 @@ export default function SupplierProductsPage() {
 
     // Auto-open editor for same action type
     if (pending.type === 'image' && !next.primaryImageUrl) {
-      setTimeout(() => setImageUploadMasterId(next!.masterId), 400);
+      setTimeout(() => setDrawerProduct(next!), 400);
     } else if (pending.type === 'description' && (!next.consumerShortDescription || !next.consumerDetailDescription)) {
       setTimeout(() => setDrawerProduct(next!), 400);
     }
@@ -1391,8 +1248,8 @@ export default function SupplierProductsPage() {
               <span className="text-amber-600"> 의약품은 약국 대상 서비스에만 연결할 수 있습니다.</span>
             </li>
             <li>
-              <strong>B2B 콘텐츠 관리</strong> — 사업자용 설명을 보강합니다. B2B 설명이 없으면 B2C 설명을 기본으로 사용합니다.
-              <button type="button" onClick={() => navigate('/supplier/b2b-content')} className="ml-1 text-blue-600 hover:text-blue-800 underline">B2B 콘텐츠로 이동</button>
+              <strong>B2B 설명 보강</strong> — 상품 행을 열어 Drawer 에서 사업자용 설명을 편집합니다.
+              B2B 설명이 없으면 B2C 설명을 기본으로 사용합니다.
             </li>
             <li>
               <strong>이벤트 오퍼 연결 / 유통참여형 펀딩 연결</strong> — 각 제품 행의 <span className="font-medium">[후속 작업]</span> 에서 연결합니다.
@@ -1631,18 +1488,6 @@ export default function SupplierProductsPage() {
             </div>
           </div>
         </div>
-      )}
-      {imageUploadMasterId && (
-        <ImageUploadModal
-          masterId={imageUploadMasterId}
-          onClose={() => setImageUploadMasterId(null)}
-          onUploaded={() => {
-            const p = products.find(pr => pr.masterId === imageUploadMasterId);
-            if (p) lastEditedRef.current = { id: p.id, type: 'image' };
-            setImageUploadMasterId(null);
-            fetchProducts(pagination.page);
-          }}
-        />
       )}
       {regulatoryProduct && (
         <RegulatoryInfoModal

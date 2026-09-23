@@ -61,7 +61,6 @@ type SidebarGroup = { label: string; icon: LucideIcon; items: SidebarItem[] };
 //   ROLE-WORKSPACE-ARCHITECTURE §2 기준 세 업무축 `Products / Orders / Content` 로 재정렬.
 //   목표 IA = 공급자 홈 / 상품 / 주문 / 콘텐츠 / 설정 (홈·설정은 Workspace utility).
 //   - 상품(Products): 종전 '상품' + '유통'(공급 오퍼 · 서비스 제공 설정 · 판매자 모집 · 유통참여형 펀딩 · 이벤트 오퍼) 흡수.
-//     `/supplier/b2b-content` 는 도매 거래 상품 정보(IR §8)이므로 '거래 상품 정보' 로 Products 유지 — 기능명 과장 금지.
 //   - 주문(Orders): 주문 현황 · 재고 관리 · 정산 내역 (B2B 주문 contract 무변경).
 //   - 콘텐츠(Content): canonical 원천 = 콘텐츠 라이브러리(neture_supplier_library_items, /supplier/library).
 //     매장용 상품 설명서 · 태블릿 화면 자료 · 디지털 사이니지 = 용도별 결과물/제작 도구, 검수·게시 현황 = 상태.
@@ -84,8 +83,9 @@ const SUPPLIER_SIDEBAR_GROUPS: SidebarGroup[] = [
       { label: '대량 등록', path: '/supplier/products/bulk' },
       // WO-O4O-SUPPLIER-PRODUCT-AI-ASSISTED-CANDIDATE-AUTHORING-V1: 별도 체계가 아니라 '상품 등록' Draft 의 입력 방법 중 하나
       { label: '소스 자동 입력', path: '/supplier/products/import-assistant' },
-      { label: '거래 상품 정보', path: '/supplier/b2b-content' },
-      { label: '공급 오퍼', path: '/supplier/supply-offers' },
+      // WO-O4O-SUPPLIER-POST-REGISTRATION-PRODUCT-MANAGEMENT-OFFER-FIRST-REALIGNMENT-V1 §C·§D (2026-09-23):
+      //   '거래 상품 정보'(B2B 설명 편집) 와 '공급 오퍼'(안내 허브) 는 상품 목록으로 접힌다.
+      //   B2B 설명은 상품 Drawer 에서, 유통 정책·서비스 대상은 상품 목록에서 직접 다룬다.
       // WO-O4O-PHARMACYHUB-SERVICE-MODEL-REALIGNMENT-AND-SUPPLIER-ROLE-REMOVAL-V1:
       //   Pharmacy-Hub 는 운영자 공급 승인이 없는 직접 opt-in 축 — 제공 설정은 Neture 에만 있다.
       { label: '서비스 제공 설정', path: '/supplier/services/pharmacy-hub' },

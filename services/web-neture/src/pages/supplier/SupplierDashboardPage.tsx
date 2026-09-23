@@ -573,10 +573,10 @@ export default function SupplierDashboardPage() {
             ) : null}
           </dl>
           <Link
-            to="/supplier/supply-offers"
+            to="/supplier/products"
             className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-blue-600 hover:text-blue-700"
           >
-            공급 오퍼 관리 <ArrowRight size={14} />
+            상품 목록에서 유통 관리 <ArrowRight size={14} />
           </Link>
         </section>
 
@@ -909,8 +909,6 @@ const QUICK_LINK_GROUPS = [
     links: [
       { label: '상품 목록', path: '/supplier/products' },
       { label: '상품 등록', path: '/supplier/products/register' },
-      { label: '거래 상품 정보', path: '/supplier/b2b-content' },
-      { label: '공급 오퍼', path: '/supplier/supply-offers' },
     ],
   },
   {
@@ -935,7 +933,8 @@ const QUICK_LINK_GROUPS = [
 //   라벨은 SupplierSpaceLayout 사이드바(canonical)와 동일 어휘를 사용한다.
 //   검수·게시 현황(/supplier/store-materials-status) 진입점 누락도 함께 해소한다.
 // WO-O4O-SUPPLIER-WORKSPACE-REALIGNMENT-AND-DISTRIBUTION-V1: 콘텐츠 축 = 사이드바 '콘텐츠' 그룹과 동일.
-//   거래 상품 정보(/supplier/b2b-content)는 상품 축으로 이동.
+// WO-O4O-SUPPLIER-POST-REGISTRATION-PRODUCT-MANAGEMENT-OFFER-FIRST-REALIGNMENT-V1 §C·§D (2026-09-23):
+//   '거래 상품 정보'·'공급 오퍼' quick link 는 상품 목록으로 접혔다.
 const CONTENT_LINKS = [
   { label: '콘텐츠 라이브러리', path: '/supplier/library' },
   { label: '매장용 상품 설명서', path: '/supplier/store-descriptions' },
