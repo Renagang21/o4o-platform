@@ -136,12 +136,21 @@ const courseEntityRepo: any = {
   findOne: async ({ where }: any) => (courses[where.id] ? { ...courses[where.id] } : null),
 };
 let assignmentWrites: string[] = [];
+/** 13차 P2: 운영자 검토의 퀴즈 배치 조회 호출 기록. */
+let quizBatchCalls: string[][] = [];
 const assignmentSvc: any = {
   upsertAssignment: async (d: any) => { assignmentWrites.push(d.lessonId); return { id: 'as', ...d }; },
   listSubmissionsForLesson: async () => [],
   // 11차 P2: 운영자 검토 화면은 과제 "존재 여부"만 읽는다 (write 0)
   getAssignmentByLesson: async (lessonId: string) => (lessonId === 'les-pub' ? { id: 'as-1', lessonId } : null),
+  // 13차 P2(Codex): lesson 별 1쿼리가 아니라 배치 1회 — 호출 인자를 기록해 검증한다.
+  findLessonIdsWithAssignment: async (lessonIds: string[]) => {
+    assignmentBatchCalls.push(lessonIds);
+    return new Set(lessonIds.filter((id) => id === 'les-pub'));
+  },
 };
+/** 13차 P2: 운영자 검토의 과제 배치 조회 호출 기록 (호출 1회 · lessonId 전량). */
+let assignmentBatchCalls: string[][] = [];
 
 type CourseRow = { id: string; serviceKey: string | null; visibility: string; instructorId: string; status: string; title: string; isPaid?: boolean; tags?: string[] };
 const courses: Record<string, CourseRow> = {};
@@ -221,6 +230,13 @@ beforeEach(() => {
       return match ? JSON.parse(JSON.stringify(match)) : null;
     },
     save: async (q: any) => { savedQuiz = q; quizzes[q.id] = q; return q; },
+    // 13차 P2(Codex): `In(lessonIds)` 배치 조회. 호출 인자를 기록해 배치 1회를 검증한다.
+    find: async ({ where }: any) => {
+      const ids: string[] = (where?.lessonId as any)?._value ?? [];
+      quizBatchCalls.push(ids);
+      return Object.values(quizzes).filter((q: any) => ids.includes(q.lessonId))
+        .map((q: any) => JSON.parse(JSON.stringify(q)));
+    },
   };
   cs.maybeRevertToPendingReview = jest.fn(async () => undefined);
 
@@ -1024,12 +1040,18 @@ describe('11차 P1-32 certificate 수정은 지원 5필드만', () => {
 
 describe('11차 P2-33 운영자 검토 화면 — 읽기 전용 · enrollment 0', () => {
   beforeEach(() => {
+    quizBatchCalls = [];
+    assignmentBatchCalls = [];
     const ls: any = LessonService.getInstance();
     ls.listLessonsByCourse = jest.fn(async (courseId: string) => ({
       lessons: courseId === 'lec-pub'
-        ? [{ id: 'les-pub', courseId, title: 'L1', type: 'video', order: 1, isPublished: false, isFree: false, content: { html: 'x' } }]
+        ? [
+            { id: 'les-pub', courseId, title: 'L1', type: 'video', order: 1, isPublished: false, isFree: false, content: { html: 'x' }, videoUrl: 'https://cdn/v.mp4', attachments: [{ name: 'a.pdf', url: 'https://cdn/a.pdf', type: 'pdf', size: 1 }] },
+            { id: 'les-pub-2', courseId, title: 'L2', type: 'text', order: 2, isPublished: true, isFree: false },
+            { id: 'les-pub-3', courseId, title: 'L3', type: 'text', order: 3, isPublished: true, isFree: false },
+          ]
         : [],
-      total: courseId === 'lec-pub' ? 1 : 0,
+      total: courseId === 'lec-pub' ? 3 : 0,
     }));
   });
 
@@ -1045,7 +1067,7 @@ describe('11차 P2-33 운영자 검토 화면 — 읽기 전용 · enrollment 0'
     expect(res.statusCode).toBe(200);
     expect(res.body.data.readOnly).toBe(true);
     expect(res.body.data.course.id).toBe('lec-pub');
-    expect(res.body.data.curriculum).toHaveLength(1);
+    expect(res.body.data.curriculum).toHaveLength(3);
     const l = res.body.data.curriculum[0];
     expect(l.content).toEqual({ html: 'x' });       // 내용 확인 가능
     expect(l.isPublished).toBe(false);              // 초안도 검토자에게는 보인다
@@ -1056,6 +1078,25 @@ describe('11차 P2-33 운영자 검토 화면 — 읽기 전용 · enrollment 0'
     expect(lessonWrites).toEqual([]);
     expect(assignmentWrites).toEqual([]);
     expect(certMutations).toEqual([]);
+  });
+
+  it('13차 P2: 평가 조회는 lesson 수와 무관하게 배치 2회다 (lesson 별 N+N 쿼리 금지)', async () => {
+    const res = await call('lec-pub');
+    expect(res.statusCode).toBe(200);
+    // lesson 3개인데 호출은 각각 1회 — 인자에 lessonId 전량이 실린다.
+    expect(quizBatchCalls).toHaveLength(1);
+    expect(assignmentBatchCalls).toHaveLength(1);
+    expect(assignmentBatchCalls[0]).toEqual(['les-pub', 'les-pub-2', 'les-pub-3']);
+    expect(quizBatchCalls[0]).toEqual(['les-pub', 'les-pub-2', 'les-pub-3']);
+  });
+
+  it('13차 P2: 검토 화면이 실제 자료(영상·첨부)를 확인할 수 있게 돌려준다', async () => {
+    const res = await call('lec-pub');
+    const l = res.body.data.curriculum[0];
+    expect(l.videoUrl).toBe('https://cdn/v.mp4');
+    expect(l.attachments).toEqual([{ name: 'a.pdf', url: 'https://cdn/a.pdf', type: 'pdf', size: 1 }]);
+    // 문항·정답은 여전히 비노출 (WO 계약)
+    expect(JSON.stringify(res.body.data)).not.toContain('"questions"');
   });
 
   it('legacy(KPA) 강의는 non-disclosure 404', async () => {
@@ -1258,6 +1299,18 @@ describe('정적 계약', () => {
     expect(review).not.toContain('instructorApi');
     expect(review).not.toContain('/instructor/courses/');
   });
+  it('13차 P2: 운영자 검토 화면은 영상·첨부를 실제로 열람할 수 있게 렌더한다 (문항·정답은 아님)', () => {
+    const page = read('services/web-lecture/src/pages/operator/OperatorCourseReviewPage.tsx');
+    expect(page).toContain('<video');                       // 영상 재생
+    expect(page).toContain('영상 원본 열기');
+    expect(page).toContain('l.attachments.map');            // 첨부 링크
+    expect(page).toContain('rel="noopener noreferrer"');
+    expect(page).toContain('문항·정답은 검토 화면에서 노출하지 않습니다');
+    expect(page).not.toContain('correctAnswer');
+    // 읽기 전용 유지 — 편집 진입점 없음
+    expect(page).not.toContain('operatorApi.update');
+  });
+
   it('11차 P2-35: PharmacyHub 가이드·KPA 홈 피드에 내부 강의 안내가 남아 있지 않다', () => {
     const ph = read('packages/shared-space-ui/src/guide/copy/pharmacy-hub.ts');
     expect(ph).not.toContain('교육 콘텐츠는 PharmacyHub 에 등록된 강의만 표시됩니다.');

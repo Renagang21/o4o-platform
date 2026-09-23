@@ -1,4 +1,4 @@
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { AppDataSource } from '../../../database/connection.js';
 import { Quiz, QuizAttempt, AttemptStatus, Lesson, LessonType } from '@o4o/lms-core';
 import { Progress, ProgressStatus, Enrollment, EnrollmentStatus } from '@o4o/lms-core';
@@ -88,6 +88,29 @@ export class QuizService {
    */
   async getQuizForLessonWithAnswers(lessonId: string): Promise<Quiz | null> {
     return this.quizRepository.findOne({ where: { lessonId } as any });
+  }
+
+  /**
+   * 운영자 검토 surface 전용 배치 조회 (PR #225 merge-gate 13차 · Codex P2).
+   * lesson 마다 1쿼리를 쏘면 500 lesson 강의에서 500 쿼리가 된다 — `IN` 으로 묶어 한 번에 읽는다.
+   * 반환은 lessonId → 문항 수 요약뿐이다. **문항·정답은 담지 않는다.**
+   */
+  async countQuizQuestionsByLessons(lessonIds: string[]): Promise<Map<string, number>> {
+    const result = new Map<string, number>();
+    if (lessonIds.length === 0) return result;
+    const CHUNK = 200; // 파라미터 폭주 방지
+    for (let i = 0; i < lessonIds.length; i += CHUNK) {
+      const quizzes = await this.quizRepository.find({
+        where: { lessonId: In(lessonIds.slice(i, i + CHUNK)) } as any,
+        select: ['id', 'lessonId', 'questions'] as any,
+      });
+      for (const quiz of quizzes) {
+        const lessonId = (quiz as any).lessonId;
+        if (!lessonId) continue;
+        result.set(lessonId, Array.isArray(quiz.questions) ? quiz.questions.length : 0);
+      }
+    }
+    return result;
   }
 
   /**

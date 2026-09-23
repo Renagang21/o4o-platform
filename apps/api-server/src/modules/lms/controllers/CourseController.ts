@@ -440,34 +440,33 @@ export class CourseController extends BaseController {
       }
 
       const { lessons } = await LessonService.getInstance().listLessonsByCourse(courseId, { limit: 500 } as any);
-      const quizService = QuizService.getInstance();
-      const assignmentService = AssignmentService.getInstance();
 
-      const curriculum = await Promise.all(
-        lessons.map(async (lesson: any) => {
-          const [quiz, assignment] = await Promise.all([
-            quizService.getQuizForLessonWithAnswers(lesson.id),
-            assignmentService.getAssignmentByLesson(lesson.id),
-          ]);
-          return {
-            id: lesson.id,
-            title: lesson.title,
-            description: lesson.description ?? null,
-            type: lesson.type,
-            order: lesson.order,
-            duration: lesson.duration ?? null,
-            isPublished: lesson.isPublished,
-            isFree: lesson.isFree,
-            videoUrl: lesson.videoUrl ?? null,
-            attachments: lesson.attachments ?? [],
-            content: lesson.content ?? null,
-            // 존재 여부만 — 문항·정답은 검토 화면에서 노출하지 않는다.
-            hasQuiz: Boolean(quiz),
-            quizQuestionCount: Array.isArray((quiz as any)?.questions) ? (quiz as any).questions.length : 0,
-            hasAssignment: Boolean(assignment),
-          };
-        })
-      );
+      // 13차 P2(Codex): lesson 마다 quiz/assignment 를 1건씩 조회하면 500 lesson 강의에서
+      // 요청 1건이 1,000 쿼리가 된다 — DB pool 을 독점하고 큰 강의일수록 검토가 timeout 된다.
+      // lessonId 를 모아 `IN` 배치 2회로 줄인다(각 서비스가 200건씩 chunk).
+      const lessonIds = lessons.map((lesson: any) => lesson.id).filter(Boolean);
+      const [quizQuestionCounts, lessonIdsWithAssignment] = await Promise.all([
+        QuizService.getInstance().countQuizQuestionsByLessons(lessonIds),
+        AssignmentService.getInstance().findLessonIdsWithAssignment(lessonIds),
+      ]);
+
+      const curriculum = lessons.map((lesson: any) => ({
+        id: lesson.id,
+        title: lesson.title,
+        description: lesson.description ?? null,
+        type: lesson.type,
+        order: lesson.order,
+        duration: lesson.duration ?? null,
+        isPublished: lesson.isPublished,
+        isFree: lesson.isFree,
+        videoUrl: lesson.videoUrl ?? null,
+        attachments: lesson.attachments ?? [],
+        content: lesson.content ?? null,
+        // 존재 여부·문항 수만 — 문항·정답은 검토 화면에서 노출하지 않는다.
+        hasQuiz: quizQuestionCounts.has(lesson.id),
+        quizQuestionCount: quizQuestionCounts.get(lesson.id) ?? 0,
+        hasAssignment: lessonIdsWithAssignment.has(lesson.id),
+      }));
 
       return BaseController.ok(res, {
         course: {

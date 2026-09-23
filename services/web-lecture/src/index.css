@@ -11,3 +11,6 @@
 .pager{display:flex;gap:8px;align-items:center;justify-content:center;margin-top:20px;font-size:14px}.empty{padding:40px;text-align:center}.dl{display:grid;grid-template-columns:140px 1fr;gap:8px 16px;font-size:14px}.dl dt{font-weight:700;color:#4b5565}.dl dd{margin:0}.submission{white-space:pre-wrap;padding:12px;border-radius:8px;background:#f4f5f8;font:inherit;font-size:14px;margin:10px 0}
 .toast-stack{position:fixed;right:16px;bottom:16px;display:grid;gap:8px;z-index:1000}.toast{padding:12px 16px;border-radius:10px;background:#172033;color:#fff;font-size:14px;box-shadow:0 8px 24px rgba(0,0,0,.18)}.toast-success{background:#16713a}.toast-error{background:#a12626}
 @media(max-width:720px){.page-wide{padding-top:28px}.dl{grid-template-columns:1fr}}
+
+/* 운영자 검토 화면 — 자료 확인용 미리보기 (읽기 전용) */
+.review-video { display: block; width: 100%; max-width: 560px; border-radius: 8px; background: #000; margin-bottom: 6px; }

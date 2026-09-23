@@ -94,11 +94,26 @@ export default function OperatorCourseReviewPage() {
           </div>
           {l.description && <div className="list-meta">{l.description}</div>}
           <div className="list-meta muted">
-            {l.videoUrl ? '영상 있음' : '영상 없음'}
-            {' · '}첨부 {l.attachments?.length ?? 0}
-            {' · '}퀴즈 {l.hasQuiz ? `있음(${l.quizQuestionCount}문항)` : '없음'}
+            퀴즈 {l.hasQuiz ? `있음(${l.quizQuestionCount}문항)` : '없음'}
             {' · '}과제 {l.hasAssignment ? '있음' : '없음'}
+            {l.hasQuiz && <span> · 문항·정답은 검토 화면에서 노출하지 않습니다</span>}
           </div>
+          {/* 13차 P2(Codex): 존재 여부만 보여주면 운영자가 내용을 확인하지 못한 채 승인하게 된다.
+              서버가 이미 돌려주는 자료를 실제로 열람할 수 있게 한다 — 읽기 전용은 그대로다. */}
+          {l.videoUrl
+            ? <div className="list-meta">
+                <video className="review-video" src={l.videoUrl} controls preload="metadata" />
+                <a href={l.videoUrl} target="_blank" rel="noopener noreferrer">영상 원본 열기</a>
+              </div>
+            : <div className="list-meta muted">영상 없음</div>}
+          {(l.attachments?.length ?? 0) > 0
+            ? <ul className="list-meta">
+                {l.attachments.map((a, i) => <li key={`${l.id}-att-${i}`}>
+                  <a href={a.url} target="_blank" rel="noopener noreferrer">{a.name || `첨부 ${i + 1}`}</a>
+                  {a.type ? <span className="muted"> · {a.type}</span> : null}
+                </li>)}
+              </ul>
+            : <div className="list-meta muted">첨부 없음</div>}
           {l.content && <pre className="code-block">{JSON.stringify(l.content, null, 2)}</pre>}
         </li>)}
       </ol>

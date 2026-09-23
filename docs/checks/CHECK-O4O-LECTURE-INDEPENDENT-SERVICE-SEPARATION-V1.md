@@ -488,6 +488,17 @@ spec 추가(12차): rate-limit-ordering spec **+1건**(401 로 끊긴 요청도 
 
 > **PR CI 의 남은 적색 2건은 main drift 다 — 이 PR 의 변경이 아니다.** `9bf65de68` 의 `API Server Jest` / `Code Quality Check` 실패는 `origin/main` 자체(`1e30e24ee`, 운영자 초대 Google 전환)에서 이미 동일하게 실패하고 있다: ① `unified-store-workspace-handoff.spec.ts › manifest 에 append 되고 expected-schema-states 와 lockstep 이다`(`1790125106065-CreateOperatorInvitations` 가 manifest·expected-schema-states 와 lockstep 이 아님) ② admin-dashboard vitest `OperatorsPage`(password-policy 단언이 재작성된 화면과 불일치). 그 뒤 main 의 "success" 런은 docs-only fast path 로 두 job 이 **skipped** 된 것이다. 본 PR 은 두 파일군 중 어느 것도 diff 에 포함하지 않고(로컬 full jest 347 suites PASS), **범위 밖이라 수정하지 않는다** — 해당 세션/별도 WO 소관.
 
+### 17-3-l. 13차 — Codex 12차 리뷰 응답 2건 (P2 2) · 운영자 검토 surface 완결
+
+`c2aac0b55` 리뷰(2026-09-23T04:47:34Z). **신규 P0/P1 = 0.** 2건 모두 신설 surface 의 실사용 가능성에 관한 것이라 반영했다.
+
+| # | 등급 | 지적 | 처리 | 판정 |
+|---|---|---|---|---|
+| 39 | P2 | 운영자 검토 화면이 "영상 있음 · 첨부 N · 퀴즈 N문항 · 과제 있음"만 보여준다. 재생기·첨부 링크가 없어 **운영자가 실제 자료를 확인하지 못한 채 승인**하게 된다 | 서버는 이미 `videoUrl`·`attachments`·`content` 를 돌려주고 있었고 화면이 존재 여부만 표시하고 있었다 → 화면에서 **영상 재생기 + 원본 열기 링크**, **첨부 개별 링크**(`target="_blank" rel="noopener noreferrer"`)를 렌더한다. `content` 는 기존대로 가공 없이 표시한다(instructor 초안 HTML 을 그대로 주입하지 않는다). **퀴즈 문항·정답은 계속 비노출** — WO 가 정한 노출 범위가 "평가 존재 여부"이고, 검토용 정답 노출은 별도 판단이 필요하므로 화면에 그 사실을 명시했다. 읽기 전용·write 0 불변 | **FIXED (문항·정답 노출은 범위 밖 · DEFERRED)** |
+| 40 | P2 | `operatorCourseReview` 가 lesson 마다 `getQuizForLessonWithAnswers` + `getAssignmentByLesson` 2쿼리를 `Promise.all` 로 띄운다 — 500 lesson 강의에서 요청 1건이 **1,000 쿼리**. DB pool 독점 · 큰 강의일수록 검토가 timeout 된다 | `QuizService.countQuizQuestionsByLessons(lessonIds)` · `AssignmentService.findLessonIdsWithAssignment(lessonIds)` 배치 조회 신설(각각 `IN` · 200건 chunk). controller 는 lesson 수와 무관하게 **배치 2회**만 쏜다. 퀴즈 배치는 문항 **수**만 map 으로 돌려주므로 정답이 controller 로 흘러오지 않는다(기존 `getQuizForLessonWithAnswers` 경로보다 노출면이 좁다) | **FIXED** |
+
+spec 추가(13차): merge-gate spec **+3건**(배치 2회 · 인자에 lessonId 전량 · 영상/첨부 실제 반환 및 `questions` 비노출 · 화면 정적 계약) → **122/122**. rate-limit-ordering spec 12/12 유지. 완화 0.
+
 ### 17-4. 검증 (merge-gate)
 
 | 항목 | 결과 |
@@ -495,6 +506,7 @@ spec 추가(12차): rate-limit-ordering spec **+1건**(401 로 끊긴 요청도 
 | shared-space-ui vitest | 8 files / 100 PASS |
 | api-server tsc | 0 |
 | api-server jest 전체 (1차 f3b8c8ca5) | 전체 실행 345 suites(4 skipped) — 344 PASS + `lms-operator-multi-service-scope` 1 FAIL(정적 계약이 `isLectureCourse` 정의를 routes 파일에서 찾음 → lecture-access.ts 로 승격된 위치로 assertion 갱신 · 완화 0) → 재실행 PASS. 최종 345/345 · 5799 tests PASS(32 skipped) · 0 FAIL |
+| 13차(Codex 12차 응답 2건 · §17-3-l) | api-server tsc 0 · web-lecture tsc 0 · web-lecture vite build PASS · **api-server full jest 347 suites / 5,909 tests PASS (fail 0 · 32 skipped)** · merge-gate spec **122/122** · rate-limit-ordering spec 12/12 · eslint(변경 5파일) error 0(기존 unused-vars warning 2 유지) |
 | 12차(Codex 11차 응답 2건 · §17-3-k) | api-server tsc 0 · web-lecture tsc 0 · web-lecture vite build PASS · **api-server full jest 347 suites / 5,906 tests PASS (fail 0 · 32 skipped)** · merge-gate spec **119/119** · rate-limit-ordering spec **12/12** · eslint(LessonController + 신규/수정 spec 2) error 0. PR CI 의 `API Server Jest` · `Code Quality Check` 적색 2건은 **main drift**(§17-3-k 하단) — 본 PR diff 밖 |
 | 11차(Codex 8~10차 응답 7건 · §17-3-j) | api-server tsc 0 · web-lecture tsc 0 · web-lecture vite build PASS · web-kpa-society build PASS · **api-server full jest 347 suites / 5,898 tests PASS (fail 0)** · merge-gate spec **115/115** · rate-limit-ordering spec **11/11** · eslint(LMS 모듈 + 신규 spec) 신규 error 0 · CodeQL `js/missing-rate-limiting` 0 |
 | 10차(SonarCloud 중복 해소 · §17-3-i) | merge-gate spec 95/95 (동일) · 계약/단언 변경 0 |
