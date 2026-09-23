@@ -452,7 +452,7 @@ spec 추가(9차): P1-18 3건 · P2-10 4건 · P2-11 1건 → merge-gate spec **
 
 | # | 등급 | 지적 | 처리 | 판정 |
 |---|---|---|---|---|
-| 30 | P1 | LMS 라우터 최상단 `router.use(apiLimiter)` 는 인증 **전**에 실행돼 키가 항상 `${ip}:anonymous` — 같은 NAT/사무실 IP 뒤 사용자 전체가 분당 60 요청 한 통을 공유한다 | 라우터 전역 적용을 제거하고 **라우트마다** `requireAuth\|optionalAuth → apiLimiter → role/membership guard → enrollment guard → controller` 순서로 배치(70개 라우트). 인증 없는 공개 라우트는 `apiLimiter → controller` 로 IP 단위 제한 유지. Auth Core 무변경 · 새 인증 로직 0 · invalid token 은 인증 실패로 anonymous IP 버킷에 남아 개인 버킷을 만들지 못한다 | **FIXED** |
+| 30 | P1 | LMS 라우터 최상단 `router.use(apiLimiter)` 는 인증 **전**에 실행돼 키가 항상 `${ip}:anonymous` — 같은 NAT/사무실 IP 뒤 사용자 전체가 분당 60 요청 한 통을 공유한다 | 라우터 전역 적용을 제거하고 **라우트마다 2겹**으로 배치(69개 인증 라우트): `ipBurstLimiter → requireAuth\|optionalAuth → apiLimiter → role/membership guard → enrollment guard → controller`. 공개 라우트는 `apiLimiter → controller` 로 IP 단위 제한 유지. Auth Core 무변경 · 새 인증 로직 0 · invalid token 은 인증 실패로 anonymous IP 버킷에 남아 개인 버킷을 만들지 못한다 | **FIXED** |
 | 31 | P1 | `LessonController.updateLesson` 이 `req.body` 를 그대로 `Object.assign(lesson, data)` — 소유권은 **수정 전** `courseId` 로만 검사하므로 `courseId` 를 실어 보내면 자기 강의의 lesson 을 타인 강의로 옮길 수 있다 | `LessonService` 에 `pickUpdatableLessonFields` allowlist(15필드) 신설, `updateLesson` 이 단일 choke point 에서 걸러낸다. allowlist 밖 키(`courseId`·`id`·소유권 파생)는 조용히 버린다 | **FIXED** |
 | 32 | P1 | `CertificateService.updateCertificate` 도 동일 — scope 통과 후 `courseId`·`userId`·`id` 를 바꿔 수료증을 다른 강의·다른 사용자 소유로 옮길 수 있다 | `pickUpdatableCertificateFields` allowlist(지원 5필드: `certificateUrl`·`badgeUrl`·`isValid`·`expiresAt`·`metadata`) 신설 | **FIXED** |
 | 33 | P2 | 운영자가 강의 **내용을 볼 수 없는 채로** 승인/반려만 가능하다. 운영 목록의 강의 링크가 learner `coursePath` 로 향해 membership·enrollment 정책에 막힌다 | **읽기 전용 운영자 검토 surface** 신설. 서버 `GET /api/v1/lms/operator/courses/:courseId/review` = `requireAuth → apiLimiter → requireLectureOperator`(active lecture membership + `lecture:operator`⊂`lecture:admin` · `platform:super_admin` break-glass 유지) · `course.serviceKey==='lecture'` 만, legacy KPA/PH/NULL 은 **non-disclosure 404** (scope 가 소유권·admin override 보다 먼저). 노출 = 강의 정보 · 커리큘럼 · lesson 내용 · 평가 존재 여부(문항·정답 비노출). 화면 `/operator/courses/:courseId/review` 는 읽기 전용이고 편집 진입점이 없다. **learner enrollment 정책 무변경 · 운영자 자동 수강 등록 0 · instructor 권한 부여 0 · write 0** | **FIXED** |
@@ -460,9 +460,18 @@ spec 추가(9차): P1-18 3건 · P2-10 4건 · P2-11 1건 → merge-gate spec **
 | 35 | P2 | PharmacyHub 가이드 copy 가 `/education` 을 "PharmacyHub 에 등록된 강의" 로 안내 — Phase 2 §14 에서 `/education/*` 은 외부 이동(redirect) 이 됐다 | KPA·K-Cosmetics 와 같은 문구로 정렬: "O4O 강의로 이동"(study.neture.co.kr). 경로 자체는 외부 이동 진입점으로 유지 | **FIXED** |
 | 36 | P2 | KPA `HomeLatestPage` 에 `강의` 탭이 남아 `type=course` 를 요청하지만 backend 홈 피드에서 `course` 는 이미 은퇴해 항상 빈 결과 | 탭·배지 제거 | **FIXED** |
 
-spec 추가(11차): 신규 `lecture-lms-rate-limit-ordering.spec.ts` **8건**(정적 5 + 동작 3: 같은 IP 의 user A/B 버킷 분리 · limiter 실행 시점에 `req.user` 존재 · 익명 IP 버킷 유지 및 위조 토큰의 개인 버킷 생성 불가) · merge-gate spec **+20건**(allowlist 5 · 운영자 검토 3 + 권한 5 · 초안 비노출 5 · 정적 2) → merge-gate spec **115/115**.
+> **두 limiter 를 겹친 이유 — Codex 와 CodeQL 의 요구가 반대 방향이었다.** Codex 는 limiter 가 `req.user` 를 볼 수 있도록 **인증 뒤**를 요구하고, CodeQL `js/missing-rate-limiting` 은 "authorization 을 수행하는 handler **앞**"을 요구한다(첫 push `f4d5f0baf` 에서 `requireAuth`·`optionalAuth` 자체가 60건 flagged). 한쪽만 만족시키면 다른 쪽이 깨지므로 **축을 나눠** 둘 다 만족시켰다:
+>
+> | | 위치 | 키 | 한도 | 의미 |
+> |---|---|---|---|---|
+> | `ipBurstLimiter` (신설 · additive) | 인증 **앞** | `getTrustedClientIp(req)` | 분당 600 | IP **상한** — 미인증 폭주 차단. 1인 할당량이 아니다(1인 할당량의 10배로 잡아 공유 NAT 정상 사용은 닿지 않는다) |
+> | `apiLimiter` (기존 · 무변경) | 인증 **뒤** | `${ip}:${userId}` | 분당 60 | 사용자 **할당량** |
+>
+> 임의 JWT decode/hash 기반 인증 로직은 만들지 않았고, `apiLimiter` 와 Auth Core 는 수정하지 않았다. `rateLimiter.ts` 변경은 **export 1개 추가뿐**(기존 소비처 영향 0).
 
-> 기존 정적 단언 8개(merge-gate spec 6 · `lms-operator-multi-service-scope` 2 · `lms-course-create-service-scope` 1 — 총 3개 spec)는 라우트 순서에 `apiLimiter` 가 들어오면서 **갱신**했다(`requireAuth, apiLimiter, …`). 단언의 대상·강도는 그대로이고 완화 0 — 순서 상수만 현행 라우트에 맞췄다.
+spec 추가(11차): 신규 `lecture-lms-rate-limit-ordering.spec.ts` **11건**(정적 7 + 동작 4: 같은 IP 의 user A/B 버킷 분리 · limiter 실행 시점에 `req.user` 존재 · 익명 IP 버킷 유지 및 위조 토큰의 개인 버킷 생성 불가 · `ipBurstLimiter` 가 인증 앞에서 IP 만으로 동작하고 한도가 600 · 두 limiter 의 키 축이 섞이지 않음) · merge-gate spec **+20건**(allowlist 5 · 운영자 검토 3 + 권한 5 · 초안 비노출 5 · 정적 2) → merge-gate spec **115/115**.
+
+> 기존 정적 단언 10개(merge-gate spec 7 · `lms-operator-multi-service-scope` 2 · `lms-course-create-service-scope` 1 — 총 3개 spec)는 라우트 순서에 `apiLimiter` 가 들어오면서 **갱신**했다(`requireAuth, apiLimiter, …`). 단언의 대상·강도는 그대로이고 완화 0 — 순서 상수만 현행 라우트에 맞췄다.
 
 > **10차 CI 실패(head `79a2f83d3`)는 이 PR 의 변경과 무관한 main drift 였다.** `AdminUserController` 가 `services/admin/service-membership-ensure.js` 를 import 하는 커밋이 main 에 먼저 들어가고 실제 파일은 `1e30e24ee`(11:58 KST)에서야 추가돼, 02:48Z 에 돌아간 PR CI 의 merge-ref 가 깨진 main 을 물었다(`TS2307` 5건 → Code Quality Check · API Server Jest FAIL). 현재 `origin/main` 에는 파일이 존재한다. 본 PR 은 해당 파일들을 건드리지 않는다.
 
@@ -473,7 +482,7 @@ spec 추가(11차): 신규 `lecture-lms-rate-limit-ordering.spec.ts` **8건**(�
 | shared-space-ui vitest | 8 files / 100 PASS |
 | api-server tsc | 0 |
 | api-server jest 전체 (1차 f3b8c8ca5) | 전체 실행 345 suites(4 skipped) — 344 PASS + `lms-operator-multi-service-scope` 1 FAIL(정적 계약이 `isLectureCourse` 정의를 routes 파일에서 찾음 → lecture-access.ts 로 승격된 위치로 assertion 갱신 · 완화 0) → 재실행 PASS. 최종 345/345 · 5799 tests PASS(32 skipped) · 0 FAIL |
-| 11차(Codex 8~10차 응답 7건 · §17-3-j) | api-server tsc 0 · web-lecture tsc 0 · web-lecture vite build PASS · web-kpa-society build PASS · merge-gate spec **115/115** · rate-limit-ordering spec **8/8** · eslint(LMS 모듈 + 신규 spec) 신규 error 0 |
+| 11차(Codex 8~10차 응답 7건 · §17-3-j) | api-server tsc 0 · web-lecture tsc 0 · web-lecture vite build PASS · web-kpa-society build PASS · **api-server full jest 347 suites / 5,898 tests PASS (fail 0)** · merge-gate spec **115/115** · rate-limit-ordering spec **11/11** · eslint(LMS 모듈 + 신규 spec) 신규 error 0 · CodeQL `js/missing-rate-limiting` 0 |
 | 10차(SonarCloud 중복 해소 · §17-3-i) | merge-gate spec 95/95 (동일) · 계약/단언 변경 0 |
 | 9차(재검토 반영 · §17-3-h) | api-server tsc 0 · merge-gate spec 95/95 · LMS·enrollment 관련 jest 16 suites / 207 tests PASS |
 | 8차(재검토 반영 · §17-3-g) | api-server tsc 0 · merge-gate spec 87/87 · LMS 관련 jest 15 suites / 198 tests PASS |

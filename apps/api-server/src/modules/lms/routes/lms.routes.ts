@@ -18,7 +18,7 @@ import { requireInstructor } from '../middleware/requireInstructor.js';
 // WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2: Lecture 접근 계약 (KPA guard · 서비스 allowlist 제거)
 import { requireLectureLearner, requireLectureOperator, isLectureCourse } from '../middleware/lecture-access.js';
 import { lmsContextMiddleware } from '../utils/lms-service-scope.js';
-import { apiLimiter } from '../../../middleware/rateLimiter.js';
+import { apiLimiter, ipBurstLimiter } from '../../../middleware/rateLimiter.js';
 import { SERVICE_KEYS } from '../../../constants/service-keys.js';
 // WO-O4O-LMS-GLOBAL-OPERATOR-ROUTES-V1
 import { CourseService } from '../services/CourseService.js';
@@ -61,57 +61,57 @@ router.use(lmsContextMiddleware({ serviceCode: SERVICE_KEYS.LECTURE }));
 // ========================================
 
 // POST /api/v1/lms/courses - Create Course
-router.post('/courses', requireAuth, apiLimiter, requireInstructor, asyncHandler(CourseController.createCourse));
+router.post('/courses', ipBurstLimiter, requireAuth, apiLimiter, requireInstructor, asyncHandler(CourseController.createCourse));
 
 // GET /api/v1/lms/courses - List Courses
 // WO-KPA-LMS-COURSE-VISIBILITY-ACCESS-POLICY-V1: optionalAuth — 비로그인은 visibility='public'만 노출
-router.get('/courses', optionalAuth, apiLimiter, asyncHandler(CourseController.listCourses));
+router.get('/courses', ipBurstLimiter, optionalAuth, apiLimiter, asyncHandler(CourseController.listCourses));
 
 // GET /api/v1/lms/courses/:id - Get Course by ID
 // WO-KPA-LMS-COURSE-VISIBILITY-ACCESS-POLICY-V1: optionalAuth — members 강의는 비로그인 시 401(MEMBERS_ONLY)
-router.get('/courses/:id', optionalAuth, apiLimiter, asyncHandler(CourseController.getCourse));
+router.get('/courses/:id', ipBurstLimiter, optionalAuth, apiLimiter, asyncHandler(CourseController.getCourse));
 
 // PATCH /api/v1/lms/courses/:id - Update Course
-router.patch('/courses/:id', requireAuth, apiLimiter, requireInstructor, asyncHandler(CourseController.updateCourse));
+router.patch('/courses/:id', ipBurstLimiter, requireAuth, apiLimiter, requireInstructor, asyncHandler(CourseController.updateCourse));
 
 // DELETE /api/v1/lms/courses/:id - Archive Course
-router.delete('/courses/:id', requireAuth, apiLimiter, requireInstructor, asyncHandler(CourseController.deleteCourse));
+router.delete('/courses/:id', ipBurstLimiter, requireAuth, apiLimiter, requireInstructor, asyncHandler(CourseController.deleteCourse));
 
 // POST /api/v1/lms/courses/:id/publish - Publish Course (Lecture 운영자 override 경로)
 // WO-O4O-LMS-COURSE-APPROVAL-FLOW-V1: 강사 직접 publish 금지 — submit-review 사용
-router.post('/courses/:id/publish', requireAuth, apiLimiter, requireLectureOperator, asyncHandler(CourseController.publishCourse));
+router.post('/courses/:id/publish', ipBurstLimiter, requireAuth, apiLimiter, requireLectureOperator, asyncHandler(CourseController.publishCourse));
 
 // POST /api/v1/lms/courses/:id/submit-review - 강사 승인 요청
 // WO-O4O-LMS-COURSE-APPROVAL-FLOW-V1: DRAFT 또는 REJECTED → PENDING_REVIEW
-router.post('/courses/:id/submit-review', requireAuth, apiLimiter, requireInstructor, asyncHandler(CourseController.submitForReview));
+router.post('/courses/:id/submit-review', ipBurstLimiter, requireAuth, apiLimiter, requireInstructor, asyncHandler(CourseController.submitForReview));
 
 // POST /api/v1/lms/courses/:id/unpublish - Unpublish Course
-router.post('/courses/:id/unpublish', requireAuth, apiLimiter, requireInstructor, asyncHandler(CourseController.unpublishCourse));
+router.post('/courses/:id/unpublish', ipBurstLimiter, requireAuth, apiLimiter, requireInstructor, asyncHandler(CourseController.unpublishCourse));
 
 // POST /api/v1/lms/courses/:id/archive - Archive Course
-router.post('/courses/:id/archive', requireAuth, apiLimiter, requireInstructor, asyncHandler(CourseController.archiveCourse));
+router.post('/courses/:id/archive', ipBurstLimiter, requireAuth, apiLimiter, requireInstructor, asyncHandler(CourseController.archiveCourse));
 
 // ========================================
 // LESSON ROUTES
 // ========================================
 
 // POST /api/v1/lms/courses/:courseId/lessons - Create Lesson
-router.post('/courses/:courseId/lessons', requireAuth, apiLimiter, requireInstructor, asyncHandler(LessonController.createLesson));
+router.post('/courses/:courseId/lessons', ipBurstLimiter, requireAuth, apiLimiter, requireInstructor, asyncHandler(LessonController.createLesson));
 
 // GET /api/v1/lms/courses/:courseId/lessons - List Lessons for Course
-router.get('/courses/:courseId/lessons', requireAuth, apiLimiter, requireEnrollment(), asyncHandler(LessonController.listLessonsByCourse));
+router.get('/courses/:courseId/lessons', ipBurstLimiter, requireAuth, apiLimiter, requireEnrollment(), asyncHandler(LessonController.listLessonsByCourse));
 
 // GET /api/v1/lms/lessons/:id - Get Lesson by ID
-router.get('/lessons/:id', requireAuth, apiLimiter, requireEnrollment({ checkLesson: true }), asyncHandler(LessonController.getLesson));
+router.get('/lessons/:id', ipBurstLimiter, requireAuth, apiLimiter, requireEnrollment({ checkLesson: true }), asyncHandler(LessonController.getLesson));
 
 // PATCH /api/v1/lms/lessons/:id - Update Lesson
-router.patch('/lessons/:id', requireAuth, apiLimiter, requireInstructor, asyncHandler(LessonController.updateLesson));
+router.patch('/lessons/:id', ipBurstLimiter, requireAuth, apiLimiter, requireInstructor, asyncHandler(LessonController.updateLesson));
 
 // DELETE /api/v1/lms/lessons/:id - Delete Lesson
-router.delete('/lessons/:id', requireAuth, apiLimiter, requireInstructor, asyncHandler(LessonController.deleteLesson));
+router.delete('/lessons/:id', ipBurstLimiter, requireAuth, apiLimiter, requireInstructor, asyncHandler(LessonController.deleteLesson));
 
 // POST /api/v1/lms/courses/:courseId/lessons/reorder - Reorder Lessons
-router.post('/courses/:courseId/lessons/reorder', requireAuth, apiLimiter, requireInstructor, asyncHandler(LessonController.reorderLessons));
+router.post('/courses/:courseId/lessons/reorder', ipBurstLimiter, requireAuth, apiLimiter, requireInstructor, asyncHandler(LessonController.reorderLessons));
 
 // ========================================
 // QUIZ ROUTES (WO-O4O-QUIZ-SYSTEM-V1)
@@ -120,24 +120,24 @@ router.post('/courses/:courseId/lessons/reorder', requireAuth, apiLimiter, requi
 // GET /api/v1/lms/lessons/:lessonId/quiz - Get Quiz for Lesson
 //   7차 P2-8: 문항 조회에도 강의 접근 정책(visibility · membership · 유료/승인 enrollment)을 적용한다.
 //   소유 강사·lecture:admin 은 allowCourseOwner 로 통과(편집 화면은 별도 instructor 경로를 쓴다).
-router.get('/lessons/:lessonId/quiz', requireAuth, apiLimiter, requireEnrollment({ checkLesson: true, allowCourseOwner: true }), asyncHandler(QuizController.getQuizForLesson));
+router.get('/lessons/:lessonId/quiz', ipBurstLimiter, requireAuth, apiLimiter, requireEnrollment({ checkLesson: true, allowCourseOwner: true }), asyncHandler(QuizController.getQuizForLesson));
 
 // GET /api/v1/lms/instructor/lessons/:lessonId/quiz — 강사 편집용 (정답 포함 · 소유자 또는 lecture:admin)
 //   PR #225 merge-gate(Codex P1): 강사 편집기는 learner sanitized 응답을 쓰지 않는다 (정답 유실 방지).
-router.get('/instructor/lessons/:lessonId/quiz', requireAuth, apiLimiter, requireInstructor, asyncHandler(QuizController.getQuizForLessonAsInstructor));
+router.get('/instructor/lessons/:lessonId/quiz', ipBurstLimiter, requireAuth, apiLimiter, requireInstructor, asyncHandler(QuizController.getQuizForLessonAsInstructor));
 
 // POST /api/v1/lms/quizzes - Create Quiz (Instructor)
-router.post('/quizzes', requireAuth, apiLimiter, requireInstructor, asyncHandler(QuizController.createQuiz));
+router.post('/quizzes', ipBurstLimiter, requireAuth, apiLimiter, requireInstructor, asyncHandler(QuizController.createQuiz));
 
 // POST /api/v1/lms/quizzes/:quizId/submit - Submit Quiz Answers
 //   4차 P1-15: membership 만으로는 유료·승인 강의의 attempt(보상 포함)를 쓸 수 없다 — 동일한 enrollment 정책 적용.
-router.post('/quizzes/:quizId/submit', requireAuth, apiLimiter, requireLectureLearner, requireEnrollment({ checkQuiz: true }), asyncHandler(QuizController.submitQuiz));
+router.post('/quizzes/:quizId/submit', ipBurstLimiter, requireAuth, apiLimiter, requireLectureLearner, requireEnrollment({ checkQuiz: true }), asyncHandler(QuizController.submitQuiz));
 
 // GET /api/v1/lms/quizzes/:quizId/attempts - Get User's Attempts
-router.get('/quizzes/:quizId/attempts', requireAuth, apiLimiter, requireLectureLearner, asyncHandler(QuizController.getAttempts));
+router.get('/quizzes/:quizId/attempts', ipBurstLimiter, requireAuth, apiLimiter, requireLectureLearner, asyncHandler(QuizController.getAttempts));
 
 // PATCH /api/v1/lms/quizzes/:quizId - Update Quiz (Instructor)
-router.patch('/quizzes/:quizId', requireAuth, apiLimiter, requireInstructor, asyncHandler(QuizController.updateQuiz));
+router.patch('/quizzes/:quizId', ipBurstLimiter, requireAuth, apiLimiter, requireInstructor, asyncHandler(QuizController.updateQuiz));
 
 // ========================================
 // ASSIGNMENT ROUTES (WO-O4O-LMS-ASSIGNMENT-MINIMAL-V1)
@@ -145,152 +145,152 @@ router.patch('/quizzes/:quizId', requireAuth, apiLimiter, requireInstructor, asy
 
 // GET /api/v1/lms/lessons/:lessonId/assignment - Get assignment for a lesson
 //   7차 P2-8: quiz 조회와 동일한 정책 — 비회원·미등록자는 과제 안내를 읽을 수 없다.
-router.get('/lessons/:lessonId/assignment', requireAuth, apiLimiter, requireEnrollment({ checkLesson: true, allowCourseOwner: true }), asyncHandler(AssignmentController.getAssignmentForLesson));
+router.get('/lessons/:lessonId/assignment', ipBurstLimiter, requireAuth, apiLimiter, requireEnrollment({ checkLesson: true, allowCourseOwner: true }), asyncHandler(AssignmentController.getAssignmentForLesson));
 
 // POST /api/v1/lms/assignments - Upsert assignment (Instructor)
-router.post('/assignments', requireAuth, apiLimiter, requireInstructor, asyncHandler(AssignmentController.upsertAssignment));
+router.post('/assignments', ipBurstLimiter, requireAuth, apiLimiter, requireInstructor, asyncHandler(AssignmentController.upsertAssignment));
 
 // POST /api/v1/lms/assignments/:assignmentId/submit - Submit assignment (Learner)
 //   4차 P1-15: quiz submit 과 같은 정책 — 제출을 저장하기 전에 enrollment 를 판정한다.
-router.post('/assignments/:assignmentId/submit', requireAuth, apiLimiter, requireLectureLearner, requireEnrollment({ checkAssignment: true }), asyncHandler(AssignmentController.submitAssignment));
+router.post('/assignments/:assignmentId/submit', ipBurstLimiter, requireAuth, apiLimiter, requireLectureLearner, requireEnrollment({ checkAssignment: true }), asyncHandler(AssignmentController.submitAssignment));
 
 // GET /api/v1/lms/assignments/:assignmentId/my - Get current user's submission
-router.get('/assignments/:assignmentId/my', requireAuth, apiLimiter, requireLectureLearner, asyncHandler(AssignmentController.getMySubmission));
+router.get('/assignments/:assignmentId/my', ipBurstLimiter, requireAuth, apiLimiter, requireLectureLearner, asyncHandler(AssignmentController.getMySubmission));
 
 // ========================================
 // COMPLETION ROUTES (WO-O4O-COMPLETION-V1)
 // ========================================
 
 // GET /api/v1/lms/completions/me - Get My Completions
-router.get('/completions/me', requireAuth, apiLimiter, requireLectureLearner, asyncHandler(CompletionController.getMyCompletions));
+router.get('/completions/me', ipBurstLimiter, requireAuth, apiLimiter, requireLectureLearner, asyncHandler(CompletionController.getMyCompletions));
 
 // ========================================
 // ENROLLMENT ROUTES
 // ========================================
 
 // POST /api/v1/lms/courses/:courseId/enroll - Enroll in Course
-router.post('/courses/:courseId/enroll', requireAuth, apiLimiter, requireLectureLearner, asyncHandler(EnrollmentController.enrollCourse));
+router.post('/courses/:courseId/enroll', ipBurstLimiter, requireAuth, apiLimiter, requireLectureLearner, asyncHandler(EnrollmentController.enrollCourse));
 
 // GET /api/v1/lms/enrollments - List Enrollments
-router.get('/enrollments', requireAuth, apiLimiter, requireLectureLearner, asyncHandler(EnrollmentController.listEnrollments));
+router.get('/enrollments', ipBurstLimiter, requireAuth, apiLimiter, requireLectureLearner, asyncHandler(EnrollmentController.listEnrollments));
 
 // GET /api/v1/lms/enrollments/me - Get My Enrollments
-router.get('/enrollments/me', requireAuth, apiLimiter, requireLectureLearner, asyncHandler(EnrollmentController.getMyEnrollments));
+router.get('/enrollments/me', ipBurstLimiter, requireAuth, apiLimiter, requireLectureLearner, asyncHandler(EnrollmentController.getMyEnrollments));
 
 // GET /api/v1/lms/enrollments/:id - Get Enrollment by ID
-router.get('/enrollments/:id', requireAuth, apiLimiter, requireLectureLearner, asyncHandler(EnrollmentController.getEnrollment));
+router.get('/enrollments/:id', ipBurstLimiter, requireAuth, apiLimiter, requireLectureLearner, asyncHandler(EnrollmentController.getEnrollment));
 
 // PATCH /api/v1/lms/enrollments/:id - Update Enrollment
-router.patch('/enrollments/:id', requireAuth, apiLimiter, requireLectureLearner, asyncHandler(EnrollmentController.updateEnrollment));
+router.patch('/enrollments/:id', ipBurstLimiter, requireAuth, apiLimiter, requireLectureLearner, asyncHandler(EnrollmentController.updateEnrollment));
 
 // POST /api/v1/lms/enrollments/:id/start - Start Enrollment
-router.post('/enrollments/:id/start', requireAuth, apiLimiter, requireLectureLearner, asyncHandler(EnrollmentController.startEnrollment));
+router.post('/enrollments/:id/start', ipBurstLimiter, requireAuth, apiLimiter, requireLectureLearner, asyncHandler(EnrollmentController.startEnrollment));
 
 // POST /api/v1/lms/enrollments/:id/complete - Complete Enrollment
-router.post('/enrollments/:id/complete', requireAuth, apiLimiter, requireLectureLearner, asyncHandler(EnrollmentController.completeEnrollment));
+router.post('/enrollments/:id/complete', ipBurstLimiter, requireAuth, apiLimiter, requireLectureLearner, asyncHandler(EnrollmentController.completeEnrollment));
 
 // POST /api/v1/lms/enrollments/:id/cancel - Cancel Enrollment
-router.post('/enrollments/:id/cancel', requireAuth, apiLimiter, requireLectureLearner, asyncHandler(EnrollmentController.cancelEnrollment));
+router.post('/enrollments/:id/cancel', ipBurstLimiter, requireAuth, apiLimiter, requireLectureLearner, asyncHandler(EnrollmentController.cancelEnrollment));
 
 // GET /api/v1/lms/enrollments/me/course/:courseId - Get My Enrollment for a Course (WO-O4O-LMS-ROUTING-INTEGRATION-FIX-V1)
-router.get('/enrollments/me/course/:courseId', requireAuth, apiLimiter, requireLectureLearner, asyncHandler(EnrollmentController.getMyEnrollmentForCourse));
+router.get('/enrollments/me/course/:courseId', ipBurstLimiter, requireAuth, apiLimiter, requireLectureLearner, asyncHandler(EnrollmentController.getMyEnrollmentForCourse));
 
 // POST /api/v1/lms/enrollments/:courseId/progress - Update Lesson Progress (WO-O4O-LMS-ROUTING-INTEGRATION-FIX-V1)
-router.post('/enrollments/:courseId/progress', requireAuth, apiLimiter, requireLectureLearner, asyncHandler(EnrollmentController.updateLessonProgress));
+router.post('/enrollments/:courseId/progress', ipBurstLimiter, requireAuth, apiLimiter, requireLectureLearner, asyncHandler(EnrollmentController.updateLessonProgress));
 
 // ========================================
 // CERTIFICATE ROUTES
 // ========================================
 
 // POST /api/v1/lms/certificates/issue - Issue Certificate
-router.post('/certificates/issue', requireAuth, apiLimiter, requireLectureOperator, asyncHandler(CertificateController.issueCertificate));
+router.post('/certificates/issue', ipBurstLimiter, requireAuth, apiLimiter, requireLectureOperator, asyncHandler(CertificateController.issueCertificate));
 
 // GET /api/v1/lms/certificates - List Certificates
-router.get('/certificates', requireAuth, apiLimiter, requireLectureLearner, asyncHandler(CertificateController.listCertificates));
+router.get('/certificates', ipBurstLimiter, requireAuth, apiLimiter, requireLectureLearner, asyncHandler(CertificateController.listCertificates));
 
 // GET /api/v1/lms/certificates/me - Get My Certificates
-router.get('/certificates/me', requireAuth, apiLimiter, requireLectureLearner, asyncHandler(CertificateController.getMyCertificates));
+router.get('/certificates/me', ipBurstLimiter, requireAuth, apiLimiter, requireLectureLearner, asyncHandler(CertificateController.getMyCertificates));
 
 // GET /api/v1/lms/certificates/verify/:verificationCode - Verify Certificate (Public)
 router.get('/certificates/verify/:verificationCode', apiLimiter, asyncHandler(CertificateController.verifyCertificate));
 
 // GET /api/v1/lms/certificates/number/:certificateNumber - Get Certificate by Number
-router.get('/certificates/number/:certificateNumber', requireAuth, apiLimiter, requireLectureLearner, asyncHandler(CertificateController.getCertificateByNumber));
+router.get('/certificates/number/:certificateNumber', ipBurstLimiter, requireAuth, apiLimiter, requireLectureLearner, asyncHandler(CertificateController.getCertificateByNumber));
 
 // GET /api/v1/lms/certificates/:id/pdf - Download Certificate PDF (WO-O4O-LMS-CERTIFICATE-PDF-V1)
-router.get('/certificates/:id/pdf', requireAuth, apiLimiter, requireLectureLearner, asyncHandler(CertificateController.downloadPdf));
+router.get('/certificates/:id/pdf', ipBurstLimiter, requireAuth, apiLimiter, requireLectureLearner, asyncHandler(CertificateController.downloadPdf));
 
 // GET /api/v1/lms/certificates/:id/verify - Public Certificate Verification (WO-O4O-LMS-CERTIFICATE-VERIFICATION-V1)
 router.get('/certificates/:id/verify', apiLimiter, asyncHandler(CertificateController.verifyPublic));
 
 // GET /api/v1/lms/certificates/:id - Get Certificate by ID
-router.get('/certificates/:id', requireAuth, apiLimiter, requireLectureLearner, asyncHandler(CertificateController.getCertificate));
+router.get('/certificates/:id', ipBurstLimiter, requireAuth, apiLimiter, requireLectureLearner, asyncHandler(CertificateController.getCertificate));
 
 // PATCH /api/v1/lms/certificates/:id - Update Certificate
-router.patch('/certificates/:id', requireAuth, apiLimiter, requireLectureOperator, asyncHandler(CertificateController.updateCertificate));
+router.patch('/certificates/:id', ipBurstLimiter, requireAuth, apiLimiter, requireLectureOperator, asyncHandler(CertificateController.updateCertificate));
 
 // POST /api/v1/lms/certificates/:id/revoke - Revoke Certificate
-router.post('/certificates/:id/revoke', requireAuth, apiLimiter, requireLectureOperator, asyncHandler(CertificateController.revokeCertificate));
+router.post('/certificates/:id/revoke', ipBurstLimiter, requireAuth, apiLimiter, requireLectureOperator, asyncHandler(CertificateController.revokeCertificate));
 
 // POST /api/v1/lms/certificates/:id/renew - Renew Certificate
-router.post('/certificates/:id/renew', requireAuth, apiLimiter, requireLectureOperator, asyncHandler(CertificateController.renewCertificate));
+router.post('/certificates/:id/renew', ipBurstLimiter, requireAuth, apiLimiter, requireLectureOperator, asyncHandler(CertificateController.renewCertificate));
 
 // ========================================
 // INSTRUCTOR ROUTES (WO-LMS-INSTRUCTOR-ROLE-V1)
 // ========================================
 
 // POST /api/v1/lms/instructor/apply - Apply for Instructor Role
-router.post('/instructor/apply', requireAuth, apiLimiter, requireLectureLearner, asyncHandler(InstructorController.apply));
+router.post('/instructor/apply', ipBurstLimiter, requireAuth, apiLimiter, requireLectureLearner, asyncHandler(InstructorController.apply));
 
 // GET /api/v1/lms/instructor/applications - List Instructor Applications (Admin)
-router.get('/instructor/applications', requireAuth, apiLimiter, requireLectureOperator, asyncHandler(InstructorController.listApplications));
+router.get('/instructor/applications', ipBurstLimiter, requireAuth, apiLimiter, requireLectureOperator, asyncHandler(InstructorController.listApplications));
 
 // POST /api/v1/lms/instructor/applications/:id/approve - Approve Application (Admin)
-router.post('/instructor/applications/:id/approve', requireAuth, apiLimiter, requireLectureOperator, asyncHandler(InstructorController.approveApplication));
+router.post('/instructor/applications/:id/approve', ipBurstLimiter, requireAuth, apiLimiter, requireLectureOperator, asyncHandler(InstructorController.approveApplication));
 
 // POST /api/v1/lms/instructor/applications/:id/reject - Reject Application (Admin)
-router.post('/instructor/applications/:id/reject', requireAuth, apiLimiter, requireLectureOperator, asyncHandler(InstructorController.rejectApplication));
+router.post('/instructor/applications/:id/reject', ipBurstLimiter, requireAuth, apiLimiter, requireLectureOperator, asyncHandler(InstructorController.rejectApplication));
 
 // GET /api/v1/lms/instructor/courses - My Courses (Instructor)
-router.get('/instructor/courses', requireAuth, apiLimiter, requireInstructor, asyncHandler(InstructorController.myCourses));
+router.get('/instructor/courses', ipBurstLimiter, requireAuth, apiLimiter, requireInstructor, asyncHandler(InstructorController.myCourses));
 
 // GET /api/v1/lms/instructor/courses/:courseId/lessons - Instructor Lessons (WO-O4O-LMS-MEMBERSHIP-COURSE-E2E-BUGFIX-V1)
-router.get('/instructor/courses/:courseId/lessons', requireAuth, apiLimiter, requireInstructor, asyncHandler(InstructorController.courseLessons));
+router.get('/instructor/courses/:courseId/lessons', ipBurstLimiter, requireAuth, apiLimiter, requireInstructor, asyncHandler(InstructorController.courseLessons));
 
 // GET /api/v1/lms/instructor/courses/:courseId/points - 강의 포인트 지급 현황 (WO-O4O-KPA-LMS-OPERATIONS-POINT-REWARD-VIEW-V1)
-router.get('/instructor/courses/:courseId/points', requireAuth, apiLimiter, requireInstructor, asyncHandler(InstructorController.coursePoints));
+router.get('/instructor/courses/:courseId/points', ipBurstLimiter, requireAuth, apiLimiter, requireInstructor, asyncHandler(InstructorController.coursePoints));
 
 // GET /api/v1/lms/instructor/enrollments - Pending Enrollments for My Courses (Instructor)
-router.get('/instructor/enrollments', requireAuth, apiLimiter, requireInstructor, asyncHandler(InstructorController.pendingEnrollments));
+router.get('/instructor/enrollments', ipBurstLimiter, requireAuth, apiLimiter, requireInstructor, asyncHandler(InstructorController.pendingEnrollments));
 
 // GET /api/v1/lms/instructor/dashboard/courses - 강사 강의 목록 + 요약 통계 (WO-O4O-LMS-INSTRUCTOR-DASHBOARD-MVP-V1)
-router.get('/instructor/dashboard/courses', requireAuth, apiLimiter, requireInstructor, asyncHandler(InstructorController.dashboardCourses));
+router.get('/instructor/dashboard/courses', ipBurstLimiter, requireAuth, apiLimiter, requireInstructor, asyncHandler(InstructorController.dashboardCourses));
 
 // GET /api/v1/lms/instructor/participants/:courseId/summary - 보상 운영 요약 통계 (WO-O4O-MARKETING-CONTENT-OPERATIONS-ENHANCEMENT-V2)
-router.get('/instructor/participants/:courseId/summary', requireAuth, apiLimiter, requireInstructor, asyncHandler(InstructorController.participantsSummary));
+router.get('/instructor/participants/:courseId/summary', ipBurstLimiter, requireAuth, apiLimiter, requireInstructor, asyncHandler(InstructorController.participantsSummary));
 
 // GET /api/v1/lms/instructor/participants/:courseId/export - CSV 내보내기 (WO-O4O-MARKETING-CONTENT-OPERATIONS-ENHANCEMENT-V2)
-router.get('/instructor/participants/:courseId/export', requireAuth, apiLimiter, requireInstructor, asyncHandler(InstructorController.participantsExport));
+router.get('/instructor/participants/:courseId/export', ipBurstLimiter, requireAuth, apiLimiter, requireInstructor, asyncHandler(InstructorController.participantsExport));
 
 // GET /api/v1/lms/instructor/participants/:courseId - 콘텐츠별 참여자 관리 (WO-O4O-MARKETING-CONTENT-OPERATIONS-MVP-V1)
-router.get('/instructor/participants/:courseId', requireAuth, apiLimiter, requireInstructor, asyncHandler(InstructorController.participants));
+router.get('/instructor/participants/:courseId', ipBurstLimiter, requireAuth, apiLimiter, requireInstructor, asyncHandler(InstructorController.participants));
 
 // GET /api/v1/lms/instructor/dashboard/stats/:courseId - 강의별 운영 지표 (WO-O4O-LMS-INSTRUCTOR-DASHBOARD-MVP-V1)
-router.get('/instructor/dashboard/stats/:courseId', requireAuth, apiLimiter, requireInstructor, asyncHandler(InstructorController.dashboardStats));
+router.get('/instructor/dashboard/stats/:courseId', ipBurstLimiter, requireAuth, apiLimiter, requireInstructor, asyncHandler(InstructorController.dashboardStats));
 
 // POST /api/v1/lms/instructor/enrollments/:id/approve - Approve Enrollment (Instructor)
-router.post('/instructor/enrollments/:id/approve', requireAuth, apiLimiter, requireInstructor, asyncHandler(InstructorController.approveEnrollment));
+router.post('/instructor/enrollments/:id/approve', ipBurstLimiter, requireAuth, apiLimiter, requireInstructor, asyncHandler(InstructorController.approveEnrollment));
 
 // POST /api/v1/lms/instructor/enrollments/:id/reject - Reject Enrollment (Instructor)
-router.post('/instructor/enrollments/:id/reject', requireAuth, apiLimiter, requireInstructor, asyncHandler(InstructorController.rejectEnrollment));
+router.post('/instructor/enrollments/:id/reject', ipBurstLimiter, requireAuth, apiLimiter, requireInstructor, asyncHandler(InstructorController.rejectEnrollment));
 
 // WO-O4O-LMS-ASSIGNMENT-GRADING-V1: 과제 채점
 
 // GET /api/v1/lms/instructor/lessons/:lessonId/submissions - List submissions (Instructor)
-router.get('/instructor/lessons/:lessonId/submissions', requireAuth, apiLimiter, requireInstructor, asyncHandler(InstructorController.listLessonSubmissions));
+router.get('/instructor/lessons/:lessonId/submissions', ipBurstLimiter, requireAuth, apiLimiter, requireInstructor, asyncHandler(InstructorController.listLessonSubmissions));
 
 // POST /api/v1/lms/instructor/submissions/:submissionId/grade - Grade submission (Instructor)
-router.post('/instructor/submissions/:submissionId/grade', requireAuth, apiLimiter, requireInstructor, asyncHandler(InstructorController.gradeSubmission));
+router.post('/instructor/submissions/:submissionId/grade', ipBurstLimiter, requireAuth, apiLimiter, requireInstructor, asyncHandler(InstructorController.gradeSubmission));
 
 // NOTE: TEMPLATE ROUTES (WO-O4O-TEMPLATE-SYSTEM-FOUNDATION) 제거
 // (WO-O4O-LMS-TEMPLATE-AND-CONTENT-CORE-DEAD-CODE-CLEANUP-V1 — 미사용 scaffold, frontend 0)
@@ -303,15 +303,15 @@ router.post('/instructor/submissions/:submissionId/grade', requireAuth, apiLimit
 
 // GET /api/v1/lms/operator/courses — 운영 목록 (status/contentKind/search 필터는 listCourses 계약 그대로)
 //   7차 P1-17: 학습자 목록(GET /courses)은 서버가 status=published 로 고정하므로, 전체 상태 열람은 이 경로만.
-router.get('/operator/courses', requireAuth, apiLimiter, requireLectureOperator, asyncHandler(CourseController.listCourses));
+router.get('/operator/courses', ipBurstLimiter, requireAuth, apiLimiter, requireLectureOperator, asyncHandler(CourseController.listCourses));
 
 // GET /api/v1/lms/operator/courses/:courseId/review — 운영자 검토 전용 read-only surface
 //   11차 P2: 승인·반려 전에 내용을 확인할 수 있어야 한다. learner enrollment 를 약화하지 않고
 //   운영자를 자동 수강 등록하지도 않으며 instructor 권한도 주지 않는다 (write 0).
-router.get('/operator/courses/:courseId/review', requireAuth, apiLimiter, requireLectureOperator, asyncHandler(CourseController.operatorCourseReview));
+router.get('/operator/courses/:courseId/review', ipBurstLimiter, requireAuth, apiLimiter, requireLectureOperator, asyncHandler(CourseController.operatorCourseReview));
 
 // POST /api/v1/lms/operator/courses/:id/approve — PENDING_REVIEW → PUBLISHED
-router.post('/operator/courses/:id/approve', requireAuth, apiLimiter, requireLectureOperator, asyncHandler(async (req: Request, res: Response) => {
+router.post('/operator/courses/:id/approve', ipBurstLimiter, requireAuth, apiLimiter, requireLectureOperator, asyncHandler(async (req: Request, res: Response) => {
   const service = CourseService.getInstance();
   const course = await service.getCourse(req.params.id);
   if (!course) { return res.status(404).json({ success: false, error: '강의를 찾을 수 없습니다' }); }
@@ -332,7 +332,7 @@ router.post('/operator/courses/:id/approve', requireAuth, apiLimiter, requireLec
 }));
 
 // POST /api/v1/lms/operator/courses/:id/reject — PENDING_REVIEW → REJECTED + rejectionReason
-router.post('/operator/courses/:id/reject', requireAuth, apiLimiter, requireLectureOperator, asyncHandler(async (req: Request, res: Response) => {
+router.post('/operator/courses/:id/reject', ipBurstLimiter, requireAuth, apiLimiter, requireLectureOperator, asyncHandler(async (req: Request, res: Response) => {
   const service = CourseService.getInstance();
   const course = await service.getCourse(req.params.id);
   if (!course) { return res.status(404).json({ success: false, error: '강의를 찾을 수 없습니다' }); }
@@ -357,7 +357,7 @@ router.post('/operator/courses/:id/reject', requireAuth, apiLimiter, requireLect
 }));
 
 // POST /api/v1/lms/operator/courses/:id/unpublish — PUBLISHED → DRAFT
-router.post('/operator/courses/:id/unpublish', requireAuth, apiLimiter, requireLectureOperator, asyncHandler(async (req: Request, res: Response) => {
+router.post('/operator/courses/:id/unpublish', ipBurstLimiter, requireAuth, apiLimiter, requireLectureOperator, asyncHandler(async (req: Request, res: Response) => {
   const service = CourseService.getInstance();
   const course = await service.getCourse(req.params.id);
   if (!course) { return res.status(404).json({ success: false, error: '강의를 찾을 수 없습니다' }); }
@@ -368,7 +368,7 @@ router.post('/operator/courses/:id/unpublish', requireAuth, apiLimiter, requireL
 }));
 
 // POST /api/v1/lms/operator/courses/:id/archive — any status → ARCHIVED
-router.post('/operator/courses/:id/archive', requireAuth, apiLimiter, requireLectureOperator, asyncHandler(async (req: Request, res: Response) => {
+router.post('/operator/courses/:id/archive', ipBurstLimiter, requireAuth, apiLimiter, requireLectureOperator, asyncHandler(async (req: Request, res: Response) => {
   const service = CourseService.getInstance();
   const course = await service.getCourse(req.params.id);
   if (!course) { return res.status(404).json({ success: false, error: '강의를 찾을 수 없습니다' }); }
@@ -379,7 +379,7 @@ router.post('/operator/courses/:id/archive', requireAuth, apiLimiter, requireLec
 }));
 
 // DELETE /api/v1/lms/operator/courses/:id/hard — ARCHIVED only, cascaded hard delete
-router.delete('/operator/courses/:id/hard', requireAuth, apiLimiter, requireLectureOperator, asyncHandler(async (req: Request, res: Response) => {
+router.delete('/operator/courses/:id/hard', ipBurstLimiter, requireAuth, apiLimiter, requireLectureOperator, asyncHandler(async (req: Request, res: Response) => {
   const service = CourseService.getInstance();
   const course = await service.getCourse(req.params.id);
   if (!course) { return res.status(404).json({ success: false, error: '강의를 찾을 수 없습니다' }); }

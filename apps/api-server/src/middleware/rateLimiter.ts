@@ -47,6 +47,28 @@ export const apiLimiter = rateLimit({
   },
 });
 
+// WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2 (11차) — 인증 앞단 IP 상한
+//
+//   `apiLimiter` 는 키에 `req.user.id` 를 쓰므로 **인증 뒤**에 놓여야 사용자 단위로 동작한다.
+//   그런데 인증 미들웨어 자체도 rate limit 없이 노출되면 안 된다(미인증 flooding).
+//   그래서 두 겹으로 둔다:
+//     ① `ipBurstLimiter` — 인증 **앞**, IP 단위. 미인증 폭주를 막는 **상한**이지
+//        사용자 할당량이 아니다. 같은 NAT 뒤 여러 사용자가 정상 사용해도 닿지 않도록
+//        1인 할당량(분당 60)의 10배로 잡는다.
+//     ② `apiLimiter`   — 인증 **뒤**, `${ip}:${userId}` 단위. 실제 사용자 할당량.
+//   invalid token 은 인증에서 걸러지므로 ② 의 개인 버킷을 만들 수 없다.
+export const ipBurstLimiter = rateLimit({
+  windowMs: 1 * 60 * 1000, // 1분
+  max: 600, // IP 당 분당 600개 — 공유 IP 상한(1인 할당량 아님)
+  message: {
+    error: '요청이 너무 많습니다.',
+    retryAfter: '1분 후 다시 시도해주세요.',
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req: Request) => getTrustedClientIp(req),
+});
+
 // 파일 업로드 레이트 리밋
 export const uploadLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1시간

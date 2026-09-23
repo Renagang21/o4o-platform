@@ -1159,9 +1159,9 @@ describe('정적 계약', () => {
   });
   it('라우트: 강사 quiz 읽기는 requireInstructor · learner 읽기는 그대로', () => {
     const routes = read('apps/api-server/src/modules/lms/routes/lms.routes.ts');
-    expect(routes).toMatch(/router\.get\('\/instructor\/lessons\/:lessonId\/quiz', requireAuth, apiLimiter, requireInstructor, asyncHandler\(QuizController\.getQuizForLessonAsInstructor\)\)/);
+    expect(routes).toMatch(/router\.get\('\/instructor\/lessons\/:lessonId\/quiz', ipBurstLimiter, requireAuth, apiLimiter, requireInstructor, asyncHandler\(QuizController\.getQuizForLessonAsInstructor\)\)/);
     // 7차 P2-8: learner 읽기에도 enrollment 정책이 붙었다 (controller 는 그대로)
-    expect(routes).toMatch(/router\.get\('\/lessons\/:lessonId\/quiz', requireAuth, apiLimiter, requireEnrollment\(\{ checkLesson: true, allowCourseOwner: true \}\), asyncHandler\(QuizController\.getQuizForLesson\)\)/);
+    expect(routes).toMatch(/router\.get\('\/lessons\/:lessonId\/quiz', ipBurstLimiter, requireAuth, apiLimiter, requireEnrollment\(\{ checkLesson: true, allowCourseOwner: true \}\), asyncHandler\(QuizController\.getQuizForLesson\)\)/);
     // 대상 강의 판정은 lecture-access 의 단일 helper 를 공유한다 (routes 로컬 재정의 0)
     expect(routes).not.toMatch(/function isLectureCourse/);
     expect(routes).toContain('isLectureCourse } from \'../middleware/lecture-access.js\'');
@@ -1206,12 +1206,12 @@ describe('정적 계약', () => {
   });
   it('7차 P2-8: 평가 조회 라우트도 requireEnrollment 를 거친다', () => {
     const routes = read('apps/api-server/src/modules/lms/routes/lms.routes.ts');
-    expect(routes).toContain("router.get('/lessons/:lessonId/quiz', requireAuth, apiLimiter, requireEnrollment({ checkLesson: true, allowCourseOwner: true })");
-    expect(routes).toContain("router.get('/lessons/:lessonId/assignment', requireAuth, apiLimiter, requireEnrollment({ checkLesson: true, allowCourseOwner: true })");
+    expect(routes).toContain("router.get('/lessons/:lessonId/quiz', ipBurstLimiter, requireAuth, apiLimiter, requireEnrollment({ checkLesson: true, allowCourseOwner: true })");
+    expect(routes).toContain("router.get('/lessons/:lessonId/assignment', ipBurstLimiter, requireAuth, apiLimiter, requireEnrollment({ checkLesson: true, allowCourseOwner: true })");
   });
   it('11차 P2-33: 운영자 검토 route 는 requireLectureOperator 를 거치고, 운영 목록은 검토 화면으로 연결된다', () => {
     const r = read('apps/api-server/src/modules/lms/routes/lms.routes.ts');
-    expect(r).toContain("router.get('/operator/courses/:courseId/review', requireAuth, apiLimiter, requireLectureOperator, asyncHandler(CourseController.operatorCourseReview))");
+    expect(r).toContain("router.get('/operator/courses/:courseId/review', ipBurstLimiter, requireAuth, apiLimiter, requireLectureOperator, asyncHandler(CourseController.operatorCourseReview))");
     const page = read('services/web-lecture/src/pages/operator/OperatorCoursesPage.tsx');
     expect(page).toContain('to={`/operator/courses/${c.id}/review`}');
     expect(page).not.toContain('coursePath(c.id)');   // learner 경로로 보내지 않는다
@@ -1232,8 +1232,8 @@ describe('정적 계약', () => {
   });
   it('4차 P1-15: 평가 제출 라우트는 enrollment 정책을 통과해야 한다', () => {
     const routes = read('apps/api-server/src/modules/lms/routes/lms.routes.ts');
-    expect(routes).toMatch(/router\.post\('\/quizzes\/:quizId\/submit', requireAuth, apiLimiter, requireLectureLearner, requireEnrollment\(\{ checkQuiz: true \}\)/);
-    expect(routes).toMatch(/router\.post\('\/assignments\/:assignmentId\/submit', requireAuth, apiLimiter, requireLectureLearner, requireEnrollment\(\{ checkAssignment: true \}\)/);
+    expect(routes).toMatch(/router\.post\('\/quizzes\/:quizId\/submit', ipBurstLimiter, requireAuth, apiLimiter, requireLectureLearner, requireEnrollment\(\{ checkQuiz: true \}\)/);
+    expect(routes).toMatch(/router\.post\('\/assignments\/:assignmentId\/submit', ipBurstLimiter, requireAuth, apiLimiter, requireLectureLearner, requireEnrollment\(\{ checkAssignment: true \}\)/);
     const mw = read('apps/api-server/src/modules/lms/middleware/requireEnrollment.ts');
     // quiz/assignment → course 역추적은 parameter binding 만 사용한다 (Guard Rule 2)
     expect(mw).toContain('checkQuiz?: boolean;');
