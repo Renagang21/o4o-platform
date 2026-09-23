@@ -93,6 +93,28 @@ env:
   VITE_SERVICE_URL_HOSPITAL_PHARMACY: https://neture.co.kr/hospital
 
 jobs:
+  deploy-hold-notice:
+    # WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 §19 (2026-09-23 INCIDENT)
+    #   배포 job 이 skip 되면 run 이 조용히 성공처럼 보여 "왜 반영이 안 되나" 착시가 생긴다.
+    #   이 job 은 게이트가 닫혔을 때**만** 돌며, 보류 사유를 Job Summary 에 남긴다.
+    #   배포 job 과 의존관계가 없으므로 skip 여부와 무관하게 실행된다.
+    if: vars.DEPLOY_ENABLED != 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Report deploy hold
+        run: |
+          {
+            echo "## ⛔ 배포 보류 — DEPLOY_ENABLED ≠ 'true'"
+            echo ""
+            echo "이 워크플로의 배포 job 은 실행되지 않았습니다 (build · migration · Cloud Run deploy 0)."
+            echo ""
+            echo "- 현재 값: '${{ vars.DEPLOY_ENABLED }}'  (변수 부재 · 공백도 차단 = fail-closed)"
+            echo "- 사유: WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 §19 INCIDENT — main 의 Lecture Phase 2 runtime 이 data cutover 전에 서빙되는 것을 막는다."
+            echo "- 해제: 사용자 승인 후 \`gh variable set DEPLOY_ENABLED --body true\`"
+            echo "- commit: ${{ github.sha }}"
+          } >> "$GITHUB_STEP_SUMMARY"
+          echo "DEPLOY_HOLD_ACTIVE=1 (DEPLOY_ENABLED='${{ vars.DEPLOY_ENABLED }}')"
+
   detect-changes:
     runs-on: ubuntu-latest
     outputs:
@@ -184,7 +206,10 @@ jobs:
 
   deploy-neture:
     needs: detect-changes
-    if: needs.detect-changes.outputs.neture == 'true'
+    # WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 §19 (2026-09-23 INCIDENT)
+    #   DEPLOY GATE (fail-closed): `DEPLOY_ENABLED` 가 'true' 일 때만 배포한다.
+    #   변수가 없거나 비어 있으면 Actions 가 빈 문자열을 돌려주므로 **차단이 기본값**이다.
+    if: vars.DEPLOY_ENABLED == 'true' && needs.detect-changes.outputs.neture == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -259,7 +284,10 @@ jobs:
 
   deploy-k-cosmetics:
     needs: detect-changes
-    if: needs.detect-changes.outputs.k-cosmetics == 'true'
+    # WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 §19 (2026-09-23 INCIDENT)
+    #   DEPLOY GATE (fail-closed): `DEPLOY_ENABLED` 가 'true' 일 때만 배포한다.
+    #   변수가 없거나 비어 있으면 Actions 가 빈 문자열을 돌려주므로 **차단이 기본값**이다.
+    if: vars.DEPLOY_ENABLED == 'true' && needs.detect-changes.outputs.k-cosmetics == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -329,7 +357,10 @@ jobs:
 
   deploy-kpa-society:
     needs: detect-changes
-    if: needs.detect-changes.outputs.kpa-society == 'true'
+    # WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 §19 (2026-09-23 INCIDENT)
+    #   DEPLOY GATE (fail-closed): `DEPLOY_ENABLED` 가 'true' 일 때만 배포한다.
+    #   변수가 없거나 비어 있으면 Actions 가 빈 문자열을 돌려주므로 **차단이 기본값**이다.
+    if: vars.DEPLOY_ENABLED == 'true' && needs.detect-changes.outputs.kpa-society == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -402,7 +433,10 @@ jobs:
   #   임시 Cloud Run URL 로 가입·승인 E2E 검증까지만 수행한다.
   deploy-pharmacy-hub:
     needs: detect-changes
-    if: needs.detect-changes.outputs.pharmacy-hub == 'true'
+    # WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 §19 (2026-09-23 INCIDENT)
+    #   DEPLOY GATE (fail-closed): `DEPLOY_ENABLED` 가 'true' 일 때만 배포한다.
+    #   변수가 없거나 비어 있으면 Actions 가 빈 문자열을 돌려주므로 **차단이 기본값**이다.
+    if: vars.DEPLOY_ENABLED == 'true' && needs.detect-changes.outputs.pharmacy-hub == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -472,7 +506,10 @@ jobs:
 
   deploy-lecture:
     needs: detect-changes
-    if: needs.detect-changes.outputs.lecture == 'true'
+    # WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 §19 (2026-09-23 INCIDENT)
+    #   DEPLOY GATE (fail-closed): `DEPLOY_ENABLED` 가 'true' 일 때만 배포한다.
+    #   변수가 없거나 비어 있으면 Actions 가 빈 문자열을 돌려주므로 **차단이 기본값**이다.
+    if: vars.DEPLOY_ENABLED == 'true' && needs.detect-changes.outputs.lecture == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -525,7 +562,10 @@ jobs:
 
   deploy-hospital-pharmacy:
     needs: detect-changes
-    if: needs.detect-changes.outputs.hospital-pharmacy == 'true'
+    # WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 §19 (2026-09-23 INCIDENT)
+    #   DEPLOY GATE (fail-closed): `DEPLOY_ENABLED` 가 'true' 일 때만 배포한다.
+    #   변수가 없거나 비어 있으면 Actions 가 빈 문자열을 돌려주므로 **차단이 기본값**이다.
+    if: vars.DEPLOY_ENABLED == 'true' && needs.detect-changes.outputs.hospital-pharmacy == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -578,7 +618,10 @@ jobs:
 
   deploy-store:
     needs: detect-changes
-    if: needs.detect-changes.outputs.store == 'true'
+    # WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 §19 (2026-09-23 INCIDENT)
+    #   DEPLOY GATE (fail-closed): `DEPLOY_ENABLED` 가 'true' 일 때만 배포한다.
+    #   변수가 없거나 비어 있으면 Actions 가 빈 문자열을 돌려주므로 **차단이 기본값**이다.
+    if: vars.DEPLOY_ENABLED == 'true' && needs.detect-changes.outputs.store == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -631,7 +674,10 @@ jobs:
 
   deploy-kpa-branch:
     needs: detect-changes
-    if: needs.detect-changes.outputs.kpa-branch == 'true'
+    # WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 §19 (2026-09-23 INCIDENT)
+    #   DEPLOY GATE (fail-closed): `DEPLOY_ENABLED` 가 'true' 일 때만 배포한다.
+    #   변수가 없거나 비어 있으면 Actions 가 빈 문자열을 돌려주므로 **차단이 기본값**이다.
+    if: vars.DEPLOY_ENABLED == 'true' && needs.detect-changes.outputs.kpa-branch == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -686,7 +732,10 @@ jobs:
   # 접근 주소는 Cloud Run 생성 URL 을 쓴다 (hostname/DNS 정책 변경 없음).
   deploy-signage-player:
     needs: detect-changes
-    if: needs.detect-changes.outputs.signage-player == 'true'
+    # WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 §19 (2026-09-23 INCIDENT)
+    #   DEPLOY GATE (fail-closed): `DEPLOY_ENABLED` 가 'true' 일 때만 배포한다.
+    #   변수가 없거나 비어 있으면 Actions 가 빈 문자열을 돌려주므로 **차단이 기본값**이다.
+    if: vars.DEPLOY_ENABLED == 'true' && needs.detect-changes.outputs.signage-player == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: read
