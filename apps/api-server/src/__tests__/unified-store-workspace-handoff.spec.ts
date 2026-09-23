@@ -104,7 +104,9 @@ describe('A. handoff_tokens DDL (§8-1 승인 범위 그대로)', () => {
 
   it('manifest 에 append 되고 expected-schema-states 와 lockstep 이다', () => {
     const manifest = read('database/incremental/manifest.ts');
-    expect(manifest).toMatch(/CreateStoreOwnerTerminationCases1789701000000,\s*AlterHandoffTokensTargetWorkspace1789974015939,\s*\]/);
+    // 뒤에 다른 마이그레이션이 더 append 되어도 깨지지 않도록 "직후에 온다" 만 고정한다
+    // (목록 끝을 고정하면 무관한 WO 가 이 테스트를 깬다).
+    expect(manifest).toMatch(/CreateStoreOwnerTerminationCases1789701000000,\s*AlterHandoffTokensTargetWorkspace1789974015939,/);
     const states = read('database/incremental/expected-schema-states.ts');
     expect(states).toContain("appliedThrough: 'AlterHandoffTokensTargetWorkspace1789974015939'");
     // 원본 생성 migration 은 손대지 않는다 (applied migration 불변)

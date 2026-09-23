@@ -3,7 +3,9 @@
  *
  * 계약: **ensure membership existence ≠ approve / reactivate membership**
  *
- * `POST /admin/users` 는 기존 사용자에게 role·credential 을 추가하는 upsert 경로다.
+ * `POST /admin/users` 는 기존 사용자에게 role·membership 을 추가하는 upsert 경로다.
+ * (WO-O4O-ADMIN-OPERATOR-GOOGLE-INVITATION-AND-ASSIGNMENT-CUTOVER-V1 §18 로
+ *  credential·신규 user 생성은 이 경로에서 은퇴했다. membership 보존 계약은 그대로다.)
  * 이 경로가 기존 `service_memberships.status` 를 `active` 로 승격하면
  * 정지(suspended)·반려(rejected)·탈퇴(withdrawn)·승인대기(pending) 회원이
  * **역할 추가만으로 서비스 접근 권한을 되찾는다.**
@@ -117,7 +119,6 @@ const membership = (status: string) => ({
 const body = (overrides: Record<string, unknown> = {}) => ({
   body: {
     email: 'existing@example.com',
-    password: 'InitialPw123!',
     firstName: '길동',
     lastName: '홍',
     roles: ['kpa:operator'],
@@ -207,7 +208,7 @@ describe('membership 이 없으면 기존 신규 생성 계약을 유지한다',
     expect(res.json.mock.calls[0][0].membershipPolicy).toBe('CREATED');
   });
 
-  it('신규 사용자 → membership active 로 생성 (기존 계약 유지)', async () => {
+  it('미가입 사용자 → membership 도 만들지 않는다 (초대 경로로만 운영자가 된다 §18)', async () => {
     const rec = install({ existingUser: null, existingMembership: null });
     const res = mockRes();
     await new AdminUserController().createUser(
@@ -215,27 +216,28 @@ describe('membership 이 없으면 기존 신규 생성 계약을 유지한다',
       res,
     );
 
-    expect(rec.membershipSaves).toHaveLength(1);
-    expect(rec.membershipSaves[0].status).toBe('active');
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.json.mock.calls[0][0].code).toBe('OPERATOR_INVITATION_REQUIRED');
+    expect(rec.membershipSaves).toHaveLength(0);
   });
 });
 
-// ─── 3. credential 추가만으로 membership 이 승인되지 않는다 ──────────────────
+// ─── 3. credential 은 이 경로에서 은퇴했다 — membership 도 승격되지 않는다 ───
 
-describe('credential 생성과 membership 승인은 분리된다', () => {
-  it('credential 이 새로 생겨도 기존 suspended membership 은 그대로다', async () => {
+describe('credential 을 쓰지 않아도 membership 보존 계약은 그대로다', () => {
+  it('credential 을 만들지 않으며 기존 suspended membership 도 그대로다', async () => {
     const rec = install({
       existingUser: { ...EXISTING_USER },
       existingMembership: membership('suspended'),
-      existingCredential: null, // credential 은 신규 생성됨
+      existingCredential: null,
     });
     const res = mockRes();
     await new AdminUserController().createUser(body() as any, res);
 
     const payload = res.json.mock.calls[0][0];
-    expect(payload.credentialPolicy).toBe('CREATED');
-    expect(rec.credentials).toHaveLength(1);
-    // credential 이 생겼어도 membership 은 승격되지 않는다
+    // 운영자 인증은 Google 하나다 — service_credentials 는 이 경로에서 생기지 않는다.
+    expect(payload.credentialPolicy).toBe('NOT_APPLICABLE');
+    expect(rec.credentials).toHaveLength(0);
     expect(rec.membershipSaves).toHaveLength(0);
     expect(payload.membershipPolicy).toBe('KEEP_EXISTING_STATUS');
   });

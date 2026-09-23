@@ -13,7 +13,10 @@
  *   - 응답의 user.status 는 요청 body 의 status 가 아니라 **기존 값**이다
  *   - body 에 status/isActive 를 실어 보내도 기존 사용자 상태는 바뀌지 않는다
  *     (상태 변경은 PATCH /admin/users/:id/status 전용 계약)
- *   - 신규 사용자는 기존 계약대로 초기 status 를 가진다
+ *
+ * WO-O4O-ADMIN-OPERATOR-GOOGLE-INVITATION-AND-ASSIGNMENT-CUTOVER-V1 §18 로
+ * 이 경로에서 **신규 user 생성과 비밀번호 수신이 은퇴**했다. 위 보존 계약은 그대로 두고,
+ * 은퇴한 두 입력이 조용히 무시되지 않고 명시 코드로 거절되는지를 함께 고정한다.
  */
 import 'reflect-metadata';
 
@@ -117,7 +120,6 @@ const APPROVED_USER = {
 const body = (overrides: Record<string, unknown> = {}) => ({
   body: {
     email: 'suspended@example.com',
-    password: 'InitialPw123!',
     firstName: '길동',
     lastName: '홍',
     roles: ['kpa:operator'],
@@ -140,8 +142,10 @@ describe('A. 기존 suspended 사용자 — role 추가로 되살아나지 않�
 
     // User repository 로의 save/insert 가 한 번도 일어나지 않아야 한다.
     expect(rec.userSaves).toHaveLength(0);
-    // membership/credential 은 정상적으로 추가된다 (기능은 살아 있다).
-    expect(rec.memberships.length + rec.credentials.length).toBeGreaterThan(0);
+    // membership 은 정상적으로 추가된다 (기능은 살아 있다).
+    expect(rec.memberships).toHaveLength(1);
+    // credential 은 이 경로에서 더 이상 만들어지지 않는다 (§18).
+    expect(rec.credentials).toHaveLength(0);
   });
 
   it('응답의 status 는 기존 suspended 를 그대로 반영한다', async () => {
@@ -187,8 +191,8 @@ describe('A. 기존 suspended 사용자 — role 추가로 되살아나지 않�
     expect(rec.userSaves).toHaveLength(0);
     const payload = res.json.mock.calls[0][0];
     expect(payload.user.status).toBe('suspended');
-    // 기존 credential 은 덮어쓰지 않는다 (기존 계약 동시 확인)
-    expect(payload.credentialPolicy).toBe('KEEP_EXISTING_CREDENTIAL');
+    // credential 은 읽지도 쓰지도 않는다 — 운영자 인증은 Google 하나다 (§18)
+    expect(payload.credentialPolicy).toBe('NOT_APPLICABLE');
     expect(rec.credentials).toHaveLength(0);
   });
 });
@@ -211,10 +215,10 @@ describe('B. 기존 approved 사용자 — 상태 그대로', () => {
   });
 });
 
-// ─── C. 신규 사용자 — 초기 status 계약 유지 ──────────────────────────────────
+// ─── C. 은퇴한 입력 — 조용히 무시하지 않고 명시 코드로 거절한다 (§18) ───────
 
-describe('C. 신규 사용자 — 기존 초기 상태 계약을 유지한다', () => {
-  it('status 미지정 시 기본 approved / isActive true 로 생성된다', async () => {
+describe('C. 신규 생성 · 비밀번호 경로는 은퇴했다', () => {
+  it('미가입 email → 400 OPERATOR_INVITATION_REQUIRED (users 를 만들지 않는다)', async () => {
     const rec = install({ existingUser: null });
     const res = mockRes();
     await new AdminUserController().createUser(
@@ -222,21 +226,29 @@ describe('C. 신규 사용자 — 기존 초기 상태 계약을 유지한다', 
       res,
     );
 
-    expect(rec.userSaves).toHaveLength(1);
-    expect(rec.userSaves[0].status).toBe('approved');
-    expect(rec.userSaves[0].isActive).toBe(true);
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.json.mock.calls[0][0].code).toBe('OPERATOR_INVITATION_REQUIRED');
+    // 어떤 행도 쓰지 않는다.
+    expect(rec.userSaves).toHaveLength(0);
+    expect(rec.memberships).toHaveLength(0);
+    expect(rec.credentials).toHaveLength(0);
   });
 
-  it('명시한 초기 status 는 신규 생성에서만 반영된다', async () => {
-    const rec = install({ existingUser: null });
+  it('body 에 password 가 있으면 400 PASSWORD_NOT_ALLOWED_HERE — 부분 수용도 하지 않는다', async () => {
+    const rec = install({ existingUser: { ...APPROVED_USER } });
     const res = mockRes();
     await new AdminUserController().createUser(
-      body({ email: 'brand-new-2@example.com', status: 'pending', isActive: false }) as any,
+      body({ email: 'approved@example.com', password: 'InitialPw123!' }) as any,
       res,
     );
 
-    expect(rec.userSaves).toHaveLength(1);
-    expect(rec.userSaves[0].status).toBe('pending');
-    expect(rec.userSaves[0].isActive).toBe(false);
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.json.mock.calls[0][0].code).toBe('PASSWORD_NOT_ALLOWED_HERE');
+    // 비밀번호를 무시하고 역할만 부여하는 silent fallback 이 아니다.
+    expect(assignRoleMock).not.toHaveBeenCalled();
+    expect(hashPasswordMock).not.toHaveBeenCalled();
+    expect(rec.userSaves).toHaveLength(0);
+    expect(rec.memberships).toHaveLength(0);
+    expect(rec.credentials).toHaveLength(0);
   });
 });

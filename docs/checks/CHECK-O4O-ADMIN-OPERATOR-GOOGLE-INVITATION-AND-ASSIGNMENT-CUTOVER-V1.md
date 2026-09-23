@@ -147,6 +147,28 @@ bootstrap + incremental 1..3)에서 산출했고, 서로 다른 fresh DB 2회로
 
 lint-ratchet baseline 상향 없음.
 
+### 5-1. 배포 후 CI 적색 — 은퇴한 계약을 고정하던 legacy 테스트 정리
+
+배포는 성공했으나 CI Pipeline(run `35812464797` · commit `1e30e24ee`)이 **실패**로 끝났다.
+원인은 코드 결함이 아니라 **이 WO 가 은퇴시킨 비밀번호 경로를 "있어야 한다" 로 고정하던 테스트들**이다.
+은퇴한 계약을 지키려고 구현을 되돌리지 않고, 테스트를 **새 계약 쪽으로** 옮겼다.
+
+| 대상 | 처리 | 근거 |
+|---|---|---|
+| `admin-dashboard/src/tests/operators-service-password.test.ts` | **삭제** | 파일 전체가 `/operators` 비밀번호 write 계약(`payload.password = formData.password` · `PUT /operator/members/:id` · `KEEP_EXISTING_CREDENTIAL`)만 고정한다. 후속 정본 = `operator-role-catalog.test.ts` §17 "비밀번호 표면 0" |
+| `operators-password-policy.test.ts` → `password-policy.test.ts` | **rename + 축소** | 정책 모듈(`@/lib/password-policy`)은 남은 소비처 `pages/users/UserForm.tsx` 가 있으므로 판정·문구 케이스는 그대로 유지. OperatorsPage 3경로 배선 검증만 제거하고 소스 계약 대상을 UserForm 으로 옮겼다 |
+| `AdminUserController.statusPreservation.test.ts` | **새 계약으로 갱신** | status 보존 계약(users write 0 · body status 무시)은 불변. §C 를 "미가입 email → 400 `OPERATOR_INVITATION_REQUIRED`" · "body password → 400 `PASSWORD_NOT_ALLOWED_HERE` (assignRole·hashPassword 호출 0 = silent fallback 아님)" 으로 교체. `credentialPolicy` 기대값 `KEEP_EXISTING_CREDENTIAL` → `NOT_APPLICABLE` |
+| `AdminUserController.membershipStatusPreservation.test.ts` | **새 계약으로 갱신** | membership 보존 계약(비-active 승격 0 · save 0회 · `membershipPolicy` 명시)은 불변. 신규 사용자 케이스를 400 거절로, credential 생성 케이스를 "credential 을 만들지 않는다" 로 교체 |
+| `unified-store-workspace-handoff.spec.ts` | **정규식 완화 1줄** | manifest 의 **끝**(`…AlterHandoffTokensTargetWorkspace1789974015939,\s*\]`)을 고정하고 있어 마이그레이션이 append 될 때마다 무관한 WO 가 이 테스트를 깬다. "직후에 온다" 만 고정하도록 tail anchor 제거. lockstep 검증은 `check-migration-contract.mjs` C22 가 유지 |
+
+**이번 WO 소관이 아닌 실패 1건 — 보고만 한다:**
+`src/__tests__/signage-player-web-deployment-contract.spec.ts` 가
+`decide "signage-player" "services/signage-player-web/"` 를 찾지 못해 실패한다.
+원인은 다른 세션의 `deploy-web-services.yml` 재작성(`682c1eea7` — affected-scope 배포 게이트)이며
+이 WO 의 변경과 무관하다. 해당 세션 소관으로 남긴다.
+
+재검증: admin-dashboard vitest **16 files / 359 tests PASS** · `check-migration-contract.mjs` **21 pass / 0 fail**.
+
 ---
 
 ## 6. 저장소 상태 — 교차 세션 유출 및 main 복구
@@ -223,6 +245,7 @@ role write 가 실제로 일어나는 Smoke A · B 가 남아 **COMPLETE 가 아
   각 서비스 email/password 로그인 UI · password signup · ForgotPassword/ResetPassword 잔재 ·
   operator PasswordModal 전수 제거 · `PUT /operator/members/:id` password 경로 · password policy ·
   `loginAttempts`/`lockedUntil` · E2E Auth Runtime 재정의 · 문서/개인정보 정책 정합.
+- `signage-player-web-deployment-contract.spec.ts` 실패는 **다른 세션 소관**(§5-1). 이 WO 에서 고치지 않았다.
 - 교차 세션 유출(§6)은 이번에 복구했으나 구조적 재발 가능성이 남아 있다 — 커밋 직전
   `node scripts/git/check-staged-scope.mjs <경로...>` 를 반드시 통과시킨다.
 
