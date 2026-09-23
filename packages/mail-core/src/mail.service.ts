@@ -391,38 +391,7 @@ export class MailService {
 
   // ── Generic email methods (merged from emailService.ts B) ──
 
-  async sendPasswordResetEmail(email: string, resetToken: string, serviceUrl?: string, serviceName?: string): Promise<boolean> {
-    // WO-O4O-PASSWORD-RESET-LEGACY-FALLBACK-DEFAULT-V1: reset URL 결정 우선순위
-    //   1. 호출자가 명시한 serviceUrl (api-server 측에서 serviceKey 기반 production origin 으로 결정 — V2 흐름)
-    //   2. PASSWORD_RESET_DEFAULT_URL — 운영자 명시적 override 환경변수
-    //   3. ADMIN_URL — 기존 환경변수 (legacy 호환)
-    //   4. NODE_ENV='production' → 안전한 production 기본값 (https://neture.co.kr)
-    //      그 외 (development/test/undefined) → http://localhost:3001 (기존 dev 동작 유지)
-    // 본 라이브러리는 V1 legacy reset (serviceKey 없는 호출) 의 fallback 만 책임진다.
-    // V2 흐름은 api-server passwordResetService 에서 이미 serviceKey 기반 URL 을 주입한다.
-    const baseUrl =
-      serviceUrl
-      || process.env.PASSWORD_RESET_DEFAULT_URL
-      || process.env.ADMIN_URL
-      || (process.env.NODE_ENV === 'production'
-            ? 'https://neture.co.kr'
-            : 'http://localhost:3001');
-    const resetUrl = `${baseUrl}/reset-password?token=${resetToken}`;
-    const displayName = serviceName || 'O4O Platform';
-
-    const result = await this.sendEmail({
-      to: email,
-      subject: `Password Reset Request - ${displayName}`,
-      template: 'password-reset',
-      templateData: {
-        resetUrl,
-        expiresIn: '1 hour',
-        year: new Date().getFullYear(),
-        serviceName: displayName,
-      },
-    });
-    return result.success;
-  }
+  // WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: sendPasswordResetEmail 은퇴 — 재설정할 비밀번호가 없다.
 
   async sendEmailVerification(email: string, verificationToken: string, serviceUrl?: string, serviceName?: string): Promise<boolean> {
     // WO-O4O-EMAIL-VERIFICATION-LINK-PRODUCTION-URL-FIX-V1: verify URL 결정 우선순위
@@ -431,7 +400,7 @@ export class MailService {
     //   3. FRONTEND_URL — 기존 환경변수 (legacy 호환)
     //   4. NODE_ENV='production' → 'https://neture.co.kr' (안전한 production 기본값)
     //      그 외 → 'http://localhost:3000' (기존 dev 동작 유지)
-    // sendPasswordResetEmail 과 동일 패턴 — V1 legacy 흐름의 fallback 만 라이브러리가 책임진다.
+    // V1 legacy 흐름(serviceKey 없는 호출)의 fallback 만 라이브러리가 책임진다.
     const baseUrl =
       serviceUrl
       || process.env.EMAIL_VERIFICATION_DEFAULT_URL

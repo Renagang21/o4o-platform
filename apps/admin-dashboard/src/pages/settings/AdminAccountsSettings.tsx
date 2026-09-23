@@ -4,23 +4,27 @@
  * WO-O4O-ADMIN-PLATFORM-SETTINGS-SUPER-ADMIN-ACCOUNT-MANAGEMENT-V1 (원본)
  * WO-O4O-ADMIN-ADMIN-ACCOUNTS-STANDARD-TABLE-AND-CRUD-V1:
  *   수동 <table> → O4O 표준 목록(BaseTable + FilterBar + RowActionMenu). 검색·상태·역할 필터,
- *   단건/일괄 활성화·비활성화, 비밀번호 재설정(기존 계약 재사용).
+ *   단건/일괄 활성화·비활성화. (비밀번호 재설정은 WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1 에서 은퇴)
  *
  *   ⚠️ 중지 조건 #4 발동(부트스트랩 migration 이 특정 계정에 super_admin 재부여:
  *      ActivateAdminUser→sohae2100 / BootstrapCanonicalSeedAccounts→super-admin@o4o.com):
- *      WO 규정에 따라 "표준 목록 전환 + 안전한 기존 액션(list/비밀번호/활성토글/일괄토글)"까지만 구현.
+ *      WO 규정에 따라 "표준 목록 전환 + 안전한 기존 액션(list/활성토글/일괄토글)"까지만 구현.
  *      계정 생성(POST /admin/users)·이름·이메일 수정(PUT /admin/users/:id)·역할 할당 CRUD 는
  *      코드 미구현, CHECK 설계 보고로 남긴다.
  *
  * SSOT = role_assignments (RBAC F9). 역할 변경은 좌측 RBAC Role Assignment 화면. 본 탭은 역할 표시만.
  * 서버측 보호(backend enforce): 본인 비활성(SELF_LOCK) / 마지막 super_admin 비활성(LAST_SUPER_ADMIN) /
  *   super_admin 대상 변경은 super_admin 만(SUPER_ADMIN_ONLY). 목록 응답에 비밀번호·해시 없음.
+ *
+ * WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1:
+ *   비밀번호 재설정 액션·모달·결과 패널을 제거했다(서버 `PATCH /admin/platform-accounts/:id/password` 은퇴).
+ *   관리자 계정의 로그인 수단은 Google 하나이며, 관리자가 남의 비밀번호를 설정하는 경로 자체가 없다.
  */
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authClient } from '@o4o/auth-client';
 import toast from 'react-hot-toast';
-import { Loader2, KeyRound, ShieldCheck, RefreshCw, Pencil, Users } from 'lucide-react';
+import { Loader2, ShieldCheck, RefreshCw, Pencil, Users } from 'lucide-react';
 import { BaseTable, RowActionMenu, FilterBar } from '@o4o/ui';
 import type { O4OColumn } from '@o4o/ui';
 
@@ -48,7 +52,6 @@ interface AdminAccount {
   lastLoginAt: string | null;
 }
 
-const MIN_PW = 8;
 const fmt = (d: string | null) => (d ? new Date(d).toLocaleDateString('ko-KR', { year: 'numeric', month: 'short', day: 'numeric' }) : '—');
 const isSuper = (a: AdminAccount) => a.roles.includes('platform:super_admin');
 
@@ -72,15 +75,6 @@ export default function AdminAccountsSettings() {
   const [expandedRoles, setExpandedRoles] = useState<Set<string>>(new Set());
   const [bulkAction, setBulkAction] = useState('');
   const [bulkBusy, setBulkBusy] = useState(false);
-
-  // 비밀번호 재설정 모달
-  const [pwTarget, setPwTarget] = useState<AdminAccount | null>(null);
-  const [pw1, setPw1] = useState('');
-  const [pw2, setPw2] = useState('');
-  const [pwSaving, setPwSaving] = useState(false);
-  // WO-O4O-ADMIN-PASSWORD-RESET-SERVICE-CREDENTIAL-SCOPE-CLARIFY-V1:
-  //   재설정이 **적용되지 않은** 서비스 목록. toast 는 사라지므로 별도 결과 패널로 남긴다.
-  const [pwResult, setPwResult] = useState<{ email: string; unaffected: string[] } | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -161,38 +155,6 @@ export default function AdminAccountsSettings() {
       await load();
     } finally {
       setBulkBusy(false);
-    }
-  };
-
-  const openPwModal = (acct: AdminAccount) => { setPwTarget(acct); setPw1(''); setPw2(''); };
-  const closePwModal = () => { if (!pwSaving) { setPwTarget(null); setPw1(''); setPw2(''); } };
-
-  const submitPw = async () => {
-    if (!pwTarget) return;
-    if (pw1.length < MIN_PW) { toast.error(`비밀번호는 최소 ${MIN_PW}자 이상이어야 합니다.`); return; }
-    if (pw1 !== pw2) { toast.error('새 비밀번호 확인이 일치하지 않습니다.'); return; }
-    setPwSaving(true);
-    try {
-      const res = await authClient.api.patch(`/admin/platform-accounts/${pwTarget.id}/password`, { newPassword: pw1 });
-      if (res.data?.success) {
-        // WO-O4O-ADMIN-PASSWORD-RESET-SERVICE-CREDENTIAL-SCOPE-CLARIFY-V1:
-        //   재설정은 플랫폼 자격(users.password)에만 적용된다. 서비스별 credential 이 있는 계정은
-        //   그 서비스 로그인 비밀번호가 **바뀌지 않는다** — 성공 toast 만 띄우면 관리자가
-        //   "전부 바뀌었다"고 오인한다. 서버가 내려준 미적용 범위를 그대로 노출한다.
-        const unaffected: string[] = res.data?.data?.unaffectedServiceKeys ?? [];
-        if (unaffected.length > 0) {
-          setPwResult({ email: pwTarget.email, unaffected });
-          toast.success('플랫폼 로그인 비밀번호가 재설정되었습니다.');
-        } else {
-          toast.success('비밀번호가 재설정되었습니다.');
-        }
-        setPwTarget(null); setPw1(''); setPw2('');
-      }
-      else toast.error(res.data?.error || '비밀번호 재설정에 실패했습니다.');
-    } catch (e: any) {
-      toast.error(e?.response?.data?.error || '비밀번호 재설정에 실패했습니다.');
-    } finally {
-      setPwSaving(false);
     }
   };
 
@@ -329,12 +291,6 @@ export default function AdminAccountsSettings() {
               onClick: () => navigate(`/users/${a.id}/edit`),
             },
             {
-              key: 'password',
-              label: '비밀번호 재설정',
-              icon: <KeyRound size={14} />,
-              onClick: () => openPwModal(a),
-            },
-            {
               key: 'toggle',
               label: a.isActive ? '비활성화' : '활성화',
               variant: a.isActive ? 'danger' : 'primary',
@@ -353,8 +309,8 @@ export default function AdminAccountsSettings() {
         <div>
           <h2 className="text-lg font-bold text-o4o-text-primary">관리자 계정</h2>
           <p className="mt-1 text-sm text-o4o-text-secondary">
-            최고/플랫폼 관리자 계정의 로그인 ID·역할·활성 상태를 확인하고, 비밀번호 재설정과 활성 여부를 관리합니다.
-            기존 비밀번호는 조회·표시되지 않습니다. <span className="font-medium">역할 변경은 좌측 메뉴의 RBAC Role Assignment에서 관리합니다.</span>
+            최고/플랫폼 관리자 계정의 로그인 ID·역할·활성 상태를 확인하고 활성 여부를 관리합니다.
+            <span className="font-medium">역할 변경은 좌측 메뉴의 RBAC Role Assignment에서 관리합니다.</span>
           </p>
         </div>
         <div className="shrink-0 flex items-center gap-2">
@@ -375,8 +331,8 @@ export default function AdminAccountsSettings() {
 
       {/* 두 화면의 역할 경계를 화면에서 분명히 한다 — 어디서 무엇을 만드는지 헷갈리지 않게. */}
       <div className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
-        서비스 운영자(KPA · Neture · K-Cosmetics · Pharmacy-Hub) 계정 등록과 서비스별 로그인
-        비밀번호는 이 화면이 아니라 <b>서비스 운영자 관리</b> 화면에서 처리합니다.
+        서비스 운영자(KPA · Neture · K-Cosmetics · Pharmacy-Hub) 계정 등록은 이 화면이 아니라
+        <b>서비스 운영자 관리</b> 화면에서 처리합니다. 로그인 수단은 Google 계정 하나입니다.
       </div>
 
       {error ? (
@@ -432,74 +388,6 @@ export default function AdminAccountsSettings() {
             />
           </div>
         </>
-      )}
-
-      {/* 비밀번호 재설정 모달 */}
-      {pwTarget && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4" onClick={closePwModal}>
-          <div className="w-full max-w-md rounded-xl bg-white p-5 shadow-xl" onClick={(e) => e.stopPropagation()}>
-            <h3 className="text-base font-bold text-o4o-text-primary">비밀번호 재설정</h3>
-            <p className="mt-1 text-sm text-slate-500">{pwTarget.email} 계정의 새 비밀번호를 설정합니다. 기존 비밀번호는 표시되지 않습니다.</p>
-            {/* WO-O4O-ADMIN-PASSWORD-RESET-SERVICE-CREDENTIAL-SCOPE-CLARIFY-V1:
-                적용 범위를 **설정 전에** 알린다. 서비스별 비밀번호를 따로 쓰는 계정은
-                이 재설정으로 해당 서비스 로그인이 바뀌지 않는다(설계된 자격 분리). */}
-            <div className="mt-3 rounded-lg border border-amber-200 bg-amber-50 p-3 text-xs text-amber-800">
-              이 재설정은 <span className="font-semibold">플랫폼 로그인 비밀번호</span>에 적용됩니다.
-              서비스별 로그인 비밀번호를 따로 사용하는 계정은 해당 서비스의 비밀번호가 변경되지 않으며,
-              사용자가 각 서비스의 &ldquo;비밀번호 찾기&rdquo;로 직접 재설정해야 합니다.
-              설정 후 적용되지 않은 서비스를 안내합니다.
-            </div>
-            <div className="mt-4 space-y-3">
-              <div>
-                <label className="block text-xs font-medium text-slate-600 mb-1">새 비밀번호</label>
-                <input type="password" value={pw1} onChange={(e) => setPw1(e.target.value)} autoComplete="new-password"
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder={`최소 ${MIN_PW}자`} />
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-slate-600 mb-1">새 비밀번호 확인</label>
-                <input type="password" value={pw2} onChange={(e) => setPw2(e.target.value)} autoComplete="new-password"
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="다시 입력" />
-              </div>
-            </div>
-            <div className="mt-5 flex justify-end gap-2">
-              <button type="button" onClick={closePwModal} disabled={pwSaving}
-                className="px-3 py-2 text-sm font-medium text-slate-600 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50">취소</button>
-              <button type="button" onClick={submitPw} disabled={pwSaving}
-                className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50">
-                {pwSaving && <Loader2 className="w-4 h-4 animate-spin" />} 새 비밀번호 설정
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* WO-O4O-ADMIN-PASSWORD-RESET-SERVICE-CREDENTIAL-SCOPE-CLARIFY-V1:
-          재설정이 적용되지 않은 서비스 결과. toast 는 사라지므로 닫을 때까지 남는 패널로 알린다. */}
-      {pwResult && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4" onClick={() => setPwResult(null)}>
-          <div className="w-full max-w-md rounded-xl bg-white p-5 shadow-xl" onClick={(e) => e.stopPropagation()}>
-            <h3 className="text-base font-bold text-o4o-text-primary">일부 서비스에는 적용되지 않았습니다</h3>
-            <p className="mt-1 text-sm text-slate-600">
-              {pwResult.email} 계정의 <span className="font-semibold">플랫폼 로그인 비밀번호</span>는 재설정됐습니다.
-            </p>
-            <div className="mt-3 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
-              <p className="font-semibold">아래 서비스의 로그인 비밀번호는 변경되지 않았습니다.</p>
-              <ul className="mt-2 list-disc pl-5">
-                {pwResult.unaffected.map((k) => (<li key={k}>{k}</li>))}
-              </ul>
-              <p className="mt-2 text-xs">
-                이 서비스들은 서비스 전용 비밀번호를 사용합니다. 사용자가 각 서비스의
-                &ldquo;비밀번호 찾기&rdquo;로 직접 재설정해야 로그인할 수 있습니다.
-              </p>
-            </div>
-            <div className="mt-5 flex justify-end">
-              <button type="button" onClick={() => setPwResult(null)}
-                className="px-3 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700">확인</button>
-            </div>
-          </div>
-        </div>
       )}
     </div>
   );

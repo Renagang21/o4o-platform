@@ -4,10 +4,15 @@
  *
  * WO-O4O-ACCOUNT-CENTER-UI-V1
  * WO-O4O-AUTH-RBAC-UNIFICATION-V2: prefix 유지, mapApiRoles 제거
+ *
+ * WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1:
+ *   `login(email, password)` 과 raw `POST /auth/login` 호출을 제거했다. 계정센터는 인증 진입점이 아니라
+ *   세션 소비자다 — 세션은 `/handoff?token=…`(cookie 교환) 또는 같은 도메인 쿠키로 들어오고,
+ *   이 컨텍스트는 `GET /auth/me` 로 확인만 한다. 로그인 자체는 각 서비스의 Google 정본 화면이 담당한다.
  */
 
-import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
-import { parseAuthResponse, normalizeUser, resolveAuthError } from '@o4o/auth-utils';
+import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react';
+import { parseAuthResponse, normalizeUser } from '@o4o/auth-utils';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
 
@@ -29,7 +34,8 @@ interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
+  /** 세션 재확인 — handoff 직후 등. 로그인 함수는 없다(Google 정본 화면이 담당). */
+  refresh: () => Promise<void>;
   logout: () => void;
 }
 
@@ -53,68 +59,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    const checkSession = async () => {
-      try {
-        const response = await fetch(`${API_BASE_URL}/api/v1/auth/me`, {
-          credentials: 'include',
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          const { user: apiUser } = parseAuthResponse(data);
-          if (apiUser) {
-            const roles = extractRoles(apiUser);
-            const base = normalizeUser(apiUser);
-            const memberships = (apiUser as any).memberships || [];
-            setUser({ ...base, roles, memberships });
-          }
-        }
-      } catch {
-        // 세션 없음 - 정상
-      }
-      setIsLoading(false);
-    };
-
-    checkSession();
-  }, []);
-
-  const login = async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
+  /** 쿠키 세션 확인 — 계정센터의 유일한 인증 경로다(자격증명 전송 없음). */
+  const refresh = useCallback(async () => {
     try {
-      setIsLoading(true);
-
-      const response = await fetch(`${API_BASE_URL}/api/v1/auth/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
+      const response = await fetch(`${API_BASE_URL}/api/v1/auth/me`, {
         credentials: 'include',
       });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        return { success: false, error: resolveAuthError(data, response.status) };
+      if (response.ok) {
+        const data = await response.json();
+        const { user: apiUser } = parseAuthResponse(data);
+        if (apiUser) {
+          const roles = extractRoles(apiUser);
+          const base = normalizeUser(apiUser);
+          const memberships = (apiUser as any).memberships || [];
+          setUser({ ...base, roles, memberships });
+        }
       }
-
-      const { user: apiUser } = parseAuthResponse(data);
-      if (apiUser) {
-        const roles = extractRoles(apiUser);
-        const base = normalizeUser(apiUser);
-        const memberships = (apiUser as any).memberships || [];
-        setUser({ ...base, roles, memberships });
-        return { success: true };
-      }
-
-      return { success: false, error: '로그인 응답이 올바르지 않습니다.' };
-    } catch (error) {
-      if (error instanceof TypeError) {
-        return { success: false, error: '서버에 연결할 수 없습니다. 잠시 후 다시 시도해주세요.' };
-      }
-      return { success: false, error: '로그인에 실패했습니다.' };
-    } finally {
-      setIsLoading(false);
+    } catch {
+      // 세션 없음 - 정상
     }
-  };
+    setIsLoading(false);
+  }, []);
+
+  useEffect(() => {
+    void refresh();
+  }, [refresh]);
 
   const logout = async () => {
     try {
@@ -134,7 +104,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         user,
         isAuthenticated: !!user,
         isLoading,
-        login,
+        refresh,
         logout,
       }}
     >

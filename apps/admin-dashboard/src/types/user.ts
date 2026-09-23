@@ -80,7 +80,7 @@ export interface UserFormData {
   name: string;
   role: UserRole;
   status: UserStatus;
-  password?: string;
+  // WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: password 필드 제거(서버가 받지 않는다).
   phone?: string;
   businessInfo?: {
     businessName?: string;

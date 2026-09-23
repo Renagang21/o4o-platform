@@ -7,7 +7,6 @@ export type {
   EmailOptions,
   EmailTemplateData,
   VerificationEmailData,
-  PasswordResetEmailData,
   MailLogger,
   MailServiceConfig,
 } from './types.js';
