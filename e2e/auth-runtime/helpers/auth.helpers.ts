@@ -4,21 +4,20 @@
  * CHECK-O4O-AUTH-RUNTIME-PLAYWRIGHT-E2E-V1
  * WO-O4O-KPA-AUTH-RUNTIME-E2E-LOGIN-REGRESSION-ROOT-CAUSE-AND-CI-CLOSURE-V1
  *
- * 자격증명 하드코딩 금지 — docs/local/TEST-ACCOUNTS.local.md 참조.
+ * 자격증명 하드코딩 금지 — 그리고 이제 **CI 가 보관하는 자격증명 자체가 없다.**
  *
- * ── credential 계약 (2026-08-26 개정) ──
- * 공용 `E2E_ADMIN_EMAIL` / `E2E_ADMIN_PASSWORD` 는 **폐기됐다.**
- * 실제 인증은 서비스별 L2 `service_credentials`(serviceKey 단위) 로 판정되므로,
- * 공용 secret 하나를 쓰면 **한 서비스의 비밀번호만 바뀜어도 CI 전체가 깨지고**
- * 그 장애가 "코드 회귀"처럼 보인다 (2026-08-21 KPA 사례).
- * 따라서 credential 은 **serviceKey 별로 분리**한다:
- *
- *   E2E_KPA_ADMIN_EMAIL    / E2E_KPA_ADMIN_PASSWORD      (kpa-society)
- *   E2E_KCOS_ADMIN_EMAIL   / E2E_KCOS_ADMIN_PASSWORD     (k-cosmetics)
- *   E2E_NETURE_ADMIN_EMAIL / E2E_NETURE_ADMIN_PASSWORD   (neture)
- *
- * 가능하면 **E2E 전용 계정**을 쓴다. 운영자 개인 계정을 CI 인증 fixture 로 쓰면
- * 정상적인 비밀번호 변경이 다시 CI 장애로 보인다.
+ * ── Google-only 재정의 (WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1 · 2026-09-23) ──
+ * password 로그인 helper(`loginAs` · `getServiceCredentials` · `missingCredentialEnvs` ·
+ * `loginAndAssertAuthenticated`)와 `E2E_*_ADMIN_EMAIL/PASSWORD` 계약을 **전부 제거**했다.
+ * 로그인 수단이 Google 하나가 되면서:
+ *   - CI 에 넣을 password 가 없고(계정에 password 자체가 없다),
+ *   - Google 계정 자동 로그인은 새 테스트 계정 금지(WO §2 제외) + Google 의 자동화 차단으로 불가,
+ *   - 토큰 주입은 "로그인한 척" 일 뿐 로그인 회귀를 증명하지 못한다.
+ * 그래서 이 스위트는 **자격증명 없이 증명 가능한 계약**만 다룬다:
+ *   로그인 surface(Google 진입 존재 · password 입력 0) · 은퇴 endpoint 404 ·
+ *   Google 경로 생존과 토큰 검증 · 미인증 동작(redirect · spinner freeze 0).
+ * 세션 이후 런타임(refresh · logout · token-cleared · 세션 복원)은 **통제된 배포 창의
+ * 사용자 브라우저 smoke** 로 이관했다 — CI 가 증명할 수 없는 것을 증명한 척하지 않는다.
  */
 
 import { type Page, expect } from '@playwright/test';
@@ -36,9 +35,8 @@ export interface ServiceConfig {
   /** login 성공 후 도달할 경로 prefix */
   dashboardPrefix: string;
   /** 서비스별 E2E 계정 email 환경변수명 */
-  emailEnv: string;
-  /** 서비스별 E2E 계정 password 환경변수명 */
-  passwordEnv: string;
+  // WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: emailEnv/passwordEnv 는 제거했다.
+  //   로그인 수단이 Google 하나가 되어 CI 가 보관할 자격증명이 없다(§CI 재정의).
   /** 서비스 특이사항 */
   note?: string;
 }
@@ -51,8 +49,6 @@ export const SERVICES: Record<string, ServiceConfig> = {
     loginPath: '/login',
     protectedPath: '/admin',
     dashboardPrefix: '/admin',
-    emailEnv: 'E2E_NETURE_ADMIN_EMAIL',
-    passwordEnv: 'E2E_NETURE_ADMIN_PASSWORD',
   },
   kpa: {
     name: 'KPA-Society',
@@ -61,8 +57,6 @@ export const SERVICES: Record<string, ServiceConfig> = {
     loginPath: '/login',
     protectedPath: '/admin',
     dashboardPrefix: '/admin',
-    emailEnv: 'E2E_KPA_ADMIN_EMAIL',
-    passwordEnv: 'E2E_KPA_ADMIN_PASSWORD',
   },
   kcosmetics: {
     name: 'K-Cosmetics',
@@ -71,8 +65,6 @@ export const SERVICES: Record<string, ServiceConfig> = {
     loginPath: '/login',
     protectedPath: '/operator',
     dashboardPrefix: '/operator',
-    emailEnv: 'E2E_KCOS_ADMIN_EMAIL',
-    passwordEnv: 'E2E_KCOS_ADMIN_PASSWORD',
     note: 'lazy session — RoleGuard에서 checkSession 트리거',
   },
 };
@@ -80,38 +72,6 @@ export const SERVICES: Record<string, ServiceConfig> = {
 export const ALL_SERVICES = Object.values(SERVICES);
 
 // ─── Credential helpers (env only — no hardcoding) ───────────────────────────
-
-/**
- * 서비스별 E2E 자격증명을 환경변수에서 읽는다.
- *
- * fallback 을 두지 않는다. 공용 secret 으로 떨어지는 경로가 있으면
- * 분리 계약이 조용히 무효화되고, 장애 시 어느 값이 쓰였는지 판별할 수 없다.
- */
-export function getServiceCredentials(svc: ServiceConfig): { email: string; password: string } {
-  const email = process.env[svc.emailEnv];
-  const password = process.env[svc.passwordEnv];
-  if (!email || !password) {
-    const missing = [!email ? svc.emailEnv : null, !password ? svc.passwordEnv : null].filter(Boolean);
-    throw new Error(
-      `[${svc.name}] E2E 자격증명 미설정 — ${missing.join(', ')}
-` +
-        `  serviceKey=${svc.serviceKey} 의 L2 credential 과 정합해야 합니다.
-` +
-        '  값은 docs/local/TEST-ACCOUNTS.local.md (Git 추적 제외) / GitHub Actions Secrets 에서 관리합니다.',
-    );
-  }
-  return { email, password };
-}
-
-/** 미설정된 서비스별 credential 환경변수명 목록 (preflight 보고용) */
-export function missingCredentialEnvs(services: ServiceConfig[] = ALL_SERVICES): string[] {
-  const missing: string[] = [];
-  for (const svc of services) {
-    if (!process.env[svc.emailEnv]) missing.push(svc.emailEnv);
-    if (!process.env[svc.passwordEnv]) missing.push(svc.passwordEnv);
-  }
-  return missing;
-}
 
 // ─── Network tracking ────────────────────────────────────────────────────────
 
@@ -132,73 +92,6 @@ export function trackAuthMeRequests(page: Page): { count: () => number; urls: ()
 }
 
 // ─── Login helper ────────────────────────────────────────────────────────────
-
-/**
- * 서비스 로그인.
- * 다양한 폼 셀렉터를 순서대로 시도한다.
- */
-export async function loginAs(
-  page: Page,
-  baseUrl: string,
-  loginPath: string,
-  email: string,
-  password: string,
-): Promise<boolean> {
-  await page.goto(`${baseUrl}${loginPath}`, { waitUntil: 'domcontentloaded' });
-
-  // 폼 렌더 대기
-  await page.waitForTimeout(1500);
-
-  const emailSelectors = [
-    'input[type="email"]',
-    'input[name="email"]',
-    'input[placeholder*="이메일"]',
-    'input[placeholder*="email" i]',
-  ];
-  const pwSelectors = [
-    'input[type="password"]',
-    'input[name="password"]',
-  ];
-  const submitSelectors = [
-    'button[type="submit"]',
-    'button:has-text("로그인")',
-    'button:has-text("Login")',
-  ];
-
-  let emailFilled = false;
-  for (const sel of emailSelectors) {
-    const el = page.locator(sel).first();
-    if (await el.isVisible({ timeout: 2000 }).catch(() => false)) {
-      await el.fill(email);
-      emailFilled = true;
-      break;
-    }
-  }
-
-  let pwFilled = false;
-  for (const sel of pwSelectors) {
-    const el = page.locator(sel).first();
-    if (await el.isVisible({ timeout: 2000 }).catch(() => false)) {
-      await el.fill(password);
-      pwFilled = true;
-      break;
-    }
-  }
-
-  if (!emailFilled || !pwFilled) return false;
-
-  for (const sel of submitSelectors) {
-    const el = page.locator(sel).first();
-    if (await el.isVisible({ timeout: 2000 }).catch(() => false)) {
-      await el.click();
-      break;
-    }
-  }
-
-  // 네비게이션 또는 상태 변화 대기
-  await page.waitForTimeout(3000);
-  return true;
-}
 
 // ─── State helpers ───────────────────────────────────────────────────────────
 
@@ -503,29 +396,6 @@ export async function expectAuthenticated(
     `[${svc.name}] ${context} — 인증 상태 아님: ${describeAuthEvidence(evidence)}`,
   ).toBe(true);
   return evidence;
-}
-
-/**
- * 로그인 → 보호 화면 진입 → **인증 성공 단언**까지 수행하는 공통 setup.
- *
- * 로그인에 실패하면 여기서 즉시 실패한다. skip 하지 않는다.
- * 이전 구현은 `if (!ok) test.skip(...)` 이었고, 그래서 2026-08-21 KPA 자격 drift 때
- * 후속 dashboard/logout 테스트가 연쇄 오탐으로 통과했다.
- */
-export async function loginAndAssertAuthenticated(
-  page: Page,
-  svc: ServiceConfig,
-): Promise<AuthEvidence> {
-  const { email, password } = getServiceCredentials(svc);
-
-  const formOk = await loginAs(page, svc.baseUrl, svc.loginPath, email, password);
-  expect(formOk, `[${svc.name}] 로그인 폼 입력 실패 (${svc.loginPath})`).toBe(true);
-
-  await page.goto(`${svc.baseUrl}${svc.protectedPath}`, { waitUntil: 'domcontentloaded' });
-  await waitForLoadingComplete(page, 8000);
-  await page.waitForTimeout(1000);
-
-  return expectAuthenticated(page, svc, `로그인 후 ${svc.protectedPath} 접근`);
 }
 
 // ─── Assertion helpers ───────────────────────────────────────────────────────
