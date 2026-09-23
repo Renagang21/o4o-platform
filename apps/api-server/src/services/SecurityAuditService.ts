@@ -52,7 +52,6 @@ export type SecurityEventType =
   | 'auth.login'
   | 'auth.logout'
   | 'auth.failed_login'
-  | 'auth.password_reset'
   | 'auth.permission_denied'
   | 'auth.token_expired'
   | 'auth.suspicious_activity'

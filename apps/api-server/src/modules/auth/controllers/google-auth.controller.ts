@@ -17,7 +17,6 @@ import { GoogleIdTokenError } from '../../../services/auth/google-identity.servi
 import { googleIdentityConfig } from '../../../config/google-identity.config.js';
 import type {
   GoogleAdminBootstrapRequestDto,
-  GoogleLinkRequestDto,
   GoogleLoginRequestDto,
   GoogleSignupRequestDto,
 } from '../dto/index.js';
@@ -80,29 +79,8 @@ export class GoogleAuthController extends BaseController {
     }
   }
 
-  /**
-   * POST /api/v1/auth/google/link — `{ idToken, currentPassword }` (requireAuth)
-   * WO-O4O-GOOGLE-IDENTITY-OPERATOR-EXPLICIT-LINK-V1: 대상 user 는 세션에서만. 세션은 새로 발급하지 않는다.
-   */
-  static async link(req: AuthRequest, res: Response): Promise<any> {
-    const userId = req.user?.id;
-    if (!userId) {
-      return BaseController.unauthorized(res, 'Authentication required', 'AUTH_REQUIRED');
-    }
-    const { idToken, currentPassword } = req.body as GoogleLinkRequestDto;
-    try {
-      const result = await googleAuthService.link({
-        userId,
-        idToken,
-        currentPassword,
-        ipAddress: getTrustedClientIp(req),
-        userAgent: req.headers['user-agent'] || 'Unknown',
-      });
-      return BaseController.ok(res, result);
-    } catch (error) {
-      return GoogleAuthController.handleError(res, error, 'link');
-    }
-  }
+  // WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1:
+  //   link / linkStatus 는 은퇴했다 (users.password 재인증 전제).
 
   /**
    * POST /api/v1/auth/google/bootstrap-admin — `{ idToken, bootstrapCode }` (세션 없음 · 전환기 1회용)
@@ -120,19 +98,6 @@ export class GoogleAuthController extends BaseController {
       });
       // userId 는 서버 판정 결과 확인용으로만 돌려준다(세션·토큰 없음).
       return BaseController.ok(res, { linked: result.linked });
-    } catch (error) {
-      return GoogleAuthController.handleError(res, error, 'link');
-    }
-  }
-
-  /** GET /api/v1/auth/google/link/status — `{ linked, passwordSet }` (requireAuth · PII 없음) */
-  static async linkStatus(req: AuthRequest, res: Response): Promise<any> {
-    const userId = req.user?.id;
-    if (!userId) {
-      return BaseController.unauthorized(res, 'Authentication required', 'AUTH_REQUIRED');
-    }
-    try {
-      return BaseController.ok(res, await googleAuthService.getLinkStatus(userId));
     } catch (error) {
       return GoogleAuthController.handleError(res, error, 'link');
     }

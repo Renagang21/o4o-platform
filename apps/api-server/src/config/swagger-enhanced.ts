@@ -77,8 +77,8 @@ const examples = {
         message: '이메일은 필수 항목입니다'
       },
       {
-        field: 'password',
-        message: '비밀번호는 8자 이상이어야 합니다'
+        field: 'name',
+        message: '이름은 필수 항목입니다'
       }
     ]
   },

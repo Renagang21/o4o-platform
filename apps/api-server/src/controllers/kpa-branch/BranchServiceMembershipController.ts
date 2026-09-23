@@ -77,12 +77,9 @@ export class BranchServiceMembershipController {
       const rows = await AppDataSource.query(
         `SELECT sm.id, sm.user_id, sm.status, sm.role, sm.rejection_reason,
                 sm.approved_at, sm.created_at, sm.updated_at,
-                u.email, u.name, u.phone,
-                (sc.id IS NOT NULL) AS has_credential
+                u.email, u.name, u.phone
            FROM service_memberships sm
            JOIN users u ON u.id = sm.user_id
-           LEFT JOIN service_credentials sc
-                  ON sc.user_id = sm.user_id AND sc.service_key = sm.service_key
            ${where}
            ORDER BY sm.created_at DESC
            LIMIT $${idx} OFFSET $${idx + 1}`,
@@ -101,8 +98,7 @@ export class BranchServiceMembershipController {
             phone: r.phone,
             status: r.status,
             role: r.role,
-            // 서비스 비밀번호(L2 credential) 보유 여부. false 면 비밀번호 재설정 안내 대상이다.
-            hasServiceCredential: r.has_credential === true,
+            // WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: hasServiceCredential 은 은퇴했다.
             rejectionReason: r.rejection_reason,
             appliedAt: r.created_at,
             approvedAt: r.approved_at ?? null,

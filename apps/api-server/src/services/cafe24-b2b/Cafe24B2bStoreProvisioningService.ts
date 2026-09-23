@@ -203,15 +203,15 @@ export class Cafe24B2bStoreProvisioningService {
 
     // ── 2. 내부 user 확보 (멱등) ──
     //   합성 email 이 결정적이므로 ON CONFLICT (email) 이 곧 재사용이다.
-    //   password 는 빈 문자열 — 해시가 아니므로 어떤 비밀번호로도 로그인할 수 없다.
+    //   WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: password 컬럼을 아예 쓰지 않는다.
     //   비밀번호 credential 을 만들지 않는다는 §10 요구를 코드가 아니라 데이터로 보장한다.
     //   기존 row 를 만나도 어떤 컬럼도 덮어쓰지 않는다.
     //   users.service_key 는 deprecated 컬럼이라 쓰지 않는다 (SSOT = service_memberships).
     let userId: string | null = existingLink?.user_id ?? null;
     if (!userId) {
       const insertedRows = await runner.query(
-        `INSERT INTO users (email, password, name, status, "isActive", "isEmailVerified", provider, provider_id)
-         VALUES ($1, '', $2, 'active', true, false, 'cafe24-b2b', $3)
+        `INSERT INTO users (email, name, status, "isActive", "isEmailVerified", provider, provider_id)
+         VALUES ($1, $2, 'active', true, false, 'cafe24-b2b', $3)
          ON CONFLICT (email) DO NOTHING
          RETURNING id`,
         [ctx.email, ctx.storeName, ctx.memberHash],

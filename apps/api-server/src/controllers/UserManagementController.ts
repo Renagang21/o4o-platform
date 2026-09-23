@@ -145,7 +145,7 @@ export class UserManagementController {
   // Create new user
   createUser = async (req: Request, res: Response): Promise<void> => {
     try {
-      const { email, password, firstName, lastName, role, roles, status } = req.body;
+      const { email, firstName, lastName, role, roles, status } = req.body;
 
       // Check if user already exists
       const existingUser = await this.userRepository.findOne({ where: { email } });
@@ -158,9 +158,9 @@ export class UserManagementController {
       }
 
       // Create new user
+      // WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: password 를 받지 않는다.
       const user = this.userRepository.create({
         email,
-        password,
         firstName,
         lastName,
         roles: roles || [role || 'customer'],
@@ -199,8 +199,7 @@ export class UserManagementController {
         res.status(400).json({
           success: false,
           error:
-            '이 API 는 비밀번호를 변경하지 않습니다. 서비스 비밀번호는 운영자 회원 관리(서비스 선택 후 변경), ' +
-            '플랫폼 계정 비밀번호는 플랫폼 계정 관리에서 변경하세요.',
+            'O4O 인증에는 비밀번호가 없습니다. 로그인은 Google 계정으로만 이뤄집니다.',
           code: 'PASSWORD_NOT_ALLOWED_HERE',
         });
         return;

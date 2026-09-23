@@ -1396,28 +1396,11 @@ export class MembershipApprovalService {
           );
         }
 
-        // STEP H1b: service_credentials — 삭제한 membership 과 **정확히 같은 서비스 범위**만 폐기
-        // WO-O4O-SERVICE-CREDENTIAL-ORPHAN-LIFECYCLE-INTEGRITY-AUDIT-V1 §9 판정 B:
-        //   hard delete 는 membership row 자체를 없애므로 되돌릴 canonical 경로가 없다
-        //   (reactivateMembership 은 suspended/withdrawn membership 이 남아 있을 때만 동작).
-        //   그런데 종전 구현은 service_credentials 를 그대로 남겨 두어
-        //   "membership 0 + credential 존재" orphan 을 만들었고(2026-08-21 실측 28행),
-        //   이후 admin 이 membership 을 다시 만들면(AdminUserController: KEEP_EXISTING_CREDENTIAL)
-        //   **아무도 새 비밀번호를 정하지 않은 채 과거 비밀번호가 다시 유효**해졌다.
-        //   따라서 hard delete 범위의 credential 은 함께 폐기한다.
-        //   soft delete(withdraw/suspend)는 credential 을 유지한다 — reactivate 로
-        //   같은 비밀번호를 복구하는 것이 설계된 동작이다(아래 else 분기 무변경).
-        if (isPlatformAdmin) {
-          await queryRunner.query(
-            `DELETE FROM service_credentials WHERE user_id = $1`,
-            [userId]
-          );
-        } else {
-          await queryRunner.query(
-            `DELETE FROM service_credentials WHERE user_id = $1 AND service_key = ANY($2)`,
-            [userId, serviceKeys]
-          );
-        }
+        // STEP H1b: WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1
+        //   service_credentials 동반 폐기는 은퇴했다. credential orphan 문제
+        //   (WO-O4O-SERVICE-CREDENTIAL-ORPHAN-LIFECYCLE-INTEGRITY-AUDIT-V1 §9 판정 B) 자체가
+        //   "삭제된 membership 뒤에 과거 비밀번호가 살아남는다"는 password 축의 문제였고,
+        //   그 축이 사라져 재현 조건이 없다. 테이블은 Phase B 스키마 정리에서 함께 제거한다.
 
         // STEP H2: role_assignments — 해당 서비스 prefix 역할만 삭제
         // 플랫폼 역할(super_admin, admin, operator)은 절대 건드리지 않음

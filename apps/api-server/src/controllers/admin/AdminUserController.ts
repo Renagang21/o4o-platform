@@ -23,11 +23,9 @@ import {
   SELF_ROLE_REVOKE_FORBIDDEN_CODE,
   SELF_ROLE_REVOKE_FORBIDDEN_MESSAGE,
 } from '../../utils/role-revoke-safety.js';
-// WO-O4O-ADMIN-PASSWORD-RESET-SERVICE-CREDENTIAL-SCOPE-CLARIFY-V1: 재설정 적용 범위 안내(read-only)
-// WO-O4O-ADMIN-OPERATORS-SERVICE-PASSWORD-WRITE-CONTRACT-FIX-V1:
-//   updateUser 가 더 이상 비밀번호를 받지 않으므로 적용범위 안내가 불필요해졌다.
-//   `resolveAdminPasswordResetScope` 는 플랫폼 계정 재설정 경로
-//   (routes/admin/platform-accounts.routes.ts) 에서 계속 사용되므로 서비스 자체는 보존한다.
+// WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1:
+//   비밀번호 재설정 적용범위 안내(`resolveAdminPasswordResetScope`)는 은퇴했다.
+//   재설정할 비밀번호가 어디에도 없다.
 
 // WO-O4O-ADMIN-OPERATOR-MEMBERSHIP-CANONICAL-KEY-FIX-V1 +
 // WO-O4O-BACKFILL-MIGRATION-CANONICAL-KEY-CONSISTENCY-V1:
@@ -435,18 +433,9 @@ export class AdminUserController {
       // WO-O4O-ADMIN-OPERATORS-SERVICE-PASSWORD-WRITE-CONTRACT-FIX-V1:
       //   이 경로는 **일반 사용자 정보 수정** 전용이다. 비밀번호는 더 이상 받지 않는다.
       //
-      //   왜 제거하나 — 이전 구현은 `users.password`(Identity V2 L1) 만 갱신했다.
-      //   로그인은 `service_credentials`(L2) 가 있으면 `users.password` 를 **보지 않으므로**
-      //   (auth-login.service.ts: `credentialHash ?? user.password`), credential 을 가진 계정은
-      //   성공 응답만 받고 실제 로그인 비밀번호가 바뀌지 않는 **사일런트 무효**였다.
-      //   `CLARIFY-V1` 이 경고 안내를 붙였지만 조작 자체는 여전히 무효였다.
-      //
-      //   대체 경로 — 서비스별 비밀번호는 serviceKey 를 명시하는
-      //   `PUT /api/v1/operator/members/:userId { password, serviceKey }` 가 담당한다.
-      //   플랫폼 계정 비밀번호는 `PATCH /api/v1/admin/platform-accounts/:id/password` 가 담당한다.
-      //
-      //   조용히 무시하지 않고 **명시적으로 거부**한다 — 무시하면 이전과 같은
-      //   "성공했는데 안 바뀜" 상태가 반복된다.
+      //   WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: 대체 경로도 더는 없다.
+      //   O4O 인증에 비밀번호가 존재하지 않으므로 이 필드는 어디로도 라우팅되지 않는다.
+      //   조용히 무시하지 않고 **명시적으로 거부**한다 — 무시하면 "성공했는데 안 바뀜" 이 된다.
       if (password !== undefined) {
         res.status(400).json({
           success: false,
