@@ -1,6 +1,6 @@
 # CHECK-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1
 
-> 작성일: 2026-09-23 · 상태: **`READY_FOR_PHASE_A_DEPLOY / BLOCKED_BY_LECTURE_INCIDENT`** (§7 · 사용자 결정 2026-09-23)
+> 작성일: 2026-09-23 · 상태: **`READY_FOR_PHASE_A_DEPLOY / AWAITING_CONTROLLED_DEPLOY_WINDOW`** (§7 · 사용자 결정 2026-09-24)
 > WO: [`WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1`](../work-orders/WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1.md)
 > 작업 브랜치: `wo/legacy-password-auth-retirement` (origin push 완료 · `main` 무접촉)
 > 작업 worktree: `C:/tmp/o4o-legacy-password-retirement` — 다른 세션의 체크아웃·worktree 는 **불가침**
@@ -182,39 +182,73 @@ backend Phase A 2커밋(`010952f0d` · `c921f90b5`)과 프런트/공통 WIP(`4d7
 | `O4O-CORE-FREEZE-V1`(F10) | 본문 미수정 — Core auth route 변경의 승인 근거는 본 WO 이며 §2 에 기록했다. Freeze 문서 본문 갱신은 별도 판단 사항으로 **보고만**(CLAUDE.md §16-4) |
 | `USER-DOMAIN-SSOT-V1` | 다이어그램에 `password` 컬럼 표기 1건 — **Phase B(스키마 제거) 시점에 갱신**. 지금 고치면 코드/스키마 상태와 어긋난다 |
 
-## 7. Phase A 배포 — BLOCKED (Lecture incident · 사용자 결정 2026-09-23)
+## 7. Phase A 배포 — 통제된 배포 창 대기 (사용자 결정 2026-09-24)
 
-배포 워크플로 3종(`deploy-api.yml` · `deploy-web-services.yml` · `deploy-admin.yml`)에 `--no-traffic` 이 **없다**.
-처음 이를 "main merge → 새 revision 이 즉시 100% 를 받는다" 로 적었으나, **실측으로 정정한다(2026-09-23 13:0x~13:1xZ)**:
-트래픽이 특정 revision 에 **pin** 된 상태에서는 `gcloud run deploy` 가 새 revision 을 만들고도 트래픽을 옮기지 않는다
-(`o4o-core-api-03748-64l`(13:10Z) · `lecture-web-00014-9gj`(13:05Z) · `kpa-society-web-01996-r8d`(13:05Z) 가 생성됐지만
-트래픽은 여전히 `03746-qlz` · `00011-drs` · `01993-6z9` 100%). 타 세션 실측(`serving 0 percent of traffic`)과 일치한다.
+### 7-1. 차단 사유 해제
 
-그래도 **결론은 동일하다**: ① 배포가 Phase 2 이미지를 production 에 만들어 두고 ② 이후 누군가 pin 을 해제하거나
-`update-traffic`/`--to-latest` 를 쓰는 순간 Lecture Phase 2 가 서빙되며 ③ API 배포는 migration job 을 동반한다.
-현재 `main` 에 Lecture Phase 2 코드가 있고 production 은 pre-cutover revision 으로 롤백된 상태이므로
-(incident 기록: `CHECK-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1` §19 · 커밋 `a7b660dbb` · 롤백 실행은 타 세션),
-**본 WO 를 main 에 merge 해 배포 파이프라인을 돌리는 일은 Lecture 처분 확정 전까지 하지 않는다.**
+**"Lecture data cutover 미실행" 은 더 이상 배포 차단 사유가 아니다**(사용자 지시 2026-09-24).
+- 삭제된 강의 11건의 **rekey 를 요구하지 않는다** · **Phase 2 revert 도 요구하지 않는다**.
+- 근거 기록은 Lecture 트랙 소관이다: `CHECK-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1`
+  §19(INCIDENT · `a7b660dbb`) · §21(LMS 31행 삭제 · `05950f5a9`) · §22(빈 상태 Phase 2 재판정 ·
+  `b8ae53f4e` · `MAIN_RUNTIME_SAFE_FOR_GENERAL_DEPLOY = YES 조건부`). 본 CHECK 는 참조만 한다.
+- 이전 판단(§7 구판)에서 내가 적었던 "Lecture 처분 확정까지 배포 금지" 는 이 지시로 **해제**된다.
 
-**배포 게이트(타 세션 · 사용자 승인)**: 저장소 변수 `DEPLOY_ENABLED` fail-closed 게이트가 도입됐고 현재 `false` 다(13:21:59Z).
-13:02:37Z 에 값이 `true` 로 바뀌어 배포 job 이 실행된 사건이 있었으나 **본 세션(legacy-password WO)은 GitHub 변수·시크릿 write 0** 이며
-그 시각 행적은 로컬 테스트 실행과 브랜치 push(22:08·22:10 KST) 뿐이다 — actor 특정은 GitHub API 한계(변수 actor 미제공 · 개인 저장소 audit-log 404)로 불가.
-본 WO 는 **어떤 경우에도 `DEPLOY_ENABLED` 를 켜지 않는다**; 배포는 사용자 승인 + Lecture 처분 확정 후에만 요청한다.
+### 7-2. 배포 대상 SHA 와 포함 변경 (2026-09-24 실측)
 
-사용자 결정(선택지 1) 에 따른 현재 경계:
+| 축 | 현재 서빙 revision (이미지 기준) | 그 revision 을 만든 SHA | 대상 SHA |
+|---|---|---|---|
+| API | `o4o-core-api-03746-qlz` (09-23 06:53Z) | `f651885ed` | **`b8ae53f4e`** (origin/main) |
+| Web | `lecture-web-00011-drs` · `kpa-society-web-01993-6z9` · `k-cosmetics-web-01161-lw5` · `pharmacy-hub-web-00251-49n` (06:20Z) | `63c9b602f` | **`b8ae53f4e`** |
+| Admin | `o4o-admin-dashboard-01305-z8l` (05:18Z) | `cc87a9385` | **`b8ae53f4e`** |
 
-| 항목 | 상태 |
-|---|---|
-| 코드 작업 · 테스트/CI · 작업 브랜치 push | **허용** |
-| `main` merge/push · deploy-api/web/admin 실행 · Cloud Run 직접 deploy | **금지** |
-| `service_credentials` 5행 삭제 · password column/table DROP · §43 destructive gate | **금지** |
-| production DB write | **금지**(본 WO 에서 0건) |
+대상 SHA 에는 **이미지·revision 이 아직 없다**. 13:02:48Z(`3c7083be5`) 배포가 만든 `03748-64l` ·
+`00014-9gj` · `01996-r8d` · `01308-29m` 가 마지막이며, 13:21:59Z 에 `DEPLOY_ENABLED=false` 로 닫힌 뒤
+실행된 배포 4건(`f951ad841` 13:46 · `ebc7204ba` 13:47 · `11c249c80` 14:20 · `b8ae53f4e` 14:56)은
+workflow 결과가 success 여도 **revision 을 만들지 않았다** — fail-closed 게이트가 잡 전체를 skip 했다(게이트 정상 동작 실측).
 
-재개 조건 — "Lecture 롤백 완료" 가 아니라 **"`main` 의 Lecture 코드가 다시 배포해도 되는 상태"** 다:
-① Lecture Phase 2 를 `main` 에서 revert 하고 pre-cutover 를 정본으로 확정, 또는
-② Lecture Phase 2 의 data/membership 정책까지 승인·완료해 재배포 가능 상태로 확정.
-그 뒤 순서: 최신 `origin/main` fetch → 브랜치 재동기화 → CI 재검증 → Phase A merge/deploy →
-production Google/auth smoke → **그 다음에만** §43 destructive gate.
+포함 변경(서빙 SHA → `b8ae53f4e` · 경로 필터 기준):
+
+| 축 | 파일 수 | 주요 범위 |
+|---|---:|---|
+| API | 74 | `modules/lms` services/controllers/utils(17) · `__tests__`(19) · `services/payment/b2b`(3) · `routes/kpa`(6) · `packages/shared-space-ui`(3) 등 |
+| Web | 145 | web-kpa-society 56 · web-pharmacy-hub 28 · web-k-cosmetics 27 · web-lecture 26 · shared-space-ui 4 · web-neture 2 · store-ui-core 1 |
+| Admin | 12 | admin-dashboard 4 · shared-space-ui 5 · store-ui-core 1 · pnpm-lock 1 · workflow 1 |
+
+**migration 실행 여부: 신규 migration 파일 0** (`git diff f651885ed..b8ae53f4e -- apps/api-server/src/database/migrations` 결과 없음).
+API 배포의 migration Job 은 `build-and-deploy` 안에 있어 실행되더라도 적용 대상이 없으므로
+`INCREMENTAL_EXECUTED=0` 이 기대값이다(Lecture 트랙이 격리 PG15 에서 동일 지문 `bc27f5bc…/5826` 으로 선확인).
+
+**예상 배포 job**: `deploy-api`(api_deploy_affected=true 예상 · migration 0) ·
+`deploy-web-services`(kpa-society · k-cosmetics · pharmacy-hub · lecture — neture/store 는 변경 2/1 파일이라 per-service 판정에 따름) ·
+`deploy-admin`. 3 워크플로 모두 `environment: production` 승인 게이트 + `DEPLOY_ENABLED=='true'` 조건이 걸려 있다.
+
+### 7-3. 이번 배포 창에서 하지 않는 것
+
+- **전역 `DEPLOY_ENABLED` 를 내가 켜지 않는다.** 다른 세션의 push 가 이어지는 동안 변수를 열면
+  그 push 들이 함께 배포되므로, 켜는 시점은 사용자가 정한다(사용자 지시 2026-09-24).
+- **§43 destructive migration(Phase B)은 이번 배포에 포함하지 않는다** — `service_credentials` 5행 삭제 ·
+  `users.password`/`loginAttempts`/`lockedUntil` · `password_reset_tokens` · `login_attempts` DROP 은
+  **별도 판정·별도 승인** 대상으로 유지한다(§9-5).
+- Phase A 브랜치(`wo/legacy-password-auth-retirement` · 고유 11커밋)는 **아직 main 미병합**이다.
+  이 창에 Phase A 를 포함할지(= main merge 선행 여부)는 사용자 결정 사항이며, 포함하면 대상 SHA 가
+  merge 커밋으로 바뀌고 위 §7-2 표를 그 SHA 기준으로 다시 확정해야 한다.
+
+### 7-4. 배포 창 절차 (승인 시 이 순서로 실행)
+
+```text
+① 사용자 승인 + DEPLOY_ENABLED=true (사용자 타이밍)
+② 3 워크플로 실행 → environment production 승인(required reviewer)
+③ 새 revision 생성 확인 (api · web 4 · admin)  ← 아직 트래픽 전환 안 함
+④ 실제 HTTP 검증 (0% revision 의 태그 URL 또는 전환 직후 즉시 검증)
+   - Phase 2 API: 강의 목록 빈 배열 · 삭제된 강의 ID 404
+   - 로그인 surface: Google 진입 렌더 · password 입력 0
+   - password 은퇴 endpoint 404 (Phase A 를 포함한 경우)
+   - 관련 Web 화면 렌더
+⑤ 통과 → 트래픽 전환 → old revision traffic 0 확인
+   실패 → 전환하지 않고 기존 revision 서빙 유지(현 상태가 안전 상태)
+⑥ 배포 후 production smoke: Google 로그인(관리자·테스트 계정) · 서비스 가입 flow
+⑦ 그 다음에만 §43 destructive gate 보고 → 별도 승인
+```
 
 ## 8. 검증 (2026-09-23 · 격리 worktree `C:/tmp/o4o-legacy-password-retirement`)
 
@@ -231,8 +265,8 @@ production Google/auth smoke → **그 다음에만** §43 destructive gate.
 
 ## 9. 남은 작업 (재개 시)
 
-1. Lecture main 처분 확정 대기(위 §7 재개 조건)
-2. `origin/main` 재동기화 + CI 전체 재검증
+1. ~~Lecture main 처분 확정 대기~~ → **해제(2026-09-24 · §7-1)**
+2. `origin/main` 재동기화 + CI 전체 재검증 — 2026-09-24 `3fbed5f7c` 로 수행(충돌 0 · 아래 §8 재검증 완료)
 3. Phase A merge → deploy(api · web · admin) → old revision traffic 0 확인
 4. production smoke: Google 로그인(관리자 · 테스트 계정) · 서비스 가입 flow 회귀 · password 경로 404/410 확인
 5. **§43 DESTRUCTIVE GATE** — row count · DROP 대상 · rollback 한계 보고 → 사용자 승인 → Phase B(migration · entity · manifest/expected schema)
@@ -242,8 +276,10 @@ production Google/auth smoke → **그 다음에만** §43 destructive gate.
 
 ## 판정
 
-`LEGACY PASSWORD AUTH RETIREMENT: READY_FOR_PHASE_A_DEPLOY / BLOCKED_BY_LECTURE_INCIDENT`
+`LEGACY PASSWORD AUTH RETIREMENT: READY_FOR_PHASE_A_DEPLOY / AWAITING_CONTROLLED_DEPLOY_WINDOW`
 
-Phase A 런타임 컷오버·테스트·정적 guard·문서 정합은 완료했고 배포만 대기한다. Phase B(스키마)는 미착수다.
+Phase A 런타임 컷오버 · 테스트 재정의 · 정적 guard · CI/E2E Google-only 재정의 · 문서 정합까지 완료했다.
+남은 것은 **통제된 배포 창**(사용자 승인 + `DEPLOY_ENABLED` + environment production 승인)뿐이며,
+Lecture 사유의 차단은 해제됐다(§7-1). Phase B(스키마 파괴적 제거)는 **미착수 · 별도 판정**이다(§7-3).
 
 문서 정합: 발견 2건(MYPAGE 매트릭스 password 2행 — 정정 완료 / USER-DOMAIN-SSOT 다이어그램 password 표기 — Phase B 로 이월) / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 1건(F10 Core Freeze 본문 갱신 여부 판단)
