@@ -6,6 +6,7 @@
 > **위상**: 조사 보고서가 아니라 **공급자→매장 B2B 주문 축을 고정하는 canonical 계약 문서**다.
 > **선행 문서**: [`O4O-STORE-COMMERCE-BOUNDARY-V1`](O4O-STORE-COMMERCE-BOUNDARY-V1.md) · [`O4O-BUSINESS-PHILOSOPHY-V1`](O4O-BUSINESS-PHILOSOPHY-V1.md) · [`O4O-3-ROLE-FLOW-BASELINE-V1`](O4O-3-ROLE-FLOW-BASELINE-V1.md)
 > **회귀 가드**: `apps/api-server/src/__tests__/b2b-supplier-to-store-order-canonical-contract.spec.ts`
+> **정정 이력**: 2026-09-24 · `WO-O4O-B2B-ORDER-CONTRACT-EVENT-OFFER-PAYMENT-FIRST-DOC-ALIGNMENT-V1` — §5-1(Axis A · Event Offer = 특가 · payment-first) · §3(결제 축 producer 4종) · §8(KPA · K-Cosmetics 행). 나머지 절은 불변이며 문서 전체는 **Active** 다.
 
 ---
 
@@ -115,7 +116,7 @@ active service membership  ∧  service-scoped role/capability
 | `store_cart_items` | **B2B 장바구니**. 매장(buyer) 이 공급자 offer 를 담는다 | 소비자 장바구니가 아니다. `O4O-STORE-COMMERCE-BOUNDARY-V1` 의 소비자 cart 금지선 대상 아님 |
 | `checkout_orders` | **canonical 주문 원장**. 3개 축 전부가 여기로 수렴한다 | 신규 `*_orders` 테이블 생성 금지 (CLAUDE.md §4) |
 | `neture_orders` | **공급자 fulfillment 원장**. 결제 확정 후 bridge 가 투영한다 | 주문의 정본이 아니라 공급자 처리 뷰다 |
-| 결제 축 | live producer 3개 한정 — `pharmacy-hub` · `neture-b2b` · `store-service-subscription` | 그 외 producer 신규 추가 금지 |
+| 결제 축 | live producer **4개 한정** — `pharmacy-hub` · `neture-b2b` · `store-b2b` · `store-service-subscription` | 그 외 producer 신규 추가 금지. `store-b2b` 는 승인축 B2B(`store_b2b_cart`) + Event Offer 특가(`store_cart_checkout`) 공용 결제 축이며(`STORE_B2B_PAYMENT_SERVICE_KEY`) `WO-O4O-B2B-ORDER-CONTRACT-EVENT-OFFER-PAYMENT-FIRST-DOC-ALIGNMENT-V1` 로 승인됐다 |
 
 **불변식 T1.** 주문 정본은 `checkout_orders` 다. `neture_orders` 는 파생이다.
 공급자 처리 상태를 `checkout_orders` 없이 단독으로 만들지 않는다.
@@ -135,14 +136,24 @@ WO 가 정한 canonical 흐름:
 
 현재 main 에 **살아 있는 구현은 3개 축**이다. 셋 다 `store_cart_items` → `checkout_orders` 로 수렴한다.
 
-### 5-1. Axis A — Event-Offer 축 (KPA Society · K-Cosmetics)
+### 5-1. Axis A — Event-Offer 축 (KPA Society · K-Cosmetics) — **payment-first**
+
+Event Offer 는 **특가 판매**다. 참여 신청 · 구매 의향 · 예약 · 약정 · 참가자 모집 · 펀딩 같은 개념은
+이 축에 존재하지 않는다. 일반 공급자→매장 B2B commerce 와 **같은 결제·처리 축**을 쓴다.
 
 ```text
-event_offer (공급자 제안, 운영자 승인)
+event_offer (공급자 특가 제안, 운영자 승인)
   → POST /api/v1/store/cart/:serviceKey/items          (B2B 장바구니 담기)
   → POST /api/v1/store/cart/:serviceKey/checkout-confirm
-      → EventOfferCartCheckoutService  (공급자별로 주문 분리 생성)
-      → checkout_orders
+      → EventOfferCartCheckoutService  (공급자별로 주문 분리 생성 · 한정수량 원자 확보)
+      → checkout_orders                (paymentStatus='pending')
+  → POST /api/v1/{kpa,cosmetics}/b2b/payments/prepare   (B2B 전용 namespace)
+      → PaymentCore + Toss → /confirm → payment.completed(serviceKey='store-b2b')
+      → checkout_orders  paid
+  → CheckoutFulfillmentBridgeService
+      → neture_orders                  (공급자 fulfillment record)
+  → 공급자 처리 → 공급자가 직접 배송 → neture_shipments 상태 기록 → delivered
+  → settlement
   → 매장 조회: /api/v1/kpa/checkout/orders
               /api/v1/cosmetics/orders
 ```
@@ -155,7 +166,22 @@ event_offer (공급자 제안, 운영자 승인)
 | `kpa-society` | `kpa-groupbuy` |
 | `k-cosmetics` | `k-cosmetics-event-offer` |
 
-이 축은 **결제 축이 아니다.** 주문 생성까지가 O4O 의 책임이고, 정산은 공급자–매장 간 기존 거래 관계를 따른다.
+**불변식 A1 (payment-first).** 주문은 `paymentStatus='pending'` 으로 생성되고, **결제 완료 event 만이**
+`paid` 로 전이시킨다. 라우트가 결제 상태를 직접 조작하지 않는다(Axis B 의 불변식 B1 과 동일).
+
+**불변식 A2.** `paid` 이후 `CheckoutFulfillmentBridgeService` 가 `neture_orders` 로 투영해야 공급자에게 보인다.
+UNPAID 주문은 fulfillment · 배송 처리 · 정산 대상이 아니다. 후불 · 외상 · 인보이스 · `collectionStatus`
+기반 무결제 fulfillment 는 **없다**. 정산은 `PAID + DELIVERED` 기준이다.
+
+**불변식 A3 (경계).** 결제 진입은 **B2B 전용 namespace** (`/api/v1/{kpa,cosmetics}/b2b/payments/*`) 다.
+소비자→매장 판매 결제(`/api/v1/kpa/payments/*` · `/api/v1/cosmetics/payments/*`)는 **410 은퇴 상태 그대로**이며
+되살리지 않는다(§9 · `O4O-STORE-COMMERCE-BOUNDARY-V1`). 공급자→매장 B2B 결제와 소비자→매장 commerce 를
+혼동하지 않는다.
+
+> **정정 이력.** 이 절은 과거 "이 축은 결제 축이 아니다 — 주문 생성까지가 O4O 의 책임이고 정산은 공급자–매장
+> 간 기존 거래 관계를 따른다" 였다. Event Offer 를 특가 판매로 확정하고 payment-first 로 구현하면서
+> (`WO-O4O-SUPPLIER-ORDER-PAYMENT-FULFILLMENT-SETTLEMENT-CANONICALIZATION-V1`) 계약이 바뀌었다.
+> 정정 근거·범위는 `WO-O4O-B2B-ORDER-CONTRACT-EVENT-OFFER-PAYMENT-FIRST-DOC-ALIGNMENT-V1`.
 
 ### 5-2. Axis B — Neture B2B 축 (payment-first)
 
@@ -264,8 +290,8 @@ Axis A 의 `checkout-confirm` 은 **주문 확정**이지 소비자 결제가 �
 
 | 서비스 | B2B 주문 축 | 매장(buyer) | 공급자(seller) 화면 | 비고 |
 |---|---|---|---|---|
-| **KPA Society** | Axis A (`kpa-groupbuy`) | 있음 — 장바구니 · `/kpa/checkout/orders` | 없음 (Neture 측이 정본) | 관심상품 주문 작업대는 **안내 전용**. 실행 leg 은 410 은퇴 |
-| **K-Cosmetics** | Axis A (`k-cosmetics-event-offer`) | 있음 — 장바구니 · `/cosmetics/orders` | 없음 | 조회 경로만 `/checkout` 접두어가 없다 (§10 DF-1) |
+| **KPA Society** | Axis A (`kpa-groupbuy`) · **payment-first** | 있음 — 장바구니 · `/kpa/checkout/orders` · 결제 `/kpa/b2b/payments/*` | 없음 (Neture 측이 정본) | 관심상품 주문 작업대는 **안내 전용**. 소비자→매장 판매 leg 은 410 은퇴(B2B 결제와 별개 축) |
+| **K-Cosmetics** | Axis A (`k-cosmetics-event-offer`) · **payment-first** | 있음 — 장바구니 · `/cosmetics/orders` · 결제 `/cosmetics/b2b/payments/*` | 없음 | 조회 경로만 `/checkout` 접두어가 없다 (§10 DF-1) |
 | **PharmacyHub** | Axis C | 있음 — 자체 라우트 표면 | 없음 (서비스에 supplier 역할 없음) | `O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1` |
 | **Neture** | Axis B | 있음 | 있음 — `/api/v1/neture/supplier/orders*` = **공급자 화면 canonical** | 다른 서비스가 복제하지 않는다 |
 
