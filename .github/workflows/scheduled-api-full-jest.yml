@@ -1,0 +1,57 @@
+name: Scheduled API Full Jest
+
+# WO-O4O-API-JEST-AFFECTED-TEST-EXECUTION-PHASE0-SHADOW-V1 §17 · §18
+#
+# **왜 필요한가.**
+# 일반 push 의 `api-tests` 는 `admin_only` / `docs_fast_eligible` 판정에서 skip 된다.
+# 그래서 코드가 깨진 뒤 문서·CHECK commit 이 연달아 올라오면 **red 인 main 이
+# green 처럼 보인다.** 실제로 IR 조사에서 그 상태가 확인됐다(마지막 green 이후
+# 문서 commit 들이 API Jest 를 계속 skip 시킴).
+#
+# 그래서 affected 선별과 **무관하게** 하루 1회 main 기준 전체 API Jest 를 돌린다.
+# Phase 1 로 넘어가 선별 실행을 켜더라도 이 workflow 가 최종 안전망이다.
+#
+# §18 — 범위는 checkout · install · API 의존성 빌드 · full Jest 뿐이다.
+# Docker 빌드 · Cloud Run 배포 · migration Job 과 연결하지 않는다.
+# §19 — 일반 push 의 docs/admin fast path 에는 손대지 않는다. 별도 workflow 다.
+
+on:
+  schedule:
+    # 매일 18:00 UTC = 03:00 KST. 국내 근무시간 밖이라 러너 경합이 적다.
+    - cron: '0 18 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: scheduled-api-full-jest
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  NODE_VERSION: '22'
+
+jobs:
+  full-jest:
+    name: API Server Jest (full, scheduled)
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+    - uses: actions/checkout@v6
+      with:
+        ref: main
+
+    - name: Setup build environment
+      uses: ./.github/actions/setup-build-env
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        strict-lockfile: 'true'
+        build-packages: 'false'
+
+    - name: Build api-server workspace dependencies
+      run: pnpm --filter '@o4o/api-server^...' run build
+
+    # 선별하지 않는다. 전체 suite 를 그대로 돌린다.
+    - name: Run tests (api-server Jest, serial to prevent OOM)
+      run: cd apps/api-server && npx jest --maxWorkers=1

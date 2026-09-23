@@ -54,6 +54,12 @@ import {
   selectDocsConsumerSpecs,
   selectPathGuardSpecs,
   workspaceDirOf,
+  listApiJestSpecs,
+  buildApiSourceImportGraph,
+  selectApiJestSpecs,
+  deriveAlwaysRunSpecs,
+  deriveMigrationSpecs,
+  API_JEST_LARGE_CHANGE_THRESHOLD,
 } from '../detect-affected.mjs';
 
 const graph = buildWorkspaceGraph();
@@ -936,4 +942,178 @@ test('§23. 9개 서비스의 실제 @o4o import 는 전부 선언된 dependency
     }
   }
   assert.deepEqual(failures, [], `UNDECLARED_USED workspace import:\n${failures.join('\n')}`);
+});
+
+/* ---------------------------------------------------------------------------
+ * WO-O4O-API-JEST-AFFECTED-TEST-EXECUTION-PHASE0-SHADOW-V1 §22 (Case J1~J16)
+ *
+ * **Phase 0 은 shadow 다.** 여기서 고정하는 것은 selector 의 판정이지 CI 의 Jest
+ * 실행 범위가 아니다. 실제 실행은 workflow 가 계속 full 로 돈다.
+ *
+ * 고정하는 것
+ *   - ALWAYS_RUN · MIGRATION 특별군은 **파일 목록 하드코딩이 아니라** 규칙에서 나온다
+ *   - findRelatedTests 가 0 을 내도 다른 축이 덮는다 (workspace 밖 파일의 0 은 무의미하다)
+ *   - 의심스러운 입력(전역 경로 · lockfile · Jest 설정 · 대규모 변경 · 판정 실패)은 전부 full
+ *   - test 만 바뀐 변경이 suite 0 으로 붕괴하지 않는다
+ * ------------------------------------------------------------------------ */
+
+const apiJestSpecs = listApiJestSpecs();
+const apiImportGraph = buildApiSourceImportGraph();
+/** jest 를 실제로 띄우지 않고(느리다) 나머지 축만 검증한다 — findRelated 는 J14 에서 따로 본다 */
+const selectJest = (lines, opts = {}) => {
+  const files = parseFileList(lines.join('\n'));
+  return selectApiJestSpecs(files, graph, REPO_ROOT, {
+    verdict: classify(files, graph),
+    skipFindRelated: true,
+    importGraph: apiImportGraph,
+    ...opts,
+  });
+};
+
+test('J1. API route 변경은 selected 이고, 그 route 를 읽는 inventory spec 을 포함한다', () => {
+  const r = selectJest(['M\tapps/api-server/src/routes/admin/store-owner-terminations.routes.ts']);
+  assert.equal(r.mode, 'selected');
+  assert.ok(r.specs.includes('src/__tests__/admin-api-guard-inventory.spec.ts'),
+    'route inventory census spec 이 빠지면 route guard 회귀를 놓친다');
+  assert.ok(r.specs.length < apiJestSpecs.length, 'selected 는 전체보다 작아야 한다');
+});
+
+test('J2. test 만 바뀐 변경은 그 test 자신을 반드시 포함한다 (0 suite 로 붕괴 금지)', () => {
+  const target = 'src/__tests__/unified-store-workspace-handoff.spec.ts';
+  const r = selectJest([`M\tapps/api-server/${target}`]);
+  assert.equal(r.mode, 'selected');
+  assert.ok(r.specs.includes(target), '변경된 test 자신이 빠지면 그 변경을 아무도 검증하지 않는다');
+  assert.ok(r.components.changedTests >= 1);
+});
+
+test('J3. packages/security-core 변경은 findRelatedTests 가 0 이어도 raw consumer 를 선별한다', () => {
+  const r = selectJest(['M\tpackages/security-core/src/index.ts']);
+  assert.equal(r.mode, 'selected');
+  assert.equal(r.components.findRelated, 0, 'workspace 밖 파일은 jest roots 밖이라 항상 0 이다');
+  assert.ok(r.components.rawSource > 0, '그 0 을 "관련 없음" 으로 읽으면 대량 누락이 된다');
+  assert.ok(r.components.importerBridge > 0, 'api-server 쪽 importer bridge 가 살아 있어야 한다');
+});
+
+test('J4. frontend package 변경도 raw-source consumer + ALWAYS_RUN 으로 덮인다', () => {
+  const r = selectJest(['M\tpackages/store-ui-core/src/index.ts']);
+  assert.equal(r.mode, 'selected');
+  assert.ok(r.components.rawSource > 0);
+  assert.ok(r.components.alwaysRun > 0);
+});
+
+test('J5. migration 변경은 database 특별군을 추가한다', () => {
+  const r = selectJest(['A\tapps/api-server/src/database/migrations/20990101000000-Example.ts']);
+  assert.equal(r.mode, 'selected');
+  assert.ok(r.components.migration > 0, 'schema false-negative 방지가 시간 절감보다 우선이다');
+  assert.ok(r.specs.includes('src/__tests__/unified-store-workspace-handoff.spec.ts'),
+    'manifest/lockstep 계약 spec 은 migration 변경에서 반드시 돈다');
+});
+
+test('J6. .github/** 변경은 full 이다 (기존 global 판정을 완화하지 않는다)', () => {
+  const r = selectJest(['M\t.github/workflows/ci-pipeline.yml']);
+  assert.equal(r.mode, 'full');
+  assert.match(r.reason, /global_or_unknown/);
+});
+
+test('J7. scripts/** 변경은 full 이다', () => {
+  const r = selectJest(['M\tscripts/ci/detect-affected.mjs']);
+  assert.equal(r.mode, 'full');
+});
+
+test('J8. pnpm-lock.yaml 변경은 full 이다', () => {
+  const r = selectJest(['M\tpnpm-lock.yaml']);
+  assert.equal(r.mode, 'full');
+});
+
+test('J9. base SHA 이상(변경 파일 수집 실패)은 full 이다', () => {
+  const r = selectApiJestSpecs([], graph, REPO_ROOT, {
+    verdict: { global_or_unknown: true },
+    skipFindRelated: true,
+    importGraph: apiImportGraph,
+  });
+  assert.equal(r.mode, 'full');
+});
+
+test('J10. 선택이 전체의 80% 를 넘으면 full 로 되돌린다 (full 이 더 싸다)', () => {
+  const r = selectApiJestSpecs(
+    parseFileList('M\tapps/api-server/src/database/entities.ts'),
+    graph,
+    REPO_ROOT,
+    {
+      verdict: {},
+      importGraph: apiImportGraph,
+      // findRelatedTests 가 거의 전체를 반환하는 상황을 강제한다
+      run: () => ({ status: 0, stdout: apiJestSpecs.map((s) => `/apps/api-server/${s.rel}`).join('\n') }),
+    },
+  );
+  assert.equal(r.mode, 'full');
+  assert.match(r.reason, /80% 초과/);
+});
+
+test('J11. 미분류 경로(저장소 루트 신규 디렉터리)는 full 이다', () => {
+  const r = selectJest(['A\tunknown-top-level/thing.ts']);
+  assert.equal(r.mode, 'full');
+});
+
+test('J12. multi-commit push 에서 앞쪽 commit 의 API 변경이 유지된다', () => {
+  const r = selectJest([
+    'M\tapps/api-server/src/routes/admin/store-owner-terminations.routes.ts',
+    'M\tdocs/checks/CHECK-EXAMPLE.md',
+  ]);
+  assert.equal(r.mode, 'selected');
+  assert.ok(r.specs.includes('src/__tests__/admin-api-guard-inventory.spec.ts'));
+});
+
+test('J13. manual full override 는 무조건 full 이다', () => {
+  const r = selectJest(['M\tapps/api-server/src/routes/admin/store-owner-terminations.routes.ts'], { manualFull: true });
+  assert.equal(r.mode, 'full');
+  assert.match(r.reason, /manual full override/);
+});
+
+test('J14. Jest 설정 · setup 변경과 대규모 변경은 full 이다', () => {
+  assert.equal(selectJest(['M\tapps/api-server/jest.config.cjs']).mode, 'full');
+  assert.equal(selectJest(['M\tapps/api-server/src/__tests__/setup/jest.setup.ts']).mode, 'full');
+  const many = Array.from({ length: API_JEST_LARGE_CHANGE_THRESHOLD + 1 },
+    (_, i) => `M\tapps/api-server/src/services/generated-${i}.ts`);
+  assert.equal(selectJest(many).mode, 'full');
+});
+
+test('J15. ALWAYS_RUN 은 파일 목록이 아니라 규칙에서 도출된다 (census spec 20종 전부 포함)', () => {
+  const derived = new Set(deriveAlwaysRunSpecs(apiJestSpecs));
+  // IR 의 runtime 계측에서 저장소 파일 2,000개 초과를 읽은 census suite 표본.
+  // 신규 census spec 이 추가돼도 규칙이 자동으로 잡아야 하므로 "포함" 만 고정한다.
+  const censusSample = apiJestSpecs
+    .filter((s) => /\breaddirSync\b|\bglobSync\b/.test(s.source))
+    .map((s) => s.rel);
+  assert.ok(censusSample.length >= 20, `census 표본이 ${censusSample.length} 개로 줄었다 — 규칙 점검 필요`);
+  for (const spec of censusSample) assert.ok(derived.has(spec), `ALWAYS_RUN 에서 누락: ${spec}`);
+});
+
+test('J16. MIGRATION 특별군도 규칙 도출이며 lockstep 계약 spec 을 포함한다', () => {
+  const derived = new Set(deriveMigrationSpecs(apiJestSpecs));
+  assert.ok(derived.has('src/__tests__/unified-store-workspace-handoff.spec.ts'));
+  assert.ok(derived.size >= 30, `migration 특별군이 ${derived.size} 개로 줄었다 — 보수성 점검 필요`);
+  assert.ok(derived.size < apiJestSpecs.length);
+});
+
+test('J17. Phase 0 계약 — workflow 는 selected 여부와 무관하게 full Jest 를 실행한다', () => {
+  const ci = readFileSync(path.join(REPO_ROOT, '.github/workflows/ci-pipeline.yml'), 'utf-8');
+  assert.ok(ci.includes('Calculate API Jest affected set (shadow)'), 'shadow step 이 없다');
+  assert.ok(ci.includes('node scripts/ci/detect-affected.mjs --mode=api-jest'), 'shadow selector 호출이 없다');
+  // Phase 0 의 핵심 계약: selector 출력이 jest 인자로 흘러가면 안 된다.
+  assert.ok(!/api_jest_specs/.test(ci.replace(/--mode=api-jest/g, '')),
+    'Phase 0 에서는 selector 출력을 실제 jest 인자로 쓰지 않는다');
+  assert.ok(ci.includes('run: cd apps/api-server && npx jest --maxWorkers=1\n'),
+    'api-tests 의 full Jest 실행 명령이 인자 없이 그대로 유지되어야 한다');
+});
+
+test('J18. 정기 full Jest workflow 가 존재하고 선별하지 않는다 (§17 · §18)', () => {
+  const wf = readFileSync(path.join(REPO_ROOT, '.github/workflows/scheduled-api-full-jest.yml'), 'utf-8');
+  assert.match(wf, /schedule:/, 'docs/admin fast path 가 red main 을 가리는 것을 막는 최종 안전망이다');
+  assert.ok(wf.includes('npx jest --maxWorkers=1\n'), '선별 인자 없이 전체를 돌려야 한다');
+  // §18 — Docker / Cloud Run / migration Job 과 연결하지 않는다
+  for (const forbidden of ['docker', 'gcloud', 'Cloud Run', 'migration']) {
+    assert.ok(!new RegExp(forbidden, 'i').test(wf.replace(/^\s*#.*$/gm, '')),
+      `scheduled full Jest 는 ${forbidden} 과 연결하지 않는다`);
+  }
 });
