@@ -1,7 +1,7 @@
 # CHECK-O4O-ADMIN-OPERATOR-GOOGLE-INVITATION-AND-ASSIGNMENT-CUTOVER-V1
 
 > WO: [`WO-O4O-ADMIN-OPERATOR-GOOGLE-INVITATION-AND-ASSIGNMENT-CUTOVER-V1`](../work-orders/WO-O4O-ADMIN-OPERATOR-GOOGLE-INVITATION-AND-ASSIGNMENT-CUTOVER-V1.md)
-> 작성일: 2026-09-23 · 상태: **DEPLOYED — SMOKE A/B PENDING_USER_ACTION**
+> 작성일: 2026-09-23 · 상태: **DEPLOYED — 테스트 계정 정리 완료 · 실 Google SMOKE A/B 는 PENDING_USER_ACTION (§7-3)**
 
 ---
 
@@ -238,6 +238,63 @@ invited_by_user_id · accepted_user_id · created_at · updated_at · accepted_a
 
 → 본 WO 는 **구현 · 배포 · 인증 가드 · schema · census 까지 확인 완료**이며,
 role write 가 실제로 일어나는 Smoke A · B 가 남아 **COMPLETE 가 아니다**.
+smoke 계획은 이후 **B→A 로 개정**되었고 그 실행과 중단 사유는 **§7-3** 에 있다.
+
+### 7-3. 테스트 계정 정리 · 개정된 smoke 계획(B→A)과 그 종결 (2026-09-23)
+
+사용자 지시로 smoke 순서를 **Smoke A → B 에서 B → A 로 개정**했다.
+근거: Smoke B 는 *아직 O4O 에 존재하지 않는 Google 사용자*의 최초 진입을 검증하므로,
+이미 로그인 이력이 있는 계정으로는 그 경로를 재현할 수 없다.
+계획은 ① 기존 테스트 계정 `renagang21` 폐기 → ② 미사용 Google 계정으로 Smoke B(초대 최초 진입)
+→ ③ role/membership 원복 → ④ 같은 계정으로 Smoke A(기존 사용자 직접 지정) → ⑤ 원복 → ⑥ postVerify 였다.
+
+**① 폐기 — production write 전 read-only census (전수, 개인정보 실값 조회 없음)**
+
+| 검사 | 범위 | 결과 |
+|---|---|---|
+| 대상 계정 보유 권한 | `role_assignments` · `service_memberships` · `service_credentials` | **전부 0** |
+| `users` 참조 FK 컬럼 | **34개 전수** | hit 2개 — `linked_accounts` 1(CASCADE) · `password_reset_tokens` 2(CASCADE) |
+| FK 없는 user 식별자 컬럼 | **215개 전수** (쿼리 실패 0) | `account_activities` 7 · `action_logs` 3 — 전부 **로그인 시도 감사 로그** |
+| email 컬럼 | **26개 전수** (쿼리 실패 0) | 업무 테이블 2곳이 이 email 을 **연락처로만** 보유 |
+
+업무 테이블 2곳은 계정 소유 데이터가 아니므로 **건드리지 않았다**:
+
+- `neture_suppliers` 1행 — `contact_email` 만 일치, **`user_id IS NULL`**, status `ACTIVE`, 2026-05-30 생성.
+- `forum_category_requests` 2행 — `requester_email` (completed / rejected).
+
+→ **보존 대상 소유 데이터 0건**을 확인한 뒤 삭제 조건 충족으로 판정했다.
+
+**삭제 실행** — postcondition 가드를 건 단일 트랜잭션(`DELETE FROM users WHERE id = <대상>` 1행).
+조건 불일치 시 자동 ROLLBACK 되도록 `DO $$ … RAISE EXCEPTION $$` 를 COMMIT 앞에 두었다.
+`DELETE 1` → `POSTCONDITION OK` → `COMMIT`.
+
+**read-only postVerify (독립 세션)**
+
+| 항목 | 기대 | 실측 | 판정 |
+|---|---|---|---|
+| `users` 총계 | 1 | **1** | PASS |
+| `linked_accounts` 총계 | 1 | **1** | PASS |
+| 대상 `users` / `linked_accounts` / `password_reset_tokens` | 0 / 0 / 0 | **0 / 0 / 0** | PASS (CASCADE 정상) |
+| 관리자 행 존재 | 1 | **1** | **불변** |
+| 관리자 `role_assignments` / `service_memberships` / `service_credentials` | 11 / 5 / 5 | **11 / 5 / 5** | **불변** |
+| 관리자 google `linked_accounts` | 1 | **1** | **불변** |
+| 관리자 `users.password IS NULL` | true | **true** | **불변** |
+| `neture_suppliers` 해당 행 | 1 | **1** | 보존 |
+| `account_activities` / `action_logs` 감사 로그 | 7 / 3 | **7 / 3** | 보존 (FK 없음 · 감사 기록 성격상 유지) |
+
+→ 관리자 user · Google identity · role · membership · credential 은 **어떤 방식으로도 변경하지 않았다.**
+
+**②~⑥ — 중단 사유**
+
+사용자가 *"아직 O4O 에 로그인한 적 없는 Google 계정"* 을 보유하고 있지 않음을 확인했다.
+지시 7항(*별도 미사용 Google 계정이 없으면 신규 테스트 계정을 억지로 만들지 않는다*)에 따라
+**전용 Google 계정을 새로 만들지 않았고, 테스트 계정을 두지 않는 상태로 마감**한다.
+
+| 항목 | 결과 |
+|---|---|
+| 기존 테스트 계정 폐기 + census + postVerify | **PASS** |
+| **Smoke B — 초대 E2E (실 Google 최초 진입)** | **PENDING_USER_ACTION** — 미사용 Google 계정 미보유. 계정 확보 시 이 절의 ②~⑥ 순서로 수행한다 |
+| **Smoke A — 기존 Google 사용자 직접 지정 (실 role write)** | **PENDING_USER_ACTION** — Smoke B 선행 필요(같은 계정을 "기존 사용자"로 만든 뒤 수행) |
 
 ## 8. 미해결 · 후속 인계
 
@@ -245,6 +302,8 @@ role write 가 실제로 일어나는 Smoke A · B 가 남아 **COMPLETE 가 아
   각 서비스 email/password 로그인 UI · password signup · ForgotPassword/ResetPassword 잔재 ·
   operator PasswordModal 전수 제거 · `PUT /operator/members/:id` password 경로 · password policy ·
   `loginAttempts`/`lockedUntil` · E2E Auth Runtime 재정의 · 문서/개인정보 정책 정합.
+- **실 Google Smoke B→A (§7-3 ②~⑥)** 는 미사용 Google 계정 확보 시 수행한다. 그 전까지 이 WO 는 COMPLETE 가 아니다.
+  현재 `users` 는 관리자 1행뿐이며 테스트 계정은 존재하지 않는다.
 - `signage-player-web-deployment-contract.spec.ts` 실패는 **다른 세션 소관**(§5-1). 이 WO 에서 고치지 않았다.
 - 교차 세션 유출(§6)은 이번에 복구했으나 구조적 재발 가능성이 남아 있다 — 커밋 직전
   `node scripts/git/check-staged-scope.mjs <경로...>` 를 반드시 통과시킨다.
