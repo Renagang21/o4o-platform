@@ -197,3 +197,33 @@ export function getCookieConfigInfo(req?: Request) {
     httpOnly: true
   };
 }
+
+/**
+ * Hospital Pharmacy — Device credential cookie
+ *
+ * WO-O4O-HOSPITAL-PHARMACY-DEVICE-ENROLLMENT-AND-LOGINLESS-ACCESS-V1 §4
+ *
+ * 병원약국 공용 PC 의 device credential 을 담는 쿠키다. **auth token 과 별개다**(원내 업무
+ * 컨텍스트는 브라우저 localStorage, 서비스 접근 credential 은 이 HttpOnly 쿠키 — §13).
+ * `getCookieConfig` 를 그대로 재사용해 도메인·Secure·SameSite 정책을 auth 쿠키와 일치시킨다:
+ *   httpOnly=true (JS 가 읽지 못함 §4), secure=프로덕션, sameSite=프로덕션 'none'(크로스
+ *   서브도메인 neture.co.kr ↔ api.neture.co.kr), domain=`.neture.co.kr`(origin 기반).
+ * 값은 서버가 만든 random device token 평문 — 저장은 해시로만, 전달은 이 쿠키로만 한다.
+ */
+export const HOSPITAL_DEVICE_COOKIE = 'hospitalDeviceToken';
+
+/** device token 을 HttpOnly 쿠키로 심는다. maxAge=1년(로그인리스 공용 PC 는 장수 세션이 정상). */
+export function setHospitalDeviceCookie(req: Request, res: Response, token: string): void {
+  const { baseOptions } = getCookieConfig(req);
+  res.cookie(HOSPITAL_DEVICE_COOKIE, token, {
+    ...baseOptions,
+    maxAge: 365 * 24 * 60 * 60 * 1000, // 1년 — revoke 는 서버 status 로 즉시 무효화한다(§16)
+  });
+}
+
+/** device 쿠키 제거(예: revoke 통지 후 클라이언트 정리 또는 재연결 유도). */
+export function clearHospitalDeviceCookie(req: Request, res: Response): void {
+  const { cookieDomain } = getCookieConfig(req);
+  const clearOptions = cookieDomain ? { domain: cookieDomain } : {};
+  res.clearCookie(HOSPITAL_DEVICE_COOKIE, clearOptions);
+}

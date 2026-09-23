@@ -1,38 +1,29 @@
-import { BrowserRouter, Routes, Route, Link, NavLink, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Link, NavLink } from 'react-router-dom';
 import { detectBasename } from './lib/basename';
 import { BRAND } from './config/service';
-import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { AuthProvider } from './contexts/AuthContext';
+import { DeviceProvider, useDevice } from './contexts/DeviceContext';
+import EnrollmentGate from './components/EnrollmentGate';
 import HomePage from './pages/HomePage';
 import WardPage from './pages/WardPage';
 import PharmacyDeptPage from './pages/PharmacyDeptPage';
-import LoginPage from './pages/LoginPage';
+import ManagePage from './pages/ManagePage';
 
 /**
- * 헤더 계정 영역 — 로그인 상태만 보여준다. 로그인 자체는 공통 Google 진입(LoginPanel)이 한다.
- * 로그인 전에도 홈 · 원내 파일 연결 · 원내 보유 조회는 그대로 쓸 수 있으므로 route guard 는 두지 않는다.
+ * 헤더 연결 영역 — 개인 로그인이 아니라 **이 PC 의 연결 상태**만 보여준다(로그인리스 §1·§12).
+ * device 쿠키는 httpOnly 라 여기서 값을 읽지 않는다 — DeviceContext(/session)가 판정한 상태만 쓴다.
  */
-function AccountArea() {
-  const { user, isAuthenticated, isLoading, logout } = useAuth();
-  const location = useLocation();
-  if (isLoading) return <span className="muted">확인 중…</span>;
-  if (!isAuthenticated) {
-    return (
-      <Link to="/login" state={{ from: location.pathname }} className="login-link">
-        로그인
-      </Link>
-    );
+function DeviceStatusArea() {
+  const { status, device } = useDevice();
+  if (status === 'enrolled') {
+    return <span className="muted">이 PC: 연결됨{device?.label ? ` · ${device.label}` : ''}</span>;
   }
-  return (
-    <span className="account">
-      <span className="muted">{user?.name || user?.email}</span>
-      <button type="button" className="linklike" onClick={logout}>
-        로그아웃
-      </button>
-    </span>
-  );
+  if (status === 'unenrolled') return <span className="muted">이 PC: 미연결</span>;
+  return <span className="muted">확인 중…</span>;
 }
 
-function Shell({ children }: { children: React.ReactNode }) {
+/** 일반 사용자 셸(홈·병동·약제부) — device 게이트 안에서만 내용이 보인다. */
+function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="site">
       <header className="header">
@@ -40,7 +31,7 @@ function Shell({ children }: { children: React.ReactNode }) {
         <nav className="nav">
           <NavLink to="/ward" className={({ isActive }) => (isActive ? 'active' : '')}>병동</NavLink>
           <NavLink to="/pharmacy" className={({ isActive }) => (isActive ? 'active' : '')}>약제부</NavLink>
-          <AccountArea />
+          <DeviceStatusArea />
         </nav>
       </header>
       <main className="content">{children}</main>
@@ -49,19 +40,32 @@ function Shell({ children }: { children: React.ReactNode }) {
   );
 }
 
-export default function App() {
+/** 로그인리스 일반 앱 — DeviceProvider 로 연결 상태를 관리하고 EnrollmentGate 로 진입을 통제한다. */
+function GeneralApp() {
   return (
-    <BrowserRouter basename={detectBasename()}>
-      <AuthProvider>
-        <Shell>
+    <DeviceProvider>
+      <AppShell>
+        <EnrollmentGate>
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/ward" element={<WardPage />} />
             <Route path="/pharmacy" element={<PharmacyDeptPage />} />
-            <Route path="/login" element={<LoginPage />} />
           </Routes>
-        </Shell>
-      </AuthProvider>
+        </EnrollmentGate>
+      </AppShell>
+    </DeviceProvider>
+  );
+}
+
+export default function App() {
+  return (
+    <BrowserRouter basename={detectBasename()}>
+      <Routes>
+        {/* 관리자 콘솔만 개인 로그인(별도 역할 §2) — device 게이트 밖의 독립 경로. */}
+        <Route path="/manage" element={<AuthProvider><ManagePage /></AuthProvider>} />
+        {/* 그 외 전부 로그인리스 일반 앱(§1·§12). */}
+        <Route path="/*" element={<GeneralApp />} />
+      </Routes>
     </BrowserRouter>
   );
 }

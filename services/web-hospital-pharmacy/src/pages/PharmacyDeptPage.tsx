@@ -9,19 +9,15 @@ import {
 } from '@o4o/hospital-pharmacy-core';
 import { loadDataset, saveDataset, clearDataset } from '../lib/localStore';
 import { requestFileUnderstanding, AiRequestError } from '../lib/aiRequest';
-import LoginPanel from '../components/LoginPanel';
+import { useDevice } from '../contexts/DeviceContext';
 
 export default function PharmacyDeptPage() {
+  const { markDisconnected } = useDevice();
   const [dataset, setDataset] = useState<HospitalDrugDataset | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [confidenceQ, setConfidenceQ] = useState<string | null>(null);
   const [summary, setSummary] = useState<string | null>(null);
-  /**
-   * 인증이 필요해 보류된 파일. 사용자가 고른 File 객체를 그대로 들고 있다가 로그인 성공 후 **같은 파일로 재시도**한다
-   * (다시 고르게 하지 않는다). 파일은 이 컴포넌트 메모리에만 있고 어디에도 저장되지 않는다.
-   */
-  const [pendingAuthFile, setPendingAuthFile] = useState<File | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => { setDataset(loadDataset()); }, []);
@@ -31,7 +27,6 @@ export default function PharmacyDeptPage() {
     setError(null);
     setConfidenceQ(null);
     setSummary(null);
-    setPendingAuthFile(null);
     try {
       // 공통 GFU — 임의 표 파일 → 구조 이해. targetSchema 는 이 클라이언트가 주입한다(도메인 중립).
       const reply = await requestFileUnderstanding(file, HOSPITAL_DRUG_TARGET_SCHEMA);
@@ -51,8 +46,9 @@ export default function PharmacyDeptPage() {
       // 낮은 신뢰도 열이 있으면(전부가 아니라 낮은 항목만) 확인 문구를 노출한다.
       if (reply.question) setConfidenceQ(reply.question);
     } catch (err) {
-      if (err instanceof AiRequestError && err.status === 401) {
-        setPendingAuthFile(file);
+      if (err instanceof AiRequestError && err.deviceRequired) {
+        // device 쿠키 없음/폐기(§16) — 연결 게이트로 되돌린다. 재연결 후 같은 파일을 다시 올리면 된다.
+        markDisconnected();
         return;
       }
       setError(err instanceof Error ? err.message : '파일을 이해하지 못했습니다. 다시 시도해 주세요.');
@@ -106,21 +102,6 @@ export default function PharmacyDeptPage() {
 
       {summary && <div className="answer">{summary}</div>}
       {confidenceQ && <div className="notice">{confidenceQ}<br />열 해석이 맞는지 확인하고, 필요하면 열 제목을 명확히 한 파일로 다시 올려 주세요.</div>}
-      {pendingAuthFile && (
-        <div className="notice">
-          <b>파일 이해에는 로그인이 필요합니다.</b> 이미 연결된 원내 자료 조회는 로그인 없이도 됩니다.
-          <br />로그인하면 방금 고른 <b>{pendingAuthFile.name}</b> 을(를) 그대로 다시 읽습니다 — 파일을 다시 고르지 않아도 됩니다.
-          <div style={{ marginTop: 12 }}>
-            <LoginPanel
-              onSuccess={() => {
-                const resume = pendingAuthFile;
-                setPendingAuthFile(null);
-                if (resume) void onFile(resume);
-              }}
-            />
-          </div>
-        </div>
-      )}
       {error && <div className="err">{error}</div>}
 
       <p className="muted" style={{ marginTop: 20 }}>
