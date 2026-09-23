@@ -158,6 +158,16 @@ function makeReq(opts: { id?: string; roles?: string[]; member?: boolean; params
   req.lmsContext = { serviceCode: 'lecture' }; // lms.routes.ts 가 고정하는 route context
   return req;
 }
+/**
+ * 7차 P2-8 · 9차 P1-18/P2-10 이 공유하는 requireEnrollment 실행기.
+ * describe 마다 같은 래퍼를 복제하지 않는다.
+ */
+async function runEnrollment(req: any, options: any = { checkLesson: true }) {
+  const res = makeRes();
+  let passed = false;
+  await requireEnrollment(options)(req, res, (() => { passed = true; }) as any);
+  return { res, passed };
+}
 function makeRes() {
   const res: any = { statusCode: 200, body: null };
   res.status = jest.fn((c: number) => { res.statusCode = c; return res; });
@@ -181,6 +191,11 @@ beforeEach(() => {
   courses['lec-mem'] = { id: 'lec-mem', serviceKey: 'lecture', visibility: 'members', instructorId: 'inst', status: 'published', title: 'L members', tags: ['a'] };
   // 7차 P1-17: 게시 전 강의 — 소유 강사·운영자 외에는 존재를 드러내지 않는다
   courses['lec-draft'] = { id: 'lec-draft', serviceKey: 'lecture', visibility: 'public', instructorId: 'inst', status: 'draft', title: 'L draft', tags: ['a'] };
+  // 7차 P2-8 · 9차 P1-18/P2-10 공용 평가 정책 fixture
+  courses['lec-paid'] = { id: 'lec-paid', serviceKey: 'lecture', visibility: 'members', instructorId: 'inst', status: 'published', title: 'paid', isPaid: true };
+  courses['lec-pub-approval'] = { id: 'lec-pub-approval', serviceKey: 'lecture', visibility: 'public', instructorId: 'inst', status: 'published', title: 'pub approval', requiresApproval: true };
+  courses['lec-pub-paid'] = { id: 'lec-pub-paid', serviceKey: 'lecture', visibility: 'public', instructorId: 'inst', status: 'published', title: 'pub paid', isPaid: true };
+  Object.assign(lessons, { 'les-paid': { courseId: 'lec-paid' }, 'les-kpa': { courseId: 'kpa-old' }, 'les-pub': { courseId: 'lec-pub' }, 'les-pub-approval': { courseId: 'lec-pub-approval' }, 'les-pub-paid': { courseId: 'lec-pub-paid' } });
   courses['kpa-old'] = { id: 'kpa-old', serviceKey: 'kpa-society', visibility: 'members', instructorId: 'inst', status: 'pending_review', title: 'legacy', tags: ['a'] };
   courses['null-old'] = { id: 'null-old', serviceKey: null, visibility: 'public', instructorId: 'inst', status: 'draft', title: 'legacy null', tags: ['a'] };
 
@@ -889,18 +904,7 @@ describe('9차 P2-11 초안 열람의 소유자 축은 소유권 + 현재 lectur
 });
 
 describe('9차 P1-18 유료·승인 강의의 enrollment 요구는 visibility 와 독립이다', () => {
-  const run = async (req: any) => {
-    const res = makeRes();
-    let passed = false;
-    await requireEnrollment({ checkLesson: true })(req, res, (() => { passed = true; }) as any);
-    return { res, passed };
-  };
-  beforeEach(() => {
-    courses['lec-pub-approval'] = { id: 'lec-pub-approval', serviceKey: 'lecture', visibility: 'public', instructorId: 'inst', status: 'published', title: 'pub approval', requiresApproval: true };
-    courses['lec-pub-paid'] = { id: 'lec-pub-paid', serviceKey: 'lecture', visibility: 'public', instructorId: 'inst', status: 'published', title: 'pub paid', isPaid: true };
-    lessons['les-pub-approval'] = { courseId: 'lec-pub-approval' };
-    lessons['les-pub-paid'] = { courseId: 'lec-pub-paid' };
-  });
+  const run = (req: any) => runEnrollment(req);
   it('공개 + 승인 필요 강의 · 승인 enrollment 없음 → 403 APPROVAL_REQUIRED (membership 은 묻지 않는다)', async () => {
     const { res, passed } = await run(makeReq({ id: 'u-nomember', params: { lessonId: 'les-pub-approval' } }));
     expect(passed).toBe(false);
@@ -913,22 +917,12 @@ describe('9차 P1-18 유료·승인 강의의 enrollment 요구는 visibility �
     expect(res.body.code).toBe('ENROLLMENT_REQUIRED');
   });
   it('공개 + 무료·승인불필요 강의는 종전대로 통과 (membership 도 불요)', async () => {
-    lessons['les-pub2'] = { courseId: 'lec-pub' };
-    expect((await run(makeReq({ id: 'u-nomember', params: { lessonId: 'les-pub2' } }))).passed).toBe(true);
+    expect((await run(makeReq({ id: 'u-nomember', params: { lessonId: 'les-pub' } }))).passed).toBe(true);
   });
 });
 
 describe('9차 P2-10 평가 조회의 소유자 면제도 현재 role + active membership 을 요구한다', () => {
-  const run = async (req: any) => {
-    const res = makeRes();
-    let passed = false;
-    await requireEnrollment({ checkLesson: true, allowCourseOwner: true })(req, res, (() => { passed = true; }) as any);
-    return { res, passed };
-  };
-  beforeEach(() => {
-    courses['lec-paid'] = { id: 'lec-paid', serviceKey: 'lecture', visibility: 'members', instructorId: 'inst', status: 'published', title: 'paid', isPaid: true };
-    lessons['les-paid'] = { courseId: 'lec-paid' };
-  });
+  const run = (req: any) => runEnrollment(req, { checkLesson: true, allowCourseOwner: true });
   it('강사 role 이 회수된 소유자(membership active) → 면제 없음 · 403 ENROLLMENT_REQUIRED', async () => {
     const { res, passed } = await run(makeReq({ id: 'inst', roles: [], member: true, params: { lessonId: 'les-paid' } }));
     expect(passed).toBe(false);
@@ -962,17 +956,7 @@ describe('7차 P2-7 createCourse 의 instructorId 는 서버가 요청자로 고
 });
 
 describe('7차 P2-8 lesson quiz/assignment 조회에도 강의 접근 정책', () => {
-  const run = async (req: any) => {
-    const res = makeRes();
-    let passed = false;
-    await requireEnrollment({ checkLesson: true, allowCourseOwner: true })(req, res, (() => { passed = true; }) as any);
-    return { res, passed };
-  };
-  beforeEach(() => {
-    courses['lec-paid'] = { id: 'lec-paid', serviceKey: 'lecture', visibility: 'members', instructorId: 'inst', status: 'published', title: 'paid', isPaid: true };
-    lessons['les-paid'] = { courseId: 'lec-paid' };
-    lessons['les-kpa'] = { courseId: 'kpa-old' };
-  });
+  const run = (req: any) => runEnrollment(req, { checkLesson: true, allowCourseOwner: true });
   it('lessonId 파라미터(:lessonId)로도 course 를 역추적한다 — membership 없는 회원 → 403', async () => {
     const { res, passed } = await run(makeReq({ id: 'u-nomember', params: { lessonId: 'les-paid' } }));
     expect(passed).toBe(false);
@@ -995,7 +979,6 @@ describe('7차 P2-8 lesson quiz/assignment 조회에도 강의 접근 정책', (
     expect(res.statusCode).toBe(404);
   });
   it('public 강의 lesson 은 종전대로 통과', async () => {
-    lessons['les-pub'] = { courseId: 'lec-pub' };
     expect((await run(makeReq({ id: 'u-nomember', params: { lessonId: 'les-pub' } }))).passed).toBe(true);
   });
 });
