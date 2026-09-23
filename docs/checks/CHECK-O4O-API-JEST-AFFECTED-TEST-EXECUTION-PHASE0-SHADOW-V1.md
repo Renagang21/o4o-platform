@@ -2,8 +2,8 @@
 
 > **WO**: `WO-O4O-API-JEST-AFFECTED-TEST-EXECUTION-PHASE0-SHADOW-V1`
 > **선행 IR**: [`IR-O4O-API-JEST-AFFECTED-TEST-EXECUTION-CENSUS-V1`](../investigations/IR-O4O-API-JEST-AFFECTED-TEST-EXECUTION-CENSUS-V1.md)
-> **상태**: Phase 0 (shadow) 구현 완료 · **Phase 1 미적용**
-> **작성일**: 2026-09-23
+> **상태**: Phase 0 (shadow) 구현 완료 · **구현 검증 미완(§13-4 ②)** · **Phase 1 미적용**
+> **작성일**: 2026-09-23 · 최종 갱신: 2026-09-23 (§13-4 실 Actions 검증 4항목 판정)
 
 ---
 
@@ -177,6 +177,10 @@ full 이 실패하면 그 실패 suite 이름을 artifact 의 `specs` 와 대조
 
 **아직 아무것도 충족되지 않았다. selected 실행은 켜지 않았다.**
 
+여기에 더해 **Phase 0 구현 검증 자체가 아직 닫히지 않았다** — §13-4 ②
+(`mode=selected` 실작동)가 PENDING 이다. 관측 시작점은 run `35831578605`
+(2026-09-23 07:24:53Z)이고, 현재까지 유효 shadow run 4건은 전부 정당한 full 이다.
+
 ## 12. §22 — detector 회귀 테스트
 
 `scripts/ci/__tests__/detect-affected.test.mjs` 에 **J1~J18** 추가. 기존 54 개 전부 유지.
@@ -226,6 +230,19 @@ Phase 0 계약이 코드로 깨지는 것을 막는다.
 
 ### 13-4. 실제 GitHub Actions 검증 (§25)
 
+#### 판정 요약 (2026-09-23 12:20 UTC 기준)
+
+| # | 항목 | 판정 | 근거 |
+|---|---|---|---|
+| ① | base SHA 조회 · `git diff` 성공 · 변경 파일 탐지 | **PASS** | 수정 이후 shadow run 4건 전부 `changedFiles` 실제 수집 (2 / 302 / 194 / 194) — 아래 C |
+| ② | **`mode=selected` 실작동 · `selectedSuiteCount > 0`** | **PENDING** | 수정 이후 shadow run 4건이 **전부 정당한 `global_or_unknown`** — 아래 D |
+| ③ | artifact 보존 | **PASS** | `api-jest-shadow-<run>-<attempt>` 4건 업로드·미만료(30일) — 아래 C |
+| ④ | full Jest green (Phase 0 불변식) | **PASS** | run `35856452802`: `cd apps/api-server && npx jest --maxWorkers=1` → 350 passed / 4 skipped, 6,010 tests |
+
+> **②가 로그·artifact로 입증되기 전에는 Phase 0 구현 검증 완료가 아니다.**
+> 수치를 만들기 위한 인위적 `api-server` 변경, detector·fast path·Jest 명령 수정은
+> 하지 않았다(§28). 다음 정상 `api-server` 변경 run 에서 아래 E 절차로 바로 판정한다.
+
 #### Scheduled API Full Jest — run `35829209575`
 
 | 항목 | 결과 |
@@ -238,6 +255,20 @@ Phase 0 계약이 코드로 깨지는 것을 막는다.
 > **상태 구분**: `cron configured` / `dispatch verified` /
 > **`first scheduled event pending`** (첫 03:00 KST 실기동 미확인).
 > 수동 dispatch 성공은 **cron 이 동작했다는 증거가 아니다.**
+
+2026-09-23 12:17 UTC 재확인 — `scheduled-api-full-jest.yml` 의 run 은 여전히
+`35829209575` **1건뿐이고 event 는 `workflow_dispatch`** 다. `schedule` event run 0건.
+cron 은 `0 18 * * *`(= 03:00 KST)이고 workflow 는 같은 날 06:57 UTC 에 생겼으므로
+첫 예정 시각은 **2026-09-23 18:00 UTC** 다. 그 이후 다음으로 확인한다.
+
+```bash
+gh api "repos/:owner/:repo/actions/workflows/scheduled-api-full-jest.yml/runs?per_page=10" \
+  -q '.workflow_runs[]|[.id,.event,(.conclusion//.status),.created_at]|@tsv'
+# event == "schedule" 인 run 이 나타나고 conclusion == success 여야 PASS
+```
+
+> GitHub 의 schedule 은 러너 혼잡 시 지연·건너뜀이 있다. **한 번의 미기동으로 결함이라고
+> 판정하지 않는다** — 연속 2회 이상 누락일 때 조사한다.
 
 #### CI Pipeline — run `35829135129` (commit `257be3cfe`)
 
@@ -265,6 +296,119 @@ detector 로직 · Jest 명령 · fast path 는 건드리지 않았다.
 §20 의 **최소 2주 shadow 관측은 위 조치 이후 최초의 유효한 shadow run**
 (= `mode` 와 `components` 가 실제 변경 파일에서 산출된 run) 시점부터 센다.
 `35829135129` 은 그 시작점이 아니다.
+
+**관측 시작점 = run `35831578605`** (commit `84cf13f22`, push, 2026-09-23 07:24:53Z).
+이 run 부터 `changedFiles` 가 실제로 수집됐다. `mode=full` 이지만 그것은 수집 실패가
+아니라 **정당하게 계산된 판정**(`.github/workflows/ci-pipeline.yml` → global)이므로
+유효한 관측이다.
+
+#### C. 수정(`84cf13f22`) 이후 shadow run 전수
+
+| run | commit | event | changedFiles | mode | reason | selected/full | artifact |
+|---|---|---|---|---|---|---|---|
+| `35831578605` | `84cf13f22` | push | 2 | full | `global_or_unknown` | 0 / 351 | `api-jest-shadow-35831578605-1` ✅ |
+| `35832189915` | `6cc5fa58a` (PR #225) | pull_request | 302 | full | `global_or_unknown` | 0 / 354 | `api-jest-shadow-35832189915-1` ✅ |
+| `35855595547` | `9a3b402b9` | push | 194 | full | `global_or_unknown` | 0 / 354 | `api-jest-shadow-35855595547-1` ✅ |
+| `35856452802` | `9a3b402b9` | push | 194 | full | `global_or_unknown` | 0 / 354 | `api-jest-shadow-35856452802-1` ✅ |
+
+각 run 이 global 로 떨어진 **실제 유발 경로**:
+
+```text
+35831578605  .github/workflows/ci-pipeline.yml
+35832189915  .github/workflows/{ci-pipeline,ci-security,deploy-api,deploy-web-services,
+             scheduled-api-full-jest}.yml · pnpm-lock.yaml · scripts/ci/detect-affected.mjs
+             · scripts/ci/__tests__/detect-affected.test.mjs
+35855595547  pnpm-lock.yaml
+35856452802  pnpm-lock.yaml
+```
+
+즉 **선별기 결함이 아니라 설계된 mandatory full fallback(§12)** 이 정확히 동작한 결과다.
+
+`35856452802` 의 로그 실측 (job `API Server Jest`):
+
+```text
+--- API Jest affected (SHADOW — 실행에는 영향 없음) ---
+mode                : full
+reason              : global_or_unknown — 전역/미분류 경로 변경
+changed files       : 194
+components          : {"fullSuiteCount":354,"findRelated":0,...,"alwaysRun":58,...}
+selected / full     : 0 / 354 (0.0%)
+...
+Run cd apps/api-server && npx jest --maxWorkers=1
+Test Suites: 4 skipped, 350 passed, 350 of 354 total
+Tests:       32 skipped, 5978 passed, 6010 total
+```
+
+#### D. ② 가 아직 PENDING 인 이유
+
+수정 이후 main 에 들어온 변경이 다음 셋 중 하나였다.
+
+1. **docs-only** (`bc9174099` · `5db20bd0a` · `59db724e4`) → docs fast path, `api-tests` 자체가 skip → shadow artifact 없음
+2. **전역 경로 동반** (위 C 4건) → `global_or_unknown` → `mode=full`
+3. **적합했으나 run 이 취소됨** — 아래
+
+**놓친 적합 후보**: commit `209efd3ff`
+(`apps/api-server/src/__tests__/store-internal-ai-retirement-contract.spec.ts` 단일 파일, +54).
+run `35856123023` 은 **job 이 하나도 시작하기 전에 cancelled** 됐다
+(11:42:44 생성 → 11:43:37 취소, jobs 0건). 같은 구간에 `35856206653`(`b82a88120`) ·
+`35856224124`(`7d17a1533`) 도 취소됐다. 세 건 모두 push event 이고 해당 트리의
+`cancel-in-progress` 는 이미 `${{ github.event_name == 'pull_request' }}`(= push 는 false)
+이므로 **concurrency 자동 취소가 아니다.** 같은 날 다른 main push run 12건은 정상 완주했다
+(취소는 11:42~11:43 한 구간에 몰려 있다).
+
+같은 범위를 **로컬**에서 돌리면 `mode=selected` 가 나온다:
+
+```text
+BASE_SHA=9a3b402b9 HEAD_SHA=209efd3ff  node scripts/ci/detect-affected.mjs --mode=api-jest
+  mode              : selected
+  reason            : always 58 + raw 5 + related 1 + staticImport 1 + changedTests 1
+  selected / full   : 61 / 354
+```
+
+> **이 로컬 실행은 ② 의 근거가 아니다.** CI runner 의 로그·artifact 가 아니고,
+> 작업트리도 해당 commit 시점이 아니다. ② 는 실제 run 으로만 닫는다.
+
+#### E. ② 판정 절차 (다음 적합 run 에서 그대로 수행)
+
+**적합 run 조건** — 아래를 **모두** 만족해야 한다.
+
+- `detect` job 출력이 `global_or_unknown=false`
+- 변경에 `apps/api-server/**` 포함
+- `admin_only` · `docs_fast_eligible` 둘 다 false (= `API Server Jest` job 이 실제로 실행됨)
+- 변경에 `.github/**` · `scripts/**` · `pnpm-lock.yaml` · root manifest **미포함**
+  (하나라도 있으면 mandatory full 이라 selected 증거가 되지 못한다)
+
+**확인 위치**
+
+| 무엇 | 어디 |
+|---|---|
+| 로그 | job `API Server Jest` → step `Calculate API Jest affected set (shadow)` |
+| artifact | `api-jest-shadow-<run_id>-<run_attempt>` 안의 `shadow/api-jest-shadow.json` |
+| 실제 실행 명령 | 같은 job 의 step `Run tests (api-server Jest, serial to prevent OOM)` |
+
+```bash
+gh api repos/:owner/:repo/actions/runs/<RUN_ID>/artifacts \
+  -q '.artifacts[]|[.id,.name]|@tsv'
+gh api repos/:owner/:repo/actions/artifacts/<ARTIFACT_ID>/zip > a.zip && unzip -o a.zip
+```
+
+**판정 기준**
+
+| # | 기준 | 통과 조건 |
+|---|---|---|
+| E1 | `git diff` 성공 | `changedFiles.length > 0`, `baseSha` 가 실제 base |
+| E2 | selected 모드 | `mode === "selected"` |
+| E3 | 선택 수치 | `0 < selectedSuiteCount < fullSuiteCount` |
+| E4 | component 정합 | `specs.length === selectedSuiteCount`, 각 component 수치 합이 중복 제거 후 `selectedSuiteCount` 와 모순 없음, `reason` 문자열의 내역과 `components` 일치 |
+| E5 | spec 실재성 | `specs` 의 모든 경로가 `apps/api-server/` 기준 실재 파일 |
+| E6 | 실행 범위 불변 (Phase 0) | 같은 job 의 Jest 명령이 `cd apps/api-server && npx jest --maxWorkers=1` 그대로이고, 실행된 suite 수가 `fullSuiteCount` 와 일치 (**selected 가 실행에 반영되면 Phase 0 위반**) |
+| E7 | false-negative | 그 run 의 full Jest 가 실패했다면, 실패 suite 가 전부 `specs` 안에 있어야 한다. 하나라도 밖이면 **false-negative 1건 기록** → §20 의 "false-negative = 0" 불충족 |
+| E8 | artifact 보존 | artifact 존재 · `expired=false` |
+
+E2~E6 이 모두 통과해야 ② PASS 다. E7 은 매 run 누적 집계 대상이다.
+
+**하지 말 것** — 수치 확보 목적의 `api-server` 코드/테스트 변경, detector 로직 수정,
+fast path 조건 수정, Jest 명령 수정. 어느 하나라도 하면 그 run 은 증거가 아니라 조작이다.
 
 ## 14. §23 · §24 — 섞지 않은 것
 

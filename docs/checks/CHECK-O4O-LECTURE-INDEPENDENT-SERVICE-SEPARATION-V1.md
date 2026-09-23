@@ -612,3 +612,124 @@ OPERATOR_LOGIN_E2E = 보류 (Auth 트랙)
 2. api + web-lecture 배포와 `lms_courses.service_key` rekey(11건)를 **한 창에서** 실행 · 기존 KPA/PH membership → Lecture membership 자동 생성 **금지**
 3. `currentEnrollments` 정합 복구(7건)는 cutover 직후 같은 창에서 판단
 4. public smoke(study.neture.co.kr) → operator E2E(Auth gate 해소 후)
+
+---
+
+## 19. INCIDENT — Phase 2 runtime 이 cutover 없이 운영 배포 → 전량 롤백 (2026-09-23)
+
+> **판정**: `INCIDENT = RESOLVED_BY_ROLLBACK` · `DATABASE_CUTOVER = FORBIDDEN(미실행)` · `PRODUCTION_DB_WRITES = 0` · `ROOT_CAUSE_DUPLICATE_PUSH = INVESTIGATE`
+
+### 19-1. 타임라인 (UTC)
+
+| 시각 | 사건 |
+|---|---|
+| 11:37:17 | main `9a3b402b9`(PR #225 merge) push → Deploy API/Web/Admin 자동 트리거 |
+| ~11:39 | **취소 전에 일부 job 이 이미 revision 생성**: `lecture-web-00012-rfj`(11:39:36 · deploy-lecture job 은 success) · `kpa-society-web-01994`(11:39:56) · `k-cosmetics-web-01162`(11:39:56) · `pharmacy-hub-web-00252`(11:40:00) · `o4o-admin-dashboard-01306`(11:40:06 · Admin run 자체가 success) |
+| 11:40:29~30 | Deploy API(`35855595361`) · Deploy Web(`35855595462`) **cancel 성공** — API 는 `build-and-deploy: cancelled` 로 revision 미생성 |
+| 11:46:06 | **같은 sha `9a3b402b9` 로 배포 3종이 다시 실행**(`35856452770` · `35856452629` · `35856452621`) — GitHub 메타상 `event=push · run_attempt=1 · actor=Renagang21` = **Re-run 이 아니라 동일 SHA 에 대한 두 번째 push 이벤트** |
+| 11:48~11:53 | 전 서비스 Phase 2 revision 생성 (`o4o-core-api-03747-kxq` 11:53:27 · `lecture-web-00013` · `kpa-society-web-01995` · `k-cosmetics-web-01163` · `pharmacy-hub-web-00253` · `o4o-admin-dashboard-01307`) |
+| — | 장애 실측: `GET /api/v1/lms/courses` → `total 0` · KPA published/public 강의 단건 **404** (production 11 course 는 전부 kpa-society/pharmacy-hub 인데 `/api/v1/lms/*` 가 `lecture` scope 고정) |
+| 이후 | 사용자 승인(선택 A) → **6축 traffic 100% 롤백** |
+
+### 19-2. 롤백 대상 — "직전 revision"이 아니라 **Phase 2 이전** revision
+
+⚠️ 11:39~11:40 revision 들은 *취소된 첫 run* 이 이미 만든 **Phase 2 산출물**이다. 따라서 롤백 기준은 11:37 merge **이전** 배포분이다. 06:20 / 05:18 배포 이후 11:37 merge 전까지 해당 표면을 건드린 main 커밋이 **0건**임을 git log 로 확인한 뒤 선택했다(추측 0).
+
+| 서비스 | 롤백 전(Phase 2) | **롤백 후(pre-Phase 2)** | 근거 |
+|---|---|---|---|
+| `o4o-core-api` | 03747-kxq (11:53) | **03746-qlz** (06:53:48) | 첫 run 은 revision 미생성 |
+| `lecture-web` | 00013-7ls (11:48) | **00011-drs** (06:20:29) | 00012-rfj(11:39)도 Phase 2 — 1차 롤백 대상 오인 후 **정정** |
+| `kpa-society-web` | 01995-5qr (11:48) | **01993-6z9** (06:20:41) | 01994(11:39)=Phase 2 |
+| `k-cosmetics-web` | 01163-4bh (11:48) | **01161-lw5** (06:20:33) | 01162(11:39)=Phase 2 |
+| `pharmacy-hub-web` | 00253-l44 (11:48) | **00251-49n** (06:20:41) | 00252(11:40)=Phase 2 |
+| `o4o-admin-dashboard` | 01307-r2k (11:49) | **01305-z8l** (05:18:58) | 01306(11:40)=Phase 2 · 직전 커밋 `cc87a9385`(05:14)은 01305 에 포함 |
+
+`neture-web` · `store-web` 은 Phase 2 LMS 장애와 직접 관계가 확인되지 않아 **롤백하지 않았다**(사용자 지시).
+
+### 19-3. 복구 smoke (전부 PASS)
+
+```text
+GET /api/v1/lms/courses            total 4 (published 3 · archived 1 · 전부 public) — 복귀
+KPA published/public 단건 3종       200 / 200 / 200   (장애 중 404 → 복구)
+kpa-society.co.kr · /courses/:id · /lms   200
+k-cosmetics.site · pharmacyhub.co.kr · study.neture.co.kr · admin.neture.co.kr   200
+서빙 번들 Phase 2 마커              LectureExternalRedirect 0 · study.neture.co.kr 0  (3 서비스 index/vendor 번들)
+```
+
+### 19-4. DB (read-only · write 0)
+
+`lms_courses 11` · `lms_enrollments 3` · `lessons 10` · `quizzes 6` · `assignments 1` · **`service_key='lecture'` 0** · `service_memberships(lecture, active)` 0 · 마지막 course 갱신 `2026-08-26 03:52:55` · 마지막 enrollment 생성 `2026-08-18`. 분포도 §18-3 과 동일(kpa-society 8 · pharmacy-hub 3).
+
+→ **장애 기간에도 데이터는 무변경**. rekey · membership 생성 · destructive 작업 전부 미실행.
+
+### 19-5. 후속 (복구 후 조사 · 필수)
+
+1. **`ROOT_CAUSE_DUPLICATE_PUSH`** — 동일 main SHA `9a3b402b9` 가 11:37 과 11:46 두 번 push 이벤트를 만든 원인. 규명 전에는 **같은 일이 재발해 롤백이 무효화될 수 있다**(main 에 Phase 2 코드가 있는 한 어떤 push 든 배포를 트리거한다).
+2. 재발 방지 없이는 main 의 다른 WO push 도 Phase 2 를 실어 나른다 → coordinated deploy WO 전까지 **배포 트리거 차단 수단**(workflow 조건 · 수동 승인 게이트 등)을 먼저 정한다.
+
+   **기전 — 정정 확정(2026-09-23 · 실측 근거)**: 처음 여기에 "`--no-traffic` 이 없으니 다음 deploy 가 트래픽을 덮어쓴다" 고 적었으나 **틀렸다.** 실제로는 롤백이 `update-traffic --to-revisions <rev>=100` 으로 트래픽을 **특정 revision 에 pin** 했고, 그 상태에서 `gcloud run deploy` 는 새 revision 을 만들되 **트래픽을 옮기지 않는다.** gcloud 자신이 배포 로그에 그렇게 출력한다:
+
+   ```
+   Service [o4o-core-api] revision [o4o-core-api-03747-kxq] has been deployed and is serving 0 percent of traffic.
+   ```
+   (run `35864390517` · 13:10:43Z · `deploy-api.yml` 의 Deploy to Cloud Run step)
+
+   즉 **pin 이 유지되는 동안은 배포가 곧 장애 재현이 아니다** — 새 revision 이 0% 로 쌓일 뿐이다. 단 `update-traffic --to-latest`(또는 콘솔에서 최신 승격) 한 번이면 즉시 Phase 2 가 서빙되므로, pin 은 안전장치이지 통제 수단이 아니다. 이 판정은 타 세션(`o4o-platform-32`)의 관측과 일치하며, 앞선 반대 서술은 본 절로 대체한다.
+3. data cutover 는 **별도 지시 전까지 시작 금지**.
+
+---
+
+## 20. 배포 차단 게이트 적용과 그 한계 (2026-09-23)
+
+§19 후속으로 사용자 승인(C안 · fail-closed)을 받아 **저장소 변수 kill switch** 를 세 배포 워크플로에 넣었다. 적용 직후 같은 변수가 외부에서 'true' 로 바뀌어 게이트가 한 번 열렸고, 그 사건 자체가 "변수 하나로는 배포 통제가 충분하지 않다" 는 실증이 됐다.
+
+### 20-1. 적용 내용 (`3c7083be5`)
+
+| 워크플로 | 게이트 위치 | 효과 |
+|---|---|---|
+| `deploy-api.yml` | `build-and-deploy` **잡 전체** | Docker build/push · `gcloud run jobs execute o4o-api-migrations` · `gcloud run deploy` 가 함께 멈춘다(보류 중 migration 0) |
+| `deploy-web-services.yml` | 서비스별 deploy job **9개** | 각 `vars.DEPLOY_ENABLED == 'true' && needs.detect-changes.outputs.<svc> == 'true'` |
+| `deploy-admin.yml` | `deploy` job | 기존 `force_deploy` OR 조건을 괄호로 묶어 게이트가 **우선**하도록 AND |
+
+- 조건은 **fail-closed**: `vars.DEPLOY_ENABLED == 'true'` 일 때만 배포. 변수 부재·공백이면 Actions 가 빈 문자열을 돌려주므로 **차단이 기본값**이다.
+- 각 워크플로에 `deploy-hold-notice` job 추가 — `if: vars.DEPLOY_ENABLED != 'true'` 로 **게이트가 닫혔을 때만** 돌며 사유·현재 값·해제 방법을 Job Summary 에 남긴다. 배포 job 과 `needs` 관계가 없어 skip 여부와 무관하게 출력된다.
+- 적용 순서: **변수를 먼저 false 로**(13:00:05Z) → 워크플로 커밋 push(13:02). 순서가 반대면 게이트 커밋 자체가 기존 규칙대로 배포를 일으킨다.
+
+### 20-2. 게이트가 한 번 열린 사건 (13:02:37Z)
+
+| 시각 | 사실 |
+|---|---|
+| 13:00:05Z | `DEPLOY_ENABLED = false` (본 세션이 설정) |
+| **13:02:37Z** | **`DEPLOY_ENABLED = true` 로 변경 — 본 세션이 하지 않았다** |
+| 13:02:48Z | 게이트 커밋 push 로 배포 3종 트리거 → 변수가 true 라 deploy job 전부 실행 |
+| 13:05~13:11 | 새 revision 생성(`o4o-core-api-03748-64l` · `kpa-society-web-01996-r8d` · `o4o-admin-dashboard-01308-29m` 등) · API migration job `o4o-api-migrations-46z8t` 실행 |
+| 13:21:59Z | 사용자 지시로 `DEPLOY_ENABLED = false` 복구 · 진행/대기 run 0 확인 |
+
+게이트 **로직은 정상 동작**했다(`deploy-hold-notice` skipped = 조건이 거짓 = 변수가 'true'). 입력값이 바뀐 것이 원인이다.
+
+**주체 미특정(추측 금지)**: GitHub 변수 API 는 `updated_at` 만 주고 actor 를 주지 않으며(`{"name":"DEPLOY_ENABLED","value":…,"created_at":…,"updated_at":…}`), 개인 저장소라 `repos/.../audit-log` · `users/.../audit-log` 모두 404 다. 남길 수 있는 사실은 다음 둘뿐이다.
+
+- 본 세션(Lecture)은 13:00:05Z `false` 설정과 13:21:59Z `false` 복구 두 번만 호출했다. 13:02:37Z 변경은 본 세션이 아니다.
+- 병행 세션 `o4o-platform-32`(legacy-password WO)는 **GitHub 변수/시크릿 write 0** 이라고 회신했다(해당 세션의 쓰기는 로컬 파일 편집과 `wo/legacy-password-auth-retirement` 브랜치 push 뿐이며, 배포 워크플로 3종은 `branches: main`/`develop` 한정이라 그 push 로는 트리거되지 않는다). 이 진술을 근거로 해당 세션은 배제한다.
+
+→ 남는 경로는 **사용자 직접 변경 또는 본 저장소에 접근하는 다른 PC/세션**이며, 현재 가용한 기록으로는 **특정 불가**로 남긴다.
+
+### 20-3. 운영 영향 — read-only 실측으로 **없음**
+
+- **트래픽**: 6축 전부 pre-Phase2 revision 100% 유지. 새 revision 은 **0%** (§19-5 정정 참조 · gcloud 가 "serving 0 percent of traffic" 출력).
+- **migration**: `o4o-api-migrations-46z8t`(13:10) 로그 — `DATABASE_STATE = LEGACY_ESTABLISHED` · `BOOTSTRAP_EXECUTION = SKIPPED` · `HISTORICAL_REPLAY = ZERO` · `INCREMENTAL_PENDING = 0` · **`INCREMENTAL_EXECUTED = 0`** · `PRE/POST_MIGRATION_SCHEMA_ASSERTION = PASS` · fingerprint `bc27f5bc…`(5826 lines) **전후 동일** · `typeorm_migrations` 688 rows · 기대 상태 `CreateHospitalDeviceTables1790125390245`(타 WO 가 이전에 적용한 것).
+- **데이터**: `lms_courses` 11(**`service_key='lecture'` 0**) · `lms_enrollments` 3 · lessons 10 · quizzes 6 · assignments 1 · quiz_attempts 0 · `service_memberships` 5(**lecture active 0**) · `roles` lecture 3 · `role_assignments` 11(lecture 0) · 마지막 course 갱신 `2026-08-26` → §19-4 와 **완전 동일**.
+
+즉 게이트가 열린 채 배포가 돌았어도 **스키마·데이터·서빙 트래픽 모두 무변경**이었다. 이는 게이트 덕분이 아니라 **트래픽 pin** 과 **적용할 migration 이 없었다**는 두 우연 덕분이다.
+
+### 20-4. 판정 — 변수 단일 게이트의 한계
+
+```text
+DEPLOY_GATE_APPLIED      = YES (api · web-services · admin · fail-closed)
+DEPLOY_GATE_SUFFICIENT   = NO  — 저장소 변수는 누구나 되돌릴 수 있고 변경 주체가 감사되지 않는다
+DEPLOY_ENABLED           = false (13:21:59Z 복구)
+PRODUCTION_IMPACT        = 0 (트래픽 · 스키마 · 데이터)
+0%_REVISIONS             = 보존 (삭제·승격 금지)
+```
+
+보강 후보(다음 지시 전 미실행): GitHub **Environment + required reviewer**(배포 job 에 `environment:` 를 걸면 승인 없이는 job 이 시작되지 않고 승인 이력이 남는다) · 변수 대신 **보호된 environment secret/variable** · 배포 워크플로의 `workflow_dispatch` 전용화.

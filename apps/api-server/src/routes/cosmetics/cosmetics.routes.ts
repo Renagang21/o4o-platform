@@ -18,6 +18,9 @@ import { createCosmeticsController } from './controllers/cosmetics.controller.js
 import { createCosmeticsOperatorDashboardController } from './controllers/operator-dashboard.controller.js';
 import { createCosmeticsOrderController } from './controllers/cosmetics-order.controller.js';
 import { createCosmeticsPaymentController } from './controllers/cosmetics-payment.controller.js';
+// WO-O4O-SUPPLIER-ORDER-PAYMENT-FULFILLMENT-SETTLEMENT-CANONICALIZATION-V1 §2-E
+import { createB2bPaymentController } from '../../services/payment/b2b/b2b-payment-controller.factory.js';
+import { COSMETICS_B2B_SERVICE_KEYS } from '../../services/payment/b2b/store-b2b-payment.constants.js';
 import { createCosmeticsStoreController } from './controllers/cosmetics-store.controller.js';
 import { requireAuth as coreRequireAuth } from '../../middleware/auth.middleware.js';
 // WO-O4O-OPERATOR-API-ARCHITECTURE-UNIFICATION-V1: Centralized scope middleware
@@ -119,7 +122,18 @@ export function createCosmeticsRoutes(dataSource: DataSource): Router {
   // WO-O4O-ACTION-SCOPE-GUARD-V1: execute endpoint admin-only scope guard
   router.use('/operator', coreRequireAuth as any, createActionQueueRouter(dataSource, cosmeticsActionConfig, requireCosmeticsScope('cosmetics:admin')));
   router.use('/orders', orderController); // H2-0: 주문 엔드포인트
-  router.use('/payments', paymentController); // Payment EventHub 연결
+  router.use('/payments', paymentController);
+
+  // WO-O4O-SUPPLIER-ORDER-PAYMENT-FULFILLMENT-SETTLEMENT-CANONICALIZATION-V1 §2-E: 매장 → 공급자 B2B 결제
+  //   /api/v1/cosmetics/b2b/payments/{prepare,confirm,order/:orderId}
+  // 위 `/payments`(소비자→매장 은퇴 · 410)는 그대로 유지한다.
+  router.use(
+    '/b2b/payments',
+    createB2bPaymentController(dataSource, coreRequireAuth as any, {
+      logLabel: 'K-Cosmetics B2B Payment',
+      allowedServiceKeys: COSMETICS_B2B_SERVICE_KEYS,
+    }),
+  ); // Payment EventHub 연결
   router.use('/stores', storeController); // WO-KCOS-STORES-PHASE1-V1: 매장 관리
   // WO-STORE-COMMON-SETTINGS-FOUNDATION-V1: unified settings + channel config
   router.use('/stores', createStoreSettingsController(dataSource, coreRequireAuth as any));

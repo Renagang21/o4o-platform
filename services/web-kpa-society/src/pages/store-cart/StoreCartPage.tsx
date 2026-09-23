@@ -18,6 +18,8 @@ import { useNavigate } from 'react-router-dom';
 import { StoreCartView, useStoreCart } from '@o4o/store-ui-core';
 import { PageHeader, LoadingSpinner, EmptyState } from '../../components/common';
 import { storeCartApi } from '../../api';
+// WO-O4O-SUPPLIER-ORDER-PAYMENT-FULFILLMENT-SETTLEMENT-CANONICALIZATION-V1 §2-E-4: payment-first — 확정 후 결제를 개시해야 공급자에게 전달된다.
+import { StoreB2bPayButton } from '../../components/store-cart/StoreB2bPayButton';
 
 const CART_SERVICE_KEY = 'kpa-society';
 
@@ -55,6 +57,7 @@ export function StoreCartPage() {
         />
       }
       emptyAction={{ label: '이벤트 상품 보기', onClick: goEventOffers }}
+      renderPaymentAction={(result) => <StoreB2bPayButton result={result} />}
     />
   );
 }
