@@ -6,7 +6,7 @@
  * KPA `/mypage/my-requests` 와 같은 **통합 신청함**을 PH 에 채택한다.
  * 신규 backend 0 — 이미 있는 세 계약을 프런트에서 합칠 뿐이다:
  *   1) GET /forum/category-requests/my?serviceCode=pharmacy-hub  — 포럼 개설 신청
- *   2) GET /lms/enrollments/me                                   — 수강 신청·진행
+ *   (수강 신청·진행은 WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2 §14 로 제거 — 독립 강의 서비스 소유)
  * 변환은 공통 `@o4o/account-ui` normalizer 를 쓴다 (PH 전용 변환 사본 금지).
  *
  * 한 축이 실패해도 나머지는 보여준다. 다만 **전부 실패하면 오류로 올린다** —
@@ -15,12 +15,10 @@
 
 import {
   normalizeForumCategoryRequest,
-  normalizeLmsEnrollment,
   sortRequestsByCreatedAtDesc,
   type MyRequestItem,
 } from '@o4o/account-ui';
 import { fetchMyPharmacyHubForumRequests } from '../../services/forumApi';
-import { lmsApi } from '../../api/lms';
 
 const SERVICE_KEY = 'pharmacy-hub';
 
@@ -31,12 +29,11 @@ function toArray(raw: any): any[] {
 }
 
 export async function fetchPharmacyHubMyRequests(): Promise<MyRequestItem[]> {
-  const [forumRes, lmsRes] = await Promise.allSettled([
+  const [forumRes] = await Promise.allSettled([
     fetchMyPharmacyHubForumRequests(),
-    lmsApi.getMyEnrollments(),
   ]);
 
-  if (forumRes.status === 'rejected' && lmsRes.status === 'rejected') {
+  if (forumRes.status === 'rejected') {
     throw new Error('신청 내역을 불러오지 못했습니다.');
   }
 
@@ -45,12 +42,6 @@ export async function fetchPharmacyHubMyRequests(): Promise<MyRequestItem[]> {
   if (forumRes.status === 'fulfilled') {
     for (const request of toArray(forumRes.value)) {
       items.push({ ...normalizeForumCategoryRequest(request), serviceKey: SERVICE_KEY });
-    }
-  }
-
-  if (lmsRes.status === 'fulfilled') {
-    for (const enrollment of toArray(lmsRes.value)) {
-      items.push(normalizeLmsEnrollment(enrollment, SERVICE_KEY));
     }
   }
 

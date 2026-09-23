@@ -116,7 +116,7 @@ export const pharmacyHubGuideIntroProps: GuideIntroPageProps = {
       title: '커뮤니티 이용 방법',
       href: '/guide/features',
       description:
-        '포럼 · 교육 · 내 글 · 콘텐츠 공개 절차를 정리했습니다. 각 항목을 누르면 해당 기능 또는 기능별 매뉴얼로 이동합니다.',
+        '포럼 · 내 글 · 콘텐츠 공개 절차와 O4O 강의 이동 경로를 정리했습니다. 각 항목을 누르면 해당 기능 또는 기능별 매뉴얼로 이동합니다.',
       items: [
         {
           label: '포럼 이용 방법',
@@ -124,8 +124,10 @@ export const pharmacyHubGuideIntroProps: GuideIntroPageProps = {
           href: '/guide/features/forum',
         },
         {
-          label: '교육 콘텐츠 이용 방법',
-          detail: '교육 콘텐츠는 PharmacyHub 에 등록된 강의만 표시됩니다.',
+          // Phase 2 §14: 강의는 독립 서비스 O4O 강의가 소유한다. PharmacyHub 의 /education 은
+          // 외부 이동 진입점만 남으므로 "PharmacyHub 에 등록된 강의" 안내는 두지 않는다.
+          label: 'O4O 강의로 이동',
+          detail: '교육 강의는 독립 서비스 「O4O 강의」(study.neture.co.kr)에서 제공합니다.',
           href: '/education',
         },
         {
@@ -484,12 +486,13 @@ export const pharmacyHubGuideFeaturesProps: GuideFeaturesPageProps = {
       step: '01',
       title: '커뮤니티',
       primaryRoute: '/community',
-      description: '약국 운영 정보를 나누고 교육 콘텐츠를 이용합니다.',
+      description: '약국 운영 정보를 나눕니다. 교육 강의는 독립 서비스 「O4O 강의」에서 제공합니다.',
       items: [
         { label: '포럼', route: '/forum' },
         { label: '커뮤니티 검색', route: '/community/search' },
         { label: '내 글', route: '/forum/my-posts' },
-        { label: '교육', route: '/education' },
+        // Phase 2 §14: /education 은 O4O 강의(study.neture.co.kr) 외부 이동 진입점.
+        { label: 'O4O 강의로 이동', route: '/education' },
       ],
       linkTo: '/guide/features/forum',
     },

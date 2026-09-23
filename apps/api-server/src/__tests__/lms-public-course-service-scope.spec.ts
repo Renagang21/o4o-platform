@@ -115,10 +115,12 @@ describe('isCourseInServiceScope — 단건 경계', () => {
     expect(isCourseInServiceScope('k-cosmetics', 'k-cosmetics')).toBe(true);
   });
 
-  it('legacy null serviceKey 는 KPA-Society 로 간주된다 (기존 fallback 과 동일)', () => {
-    expect(isCourseInServiceScope(null, 'kpa-society')).toBe(true);
-    expect(isCourseInServiceScope(undefined, 'kpa-society')).toBe(true);
+  it('legacy null serviceKey 는 어떤 scope 에도 속하지 않는다 (Lecture Phase 2 §8 — KPA fallback 제거)', () => {
+    expect(isCourseInServiceScope(null, 'kpa-society')).toBe(false);
+    expect(isCourseInServiceScope(undefined, 'kpa-society')).toBe(false);
+    expect(isCourseInServiceScope(null, 'lecture')).toBe(false);
     expect(isCourseInServiceScope(null, 'k-cosmetics')).toBe(false);
+    expect(isCourseInServiceScope('lecture', 'lecture')).toBe(true);
   });
 });
 
@@ -172,10 +174,10 @@ describe('CourseService.listCourses — service boundary SQL', () => {
     expect(conds[0].condition).not.toContain('k-cosmetics');
   });
 
-  it('KPA scope 는 legacy null 을 함께 포함한다', async () => {
+  it('KPA scope 도 legacy null 을 포함하지 않는다 (Lecture Phase 2 §8)', async () => {
     const conds = serviceConds(await runListCourses({ serviceKey: 'kpa-society' }));
     expect(conds).toHaveLength(1);
-    expect(conds[0].condition).toBe('(course.serviceKey = :svcKey OR course.serviceKey IS NULL)');
+    expect(conds[0].condition).toBe('course.serviceKey = :svcKey');
     expect(conds[0].params).toEqual({ svcKey: 'kpa-society' });
   });
 
@@ -196,9 +198,11 @@ describe('CourseService.listCourses — service boundary SQL', () => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 describe('정적 회귀 가드 — mount 계약 / 프런트 소비', () => {
-  it('KPA LMS remount 는 라우트 컨텍스트를 유지한다', () => {
-    const src = read('apps/api-server/src/routes/kpa/kpa.routes.ts');
-    expect(src).toMatch(/lmsRouter\.use\(\s*lmsContextMiddleware\(\{\s*serviceCode:\s*'kpa'\s*\}\)\s*\)/);
+  it('generic /api/v1/lms 라우터는 lecture 컨텍스트를 서버가 고정한다 (Lecture Phase 2 §8)', () => {
+    const src = read('apps/api-server/src/modules/lms/routes/lms.routes.ts');
+    expect(src).toMatch(/router\.use\(\s*lmsContextMiddleware\(\{\s*serviceCode:\s*SERVICE_KEYS\.LECTURE\s*\}\)\s*\)/);
+    const kpa = read('apps/api-server/src/routes/kpa/kpa.routes.ts');
+    expect(kpa).not.toContain('lmsContextMiddleware');
   });
 
   it('controller 는 client 가 보낸 raw serviceKey 를 그대로 신뢰하지 않는다', () => {
@@ -221,28 +225,26 @@ describe('정적 회귀 가드 — mount 계약 / 프런트 소비', () => {
     expect(src).not.toMatch(/kpa'\s*:\s*'kpa-society'/);
   });
 
-  it('generic route 를 쓰는 서비스 프런트는 canonical serviceKey 를 주입한다', () => {
-    expect(read('services/web-k-cosmetics/src/api/lms.ts'))
-      .toMatch(/createLmsLearnerClient\(lmsHttp,\s*\{\s*serviceKey:\s*'k-cosmetics'\s*\}\)/);
-  });
-
-  it('KPA 프런트는 서비스 prefix 라우트로 경계를 얻는다 (serviceKey 주입 불필요)', () => {
-    const src = read('services/web-kpa-society/src/api/lms.ts');
+  // WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2 §8/§14:
+  //   generic `/api/v1/lms/*` 의 유일한 프런트 소비자는 services/web-lecture 이고 serviceKey 를 주입하지 않는다
+  //   (서버가 `lecture` 로 고정). KPA / KCos / PH 의 LMS client 는 삭제되었다.
+  it('Lecture 프런트는 serviceKey 를 주입하지 않는다 (서버 고정)', () => {
+    const src = read('services/web-lecture/src/api/lecture.ts');
     expect(src).toContain('createLmsLearnerClient(lmsHttp)');
-    expect(src).toContain('/api/v1/kpa');
+    expect(src).not.toMatch(/createLmsLearnerClient\(lmsHttp,\s*\{/);
+    expect(src).not.toMatch(/api\.get[^\n]*`\/lms\/courses\?/);
   });
 
-  it('서비스 화면이 generic 목록 URL 을 직접 호출하지 않는다', () => {
-    // WO-O4O-OPERATOR-GP-VIEW-DEDUP-AND-CROSSSERVICE-TABLE-UX-ALIGN-V1:
-    //   기존 대상 `LmsCoursesPage.tsx` 는 route 에서 이미 분리된 dead code(import 0)라 삭제했다.
-    //   `/operator/lms` 가 실제로 렌더하는 화면은 공통 `OperatorLmsCoursesManager` 를 쓰는
-    //   `OperatorLmsCoursesPage.tsx` 이므로 가드 대상을 실렌더 경로로 옮긴다 (가드 의미 동일).
-    const pages = [
+  it('KPA / KCos / PH 의 LMS client 와 operator LMS 화면은 삭제되었다', () => {
+    for (const rel of [
+      'services/web-k-cosmetics/src/api/lms.ts',
+      'services/web-kpa-society/src/api/lms.ts',
+      'services/web-pharmacy-hub/src/api/lms.ts',
       'services/web-k-cosmetics/src/pages/operator/OperatorLmsCoursesPage.tsx',
-    ];
-    for (const rel of pages) {
-      const src = read(rel);
-      expect(src).not.toMatch(/api\.get[^\n]*`\/lms\/courses\?/);
+      'services/web-kpa-society/src/pages/operator/OperatorLmsCoursesPage.tsx',
+      'services/web-pharmacy-hub/src/pages/operator/OperatorLmsCoursesPage.tsx',
+    ]) {
+      expect(fs.existsSync(path.join(REPO_ROOT, rel))).toBe(false);
     }
   });
 });

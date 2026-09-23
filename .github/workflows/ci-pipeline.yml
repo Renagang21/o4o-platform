@@ -18,6 +18,12 @@ on:
         description: '판정 기준 head SHA (비우면 현재 SHA)'
         required: false
         default: ''
+      # WO-O4O-API-JEST-AFFECTED-TEST-EXECUTION-PHASE0-SHADOW-V1 §13
+      # affected selector 를 무시하고 full 로 되돌리는 **유일한** 수동 축.
+      full_jest:
+        description: 'API Jest affected selector 를 무시하고 full 강제 (true)'
+        required: false
+        default: ''
 
 # WO-O4O-DOCS-ONLY-CI-SECURITY-FAST-PATH-AND-PUSH-CONCURRENCY-PRESERVATION-V1 §17
 # 이전 정책(`cancel-in-progress: true`)에서는 **뒤따르는 문서/CHECK commit 이
@@ -290,6 +296,11 @@ jobs:
 
     steps:
     - uses: actions/checkout@v6
+      with:
+        # detect · docs-fast · admin-fast 와 같은 기준이다.
+        # shallow checkout 이면 base SHA object 가 없어 아래 shadow selector 가
+        # 항상 "변경 파일 수집 실패 → full" 로만 떨어져 관측 데이터가 쌓이지 않는다.
+        fetch-depth: 0
 
     - name: Setup build environment
       uses: ./.github/actions/setup-build-env
@@ -301,6 +312,48 @@ jobs:
     - name: Build api-server workspace dependencies
       run: pnpm --filter '@o4o/api-server^...' run build
 
+    # WO-O4O-API-JEST-AFFECTED-TEST-EXECUTION-PHASE0-SHADOW-V1 §14 · §15
+    #
+    # **Phase 0 은 shadow 다.** 아래 selector 는 "돌았어야 할 suite 목록" 만 계산하고,
+    # 실제 Jest 실행 범위는 **건드리지 않는다**(바로 아래 step 은 그대로 전체 실행).
+    # full 이 실패하면 "그 실패 suite 가 shadow 선택 안에 있었는가" 를 artifact 로
+    # 대조할 수 있고, 그 대조에서 false-negative 0 이 확인돼야 Phase 1 로 간다.
+    # selector 자체의 실패가 Jest gate 를 깨뜨리면 안 되므로 continue-on-error 다.
+    - name: Calculate API Jest affected set (shadow)
+      id: api-jest-shadow
+      continue-on-error: true
+      env:
+        BASE_SHA: ${{ github.event.inputs.base_sha || (github.event_name == 'pull_request' && github.event.pull_request.base.sha) || github.event.before }}
+        HEAD_SHA: ${{ github.sha }}
+        # §13 manual override — 축은 하나만 둔다 (workflow_dispatch 입력).
+        FULL_JEST: ${{ github.event.inputs.full_jest }}
+      run: |
+        mkdir -p shadow
+        node scripts/ci/detect-affected.mjs --mode=api-jest | tee shadow/api-jest-shadow.json
+        node -e "
+          const r = require('./shadow/api-jest-shadow.json');
+          const ratio = r.fullSuiteCount ? (r.selectedSuiteCount / r.fullSuiteCount * 100).toFixed(1) : 'n/a';
+          console.log('--- API Jest affected (SHADOW — 실행에는 영향 없음) ---');
+          console.log('mode                :', r.mode);
+          console.log('reason              :', r.reason);
+          console.log('changed files       :', r.changedFiles.length);
+          console.log('components          :', JSON.stringify(r.components));
+          console.log('selected / full     :', r.selectedSuiteCount, '/', r.fullSuiteCount, '(' + ratio + '%)');
+          for (const p of r.specs) console.log('  +', p);
+        "
+
+    - name: Upload API Jest shadow selection
+      if: always()
+      uses: actions/upload-artifact@v4
+      continue-on-error: true
+      with:
+        name: api-jest-shadow-${{ github.run_id }}-${{ github.run_attempt }}
+        path: shadow/api-jest-shadow.json
+        retention-days: 30
+        if-no-files-found: ignore
+
+    # Phase 0 에서는 selector 결과와 무관하게 **항상 전체**를 돌린다.
+    # 이 명령은 Phase 1 승인 전까지 바뀌지 않는다.
     - name: Run tests (api-server Jest, serial to prevent OOM)
       run: cd apps/api-server && npx jest --maxWorkers=1
 

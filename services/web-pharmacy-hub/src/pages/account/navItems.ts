@@ -24,8 +24,7 @@ import type { MyPageNavItem } from '@o4o/account-ui';
  */
 export const PHARMACY_HUB_ACCOUNT_NAV_ITEMS: MyPageNavItem[] = [
   { label: '내 프로필', path: '', end: true },
-  { label: '내 수강', path: '/enrollments' },
-  { label: '내 수료증', path: '/certificates' },
+  // 내 수강 · 내 수료증 — Phase 2 §14 (WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1): 독립 강의 서비스 소유 — 제거
   { label: '내 크레딧', path: '/credits' },
   // WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §5 (#19·#51)
   { label: '내 신청', path: '/my-requests' },

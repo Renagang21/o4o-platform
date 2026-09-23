@@ -1000,6 +1000,582 @@ export function selectDocsConsumerSpecs(changedFiles, root = REPO_ROOT) {
 }
 
 // ---------------------------------------------------------------------------
+// API Jest affected selection (Phase 0 — shadow only)
+// ---------------------------------------------------------------------------
+
+/**
+ * WO-O4O-API-JEST-AFFECTED-TEST-EXECUTION-PHASE0-SHADOW-V1
+ * 선행 정본: docs/investigations/IR-O4O-API-JEST-AFFECTED-TEST-EXECUTION-CENSUS-V1.md
+ *
+ * **Phase 0 은 shadow 다.** 이 함수의 결과로 실제 Jest 실행 범위를 줄이지 않는다.
+ * CI 는 계속 `npx jest --maxWorkers=1` 전체를 돌리고, 여기 결과는 로그·artifact 로만 남는다.
+ *
+ * 모델 B (IR §13) — 다섯 축의 **합집합**이며 어느 축도 다른 축을 대체하지 않는다:
+ *
+ *   SELECTED = ALWAYS_RUN
+ *            ∪ MIGRATION_SET            (apps/api-server/src/database/** 변경 시)
+ *            ∪ FIND_RELATED             (apps/api-server 내부 변경 파일만)
+ *            ∪ RAW_SOURCE               (모든 변경 파일)
+ *            ∪ CHANGED_TEST_ITSELF
+ *            ∪ API 의존 package 의 RAW_SOURCE consumer
+ *
+ * IR 실측 근거:
+ *   - 346 suite 중 203 개가 apps/api-server **밖** 파일을 실제로 읽는다
+ *     → module graph 단독(=findRelatedTests) 선택은 구조적으로 불가능하다.
+ *   - `packages/security-core` 변경에 `--findRelatedTests` 는 **0** 을 반환하는데
+ *     실제 raw consumer 는 **89** 다 (jest `roots` 가 `<rootDir>/src` 로 한정된 탓).
+ *     → workspace 밖 파일을 findRelatedTests 에 위임하면 조용한 누락이 된다.
+ *   - `src/database/entities.ts` 는 FIND_RELATED(123) > RAW_SOURCE(96) 였다.
+ *     → 어느 축도 다른 축의 상위집합이 아니다. UNION 이 필수다.
+ *
+ * false positive(몇 개 더 실행)는 허용하고 false negative(누락)는 허용하지 않는다.
+ */
+
+const API_SRC_REL = 'apps/api-server/src';
+
+/** jest testMatch 와 같은 의미의 test 파일 판정 */
+const JEST_TEST_FILE = /\.(spec|test)\.(ts|tsx|js)$/;
+
+/** jest `testPathIgnorePatterns` 와 같은 제외 (node_modules · setup) */
+const JEST_SKIP_DIRS = new Set(['node_modules', 'setup']);
+
+/**
+ * `apps/api-server/src` 아래 모든 test 파일을 jest 인자 형태(`src/...`)로 열거한다.
+ * 목록을 코드에 박지 않는 것이 핵심이다 — 신규 spec 이 조용히 빠지면 안 된다.
+ *
+ * @returns {{ rel: string, source: string }[]}
+ */
+export function listApiJestSpecs(root = REPO_ROOT) {
+  const srcAbs = path.join(root, ...API_SRC_REL.split('/'));
+  if (!existsSync(srcAbs)) return [];
+  /** @type {{ rel: string, source: string }[]} */
+  const out = [];
+  const walk = (dirAbs, dirRel) => {
+    for (const entry of readdirSync(dirAbs, { withFileTypes: true })) {
+      const abs = path.join(dirAbs, entry.name);
+      const rel = dirRel ? `${dirRel}/${entry.name}` : entry.name;
+      if (entry.isDirectory()) {
+        if (!JEST_SKIP_DIRS.has(entry.name)) walk(abs, rel);
+        continue;
+      }
+      if (!entry.isFile() || !JEST_TEST_FILE.test(entry.name)) continue;
+      out.push({ rel: `src/${rel}`, source: readFileSync(abs, 'utf-8') });
+    }
+  };
+  walk(srcAbs, '');
+  return out.sort((a, b) => (a.rel < b.rel ? -1 : 1));
+}
+
+/**
+ * ALWAYS_RUN 도출 (IR §11-I).
+ *
+ * **고정 파일 목록을 쓰지 않는다.** 목록을 박으면 신규 census spec 이 조용히 빠진다.
+ *
+ * 규칙: **디렉터리를 열거하는 spec 은 언제나 돈다.**
+ * 디렉터리를 열거하는 test 는 "무엇이 있는지"를 판정 근거로 삼으므로, 저장소 어디든
+ * 파일이 추가·삭제되면 판정이 바뀔 수 있다. 어떤 경로 기반 selector 로도 이 결합을
+ * 좁힐 수 없다. IR 의 runtime 계측에서 저장소 파일 2,000개 초과를 읽은 census spec
+ * 20개는 **전부** 이 규칙에 포함된다(누락 0).
+ */
+// pnpm-lock / pnpm-workspace 를 읽는 spec 도 저장소 전역을 판정 근거로 삼으므로 같은 부류다.
+const DIRECTORY_ENUMERATION = /\breaddirSync\b|\breaddir\b|\bglobSync\b|fast-glob|\bls-files\b|pnpm-lock\.yaml|pnpm-workspace\.yaml/;
+
+export function deriveAlwaysRunSpecs(specs) {
+  return specs.filter((s) => DIRECTORY_ENUMERATION.test(s.source)).map((s) => s.rel);
+}
+
+/**
+ * MIGRATION 특별군 (WO §11 · IR §9).
+ *
+ * migration 에서 몇십 초를 아끼는 것보다 schema false-negative 방지가 우선이다.
+ *
+ * runtime 계측상 `apps/api-server/src/database/**` 를 읽는 suite 는 **139** 개다.
+ * 그중 raw text 로 migration 경로·manifest 를 검사하는 것은 이 규칙이 잡고(17),
+ * 나머지는 전부 entities/data-source/connection 을 통한 **module import** 이므로
+ * 그 세 anchor 를 findRelatedTests 대상에 추가해 잡는다(123). 남는 7 개는 ALWAYS_RUN 이다.
+ * → 세 축 UNION 의 실측 누락은 **0** 이다.
+ */
+const MIGRATION_REFERENCE = /database\/(migrations|incremental|entities|data-source|connection)\b|INCREMENTAL_MIGRATIONS|expected-schema-states|appliedThrough/;
+
+/**
+ * database 변경 시 module graph 로 확장할 anchor.
+ * 개별 migration 파일은 아무도 import 하지 않으므로 findRelatedTests 가 0 을 낸다.
+ * 실제 schema 소비자는 이 세 파일을 거친다.
+ */
+export const API_JEST_DATABASE_ANCHORS = [
+  'src/database/entities.ts',
+  'src/database/data-source.ts',
+  'src/database/connection.ts',
+];
+
+/** `path.join(SRC, 'database', 'entities.ts')` 형태도 같은 참조로 인정한다 */
+const MIGRATION_SEGMENTED = /['"`]database['"`]\s*,\s*['"`](migrations|incremental|entities\.ts|data-source\.ts|connection\.ts)['"`]/;
+
+export function deriveMigrationSpecs(specs) {
+  return specs
+    .filter((s) => MIGRATION_REFERENCE.test(s.source) || MIGRATION_SEGMENTED.test(s.source))
+    .map((s) => s.rel);
+}
+
+/**
+ * 변경 경로 → raw-source needle 집합.
+ *
+ * `selectPathGuardSpecs()` 의 needle 생성(경로 · 상위 경로 · workspace dir · dir basename ·
+ * package name)을 일반화한다. 다만 **api-server 자신**의 변경에는 workspace 토큰
+ * (`apps/api-server` · `api-server` · `@o4o/api-server`)을 needle 로 쓰지 않는다 —
+ * 거의 모든 spec 이 그 문자열을 포함하므로 사실상 전체 선택이 되어 선별 의미가 사라진다.
+ * 대신 spec 들이 실제로 쓰는 세 가지 표기를 모두 만든다:
+ *
+ *   apps/api-server/src/database/incremental/manifest.ts   (저장소 기준)
+ *   src/database/incremental/manifest.ts                   (workspace 기준)
+ *   database/incremental/manifest.ts                       (src 기준 — 실제 사용례)
+ */
+export function apiJestNeedles(changedFiles, graph) {
+  const needles = new Set();
+  /** 상위 경로까지 전부 추가하되, 세그먼트 2개 미만(너무 넓음)은 버린다 */
+  const addPathAndAncestors = (p, minSegments) => {
+    let cur = p;
+    while (cur.includes('/')) {
+      if (cur.split('/').length >= minSegments) needles.add(cur);
+      cur = cur.slice(0, cur.lastIndexOf('/'));
+    }
+  };
+
+  for (const { path: file } of changedFiles) {
+    if (file.startsWith(`${API_DIR}/`)) {
+      // api-server 내부 — workspace 토큰은 제외하고 세 가지 표기를 만든다
+      addPathAndAncestors(file, 4); // apps/api-server/src/...
+      const fromWorkspace = file.slice(API_DIR.length + 1); // src/...
+      addPathAndAncestors(fromWorkspace, 2);
+      if (fromWorkspace.startsWith('src/')) addPathAndAncestors(fromWorkspace.slice(4), 2);
+      continue;
+    }
+    const wsDir = workspaceDirOf(graph, file);
+    if (wsDir) {
+      needles.add(wsDir);
+      needles.add(wsDir.slice(wsDir.lastIndexOf('/') + 1));
+      const pkgName = graph.byDir.get(wsDir);
+      if (pkgName) needles.add(pkgName);
+      addPathAndAncestors(file, 2);
+      continue;
+    }
+    // workspace 밖(docs/ 등) — `<루트>/<area>` 이상 깊이만
+    const seg = file.split('/');
+    if (seg.length >= 2) needles.add(`${seg[0]}/${seg[1]}`);
+    if (seg.length >= 2) needles.add(file);
+  }
+  return needles;
+}
+
+/**
+ * needle 하나가 spec 본문에 나타나는지 판정한다.
+ *
+ * 문자열 포함만으로는 부족하다. contract spec 들은 경로를 통째로 쓰지 않고
+ * `path.join(SRC, 'modules', 'deployment')` 처럼 **세그먼트로 쪼개서** 쓴다.
+ * 260 commit 재현에서 남아 있던 false-negative 의 대부분이 이 형태였다
+ * (deployment/sites-domain-retirement · admin-api-guard-inventory ·
+ *  service-monitor-retirement · api-database-readiness-cold-start-gate).
+ * 그래서 따옴표로 분리된 세그먼트 나열도 같은 needle 로 인정한다.
+ */
+export function apiJestNeedleMatches(source, needle) {
+  if (source.includes(needle)) return true;
+  const segments = needle.split('/').filter(Boolean);
+  if (segments.length < 2) return false;
+  const quote = (seg) => `['"\`]${seg.replace(/[.*+?^${}()|[\]\\]/g, (ch) => `\\${ch}`)}['"\`]`;
+  // 앞쪽 세그먼트는 보통 상수(`SRC`, `REPO_ROOT`)로 대체되어 있으므로
+  // 길이 2 이상인 **모든 접미 부분열**을 후보로 본다.
+  for (let start = 0; start <= segments.length - 2; start += 1) {
+    const tail = segments.slice(start).map(quote).join('\\s*,\\s*');
+    if (new RegExp(tail).test(source)) return true;
+  }
+  return false;
+}
+
+/** needle 텍스트 매칭으로 raw-source consumer spec 을 고른다 */
+export function selectApiJestRawSourceSpecs(changedFiles, graph, specs) {
+  const needles = apiJestNeedles(changedFiles, graph);
+  if (needles.size === 0) return [];
+  const selected = [];
+  for (const s of specs) {
+    for (const needle of needles) {
+      if (apiJestNeedleMatches(s.source, needle)) { selected.push(s.rel); break; }
+    }
+  }
+  return selected;
+}
+
+
+/**
+ * **api-server 내부 정적 import graph.**
+ *
+ * `--findRelatedTests` 는 jest 의 **런타임** module graph 라서 `import type` 으로만
+ * 이어진 의존을 보지 못한다 (타입은 컴파일 시 지워진다). 260 commit 재현에서
+ * `product-promotion.types.ts` · `product-type.util.ts` 변경이 정확히 이 이유로
+ * suite 를 놓쳤다. ts-jest 는 타입을 검사하므로 이 결합은 실제로 깨질 수 있다.
+ *
+ * 그래서 소스 텍스트에서 상대 specifier 를 직접 읽어 정적 graph 를 만들고
+ * 역방향으로 닫는다. 오프라인·결정론적이며 `import type` 도 포함한다.
+ */
+const IMPORT_SPECIFIER = /(?:\bfrom\s*|\bimport\s*\(\s*|\brequire\s*\(\s*)['"`](\.[^'"`]*)['"`]/g;
+const SOURCE_FILE = /\.(ts|tsx|js|mjs|cjs)$/;
+
+/** 상대 specifier 를 api-server/src 기준 실제 파일로 해석한다 (.js → .ts 포함) */
+function resolveApiImport(fromRel, spec, known) {
+  const baseDir = fromRel.slice(0, fromRel.lastIndexOf('/'));
+  const parts = `${baseDir}/${spec}`.split('/');
+  const stack = [];
+  for (const part of parts) {
+    if (part === '' || part === '.') continue;
+    if (part === '..') { stack.pop(); continue; }
+    stack.push(part);
+  }
+  let target = stack.join('/');
+  const bare = target.replace(/\.(js|mjs|cjs)$/, '');
+  for (const candidate of [target, bare, `${bare}.ts`, `${bare}.tsx`, `${bare}/index.ts`, `${bare}/index.tsx`]) {
+    if (known.has(candidate)) return candidate;
+  }
+  return null;
+}
+
+/**
+ * @returns {{ importedBy: Map<string, Set<string>> }} — key/값 모두 `src/...` 상대 경로
+ */
+export function buildApiSourceImportGraph(root = REPO_ROOT) {
+  const srcAbs = path.join(root, ...API_DIR.split('/'), 'src');
+  const sources = new Map();
+  if (!existsSync(srcAbs)) return { importedBy: new Map() };
+  const walk = (dirAbs, dirRel) => {
+    for (const entry of readdirSync(dirAbs, { withFileTypes: true })) {
+      const abs = path.join(dirAbs, entry.name);
+      const rel = dirRel ? `${dirRel}/${entry.name}` : entry.name;
+      if (entry.isDirectory()) {
+        if (entry.name !== 'node_modules') walk(abs, rel);
+        continue;
+      }
+      if (entry.isFile() && SOURCE_FILE.test(entry.name)) sources.set(`src/${rel}`, readFileSync(abs, 'utf-8'));
+    }
+  };
+  walk(srcAbs, '');
+
+  const known = new Set(sources.keys());
+  const importedBy = new Map();
+  for (const [rel, text] of sources) {
+    IMPORT_SPECIFIER.lastIndex = 0;
+    let match;
+    while ((match = IMPORT_SPECIFIER.exec(text)) !== null) {
+      const target = resolveApiImport(rel, match[1], known);
+      if (!target || target === rel) continue;
+      if (!importedBy.has(target)) importedBy.set(target, new Set());
+      importedBy.get(target).add(rel);
+    }
+  }
+  return { importedBy };
+}
+
+/** 변경 파일을 (전이적으로) import 하는 api-server spec 들 */
+export function staticImportApiJestSpecs(changedFiles, importGraph) {
+  const seeds = changedFiles
+    .filter((x) => x.path.startsWith(`${API_DIR}/src/`))
+    .map((x) => x.path.slice(API_DIR.length + 1));
+  if (seeds.length === 0) return [];
+  const seen = new Set(seeds);
+  const queue = [...seeds];
+  while (queue.length) {
+    for (const importer of importGraph.importedBy.get(queue.pop()) ?? []) {
+      if (seen.has(importer)) continue;
+      seen.add(importer);
+      queue.push(importer);
+    }
+  }
+  return [...seen].filter((rel) => JEST_TEST_FILE.test(rel));
+}
+
+/**
+ * **route inventory 축.**
+ *
+ * `admin-api-guard-inventory.spec.ts` 처럼 route 등록 파일을 읽고 거기서 얻은 경로를
+ * `existsSync` 로 따라가 검사하는 spec 은, 어떤 route/controller 가 추가·변경돼도
+ * 판정이 바뀐다. 파일 이름으로는 결합을 알 수 없으므로 축 하나로 따로 둔다.
+ */
+const ROUTE_INVENTORY_REFERENCE = /register-routes|registerRoutes/;
+const ROUTE_LIKE_PATH = /\/(routes|controllers|bootstrap)\/|\.(routes|controller)\.ts$/;
+
+export function deriveRouteInventorySpecs(specs) {
+  return specs.filter((s) => ROUTE_INVENTORY_REFERENCE.test(s.source)).map((s) => s.rel);
+}
+
+export function touchesApiRoutes(changedFiles) {
+  return changedFiles.some((x) => x.path.startsWith(`${API_DIR}/src/`) && ROUTE_LIKE_PATH.test(x.path));
+}
+
+/**
+ * **cross-workspace module import bridge.**
+ *
+ * jest `roots` 가 `<rootDir>/src` 로 한정되어 있어 `--findRelatedTests` 는
+ * `packages/**` 파일에 대해 항상 **0** 을 반환한다 (IR §6-3). 그런데 실측상
+ * `packages/security-core` 를 실제로 읽는 api-server suite 는 **107** 개다.
+ * 즉 0 을 "관련 테스트 없음" 으로 읽으면 대량 누락이 된다.
+ *
+ * 그래서 경계를 직접 잇는다: 변경된 package 를 (전이적으로) 의존하는 workspace
+ * package 집합을 구한 뒤, 그 package 를 import 하는 **api-server 내부 파일**을 찾아
+ * findRelatedTests 의 대상으로 넘긴다. 그러면 jest 가 roots 안에서 정상적으로
+ * 역방향 module graph 를 펼친다.
+ */
+export function apiImporterFilesFor(pkgNames, root = REPO_ROOT) {
+  if (pkgNames.size === 0) return [];
+  const srcAbs = path.join(root, ...API_DIR.split('/'), 'src');
+  if (!existsSync(srcAbs)) return [];
+  const names = [...pkgNames];
+  const out = [];
+  const walk = (dirAbs, dirRel) => {
+    for (const entry of readdirSync(dirAbs, { withFileTypes: true })) {
+      const abs = path.join(dirAbs, entry.name);
+      const rel = dirRel ? `${dirRel}/${entry.name}` : entry.name;
+      if (entry.isDirectory()) {
+        if (entry.name !== 'node_modules') walk(abs, rel);
+        continue;
+      }
+      if (!entry.isFile() || !/\.(ts|tsx|js|mjs|cjs)$/.test(entry.name)) continue;
+      const text = readFileSync(abs, 'utf-8');
+      for (const name of names) {
+        if (text.includes(`'${name}'`) || text.includes(`"${name}"`)
+          || text.includes(`'${name}/`) || text.includes(`"${name}/`)) {
+          out.push(`src/${rel}`);
+          break;
+        }
+      }
+    }
+  };
+  walk(srcAbs, '');
+  return out;
+}
+
+/** 변경 package 를 (전이적으로) 의존하는 workspace package 이름 집합 — 자신 포함 */
+export function reverseWorkspaceClosure(pkgNames, graph) {
+  const result = new Set(pkgNames);
+  let grew = true;
+  while (grew) {
+    grew = false;
+    for (const node of graph.byName.values()) {
+      if (result.has(node.name)) continue;
+      if (node.deps.some((d) => result.has(d))) { result.add(node.name); grew = true; }
+    }
+  }
+  return result;
+}
+
+/**
+ * `jest --findRelatedTests` (module import graph 축).
+ *
+ * **apps/api-server 내부 변경 파일만 넘긴다.** workspace 밖 파일은 jest `roots` 밖이라
+ * 항상 0 을 반환하며, 그 0 을 "관련 테스트 없음" 으로 읽으면 조용한 누락이 된다 (IR §6-3).
+ *
+ * 실행 실패·타임아웃은 **에러가 아니라 fallback 신호**다. 호출자가 full 로 되돌린다.
+ */
+export function findRelatedApiJestSpecs(changedFiles, root = REPO_ROOT, opts = {}) {
+  const workspaceAbs = path.join(root, ...API_DIR.split('/'));
+  const targets = [...new Set([
+    ...changedFiles
+      .filter((f) => f.status !== 'D' && f.path.startsWith(`${API_DIR}/src/`))
+      .map((f) => f.path.slice(API_DIR.length + 1)),
+    // database 변경 시 schema anchor 까지 module graph 로 확장한다 (§11)
+    ...(opts.extraTargets ?? []).filter((t) => existsSync(path.join(workspaceAbs, ...t.split('/')))),
+  ])];
+  if (targets.length === 0) return { ok: true, specs: [] };
+
+  const run = opts.run ?? ((args, cwd) =>
+    spawnSync('npx', ['jest', ...args], { cwd, encoding: 'utf-8', shell: true, maxBuffer: 64 * 1024 * 1024 }));
+
+  const res = run(['--listTests', '--findRelatedTests', ...targets], path.join(root, ...API_DIR.split('/')));
+  if (!res || res.status !== 0 || typeof res.stdout !== 'string') {
+    return { ok: false, specs: [], reason: 'findRelatedTests 실행 실패' };
+  }
+  const specs = res.stdout
+    .split('\n')
+    .map((line) => normalize(line.trim()))
+    .filter((line) => line.includes('/apps/api-server/src/'))
+    .map((line) => line.slice(line.indexOf('/apps/api-server/src/') + '/apps/api-server/'.length));
+  return { ok: true, specs };
+}
+
+/** 변경된 test 파일 자신 (§9 — test-only 변경이 0 suite 로 붕괴하면 안 된다) */
+export function changedApiJestSpecs(changedFiles) {
+  return changedFiles
+    .filter((f) => f.status !== 'D')
+    .filter((f) => f.path.startsWith(`${API_DIR}/src/`) && JEST_TEST_FILE.test(f.path))
+    .map((f) => f.path.slice(API_DIR.length + 1));
+}
+
+// --- mandatory full fallback (WO §12) --------------------------------------
+
+const API_JEST_ROOT_BUILD_EXACT = new Set([
+  'pnpm-lock.yaml',
+  'pnpm-workspace.yaml',
+  'package.json',
+  'turbo.json',
+]);
+const API_JEST_ROOT_TSCONFIG = /^tsconfig[^/]*\.json$/;
+const API_JEST_CONFIG_EXACT = new Set([
+  'apps/api-server/jest.config.cjs',
+  'apps/api-server/package.json',
+  'apps/api-server/tsconfig.json',
+]);
+const API_JEST_SETUP_PREFIX = `${API_DIR}/src/__tests__/setup/`;
+const API_JEST_FRAMEWORK_DEPS = ['jest', 'ts-jest', '@types/jest', 'supertest', 'babel-jest', 'jest-environment'];
+/** 변경 파일이 이보다 많으면 선별 이득보다 위험이 크다 */
+export const API_JEST_LARGE_CHANGE_THRESHOLD = 200;
+/** 전체의 이 비율을 넘으면 full 이 더 싸다 */
+export const API_JEST_SELECTED_RATIO_LIMIT = 0.8;
+
+export function apiJestFullFallbackReason(changedFiles, verdict, opts = {}) {
+  if (verdict?.global_or_unknown) return 'global_or_unknown — 전역/미분류 경로 변경';
+  if (opts.manualFull) return 'manual full override';
+  if (changedFiles.length > API_JEST_LARGE_CHANGE_THRESHOLD) {
+    return `대규모 변경 (${changedFiles.length} > ${API_JEST_LARGE_CHANGE_THRESHOLD})`;
+  }
+  for (const { path: file } of changedFiles) {
+    if (API_JEST_ROOT_BUILD_EXACT.has(file)) return `root build config 변경 — ${file}`;
+    if (API_JEST_ROOT_TSCONFIG.test(file)) return `root tsconfig 변경 — ${file}`;
+    if (API_JEST_CONFIG_EXACT.has(file)) return `Jest/빌드 설정 변경 — ${file}`;
+    if (file.startsWith(API_JEST_SETUP_PREFIX)) return `Jest setup 변경 — ${file}`;
+  }
+  if (opts.frameworkDepChanged) return 'test framework dependency 변경';
+  return null;
+}
+
+/** pnpm-lock 은 이미 full 대상이지만, package.json 의 test framework 의존 변경도 잡는다 */
+export function apiJestFrameworkDepChanged(baseText, headText) {
+  if (typeof baseText !== 'string' || typeof headText !== 'string') return false;
+  const pick = (text) => {
+    try {
+      const pkg = JSON.parse(text);
+      const out = {};
+      for (const field of DEP_FIELDS) {
+        for (const [name, range] of Object.entries(pkg?.[field] ?? {})) {
+          if (API_JEST_FRAMEWORK_DEPS.some((dep) => name === dep || name.startsWith(`${dep}-`) || name.startsWith(`${dep}/`))) {
+            out[`${field}:${name}`] = range;
+          }
+        }
+      }
+      return out;
+    } catch { return null; }
+  };
+  const a = pick(baseText); const b = pick(headText);
+  if (a === null || b === null) return true; // 파싱 실패 = 안전하게 full
+  return JSON.stringify(a) !== JSON.stringify(b);
+}
+
+/**
+ * Model B 선택 집합 (Phase 0 shadow).
+ *
+ * @returns {{ mode: 'full'|'selected', specs: string[], reason: string, components: object }}
+ */
+export function selectApiJestSpecs(changedFiles, graph, root = REPO_ROOT, opts = {}) {
+  const specs = listApiJestSpecs(root);
+  const fullCount = specs.length;
+  const alwaysRun = deriveAlwaysRunSpecs(specs);
+  const emptyComponents = {
+    fullSuiteCount: fullCount,
+    findRelated: 0,
+    staticImport: 0,
+    routeInventory: 0,
+    rawSource: 0,
+    alwaysRun: alwaysRun.length,
+    migration: 0,
+    changedTests: 0,
+  };
+
+  const forced = apiJestFullFallbackReason(changedFiles, opts.verdict ?? {}, opts);
+  if (forced) return { mode: 'full', specs: [], reason: forced, components: emptyComponents };
+  if (fullCount === 0) {
+    return { mode: 'full', specs: [], reason: 'api-server test 목록 수집 실패', components: emptyComponents };
+  }
+
+  const touchesDatabase = changedFiles.some((f) => f.path.startsWith(`${API_DIR}/src/database/`));
+  const migration = touchesDatabase ? deriveMigrationSpecs(specs) : [];
+  const routeInventory = touchesApiRoutes(changedFiles) ? deriveRouteInventorySpecs(specs) : [];
+  const staticImport = staticImportApiJestSpecs(changedFiles, opts.importGraph ?? buildApiSourceImportGraph(root));
+  const rawSource = selectApiJestRawSourceSpecs(changedFiles, graph, specs);
+  const changedTests = changedApiJestSpecs(changedFiles);
+
+  // 변경된 workspace package → 그것을 import 하는 api-server 파일 (roots 경계 우회)
+  const changedPkgs = new Set();
+  for (const { path: file } of changedFiles) {
+    if (file.startsWith(`${API_DIR}/`)) continue;
+    const wsDir = workspaceDirOf(graph, file);
+    const name = wsDir ? graph.byDir.get(wsDir) : null;
+    if (name) changedPkgs.add(name);
+  }
+  const bridgeTargets = changedPkgs.size
+    ? apiImporterFilesFor(reverseWorkspaceClosure(changedPkgs, graph), root)
+    : [];
+
+  const related = opts.skipFindRelated
+    ? { ok: true, specs: [] }
+    : findRelatedApiJestSpecs(changedFiles, root, {
+        ...opts,
+        extraTargets: [
+          ...(touchesDatabase ? API_JEST_DATABASE_ANCHORS : []),
+          ...bridgeTargets,
+        ],
+      });
+  if (!related.ok) {
+    return {
+      mode: 'full',
+      specs: [],
+      reason: related.reason ?? 'findRelatedTests 판정 불가',
+      components: { ...emptyComponents, rawSource: rawSource.length, migration: migration.length, changedTests: changedTests.length },
+    };
+  }
+
+  const known = new Set(specs.map((s) => s.rel));
+  const union = new Set();
+  for (const group of [alwaysRun, migration, routeInventory, staticImport, related.specs, rawSource, changedTests]) {
+    for (const s of group) union.add(s);
+  }
+
+  const components = {
+    fullSuiteCount: fullCount,
+    findRelated: related.specs.length,
+    staticImport: staticImport.length,
+    routeInventory: routeInventory.length,
+    importerBridge: bridgeTargets.length,
+    rawSource: rawSource.length,
+    alwaysRun: alwaysRun.length,
+    migration: migration.length,
+    changedTests: changedTests.length,
+  };
+
+  // selector 결과 이상 — 존재하지 않는 경로가 섞이면 판정을 믿지 않는다
+  const unknown = [...union].filter((s) => !known.has(s));
+  if (unknown.length > 0) {
+    return { mode: 'full', specs: [], reason: `selector 결과 이상 — 미지 경로 ${unknown.length}건 (${unknown[0]})`, components };
+  }
+  if (union.size === 0) {
+    return { mode: 'full', specs: [], reason: 'selector 결과 이상 — 선택 0건', components };
+  }
+  if (union.size > fullCount * API_JEST_SELECTED_RATIO_LIMIT) {
+    return {
+      mode: 'full',
+      specs: [],
+      reason: `선택 ${union.size}/${fullCount} 가 ${API_JEST_SELECTED_RATIO_LIMIT * 100}% 초과 — full 이 더 싸다`,
+      components,
+    };
+  }
+
+  return {
+    mode: 'selected',
+    specs: [...union].sort(),
+    reason: `always ${alwaysRun.length} + raw ${rawSource.length} + related ${related.specs.length}`
+      + `${staticImport.length ? ` + staticImport ${staticImport.length}` : ''}`
+      + `${routeInventory.length ? ` + routeInventory ${routeInventory.length}` : ''}`
+      + `${migration.length ? ` + migration ${migration.length}` : ''}`
+      + `${changedTests.length ? ` + changedTests ${changedTests.length}` : ''}`,
+    components,
+  };
+}
+
+// ---------------------------------------------------------------------------
 // CLI
 // ---------------------------------------------------------------------------
 
@@ -1051,6 +1627,47 @@ function main() {
       return;
     }
     process.stdout.write(`${selectPathGuardSpecs(read.files, graph).join(' ')}\n`);
+    return;
+  }
+
+  // WO-O4O-API-JEST-AFFECTED-TEST-EXECUTION-PHASE0-SHADOW-V1 §5 · §14
+  // **Phase 0 은 shadow 다.** 이 출력으로 CI 의 Jest 실행 범위를 줄이지 않는다.
+  // workflow 는 full Jest 를 그대로 돌리고, 이 결과는 로그·artifact 로만 남긴다.
+  if (mode === 'api-jest') {
+    const manualFull = argv.includes('--full') || process.env.FULL_JEST === 'true';
+    const jestVerdict = read.ok ? classify(read.files, graph) : { global_or_unknown: true };
+    const result = read.ok
+      ? selectApiJestSpecs(read.files, graph, REPO_ROOT, { verdict: jestVerdict, manualFull })
+      : {
+          mode: 'full',
+          specs: [],
+          reason: `변경 파일 수집 실패 — ${read.reason}`,
+          components: { fullSuiteCount: listApiJestSpecs().length },
+        };
+    const payload = {
+      baseSha: read.base ?? null,
+      headSha: read.head ?? null,
+      mode: result.mode,
+      reason: result.reason,
+      changedFiles: read.ok ? read.files.map((x) => x.path) : [],
+      fullSuiteCount: result.components.fullSuiteCount,
+      selectedSuiteCount: result.specs.length,
+      components: result.components,
+      specs: result.specs,
+    };
+    process.stdout.write(`${JSON.stringify(payload, null, 2)}\n`);
+    if (process.env.GITHUB_OUTPUT) {
+      appendFileSync(
+        process.env.GITHUB_OUTPUT,
+        [
+          `api_jest_mode=${result.mode}`,
+          `api_jest_specs=${result.specs.join(' ')}`,
+          `api_jest_reason=${result.reason.replace(/\r?\n/g, ' ').slice(0, 900)}`,
+          '',
+        ].join('\n'),
+        'utf-8',
+      );
+    }
     return;
   }
 

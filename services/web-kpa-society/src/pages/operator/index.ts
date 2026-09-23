@@ -19,7 +19,6 @@ export { default as ProductApplicationManagementPage } from './ProductApplicatio
 export { default as CommunityManagementPage } from './CommunityManagementPage';
 export { default as QualificationRequestsPage } from './QualificationRequestsPage';
 // WO-KPA-OPERATOR-LMS-MENU-AND-MANAGEMENT-PAGE-RESTORE-V1
-export { default as OperatorLmsCoursesPage } from './OperatorLmsCoursesPage';
 // WO-KPA-OPERATOR-RESOURCES-MANAGEMENT-MENU-V1
 export { default as OperatorResourcesPage } from './OperatorResourcesPage';
 // WO-O4O-KPA-OPERATOR-PRODUCT-ORDER-VIEW-INTRODUCE-V1: 상품 현황 (view-only)

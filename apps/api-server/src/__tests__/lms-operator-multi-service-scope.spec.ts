@@ -1,65 +1,65 @@
 /**
- * WO-O4O-KPA-PHARMACYHUB-COMMUNITY-MY-STORE-PRODUCTION-CLOSURE-V1 §15
+ * WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2
  *
- * production smoke 결함: PH operator 콘솔의 `승인 (공개)` CTA 가 403
- * `SERVICE_SCOPE_VIOLATION` 으로 실패했다 (dead CTA).
+ * 종전(WO-O4O-KPA-PHARMACYHUB-COMMUNITY-MY-STORE-PRODUCTION-CLOSURE-V1 §15) 이 파일은
+ * `isCourseAccessibleByOperator` 의 다중 서비스 운영자(kpa / cosmetics / pharmacy-hub) 판정을
+ * 고정했다. Phase 2 에서 LMS runtime 의 Application Service 는 O4O 강의(lecture) 하나뿐이므로
+ * 서비스 allowlist 자체가 사라졌다. 본 spec 은 그 은퇴를 정적으로 고정한다.
  *
- * 원인: `isCourseAccessibleByOperator` 가 역할 목록에서 **첫 서비스 역할 하나만** 보고
- *      즉시 판정했다. 다중 서비스 운영자(`kpa:store_owner` 가 앞, `pharmacy-hub:operator`
- *      가 뒤)는 자기 서비스 강의에도 접근하지 못했다.
- *
- * 계약: 역할 목록 전체를 확인한다. 단, 매칭 대상은 운영 역할(admin·operator)로 제한해
- *      store_owner 같은 비운영 역할이 다른 서비스 권한을 만들지 않게 한다.
+ * 계약:
+ *   - 운영자 경로 guard = requireLectureOperator (active lecture membership + lecture:operator|admin)
+ *   - 운영 대상 = course.serviceKey === 'lecture' 만. 그 외(legacy NULL 포함)는 non-disclosure 404
+ *   - kpa:* / cosmetics:* / pharmacy-hub:* / admin / super_admin 문자열 allowlist 0
  */
 import { readFileSync } from 'fs';
 import { join } from 'path';
 
-const ROUTES = readFileSync(
-  join(__dirname, '../modules/lms/routes/lms.routes.ts'),
-  'utf-8',
-);
-const FN = ROUTES.slice(
-  ROUTES.indexOf('function isCourseAccessibleByOperator'),
-  ROUTES.indexOf('const router: Router = Router();'),
-);
+const ROUTES = readFileSync(join(__dirname, '../modules/lms/routes/lms.routes.ts'), 'utf-8');
+// PR #225 merge-gate repair: isLectureCourse 는 lecture-access.ts 로 승격(CourseController 강사 write 경로와 공유)
+const ACCESS = readFileSync(join(__dirname, '../modules/lms/middleware/lecture-access.ts'), 'utf-8');
 
-describe('LMS operator service scope — 다중 서비스 운영자 (§15)', () => {
-  it('역할 목록 전체를 확인한다 (첫 역할만 보고 단정하지 않는다)', () => {
-    expect(FN).toContain('roles.some(');
-    expect(FN).not.toMatch(/for \(const role of roles\)/);
+describe('LMS operator route — Lecture 전용 (다중 서비스 allowlist 은퇴)', () => {
+  it('서비스 allowlist 판정 함수와 KPA guard 가 남아 있지 않다', () => {
+    expect(ROUTES).not.toContain('isCourseAccessibleByOperator');
+    expect(ROUTES).not.toContain('requireLmsOperator');
+    expect(ROUTES).not.toContain('requireKpaAdmin');
+    expect(ROUTES).not.toContain('KPA_SCOPE_CONFIG');
+    expect(ROUTES).not.toContain('PLATFORM_ADMIN_ROLES');
+    expect(ROUTES).not.toContain("'cosmetics:admin'");
+    expect(ROUTES).not.toContain("'pharmacy-hub:operator'");
+    expect(ROUTES).not.toContain('SERVICE_SCOPE_VIOLATION');
   });
 
-  it('매칭 대상을 운영 역할(admin·operator)로 제한한다', () => {
-    expect(FN).toContain("suffix !== 'admin' && suffix !== 'operator'");
+  it('운영 mutation 5종은 requireLectureOperator 로만 보호된다', () => {
+    const lines = ROUTES.split('\n');
+    for (const p of [
+      "router.post('/operator/courses/:id/unpublish'",
+      "router.post('/operator/courses/:id/approve'",
+      "router.post('/operator/courses/:id/reject'",
+      "router.post('/operator/courses/:id/archive'",
+      "router.delete('/operator/courses/:id/hard'",
+    ]) {
+      const line = lines.find((l) => l.includes(p));
+      expect(line).toBeDefined();
+      // 11차 P1-30: apiLimiter 가 인증 뒤 · guard 앞에 온다 (키에 userId 가 실린다)
+      expect(line).toContain('ipBurstLimiter, requireAuth, apiLimiter, requireLectureOperator');
+    }
   });
 
-  it('platform admin bypass 와 legacy(unscoped) 강의 허용은 유지한다', () => {
-    expect(FN).toContain('PLATFORM_ADMIN_ROLES.has(r)');
-    expect(FN).toContain('if (!courseServiceKey) return true;');
+  it('운영 목록(GET /operator/courses)이 존재하며 requireLectureOperator 로 보호된다', () => {
+    expect(ROUTES).toMatch(/router\.get\('\/operator\/courses',\s*ipBurstLimiter,\s*requireAuth,\s*apiLimiter,\s*requireLectureOperator/);
   });
 
-  it('canonical serviceKey 해석은 security-core SSOT 를 계속 사용한다', () => {
-    expect(FN).toContain('resolveCanonicalServiceKey(prefix) === courseServiceKey');
+  it('운영 대상은 course.serviceKey === lecture 만이며, 그 외는 404 (403 아님)', () => {
+    expect(ACCESS).toContain("export function isLectureCourse(courseServiceKey: string | null | undefined): boolean");
+    expect(ACCESS).toContain('return courseServiceKey === SERVICE_KEYS.LECTURE;');
+    expect(ROUTES).toContain("import { requireLectureLearner, requireLectureOperator, isLectureCourse } from '../middleware/lecture-access.js';");
+    expect(ROUTES).not.toContain('function isLectureCourse(');
+    const checks = ROUTES.match(/if \(!isLectureCourse\(course\.serviceKey\)\) \{ return res\.status\(404\)/g) ?? [];
+    expect(checks.length).toBe(5);
   });
 
-  it('시뮬레이션: kpa:store_owner 가 앞선 pharmacy-hub 운영자도 PH 강의에 접근한다', () => {
-    const resolve = (p: string) => (p === 'kpa' ? 'kpa-society' : p);
-    const accessible = (roles: string[], courseServiceKey: string | null) => {
-      if (roles.some((r) => ['admin', 'super_admin', 'platform:super_admin'].includes(r))) return true;
-      if (!courseServiceKey) return true;
-      return roles.some((role) => {
-        const colon = role.indexOf(':');
-        if (colon <= 0) return false;
-        const prefix = role.slice(0, colon);
-        const suffix = role.slice(colon + 1);
-        if (prefix === 'lms' || prefix === 'platform') return false;
-        if (suffix !== 'admin' && suffix !== 'operator') return false;
-        return resolve(prefix) === courseServiceKey;
-      });
-    };
-    const roles = ['kpa:store_owner', 'pharmacy-hub:operator', 'pharmacy-hub:admin'];
-    expect(accessible(roles, 'pharmacy-hub')).toBe(true);
-    // 비운영 역할만 가진 서비스의 강의에는 접근하지 못한다
-    expect(accessible(['kpa:store_owner', 'pharmacy-hub:operator'], 'kpa-society')).toBe(false);
+  it('generic LMS 라우터는 lecture 컨텍스트를 서버가 고정한다 (client serviceKey 미신뢰)', () => {
+    expect(ROUTES).toContain('router.use(lmsContextMiddleware({ serviceCode: SERVICE_KEYS.LECTURE }));');
   });
 });

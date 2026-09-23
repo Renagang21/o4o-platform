@@ -55,6 +55,8 @@ export function lmsContextMiddleware(context: LmsContext): RequestHandler {
  * 값은 `SERVICE_KEYS` SSOT 에서만 파생한다 (로컬 문자열 리터럴 정의 금지).
  */
 const LMS_SCOPED_SERVICE_KEYS: ReadonlySet<string> = new Set<string>([
+  // WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2: LMS runtime 의 유일한 Application Service
+  SERVICE_KEYS.LECTURE,
   SERVICE_KEYS.KPA_SOCIETY,
   SERVICE_KEYS.K_COSMETICS,
   SERVICE_KEYS.NETURE,
@@ -103,15 +105,16 @@ export function resolveLmsServiceScope(req: Request): string | undefined {
 /**
  * 강의 1건이 현재 service scope 에 속하는지 판단한다.
  *
- * `service_key IS NULL` 은 legacy 강의다. 기존 코드가 일관되게 쓰는 fallback
- * (`course.serviceKey ?? 'kpa-society'` — CourseService / AssignmentService /
- * CertificateController)과 동일하게 KPA scope 에만 포함시킨다.
+ * WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2 §8:
+ * `service_key IS NULL` 을 KPA 로 귀속시키던 fallback 을 제거했다. scope 가 있는 요청에서
+ * NULL 강의는 어떤 서비스에도 속하지 않는다 (data cutover 이전의 legacy row 는 Lecture
+ * 경로에 노출되지 않는다 — 노출은 migration 으로만 해결한다).
  */
 export function isCourseInServiceScope(
   courseServiceKey: string | null | undefined,
   scope: string | undefined,
 ): boolean {
   if (!scope) return true; // 무경계 요청
-  const effective = courseServiceKey ?? SERVICE_KEYS.KPA_SOCIETY;
-  return effective === scope;
+  if (!courseServiceKey) return false;
+  return courseServiceKey === scope;
 }

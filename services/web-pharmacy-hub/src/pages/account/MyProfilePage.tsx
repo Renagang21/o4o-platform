@@ -27,10 +27,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 import {
-  Award,
   ClipboardList,
   Coins,
-  GraduationCap,
   Mail,
   MessageSquare,
   Phone,
@@ -347,8 +345,7 @@ export default function MyProfilePage({
         items={[
           { key: 'my-posts', title: '내 글', href: '/forum/my-posts', icon: <MessageSquare className="h-5 w-5" /> },
           { key: 'my-forums', title: '내 포럼', href: '/forum/my-dashboard', icon: <UsersRound className="h-5 w-5" /> },
-          { key: 'enrollments', title: '내 수강', href: '/account/enrollments', icon: <GraduationCap className="h-5 w-5" /> },
-          { key: 'certificates', title: '내 수료증', href: '/account/certificates', icon: <Award className="h-5 w-5" /> },
+          // 내 수강 · 내 수료증 — Phase 2 §14 (WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1): 독립 강의 서비스 소유 — 제거
           { key: 'credits', title: '내 크레딧', href: '/account/credits', icon: <Coins className="h-5 w-5" /> },
           { key: 'my-requests', title: '내 신청', href: '/account/my-requests', icon: <ClipboardList className="h-5 w-5" /> },
         ]}

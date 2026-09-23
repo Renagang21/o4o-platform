@@ -98,7 +98,6 @@ const CAPABILITY_LABELS: Record<string, string> = {
   'kpa:store_owner': '매장 운영',
   'kpa:operator': '운영자',
   'kpa:admin': '관리자',
-  'lms:instructor': '강사',
   'platform:super_admin': '플랫폼 관리자',
 };
 
@@ -107,7 +106,6 @@ const CAPABILITY_PRIORITY: Record<string, number> = {
   'kpa:admin': 1,
   'kpa:operator': 2,
   'kpa:store_owner': 3,
-  'lms:instructor': 4,
 };
 
 function sortCapabilities(caps: string[]): string[] {

@@ -36,7 +36,6 @@ import {
   AppEntrySection,
   O4OHelpSection,
   ForumIcon,
-  EducationIcon,
   ContentIcon,
   SignageIcon,
   ResourcesIcon,
@@ -52,7 +51,8 @@ import { useAuthModal } from '../contexts/LoginModalContext';
 //   3서비스에 인라인 복제돼 있던 구현을 공통 View(@o4o/shared-space-ui `LatestActivitySection`) 로
 //   이관했다. 여기에는 KPA 정책(탭 바로가기 경로 · accent)만 남는다.
 
-const LATEST_TABS = buildLatestActivityTabs();
+// WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2 §14: '강의' 탭 제거 (backend /home/latest 도 course 미제공)
+const LATEST_TABS = buildLatestActivityTabs().filter((t) => t.key !== 'course');
 
 
 // ─── 서비스 전용 아이콘 ─────────────────────────────────────
@@ -231,7 +231,6 @@ export function CommunityHomePage() {
       }
       appEntryCards={[
         { title: '포럼', description: '동료 약사와 질문·토론으로 전문성을 높이세요', href: '/forum', icon: <span className={iconCls}><ForumIcon /></span> },
-        { title: '강의', description: '보수교육·세미나를 온라인으로 수강하세요', href: '/lms', icon: <span className={iconCls}><EducationIcon /></span> },
         { title: '콘텐츠', description: '플랫폼 콘텐츠를 검색하고 활용하세요', href: '/content', icon: <span className={iconCls}><ContentIcon /></span> },
         { title: '디지털사이니지', description: '매장 화면에 송출할 콘텐츠를 관리하세요', href: '/signage', icon: <span className={iconCls}><SignageIcon size={24} /></span> },
         { title: '자료실', description: '자료를 저장하고 AI 작업에 활용하세요', href: '/resources', icon: <span className={iconCls}><ResourcesIcon /></span> },

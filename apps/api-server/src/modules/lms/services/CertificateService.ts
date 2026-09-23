@@ -26,6 +26,33 @@ export interface UpdateCertificateRequest {
   metadata?: Record<string, any>;
 }
 
+/**
+ * PR #225 merge-gate 11차 P1: certificate 수정 가능 필드 allowlist.
+ *
+ * `updateCertificate` 는 `Object.assign(certificate, data)` 로 임의 키를 반영했기 때문에
+ * `courseId` · `userId` · `id` 를 실어 보내면 scope 검사(lecture 인지)를 통과한 뒤
+ * 인증서를 다른 강의 · 다른 사용자 소유로 옮길 수 있었다.
+ * 계약: 지원하는 5개 필드 밖의 키는 조용히 버린다.
+ */
+const UPDATABLE_CERTIFICATE_FIELDS = [
+  'certificateUrl',
+  'badgeUrl',
+  'isValid',
+  'expiresAt',
+  'metadata',
+] as const satisfies ReadonlyArray<keyof UpdateCertificateRequest>;
+
+export function pickUpdatableCertificateFields(input: unknown): UpdateCertificateRequest {
+  const source = (input ?? {}) as Record<string, unknown>;
+  const picked: Record<string, unknown> = {};
+  for (const key of UPDATABLE_CERTIFICATE_FIELDS) {
+    if (Object.prototype.hasOwnProperty.call(source, key)) {
+      picked[key] = source[key];
+    }
+  }
+  return picked as UpdateCertificateRequest;
+}
+
 export interface CertificateFilters {
   userId?: string;
   /**
@@ -238,11 +265,14 @@ export class CertificateService extends BaseService<Certificate> {
     return { certificates, total };
   }
 
-  async updateCertificate(id: string, data: UpdateCertificateRequest): Promise<Certificate> {
+  async updateCertificate(id: string, input: UpdateCertificateRequest): Promise<Certificate> {
     const certificate = await this.getCertificate(id);
     if (!certificate) {
       throw new Error(`Certificate not found: ${id}`);
     }
+
+    // PR #225 merge-gate 11차 P1: allowlist 밖 키(courseId · userId · id)는 여기서 제거한다.
+    const data = pickUpdatableCertificateFields(input);
 
     // Update fields
     Object.assign(certificate, data);

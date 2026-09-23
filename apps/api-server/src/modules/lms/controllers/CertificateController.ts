@@ -5,7 +5,7 @@ import { generateCertificatePdf } from '../utils/certificatePdf.js';
 import logger from '../../../utils/logger.js';
 // WO-O4O-LMS-CROSSSERVICE-READ-WRITE-BOUNDARY-COMPLETION-V1 §7
 // 수료증 발급/UX 정책은 서비스별로 유지하고, service boundary 만 공통 보장한다.
-import { guardLoadedCourseScope, resolveScopeOrRespond } from '../utils/lms-scope-guard.js';
+import { guardCourseScope, guardLoadedCourseScope, resolveScopeOrRespond } from '../utils/lms-scope-guard.js';
 // WO-O4O-LMS-CERTIFICATE-OWNERSHIP-AND-READ-AUTHORIZATION-BOUNDARY-FIX-V1
 // private read 는 scope → ownership 순으로 공통 helper 가 판정한다.
 import {
@@ -49,6 +49,9 @@ export class CertificateController extends BaseController {
       const data = req.body;
       const issuedBy = (req as any).user?.id;
       const service = CertificateService.getInstance();
+
+      // PR #225 merge-gate: 발급 대상 course 는 lecture scope 만 (legacy KPA/PH courseId 는 non-disclosure 404).
+      if (!(await guardCourseScope(req, res, data?.courseId))) return;
 
       const certificate = await service.issueCertificate(data, issuedBy);
 
@@ -184,11 +187,31 @@ export class CertificateController extends BaseController {
     }
   }
 
+  /**
+   * PR #225 merge-gate 재검토 P1-9: update/revoke/renew 대상 certificate 는 lecture course 의 것만.
+   * legacy(KPA/PH) certificate 는 non-disclosure 404 · write 0. `null` 이면 이미 응답된 상태다.
+   */
+  private static async loadLectureCertificateOr404(req: Request, res: Response, id: string | undefined) {
+    if (!id) {
+      BaseController.notFound(res, 'Certificate not found');
+      return null;
+    }
+    const certificate = await CertificateService.getInstance().getCertificate(id);
+    if (!certificate) {
+      BaseController.notFound(res, 'Certificate not found');
+      return null;
+    }
+    if (!guardLoadedCourseScope(req, res, certificate.course?.serviceKey, 'Certificate not found')) return null;
+    return certificate;
+  }
+
   static async updateCertificate(req: Request, res: Response): Promise<any> {
     try {
       const { id } = req.params;
       const data = req.body;
       const service = CertificateService.getInstance();
+
+      if (!(await CertificateController.loadLectureCertificateOr404(req, res, id))) return;
 
       const certificate = await service.updateCertificate(id, data);
 
@@ -209,6 +232,8 @@ export class CertificateController extends BaseController {
       const { id } = req.params;
       const service = CertificateService.getInstance();
 
+      if (!(await CertificateController.loadLectureCertificateOr404(req, res, id))) return;
+
       const certificate = await service.revokeCertificate(id);
 
       return BaseController.ok(res, { certificate, message: 'Certificate revoked successfully' });
@@ -228,6 +253,8 @@ export class CertificateController extends BaseController {
       const { id } = req.params;
       const { months } = req.body;
       const service = CertificateService.getInstance();
+
+      if (!(await CertificateController.loadLectureCertificateOr404(req, res, id))) return;
 
       const certificate = await service.renewCertificate(id, months);
 
@@ -279,7 +306,7 @@ export class CertificateController extends BaseController {
       const userName = (certificate.user as any)?.name || '수강자';
       const courseTitle = certificate.course?.title || '과정';
 
-      // WO-O4O-LMS-CERTIFICATE-DOMAIN-V1: serviceKey 기준 도메인 결정 (legacy null → KPA fallback)
+      // WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2 §17: 검증 링크는 Lecture(study.neture.co.kr) 단일 — KPA fallback 없음.
       const frontendBase = resolveVerificationBase(certificate.course?.serviceKey);
       const verificationUrl = `${frontendBase}/certificate/verify/${certificate.id}`;
 

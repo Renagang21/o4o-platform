@@ -11,7 +11,7 @@
  *   platform:super_admin / kpa:admin → /admin
  *   kpa:operator                     → /operator
  *   kpa:store_owner                  → /store (내 약국 — O4O 공통 철학 정렬)
- *   그 외 (lms:instructor, kpa:pharmacist, kpa:student, 없음)
+ *   그 외 (kpa:pharmacist, kpa:student, 없음)
  *     → null (메인/커뮤니티 유지)
  *
  * O4O 공통 철학 정렬 (WO-O4O-KPA-POSTLOGIN-STOREOWNER-DASHBOARD-ALIGNMENT-V1):
@@ -20,7 +20,7 @@
  *   본 변경은 WO-O4O-KPA-POST-LOGIN-PRIMARY-ROUTE-FIX-V1 의 "store_owner 도 커뮤니티 Home 유지"
  *   결정을 supersede 한다. (선행 IR: IR-O4O-CROSSSERVICE-POSTLOGIN-STOREOWNER-DASHBOARD-POLICY-AUDIT-V1,
  *   IR-O4O-KPA-STOREOWNER-AUTO-STORE-ACCESS-FLOW-AUDIT-V1 — 별도 사용승인 게이트 없음 확인.)
- *   강사 대시보드(/instructor)는 여전히 메뉴에서 직접 진입한다.
+ *   (강사 대시보드는 Phase 2 §14 로 KPA 에서 제거 — 독립 강의 서비스 소유)
  *   일반 회원/약사/약대생은 기존처럼 메인/커뮤니티를 유지한다.
  *   공개 Home("/") 구조는 변경하지 않는다.
  *
@@ -35,7 +35,7 @@ import type { User } from '../contexts/AuthContext';
  * 역할 우선순위 — 다중 역할 보유 시 첫 번째 매칭 역할이 redirect 결정.
  *
  * WO-O4O-KPA-POST-LOGIN-PRIMARY-ROUTE-FIX-V1:
- *   - lms:instructor 제거 — 강사 대시보드는 메뉴에서 직접 진입한다.
+ *   - lms:instructor 제거 — 강사 역할은 lecture 서비스 소유(Phase 2 §13).
  *     (약국 경영자 + 강사 / 일반 강사 모두 메인/커뮤니티 유지)
  *   - kpa:admin / kpa:operator 는 운영 화면 자동 진입 정책 유지.
  *

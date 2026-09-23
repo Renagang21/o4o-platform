@@ -2,8 +2,12 @@ import { Route } from 'react-router-dom';
 import { AdminProtectedRoute } from '@o4o/auth-context';
 import { Suspense, lazy } from 'react';
 
-// LMS-Instructor Pages (WO-LMS-INSTRUCTOR-DASHBOARD-UX-REFINEMENT-V1)
-const LmsInstructorRouter = lazy(() => import('@/pages/lms-instructor/LmsInstructorRouter'));
+/**
+ * LMS instructor 관리 콘솔(/admin/lms-instructor/*) 제거
+ * (WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2 §11)
+ * Platform Admin 은 Lecture 화면을 소유하지 않는다 — 수강 승인 · 강사 관리는
+ * O4O 강의(study.neture.co.kr) 의 Instructor/Operator surface 로 이동했다.
+ */
 
 /**
  * LMS-Marketing publisher/onboarding/automation/engagement 콘솔 제거
@@ -53,20 +57,13 @@ const PageLoader = () => (
 );
 
 /**
- * LMS instructor · digital signage · store content/POP/QR/tablet routes
+ * digital signage · store content/POP/QR/tablet routes
  *
  * (파일명은 역사적 이유로 `lms-marketing.routes` 를 유지한다. marketing publisher 콘솔은
  *  WO-O4O-ADMIN-LMS-MARKETING-CONSOLE-RETIREMENT-V1 에서 제거됐다.)
  */
 export function LmsMarketingRoutes() {
   return [
-    // LMS-Instructor Dashboard (WO-LMS-INSTRUCTOR-DASHBOARD-UX-REFINEMENT-V1)
-    <Route key="/admin/lms-instructor/*" path="/admin/lms-instructor/*" element={
-      <Suspense fallback={<PageLoader />}>
-        <LmsInstructorRouter />
-      </Suspense>
-    } />,
-
     // Digital Signage Management (Phase 6)
     <Route key="/admin/digital-signage/*" path="/admin/digital-signage/*" element={
       <AdminProtectedRoute requiredRoles={['admin']}>

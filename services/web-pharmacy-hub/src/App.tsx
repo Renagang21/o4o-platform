@@ -25,9 +25,7 @@
  *   /community/search            커뮤니티 검색 (동일 WO §6 — forum 중심)
  *   /news                        뉴스 목록 (public · 공통 cms_contents type='news')
  *   /news/:id                    뉴스 상세 (WO-O4O-PHARMACYHUB-HOME-NEWS-AND-USAGE-GUIDE-REALIGNMENT-V1 §3)
- *   /education                   교육 허브 (동일 WO §7 — 공통 LmsHubTemplate)
- *   /education/course/:id        강의 상세 (공통 CourseDetailView · 수강신청 활성 — LMS learner adoption WO §6)
- *   /education/course/:courseId/lesson/:lessonId  레슨 (공통 LessonPlayerView)
+ *   /education/*                 → 독립 강의 서비스 외부 이동 (WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2 §14)
  *   /operator                    운영자 셸 (OperatorLayoutWrapper — 공통 OperatorAreaShell)
  *     ├ (index)                  서비스 운영자 진입점
  *     ├ /memberships             가입 신청 관리 목록
@@ -55,10 +53,9 @@
  *     ├ /blog/:id/edit           블로그 글 수정 (동일 WO)
  *     ├ /info                  매장 정보 (조직 · WO-...-STORE-INFO-AND-ACCOUNT-V1)
  *     └ /account                 내 계정 (사용자 · 동일 WO)
- *        ├ /account/enrollments   내 수강 목록 (LMS learner adoption WO §7)
- *        ├ /account/certificates  내 수료증 (동일 WO §11)
- *        └ /account/credits       내 크레딧 (동일 WO §15)
- *   /certificate/verify/:id      수료증 공개 검증 (동일 WO §10 · 인증 없음)
+ *        ├ /account/enrollments · /account/certificates → 독립 강의 서비스 외부 이동 (Phase 2 §14)
+ *        └ /account/credits       내 크레딧 (LMS learner adoption WO §15)
+ *   /certificate/verify/:id      → 독립 강의 서비스 외부 이동 (Phase 2 §17)
  *   /store-owner/payment         결제 (셸 동일 · 사이드바 메뉴 미노출 deep route)
  *     ├ /success                 PG 성공 callback
  *     └ /fail                    PG 실패 callback
@@ -73,7 +70,8 @@
 
 // WO-O4O-WEB-CATCH-ALL-ROUTE-CROSS-SERVICE-V1: catch-all 은 Navigate 가 아니라 NotFoundPage 다.
 // WO-O4O-PHARMACYHUB-GUIDE-ADOPTION-V1: `/guide` → `/guide/intro` canonical 수렴에만 Navigate 를 쓴다.
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { useEffect } from 'react';
+import { BrowserRouter, Routes, Route, Navigate, useParams } from 'react-router-dom';
 import { O4OErrorBoundary, O4OToastProvider } from '@o4o/error-handling';
 import { AuthProvider } from './contexts/AuthContext';
 import { StoreOwnerShell, StoreOwnerChromeFreeGuard, StoreOwnerWorkspaceShell } from './layouts/StoreOwnerShell';
@@ -148,9 +146,8 @@ import PharmacyHubContentDetailPage from './pages/content/PharmacyHubContentDeta
 import PharmacyHubSurveyListPage from './pages/content/PharmacyHubSurveyListPage';
 import PharmacyHubSurveyDetailPage from './pages/content/PharmacyHubSurveyDetailPage';
 import PharmacyHubContentWritePage from './pages/content/PharmacyHubContentWritePage';
-import EducationPage from './pages/education/EducationPage';
-import LmsCourseDetailPage from './pages/education/LmsCourseDetailPage';
-import LmsLessonPage from './pages/education/LmsLessonPage';
+// WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2 §14·§15: PharmacyHub 는 LMS runtime surface 를 소유하지 않는다 — 독립 강의 서비스(외부 public link)
+import { LECTURE_SERVICE_URL } from './config/navigation';
 import MembershipsPage from './pages/operator/MembershipsPage';
 // WO-O4O-PHARMACY-HUB-SERVICE-LEGAL-SETTINGS-ADOPTION-V1 — 공통 법정정보 설정 채택
 import PharmacyHubAdminDashboard from './pages/admin/PharmacyHubAdminDashboard';
@@ -176,21 +173,9 @@ import OperatorCommunityContentsPage from './pages/operator/CommunityContentsPag
 //   설문조사 관리 — 화면 본체는 공통 @o4o/operator-core-ui Surveys module.
 import OperatorSurveyListPage from './pages/operator/survey/OperatorSurveyListPage';
 import OperatorSurveyCreatePage from './pages/operator/survey/OperatorSurveyCreatePage';
-// WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §4 (#95)
-//   강의 운영 관리 — 공통 @o4o/operator-core-ui OperatorLmsCoursesManager.
-import OperatorLmsCoursesPage from './pages/operator/OperatorLmsCoursesPage';
 // 동일 WO §4 (#96) — 안내 문구 관리 (공통 GuideContentsConsolePage).
 import OperatorGuideContentsPage from './pages/operator/OperatorGuideContentsPage';
 
-// WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §4 (#42)
-//   강사 운영 콘솔. 화면 본체는 공통 @o4o/operator-core-ui instructor 모듈이고
-//   backend 는 서비스 중립 `/api/v1/lms/instructor/*` (requireInstructor) 이다.
-import InstructorGate from './pages/instructor/InstructorGate';
-import InstructorDashboardPage from './pages/instructor/InstructorDashboardPage';
-import InstructorCoursesPage from './pages/instructor/InstructorCoursesPage';
-import InstructorCourseEditPage from './pages/instructor/InstructorCourseEditPage';
-import InstructorEnrollmentsPage from './pages/instructor/InstructorEnrollmentsPage';
-import InstructorSubmissionsPage from './pages/instructor/InstructorSubmissionsPage';
 // WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §4:
 //   공지/뉴스 관리 (공통 @o4o/operator-core-ui CmsContentManager · /pharmacy-hub/news)
 import OperatorContentPage from './pages/operator/ContentPage';
@@ -226,13 +211,8 @@ import StoreInfoPage from './pages/store-owner/StoreInfoPage';
 import AccountPage from './pages/store-owner/AccountPage';
 // WO-O4O-CROSS-SERVICE-PROFILE-COMMONIZATION-V1 — 역할 무관 개인 프로필 (canonical /account)
 import MyProfilePage from './pages/account/MyProfilePage';
-// WO-O4O-PHARMACYHUB-LMS-LEARNER-FULL-ADOPTION-V1 §7·§11·§15 — LMS learner 개인 화면
-import MyEnrollmentsPage from './pages/account/MyEnrollmentsPage';
-import MyCertificatesPage from './pages/account/MyCertificatesPage';
 import MyRequestsPage from './pages/account/MyRequestsPage';
 import MyCreditsPage from './pages/account/MyCreditsPage';
-// 동일 WO §10 — 수료증 공개 검증 (인증 불필요)
-import CertificateVerifyPage from './pages/education/CertificateVerifyPage';
 // WO-PHARMACY-HUB-STORE-EXECUTION-ASSETS-V1 — 매장 실행 자산 (QR · POP · 사이니지 · 상품 설명서)
 import QrPage from './pages/store-owner/QrPage';
 // WO-O4O-STORE-EXECUTION-HOME-TABLET-QR-V1: 매장 실행 홈(태블릿+QR 배치 현황)
@@ -269,6 +249,22 @@ import TabletStorePage from './pages/tablet/TabletStorePage';
 import NotFoundPage from './pages/NotFoundPage';
 // WO-PHARMACY-HUB-STORE-TABLET-SERVICE-SCOPED-INTEGRATION-V1 — 태블릿 · 화면 세트
 import TabletsPage from './pages/store-owner/TabletsPage';
+
+/**
+ * WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2 §14·§15
+ * 레거시 LMS 경로 → 독립 강의 서비스(study.neture.co.kr) 외부 이동. 서비스 간 이동은 public link 로만 한다.
+ */
+function LectureExternalRedirect({ path = '' }: { path?: string }) {
+  useEffect(() => { window.location.replace(`${LECTURE_SERVICE_URL}${path}`); }, [path]);
+  return null;
+}
+function LectureCertificateVerifyRedirect() {
+  const { certificateId } = useParams<{ certificateId: string }>();
+  useEffect(() => {
+    window.location.replace(`${LECTURE_SERVICE_URL}/certificates/verify/${encodeURIComponent(certificateId ?? '')}`);
+  }, [certificateId]);
+  return null;
+}
 
 export default function App() {
   return (
@@ -337,24 +333,17 @@ export default function App() {
           */}
           <Route path="/account" element={<MyProfilePage />} />
 
-          {/*
-            WO-O4O-PHARMACYHUB-LMS-LEARNER-FULL-ADOPTION-V1 §7·§11·§15·§17
-
-            LMS learner 개인 화면. 개인 축은 `/account` 이며 `/mypage` 를 새로 만들지
-            않는다(§13 계약 유지). 미인증 안내는 화면이 직접 렌더하므로 MembershipGate 를
-            걸지 않는다 — 승인 대기·반려 사용자도 자신의 학습 이력을 확인할 수 있어야 한다.
-            데이터 경계는 백엔드 serviceKey 스코프가 담당한다(§19).
-          */}
-          <Route path="/account/enrollments" element={<MyEnrollmentsPage />} />
-          <Route path="/account/certificates" element={<MyCertificatesPage />} />
+          {/* 내 수강 · 내 수료증 — WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2 §14·§15:
+              독립 강의 서비스 소유. 레거시 경로는 외부 이동(public link). */}
+          <Route path="/account/enrollments" element={<LectureExternalRedirect path="/my/enrollments" />} />
+          <Route path="/account/certificates" element={<LectureExternalRedirect path="/my/certificates" />} />
           <Route path="/account/credits" element={<MyCreditsPage />} />
           {/* WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §5 (#19·#51)
               통합 신청함 — KPA `/mypage/my-requests` 와 같은 공통 MyRequestsInbox. */}
           <Route path="/account/my-requests" element={<MyRequestsPage />} />
 
-          {/* 동일 WO §10 — 수료증 공개 검증. 수료증 공유 링크의 착지점이며 인증이 없다.
-              이 route 가 없으면 공통 MyCertificatesView 의 "링크 복사" 가 데드링크가 된다. */}
-          <Route path="/certificate/verify/:certificateId" element={<CertificateVerifyPage />} />
+          {/* 수료증 공개 검증 — Phase 2 §17: 독립 강의 서비스 소유 (레거시 공유 링크 착지점 → 외부 이동) */}
+          <Route path="/certificate/verify/:certificateId" element={<LectureCertificateVerifyRedirect />} />
 
           {/* WO-O4O-CROSSSERVICE-LEGAL-POLICY-PRODUCTION-COMPLETION-V1:
               공개 정책 문서. 다른 4서비스와 같은 공통 PolicyDocumentViewer 소비(게시 문서만 표시,
@@ -429,25 +418,8 @@ export default function App() {
             element={<GuideFeatureManualPage {...pharmacyHubGuideFeatureManualsProps} />}
           />
 
-          {/* WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §4 (#42)
-              강사 운영 콘솔. PH 에는 RoleGuard 컴포넌트가 없으므로 서비스 표준대로
-              MembershipGate + 역할 확인(InstructorGate)으로 감싼다.
-              강사 신청/승인 동선은 두지 않는다 — backend 가 KPA 전용(requireKpaAdmin)이라
-              PH 에서는 dead navigation 이 된다. */}
-          <Route path="/instructor" element={<InstructorGate><InstructorDashboardPage /></InstructorGate>} />
-          <Route path="/instructor/courses" element={<InstructorGate><InstructorCoursesPage /></InstructorGate>} />
-          <Route path="/instructor/courses/new" element={<InstructorGate><InstructorCourseEditPage /></InstructorGate>} />
-          <Route path="/instructor/courses/:courseId" element={<InstructorGate><InstructorCourseEditPage /></InstructorGate>} />
-          <Route
-            path="/instructor/courses/:courseId/enrollments"
-            element={<InstructorGate><InstructorEnrollmentsPage /></InstructorGate>}
-          />
-          {/* WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §4 (#40)
-              과제 제출물 채점 — 공통 `/lms/instructor/*` (requireInstructor) 계약. */}
-          <Route
-            path="/instructor/courses/:courseId/lessons/:lessonId/submissions"
-            element={<InstructorGate><InstructorSubmissionsPage /></InstructorGate>}
-          />
+          {/* 강사 운영 콘솔 — WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2 §14: 독립 강의 서비스 소유 */}
+          <Route path="/instructor/*" element={<LectureExternalRedirect />} />
 
           {/* WO-O4O-PHARMACY-HUB-COMMUNITY-HOME-COMMON-CORE-V1 — active PharmacyHub 회원만 */}
           <Route
@@ -619,31 +591,8 @@ export default function App() {
             }
           />
 
-          {/* 동일 WO §7 — 교육(LMS) 조회·학습 baseline */}
-          <Route
-            path="/education"
-            element={
-              <MembershipGate>
-                <EducationPage />
-              </MembershipGate>
-            }
-          />
-          <Route
-            path="/education/course/:id"
-            element={
-              <MembershipGate>
-                <LmsCourseDetailPage />
-              </MembershipGate>
-            }
-          />
-          <Route
-            path="/education/course/:courseId/lesson/:lessonId"
-            element={
-              <MembershipGate>
-                <LmsLessonPage />
-              </MembershipGate>
-            }
-          />
+          {/* 교육(LMS) — WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2 §14·§15: 독립 강의 서비스로 외부 이동 */}
+          <Route path="/education/*" element={<LectureExternalRedirect />} />
           <Route
             path="/forum/posts/:postId"
             element={
@@ -701,9 +650,6 @@ export default function App() {
             {/* 동일 WO 4 (#97) — KPA/KCos 와 같은 공통 설문 콘솔. */}
             <Route path="surveys" element={<OperatorSurveyListPage />} />
             <Route path="surveys/new" element={<OperatorSurveyCreatePage />} />
-            {/* 동일 WO §4 (#95) — 공통 LMS 운영 콘솔. 서비스 경계는 backend 가
-                course.serviceKey 로 강제한다(isCourseAccessibleByOperator). */}
-            <Route path="lms" element={<OperatorLmsCoursesPage />} />
             {/* 동일 WO §4 (#96) */}
             <Route path="guide-contents" element={<OperatorGuideContentsPage />} />
             <Route path="roles" element={<OperatorRoleManagementPage />} />

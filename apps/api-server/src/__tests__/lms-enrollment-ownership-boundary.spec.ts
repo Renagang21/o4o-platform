@@ -253,18 +253,33 @@ describe('read leak — GET /enrollments (목록)', () => {
     expect(filtersOfLastCall().userId).toBe(USER_A);
   });
 
-  it('기존 관리 역할(lms:instructor)은 전체 목록 계약을 유지한다', async () => {
-    mockHasAnyRole.mockResolvedValue(true);
-    const res = fakeRes();
-    await EnrollmentController.listEnrollments(fakeReq({ userId: USER_A, query: {} }), res);
-    expect(filtersOfLastCall().userId).toBeUndefined();
+  // WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2: 관리 역할 = Lecture 계약만.
+  it('Lecture 운영 역할(lecture:operator / lecture:admin)은 전체 목록 계약을 가진다', async () => {
+    for (const role of ['lecture:operator', 'lecture:admin']) {
+      mockEnrollmentService.listEnrollments.mockClear();
+      const res = fakeRes();
+      await EnrollmentController.listEnrollments(fakeReq({ userId: USER_A, roles: [role], query: {} }), res);
+      expect(filtersOfLastCall().userId).toBeUndefined();
+    }
   });
 
-  it('토큰 roles 의 kpa:admin 도 전체 목록 계약을 유지한다', async () => {
-    mockHasAnyRole.mockResolvedValue(false);
+  // PR #225 merge-gate 14차(Codex 13차 P1-42): 강사는 이 learner-facing 목록에서 elevated 가 아니다.
+  // 강사가 전체 목록을 받으면 타 강사 강의의 수강생까지 노출된다 — 강사의 수강 관리는
+  // `course.instructorId` 술어가 걸린 `/lms/instructor/enrollments` 가 담당한다.
+  it('lecture:instructor 는 전체 목록을 받지 않는다 (본인 목록으로 강제)', async () => {
+    mockEnrollmentService.listEnrollments.mockClear();
     const res = fakeRes();
-    await EnrollmentController.listEnrollments(fakeReq({ userId: USER_A, roles: ['kpa:admin'], query: {} }), res);
-    expect(filtersOfLastCall().userId).toBeUndefined();
+    await EnrollmentController.listEnrollments(fakeReq({ userId: USER_A, roles: ['lecture:instructor'], query: {} }), res);
+    expect(filtersOfLastCall().userId).toBe(USER_A);
+  });
+
+  it('legacy lms:instructor · kpa:admin 은 더 이상 관리 역할이 아니다 (본인 목록으로 강제)', async () => {
+    for (const role of ['lms:instructor', 'kpa:admin', 'cosmetics:admin', 'pharmacy-hub:operator']) {
+      mockEnrollmentService.listEnrollments.mockClear();
+      const res = fakeRes();
+      await EnrollmentController.listEnrollments(fakeReq({ userId: USER_A, roles: [role], query: {} }), res);
+      expect(filtersOfLastCall().userId).toBe(USER_A);
+    }
   });
 
   it('목록도 canonical serviceKey 로 덮어쓴다 (client raw 값 미신뢰)', async () => {

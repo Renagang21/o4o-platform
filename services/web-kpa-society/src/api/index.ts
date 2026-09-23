@@ -4,9 +4,7 @@
 
 export { apiClient } from './client';
 export { forumApi } from './forum';
-export { lmsApi } from './lms';
-export { aiApi } from './ai';
-export type { AiAnalyzeResult, AiAnalyzeKind } from './ai';
+// WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2 §14: lmsApi · aiApi(LMS quiz/assignment analyze) 제거 — LMS runtime 은 O4O 강의(study.neture.co.kr) 소유
 export { eventOfferApi } from './eventOffer';
 export { eventOfferAdminApi } from './eventOfferAdmin';
 export { newsApi } from './news';

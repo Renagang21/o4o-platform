@@ -83,8 +83,8 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
   ],
   // WO-KCOS-OPERATOR-LMS-BOOTSTRAP-V1
   // WO-O4O-KCOS-OPERATOR-MENU-ALIGN-WITH-KPA-V1: 안내 문구 관리 추가 (KPA lms 그룹 정합)
+  // WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2 §14: '강의 관리'(/operator/lms) 제거 — 독립 강의 서비스 소유
   lms: [
-    { label: '강의 관리', path: '/operator/lms' },
     // WO-O4O-OPERATOR-GUIDE-CONTENTS-CORE-EXTRACTION-V1
     { label: '안내 문구 관리', path: '/operator/guide-contents' },
   ],

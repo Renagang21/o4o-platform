@@ -12,6 +12,7 @@ import { applyCourseScopeToQuery } from '../utils/lms-scope-guard.js';
 import { CreditSourceType } from '../../credit/entities/CreditTransaction.js';
 import { CREDIT_DESCRIPTIONS } from '../../credit/credit-constants.js';
 import { resolveRewardAmount, grantRewardIfConfigured } from './RewardPolicyService.js';
+import { SERVICE_KEYS } from '../../../constants/service-keys.js';
 
 export interface EnrollCourseRequest {
   courseId: string;
@@ -424,7 +425,7 @@ export class EnrollmentService extends BaseService<Enrollment> {
 
     // reward 컨텍스트 (정책 해석 + serviceKey)
     const course: any = await this.courseService.getCourse(courseId);
-    const serviceKey: string = course?.serviceKey ?? 'kpa-society';
+    const serviceKey: string = course?.serviceKey ?? SERVICE_KEYS.LECTURE;
     const lesson = await lessonRepo.findOne({ where: { id: lessonId } });
 
     // lesson_complete reward — 정책 설정 시에만

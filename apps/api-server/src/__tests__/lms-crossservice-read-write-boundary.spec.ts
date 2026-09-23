@@ -115,9 +115,9 @@ describe('guardCourseScope — enrollment write(enroll) 경계', () => {
     expect(res.state.statusCode).toBe(404);
   });
 
-  it('legacy service_key NULL 은 KPA scope 에만 포함된다', async () => {
+  it('legacy service_key NULL 은 어떤 scope 에도 속하지 않는다 (Lecture Phase 2 §8 — KPA fallback 제거)', async () => {
     dbQuery.mockResolvedValue([{ service_key: null }]);
-    await expect(guardCourseScope(kpaReq(), fakeRes(), 'c')).resolves.toBe(true);
+    await expect(guardCourseScope(kpaReq(), fakeRes(), 'c')).resolves.toBe(false);
     await expect(guardCourseScope(gpReq(), fakeRes(), 'c')).resolves.toBe(false);
   });
 
@@ -190,10 +190,10 @@ describe('applyCourseScopeToQuery — 목록(enrollment / certificate) SQL 필�
     return { calls, andWhere(c: string, p?: any) { calls.push([c, p]); return this; } };
   };
 
-  it('KPA scope 는 legacy NULL 을 포함한다', () => {
+  it('KPA scope 도 legacy NULL 을 포함하지 않는다 (Lecture Phase 2 §8)', () => {
     const q = fakeQuery();
     applyCourseScopeToQuery(q, 'course', 'kpa-society');
-    expect(q.calls[0][0]).toBe('(course.serviceKey = :lmsScopeKey OR course.serviceKey IS NULL)');
+    expect(q.calls[0][0]).toBe('course.serviceKey = :lmsScopeKey');
   });
 
   it('타 서비스 scope 는 정확 일치만 허용한다', () => {
@@ -274,23 +274,28 @@ describe('정적 회귀 — read 경로 guard 배선', () => {
   });
 });
 
-describe('정적 회귀 — KPA remount 계약', () => {
+describe('정적 회귀 — KPA remount 은퇴 (WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2)', () => {
   const kpa = read('apps/api-server/src/routes/kpa/kpa.routes.ts');
 
-  it('KPA LMS 화면이 호출하는 quiz/assignment endpoint 가 remount 되어 있다', () => {
-    expect(kpa).toContain("lmsRouter.get('/lessons/:lessonId/quiz'");
-    expect(kpa).toContain("lmsRouter.post('/quizzes/:quizId/submit'");
-    expect(kpa).toContain("lmsRouter.get('/quizzes/:quizId/attempts'");
-    expect(kpa).toContain("lmsRouter.get('/lessons/:lessonId/assignment'");
-    expect(kpa).toContain("lmsRouter.post('/assignments/:assignmentId/submit'");
-    expect(kpa).toContain("lmsRouter.get('/assignments/:assignmentId/my'");
+  it('KPA 는 LMS 를 remount 하지 않는다 (/api/v1/kpa/lms/* = 0)', () => {
+    expect(kpa).not.toContain("router.use('/lms', lmsRouter)");
+    expect(kpa).not.toContain("lmsRouter.");
+    expect(kpa).not.toContain("modules/lms/");
   });
 });
 
 describe('정적 회귀 — 프런트 serviceKey 주입 (generic LMS 소비 서비스)', () => {
-  it('K-Cosmetics 는 /lms/* 요청에 canonical serviceKey 를 붙인다', () => {
+  // WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2 §8/§14:
+  //   generic `/lms/*` 프런트 소비자는 web-lecture 뿐이고 서버가 `lecture` 로 고정한다.
+  //   K-Cosmetics 는 LMS 소비처 0 — serviceKey 부착 interceptor 는 제거되었다.
+  it('K-Cosmetics 의 /lms/* serviceKey 부착 interceptor 는 제거되었다', () => {
     const src = read('services/web-k-cosmetics/src/lib/apiClient.ts');
-    expect(src).toContain("const LMS_SERVICE_KEY = 'k-cosmetics'");
-    expect(src).toContain("url.startsWith('/lms/')");
+    expect(src).not.toContain("const LMS_SERVICE_KEY = 'k-cosmetics'");
+    expect(src).not.toContain("url.startsWith('/lms/')");
+  });
+
+  it('Lecture 프런트는 /lms/* 요청에 serviceKey 를 붙이지 않는다', () => {
+    const src = read('services/web-lecture/src/lib/apiClient.ts');
+    expect(src).not.toMatch(/serviceKey/);
   });
 });

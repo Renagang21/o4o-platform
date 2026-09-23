@@ -1,252 +1,113 @@
 /**
- * WO-O4O-PHARMACYHUB-LMS-LEARNER-FULL-ADOPTION-V1 §23
+ * PharmacyHub LMS learner surface — 은퇴 계약 (Regression Test)
  *
- * PharmacyHub LMS learner adoption 의 계약을 고정한다.
+ * 이력:
+ *  - WO-O4O-PHARMACYHUB-LMS-LEARNER-FULL-ADOPTION-V1: PH 가 공통 LMS 계약(client/ui/account-ui)을 채택한 상태를 고정했다.
+ *  - WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2 §14·§15·§17:
+ *    LMS runtime surface 는 독립 강의 서비스(`services/web-lecture` · study.neture.co.kr) 단일 소유로 전환.
+ *    PH 의 학습자/강사/운영자 LMS 화면·client 는 삭제되고, 기존 URL 은 공개 링크(외부 이동)로만 남는다.
+ *    backend 공통 LMS 계약(scope · ownership guard)은 그대로 재사용된다(§10 LMS Core 재사용).
  *
- * 이 adoption 의 대원칙은 "PH 전용 LMS 를 만들지 않고 공통 LMS Core/View/API 를
- * 채택한다"(§1·§20·§21) 이다. 따라서 이 spec 은 세 축을 정적으로 고정한다.
- *   (1) 공통 backend 계약이 pharmacy-hub scope 를 이미 수용하는가 (신규 API 0 · migration 0)
- *   (2) PH frontend 가 공통 View/Client 를 채택했는가 (stub · fake success · 전용 구현 0)
- *   (3) 서비스 경계·소유권 계약이 그대로 소비되는가 (§19)
+ * 프런트 web 서비스에는 test runner 가 없으므로 저장소 관례대로 api-server jest 에서 계약을 고정한다.
  */
 
-import fs from 'fs';
-import path from 'path';
+import * as fs from 'fs';
+import * as path from 'path';
 
-const repoRoot = path.resolve(__dirname, '../../../..');
-const read = (rel: string) => fs.readFileSync(path.resolve(repoRoot, rel), 'utf8');
+const REPO_ROOT = path.resolve(__dirname, '../../../..');
+const read = (rel: string) => fs.readFileSync(path.join(REPO_ROOT, rel), 'utf8');
+const exists = (rel: string) => fs.existsSync(path.join(REPO_ROOT, rel));
 
 const PH_WEB = 'services/web-pharmacy-hub/src';
-
-const phLmsApi = read(`${PH_WEB}/api/lms.ts`);
-const phAdapter = read(`${PH_WEB}/pages/education/lmsViewAdapter.ts`);
-const phCourseDetail = read(`${PH_WEB}/pages/education/LmsCourseDetailPage.tsx`);
-const phLessonPage = read(`${PH_WEB}/pages/education/LmsLessonPage.tsx`);
-const phVerifyPage = read(`${PH_WEB}/pages/education/CertificateVerifyPage.tsx`);
-const phEnrollmentsPage = read(`${PH_WEB}/pages/account/MyEnrollmentsPage.tsx`);
-const phCertificatesPage = read(`${PH_WEB}/pages/account/MyCertificatesPage.tsx`);
-const phCreditsPage = read(`${PH_WEB}/pages/account/MyCreditsPage.tsx`);
-const phNavItems = read(`${PH_WEB}/pages/account/navItems.ts`);
 const phAppTsx = read(`${PH_WEB}/App.tsx`);
 const phNavigation = read(`${PH_WEB}/config/navigation.ts`);
+const phNavItems = read(`${PH_WEB}/pages/account/navItems.ts`);
+const phCreditsPage = read(`${PH_WEB}/pages/account/MyCreditsPage.tsx`);
+const phOperatorMenu = read(`${PH_WEB}/config/operatorMenuGroups.ts`);
 
-const lmsClient = read('packages/lms-client/src/index.ts');
-const accountUiIndex = read('packages/account-ui/src/index.ts');
-const certificateVerifyView = read('packages/account-ui/src/components/CertificateVerifyView.tsx');
-const lessonPlayerView = read('packages/lms-ui/src/views/LessonPlayerView.tsx');
-
-const lmsServiceScope = read('apps/api-server/src/modules/lms/utils/lms-service-scope.ts');
-const certificateOwnerGuard = read('apps/api-server/src/modules/lms/utils/lms-certificate-owner-guard.ts');
-const enrollmentOwnerGuard = read('apps/api-server/src/modules/lms/utils/lms-enrollment-owner-guard.ts');
-const verificationBase = read('apps/api-server/src/modules/lms/utils/certificate-verification-base.ts');
-
-/** 주석은 계약이 아니다 — 금지 패턴 검사는 실제 코드에만 적용한다. */
-const stripComments = (src: string) =>
-  src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^[ \t]*\/\/.*$/gm, '');
-
-const phLmsApiCode = stripComments(phLmsApi);
-const phAdapterCode = stripComments(phAdapter);
-
-// ─────────────────────────────────────────────────────────────────────────────
-// §4·§21·§22 canonical 계약 — 신규 API / 신규 table 0
-// ─────────────────────────────────────────────────────────────────────────────
-
-describe('§4·§21·§22 공통 LMS 계약 채택 — PH 전용 backend 신설 0', () => {
-  it('공통 LMS scope 계약이 pharmacy-hub 를 이미 수용한다', () => {
-    expect(lmsServiceScope).toContain('LMS_SCOPED_SERVICE_KEYS');
-    expect(lmsServiceScope).toContain('SERVICE_KEYS.PHARMACY_HUB');
+describe('§14 PH LMS surface 0 — 화면·client 삭제', () => {
+  it.each([
+    `${PH_WEB}/api/lms.ts`,
+    `${PH_WEB}/api/ai.ts`,
+    `${PH_WEB}/pages/education`,
+    `${PH_WEB}/pages/instructor`,
+    `${PH_WEB}/pages/account/MyEnrollmentsPage.tsx`,
+    `${PH_WEB}/pages/account/MyCertificatesPage.tsx`,
+    `${PH_WEB}/pages/operator/OperatorLmsCoursesPage.tsx`,
+  ])('%s 는 존재하지 않는다', (rel) => {
+    expect(exists(rel)).toBe(false);
   });
 
-  it('PH client 는 공통 `/lms/*` 만 호출한다 — PH 전용 endpoint 를 만들지 않는다', () => {
-    expect(phLmsApiCode).not.toContain('/pharmacy-hub/lms');
-    expect(phLmsApiCode).toContain('createLmsLearnerClient(lmsHttp, { serviceKey: PH_SERVICE_KEY })');
-    expect(phLmsApiCode).toContain("export const PH_SERVICE_KEY = 'pharmacy-hub'");
+  it('PH 소스에 `/lms/` API 호출 · lms-client 소비가 남아 있지 않다', () => {
+    const walk = (dir: string): string[] =>
+      fs.readdirSync(dir, { withFileTypes: true }).flatMap((d) => {
+        const p = path.join(dir, d.name);
+        return d.isDirectory() ? walk(p) : /\.(ts|tsx)$/.test(d.name) ? [p] : [];
+      });
+    const offenders = walk(path.join(REPO_ROOT, PH_WEB)).filter((p) => {
+      const src = fs.readFileSync(p, 'utf8');
+      return /['"`]\/lms\//.test(src) || src.includes("from '@o4o/lms-client'") || src.includes("from '@o4o/lms-ui'");
+    });
+    expect(offenders.map((p) => path.relative(REPO_ROOT, p))).toEqual([]);
   });
 
-  it('PH client 는 다른 서비스 LMS base 를 호출하지 않는다 (§19)', () => {
-    for (const other of ['/kpa/lms', '/cosmetics/lms', '/neture/lms']) {
-      expect(phLmsApiCode).not.toContain(other);
-    }
-  });
-
-  it('공통 client 가 learner read 에 serviceKey 를 부착한다 (client-side filtering 아님)', () => {
-    for (const m of [
-      'getEnrollmentByCourse',
-      'getMyEnrollments',
-      'getQuizForLesson',
-      'getAssignmentForLesson',
-      'getMyAssignmentSubmission',
-      'getMyCertificates',
-      'getCertificate',
-    ]) {
-      expect(lmsClient).toContain(m);
-    }
-    const scoped = lmsClient.match(/withScope\(/g) ?? [];
-    expect(scoped.length).toBeGreaterThanOrEqual(7);
+  it('operator 메뉴에 강의 관리(/operator/lms)가 없다 — LMS 운영은 Lecture Operator 소유', () => {
+    expect(phOperatorMenu).not.toContain("'/operator/lms'");
   });
 });
 
-// ─────────────────────────────────────────────────────────────────────────────
-// §5·§6·§8 adapter stub 제거 / enrollment / progress
-// ─────────────────────────────────────────────────────────────────────────────
-
-describe('§5·§6·§8 adapter — null stub · fake success · local-only state 0', () => {
-  it('learner port 3종(getEnrollment / enroll / updateProgress)이 실제 API 를 호출한다', () => {
-    expect(phAdapterCode).toContain('lmsApi.getEnrollmentByCourse(');
-    expect(phAdapterCode).toContain('lmsApi.enrollCourse(');
-    expect(phAdapterCode).toContain('lmsApi.updateProgress(');
+describe('§15·§17 기존 URL 은 공개 링크(외부 이동)로만 남는다 — cross-service 진입 0', () => {
+  it('LECTURE_SERVICE_URL 은 study.neture.co.kr 이다', () => {
+    expect(phNavigation).toContain("export const LECTURE_SERVICE_URL = 'https://study.neture.co.kr'");
   });
 
-  it('adapter 에 `=> null` stub 이 남아 있지 않다', () => {
-    expect(phAdapterCode).not.toMatch(
-      /(getEnrollment|enroll|updateProgress):\s*async\s*\([^)]*\)\s*=>\s*null/,
-    );
+  it('/education/* · /instructor/* 는 Lecture 로 외부 이동한다', () => {
+    expect(phAppTsx).toMatch(/path="\/education\/\*"[^\n]*LectureExternalRedirect/);
+    expect(phAppTsx).toMatch(/path="\/instructor\/\*"[^\n]*LectureExternalRedirect/);
+    expect(phAppTsx).toContain('window.location.replace(`${LECTURE_SERVICE_URL}${path}`)');
   });
 
-  it('진도를 localStorage 로 처리하지 않는다 (§8)', () => {
-    expect(phAdapterCode).not.toContain('localStorage');
-    expect(stripComments(phLessonPage)).not.toContain('localStorage');
+  it('/account/enrollments · /account/certificates 는 Lecture /my/* 로 외부 이동한다', () => {
+    expect(phAppTsx).toMatch(/path="\/account\/enrollments"[^\n]*LectureExternalRedirect path="\/my\/enrollments"/);
+    expect(phAppTsx).toMatch(/path="\/account\/certificates"[^\n]*LectureExternalRedirect path="\/my\/certificates"/);
   });
 
-  it('enrollment 상태를 하드코딩하지 않는다 (§5)', () => {
-    expect(phAdapterCode).not.toMatch(/status:\s*'(enrolled|completed|approved)'/);
+  it('/certificate/verify/:id 는 Lecture 공개 검증으로 외부 이동한다 (§17 · PH 자체 검증 도메인 없음)', () => {
+    expect(phAppTsx).toMatch(/path="\/certificate\/verify\/:certificateId"[^\n]*LectureCertificateVerifyRedirect/);
+    expect(phAppTsx).toContain('`${LECTURE_SERVICE_URL}/certificates/verify/${encodeURIComponent(certificateId');
   });
 
-  it('수강신청이 비활성으로 남아 있지 않다 (§6)', () => {
-    expect(stripComments(phCourseDetail)).not.toContain('enrollmentEnabled: false');
-    expect(stripComments(phLessonPage)).not.toContain('enrollmentEnabled: false');
-    expect(phCourseDetail).toContain('isAuthenticated');
-    expect(phCourseDetail).toContain('onRequireLogin');
-  });
-});
-
-// ─────────────────────────────────────────────────────────────────────────────
-// §12·§13 Quiz / Assignment — KPA learner flow 에서 실사용되므로 parity 대상
-// ─────────────────────────────────────────────────────────────────────────────
-
-describe('§12·§13 Quiz / Assignment — 공통 View 의 port 배선만으로 성립한다', () => {
-  it('공통 LessonPlayerView 는 port 유무로 quiz/assignment 를 켠다 (서비스 전용 화면 금지)', () => {
-    expect(lessonPlayerView).toContain('port.getQuizForLesson');
-    expect(lessonPlayerView).toContain('port.submitQuiz');
-    expect(lessonPlayerView).toContain('port.getAssignmentForLesson');
-    expect(lessonPlayerView).toContain('port.submitAssignment');
+  it('개인 축 nav · Footer 에 내 수강/내 수료증 항목이 없다 (진입점 = 외부 링크뿐)', () => {
+    expect(phNavItems).not.toContain('/account/enrollments');
+    expect(phNavItems).not.toContain('/account/certificates');
+    expect(phNavigation).not.toContain("'/account/enrollments'");
+    expect(phNavigation).not.toContain("'/account/certificates'");
+    expect(phNavigation).not.toContain("'/education'");
   });
 
-  it('PH adapter 가 quiz·assignment port 를 모두 연결한다', () => {
-    for (const m of [
-      'getQuizForLesson',
-      'submitQuiz',
-      'getAssignmentForLesson',
-      'getMyAssignmentSubmission',
-      'submitAssignment',
-    ]) {
-      expect(phAdapterCode).toContain(`lmsApi.${m}(`);
-    }
+  it('내 크레딧 화면은 남되 학습 CTA 는 Lecture 외부 링크다', () => {
+    expect(phCreditsPage).toContain('window.location.assign(LECTURE_SERVICE_URL)');
+    expect(phCreditsPage).not.toContain("navigate('/education')");
   });
 });
 
-// ─────────────────────────────────────────────────────────────────────────────
-// §7·§11·§15 개인 학습 화면 — 공통 View 채택
-// ─────────────────────────────────────────────────────────────────────────────
-
-describe('§7·§11·§15 개인 화면 — @o4o/account-ui 공통 View wrapper', () => {
-  it('내 수강 목록은 공통 MyEnrollmentsView 다 (PH 전용 대형 JSX 금지)', () => {
-    expect(phEnrollmentsPage).toContain("from '@o4o/account-ui'");
-    expect(phEnrollmentsPage).toContain('MyEnrollmentsView');
-    expect(phEnrollmentsPage).toContain('lmsApi.getMyEnrollments()');
+describe('§10 backend 공통 LMS 계약 재사용 — PH 전용 backend 0', () => {
+  it('공통 scope · ownership guard 는 그대로다', () => {
+    expect(exists('apps/api-server/src/modules/lms/utils/lms-service-scope.ts')).toBe(true);
+    expect(exists('apps/api-server/src/modules/lms/utils/lms-certificate-owner-guard.ts')).toBe(true);
+    expect(exists('apps/api-server/src/modules/lms/utils/lms-enrollment-owner-guard.ts')).toBe(true);
   });
 
-  it('내 수료증은 공통 MyCertificatesView 다', () => {
-    expect(phCertificatesPage).toContain('MyCertificatesView');
-    expect(phCertificatesPage).toContain('lmsApi.getMyCertificates(');
-    expect(phCertificatesPage).toContain('lmsApi.downloadCertificatePdf(cert.id)');
+  it('pharmacy-hub routes 에 LMS 위임 경로가 없다', () => {
+    const phRoutes = read('apps/api-server/src/routes/pharmacy-hub/pharmacy-hub.routes.ts');
+    expect(phRoutes).not.toMatch(/['"]\/lms['"]/);
+    expect(phRoutes).not.toContain('FROM lms_courses');
   });
 
-  it('내 크레딧은 공통 MyCreditsView + service-neutral 원장 계약이다 (§15)', () => {
-    expect(phCreditsPage).toContain('MyCreditsView');
-    expect(phCreditsPage).toContain("'/credits/me'");
-    expect(phCreditsPage).toContain("'/credits/me/transactions'");
-  });
-
-  it('세 화면 모두 조회 실패를 빈 목록으로 삼키지 않는다 (Load-Error 계약)', () => {
-    for (const src of [phEnrollmentsPage, phCertificatesPage, phCreditsPage]) {
-      expect(src).toContain('setError(');
-      expect(src).toContain('error={error}');
-    }
-  });
-});
-
-// ─────────────────────────────────────────────────────────────────────────────
-// §10 Certificate — 소유권/보안 계약 재사용 · 공개 검증 화면
-// ─────────────────────────────────────────────────────────────────────────────
-
-describe('§10·§19 Certificate — 기존 ownership/security 계약 재사용', () => {
-  it('backend 수료증 소유권 가드가 그대로다 (타인 수료증 = 비노출)', () => {
-    expect(certificateOwnerGuard).toContain('resolveOwnedCertificateByIdOrRespond');
-    expect(certificateOwnerGuard).toContain('404');
-  });
-
-  it('backend enrollment 소유권 가드가 그대로다 (§19)', () => {
-    expect(enrollmentOwnerGuard).toContain('LMS_ELEVATED_MANAGER_ROLES');
-    expect(enrollmentOwnerGuard).toContain('404');
-  });
-
-  it('PH 는 자기 검증 도메인을 갖는다 (§21 누락된 serviceKey 매핑 — KPA 로 새지 않는다)', () => {
-    expect(verificationBase).toContain("case 'pharmacy-hub':");
-    expect(verificationBase).toContain('PHARMACY_HUB_FRONTEND_URL');
-  });
-
-  it('공개 검증 화면은 공통 View 로 추출돼 PH 가 wrapper 로만 소비한다', () => {
-    expect(accountUiIndex).toContain('CertificateVerifyView');
-    expect(certificateVerifyView).toContain('/verify');
-    expect(phVerifyPage).toContain('CertificateVerifyView');
-    expect(phVerifyPage).toContain('API_BASE_URL');
-  });
-});
-
-// ─────────────────────────────────────────────────────────────────────────────
-// §17·§18 navigation — deep-link only 금지 / 데드링크 0
-// ─────────────────────────────────────────────────────────────────────────────
-
-describe('§17·§18 navigation — 진입점 없는 기능을 남기지 않는다', () => {
-  const NEW_ROUTES = [
-    '/account/enrollments',
-    '/account/certificates',
-    '/account/credits',
-    '/certificate/verify/:certificateId',
-  ];
-
-  it.each(NEW_ROUTES)('%s route 가 App.tsx 에 등재돼 있다', (route) => {
-    expect(phAppTsx).toContain(`path="${route}"`);
-  });
-
-  it('개인 축은 여전히 /account 다 — /mypage 를 새로 만들지 않는다 (§18)', () => {
-    expect(phNavItems).toContain("path: '/enrollments'");
-    expect(phNavItems).toContain("path: '/certificates'");
-    expect(phNavItems).toContain("path: '/credits'");
-    for (const src of [phEnrollmentsPage, phCertificatesPage, phCreditsPage]) {
-      expect(src).toContain('basePath="/account"');
-      expect(src).toContain('PHARMACY_HUB_ACCOUNT_NAV_ITEMS');
-    }
-    expect(stripComments(phAppTsx)).not.toContain('path="/mypage"');
-  });
-
-  /*
-   * WO-O4O-GLOBAL-HEADER-UNUSED-CHILDREN-CONTRACT-REMOVAL-V1:
-   *   header nav `children` 제거로 두 route 의 진입점은 '교육' 메뉴가 아니라
-   *   PH_FOOTER_SECTIONS('서비스' 섹션)와 My Page nav 다. 단언 대상은 그대로
-   *   navigation.ts 지만, 통과 근거가 footer 이므로 테스트 명을 실제와 맞춘다.
-   */
-  it('Footer 에서 내 수강·내 수료증으로 바로 갈 수 있다 (§17 — deep-link only 금지)', () => {
-    const footerBlock = phNavigation.slice(phNavigation.indexOf('PH_FOOTER_SECTIONS'));
-    expect(footerBlock).toContain("href: '/account/enrollments'");
-    expect(footerBlock).toContain("href: '/account/certificates'");
-  });
-
-  it('learner 화면은 /education 으로 되돌아간다 (다른 서비스 경로로 새지 않는다)', () => {
-    for (const src of [phEnrollmentsPage, phCertificatesPage, phCreditsPage]) {
-      expect(src).toContain("navigate('/education')");
-      expect(src).not.toContain("navigate('/lms')");
-    }
+  it('수료증 검증 링크는 Lecture 단일 base 다 (§17 — 서비스별 도메인 분기 없음)', () => {
+    const base = read('apps/api-server/src/modules/lms/utils/certificate-verification-base.ts');
+    expect(base).toContain("'https://study.neture.co.kr'");
+    expect(base).not.toContain('pharmacyhub.co.kr');
+    expect(base).not.toContain('kpa-society.co.kr');
   });
 });

@@ -1,4 +1,4 @@
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { AppDataSource } from '../../../database/connection.js';
 import { Quiz, QuizAttempt, AttemptStatus, Lesson, LessonType } from '@o4o/lms-core';
 import { Progress, ProgressStatus, Enrollment, EnrollmentStatus } from '@o4o/lms-core';
@@ -13,6 +13,7 @@ import { resolveRewardAmount, grantRewardIfConfigured } from './RewardPolicyServ
 import { CompletionService } from './CompletionService.js';
 // WO-O4O-LMS-COURSE-REAPPROVAL-FLOW-V1
 import { CourseService } from './CourseService.js';
+import { SERVICE_KEYS } from '../../../constants/service-keys.js';
 
 export interface SubmitQuizRequest {
   answers: Array<{ questionId: string; answer: string | string[] }>;
@@ -78,6 +79,38 @@ export class QuizService {
    */
   async getQuiz(quizId: string): Promise<Quiz | null> {
     return this.quizRepository.findOne({ where: { id: quizId } });
+  }
+
+  /**
+   * 강사 편집용 — 정답 포함 · 미공개 퀴즈 포함 (PR #225 merge-gate · Codex P1).
+   * controller 가 소유권(course.instructorId 또는 lecture:admin)을 먼저 판정한 뒤에만 호출한다.
+   * learner 경로(`getQuizForLesson`)는 그대로 정답을 제거한다.
+   */
+  async getQuizForLessonWithAnswers(lessonId: string): Promise<Quiz | null> {
+    return this.quizRepository.findOne({ where: { lessonId } as any });
+  }
+
+  /**
+   * 운영자 검토 surface 전용 배치 조회 (PR #225 merge-gate 13차 · Codex P2).
+   * lesson 마다 1쿼리를 쏘면 500 lesson 강의에서 500 쿼리가 된다 — `IN` 으로 묶어 한 번에 읽는다.
+   * 반환은 lessonId → 문항 수 요약뿐이다. **문항·정답은 담지 않는다.**
+   */
+  async countQuizQuestionsByLessons(lessonIds: string[]): Promise<Map<string, number>> {
+    const result = new Map<string, number>();
+    if (lessonIds.length === 0) return result;
+    const CHUNK = 200; // 파라미터 폭주 방지
+    for (let i = 0; i < lessonIds.length; i += CHUNK) {
+      const quizzes = await this.quizRepository.find({
+        where: { lessonId: In(lessonIds.slice(i, i + CHUNK)) } as any,
+        select: ['id', 'lessonId', 'questions'] as any,
+      });
+      for (const quiz of quizzes) {
+        const lessonId = (quiz as any).lessonId;
+        if (!lessonId) continue;
+        result.set(lessonId, Array.isArray(quiz.questions) ? quiz.questions.length : 0);
+      }
+    }
+    return result;
   }
 
   /**
@@ -165,7 +198,7 @@ export class QuizService {
 
     // WO-O4O-CREDIT-SYSTEM-V1 / WO-O4O-POINT-CORE-SEPARATION-V1: 포인트 지급 (PointService facade)
     // WO-O4O-LMS-SERVICEKEY-CONTEXT-V1: resolve course.serviceKey to prevent cross-service budget drain
-    // null serviceKey = legacy course → fallback to 'kpa-society' for backward compat
+    // null serviceKey → Lecture 고정 (WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 §17 — KPA fallback 제거)
     let courseServiceKey: string | null = null;
     let quizCourse: any = null;
     if (quiz.courseId) {
@@ -185,7 +218,7 @@ export class QuizService {
         sourceId: quizId,
         referenceKey: `quiz_pass:${userId}:${quizId}`,
         description: CREDIT_DESCRIPTIONS.QUIZ_PASS,
-        serviceKey: courseServiceKey ?? 'kpa-society',
+        serviceKey: courseServiceKey ?? SERVICE_KEYS.LECTURE,
       });
       if (granted) creditsEarned += quizPassAmount;
     }
@@ -320,7 +353,7 @@ export class QuizService {
       sourceId: lessonId,
       referenceKey: `lesson_complete:${userId}:${lessonId}`,
       description: CREDIT_DESCRIPTIONS.LESSON_COMPLETE,
-      serviceKey: lessonCourseServiceKey ?? 'kpa-society',
+      serviceKey: lessonCourseServiceKey ?? SERVICE_KEYS.LECTURE,
     });
 
     // Update enrollment progress
@@ -373,7 +406,7 @@ export class QuizService {
       // WO-O4O-LMS-COMPLETION-REWARD-POLICY-SEPARATION-V1:
       // course_complete reward 는 course 의 rewardPolicy.courseComplete 가 설정된 경우에만 1회 지급.
       // referenceKey UNIQUE + dedup 으로 재완료 재지급 차단. 미설정 → 미지급(오류 아님).
-      // serviceKey: null = legacy course → fallback 'kpa-society'.
+      // serviceKey: null → Lecture 고정 (KPA fallback 제거).
       const courseCompleteAmount = resolveRewardAmount('course_complete', { course: lessonCourse });
       await grantRewardIfConfigured({
         event: 'course_complete',
@@ -383,7 +416,7 @@ export class QuizService {
         sourceId: courseId,
         referenceKey: `course_complete:${userId}:${courseId}`,
         description: CREDIT_DESCRIPTIONS.COURSE_COMPLETE,
-        serviceKey: lessonCourseServiceKey ?? 'kpa-society',
+        serviceKey: lessonCourseServiceKey ?? SERVICE_KEYS.LECTURE,
       });
 
       // WO-O4O-COMPLETION-V1: Auto-create completion record + certificate
@@ -495,7 +528,30 @@ export class QuizService {
     const mergedMetadata =
       incomingMetadata !== undefined ? { ...(quiz.metadata ?? {}), ...incomingMetadata } : undefined;
 
-    Object.assign(quiz, data);
+    // PR #225 merge-gate: allowlist — lessonId/courseId(귀속) · id 등은 PATCH 로 바꿀 수 없다.
+    const picked: Record<string, unknown> = {};
+    for (const key of ['title', 'description', 'questions', 'passingScore', 'isPublished'] as const) {
+      if (data[key] !== undefined) picked[key] = data[key];
+    }
+
+    // 4차 P1-14: 채점은 attempt.questionId ↔ questions[].id 매칭이다. id 없는 문항을 그대로 저장하면
+    // 기존 제출이 전부 매칭 불가가 된다. 클라이언트가 id 를 빠뜨리면 같은 자리(order/index)의 기존 id 를
+    // 승계하고, 그래도 없으면 새로 발급한다 (createQuiz 와 동일 규칙).
+    if (picked.questions !== undefined && Array.isArray(picked.questions)) {
+      const previous: QuizQuestion[] = Array.isArray(quiz.questions) ? quiz.questions : [];
+      const usedIds = new Set<string>();
+      picked.questions = (picked.questions as QuizQuestion[]).map((q, index) => {
+        if (q?.id) { usedIds.add(q.id); return q; }
+        const inherited = previous.find(
+          (p) => p?.id && !usedIds.has(p.id) && (q?.order !== undefined ? p.order === q.order : false),
+        ) ?? (previous[index]?.id && !usedIds.has(previous[index].id) ? previous[index] : undefined);
+        const id = inherited?.id ?? crypto.randomUUID();
+        usedIds.add(id);
+        return { ...q, id };
+      });
+    }
+
+    Object.assign(quiz, picked);
 
     if (mergedMetadata !== undefined) {
       quiz.metadata = mergedMetadata;

@@ -26,7 +26,6 @@ import {
   InvalidLmsServiceKeyError,
   INVALID_SERVICE_KEY_CODE,
 } from './lms-service-scope.js';
-import { SERVICE_KEYS } from '../../../constants/service-keys.js';
 
 /**
  * 응답 envelope 은 BaseController 와 동일하다. 다만 BaseController 의 helper 는
@@ -154,7 +153,8 @@ export function guardLoadedCourseScope(
 
 /**
  * 목록 쿼리에 course service scope 조건을 SQL 로 적용한다.
- * legacy `service_key IS NULL` 은 KPA scope 에만 포함시킨다 (isCourseInServiceScope 와 동일 규칙).
+ * legacy `service_key IS NULL` 을 KPA 에 포함시키던 분기는 Phase 2 에서 제거
+ * (isCourseInServiceScope 와 동일 규칙 — NULL 은 어느 scope 에도 속하지 않는다).
  *
  * ⚠️ client-side filtering 금지 — 반드시 이 헬퍼로 SQL 단계에서 건다.
  */
@@ -164,9 +164,5 @@ export function applyCourseScopeToQuery(
   scope: string | undefined,
 ): void {
   if (!scope) return;
-  if (scope === SERVICE_KEYS.KPA_SOCIETY) {
-    query.andWhere(`(${alias}.serviceKey = :lmsScopeKey OR ${alias}.serviceKey IS NULL)`, { lmsScopeKey: scope });
-  } else {
-    query.andWhere(`${alias}.serviceKey = :lmsScopeKey`, { lmsScopeKey: scope });
-  }
+  query.andWhere(`${alias}.serviceKey = :lmsScopeKey`, { lmsScopeKey: scope });
 }

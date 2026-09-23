@@ -5,10 +5,13 @@
  * WO-O4O-ROUTES-REFACTOR-V1: Extracted from kpa.routes.ts (Q1-Q7)
  * WO-KPA-B-LMS-GUARD-BYPASS-AUDIT-AND-IMPLEMENTATION-V1 origin
  * WO-PLATFORM-APPROVAL-ENGINE-UNIFICATION-V1: dual-query (legacy + unified)
+ * WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2 (§12 · §13):
+ *   KPA 강사 자격은 KPA 내부 자격일 뿐 LMS 권한이 아니다. 승인/해지 시 legacy `lms:instructor`
+ *   role 을 부여·회수하던 runtime consumer 를 제거했다. Lecture 강사 권한(`lecture:instructor`)은
+ *   Lecture Operator 의 강사 신청 승인 경로에서만 부여된다.
  */
 
 import type { DataSource, QueryRunner } from 'typeorm';
-import { roleAssignmentService } from '../../../modules/auth/services/role-assignment.service.js';
 
 export class InstructorService {
   constructor(private dataSource: DataSource) {}
@@ -234,7 +237,7 @@ export class InstructorService {
     qualificationId: string,
     reviewerId: string,
     reviewComment?: string,
-  ): Promise<{ qualificationId: string; status: string; roleAssigned: string } | { error: { code: string; message: string; httpStatus: number } }> {
+  ): Promise<{ qualificationId: string; status: string } | { error: { code: string; message: string; httpStatus: number } }> {
     // Try unified table first
     const [arRow] = await this.dataSource.query(
       `SELECT id, requester_id, status FROM kpa_approval_requests WHERE id = $1 AND entity_type = 'instructor_qualification' LIMIT 1`,
@@ -252,9 +255,8 @@ export class InstructorService {
           `UPDATE kpa_approval_requests SET status = 'approved', reviewed_by = $1, reviewed_at = NOW(), review_comment = $2, updated_at = NOW() WHERE id = $3`,
           [reviewerId, reviewComment || null, qualificationId],
         );
-        await roleAssignmentService.assignRole({ userId: arRow.requester_id, role: 'lms:instructor', assignedBy: reviewerId });
         await queryRunner.commitTransaction();
-        return { qualificationId, status: 'approved', roleAssigned: 'lms:instructor' };
+        return { qualificationId, status: 'approved' };
       } catch (err) {
         await queryRunner.rollbackTransaction();
         throw err;
@@ -283,9 +285,8 @@ export class InstructorService {
         `UPDATE kpa_instructor_qualifications SET status = 'approved', reviewed_by = $1, reviewed_at = NOW(), review_comment = $2, updated_at = NOW() WHERE id = $3`,
         [reviewerId, reviewComment || null, qualificationId],
       );
-      await roleAssignmentService.assignRole({ userId: qual.user_id, role: 'lms:instructor', assignedBy: reviewerId });
       await queryRunner.commitTransaction();
-      return { qualificationId, status: 'approved', roleAssigned: 'lms:instructor' };
+      return { qualificationId, status: 'approved' };
     } catch (err) {
       await queryRunner.rollbackTransaction();
       throw err;
@@ -364,7 +365,6 @@ export class InstructorService {
                   updated_at = NOW() WHERE id = $3`,
           [reviewerId, JSON.stringify({ revoke_reason: reason, revoked_by: reviewerId, revoked_at: new Date().toISOString() }), qualificationId],
         );
-        await roleAssignmentService.removeRole(arRow.requester_id, 'lms:instructor');
         await queryRunner.commitTransaction();
         return { qualificationId, status: 'revoked' };
       } catch (err) {
@@ -395,7 +395,6 @@ export class InstructorService {
         `UPDATE kpa_instructor_qualifications SET status = 'revoked', revoked_by = $1, revoked_at = NOW(), revoke_reason = $2, updated_at = NOW() WHERE id = $3`,
         [reviewerId, reason, qualificationId],
       );
-      await roleAssignmentService.removeRole(qual.user_id, 'lms:instructor');
       await queryRunner.commitTransaction();
       return { qualificationId, status: 'revoked' };
     } catch (err) {
