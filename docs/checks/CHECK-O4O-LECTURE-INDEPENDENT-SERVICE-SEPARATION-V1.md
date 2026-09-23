@@ -733,3 +733,93 @@ PRODUCTION_IMPACT        = 0 (트래픽 · 스키마 · 데이터)
 ```
 
 보강 후보(다음 지시 전 미실행): GitHub **Environment + required reviewer**(배포 job 에 `environment:` 를 걸면 승인 없이는 job 이 시작되지 않고 승인 이력이 남는다) · 변수 대신 **보호된 environment secret/variable** · 배포 워크플로의 `workflow_dispatch` 전용화.
+
+---
+
+## 21. 기존 LMS 테스트 데이터 전수 삭제 (2026-09-23 · 사용자 승인)
+
+> **판정 전환**: §17-5 · §18~§19 가 전제하던 **"11 course rekey → coordinated cutover"** 계획은 **취소됐다.**
+> 대상 11건과 수강 3건이 전부 smoke/E2E 테스트 데이터로 확인돼, 옮기는 대신 **삭제**하기로 사용자가 결정했다.
+> 새 Lecture 서비스는 **빈 강의 목록에서 시작**한다. `DATABASE_CUTOVER = FORBIDDEN`(rekey·이관 금지)은 그대로 유지되며,
+> 이번 작업은 rekey 가 아니라 삭제다.
+
+### 21-1. 삭제 전 census (SELECT only)
+
+| 대상 | 건수 | 비고 |
+|---|---|---|
+| `lms_courses` | **11** | kpa-society 8 · pharmacy-hub 3 · `service_key='lecture'` **0** |
+| `lms_lessons` | 10 | |
+| `lms_quizzes` | 6 | |
+| `lms_enrollments` | 3 | 전원 동일 사용자(`cfd2a5e7…`) — **계정은 삭제 대상 아님** |
+| `lms_assignments` | 1 | |
+| **합계** | **31행** | |
+
+제목이 성격을 드러낸다: `course_complete serviceKey 검증` · `[SMOKE-CLOSURE-V1] …`(3건) · `[E2E-FIXTURE] PH LMS learner adoption …` · `smoke 강의 [guide-test]` · `회원제 승인필요 강의 테스트` 등.
+
+나머지 **LMS 테이블 11개는 이미 0건**이었다(progress · certificates · quiz_attempts · submissions · events · attendance · surveys · survey_questions · survey_responses · content_bundles · instructor_applications).
+
+### 21-2. FK 관계 — quizzes 는 CASCADE 가 아니다
+
+```text
+lms_courses     -> lessons · enrollments · events · certificates    CASCADE
+lms_lessons     -> assignments · progress                           CASCADE
+lms_assignments -> submissions                                      CASCADE
+lms_enrollments -> progress                                         CASCADE
+lms_quizzes."courseId" / ."lessonId"                                SET NULL   <-- 고아로 남는다
+lms_quizzes     -> quiz_attempts                                    CASCADE
+```
+
+→ **quizzes 6건을 먼저 명시적으로 삭제**해야 한다. courses 부터 지우면 quiz 가 `courseId=NULL · lessonId=NULL` 로 남아 그대로 "잔여 참조" 가 된다.
+
+### 21-3. 외부 참조 — 감사 로그 21건뿐 (보존)
+
+- `courseId` · `lessonId` · `quizId` · `enrollmentId` 계열 컬럼을 가진 **비-LMS 테이블 0개**.
+- 교차 참조 후보 16개 테이블 전수 probe(`credit_transactions` · `audit_logs` · `media_entity_links` · `appreciation_sends` · `kpa_approval_requests` 등) → **참조 0**.
+- 유일한 참조: **`o4o_event_logs` 21건** (`course.submitted` 8 · `course.approved` 12 · `course.rejected` 1 · kpa-society 16 · pharmacy-hub 5 · 2026-05~08). **FK 제약 없음** → 삭제를 막지 않는다.
+  - 성격이 **감사 기록**이라 사용자 지시로 **보존**했다. 화면·API 노출 경로는 없다.
+
+### 21-4. 실행 (단일 트랜잭션 · 가드 포함)
+
+복구용 덤프를 먼저 확보했다: `--data-only --column-inserts` 로 **INSERT 31건**. 보관 경로는 **저장소 밖**이며 Git 에 올리지 않았다(내용도 커밋하지 않음).
+
+```text
+경로: C:/tmp/lms-testdata-backup-20260923.sql   (로컬 보관 · git 미포함)
+```
+
+트랜잭션 안에 사전/사후 가드를 넣어, 대상 건수가 승인 범위(11/10/6/3/1)와 다르거나 `lecture` scope 강의가 섞이면 `RAISE EXCEPTION` 으로 중단되게 했다.
+
+```text
+BEGIN
+DO      -- 사전 가드: courses 11 · lessons 10 · quizzes 6 · enrollments 3 · assignments 1 · lecture 0
+DELETE 6    -- lms_quizzes  (FK SET NULL 이므로 명시 선삭제)
+DELETE 11   -- lms_courses  (CASCADE -> lessons 10 · enrollments 3 · assignments 1)
+DO      -- 사후 가드: 잔여 LMS 행 0
+COMMIT
+```
+
+실행 직전 재대조에서 census 와 **차이 0**이었다(course id 지문 `9a6ce2b6…` 일치).
+
+### 21-5. 사후 검증
+
+```text
+LMS 16개 테이블            전부 0건
+고아 quiz                  0
+users 1 · roles 44 · role_assignments 11 · service_memberships 5     불변
+o4o_event_logs 21 · audit_logs 8                                     불변(보존)
+
+GET /api/v1/lms/courses                total 0
+기존 published 강의 단건 3종            404 · 404 · 404   (삭제에 따른 예상 결과)
+kpa-society · pharmacyhub · study.neture · k-cosmetics   전부 200
+```
+
+기존 KPA·PH 화면에 강의가 "없음" 으로 보이는 것은 이번 결정에 따른 결과다. 기존 강의 화면·API 복원(113 파일 · 14,728줄)은 **취소**됐다.
+
+```text
+LMS_TEST_DATA_PURGE = DONE (31행 · 단일 트랜잭션 · 승인 범위 내)
+PRODUCTION_WRITE    = 31행 삭제 외 0
+REKEY / 이관        = 0 (계속 금지)
+```
+
+### 21-6. 이 삭제가 무효화하는 선행 조건
+
+§17-5 · §18-4 · §19-5 가 "배포 전 필수" 로 적었던 **11 course rekey · 수강 이관 · coordinated deploy+cutover** 는 **대상이 사라져 더 이상 성립하지 않는다.** 남은 판단은 **빈 Lecture 상태에서 Phase 2 runtime 이 안전한가** 하나이며, 그 검증 결과는 §22 에 기록한다.
