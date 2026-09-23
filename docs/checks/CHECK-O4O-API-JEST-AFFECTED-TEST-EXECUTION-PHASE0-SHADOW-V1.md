@@ -226,7 +226,45 @@ Phase 0 계약이 코드로 깨지는 것을 막는다.
 
 ### 13-4. 실제 GitHub Actions 검증 (§25)
 
-**미실시.** push 후 확인해야 하며, 본 CHECK 는 push 시점에 갱신한다.
+#### Scheduled API Full Jest — run `35829209575`
+
+| 항목 | 결과 |
+|---|---|
+| 기동 방식 | **workflow_dispatch (수동)** |
+| 명령 | `cd apps/api-server && npx jest --maxWorkers=1` (선별 없음) |
+| 결과 | **347 passed / 4 skipped / 0 failed**, 5,829 tests, Jest step 553.4s |
+| Docker · gcloud · migration 연결 | 없음 (§18 준수) |
+
+> **상태 구분**: `cron configured` / `dispatch verified` /
+> **`first scheduled event pending`** (첫 03:00 KST 실기동 미확인).
+> 수동 dispatch 성공은 **cron 이 동작했다는 증거가 아니다.**
+
+#### CI Pipeline — run `35829135129` (commit `257be3cfe`)
+
+| 항목 | 결과 |
+|---|---|
+| job `API Server Jest` | success |
+| shadow step 실행 | 됨 (`continue-on-error` 발동 없음) |
+| shadow 출력 | `mode=full` / `reason=변경 파일 수집 실패 — git diff 실패 (fatal: bad object f651885ed…)` / `0 / 351` |
+| 실제 Jest 실행 | **347 passed / 4 skipped / 0 failed** — full 유지 (§3 불변식 지켜짐) |
+| Docs Fast · Admin Fast | skipped (§19 비회귀) |
+
+> **이 run 은 shadow 관측 데이터로는 무효다.**
+> safe fallback(수집 실패 → full) 과 Phase 0 불변식(실제 Jest 가 full) 은 실증됐지만,
+> selector 가 변경 파일을 보지 못했으므로 false-negative 판정 근거가 아니다.
+
+**원인** — selector 로직이 아니라 `api-tests` job 의 **shallow checkout** 이다.
+`detect` · `docs-fast-validate` · `admin-fast-guards` 는 `fetch-depth: 0` 을 쓰지만
+`api-tests` 만 기본값(depth 1)이어서 base SHA object 가 없었다.
+
+**조치** — `api-tests` checkout 에 `fetch-depth: 0` 한 줄 추가. 기존 세 job 과 동일 기준이며
+detector 로직 · Jest 명령 · fast path 는 건드리지 않았다.
+
+#### 관측 시작일 기준
+
+§20 의 **최소 2주 shadow 관측은 위 조치 이후 최초의 유효한 shadow run**
+(= `mode` 와 `components` 가 실제 변경 파일에서 산출된 run) 시점부터 센다.
+`35829135129` 은 그 시작점이 아니다.
 
 ## 14. §23 · §24 — 섞지 않은 것
 

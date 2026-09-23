@@ -296,6 +296,11 @@ jobs:
 
     steps:
     - uses: actions/checkout@v6
+      with:
+        # detect · docs-fast · admin-fast 와 같은 기준이다.
+        # shallow checkout 이면 base SHA object 가 없어 아래 shadow selector 가
+        # 항상 "변경 파일 수집 실패 → full" 로만 떨어져 관측 데이터가 쌓이지 않는다.
+        fetch-depth: 0
 
     - name: Setup build environment
       uses: ./.github/actions/setup-build-env
