@@ -66,6 +66,15 @@ export const EXPECTED_SCHEMA_STATES: readonly ExpectedSchemaState[] = [
     fingerprint: '3145442eb56844659a17b24354bdbf535b2088c2ae6786bff07d5917ba9bf9a6',
     fingerprintLineCount: 5798,
   },
+  // WO-O4O-HOSPITAL-PHARMACY-DEVICE-ENROLLMENT-AND-LOGINLESS-ACCESS-V1 §8·§9 — hospital_devices +
+  // hospital_device_enrollment_codes (해시 전용 · token_hash/code_hash UNIQUE + service_key 인덱스).
+  // baseline 2026-09-18-id685 fresh bootstrap + incremental 1..4 를 격리 PostgreSQL 15
+  // (docker postgres:15, 로컬 전용 포트 55433) 에서 산출: 운영 DB fingerprint 채택 아님.
+  {
+    appliedThrough: 'CreateHospitalDeviceTables1790125390245',
+    fingerprint: 'bc27f5bc6c2077c50c0f112e863205bc14200c7284cab2c9689937a9a11e549a',
+    fingerprintLineCount: 5826,
+  },
 ] as const;
 
 /** Expected state after `prefixLength` incremental migrations; undefined when not registered. */

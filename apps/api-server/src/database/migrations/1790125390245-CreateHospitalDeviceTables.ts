@@ -24,14 +24,15 @@ import { MigrationInterface, QueryRunner } from 'typeorm';
  *   device token 은 서버가 만든 random 값이며 HttpOnly 쿠키로만 브라우저에 내려간다(§4).
  *
  * ─────────────────────────────────────────────────────────────────────────────
- * 등록 상태 (WO deployment gate)
+ * 등록 상태 (deployment gate 해제 완료 — 2026-09-23)
  *
- *   이 파일은 존재하지만 이 커밋 시점에는 incremental manifest 에 **등록하지 않는다.**
- *   append-only migration registry(`manifest.ts`)가 다른 세션(ADMIN-OPERATOR WO)의
- *   미커밋 작업으로 오염돼 있어, 그 위에 순서/fingerprint 를 강제 확정하면 production
- *   deploy Job(POST_MIGRATION_SCHEMA_ASSERTION)이 영구 실패할 수 있다. 그 WO 가
- *   origin/main 에 정상 landing 된 뒤 최신 순서로 등록 + fingerprint 생성 + deploy 한다
- *   (동일 WO 의 일시적 deployment gate). foreign migration/manifest 는 수정하지 않는다.
+ *   ADMIN-OPERATOR WO(`CreateOperatorInvitations1790125106065`)가 origin/main 에 3자 정합
+ *   (파일 + manifest + expected-schema-states)으로 정상 landing 된 것을 확인한 뒤, 최신
+ *   origin/main 기준 통합 worktree 에서 append-only 순서로 등록했다: `manifest.ts` 에 4번째
+ *   incremental 로 append + `expected-schema-states.ts` 에 격리 PostgreSQL 15 산출 fingerprint
+ *   (bc27f5bc…, 5826 lines · POST_MIGRATION_SCHEMA_ASSERTION PASS)를 등록. timestamp 가
+ *   ADMIN-OPERATOR(…106065)보다 커서 rename 없이 순서 정합. foreign migration/manifest 는
+ *   수정하지 않았다.
  */
 export class CreateHospitalDeviceTables1790125390245 implements MigrationInterface {
   name = 'CreateHospitalDeviceTables1790125390245';

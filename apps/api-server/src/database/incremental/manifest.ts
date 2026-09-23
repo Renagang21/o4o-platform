@@ -32,6 +32,8 @@ import { CreateStoreOwnerTerminationCases1789701000000 } from '../migrations/178
 import { AlterHandoffTokensTargetWorkspace1789974015939 } from '../migrations/1789974015939-AlterHandoffTokensTargetWorkspace.js';
 // WO-O4O-ADMIN-OPERATOR-GOOGLE-INVITATION-AND-ASSIGNMENT-CUTOVER-V1 §8 (operator_invitations)
 import { CreateOperatorInvitations1790125106065 } from '../migrations/1790125106065-CreateOperatorInvitations.js';
+// WO-O4O-HOSPITAL-PHARMACY-DEVICE-ENROLLMENT-AND-LOGINLESS-ACCESS-V1 §8·§9 (hospital_devices · hospital_device_enrollment_codes · 해시만)
+import { CreateHospitalDeviceTables1790125390245 } from '../migrations/1790125390245-CreateHospitalDeviceTables.js';
 
 export const INCREMENTAL_MIGRATION_CUTOFF = {
   baselineVersion: '2026-09-18-id685',
@@ -49,6 +51,7 @@ export const INCREMENTAL_MIGRATIONS: readonly MigrationClass[] = [
   CreateStoreOwnerTerminationCases1789701000000,
   AlterHandoffTokensTargetWorkspace1789974015939,
   CreateOperatorInvitations1790125106065,
+  CreateHospitalDeviceTables1790125390245,
 ];
 
 export function incrementalMigrationNames(): string[] {
