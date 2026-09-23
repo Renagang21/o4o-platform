@@ -21,6 +21,7 @@ const WORKFLOW = path.join(ROOT, '.github/workflows/deploy-web-services.yml');
 const DOCKERFILE = path.join(ROOT, 'services/signage-player-web/Dockerfile');
 const NGINX_CONF = path.join(ROOT, 'services/signage-player-web/nginx.conf');
 const MIDDLEWARES = path.join(ROOT, 'apps/api-server/src/bootstrap/setup-middlewares.ts');
+const DETECTOR = path.join(ROOT, 'scripts/ci/detect-affected.mjs');
 
 const read = (p: string) => fs.readFileSync(p, 'utf8');
 
@@ -64,10 +65,15 @@ describe('STATIC CONTRACT: signage-player-web 배포 채택 (§30)', () => {
     expect(read(WORKFLOW)).toContain("- 'services/signage-player-web/**'");
   });
 
+  // WO-O4O-WEB-SERVICES-CD-DEPENDENCY-AFFECTED-DEPLOY-GATE-V1:
+  //   판정이 workflow 인라인 `decide` 헬퍼에서 공통 SSOT(detect-affected.mjs)의
+  //   WEB_SERVICES registry 로 옮겨졌다. 단언 대상을 사라진 구현 세부가 아니라
+  //   **현재 판정 지점**으로 옮긴다 — 막는 회귀(#2 player 가 다시 빠지는 것)는 그대로다.
   it('detect-changes 가 player 를 판정하고 output 으로 노출한다', () => {
-    const wf = read(WORKFLOW);
-    expect(wf).toContain('decide "signage-player" "services/signage-player-web/"');
-    expect(wf).toContain('signage-player: ${{ steps.changes.outputs.signage-player }}');
+    expect(read(DETECTOR)).toMatch(
+      /key:\s*'signage-player'\s*,\s*dir:\s*'services\/signage-player-web'/,
+    );
+    expect(read(WORKFLOW)).toContain('signage-player: ${{ steps.changes.outputs.signage-player }}');
   });
 
   it('deploy job 이 존재하고 detect-changes 결과로 gate 된다', () => {
