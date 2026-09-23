@@ -667,7 +667,69 @@ k-cosmetics.site · pharmacyhub.co.kr · study.neture.co.kr · admin.neture.co.k
 1. **`ROOT_CAUSE_DUPLICATE_PUSH`** — 동일 main SHA `9a3b402b9` 가 11:37 과 11:46 두 번 push 이벤트를 만든 원인. 규명 전에는 **같은 일이 재발해 롤백이 무효화될 수 있다**(main 에 Phase 2 코드가 있는 한 어떤 push 든 배포를 트리거한다).
 2. 재발 방지 없이는 main 의 다른 WO push 도 Phase 2 를 실어 나른다 → coordinated deploy WO 전까지 **배포 트리거 차단 수단**(workflow 조건 · 수동 승인 게이트 등)을 먼저 정한다.
 
-   **기전 실측(2026-09-23)**: 롤백은 `update-traffic --to-revisions <rev>=100` 이라 현재 6개 서비스의 `spec.traffic` 은 특정 revision 고정이다. 그러나 `deploy-api.yml` · `deploy-web-services.yml` 어디에도 **`--no-traffic` 이 없다** — 즉 다음 `gcloud run deploy` 가 새 revision 을 만들며 트래픽을 그리로 **덮어써서 롤백이 소거**된다(pin 이 지켜주지 않는다). 따라서 **main 에 비-docs push 가 한 번이라도 들어가면 그 순간 Phase 2 가 다시 서빙된다.** docs-only push 는 `detect-changes` 에서 배포가 skip 되어 안전하다(본 CHECK §19 커밋 `a7b660dbb` 로 확인: CI·CodeQL 만 실행).
+   **기전 — 정정 확정(2026-09-23 · 실측 근거)**: 처음 여기에 "`--no-traffic` 이 없으니 다음 deploy 가 트래픽을 덮어쓴다" 고 적었으나 **틀렸다.** 실제로는 롤백이 `update-traffic --to-revisions <rev>=100` 으로 트래픽을 **특정 revision 에 pin** 했고, 그 상태에서 `gcloud run deploy` 는 새 revision 을 만들되 **트래픽을 옮기지 않는다.** gcloud 자신이 배포 로그에 그렇게 출력한다:
 
-   타 세션(`o4o-platform-32`, legacy-password WO)에 이 사실을 공유했다 — 다른 WO 의 Phase A 배포가 Lecture Phase 2 를 동반 배포하게 되므로 사용자 확인이 선행돼야 한다.
+   ```
+   Service [o4o-core-api] revision [o4o-core-api-03747-kxq] has been deployed and is serving 0 percent of traffic.
+   ```
+   (run `35864390517` · 13:10:43Z · `deploy-api.yml` 의 Deploy to Cloud Run step)
+
+   즉 **pin 이 유지되는 동안은 배포가 곧 장애 재현이 아니다** — 새 revision 이 0% 로 쌓일 뿐이다. 단 `update-traffic --to-latest`(또는 콘솔에서 최신 승격) 한 번이면 즉시 Phase 2 가 서빙되므로, pin 은 안전장치이지 통제 수단이 아니다. 이 판정은 타 세션(`o4o-platform-32`)의 관측과 일치하며, 앞선 반대 서술은 본 절로 대체한다.
 3. data cutover 는 **별도 지시 전까지 시작 금지**.
+
+---
+
+## 20. 배포 차단 게이트 적용과 그 한계 (2026-09-23)
+
+§19 후속으로 사용자 승인(C안 · fail-closed)을 받아 **저장소 변수 kill switch** 를 세 배포 워크플로에 넣었다. 적용 직후 같은 변수가 외부에서 'true' 로 바뀌어 게이트가 한 번 열렸고, 그 사건 자체가 "변수 하나로는 배포 통제가 충분하지 않다" 는 실증이 됐다.
+
+### 20-1. 적용 내용 (`3c7083be5`)
+
+| 워크플로 | 게이트 위치 | 효과 |
+|---|---|---|
+| `deploy-api.yml` | `build-and-deploy` **잡 전체** | Docker build/push · `gcloud run jobs execute o4o-api-migrations` · `gcloud run deploy` 가 함께 멈춘다(보류 중 migration 0) |
+| `deploy-web-services.yml` | 서비스별 deploy job **9개** | 각 `vars.DEPLOY_ENABLED == 'true' && needs.detect-changes.outputs.<svc> == 'true'` |
+| `deploy-admin.yml` | `deploy` job | 기존 `force_deploy` OR 조건을 괄호로 묶어 게이트가 **우선**하도록 AND |
+
+- 조건은 **fail-closed**: `vars.DEPLOY_ENABLED == 'true'` 일 때만 배포. 변수 부재·공백이면 Actions 가 빈 문자열을 돌려주므로 **차단이 기본값**이다.
+- 각 워크플로에 `deploy-hold-notice` job 추가 — `if: vars.DEPLOY_ENABLED != 'true'` 로 **게이트가 닫혔을 때만** 돌며 사유·현재 값·해제 방법을 Job Summary 에 남긴다. 배포 job 과 `needs` 관계가 없어 skip 여부와 무관하게 출력된다.
+- 적용 순서: **변수를 먼저 false 로**(13:00:05Z) → 워크플로 커밋 push(13:02). 순서가 반대면 게이트 커밋 자체가 기존 규칙대로 배포를 일으킨다.
+
+### 20-2. 게이트가 한 번 열린 사건 (13:02:37Z)
+
+| 시각 | 사실 |
+|---|---|
+| 13:00:05Z | `DEPLOY_ENABLED = false` (본 세션이 설정) |
+| **13:02:37Z** | **`DEPLOY_ENABLED = true` 로 변경 — 본 세션이 하지 않았다** |
+| 13:02:48Z | 게이트 커밋 push 로 배포 3종 트리거 → 변수가 true 라 deploy job 전부 실행 |
+| 13:05~13:11 | 새 revision 생성(`o4o-core-api-03748-64l` · `kpa-society-web-01996-r8d` · `o4o-admin-dashboard-01308-29m` 등) · API migration job `o4o-api-migrations-46z8t` 실행 |
+| 13:21:59Z | 사용자 지시로 `DEPLOY_ENABLED = false` 복구 · 진행/대기 run 0 확인 |
+
+게이트 **로직은 정상 동작**했다(`deploy-hold-notice` skipped = 조건이 거짓 = 변수가 'true'). 입력값이 바뀐 것이 원인이다.
+
+**주체 미특정(추측 금지)**: GitHub 변수 API 는 `updated_at` 만 주고 actor 를 주지 않으며(`{"name":"DEPLOY_ENABLED","value":…,"created_at":…,"updated_at":…}`), 개인 저장소라 `repos/.../audit-log` · `users/.../audit-log` 모두 404 다. 남길 수 있는 사실은 다음 둘뿐이다.
+
+- 본 세션(Lecture)은 13:00:05Z `false` 설정과 13:21:59Z `false` 복구 두 번만 호출했다. 13:02:37Z 변경은 본 세션이 아니다.
+- 병행 세션 `o4o-platform-32`(legacy-password WO)는 **GitHub 변수/시크릿 write 0** 이라고 회신했다(해당 세션의 쓰기는 로컬 파일 편집과 `wo/legacy-password-auth-retirement` 브랜치 push 뿐이며, 배포 워크플로 3종은 `branches: main`/`develop` 한정이라 그 push 로는 트리거되지 않는다). 이 진술을 근거로 해당 세션은 배제한다.
+
+→ 남는 경로는 **사용자 직접 변경 또는 본 저장소에 접근하는 다른 PC/세션**이며, 현재 가용한 기록으로는 **특정 불가**로 남긴다.
+
+### 20-3. 운영 영향 — read-only 실측으로 **없음**
+
+- **트래픽**: 6축 전부 pre-Phase2 revision 100% 유지. 새 revision 은 **0%** (§19-5 정정 참조 · gcloud 가 "serving 0 percent of traffic" 출력).
+- **migration**: `o4o-api-migrations-46z8t`(13:10) 로그 — `DATABASE_STATE = LEGACY_ESTABLISHED` · `BOOTSTRAP_EXECUTION = SKIPPED` · `HISTORICAL_REPLAY = ZERO` · `INCREMENTAL_PENDING = 0` · **`INCREMENTAL_EXECUTED = 0`** · `PRE/POST_MIGRATION_SCHEMA_ASSERTION = PASS` · fingerprint `bc27f5bc…`(5826 lines) **전후 동일** · `typeorm_migrations` 688 rows · 기대 상태 `CreateHospitalDeviceTables1790125390245`(타 WO 가 이전에 적용한 것).
+- **데이터**: `lms_courses` 11(**`service_key='lecture'` 0**) · `lms_enrollments` 3 · lessons 10 · quizzes 6 · assignments 1 · quiz_attempts 0 · `service_memberships` 5(**lecture active 0**) · `roles` lecture 3 · `role_assignments` 11(lecture 0) · 마지막 course 갱신 `2026-08-26` → §19-4 와 **완전 동일**.
+
+즉 게이트가 열린 채 배포가 돌았어도 **스키마·데이터·서빙 트래픽 모두 무변경**이었다. 이는 게이트 덕분이 아니라 **트래픽 pin** 과 **적용할 migration 이 없었다**는 두 우연 덕분이다.
+
+### 20-4. 판정 — 변수 단일 게이트의 한계
+
+```text
+DEPLOY_GATE_APPLIED      = YES (api · web-services · admin · fail-closed)
+DEPLOY_GATE_SUFFICIENT   = NO  — 저장소 변수는 누구나 되돌릴 수 있고 변경 주체가 감사되지 않는다
+DEPLOY_ENABLED           = false (13:21:59Z 복구)
+PRODUCTION_IMPACT        = 0 (트래픽 · 스키마 · 데이터)
+0%_REVISIONS             = 보존 (삭제·승격 금지)
+```
+
+보강 후보(다음 지시 전 미실행): GitHub **Environment + required reviewer**(배포 job 에 `environment:` 를 걸면 승인 없이는 job 이 시작되지 않고 승인 이력이 남는다) · 변수 대신 **보호된 environment secret/variable** · 배포 워크플로의 `workflow_dispatch` 전용화.
