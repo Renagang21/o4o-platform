@@ -9,8 +9,6 @@ import logger from '../../../utils/logger.js';
 // WO-O4O-LMS-PUBLIC-COURSE-LIST-SERVICE-SCOPE-V1: canonical service key SSOT
 import { SERVICE_KEYS } from '../../../constants/service-keys.js';
 
-const KPA_SOCIETY_SERVICE_KEY: string = SERVICE_KEYS.KPA_SOCIETY;
-
 /** WO-O4O-GLOBAL-EVENT-LOG-MINIMAL-V1: actor passed from controller for audit trail */
 type EventActor = { id: string; role: string | null };
 
@@ -56,6 +54,31 @@ export interface CreateCourseRequest {
 
 export interface UpdateCourseRequest extends Partial<CreateCourseRequest> {
   status?: CourseStatus;
+}
+
+/**
+ * PR #225 merge-gate (Codex P1 · serviceKey immutable):
+ * PATCH 로 갱신 가능한 필드 allowlist. `serviceKey`(서비스 소유권) 와 `instructorId`(강의 소유자) 는
+ * 생성 시 서버가 고정하며 update 로 바꿀 수 없다. contentKind 는 별개 축이라 그대로 허용.
+ * (raw req.body 가 그대로 오므로 id/createdAt/enrollmentCount 등 비-요청 필드도 함께 차단된다.)
+ */
+export const UPDATABLE_COURSE_FIELDS: ReadonlyArray<keyof UpdateCourseRequest> = [
+  'title', 'description', 'thumbnail', 'duration',
+  'organizationId', 'isOrganizationExclusive', 'isRequired', 'requiresApproval', 'maxEnrollments',
+  'startAt', 'endAt', 'credits', 'metadata', 'tags', 'isPaid', 'price',
+  'contentKind', 'visibility', 'reusablePolicy',
+];
+// `status` 는 allowlist 에 없다 — 상태 전이는 전용 endpoint(submit-review / publish / unpublish / archive ·
+// operator approve/reject) 로만 일어난다 (재검토 P1-8: 강사가 PATCH 로 published 자가 승인 금지).
+
+export function pickUpdatableCourseFields(data: UpdateCourseRequest): UpdateCourseRequest {
+  const picked: Record<string, unknown> = {};
+  for (const key of UPDATABLE_COURSE_FIELDS) {
+    if (data && Object.prototype.hasOwnProperty.call(data, key) && data[key] !== undefined) {
+      picked[key as string] = data[key];
+    }
+  }
+  return picked as UpdateCourseRequest;
 }
 
 export interface CourseFilters {
@@ -180,14 +203,10 @@ export class CourseService extends BaseService<Course> {
     }
 
     // WO-O4O-LMS-PUBLIC-COURSE-LIST-SERVICE-SCOPE-V1: service boundary.
-    // 미전달 시 무필터(현행) — generic/admin 경로 호환. KPA scope 는 legacy null 강의를
-    // 함께 포함한다 (기존 `serviceKey ?? 'kpa-society'` fallback 과 동일 판단).
+    // 미전달 시 무필터 — admin 카탈로그 호환. legacy NULL 을 KPA 에 포함시키던 분기는
+    // WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2 §8 에서 제거.
     if (serviceKey) {
-      if (serviceKey === KPA_SOCIETY_SERVICE_KEY) {
-        query.andWhere('(course.serviceKey = :svcKey OR course.serviceKey IS NULL)', { svcKey: serviceKey });
-      } else {
-        query.andWhere('course.serviceKey = :svcKey', { svcKey: serviceKey });
-      }
+      query.andWhere('course.serviceKey = :svcKey', { svcKey: serviceKey });
     }
 
     // Filters
@@ -237,11 +256,14 @@ export class CourseService extends BaseService<Course> {
     return { courses, total };
   }
 
-  async updateCourse(id: string, data: UpdateCourseRequest): Promise<Course> {
+  async updateCourse(id: string, rawData: UpdateCourseRequest): Promise<Course> {
     const course = await this.getCourse(id);
     if (!course) {
       throw new Error(`Course not found: ${id}`);
     }
+
+    // PR #225 merge-gate: allowlist — serviceKey / instructorId 등 소유권 필드는 무시된다.
+    const data = pickUpdatableCourseFields(rawData);
 
     // WO-LMS-PAID-COURSE-V1 + WO-LMS-INSTRUCTOR-ROLE-V1: 제약 검증 (변경 후 상태 기준)
     const willBePaid = data.isPaid ?? course.isPaid;
@@ -388,9 +410,9 @@ export class CourseService extends BaseService<Course> {
     });
 
     // WO-O4O-GLOBAL-EVENT-LOG-MINIMAL-V1
-    // WO-O4O-LMS-SERVICEKEY-CONTEXT-V1: use course.serviceKey; null = legacy KPA fallback
+    // WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 §17: event serviceKey 는 Lecture 고정 (KPA fallback 제거)
     await logEvent({
-      serviceKey: updated.serviceKey ?? 'kpa-society',
+      serviceKey: updated.serviceKey ?? SERVICE_KEYS.LECTURE,
       entityType: 'course',
       entityId: updated.id,
       action: 'course.submitted',
@@ -442,9 +464,9 @@ export class CourseService extends BaseService<Course> {
     });
 
     // WO-O4O-GLOBAL-EVENT-LOG-MINIMAL-V1
-    // WO-O4O-LMS-SERVICEKEY-CONTEXT-V1: use course.serviceKey; null = legacy KPA fallback
+    // WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 §17: event serviceKey 는 Lecture 고정 (KPA fallback 제거)
     await logEvent({
-      serviceKey: updated.serviceKey ?? 'kpa-society',
+      serviceKey: updated.serviceKey ?? SERVICE_KEYS.LECTURE,
       entityType: 'course',
       entityId: updated.id,
       action: 'course.approved',
@@ -502,9 +524,9 @@ export class CourseService extends BaseService<Course> {
     });
 
     // WO-O4O-GLOBAL-EVENT-LOG-MINIMAL-V1
-    // WO-O4O-LMS-SERVICEKEY-CONTEXT-V1: use course.serviceKey; null = legacy KPA fallback
+    // WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 §17: event serviceKey 는 Lecture 고정 (KPA fallback 제거)
     await logEvent({
-      serviceKey: updated.serviceKey ?? 'kpa-society',
+      serviceKey: updated.serviceKey ?? SERVICE_KEYS.LECTURE,
       entityType: 'course',
       entityId: updated.id,
       action: 'course.rejected',

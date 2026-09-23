@@ -15,6 +15,10 @@
 import type { ContextualNavItem, GlobalHeaderNavItem } from '@o4o/ui';
 import { ROLE_LABELS, ROLES } from './service';
 
+// ─── 독립 강의 서비스 (WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2 §14·§15) ──
+// PharmacyHub 는 LMS runtime surface 를 소유하지 않는다. 강의 진입은 외부 public link 로만 제공한다.
+export const LECTURE_SERVICE_URL = 'https://study.neture.co.kr';
+
 // ─── Public Nav ──────────────────────────────────────────────────────────────
 
 /*
@@ -46,10 +50,7 @@ export const PH_BASE_NAV: GlobalHeaderNavItem[] = [
 
 /** 역할 진입점 뒤에 오는 공개 안내 항목 (KPA 의 '서비스 안내' 위치와 동일 축). */
 export const PH_TRAILING_NAV: GlobalHeaderNavItem[] = [
-  // WO-O4O-PHARMACYHUB-LMS-LEARNER-FULL-ADOPTION-V1 §17:
-  //   learner 개인 화면(내 수강 / 내 수료증)은 Footer '서비스' 섹션과
-  //   My Page nav(PHARMACY_HUB_ACCOUNT_NAV_ITEMS)가 담당한다 — deep-link only 아님.
-  { label: '교육', href: '/education' },
+  // WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2 §14: '교육'(/education) 제거 — 독립 강의 서비스 소유
   // WO-O4O-PHARMACYHUB-GUIDE-ADOPTION-V1
   //   기능 이용 매뉴얼(/guide/*)은 Footer '이용 안내' 섹션과
   //   커뮤니티 홈 help 섹션이 담당한다.
@@ -105,10 +106,7 @@ export const PH_FOOTER_SECTIONS: { title: string; links: GlobalHeaderNavItem[] }
       { label: '콘텐츠', href: '/content' },
       // WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 6 (#24)
       { label: '설문조사', href: '/content/surveys' },
-      { label: '교육', href: '/education' },
-      // 동일 WO §17 — 학습 이력 진입점
-      { label: '내 수강', href: '/account/enrollments' },
-      { label: '내 수료증', href: '/account/certificates' },
+      // 교육 · 내 수강 · 내 수료증 — Phase 2 §14 (WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1): 독립 강의 서비스 소유 — 제거
     ],
   },
   {

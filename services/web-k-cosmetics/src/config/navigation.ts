@@ -11,6 +11,10 @@
 import type { ContextualNavItem, GlobalHeaderNavItem } from '@o4o/ui';
 import { kcosmeticsConfig } from '@o4o/operator-ux-core';
 
+// ─── 독립 강의 서비스 (WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2 §14·§15) ──
+// K-Cosmetics 는 LMS runtime surface 를 소유하지 않는다. 강의 진입은 외부 public link 로만 제공한다.
+export const LECTURE_SERVICE_URL = 'https://study.neture.co.kr';
+
 // ─── Public Nav ──────────────────────────────────────────────────────────────
 
 // WO-O4O-KCOS-MENU-CANONICAL-ALIGN-V1: 커뮤니티 단일 진입점

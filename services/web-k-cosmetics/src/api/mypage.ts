@@ -5,7 +5,7 @@
  *
  * Sources:
  *   1) GET /cosmetics/stores/application/me — 매장(파트너) 신청 (store_application)
- *   2) GET /lms/enrollments/me             — LMS 수강 신청 (course_enrollment)
+ *   (LMS 수강 신청은 WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2 §14 로 제거 — 독립 강의 서비스 소유)
  *   3) GET /cosmetics/mypage/business-info — 매장 경영자 사업자 정보 (canonical)
  *   4) PATCH /cosmetics/mypage/business-info — 매장 경영자 사업자 정보 수정
  *
@@ -97,35 +97,10 @@ function normalizeStoreApplication(app: any): MyRequestItem {
   };
 }
 
-function normalizeLmsEnrollment(enrollment: any): MyRequestItem {
-  const course = enrollment.course ?? {};
-  return {
-    id: enrollment.id,
-    entityType: 'course_enrollment',
-    status: enrollment.status ?? 'in_progress',
-    displayTitle: course.title ?? enrollment.courseTitle ?? '강의 수강',
-    displayDescription: course.category ?? null,
-    reviewComment: null,
-    revisionNote: null,
-    reviewedAt: enrollment.completedAt ?? null,
-    resultEntityId: enrollment.courseId ?? null,
-    resultMetadata: null,
-    submittedAt: enrollment.startedAt ?? enrollment.createdAt ?? null,
-    createdAt: enrollment.createdAt ?? enrollment.startedAt ?? new Date().toISOString(),
-    updatedAt: enrollment.updatedAt ?? enrollment.createdAt ?? undefined,
-    serviceKey: 'k-cosmetics',
-    payload: {
-      courseId: enrollment.courseId ?? null,
-      progress: enrollment.progressPercentage ?? enrollment.progress ?? null,
-    },
-  };
-}
-
 export const kcosMyRequestsApi = {
   getMyRequests: async (): Promise<MyRequestItem[]> => {
-    const [storeRes, lmsRes, forumRes] = await Promise.allSettled([
+    const [storeRes, forumRes] = await Promise.allSettled([
       api.get<any>('/cosmetics/stores/application/me'),
-      api.get<any>('/lms/enrollments/me'),
       // WO-O4O-CROSS-SERVICE-MYPAGE-REQUESTS-COMMONIZATION-V1 §5·§18:
       // 포럼 개설 신청은 K-Cos 에서 제출은 되지만 사용자 상태 조회 화면이 없었다
       // (`fetchMyForumRequests` 소비처 0). 신규 endpoint 없이 기존 계약을 연결한다.
@@ -143,18 +118,6 @@ export const kcosMyRequestsApi = {
         : [];
       for (const app of applications) {
         items.push(normalizeStoreApplication(app));
-      }
-    }
-
-    if (lmsRes.status === 'fulfilled') {
-      const raw = lmsRes.value.data;
-      const enrollments: any[] = Array.isArray(raw?.data)
-        ? raw.data
-        : Array.isArray(raw)
-        ? raw
-        : [];
-      for (const enrollment of enrollments) {
-        items.push(normalizeLmsEnrollment(enrollment));
       }
     }
 

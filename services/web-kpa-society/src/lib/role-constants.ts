@@ -19,8 +19,7 @@ export const ROLES = {
   // WO-O4O-STORE-OWNER-ROLE-BASED-ACCESS-UNIFICATION-V1
   KPA_STORE_OWNER: 'kpa:store_owner',
 
-  // WO-O4O-INSTRUCTOR-DASHBOARD-ENTRY-V1
-  LMS_INSTRUCTOR: 'lms:instructor',
+  // WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2 §13: LMS_INSTRUCTOR('lms:instructor') 제거 — 강사 역할은 lecture 서비스(lecture:instructor) 소유.
 
   // 플랫폼 Super
   // WO-O4O-LEGACY-PLATFORM-ADMIN-AND-OPERATOR-CODE-REMOVAL-V1:

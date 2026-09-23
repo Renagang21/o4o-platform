@@ -26,8 +26,6 @@
  * ├─────────────────────────────────────────────────────────────────────┤
  * │ AUTHENTICATED (requireAuth only)                                    │
  * │  /mypage            - 마이페이지                                       │
- * │  /lms/enrollments   - 수강 관리                                       │
- * │  /lms/certificates  - 수료증 조회                                      │
  * │  /pharmacy/store    - 약국 스토어 설정                                  │
  * │  /pharmacy/products - 약국 상품 관리                                    │
  * │  /store-hub         - 스토어 허브                                      │
@@ -36,7 +34,6 @@
  * │ PUBLIC (no auth / optionalAuth)                                     │
  * │  /forum (GET)       - 포럼 조회                                        │
  * │  (demo-forum removed — WO-O4O-KPA-CODE-CLEANUP-V1)                     │
- * │  /lms/courses (GET) - 강좌 목록                                        │
  * │  /home              - 홈 페이지 데이터                                  │
  * │  /news (GET)        - 공지사항/뉴스 조회                                │
  * │  /resources         - 자료실 (placeholder)                             │
@@ -117,7 +114,6 @@ import { createLayoutController } from '../o4o-store/controllers/layout.controll
 import { createStoreSettingsController } from '../o4o-store/controllers/store-settings.controller.js'; // WO-STORE-COMMON-SETTINGS-FOUNDATION-V1
 // WO-O4O-ROUTES-REFACTOR-V1: Extracted controllers
 import { createInstructorController } from './controllers/instructor.controller.js';
-import { createCourseRequestController } from './controllers/course-request.controller.js';
 import { createForumRequestController } from './controllers/forum-request.controller.js';
 import { createForumMembershipController } from './controllers/forum-membership.controller.js';
 import { createContentApprovalController } from './controllers/content-approval.controller.js';
@@ -164,26 +160,11 @@ import { ForumController } from '../../controllers/forum/ForumController.js';
 import { forumContextMiddleware } from '../../middleware/forum-context.middleware.js';
 // WO-O4O-COMMUNITY-WORKSPACE-CATALOG-AND-ACCESS-ALIGNMENT-V1: 약사 커뮤니티 참여 자격 gate (공통)
 import { requireCommunityAccess } from '../forum/service-forum.routes.js';
-// WO-O4O-LMS-PUBLIC-COURSE-LIST-SERVICE-SCOPE-V1
-import { lmsContextMiddleware } from '../../modules/lms/utils/lms-service-scope.js';
-
-// LMS Controllers
-import { CourseController } from '../../modules/lms/controllers/CourseController.js';
-import { LessonController } from '../../modules/lms/controllers/LessonController.js';
-import { EnrollmentController } from '../../modules/lms/controllers/EnrollmentController.js';
-import { CertificateController } from '../../modules/lms/controllers/CertificateController.js';
-import { InstructorPublicController } from '../../modules/lms/controllers/InstructorPublicController.js';
-// WO-KPA-OPERATOR-LMS-BULK-ACTION-FIX-V1
-import { CourseService } from '../../modules/lms/services/CourseService.js';
+// WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2:
+//   KPA 는 더 이상 LMS runtime 을 소유하지 않는다. `/api/v1/kpa/lms/*` remount · LMS controller import ·
+//   course-request → LMS course 생성 경로를 제거했다. 강의는 O4O 강의(lecture) 서비스(study.neture.co.kr) 가 담당한다.
 // WO-O4O-CREDIT-SYSTEM-V1
 import { CreditController } from '../../modules/credit/controllers/CreditController.js';
-// WO-O4O-COMPLETION-V1
-import { CompletionController } from '../../modules/lms/controllers/CompletionController.js';
-// WO-O4O-LMS-CROSSSERVICE-READ-WRITE-BOUNDARY-COMPLETION-V1 §9:
-// KPA 학습 화면(lmsViewAdapter)이 실제로 호출하는데 remount 누락으로 404 나던 경로 보강.
-import { QuizController } from '../../modules/lms/controllers/QuizController.js';
-import { AssignmentController } from '../../modules/lms/controllers/AssignmentController.js';
-import { requireEnrollment } from '../../modules/lms/middleware/requireEnrollment.js';
 import { createStoreLocalProductRoutes } from '../platform/store-local-product.routes.js';
 import { createStoreTabletRoutes } from '../platform/store-tablet.routes.js';
 
@@ -250,9 +231,6 @@ export function createKpaRoutes(dataSource: DataSource): Router {
 
   // Instructor Qualifications (WO-O4O-ROUTES-REFACTOR-V1)
   router.use('/', createInstructorController(dataSource, coreRequireAuth as any, requireKpaScope));
-
-  // Course Requests (WO-O4O-ROUTES-REFACTOR-V1)
-  router.use('/', createCourseRequestController(dataSource, coreRequireAuth as any, requireKpaScope));
 
   // Forum Requests (WO-O4O-ROUTES-REFACTOR-V1)
   // @deprecated WO-O4O-FORUM-REQUEST-API-DEDUP-V1 — legacy /kpa/forum-requests/* (kpa_approval_requests).
@@ -742,158 +720,8 @@ export function createKpaRoutes(dataSource: DataSource): Router {
 
   router.use('/forum', forumRouter);
 
-  // ============================================================================
-  // LMS Routes - /api/v1/kpa/lms/*
-  // ============================================================================
-  const lmsRouter = Router();
-
-  // WO-O4O-LMS-PUBLIC-COURSE-LIST-SERVICE-SCOPE-V1: 서비스 prefix 라우트 컨텍스트.
-  // Forum 의 forumContextMiddleware 선례와 동일 계약 — serviceCode 는 RBAC role prefix 이고
-  // controller 가 resolveCanonicalServiceKey() 로 'kpa-society' 로 변환한다.
-  lmsRouter.use(lmsContextMiddleware({ serviceCode: 'kpa' }));
-
-  // Courses
-  lmsRouter.get('/courses', optionalAuth, asyncHandler(CourseController.listCourses));
-  lmsRouter.get('/courses/:id', optionalAuth, asyncHandler(CourseController.getCourse));
-  lmsRouter.get('/courses/:courseId/lessons', optionalAuth, asyncHandler(LessonController.listLessonsByCourse));
-
-  // Lesson detail (authenticated + enrollment check)
-  lmsRouter.get('/lessons/:id', authenticate, requireEnrollment({ checkLesson: true }), asyncHandler(LessonController.getLesson));
-
-  // Enrollments (authenticated)
-  lmsRouter.get('/enrollments', authenticate, asyncHandler(EnrollmentController.getMyEnrollments));
-  // IR-O4O-KPA-MYPAGE-ENROLLMENTS-API-FAIL-AUDIT-V1:
-  // lms-client factory 의 getMyEnrollments 는 /lms/enrollments/me 를 호출한다.
-  // KPA lmsRouter 에 /enrollments/me 가 없으면 아래 /enrollments/:courseId 가 courseId='me' 로
-  // 캡처하여 getMyEnrollmentForCourse 를 호출 → 잘못된 핸들러 → 오류 발생.
-  // 반드시 /:courseId wildcard 보다 먼저 등록해야 한다.
-  lmsRouter.get('/enrollments/me', authenticate, asyncHandler(EnrollmentController.getMyEnrollments));
-  // HOTFIX-O4O-KPA-LMS-ENROLLMENT-ROUTE-ALIAS-V1:
-  // factory(learnerClient) 호출 경로 /enrollments/me/course/:courseId 와 기존 /enrollments/:courseId 모두 지원.
-  // 둘 다 getMyEnrollmentForCourse(userId+courseId 복합 조회)를 사용해야 함.
-  // 기존 라우트는 getEnrollment(id 단독 조회) → 잘못된 핸들러였으므로 함께 수정.
-  lmsRouter.get('/enrollments/me/course/:courseId', authenticate, asyncHandler(EnrollmentController.getMyEnrollmentForCourse));
-  lmsRouter.get('/enrollments/:courseId', authenticate, asyncHandler(EnrollmentController.getMyEnrollmentForCourse));
-  lmsRouter.post('/courses/:courseId/enroll', authenticate, asyncHandler(EnrollmentController.enrollCourse));
-  lmsRouter.post('/enrollments/:courseId/progress', authenticate, asyncHandler(EnrollmentController.updateLessonProgress));
-
-  // WO-O4O-LMS-CROSSSERVICE-READ-WRITE-BOUNDARY-COMPLETION-V1 §9 (routing defect fix)
-  // KPA `lmsViewAdapter` 는 quiz/assignment 학습자 API 를 호출하지만 remount 에 빠져 있어
-  // `/api/v1/kpa/lms/*` 에서 404 였다. 신규 기능 구현이 아니라 generic 라우터와 동일한
-  // 핸들러·가드를 그대로 remount 하는 정합 조치다.
-  lmsRouter.get('/lessons/:lessonId/quiz', authenticate, asyncHandler(QuizController.getQuizForLesson));
-  lmsRouter.post('/quizzes/:quizId/submit', authenticate, asyncHandler(QuizController.submitQuiz));
-  lmsRouter.get('/quizzes/:quizId/attempts', authenticate, asyncHandler(QuizController.getAttempts));
-  lmsRouter.get('/lessons/:lessonId/assignment', authenticate, asyncHandler(AssignmentController.getAssignmentForLesson));
-  lmsRouter.post('/assignments/:assignmentId/submit', authenticate, asyncHandler(AssignmentController.submitAssignment));
-  lmsRouter.get('/assignments/:assignmentId/my', authenticate, asyncHandler(AssignmentController.getMySubmission));
-
-  // Certificates
-  lmsRouter.get('/certificates', authenticate, asyncHandler(CertificateController.getMyCertificates));
-  lmsRouter.get('/certificates/:id', authenticate, asyncHandler(CertificateController.getCertificate));
-
-  // Instructor Public Profile (no auth) - WO-CONTENT-INSTRUCTOR-PUBLIC-PROFILE-V1
-  lmsRouter.get('/instructors/:userId/public-profile', asyncHandler(InstructorPublicController.getPublicProfile));
-
-  // WO-O4O-COMPLETION-V1: Completions
-  lmsRouter.get('/completions/me', authenticate, asyncHandler(CompletionController.getMyCompletions));
-
-  // WO-KPA-OPERATOR-LMS-BULK-ACTION-FIX-V1: Operator 강의 상태 변경
-  // requireInstructor/isOwnerOrAdmin 우회 — kpa:operator 이상 역할이면 모든 강의 상태 변경 가능
-  lmsRouter.post('/operator/courses/:id/unpublish', authenticate, requireKpaScope('kpa:operator'), asyncHandler(async (req: Request, res: Response) => {
-    const service = CourseService.getInstance();
-    const course = await service.getCourse(req.params.id);
-    if (!course) { res.status(404).json({ success: false, error: '강의를 찾을 수 없습니다' }); return; }
-    const updated = await service.unpublishCourse(req.params.id);
-    res.json({ success: true, data: { course: updated } });
-  }));
-
-  // WO-O4O-LMS-COURSE-APPROVAL-FLOW-V1: Operator 강의 승인
-  // PENDING_REVIEW → PUBLISHED. PENDING_REVIEW 상태가 아닌 강의는 400 반환.
-  lmsRouter.post('/operator/courses/:id/approve', authenticate, requireKpaScope('kpa:operator'), asyncHandler(async (req: Request, res: Response) => {
-    const service = CourseService.getInstance();
-    const course = await service.getCourse(req.params.id);
-    if (!course) { res.status(404).json({ success: false, error: '강의를 찾을 수 없습니다' }); return; }
-    try {
-      const userRoles: string[] = (req as any).user?.roles || [];
-      const updated = await service.approveCourse(req.params.id, {
-        id: (req as any).user?.id,
-        role: userRoles[0] ?? null,
-      });
-      res.json({ success: true, data: { course: updated } });
-    } catch (err: any) {
-      if (err.message?.startsWith('INVALID_STATUS_TRANSITION')) {
-        res.status(400).json({ success: false, error: '검토 대기(PENDING_REVIEW) 상태의 강의만 승인할 수 있습니다.', code: 'INVALID_STATUS_TRANSITION' });
-        return;
-      }
-      throw err;
-    }
-  }));
-
-  // WO-O4O-LMS-COURSE-APPROVAL-FLOW-V1: Operator 강의 반려
-  // PENDING_REVIEW → REJECTED + rejectionReason 저장.
-  // Body: { reason: string }
-  lmsRouter.post('/operator/courses/:id/reject', authenticate, requireKpaScope('kpa:operator'), asyncHandler(async (req: Request, res: Response) => {
-    const service = CourseService.getInstance();
-    const course = await service.getCourse(req.params.id);
-    if (!course) { res.status(404).json({ success: false, error: '강의를 찾을 수 없습니다' }); return; }
-    const reason = typeof req.body?.reason === 'string' ? req.body.reason : '';
-    try {
-      const userRoles: string[] = (req as any).user?.roles || [];
-      const updated = await service.rejectCourse(req.params.id, reason, {
-        id: (req as any).user?.id,
-        role: userRoles[0] ?? null,
-      });
-      res.json({ success: true, data: { course: updated } });
-    } catch (err: any) {
-      if (err.message === 'REJECTION_REASON_REQUIRED') {
-        res.status(400).json({ success: false, error: '반려 사유를 입력해주세요.', code: 'REJECTION_REASON_REQUIRED' });
-        return;
-      }
-      if (err.message?.startsWith('INVALID_STATUS_TRANSITION')) {
-        res.status(400).json({ success: false, error: '검토 대기(PENDING_REVIEW) 상태의 강의만 반려할 수 있습니다.', code: 'INVALID_STATUS_TRANSITION' });
-        return;
-      }
-      throw err;
-    }
-  }));
-
-  lmsRouter.post('/operator/courses/:id/archive', authenticate, requireKpaScope('kpa:operator'), asyncHandler(async (req: Request, res: Response) => {
-    const service = CourseService.getInstance();
-    const course = await service.getCourse(req.params.id);
-    if (!course) { res.status(404).json({ success: false, error: '강의를 찾을 수 없습니다' }); return; }
-    const updated = await service.archiveCourse(req.params.id);
-    res.json({ success: true, data: { course: updated } });
-  }));
-
-  // WO-LMS-COURSE-HARD-DELETE-V1: Operator 강의 완전 삭제 (archived 상태만)
-  lmsRouter.delete('/operator/courses/:id/hard', authenticate, requireKpaScope('kpa:operator'), asyncHandler(async (req: Request, res: Response) => {
-    const service = CourseService.getInstance();
-    const course = await service.getCourse(req.params.id);
-    if (!course) { res.status(404).json({ success: false, error: '강의를 찾을 수 없습니다' }); return; }
-    if (course.status !== 'archived') {
-      res.status(400).json({ success: false, error: '종료(보관) 상태의 강의만 완전 삭제할 수 있습니다.' });
-      return;
-    }
-    const courseId = course.id;
-    const title = course.title;
-
-    // FK cascade 순서: 자식 → 부모
-    await dataSource.query(`DELETE FROM lms_progress WHERE "enrollmentId" IN (SELECT id FROM lms_enrollments WHERE "courseId" = $1)`, [courseId]);
-    await dataSource.query(`DELETE FROM lms_progress WHERE "lessonId" IN (SELECT id FROM lms_lessons WHERE "courseId" = $1)`, [courseId]);
-    await dataSource.query(`DELETE FROM lms_quiz_attempts WHERE "quizId" IN (SELECT id FROM lms_quizzes WHERE "courseId" = $1)`, [courseId]);
-    await dataSource.query(`DELETE FROM lms_quizzes WHERE "courseId" = $1`, [courseId]);
-    await dataSource.query(`DELETE FROM lms_certificates WHERE "courseId" = $1`, [courseId]);
-    await dataSource.query(`DELETE FROM lms_enrollments WHERE "courseId" = $1`, [courseId]);
-    await dataSource.query(`DELETE FROM lms_events WHERE "courseId" = $1`, [courseId]);
-    await dataSource.query(`DELETE FROM lms_lessons WHERE "courseId" = $1`, [courseId]);
-    await dataSource.query(`DELETE FROM lms_courses WHERE id = $1`, [courseId]);
-
-    await writeAuditLog((req as any).user, 'COURSE_HARD_DELETED', 'content', courseId, { title });
-    res.json({ success: true, data: { deleted: true, id: courseId, title } });
-  }));
-
-  router.use('/lms', lmsRouter);
+  // LMS Routes — WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2: `/api/v1/kpa/lms/*` 제거.
+  //   KPA runtime 은 LMS 를 소유하지 않는다. 학습·강사·운영 API 는 `/api/v1/lms/*` (Lecture 전용) 만 존재한다.
 
   // ============================================================================
   // Credit Routes - /api/v1/kpa/credits/* (WO-O4O-CREDIT-SYSTEM-V1)
@@ -1029,7 +857,7 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   }));
 
   // GET /home/latest — 통합 최신 활동 피드 (WO-O4O-KPA-HOME-LATEST-ACTIVITY-SECTION-V1)
-  // ?type=all|forum|course|content|resource|signage  ?limit=20
+  // ?type=all|forum|content|resource|signage  ?limit=20
   homeRouter.get('/latest', optionalAuth, asyncHandler(async (req: Request, res: Response) => {
     const filterType = ((req.query.type as string) || 'all').toLowerCase();
     const limit = Math.min(parseInt(req.query.limit as string) || 20, 50);
@@ -1060,33 +888,7 @@ export function createKpaRoutes(dataSource: DataSource): Router {
       })());
     }
 
-    if (filterType === 'all' || filterType === 'course') {
-      tasks.push((async () => {
-        // WO-O4O-KPA-COMMUNITY-FINAL-STABILIZATION-V1:
-        //   lms_courses 는 camelCase 인용 컬럼("instructorId"/"createdAt")을 쓰는데
-        //   snake_case(instructor_id/created_at)로 조회해 쿼리가 매번 throw 됐고,
-        //   상위 Promise.allSettled 가 이를 삼켜 **강의 탭이 항상 빈 목록**이었다
-        //   (데이터 부재가 아님 — /lms 목록에는 published 강의가 존재).
-        //   컬럼명만 실제 스키마에 맞춘다. 조회 조건·정렬·개수는 무변경.
-        const rows: any[] = await dataSource.query(
-          `SELECT c.id, c.title, c."createdAt" AS created_at, u.name AS author_name
-           FROM lms_courses c LEFT JOIN users u ON c."instructorId" = u.id
-           WHERE c.status = 'published' ORDER BY c."createdAt" DESC LIMIT $1`,
-          [perLimit],
-        );
-        for (const r of rows) {
-          items.push({
-            type: 'course', id: r.id, title: r.title,
-            authorName: r.author_name ?? undefined,
-            createdAt: new Date(r.created_at).toISOString(),
-            // WO-O4O-KPA-MAIN-HOME-LINK-CANONICAL-ALIGNMENT-V1:
-            //   프론트 canonical 라우트는 `/lms/course/:id` 다 (App.tsx). 기존 `/lms/courses/:id` 는
-            //   API 경로 형태를 그대로 내보낸 것으로 라우트가 없어 NotFoundPage 로 떨어졌다.
-            href: `/lms/course/${r.id}`,
-          });
-        }
-      })());
-    }
+    // WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2: 'course' 탭 제거 (lms_courses 는 KPA 데이터가 아니다).
 
     if (filterType === 'all' || filterType === 'content') {
       tasks.push((async () => {

@@ -8,10 +8,12 @@ import { Link } from 'react-router-dom';
 import { Loader2, AlertCircle, RefreshCw } from 'lucide-react';
 import { homeApi, type LatestItem } from '../api/home';
 
+// WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2 (PR #225 11차 P2):
+// '강의' 탭 제거 — backend 홈 피드에서 'course' 타입이 은퇴해 항상 빈 결과였다.
+// 강의는 독립 서비스 O4O 강의(study.neture.co.kr) 소유이며 KPA 홈 피드에 실리지 않는다.
 const TABS = [
   { key: 'all',      label: '전체' },
   { key: 'forum',    label: '포럼' },
-  { key: 'course',   label: '강의' },
   { key: 'content',  label: '콘텐츠' },
   { key: 'signage',  label: '사이니지' },
   { key: 'resource', label: '자료실' },
@@ -19,7 +21,6 @@ const TABS = [
 
 const TYPE_BADGE: Record<string, { label: string; cls: string }> = {
   forum:    { label: '포럼',     cls: 'bg-blue-100 text-blue-700' },
-  course:   { label: '강의',     cls: 'bg-purple-100 text-purple-700' },
   content:  { label: '콘텐츠',   cls: 'bg-emerald-100 text-emerald-700' },
   resource: { label: '자료실',   cls: 'bg-amber-100 text-amber-700' },
   signage:  { label: '사이니지', cls: 'bg-rose-100 text-rose-700' },

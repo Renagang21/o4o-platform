@@ -33,7 +33,6 @@ const KCOS_AXES: OperatorAxisGroup[] = [
       { key: 'stores', label: '매장 관리', href: '/operator/stores' },
       { key: 'content-management', label: '콘텐츠 관리', href: '/operator/content-management' },
       { key: 'supplier-contents', label: '제공받은 콘텐츠', href: '/operator/supplier-contents' },
-      { key: 'lms', label: '강의 관리', href: '/operator/lms' },
       { key: 'resources', label: '자료실', href: '/operator/resources' },
       { key: 'signage', label: '사이니지', href: '/operator/signage/hq-media' },
     ],

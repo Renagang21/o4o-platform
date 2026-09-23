@@ -70,7 +70,7 @@ const NON_STORE_REPRESENTATIVES = [
   'packages/shared-space-ui/src/ForumWriteForm.tsx', // COMMUNITY
   'services/web-neture/src/pages/supplier/SupplierProductCreatePage.tsx', // SUPPLIER
   'packages/operator-core-ui/src/modules/hub-content-write/OperatorHubContentWritePage.tsx', // OPERATOR
-  'services/web-kpa-society/src/pages/instructor/courses/CourseEditPage.tsx', // LECTURE
+  'services/web-lecture/src/pages/instructor/InstructorCourseEditPage.tsx', // LECTURE (Phase 2 §14: KPA 강사 화면 은퇴)
 ];
 
 /** 파일 안의 모든 <RichTextEditor ...> 여는 태그 텍스트 */

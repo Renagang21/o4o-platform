@@ -12,6 +12,15 @@ import {
 } from '../utils/lms-service-scope.js';
 // WO-O4O-LMS-CROSSSERVICE-READ-WRITE-BOUNDARY-COMPLETION-V1
 import { guardLessonScope } from '../utils/lms-scope-guard.js';
+import {
+  rolesIncludeLectureAdmin,
+  isLectureCourse,
+  isPlatformSuperAdmin,
+  hasLectureAdminRole,
+  hasLectureOperatorRole,
+  hasLectureInstructorRole,
+  resolveLectureMembershipStatus,
+} from '../middleware/lecture-access.js';
 
 /**
  * LessonController
@@ -20,15 +29,44 @@ import { guardLessonScope } from '../utils/lms-scope-guard.js';
  *
  * WO-KPA-A-LMS-COURSE-OWNERSHIP-GUARD-V1:
  * - All write operations verify parent course.instructorId === userId
- * - kpa:admin bypasses ownership check
+ * - lecture:admin bypasses ownership check (WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2)
+ * - PR #225 merge-gate: 대상 course 가 lecture 가 아니면(legacy KPA/PH) 소유자·lecture:admin 여부와 무관하게
+ *   non-disclosure 404 — Lecture runtime 이 타 서비스 강의를 ID 로 변경할 수 없다.
  */
 export class LessonController extends BaseController {
   private static async checkCourseOwnership(courseId: string, userId: string, userRoles: string[]): Promise<{ allowed: boolean; notFound: boolean }> {
-    if (userRoles.includes('kpa:admin')) return { allowed: true, notFound: false };
     const courseService = CourseService.getInstance();
     const course = await courseService.getCourse(courseId);
-    if (!course) return { allowed: false, notFound: true };
+    if (!course || !isLectureCourse(course.serviceKey)) return { allowed: false, notFound: true };
+    if (rolesIncludeLectureAdmin(userRoles)) return { allowed: true, notFound: false };
     return { allowed: course.instructorId === userId, notFound: false };
+  }
+
+  /**
+   * PR #225 merge-gate 11차 P2: 미발행(draft) lesson 은 learner 에게 보이지 않는다.
+   *
+   * learner 경로(`/courses/:courseId/lessons`, `/lessons/:id`)는 `requireEnrollment` 만 통과하면
+   * `isPublished=false` 인 초안까지 그대로 돌려줬다. 강사 초안 접근은 별도 경로
+   * (`/instructor/courses/:courseId/lessons`)가 담당하지만, 소유자 · lecture staff 가
+   * learner 경로로 들어온 경우까지 막지 않기 위해 여기서만 예외를 둔다.
+   *
+   * 11차 후속(Codex P2 · LessonController:50): 예외의 조건은 `CourseController.canSeeUnpublished`
+   * 와 **같다**. 무료·public 강의에서는 `requireEnrollment` 가 membership 판정을 건너뛰므로,
+   * 여기서 active Lecture membership 을 직접 확인한다 — role 이 회수된 과거 강사(`instructorId`
+   * 잔존)나 membership 이 정지된 stale `lecture:admin` 토큰은 초안을 열지 못한다.
+   * 소유권은 role 을 대체하지 않는다. (`platform:super_admin` break-glass 만 예외.)
+   */
+  private static async canSeeUnpublishedLessons(
+    req: Request,
+    course: { instructorId?: string | null } | null | undefined,
+  ): Promise<boolean> {
+    const userId = (req as any).user?.id;
+    if (!userId) return false;
+    if (isPlatformSuperAdmin(req)) return true;
+    const isOwningInstructor = Boolean(course?.instructorId) && course?.instructorId === userId && hasLectureInstructorRole(req);
+    const isLectureStaff = hasLectureOperatorRole(req) || hasLectureAdminRole(req);
+    if (!isOwningInstructor && !isLectureStaff) return false;
+    return (await resolveLectureMembershipStatus(req)) === 'active';
   }
 
   static async createLesson(req: Request, res: Response): Promise<any> {
@@ -69,6 +107,14 @@ export class LessonController extends BaseController {
         return BaseController.notFound(res, 'Lesson not found');
       }
 
+      // 11차 P2: 미발행 lesson 은 소유자 · lecture:admin 이 아니면 존재를 알리지 않는다.
+      if (lesson.isPublished === false) {
+        const course = await CourseService.getInstance().getCourse(lesson.courseId);
+        if (!(await LessonController.canSeeUnpublishedLessons(req, course))) {
+          return BaseController.notFound(res, 'Lesson not found');
+        }
+      }
+
       return BaseController.ok(res, { lesson });
     } catch (error: any) {
       logger.error('[LessonController.getLesson] Error', { error: error.message });
@@ -93,14 +139,25 @@ export class LessonController extends BaseController {
         }
         throw e;
       }
+      let course: Awaited<ReturnType<CourseService['getCourse']>> | null = null;
       if (serviceScope) {
-        const course = await CourseService.getInstance().getCourse(courseId);
+        course = await CourseService.getInstance().getCourse(courseId);
         if (!course || !isCourseInServiceScope(course.serviceKey, serviceScope)) {
           return BaseController.notFound(res, 'Course not found');
         }
       }
 
-      const { lessons, total } = await service.listLessonsByCourse(courseId, filters as any);
+      // 11차 P2: learner 목록에는 발행된 lesson 만. 소유자 · lecture:admin 만 초안을 본다
+      // (요청의 isPublished 필터를 신뢰하지 않고 서버가 확정한다).
+      const effectiveFilters: Record<string, any> = { ...(filters as any) };
+      // role 만으로 단정하지 않는다 — membership 까지 확인하는 단일 판정을 쓴다.
+      course = course ?? (await CourseService.getInstance().getCourse(courseId));
+      const canSeeDrafts = await LessonController.canSeeUnpublishedLessons(req, course);
+      if (!canSeeDrafts) {
+        effectiveFilters.isPublished = true;
+      }
+
+      const { lessons, total } = await service.listLessonsByCourse(courseId, effectiveFilters as any);
 
       return BaseController.okPaginated(res, lessons, {
         total,
@@ -127,6 +184,7 @@ export class LessonController extends BaseController {
       if (!lesson) return BaseController.notFound(res, 'Lesson not found');
 
       const ownership = await LessonController.checkCourseOwnership(lesson.courseId, userId, userRoles);
+      if (ownership.notFound) return BaseController.notFound(res, 'Lesson not found');
       if (!ownership.allowed) return BaseController.forbidden(res, 'You can only modify lessons in your own courses');
 
       const updated = await service.updateLesson(id, data);
@@ -154,6 +212,7 @@ export class LessonController extends BaseController {
       if (!lesson) return BaseController.notFound(res, 'Lesson not found');
 
       const ownership = await LessonController.checkCourseOwnership(lesson.courseId, userId, userRoles);
+      if (ownership.notFound) return BaseController.notFound(res, 'Lesson not found');
       if (!ownership.allowed) return BaseController.forbidden(res, 'You can only delete lessons in your own courses');
 
       await service.deleteLesson(id);

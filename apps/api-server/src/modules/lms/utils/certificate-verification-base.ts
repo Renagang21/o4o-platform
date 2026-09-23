@@ -1,26 +1,19 @@
 /**
- * WO-O4O-KCOSMETICS-CERTIFICATE-VERIFICATION-DOMAIN-FALLBACK-FIX-V1
- *
  * 수료증 검증 링크(PDF QR)의 frontend base URL 결정 계약.
- * WO-O4O-LMS-CERTIFICATE-DOMAIN-V1 에서 CertificateController 내부 private
- * 함수로 있던 것을 계약 고정(unit test) 목적으로 util 로 분리했다. 동작은 동일하다.
  *
- * 우선순위: 서비스별 env → 공통 FRONTEND_URL → 코드 fallback(정본 production 도메인)
- * null/unknown serviceKey = legacy course → KPA fallback (하위호환 유지)
+ * 이력:
+ *  - WO-O4O-LMS-CERTIFICATE-DOMAIN-V1 · WO-O4O-KCOSMETICS-CERTIFICATE-VERIFICATION-DOMAIN-FALLBACK-FIX-V1:
+ *    serviceKey 별 도메인(kpa-society / k-cosmetics / pharmacy-hub) 분기 + KPA default fallback.
+ *  - WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2 §17:
+ *    수료증 화면은 독립 강의 서비스(`lecture` · study.neture.co.kr) 단일 소유다.
+ *    KPA / K-Cosmetics / PharmacyHub 의 `/certificate/verify/:id` 는 Lecture 로 외부 이동만 하므로
+ *    검증 링크는 serviceKey 와 무관하게 Lecture 도메인으로 인쇄한다. **KPA fallback 은 없다.**
+ *    (data cutover 전 잔존 legacy serviceKey row 도 동일 — Lecture 가 id 기반 공개 검증을 제공한다.)
+ *
+ * 우선순위: LECTURE_FRONTEND_URL → 코드 fallback(정본 production 도메인)
  */
-export function resolveVerificationBase(serviceKey: string | null | undefined): string {
-  switch (serviceKey) {
-    case 'k-cosmetics':
-      // k-cosmetics 정본 production 도메인은 k-cosmetics.site 다.
-      // (k-cosmetics.co.kr 은 O4O 소유가 아닌 제3자 Cafe24 몰이다 — CHECK 문서 §2 참조)
-      return process.env.KCOSMETICS_FRONTEND_URL || process.env.FRONTEND_URL || 'https://k-cosmetics.site';
-    case 'pharmacy-hub':
-      // WO-O4O-PHARMACYHUB-LMS-LEARNER-FULL-ADOPTION-V1 §21 (누락된 serviceKey 매핑)
-      // PH 수료증도 공통 LMS lifecycle 로 발급되는데 매핑이 없어 검증 링크가
-      // KPA 도메인으로 인쇄되고 있었다. 계약 변경 없이 case 만 추가한다.
-      return process.env.PHARMACY_HUB_FRONTEND_URL || process.env.FRONTEND_URL || 'https://pharmacyhub.co.kr';
-    case 'kpa-society':
-    default:
-      return process.env.KPA_FRONTEND_URL || process.env.FRONTEND_URL || 'https://kpa-society.co.kr';
-  }
+export const LECTURE_CERTIFICATE_VERIFICATION_BASE = 'https://study.neture.co.kr';
+
+export function resolveVerificationBase(_serviceKey: string | null | undefined): string {
+  return process.env.LECTURE_FRONTEND_URL || LECTURE_CERTIFICATE_VERIFICATION_BASE;
 }

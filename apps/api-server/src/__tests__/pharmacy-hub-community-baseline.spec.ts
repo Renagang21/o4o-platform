@@ -28,8 +28,9 @@ describe('PharmacyHub Community baseline — /home/latest 서비스 경계', () 
     expect(LATEST).toContain("communityForumStorageCodes('pharmacy')");
   });
 
-  it('course 집계는 lms_courses.service_key 로 격리한다', () => {
-    expect(LATEST).toContain('c.service_key = $1');
+  it('course 축은 /home/latest 에서 제거됐다 — LMS runtime 은 O4O 강의(lecture) 전용 (WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2 §14)', () => {
+    expect(LATEST).not.toContain('FROM lms_courses');
+    expect(LATEST).not.toContain('c.service_key = $1');
   });
 
   it('closed forum 글은 공개 최신 활동에 넣지 않는다', () => {
@@ -47,11 +48,9 @@ describe('PharmacyHub Community baseline — /home/latest 서비스 경계', () 
     expect(LATEST).toContain("c.status = 'published'");
   });
 
-  it('lms_courses 는 quoted camelCase 컬럼으로 조회한다(snake_case 오조회 재발 방지)', () => {
-    expect(LATEST).toContain('c."instructorId"');
-    expect(LATEST).toContain('c."createdAt"');
+  it('lms_courses 조회가 남아 있지 않다 (snake_case 오조회 회귀 대상 자체가 없음)', () => {
+    expect(LATEST).not.toContain('c."instructorId"');
     expect(LATEST).not.toContain('c.instructor_id');
-    expect(LATEST).not.toContain('c.created_at');
   });
 
   it('조회 실패를 빈 목록으로 위장하지 않는다(allSettled 로 삼키지 않는다)', () => {

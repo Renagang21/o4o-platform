@@ -27,7 +27,6 @@ import { useAuth } from '../../contexts/AuthContext';
 const TYPE_FILTERS = [
   { key: '', label: '전체' },
   { key: 'forum_category', label: '포럼 개설' },
-  { key: 'course_enrollment', label: '수강' },
 ];
 
 export default function MyRequestsPage() {

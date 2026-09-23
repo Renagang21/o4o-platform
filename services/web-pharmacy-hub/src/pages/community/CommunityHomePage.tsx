@@ -52,7 +52,7 @@ const LATEST_TABS: LatestActivityTab[] = [
   { key: 'forum', label: '포럼', shortcutHref: '/forum', shortcutLabel: '포럼 바로가기' },
   { key: 'content', label: '콘텐츠', shortcutHref: '/content', shortcutLabel: '콘텐츠 바로가기' },
   { key: 'resource', label: '자료실', shortcutHref: '/resources', shortcutLabel: '자료실 바로가기' },
-  { key: 'course', label: '교육', shortcutHref: '/education', shortcutLabel: '교육 바로가기' },
+  // 교육 탭 — Phase 2 §14 (WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1): 독립 강의 서비스 소유 — 제거
 ];
 
 export default function CommunityHomePage() {
@@ -140,7 +140,6 @@ export default function CommunityHomePage() {
       noticesRightSlot={<HomeNewsCard />}
       appEntryCards={[
         { title: '포럼', description: '약국·공급자 정보 교류 게시판', href: '/forum' },
-        { title: '교육', description: '매장 운영·상품 이해 교육 콘텐츠', href: '/education' },
         { title: '콘텐츠', description: '회원이 작성한 지식 콘텐츠 읽고 쓰기', href: '/content' },
         { title: '커뮤니티 검색', description: '커뮤니티 글을 한 번에 검색', href: '/community/search' },
         { title: '내 글', description: '내가 작성한 글 모아보기', href: '/forum/my-posts' },

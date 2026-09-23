@@ -13,7 +13,7 @@
 
 import { useNavigate } from 'react-router-dom';
 import { useCallback } from 'react';
-import { LayoutDashboard, UserCircle, Settings, GraduationCap, Shield, Sparkles } from 'lucide-react';
+import { LayoutDashboard, UserCircle, Settings, Shield, Sparkles } from 'lucide-react';
 import { GlobalHeader, GlobalHeaderMenuItem, filterContextualNav } from '@o4o/ui';
 import { NotificationBell, useNotifications,
   resolveNotificationTarget, getUserDisplayName } from '@o4o/account-ui';
@@ -39,14 +39,8 @@ export function KCosGlobalHeader() {
   const isOperator = isAuthenticated && user?.roles?.some(
     (r: string) => r === 'cosmetics:operator' || r === 'cosmetics:admin' || r === 'platform:super_admin',
   );
-  // WO-O4O-KCOS-GLOBAL-HEADER-PROFILE-MENU-ALIGNMENT-V1:
-  // "강의 대시보드" 는 실제 lms:instructor 역할 보유자에게만 노출한다.
-  // 이전 결선 `showInstructor = isInstructor || isAdmin` 은 관리자라는 이유만으로
-  // 강의 대시보드를 강제 노출시키는 메뉴 오염이었음 — 제거.
-  const isInstructor = isAuthenticated && user?.roles?.some(
-    (r: string) => r === 'lms:instructor',
-  );
-  const showInstructor = isInstructor;
+  // WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2 §13·§14:
+  // legacy `lms:instructor` 판정 · 강의 대시보드 메뉴 제거 (강사 화면은 독립 강의 서비스 소유).
 
   // WO-O4O-AUTH-UTILS-STORE-OWNER-DUAL-V1: cosmetics:store_owner 부분 helper 적용
   // isStoreManager = 매장 경영자 OR 관리/운영 역할 (광의)
@@ -128,12 +122,6 @@ export function KCosGlobalHeader() {
       ) : undefined}
       userMenuItems={
         <>
-          {/* 강의 대시보드 — 최상단 (WO-KCOS-LMS-INSTRUCTOR-BOOTSTRAP-V1) */}
-          {showInstructor && (
-            <GlobalHeaderMenuItem to="/instructor" icon={<GraduationCap className="w-4 h-4" />}>
-              강의 대시보드
-            </GlobalHeaderMenuItem>
-          )}
           {/* WO-O4O-KCOS-PROFILE-DASHBOARD-LINK-FIX-V1:
               관리자/운영자 — 역할별 독립 표시 (KPA canonical
               WO-O4O-ROLE-BASED-PROFILE-MENU-CANONICALIZATION-V1 정합).

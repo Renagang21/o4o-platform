@@ -350,7 +350,7 @@ export function createCosmeticsRoutes(dataSource: DataSource): Router {
   });
 
   // GET /home/latest — 통합 최신 활동 피드
-  // ?type=all|forum|course|content|resource|signage  ?limit=20
+  // ?type=all|forum|content|resource|signage  ?limit=20
   homeRouter.get('/latest', optionalAuth as any, asyncHandler(async (req: Request, res: Response) => {
     const filterType = ((req.query.type as string) || 'all').toLowerCase();
     const limit = Math.min(parseInt(req.query.limit as string) || 20, 50);
@@ -381,24 +381,7 @@ export function createCosmeticsRoutes(dataSource: DataSource): Router {
       })());
     }
 
-    if (filterType === 'all' || filterType === 'course') {
-      tasks.push((async () => {
-        const rows: any[] = await dataSource.query(
-          `SELECT c.id, c.title, c.created_at, u.name AS author_name
-           FROM lms_courses c LEFT JOIN users u ON c.instructor_id = u.id
-           WHERE c.status = 'published' ORDER BY c.created_at DESC LIMIT $1`,
-          [perLimit],
-        );
-        for (const r of rows) {
-          items.push({
-            type: 'course', id: r.id, title: r.title,
-            authorName: r.author_name ?? undefined,
-            createdAt: new Date(r.created_at).toISOString(),
-            href: `/lms/course/${r.id}`,
-          });
-        }
-      })());
-    }
+    // WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2: 'course' 축 제거 — LMS runtime 은 O4O 강의(lecture) 서비스 전용이다.
 
     if (filterType === 'all' || filterType === 'content') {
       tasks.push((async () => {

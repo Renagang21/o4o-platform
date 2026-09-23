@@ -64,10 +64,8 @@ const PrivacyPage = lazy(() => import('@/pages/legal/PolicyDocumentPage').then(m
 const MyPageHub = lazy(() => import('@/pages/mypage/MyPageHub'));
 const MyProfilePage = lazy(() => import('@/pages/mypage/MyProfilePage'));
 const MySettingsPage = lazy(() => import('@/pages/mypage/MySettingsPage'));
-// MyPage LMS (WO-O4O-KCOS-LMS-MYPAGE-CANONICAL-ALIGNMENT-V1)
+// MyPage 크레딧 (내 수강·학습 결과는 Phase 2 §14 로 독립 강의 서비스 소유 — 제거)
 const MyCreditsPage = lazy(() => import('@/pages/mypage/MyCreditsPage'));
-const MyEnrollmentsPage = lazy(() => import('@/pages/mypage/MyEnrollmentsPage'));
-const MyCertificatesPage = lazy(() => import('@/pages/mypage/MyCertificatesPage'));
 const KcosMyRequestsPage = lazy(() => import('@/pages/mypage/MyRequestsPage'));
 
 // WO-O4O-PARTNER-APPLICATION-ENTITY-TABLE-CONTRACT-ROOT-CAUSE-AND-PRODUCTION-CLOSURE-V1:
@@ -106,14 +104,8 @@ const ForumRequestCategoryPage = lazy(() => import('@/pages/forum/RequestCategor
 // WO-O4O-FORUM-MEMBER-MANAGEMENT-EXPANSION-FRONTEND-V1
 const ForumMemberManagementPage = lazy(() => import('@/pages/forum/ForumMemberManagementPage'));
 
-// LMS (WO-KCOS-KPA-LMS-STEP1-ENABLE-V1 / WO-KCOS-KPA-LMS-STEP3-LESSON-PLAYER-V1)
-const EducationPage = lazy(() => import('@/pages/lms/EducationPage'));
-const LmsCourseDetailPage = lazy(() => import('@/pages/lms/LmsCourseDetailPage'));
-const LmsLessonPage = lazy(() => import('@/pages/lms/LmsLessonPage'));
-
-// LMS Instructor (WO-KCOS-LMS-INSTRUCTOR-BOOTSTRAP-V1)
-const InstructorDashboardPage = lazy(() => import('@/pages/instructor/InstructorDashboardPage'));
-const InstructorCoursesPage = lazy(() => import('@/pages/instructor/InstructorCoursesPage'));
+// WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2 §14·§15: K-Cosmetics 는 LMS runtime surface 를 소유하지 않는다 — 독립 강의 서비스(외부 public link)
+import { LECTURE_SERVICE_URL } from '@/config/navigation';
 
 // Resources Hub (WO-KCOS-RESOURCES-HUB-IMPLEMENTATION-V1)
 const ResourcesPage = lazy(() => import('@/pages/resources/ResourcesPage').then(m => ({ default: m.ResourcesPage })));
@@ -247,8 +239,6 @@ const OperatorSupplierContentsPage = lazy(() => import('@/pages/operator/Operato
 //   운영 분석 / Home 편집 공통 모듈 채택 (K-Cosmetics 만 미채택이었다)
 const OperatorAnalyticsPage = lazy(() => import('@/pages/operator/AnalyticsPage'));
 const OperatorCommunityManagementPage = lazy(() => import('@/pages/operator/CommunityManagementPage'));
-// WO-KCOS-OPERATOR-LMS-BOOTSTRAP-V1
-const OperatorLmsCoursesPage = lazy(() => import('@/pages/operator/OperatorLmsCoursesPage'));
 
 // WO-O4O-KCOSMETICS-OPERATOR-SURVEYS-V1
 const OperatorSurveyListPage = lazy(() => import('@/pages/operator/survey/OperatorSurveyListPage'));
@@ -280,7 +270,6 @@ import {
   kCosmeticsGuideUsageProps,
   kCosmeticsGuideFeaturesProps,
   kCosmeticsGuideFeatureForumProps,
-  kCosmeticsGuideFeatureLmsProps,
   kCosmeticsGuideFeatureContentProps,
   kCosmeticsGuideFeatureResourcesProps,
   kCosmeticsGuideFeatureSignageProps,
@@ -519,7 +508,7 @@ function PostLoginRedirect() {
     }
 
     // workspace 경로 early-exit
-    const WORKSPACE_PREFIXES = ['/store', '/operator', '/admin', '/instructor'];
+    const WORKSPACE_PREFIXES = ['/store', '/operator', '/admin'];
     if (WORKSPACE_PREFIXES.some(p => location.pathname.startsWith(p))) {
       didRedirectRef.current = true; return;
     }
@@ -533,6 +522,15 @@ function PostLoginRedirect() {
 }
 
 // App Routes
+/**
+ * WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2 §14·§15
+ * 레거시 LMS 경로 → 독립 강의 서비스(study.neture.co.kr) 외부 이동. 서비스 간 이동은 public link 로만 한다.
+ */
+function LectureExternalRedirect({ path = '' }: { path?: string }) {
+  useEffect(() => { window.location.replace(`${LECTURE_SERVICE_URL}${path}`); }, [path]);
+  return null;
+}
+
 function AppRoutes() {
   return (
     <Routes>
@@ -632,30 +630,10 @@ function AppRoutes() {
           }
         />
 
-        {/* LMS (WO-KCOS-KPA-LMS-STEP1-ENABLE-V1 / WO-KCOS-KPA-LMS-STEP3-LESSON-PLAYER-V1) */}
-        <Route path="lms" element={<EducationPage />} />
-        <Route path="lms/course/:id" element={<LmsCourseDetailPage />} />
-        <Route path="lms/course/:courseId/lesson/:lessonId" element={<LmsLessonPage />} />
-
-        {/* LMS Instructor (WO-KCOS-LMS-INSTRUCTOR-BOOTSTRAP-V1)
-            진입은 lms:instructor / cosmetics:admin / platform:super_admin.
-            백엔드 requireInstructor 가 실제 권한을 검증하므로 가드는 정책상 일관성을 위한 1차 차단. */}
-        <Route
-          path="instructor"
-          element={
-            <ProtectedRoute allowedRoles={['lms:instructor', 'cosmetics:admin', 'platform:super_admin']}>
-              <InstructorDashboardPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="instructor/courses"
-          element={
-            <ProtectedRoute allowedRoles={['lms:instructor', 'cosmetics:admin', 'platform:super_admin']}>
-              <InstructorCoursesPage />
-            </ProtectedRoute>
-          }
-        />
+        {/* LMS / 강사 — WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2 §14·§15:
+            레거시 경로는 독립 강의 서비스로 외부 이동(public link) */}
+        <Route path="lms/*" element={<LectureExternalRedirect />} />
+        <Route path="instructor/*" element={<LectureExternalRedirect />} />
 
         {/* MyPage 3-split (WO-O4O-KCOSMETICS-MYPAGE-SPLIT-V1) */}
         <Route
@@ -682,28 +660,14 @@ function AppRoutes() {
             </ProtectedRoute>
           }
         />
-        {/* MyPage LMS (WO-O4O-KCOS-LMS-MYPAGE-CANONICAL-ALIGNMENT-V1) */}
+        {/* MyPage 크레딧 (내 수강·학습 결과는 Phase 2 §14 로 독립 강의 서비스 소유) */}
+        <Route path="mypage/enrollments" element={<LectureExternalRedirect path="/my/enrollments" />} />
+        <Route path="mypage/certificates" element={<LectureExternalRedirect path="/my/certificates" />} />
         <Route
           path="mypage/credits"
           element={
             <ProtectedRoute>
               <MyCreditsPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="mypage/enrollments"
-          element={
-            <ProtectedRoute>
-              <MyEnrollmentsPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="mypage/certificates"
-          element={
-            <ProtectedRoute>
-              <MyCertificatesPage />
             </ProtectedRoute>
           }
         />
@@ -766,7 +730,6 @@ function AppRoutes() {
         <Route path="guide/usage" element={<GuideUsagePage {...kCosmeticsGuideUsageProps} />} />
         <Route path="guide/features" element={<GuideFeaturesPage {...kCosmeticsGuideFeaturesProps} />} />
         <Route path="guide/features/forum" element={<GuideFeatureManualPage {...kCosmeticsGuideFeatureForumProps} />} />
-        <Route path="guide/features/lms" element={<GuideFeatureManualPage {...kCosmeticsGuideFeatureLmsProps} />} />
         <Route path="guide/features/content" element={<GuideFeatureManualPage {...kCosmeticsGuideFeatureContentProps} />} />
         <Route path="guide/features/resources" element={<GuideFeatureManualPage {...kCosmeticsGuideFeatureResourcesProps} />} />
         <Route path="guide/features/signage" element={<GuideFeatureManualPage {...kCosmeticsGuideFeatureSignageProps} />} />
@@ -887,8 +850,6 @@ function AppRoutes() {
         <Route path="community" element={<OperatorCommunityManagementPage />} />
         {/* 문의 관리 — operator 이관 (WO-O4O-KCOS-OPERATOR-CONTACT-MANAGEMENT-MIGRATION-V1) */}
         <Route path="contacts" element={<OperatorContactInquiriesPage />} />
-        {/* LMS 강의 관리 (WO-KCOS-OPERATOR-LMS-BOOTSTRAP-V1) */}
-        <Route path="lms" element={<OperatorLmsCoursesPage />} />
         {/* 설문조사 관리 (WO-O4O-KCOSMETICS-OPERATOR-SURVEYS-V1) */}
         <Route path="surveys" element={<OperatorSurveyListPage />} />
         <Route path="surveys/new" element={<OperatorSurveyCreatePage />} />

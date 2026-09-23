@@ -15,6 +15,12 @@ import { kpaConfig } from '@o4o/operator-ux-core';
 // 로그인 상태와 무관하게 항상 노출. About은 마지막에 위치.
 // KpaGlobalHeader가 역할 조건 아이템을 삽입 후 이 배열을 조합한다.
 
+/**
+ * O4O 강의 (Lecture) 독립 서비스 — WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2 §14·§15
+ * KPA 는 LMS runtime surface 를 갖지 않는다. 강의 이동은 public link 로만 한다 (권한·회원 승계 없음).
+ */
+export const LECTURE_SERVICE_URL = 'https://study.neture.co.kr';
+
 export const KPA_BASE_NAV: GlobalHeaderNavItem[] = [
   { label: '커뮤니티', href: '/' },
 ];
@@ -59,7 +65,6 @@ export const KPA_FOOTER_SECTIONS: { title: string; links: GlobalHeaderNavItem[] 
     title: '서비스',
     links: [
       { label: '포럼', href: '/forum' },
-      { label: '강의', href: '/lms' },
       { label: '콘텐츠', href: '/content' },
       { label: '디지털사이니지', href: '/signage' },
       { label: '자료실', href: '/resources' },

@@ -6,11 +6,11 @@
  */
 
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Pagination, Card } from '../../components/common';
 import { MyPageLayout } from '../../layouts/MyPageLayout';
 import { MyPageLoadingState, MyPageEmptyState } from '@o4o/account-ui';
 import { creditApi } from '../../api/credit';
+import { LECTURE_SERVICE_URL } from '../../config/navigation';
 import { useAuth } from '../../contexts';
 import { colors, typography } from '../../styles/theme';
 import type { CreditTransaction } from '../../types';
@@ -22,7 +22,6 @@ const SOURCE_LABELS: Record<string, string> = {
 };
 
 export function MyCreditsPage() {
-  const navigate = useNavigate();
   const { user } = useAuth();
   const [balance, setBalance] = useState(0);
   const [transactions, setTransactions] = useState<CreditTransaction[]>([]);
@@ -135,7 +134,7 @@ export function MyCreditsPage() {
           title="적립 내역이 없습니다"
           description="학습 활동을 완료하면 크레딧이 적립됩니다."
           actionLabel="학습 시작"
-          onAction={() => navigate('/lms')}
+          onAction={() => window.location.assign(LECTURE_SERVICE_URL)}
         />
       ) : (
         <>

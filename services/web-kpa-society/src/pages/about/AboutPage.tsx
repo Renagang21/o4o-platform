@@ -13,6 +13,7 @@
  */
 
 import { useEffect } from 'react';
+import { LECTURE_SERVICE_URL } from '../../config/navigation';
 
 export function AboutPage() {
   useEffect(() => {
@@ -207,7 +208,7 @@ const O4O_STEPS = [
 
 const CTA_ITEMS = [
   { href: '/forum', icon: '💬', label: '포럼', desc: '약사 커뮤니티' },
-  { href: '/lms', icon: '🎓', label: '강의', desc: '보수교육·세미나' },
+  { href: LECTURE_SERVICE_URL, icon: '🎓', label: 'O4O 강의', desc: '독립 강의 서비스(외부)' },
   { href: '/content', icon: '📄', label: '콘텐츠', desc: '자료 검색·활용' },
   { href: '/resources', icon: '📁', label: '자료실', desc: '파일·AI 연결' },
 ];

@@ -526,17 +526,18 @@ export const kpaGuideFeaturesProps: GuideFeaturesPageProps = {
       linkTo: '/guide/features/forum',
     },
     {
+      // WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2 §14·§15:
+      // 강의는 독립 서비스 O4O 강의(study.neture.co.kr)가 소유한다. KPA 의 /lms · /mypage/enrollments 는
+      // 외부 이동 진입점만 남는다 — KPA 안에 강의 이용 가이드는 두지 않는다.
       step: '02',
       title: '강의',
       primaryRoute: '/lms',
-      description: '약사 전문 교육 강의 조회 및 수강. 강의별 레슨 학습과 진행 상황을 확인합니다.',
+      description: '약사 전문 교육 강의는 독립 서비스 「O4O 강의」에서 제공합니다. 아래 진입점에서 O4O 강의(study.neture.co.kr)로 이동해 수강·학습 관리·수료증을 이용합니다.',
       items: [
-        { label: '강의(LMS) 이용 방법', route: '/guide/features/lms' },
-        { label: '강의 목록', route: '/lms' },
-        { label: '강의 상세·수강', route: '/lms/course/:id' },
-        { label: '내 강의·수강 이력', route: '/mypage/enrollments' },
+        { label: 'O4O 강의로 이동', route: '/lms' },
+        { label: '내 강의·수강 이력 (O4O 강의)', route: '/mypage/enrollments' },
       ],
-      linkTo: '/guide/features/lms',
+      linkTo: '/lms',
     },
     {
       step: '03',
@@ -824,7 +825,7 @@ export const kpaGuideFeatureContentProps: GuideFeatureManualPageProps = {
       description: '설문조사와 강의는 각각의 전용 화면과 가이드에서 이용합니다.',
       items: [
         { label: '설문조사 가이드', detail: '설문 참여·작성·결과 확인·포인트 보상은 /guide/features/survey 가이드를 참고합니다.' },
-        { label: '강의(LMS) 가이드', detail: '강의 수강·작성 흐름은 /guide/features/lms 가이드를 참고합니다.' },
+        { label: '강의(O4O 강의)', detail: '강의 수강·작성은 독립 서비스 O4O 강의(study.neture.co.kr)에서 합니다. 홈의 강의 메뉴(/lms)에서 이동합니다.' },
       ],
     },
   ],
@@ -1396,95 +1397,6 @@ export const kpaGuideFeatureBlogProps: GuideFeatureManualPageProps = {
   },
 };
 
-// ─── /guide/features/lms ──────────────────────────────────────────────
-// WO-O4O-KPA-GUIDE-LMS-MANUAL-REFRESH-V1: 실제 구현 기준 전면 정비
-// - 강의 → 레슨 2단계 구조 (Chapter 제거)
-// - 레슨 타입 4종 반영 (텍스트·영상·퀴즈·과제)
-// - 학습자/강사 기능 분리
-
-export const kpaGuideFeatureLmsProps: GuideFeatureManualPageProps = {
-  hero: {
-    eyebrow: '기능별 이용 방법',
-    title: '강의(LMS) 이용 방법',
-    description: '약사 대상 전문 강의를 수강하고 학습 진행·수료 상태를 관리하는 교육 허브입니다',
-    primaryAction: { label: '강의 목록으로 이동 →', to: '/lms' },
-    flowBarTitle: '이용 흐름',
-    flowLabels: ['강의 찾기', '수강 신청', '강의 학습', '학습 관리', '수료증', '강사 기능'],
-  },
-  sections: [
-    {
-      step: '01',
-      title: '강의 찾기',
-      routeLabel: '/lms',
-      description: '강의 목록에서 원하는 강의를 찾습니다. 키워드 검색과 카테고리 필터로 빠르게 탐색할 수 있습니다.',
-      items: [
-        { label: '강의 목록', detail: '수강 가능한 강의 전체가 표시됩니다. 강의명·강사·카테고리 정보를 확인합니다.' },
-        { label: '검색', detail: '키워드를 입력해 강의명 기준으로 검색합니다.' },
-        { label: '필터', detail: '카테고리·상태별로 강의를 좁혀 탐색합니다.' },
-      ],
-    },
-    {
-      step: '02',
-      title: '수강 신청',
-      routeLabel: '/lms/course/:id',
-      description: '원하는 강의를 선택한 뒤 수강 신청 버튼을 누르면 학습을 시작할 수 있습니다.',
-      items: [
-        { label: '일반 강의', detail: '수강 신청 즉시 첫 레슨으로 이동합니다.' },
-        { label: '회원제 강의', detail: '로그인한 회원만 수강 신청이 가능합니다.' },
-        { label: '승인 필요 강의', detail: '강사가 수강 승인을 설정한 강의는 승인 후 학습이 시작됩니다. 승인 대기 중에는 내 강의에서 상태를 확인할 수 있습니다.' },
-      ],
-    },
-    {
-      step: '03',
-      title: '강의 학습',
-      routeLabel: '/lms/course/:courseId/lesson/:lessonId',
-      description: '강의는 강의 → 레슨 구조로 구성됩니다. 레슨 단위로 학습이 진행되며, 각 레슨은 텍스트·영상·퀴즈·과제 중 하나로 제공됩니다.',
-      items: [
-        { label: '텍스트 레슨', detail: '글 형태로 구성된 레슨입니다. 내용을 확인하고 완료 버튼을 누릅니다.' },
-        { label: '영상 레슨', detail: '영상을 시청하는 레슨입니다. 일정 비율 이상 시청하면 완료 처리됩니다.' },
-        { label: '퀴즈', detail: '문제를 풀고 제출하면 결과가 즉시 표시됩니다.' },
-        { label: '과제', detail: '답안을 작성해 제출합니다. 강사의 채점 후 결과를 확인할 수 있습니다.' },
-      ],
-    },
-    {
-      step: '04',
-      title: '학습 관리',
-      routeLabel: '/mypage/enrollments',
-      description: '내 강의에서 수강 중인 강의의 진행 상태를 확인합니다.',
-      items: [
-        { label: '진행률 확인', detail: '수강 중인 강의별 레슨 완료 비율이 표시됩니다.' },
-        { label: '내 강의', detail: '진행 중·완료·승인 대기·거절 상태별로 수강 이력을 확인합니다.' },
-      ],
-    },
-    {
-      step: '05',
-      title: '수료증',
-      routeLabel: '/mypage/certificates',
-      description: '모든 레슨을 완료하면 수료증이 자동 발급됩니다.',
-      items: [
-        { label: 'PDF 다운로드', detail: '수료증을 PDF 파일로 내려받을 수 있습니다. 수료 일시와 강의명이 포함됩니다.' },
-        { label: '공개 검증', detail: '수료증 링크를 통해 외부에서 수료 사실을 확인할 수 있습니다.' },
-      ],
-    },
-    {
-      step: '06',
-      title: '강사 기능',
-      routeLabel: '/instructor/courses',
-      description: '강사는 강의를 직접 만들고 수강생을 관리합니다.',
-      items: [
-        { label: '강의 만들기', detail: '강의 제목·설명·공개 여부를 설정하고 레슨을 추가합니다.' },
-        { label: '레슨 구성', detail: '텍스트·영상·퀴즈·과제 중 타입을 선택해 레슨을 구성합니다.' },
-        { label: '수강생 관리', detail: '수강 신청을 승인하거나 거절하고, 수강생별 진행 현황을 확인합니다.' },
-        { label: '과제 채점', detail: '제출된 과제를 확인하고 점수를 부여합니다.' },
-      ],
-    },
-  ],
-  bottomNav: {
-    prev: { label: '← 기능별 이용 방법', to: '/guide/features' },
-    home: { label: '홈으로', to: '/' },
-  },
-};
-
 // ─── /guide/features/store ─────────────────────────────────────────────
 
 export const kpaGuideFeatureStoreProps: GuideFeatureManualPageProps = {
@@ -1832,15 +1744,14 @@ export const kpaGuideForOperatorProps: GuideUsagePageProps = {
     {
       step: '04',
       title: '매장·회원 지원과 커뮤니티 운영',
-      routeLabel: '/operator/{members, forum-management, lms, surveys}',
+      routeLabel: '/operator/{members, forum-management, surveys}',
       description:
-        '회원 신청을 승인하고 포럼·LMS·설문 등 커뮤니티 활동을 운영합니다. 약국 경영자 회원을 승인하면 매장 운영 권한이 함께 부여됩니다. 운영자는 매장과 회원에게 운영 서비스를 제공하는 사업자입니다.',
+        '회원 신청을 승인하고 포럼·설문 등 커뮤니티 활동을 운영합니다. 강의 운영은 독립 서비스 O4O 강의의 운영자 화면이 담당합니다. 약국 경영자 회원을 승인하면 매장 운영 권한이 함께 부여됩니다. 운영자는 매장과 회원에게 운영 서비스를 제공하는 사업자입니다.',
       items: [
         // WO-O4O-KPA-OPERATOR-PHARMACY-SERVICE-REQUEST-LEGACY-REMOVE-V1:
         //   별도 '약국 신청 승인'(/operator/pharmacy-requests) 폐지 → 약국 경영자 회원 승인(회원 관리)에서 매장 권한 자동 부여.
         { label: '회원 관리', detail: '/operator/members — 가입 승인·역할·자격 관리 (약국 경영자 승인 시 매장 권한 자동 부여)' },
         { label: '포럼 관리', detail: '/operator/forum-management — 포럼 개설 승인·콘텐츠' },
-        { label: 'LMS 강의 운영', detail: '/operator/lms — 강의 개설·강사·커리큘럼' },
         { label: '설문 운영', detail: '/operator/surveys — 설문 작성·배포·응답 분석' },
       ],
     },

@@ -14,6 +14,7 @@ import { useNavigate } from 'react-router-dom';
 import { MyPageShell, MyPageAuthRequired, MyCreditsView } from '@o4o/account-ui';
 import { PHARMACY_HUB_ACCOUNT_NAV_ITEMS } from './navItems';
 import { api } from '../../lib/apiClient';
+import { LECTURE_SERVICE_URL } from '../../config/navigation';
 import { useAuth } from '../../contexts/AuthContext';
 
 export default function MyCreditsPage() {
@@ -85,7 +86,7 @@ export default function MyCreditsPage() {
       currentPage={currentPage}
       totalPages={totalPages}
       onPageChange={setCurrentPage}
-      onBrowseCourses={() => navigate('/education')}
+      onBrowseCourses={() => window.location.assign(LECTURE_SERVICE_URL)}
     />,
   );
 }

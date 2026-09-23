@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate, Outlet, Link, useNavigate, useLocation, useParams, useSearchParams } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, Link, useNavigate, useLocation, useParams, useSearchParams } from 'react-router-dom';
 import { useEffect, useState, useRef, lazy, Suspense, type ReactNode } from 'react';
 // WO-O4O-STORE-PRODUCTS-QUERYCLIENT-PROVIDER-ALIGN-V1
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -42,35 +42,9 @@ const ForumFeedPage = lazy(() => import('./pages/forum/ForumFeedPage').then(m =>
 const ForumMyPostsPage = lazy(() => import('./pages/forum/MyPostsPage').then(m => ({ default: m.MyPostsPage })));
 
 
-// LMS pages — WO-KPA-SOCIETY-APP-ROUTE-CODE-SPLITTING-V1: lazy (barrel unwound)
-const LmsCoursesPage = lazy(() => import('./pages/lms/LmsCoursesPage').then(m => ({ default: m.LmsCoursesPage })));
-const LmsCourseDetailPage = lazy(() => import('./pages/lms/LmsCourseDetailPage').then(m => ({ default: m.LmsCourseDetailPage })));
-const LmsLessonPage = lazy(() => import('./pages/lms/LmsLessonPage').then(m => ({ default: m.LmsLessonPage })));
-const LmsCertificatesPage = lazy(() => import('./pages/lms/LmsCertificatesPage').then(m => ({ default: m.LmsCertificatesPage })));
-// Certificate Verification (WO-O4O-LMS-CERTIFICATE-VERIFICATION-V1) — public, no auth — Phase 2 lazy
-const CertificateVerifyPage = lazy(() => import('./pages/lms/CertificateVerifyPage'));
-
-// Course pages (Public-facing) — Phase 2 lazy (barrel unwound)
-const CourseHubPage = lazy(() => import('./pages/courses/CourseHubPage').then(m => ({ default: m.CourseHubPage })));
-const CourseIntroPage = lazy(() => import('./pages/courses/CourseIntroPage').then(m => ({ default: m.CourseIntroPage })));
-
-// Instructor public profile — Phase 2 lazy
-const InstructorProfilePage = lazy(() => import('./pages/instructors/InstructorProfilePage').then(m => ({ default: m.InstructorProfilePage })));
-// Instructor pages — WO-KPA-SOCIETY-APP-ROUTE-CODE-SPLITTING-V1: lazy
-const InstructorDashboardPage = lazy(() => import('./pages/instructor/InstructorDashboardPage'));
-const CourseListPage = lazy(() => import('./pages/instructor/courses/CourseListPage'));
-const CourseNewPage = lazy(() => import('./pages/instructor/courses/CourseNewPage'));
-const CourseEditPage = lazy(() => import('./pages/instructor/courses/CourseEditPage'));
-// WO-O4O-KPA-LMS-INSTRUCTOR-OPERATIONS-MENU-REFACTOR-V1: 강의 운영 신규 페이지
-const OperationsCourseListPage = lazy(() => import('./pages/instructor/operations/OperationsCourseListPage'));
-const OperationsCourseDetailPage = lazy(() => import('./pages/instructor/operations/OperationsCourseDetailPage'));
-const ContentParticipantsPage = lazy(() => import('./pages/instructor/ContentParticipantsPage'));
-// WO-O4O-LMS-ASSIGNMENT-GRADING-V1
-const LessonSubmissionsPage = lazy(() => import('./pages/instructor/courses/LessonSubmissionsPage'));
-// WO-KPA-INSTRUCTOR-DASHBOARD-SIDEBAR-LAYOUT-V1: 강사 영역 사이드바 레이아웃
-import { InstructorLayout } from './components/instructor/InstructorLayout';
-import { RoleGuard } from './components/auth/RoleGuard';
-import { ROLES } from './lib/role-constants';
+// LMS / Instructor 화면 — WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2 §14:
+// KPA 는 LMS runtime surface 를 소유하지 않는다. 레거시 경로는 독립 강의 서비스(LECTURE_SERVICE_URL)로 외부 이동한다.
+import { LECTURE_SERVICE_URL } from './config/navigation';
 
 // Events pages — Phase 2 lazy
 const EventsHomePage = lazy(() => import('./pages/events/EventsHomePage').then(m => ({ default: m.EventsHomePage })));
@@ -112,9 +86,7 @@ const PrivacyPage = lazy(() => import('./pages/legal/PrivacyPage').then(m => ({ 
 const MyDashboardPage = lazy(() => import('./pages/mypage/MyDashboardPage').then(m => ({ default: m.MyDashboardPage })));
 const MyProfilePage = lazy(() => import('./pages/mypage/MyProfilePage').then(m => ({ default: m.MyProfilePage })));
 const MySettingsPage = lazy(() => import('./pages/mypage/MySettingsPage').then(m => ({ default: m.MySettingsPage })));
-const MyCertificatesPage = lazy(() => import('./pages/mypage/MyCertificatesPage').then(m => ({ default: m.MyCertificatesPage })));
 const MyQualificationsPage = lazy(() => import('./pages/mypage/MyQualificationsPage').then(m => ({ default: m.MyQualificationsPage })));
-const MyEnrollmentsPage = lazy(() => import('./pages/mypage/MyEnrollmentsPage').then(m => ({ default: m.MyEnrollmentsPage })));
 const MyCreditsPage = lazy(() => import('./pages/mypage/MyCreditsPage').then(m => ({ default: m.MyCreditsPage })));
 // default-as-named (wrapper 불필요)
 const MyForumDashboardPage = lazy(() => import('./pages/mypage/MyForumDashboardPage'));
@@ -153,7 +125,6 @@ const GuideFeaturePopPage = lazy(() => import('./pages/guide/GuideFeaturePopPage
 const GuideFeatureProductionMaterialsPage = lazy(() => import('./pages/guide/GuideFeatureProductionMaterialsPage').then(m => ({ default: m.GuideFeatureProductionMaterialsPage })));
 const GuideFeatureBlogPage = lazy(() => import('./pages/guide/GuideFeatureBlogPage').then(m => ({ default: m.GuideFeatureBlogPage })));
 const GuideFeatureStorePage = lazy(() => import('./pages/guide/GuideFeatureStorePage').then(m => ({ default: m.GuideFeatureStorePage })));
-const GuideFeatureLmsPage = lazy(() => import('./pages/guide/GuideFeatureLmsPage').then(m => ({ default: m.GuideFeatureLmsPage })));
 // WO-O4O-KPA-GUIDE-SURVEY-MANUAL-NEW-V1
 const GuideFeatureSurveyPage = lazy(() => import('./pages/guide/GuideFeatureSurveyPage').then(m => ({ default: m.GuideFeatureSurveyPage })));
 // WO-O4O-KPA-GUIDE-FOR-ROLE-V1: 역할별 Value Guide
@@ -178,7 +149,6 @@ const ServiceGuidePage = lazy(() => import('./pages/service-guide/ServiceGuidePa
 // Service Detail Pages — Phase 2 lazy (barrel unwound)
 const PharmacyServicePage = lazy(() => import('./pages/services/PharmacyServicePage').then(m => ({ default: m.PharmacyServicePage })));
 const ForumServicePage = lazy(() => import('./pages/services/ForumServicePage').then(m => ({ default: m.ForumServicePage })));
-const LmsServicePage = lazy(() => import('./pages/services/LmsServicePage').then(m => ({ default: m.LmsServicePage })));
 
 // Join Pages — Phase 2 lazy (barrel unwound)
 const PharmacyJoinPage = lazy(() => import('./pages/join/PharmacyJoinPage').then(m => ({ default: m.PharmacyJoinPage })));
@@ -307,7 +277,6 @@ import { KpaGlobalHeader } from './components/KpaGlobalHeader';
 // Work Pages — Phase 2 lazy (barrel unwound)
 const WorkPage = lazy(() => import('./pages/work/WorkPage').then(m => ({ default: m.WorkPage })));
 const WorkTasksPage = lazy(() => import('./pages/work/WorkTasksPage').then(m => ({ default: m.WorkTasksPage })));
-const WorkLearningPage = lazy(() => import('./pages/work/WorkLearningPage').then(m => ({ default: m.WorkLearningPage })));
 const WorkDisplayPage = lazy(() => import('./pages/work/WorkDisplayPage').then(m => ({ default: m.WorkDisplayPage })));
 const WorkCommunityPage = lazy(() => import('./pages/work/WorkCommunityPage').then(m => ({ default: m.WorkCommunityPage })));
 
@@ -423,8 +392,7 @@ function PostLoginRedirect() {
     if (
       location.pathname.startsWith('/store') ||
       location.pathname.startsWith('/operator') ||
-      location.pathname.startsWith('/admin') ||
-      location.pathname.startsWith('/instructor')
+      location.pathname.startsWith('/admin')
     ) { didRedirectRef.current = true; return; }
 
     // WO-O4O-KPA-DASHBOARD-REDIRECT-UNIFICATION-V1: PRIORITY+MAP 기반 redirect
@@ -669,6 +637,22 @@ function SeoWatcher() {
   return null;
 }
 
+/**
+ * WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2 §14·§15
+ * 레거시 LMS 경로 → 독립 강의 서비스(study.neture.co.kr) 외부 이동. 서비스 간 이동은 public link 로만 한다.
+ */
+function LectureExternalRedirect({ path = '' }: { path?: string }) {
+  useEffect(() => { window.location.replace(`${LECTURE_SERVICE_URL}${path}`); }, [path]);
+  return null;
+}
+function LectureCertificateVerifyRedirect() {
+  const { certificateId } = useParams<{ certificateId: string }>();
+  useEffect(() => {
+    window.location.replace(`${LECTURE_SERVICE_URL}/certificates/verify/${encodeURIComponent(certificateId ?? '')}`);
+  }, [certificateId]);
+  return null;
+}
+
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
@@ -764,7 +748,6 @@ function App() {
           <Route path="/guide/features/production-materials" element={<Layout serviceName={SERVICE_NAME}><GuideFeatureProductionMaterialsPage /></Layout>} />
           <Route path="/guide/features/blog" element={<Layout serviceName={SERVICE_NAME}><GuideFeatureBlogPage /></Layout>} />
           <Route path="/guide/features/store" element={<Layout serviceName={SERVICE_NAME}><GuideFeatureStorePage /></Layout>} />
-          <Route path="/guide/features/lms" element={<Layout serviceName={SERVICE_NAME}><GuideFeatureLmsPage /></Layout>} />
           {/* WO-O4O-KPA-GUIDE-SURVEY-MANUAL-NEW-V1 */}
           <Route path="/guide/features/survey" element={<Layout serviceName={SERVICE_NAME}><GuideFeatureSurveyPage /></Layout>} />
           {/* WO-O4O-KPA-GUIDE-FOR-ROLE-V1: 역할별 Value Guide */}
@@ -779,7 +762,6 @@ function App() {
               지부·분회는 별도 분회 서비스(services/web-kpa-branch) 소관이다. */}
           <Route path="/services/pharmacy" element={<Layout serviceName={SERVICE_NAME}><PharmacyServicePage /></Layout>} />
           <Route path="/services/forum" element={<Layout serviceName={SERVICE_NAME}><ForumServicePage /></Layout>} />
-          <Route path="/services/lms" element={<Layout serviceName={SERVICE_NAME}><LmsServicePage /></Layout>} />
 
           {/* Join/Participation Pages (WO-KPA-HOME-SERVICE-SECTION-V1) */}
           <Route path="/join/pharmacy" element={<Layout serviceName={SERVICE_NAME}><PharmacyJoinPage /></Layout>} />
@@ -813,7 +795,6 @@ function App() {
            * ======================================== */}
           <Route path="/work" element={<Layout serviceName={SERVICE_NAME}><WorkPage /></Layout>} />
           <Route path="/work/tasks" element={<Layout serviceName={SERVICE_NAME}><WorkTasksPage /></Layout>} />
-          <Route path="/work/learning" element={<Layout serviceName={SERVICE_NAME}><WorkLearningPage /></Layout>} />
           <Route path="/work/display" element={<Layout serviceName={SERVICE_NAME}><WorkDisplayPage /></Layout>} />
           <Route path="/work/community" element={<Layout serviceName={SERVICE_NAME}><WorkCommunityPage /></Layout>} />
 
@@ -938,46 +919,12 @@ function App() {
           <Route path="/contents" element={<Navigate to="/content" replace />} />
           <Route path="/content/notice" element={<Navigate to="/content" replace />} />
 
-          {/* Course Hub & Intro (Public-facing) - WO-CONTENT-COURSE-HUB/INTRO */}
-          <Route path="/courses" element={<Layout serviceName={SERVICE_NAME}><CourseHubPage /></Layout>} />
-          <Route path="/courses/:courseId" element={<Layout serviceName={SERVICE_NAME}><CourseIntroPage /></Layout>} />
-
-          {/* Instructor Public Profile - WO-CONTENT-INSTRUCTOR-PUBLIC-PROFILE-V1 */}
-          <Route path="/instructors/:userId" element={<Layout serviceName={SERVICE_NAME}><InstructorProfilePage /></Layout>} />
-
-          {/* Instructor Dashboard - WO-O4O-INSTRUCTOR-DASHBOARD-V1
-              WO-KPA-INSTRUCTOR-DASHBOARD-SIDEBAR-LAYOUT-V1: Layout → InstructorLayout(사이드바+본문)
-              WO-O4O-INSTRUCTOR-ROUTE-GUARD-V1: RoleGuard — lms:instructor / kpa:admin / platform:super_admin 전용 */}
-          <Route element={
-            <RoleGuard
-              allowedRoles={[ROLES.LMS_INSTRUCTOR, ROLES.KPA_ADMIN, ROLES.PLATFORM_SUPER_ADMIN]}
-              accessDeniedMessage="강사 권한이 필요합니다. 강사 신청 후 심사를 받으세요."
-              enforceMembership={false}
-            >
-              <Outlet />
-            </RoleGuard>
-          }>
-            <Route path="/instructor" element={<InstructorLayout><InstructorDashboardPage /></InstructorLayout>} />
-            <Route path="/instructor/courses" element={<InstructorLayout><CourseListPage /></InstructorLayout>} />
-            <Route path="/instructor/courses/new" element={<InstructorLayout><CourseNewPage /></InstructorLayout>} />
-            <Route path="/instructor/courses/:id" element={<InstructorLayout><CourseEditPage /></InstructorLayout>} />
-            {/* WO-O4O-KPA-LMS-INSTRUCTOR-OPERATIONS-MENU-REFACTOR-V1: 강의 운영 신규 메뉴 */}
-            <Route path="/instructor/operations" element={<InstructorLayout><OperationsCourseListPage /></InstructorLayout>} />
-            <Route path="/instructor/operations/:courseId" element={<InstructorLayout><OperationsCourseDetailPage /></InstructorLayout>} />
-            {/* /instructor/dashboard: legacy → /instructor/operations 로 redirect (backward compat) */}
-            <Route path="/instructor/dashboard" element={<Navigate to="/instructor/operations" replace />} />
-            {/* WO-O4O-MARKETING-CONTENT-OPERATIONS-MVP-V1 */}
-            <Route path="/instructor/contents/:courseId/participants" element={<InstructorLayout><ContentParticipantsPage /></InstructorLayout>} />
-            {/* WO-O4O-LMS-ASSIGNMENT-GRADING-V1: 과제 채점 */}
-            <Route path="/instructor/courses/:courseId/lessons/:lessonId/submissions" element={<InstructorLayout><LessonSubmissionsPage /></InstructorLayout>} />
-          </Route>
-
-          {/* LMS (교육/강의) — WO-O4O-LMS-CANONICAL-ROUTE-ALIGN-V1: /lms canonical → LmsCoursesPage */}
-          <Route path="/lms" element={<Layout serviceName={SERVICE_NAME}><LmsCoursesPage /></Layout>} />
-          <Route path="/lms/courses" element={<Navigate to="/lms" replace />} />
-          <Route path="/lms/course/:id" element={<Layout serviceName={SERVICE_NAME}><LmsCourseDetailPage /></Layout>} />
-          <Route path="/lms/course/:courseId/lesson/:lessonId" element={<Layout serviceName={SERVICE_NAME}><LmsLessonPage /></Layout>} />
-          <Route path="/lms/certificate" element={<Layout serviceName={SERVICE_NAME}><LmsCertificatesPage /></Layout>} />
+          {/* LMS / 강의 / 강사 — WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2 §14·§15:
+              KPA 는 LMS runtime surface 를 소유하지 않는다. 레거시 경로는 독립 강의 서비스로 외부 이동(public link) */}
+          <Route path="/courses/*" element={<LectureExternalRedirect />} />
+          <Route path="/instructors/*" element={<LectureExternalRedirect />} />
+          <Route path="/instructor/*" element={<LectureExternalRedirect />} />
+          <Route path="/lms/*" element={<LectureExternalRedirect />} />
 
           {/* Signage (디지털 사이니지) */}
           <Route path="/signage" element={<Layout serviceName={SERVICE_NAME}><ContentHubPage /></Layout>} />
@@ -996,7 +943,10 @@ function App() {
           <Route path="/mypage" element={<MyPageGuard><Layout serviceName={SERVICE_NAME}><MyDashboardPage /></Layout></MyPageGuard>} />
           <Route path="/mypage/profile" element={<MyPageGuard><Layout serviceName={SERVICE_NAME}><MyProfilePage /></Layout></MyPageGuard>} />
           <Route path="/mypage/settings" element={<MyPageGuard><Layout serviceName={SERVICE_NAME}><MySettingsPage /></Layout></MyPageGuard>} />
-          <Route path="/mypage/certificates" element={<MyPageGuard><Layout serviceName={SERVICE_NAME}><MyCertificatesPage /></Layout></MyPageGuard>} />
+          {/* Phase 2 §14: 내 수강 · 학습 결과는 독립 강의 서비스 소유 */}
+          <Route path="/mypage/certificates" element={<LectureExternalRedirect path="/my/certificates" />} />
+          <Route path="/mypage/enrollments" element={<LectureExternalRedirect path="/my/enrollments" />} />
+          <Route path="/mypage/completions" element={<LectureExternalRedirect path="/my/certificates" />} />
           {/* WO-O4O-FORUM-MY-FORUM-EXPANSION-V1 */}
           <Route path="/mypage/my-forums" element={<MyPageGuard><Layout serviceName={SERVICE_NAME}><MyForumDashboardPage /></Layout></MyPageGuard>} />
           {/* WO-FORUM-REQUEST-ROUTE-EXTRACTION-FROM-MYPAGE-V1: 레거시 리다이렉트 */}
@@ -1007,11 +957,8 @@ function App() {
           <Route path="/mypage/my-requests" element={<MyPageGuard><Layout serviceName={SERVICE_NAME}><MyRequestsPage /></Layout></MyPageGuard>} />
           {/* WO-O4O-QUALIFICATION-SYSTEM-V1 */}
           <Route path="/mypage/qualifications" element={<MyPageGuard><Layout serviceName={SERVICE_NAME}><MyQualificationsPage /></Layout></MyPageGuard>} />
-          <Route path="/mypage/enrollments" element={<MyPageGuard><Layout serviceName={SERVICE_NAME}><MyEnrollmentsPage /></Layout></MyPageGuard>} />
           {/* WO-O4O-CREDIT-SYSTEM-V1 */}
           <Route path="/mypage/credits" element={<MyPageGuard><Layout serviceName={SERVICE_NAME}><MyCreditsPage /></Layout></MyPageGuard>} />
-          {/* WO-MYPAGE-STATE-BASED-IA-REDEFINITION-V1: completions → certificates redirect */}
-          <Route path="/mypage/completions" element={<Navigate to="/mypage/certificates" replace />} />
 
           {/* Survey (설문조사) — WO-O4O-SURVEY-POINT-REWARD-PHASE1-V1 */}
           <Route path="/surveys" element={<Layout serviceName={SERVICE_NAME}><SurveyListPage /></Layout>} />
@@ -1245,8 +1192,8 @@ function App() {
           {/* Foreign Visitor Affiliate Landing (WO-O4O-FOREIGN-VISITOR-AFFILIATE-LANDING-V1) — public, no auth */}
           <Route path="/foreign-visitor/affiliate/:shortCode" element={<ForeignVisitorAffiliatePublicLandingPage />} />
 
-          {/* Certificate Verification (WO-O4O-LMS-CERTIFICATE-VERIFICATION-V1) — public, no auth */}
-          <Route path="/certificate/verify/:certificateId" element={<CertificateVerifyPage />} />
+          {/* Certificate Verification — Phase 2 §17: 수료증 진위 확인은 독립 강의 서비스 소유 */}
+          <Route path="/certificate/verify/:certificateId" element={<LectureCertificateVerifyRedirect />} />
 
           {/* Public Signage Rendering (WO-O4O-SIGNAGE-STRUCTURE-CONSOLIDATION-V1) — public, no auth */}
           <Route path="/public/signage" element={<PublicSignagePage />} />

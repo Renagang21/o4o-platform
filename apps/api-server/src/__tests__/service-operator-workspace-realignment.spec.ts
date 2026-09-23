@@ -140,12 +140,13 @@ describe('메뉴 항목(route) 단위 도메인 분류 (WO §9 · §10)', () => 
     expect(kpa.get('/operator/recruitment-exposure')).toBe('business_operation');
   });
 
-  it('KPA: 회원 · 매장(가맹점) · 매장 지원 콘텐츠 · 공지 · 포럼 · 자료 · 강의 · 설문 · 협업 문의 · 사이니지 → 서비스 운영', () => {
+  it('KPA: 회원 · 매장(가맹점) · 매장 지원 콘텐츠 · 공지 · 포럼 · 자료 · 설문 · 협업 문의 · 사이니지 → 서비스 운영 (강의 관리는 Lecture Operator 소유 — Phase 2 §14)', () => {
+    expect(kpa.has('/operator/lms')).toBe(false);
     for (const p of [
       '/operator/members', '/operator/stores', '/operator/store-channels', '/operator/blog', '/operator/pop', '/operator/qr',
       '/operator/video', '/operator/multilingual-product-contents', '/operator/tablet/screen-sets',
       '/operator/content', '/operator/community', '/operator/docs', '/operator/surveys', '/operator/collaboration-requests',
-      '/operator/resources', '/operator/lms', '/operator/qualification-requests', '/operator/guide-contents',
+      '/operator/resources', '/operator/qualification-requests', '/operator/guide-contents',
       '/operator/signage/hq-media', '/operator/forum', '/operator/forum-requests',
     ]) {
       expect([p, kpa.get(p)]).toEqual([p, 'service_operation']);

@@ -162,8 +162,9 @@ describe('공통 View 순수성', () => {
   });
 });
 
-describe('KPA 서비스 wrapper — 카드형 목록', () => {
-  const hub = read('services/web-kpa-society/src/pages/courses/CourseHubPage.tsx');
+// WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2 §11/§14: LMS 화면은 services/web-lecture 단일 소유.
+describe('Lecture 서비스 wrapper — 카드형 목록 (KPA/KCos 목록 화면은 은퇴)', () => {
+  const hub = read('services/web-lecture/src/pages/learner/CoursesPage.tsx');
 
   it('/courses 목록은 공통 CourseListView 를 소비한다', () => {
     expect(hub).toContain("from '@o4o/lms-ui'");
@@ -177,37 +178,25 @@ describe('KPA 서비스 wrapper — 카드형 목록', () => {
     expect(hub).not.toContain('thumbnailPlaceholder');
   });
 
-  it('상세 경로(/courses/:id)와 가격 필터 계약은 유지된다', () => {
-    expect(hub).toContain('/courses/${');
-    expect(hub).toContain("'free'");
-    expect(hub).toContain("'paid'");
+  it('상세 경로(/courses/:id) 계약은 유지된다 — hrefFor 로 주입 (lmsViewAdapter.coursePath)', () => {
+    expect(hub).toContain('hrefFor={(c) => coursePath(c.id)}');
+    expect(read('services/web-lecture/src/lib/lmsViewAdapter.ts')).toContain('export const coursePath = (courseId: string) => `${LECTURE_HUB_PATH}/${courseId}`');
   });
 
-  it('강사 프로필의 지역 CourseCard 는 공통 CourseCard 로 수렴했다', () => {
-    const profile = read('services/web-kpa-society/src/pages/instructors/InstructorProfilePage.tsx');
-    expect(profile).toContain("from '@o4o/lms-ui'");
-    expect(profile).toContain('CourseCard');
-    expect(profile).not.toContain('function CourseCard(');
-    expect(profile).not.toContain('formatDuration');
-  });
-
-  it('중복 목록 컴포넌트(LectureCard / LectureGrid / EducationTabs / EducationSidebar)는 제거되었다', () => {
-    expect(fs.existsSync(path.join(REPO_ROOT, 'services/web-kpa-society/src/components/education'))).toBe(false);
+  it('KPA / K-Cosmetics 의 LMS 목록·강사 프로필 화면은 삭제되었다 (§14)', () => {
+    for (const rel of [
+      'services/web-kpa-society/src/pages/courses',
+      'services/web-kpa-society/src/pages/instructors',
+      'services/web-kpa-society/src/pages/lms',
+      'services/web-kpa-society/src/components/education',
+      'services/web-k-cosmetics/src/pages/lms',
+    ]) {
+      expect(fs.existsSync(path.join(REPO_ROOT, rel))).toBe(false);
+    }
   });
 });
 
-describe('/lms 목록 hub — 3서비스 공통 템플릿 유지', () => {
-  const cases: Array<[string, string]> = [
-    ['services/web-kpa-society/src/pages/lms/LmsCoursesPage.tsx', 'kpa-society'],
-    ['services/web-k-cosmetics/src/pages/lms/EducationPage.tsx', 'k-cosmetics'],
-  ];
-
-  it.each(cases)('%s 는 LmsHubTemplate + serviceKey / 상세경로 계약을 유지한다', (rel, serviceKey) => {
-    const src = read(rel);
-    expect(src).toContain('LmsHubTemplate');
-    expect(src).toContain(serviceKey);
-    expect(src).toContain('/lms/course/');
-  });
+describe('/lms 목록 hub — 공통 템플릿 유지', () => {
 
   it('LmsHubTemplate 은 조회 실패를 빈 목록으로 삼키지 않는다', () => {
     const src = read('packages/shared-space-ui/src/LmsHubTemplate.tsx');

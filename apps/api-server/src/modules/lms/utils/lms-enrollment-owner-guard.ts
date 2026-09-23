@@ -23,15 +23,20 @@ import type { Request, Response } from 'express';
 import type { Enrollment } from '@o4o/lms-core';
 import { EnrollmentService } from '../services/EnrollmentService.js';
 import { guardLoadedCourseScope, resolveScopeOrRespond } from './lms-scope-guard.js';
-import { roleAssignmentService } from '../../auth/services/role-assignment.service.js';
+import {
+  hasLectureOperatorRole,
+  LECTURE_ADMIN_ROLE,
+  LECTURE_INSTRUCTOR_ROLE,
+  LECTURE_OPERATOR_ROLE,
+} from '../middleware/lecture-access.js';
 
 const ENROLLMENT_NOT_FOUND = 'Enrollment not found';
 
 /**
- * 기존 LMS 관리 정책과 동일한 역할 집합이다 (InstructorController / requireInstructor).
- * 새 권한 정책을 만들지 않는다.
+ * Lecture 관리 역할 집합 (WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2).
+ * legacy `lms:instructor` · `kpa:admin` 은 더 이상 인정하지 않는다.
  */
-export const LMS_ELEVATED_MANAGER_ROLES = ['lms:instructor', 'kpa:admin'] as const;
+export const LMS_ELEVATED_MANAGER_ROLES = [LECTURE_INSTRUCTOR_ROLE, LECTURE_OPERATOR_ROLE, LECTURE_ADMIN_ROLE] as const;
 
 function respondUnauthorized(res: Response): void {
   res.status(401).json({ success: false, error: 'User not authenticated', code: 'UNAUTHORIZED' });
@@ -42,18 +47,17 @@ function respondNotFound(res: Response): void {
 }
 
 /**
- * 기존 관리 정책(requireInstructor)과 동일한 판정.
+ * Lecture 운영 역할(운영자 · 관리자 · break-glass) 판정 — 토큰 roles 기준.
  * enrollment 목록처럼 "본인 것만" 으로 좁힐지 결정할 때만 사용한다.
+ *
+ * 13차 Codex P1: **강사는 여기에 포함하지 않는다.** 강사가 learner-facing
+ * `GET /lms/enrollments` 에서 elevated 로 취급되면 타 강사 강의의 수강생까지 조회된다.
+ * 강사의 수강 관리는 `course.instructorId` 술어가 이미 걸린 `/lms/instructor/enrollments` 가 담당한다.
  */
 export async function isLmsElevatedManager(req: Request): Promise<boolean> {
   const userId = (req as any).user?.id;
   if (!userId) return false;
-
-  // requireInstructor 와 동일하게 토큰 roles 의 kpa:admin 을 먼저 인정한다.
-  const tokenRoles: string[] = (req as any).user?.roles || [];
-  if (tokenRoles.includes('kpa:admin')) return true;
-
-  return roleAssignmentService.hasAnyRole(userId, [...LMS_ELEVATED_MANAGER_ROLES]);
+  return hasLectureOperatorRole(req);
 }
 
 /**

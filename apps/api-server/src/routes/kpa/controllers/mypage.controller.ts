@@ -10,8 +10,6 @@
  * - PUT /settings         (authenticate) — Update settings (placeholder)
  * - GET /activities       (authenticate) — Activities (placeholder)
  * - GET /summary          (authenticate) — Summary stats (placeholder)
- * - GET /enrollments      (authenticate) — Delegates to EnrollmentController
- * - GET /certificates     (authenticate) — Delegates to CertificateController
  * - GET /groupbuys        (authenticate) — Groupbuys (placeholder)
  * - GET /my-requests      (authenticate) — Unified approval requests (WO-KPA-A-MYPAGE-UNIFIED-REQUEST-INBOX-V1)
  */
@@ -20,8 +18,7 @@ import { Router, Request, Response, RequestHandler } from 'express';
 import type { DataSource } from 'typeorm';
 import { asyncHandler } from '../../../middleware/error-handler.js';
 import { MypageService } from '../services/mypage.service.js';
-import { EnrollmentController } from '../../../modules/lms/controllers/EnrollmentController.js';
-import { CertificateController } from '../../../modules/lms/controllers/CertificateController.js';
+// WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2: /enrollments · /certificates 위임 제거 (KPA 는 LMS runtime 을 소유하지 않는다)
 
 export function createMypageController(
   dataSource: DataSource,
@@ -107,15 +104,6 @@ export function createMypageController(
     });
   });
 
-  /**
-   * GET /enrollments — Delegates to EnrollmentController.getMyEnrollments
-   */
-  router.get('/enrollments', authenticate, asyncHandler(EnrollmentController.getMyEnrollments));
-
-  /**
-   * GET /certificates — Delegates to CertificateController.getMyCertificates
-   */
-  router.get('/certificates', authenticate, asyncHandler(CertificateController.getMyCertificates));
 
   /**
    * GET /my-requests — Unified approval requests

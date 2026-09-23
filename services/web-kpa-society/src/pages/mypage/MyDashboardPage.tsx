@@ -18,7 +18,7 @@
 
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { UserCog, MessageSquare, GraduationCap, ScrollText, ClipboardList, Settings } from 'lucide-react';
+import { UserCog, MessageSquare, ScrollText, ClipboardList, Settings } from 'lucide-react';
 import { Card } from '../../components/common';
 import { MyPageLayout } from '../../layouts/MyPageLayout';
 import {
@@ -228,31 +228,7 @@ export function MyDashboardPage() {
     >
       {/* 활동 요약 카드 — KPA 고유 지표 (SERVICE_SPECIFIC) */}
       <div style={styles.summaryGrid}>
-        <Link to={`/mypage/enrollments`} style={styles.summaryLink}>
-          <Card padding="medium">
-            <div style={styles.summaryItem}>
-              <span style={styles.summaryIcon}>📚</span>
-              <span style={styles.summaryValue}>{summary?.enrolledCourses || 0}</span>
-              <span style={styles.summaryLabel}>수강 중 과정</span>
-            </div>
-          </Card>
-        </Link>
-        <Card padding="medium">
-          <div style={styles.summaryItem}>
-            <span style={styles.summaryIcon}>✅</span>
-            <span style={styles.summaryValue}>{summary?.completedCourses || 0}</span>
-            <span style={styles.summaryLabel}>수료 완료</span>
-          </div>
-        </Card>
-        <Link to={`/mypage/certificates`} style={styles.summaryLink}>
-          <Card padding="medium">
-            <div style={styles.summaryItem}>
-              <span style={styles.summaryIcon}>🎓</span>
-              <span style={styles.summaryValue}>{summary?.certificates || 0}</span>
-              <span style={styles.summaryLabel}>수료증</span>
-            </div>
-          </Card>
-        </Link>
+        {/* 수강/수료 카드 — WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2 §14: 독립 강의 서비스 소유 — 제거 */}
         <Link to={`/mypage/my-forums`} style={styles.summaryLink}>
           <Card padding="medium">
             <div style={styles.summaryItem}>
@@ -319,7 +295,6 @@ export function MyDashboardPage() {
         items={[
           { key: 'profile', title: '프로필', href: '/mypage/profile', icon: <UserCog className="w-5 h-5" /> },
           { key: 'my-forums', title: '내 포럼', href: '/mypage/my-forums', icon: <MessageSquare className="w-5 h-5" /> },
-          { key: 'certificates', title: '학습 결과', href: '/mypage/certificates', icon: <GraduationCap className="w-5 h-5" /> },
           { key: 'qualifications', title: '내 자격', href: '/mypage/qualifications', icon: <ScrollText className="w-5 h-5" /> },
           // WO-O4O-MYPAGE-MY-REQUESTS-HUB-CARD-ALIGNMENT-V1
           { key: 'my-requests', title: '내 신청', href: '/mypage/my-requests', icon: <ClipboardList className="w-5 h-5" /> },

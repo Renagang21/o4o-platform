@@ -98,12 +98,13 @@ describe('backend appreciation mount — 단일 canonical', () => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 describe('certificate 프런트 계약 — dead path 0', () => {
-  it('K-Cosmetics 수료증 화면도 `/pdf` 계약을 유지한다', () => {
+  it('Lecture 수료증 화면이 `/pdf` 계약을 유지한다 (KCos 수료증 화면은 은퇴 — Lecture Phase 2 §14)', () => {
+    expect(fs.existsSync(path.join(REPO_ROOT, 'services/web-k-cosmetics/src/pages/mypage/MyCertificatesPage.tsx'))).toBe(false);
     for (const rel of [
-      'services/web-k-cosmetics/src/pages/mypage/MyCertificatesPage.tsx',
+      'services/web-lecture/src/pages/learner/MyCertificatesPage.tsx',
     ]) {
       const src = read(rel);
-      expect(src).toContain('/lms/certificates/${cert.id}/pdf');
+      expect(src).toContain('/lms/certificates/${c.id}/pdf');
       expect(src).not.toContain('/download');
     }
   });
@@ -121,8 +122,8 @@ describe('certificate 프런트 계약 — dead path 0', () => {
 });
 
 describe('appreciation 소비 화면 — client 단일 경유', () => {
+  // Lecture Phase 2 §14: KPA LmsCourseDetailPage 는 삭제 — appreciation 소비처에서 제외
   const consumers = [
-    'services/web-kpa-society/src/pages/lms/LmsCourseDetailPage.tsx',
     'services/web-kpa-society/src/pages/forum/ForumDetailPage.tsx',
     'services/web-kpa-society/src/pages/forum/ForumListPage.tsx',
     'services/web-kpa-society/src/pages/contents/ContentDetailPage.tsx',

@@ -1,4 +1,4 @@
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { AppDataSource } from '../../../database/connection.js';
 import {
   Assignment,
@@ -16,6 +16,7 @@ import { CourseService } from './CourseService.js';
 import { CreditSourceType } from '../../credit/entities/CreditTransaction.js';
 import { CREDIT_DESCRIPTIONS } from '../../credit/credit-constants.js';
 import { resolveRewardAmount, grantRewardIfConfigured } from './RewardPolicyService.js';
+import { SERVICE_KEYS } from '../../../constants/service-keys.js';
 
 /**
  * AssignmentService
@@ -107,6 +108,26 @@ export class AssignmentService {
 
   async getAssignmentByLesson(lessonId: string): Promise<Assignment | null> {
     return this.assignmentRepository.findOne({ where: { lessonId } });
+  }
+
+  /**
+   * 운영자 검토 surface 전용 배치 조회 (PR #225 merge-gate 13차 · Codex P2).
+   * lesson 별 1쿼리 대신 `IN` 으로 묶는다. 반환은 과제가 있는 lessonId 집합뿐이다.
+   */
+  async findLessonIdsWithAssignment(lessonIds: string[]): Promise<Set<string>> {
+    const found = new Set<string>();
+    if (lessonIds.length === 0) return found;
+    const CHUNK = 200;
+    for (let i = 0; i < lessonIds.length; i += CHUNK) {
+      const rows = await this.assignmentRepository.find({
+        where: { lessonId: In(lessonIds.slice(i, i + CHUNK)) } as any,
+        select: ['id', 'lessonId'] as any,
+      });
+      for (const row of rows) {
+        if ((row as any).lessonId) found.add((row as any).lessonId);
+      }
+    }
+    return found;
   }
 
   async getAssignment(id: string): Promise<Assignment | null> {
@@ -315,7 +336,7 @@ export class AssignmentService {
     // WO-O4O-LMS-COMPLETION-REWARD-POLICY-SEPARATION-V1:
     // reward 정책 해석을 위한 course/lesson 컨텍스트(serviceKey 포함). reward 는 정책 설정 시에만 지급.
     const assignmentCourse: any = await CourseService.getInstance().getCourse(courseId);
-    const assignmentServiceKey: string = assignmentCourse?.serviceKey ?? 'kpa-society';
+    const assignmentServiceKey: string = assignmentCourse?.serviceKey ?? SERVICE_KEYS.LECTURE;
     const assignmentLesson = await this.lessonRepository.findOne({ where: { id: lessonId } });
 
     // lesson_complete reward (정책 설정 시에만)
