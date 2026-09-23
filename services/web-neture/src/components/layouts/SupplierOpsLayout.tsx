@@ -7,7 +7,11 @@
  * - 상단: Neture 헤더 (h-14) + 메인 사이트 링크
  * - 좌측: 사이드바 (w-60, collapsible groups)
  * - 모바일: 수평 아이콘 바
- * - 스코프: /workspace 하위 모든 페이지
+ * - 스코프: /workspace 하위 중 실제로 살아 있는 화면 (허브 · 포럼). Admin/Operator 전용이다.
+ *
+ * WO-O4O-SUPPLIER-POST-REGISTRATION-PRODUCT-MANAGEMENT-OFFER-FIRST-REALIGNMENT-V1 closeout (2026-09-23):
+ *   공급자 업무는 SupplierSpaceLayout(/supplier/*) 이 담당한다. 여기 사이드바에는
+ *   `/workspace` · `/workspace/content` 처럼 `/` 로 튕기는 죽은 항목을 두지 않는다.
  *
  * WO-O4O-NETURE-SHELL-FOOTER-LEGAL-CONTRACT-ADOPTION-V1:
  *   footer 를 Neture canonical 법정 계약에 편입한다(좌측 2줄 구조 등 기존 마크업 유지).
@@ -19,9 +23,7 @@
 import { useState } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import {
-  Home,
   Package,
-  FileText,
   Box,
   ChevronRight,
   ChevronDown,
@@ -43,19 +45,10 @@ type SidebarGroup = { label: string; icon: LucideIcon; items: SidebarItem[] };
 
 const BASE_SIDEBAR_GROUPS: SidebarGroup[] = [
   {
-    label: '홈',
-    icon: Home,
-    items: [{ label: '홈', path: '/workspace', exact: true }],
-  },
-  {
     label: '상품',
     icon: Package,
-    items: [{ label: '상품 관리', path: '/workspace/supplier/products' }],
-  },
-  {
-    label: '콘텐츠',
-    icon: FileText,
-    items: [{ label: '콘텐츠', path: '/workspace/content' }],
+    // `/workspace/supplier/products` 는 redirect alias 다 — canonical 로 바로 보낸다.
+    items: [{ label: '상품 관리', path: '/supplier/products' }],
   },
 ];
 

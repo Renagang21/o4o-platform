@@ -430,7 +430,7 @@ export const netureGuideUsageProps: GuideUsagePageProps = {
     {
       step: '03',
       title: '콘텐츠 운영',
-      routeLabel: '/supplier/b2b-content · /supplier/library',
+      routeLabel: '/supplier/products · /supplier/library',
       description:
         '매장에 전달할 B2B 콘텐츠와 자료를 준비합니다. 콘텐츠가 충실할수록 매장 현장에서 고객 안내의 품질이 높아집니다.',
       items: [
@@ -530,9 +530,9 @@ export const netureGuideFeaturesProps: GuideFeaturesPageProps = {
     {
       step: '03',
       title: 'B2B 콘텐츠',
-      primaryRoute: '/supplier/b2b-content',
+      primaryRoute: '/supplier/products',
       description:
-        '매장 대상 B2B 콘텐츠를 작성하고 고객 안내 자료로 활용하는 방법을 안내합니다.',
+        '내 상품 상세의 B2B 편집에서 매장 대상 설명을 작성하고 고객 안내 자료로 활용하는 방법을 안내합니다.',
       items: [{ label: 'B2B 콘텐츠 이용 방법', route: '/guide/features/b2b-content' }],
       linkTo: '/guide/features/b2b-content',
     },
@@ -806,8 +806,8 @@ export const netureGuideFeatureB2BContentProps: GuideFeatureManualPageProps = {
     eyebrow: '기능별 이용 방법',
     title: 'B2B 콘텐츠',
     description:
-      '매장 담당자에게 전달하는 B2B 콘텐츠를 작성하고 활용하는 방법을 안내합니다. 충실한 B2B 콘텐츠는 매장 현장 상담의 품질을 높입니다. 이 문서는 기능 사용 방법을 설명합니다 — 콘텐츠로 사업을 운영하는 관점은 Business Guide의 「콘텐츠 네트워크 운영 안내」(/guide/business/content-network)를 참고하세요.',
-    primaryAction: { label: 'B2B 콘텐츠로 이동 →', to: '/supplier/b2b-content' },
+      '매장 담당자에게 전달하는 B2B 콘텐츠를 작성하고 활용하는 방법을 안내합니다. B2B 콘텐츠는 별도 화면이 아니라 내 상품(/supplier/products) 상세의 B2B 편집에서 작성합니다. 충실한 B2B 콘텐츠는 매장 현장 상담의 품질을 높입니다. 이 문서는 기능 사용 방법을 설명합니다 — 콘텐츠로 사업을 운영하는 관점은 Business Guide의 「콘텐츠 네트워크 운영 안내」(/guide/business/content-network)를 참고하세요.',
+    primaryAction: { label: '내 상품으로 이동 →', to: '/supplier/products' },
     flowBarTitle: '작성 흐름',
     flowLabels: ['상품 선택', '내용 작성', '저장 · 매장 노출'],
   },
@@ -824,7 +824,7 @@ export const netureGuideFeatureB2BContentProps: GuideFeatureManualPageProps = {
         },
         {
           label: 'B2B 콘텐츠 작성',
-          detail: '상품 상세에서 매장 대상 콘텐츠 편집 화면으로 이동합니다.',
+          detail: '상품 상세를 열고 B2B 편집에서 매장 대상 설명을 작성합니다.',
         },
       ],
     },
