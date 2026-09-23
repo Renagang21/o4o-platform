@@ -10,6 +10,8 @@
  *   (C) backend `/api/ai/qr-description` route · `ai-prompts/qrDescription.ts` 제거 · 나머지 ai-proxy route 불변
  *   (D) Store 파일에 `AiContentModal` import/mount 0 · `/api/ai/content` 문자열 0 · `gemini-qr-description` write 0
  *   (E) NON-STORE · content-editor 공통 AI 불변 — AiContentModal · StoreUseModal · /api/ai/content · Community/Lecture 소비처 존재
+ *   (F) 통합 내 매장 표면(`services/web-store`, Unified Store Workspace) — Store 전용 workspace 이므로 위 계약을 표면 전체에 적용한다.
+ *       파일 목록을 하드코딩하지 않고 편집기를 쓰는 파일을 스캔한다(신규 화면 추가 시 자동 커버).
  *
  * web 서비스에는 DOM test runner 가 없다 → api-server jest 소스 텍스트 계약(저장소 관례).
  */
@@ -164,6 +166,58 @@ describe('WO-O4O-STORE-INTERNAL-AI-RETIREMENT-V1 — (D) Store AiContentModal / 
     const src = read('services/web-kpa-society/src/pages/pharmacy/productionTargets.tsx');
     expect(src).not.toMatch(/export (const|type) (PRODUCTION_TARGET_TO_AI_MODE|AiModeForProduction)\b/);
     expect(src).not.toMatch(/productionTargetToAiMode\s*\(/);
+  });
+});
+
+describe('WO-O4O-STORE-INTERNAL-AI-RETIREMENT-V1 — (F) 통합 내 매장(services/web-store) 표면 전체', () => {
+  // WO4 이후 Unified Store Workspace 트랙이 Store 화면을 이 표면으로 복제했다.
+  // Store 전용 workspace(serviceKey 없음 · forum/instructor 등 비-Store 화면 없음)이므로
+  // 파일 목록 대신 "편집기를 렌더하는 파일 전부" 를 스캔해 WO1~4 계약을 고정한다.
+  const ROOT = path.join(REPO_ROOT, 'services/web-store/src');
+  const editorFiles: string[] = [];
+  const walk = (dir: string) => {
+    if (!fs.existsSync(dir)) return;
+    for (const ent of fs.readdirSync(dir, { withFileTypes: true })) {
+      if (ent.name === 'node_modules' || ent.name === 'dist' || ent.name.startsWith('.')) continue;
+      const full = path.join(dir, ent.name);
+      if (ent.isDirectory()) walk(full);
+      else if (/\.tsx?$/.test(ent.name) && fs.readFileSync(full, 'utf8').includes('<RichTextEditor')) {
+        editorFiles.push(path.relative(REPO_ROOT, full).split(path.sep).join('/'));
+      }
+    }
+  };
+  walk(ROOT);
+
+  it('표면이 존재하고 편집기 화면이 1개 이상 스캔된다(스캔 자체가 비면 가드가 무력화되므로 실패)', () => {
+    expect(fs.existsSync(ROOT)).toBe(true);
+    expect(editorFiles.length).toBeGreaterThan(0);
+  });
+
+  it('편집기 화면 전부 — 내부 AI 0(aiRequestHeaders · showInternalAi={true} · AiContentModal · /api/ai/*)', () => {
+    const violations: string[] = [];
+    for (const rel of editorFiles) {
+      const src = read(rel);
+      if (/aiRequestHeaders\s*=/.test(src)) violations.push(`${rel}: aiRequestHeaders prop`);
+      if (/const aiHeaders\s*=/.test(src)) violations.push(`${rel}: aiHeaders helper`);
+      if (!src.includes('showInternalAi={false}')) violations.push(`${rel}: showInternalAi={false} 누락`);
+      if (src.includes('showInternalAi={true}')) violations.push(`${rel}: showInternalAi={true}`);
+      if (/import\s*\{[^}]*AiContentModal|<AiContentModal/.test(src)) violations.push(`${rel}: AiContentModal`);
+      if (/['"`][^'"`\n]*\/api\/ai\//.test(src)) violations.push(`${rel}: /api/ai/* 호출`);
+      if (src.includes('gemini-qr-description')) violations.push(`${rel}: gemini provenance`);
+    }
+    expect(violations).toEqual([]);
+  });
+
+  it('편집기 화면 전부 — 외부 LLM 진입점 존재(LlmAssistPanel + Prompt Core + 라벨) · Prompt 전문 복사본 0', () => {
+    const violations: string[] = [];
+    for (const rel of editorFiles) {
+      const src = read(rel);
+      if (!/import \{[^}]*LlmAssistPanel[^}]*\} from '@o4o\/content-editor'/.test(src)) violations.push(`${rel}: LlmAssistPanel import`);
+      if (!/import \{[^}]*buildStoreContentAuthoringPrompt[^}]*\} from '@o4o\/store-ui-core'/.test(src)) violations.push(`${rel}: Prompt Core import`);
+      if (!src.includes('label={STORE_LLM_ASSIST_LABEL}')) violations.push(`${rel}: 라벨`);
+      if (src.includes('[결과 조건]') || src.includes('HTML 만 반환')) violations.push(`${rel}: Prompt 전문 복사본`);
+    }
+    expect(violations).toEqual([]);
   });
 });
 
