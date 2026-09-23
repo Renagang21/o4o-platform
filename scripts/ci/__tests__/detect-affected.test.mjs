@@ -31,13 +31,16 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, rmSync } from 'node:fs';
+import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, readdirSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 
 import {
   apiDeployImporters,
   buildWorkspaceGraph,
+  classifyWebDeploy,
+  webServiceClosures,
+  WEB_SERVICES,
   dependencyClosure,
   classify,
   classifyApiDeploy,
@@ -738,4 +741,199 @@ test('§13 · §15. migration/deploy step 은 build-and-deploy 안에만 있고,
   }
   assert.match(yml, /base_sha:/, '판정 재현용 입력이 있어야 한다');
   assert.match(yml, /github\.event\.inputs\.base_sha == ''/, 'base_sha 재현 실행은 배포하지 않는다');
+});
+
+// ---------------------------------------------------------------------------
+// WO-O4O-WEB-SERVICES-CD-DEPENDENCY-AFFECTED-DEPLOY-GATE-V1 §22 (Case W1~W13)
+//
+// 고정하는 것
+//   - Web 배포 판정은 **하드코딩 목록이 아니라** workspace dependency graph 의
+//     transitive closure 에서 나온다
+//   - 어떤 Web 서비스도 쓰지 않는 package 변경은 Web 배포를 0 으로 만든다
+//   - 판정 불가(base SHA 이상 · 매핑 불가 · root build 입력)는 전부 9개 fallback
+// ---------------------------------------------------------------------------
+
+const WEB_KEYS = WEB_SERVICES.map((s) => s.key);
+const webOf = (lines, opts) => classifyWebDeploy(parseFileList(lines.join('\n')), graph, opts);
+const onOf = (verdict) => WEB_KEYS.filter((k) => verdict.services[k]).sort();
+/** graph 가 말하는 consumer — 기대값을 테스트에 적지 않고 graph 에서 받아온다 */
+const consumersOf = (pkg) =>
+  [...webServiceClosures(graph).values()].filter((e) => e.closure.has(pkg)).map((e) => e.key).sort();
+
+test('W1. 서비스 자체 변경 → 그 서비스만 배포된다', () => {
+  const v = webOf(['M\tservices/web-kpa-branch/src/App.tsx']);
+  assert.deepEqual(onOf(v), ['kpa-branch']);
+  assert.equal(v.fallback, false);
+});
+
+test('W2. hospital-pharmacy-core 변경 → hospital-pharmacy 만 (기존엔 9개 전부였다)', () => {
+  const v = webOf(['M\tpackages/hospital-pharmacy-core/src/index.ts']);
+  assert.deepEqual(onOf(v), consumersOf('@o4o/hospital-pharmacy-core'));
+  assert.deepEqual(onOf(v), ['hospital-pharmacy']);
+  assert.equal(onOf(v).length, 1, '9개 전부 배포하던 자리다');
+});
+
+test('W3. store-ui-core 변경 → graph consumer 만 · 비소비 서비스는 false', () => {
+  const v = webOf(['M\tpackages/store-ui-core/src/index.ts']);
+  assert.deepEqual(onOf(v), consumersOf('@o4o/store-ui-core'));
+  for (const key of ['lecture', 'kpa-branch', 'signage-player', 'hospital-pharmacy']) {
+    assert.equal(v.services[key], false, `${key} 는 store-ui-core 를 소비하지 않는다`);
+  }
+});
+
+test('W4. auth-client 변경 → 소비 서비스 전부 · 그래도 "9개 하드코딩" 은 아니다', () => {
+  const v = webOf(['M\tpackages/auth-client/src/api.ts']);
+  const expected = consumersOf('@o4o/auth-client');
+  assert.deepEqual(onOf(v), expected);
+  assert.ok(expected.length >= 8, 'auth 계열은 실제로 거의 전 서비스가 쓴다');
+  assert.equal(v.fallback, false, '넓은 판정이어도 fallback 이 아니라 graph 결과다');
+});
+
+test('W5. 어떤 Web 서비스도 소비하지 않는 package → Web 배포 0', () => {
+  assert.deepEqual(consumersOf('@o4o/ai-core'), [], '전제: ai-core 는 web closure 밖이다');
+  const v = webOf(['M\tpackages/ai-core/src/router.ts']);
+  assert.deepEqual(onOf(v), []);
+  assert.equal(v.fallback, false);
+});
+
+test('W6. 서비스 변경 + package 변경 → 합집합', () => {
+  const v = webOf([
+    'M\tservices/web-lecture/src/main.tsx',
+    'M\tpackages/hospital-pharmacy-core/src/index.ts',
+  ]);
+  assert.deepEqual(onOf(v), ['hospital-pharmacy', 'lecture']);
+});
+
+test('W7. 여러 서비스 동시 변경 → 각각 true, 나머지는 false', () => {
+  const v = webOf([
+    'M\tservices/web-neture/src/a.tsx',
+    'M\tservices/signage-player-web/src/b.tsx',
+  ]);
+  assert.deepEqual(onOf(v), ['neture', 'signage-player']);
+});
+
+test('W8. transitive(2단계 이상) dependency 변경도 잡는다', () => {
+  // 어떤 서비스의 **직접** dependency 도 아닌 package 를 graph 에서 고른다
+  const direct = new Set();
+  for (const svc of WEB_SERVICES) {
+    const name = graph.byDir.get(svc.dir);
+    for (const dep of graph.byName.get(name).deps) direct.add(dep);
+  }
+  const transitive = [];
+  for (const entry of webServiceClosures(graph).values()) {
+    for (const pkg of entry.closure) {
+      if (pkg !== entry.name && !direct.has(pkg)) transitive.push(pkg);
+    }
+  }
+  assert.ok(transitive.length > 0, '전제: 2단계 이상 의존 package 가 존재한다');
+  const pkg = transitive[0];
+  const dir = graph.byName.get(pkg).dir;
+  const v = webOf([`M\t${dir}/src/index.ts`]);
+  assert.deepEqual(onOf(v), consumersOf(pkg));
+  assert.ok(onOf(v).length > 0, '직접 의존이 아니어도 배포 대상이 나와야 한다');
+});
+
+test('W9. 매핑 불가 경로 · root build 입력 → 9개 전부 fallback', () => {
+  for (const line of [
+    'M\tunknown-root-thing/x.ts',
+    'M\tpackage.json',
+    'M\tpnpm-workspace.yaml',
+    'M\ttsconfig.base.json',
+  ]) {
+    const v = webOf([line]);
+    assert.deepEqual(onOf(v), [...WEB_KEYS].sort(), `${line} → 전 서비스`);
+    assert.equal(v.fallback, true);
+  }
+  // 반면 이미지 빌드에 들어가지 않는 경로는 무영향이다
+  for (const line of ['M\tdocs/checks/CHECK.md', 'M\tCLAUDE.md', 'M\te2e/spec.ts']) {
+    assert.deepEqual(onOf(webOf([line])), [], `${line} → Web 무영향`);
+  }
+});
+
+test('W10. multi-commit push — 배치 앞 commit 의 package 변경을 놓치지 않는다', () => {
+  const { dir, write, base } = makeRepo();
+  try {
+    write('packages/hospital-pharmacy-core/src/index.ts', 'x\n');
+    git(dir, ['add', '-A']);
+    git(dir, ['commit', '-q', '-m', 'core change']);
+
+    write('docs/checks/CHECK.md', 'doc\n');
+    git(dir, ['add', '-A']);
+    git(dir, ['commit', '-q', '-m', 'docs only']);
+    const head = git(dir, ['rev-parse', 'HEAD']).stdout.trim();
+
+    const lastOnly = classifyWebDeploy(readChangedFiles(`${head}~1`, head, dir).files, graph);
+    assert.deepEqual(onOf(lastOnly), [], '마지막 commit 만 보면 배포가 사라진다');
+
+    const batch = readChangedFiles(base, head, dir);
+    assert.equal(batch.ok, true);
+    assert.deepEqual(onOf(classifyWebDeploy(batch.files, graph)), ['hospital-pharmacy']);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('W11. base SHA 이상 · 변경 0건 → 9개 전부 fallback', () => {
+  const v = classifyWebDeploy([], graph);
+  assert.deepEqual(onOf(v), [...WEB_KEYS].sort());
+  assert.equal(v.fallback, true);
+  // classify() 전체 경로에서도 동일하다
+  const full = classify([], graph);
+  for (const key of WEB_KEYS) assert.equal(full.web_deploy[key], true);
+});
+
+test('W12 · W13. deploy-web-services.yml 계약 — dispatch all/단일 배포는 그대로다', () => {
+  const yml = workflowYaml('deploy-web-services.yml');
+  assert.match(yml, /node scripts\/ci\/detect-affected\.mjs/, '판정은 공통 SSOT 를 쓴다');
+  assert.ok(!/grep -q "\^packages\//.test(yml), 'packages/** → 전 서비스 배포 규칙은 제거돼야 한다');
+  assert.match(yml, /fetch-depth: 0/, 'push batch 전체를 봐야 한다');
+  assert.match(yml, /github\.event\.before/, 'before..sha 배치 diff 를 유지한다');
+  // §20 — 수동 배포 경로는 detector 가 제한하지 않는다
+  assert.match(yml, /if \[ "\$SERVICE" = "all" \]; then/, 'dispatch all 경로 유지');
+  for (const key of WEB_KEYS) {
+    assert.ok(yml.includes(`echo "${key}=$( [ "$SERVICE" = '${key}' ]`), `dispatch 단일 배포 유지: ${key}`);
+    assert.ok(yml.includes(`deploy-${key}:`), `deploy job 이 있어야 한다: ${key}`);
+    // §21 — summary 가 9개를 전부 알아야 한다
+    assert.ok(yml.includes(`      - deploy-${key}`), `summary needs 누락: deploy-${key}`);
+    assert.ok(yml.includes(`needs.detect-changes.outputs.${key} }}"`), `summary 출력 누락: ${key}`);
+  }
+  // §17 — root build 입력이 trigger 에 있어야 silent false-negative 가 없다
+  for (const trigger of ["- 'package.json'", "- 'pnpm-lock.yaml'", "- 'pnpm-workspace.yaml'"]) {
+    assert.ok(yml.includes(trigger), `push trigger 누락: ${trigger}`);
+  }
+});
+
+test('§23. 9개 서비스의 실제 @o4o import 는 전부 선언된 dependency closure 안에 있다', () => {
+  // undeclared workspace import 가 있으면 graph 기반 판정이 false-negative 를 낸다.
+  const failures = [];
+  for (const entry of webServiceClosures(graph).values()) {
+    const files = [];
+    const walk = (d) => {
+      let items;
+      try {
+        items = readdirSync(d, { withFileTypes: true });
+      } catch {
+        return;
+      }
+      for (const it of items) {
+        if (it.name === 'node_modules' || it.name === 'dist') continue;
+        const abs = path.join(d, it.name);
+        if (it.isDirectory()) walk(abs);
+        else if (/\.(ts|tsx|js|jsx|mjs|cjs)$/.test(it.name)) files.push(abs);
+      }
+    };
+    walk(path.join(REPO_ROOT, entry.dir, 'src'));
+    for (const file of files) {
+      const code = readFileSync(file, 'utf-8')
+        .replace(/\/\*[\s\S]*?\*\//g, '')
+        .replace(/^\s*\/\/.*$/gm, '');
+      const re = /(?:from\s+|import\s*\(|require\(\s*)['"](@o4o(?:-apps)?\/[a-z0-9-]+)/g;
+      for (const m of code.matchAll(re)) {
+        const pkg = m[1];
+        if (!graph.byName.has(pkg)) continue;
+        if (!entry.closure.has(pkg)) failures.push(`${entry.key}: ${pkg} (${path.relative(REPO_ROOT, file)})`);
+      }
+    }
+  }
+  assert.deepEqual(failures, [], `UNDECLARED_USED workspace import:\n${failures.join('\n')}`);
 });

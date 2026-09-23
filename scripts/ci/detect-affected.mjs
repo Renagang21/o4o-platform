@@ -328,6 +328,7 @@ export function classify(changedFiles, graph, opts = {}) {
     api_affected: false,
     api_ci_affected: false,
     api_deploy_affected: false,
+    web_deploy: {},
     docs_only: false,
     docs_fast_eligible: false,
     global_or_unknown: false,
@@ -343,11 +344,12 @@ export function classify(changedFiles, graph, opts = {}) {
       api_affected: true,
       api_ci_affected: true,
       api_deploy_affected: true,
+      web_deploy: classifyWebDeploy(changedFiles, graph, opts).services,
       docs_only: false,
       docs_fast_eligible: false,
       global_or_unknown: true,
       fallback: true,
-      reasons: ['변경 파일 0건 — 판정 불가, full CI · API 배포로 fallback'],
+      reasons: ['변경 파일 0건 — 판정 불가, full CI · API 배포 · 전 Web 서비스 배포로 fallback'],
     };
   }
 
@@ -405,6 +407,9 @@ export function classify(changedFiles, graph, opts = {}) {
   const docs = classifyDocs(changedFiles);
   // 배포 축은 CI 축과 **독립적으로** 계산한다 (WO-O4O-API-CD-RUNTIME-AFFECTED-DEPLOY-GATE-V1 §5).
   const deploy = classifyApiDeploy(changedFiles, graph, opts);
+  // Web Services 배포 축도 독립적으로 계산한다
+  // (WO-O4O-WEB-SERVICES-CD-DEPENDENCY-AFFECTED-DEPLOY-GATE-V1 §6).
+  const web = classifyWebDeploy(changedFiles, graph, opts);
 
   if (global) {
     return {
@@ -413,11 +418,12 @@ export function classify(changedFiles, graph, opts = {}) {
       api_affected: true,
       api_ci_affected: true,
       api_deploy_affected: deploy.api_deploy_affected,
+      web_deploy: web.services,
       docs_only: docs.docs_only,
       docs_fast_eligible: false,
       global_or_unknown: true,
       fallback: false,
-      reasons: [...result.reasons, ...docs.reasons, ...deploy.reasons],
+      reasons: [...result.reasons, ...docs.reasons, ...deploy.reasons, ...web.reasons],
     };
   }
 
@@ -427,11 +433,12 @@ export function classify(changedFiles, graph, opts = {}) {
     api_affected: apiAffected,
     api_ci_affected: apiAffected,
     api_deploy_affected: deploy.api_deploy_affected,
+    web_deploy: web.services,
     docs_only: docs.docs_only,
     docs_fast_eligible: docs.docs_fast_eligible,
     global_or_unknown: false,
     fallback: false,
-    reasons: [...result.reasons, ...docs.reasons, ...deploy.reasons],
+    reasons: [...result.reasons, ...docs.reasons, ...deploy.reasons, ...web.reasons],
   };
 }
 
@@ -677,6 +684,195 @@ export function classifyApiDeploy(changedFiles, graph, opts = {}) {
 }
 
 // ---------------------------------------------------------------------------
+// Web Services 배포 영향 판정
+// ---------------------------------------------------------------------------
+
+/**
+ * WO-O4O-WEB-SERVICES-CD-DEPENDENCY-AFFECTED-DEPLOY-GATE-V1 §15
+ *
+ * **배포 target 의 정적 registry** 다 — workflow output key 와 1:1 이다.
+ * 여기에 두는 것은 `key ↔ 서비스 디렉터리` 매핑뿐이고,
+ * **어떤 package 를 쓰는지는 절대 적지 않는다.** 의존성은 workspace graph 가 정본이다.
+ */
+export const WEB_SERVICES = [
+  { key: 'neture', dir: 'services/web-neture' },
+  { key: 'k-cosmetics', dir: 'services/web-k-cosmetics' },
+  { key: 'kpa-society', dir: 'services/web-kpa-society' },
+  { key: 'pharmacy-hub', dir: 'services/web-pharmacy-hub' },
+  { key: 'lecture', dir: 'services/web-lecture' },
+  { key: 'store', dir: 'services/web-store' },
+  { key: 'kpa-branch', dir: 'services/web-kpa-branch' },
+  { key: 'signage-player', dir: 'services/signage-player-web' },
+  { key: 'hospital-pharmacy', dir: 'services/web-hospital-pharmacy' },
+];
+
+const WEB_DEPLOY_WORKFLOW = '.github/workflows/deploy-web-services.yml';
+
+/**
+ * 9개 Dockerfile 이 **전부 root 에서 COPY 하는** 빌드 입력 (census 결과).
+ * 이 파일들이 바뀌면 어떤 서비스의 이미지도 달라질 수 있다.
+ * `pnpm-lock.yaml` 은 여기 두지 않는다 — importer 단위로 더 정밀하게 본다.
+ */
+const WEB_ROOT_BUILD_INPUTS = new Set([
+  'package.json',
+  'pnpm-workspace.yaml',
+  'tsconfig.base.json',
+  'tsconfig.packages.json',
+  '.npmrc',
+  '.dockerignore',
+]);
+
+/** Web 이미지 빌드에 참여하지 않는 공용 경로. */
+const WEB_DEPLOY_NEUTRAL_PREFIXES = ['.github/', 'scripts/', 'tools/', 'e2e/', '.husky/', 'docs/'];
+
+/** root 최상위 markdown (README · AGENTS.md · CLAUDE.md 등) — 이미지 산출물에 들어가지 않는다. */
+const WEB_ROOT_DOC_FILE = /^[^/]+\.md$/;
+
+/** 각 서비스의 workspace 이름. graph 에서 dir 로 역조회한다. */
+function webServiceName(graph, dir) {
+  return graph.byDir.get(dir) ?? null;
+}
+
+/**
+ * 서비스별 transitive dependency closure (자기 자신 포함).
+ * WO-O4O-WEB-SERVICES-CD-DEPENDENCY-AFFECTED-DEPLOY-GATE-V1 §14 — 직접 의존성만 보면 2단계 이상 package 변경을 놓친다.
+ *
+ * @returns {Map<string, {key: string, dir: string, name: string|null, closure: Set<string>}>}
+ */
+export function webServiceClosures(graph) {
+  const out = new Map();
+  for (const svc of WEB_SERVICES) {
+    const name = webServiceName(graph, svc.dir);
+    out.set(svc.key, {
+      key: svc.key,
+      dir: svc.dir,
+      name,
+      closure: name ? dependencyClosure(graph, name) : new Set(),
+    });
+  }
+  return out;
+}
+
+/** 서비스 하나의 lockfile importer 집합 (root + 자기 자신 + closure package dir). */
+function webImportersOf(graph, entry) {
+  const set = new Set(['.', entry.dir]);
+  for (const name of entry.closure) {
+    const dir = graph.byName.get(name)?.dir;
+    if (dir) set.add(dir);
+  }
+  return set;
+}
+
+const allTrue = (reason, reasons) => {
+  const services = {};
+  for (const svc of WEB_SERVICES) services[svc.key] = true;
+  return { services, reasons: [...reasons, reason], fallback: true };
+};
+
+/**
+ * WO-O4O-WEB-SERVICES-CD-DEPENDENCY-AFFECTED-DEPLOY-GATE-V1 §7 · §8 · §9 · §10 · §14 · §16 · §19
+ *
+ * 기존 정책은 `packages/** 변경 → 9개 서비스 전부 재배포` 였다. 실측상
+ * `hospital-pharmacy-core` 한 package 변경으로 9개가 전부 배포됐고, 그중 8개는
+ * 그 package 를 dependency closure 안에 갖고 있지도 않았다.
+ *
+ * 여기서는 **workspace graph 의 transitive closure** 만으로 판정한다.
+ * package 이름 allowlist/denylist 를 두지 않는다.
+ *
+ * 안전 방향은 한쪽뿐이다 — 판정 불가는 전부 9개 true (§19).
+ *
+ * @param {{status: string, path: string}[]} changedFiles
+ * @param {ReturnType<typeof buildWorkspaceGraph>} graph
+ * @param {{readLock?: (which: 'base'|'head') => string|undefined}} opts
+ * @returns {{services: Record<string, boolean>, reasons: string[], fallback: boolean}}
+ */
+export function classifyWebDeploy(changedFiles, graph, opts = {}) {
+  const reasons = [];
+  if (!Array.isArray(changedFiles) || changedFiles.length === 0) {
+    return allTrue('변경 파일 0건 — 판정 불가, 전 서비스 배포 fallback', reasons);
+  }
+
+  const entries = webServiceClosures(graph);
+  const missing = [...entries.values()].filter((e) => !e.name);
+  if (missing.length > 0) {
+    return allTrue(
+      `서비스 manifest 를 graph 에서 찾지 못함(${missing.map((m) => m.dir).join(', ')}) — 안전 fallback`,
+      reasons,
+    );
+  }
+
+  const services = {};
+  for (const svc of WEB_SERVICES) services[svc.key] = false;
+  const mark = (key, reason) => {
+    services[key] = true;
+    reasons.push(reason);
+  };
+
+  for (const { path: file } of changedFiles) {
+    if (file === 'pnpm-lock.yaml') {
+      let hitAny = false;
+      let failed = null;
+      for (const entry of entries.values()) {
+        let verdict;
+        try {
+          verdict = lockfileDeployImpact(opts.readLock?.('base'), opts.readLock?.('head'), webImportersOf(graph, entry));
+        } catch (err) {
+          failed = err.message;
+          break;
+        }
+        if (verdict.affected) {
+          hitAny = true;
+          mark(entry.key, `${entry.key}: ${verdict.reason}`);
+        }
+      }
+      if (failed) return allTrue(`pnpm-lock.yaml 판정 예외 — 안전 fallback (${failed})`, reasons);
+      if (!hitAny) reasons.push('pnpm-lock.yaml 변경이 어떤 Web 서비스 importer 에도 닿지 않음');
+      continue;
+    }
+
+    // 이 workflow 자체를 고치면 판정 자체를 검증해야 한다 (§16).
+    if (file === WEB_DEPLOY_WORKFLOW) {
+      return allTrue(`deploy workflow 자체 변경 — 판정 검증 위해 전 서비스 배포: ${file}`, reasons);
+    }
+
+    if (WEB_ROOT_BUILD_INPUTS.has(file)) {
+      return allTrue(`9개 Dockerfile 공통 build 입력 변경 — 전 서비스 배포: ${file}`, reasons);
+    }
+
+    if (WEB_ROOT_DOC_FILE.test(file)) {
+      reasons.push(`root 문서 — Web 이미지 무영향: ${file}`);
+      continue;
+    }
+
+    if (hasPrefix(file, WEB_DEPLOY_NEUTRAL_PREFIXES)) {
+      reasons.push(`Web 이미지 빌드 미참여 경로 — 무영향: ${file}`);
+      continue;
+    }
+
+    const wsDir = workspaceDirOf(graph, file);
+    if (!wsDir) {
+      return allTrue(`Web 판정 불가(workspace 매핑 없음) — 안전 fallback: ${file}`, reasons);
+    }
+
+    const svc = WEB_SERVICES.find((x) => x.dir === wsDir);
+    if (svc) {
+      mark(svc.key, `${svc.key} 서비스 자체 변경: ${file}`);
+      continue;
+    }
+
+    const pkgName = graph.byDir.get(wsDir);
+    const consumers = [...entries.values()].filter((e) => e.closure.has(pkgName));
+    if (consumers.length === 0) {
+      reasons.push(`${pkgName} — Web consumer 0, 무영향: ${file}`);
+      continue;
+    }
+    for (const e of consumers) mark(e.key, `${e.key}: 의존성 closure package ${pkgName} 변경 (${file})`);
+  }
+
+  return { services, reasons, fallback: false };
+}
+
+// ---------------------------------------------------------------------------
 // api-server 정적 guard spec 선별
 // ---------------------------------------------------------------------------
 
@@ -864,6 +1060,8 @@ function main() {
       admin_affected: true,
       admin_only: false,
       api_affected: true,
+      // 진단 불가 = 전 Web 서비스 배포 (§19).
+      web_deploy: Object.fromEntries(WEB_SERVICES.map((svc) => [svc.key, true])),
       docs_only: false,
       docs_fast_eligible: false,
       global_or_unknown: true,
@@ -893,6 +1091,9 @@ function main() {
   console.log(`api_affected    : ${verdict.api_affected}`);
   console.log(`api_ci_affected : ${verdict.api_ci_affected}`);
   console.log(`api_deploy_affected: ${verdict.api_deploy_affected}`);
+  for (const svc of WEB_SERVICES) {
+    console.log(`web:${svc.key.padEnd(18)}: ${verdict.web_deploy?.[svc.key] ?? 'n/a'}`);
+  }
   console.log(`docs_only       : ${verdict.docs_only}`);
   console.log(`docs_fast_eligible: ${verdict.docs_fast_eligible}`);
   console.log(`global_or_unknown: ${verdict.global_or_unknown}`);
@@ -912,6 +1113,8 @@ function main() {
         `api_affected=${verdict.api_affected}`,
         `api_ci_affected=${verdict.api_ci_affected}`,
         `api_deploy_affected=${verdict.api_deploy_affected}`,
+        // Web 서비스 판정은 workflow output key 와 동일한 이름으로 그대로 내보낸다.
+        ...WEB_SERVICES.map((svc) => `${svc.key}=${verdict.web_deploy?.[svc.key] === true}`),
         `docs_only=${verdict.docs_only}`,
         `docs_fast_eligible=${verdict.docs_fast_eligible}`,
         `global_or_unknown=${verdict.global_or_unknown}`,

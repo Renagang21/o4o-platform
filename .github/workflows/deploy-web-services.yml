@@ -27,6 +27,16 @@ on:
       # WO-O4O-HOSPITAL-PHARMACY-SERVICE-FOUNDATION-V1 — neture.co.kr/hospital (병원약국 · 임시 서비스 · 서브디렉토리)
       - 'services/web-hospital-pharmacy/**'
       - 'packages/**'
+      # WO-O4O-WEB-SERVICES-CD-DEPENDENCY-AFFECTED-DEPLOY-GATE-V1 §17:
+      # 9개 Dockerfile 이 전부 root 에서 COPY 하는 build 입력이다.
+      # trigger 에 없어서 lockfile·root manifest 만 바뀜 push 가 조용히 누락됐다
+      # (silent false-negative). 판정은 detector 가 서비스별로 좌혀준다.
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'pnpm-workspace.yaml'
+      - 'tsconfig.base.json'
+      - 'tsconfig.packages.json'
+      - 'scripts/ci/detect-affected.mjs'
       - '.github/workflows/deploy-web-services.yml'
   workflow_dispatch:
     inputs:
@@ -34,6 +44,15 @@ on:
         description: 'Service to deploy (all, neture, k-cosmetics, kpa-society, pharmacy-hub, lecture, store, kpa-branch, signage-player, hospital-pharmacy)'
         required: false
         default: 'all'
+      # WO-O4O-WEB-SERVICES-CD-DEPENDENCY-AFFECTED-DEPLOY-GATE-V1 §24 — 판정 재현 전용.
+      # 둘 다 주면 service 입력 대신 그 범위를 detector 로 판정한다
+      # (API CD gate 와 동일한 선례). 비워두면 기존 수동 배포 동작 그대로다.
+      base_sha:
+        description: '(optional) 판정 재현 base SHA'
+        required: false
+      head_sha:
+        description: '(optional) 판정 재현 head SHA'
+        required: false
 
 env:
   PROJECT_ID: netureyoutube
@@ -97,6 +116,13 @@ jobs:
       - name: Detect changed services
         id: changes
         run: |
+          # 판정 재현 모드 — base/head 를 명시하면 detector 를 그대로 돌린다 (§24).
+          if [ -n "${{ github.event.inputs.base_sha }}" ] && [ -n "${{ github.event.inputs.head_sha }}" ]; then
+            echo "replay mode: ${{ github.event.inputs.base_sha }}..${{ github.event.inputs.head_sha }}"
+            BASE_SHA="${{ github.event.inputs.base_sha }}" HEAD_SHA="${{ github.event.inputs.head_sha }}"               node scripts/ci/detect-affected.mjs
+            exit 0
+          fi
+
           # For workflow_dispatch with specific service
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             SERVICE="${{ github.event.inputs.service }}"
@@ -132,62 +158,29 @@ jobs:
           BASE_SHA="${{ github.event.before }}"
 
           # fallback when before is unusable: all-zeros (new branch / first push / force push)
-          # or not present locally → use HEAD~1; if even that is missing, force ALL (safe).
+          # or not present locally → use HEAD~1; if even that is missing, the detector's own
+          # safe fallback (base SHA 없음 → 전 서비스 true) takes over.
           if [ -z "$BASE_SHA" ] || [ "$BASE_SHA" = "0000000000000000000000000000000000000000" ] || ! git cat-file -e "${BASE_SHA}^{commit}" 2>/dev/null; then
             echo "event.before unusable ('${BASE_SHA}') — fallback to HEAD~1"
             BASE_SHA=$(git rev-parse HEAD~1 2>/dev/null || echo "")
           fi
 
-          if [ -n "$BASE_SHA" ]; then
-            CHANGED_FILES=$(git diff --name-only "$BASE_SHA" "$HEAD_SHA")
-            FORCE_ALL=0
-          else
-            echo "no usable base SHA — forcing ALL web services (safe default)"
-            CHANGED_FILES=""
-            FORCE_ALL=1
-          fi
-
           echo "event=push"
           echo "base_sha=${BASE_SHA:-<none>}"
           echo "head_sha=${HEAD_SHA}"
-          echo "Changed files:"
-          echo "$CHANGED_FILES"
 
-          # Shared packages changed (or no base) → rebuild ALL web services
-          if [ "$FORCE_ALL" = "1" ] || echo "$CHANGED_FILES" | grep -q "^packages/"; then
-            echo "decision: shared packages changed or forced — rebuilding all web services"
-            echo "neture=true" >> $GITHUB_OUTPUT
-            echo "k-cosmetics=true" >> $GITHUB_OUTPUT
-            echo "kpa-society=true" >> $GITHUB_OUTPUT
-            echo "pharmacy-hub=true" >> $GITHUB_OUTPUT
-            echo "lecture=true" >> $GITHUB_OUTPUT
-            echo "store=true" >> $GITHUB_OUTPUT
-            echo "kpa-branch=true" >> $GITHUB_OUTPUT
-            echo "signage-player=true" >> $GITHUB_OUTPUT
-            echo "hospital-pharmacy=true" >> $GITHUB_OUTPUT
-            exit 0
-          fi
-
-          # Per-service detection (helper logs the decision)
-          decide() {
-            local svc="$1" path="$2"
-            if echo "$CHANGED_FILES" | grep -q "^${path}"; then
-              echo "${svc}=true" >> $GITHUB_OUTPUT
-              echo "decision: ${svc}=true (matched ${path})"
-            else
-              echo "${svc}=false" >> $GITHUB_OUTPUT
-              echo "decision: ${svc}=false"
-            fi
-          }
-          decide "neture" "services/web-neture/"
-          decide "k-cosmetics" "services/web-k-cosmetics/"
-          decide "kpa-society" "services/web-kpa-society/"
-          decide "pharmacy-hub" "services/web-pharmacy-hub/"
-          decide "lecture" "services/web-lecture/"
-          decide "store" "services/web-store/"
-          decide "kpa-branch" "services/web-kpa-branch/"
-          decide "signage-player" "services/signage-player-web/"
-          decide "hospital-pharmacy" "services/web-hospital-pharmacy/"
+          # WO-O4O-WEB-SERVICES-CD-DEPENDENCY-AFFECTED-DEPLOY-GATE-V1 §6 · §7 · §15
+          #
+          # 이전 정책은 `packages/** 변경 → 9개 서비스 전부 재배포` 였다.
+          # 실측상 `hospital-pharmacy-core` 한 package 변경으로 9개가 전부 배포됐고
+          # 그중 8개는 그 package 를 dependency closure 안에 갖고 있지도 않았다.
+          #
+          # 판정은 Admin·Docs·API 와 같은 SSOT(`scripts/ci/detect-affected.mjs`) 다.
+          # workspace dependency graph 의 transitive closure 만 쓴다 —
+          # package 이름 allowlist/denylist 는 어느 쪽에도 없다.
+          #
+          # output key 는 기존과 동일하다 — detector 가 그 이름 그대로 써넣는다.
+          BASE_SHA="$BASE_SHA" HEAD_SHA="$HEAD_SHA" node scripts/ci/detect-affected.mjs
 
   deploy-neture:
     needs: detect-changes
@@ -767,7 +760,20 @@ jobs:
           fi
 
   summary:
-    needs: [detect-changes, deploy-neture, deploy-k-cosmetics, deploy-kpa-society, deploy-pharmacy-hub, deploy-kpa-branch, deploy-signage-player]
+    # WO-O4O-WEB-SERVICES-CD-DEPENDENCY-AFFECTED-DEPLOY-GATE-V1 §21:
+    # lecture·store·hospital-pharmacy 가 뒤달아 추가될 때 needs 와 출력 목록이
+    # 함께 갱신되지 않았다 — 그 3개는 summary 에 전혀 드러나지 않았다.
+    needs:
+      - detect-changes
+      - deploy-neture
+      - deploy-k-cosmetics
+      - deploy-kpa-society
+      - deploy-pharmacy-hub
+      - deploy-lecture
+      - deploy-store
+      - deploy-kpa-branch
+      - deploy-signage-player
+      - deploy-hospital-pharmacy
     if: always()
     runs-on: ubuntu-latest
     steps:
@@ -782,8 +788,11 @@ jobs:
           echo "  - k-cosmetics-web: ${{ needs.detect-changes.outputs.k-cosmetics }}"
           echo "  - kpa-society-web: ${{ needs.detect-changes.outputs.kpa-society }}"
           echo "  - pharmacy-hub-web: ${{ needs.detect-changes.outputs.pharmacy-hub }}"
+          echo "  - lecture-web: ${{ needs.detect-changes.outputs.lecture }}"
+          echo "  - store-web: ${{ needs.detect-changes.outputs.store }}"
           echo "  - kpa-branch-web: ${{ needs.detect-changes.outputs.kpa-branch }}"
           echo "  - signage-player-web: ${{ needs.detect-changes.outputs.signage-player }}"
+          echo "  - hospital-pharmacy-web: ${{ needs.detect-changes.outputs.hospital-pharmacy }}"
           echo ""
           echo "Time: $(date)"
           echo "Commit: ${{ github.sha }}"
