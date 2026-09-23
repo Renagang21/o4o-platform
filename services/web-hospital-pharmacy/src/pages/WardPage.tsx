@@ -12,7 +12,7 @@ import {
 } from '@o4o/hospital-pharmacy-core';
 import { loadDataset } from '../lib/localStore';
 import { sendHospitalRequest, AiRequestError } from '../lib/aiRequest';
-import LoginPanel from '../components/LoginPanel';
+import { useDevice } from '../contexts/DeviceContext';
 
 // 화면-국소 질의 파싱: 조사(josa)·불용어를 떼어 2자 이상 needle 만 남긴다.
 // 도메인 규칙(제품/함량/원내/동일성분)은 @o4o/hospital-pharmacy-core 가 소유하고, 여기서는 표시용 needle 만 만든다.
@@ -35,16 +35,12 @@ function extractLocalNeedles(text: string): string[] {
 }
 
 export default function WardPage() {
+  const { markDisconnected } = useDevice();
   const [dataset, setDataset] = useState<HospitalDrugDataset | null>(null);
   const [input, setInput] = useState('');
   const [question, setQuestion] = useState<string | null>(null);
   const [answer, setAnswer] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  /**
-   * 인증이 필요해 보류된 요청. 화면(입력 · 원내 연결 · 직전 답변)을 버리지 않고 제자리에서 로그인한 뒤
-   * **같은 문장을 그대로 다시 보낸다**(로그인 라우트로 이동하지 않으므로 작업 손실 0).
-   */
-  const [pendingAuthRequest, setPendingAuthRequest] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
 
   useEffect(() => { setDataset(loadDataset()); }, []);
@@ -53,7 +49,6 @@ export default function WardPage() {
     if (!text || pending) return;
     setPending(true);
     setError(null);
-    setPendingAuthRequest(null);
     setQuestion(text);
     setAnswer(null);
     try {
@@ -78,7 +73,7 @@ export default function WardPage() {
       });
       setInput('');
       if (reply.kind === 'work') {
-        setAnswer('이 요청은 화면 자동화(PC) 작업으로 판정되었습니다. PC 자동화 연결이 필요합니다.');
+        setAnswer(reply.message);
         return;
       }
 
@@ -99,15 +94,16 @@ export default function WardPage() {
       }
       setAnswer(text_answer);
     } catch (err) {
-      if (err instanceof AiRequestError && err.status === 401) {
-        setPendingAuthRequest(text);
+      if (err instanceof AiRequestError && err.deviceRequired) {
+        // device 쿠키 없음/폐기(§16) — 연결 게이트로 되돌린다. 재연결 후 다시 조사하면 된다.
+        markDisconnected();
         return;
       }
       setError(err instanceof Error ? err.message : '응답을 생성하지 못했습니다. 다시 시도해 주세요.');
     } finally {
       setPending(false);
     }
-  }, [dataset, pending]);
+  }, [dataset, pending, markDisconnected]);
 
   const onSubmit = (e: FormEvent) => { e.preventDefault(); void submit(input.trim()); };
 
@@ -147,21 +143,6 @@ export default function WardPage() {
         </div>
       </form>
 
-      {pendingAuthRequest && (
-        <div className="notice">
-          <b>조사에는 로그인이 필요합니다.</b> 원내 보유 조회는 로그인 없이도 되지만, 서버 조사는 O4O 계정이 필요합니다.
-          <br />로그인하면 방금 요청을 그대로 이어서 진행합니다 — 입력한 내용은 사라지지 않습니다.
-          <div style={{ marginTop: 12 }}>
-            <LoginPanel
-              onSuccess={() => {
-                const resume = pendingAuthRequest;
-                setPendingAuthRequest(null);
-                if (resume) void submit(resume);
-              }}
-            />
-          </div>
-        </div>
-      )}
       {error && <div className="err">{error}</div>}
       {question && !error && (
         <div className="panel">

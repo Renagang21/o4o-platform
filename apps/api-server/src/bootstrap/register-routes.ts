@@ -430,6 +430,19 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
     app.use('/api/ai', aiProxyRoutes);
     logger.info('✅ AI Query + Proxy routes registered at /api/ai');
 
+    // 22-hospital. Hospital Pharmacy — 로그인리스 Device Enrollment + hospital 범위 AI
+    //   (WO-O4O-HOSPITAL-PHARMACY-DEVICE-ENROLLMENT-AND-LOGINLESS-ACCESS-V1)
+    //   공유 /api/ai/* 인증은 건드리지 않는다: 이 라우터가 device-auth 게이트를 두고 기존 공통 Core 를 소비만 한다.
+    try {
+      const { createHospitalRoutes } = await import('../routes/hospital/hospital.routes.js');
+      app.use('/api/hospital', createHospitalRoutes(dataSource));
+      logger.info('✅ Hospital Pharmacy device routes registered at /api/hospital');
+    } catch (error) {
+      logger.error('❌ Hospital Pharmacy routes registration failed', {
+        error: error instanceof Error ? error.message : String(error),
+      });
+    }
+
     // 22-local-agent. Local Work Agent (WO-O4O-LOCAL-WORK-AGENT-V0)
     //   사용자 축(/pair, /devices)과 agent 축(/register, /connect, /heartbeat, /result)이
     //   한 라우터에 있지만 인증 미들웨어가 서로 다르다. 상세는 해당 파일 주석 참조.
