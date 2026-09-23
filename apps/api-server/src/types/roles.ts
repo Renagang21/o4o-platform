@@ -92,7 +92,7 @@ export type CosmeticsRole =
  * LMS roles
  */
 export type LmsRole =
-  | 'lms:instructor';     // Legacy LMS 강사 — Lecture cutover 완료 전 유지
+  | 'lms:instructor';     // Legacy LMS 강사 — 선언만 유지(runtime 소비 0 · 과거 role_assignment 해석용)
 
 /** O4O Lecture service roles — 일반 학습자는 role이 아니라 service_memberships로 판정 */
 export type LectureRole =

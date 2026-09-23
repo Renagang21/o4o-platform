@@ -316,7 +316,7 @@ read-only(`o4o_api_v2` · cloud-sql-proxy). 9/18 IR 대비 **이탈 0** — STOP
 | `LMS_CORE_REUSED` / `NEW_LMS_CORE` | YES / NO |
 | `PRODUCTION_LMS_WRITE` | 0 |
 | `PRODUCTION_RE_CENSUS` | DONE (SELECT only · 이탈 0) |
-| `READY_FOR_LECTURE_DATA_CUTOVER` | **YES (coordinated)** — 실행 순서는 §17-5 로 확정: **merge → final production re-census → coordinated deploy + data cutover → public smoke → operator E2E(Auth gate 해소 시)**. Phase 2 runtime 단독 배포 금지(`PHASE2_MERGE != PHASE2_DEPLOY`) |
+| `READY_FOR_LECTURE_DATA_CUTOVER` | ~~**YES (coordinated)**~~ **SUPERSEDED (§21 · 2026-09-23)** — 이관 대상이 삭제돼 조건 자체가 소멸했다. 이하 서술은 당시 기록이다: — 실행 순서는 §17-5 로 확정: **merge → final production re-census → coordinated deploy + data cutover → public smoke → operator E2E(Auth gate 해소 시)**. Phase 2 runtime 단독 배포 금지(`PHASE2_MERGE != PHASE2_DEPLOY`) |
 
 ## 16. Phase 2 비범위 (§20 · 미착수 확인)
 production `service_key` migration(kpa-society 8 · pharmacy-hub 3 → lecture) · `currentEnrollments` 7 정정 · production membership 생성 · reward/credit/certificate/organization/paid 이관 · KCos/PH `package.json` lms 의존 선언 정리 · `types/roles.ts` `lms:instructor` 제거 · KPA AI route 2 삭제. 전부 **별도 WO**.
@@ -541,6 +541,9 @@ spec 추가(14차): merge-gate spec **+10건**(재검토 강의 learner 404 · �
 
 ### 17-5. 실행 순서 (확정 · PR 설명 동기화)
 
+> **상태: SUPERSEDED (§21·§22 · 2026-09-23)** — 아래 순서의 "coordinated deploy + data cutover" 는 **취소**됐다.
+> 이관할 데이터가 없으며(§21 삭제), 현행 배포 조건은 §22 의 빈 상태 검증 결과를 따른다. 이하는 당시 기록이다.
+
 ```
 merge(PR #225) → final production re-census(SELECT only)
   → coordinated deploy + data cutover (api + web-lecture 배포와 lms_courses.service_key rekey 를 한 창에서 · 별도 WO)
@@ -607,6 +610,8 @@ OPERATOR_LOGIN_E2E = 보류 (Auth 트랙)
 ```
 
 ### 18-4. 다음 (coordinated deploy + cutover WO 에서)
+
+> **상태: SUPERSEDED (§21·§22)** — 1·2·3번(membership 부여 경로 확정을 제외한 rekey·currentEnrollments 복구)은 대상 소멸로 취소됐다.
 
 1. Lecture membership 부여 경로 확정(§17-5 OPERATIONAL_GATE) — 운영자 지정 vs `joinEnabled=true`
 2. api + web-lecture 배포와 `lms_courses.service_key` rekey(11건)를 **한 창에서** 실행 · 기존 KPA/PH membership → Lecture membership 자동 생성 **금지**
@@ -823,3 +828,66 @@ REKEY / 이관        = 0 (계속 금지)
 ### 21-6. 이 삭제가 무효화하는 선행 조건
 
 §17-5 · §18-4 · §19-5 가 "배포 전 필수" 로 적었던 **11 course rekey · 수강 이관 · coordinated deploy+cutover** 는 **대상이 사라져 더 이상 성립하지 않는다.** 남은 판단은 **빈 Lecture 상태에서 Phase 2 runtime 이 안전한가** 하나이며, 그 검증 결과는 §22 에 기록한다.
+
+---
+
+## 22. 빈 LMS 상태에서의 Phase 2 재판정 (2026-09-23)
+
+> **검증 대상 SHA**: `05950f5a9` (main · Phase 2 포함) · 검증 중 `DEPLOY_ENABLED=false` · 운영 트래픽·DB·membership 변경 0
+
+### 22-1. 선행조건 정정 (§21 반영)
+
+`rekey` · `수강 이관` · `coordinated data cutover` 를 **배포 필수 조건**으로 적은 지점을 전수 조사해 정정했다.
+
+| 위치 | 성격 | 조치 |
+|---|---|---|
+| `lecture-access.ts` · `certificate-verification-base.ts` · `lms-service-scope.ts` · `types/roles.ts` | **주석** | 문구 정정(런타임 동작 변경 0) |
+| `lecture-phase2-merge-gate-contract.spec.ts` 헤더 P1-5 | **주석** | 게이트 해소 표기(단언 변경 0) |
+| CHECK §15 판정표 `READY_FOR_LECTURE_DATA_CUTOVER` · §17-5 실행순서 · §18-4 | **기록** | **SUPERSEDED 표기**(본문 보존 — 과거 시점 기록) |
+
+**런타임 단언·분기에 cutover 의존은 없었다** — 전부 주석이었다. `REKEY/IMPORT = FORBIDDEN` 은 그대로 유지한다.
+
+### 22-2. 검증 방법과 근거
+
+배포 없이 검증해야 하므로 **격리 환경 재현 + 계약 테스트 + 번들 실측** 세 축을 썼다.
+
+| # | 항목 | 방법 | 결과 |
+|---|---|---|---|
+| 1 | 운영과 동일한 빈 스키마 재현 | docker `postgres:15` 격리 DB → `migrate.ts` (bootstrap + incremental 4) | `POST_MIGRATION_SCHEMA_ASSERTION = PASS` · `LIVE_FINGERPRINT = bc27f5bc… (5826 lines)` — **운영 지문과 일치** · LMS 0건 |
+| 2 | Lecture reference seed | 격리 DB 에 CLI seed | `POST_SEED_ASSERTION = PASS` · platform_services 1 · roles 3 · `lecture:member` 0 |
+| 3 | Phase 2 계약 | jest 4 suites (`lecture-phase2-merge-gate-contract` · `lms-crossservice-read-write-boundary` · `lecture-service-foundation` · `lecture-scope-guard`) | **175 tests PASS** |
+| 4 | 빈 강의 목록 · 기존 ID 404 | 운영 API 실측(§21-5) | `GET /api/v1/lms/courses` total 0 · 삭제된 ID 3종 404 |
+| 5 | 과거 링크 이동 | 3 서비스 번들 실측 | `study.neture.co.kr` 참조 KPA 3 · KCos 2 · PH 2 (리다이렉트 살아 있음) |
+| 6 | 주요 화면 빌드 | `lecture-web` · `@o4o/web-kpa-society` · `@o4o/web-k-cosmetics` · `pharmacy-hub-web` | **4/4 build PASS** (dist 생성 확인) |
+| 7 | 다른 서비스 API 영향 | Phase 2 diff 중 LMS/Lecture 밖 backend 12파일 전수 검토 | 공용 `rateLimiter.ts` 는 **additive**(`ipBurstLimiter` 신규 export · 기존 `apiLimiter` 불변) · 나머지는 전부 LMS 표면 제거만(cosmetics/PH 홈 피드의 course 블록 · KPA mypage enrollments/certificates delegate · operator 메뉴 1줄) |
+| 8 | Lecture 번들의 legacy 잔재 | `lecture-web` dist 검색 | `kpa-society` 0 · `pharmacy-hub` 0 |
+
+**삭제된 강의 ID 의 404 는 예상 결과로 판정한다**(§21 삭제의 직접 결과).
+
+### 22-3. 해소되지 않은 것 (정직한 기록)
+
+**로컬 API 전체 기동은 달성하지 못했다.** 두 번 막혔고 둘 다 **로컬 빌드 산출물 문제**이며 Phase 2 코드 결함이 아니다.
+
+1. `tsx src/main.ts` — `ColumnTypeUndefinedError: NetureSupplier#slug` (decorator metadata 미방출). 운영은 빌드 산출물을 실행한다.
+2. `node dist/main.js` — `ERR_MODULE_NOT_FOUND: @o4o/forum-core/dist/public-ui/components/ForumBlockRenderer` (dist 가 확장자 없는 ESM import 를 방출 · 재빌드해도 동일). 운영 Docker 이미지는 정상 기동 중이다.
+
+따라서 **"Phase 2 런타임이 실제 HTTP 응답을 어떻게 내는가"는 로컬에서 직접 관측하지 못했다.** 다만 다음 논거로 위험이 낮다고 본다:
+
+- LMS 테이블이 **전부 0건**이므로, `/api/v1/lms/*` 의 scope 고정(`lecture`)은 결과를 **좁힐 대상이 없다**. 빈 목록·404 는 코드 버전과 무관하게 동일하다.
+- 인증·다른 서비스 API 는 LMS 데이터에 의존하지 않으며, Phase 2 가 그 밖에서 바꾼 공용 모듈은 additive 한 건뿐이다(항목 7).
+
+→ **실제 HTTP 응답 관측은 통제된 배포 시점의 검증 항목으로 남긴다**(승인 게이트 → 배포 → smoke → 필요 시 즉시 롤백).
+
+### 22-4. 판정
+
+```text
+MAIN_RUNTIME_SAFE_FOR_GENERAL_DEPLOY = YES (조건부)
+  근거: 격리 DB 운영 동일 지문 · 계약 175 PASS · 4종 빌드 PASS · 비-LMS 영향 additive 1건
+  미해소: 로컬 API HTTP 응답 직접 관측(로컬 빌드 산출물 문제 · 배포 시점 검증으로 이월)
+LECTURE_DATA_CUTOVER 배포 차단 조건 = 해제 (§21 로 대상 소멸)
+REKEY / IMPORT = FORBIDDEN (유지)
+DEPLOY_ENABLED = false (유지) · 운영 트래픽 = 롤백 상태 유지
+강의 작성 가능 상태 = 별도 판정(§23) — 기존 데이터 이관과 연결하지 않는다
+```
+
+Password 트랙(legacy-password Phase A)을 막던 사유 중 **"Lecture data cutover 미실행"은 더 이상 유효하지 않다.** 단 실제 운영 배포는 준비된 변경 전체를 대상으로 **하나의 통제된 배포**(production 승인 게이트 · API migration · 트래픽 전환 확인)로 다룬다.

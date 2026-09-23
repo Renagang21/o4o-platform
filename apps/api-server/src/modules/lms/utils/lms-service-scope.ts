@@ -107,7 +107,7 @@ export function resolveLmsServiceScope(req: Request): string | undefined {
  *
  * WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2 §8:
  * `service_key IS NULL` 을 KPA 로 귀속시키던 fallback 을 제거했다. scope 가 있는 요청에서
- * NULL 강의는 어떤 서비스에도 속하지 않는다 (data cutover 이전의 legacy row 는 Lecture
+ * NULL 강의는 어떤 서비스에도 속하지 않는다 (§21 이전에 존재하던 legacy row 는 Lecture
  * 경로에 노출되지 않는다 — 노출은 migration 으로만 해결한다).
  */
 export function isCourseInServiceScope(

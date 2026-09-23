@@ -138,7 +138,7 @@ export async function isActiveLectureLearner(req: Request): Promise<boolean> {
 /**
  * 운영·강사 write 대상 강의 판정 — `course.serviceKey === 'lecture'` 만 Lecture runtime 의 대상이다.
  * approve/reject/unpublish/archive/hard-delete(routes) 와 publish/update/delete/submit-review(controller)
- * 가 같은 규칙을 공유한다. legacy(KPA/PH/null) 강의는 non-disclosure 404 (data cutover 로만 해결).
+ * 가 같은 규칙을 공유한다. legacy(KPA/PH/null) 강의는 non-disclosure 404. data cutover 는 §21 에서 취소됐다(테스트 데이터 삭제로 대상 소멸) — legacy row 자체가 0건이므로 이 404 는 이제 평상 상태다.
  */
 export function isLectureCourse(courseServiceKey: string | null | undefined): boolean {
   return courseServiceKey === SERVICE_KEYS.LECTURE;
