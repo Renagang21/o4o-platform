@@ -41,9 +41,26 @@
  *   node scripts/ci/detect-affected.mjs --files-from <file>   # "STATUS\tpath" 목록 (테스트/재현용)
  *   node scripts/ci/detect-affected.mjs --mode=guard-specs    # 선별된 api-server spec 경로 출력
  *
+ *   node scripts/ci/detect-affected.mjs --mode=docs-specs     # 변경 문서를 소비하는 api-server test 경로 출력
+ *
  *   GITHUB_OUTPUT 가 있으면 admin_affected / admin_only / api_affected /
- *   global_or_unknown / fallback / reason 을 기록한다. 항상 exit 0 이다 —
- *   판정기 자체의 실패가 파이프라인을 막는 대신 안전한 fallback 이 되도록 한다.
+ *   docs_only / docs_fast_eligible / global_or_unknown / fallback / reason 을
+ *   기록한다. 항상 exit 0 이다 — 판정기 자체의 실패가 파이프라인을 막는 대신
+ *   안전한 fallback 이 되도록 한다.
+ *
+ * docs fast path
+ * ---------------------------------------------------------------
+ *   WO-O4O-DOCS-ONLY-CI-SECURITY-FAST-PATH-AND-PUSH-CONCURRENCY-PRESERVATION-V1
+ *
+ *   문서만 바꾼 commit 에서도 CI 전체(약 14분) + CodeQL 전체(약 7분 30초)가 돌았다.
+ *   `docs_fast_eligible` 은 그 중 **가장 좁은 부분집합**만 참으로 만든다:
+ *     - 변경 전체가 `docs/**` 안
+ *     - 상태가 A(추가) · M(수정) 뿐 — 삭제 · 이동은 기록물 존재를 단언하는
+ *       정적 spec 이 있으므로 기존 full fallback 유지
+ *     - 확장자가 `.md` 뿐 — `docs/checks/data/**` 의 JSON fixture 처럼
+ *       **코드·테스트가 읽는 데이터 자산**은 문서가 아니다
+ *     - 경로에 `data/` 세그먼트가 없음 (같은 이유의 보수적 여유)
+ *   나머지는 전부 기존 경로다. 애매하면 full CI 한 번을 선택한다.
  */
 
 import { spawnSync } from 'node:child_process';
@@ -102,6 +119,11 @@ const GLOBAL_PREFIXES = [
 
 /** 추가·수정일 때 중립으로 취급하는 경로 (삭제·이동은 중립이 아니다). */
 const NEUTRAL_PREFIXES = ['docs/'];
+
+/** docs fast path 대상 확장자 — Markdown 문서만. */
+const DOCS_FAST_EXTENSIONS = ['.md'];
+/** docs 경로 안이어도 문서가 아니라 **데이터 자산**으로 보는 세그먼트. */
+const DOCS_DATA_SEGMENTS = new Set(['data', 'fixtures', 'translations']);
 
 // ---------------------------------------------------------------------------
 // workspace graph
@@ -245,6 +267,57 @@ export function workspaceDirOf(graph, filePath) {
 }
 
 /**
+ * docs fast path 판정.
+ *
+ * WO-O4O-DOCS-ONLY-CI-SECURITY-FAST-PATH-AND-PUSH-CONCURRENCY-PRESERVATION-V1
+ *
+ *   docs_only          변경 전체가 `docs/**` 안
+ *   docs_fast_eligible docs_only + 상태 A/M + 확장자 `.md` + data 세그먼트 없음
+ *
+ * `.md` 가 아니거나(예: `docs/checks/data/**.json` guard fixture,
+ * `docs/guides/.../translations/*.json`) 삭제·이동이면 fast 대상이 아니다.
+ * 이 경우 docs_only 는 참일 수 있지만 docs_fast_eligible 은 거짓이며,
+ * 호출자는 기존 full 경로를 그대로 탄다.
+ *
+ * @param {{status: string, path: string}[]} changedFiles
+ * @returns {{docs_only: boolean, docs_fast_eligible: boolean, reasons: string[]}}
+ */
+export function classifyDocs(changedFiles) {
+  if (!Array.isArray(changedFiles) || changedFiles.length === 0) {
+    return { docs_only: false, docs_fast_eligible: false, reasons: ['변경 파일 0건 — docs fast 대상 아님'] };
+  }
+
+  const reasons = [];
+  let docsOnly = true;
+  let fast = true;
+
+  for (const { status, path: file } of changedFiles) {
+    if (!hasPrefix(file, NEUTRAL_PREFIXES)) {
+      docsOnly = false;
+      fast = false;
+      continue;
+    }
+    if (status !== 'A' && status !== 'M') {
+      fast = false;
+      reasons.push(`문서 ${status}(삭제/이동) — docs fast 아님: ${file}`);
+      continue;
+    }
+    if (!DOCS_FAST_EXTENSIONS.some((ext) => file.toLowerCase().endsWith(ext))) {
+      fast = false;
+      reasons.push(`Markdown 이 아닌 문서 경로 자산 — docs fast 아님: ${file}`);
+      continue;
+    }
+    if (file.split('/').some((seg) => DOCS_DATA_SEGMENTS.has(seg))) {
+      fast = false;
+      reasons.push(`데이터 성격 경로(${file.split('/').find((seg) => DOCS_DATA_SEGMENTS.has(seg))}/) — docs fast 아님: ${file}`);
+      continue;
+    }
+  }
+
+  return { docs_only: docsOnly, docs_fast_eligible: docsOnly && fast, reasons };
+}
+
+/**
  * @param {{status: string, path: string}[]} changedFiles
  * @param {ReturnType<typeof buildWorkspaceGraph>} graph
  */
@@ -253,6 +326,8 @@ export function classify(changedFiles, graph) {
     admin_affected: false,
     admin_only: false,
     api_affected: false,
+    docs_only: false,
+    docs_fast_eligible: false,
     global_or_unknown: false,
     fallback: false,
     reasons: [],
@@ -264,6 +339,8 @@ export function classify(changedFiles, graph) {
       ...result,
       admin_affected: true,
       api_affected: true,
+      docs_only: false,
+      docs_fast_eligible: false,
       global_or_unknown: true,
       fallback: true,
       reasons: ['변경 파일 0건 — 판정 불가, full CI 로 fallback'],
@@ -319,14 +396,20 @@ export function classify(changedFiles, graph) {
     }
   }
 
+  // docs 축은 code 축과 독립적으로 계산한다 — 문서 삭제·이동은 위에서 이미 global 이므로
+  // 여기서 docs_fast_eligible 이 참이 되는 경우는 `docs/**` Markdown 추가·수정뿐이다.
+  const docs = classifyDocs(changedFiles);
+
   if (global) {
     return {
       admin_affected: true,
       admin_only: false,
       api_affected: true,
+      docs_only: docs.docs_only,
+      docs_fast_eligible: false,
       global_or_unknown: true,
       fallback: false,
-      reasons: result.reasons,
+      reasons: [...result.reasons, ...docs.reasons],
     };
   }
 
@@ -334,9 +417,11 @@ export function classify(changedFiles, graph) {
     admin_affected: adminAffected,
     admin_only: adminAffected && !nonAdminCode,
     api_affected: apiAffected,
+    docs_only: docs.docs_only,
+    docs_fast_eligible: docs.docs_fast_eligible,
     global_or_unknown: false,
     fallback: false,
-    reasons: result.reasons,
+    reasons: [...result.reasons, ...docs.reasons],
   };
 }
 
@@ -406,6 +491,68 @@ export function selectPathGuardSpecs(changedFiles, graph, root = REPO_ROOT) {
 }
 
 // ---------------------------------------------------------------------------
+// 변경 문서를 소비하는 api-server test 선별 (docs fast path)
+// ---------------------------------------------------------------------------
+
+/**
+ * WO-O4O-DOCS-ONLY-CI-SECURITY-FAST-PATH-AND-PUSH-CONCURRENCY-PRESERVATION-V1 §9 · §10
+ *
+ * 문서를 **실제로 읽는** test 는 top-level `src/__tests__/*.spec.ts` 에만 있지 않다.
+ * 전수 조사에서 nested test(`src/modules/content-guard/__tests__/liquid-guard.test.ts`)가
+ * `docs/checks/data/**` 를 읽는 사례가 확인됐다. 따라서 docs 축 선별은
+ * `apps/api-server/src` 전체를 재귀로 훑는다.
+ *
+ * Admin 축(`selectPathGuardSpecs`)의 탐색 범위는 **바꾸지 않는다** —
+ * 선행 WO 의 Admin fast path 실측(2분 57초)을 회귀시키지 않기 위해서다.
+ *
+ * 매칭 단위는 `docs/<area>` 이상이다. `docs` 단독까지 내려가면 사실상 전체 선택이 된다.
+ * false positive(몇 개 더 실행)는 허용하고 false negative(guard 누락)는 허용하지 않는다.
+ *
+ * @returns {string[]} apps/api-server 기준 상대 경로 (jest 인자로 그대로 사용)
+ */
+export function selectDocsConsumerSpecs(changedFiles, root = REPO_ROOT) {
+  const srcRel = 'apps/api-server/src';
+  const srcAbs = path.join(root, ...srcRel.split('/'));
+  if (!existsSync(srcAbs)) return [];
+
+  const needles = new Set();
+  for (const { path: file } of changedFiles) {
+    if (!hasPrefix(file, NEUTRAL_PREFIXES)) continue;
+    const seg = file.split('/');
+    if (seg.length >= 2) needles.add(`${seg[0]}/${seg[1]}`);
+    needles.add(file);
+  }
+  if (needles.size === 0) return [];
+
+  const TEST_FILE = /\.(spec|test)\.(ts|tsx|js)$/;
+  const selected = [];
+
+  /** @param {string} dirAbs @param {string} dirRel */
+  const walk = (dirAbs, dirRel) => {
+    for (const entry of readdirSync(dirAbs, { withFileTypes: true })) {
+      const abs = path.join(dirAbs, entry.name);
+      const rel = dirRel ? `${dirRel}/${entry.name}` : entry.name;
+      if (entry.isDirectory()) {
+        if (entry.name === 'node_modules' || entry.name === 'setup') continue;
+        walk(abs, rel);
+        continue;
+      }
+      if (!entry.isFile() || !TEST_FILE.test(entry.name)) continue;
+      const source = readFileSync(abs, 'utf-8');
+      for (const needle of needles) {
+        if (source.includes(needle)) {
+          selected.push(`src/${rel}`);
+          break;
+        }
+      }
+    }
+  };
+
+  walk(srcAbs, '');
+  return selected.sort();
+}
+
+// ---------------------------------------------------------------------------
 // CLI
 // ---------------------------------------------------------------------------
 
@@ -439,6 +586,16 @@ function main() {
     read = { ok: false, reason: `변경 파일 수집 예외: ${err.message}` };
   }
 
+  if (mode === 'docs-specs') {
+    // 선별 실패(판정 불가)는 빈 출력이다. 호출자는 빈 목록을 "전체 suite 로 되돌림" 으로 읽는다.
+    if (!read.ok) {
+      process.stdout.write('\n');
+      return;
+    }
+    process.stdout.write(`${selectDocsConsumerSpecs(read.files).join(' ')}\n`);
+    return;
+  }
+
   if (mode === 'guard-specs') {
     // 선별 실패 = 안전하게 "전체" 를 뜻하는 빈 출력 대신 비어 있음을 명시한다.
     // 호출자(workflow)는 목록이 비면 전체 suite 로 되돌린다.
@@ -456,6 +613,8 @@ function main() {
       admin_affected: true,
       admin_only: false,
       api_affected: true,
+      docs_only: false,
+      docs_fast_eligible: false,
       global_or_unknown: true,
       fallback: true,
       reasons: [`safe fallback — ${read.reason}`],
@@ -473,6 +632,8 @@ function main() {
   console.log(`admin_affected  : ${verdict.admin_affected}`);
   console.log(`admin_only      : ${verdict.admin_only}`);
   console.log(`api_affected    : ${verdict.api_affected}`);
+  console.log(`docs_only       : ${verdict.docs_only}`);
+  console.log(`docs_fast_eligible: ${verdict.docs_fast_eligible}`);
   console.log(`global_or_unknown: ${verdict.global_or_unknown}`);
   console.log(`fallback        : ${verdict.fallback}`);
   console.log(`reason          : ${reason}`);
@@ -488,6 +649,8 @@ function main() {
         `admin_affected=${verdict.admin_affected}`,
         `admin_only=${verdict.admin_only}`,
         `api_affected=${verdict.api_affected}`,
+        `docs_only=${verdict.docs_only}`,
+        `docs_fast_eligible=${verdict.docs_fast_eligible}`,
         `global_or_unknown=${verdict.global_or_unknown}`,
         `fallback=${verdict.fallback}`,
         `reason=${reason.replace(/\r?\n/g, ' ').slice(0, 900)}`,

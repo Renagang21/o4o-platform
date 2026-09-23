@@ -12,11 +12,18 @@
  *     full CI 로 fallback 한다
  *   - multi-commit push 에서 앞쪽 commit 의 변경을 놓치지 않는다
  *   - admin_only 여도 Admin 소스를 읽는 api-server 정적 guard spec 은 선별된다
+ *
+ * WO-O4O-DOCS-ONLY-CI-SECURITY-FAST-PATH-AND-PUSH-CONCURRENCY-PRESERVATION-V1 §19 (Case D1~D10)
+ *   - Markdown 문서 추가·수정만 docs fast path 다
+ *   - `docs/` 안이어도 데이터 자산(JSON fixture 등)은 fast 가 아니다
+ *   - 문서 삭제·이동, 코드 혼합, base SHA 이상은 전부 기존 경로다
+ *   - scheduled CodeQL 은 판정과 무관하게 항상 Analyze 한다 (workflow 계약)
+ *   - main push 는 진행 중인 검증을 취소하지 않는다 (concurrency 계약)
  */
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
+import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 
@@ -24,8 +31,11 @@ import {
   buildWorkspaceGraph,
   dependencyClosure,
   classify,
+  classifyDocs,
   parseFileList,
   readChangedFiles,
+  REPO_ROOT,
+  selectDocsConsumerSpecs,
   selectPathGuardSpecs,
   workspaceDirOf,
 } from '../detect-affected.mjs';
@@ -272,4 +282,193 @@ test('admin_only 경로에서도 Admin 소스를 읽는 api-server 정적 guard 
 
   // 전체 suite 를 그대로 되돌리는 것은 선별이 아니다 — 실제로 부분집합이어야 한다
   assert.ok(specs.length < 100, `선별이 사실상 전체다: ${specs.length}`);
+});
+
+// ---------------------------------------------------------------------------
+// Case D1~D10 — docs fast path
+//   WO-O4O-DOCS-ONLY-CI-SECURITY-FAST-PATH-AND-PUSH-CONCURRENCY-PRESERVATION-V1 §19
+// ---------------------------------------------------------------------------
+
+const docsOf = (lines) => classifyDocs(parseFileList(lines.join('\n')));
+
+test('Case D1. CHECK 문서 1건 수정 → docs fast', () => {
+  const v = verdictOf(['M\tdocs/checks/CHECK-X.md']);
+  assert.equal(v.docs_only, true);
+  assert.equal(v.docs_fast_eligible, true);
+  assert.equal(v.global_or_unknown, false);
+  // docs fast 는 code 축을 깨우지 않는다
+  assert.equal(v.admin_affected, false);
+  assert.equal(v.api_affected, false);
+});
+
+test('Case D2. baseline 수정 + WO 추가 → docs fast', () => {
+  const v = verdictOf(['M\tdocs/baseline/X.md', 'A\tdocs/work-orders/WO-X.md']);
+  assert.equal(v.docs_only, true);
+  assert.equal(v.docs_fast_eligible, true);
+});
+
+test('Case D3. docs 안의 데이터 자산은 fast 아님', () => {
+  const v = verdictOf(['M\tdocs/checks/data/product-description-guard/foo.json']);
+  assert.equal(v.docs_only, true, 'docs/ 안이므로 docs_only 는 참이다');
+  assert.equal(v.docs_fast_eligible, false, 'Markdown 이 아니므로 fast 가 아니다');
+
+  // 확장자 축과 세그먼트 축이 각각 독립적으로 막는다
+  assert.equal(docsOf(['M\tdocs/guides/content-authoring/translations/ko.json']).docs_fast_eligible, false);
+  assert.equal(docsOf(['M\tdocs/checks/data/anything.md']).docs_fast_eligible, false, 'data/ 세그먼트는 .md 여도 제외');
+  assert.equal(docsOf(['M\tdocs/checks/rollback-manifest.yml']).docs_fast_eligible, false);
+  assert.equal(docsOf(['M\tdocs/checks/export.csv']).docs_fast_eligible, false);
+});
+
+test('Case D4. 문서 삭제 → full fallback (기록물 존재를 단언하는 정적 spec 보호)', () => {
+  const v = verdictOf(['D\tdocs/checks/X.md']);
+  assert.equal(v.docs_fast_eligible, false);
+  assert.equal(v.global_or_unknown, true);
+  assert.equal(v.api_affected, true);
+});
+
+test('Case D5. 문서 rename → full fallback', () => {
+  const v = verdictOf(['R\tdocs/baseline/A.md', 'R\tdocs/baseline/B.md']);
+  assert.equal(v.docs_fast_eligible, false);
+  assert.equal(v.global_or_unknown, true);
+});
+
+test('Case D6. 문서 + API 코드 혼합 → docs_only=false, 기존 code 경로', () => {
+  const v = verdictOf(['M\tdocs/checks/X.md', 'M\tapps/api-server/src/foo.ts']);
+  assert.equal(v.docs_only, false);
+  assert.equal(v.docs_fast_eligible, false);
+  assert.equal(v.api_affected, true);
+});
+
+test('Case D6-b. 문서 + scripts/.github/root manifest 혼합 → global fallback', () => {
+  for (const other of [
+    'M\tscripts/ci/detect-affected.mjs',
+    'M\t.github/workflows/ci-pipeline.yml',
+    'M\tpackage.json',
+  ]) {
+    const v = verdictOf(['M\tdocs/checks/X.md', other]);
+    assert.equal(v.docs_fast_eligible, false, other);
+    assert.equal(v.global_or_unknown, true, other);
+  }
+});
+
+test('Case D7. multi-commit push — 앞 commit 이 코드면 docs fast 아님', () => {
+  const { dir, write, base } = makeRepo();
+  try {
+    write('apps/admin-dashboard/src/main.tsx', 'code\n');
+    git(dir, ['add', '-A']);
+    git(dir, ['commit', '-q', '-m', 'code']);
+
+    write('docs/checks/CHECK.md', 'doc\n');
+    git(dir, ['add', '-A']);
+    git(dir, ['commit', '-q', '-m', 'docs only']);
+    const head = git(dir, ['rev-parse', 'HEAD']).stdout.trim();
+
+    // 마지막 commit 만 보면 docs-only 로 보인다 — push batch 전체 기준으로 판정해야 한다.
+    const lastOnly = classify(readChangedFiles(`${head}~1`, head, dir).files, graph);
+    assert.equal(lastOnly.docs_fast_eligible, true, '마지막 commit 단독은 docs-only 다');
+
+    const batch = readChangedFiles(base, head, dir);
+    assert.equal(batch.ok, true);
+    const v = classify(batch.files, graph);
+    assert.equal(v.docs_only, false, 'push batch 전체를 보면 docs-only 가 아니다');
+    assert.equal(v.docs_fast_eligible, false);
+    assert.equal(v.admin_affected, true);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('Case D8. multi-commit push — 전부 문서면 docs fast', () => {
+  const { dir, write, base } = makeRepo();
+  try {
+    write('docs/checks/CHECK-1.md', 'doc\n');
+    git(dir, ['add', '-A']);
+    git(dir, ['commit', '-q', '-m', 'docs 1']);
+
+    write('docs/work-orders/WO-2.md', 'doc\n');
+    git(dir, ['add', '-A']);
+    git(dir, ['commit', '-q', '-m', 'docs 2']);
+    const head = git(dir, ['rev-parse', 'HEAD']).stdout.trim();
+
+    const batch = readChangedFiles(base, head, dir);
+    assert.equal(batch.ok, true);
+    const v = classify(batch.files, graph);
+    assert.equal(v.docs_only, true);
+    assert.equal(v.docs_fast_eligible, true);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('Case D9. 판정 불가 입력은 docs fast 가 되지 않는다', () => {
+  const v = classify([], graph);
+  assert.equal(v.docs_only, false);
+  assert.equal(v.docs_fast_eligible, false);
+  assert.equal(v.fallback, true);
+  assert.equal(docsOf([]).docs_fast_eligible, false);
+});
+
+// ---------------------------------------------------------------------------
+// 문서를 실제로 소비하는 test 선별 (§9 census 결과 고정)
+// ---------------------------------------------------------------------------
+
+test('변경 문서를 raw text 로 읽는 api-server test 가 선별된다 (nested 포함)', () => {
+  const checks = selectDocsConsumerSpecs(parseFileList('M\tdocs/checks/CHECK-X.md'));
+  // 기록물 폴더 존재·문서 수를 단언하는 정적 guard
+  assert.ok(
+    checks.includes('src/__tests__/archive-retention-and-tracked-backup-disposition.spec.ts'),
+    `archive-retention guard 가 선별되어야 한다: ${checks.join(' ')}`,
+  );
+  // top-level 만 훑으면 놓치는 nested consumer (docs/checks/data/ JSON 을 읽는다)
+  assert.ok(
+    checks.includes('src/modules/content-guard/__tests__/liquid-guard.test.ts'),
+    `nested docs consumer 가 선별되어야 한다: ${checks.join(' ')}`,
+  );
+
+  const baseline = selectDocsConsumerSpecs(
+    parseFileList('M\tdocs/baseline/O4O-SIGNAGE-CANONICAL-PLAYBACK-PATH-V1.md'),
+  );
+  assert.ok(
+    baseline.includes('src/__tests__/channels-stack-retirement.spec.ts'),
+    `baseline 문서 존재를 단언하는 spec 이 선별되어야 한다: ${baseline.join(' ')}`,
+  );
+
+  // 선별이지 전체 실행이 아니다
+  assert.ok(checks.length > 0 && checks.length < 40, `선별이 사실상 전체다: ${checks.length}`);
+  for (const spec of checks) assert.match(spec, /^src\/.+\.(spec|test)\.tsx?$/);
+
+  // 문서가 아닌 변경에는 docs consumer 선별이 관여하지 않는다
+  assert.deepEqual(selectDocsConsumerSpecs(parseFileList('M\tapps/api-server/src/foo.ts')), []);
+});
+
+// ---------------------------------------------------------------------------
+// Case D10 + §17 — workflow 계약 (YAML 정적 검증)
+// ---------------------------------------------------------------------------
+
+const workflowYaml = (name) => readFileSync(path.join(REPO_ROOT, '.github', 'workflows', name), 'utf-8');
+
+test('Case D10. scheduled · workflow_dispatch CodeQL 은 판정과 무관하게 Analyze 한다', () => {
+  const yml = workflowYaml('ci-security.yml');
+  assert.match(yml, /schedule:/);
+  assert.match(yml, /github\.event_name == 'schedule'/, 'schedule 은 항상 Analyze 여야 한다');
+  assert.match(yml, /github\.event_name == 'workflow_dispatch'/, 'workflow_dispatch 는 항상 Analyze 여야 한다');
+  assert.match(yml, /docs_fast_eligible != 'true'/, 'docs fast 일 때만 skip 이어야 한다');
+});
+
+test('§17. main push 는 진행 중인 검증을 취소하지 않는다 (PR 만 cancel-in-progress)', () => {
+  for (const name of ['ci-pipeline.yml', 'ci-security.yml']) {
+    const yml = workflowYaml(name);
+    assert.match(
+      yml,
+      /cancel-in-progress: \$\{\{ github\.event_name == 'pull_request' \}\}/,
+      `${name} 의 concurrency 가 PR 한정 취소여야 한다`,
+    );
+  }
+});
+
+test('docs fast job 은 heavy job 과 상호배타다 (ci-pipeline.yml 계약)', () => {
+  const yml = workflowYaml('ci-pipeline.yml');
+  assert.match(yml, /docs-fast-validate:/, 'docs fast job 이 있어야 한다');
+  const heavy = yml.match(/needs\.detect\.outputs\.docs_fast_eligible != 'true'/g) ?? [];
+  assert.ok(heavy.length >= 3, `heavy job 게이트가 3개 이상이어야 한다: ${heavy.length}`);
 });

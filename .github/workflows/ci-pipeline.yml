@@ -19,9 +19,14 @@ on:
         required: false
         default: ''
 
+# WO-O4O-DOCS-ONLY-CI-SECURITY-FAST-PATH-AND-PUSH-CONCURRENCY-PRESERVATION-V1 §17
+# 이전 정책(`cancel-in-progress: true`)에서는 **뒤따르는 문서/CHECK commit 이
+# 앞의 코드 full CI 를 취소**했다(실측: 619c51a4f · c5f33791a 의 CI Pipeline cancelled).
+# main/develop push 의 검증은 끝까지 보존하고, PR 은 새 revision 이 오면 이전 검사가
+# obsolete 이므로 취소를 유지한다.
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 env:
   NODE_VERSION: '22.18.0'
@@ -47,6 +52,8 @@ jobs:
       admin_affected: ${{ steps.scope.outputs.admin_affected }}
       admin_only: ${{ steps.scope.outputs.admin_only }}
       api_affected: ${{ steps.scope.outputs.api_affected }}
+      docs_only: ${{ steps.scope.outputs.docs_only }}
+      docs_fast_eligible: ${{ steps.scope.outputs.docs_fast_eligible }}
       global_or_unknown: ${{ steps.scope.outputs.global_or_unknown }}
       fallback: ${{ steps.scope.outputs.fallback }}
 
@@ -67,8 +74,9 @@ jobs:
     name: Code Quality Check
     runs-on: ubuntu-latest
     needs: [detect]
-    # Admin-only 변경은 아래 admin-fast-* 두 잡이 대체한다. 그 외에는 전부 여기로 온다.
-    if: needs.detect.outputs.admin_only != 'true'
+    # Admin-only 변경은 아래 admin-fast-* 두 잡이, 문서 Markdown 추가·수정만인 변경은
+    # docs-fast-validate 가 대체한다. 그 외에는 전부 여기로 온다.
+    if: needs.detect.outputs.admin_only != 'true' && needs.detect.outputs.docs_fast_eligible != 'true'
 
     steps:
     - uses: actions/checkout@v6
@@ -277,7 +285,8 @@ jobs:
     needs: [detect]
     # Admin-only 변경에서는 전체 suite 대신 admin-fast-guards 가
     # **Admin 소스를 읽는 정적 guard spec** 만 선별해 돌린다(범위 축소가 아니라 선별).
-    if: needs.detect.outputs.admin_only != 'true'
+    # docs fast 도 같은 원리다 — docs-fast-validate 가 **그 문서를 읽는 test** 만 선별한다.
+    if: needs.detect.outputs.admin_only != 'true' && needs.detect.outputs.docs_fast_eligible != 'true'
 
     steps:
     - uses: actions/checkout@v6
@@ -300,7 +309,7 @@ jobs:
     name: Build Applications
     runs-on: ubuntu-latest
     needs: [detect, quality-check, api-tests]
-    if: needs.detect.outputs.admin_only != 'true'
+    if: needs.detect.outputs.admin_only != 'true' && needs.detect.outputs.docs_fast_eligible != 'true'
 
     # build matrix 대상은 배포되는 앱만 유지한다.
     # WO-O4O-MAIN-SITE-FULL-SOURCE-DELETION-V1 에서 은퇴 앱이 소스째 삭제되어
@@ -350,6 +359,82 @@ jobs:
           apps/${{ matrix.app }}/dist
           apps/${{ matrix.app }}/build
         retention-days: 7
+
+  # ===========================================================================
+  # 4. Docs-only fast path
+  #
+  # WO-O4O-DOCS-ONLY-CI-SECURITY-FAST-PATH-AND-PUSH-CONCURRENCY-PRESERVATION-V1
+  #
+  # 문서 Markdown **추가·수정만** 있는 push 에서 실행된다(판정: detect).
+  # 실측 기준선: docs-only commit 63c36e11e 에서도 CI 14분 09초 + CodeQL 7분 32초가 돌았다.
+  #
+  # 무엇을 **줄이지 않았는지** 명시한다:
+  #   - 변경 문서를 **실제로 읽는** api-server test 는 전부 선별해 그대로 돌린다
+  #     (`--mode=docs-specs`. 전수 조사 §9 결과: 기록물 보존 guard · 정본 존재 단언 ·
+  #      docs/checks/data fixture 를 읽는 nested content-guard test)
+  #   - 판정기 자체의 회귀 시험(node:test)은 여기서도 blocking 으로 돈다
+  #   - 문서 **삭제 · 이동**, docs 안의 **데이터 자산(JSON/CSV/YAML)**, 코드 혼합은
+  #     이 경로로 오지 않는다 — 전부 위의 기존 full/affected 경로다
+  #
+  # 건너뛰는 것은 Markdown 문서 추가·수정이 **닿을 수 없는** 축뿐이다:
+  #   type-check · ESLint · entity/migration/route guard · 각 package Vitest/Jest ·
+  #   API 전체 Jest · Admin production build.
+  docs-fast-validate:
+    name: Docs Fast — docs consumer tests
+    runs-on: ubuntu-latest
+    needs: [detect]
+    if: needs.detect.outputs.docs_fast_eligible == 'true'
+
+    steps:
+    - uses: actions/checkout@v6
+      with:
+        # detect 와 같은 기준으로 push batch 전체를 본다.
+        fetch-depth: 0
+
+    # 저장소 전체 build:packages 도 Admin/API build 도 하지 않는다.
+    # 선별된 test 는 ts-jest 가 소스를 직접 변환하며(모듈 매핑은 jest.config.cjs 의
+    # moduleNameMapper 가 src 로 건다), 나머지는 순수 fs 정적 guard 다.
+    - name: Setup build environment
+      uses: ./.github/actions/setup-build-env
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        strict-lockfile: 'true'
+        build-packages: 'false'
+
+    # docs 축 판정 자체의 회귀(Case D1~D10)를 여기서도 막는다.
+    - name: Run tests (CI affected-scope detector node:test)
+      run: node --test scripts/ci/__tests__/detect-affected.test.mjs
+
+    - name: Select docs consumer tests
+      id: select
+      env:
+        BASE_SHA: ${{ github.event.inputs.base_sha || (github.event_name == 'pull_request' && github.event.pull_request.base.sha) || github.event.before }}
+        HEAD_SHA: ${{ github.event.inputs.head_sha || (github.event_name == 'pull_request' && github.event.pull_request.head.sha) || github.sha }}
+      run: |
+        VERDICT=$(node scripts/ci/detect-affected.mjs | awk -F': *' '/^docs_fast_eligible/{print $2}')
+        SPECS=$(node scripts/ci/detect-affected.mjs --mode=docs-specs)
+        echo "docs_fast_eligible(재확인): ${VERDICT}"
+        echo "선별된 docs consumer test: ${SPECS:-<없음>}"
+        echo "verdict=${VERDICT}" >> "$GITHUB_OUTPUT"
+        echo "specs=${SPECS}" >> "$GITHUB_OUTPUT"
+
+    # 이 잡 안에서 판정이 재현되지 않으면(=detect 와 결론이 다르면) 선별을 믿지 않고
+    # 전체 suite 로 되돌린다. 빈 선별 자체는 정상이다 — 그 문서를 읽는 test 가 없다는 뜻이다.
+    - name: Run docs consumer tests (api-server Jest)
+      env:
+        VERDICT: ${{ steps.select.outputs.verdict }}
+        SPECS: ${{ steps.select.outputs.specs }}
+        NODE_OPTIONS: --max-old-space-size=6144
+      run: |
+        if [ "$VERDICT" != "true" ]; then
+          echo "⚠️ 이 잡에서 docs fast 판정이 재현되지 않았습니다 — 안전하게 전체 suite 를 실행합니다"
+          pnpm --filter '@o4o/api-server^...' run build
+          cd apps/api-server && npx jest --maxWorkers=1
+        elif [ -z "${SPECS// /}" ]; then
+          echo "✅ 변경 문서를 읽는 test 가 없습니다 (선별 0건)"
+        else
+          cd apps/api-server && npx jest --maxWorkers=1 $SPECS
+        fi
 
   # ===========================================================================
   # 4. Admin-only fast path
