@@ -321,11 +321,13 @@ export function classifyDocs(changedFiles) {
  * @param {{status: string, path: string}[]} changedFiles
  * @param {ReturnType<typeof buildWorkspaceGraph>} graph
  */
-export function classify(changedFiles, graph) {
+export function classify(changedFiles, graph, opts = {}) {
   const result = {
     admin_affected: false,
     admin_only: false,
     api_affected: false,
+    api_ci_affected: false,
+    api_deploy_affected: false,
     docs_only: false,
     docs_fast_eligible: false,
     global_or_unknown: false,
@@ -339,11 +341,13 @@ export function classify(changedFiles, graph) {
       ...result,
       admin_affected: true,
       api_affected: true,
+      api_ci_affected: true,
+      api_deploy_affected: true,
       docs_only: false,
       docs_fast_eligible: false,
       global_or_unknown: true,
       fallback: true,
-      reasons: ['변경 파일 0건 — 판정 불가, full CI 로 fallback'],
+      reasons: ['변경 파일 0건 — 판정 불가, full CI · API 배포로 fallback'],
     };
   }
 
@@ -399,17 +403,21 @@ export function classify(changedFiles, graph) {
   // docs 축은 code 축과 독립적으로 계산한다 — 문서 삭제·이동은 위에서 이미 global 이므로
   // 여기서 docs_fast_eligible 이 참이 되는 경우는 `docs/**` Markdown 추가·수정뿐이다.
   const docs = classifyDocs(changedFiles);
+  // 배포 축은 CI 축과 **독립적으로** 계산한다 (WO-O4O-API-CD-RUNTIME-AFFECTED-DEPLOY-GATE-V1 §5).
+  const deploy = classifyApiDeploy(changedFiles, graph, opts);
 
   if (global) {
     return {
       admin_affected: true,
       admin_only: false,
       api_affected: true,
+      api_ci_affected: true,
+      api_deploy_affected: deploy.api_deploy_affected,
       docs_only: docs.docs_only,
       docs_fast_eligible: false,
       global_or_unknown: true,
       fallback: false,
-      reasons: [...result.reasons, ...docs.reasons],
+      reasons: [...result.reasons, ...docs.reasons, ...deploy.reasons],
     };
   }
 
@@ -417,12 +425,255 @@ export function classify(changedFiles, graph) {
     admin_affected: adminAffected,
     admin_only: adminAffected && !nonAdminCode,
     api_affected: apiAffected,
+    api_ci_affected: apiAffected,
+    api_deploy_affected: deploy.api_deploy_affected,
     docs_only: docs.docs_only,
     docs_fast_eligible: docs.docs_fast_eligible,
     global_or_unknown: false,
     fallback: false,
-    reasons: [...result.reasons, ...docs.reasons],
+    reasons: [...result.reasons, ...docs.reasons, ...deploy.reasons],
   };
+}
+
+// ---------------------------------------------------------------------------
+// API 배포 영향 판정 (api_ci_affected vs api_deploy_affected)
+// ---------------------------------------------------------------------------
+
+/**
+ * WO-O4O-API-CD-RUNTIME-AFFECTED-DEPLOY-GATE-V1
+ *
+ * 두 축은 다른 질문이다.
+ *   api_ci_affected     — API 를 **검증**해야 하는가 (Jest · type-check)
+ *   api_deploy_affected — production **image/runtime/schema** 가 바뀌는가
+ *
+ * 후자가 거짓이면 Docker build/push · Cloud Run migration Job 실행 ·
+ * 새 revision · one-off job image 재고정이 **전부 불필요한 프로덕션 작업**이다.
+ *
+ * production image 실측 구성 (Dockerfile · tsup.config.ts · deploy-api.yml 조사):
+ *   dist/main.js · dist/migrate.js · one-off job entry 7개 (tsup 번들)
+ *   dist/database/** (tsc 산출 migration + migration-config)
+ *   src/assets/** · packages/mail-core/templates/email
+ * 이 중 어디에도 test 파일은 들어가지 않는다.
+ */
+
+/**
+ * 배포 파이프라인이 **실제로 사용하는** 저장소 공용 경로.
+ * 조사 결과 `deploy-api.yml` 이 참조하는 저장소 파일은 composite action 하나뿐이고
+ * (`uses: ./.github/actions/setup-build-env`), root `build:packages` 와 api-server 의
+ * `build`/`build:api` 어디에도 `scripts/**` 호출이 없다.
+ */
+const API_DEPLOY_WORKFLOW = '.github/workflows/deploy-api.yml';
+const API_DEPLOY_BUILD_PREFIXES = ['.github/actions/'];
+/**
+ * global 이지만 **API production image 와 무관한** 경로.
+ * 다른 서비스의 workflow(`deploy-web-services.yml` 등) · CI 스크립트 · e2e · hook 은
+ * 이미지 내용에 들어가지도, 빌드에 참여하지도 않는다.
+ */
+const API_DEPLOY_NEUTRAL_PREFIXES = ['.github/', 'scripts/', 'tools/', 'e2e/', '.husky/'];
+
+/** apps/api-server 안에서 production bundle 에 **들어가지 않는** 경로 (test 축). */
+const API_NON_DEPLOY_PATTERNS = [
+  /(^|\/)__tests__\//,
+  /(^|\/)__mocks__\//,
+  /\.(spec|test)\.(ts|tsx|js|mjs|cjs)$/,
+  /(^|\/)jest\.config\.[a-z]+$/,
+];
+
+/**
+ * 조사 근거(census):
+ *   - `apps/api-server/tsconfig.build.json` 이 `*.spec.ts` · `*.test.ts` ·
+ *     `src/__tests__/**` 를 exclude 한다 → tsc migration 산출물에 없다.
+ *   - `tsup.config.ts` entry 9개(main · migrate · *-job)에서 test 파일로 가는
+ *     import 경로가 없다. production source 가 `__tests__`/`tests/` 에서
+ *     import 하는 사례 **0건**.
+ *   - production source 가 test 파일을 raw text 로 읽는 사례 **0건**
+ *     (`readFileSync` 히트 2건은 전부 `src/scripts/**` — build 에서 제외되고
+ *      tsup entry 도 아니다).
+ * 추측이 아니라 이 census 결과로 제외한다.
+ */
+export function isApiNonDeployPath(file) {
+  if (!file.startsWith(`${API_DIR}/`)) return false;
+  const rel = file.slice(API_DIR.length + 1);
+  // apps/api-server/tests/** — vitest multi-tenant 스위트. 번들·이미지와 무관하다.
+  if (rel === 'tests' || rel.startsWith('tests/')) return true;
+  return API_NON_DEPLOY_PATTERNS.some((re) => re.test(rel));
+}
+
+/**
+ * pnpm-lock.yaml 을 `importers:` 블록과 그 밖(tail)으로 가른다.
+ * tail 에는 `lockfileVersion` · `settings` · `overrides` · `packages` · `snapshots` 가 들어간다.
+ * @returns {{importers: Map<string,string>, tail: string} | null} 파싱 불가면 null
+ */
+export function parsePnpmLock(text) {
+  if (typeof text !== 'string' || text.length === 0) return null;
+  const lines = text.split(/\r?\n/);
+  const importers = new Map();
+  const tail = [];
+  let sawImporters = false;
+  let inImporters = false;
+  let key = null;
+  let buf = [];
+  const flush = () => {
+    if (key !== null) importers.set(key, buf.join('\n'));
+    key = null;
+    buf = [];
+  };
+  for (const line of lines) {
+    if (!inImporters) {
+      if (line === 'importers:') {
+        sawImporters = true;
+        inImporters = true;
+        continue;
+      }
+      tail.push(line);
+      continue;
+    }
+    if (line.trim() !== '' && /^\S/.test(line)) {
+      // importers 블록 종료 — 다음 top-level 키
+      flush();
+      inImporters = false;
+      tail.push(line);
+      continue;
+    }
+    const m = line.match(/^  (\S.*?):\s*$/);
+    if (m) {
+      flush();
+      key = m[1].replace(/^'(.*)'$/, '$1').replace(/^"(.*)"$/, '$1');
+      continue;
+    }
+    if (key !== null) buf.push(line);
+    else tail.push(line);
+  }
+  flush();
+  if (!sawImporters) return null;
+  return { importers, tail: tail.join('\n') };
+}
+
+/** API production image 에 영향을 줄 수 있는 pnpm importer 경로 집합. */
+export function apiDeployImporters(graph, closure = dependencyClosure(graph, API_PACKAGE)) {
+  // root importer('.') 는 build 환경 자체의 의존성이므로 보수적으로 포함한다.
+  const set = new Set(['.']);
+  for (const name of closure) {
+    const dir = graph.byName.get(name)?.dir;
+    if (dir) set.add(dir);
+  }
+  return set;
+}
+
+/**
+ * WO-O4O-API-CD-RUNTIME-AFFECTED-DEPLOY-GATE-V1 §9
+ *
+ * `pnpm-lock.yaml` 을 무조건 global=true 로 끝내지 않는다. 실측상 frontend 서비스 ·
+ * closure 밖 package 하나를 추가·수정한 것만으로 lockfile 이 바뀌어 API 가 배포됐다.
+ *
+ * 판정은 **두 단계 모두 안전한 쪽**으로만 거짓이 된다:
+ *   1. importers 밖(packages/snapshots/overrides/settings)이 조금이라도 다르면 → true
+ *      (외부 의존성 해석 변경 = 번들 산출물이 달라질 수 있다)
+ *   2. importers 안에서 바뀐 항목이 **API closure 밖 importer 뿐**일 때만 false
+ * 파싱 실패 · 내용 없음 · 예외는 전부 true 다.
+ */
+export function lockfileDeployImpact(baseText, headText, deployImporters) {
+  const base = parsePnpmLock(baseText);
+  const head = parsePnpmLock(headText);
+  if (!base || !head) return { affected: true, reason: 'pnpm-lock.yaml 내용 비교 불가 — 안전 fallback' };
+  if (base.tail !== head.tail) {
+    return { affected: true, reason: 'pnpm-lock.yaml importers 밖(packages/snapshots/overrides) 변경 — 의존성 해석 변경' };
+  }
+  const keys = new Set([...base.importers.keys(), ...head.importers.keys()]);
+  const changed = [...keys].filter((k) => base.importers.get(k) !== head.importers.get(k)).sort();
+  const hit = changed.filter((k) => deployImporters.has(k));
+  if (hit.length > 0) {
+    return { affected: true, reason: `pnpm-lock.yaml API closure importer 변경: ${hit.join(', ')}` };
+  }
+  return {
+    affected: false,
+    reason: `pnpm-lock.yaml 변경이 API closure 밖 importer 뿐: ${changed.join(', ') || '(importer 변경 없음)'}`,
+  };
+}
+
+/**
+ * WO-O4O-API-CD-RUNTIME-AFFECTED-DEPLOY-GATE-V1 §5 · §6 · §7 · §8 · §16
+ *
+ * @param {{status: string, path: string}[]} changedFiles
+ * @param {ReturnType<typeof buildWorkspaceGraph>} graph
+ * @param {{readLock?: (which: 'base'|'head') => string|undefined}} opts
+ *        pnpm-lock.yaml 정밀 판정을 위한 base/head 원문 공급자. 없으면 안전 fallback.
+ * @returns {{api_deploy_affected: boolean, reasons: string[]}}
+ */
+export function classifyApiDeploy(changedFiles, graph, opts = {}) {
+  if (!Array.isArray(changedFiles) || changedFiles.length === 0) {
+    return { api_deploy_affected: true, reasons: ['변경 파일 0건 — 판정 불가, API 배포 fallback'] };
+  }
+
+  const closure = dependencyClosure(graph, API_PACKAGE);
+  const importers = apiDeployImporters(graph, closure);
+  const reasons = [];
+  let affected = false;
+
+  for (const { path: file } of changedFiles) {
+    if (file === 'pnpm-lock.yaml') {
+      let verdict;
+      try {
+        verdict = lockfileDeployImpact(opts.readLock?.('base'), opts.readLock?.('head'), importers);
+      } catch (err) {
+        verdict = { affected: true, reason: `pnpm-lock.yaml 판정 예외 — 안전 fallback (${err.message})` };
+      }
+      if (verdict.affected) affected = true;
+      reasons.push(verdict.reason);
+      continue;
+    }
+
+    // 문서는 production image 에 들어가지 않는다 — 삭제·이동도 배포 영향이 아니다.
+    // (기록물 guard spec 은 CI 축의 문제이지 배포 축의 문제가 아니다.)
+    if (hasPrefix(file, NEUTRAL_PREFIXES)) continue;
+
+    // 이 workflow 자체의 변경은 배포 영향으로 취급한다 (§15).
+    if (file === API_DEPLOY_WORKFLOW) {
+      affected = true;
+      reasons.push(`deploy workflow 자체: ${file}`);
+      continue;
+    }
+    if (hasPrefix(file, API_DEPLOY_BUILD_PREFIXES)) {
+      affected = true;
+      reasons.push(`배포가 사용하는 composite action: ${file}`);
+      continue;
+    }
+    if (hasPrefix(file, API_DEPLOY_NEUTRAL_PREFIXES)) {
+      reasons.push(`배포 파이프라인 미참여 공용 경로 — 배포 무영향: ${file}`);
+      continue;
+    }
+    if (GLOBAL_EXACT.has(file) || hasPrefix(file, GLOBAL_PREFIXES)) {
+      affected = true;
+      reasons.push(`deploy global(root manifest/config · 빌드 컨텍스트): ${file}`);
+      continue;
+    }
+
+    if (file === API_DIR || file.startsWith(`${API_DIR}/`)) {
+      if (isApiNonDeployPath(file)) {
+        reasons.push(`api test 축 — production image 무영향: ${file}`);
+        continue;
+      }
+      affected = true;
+      reasons.push(`api runtime: ${file}`);
+      continue;
+    }
+
+    const wsDir = workspaceDirOf(graph, file);
+    if (!wsDir) {
+      affected = true;
+      reasons.push(`deploy 판정 불가(workspace 매핑 없음) — 안전 fallback: ${file}`);
+      continue;
+    }
+    const pkgName = graph.byDir.get(wsDir);
+    if (closure.has(pkgName)) {
+      affected = true;
+      reasons.push(`api 의존성 closure package ${pkgName}: ${file}`);
+      continue;
+    }
+    reasons.push(`api closure 밖 ${pkgName} — 배포 무영향: ${file}`);
+  }
+
+  return { api_deploy_affected: affected, reasons };
 }
 
 // ---------------------------------------------------------------------------
@@ -571,7 +822,7 @@ function resolveChangedFiles(argv) {
   const base = argValue(argv, '--base') ?? process.env.BASE_SHA ?? '';
   const head = argValue(argv, '--head') ?? process.env.HEAD_SHA ?? 'HEAD';
   const read = readChangedFiles(base, head);
-  return { ...read, source: `git diff ${base.slice(0, 8)}..${head.slice(0, 8)}` };
+  return { ...read, base, head, source: `git diff ${base.slice(0, 8)}..${head.slice(0, 8)}` };
 }
 
 function main() {
@@ -620,7 +871,15 @@ function main() {
       reasons: [`safe fallback — ${read.reason}`],
     };
   } else {
-    verdict = classify(read.files, graph);
+    // WO-O4O-API-CD-RUNTIME-AFFECTED-DEPLOY-GATE-V1 §9 — pnpm-lock.yaml 정밀 판정용 base/head 원문.
+    // `--files-from` 재현 모드에는 revision 이 없다 → 공급자 없음 → 안전 fallback(true).
+    const readLock = (which) => {
+      const rev = which === 'base' ? read.base : read.head;
+      if (!rev) return undefined;
+      const out = git(['show', `${rev}:pnpm-lock.yaml`]);
+      return out.status === 0 ? out.stdout : undefined;
+    };
+    verdict = classify(read.files, graph, { readLock });
   }
 
   // 중립 변경(docs 추가·수정)만 있으면 사유 줄이 비는 것이 정상이다 —
@@ -632,6 +891,8 @@ function main() {
   console.log(`admin_affected  : ${verdict.admin_affected}`);
   console.log(`admin_only      : ${verdict.admin_only}`);
   console.log(`api_affected    : ${verdict.api_affected}`);
+  console.log(`api_ci_affected : ${verdict.api_ci_affected}`);
+  console.log(`api_deploy_affected: ${verdict.api_deploy_affected}`);
   console.log(`docs_only       : ${verdict.docs_only}`);
   console.log(`docs_fast_eligible: ${verdict.docs_fast_eligible}`);
   console.log(`global_or_unknown: ${verdict.global_or_unknown}`);
@@ -649,6 +910,8 @@ function main() {
         `admin_affected=${verdict.admin_affected}`,
         `admin_only=${verdict.admin_only}`,
         `api_affected=${verdict.api_affected}`,
+        `api_ci_affected=${verdict.api_ci_affected}`,
+        `api_deploy_affected=${verdict.api_deploy_affected}`,
         `docs_only=${verdict.docs_only}`,
         `docs_fast_eligible=${verdict.docs_fast_eligible}`,
         `global_or_unknown=${verdict.global_or_unknown}`,

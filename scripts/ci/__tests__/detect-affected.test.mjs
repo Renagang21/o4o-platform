@@ -19,6 +19,14 @@
  *   - 문서 삭제·이동, 코드 혼합, base SHA 이상은 전부 기존 경로다
  *   - scheduled CodeQL 은 판정과 무관하게 항상 Analyze 한다 (workflow 계약)
  *   - main push 는 진행 중인 검증을 취소하지 않는다 (concurrency 계약)
+ *
+ * WO-O4O-API-CD-RUNTIME-AFFECTED-DEPLOY-GATE-V1 §17 (Case A~K)
+ *   - CI 영향(api_ci_affected)과 배포 영향(api_deploy_affected)은 다른 축이다
+ *   - API test 만 바뀐 변경은 production image 를 바꾸지 않는다 → 배포 skip
+ *   - closure 밖 package · 서비스 프론트 변경은 API 를 배포시키지 않는다
+ *   - migration 변경은 무조건 배포 영향이다
+ *   - pnpm-lock.yaml 은 importer 단위로 정밀 판정하되 조금이라도 불확실하면 true
+ *   - base SHA 이상 · 판정 실패는 전부 배포 fallback(true)
  */
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -28,11 +36,16 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 
 import {
+  apiDeployImporters,
   buildWorkspaceGraph,
   dependencyClosure,
   classify,
+  classifyApiDeploy,
   classifyDocs,
+  isApiNonDeployPath,
+  lockfileDeployImpact,
   parseFileList,
+  parsePnpmLock,
   readChangedFiles,
   REPO_ROOT,
   selectDocsConsumerSpecs,
@@ -471,4 +484,258 @@ test('docs fast job 은 heavy job 과 상호배타다 (ci-pipeline.yml 계약)',
   assert.match(yml, /docs-fast-validate:/, 'docs fast job 이 있어야 한다');
   const heavy = yml.match(/needs\.detect\.outputs\.docs_fast_eligible != 'true'/g) ?? [];
   assert.ok(heavy.length >= 3, `heavy job 게이트가 3개 이상이어야 한다: ${heavy.length}`);
+});
+
+
+// ---------------------------------------------------------------------------
+// WO-O4O-API-CD-RUNTIME-AFFECTED-DEPLOY-GATE-V1 §17 — API 배포 영향 판정 회귀 (Case A~K)
+//
+// 기존 Admin/Docs 케이스는 위에 그대로 남는다. 여기서는 **배포 축**만 본다.
+// 원칙: false positive(불필요한 배포 1회)는 허용, false negative(배포 누락)는 금지.
+// ---------------------------------------------------------------------------
+
+/** 배포 축 판정만 뽑는다. lockfile 은 기본적으로 공급자 없음 = 안전 fallback. */
+const deployOf = (lines, opts) => classifyApiDeploy(parseFileList(lines.join('\n')), graph, opts);
+
+test('Case 0-D. API closure 는 하드코딩이 아니라 workspace graph 에서 나온다', () => {
+  const closure = dependencyClosure(graph, API);
+  assert.ok(closure.has(API));
+  // 대표 의존성(실재 확인용) — 목록 자체가 계약은 아니다
+  assert.ok(closure.has('@o4o/security-core'));
+  assert.ok(closure.has('@o4o/platform-core'));
+  // API 와 무관한 frontend package 는 closure 밖이다
+  assert.ok(!closure.has('@o4o/hospital-pharmacy-core'));
+  assert.ok(!closure.has('@o4o/store-ui-core'));
+  assert.ok(!closure.has('@o4o/auth-react'));
+
+  const importers = apiDeployImporters(graph, closure);
+  assert.ok(importers.has('.'), 'root importer 는 보수적으로 포함한다');
+  assert.ok(importers.has('apps/api-server'));
+  assert.ok(!importers.has('services/web-hospital-pharmacy'));
+});
+
+test('Case A. API runtime source → 배포 영향', () => {
+  const v = deployOf(['M\tapps/api-server/src/routes/foo.ts']);
+  assert.equal(v.api_deploy_affected, true);
+
+  const full = classify(parseFileList('M\tapps/api-server/src/routes/foo.ts'), graph);
+  assert.equal(full.api_ci_affected, true);
+  assert.equal(full.api_deploy_affected, true);
+});
+
+test('Case B. API test 만 → CI 는 돌고 배포는 안 한다', () => {
+  const files = [
+    'M\tapps/api-server/src/__tests__/foo.spec.ts',
+    'M\tapps/api-server/src/services/__tests__/bar.test.ts',
+    'M\tapps/api-server/jest.config.cjs',
+    'M\tapps/api-server/tests/multi-tenant/navigation.spec.ts',
+  ];
+  const full = classify(parseFileList(files.join('\n')), graph);
+  assert.equal(full.api_ci_affected, true, 'API 검증은 그대로 돌아야 한다');
+  assert.equal(full.api_deploy_affected, false, 'production image 는 바뀌지 않는다');
+});
+
+test('Case C. API test helper/fixture 만 → 배포 영향 아님 (census 확인 경로)', () => {
+  // 실재하는 helper 경로다. production source 가 이 경로를 import 하거나
+  // raw text 로 읽는 사례가 0건임을 조사로 확인했다.
+  for (const f of [
+    'apps/api-server/src/__tests__/helpers/local-agent-db-stub.ts',
+    'apps/api-server/src/__tests__/security/test-utils.ts',
+    'apps/api-server/src/__tests__/setup/jest.setup.ts',
+    'apps/api-server/src/modules/neture/promotion/__tests__/in-memory-promotion-store.ts',
+    'apps/api-server/src/modules/content-guard/__tests__/fixtures/known-errors.ts',
+  ]) {
+    assert.equal(isApiNonDeployPath(f), true, `배포 무영향이어야 한다: ${f}`);
+  }
+  // 반대로 production 경로는 전부 배포 영향이다
+  for (const f of [
+    'apps/api-server/src/main.ts',
+    'apps/api-server/src/migrate.ts',
+    'apps/api-server/src/bootstrap/register-routes.ts',
+    'apps/api-server/src/assets/fonts/x.ttf',
+    'apps/api-server/Dockerfile',
+    'apps/api-server/tsup.config.ts',
+    'apps/api-server/package.production.json',
+  ]) {
+    assert.equal(isApiNonDeployPath(f), false, `배포 영향이어야 한다: ${f}`);
+  }
+});
+
+test('Case D. API closure 안의 package → 배포 영향', () => {
+  assert.equal(deployOf(['M\tpackages/security-core/src/index.ts']).api_deploy_affected, true);
+  assert.equal(deployOf(['M\tpackages/platform-core/src/a.ts']).api_deploy_affected, true);
+  assert.equal(deployOf(['M\tpackages/mail-core/templates/email/x.hbs']).api_deploy_affected, true);
+});
+
+test('Case E. closure 밖 frontend package → 배포 영향 아님', () => {
+  const files = [
+    'M\tpackages/store-ui-core/src/index.ts',
+    'M\tpackages/auth-react/src/GoogleContinue.tsx',
+    'M\tpackages/hospital-pharmacy-core/src/plan.ts',
+    'M\tpackages/shared-space-ui/src/index.ts',
+  ];
+  assert.equal(deployOf(files).api_deploy_affected, false);
+});
+
+test('Case F. 서비스 프론트만 → 배포 영향 아님', () => {
+  assert.equal(
+    deployOf([
+      'M\tservices/web-hospital-pharmacy/src/App.tsx',
+      'M\tapps/admin-dashboard/src/pages/auth/Login.tsx',
+    ]).api_deploy_affected,
+    false,
+  );
+});
+
+test('Case G. migration · bootstrap · incremental 은 무조건 배포 영향', () => {
+  for (const f of [
+    'apps/api-server/src/database/migrations/1758000000000-Foo.ts',
+    'apps/api-server/src/database/incremental/expected-schema-snapshot.ts',
+    'apps/api-server/src/database/bootstrap/baseline-marker.ts',
+    'apps/api-server/src/database/migration-config.ts',
+    'apps/api-server/src/migrate.ts',
+  ]) {
+    assert.equal(deployOf([`M\t${f}`]).api_deploy_affected, true, f);
+  }
+});
+
+test('Case H. test + runtime 혼합 → 배포 영향', () => {
+  assert.equal(
+    deployOf([
+      'M\tapps/api-server/src/__tests__/foo.spec.ts',
+      'M\tapps/api-server/src/services/auth/auth-login.service.ts',
+    ]).api_deploy_affected,
+    true,
+  );
+});
+
+test('Case I. pnpm-lock.yaml — importer 단위 정밀 판정 + 안전 fallback', () => {
+  const lock = (importers, tail) =>
+    `lockfileVersion: '9.0'\n\nimporters:\n${importers}\npackages:\n${tail}\n`;
+  const base = lock(
+    "  .:\n    x: 1\n  apps/api-server:\n    a: 1\n  services/web-hospital-pharmacy:\n    b: 1\n",
+    "  left-pad@1.0.0: {}\n",
+  );
+
+  // (1) closure 밖 importer 만 바뀌었고 packages/snapshots 동일 → 배포 아님
+  const headOutside = lock(
+    "  .:\n    x: 1\n  apps/api-server:\n    a: 1\n  services/web-hospital-pharmacy:\n    b: 2\n",
+    "  left-pad@1.0.0: {}\n",
+  );
+  assert.equal(lockfileDeployImpact(base, headOutside, apiDeployImporters(graph)).affected, false);
+
+  // (2) api-server importer 가 바뀌면 배포
+  const headApi = lock(
+    "  .:\n    x: 1\n  apps/api-server:\n    a: 2\n  services/web-hospital-pharmacy:\n    b: 1\n",
+    "  left-pad@1.0.0: {}\n",
+  );
+  assert.equal(lockfileDeployImpact(base, headApi, apiDeployImporters(graph)).affected, true);
+
+  // (3) importers 밖(외부 의존성 해석)이 바뀌면 배포
+  const headTail = lock(
+    "  .:\n    x: 1\n  apps/api-server:\n    a: 1\n  services/web-hospital-pharmacy:\n    b: 2\n",
+    "  left-pad@1.0.1: {}\n",
+  );
+  assert.equal(lockfileDeployImpact(base, headTail, apiDeployImporters(graph)).affected, true);
+
+  // (4) 파싱 불가 · 원문 없음 → 안전 fallback
+  assert.equal(lockfileDeployImpact(undefined, headTail, apiDeployImporters(graph)).affected, true);
+  assert.equal(lockfileDeployImpact(base, 'not a lockfile', apiDeployImporters(graph)).affected, true);
+  assert.equal(parsePnpmLock('x'), null);
+
+  // (5) CLI 가 원문을 못 주면(예: --files-from 재현) lockfile 변경은 배포로 본다
+  assert.equal(deployOf(['M\tpnpm-lock.yaml']).api_deploy_affected, true);
+
+  // (6) 원문 공급자가 있으면 closure 밖 변경은 skip 된다
+  const readLock = (which) => (which === 'base' ? base : headOutside);
+  assert.equal(
+    deployOf(['M\tservices/web-hospital-pharmacy/src/App.tsx', 'M\tpnpm-lock.yaml'], { readLock })
+      .api_deploy_affected,
+    false,
+  );
+});
+
+test('Case I-2. root package.json · 빌드 컨텍스트 · 이 workflow 자체는 배포 영향', () => {
+  for (const f of ['package.json', 'pnpm-workspace.yaml', '.dockerignore', 'tsconfig.base.json']) {
+    assert.equal(deployOf([`M\t${f}`]).api_deploy_affected, true, f);
+  }
+  assert.equal(deployOf(['M\t.github/workflows/deploy-api.yml']).api_deploy_affected, true);
+  assert.equal(deployOf(['M\t.github/actions/setup-build-env/action.yml']).api_deploy_affected, true);
+
+  // 다른 서비스의 workflow · CI 스크립트는 API 이미지에 들어가지 않는다
+  assert.equal(deployOf(['M\t.github/workflows/deploy-web-services.yml']).api_deploy_affected, false);
+  assert.equal(deployOf(['M\tscripts/ci/detect-affected.mjs']).api_deploy_affected, false);
+  // 문서는 상태와 무관하게 배포 무영향 (삭제·이동 포함)
+  assert.equal(deployOf(['D\tdocs/checks/OLD.md']).api_deploy_affected, false);
+});
+
+test('Case J. multi-commit push — 배치 앞의 runtime 변경을 놓치지 않는다', () => {
+  const { dir, write, base } = makeRepo();
+  try {
+    write('apps/api-server/src/routes/foo.ts', 'x\n');
+    git(dir, ['add', '-A']);
+    git(dir, ['commit', '-q', '-m', 'api runtime']);
+
+    write('services/web-neture/src/App.tsx', 'y\n');
+    git(dir, ['add', '-A']);
+    git(dir, ['commit', '-q', '-m', 'frontend only']);
+    const head = git(dir, ['rev-parse', 'HEAD']).stdout.trim();
+
+    const lastOnly = classify(readChangedFiles(`${head}~1`, head, dir).files, graph);
+    assert.equal(lastOnly.api_deploy_affected, false, '마지막 commit 만 보면 배포가 skip 된다');
+
+    const batch = readChangedFiles(base, head, dir);
+    assert.equal(batch.ok, true);
+    assert.equal(classify(batch.files, graph).api_deploy_affected, true, 'batch 전체는 배포다');
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('Case K. base SHA 이상 · 변경 0건 → 배포 fallback(true)', () => {
+  assert.equal(classifyApiDeploy([], graph).api_deploy_affected, true);
+  assert.equal(classify([], graph).api_deploy_affected, true);
+  assert.equal(classify([], graph).fallback, true);
+  // 매핑 불가 경로도 배포 fallback
+  assert.equal(deployOf(['M\tunknown-root-thing/x.ts']).api_deploy_affected, true);
+});
+
+// ---------------------------------------------------------------------------
+// WO-O4O-API-CD-RUNTIME-AFFECTED-DEPLOY-GATE-V1 §11 · §13 — deploy-api.yml 계약 (YAML 정적 검증)
+// ---------------------------------------------------------------------------
+
+test('§11. deploy-api.yml 은 detect → 조건부 build-and-deploy 구조다', () => {
+  const yml = workflowYaml('deploy-api.yml');
+  assert.match(yml, /^\s{2}detect:$/m, 'detect 잡이 있어야 한다');
+  assert.match(yml, /node scripts\/ci\/detect-affected\.mjs/, '판정은 공통 SSOT 를 쓴다');
+  assert.match(yml, /needs: \[detect\]/);
+  assert.match(
+    yml,
+    /needs\.detect\.outputs\.api_deploy_affected == 'true'/,
+    'heavy deploy 는 판정에 걸려 있어야 한다',
+  );
+  assert.match(yml, /fetch-depth: 0/, 'push batch 전체를 봐야 한다');
+  // §12 — trigger 자체를 좁혀 workflow 가 안 뜨게 만들지 않는다
+  assert.match(yml, /- 'apps\/api-server\/\*\*'/);
+  assert.match(yml, /- 'packages\/\*\*'/);
+  assert.match(yml, /- 'pnpm-lock\.yaml'/);
+});
+
+test('§13 · §15. migration/deploy step 은 build-and-deploy 안에만 있고, 재현 dispatch 는 배포하지 않는다', () => {
+  const yml = workflowYaml('deploy-api.yml');
+  // 세 가지 production 작업이 모두 같은 잡(build-and-deploy)에 있어야 판정 하나로 0 이 된다
+  for (const step of [
+    'Build and Push Docker image',
+    'Run database migrations',
+    'Deploy to Cloud Run',
+    'Refresh one-off Cloud Run job image references',
+  ]) {
+    assert.ok(yml.includes(step), `step 이 있어야 한다: ${step}`);
+    assert.ok(
+      yml.indexOf(step) > yml.indexOf('build-and-deploy:'),
+      `${step} 은 build-and-deploy 잡 안에 있어야 한다`,
+    );
+  }
+  assert.match(yml, /base_sha:/, '판정 재현용 입력이 있어야 한다');
+  assert.match(yml, /github\.event\.inputs\.base_sha == ''/, 'base_sha 재현 실행은 배포하지 않는다');
 });

@@ -31,9 +31,21 @@ on:
   workflow_dispatch:
     inputs:
       force_deploy:
-        description: 'Force deployment'
+        description: 'Force deployment (판정과 무관하게 배포)'
         required: false
         default: 'false'
+      # WO-O4O-API-CD-RUNTIME-AFFECTED-DEPLOY-GATE-V1 §15
+      # workflow 를 고쳐 놓고 자기 자신을 검증할 수 없는 구조를 만들지 않는다.
+      # base_sha/head_sha 를 주면 **과거 push 의 변경 집합으로 판정만 재현**하고
+      # (force_deploy=true 가 아닌 한) production 배포는 하지 않는다.
+      base_sha:
+        description: '판정 재현용 base SHA (40자). 주면 배포 없이 판정만 재현한다'
+        required: false
+        default: ''
+      head_sha:
+        description: '판정 재현용 head SHA (40자)'
+        required: false
+        default: ''
 
 env:
   PROJECT_ID: netureyoutube
@@ -47,8 +59,67 @@ env:
   PUBLIC_API_URL: https://api.neture.co.kr
 
 jobs:
+  # ===========================================================================
+  # WO-O4O-API-CD-RUNTIME-AFFECTED-DEPLOY-GATE-V1
+  #
+  # 이 workflow 의 push trigger 는 `apps/api-server/**` · `packages/**` ·
+  # `package.json` · `pnpm-lock.yaml` 전체다. 그래서 **production API runtime 이
+  # 한 줄도 바뀌지 않는 변경**에서도 Docker build/push · Cloud Run migration Job ·
+  # 새 revision · one-off job image 재고정이 전부 실행됐다.
+  # (실측: 최근 성공 58회 중 17회 · 149.4분이 이 부류였다)
+  #
+  # trigger 자체를 좁히지 않는 이유(§12): workflow 가 아예 뜨지 않으면 판정 기록도
+  # 상태 보고도 사라진다. 대신 **가벼운 detect 잡은 항상 돌고 heavy deploy 만
+  # 조건부**로 둔다. 판정은 Admin·Docs 와 같은 SSOT(`scripts/ci/detect-affected.mjs`)다.
+  #
+  # 안전 방향은 한쪽뿐이다 — base SHA 이상 · force push · git diff 실패 ·
+  # workspace graph 실패 · lockfile 비교 불가는 전부 `api_deploy_affected=true` 다.
+  detect:
+    name: Detect API deploy scope
+    runs-on: ubuntu-latest
+    outputs:
+      api_deploy_affected: ${{ steps.scope.outputs.api_deploy_affected }}
+      api_ci_affected: ${{ steps.scope.outputs.api_ci_affected }}
+      reason: ${{ steps.scope.outputs.reason }}
+
+    steps:
+    - uses: actions/checkout@v6
+      with:
+        # push batch 전체(before..after)를 봐야 한다 — 마지막 commit 만 보면
+        # 배치 앞쪽의 runtime 변경을 놓친다.
+        fetch-depth: 0
+
+    - name: Classify changed scope
+      id: scope
+      env:
+        BASE_SHA: ${{ github.event.inputs.base_sha || github.event.before }}
+        HEAD_SHA: ${{ github.event.inputs.head_sha || github.sha }}
+      run: node scripts/ci/detect-affected.mjs
+
+    - name: Summary
+      run: |
+        {
+          echo "### API 배포 영향 판정"
+          echo ""
+          echo "- \`api_deploy_affected\`: **${{ steps.scope.outputs.api_deploy_affected }}**"
+          echo "- \`api_ci_affected\`: ${{ steps.scope.outputs.api_ci_affected }}"
+          echo "- 사유: ${{ steps.scope.outputs.reason }}"
+        } >> "$GITHUB_STEP_SUMMARY"
+
   build-and-deploy:
     runs-on: ubuntu-latest
+    needs: [detect]
+    # WO-O4O-API-CD-RUNTIME-AFFECTED-DEPLOY-GATE-V1 §11 · §13 · §15
+    #
+    #   1. `api_deploy_affected=false` → Docker build/push 0 · migration 0 ·
+    #      Cloud Run revision 0 · one-off job image 갱신 0. 이 잡 전체가 skip 된다.
+    #   2. `base_sha` 를 준 수동 실행은 **판정 재현 전용**이다 — force_deploy 없이는
+    #      production 을 건드리지 않는다. (base_sha 없는 기존 수동 실행 동작은 그대로)
+    if: >-
+      needs.detect.outputs.api_deploy_affected == 'true' &&
+      (github.event_name != 'workflow_dispatch' ||
+       github.event.inputs.base_sha == '' ||
+       github.event.inputs.force_deploy == 'true')
 
     permissions:
       contents: read
