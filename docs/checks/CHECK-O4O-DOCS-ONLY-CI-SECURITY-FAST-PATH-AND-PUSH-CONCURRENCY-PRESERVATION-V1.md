@@ -166,6 +166,8 @@ main/develop push 는 각 commit 의 검증을 끝까지 남긴다 — 문서 pu
 |---|---|---|---|---|---|
 | 코드 push (기존 경로 비회귀) | 본 WO commit `6d1942b8e` (`scripts/` + `.github/`) | 35801247672 | `global_or_unknown=true` | quality-check · api-tests · build | **success** (docs fast skipped) |
 | 같은 commit 의 CodeQL | `6d1942b8e` | 35801247529 | — | detect + **Analyze 실행** | success |
+| A. 순수 CHECK 문서 1건 (본 문서 push `818e1477b`) | `docs/checks/...md` A | **35803223795** | `docs_only=true` · `docs_fast_eligible=true` | **docs-fast-validate 만** | **success · 1분 50초** |
+| A. 같은 push 의 CodeQL | 〃 | **35803223845** | 〃 | detect 만 · **Analyze skipped** | **success · 28초** |
 | B. baseline 문서 1건 (`63c36e11e`) | `docs/baseline/...md` M | **35802158968** | `docs_only=true` · `docs_fast_eligible=true` | **docs-fast-validate 만** | **success · 1분 44초** |
 | C. 문서 + `docs/checks/data/**` JSON (`da8e05b42`) | md 1 + json 2 | 35802348990 | `docs_only=true` · **`fast=false`** | quality-check · api-tests (full 경로 진입 확인 후 수동 취소) | 판정 확인 |
 | D. 문서 + API 코드 (`9414d54d9`) | md 1 + `apps/api-server/src` 1 | 35802515161 | `docs_only=false` · `api_affected=true` | quality-check · api-tests (진입 확인 후 수동 취소) | 판정 확인 |
@@ -193,6 +195,12 @@ Tests:       178 passed, 178 total
 
 판정기 회귀 시험도 같은 job 에서 `# pass 26` 으로 통과했다.
 
+시나리오 A(본 CHECK 문서 push)에서는 **다른 6 건**이 선별됐다 — `docs/checks` 축을 읽는
+`archive-retention-and-tracked-backup-disposition` · `cross-session-safe-commit-guard` ·
+`database-migration-ownership-startup-health-final-closure` · `store-handled-products-dedupe` ·
+`wordpress-compat-field-and-theme-final-disposition` · nested `content-guard/liquid-guard`
+(6 suites / 101 tests PASS). **변경 문서에 따라 선별 집합이 실제로 달라진다** — 전체 실행도, 고정 목록도 아니다.
+
 ### 시나리오 C · E 의 판정 사유(원문)
 
 ```
@@ -209,7 +217,7 @@ E: 문서 삭제/이동(D) — 기록물 존재를 단언하는 정적 spec 때�
 | 변경 유형 | 전 | 후 | 근거 run |
 |---|---|---|---|
 | 문서 Markdown 1건 — CI Pipeline | 14분 09초 | **1분 44초** | 35735637972 → 35802158968 |
-| 문서 Markdown 1건 — CodeQL Analyze | 7분 32초 | **skip** (detect 만 ≈ 25초) | 35735638130 → 본 문서 §11 |
+| 문서 Markdown 1건 — CodeQL Analyze | 7분 32초 | **28초** (detect 만 · Analyze skipped) | 35735638130 → 35803223845 |
 | Admin-only 변경 | 2분 57초 | 3분 02초 (동급 · 회귀 없음) | 35698331635 계열 → 35802837666 |
 | 코드 변경 | 변화 없음 | 변화 없음 | 35801247672 success |
 
@@ -249,6 +257,7 @@ Admin 축 선별기(`selectPathGuardSpecs`)와 그 시험 12건은 손대지 않
 | 항목 | 값 |
 |---|---|
 | 구현 commit | `6d1942b8e` (판정기 · 시험 · workflow 2종) |
+| CHECK commit | `818e1477b` (본 문서 · 시나리오 A 실측 대상) |
 | 변경 파일 | `scripts/ci/detect-affected.mjs` · `scripts/ci/__tests__/detect-affected.test.mjs` · `.github/workflows/ci-pipeline.yml` · `.github/workflows/ci-security.yml` |
 | 다른 세션 파일 | `packages/action-log-core/**` 삭제 7건 — **접촉하지 않음** |
 
