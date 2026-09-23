@@ -612,3 +612,58 @@ OPERATOR_LOGIN_E2E = 보류 (Auth 트랙)
 2. api + web-lecture 배포와 `lms_courses.service_key` rekey(11건)를 **한 창에서** 실행 · 기존 KPA/PH membership → Lecture membership 자동 생성 **금지**
 3. `currentEnrollments` 정합 복구(7건)는 cutover 직후 같은 창에서 판단
 4. public smoke(study.neture.co.kr) → operator E2E(Auth gate 해소 후)
+
+---
+
+## 19. INCIDENT — Phase 2 runtime 이 cutover 없이 운영 배포 → 전량 롤백 (2026-09-23)
+
+> **판정**: `INCIDENT = RESOLVED_BY_ROLLBACK` · `DATABASE_CUTOVER = FORBIDDEN(미실행)` · `PRODUCTION_DB_WRITES = 0` · `ROOT_CAUSE_DUPLICATE_PUSH = INVESTIGATE`
+
+### 19-1. 타임라인 (UTC)
+
+| 시각 | 사건 |
+|---|---|
+| 11:37:17 | main `9a3b402b9`(PR #225 merge) push → Deploy API/Web/Admin 자동 트리거 |
+| ~11:39 | **취소 전에 일부 job 이 이미 revision 생성**: `lecture-web-00012-rfj`(11:39:36 · deploy-lecture job 은 success) · `kpa-society-web-01994`(11:39:56) · `k-cosmetics-web-01162`(11:39:56) · `pharmacy-hub-web-00252`(11:40:00) · `o4o-admin-dashboard-01306`(11:40:06 · Admin run 자체가 success) |
+| 11:40:29~30 | Deploy API(`35855595361`) · Deploy Web(`35855595462`) **cancel 성공** — API 는 `build-and-deploy: cancelled` 로 revision 미생성 |
+| 11:46:06 | **같은 sha `9a3b402b9` 로 배포 3종이 다시 실행**(`35856452770` · `35856452629` · `35856452621`) — GitHub 메타상 `event=push · run_attempt=1 · actor=Renagang21` = **Re-run 이 아니라 동일 SHA 에 대한 두 번째 push 이벤트** |
+| 11:48~11:53 | 전 서비스 Phase 2 revision 생성 (`o4o-core-api-03747-kxq` 11:53:27 · `lecture-web-00013` · `kpa-society-web-01995` · `k-cosmetics-web-01163` · `pharmacy-hub-web-00253` · `o4o-admin-dashboard-01307`) |
+| — | 장애 실측: `GET /api/v1/lms/courses` → `total 0` · KPA published/public 강의 단건 **404** (production 11 course 는 전부 kpa-society/pharmacy-hub 인데 `/api/v1/lms/*` 가 `lecture` scope 고정) |
+| 이후 | 사용자 승인(선택 A) → **6축 traffic 100% 롤백** |
+
+### 19-2. 롤백 대상 — "직전 revision"이 아니라 **Phase 2 이전** revision
+
+⚠️ 11:39~11:40 revision 들은 *취소된 첫 run* 이 이미 만든 **Phase 2 산출물**이다. 따라서 롤백 기준은 11:37 merge **이전** 배포분이다. 06:20 / 05:18 배포 이후 11:37 merge 전까지 해당 표면을 건드린 main 커밋이 **0건**임을 git log 로 확인한 뒤 선택했다(추측 0).
+
+| 서비스 | 롤백 전(Phase 2) | **롤백 후(pre-Phase 2)** | 근거 |
+|---|---|---|---|
+| `o4o-core-api` | 03747-kxq (11:53) | **03746-qlz** (06:53:48) | 첫 run 은 revision 미생성 |
+| `lecture-web` | 00013-7ls (11:48) | **00011-drs** (06:20:29) | 00012-rfj(11:39)도 Phase 2 — 1차 롤백 대상 오인 후 **정정** |
+| `kpa-society-web` | 01995-5qr (11:48) | **01993-6z9** (06:20:41) | 01994(11:39)=Phase 2 |
+| `k-cosmetics-web` | 01163-4bh (11:48) | **01161-lw5** (06:20:33) | 01162(11:39)=Phase 2 |
+| `pharmacy-hub-web` | 00253-l44 (11:48) | **00251-49n** (06:20:41) | 00252(11:40)=Phase 2 |
+| `o4o-admin-dashboard` | 01307-r2k (11:49) | **01305-z8l** (05:18:58) | 01306(11:40)=Phase 2 · 직전 커밋 `cc87a9385`(05:14)은 01305 에 포함 |
+
+`neture-web` · `store-web` 은 Phase 2 LMS 장애와 직접 관계가 확인되지 않아 **롤백하지 않았다**(사용자 지시).
+
+### 19-3. 복구 smoke (전부 PASS)
+
+```text
+GET /api/v1/lms/courses            total 4 (published 3 · archived 1 · 전부 public) — 복귀
+KPA published/public 단건 3종       200 / 200 / 200   (장애 중 404 → 복구)
+kpa-society.co.kr · /courses/:id · /lms   200
+k-cosmetics.site · pharmacyhub.co.kr · study.neture.co.kr · admin.neture.co.kr   200
+서빙 번들 Phase 2 마커              LectureExternalRedirect 0 · study.neture.co.kr 0  (3 서비스 index/vendor 번들)
+```
+
+### 19-4. DB (read-only · write 0)
+
+`lms_courses 11` · `lms_enrollments 3` · `lessons 10` · `quizzes 6` · `assignments 1` · **`service_key='lecture'` 0** · `service_memberships(lecture, active)` 0 · 마지막 course 갱신 `2026-08-26 03:52:55` · 마지막 enrollment 생성 `2026-08-18`. 분포도 §18-3 과 동일(kpa-society 8 · pharmacy-hub 3).
+
+→ **장애 기간에도 데이터는 무변경**. rekey · membership 생성 · destructive 작업 전부 미실행.
+
+### 19-5. 후속 (복구 후 조사 · 필수)
+
+1. **`ROOT_CAUSE_DUPLICATE_PUSH`** — 동일 main SHA `9a3b402b9` 가 11:37 과 11:46 두 번 push 이벤트를 만든 원인. 규명 전에는 **같은 일이 재발해 롤백이 무효화될 수 있다**(main 에 Phase 2 코드가 있는 한 어떤 push 든 배포를 트리거한다).
+2. 재발 방지 없이는 main 의 다른 WO push 도 Phase 2 를 실어 나른다 → coordinated deploy WO 전까지 **배포 트리거 차단 수단**(workflow 조건 · 수동 승인 게이트 등)을 먼저 정한다.
+3. data cutover 는 **별도 지시 전까지 시작 금지**.
