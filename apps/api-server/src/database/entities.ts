@@ -27,6 +27,8 @@ import { EmailVerificationToken } from '../entities/EmailVerificationToken.js';
 import { ApprovalLog } from '../entities/ApprovalLog.js';
 import { ProductApproval } from '../entities/ProductApproval.js';
 import { LinkedAccount } from '../entities/LinkedAccount.js';
+// WO-O4O-ADMIN-OPERATOR-GOOGLE-INVITATION-AND-ASSIGNMENT-CUTOVER-V1
+import { OperatorInvitation } from '../entities/OperatorInvitation.js';
 import { AccountActivity } from '../entities/AccountActivity.js';
 import { UserActivityLog } from '../entities/UserActivityLog.js';
 import { Notification } from '../entities/Notification.js';
@@ -204,10 +206,11 @@ import {
   SupplierProductOffer,
   // WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1:
   //   Legacy Partner 엔티티 7종 등록 해제. 판매자 모집(비-Partner) 2종만 유지(물리 테이블은 legacy 명).
+  // WO-O4O-SUPPLIER-POST-REGISTRATION-PRODUCT-MANAGEMENT-OFFER-FIRST-REALIGNMENT-V1 §I (2026-09-23):
+  //   SupplierCsvImportBatch / SupplierCsvImportRow 등록 해제(공급자 CSV import 경로 은퇴).
+  //   물리 테이블 supplier_csv_import_batches / _rows 와 migration 은 그대로 둔다 — DROP 하지 않는다.
   SellerRecruitment,
   SellerRecruitmentApplication,
-  SupplierCsvImportBatch,
-  SupplierCsvImportRow,
   NetureSupplierLibraryItem,
   ProductImage,
   NetureSettlement,
@@ -560,6 +563,7 @@ export const entities = [
   ApprovalLog,
   ProductApproval, // WO-PRODUCT-POLICY-V2-DATA-LAYER-INTRODUCTION-V1
   LinkedAccount,
+  OperatorInvitation, // WO-O4O-ADMIN-OPERATOR-GOOGLE-INVITATION-AND-ASSIGNMENT-CUTOVER-V1
   AccountActivity,
   UserActivityLog,
   Notification,
@@ -680,10 +684,11 @@ export const entities = [
   SupplierProductOffer,
   // WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1:
   //   Legacy Partner 엔티티 7종 등록 해제. 판매자 모집(비-Partner) 2종만 유지(물리 테이블은 legacy 명).
+  // WO-O4O-SUPPLIER-POST-REGISTRATION-PRODUCT-MANAGEMENT-OFFER-FIRST-REALIGNMENT-V1 §I (2026-09-23):
+  //   SupplierCsvImportBatch / SupplierCsvImportRow 등록 해제(공급자 CSV import 경로 은퇴).
+  //   물리 테이블 supplier_csv_import_batches / _rows 와 migration 은 그대로 둔다 — DROP 하지 않는다.
   SellerRecruitment,
   SellerRecruitmentApplication,
-  SupplierCsvImportBatch,
-  SupplierCsvImportRow,
   NetureSupplierLibraryItem,
   ProductImage,
   NetureSettlement,

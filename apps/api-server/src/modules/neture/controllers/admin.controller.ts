@@ -6,15 +6,15 @@
  *   admin/suppliers/*, admin/products/*, admin/masters/*,
  *   admin/categories/*, admin/brands/*, admin/dashboard/summary,
  *   admin/requests, admin/service-approvals/*,
- *   admin/products/:masterId/images (admin image upload),
- *   products/:masterId/images (supplier image upload — mounted separately),
- *   products/images/:imageId/primary, products/images/:imageId (delete)
+ *   admin/products/:masterId/images (admin image upload)
  *
  * Mounted at: /admin (admin-prefixed routes)
- *             + /  (image routes that lack the admin prefix)
+ *
+ * 공급자용 이미지 route(products/*)는
+ * WO-O4O-SUPPLIER-POST-REGISTRATION-PRODUCT-MANAGEMENT-OFFER-FIRST-REALIGNMENT-V1 §H 로
+ * controllers/supplier-product-image.controller.ts 로 이동했다.
  */
 import { Router, Request, Response } from 'express';
-import type { RequestHandler } from 'express';
 import type { DataSource } from 'typeorm';
 import { requireAuth } from '../../../middleware/auth.middleware.js';
 import { requireNetureScope } from '../../../middleware/neture-scope.middleware.js';
@@ -40,11 +40,6 @@ type AuthenticatedRequest = Request & {
     role: string;
     supplierId?: string;
   };
-};
-
-/** Request with supplierId set by requireActiveSupplier middleware */
-type SupplierRequest = AuthenticatedRequest & {
-  supplierId: string;
 };
 
 /**
@@ -943,235 +938,6 @@ export function createAdminController(dataSource: DataSource): Router {
     } catch (error) {
       logger.error('[Neture API] Error syncing offer approvals:', error);
       res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: 'Failed to sync offer approvals' } });
-    }
-  });
-
-  return router;
-}
-
-/**
- * Creates a router for supplier-facing product image endpoints.
- *
- * These routes do NOT require admin scope — they use requireActiveSupplier
- * for supplier identity verification. They are separated because they are
- * mounted at a different prefix (not /admin).
- *
- * Mount at: / (root of neture router, paths start with /products/)
- */
-export function createProductImageController(dataSource: DataSource): Router {
-  const router = Router();
-  const netureService = new NetureService();
-  const imageStorageService = new ImageStorageService();
-
-  // Inline requireActiveSupplier middleware (matches original neture.routes.ts)
-  async function requireActiveSupplier(req: Request, res: Response, next: () => void): Promise<void> {
-    const authReq = req as AuthenticatedRequest;
-    if (!authReq.user?.id) {
-      res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: 'Authentication required' } });
-      return;
-    }
-    const supplier = await netureService.getSupplierByUserId(authReq.user.id);
-    if (!supplier) {
-      res.status(403).json({ success: false, error: { code: 'NO_SUPPLIER', message: 'No linked supplier account found' } });
-      return;
-    }
-    if (supplier.status !== SupplierStatus.ACTIVE) {
-      res.status(403).json({
-        success: false,
-        error: { code: 'SUPPLIER_NOT_ACTIVE', message: `Supplier account is ${supplier.status}. Only ACTIVE suppliers can perform this action.` },
-        currentStatus: supplier.status,
-      });
-      return;
-    }
-    (req as SupplierRequest).supplierId = supplier.id;
-    next();
-  }
-
-  /**
-   * 공급자 소유 master 인지 확인한다 — WO-O4O-NETURE-SUPPLIER-PRODUCT-AUTHORING-EXPANSION-CLOSEOUT-BATCH-V1
-   *
-   * 이미지 write 경로는 masterId 를 클라이언트에서 받는다. ACTIVE 공급자라는 것만 확인하면
-   * 남의 master(대표 이미지 교체·삭제 포함)까지 건드릴 수 있어 소유 확인을 추가한다.
-   * 소유 기준 = 해당 master 에 대한 자기 offer 보유(삭제되지 않은 offer).
-   */
-  async function ownsMaster(supplierId: string, masterId: string): Promise<boolean> {
-    if (!masterId) return false;
-    const rows = await dataSource.query(
-      `SELECT 1 FROM supplier_product_offers
-        WHERE supplier_id = $1 AND master_id = $2 AND deleted_at IS NULL
-        LIMIT 1`,
-      [supplierId, masterId],
-    );
-    return rows.length > 0;
-  }
-
-  /** imageId 로부터 master 를 찾아 소유 확인 (primary/delete 경로용) */
-  async function ownsImageMaster(supplierId: string, imageId: string, masterId: string): Promise<boolean> {
-    const rows = await dataSource.query(
-      `SELECT master_id FROM product_images WHERE id = $1 LIMIT 1`,
-      [imageId],
-    );
-    const actualMasterId = rows[0]?.master_id;
-    // 요청 body 의 masterId 와 실제 이미지의 master 가 다르면 거부(경로 스푸핑 방지)
-    if (!actualMasterId || actualMasterId !== masterId) return false;
-    return ownsMaster(supplierId, actualMasterId);
-  }
-
-  const NOT_OWNED = {
-    success: false,
-    error: 'MASTER_NOT_OWNED',
-    message: '이 상품에 대한 권한이 없습니다.',
-  };
-
-  /**
-   * GET /products/:masterId/images
-   * 상품 이미지 목록 조회
-   */
-  router.get('/products/:masterId/images', requireAuth, async (req: Request, res: Response) => {
-    try {
-      const images = await netureService.getProductImages(req.params.masterId);
-      res.json({ success: true, data: images });
-    } catch (error) {
-      logger.error('[Neture API] Error fetching product images:', error);
-      res.status(500).json({ success: false, error: 'INTERNAL_ERROR' });
-    }
-  });
-
-  /**
-   * POST /products/:masterId/images
-   * 상품 이미지 업로드 (공급자용)
-   * - multer memoryStorage → sharp 리사이즈 → GCS 업로드 → DB 저장
-   */
-  router.post('/products/:masterId/images', requireAuth, requireActiveSupplier as unknown as RequestHandler, uploadSingleMiddleware('image'), async (req: AuthenticatedRequest, res: Response) => {
-    try {
-      const { masterId } = req.params;
-      if (!(await ownsMaster((req as SupplierRequest).supplierId, masterId))) {
-        return res.status(403).json(NOT_OWNED);
-      }
-      const file = req.file as Express.Multer.File;
-      const imageType = (['thumbnail', 'detail', 'content'].includes(req.body?.type) ? req.body.type : 'detail') as 'thumbnail' | 'detail' | 'content';
-
-      if (!file) {
-        return res.status(400).json({ success: false, error: 'NO_FILE' });
-      }
-
-      // WO-NETURE-IMAGE-ASSET-STRUCTURE-V1: type별 리사이즈 정책
-      const processed = imageType === 'thumbnail'
-        ? await sharp(file.buffer).resize(1000, 1000, { fit: 'cover' }).webp({ quality: 85 }).toBuffer()
-        : await sharp(file.buffer).resize(1200, 1200, { fit: 'inside', withoutEnlargement: true }).webp({ quality: 85 }).toBuffer();
-
-      // GCS 업로드
-      const { url, gcsPath } = await imageStorageService.uploadImage(masterId, processed, 'image/webp', file.originalname, imageType);
-
-      // DB 레코드 생성
-      const image = await netureService.addProductImage(masterId, url, gcsPath, imageType);
-
-      // 교체된 썸네일 GCS 삭제
-      if (image.replacedGcsPath) {
-        imageStorageService.deleteImage(image.replacedGcsPath).catch(() => {});
-      }
-
-      // Fire-and-forget: OCR 추출 (WO-O4O-PRODUCT-AI-CONTENT-PIPELINE-V1)
-      if (imageType !== 'thumbnail') {
-        import('../../store-ai/services/product-ocr.service.js')
-          .then(({ ProductOcrService }) => {
-            const ocrService = new ProductOcrService(dataSource);
-            return ocrService.extractAndSave(masterId, image.id, url);
-          })
-          .catch(() => {});
-      }
-
-      res.status(201).json({ success: true, data: image });
-    } catch (error) {
-      logger.error('[Neture API] Error uploading product image:', error);
-      res.status(500).json({ success: false, error: 'UPLOAD_FAILED' });
-    }
-  });
-
-  /**
-   * POST /products/:masterId/images/from-url
-   * 공용 미디어 라이브러리 URL로 상품 이미지 등록 (WO-NETURE-PRODUCT-PRIMARY-IMAGE-MEDIA-LIBRARY-INTEGRATION-V1)
-   */
-  router.post('/products/:masterId/images/from-url', requireAuth, requireActiveSupplier as unknown as RequestHandler, async (req: AuthenticatedRequest, res: Response) => {
-    try {
-      const { masterId } = req.params;
-      const { imageUrl, type = 'detail' } = req.body;
-
-      if (!imageUrl || typeof imageUrl !== 'string') {
-        return res.status(400).json({ success: false, error: 'MISSING_IMAGE_URL' });
-      }
-      if (!(await ownsMaster((req as SupplierRequest).supplierId, masterId))) {
-        return res.status(403).json(NOT_OWNED);
-      }
-
-      const imageType = (['thumbnail', 'detail', 'content'].includes(type) ? type : 'detail') as 'thumbnail' | 'detail' | 'content';
-
-      // gcsPath를 빈 문자열로 설정 — 외부 참조이므로 GCS 삭제 대상 아님
-      const image = await netureService.addProductImage(masterId, imageUrl, '', imageType);
-
-      // 교체된 썸네일의 gcsPath가 있으면 GCS 삭제
-      if (image.replacedGcsPath) {
-        imageStorageService.deleteImage(image.replacedGcsPath).catch(() => {});
-      }
-
-      res.status(201).json({ success: true, data: image });
-    } catch (error) {
-      logger.error('[Neture API] Error registering image from URL:', error);
-      res.status(500).json({ success: false, error: 'REGISTER_FAILED' });
-    }
-  });
-
-  /**
-   * PATCH /products/images/:imageId/primary
-   * 대표 이미지 변경
-   */
-  router.patch('/products/images/:imageId/primary', requireAuth, requireActiveSupplier as unknown as RequestHandler, async (req: AuthenticatedRequest, res: Response) => {
-    try {
-      const { imageId } = req.params;
-      const { masterId } = req.body;
-
-      if (!masterId) {
-        return res.status(400).json({ success: false, error: 'MISSING_MASTER_ID' });
-      }
-      if (!(await ownsImageMaster((req as SupplierRequest).supplierId, imageId, masterId))) {
-        return res.status(403).json(NOT_OWNED);
-      }
-
-      await netureService.setPrimaryImage(imageId, masterId);
-      res.json({ success: true });
-    } catch (error) {
-      logger.error('[Neture API] Error setting primary image:', error);
-      res.status(500).json({ success: false, error: 'INTERNAL_ERROR' });
-    }
-  });
-
-  /**
-   * DELETE /products/images/:imageId
-   * 이미지 삭제 (DB + GCS)
-   */
-  router.delete('/products/images/:imageId', requireAuth, requireActiveSupplier as unknown as RequestHandler, async (req: AuthenticatedRequest, res: Response) => {
-    try {
-      const { imageId } = req.params;
-      const { masterId } = req.body;
-
-      if (!masterId) {
-        return res.status(400).json({ success: false, error: 'MISSING_MASTER_ID' });
-      }
-      if (!(await ownsImageMaster((req as SupplierRequest).supplierId, imageId, masterId))) {
-        return res.status(403).json(NOT_OWNED);
-      }
-
-      const { gcsPath } = await netureService.deleteProductImage(imageId, masterId);
-      if (gcsPath) {
-        await imageStorageService.deleteImage(gcsPath);
-      }
-
-      res.json({ success: true });
-    } catch (error) {
-      const message = error instanceof Error ? error.message : 'INTERNAL_ERROR';
-      const status = message === 'IMAGE_NOT_FOUND' ? 404 : 500;
-      logger.error('[Neture API] Error deleting product image:', error);
-      res.status(status).json({ success: false, error: message });
     }
   });
 

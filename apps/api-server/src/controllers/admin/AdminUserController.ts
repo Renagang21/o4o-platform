@@ -5,20 +5,14 @@
  * Freeze: WO-O4O-CORE-FREEZE-V1 (2026-03-11)
  */
 import { Request, Response } from 'express';
-import type { EntityManager } from 'typeorm';
 import { AppDataSource } from '../../database/connection.js';
 import { User, UserRole, UserStatus } from '../../modules/auth/entities/User.js';
 import { validationResult } from 'express-validator';
-import { hashPassword } from '../../utils/auth.utils.js';
 import { roleAssignmentService } from '../../modules/auth/services/role-assignment.service.js';
 import logger from '../../utils/logger.js';
-import type { ServiceMembership } from '../../modules/auth/entities/ServiceMembership.js';
-import type { ServiceCredential } from '../../modules/auth/entities/ServiceCredential.js';
 import { resolveCanonicalServiceKey } from '@o4o/security-core';
 // WO-O4O-ADMIN-USER-LIST-SENSITIVE-FIELD-EXPOSURE-FIX-V1
 import { sanitizeAdminUser } from './admin-user-sanitizer.js';
-// WO-O4O-PASSWORD-COMPLEXITY-POLICY-UNIFY-V1: 비밀번호 정책 정본
-import { PASSWORD_MIN_LENGTH, PASSWORD_POLICY_MESSAGE, isPasswordPolicyCompliant } from '../../utils/password-policy.js';
 // WO-O4O-CENTRAL-OPERATOR-ROLE-REVOKE-SAFETY-GUARDS-V1
 import { invalidateRoles } from '../../modules/auth/utils/role-cache.js';
 import {
@@ -57,12 +51,6 @@ export class OperatorRegistrationContractError extends Error {
     this.name = 'OperatorRegistrationContractError';
   }
 }
-
-/**
- * 서비스 credential 최소 길이 — 등록 UI(8자)와 동일하게 서버에서도 강제한다.
- * WO-O4O-PASSWORD-COMPLEXITY-POLICY-UNIFY-V1: 값은 정책 정본에서 파생한다(중복 정의 금지).
- */
-export const SERVICE_PASSWORD_MIN_LENGTH = PASSWORD_MIN_LENGTH;
 
 /**
  * 등록 대상 서비스(canonical service_key) 확정.
@@ -152,80 +140,26 @@ export function buildUserSearchWhere(alias: string): string {
 }
 
 /**
- * WO-O4O-SERVICE-MEMBERSHIP-UPSERT-STATUS-PRESERVATION-V1:
- *   membership 처리 결과를 응답에 명시한다(조용한 동작 금지).
- *   - `CREATED`              : membership 이 없어 새로 만들었다 (status='active')
- *   - `KEEP_EXISTING_STATUS` : 기존 membership 을 그대로 두었다 (status·role 무변경)
- *   - `MIXED`                : 여러 서비스가 섞였다 (일부 생성 · 일부 보존)
- *   - `NOT_APPLICABLE`       : prefixed role 이 없어 membership 대상이 아니다
+ * membership ensure 계약은 `services/admin/service-membership-ensure.ts` 로 추출됐다
+ * (WO-O4O-ADMIN-OPERATOR-GOOGLE-INVITATION-AND-ASSIGNMENT-CUTOVER-V1 — 직접 지정·초대 수락이 같은 함수를 쓴다).
+ * 기존 import 경로를 유지하기 위해 여기서 re-export 한다. 구현을 여기에 복제하지 않는다.
  */
-export type MembershipPolicy = 'CREATED' | 'KEEP_EXISTING_STATUS' | 'MIXED' | 'NOT_APPLICABLE';
+import {
+  ensureServiceMembershipsForRoles,
+  type MembershipPolicy,
+} from '../../services/admin/service-membership-ensure.js';
 
-export interface MembershipEnsureResult {
-  created: number;
-  kept: number;
-  policy: MembershipPolicy;
-}
-
-export function resolveMembershipPolicy(created: number, kept: number): MembershipPolicy {
-  if (created > 0 && kept > 0) return 'MIXED';
-  if (created > 0) return 'CREATED';
-  if (kept > 0) return 'KEEP_EXISTING_STATUS';
-  return 'NOT_APPLICABLE';
-}
+export {
+  resolveMembershipPolicy,
+  ensureServiceMembershipsForRoles,
+} from '../../services/admin/service-membership-ensure.js';
+export type {
+  MembershipPolicy,
+  MembershipEnsureResult,
+} from '../../services/admin/service-membership-ensure.js';
 
 export class AdminUserController {
 
-  // WO-O4O-OPERATOR-CREATION-FLOW-FIX-V1: Ensure service_memberships exist for each role's service
-  // WO-O4O-ADMIN-OPERATOR-MEMBERSHIP-CANONICAL-KEY-FIX-V1: role prefix를 canonical service_key로 매핑
-  // WO-O4O-ADMIN-SERVICE-OPERATOR-REGISTRATION-IDENTITY-V2-V1:
-  //   선택적 `manager` — 등록 트랜잭션 안에서 호출되면 같은 트랜잭션으로 쓴다.
-  //
-  // WO-O4O-SERVICE-MEMBERSHIP-UPSERT-STATUS-PRESERVATION-V1:
-  //   **ensure membership existence ≠ approve / reactivate membership.**
-  //   이전 구현은 기존 membership 의 status 가 'active' 가 아니면 status 를 'active' 로,
-  //   role 을 새 role 로 덮어썼다. 그 결과 pending·suspended·rejected·withdrawn 회원이
-  //   **역할 추가만으로 서비스 접근 권한을 되찾았다** (승인 이력 approved_by/approved_at 도 없이).
-  //   membership 상태 변경은 canonical 경로(MembershipApprovalService 의
-  //   approve/reject/suspend/reactivate)만 담당한다. 여기서는 **없을 때만 생성**한다.
-  private ensureServiceMemberships = async (
-    userId: string,
-    roles: string[],
-    manager?: EntityManager,
-  ): Promise<MembershipEnsureResult> => {
-    const smRepo = (manager ?? AppDataSource).getRepository<ServiceMembership>('ServiceMembership');
-    const processedServices = new Set<string>();
-    let created = 0;
-    let kept = 0;
-
-    for (const r of roles) {
-      const parts = r.split(':');
-      if (parts.length === 2) {
-        const [rolePrefix, roleName] = parts;
-        const serviceKey = toCanonicalServiceKey(rolePrefix);
-        if (!processedServices.has(serviceKey)) {
-          processedServices.add(serviceKey);
-          const existing = await smRepo.findOne({ where: { userId, serviceKey } as any });
-          if (!existing) {
-            const membership = smRepo.create({
-              userId,
-              serviceKey,
-              status: 'active',
-              role: roleName,
-            } as any);
-            await smRepo.save(membership);
-            created += 1;
-          } else {
-            // 기존 membership 은 status·role 모두 건드리지 않는다.
-            // 재활성화가 필요하면 명시적 승인/reactivate 경로를 쓴다.
-            kept += 1;
-          }
-        }
-      }
-    }
-
-    return { created, kept, policy: resolveMembershipPolicy(created, kept) };
-  };
   
   // Get all users with pagination and filters
   // WO-OPERATOR-FIX-V1: JOIN role_assignments to include roles in response
@@ -351,6 +285,18 @@ export class AdminUserController {
   };
 
   // Create new user
+  /**
+   * POST /admin/users — **기존 사용자에게 운영 역할·membership 을 추가하는 경로만 남는다.**
+   *
+   * WO-O4O-ADMIN-OPERATOR-GOOGLE-INVITATION-AND-ASSIGNMENT-CUTOVER-V1 §17 · §18:
+   *   운영자 onboarding 의 Identity 계약이 Google 기준으로 바뀌었다. 관리자는 더 이상 타인의
+   *   비밀번호를 만들지 않는다. 따라서 이 경로에서 은퇴하는 것은 다음 둘이다.
+   *     1. `password` 수신 → `service_credentials` / `users.password` 생성  (400 PASSWORD_NOT_ALLOWED_HERE)
+   *     2. 미가입 email 로 신규 user 생성                                     (400 OPERATOR_INVITATION_REQUIRED)
+   *   대체 경로: `POST /api/v1/admin/operator-assignments` (기존 사용자 · userId 로 지정) ·
+   *             `POST /api/v1/admin/operator-invitations` (미가입자 초대).
+   *   **조용한 대체(silent fallback)를 만들지 않는다** — 옛 계약으로 온 요청은 명시 코드로 거절한다.
+   */
   createUser = async (req: Request, res: Response): Promise<void> => {
     try {
       const errors = validationResult(req);
@@ -366,21 +312,24 @@ export class AdminUserController {
       const {
         email,
         password,
-        firstName,
-        lastName,
-        name,
         role = UserRole.USER,
         roles: rolesArray,
-        status = UserStatus.APPROVED,
-        isActive = true
       } = req.body;
 
-      const userRepo = AppDataSource.getRepository(User);
+      // 은퇴 1 — 비밀번호는 이 경로에 존재하지 않는다(부분 수용도 하지 않는다).
+      if (typeof password === 'string' && password.length > 0) {
+        res.status(400).json({
+          success: false,
+          error: '이 경로에서는 비밀번호를 만들지 않습니다. 운영자는 Google 계정으로 지정·초대합니다.',
+          code: 'PASSWORD_NOT_ALLOWED_HERE',
+        });
+        return;
+      }
 
+      const userRepo = AppDataSource.getRepository(User);
       const rolesToAssign = Array.isArray(rolesArray) && rolesArray.length > 0 ? rolesArray : [role];
 
-      // WO-O4O-ADMIN-SERVICE-OPERATOR-REGISTRATION-IDENTITY-V2-V1:
-      //   대상 서비스를 먼저 확정한다. 여기서 걸리면 **아무것도 쓰지 않는다**.
+      // 대상 서비스 확정 — 여기서 걸리면 아무것도 쓰지 않는다(멀티 서비스 · serviceKey 모순 거절).
       const target = resolveOperatorTargetServiceKey(rolesToAssign, req.body?.serviceKey);
       if (target.error) {
         res.status(target.error.status).json({
@@ -392,165 +341,44 @@ export class AdminUserController {
       }
       const targetServiceKey = target.serviceKey;
 
-      // Check if email already exists
       const existingUser = await userRepo.findOne({ where: { email } });
 
-      const hasPassword = typeof password === 'string' && password.length > 0;
-      // WO-O4O-PASSWORD-COMPLEXITY-POLICY-UNIFY-V1: 길이뿐 아니라 영문·숫자 포함까지 검사한다.
-      const passwordTooShort = hasPassword && !isPasswordPolicyCompliant(password);
-
-      // ── 기존 사용자: 권한·Membership 추가 + credential 은 **없을 때만** 생성 ──
-      // WO-OPERATOR-MULTI-SERVICE-V1: 한 사용자가 여러 서비스 운영자일 수 있다.
-      // WO-O4O-ADMIN-SERVICE-OPERATOR-REGISTRATION-IDENTITY-V2-V1:
-      //   기존 credential 은 절대 덮어쓰지 않는다(그 서비스의 현재 비밀번호를 관리자가 모른 채 바꿔버리는 것 금지).
-      //   credential 이 없으면 그 서비스 전용 초기 비밀번호를 **명시적으로** 받아 생성한다.
-      if (existingUser) {
-        if (passwordTooShort) {
-          res.status(400).json({
-            success: false,
-            error: `서비스 초기 ${PASSWORD_POLICY_MESSAGE}`,
-            code: 'SERVICE_PASSWORD_TOO_SHORT',
-          });
-          return;
-        }
-        // 해싱은 트랜잭션 밖에서(느린 bcrypt 를 트랜잭션 안에 두지 않는다).
-        const candidateHash = hasPassword ? await hashPassword(password) : null;
-
-        let credentialPolicy: 'CREATED' | 'KEEP_EXISTING_CREDENTIAL' | 'NOT_APPLICABLE' =
-          'NOT_APPLICABLE';
-        // WO-O4O-SERVICE-MEMBERSHIP-UPSERT-STATUS-PRESERVATION-V1
-        let membershipPolicy: MembershipPolicy = 'NOT_APPLICABLE';
-
-        await AppDataSource.transaction(async (manager) => {
-          for (const r of rolesToAssign) {
-            await roleAssignmentService.assignRole({ userId: existingUser.id, role: r }, manager);
-          }
-          // WO-O4O-OPERATOR-CREATION-FLOW-FIX-V1: Create service_memberships from roles
-          membershipPolicy = (
-            await this.ensureServiceMemberships(existingUser.id, rolesToAssign, manager)
-          ).policy;
-
-          if (targetServiceKey) {
-            const credRepo = manager.getRepository<ServiceCredential>('ServiceCredential');
-            const existingCredential = await credRepo.findOne({
-              where: { userId: existingUser.id, serviceKey: targetServiceKey } as any,
-            });
-            if (existingCredential) {
-              credentialPolicy = 'KEEP_EXISTING_CREDENTIAL';
-            } else {
-              if (!candidateHash) {
-                // 트랜잭션 안에서 던져 role·membership 까지 함께 롤백시킨다(부분 생성 0).
-                throw new OperatorRegistrationContractError(
-                  400,
-                  'SERVICE_PASSWORD_REQUIRED',
-                  '이 사용자는 해당 서비스의 로그인 비밀번호가 아직 없습니다. 초기 서비스 비밀번호를 입력하세요.',
-                );
-              }
-              await credRepo.insert({
-                userId: existingUser.id,
-                serviceKey: targetServiceKey,
-                passwordHash: candidateHash,
-              } as any);
-              credentialPolicy = 'CREATED';
-            }
-          }
-        });
-
-        res.status(200).json({
-          success: true,
-          user: sanitizeAdminUser(existingUser),
-          message: 'Roles added to existing user',
-          isExistingUser: true,
-          serviceKey: targetServiceKey,
-          // users.password(L1) 는 이 경로에서 바뀌지 않는다 — 기존 계약 유지.
-          passwordPolicy: 'KEEP_EXISTING_PASSWORD',
-          // 실제 서비스 로그인 비밀번호(L2)에 무슨 일이 있었는지는 별도로 알린다.
-          credentialPolicy,
-          // WO-O4O-SERVICE-MEMBERSHIP-UPSERT-STATUS-PRESERVATION-V1:
-          //   기존 membership 은 승격되지 않는다 — 관리자가 그 사실을 알 수 있게 명시한다.
-          membershipPolicy,
-        });
-        return;
-      }
-
-      // ── 신규 사용자 ──
-      // 이름은 신규 생성에서만 필수다(기존 사용자 경로는 이름을 쓰지 않는다).
-      if (!firstName || !lastName) {
+      // 은퇴 2 — 미가입자는 초대 경로로만 운영자가 된다. 여기서 users 를 만들지 않는다.
+      if (!existingUser) {
         res.status(400).json({
           success: false,
-          error: '신규 운영자 등록에는 성과 이름이 필요합니다.',
-          code: 'NAME_REQUIRED',
-        });
-        return;
-      }
-      if (!hasPassword || passwordTooShort) {
-        res.status(400).json({
-          success: false,
-          error: `신규 운영자 등록에는 비밀번호가 필요합니다. ${PASSWORD_POLICY_MESSAGE}`,
-          code: 'SERVICE_PASSWORD_REQUIRED',
+          error: '가입하지 않은 사용자입니다. 운영자 초대(POST /api/v1/admin/operator-invitations)를 사용하세요.',
+          code: 'OPERATOR_INVITATION_REQUIRED',
         });
         return;
       }
 
-      const hashedPassword = await hashPassword(password);
+      let membershipPolicy: MembershipPolicy = 'NOT_APPLICABLE';
+      let membershipStatuses: Record<string, string> = {};
 
-      // WO-O4O-ADMIN-SERVICE-OPERATOR-REGISTRATION-IDENTITY-V2-V1:
-      //   User · role_assignments · service_memberships · service_credentials 를 **하나의 트랜잭션**으로 만든다.
-      //   이전 구현은 순차 저장이라 중간 실패 시 "User 만" · "역할 일부만" 같은 부분 생성이 남았다.
-      //
-      //   users.password 도 함께 쓴다 — `users.password` 는 NOT NULL 이라 생략할 수 없다.
-      //   안전 근거: 로그인은 serviceKey 가 오면 `service_credentials` 를 우선 사용하고
-      //   (auth-login.service.ts: `credentialHash ?? user.password`), 우리는 그 credential 을
-      //   같은 트랜잭션에서 만든다. 즉 **서비스 로그인 원본은 credential** 이며 users.password 는
-      //   스키마 제약을 만족시키는 초기값일 뿐이다. 이는 일반 가입 경로
-      //   (auth-register.controller.ts: 동일 hash 로 users.password + credential 동시 기록)와 같은 계약이다.
-      // WO-O4O-SERVICE-MEMBERSHIP-UPSERT-STATUS-PRESERVATION-V1
-      let newUserMembershipPolicy: MembershipPolicy = 'NOT_APPLICABLE';
-      const savedUser = await AppDataSource.transaction(async (manager) => {
-        const txUserRepo = manager.getRepository(User);
-        const created = txUserRepo.create({
-          email,
-          password: hashedPassword,
-          firstName,
-          lastName,
-          name,
-          status,
-          isActive
-        });
-        const saved = await txUserRepo.save(created);
-
-        // WO-OPERATOR-FIX-V1: role_assignments 가 role SSOT
+      await AppDataSource.transaction(async (manager) => {
         for (const r of rolesToAssign) {
-          await roleAssignmentService.assignRole({ userId: saved.id, role: r }, manager);
+          await roleAssignmentService.assignRole({ userId: existingUser.id, role: r }, manager);
         }
-
-        // WO-O4O-OPERATOR-CREATION-FLOW-FIX-V1: Create service_memberships from roles
-        newUserMembershipPolicy = (
-          await this.ensureServiceMemberships(saved.id, rolesToAssign, manager)
-        ).policy;
-
-        // Identity V2 L2 — 선택한 서비스 credential 하나만 만든다(다른 서비스 무변경).
-        if (targetServiceKey) {
-          await manager.getRepository<ServiceCredential>('ServiceCredential').insert({
-            userId: saved.id,
-            serviceKey: targetServiceKey,
-            passwordHash: hashedPassword,
-          } as any);
-        }
-
-        return saved;
+        const ensured = await ensureServiceMembershipsForRoles(existingUser.id, rolesToAssign, manager);
+        membershipPolicy = ensured.policy;
+        membershipStatuses = ensured.existingStatuses;
       });
 
-      res.status(201).json({
+      res.status(200).json({
         success: true,
-        user: sanitizeAdminUser(savedUser),
-        message: 'User created successfully',
+        user: sanitizeAdminUser(existingUser),
+        message: 'Roles added to existing user',
+        isExistingUser: true,
         serviceKey: targetServiceKey,
-        credentialPolicy: targetServiceKey ? 'CREATED' : 'NOT_APPLICABLE',
-        membershipPolicy: newUserMembershipPolicy,
+        // 이 경로는 users.password 도 service_credentials 도 쓰지 않는다.
+        passwordPolicy: 'KEEP_EXISTING_PASSWORD',
+        credentialPolicy: 'NOT_APPLICABLE',
+        // 기존 membership 은 승격되지 않는다 — 관리자가 그 사실을 알 수 있게 명시한다.
+        membershipPolicy,
+        membershipStatuses,
       });
     } catch (error) {
-      // 계약 위반은 500 으로 뭉개지 않는다 — 트랜잭션은 이미 롤백됐고(부분 생성 0), 원인을 그대로 알린다.
       if (error instanceof OperatorRegistrationContractError) {
         res.status(error.status).json({
           success: false,

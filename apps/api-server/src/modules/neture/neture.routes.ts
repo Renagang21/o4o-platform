@@ -29,7 +29,8 @@ import { createSupplierOrderController } from './controllers/supplier-order.cont
 import { createShipmentController } from './controllers/shipment.controller.js';
 import { createInventoryController } from './controllers/inventory.controller.js';
 import { createSupplierSettlementController } from './controllers/supplier-settlement.controller.js';
-import { createAdminController, createProductImageController } from './controllers/admin.controller.js';
+import { createAdminController } from './controllers/admin.controller.js';
+import { createSupplierProductImageController } from './controllers/supplier-product-image.controller.js';
 import { createAdminServiceAudienceController } from './controllers/admin-service-audience.controller.js';
 import { createAdminSettlementController } from './controllers/admin-settlement.controller.js';
 import { createSellerController } from './controllers/seller.controller.js';
@@ -216,7 +217,7 @@ export default function createNetureModuleRoutes(dataSource: DataSource): Expres
   router.use('/', createContactController(dataSource));
 
   // Product images (supplier-facing, mounted at root: /products/*)
-  router.use('/', createProductImageController(dataSource));
+  router.use('/', createSupplierProductImageController(dataSource));
 
   // Existing controllers
   const hubTriggerController = createNetureHubTriggerController({

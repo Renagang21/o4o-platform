@@ -13,7 +13,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { X, Pencil, Trash2, ImagePlus, Loader2, Sparkles, Plus, ChevronDown, ChevronRight } from 'lucide-react';
+import { X, Pencil, Trash2, ImagePlus, Loader2, ChevronDown, ChevronRight } from 'lucide-react';
 import { supplierApi, type SupplierProduct, productApi, type ProductImage, type CategoryTreeItem, type BrandItem, type SpotPricePolicy } from '../../lib/api';
 import { SUPPLIER_SPOT_POLICIES_FORBIDDEN } from '../../lib/api/supplier';
 import { ProductForm, type ProductFormData } from '../../components/product';
@@ -191,17 +191,6 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
   const [categories, setCategories] = useState<CategoryTreeItem[]>([]);
   const [brands, setBrands] = useState<BrandItem[]>([]);
 
-  // WO-NETURE-SUPPLIER-TAG-AI-B2C-ALIGNMENT-V1: AI tag management state
-  const [aiTags, setAiTags] = useState<Array<{ id: string; tag: string; confidence: number; source: string }>>([]);
-  const [manualTags, setManualTags] = useState<Array<{ id: string; tag: string; confidence: number; source: string }>>([]);
-  const [suggestedTags, setSuggestedTags] = useState<Array<{ tag: string; confidence: number }>>([]);
-  const [suggestAttempted, setSuggestAttempted] = useState(false);
-  const [aiTagLoading, setAiTagLoading] = useState(false);
-  const [aiSuggestLoading, setAiSuggestLoading] = useState(false);
-  const [manualTagInput, setManualTagInput] = useState('');
-  const [addingTag, setAddingTag] = useState(false);
-  // V2: multi-select AI suggestions in edit mode
-  const [selectedSuggestions, setSelectedSuggestions] = useState<Set<string>>(new Set());
   // WO-NETURE-DESCRIPTION-IMAGE-MEDIA-LIBRARY-INTEGRATION-V1
   const [mediaPickerTarget, setMediaPickerTarget] = useState<((media: MediaInsert) => void) | null>(null);
   // WO-NETURE-PRODUCT-PRIMARY-IMAGE-MEDIA-LIBRARY-INTEGRATION-V1
@@ -231,24 +220,6 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
     }
   }, [product?.masterId, open]);
 
-  // Load AI tags when drawer opens
-  useEffect(() => {
-    if (product?.masterId && open) {
-      setAiTagLoading(true);
-      productApi.getAiTags(product.masterId).then((data) => {
-        setAiTags(data.aiTags);
-        setManualTags(data.manualTags);
-        setAiTagLoading(false);
-      });
-    }
-    if (!open) {
-      setAiTags([]);
-      setManualTags([]);
-      setSuggestedTags([]);
-      setManualTagInput('');
-      setSelectedSuggestions(new Set());
-    }
-  }, [product?.masterId, open]);
 
   // Reset state when product changes
   useEffect(() => {
@@ -258,9 +229,6 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
       setShowDirtyConfirm(false);
       formRef.current = null;
       isDirtyRef.current = false;
-      setSuggestedTags([]);
-      setManualTagInput('');
-      setSelectedSuggestions(new Set());
     }
   }, [product]);
 
@@ -512,92 +480,6 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
   // WO-NETURE-SUPPLIER-TAG-AI-B2C-ALIGNMENT-V1: AI tag handlers
   // WO-NETURE-AI-TAG-EDITING-OVERRIDE-INPUT-V1: 편집 중 값을 override로 전달
   // WO-NETURE-B2C-B2B-TAG-RECOMMENDATION-STRATEGY-V1: purpose별 AI 태그 추천
-  const handleAiSuggest = async (purpose: 'b2c' | 'b2b') => {
-    if (!product?.masterId) return;
-    setAiSuggestLoading(true);
-    setSuggestedTags([]);
-    setSuggestAttempted(false);
-
-    const overrides = isEditing
-      ? {
-          consumerShortDescription: editConsumerShort.trim() || null,
-          consumerDetailDescription: editConsumerDetail.trim() || null,
-          businessShortDescription: editBizShort.trim() || null,
-          businessDetailDescription: editBizDetail.trim() || null,
-        }
-      : undefined;
-
-    const suggestions = await productApi.suggestAiTags(product.masterId, overrides, purpose);
-    setSuggestedTags(suggestions);
-    setSuggestAttempted(true);
-    setAiSuggestLoading(false);
-  };
-
-  const handleAcceptSuggestion = async (tag: string) => {
-    if (!product?.masterId) return;
-    setAddingTag(true);
-    const result = await productApi.addManualTag(product.masterId, tag);
-    if (result.success) {
-      setSuggestedTags((prev) => prev.filter((s) => s.tag !== tag));
-      const data = await productApi.getAiTags(product.masterId);
-      setAiTags(data.aiTags);
-      setManualTags(data.manualTags);
-      onSaved?.();
-    }
-    setAddingTag(false);
-  };
-
-  // V2: multi-select AI suggestion handlers
-  const handleAcceptSelectedSuggestions = async () => {
-    if (!product?.masterId || selectedSuggestions.size === 0) return;
-    setAddingTag(true);
-    const tagsToAdd = Array.from(selectedSuggestions);
-    const result = await productApi.addManualTagsBatch(product.masterId, tagsToAdd);
-    if (result.success) {
-      setSuggestedTags((prev) => prev.filter((s) => !selectedSuggestions.has(s.tag)));
-      setSelectedSuggestions(new Set());
-      const data = await productApi.getAiTags(product.masterId);
-      setAiTags(data.aiTags);
-      setManualTags(data.manualTags);
-      onSaved?.();
-    }
-    setAddingTag(false);
-  };
-
-  const toggleSuggestion = (tag: string) => {
-    setSelectedSuggestions((prev) => {
-      const next = new Set(prev);
-      if (next.has(tag)) next.delete(tag);
-      else next.add(tag);
-      return next;
-    });
-  };
-
-  const handleAddManualTag = async () => {
-    const tag = manualTagInput.trim();
-    if (!tag || !product?.masterId) return;
-    setAddingTag(true);
-    const result = await productApi.addManualTag(product.masterId, tag);
-    if (result.success) {
-      setManualTagInput('');
-      const data = await productApi.getAiTags(product.masterId);
-      setAiTags(data.aiTags);
-      setManualTags(data.manualTags);
-      onSaved?.();
-    }
-    setAddingTag(false);
-  };
-
-  const handleDeleteTag = async (tagId: string) => {
-    if (!product?.masterId) return;
-    const result = await productApi.deleteAiTag(product.masterId, tagId);
-    if (result.success) {
-      setAiTags((prev) => prev.filter((t) => t.id !== tagId));
-      setManualTags((prev) => prev.filter((t) => t.id !== tagId));
-      onSaved?.();
-    }
-  };
-
   // Image handlers
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -1635,171 +1517,9 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
             </Section>
           )}
 
-          {/* ── 태그 관리 (V2: 편집/읽기 모드 모두 표시, 후편집 4단계) ── */}
-          <Section title="태그 관리">
-            {/* WO-NETURE-BULK-PRODUCT-POST-IMPORT-CURATION-FLOW-V1: 태그 추천 안내 */}
-            {(!product.categoryId || (!product.consumerShortDescription && !product.consumerDetailDescription)) && (
-              <p className="text-xs text-blue-600 bg-blue-50 rounded-lg px-3 py-2 mb-3">
-                카테고리와 설명을 먼저 입력하면 더 정확한 태그가 추천됩니다.
-              </p>
-            )}
-            {aiTagLoading ? (
-              <div className="flex items-center justify-center py-3">
-                <Loader2 size={16} className="animate-spin text-slate-400" />
-              </div>
-            ) : (
-              <>
-                {/* 기존 AI 태그 */}
-                {aiTags.length > 0 && (
-                  <div className="mb-3">
-                    <span className="text-xs text-slate-400 block mb-1.5">자동 생성 태그</span>
-                    <div className="flex flex-wrap gap-1">
-                      {aiTags.map((t) => (
-                        <span key={t.id} className="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-50 text-blue-700 rounded text-xs">
-                          {t.tag}
-                          <span className="text-blue-400 text-[10px]">{Math.round(t.confidence * 100)}%</span>
-                          <button
-                            onClick={() => handleDeleteTag(t.id)}
-                            className="text-blue-300 hover:text-red-500 ml-0.5"
-                            title="삭제"
-                          >&times;</button>
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* 수동 태그 */}
-                {manualTags.length > 0 && (
-                  <div className="mb-3">
-                    <span className="text-xs text-slate-400 block mb-1.5">수동 태그</span>
-                    <div className="flex flex-wrap gap-1">
-                      {manualTags.map((t) => (
-                        <span key={t.id} className="inline-flex items-center gap-1 px-2 py-0.5 bg-green-50 text-green-700 rounded text-xs">
-                          {t.tag}
-                          <button
-                            onClick={() => handleDeleteTag(t.id)}
-                            className="text-green-300 hover:text-red-500 ml-0.5"
-                            title="삭제"
-                          >&times;</button>
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {aiTags.length === 0 && manualTags.length === 0 && (
-                  <p className="text-sm text-slate-400 mb-3">등록된 태그가 없습니다</p>
-                )}
-
-                {/* 추천 결과 0건 안내 */}
-                {suggestAttempted && suggestedTags.length === 0 && (
-                  <p className="text-xs text-slate-500 mb-3">추천할 새 태그가 없습니다. 설명을 보강하거나 수동으로 태그를 입력하세요.</p>
-                )}
-
-                {/* AI 추천 결과 — V2: 편집 모드에서는 multi-select */}
-                {suggestedTags.length > 0 && (
-                  <div className="mb-3 p-3 bg-amber-50/60 border border-amber-200 rounded-lg">
-                    <span className="text-xs font-medium text-amber-700 block mb-1.5">
-                      AI 추천 태그 {isEditing ? '(선택 후 일괄 추가)' : '(클릭하여 추가)'}
-                    </span>
-                    <div className="flex flex-wrap gap-1">
-                      {suggestedTags.map((s, i) => (
-                        isEditing ? (
-                          <button
-                            key={i}
-                            onClick={() => toggleSuggestion(s.tag)}
-                            disabled={addingTag}
-                            className={`inline-flex items-center gap-1 px-2 py-0.5 border rounded text-xs transition-colors disabled:opacity-50 ${
-                              selectedSuggestions.has(s.tag)
-                                ? 'bg-amber-200 border-amber-400 text-amber-900 font-medium'
-                                : 'bg-white border-amber-300 text-amber-800 hover:bg-amber-100'
-                            }`}
-                          >
-                            {selectedSuggestions.has(s.tag) && '\u2713 '}{s.tag}
-                            <span className="text-amber-400 text-[10px]">{Math.round(s.confidence * 100)}%</span>
-                          </button>
-                        ) : (
-                          <button
-                            key={i}
-                            onClick={() => handleAcceptSuggestion(s.tag)}
-                            disabled={addingTag}
-                            className="inline-flex items-center gap-1 px-2 py-0.5 bg-white border border-amber-300 text-amber-800 rounded text-xs hover:bg-amber-100 transition-colors disabled:opacity-50"
-                          >
-                            <Plus size={10} />
-                            {s.tag}
-                            <span className="text-amber-400 text-[10px]">{Math.round(s.confidence * 100)}%</span>
-                          </button>
-                        )
-                      ))}
-                    </div>
-                    {isEditing && selectedSuggestions.size > 0 && (
-                      <button
-                        onClick={handleAcceptSelectedSuggestions}
-                        disabled={addingTag}
-                        className="mt-2 px-3 py-1 text-xs font-medium text-white bg-amber-600 hover:bg-amber-700 rounded-lg disabled:opacity-50"
-                      >
-                        {addingTag ? '추가 중...' : `선택 추가 (${selectedSuggestions.size}개)`}
-                      </button>
-                    )}
-                  </div>
-                )}
-
-                {/* 액션 버튼: B2C/B2B 전략 분리 (WO-NETURE-B2C-B2B-TAG-RECOMMENDATION-STRATEGY-V1) */}
-                <div className="flex items-center gap-2 mb-3">
-                  <button
-                    onClick={() => handleAiSuggest('b2c')}
-                    disabled={aiSuggestLoading || !product?.masterId}
-                    className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-lg transition-colors disabled:opacity-50"
-                  >
-                    {aiSuggestLoading ? (
-                      <Loader2 size={12} className="animate-spin" />
-                    ) : (
-                      <Sparkles size={12} />
-                    )}
-                    B2C 추가 추천
-                  </button>
-                  <button
-                    onClick={() => handleAiSuggest('b2b')}
-                    disabled={aiSuggestLoading || !product?.masterId}
-                    className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors disabled:opacity-50"
-                  >
-                    {aiSuggestLoading ? (
-                      <Loader2 size={12} className="animate-spin" />
-                    ) : (
-                      <Sparkles size={12} />
-                    )}
-                    B2B 추가 추천
-                  </button>
-                </div>
-
-                {/* 수동 태그 입력 */}
-                <div className="flex items-center gap-2">
-                  <input
-                    type="text"
-                    value={manualTagInput}
-                    onChange={(e) => setManualTagInput(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' && manualTagInput.trim()) {
-                        e.preventDefault();
-                        handleAddManualTag();
-                      }
-                    }}
-                    placeholder="태그 직접 입력 후 Enter"
-                    disabled={addingTag}
-                    className="flex-1 px-3 py-1.5 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-slate-50"
-                  />
-                  <button
-                    onClick={handleAddManualTag}
-                    disabled={addingTag || !manualTagInput.trim()}
-                    className="px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg disabled:opacity-50"
-                  >
-                    추가
-                  </button>
-                </div>
-              </>
-            )}
-          </Section>
+          {/* WO-O4O-SUPPLIER-POST-REGISTRATION-PRODUCT-MANAGEMENT-OFFER-FIRST-REALIGNMENT-V1 §E-1 (2026-09-23):
+              공급자 표면의 AI 태그 생성·추천·수동 태그 관리 UI 는 제거됐다.
+              공급자 화면에서 내부 LLM 을 호출하지 않는다(product_masters.tags 동기화 경로 포함). */}
 
           {/* ── 가격 점검 (후편집 마지막 단계) ── */}
           {!isEditing && (

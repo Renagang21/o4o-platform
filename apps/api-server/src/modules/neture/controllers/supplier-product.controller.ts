@@ -2,7 +2,12 @@
  * SupplierProductController — WO-O4O-ROUTES-REFACTOR-V1
  * Extracted from neture.routes.ts
  *
- * Routes: supplier/products, supplier/csv-import/*
+ * Routes: supplier/products/*
+ *
+ * WO-O4O-SUPPLIER-POST-REGISTRATION-PRODUCT-MANAGEMENT-OFFER-FIRST-REALIGNMENT-V1 §I (2026-09-23):
+ *   supplier/csv-import/* 와 supplier/products/template 은퇴.
+ *   공급자 → ProductMaster 직접 생성의 마지막 HTTP 경로였다.
+ *   대량 등록은 /supplier/products/bulk-candidates (ProductCandidate 경유 · 운영자 승인) 만 남는다.
  */
 import { Router } from 'express';
 import type { Response, RequestHandler } from 'express';
@@ -11,10 +16,7 @@ import { requireAuth } from '../../../middleware/auth.middleware.js';
 import { createRequireActiveSupplier, createRequireLinkedSupplier } from '../middleware/neture-identity.middleware.js';
 import type { SupplierRequest, AuthenticatedRequest } from '../middleware/neture-identity.middleware.js';
 import { NetureService } from '../neture.service.js';
-import { CsvImportService } from '../services/csv-import.service.js';
 import { ProductCandidateService } from '../services/product-candidate.service.js';
-import { generateProductTemplate } from '../services/xlsx-template.service.js';
-import { uploadSingleMiddleware } from '../../../middleware/upload.middleware.js';
 import logger from '../../../utils/logger.js';
 import { OfferErrorCode } from '../constants/offer-error-code.js';
 
@@ -66,7 +68,6 @@ function pickField(fields: Record<string, string>, ...keys: string[]): string {
 export function createSupplierProductController(dataSource: DataSource): Router {
   const router = Router();
   const netureService = new NetureService();
-  const csvImportService = new CsvImportService(dataSource);
   const productCandidateService = new ProductCandidateService(dataSource);
   const requireActiveSupplier = createRequireActiveSupplier(dataSource);
   const requireLinkedSupplier = createRequireLinkedSupplier(dataSource);
@@ -338,188 +339,6 @@ export function createSupplierProductController(dataSource: DataSource): Router 
     } catch (error) {
       logger.error('[Neture API] Error setting service prices:', error);
       res.status(500).json({ success: false, error: 'INTERNAL_ERROR' });
-    }
-  });
-
-  // GET /supplier/products/template — XLSX 템플릿 다운로드 (WO-NETURE-BULK-IMPORT-TEMPLATE-UPGRADE-V1)
-  router.get('/products/template', requireAuth, async (_req: AuthenticatedRequest, res: Response) => {
-    try {
-      const buffer = await generateProductTemplate();
-      res.setHeader('Content-Disposition', 'attachment; filename=neture_product_template.xlsx');
-      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-      res.send(buffer);
-    } catch (error) {
-      logger.error('[Neture API] Error generating product template:', error);
-      res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to generate template' });
-    }
-  });
-
-  // POST /supplier/csv-import/upload
-  router.post('/csv-import/upload', requireAuth, requireActiveSupplier as RequestHandler, uploadSingleMiddleware('file'), async (req: AuthenticatedRequest, res: Response) => {
-    try {
-      const supplierId = (req as SupplierRequest).supplierId;
-      const userId = req.user?.id;
-      if (!userId) {
-        return res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED' } });
-      }
-      const file = (req as any).file as Express.Multer.File | undefined;
-      if (!file) {
-        return res.status(400).json({ success: false, error: { code: 'NO_FILE', message: 'CSV file is required' } });
-      }
-      // WO-O4O-NETURE-CSV-XLSX-UPLOAD-NETWORK-ERROR-FIX-V1: 업로드 파일 정보 로깅
-      logger.info(`[Neture CSV] Upload started — file: ${file.originalname}, size: ${file.size}, mime: ${file.mimetype}, supplier: ${supplierId}`);
-      const result = await csvImportService.uploadAndValidate(supplierId, userId, {
-        buffer: file.buffer,
-        originalname: file.originalname,
-      });
-      if (!result.success) {
-        logger.warn(`[Neture CSV] Validation failed — file: ${file.originalname}, error: ${result.error}`);
-        return res.status(400).json({ success: false, error: { code: result.error, message: result.error } });
-      }
-      logger.info(`[Neture CSV] Upload success — file: ${file.originalname}, batchId: ${result.data?.batchId}, valid: ${result.data?.validRows}/${result.data?.totalRows}`);
-      res.status(200).json(result);
-    } catch (error) {
-      const errMsg = error instanceof Error ? error.message : 'Unknown error';
-      logger.error(`[Neture API] Error uploading file: ${(req as any).file?.originalname} — ${errMsg}`, error);
-      res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: `파일 처리 실패: ${errMsg}` } });
-    }
-  });
-
-  // GET /supplier/csv-import/batches
-  router.get('/csv-import/batches', requireAuth, requireLinkedSupplier as RequestHandler, async (req: AuthenticatedRequest, res: Response) => {
-    try {
-      const supplierId = (req as SupplierRequest).supplierId;
-      const batches = await csvImportService.listBatches(supplierId);
-      res.json({ success: true, data: batches });
-    } catch (error) {
-      logger.error('[Neture API] Error listing CSV batches:', error);
-      res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: 'Failed to list CSV batches' } });
-    }
-  });
-
-  // GET /supplier/csv-import/batches/:id
-  router.get('/csv-import/batches/:id', requireAuth, requireLinkedSupplier as RequestHandler, async (req: AuthenticatedRequest, res: Response) => {
-    try {
-      const supplierId = (req as SupplierRequest).supplierId;
-      const { id } = req.params;
-      const result = await csvImportService.getBatch(id, supplierId);
-      if (!result.success) {
-        return res.status(404).json({ success: false, error: { code: result.error, message: result.error } });
-      }
-      res.json(result);
-    } catch (error) {
-      logger.error('[Neture API] Error fetching CSV batch:', error);
-      res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: 'Failed to fetch CSV batch' } });
-    }
-  });
-
-  // PATCH /supplier/csv-import/batches/:batchId/rows/:rowId — WO-NETURE-IMPORT-ROW-QUICK-EDIT-V1
-  router.patch('/csv-import/batches/:batchId/rows/:rowId', requireAuth, requireActiveSupplier as RequestHandler, async (req: AuthenticatedRequest, res: Response) => {
-    try {
-      const supplierId = (req as SupplierRequest).supplierId;
-      const { batchId, rowId } = req.params;
-      const result = await csvImportService.updateRow(batchId, rowId, supplierId, req.body);
-      if (!result.success) {
-        const status = result.error === 'BATCH_NOT_FOUND' || result.error === 'ROW_NOT_FOUND' ? 404 : 400;
-        return res.status(status).json({ success: false, error: { code: result.error, message: result.error } });
-      }
-      res.json(result);
-    } catch (error) {
-      logger.error('[Neture API] Error updating CSV import row:', error);
-      res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: 'Failed to update row' } });
-    }
-  });
-
-  // POST /supplier/csv-import/batches/:id/apply
-  router.post('/csv-import/batches/:id/apply', requireAuth, requireActiveSupplier as RequestHandler, async (req: AuthenticatedRequest, res: Response) => {
-    try {
-      const supplierId = (req as SupplierRequest).supplierId;
-      const { id } = req.params;
-      const result = await csvImportService.applyBatch(id, supplierId);
-      if (!result.success) {
-        const status = result.error === 'BATCH_NOT_FOUND' ? 404
-          : result.error === 'SUPPLIER_NOT_ACTIVE' ? 403
-          : 400;
-        return res.status(status).json({ success: false, error: { code: result.error, message: result.error } });
-      }
-      res.json(result);
-    } catch (error) {
-      const errMsg = error instanceof Error ? error.message : String(error);
-      logger.error('[Neture API] Error applying CSV batch:', error);
-      res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: errMsg } });
-    }
-  });
-
-  // POST /supplier/csv-import/batches/:id/retry — WO-O4O-NETURE-IMPORT-RETRY-FAILED-V1
-  router.post('/csv-import/batches/:id/retry', requireAuth, requireActiveSupplier as RequestHandler, async (req: AuthenticatedRequest, res: Response) => {
-    try {
-      const supplierId = (req as SupplierRequest).supplierId;
-      const { id } = req.params;
-      const targetRows = Array.isArray(req.body?.rows) ? req.body.rows : undefined;
-      const result = await csvImportService.retryBatch(id, supplierId, targetRows);
-      if (!result.success) {
-        const status = result.error === 'BATCH_NOT_FOUND' ? 404
-          : result.error === 'SUPPLIER_NOT_ACTIVE' ? 403
-          : 400;
-        return res.status(status).json({ success: false, error: { code: result.error, message: result.error } });
-      }
-      res.json(result);
-    } catch (error) {
-      const errMsg = error instanceof Error ? error.message : String(error);
-      logger.error('[Neture API] Error retrying CSV batch:', error);
-      res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: errMsg } });
-    }
-  });
-
-  // DELETE /supplier/csv-import/batches/:id — WO-O4O-NETURE-IMPORT-HISTORY-DELETE-V1
-  router.delete('/csv-import/batches/:id', requireAuth, requireLinkedSupplier as RequestHandler, async (req: AuthenticatedRequest, res: Response) => {
-    try {
-      const supplierId = (req as SupplierRequest).supplierId;
-      const { id } = req.params;
-      const result = await csvImportService.deleteBatch(id, supplierId);
-      if (!result.success) {
-        const status = result.error === 'BATCH_NOT_FOUND' ? 404 : 400;
-        return res.status(status).json({ success: false, error: { code: result.error, message: result.error } });
-      }
-      res.json(result);
-    } catch (error) {
-      logger.error('[Neture API] Error deleting CSV batch:', error);
-      res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: 'Failed to delete CSV batch' } });
-    }
-  });
-
-  // GET /supplier/csv-import/batches/:id/delete-check — WO-O4O-NETURE-IMPORT-HISTORY-FULL-DELETE-V1
-  router.get('/csv-import/batches/:id/delete-check', requireAuth, requireLinkedSupplier as RequestHandler, async (req: AuthenticatedRequest, res: Response) => {
-    try {
-      const supplierId = (req as SupplierRequest).supplierId;
-      const { id } = req.params;
-      const result = await csvImportService.checkFullDelete(id, supplierId);
-      if (!result.success) {
-        const status = result.error === 'BATCH_NOT_FOUND' ? 404 : 400;
-        return res.status(status).json({ success: false, error: { code: result.error, message: result.error } });
-      }
-      res.json(result);
-    } catch (error) {
-      logger.error('[Neture API] Error checking full delete:', error);
-      res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: 'Failed to check full delete' } });
-    }
-  });
-
-  // DELETE /supplier/csv-import/batches/:id/full-delete — WO-O4O-NETURE-IMPORT-HISTORY-FULL-DELETE-V1
-  router.delete('/csv-import/batches/:id/full-delete', requireAuth, requireActiveSupplier as RequestHandler, async (req: AuthenticatedRequest, res: Response) => {
-    try {
-      const supplierId = (req as SupplierRequest).supplierId;
-      const userId = req.user!.id;
-      const { id } = req.params;
-      const result = await csvImportService.fullDeleteBatch(id, supplierId, userId);
-      if (!result.success) {
-        const status = result.error === 'BATCH_NOT_FOUND' ? 404 : result.error === 'FULL_DELETE_BLOCKED' ? 409 : 400;
-        return res.status(status).json({ success: false, error: { code: result.error, message: result.error } });
-      }
-      res.json(result);
-    } catch (error) {
-      logger.error('[Neture API] Error full deleting CSV batch:', error);
-      res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: 'Failed to full delete CSV batch' } });
     }
   });
 

@@ -61,7 +61,6 @@ export {
   type ProductPerformanceItem,
   type DistributionItem,
   type TrendingProductItem,
-  type SupplierAiInsight,
   type SpotPricePolicy,
   supplierKpaEventOfferApi,
   type SupplierEventOfferStats,

@@ -286,7 +286,15 @@ export class GoogleAuthService {
     return this.establishSession(user, input, true);
   }
 
-  private async createGoogleUser(
+  /**
+   * Google Identity 로 신규 users + linked_accounts 를 만든다 (password=null).
+   *
+   * WO-O4O-ADMIN-OPERATOR-GOOGLE-INVITATION-AND-ASSIGNMENT-CUTOVER-V1 §11:
+   *   운영자 초대 수락도 **같은 생성 경로**를 써야 한다(별도 Google 가입 구현 금지).
+   *   그래서 private 에서 공개로 바꾼다 — 동작·시그니처는 그대로다.
+   *   호출자는 반드시 자신의 트랜잭션 `manager` 를 넘긴다.
+   */
+  async createGoogleUser(
     manager: EntityManager,
     identity: VerifiedGoogleIdentity,
     consents: GoogleSignupConsents,

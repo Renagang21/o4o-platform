@@ -39,9 +39,7 @@ jest.mock('../../neture.service.js', () => ({
     createSupplierOfferFromExistingMaster: mockFromMaster,
   })),
 }));
-jest.mock('../../services/csv-import.service.js', () => ({ CsvImportService: jest.fn().mockImplementation(() => ({})) }));
 jest.mock('../../services/product-candidate.service.js', () => ({ ProductCandidateService: jest.fn().mockImplementation(() => ({})) }));
-jest.mock('../../services/xlsx-template.service.js', () => ({ generateProductTemplate: jest.fn() }));
 jest.mock('../../../../middleware/upload.middleware.js', () => ({
   uploadSingleMiddleware: () => (_req: express.Request, _res: express.Response, next: express.NextFunction) => next(),
 }));

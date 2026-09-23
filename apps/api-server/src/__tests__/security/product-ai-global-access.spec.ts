@@ -207,13 +207,23 @@ describe('resolveGlobalProductResourceAccess — 전역 ProductMaster 자원 접
   });
 
   describe('공급자 — 자기 offer 의 master 만', () => {
-    it('공급자 A 는 자기 offer master 에 대해 전 모드 허용', async () => {
-      for (const mode of ALL_MODES) {
+    // WO-O4O-SUPPLIER-POST-REGISTRATION-PRODUCT-MANAGEMENT-OFFER-FIRST-REALIGNMENT-V1 §F:
+    // 공급자 관계는 조회 전용으로 축소됐다 (write deny · read 불변).
+    it('공급자 A 는 자기 offer master 에 대해 조회 모드만 허용', async () => {
+      for (const mode of ['manage_read', 'render_read'] as ProductAccessMode[]) {
         const { result } = await resolve(USER_SUPPLIER_A, MASTER_A, mode);
         expect(result.allowed).toBe(true);
         expect(result.actorType).toBe('supplier');
         expect(result.supplierId).toBe('supplier-a');
       }
+    });
+
+    it('ACTIVE 공급자라도 자기 offer master 에 대한 write 는 거부 (§F 권한 축소)', async () => {
+      const { result } = await resolve(USER_SUPPLIER_A, MASTER_A, 'write');
+      expect(result.allowed).toBe(false);
+      expect(result.actorType).toBe('none');
+      expect(result.supplierId).toBe('supplier-a');
+      expect(result.denyReason).toBe('SUPPLIER_WRITE_FORBIDDEN');
     });
 
     it('공급자 A 는 공급자 B 의 master 에 대해 거부', async () => {

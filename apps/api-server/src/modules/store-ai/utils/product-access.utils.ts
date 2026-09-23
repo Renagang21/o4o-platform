@@ -15,7 +15,8 @@
  *
  * 판정 순서:
  *   1. platform:super_admin         → 전 모드 허용
- *   2. 공급자 + 자기 offer.master_id → 전 모드 허용 (write 는 ACTIVE 공급자만)
+ *   2. 공급자 + 자기 offer.master_id → 조회만 허용 ('manage_read' · 'render_read')
+ *                                      write 는 금지 (WO-…-OFFER-FIRST-REALIGNMENT-V1 §F)
  *   3. active OPL(organization_id + master_id) 보유 매장 → 'render_read' 만 허용
  *   4. 그 외                         → 거부
  *
@@ -93,6 +94,7 @@ export interface GlobalProductResourceAccess {
     | 'NO_USER'
     | 'INVALID_PRODUCT_ID'
     | 'WRITE_REQUIRES_ACTIVE_SUPPLIER'
+    | 'SUPPLIER_WRITE_FORBIDDEN'
     | 'NO_RELATION_TO_MASTER'
     | 'STORE_WRITE_FORBIDDEN';
 }
@@ -157,13 +159,19 @@ export async function resolveGlobalProductResourceAccess(
       [supplierId, productId],
     );
     if (ownRows.length > 0) {
-      if (mode === 'write' && supplierStatus !== 'ACTIVE') {
+      // WO-O4O-SUPPLIER-POST-REGISTRATION-PRODUCT-MANAGEMENT-OFFER-FIRST-REALIGNMENT-V1 §F:
+      // 공급자는 SupplierProductOffer 를 편집하고 ProductMaster 기준정보는 읽기만 한다.
+      // 전역 상품 AI 자원(product_ai_contents / product_ai_tags)에 대한 **쓰기**는
+      // 공급자 관계로 허용하지 않는다. 'render_read' / 'manage_read' 판정과
+      // multi-actor fall-through 는 불변 (권한 축소만, 확대 0).
+      if (mode === 'write') {
         return {
           ...base,
           allowed: false,
           actorType: 'none',
           supplierId,
-          denyReason: 'WRITE_REQUIRES_ACTIVE_SUPPLIER',
+          denyReason:
+            supplierStatus === 'ACTIVE' ? 'SUPPLIER_WRITE_FORBIDDEN' : 'WRITE_REQUIRES_ACTIVE_SUPPLIER',
         };
       }
       return {

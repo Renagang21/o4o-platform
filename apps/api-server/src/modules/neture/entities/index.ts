@@ -76,8 +76,6 @@ export { StoreProductProfile } from '../../store-core/entities/StoreProductProfi
 //   판매자 모집(Seller Recruitment) 은 Partner 가 아니므로 분리 유지한다.
 export { SellerRecruitment, RecruitmentStatus, ExposureStatus, SELLER_RECRUITMENT_TABLE } from './SellerRecruitment.entity.js';
 export { SellerRecruitmentApplication, ApplicationStatus, SELLER_RECRUITMENT_APPLICATION_TABLE } from './SellerRecruitmentApplication.entity.js';
-export { SupplierCsvImportBatch, CsvImportBatchStatus } from './SupplierCsvImportBatch.entity.js';
-export { SupplierCsvImportRow, CsvRowValidationStatus, CsvRowActionType } from './SupplierCsvImportRow.entity.js';
 export { NetureSupplierLibraryItem } from './NetureSupplierLibraryItem.entity.js';
 export { ProductImage } from './ProductImage.entity.js';
 export { NetureSettlement } from './neture-settlement.entity.js';

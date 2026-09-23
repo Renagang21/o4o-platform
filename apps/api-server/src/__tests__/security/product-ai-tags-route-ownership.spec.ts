@@ -8,7 +8,8 @@
  * 회귀 위험: endpoint 하나가 `authenticate` 만 남기고 판정 호출을 빠뜨리면
  * 인증된 아무 사용자나 임의 ProductMaster 의 tags 를 수정할 수 있게 된다.
  *
- *   공급자 A  — 자기 offer master        → 통과 (403 아님)
+ *   공급자 A  — 자기 offer master (write) → 403  (§F Offer-First: Master write 0)
+ *   공급자 A  — 자기 offer master (read)  → 통과
  *   공급자 A  — 공급자 B 의 master        → 403
  *   공급자 A  — offer 없는 master         → 403
  *   서비스 운영자(kpa/cosmetics/neture) → 403 (역할만으로 전역 write 없음)
@@ -133,10 +134,18 @@ describe('WO-O4O-PRODUCT-AI-TAGS-SUPPLIER-OWNERSHIP-GUARD-V1 — route 배선', 
   const post = (user: string, path: string, body: unknown) =>
     request(app).post(path).set('x-test-user', user).send(body as object);
 
-  describe('공급자 — 자기 제품만', () => {
-    it.each(WRITE_ENDPOINTS)('%s — 자기 offer master 는 통과', async (_label, path, body) => {
+  /**
+   * WO-O4O-SUPPLIER-POST-REGISTRATION-PRODUCT-MANAGEMENT-OFFER-FIRST-REALIGNMENT-V1 §F (2026-09-23):
+   *   공급자는 자기 offer master 라도 ai-tags write 를 할 수 없다.
+   *   ai-tags write 는 syncMasterTags 를 통해 product_masters.tags 를 바꾸므로 Master write 다 —
+   *   Offer-First 경계에서 공급자 표면은 Master 를 쓰지 않는다.
+   *   read(GET, manage_read) 는 그대로 유지된다.
+   */
+  describe('공급자 — Master write 0 (§F)', () => {
+    it.each(WRITE_ENDPOINTS)('%s — 자기 offer master 라도 403', async (_label, path, body) => {
       const res = await post('supplier-a-user', path(MASTER_A), body);
-      expect(res.status).not.toBe(403);
+      expect(res.status).toBe(403);
+      expect(res.body.code).toBe('PRODUCT_ACCESS_DENIED');
     });
 
     it.each(WRITE_ENDPOINTS)('%s — 타 공급자 master 는 403', async (_label, path, body) => {
@@ -150,16 +159,21 @@ describe('WO-O4O-PRODUCT-AI-TAGS-SUPPLIER-OWNERSHIP-GUARD-V1 — route 배선', 
       expect(res.status).toBe(403);
     });
 
-    it('DELETE — 타 공급자 master 는 403, 자기 master 는 통과', async () => {
+    it('DELETE — 자기 master 도 타 공급자 master 도 403', async () => {
       const other = await request(app).delete(DELETE_ENDPOINT(MASTER_B)).set('x-test-user', 'supplier-a-user');
       expect(other.status).toBe(403);
       const own = await request(app).delete(DELETE_ENDPOINT(MASTER_A)).set('x-test-user', 'supplier-a-user');
-      expect(own.status).not.toBe(403);
+      expect(own.status).toBe(403);
     });
 
     it('비ACTIVE 공급자는 자기 master 라도 write 403', async () => {
       const res = await post('supplier-pending-user', `/api/v1/products/${MASTER_A}/ai-tags/manual`, { tag: 'x' });
       expect(res.status).toBe(403);
+    });
+
+    it('회귀 — 공급자의 자기 master 태그 조회(manage_read)는 유지된다', async () => {
+      const res = await request(app).get(`/api/v1/products/${MASTER_A}/ai-tags`).set('x-test-user', 'supplier-a-user');
+      expect(res.status).not.toBe(403);
     });
   });
 

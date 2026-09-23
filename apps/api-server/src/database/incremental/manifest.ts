@@ -30,6 +30,8 @@ import type { MigrationInterface } from 'typeorm';
 import { CreateStoreOwnerTerminationCases1789701000000 } from '../migrations/1789701000000-CreateStoreOwnerTerminationCases.js';
 // WO-O4O-UNIFIED-STORE-WORKSPACE-FOUNDATION-V1 §8-1 (handoff_tokens: SERVICE / WORKSPACE('store') 두 형태 · CHECK)
 import { AlterHandoffTokensTargetWorkspace1789974015939 } from '../migrations/1789974015939-AlterHandoffTokensTargetWorkspace.js';
+// WO-O4O-ADMIN-OPERATOR-GOOGLE-INVITATION-AND-ASSIGNMENT-CUTOVER-V1 §8 (operator_invitations)
+import { CreateOperatorInvitations1790125106065 } from '../migrations/1790125106065-CreateOperatorInvitations.js';
 
 export const INCREMENTAL_MIGRATION_CUTOFF = {
   baselineVersion: '2026-09-18-id685',
@@ -46,6 +48,7 @@ export type MigrationClass = new () => MigrationInterface;
 export const INCREMENTAL_MIGRATIONS: readonly MigrationClass[] = [
   CreateStoreOwnerTerminationCases1789701000000,
   AlterHandoffTokensTargetWorkspace1789974015939,
+  CreateOperatorInvitations1790125106065,
 ];
 
 export function incrementalMigrationNames(): string[] {

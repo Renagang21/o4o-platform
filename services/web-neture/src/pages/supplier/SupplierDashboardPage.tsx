@@ -14,17 +14,22 @@
  *  5. 상품 · 콘텐츠 운영 현황
  *  6. 상품 축 — 유통 활동 현황 (판매자 모집 / 유통참여형 펀딩 / 이벤트 오퍼)
  *  7. 공급자 계정 상태 (승인 ≠ 프로필 완성)
- *  8. AI · 분석 (기존 Copilot 블록 — 접기 가능, 하단 배치)
+ *  8. 지표 분석 (Copilot 집계 블록 — 접기 가능, 하단 배치)
+ *
+ * WO-O4O-SUPPLIER-POST-REGISTRATION-PRODUCT-MANAGEMENT-OFFER-FIRST-REALIGNMENT-V1 §E (2026-09-23):
+ *   공급자 표면의 내부 LLM 진입점을 0 으로 만든다. LLM 이 생성하던
+ *   'AI 공급자 요약' · 'AI 상품 분석' · '추천 전략' 블록을 제거했다.
+ *   남은 블록(상품 성과 · 매장 확산 · 인기/성장 상품)은 전부 SQL 집계 지표다.
+ *   문안 생성은 외부 LLM('ChatGPT로 작업')이 담당한다.
  *
  * 원칙:
  *  - 기존 API 재사용만. 신규 backend / 복합 dashboard API 없음.
  *  - 정확히 계산 가능한 수치만 표시. 추정·하드코딩 금지.
  *  - Promise.allSettled — 일부 API 실패가 전체 대시보드를 무너뜨리지 않는다.
- *  - 기존 AI 기능(요약/성과/확산/분석/인기/성장/추천)은 삭제하지 않고 운영 현황 아래로 이동.
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { GuideBackLink } from '../../components/GuideBackLink';
 import SupplierActivationGate from '../../components/supplier/SupplierActivationGate';
 import {
@@ -48,7 +53,6 @@ import {
   type ProductPerformanceItem,
   type DistributionItem,
   type TrendingProductItem,
-  type SupplierAiInsight,
   type SupplierEventOfferStats,
   type SupplierOrderKpi,
   type SettlementKpi,
@@ -160,7 +164,7 @@ function countBy<T>(items: T[], key: (item: T) => string): Record<string, number
 
 export default function SupplierDashboardPage() {
   const { user } = useAuth();
-  const navigate = useNavigate();
+
 
   // 운영 현황
   const [kpi, setKpi] = useState<SupplierKpiSummary | null>(null);
@@ -175,8 +179,7 @@ export default function SupplierDashboardPage() {
   const [trials, setTrials] = useState<Trial[] | null>(null);
   const [eventOfferStats, setEventOfferStats] = useState<SupplierEventOfferStats | null>(null);
 
-  // AI · 분석 (기존 유지)
-  const [aiInsight, setAiInsight] = useState<SupplierAiInsight | null>(null);
+  // 지표 분석 (Copilot SQL 집계)
   const [performance, setPerformance] = useState<ProductPerformanceItem[]>([]);
   const [distribution, setDistribution] = useState<DistributionItem[]>([]);
   const [trending, setTrending] = useState<TrendingProductItem[]>([]);
@@ -265,8 +268,7 @@ export default function SupplierDashboardPage() {
 
     setOpsFailed({ orders: ordersFailed, inventory: inventoryFailed, settlements: settlementsFailed });
 
-    // AI · 분석 — fire-and-forget (기존 동작 유지)
-    supplierCopilotApi.getAiInsight().then(setAiInsight).catch(() => {});
+    // 지표 분석 — fire-and-forget (SQL 집계 · 내부 LLM 호출 없음)
     supplierCopilotApi.getProductPerformance().then(setPerformance).catch(() => {});
     supplierCopilotApi.getDistribution().then(setDistribution).catch(() => {});
     supplierCopilotApi.getTrendingProducts().then(setTrending).catch(() => {});
@@ -382,10 +384,6 @@ export default function SupplierDashboardPage() {
 
   const topByRevenue = performance.slice(0, 5);
   const topByOrders = [...performance].sort((a, b) => b.orders - a.orders).slice(0, 5);
-  const aiActions = aiInsight?.insight?.recommendedActions || [];
-  const riskColor = aiInsight?.insight?.riskLevel === 'high' ? 'text-red-600 bg-red-50'
-    : aiInsight?.insight?.riskLevel === 'medium' ? 'text-amber-600 bg-amber-50'
-    : 'text-emerald-600 bg-emerald-50';
 
   const supplierLabel = profile?.name || user?.name || null;
 
@@ -727,7 +725,7 @@ export default function SupplierDashboardPage() {
         </p>
       </section>
 
-      {/* ── 7. AI · 분석 (기존 Copilot 블록 — 접기 가능) ── */}
+      {/* ── 7. 지표 분석 (Copilot 집계 블록 — 접기 가능) ── */}
       <section className="bg-white rounded-xl border border-slate-200">
         <button
           type="button"
@@ -736,9 +734,9 @@ export default function SupplierDashboardPage() {
           className="w-full flex items-center justify-between gap-3 p-6 text-left"
         >
           <div className="min-w-0">
-            <h2 className="text-base font-semibold text-slate-800">AI · 분석</h2>
+            <h2 className="text-base font-semibold text-slate-800">지표 분석</h2>
             <p className="text-xs text-slate-500 mt-0.5">
-              AI 공급자 요약, 상품 성과, 매장 확산, 인기·성장 상품, 추천 전략
+              상품 성과, 매장 확산, 인기·성장 상품
             </p>
           </div>
           {aiOpen ? <ChevronUp size={18} className="text-slate-400 shrink-0" /> : <ChevronDown size={18} className="text-slate-400 shrink-0" />}
@@ -746,28 +744,6 @@ export default function SupplierDashboardPage() {
 
         {aiOpen && (
           <div className="px-6 pb-6 space-y-6">
-            {/* AI 공급자 요약 */}
-            <div className="bg-indigo-50 rounded-xl border border-indigo-200 p-6">
-              <div className="flex items-center gap-2 mb-3">
-                <h3 className="text-base font-semibold text-indigo-900">AI 공급자 요약</h3>
-                {aiInsight?.insight?.riskLevel && (
-                  <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${riskColor}`}>
-                    {aiInsight.insight.riskLevel === 'high' ? '주의' : aiInsight.insight.riskLevel === 'medium' ? '보통' : '양호'}
-                  </span>
-                )}
-              </div>
-              {aiInsight ? (
-                <>
-                  <p className="text-sm text-indigo-800 leading-relaxed">{aiInsight.insight.summary}</p>
-                  <p className="text-xs text-indigo-400 mt-3">
-                    {aiInsight.meta.provider}/{aiInsight.meta.model} &middot; {aiInsight.meta.durationMs}ms
-                  </p>
-                </>
-              ) : (
-                <p className="text-sm text-indigo-400">AI 분석을 불러오는 중...</p>
-              )}
-            </div>
-
             {/* 상품 성과 + 매장 확산 */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <div className="bg-white rounded-xl border border-slate-200 p-6">
@@ -813,21 +789,6 @@ export default function SupplierDashboardPage() {
                 )}
               </div>
             </div>
-
-            {/* AI 상품 분석 */}
-            {aiActions.length > 0 && (
-              <div className="bg-indigo-50 rounded-xl border border-indigo-200 p-6">
-                <h3 className="text-base font-semibold text-indigo-900 mb-4">AI 상품 분석</h3>
-                <div className="space-y-2">
-                  {aiActions.slice(0, 3).map((action, idx) => (
-                    <div key={idx} className="flex items-start gap-3 p-3 bg-white/60 rounded-lg">
-                      <span className="text-indigo-400 text-xs font-bold mt-0.5">{idx + 1}</span>
-                      <p className="text-sm text-indigo-800">{action}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
 
             {/* 인기 상품 + 성장 상품 */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -881,26 +842,6 @@ export default function SupplierDashboardPage() {
               </div>
             </div>
 
-            {/* 추천 전략 */}
-            <div className="bg-violet-50 rounded-xl border border-violet-200 p-6">
-              <h3 className="text-base font-semibold text-violet-900 mb-4">추천 전략</h3>
-              {aiActions.length > 0 ? (
-                <div className="space-y-2">
-                  {aiActions.map((action, idx) => (
-                    <div
-                      key={idx}
-                      className="flex items-start gap-3 p-3 bg-white/60 rounded-lg cursor-pointer hover:bg-white/80 transition-colors"
-                      onClick={() => inferActionPath(action, navigate)}
-                    >
-                      <span className="text-violet-400 text-xs font-bold mt-0.5">{idx + 1}</span>
-                      <p className="text-sm text-violet-800">{action}</p>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-sm text-violet-400">AI 추천을 불러오는 중...</p>
-              )}
-            </div>
           </div>
         )}
       </section>
@@ -1002,24 +943,3 @@ const CONTENT_LINKS = [
   { label: '디지털 사이니지', path: '/supplier/signage' },
   { label: '검수·게시 현황', path: '/supplier/store-materials-status' },
 ];
-
-function inferActionPath(action: string, navigate: (path: string) => void) {
-  const lower = action.toLowerCase();
-  if (lower.includes('상품') || lower.includes('제품') || lower.includes('product')) {
-    navigate('/supplier/products');
-  } else if (lower.includes('주문') || lower.includes('order')) {
-    navigate('/supplier/orders');
-  } else if (lower.includes('재고') || lower.includes('inventory')) {
-    navigate('/supplier/inventory');
-  } else if (lower.includes('정산') || lower.includes('settlement')) {
-    navigate('/supplier/settlements');
-  } else if (lower.includes('라이브러리') || lower.includes('콘텐츠') || lower.includes('content')) {
-    navigate('/supplier/b2b-content');
-  } else if (lower.includes('판매자') || lower.includes('seller') || lower.includes('신청')) {
-    navigate('/supplier/recruitments');
-  } else if (lower.includes('trial') || lower.includes('시범') || lower.includes('트라이얼') || lower.includes('펀딩')) {
-    navigate('/supplier/market-trial');
-  } else if (lower.includes('프로필') || lower.includes('profile') || lower.includes('사업자')) {
-    navigate('/mypage/business-profile');
-  }
-}

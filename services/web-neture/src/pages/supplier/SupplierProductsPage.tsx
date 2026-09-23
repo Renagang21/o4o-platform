@@ -16,7 +16,7 @@ import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import { GuideBackLink } from '../../components/GuideBackLink';
 import type { SupplierSpaceOutletContext } from '../../components/layouts/SupplierSpaceLayout';
-import { Search, Plus, Sparkles, ImagePlus, X, Eye, Send, FileText, Info, Tag } from 'lucide-react';
+import { Search, Plus, ImagePlus, X, Eye, Send, FileText, Info, Tag } from 'lucide-react';
 import { ContentRenderer } from '@o4o/content-editor';
 import {
   EditableDataTable,
@@ -674,7 +674,6 @@ export default function SupplierProductsPage() {
   // 조회 실패(loadError) 와 정상 0건을 구분한다 — 실패 시 빈 상태 문구를 표시하지 않는다.
   const [loadError, setLoadError] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [generatingTagFor, setGeneratingTagFor] = useState<string | null>(null);
 
   // Bulk edit state
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -1108,14 +1107,6 @@ export default function SupplierProductsPage() {
     return '등록된 제품이 없습니다';
   }, [hasAnyFilter, resetAllFilters]);
 
-  const handleGenerateAiTags = async (masterId: string) => {
-    setGeneratingTagFor(masterId);
-    await productApi.regenerateAiTags(masterId);
-    setTimeout(() => {
-      fetchProducts(pagination.page);
-      setGeneratingTagFor(null);
-    }, 2000);
-  };
 
   // WO-O4O-NETURE-SUPPLIER-PRODUCTS-LOAD-ERROR-CONTRACT-V1:
   // getProductsPaginated 는 조회 실패 시 throw 한다. 실패를 빈 목록으로 렌더하지 않고 loadError 로 분리한다.
@@ -1563,23 +1554,8 @@ export default function SupplierProductsPage() {
           ...enhancedColumns,
           // WO-NETURE-PRODUCT-LIST-COLUMN-LABEL-AND-DESCRIPTION-REFINE-V1:
           // _preview 컬럼 제거 → 상세설명 컬럼(detailDescCol)에 통합
-          {
-            key: 'masterId' as any,
-            header: 'AI',
-            width: '50px',
-            align: 'center',
-            render: (_v: string, row: SupplierProduct) => (
-              <button
-                type="button"
-                onClick={(e) => { e.stopPropagation(); handleGenerateAiTags(row.masterId); }}
-                disabled={generatingTagFor === row.masterId}
-                className="p-1 rounded hover:bg-blue-50 text-blue-600 disabled:opacity-50 disabled:animate-pulse"
-                title="태그 재생성"
-              >
-                <Sparkles size={14} />
-              </button>
-            ),
-          } as any,
+          // WO-O4O-SUPPLIER-POST-REGISTRATION-PRODUCT-MANAGEMENT-OFFER-FIRST-REALIGNMENT-V1 §E-1 (2026-09-23):
+          //   AI 태그 재생성 컬럼 제거 — 공급자 표면에서 내부 LLM 을 호출하지 않는다.
         ]}
         data={filteredProducts}
         rowKey="id"

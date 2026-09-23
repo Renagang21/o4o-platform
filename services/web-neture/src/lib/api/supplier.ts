@@ -295,21 +295,11 @@ export interface TrendingProductItem {
   growthRate: number;
 }
 
-export interface SupplierAiInsight {
-  insight: {
-    summary: string;
-    riskLevel: string;
-    recommendedActions: string[];
-    confidenceScore: number;
-  };
-  meta: {
-    provider: string;
-    model: string;
-    durationMs: number;
-  };
-}
-
 // ==================== Supplier Copilot API ====================
+//
+// WO-O4O-SUPPLIER-POST-REGISTRATION-PRODUCT-MANAGEMENT-OFFER-FIRST-REALIGNMENT-V1 §E:
+// Copilot 은 SQL 집계 기반 지표만 제공한다. 공급자 표면에서 내부 LLM 을 호출하는
+// 진입점(AI insight · AI tag)은 없다. 문안 생성은 외부 LLM('ChatGPT로 작업')이 담당한다.
 
 export const supplierCopilotApi = {
   async getKpi(): Promise<SupplierKpiSummary> {
@@ -352,18 +342,6 @@ export const supplierCopilotApi = {
       return result.data || [];
     } catch (error) {
       console.warn('[Supplier Copilot] Trending fetch failed:', error);
-      throw error;
-    }
-  },
-
-  async getAiInsight(): Promise<SupplierAiInsight | null> {
-    try {
-      const response = await api.get('/neture/supplier/dashboard/ai-insight');
-      const result = response.data;
-      return result.data || null;
-    } catch (error) {
-      console.warn('[Supplier Copilot] AI insight fetch failed:', error);
-      if ((error as any)?.response?.status === 404) return null;
       throw error;
     }
   },
@@ -1123,18 +1101,6 @@ export const supplierApi = {
     return result.data as InventoryItem[];
   },
 
-  /** null = 미존재(404). 조회 실패는 throw. */
-  async getInventoryItem(offerId: string): Promise<InventoryItem | null> {
-    let response;
-    try {
-      response = await api.get(`/neture/supplier/inventory/${offerId}`);
-    } catch (error) {
-      if (isNotFound(error)) return null;
-      console.warn('[Supplier API] Failed to fetch inventory item:', extractApiError(error));
-      throw new Error(SUPPLIER_INVENTORY_LOAD_FAILED);
-    }
-    return (response.data?.data as InventoryItem) ?? null;
-  },
 
   async updateInventory(
     offerId: string,
@@ -1310,18 +1276,6 @@ export const supplierApi = {
     return result.data as SpotPricePolicy[];
   },
 
-  /** 스팟 정책 수정 (DRAFT만) */
-  async updateSpotPolicy(
-    id: string,
-    data: { policyName?: string; spotPrice?: number; startAt?: string; endAt?: string },
-  ): Promise<{ success: boolean; data?: SpotPricePolicy; error?: string }> {
-    try {
-      const response = await api.patch(`/neture/supplier/spot-policies/${id}`, data);
-      return response.data;
-    } catch (error) {
-      return { success: false, error: extractApiError(error) };
-    }
-  },
 
   /** 스팟 정책 상태 변경 */
   async changeSpotPolicyStatus(
@@ -1366,22 +1320,6 @@ export const supplierProfileApi = {
     return data as SupplierProfile;
   },
 
-  /** WO-O4O-NETURE-SUPPLIER-REMAINING-LOAD-ERROR-CONTRACT-V1: 조회 실패는 고정 코드로 throw. */
-  async getCompleteness(): Promise<ProfileCompleteness> {
-    let response;
-    try {
-      response = await api.get('/neture/supplier/profile/completeness');
-    } catch (error) {
-      console.warn('[Supplier Profile API] Failed to fetch completeness:', extractApiError(error));
-      throw new Error(SUPPLIER_PROFILE_COMPLETENESS_LOAD_FAILED);
-    }
-    const data = response.data?.data;
-    if (data === null || data === undefined || typeof data !== 'object' || Array.isArray(data)) {
-      console.warn('[Supplier Profile API] Unexpected completeness payload shape');
-      throw new Error(SUPPLIER_PROFILE_COMPLETENESS_LOAD_FAILED);
-    }
-    return data as ProfileCompleteness;
-  },
 
   async updateProfile(data: {
     contactEmail?: string;
@@ -1642,45 +1580,8 @@ export const supplierRegulatedCategoryApi = {
     }
   },
 
-  async updateRegistrationNumber(
-    category: RegulatedCategory,
-    registrationNumber: string,
-  ): Promise<{ success: boolean; error?: string; data?: SupplierRegulatedCategory }> {
-    try {
-      const response = await api.patch(`/neture/supplier/regulated-categories/${category}`, { registrationNumber });
-      return response.data;
-    } catch (error) {
-      return { success: false, error: extractApiError(error) };
-    }
-  },
 
-  // WO-O4O-NETURE-SUPPLIER-REGULATED-CATEGORY-NUMBER-FIRST-V1: 번호만으로도 검토 요청(파일 선택)
-  async submitForReview(
-    category: RegulatedCategory,
-  ): Promise<{ success: boolean; error?: string; data?: SupplierRegulatedCategory }> {
-    try {
-      const response = await api.post(`/neture/supplier/regulated-categories/${category}/submit`);
-      return response.data;
-    } catch (error) {
-      return { success: false, error: extractApiError(error) };
-    }
-  },
 
-  async uploadEvidence(
-    category: RegulatedCategory,
-    file: File,
-  ): Promise<{ success: boolean; error?: string; data?: SupplierRegulatedCategory }> {
-    try {
-      const form = new FormData();
-      form.append('file', file);
-      const response = await api.post(`/neture/supplier/regulated-categories/${category}/document`, form, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
-      return response.data;
-    } catch (error) {
-      return { success: false, error: extractApiError(error) };
-    }
-  },
 
   async downloadEvidence(category: RegulatedCategory): Promise<Blob | null> {
     try {
