@@ -46,7 +46,7 @@ export interface GoogleSignupConsents {
 
 /** 이 패키지가 요구하는 authClient 의 최소 표면(@o4o/auth-client 인스턴스가 충족). */
 export interface AuthClientLike {
-  login(input: { email: string; password: string; serviceKey?: string }): Promise<unknown>;
+  // WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: login(email+password) 는 표면에서 은퇴했다.
   /** WO-O4O-GOOGLE-ONLY-SIGNUP-LOGIN-V1: Google ID token → 세션(미등록이면 404 GOOGLE_SIGNUP_REQUIRED 로 reject). */
   loginWithGoogle(idToken: string, options?: { serviceKey?: string }): Promise<unknown>;
   signupWithGoogle(idToken: string, consents: GoogleSignupConsents): Promise<unknown>;
@@ -133,8 +133,6 @@ export interface ServiceAuthCore<TUser> {
    * 4 서비스 본문이 동일한 통합약관이므로 한 번의 동의 행위로 전부 제출한다(사용자가 전문을 읽고 체크한 뒤).
    */
   acceptPendingPolicies: () => Promise<PolicyAcceptanceResult>;
-  /** email/password 로그인 — legacy · 임시 테스트/전환용. 기본 경로는 `loginWithGoogle`. */
-  login: (email: string, password: string) => Promise<AuthLoginResult<TUser>>;
   /**
    * WO-O4O-GOOGLE-ONLY-SIGNUP-LOGIN-V1: Google ID token 로그인.
    * 실패 result 의 `code === 'GOOGLE_SIGNUP_REQUIRED'` 면 동의 화면 → `signupWithGoogle`.

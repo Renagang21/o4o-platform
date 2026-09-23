@@ -1,7 +1,8 @@
 /**
  * LoginPage - K-Cosmetics
- * WO-O4O-KCOS-AUTH-DESIGN-POLISH-V1: inline style → Tailwind, hex → theme, Card/Button 적용
- * WO-O4O-GOOGLE-ONLY-SIGNUP-LOGIN-V1: Google 로 계속하기 = 기본 진입 · email/password = 임시 테스트/전환용
+ * WO-O4O-KCOS-AUTH-DESIGN-POLISH-V1: inline style → Tailwind, hex → theme, Card 적용
+ * WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1:
+ *   로그인 수단은 "Google 로 계속하기" 하나다. 이메일/비밀번호 · 비밀번호 찾기 · 별도 회원가입 화면은 은퇴했다.
  */
 
 import { useState } from 'react';
@@ -9,49 +10,16 @@ import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { Sparkles } from 'lucide-react';
 import { GoogleContinue } from '@o4o/auth-react';
 import { useAuth, type User } from '@/contexts/AuthContext';
-import { Card, Button } from '@o4o/ui';
+import { Card } from '@o4o/ui';
 
 export default function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { login, loginWithGoogle, signupWithGoogle, getGoogleAuthConfig } = useAuth();
+  const { loginWithGoogle, signupWithGoogle, getGoogleAuthConfig } = useAuth();
   const returnUrl = (location.state as any)?.from;
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  // WO-O4O-LOGIN-SERVICE-NOT-MEMBER-UX-V1: 서비스 미가입 차단을 비밀번호 오류와 분리 표시
+  // WO-O4O-LOGIN-SERVICE-NOT-MEMBER-UX-V1: 서비스 미가입 차단은 일반 오류와 분리 표시
   const [isNotMember, setIsNotMember] = useState(false);
-  const [loading, setLoading] = useState(false);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    setIsNotMember(false);
-    setLoading(true);
-
-    try {
-      const result = await login(email, password);
-      if (!result.success) {
-        // WO-O4O-LOGIN-SERVICE-NOT-MEMBER-UX-V1:
-        //   SERVICE_NOT_MEMBER 는 별도 안내(가입 링크 포함)로 노출한다.
-        if (result.code === 'SERVICE_NOT_MEMBER') {
-          setIsNotMember(true);
-          setError('이 계정은 K-Cosmetics 서비스 이용 권한이 없습니다. 서비스 가입 또는 이용 신청 후 로그인할 수 있습니다.');
-        } else {
-          setError(result.error || '로그인에 실패했습니다.');
-        }
-        return;
-      }
-      // returnUrl만 LoginPage에서 처리.
-      // WO-O4O-POSTLOGINREDIRECT-CANONICALIZATION-V1: 일반 역할 redirect는 App.tsx PostLoginRedirect 담당.
-      if (returnUrl) navigate(returnUrl);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : '로그인에 실패했습니다.');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   return (
     <div className="min-h-[80vh] flex items-center justify-center py-12 px-6">
@@ -62,7 +30,18 @@ export default function LoginPage() {
         <h1 className="text-2xl font-bold text-slate-800 mb-2 mt-0">로그인</h1>
         <p className="text-sm text-slate-500 mb-8 mt-0">K-Cosmetics에 오신 것을 환영합니다</p>
 
-        {/* WO-O4O-GOOGLE-ONLY-SIGNUP-LOGIN-V1: Google 로 계속하기(기본) — 미등록이면 약관 동의 → 계정 생성 */}
+        {error && !isNotMember && (
+          <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm text-center mb-4">
+            {error}
+          </div>
+        )}
+        {isNotMember && error && (
+          <div className="bg-amber-50 border border-amber-200 p-4 rounded-lg mb-4 text-left">
+            <p className="text-sm text-amber-800">{error}</p>
+          </div>
+        )}
+
+        {/* WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: 로그인 진입은 이 버튼 하나다(미등록이면 약관 동의 → 가입). */}
         <div className="mb-6 text-left">
           <GoogleContinue<User>
             getConfig={getGoogleAuthConfig}
@@ -70,99 +49,21 @@ export default function LoginPage() {
             signupWithGoogle={signupWithGoogle}
             onSuccess={() => { setError(null); setIsNotMember(false); if (returnUrl) navigate(returnUrl); }}
             onStart={() => { setError(null); setIsNotMember(false); }}
-            onError={(e) => { setIsNotMember(false); setError(e.message); }}
+            onError={({ message, code }) => {
+              const notMember = code === 'SERVICE_NOT_MEMBER';
+              setIsNotMember(notMember);
+              setError(
+                notMember
+                  ? '이 계정은 K-Cosmetics 서비스 이용 권한이 없습니다. 이용 신청 후 승인되면 로그인할 수 있습니다.'
+                  : message,
+              );
+            }}
             termsHref="/terms"
             privacyHref="/privacy"
           />
         </div>
-        <div className="flex items-center gap-3 mb-4">
-          <span className="flex-1 h-px bg-slate-200" />
-          <span className="text-xs text-slate-400">임시 테스트 · 전환용 이메일 로그인</span>
-          <span className="flex-1 h-px bg-slate-200" />
-        </div>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4 text-left">
-          {error && !isNotMember && (
-            <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm text-center">
-              {error}
-            </div>
-          )}
-          {/* WO-O4O-LOGIN-SERVICE-NOT-MEMBER-UX-V1: 서비스 미가입 안내 + 가입 링크 */}
-          {isNotMember && error && (
-            <div className="bg-amber-50 border border-amber-200 p-4 rounded-lg space-y-3 text-left">
-              <p className="text-sm text-amber-800">{error}</p>
-              <Link
-                to="/register"
-                className="block w-full py-2 bg-primary text-white text-sm font-medium rounded-lg text-center no-underline hover:opacity-90 transition-opacity"
-              >
-                K-Cosmetics 가입 신청하기
-              </Link>
-            </div>
-          )}
-
-          <div className="flex flex-col gap-1">
-            <label className="text-sm font-medium text-slate-700">이메일</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="이메일을 입력하세요"
-              className="w-full px-4 py-3 border border-slate-200 rounded-lg text-base outline-none transition-colors focus:border-primary"
-              required
-            />
-          </div>
-
-          <div className="flex flex-col gap-1">
-            <label className="text-sm font-medium text-slate-700">비밀번호</label>
-            <div className="relative">
-              <input
-                type={showPassword ? 'text' : 'password'}
-                autoComplete="current-password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="비밀번호를 입력하세요"
-                className="w-full px-4 py-3 pr-12 border border-slate-200 rounded-lg text-base outline-none transition-colors focus:border-primary"
-                required
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 bg-transparent border-none p-1 cursor-pointer text-slate-400 flex items-center justify-center"
-              >
-                {showPassword ? (
-                  <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
-                  </svg>
-                ) : (
-                  <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                  </svg>
-                )}
-              </button>
-            </div>
-          </div>
-
-          {/* Remember Me & Forgot Password */}
-          <div className="flex justify-between items-center">
-            <label className="flex items-center gap-2 text-sm text-slate-500 cursor-pointer">
-              <input type="checkbox" className="w-4 h-4 accent-primary" />
-              <span>로그인 상태 유지</span>
-            </label>
-            <Link to="/forgot-password" className="text-sm text-primary no-underline hover:underline">
-              비밀번호 찾기
-            </Link>
-          </div>
-
-          <Button
-            type="submit"
-            variant="primary"
-            className="w-full h-12 text-base mt-2"
-            disabled={loading}
-          >
-            {loading ? '로그인 중...' : '이메일로 로그인 (임시)'}
-          </Button>
-        </form>
+        <p className="text-sm text-slate-500 mb-0">처음이신가요? 같은 버튼으로 약관 동의 후 계정이 만들어집니다.</p>
 
         <div className="mt-6 pt-6 border-t border-slate-200 text-center">
           <Link to="/" className="text-sm font-medium text-primary no-underline hover:underline">홈으로 돌아가기</Link>

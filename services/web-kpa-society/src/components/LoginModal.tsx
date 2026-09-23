@@ -2,76 +2,31 @@
  * LoginModal - KPA Society 로그인 모달
  *
  * WO-O4O-AUTH-MODAL-LOGIN-AND-ACCOUNT-STANDARD-V1
- * WO-O4O-AUTH-MODAL-REGISTER-STANDARD-V1
  * WO-O4O-LOGIN-STANDARDIZATION-V1: 전체 서비스 로그인 표준화
- * WO-O4O-GOOGLE-ONLY-SIGNUP-LOGIN-V1: Google 로 계속하기 = 기본 진입 · email/password = 임시 테스트/전환용
+ * WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1:
+ *   로그인 수단은 "Google 로 계속하기" 하나다. 이메일/비밀번호 입력 · 이메일 저장 ·
+ *   비밀번호 찾기 · 별도 회원가입 모달은 은퇴했다(미등록 Google 계정은 같은 버튼에서 약관 동의 → 가입).
  *
  * 원칙:
  * - 로그인은 항상 모달로만 수행
- * - 로그인 성공 후 현재 화면 유지 (navigate 없음)
- * - 회원가입 클릭 시 RegisterModal로 전환 (페이지 이동 없음)
- *
- * 표준 기능:
- * - 이메일/비밀번호 입력
- * - 비밀번호 보기/숨기기 토글
- * - 이메일 저장 (Remember Me)
- * - 비밀번호 찾기 링크
- * - 회원가입 링크
+ * - 로그인 성공 후 역할 기반 진입 화면 또는 콜백(현재 화면 유지)
  */
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { X, Eye, EyeOff } from 'lucide-react';
+import { X } from 'lucide-react';
 import { GoogleContinue } from '@o4o/auth-react';
 import { useAuth, type User } from '../contexts/AuthContext';
 import { useAuthModal } from '../contexts/AuthModalContext';
 import { getKpaPostLoginRoute } from '../config/dashboard';
 
-const REMEMBER_EMAIL_KEY = 'kpasociety_remember_email';
-
-/**
- * WO-O4O-FRONTEND-AUTH-CONTEXT-AND-ROUTE-GUARD-COMMONIZATION-V1
- * 기존 catch 블록의 code 별 한글 안내를 **문구 변경 없이** 옮긴 것.
- * login() 이 result object 를 반환하도록 바뀌었을 뿐, 사용자에게 보이는 메시지와
- * 부가 상태(가입 승인 대기 / 미가입 안내)는 이전과 동일하다.
- */
-function resolveLoginErrorMessage(
-  result: { error?: string; code?: string; status?: number },
-  flags: { setIsNotMember: (v: boolean) => void },
-): string {
-  const { code, status } = result;
-  if (code === 'INVALID_USER') return '등록되지 않은 이메일입니다.';
-  if (code === 'INVALID_CREDENTIALS') return '비밀번호가 올바르지 않습니다.';
-  // WO-O4O-AUTH-ACCOUNT-STATUS-UX-AND-PH-MOBILE-LOGOUT-CLOSURE-V1:
-  //   `pending` 은 제한 로그인으로 성공하므로 이 코드는 더 이상 "승인 대기" 가 아니다.
-  //   rejected / suspended / inactive 구분 문구는 공통 계층(resolveAuthError)이 만든다 →
-  //   여기서 문자열을 다시 분기하지 않고 Core 메시지를 그대로 쓴다.
-  if (code === 'ACCOUNT_NOT_ACTIVE') {
-    return result.error || '현재 로그인할 수 없는 계정 상태입니다. 운영자에게 문의해 주세요.';
-  }
-  if (code === 'ACCOUNT_LOCKED') return '로그인 시도가 너무 많아 계정이 일시적으로 잠겼습니다.';
-  if (code === 'SERVICE_NOT_MEMBER') {
-    // WO-O4O-LOGIN-SERVICE-NOT-MEMBER-UX-V1
-    flags.setIsNotMember(true);
-    return '이 계정은 KPA-Society 서비스에 가입되어 있지 않습니다. 회원가입 또는 서비스 이용 절차를 진행해 주세요.';
-  }
-  if (status === 429) return '로그인 시도가 너무 많습니다. 잠시 후 다시 시도해주세요.';
-  // Core 가 resolveAuthError 로 만든 한국어 메시지를 우선 사용(네트워크 오류 문구 포함).
-  return result.error || '로그인에 실패했습니다.';
-}
-
 export default function LoginModal() {
   const navigate = useNavigate();
-  const { login, loginWithGoogle, signupWithGoogle, getGoogleAuthConfig } = useAuth();
-  const { activeModal, closeModal, openRegisterModal, onLoginSuccess } = useAuthModal();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [rememberEmail, setRememberEmail] = useState(false);
+  const { loginWithGoogle, signupWithGoogle, getGoogleAuthConfig } = useAuth();
+  const { activeModal, closeModal, onLoginSuccess } = useAuthModal();
   const [error, setError] = useState<string | null>(null);
-  // WO-O4O-LOGIN-SERVICE-NOT-MEMBER-UX-V1: 서비스 미가입 차단을 비밀번호 오류와 분리 표시
+  // WO-O4O-LOGIN-SERVICE-NOT-MEMBER-UX-V1: 서비스 미가입 차단은 일반 오류와 분리 표시
   const [isNotMember, setIsNotMember] = useState(false);
-  const [loading, setLoading] = useState(false);
 
   const isOpen = activeModal === 'login';
 
@@ -90,103 +45,31 @@ export default function LoginModal() {
     };
   }, [isOpen, closeModal]);
 
-  // 저장된 이메일 불러오기
-  useEffect(() => {
-    const savedEmail = localStorage.getItem(REMEMBER_EMAIL_KEY);
-    if (savedEmail) {
-      setEmail(savedEmail);
-      setRememberEmail(true);
-    }
-  }, []);
-
-  // 모달 열릴 때 입력 초기화 (저장된 이메일 유지)
   useEffect(() => {
     if (isOpen) {
-      const savedEmail = localStorage.getItem(REMEMBER_EMAIL_KEY);
-      if (!savedEmail) {
-        setEmail('');
-      }
-      setPassword('');
       setError(null);
+      setIsNotMember(false);
     }
   }, [isOpen]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    setIsNotMember(false);
-    setLoading(true);
-
-    try {
-      // WO-O4O-ROLE-BASED-POST-LOGIN-REDIRECT-V1: 반환값 캡처 (역할 기반 redirect용)
-      // WO-O4O-FRONTEND-AUTH-CONTEXT-AND-ROUTE-GUARD-COMMONIZATION-V1:
-      //   login() 이 throw 대신 result object 를 반환한다. 아래 안내 문구·부가 상태는 전부 보존.
-      const result = await login(email, password);
-
-      if (!result.success) {
-        setError(resolveLoginErrorMessage(result, { setIsNotMember }));
-        return;
-      }
-      const loggedInUser = result.user!;
-
-      // 이메일 저장 처리
-      if (rememberEmail) {
-        localStorage.setItem(REMEMBER_EMAIL_KEY, email);
-      } else {
-        localStorage.removeItem(REMEMBER_EMAIL_KEY);
-      }
-
-      finishLogin(loggedInUser);
-    } catch (err: unknown) {
-      // login() 은 더 이상 throw 하지 않는다 — 여기 도달하면 로그인 이후 처리(리다이렉트 등) 오류다.
-      console.error('[Login] Post-login error:', err);
-      setError('로그인 처리 중 오류가 발생했습니다. 다시 시도해주세요.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  /** 로그인 성공 공통 후처리(password · Google 동일): 모달 닫기 → 콜백 또는 역할 기반 진입 화면. */
+  /** 로그인 성공 후처리: 모달 닫기 → 콜백 또는 역할 기반 진입 화면. */
   const finishLogin = (loggedInUser: User) => {
     try {
-      // 로그인 성공: 모달 닫기
       closeModal();
-
-      // 선택적 콜백 실행 (예: 글 작성 재시도, returnTo 이동)
       if (onLoginSuccess) {
         onLoginSuccess();
-      } else {
-        // WO-O4O-KPA-POSTLOGIN-STOREOWNER-DASHBOARD-ALIGNMENT-V1: 역할 기반 기본 진입 화면
-        // (O4O 공통 철학 정렬 — 약국 경영자는 K-Cosmetics 와 동일하게 /store 시작)
-        // - kpa:store_owner → /store (내 약국)
-        // - super_admin/admin → /admin, operator → /operator
-        // - 일반 회원/약사/약대생 → 현재 화면 유지 (커뮤니티)
-        // 매핑 SSOT: config/dashboard.ts (getKpaPostLoginRoute / KPA_DASHBOARD_MAP).
-        // Note: 역할이 login API 응답에 없는 경우 fetchKpaContext() 완료 후
-        //       App.tsx의 PostLoginRedirect가 fallback으로 처리
-        const redirectTo = getKpaPostLoginRoute(loggedInUser);
-        if (redirectTo) {
-          navigate(redirectTo);
-        }
+        return;
+      }
+      // WO-O4O-KPA-POSTLOGIN-STOREOWNER-DASHBOARD-ALIGNMENT-V1: 역할 기반 기본 진입 화면
+      // 매핑 SSOT: config/dashboard.ts (getKpaPostLoginRoute / KPA_DASHBOARD_MAP).
+      const redirectTo = getKpaPostLoginRoute(loggedInUser);
+      if (redirectTo) {
+        navigate(redirectTo);
       }
     } catch (err: unknown) {
       console.error('[Login] Post-login error:', err);
       setError('로그인 처리 중 오류가 발생했습니다. 다시 시도해주세요.');
     }
-  };
-
-  const handleForgotPassword = (e: React.MouseEvent) => {
-    e.preventDefault();
-    // TODO: ForgotPasswordModal로 전환
-    // 현재는 페이지 이동 유지 (추후 모달로 전환)
-    closeModal();
-    navigate('/forgot-password');
-  };
-
-  const handleRegister = (e: React.MouseEvent) => {
-    e.preventDefault();
-    // 페이지 이동 대신 RegisterModal로 전환
-    openRegisterModal();
   };
 
   if (!isOpen) return null;
@@ -223,141 +106,41 @@ export default function LoginModal() {
         </div>
 
         <div className="p-6">
-          {/* WO-O4O-GOOGLE-ONLY-SIGNUP-LOGIN-V1: Google 로 계속하기(기본) — 미등록이면 약관 동의 → 계정 생성 */}
-          <div className="mb-6">
-            <GoogleContinue<User>
-              getConfig={getGoogleAuthConfig}
-              loginWithGoogle={loginWithGoogle}
-              signupWithGoogle={signupWithGoogle}
-              onSuccess={({ user: loggedInUser }) => { setError(null); setIsNotMember(false); finishLogin(loggedInUser); }}
-              onStart={() => { setError(null); setIsNotMember(false); }}
-              onError={(e) => { setIsNotMember(false); setError(e.message); }}
-              termsHref="/policy"
-              privacyHref="/privacy"
-            />
-          </div>
-
-          {/* 구분선 */}
-          <div className="flex items-center gap-4 mb-4">
-            <div className="flex-1 h-px bg-gray-200" />
-            <span className="text-xs text-gray-400">임시 테스트 · 전환용 이메일 로그인</span>
-            <div className="flex-1 h-px bg-gray-200" />
-          </div>
-
-          {/* 로그인 폼(legacy email/password — 임시 유지) */}
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {error && !isNotMember && (
-              <div className="p-3 rounded-lg border bg-red-50 border-red-200">
-                <p className="text-sm text-red-600">{error}</p>
-              </div>
-            )}
-            {/* WO-O4O-LOGIN-SERVICE-NOT-MEMBER-UX-V1: 서비스 미가입 안내 + 회원가입 모달 전환 */}
-            {isNotMember && error && (
-              <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg space-y-3">
-                <p className="text-sm text-amber-800">{error}</p>
-                <button
-                  type="button"
-                  onClick={() => openRegisterModal()}
-                  className="w-full py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
-                >
-                  회원가입 진행하기
-                </button>
-              </div>
-            )}
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                이메일
-              </label>
-              <input
-                type="email"
-                autoComplete="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="이메일을 입력하세요"
-                required
-                className="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-shadow"
-              />
+          {error && !isNotMember && (
+            <div className="mb-4 p-3 rounded-lg border bg-red-50 border-red-200">
+              <p className="text-sm text-red-600">{error}</p>
             </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                비밀번호
-              </label>
-              <div className="relative">
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  autoComplete="current-password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="비밀번호를 입력하세요"
-                  required
-                  className="w-full px-4 py-3 pr-12 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-shadow"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600"
-                >
-                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                </button>
-              </div>
+          )}
+          {/* WO-O4O-LOGIN-SERVICE-NOT-MEMBER-UX-V1: 서비스 미가입 안내 */}
+          {isNotMember && error && (
+            <div className="mb-4 p-4 bg-amber-50 border border-amber-200 rounded-lg">
+              <p className="text-sm text-amber-800">{error}</p>
             </div>
+          )}
 
-            {/* 이메일 저장 체크박스 */}
-            <div className="flex items-center">
-              <input
-                type="checkbox"
-                id="rememberEmail"
-                checked={rememberEmail}
-                onChange={(e) => setRememberEmail(e.target.checked)}
-                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-              />
-              <label htmlFor="rememberEmail" className="ml-2 text-sm text-gray-600">
-                이메일 저장
-              </label>
-            </div>
+          {/* WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: 로그인 진입은 이 버튼 하나다. */}
+          <GoogleContinue<User>
+            getConfig={getGoogleAuthConfig}
+            loginWithGoogle={loginWithGoogle}
+            signupWithGoogle={signupWithGoogle}
+            onSuccess={({ user: loggedInUser }) => { setError(null); setIsNotMember(false); finishLogin(loggedInUser); }}
+            onStart={() => { setError(null); setIsNotMember(false); }}
+            onError={({ message, code }) => {
+              const notMember = code === 'SERVICE_NOT_MEMBER';
+              setIsNotMember(notMember);
+              setError(
+                notMember
+                  ? '이 계정은 KPA-Society 서비스에 가입되어 있지 않습니다. 서비스 이용 절차를 진행해 주세요.'
+                  : message,
+              );
+            }}
+            termsHref="/policy"
+            privacyHref="/privacy"
+          />
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {loading ? '로그인 중...' : '이메일로 로그인 (임시)'}
-            </button>
-          </form>
-
-          {/* 아이디·비밀번호 찾기 */}
-          <div className="mt-4 text-center">
-            <a
-              href="/forgot-password"
-              onClick={handleForgotPassword}
-              className="text-sm text-gray-500 hover:text-gray-700"
-            >
-              아이디 · 비밀번호 찾기
-            </a>
-          </div>
-
-          {/* 구분선 */}
-          <div className="flex items-center gap-4 my-6">
-            <div className="flex-1 h-px bg-gray-200" />
-            <span className="text-xs text-gray-400">또는</span>
-            <div className="flex-1 h-px bg-gray-200" />
-          </div>
-
-          {/* 회원가입 */}
-          <div className="text-center">
-            <p className="text-sm text-gray-500">
-              아직 계정이 없으신가요?{' '}
-              <a
-                href="#"
-                onClick={handleRegister}
-                className="text-blue-600 font-medium hover:text-blue-700"
-              >
-                회원가입
-              </a>
-            </p>
-          </div>
+          <p className="mt-6 text-center text-sm text-gray-500">
+            처음이신가요? 같은 버튼으로 약관 동의 후 계정이 만들어집니다.
+          </p>
         </div>
       </div>
     </div>

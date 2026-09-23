@@ -1,7 +1,7 @@
 export { AccountPageLayout } from './components/AccountPageLayout.js';
 export { ProfileCard } from './components/ProfileCard.js';
 export { ProfileInfoField } from './components/ProfileInfoField.js';
-export { PasswordChangeModal } from './components/PasswordChangeModal.js';
+// WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: PasswordChangeModal 은 은퇴했다(바꿀 비밀번호가 없다).
 export { QuickActionsSection } from './components/QuickActionsSection.js';
 export { MyPageNavigation } from './components/MyPageNavigation.js';
 export { MyPageLayout } from './components/MyPageLayout.js';

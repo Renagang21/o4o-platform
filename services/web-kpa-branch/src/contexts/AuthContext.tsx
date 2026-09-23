@@ -3,7 +3,8 @@
  * WO-O4O-PHARMACIST-BRANCH-SERVICE-FOUNDATION-DESIGN-AND-IMPLEMENTATION-V1
  *
  * 기존 O4O auth 계약을 그대로 재사용한다 (신규 인증 구조 금지):
- *   - authClient.login({ email, password, serviceKey }) → backend 가 service_memberships 검증
+ *   - WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: 로그인 진입은 Google 하나다
+ *     (POST /auth/google/login · /auth/google/signup → backend 가 service_memberships 검증)
  *   - 세션 복구는 GET /auth/me
  *   - 공통 훅 `useServiceAuth` (@o4o/auth-react) 사용
  *
@@ -32,8 +33,7 @@ interface AuthContextValue {
   user: BranchUser | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (email: string, password: string) => Promise<AuthLoginResult<BranchUser>>;
-  /** WO-O4O-GOOGLE-ONLY-SIGNUP-LOGIN-V1: Google 기본 진입(email/password 는 임시 테스트/전환용). */
+  /** WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: login(email+password) 은퇴 — 진입은 Google 하나다. */
   loginWithGoogle: (idToken: string) => Promise<AuthLoginResult<BranchUser>>;
   signupWithGoogle: (idToken: string, consents: GoogleSignupConsents) => Promise<AuthLoginResult<BranchUser>>;
   getGoogleAuthConfig: () => Promise<GoogleAuthConfig>;
@@ -76,7 +76,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         user: core.user,
         isAuthenticated: core.isAuthenticated,
         isLoading: core.isLoading,
-        login: core.login,
         loginWithGoogle: core.loginWithGoogle,
         signupWithGoogle: core.signupWithGoogle,
         getGoogleAuthConfig,

@@ -1,5 +1,6 @@
 /**
- * Pharmacy-Hub 계정 API 클라이언트 (사용자 프로필 · 비밀번호)
+ * Pharmacy-Hub 계정 API 클라이언트 (사용자 프로필)
+ * WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: 비밀번호 변경 계약은 은퇴했다.
  *
  * WO-PHARMACY-HUB-STORE-INFO-AND-ACCOUNT-V1
  * WO-O4O-CROSS-SERVICE-SELF-PROFILE-WRITE-CONTRACT-V1:
@@ -9,9 +10,7 @@
  *
  *   GET   /users/me/profile    내 프로필 (ACCOUNT_CORE)
  *   PATCH /users/me/profile    { name, nickname, phone } 등 allowlist 필드
- *   PUT   /users/password      { currentPassword, newPassword, newPasswordConfirm, serviceKey }
  *
- * ⚠️ 비밀번호 값은 이 모듈 밖으로 나가지 않는다 — 로깅·저장·재사용 금지.
  * ⚠️ 사용자 계정(users)과 매장 정보(organizations)는 서로 다른 SSOT 다. 섞지 않는다.
  */
 import { api } from '../apiClient';
@@ -55,19 +54,4 @@ export async function updateAccountProfile(patch: {
   return unwrap<AccountProfile>(res.data, '계정 정보를 저장하지 못했습니다.');
 }
 
-/**
- * 비밀번호 변경. 실패는 예외로 올려 모달이 서버 메시지를 그대로 보여주게 한다
- * (자체 판정으로 성공을 흉내내지 않는다).
- */
-export async function changeAccountPassword(
-  currentPassword: string,
-  newPassword: string,
-  newPasswordConfirm: string,
-): Promise<void> {
-  await api.put('/users/password', {
-    currentPassword,
-    newPassword,
-    newPasswordConfirm,
-    serviceKey: SERVICE_KEY,
-  });
-}
+// WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: changeAccountPassword(PUT /users/password) 는 은퇴했다.

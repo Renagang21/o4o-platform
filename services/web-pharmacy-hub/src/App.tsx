@@ -117,8 +117,7 @@ import { MembershipGate } from './components/MembershipGate';
 // WO-O4O-INTEGRATED-TERMS-ACCEPTANCE-AND-SIGNUP-ALIGNMENT-V1 §17: 기존 회원 약관 재동의 게이트
 import { TermsAcceptanceGate } from './components/TermsAcceptanceGate';
 import LoginPage from './pages/LoginPage';
-import ForgotPasswordPage from './pages/auth/ForgotPasswordPage';
-import ResetPasswordPage from './pages/auth/ResetPasswordPage';
+// WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: 비밀번호 찾기·재설정 화면은 은퇴했다.
 import JoinPage from './pages/JoinPage';
 import JoinStatusPage from './pages/JoinStatusPage';
 import HandoffPage from './pages/HandoffPage';
@@ -306,14 +305,9 @@ export default function App() {
           */}
           <Route path="/handoff" element={<HandoffPage />} />
 
-          {/*
-            WO-O4O-PHARMACYHUB-PASSWORD-RECOVERY-UI-FIX-V1
-            비밀번호 찾기·재설정 공개 화면. 백엔드는 공통 /api/v1/auth/{forgot,reset}-password
-            를 그대로 사용하며, `/reset-password` 는 재설정 메일 링크의 착지 경로다
-            (mail-core: `${serviceUrl}/reset-password?token=...`).
-          */}
-          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-          <Route path="/reset-password" element={<ResetPasswordPage />} />
+          {/* WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: 찾거나 재설정할 비밀번호가 없다. */}
+          <Route path="/forgot-password" element={<Navigate to="/login" replace />} />
+          <Route path="/reset-password" element={<Navigate to="/login" replace />} />
           <Route path="/join" element={<JoinPage />} />
           <Route path="/join/status" element={<JoinStatusPage />} />
 

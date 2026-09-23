@@ -34,8 +34,7 @@ import { StoreProductsManagerPage } from '@o4o/store-products-ui';
 import { HomePage, NotFoundPage } from '@/pages';
 import LoginPage from '@/pages/auth/LoginPage';
 import HandoffPage from '@/pages/HandoffPage';
-import AccountRecoveryPage from '@/pages/auth/AccountRecoveryPage';
-import ResetPasswordPage from '@/pages/auth/ResetPasswordPage';
+// WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: AccountRecoveryPage · ResetPasswordPage · RegisterPage 는 은퇴했다.
 // WO-O4O-AUTH-VERIFY-EMAIL-FRONTEND-PAGE-V1: 이메일 인증 결과 페이지
 import VerifyEmailPage from '@/pages/auth/VerifyEmailPage';
 
@@ -53,7 +52,6 @@ const StoresPage = lazy(() => import('@/pages').then(m => ({ default: m.StoresPa
 const ProductsPage = lazy(() => import('@/pages').then(m => ({ default: m.ProductsPage })));
 const SupplyPage = lazy(() => import('@/pages').then(m => ({ default: m.SupplyPage })));
 const TouristHubPage = lazy(() => import('@/pages').then(m => ({ default: m.TouristHubPage })));
-const RegisterPage = lazy(() => import('@/pages/auth/RegisterPage'));
 const SupplierInfoPage = lazy(() => import('@/pages/SupplierInfoPage'));
 // WO-O4O-KCOS-SERVICE-GUIDE-PAGE-V1: 서비스 안내 (공개)
 const ServiceGuidePage = lazy(() => import('@/pages/ServiceGuidePage'));
@@ -541,9 +539,10 @@ function AppRoutes() {
         <Route index element={<HomePage />} />
         <Route path="handoff" element={<HandoffPage />} />
         <Route path="login" element={<LoginPage />} />
-        <Route path="register" element={<RegisterPage />} />
-        <Route path="forgot-password" element={<AccountRecoveryPage />} />
-        <Route path="reset-password" element={<ResetPasswordPage />} />
+        {/* WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: 가입은 로그인 화면의 Google 하나로 모인다. */}
+        <Route path="register" element={<Navigate to="/login" replace />} />
+        <Route path="forgot-password" element={<Navigate to="/login" replace />} />
+        <Route path="reset-password" element={<Navigate to="/login" replace />} />
         <Route path="auth/verify-email" element={<VerifyEmailPage />} />
         <Route path="contact" element={<ContactPage />} />
         {/* WO-O4O-CROSSSERVICE-POLICY-ROUTES-V1: 공개 약관/개인정보처리방침 (published 만 표시) */}

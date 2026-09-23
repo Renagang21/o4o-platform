@@ -36,15 +36,14 @@ export interface User {
   memberships?: { serviceKey: string; status: string }[];
 }
 
-/** 기존 호출부 계약 보존 — success 시 role/roles 도 함께 준다. */
-type NetureLoginResult = AuthLoginResult<User> & { role?: UserRole; roles?: UserRole[] };
-
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (email: string, password: string) => Promise<NetureLoginResult>;
-  /** WO-O4O-GOOGLE-ONLY-SIGNUP-LOGIN-V1: Google 기본 진입(email/password 는 임시 테스트/전환용). */
+  /**
+   * WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1:
+   *   email+password login 은 은퇴했다. Neture 로그인 진입은 Google 하나다.
+   */
   loginWithGoogle: (idToken: string) => Promise<AuthLoginResult<User>>;
   signupWithGoogle: (idToken: string, consents: GoogleSignupConsents) => Promise<AuthLoginResult<User>>;
   getGoogleAuthConfig: () => Promise<GoogleAuthConfig>;
@@ -123,22 +122,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // 역할 전환·부분 갱신은 3서비스 동일 구현이었다 → 공통 Core(useRoleSelection).
   const { switchRole, updateUser, hasMultipleRoles } = useRoleSelection(core);
 
-  const login = async (email: string, password: string): Promise<NetureLoginResult> => {
-    const result = await core.login(email, password);
-    if (result.success && result.user) {
-      return { ...result, role: result.user.roles[0], roles: result.user.roles };
-    }
-    return result;
-  };
-
-
   return (
     <AuthContext.Provider
       value={{
         user,
         isAuthenticated: core.isAuthenticated,
         isLoading: core.isLoading,
-        login,
         loginWithGoogle: core.loginWithGoogle,
         signupWithGoogle: core.signupWithGoogle,
         getGoogleAuthConfig,

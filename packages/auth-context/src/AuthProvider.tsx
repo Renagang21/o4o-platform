@@ -190,10 +190,7 @@ export const AuthProvider: FC<AuthProviderProps> = ({
     checkInitialAuth();
   }, [authClient, ssoClient, strategy]);
 
-  /**
-   * 로그인 응답 → 세션 채택(password · Google 공통).
-   * WO-O4O-GOOGLE-ONLY-SIGNUP-LOGIN-V1: `login` 의 본문을 그대로 분리했다 — 동작 변경 없음.
-   */
+  /** 로그인 응답 → 세션 채택(Google 로그인 단일 경로). */
   const adoptLoginResponse = (response: unknown) => {
     // API 응답 구조: { success, data: { user, accessToken, refreshToken } }
     const loginData = (response as any).data || response;
@@ -244,21 +241,7 @@ export const AuthProvider: FC<AuthProviderProps> = ({
     }
   };
 
-  const login = async (credentials: { email: string; password: string; serviceKey?: string }) => {
-    try {
-      setIsLoading(true);
-      setError(null);
-      const response = await authClient.login(credentials);
-      adoptLoginResponse(response);
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Login failed';
-      setError(errorMessage);
-      onAuthError?.(errorMessage);
-      throw err;
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  // WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: email+password login 은 은퇴했다.
 
   /**
    * WO-O4O-GOOGLE-ONLY-SIGNUP-LOGIN-V1: Google ID token 로그인(admin 은 로그인만 — 가입은 서비스 화면에서).
@@ -364,7 +347,6 @@ export const AuthProvider: FC<AuthProviderProps> = ({
     error,
     isAdmin,
     authClient, // Expose authClient for API calls
-    login,
     loginWithGoogle,
     getGoogleAuthConfig,
     logout,

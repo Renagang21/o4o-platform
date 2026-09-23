@@ -3,7 +3,6 @@
  */
 
 import { apiClient } from './client';
-import { authClient } from '../contexts/AuthContext';
 import type {
   Enrollment,
   Certificate,
@@ -22,11 +21,7 @@ export interface ProfileUpdateRequest {
   workplace?: string;
 }
 
-export interface PasswordChangeRequest {
-  currentPassword: string;
-  newPassword: string;
-  newPasswordConfirm: string;
-}
+// WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: PasswordChangeRequest 는 은퇴했다(바꿀 비밀번호가 없다).
 
 export interface UserSettings {
   emailNotifications: boolean;
@@ -150,17 +145,7 @@ export const mypageApi = {
   updateProfile: (data: ProfileUpdateRequest) =>
     apiClient.put<ApiResponse<ProfileResponse>>('/mypage/profile', data),
 
-  // 비밀번호 변경 - /api/v1/users/password 엔드포인트 사용
-  //   WO-O4O-IDENTITY-V2-PHASE2-CHANGE-PASSWORD-SERVICE-SCOPE-V1:
-  //   serviceKey='kpa-society' 를 자동 주입하여 KPA 범위의 service_credentials 만 갱신.
-  //   다른 서비스의 비밀번호에 영향이 없다.
-  changePassword: async (data: PasswordChangeRequest): Promise<ApiResponse<{ message: string }>> => {
-    const response = await authClient.api.put('/users/password', {
-      ...data,
-      serviceKey: 'kpa-society',
-    });
-    return response.data;
-  },
+  // WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: changePassword(PUT /users/password) 는 은퇴했다.
 
   // 설정
   getSettings: () =>

@@ -4,7 +4,8 @@
  * WO-PHARMACY-HUB-NEW-SERVICE-FOUNDATION-V1
  *
  * 기존 서비스와 동일 계약:
- *   - authClient.login({ email, password, serviceKey }) → backend 가 service_memberships 검증
+ *   - WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: 로그인 진입은 Google 하나다
+ *     (POST /auth/google/login · /auth/google/signup → backend 가 service_memberships 검증)
  *   - 미가입자는 401 SERVICE_NOT_MEMBER 로 차단 (자동 편입 없음)
  *   - 세션 복구는 GET /auth/me
  *
@@ -40,8 +41,7 @@ interface AuthContextValue {
   user: PharmacyHubUser | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (email: string, password: string) => Promise<AuthLoginResult<PharmacyHubUser>>;
-  /** WO-O4O-GOOGLE-ONLY-SIGNUP-LOGIN-V1: Google 기본 진입(email/password 는 임시 테스트/전환용). */
+  /** WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: login(email+password) 은퇴 — 진입은 Google 하나다. */
   loginWithGoogle: (idToken: string) => Promise<AuthLoginResult<PharmacyHubUser>>;
   signupWithGoogle: (idToken: string, consents: GoogleSignupConsents) => Promise<AuthLoginResult<PharmacyHubUser>>;
   getGoogleAuthConfig: () => Promise<GoogleAuthConfig>;
@@ -93,7 +93,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         user: core.user,
         isAuthenticated: core.isAuthenticated,
         isLoading: core.isLoading,
-        login: core.login,
         loginWithGoogle: core.loginWithGoogle,
         signupWithGoogle: core.signupWithGoogle,
         getGoogleAuthConfig,

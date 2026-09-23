@@ -177,11 +177,6 @@ export function MySettingsPage() {
         onLogoutAll={logoutAll}
         logoutAllIncludesCurrentDevice
         onAfterLogoutAll={() => navigate('/')}
-        onChangePassword={async (currentPassword, newPassword, newPasswordConfirm) => {
-          // serviceKey='kpa-society' 는 mypageApi.changePassword 가 주입한다
-          // (WO-O4O-IDENTITY-V2-PHASE2-CHANGE-PASSWORD-SERVICE-SCOPE-V1).
-          await mypageApi.changePassword({ currentPassword, newPassword, newPasswordConfirm });
-        }}
       />
     </MyPageLayout>
   );

@@ -10,13 +10,16 @@
  *     차이는 매장 경영 capability 하나뿐이며, 약사 회원에게는 약국 경영 정보를 묻지 않는다.
  *     공급자는 Pharmacy-Hub 회원이 아니고(REALIGNMENT-AND-SUPPLIER-ROLE-REMOVAL-V1),
  *     운영자·관리자·강사·커뮤니티 운영자는 자가 신청이 아니라 사후 부여다.
- *   - 신규 사용자·기존 O4O 사용자 모두 동일 폼을 사용한다 (백엔드가 이메일로 분기).
+ *   - WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: 계정은 Google 로그인으로 먼저 만들어진다.
+ *     이 화면은 그 세션(users.id)에 가입 신청만 붙인다 — 이메일·비밀번호 입력은 없다.
  */
 
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { usePublishedPolicyDocument } from '@o4o/shared-space-ui';
+import { GoogleContinue } from '@o4o/auth-react';
 import { api } from '../lib/apiClient';
+import { useAuth, type PharmacyHubUser } from '../contexts/AuthContext';
 import { BRAND, SERVICE_KEY } from '../config/service';
 import { loadPolicy } from './legal/PolicyDocumentPage';
 
@@ -43,16 +46,13 @@ const FIELD_LABEL: Record<string, string> = {
   businessNumber: '사업자등록번호',
   businessAddress: '사업장 주소',
   businessPhone: '사업장 연락처',
-  email: '이메일',
-  password: '비밀번호',
 };
 
 export default function JoinPage() {
   const navigate = useNavigate();
+  const { user, isLoading, loginWithGoogle, signupWithGoogle, getGoogleAuthConfig } = useAuth();
   const [roleType, setRoleType] = useState<RoleType>('member');
   const [form, setForm] = useState({
-    email: '',
-    password: '',
     name: '',
     phone: '',
     businessName: '',
@@ -86,8 +86,6 @@ export default function JoinPage() {
     try {
       await api.post('/pharmacy-hub/join', {
         roleType,
-        email: form.email,
-        password: form.password,
         name: form.name,
         phone: form.phone,
         // 약국명은 약국 경영자 신청에만 보낸다 (백엔드 검증 축과 같은 표).
@@ -112,6 +110,35 @@ export default function JoinPage() {
       setSubmitting(false);
     }
   };
+
+  if (isLoading) {
+    return <div className="mx-auto max-w-lg px-4 py-10 text-sm text-gray-500">확인 중…</div>;
+  }
+
+  // WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: 계정 생성은 Google 하나 — 먼저 로그인한다.
+  if (!user) {
+    return (
+      <div className="mx-auto max-w-lg px-4 py-10">
+        <h1 className="mb-1 text-xl font-bold">{BRAND.name} 가입 신청</h1>
+        <p className="mb-6 text-sm text-gray-500">
+          먼저 Google 계정으로 로그인해 주세요. 계정이 없으면 같은 버튼에서 약관 동의 후 만들어집니다.
+        </p>
+        <div className="rounded-lg border border-gray-200 bg-white p-5">
+          <GoogleContinue<PharmacyHubUser>
+            getConfig={getGoogleAuthConfig}
+            loginWithGoogle={loginWithGoogle}
+            signupWithGoogle={signupWithGoogle}
+            onSuccess={() => setError(null)}
+            onStart={() => setError(null)}
+            onError={(e) => setError(e.message)}
+            termsHref="/terms"
+            privacyHref="/privacy"
+          />
+          {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto max-w-lg px-4 py-10">
@@ -150,29 +177,10 @@ export default function JoinPage() {
             {roleType === 'store_owner' ? '약국 경영자 정보' : '약사 회원 정보'}
           </h2>
 
-          <label className="block text-sm">
-            이메일
-            <input
-              type="email"
-              value={form.email}
-              onChange={set('email')}
-              required
-              className="mt-1 w-full rounded border border-gray-300 px-3 py-2"
-            />
-          </label>
-          <label className="block text-sm">
-            비밀번호
-            <input
-              type="password"
-              value={form.password}
-              onChange={set('password')}
-              required
-              className="mt-1 w-full rounded border border-gray-300 px-3 py-2"
-            />
-            <span className="mt-1 block text-xs text-gray-400">
-              기존 O4O 계정이 있어도 파머시 허브 전용 비밀번호로 신청할 수 있습니다.
-            </span>
-          </label>
+          {/* WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: 계정은 Google 하나 — 로그인 계정으로 신청한다. */}
+          <p className="text-sm text-gray-600">
+            로그인 계정: <span className="font-medium">{user?.email ?? user?.name ?? '내 Google 계정'}</span>
+          </p>
           <label className="block text-sm">
             이름
             <input

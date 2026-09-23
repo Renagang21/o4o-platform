@@ -113,7 +113,7 @@ export function KCosGlobalHeader() {
       contextualNav={contextualNav}
       user={headerUser}
       onLogin={openLoginModal}
-      onRegister={() => navigate('/register')}
+      onRegister={() => navigate('/login')}
       onLogout={handleLogout}
       utilitySlot={user ? (
         <NotificationBell

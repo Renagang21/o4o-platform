@@ -53,7 +53,7 @@ export default function Footer() {
             <h4 style={styles.sectionTitle}>참여하기</h4>
             <ul style={styles.list}>
               <li>
-                <Link to="/register" style={styles.link}>매장 입점 신청</Link>
+                <Link to="/login" style={styles.link}>매장 입점 신청</Link>
               </li>
               <li>
                 <Link to="/contact" style={styles.link}>제휴/파트너 문의</Link>

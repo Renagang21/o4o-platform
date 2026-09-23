@@ -7,7 +7,9 @@
 
 import { createContext, useContext, useState, useCallback, ReactNode } from 'react';
 
-type ModalType = 'login' | 'register' | null;
+// WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: 'register' 모달은 은퇴했다.
+//   가입은 로그인 모달의 'Google 로 계속하기' 하나가 담당한다(미등록이면 동의 → 가입).
+type ModalType = 'login' | null;
 
 interface LoginModalContextType {
   activeModal: ModalType;
@@ -31,8 +33,10 @@ export function LoginModalProvider({ children }: { children: ReactNode }) {
     setActiveModal('login');
   }, []);
 
+  /** 회원가입 진입 — 로그인 모달과 같은 화면이다(Google 로 계속하기가 가입을 겸한다). */
   const openRegisterModal = useCallback(() => {
-    setActiveModal('register');
+    setLoginReturnUrl(undefined);
+    setActiveModal('login');
   }, []);
 
   const closeModal = useCallback(() => {

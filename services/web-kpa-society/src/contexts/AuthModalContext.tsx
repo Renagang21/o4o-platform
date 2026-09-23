@@ -13,17 +13,18 @@
 import { createContext, useContext, useState, ReactNode, useCallback } from 'react';
 
 // WO-KPA-A-AUTH-UX-STATE-UNIFICATION-V1: functionGate 제거 (AuthGate 페이지로 대체)
-type ModalType = 'login' | 'register' | 'forgotPassword' | null;
+// WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1:
+//   'register' · 'forgotPassword' 모달은 은퇴했다. 가입은 로그인 모달의 'Google 로 계속하기'
+//   하나가 겸하고(미등록이면 약관 동의 → 가입), 되찾을 비밀번호는 존재하지 않는다.
+type ModalType = 'login' | null;
 
 interface AuthModalContextType {
   /** 현재 열린 모달 타입 */
   activeModal: ModalType;
   /** 로그인 모달 열기 */
   openLoginModal: () => void;
-  /** 가입 모달 열기 */
+  /** 가입 진입 — 로그인 모달과 같은 화면이다(Google 로 계속하기가 가입을 겸한다). */
   openRegisterModal: () => void;
-  /** 비밀번호 찾기 모달 열기 */
-  openForgotPasswordModal: () => void;
   /** 모달 닫기 */
   closeModal: () => void;
   /** 로그인 성공 후 실행할 콜백 */
@@ -46,11 +47,7 @@ export function AuthModalProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const openRegisterModal = useCallback(() => {
-    setActiveModal('register');
-  }, []);
-
-  const openForgotPasswordModal = useCallback(() => {
-    setActiveModal('forgotPassword');
+    setActiveModal('login');
   }, []);
 
   const closeModal = useCallback(() => {
@@ -72,7 +69,6 @@ export function AuthModalProvider({ children }: { children: ReactNode }) {
         activeModal,
         openLoginModal,
         openRegisterModal,
-        openForgotPasswordModal,
         closeModal,
         onLoginSuccess,
         setOnLoginSuccess,

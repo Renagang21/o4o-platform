@@ -11,7 +11,6 @@ export type {
   UserStatus,
   RoleAssignment,
   AuthTokens,
-  LoginCredentials,
   RegisterData,
   MeResponse,
   JWTPayload,
@@ -116,17 +115,5 @@ export interface GoogleAuthResponse extends AuthResponse {
 /** 서버가 미등록 Google 계정에 돌려주는 코드 — 호출부는 이 코드로 가입(동의) 흐름으로 분기한다. */
 export const GOOGLE_SIGNUP_REQUIRED_CODE = 'GOOGLE_SIGNUP_REQUIRED';
 
-/**
- * WO-O4O-GOOGLE-IDENTITY-OPERATOR-EXPLICIT-LINK-V1
- * GET /auth/google/link/status — 로그인된 계정의 Google 연결 여부 · users.password 보유 여부. Google email/sub 는 없다.
- */
-export interface GoogleLinkStatus {
-  linked: boolean;
-  passwordSet: boolean;
-}
-
-/** POST /auth/google/link 응답 — 같은 sub 가 이미 연결돼 있으면 alreadyLinked=true(멱등). */
-export interface GoogleLinkResult {
-  linked: true;
-  alreadyLinked: boolean;
-}
+// WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1:
+//   GoogleLinkStatus / GoogleLinkResult 는 은퇴했다(명시 연결 경로와 함께).

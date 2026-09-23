@@ -40,14 +40,13 @@ export interface User {
 }
 
 /** 기존 호출부 계약 보존 — success 시 role/roles 도 함께 준다. */
-type KCosLoginResult = AuthLoginResult<User> & { role?: UserRole; roles?: UserRole[] };
+// WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: KCosLoginResult(email+password 로그인 결과)는 은퇴했다.
 
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
   isSessionChecked: boolean;
-  login: (email: string, password: string) => Promise<KCosLoginResult>;
   /** WO-O4O-GOOGLE-ONLY-SIGNUP-LOGIN-V1: Google 기본 진입(email/password 는 임시 테스트/전환용). */
   loginWithGoogle: (idToken: string) => Promise<AuthLoginResult<User>>;
   signupWithGoogle: (idToken: string, consents: GoogleSignupConsents) => Promise<AuthLoginResult<User>>;
@@ -115,17 +114,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await core.refresh();
   }, [core.refresh]);
 
-  const login = async (email: string, password: string): Promise<KCosLoginResult> => {
-    const result = await core.login(email, password);
-    if (result.success && result.user) {
-      isSessionCheckedRef.current = true;
-      setIsSessionChecked(true);
-      return { ...result, role: result.user.roles[0], roles: result.user.roles };
-    }
-    return result;
-  };
-
-
   return (
     <AuthContext.Provider
       value={{
@@ -133,7 +121,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isAuthenticated: core.isAuthenticated,
         isLoading: core.isLoading,
         isSessionChecked,
-        login,
         loginWithGoogle: core.loginWithGoogle,
         signupWithGoogle: core.signupWithGoogle,
         getGoogleAuthConfig,

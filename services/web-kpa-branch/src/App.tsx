@@ -5,7 +5,6 @@
  * 라우트 (공용 경로 — https://kpa-society.co.kr/kpa 아래, router basename='/kpa'):
  *   /                                 분회 찾기 (registry)
  *   /login                            로그인 (serviceKey='kpa-branch')
- *   /reset-password                   비밀번호 재설정 (메일 링크 착지점 — 분회 축 아님)
  *   /me                               내 분회 / 전입·전출 이력
  *   /:branchSlug                      분회 홈 (고정 템플릿)
  *   /:branchSlug/notices              공지
@@ -38,7 +37,7 @@
  * 프론트 라우트는 UX 안내이며 권한 판정 근거가 아니다.
  * 실제 경계는 backend 의 requireKpaBranchScope + resolveBranch + requireBranchScope 가 강제한다.
  */
-import { BrowserRouter, Routes, Route, useParams } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useParams } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import { TenantProvider, useTenant, detectBasename } from './lib/tenant';
 import { BranchLayout } from './layouts/BranchLayout';
@@ -46,7 +45,7 @@ import DirectoryPage from './pages/DirectoryPage';
 import LoginPage from './pages/LoginPage';
 import JoinPage from './pages/JoinPage';
 import MyBranchPage from './pages/MyBranchPage';
-import ResetPasswordPage from './pages/auth/ResetPasswordPage';
+// WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: 비밀번호 재설정 화면은 은퇴했다.
 import HandoffPage from './pages/HandoffPage';
 import BranchHomePage from './pages/BranchHomePage';
 import BranchPostsPage from './pages/BranchPostsPage';
@@ -125,7 +124,8 @@ function AppRoutes() {
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/join" element={<JoinPage />} />
-        <Route path="/reset-password" element={<ResetPasswordPage />} />
+        {/* WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: 재설정할 비밀번호가 없다. */}
+        <Route path="/reset-password" element={<Navigate to="/login" replace />} />
         <Route path="/handoff" element={<HandoffPage />} />
         <Route path="/me" element={<MyBranchPage />} />
         <Route path="/*" element={<BranchSection slug={hostBranch.slug} basePath="" />} />
@@ -138,7 +138,8 @@ function AppRoutes() {
       <Route path="/" element={<DirectoryPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/join" element={<JoinPage />} />
-      <Route path="/reset-password" element={<ResetPasswordPage />} />
+      {/* WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: 재설정할 비밀번호가 없다. */}
+      <Route path="/reset-password" element={<Navigate to="/login" replace />} />
       {/*
         WO-O4O-NETURE-UNIFIED-ENTRY-UI-PHASE1-V1
         O4O 대표 홈 → 분회 서비스 이동 수신 경로 (`/kpa/handoff?token=…&returnTo=/{slug}`).

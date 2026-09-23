@@ -109,18 +109,7 @@ export interface MembersConsoleClient {
   /** Batch status change. Backend supports approved/rejected/suspended.
    *  선택 — 미제공 시 행 선택/일괄 액션 UI 를 노출하지 않는다. */
   batchUpdateStatus?(ids: string[], status: 'approved' | 'rejected' | 'suspended'): Promise<any>;
-  /** Update password (operator-as-user). */
-  /**
-   * 회원 비밀번호 변경.
-   *
-   * WO-O4O-SERVICE-PASSWORD-CHANGE-UI-SCOPE-AND-INTEGRATION-V2:
-   *   비밀번호는 **서비스별로 독립**하다(Identity V2 `service_credentials`).
-   *   따라서 어느 서비스의 비밀번호인지 반드시 함께 보낸다 — `serviceKey` 는 필수다.
-   *   서버는 이 값으로 정확히 한 건의 credential 만 갱신하며,
-   *   미지정·모호한 요청은 400(`SERVICE_KEY_REQUIRED`)으로 거절한다.
-   */
-  /** 선택 — 미제공 시 '비밀번호 변경' 행 액션을 노출하지 않는다. */
-  updatePassword?(userId: string, password: string, serviceKey: string): Promise<void>;
+  // WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: updatePassword 계약은 은퇴했다.
 }
 
 // ─── Tabs ────────────────────────────────────────────────────
@@ -163,7 +152,7 @@ export interface DeleteFlowRenderProps {
 
 // ─── Configurable Action Types ───────────────────────────────
 
-/** Extra row-level action appended after core edit/password/delete. */
+/** Extra row-level action appended after core edit/delete. */
 export interface MembersRowActionConfig {
   key: string;
   label: string;
@@ -280,7 +269,7 @@ export interface OperatorMembersConsolePageProps {
   renderDeleteFlow?: (props: DeleteFlowRenderProps) => ReactNode;
 
   /**
-   * Extra row-level actions appended after core edit/password/delete in RowActionMenu.
+   * Extra row-level actions appended after core edit/delete in RowActionMenu.
    * Use for status-change shortcuts (suspend, restore) that are service-specific.
    */
   extraRowActions?: MembersRowActionConfig[];

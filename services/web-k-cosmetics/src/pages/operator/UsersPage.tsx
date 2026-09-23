@@ -116,11 +116,7 @@ const kcosMembersClient: MembersConsoleClient = {
     const { data } = await api.post('/operator/members/batch-status', { ids, status, serviceKey: 'k-cosmetics' });
     return data;
   },
-  async updatePassword(userId, password, serviceKey) {
-    // WO-O4O-SERVICE-PASSWORD-CHANGE-UI-SCOPE-AND-INTEGRATION-V2:
-    //   서비스별 credential 이므로 대상 serviceKey 를 함께 보낸다(미전달 시 서버가 400).
-    await api.put(`/operator/members/${userId}`, { password, serviceKey });
-  },
+  // WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: updatePassword 어댑터는 은퇴했다.
 };
 
 // ─── Main Component ──────────────────────────────────────────

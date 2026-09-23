@@ -1,94 +1,33 @@
-import { useState } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  KeyboardAvoidingView,
-  Platform,
-  ActivityIndicator,
-  Alert,
-} from 'react-native';
+/**
+ * LoginScreen — O4O 운영앱
+ * WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1:
+ *   O4O 인증에 비밀번호가 존재하지 않는다(Identity = Google sub → users.id).
+ *   모바일 Google 로그인은 네이티브 SDK 의존성이 필요하므로 이 WO 범위 밖이며(의존성 변경 = 중지 조건),
+ *   그때까지 앱 로그인 화면은 안내만 한다. 비밀번호 폼은 제거했다.
+ */
+import { View, Text, StyleSheet, Linking, TouchableOpacity } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import { useAuth } from '@/contexts/AuthContext';
+
+const WEB_LOGIN_URL = 'https://neture.co.kr/login';
 
 export default function LoginScreen() {
-  const { login } = useAuth();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
-
-  async function handleLogin() {
-    if (!email.trim() || !password.trim()) {
-      Alert.alert('입력 오류', '이메일과 비밀번호를 입력해주세요.');
-      return;
-    }
-
-    setLoading(true);
-    try {
-      await login(email.trim(), password);
-    } catch (error) {
-      const message = error instanceof Error ? error.message : '로그인에 실패했습니다.';
-      Alert.alert('로그인 실패', message);
-    } finally {
-      setLoading(false);
-    }
-  }
-
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    >
+    <View style={styles.container}>
       <StatusBar style="dark" />
-
       <View style={styles.inner}>
-        {/* 헤더 */}
-        <View style={styles.header}>
-          <Text style={styles.title}>O4O 운영앱</Text>
-          <Text style={styles.subtitle}>운영자 로그인</Text>
-        </View>
+        <Text style={styles.title}>O4O 운영앱</Text>
+        <Text style={styles.subtitle}>운영자 로그인</Text>
 
-        {/* 폼 */}
-        <View style={styles.form}>
-          <Text style={styles.label}>이메일</Text>
-          <TextInput
-            style={styles.input}
-            value={email}
-            onChangeText={setEmail}
-            placeholder="이메일 주소"
-            keyboardType="email-address"
-            autoCapitalize="none"
-            autoCorrect={false}
-            editable={!loading}
-          />
+        <Text style={styles.notice}>
+          O4O 로그인은 Google 계정 하나로 통합되었습니다. 앱의 Google 로그인은 준비 중이며,
+          그 전까지는 웹에서 이용해 주세요.
+        </Text>
 
-          <Text style={styles.label}>비밀번호</Text>
-          <TextInput
-            style={styles.input}
-            value={password}
-            onChangeText={setPassword}
-            placeholder="비밀번호"
-            secureTextEntry
-            editable={!loading}
-            onSubmitEditing={handleLogin}
-          />
-
-          <TouchableOpacity
-            style={[styles.button, loading && styles.buttonDisabled]}
-            onPress={handleLogin}
-            disabled={loading}
-          >
-            {loading ? (
-              <ActivityIndicator color="#fff" />
-            ) : (
-              <Text style={styles.buttonText}>로그인</Text>
-            )}
-          </TouchableOpacity>
-        </View>
+        <TouchableOpacity style={styles.button} onPress={() => { void Linking.openURL(WEB_LOGIN_URL); }}>
+          <Text style={styles.buttonText}>웹에서 로그인</Text>
+        </TouchableOpacity>
       </View>
-    </KeyboardAvoidingView>
+    </View>
   );
 }
 
@@ -102,39 +41,24 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: 24,
   },
-  header: {
-    alignItems: 'center',
-    marginBottom: 48,
-  },
   title: {
     fontSize: 28,
     fontWeight: '700',
     color: '#1e293b',
     marginBottom: 8,
+    textAlign: 'center',
   },
   subtitle: {
     fontSize: 16,
     color: '#64748b',
+    textAlign: 'center',
   },
-  form: {
-    gap: 4,
-  },
-  label: {
+  notice: {
+    marginTop: 32,
     fontSize: 14,
-    fontWeight: '600',
-    color: '#374151',
-    marginBottom: 6,
-    marginTop: 12,
-  },
-  input: {
-    backgroundColor: '#fff',
-    borderWidth: 1,
-    borderColor: '#d1d5db',
-    borderRadius: 8,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    fontSize: 16,
-    color: '#111827',
+    lineHeight: 22,
+    color: '#334155',
+    textAlign: 'center',
   },
   button: {
     backgroundColor: '#1976d2',
@@ -142,9 +66,6 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     alignItems: 'center',
     marginTop: 24,
-  },
-  buttonDisabled: {
-    opacity: 0.6,
   },
   buttonText: {
     color: '#fff',
