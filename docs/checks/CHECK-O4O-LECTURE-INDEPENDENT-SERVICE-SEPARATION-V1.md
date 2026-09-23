@@ -666,4 +666,8 @@ k-cosmetics.site · pharmacyhub.co.kr · study.neture.co.kr · admin.neture.co.k
 
 1. **`ROOT_CAUSE_DUPLICATE_PUSH`** — 동일 main SHA `9a3b402b9` 가 11:37 과 11:46 두 번 push 이벤트를 만든 원인. 규명 전에는 **같은 일이 재발해 롤백이 무효화될 수 있다**(main 에 Phase 2 코드가 있는 한 어떤 push 든 배포를 트리거한다).
 2. 재발 방지 없이는 main 의 다른 WO push 도 Phase 2 를 실어 나른다 → coordinated deploy WO 전까지 **배포 트리거 차단 수단**(workflow 조건 · 수동 승인 게이트 등)을 먼저 정한다.
+
+   **기전 실측(2026-09-23)**: 롤백은 `update-traffic --to-revisions <rev>=100` 이라 현재 6개 서비스의 `spec.traffic` 은 특정 revision 고정이다. 그러나 `deploy-api.yml` · `deploy-web-services.yml` 어디에도 **`--no-traffic` 이 없다** — 즉 다음 `gcloud run deploy` 가 새 revision 을 만들며 트래픽을 그리로 **덮어써서 롤백이 소거**된다(pin 이 지켜주지 않는다). 따라서 **main 에 비-docs push 가 한 번이라도 들어가면 그 순간 Phase 2 가 다시 서빙된다.** docs-only push 는 `detect-changes` 에서 배포가 skip 되어 안전하다(본 CHECK §19 커밋 `a7b660dbb` 로 확인: CI·CodeQL 만 실행).
+
+   타 세션(`o4o-platform-32`, legacy-password WO)에 이 사실을 공유했다 — 다른 WO 의 Phase A 배포가 Lecture Phase 2 를 동반 배포하게 되므로 사용자 확인이 선행돼야 한다.
 3. data cutover 는 **별도 지시 전까지 시작 금지**.
