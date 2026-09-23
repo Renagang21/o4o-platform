@@ -42,6 +42,10 @@ import adminAppsRoutes from '../routes/admin/apps.routes.js';
 // WO-O4O-ADMIN-APP-AVAILABILITY-READ-CONTRACT-FIX-V1: 인증 사용자용 앱 활성 상태(read-only)
 import appAvailabilityRoutes from '../routes/app-availability.routes.js';
 import adminUsersRoutes from '../routes/admin/users.routes.js';
+// WO-O4O-ADMIN-OPERATOR-GOOGLE-INVITATION-AND-ASSIGNMENT-CUTOVER-V1
+import adminOperatorAssignmentsRoutes from '../routes/admin/operator-assignments.routes.js';
+import adminOperatorInvitationsRoutes from '../routes/admin/operator-invitations.routes.js';
+import operatorInvitationPublicRoutes from '../routes/operator-invitations.routes.js';
 // WO-O4O-ADMIN-PLATFORM-SETTINGS-SUPER-ADMIN-ACCOUNT-MANAGEMENT-V1: 관리자 계정 안전 유지관리(additive)
 import adminPlatformAccountsRoutes from '../routes/admin/platform-accounts.routes.js';
 // WO-O4O-PLATFORM-GLOBAL-USERS-READONLY-LIST-V1: 전체 사용자 read-only 조회(투영, additive)
@@ -168,6 +172,12 @@ export async function registerCoreRoutes(app: Application): Promise<void> {
   app.use('/api/v1/apps', appAvailabilityRoutes);
   app.use('/api/v1/admin/apps', adminAppsRoutes);
   app.use('/api/v1/admin/users', adminUsersRoutes);
+  // WO-O4O-ADMIN-OPERATOR-GOOGLE-INVITATION-AND-ASSIGNMENT-CUTOVER-V1:
+  //   운영자 지정(userId 기준)·초대(email 기준) — 둘 다 platform:super_admin 전용.
+  app.use('/api/v1/admin/operator-assignments', adminOperatorAssignmentsRoutes);
+  app.use('/api/v1/admin/operator-invitations', adminOperatorInvitationsRoutes);
+  //   초대 수락은 계정이 없을 수 있는 사람이 쓰므로 공개 경로다(토큰 + Google 검증이 조건).
+  app.use('/api/v1/operator-invitations', operatorInvitationPublicRoutes);
   app.use('/api/v1/admin/platform-accounts', adminPlatformAccountsRoutes);
   app.use('/api/v1/admin/platform-users', adminPlatformUsersRoutes);
   app.use('/api/v1/admin/security', adminSecurityBlockedIpsRoutes);

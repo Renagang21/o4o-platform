@@ -188,6 +188,25 @@ export const googleAdminBootstrapLimiter = rateLimit({
   skip: isLocalhost
 });
 
+/**
+ * 운영자 초대 공개 경로 (WO-O4O-ADMIN-OPERATOR-GOOGLE-INVITATION-AND-ASSIGNMENT-CUTOVER-V1 §10·§13)
+ * `/operator-invitations/preview|accept` — 인증 없이 토큰만으로 접근한다.
+ * 토큰은 256bit 무작위라 추측이 사실상 불가능하지만, 대량 시도 자체를 막기 위해 IP 당 시간당 30회로 제한한다.
+ */
+export const operatorInvitationPublicLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 30,
+  message: {
+    success: false,
+    error: 'Too many requests from this IP',
+    code: 'RATE_LIMIT_EXCEEDED',
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: getClientIP,
+  skip: isLocalhost,
+});
+
 export const rateLimiters = {
   standard: standardLimiter,
   public: publicLimiter,
@@ -198,4 +217,5 @@ export const rateLimiters = {
   adminReview: adminReviewLimiter,
   playbackLog: playbackLogLimiter,
   googleAdminBootstrap: googleAdminBootstrapLimiter,
+  operatorInvitationPublic: operatorInvitationPublicLimiter,
 };

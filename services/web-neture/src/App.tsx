@@ -46,6 +46,9 @@ import { ADMIN_ROLES } from './lib/role-constants';
 // NetureHomePage removed — Community promoted to Home (WO-NETURE-HOME-COMMUNITY-PROMOTION-V1)
 import HandoffPage from './pages/HandoffPage';
 import { TermsPage, PrivacyPage } from './pages/legal/PolicyDocumentPage';
+// WO-O4O-ADMIN-OPERATOR-GOOGLE-INVITATION-AND-ASSIGNMENT-CUTOVER-V1 §10:
+//   운영자 초대 수락(공개). 초대받은 사람은 아직 계정이 없을 수 있으므로 인증 게이트 밖에 둔다.
+const OperatorInvitationAcceptPage = lazy(() => import('./pages/auth/OperatorInvitationAcceptPage'));
 import CommunityPage from './pages/CommunityPage';
 // WO-O4O-COMMON-HOME-PHASE1-V1: O4O 전체 대표 진입점 (`/`)
 import O4OHomePage from './pages/O4OHomePage';
@@ -718,6 +721,10 @@ function App() {
                   public API + 공통 PolicyDocumentViewer 로 정렬한다. */}
               <Route path="/terms" element={<TermsPage />} />
               <Route path="/privacy" element={<PrivacyPage />} />
+
+              {/* WO-O4O-ADMIN-OPERATOR-GOOGLE-INVITATION-AND-ASSIGNMENT-CUTOVER-V1 §10~§14:
+                  초대 토큰 + Google 인증만으로 운영 권한을 수락한다(비밀번호 없음). */}
+              <Route path="/operator-invitations/accept" element={<OperatorInvitationAcceptPage />} />
 
               {/* Forum — O4O 공통 구조 (WO-NETURE-HOME-COMMUNITY-PROMOTION-V1) */}
               <Route path="/forum" element={<ForumHubPage title="네뚜레 포럼" description="o4o 개념과 네뚜레 구조에 대한 질문과 의견을 나누는 공간입니다" basePath="/forum" />} />

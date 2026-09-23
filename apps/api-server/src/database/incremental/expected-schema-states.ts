@@ -57,6 +57,15 @@ export const EXPECTED_SCHEMA_STATES: readonly ExpectedSchemaState[] = [
     fingerprint: 'a9af1ccebf6278a0878ec0490036ea06b6e491ef7b1c05ee23a63129ca88e76a',
     fingerprintLineCount: 5773,
   },
+  // WO-O4O-ADMIN-OPERATOR-GOOGLE-INVITATION-AND-ASSIGNMENT-CUTOVER-V1 §23 — operator_invitations
+  // (token_hash UNIQUE + pending 중복 방지 partial UNIQUE + service_key/status 인덱스).
+  // baseline 2026-09-18-id685 fresh bootstrap + incremental 1..3 을 격리 PostgreSQL 15
+  // (docker postgres:15, 로컬 전용 포트) 에서 산출: 운영 DB fingerprint 채택 아님.
+  {
+    appliedThrough: 'CreateOperatorInvitations1790125106065',
+    fingerprint: '3145442eb56844659a17b24354bdbf535b2088c2ae6786bff07d5917ba9bf9a6',
+    fingerprintLineCount: 5798,
+  },
 ] as const;
 
 /** Expected state after `prefixLength` incremental migrations; undefined when not registered. */
