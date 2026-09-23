@@ -1148,6 +1148,42 @@ describe('11차 P2-34 미발행 lesson 은 learner 에게 보이지 않는다', 
     await LessonController.getLesson(req, res);
     expect(res.statusCode).toBe(200);
   });
+
+  // 11차 후속 — Codex P2(LessonController:50): 소유권·stale role 만으로는 초안을 열지 못한다.
+  // 무료·public 강의는 requireEnrollment 가 membership 판정을 건너뛰므로 여기서 직접 확인한다.
+  it('role 이 회수된 과거 소유 강사(membership 만)는 초안을 보지 못한다', async () => {
+    const req = makeReq({ id: 'inst', roles: [], member: true, params: { courseId: 'lec-pub' } });
+    await LessonController.listLessonsByCourse(req, makeRes());
+    expect(listArgs[0][1].isPublished).toBe(true);
+
+    const res = makeRes();
+    await LessonController.getLesson(
+      makeReq({ id: 'inst', roles: [], member: true, params: { id: 'les-draft' } }), res);
+    expect(res.statusCode).toBe(404);
+  });
+
+  it('membership 이 없는 stale lecture:admin 토큰은 초안을 보지 못한다', async () => {
+    const req = makeReq({ id: 'ad2', roles: ['lecture:admin'], member: false, params: { courseId: 'lec-pub' } });
+    await LessonController.listLessonsByCourse(req, makeRes());
+    expect(listArgs[0][1].isPublished).toBe(true);
+
+    const res = makeRes();
+    await LessonController.getLesson(
+      makeReq({ id: 'ad2', roles: ['lecture:admin'], member: false, params: { id: 'les-draft' } }), res);
+    expect(res.statusCode).toBe(404);
+  });
+
+  it('active membership 을 가진 운영자는 초안을 본다 (검토 목적)', async () => {
+    const req = makeReq({ id: 'op', roles: ['lecture:operator'], member: true, params: { courseId: 'lec-pub' } });
+    await LessonController.listLessonsByCourse(req, makeRes());
+    expect(listArgs[0][1].isPublished).toBeUndefined();
+  });
+
+  it('다른 강의 소유 강사는 이 강의 초안을 보지 못한다 (소유권은 role 을 대체하지 않는다)', async () => {
+    const req = makeReq({ id: 'other-inst', roles: ['lecture:instructor'], member: true, params: { courseId: 'lec-pub' } });
+    await LessonController.listLessonsByCourse(req, makeRes());
+    expect(listArgs[0][1].isPublished).toBe(true);
+  });
 });
 
 describe('정적 계약', () => {

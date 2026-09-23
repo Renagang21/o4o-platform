@@ -179,4 +179,21 @@ describe('11차 P1 동작 — 인증 앞 IP 상한은 사용자를 구분하지 
     expect(res.body.user).toBeNull();     // 인증 전이므로 사용자는 없다
     expect(res.headers['ratelimit-limit']).toBe('600'); // 1인 할당량(60)이 아니라 IP 상한
   });
+
+  // Codex P2(lms.routes.ts:64): 실제 requireAuth 는 토큰이 없거나 만료면 next() 없이 401 을 돌려준다.
+  // 그래서 인증 실패 트래픽은 apiLimiter 에 도달하지 못한다 — 그 트래픽을 세는 것이 ipBurstLimiter 의 역할이다.
+  it('인증이 401 로 끊겨도(next() 호출 없음) IP 상한은 이미 소비된다', async () => {
+    const app = express();
+    app.set('trust proxy', 2);
+    app.use(ipBurstLimiter);                                   // 인증 앞
+    app.use((_req, res) => res.status(401).json({ error: 'AUTH_REQUIRED' })); // next() 하지 않는 인증 실패
+    const ip = '198.51.100.21, 10.0.0.1';
+    const first = await request(app).get('/x').set('X-Forwarded-For', ip);
+    expect(first.status).toBe(401);
+    const firstRemaining = Number(first.headers['ratelimit-remaining']);
+    const second = await request(app).get('/x').set('X-Forwarded-For', ip);
+    expect(second.status).toBe(401);
+    // 401 로 끝난 요청도 버킷을 소모한다 (JWT 검증 flooding 이 무제한이 아니다)
+    expect(Number(second.headers['ratelimit-remaining'])).toBe(firstRemaining - 1);
+  });
 });

@@ -475,6 +475,19 @@ spec 추가(11차): 신규 `lecture-lms-rate-limit-ordering.spec.ts` **11건**(�
 
 > **10차 CI 실패(head `79a2f83d3`)는 이 PR 의 변경과 무관한 main drift 였다.** `AdminUserController` 가 `services/admin/service-membership-ensure.js` 를 import 하는 커밋이 main 에 먼저 들어가고 실제 파일은 `1e30e24ee`(11:58 KST)에서야 추가돼, 02:48Z 에 돌아간 PR CI 의 merge-ref 가 깨진 main 을 물었다(`TS2307` 5건 → Code Quality Check · API Server Jest FAIL). 현재 `origin/main` 에는 파일이 존재한다. 본 PR 은 해당 파일들을 건드리지 않는다.
 
+### 17-3-k. 12차 — Codex 11차 리뷰 응답 2건 (P2 2) · merge-gate 종결 라운드
+
+`f4d5f0baf` 에 대한 Codex 리뷰(2026-09-23T03:47:51Z) 2건. 둘 다 **authorization 축**이라 UX-polish DEFERRED 대상이 아니다.
+
+| # | 등급 | 지적 | 처리 | 판정 |
+|---|---|---|---|---|
+| 37 | P2 | 실제 `requireAuth` 는 토큰이 없거나 만료·무효·미존재 사용자면 `next()` 없이 401 을 돌려주므로 `apiLimiter` 에 도달하지 못한다 — 미인증 트래픽이 JWT 검증(및 사용자 조회)을 무제한 반복할 수 있다. 신규 spec 의 mock 인증은 항상 `next()` 라 이 경로를 잡지 못한다 | **이미 `9bf65de68` 에서 해소** — 인증 **앞**의 `ipBurstLimiter`(IP 단위, 분당 600)가 인증 실패로 끝나는 요청까지 센다(리뷰 시점 head `f4d5f0baf` 에는 없었다). 12차에서 **그 사실을 잡는 동작 테스트**를 추가했다: `next()` 를 호출하지 않고 401 로 끝나는 미들웨어를 뒤에 두고, 두 번째 요청의 `ratelimit-remaining` 이 1 감소하는지 확인한다. 사용자 단위 키는 `apiLimiter` 에 그대로 남는다 | **FIXED** |
+| 38 | P2 | `LessonController` 의 초안 예외(#34)가 **소유권 단독** 또는 **stale `lecture:admin` role** 만으로 성립한다. 무료·public 강의에서는 `requireEnrollment` 가 Lecture membership 판정을 건너뛰므로, role 이 회수됐지만 `instructorId` 에 남아 있는 과거 강사나 membership 이 정지된 admin 토큰이 미발행 lesson 을 목록·상세로 계속 읽는다 | `canSeeUnpublishedLessons` 를 `CourseController.canSeeUnpublished` 와 **동일 조건**으로 맞췄다(async): `platform:super_admin` break-glass → 그 외에는 (소유 `instructorId` 일치 + 현재 `lecture:instructor`) 또는 lecture staff(`lecture:operator` \| `lecture:admin`) **이면서** `resolveLectureMembershipStatus(req)==='active'`. 목록 경로에서 membership 을 건너뛰던 `rolesIncludeLectureAdmin` 선행 단축도 제거해 판정 지점을 하나로 모았다. **소유권은 role 을 대체하지 않는다** | **FIXED** |
+
+spec 추가(12차): rate-limit-ordering spec **+1건**(401 로 끊긴 요청도 IP 상한을 소모) → **12/12** · merge-gate spec **+4건**(role 회수된 과거 소유 강사 · membership 없는 stale `lecture:admin` · active membership 운영자는 검토 목적으로 초안 열람 · 타 강의 소유 강사 차단) → **119/119**. 완화 0 · 신규 계약 약화 0.
+
+> **PR CI 의 남은 적색 2건은 main drift 다 — 이 PR 의 변경이 아니다.** `9bf65de68` 의 `API Server Jest` / `Code Quality Check` 실패는 `origin/main` 자체(`1e30e24ee`, 운영자 초대 Google 전환)에서 이미 동일하게 실패하고 있다: ① `unified-store-workspace-handoff.spec.ts › manifest 에 append 되고 expected-schema-states 와 lockstep 이다`(`1790125106065-CreateOperatorInvitations` 가 manifest·expected-schema-states 와 lockstep 이 아님) ② admin-dashboard vitest `OperatorsPage`(password-policy 단언이 재작성된 화면과 불일치). 그 뒤 main 의 "success" 런은 docs-only fast path 로 두 job 이 **skipped** 된 것이다. 본 PR 은 두 파일군 중 어느 것도 diff 에 포함하지 않고(로컬 full jest 347 suites PASS), **범위 밖이라 수정하지 않는다** — 해당 세션/별도 WO 소관.
+
 ### 17-4. 검증 (merge-gate)
 
 | 항목 | 결과 |
@@ -482,6 +495,7 @@ spec 추가(11차): 신규 `lecture-lms-rate-limit-ordering.spec.ts` **11건**(�
 | shared-space-ui vitest | 8 files / 100 PASS |
 | api-server tsc | 0 |
 | api-server jest 전체 (1차 f3b8c8ca5) | 전체 실행 345 suites(4 skipped) — 344 PASS + `lms-operator-multi-service-scope` 1 FAIL(정적 계약이 `isLectureCourse` 정의를 routes 파일에서 찾음 → lecture-access.ts 로 승격된 위치로 assertion 갱신 · 완화 0) → 재실행 PASS. 최종 345/345 · 5799 tests PASS(32 skipped) · 0 FAIL |
+| 12차(Codex 11차 응답 2건 · §17-3-k) | api-server tsc 0 · web-lecture tsc 0 · web-lecture vite build PASS · **api-server full jest 347 suites / 5,906 tests PASS (fail 0 · 32 skipped)** · merge-gate spec **119/119** · rate-limit-ordering spec **12/12** · eslint(LessonController + 신규/수정 spec 2) error 0. PR CI 의 `API Server Jest` · `Code Quality Check` 적색 2건은 **main drift**(§17-3-k 하단) — 본 PR diff 밖 |
 | 11차(Codex 8~10차 응답 7건 · §17-3-j) | api-server tsc 0 · web-lecture tsc 0 · web-lecture vite build PASS · web-kpa-society build PASS · **api-server full jest 347 suites / 5,898 tests PASS (fail 0)** · merge-gate spec **115/115** · rate-limit-ordering spec **11/11** · eslint(LMS 모듈 + 신규 spec) 신규 error 0 · CodeQL `js/missing-rate-limiting` 0 |
 | 10차(SonarCloud 중복 해소 · §17-3-i) | merge-gate spec 95/95 (동일) · 계약/단언 변경 0 |
 | 9차(재검토 반영 · §17-3-h) | api-server tsc 0 · merge-gate spec 95/95 · LMS·enrollment 관련 jest 16 suites / 207 tests PASS |

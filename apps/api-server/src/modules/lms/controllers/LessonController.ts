@@ -12,7 +12,15 @@ import {
 } from '../utils/lms-service-scope.js';
 // WO-O4O-LMS-CROSSSERVICE-READ-WRITE-BOUNDARY-COMPLETION-V1
 import { guardLessonScope } from '../utils/lms-scope-guard.js';
-import { rolesIncludeLectureAdmin, isLectureCourse } from '../middleware/lecture-access.js';
+import {
+  rolesIncludeLectureAdmin,
+  isLectureCourse,
+  isPlatformSuperAdmin,
+  hasLectureAdminRole,
+  hasLectureOperatorRole,
+  hasLectureInstructorRole,
+  resolveLectureMembershipStatus,
+} from '../middleware/lecture-access.js';
 
 /**
  * LessonController
@@ -39,15 +47,26 @@ export class LessonController extends BaseController {
    *
    * learner 경로(`/courses/:courseId/lessons`, `/lessons/:id`)는 `requireEnrollment` 만 통과하면
    * `isPublished=false` 인 초안까지 그대로 돌려줬다. 강사 초안 접근은 별도 경로
-   * (`/instructor/courses/:courseId/lessons`)가 담당하지만, 소유자 · lecture:admin 이
+   * (`/instructor/courses/:courseId/lessons`)가 담당하지만, 소유자 · lecture staff 가
    * learner 경로로 들어온 경우까지 막지 않기 위해 여기서만 예외를 둔다.
-   * 소유권은 role 을 대체하지 않으므로, scope(lecture) 판정은 호출부가 이미 끝낸 뒤에만 쓴다.
+   *
+   * 11차 후속(Codex P2 · LessonController:50): 예외의 조건은 `CourseController.canSeeUnpublished`
+   * 와 **같다**. 무료·public 강의에서는 `requireEnrollment` 가 membership 판정을 건너뛰므로,
+   * 여기서 active Lecture membership 을 직접 확인한다 — role 이 회수된 과거 강사(`instructorId`
+   * 잔존)나 membership 이 정지된 stale `lecture:admin` 토큰은 초안을 열지 못한다.
+   * 소유권은 role 을 대체하지 않는다. (`platform:super_admin` break-glass 만 예외.)
    */
-  private static canSeeUnpublishedLessons(req: Request, course: { instructorId?: string | null } | null | undefined): boolean {
+  private static async canSeeUnpublishedLessons(
+    req: Request,
+    course: { instructorId?: string | null } | null | undefined,
+  ): Promise<boolean> {
     const userId = (req as any).user?.id;
-    const userRoles: string[] = (req as any).user?.roles || [];
-    if (rolesIncludeLectureAdmin(userRoles)) return true;
-    return Boolean(userId) && course?.instructorId === userId;
+    if (!userId) return false;
+    if (isPlatformSuperAdmin(req)) return true;
+    const isOwningInstructor = Boolean(course?.instructorId) && course?.instructorId === userId && hasLectureInstructorRole(req);
+    const isLectureStaff = hasLectureOperatorRole(req) || hasLectureAdminRole(req);
+    if (!isOwningInstructor && !isLectureStaff) return false;
+    return (await resolveLectureMembershipStatus(req)) === 'active';
   }
 
   static async createLesson(req: Request, res: Response): Promise<any> {
@@ -91,7 +110,7 @@ export class LessonController extends BaseController {
       // 11차 P2: 미발행 lesson 은 소유자 · lecture:admin 이 아니면 존재를 알리지 않는다.
       if (lesson.isPublished === false) {
         const course = await CourseService.getInstance().getCourse(lesson.courseId);
-        if (!LessonController.canSeeUnpublishedLessons(req, course)) {
+        if (!(await LessonController.canSeeUnpublishedLessons(req, course))) {
           return BaseController.notFound(res, 'Lesson not found');
         }
       }
@@ -131,11 +150,9 @@ export class LessonController extends BaseController {
       // 11차 P2: learner 목록에는 발행된 lesson 만. 소유자 · lecture:admin 만 초안을 본다
       // (요청의 isPublished 필터를 신뢰하지 않고 서버가 확정한다).
       const effectiveFilters: Record<string, any> = { ...(filters as any) };
-      let canSeeDrafts = rolesIncludeLectureAdmin((req as any).user?.roles || []);
-      if (!canSeeDrafts) {
-        course = course ?? (await CourseService.getInstance().getCourse(courseId));
-        canSeeDrafts = LessonController.canSeeUnpublishedLessons(req, course);
-      }
+      // role 만으로 단정하지 않는다 — membership 까지 확인하는 단일 판정을 쓴다.
+      course = course ?? (await CourseService.getInstance().getCourse(courseId));
+      const canSeeDrafts = await LessonController.canSeeUnpublishedLessons(req, course);
       if (!canSeeDrafts) {
         effectiveFilters.isPublished = true;
       }
