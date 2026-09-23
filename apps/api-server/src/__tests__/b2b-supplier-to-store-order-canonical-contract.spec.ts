@@ -190,9 +190,13 @@ describe('WO-O4O-CROSSSERVICE-B2B-SUPPLIER-TO-STORE-ORDER-CANONICAL-CONTRACT-V1'
       expect(hits(/v1\(\s*[`'"]\/ecommerce\//)).toEqual([]);
     });
 
-    it('살아 있는 payment producer serviceKey 는 3종뿐이다', () => {
+    // WO-O4O-B2B-ORDER-CONTRACT-EVENT-OFFER-PAYMENT-FIRST-DOC-ALIGNMENT-V1:
+    //   Event Offer 는 특가 판매로 확정되어 payment-first 축에 편입됐다. 승인축 B2B 와 함께
+    //   `store-b2b` 공용 결제 축을 쓰므로 live producer 는 4종이다(baseline §3).
+    it('살아 있는 payment producer serviceKey 는 4종이다', () => {
       expect(hits(/['"`]neture-b2b['"`]/).length).toBeGreaterThan(0);
       expect(hits(/['"`]pharmacy-hub['"`]/).length).toBeGreaterThan(0);
+      expect(hits(/['"`]store-b2b['"`]/).length).toBeGreaterThan(0);
       expect(hits(/['"`]store-service-subscription['"`]/).length).toBeGreaterThan(0);
     });
 
