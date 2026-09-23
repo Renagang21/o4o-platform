@@ -211,6 +211,10 @@ jobs:
     #   변수가 없거나 비어 있으면 Actions 가 빈 문자열을 돌려주므로 **차단이 기본값**이다.
     if: vars.DEPLOY_ENABLED == 'true' && needs.detect-changes.outputs.neture == 'true'
     runs-on: ubuntu-latest
+    # WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 §20 — 배포 승인 게이트.
+    #   environment 가 붙은 job 은 required reviewer 승인 전에는 runner 가 배정되지 않는다
+    #   (변수 게이트는 skip, environment 는 waiting — build · migration · deploy 가 시작도 안 된다).
+    environment: production
     permissions:
       contents: read
       id-token: write
@@ -289,6 +293,10 @@ jobs:
     #   변수가 없거나 비어 있으면 Actions 가 빈 문자열을 돌려주므로 **차단이 기본값**이다.
     if: vars.DEPLOY_ENABLED == 'true' && needs.detect-changes.outputs.k-cosmetics == 'true'
     runs-on: ubuntu-latest
+    # WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 §20 — 배포 승인 게이트.
+    #   environment 가 붙은 job 은 required reviewer 승인 전에는 runner 가 배정되지 않는다
+    #   (변수 게이트는 skip, environment 는 waiting — build · migration · deploy 가 시작도 안 된다).
+    environment: production
     permissions:
       contents: read
       id-token: write
@@ -362,6 +370,10 @@ jobs:
     #   변수가 없거나 비어 있으면 Actions 가 빈 문자열을 돌려주므로 **차단이 기본값**이다.
     if: vars.DEPLOY_ENABLED == 'true' && needs.detect-changes.outputs.kpa-society == 'true'
     runs-on: ubuntu-latest
+    # WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 §20 — 배포 승인 게이트.
+    #   environment 가 붙은 job 은 required reviewer 승인 전에는 runner 가 배정되지 않는다
+    #   (변수 게이트는 skip, environment 는 waiting — build · migration · deploy 가 시작도 안 된다).
+    environment: production
     permissions:
       contents: read
       id-token: write
@@ -438,6 +450,10 @@ jobs:
     #   변수가 없거나 비어 있으면 Actions 가 빈 문자열을 돌려주므로 **차단이 기본값**이다.
     if: vars.DEPLOY_ENABLED == 'true' && needs.detect-changes.outputs.pharmacy-hub == 'true'
     runs-on: ubuntu-latest
+    # WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 §20 — 배포 승인 게이트.
+    #   environment 가 붙은 job 은 required reviewer 승인 전에는 runner 가 배정되지 않는다
+    #   (변수 게이트는 skip, environment 는 waiting — build · migration · deploy 가 시작도 안 된다).
+    environment: production
     permissions:
       contents: read
       id-token: write
@@ -511,6 +527,10 @@ jobs:
     #   변수가 없거나 비어 있으면 Actions 가 빈 문자열을 돌려주므로 **차단이 기본값**이다.
     if: vars.DEPLOY_ENABLED == 'true' && needs.detect-changes.outputs.lecture == 'true'
     runs-on: ubuntu-latest
+    # WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 §20 — 배포 승인 게이트.
+    #   environment 가 붙은 job 은 required reviewer 승인 전에는 runner 가 배정되지 않는다
+    #   (변수 게이트는 skip, environment 는 waiting — build · migration · deploy 가 시작도 안 된다).
+    environment: production
     permissions:
       contents: read
       id-token: write
@@ -567,6 +587,10 @@ jobs:
     #   변수가 없거나 비어 있으면 Actions 가 빈 문자열을 돌려주므로 **차단이 기본값**이다.
     if: vars.DEPLOY_ENABLED == 'true' && needs.detect-changes.outputs.hospital-pharmacy == 'true'
     runs-on: ubuntu-latest
+    # WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 §20 — 배포 승인 게이트.
+    #   environment 가 붙은 job 은 required reviewer 승인 전에는 runner 가 배정되지 않는다
+    #   (변수 게이트는 skip, environment 는 waiting — build · migration · deploy 가 시작도 안 된다).
+    environment: production
     permissions:
       contents: read
       id-token: write
@@ -623,6 +647,10 @@ jobs:
     #   변수가 없거나 비어 있으면 Actions 가 빈 문자열을 돌려주므로 **차단이 기본값**이다.
     if: vars.DEPLOY_ENABLED == 'true' && needs.detect-changes.outputs.store == 'true'
     runs-on: ubuntu-latest
+    # WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 §20 — 배포 승인 게이트.
+    #   environment 가 붙은 job 은 required reviewer 승인 전에는 runner 가 배정되지 않는다
+    #   (변수 게이트는 skip, environment 는 waiting — build · migration · deploy 가 시작도 안 된다).
+    environment: production
     permissions:
       contents: read
       id-token: write
@@ -679,6 +707,10 @@ jobs:
     #   변수가 없거나 비어 있으면 Actions 가 빈 문자열을 돌려주므로 **차단이 기본값**이다.
     if: vars.DEPLOY_ENABLED == 'true' && needs.detect-changes.outputs.kpa-branch == 'true'
     runs-on: ubuntu-latest
+    # WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 §20 — 배포 승인 게이트.
+    #   environment 가 붙은 job 은 required reviewer 승인 전에는 runner 가 배정되지 않는다
+    #   (변수 게이트는 skip, environment 는 waiting — build · migration · deploy 가 시작도 안 된다).
+    environment: production
     permissions:
       contents: read
       id-token: write
@@ -737,6 +769,10 @@ jobs:
     #   변수가 없거나 비어 있으면 Actions 가 빈 문자열을 돌려주므로 **차단이 기본값**이다.
     if: vars.DEPLOY_ENABLED == 'true' && needs.detect-changes.outputs.signage-player == 'true'
     runs-on: ubuntu-latest
+    # WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 §20 — 배포 승인 게이트.
+    #   environment 가 붙은 job 은 required reviewer 승인 전에는 runner 가 배정되지 않는다
+    #   (변수 게이트는 skip, environment 는 waiting — build · migration · deploy 가 시작도 안 된다).
+    environment: production
     permissions:
       contents: read
       id-token: write

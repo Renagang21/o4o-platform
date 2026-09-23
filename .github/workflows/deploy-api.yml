@@ -130,6 +130,10 @@ jobs:
 
   build-and-deploy:
     runs-on: ubuntu-latest
+    # WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 §20 — 배포 승인 게이트.
+    #   environment 가 붙은 job 은 required reviewer 승인 전에는 runner 가 배정되지 않는다
+    #   (변수 게이트는 skip, environment 는 waiting — build · migration · deploy 가 시작도 안 된다).
+    environment: production
     needs: [detect]
     # WO-O4O-API-CD-RUNTIME-AFFECTED-DEPLOY-GATE-V1 §11 · §13 · §15
     #
