@@ -166,7 +166,10 @@ export class SupplierOrderService {
    *   기존 Neture B2B 운영(created→preparing 등)을 그대로 유지한다.
    * - readiness 기준(IR-O4O-STORE-ORDER-PAYMENT-READINESS-MODEL-V1):
    *     paymentReady   := metadata.paymentStatus='paid' | metadata.paymentReady=true
-   *     collectionReady:= metadata.collectionStatus='confirmed'  (V2 collectionStatus 모델 대비)
+   *   WO-O4O-SUPPLIER-ORDER-PAYMENT-FULFILLMENT-SETTLEMENT-CANONICALIZATION-V1:
+   *     **collectionStatus 는 readiness 기준에서 제거됐다.** 확정 사업정책상 모든 실제
+   *     전자상거래 주문은 payment-first 이며 후불·외상·인보이스·미결제 배송은 없다.
+   *     metadata 필드 자체는 물리 제거하지 않지만 runtime 의미는 없다.
    *   + 보조: bridge 가 neture_order 자체를 paid 로 세팅한 경우(status='paid' | paid_at)도 ready 로 인정.
    *
    * 현재 bridge 가 아직 없어 checkout-origin neture_order 는 존재하지 않을 수 있다(positive guard hit 미발생).
@@ -190,9 +193,9 @@ export class SupplierOrderService {
     if (!isCheckoutOrigin) return { isCheckoutOrigin: false, fulfillmentReady: true };
 
     const paymentReady = md.paymentStatus === 'paid' || md.paymentReady === true;
-    const collectionReady = md.collectionStatus === 'confirmed';
     const statusReady = row.status === 'paid' || !!row.paid_at;
-    return { isCheckoutOrigin: true, fulfillmentReady: paymentReady || collectionReady || statusReady };
+    // WO-O4O-SUPPLIER-ORDER-PAYMENT-FULFILLMENT-SETTLEMENT-CANONICALIZATION-V1: collectionStatus OR 분기 제거(payment-first 확정).
+    return { isCheckoutOrigin: true, fulfillmentReady: paymentReady || statusReady };
   }
 
   async createShipment(orderId: string, supplierId: string, data: { carrier_code: string; carrier_name: string; tracking_number: string }) {

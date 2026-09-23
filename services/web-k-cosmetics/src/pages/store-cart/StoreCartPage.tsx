@@ -14,6 +14,8 @@ import { useNavigate } from 'react-router-dom';
 import { StoreCartView, useStoreCart } from '@o4o/store-ui-core';
 import { storeCartApi } from '@/api/storeCart';
 import { CART_SERVICE_KEY } from '@/utils/eventOfferCart';
+// WO-O4O-SUPPLIER-ORDER-PAYMENT-FULFILLMENT-SETTLEMENT-CANONICALIZATION-V1 2-E-4
+import { StoreB2bPayButton } from '@/components/store-cart/StoreB2bPayButton';
 
 export function StoreCartPage() {
   const navigate = useNavigate();
@@ -24,6 +26,7 @@ export function StoreCartPage() {
       cart={cart}
       accent="pink"
       emptyAction={{ label: '이벤트 상품 보기', onClick: () => navigate('/store-hub/event-offers') }}
+      renderPaymentAction={(result) => <StoreB2bPayButton result={result} />}
     />
   );
 }

@@ -96,6 +96,9 @@ import { createStoreExternalSalesController } from '../o4o-store/controllers/sto
 import { createKpaStoreTemplateController } from '../o4o-store/controllers/kpa-store-template.controller.js';
 import { createKpaCheckoutController } from './controllers/kpa-checkout.controller.js'; // WO-O4O-KPA-CUSTOMER-COMMERCE-LOOP-V1
 import { createKpaPaymentController } from './controllers/kpa-payment.controller.js'; // WO-O4O-KPA-CUSTOMER-COMMERCE-LOOP-V1
+// WO-O4O-SUPPLIER-ORDER-PAYMENT-FULFILLMENT-SETTLEMENT-CANONICALIZATION-V1 §2-E: 매장→공급자 B2B 결제(소비자 commerce 경로와 별개)
+import { createB2bPaymentController } from '../../services/payment/b2b/b2b-payment-controller.factory.js';
+import { KPA_B2B_SERVICE_KEYS } from '../../services/payment/b2b/store-b2b-payment.constants.js';
 import { createBlogController } from '../o4o-store/controllers/blog.controller.js';
 // WO-O4O-OPERATOR-BLOG-PUBLISHING-WRITE-API-V1: 운영자 HUB 게시 write API
 import { createOperatorBlogController } from '../o4o-store/controllers/operator-blog.controller.js';
@@ -2207,6 +2210,25 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   // ============================================================================
   const kpaPaymentController = createKpaPaymentController(dataSource, coreRequireAuth as any);
   router.use('/payments', kpaPaymentController);
+
+  // ============================================================================
+  // WO-O4O-SUPPLIER-ORDER-PAYMENT-FULFILLMENT-SETTLEMENT-CANONICALIZATION-V1 §2-E
+  // 매장 → 공급자 B2B 결제 (승인축 B2B + Event Offer 특가)
+  //   POST /api/v1/kpa/b2b/payments/prepare
+  //   POST /api/v1/kpa/b2b/payments/confirm
+  //   GET  /api/v1/kpa/b2b/payments/order/:orderId
+  //
+  // 위 `/payments` (소비자 → 매장 판매)는 410 Gone 으로 **그대로 유지**한다.
+  // 이 경로는 성격이 다른 축(B2B)이므로 별도 namespace 를 쓴다 —
+  // 소비자→매장 commerce 를 복구하는 것이 아니다.
+  // ============================================================================
+  router.use(
+    '/b2b/payments',
+    createB2bPaymentController(dataSource, coreRequireAuth as any, {
+      logLabel: 'KPA B2B Payment',
+      allowedServiceKeys: KPA_B2B_SERVICE_KEYS,
+    }),
+  );
 
   // Health check endpoint
   router.get('/health', (req, res) => {

@@ -172,6 +172,10 @@ export class CheckoutOrder {
    * WO-O4O-ORDER-COLLECTION-STATUS-METADATA-CONTRACT-V1:
    *   수금 확인 계약(V1)을 metadata 로 표현한다(컬럼 미추가). 계약/헬퍼는
    *   `services/order-collection-status.ts` 참조.
+   *   **[SUPERSEDED WO-O4O-SUPPLIER-ORDER-PAYMENT-FULFILLMENT-SETTLEMENT-CANONICALIZATION-V1]** 아래 collectionStatus readiness 계약은 더 이상 runtime 에서
+   *   적용되지 않는다. 확정 사업정책: 모든 실제 전자상거래 주문은 payment-first 이며
+   *   후불·외상·인보이스·미결제 배송은 존재하지 않는다. metadata 필드는 과거 기록 보존을
+   *   위해 물리 삭제하지 않지만, fulfillment/settlement 판정에는 쓰지 않는다.
    *   - collectionStatus='confirmed' 이면 fulfillment/settlement readiness 로 인정된다
    *     (paymentStatus='paid' 와 OR 관계). B2B/인보이스/운영자 확인 주문에 사용.
    *   - 필드: collectionStatus / collectionMethod / collectionConfirmedAt / collectionConfirmedBy.
