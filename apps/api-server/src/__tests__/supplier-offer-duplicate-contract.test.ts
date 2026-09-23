@@ -139,7 +139,10 @@ describe('source contract', () => {
 
   it('기존 계약을 유지한다 (SUPPLIER_NOT_ACTIVE 403, 그 외 400, 성공 201)', () => {
     const src = controllerSrc();
-    expect(src).toMatch(/result\.error === 'SUPPLIER_NOT_ACTIVE' \? 403/);
+    // WO-O4O-SUPPLIER-POST-REGISTRATION-PRODUCT-MANAGEMENT-OFFER-FIRST-REALIGNMENT-V1 §I (2026-09-23):
+    //   문자열 리터럴 'SUPPLIER_NOT_ACTIVE' 는 은퇴한 CSV Import 라우트에도 있었다. CSV 은퇴 후
+    //   살아있는 Offer 경로는 OfferErrorCode 상수를 쓰므로 두 표기를 모두 허용한다(403 계약 불변).
+    expect(src).toMatch(/result\.error === (?:'SUPPLIER_NOT_ACTIVE'|OfferErrorCode\.SUPPLIER_NOT_ACTIVE) \? 403/);
     expect(src).toMatch(/: 400;/);
     expect(src).toMatch(/res\.status\(201\)\.json\(result\)/);
   });
