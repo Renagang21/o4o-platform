@@ -429,6 +429,16 @@ spec 추가(8차): '8차 P2-9' 4건(membership 없는 소유 강사 404 · stale
 
 spec 추가(9차): P1-18 3건 · P2-10 4건 · P2-11 1건 → merge-gate spec **95/95**.
 
+### 17-3-i. 10차 — SonarCloud Quality Gate (Codex 지적 아님 · CI 게이트)
+
+`a4b5a3c4b` 에서 SonarCloud Quality Gate 가 **New Code 중복 3.5% (허용 3%)** 로 FAIL 했다. 나머지 check(API Server Jest · Code Quality · CodeQL · Analyze typescript · builds · guards)는 전부 PASS.
+
+| # | 등급 | 지적 | 처리 | 판정 |
+|---|---|---|---|---|
+| 29 | CI | 7차/9차에 추가한 merge-gate describe 3개가 동일한 `requireEnrollment` 실행 래퍼와 평가 정책 fixture 를 각자 복제 | `runEnrollment(req, options)` 공용 헬퍼 1개로 합치고, `lec-paid`·`lec-pub-approval`·`lec-pub-paid` 와 lesson fixture 를 전역 `beforeEach` 로 올렸다. describe 지역 `beforeEach` 3개 제거 | **FIXED** |
+
+**계약·단언 변경 0** — 테스트 수·단언은 그대로이고(95/95 동일) 중복된 보일러플레이트만 제거했다. test expectation 완화 0.
+
 ### 17-4. 검증 (merge-gate)
 
 | 항목 | 결과 |
@@ -436,6 +446,7 @@ spec 추가(9차): P1-18 3건 · P2-10 4건 · P2-11 1건 → merge-gate spec **
 | shared-space-ui vitest | 8 files / 100 PASS |
 | api-server tsc | 0 |
 | api-server jest 전체 (1차 f3b8c8ca5) | 전체 실행 345 suites(4 skipped) — 344 PASS + `lms-operator-multi-service-scope` 1 FAIL(정적 계약이 `isLectureCourse` 정의를 routes 파일에서 찾음 → lecture-access.ts 로 승격된 위치로 assertion 갱신 · 완화 0) → 재실행 PASS. 최종 345/345 · 5799 tests PASS(32 skipped) · 0 FAIL |
+| 10차(SonarCloud 중복 해소 · §17-3-i) | merge-gate spec 95/95 (동일) · 계약/단언 변경 0 |
 | 9차(재검토 반영 · §17-3-h) | api-server tsc 0 · merge-gate spec 95/95 · LMS·enrollment 관련 jest 16 suites / 207 tests PASS |
 | 8차(재검토 반영 · §17-3-g) | api-server tsc 0 · merge-gate spec 87/87 · LMS 관련 jest 15 suites / 198 tests PASS |
 | 7차(재검토 반영 · §17-3-f) | api-server tsc 0 · web-lecture tsc 0 · vite build PASS · merge-gate spec 83/83 · api-server jest 전체 346/350 suites(4 skipped) · 5,858/5,890 tests PASS(32 skipped) |
