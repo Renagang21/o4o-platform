@@ -184,11 +184,22 @@ backend Phase A 2커밋(`010952f0d` · `c921f90b5`)과 프런트/공통 WIP(`4d7
 
 ## 7. Phase A 배포 — BLOCKED (Lecture incident · 사용자 결정 2026-09-23)
 
-배포 워크플로 3종(`deploy-api.yml` · `deploy-web-services.yml` · `deploy-admin.yml`)에 **`--no-traffic` 이 없다**(실측).
-즉 `main` merge → `gcloud run deploy` 실행 → **새 revision 이 100% 트래픽을 받는다**. 현재 `main` 에는
-Lecture Phase 2 코드가 들어 있고 production 은 pre-cutover revision 으로 롤백된 상태이므로
+배포 워크플로 3종(`deploy-api.yml` · `deploy-web-services.yml` · `deploy-admin.yml`)에 `--no-traffic` 이 **없다**.
+처음 이를 "main merge → 새 revision 이 즉시 100% 를 받는다" 로 적었으나, **실측으로 정정한다(2026-09-23 13:0x~13:1xZ)**:
+트래픽이 특정 revision 에 **pin** 된 상태에서는 `gcloud run deploy` 가 새 revision 을 만들고도 트래픽을 옮기지 않는다
+(`o4o-core-api-03748-64l`(13:10Z) · `lecture-web-00014-9gj`(13:05Z) · `kpa-society-web-01996-r8d`(13:05Z) 가 생성됐지만
+트래픽은 여전히 `03746-qlz` · `00011-drs` · `01993-6z9` 100%). 타 세션 실측(`serving 0 percent of traffic`)과 일치한다.
+
+그래도 **결론은 동일하다**: ① 배포가 Phase 2 이미지를 production 에 만들어 두고 ② 이후 누군가 pin 을 해제하거나
+`update-traffic`/`--to-latest` 를 쓰는 순간 Lecture Phase 2 가 서빙되며 ③ API 배포는 migration job 을 동반한다.
+현재 `main` 에 Lecture Phase 2 코드가 있고 production 은 pre-cutover revision 으로 롤백된 상태이므로
 (incident 기록: `CHECK-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1` §19 · 커밋 `a7b660dbb` · 롤백 실행은 타 세션),
-**본 WO 를 main 에 merge 하면 Lecture Phase 2 가 함께 재배포되어 롤백이 무효화된다.**
+**본 WO 를 main 에 merge 해 배포 파이프라인을 돌리는 일은 Lecture 처분 확정 전까지 하지 않는다.**
+
+**배포 게이트(타 세션 · 사용자 승인)**: 저장소 변수 `DEPLOY_ENABLED` fail-closed 게이트가 도입됐고 현재 `false` 다(13:21:59Z).
+13:02:37Z 에 값이 `true` 로 바뀌어 배포 job 이 실행된 사건이 있었으나 **본 세션(legacy-password WO)은 GitHub 변수·시크릿 write 0** 이며
+그 시각 행적은 로컬 테스트 실행과 브랜치 push(22:08·22:10 KST) 뿐이다 — actor 특정은 GitHub API 한계(변수 actor 미제공 · 개인 저장소 audit-log 404)로 불가.
+본 WO 는 **어떤 경우에도 `DEPLOY_ENABLED` 를 켜지 않는다**; 배포는 사용자 승인 + Lecture 처분 확정 후에만 요청한다.
 
 사용자 결정(선택지 1) 에 따른 현재 경계:
 
