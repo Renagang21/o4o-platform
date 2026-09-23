@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { CourseVisibility } from '@o4o/lms-core';
+import { CourseStatus, CourseVisibility } from '@o4o/lms-core';
 import { BaseController } from '../../../common/base.controller.js';
 import { CourseService } from '../services/CourseService.js';
 import logger from '../../../utils/logger.js';
@@ -28,11 +28,25 @@ import {
  * - 모든 write 대상은 `course.serviceKey === 'lecture'` 만 — legacy 강의는 non-disclosure 404
  *   (operator routes 의 approve/reject/archive 와 동일 규칙, `isLectureCourse`).
  * - serviceKey 는 PATCH 로 바꿀 수 없다 (CourseService.updateCourse allowlist).
+ * 7차 재검토(Codex):
+ * - P1-17 학습자 목록·상세는 PUBLISHED 만 — 운영자 승인 전 초안은 비노출(404). 전체 상태가 필요한
+ *   운영 목록은 `/operator/courses`(requireLectureOperator) 가 따로 있다.
+ * - P2-7 생성 시 instructorId 는 serviceKey 와 같이 서버가 요청자로 고정한다(타인 명의 초안 금지).
  */
 export class CourseController extends BaseController {
   private static isOwnerOrAdmin(req: Request, userId: string, courseInstructorId: string): boolean {
     if (hasLectureAdminRole(req)) return true;
     return courseInstructorId === userId;
+  }
+
+  /**
+   * 7차 P1-17: 학습자 경로에서 게시 전 강의를 볼 수 있는 주체 — 소유 강사와 Lecture 운영자(admin 포함).
+   * 그 외에는 상태를 드러내지 않고 404 로 답한다.
+   */
+  private static canSeeUnpublished(req: Request, courseInstructorId: string): boolean {
+    if (hasLectureOperatorRole(req) || hasLectureAdminRole(req)) return true;
+    const userId = (req as any).user?.id;
+    return !!userId && courseInstructorId === userId;
   }
 
   /** write 대상 강의를 로드한다. 없거나 Lecture 소유가 아니면 404 를 보내고 null 을 돌려준다. */
@@ -53,10 +67,9 @@ export class CourseController extends BaseController {
       // 강의 생성 자격은 라우트 guard(active lecture membership + lecture:instructor)가
       // 이미 판정했다. 유료 여부에 따른 별도 role 판정(legacy lms:instructor/kpa:admin)은 제거.
 
-      // Set instructorId to current user if not specified
-      if (!data.instructorId && userId) {
-        data.instructorId = userId;
-      }
+      // 7차 P2-7: instructorId 는 클라이언트 값을 신뢰하지 않는다 — serviceKey 와 동일하게 서버가
+      // 요청자로 고정한다 (Lecture 강사가 타인 명의의 강의 초안을 만들 수 없다).
+      data.instructorId = userId;
 
       // WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 §8:
       //   Lecture 가 LMS runtime 의 유일한 Application Service 다. 생성 강의의 서비스 귀속은
@@ -98,6 +111,12 @@ export class CourseController extends BaseController {
 
       // 다른 서비스의 강의는 존재 자체를 노출하지 않는다 (403 아닌 404).
       if (!isCourseInServiceScope(course.serviceKey, serviceScope)) {
+        return BaseController.notFound(res, 'Course not found');
+      }
+
+      // 7차 P1-17: 학습자 상세는 게시된 강의만. 소유 강사·운영자만 게시 전 상태를 열람한다.
+      // (비노출은 403 이 아니라 404 — 존재 자체를 드러내지 않는다.)
+      if (course.status !== CourseStatus.PUBLISHED && !CourseController.canSeeUnpublished(req, course.instructorId)) {
         return BaseController.notFound(res, 'Course not found');
       }
 
@@ -144,6 +163,14 @@ export class CourseController extends BaseController {
       // public 만 — members 강의는 목록에서도 제외한다.
       if (!(await isActiveLectureLearner(req))) {
         filters.visibility = CourseVisibility.PUBLIC;
+      }
+
+      // 7차 P1-17: 학습자 목록은 클라이언트 status 를 쓰지 않는다 — 서버가 PUBLISHED 로 고정한다.
+      // 전체 상태가 필요한 운영 목록은 같은 handler 를 쓰는 `/operator/courses` 뿐이며,
+      // 그 라우트는 requireLectureOperator 가 이미 판정했다(경로 + role 둘 다 확인).
+      const isOperatorListing = req.path.startsWith('/operator/') && hasLectureOperatorRole(req);
+      if (!isOperatorListing) {
+        filters.status = CourseStatus.PUBLISHED;
       }
 
       const { courses, total } = await service.listCourses(filters);

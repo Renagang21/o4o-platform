@@ -19,6 +19,9 @@
  *  4차 P1-14 문항 id 보존     : 편집기·updateQuiz 가 questions[].id 를 유지한다 (채점 매칭 유실 방지)
  *  4차 P1-15 제출 enrollment  : quiz/assignment 제출은 membership 위에 enrollment 정책까지 통과해야 한다
  *  6차 P1-16 퀴즈 저장 정합   : 정답 없는/보기에 없는 문항 저장 차단 · 보기 편집 시 정답 동기화 · 로드 실패를 미존재로 오인 금지(중복 퀴즈)
+ *  7차 P1-17 학습자 노출 상태 : GET /courses · /courses/:id 는 PUBLISHED 만 (초안은 소유 강사·운영자에게만 · 그 외 404)
+ *  7차 P2-7  생성 명의       : createCourse 의 instructorId 는 서버가 요청자로 고정한다
+ *  7차 P2-8  평가 조회 정책  : lesson quiz/assignment 조회에도 visibility·membership·enrollment 정책 (소유 강사 예외)
  *
  * DB 없이 controller/service 를 실제로 실행한다: TypeORM entity 그래프는 virtual mock,
  * DataSource 는 service_memberships / lms_lessons 조회만 흉내낸다.
@@ -51,7 +54,13 @@ jest.mock('../database/connection.js', () => ({
   AppDataSource: {
     get isInitialized() { return true; },
     // InstructorController 는 Enrollment repository 를 직접 쓴다 — 그 외 repository 는 사용하지 않는다.
-    getRepository: (entity: any) => (entity?.name === 'Enrollment' ? enrollmentRepo : {}),
+    getRepository: (entity: any) => {
+      const name = typeof entity === 'string' ? entity : entity?.name;
+      if (name === 'Enrollment') return enrollmentRepo;
+      if (name === 'Lesson') return lessonEntityRepo;   // 7차 P2-8: requireEnrollment lessonId → courseId
+      if (name === 'Course') return courseEntityRepo;   // 7차 P2-8: requireEnrollment course 정책 로드
+      return {};
+    },
     query: jest.fn(async (sql: string, params: any[] = []) => {
       if (sql.includes('FROM lms_lessons WHERE id')) {
         const l = lessons[params[0]];
@@ -103,6 +112,7 @@ import { CertificateController } from '../modules/lms/controllers/CertificateCon
 import { CertificateService } from '../modules/lms/services/CertificateService.js';
 import { AssignmentController } from '../modules/lms/controllers/AssignmentController.js';
 import { InstructorController } from '../modules/lms/controllers/InstructorController.js';
+import { requireEnrollment } from '../modules/lms/middleware/requireEnrollment.js';
 
 const enrollments: Record<string, { id: string; courseId: string; userId: string; status: string }> = {};
 let enrollmentSaves: string[] = [];
@@ -112,6 +122,13 @@ const enrollmentRepo = {
     return e ? { ...e, course: courses[e.courseId] ? { ...courses[e.courseId] } : null } : null;
   },
   save: async (e: any) => { enrollmentSaves.push(e.id); return e; },
+};
+// 7차 P2-8: requireEnrollment 가 쓰는 TypeORM repository 2종 (in-memory)
+const lessonEntityRepo: any = {
+  findOne: async ({ where }: any) => (lessons[where.id] ? { id: where.id, courseId: lessons[where.id].courseId } : null),
+};
+const courseEntityRepo: any = {
+  findOne: async ({ where }: any) => (courses[where.id] ? { ...courses[where.id] } : null),
 };
 let assignmentWrites: string[] = [];
 const assignmentSvc: any = {
@@ -123,8 +140,9 @@ type CourseRow = { id: string; serviceKey: string | null; visibility: string; in
 const courses: Record<string, CourseRow> = {};
 const quizzes: Record<string, any> = {};
 
-function makeReq(opts: { id?: string; roles?: string[]; member?: boolean; params?: any; body?: any; query?: any } = {}): any {
-  const req: any = { params: opts.params ?? {}, body: opts.body ?? {}, query: opts.query ?? {} };
+function makeReq(opts: { id?: string; roles?: string[]; member?: boolean; params?: any; body?: any; query?: any; path?: string } = {}): any {
+  // 7차 P1-17: listCourses 는 학습자 목록(/courses)과 운영 목록(/operator/courses)을 path 로 구분한다.
+  const req: any = { params: opts.params ?? {}, body: opts.body ?? {}, query: opts.query ?? {}, path: opts.path ?? '/courses' };
   if (opts.id) {
     req.user = {
       id: opts.id,
@@ -155,14 +173,17 @@ beforeEach(() => {
   for (const k of Object.keys(courses)) delete courses[k];
   for (const k of Object.keys(lessons)) delete lessons[k];
   for (const k of Object.keys(quizzes)) delete quizzes[k];
-  courses['lec-pub'] = { id: 'lec-pub', serviceKey: 'lecture', visibility: 'public', instructorId: 'inst', status: 'draft', title: 'L public', tags: ['a'] };
-  courses['lec-mem'] = { id: 'lec-mem', serviceKey: 'lecture', visibility: 'members', instructorId: 'inst', status: 'draft', title: 'L members', tags: ['a'] };
+  courses['lec-pub'] = { id: 'lec-pub', serviceKey: 'lecture', visibility: 'public', instructorId: 'inst', status: 'published', title: 'L public', tags: ['a'] };
+  courses['lec-mem'] = { id: 'lec-mem', serviceKey: 'lecture', visibility: 'members', instructorId: 'inst', status: 'published', title: 'L members', tags: ['a'] };
+  // 7차 P1-17: 게시 전 강의 — 소유 강사·운영자 외에는 존재를 드러내지 않는다
+  courses['lec-draft'] = { id: 'lec-draft', serviceKey: 'lecture', visibility: 'public', instructorId: 'inst', status: 'draft', title: 'L draft', tags: ['a'] };
   courses['kpa-old'] = { id: 'kpa-old', serviceKey: 'kpa-society', visibility: 'members', instructorId: 'inst', status: 'pending_review', title: 'legacy', tags: ['a'] };
   courses['null-old'] = { id: 'null-old', serviceKey: null, visibility: 'public', instructorId: 'inst', status: 'draft', title: 'legacy null', tags: ['a'] };
 
   // CourseService: repository 를 in-memory 로 대체 (updateCourse 는 실제 코드 경로 실행)
   const cs: any = CourseService.getInstance();
   cs.courseRepository = {
+    create: (d: any) => ({ id: d.id ?? 'new-course', ...d }),
     findOne: async ({ where }: any) => (courses[where.id] ? { ...courses[where.id] } : null),
     save: async (c: any) => { savedCourse = c; courses[c.id] = { ...courses[c.id], ...c }; return c; },
   };
@@ -638,10 +659,10 @@ describe('3차 P1-8 PATCH /courses/:id 는 status 를 바꾸지 않는다', () =
   });
   it('소유 강사가 PATCH { status: published } → 저장된 status 는 draft 그대로', async () => {
     const res = makeRes();
-    await CourseController.updateCourse(makeReq({ id: 'inst', roles: ['lecture:instructor'], member: true, params: { id: 'lec-pub' }, body: { title: 'renamed', status: 'published' } }), res);
+    await CourseController.updateCourse(makeReq({ id: 'inst', roles: ['lecture:instructor'], member: true, params: { id: 'lec-draft' }, body: { title: 'renamed', status: 'published' } }), res);
     expect(res.statusCode).toBe(200);
-    expect(courses['lec-pub'].status).toBe('draft');
-    expect(courses['lec-pub'].title).toBe('renamed');
+    expect(courses['lec-draft'].status).toBe('draft');
+    expect(courses['lec-draft'].title).toBe('renamed');
   });
 });
 
@@ -779,6 +800,107 @@ import * as path from 'path';
 const REPO_ROOT = path.resolve(__dirname, '../../../..');
 const read = (rel: string) => fs.readFileSync(path.join(REPO_ROOT, rel), 'utf8');
 
+// ─────────────────────────────────────────────────────────────────────────────
+// 7차 P1-17 학습자 노출 상태 / P2-7 생성 명의 / P2-8 평가 조회 정책
+// ─────────────────────────────────────────────────────────────────────────────
+describe('7차 P1-17 학습자 목록·상세는 게시된 강의만', () => {
+  it('GET /courses · 비로그인이 status=draft 를 보내도 서버가 published 로 고정', async () => {
+    await CourseController.listCourses(makeReq({ query: { status: 'draft' } }), makeRes());
+    expect(listFilters[0].status).toBe('published');
+  });
+  it('GET /courses · active membership 학습자도 published 고정', async () => {
+    await CourseController.listCourses(makeReq({ id: 'u-mem', member: true, query: { status: 'pending_review' } }), makeRes());
+    expect(listFilters[0].status).toBe('published');
+  });
+  it('GET /operator/courses · lecture:operator → 클라이언트 status 유지 (운영 목록은 별도 경로)', async () => {
+    await CourseController.listCourses(makeReq({ id: 'op', roles: ['lecture:operator'], member: true, path: '/operator/courses', query: { status: 'pending_review' } }), makeRes());
+    expect(listFilters[0].status).toBe('pending_review');
+  });
+  it('운영자라도 학습자 경로(/courses)로 오면 published 고정', async () => {
+    await CourseController.listCourses(makeReq({ id: 'op', roles: ['lecture:operator'], member: true, query: { status: 'draft' } }), makeRes());
+    expect(listFilters[0].status).toBe('published');
+  });
+  it('GET /courses/:id · 비로그인 · 초안 → 404 (제목 비노출)', async () => {
+    const res = makeRes();
+    await CourseController.getCourse(makeReq({ params: { id: 'lec-draft' } }), res);
+    expect(res.statusCode).toBe(404);
+    expect(JSON.stringify(res.body)).not.toContain('L draft');
+  });
+  it('GET /courses/:id · 다른 회원(membership 있음) · 초안 → 404', async () => {
+    const res = makeRes();
+    await CourseController.getCourse(makeReq({ id: 'u-mem', member: true, params: { id: 'lec-draft' } }), res);
+    expect(res.statusCode).toBe(404);
+    expect(JSON.stringify(res.body)).not.toContain('L draft');
+  });
+  it('GET /courses/:id · 소유 강사 → 200 (편집 화면은 같은 경로를 쓴다)', async () => {
+    const res = makeRes();
+    await CourseController.getCourse(makeReq({ id: 'inst', roles: ['lecture:instructor'], member: true, params: { id: 'lec-draft' } }), res);
+    expect(res.statusCode).toBe(200);
+    expect(res.body.data.course.title).toBe('L draft');
+  });
+  it('GET /courses/:id · lecture:operator → 200 · 게시 강의는 종전대로 200', async () => {
+    const op = makeRes();
+    await CourseController.getCourse(makeReq({ id: 'op', roles: ['lecture:operator'], member: true, params: { id: 'lec-draft' } }), op);
+    expect(op.statusCode).toBe(200);
+    const pub = makeRes();
+    await CourseController.getCourse(makeReq({ params: { id: 'lec-pub' } }), pub);
+    expect(pub.statusCode).toBe(200);
+  });
+});
+
+describe('7차 P2-7 createCourse 의 instructorId 는 서버가 요청자로 고정한다', () => {
+  it('body 의 instructorId(타인) 는 무시된다 · serviceKey 도 lecture 고정', async () => {
+    const res = makeRes();
+    await CourseController.createCourse(
+      makeReq({ id: 'inst', roles: ['lecture:instructor'], member: true, body: { title: 'new', tags: ['a'], instructorId: 'victim', serviceKey: 'kpa-society' } }),
+      res,
+    );
+    expect(res.statusCode).toBe(201);
+    expect(savedCourse.instructorId).toBe('inst');
+    expect(savedCourse.serviceKey).toBe('lecture');
+    expect(savedCourse.status).toBe('draft');
+  });
+});
+
+describe('7차 P2-8 lesson quiz/assignment 조회에도 강의 접근 정책', () => {
+  const run = async (req: any) => {
+    const res = makeRes();
+    let passed = false;
+    await requireEnrollment({ checkLesson: true, allowCourseOwner: true })(req, res, (() => { passed = true; }) as any);
+    return { res, passed };
+  };
+  beforeEach(() => {
+    courses['lec-paid'] = { id: 'lec-paid', serviceKey: 'lecture', visibility: 'members', instructorId: 'inst', status: 'published', title: 'paid', isPaid: true };
+    lessons['les-paid'] = { courseId: 'lec-paid' };
+    lessons['les-kpa'] = { courseId: 'kpa-old' };
+  });
+  it('lessonId 파라미터(:lessonId)로도 course 를 역추적한다 — membership 없는 회원 → 403', async () => {
+    const { res, passed } = await run(makeReq({ id: 'u-nomember', params: { lessonId: 'les-paid' } }));
+    expect(passed).toBe(false);
+    expect(res.statusCode).toBe(403);
+    expect(res.body.code).toBe('MEMBERSHIP_NOT_FOUND');
+  });
+  it('membership 은 있으나 유료 강의에 등록하지 않은 회원 → 403 ENROLLMENT_REQUIRED', async () => {
+    const { res, passed } = await run(makeReq({ id: 'u-mem', member: true, params: { lessonId: 'les-paid' } }));
+    expect(passed).toBe(false);
+    expect(res.statusCode).toBe(403);
+    expect(res.body.code).toBe('ENROLLMENT_REQUIRED');
+  });
+  it('소유 강사·lecture:admin 은 통과 (편집 화면의 과제 조회가 막히지 않는다)', async () => {
+    expect((await run(makeReq({ id: 'inst', roles: ['lecture:instructor'], member: true, params: { lessonId: 'les-paid' } }))).passed).toBe(true);
+    expect((await run(makeReq({ id: 'adm', roles: ['lecture:admin'], member: true, params: { lessonId: 'les-paid' } }))).passed).toBe(true);
+  });
+  it('legacy(kpa-society) lesson 은 소유 강사에게도 404 (scope 가 먼저)', async () => {
+    const { res, passed } = await run(makeReq({ id: 'inst', roles: ['lecture:admin'], member: true, params: { lessonId: 'les-kpa' } }));
+    expect(passed).toBe(false);
+    expect(res.statusCode).toBe(404);
+  });
+  it('public 강의 lesson 은 종전대로 통과', async () => {
+    lessons['les-pub'] = { courseId: 'lec-pub' };
+    expect((await run(makeReq({ id: 'u-nomember', params: { lessonId: 'les-pub' } }))).passed).toBe(true);
+  });
+});
+
 describe('정적 계약', () => {
   it('web-lecture instructorApi.getQuizForLesson 은 강사 전용 경로를 쓴다', () => {
     const src = read('services/web-lecture/src/api/lecture.ts');
@@ -789,7 +911,8 @@ describe('정적 계약', () => {
   it('라우트: 강사 quiz 읽기는 requireInstructor · learner 읽기는 그대로', () => {
     const routes = read('apps/api-server/src/modules/lms/routes/lms.routes.ts');
     expect(routes).toMatch(/router\.get\('\/instructor\/lessons\/:lessonId\/quiz', requireAuth, requireInstructor, asyncHandler\(QuizController\.getQuizForLessonAsInstructor\)\)/);
-    expect(routes).toMatch(/router\.get\('\/lessons\/:lessonId\/quiz', requireAuth, asyncHandler\(QuizController\.getQuizForLesson\)\)/);
+    // 7차 P2-8: learner 읽기에도 enrollment 정책이 붙었다 (controller 는 그대로)
+    expect(routes).toMatch(/router\.get\('\/lessons\/:lessonId\/quiz', requireAuth, requireEnrollment\(\{ checkLesson: true, allowCourseOwner: true \}\), asyncHandler\(QuizController\.getQuizForLesson\)\)/);
     // 대상 강의 판정은 lecture-access 의 단일 helper 를 공유한다 (routes 로컬 재정의 0)
     expect(routes).not.toMatch(/function isLectureCourse/);
     expect(routes).toContain('isLectureCourse } from \'../middleware/lecture-access.js\'');
@@ -831,6 +954,11 @@ describe('정적 계약', () => {
     expect(page).not.toContain('} catch { /* 없으면 새로 만든다 */ }');
     const api = read('services/web-lecture/src/api/lecture.ts');
     expect(api).toContain('export function errorStatus(err: unknown): number | undefined');
+  });
+  it('7차 P2-8: 평가 조회 라우트도 requireEnrollment 를 거친다', () => {
+    const routes = read('apps/api-server/src/modules/lms/routes/lms.routes.ts');
+    expect(routes).toContain("router.get('/lessons/:lessonId/quiz', requireAuth, requireEnrollment({ checkLesson: true, allowCourseOwner: true })");
+    expect(routes).toContain("router.get('/lessons/:lessonId/assignment', requireAuth, requireEnrollment({ checkLesson: true, allowCourseOwner: true })");
   });
   it('4차 P1-15: 평가 제출 라우트는 enrollment 정책을 통과해야 한다', () => {
     const routes = read('apps/api-server/src/modules/lms/routes/lms.routes.ts');

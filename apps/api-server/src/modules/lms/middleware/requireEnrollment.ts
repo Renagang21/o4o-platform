@@ -26,7 +26,7 @@ import {
   InvalidLmsServiceKeyError,
   INVALID_SERVICE_KEY_CODE,
 } from '../utils/lms-service-scope.js';
-import { resolveLectureMembershipStatus, isPlatformSuperAdmin } from './lecture-access.js';
+import { resolveLectureMembershipStatus, isPlatformSuperAdmin, hasLectureAdminRole } from './lecture-access.js';
 
 interface RequireEnrollmentOptions {
   /** lesson 라우트에서 lessonId → courseId 역추적 */
@@ -38,6 +38,11 @@ interface RequireEnrollmentOptions {
    */
   checkQuiz?: boolean;
   checkAssignment?: boolean;
+  /**
+   * 7차 P2-8: 강사 편집 화면이 쓰는 조회(평가 읽기)에서 소유 강사·lecture:admin 은
+   * enrollment 없이 통과시킨다. 학습자 정책(visibility · membership · 유료/승인 enrollment)은 그대로.
+   */
+  allowCourseOwner?: boolean;
 }
 
 /** quiz → (lesson) → course. lessonId 가 없으면 quiz.courseId 를 쓴다. */
@@ -67,10 +72,11 @@ export function requireEnrollment(options?: RequireEnrollmentOptions) {
     let courseId = req.params.courseId;
 
     // lesson 경로인 경우: lessonId → courseId 역추적
-    if (!courseId && req.params.id && options?.checkLesson) {
+    const lessonParam = req.params.id ?? req.params.lessonId;
+    if (!courseId && lessonParam && options?.checkLesson) {
       const lessonRepo = AppDataSource.getRepository('Lesson');
       const lesson = await lessonRepo.findOne({
-        where: { id: req.params.id },
+        where: { id: lessonParam },
         select: ['id', 'courseId'],
       });
       if (!lesson) {
@@ -106,7 +112,7 @@ export function requireEnrollment(options?: RequireEnrollmentOptions) {
     const courseRepo = AppDataSource.getRepository(Course);
     const course = await courseRepo.findOne({
       where: { id: courseId },
-      select: ['id', 'visibility', 'isPaid', 'requiresApproval', 'serviceKey'],
+      select: ['id', 'visibility', 'isPaid', 'requiresApproval', 'serviceKey', 'instructorId'],
     });
 
     if (!course) {
@@ -131,6 +137,11 @@ export function requireEnrollment(options?: RequireEnrollmentOptions) {
       // non-disclosure — scope 밖 resource 는 존재를 드러내지 않는다
       const message = options?.checkLesson ? 'Lesson not found' : 'Course not found';
       return res.status(404).json({ success: false, error: message });
+    }
+
+    // 7차 P2-8: scope 판정 이후에만 — 소유 강사·lecture:admin 은 자기 강의의 평가를 수강 없이 읽는다.
+    if (options?.allowCourseOwner && ((course as any).instructorId === userId || hasLectureAdminRole(req))) {
+      return next();
     }
 
     // PUBLIC 강의: enrollment 없이 통과

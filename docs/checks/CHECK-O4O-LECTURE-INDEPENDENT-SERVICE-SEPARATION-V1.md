@@ -381,6 +381,32 @@ sweep(지적 외 · 동일 계열): `InstructorController` `dashboardStats · pa
 spec 추가(3차): P1-8 2건 · P1-9 2건 · P1-10 2건 · P1-11 2건 · P1-12 2건 · P2-2 정적 1건 → merge-gate spec **56/56**.
 
 
+### 17-3-e. Codex 4·5·6차 재검토 — 처리표 (커밋 당시 CHECK 미기록분 · 사후 기록)
+
+4~6 차는 같은 PR 에서 별도 세션이 처리했고 CHECK 에 남기지 않았다. 판정 근거는 각 커밋 메시지와 merge-gate spec 이며, 여기 한 표로 합친다 (새 CHECK 없음).
+
+| # | 등급 | 지적 | 처리 | 커밋 | 판정 |
+|---|---|---|---|---|---|
+| 15 | P1 | `POST /quizzes` 가 `courseId` 를 생략하고 `lessonId` 만 보내면 scope·소유권 검사를 통째로 건너뜀 | 귀속될 course 를 먼저 확정(lessonId → `guardLessonScope` + 실제 courseId) · courseId 와 lesson 소속 불일치 404 · 둘 다 없으면 400 · 확정된 courseId 로 저장 | `edc209933` | **FIXED** |
+| 16 | P1 | 강사 편집기가 `questions[].id` 를 버려 저장 시 기존 제출 답안의 채점 매칭이 전부 깨짐 | 편집기가 id 를 유지 · `QuizService.updateQuiz` 가 같은 order 의 기존 id 를 승계(없으면 발급) | `c8154a108` | **FIXED** |
+| 17 | P1 | quiz/assignment 제출이 membership 만 보고 유료·승인 강의에서 승인 enrollment 없이 저장(보상 포함) | `requireEnrollment({ checkQuiz \| checkAssignment })` 를 두 제출 라우트에 — write 이전 판정 · 미존재는 404 | `c8154a108` | **FIXED** |
+| 18 | P1 | 정답 없는 문항 저장 가능 → `checkAnswer` 가 항상 false 라 합격 불가 | 저장 전 문항별 정답 필수 · 선택형은 남은 보기 중 하나여야 함(문항 번호 안내) | `c05128897` | **FIXED** |
+| 19 | P2 | 보기 텍스트 편집·삭제 시 선택해 둔 정답이 보기에 없는 값으로 남음 | `patchQ` 에서 options 변경 시 answer remap(이름 변경 승계 · 삭제 시 해제) | `c05128897` | **FIXED** |
+| 20 | P2 | 퀴즈 로드 실패(5xx·네트워크·권한)를 "퀴즈 없음" 으로 삼켜 중복 생성 | 404 만 새로 만들기 · 그 외는 배너 + 저장 차단(`errorStatus`) · 같은 결함의 과제 편집기에도 적용 | `c05128897` | **FIXED** |
+
+4·5차 P2 중 **lifecycle notification 의 serviceKey 누락**, **legacy KPA 딥링크 보존**은 범위 밖으로 보고만 했다 (§17-6 잔여).
+
+### 17-3-f. Codex 7차 재검토(`71a03a3f5` 대상) — 신규 지적 처리표
+
+| # | 등급 | 지적 | 처리 | 판정 |
+|---|---|---|---|---|
+| 21 | P1 | Lecture membership 이 없는 사용자에게 `AccessGate` 가 안내만 하고 실제 가입 동작이 없음(`lecture.joinEnabled=false` · 전용 가입 API 없음) | 코드로 닫지 않는다. self-join 을 켜는 것은 서비스 가입 정책 변경(route·계약 변경 · WO 중지 조건)이고, WO 의 `AUTO_LECTURE_MEMBERSHIP=0` 과 직접 충돌한다. **배포 게이트**로 고정: coordinated deploy 전에 운영자가 membership 부여 경로(운영자 지정 또는 `joinEnabled` 정책 결정)를 확정해야 한다 — §17-5 실행 순서에 편입 | **OPERATIONAL_GATE** |
+| 22 | P1 | 학습자 목록·상세가 게시 상태를 강제하지 않아 익명 사용자가 `?status=draft` 또는 알려진 ID 로 승인 전 초안 열람 | `listCourses` 는 서버가 `status=PUBLISHED` 고정(운영 목록은 `/operator/courses` + `requireLectureOperator` 경로일 때만 클라이언트 status 유지) · `getCourse` 는 PUBLISHED 가 아니면 소유 강사·Lecture 운영자 외 404(non-disclosure) | **FIXED** |
+| 23 | P2 | `GET /lessons/:lessonId/quiz` · `/assignment` 가 `requireAuth` 만 — 비회원·미등록자가 문항·과제 안내 열람 | 두 조회에 `requireEnrollment({ checkLesson: true, allowCourseOwner: true })` — visibility·membership·유료/승인 enrollment 정책을 제출 경로와 동일하게 적용. 소유 강사·`lecture:admin` 은 통과(편집 화면 회귀 방지) · `checkLesson` 이 `:lessonId` 파라미터도 역추적 | **FIXED** |
+| 24 | P2 | `createCourse` 가 클라이언트 `instructorId` 를 보존해 타인 명의 초안 생성 가능 | `serviceKey` 와 동일하게 서버가 `instructorId = 요청자` 로 무조건 고정 | **FIXED** |
+
+spec 추가(7차): P1-17 8건 · P2-7 1건 · P2-8 5건 · 정적 계약 1건 → merge-gate spec **83/83**.
+
 ### 17-4. 검증 (merge-gate)
 
 | 항목 | 결과 |
@@ -388,6 +414,7 @@ spec 추가(3차): P1-8 2건 · P1-9 2건 · P1-10 2건 · P1-11 2건 · P1-12 2
 | shared-space-ui vitest | 8 files / 100 PASS |
 | api-server tsc | 0 |
 | api-server jest 전체 (1차 f3b8c8ca5) | 전체 실행 345 suites(4 skipped) — 344 PASS + `lms-operator-multi-service-scope` 1 FAIL(정적 계약이 `isLectureCourse` 정의를 routes 파일에서 찾음 → lecture-access.ts 로 승격된 위치로 assertion 갱신 · 완화 0) → 재실행 PASS. 최종 345/345 · 5799 tests PASS(32 skipped) · 0 FAIL |
+| 7차(재검토 반영 · §17-3-f) | api-server tsc 0 · web-lecture tsc 0 · vite build PASS · merge-gate spec 83/83 · api-server jest 전체 346/350 suites(4 skipped) · 5,858/5,890 tests PASS(32 skipped) |
 | 3차(재검토 반영 · §17-3-d) | api-server tsc 0 · web-lecture tsc 0 · vite build PASS · merge-gate spec 56/56 · api-server jest 전체 345/345 suites(4 skipped) · 5817 tests PASS(32 skipped) |
 | 2차(재검토 반영) | api-server tsc 0 · web-lecture tsc 0 · lecture 3 suites 71/71 · api-server jest 전체 345/345 suites · 5807 tests PASS(32 skipped · 0 FAIL — P1-6/7/P2 반영본 · apiLimiter 1줄은 tsc+lecture 3 suites 로 로컬 확인, 전체는 CI jest) |
 | web-lecture tsc · vite build | 0 · PASS |
@@ -404,3 +431,4 @@ merge(PR #225) → final production re-census(SELECT only)
 
 - Phase 2 runtime 만 먼저 배포하면 production 11 course(kpa-society 8 · pharmacy-hub 3) 가 Lecture 경로에서 404 가 되고 기존 서비스 URL 은 이미 Lecture 로 외부 이동한다 → 단독 배포 금지.
 - membership: `service_memberships(lecture)` 는 사용자 가입/운영자 지정으로만 생성. 자동 변환 0.
+- **배포 전 확정 필요(7차 OPERATIONAL_GATE · §17-3-f #21)**: Lecture membership 부여 경로. 현재 `joinEnabled=false` 라 일반 사용자는 로그인 후에도 스스로 가입할 수 없다 — 운영자 지정으로 갈지 `joinEnabled` 를 켤지는 사용자 판단이며, 코드 기본값은 바꾸지 않았다.

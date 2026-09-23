@@ -107,7 +107,9 @@ router.post('/courses/:courseId/lessons/reorder', requireAuth, requireInstructor
 // ========================================
 
 // GET /api/v1/lms/lessons/:lessonId/quiz - Get Quiz for Lesson
-router.get('/lessons/:lessonId/quiz', requireAuth, asyncHandler(QuizController.getQuizForLesson));
+//   7차 P2-8: 문항 조회에도 강의 접근 정책(visibility · membership · 유료/승인 enrollment)을 적용한다.
+//   소유 강사·lecture:admin 은 allowCourseOwner 로 통과(편집 화면은 별도 instructor 경로를 쓴다).
+router.get('/lessons/:lessonId/quiz', requireAuth, requireEnrollment({ checkLesson: true, allowCourseOwner: true }), asyncHandler(QuizController.getQuizForLesson));
 
 // GET /api/v1/lms/instructor/lessons/:lessonId/quiz — 강사 편집용 (정답 포함 · 소유자 또는 lecture:admin)
 //   PR #225 merge-gate(Codex P1): 강사 편집기는 learner sanitized 응답을 쓰지 않는다 (정답 유실 방지).
@@ -131,7 +133,8 @@ router.patch('/quizzes/:quizId', requireAuth, requireInstructor, asyncHandler(Qu
 // ========================================
 
 // GET /api/v1/lms/lessons/:lessonId/assignment - Get assignment for a lesson
-router.get('/lessons/:lessonId/assignment', requireAuth, asyncHandler(AssignmentController.getAssignmentForLesson));
+//   7차 P2-8: quiz 조회와 동일한 정책 — 비회원·미등록자는 과제 안내를 읽을 수 없다.
+router.get('/lessons/:lessonId/assignment', requireAuth, requireEnrollment({ checkLesson: true, allowCourseOwner: true }), asyncHandler(AssignmentController.getAssignmentForLesson));
 
 // POST /api/v1/lms/assignments - Upsert assignment (Instructor)
 router.post('/assignments', requireAuth, requireInstructor, asyncHandler(AssignmentController.upsertAssignment));
@@ -288,6 +291,7 @@ router.post('/instructor/submissions/:submissionId/grade', requireAuth, requireI
 // ========================================
 
 // GET /api/v1/lms/operator/courses — 운영 목록 (status/contentKind/search 필터는 listCourses 계약 그대로)
+//   7차 P1-17: 학습자 목록(GET /courses)은 서버가 status=published 로 고정하므로, 전체 상태 열람은 이 경로만.
 router.get('/operator/courses', requireAuth, requireLectureOperator, asyncHandler(CourseController.listCourses));
 
 // POST /api/v1/lms/operator/courses/:id/approve — PENDING_REVIEW → PUBLISHED
