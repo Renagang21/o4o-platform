@@ -34,8 +34,8 @@
 ```
                          ┌────────────────────────┐
    (신규) mobile_product_drafts ──┐                │
-   (현존) catalog_import_rows ────┼──► product_candidates (신규: 웹 검토 후보 큐)
-   (현존) csv_import_rows ────────┘                │  매칭/확정
+   (현존) catalog_import_rows ────┴──► product_candidates (신규: 웹 검토 후보 큐)
+                                                   │  매칭/확정
                                                    ▼
                             ┌──────────────────────────────┐
                             │   ProductMaster (현존, SSOT)   │  ◄── product_identifiers (신규 계층)
@@ -72,7 +72,15 @@
 | **매장 copy 계층** | `store_products` / `StoreProduct` | catalog → 매장 독립 copy | `apps/api-server/src/modules/store/entities/store-product.entity.ts` |
 | **Drug Extension** | `pharma_product_masters` / `PharmaProductMaster` | 의약품 확장 (drugCode/insuranceCode/atcCode, OTC·ETC·QUASI) — Core 와 느슨한 연결 | `packages/pharmaceutical-core/src/entities/PharmaProductMaster.entity.ts` |
 | **Service Product prep** | `service_products` / `ServiceProduct` | `Master→Offer→ServiceProduct→Listing` 미래 구조 준비 | `apps/api-server/src/routes/kpa/entities/service-product.entity.ts` |
-| **Import / Source staging** | `catalog_import_rows`, `csv_import_rows` | CSV/xlsx 일괄등록 staging (원시 수집→매칭→확정 패턴) | `apps/api-server/src/modules/catalog-import/entities/`, `.../neture/entities/SupplierCsvImportRow.entity.ts` |
+| **Import / Source staging** | `catalog_import_rows` / `CatalogImportRow` | 현재 active import staging. CSV/xlsx 일괄등록 (원시 수집→매칭→확정 패턴) | `apps/api-server/src/modules/catalog-import/entities/` |
+
+> **Legacy supplier CSV staging — `supplier_csv_import_batches` / `supplier_csv_import_rows`**
+> (WO-O4O-SUPPLIER-POST-REGISTRATION-PRODUCT-MANAGEMENT-OFFER-FIRST-REALIGNMENT-V1 closeout, 2026-09-23)
+>
+> - runtime API · service · entity = **RETIRED** (살아 있는 코드 없음)
+> - 물리 테이블·migration 은 **아직 보존**
+> - canonical Product Core 구성요소 **아니다**
+> - DB DROP 은 별도 DB cleanup 대상 (본 baseline 범위 아님)
 
 ---
 
@@ -155,7 +163,7 @@
 
 - 모바일은 바코드/상품명/이미지/가격수준을 "검토 필요" 상태로 **수집(draft)** 만 한다.
 - 확정(매칭/신규 Master 생성/매장 활용 전환)은 **웹 검토 큐(`product_candidates`)** 에서 수행한다.
-- 가장 근접한 기존 패턴은 CSV/xlsx import staging(`catalog_import_rows`/`csv_import_rows`)의 "원시 수집 → 매칭 → 확정" 이며, 모바일 draft 는 이를 row-단위 수집으로 일반화한다.
+- 가장 근접한 기존 패턴은 CSV/xlsx import staging(`catalog_import_rows`)의 "원시 수집 → 매칭 → 확정" 이며, 모바일 draft 는 이를 row-단위 수집으로 일반화한다.
 - **모바일 수집 데이터를 `ProductMaster` 에 직접 확정 저장하지 않는다** (SSOT 오염 방지).
 
 ---

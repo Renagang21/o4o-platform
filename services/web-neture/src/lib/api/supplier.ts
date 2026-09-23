@@ -440,12 +440,6 @@ export interface SupplierOrderCondition {
   note: string | null;
 }
 
-export interface ProfileCompleteness {
-  total: number;
-  completed: number;
-  missing: string[];
-}
-
 // WO-O4O-NETURE-SUPPLIER-ORDER-UNIFIED-VIEW-V1 (read-only 통합 주문 조회)
 export interface UnifiedSupplierOrder {
   id: string;

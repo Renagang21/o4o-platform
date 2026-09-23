@@ -264,10 +264,6 @@ export class NetureService {
     return this.supplierService.updateSupplierProfile(supplierId, data);
   }
 
-  async computeProfileCompleteness(supplierId: string) {
-    return this.supplierService.computeProfileCompleteness(supplierId);
-  }
-
   // ==================== Supplier Products ====================
 
   async getSupplierProducts(supplierId: string) {

@@ -55,7 +55,6 @@ export {
   type SupplierOnboarding,
   type SupplierOnboardingDocument,
   type SupplierOrderCondition,
-  type ProfileCompleteness,
   supplierCopilotApi,
   type SupplierKpiSummary,
   type ProductPerformanceItem,

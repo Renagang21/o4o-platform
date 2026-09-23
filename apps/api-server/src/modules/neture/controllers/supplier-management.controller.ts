@@ -78,21 +78,6 @@ export function createSupplierManagementController(dataSource: DataSource): Rout
     }
   });
 
-  // GET /supplier/profile/completeness
-  router.get('/profile/completeness', requireAuth, requireLinkedSupplier as RequestHandler, async (req: AuthenticatedRequest, res: Response) => {
-    try {
-      const supplierId = (req as SupplierRequest).supplierId;
-      const result = await netureService.computeProfileCompleteness(supplierId);
-      if (!result) {
-        return res.status(404).json({ success: false, error: 'SUPPLIER_NOT_FOUND' });
-      }
-      res.json({ success: true, data: result });
-    } catch (error) {
-      logger.error('[Neture API] Error fetching profile completeness:', error);
-      res.status(500).json({ success: false, error: 'INTERNAL_ERROR' });
-    }
-  });
-
   // GET /supplier/onboarding
   // WO-O4O-SUPPLIER-ONBOARDING-BASIC-DOCUMENTS-AND-SETTLEMENT-V1
   router.get('/onboarding', requireAuth, requireLinkedSupplier as RequestHandler, async (req: AuthenticatedRequest, res: Response) => {
@@ -182,6 +167,14 @@ export function createSupplierManagementController(dataSource: DataSource): Rout
   });
 
   // ==================== 공급 예정 품목군 (WO-O4O-SUPPLIER-REGULATED-CATEGORY-DOCUMENTS-V1) ====================
+  //
+  // WO-O4O-SUPPLIER-POST-REGISTRATION-PRODUCT-MANAGEMENT-OFFER-FIRST-REALIGNMENT-V1 closeout (2026-09-23):
+  //   프로필 단계는 선택-only 로 정리되었다. 소비처 0 이던 orphan endpoint 3건을 제거한다:
+  //     GET   /supplier/profile/completeness
+  //     PATCH /supplier/regulated-categories/:category        (번호 입력)
+  //     POST  /supplier/regulated-categories/:category/submit (검토 요청)
+  //   품목군 자체는 유지된다 — 목록·선택·선택해제·증빙 업로드/다운로드 및 Operator/Admin 검토 API.
+  //   증빙 업로드(uploadEvidence)가 status 를 'submitted' 로 올리므로 검토 흐름은 그대로 살아 있다.
 
   // GET /supplier/regulated-categories — 공급자 본인 품목군 목록
   router.get('/regulated-categories', requireAuth, requireLinkedSupplier as RequestHandler, async (req: AuthenticatedRequest, res: Response) => {
@@ -207,41 +200,6 @@ export function createSupplierManagementController(dataSource: DataSource): Rout
       res.status(201).json({ success: true, data: result.data });
     } catch (error) {
       logger.error('[Neture API] Error selecting regulated category:', error);
-      res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR' } });
-    }
-  });
-
-  // PATCH /supplier/regulated-categories/:category — 신고/허가 번호 입력
-  router.patch('/regulated-categories/:category', requireAuth, requireLinkedSupplier as RequestHandler, async (req: AuthenticatedRequest, res: Response) => {
-    try {
-      const supplierId = (req as SupplierRequest).supplierId;
-      const result = await regulatedCategoryService.updateCategory(supplierId, req.params.category, {
-        registrationNumber: req.body?.registrationNumber,
-      });
-      if (!result.success) {
-        const status = result.error === 'CATEGORY_NOT_FOUND' ? 404 : 400;
-        return res.status(status).json({ success: false, error: { code: result.error } });
-      }
-      res.json({ success: true, data: result.data });
-    } catch (error) {
-      logger.error('[Neture API] Error updating regulated category:', error);
-      res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR' } });
-    }
-  });
-
-  // POST /supplier/regulated-categories/:category/submit — 검토 요청(번호 우선, 파일 선택)
-  // WO-O4O-NETURE-SUPPLIER-REGULATED-CATEGORY-NUMBER-FIRST-V1
-  router.post('/regulated-categories/:category/submit', requireAuth, requireLinkedSupplier as RequestHandler, async (req: AuthenticatedRequest, res: Response) => {
-    try {
-      const supplierId = (req as SupplierRequest).supplierId;
-      const result = await regulatedCategoryService.submitForReview(supplierId, req.params.category);
-      if (!result.success) {
-        const status = result.error === 'CATEGORY_NOT_FOUND' ? 404 : 400;
-        return res.status(status).json({ success: false, error: { code: result.error } });
-      }
-      res.json({ success: true, data: result.data });
-    } catch (error) {
-      logger.error('[Neture API] Error submitting regulated category for review:', error);
       res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR' } });
     }
   });
