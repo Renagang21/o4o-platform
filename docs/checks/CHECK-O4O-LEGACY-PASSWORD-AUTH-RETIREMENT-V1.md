@@ -439,7 +439,7 @@ store-ui-core 8 · operator-core-ui 4 · shared-space-ui 8 · auth-client 2 · w
 1. ~~Lecture main 처분 확정 대기~~ → **해제(2026-09-24 · §7-1)**
 2. `origin/main` 재동기화 + CI 전체 재검증 — 2026-09-24 `3fbed5f7c` 로 수행(충돌 0 · 아래 §8 재검증 완료)
 3. Phase A merge → deploy(api · web · admin) → old revision traffic 0 확인
-4. production smoke: 은퇴 경로 404 · 가입 flow · 번들 password 0 은 **완료(§7-9)**. **Google 실브라우저 smoke 는 `PENDING_USER_ACTION`**(§10-6 · 기준선 확보)
+4. production smoke: 은퇴 경로 404 · 가입 flow · 번들 password 0(§7-9) + **Google 실브라우저 smoke PASS**(§10-6 · 2026-09-24) — **완료**
 5. **§43 DESTRUCTIVE GATE** — census · 제거안 · rollback 한계 **보고 완료(§10 · 2026-09-24 · production write 0)** → **사용자 승인 대기** → Phase B(코드 선행 → incremental migration → 격리 PG15 fingerprint → expected-schema-states)
 6. Smoke A/B(operator invitation WO) 인계 항목 정리
 
@@ -533,10 +533,54 @@ DELETE · DROP · migration 실행은 사용자 승인 전까지 하지 않았�
   되돌리는 수단이 아니다.
 - `login_attempts` 는 이번에 남기므로 lockout 관련 되돌림 여지는 유지된다.
 
-### 10-6. Google production smoke — **PENDING_USER_ACTION**
+### 10-6. Google production smoke — **PASS** (2026-09-24 04:38Z · 사용자 브라우저 + 서버측 실측)
 
-브라우저 조작(계정 선택 · Google 인증)은 이 세션이 수행할 수 없다(브라우저 자동화 도구 없음 · Google 이 자동 브라우저 로그인을 차단).
-사용자에게 정확한 클릭 순서를 요청했고, **identity 증거 기준선**을 미리 확보해 두었다.
+브라우저 조작은 사용자가 수행하고(이 세션에 브라우저 자동화 도구 없음 · Google 이 자동 브라우저 로그인을 차단),
+**identity 판정은 이 세션이 DB read-only 로** 했다. 화면 문자열은 판정 근거로 쓰지 않았다.
+
+사용자 관측: `admin.neture.co.kr` → Google 로그인(`sohae2100@gmail.com`) → Admin 진입 →
+**F5 세션 유지** → 로그아웃 → **동일 Google 계정 재로그인** 까지 오류 없이 완료.
+
+서버측 실측 (기준선 = 2026-09-22 12:59:20)
+
+| 검증 항목 | 실측 | 판정 |
+|---|---|---|
+| Google `sub` 가 **기존** admin `users.id` 에 연결 | `linked_accounts(provider='google', providerId=117391***)` → `users.id cfd2a5e7…` · verified · primary · `linkedAt` 2026-09-22(신규 생성 아님) | PASS |
+| `users.lastLoginAt` 전진 | 2026-09-22 12:59:20.598 → **2026-09-24 04:38:09.130** | PASS |
+| google link `lastUsedAt` 전진 | 2026-09-22 12:59:20.605 → **2026-09-24 04:38:09.134** | PASS |
+| `users.email` 이 인증 식별자가 **아님** | `linked_accounts.email` 이 **NULL** — 연결 행은 `provider` + `providerId(sub)` 만 보유한다. 즉 조회 키에 email 이 **들어갈 수 없다**. `users.email`(프로필/내부 이메일)은 로그인 계정과 **다른 값**이며 그대로 유지됐다 | PASS |
+| `platform:super_admin` active 유지 | `role_assignments` 11행 **전부 `is_active`** · `platform:super_admin` active 1 · `assigned_at` 2026-05-15(재발급 아님) | PASS |
+| roles 11 / memberships 5 불변 | 11 / 5(전부 `active`) — smoke 전후 동일 | PASS |
+| 새 계정 생성 0 | `users` total **1** · distinct email 1 | PASS |
+| gate 수치 불변(내 write 0) | `service_credentials` 5 · `password_reset_tokens` 5 · `login_attempts` 0 · `users.password` non-null 0 · `refresh_tokens` 0 | PASS |
+
+`lastLoginAt` / `lastUsedAt` 두 값의 전진은 **애플리케이션이 로그인 처리 중 수행한 write** 이며,
+이 세션의 write 가 아니다(이 세션은 SELECT 만 실행했다).
+
+**`GOOGLE_PRODUCTION_SMOKE = PASS`.** 남은 미검증은 Invitation Smoke B / Assignment Smoke A 뿐이고
+이 둘은 이 WO 와 별개로 계속 `PENDING_USER_ACTION` 이다.
+
+#### 10-6a. 화면 표시 2건 — 권한 정본이 아니며 이 WO 범위 밖(보고만)
+
+사용자 화면에 `역할: kpa-branch:operator | SSO 인증` 과 프로필 이메일 `ren***@gmail.com` 이 보였다. 조사 결과:
+
+1. **원인은 정렬 없는 조회다.** `AdminHeader.tsx:153` 이 `user?.role` 을 출력하고, 그 값은
+   `auth-context.helper.ts:82` / `auth-account.controller.ts:56` 의 **`roles[0]`** 이다.
+   `roles` 는 `role-assignment.service.ts:42` 의 `repository.find({ where })` — **`ORDER BY` 가 없다**.
+   PostgreSQL 은 순서를 보장하지 않으므로 `roles[0]` 은 **비결정적**이고, 11개 보유 role 중 임의의 하나가 찍힌다.
+2. **권한 판정은 이 값을 쓰지 않는다.** 실측: 백엔드 guard 는 `roles.includes('platform:super_admin')` 형태의
+   **배열 판정**이고, admin-dashboard 진입은 `requiredRoles={['platform:super_admin']}` 이다.
+   `user.role` 스칼라를 비교하는 인가 코드는 **0건**이다(검색 결과 없음). 따라서 **표시 문제이며 권한 결함이 아니다.**
+3. 프로필 이메일 표시도 같은 성격이다 — `users.email` 은 인증에 관여하지 않지만(위 표),
+   화면에는 그것만 보여 "어느 Google 계정으로 들어왔는지" 를 알 수 없다.
+
+둘 다 **이 WO 범위 밖**이므로 고치지 않고 보고한다(§16-2 · 범위 외 수정 금지).
+별도 WO 제안: ① `roles[0]` 대표값을 결정적으로 만들 것 — 정렬 추가 또는 우선순위 규칙(`platform:super_admin` 우선).
+② 계정 표시를 **"Google 로그인: … / 프로필 이메일: …"** 로 분리(`users.email` optional 화 판단과 함께).
+
+#### 10-6b. smoke 전 기준선 (보존)
+
+smoke 전에 확보한 기준선이다. 전진 비교의 근거이므로 갱신하지 않고 그대로 남긴다.
 
 | 기준선 (2026-09-24 03:59Z 조회) | 값 |
 |---|---|
@@ -545,18 +589,20 @@ DELETE · DROP · migration 실행은 사용자 승인 전까지 하지 않았�
 | google `providerId`(sub) | `117391***` (마스킹) |
 | `refresh_tokens` | 0행 |
 
-로그인 직후 이 두 타임스탬프가 **2026-09-24 로 전진**하면 "그 화면이 실제로 그 `users.id` · 그 Google `sub` 로 인증됐다" 가 실증된다.
-전진하지 않으면 화면 진입 여부와 무관하게 **FAIL** 로 기록한다. 사전 상태(제 조회): `admin.neture.co.kr` 200 ·
-`/auth/google/config` `enabled:true` · `POST /auth/login` **404**.
-
-Invitation Smoke B / Assignment Smoke A 는 이 WO 와 별개로 계속 `PENDING_USER_ACTION` 이다.
+사전 상태(조회): `admin.neture.co.kr` 200 · `/auth/google/config` `enabled:true` · `POST /auth/login` **404**.
+두 타임스탬프는 실제로 전진했고 판정은 위 §10-6 표에 있다.
 
 ### 10-7. GATE 보고 (사용자 승인 대기)
 
 ```text
 PASSWORD RETIREMENT DESTRUCTIVE GATE
 
-Google production smoke = PENDING_USER_ACTION  (브라우저 조작 필요 · 기준선 확보 · PASS 로 쓰지 않음)
+Google production smoke = PASS  (2026-09-24 04:38Z · 사용자 브라우저 조작 + 서버측 DB 실측)
+  evidence: google sub 117391*** -> users.id cfd2a5e7 (기존 id · 신규 생성 0)
+            users.lastLoginAt   2026-09-22 12:59:20 -> 2026-09-24 04:38:09
+            google lastUsedAt   2026-09-22 12:59:20 -> 2026-09-24 04:38:09
+            linked_accounts.email IS NULL -> email 은 조회 키에 들어갈 수 없다
+            platform:super_admin active 유지 · roles 11 / memberships 5 불변
 
 users:
   total = 1
@@ -630,9 +676,12 @@ PHASE B EXECUTION = WAITING_FOR_USER_APPROVAL
 
 Phase A 는 **운영 반영까지 끝났다**(`7a44a97bc` · 2026-09-24 · §7-9). 런타임에서 password reader/writer/UI 0 ·
 은퇴 endpoint 404 · 서빙 번들 password 입력 0 을 실측했고, 스키마는 **의도대로 무변화**다(migration 0).
-남은 것: ① **Google 실브라우저 smoke** — 브라우저 조작이 필요해 `PENDING_USER_ACTION`, identity 증거 기준선은 확보(§10-6)
-② **Phase B/§43** — census · 항목별 제거안 · 실행 레시피 · rollback 한계를 **§10 에 보고 완료(production write 0)**,
-이제 **사용자 승인 대기**다. 승인 전에는 DELETE · DROP · production migration 을 실행하지 않는다.
+**Google 실브라우저 smoke 는 PASS 로 닫혔다**(§10-6 · 2026-09-24 04:38Z · Google sub → 기존 admin `users.id` ·
+두 타임스탬프 전진 · `platform:super_admin` 유지 · roles 11 / memberships 5 불변).
+남은 것은 **Phase B/§43 하나**다 — census · 항목별 제거안 · 실행 레시피 · rollback 한계를 §10 에 보고했고
+(**production write 0**) **사용자 승인 대기**다. 승인 전에는 DELETE · DROP · production migration 을 실행하지 않는다.
 `login_attempts` 는 FROZEN `auth-core` 소유라 이번 범위에서 **제외**했다(Core 승인 선행).
+범위 밖 보고 2건: `roles[0]` 대표 role 이 정렬 없는 조회라 **비결정적**(표시 전용 · 인가는 배열 판정) ·
+로그인 Google 계정과 프로필 이메일이 화면에서 구분되지 않음(§10-6a).
 
 문서 정합: 발견 2건(MYPAGE 매트릭스 password 2행 — 정정 완료 / USER-DOMAIN-SSOT 다이어그램 password 표기 — Phase B 로 이월) / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 1건(F10 Core Freeze 본문 갱신 여부 판단)
