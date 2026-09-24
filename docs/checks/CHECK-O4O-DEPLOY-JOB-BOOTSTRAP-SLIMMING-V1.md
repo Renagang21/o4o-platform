@@ -3,7 +3,7 @@
 > **WO**: `WO-O4O-DEPLOY-JOB-BOOTSTRAP-SLIMMING-V1` (사용자 판단 위임 · 배포/CI 소요시간 개선 6번)
 > **구현 commit**: `6ae232ea1`
 > **선행**: [`CHECK-O4O-CI-FRONTEND-TYPECHECK-PARALLELIZATION-V1`](CHECK-O4O-CI-FRONTEND-TYPECHECK-PARALLELIZATION-V1.md)
-> **상태**: 구현 · 정적 검증 PASS · CI green · **실 배포 실측 PENDING (다음 배포 창 — 3·4번과 동일 방침)**
+> **상태**: COMPLETE — 실 배포 실측 완료 (§4-1). checkout 절감 확인 · `skip_install` 은 **효과 미미**(인증 첫 호출이 시간을 차지)
 > **작성일**: 2026-09-24
 
 ---
@@ -80,6 +80,25 @@ admin · api 배포 job 도 같은 checkout · setup-gcloud 구성.
 | log 에서 `apps/api-server/src/scripts/data` 부재 · 빌드 성공 | 필수 |
 
 **실패 시**: checkout · SDK 설정 · 빌드는 모두 이미지 push · migration · Cloud Run deploy **이전** 단계라 운영 영향 없음. 복구는 `6ae232ea1` revert 1 커밋.
+
+### 4-1. 실측 결과 (2026-09-24, Password Phase B-1 통제 배포 창 · 타 세션 — 측정 전용 배포 없음)
+
+| run | job | Checkout (기준 22~25s) | Set up Cloud SDK (기준 17~27s) | job 전체 |
+|---|---|---|---|---|
+| `35978611257` api `b2925e765` | build-and-deploy | **19s** | 22s | 272s (기준 490s — 3·4번 포함) |
+| `35978614989` admin `b2925e765` | deploy | **18s** | 28s | failure (아래) |
+| `35989259445` admin `a6571915c` | deploy | **18s** | 10s | 140s (기준 142s) |
+| `35979164238` web `18d519a5d` | deploy-neture | **16s** | 8s | **111s** (기준 146~153s) |
+
+- **sparse checkout: 효과 확인** — 매 job ≈5~8s 절감, 전 run 에서 빌드 성공 (scripts/data 부재가 빌드에 영향 없음 실증).
+- **`skip_install: true`: 효과 미미** — 로그상 `Skipping installation ("skip_install" was true)` 로 설치는 생략됐으나,
+  직후 **첫 gcloud 인증 호출(`Successfully authenticated`)이 ≈19s** 를 차지해 step 합계가 8~28s 로 기준과 비슷하다.
+  해가 없어 되돌리지 않는다(되돌리면 오히려 배포 경로 변경 1회 추가).
+- **admin `35978614989` 실패는 본 변경과 무관** — `refs/tags/deploy/2026-09-24-phase-b1-r2` 태그 ref 로 dispatch 됐는데
+  `Determine deployment target` 이 `refs/heads/main|develop` 만 처리해 `image_name` 이 비어 Docker tag 가 `…/o4o-api/:<sha>` 로 조립됐다
+  (`invalid reference format`, Cloud Run 이전 단계 · 운영 영향 0). 타 세션이 `a6571915c` 에서 태그 ref 지원 + fail-closed 로 수정했고 재배포 성공.
+  같은 run 에서 본 변경의 checkout · Cloud SDK step 은 success.
+- 운영: `o4o-core-api` = `b2925e765` · `o4o-admin-dashboard` = `a6571915c` · `/api/health` `database: healthy` · admin 200.
 
 ## 5. 범위 밖 발견 (보고만 — 별도 판단)
 

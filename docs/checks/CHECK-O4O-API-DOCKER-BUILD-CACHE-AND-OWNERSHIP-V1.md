@@ -3,7 +3,7 @@
 > **WO**: `WO-O4O-API-DOCKER-BUILD-CACHE-AND-OWNERSHIP-V1` (사용자 직접 지시 · 배포/CI 소요시간 개선 3번 항목)
 > **구현 commit**: `6245d41df`
 > **선행**: [`CHECK-O4O-CI-BUILD-JOB-PARALLELIZATION-V1`](CHECK-O4O-CI-BUILD-JOB-PARALLELIZATION-V1.md)
-> **상태**: 구현 · 운영 배포 · smoke PASS · **warm cache 실측 PENDING (다음 자연 API 배포)**
+> **상태**: COMPLETE — 운영 배포 · smoke PASS · warm cache 실측 PASS (§4, run `35978611257`)
 > **작성일**: 2026-09-24
 
 ---
@@ -87,15 +87,18 @@ Docker 로그:
 | one-off Job 8개 이미지 참조 | 전부 `6245d41df…` |
 | 새 revision ERROR / `EACCES` 로그 (30분) | 0 / 0 |
 
-## 4. PENDING — warm cache 실측
+## 4. warm cache 실측 — run `35978611257` (commit `b2925e765`, Password Phase B-1 통제 배포 · 타 세션)
 
-다음 자연 API 배포(`package.production.json` 불변)에서 기록한다. 기대:
+측정만을 위한 운영 재배포는 하지 않았다. 타 세션의 통제 배포 창을 그대로 관측했다.
 
-- `[deps 4/4] RUN npm install` → `CACHED` (−≈32s)
-- node_modules 레이어 push skip (layer already exists)
-- 예상 Build and Push ≈ 50~60s
-
-운영 재배포를 측정만을 위해 만들지 않는다.
+| 항목 | 결과 |
+|---|---|
+| `importing cache manifest … :buildcache` | DONE 5.2s (hit) |
+| `[deps 4/4] RUN npm install --omit=dev …` | **`CACHED`** |
+| base · WORKDIR · COPY package.json · node_modules COPY | `CACHED` |
+| **Build and Push Docker image** | **54s** (기준선 152s · cold 96s) |
+| build-and-deploy 잡 전체 | **272s** (기준선 490s — 4·6번 효과 포함) |
+| 운영 | `o4o-core-api` = `b2925e765` · `/api/health` 200 · `database: healthy` |
 
 ## 5. 남은 개선 (별도 항목)
 

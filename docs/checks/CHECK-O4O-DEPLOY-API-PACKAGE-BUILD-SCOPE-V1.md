@@ -3,7 +3,7 @@
 > **WO**: `WO-O4O-DEPLOY-API-PACKAGE-BUILD-SCOPE-V1` (사용자 직접 지시 · 배포/CI 소요시간 개선 4번 항목)
 > **구현 commit**: `a95384b78`
 > **선행**: [`CHECK-O4O-API-DOCKER-BUILD-CACHE-AND-OWNERSHIP-V1`](CHECK-O4O-API-DOCKER-BUILD-CACHE-AND-OWNERSHIP-V1.md)
-> **상태**: 구현 · 정적 검증 PASS · **실 배포 실측 PENDING (사용자 결정: 다음 자연 API 배포에서 확인)**
+> **상태**: COMPLETE — 정적 검증 PASS · 실 배포 PASS (§4, run `35978611257`)
 > **작성일**: 2026-09-24
 
 ---
@@ -49,20 +49,20 @@ deploy-api 의 `Setup build environment` 가 root `build:packages` 전체(프론
 > 향후 런타임 코드가 **선언 없이** 새 `@o4o/*` 를 import 하면 closure 밖이라 dist 가 없어 deploy 빌드가 실패한다.
 > 이는 조용한 누락이 아니라 **빌드 실패로 드러나는** 방향이며, 올바른 수정은 package.json 에 의존성을 선언하는 것이다.
 
-## 4. 실 배포 검증 — PENDING
+## 4. 실 배포 검증 — run `35978611257` (commit `b2925e765`, Password Phase B-1 통제 배포 · 타 세션)
 
-push run `35950968950` 은 workflow-only 변경이라 `build-and-deploy` **skipped** (정상 — detect 판정).
-사용자 결정: 측정만을 위한 운영 강제 배포는 하지 않고 **다음 자연 API 배포**에서 확인한다.
+push run `35950968950` 은 workflow-only 변경이라 `build-and-deploy` skipped 였고, 사용자 결정에 따라
+측정 전용 배포 없이 다음 자연 배포를 관측했다.
 
-다음 배포에서 기록할 것:
+| step | 기준선 (`35864390517` / `35947666020`) | 본 run |
+|---|---|---|
+| Setup build environment | 133s / 106s | **28s** |
+| Build API-specific packages | 28s / 20s (하드코딩 18개 재빌드) | 35s (closure 1회 — 이 step 이 유일한 패키지 빌드) |
+| 패키지 빌드 관련 합계 (Setup + API packages) | 161s / 126s | **63s** |
+| Build API server (tsup) | 33s / 25s | 22s — closure 만으로 tsc · tsup 빌드 성공 |
+| build-and-deploy 잡 전체 | 490s / 378s | **272s** (3·6번 효과 포함) |
 
-- `Setup build environment` 소요 (기대: 106~133s → ≈30~40s, install 만)
-- `Build API-specific packages` 소요 (기대: ≈50s, CI api-tests 의 동일 명령 실측 51s)
-- 잡 전체 합계 변화 (기대: −60~80s)
-- 같은 run 에서 3번의 warm cache 실측 (`CHECK-O4O-API-DOCKER-BUILD-CACHE-AND-OWNERSHIP-V1` §4)
-
-**실패 시**: 실패 지점은 `Build API-specific packages` 또는 `Build API server (bundled with tsup)` 이며,
-둘 다 이미지 push · migration · Cloud Run deploy **이전**이라 운영 영향 없음. 복구는 `a95384b78` revert 1 커밋.
+closure 충분성(§3)은 실 배포에서 확인됐다 — 빌드 · migration · deploy 전부 success.
 
 ## 5. 문서 정합
 
