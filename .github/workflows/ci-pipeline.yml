@@ -86,6 +86,14 @@ jobs:
 
     steps:
     - uses: actions/checkout@v6
+      with:
+        # WO-O4O-CI-SPARSE-CHECKOUT-DATA-EXCLUSION-V1: 운영 데이터 manifest
+        # (apps/api-server/src/scripts/data, ≈1.25GB · json/jsonl/md 뿐, 코드 0)를 받지 않는다.
+        # tsc · ESLint(ts/tsx 만) · guard · test 어느 것도 이 경로를 읽지 않는다. sparse = blob:none 부분 fetch.
+        sparse-checkout: |
+          /*
+          !/apps/api-server/src/scripts/data/
+        sparse-checkout-cone-mode: false
 
     - name: Setup build environment
       uses: ./.github/actions/setup-build-env
@@ -313,12 +321,26 @@ jobs:
         shard: [1, 2, 3]
 
     steps:
+    # shard 1 만 shadow selector 를 돌리므로 full history 가 필요하다.
+    # WO-O4O-CI-SPARSE-CHECKOUT-DATA-EXCLUSION-V1: shard 1 은 **기존 그대로** 둔다 —
+    # blob:none 이면 selector 의 `git diff` rename 판정이 blob 을 1개씩 지연 fetch 할 수 있고,
+    # Phase 0 shadow 관측 조건을 바꾸지 않기 위해서다.
     - uses: actions/checkout@v6
+      if: matrix.shard == 1
       with:
         # detect · docs-fast · admin-fast 와 같은 기준이다.
         # shallow checkout 이면 base SHA object 가 없어 아래 shadow selector 가
         # 항상 "변경 파일 수집 실패 → full" 로만 떨어져 관측 데이터가 쌓이지 않는다.
         fetch-depth: 0
+
+    # shard 2..N 은 history 가 필요 없다 — shallow + 운영 데이터 manifest 제외.
+    - uses: actions/checkout@v6
+      if: matrix.shard != 1
+      with:
+        sparse-checkout: |
+          /*
+          !/apps/api-server/src/scripts/data/
+        sparse-checkout-cone-mode: false
 
     - name: Setup build environment
       uses: ./.github/actions/setup-build-env
@@ -401,6 +423,14 @@ jobs:
     
     steps:
     - uses: actions/checkout@v6
+      with:
+        # WO-O4O-CI-SPARSE-CHECKOUT-DATA-EXCLUSION-V1: 운영 데이터 manifest
+        # (apps/api-server/src/scripts/data, ≈1.25GB · json/jsonl/md 뿐, 코드 0)를 받지 않는다.
+        # tsc · ESLint(ts/tsx 만) · guard · test 어느 것도 이 경로를 읽지 않는다. sparse = blob:none 부분 fetch.
+        sparse-checkout: |
+          /*
+          !/apps/api-server/src/scripts/data/
+        sparse-checkout-cone-mode: false
 
     - name: Setup build environment
       uses: ./.github/actions/setup-build-env
@@ -546,6 +576,14 @@ jobs:
 
     steps:
     - uses: actions/checkout@v6
+      with:
+        # WO-O4O-CI-SPARSE-CHECKOUT-DATA-EXCLUSION-V1: 운영 데이터 manifest
+        # (apps/api-server/src/scripts/data, ≈1.25GB · json/jsonl/md 뿐, 코드 0)를 받지 않는다.
+        # tsc · ESLint(ts/tsx 만) · guard · test 어느 것도 이 경로를 읽지 않는다. sparse = blob:none 부분 fetch.
+        sparse-checkout: |
+          /*
+          !/apps/api-server/src/scripts/data/
+        sparse-checkout-cone-mode: false
 
     - name: Setup build environment
       uses: ./.github/actions/setup-build-env
