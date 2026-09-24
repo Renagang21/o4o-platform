@@ -43,7 +43,7 @@ export default function MySettingsPage() {
       navItems={KCOS_MYPAGE_NAV_ITEMS}
     >
       <AccountSecuritySettings
-        securityDescription="정기적인 비밀번호 변경을 권장합니다"
+        securityDescription="로그인 수단 — Google 계정"
         notify={{ success: toast.success, error: toast.error }}
         onLogoutAll={logoutAll}
       />

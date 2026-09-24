@@ -168,11 +168,12 @@ export function MySettingsPage() {
 
       {/* 보안 설정 / 계정 관리 — 공통 계층
           WO-O4O-CROSS-SERVICE-MYPAGE-SETTINGS-SECURITY-COMMONIZATION-V1
-          ⚠️ 비밀번호 값은 공통 모달 밖으로 나가지 않는다 (이 화면에 저장·로깅하지 않는다).
+          ⚠️ WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: 비밀번호 변경 모달은 은퇴했다 —
+          이 블록은 로그인 수단 표기와 로그아웃(전 기기 포함)만 담는다.
           WO-O4O-MYPAGE-TIER1-DEAD-STUB-CLEANUP-V1 의 `계정 탈퇴` 제거는 유지한다
           (mypageApi.requestWithdraw() backend 미구현). */}
       <AccountSecuritySettings
-        securityDescription="KPA 로그인 비밀번호"
+        securityDescription="KPA 로그인 수단 — Google 계정"
         notify={{ success: toast.success, error: toast.error }}
         onLogoutAll={logoutAll}
         logoutAllIncludesCurrentDevice

@@ -1,10 +1,10 @@
 # CHECK-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1
 
-> 작성일: 2026-09-23 · 상태: **`MERGED_TO_MAIN / AWAITING_CONTROLLED_DEPLOY`** — 배포 대상 SHA **`7a44a97bc`** (§7-2 · CI 수정 2라운드 반영 · 2026-09-24)
+> 작성일: 2026-09-23 · 상태: **`PHASE_A_DEPLOYED`** — `7a44a97bc` 운영 반영 완료(2026-09-24 · §7-9) · **Phase B/§43 은 미착수·별도 승인**
 > WO: [`WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1`](../work-orders/WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1.md)
-> 작업 브랜치: `wo/legacy-password-auth-retirement` (origin push 완료 · `main` 무접촉)
+> 작업 브랜치: `wo/legacy-password-auth-retirement` (origin push 완료 · `main` 반영은 배포 담당 세션이 수행 — 본 세션 main push 0)
 > 작업 worktree: `C:/tmp/o4o-legacy-password-retirement` — 다른 세션의 체크아웃·worktree 는 **불가침**
-> Phase B(스키마 파괴적 제거)는 **미착수** — §43 DESTRUCTIVE GATE 는 Phase A production 배포·검증 이후에만 진입한다
+> Phase B(스키마 파괴적 제거)는 **미착수** — Phase A 배포·검증은 끝났으나(§7-9) §43 DESTRUCTIVE GATE 진입은 **사용자 승인 후**다
 
 ---
 
@@ -380,6 +380,45 @@ store-ui-core 8 · operator-core-ui 4 · shared-space-ui 8 · auth-client 2 · w
 - `service_credentials` 5행 · `password_reset_tokens` 5행은 모두 관리자 소유이며 `users.password` non-null 은 **0**이다
   (§43 gate 보고에 쓸 최신 count).
 
+### 7-9. Phase A 운영 반영 (2026-09-24 · 통제된 배포 창)
+
+배포 실행은 배포 담당 세션이 했고(같은 창에서 Lecture Phase 2 동반), **본 세션은 독립 검증만** 했다
+(본 세션 배포 실행 0 · `DEPLOY_ENABLED` 무접촉 · 트래픽 전환 0 · main push 0).
+
+| 항목 | 실측(본 세션) |
+|---|---|
+| 배포 SHA | **`7a44a97bc`**(tag `deploy/2026-09-24-phase-a`) |
+| 서빙 revision | `o4o-core-api-03749-9p8` · `lecture-web-00015-gk9` · `kpa-society-web-01997-d7x` · `k-cosmetics-web-01165-wzj` · `pharmacy-hub-web-00255-qw8` · `o4o-admin-dashboard-01309-hrs`(명시적 전환) · `neture-web-01656-vnf` · `store-web-00016-bvj`(pin 없어 자동 추종) — 전부 **100%** |
+| `DEPLOY_ENABLED` | 창 종료 후 **`false` 복귀**(03:15:17Z) |
+| migration | 2회 모두 **`INCREMENTAL_EXECUTED = 0`** · PRE/POST assertion PASS · `LEGACY_HISTORY_FINGERPRINT = MATCH` · **스키마 변화 0** |
+| 은퇴 endpoint(본 세션 curl) | `/auth/login` · `/auth/register` · `/auth/signup` · `/auth/check-email` · `/auth/forgot-password` · `/auth/reset-password` · `/auth/find-id` · `/auth/google/link` · `/auth/google/link/status` → **전부 404** |
+| 서빙 번들 | `type="password"` **0**(배포 담당 세션 전수 — entry + lazy chunk 74) |
+| Google 경로 | `/auth/google/config` 200(enabled) · `google/login` 가짜 idToken → 401 `GOOGLE_ID_TOKEN_INVALID` · `google/signup` → 400(consents 필수) |
+| 가입 flow | `/pharmacy-hub/join` 200 · `POST /pharmacy-hub/join` 401 · KPA `/register`·`/join`·`/branch/join` 200 · 해당 번들 password 입력 0 |
+
+**기대와 달랐던 2건 — 본 세션 재측정으로 판정**
+
+1. `POST /auth/google/bootstrap-admin` — 빈 body 로는 **400**(DTO 검증이 먼저). 형식이 맞는 body 로는
+   **404 `GOOGLE_ADMIN_BOOTSTRAP_DISABLED`**(재측정 확인). 즉 **내 E2E spec 의 404 기대는 유효**하며,
+   "빈 body 400" 을 route 생존으로 읽지 않도록 spec 에 근거 주석을 추가했다.
+2. `PUT /users/password` — **401**. 대조 프로브(`/users/me/profile` · `/users/__does_not_exist__`)도 전부 401 이라
+   **401 은 은퇴 근거가 못 된다**(라우터 수준 `requireAuth`). 내 E2E spec 이 이 경로를 404 목록에 넣은 것은 **오류** —
+   목록에서 빼고, "401 이며 임의 경로와 구분되지 않는다" 를 명시 고정하는 케이스로 교체했다.
+   소스 수준 부재는 정적 guard P2 가 본다.
+
+**Phase A 정리 누락 2건(지적 접수 · 본 세션 수정)**
+
+- `packages/auth-utils/src/errorMessages.ts` 의 `INVALID_CREDENTIALS → '비밀번호가 올바르지 않습니다.'` 제거
+  (`packages/error-handling` 은 이미 제거됐던 **대칭 누락**). 6개 서비스 번들에 실려 나가던 문구가 사라진다.
+  `errorMessages.test.ts` 는 삭제 대신 **부활 감지 계약**으로 전환(매핑 부재 + 전체 메시지에 "비밀번호" 0 + 미지 코드 fallback).
+- `securityDescription` 3곳을 Google 전용 문구로 정정 — pharmacy-hub `MyProfilePage`("Pharmacy-Hub 로그인 수단 — Google 계정") ·
+  kpa-society `MySettingsPage`("KPA 로그인 수단 — Google 계정") · k-cosmetics `MySettingsPage`("로그인 수단 — Google 계정").
+  ※ `AccountSecuritySettings` 의 `onChangePassword` 는 **이미 prop 자체가 없고 주석 언급만** 남아 있었다(지적 일부 정정).
+
+**NOT VERIFIED (PASS 로 쓰지 않는다):** Google 전용이라 스크립트로 세션을 만들 수 없고 사용 가능한 테스트 계정도 없어
+**인증 후 E2E(로그인 → 세션 유지 → 가입 제출 → 로그아웃)는 미검증**이다. 실계정 확인이 필요하면 Google 테스트 계정
+재생성이 선행돼야 한다(본 WO 는 계정을 만들지 않는다). 상세 배포 기록은 Lecture CHECK §23.
+
 ## 8. 검증 (2026-09-23 · 격리 worktree `C:/tmp/o4o-legacy-password-retirement`)
 
 | 항목 | 결과 |
@@ -408,10 +447,12 @@ store-ui-core 8 · operator-core-ui 4 · shared-space-ui 8 · auth-client 2 · w
 
 ## 판정
 
-`LEGACY PASSWORD AUTH RETIREMENT: READY_FOR_PHASE_A_DEPLOY / AWAITING_CONTROLLED_DEPLOY_WINDOW`
+`LEGACY PASSWORD AUTH RETIREMENT: PHASE_A_DEPLOYED / PHASE_B_PENDING_APPROVAL`
 
-Phase A 런타임 컷오버 · 테스트 재정의 · 정적 guard · CI/E2E Google-only 재정의 · 문서 정합까지 완료했다.
-남은 것은 **통제된 배포 창**(사용자 승인 + `DEPLOY_ENABLED` + environment production 승인)뿐이며,
-Lecture 사유의 차단은 해제됐다(§7-1). Phase B(스키마 파괴적 제거)는 **미착수 · 별도 판정**이다(§7-3).
+Phase A 는 **운영 반영까지 끝났다**(`7a44a97bc` · 2026-09-24 · §7-9). 런타임에서 password reader/writer/UI 0 ·
+은퇴 endpoint 404 · 서빙 번들 password 입력 0 을 실측했고, 스키마는 **의도대로 무변화**다(migration 0).
+남은 것: ① 인증 후 E2E 미검증(테스트 계정 부재) ② **Phase B/§43 destructive gate** — row count · DROP 대상 ·
+rollback 한계를 보고한 뒤 **사용자 승인**을 받아야 착수한다(현재 `service_credentials` 5 · `password_reset_tokens` 5 ·
+`users.password` non-null 0 · `login_attempts` 0).
 
 문서 정합: 발견 2건(MYPAGE 매트릭스 password 2행 — 정정 완료 / USER-DOMAIN-SSOT 다이어그램 password 표기 — Phase B 로 이월) / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 1건(F10 Core Freeze 본문 갱신 여부 판단)
