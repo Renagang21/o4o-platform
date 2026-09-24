@@ -24,6 +24,26 @@ const AdminHeader: FC<AdminHeaderProps> = ({ onMenuClick }) => {
   // WO-O4O-IDENTITY-ACCOUNT-DISPLAY-AND-DOCUMENT-ALIGNMENT-V1:
   //   표시 전용 값이다 — 인가는 AdminProtectedRoute/백엔드 guard 가 roles[] 로 한다.
   const accountDisplay = buildAccountDisplayInfo(user);
+  // WO-O4O-IDENTITY-ACCOUNT-DISPLAY-AND-DOCUMENT-ALIGNMENT-V1: 계정 상태는 `/auth/me` 의 `status`(UserStatus) 로 표시한다.
+  //   매핑에 없는 값은 지어내지 않고 원문을 보여준다 — 거짓 라벨보다 낫다.
+  const accountStatus = ((): { label: string; tone: string } => {
+    const status = (user as { status?: string } | null | undefined)?.status;
+    switch (status) {
+      case 'active':
+      case 'approved':
+        return { label: '정상', tone: 'text-green-600' };
+      case 'pending':
+        return { label: '승인대기', tone: 'text-yellow-600' };
+      case 'suspended':
+        return { label: '정지', tone: 'text-red-600' };
+      case 'rejected':
+        return { label: '거부', tone: 'text-red-600' };
+      case 'inactive':
+        return { label: '비활성', tone: 'text-o4o-text-tertiary' };
+      default:
+        return { label: status ?? '알 수 없음', tone: 'text-o4o-text-tertiary' };
+    }
+  })();
   const navigate = useNavigate();
   const [sessionStatus, setSessionStatus] = useState(getSessionStatus());
 
@@ -203,11 +223,14 @@ const AdminHeader: FC<AdminHeaderProps> = ({ onMenuClick }) => {
                     <span>권한:</span>
                     <span className="text-green-600">활성</span>
                   </div>
+                  {/* WO-O4O-IDENTITY-ACCOUNT-DISPLAY-AND-DOCUMENT-ALIGNMENT-V1:
+                      전: `user?.isApproved` — **백엔드에 없는 필드**라 항상 undefined 였고,
+                      그래서 누가 로그인하든 노란색 "승인대기" 로 보였다(운영 관리자는 status=active).
+                      후: `/auth/me` 가 실제로 내려주는 `status` 를 쓴다. 알 수 없는 값이면
+                      지어내지 않고 원문을 그대로 보여준다. */}
                   <div className="flex justify-between">
                     <span>계정:</span>
-                    <span className={user?.isApproved ? 'text-green-600' : 'text-yellow-600'}>
-                      {user?.isApproved ? '승인됨' : '승인대기'}
-                    </span>
+                    <span className={accountStatus.tone}>{accountStatus.label}</span>
                   </div>
                 </div>
               </div>
