@@ -106,7 +106,12 @@ jobs:
         test -f packages/types/dist/forum.d.ts || (echo "❌ packages/types/dist/forum.d.ts missing" && exit 1)
         echo "✅ packages/types/dist freshness verified"
 
+    # WO-O4O-CI-FRONTEND-TYPECHECK-PARALLELIZATION-V1
+    # 워크스페이스별 tsc(산출물 없음, 서로 독립)를 4개씩 동시에 돌린다 (runner 4 vCPU).
+    # 검사 대상 · 명령 · 실패 판정은 직렬과 같고 실행 순서만 바뀐다. 미설정 시 로컬 기본값은 직렬.
     - name: Run TypeScript check (Frontend only)
+      env:
+        O4O_TYPECHECK_CONCURRENCY: '4'
       run: pnpm run type-check:frontend
 
     # WO-O4O-CI-BLOCKING-GATE-FINALIZATION-V1: 실제로 green 이므로 blocking 으로 전환.
