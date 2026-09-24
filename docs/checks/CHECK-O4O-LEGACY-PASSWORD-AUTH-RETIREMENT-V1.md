@@ -794,6 +794,176 @@ needs.detect.outputs.api_deploy_affected == 'true'
 사용자에게 승인을 요청한다. 기존 태그 `deploy/2026-09-24-phase-b1` 은 **재사용하지 않고**
 수정 반영된 새 SHA 로 새 태그를 만든다.
 
+### 11-6. deploy-admin tag-ref 결함 — 수정 · 회귀 계약 (2026-09-24)
+
+1차 창(§11-5)에서 detector fallback 을 고친 뒤 2차 창을 열었더니 **Admin 만 build 단계에서 실패**했다.
+
+```text
+ERROR: failed to build: invalid tag ".../o4o-api/:b2925e765...": invalid reference format
+```
+
+**원인** — `deploy-admin.yml` 의 `Determine deployment target` 이 `refs/heads/main` ·
+`refs/heads/develop` **두 분기만** 가진다. 통제된 배포는 검증된 SHA 를 태그로 고정해 dispatch 하므로
+ref 가 `refs/tags/deploy/*` 였고, **어떤 output 도 설정되지 않아** `image_name` 이 빈 값이 됐다.
+Cloud Run 이전 단계라 **운영 영향 0** 이지만 승인받은 창 하나를 소모했고, `service_name` 도 함께
+비어 있어 build 가 성공했다면 이름 없는 서비스로 deploy 를 시도할 구조였다.
+`deploy-api.yml` 은 정적 `env:`(`SERVICE_NAME` · `IMAGE_NAME`)를 쓰므로 같은 결함이 없다(그래서 성공했다).
+
+**수정** (`a6571915c` — `b2925e765` 위의 **workflow-only repair**, diff 2파일)
+
+```text
+refs/heads/main        → production
+refs/tags/deploy/*     → production        ← 신설
+refs/heads/develop     → development
+그 외 ref              → ::error:: + exit 1  (hard fail)
+service_name / image_name / api_url / app_origin → 빈 값 검사 통과 후에만 GITHUB_OUTPUT (fail-closed)
+```
+
+`set -euo pipefail` 추가 · 분기 안에서 곧바로 `echo "image_name=…"` 하던 형태 제거.
+**4가지 ref 로 실제 실행해 확인**: main·deploy 태그 → production, develop → development,
+나머지 2종(`refs/heads/some-feature` · `refs/tags/v1.2.3`) → **rc=1 · output 0건**.
+
+**회귀 계약** `apps/api-server/src/__tests__/deploy-target-ref-resolution.spec.ts` **10 tests PASS**
+(A deploy 태그 production 판정 · B 알 수 없는 ref hard fail · C 4개 값 빈 값 검사 후 출력 ·
+D `deploy-api` 는 ref 분기 없이 정적 env 유지). jest 이므로 CI 샤드에서 자동 실행된다.
+
+태그는 재사용하지 않았다 — `r2` 는 1차 창에서 `b2925e765` 에 이미 붙었으므로 repair commit 에는
+**`deploy/2026-09-24-phase-b1-r3`** 를 새로 만들었다.
+
+### 11-7. **Phase B-1 운영 반영 완료** (2026-09-24 · 3개 창)
+
+| 창 | ref | 결과 |
+|---|---|---|
+| 1차 07:49~08:06Z | `deploy/2026-09-24-phase-b1` (`796932575`) | **STOP** — detector fallback 결함 · 배포 0 (§11-5) |
+| 2차 09:00~09:58Z | `deploy/2026-09-24-phase-b1-r2` (`b2925e765`) | **API 성공 · Admin build 실패**(§11-6) |
+| 3차 10:47~10:56Z | `deploy/2026-09-24-phase-b1-r3` (`a6571915c`) | **Admin 성공** |
+
+**traffic 전환** (사용자 승인 · `DEPLOY_ENABLED` 는 `false` 유지 — 전환에 게이트는 필요 없다)
+`API → 확인 → Admin` 순서로 통제 전환했다(두 명령은 원자적이 아니다).
+
+| 서비스 | B-1 revision | 이미지 | 전환 후 traffic |
+|---|---|---|---|
+| `o4o-core-api` | **`03751-ctw`** | `api-server@sha256:e1062128…` | **100%** (이전 `03749-9p8` → 0%) |
+| `o4o-admin-dashboard` | **`01310-cwm`** | `admin-dashboard@sha256:f168eb9f…` | **100%** (이전 `01309-hrs` → 0%) |
+
+**postVerify — 전부 PASS**
+
+| 항목 | 실측 |
+|---|---|
+| migration | **`INCREMENTAL_EXECUTED = 0`** · `INCREMENTAL_PENDING = 0` · PRE/POST assertion PASS · fingerprint 전후 동일(`bc27f5bc…` 5826 lines) · `typeorm_migrations` **688행 · 최신 `CreateHospitalDeviceTables1790125390245`**(추가 0) |
+| API 응답 | `/health` 200 · `/health/ready` `{"status":"ready"}` · `/auth/google/config` `enabled:true` |
+| 은퇴 endpoint | `/auth/login` · `register` · `signup` · `check-email` · `forgot-password` · `reset-password` · `find-id` · `google/link` → **전부 404** |
+| Admin | `admin.neture.co.kr` **200** |
+| 관리자 identity | `cfd2a5e7…` · status `active` · Google sub `117391***` — **불변** |
+| roles / memberships | `role_assignments` **11** · `platform:super_admin` active **1** · memberships active **5** |
+| users | **1** · `password` non-null **0** |
+| **password 축 스키마 — 아직 존재** | `users.password` · `reset_password_token` · `reset_password_expires` · `loginAttempts` · `lockedUntil` 컬럼 5개 · `service_credentials`(**5행**) · `password_reset_tokens`(**5행**) · `login_attempts`(0행) 테이블 3개 **전부 present** |
+| DROP / DELETE | **0** — B-1 은 스키마를 건드리지 않는다 |
+| b4 build-path 3건 | `Build API-specific packages` · `Build API server (tsup)` · sparse checkout · `Set up Cloud SDK` 모두 통과 — **revert 대상 없음** |
+| `DEPLOY_ENABLED` | 각 창 종료 시 `false` 복귀(08:06:34Z · 09:58:06Z · 10:56:18Z) |
+
+**rollback 가능 지점이다** — 스키마가 그대로이므로 traffic 을 이전 revision(`03749-9p8` · `01309-hrs`)으로
+되돌리면 이전 동작으로 복귀한다(이미지 보존).
+
+#### 11-7a. B-1 revision 에서의 관리자 Google 브라우저 회귀 — **PASS** (2026-09-24 11:53Z)
+
+사용자가 `admin.neture.co.kr` 에서 로그인 → Admin 진입 → F5 세션 유지 → 로그아웃 → 동일 계정 재로그인을
+수행했고, **판정은 이 세션이 DB read-only 로** 했다(화면 문자열은 근거로 쓰지 않는다).
+
+| 항목 | 기준선(전환 전) | 회귀 후 | 판정 |
+|---|---|---|---|
+| `users.lastLoginAt` | 2026-09-24 04:38:09.130 | **2026-09-24 11:53:07.687** | 전진 PASS |
+| google link `lastUsedAt` | 2026-09-24 04:38:09.134 | **2026-09-24 11:53:07.693** | 전진 PASS |
+| Google `sub` | `117391***` | **동일** | 불변 |
+| `users.id` | `cfd2a5e7…` | **동일** · users total 1 | 불변 |
+| roles active / memberships active | 11 / 5 | **11 / 5** | 불변 |
+| `service_credentials` / `password_reset_tokens` | 5 / 5 | **5 / 5** | B-1 은 지우지 않는다 |
+
+즉 **B-1 revision 이 서빙되는 상태에서** Google 전용 로그인이 기존 관리자 identity 로 정상 동작한다.
+password 컬럼·테이블이 런타임에서 완전히 떨어진 뒤에도 인증이 유지된다는 것이 실증됐다.
+
+**판정: `PHASE_B1 = COMPLETE` · `PHASE_B2_DESTRUCTIVE = READY`.**
+B-2 는 §11-2 의 대상·§10-4 의 레시피대로 진행하며, production 실행은 **별도의 통제된 배포 창**에서만 한다.
+
+### 11-8. Phase B-2 candidate — 격리 PostgreSQL 15 검증 (2026-09-24 · production 미실행)
+
+migration 1건을 작성하고 **격리 DB 에서만** 검증했다. **production DB write 0 · DROP 0** 이다.
+
+| 산출물 | 값 |
+|---|---|
+| migration | `apps/api-server/src/database/migrations/1790251584623-DropLegacyPasswordAuthSchema.ts` |
+| epoch13 | **`1790251584623`** > 직전 `1790125390245` · class 명 = `name` 값 |
+| manifest | 5번째 incremental 로 append (기존 4건 무수정) |
+| expected state | `appliedThrough: 'DropLegacyPasswordAuthSchema1790251584623'` · **`6503cfb6…` / 5793 lines** |
+
+대상: `DROP TABLE service_credentials` · `password_reset_tokens` · `users` 컬럼 5개
+(`password` · `reset_password_token` · `reset_password_expires` · `"loginAttempts"` · `"lockedUntil"`).
+단독 `DELETE` 없음. **`IF EXISTS` 를 쓰지 않는다** — 대상 부재는 예상하지 못한 상태이므로 크게 실패해야 한다.
+
+#### 검증 실행 4회 (docker `postgres:15` → PostgreSQL **15.19** · `127.0.0.1:55433` · throwaway DB)
+
+| # | 시나리오 | 결과 |
+|---|---|---|
+| ① | fresh DB · expected state **미등록** | baseline + incremental 5건 적용 → `EXPECTED_SCHEMA_STATE = UNREGISTERED` → **POST assertion FAILED**. lockstep 이 의도대로 막았고 여기서 fingerprint `6503cfb6…`(5793 lines)를 얻었다 |
+| ② | expected state append 후 **fresh DB** | `PENDING=5` · `EXECUTED=5` · **POST PASS** · **expected == live** |
+| ③ | 같은 DB **재실행**(멱등) | `PREFIX 5/5` · **PRE PASS** · `PENDING=0` · `EXECUTED=0` · POST PASS |
+| ④ | **`down()` 적용 + 이력행 삭제 → 재실행** | down 직후 live fingerprint 가 **`bc27f5bc…` / 5826** 로 정확히 복귀(= 등록된 state 4) · PRE PASS · 이어서 **`PENDING=1` · `EXECUTED=1`** · POST PASS → `6503cfb6…` |
+
+**④ 는 단순 fresh bootstrap 보다 강한 검증이며 사실상 운영 리허설이다.** 운영 live fingerprint 는
+같은 날 실측한 **`bc27f5bc…` / 5826** 으로 격리 state 4 와 동일하다 — 즉 격리에서 재현한 전이
+(state 4 → state 5)가 운영에서 일어날 전이와 같다.
+
+#### `down()` 의 의미 — 구조 복원이지 데이터 복원이 아니다
+
+④ 의 "fingerprint 가 정확히 복귀" 는 **스키마 구조**(테이블 · 컬럼 · PK · UNIQUE · index · FK)가
+이전 상태와 **byte 단위로 같다**는 뜻이다. **데이터는 복원되지 않는다** — `service_credentials` 5행과
+`password_reset_tokens` 5행은 §10-5 · §43 판정대로 **영구 소실**이다. 두 서술은 모순이 아니다:
+fingerprint 는 구조만 해시하고 행을 보지 않는다. 그래서 rollback 으로 되찾을 수 있는 것은
+"password 컬럼이 다시 있는 상태" 뿐이고, **그 안의 해시값은 없다** — 비밀번호 로그인으로 돌아가려면
+각 사용자가 Google 로 로그인한 뒤 새로 설정해야 한다(현 계정 1개는 이미 `password` NULL 이라 실질 손실 0).
+
+#### 격리 DB 스키마 직접 확인
+
+DROP 대상 7개 **전부 부재** · KEEP 4개(`login_attempts` · `users.email` · `linked_accounts` · `users.lastLoginAt`)
+**전부 존재** · 지운 테이블을 가리키던 **orphan FK 0**.
+
+#### 계약 · 테스트
+
+`check-migration-contract.mjs` **21 pass / 0 fail**(`C22` = baseline + incremental **5**, `C25` = 549 파일 identity) ·
+`tsc --noEmit` rc=0 · DB/guard spec 4 suite **105 tests PASS**.
+
+**B-2 여파 1건 수정** — `__tests__/security/terms-acceptance-isolated-pg.spec.ts` 의 fixture 가
+`INSERT INTO users (… password …)` 로 삽입하고 있었다. 컬럼이 사라지면 깨지므로 `password` 를 제거했고
+(약관 승낙 축이라 password 와 무관) B-2 스키마에서 **2/2 PASS** 를 확인했다. 같은 패턴 전수 검색 결과
+나머지 1건은 **frozen historical migration**(재실행 대상 아님)뿐이다.
+
+`expected-schema-states.ts` 에 넣은 값은 **격리 DB 산출값**이며 운영 live fingerprint 를 복사하지 않았다.
+주석에 "**줄 수가 줄어드는 첫 항목**(5826 → 5793)" 성질도 남겼다 — 지금까지 incremental 은 객체를 더했고
+이번은 없애므로, 감소 자체는 정상이고 폭이 다르면 대상이 달라졌다는 신호다.
+
+#### B-2 production STOP 조건 (하나라도 다르면 API 새 revision 으로 넘어가지 않는다)
+
+```text
+PRE  fingerprint                  = bc27f5bc… / 5826
+CURRENT_INCREMENTAL_PREFIX        = 4 / 5
+INCREMENTAL_PENDING               = 1
+INCREMENTAL_EXECUTED              = 1
+POST fingerprint                  = 6503cfb6… / 5793
+POST_MIGRATION_SCHEMA_ASSERTION   = PASS
+LEGACY_HISTORY_FINGERPRINT        = MATCH
+```
+
+**안전장치**: B-1 이 이미 서빙 중이고 그 런타임은 password 스키마를 참조하지 않는다. 따라서
+migration 성공 후 deploy 단계에서 문제가 생겨도 **현재 서빙 revision 이 새 스키마와 호환**된다.
+(B-1 을 먼저 보낸 이유가 여기서 값을 한다.)
+
+#### production 적용 후 확인 (예정)
+
+DROP 7개 absent · KEEP 4개 present · `users` 1 · 관리자 `users.id` 동일 · Google `sub` 동일 ·
+`platform:super_admin` active · roles 11 · memberships 5 → 그리고 관리자 Google 로그인 →
+Admin 진입 → F5 → 로그아웃 → 재로그인 재PASS. 여기까지 PASS 하면
+**`WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1 = COMPLETE`** 로 닫는다.
+
 ### 11-2. Phase B-2 — 스키마 계약 (B-1 서빙 확인 후에만)
 
 **아직 착수하지 않았다.** B-1 revision 이 production traffic 을 받고 이전 revision traffic 0 을 확인한 뒤에만
@@ -838,7 +1008,7 @@ login_attempts = preserved              users.email = preserved
 
 ## 판정
 
-`LEGACY PASSWORD AUTH RETIREMENT: PHASE_A_DEPLOYED / PHASE_B_PENDING_APPROVAL`
+`LEGACY PASSWORD AUTH RETIREMENT: PHASE_B1_COMPLETE / PHASE_B2_DESTRUCTIVE_READY`
 
 Phase A 는 **운영 반영까지 끝났다**(`7a44a97bc` · 2026-09-24 · §7-9). 런타임에서 password reader/writer/UI 0 ·
 은퇴 endpoint 404 · 서빙 번들 password 입력 0 을 실측했고, 스키마는 **의도대로 무변화**다(migration 0).

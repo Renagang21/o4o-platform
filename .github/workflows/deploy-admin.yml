@@ -128,22 +128,56 @@ jobs:
           !/apps/api-server/src/scripts/data/
         sparse-checkout-cone-mode: false
 
+    # WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1 §11-6 (2026-09-24 INCIDENT)
+    #
+    #   통제된 배포는 검증된 SHA 를 태그로 고정해 dispatch 한다(`deploy/<날짜>-<이름>`).
+    #   그런데 이 step 은 `refs/heads/main` · `refs/heads/develop` **두 분기만** 가지고 있어
+    #   태그 ref 에서는 **어떤 output 도 설정되지 않았다.** 그 결과 `image_name` 이 빈 값이 되어
+    #   Docker tag 가 `.../o4o-api/:<sha>` 로 조립되고 build 가 실패했다
+    #   (`invalid reference format`). Cloud Run 이전 단계라 운영 영향은 0 이었지만
+    #   **승인받은 배포 창 하나를 소모**했고, `service_name` 도 함께 비어 있었다.
+    #
+    #   그래서 두 가지를 고친다.
+    #     1. `refs/tags/deploy/*` 를 production 으로 **명시 지원**한다.
+    #     2. 알 수 없는 ref 는 **즉시 실패**한다 — 빈 output 으로 build 까지 가지 않는다(fail-closed).
+    #        설정 후 4개 값이 모두 비어 있지 않은지 스스로 검사한다.
     - name: Determine deployment target
       id: config
       run: |
-        if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
-          echo "✅ Deploying to PRODUCTION"
-          echo "service_name=o4o-admin-dashboard" >> $GITHUB_OUTPUT
-          echo "image_name=admin-dashboard" >> $GITHUB_OUTPUT
-          echo "api_url=https://api.neture.co.kr/api" >> $GITHUB_OUTPUT
-          echo "app_origin=https://admin.neture.co.kr" >> $GITHUB_OUTPUT
-        elif [[ "${{ github.ref }}" == "refs/heads/develop" ]]; then
-          echo "⚠️ Deploying to DEVELOPMENT"
-          echo "service_name=o4o-admin-dashboard-dev" >> $GITHUB_OUTPUT
-          echo "image_name=admin-dashboard-dev" >> $GITHUB_OUTPUT
-          echo "api_url=https://api.neture.co.kr/api" >> $GITHUB_OUTPUT
-          echo "app_origin=https://dev-admin.neture.co.kr" >> $GITHUB_OUTPUT
+        set -euo pipefail
+        REF="${{ github.ref }}"
+
+        if [[ "$REF" == "refs/heads/main" || "$REF" == refs/tags/deploy/* ]]; then
+          # 통제된 배포 태그는 production 이다 — 태그가 가리키는 SHA 가 검증 대상이다.
+          echo "✅ Deploying to PRODUCTION (ref=$REF)"
+          SERVICE_NAME=o4o-admin-dashboard
+          IMAGE_NAME=admin-dashboard
+          API_URL=https://api.neture.co.kr/api
+          APP_ORIGIN=https://admin.neture.co.kr
+        elif [[ "$REF" == "refs/heads/develop" ]]; then
+          echo "⚠️ Deploying to DEVELOPMENT (ref=$REF)"
+          SERVICE_NAME=o4o-admin-dashboard-dev
+          IMAGE_NAME=admin-dashboard-dev
+          API_URL=https://api.neture.co.kr/api
+          APP_ORIGIN=https://dev-admin.neture.co.kr
+        else
+          echo "::error::배포 대상을 판정할 수 없는 ref 입니다: $REF"
+          echo "허용: refs/heads/main · refs/heads/develop · refs/tags/deploy/*"
+          echo "빈 service_name/image_name 으로 build 를 진행하지 않습니다 (fail-closed)."
+          exit 1
         fi
+
+        # 네 값 중 하나라도 비면 여기서 멈춘다. 빈 값이 Docker tag·gcloud 인자로 새어나가면
+        # `.../o4o-api/:<sha>` 같은 조립 오류나 이름 없는 서비스 배포로 이어진다.
+        for pair in "service_name=$SERVICE_NAME" "image_name=$IMAGE_NAME" \
+                    "api_url=$API_URL" "app_origin=$APP_ORIGIN"; do
+          key="${pair%%=*}"; value="${pair#*=}"
+          if [[ -z "$value" ]]; then
+            echo "::error::$key 가 비어 있습니다 (ref=$REF) — fail-closed"
+            exit 1
+          fi
+          echo "$key=$value" >> $GITHUB_OUTPUT
+        done
 
     - name: Setup build environment
       uses: ./.github/actions/setup-build-env
