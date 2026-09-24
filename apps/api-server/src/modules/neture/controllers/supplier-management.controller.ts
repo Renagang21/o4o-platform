@@ -289,9 +289,13 @@ export function createSupplierManagementController(dataSource: DataSource): Rout
         // WO-O4O-POSTAL-CODE-ADDRESS-V1
         businessZipCode, businessAddressDetail,
         // WO-O4O-BUSINESS-REGISTRATION-FIELD-NAMING-STANDARD-V1
-        managerName, managerPhone, businessType, businessItem, taxInvoiceEmail,
+        managerName, managerPhone, businessType, businessItem,
+        // WO-O4O-SUPPLIER-IDENTITY-RELATIONSHIP-AND-BUSINESS-PROFILE-CANONICALIZATION-V1 §E (정책 7):
+        //   taxInvoiceEmail 은 **onboarding(정산·세금계산서 축) 단일 소유**다.
+        //   두 route 가 같은 컬럼을 쓰면 마지막 저장이 조용히 이긴다 — profile 입력에서 제거한다.
+        //   read(GET /supplier/profile 응답)와 PATCH /supplier/onboarding 은 그대로 유지.
         // WO-O4O-NETURE-SUPPLIER-PROFILE-P4-FIELDS-ADD-V1: 사업자등록증 P4 fields
-        //   (저장 위치: users.businessInfo JSONB — neture_suppliers 컬럼 부재로 인한 결정)
+        //   (이전 저장 위치 users.businessInfo 는 §D·§G 로 은퇴 — 현재 저장 위치 없음 → 400 거부)
         businessEntityType, businessStartDate,
         // WO-NETURE-B2B-SUPPLIER-ORDER-CONDITION-V1
         minOrderAmount, minOrderSurcharge, orderConditionNote,
@@ -305,7 +309,7 @@ export function createSupplierManagementController(dataSource: DataSource): Rout
         contactWebsiteVisibility, contactKakaoVisibility,
         businessNumber, representativeName, businessAddress,
         businessZipCode, businessAddressDetail,
-        managerName, managerPhone, businessType, businessItem, taxInvoiceEmail,
+        managerName, managerPhone, businessType, businessItem,
         businessEntityType, businessStartDate,
         minOrderAmount, minOrderSurcharge, orderConditionNote,
         baseShippingFee, freeShippingThreshold, averageDispatchDays, returnExchangeNotice,

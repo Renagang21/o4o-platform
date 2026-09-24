@@ -91,17 +91,67 @@ describe('§D·§G users.businessInfo Supplier runtime 은퇴', () => {
     expect(svc).not.toMatch(/UPDATE\s+users[\s\S]{0,80}businessInfo/i);
   });
 
+  it('read 경로도 users.businessInfo 를 읽지 않는다 (§D 읽기 SSOT)', () => {
+    expect(svc).not.toMatch(/SELECT\s+"businessInfo"\s+FROM\s+users/i);
+    expect(svc).not.toContain('businessInfo');
+  });
+
   it('공유 util 파일은 삭제하지 않았다 (타 서비스 소비처 존재)', () => {
     expect(() => read(BIZ_UTIL)).not.toThrow();
+  });
+});
+
+describe('§D businessEntityType / businessStartDate 의 canonical 저장 위치', () => {
+  const svc = stripComments(read(SUPPLIER_SVC));
+
+  it('Organization 확장 필드에 저장한다 (migration 0)', () => {
+    expect(svc).toContain('businessProfile');
+    expect(svc).toMatch(/setClauses\.push\(`metadata = \$\$\{idx\+\+\}`\)/);
+  });
+
+  it('metadata 를 통째로 덮어쓰지 않고 읽어서 merge 한다 (타 서비스 key 보존)', () => {
+    expect(svc).toMatch(/SELECT metadata FROM organizations WHERE id = \$1/);
+    expect(svc).toContain('...currentMeta');
+  });
+
+  it('metadata merge 가 같은 runner(=트랜잭션)에서 일어난다', () => {
+    const i = svc.indexOf('SELECT metadata FROM organizations');
+    expect(svc.slice(Math.max(0, i - 400), i)).toContain('const runner = manager ?? AppDataSource');
+  });
+
+  it('read 가 organizations.metadata 에서 되읽는다', () => {
+    expect(svc).toContain("metadata FROM organizations");
+    expect(svc).toMatch(/org\?\.metadata\?\.businessProfile/);
+  });
+});
+
+describe('§E taxInvoiceEmail 소유 단일화', () => {
+  const ctl = stripComments(read(MGMT_CTL));
+
+  it('PATCH /supplier/profile 이 taxInvoiceEmail 을 더 이상 받지 않는다', () => {
+    const i = ctl.indexOf("router.patch('/profile'");
+    const j = ctl.indexOf("router.", i + 10);
+    expect(i).toBeGreaterThan(-1);
+    expect(ctl.slice(i, j > i ? j : undefined)).not.toContain('taxInvoiceEmail');
+  });
+
+  it('onboarding 이 쓰기 소유자로 남아 있다', () => {
+    const onboarding = stripComments(
+      read('apps/api-server/src/modules/neture/services/supplier-onboarding.service.ts'),
+    );
+    expect(onboarding).toContain('supplier.taxInvoiceEmail = taxInvoiceEmail');
   });
 });
 
 describe('§9 silent skip / silent success 금지', () => {
   const svc = stripComments(read(SUPPLIER_SVC));
 
-  it('저장 위치가 없는 필드는 명시적 오류로 거부한다', () => {
+  it('조직이 없어 저장 위치가 없으면 명시적 오류로 거부한다 (조용한 성공 금지)', () => {
     expect(svc).toContain('SupplierProfileFieldUnsupportedError');
     expect(svc).toMatch(/throw new SupplierProfileFieldUnsupportedError/);
+    // 거부 조건은 "조직 미연결" 이다 — 조직이 있으면 실제로 저장한다
+    const i = svc.indexOf('throw new SupplierProfileFieldUnsupportedError');
+    expect(svc.slice(Math.max(0, i - 300), i)).toContain('!supplier.organizationId');
   });
 
   it('controller 가 그 오류를 400 으로 노출한다 (조용히 성공 아님)', () => {

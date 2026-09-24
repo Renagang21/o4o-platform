@@ -261,7 +261,10 @@ export default function SupplierProfilePage() {
       // WO-O4O-NETURE-SUPPLIER-PROFILE-P4-FIELDS-ADD-V1
       businessEntityType: businessEntityType || undefined,
       businessStartDate: businessStartDate || undefined,
-      taxInvoiceEmail,
+      // WO-O4O-SUPPLIER-IDENTITY-RELATIONSHIP-AND-BUSINESS-PROFILE-CANONICALIZATION-V1 §E:
+      //   taxInvoiceEmail 은 onboarding(정산·세금계산서) 단일 소유다. 두 저장 버튼이 같은 값을
+      //   서로 다른 시점에 쓰면 마지막 저장이 조용히 이긴다 — 여기서는 보내지 않는다.
+      //   (입력 UI 와 저장은 handleSaveOnboarding 이 담당하고, 읽기는 그대로 유지한다.)
       // Section B
       managerName,
       managerPhone,
