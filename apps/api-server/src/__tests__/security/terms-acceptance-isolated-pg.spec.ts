@@ -41,8 +41,11 @@ describeIsolated('user_policy_acceptances — 격리 PG 실 SQL', () => {
     await client.connect();
     await client.query('BEGIN');
     await client.query(
-      `INSERT INTO users (id, email, password, name, status, "isActive")
-       VALUES ($1,'terms-t1@example.test','h','t1','active',true),($2,'terms-t2@example.test','h','t2','active',true)`,
+      // WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1 Phase B-2:
+      //   users.password 컬럼이 DROP 됐다. fixture 는 그 컬럼을 채우지 않는다
+      //   (이 spec 은 약관 승낙 축을 보며 password 와 무관하다).
+      `INSERT INTO users (id, email, name, status, "isActive")
+       VALUES ($1,'terms-t1@example.test','t1','active',true),($2,'terms-t2@example.test','t2','active',true)`,
       [U1, U2],
     );
     await client.query(

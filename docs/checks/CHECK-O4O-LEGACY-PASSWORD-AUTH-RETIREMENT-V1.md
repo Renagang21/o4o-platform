@@ -885,6 +885,85 @@ password 컬럼·테이블이 런타임에서 완전히 떨어진 뒤에도 인�
 **판정: `PHASE_B1 = COMPLETE` · `PHASE_B2_DESTRUCTIVE = READY`.**
 B-2 는 §11-2 의 대상·§10-4 의 레시피대로 진행하며, production 실행은 **별도의 통제된 배포 창**에서만 한다.
 
+### 11-8. Phase B-2 candidate — 격리 PostgreSQL 15 검증 (2026-09-24 · production 미실행)
+
+migration 1건을 작성하고 **격리 DB 에서만** 검증했다. **production DB write 0 · DROP 0** 이다.
+
+| 산출물 | 값 |
+|---|---|
+| migration | `apps/api-server/src/database/migrations/1790251584623-DropLegacyPasswordAuthSchema.ts` |
+| epoch13 | **`1790251584623`** > 직전 `1790125390245` · class 명 = `name` 값 |
+| manifest | 5번째 incremental 로 append (기존 4건 무수정) |
+| expected state | `appliedThrough: 'DropLegacyPasswordAuthSchema1790251584623'` · **`6503cfb6…` / 5793 lines** |
+
+대상: `DROP TABLE service_credentials` · `password_reset_tokens` · `users` 컬럼 5개
+(`password` · `reset_password_token` · `reset_password_expires` · `"loginAttempts"` · `"lockedUntil"`).
+단독 `DELETE` 없음. **`IF EXISTS` 를 쓰지 않는다** — 대상 부재는 예상하지 못한 상태이므로 크게 실패해야 한다.
+
+#### 검증 실행 4회 (docker `postgres:15` → PostgreSQL **15.19** · `127.0.0.1:55433` · throwaway DB)
+
+| # | 시나리오 | 결과 |
+|---|---|---|
+| ① | fresh DB · expected state **미등록** | baseline + incremental 5건 적용 → `EXPECTED_SCHEMA_STATE = UNREGISTERED` → **POST assertion FAILED**. lockstep 이 의도대로 막았고 여기서 fingerprint `6503cfb6…`(5793 lines)를 얻었다 |
+| ② | expected state append 후 **fresh DB** | `PENDING=5` · `EXECUTED=5` · **POST PASS** · **expected == live** |
+| ③ | 같은 DB **재실행**(멱등) | `PREFIX 5/5` · **PRE PASS** · `PENDING=0` · `EXECUTED=0` · POST PASS |
+| ④ | **`down()` 적용 + 이력행 삭제 → 재실행** | down 직후 live fingerprint 가 **`bc27f5bc…` / 5826** 로 정확히 복귀(= 등록된 state 4) · PRE PASS · 이어서 **`PENDING=1` · `EXECUTED=1`** · POST PASS → `6503cfb6…` |
+
+**④ 는 단순 fresh bootstrap 보다 강한 검증이며 사실상 운영 리허설이다.** 운영 live fingerprint 는
+같은 날 실측한 **`bc27f5bc…` / 5826** 으로 격리 state 4 와 동일하다 — 즉 격리에서 재현한 전이
+(state 4 → state 5)가 운영에서 일어날 전이와 같다.
+
+#### `down()` 의 의미 — 구조 복원이지 데이터 복원이 아니다
+
+④ 의 "fingerprint 가 정확히 복귀" 는 **스키마 구조**(테이블 · 컬럼 · PK · UNIQUE · index · FK)가
+이전 상태와 **byte 단위로 같다**는 뜻이다. **데이터는 복원되지 않는다** — `service_credentials` 5행과
+`password_reset_tokens` 5행은 §10-5 · §43 판정대로 **영구 소실**이다. 두 서술은 모순이 아니다:
+fingerprint 는 구조만 해시하고 행을 보지 않는다. 그래서 rollback 으로 되찾을 수 있는 것은
+"password 컬럼이 다시 있는 상태" 뿐이고, **그 안의 해시값은 없다** — 비밀번호 로그인으로 돌아가려면
+각 사용자가 Google 로 로그인한 뒤 새로 설정해야 한다(현 계정 1개는 이미 `password` NULL 이라 실질 손실 0).
+
+#### 격리 DB 스키마 직접 확인
+
+DROP 대상 7개 **전부 부재** · KEEP 4개(`login_attempts` · `users.email` · `linked_accounts` · `users.lastLoginAt`)
+**전부 존재** · 지운 테이블을 가리키던 **orphan FK 0**.
+
+#### 계약 · 테스트
+
+`check-migration-contract.mjs` **21 pass / 0 fail**(`C22` = baseline + incremental **5**, `C25` = 549 파일 identity) ·
+`tsc --noEmit` rc=0 · DB/guard spec 4 suite **105 tests PASS**.
+
+**B-2 여파 1건 수정** — `__tests__/security/terms-acceptance-isolated-pg.spec.ts` 의 fixture 가
+`INSERT INTO users (… password …)` 로 삽입하고 있었다. 컬럼이 사라지면 깨지므로 `password` 를 제거했고
+(약관 승낙 축이라 password 와 무관) B-2 스키마에서 **2/2 PASS** 를 확인했다. 같은 패턴 전수 검색 결과
+나머지 1건은 **frozen historical migration**(재실행 대상 아님)뿐이다.
+
+`expected-schema-states.ts` 에 넣은 값은 **격리 DB 산출값**이며 운영 live fingerprint 를 복사하지 않았다.
+주석에 "**줄 수가 줄어드는 첫 항목**(5826 → 5793)" 성질도 남겼다 — 지금까지 incremental 은 객체를 더했고
+이번은 없애므로, 감소 자체는 정상이고 폭이 다르면 대상이 달라졌다는 신호다.
+
+#### B-2 production STOP 조건 (하나라도 다르면 API 새 revision 으로 넘어가지 않는다)
+
+```text
+PRE  fingerprint                  = bc27f5bc… / 5826
+CURRENT_INCREMENTAL_PREFIX        = 4 / 5
+INCREMENTAL_PENDING               = 1
+INCREMENTAL_EXECUTED              = 1
+POST fingerprint                  = 6503cfb6… / 5793
+POST_MIGRATION_SCHEMA_ASSERTION   = PASS
+LEGACY_HISTORY_FINGERPRINT        = MATCH
+```
+
+**안전장치**: B-1 이 이미 서빙 중이고 그 런타임은 password 스키마를 참조하지 않는다. 따라서
+migration 성공 후 deploy 단계에서 문제가 생겨도 **현재 서빙 revision 이 새 스키마와 호환**된다.
+(B-1 을 먼저 보낸 이유가 여기서 값을 한다.)
+
+#### production 적용 후 확인 (예정)
+
+DROP 7개 absent · KEEP 4개 present · `users` 1 · 관리자 `users.id` 동일 · Google `sub` 동일 ·
+`platform:super_admin` active · roles 11 · memberships 5 → 그리고 관리자 Google 로그인 →
+Admin 진입 → F5 → 로그아웃 → 재로그인 재PASS. 여기까지 PASS 하면
+**`WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1 = COMPLETE`** 로 닫는다.
+
 ### 11-2. Phase B-2 — 스키마 계약 (B-1 서빙 확인 후에만)
 
 **아직 착수하지 않았다.** B-1 revision 이 production traffic 을 받고 이전 revision traffic 0 을 확인한 뒤에만

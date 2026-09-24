@@ -34,6 +34,11 @@ import { AlterHandoffTokensTargetWorkspace1789974015939 } from '../migrations/17
 import { CreateOperatorInvitations1790125106065 } from '../migrations/1790125106065-CreateOperatorInvitations.js';
 // WO-O4O-HOSPITAL-PHARMACY-DEVICE-ENROLLMENT-AND-LOGINLESS-ACCESS-V1 §8·§9 (hospital_devices · hospital_device_enrollment_codes · 해시만)
 import { CreateHospitalDeviceTables1790125390245 } from '../migrations/1790125390245-CreateHospitalDeviceTables.js';
+// WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1 §43 Phase B-2 (destructive · 사용자 승인 2026-09-24)
+//   service_credentials · password_reset_tokens DROP + users 의 password/재설정/lockout 컬럼 5개 DROP.
+//   런타임 의존은 Phase B-1 에서 0 이 됐고(B-1 revision 서빙 상태에서 Google 로그인 회귀 PASS),
+//   deploy 는 migration 이 새 revision 보다 먼저 실행되므로 코드 선행이 필수였다.
+import { DropLegacyPasswordAuthSchema1790251584623 } from '../migrations/1790251584623-DropLegacyPasswordAuthSchema.js';
 
 export const INCREMENTAL_MIGRATION_CUTOFF = {
   baselineVersion: '2026-09-18-id685',
@@ -52,6 +57,7 @@ export const INCREMENTAL_MIGRATIONS: readonly MigrationClass[] = [
   AlterHandoffTokensTargetWorkspace1789974015939,
   CreateOperatorInvitations1790125106065,
   CreateHospitalDeviceTables1790125390245,
+  DropLegacyPasswordAuthSchema1790251584623,
 ];
 
 export function incrementalMigrationNames(): string[] {

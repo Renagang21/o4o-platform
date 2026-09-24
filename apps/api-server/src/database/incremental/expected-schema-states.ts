@@ -75,6 +75,18 @@ export const EXPECTED_SCHEMA_STATES: readonly ExpectedSchemaState[] = [
     fingerprint: 'bc27f5bc6c2077c50c0f112e863205bc14200c7284cab2c9689937a9a11e549a',
     fingerprintLineCount: 5826,
   },
+  // WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1 §43 Phase B-2 (destructive · 사용자 승인 2026-09-24) —
+  // service_credentials · password_reset_tokens DROP + users 의 password / reset_password_token /
+  // reset_password_expires / "loginAttempts" / "lockedUntil" 컬럼 DROP.
+  // **줄 수가 줄어드는 첫 항목이다**(5826 → 5793): 지금까지 incremental 은 객체를 더했고
+  // 이번은 없앤다. 감소 자체가 정상이며, 그 폭이 기대와 다르면 대상이 달라졌다는 신호다.
+  // baseline 2026-09-18-id685 fresh bootstrap + incremental 1..5 를 격리 PostgreSQL 15.19
+  // (docker postgres:15, 로컬 전용 포트 55433, throwaway DB) 에서 산출: 운영 DB fingerprint 채택 아님.
+  {
+    appliedThrough: 'DropLegacyPasswordAuthSchema1790251584623',
+    fingerprint: '6503cfb6ac967ed294f7cd50a56df704fced80777cab75d0dff64b2af602c72c',
+    fingerprintLineCount: 5793,
+  },
 ] as const;
 
 /** Expected state after `prefixLength` incremental migrations; undefined when not registered. */
