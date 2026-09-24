@@ -13,7 +13,7 @@ import logger from '../utils/logger.js';
  *     → 2년 시스템 전환 시에는 정본 개정 + policyDays 상향으로 처리한다.
  *
  * 삭제 방식: `DELETE ... WHERE id IN (SELECT id ... LIMIT batch)` 반복. row 내용은 어떤 로그에도 남기지 않는다(건수·기준일만).
- * login_attempts 는 기존 CleanupLoginAttemptsJob(30일) 계약 그대로 — 이 서비스의 대상이 아니다.
+ * login_attempts 는 WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1 로 은퇴했다(신규 기록 0).
  */
 
 export type RetentionTargetKey =

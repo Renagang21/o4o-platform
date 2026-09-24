@@ -131,17 +131,8 @@ export interface ApiRequestConfig {
 }
 
 // Common API payloads
-export interface LoginPayload {
-  email: string;
-  password: string;
-}
-
-export interface RegisterPayload {
-  email: string;
-  password: string;
-  name: string;
-  role?: 'customer' | 'business' | 'affiliate';
-}
+// WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1:
+//   LoginPayload · RegisterPayload(email+password) 는 은퇴했다 — 소비처 0. 로그인/가입은 Google ID token 계약이다.
 
 export interface UpdateProfilePayload {
   name?: string;

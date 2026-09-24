@@ -1,6 +1,7 @@
 name: E2E — Auth Runtime Regression
 
-# 3개 배포 서비스(Neture / KPA-Society / K-Cosmetics) auth runtime 검증
+# 3개 배포 서비스(Neture / KPA-Society / K-Cosmetics) auth runtime 검증 — **Google-only 기준**
+# (WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: password 로그인 시나리오·secret 소비 0)
 # 실제 운영 URL을 대상으로 하므로 과도한 자동 실행 방지:
 #   - workflow_dispatch: 유일한 실행 경로 (배포 후 수동 검증)
 #
@@ -54,48 +55,29 @@ jobs:
       - name: Install Playwright Chromium
         run: npx playwright install chromium --with-deps
 
-      # WO-O4O-KPA-AUTH-RUNTIME-E2E-LOGIN-REGRESSION-ROOT-CAUSE-AND-CI-CLOSURE-V1
+      # WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1 (2026-09-23) — Google-only 재정의
       #
-      # 공용 E2E_ADMIN_EMAIL / E2E_ADMIN_PASSWORD 계약은 폐기했다.
-      # 실제 인증은 서비스별 L2 `service_credentials`(serviceKey 단위)로 판정되므로,
-      # 한 서비스의 비밀번호만 바뀌어도 공용 secret 하나로는 CI 전체가 깨지고
-      # 그 장애가 "코드 회귀"처럼 보인다 (2026-08-21 KPA 사례).
+      # `E2E_*_ADMIN_EMAIL/PASSWORD` **secret 소비를 전부 제거**했다. 로그인 수단이 Google 하나가 되어
+      # CI 에 넣을 password 가 존재하지 않으며(계정에 password 자체가 없다), Google 계정 자동 로그인은
+      # 새 테스트 계정 금지 + Google 의 자동화 차단으로 CI 에서 재현 불가다.
+      # 토큰 주입은 "로그인한 척" 일 뿐이라 쓰지 않는다.
       #
-      # 또한 미설정을 warning + skip 으로 흡수하지 않는다. 자격증명이 없으면
-      # 이 workflow 는 아무것도 검증하지 못하므로 초록불을 만들면 안 된다.
-      - name: Validate E2E credentials (per service)
+      # 그래서 이 workflow 는 **자격증명 없이 증명 가능한 계약**만 본다:
+      #   로그인 surface(Google 진입 존재 · password 입력 0) · 은퇴 endpoint 404 ·
+      #   Google 경로 생존과 토큰 검증(가짜 토큰 401) · 미인증 동작.
+      # 세션 이후 런타임(refresh · logout · token-cleared)은 통제된 배포 창의 사용자 브라우저 smoke 다.
+      #
+      # 남은 secret 은 삭제하지 않는다 — 저장소 secret 정리는 사용자 판단 사항이며, 여기서는 **소비 0** 으로 끊는다.
+      - name: Verify no password credential is consumed
         run: |
-          MISSING=""
-          check() {
-            if [ -z "$2" ]; then MISSING="$MISSING $1"; fi
-          }
-          check E2E_KPA_ADMIN_EMAIL      "${{ secrets.E2E_KPA_ADMIN_EMAIL }}"
-          check E2E_KPA_ADMIN_PASSWORD   "${{ secrets.E2E_KPA_ADMIN_PASSWORD }}"
-          check E2E_KCOS_ADMIN_EMAIL     "${{ secrets.E2E_KCOS_ADMIN_EMAIL }}"
-          check E2E_KCOS_ADMIN_PASSWORD  "${{ secrets.E2E_KCOS_ADMIN_PASSWORD }}"
-          check E2E_NETURE_ADMIN_EMAIL   "${{ secrets.E2E_NETURE_ADMIN_EMAIL }}"
-          check E2E_NETURE_ADMIN_PASSWORD "${{ secrets.E2E_NETURE_ADMIN_PASSWORD }}"
-
-          if [ -n "$MISSING" ]; then
-            echo "::error::서비스별 E2E Secret 미설정:$MISSING"
-            echo ""
-            echo "설정 위치: GitHub repo → Settings → Secrets and variables → Actions"
-            echo "계약: serviceKey 별로 계정·비밀번호를 분리한다 (가능하면 E2E 전용 계정)."
-            echo "  kpa-society  → E2E_KPA_ADMIN_EMAIL    / E2E_KPA_ADMIN_PASSWORD"
-            echo "  k-cosmetics  → E2E_KCOS_ADMIN_EMAIL   / E2E_KCOS_ADMIN_PASSWORD"
-            echo "  neture       → E2E_NETURE_ADMIN_EMAIL / E2E_NETURE_ADMIN_PASSWORD"
+          if grep -RInE 'E2E_[A-Z]+_ADMIN_(EMAIL|PASSWORD)' e2e/auth-runtime; then
+            echo "::error::E2E 스위트가 password 자격증명을 다시 소비한다 (Google-only 계약 위반)"
             exit 1
           fi
-          echo "✅ 3개 서비스 credential 모두 설정됨"
+          echo "✅ password 자격증명 소비 0 — Google-only 계약 유지""
 
-      - name: Run Auth Runtime E2E
+      - name: Run Auth Runtime E2E (Google-only)
         env:
-          E2E_KPA_ADMIN_EMAIL: ${{ secrets.E2E_KPA_ADMIN_EMAIL }}
-          E2E_KPA_ADMIN_PASSWORD: ${{ secrets.E2E_KPA_ADMIN_PASSWORD }}
-          E2E_KCOS_ADMIN_EMAIL: ${{ secrets.E2E_KCOS_ADMIN_EMAIL }}
-          E2E_KCOS_ADMIN_PASSWORD: ${{ secrets.E2E_KCOS_ADMIN_PASSWORD }}
-          E2E_NETURE_ADMIN_EMAIL: ${{ secrets.E2E_NETURE_ADMIN_EMAIL }}
-          E2E_NETURE_ADMIN_PASSWORD: ${{ secrets.E2E_NETURE_ADMIN_PASSWORD }}
           CI: 'true'
         run: npx playwright test --config=e2e/auth-runtime/playwright.config.ts
 

@@ -3,6 +3,8 @@
  * WO-O4O-KPA-BRANCH-PHARMACIST-PROFILE-CANONICALIZATION-V1
  *
  * `POST /kpa-branch/join` — serviceKey/role 은 서버가 강제한다 (클라이언트가 보내지 않는다).
+ * WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: 이 경로는 계정을 만들지 않는다 —
+ *   Google 로그인으로 만들어진 세션(users.id)에 service_memberships(pending) 를 단다.
  * 면허번호·직역은 가입 시점에 canonical 약사 프로필(`kpa_pharmacist_profiles`)로 승격된다.
  */
 import { api } from '../apiClient';
@@ -29,13 +31,9 @@ export const JOIN_ACTIVITY_TYPE_OPTIONS: ReadonlyArray<{ value: string; label: s
 ];
 
 export interface BranchJoinInput {
-  email: string;
-  password: string;
-  name: string;
-  phone?: string;
   licenseNumber?: string;
   activityType?: string;
-  /** 이용약관 동의 — 서버 register 필수값 */
+  /** 이용약관 동의 — 신청 화면의 확인 절차(계정은 Google 가입 시점에 이미 동의했다) */
   tos: true;
 }
 

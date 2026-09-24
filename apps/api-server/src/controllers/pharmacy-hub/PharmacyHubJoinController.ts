@@ -4,11 +4,12 @@
  * WO-PHARMACY-HUB-MEMBERSHIP-JOIN-AND-APPROVAL-V1 §6-A
  *
  * 정책:
- *   - 가입 write-path 는 공통 Core 경로(AuthRegisterController.register)를 그대로 사용한다.
+ *   - 가입 write-path 는 공통 SSOT(ServiceJoinService.apply)를 사용한다.
  *     이 컨트롤러는 serviceKey 강제 + 신청 역할 제한 + 중복 상태 코드 분기만 담당하는 얇은 래퍼다.
  *     (service_memberships 를 직접 INSERT 하지 않는다 — 가입 SSOT 이중화 방지)
+ *   - WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: 가입은 Google 인증을 전제한다.
  *   - serviceKey 는 항상 서버가 'pharmacy-hub' 로 강제한다. 클라이언트 값은 무시된다.
- *   - status 는 Core 경로가 항상 'pending' 으로 생성한다.
+ *   - status 는 항상 'pending' 으로 생성된다.
  *   - roleType 은 member(일반 약사 회원) / store_owner(약국 경영자) 둘만 허용한다
  *     (WO-O4O-PHARMACYHUB-PHARMACIST-MEMBER-AND-STORE-OWNER-MODEL-CLOSURE-V1).
  *     operator·admin·강사·커뮤니티 운영자는 자가 신청이 아니라 사후 부여다.
@@ -29,9 +30,7 @@
 
 import type { Request, Response } from 'express';
 import { AppDataSource } from '../../database/connection.js';
-import { User } from '../../modules/auth/entities/User.js';
-import { ServiceMembership } from '../../modules/auth/entities/ServiceMembership.js';
-import { AuthRegisterController } from '../../modules/auth/controllers/auth-register.controller.js';
+import { ServiceJoinService } from '../../services/auth/service-join.service.js';
 import { SERVICE_KEYS } from '../../constants/service-keys.js';
 import {
   PHARMACY_HUB_SIGNUP_ROLES,
@@ -103,12 +102,25 @@ function validateMinimalProfile(body: Record<string, any>, roleType: AllowedRole
 
 export class PharmacyHubJoinController {
   /**
-   * POST /api/v1/pharmacy-hub/join
-   * 가입 신청 — 신규 사용자 / 기존 O4O 사용자 모두 동일 경로.
+   * POST /api/v1/pharmacy-hub/join  (requireAuth)
+   * 가입 신청 — Google 로 인증된 사용자를 파머시 허브 회원으로 신청시킨다.
+   *
+   * WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1:
+   *   users 생성 · service_credentials 생성이 이 경로에서 사라졌다.
+   *   계정은 `POST /auth/google/signup` 으로 만들어지고, 여기서는 membership 만 신청한다.
    */
   static async apply(req: Request, res: Response): Promise<any> {
     const body = (req.body ?? {}) as Record<string, any>;
     const roleType = String(body.roleType ?? body.role ?? '');
+
+    const userId = (req as any).user?.id as string | undefined;
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        error: '가입 신청 전에 Google 계정으로 로그인해 주세요.',
+        code: 'AUTH_REQUIRED',
+      });
+    }
 
     if (!ALLOWED_ROLE_TYPES.includes(roleType as AllowedRoleType)) {
       return res.status(400).json({
@@ -116,11 +128,6 @@ export class PharmacyHubJoinController {
         error: '가입 신청 역할이 필요합니다. (약사 회원 / 약국 경영자)',
         code: 'PHARMACY_HUB_SIGNUP_ROLE_REQUIRED',
       });
-    }
-
-    const email = String(body.email ?? '').trim();
-    if (!email) {
-      return res.status(400).json({ success: false, error: '이메일이 필요합니다.', code: 'EMAIL_REQUIRED' });
     }
 
     const missingFields = validateMinimalProfile(body, roleType as AllowedRoleType);
@@ -133,42 +140,50 @@ export class PharmacyHubJoinController {
       });
     }
 
+    let result;
     try {
-      // 중복 신청 상태 사전 판정 — 상태별 코드 분기를 위해 선조회한다.
-      // (Core 경로는 모든 기존 row 를 SERVICE_ALREADY_JOINED 로 묶어 응답한다.)
-      const existingUser = await AppDataSource.getRepository(User).findOne({ where: { email } });
-      if (existingUser) {
-        const membership = await AppDataSource.getRepository(ServiceMembership).findOne({
-          where: { userId: existingUser.id, serviceKey: SERVICE_KEY },
-        });
-        if (membership) {
-          const dup = DUPLICATE_RESPONSE[membership.status] ?? DUPLICATE_RESPONSE.active;
-          return res.status(409).json({
-            success: false,
-            error: dup.message,
-            code: dup.code,
-            data: { status: membership.status },
-          });
-        }
-      }
+      // serviceKey / role 은 서버가 강제한다 — 클라이언트가 임의 서비스나 operator 로 신청할 수 없다.
+      result = await ServiceJoinService.apply({
+        userId,
+        serviceKey: SERVICE_KEY,
+        role: roleType,
+        profile: {
+          // 약국명은 기존 businessName 축으로 정규화 (신규 프로필 테이블 없음)
+          businessName: body.businessName || body.companyName,
+          companyName: body.companyName || body.businessName,
+          representativeName: body.representativeName || body.ceoName,
+          businessNumber: body.businessNumber,
+          businessAddress: body.businessAddress || body.address1,
+          businessPhone: body.businessPhone,
+        },
+      });
     } catch (error) {
-      logger.error('[PharmacyHubJoin] duplicate pre-check failed', {
+      logger.error('[PharmacyHubJoin] membership apply failed', {
         error: error instanceof Error ? error.message : String(error),
       });
       return res.status(500).json({ success: false, error: '가입 신청 처리에 실패했습니다.' });
     }
 
-    // serviceKey / role 은 서버가 강제한다 — 클라이언트가 임의 서비스나 operator 로 신청할 수 없다.
-    req.body = {
-      ...body,
-      service: SERVICE_KEY,
-      role: roleType,
-      // 약국명은 기존 businessName 축으로 정규화 (신규 프로필 테이블 없음)
-      businessName: body.businessName || body.companyName,
-      companyName: body.companyName || body.businessName,
-    };
+    if (result.outcome === 'duplicate') {
+      const dup = DUPLICATE_RESPONSE[result.status] ?? DUPLICATE_RESPONSE.active;
+      return res.status(409).json({
+        success: false,
+        error: dup.message,
+        code: dup.code,
+        data: { status: result.status },
+      });
+    }
 
-    return AuthRegisterController.register(req, res);
+    return res.status(201).json({
+      success: true,
+      data: {
+        serviceKey: SERVICE_KEY,
+        status: 'pending',
+        role: roleType,
+        reapplied: result.outcome === 'reapplied',
+      },
+      message: '가입 신청이 접수되었습니다. 운영자 승인 후 이용할 수 있습니다.',
+    });
   }
 
   /**

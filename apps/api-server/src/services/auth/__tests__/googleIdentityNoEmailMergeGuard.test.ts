@@ -8,7 +8,9 @@
  *  G2  OAuth/Google/social/link/merge 문맥(파일명 또는 둘러싼 함수/메서드명)에 있는 repository 조회
  *      (`findOne` · `findOneBy` · `find` · `findBy` · `exists` · `count`) 의 `where` 에 `email` 키가 없다.
  *      — email/password 로그인(`handleEmailLogin`) · 조회 서비스는 문맥 밖이므로 그대로 허용된다.
- *  G3  `AuthLoginService` 에 `handleOAuthLogin` 메서드 · `oauthProfile` 식별자 · `linkOAuthAccount` 호출이 없다.
+ *  G3  password 로그인 런타임(`services/auth/auth-login.service.ts` · `modules/auth/controllers/auth-login.controller.ts`)이
+ *      **파일 자체로 존재하지 않는다** — WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1 로 은퇴했고,
+ *      auth 모듈 어디서도 import 하지 않는다(재유입 차단).
  *  G4  `passportDynamic` strategy verify callback 안에 repository 조회/저장 · `handleSocialAuth` 호출이 없다.
  *  G5  `google-identity.service.ts` 는 `email` · `provider_id` · `users.provider` 를 조회 조건/식별자로 쓰지 않는다.
  *  G6  `AccountLinkingService.mergeAccounts` 가 없다.
@@ -116,7 +118,7 @@ function calledMethodName(call: ts.CallExpression): string | undefined {
 describe('WO-2B 정적 guard — OAuth/Google 흐름의 email lookup · 자동 병합 재도입 차단', () => {
   it('스캔 대상이 존재한다', () => {
     expect(files.length).toBeGreaterThan(5);
-    expect(files.some((f) => rel(f) === 'services/auth/auth-login.service.ts')).toBe(true);
+    expect(files.some((f) => rel(f) === 'services/auth/google-auth.service.ts')).toBe(true);
     expect(files.some((f) => rel(f) === 'services/auth/google-identity.service.ts')).toBe(true);
     expect(files.some((f) => rel(f) === 'config/passportDynamic.ts')).toBe(true);
   });
@@ -154,24 +156,27 @@ describe('WO-2B 정적 guard — OAuth/Google 흐름의 email lookup · 자동 �
     expect(violations).toEqual([]);
   });
 
-  it('G3 AuthLoginService — handleOAuthLogin · oauthProfile · linkOAuthAccount 호출 없음 · provider !== email 은 거절', () => {
-    const f = path.join(SRC, 'services/auth/auth-login.service.ts');
-    const sf = sources.get(f)!;
-    const found: string[] = [];
-    walk(sf, (n) => {
-      if (ts.isMethodDeclaration(n) && ts.isIdentifier(n.name) && /oauth/i.test(n.name.text)) found.push(`method ${n.name.text}`);
-      if (ts.isIdentifier(n) && n.text === 'oauthProfile') found.push('identifier oauthProfile');
-      if (ts.isCallExpression(n) && calledMethodName(n) === 'linkOAuthAccount') found.push('call linkOAuthAccount');
-    });
-    expect(found).toEqual([]);
+  it('G3 password 로그인 런타임 부재 — auth-login service/controller 파일 0 · import 0', () => {
+    // WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: 파일이 다시 생기면 이 guard 가 먼저 깨진다.
+    for (const retired of [
+      'services/auth/auth-login.service.ts',
+      'modules/auth/controllers/auth-login.controller.ts',
+      'services/passwordResetService.ts',
+      'utils/password-policy.ts',
+    ]) {
+      expect(fs.existsSync(path.join(SRC, retired))).toBe(false);
+    }
 
-    // login() 본문에 provider !== 'email' 거절 분기가 있다 (email 전용 축소).
-    let loginBody = '';
-    walk(sf, (n) => {
-      if (ts.isMethodDeclaration(n) && ts.isIdentifier(n.name) && n.name.text === 'login' && n.body) loginBody = n.body.getText(sf);
-    });
-    expect(loginBody).toMatch(/provider\s*!==\s*'email'/);
-    expect(loginBody).not.toMatch(/handleOAuthLogin/);
+    const importers: string[] = [];
+    for (const [f, sf] of sources) {
+      walk(sf, (n) => {
+        if (ts.isImportDeclaration(n) && ts.isStringLiteral(n.moduleSpecifier)
+          && /auth-login\.(service|controller)|passwordResetService|password-policy/.test(n.moduleSpecifier.text)) {
+          importers.push(`${rel(f)} → ${n.moduleSpecifier.text}`);
+        }
+      });
+    }
+    expect(importers).toEqual([]);
   });
 
   it('G4 passportDynamic strategy verify callback — repository 조회/저장 · handleSocialAuth 호출 없음', () => {

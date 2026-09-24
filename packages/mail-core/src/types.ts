@@ -21,10 +21,7 @@ export interface VerificationEmailData extends EmailTemplateData {
   verificationCode?: string;
 }
 
-export interface PasswordResetEmailData extends EmailTemplateData {
-  resetCode?: string;
-  expiresIn?: string;
-}
+// WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: PasswordResetEmailData 는 은퇴했다.
 
 export interface MailLogger {
   info(message: string, ...args: any[]): void;

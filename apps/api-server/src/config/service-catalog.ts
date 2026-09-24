@@ -6,7 +6,6 @@
  *
  * 사용처:
  * - /check-email API 응답
- * - PASSWORD_MISMATCH 응답
  * - 가입 UX 서비스 표시
  * - Account Center (향후)
  * - 서비스 이동 handoff (`POST /auth/handoff` · `/auth/handoff/exchange`)
@@ -253,9 +252,9 @@ export function getServiceOrigins(): string[] {
  * 서비스 키 → 공식 origin (`https://{domain}`).
  * 모르는 키면 undefined.
  *
- * WO-O4O-PASSWORD-RESET-EMAIL-LINK-PRODUCTION-URL-FIX-V1:
- *   비밀번호 재설정 이메일의 base URL 을 server 측에서 serviceKey 로 결정하기 위한 helper.
- *   클라이언트가 serviceUrl 을 제공하지 않더라도 production URL 이 보장된다.
+ *   메일 링크(이메일 인증 · 운영자 초대)와 handoff 의 base URL 을 server 측에서
+ *   serviceKey 로 결정한다. 클라이언트가 serviceUrl 을 제공하지 않아도 production URL 이 보장된다.
+ *   (WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: 비밀번호 재설정 메일 소비처는 은퇴했다.)
  */
 export function getServiceOrigin(key: string): string | undefined {
   const svc = serviceMap.get(key);

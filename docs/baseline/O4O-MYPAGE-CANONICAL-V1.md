@@ -5,7 +5,7 @@
 > 본 문서는 [IR-O4O-MYPAGE-VS-ACCOUNT-CENTER-CANONICAL-V1](../investigations/IR-O4O-MYPAGE-VS-ACCOUNT-CENTER-CANONICAL-V1.md) 의 **Option D** 채택을 baseline 으로 승격하여, 향후 web-account 에 비밀번호 / 프로필 / 서비스별 기능을 과도하게 추가하는 drift 를 방지한다.
 
 - **버전:** V1 (2026-05-24)
-- **상태:** Baseline (Locked)
+- **상태:** Baseline (Locked) — **부분 갱신 2026-09-23**: `WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1` 로 password 인증이 은퇴해 §2 매트릭스의 비밀번호 2행을 정정했다. **canonical 위치 결정(Option D: web-account = 서비스 목록 + Handoff outbound 전용, 계정 관리는 각 service `/mypage`)은 불변**이며, 근거였던 "비밀번호가 서비스별" 논거만 소멸했다(결론은 그대로 — 인증 자체가 Google 단일이 되어 web-account 에 로그인/자격 UI 를 둘 이유가 더 없다).
 - **선행 산출물:** [IR-O4O-MYPAGE-VS-ACCOUNT-CENTER-CANONICAL-V1](../investigations/IR-O4O-MYPAGE-VS-ACCOUNT-CENTER-CANONICAL-V1.md)
 - **상위 SSOT:**
   - `CLAUDE.md` (사업 철학 priority chain)
@@ -23,7 +23,7 @@
 
 ### 1.1 채택 사유 (요약)
 
-1. **Identity V2 의 L2 (`service_credentials`) 가 service-scoped** → 비밀번호 변경 UI 가 본질적으로 서비스별. web-account 가 비밀번호 UI 를 제공하면 "어느 서비스의 비밀번호?" UX 가 어색.
+1. ~~**Identity V2 의 L2 (`service_credentials`) 가 service-scoped** → 비밀번호 변경 UI 가 본질적으로 서비스별. web-account 가 비밀번호 UI 를 제공하면 "어느 서비스의 비밀번호?" UX 가 어색.~~ → **논거 소멸(2026-09-23)**: password 축 자체가 은퇴했다. 결론(web-account 에 자격 UI 를 두지 않는다)은 유지되며, 근거는 "web-account 는 인증 진입점이 아니라 세션 소비자(Handoff outbound 전용)" 로 바뀐다.
 2. **현재 4 service `/mypage` 가 이미 V2 Phase 2 정렬 완료** — `PUT /users/password` with `serviceKey` 가 4 service 모두 적용됨. 변경 없이 canonical 인정.
 3. **web-account 의 minimum viable 기능 (서비스 목록 + Handoff outbound) 이미 구현됨** — 향후 배포만 별건 결정.
 
@@ -42,8 +42,9 @@
 | 기능 | Identity V2 Layer | Canonical 위치 |
 |---|:---:|---|
 | 이름 / 닉네임 / 연락처 수정 | L1 Identity | **각 service `/mypage/profile`** (`PUT /users/profile`) |
-| 비밀번호 변경 | L2 Credential | **각 service `/mypage/settings`** (`PUT /users/password` with `serviceKey`) |
-| 비밀번호 재설정 (이메일) | L2 Credential | **각 service login 의 "비밀번호 찾기"** (serviceKey 주입) |
+| ~~비밀번호 변경~~ | ~~L2 Credential~~ | **은퇴 (2026-09-23)** — `PUT /users/password` 및 서비스별 password 변경 UI 제거. 로그인 수단은 Google 계정 하나이므로 변경할 비밀번호가 없다 |
+| ~~비밀번호 재설정 (이메일)~~ | ~~L2 Credential~~ | **은퇴 (2026-09-23)** — `/auth/forgot-password` · `/auth/reset-password` 및 각 서비스 "비밀번호 찾기" 진입 제거 |
+| 로그인 수단 (Google 계정) | L1 Identity | **각 service 로그인 화면의 `GoogleContinue`** (`POST /auth/google/login` · 미등록 계정은 동의 후 `/auth/google/signup`) |
 | 이메일 인증 | L1 Identity | **각 service `/auth/verify-email`** (토큰 도착지) |
 | 서비스 가입 신청 | L3 Membership | **각 service Register 흐름** |
 | 서비스 이용 상태 (active/pending) 보기 | L3 Membership | **각 service `/mypage` 의 status 배지** + (선택) web-account 의 통합 view |

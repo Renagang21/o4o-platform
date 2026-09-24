@@ -24,7 +24,6 @@ const queryClient = new QueryClient({
 import { AuthProvider, LoginModalProvider, useLoginModal, useAuth, getNetureDashboardRoute, WorkScopeProvider } from './contexts';
 import { TermsAcceptanceGate } from './components/auth/TermsAcceptanceGate';
 import LoginModal from './components/LoginModal';
-import RegisterModal from './components/RegisterModal';
 import { O4OErrorBoundary, O4OToastProvider } from '@o4o/error-handling';
 import { usePageSeo } from '@o4o/shared-space-ui';
 import { netureSeoRegistry, resolveNetureSeoDefaults } from './config/seoRegistry';
@@ -95,8 +94,7 @@ import {
 // Neture 공통 페이지 (즉시 로드)
 // ============================================================================
 // RegisterPage는 RegisterModal로 대체됨 (WO-O4O-AUTH-MODAL-SIGNUP-ROLE-UPDATE-V1)
-import AccountRecoveryPage from './pages/auth/AccountRecoveryPage';
-import ResetPasswordPage from './pages/auth/ResetPasswordPage';
+// WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: AccountRecoveryPage · ResetPasswordPage 는 은퇴했다.
 // WO-O4O-AUTH-VERIFY-EMAIL-FRONTEND-PAGE-V1: 이메일 인증 결과 페이지
 import VerifyEmailPage from './pages/auth/VerifyEmailPage';
 import { RegisterPendingPage } from './pages/RegisterPendingPage';
@@ -598,7 +596,6 @@ function ModalRenderer() {
         onClose={closeModal}
         returnUrl={loginReturnUrl}
       />
-      <RegisterModal isOpen={activeModal === 'register'} />
     </>
   );
 }
@@ -678,8 +675,9 @@ function App() {
             <Route path="/handoff" element={<HandoffPage />} />
             <Route path="/login" element={<LoginRedirect />} />
             <Route path="/register" element={<RegisterRedirect />} />
-            <Route path="/forgot-password" element={<AccountRecoveryPage />} />
-            <Route path="/reset-password" element={<ResetPasswordPage />} />
+            {/* WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: 비밀번호 찾기·재설정 경로는 은퇴했다. */}
+            <Route path="/forgot-password" element={<Navigate to="/" replace />} />
+            <Route path="/reset-password" element={<Navigate to="/" replace />} />
             <Route path="/auth/verify-email" element={<VerifyEmailPage />} />
             <Route path="/register/pending" element={<RegisterPendingPage />} />
             <Route path="/qr/:slug" element={<QrLandingPage />} />

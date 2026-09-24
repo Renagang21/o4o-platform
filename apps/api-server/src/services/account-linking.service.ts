@@ -15,7 +15,7 @@ import {
   SecurityVerification
 } from '../types/account-linking.js';
 import { emailService } from './email.service.js';
-import { generateRandomToken, hashPassword, comparePassword } from '../utils/auth.utils.js';
+import { generateRandomToken } from '../utils/auth.utils.js';
 import logger from '../utils/logger.js';
 import { EntityManager } from 'typeorm';
 
@@ -132,102 +132,9 @@ export class AccountLinkingService {
     }
   }
 
-  /**
-   * Link email account to existing OAuth user
-   */
-  static async linkEmailAccount(
-    userId: string,
-    email: string,
-    password: string
-  ): Promise<LinkAccountResponse> {
-    const userRepo = AppDataSource.getRepository(User);
-    const linkedAccountRepo = AppDataSource.getRepository(LinkedAccount);
-    const sessionRepo = AppDataSource.getRepository(LinkingSession);
-
-    try {
-      const user = await userRepo.findOne({
-        where: { id: userId },
-        relations: ['linkedAccounts']
-      });
-
-      if (!user) {
-        return {
-          success: false,
-          message: '사용자를 찾을 수 없습니다',
-          error: {
-            code: AccountLinkingError.ACCOUNT_NOT_FOUND,
-            message: '사용자를 찾을 수 없습니다'
-          }
-        };
-      }
-
-      // Check if email is already linked
-      const existingEmailLink = user.linkedAccounts.find(
-        account => account.provider === 'email' && account.email === email
-      );
-
-      if (existingEmailLink) {
-        return {
-          success: false,
-          message: '이미 연결된 이메일입니다',
-          error: {
-            code: AccountLinkingError.ALREADY_LINKED,
-            message: '이미 연결된 이메일입니다'
-          }
-        };
-      }
-
-      // Set password for user if not already set
-      if (!user.password) {
-        user.password = await hashPassword(password);
-        await userRepo.save(user);
-      }
-
-      // Create verification session
-      const verificationToken = generateRandomToken();
-      const session = sessionRepo.create({
-        userId,
-        user,
-        provider: 'email',
-        status: LinkingStatus.PENDING,
-        verificationToken,
-        expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
-        metadata: { email }
-      });
-
-      await sessionRepo.save(session);
-
-      // Send verification email
-      await emailService.sendEmail({
-        to: email,
-        subject: '이메일 계정 연결 확인',
-        template: 'verification',
-        data: {
-          name: user.name || email,
-          actionUrl: `${process.env.FRONTEND_URL}/auth/link-email?token=${verificationToken}`,
-          supportEmail: process.env.SUPPORT_EMAIL || 'support@o4o.com',
-          companyName: process.env.COMPANY_NAME || 'O4O Platform',
-          year: new Date().getFullYear()
-        }
-      });
-
-      return {
-        success: true,
-        message: '인증 이메일이 발송되었습니다. 이메일을 확인해주세요.',
-        requiresVerification: true
-      };
-    } catch (error) {
-      logger.error('Email account linking error:', error);
-      return {
-        success: false,
-        message: '이메일 계정 연결 중 오류가 발생했습니다',
-        error: {
-          code: AccountLinkingError.PROVIDER_ERROR,
-          message: '이메일 계정 연결 중 오류가 발생했습니다'
-        }
-      };
-    }
-  }
+  // WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1:
+  //   linkEmailAccount 는 은퇴했다. email+password 를 계정에 붙이는 경로였고,
+  //   password 축이 사라진 뒤에는 만들 자격증명이 없다. Identity 연결은 Google 하나다.
 
   /**
    * Verify email linking
@@ -356,20 +263,8 @@ export class AccountLinkingService {
         };
       }
 
-      // Verify security
-      if (verification.method === 'password' && verification.password) {
-        const isValid = await comparePassword(verification.password, user.password);
-        if (!isValid) {
-          return {
-            success: false,
-            message: '비밀번호가 올바르지 않습니다',
-            error: {
-              code: AccountLinkingError.SECURITY_VERIFICATION_FAILED,
-              message: '비밀번호가 올바르지 않습니다'
-            }
-          };
-        }
-      }
+      // WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1:
+      //   password 재확인 분기는 은퇴했다. 확인할 비밀번호가 존재하지 않는다.
 
       // Find linked account
       const linkedAccount = user.linkedAccounts.find(

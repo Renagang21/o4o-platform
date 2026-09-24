@@ -17,7 +17,6 @@ import { Alert } from 'react-native';
 import { router } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
 import {
-  loginApi,
   setAuthToken,
   setUnauthorizedHandler,
   isAccessTokenExpired,
@@ -36,7 +35,6 @@ interface AuthContextValue {
   token: string | null;
   user: User | null;
   isLoading: boolean;
-  login: (email: string, password: string) => Promise<void>;
   logout: () => void;
 }
 
@@ -97,30 +95,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     restoreToken();
   }, []);
 
-  async function login(email: string, password: string) {
-    const result = await loginApi(email, password);
-
-    if (!result.success || !result.data) {
-      throw new Error(result.error ?? result.message ?? '로그인에 실패했습니다.');
-    }
-
-    // 토큰은 data.tokens.accessToken (현행 봉투). data.accessToken 은 레거시 fallback.
-    const accessToken = result.data.tokens?.accessToken ?? result.data.accessToken;
-    const userData = result.data.user;
-
-    if (!accessToken) {
-      throw new Error('로그인 응답에서 토큰을 확인하지 못했습니다.');
-    }
-
-    await SecureStore.setItemAsync(ACCESS_TOKEN_KEY, accessToken);
-    setAuthToken(accessToken);
-    setToken(accessToken);
-    setUser(userData);
-    hasSessionRef.current = true;
-    expiringRef.current = false; // 새 세션 시작 — 다음 만료를 다시 처리할 수 있도록 가드 해제
-
-    router.replace('/(app)');
-  }
+  // WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1:
+  //   login(email, password) 은퇴 — O4O 인증에 비밀번호가 없다. 앱의 Google 로그인은 별도 WO.
+  //   세션 복원(SecureStore accessToken)·만료 처리는 그대로 유지한다.
 
   function logout() {
     clearSession();
@@ -128,7 +105,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ token, user, isLoading, login, logout }}>
+    <AuthContext.Provider value={{ token, user, isLoading, logout }}>
       {children}
     </AuthContext.Provider>
   );

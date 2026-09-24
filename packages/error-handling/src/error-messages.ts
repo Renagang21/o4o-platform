@@ -12,15 +12,15 @@
 /** Complete Korean error message map */
 export const ERROR_MESSAGES: Record<string, string> = {
   // ─── Auth / Token (401) ────────────────────────────────────────────────
+  // WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: password 계열 코드(INVALID_CREDENTIALS ·
+  //   PASSWORD_VALIDATION_FAILED · INVALID_RESET_TOKEN · SOCIAL_LOGIN_REQUIRED)는 은퇴했다.
   AUTH_REQUIRED: '로그인이 필요합니다.',
   INVALID_TOKEN: '인증 토큰이 유효하지 않습니다. 다시 로그인해주세요.',
   TOKEN_EXPIRED: '세션이 만료되었습니다. 다시 로그인해주세요.',
-  INVALID_CREDENTIALS: '비밀번호가 올바르지 않습니다.',
   INVALID_USER: '등록되지 않은 이메일입니다.',
   USER_INACTIVE: '계정이 비활성 상태입니다.',
   INVALID_REFRESH_TOKEN: '세션을 갱신할 수 없습니다. 다시 로그인해주세요.',
   NO_REFRESH_TOKEN: '로그인 정보가 없습니다. 다시 로그인해주세요.',
-  SOCIAL_LOGIN_REQUIRED: '소셜 로그인으로 가입된 계정입니다.',
 
   // ─── Authorization (403) ───────────────────────────────────────────────
   FORBIDDEN: '접근 권한이 없습니다.',
@@ -45,8 +45,6 @@ export const ERROR_MESSAGES: Record<string, string> = {
   MISSING_REQUIRED_FIELD: '필수 항목을 입력해주세요.',
   INVALID_FORMAT: '입력 형식이 올바르지 않습니다.',
   EMAIL_EXISTS: '이미 가입된 이메일입니다.',
-  PASSWORD_VALIDATION_FAILED: '비밀번호 형식이 올바르지 않습니다.',
-  INVALID_RESET_TOKEN: '비밀번호 재설정 링크가 만료되었습니다.',
   INVALID_VERIFICATION_TOKEN: '인증 링크가 만료되었습니다.',
 
   // ─── Not Found (404) ───────────────────────────────────────────────────

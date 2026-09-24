@@ -4,10 +4,9 @@
  * Do not modify without CORE_CHANGE approval.
  * Freeze: WO-O4O-CORE-FREEZE-V1 (2026-03-11)
  */
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, Index, BeforeInsert, BeforeUpdate, OneToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, Index, OneToMany } from 'typeorm';
 import { UserRole, UserStatus } from '../../../types/auth.js';
 import type { BusinessInfo } from '../../../types/user.js';
-import bcrypt from 'bcryptjs';
 
 // Re-export types for external use
 export { UserRole, UserStatus };
@@ -219,19 +218,9 @@ export class User {
   seller?: any;
 
 
-  // Password hashing
-  @BeforeInsert()
-  @BeforeUpdate()
-  async hashPassword() {
-    if (this.password && !this.password.startsWith('$2')) {
-      this.password = await bcrypt.hash(this.password, 10);
-    }
-  }
-
-  // Password validation
-  async validatePassword(password: string): Promise<boolean> {
-    return await bcrypt.compare(password, this.password);
-  }
+  // WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1:
+  //   hashPassword 훅과 validatePassword 는 은퇴했다. 해싱하거나 비교할 비밀번호가 없다.
+  //   password / reset_password_* 컬럼 자체는 contract-last 원칙에 따라 Phase B 에서 제거한다.
 
   // Role helper methods (use this.roles — set by middleware from RoleAssignment)
   hasRole(role: UserRole | string): boolean {

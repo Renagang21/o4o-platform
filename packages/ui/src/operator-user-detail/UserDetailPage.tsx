@@ -6,7 +6,7 @@
  * 서비스별 차이는 config + actions + apiAdapter로 주입.
  */
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   ArrowLeft,
   Loader2,
@@ -15,7 +15,6 @@ import {
   XCircle,
   Shield,
   Globe,
-  KeyRound,
   Trash2,
   UserCheck,
   UserX,
@@ -32,22 +31,13 @@ import type {
   MembershipData,
   UserDetailApiAdapter,
 } from './user-detail.types';
-import { getServiceDisplayName } from '@o4o/types';
 import EditUserModal from './EditUserModal';
 
 /**
- * 비밀번호 정책 — WO-O4O-PASSWORD-COMPLEXITY-POLICY-UNIFY-V1
- *
- * 8자 이상 + 영문 1자 + 숫자 1자 (특수문자는 허용하되 필수 아님).
- * 이 패키지는 `@o4o/auth-utils` 에 의존하지 않으므로(새 의존 구조를 만들지 않는다는 조건)
- * 동일 규칙을 로컬로 둔다. 최종 강제는 백엔드가 하며 계약은 양쪽 테스트로 고정한다.
+ * WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1:
+ *   운영자가 회원의 서비스 비밀번호를 바꾸던 PasswordModal · 비밀번호 정책 상수는 은퇴했다.
+ *   O4O 인증에 비밀번호가 존재하지 않으므로 바꿀 대상이 없다(로그인은 Google 하나).
  */
-const PASSWORD_MIN_LENGTH = 8;
-const PASSWORD_POLICY_MESSAGE = '비밀번호는 8자 이상이며 영문과 숫자를 각각 1자 이상 포함해야 합니다.';
-function isPasswordPolicyCompliant(pw: string): boolean {
-  return pw.length >= PASSWORD_MIN_LENGTH && /[a-zA-Z]/.test(pw) && /\d/.test(pw);
-}
-
 
 // ─── Status Config ───────────────────────────────────────────
 
@@ -105,123 +95,7 @@ function themeClasses(theme: 'primary' | 'blue') {
   };
 }
 
-// ─── Password Modal ──────────────────────────────────────────
-
-function PasswordModal({ userId, userName, memberships, apiAdapter, theme, onClose, onSuccess }: {
-  userId: string; userName: string; memberships: MembershipData[];
-  apiAdapter: UserDetailApiAdapter; theme: 'primary' | 'blue';
-  onClose: () => void; onSuccess: () => void;
-}) {
-  const tc = themeClasses(theme);
-  const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-
-  // WO-O4O-OPERATOR-USER-DETAIL-PASSWORD-SERVICEKEY-SELECTION-V1:
-  //   비밀번호는 서비스별로 독립하므로(Identity V2 service_credentials) **어느 서비스의
-  //   비밀번호인지** 반드시 정해야 한다. 후보 = 호출자 관리 범위 ∩ 대상자 Membership.
-  //   상세 API(`GET /operator/members/:userId`) 가 이미 운영자 scope 로 memberships 를
-  //   필터해 내려주므로(platform admin 은 전체) 그 값을 그대로 후보로 쓴다 — 새 API 없음.
-  //   목록 모달(OperatorMembersConsolePage PasswordModal)과 동일 규칙이다.
-  const candidates = useMemo(() => {
-    const keys = (memberships ?? []).map((m) => m.serviceKey).filter(Boolean);
-    return Array.from(new Set(keys));
-  }, [memberships]);
-
-  // 후보가 하나면 자동 확정한다(그래도 화면에는 서비스명을 표시한다).
-  const [serviceKey, setServiceKey] = useState(candidates.length === 1 ? candidates[0] : '');
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!serviceKey) { setError('비밀번호를 변경할 서비스를 선택해주세요.'); return; }
-    if (!isPasswordPolicyCompliant(password)) { setError(PASSWORD_POLICY_MESSAGE); return; }
-    setLoading(true);
-    setError('');
-    try {
-      await apiAdapter.put(`/operator/members/${userId}`, { password, serviceKey });
-      alert(`${getServiceDisplayName(serviceKey)} 비밀번호가 변경되었습니다.`);
-      onSuccess();
-      onClose();
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-      <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-sm">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-bold text-slate-800">비밀번호 변경</h3>
-          <button onClick={onClose} className="p-1 hover:bg-slate-100 rounded"><X className="w-5 h-5" /></button>
-        </div>
-        <p className="text-sm text-slate-500 mb-4">{userName}</p>
-
-        {/* 대상 서비스: 후보 0 → 변경 불가 안내 / 1 → 표시 후 자동 확정 / 복수 → 명시적 선택 필수 */}
-        {candidates.length === 0 ? (
-          <div className="flex items-start gap-2 rounded-lg bg-amber-50 p-3 text-sm text-amber-800 mb-4">
-            <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
-            <span>
-              이 회원의 비밀번호를 변경할 수 있는 서비스가 없습니다.
-              <br />
-              내가 관리하는 서비스 중 이 회원이 가입한 서비스가 없습니다.
-            </span>
-          </div>
-        ) : candidates.length === 1 ? (
-          <div className="rounded-lg bg-slate-50 border border-slate-200 px-3 py-2 text-sm mb-4">
-            <span className="text-slate-500">대상 서비스</span>
-            <span className="ml-2 font-semibold text-slate-800">{getServiceDisplayName(candidates[0])}</span>
-            <p className="mt-1 text-xs text-slate-500">이 서비스의 로그인 비밀번호만 변경됩니다.</p>
-          </div>
-        ) : (
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-slate-700 mb-1">
-              대상 서비스 <span className="text-red-500">*</span>
-            </label>
-            <select
-              value={serviceKey}
-              onChange={(e) => setServiceKey(e.target.value)}
-              className={`w-full px-3 py-2 border border-slate-300 rounded-lg text-sm ${tc.ringClass}`}
-              required
-            >
-              <option value="">서비스를 선택하세요</option>
-              {candidates.map((key) => (
-                <option key={key} value={key}>{getServiceDisplayName(key)}</option>
-              ))}
-            </select>
-            <p className="mt-1 text-xs text-slate-500">
-              선택한 서비스의 로그인 비밀번호만 변경됩니다. 다른 서비스는 영향받지 않습니다.
-            </p>
-          </div>
-        )}
-
-        {error && (
-          <div className="flex items-center gap-2 rounded-lg bg-red-50 p-3 text-sm text-red-700 mb-3">
-            <AlertCircle className="w-4 h-4 shrink-0" />{error}
-          </div>
-        )}
-        <form onSubmit={handleSubmit}>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="새 비밀번호 (영문·숫자 포함 8자 이상)"
-            className={`w-full px-3 py-2 border border-slate-300 rounded-lg text-sm mb-4 ${tc.ringClass}`}
-            required
-            minLength={8}
-          />
-          <div className="flex gap-2">
-            <button type="button" onClick={onClose} className="flex-1 py-2 text-sm border border-slate-300 rounded-lg hover:bg-slate-50">취소</button>
-            <button type="submit" disabled={loading || !serviceKey} className={`flex-1 py-2 text-sm ${tc.btnBg} text-white rounded-lg disabled:opacity-50`}>
-              {loading ? '처리 중...' : '변경'}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  );
-}
+// WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: PasswordModal 은퇴.
 
 // ─── Role Modal ─────────────────────────────────────────────
 
@@ -338,7 +212,6 @@ export default function UserDetailPage({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [actionLoading, setActionLoading] = useState<string | null>(null);
-  const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [showRoleModal, setShowRoleModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
 
@@ -624,12 +497,6 @@ export default function UserDetailPage({
               <Pencil className="w-4 h-4" />정보 수정
             </button>
             <button
-              onClick={() => setShowPasswordModal(true)}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-sm border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50"
-            >
-              <KeyRound className="w-4 h-4" />비밀번호 변경
-            </button>
-            <button
               onClick={handleDelete}
               disabled={actionLoading === 'delete'}
               className="flex items-center gap-1.5 px-3 py-1.5 text-sm border border-red-200 text-red-600 rounded-lg hover:bg-red-50 disabled:opacity-50 ml-auto"
@@ -825,19 +692,6 @@ export default function UserDetailPage({
           <div className="p-8 text-center text-sm text-slate-400">가입된 서비스가 없습니다.</div>
         )}
       </section>
-
-      {/* Password Modal */}
-      {showPasswordModal && (
-        <PasswordModal
-          userId={user.id}
-          userName={`${getUserName(user)} (${user.email})`}
-          memberships={memberships}
-          apiAdapter={apiAdapter}
-          theme={config.theme}
-          onClose={() => setShowPasswordModal(false)}
-          onSuccess={fetchDetail}
-        />
-      )}
 
       {/* Role Modal */}
       {showRoleModal && (

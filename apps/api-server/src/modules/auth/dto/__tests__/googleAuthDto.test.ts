@@ -7,7 +7,6 @@ import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
 import {
   GoogleAdminBootstrapRequestDto,
-  GoogleLinkRequestDto,
   GoogleLoginRequestDto,
   GoogleSignupRequestDto,
 } from '../google-auth.dto.js';
@@ -37,15 +36,7 @@ describe('Google auth DTO — 입력 계약', () => {
       expect(errors.some((e) => e.property === field)).toBe(true);
     }
   });
-  it('link: { idToken, currentPassword } 만 허용 — userId/email/sub/providerId/serviceKey 는 400 (WO-O4O-GOOGLE-IDENTITY-OPERATOR-EXPLICIT-LINK-V1)', async () => {
-    expect(await run(GoogleLinkRequestDto, { idToken: 't', currentPassword: 'p' })).toHaveLength(0);
-    expect((await run(GoogleLinkRequestDto, { idToken: 't' })).length).toBeGreaterThan(0);
-    expect((await run(GoogleLinkRequestDto, { idToken: 't', currentPassword: '' })).length).toBeGreaterThan(0);
-    for (const field of ['userId', 'email', 'sub', 'providerId', 'provider', 'role', 'serviceKey', 'includeLegacyTokens']) {
-      const errors = await run(GoogleLinkRequestDto, { idToken: 't', currentPassword: 'p', [field]: 'x' });
-      expect(errors.some((e) => e.property === field && e.constraints?.whitelistValidation)).toBe(true);
-    }
-  });
+  // WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: GoogleLinkRequestDto(currentPassword 재인증) 계약은 은퇴했다.
   it('bootstrap-admin: { idToken, bootstrapCode } 만 허용 — 대상 지정 필드는 400 (WO §15)', async () => {
     expect(await run(GoogleAdminBootstrapRequestDto, { idToken: 't', bootstrapCode: 'c' })).toHaveLength(0);
     expect((await run(GoogleAdminBootstrapRequestDto, { idToken: 't' })).length).toBeGreaterThan(0);

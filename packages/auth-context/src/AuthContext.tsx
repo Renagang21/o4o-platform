@@ -80,7 +80,6 @@ interface AuthContextType {
   error: string | null;
   isAdmin: boolean;
   authClient?: any; // AuthClient instance for API calls
-  login: (credentials: { email: string; password: string; serviceKey?: string }) => Promise<void>;
   /** WO-O4O-GOOGLE-ONLY-SIGNUP-LOGIN-V1: Google ID token 로그인(기본 진입). 실패는 throw. */
   loginWithGoogle: (idToken: string, serviceKey?: string) => Promise<void>;
   /** `{ enabled, clientId }` — GIS 초기화용 공개 Client ID. */

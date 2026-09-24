@@ -65,7 +65,6 @@ export interface AuthRequest extends Request {
     supplierId?: string;
     domain?: string;
     // Add other User properties as needed
-    validatePassword?(password: string): Promise<boolean>;
     hasRole?(role: UserRole | string): boolean;
     hasAnyRole?(roles: (UserRole | string)[]): boolean;
     isAdmin?(): boolean;
@@ -75,14 +74,10 @@ export interface AuthRequest extends Request {
   };
 }
 
-export interface LoginCredentials {
-  email: string;
-  password: string;
-}
-
+// WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1:
+//   LoginCredentials 는 은퇴했다(email+password 로그인 계약).
 export interface RegisterData {
   email: string;
-  password: string;
   firstName?: string;
   lastName?: string;
   name?: string;
@@ -207,11 +202,7 @@ export interface AuthTokens {
 }
 
 // Request/Response types
-export interface LoginRequest {
-  email: string;
-  password: string;
-  domain?: string;
-}
+// WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: LoginRequest 는 은퇴했다.
 
 export interface UserData {
   id: string;

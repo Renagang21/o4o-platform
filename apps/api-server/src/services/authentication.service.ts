@@ -5,16 +5,11 @@ import type {
   AccessTokenPayload,
 } from '../types/auth.js';
 import type {
-  AuthProvider,
-  UnifiedLoginRequest,
-  UnifiedLoginResponse,
   GuestTokenIssueRequest,
   GuestTokenIssueResponse,
 } from '../types/account-linking.js';
-import { AuthLoginService } from './auth/auth-login.service.js';
 import { AuthTokenSessionService } from './auth/auth-token-session.service.js';
 import { AuthGuestService } from './auth/auth-guest.service.js';
-import { AuthAccountInquiryService } from './auth/auth-account-inquiry.service.js';
 
 /**
  * AuthenticationService - SSOT (Single Source of Truth) for Authentication
@@ -24,10 +19,13 @@ import { AuthAccountInquiryService } from './auth/auth-account-inquiry.service.j
  * ============================================================================
  *
  * This service is the single source of truth for all authentication operations:
- * - Login (email + OAuth)
  * - Token generation and validation
  * - Session management
- * - Password reset
+ * - Guest token issuance
+ *
+ * WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1:
+ *   로그인 자체는 Google 경로(GoogleAuthController)가 수행하고, 이 서비스는
+ *   그 뒤의 토큰·세션 축만 담당한다. password / password reset 축은 존재하지 않는다.
  *
  * DO NOT use:
  * - AuthService (DEPRECATED)
@@ -41,25 +39,19 @@ import { AuthAccountInquiryService } from './auth/auth-account-inquiry.service.j
  * This class delegates every call for backward compatibility with 4 external consumers.
  *
  * Sub-services:
- * - AuthLoginService          (login, email/OAuth flows)
  * - AuthTokenSessionService   (token refresh, verify, logout, cookies)
  * - AuthGuestService          (guest token issuance)
- * - AuthAccountInquiryService (provider checks, test accounts, find-id)
  *
  * @see docs/architecture/auth-ssot-declaration.md
  * @see CLAUDE.md Section 2.6
  */
 export class AuthenticationService {
-  private readonly loginService = new AuthLoginService();
   private readonly tokenSessionService = new AuthTokenSessionService();
   private readonly guestService = new AuthGuestService();
-  private readonly accountInquiryService = new AuthAccountInquiryService();
 
-  // ==================== Login ====================
-
-  async login(request: UnifiedLoginRequest): Promise<UnifiedLoginResponse> {
-    return this.loginService.login(request);
-  }
+  // WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1:
+  //   email+password 로그인(AuthLoginService)은 은퇴했다.
+  //   로그인 진입점은 `POST /auth/google/login` → GoogleAuthController 하나다.
 
   // ==================== Guest ====================
 
@@ -97,19 +89,10 @@ export class AuthenticationService {
     return this.tokenSessionService.getUserById(userId);
   }
 
-  // ==================== Account Inquiry ====================
-
-  async canLogin(email: string, provider: AuthProvider): Promise<boolean> {
-    return this.accountInquiryService.canLogin(email, provider);
-  }
-
-  async getAvailableProviders(email: string): Promise<AuthProvider[]> {
-    return this.accountInquiryService.getAvailableProviders(email);
-  }
-
-  async sendFindIdEmail(email: string): Promise<void> {
-    return this.accountInquiryService.sendFindIdEmail(email);
-  }
+  // WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1:
+  //   Account Inquiry(canLogin · getAvailableProviders · sendFindIdEmail)는 은퇴했다.
+  //   email 로 계정을 조회해 인증 가능 여부를 답하던 경로이며, 소비처가 이미 0 이었다.
+  //   Identity Key 는 Google sub 이므로 email 질의는 인증 판정이 될 수 없다.
 }
 
 // Create singleton instance

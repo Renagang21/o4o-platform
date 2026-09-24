@@ -112,24 +112,7 @@ export const schemas = {
   },
 
   // Authentication
-  LoginRequest: {
-    type: 'object',
-    required: ['email', 'password'],
-    properties: {
-      email: {
-        type: 'string',
-        format: 'email',
-        example: 'user@example.com',
-        description: '사용자 이메일'
-      },
-      password: {
-        type: 'string',
-        format: 'password',
-        example: 'password123',
-        description: '사용자 비밀번호'
-      }
-    }
-  },
+  // WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: LoginRequest 는 은퇴했다(email+password).
 
   LoginResponse: {
     type: 'object',
@@ -154,42 +137,7 @@ export const schemas = {
     }
   },
 
-  RegisterRequest: {
-    type: 'object',
-    required: ['email', 'password', 'name'],
-    properties: {
-      email: {
-        type: 'string',
-        format: 'email',
-        example: 'newuser@example.com'
-      },
-      password: {
-        type: 'string',
-        format: 'password',
-        minLength: 8,
-        example: 'StrongPassword123!'
-      },
-      name: {
-        type: 'string',
-        example: 'John Doe'
-      },
-      role: {
-        type: 'string',
-        enum: ['customer', 'vendor', 'business'],
-        default: 'customer'
-      },
-      businessInfo: {
-        type: 'object',
-        properties: {
-          companyName: { type: 'string' },
-          businessNumber: { type: 'string' },
-          businessType: { type: 'string' },
-          address: { type: 'string' },
-          phone: { type: 'string' }
-        }
-      }
-    }
-  },
+  // WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: RegisterRequest 는 은퇴했다(email+password 가입).
 
   // User Management
   User: {
@@ -788,18 +736,7 @@ export const schemas = {
         type: 'object',
         properties: {
           twoFactorAuth: { type: 'boolean' },
-          passwordPolicy: {
-            type: 'object',
-            properties: {
-              minLength: { type: 'integer' },
-              requireUppercase: { type: 'boolean' },
-              requireLowercase: { type: 'boolean' },
-              requireNumbers: { type: 'boolean' },
-              requireSpecialChars: { type: 'boolean' }
-            }
-          },
-          sessionTimeout: { type: 'integer' },
-          maxLoginAttempts: { type: 'integer' }
+          sessionTimeout: { type: 'integer' }
         }
       }
     }

@@ -22,12 +22,12 @@ import { getPharmacyInfo } from './api/pharmacyInfo';
 import { LoginModalProvider, useAuthModal } from './contexts/LoginModalContext';
 import LoginModal from './components/LoginModal';
 import { getKpaPostLoginRoute } from './config/dashboard';
-import RegisterModal from './components/RegisterModal';
+// WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: RegisterModal(email+password 가입) 은 은퇴했다.
+//   가입은 로그인 모달의 'Google 로 계속하기' 하나가 겸한다.
 // WO-O4O-AUTH-REFRESH-TOKEN-FAMILY-CONTINUITY-AND-HANDOFF-STALE-TOKEN-GUARD-V1: 정적 import —
 //   lazy 면 AuthProvider 의 세션 복구 effect 가 chunk 로드보다 먼저 실행돼 stale 토큰 guard 가 늦는다.
 import HandoffPage from './pages/HandoffPage';
-const AccountRecoveryPage = lazy(() => import('./pages/auth/AccountRecoveryPage'));
-const ResetPasswordPage = lazy(() => import('./pages/auth/ResetPasswordPage'));
+// WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: 계정 찾기 · 비밀번호 재설정 화면은 은퇴했다.
 // WO-O4O-AUTH-VERIFY-EMAIL-FRONTEND-PAGE-V1: 이메일 인증 결과 페이지
 const VerifyEmailPage = lazy(() => import('./pages/auth/VerifyEmailPage'));
 
@@ -436,6 +436,10 @@ function LoginRoute() {
   return <Layout serviceName={SERVICE_NAME}><CommunityHomePage /></Layout>;
 }
 
+/**
+ * WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1:
+ *   /register 는 canonical URL 로 유지하되 로그인 모달을 연다(같은 Google 버튼이 가입을 겸한다).
+ */
 function RegisterRoute() {
   const { openRegisterModal } = useAuthModal();
 
@@ -668,7 +672,6 @@ function App() {
         <O4OToastProvider />
         {/* 전역 인증 모달 (WO-O4O-AUTH-MODAL-LOGIN-AND-ACCOUNT-STANDARD-V1, WO-O4O-AUTH-MODAL-REGISTER-STANDARD-V1) */}
         <LoginModal />
-        <RegisterModal />
         {/* WO-O4O-ROLE-BASED-POST-LOGIN-REDIRECT-V1: KPA context 완료 후 역할 기반 redirect fallback */}
         <PostLoginRedirect />
         {/* WO-O4O-INTEGRATED-TERMS-ACCEPTANCE-AND-SIGNUP-ALIGNMENT-V1 §17: 기존 회원 약관 재동의 게이트 */}
@@ -806,8 +809,9 @@ function App() {
           <Route path="/handoff" element={<HandoffPage />} />
           <Route path="/login" element={<LoginRoute />} />
           <Route path="/register" element={<RegisterRoute />} />
-          <Route path="/forgot-password" element={<AccountRecoveryPage />} />
-          <Route path="/reset-password" element={<ResetPasswordPage />} />
+          {/* WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: 계정 찾기 · 비밀번호 재설정 경로는 은퇴했다. */}
+          <Route path="/forgot-password" element={<Navigate to="/login" replace />} />
+          <Route path="/reset-password" element={<Navigate to="/login" replace />} />
           <Route path="/auth/verify-email" element={<VerifyEmailPage />} />
           <Route path="/admin/*" element={<AdminRoutes />} />
           {/* 약국 HUB — WO-KPA-PHARMACY-HUB-SIDEBAR-LAYOUT-AND-PRODUCT-TABS-FIX-V1: 좌측 사이드바 레이아웃 */}

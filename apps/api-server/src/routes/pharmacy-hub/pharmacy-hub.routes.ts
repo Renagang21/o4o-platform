@@ -154,7 +154,7 @@ export function createPharmacyHubRoutes(): Router {
   //   POST /join         (public) 신규/기존 사용자 가입 신청 — Core register 경로에 위임
   //   GET  /join/status  (auth)   내 가입 상태
   // ───────────────────────────────────────────────────────────────────────────
-  router.post('/join', PharmacyHubJoinController.apply);
+  router.post('/join', requireAuth as any, PharmacyHubJoinController.apply);
   router.get('/join/status', requireAuth as any, PharmacyHubJoinController.myStatus);
 
   // ───────────────────────────────────────────────────────────────────────────

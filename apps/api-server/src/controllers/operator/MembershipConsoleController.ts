@@ -11,7 +11,6 @@ import { AppDataSource } from '../../database/connection.js';
 import { User } from '../../modules/auth/entities/User.js';
 import type { ServiceScope } from '../../utils/serviceScope.js';
 import { resolveOperatorScope, logCrossServiceQuery, PLATFORM_ADMIN_SCOPE_REQUIRED_RESPONSE } from '../../utils/serviceScope.js';
-import { hashPassword } from '../../utils/auth.utils.js';
 import logger from '../../utils/logger.js';
 // WO-O4O-KPA-PROFILE-WRITE-JSONB-CONCAT-CONVERGENCE-V1: businessInfo 부분 갱신 (스냅샷 되쓰기 제거)
 import { buildBusinessInfoUpdate } from '../../utils/business-info-write.js';
@@ -20,12 +19,6 @@ import { roleAssignmentService } from '../../modules/auth/services/role-assignme
 import { roleService } from '../../modules/auth/services/role.service.js';
 import { isOperationalRole } from '../../types/roles.js';
 import { ActionLogService } from '@o4o/action-log-core';
-// WO-O4O-OPERATOR-SERVICE-CREDENTIAL-PASSWORD-CHANGE-AND-DOC-ALIGNMENT-V1:
-//   canonical service_key → role prefix 는 @o4o/security-core SSOT 위임 (로컬 매핑 금지).
-import { resolveRolePrefixFromCanonicalServiceKey } from '@o4o/security-core';
-// WO-O4O-OPERATOR-MEMBER-PASSWORD-MIN-LENGTH-UNIFY-V1 / -COMPLEXITY-POLICY-UNIFY-V1:
-//   비밀번호 정책(8자 + 영문 + 숫자) 정본을 재사용한다. 로컬 상수·정규식 신설 금지.
-import { isPasswordPolicyCompliant, PASSWORD_POLICY_MESSAGE } from '../../utils/password-policy.js';
 // WO-O4O-MEMBERSHIP-CONSOLE-ROLE-REVOKE-SAFETY-GUARDS-V1:
 //   중앙 `AdminUserController.revokeRoleAssignment` 와 **같은** 안전 계약을 쓴다.
 //   이 경로는 platform admin 일 때 tier 제한을 건너뛰므로, 가드가 없으면
@@ -63,41 +56,6 @@ const INVALID_USER_ID_RESPONSE = {
  */
 const MEMBERSHIP_SCOPED_STATUSES = ['withdrawn', 'pending'];
 
-/**
- * WO-O4O-OPERATOR-SERVICE-CREDENTIAL-PASSWORD-CHANGE-AND-DOC-ALIGNMENT-V1
- * WO-O4O-SERVICE-PASSWORD-CHANGE-UI-SCOPE-AND-INTEGRATION-V2
- *
- * 운영 계층. 비밀번호 변경은 **상위 계층만 하위 계층에 대해** 허용한다.
- * 판정 축은 `isOperationalRole` 과 동일하게 role 의 마지막 세그먼트다.
- */
-type OperationalTier = 'member' | 'operator' | 'admin' | 'platform';
-
-/** 비밀번호 변경 실패 응답. 성공 시 null 을 반환한다. */
-interface PasswordChangeFailure {
-  status: number;
-  error: string;
-  code: string;
-}
-
-const OPERATIONAL_TIER_RANK: Record<OperationalTier, number> = {
-  member: 0,
-  operator: 1,
-  admin: 2,
-  platform: 3,
-};
-
-/**
- * 주어진 서비스(rolePrefix) 기준 운영 계층을 판정한다.
- * platform 계정은 서비스와 무관하게 최상위다.
- */
-function resolveOperationalTier(roles: string[], rolePrefix: string): OperationalTier {
-  if (roles.includes(PLATFORM_SUPER_ADMIN_ROLE) || roles.includes('super_admin')) return 'platform';
-  if (roles.includes(`${rolePrefix}:admin`)) return 'admin';
-  if (roles.includes(`${rolePrefix}:operator`)) return 'operator';
-  return 'member';
-}
-
-
 export class MembershipConsoleController {
   private actionLogService?: ActionLogService;
 
@@ -108,125 +66,8 @@ export class MembershipConsoleController {
     return this.actionLogService!;
   }
 
-  /**
-   * 운영자의 회원 비밀번호 변경 — Identity V2 서비스별 credential 경로.
-   *
-   * WO-O4O-OPERATOR-SERVICE-CREDENTIAL-PASSWORD-CHANGE-AND-DOC-ALIGNMENT-V1
-   *
-   * 계약:
-   *   - `users.password` 를 건드리지 않는다 (V1 공통 비밀번호 경로 종료).
-   *   - **정확히 하나의 serviceKey** 에 해당하는 `service_credentials` 만 갱신한다.
-   *     대상 서비스가 모호하면 전역 변경 대신 400 으로 거절한다.
-   *   - 운영 계층 순위(member < operator < admin < platform)에서 **상위만 하위를 변경**한다.
-   *     동급(operator → 다른 operator)·상위(operator → admin) 변경은 금지.
-   *   - credential row 가 없으면 그 서비스 row 만 생성한다(다른 서비스 credential 무변경).
-   */
-  private async changeMemberServicePassword(params: {
-    req: Request;
-    scope: ServiceScope;
-    targetUserId: string;
-    newPassword: string;
-  }): Promise<PasswordChangeFailure | null> {
-    const { req, scope, targetUserId, newPassword } = params;
-
-    // (0) 비밀번호 정책 검증 — hash · credential write 이전에 거절한다.
-    //     WO-O4O-PASSWORD-COMPLEXITY-POLICY-UNIFY-V1:
-    //       프런트만 강제하면 API 직접 호출로 정책을 우회할 수 있다.
-    //       정책 = 8자 이상 + 영문 1자 + 숫자 1자 (특수문자 선택).
-    if (!isPasswordPolicyCompliant(newPassword)) {
-      return { status: 400, error: PASSWORD_POLICY_MESSAGE, code: 'WEAK_PASSWORD' };
-    }
-
-    // (1) 후보 서비스 산출 = **호출자 관리 범위 ∩ 대상자 Membership**
-    //     WO-O4O-SERVICE-PASSWORD-CHANGE-UI-SCOPE-AND-INTEGRATION-V2:
-    //       이전 구현은 `scope.serviceKeys.length === 1` 만 자동 확정해서,
-    //       2개 서비스를 관리하는 운영자가 **한 서비스에만 속한 회원**을 바꿀 때도 400 이 났다.
-    //       기준은 운영자가 관리하는 서비스 수가 아니라 **교집합 후보 수**여야 한다.
-    const targetMembershipRows = await AppDataSource.query(
-      `SELECT service_key FROM service_memberships WHERE user_id = $1`,
-      [targetUserId]
-    );
-    const targetServiceKeys: string[] = targetMembershipRows.map((r: { service_key: string }) => r.service_key);
-    const candidates = scope.isPlatformAdmin
-      ? targetServiceKeys
-      : targetServiceKeys.filter((k) => scope.serviceKeys.includes(k));
-
-    if (candidates.length === 0) {
-      return {
-        status: 404,
-        error: '비밀번호를 변경할 수 있는 서비스가 없습니다.',
-        code: 'NO_MANAGEABLE_SERVICE',
-      };
-    }
-
-    // (2) 대상 서비스 확정 — 모호하면 거절한다(전역·일괄 변경 금지).
-    const requested = req.body?.serviceKey ?? req.body?.membershipServiceKey;
-    const explicitKey = typeof requested === 'string' && requested.trim() ? requested.trim() : undefined;
-
-    let serviceKey: string | undefined;
-    if (explicitKey) {
-      if (!candidates.includes(explicitKey)) {
-        // 관리 범위 밖이거나 대상이 그 서비스 회원이 아니다. 어느 쪽인지 구분해 응답한다.
-        const inScope = scope.isPlatformAdmin || scope.serviceKeys.includes(explicitKey);
-        return inScope
-          ? { status: 404, error: '해당 서비스의 회원이 아닙니다.', code: 'SERVICE_NOT_MEMBER' }
-          : { status: 403, error: '다른 서비스 회원의 비밀번호는 변경할 수 없습니다.', code: 'SERVICE_SCOPE_FORBIDDEN' };
-      }
-      serviceKey = explicitKey;
-    } else if (!scope.isPlatformAdmin && candidates.length === 1) {
-      // 후보가 하나뿐이면 자동 확정. 플랫폼 관리자는 항상 명시적으로 선택해야 한다.
-      serviceKey = candidates[0];
-    }
-
-    if (!serviceKey) {
-      return {
-        status: 400,
-        error: '대상 서비스(serviceKey)를 지정해야 합니다.',
-        code: 'SERVICE_KEY_REQUIRED',
-      };
-    }
-
-    // (3) 운영 계층 검증 — **선택된 서비스 안에서만** 판정한다.
-    //     다른 서비스의 role 이나 사용자의 전체 최고 role 로 판정하지 않는다.
-    //     예) 대상이 kpa:admin 이어도 neture 에서 일반 회원이면 neture 에서는 member 다.
-    //     platform 계정만 서비스와 무관한 최상위이며, 이는 "플랫폼 계정 비밀번호는
-    //     이 경로가 다루지 않는다"는 계약을 표현한다(대상이 platform 이면 항상 차단).
-    const rolePrefix = resolveRolePrefixFromCanonicalServiceKey(serviceKey);
-    const callerRoles: string[] = (req as any).user?.roles ?? [];
-    const targetRoleRows = await AppDataSource.query(
-      `SELECT role FROM role_assignments WHERE user_id = $1 AND is_active = true`,
-      [targetUserId]
-    );
-    const targetRoles: string[] = targetRoleRows.map((r: { role: string }) => r.role);
-
-    const callerTier = resolveOperationalTier(callerRoles, rolePrefix);
-    const targetTier = resolveOperationalTier(targetRoles, rolePrefix);
-
-    if (OPERATIONAL_TIER_RANK[callerTier] <= OPERATIONAL_TIER_RANK[targetTier]) {
-      return {
-        status: 403,
-        error: '이 회원의 비밀번호를 변경할 권한이 없습니다.',
-        code: 'INSUFFICIENT_OPERATOR_TIER',
-      };
-    }
-
-    // (4) 해당 서비스 credential 만 갱신 — users.password·타 서비스 credential 무변경.
-    const passwordHash = await hashPassword(newPassword);
-    await AppDataSource.query(
-      `INSERT INTO service_credentials (user_id, service_key, password_hash, created_at, updated_at)
-       VALUES ($1, $2, $3, NOW(), NOW())
-       ON CONFLICT ON CONSTRAINT "uq_service_credentials_user_service"
-       DO UPDATE SET password_hash = EXCLUDED.password_hash, updated_at = NOW()`,
-      [targetUserId, serviceKey, passwordHash]
-    );
-
-    logger.info('[MembershipConsole] service credential password changed', {
-      targetUserId, serviceKey, callerTier, targetTier,
-      changedBy: (req as any).user?.id ?? null,
-    });
-
-    return null;
-  }
+  // WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1:
+  //   changeMemberServicePassword 는 은퇴했다 (service_credentials write-path).
 
   /**
    * Service boundary check — non-platform-admin can only access users in their service scope
@@ -1152,7 +993,7 @@ export class MembershipConsoleController {
       // WO-O4O-KPA-BUSINESSINFO-CANONICAL-FORM-ALIGNMENT-V1: ceoName/taxInvoiceEmail/managerPhone canonical 수용.
       // taxEmail/representativeName 은 legacy alias — controller 에서 canonical key 로만 저장.
       const {
-        password, lastName, firstName, nickname, phone,
+        lastName, firstName, nickname, phone,
         businessName, businessNumber, businessType,
         businessCategory, zipCode, address1, address2,
         ceoName, contactName, taxInvoiceEmail, pharmacyPhone, managerPhone,
@@ -1193,32 +1034,10 @@ export class MembershipConsoleController {
         }
       }
 
-      // 1. Password update — Identity V2 서비스별 credential
-      //
-      // WO-O4O-OPERATOR-SERVICE-CREDENTIAL-PASSWORD-CHANGE-AND-DOC-ALIGNMENT-V1:
-      //   이전 구현은 `UPDATE users SET password` 로 V1 공통 비밀번호를 갱신했다.
-      //   Identity V2(DECISION-...-V2-ADOPTION-V1) 채택 후 서비스 로그인은
-      //   service_credentials 가 있으면 users.password 를 **보지 않는다**
-      //   (auth-login.service.ts: `credentialHash ?? user.password`).
-      //   따라서 credential 을 가진 회원에게는 성공 응답만 돌아가고 실제 로그인 비밀번호는
-      //   바뀌지 않는 **사일런트 무효** 상태였다. Phase 2 에서 본인 변경(`PUT /users/password`)만
-      //   서비스 범위로 전환되고 운영자의 타인 변경 경로가 누락된 결과다.
-      if (password) {
-        const pwFailure = await this.changeMemberServicePassword({
-          req,
-          scope,
-          targetUserId: userId,
-          newPassword: password,
-        });
-        if (pwFailure) {
-          res.status(pwFailure.status).json({
-            success: false,
-            error: pwFailure.error,
-            code: pwFailure.code,
-          });
-          return;
-        }
-      }
+      // WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1:
+      //   운영자의 회원 비밀번호 변경은 은퇴했다. service_credentials 축 자체가 사라졌고,
+      //   회원 로그인은 Google sub → users.id 하나로만 이뤄진다.
+      //   운영자가 대신 바꿔줄 비밀번호가 존재하지 않으므로 이 경로는 무의미하다.
 
       // 2. Profile fields update
       const sets: string[] = [];

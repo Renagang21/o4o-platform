@@ -50,20 +50,8 @@ export class GoogleSignupRequestDto {
   includeLegacyTokens?: boolean;
 }
 
-/**
- * WO-O4O-GOOGLE-IDENTITY-OPERATOR-EXPLICIT-LINK-V1 §2
- * 로그인된 계정에 Google Identity 를 명시 연결한다. 대상 user 는 세션(`req.user.id`)에서만 온다.
- * `currentPassword` 는 `users.password` 재인증용(service_credentials 금지). userId/email/sub/providerId 는 400.
- */
-export class GoogleLinkRequestDto {
-  @IsString()
-  @IsNotEmpty()
-  idToken!: string;
-
-  @IsString()
-  @IsNotEmpty()
-  currentPassword!: string;
-}
+// WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1:
+//   GoogleLinkRequestDto 는 은퇴했다 (`currentPassword` 재인증 전제).
 
 /**
  * WO-O4O-GOOGLE-IDENTITY-OPERATOR-EXPLICIT-LINK-V1 §15 — Admin Google Bootstrap(전환기 1회용)

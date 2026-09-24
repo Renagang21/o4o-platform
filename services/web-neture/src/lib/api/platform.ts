@@ -3,7 +3,6 @@
  *
  * 기존 backend platform API 재사용(신규 API 없음):
  *   GET   /api/v1/admin/platform-accounts
- *   PATCH /api/v1/admin/platform-accounts/:id/password   { newPassword }
  *   PATCH /api/v1/admin/platform-accounts/:id/status     { isActive }
  *   GET   /api/v1/admin/platform-services
  * guard(backend): platform:super_admin (+ 서버측 SELF_LOCK / LAST_SUPER_ADMIN / SUPER_ADMIN_ONLY).
@@ -79,11 +78,7 @@ export const platformAdminApi = {
       return res.data?.data ?? [];
     } catch (err) { throw toError(err); }
   },
-  async resetPassword(id: string, newPassword: string): Promise<void> {
-    try {
-      await api.patch(`/admin/platform-accounts/${id}/password`, { newPassword });
-    } catch (err) { throw toError(err); }
-  },
+  // WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: resetPassword 는 은퇴했다(서버 endpoint 부재).
   async setAccountStatus(id: string, isActive: boolean): Promise<void> {
     try {
       await api.patch(`/admin/platform-accounts/${id}/status`, { isActive });

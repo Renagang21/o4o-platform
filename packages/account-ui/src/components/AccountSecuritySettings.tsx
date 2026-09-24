@@ -9,20 +9,21 @@
  *
  * K-Cosmetics / Neture 의 `MySettingsPage` 본문이
  * serviceKey 주입값과 2단계 인증 안내 유무만 다른 3중 복제였다.
- * 비밀번호 변경 모달 · 모든 기기 로그아웃 · 확인 다이얼로그 흐름을 여기로 수렴한다.
+ * 모든 기기 로그아웃 · 확인 다이얼로그 흐름을 여기로 수렴한다.
+ *
+ * WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1:
+ *   비밀번호 변경 모달(`PasswordChangeModal`) · `onChangePassword` 계약은 은퇴했다.
+ *   O4O 인증에 비밀번호가 존재하지 않으므로 바꿀 대상이 없다. 로그인 수단은 Google 하나다.
  *
  * 경계:
- *   - 실제 API 호출(`PUT /users/password`, `logoutAll`)은 호출자가 주입한다.
- *     account-ui 는 서비스 apiClient 를 알지 못한다.
- *   - ⚠️ 비밀번호 값은 onChangePassword 로 전달만 하고 이 컴포넌트에 저장/로깅하지 않는다.
+ *   - 실제 API 호출(`logoutAll`)은 호출자가 주입한다. account-ui 는 서비스 apiClient 를 알지 못한다.
  *   - toast 는 `@o4o/error-handling` 의존을 만들지 않기 위해 `notify` 로 주입받는다.
  */
 
 import { useState } from 'react';
 import type { ReactNode } from 'react';
-import { Lock, LogOut } from 'lucide-react';
+import { LogOut, ShieldCheck } from 'lucide-react';
 import { SettingsSection } from './SettingsSection.js';
-import { PasswordChangeModal } from './PasswordChangeModal.js';
 
 export interface AccountSecurityNotify {
   success: (message: string) => void;
@@ -30,12 +31,6 @@ export interface AccountSecurityNotify {
 }
 
 export interface AccountSecuritySettingsProps {
-  /** 비밀번호 변경 실행. serviceKey 주입은 호출자 책임. */
-  onChangePassword: (
-    currentPassword: string,
-    newPassword: string,
-    newPasswordConfirm: string,
-  ) => Promise<void>;
   /** 모든 기기 로그아웃. `onLogout` 과 함께 미지정이면 "계정 관리" 섹션을 렌더하지 않는다. */
   onLogoutAll?: () => Promise<void>;
   /**
@@ -70,7 +65,6 @@ const LOGOUT_ALL_CONFIRM_WITH_CURRENT =
   '모든 기기에서 로그아웃됩니다.\n현재 기기도 로그아웃됩니다.\n\n계속하시겠습니까?';
 
 export function AccountSecuritySettings({
-  onChangePassword,
   onLogoutAll,
   onLogout,
   logoutAllIncludesCurrentDevice = false,
@@ -80,22 +74,7 @@ export function AccountSecuritySettings({
   showTwoFactorNotice = false,
   children,
 }: AccountSecuritySettingsProps) {
-  const [showPasswordModal, setShowPasswordModal] = useState(false);
-  const [changingPassword, setChangingPassword] = useState(false);
   const [loggingOutAll, setLoggingOutAll] = useState(false);
-
-  const handleChangePassword = async (
-    currentPassword: string,
-    newPassword: string,
-    newPasswordConfirm: string,
-  ) => {
-    setChangingPassword(true);
-    try {
-      await onChangePassword(currentPassword, newPassword, newPasswordConfirm);
-    } finally {
-      setChangingPassword(false);
-    }
-  };
 
   const handleLogoutAll = async () => {
     if (!onLogoutAll) return;
@@ -122,12 +101,14 @@ export function AccountSecuritySettings({
   return (
     <>
       <SettingsSection title="보안 설정" description={securityDescription}>
-        <button type="button" onClick={() => setShowPasswordModal(true)} className={ROW_CLS}>
+        {/* WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: 로그인 수단은 Google 하나 — 상태 표시만 한다. */}
+        <div className="w-full flex items-center justify-between p-4 bg-gray-50 rounded-xl">
           <div className="flex items-center gap-3">
-            <Lock className="w-4 h-4 text-gray-500" />
-            <span className="text-sm text-gray-700">비밀번호 변경</span>
+            <ShieldCheck className="w-4 h-4 text-gray-500" />
+            <span className="text-sm text-gray-700">로그인 방법</span>
           </div>
-        </button>
+          <span className="text-xs text-gray-500">Google 계정</span>
+        </div>
         {showTwoFactorNotice && (
           // 2단계 인증 API 미도입 — no-op button 대신 "준비 중" 정직 표시.
           <div className="w-full flex items-center justify-between p-4 bg-gray-50 rounded-xl opacity-60 cursor-not-allowed">
@@ -169,13 +150,6 @@ export function AccountSecuritySettings({
       )}
 
       {children}
-
-      <PasswordChangeModal
-        open={showPasswordModal}
-        onClose={() => setShowPasswordModal(false)}
-        onSubmit={handleChangePassword}
-        submitting={changingPassword}
-      />
     </>
   );
 }

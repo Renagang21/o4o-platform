@@ -7,6 +7,10 @@ import { AppError, ErrorCategory, ErrorSeverity } from './AppError.js';
  * All errors extend AppError for unified error handling middleware.
  */
 
+// WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1:
+//   InvalidCredentialsError · SocialLoginRequiredError · PasswordValidationError ·
+//   InvalidPasswordResetTokenError 는 은퇴했다. 검증하거나 재설정할 비밀번호가 없다.
+
 /**
  * Base Authentication Error
  */
@@ -14,16 +18,6 @@ export class AuthenticationError extends AppError {
   constructor(message: string, code: string, details?: Record<string, any>) {
     super(code, message, 401, ErrorCategory.AUTHENTICATION, ErrorSeverity.MEDIUM, true, undefined, details);
     this.name = 'AuthenticationError';
-  }
-}
-
-/**
- * Invalid credentials error (wrong email/password)
- */
-export class InvalidCredentialsError extends AuthenticationError {
-  constructor() {
-    super('Invalid credentials', 'INVALID_CREDENTIALS');
-    this.name = 'InvalidCredentialsError';
   }
 }
 
@@ -188,36 +182,12 @@ export class TooManyAttemptsError extends AuthorizationError {
 }
 
 /**
- * Social login required error (for users without password)
- */
-export class SocialLoginRequiredError extends AuthenticationError {
-  constructor(provider?: string) {
-    const message = provider
-      ? `Please use ${provider} to log in`
-      : 'Please use social login';
-
-    super(message, 'SOCIAL_LOGIN_REQUIRED', provider ? { provider } : undefined);
-    this.name = 'SocialLoginRequiredError';
-  }
-}
-
-/**
  * Email already exists error
  */
 export class EmailAlreadyExistsError extends AppError {
   constructor() {
     super('EMAIL_EXISTS', 'Email already exists', 409, ErrorCategory.VALIDATION, ErrorSeverity.LOW);
     this.name = 'EmailAlreadyExistsError';
-  }
-}
-
-/**
- * Password validation error
- */
-export class PasswordValidationError extends AppError {
-  constructor(message: string = 'Password does not meet requirements') {
-    super('PASSWORD_VALIDATION_FAILED', message, 400, ErrorCategory.VALIDATION, ErrorSeverity.LOW);
-    this.name = 'PasswordValidationError';
   }
 }
 
@@ -242,15 +212,5 @@ export class InvalidVerificationTokenError extends AppError {
   constructor() {
     super('INVALID_VERIFICATION_TOKEN', 'Invalid or expired verification token', 400, ErrorCategory.AUTHENTICATION, ErrorSeverity.LOW);
     this.name = 'InvalidVerificationTokenError';
-  }
-}
-
-/**
- * Invalid password reset token error
- */
-export class InvalidPasswordResetTokenError extends AppError {
-  constructor() {
-    super('INVALID_RESET_TOKEN', 'Invalid or expired password reset token', 400, ErrorCategory.AUTHENTICATION, ErrorSeverity.LOW);
-    this.name = 'InvalidPasswordResetTokenError';
   }
 }

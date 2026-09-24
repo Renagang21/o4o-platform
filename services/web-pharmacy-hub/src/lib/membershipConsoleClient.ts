@@ -12,7 +12,7 @@
  *     PATCH /pharmacy-hub/operator/memberships/:id/approve
  *     PATCH /pharmacy-hub/operator/memberships/:id/reject   { reason }
  *
- *   그 외(listAll / stats / batchUpdateStatus / updatePassword)는 **구현하지 않는다**.
+ *   그 외(listAll / stats / batchUpdateStatus)는 **구현하지 않는다**.
  *   백엔드에 존재하지 않는 기능이며(PharmacyHubMembershipConsoleController 주석 참조:
  *   공통 /api/v1/operator/members 라우터에 pharmacy-hub:operator 를 의도적으로 넣지 않았다),
  *   공통 콘솔은 선택 메서드 부재를 그대로 "그 기능 없음"으로 해석한다.

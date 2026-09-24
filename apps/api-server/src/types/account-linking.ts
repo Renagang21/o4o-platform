@@ -32,13 +32,11 @@ export interface LinkAccountRequest {
   provider: AuthProvider;
   code?: string; // OAuth authorization code
   email?: string; // For email provider
-  password?: string; // For email provider
 }
 
 // Account unlinking request
 export interface UnlinkAccountRequest {
   provider: AuthProvider;
-  password?: string; // Required for security verification
 }
 
 // Account linking response
@@ -104,10 +102,10 @@ export interface OAuthLinkingState {
 }
 
 // Security verification for sensitive operations
+// WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: method 'password' 제거.
 export interface SecurityVerification {
-  method: 'password' | 'email' | 'sms';
+  method: 'email' | 'sms';
   token?: string;
-  password?: string;
   code?: string;
 }
 
@@ -137,33 +135,9 @@ export enum AccountLinkingError {
   LAST_PROVIDER = 'LAST_PROVIDER' // Cannot unlink the last authentication method
 }
 
-// Unified login request
-// WO-O4O-GOOGLE-IDENTITY-AUTOMATIC-EMAIL-MERGE-REMOVAL-V1 (WO-2B): email/password 전용.
-//   oauthProfile · autoLinked · OAuthProfile · AccountMerge* 는 자동 병합 경로와 함께 제거했다.
-export interface UnifiedLoginRequest {
-  provider: AuthProvider;
-  credentials?: {
-    email: string;
-    password: string;
-    /** WO-O4O-LOGIN-SERVICEKEY-PARAMETER-V1: 서비스 독립 인증 기반. 미제공 시 global fallback. */
-    serviceKey?: string;
-  };
-  ipAddress: string;
-  userAgent: string;
-}
-
-// Unified login response
-export interface UnifiedLoginResponse {
-  success: boolean;
-  user: any; // User public data
-  tokens: {
-    accessToken: string;
-    refreshToken: string;
-    expiresIn: number;
-  };
-  linkedAccounts: LinkedAccount[];
-  isNewUser: boolean;
-}
+// WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1:
+//   UnifiedLoginRequest / UnifiedLoginResponse 는 은퇴했다 (email+password 로그인 계약).
+//   로그인 계약은 Google 경로(GoogleAuthService)가 가진다.
 
 // ============================================================================
 // Phase 1: Service User 인증 기반 (WO-AUTH-SERVICE-IDENTITY-PHASE1)

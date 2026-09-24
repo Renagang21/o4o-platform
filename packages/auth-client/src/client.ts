@@ -1,12 +1,9 @@
 import axios, { AxiosInstance, AxiosError } from 'axios';
 import type {
-  LoginCredentials,
   AuthResponse,
   GoogleAuthResponse,
   GoogleAuthConfig,
   GoogleSignupConsents,
-  GoogleLinkStatus,
-  GoogleLinkResult,
 } from './types.js';
 import {
   getAccessToken,
@@ -125,9 +122,7 @@ export class AuthClient {
         if (error.response?.status === 401 && !originalRequest._retry) {
           // Skip refresh for auth endpoints - 401 from login/register/refresh is expected
           const requestUrl = originalRequest?.url || '';
-          if (requestUrl.includes('/auth/login') ||
-              requestUrl.includes('/auth/register') ||
-              requestUrl.includes('/auth/refresh') ||
+          if (requestUrl.includes('/auth/refresh') ||
               // WO-O4O-GOOGLE-ONLY-SIGNUP-LOGIN-V1: Google login/signup 401 은 ID token 거절이다.
               requestUrl.includes('/auth/google/')) {
             return Promise.reject(error);
@@ -267,24 +262,8 @@ export class AuthClient {
     );
   }
 
-  /**
-   * Login with credentials
-   *
-   * Phase 6-7: Cookie Auth Primary
-   * - Cookie strategy: Server sets httpOnly cookies, no tokens in response
-   * - localStorage strategy: Server returns tokens in response body
-   *
-   * Server response format: { success: true, data: { user, tokens: { accessToken, refreshToken } } }
-   */
-  async login(credentials: LoginCredentials): Promise<AuthResponse> {
-    // Phase 6-7: For localStorage strategy, request tokens in body
-    const payload = this.strategy === 'localStorage'
-      ? { ...credentials, includeLegacyTokens: true }
-      : credentials;
-
-    const response = await this.api.post('/auth/login', payload);
-    return this.adoptSessionResponse(response.data as { success?: boolean; data?: any });
-  }
+  // WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1:
+  //   login(email+password) 은 은퇴했다. 로그인 진입점은 `loginWithGoogle` 하나다.
 
   /**
    * WO-O4O-GOOGLE-ONLY-SIGNUP-LOGIN-V1 (WO-2D)
@@ -325,17 +304,9 @@ export class AuthClient {
     }
   }
 
-  /**
-   * WO-O4O-GOOGLE-IDENTITY-OPERATOR-EXPLICIT-LINK-V1
-   * 로그인된 계정에 Google Identity 명시 연결 — POST /auth/google/link `{ idToken, currentPassword }`.
-   * 세션은 바뀌지 않는다(토큰 재발급 없음). 서버 오류(INVALID_PASSWORD 401 · GOOGLE_IDENTITY_IN_USE 409 ·
-   * GOOGLE_ACCOUNT_ALREADY_LINKED 409 · PASSWORD_NOT_SET 400)는 axios 오류로 전파된다.
-   */
-  async linkGoogle(idToken: string, currentPassword: string): Promise<GoogleLinkResult> {
-    const response = await this.api.post('/auth/google/link', { idToken, currentPassword });
-    const data = (response.data as { data?: Partial<GoogleLinkResult> })?.data;
-    return { linked: true, alreadyLinked: data?.alreadyLinked === true };
-  }
+  // WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1:
+  //   linkGoogle / getGoogleLinkStatus 는 은퇴했다. password 로 재인증하고 Google 을 붙이던
+  //   전환기 경로이며, 세션 자체가 이미 Google 연결에서만 나온다.
 
   /**
    * WO-O4O-GOOGLE-IDENTITY-OPERATOR-EXPLICIT-LINK-V1 §15 — 전환기 1회용 Admin Google Bootstrap.
@@ -346,18 +317,6 @@ export class AuthClient {
     const response = await this.api.post('/auth/google/bootstrap-admin', { idToken, bootstrapCode });
     const data = (response.data as { data?: { linked?: boolean } })?.data;
     return { linked: data?.linked === true };
-  }
-
-  /** GET /auth/google/link/status — `{ linked, passwordSet }`. 실패 시 null(화면은 카드를 숨긴다). */
-  async getGoogleLinkStatus(): Promise<GoogleLinkStatus | null> {
-    try {
-      const response = await this.api.get('/auth/google/link/status');
-      const data = (response.data as { data?: Partial<GoogleLinkStatus> })?.data;
-      if (!data || typeof data.linked !== 'boolean') return null;
-      return { linked: data.linked, passwordSet: data.passwordSet === true };
-    } catch {
-      return null;
-    }
   }
 
   /**

@@ -81,8 +81,6 @@ export const AUTH_ERROR_CODES = {
 
   // Validation errors (400)
   EMAIL_EXISTS: 'EMAIL_EXISTS',
-  PASSWORD_VALIDATION_FAILED: 'PASSWORD_VALIDATION_FAILED',
-  INVALID_RESET_TOKEN: 'INVALID_RESET_TOKEN',
   INVALID_VERIFICATION_TOKEN: 'INVALID_VERIFICATION_TOKEN',
 } as const;
 
@@ -164,26 +162,12 @@ export interface MeResponse {
   metadata?: Record<string, unknown>;
 }
 
-// Login credentials
-export interface LoginCredentials {
-  email: string;
-  password: string;
-  deviceId?: string;
-  /**
-   * WO-O4O-LOGIN-SERVICEKEY-FRONTEND-ALIGNMENT-V1:
-   * service-scoped login 검증을 위한 옵션. 명시 시 backend 가
-   * service_memberships 조회 → 미가입자 401 SERVICE_NOT_MEMBER 반환.
-   * 미명시 시 기존 global login 흐름 유지 (legacy / platform-level 호출).
-   * Backend: apps/api-server/src/services/auth/auth-login.service.ts.
-   */
-  serviceKey?: string;
-}
+// WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1:
+//   LoginCredentials(email+password) 는 은퇴했다. 로그인은 Google ID token 하나다.
 
 // Register data
 export interface RegisterData {
   email: string;
-  password: string;
-  passwordConfirm: string;
   name: string;
   role?: string;
   tos: boolean;

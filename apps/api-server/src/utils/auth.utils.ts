@@ -1,15 +1,8 @@
-import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 
-// Password hashing
-export const hashPassword = async (password: string): Promise<string> => {
-  const saltRounds = parseInt(process.env.BCRYPT_SALT_ROUNDS || '10', 10);
-  return bcrypt.hash(password, saltRounds);
-};
-
-export const comparePassword = async (password: string, hash: string): Promise<boolean> => {
-  return bcrypt.compare(password, hash);
-};
+// WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1:
+//   hashPassword / comparePassword 는 은퇴했다. 저장하거나 비교할 비밀번호가 없다.
+//   (bcryptjs 의존도 이 파일에서는 사라진다.)
 
 // Random token generation
 export const generateRandomToken = (length: number = 32): string => {

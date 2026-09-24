@@ -54,7 +54,6 @@ import {
 import { getServiceMembershipStatus } from '../../lib/membershipGate';
 import { PHARMACY_HUB_ACCOUNT_NAV_ITEMS } from './navItems';
 import {
-  changeAccountPassword,
   fetchAccountProfile,
   updateAccountProfile,
   type AccountProfile,
@@ -333,7 +332,6 @@ export default function MyProfilePage({
           ⚠️ 비밀번호 값은 공통 모달 밖으로 나가지 않는다. */}
       <AccountSecuritySettings
         securityDescription="Pharmacy-Hub 로그인 비밀번호"
-        onChangePassword={changeAccountPassword}
         onLogout={handleLogout}
       />
 

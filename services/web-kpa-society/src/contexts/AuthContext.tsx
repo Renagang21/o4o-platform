@@ -121,12 +121,10 @@ interface AuthContextType {
   /** WO-KPA-LOGIN-LATENCY-CLEANUP-V1: KPA context 로딩 완료 여부 */
   isKpaContextLoaded: boolean;
   /**
-   * WO-O4O-FRONTEND-AUTH-CONTEXT-AND-ROUTE-GUARD-COMMONIZATION-V1:
-   *   반환 계약을 result object 로 통일(기존 throw 방식 폐기).
-   *   서버 `code`(SERVICE_NOT_MEMBER 등)를 호출부가 그대로 분기할 수 있다.
+   * WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1:
+   *   login(email, password) 는 은퇴했다. 로그인 진입은 Google 하나다.
+   *   반환 계약(result object)은 그대로 — 서버 `code`(SERVICE_NOT_MEMBER 등)를 호출부가 분기한다.
    */
-  login: (email: string, password: string) => Promise<AuthLoginResult<User>>;
-  /** WO-O4O-GOOGLE-ONLY-SIGNUP-LOGIN-V1: Google 기본 진입(email/password 는 임시 테스트/전환용). */
   loginWithGoogle: (idToken: string) => Promise<AuthLoginResult<User>>;
   signupWithGoogle: (idToken: string, consents: GoogleSignupConsents) => Promise<AuthLoginResult<User>>;
   getGoogleAuthConfig: () => Promise<GoogleAuthConfig>;
@@ -286,13 +284,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
    */
   const checkAuth = core.refresh;
 
-  /**
-   * WO-O4O-FRONTEND-AUTH-CONTEXT-AND-ROUTE-GUARD-COMMONIZATION-V1:
-   *   기존 KPA login 은 성공 시 User 를 반환하고 실패 시 throw 했다.
-   *   공통 계약(result object)으로 통일한다 — 호출부(LoginModal)도 함께 수정했다.
-   *   KPA context 후속 로딩은 Core 의 onAuthenticated 훅에서 일어난다.
-   */
-  const login = core.login;
+  // WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: core.login(email+password) 은퇴.
+  //   KPA context 후속 로딩은 Core 의 onAuthenticated 훅에서 일어난다(Google 경로 동일).
 
   const logout = core.logout;
 
@@ -327,7 +320,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         isAuthenticated: core.isAuthenticated,
         isLoading: core.isLoading,
         isKpaContextLoaded,
-        login,
         loginWithGoogle: core.loginWithGoogle,
         signupWithGoogle: core.signupWithGoogle,
         getGoogleAuthConfig,

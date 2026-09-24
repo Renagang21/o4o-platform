@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { BaseController } from '../../../common/base.controller.js';
 import type { AuthRequest } from '../../../common/middleware/auth.middleware.js';
-import { PasswordResetService } from '../../../services/passwordResetService.js';
+import { EmailVerificationService } from '../../../services/emailVerificationService.js';
 import { EmailVerificationDto } from '../dto/index.js';
 import logger from '../../../utils/logger.js';
 
@@ -19,7 +19,7 @@ export class VerificationController extends BaseController {
     const { token } = req.body as EmailVerificationDto;
 
     try {
-      await PasswordResetService.verifyEmail(token);
+      await EmailVerificationService.verifyEmail(token);
 
       return BaseController.ok(res, {
         message: 'Email has been verified successfully',
@@ -56,7 +56,7 @@ export class VerificationController extends BaseController {
     }
 
     try {
-      await PasswordResetService.verifyEmail(token);
+      await EmailVerificationService.verifyEmail(token);
 
       return BaseController.ok(res, {
         message: 'Email has been verified successfully',
@@ -93,7 +93,7 @@ export class VerificationController extends BaseController {
         ?.memberships?.find((m) => m.status === 'active')?.serviceKey;
       const effectiveServiceKey = bodyServiceKey ?? firstActiveServiceKey;
 
-      await PasswordResetService.requestEmailVerification(userId, effectiveServiceKey);
+      await EmailVerificationService.requestEmailVerification(userId, effectiveServiceKey);
 
       return BaseController.ok(res, {
         message: 'Verification email has been sent',

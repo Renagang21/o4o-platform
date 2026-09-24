@@ -9,7 +9,7 @@
  *   - isLoading 초기값 = 토큰 유무 (토큰 없으면 spinner 없이 즉시 시작)
  *   - 세션 복구: 토큰 없으면 `/auth/me` 를 호출조차 하지 않는다(불필요한 401 방지)
  *   - AUTH_TOKEN_CLEARED_EVENT 수신 시 user 정리(토큰 갱신 실패 → stale auth 제거)
- *   - login / logout / logoutAll
+ *   - loginWithGoogle / signupWithGoogle / logout / logoutAll
  *
  * **서비스명 조건문을 두지 않는다.** 차이는 전부 `ServiceAuthConfig` 주입으로 표현한다.
  */
@@ -118,7 +118,7 @@ export function useServiceAuth<TUser>(config: ServiceAuthConfig<TUser>): Service
   }, []);
 
   /**
-   * 세션 채택 공통 — /auth/login · /auth/google/login · /auth/google/signup.
+   * 세션 채택 공통 — /auth/google/login · /auth/google/signup.
    * **항상 result object 를 반환하고 throw 하지 않는다.**
    * 서버 응답 `code`(예: `SERVICE_NOT_MEMBER` · `GOOGLE_SIGNUP_REQUIRED`)를 그대로 전달해
    * 서비스별 안내 UX 가 분기할 수 있게 한다.
@@ -161,13 +161,6 @@ export function useServiceAuth<TUser>(config: ServiceAuthConfig<TUser>): Service
       }
     },
     [toUser, onAuthenticated],
-  );
-
-  /** 로그인(email/password — 임시 테스트/전환용). */
-  const login = useCallback(
-    (email: string, password: string): Promise<AuthLoginResult<TUser>> =>
-      adoptSession(() => authClient.login({ email, password, serviceKey }), '로그인에 실패했습니다.'),
-    [adoptSession, authClient, serviceKey],
   );
 
   /**
@@ -245,7 +238,6 @@ export function useServiceAuth<TUser>(config: ServiceAuthConfig<TUser>): Service
     isLoading,
     pendingPolicyAcceptances,
     acceptPendingPolicies,
-    login,
     loginWithGoogle,
     signupWithGoogle,
     logout,

@@ -5,16 +5,13 @@
  */
 
 // Login DTOs
-export * from './login.dto.js';
 
 // Register DTOs
-export * from './register.dto.js';
 
 // Refresh Token DTOs
 export * from './refresh.dto.js';
 
 // Password DTOs
-export * from './password.dto.js';
 
 // Verification DTOs
 export * from './verification.dto.js';
