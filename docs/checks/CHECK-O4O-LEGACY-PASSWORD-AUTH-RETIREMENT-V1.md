@@ -865,9 +865,25 @@ D `deploy-api` 는 ref 분기 없이 정적 env 유지). jest 이므로 CI 샤�
 **rollback 가능 지점이다** — 스키마가 그대로이므로 traffic 을 이전 revision(`03749-9p8` · `01309-hrs`)으로
 되돌리면 이전 동작으로 복귀한다(이미지 보존).
 
-**남은 것**: 관리자 Google 브라우저 회귀(로그인 → Admin 진입 → F5 → 로그아웃 → 재로그인) +
-`lastLoginAt` / Google `lastUsedAt` 전진 DB 확인. **여기까지 PASS 해야**
-`PHASE_B1 = COMPLETE` · `PHASE_B2_DESTRUCTIVE = READY` 로 판정하며, 그 전에는 B-2 migration 에 착수하지 않는다.
+#### 11-7a. B-1 revision 에서의 관리자 Google 브라우저 회귀 — **PASS** (2026-09-24 11:53Z)
+
+사용자가 `admin.neture.co.kr` 에서 로그인 → Admin 진입 → F5 세션 유지 → 로그아웃 → 동일 계정 재로그인을
+수행했고, **판정은 이 세션이 DB read-only 로** 했다(화면 문자열은 근거로 쓰지 않는다).
+
+| 항목 | 기준선(전환 전) | 회귀 후 | 판정 |
+|---|---|---|---|
+| `users.lastLoginAt` | 2026-09-24 04:38:09.130 | **2026-09-24 11:53:07.687** | 전진 PASS |
+| google link `lastUsedAt` | 2026-09-24 04:38:09.134 | **2026-09-24 11:53:07.693** | 전진 PASS |
+| Google `sub` | `117391***` | **동일** | 불변 |
+| `users.id` | `cfd2a5e7…` | **동일** · users total 1 | 불변 |
+| roles active / memberships active | 11 / 5 | **11 / 5** | 불변 |
+| `service_credentials` / `password_reset_tokens` | 5 / 5 | **5 / 5** | B-1 은 지우지 않는다 |
+
+즉 **B-1 revision 이 서빙되는 상태에서** Google 전용 로그인이 기존 관리자 identity 로 정상 동작한다.
+password 컬럼·테이블이 런타임에서 완전히 떨어진 뒤에도 인증이 유지된다는 것이 실증됐다.
+
+**판정: `PHASE_B1 = COMPLETE` · `PHASE_B2_DESTRUCTIVE = READY`.**
+B-2 는 §11-2 의 대상·§10-4 의 레시피대로 진행하며, production 실행은 **별도의 통제된 배포 창**에서만 한다.
 
 ### 11-2. Phase B-2 — 스키마 계약 (B-1 서빙 확인 후에만)
 
@@ -913,7 +929,7 @@ login_attempts = preserved              users.email = preserved
 
 ## 판정
 
-`LEGACY PASSWORD AUTH RETIREMENT: PHASE_A_DEPLOYED / PHASE_B_PENDING_APPROVAL`
+`LEGACY PASSWORD AUTH RETIREMENT: PHASE_B1_COMPLETE / PHASE_B2_DESTRUCTIVE_READY`
 
 Phase A 는 **운영 반영까지 끝났다**(`7a44a97bc` · 2026-09-24 · §7-9). 런타임에서 password reader/writer/UI 0 ·
 은퇴 endpoint 404 · 서빙 번들 password 입력 0 을 실측했고, 스키마는 **의도대로 무변화**다(migration 0).
