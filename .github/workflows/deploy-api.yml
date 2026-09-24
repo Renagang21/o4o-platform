@@ -162,6 +162,14 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v6
+      with:
+        # WO-O4O-DEPLOY-JOB-BOOTSTRAP-SLIMMING-V1: 운영 데이터 매니페스트
+        # (apps/api-server/src/scripts/data, ≈1.25GB)는 tsc(tsconfig.build 가 src/scripts 제외) ·
+        # tsup(entry 9개) · Docker 이미지 어디에도 쓰이지 않는다. sparse 지정 시 blob:none 부분 fetch.
+        sparse-checkout: |
+          /*
+          !/apps/api-server/src/scripts/data/
+        sparse-checkout-cone-mode: false
 
     # WO-O4O-CI-DEPLOY-API-SETUP-BUILD-ENV-ALIGN-V1:
     # 4-step pnpm/node/install/build:packages 흐름을 다른 workflow와 동일한
@@ -302,6 +310,8 @@ jobs:
       uses: google-github-actions/setup-gcloud@v2
       with:
         project_id: ${{ env.PROJECT_ID }}
+        # runner 에 설치된 gcloud 를 쓴다 (매 job ≈20s SDK 다운로드 생략)
+        skip_install: true
 
     - name: Configure Docker for Artifact Registry
       run: |
