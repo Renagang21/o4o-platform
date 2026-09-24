@@ -1060,3 +1060,18 @@ Admin lazy chunk 전수 스캔(74개) 결과 password 입력을 가진 chunk 3�
 | `REKEY/IMPORT` · `DATABASE_CUTOVER` · §43 destructive | `FORBIDDEN` 유지 |
 
 문서 정합: 발견 3건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 4건 (잔존 ①②③ · API dispatch `api_deploy_affected` 결함)
+
+### 23-10. 게이트 복귀 후 차단 실증 (2026-09-24 03:2xZ)
+
+`DEPLOY_ENABLED = false` 복귀 직후 타 세션 push `a95384b78` 이 API 배포 워크플로를 띄웠다. run `35950968950` 의 job 결과:
+
+| job | 결과 |
+|---|---|
+| Detect API deploy scope | `success` |
+| `deploy-hold-notice` | `success` (보류 안내만 기록) |
+| `build-and-deploy` | **`skipped`** |
+
+- 새 API revision 생성 **0건** (최신은 여전히 `o4o-core-api-03750-x8z` · 03:04:56Z)
+- migration job 실행 **0건** (최신은 여전히 `o4o-api-migrations-bzvkt` · 03:04:29Z)
+
+워크플로 run 자체는 `success` 로 표시되므로 **run 상태만 보고 "배포됐다"고 판단하면 안 된다** — 판정은 job 결과(`build-and-deploy`)와 revision/execution 생성 여부로 한다. §20 의 fail-closed 게이트가 의도대로 동작함을 실측으로 확인했다.
