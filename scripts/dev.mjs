@@ -160,30 +160,82 @@ function ensureStandaloneInstall(tracker, relPath) {
 }
 
 /**
- * 워크스페이스 1개 타입체크.
+ * 워크스페이스 1개 타입체크 **계획**.
  * 자체 script 가 있으면 그것을 쓰고, 없으면 tsconfig 기준 `npx tsc --noEmit`.
+ * 실행할 것이 없으면(skip · 독립 install 실패) null 을 돌려준다 — install 실패는 tracker 에 이미 기록된다.
  */
-function typeCheckWorkspace(tracker, relPath) {
-  if (!ensureStandaloneInstall(tracker, relPath)) return false;
+function planTypeCheckWorkspace(tracker, relPath) {
+  if (!ensureStandaloneInstall(tracker, relPath)) return null;
+  const plan = (cmd, note) => ({ label: `type-check ${relPath}`, relPath, cmd, note, cwd: join(ROOT_DIR, relPath) });
   const script = typeCheckScriptName(relPath);
-  if (script) {
-    console.log(`  - ${relPath} (pnpm run ${script})`);
-    return tracker.track(`type-check ${relPath}`, exec(`pnpm run ${script}`, join(ROOT_DIR, relPath)));
-  }
+  if (script) return plan(`pnpm run ${script}`, `pnpm run ${script}`);
   if (!hasOwnTsconfig(relPath)) {
     log.warn(`  - Skipping ${relPath} (no type-check script, no tsconfig.json)`);
-    return true;
+    return null;
   }
   // solution tsconfig(`files: []` + `references`)에 `tsc --noEmit` 을 걸면 참조 프로젝트를
   // 따라가지 않아 **아무 파일도 검사하지 않고 성공**한다(공허 검사). 이 경우 `tsc -b` 로
   // 참조 프로젝트를 실제로 검사한다. 대상 tsconfig.app.json 은 noEmit:true 이므로 산출물은 없다.
-  if (isSolutionTsconfig(relPath)) {
-    console.log(`  - ${relPath} (npx tsc -b — solution tsconfig)`);
-    return tracker.track(`type-check ${relPath}`, exec('npx tsc -b', join(ROOT_DIR, relPath)));
-  }
+  if (isSolutionTsconfig(relPath)) return plan('npx tsc -b', 'npx tsc -b — solution tsconfig');
+  return plan('npx tsc --noEmit', 'npx tsc --noEmit');
+}
 
-  console.log(`  - ${relPath} (npx tsc --noEmit)`);
-  return tracker.track(`type-check ${relPath}`, exec('npx tsc --noEmit', join(ROOT_DIR, relPath)));
+/**
+ * 워크스페이스 1개 타입체크 (직렬 실행).
+ */
+function typeCheckWorkspace(tracker, relPath) {
+  const p = planTypeCheckWorkspace(tracker, relPath);
+  if (!p) return true;
+  console.log(`  - ${p.relPath} (${p.note})`);
+  return tracker.track(p.label, exec(p.cmd, p.cwd));
+}
+
+/**
+ * WO-O4O-CI-FRONTEND-TYPECHECK-PARALLELIZATION-V1
+ *
+ * 타입체크 계획들을 최대 `concurrency` 개씩 동시에 실행한다. 각 계획은 서로 독립인
+ * `tsc --noEmit`/`tsc -b`(산출물 없음) 이므로 순서 의존이 없다.
+ * 출력은 대상별로 모아 **끝난 순서대로 한 덩어리씩** 찍는다(동시 출력이 섞이지 않게).
+ * 실패 목록은 완료 순서가 아니라 **계획 순서**로 tracker 에 기록해 직렬 실행과 같은 보고가 되게 한다.
+ */
+function runTypeCheckPlansParallel(tracker, plans, concurrency) {
+  const results = new Array(plans.length);
+  let next = 0;
+  const runOne = (i) => new Promise((resolveRun) => {
+    const p = plans[i];
+    const started = Date.now();
+    const child = spawn(p.cmd, { cwd: p.cwd, shell: true, env: process.env });
+    const chunks = [];
+    child.stdout.on('data', (d) => chunks.push(d));
+    child.stderr.on('data', (d) => chunks.push(d));
+    const done = (ok) => {
+      const secs = ((Date.now() - started) / 1000).toFixed(1);
+      console.log(`  - ${p.relPath} (${p.note}) — ${ok ? 'ok' : 'FAILED'} ${secs}s`);
+      const out = Buffer.concat(chunks).toString();
+      if (out.trim()) process.stdout.write(out.endsWith('\n') ? out : `${out}\n`);
+      if (!ok) log.error(`  ✗ FAILED (${p.cwd}): ${p.cmd}`);
+      results[i] = ok;
+      resolveRun();
+    };
+    child.on('error', () => done(false));
+    child.on('close', (code) => done(code === 0));
+  });
+  const worker = async () => {
+    while (next < plans.length) await runOne(next++);
+  };
+  const workers = Array.from({ length: Math.min(concurrency, plans.length) }, worker);
+  return Promise.all(workers).then(() => {
+    plans.forEach((p, i) => tracker.track(p.label, results[i] === true));
+  });
+}
+
+/**
+ * `O4O_TYPECHECK_CONCURRENCY` (정수 ≥ 1). 미설정 · 1 · 잘못된 값이면 1 = 기존 직렬 동작.
+ * CI(ci-pipeline.yml quality-check)만 이 값을 올린다 — 로컬 기본 동작은 바뀌지 않는다.
+ */
+function typeCheckConcurrency() {
+  const n = Number.parseInt(process.env.O4O_TYPECHECK_CONCURRENCY ?? '', 10);
+  return Number.isInteger(n) && n > 1 ? n : 1;
 }
 
 /**
@@ -360,21 +412,28 @@ function runTypeCheckFrontend() {
   // Type check frontend apps only (skip api-server)
 
   // 'ecommerce' dead entry 제거, 자동 탐색으로 전환.
-  log.info('Type checking frontend apps...');
-  for (const rel of discoverWorkspaces('apps')) {
-    if (rel === 'apps/api-server') continue;
-    typeCheckWorkspace(t, rel);
+  // 과거에는 services/ 가 web-kpa-society 1개만 검사해 나머지 운영 서비스가 전부 빠져 있었다.
+  const targets = [
+    ...discoverWorkspaces('apps').filter((rel) => rel !== 'apps/api-server'),
+    ...discoverWorkspaces('services'),
+  ];
+
+  const concurrency = typeCheckConcurrency();
+  const finishReport = () => {
+    log.warn('Skipping api-server type check (run `pnpm run type-check` for it)');
+    return t.report('type-check:frontend');
+  };
+
+  if (concurrency === 1) {
+    log.info('Type checking frontend apps and web services...');
+    for (const rel of targets) typeCheckWorkspace(t, rel);
+    return finishReport();
   }
 
-  // Type check web services
-  // 과거에는 web-kpa-society 1개만 검사해 나머지 운영 서비스가 전부 빠져 있었다.
-  log.info('Type checking web services...');
-  for (const rel of discoverWorkspaces('services')) {
-    typeCheckWorkspace(t, rel);
-  }
-
-  log.warn('Skipping api-server type check (run `pnpm run type-check` for it)');
-  return t.report('type-check:frontend');
+  // 계획 단계(독립 install 보장 포함)는 직렬로 끝낸 뒤, tsc 실행만 병렬로 돌린다.
+  log.info(`Type checking frontend apps and web services (concurrency=${concurrency})...`);
+  const plans = targets.map((rel) => planTypeCheckWorkspace(t, rel)).filter(Boolean);
+  return runTypeCheckPlansParallel(t, plans, concurrency).then(finishReport);
 }
 
 function runTests() {
@@ -515,7 +574,11 @@ switch (command) {
     finish(runTypeCheck());
     break;
   case 'type-check:frontend':
-    finish(runTypeCheckFrontend());
+    // O4O_TYPECHECK_CONCURRENCY > 1 이면 Promise 를 돌려준다.
+    Promise.resolve(runTypeCheckFrontend()).then(finish, (err) => {
+      log.error(`type-check:frontend: ${err?.stack ?? err}`);
+      finish(false);
+    });
     break;
   case 'test':
     finish(runTests());

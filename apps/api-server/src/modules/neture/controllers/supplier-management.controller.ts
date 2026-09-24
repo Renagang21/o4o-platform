@@ -11,6 +11,7 @@ import { requireAuth } from '../../../middleware/auth.middleware.js';
 import { createRequireLinkedSupplier } from '../middleware/neture-identity.middleware.js';
 import type { SupplierRequest, AuthenticatedRequest } from '../middleware/neture-identity.middleware.js';
 import { NetureService } from '../neture.service.js';
+import { SupplierProfileFieldUnsupportedError } from '../services/supplier.service.js';
 import logger from '../../../utils/logger.js';
 import { uploadSingleMiddleware } from '../../../middleware/upload.middleware.js';
 import {
@@ -315,6 +316,15 @@ export function createSupplierManagementController(dataSource: DataSource): Rout
       }
       res.json({ success: true, data: result });
     } catch (error) {
+      // WO-O4O-SUPPLIER-IDENTITY-RELATIONSHIP-AND-BUSINESS-PROFILE-CANONICALIZATION-V1 9: canonical 저장 위치가 없는 필드는 조용히 버리지 않고 400 으로 거부한다.
+      if (error instanceof SupplierProfileFieldUnsupportedError) {
+        return res.status(400).json({
+          success: false,
+          error: 'SUPPLIER_PROFILE_FIELD_UNSUPPORTED',
+          message: '아직 저장할 수 없는 항목입니다. 사업자 정보 일부는 조직 정보로 이전 예정입니다.',
+          fields: error.fields,
+        });
+      }
       logger.error('[Neture API] Error updating supplier profile:', error);
       res.status(500).json({ success: false, error: 'INTERNAL_ERROR' });
     }

@@ -162,52 +162,40 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v6
+      with:
+        # WO-O4O-DEPLOY-JOB-BOOTSTRAP-SLIMMING-V1: 운영 데이터 매니페스트
+        # (apps/api-server/src/scripts/data, ≈1.25GB)는 tsc(tsconfig.build 가 src/scripts 제외) ·
+        # tsup(entry 9개) · Docker 이미지 어디에도 쓰이지 않는다. sparse 지정 시 blob:none 부분 fetch.
+        sparse-checkout: |
+          /*
+          !/apps/api-server/src/scripts/data/
+        sparse-checkout-cone-mode: false
 
     # WO-O4O-CI-DEPLOY-API-SETUP-BUILD-ENV-ALIGN-V1:
     # 4-step pnpm/node/install/build:packages 흐름을 다른 workflow와 동일한
     # composite action으로 통일. unpinned pnpm + frozen-lockfile 단독 사용으로
     # CI를 차단하던 ERR_PNPM_LOCKFILE_CONFIG_MISMATCH 회피.
+    # WO-O4O-DEPLOY-API-PACKAGE-BUILD-SCOPE-V1
+    # 과거에는 여기서 root `build:packages` 전체(프론트 패키지 포함, ≈100s)를 빌드한 뒤
+    # 아래 step 이 하드코딩 목록 18개를 **다시** 빌드했다. 그 18개는 전부
+    # `build:packages` 마지막의 `build:api-deps`(= `@o4o/api-server^...`)에 이미 포함돼 있었다.
+    # 배포 이미지에 필요한 것은 api-server 의 workspace dependency closure 뿐이므로
+    # 여기서는 설치만 하고, 아래 step 이 closure 만 한 번 빌드한다
+    # (CI api-tests · scheduled full Jest 와 같은 방식).
     - name: Setup build environment
       uses: ./.github/actions/setup-build-env
       with:
         node-version: '22.18.0'
+        build-packages: 'false'
 
+    # closure 는 package.json 의 workspace 의존성 그래프에서 나온다 — 목록 하드코딩 금지(drift).
+    # api-server 런타임 코드(테스트 제외)가 import 하는 @o4o 패키지는 전부 package.json 에 선언돼 있다.
+    # --fail-if-no-match: filter 가 아무것도 고르지 못하면 조용히 통과하지 않고 실패한다.
     - name: Build API-specific packages
       run: |
-        echo "🔨 Phase 2: Building API-server-specific packages..."
-        echo "============================================================"
-        echo "(These packages are only needed by api-server, not frontend)"
-        echo ""
-
-        # Infrastructure (depends on types/utils — already built in Phase 1)
-        echo "📦 Infrastructure..."
-        pnpm --filter '@o4o/capabilities' run build
-        pnpm --filter '@o4o/mail-core' run build
-        pnpm --filter '@o4o/platform-core' run build
-        pnpm --filter '@o4o/cpt-registry' run build
-        pnpm --filter '@o4o/ai-core' run build
-        pnpm --filter '@o4o/ai-prompts' run build
-        pnpm --filter '@o4o/security-core' run build
-        pnpm --filter '@o4o/store-core' run build
-        pnpm --filter '@o4o/asset-copy-core' run build
-        pnpm --filter '@o4o/action-log-core' run build
-        pnpm --filter '@o4o/payment-core' run build
-
-        # Domain Core (depends on infrastructure)
-        echo "📦 Domain Core..."
-        pnpm --filter '@o4o-apps/cms-core' run build
-        pnpm --filter '@o4o/interactive-content-core' run build
-        pnpm --filter '@o4o/education-extension' run build
-        pnpm --filter '@o4o/lms-core' run build
-
-        # Extensions & Features (depends on Domain Core)
-        echo "📦 Extensions & Features..."
-        pnpm --filter '@o4o-apps/digital-signage-core' run build
-        pnpm --filter '@o4o-extensions/organization-forum' run build
-        pnpm --filter '@o4o/market-trial' run build
-
-        echo ""
-        echo "✅ All API-specific packages built successfully!"
+        echo "🔨 Building @o4o/api-server workspace dependency closure..."
+        pnpm --fail-if-no-match --filter '@o4o/api-server^...' run build
+        echo "✅ API dependency closure built successfully"
 
     - name: Build API server (bundled with tsup)
       run: |
@@ -322,6 +310,8 @@ jobs:
       uses: google-github-actions/setup-gcloud@v2
       with:
         project_id: ${{ env.PROJECT_ID }}
+        # runner 에 설치된 gcloud 를 쓴다 (매 job ≈20s SDK 다운로드 생략)
+        skip_install: true
 
     - name: Configure Docker for Artifact Registry
       run: |
@@ -346,24 +336,38 @@ jobs:
         IMAGE_TAG="${{ github.sha }}"
         FULL_IMAGE="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY_NAME }}/${{ env.IMAGE_NAME }}:${IMAGE_TAG}"
         LATEST_IMAGE="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY_NAME }}/${{ env.IMAGE_NAME }}:latest"
+        CACHE_IMAGE="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY_NAME }}/${{ env.IMAGE_NAME }}:buildcache"
 
-        echo "🐳 Building Docker image..."
-        docker build \
-          --no-cache \
+        # WO-O4O-API-DOCKER-BUILD-CACHE-AND-OWNERSHIP-V1
+        #
+        # GitHub-hosted runner 는 매번 빈 Docker 로 시작하므로 과거 `--no-cache` 는 실효가 없었고,
+        # 매 배포가 production npm install(≈32s)과 node_modules 레이어 push 를 반복했다.
+        # 여기서는 Artifact Registry 의 `:buildcache` 를 레이어 캐시로 쓴다.
+        #
+        # stale dist 재발 방지(9ef911fde 의 원 사고)는 그대로 유지된다:
+        #   - Dockerfile 의 `RUN echo ${CACHEBUST}` 가 매 빌드 다른 값이라 그 뒤의 모든
+        #     dist/assets/templates COPY 레이어는 캐시에서 재사용될 수 없다.
+        #   - 캐시가 재사용할 수 있는 것은 CACHEBUST 앞(base image · npm install · node_modules)뿐이며
+        #     그 키는 package.production.json 내용이다.
+        # 캐시 ref 가 없거나 읽기 실패면 buildx 는 경고 후 캐시 없이 빌드한다(배포 실패 아님).
+        echo "🐳 Building and pushing Docker image (buildx + registry cache)..."
+        docker buildx create --name o4o-api-builder --driver docker-container --use
+        docker buildx build \
           --build-arg CACHEBUST=$(date +%s) \
           --platform linux/amd64 \
+          --cache-from "type=registry,ref=${CACHE_IMAGE}" \
+          --cache-to "type=registry,ref=${CACHE_IMAGE},mode=max,image-manifest=true,oci-mediatypes=true" \
           --tag "${FULL_IMAGE}" \
           --tag "${LATEST_IMAGE}" \
           --file Dockerfile \
+          --push \
           .
 
-        # Verify the image contains the bundle
-        echo "🔍 Verifying Docker image contents..."
-        docker run --rm "${FULL_IMAGE}" ls -la /app/dist/
-
-        echo "📤 Pushing to Artifact Registry..."
-        docker push "${FULL_IMAGE}"
-        docker push "${LATEST_IMAGE}"
+        # Verify the pushed image exists in Artifact Registry.
+        # 이미지 내용(dist/main.js · migrate.js · migrations · ownership)은 Dockerfile 의 RUN 검사가
+        # 빌드 단계에서 실패로 강제한다.
+        echo "🔍 Verifying pushed image..."
+        docker buildx imagetools inspect "${FULL_IMAGE}"
 
         echo "✅ Image pushed: ${FULL_IMAGE}"
         echo "IMAGE_TAG=${IMAGE_TAG}" >> $GITHUB_ENV

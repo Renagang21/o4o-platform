@@ -1103,8 +1103,16 @@ test('J17. Phase 0 계약 — workflow 는 selected 여부와 무관하게 full 
   // Phase 0 의 핵심 계약: selector 출력이 jest 인자로 흘러가면 안 된다.
   assert.ok(!/api_jest_specs/.test(ci.replace(/--mode=api-jest/g, '')),
     'Phase 0 에서는 selector 출력을 실제 jest 인자로 쓰지 않는다');
-  assert.ok(ci.includes('run: cd apps/api-server && npx jest --maxWorkers=1\n'),
-    'api-tests 의 full Jest 실행 명령이 인자 없이 그대로 유지되어야 한다');
+  // WO-O4O-CI-API-JEST-SHARD-PARALLELIZATION-V1 — 허용되는 추가 인자는 `--shard` 하나뿐이다.
+  // shard 는 선별이 아니라 분할이므로, matrix 가 1..N 을 빠짐없이 덮는지까지 확인한다.
+  const run = ci.match(/run: cd apps\/api-server && npx jest --maxWorkers=1 --shard=\$\{\{ matrix\.shard \}\}\/(\d+)\n/);
+  assert.ok(run, 'api-tests 의 full Jest 실행 명령은 --maxWorkers=1 과 --shard 외 인자를 갖지 않아야 한다');
+  const total = Number(run[1]);
+  const shards = ci.match(/\n\s+shard: \[([\d,\s]+)\]\n/);
+  assert.ok(shards, 'api-tests matrix.shard 목록이 없다');
+  const list = shards[1].split(',').map((s) => Number(s.trim()));
+  assert.deepEqual(list, Array.from({ length: total }, (_, i) => i + 1),
+    `matrix.shard 는 1..${total} 전부여야 한다 — 빠진 shard 는 그만큼 suite 를 건너뛴다`);
 });
 
 test('J18. 정기 full Jest workflow 가 존재하고 선별하지 않는다 (§17 · §18)', () => {

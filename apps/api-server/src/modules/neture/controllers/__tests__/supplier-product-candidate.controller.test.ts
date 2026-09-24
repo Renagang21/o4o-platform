@@ -29,6 +29,10 @@ const CANDIDATE_ID = '33333333-3333-4333-8333-333333333333';
 function dataSourceWithSupplier(row: { id: string; status: string } | null): DataSource {
   return {
     query: jest.fn(async (sql: string) => {
+      // WO-O4O-SUPPLIER-IDENTITY-RELATIONSHIP-AND-BUSINESS-PROFILE-CANONICALIZATION-V1:
+      //   supplier resolve 가 canonical(organization_members JOIN) → legacy(neture_suppliers.user_id)
+      //   두 질의를 한다. 이 테스트는 legacy 경로를 쓰므로 canonical 은 빈 배열을 돌려준다.
+      if (sql.includes('organization_members')) return [];
       if (sql.includes('neture_suppliers')) return row ? [row] : [];
       throw new Error(`unexpected query: ${sql}`);
     }),

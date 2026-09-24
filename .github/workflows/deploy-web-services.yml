@@ -221,6 +221,13 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
+        with:
+          # WO-O4O-DEPLOY-JOB-BOOTSTRAP-SLIMMING-V1: 배포 빌드와 무관한 운영 데이터 매니페스트
+          # (apps/api-server/src/scripts/data, ≈1.25GB)를 받지 않는다. sparse 지정 시 blob:none 부분 fetch.
+          sparse-checkout: |
+            /*
+            !/apps/api-server/src/scripts/data/
+          sparse-checkout-cone-mode: false
 
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v3
@@ -231,6 +238,8 @@ jobs:
         uses: google-github-actions/setup-gcloud@v2
         with:
           project_id: ${{ env.PROJECT_ID }}
+          # runner 에 설치된 gcloud 를 쓴다 (매 job ≈20s SDK 다운로드 생략)
+          skip_install: true
 
       - name: Configure Docker for GCR
         run: gcloud auth configure-docker gcr.io --quiet
@@ -303,6 +312,13 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
+        with:
+          # WO-O4O-DEPLOY-JOB-BOOTSTRAP-SLIMMING-V1: 배포 빌드와 무관한 운영 데이터 매니페스트
+          # (apps/api-server/src/scripts/data, ≈1.25GB)를 받지 않는다. sparse 지정 시 blob:none 부분 fetch.
+          sparse-checkout: |
+            /*
+            !/apps/api-server/src/scripts/data/
+          sparse-checkout-cone-mode: false
 
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v3
@@ -313,6 +329,8 @@ jobs:
         uses: google-github-actions/setup-gcloud@v2
         with:
           project_id: ${{ env.PROJECT_ID }}
+          # runner 에 설치된 gcloud 를 쓴다 (매 job ≈20s SDK 다운로드 생략)
+          skip_install: true
 
       - name: Configure Docker for GCR
         run: gcloud auth configure-docker gcr.io --quiet
@@ -380,6 +398,13 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
+        with:
+          # WO-O4O-DEPLOY-JOB-BOOTSTRAP-SLIMMING-V1: 배포 빌드와 무관한 운영 데이터 매니페스트
+          # (apps/api-server/src/scripts/data, ≈1.25GB)를 받지 않는다. sparse 지정 시 blob:none 부분 fetch.
+          sparse-checkout: |
+            /*
+            !/apps/api-server/src/scripts/data/
+          sparse-checkout-cone-mode: false
 
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v3
@@ -390,6 +415,8 @@ jobs:
         uses: google-github-actions/setup-gcloud@v2
         with:
           project_id: ${{ env.PROJECT_ID }}
+          # runner 에 설치된 gcloud 를 쓴다 (매 job ≈20s SDK 다운로드 생략)
+          skip_install: true
 
       - name: Configure Docker for GCR
         run: gcloud auth configure-docker gcr.io --quiet
@@ -460,6 +487,13 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
+        with:
+          # WO-O4O-DEPLOY-JOB-BOOTSTRAP-SLIMMING-V1: 배포 빌드와 무관한 운영 데이터 매니페스트
+          # (apps/api-server/src/scripts/data, ≈1.25GB)를 받지 않는다. sparse 지정 시 blob:none 부분 fetch.
+          sparse-checkout: |
+            /*
+            !/apps/api-server/src/scripts/data/
+          sparse-checkout-cone-mode: false
 
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v3
@@ -470,6 +504,8 @@ jobs:
         uses: google-github-actions/setup-gcloud@v2
         with:
           project_id: ${{ env.PROJECT_ID }}
+          # runner 에 설치된 gcloud 를 쓴다 (매 job ≈20s SDK 다운로드 생략)
+          skip_install: true
 
       - name: Configure Docker for GCR
         run: gcloud auth configure-docker gcr.io --quiet
@@ -537,6 +573,13 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
+        with:
+          # WO-O4O-DEPLOY-JOB-BOOTSTRAP-SLIMMING-V1: 배포 빌드와 무관한 운영 데이터 매니페스트
+          # (apps/api-server/src/scripts/data, ≈1.25GB)를 받지 않는다. sparse 지정 시 blob:none 부분 fetch.
+          sparse-checkout: |
+            /*
+            !/apps/api-server/src/scripts/data/
+          sparse-checkout-cone-mode: false
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v3
         with:
@@ -545,6 +588,8 @@ jobs:
         uses: google-github-actions/setup-gcloud@v2
         with:
           project_id: ${{ env.PROJECT_ID }}
+          # runner 에 설치된 gcloud 를 쓴다 (매 job ≈20s SDK 다운로드 생략)
+          skip_install: true
       - name: Configure Docker for GCR
         run: gcloud auth configure-docker gcr.io --quiet
       - name: Build and push Docker image
@@ -597,6 +642,13 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
+        with:
+          # WO-O4O-DEPLOY-JOB-BOOTSTRAP-SLIMMING-V1: 배포 빌드와 무관한 운영 데이터 매니페스트
+          # (apps/api-server/src/scripts/data, ≈1.25GB)를 받지 않는다. sparse 지정 시 blob:none 부분 fetch.
+          sparse-checkout: |
+            /*
+            !/apps/api-server/src/scripts/data/
+          sparse-checkout-cone-mode: false
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v3
         with:
@@ -605,6 +657,8 @@ jobs:
         uses: google-github-actions/setup-gcloud@v2
         with:
           project_id: ${{ env.PROJECT_ID }}
+          # runner 에 설치된 gcloud 를 쓴다 (매 job ≈20s SDK 다운로드 생략)
+          skip_install: true
       - name: Configure Docker for GCR
         run: gcloud auth configure-docker gcr.io --quiet
       - name: Build and push Docker image
@@ -657,6 +711,13 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
+        with:
+          # WO-O4O-DEPLOY-JOB-BOOTSTRAP-SLIMMING-V1: 배포 빌드와 무관한 운영 데이터 매니페스트
+          # (apps/api-server/src/scripts/data, ≈1.25GB)를 받지 않는다. sparse 지정 시 blob:none 부분 fetch.
+          sparse-checkout: |
+            /*
+            !/apps/api-server/src/scripts/data/
+          sparse-checkout-cone-mode: false
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v3
         with:
@@ -665,6 +726,8 @@ jobs:
         uses: google-github-actions/setup-gcloud@v2
         with:
           project_id: ${{ env.PROJECT_ID }}
+          # runner 에 설치된 gcloud 를 쓴다 (매 job ≈20s SDK 다운로드 생략)
+          skip_install: true
       - name: Configure Docker for GCR
         run: gcloud auth configure-docker gcr.io --quiet
       - name: Build and push Docker image
@@ -717,6 +780,13 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
+        with:
+          # WO-O4O-DEPLOY-JOB-BOOTSTRAP-SLIMMING-V1: 배포 빌드와 무관한 운영 데이터 매니페스트
+          # (apps/api-server/src/scripts/data, ≈1.25GB)를 받지 않는다. sparse 지정 시 blob:none 부분 fetch.
+          sparse-checkout: |
+            /*
+            !/apps/api-server/src/scripts/data/
+          sparse-checkout-cone-mode: false
 
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v3
@@ -727,6 +797,8 @@ jobs:
         uses: google-github-actions/setup-gcloud@v2
         with:
           project_id: ${{ env.PROJECT_ID }}
+          # runner 에 설치된 gcloud 를 쓴다 (매 job ≈20s SDK 다운로드 생략)
+          skip_install: true
 
       - name: Configure Docker for GCR
         run: gcloud auth configure-docker gcr.io --quiet
@@ -779,6 +851,13 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
+        with:
+          # WO-O4O-DEPLOY-JOB-BOOTSTRAP-SLIMMING-V1: 배포 빌드와 무관한 운영 데이터 매니페스트
+          # (apps/api-server/src/scripts/data, ≈1.25GB)를 받지 않는다. sparse 지정 시 blob:none 부분 fetch.
+          sparse-checkout: |
+            /*
+            !/apps/api-server/src/scripts/data/
+          sparse-checkout-cone-mode: false
 
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v3
@@ -789,6 +868,8 @@ jobs:
         uses: google-github-actions/setup-gcloud@v2
         with:
           project_id: ${{ env.PROJECT_ID }}
+          # runner 에 설치된 gcloud 를 쓴다 (매 job ≈20s SDK 다운로드 생략)
+          skip_install: true
 
       - name: Configure Docker for GCR
         run: gcloud auth configure-docker gcr.io --quiet

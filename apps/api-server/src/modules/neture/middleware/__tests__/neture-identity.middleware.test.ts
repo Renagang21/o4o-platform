@@ -21,8 +21,19 @@ function mockRes() {
   return res;
 }
 
-function dataSourceWith(rows: any[]): DataSource {
-  return { query: jest.fn().mockResolvedValue(rows) } as unknown as DataSource;
+/**
+ * WO-O4O-SUPPLIER-IDENTITY-RELATIONSHIP-AND-BUSINESS-PROFILE-CANONICALIZATION-V1:
+ *   resolver 가 두 종류 질의를 한다 — canonical(organization_members JOIN) / legacy(neture_suppliers.user_id).
+ *   기존 mock 은 모든 질의에 같은 rows 를 돌려줘 canonical 결과를 오해석했다.
+ *   **응답 계약은 그대로다.** mock 만 질의를 구분하도록 현실화한다.
+ *   기본값은 canonical 0건 → legacy fallback — 즉 기존 테스트의 의미(=user_id 로 찾는다)를 유지한다.
+ */
+function dataSourceWith(rows: any[], canonicalRows: any[] = []): DataSource {
+  return {
+    query: jest.fn(async (sql: string) =>
+      sql.includes('organization_members') ? canonicalRows : rows,
+    ),
+  } as unknown as DataSource;
 }
 
 const USER_REQ = { user: { id: 'u1', role: 'user' } } as any;
