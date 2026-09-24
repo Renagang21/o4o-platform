@@ -85,8 +85,13 @@ RBAC SSOT(Core) 수정 · 전역 role 서열 신설.
 
 ```yaml
 - name: Run tests (auth-context Vitest)
-  run: npx vitest run --config packages/auth-context/vitest.config.mjs
+  run: pnpm exec vitest run --config packages/auth-context/vitest.config.mjs
 ```
+
+형제 5개 step 은 `npx` 를 쓰지만 이 step 은 **`pnpm exec`** 다. SonarCloud 가 **새로 추가된 줄**에만
+적용하는 보안 규칙 때문이다 — `githubactions:S6505`(npx 는 on-demand 설치 + lifecycle script 실행 가능) ·
+`githubactions:S8543`(정확한 버전 고정). `pnpm exec` 는 **이미 설치된 로컬 바이너리만 실행**하므로
+on-demand 설치 경로가 없다. 기존 5개는 이 WO 의 변경 대상이 아니라 그대로 두었다(정렬은 별건 · 보고).
 
 블록 주석의 집계도 실제 상태로 정정했다: **5개 / 17 files / 241 tests → 6개 / 18 files / 248 tests**,
 설명 줄 `auth-context  account display · admin role display · authorization separation (7)` 추가.
@@ -122,7 +127,12 @@ PR #231 1차에서 **SonarCloud 만 fail** 했다(나머지 체크 전부 pass).
 지적이 타당했다: 비교 함수 없는 `sort()` 는 UTF-16 코드 단위 정렬이라 "알파벳 정렬" 의도를
 코드로 드러내지 않는다. 다만 Sonar 가 권하는 `localeCompare` 는 **로케일 의존**이어서 이 값의 목적
 (요청마다 같은 값)과 상충하므로 채택하지 않고, 비교를 명시한 최소값 선택으로 해결했다.
-**gate baseline 완화 0** — 규칙을 끄거나 예외를 추가하지 않았다.
+**2차 (같은 PR, 새 HEAD)**: Reliability 는 해소됐고 이번엔 **`C Security Rating on New Code`** 였다.
+지적 2건 모두 **내가 추가한 CI 한 줄**이었다 — `npx vitest ...` 에 대한 `githubactions:S6505` ·
+`S8543`. 기존 5개 형제 step 도 같은 패턴이지만 Sonar 는 **new code 만** 평가한다.
+`pnpm exec` 로 바꿔 해결했다(설치 경로 자체가 없어 더 안전하다). 기존 5줄은 이 WO 범위가 아니라 유지.
+
+**gate baseline 완화 0** — 두 차례 모두 규칙을 끄거나 예외를 추가하지 않고 코드를 고쳤다.
 
 정적 guard G4 도 새 구현으로 갱신하고, "비교 함수 없는 `sort()` 로 대표값을 만들지 않는다" 를
 **추가 단정**으로 고정했다(재유입 차단).

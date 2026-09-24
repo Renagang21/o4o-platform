@@ -252,8 +252,14 @@ jobs:
     - name: Run tests (auth-react Vitest)
       run: npx vitest run --config packages/auth-react/vitest.config.mjs
 
+    # ⚠️ 위 5개 형제 step 과 달리 `npx` 가 아니라 `pnpm exec` 를 쓴다.
+    #   SonarCloud 가 **새로 추가된 줄**에만 적용하는 보안 규칙 때문이다:
+    #     githubactions:S6505 — npx 는 on-demand 설치 + lifecycle script 실행이 가능하다
+    #     githubactions:S8543 — 정확한 패키지 버전을 고정하라
+    #   `pnpm exec` 는 **이미 설치된 로컬 바이너리만 실행**하므로 on-demand 설치 경로가 없다.
+    #   기존 5개 step 은 이 WO 의 변경 대상이 아니라 그대로 두었다(같은 형태로 정렬하는 것은 별건).
     - name: Run tests (auth-context Vitest)
-      run: npx vitest run --config packages/auth-context/vitest.config.mjs
+      run: pnpm exec vitest run --config packages/auth-context/vitest.config.mjs
 
     - name: Run tests (store-ui-core Vitest)
       run: npx vitest run --config packages/store-ui-core/vitest.config.mjs
