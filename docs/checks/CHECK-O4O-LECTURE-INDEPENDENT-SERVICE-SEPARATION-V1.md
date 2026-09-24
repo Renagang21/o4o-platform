@@ -1000,7 +1000,7 @@ job execution `o4o-api-migrations-fff8n` (02:26:30Z):
 | `GET /api/v1/auth/me` · `POST /api/v1/auth/logout` · `logout-all` · `refresh` | 전부 `401` (`requireAuth`) |
 | `POST /api/v1/auth/handoff` / `handoff/exchange` | `401` / `400` |
 
-`POST /auth/google/bootstrap-admin` 은 `400`(route 생존·검증 동작)이지만 배포된 revision 에 bootstrap env 가 없어 **창은 닫혀 있다**. c6 가 기대한 "404" 는 부정확했다.
+`POST /auth/google/bootstrap-admin` 은 빈 body 로 `400` 을 돌려준다. 이는 `validateDto(GoogleAdminBootstrapRequestDto)` 가 컨트롤러보다 먼저 걸리기 때문이고, 형식이 맞는 body 면 env 플래그 부재로 `GOOGLE_ADMIN_BOOTSTRAP_DISABLED` → **`404`** 다(`google-auth.service.ts:83`). 따라서 **창은 닫혀 있고, c6 의 "404 기대" 는 유효하다** — 초판에서 이를 "부정확"이라고 쓴 것은 내 오판이며 여기서 정정한다(§23-11).
 
 **서빙 번들의 password 입력 잔존 (핵심 검증)**
 
@@ -1020,7 +1020,7 @@ Admin lazy chunk 전수 스캔(74개) 결과 password 입력을 가진 chunk 3�
 
 **계정 보안 화면**
 
-`packages/account-ui` 의 `AccountSecuritySettings` 는 "로그인 방법 / Google 계정" 상태 표시만 렌더하고, `onChangePassword` 를 전달하는 소비처는 **0건**. 비밀번호 변경·초기화 버튼 없음.
+`packages/account-ui` 의 `AccountSecuritySettings` 는 "로그인 방법 / Google 계정" 상태 표시만 렌더한다. 비밀번호 변경·초기화 버튼 없음. `onChangePassword` 는 **소스에 prop 자체가 없다**(주석 언급만) — 초판에서 "dead prop" 이라고 쓴 근거는 git 미추적 로컬 빌드 산출물 `packages/account-ui/dist/components/AccountSecuritySettings.d.ts` 였고, 이는 은퇴 전 계약이 남은 stale dist 다. §23-11 에서 정정한다.
 
 **가입 flow (c6 가 지목한 최대 회귀 위험)**
 
@@ -1040,7 +1040,7 @@ Admin lazy chunk 전수 스캔(74개) 결과 password 입력을 가진 chunk 3�
 
 1. **인증 후 E2E 미실측.** Google 전용 로그인은 스크립트로 세션을 만들 수 없고, §21 이전 users reset 으로 사용 가능한 테스트 계정이 없다. 따라서 **실제 로그인 → 세션 유지 → 가입 신청 제출 → 로그아웃** 은 `NOT VERIFIED` 다. PASS 로 보고하지 않는다. 브라우저 유인 검증은 계정 확보 후 별도로 필요하다.
 2. **잔존 ① (공유 패키지 · 별도 WO):** `packages/auth-utils/src/errorMessages.ts:4` 이 `INVALID_CREDENTIALS → '비밀번호가 올바르지 않습니다.'` 를 여전히 보유한다. `packages/error-handling/src/error-messages.ts` 는 같은 WO 로 이미 제거했으므로 Phase A 정리 누락이다. password 로그인 호출이 사라져 **발생 자체가 없는** 죽은 문구지만, 공유 패키지라 이 범위에서 고치지 않고 분리한다.
-3. **잔존 ② (copy drift):** `securityDescription` 3개 소비처가 여전히 비밀번호 표현을 쓴다 — `web-pharmacy-hub/.../MyProfilePage.tsx:334` "Pharmacy-Hub 로그인 비밀번호", `web-kpa-society/.../MySettingsPage.tsx:175` "KPA 로그인 비밀번호", `web-k-cosmetics/.../MySettingsPage.tsx:46` "정기적인 비밀번호 변경을 권장합니다". 섹션 본문은 Google 전용인데 설명문만 남아 사용자에게 모순으로 보인다. `AccountSecuritySettings` 의 `onChangePassword` prop 도 소비처 0의 dead prop.
+3. **잔존 ② (copy drift):** `securityDescription` 3개 소비처가 여전히 비밀번호 표현을 쓴다 — `web-pharmacy-hub/.../MyProfilePage.tsx:334` "Pharmacy-Hub 로그인 비밀번호", `web-kpa-society/.../MySettingsPage.tsx:175` "KPA 로그인 비밀번호", `web-k-cosmetics/.../MySettingsPage.tsx:46` "정기적인 비밀번호 변경을 권장합니다". 섹션 본문은 Google 전용인데 설명문만 남아 사용자에게 모순으로 보인다. (초판에 함께 적은 `onChangePassword` dead prop 은 오판 — §23-11.)
 4. **잔존 ③ (빌드 위생):** 위 debug chunk 3개가 라우트 미등록 상태로 CDN 에 파일로 남는다. 도달 경로는 없으나 `type="password"` 를 포함한 산출물이므로 chunk 자체를 emit 하지 않는 편이 낫다 (CLAUDE.md §8-3 의 정신).
 5. **SonarCloud** `new_duplicated_lines_density 4.3%` 미해소.
 6. **Lecture 강의 작성 권한 부여 경로 미결정** — ⓐ `joinEnabled=true` + 운영자 승인 vs ⓑ 운영자 직접 부여. 배포와 분리된 사안이며 배포 차단 사유로 쓰지 않는다. membership 자동 생성 금지 유지.
@@ -1075,3 +1075,18 @@ Admin lazy chunk 전수 스캔(74개) 결과 password 입력을 가진 chunk 3�
 - migration job 실행 **0건** (최신은 여전히 `o4o-api-migrations-bzvkt` · 03:04:29Z)
 
 워크플로 run 자체는 `success` 로 표시되므로 **run 상태만 보고 "배포됐다"고 판단하면 안 된다** — 판정은 job 결과(`build-and-deploy`)와 revision/execution 생성 여부로 한다. §20 의 fail-closed 게이트가 의도대로 동작함을 실측으로 확인했다.
+
+### 23-11. 정정 — Phase A 담당 세션(c6)의 반증 수용 (2026-09-24)
+
+§23-7 · §23-8 초판의 두 서술이 틀렸다. c6 의 지적을 검증하고 수용한다.
+
+| 초판 서술 | 정정 | 확인 근거 |
+|---|---|---|
+| "`bootstrap-admin` 400 — c6 의 404 기대는 부정확" | **c6 가 옳다.** 빈 body 400 은 `validateDto` 선행 때문이고, 형식이 맞는 body 는 `GOOGLE_ADMIN_BOOTSTRAP_DISABLED` → `404` | `auth.routes.ts:74-79` 미들웨어 순서 · `google-auth.service.ts:83` 상태코드 매핑 · `:340` throw 지점 |
+| "`AccountSecuritySettings` 의 `onChangePassword` 는 dead prop" | **prop 자체가 소스에 없다.** 내가 본 것은 git 미추적 로컬 `dist/*.d.ts` 의 은퇴 전 계약 | `src/components/AccountSecuritySettings.tsx` 에 식별자 부재(주석만) · `git ls-files` 결과 dist 미추적 |
+
+교훈: **은퇴 여부를 `dist` 산출물로 판정하지 않는다.** 로컬 `dist` 는 재빌드 전까지 은퇴 전 계약을 그대로 들고 있어 허위 잔존을 만든다. 판정은 `src` 와 추적 파일 기준.
+
+c6 는 잔존 ①②(`auth-utils/errorMessages.ts` 의 `INVALID_CREDENTIALS` · `securityDescription` 3소비처)를 브랜치 `wo/legacy-password-auth-retirement` `4f2cb8709` 에서 수정하고 test 기대를 뒤집었다(vitest 5/5 PASS). **main 미반영 · 런타임 동작 변경 없음** — 다음 배포 창에 묶는다. 이 CHECK 의 잔존 ①② 는 "수정됨(브랜치) · main 반영 대기" 로 읽는다.
+
+§23-7 의 `PUT /api/v1/users/password` 판정(401 은 `/users/*` 전체 라우터 인증이라 은퇴 근거가 못 되고, 소스의 은퇴 명시로 판정)은 c6 도 같은 결론이며 그쪽 E2E spec 도 그에 맞게 교체됐다.
