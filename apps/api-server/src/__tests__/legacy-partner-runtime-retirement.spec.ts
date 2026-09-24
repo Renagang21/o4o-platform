@@ -97,9 +97,22 @@ describe('WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT — Legacy Partner runtime = 
     expect(c).not.toMatch(/'neture:partner'|'cosmetics:partner'|'partner':/);
   });
 
-  it('Neture 가입 신청은 supplier 만 허용한다', () => {
-    const c = code('apps/api-server/src/modules/auth/controllers/auth-register.controller.ts');
-    expect(c).toContain("NETURE_ALLOWED_SIGNUP_ROLES = ['supplier']");
+  /**
+   * WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1 (2026-09-24):
+   *   이 검사는 password 회원가입 controller(`auth-register.controller.ts`) 안의
+   *   `NETURE_ALLOWED_SIGNUP_ROLES = ['supplier']` 상수를 읽고 있었다. 그 controller 가 은퇴해
+   *   파일이 없어지면서 ENOENT 로 깨졌다(계약 위반이 아니라 **검사 대상 소멸**).
+   *
+   *   이 spec 의 목적은 "Legacy Partner runtime = 0" 이므로, 같은 보장을 **살아 있는 가입 경로**에서
+   *   다시 고정한다: 가입은 `POST /auth/services/:serviceKey/join`(HandoffController) 하나뿐이고
+   *   그 경로는 partner 개념을 모른다. password 가입 controller 자체가 부재하는 것도 함께 못박는다.
+   */
+  it('password 회원가입 controller 는 부재하고, 살아 있는 가입 경로는 partner 를 모른다', () => {
+    expect(existsSync(resolve(REPO, 'apps/api-server/src/modules/auth/controllers/auth-register.controller.ts'))).toBe(false);
+
+    const join = code('apps/api-server/src/modules/auth/controllers/handoff.controller.ts');
+    expect(join).toContain('joinService');
+    expect(join).not.toMatch(/neture:partner|'partner'|cosmetics:partner/);
   });
 });
 

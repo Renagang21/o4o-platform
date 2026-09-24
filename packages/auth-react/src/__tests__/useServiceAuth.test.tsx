@@ -128,41 +128,30 @@ describe('useServiceAuth — 세션 복구', () => {
   });
 });
 
-describe('useServiceAuth — login 반환 계약', () => {
-  it('성공 시 success:true 와 변환된 user 를 돌려주고 throw 하지 않는다', async () => {
+describe('useServiceAuth — password login 은퇴 계약 (WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1)', () => {
+  /**
+   * 구 계약: `login(email, password)` 의 성공/실패 반환 형태를 고정했다.
+   * password 인증이 은퇴하면서 훅 표면에서 `login` 자체가 사라졌으므로,
+   * **계약을 지우지 않고 뒤집어** 고정한다 — password 경로가 되살아나면 여기서 먼저 깨진다.
+   */
+  it('훅 표면에 password login 이 없다 (부활 감지)', async () => {
     const { hook, client } = setup({ token: null });
     await waitFor(() => expect(hook.result.current.isLoading).toBe(false));
 
-    let result!: Awaited<ReturnType<typeof hook.result.current.login>>;
-    await act(async () => {
-      result = await hook.result.current.login('tester@example.com', 'pw');
-    });
-
-    expect(result.success).toBe(true);
-    expect(result.user?.email).toBe('tester@example.com');
-    expect(result.error).toBeUndefined();
-    expect(hook.result.current.isAuthenticated).toBe(true);
-    // serviceKey 가 반드시 실려 나간다 — backend 가 service_memberships 를 검증하는 근거.
-    expect(client.login).toHaveBeenCalledWith({
-      email: 'tester@example.com',
-      password: 'pw',
-      serviceKey: 'neture',
-    });
+    expect((hook.result.current as Record<string, unknown>).login).toBeUndefined();
+    // authClient 에 login 대역이 있어도 훅은 그것을 호출하지 않는다.
+    expect(client.login).not.toHaveBeenCalled();
   });
 
-  it('응답에 user 가 없으면 success:false 로 떨어진다', async () => {
-    const client = makeClient({ login: vi.fn(async () => ({})) as never });
-    const { hook } = setup({ token: null, client });
+  it('로그인 진입은 Google 경로 둘뿐이다 (loginWithGoogle · signupWithGoogle)', async () => {
+    const { hook } = setup({ token: null });
     await waitFor(() => expect(hook.result.current.isLoading).toBe(false));
 
-    let result!: Awaited<ReturnType<typeof hook.result.current.login>>;
-    await act(async () => {
-      result = await hook.result.current.login('a@b.c', 'pw');
-    });
-
-    expect(result.success).toBe(false);
-    expect(result.error).toBe('로그인 응답이 올바르지 않습니다.');
-    expect(hook.result.current.isAuthenticated).toBe(false);
+    expect(typeof hook.result.current.loginWithGoogle).toBe('function');
+    expect(typeof hook.result.current.signupWithGoogle).toBe('function');
+    for (const retired of ['login', 'register', 'resetPassword', 'changePassword']) {
+      expect((hook.result.current as Record<string, unknown>)[retired]).toBeUndefined();
+    }
   });
 });
 
@@ -263,19 +252,25 @@ describe('useServiceAuth — Google 로그인/가입 (WO-O4O-GOOGLE-ONLY-SIGNUP-
   });
 });
 
-describe('useServiceAuth — 로그인 실패와 오류 코드 전달', () => {
+describe('useServiceAuth — 로그인 실패와 오류 코드 전달 (Google 경로)', () => {
+  /**
+   * 이 계약들은 원래 password `login` 에서 검증했다. password 축이 은퇴한 뒤에도
+   * **살아 있어야 하는 계약**(가입 안내 분기 · rate limit · 네트워크 오류 구분)이므로
+   * 같은 기대를 Google 경로(`loginWithGoogle`)로 옮겨 유지한다.
+   * `INVALID_CREDENTIALS`(비밀번호 오류 문구)는 password 축 소멸로 **발생 자체가 없어져** 제거했다.
+   */
   it('SERVICE_NOT_MEMBER 를 code 로 그대로 올려보낸다 (서비스별 가입 안내 UX 분기 근거)', async () => {
     const client = makeClient({
-      login: vi.fn(async () => {
+      loginWithGoogle: vi.fn(async () => {
         throw { response: { status: 401, data: { code: 'SERVICE_NOT_MEMBER' } } };
-      }) as never,
-    });
+      }),
+    } as never);
     const { hook } = setup({ token: null, client });
     await waitFor(() => expect(hook.result.current.isLoading).toBe(false));
 
-    let result!: Awaited<ReturnType<typeof hook.result.current.login>>;
+    let result!: Awaited<ReturnType<typeof hook.result.current.loginWithGoogle>>;
     await act(async () => {
-      result = await hook.result.current.login('a@b.c', 'pw');
+      result = await hook.result.current.loginWithGoogle('id-token');
     });
 
     expect(result.success).toBe(false);
@@ -285,36 +280,18 @@ describe('useServiceAuth — 로그인 실패와 오류 코드 전달', () => {
     expect(hook.result.current.isAuthenticated).toBe(false);
   });
 
-  it('INVALID_CREDENTIALS 는 비밀번호 오류 문구로 매핑된다', async () => {
-    const client = makeClient({
-      login: vi.fn(async () => {
-        throw { response: { status: 401, data: { code: 'INVALID_CREDENTIALS' } } };
-      }) as never,
-    });
-    const { hook } = setup({ token: null, client });
-    await waitFor(() => expect(hook.result.current.isLoading).toBe(false));
-
-    let result!: Awaited<ReturnType<typeof hook.result.current.login>>;
-    await act(async () => {
-      result = await hook.result.current.login('a@b.c', 'wrong');
-    });
-
-    expect(result.code).toBe('INVALID_CREDENTIALS');
-    expect(result.error).toBe('비밀번호가 올바르지 않습니다.');
-  });
-
   it('code 없이 429 면 rate-limit 문구로 떨어진다 (status 기반 분기 보존)', async () => {
     const client = makeClient({
-      login: vi.fn(async () => {
+      loginWithGoogle: vi.fn(async () => {
         throw { response: { status: 429, data: {} } };
-      }) as never,
-    });
+      }),
+    } as never);
     const { hook } = setup({ token: null, client });
     await waitFor(() => expect(hook.result.current.isLoading).toBe(false));
 
-    let result!: Awaited<ReturnType<typeof hook.result.current.login>>;
+    let result!: Awaited<ReturnType<typeof hook.result.current.loginWithGoogle>>;
     await act(async () => {
-      result = await hook.result.current.login('a@b.c', 'pw');
+      result = await hook.result.current.loginWithGoogle('id-token');
     });
 
     expect(result.status).toBe(429);
@@ -323,16 +300,16 @@ describe('useServiceAuth — 로그인 실패와 오류 코드 전달', () => {
 
   it('네트워크 오류는 서버 연결 실패 문구로 구분된다', async () => {
     const client = makeClient({
-      login: vi.fn(async () => {
+      loginWithGoogle: vi.fn(async () => {
         throw Object.assign(new Error('net'), { code: 'ERR_NETWORK' });
-      }) as never,
-    });
+      }),
+    } as never);
     const { hook } = setup({ token: null, client });
     await waitFor(() => expect(hook.result.current.isLoading).toBe(false));
 
-    let result!: Awaited<ReturnType<typeof hook.result.current.login>>;
+    let result!: Awaited<ReturnType<typeof hook.result.current.loginWithGoogle>>;
     await act(async () => {
-      result = await hook.result.current.login('a@b.c', 'pw');
+      result = await hook.result.current.loginWithGoogle('id-token');
     });
 
     expect(result.success).toBe(false);

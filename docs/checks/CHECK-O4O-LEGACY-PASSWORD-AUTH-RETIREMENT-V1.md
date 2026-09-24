@@ -1,6 +1,6 @@
 # CHECK-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1
 
-> 작성일: 2026-09-23 · 상태: **`READY_FOR_PHASE_A_DEPLOY / AWAITING_CONTROLLED_DEPLOY_WINDOW`** (§7 · 사용자 결정 2026-09-24)
+> 작성일: 2026-09-23 · 상태: **`MERGED_TO_MAIN / AWAITING_CONTROLLED_DEPLOY`** — 배포 대상 SHA 확정 `0af9db301` (§7-2 · 2026-09-24)
 > WO: [`WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1`](../work-orders/WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1.md)
 > 작업 브랜치: `wo/legacy-password-auth-retirement` (origin push 완료 · `main` 무접촉)
 > 작업 worktree: `C:/tmp/o4o-legacy-password-retirement` — 다른 세션의 체크아웃·worktree 는 **불가침**
@@ -195,11 +195,21 @@ backend Phase A 2커밋(`010952f0d` · `c921f90b5`)과 프런트/공통 WIP(`4d7
 
 ### 7-2. 배포 대상 SHA 와 포함 변경 (2026-09-24 실측 · **대상 SHA 정정**)
 
-> **정정(2026-09-24 · Lecture 트랙 세션과 합의):** 배포 대상은 `b8ae53f4e` 가 **아니다**.
-> 대상 = **Phase A 를 main 에 병합한 직후의 최종 main SHA 하나**(merge 커밋)이며, 그 SHA 하나만 양쪽이 기록한다.
-> 병합 전 사전 대조는 끝났다 — 브랜치를 최신 `origin/main`(`fc2a2ca38`)에 동기화한 로컬 merge `195798f6c` 에서
-> **충돌 0** 이고, Lecture Phase 2 `9a3b402b9` · 배포 게이트 `3c7083be5` · `ebc7204ba` 3종이 모두 포함된다.
-> 따라서 병합만 되면 그 merge SHA 가 자동으로 세 marker 를 포함한다. 아래 표의 "현재 서빙" 실측은 유효하다.
+> **배포 대상 SHA 확정(2026-09-24):** **`0af9db3011cb1ed105c198721d5bbb87420cd225`(`0af9db301`)**
+> = `origin/main 21e8ad587` + Phase A 브랜치 tip `d1f6c3d4f` 의 `--no-ff` merge. 병합 실행은 배포 담당 세션이 했고,
+> 본 세션은 **독립 검증만** 했다(본 세션 main push 0 · 병합 미실행).
+>
+> | 검증(본 세션 · 2026-09-24) | 결과 |
+> |---|---|
+> | `origin/main` | `0af9db3011cb1ed105c198721d5bbb87420cd225` |
+> | Phase A tip `d1f6c3d4f` 조상 포함 | **포함** |
+> | marker 3종 `9a3b402b9` · `3c7083be5` · `ebc7204ba` | **전부 포함** |
+> | 병합 규모 | 171 files · +1,911 / −16,120 · **충돌 0** |
+> | §43 미포함 재검증 (`21e8ad587..0af9db301`) | 신규 migration **0건** · 파괴적 SQL(DROP/DELETE/TRUNCATE/dropColumn) **0건** |
+> | Phase A 산출물 main 반영 | 정적 guard spec · Google-only E2E spec · 본 CHECK **전부 존재** |
+> | 은퇴 파일 main 부재 | `auth-login.service.ts` · `passwordResetService.ts` · `passwordPolicy.ts` **전부 없음** |
+>
+> 이전 보고의 `b8ae53f4e` · `fc2a2ca38` 기준은 **폐기**한다(병합 전 main HEAD 였다). 아래 표의 "현재 서빙" 실측은 유효하다.
 
 | 축 | 현재 서빙 revision (이미지 기준) | 그 revision 을 만든 SHA | 대상 SHA |
 |---|---|---|---|
@@ -312,6 +322,52 @@ API 배포의 migration Job 은 `build-and-deploy` 안에 있어 실행되더라
 보류 중 승인을 대신하지 못한다 — 피어 자신도 같은 판단을 확인했다. 사용자 확인 한 줄을 받으면 즉시
 `origin/main` 재동기화 → 병합 → 최종 SHA·CI 보고 순으로 진행한다. 그때까지 main 무접촉 ·
 `DEPLOY_ENABLED` 무접촉 · 트래픽 전환 0.
+
+### 7-7. 병합 후 main CI red — 원인·수정·검증 범위 정정 (2026-09-24)
+
+**사실:** 병합 커밋 `0af9db301` 의 **CI Pipeline 이 failure** 였다(run `35936532173`). 배포는 일어나지 않았다 —
+Deploy 3종은 workflow 결과가 success 여도 `DEPLOY_ENABLED=false` 게이트로 job 전체가 skip 돼 **revision 생성 0**,
+운영은 여전히 pre-Phase-A 코드를 서빙했다(실측: `/auth/login` `/auth/register` `/auth/forgot-password` 모두 **400**
+= route 생존 · neture·kpa-society·pharmacyhub 번들에 `type="password"`·`비밀번호 찾기` 잔존 · admin 만 이미 Google 전용).
+
+**실패 5건 — 전부 Phase A 여파(런타임 결함 0)**
+
+| # | 실패 | 원인 | 수정 |
+|---|---|---|---|
+| 1 | Code Quality · TS6133 | `services/web-pharmacy-hub/src/lib/api/pharmacyHubAccount.ts` 의 미사용 `SERVICE_KEY` import (password 변경 함수 삭제 잔재) | import 1줄 제거 |
+| 2 | `database-migration-ownership-startup-health-final-closure.spec` dangling | `apps/api-server/package.json` 의 `"create-admin": npx tsx src/scripts/create-admin-user.ts` 가 **삭제된 파일** 참조 | script 항목 제거 |
+| 3 | `legacy-partner-runtime-retirement.spec` ENOENT | 삭제된 `auth-register.controller.ts` 를 읽어 `NETURE_ALLOWED_SIGNUP_ROLES` 확인 | 가드를 **살아 있는 경로**로 갱신 — password 회원가입 controller **부재** + `HandoffController.joinService` 가 partner 를 모른다 |
+| 4 | `pharmacy-hub-member-model-contract.spec` ENOENT | `SIGNUP_WRITE_PATHS` 가 같은 삭제 파일 포함 | 살아남은 `PharmacyHubJoinController.ts` 1곳으로 정정(사유 주석) |
+| 5 | `serviceCredentialLifecycle.test` 4케이스 | hard delete 의 credential 동반 폐기를 기대 — Phase A 가 **의도적으로 은퇴**(STEP H1b · orphan 문제는 password 축 문제였고 축이 사라져 재현 조건 없음) | 계약을 **지우지 않고 뒤집어 고정**: "membership 은 삭제 · credential write **0**" · 마지막 케이스를 `password 축 부활 감지` 로 전환 · 헤더에 구 계약→은퇴 사유→Phase B 경위 기록 |
+
+**본 세션 실책(기록):** 브랜치에 **CI 를 한 번도 돌리지 않았고**, 검증을 auth 범위 jest(`src/services/auth` ·
+`src/modules/auth` + 신규 guard)와 프런트 일부 tsc 로 좁혀 놓고 `READY_FOR_PHASE_A_DEPLOY` 를 보고했다.
+**전체 API jest 와 `pnpm run type-check:frontend`(web-pharmacy-hub·web-store 포함)를 돌리지 않은 것이 직접 원인**이다.
+배포 담당 세션도 병합 전에 "브랜치 CI 이력 0" 을 확인하지 않았음을 자기 CHECK 에 남기기로 했다.
+재발 방지 합의: **main 반영 전 PR 로 CI 를 한 번 통과시키는 것을 기본값**으로 한다(이번 수정도 PR 경유).
+
+**추가 실패 1건 (PR #226 CI 에서 드러남 · 같은 계열):** `packages/auth-react/src/__tests__/useServiceAuth.test.tsx` 6 test —
+Phase A 가 훅 표면에서 password `login` 을 은퇴시켰는데 vitest 가 그것을 계속 검사했다(앞선 tsc 실패가 job 을 먼저
+죽여 가려져 있었다). 같은 원칙으로 처리: ① `login` **부재 자체를 계약**으로 고정(부활 감지) + 로그인 진입이
+Google 둘뿐임을 고정 ② 살아 있어야 하는 계약(`SERVICE_NOT_MEMBER` 가입 안내 분기 · 429 rate-limit ·
+네트워크 오류 구분)은 **Google 경로(`loginWithGoogle`)로 이전** ③ `INVALID_CREDENTIALS` 는 password 축 소멸로
+발생 자체가 없어져 제거. → auth-react **64/64 PASS**.
+**본 세션 실책 2차:** auth-react vitest 도 재실행하지 않았다(브랜치 WIP 커밋이 `useServiceAuth.ts` 를 바꿨는데도).
+이후 CI 가 돌리는 **vitest 8종 전부**를 검증 범위에 포함한다(아래).
+
+**수정 후 검증(본 세션 · 2026-09-24):** 문제 4 suite **92/92 PASS** · **전체 API jest `--maxWorkers=1`(heap 6GB) → 347 suites / 5,965 tests PASS · 실패 0**(4 suite·32 test skipped) · `pnpm run type-check:frontend` **OK**(TS6133 해소) · `apps/api-server tsc --noEmit` **0** · **vitest 9종 전부 PASS**(auth-react 64/64 · ui · auth-utils ·
+store-ui-core 8 · operator-core-ui 4 · shared-space-ui 8 · auth-client 2 · web-neture 20 · web-kpa-society 2).
+역할 분담: 본 세션은 **브랜치 push 만**, PR 생성·CI·merge 는 배포 담당 세션(main freeze 보유).
+
+### 7-8. 배포 후 negative 검증 대상 변경 (2026-09-24 실측)
+
+운영 `users` 가 **2 → 1** 로 줄었다. 남은 계정은 관리자(`cfd2a5e7…` · Google 연결 1 · roles 11 · creds 5)이고
+**테스트 계정 `renagang21`(`f707c74e…`)이 삭제**됐다(본 세션 write 0 · 다른 경로에서 삭제). 그 결과:
+
+- 기존 smoke 항목 "테스트 계정으로 admin 접근 차단" 은 **대상 부재**로 실행 불가 → 배포 후 negative 검증을
+  ① 미인증 요청의 401/403 · ② 가짜 Google idToken 의 `401 GOOGLE_ID_TOKEN_INVALID` · ③ 은퇴 endpoint 404 로 대체한다.
+- `service_credentials` 5행 · `password_reset_tokens` 5행은 모두 관리자 소유이며 `users.password` non-null 은 **0**이다
+  (§43 gate 보고에 쓸 최신 count).
 
 ## 8. 검증 (2026-09-23 · 격리 worktree `C:/tmp/o4o-legacy-password-retirement`)
 
