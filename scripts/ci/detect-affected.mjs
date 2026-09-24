@@ -321,8 +321,21 @@ export function classifyDocs(changedFiles) {
  * @param {{status: string, path: string}[]} changedFiles
  * @param {ReturnType<typeof buildWorkspaceGraph>} graph
  */
-export function classify(changedFiles, graph, opts = {}) {
-  const result = {
+/**
+ * 판정 결과의 **정본 형태**. 모든 축을 "영향 없음"(false)으로 둔 빈 verdict 다.
+ *
+ * WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1 Phase B-1 배포 창(2026-09-24)에서
+ * `!read.ok` safe fallback 이 `api_ci_affected` · `api_deploy_affected` 를 **빠뜨려**
+ * 두 값이 `undefined` 가 됐고, `deploy-api.yml` 의 `api_deploy_affected == 'true'` 를
+ * 통과하지 못해 **build-and-deploy 전체가 skip** 됐다(false-negative).
+ * "의심스러우면 전부 실행한다"는 계약과 정반대다.
+ *
+ * 그래서 fallback 을 필드 두 개 추가로 때우지 않고, **형태를 한 곳에서** 만든다.
+ * 새 축이 생겨도 여기에 추가되므로 fallback 이 조용히 그 축을 빼먹을 수 없다
+ * (형태 일치는 `detect-affected.test.mjs` 가 고정한다).
+ */
+export function emptyVerdict() {
+  return {
     admin_affected: false,
     admin_only: false,
     api_affected: false,
@@ -335,6 +348,33 @@ export function classify(changedFiles, graph, opts = {}) {
     fallback: false,
     reasons: [],
   };
+}
+
+/**
+ * 변경 파일을 읽을 수 없을 때의 verdict — **모든 실행 축을 true 로** 연다.
+ * base SHA 없음/all-zero, 없는 commit, shallow history, diff 수집 예외가 여기로 온다.
+ *
+ * `main()` 안 인라인 객체였기 때문에 시험이 닿지 못했다(기존 Case 8 은 `classify([], graph)`
+ * 경로만 봤다). 회귀를 고정할 수 있도록 export 한다.
+ */
+export function safeFallbackVerdict(reason) {
+  return {
+    ...emptyVerdict(),
+    admin_affected: true,
+    admin_only: false,
+    api_affected: true,
+    api_ci_affected: true,
+    api_deploy_affected: true,
+    // 진단 불가 = 전 Web 서비스 배포 (§19).
+    web_deploy: Object.fromEntries(WEB_SERVICES.map((svc) => [svc.key, true])),
+    global_or_unknown: true,
+    fallback: true,
+    reasons: [`safe fallback — ${reason}`],
+  };
+}
+
+export function classify(changedFiles, graph, opts = {}) {
+  const result = emptyVerdict();
 
   if (!Array.isArray(changedFiles) || changedFiles.length === 0) {
     // 변경 0건은 판정 불가로 본다 (예: 빈 push, 알 수 없는 diff).
@@ -1673,18 +1713,7 @@ function main() {
 
   let verdict;
   if (!read.ok) {
-    verdict = {
-      admin_affected: true,
-      admin_only: false,
-      api_affected: true,
-      // 진단 불가 = 전 Web 서비스 배포 (§19).
-      web_deploy: Object.fromEntries(WEB_SERVICES.map((svc) => [svc.key, true])),
-      docs_only: false,
-      docs_fast_eligible: false,
-      global_or_unknown: true,
-      fallback: true,
-      reasons: [`safe fallback — ${read.reason}`],
-    };
+    verdict = safeFallbackVerdict(read.reason);
   } else {
     // WO-O4O-API-CD-RUNTIME-AFFECTED-DEPLOY-GATE-V1 §9 — pnpm-lock.yaml 정밀 판정용 base/head 원문.
     // `--files-from` 재현 모드에는 revision 이 없다 → 공급자 없음 → 안전 fallback(true).
