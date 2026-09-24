@@ -323,6 +323,42 @@ API 배포의 migration Job 은 `build-and-deploy` 안에 있어 실행되더라
 `origin/main` 재동기화 → 병합 → 최종 SHA·CI 보고 순으로 진행한다. 그때까지 main 무접촉 ·
 `DEPLOY_ENABLED` 무접촉 · 트래픽 전환 0.
 
+### 7-7. 병합 후 main CI red — 원인·수정·검증 범위 정정 (2026-09-24)
+
+**사실:** 병합 커밋 `0af9db301` 의 **CI Pipeline 이 failure** 였다(run `35936532173`). 배포는 일어나지 않았다 —
+Deploy 3종은 workflow 결과가 success 여도 `DEPLOY_ENABLED=false` 게이트로 job 전체가 skip 돼 **revision 생성 0**,
+운영은 여전히 pre-Phase-A 코드를 서빙했다(실측: `/auth/login` `/auth/register` `/auth/forgot-password` 모두 **400**
+= route 생존 · neture·kpa-society·pharmacyhub 번들에 `type="password"`·`비밀번호 찾기` 잔존 · admin 만 이미 Google 전용).
+
+**실패 5건 — 전부 Phase A 여파(런타임 결함 0)**
+
+| # | 실패 | 원인 | 수정 |
+|---|---|---|---|
+| 1 | Code Quality · TS6133 | `services/web-pharmacy-hub/src/lib/api/pharmacyHubAccount.ts` 의 미사용 `SERVICE_KEY` import (password 변경 함수 삭제 잔재) | import 1줄 제거 |
+| 2 | `database-migration-ownership-startup-health-final-closure.spec` dangling | `apps/api-server/package.json` 의 `"create-admin": npx tsx src/scripts/create-admin-user.ts` 가 **삭제된 파일** 참조 | script 항목 제거 |
+| 3 | `legacy-partner-runtime-retirement.spec` ENOENT | 삭제된 `auth-register.controller.ts` 를 읽어 `NETURE_ALLOWED_SIGNUP_ROLES` 확인 | 가드를 **살아 있는 경로**로 갱신 — password 회원가입 controller **부재** + `HandoffController.joinService` 가 partner 를 모른다 |
+| 4 | `pharmacy-hub-member-model-contract.spec` ENOENT | `SIGNUP_WRITE_PATHS` 가 같은 삭제 파일 포함 | 살아남은 `PharmacyHubJoinController.ts` 1곳으로 정정(사유 주석) |
+| 5 | `serviceCredentialLifecycle.test` 4케이스 | hard delete 의 credential 동반 폐기를 기대 — Phase A 가 **의도적으로 은퇴**(STEP H1b · orphan 문제는 password 축 문제였고 축이 사라져 재현 조건 없음) | 계약을 **지우지 않고 뒤집어 고정**: "membership 은 삭제 · credential write **0**" · 마지막 케이스를 `password 축 부활 감지` 로 전환 · 헤더에 구 계약→은퇴 사유→Phase B 경위 기록 |
+
+**본 세션 실책(기록):** 브랜치에 **CI 를 한 번도 돌리지 않았고**, 검증을 auth 범위 jest(`src/services/auth` ·
+`src/modules/auth` + 신규 guard)와 프런트 일부 tsc 로 좁혀 놓고 `READY_FOR_PHASE_A_DEPLOY` 를 보고했다.
+**전체 API jest 와 `pnpm run type-check:frontend`(web-pharmacy-hub·web-store 포함)를 돌리지 않은 것이 직접 원인**이다.
+배포 담당 세션도 병합 전에 "브랜치 CI 이력 0" 을 확인하지 않았음을 자기 CHECK 에 남기기로 했다.
+재발 방지 합의: **main 반영 전 PR 로 CI 를 한 번 통과시키는 것을 기본값**으로 한다(이번 수정도 PR 경유).
+
+**수정 후 검증(본 세션 · 2026-09-24):** 문제 4 suite **92/92 PASS** · **전체 API jest `--maxWorkers=1`(heap 6GB) → 347 suites / 5,965 tests PASS · 실패 0**(4 suite·32 test skipped) · `pnpm run type-check:frontend` **OK**(TS6133 해소) · `apps/api-server tsc --noEmit` **0**.
+역할 분담: 본 세션은 **브랜치 push 만**, PR 생성·CI·merge 는 배포 담당 세션(main freeze 보유).
+
+### 7-8. 배포 후 negative 검증 대상 변경 (2026-09-24 실측)
+
+운영 `users` 가 **2 → 1** 로 줄었다. 남은 계정은 관리자(`cfd2a5e7…` · Google 연결 1 · roles 11 · creds 5)이고
+**테스트 계정 `renagang21`(`f707c74e…`)이 삭제**됐다(본 세션 write 0 · 다른 경로에서 삭제). 그 결과:
+
+- 기존 smoke 항목 "테스트 계정으로 admin 접근 차단" 은 **대상 부재**로 실행 불가 → 배포 후 negative 검증을
+  ① 미인증 요청의 401/403 · ② 가짜 Google idToken 의 `401 GOOGLE_ID_TOKEN_INVALID` · ③ 은퇴 endpoint 404 로 대체한다.
+- `service_credentials` 5행 · `password_reset_tokens` 5행은 모두 관리자 소유이며 `users.password` non-null 은 **0**이다
+  (§43 gate 보고에 쓸 최신 count).
+
 ## 8. 검증 (2026-09-23 · 격리 worktree `C:/tmp/o4o-legacy-password-retirement`)
 
 | 항목 | 결과 |

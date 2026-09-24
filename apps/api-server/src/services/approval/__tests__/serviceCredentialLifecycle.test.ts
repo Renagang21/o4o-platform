@@ -3,13 +3,19 @@
  *
  * membership 수명주기와 `service_credentials` 의 관계를 계약으로 고정한다.
  *
+ * ── 계약 변경 (WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1 · 2026-09-24) ──
+ * hard delete 의 `service_credentials` 동반 폐기는 **은퇴**했다(`MembershipApprovalService` STEP H1b).
+ * 원래 orphan 문제("삭제된 membership 뒤에 과거 비밀번호가 살아남는다")는 password 축의 문제였고,
+ * 그 축이 사라져 재현 조건이 없다. 테이블 자체는 Phase B 스키마 정리에서 제거한다.
+ *
+ * 그래서 이 spec 은 **계약을 지우지 않고 뒤집어 고정**한다 — credential write 경로가 되살아나면
+ * (password 축 부활 신호) 이 테스트가 먼저 깨진다.
+ *
  * 고정하는 사실:
- *  1) hard delete — 삭제한 membership 과 **같은 서비스 범위의 credential 만** 폐기한다.
- *     (2026-08-21 이전 구현은 credential 을 남겨 orphan 28행을 만들었다 — 재현 테스트)
- *  2) hard delete (platform admin) — 모든 membership 을 지우므로 모든 credential 을 폐기한다.
- *  3) soft delete / withdraw / suspend — credential 을 **유지**한다.
- *     reactivateMembership 이 같은 비밀번호로 접근을 되살리는 것이 설계된 동작이기 때문이다.
- *  4) 서비스 A 를 hard delete 해도 서비스 B 의 credential 은 남는다 (교차 영향 0).
+ *  1) hard delete — membership 은 삭제하고 `service_credentials` 에는 **어떤 write 도 하지 않는다**.
+ *  2) hard delete (platform admin) — 전 서비스 membership 을 지우되 credential write 0.
+ *  3) soft delete / withdraw / suspend — credential 무접촉(종전과 동일 · 아래 describe 유지).
+ *  4) users row 는 어떤 경우에도 물리 삭제하지 않는다 (Identity 보존).
  *
  * SQL 문자열을 캡처해 검증한다 — DB 접속 없음.
  */
@@ -60,7 +66,7 @@ beforeEach(() => {
 });
 
 describe('service_credentials 수명주기 — hard delete', () => {
-  it('서비스 범위 hard delete 는 같은 serviceKey 의 credential 만 삭제한다', async () => {
+  it('서비스 범위 hard delete 는 membership 만 지우고 credential 에는 write 하지 않는다', async () => {
     await service.deleteMember({
       userId: USER,
       deletedBy: 'admin-1',
@@ -69,14 +75,14 @@ describe('service_credentials 수명주기 — hard delete', () => {
       mode: 'hard',
     });
 
-    const credQ = credentialWrites();
-    expect(credQ).toHaveLength(1);
-    expect(credQ[0].sql).toMatch(/DELETE FROM service_credentials/i);
-    expect(credQ[0].sql).toMatch(/service_key = ANY\(\$2\)/i);
-    expect(credQ[0].params).toEqual([USER, ['kpa-society']]);
+    const smDel = membershipDeletes();
+    expect(smDel).toHaveLength(1);
+    expect(smDel[0].params).toEqual([USER, ['kpa-society']]);
+    // password 축 은퇴 — credential write 경로가 부활하면 여기서 먼저 깨진다.
+    expect(credentialWrites()).toHaveLength(0);
   });
 
-  it('credential 삭제 범위는 membership 삭제 범위와 정확히 같다 (교차 서비스 영향 0)', async () => {
+  it('credential write 0 은 서비스 범위와 무관하게 유지된다 (교차 서비스 영향 0)', async () => {
     await service.deleteMember({
       userId: USER,
       deletedBy: 'admin-1',
@@ -85,14 +91,11 @@ describe('service_credentials 수명주기 — hard delete', () => {
       mode: 'hard',
     });
 
-    const smDel = membershipDeletes();
-    const credDel = credentialWrites();
-    expect(smDel).toHaveLength(1);
-    expect(credDel).toHaveLength(1);
-    expect(credDel[0].params).toEqual(smDel[0].params);
+    expect(membershipDeletes()).toHaveLength(1);
+    expect(credentialWrites()).toHaveLength(0);
   });
 
-  it('platform admin hard delete 는 전 서비스 membership 과 credential 을 함께 폐기한다', async () => {
+  it('platform admin hard delete 는 전 서비스 membership 을 폐기하고 credential 은 무접촉이다', async () => {
     await service.deleteMember({
       userId: USER,
       deletedBy: 'admin-1',
@@ -101,11 +104,9 @@ describe('service_credentials 수명주기 — hard delete', () => {
       mode: 'hard',
     });
 
-    const credQ = credentialWrites();
-    expect(credQ).toHaveLength(1);
-    expect(credQ[0].sql).toMatch(/DELETE FROM service_credentials WHERE user_id = \$1/i);
-    expect(credQ[0].sql).not.toMatch(/service_key/i);
-    expect(credQ[0].params).toEqual([USER]);
+    // 전 서비스 membership 은 지우되 credential 은 건드리지 않는다(은퇴 계약).
+    expect(membershipDeletes().length).toBeGreaterThan(0);
+    expect(credentialWrites()).toHaveLength(0);
   });
 
   it('hard delete 후에도 users row 는 삭제하지 않는다 (Identity 보존)', async () => {
@@ -123,7 +124,7 @@ describe('service_credentials 수명주기 — hard delete', () => {
     ).toBe(true);
   });
 
-  it('orphan 재현 방지 — hard delete 트랜잭션에 credential 삭제가 반드시 포함된다', async () => {
+  it('password 축 부활 감지 — hard delete 트랜잭션에 credential write 가 없다', async () => {
     await service.deleteMember({
       userId: USER,
       deletedBy: 'admin-1',
@@ -132,9 +133,11 @@ describe('service_credentials 수명주기 — hard delete', () => {
       mode: 'hard',
     });
 
-    // membership 을 지우면서 credential 을 남기면 "membership 0 + credential 존재" orphan 이 된다.
+    // 구 계약은 "credential 을 함께 지워야 orphan 이 아니다" 였다. password 축이 은퇴한 뒤에는
+    // credential 자체가 인증에 쓰이지 않으므로 orphan 이 성립하지 않고, 남은 행은 Phase B 에서 테이블과 함께 사라진다.
+    // 여기서 credential write 가 다시 보이면 password 경로가 되살아났다는 뜻이다.
     expect(membershipDeletes().length).toBeGreaterThan(0);
-    expect(credentialWrites().length).toBeGreaterThan(0);
+    expect(credentialWrites()).toHaveLength(0);
   });
 });
 

@@ -14,7 +14,6 @@
  * ⚠️ 사용자 계정(users)과 매장 정보(organizations)는 서로 다른 SSOT 다. 섞지 않는다.
  */
 import { api } from '../apiClient';
-import { SERVICE_KEY } from '../../config/service';
 
 export interface AccountProfile {
   id: string;

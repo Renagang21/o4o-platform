@@ -20,7 +20,6 @@
     "clean": "rimraf dist",
     "clean:all": "pnpm run clean && rimraf node_modules",
     "clean:dist": "rimraf dist",
-    "create-admin": "npx tsx src/scripts/create-admin-user.ts",
     "drug:candidate-import": "npx tsx src/scripts/drug-candidate-import.ts",
     "easy-drug-info:import": "npx tsx src/scripts/easy-drug-info-candidate-import.ts",
     "quasi-drug:candidate-import": "npx tsx src/scripts/quasi-drug-permit-candidate-import.ts",

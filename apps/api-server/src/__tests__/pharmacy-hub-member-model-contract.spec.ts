@@ -25,9 +25,15 @@ import { ROLE_REGISTRY } from '../types/roles.js';
 const SRC = join(__dirname, '..');
 const read = (rel: string) => readFileSync(join(SRC, rel), 'utf-8');
 
-/** 가입 write-path 는 이 둘뿐이다 (공통 Core + 얇은 래퍼) */
+/**
+ * 가입 write-path.
+ *
+ * WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1 (2026-09-24):
+ *   공통 Core 였던 `modules/auth/controllers/auth-register.controller.ts`(password 회원가입)가 은퇴해
+ *   목록에서 제거했다. 계정 생성은 Google 경로(`/auth/google/signup`)가, 서비스 가입은 아래 얇은 래퍼가 담당한다.
+ *   따라서 이 SSOT 를 소비해야 하는 write-path 는 현재 1곳이다.
+ */
 const SIGNUP_WRITE_PATHS = [
-  'modules/auth/controllers/auth-register.controller.ts',
   'controllers/pharmacy-hub/PharmacyHubJoinController.ts',
 ];
 
