@@ -68,12 +68,13 @@ admin · api 배포 job 도 같은 checkout · setup-gcloud 구성.
 | CI run `35953831688` (`6ae232ea1`) | success · 435s |
 | deploy run 3개 (`6ae232ea1`) | 배포 job 전부 **skipped** (`deploy-hold-notice` 실행 = `DEPLOY_ENABLED` 차단 상태, workflow-only 변경) |
 | sparse 패턴 로컬 재현 (별도 clone) | **미실행** — 로컬 clone 명령이 권한 거부됨. 패턴은 actions/checkout 문서의 non-cone 예시 형식 그대로 |
+| sparse 패턴 실 runner 실증 (후속) | **PASS** — 동일 패턴을 CI 에 적용한 run `35956356976` 에서 `fetch --filter=blob:none` · checkout 24,269 = 28,086 − 3,817(`scripts/data`) 로 정확히 해당 디렉터리만 제외됨. 근거: [`CHECK-O4O-CI-SPARSE-CHECKOUT-DATA-EXCLUSION-V1`](CHECK-O4O-CI-SPARSE-CHECKOUT-DATA-EXCLUSION-V1.md) §3-1. 남은 checkout 시간(≈16s)은 나머지 파일 blob fetch 라 §4 의 checkout 기대치는 **≈17~18s** 로 정정 |
 
 ## 4. PENDING — 다음 배포 창에서 기록
 
 | 항목 | 기대 |
 |---|---|
-| Checkout code (web/admin/api) | 22~25s → ≈5~8s |
+| Checkout code (web/admin/api) | 22~25s → ≈17~18s (CI 실증치 기준으로 정정 — 초판 기대 ≈5~8s 는 과대) |
 | Set up Cloud SDK | 17~27s → ≈2~5s |
 | web 배포 job 1개 | ≈110~150s → ≈75~115s |
 | log 에서 `apps/api-server/src/scripts/data` 부재 · 빌드 성공 | 필수 |
