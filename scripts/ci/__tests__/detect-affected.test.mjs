@@ -38,6 +38,8 @@ import path from 'node:path';
 import {
   apiDeployImporters,
   buildWorkspaceGraph,
+  emptyVerdict,
+  safeFallbackVerdict,
   classifyWebDeploy,
   webServiceClosures,
   WEB_SERVICES,
@@ -280,6 +282,69 @@ test('Case 8. base SHA 이상(all-zero · 없는 commit) → safe fallback', () 
   assert.equal(v.admin_affected, true);
   assert.equal(v.api_affected, true);
   assert.equal(v.fallback, true);
+});
+
+// ---------------------------------------------------------------------------
+// Case 8b~8d — `!read.ok` safe fallback 그 자체
+//
+// 2026-09-24 사고: base SHA 가 빈 workflow_dispatch 실행에서 fallback 이
+// `api_ci_affected` · `api_deploy_affected` 를 빠뜨려 두 값이 undefined 가 됐고,
+// `deploy-api.yml` 의 `api_deploy_affected == 'true'` 를 통과하지 못해
+// **build-and-deploy 전체가 skip** 됐다(배포 0건인데 workflow 는 success).
+// 기존 Case 8 은 `classify([], graph)` 경로만 봤기 때문에 이 결함을 못 잡았다 —
+// fallback 이 `main()` 안 인라인 객체였고 시험이 닿지 않았다.
+// 아래 세 케이스가 그 구멍을 막는다.
+// ---------------------------------------------------------------------------
+
+test('Case 8b. base SHA 없음/all-zero → fallback 이 모든 실행 축을 연다', () => {
+  for (const reason of [
+    'base SHA 없음/all-zero (empty)',
+    'base SHA 없음/all-zero (0000000000000000000000000000000000000000)',
+    '변경 파일 수집 예외: fatal: bad object deadbeef',
+  ]) {
+    const v = safeFallbackVerdict(reason);
+    // 판정 불가 = 전부 실행. 하나라도 false/undefined 면 조용한 skip 이 된다.
+    assert.equal(v.api_ci_affected, true, `api_ci_affected (${reason})`);
+    assert.equal(v.api_deploy_affected, true, `api_deploy_affected (${reason})`);
+    assert.equal(v.admin_affected, true);
+    assert.equal(v.api_affected, true);
+    assert.equal(v.global_or_unknown, true);
+    assert.equal(v.fallback, true);
+    assert.equal(v.admin_only, false);
+    assert.equal(v.docs_only, false);
+    assert.equal(v.docs_fast_eligible, false);
+    // 전 Web 서비스 배포
+    for (const svc of WEB_SERVICES) {
+      assert.equal(v.web_deploy[svc.key], true, `web_deploy.${svc.key}`);
+    }
+    assert.match(v.reasons.join(' '), /safe fallback/);
+  }
+});
+
+test('Case 8c. fallback 은 정본 verdict 와 **형태가 같다** (새 축이 조용히 빠지지 않는다)', () => {
+  // 이 단언이 2026-09-24 결함의 재발 방지 핵심이다.
+  // 축이 추가되면 emptyVerdict 에 들어가고, fallback 이 그 키를 빼면 여기서 깨진다.
+  const fallbackKeys = Object.keys(safeFallbackVerdict('reason')).sort();
+  const shapeKeys = Object.keys(emptyVerdict()).sort();
+  assert.deepEqual(fallbackKeys, shapeKeys);
+
+  // 실제 판정 경로의 결과와도 같은 형태여야 한다(workflow output 이름이 여기서 나온다).
+  const classified = Object.keys(classify(parseFileList('M\tapps/api-server/src/main.ts'), graph)).sort();
+  assert.deepEqual(fallbackKeys, classified);
+
+  // undefined 가 하나도 없어야 한다 — workflow 는 문자열 'true' 비교를 한다.
+  for (const [k, val] of Object.entries(safeFallbackVerdict('reason'))) {
+    assert.notEqual(val, undefined, `${k} is undefined`);
+  }
+});
+
+test('Case 8d. fallback 이 만능 참은 아니다 — 정상 판정은 그대로 좁게 유지된다', () => {
+  // fallback 을 열어둔 대가로 정상 경로가 넓어지면 안 된다.
+  const v = classify(parseFileList('M\tapps/api-server/src/__tests__/some.spec.ts'), graph);
+  assert.equal(v.fallback, false);
+  assert.equal(v.global_or_unknown, false);
+  // test 만 바뀐 변경은 production image 를 바꾸지 않는다 (§17 Case B)
+  assert.equal(v.api_deploy_affected, false);
 });
 
 // ---------------------------------------------------------------------------

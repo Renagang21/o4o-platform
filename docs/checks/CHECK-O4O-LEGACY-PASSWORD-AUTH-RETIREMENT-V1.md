@@ -717,6 +717,83 @@ DROP 예정 스키마에 대한 **런타임 의존을 먼저 0 으로** 만든�
 
 배포는 아직 하지 않았다 — 통제된 배포 창은 사용자 확인 후에만 연다.
 
+### 11-5. B-1 1차 배포 창 — **STOP · 배포 0건** (2026-09-24 07:49~08:06Z)
+
+창을 열었으나 **production 변경 0 으로 안전하게 종료**했다. 승인 클릭 전에 CI 결함이 드러났다.
+
+| 실측 | 값 |
+|---|---|
+| ref | tag `deploy/2026-09-24-phase-b1` → `796932575` (CI Pipeline **success** 확인) |
+| Deploy API run `35971802333` | workflow **success** · `Detect API deploy scope` success · **`build-and-deploy` SKIPPED** |
+| Deploy Admin run `35971805634` | `deploy` **waiting**(production 승인 대기) → **취소**(`cancelled`) |
+| `DEPLOY_ENABLED` | 07:49:37Z `true` → **08:06:34Z `false` 복귀** |
+| 서빙 revision | `o4o-core-api-03749-9p8` · `o4o-admin-dashboard-01309-hrs` — **무변화** |
+| 창 구간 신규 revision | **0** (최신 생성은 03:04Z `03750-x8z`, traffic 0% · 어제 창 잔여물) |
+| 창 구간 migration execution | **0** (최신 `o4o-api-migrations-bzvkt` 03:04Z) |
+
+**Admin 만 승인하면 API 없이 Admin 만 배포되는 반쪽 B-1** 이 됐을 상황이었다. 그래서 승인하지 않고 닫았다.
+
+#### 원인 — `detect-affected.mjs` 의 `!read.ok` safe fallback 이 두 축을 빠뜨렸다
+
+run 로그 실측:
+
+```text
+BASE_SHA:
+api_affected    : true
+api_ci_affected : undefined
+api_deploy_affected: undefined
+fallback        : true
+reason          : safe fallback — base SHA 없음/all-zero (empty)
+```
+
+`workflow_dispatch` 는 base SHA 를 주지 않으므로 `readChangedFiles` 가 `ok:false` 를 돌려주고
+`main()` 의 fallback verdict 로 들어간다. 그 객체가 `api_ci_affected` · `api_deploy_affected` 를
+설정하지 않아 두 값이 `undefined` 가 되고, `deploy-api.yml` 의
+
+```yaml
+needs.detect.outputs.api_deploy_affected == 'true'
+```
+
+를 통과하지 못해 **`build-and-deploy` 전체가 skip** 됐다. "의심스러우면 전부 실행한다"는 계약과 **정반대로**
+동작하는 false-negative 다. `DEPLOY_ENABLED` 게이트와 무관하며(게이트는 열려 있었다), 운영 영향은 0 이었다.
+
+**왜 시험이 못 잡았나** — 기존 `Case 8. base SHA 이상 → safe fallback` 은 `classify([], graph)`
+(변경 0건 경로)만 봤고 그 fallback 은 두 필드를 올바르게 `true` 로 설정한다.
+문제의 fallback 은 **`main()` 안 인라인 객체**여서 시험이 닿지 못했다.
+
+#### 수정 (필드 2개 추가가 아니라 구조)
+
+1. `emptyVerdict()` 신설 — 판정 결과의 **정본 형태**(모든 축 false)를 한 곳에서 만든다.
+   `classify()` 의 지역 리터럴도 이것으로 교체했다.
+2. `safeFallbackVerdict(reason)` 을 **export** 로 끌어냈다(인라인 → 시험 가능).
+   `emptyVerdict()` 를 펼친 뒤 `admin_affected` · `api_affected` · **`api_ci_affected`** ·
+   **`api_deploy_affected`** · `global_or_unknown` · `fallback` 을 `true`, 전 Web 서비스를 `true` 로 연다.
+3. `main()` 은 그 함수를 호출한다.
+
+새 축이 생기면 `emptyVerdict()` 에 들어가므로 fallback 이 그 축을 조용히 빠뜨릴 수 없다.
+
+#### 회귀 시험 3건 (`detect-affected.test.mjs` 72 → 75)
+
+- **Case 8b** — base 없음 / all-zero / diff 수집 예외 3가지 입력 모두에서
+  `api_ci_affected` · `api_deploy_affected` · `admin_affected` · `api_affected` ·
+  `global_or_unknown` · `fallback` = `true`, 전 Web 서비스 `true`.
+- **Case 8c** — fallback 의 **키 집합이 `emptyVerdict()` 와, 그리고 실제 판정 결과와 일치**한다.
+  추가로 `undefined` 값이 하나도 없음을 단언한다(workflow 는 문자열 `'true'` 비교를 한다).
+  이 단언이 재발 방지의 핵심이다.
+- **Case 8d** — fallback 을 연 대가로 정상 판정이 넓어지지 않는다:
+  test 파일만 바뀐 변경은 `fallback:false` · `api_deploy_affected:false` 로 남는다.
+
+검증: `node --test` **75 pass / 0 fail** · eslint rc=0 ·
+`BASE_SHA=""` 재현 결과 `api_deploy_affected: true`(수정 전 `undefined`).
+
+#### 절차 교훈 (고정)
+
+**`workflow success` ≠ `deployment success`.** 판정은 run 결론이 아니라
+① 해당 job(`build-and-deploy` / `deploy`)의 실행 여부 ② 새 revision 생성 ③ traffic 이동
+으로 한다. 다음 창에서는 **dispatch 직후 두 deploy job 이 모두 `waiting` 인지 먼저 확인**한 뒤
+사용자에게 승인을 요청한다. 기존 태그 `deploy/2026-09-24-phase-b1` 은 **재사용하지 않고**
+수정 반영된 새 SHA 로 새 태그를 만든다.
+
 ### 11-2. Phase B-2 — 스키마 계약 (B-1 서빙 확인 후에만)
 
 **아직 착수하지 않았다.** B-1 revision 이 production traffic 을 받고 이전 revision traffic 0 을 확인한 뒤에만
