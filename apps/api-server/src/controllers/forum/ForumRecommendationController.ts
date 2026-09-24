@@ -265,7 +265,10 @@ export class ForumRecommendationController {
     // Build user context from authenticated user and query params
     const context: UserContext = {
       userId: user?.id,
-      role: user?.roles?.[0],
+      // WO-O4O-IDENTITY-ACCOUNT-DISPLAY-AND-DOCUMENT-ALIGNMENT-V1:
+      //   `roles[0]` 은 정렬 없는 조회 결과라 어떤 role 이 올지 보장되지 않는다.
+      //   추천 가중치가 요청마다 달라질 수 있으므로 배열 전체를 넘기고 판정은 보유 여부로 한다.
+      roles: user?.roles ?? [],
       organizationId: user?.organizationId || (req.query.organizationId as string),
     };
 

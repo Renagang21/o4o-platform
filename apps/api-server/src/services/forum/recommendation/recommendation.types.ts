@@ -89,8 +89,12 @@ export const DEFAULT_RECENCY_CONFIG: RecencyConfig = {
 export interface UserContext {
   /** User ID */
   userId?: string;
-  /** User role (admin, manager, member, pharmacist, etc.) */
-  role?: string;
+  /**
+   * 보유 role 전체. WO-O4O-IDENTITY-ACCOUNT-DISPLAY-AND-DOCUMENT-ALIGNMENT-V1:
+   *   전에는 `role?: string`(= `roles[0]`) 하나였고 role 조회에 정렬이 없어 요청마다 값이
+   *   달라질 수 있었다 — 추천 가중치가 비결정적으로 흔들렸다. 판정은 보유 여부로 한다.
+   */
+  roles?: string[];
   /** Organization ID */
   organizationId?: string;
   /** Recently viewed post IDs (most recent first) */

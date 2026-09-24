@@ -232,20 +232,34 @@ jobs:
 
     # WO-O4O-PACKAGE-LEVEL-VITEST-CI-ADOPTION-FULL-CENSUS-AND-CLOSURE-V1
     # vitest.config.mjs 만 있고 workflow step 이 없어 로컬 전용이던 package-level 테스트
-    # 5개(17 파일 · 241 tests) 를 blocking 으로 연결한다. 실패 패키지를 즉시 식별하기 위해
+    # 6개(18 파일 · 248 tests) 를 blocking 으로 연결한다. 실패 패키지를 즉시 식별하기 위해
     # 개별 step 으로 둔다. 모든 config 가 passWithNoTests: false 라 무실행 통과가 불가능하다.
     # DB · secret 불필요. 루트에 설치된 vitest/jsdom/@testing-library 를 그대로 쓴다.
     #   auth-utils       비밀번호 정책 · 오류 메시지 (17)
     #   auth-react       라우트 가드 · 역할 선택 · 서비스 인증 (44)
+    #   auth-context     account display · admin role display · authorization separation (7)
     #   store-ui-core    My Store parity 계약 (18)
     #   operator-core-ui community/content-hub 콘솔 · resources lifecycle (53)
     #   shared-space-ui  forum write shell · community nav · guide 계약 (109)
+    #
+    # WO-O4O-IDENTITY-ACCOUNT-DISPLAY-AND-DOCUMENT-ALIGNMENT-V1 (2026-09-24, 사용자 승인):
+    #   auth-context 가 이번 WO 에서 config/test 를 갖게 되어 같은 정책에 한 패키지를 추가한다.
+    #   표시/인가 분리와 role 배열 permutation 불변을 고정하는 계약이라 로컬 전용으로 두지 않는다.
 
     - name: Run tests (auth-utils Vitest)
       run: npx vitest run --config packages/auth-utils/vitest.config.mjs
 
     - name: Run tests (auth-react Vitest)
       run: npx vitest run --config packages/auth-react/vitest.config.mjs
+
+    # ⚠️ 위 5개 형제 step 과 달리 `npx` 가 아니라 `pnpm exec` 를 쓴다.
+    #   SonarCloud 가 **새로 추가된 줄**에만 적용하는 보안 규칙 때문이다:
+    #     githubactions:S6505 — npx 는 on-demand 설치 + lifecycle script 실행이 가능하다
+    #     githubactions:S8543 — 정확한 패키지 버전을 고정하라
+    #   `pnpm exec` 는 **이미 설치된 로컬 바이너리만 실행**하므로 on-demand 설치 경로가 없다.
+    #   기존 5개 step 은 이 WO 의 변경 대상이 아니라 그대로 두었다(같은 형태로 정렬하는 것은 별건).
+    - name: Run tests (auth-context Vitest)
+      run: pnpm exec vitest run --config packages/auth-context/vitest.config.mjs
 
     - name: Run tests (store-ui-core Vitest)
       run: npx vitest run --config packages/store-ui-core/vitest.config.mjs

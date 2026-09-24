@@ -8,6 +8,34 @@
 
 ---
 
+## 0. Identity 축 (2026-09-24 현행)
+
+WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1 로 password 인증이 **런타임·스키마 양쪽에서 제거**됐다.
+현재 identity 관계는 다음 하나다.
+
+```
+users                       = O4O 내부 사용자 identity (PK: users.id)
+
+linked_accounts             = "어떻게 로그인하는가"
+  provider   = 'google'
+  providerId = Google sub        ← 검증된 ID token 의 sub
+        │
+        └──────────────▶ users.id      (조회 키는 (provider, providerId) 하나)
+
+users.email                 = 프로필 · 연락 필드
+                              **인증 키가 아니다.** email 로 users/linked_accounts 를
+                              조회하지 않으며(자동 병합 금지), 로그인 계정 주소와
+                              다를 수 있다.
+```
+
+제거된 것(물리 컬럼·테이블): `users.password` · `users.reset_password_token` ·
+`users.reset_password_expires` · `users."loginAttempts"` · `users."lockedUntil"` ·
+`service_credentials` · `password_reset_tokens`.
+남은 것: `login_attempts` 테이블(FROZEN `auth-core` 소유 · 0행) · `users.email`.
+
+권한 정본은 `role_assignments` 이며 **배열 전체**로 판정한다 — 대표 역할을 배열 순서로 정하지 않는다
+(WO-O4O-IDENTITY-ACCOUNT-DISPLAY-AND-DOCUMENT-ALIGNMENT-V1).
+
 ## 1. User Domain ERD
 
 ```
@@ -16,13 +44,16 @@
 │ PK: id (UUID)                                               │
 │ UNIQUE: email                                               │
 │ Columns: name, firstName, lastName, nickname, phone,        │
-│          status, isActive, domain, password, avatar,         │
+│          status, isActive, domain, avatar,                   │
 │          businessInfo, permissions, isEmailVerified,          │
-│          refreshTokenFamily, lastLoginAt, loginAttempts,     │
+│          refreshTokenFamily, lastLoginAt,                    │
 │          provider, provider_id, onboardingCompleted,         │
 │          tosAcceptedAt, privacyAcceptedAt, marketingAccepted │
 │ DEPRECATED: service_key (→ service_memberships)             │
 │ DROPPED: role, roles (→ role_assignments)                   │
+│ DROPPED: password, reset_password_token,                     │
+│          reset_password_expires, loginAttempts, lockedUntil  │
+│          (2026-09-24 · Google 단일 로그인)                    │
 └─────────────────┬───────────────────────────────────────────┘
                   │
     ┌─────────────┼─────────────────────┐
