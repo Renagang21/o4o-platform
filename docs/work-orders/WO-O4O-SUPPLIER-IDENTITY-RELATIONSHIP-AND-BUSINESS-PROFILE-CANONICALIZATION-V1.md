@@ -1,6 +1,24 @@
 # WO-O4O-SUPPLIER-IDENTITY-RELATIONSHIP-AND-BUSINESS-PROFILE-CANONICALIZATION-V1
 
-> **상태:** READY FOR EXECUTION · HANDOFF ONLY · 구현 WO · 실행 착수는 별도 명시 지시
+> **상태 (2026-09-24 갱신):** `WAITING_FOR_GOOGLE_IDENTITY`
+>
+> | 단계 | 상태 |
+> |---|---|
+> | A~H | **COMPLETE** — `6bfccbd4d`(A~H) · `73d9d2089`(§D 읽기 · §E). 두 커밋 CI 전부 success |
+> | I | **배포 대기** — 저장소 전역 `DEPLOY_ENABLED` fail-closed 게이트로 보류. 코드는 `main` 반영 완료, 운영 반영 0 |
+> | J | **`DEFERRED_PENDING_GOOGLE_IDENTITY`** |
+> | K | **`AUTHENTICATED_SUPPLIER_SMOKE = PENDING`** — J 이후에만 가능 |
+> | L · M | J · K 이후 마감 |
+>
+> **J 를 시작하지 않는 사유 (사용자 판정 2026-09-24):**
+> O4O Google Identity/Login 선행 트랙이 아직 완료되지 않았고, Supplier owner 가 될 실제 Google user 가 `users` 에 생성되지 않았다.
+> 순서는 **Google 로그인 구현 완료 → 실제 공급자 사용자가 직접 Google 로그인 → `users` 생성 → 그 user 를 `organization_members` owner 로 연결 → 호환 `user_id` 설정** 이다.
+> 이메일을 먼저 DB 에 적거나 사용자를 수동 생성해 Google 로그인을 맞추는 순서가 **아니다.**
+>
+> 그때까지 금지: owner 이메일 요청 · `users` 생성 · `organization_members` INSERT · `neture_suppliers.user_id` UPDATE · 테스트 Supplier DELETE.
+> 운영 Supplier 3건(`91169739` · `251adaaf` · `5de3098e`)은 전부 **KEEP AS-IS** — stale 판정·삭제·PENDING 해제 모두 하지 않는다.
+>
+> **원 상태:** READY FOR EXECUTION · HANDOFF ONLY · 구현 WO · 실행 착수는 별도 명시 지시
 > **기준 코드:** 작성 시점 `origin/main` `f8f077e3e`. 실행은 항상 최신 `origin/main` 에서 시작하며 과거 커밋으로 reset/rebase 하지 않는다
 > **선행 조사:** [`IR-O4O-SUPPLIER-IDENTITY-BUSINESS-PROFILE-CANONICALIZATION-V1`](../investigations/IR-O4O-SUPPLIER-IDENTITY-BUSINESS-PROFILE-CANONICALIZATION-V1.md)(`f8f077e3e`) — 재조사하지 않는다
 > **선행 CLOSED(재판단 안 함):** SUPPLIER_PRODUCT_REGISTRATION · SUPPLIER_POST_REGISTRATION_PRODUCT · ORDER_PAYMENT_FULFILLMENT
@@ -189,6 +207,11 @@ Operator 승인/검토 route · Admin 정지/재활성 route 의 guard 불변(�
 backend 중심. 프런트 변경(B 의 context 선택 UI)이 있으면 같은 완료 흐름에서 배포. **운영 데이터 write 0.**
 
 ## J. **STOP → 사용자 승인된 production relationship repair** (정책 12·13·14)
+
+> **상태: `DEFERRED_PENDING_GOOGLE_IDENTITY` (2026-09-24).**
+> Google Identity/Login 선행 트랙이 끝나고 **실제 공급자 사용자가 직접 Google 로그인해 `users` 행이 생성된 뒤**에 재개한다.
+> 아래 ①(owner 이메일 확인)조차 지금은 하지 않는다 — 연결할 계정이 아직 존재하지 않기 때문이다.
+> 운영 Supplier 3건은 KEEP AS-IS.
 
 > **여기서 반드시 멈추고 보고한다.** 사용자가 각 Supplier 의 실제 Google User owner 를 지정하기 전에는 **어떤 UPDATE/INSERT/DELETE 도 하지 않는다.**
 

@@ -923,46 +923,19 @@ export class NetureSupplierService {
       // WO-O4O-NETURE-ORG-READ-PATH-SWITCH-V1: org-primary read for canonical fields
       const org = await this.getOrgData(supplier.organizationId);
 
-      // WO-NETURE-SUPPLIER-BUSINESS-PROFILE-FORM-ALIGNMENT-V1: pre-fill from users.businessInfo
-      let prefilled: Record<string, string | null> = {};
-      // WO-O4O-NETURE-SUPPLIER-PROFILE-P4-FIELDS-ADD-V1:
-      //   users.businessInfo SSOT 인 P4 fields 를 별도 보관 (needsPrefill 과 무관하게 항상 조회).
-      let p4Fields: { businessEntityType: string | null; businessStartDate: string | null } = {
-        businessEntityType: null,
-        businessStartDate: null,
+      // WO-O4O-SUPPLIER-IDENTITY-RELATIONSHIP-AND-BUSINESS-PROFILE-CANONICALIZATION-V1 §D · §G (정책 4·6):
+      //   이 read 는 더 이상 `users.businessInfo` 를 보지 않는다.
+      //   businessInfo 는 **가입 입력 snapshot** 이지 Supplier Business Identity 의 SSOT 가 아니며,
+      //   `supplier.userId` 에 의존하는 read 는 canonical 관계가 organization_members 로 옮겨간 뒤에는
+      //   성립하지 않는다(운영 3건이 user_id NULL — IR §5).
+      //   가입 시점의 businessInfo 는 승인 경로(operator-registration.service)가 이미
+      //   organizations(business_number · address · address_detail) 와 neture_suppliers 로 복사하므로
+      //   여기서 다시 읽을 필요가 없다.
+      //   전용 컬럼이 없는 사업자등록증 기재사항은 organizations.metadata.businessProfile 에 있다(§D).
+      const orgBusinessProfile = (org?.metadata?.businessProfile ?? {}) as {
+        businessEntityType?: string | null;
+        businessStartDate?: string | null;
       };
-      const needsPrefill =
-        supplier.userId &&
-        !org?.business_number &&
-        !supplier.representativeName &&
-        !org?.address;
-
-      if (supplier.userId) {
-        try {
-          const rows = await AppDataSource.query(
-            `SELECT "businessInfo" FROM users WHERE id = $1 LIMIT 1`,
-            [supplier.userId],
-          );
-          const bi = rows[0]?.businessInfo;
-          if (bi && typeof bi === 'object') {
-            p4Fields = {
-              businessEntityType: bi.businessEntityType || null,
-              businessStartDate: bi.businessStartDate || null,
-            };
-            if (needsPrefill) {
-              prefilled = {
-                businessNumber: bi.businessNumber || null,
-                // businessAddress canonical — address legacy fallback
-                businessAddress: bi.businessAddress || [bi.address, bi.address2].filter(Boolean).join(' ') || null,
-                businessType: bi.businessType || null,
-                taxInvoiceEmail: bi.taxInvoiceEmail || null,
-              };
-            }
-          }
-        } catch (prefillError) {
-          logger.warn('[NetureSupplierService] users.businessInfo read failed:', prefillError);
-        }
-      }
 
       // WO-O4O-POSTAL-CODE-ADDRESS-V1
       const addrDetail = org?.address_detail;
@@ -981,20 +954,28 @@ export class NetureSupplierService {
         // deprecated 호환 별칭 (승인 게이트 아님)
         activationReady: missingProfileFields.length === 0,
         missingActivationFields: missingProfileFields,
-        // Business profile — org-primary with supplier + prefill fallback
-        businessNumber: org?.business_number ?? prefilled.businessNumber ?? null,
+        // Business profile — Organization 이 Business Identity SSOT (정책 4)
+        businessNumber: org?.business_number ?? null,
+        // WO-O4O-SUPPLIER-IDENTITY-...-CANONICALIZATION-V1 §D:
+        //   representativeName · businessType 의 **최종 SSOT 는 Organization** 이다.
+        //   이번 WO 는 migration 0 이므로 현재 위치(neture_suppliers)에서 읽고, 이관은 §L 판정 대상이다.
         representativeName: supplier.representativeName || null,
         businessZipCode: addrDetail?.zipCode ?? null,
-        businessAddress: org?.address ?? prefilled.businessAddress ?? null,
+        businessAddress: org?.address ?? null,
         businessAddressDetail: addrDetail?.detailAddress ?? null,
         managerName: supplier.managerName || null,
         managerPhone: supplier.managerPhone || null,
-        businessType: supplier.businessType || prefilled.businessType || null,
-        // WO-O4O-NETURE-SUPPLIER-PROFILE-P4-FIELDS-ADD-V1: users.businessInfo SSOT
-        businessEntityType: p4Fields.businessEntityType,
-        businessStartDate: p4Fields.businessStartDate,
-        taxInvoiceEmail: supplier.taxInvoiceEmail || prefilled.taxInvoiceEmail || null,
-        _prefilled: Object.keys(prefilled).length > 0,
+        businessType: supplier.businessType || null,
+        // WO-O4O-SUPPLIER-IDENTITY-...-CANONICALIZATION-V1 §D:
+        //   이전에는 users.businessInfo 에서 읽었으나 **그 키는 한 번도 저장된 적이 없다**(IR §5 —
+        //   write 가 `if (supplier.userId)` 뒤에서 조용히 skip 됐다).
+        //   canonical 위치는 Organization 이다 — 전용 컬럼 신설 전까지 metadata.businessProfile.
+        businessEntityType: orgBusinessProfile.businessEntityType ?? null,
+        businessStartDate: orgBusinessProfile.businessStartDate ?? null,
+        // §E: taxInvoiceEmail 의 write 소유는 onboarding 이고, read 는 여기서 유지한다.
+        taxInvoiceEmail: supplier.taxInvoiceEmail || null,
+        // deprecated — businessInfo prefill 은퇴 후 항상 false (응답 키만 호환 유지)
+        _prefilled: false,
         // Contact (existing — supplier remains SSOT for contact visibility)
         contactEmail: supplier.contactEmail || null,
         contactPhone: supplier.contactPhone || null,
@@ -1045,9 +1026,14 @@ export class NetureSupplierService {
       managerPhone?: string;
       businessType?: string;
       businessItem?: string;
+      // WO-O4O-SUPPLIER-IDENTITY-...-CANONICALIZATION-V1 §E (정책 7):
+      //   공급자 본인 경로(PATCH /supplier/profile)는 더 이상 이 필드를 보내지 않는다 —
+      //   세금계산서 이메일의 소유는 onboarding(정산 축) 단일이다.
+      //   이 도메인 메서드는 **운영자 기본정보 보완 경로**(PATCH /operator/suppliers/:id ·
+      //   승인 전 필수 정보 화이트리스트)가 함께 쓰므로 §11(Operator 경계 불변)에 따라 인자로는 남긴다.
       taxInvoiceEmail?: string;
       // WO-O4O-NETURE-SUPPLIER-PROFILE-P4-FIELDS-ADD-V1
-      //   사업자등록증 P4 fields — neture_suppliers 컬럼 부재로 인해 users.businessInfo JSONB 저장
+      //   사업자등록증 P4 fields — 저장 위치 부재. §D·§9 로 명시 거부한다.
       businessEntityType?: string;
       businessStartDate?: string;
       // WO-NETURE-B2B-SUPPLIER-ORDER-CONDITION-V1
@@ -1085,6 +1071,8 @@ export class NetureSupplierService {
       if (data.managerPhone !== undefined) supplier.managerPhone = data.managerPhone ? data.managerPhone.replace(/\D/g, '') : null;
       if (data.businessType !== undefined) supplier.businessType = data.businessType || null;
       if (data.businessItem !== undefined) supplier.businessItem = data.businessItem || null;
+      // §E: 공급자 profile route 는 이 값을 더 이상 보내지 않는다(onboarding 단일 소유).
+      //     남은 유일한 호출자는 운영자 기본정보 보완 경로다 — §11 경계 유지.
       if (data.taxInvoiceEmail !== undefined) supplier.taxInvoiceEmail = data.taxInvoiceEmail || null;
 
       // WO-NETURE-B2B-SUPPLIER-ORDER-CONDITION-V1: B2B order condition
@@ -1121,13 +1109,31 @@ export class NetureSupplierService {
         supplier.shippingMountain = data.shippingMountain ? data.shippingMountain.trim() : null;
       }
 
+      // WO-O4O-SUPPLIER-IDENTITY-...-CANONICALIZATION-V1 §D (정책 4·16):
+      //   businessEntityType / businessStartDate 의 canonical 소유자는 **Organization** 이다.
+      //   이전 저장 위치였던 users.businessInfo 는 §G 로 은퇴했고, 두 키는 `if (supplier.userId)`
+      //   가드 때문에 **한 번도 저장된 적이 없다**(IR §5). 전용 컬럼 신설은 §L 판정 대상이므로
+      //   이번에는 **migration 0** 으로 `organizations.metadata.businessProfile` 에 둔다
+      //   (metadata = 조직 확장 필드 jsonb · DDL 0 · 엔티티 변경 0).
+      const businessProfileWriteNeeded =
+        data.businessEntityType !== undefined || data.businessStartDate !== undefined;
+
+      // §9 silent success 금지:
+      //   조직이 연결돼 있지 않으면 canonical 저장 위치 자체가 없다. 조용히 버리지 않고 거부한다.
+      if (businessProfileWriteNeeded && !supplier.organizationId) {
+        throw new SupplierProfileFieldUnsupportedError(
+          (['businessEntityType', 'businessStartDate'] as const).filter((k) => data[k] !== undefined),
+        );
+      }
+
       // WO-O4O-NETURE-SUPPLIER-DEPRECATION-V1 Phase 5-B: org-only write (no supplier reverse-sync)
       const orgWriteNeeded =
         data.businessNumber !== undefined ||
         data.businessAddress !== undefined ||
         data.businessZipCode !== undefined ||
         data.businessAddressDetail !== undefined ||
-        data.contactPhone !== undefined;
+        data.contactPhone !== undefined ||
+        businessProfileWriteNeeded;
       // WO-O4O-SUPPLIER-IDENTITY-RELATIONSHIP-AND-BUSINESS-PROFILE-CANONICALIZATION-V1 §F:
       //   하나의 사용자 action 이 **두 canonical resource**(organizations · neture_suppliers)를
       //   바꿔야 하므로 단일 트랜잭션으로 묶는다. 이전엔 순차 write 였어
@@ -1157,6 +1163,13 @@ export class NetureSupplierService {
               address: data.businessAddress !== undefined ? (data.businessAddress || null) : undefined,
               phone: data.contactPhone !== undefined ? (data.contactPhone ? data.contactPhone.replace(/\D/g, '') : null) : undefined,
               address_detail: addressDetail,
+              // §D: 사업자등록증 기재사항 — Organization 확장 필드에 저장(migration 0)
+              business_profile: businessProfileWriteNeeded
+                ? {
+                    businessEntityType: data.businessEntityType !== undefined ? (data.businessEntityType || null) : undefined,
+                    businessStartDate: data.businessStartDate !== undefined ? (data.businessStartDate || null) : undefined,
+                  }
+                : undefined,
             },
             manager,
           );
@@ -1168,18 +1181,14 @@ export class NetureSupplierService {
       // WO-O4O-NETURE-SUPPLIER-DEPRECATION-V1 Phase 5-B: read org for canonical fields
       const org = await this.getOrgData(supplier.organizationId);
 
-      // WO-O4O-SUPPLIER-IDENTITY-RELATIONSHIP-AND-BUSINESS-PROFILE-CANONICALIZATION-V1 §D · §G · §9:
+      // WO-O4O-SUPPLIER-IDENTITY-RELATIONSHIP-AND-BUSINESS-PROFILE-CANONICALIZATION-V1 §D · §G:
       //   `users.businessInfo` 는 **가입 입력 snapshot** 이며 Supplier profile 의 read/write SSOT 가 아니다.
-      //   이전 구현은 businessEntityType / businessStartDate 를 여기에 썼는데, `if (supplier.userId)`
-      //   가드 때문에 user_id 가 NULL 이면 **오류 없이 사라졌다**(silent data loss · 운영 3건이 그 상태).
-      //   지금은 businessInfo 에 쓰지 않는다. 사업자등록증 기재사항의 최종 SSOT 는 Organization 이고,
-      //   저장 컬럼이 아직 없는 두 필드는 **성공을 가장하지 않고 명시적으로 거부**한다(migration 은 후속 판정).
-      const unsupported = (['businessEntityType', 'businessStartDate'] as const).filter(
-        (k) => data[k] !== undefined,
-      );
-      if (unsupported.length > 0) {
-        throw new SupplierProfileFieldUnsupportedError(unsupported as unknown as string[]);
-      }
+      //   businessEntityType / businessStartDate 는 위 트랜잭션에서 Organization 에 저장했으므로
+      //   여기서 businessInfo 를 읽거나 쓰지 않는다.
+      const savedBusinessProfile = (org?.metadata?.businessProfile ?? {}) as {
+        businessEntityType?: string | null;
+        businessStartDate?: string | null;
+      };
 
       return {
         id: supplier.id,
@@ -1193,10 +1202,10 @@ export class NetureSupplierService {
         managerPhone: supplier.managerPhone || null,
         businessType: supplier.businessType || null,
         businessItem: supplier.businessItem || null,
-        // WO-O4O-NETURE-SUPPLIER-PROFILE-P4-FIELDS-ADD-V1: users.businessInfo JSONB SSOT
-        // WO-O4O-SUPPLIER-IDENTITY-RELATIONSHIP-AND-BUSINESS-PROFILE-CANONICALIZATION-V1: Organization 컬럼 신설 전까지 미지원(저장·반환 안 함)
-        businessEntityType: null,
-        businessStartDate: null,
+        // WO-O4O-SUPPLIER-IDENTITY-...-CANONICALIZATION-V1 §D:
+        //   Organization 이 canonical 소유자 — 전용 컬럼 신설 전까지 metadata.businessProfile.
+        businessEntityType: savedBusinessProfile.businessEntityType ?? null,
+        businessStartDate: savedBusinessProfile.businessStartDate ?? null,
         taxInvoiceEmail: supplier.taxInvoiceEmail || null,
         // Contact
         contactEmail: supplier.contactEmail || null,
@@ -1354,6 +1363,12 @@ export class NetureSupplierService {
       phone?: string | null;
       // WO-O4O-POSTAL-CODE-ADDRESS-V1
       address_detail?: Record<string, string | null> | null;
+      /**
+       * WO-O4O-SUPPLIER-IDENTITY-...-CANONICALIZATION-V1 §D:
+       *   `organizations.metadata.businessProfile` 로 merge 되는 사업자등록증 기재사항.
+       *   값이 `undefined` 인 키는 건드리지 않는다(부분 수정).
+       */
+      business_profile?: Record<string, string | null | undefined>;
     },
     /**
      * WO-O4O-SUPPLIER-IDENTITY-RELATIONSHIP-AND-BUSINESS-PROFILE-CANONICALIZATION-V1 §F:
@@ -1385,6 +1400,29 @@ export class NetureSupplierService {
         params.push(data.address_detail ? JSON.stringify(data.address_detail) : null);
       }
 
+      // WO-O4O-SUPPLIER-IDENTITY-...-CANONICALIZATION-V1 §D:
+      //   metadata 는 조직 공통 확장 필드라 다른 서비스 key 와 같은 컬럼을 공유한다.
+      //   전체 덮어쓰기는 남의 키를 지우므로 **읽어서 merge** 한 뒤 되쓴다(같은 TX 안).
+      //   `||` jsonb 연산자를 쓰지 않는 이유: 이 컬럼의 물리 타입(json vs jsonb)을 코드에서
+      //   단정하지 않기 위해서다 — users."businessInfo" 가 json 이라 jsonb 연산이 깨진 선례가 있다.
+      //   문자열 파라미터 대입은 두 타입 모두에서 동작한다(address_detail 과 동일한 방식).
+      const runner = manager ?? AppDataSource;
+
+      if (data.business_profile !== undefined) {
+        const rows = await runner.query(
+          `SELECT metadata FROM organizations WHERE id = $1 LIMIT 1`,
+          [organizationId],
+        );
+        const currentMeta = (rows[0]?.metadata as Record<string, any>) || {};
+        const currentProfile = (currentMeta.businessProfile as Record<string, unknown>) || {};
+        const nextProfile = { ...currentProfile };
+        for (const [key, value] of Object.entries(data.business_profile)) {
+          if (value !== undefined) nextProfile[key] = value;
+        }
+        setClauses.push(`metadata = $${idx++}`);
+        params.push(JSON.stringify({ ...currentMeta, businessProfile: nextProfile }));
+      }
+
       if (setClauses.length === 0) return;
 
       setClauses.push(`"updatedAt" = NOW()`);
@@ -1393,7 +1431,6 @@ export class NetureSupplierService {
       // WO-O4O-SUPPLIER-IDENTITY-RELATIONSHIP-AND-BUSINESS-PROFILE-CANONICALIZATION-V1 §F · §9:
       //   이전엔 catch 가 실패를 삼켜 warn 만 남기고 **성공처럼 응답**했다.
       //   트랜잭션 안에서 그러면 롤백이 일어나지 않아 부분 반영이 남는다 — 오류를 전파한다.
-      const runner = manager ?? AppDataSource;
       await runner.query(
         `UPDATE organizations SET ${setClauses.join(', ')} WHERE id = $${idx}`,
         params,
@@ -1429,12 +1466,16 @@ export class NetureSupplierService {
     address: string | null;
     phone: string | null;
     address_detail: Record<string, string | null> | null;
+    // WO-O4O-SUPPLIER-IDENTITY-...-CANONICALIZATION-V1 §D:
+    //   조직 확장 필드. Supplier Business Identity 중 전용 컬럼이 없는 항목을
+    //   `metadata.businessProfile` 에 둔다(migration 0 · 전용 컬럼화는 §L 판정).
+    metadata: Record<string, any> | null;
   } | null> {
     if (!organizationId) return null;
 
     try {
       const rows = await AppDataSource.query(
-        `SELECT name, business_number, address, phone, address_detail FROM organizations WHERE id = $1 LIMIT 1`,
+        `SELECT name, business_number, address, phone, address_detail, metadata FROM organizations WHERE id = $1 LIMIT 1`,
         [organizationId],
       );
       return rows[0] || null;

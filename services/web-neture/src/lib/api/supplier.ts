@@ -1334,8 +1334,10 @@ export const supplierProfileApi = {
     managerPhone?: string;
     businessType?: string;
     businessItem?: string;
-    taxInvoiceEmail?: string;
+    // WO-O4O-SUPPLIER-IDENTITY-...-CANONICALIZATION-V1 §E:
+    //   taxInvoiceEmail 은 updateOnboarding 소유 — profile 저장 payload 에서 제거.
     // WO-O4O-NETURE-SUPPLIER-PROFILE-P4-FIELDS-ADD-V1
+    //   (저장 위치는 §D 로 organizations.metadata.businessProfile 로 이동)
     businessEntityType?: string;
     businessStartDate?: string;
     // WO-NETURE-B2B-SUPPLIER-ORDER-CONDITION-V1
