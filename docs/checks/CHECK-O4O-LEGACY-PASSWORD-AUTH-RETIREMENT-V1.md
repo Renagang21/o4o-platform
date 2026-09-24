@@ -439,11 +439,190 @@ store-ui-core 8 · operator-core-ui 4 · shared-space-ui 8 · auth-client 2 · w
 1. ~~Lecture main 처분 확정 대기~~ → **해제(2026-09-24 · §7-1)**
 2. `origin/main` 재동기화 + CI 전체 재검증 — 2026-09-24 `3fbed5f7c` 로 수행(충돌 0 · 아래 §8 재검증 완료)
 3. Phase A merge → deploy(api · web · admin) → old revision traffic 0 확인
-4. production smoke: Google 로그인(관리자 · 테스트 계정) · 서비스 가입 flow 회귀 · password 경로 404/410 확인
-5. **§43 DESTRUCTIVE GATE** — row count · DROP 대상 · rollback 한계 보고 → 사용자 승인 → Phase B(migration · entity · manifest/expected schema)
+4. production smoke: 은퇴 경로 404 · 가입 flow · 번들 password 0 은 **완료(§7-9)**. **Google 실브라우저 smoke 는 `PENDING_USER_ACTION`**(§10-6 · 기준선 확보)
+5. **§43 DESTRUCTIVE GATE** — census · 제거안 · rollback 한계 **보고 완료(§10 · 2026-09-24 · production write 0)** → **사용자 승인 대기** → Phase B(코드 선행 → incremental migration → 격리 PG15 fingerprint → expected-schema-states)
 6. Smoke A/B(operator invitation WO) 인계 항목 정리
 
 ---
+
+## 10. §43 DESTRUCTIVE GATE — read-only census · Phase B 제거안 (2026-09-24)
+
+**PRODUCTION WRITE = 0.** 이 절의 모든 수치는 Cloud SQL Auth Proxy v2 를 통한 **SELECT 전용** 조회다.
+DELETE · DROP · migration 실행은 사용자 승인 전까지 하지 않았고, 이 절은 승인 판단 자료다.
+
+### 10-1. 데이터 census (production · 2026-09-24 03:57Z~04:06Z · Cloud SQL Auth Proxy v2 · SELECT 전용)
+
+| 대상 | 실측 |
+|---|---|
+| `users` | total **1** · `password` non-null **0** · `reset_password_token` non-null **0** · `reset_password_expires` non-null **0** · `loginAttempts` ≠0 **0** · `lockedUntil` non-null **0** |
+| `service_credentials` | **5행 / distinct user 1** · service_key 각 1행(`k-cosmetics` · `kpa-branch` · `kpa-society` · `neture` · `pharmacy-hub`) · orphan(소유자 없는 행) **0** · 최신 갱신 2026-09-17 |
+| `password_reset_tokens` | **5행** · used 4 / unused 1 · **expired 5 / unexpired 0** · distinct user 1 · service_key `kpa-society` 3 · `neture` 1 · NULL 1 · 최신 2026-09-21 |
+| `login_attempts` (테이블) | **존재 · 0행** (컬럼: id · email · ipAddress · userAgent · success · failureReason · createdAt) |
+| `linked_accounts` | `google` **1행 / 1 user** (verified · primary) · **legacy/기타 provider 0행** |
+| `refresh_tokens` · `email_verification_tokens` · `handoff_tokens` | 각 **0행** |
+| 관리자 identity | `cfd2a5e7…` · status `active` · `isActive` true · role_assignments **11**(전부 `is_active` · 만료 없음 · `platform:super_admin` 포함) · service_memberships **5**(전부 `active`) |
+| 의존 객체 | password 축을 참조하는 **view 0** · `users` 의 password/lockout 컬럼 위 **index 0** · `users` **trigger 0** · FK 는 두 테이블 → `users` 방향 **2건**(자식 쪽이므로 다른 의존자 없음) |
+| 적용된 migration | `typeorm_migrations` 최신 = `CreateHospitalDeviceTables1790125390245` (id 689) = manifest 의 incremental #4 |
+
+**census 로 새로 드러난 것 3건** (원래 후보 목록에 없었다)
+
+1. `users.reset_password_token` · `users.reset_password_expires` **컬럼이 실재**한다 — 후보에 빠져 있었다.
+2. `google-auth.service.ts:419-427` 이 Google 로그인 성공마다 `loginAttempts: 0` · `lockedUntil: null` 을
+   **UPDATE 한다.** 이 두 컬럼을 먼저 드롭하면 **Google 로그인이 깨진다** → 코드 선행, 컬럼 후행.
+3. `packages/auth-core/src/manifest.ts` 가 `login_attempts` 를 **소유 테이블로 선언한 FROZEN Core**(§3·F10)이고
+   `maxLoginAttempts` · `lockoutDurationMinutes` 정책 기본값도 여기 있다 → Core 변경은 **별도 명시 승인**.
+
+### 10-2. 코드 census (git-tracked 런타임 소스 4,720개 · comment 제거 후 판정)
+
+판정 대상에서 제외: `dist` · `build` · `node_modules` · `__tests__` · `*.spec/*.test` · `*.d.ts` ·
+`src/database/migrations/`(frozen historical) · `e2e/` · `docs/`.
+**dist 를 근거로 판정하지 않는다** — 동료 세션이 추적되지 않은 stale `dist/*.d.ts` 로 은퇴를 오판한 사례(2026-09-24)가 있다.
+
+| 축 | 결과 | 남은 hit 의 정체 |
+|---|---|---|
+| `users.password` runtime **reader** | **0** | `media-catalog.service.ts:63` 의 `u.password` 는 URL 객체 파싱(오탐) |
+| `users.password` runtime **writer** | **1 (NULL 기록만)** | `google-auth.service.ts:284` 의 `password: null` — 신규 user 생성 시 명시적 NULL. 컬럼 드롭 시 이 줄도 제거 |
+| `service_credentials` reader/writer | **0 / 0** | entity 선언 · `entities.ts` 등록 · canonical baseline SQL 뿐. **repository 소비처 0** |
+| password reset runtime consumer | **0** | entity · baseline · **sanitizer 3곳**(`admin-user-sanitizer` · `lms/sanitize-user` · `ForumControllerBase`)의 응답 차단 블랙리스트 |
+| bcrypt / hashPassword / comparePassword | **0** | import 4건은 전부 **frozen historical migration** 파일 |
+| password login frontend surface | **0** | — |
+| forgot/reset frontend surface | **0 (살아 있는 화면)** | 5서비스 `App.tsx` 의 `Navigate to /login` **리다이렉트 스텁**뿐 |
+| password 변경 admin/operator surface | **0** | `changePassword` · `currentPassword` · `ChangePasswordModal` 전부 0 |
+| 남은 `type="password"` | **2 (인증 아님)** | k-cosmetics 매장 채널 **PIN** · Neture **SMTP 앱 비밀번호**. 정적 guard allowlist 항목 |
+
+### 10-3. Phase B 제거안 — 항목별 판정
+
+| 대상 | 판정 | 근거 · 제약 |
+|---|---|---|
+| `service_credentials` 테이블 | **DROP** | runtime 소비 0 · 5행 전부 관리자 1인 소유 · orphan 0 · 인증 경로에서 읽히지 않음 |
+| `password_reset_tokens` 테이블 | **DROP** | runtime 소비 0 · 5행 전부 **expired** · 재설정 경로 은퇴 |
+| `users.password` 컬럼 | **DROP** | non-null 0 · reader 0 · writer 는 NULL 기록 1줄뿐(같은 커밋에서 제거) |
+| `users.reset_password_token` · `reset_password_expires` | **DROP** | non-null 0 · reader 0 (census 로 추가 발견) |
+| `users.loginAttempts` · `users.lockedUntil` | **DROP (순서 제약)** | 값은 default 뿐이지만 `google-auth.service.ts` 가 매 로그인 **UPDATE** 한다 → **코드에서 먼저 제거한 뒤** 컬럼 드롭. 같은 배포에 묶되 migration 은 코드 뒤 |
+| `login_attempts` 테이블 | **KEEP_WITH_REASON (이번 범위 밖)** | 0행이지만 **FROZEN `auth-core` manifest 소유 테이블**(§3·F10). Core 변경 승인이 선행돼야 한다 — 이번 WO 에 넣으면 Core Freeze 위반 |
+| `ServiceCredential` · `PasswordResetToken` entity + `entities.ts` 등록 | **DROP** | repository 소비처 0 · `synchronize: false` 라 런타임 스키마 검증 없음 |
+| `LoginAttempt` entity | **KEEP_WITH_REASON** | 위 테이블 판정과 동일(Core) |
+| password 전용 service/repository | **ALREADY_ABSENT** | Phase A 에서 제거(`auth-login.service` · `passwordResetService` · `password-policy` · `admin-password-reset-scope`) |
+| password 전용 DTO/type | **ALREADY_ABSENT** | `PasswordResetEmailData` 등 은퇴 주석만 남음 |
+| password 전용 mail template | **DROP (dead asset)** | `apps/api-server/src/templates/email/password-reset.html` · `packages/mail-core/templates/email/password-reset.html` — **소비처 0** (sender·template service 모두 은퇴) |
+| `mail.service.ts` 의 `password_changed` · `suspicious_login_attempts` 알림 타입 | **KEEP_WITH_REASON** | `sendSecurityAlert` 의 열거 값. 발송 경로는 없지만 제거는 mail-core 공용 계약 변경 → 별도 WO |
+| `bcrypt` · `bcryptjs` · `@types/bcryptjs` dependency | **KEEP_WITH_REASON** | import 하는 4개 파일이 **frozen historical migration**(`historical-migrations.manifest.json` 544 entries, 집합 축소는 `--baseline-rollover` 로만 허용). dep 제거는 baseline rollover WO 소관 |
+| `users.email` optional 화 | **범위 밖** | 사용자 지시로 이번 WO 제외 |
+| role_assignments · service_memberships · `linked_accounts.google` · consent · business data | **불변** | 건드리지 않는다 |
+| `SecurityAuditService` 의 `failedLoginAttempts` | **KEEP_WITH_REASON** | in-memory rate limit — DB 컬럼과 무관 |
+| `canonical-schema-baseline.ts` | **편집하지 않는다** | 신규 DB 는 baseline 생성 → incremental drop 순으로 같은 최종 상태에 도달한다. 판정 기준은 `EXPECTED_SCHEMA_STATES[k]` |
+
+### 10-4. 실행 레시피 (승인 시 · 아직 미실행)
+
+1. **코드 먼저** — `google-auth.service.ts` 의 `loginAttempts`/`lockedUntil`/`password: null` write 제거 ·
+   entity 2종 + `entities.ts` 등록 제거 · dead mail template 2개 삭제 · sanitizer 는 **유지**(과거 필드명 방어).
+2. **incremental migration 1건** — `src/database/migrations/<epoch13>-<PascalName>.ts`,
+   `epoch13 > 1790125390245`, class 명 = `name` 값. manifest 에 import + append.
+3. **격리 PostgreSQL 15** 에서 baseline + incremental 전체를 순서대로 적용해 POST_MIGRATION fingerprint 획득 →
+   `expected-schema-states.ts` 에 append (append-only · **live DB fingerprint 복사 금지**).
+4. 같은 커밋에 `check-migration-contract.mjs` C22 통과 · ledger/agent spec 동반 갱신 · 정적 guard 갱신.
+5. PR → CI 전체 통과 → 통제된 배포 창(사용자 승인 + `DEPLOY_ENABLED` + environment production).
+
+### 10-5. Rollback 한계 (승인 전 반드시 읽을 항목)
+
+- `DROP TABLE` · `DROP COLUMN` 은 **되돌려도 데이터가 돌아오지 않는다.** 구조는 down migration 으로 복원 가능하지만
+  `service_credentials` 5행의 **password hash 와 `password_reset_tokens` 5행은 영구 소실**이다.
+- 그 소실이 의미하는 것: **비밀번호 로그인으로의 복귀 경로가 닫힌다.** 되살리려면 각 사용자가 Google 로 로그인한 뒤
+  비밀번호를 **새로 설정**해야 한다(현재 계정은 1개이고 그 계정은 이미 `password` NULL 이므로 실질 손실은 0).
+- 운영 DB 백업 시점 이전으로의 point-in-time 복구는 **다른 테이블까지 함께 되돌린다** — 이번 변경만 선택적으로
+  되돌리는 수단이 아니다.
+- `login_attempts` 는 이번에 남기므로 lockout 관련 되돌림 여지는 유지된다.
+
+### 10-6. Google production smoke — **PENDING_USER_ACTION**
+
+브라우저 조작(계정 선택 · Google 인증)은 이 세션이 수행할 수 없다(브라우저 자동화 도구 없음 · Google 이 자동 브라우저 로그인을 차단).
+사용자에게 정확한 클릭 순서를 요청했고, **identity 증거 기준선**을 미리 확보해 두었다.
+
+| 기준선 (2026-09-24 03:59Z 조회) | 값 |
+|---|---|
+| `users.lastLoginAt` | **2026-09-22 12:59:20.598** |
+| `linked_accounts.lastUsedAt` (google) | **2026-09-22 12:59:20.605** |
+| google `providerId`(sub) | `117391***` (마스킹) |
+| `refresh_tokens` | 0행 |
+
+로그인 직후 이 두 타임스탬프가 **2026-09-24 로 전진**하면 "그 화면이 실제로 그 `users.id` · 그 Google `sub` 로 인증됐다" 가 실증된다.
+전진하지 않으면 화면 진입 여부와 무관하게 **FAIL** 로 기록한다. 사전 상태(제 조회): `admin.neture.co.kr` 200 ·
+`/auth/google/config` `enabled:true` · `POST /auth/login` **404**.
+
+Invitation Smoke B / Assignment Smoke A 는 이 WO 와 별개로 계속 `PENDING_USER_ACTION` 이다.
+
+### 10-7. GATE 보고 (사용자 승인 대기)
+
+```text
+PASSWORD RETIREMENT DESTRUCTIVE GATE
+
+Google production smoke = PENDING_USER_ACTION  (브라우저 조작 필요 · 기준선 확보 · PASS 로 쓰지 않음)
+
+users:
+  total = 1
+  password_non_null = 0
+  reset_password_token_non_null = 0
+  loginAttempts_nonzero = 0
+  lockedUntil_non_null = 0
+
+service_credentials:
+  rows = 5
+  users = 1
+  by_service = k-cosmetics 1 / kpa-branch 1 / kpa-society 1 / neture 1 / pharmacy-hub 1
+  orphan = 0
+
+password_reset_tokens:
+  total = 5
+  used = 4
+  unused = 1
+  expired = 5   unexpired = 0
+
+lockout/password auxiliary:
+  users.loginAttempts / users.lockedUntil  = 컬럼 존재 · non-default 0
+  users.reset_password_token / reset_password_expires = 컬럼 존재 · non-null 0  (census 로 추가 발견)
+  login_attempts table = 존재 · 0 rows  (FROZEN auth-core 소유 → 이번 범위 밖)
+
+linked_accounts:
+  google = 1 (verified · primary)
+  legacy = 0
+
+Runtime readers = 0/0
+Runtime writers = 1/1  (google-auth.service.ts 의 password:null · loginAttempts/lockedUntil reset — 코드 선행 제거 대상)
+Frontend password surfaces = 0/0  (남은 type="password" 2곳은 매장 PIN · SMTP 앱 비밀번호)
+
+Planned DROP/DELETE:
+  DROP TABLE service_credentials            (5 rows 소실)
+  DROP TABLE password_reset_tokens          (5 rows 소실 · 전부 expired)
+  ALTER TABLE users DROP COLUMN password
+  ALTER TABLE users DROP COLUMN reset_password_token
+  ALTER TABLE users DROP COLUMN reset_password_expires
+  ALTER TABLE users DROP COLUMN "loginAttempts"     (코드 선행 제거 필요)
+  ALTER TABLE users DROP COLUMN "lockedUntil"       (코드 선행 제거 필요)
+  DELETE 단독 실행은 하지 않는다 — DROP 에 포함된다
+
+Preserved:
+  login_attempts table            (FROZEN auth-core manifest 소유 · 별도 Core 승인 필요)
+  linked_accounts (google)        · refresh_tokens · email_verification_tokens · handoff_tokens
+  sanitizer 블랙리스트 3곳        (과거 필드명 방어 · 제거하면 재유입 시 무방비)
+  bcrypt/bcryptjs dependency      (frozen historical migration 4파일이 import)
+  users.email                     (optional 화는 범위 밖)
+  canonical-schema-baseline.ts    (편집하지 않음 · incremental 로만 변경)
+
+Expected unchanged:
+  admin users.id           = cfd2a5e7… (변경·삭제 없음)
+  platform:super_admin     = 유지
+  role_assignments         = 11
+  service_memberships      = 5 (전부 active)
+  linked_accounts.google   = 1
+
+Rollback limitation:
+  DROP 은 구조만 복원 가능 · 데이터는 영구 소실(§10-5)
+  password 로그인 복귀 경로가 닫힌다 (현 계정은 이미 password NULL → 실질 손실 0)
+  point-in-time 복구는 다른 테이블까지 함께 되돌린다 — 선택적 복구 수단이 아니다
+
+PRODUCTION WRITE = 0
+PHASE B EXECUTION = WAITING_FOR_USER_APPROVAL
+```
 
 ## 판정
 
@@ -451,8 +630,9 @@ store-ui-core 8 · operator-core-ui 4 · shared-space-ui 8 · auth-client 2 · w
 
 Phase A 는 **운영 반영까지 끝났다**(`7a44a97bc` · 2026-09-24 · §7-9). 런타임에서 password reader/writer/UI 0 ·
 은퇴 endpoint 404 · 서빙 번들 password 입력 0 을 실측했고, 스키마는 **의도대로 무변화**다(migration 0).
-남은 것: ① 인증 후 E2E 미검증(테스트 계정 부재) ② **Phase B/§43 destructive gate** — row count · DROP 대상 ·
-rollback 한계를 보고한 뒤 **사용자 승인**을 받아야 착수한다(현재 `service_credentials` 5 · `password_reset_tokens` 5 ·
-`users.password` non-null 0 · `login_attempts` 0).
+남은 것: ① **Google 실브라우저 smoke** — 브라우저 조작이 필요해 `PENDING_USER_ACTION`, identity 증거 기준선은 확보(§10-6)
+② **Phase B/§43** — census · 항목별 제거안 · 실행 레시피 · rollback 한계를 **§10 에 보고 완료(production write 0)**,
+이제 **사용자 승인 대기**다. 승인 전에는 DELETE · DROP · production migration 을 실행하지 않는다.
+`login_attempts` 는 FROZEN `auth-core` 소유라 이번 범위에서 **제외**했다(Core 승인 선행).
 
 문서 정합: 발견 2건(MYPAGE 매트릭스 password 2행 — 정정 완료 / USER-DOMAIN-SSOT 다이어그램 password 표기 — Phase B 로 이월) / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 1건(F10 Core Freeze 본문 갱신 여부 판단)
