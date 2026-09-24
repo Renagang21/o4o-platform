@@ -1,9 +1,14 @@
 /**
  * SupplierProfilePage - 사업자 프로필 관리
  *
- * 섹션 A: 사업자 기본정보 (상호명, 대표자명, 사업자등록번호, 업종, 주소, 세금계산서 이메일)
- * 섹션 B: 담당자 정보 (담당자명, 담당자 전화번호)
- * 섹션 C: 외부 공개 연락처 (이메일, 전화, 웹사이트, 카카오톡 + visibility)
+ * 섹션 A  : 사업자 기본정보 (상호명, 대표자명, 사업자등록번호, 업종, 주소)
+ * 섹션 A-2: 공급자 서류 및 정산 정보 (세금계산서 이메일, 정산 계좌·담당자, 제출 문서)
+ * 섹션 B  : 담당자 정보 (담당자명, 담당자 전화번호)
+ * 섹션 C  : 외부 공개 연락처 (이메일, 전화, 웹사이트, 카카오톡 + visibility)
+ *
+ * 저장 버튼은 섹션별로 다른 API 를 호출한다. **입력은 그것을 저장하는 버튼과 같은 섹션에 둔다** —
+ * 어긋나면 저장을 눌러도 값이 기록되지 않는 조용한 성공이 생긴다
+ * (WO-O4O-SUPPLIER-IDENTITY-RELATIONSHIP-AND-BUSINESS-PROFILE-CANONICALIZATION-V1 §E).
  *
  * WO-O4O-SUPPLIER-PUBLIC-CONTACT-POLICY-V1
  * WO-NETURE-SUPPLIER-BUSINESS-PROFILE-FORM-ALIGNMENT-V1
@@ -583,20 +588,10 @@ export default function SupplierProfilePage() {
             />
           </div>
 
-          {/* 세금계산서 이메일 */}
-          <div>
-            <label className="flex items-center gap-1.5 text-sm font-medium text-gray-700 mb-1.5">
-              <Mail className="w-3.5 h-3.5 text-gray-400" />
-              세금계산서 이메일 <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="email"
-              value={taxInvoiceEmail}
-              onChange={(e) => setTaxInvoiceEmail(e.target.value)}
-              placeholder="tax@company.com"
-              className={inputClass}
-            />
-          </div>
+          {/* WO-O4O-SUPPLIER-IDENTITY-RELATIONSHIP-AND-BUSINESS-PROFILE-CANONICALIZATION-V1 §E:
+              세금계산서 이메일 입력은 **정산 정보 저장 버튼이 있는 Section A-2 로 옮겼다.**
+              쓰기 소유가 onboarding 단독이 된 뒤에도 입력이 여기 남아 있으면, 이 섹션의
+              저장 버튼을 눌렀을 때 "저장됨" 만 뜨고 값은 어디에도 기록되지 않는다(조용한 성공). */}
         </div>
       </div>
 
@@ -632,6 +627,22 @@ export default function SupplierProfilePage() {
         )}
 
         <div className="space-y-5">
+          {/* 세금계산서 이메일 — WO-O4O-SUPPLIER-IDENTITY-...-CANONICALIZATION-V1 §E:
+              쓰기 소유 = PATCH /supplier/onboarding. 이 섹션의 "정산 정보 저장" 이 저장한다. */}
+          <div>
+            <label className="flex items-center gap-1.5 text-sm font-medium text-gray-700 mb-1.5">
+              <Mail className="w-3.5 h-3.5 text-gray-400" />
+              세금계산서 이메일 <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="email"
+              value={taxInvoiceEmail}
+              onChange={(e) => setTaxInvoiceEmail(e.target.value)}
+              placeholder="tax@company.com"
+              className={inputClass}
+            />
+          </div>
+
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">은행명 <span className="text-red-500">*</span></label>
