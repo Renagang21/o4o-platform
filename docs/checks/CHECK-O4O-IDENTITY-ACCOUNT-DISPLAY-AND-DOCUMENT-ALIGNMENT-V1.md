@@ -1,6 +1,6 @@
 # CHECK-O4O-IDENTITY-ACCOUNT-DISPLAY-AND-DOCUMENT-ALIGNMENT-V1
 
-> 작성일: 2026-09-24 · 상태: **`DEPLOYED / SMOKE_PASS`** — 6서비스 통제 배포·smoke 완료(§6). 잔여: §6-4 계정 상태 수정의 admin 재배포 1건
+> 작성일: 2026-09-24 · 상태: **`COMPLETE`** (2026-09-25) — 2회 통제 배포(6서비스 + Admin 1) · 최종 smoke PASS
 > WO: [`WO-O4O-IDENTITY-ACCOUNT-DISPLAY-AND-DOCUMENT-ALIGNMENT-V1`](../work-orders/WO-O4O-IDENTITY-ACCOUNT-DISPLAY-AND-DOCUMENT-ALIGNMENT-V1.md)
 > 작업 브랜치: `wo/identity-account-display-alignment` · **migration 0 · production DB write 0**
 
@@ -215,10 +215,63 @@ Admin 계정 메뉴의 계정 상태가 **항상 노란색 "승인대기"** 였�
 `user.isApproved` 소비처는 admin 전체에서 이 한 곳뿐이었다(전수 확인). admin tsc rc=0 · 표시 계약 15/15 PASS.
 **이 수정은 admin-dashboard 재배포가 필요하다**(§7).
 
-## 7. 남은 것
+## 7. Admin 잔여 배포 · 최종 판정 (2026-09-24 22:57~23:40Z)
 
-- **§6-4 계정 상태 수정의 배포** — admin-dashboard 1개만 대상. 짧은 통제 창 하나가 더 필요하다.
-  (이번 WO 의 나머지는 §6 에서 배포·smoke 까지 끝났다.)
+§6-4 의 계정 상태 수정만 **Admin 1개**로 통제 배포했다.
+
+| 항목 | 값 |
+|---|---|
+| merge SHA | **`26ac02a60`** — 다른 세션 커밋 **미포함**(내 커밋만) |
+| 태그 | `deploy/2026-09-25-admin-account-status` |
+| CI | admin_only fast path — `Admin Fast(guards/validate&build)` · CodeQL · **SonarCloud pass** |
+| run | [36070268590](https://github.com/Renagang21/o4o-platform/actions/runs/36070268590) · `deploy` **waiting → success**(승인 후) |
+| revision | **`01312-87t`** `Ready=True` → **명시적 100% 전환**(이전 `01311-kbf` → 0%) |
+| `DEPLOY_ENABLED` | 22:57:40Z open → **23:39:59Z `false` 복귀** |
+| 범위 | **API 배포 0 · 다른 web 배포 0 · migration 0 · production DB write 0** |
+
+### 7-1. 최종 브라우저 smoke — **PASS**
+
+사용자 화면 실측:
+
+```text
+로그인 수단    Google
+관리 권한      최고 관리자
+프로필 이메일  renariver21@gmail.com
+─────────────────────────
+세션 상태      Active
+권한           활성
+계정           정상        ← 이전 "승인대기"(거짓 표시) 해소
+```
+
+DB read-only 불변: `users` **1** · `cfd2a5e7…` · status **active** · Google sub `117391***` ·
+roles active **11** · `platform:super_admin` **1** · memberships active **5** ·
+password 컬럼 **0** · `typeorm_migrations` **689**.
+
+---
+
+## 판정
+
+`WO-O4O-IDENTITY-ACCOUNT-DISPLAY-AND-DOCUMENT-ALIGNMENT-V1 = COMPLETE`
+
+Google-only Identity 와 `role_assignments` SSOT 를 **UI 와 문서가 정확히 표현**하게 만들었다.
+Identity/Authorization 의 **동작은 바꾸지 않았다**(인가는 그대로 `roles[]` 배열 판정).
+
+| 축 | 결과 |
+|---|---|
+| 비결정 대표 역할 표시 | **0** — 보유 여부 판정으로 교체, permutation 불변을 테스트로 고정 |
+| `roles[0]` 기반 **접근 판정** | **0** — `HubPage` routing 결함 제거(실사용으로 실증) |
+| compatibility scalar | **결정적** — `compatPrimaryRole()`(정렬·로케일 비의존) |
+| `users.email` 의미 | 로그인 ID 표기 **0** — "프로필 이메일" 로 분리 |
+| 거짓 계정 상태 | **0** — 없는 필드(`isApproved`) 대신 실제 `status` |
+| 문서 | SSOT §0 신설 · V3 완료 시제 · MYPAGE 근거 정정 · CANONICAL-INDEX 갱신 |
+| migration / DB write | **0 / 0** |
+
+**부수 성과**: SonarCloud Quality Gate 2건(reliability `sort()` 5곳 · security `npx` 1곳)을
+**게이트 완화 없이 코드로** 해결했고, `deploy-web-services.yml` 의 concurrency 함정을 실측해 기록했다.
+
+**남긴 것(REPORT_ONLY)**: F10 · F11 Freeze 본문의 password 서술 · `packages/ui` 의 DEAD
+`AGHeader`/`AGAppLayout`(소비처 0) — 다음 dead-code 정비에 합친다.
+`ci-pipeline.yml` 의 형제 5개 Vitest step 은 여전히 `npx` 다(같은 취약 패턴 · 이번 WO 범위 밖).
 - **별도 판단 (2026-09-24 축소 확정)**:
   ① auth-context vitest CI 연결 → **이번 WO 에서 처리 완료**(§3).
   ② RBAC Core `ORDER BY` → **하지 않음 · 별도 WO 없음**(§1-1 판정).
