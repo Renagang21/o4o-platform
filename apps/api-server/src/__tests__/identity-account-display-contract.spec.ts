@@ -124,12 +124,24 @@ describe('WO-O4O-IDENTITY-ACCOUNT-DISPLAY-AND-DOCUMENT-ALIGNMENT-V1 — 표시 �
   });
 
   describe('G4 compatibility scalar 는 결정적이다', () => {
-    it('JWT role claim 이 정렬 사본에서 나온다', () => {
-      expect(codeOnly(read(TOKEN_UTILS))).toMatch(/\[\.\.\.userRoles\]\.sort\(\)\[0\]/);
+    it('JWT role claim 이 compatPrimaryRole 에서 나온다', () => {
+      expect(codeOnly(read(TOKEN_UTILS))).toMatch(/compatPrimaryRole\(userRoles\)/);
     });
 
-    it('/auth/me 의 user.role 도 정렬 사본에서 나온다', () => {
-      expect(codeOnly(read(AUTH_CONTEXT_HELPER))).toMatch(/\[\.\.\.roles\]\.sort\(\)\[0\]/);
+    it('/auth/me 의 user.role 도 compatPrimaryRole 에서 나온다', () => {
+      expect(codeOnly(read(AUTH_CONTEXT_HELPER))).toMatch(/compatPrimaryRole\(roles\)/);
+    });
+
+    it('비교 함수 없는 sort() 로 대표값을 만들지 않는다 (SonarQube reliability)', () => {
+      // localeCompare 는 로케일 의존이고, 비교 함수 없는 sort() 는 의도를 코드로 드러내지 않는다.
+      // compatPrimaryRole 은 코드 단위 비교의 최소값을 직접 고른다.
+      for (const f of [TOKEN_UTILS, AUTH_CONTEXT_HELPER, path.join(SRC, 'modules', 'auth', 'controllers', 'auth-account.controller.ts')]) {
+        expect({ f, hit: /\.sort\(\)\s*\[\s*0\s*\]/.test(codeOnly(read(f))) }).toEqual({ f, hit: false });
+      }
+      const helper = codeOnly(read(path.join(SRC, 'utils', 'compat-primary-role.ts')));
+      expect(helper).not.toMatch(/\.sort\(/);
+      expect(helper).not.toMatch(/localeCompare/);
+      expect(helper).toMatch(/if \(role < min\) min = role;/);
     });
 
     it('roles 배열 자체는 그대로 응답에 실린다 (인가 정본)', () => {

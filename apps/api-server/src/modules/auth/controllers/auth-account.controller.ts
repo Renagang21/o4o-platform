@@ -5,6 +5,7 @@
  * Freeze: WO-O4O-CORE-FREEZE-V1 (2026-03-11)
  */
 import { Response } from 'express';
+import { compatPrimaryRole } from '../../../utils/compat-primary-role.js';
 import { BaseController } from '../../../common/base.controller.js';
 import type { AuthRequest } from '../../../common/middleware/auth.middleware.js';
 import { AppDataSource } from '../../../database/connection.js';
@@ -54,7 +55,7 @@ export class AuthAccountController extends BaseController {
       // WO-KPA-OPERATOR-SCOPE-ASSIGNMENT-OPS-V1: scopes 계산
       const scopes = deriveUserScopes({
         // WO-O4O-IDENTITY-ACCOUNT-DISPLAY-AND-DOCUMENT-ALIGNMENT-V1 §7-B: compatibility 필드 · 결정적 값(정렬 사본).
-        role: [...roles].sort()[0] || 'user',
+        role: compatPrimaryRole(roles),
         roles,
       });
 
@@ -64,7 +65,7 @@ export class AuthAccountController extends BaseController {
         name: req.user.name,
         // WO-O4O-KPA-FORUM-DISPLAYNAME-NICKNAME-ALIGNMENT-V1: nickname fallback
         nickname: req.user.nickname || null,
-        role: [...roles].sort()[0] || 'user',
+        role: compatPrimaryRole(roles),
         roles,  // WO-O4O-ROLE-MODEL-UNIFICATION-PHASE1-V1
         status: req.user.status,
         scopes: [] as string[],
@@ -305,7 +306,7 @@ export class AuthAccountController extends BaseController {
       userData.roles = roles;
       // WO-KPA-OPERATOR-SCOPE-ASSIGNMENT-OPS-V1: scopes 주입
       const scopes = deriveUserScopes({
-        role: [...roles].sort()[0] || 'user',
+        role: compatPrimaryRole(roles),
         roles,
       });
       userData.scopes = scopes;

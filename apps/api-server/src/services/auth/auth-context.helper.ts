@@ -1,4 +1,5 @@
 import { AppDataSource } from '../../database/connection.js';
+import { compatPrimaryRole } from '../../utils/compat-primary-role.js';
 import { roleAssignmentService } from '../../modules/auth/services/role-assignment.service.js';
 import * as tokenUtils from '../../utils/token.utils.js';
 import type { User } from '../../entities/User.js';
@@ -80,7 +81,7 @@ export function injectRolesIntoPublicData(
 ): void {
   publicData.roles = roles;
   // WO-O4O-IDENTITY-ACCOUNT-DISPLAY-AND-DOCUMENT-ALIGNMENT-V1 §7-B: compatibility 필드 · 결정적 값(정렬 사본). 인가는 publicData.roles 로 한다.
-  publicData.role = ([...roles].sort()[0] as any) || 'user';
+  publicData.role = compatPrimaryRole(roles) as any;
   if (memberships) {
     publicData.memberships = memberships;
   }

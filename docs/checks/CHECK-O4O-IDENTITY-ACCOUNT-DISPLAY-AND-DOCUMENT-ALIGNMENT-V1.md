@@ -19,9 +19,18 @@ e2e · docs 제외, 주석 제거 후 판정).
 | `services/auth/auth-context.helper.ts` | `publicData.role = roles[0]` | **COMPATIBILITY** → 결정적으로 교체 |
 | `modules/auth/controllers/auth-account.controller.ts` ×3 | `role: roles[0]` (`/auth/me` 응답 · `deriveUserScopes` 인자) | **COMPATIBILITY** → 결정적으로 교체 |
 
-근원인 `role-assignment.service.ts`(RBAC SSOT)에 `ORDER BY` 를 넣는 방법도 있었으나
-**FROZEN Core**(`@core O4O_PLATFORM_CORE` · CORE_CHANGE 승인 필요)라 건드리지 않았다.
-대신 **생산자에서 정렬 사본**(`[...roles].sort()[0]`)으로 결정성을 만들었다 — 원본 배열은 그대로다.
+**판정 (사용자 확정 2026-09-24): RBAC Core 에 `ORDER BY` 를 추가하지 않는다 · 별도 Core 정렬 WO 도 만들지 않는다.**
+
+근거: `role_assignments` 는 **집합 SSOT** 이고 role 순서 자체에 business meaning 이 없다.
+Core 에서 정렬해 버리면 오히려 "첫 원소가 대표 역할" 이라는 의미가 **다시 생긴다**(§3-2 와 반대).
+census 결과 authorization/routing 의 scalar 소비는 0 이고 routing 결함은 배열 보유 판정으로 고쳤으므로,
+**출력 경계에서만 compatibility scalar 를 결정적으로** 만드는 지금 구조가 구조적으로 맞다.
+장기적으로 `user.role` 의 active consumer 가 진짜 0 이 되는 시점에는 정렬을 넣는 것보다
+**scalar 자체를 제거**하는 쪽을 검토한다.
+
+구현: `apps/api-server/src/utils/compat-primary-role.ts` — 코드 단위 비교의 **최소값**을 직접 고른다.
+`sort()` 를 쓰지 않는다(비교 함수 없는 `sort()` 는 의도를 코드로 드러내지 않아 SonarQube reliability
+규칙에 걸렸고, `localeCompare` 는 **로케일 의존**이라 "결정성" 목적과 상충한다).
 
 ### 1-2. **소비자** 판정표
 
@@ -58,7 +67,8 @@ e2e · docs 제외, 주석 제거 후 판정).
 | `ForumRecommendationController.ts` · `recommendation.types.ts` · `recommendation-score.ts` | `role?: string`(=`roles[0]`) → `roles?: string[]` + 보유 판정 |
 | `OperatorMembersConsolePage.tsx` | membership 없으면 `'-'` |
 | `UserDetail.tsx` | `Assigned Roles` = `roles[]` 전체(없으면 "할당된 역할이 없습니다") |
-| `token.utils.ts` · `auth-context.helper.ts` · `auth-account.controller.ts` | compatibility scalar 를 **정렬 사본**으로 결정화 |
+| `token.utils.ts` · `auth-context.helper.ts` · `auth-account.controller.ts` | compatibility scalar 를 `compatPrimaryRole()` 로 결정화(5곳) |
+| `utils/compat-primary-role.ts` **신규** | 코드 단위 비교의 최소값을 직접 고른다 — `sort()` · `localeCompare` 미사용. 반환값은 **대표 역할이 아니다** |
 
 **하지 않은 것**: `users.email` 컬럼 변경 · Google email 저장 · role/membership 데이터 변경 ·
 RBAC SSOT(Core) 수정 · 전역 role 서열 신설.
@@ -70,10 +80,20 @@ RBAC SSOT(Core) 수정 · 전역 role 서열 신설.
 | `packages/auth-context/src/__tests__/accountDisplay.test.ts` (vitest 7) | **PASS** — ① role 배열 **모든 회전(permutation)** 에서 표시 동일 ② 사고 재현(첫 원소 `kpa-branch:operator`)에서도 "최고 관리자" ③ 표시 helper 와 인가 판정의 **독립성** ④ `loginMethod` 에 email 이 섞이지 않음 |
 | `apps/api-server/src/__tests__/identity-account-display-contract.spec.ts` (jest 14) | **PASS** — G1 helper 가 보유 여부 판정 · G2 AdminHeader 에 `user.role`/"SSO 인증"/로그인-이메일 표기 없음 + 3항목 label 분리 · G3 HubPage `roles[0]` 부재 · G4 scalar 결정성 · G5 email 이름 |
 
-vitest 쪽은 **CI 미연결**이다 — `ci-pipeline.yml` 에 step 을 추가하는 것은 CI 인프라 변경이라
-**사용자 승인 필요**(CLAUDE.md 중지 조건). 그래서 같은 계약의 **정적 축을 api-server jest 에 두어**
-CI 에서 자동 실행되게 했다. 승인 시 추가할 step 1줄:
-`npx vitest run --config packages/auth-context/vitest.config.mjs`
+**CI 연결 완료 (사용자 승인 2026-09-24).** `ci-pipeline.yml` 의 기존 package-level Vitest 블록에
+`auth-context` step 을 추가했다 — 새 CI 구조를 만든 것이 아니라 **같은 정책에 한 패키지를 추가**한 것이다.
+
+```yaml
+- name: Run tests (auth-context Vitest)
+  run: npx vitest run --config packages/auth-context/vitest.config.mjs
+```
+
+블록 주석의 집계도 실제 상태로 정정했다: **5개 / 17 files / 241 tests → 6개 / 18 files / 248 tests**,
+설명 줄 `auth-context  account display · admin role display · authorization separation (7)` 추가.
+다른 CI 구조 · job · selector 는 **변경하지 않았다**(baseline 완화 0).
+
+정적 축은 그대로 유지한다 — `identity-account-display-contract.spec.ts`(jest)가 같은 계약의
+텍스트 축을 CI 에서 자동 실행한다.
 
 정적 guard 자체의 **오탐 1건을 제조 중에 잡았다** — 줄 단위 주석 필터가 JSX 블록 주석의 중간 줄을
 위반으로 읽었다. 블록 주석을 먼저 제거하도록 고치고, **guard 가 무력해지지 않았음을 증명하는
@@ -88,6 +108,24 @@ CI 에서 자동 실행되게 했다. 승인 시 추가할 step 1줄:
 | `baseline/O4O-MYPAGE-CANONICAL-V1.md` | `PUT /users/password` 를 현행처럼 적은 근거 3곳 정정. **결정(Option D)은 불변** |
 | `docs/CANONICAL-INDEX.md` | 두 행의 설명만 현재 상태로 갱신 (ACTIVE/SUPERSEDED 판정 불변) |
 | `architecture/O4O-CORE-FREEZE-V1.md`(F10) · `architecture/USER-OPERATOR-FREEZE-V1.md`(F11) | **REPORT_ONLY** — `service_credentials` 신설/`users.password` 제거를 예정처럼 서술한 표가 남아 있다. Frozen Baseline 본문 수정은 §16-4 금지이므로 고치지 않고 보고한다 |
+
+## 4-A. SonarCloud Quality Gate — 실패 → 수정 (2026-09-25)
+
+PR #231 1차에서 **SonarCloud 만 fail** 했다(나머지 체크 전부 pass).
+사유: **`D Reliability Rating on New Code`** (요구 ≥ A). 내용은 내가 새로 넣은 코드 5곳이었다.
+
+| 지적 | 대상 | 처리 |
+|---|---|---|
+| BUG CRITICAL ×5 — "Provide a compare function … to reliably sort elements alphabetically" | `[...roles].sort()[0]` (token.utils · auth-context.helper · auth-account.controller ×3) | `compatPrimaryRole()` 로 교체 — **정렬을 쓰지 않고** 코드 단위 최소값을 고른다 |
+| CODE_SMELL MINOR ×1 | `HUB_ALLOWED_ROLES.includes` | `new Set(...)` + `.has()` |
+
+지적이 타당했다: 비교 함수 없는 `sort()` 는 UTF-16 코드 단위 정렬이라 "알파벳 정렬" 의도를
+코드로 드러내지 않는다. 다만 Sonar 가 권하는 `localeCompare` 는 **로케일 의존**이어서 이 값의 목적
+(요청마다 같은 값)과 상충하므로 채택하지 않고, 비교를 명시한 최소값 선택으로 해결했다.
+**gate baseline 완화 0** — 규칙을 끄거나 예외를 추가하지 않았다.
+
+정적 guard G4 도 새 구현으로 갱신하고, "비교 함수 없는 `sort()` 로 대표값을 만들지 않는다" 를
+**추가 단정**으로 고정했다(재유입 차단).
 
 ## 5. 검증
 
@@ -106,5 +144,8 @@ CI 에서 자동 실행되게 했다. 승인 시 추가할 step 1줄:
   (Cloud Run traffic pin 때문에 명시적 전환 없이는 서빙이 바뀌지 않는다).
 - **배포 후 smoke**: Google 로그인 → Admin 진입 → Header 의 세 항목 의미 확인 → F5 → 로그아웃 → 재로그인,
   그리고 read-only 로 `users 1 · Google sub 동일 · roles 11 · memberships 5 · platform:super_admin active` 불변 확인.
-- **별도 판단**: ① auth-context vitest 의 CI step 추가(승인 필요) ② F10/F11 Freeze 본문 갱신 여부
-  ③ `packages/ui` 의 DEAD layout(`AGHeader`/`AGAppLayout`) 처분.
+- **별도 판단 (2026-09-24 축소 확정)**:
+  ① auth-context vitest CI 연결 → **이번 WO 에서 처리 완료**(§3).
+  ② RBAC Core `ORDER BY` → **하지 않음 · 별도 WO 없음**(§1-1 판정).
+  ③ DEAD `AGHeader`/`AGAppLayout` → **REPORT_ONLY**, 지금 별도 WO 를 만들지 않고 다음 dead-code 정비에 합친다.
+  ④ F10/F11 Freeze 본문 갱신 여부 → 사용자 판단 대기(REPORT_ONLY 유지).
