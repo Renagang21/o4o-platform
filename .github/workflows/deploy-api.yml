@@ -167,47 +167,27 @@ jobs:
     # 4-step pnpm/node/install/build:packages 흐름을 다른 workflow와 동일한
     # composite action으로 통일. unpinned pnpm + frozen-lockfile 단독 사용으로
     # CI를 차단하던 ERR_PNPM_LOCKFILE_CONFIG_MISMATCH 회피.
+    # WO-O4O-DEPLOY-API-PACKAGE-BUILD-SCOPE-V1
+    # 과거에는 여기서 root `build:packages` 전체(프론트 패키지 포함, ≈100s)를 빌드한 뒤
+    # 아래 step 이 하드코딩 목록 18개를 **다시** 빌드했다. 그 18개는 전부
+    # `build:packages` 마지막의 `build:api-deps`(= `@o4o/api-server^...`)에 이미 포함돼 있었다.
+    # 배포 이미지에 필요한 것은 api-server 의 workspace dependency closure 뿐이므로
+    # 여기서는 설치만 하고, 아래 step 이 closure 만 한 번 빌드한다
+    # (CI api-tests · scheduled full Jest 와 같은 방식).
     - name: Setup build environment
       uses: ./.github/actions/setup-build-env
       with:
         node-version: '22.18.0'
+        build-packages: 'false'
 
+    # closure 는 package.json 의 workspace 의존성 그래프에서 나온다 — 목록 하드코딩 금지(drift).
+    # api-server 런타임 코드(테스트 제외)가 import 하는 @o4o 패키지는 전부 package.json 에 선언돼 있다.
+    # --fail-if-no-match: filter 가 아무것도 고르지 못하면 조용히 통과하지 않고 실패한다.
     - name: Build API-specific packages
       run: |
-        echo "🔨 Phase 2: Building API-server-specific packages..."
-        echo "============================================================"
-        echo "(These packages are only needed by api-server, not frontend)"
-        echo ""
-
-        # Infrastructure (depends on types/utils — already built in Phase 1)
-        echo "📦 Infrastructure..."
-        pnpm --filter '@o4o/capabilities' run build
-        pnpm --filter '@o4o/mail-core' run build
-        pnpm --filter '@o4o/platform-core' run build
-        pnpm --filter '@o4o/cpt-registry' run build
-        pnpm --filter '@o4o/ai-core' run build
-        pnpm --filter '@o4o/ai-prompts' run build
-        pnpm --filter '@o4o/security-core' run build
-        pnpm --filter '@o4o/store-core' run build
-        pnpm --filter '@o4o/asset-copy-core' run build
-        pnpm --filter '@o4o/action-log-core' run build
-        pnpm --filter '@o4o/payment-core' run build
-
-        # Domain Core (depends on infrastructure)
-        echo "📦 Domain Core..."
-        pnpm --filter '@o4o-apps/cms-core' run build
-        pnpm --filter '@o4o/interactive-content-core' run build
-        pnpm --filter '@o4o/education-extension' run build
-        pnpm --filter '@o4o/lms-core' run build
-
-        # Extensions & Features (depends on Domain Core)
-        echo "📦 Extensions & Features..."
-        pnpm --filter '@o4o-apps/digital-signage-core' run build
-        pnpm --filter '@o4o-extensions/organization-forum' run build
-        pnpm --filter '@o4o/market-trial' run build
-
-        echo ""
-        echo "✅ All API-specific packages built successfully!"
+        echo "🔨 Building @o4o/api-server workspace dependency closure..."
+        pnpm --fail-if-no-match --filter '@o4o/api-server^...' run build
+        echo "✅ API dependency closure built successfully"
 
     - name: Build API server (bundled with tsup)
       run: |
