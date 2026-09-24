@@ -1,6 +1,6 @@
 # CHECK-O4O-IDENTITY-ACCOUNT-DISPLAY-AND-DOCUMENT-ALIGNMENT-V1
 
-> 작성일: 2026-09-24 · 상태: **`CODE_AND_DOCS_DONE / AWAITING_CONTROLLED_DEPLOY`**
+> 작성일: 2026-09-24 · 상태: **`DEPLOYED / SMOKE_PASS`** — 6서비스 통제 배포·smoke 완료(§6). 잔여: §6-4 계정 상태 수정의 admin 재배포 1건
 > WO: [`WO-O4O-IDENTITY-ACCOUNT-DISPLAY-AND-DOCUMENT-ALIGNMENT-V1`](../work-orders/WO-O4O-IDENTITY-ACCOUNT-DISPLAY-AND-DOCUMENT-ALIGNMENT-V1.md)
 > 작업 브랜치: `wo/identity-account-display-alignment` · **migration 0 · production DB write 0**
 
@@ -147,13 +147,78 @@ PR #231 1차에서 **SonarCloud 만 fail** 했다(나머지 체크 전부 pass).
 | 표시 계약 vitest | 7/7 PASS |
 | 정적 contract jest | 14/14 PASS |
 
-## 6. 남은 것
+## 6. 통제 배포 (2026-09-24 22:05~22:24Z)
 
-- **배포**: Admin UI · 공용 패키지 · api-server 가 바뀌었으므로 detector 판정에 따른 통제 배포가 필요하다.
-  판정은 `workflow success` 가 아니라 **deploy job 실행 · revision 생성 · traffic 전환** 3단계로 한다
-  (Cloud Run traffic pin 때문에 명시적 전환 없이는 서빙이 바뀌지 않는다).
-- **배포 후 smoke**: Google 로그인 → Admin 진입 → Header 의 세 항목 의미 확인 → F5 → 로그아웃 → 재로그인,
-  그리고 read-only 로 `users 1 · Google sub 동일 · roles 11 · memberships 5 · platform:super_admin active` 불변 확인.
+기준 SHA 를 **`757727b58`** 로 고정하고(직전 `origin/main` 재확인) 태그
+`deploy/2026-09-25-identity-display` 로 dispatch 했다. 다른 Claude 세션 0.
+
+| 항목 | 값 |
+|---|---|
+| detector 판정 | admin **true** · api_deploy **true** · web **neture · k-cosmetics · kpa-society · pharmacy-hub** true / lecture · store · kpa-branch · signage-player · hospital-pharmacy **false** |
+| dispatch | API 1 · Admin 1 · Web 1(4서비스) — **전 서비스 강제 배포 아님** |
+| 승인 전 확인 | 6개 deploy job 전부 **`waiting`**, 무관한 web job 5개 **`skipped`** (job 상태로 판정 · workflow 결론으로 판정하지 않음) |
+| migration | **`INCREMENTAL_PENDING = 0` · `INCREMENTAL_EXECUTED = 0`** · PRE/POST assertion PASS · fingerprint 전후 동일(`6503cfb6…`/5793 — B-2 상태 유지) |
+| `DEPLOY_ENABLED` | 22:05:10Z open → **22:23:59Z `false` 복귀** |
+
+### 6-1. 진행 중 발견 — `deploy-web-services.yml` 의 concurrency 충돌
+
+이 워크플로는 **`concurrency: group: deploy-web-${{ github.ref }}`** 다. 같은 태그로 서비스별
+4번 dispatch 하면 **서로를 취소**한다(실제로 2건이 즉시 `cancelled`). 4건을 모두 취소한 뒤
+이 워크플로가 지원하는 **detector replay 모드**(`base_sha`/`head_sha`)로 **한 run 에 묶었다** —
+결과는 정확히 대상 4개 `waiting` · 무관 5개 `skipped` 였다. `service=all`(9개)로 넓히지 않았다.
+취소된 run 들은 승인 전이라 **배포 0**.
+
+### 6-2. traffic 전환 (6개 준비 확인 후 일괄)
+
+`Ready=True` 6개를 모두 확인한 뒤 전환했다. `neture-web` 은 pin 이 없어 이미 새 revision 을
+서빙하고 있었고 나머지 5개는 명시적 `update-traffic` 이 필요했다.
+
+| 서비스 | 새 revision | 전환 후 | 이전 |
+|---|---|---|---|
+| `o4o-core-api` | `03753-pnk` | **100%** | `03751-ctw` → 0% |
+| `o4o-admin-dashboard` | `01311-kbf` | **100%** | `01310-cwm` → 0% |
+| `neture-web` | `01658-fzw` | **100%** | pin 없음(자동 추종) |
+| `k-cosmetics-web` | `01166-rtp` | **100%** | `01165-wzj` → 0% |
+| `kpa-society-web` | `01998-wg4` | **100%** | `01997-d7x` → 0% |
+| `pharmacy-hub-web` | `00256-9jh` | **100%** | `00255-qw8` → 0% |
+
+### 6-3. Production smoke — **PASS**
+
+| 축 | 결과 |
+|---|---|
+| API | `/health` 200 · `/health/ready` `{"status":"ready"}` · `/auth/google/config` `enabled:true` · 가짜 idToken **401** · `POST /auth/login` **404**(은퇴 유지) |
+| web 진입 | `admin.neture.co.kr` · `neture.co.kr` · `k-cosmetics.co.kr` · `kpa-society.co.kr` · `pharmacyhub.co.kr` **전부 200** |
+| **Admin 계정 메뉴** | `로그인 수단 Google` / `관리 권한 최고 관리자` / `프로필 이메일 …` **세 줄 분리 확인**(사용자 화면). 이전의 `역할: kpa-branch:operator \| SSO 인증` 소멸 |
+| **Neture 허브** | 약관 재동의 게이트 통과 후 `/workspace/hub` **진입 성공** — `platform:super_admin` 보유자가 차단되지 않았고 `관리자 운영(Admin)` 섹션까지 렌더됐다. **roles[0] 비결정 차단 제거를 실사용으로 실증** |
+| DB 불변 | `users` 1 · admin `cfd2a5e7…` · status **active** · Google sub `117391***` · roles active **11** · memberships active **5** · `lastLoginAt` / google `lastUsedAt` **2026-09-24 22:30:45 로 동반 전진** |
+
+※ 처음 `kpa.neture.co.kr` · `pharmacy.neture.co.kr` 로 찍어 000 이 났는데 **내가 도메인을 잘못 짚은 것**이었다
+(정본은 `kpa-society.co.kr` · `pharmacyhub.co.kr`). 장애가 아니다.
+
+### 6-4. smoke 중 발견 — `계정: 승인대기` **거짓 표시** (같은 WO 에서 수정)
+
+Admin 계정 메뉴의 계정 상태가 **항상 노란색 "승인대기"** 였다. 원인:
+
+```tsx
+{user?.isApproved ? '승인됨' : '승인대기'}
+```
+
+`isApproved` 는 **백엔드에 존재하지 않는 필드**다 — `users` 에는 `approvedAt` 컬럼만 있고
+`/auth/me` 는 `status`(UserStatus)와 파생값 `accountAccess` 를 내려준다. 따라서 값은 항상
+`undefined` 였고 **로그인한 모든 관리자에게 "승인대기"** 가 보였다(실제 계정은 `status = active`).
+
+`/auth/me` 가 실제로 주는 `status` 로 표시하도록 고쳤다:
+`active`/`approved` → 정상 · `pending` → 승인대기 · `suspended` → 정지 · `rejected` → 거부 ·
+`inactive` → 비활성 · **매핑에 없는 값은 지어내지 않고 원문 그대로**(거짓 라벨보다 낫다).
+
+§10 의 "잘못된 의미를 전달하는 active UI 는 이번 WO 에서 정정한다" 에 해당하므로 같은 WO 에서 처리했다.
+`user.isApproved` 소비처는 admin 전체에서 이 한 곳뿐이었다(전수 확인). admin tsc rc=0 · 표시 계약 15/15 PASS.
+**이 수정은 admin-dashboard 재배포가 필요하다**(§7).
+
+## 7. 남은 것
+
+- **§6-4 계정 상태 수정의 배포** — admin-dashboard 1개만 대상. 짧은 통제 창 하나가 더 필요하다.
+  (이번 WO 의 나머지는 §6 에서 배포·smoke 까지 끝났다.)
 - **별도 판단 (2026-09-24 축소 확정)**:
   ① auth-context vitest CI 연결 → **이번 WO 에서 처리 완료**(§3).
   ② RBAC Core `ORDER BY` → **하지 않음 · 별도 WO 없음**(§1-1 판정).
