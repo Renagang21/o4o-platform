@@ -1,7 +1,9 @@
 /** 공통 로그인 에러 코드 → 사용자 메시지 매핑 */
 export const AUTH_ERROR_MESSAGES: Record<string, string> = {
   INVALID_USER: '등록되지 않은 이메일입니다.',
-  INVALID_CREDENTIALS: '비밀번호가 올바르지 않습니다.',
+  // WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1:
+  //   INVALID_CREDENTIALS('비밀번호가 올바르지 않습니다.') 는 제거했다 — 서버가 이 코드를 더는 내지 않는다
+  //   (password 로그인 경로 은퇴). `packages/error-handling` 쪽은 같은 WO 에서 이미 제거했고 이쪽이 대칭 누락이었다.
   // WO-O4O-AUTH-ACCOUNT-STATUS-UX-AND-PH-MOBILE-LOGOUT-CLOSURE-V1:
   //   `pending` 은 제한 로그인(WO-O4O-RESTRICTED-LOGIN-FOR-PENDING-REJECTED-V1)으로 **성공**하므로
   //   이 코드는 더 이상 "승인 대기" 를 뜻하지 않는다. 상태 미상일 때의 중립 fallback 만 둔다.

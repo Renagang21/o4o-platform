@@ -117,7 +117,16 @@ describe('sanitizeAdminUsers — 목록 전체 적용', () => {
 });
 
 describe('민감 필드 목록 자체 검증', () => {
-  it('모든 민감 필드가 User 엔티티의 실제 컬럼이다 (오탈자 방지)', () => {
+  /**
+   * WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1 Phase B-1:
+   *   password · reset_password_* 는 entity 컬럼에서 제거됐지만 **블랙리스트에는 남긴다**.
+   *   sanitizer 는 "응답에 실려 나가면 안 되는 key" 를 지우는 방어층이므로, 컬럼이 사라진 뒤에도
+   *   과거 이름이 어딘가에서 객체에 섞여 들어오면 그대로 막아야 한다(제거하면 재유입 시 무방비).
+   *   따라서 오탈자 가드는 "실제 컬럼" 대신 "실제 컬럼 ∪ 명시적 은퇴 컬럼" 을 기준으로 판정한다.
+   */
+  const RETIRED_COLUMNS = ['password', 'resetPasswordToken', 'resetPasswordExpires'];
+
+  it('모든 민감 필드가 User 엔티티의 실제 컬럼이거나 명시적 은퇴 컬럼이다 (오탈자 방지)', () => {
     const storage = getMetadataArgsStorage();
     const columns = new Set(
       storage.columns
@@ -125,8 +134,12 @@ describe('민감 필드 목록 자체 검증', () => {
         .map((c) => c.propertyName),
     );
     expect(columns.size).toBeGreaterThan(0);
-    const unmapped = ADMIN_USER_SENSITIVE_FIELDS.filter((f) => !columns.has(f));
+    const unmapped = ADMIN_USER_SENSITIVE_FIELDS.filter(
+      (f) => !columns.has(f) && !RETIRED_COLUMNS.includes(f),
+    );
     expect(unmapped).toEqual([]);
+    // 은퇴 컬럼이 entity 로 되돌아오면(= password 축 부활) 여기서 먼저 깨진다.
+    expect(RETIRED_COLUMNS.filter((f) => columns.has(f))).toEqual([]);
   });
 
   it('목록·단건이 같은 계약을 쓰도록 단일 SSOT 를 제공한다', () => {

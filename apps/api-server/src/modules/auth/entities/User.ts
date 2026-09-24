@@ -21,10 +21,9 @@ export class User {
   @Column({ type: 'varchar', length: 255, unique: true })
   email!: string;
 
-  // WO-O4O-GOOGLE-IDENTITY-PREREQUISITES-V1 (Identity V3 §2 · REVIEW-8): Google-only user = NULL.
-  //   legacy `''` sentinel(social-only) 도 잔존 가능 — 두 경우 모두 `!user.password` 로 "password 없음" 판정.
-  @Column({ type: 'varchar', length: 255, nullable: true })
-  password!: string | null; // bcrypt hashed · NULL = password 없음(Google-only)
+  // WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1 Phase B-1: `password` 컬럼 선언을 제거했다.
+  //   런타임 reader 0 · writer 0 인 상태에서 entity 를 먼저 떼어내고(이 배포),
+  //   물리 컬럼은 B-2 migration 이 DROP 한다(contract-last). Identity 는 linked_accounts(sub) 다.
 
   @Column({ type: 'varchar', length: 100, nullable: true })
   firstName?: string;
@@ -110,11 +109,9 @@ export class User {
   @Column({ type: 'varchar', length: 50, nullable: true })
   lastLoginIp?: string;
 
-  @Column({ type: 'integer', default: 0 })
-  loginAttempts!: number;
-
-  @Column({ type: 'timestamp', nullable: true })
-  lockedUntil?: Date;
+  // WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1 Phase B-1: loginAttempts / lockedUntil 선언 제거.
+  //   password 로그인이 없어 실패 카운트를 올리는 주체가 없다. 물리 컬럼은 B-2 가 DROP 한다.
+  //   ※ `login_attempts` 테이블과 `LoginAttempt` entity 는 FROZEN auth-core 소유라 **유지**한다.
 
   // Domain for multi-tenant support
   @Column({ type: 'varchar', length: 255, nullable: true })
@@ -151,12 +148,8 @@ export class User {
   @Column({ type: 'varchar', length: 255, nullable: true })
   provider_id?: string;
 
-  // 비밀번호 재설정 토큰
-  @Column({ type: 'varchar', length: 255, nullable: true, name: 'reset_password_token' })
-  resetPasswordToken?: string | null;
-
-  @Column({ type: 'timestamp', nullable: true, name: 'reset_password_expires' })
-  resetPasswordExpires?: Date | null;
+  // WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1 Phase B-1: reset_password_token / reset_password_expires 선언 제거.
+  //   재설정 경로가 은퇴했고 non-null 행도 0 이다. 물리 컬럼은 B-2 가 DROP 한다.
 
   // Phase 3-2: Onboarding completion flag
   @Column({ type: 'boolean', default: false, name: 'onboarding_completed' })
@@ -172,10 +165,7 @@ export class User {
   @Column({ type: 'boolean', default: false, name: 'marketing_accepted' })
   marketingAccepted!: boolean;
 
-  // 계정 잠금 상태 확인
-  get isLocked(): boolean {
-    return !!(this.lockedUntil && this.lockedUntil > new Date());
-  }
+  // WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1 Phase B-1: `isLocked` getter 제거 — 판정 근거인 lockedUntil 이 사라졌고 호출부는 0 이었다.
 
   /**
    * 전체 이름 반환
@@ -220,7 +210,8 @@ export class User {
 
   // WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1:
   //   hashPassword 훅과 validatePassword 는 은퇴했다. 해싱하거나 비교할 비밀번호가 없다.
-  //   password / reset_password_* 컬럼 자체는 contract-last 원칙에 따라 Phase B 에서 제거한다.
+  //   password / reset_password_* / lockout 컬럼 선언은 Phase B-1(이 커밋)에서 제거했고,
+  //   물리 컬럼은 B-2 migration 이 DROP 한다.
 
   // Role helper methods (use this.roles — set by middleware from RoleAssignment)
   hasRole(role: UserRole | string): boolean {

@@ -28,7 +28,6 @@ const RETIRED_ENDPOINTS: [string, 'post' | 'put' | 'patch', string, Record<strin
   ['비밀번호 재설정 요청', 'post', '/auth/forgot-password', { email: 'retired@example.test' }],
   ['비밀번호 재설정 적용', 'post', '/auth/reset-password', { token: 'x', newPassword: 'x' }],
   ['아이디 찾기', 'post', '/auth/find-id', { phone: '01000000000' }],
-  ['내 비밀번호 변경', 'put', '/users/password', { currentPassword: 'x', newPassword: 'y', newPasswordConfirm: 'y' }],
   ['Google 명시 연결(password 재인증)', 'post', '/auth/google/link', { idToken: 'x', currentPassword: 'x' }],
 ];
 
@@ -57,6 +56,30 @@ test.describe('은퇴한 password endpoint (R1·R3)', () => {
   });
 });
 
+test.describe('requireAuth 뒤의 은퇴 경로 (R1-b)', () => {
+  /**
+   * `PUT /users/password` 는 `/users/*` 라우터 전체에 `requireAuth` 가 걸려 있어 미인증 요청이
+   * **404 이전에 401** 로 끝난다(2026-09-24 운영 실측: `/users/me/profile` · 없는 경로도 동일하게 401).
+   * 따라서 401 은 은퇴 근거가 되지 못한다 — 같은 라우터의 임의 경로와 **구분 불가**함을 고정해
+   * "401 을 보고 은퇴했다고 잘못 판정" 하는 일을 막는다. 소스 수준 부재는 정적 guard
+   * (`apps/api-server/src/__tests__/legacy-password-auth-retirement.spec.ts` P2)가 본다.
+   */
+  test('PUT /users/password 는 미인증에서 401 이며, 같은 라우터의 임의 경로와 구분되지 않는다', async ({ request }) => {
+    const retired = await request.put(`${V1}/users/password`, {
+      data: { currentPassword: 'x', newPassword: 'y', newPasswordConfirm: 'y' },
+      failOnStatusCode: false,
+    });
+    const nonexistent = await request.put(`${V1}/users/__does_not_exist__`, {
+      data: {}, failOnStatusCode: false,
+    });
+
+    expect(retired.status()).toBe(401);
+    expect(nonexistent.status()).toBe(401);
+    // 응답에 password 관련 힌트가 없다(존재를 알려주지 않는다)
+    expect((await retired.text()).toLowerCase()).not.toContain('password_not_set');
+  });
+});
+
 test.describe('Google 경로 생존 + 검증 동작 (R2)', () => {
   test('POST /auth/google/login 은 살아 있고 가짜 토큰을 401 로 거절한다', async ({ request }) => {
     const res = await request.post(`${V1}/auth/google/login`, {
@@ -78,6 +101,11 @@ test.describe('Google 경로 생존 + 검증 동작 (R2)', () => {
     expect(body?.code).toBe('GOOGLE_ID_TOKEN_INVALID');
   });
 
+  /**
+   * 주의: 빈 body 로 찌르면 DTO 검증이 먼저 걸려 **400** 이 난다(route 생존 신호가 아니다).
+   * 닫힘을 보려면 형식이 맞는 body 를 보내야 하고, 그때 404 `GOOGLE_ADMIN_BOOTSTRAP_DISABLED` 가 나온다
+   * (2026-09-24 운영 실측 확인).
+   */
   test('전환기 bootstrap 경로는 닫혀 있다 — POST /auth/google/bootstrap-admin → 404', async ({ request }) => {
     const res = await request.post(`${V1}/auth/google/bootstrap-admin`, {
       data: { idToken: 'x', bootstrapCode: 'closed-window-code-1234567890' },

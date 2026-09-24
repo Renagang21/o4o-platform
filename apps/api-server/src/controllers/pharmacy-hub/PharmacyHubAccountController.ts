@@ -17,7 +17,7 @@
  *
  * SSOT
  *   사용자 프로필  users (name · nickname · phone)
- *   비밀번호       PUT /api/v1/users/password (기존 인증 계약 — 여기서 다루지 않음)
+ *   비밀번호       없음 — WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1 로 은퇴(로그인 수단 = Google)
  *   알림           기존 notification 계약
  *
  * 보안 계약

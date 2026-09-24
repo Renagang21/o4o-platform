@@ -101,7 +101,9 @@ describe('auth-core dead lifecycle · 은퇴한 user_roles 재생성 경로 종�
         join(SRC, 'modules', 'auth', 'entities', 'RefreshToken.ts'),
         join(SRC, 'modules', 'auth', 'entities', 'LoginAttempt.ts'),
         join(SRC, 'modules', 'auth', 'entities', 'ServiceMembership.ts'),
-        join(SRC, 'modules', 'auth', 'entities', 'ServiceCredential.ts'),
+        // WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1 Phase B-1:
+        //   ServiceCredential 은 이 목록에서 빠졌다 — password 축 은퇴로 entity 를 제거했다.
+        //   "정본이라 보존한다" 가 아니라 "은퇴했다" 가 현재 계약이므로 아래 D 에서 부재를 고정한다.
       ];
       for (const f of files) expect({ f, exists: existsSync(f) }).toEqual({ f, exists: true });
 
@@ -109,6 +111,23 @@ describe('auth-core dead lifecycle · 은퇴한 user_roles 재생성 경로 종�
       for (const name of ['User', 'Role', 'RoleAssignment', 'RefreshToken', 'LoginAttempt', 'LinkedAccount', 'ServiceMembership']) {
         expect({ name, hit: new RegExp(`import \{ ${name} \}`).test(registry) }).toEqual({ name, hit: true });
       }
+    });
+
+    it('password 축 entity 는 은퇴했다 (부활 감지 · WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1)', () => {
+      // 되살아나면 인증 축이 다시 두 갈래가 된다 — 여기서 먼저 깨진다.
+      for (const f of [
+        join(SRC, 'modules', 'auth', 'entities', 'ServiceCredential.ts'),
+        join(SRC, 'entities', 'PasswordResetToken.ts'),
+      ]) {
+        expect({ f, exists: existsSync(f) }).toEqual({ f, exists: false });
+      }
+      const registry = read(join(SRC, 'database', 'entities.ts'));
+      for (const name of ['ServiceCredential', 'PasswordResetToken']) {
+        expect({ name, imported: new RegExp(`import \{ ${name} \}`).test(registry) })
+          .toEqual({ name, imported: false });
+      }
+      // LoginAttempt 는 FROZEN auth-core 소유라 유지된다(위 목록에 남아 있다).
+      expect(existsSync(join(SRC, 'modules', 'auth', 'entities', 'LoginAttempt.ts'))).toBe(true);
     });
 
     it('인증 테이블의 정본 migration 이 api-server 에 존재한다', () => {

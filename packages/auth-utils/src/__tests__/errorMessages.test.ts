@@ -33,12 +33,23 @@ describe('resolveAuthError — 계정 상태 구분', () => {
   });
 
   it('기존 코드 기반 분기는 그대로 동작한다', () => {
-    expect(resolveAuthError({ code: 'INVALID_CREDENTIALS' }, 401)).toBe(
-      AUTH_ERROR_MESSAGES.INVALID_CREDENTIALS,
-    );
     expect(resolveAuthError({ code: 'SERVICE_NOT_MEMBER' }, 401)).toBe(
       AUTH_ERROR_MESSAGES.SERVICE_NOT_MEMBER,
     );
     expect(resolveAuthError({}, 429)).toContain('너무 많습니다');
+  });
+
+  /**
+   * WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1:
+   *   password 축이 은퇴해 서버가 `INVALID_CREDENTIALS` 를 더는 내지 않는다.
+   *   매핑을 지운 사실 자체를 계약으로 고정한다 — 다시 생기면(= password 경로 부활) 여기서 먼저 깨진다.
+   */
+  it('password 오류 문구는 은퇴했다 (부활 감지)', () => {
+    expect(AUTH_ERROR_MESSAGES.INVALID_CREDENTIALS).toBeUndefined();
+    expect(Object.values(AUTH_ERROR_MESSAGES).join(' ')).not.toContain('비밀번호');
+    // 알 수 없는 코드로 취급돼 중립 fallback 으로 떨어진다(임의 문구를 만들지 않는다).
+    const fallback = resolveAuthError({ code: 'INVALID_CREDENTIALS' }, 401);
+    expect(fallback).not.toContain('비밀번호');
+    expect(typeof fallback).toBe('string');
   });
 });

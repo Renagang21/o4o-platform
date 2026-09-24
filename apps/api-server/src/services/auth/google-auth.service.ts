@@ -12,7 +12,8 @@
  *   - Google 전용 JWT 없음 — `generateTokensWithContext` / `persistRefreshTokenFamily` 재사용, JWT sub = users.id.
  *   - signup 은 role_assignments · service_memberships · service_credentials 를 **만들지 않는다**.
  *   - linked_accounts 에 email/displayName/profileImage/providerData 스냅샷을 쓰지 않는다(picture 미저장).
- *   - users.name = NULL · users.password = NULL. email 은 `users.email NOT NULL UNIQUE` 가 남아 있어
+ *   - users.name = NULL. (password 컬럼은 Phase B-1 에서 선언째 사라졌다 — 쓰지 않는다.)
+ *     email 은 `users.email NOT NULL UNIQUE` 가 남아 있어
  *     Google email claim 을 과도기 프로필 값으로만 저장한다. claim 이 없으면 placeholder 없이 실패.
  *
  * WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1:
@@ -280,8 +281,8 @@ export class GoogleAuthService {
 
     const now = new Date();
     const user = userRepo.create({
+      // WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1 Phase B-1: `password: null` write 제거 — 컬럼이 B-2 에서 사라진다.
       email: identity.email!,
-      password: null,
       name: null,
       status: UserStatus.ACTIVE,
       isActive: true,
@@ -419,9 +420,9 @@ export class GoogleAuthService {
     await this.userRepository.update(
       { id: user.id },
       {
+        // WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1 Phase B-1: loginAttempts/lockedUntil 리셋 제거 —
+        //   password 로그인이 없으므로 증가시키는 주체가 없고, 두 컬럼은 B-2 에서 DROP 된다.
         lastLoginAt: new Date(),
-        loginAttempts: 0,
-        lockedUntil: null,
         ...(tokenFamily && { refreshTokenFamily: tokenFamily }),
       },
     );
