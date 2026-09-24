@@ -159,7 +159,7 @@ describe('GoogleAuthService — Google-only Signup/Login', () => {
   });
 
   // ── signup ────────────────────────────────────────────────────────────────
-  it('signup · 신규 sub → users + linked_accounts 생성, password/name NULL, picture 미저장, role/membership 0', async () => {
+  it('signup · 신규 sub → users + linked_accounts 생성, password 키 자체 없음, name NULL, picture 미저장, role/membership 0', async () => {
     build({ 'tok-a': { sub: SUB_A, email: 'new@example.test', emailVerified: true } });
 
     const session = await svc.signup({ idToken: 'tok-a', consents: { ...CONSENTS, marketing: true }, ...META });
@@ -168,7 +168,10 @@ describe('GoogleAuthService — Google-only Signup/Login', () => {
     expect(store.linked).toHaveLength(1);
     const u = store.users[0];
     const l = store.linked[0];
-    expect(u.password).toBeNull();
+    // WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1 Phase B-1:
+    //   구 계약은 `password: null` 을 명시적으로 기록하는 것이었다. 컬럼이 B-2 에서 사라지므로
+    //   이제는 **키 자체를 만들지 않는다**. 다시 생기면 password 축이 부활한 것이다.
+    expect('password' in u).toBe(false);
     expect(u.name).toBeNull();
     expect(u.status).toBe('active');
     expect(u.isEmailVerified).toBe(true);

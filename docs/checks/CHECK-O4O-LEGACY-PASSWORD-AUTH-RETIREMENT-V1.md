@@ -670,6 +670,95 @@ PRODUCTION WRITE = 0
 PHASE B EXECUTION = WAITING_FOR_USER_APPROVAL
 ```
 
+## 11. Phase B — 승인 후 실행 (2026-09-24 · B-1 / B-2 두 단계)
+
+사용자가 §43 을 승인하면서 **배포 순서 제약**을 함께 지정했다. `deploy-api.yml` 은
+`이미지 빌드 → migration job → API revision deploy` 순이므로, DROP migration 을 코드 정리와 같은 배포에 넣으면
+**migration 이 새 API 보다 먼저 실행되어** 그 순간 서빙 중인 이전 revision 이 없는 컬럼을 참조한다.
+그래서 같은 WO 안에서 **B-1(코드) → B-2(스키마)** 로 나눠 배포한다. WO 를 쪼개지 않는다.
+
+### 11-1. Phase B-1 — 코드 선행 (migration 0)
+
+DROP 예정 스키마에 대한 **런타임 의존을 먼저 0 으로** 만든다. 이 단계에 **migration 은 없다.**
+
+| 변경 | 내용 |
+|---|---|
+| `services/auth/google-auth.service.ts` | 신규 user 생성의 `password: null` write 제거 · 로그인 시 `loginAttempts: 0` · `lockedUntil: null` reset 제거 (`lastLoginAt` · `refreshTokenFamily` 는 유지) |
+| `modules/auth/entities/User.ts` | 컬럼 선언 5개 제거 — `password` · `loginAttempts` · `lockedUntil` · `resetPasswordToken`(`reset_password_token`) · `resetPasswordExpires`(`reset_password_expires`) · 근거가 사라진 `get isLocked()` 제거(호출부 0) |
+| `database/entities.ts` | `ServiceCredential` · `PasswordResetToken` 등록·import 해제 |
+| 파일 삭제 | `modules/auth/entities/ServiceCredential.ts` · `entities/PasswordResetToken.ts` · `templates/email/password-reset.html` · `packages/mail-core/templates/email/password-reset.html`(둘 다 소비처 0) |
+| `apps/admin-dashboard` `pages/users/UserDetail.tsx` | `Login Attempts` 통계 카드 제거 — `(user as any)?.loginAttempts \|\| 0` 로 읽고 있었다. `as any` 라 tsc 에도 안 걸리고 크래시도 없지만 컬럼이 사라지면 **영원히 `0` 을 보여주는 거짓 지표**가 된다. 2열로 재배치 |
+| 낡은 주석 2건 | `google-auth.service.ts` 헤더의 "users.password = NULL" · `PharmacyHubAccountController` 의 "비밀번호 PUT /api/v1/users/password (기존 인증 계약)" — 둘 다 현재 사실로 교체 |
+| **KEEP** | `login_attempts` 테이블 · `LoginAttempt` entity(FROZEN auth-core) · `bcrypt`/`bcryptjs` dependency · `users.email` · sanitizer 블랙리스트 3곳 |
+
+**census 가 못 잡은 의존 1건** — 위 `UserDetail.tsx` 는 `(user as any)` 캐스팅이라 식별자 검색·타입 검사 양쪽을
+빠져나갔다. §10-2 의 코드 census 가 "runtime reader 0" 으로 판정한 축에 **UI 표시 reader 가 1건 남아 있었다.**
+교훈: `as any` 로 읽는 소비처는 컬럼 census 에서 보이지 않는다 — 컬럼 이름 자체로 다시 훑어야 한다.
+
+**테스트 — 지우지 않고 뒤집었다** (계약을 없애면 부활을 감지할 수 없다)
+
+| spec | 구 계약 → 새 계약 |
+|---|---|
+| `services/auth/__tests__/googleAuthService.test.ts` | `u.password === null`(명시적 NULL 기록) → **`'password' in u === false`**(키 자체를 만들지 않는다) |
+| `controllers/admin/__tests__/admin-user-sanitizer.test.ts` | 민감 필드 전부가 **실제 컬럼**이어야 한다 → **실제 컬럼 ∪ 명시적 은퇴 컬럼**. 블랙리스트는 방어층이라 컬럼이 사라져도 이름을 남긴다. 추가로 **은퇴 컬럼이 entity 로 되돌아오면 깨지는** 역방향 단정을 넣었다 |
+| `__tests__/auth-core-dead-lifecycle-…-closure.spec.ts` | 보존 entity 목록에 `ServiceCredential.ts` **존재** → 목록에서 제거 + `ServiceCredential` · `PasswordResetToken` **부재**를 고정(`LoginAttempt` 는 존재 유지) |
+| `__tests__/legacy-password-auth-retirement.spec.ts` | **P6 신설** — User entity 의 컬럼 선언 5종 부재 · `google-auth.service` 의 write 3종 부재 · DataSource 등록 2종 부재 · **KEEP 대상(`login_attempts`/`LoginAttempt`)의 존재**. P1 부재 목록에 삭제한 entity·템플릿 4개 추가 |
+
+#### 11-1a. B-1 검증 실측 (2026-09-24)
+
+| 검증 | 결과 |
+|---|---|
+| api-server `tsc --noEmit` | **rc=0** |
+| admin-dashboard `tsc --noEmit` | **rc=0** |
+| full api-server jest (`--maxWorkers=1` · heap 6GB · CI 와 동일 방식) | **345 suite / 5,959 test PASS** · 4 skipped |
+| 위 실행에서 2 suite 실패(`content-guard`) | **내 실행 위치 artifact** — 저장소 루트에서 돌려 `process.cwd()` 상대경로가 깨졌다(`C:\docs\...`). CI 는 `cd apps/api-server` 에서 실행한다. 같은 위치에서 재실행 → **5 suite / 170 test PASS**. 코드 회귀 아님 |
+| 영향 4 suite 개별 재실행 | **84/84 PASS** |
+| `check-migration-contract.mjs` | **21 pass / 0 fail** (C22 = baseline + incremental **4** — B-1 에 migration 추가 0 이 의도한 상태) |
+
+배포는 아직 하지 않았다 — 통제된 배포 창은 사용자 확인 후에만 연다.
+
+### 11-2. Phase B-2 — 스키마 계약 (B-1 서빙 확인 후에만)
+
+**아직 착수하지 않았다.** B-1 revision 이 production traffic 을 받고 이전 revision traffic 0 을 확인한 뒤에만
+destructive migration 을 추가한다. 대상:
+
+```sql
+DROP TABLE service_credentials;
+DROP TABLE password_reset_tokens;
+ALTER TABLE users DROP COLUMN password;
+ALTER TABLE users DROP COLUMN reset_password_token;
+ALTER TABLE users DROP COLUMN reset_password_expires;
+ALTER TABLE users DROP COLUMN "loginAttempts";
+ALTER TABLE users DROP COLUMN "lockedUntil";
+```
+
+단독 `DELETE` 는 실행하지 않는다(DROP 에 포함). 절차 제약:
+`epoch13 > 1790125390245` · class 명 = `name` 값 · manifest append · **격리 PostgreSQL 15** 에서
+baseline + incremental 전체 적용 → POST assertion → fingerprint → `expected-schema-states.ts` append ·
+`check-migration-contract.mjs` C22 통과. 배포에서 **신규 migration 이 정확히 1건**인지 확인하고 다르면 STOP.
+
+### 11-3. 배포 게이트 (사용자 지시)
+
+B-1 · B-2 **각각 별도의 통제된 배포 창**에서만 게이트를 열고 **즉시 다시 닫는다**.
+B-1 배포의 migration 결과는 반드시 **`INCREMENTAL_EXECUTED = 0`** 이어야 한다(스키마 무변화).
+그 뒤 이전 API revision traffic 0 · 관리자 Google 로그인 회귀를 확인한다.
+
+### 11-4. B-2 이후 postVerify (예정 · 미실행)
+
+```text
+users = 1 · linked_accounts.google = 1 · platform:super_admin = active
+role_assignments = 11 · service_memberships = 5
+service_credentials table = absent      password_reset_tokens table = absent
+users.password / reset_password_token / reset_password_expires = absent
+users.loginAttempts / lockedUntil = absent
+login_attempts = preserved              users.email = preserved
+```
+
+관리자 Google 로그인(로그인 → Admin 진입 → F5 유지 → 로그아웃 → 재로그인) 재확인.
+신규 테스트 계정은 만들지 않는다. Invitation Smoke B / Assignment Smoke A 는 계속 `PENDING_USER_ACTION`.
+기존 관리자 `users.id` · Google `sub` · roles 11 · memberships 5 중 하나라도 변하면 **STOP**.
+**postVerify 전부 PASS 후에만** `WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1 = COMPLETE` 를 선언한다.
+
 ## 판정
 
 `LEGACY PASSWORD AUTH RETIREMENT: PHASE_A_DEPLOYED / PHASE_B_PENDING_APPROVAL`

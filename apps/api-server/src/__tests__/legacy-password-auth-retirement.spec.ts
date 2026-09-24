@@ -45,6 +45,11 @@ const RETIRED_FILES: [string, string][] = [
   ['admin-dashboard lib/password-policy.ts', path.join(REPO, 'apps', 'admin-dashboard', 'src', 'lib', 'password-policy.ts')],
   ['admin-dashboard pages/auth/ForgotPassword.tsx', path.join(REPO, 'apps', 'admin-dashboard', 'src', 'pages', 'auth', 'ForgotPassword.tsx')],
   ['admin-dashboard pages/auth/ResetPassword.tsx', path.join(REPO, 'apps', 'admin-dashboard', 'src', 'pages', 'auth', 'ResetPassword.tsx')],
+  // Phase B-1 (2026-09-24): password 축 entity·죽은 메일 템플릿. 물리 스키마는 B-2 가 DROP 한다.
+  ['api-server modules/auth/entities/ServiceCredential.ts', path.join(SRC, 'modules', 'auth', 'entities', 'ServiceCredential.ts')],
+  ['api-server entities/PasswordResetToken.ts', path.join(SRC, 'entities', 'PasswordResetToken.ts')],
+  ['api-server templates/email/password-reset.html', path.join(SRC, 'templates', 'email', 'password-reset.html')],
+  ['packages/mail-core templates/email/password-reset.html', path.join(REPO, 'packages', 'mail-core', 'templates', 'email', 'password-reset.html')],
 ];
 
 /** P2 — auth.routes.ts 에 다시 등록되면 안 되는 경로 */
@@ -224,4 +229,50 @@ describe('WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1 — 재유입 차단 정적 
       expect(missing).toEqual([]);
     });
   });
+  describe('P6 password 축 스키마 의존 0 (Phase B-1 · 2026-09-24)', () => {
+    /**
+     * B-2 migration 이 DROP 할 스키마에 런타임이 다시 기대면 배포 순서상
+     * (migration → deploy) 서빙 중 코드가 없는 컬럼을 참조하게 된다.
+     * 그 재유입을 여기서 먼저 깬다.
+     *
+     * KEEP 대상은 반대로 **존재**를 고정한다 — `login_attempts` / `LoginAttempt` 는
+     * FROZEN auth-core 소유이므로 이번 은퇴에 휩쓸려 사라지면 안 된다.
+     */
+    const USER_ENTITY = path.join(SRC, 'modules', 'auth', 'entities', 'User.ts');
+    const GOOGLE_AUTH = path.join(SRC, 'services', 'auth', 'google-auth.service.ts');
+    const ENTITY_REGISTRY = path.join(SRC, 'database', 'entities.ts');
+
+    it.each([
+      ['password', /@Column\([^)]*\)\s*password\b/],
+      ['loginAttempts', /@Column\([^)]*\)\s*loginAttempts\b/],
+      ['lockedUntil', /@Column\([^)]*\)\s*lockedUntil\b/],
+      ['resetPasswordToken', /@Column\([^)]*\)\s*resetPasswordToken\b/],
+      ['resetPasswordExpires', /@Column\([^)]*\)\s*resetPasswordExpires\b/],
+    ])('User entity 에 %s 컬럼 선언이 없다', (_name, re) => {
+      expect(re.test(codeOnly(fs.readFileSync(USER_ENTITY, 'utf-8')))).toBe(false);
+    });
+
+    it.each([
+      ['password', /\bpassword\s*:/],
+      ['loginAttempts', /\bloginAttempts\s*:/],
+      ['lockedUntil', /\blockedUntil\s*:/],
+    ])('google-auth.service 가 %s 를 쓰지 않는다', (_name, re) => {
+      expect(re.test(codeOnly(fs.readFileSync(GOOGLE_AUTH, 'utf-8')))).toBe(false);
+    });
+
+    it.each(['ServiceCredential', 'PasswordResetToken'])(
+      'DataSource 에 %s 가 등록되지 않는다',
+      (name) => {
+        const code = codeOnly(fs.readFileSync(ENTITY_REGISTRY, 'utf-8'));
+        expect(new RegExp(`import \\{ ${name} \\}`).test(code)).toBe(false);
+        expect(new RegExp(`^\\s*${name},\\s*$`, 'm').test(code)).toBe(false);
+      },
+    );
+
+    it('KEEP — login_attempts / LoginAttempt 는 유지된다 (FROZEN auth-core)', () => {
+      expect(fs.existsSync(path.join(SRC, 'modules', 'auth', 'entities', 'LoginAttempt.ts'))).toBe(true);
+      expect(codeOnly(fs.readFileSync(ENTITY_REGISTRY, 'utf-8'))).toMatch(/\bLoginAttempt\b/);
+    });
+  });
+
 });

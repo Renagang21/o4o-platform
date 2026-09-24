@@ -22,7 +22,6 @@ import { Permission } from '../modules/auth/entities/Permission.js';
 import { RefreshToken } from '../modules/auth/entities/RefreshToken.js';
 import { LoginAttempt } from '../modules/auth/entities/LoginAttempt.js';
 import { LinkingSession } from '../modules/auth/entities/LinkingSession.js';
-import { PasswordResetToken } from '../entities/PasswordResetToken.js';
 import { EmailVerificationToken } from '../entities/EmailVerificationToken.js';
 import { ApprovalLog } from '../entities/ApprovalLog.js';
 import { ProductApproval } from '../entities/ProductApproval.js';
@@ -70,7 +69,6 @@ import { RoleAssignment } from '../modules/auth/entities/RoleAssignment.js';
 // WO-O4O-SERVICE-MEMBERSHIP-ARCHITECTURE-V1: Global User + Service Membership
 import { ServiceMembership } from '../modules/auth/entities/ServiceMembership.js';
 // WO-O4O-IDENTITY-V2-PHASE1-SCHEMA-RESET-V1: Identity V2 L2 Credential Layer
-import { ServiceCredential } from '../modules/auth/entities/ServiceCredential.js';
 import { RoleApplication } from '../entities/RoleApplication.js';
 import { KycDocument } from '../entities/KycDocument.js';
 // SupplierProfile/SellerProfile/PartnerProfile removed - now in dropshipping-core
@@ -554,11 +552,11 @@ export const entities = [
   RefreshToken,
   RoleAssignment,
   ServiceMembership, // WO-O4O-SERVICE-MEMBERSHIP-ARCHITECTURE-V1
-  ServiceCredential, // WO-O4O-IDENTITY-V2-PHASE1-SCHEMA-RESET-V1
+  // WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1 Phase B-1: ServiceCredential 등록 해제(소비처 0) · 테이블은 B-2 가 DROP.
   LoginAttempt,
   LinkingSession,
   // Legacy AUTH entities (to be migrated)
-  PasswordResetToken,
+  // WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1 Phase B-1: PasswordResetToken 등록 해제(소비처 0) · 테이블은 B-2 가 DROP.
   EmailVerificationToken,
   ApprovalLog,
   ProductApproval, // WO-PRODUCT-POLICY-V2-DATA-LAYER-INTRODUCTION-V1

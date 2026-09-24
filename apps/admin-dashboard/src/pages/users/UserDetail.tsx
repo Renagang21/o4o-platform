@@ -288,7 +288,11 @@ export default function UserDetail() {
               <CardTitle>Account Status</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1 Phase B-1:
+                  `Login Attempts` 카드를 제거했다 — password 로그인이 없어 실패 카운트를 올리는 주체가
+                  없고, `users.loginAttempts` 컬럼은 B-2 migration 이 DROP 한다. 남겨두면 값이 오지
+                  않는데도 항상 `0` 을 보여주는 거짓 지표가 된다. 2열로 재배치. */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="text-center p-4 border rounded-lg">
                   <p className="text-sm text-gray-600">Email Verified</p>
                   <p className="text-2xl font-bold">
@@ -299,12 +303,6 @@ export default function UserDetail() {
                   <p className="text-sm text-gray-600">Account Active</p>
                   <p className="text-2xl font-bold">
                     {(user as any)?.isActive ? '✓' : '✗'}
-                  </p>
-                </div>
-                <div className="text-center p-4 border rounded-lg">
-                  <p className="text-sm text-gray-600">Login Attempts</p>
-                  <p className="text-2xl font-bold">
-                    {(user as any)?.loginAttempts || 0}
                   </p>
                 </div>
               </div>
