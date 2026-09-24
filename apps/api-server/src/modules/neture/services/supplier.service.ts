@@ -14,7 +14,19 @@ import { ServiceMembership } from '../../auth/entities/ServiceMembership.js';
 import { organizationOpsService } from '../../organization/services/organization-ops.service.js';
 import { notificationService } from '../../../services/NotificationService.js';
 // WO-O4O-BUSINESSINFO-JSON-COLUMN-CONCAT-RUNTIME-FAILURE-FIX-V1: json 컬럼 안전 부분 갱신
-import { buildBusinessInfoUpdateStatement } from '../../../utils/business-info-write.js';
+
+/**
+ * WO-O4O-SUPPLIER-IDENTITY-RELATIONSHIP-AND-BUSINESS-PROFILE-CANONICALIZATION-V1 §9:
+ *   canonical 저장 위치가 없는 프로필 필드는 **조용히 버리지 않고** 이 오류로 거부한다.
+ *   (이전에는 user_id 가 NULL 이면 오류 없이 사라졌다.)
+ */
+export class SupplierProfileFieldUnsupportedError extends Error {
+  constructor(public readonly fields: string[]) {
+    super(`SUPPLIER_PROFILE_FIELD_UNSUPPORTED: ${fields.join(', ')}`);
+    this.name = 'SupplierProfileFieldUnsupportedError';
+  }
+}
+
 
 /**
  * NetureSupplierService
@@ -1116,60 +1128,57 @@ export class NetureSupplierService {
         data.businessZipCode !== undefined ||
         data.businessAddressDetail !== undefined ||
         data.contactPhone !== undefined;
-      if (orgWriteNeeded && supplier.organizationId) {
-        // WO-O4O-POSTAL-CODE-ADDRESS-V1: build address_detail JSONB
-        let addressDetail: Record<string, string | null> | undefined;
-        if (data.businessAddress !== undefined || data.businessZipCode !== undefined || data.businessAddressDetail !== undefined) {
-          // Read existing address_detail to merge
-          const orgRows = await AppDataSource.query(
-            `SELECT address_detail FROM organizations WHERE id = $1`,
-            [supplier.organizationId],
+      // WO-O4O-SUPPLIER-IDENTITY-RELATIONSHIP-AND-BUSINESS-PROFILE-CANONICALIZATION-V1 §F:
+      //   하나의 사용자 action 이 **두 canonical resource**(organizations · neture_suppliers)를
+      //   바꿔야 하므로 단일 트랜잭션으로 묶는다. 이전엔 순차 write 였어
+      //   "organizations 저장 성공 + neture_suppliers 저장 실패" 같은 부분 반영이 가능했다.
+      await AppDataSource.transaction(async (manager) => {
+        if (orgWriteNeeded && supplier.organizationId) {
+          // WO-O4O-POSTAL-CODE-ADDRESS-V1: build address_detail JSONB
+          let addressDetail: Record<string, string | null> | undefined;
+          if (data.businessAddress !== undefined || data.businessZipCode !== undefined || data.businessAddressDetail !== undefined) {
+            // Read existing address_detail to merge (같은 TX 안에서 읽는다)
+            const orgRows = await manager.query(
+              `SELECT address_detail FROM organizations WHERE id = $1`,
+              [supplier.organizationId],
+            );
+            const existing = (orgRows[0]?.address_detail as Record<string, string | null>) || {};
+            addressDetail = {
+              zipCode: data.businessZipCode !== undefined ? (data.businessZipCode || null) : (existing.zipCode || null),
+              baseAddress: data.businessAddress !== undefined ? (data.businessAddress || '') : (existing.baseAddress || ''),
+              detailAddress: data.businessAddressDetail !== undefined ? (data.businessAddressDetail || null) : (existing.detailAddress || null),
+            };
+          }
+
+          await this.writeOrgBusinessData(
+            supplier.organizationId,
+            {
+              business_number: data.businessNumber !== undefined ? (data.businessNumber || null) : undefined,
+              address: data.businessAddress !== undefined ? (data.businessAddress || null) : undefined,
+              phone: data.contactPhone !== undefined ? (data.contactPhone ? data.contactPhone.replace(/\D/g, '') : null) : undefined,
+              address_detail: addressDetail,
+            },
+            manager,
           );
-          const existing = (orgRows[0]?.address_detail as Record<string, string | null>) || {};
-          addressDetail = {
-            zipCode: data.businessZipCode !== undefined ? (data.businessZipCode || null) : (existing.zipCode || null),
-            baseAddress: data.businessAddress !== undefined ? (data.businessAddress || '') : (existing.baseAddress || ''),
-            detailAddress: data.businessAddressDetail !== undefined ? (data.businessAddressDetail || null) : (existing.detailAddress || null),
-          };
         }
 
-        await this.writeOrgBusinessData(supplier.organizationId, {
-          business_number: data.businessNumber !== undefined ? (data.businessNumber || null) : undefined,
-          address: data.businessAddress !== undefined ? (data.businessAddress || null) : undefined,
-          phone: data.contactPhone !== undefined ? (data.contactPhone ? data.contactPhone.replace(/\D/g, '') : null) : undefined,
-          address_detail: addressDetail,
-        });
-      }
-
-      await this.supplierRepo.save(supplier);
+        await manager.getRepository(NetureSupplier).save(supplier);
+      });
 
       // WO-O4O-NETURE-SUPPLIER-DEPRECATION-V1 Phase 5-B: read org for canonical fields
       const org = await this.getOrgData(supplier.organizationId);
 
-      // WO-O4O-NETURE-SUPPLIER-PROFILE-P4-FIELDS-ADD-V1:
-      //   businessEntityType / businessStartDate 는 users.businessInfo JSONB 에 jsonb_set 으로 merge.
-      //   payload 에 포함된 키만 update — 미포함 키는 변경 없음. organizations 와 dual-write 안 함.
-      const bizPatch: Record<string, unknown> = {};
-      if (data.businessEntityType !== undefined) bizPatch.businessEntityType = data.businessEntityType || null;
-      if (data.businessStartDate !== undefined) bizPatch.businessStartDate = data.businessStartDate || null;
-      // WO-O4O-BUSINESSINFO-JSON-COLUMN-CONCAT-RUNTIME-FAILURE-FIX-V1:
-      //   기존 SQL 의 `COALESCE("businessInfo", '{}'::jsonb)` 는 컬럼 실제 타입이 **json** 이라
-      //   프로덕션에서 항상 실패했고(`COALESCE could not convert type jsonb to json`),
-      //   catch 가 그것을 삼킨 뒤 아래에서 저장 전 값을 다시 읽어 성공 응답에 실었다.
-      //   교정: 검증된 공통 표현식을 쓰고 삼킴을 제거해 실패가 관측되게 한다
-      //   (바로 위 `supplierRepo.save(supplier)` 와 동일한 오류 전파 방식).
-      let savedBiz: Record<string, unknown> = {};
-      if (supplier.userId) {
-        const bizUpdate = buildBusinessInfoUpdateStatement({ root: bizPatch }, supplier.userId);
-        if (bizUpdate) {
-          await AppDataSource.query(bizUpdate.sql, bizUpdate.params);
-        }
-      }
-      if (supplier.userId) {
-        try {
-          const rows = await AppDataSource.query(`SELECT "businessInfo" FROM users WHERE id = $1`, [supplier.userId]);
-          savedBiz = (rows[0]?.businessInfo as Record<string, unknown>) || {};
-        } catch { /* graceful */ }
+      // WO-O4O-SUPPLIER-IDENTITY-RELATIONSHIP-AND-BUSINESS-PROFILE-CANONICALIZATION-V1 §D · §G · §9:
+      //   `users.businessInfo` 는 **가입 입력 snapshot** 이며 Supplier profile 의 read/write SSOT 가 아니다.
+      //   이전 구현은 businessEntityType / businessStartDate 를 여기에 썼는데, `if (supplier.userId)`
+      //   가드 때문에 user_id 가 NULL 이면 **오류 없이 사라졌다**(silent data loss · 운영 3건이 그 상태).
+      //   지금은 businessInfo 에 쓰지 않는다. 사업자등록증 기재사항의 최종 SSOT 는 Organization 이고,
+      //   저장 컬럼이 아직 없는 두 필드는 **성공을 가장하지 않고 명시적으로 거부**한다(migration 은 후속 판정).
+      const unsupported = (['businessEntityType', 'businessStartDate'] as const).filter(
+        (k) => data[k] !== undefined,
+      );
+      if (unsupported.length > 0) {
+        throw new SupplierProfileFieldUnsupportedError(unsupported as unknown as string[]);
       }
 
       return {
@@ -1185,8 +1194,9 @@ export class NetureSupplierService {
         businessType: supplier.businessType || null,
         businessItem: supplier.businessItem || null,
         // WO-O4O-NETURE-SUPPLIER-PROFILE-P4-FIELDS-ADD-V1: users.businessInfo JSONB SSOT
-        businessEntityType: (savedBiz.businessEntityType as string | null) || null,
-        businessStartDate: (savedBiz.businessStartDate as string | null) || null,
+        // WO-O4O-SUPPLIER-IDENTITY-RELATIONSHIP-AND-BUSINESS-PROFILE-CANONICALIZATION-V1: Organization 컬럼 신설 전까지 미지원(저장·반환 안 함)
+        businessEntityType: null,
+        businessStartDate: null,
         taxInvoiceEmail: supplier.taxInvoiceEmail || null,
         // Contact
         contactEmail: supplier.contactEmail || null,
@@ -1303,8 +1313,23 @@ export class NetureSupplierService {
       const orgId = supplier.organizationId;
 
       // 2. Ensure owner member
+      //     WO-O4O-SUPPLIER-IDENTITY-RELATIONSHIP-AND-BUSINESS-PROFILE-CANONICALIZATION-V1 §C:
+      //     organization_members(owner) 가 **canonical authorization 관계**다. 생성 실패를 조용히
+      //     넘기면 신규 공급자가 로그인해도 진입하지 못한다(운영 3건이 정확히 그 상태).
       if (supplier.userId) {
-        await organizationOpsService.setOwner(orgId, supplier.userId);
+        try {
+          await organizationOpsService.setOwner(orgId, supplier.userId);
+        } catch (ownerErr) {
+          logger.error(
+            `[NetureSupplierService] CANONICAL_OWNER_MEMBERSHIP_FAILED supplier=${supplier.id} org=${orgId}`,
+            ownerErr,
+          );
+          throw ownerErr;
+        }
+      } else {
+        logger.error(
+          `[NetureSupplierService] CANONICAL_OWNER_MEMBERSHIP_SKIPPED supplier=${supplier.id} org=${orgId}`,
+        );
       }
 
       // 3. Ensure service enrollment (only when active)
@@ -1330,8 +1355,14 @@ export class NetureSupplierService {
       // WO-O4O-POSTAL-CODE-ADDRESS-V1
       address_detail?: Record<string, string | null> | null;
     },
+    /**
+     * WO-O4O-SUPPLIER-IDENTITY-RELATIONSHIP-AND-BUSINESS-PROFILE-CANONICALIZATION-V1 §F:
+     *   호출자가 트랜잭션 안에서 쓸 수 있도록 EntityManager 를 받는다.
+     *   주어지지 않으면 기존처럼 AppDataSource 를 쓴다(무회귀).
+     */
+    manager?: EntityManager,
   ): Promise<void> {
-    try {
+    {
       const setClauses: string[] = [];
       const params: any[] = [];
       let idx = 1;
@@ -1359,12 +1390,14 @@ export class NetureSupplierService {
       setClauses.push(`"updatedAt" = NOW()`);
       params.push(organizationId);
 
-      await AppDataSource.query(
+      // WO-O4O-SUPPLIER-IDENTITY-RELATIONSHIP-AND-BUSINESS-PROFILE-CANONICALIZATION-V1 §F · §9:
+      //   이전엔 catch 가 실패를 삼켜 warn 만 남기고 **성공처럼 응답**했다.
+      //   트랜잭션 안에서 그러면 롤백이 일어나지 않아 부분 반영이 남는다 — 오류를 전파한다.
+      const runner = manager ?? AppDataSource;
+      await runner.query(
         `UPDATE organizations SET ${setClauses.join(', ')} WHERE id = $${idx}`,
         params,
       );
-    } catch (error) {
-      logger.warn(`[NetureSupplierService] Org business write failed for org ${organizationId}:`, error);
     }
   }
 
