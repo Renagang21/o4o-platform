@@ -346,7 +346,17 @@ Deploy 3종은 workflow 결과가 success 여도 `DEPLOY_ENABLED=false` 게이�
 배포 담당 세션도 병합 전에 "브랜치 CI 이력 0" 을 확인하지 않았음을 자기 CHECK 에 남기기로 했다.
 재발 방지 합의: **main 반영 전 PR 로 CI 를 한 번 통과시키는 것을 기본값**으로 한다(이번 수정도 PR 경유).
 
-**수정 후 검증(본 세션 · 2026-09-24):** 문제 4 suite **92/92 PASS** · **전체 API jest `--maxWorkers=1`(heap 6GB) → 347 suites / 5,965 tests PASS · 실패 0**(4 suite·32 test skipped) · `pnpm run type-check:frontend` **OK**(TS6133 해소) · `apps/api-server tsc --noEmit` **0**.
+**추가 실패 1건 (PR #226 CI 에서 드러남 · 같은 계열):** `packages/auth-react/src/__tests__/useServiceAuth.test.tsx` 6 test —
+Phase A 가 훅 표면에서 password `login` 을 은퇴시켰는데 vitest 가 그것을 계속 검사했다(앞선 tsc 실패가 job 을 먼저
+죽여 가려져 있었다). 같은 원칙으로 처리: ① `login` **부재 자체를 계약**으로 고정(부활 감지) + 로그인 진입이
+Google 둘뿐임을 고정 ② 살아 있어야 하는 계약(`SERVICE_NOT_MEMBER` 가입 안내 분기 · 429 rate-limit ·
+네트워크 오류 구분)은 **Google 경로(`loginWithGoogle`)로 이전** ③ `INVALID_CREDENTIALS` 는 password 축 소멸로
+발생 자체가 없어져 제거. → auth-react **64/64 PASS**.
+**본 세션 실책 2차:** auth-react vitest 도 재실행하지 않았다(브랜치 WIP 커밋이 `useServiceAuth.ts` 를 바꿨는데도).
+이후 CI 가 돌리는 **vitest 8종 전부**를 검증 범위에 포함한다(아래).
+
+**수정 후 검증(본 세션 · 2026-09-24):** 문제 4 suite **92/92 PASS** · **전체 API jest `--maxWorkers=1`(heap 6GB) → 347 suites / 5,965 tests PASS · 실패 0**(4 suite·32 test skipped) · `pnpm run type-check:frontend` **OK**(TS6133 해소) · `apps/api-server tsc --noEmit` **0** · **vitest 9종 전부 PASS**(auth-react 64/64 · ui · auth-utils ·
+store-ui-core 8 · operator-core-ui 4 · shared-space-ui 8 · auth-client 2 · web-neture 20 · web-kpa-society 2).
 역할 분담: 본 세션은 **브랜치 push 만**, PR 생성·CI·merge 는 배포 담당 세션(main freeze 보유).
 
 ### 7-8. 배포 후 negative 검증 대상 변경 (2026-09-24 실측)
