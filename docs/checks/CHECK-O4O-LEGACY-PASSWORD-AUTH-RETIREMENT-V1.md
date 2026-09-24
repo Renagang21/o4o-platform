@@ -1,6 +1,6 @@
 # CHECK-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1
 
-> 작성일: 2026-09-23 · 상태: **`MERGED_TO_MAIN / AWAITING_CONTROLLED_DEPLOY`** — 배포 대상 SHA 확정 `0af9db301` (§7-2 · 2026-09-24)
+> 작성일: 2026-09-23 · 상태: **`MERGED_TO_MAIN / AWAITING_CONTROLLED_DEPLOY`** — 배포 대상 SHA **`7a44a97bc`** (§7-2 · CI 수정 2라운드 반영 · 2026-09-24)
 > WO: [`WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1`](../work-orders/WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1.md)
 > 작업 브랜치: `wo/legacy-password-auth-retirement` (origin push 완료 · `main` 무접촉)
 > 작업 worktree: `C:/tmp/o4o-legacy-password-retirement` — 다른 세션의 체크아웃·worktree 는 **불가침**
@@ -195,7 +195,18 @@ backend Phase A 2커밋(`010952f0d` · `c921f90b5`)과 프런트/공통 WIP(`4d7
 
 ### 7-2. 배포 대상 SHA 와 포함 변경 (2026-09-24 실측 · **대상 SHA 정정**)
 
-> **배포 대상 SHA 확정(2026-09-24):** **`0af9db3011cb1ed105c198721d5bbb87420cd225`(`0af9db301`)**
+> **배포 대상 SHA 최종(2026-09-24 · PR #226 merge 후):** **`7a44a97bc83c5a43af5b889af1098a628161670f`(`7a44a97bc`)**
+>
+> 1차 병합 `0af9db301` 은 CI red 였고(§7-7), 수정 2라운드(`f38f120bf` · `44d6dd66c`)를 PR #226 으로 올려
+> **CI 전부 success** 확인 후 merge 한 것이 이 SHA 다. 본 세션 독립 검증(2026-09-24):
+> `origin/main = 7a44a97bc…` · 수정 tip `44d6dd66c` 조상 포함 · marker 6종(`9a3b402b9` · `3c7083be5` ·
+> `ebc7204ba` · `0af9db301` · `f38f120bf` · `44d6dd66c`) 전부 포함 ·
+> §43 재확인(`0af9db301..7a44a97bc`): 신규 migration **0** · 파괴적 SQL **0**.
+> SonarCloud 는 `new_duplicated_lines_density 4.3%(>3%)` 로 fail — 계약 테스트를 명시적으로 늘린 결과이며
+> 등급·hotspot 은 전부 통과. 비필수 게이트이고 헬퍼 추출은 "케이스마다 무엇을 지키는지 보이게" 하려는 의도와
+> 상충하므로 현행 유지, 필요 시 사용자 판단으로 정리한다.
+>
+> (이전) 1차 병합 기록: **`0af9db3011cb1ed105c198721d5bbb87420cd225`(`0af9db301`)**
 > = `origin/main 21e8ad587` + Phase A 브랜치 tip `d1f6c3d4f` 의 `--no-ff` merge. 병합 실행은 배포 담당 세션이 했고,
 > 본 세션은 **독립 검증만** 했다(본 세션 main push 0 · 병합 미실행).
 >
