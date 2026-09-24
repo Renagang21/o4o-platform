@@ -794,6 +794,81 @@ needs.detect.outputs.api_deploy_affected == 'true'
 사용자에게 승인을 요청한다. 기존 태그 `deploy/2026-09-24-phase-b1` 은 **재사용하지 않고**
 수정 반영된 새 SHA 로 새 태그를 만든다.
 
+### 11-6. deploy-admin tag-ref 결함 — 수정 · 회귀 계약 (2026-09-24)
+
+1차 창(§11-5)에서 detector fallback 을 고친 뒤 2차 창을 열었더니 **Admin 만 build 단계에서 실패**했다.
+
+```text
+ERROR: failed to build: invalid tag ".../o4o-api/:b2925e765...": invalid reference format
+```
+
+**원인** — `deploy-admin.yml` 의 `Determine deployment target` 이 `refs/heads/main` ·
+`refs/heads/develop` **두 분기만** 가진다. 통제된 배포는 검증된 SHA 를 태그로 고정해 dispatch 하므로
+ref 가 `refs/tags/deploy/*` 였고, **어떤 output 도 설정되지 않아** `image_name` 이 빈 값이 됐다.
+Cloud Run 이전 단계라 **운영 영향 0** 이지만 승인받은 창 하나를 소모했고, `service_name` 도 함께
+비어 있어 build 가 성공했다면 이름 없는 서비스로 deploy 를 시도할 구조였다.
+`deploy-api.yml` 은 정적 `env:`(`SERVICE_NAME` · `IMAGE_NAME`)를 쓰므로 같은 결함이 없다(그래서 성공했다).
+
+**수정** (`a6571915c` — `b2925e765` 위의 **workflow-only repair**, diff 2파일)
+
+```text
+refs/heads/main        → production
+refs/tags/deploy/*     → production        ← 신설
+refs/heads/develop     → development
+그 외 ref              → ::error:: + exit 1  (hard fail)
+service_name / image_name / api_url / app_origin → 빈 값 검사 통과 후에만 GITHUB_OUTPUT (fail-closed)
+```
+
+`set -euo pipefail` 추가 · 분기 안에서 곧바로 `echo "image_name=…"` 하던 형태 제거.
+**4가지 ref 로 실제 실행해 확인**: main·deploy 태그 → production, develop → development,
+나머지 2종(`refs/heads/some-feature` · `refs/tags/v1.2.3`) → **rc=1 · output 0건**.
+
+**회귀 계약** `apps/api-server/src/__tests__/deploy-target-ref-resolution.spec.ts` **10 tests PASS**
+(A deploy 태그 production 판정 · B 알 수 없는 ref hard fail · C 4개 값 빈 값 검사 후 출력 ·
+D `deploy-api` 는 ref 분기 없이 정적 env 유지). jest 이므로 CI 샤드에서 자동 실행된다.
+
+태그는 재사용하지 않았다 — `r2` 는 1차 창에서 `b2925e765` 에 이미 붙었으므로 repair commit 에는
+**`deploy/2026-09-24-phase-b1-r3`** 를 새로 만들었다.
+
+### 11-7. **Phase B-1 운영 반영 완료** (2026-09-24 · 3개 창)
+
+| 창 | ref | 결과 |
+|---|---|---|
+| 1차 07:49~08:06Z | `deploy/2026-09-24-phase-b1` (`796932575`) | **STOP** — detector fallback 결함 · 배포 0 (§11-5) |
+| 2차 09:00~09:58Z | `deploy/2026-09-24-phase-b1-r2` (`b2925e765`) | **API 성공 · Admin build 실패**(§11-6) |
+| 3차 10:47~10:56Z | `deploy/2026-09-24-phase-b1-r3` (`a6571915c`) | **Admin 성공** |
+
+**traffic 전환** (사용자 승인 · `DEPLOY_ENABLED` 는 `false` 유지 — 전환에 게이트는 필요 없다)
+`API → 확인 → Admin` 순서로 통제 전환했다(두 명령은 원자적이 아니다).
+
+| 서비스 | B-1 revision | 이미지 | 전환 후 traffic |
+|---|---|---|---|
+| `o4o-core-api` | **`03751-ctw`** | `api-server@sha256:e1062128…` | **100%** (이전 `03749-9p8` → 0%) |
+| `o4o-admin-dashboard` | **`01310-cwm`** | `admin-dashboard@sha256:f168eb9f…` | **100%** (이전 `01309-hrs` → 0%) |
+
+**postVerify — 전부 PASS**
+
+| 항목 | 실측 |
+|---|---|
+| migration | **`INCREMENTAL_EXECUTED = 0`** · `INCREMENTAL_PENDING = 0` · PRE/POST assertion PASS · fingerprint 전후 동일(`bc27f5bc…` 5826 lines) · `typeorm_migrations` **688행 · 최신 `CreateHospitalDeviceTables1790125390245`**(추가 0) |
+| API 응답 | `/health` 200 · `/health/ready` `{"status":"ready"}` · `/auth/google/config` `enabled:true` |
+| 은퇴 endpoint | `/auth/login` · `register` · `signup` · `check-email` · `forgot-password` · `reset-password` · `find-id` · `google/link` → **전부 404** |
+| Admin | `admin.neture.co.kr` **200** |
+| 관리자 identity | `cfd2a5e7…` · status `active` · Google sub `117391***` — **불변** |
+| roles / memberships | `role_assignments` **11** · `platform:super_admin` active **1** · memberships active **5** |
+| users | **1** · `password` non-null **0** |
+| **password 축 스키마 — 아직 존재** | `users.password` · `reset_password_token` · `reset_password_expires` · `loginAttempts` · `lockedUntil` 컬럼 5개 · `service_credentials`(**5행**) · `password_reset_tokens`(**5행**) · `login_attempts`(0행) 테이블 3개 **전부 present** |
+| DROP / DELETE | **0** — B-1 은 스키마를 건드리지 않는다 |
+| b4 build-path 3건 | `Build API-specific packages` · `Build API server (tsup)` · sparse checkout · `Set up Cloud SDK` 모두 통과 — **revert 대상 없음** |
+| `DEPLOY_ENABLED` | 각 창 종료 시 `false` 복귀(08:06:34Z · 09:58:06Z · 10:56:18Z) |
+
+**rollback 가능 지점이다** — 스키마가 그대로이므로 traffic 을 이전 revision(`03749-9p8` · `01309-hrs`)으로
+되돌리면 이전 동작으로 복귀한다(이미지 보존).
+
+**남은 것**: 관리자 Google 브라우저 회귀(로그인 → Admin 진입 → F5 → 로그아웃 → 재로그인) +
+`lastLoginAt` / Google `lastUsedAt` 전진 DB 확인. **여기까지 PASS 해야**
+`PHASE_B1 = COMPLETE` · `PHASE_B2_DESTRUCTIVE = READY` 로 판정하며, 그 전에는 B-2 migration 에 착수하지 않는다.
+
 ### 11-2. Phase B-2 — 스키마 계약 (B-1 서빙 확인 후에만)
 
 **아직 착수하지 않았다.** B-1 revision 이 production traffic 을 받고 이전 revision traffic 0 을 확인한 뒤에만
