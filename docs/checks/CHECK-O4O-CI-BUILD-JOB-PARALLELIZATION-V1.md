@@ -3,7 +3,7 @@
 > **WO**: `WO-O4O-CI-BUILD-JOB-PARALLELIZATION-V1` (사용자 직접 지시 · 배포/CI 소요시간 개선 2번 항목)
 > **구현 commit**: `9c3a619d2`
 > **선행**: [`CHECK-O4O-CI-API-JEST-SHARD-PARALLELIZATION-V1`](CHECK-O4O-CI-API-JEST-SHARD-PARALLELIZATION-V1.md)
-> **상태**: 구현 완료 · 병렬 스케줄링 실측 PASS · **CI 전체 wall-clock 실측 PENDING (main red — 본 변경과 무관)**
+> **상태**: COMPLETE — 병렬 스케줄링 PASS · CI 전체 wall-clock 실측 PASS (main green 복귀 후, §2-2)
 > **작성일**: 2026-09-24
 
 ---
@@ -28,7 +28,7 @@ build 가 quality-check · api-tests 뒤에 직렬로 붙던 84~102s 를 critica
 | 실 Actions run `35937365310` — build 시작 시각 | detect 종료(00:14:25) 직후 **00:14:27** 시작, quality-check · Jest 3 shard 와 동시 → **병렬 스케줄링 PASS** |
 | build 잡 결과 | success · 102s |
 
-### 2-1. CI 전체 wall-clock — PENDING
+### 2-1. main red 기간 (기록)
 
 run `35937365310` 은 **failure** 다. 원인은 본 변경이 아니라 선행 commit 이다:
 
@@ -45,7 +45,20 @@ run `35937365310` 은 **failure** 다. 원인은 본 변경이 아니라 선행 
 - API Jest — `legacy-partner-runtime-retirement.spec.ts` · `database-migration-ownership-startup-health-final-closure.spec.ts` (8.5 dangling script) · `serviceCredentialLifecycle.test.ts` (hard delete 4건) · `pharmacy-hub-member-model-contract.spec.ts`
 
 quality-check 가 type-check 에서 265s 에 중단되어 이 run 의 total 451s 는 기준선과 비교할 수 없다.
-**main 이 green 으로 돌아온 뒤 첫 run 에서 total 을 기록한다.** 예상치: detect 28s + quality-check ≈ 474s ≈ 500s (8분대).
+main red 는 타 세션이 해소했다 (첫 green: `44d6dd66c`).
+
+### 2-2. CI 전체 wall-clock — main green 복귀 후 실측
+
+| run | commit | Detect | Quality Check | Jest 1/2/3 | Build | **CI 전체** |
+|---|---|---|---|---|---|---|
+| `35940308583` | `44d6dd66c` | 27s | 373s | 280 / 290 / 315s | 106s | **406s** |
+| `35941279765` | `7a44a97bc` | 25s | 449s | 284 / 248 / 345s | 105s | **490s** |
+
+- 두 run 모두 build 가 detect 직후 quality-check · Jest 와 **동시에 시작**했다.
+- critical path = detect → Code Quality Check. build(≈105s)는 critical path 밖이다.
+- Jest shard 합계(`7a44a97bc`): suites 347 passed / 4 skipped / 351 total · tests 5,965 passed / 32 skipped / 5,997 total — suite 수 감소(357→351)는 password 은퇴 WO 의 test 정리 결과이며 본 변경과 무관.
+
+**누적 효과 (CI 전체)**: 기준선 740~880s → Jest shard 후 594s → Build 병렬 후 **406~490s**.
 
 ## 3. 범위 밖 발견 (보고만)
 
