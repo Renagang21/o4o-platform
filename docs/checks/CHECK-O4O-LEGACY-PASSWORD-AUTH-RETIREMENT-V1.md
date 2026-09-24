@@ -1,10 +1,10 @@
 # CHECK-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1
 
-> 작성일: 2026-09-23 · 상태: **`PHASE_A_DEPLOYED`** — `7a44a97bc` 운영 반영 완료(2026-09-24 · §7-9) · **Phase B/§43 은 미착수·별도 승인**
+> 작성일: 2026-09-23 · 상태: **`COMPLETE`** (2026-09-24) — Phase A `7a44a97bc` · B-1 `03751-ctw`/`01310-cwm` · B-2 `DropLegacyPasswordAuthSchema1790251584623`. password 축은 **런타임·스키마 양쪽에서 제거**됐다
 > WO: [`WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1`](../work-orders/WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1.md)
 > 작업 브랜치: `wo/legacy-password-auth-retirement` (origin push 완료 · `main` 반영은 배포 담당 세션이 수행 — 본 세션 main push 0)
 > 작업 worktree: `C:/tmp/o4o-legacy-password-retirement` — 다른 세션의 체크아웃·worktree 는 **불가침**
-> Phase B(스키마 파괴적 제거)는 **미착수** — Phase A 배포·검증은 끝났으나(§7-9) §43 DESTRUCTIVE GATE 진입은 **사용자 승인 후**다
+> §43 DESTRUCTIVE GATE: 사용자 승인(2026-09-24) → **B-1(코드) → B-2(스키마)** 두 창으로 실행 완료. 최종 브라우저 회귀 §11-9a
 
 ---
 
@@ -1006,18 +1006,88 @@ login_attempts = preserved              users.email = preserved
 기존 관리자 `users.id` · Google `sub` · roles 11 · memberships 5 중 하나라도 변하면 **STOP**.
 **postVerify 전부 PASS 후에만** `WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1 = COMPLETE` 를 선언한다.
 
+### 11-9. **Phase B-2 운영 적용 완료** (2026-09-24 13:49~14:03Z)
+
+| 항목 | 실측 |
+|---|---|
+| ref | tag `deploy/2026-09-24-phase-b2` → **`33e61d841`**(PR #229 merge · CI 전부 pass) |
+| 함께 실린 것 | 문서 1건(`403b82b84`)뿐 · **DB 축 변경 0** → fingerprint 기준 유지 |
+| dispatch | **API 만**(Admin · Web 창 없음) |
+| run | [36008358476](https://github.com/Renagang21/o4o-platform/actions/runs/36008358476) · `build-and-deploy` **success** |
+| migration execution | `o4o-api-migrations-mdlbt` · `MIGRATION_JOB = SUCCESS` |
+| `DEPLOY_ENABLED` | 14:02:54Z **`false` 복귀** |
+
+#### STOP 조건 대조 — 7/7 일치
+
+| 조건 | 기대 | 운영 실측 |
+|---|---|---|
+| PRE fingerprint | `bc27f5bc…` / 5826 | **일치** |
+| `CURRENT_INCREMENTAL_PREFIX` | 4 / 5 | **4 / 5** |
+| `INCREMENTAL_PENDING` | 1 | **1** |
+| `INCREMENTAL_EXECUTED` | 1 | **1** |
+| POST fingerprint | `6503cfb6…` / 5793 | **일치** |
+| `POST_MIGRATION_SCHEMA_ASSERTION` | PASS | **PASS** |
+| `LEGACY_HISTORY_FINGERPRINT` | MATCH | **MATCH** |
+
+격리 리허설(§11-8 ④)이 예측한 값과 운영 실측이 **완전히 같았다** — 리허설이 유효한 모델이었다.
+
+#### postVerify
+
+| 구분 | 결과 |
+|---|---|
+| **DROP 7개** | `users.password` · `reset_password_token` · `reset_password_expires` · `"loginAttempts"` · `"lockedUntil"` · `service_credentials` · `password_reset_tokens` → **전부 absent** |
+| **KEEP 4개** | `login_attempts`(0행 유지) · `users.email` · `users.lastLoginAt` · `linked_accounts` → **전부 present** |
+| 불변 | users **1** · admin `cfd2a5e7…` · Google sub `117391***` · google link 1 · roles **11** · `platform:super_admin` active · memberships **5 active** |
+| 이력 | `typeorm_migrations` **689행** · 최신 `DropLegacyPasswordAuthSchema1790251584623` |
+| **스키마 전역 잔여** | password 관련 **컬럼 0** · password/credential **테이블 0** |
+
+#### 안전장치 실증
+
+새 revision `03752-zpl` 은 생성됐지만 traffic 은 **B-1 revision `03751-ctw` 100%** 그대로다(pin).
+그 상태에서 `/health/ready` 가 `{"status":"ready"}` 였다 — **지금 서빙 중인 런타임이 password 컬럼이
+사라진 새 스키마와 정상 호환**된다. B-1(코드)을 B-2(스키마)보다 먼저 보낸 설계가 여기서 값을 했다.
+`03752-zpl` 승격은 이 WO 의 목적(migration)과 별개이므로 **traffic 은 건드리지 않았다.**
+
+#### 11-9a. 최종 브라우저 회귀 — **PASS** (2026-09-24 14:09Z)
+
+`users.password` 컬럼이 **아예 없는 스키마**에서 관리자 Google 로그인 → Admin 진입 → F5 → 로그아웃 →
+재로그인. 판정은 DB read-only.
+
+| 항목 | 이전 | 회귀 후 |
+|---|---|---|
+| `users.lastLoginAt` | 11:53:07.687 | **14:09:46.672** (전진) |
+| google link `lastUsedAt` | 11:53:07.693 | **14:09:46.676** (전진) |
+| Google sub / `users.id` / users / roles / memberships | `117391***` / `cfd2a5e7…` / 1 / 11 / 5 | **전부 동일** |
+| 스키마에 남은 password 컬럼 | — | **0** |
+
+즉 **password 축이 물리적으로 존재하지 않는 상태에서 인증이 정상 동작한다.**
+
 ## 판정
 
-`LEGACY PASSWORD AUTH RETIREMENT: PHASE_B1_COMPLETE / PHASE_B2_DESTRUCTIVE_READY`
+`WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1 = COMPLETE`
 
-Phase A 는 **운영 반영까지 끝났다**(`7a44a97bc` · 2026-09-24 · §7-9). 런타임에서 password reader/writer/UI 0 ·
-은퇴 endpoint 404 · 서빙 번들 password 입력 0 을 실측했고, 스키마는 **의도대로 무변화**다(migration 0).
-**Google 실브라우저 smoke 는 PASS 로 닫혔다**(§10-6 · 2026-09-24 04:38Z · Google sub → 기존 admin `users.id` ·
-두 타임스탬프 전진 · `platform:super_admin` 유지 · roles 11 / memberships 5 불변).
-남은 것은 **Phase B/§43 하나**다 — census · 항목별 제거안 · 실행 레시피 · rollback 한계를 §10 에 보고했고
-(**production write 0**) **사용자 승인 대기**다. 승인 전에는 DELETE · DROP · production migration 을 실행하지 않는다.
-`login_attempts` 는 FROZEN `auth-core` 소유라 이번 범위에서 **제외**했다(Core 승인 선행).
-범위 밖 보고 2건: `roles[0]` 대표 role 이 정렬 없는 조회라 **비결정적**(표시 전용 · 인가는 배열 판정) ·
-로그인 Google 계정과 프로필 이메일이 화면에서 구분되지 않음(§10-6a).
+password 인증은 **런타임과 스키마 양쪽에서 제거됐다.**
+
+| 단계 | 내용 | 완료 |
+|---|---|---|
+| Phase A | 런타임 컷오버(route · service · UI · 테스트 재정의 · 정적 guard) | 2026-09-24 `7a44a97bc` (§7-9) |
+| §43 GATE | census · 제거안 · rollback 한계 보고 → **사용자 승인** | §10 |
+| Phase B-1 | 스키마 의존 0(entity 컬럼 5 · write 3 · entity 2 · 죽은 템플릿 2 · admin 카드 1) | `03751-ctw` / `01310-cwm` traffic 100% (§11-7) |
+| Phase B-2 | **물리 제거** — 테이블 2 · 컬럼 5 DROP | `DropLegacyPasswordAuthSchema1790251584623` · POST `6503cfb6…` (§11-9) |
+
+최종 상태: 스키마 전역에 password 컬럼 0 · password/credential 테이블 0, 그 상태에서
+관리자 Google 로그인 회귀 PASS(§11-9a). Identity 는 `linked_accounts(provider,providerId)` 단일 축이다.
+
+**남긴 것(의도)**: `login_attempts` 테이블 + `LoginAttempt` entity(FROZEN `auth-core` 소유 — Core 승인 선행) ·
+`users.email`(optional 화는 범위 밖) · `bcrypt`/`bcryptjs` dep(frozen historical migration 4파일이 import ·
+제거는 baseline rollover 소관) · sanitizer 블랙리스트 3곳(과거 필드명 방어층).
+
+**부수 성과** — 배포 창에서 CI 결함 2건을 잡아 고쳤다: ① `detect-affected.mjs` 의 `!read.ok` fallback 이
+`api_deploy_affected` 를 빠뜨려 **배포가 조용히 skip**(§11-5) ② `deploy-admin.yml` 이 deploy 태그 ref 에서
+빈 `image_name` 으로 build(§11-6). 회귀 계약 13건을 남겼다.
+
+**미해결 보고 2건(범위 밖 · 별도 WO)**: `roles[0]` 대표 role 이 정렬 없는 조회라 **비결정적**
+(표시 전용 · 인가는 배열 판정이라 권한 결함 아님) · 로그인 Google 계정과 프로필 이메일이 화면에서
+구분되지 않음 — 둘 다 §10-6a.
 
 문서 정합: 발견 2건(MYPAGE 매트릭스 password 2행 — 정정 완료 / USER-DOMAIN-SSOT 다이어그램 password 표기 — Phase B 로 이월) / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 1건(F10 Core Freeze 본문 갱신 여부 판단)
