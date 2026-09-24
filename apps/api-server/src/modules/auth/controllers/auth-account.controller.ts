@@ -53,7 +53,8 @@ export class AuthAccountController extends BaseController {
 
       // WO-KPA-OPERATOR-SCOPE-ASSIGNMENT-OPS-V1: scopes 계산
       const scopes = deriveUserScopes({
-        role: roles[0] || 'user',
+        // WO-O4O-IDENTITY-ACCOUNT-DISPLAY-AND-DOCUMENT-ALIGNMENT-V1 §7-B: compatibility 필드 · 결정적 값(정렬 사본).
+        role: [...roles].sort()[0] || 'user',
         roles,
       });
 
@@ -63,7 +64,7 @@ export class AuthAccountController extends BaseController {
         name: req.user.name,
         // WO-O4O-KPA-FORUM-DISPLAYNAME-NICKNAME-ALIGNMENT-V1: nickname fallback
         nickname: req.user.nickname || null,
-        role: roles[0] || 'user',
+        role: [...roles].sort()[0] || 'user',
         roles,  // WO-O4O-ROLE-MODEL-UNIFICATION-PHASE1-V1
         status: req.user.status,
         scopes: [] as string[],
@@ -304,7 +305,7 @@ export class AuthAccountController extends BaseController {
       userData.roles = roles;
       // WO-KPA-OPERATOR-SCOPE-ASSIGNMENT-OPS-V1: scopes 주입
       const scopes = deriveUserScopes({
-        role: roles[0] || 'user',
+        role: [...roles].sort()[0] || 'user',
         roles,
       });
       userData.scopes = scopes;

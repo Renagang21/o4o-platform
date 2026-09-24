@@ -77,7 +77,12 @@ export function generateAccessToken(user: User, roles: string[], domain: string 
 
   // Phase3-E PR3: roles from RoleAssignment table (explicit parameter)
   const userRoles = roles;
-  const primaryRole = userRoles[0] || 'user';
+  // WO-O4O-IDENTITY-ACCOUNT-DISPLAY-AND-DOCUMENT-ALIGNMENT-V1 §7-B:
+  //   `role` claim 은 **compatibility 필드**다(인가는 `roles[]` 로 한다 — 이 claim 을 보는
+  //   권한 판정 코드는 census 결과 0). 다만 값이 조회 순서에 따라 흔들리면 로그·표시가
+  //   요청마다 달라지므로 **정렬 사본의 첫 원소**로 고정한다. 원본 배열은 건드리지 않는다.
+  //   ※ RBAC SSOT(role-assignment.service, FROZEN Core)는 수정하지 않았다.
+  const primaryRole = [...userRoles].sort()[0] || 'user';
 
   // WO-O4O-LEGACY-BACKEND-JWT-SCOPE-BRANCH-REMOVAL-V1:
   //   access token 의 scopes claim 생성을 제거했다. 인증 미들웨어가 payload.scopes 를

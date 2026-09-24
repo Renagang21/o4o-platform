@@ -255,15 +255,24 @@ export default function UserDetail() {
               <div className="space-y-4">
                 <div>
                   <p className="text-sm text-gray-600 mb-2">Assigned Roles</p>
+                  {/* WO-O4O-IDENTITY-ACCOUNT-DISPLAY-AND-DOCUMENT-ALIGNMENT-V1:
+                      전: `{user?.role ? [user.role] : [].map(...)}` — 연산자 우선순위 때문에
+                      배열이 그대로 렌더되고, 값 자체도 backend `roles[0]`(정렬 없는 조회)였다.
+                      즉 11개 role 보유자에게 임의의 1개만, 그것도 Badge 없이 보여줬다.
+                      후: 권한 정본인 `roles[]` 전체를 렌더한다(순서 무관 · 없으면 없다고 표시). */}
                   <div className="flex gap-2 flex-wrap">
-                    {user?.role ? [user.role] : [].map((role: string) => (
-                      <Badge
-                        key={role}
-                        className={`${getRoleBadgeColor(role)} text-white`}
-                      >
-                        {role.replace('_', ' ')}
-                      </Badge>
-                    ))}
+                    {(user?.roles ?? []).length > 0 ? (
+                      (user?.roles ?? []).map((role: string) => (
+                        <Badge
+                          key={role}
+                          className={`${getRoleBadgeColor(role)} text-white`}
+                        >
+                          {role}
+                        </Badge>
+                      ))
+                    ) : (
+                      <span className="text-sm text-gray-500">할당된 역할이 없습니다</span>
+                    )}
                   </div>
                 </div>
                 {(user as any)?.permissions && (user as any)?.permissions.length > 0 && (

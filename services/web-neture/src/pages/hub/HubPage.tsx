@@ -530,11 +530,15 @@ export default function HubPage() {
     );
   }
 
-  const role = user.roles[0];
   const userRoles = user.roles;
 
-  // user 역할은 허브 접근 불가
-  if (!['neture:admin', 'platform:super_admin', 'neture:supplier', 'supplier'].includes(role)) {
+  // WO-O4O-IDENTITY-ACCOUNT-DISPLAY-AND-DOCUMENT-ALIGNMENT-V1:
+  //   전: `const role = user.roles[0]` 하나만 검사했다. role 조회에 정렬이 없어
+  //   배열 첫 원소가 무엇일지 보장되지 않으므로, `platform:super_admin` 을 **보유했는데도**
+  //   첫 원소가 다른 role 이면 허브 접근이 거부될 수 있었다(비결정적 차단).
+  //   후: 보유 여부로 판정한다 — 순서와 무관하다.
+  const HUB_ALLOWED_ROLES = ['neture:admin', 'platform:super_admin', 'neture:supplier', 'supplier'];
+  if (!userRoles.some((r) => HUB_ALLOWED_ROLES.includes(r))) {
     return (
       // WO-O4O-WEB-COMMON-UX-COMPONENT-PROMOTION-BATCH-V1: 공통 AccessDenied 로 교체
       <AccessDenied message="공급자 또는 관리자 권한이 필요합니다." />

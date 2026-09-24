@@ -24,7 +24,7 @@
 ### 1.1 채택 사유 (요약)
 
 1. ~~**Identity V2 의 L2 (`service_credentials`) 가 service-scoped** → 비밀번호 변경 UI 가 본질적으로 서비스별. web-account 가 비밀번호 UI 를 제공하면 "어느 서비스의 비밀번호?" UX 가 어색.~~ → **논거 소멸(2026-09-23)**: password 축 자체가 은퇴했다. 결론(web-account 에 자격 UI 를 두지 않는다)은 유지되며, 근거는 "web-account 는 인증 진입점이 아니라 세션 소비자(Handoff outbound 전용)" 로 바뀐다.
-2. **현재 4 service `/mypage` 가 이미 V2 Phase 2 정렬 완료** — `PUT /users/password` with `serviceKey` 가 4 service 모두 적용됨. 변경 없이 canonical 인정.
+2. ~~**현재 4 service `/mypage` 가 이미 V2 Phase 2 정렬 완료** — `PUT /users/password` with `serviceKey` 가 4 service 모두 적용됨.~~ → **근거 소멸(2026-09-24)**: `PUT /users/password` 는 은퇴했고 password 축은 스키마에서도 제거됐다. 결론(각 service `/mypage` canonical)은 **그대로 유지**된다 — 근거는 "계정 관리 UI 는 서비스 맥락에서 소비된다" 로 바뀐다.
 3. **web-account 의 minimum viable 기능 (서비스 목록 + Handoff outbound) 이미 구현됨** — 향후 배포만 별건 결정.
 
 ### 1.2 기각된 옵션
@@ -104,12 +104,13 @@
 
 ```text
 1. 계정 관리 UI 는 각 service /mypage canonical.
-2. 비밀번호 변경은 PUT /users/password with serviceKey — 서비스별 분리 유지.
+2. 비밀번호 변경 없음 — password 인증 은퇴(2026-09-24). 로그인 수단은 Google 계정 하나다.
 3. 프로필 수정은 PUT /users/profile — API 가 공통이므로 어디서 호출하든 OK,
    단 UI 진입은 각 service /mypage/profile 유지.
-4. web-account 는 본인 view (서비스 목록 + Handoff) 만 — 비밀번호 / 프로필 UI 추가 금지.
+4. web-account 는 본인 view (서비스 목록 + Handoff) 만 — 자격(로그인 수단) / 프로필 UI 추가 금지.
 5. 새 계정 관리 기능 추가 시 본 baseline §2 매트릭스 + §3.3 결정 절차 적용.
-6. service_credentials 와 service_memberships 의 service-scoped 특성을 UI 에서도 보존.
+6. `service_memberships` 의 service-scoped 특성을 UI 에서도 보존.
+   (`service_credentials` 는 2026-09-24 에 DROP — 서비스별 자격 축 자체가 없다.)
 ```
 
 ---

@@ -2,7 +2,7 @@
 import { useState, useEffect, FC } from 'react';
 import { Menu, Bell, User, LogOut, Settings as SettingsIcon, Shield, Clock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@o4o/auth-context';
+import { useAuth, buildAccountDisplayInfo } from '@o4o/auth-context';
 import toast from 'react-hot-toast';
 import { O4OHomeButton, O4O_LOGOUT_LABEL } from '@o4o/auth-react';
 import { api } from '@/api/base';
@@ -21,6 +21,9 @@ interface AdminHeaderProps {
 
 const AdminHeader: FC<AdminHeaderProps> = ({ onMenuClick }) => {
   const { user, logout, logoutAll, getSessionStatus } = useAuth();
+  // WO-O4O-IDENTITY-ACCOUNT-DISPLAY-AND-DOCUMENT-ALIGNMENT-V1:
+  //   표시 전용 값이다 — 인가는 AdminProtectedRoute/백엔드 guard 가 roles[] 로 한다.
+  const accountDisplay = buildAccountDisplayInfo(user);
   const navigate = useNavigate();
   const [sessionStatus, setSessionStatus] = useState(getSessionStatus());
 
@@ -156,10 +159,32 @@ const AdminHeader: FC<AdminHeaderProps> = ({ onMenuClick }) => {
                     <Shield className="w-4 h-4 text-blue-600" />
                     {user?.name || 'Admin'}
                   </div>
-                  <div className="text-sm text-o4o-text-secondary">{user?.email}</div>
-                  <div className="text-xs text-o4o-text-tertiary">
-                    역할: {user?.role} | SSO 인증
-                  </div>
+                  {/* WO-O4O-IDENTITY-ACCOUNT-DISPLAY-AND-DOCUMENT-ALIGNMENT-V1 §8 · §9
+                      전: `{user?.email}` + `역할: {user?.role} | SSO 인증`
+                        - email 이 **로그인 계정**처럼 읽혔다. 로그인은 Google `sub` 로 하고
+                          `users.email` 은 프로필/연락 값이다(인증 키 아님).
+                        - `user.role` 은 backend `roles[0]` 이라 **어느 role 이 담길지 보장되지 않았다**
+                          (super_admin 보유자에게 `kpa-branch:operator` 가 찍힌 사례).
+                      후: 로그인 수단 / 관리 권한 / 프로필 이메일을 label 과 함께 분리한다.
+                      판정은 보유 여부이며 배열 순서에 의존하지 않는다(resolveAdminRoleLabel). */}
+                  <dl className="text-xs text-o4o-text-tertiary space-y-0.5 m-0">
+                    <div className="flex gap-1">
+                      <dt className="text-o4o-text-secondary">로그인 수단</dt>
+                      <dd className="m-0">{accountDisplay.loginMethod}</dd>
+                    </div>
+                    {accountDisplay.adminRole && (
+                      <div className="flex gap-1">
+                        <dt className="text-o4o-text-secondary">관리 권한</dt>
+                        <dd className="m-0">{accountDisplay.adminRole}</dd>
+                      </div>
+                    )}
+                    {accountDisplay.profileEmail && (
+                      <div className="flex gap-1">
+                        <dt className="text-o4o-text-secondary">프로필 이메일</dt>
+                        <dd className="m-0 truncate">{accountDisplay.profileEmail}</dd>
+                      </div>
+                    )}
+                  </dl>
                 </div>
               </DropdownMenuLabel>
 

@@ -302,7 +302,12 @@ export function scoreYaksaPost(
 
   const documentType = yaksaData?.documentType || aiTags?.documentType;
   if (documentType) {
-    if (userContext.role === 'admin' || userContext.role === 'manager') {
+    // WO-O4O-IDENTITY-ACCOUNT-DISPLAY-AND-DOCUMENT-ALIGNMENT-V1: 배열 보유 여부 판정(순서 무관).
+    //   role 은 `kpa:admin` 처럼 서비스 접두가 붙어 오므로 suffix 로도 본다.
+    const hasManagerialRole = (userContext.roles ?? []).some(
+      (r) => r === 'admin' || r === 'manager' || r.endsWith(':admin') || r.endsWith(':manager'),
+    );
+    if (hasManagerialRole) {
       if (['notice', 'admin'].includes(documentType)) {
         domainScore += 0.3;
         if (reasonCode !== 'same_organization') {

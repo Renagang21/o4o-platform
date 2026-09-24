@@ -85,8 +85,11 @@ function defaultGetPrimaryRole(serviceKey: string) {
   return (u: UserData): string => {
     const membership = u.memberships?.find((m) => m.serviceKey === serviceKey);
     if (membership?.role) return membership.role;
-    const roles = u.roles || (u.role ? [u.role] : []);
-    return roles[0] || 'user';
+    // WO-O4O-IDENTITY-ACCOUNT-DISPLAY-AND-DOCUMENT-ALIGNMENT-V1:
+    //   해당 서비스 membership 이 없으면 예전에는 `roles[0]` 을 보여줬다. 그 값은 정렬 없는
+    //   조회 결과라 같은 사용자가 조회마다 다르게 보일 수 있었다. 서비스별 표에서 다른 서비스의
+    //   role 을 대표로 끌어다 쓰는 것도 의미가 틀리다 — membership 이 없으면 없다고 표시한다.
+    return '-';
   };
 }
 

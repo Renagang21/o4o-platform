@@ -52,7 +52,7 @@ L1 만 L2/L3/L4 의 부모다(FK). L2/L3/L4 사이에 직접 FK 는 없다. 본 
 | §8 Switcher "가입 시 신규 password 입력" | **폐기** — 서비스 가입은 password 없이 L3 row 생성 |
 | §9 Freeze 영향(F10 · F11 명시적 예외 승인 절차) | **승계** — 절차는 그대로, 대상 항목만 §13 표로 교체 |
 | V1 §3-§8 · §10-§15 (서버/JWT/쿠키/Handoff 메커니즘/Switcher/Account Center/CORS/도메인 3축) | **구조적으로 유지** (V2 와 동일) |
-| `service_credentials` 테이블 · dual-read 로그인 | **전환 기간 한정 잔존** — Google 연결 완료 계정부터 의미 상실, Phase 2 마지막 단계(password 폐기)에서 `users.password` 와 함께 정리(§13 REVIEW-8) |
+| `service_credentials` 테이블 · dual-read 로그인 | **제거 완료 (2026-09-24)** — `WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1` 이 런타임 은퇴(Phase A) → 스키마 의존 0(B-1) → `DROP TABLE`(B-2) 순으로 정리했다. `users.password` 도 같은 migration 에서 DROP |
 
 ---
 
@@ -61,7 +61,10 @@ L1 만 L2/L3/L4 의 부모다(FK). L2/L3/L4 사이에 직접 FK 는 없다. 본 
 - `users` 의 **필수 컬럼은 `id · status · created_at · updated_at`** 뿐이다. **필수 개인정보는 없다.**
 - `email · name · nickname · phone` 은 **optional profile / contact** 다. **Identity Key 가 아니며** 로그인 · 계정 동일성 · 병합 판단에 쓰지 않는다.
 - Google 가입 직후 **추가 개인정보 입력 없이 계정이 성립**한다. 프로필 · 연락처는 서비스가 필요할 때 사용자가 채운다.
-- 현행 물리 제약(`users.email NOT NULL UNIQUE` · `password NOT NULL` · `name NOT NULL default`) 은 본 정의와 어긋난다 → §13 REVIEW-8 (auth-core F10 예외 WO). 제약 완화 전까지 운영 코드는 현행대로 동작한다.
+- 현행 물리 제약: `users.email NOT NULL UNIQUE` **만 남아 있다**. `password` 컬럼은 2026-09-24 에 DROP 됐고
+  (`DropLegacyPasswordAuthSchema1790251584623`), `name` 은 Google 가입에서 NULL 로 생성된다.
+  남은 `email NOT NULL UNIQUE` 는 §2 의 "최소 개인정보" 정의와 여전히 어긋나므로 §13 REVIEW-8 로 유지한다
+  (email optional 화는 별도 Privacy/Identity 데이터 모델 단계 — 이번 범위 밖).
 - V2 L1 의 "사람의 정체성(이메일·이름·전화)" 정의는 폐기한다. `users` 는 **시스템 주체 row** 이지 개인정보 원본 저장소가 아니다.
 
 ## 3. B. Authentication Identity (L2)
@@ -69,7 +72,10 @@ L1 만 L2/L3/L4 의 부모다(FK). L2/L3/L4 사이에 직접 FK 는 없다. 본 
 - **O4O 로그인 = Google 단일 로그인.** 외부 Identity 기준은 **Google `sub`** 다.
 - 연결 경로: `Google ID token 검증 → sub 로 linked_accounts 조회 → users.id → 세션 발급`.
 - **이메일로 Identity 를 판정하지 않는다.** `sub` miss 일 때 이메일로 기존 `users` 를 찾아 붙이는 **자동 병합은 금지**한다(현행 `socialAuthService` 의 이메일 자동 병합은 Phase 2 첫 제거 대상).
-- 기존 email+password 사용자는 **로그인 상태에서 본인이 Google 을 명시 연결**한다(재인증 후 `linked_accounts` insert). 연결 완료 계정부터 password 를 NULL 처리한다.
+- ~~기존 email+password 사용자는 로그인 상태에서 본인이 Google 을 명시 연결한다(재인증 후 `linked_accounts` insert).~~
+  → **전환 완료 (2026-09-24)**. 명시 연결 경로(`/auth/google/link`)는 password 가 사라지면서 도달 불가가 되어 은퇴했고,
+  관리자 계정은 1회용 bootstrap 으로 기존 `users.id` 에 Google `sub` 를 연결했다. 현재 로그인 경로는
+  `/auth/google/login` · `/auth/google/signup` 둘뿐이다.
 - `linked_accounts` 를 **초기 Auth Identity 물리 구조로 재사용**한다: provider = `google` 고정, providerId = `sub`, `(provider, providerId)` unique. email/displayName/profileImage/providerData 스냅샷 컬럼은 저장하지 않는다(자동 병합 유혹 제거). 테이블 rename 은 요구하지 않는다.
 - **Kakao · Naver 등 다른 소셜은 로그인 Identity 대상이 아니다.** KakaoTalk / LINE / WhatsApp 은 §9 의 업무 채널이다.
 - JWT `sub` 는 `users.id` 를 유지한다. Google `sub` 는 토큰에 싣지 않는다.
@@ -157,7 +163,7 @@ L1 만 L2/L3/L4 의 부모다(FK). L2/L3/L4 사이에 직접 FK 는 없다. 본 
 
 | # | 내용 | 후속 배치 |
 |---|---|---|
-| **REVIEW-8** | auth-core `users` 물리 제약(`email NOT NULL UNIQUE` · `password NOT NULL` · `name NOT NULL default`) 이 §2 와 충돌. `service_credentials` · `users.password` 정리 포함 | Phase 2/5 — F10 예외 WO |
+| **REVIEW-8** | **부분 해소 (2026-09-24)** — `service_credentials` · `users.password` 정리는 완료(`WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1`). **잔존**: `users.email NOT NULL UNIQUE` 가 §2 와 충돌 → email optional 화는 Privacy/Identity 데이터 모델 단계에서 판단(F10 예외 WO 필요 여부 포함) |
 | **REVIEW-9** | organization-core — Business/Store 별도 row · `Organization.type` 확장 · parent/level/path · `business_number` unique · provisioning `code=kpa-pharm-{bizno}` 변경 | Phase 3 — organization-core 예외 WO |
 | **REVIEW-10** | 사업자 공식 검증 — 외부 조회/API 사용 가능 여부 · 운영계약 확인. 파일 기본수집 금지는 확정 | Phase 5 |
 | **REVIEW-11** | `refresh_tokens` DEAD_RETIRE 물리 제거 — entity/manifest/spec/baseline DDL 동시 | F10 예외 WO(시점 자유) |
