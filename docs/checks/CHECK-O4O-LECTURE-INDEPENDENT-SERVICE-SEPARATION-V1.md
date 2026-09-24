@@ -891,3 +891,172 @@ DEPLOY_ENABLED = false (유지) · 운영 트래픽 = 롤백 상태 유지
 ```
 
 Password 트랙(legacy-password Phase A)을 막던 사유 중 **"Lecture data cutover 미실행"은 더 이상 유효하지 않다.** 단 실제 운영 배포는 준비된 변경 전체를 대상으로 **하나의 통제된 배포**(production 승인 게이트 · API migration · 트래픽 전환 확인)로 다룬다.
+
+---
+
+## 23. 통제된 운영 배포 — Phase 2 + Password Phase A (2026-09-24 · 사용자 승인)
+
+§19 INCIDENT 로 되돌린 트래픽을, 사용자 승인 아래 **단일 통제 창**에서 정식 반영했다.
+§22 재판정(빈 LMS 상태에서 Phase 2 안전) + Password Phase A 를 같은 SHA 로 함께 올렸다.
+
+### 23-1. 배포 대상 고정
+
+| 항목 | 값 |
+|---|---|
+| 대상 SHA | `7a44a97bc83c5a43af5b889af1098a628161670f` |
+| 고정 수단 | tag `deploy/2026-09-24-phase-a` (dispatch 중 main 이 docs-only `87f2e90d2` 로 진행 → SHA drift 방지) |
+| 포함 | Lecture Phase 2 · Password Phase A(PR #226 fix-forward 포함) |
+| 제외 | §43 destructive migration · REKEY/IMPORT · DATABASE_CUTOVER (전부 금지 유지) |
+
+drift 사고: `87f2e90d2` 대상으로 먼저 뜬 API dispatch(`35942469902`)를 취소하고 태그 기준으로 3개 워크플로를 재dispatch 해 세 서비스가 같은 SHA 를 빌드하게 했다.
+
+### 23-2. 게이트 개방 · 승인
+
+| 단계 | 사실 |
+|---|---|
+| `DEPLOY_ENABLED` | `false` → `true` (01:18:41Z, 이 창 전용) → **`false` 복귀 (03:15:17Z)** |
+| Environment `production` | required reviewer 승인 후 job 진입 (승인자 Renagang21) |
+| 트래픽 전환 | 승인·migration 검증 **후** 별도 명령으로 명시적 수행 (배포가 자동 전환하지 않음) |
+
+### 23-3. 배포 run
+
+| 워크플로 | run id | event | 구간 |
+|---|---|---|---|
+| Deploy API Server | `35942572478` | workflow_dispatch | 01:21:43 → 02:28:02Z |
+| Deploy Web Services | `35942371391` | workflow_dispatch | 01:19:01 → 02:23:31Z |
+| Deploy Admin Dashboard | `35942373982` | workflow_dispatch | 01:19:03 → 02:23:27Z |
+
+API dispatch 결함(별건): `base_sha` 를 비우면 detector 가 `api_deploy_affected` 를 출력하지 않아 `force_deploy=true` 만으로는 배포되지 않는다. 이번에는 `base_sha` / `head_sha` 를 명시해 우회했고, 수정은 별도 WO 로 분리한다.
+
+### 23-4. migration 검증 (트래픽 전환 전)
+
+job execution `o4o-api-migrations-fff8n` (02:26:30Z):
+
+| 지표 | 값 |
+|---|---|
+| `DATABASE_STATE` | `LEGACY_ESTABLISHED` |
+| `CURRENT_INCREMENTAL_PREFIX` | `4 / 4` |
+| `BOOTSTRAP_EXECUTION` | `SKIPPED` |
+| `INCREMENTAL_PENDING` | `0` |
+| **`INCREMENTAL_EXECUTED`** | **`0`** |
+| PRE / POST schema assertion | `PASS` / `PASS` |
+| `LIVE` vs `EXPECTED` | 동일 (`bc27f5bc…` · 5826 lines) |
+| `LEGACY_HISTORY_FINGERPRINT` | `MATCH` |
+
+예상 외 migration 0건 — 사용자 지시의 중지 조건에 해당하지 않아 전환으로 진행했다.
+
+### 23-5. 명시적 트래픽 전환
+
+`gcloud run services update-traffic <svc> --to-revisions <rev>=100` (region `asia-northeast3`). API 를 먼저 전환·확인한 뒤 나머지를 전환했다.
+
+| 서비스 | revision | 전환 방식 |
+|---|---|---|
+| `o4o-core-api` | `o4o-core-api-03749-9p8` | 명시적 |
+| `lecture-web` | `lecture-web-00015-gk9` | 명시적 |
+| `kpa-society-web` | `kpa-society-web-01997-d7x` | 명시적 |
+| `k-cosmetics-web` | `k-cosmetics-web-01165-wzj` | 명시적 |
+| `pharmacy-hub-web` | `pharmacy-hub-web-00255-qw8` | 명시적 |
+| `o4o-admin-dashboard` | `o4o-admin-dashboard-01309-hrs` | 명시적 |
+| `neture-web` | `neture-web-01656-vnf` | **자동 추종** (§19 에서 pin 대상이 아니었으므로 배포가 100% 라우팅) |
+| `store-web` | `store-web-00016-bvj` | **자동 추종** (동일) |
+
+즉 이번 창에서 실제로 운영에 반영된 서비스는 **8개**다. 두 서비스는 pin 이 없었기 때문에 명시적 전환을 기다리지 않았다 — 통제 창의 한계로 기록한다.
+
+### 23-6. §19-5 메커니즘 2차 실증 (의도치 않은 배포 1건)
+
+게이트가 열려 있던 동안 타 세션 push `6245d41df` (02:32) 가 API 를 배포했다.
+
+- 새 revision `o4o-core-api-03750-x8z` 생성 (03:04:56Z) · **트래픽 0%**
+- 그 배포의 migration `o4o-api-migrations-bzvkt` (03:04:29Z) 도 `INCREMENTAL_EXECUTED = 0` · PRE/POST `PASS`
+- 운영 영향 없음
+
+§19-5 의 정정("트래픽이 특정 revision 에 pin 돼 있으면 `--no-traffic` 없는 배포도 트래픽을 가져가지 못한다")이 **실측으로 두 번째 확인**됐다. 동시에, 게이트를 연 창에는 내 대상 SHA 만 배포되지 않는다는 점도 확인됐다 — 창을 최소화해야 한다.
+
+### 23-7. 전환 직후 smoke
+
+**Lecture (빈 상태)**
+
+| 항목 | 결과 |
+|---|---|
+| `GET /api/v1/lms/courses` | `200` · `total = 0` |
+| §21 에서 삭제한 강의 3건 id 직접 조회 | `404` / `404` / `404` |
+| `GET /api/v1/public/services/lecture/footer-legal` | `200` |
+| `study.neture.co.kr` 번들에 `kpa-society` / `pharmacy-hub` 참조 | `0` / `0` |
+
+**은퇴한 password 경로 (전부 404)**
+
+`/auth/login` · `/auth/register` · `/auth/signup` · `/auth/check-email` · `/auth/forgot-password` · `/auth/reset-password` · `/auth/find-id` · `/auth/google/link` · `/auth/google/link/status`
+→ 응답 본문의 경로 반향은 Express 의 `Cannot POST <path>` 문자열이며 자격정보 힌트가 아니다.
+
+`PUT /api/v1/users/password` → `401`. 대조 프로브 결과 `/api/v1/users/*` 전 경로가 라우터 수준에서 `401` 이고 `users.routes.ts:90` 이 해당 route 를 은퇴로 명시하므로 PASS 로 판정.
+
+**살아 있어야 하는 인증 경로**
+
+| 경로 | 결과 |
+|---|---|
+| `GET /api/v1/auth/google/config` | `200` · `enabled: true` |
+| `POST /api/v1/auth/google/login` (가짜 idToken) | `401` `GOOGLE_ID_TOKEN_INVALID` |
+| `POST /api/v1/auth/google/signup` (가짜 idToken) | `400` — `consents` 필수 (통합 약관 계약 유지) |
+| `GET /api/v1/auth/me` · `POST /api/v1/auth/logout` · `logout-all` · `refresh` | 전부 `401` (`requireAuth`) |
+| `POST /api/v1/auth/handoff` / `handoff/exchange` | `401` / `400` |
+
+`POST /auth/google/bootstrap-admin` 은 `400`(route 생존·검증 동작)이지만 배포된 revision 에 bootstrap env 가 없어 **창은 닫혀 있다**. c6 가 기대한 "404" 는 부정확했다.
+
+**서빙 번들의 password 입력 잔존 (핵심 검증)**
+
+| 표면 | `type="password"` | `비밀번호` 문자열 |
+|---|---|---|
+| `kpa-society.co.kr` | 0 | 1 (아래 잔존 ①) |
+| `k-cosmetics.site` | 0 | 1 (①) |
+| `pharmacyhub.co.kr` | 0 | 2 (① + 아래 ②) |
+| `neture.co.kr` · `store.neture.co.kr` · `study.neture.co.kr` | 0 | 1 (①) |
+| `admin.neture.co.kr` (entry + lazy chunk 74개 전수) | 0 (도달 가능 경로) | 의도된 문구만 |
+
+`/forgot-password` · `/reset-password` 문자열이 잡힌 3건은 모두 `<Navigate to="/login" replace>` 리다이렉트 스텁이었다 — 입력 폼이 아니다.
+
+Admin lazy chunk 전수 스캔(74개) 결과 password 입력을 가진 chunk 3개(`AuthBootstrapDebug` · `AuthStateJsonDebug` · `LoginDiagnostic`)가 **파일로는 존재**하지만, 엔트리 번들에 라우트 경로 문자열(`__debug__/auth-bootstrap` · `debug/auth` · `__debug__/login` · `auth-inspector`)이 **0건** — `public.routes.tsx` 의 `import.meta.env.PROD ? [] : [...]` 게이트가 프로덕션에서 라우트를 등록하지 않는다. 도달 불가한 dead chunk 다(§23-8 ④).
+`AIPageGeneratorTest` 의 `type="password"` 는 Gemini API 키 입력, `Settings` 의 것은 SMTP 비밀번호 — 로그인 축과 무관.
+`UserForm` chunk 는 "Google 계정으로만 로그인합니다. 이 화면에서 비밀번호를 만들거나 바꾸지 않습니다.", 초대 메일 문구는 "초대 메일에는 비밀번호가 포함되지 않습니다." — **Phase A 의도 문구가 서빙 중임을 확인**.
+
+**계정 보안 화면**
+
+`packages/account-ui` 의 `AccountSecuritySettings` 는 "로그인 방법 / Google 계정" 상태 표시만 렌더하고, `onChangePassword` 를 전달하는 소비처는 **0건**. 비밀번호 변경·초기화 버튼 없음.
+
+**가입 flow (c6 가 지목한 최대 회귀 위험)**
+
+| 경로 | 결과 |
+|---|---|
+| `https://pharmacyhub.co.kr/pharmacy-hub/join` | `200` |
+| `POST /api/v1/pharmacy-hub/join` (미인증) | `401` — Google 세션 선행 계약 |
+| `GET /api/v1/pharmacy-hub/join/status` (미인증) | `401` |
+| `https://kpa-society.co.kr/register` · `/join` · `/branch/join` | `200` / `200` / `200` |
+| pharmacy-hub 번들 password 입력 | `0` |
+
+**타 서비스 회귀**
+
+`/api/health` `200` · `kpa-society` / `neture` / `pharmacy-hub` / `lecture` footer-legal 전부 `200` · 로그인·가입 프런트 7개 도메인 전부 `200`.
+
+### 23-8. 검증하지 못한 것 · 잔존 (숨기지 않고 기록)
+
+1. **인증 후 E2E 미실측.** Google 전용 로그인은 스크립트로 세션을 만들 수 없고, §21 이전 users reset 으로 사용 가능한 테스트 계정이 없다. 따라서 **실제 로그인 → 세션 유지 → 가입 신청 제출 → 로그아웃** 은 `NOT VERIFIED` 다. PASS 로 보고하지 않는다. 브라우저 유인 검증은 계정 확보 후 별도로 필요하다.
+2. **잔존 ① (공유 패키지 · 별도 WO):** `packages/auth-utils/src/errorMessages.ts:4` 이 `INVALID_CREDENTIALS → '비밀번호가 올바르지 않습니다.'` 를 여전히 보유한다. `packages/error-handling/src/error-messages.ts` 는 같은 WO 로 이미 제거했으므로 Phase A 정리 누락이다. password 로그인 호출이 사라져 **발생 자체가 없는** 죽은 문구지만, 공유 패키지라 이 범위에서 고치지 않고 분리한다.
+3. **잔존 ② (copy drift):** `securityDescription` 3개 소비처가 여전히 비밀번호 표현을 쓴다 — `web-pharmacy-hub/.../MyProfilePage.tsx:334` "Pharmacy-Hub 로그인 비밀번호", `web-kpa-society/.../MySettingsPage.tsx:175` "KPA 로그인 비밀번호", `web-k-cosmetics/.../MySettingsPage.tsx:46` "정기적인 비밀번호 변경을 권장합니다". 섹션 본문은 Google 전용인데 설명문만 남아 사용자에게 모순으로 보인다. `AccountSecuritySettings` 의 `onChangePassword` prop 도 소비처 0의 dead prop.
+4. **잔존 ③ (빌드 위생):** 위 debug chunk 3개가 라우트 미등록 상태로 CDN 에 파일로 남는다. 도달 경로는 없으나 `type="password"` 를 포함한 산출물이므로 chunk 자체를 emit 하지 않는 편이 낫다 (CLAUDE.md §8-3 의 정신).
+5. **SonarCloud** `new_duplicated_lines_density 4.3%` 미해소.
+6. **Lecture 강의 작성 권한 부여 경로 미결정** — ⓐ `joinEnabled=true` + 운영자 승인 vs ⓑ 운영자 직접 부여. 배포와 분리된 사안이며 배포 차단 사유로 쓰지 않는다. membership 자동 생성 금지 유지.
+
+### 23-9. 판정
+
+| 항목 | 값 |
+|---|---|
+| 통제된 배포 | `DONE` (8 서비스 · 대상 SHA `7a44a97bc`) |
+| migration | `INCREMENTAL_EXECUTED = 0` · assertion PASS (2회) |
+| Lecture 빈 목록 · 삭제 강의 비노출 | `PASS` |
+| password 은퇴 경로 404 · 입력 폼 0 | `PASS` |
+| Google 로그인/가입 경로 생존 | `PASS` |
+| 가입 flow HTTP · API 계약 | `PASS` (인증 후 제출은 `NOT VERIFIED`) |
+| 롤백 필요 여부 | `NO` — 되돌리지 않았다 |
+| `DEPLOY_ENABLED` | `false` (복귀 완료) |
+| `REKEY/IMPORT` · `DATABASE_CUTOVER` · §43 destructive | `FORBIDDEN` 유지 |
+
+문서 정합: 발견 3건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 4건 (잔존 ①②③ · API dispatch `api_deploy_affected` 결함)
