@@ -375,10 +375,16 @@ jobs:
       run: cd apps/api-server && npx jest --maxWorkers=1 --shard=${{ matrix.shard }}/3
 
   # 3. Build all applications
+  #
+  # WO-O4O-CI-BUILD-JOB-PARALLELIZATION-V1
+  # build 는 quality-check · api-tests 의 산출물을 쓰지 않는다(각자 별도 runner 에서
+  # 독립 install + dependency closure build). 과거 `needs: [quality-check, api-tests]` 는
+  # 검증 게이트가 아니라 순서만 강제해 critical path 에 build 시간을 직렬로 더했다.
+  # 세 잡은 모두 blocking 이며 run 결과는 셋 중 하나라도 실패하면 실패다 — 병렬화로 약해지는 게이트는 없다.
   build:
     name: Build Applications
     runs-on: ubuntu-latest
-    needs: [detect, quality-check, api-tests]
+    needs: [detect]
     if: needs.detect.outputs.admin_only != 'true' && needs.detect.outputs.docs_fast_eligible != 'true'
 
     # build matrix 대상은 배포되는 앱만 유지한다.
