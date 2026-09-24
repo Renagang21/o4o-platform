@@ -19,6 +19,8 @@ import { NotificationBell, useNotifications,
   resolveNotificationTarget, getUserDisplayName } from '@o4o/account-ui';
 import type { NotificationItem } from '@o4o/account-ui';
 import { isStoreOwnerDual } from '@o4o/auth-utils';
+import { O4OHomeButton, O4O_LOGOUT_LABEL } from '@o4o/auth-react';
+import { authClient } from '@/lib/apiClient';
 import { useAuth, getKCosmeticsDashboardRoute } from '@/contexts/AuthContext';
 import { useLoginModal } from '@/contexts/LoginModalContext';
 import {
@@ -26,6 +28,10 @@ import {
   KCOS_CONTEXTUAL_NAV,
 } from '@/config/navigation';
 import { notificationsApi } from '@/lib/api/notifications';
+/** 모바일 drawer 사용자 메뉴 항목과 같은 모양의 O4O 홈 버튼 */
+const O4O_HOME_MENU_ITEM_CLASS =
+  'flex items-center gap-3 w-full px-4 py-3 text-sm font-medium text-slate-600 bg-transparent border-none text-left cursor-pointer rounded-xl hover:bg-slate-50 disabled:opacity-60';
+
 // ─── Component ───────────────────────────────────────────────────────────────
 
 export function KCosGlobalHeader() {
@@ -95,6 +101,37 @@ export function KCosGlobalHeader() {
 
   const dashboardPath = user?.roles ? getKCosmeticsDashboardRoute(user.roles) : '/';
 
+  const userMenuItems = (
+    <>
+      {/* WO-O4O-KCOS-PROFILE-DASHBOARD-LINK-FIX-V1:
+          관리자/운영자 — 역할별 독립 표시 (KPA canonical
+          WO-O4O-ROLE-BASED-PROFILE-MENU-CANONICALIZATION-V1 정합).
+          legacy ternary(admin 이면 운영 대시보드 숨김) 제거 — admin/operator 동시
+          보유 시 두 항목 모두 노출. 둘 다 미보유 시에만 일반 대시보드 fallback. */}
+      {isAdmin && (
+        <GlobalHeaderMenuItem to="/admin" icon={<Shield className="w-4 h-4" />}>
+          관리자 대시보드
+        </GlobalHeaderMenuItem>
+      )}
+      {isOperator && (
+        <GlobalHeaderMenuItem to="/operator" icon={<Shield className="w-4 h-4" />}>
+          운영 대시보드
+        </GlobalHeaderMenuItem>
+      )}
+      {!isAdmin && !isOperator && (
+        <GlobalHeaderMenuItem to={dashboardPath} icon={<LayoutDashboard className="w-4 h-4" />}>
+          대시보드
+        </GlobalHeaderMenuItem>
+      )}
+      <GlobalHeaderMenuItem to="/mypage" icon={<UserCircle className="w-4 h-4" />}>
+        마이페이지
+      </GlobalHeaderMenuItem>
+      <GlobalHeaderMenuItem to="/mypage/settings" icon={<Settings className="w-4 h-4" />}>
+        설정
+      </GlobalHeaderMenuItem>
+    </>
+  );
+
   return (
     <GlobalHeader
       brand={{
@@ -109,45 +146,33 @@ export function KCosGlobalHeader() {
       onLogin={openLoginModal}
       onRegister={() => navigate('/login')}
       onLogout={handleLogout}
+      /* WO-O4O-REPRESENTATIVE-ENTRY-RETURN-HANDOFF-AND-HOME-NAVIGATION-V1: 서버 logout 은 O4O 계정 전체 종료 */
+      logoutLabel={O4O_LOGOUT_LABEL}
       utilitySlot={user ? (
-        <NotificationBell
-          unreadCount={notif.unreadCount}
-          notifications={notif.notifications}
-          loading={notif.loading}
-          onOpen={notif.refetchList}
-          onItemClick={handleNotificationClick}
-          onMarkAsRead={notif.markAsRead}
-          onMarkAllAsRead={notif.markAllAsRead}
-        />
+        <div className="flex items-center gap-2">
+          {/* O4O 홈 — 로그인 유지한 채 neture.co.kr 대표 홈으로 복귀 (로그아웃 아님) */}
+          <O4OHomeButton
+            api={authClient.api}
+            isAuthenticated
+            className="px-3 py-1.5 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded-full cursor-pointer hover:bg-slate-50 disabled:opacity-60"
+          />
+          <NotificationBell
+            unreadCount={notif.unreadCount}
+            notifications={notif.notifications}
+            loading={notif.loading}
+            onOpen={notif.refetchList}
+            onItemClick={handleNotificationClick}
+            onMarkAsRead={notif.markAsRead}
+            onMarkAllAsRead={notif.markAllAsRead}
+          />
+        </div>
       ) : undefined}
-      userMenuItems={
+      userMenuItems={userMenuItems}
+      /* WO-O4O-REPRESENTATIVE-ENTRY-RETURN-HANDOFF-AND-HOME-NAVIGATION-V1: 모바일 drawer 에 O4O 홈 추가 */
+      mobileUserMenuItems={
         <>
-          {/* WO-O4O-KCOS-PROFILE-DASHBOARD-LINK-FIX-V1:
-              관리자/운영자 — 역할별 독립 표시 (KPA canonical
-              WO-O4O-ROLE-BASED-PROFILE-MENU-CANONICALIZATION-V1 정합).
-              legacy ternary(admin 이면 운영 대시보드 숨김) 제거 — admin/operator 동시
-              보유 시 두 항목 모두 노출. 둘 다 미보유 시에만 일반 대시보드 fallback. */}
-          {isAdmin && (
-            <GlobalHeaderMenuItem to="/admin" icon={<Shield className="w-4 h-4" />}>
-              관리자 대시보드
-            </GlobalHeaderMenuItem>
-          )}
-          {isOperator && (
-            <GlobalHeaderMenuItem to="/operator" icon={<Shield className="w-4 h-4" />}>
-              운영 대시보드
-            </GlobalHeaderMenuItem>
-          )}
-          {!isAdmin && !isOperator && (
-            <GlobalHeaderMenuItem to={dashboardPath} icon={<LayoutDashboard className="w-4 h-4" />}>
-              대시보드
-            </GlobalHeaderMenuItem>
-          )}
-          <GlobalHeaderMenuItem to="/mypage" icon={<UserCircle className="w-4 h-4" />}>
-            마이페이지
-          </GlobalHeaderMenuItem>
-          <GlobalHeaderMenuItem to="/mypage/settings" icon={<Settings className="w-4 h-4" />}>
-            설정
-          </GlobalHeaderMenuItem>
+          <O4OHomeButton api={authClient.api} isAuthenticated className={O4O_HOME_MENU_ITEM_CLASS} />
+          {userMenuItems}
         </>
       }
     />

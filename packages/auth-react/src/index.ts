@@ -17,6 +17,17 @@ export { useServiceAuth } from './useServiceAuth';
 export { createRouteGuard } from './createRouteGuard';
 export { useRoleSelection } from './useRoleSelection';
 export { GoogleContinue } from './GoogleContinue';
+// WO-O4O-REPRESENTATIVE-ENTRY-RETURN-HANDOFF-AND-HOME-NAVIGATION-V1: 서비스 → O4O 대표 홈 복귀(로그인 유지)
+export {
+  useO4OHomeReturn,
+  startO4OHomeReturn,
+  O4OHomeButton,
+  O4O_HOME_URL,
+  O4O_HOME_LABEL,
+  O4O_LOGOUT_LABEL,
+  REPRESENTATIVE_ENTRY_SERVICE_KEY,
+} from './useO4OHomeReturn';
+export type { O4OHomeReturnOptions, O4OHomeReturn, O4OHomeButtonProps, O4OHomeApiLike } from './useO4OHomeReturn';
 export type { GoogleContinueProps } from './GoogleContinue';
 // WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: GoogleAccountLink 는 은퇴했다(비밀번호 재인증 기반 연결 카드).
 export type {

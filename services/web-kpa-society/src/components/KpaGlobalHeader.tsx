@@ -17,9 +17,11 @@ import { GlobalHeader, buildCommunityPrimaryNav } from '@o4o/ui';
 import { NotificationBell, useNotifications, getUserDisplayName } from '@o4o/account-ui';
 import type { NotificationItem } from '@o4o/account-ui';
 import { isStoreOwnerDual } from '@o4o/auth-utils';
+import { O4OHomeButton, O4O_LOGOUT_LABEL } from '@o4o/auth-react';
 import { getKpaServiceRoleLabel, KpaUserMenuItems } from './KpaUserMenu';
 import { resolveNotificationTarget } from '../lib/notificationRouting';
 import { useAuth } from '../contexts';
+import { authClient } from '../contexts/AuthContext';
 import { useAuthModal } from '../contexts/LoginModalContext';
 import {
   KPA_BASE_NAV,
@@ -127,8 +129,18 @@ export function KpaGlobalHeader() {
       onLogin={openLoginModal}
       onRegister={openRegisterModal}
       onLogout={handleLogout}
+      /* WO-O4O-REPRESENTATIVE-ENTRY-RETURN-HANDOFF-AND-HOME-NAVIGATION-V1: 서버 logout 은 O4O 계정 전체 종료 */
+      logoutLabel={O4O_LOGOUT_LABEL}
       utilitySlot={
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          {/* O4O 홈 — 로그인 유지한 채 neture.co.kr 대표 홈으로 복귀 (로그아웃 아님) */}
+          {user && (
+            <O4OHomeButton
+              api={authClient.api}
+              isAuthenticated
+              className="px-3 py-1.5 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded-full cursor-pointer hover:bg-slate-50 disabled:opacity-60"
+            />
+          )}
           {user && creditBalance !== null && (
             <Link
               to="/mypage/credits"

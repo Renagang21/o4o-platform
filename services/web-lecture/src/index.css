@@ -14,3 +14,5 @@
 
 /* 운영자 검토 화면 — 자료 확인용 미리보기 (읽기 전용) */
 .review-video { display: block; width: 100%; max-width: 560px; border-radius: 8px; background: #000; margin-bottom: 6px; }
+/* WO-O4O-REPRESENTATIVE-ENTRY-RETURN-HANDOFF-AND-HOME-NAVIGATION-V1: 어두운 footer 위 O4O 홈 버튼 */
+.footer-links .footer-o4o-home{color:#fff;font-size:inherit}

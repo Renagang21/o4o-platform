@@ -18,7 +18,9 @@
 import { useEffect, useState } from 'react';
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
 import { getPublicSite, getOperatorSite, type BranchSite } from '../lib/api/branch';
+import { O4OHomeButton, O4O_LOGOUT_LABEL } from '@o4o/auth-react';
 import { useAuth } from '../contexts/AuthContext';
+import { authClient } from '../lib/apiClient';
 import { ROLES, satisfiesRole } from '../config/service';
 import NotFoundPage from '../pages/NotFoundPage';
 
@@ -171,7 +173,13 @@ export function BranchLayout({ slug, basePath }: { slug: string; basePath: strin
                 {canUseMemberArea && (
                   <Link to={`${basePath}/mypage`} className="text-gray-600 hover:text-gray-900">내 정보</Link>
                 )}
-                <button type="button" onClick={logout} className="text-gray-500 hover:text-gray-900">로그아웃</button>
+                {/* WO-O4O-REPRESENTATIVE-ENTRY-RETURN-HANDOFF-AND-HOME-NAVIGATION-V1: O4O 홈(로그인 유지) · 로그아웃 = O4O 계정 전체 종료 */}
+                <O4OHomeButton
+                  api={authClient.api}
+                  isAuthenticated
+                  className="bg-transparent border-none p-0 cursor-pointer text-gray-600 hover:text-gray-900 disabled:opacity-60"
+                />
+                <button type="button" onClick={logout} className="text-gray-500 hover:text-gray-900">{O4O_LOGOUT_LABEL}</button>
               </span>
             ) : (
               <span className="flex items-center gap-3">

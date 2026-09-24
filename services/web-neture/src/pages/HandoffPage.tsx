@@ -38,6 +38,9 @@ const ERROR_MESSAGES: Record<string, string> = {
   HANDOFF_TARGET_WITHDRAWN: '탈퇴한 서비스는 이동할 수 없습니다.',
   HANDOFF_TARGET_NOT_ACTIVE: '이 서비스 이용이 아직 승인되지 않았거나 정지 상태입니다.',
   INVALID_USER: '계정을 확인할 수 없습니다. 다시 로그인해 주세요.',
+  // WO-O4O-REPRESENTATIVE-ENTRY-RETURN-HANDOFF-AND-HOME-NAVIGATION-V1
+  HANDOFF_SESSION_REVOKED: '로그인 세션이 종료되었습니다. 다시 로그인해 주세요.',
+  ACCOUNT_NOT_ACTIVE: '이용할 수 없는 계정 상태입니다.',
 };
 
 export default function HandoffPage() {

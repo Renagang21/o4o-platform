@@ -7,7 +7,9 @@ import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { PublicLegalFooterInfo } from '@o4o/shared-space-ui';
 import { BRAND, PLATFORM_LEGAL_SERVICE_KEY, PLATFORM_ORIGIN, ROOT_NAV_ITEMS, WORKSPACE_PATHS } from '../config/workspace';
 import { loadFooterLegal } from '../lib/footerLegal';
+import { O4OHomeButton, O4O_LOGOUT_LABEL } from '@o4o/auth-react';
 import { useAuth } from '../contexts/AuthContext';
+import { authClient } from '../lib/apiClient';
 import { useUnifiedStore } from '../contexts/StoreContext';
 
 function StoreSwitcher() {
@@ -43,8 +45,10 @@ export default function RootShell() {
             {item.label}
           </NavLink>
         ))}
+        {/* WO-O4O-REPRESENTATIVE-ENTRY-RETURN-HANDOFF-AND-HOME-NAVIGATION-V1: O4O 홈(로그인 유지) · 로그아웃 = O4O 계정 전체 종료 */}
+        <O4OHomeButton api={authClient.api} isAuthenticated={isAuthenticated} className="link-button" />
         {isAuthenticated
-          ? <button className="link-button" type="button" onClick={logout}>로그아웃</button>
+          ? <button className="link-button" type="button" onClick={logout}>{O4O_LOGOUT_LABEL}</button>
           : <Link to={WORKSPACE_PATHS.login}>로그인</Link>}
       </nav>
     </header>
@@ -53,7 +57,7 @@ export default function RootShell() {
       <div className="footer-links">
         <a href={`${PLATFORM_ORIGIN}/terms`}>이용약관</a>
         <a href={`${PLATFORM_ORIGIN}/privacy`}>개인정보처리방침</a>
-        <a href={PLATFORM_ORIGIN}>Neture</a>
+        <O4OHomeButton api={authClient.api} isAuthenticated={isAuthenticated} className="link-button footer-o4o-home" />
       </div>
       <PublicLegalFooterInfo serviceKey={PLATFORM_LEGAL_SERVICE_KEY} loadProfile={loadFooterLegal} />
       <p>© {new Date().getFullYear()} Neture · {BRAND.name}</p>

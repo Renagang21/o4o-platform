@@ -5,6 +5,7 @@
 import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useState } from 'react';
 import { useAuth, type UserRole } from '@/contexts/AuthContext';
+import { O4O_LOGOUT_LABEL } from '@o4o/auth-react';
 import { KCosGlobalHeader } from '../KCosGlobalHeader';
 
 interface DashboardLayoutProps {
@@ -379,7 +380,8 @@ export default function DashboardLayout({ role }: DashboardLayoutProps) {
               className="flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-medium text-slate-600 hover:bg-red-50 hover:text-red-600 transition-colors"
             >
               <icons.LogOut className="w-5 h-5" />
-              로그아웃
+              {/* WO-O4O-REPRESENTATIVE-ENTRY-RETURN-HANDOFF-AND-HOME-NAVIGATION-V1: 서버 logout = O4O 계정 전체 종료 */}
+              {O4O_LOGOUT_LABEL}
             </button>
           </div>
         </div>

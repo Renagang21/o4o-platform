@@ -26,13 +26,19 @@ import { GlobalHeader, GlobalHeaderMenuItem, buildCommunityPrimaryNav } from '@o
 import { NotificationBell, useNotifications,
   resolveNotificationTarget, getUserDisplayName } from '@o4o/account-ui';
 import type { NotificationItem } from '@o4o/account-ui';
+import { O4OHomeButton, O4O_LOGOUT_LABEL } from '@o4o/auth-react';
 import { useAuth } from '../contexts/AuthContext';
+import { authClient } from '../lib/apiClient';
 import { BRAND, ROLES, SERVICE_KEY, satisfiesRole } from '../config/service';
 import { PH_BASE_NAV, PH_CONTEXTUAL_NAV, PH_TRAILING_NAV } from '../config/navigation';
 import { notificationsApi } from '../lib/api/notifications';
 
 /** 브랜드 primary — 다른 서비스와 구분되는 Pharmacy-Hub 색(teal, 공급자 헤더와 동일 계열) */
 const PH_PRIMARY = '#0d9488';
+
+/** 모바일 drawer 사용자 메뉴 항목과 같은 모양의 O4O 홈 버튼 */
+const O4O_HOME_MENU_ITEM_CLASS =
+  'flex items-center gap-3 w-full px-4 py-3 text-sm font-medium text-slate-600 bg-transparent border-none text-left cursor-pointer rounded-xl hover:bg-slate-50 disabled:opacity-60';
 
 export function PharmacyHubGlobalHeader() {
   const { user, isAuthenticated, logout } = useAuth();
@@ -111,6 +117,41 @@ export function PharmacyHubGlobalHeader() {
     navigate('/');
   }, [logout, navigate]);
 
+  const userMenuItems = (
+    <>
+      {isStoreOwner && (
+        <GlobalHeaderMenuItem to="/store-owner" icon={<Store className="w-4 h-4" />}>
+          내 약국
+        </GlobalHeaderMenuItem>
+      )}
+      {isAdmin && (
+        <GlobalHeaderMenuItem to="/admin" icon={<Shield className="w-4 h-4" />}>
+          관리자 대시보드
+        </GlobalHeaderMenuItem>
+      )}
+      {isOperator && (
+        <GlobalHeaderMenuItem to="/operator" icon={<LayoutDashboard className="w-4 h-4" />}>
+          운영 대시보드
+        </GlobalHeaderMenuItem>
+      )}
+      {/*
+        내 프로필 = 개인 계정(users) 화면. 역할과 무관하게 모든 로그인 사용자에게 노출한다.
+        WO-O4O-CROSS-SERVICE-PROFILE-COMMONIZATION-V1 (production 잔여 결함):
+          기존에는 매장 셸 안의 /store-owner/account 만 있어 `isStoreOwner` 로 게이트했고,
+          그 결과 운영자·공급자에게는 Profile 진입점이 아예 없었다. 개인 계정 화면을
+          역할 셸 밖 canonical route `/account` 로 올려 데드링크 없이 전원에게 연다.
+          (`/store-owner/account` 는 매장 셸 사이드바용으로 유지 — 같은 화면을 렌더한다)
+        매장·사업자 정보는 이 진입점이 아니라 `내 약국`(역할·도메인 화면) 소관이다.
+      */}
+      <GlobalHeaderMenuItem to="/account" icon={<UserCircle className="w-4 h-4" />}>
+        내 프로필
+      </GlobalHeaderMenuItem>
+      <GlobalHeaderMenuItem to="/join/status" icon={<LogIn className="w-4 h-4" />}>
+        가입 상태
+      </GlobalHeaderMenuItem>
+    </>
+  );
+
   return (
     <GlobalHeader
       brand={{
@@ -125,49 +166,33 @@ export function PharmacyHubGlobalHeader() {
       onLogin={() => navigate('/login')}
       onRegister={() => navigate('/join')}
       onLogout={handleLogout}
+      /* WO-O4O-REPRESENTATIVE-ENTRY-RETURN-HANDOFF-AND-HOME-NAVIGATION-V1: 서버 logout 은 O4O 계정 전체 종료 */
+      logoutLabel={O4O_LOGOUT_LABEL}
       utilitySlot={user ? (
-        <NotificationBell
-          unreadCount={notif.unreadCount}
-          notifications={notif.notifications}
-          loading={notif.loading}
-          onOpen={notif.refetchList}
-          onItemClick={handleNotificationClick}
-          onMarkAsRead={notif.markAsRead}
-          onMarkAllAsRead={notif.markAllAsRead}
-        />
+        <div className="flex items-center gap-2">
+          {/* O4O 홈 — 로그인 유지한 채 neture.co.kr 대표 홈으로 복귀 (로그아웃 아님) */}
+          <O4OHomeButton
+            api={authClient.api}
+            isAuthenticated
+            className="px-3 py-1.5 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded-full cursor-pointer hover:bg-slate-50 disabled:opacity-60"
+          />
+          <NotificationBell
+            unreadCount={notif.unreadCount}
+            notifications={notif.notifications}
+            loading={notif.loading}
+            onOpen={notif.refetchList}
+            onItemClick={handleNotificationClick}
+            onMarkAsRead={notif.markAsRead}
+            onMarkAllAsRead={notif.markAllAsRead}
+          />
+        </div>
       ) : undefined}
-      userMenuItems={
+      userMenuItems={userMenuItems}
+      /* WO-O4O-REPRESENTATIVE-ENTRY-RETURN-HANDOFF-AND-HOME-NAVIGATION-V1: 모바일 drawer 에 O4O 홈 추가 */
+      mobileUserMenuItems={
         <>
-          {isStoreOwner && (
-            <GlobalHeaderMenuItem to="/store-owner" icon={<Store className="w-4 h-4" />}>
-              내 약국
-            </GlobalHeaderMenuItem>
-          )}
-          {isAdmin && (
-            <GlobalHeaderMenuItem to="/admin" icon={<Shield className="w-4 h-4" />}>
-              관리자 대시보드
-            </GlobalHeaderMenuItem>
-          )}
-          {isOperator && (
-            <GlobalHeaderMenuItem to="/operator" icon={<LayoutDashboard className="w-4 h-4" />}>
-              운영 대시보드
-            </GlobalHeaderMenuItem>
-          )}
-          {/*
-            내 프로필 = 개인 계정(users) 화면. 역할과 무관하게 모든 로그인 사용자에게 노출한다.
-            WO-O4O-CROSS-SERVICE-PROFILE-COMMONIZATION-V1 (production 잔여 결함):
-              기존에는 매장 셸 안의 /store-owner/account 만 있어 `isStoreOwner` 로 게이트했고,
-              그 결과 운영자·공급자에게는 Profile 진입점이 아예 없었다. 개인 계정 화면을
-              역할 셸 밖 canonical route `/account` 로 올려 데드링크 없이 전원에게 연다.
-              (`/store-owner/account` 는 매장 셸 사이드바용으로 유지 — 같은 화면을 렌더한다)
-            매장·사업자 정보는 이 진입점이 아니라 `내 약국`(역할·도메인 화면) 소관이다.
-          */}
-          <GlobalHeaderMenuItem to="/account" icon={<UserCircle className="w-4 h-4" />}>
-            내 프로필
-          </GlobalHeaderMenuItem>
-          <GlobalHeaderMenuItem to="/join/status" icon={<LogIn className="w-4 h-4" />}>
-            가입 상태
-          </GlobalHeaderMenuItem>
+          <O4OHomeButton api={authClient.api} isAuthenticated className={O4O_HOME_MENU_ITEM_CLASS} />
+          {userMenuItems}
         </>
       }
     />

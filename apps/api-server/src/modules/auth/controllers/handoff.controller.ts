@@ -16,8 +16,13 @@
  *   Store workspace handoff 는 특정 서비스 membership 이 아니라 "Store 접근 가능 organization ≥ 1" 로 판단하고,
  *   exchange 는 store.neture.co.kr origin 에서만 허용한다. 가짜 serviceKey('store') 는 쓰지 않는다.
  *
+ * WO-O4O-REPRESENTATIVE-ENTRY-RETURN-HANDOFF-AND-HOME-NAVIGATION-V1:
+ *   대표 진입(targetServiceKey === REPRESENTATIVE_ENTRY_SERVICE_KEY) 만 membership 검사 대신
+ *   활성 계정 + 대표 진입 origin 고정 + returnTo '/' 고정으로 판정한다. 다른 서비스 대상은 불변.
+ *   모든 대상 공통: 폐기된 세션(refreshTokenFamily null)은 발급·교환 모두 401 HANDOFF_SESSION_REVOKED.
+ *
  * Endpoints:
- * - POST /api/v1/auth/handoff         — Generate handoff token (requireAuth)
+ * - POST /api/v1/auth/handoff       — Generate handoff token (requireAuth)
  * - POST /api/v1/auth/handoff/exchange — Exchange token for auth (public)
  * - GET  /api/v1/auth/services        — User's service catalog (requireAuth)
  */
@@ -36,7 +41,22 @@ import { getService, getServiceOrigin, O4O_SERVICES } from '../../../config/serv
 import { STORE_WORKSPACE_KEY, STORE_WORKSPACE_ORIGIN, isStoreWorkspaceExchangeOrigin } from '../../../config/store-workspace.js';
 import { resolveAccessibleStores } from '../../../utils/service-tenant.resolver.js';
 import { isHandoffWorkspace } from '../../../services/handoff-token.service.js';
+import { isRepresentativeEntryTarget, isRepresentativeEntryExchangeOrigin } from '../../../config/representative-entry.js';
+import { resolveAccountAccess } from '../../../common/auth/account-access.policy.js';
 import logger from '../../../utils/logger.js';
+
+/**
+ * WO-O4O-REPRESENTATIVE-ENTRY-RETURN-HANDOFF-AND-HOME-NAVIGATION-V1 §6 — 폐기된 세션의 handoff 부활 차단.
+ *
+ * logout / logout-all / family mismatch 는 `users.refreshTokenFamily` 를 null 로 만든다. 그 뒤에도 남은
+ * access token(최대 15분)으로 handoff 를 발급·교환하면 exchange 가 새 family 를 만들어 세션이 되살아났다.
+ * 모든 로그인 경로는 family 를 기록하므로(`persistRefreshTokenFamily` 계약) null family = 종료된 세션이다.
+ */
+const SESSION_REVOKED_CODE = 'HANDOFF_SESSION_REVOKED';
+const SESSION_REVOKED_MESSAGE = '로그인 세션이 종료되었습니다. 다시 로그인해 주세요.';
+function hasLiveSession(user: { refreshTokenFamily?: string | null } | null | undefined): boolean {
+  return typeof user?.refreshTokenFamily === 'string' && user.refreshTokenFamily.length > 0;
+}
 
 /**
  * WO-O4O-NETURE-UNIFIED-ENTRY-UI-PHASE1-V1: returnPath 안전 검증.
@@ -83,6 +103,10 @@ export class HandoffController extends BaseController {
 
     if (!user) {
       return BaseController.error(res, 'Authentication required', 401, 'AUTH_REQUIRED');
+    }
+    if (!hasLiveSession(user as { refreshTokenFamily?: string | null })) {
+      logger.warn('[Handoff] Blocked generation — session revoked', { userId: user.id, reason: 'session_revoked' });
+      return BaseController.error(res, SESSION_REVOKED_MESSAGE, 401, SESSION_REVOKED_CODE);
     }
 
     // §8-2: 대상 종류는 정확히 하나 — targetServiceKey(SERVICE) 또는 targetWorkspace(WORKSPACE)
@@ -149,6 +173,31 @@ export class HandoffController extends BaseController {
     const targetService = getService(targetServiceKey);
     if (!targetService) {
       return BaseController.error(res, `Unknown service: ${targetServiceKey}`, 400, 'INVALID_SERVICE');
+    }
+
+    // ── REPRESENTATIVE ENTRY RETURN (O4O 홈 → neture.co.kr) ─────────────────
+    //   WO-O4O-REPRESENTATIVE-ENTRY-RETURN-HANDOFF-AND-HOME-NAVIGATION-V1 §5-2:
+    //   대표 진입 복귀는 neture membership 을 요구하지 않는다(O4O 계정 인증 ≠ 서비스 회원권).
+    //   "아무 서비스 active membership" 도 자격으로 쓰지 않는다 — 자격은 활성 O4O 계정 + 살아 있는 세션뿐.
+    //   계정 상태는 requireAuth 가 DB 기준으로 이미 판정했다(blocked 403 · restricted 는 이 경로 비허용).
+    //   목적지는 대표 홈 '/' 고정 — 범용 redirect 를 만들지 않는다. membership·role 생성 0.
+    if (isRepresentativeEntryTarget(targetService.key)) {
+      if (safeReturnPath && safeReturnPath !== '/') {
+        return BaseController.error(res, 'returnPath must be / for representative entry', 400, 'VALIDATION_ERROR');
+      }
+      try {
+        const sourceServiceKey = detectSourceServiceKey(req.get('origin') || '');
+        const handoffToken = await handoffTokenService.generateToken(user.id, sourceServiceKey, targetService.key);
+        const targetOrigin = getServiceOrigin(targetService.key) ?? `https://${targetService.domain}`;
+        return BaseController.ok(res, {
+          handoffToken,
+          targetUrl: `${targetOrigin}/handoff?token=${handoffToken}&returnTo=${encodeURIComponent('/')}`,
+          targetService: { key: targetService.key, name: targetService.name, domain: targetService.domain },
+        });
+      } catch (err: any) {
+        logger.error('[Handoff] Representative entry token generation failed', err);
+        return BaseController.error(res, 'Failed to generate handoff token', 500, 'HANDOFF_GENERATION_FAILED');
+      }
     }
 
     try {
@@ -273,6 +322,12 @@ export class HandoffController extends BaseController {
         return BaseController.error(res, 'User not found or inactive', 401, 'INVALID_USER');
       }
 
+      // §6: 토큰 발급 뒤 60s 사이 logout 됐으면 교환으로 세션을 되살리지 않는다(모든 대상 공통).
+      if (!hasLiveSession(user)) {
+        logger.warn('[Handoff] Blocked exchange — session revoked', { userId: user.id, reason: 'session_revoked' });
+        return BaseController.error(res, SESSION_REVOKED_MESSAGE, 401, SESSION_REVOKED_CODE);
+      }
+
       // 3. Load fresh roles from role_assignments
       const roles = await roleAssignmentService.getRoleNames(user.id);
 
@@ -305,6 +360,30 @@ export class HandoffController extends BaseController {
         }
         return HandoffController.issueHandoffSession(req, res, user, roles, memberships, {
           targetWorkspace: payload.targetWorkspace,
+        });
+      }
+
+      // ── REPRESENTATIVE ENTRY RETURN (neture.co.kr) ──────────────────────────
+      //   §5-2 / §5-3: membership 대신 (1) 수신 origin = 대표 진입 host 고정 (2) 계정 상태 DB 재확인.
+      //   토큰은 이미 원자 소비됐으므로 여기서 거부되면 재사용될 수 없다. membership·role 은 읽기만 한다.
+      if (isRepresentativeEntryTarget(payload.targetServiceKey)) {
+        if (!isRepresentativeEntryExchangeOrigin(req.get('origin'))) {
+          logger.warn('[Handoff] Blocked exchange — representative entry token from non-entry origin', {
+            userId: user.id,
+            targetServiceKey: payload.targetServiceKey,
+            reason: 'origin_mismatch',
+          });
+          return BaseController.error(res, 'Handoff token is invalid or expired', 401, 'HANDOFF_TOKEN_INVALID');
+        }
+        if (resolveAccountAccess(user.status) !== 'normal') {
+          logger.warn('[Handoff] Blocked exchange — account not accessible for representative entry', {
+            userId: user.id,
+            reason: 'account_not_active',
+          });
+          return BaseController.error(res, '이용할 수 없는 계정 상태입니다.', 403, 'ACCOUNT_NOT_ACTIVE');
+        }
+        return HandoffController.issueHandoffSession(req, res, user, roles, memberships, {
+          targetServiceKey: payload.targetServiceKey,
         });
       }
 

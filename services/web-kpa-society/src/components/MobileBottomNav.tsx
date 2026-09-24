@@ -30,7 +30,8 @@ import {
   useMobileBottomNavSheet,
 } from '@o4o/account-ui';
 import type { NotificationItem, MobileBottomNavItem } from '@o4o/account-ui';
-import { useAuth } from '../contexts/AuthContext';
+import { O4OHomeButton, O4O_LOGOUT_LABEL } from '@o4o/auth-react';
+import { useAuth, authClient } from '../contexts/AuthContext';
 import { useAuthModal } from '../contexts/LoginModalContext';
 import { notificationsApi } from '../api/notifications';
 import {
@@ -39,6 +40,10 @@ import {
   KpaUserMenuItems,
 } from './KpaUserMenu';
 import { resolveNotificationTarget } from '../lib/notificationRouting';
+
+/** 프로필 시트 메뉴 항목과 같은 모양의 O4O 홈 버튼 */
+const O4O_HOME_SHEET_ITEM_CLASS =
+  'flex items-center gap-2 w-full px-4 py-2.5 text-sm text-slate-700 bg-transparent border-none text-left cursor-pointer hover:bg-slate-50 disabled:opacity-60';
 
 /** KPA 브랜드 active 색. */
 const ACTIVE_COLOR = '#2563eb';
@@ -172,7 +177,10 @@ export function MobileBottomNav() {
           roleLabelClassName="text-blue-700"
           onClose={closeSheet}
           onLogout={() => void handleLogout()}
+          logoutLabel={O4O_LOGOUT_LABEL}
         >
+          {/* WO-O4O-REPRESENTATIVE-ENTRY-RETURN-HANDOFF-AND-HOME-NAVIGATION-V1: O4O 홈(로그인 유지) */}
+          <O4OHomeButton api={authClient.api} isAuthenticated className={O4O_HOME_SHEET_ITEM_CLASS} />
           <KpaUserMenuItems user={user} onItemClick={closeSheet} />
         </MobileBottomNavProfileSheet>
       )}

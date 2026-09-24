@@ -13,7 +13,9 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { Home, LogOut, ShieldCheck } from 'lucide-react';
 import { getUserDisplayName } from '@o4o/account-ui';
+import { O4OHomeButton, O4O_LOGOUT_LABEL } from '@o4o/auth-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { authClient } from '../../lib/apiClient';
 import { BRAND } from '../../config/service';
 
 /**
@@ -60,6 +62,14 @@ export function OperatorHeader({
             <Home className="h-4 w-4" />
             <span className="hidden md:inline">홈</span>
           </Link>
+          {/* WO-O4O-REPRESENTATIVE-ENTRY-RETURN-HANDOFF-AND-HOME-NAVIGATION-V1: O4O 홈(로그인 유지) — 위 "홈"은 이 서비스 홈 */}
+          {user && (
+            <O4OHomeButton
+              api={authClient.api}
+              isAuthenticated
+              className="rounded-lg px-3 py-1.5 text-sm font-medium text-slate-600 bg-transparent border-none cursor-pointer hover:bg-slate-100 disabled:opacity-60"
+            />
+          )}
           {userName && (
             <span className="hidden text-sm font-medium text-slate-700 md:block">{userName}</span>
           )}
@@ -72,7 +82,7 @@ export function OperatorHeader({
             className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium text-slate-600 hover:bg-slate-100"
           >
             <LogOut className="h-4 w-4" />
-            <span className="hidden md:inline">로그아웃</span>
+            <span className="hidden md:inline">{O4O_LOGOUT_LABEL}</span>
           </button>
         </div>
       </div>

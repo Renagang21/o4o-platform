@@ -4,6 +4,8 @@ import { Menu, Bell, User, LogOut, Settings as SettingsIcon, Shield, Clock } fro
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@o4o/auth-context';
 import toast from 'react-hot-toast';
+import { O4OHomeButton, O4O_LOGOUT_LABEL } from '@o4o/auth-react';
+import { api } from '@/api/base';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -109,6 +111,12 @@ const AdminHeader: FC<AdminHeaderProps> = ({ onMenuClick }) => {
 
         {/* Right side */}
         <div className="flex items-center gap-4">
+          {/* WO-O4O-REPRESENTATIVE-ENTRY-RETURN-HANDOFF-AND-HOME-NAVIGATION-V1: O4O 홈(로그인 유지 · 권한 확대 없음) */}
+          <O4OHomeButton
+            api={api}
+            isAuthenticated={!!user}
+            className="px-3 py-1.5 text-sm font-medium rounded-md border border-gray-200 text-o4o-text-secondary hover:text-o4o-text-primary hover:bg-o4o-bg-tertiary disabled:opacity-60"
+          />
           {/* Session Status Indicator */}
           <div className={`flex items-center gap-1 text-xs ${getSessionStatusColor()}`}>
             <Clock className="w-3 h-3" />
@@ -219,7 +227,8 @@ const AdminHeader: FC<AdminHeaderProps> = ({ onMenuClick }) => {
                 className="text-red-600 focus:text-red-600 focus:bg-red-50"
               >
                 <LogOut className="mr-2 h-4 w-4" />
-                로그아웃
+                {/* 서버 logout 은 사용자 refresh family 전체 폐기 = O4O 계정 전체 종료 */}
+                {O4O_LOGOUT_LABEL}
               </DropdownMenuItem>
 
               {/* Footer */}
