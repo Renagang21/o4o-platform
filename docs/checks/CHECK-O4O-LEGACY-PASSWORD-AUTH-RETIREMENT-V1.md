@@ -1,6 +1,6 @@
 # CHECK-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1
 
-> 작성일: 2026-09-23 · 상태: **`READY_FOR_PHASE_A_DEPLOY / AWAITING_CONTROLLED_DEPLOY_WINDOW`** (§7 · 사용자 결정 2026-09-24)
+> 작성일: 2026-09-23 · 상태: **`MERGED_TO_MAIN / AWAITING_CONTROLLED_DEPLOY`** — 배포 대상 SHA 확정 `0af9db301` (§7-2 · 2026-09-24)
 > WO: [`WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1`](../work-orders/WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1.md)
 > 작업 브랜치: `wo/legacy-password-auth-retirement` (origin push 완료 · `main` 무접촉)
 > 작업 worktree: `C:/tmp/o4o-legacy-password-retirement` — 다른 세션의 체크아웃·worktree 는 **불가침**
@@ -195,11 +195,21 @@ backend Phase A 2커밋(`010952f0d` · `c921f90b5`)과 프런트/공통 WIP(`4d7
 
 ### 7-2. 배포 대상 SHA 와 포함 변경 (2026-09-24 실측 · **대상 SHA 정정**)
 
-> **정정(2026-09-24 · Lecture 트랙 세션과 합의):** 배포 대상은 `b8ae53f4e` 가 **아니다**.
-> 대상 = **Phase A 를 main 에 병합한 직후의 최종 main SHA 하나**(merge 커밋)이며, 그 SHA 하나만 양쪽이 기록한다.
-> 병합 전 사전 대조는 끝났다 — 브랜치를 최신 `origin/main`(`fc2a2ca38`)에 동기화한 로컬 merge `195798f6c` 에서
-> **충돌 0** 이고, Lecture Phase 2 `9a3b402b9` · 배포 게이트 `3c7083be5` · `ebc7204ba` 3종이 모두 포함된다.
-> 따라서 병합만 되면 그 merge SHA 가 자동으로 세 marker 를 포함한다. 아래 표의 "현재 서빙" 실측은 유효하다.
+> **배포 대상 SHA 확정(2026-09-24):** **`0af9db3011cb1ed105c198721d5bbb87420cd225`(`0af9db301`)**
+> = `origin/main 21e8ad587` + Phase A 브랜치 tip `d1f6c3d4f` 의 `--no-ff` merge. 병합 실행은 배포 담당 세션이 했고,
+> 본 세션은 **독립 검증만** 했다(본 세션 main push 0 · 병합 미실행).
+>
+> | 검증(본 세션 · 2026-09-24) | 결과 |
+> |---|---|
+> | `origin/main` | `0af9db3011cb1ed105c198721d5bbb87420cd225` |
+> | Phase A tip `d1f6c3d4f` 조상 포함 | **포함** |
+> | marker 3종 `9a3b402b9` · `3c7083be5` · `ebc7204ba` | **전부 포함** |
+> | 병합 규모 | 171 files · +1,911 / −16,120 · **충돌 0** |
+> | §43 미포함 재검증 (`21e8ad587..0af9db301`) | 신규 migration **0건** · 파괴적 SQL(DROP/DELETE/TRUNCATE/dropColumn) **0건** |
+> | Phase A 산출물 main 반영 | 정적 guard spec · Google-only E2E spec · 본 CHECK **전부 존재** |
+> | 은퇴 파일 main 부재 | `auth-login.service.ts` · `passwordResetService.ts` · `passwordPolicy.ts` **전부 없음** |
+>
+> 이전 보고의 `b8ae53f4e` · `fc2a2ca38` 기준은 **폐기**한다(병합 전 main HEAD 였다). 아래 표의 "현재 서빙" 실측은 유효하다.
 
 | 축 | 현재 서빙 revision (이미지 기준) | 그 revision 을 만든 SHA | 대상 SHA |
 |---|---|---|---|
