@@ -143,6 +143,8 @@ IR 작성 시점과 `main` 이 동일(`23212304f`)하므로 **판정 drift 없�
 | D6 | `resend-verification` 경로가 정책 allowlist 2곳에 남아 있었다 | 제거 |
 | D7 | `OperatorAssignmentController` 가 초대 endpoint 4종(list·create·resend·cancel)을 함께 갖고 있었다 — IR 의 888 LOC 집계 밖 | 직접 지정만 남기고 제거 |
 | D8 | `services/mobile-app/node_modules` 재귀 삭제는 **과거 사고 패턴**(junction 추적 삭제) | `git rm -r` 로 tracked 파일만 제거. **node_modules 는 남겨 둠 — 사용자가 정리** |
+| D9 | **로컬 full jest 가 heap OOM 으로 완주 불가** — CI 3샤드가 정본임을 재확인 | 판정은 CI 로 대체. 섞인 로컬 결과를 PASS 로 올리지 않음 |
+| D10 | CI 가 **테스트 5개 파일**을 잡았다 — `OPERATOR_INVITATION_REQUIRED` 3곳 · `RefreshToken` 정본 목록 · `account-linking` 계약 | 전부 **반전**(코드 변경 아님). 타깃 실행만으로는 못 찾았을 구간 |
 
 ## 4. 미완료 항목과 이유
 

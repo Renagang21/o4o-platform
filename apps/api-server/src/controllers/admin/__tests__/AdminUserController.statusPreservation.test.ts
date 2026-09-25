@@ -218,7 +218,8 @@ describe('B. 기존 approved 사용자 — 상태 그대로', () => {
 // ─── C. 은퇴한 입력 — 조용히 무시하지 않고 명시 코드로 거절한다 (§18) ───────
 
 describe('C. 신규 생성 · 비밀번호 경로는 은퇴했다', () => {
-  it('미가입 email → 400 OPERATOR_INVITATION_REQUIRED (users 를 만들지 않는다)', async () => {
+  // WO-O4O-GOOGLE-ONLY-AUTH-CLEANUP-V1: 초대 경로 은퇴 — 미가입자는 Google 가입 후 지정 대상이 된다.
+  it('미가입 email → 400 USER_SIGNUP_REQUIRED (users 를 만들지 않는다)', async () => {
     const rec = install({ existingUser: null });
     const res = mockRes();
     await new AdminUserController().createUser(
@@ -227,7 +228,7 @@ describe('C. 신규 생성 · 비밀번호 경로는 은퇴했다', () => {
     );
 
     expect(res.status).toHaveBeenCalledWith(400);
-    expect(res.json.mock.calls[0][0].code).toBe('OPERATOR_INVITATION_REQUIRED');
+    expect(res.json.mock.calls[0][0].code).toBe('USER_SIGNUP_REQUIRED');
     // 어떤 행도 쓰지 않는다.
     expect(rec.userSaves).toHaveLength(0);
     expect(rec.memberships).toHaveLength(0);

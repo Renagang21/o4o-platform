@@ -97,20 +97,33 @@ describe('WO-O4O-AUTH-RUNTIME-AND-LEGACY-PACKAGE-FINAL-CLOSURE-V1', () => {
       expect(src).not.toContain('new Set([...(this.permissions || [])])');
     });
 
-    it('account-linking 이 permissions 를 병합하지 않는다', () => {
-      const src = read('services', 'account-linking.service.ts');
-      expect(src).not.toContain('mergeFields.permissions');
+    it('account-linking service 자체가 없다 (permissions 병합 경로 부재의 상위 계약)', () => {
+      // WO-O4O-GOOGLE-ONLY-AUTH-CLEANUP-V1: runtime consumer 0 으로 서비스를 제거했다.
+      //   "permissions 를 병합하지 않는다" 보다 강한 계약 — 파일이 없다.
+      expect(fs.existsSync(path.join(SRC, 'services', 'account-linking.service.ts'))).toBe(false);
     });
 
     // WO-O4O-GOOGLE-IDENTITY-AUTOMATIC-EMAIL-MERGE-REMOVAL-V1 (WO-2B):
     //   `mergeAccounts` 자체가 caller 0 확인 후 은퇴했다(V3 §3 자동 병합 금지). 종전 "다른 identity field
     //   병합은 유지된다" 계약은 "계정 병합 경로가 다시 생기지 않는다"로 뒤집혔다. permissions 스냅샷 write 경로
     //   부재(D축)는 그대로 성립한다.
-    it('account-linking 에 계정 병합(mergeAccounts) 경로가 없다 — WO-2B 은퇴', () => {
-      const src = read('services', 'account-linking.service.ts');
-      expect(src).not.toMatch(/static async mergeAccounts\(/);
-      expect(src).not.toContain('mergeFields.businessInfo');
-      expect(src).not.toContain('mergeFields.roles');
+    it('계정 병합(mergeAccounts) 식별자가 runtime 어디에도 없다 — WO-2B 은퇴 유지', () => {
+      // WO-O4O-GOOGLE-ONLY-AUTH-CLEANUP-V1: 파일 제거 후에도 **이름이 다시 나타나지 않는 것**을 전수로 고정한다.
+      const offenders: string[] = [];
+      const walk = (dir: string) => {
+        for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+          const full = path.join(dir, e.name);
+          if (e.isDirectory()) {
+            if (/(^|[\\/])(__tests__|node_modules|dist|migrations)([\\/]|$)/.test(full)) continue;
+            walk(full);
+          } else if (full.endsWith('.ts') && !/\.(spec|test)\.ts$/.test(full)) {
+            const src = fs.readFileSync(full, 'utf-8');
+            if (/mergeAccounts|AccountLinkingService/.test(src)) offenders.push(full);
+          }
+        }
+      };
+      walk(SRC);
+      expect(offenders).toEqual([]);
     });
 
     // WO-O4O-LEGACY-PRODUCTION-SCHEMA-AND-LOCAL-HOUSEKEEPING-FINAL-CLOSURE-V1 (A/B축)
