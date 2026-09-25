@@ -1441,23 +1441,28 @@ export class MembershipApprovalService {
           );
         }
 
-        // STEP H4: users — 절대 삭제 금지
-        // 남은 service_memberships가 없으면 users를 비활성화(soft-deactivate)만 수행
+        // STEP H4: users — **건드리지 않는다**
+        //
+        // WO-O4O-SERVICE-MEMBERSHIP-TERMINATION-GLOBAL-IDENTITY-DECOUPLING-V1:
+        //   이전 구현은 남은 service_memberships 가 0 이면
+        //   `UPDATE users SET status='deleted', "isActive"=false` 를 실행했다.
+        //   `requireAuth` 가 매 요청 `users.isActive` 를 검사하므로 결과는 **계정 정지**였고,
+        //   Google 로그인까지 차단됐다(2026-09-25 실측 — 테스트 계정이 이 경로로 죽었다).
+        //
+        //   `users` 는 **전역 Identity**, `service_memberships` 는 **서비스 관계**다.
+        //   서비스와의 관계가 0개가 되어도 O4O User Identity 는 존재할 수 있어야 한다.
+        //   계정 정지/탈퇴는 **명시적인 플랫폼 경로**(관리자 계정 관리)에서만 일어난다.
         const remainingMemberships = await queryRunner.query(
           `SELECT 1 FROM service_memberships WHERE user_id = $1 LIMIT 1`,
           [userId]
         );
-        if (remainingMemberships.length === 0) {
-          await queryRunner.query(
-            `UPDATE users SET status = 'deleted', "isActive" = false, "updatedAt" = NOW() WHERE id = $1`,
-            [userId]
-          );
-        }
 
         await queryRunner.commitTransaction();
         logger.info('[ApprovalService] HARD_DELETE_SUCCESS', {
           userId, deletedBy, serviceKeys, isPlatformAdmin,
-          usersDeactivated: remainingMemberships.length === 0,
+          // 관계가 0개여도 Identity 는 유지된다(의도).
+          remainingMemberships: remainingMemberships.length,
+          usersDeactivated: false,
         });
       } else {
         // Soft delete: 비활성화만 수행 (users row 삭제 없음)
@@ -1473,10 +1478,12 @@ export class MembershipApprovalService {
         //   플랫폼 관리자 = 계정 전체 탈퇴(기존 계약 보존).
         //   role 정리는 아래 prefixesToClean 이 이미 권한별로 스코프하고 있어 그대로 둔다.
         if (isPlatformAdmin) {
-          await queryRunner.query(
-            `UPDATE users SET status = 'deleted', "isActive" = false, "updatedAt" = NOW() WHERE id = $1`,
-            [userId]
-          );
+          // WO-O4O-SERVICE-MEMBERSHIP-TERMINATION-GLOBAL-IDENTITY-DECOUPLING-V1:
+          //   이전에는 여기서 `UPDATE users SET status='deleted', "isActive"=false` 도 실행했다.
+          //   "플랫폼 관리자가 호출했다" 는 사실이 **계정 탈퇴 의도**를 뜻하지는 않는다 —
+          //   서비스 콘솔에서 누른 "탈퇴 처리" 도 요청자가 super_admin 이면 이 분기로 들어왔다.
+          //   membership 종료는 membership 만 끝낸다. 계정 정지/탈퇴는 명시적 플랫폼 경로에서 한다.
+          //
           // WO-O4O-SM-WITHDRAWN-STATUS-CANONICAL-ALIGNMENT-V1:
           //   soft delete 도 lifecycle 종료 status 'withdrawn' 으로 일원화.
           //   withdrawMembership() 과 동일 enum 사용 (별도 'inactive' 분리 금지).

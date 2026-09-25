@@ -109,7 +109,7 @@ describe('service_credentials 수명주기 — hard delete', () => {
     expect(credentialWrites()).toHaveLength(0);
   });
 
-  it('hard delete 후에도 users row 는 삭제하지 않는다 (Identity 보존)', async () => {
+  it('hard delete 후에도 users row 는 삭제하지 않고 **비활성화도 하지 않는다** (Identity 보존)', async () => {
     await service.deleteMember({
       userId: USER,
       deletedBy: 'admin-1',
@@ -119,9 +119,21 @@ describe('service_credentials 수명주기 — hard delete', () => {
     });
 
     expect(queries.some((q) => /DELETE FROM users/i.test(q.sql))).toBe(false);
+
+    // WO-O4O-SERVICE-MEMBERSHIP-TERMINATION-GLOBAL-IDENTITY-DECOUPLING-V1:
+    //   구 계약은 "남은 membership 이 0 이면 users 를 status='deleted' 로 내린다" 였고
+    //   이 테스트가 그 UPDATE 의 **존재**를 단정했다. requireAuth 가 isActive 를 보므로
+    //   결과는 계정 정지였고 Google 로그인까지 막혔다(2026-09-25 실측).
+    //   users 는 전역 Identity, service_memberships 는 서비스 관계다 —
+    //   관계가 0개가 되어도 Identity 는 존재할 수 있어야 한다.
+    //   계약을 지우지 않고 **뒤집어** 고정한다: 부수효과가 되살아나면 여기서 먼저 깨진다.
     expect(
       queries.some((q) => /UPDATE users SET status = 'deleted'/i.test(q.sql)),
-    ).toBe(true);
+    ).toBe(false);
+    expect(queries.some((q) => /UPDATE users SET[^;]*"isActive" = false/i.test(q.sql))).toBe(false);
+
+    // membership 종료 자체는 그대로 일어난다(기능을 지운 것이 아니다).
+    expect(membershipDeletes().length).toBeGreaterThan(0);
   });
 
   it('password 축 부활 감지 — hard delete 트랜잭션에 credential write 가 없다', async () => {

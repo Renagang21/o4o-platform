@@ -204,15 +204,29 @@ describe('deleteMember(soft) — 서비스 탈퇴의 cross-service 격리', () =
     });
   });
 
-  describe('플랫폼 관리자 — 계정 전체 탈퇴 계약 보존', () => {
-    it('users 를 deleted 로 비활성화한다', async () => {
+  describe('플랫폼 관리자 — 전 서비스 관계 종료 (계정은 건드리지 않는다)', () => {
+    /**
+     * WO-O4O-SERVICE-MEMBERSHIP-TERMINATION-GLOBAL-IDENTITY-DECOUPLING-V1:
+     *   구 계약은 "플랫폼 관리자의 soft delete = 계정 전체 탈퇴" 였고 이 테스트가
+     *   `users.status='deleted'` · `isActive=false` 를 단정했다.
+     *
+     *   문제는 **분기가 의도가 아니라 요청자 권한으로 정해진다**는 점이었다 —
+     *   서비스 콘솔(k-cosmetics 회원 관리)에서 누른 "탈퇴 처리" 도 요청자가 super_admin 이면
+     *   이 분기로 들어와 계정을 죽였고, `requireAuth` 가 `isActive` 를 보므로 Google 로그인까지 막혔다.
+     *
+     *   새 계약: membership 종료는 **membership 만** 끝낸다. 계정 정지/탈퇴는 명시적인
+     *   플랫폼 계정 관리 경로에서 한다. 계약을 지우지 않고 **뒤집어** 고정한다.
+     */
+    it('users 를 건드리지 않는다 (status · isActive 불변)', async () => {
       seed();
 
       const ok = await softDeleteAsPlatformAdmin();
 
       expect(ok).toBe(true);
-      expect(user().status).toBe('deleted');
-      expect(user().isActive).toBe(false);
+      expect(user().status).toBe('active');
+      expect(user().isActive).toBe(true);
+      // users 에 대한 write 자체가 없어야 한다.
+      expect(usersWrites()).toEqual([]);
     });
 
     it('모든 서비스 Membership 을 종료한다', async () => {
