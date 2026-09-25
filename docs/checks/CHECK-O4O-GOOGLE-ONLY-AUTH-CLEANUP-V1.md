@@ -40,26 +40,26 @@ IR 작성 시점과 `main` 이 동일(`23212304f`)하므로 **판정 drift 없�
 
 | # | 항목 | 완료 조건 | 상태 |
 |---|---|---|---|
-| A1 | Passport 계층 제거 | `passportDynamic.ts` 삭제 · `initializePassport` 호출 0 · passport/session 미들웨어 0 | `[ ]` |
-| A2 | dependency 5종 | `passport`·`-google-oauth20`·`-kakao`·`-naver-v2`·`express-session` 을 `package.json` **+ `package.production.json`** 동시 제거 | `[ ]` |
-| A3 | Kakao/Naver 로그인 설정 | `app.config.ts` FeatureStatus·부팅로그·`oauth:*` · `settingsController.ts` 블록 · Admin `OAuthSettings` 항목 (**Google 유지**) | `[ ]` |
-| A4 | Admin Google bootstrap | route·controller·service·config·`authClient.bootstrapAdminGoogle`·Admin Login UI 제거 | `[ ]` |
-| A5 | Account linking | `account-linking.service.ts`·`LinkingSession`·linking 전용 타입 (**`AuthProvider` 유지**) | `[ ]` |
-| A6 | 이메일 인증 체인 | route 3·controller·service·entity·프런트 2 페이지/라우트 | `[ ]` |
-| A7 | 중복 `/auth/verify` | route + policy allowlist 2곳 (**`/auth/status` 유지**) | `[ ]` |
-| A8 | `refresh_tokens` 소비 | 세션 조회 2지점·entity·`User.refreshTokens` | `[ ]` |
-| A9 | mobile-app + 전용 백엔드 | `services/mobile-app` 전체 · `/api/v1/mobile/product-drafts` 등록·controller·service·entity | `[ ]` |
-| A10 | 운영자 이메일 초대 | entity·service·accept controller·route 2·프런트 accept·Admin 초대 탭·rate limiter·메일 템플릿 | `[ ]` |
-| A11 | 주석 현행화 | Admin `Login.tsx` 의 거짓 서술 삭제 · `auth-client` 의 `'localStorage' = legacy` → **현행**으로 정정 | `[ ]` |
+| A1 | Passport 계층 제거 | `passportDynamic.ts` 삭제 · `initializePassport` 호출 0 · passport/session 미들웨어 0 | `[x]` |
+| A2 | dependency 5종 | 위 5종 + `@types/passport*`·`@types/express-session`. 두 manifest 동시 | `[x]` **lockfile 갱신 남음** |
+| A3 | Kakao/Naver 로그인 설정 | `socialAuthConfig` 전체 + OAuth 설정 endpoint 2 + Admin `OAuthSettings` 화면 제거 | `[x]` |
+| A4 | Admin Google bootstrap | route·controller·service·config·limiter·client·Admin Login UI 제거 | `[x]` |
+| A5 | Account linking | service·entity·등록 해제 · 타입 파일은 소비되는 6종만 남김 | `[x]` |
+| A6 | 이메일 인증 체인 | route 3·controller·service·entity·**프런트 3** 페이지/라우트·메일 템플릿 2 | `[x]` |
+| A7 | 중복 `/auth/verify` | route + policy allowlist 2곳 (**`/auth/status` 유지**) | `[x]` |
+| A8 | `refresh_tokens` 소비 | 세션 조회 2지점(라우트 미연결)·entity·`User.refreshTokens` | `[x]` |
+| A9 | mobile-app + 전용 백엔드 | git-tracked 23파일 · route·controller·service·entity·workspace 예외 | `[x]` **node_modules 미삭제** |
+| A10 | 운영자 이메일 초대 | entity·service·accept controller·route 2·assignment controller 의 초대 endpoint 4·프런트 accept·Admin 초대 UI·limiter·메일 | `[x]` |
+| A11 | 주석 현행화 | Admin `Login.tsx` 거짓 서술 삭제 · `auth-client` 전략 주석 정정 | `[x]` |
 
 ### T2 — 테스트 (지우지 않고 **뒤집는다**)
 
 | # | 항목 | 완료 조건 | 상태 |
 |---|---|---|---|
-| T2-1 | `googleIdentityNoEmailMergeGuard` G4 | `passportDynamic.ts` **부재**를 단정하도록 반전 | `[ ]` |
-| T2-2 | `googleAdminBootstrap.test.ts` | bootstrap 경로 **부재** 단정으로 반전 | `[ ]` |
-| T2-3 | 신규 정적 가드 | `passport`·`express-session` import 0 · `/api/v1/social` 0 · `passport.authenticate` 0 · 제거 도메인 재등장 0 | `[ ]` |
-| T2-4 | 제거 도메인 참조 테스트 정리 | 초대·mobile·email verification 테스트를 계약 반전 또는 제거 | `[ ]` |
+| T2-1 | `googleIdentityNoEmailMergeGuard` G4·G6 | 파일 **부재** + passport/session import 0 로 반전 · 9 PASS | `[x]` |
+| T2-2 | `googleAdminBootstrap.test.ts` | 296줄 런타임 테스트를 **부재 계약**으로 반전 · 6 PASS | `[x]` |
+| T2-3 | 신규 `google-only-auth-cleanup.spec.ts` | 제거 9축 부재 + **살아 있어야 하는 것 6축** 동시 고정 · 17 PASS | `[x]` |
+| T2-4 | 제거 도메인 참조 테스트 정리 | `legacy-password-auth-retirement` allowlist · admin 2건 반전 | `[x]` |
 
 ### T3 — 검증
 
@@ -121,11 +121,28 @@ IR 작성 시점과 `main` 이 동일(`23212304f`)하므로 **판정 drift 없�
 
 ## 2. 진행 기록
 
-(단계 완료 시마다 추가)
+| 커밋 | 내용 |
+|---|---|
+| `e1ac10708` | A1 Passport 계층 · A2 dependency · A3 OAuth 설정 |
+| `76d0016ce` | A4 bootstrap backend |
+| (admin) | A4 bootstrap UI · A11 Admin 주석 |
+| `2651cce19` | A5 account-linking · A6 이메일 인증 · A7 `/auth/verify` · A8 refresh_tokens |
+| `7595e6d27` | A9 mobile-app + 전용 백엔드 |
+| `c316ff46f` | A10 운영자 이메일 초대 |
+| `dcd72e256` | A11 auth-client 전략 이름 정정 · T2-1/T2-2 guard 반전 |
 
-## 3. 작업 중 발견 (누락 추가)
+## 3. 작업 중 발견 (TODO 에 없던 것 — 모두 이번 범위에서 처리)
 
-(발견 시 TODO 에 항목을 추가하고 여기에 근거를 적는다)
+| # | 발견 | 처리 |
+|---|---|---|
+| D1 | **`req.user` 타입 증강의 출처가 `@types/passport`** 였다. passport 를 지우자 `Request.user` 가 사라져 8개 파일이 컴파일 실패 | `types/express.d.ts` 로 **소유권 이전** — 외부 타입 패키지에 의존하지 않는다 |
+| D2 | `GET /api/settings/oauth/admin` 이 **`clientSecret` 을 응답에 실어 보내고** 있었다. PUT 은 저장조차 하지 않는 안내였다 | 기능 제거가 **secret 노출면도 함께 닫는다** |
+| D3 | IR 은 `VerifyEmailPage` 를 2개로 셌으나 **실제 3개**(web-neture 누락) | 3개 모두 제거 |
+| D4 | 이메일 인증 메일 템플릿 2종(`email-verification` · `verification`)이 mail-core 에 남아 있었다 | 함께 제거(발송 경로 0) |
+| D5 | `securityMiddleware` 의 SQL injection 예외 allowlist 에 **등록된 적 없는** `/api/v1/social/*` 3개가 남아 있었다 | 죽은 예외 제거 |
+| D6 | `resend-verification` 경로가 정책 allowlist 2곳에 남아 있었다 | 제거 |
+| D7 | `OperatorAssignmentController` 가 초대 endpoint 4종(list·create·resend·cancel)을 함께 갖고 있었다 — IR 의 888 LOC 집계 밖 | 직접 지정만 남기고 제거 |
+| D8 | `services/mobile-app/node_modules` 재귀 삭제는 **과거 사고 패턴**(junction 추적 삭제) | `git rm -r` 로 tracked 파일만 제거. **node_modules 는 남겨 둠 — 사용자가 정리** |
 
 ## 4. 미완료 항목과 이유
 

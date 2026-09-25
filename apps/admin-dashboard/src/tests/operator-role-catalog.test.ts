@@ -75,9 +75,14 @@ describe('/operators — 비밀번호 표면 0 (§17)', () => {
     expect(code).not.toMatch(/post\(\s*['"`]\/admin\/users['"`]/);
   });
 
-  it('두 경로(직접 지정 · 초대) 만 사용한다', () => {
+  /**
+   * WO-O4O-GOOGLE-ONLY-AUTH-CLEANUP-V1 — 계약 축소
+   *   구 계약은 "직접 지정 · 초대 두 경로만 사용한다" 였다. 이메일 초대 흐름이 은퇴하면서
+   *   경로는 **직접 지정 하나**가 됐다. 초대 경로가 되살아나면 여기서 먼저 깨진다.
+   */
+  it('직접 지정 한 경로만 사용한다 (초대 경로 부재)', () => {
     expect(code).toMatch(/\/admin\/operator-assignments['"`]/);
-    expect(code).toMatch(/\/admin\/operator-invitations['"`]/);
+    expect(code).not.toMatch(/\/admin\/operator-invitations/);
     // 지정 대상은 email 이 아니라 userId 다 (§5 — email ≠ Identity Key).
     expect(code).toMatch(/userId:\s*selectedCandidate!\.userId/);
   });
