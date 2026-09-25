@@ -36,11 +36,16 @@ Google 단일 Identity 전환이 끝나 **`users` 는 전역 Identity, `service_
 
 ## 3. 확정 정책
 
+> **서비스와의 관계가 0개가 되어도 O4O User Identity 는 존재할 수 있다.**
+
 ```text
 O4O User Identity  ≠  Service Membership
 
 마지막 membership 종료  ≠  O4O 사용자 삭제/비활성화
 ```
+
+따라서 `users.status='deleted'` · `users.isActive=false` 는 **명시적인 플랫폼 계정 정지/탈퇴 경로에서만**
+발생해야 한다. **서비스 membership 종료의 부수효과로 발생해서는 안 된다.**
 
 ### 완료 계약
 
@@ -80,7 +85,8 @@ service_membership 종료
 [ ] reactivate 경로 정합
 [ ] users.status writer 전수 census + 판정표
 [ ] 회귀 테스트 (마지막 membership 종료 시나리오 포함)
-[ ] production 검증 — 아래 fixture 로 실증
+[ ] production 검증 — §7 TEST FIXTURE FINAL 로 실증 (수치는 **테스트 사용자 기준**)
+[ ] users.status='deleted' / isActive=false 가 **명시적 정지/탈퇴 경로에서만** 발생함을 census 로 확인
 [ ] CHECK 작성 · HEAD == origin/main · 미커밋 0
 ```
 
@@ -88,14 +94,39 @@ service_membership 종료
 
 Operator WO §7-7 에서 보존한 테스트 계정을 그대로 쓴다.
 
+**시작 상태** (Operator WO §7-7 에서 보존)
+
 ```text
-시작 상태  users row 1 · linked_accounts.google 1 · status active · isActive true
+test user  users row 1 · linked_accounts.google 1 · status active · isActive true
            active roles 0
            memberships  k-cosmetics active · neture active
+```
 
-검증 순서  ① neture membership 종료   → user active 유지 · Google 로그인 가능
-           ② 마지막 k-cosmetics 종료  → memberships 0 · user active 유지 · Google 로그인 가능
-           ③ 최종                     roles 0 · linked_accounts.google 1 · users row 1
+**검증 순서**
+
+```text
+① neture membership 종료      → test user active 유지 · Google 로그인 가능
+② 마지막 k-cosmetics 종료      → active memberships 0 · test user active 유지 · Google 로그인 가능
+③ 최종 상태 확인 (아래 TEST FIXTURE FINAL)
+```
+
+**TEST FIXTURE FINAL** — 모든 수치는 **테스트 사용자 기준**이다.
+`users` 전역 count 가 아니다(관리자 계정이 있으므로 그 시점에도 전역 2 일 가능성이 높다).
+
+```text
+test user
+- users row for test user            = 1
+- linked_accounts.google for test user = 1
+- Google sub                          동일
+- users.status                        = active
+- users.isActive                      = true
+- active roles                        = 0
+- active service memberships          = 0
+
+global invariant
+- 기존 admin user                     유지
+- admin platform:super_admin          유지
+- 다른 사용자 / role / membership 변화  0
 ```
 
 ③ 까지 성공하면 **"서비스 0개인 사용자도 O4O Identity 로 존재할 수 있다"** 를 production 에서 직접 증명한다.
