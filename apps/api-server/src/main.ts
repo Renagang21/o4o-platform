@@ -30,7 +30,6 @@ import { startupService } from './services/startup.service.js';
 import { transitionStartupState, isGracefulStartupAllowed, logStartupPhase } from './bootstrap/startup-state.js';
 
 // Configuration
-import { initializePassport } from './config/passportDynamic.js';
 import { setupSwagger } from './config/swagger-enhanced.js';
 import { AppDataSource } from './database/connection.js';
 
@@ -182,12 +181,7 @@ const startServer = async () => {
     logger.warn('🔄 GRACEFUL_STARTUP (non-production): Continuing with degraded functionality');
   }
 
-  try {
-    await initializePassport();
-    logger.info('✅ Dynamic Passport strategies initialized');
-  } catch (passportError) {
-    logger.error('Failed to initialize Passport strategies:', passportError);
-  }
+  // WO-O4O-GOOGLE-ONLY-AUTH-CLEANUP-V1: Passport 전략 초기화 은퇴 — 전략을 쓰는 route 가 0 이었다(IR §3-1).
 
   // ── Phase 3: Domain routes — BEFORE listen (eliminates 404 window) ──
   // WO-O4O-CARE-AI-CHAT-STABILITY-FIX-V1

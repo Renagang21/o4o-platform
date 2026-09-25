@@ -292,9 +292,8 @@ export class AdminUserController {
    *   운영자 onboarding 의 Identity 계약이 Google 기준으로 바뀌었다. 관리자는 더 이상 타인의
    *   비밀번호를 만들지 않는다. 따라서 이 경로에서 은퇴하는 것은 다음 둘이다.
    *     1. `password` 수신 → `service_credentials` / `users.password` 생성  (400 PASSWORD_NOT_ALLOWED_HERE)
-   *     2. 미가입 email 로 신규 user 생성                                     (400 OPERATOR_INVITATION_REQUIRED)
+   *     2. 미가입 email 로 신규 user 생성                                     (400 USER_SIGNUP_REQUIRED)
    *   대체 경로: `POST /api/v1/admin/operator-assignments` (기존 사용자 · userId 로 지정) ·
-   *             `POST /api/v1/admin/operator-invitations` (미가입자 초대).
    *   **조용한 대체(silent fallback)를 만들지 않는다** — 옛 계약으로 온 요청은 명시 코드로 거절한다.
    */
   createUser = async (req: Request, res: Response): Promise<void> => {
@@ -347,8 +346,8 @@ export class AdminUserController {
       if (!existingUser) {
         res.status(400).json({
           success: false,
-          error: '가입하지 않은 사용자입니다. 운영자 초대(POST /api/v1/admin/operator-invitations)를 사용하세요.',
-          code: 'OPERATOR_INVITATION_REQUIRED',
+          error: '가입하지 않은 사용자입니다. 대상자가 Google 로 O4O 에 가입한 뒤 운영자로 지정하세요.',
+          code: 'USER_SIGNUP_REQUIRED',
         });
         return;
       }

@@ -68,16 +68,9 @@ export function handleAuthFailure(req: Request, error: string, userEmail?: strin
  * SQL injection detection middleware
  */
 export function sqlInjectionDetection(req: Request, res: Response, next: NextFunction) {
-  // Whitelist OAuth callback routes - they contain authorization codes that look suspicious
-  const oauthCallbackRoutes = [
-    '/api/v1/social/google/callback',
-    '/api/v1/social/kakao/callback',
-    '/api/v1/social/naver/callback'
-  ];
-
-  if (oauthCallbackRoutes.includes(req.path)) {
-    return next();
-  }
+  // WO-O4O-GOOGLE-ONLY-AUTH-CLEANUP-V1: OAuth 콜백 allowlist 은퇴.
+  //   `/api/v1/social/*` 는 라우터에 **등록된 적이 없는 경로**였고(passport 전략의 callbackUrl
+  //   문자열만 존재), Passport 계층과 함께 제거했다. 죽은 예외를 남기지 않는다.
 
   const sqlPatterns = [
     /(\b(union|select|insert|update|delete|drop|create|alter|exec|execute)\b.*\b(from|into|where|table)\b)/i,

@@ -34,6 +34,17 @@ declare global {
 
     interface Request {
       /**
+       * Authenticated user — set by requireAuth / optional auth middleware.
+       *
+       * WO-O4O-GOOGLE-ONLY-AUTH-CLEANUP-V1:
+       *   이 선언은 종전에 `@types/passport` 가 제공하던 것이다. Passport 런타임을
+       *   은퇴시키면서(전략을 쓰는 route 0 · IR §3-1) 타입 증강의 출처도 함께 사라졌다.
+       *   `req.user` 는 Passport 와 무관하게 우리 인증 미들웨어가 붙이는 값이므로
+       *   **소유권을 이쪽으로 가져온다** — 외부 타입 패키지에 의존하지 않는다.
+       */
+      user?: User;
+
+      /**
        * Request correlation ID — set by requestLoggingMiddleware
        * WO-O4O-STRUCTURED-LOGGING-IMPLEMENTATION-V1
        */

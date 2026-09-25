@@ -45,8 +45,6 @@ import adminUsersRoutes from '../routes/admin/users.routes.js';
 import adminOperatorAssignmentsRoutes from '../routes/admin/operator-assignments.routes.js';
 // WO-O4O-SUPPLIER-ORDER-PAYMENT-FULFILLMENT-SETTLEMENT-CANONICALIZATION-V1 2-F: paid-but-unbridged 복구
 import { createAdminFulfillmentRecoveryRoutes } from '../routes/admin/admin-fulfillment-recovery.routes.js';
-import adminOperatorInvitationsRoutes from '../routes/admin/operator-invitations.routes.js';
-import operatorInvitationPublicRoutes from '../routes/operator-invitations.routes.js';
 // WO-O4O-ADMIN-PLATFORM-SETTINGS-SUPER-ADMIN-ACCOUNT-MANAGEMENT-V1: 관리자 계정 안전 유지관리(additive)
 import adminPlatformAccountsRoutes from '../routes/admin/platform-accounts.routes.js';
 // WO-O4O-PLATFORM-GLOBAL-USERS-READONLY-LIST-V1: 전체 사용자 read-only 조회(투영, additive)
@@ -177,9 +175,7 @@ export async function registerCoreRoutes(app: Application): Promise<void> {
   // WO-O4O-ADMIN-OPERATOR-GOOGLE-INVITATION-AND-ASSIGNMENT-CUTOVER-V1:
   //   운영자 지정(userId 기준)·초대(email 기준) — 둘 다 platform:super_admin 전용.
   app.use('/api/v1/admin/operator-assignments', adminOperatorAssignmentsRoutes);
-  app.use('/api/v1/admin/operator-invitations', adminOperatorInvitationsRoutes);
   //   초대 수락은 계정이 없을 수 있는 사람이 쓰므로 공개 경로다(토큰 + Google 검증이 조건).
-  app.use('/api/v1/operator-invitations', operatorInvitationPublicRoutes);
   // WO-O4O-SUPPLIER-ORDER-PAYMENT-FULFILLMENT-SETTLEMENT-CANONICALIZATION-V1 2-F:
   //   결제됐으나 공급자에게 전달되지 않은(paid-but-unbridged) 주문 탐지·복구 — 전 producer 공통.
   //   기존 Pharmacy-Hub 전용 recovery 는 그대로 유지한다(무회귀).
@@ -668,14 +664,9 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
       logger.error('Failed to register Product Master Image routes:', masterImageError);
     }
 
-    // 24-e3. Register Mobile Product Draft routes (WO-O4O-MOBILE-PRODUCT-DRAFT-TO-CANDIDATE-V1, Phase 4)
-    try {
-      const { createMobileProductDraftController } = await import('../modules/neture/controllers/mobile-product-draft.controller.js');
-      app.use('/api/v1/mobile/product-drafts', createMobileProductDraftController(dataSource));
-      logger.info('✅ Mobile Product Draft routes registered at /api/v1/mobile/product-drafts');
-    } catch (mobileProductDraftError) {
-      logger.error('Failed to register Mobile Product Draft routes:', mobileProductDraftError);
-    }
+    // 24-e3. (은퇴) Mobile Product Draft routes — WO-O4O-GOOGLE-ONLY-AUTH-CLEANUP-V1
+    //   유일한 소비자였던 `services/mobile-app` 을 은퇴시켰다. 배포된 적이 없고
+    //   운영 로그 30일간 `/api/v1/mobile/*` 요청이 0건이었다(IR §6-2).
 
     // 24-f. Register Operator Store Console routes (WO-O4O-STORE-CONSOLE-V1)
     app.use('/api/v1/operator/stores', operatorStoreRoutes);

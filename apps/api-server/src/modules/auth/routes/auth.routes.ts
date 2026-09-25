@@ -13,7 +13,6 @@ import { Router, type IRouter } from 'express';
 import {
   AuthSessionController,
   AuthAccountController,
-  VerificationController,
 } from '../controllers/index.js';
 import { HandoffController } from '../controllers/handoff.controller.js';
 import { GoogleAuthController } from '../controllers/google-auth.controller.js';
@@ -26,13 +25,10 @@ import {
 } from '../../../common/middleware/auth.middleware.js';
 import {
   RefreshTokenRequestDto,
-  EmailVerificationDto,
   GoogleLoginRequestDto,
   GoogleSignupRequestDto,
-  GoogleAdminBootstrapRequestDto,
 } from '../dto/index.js';
 import { asyncHandler } from '../../../middleware/error-handler.js';
-import { googleAdminBootstrapLimiter } from '../../../config/rate-limiters.config.js';
 
 const router: IRouter = Router();
 
@@ -66,17 +62,9 @@ router.post(
 //   POST /google/link · GET /google/link/status 는 은퇴했다.
 //   users.password 재인증을 전제로 한 전환기 경로이며, 세션은 이미 Google 연결에서만 나온다.
 
-// WO-O4O-GOOGLE-IDENTITY-OPERATOR-EXPLICIT-LINK-V1 §15: 전환기 1회용 Admin Google Bootstrap
-// POST /api/v1/auth/google/bootstrap-admin - { idToken, bootstrapCode }
-//   세션을 요구할 수 없는 유일한 연결 경로(연결 전에는 그 계정으로 로그인 불가)이므로
-//   env 플래그 + 일회용 코드로만 열리고(없으면 404), 대상 users.id 는 서버가 platform:super_admin 으로 결정한다.
-//   성공 후에는 대상에 Google 연결이 존재하므로 재사용 불가(1회성). 세션 발급 없음.
-router.post(
-  '/google/bootstrap-admin',
-  googleAdminBootstrapLimiter,
-  validateDto(GoogleAdminBootstrapRequestDto),
-  asyncHandler(GoogleAuthController.bootstrapAdmin)
-);
+// WO-O4O-GOOGLE-ONLY-AUTH-CLEANUP-V1: Admin Google Bootstrap(전환기 1회용)은 은퇴했다.
+//   목적이던 "기존 관리자 users.id 에 Google 연결"은 완료됐고 1회용이라 재사용 경로가 없다.
+//   운영 env 에 플래그/코드가 없어 이미 fail-closed 로 닫혀 있었다.
 
 // POST /api/v1/auth/refresh - Refresh access token
 router.post(
@@ -158,31 +146,10 @@ router.post(
 //   Password Management Routes(/forgot-password · /reset-password · /find-id)는 은퇴했다.
 //   복구할 password 가 없고, 계정 접근 복구는 Google 계정 복구가 담당한다.
 
-/**
- * ========================================
- * Email Verification Routes
- * ========================================
- */
-
-// POST /api/v1/auth/verify-email - Verify email (POST)
-router.post(
-  '/verify-email',
-  validateDto(EmailVerificationDto),
-  asyncHandler(VerificationController.verifyEmail)
-);
-
-// GET /api/v1/auth/verify-email - Verify email (GET - for email links)
-router.get(
-  '/verify-email',
-  asyncHandler(VerificationController.verifyEmailGet)
-);
-
-// POST /api/v1/auth/resend-verification - Resend verification email
-router.post(
-  '/resend-verification',
-  requireAuth,
-  asyncHandler(VerificationController.resendVerification)
-);
+// WO-O4O-GOOGLE-ONLY-AUTH-CLEANUP-V1: 이메일 인증 체인 은퇴.
+//   토큰을 발급하는 주체가 없었다 — `requestEmailVerification` 의 호출부는 resend 엔드포인트
+//   자기 자신뿐이었고 Google 가입 경로는 이 서비스를 부르지 않는다(IR §3-5).
+//   Google 이 이미 이메일을 검증하므로 O4O 가 다시 검증할 근거도 없다.
 
 /**
  * ========================================
@@ -197,11 +164,7 @@ router.get(
   asyncHandler(AuthAccountController.status)
 );
 
-// GET /api/v1/auth/verify - Alias for /status (backward compatibility)
-router.get(
-  '/verify',
-  requireAuth,
-  asyncHandler(AuthAccountController.me)
-);
+// WO-O4O-GOOGLE-ONLY-AUTH-CLEANUP-V1: `/auth/verify` 은퇴 — `/auth/me` 와 **같은 핸들러**였고 소비처가 0이었다.
+//   인증 상태 확인은 `/auth/status`(공개) · 계정 조회는 `/auth/me` 로 일원화한다.
 
 export default router;

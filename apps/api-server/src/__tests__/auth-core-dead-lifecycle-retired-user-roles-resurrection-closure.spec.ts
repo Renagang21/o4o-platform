@@ -98,7 +98,6 @@ describe('auth-core dead lifecycle · 은퇴한 user_roles 재생성 경로 종�
         join(SRC, 'entities', 'LinkedAccount.ts'),
         join(SRC, 'modules', 'auth', 'entities', 'Role.ts'),
         join(SRC, 'modules', 'auth', 'entities', 'RoleAssignment.ts'),
-        join(SRC, 'modules', 'auth', 'entities', 'RefreshToken.ts'),
         join(SRC, 'modules', 'auth', 'entities', 'LoginAttempt.ts'),
         join(SRC, 'modules', 'auth', 'entities', 'ServiceMembership.ts'),
         // WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1 Phase B-1:
@@ -108,9 +107,18 @@ describe('auth-core dead lifecycle · 은퇴한 user_roles 재생성 경로 종�
       for (const f of files) expect({ f, exists: existsSync(f) }).toEqual({ f, exists: true });
 
       const registry = read(join(SRC, 'database', 'entities.ts'));
-      for (const name of ['User', 'Role', 'RoleAssignment', 'RefreshToken', 'LoginAttempt', 'LinkedAccount', 'ServiceMembership']) {
+      // WO-O4O-GOOGLE-ONLY-AUTH-CLEANUP-V1: RefreshToken 은 이 목록에서 빠졌다.
+      //   refresh token 은 JWT 로 검증하고 `refresh_tokens` 에 INSERT 하는 코드가 0이었다
+      //   (조회 2지점은 라우트에 연결돼 있지도 않아 항상 빈 목록을 읽었다).
+      //   "정본이라 보존한다" 가 아니라 "은퇴했다" 가 현재 계약이므로 아래에서 부재를 고정한다.
+      for (const name of ['User', 'Role', 'RoleAssignment', 'LoginAttempt', 'LinkedAccount', 'ServiceMembership']) {
         expect({ name, hit: new RegExp(`import \{ ${name} \}`).test(registry) }).toEqual({ name, hit: true });
       }
+    });
+
+    it('refresh_tokens entity 는 은퇴했다 (되살아나면 먼저 깨진다)', () => {
+      expect(existsSync(join(SRC, 'modules', 'auth', 'entities', 'RefreshToken.ts'))).toBe(false);
+      expect(read(join(SRC, 'database', 'entities.ts'))).not.toMatch(/import \{ RefreshToken \}/);
     });
 
     it('password 축 entity 는 은퇴했다 (부활 감지 · WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1)', () => {

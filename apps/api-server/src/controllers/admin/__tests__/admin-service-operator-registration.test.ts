@@ -3,7 +3,7 @@
  *
  * 이 경로에서 **은퇴한 것**을 회귀로 고정한다.
  *   - 비밀번호 수신 → users.password / service_credentials 생성   (400 PASSWORD_NOT_ALLOWED_HERE)
- *   - 미가입 email 로 신규 user 생성                                (400 OPERATOR_INVITATION_REQUIRED)
+ *   - 미가입 email 로 신규 user 생성                                (400 USER_SIGNUP_REQUIRED)
  * 남는 것은 **기존 사용자에게 역할·membership 을 추가**하는 경로 하나뿐이며, 그 경로도
  * credential 을 만들지 않는다. 대체 경로는 `POST /admin/operator-assignments` · `POST /admin/operator-invitations`.
  *
@@ -176,7 +176,8 @@ describe('createUser — 비밀번호 경로 은퇴', () => {
     expect(res.json.mock.calls[0][0]).toMatchObject({ code: 'PASSWORD_NOT_ALLOWED_HERE' });
   });
 
-  it('미가입 email 이면 user 를 만들지 않고 400 OPERATOR_INVITATION_REQUIRED', async () => {
+  // WO-O4O-GOOGLE-ONLY-AUTH-CLEANUP-V1: 초대 경로 은퇴 — 코드가 OPERATOR_INVITATION_REQUIRED 에서 USER_SIGNUP_REQUIRED 로 바뀌었다.
+  it('미가입 email 이면 user 를 만들지 않고 400 USER_SIGNUP_REQUIRED', async () => {
     const rec = installDataSource({});
     const res = mockRes();
 
@@ -186,7 +187,7 @@ describe('createUser — 비밀번호 경로 은퇴', () => {
     expect(rec.users).toHaveLength(0);
     expect(rec.credentials).toHaveLength(0);
     expect(res.status).toHaveBeenCalledWith(400);
-    expect(res.json.mock.calls[0][0]).toMatchObject({ code: 'OPERATOR_INVITATION_REQUIRED' });
+    expect(res.json.mock.calls[0][0]).toMatchObject({ code: 'USER_SIGNUP_REQUIRED' });
   });
 
   it('대상 서비스가 모순이면 트랜잭션을 시작조차 하지 않는다', async () => {

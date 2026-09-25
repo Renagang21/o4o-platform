@@ -47,7 +47,6 @@ import HandoffPage from './pages/HandoffPage';
 import { TermsPage, PrivacyPage } from './pages/legal/PolicyDocumentPage';
 // WO-O4O-ADMIN-OPERATOR-GOOGLE-INVITATION-AND-ASSIGNMENT-CUTOVER-V1 §10:
 //   운영자 초대 수락(공개). 초대받은 사람은 아직 계정이 없을 수 있으므로 인증 게이트 밖에 둔다.
-const OperatorInvitationAcceptPage = lazy(() => import('./pages/auth/OperatorInvitationAcceptPage'));
 import CommunityPage from './pages/CommunityPage';
 // WO-O4O-COMMON-HOME-PHASE1-V1: O4O 전체 대표 진입점 (`/`)
 import O4OHomePage from './pages/O4OHomePage';
@@ -96,7 +95,6 @@ import {
 // RegisterPage는 RegisterModal로 대체됨 (WO-O4O-AUTH-MODAL-SIGNUP-ROLE-UPDATE-V1)
 // WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: AccountRecoveryPage · ResetPasswordPage 는 은퇴했다.
 // WO-O4O-AUTH-VERIFY-EMAIL-FRONTEND-PAGE-V1: 이메일 인증 결과 페이지
-import VerifyEmailPage from './pages/auth/VerifyEmailPage';
 import { RegisterPendingPage } from './pages/RegisterPendingPage';
 // MyPage 3-split (WO-O4O-NETURE-MYPAGE-SPLIT-V1)
 import MyPageHub from './pages/mypage/MyPageHub';
@@ -678,7 +676,6 @@ function App() {
             {/* WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: 비밀번호 찾기·재설정 경로는 은퇴했다. */}
             <Route path="/forgot-password" element={<Navigate to="/" replace />} />
             <Route path="/reset-password" element={<Navigate to="/" replace />} />
-            <Route path="/auth/verify-email" element={<VerifyEmailPage />} />
             <Route path="/register/pending" element={<RegisterPendingPage />} />
             <Route path="/qr/:slug" element={<QrLandingPage />} />
             <Route path="/p/:publicKey" element={<ProductLandingPage />} />
@@ -722,7 +719,6 @@ function App() {
 
               {/* WO-O4O-ADMIN-OPERATOR-GOOGLE-INVITATION-AND-ASSIGNMENT-CUTOVER-V1 §10~§14:
                   초대 토큰 + Google 인증만으로 운영 권한을 수락한다(비밀번호 없음). */}
-              <Route path="/operator-invitations/accept" element={<OperatorInvitationAcceptPage />} />
 
               {/* Forum — O4O 공통 구조 (WO-NETURE-HOME-COMMUNITY-PROMOTION-V1) */}
               <Route path="/forum" element={<ForumHubPage title="네뚜레 포럼" description="o4o 개념과 네뚜레 구조에 대한 질문과 의견을 나누는 공간입니다" basePath="/forum" />} />

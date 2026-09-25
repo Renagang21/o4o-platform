@@ -208,7 +208,7 @@ describe('membership 이 없으면 기존 신규 생성 계약을 유지한다',
     expect(res.json.mock.calls[0][0].membershipPolicy).toBe('CREATED');
   });
 
-  it('미가입 사용자 → membership 도 만들지 않는다 (초대 경로로만 운영자가 된다 §18)', async () => {
+  it('미가입 사용자 → membership 도 만들지 않는다 (가입 후 지정만 가능하다)', async () => {
     const rec = install({ existingUser: null, existingMembership: null });
     const res = mockRes();
     await new AdminUserController().createUser(
@@ -217,7 +217,8 @@ describe('membership 이 없으면 기존 신규 생성 계약을 유지한다',
     );
 
     expect(res.status).toHaveBeenCalledWith(400);
-    expect(res.json.mock.calls[0][0].code).toBe('OPERATOR_INVITATION_REQUIRED');
+    // WO-O4O-GOOGLE-ONLY-AUTH-CLEANUP-V1: 초대 경로 은퇴 — 미가입자는 먼저 Google 로 가입한 뒤 지정 대상이 된다.
+    expect(res.json.mock.calls[0][0].code).toBe('USER_SIGNUP_REQUIRED');
     expect(rec.membershipSaves).toHaveLength(0);
   });
 });

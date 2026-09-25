@@ -352,78 +352,8 @@ export class MailService {
     await this.sendEmail({ to, subject: `[${data.serviceName}] 서비스 이용 신청 결과 안내`, html, text: htmlToText(html) });
   }
 
-  /**
-   * 운영자 초대 메일 — WO-O4O-ADMIN-OPERATOR-GOOGLE-INVITATION-AND-ASSIGNMENT-CUTOVER-V1 §9.
-   *
-   * 계약:
-   *   - **비밀번호를 담지 않는다.** 임시 비밀번호 개념 자체가 없다. 수신자는 Google 계정으로 수락한다.
-   *   - 수락 링크는 호출자(api-server)가 service catalog origin 으로 만든 URL 만 받는다
-   *     (여기서 base URL 을 추측하지 않는다 — open redirect 표면을 만들지 않기 위해).
-   *   - 본문에 토큰 외 개인정보를 넣지 않는다.
-   */
-  async sendOperatorInvitationEmail(to: string, data: {
-    acceptUrl: string;
-    serviceName: string;
-    roleLabel: string;
-    expiresAtLabel: string;
-  }): Promise<{ success: boolean; error?: string }> {
-    const html = `
-      <div style="font-family:system-ui,-apple-system,'Segoe UI',sans-serif;max-width:560px;margin:0 auto;color:#111">
-        <h2 style="font-size:18px;margin:0 0 16px">${data.serviceName} 운영자로 초대되었습니다</h2>
-        <p style="margin:0 0 12px">부여될 역할: <strong>${data.roleLabel}</strong></p>
-        <p style="margin:0 0 20px">아래 버튼을 눌러 <strong>Google 계정</strong>으로 초대를 수락하세요.
-          이 초대를 받은 이메일과 동일한 Google 계정이어야 합니다.</p>
-        <p style="margin:0 0 20px">
-          <a href="${data.acceptUrl}" style="display:inline-block;background:#1a73e8;color:#fff;text-decoration:none;padding:12px 20px;border-radius:6px">초대 수락하기</a>
-        </p>
-        <p style="margin:0 0 12px;color:#555;font-size:13px">링크가 열리지 않으면 아래 주소를 복사해 붙여넣으세요.<br>${data.acceptUrl}</p>
-        <p style="margin:0 0 12px;color:#555;font-size:13px">유효기간: ${data.expiresAtLabel} 까지</p>
-        <p style="margin:0;color:#888;font-size:12px">본 메일에는 비밀번호가 포함되지 않습니다. O4O 는 운영자 비밀번호를 발급하지 않습니다.</p>
-      </div>
-    `;
-    return this.sendEmail({
-      to,
-      subject: `[O4O] ${data.serviceName} 운영자 초대`,
-      html,
-      text: htmlToText(html),
-    });
-  }
-
-  // ── Generic email methods (merged from emailService.ts B) ──
-
-  // WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: sendPasswordResetEmail 은퇴 — 재설정할 비밀번호가 없다.
-
-  async sendEmailVerification(email: string, verificationToken: string, serviceUrl?: string, serviceName?: string): Promise<boolean> {
-    // WO-O4O-EMAIL-VERIFICATION-LINK-PRODUCTION-URL-FIX-V1: verify URL 결정 우선순위
-    //   1. 호출자가 명시한 serviceUrl (api-server 가 serviceKey 기반 production origin 으로 주입)
-    //   2. EMAIL_VERIFICATION_DEFAULT_URL — 운영자 명시적 override 환경변수
-    //   3. FRONTEND_URL — 기존 환경변수 (legacy 호환)
-    //   4. NODE_ENV='production' → 'https://neture.co.kr' (안전한 production 기본값)
-    //      그 외 → 'http://localhost:3000' (기존 dev 동작 유지)
-    // V1 legacy 흐름(serviceKey 없는 호출)의 fallback 만 라이브러리가 책임진다.
-    const baseUrl =
-      serviceUrl
-      || process.env.EMAIL_VERIFICATION_DEFAULT_URL
-      || process.env.FRONTEND_URL
-      || (process.env.NODE_ENV === 'production'
-            ? 'https://neture.co.kr'
-            : 'http://localhost:3000');
-    const verifyUrl = `${baseUrl}/auth/verify-email?token=${verificationToken}`;
-    const displayName = serviceName || 'O4O Platform';
-
-    const result = await this.sendEmail({
-      to: email,
-      subject: `Verify Your Email - ${displayName}`,
-      template: 'email-verification',
-      templateData: {
-        verifyUrl,
-        year: new Date().getFullYear(),
-        serviceName: displayName,
-      },
-    });
-    return result.success;
-  }
-
+  // WO-O4O-GOOGLE-ONLY-AUTH-CLEANUP-V1: sendOperatorInvitationEmail 은퇴 — 운영자 이메일 초대 흐름을 제거했다.
+  //   운영자 지정은 "Google 로 가입 후 관리자가 직접 지정" 으로 일원화한다.
   async sendSecurityAlert(email: string, alertData: {
     type: 'suspicious_login_attempts' | 'account_locked' | 'password_changed' | 'new_device_login';
     details: {
