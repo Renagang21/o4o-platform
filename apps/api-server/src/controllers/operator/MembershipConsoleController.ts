@@ -24,6 +24,7 @@ import { ActionLogService } from '@o4o/action-log-core';
 //   이 경로는 platform admin 일 때 tier 제한을 건너뛰므로, 가드가 없으면
 //   마지막 서비스 admin 해제와 자기 역할 해제가 여기로 우회된다.
 import {
+  canRevokeOwnRole,
   getServiceAdminRoleServiceKey,
   isAdminTierRoleName,
   LAST_ADMIN_PROTECTED_CODE,
@@ -1411,10 +1412,21 @@ export class MembershipConsoleController {
       // WO-O4O-MEMBERSHIP-CONSOLE-ROLE-REVOKE-SAFETY-GUARDS-V1 (2):
       //   요청자가 자기 자신의 역할을 해제하는 행위 차단.
       //   중앙 경로와 동일한 코드·문구를 쓴다(SELF_ROLE_REVOKE_FORBIDDEN).
-      //   platform admin 여부와 무관하게 적용한다 — 자기 권한을 스스로 떨어뜨려
       //   복구 불가 상태를 만드는 것은 어느 경로에서도 막아야 한다.
+      //
+      // WO-O4O-PLATFORM-ADMIN-SERVICE-ROLE-RESET-V1:
+      //   중앙 경로와 같은 예외를 둔다 — `platform:super_admin` 요청자의
+      //   **자기 service-scoped 역할** 해제는 허용한다. 자기 `platform:*` 은 그대로 금지이며,
+      //   `platform:super_admin` 은 아래 LAST_PLATFORM_SUPER_ADMIN 보호도 함께 받는다.
       const requesterId = (req as any).user?.id;
-      if (requesterId && requesterId === userId) {
+      //   판정원은 이 컨트롤러가 이미 쓰는 `scope`(injectServiceScope 가 같은
+      //   `platform:super_admin` 규칙으로 파생한 값)로 통일한다 — 이중 파생 금지.
+      const requesterIsPlatformSuperAdmin = scope?.isPlatformAdmin === true;
+      if (
+        requesterId &&
+        requesterId === userId &&
+        !canRevokeOwnRole({ requesterIsPlatformSuperAdmin, role })
+      ) {
         res.status(403).json({
           success: false,
           error: SELF_ROLE_REVOKE_FORBIDDEN_MESSAGE,
@@ -1521,7 +1533,10 @@ export class MembershipConsoleController {
       //   `revokeServiceAdminRoleWithLock` 정본을 사용해 동시 해제 우회까지 막는다.
       const adminServiceKey = getServiceAdminRoleServiceKey(role);
       if (adminServiceKey) {
-        const outcome = await revokeServiceAdminRoleWithLock(AppDataSource, userId, role);
+        // WO-O4O-PLATFORM-ADMIN-SERVICE-ROLE-RESET-V1: platform:super_admin 은 마지막 서비스 admin 도 정리할 수 있다.
+        const outcome = await revokeServiceAdminRoleWithLock(AppDataSource, userId, role, {
+          allowLastAdmin: requesterIsPlatformSuperAdmin,
+        });
         if (outcome.status === 'not_holder') {
           res.status(404).json({ success: false, error: 'Role not found or already inactive' });
           return;

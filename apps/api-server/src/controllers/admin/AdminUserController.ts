@@ -15,7 +15,9 @@ import { resolveCanonicalServiceKey } from '@o4o/security-core';
 import { sanitizeAdminUser } from './admin-user-sanitizer.js';
 // WO-O4O-CENTRAL-OPERATOR-ROLE-REVOKE-SAFETY-GUARDS-V1
 import { invalidateRoles } from '../../modules/auth/utils/role-cache.js';
+import { isPlatformAdmin } from '../../utils/role.utils.js';
 import {
+  canRevokeOwnRole,
   getServiceAdminRoleServiceKey,
   LAST_ADMIN_PROTECTED_CODE,
   lastAdminProtectedMessage,
@@ -616,8 +618,19 @@ export class AdminUserController {
       //   요청자가 자기 자신의 역할을 해제하는 행위 차단.
       //   requireAuth 를 통과한 요청자 ID 와 경로의 대상 ID 를 직접 비교한다.
       //   (대상 존재 확인보다 앞에 둔다 — 계정 조회 없이 판정이 끝나는 조건이다.)
+      //
+      // WO-O4O-PLATFORM-ADMIN-SERVICE-ROLE-RESET-V1:
+      //   단, `platform:super_admin` 요청자가 **자기 service-scoped 역할**을 해제하는 것은
+      //   허용한다. 플랫폼 관리자는 각 서비스의 admin/operator 를 보유하지 않아도 되며,
+      //   종전 전면 금지는 그 정리를 불가능하게 만들었다. 자기 `platform:*` 해제는 그대로 금지다
+      //   (`platform:super_admin` 은 위에서 이미 전면 차단된다).
       const requesterId = (req as any).user?.id;
-      if (requesterId && requesterId === userId) {
+      const requesterIsPlatformSuperAdmin = isPlatformAdmin((req as any).user?.roles ?? []);
+      if (
+        requesterId &&
+        requesterId === userId &&
+        !canRevokeOwnRole({ requesterIsPlatformSuperAdmin, role })
+      ) {
         res.status(403).json({
           success: false,
           error: SELF_ROLE_REVOKE_FORBIDDEN_MESSAGE,
@@ -647,7 +660,10 @@ export class AdminUserController {
         //   잠금·판정·UPDATE 는 `revokeServiceAdminRoleWithLock` 정본을 사용한다.
         //   같은 계약을 쓰는 다른 해제 경로(MembershipConsoleController.removeMemberRole)와
         //   판정이 갈리지 않게 하기 위해서다(동작 동일, SQL 동일).
-        const outcome = await revokeServiceAdminRoleWithLock(AppDataSource, userId, role);
+        // WO-O4O-PLATFORM-ADMIN-SERVICE-ROLE-RESET-V1: platform:super_admin 은 마지막 서비스 admin 도 정리할 수 있다.
+        const outcome = await revokeServiceAdminRoleWithLock(AppDataSource, userId, role, {
+          allowLastAdmin: requesterIsPlatformSuperAdmin,
+        });
         const notHolder = outcome.status === 'not_holder';
         const lastAdmin = outcome.status === 'last_admin';
         if (outcome.status === 'revoked') affected = outcome.affected;

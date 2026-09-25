@@ -73,6 +73,43 @@ export function isAdminTierRoleName(role: unknown): boolean {
   return ADMIN_TIER_ROLE_KEYS.has(key);
 }
 
+/**
+ * service-scoped 역할 판정 — `{prefix}:{key}` 이고 prefix 가 'platform' 이 아닐 때.
+ *
+ * WO-O4O-PLATFORM-ADMIN-SERVICE-ROLE-RESET-V1:
+ *   prefix 가 없는 legacy 이름('admin' 등)은 **service-scoped 로 단정하지 않는다.**
+ *   어느 서비스의 역할인지 문자열만으로 확정할 수 없기 때문이다(fail-closed).
+ */
+export function isServiceScopedRole(role: unknown): boolean {
+  if (typeof role !== 'string') return false;
+  const name = role.trim().toLowerCase();
+  const idx = name.indexOf(':');
+  if (idx <= 0 || idx === name.length - 1) return false;
+  return name.slice(0, idx) !== 'platform';
+}
+
+/**
+ * 자기 자신의 역할을 해제해도 되는가.
+ *
+ * WO-O4O-PLATFORM-ADMIN-SERVICE-ROLE-RESET-V1 — 플랫폼 관리자의 운영 모델:
+ *   `platform:super_admin` 은 **모든 서비스의 운영자를 지정·해제하는 권한**이지
+ *   각 서비스의 admin/operator 를 스스로 보유해야 하는 역할이 아니다.
+ *   그런데 종전 가드는 자기 해제를 전면 금지해서, 관리자 계정에 붙은 불필요한
+ *   서비스 역할을 **정리할 방법 자체가 없었다**(두 번째 super_admin 을 임시로
+ *   세우는 우회만 남았다).
+ *
+ *   그래서 자기 해제를 **service-scoped 역할에 한해** 연다.
+ *   자기 `platform:*` 역할 해제는 그대로 막는다 — 복구가 애플리케이션 경로로
+ *   불가능해지는(플랫폼 관리자 0명) 상황을 만드는 것은 여전히 금지다.
+ */
+export function canRevokeOwnRole(params: {
+  requesterIsPlatformSuperAdmin: boolean;
+  role: unknown;
+}): boolean {
+  if (!params.requesterIsPlatformSuperAdmin) return false;
+  return isServiceScopedRole(params.role);
+}
+
 export const SELF_ROLE_REVOKE_FORBIDDEN_CODE = 'SELF_ROLE_REVOKE_FORBIDDEN';
 export const SELF_ROLE_REVOKE_FORBIDDEN_MESSAGE =
   '자기 자신의 역할은 해제할 수 없습니다. 다른 관리자에게 요청하세요.';
@@ -114,10 +151,19 @@ export type ServiceAdminRevokeOutcome =
   /** 해제했다 */
   | { status: 'revoked'; affected: number };
 
+/**
+ * @param options.allowLastAdmin
+ *   WO-O4O-PLATFORM-ADMIN-SERVICE-ROLE-RESET-V1: `platform:super_admin` 요청자는 마지막 `{service}:admin` 도 해제할 수 있다.
+ *   중앙 관리자가 언제든 다시 지정할 수 있으므로 복구 불가 상태가 아니다.
+ *   보호의 목적은 **서비스 운영자끼리** 서로의 마지막 admin 을 없애 서비스가
+ *   관리자 없이 남는 것을 막는 데 있고, 그 경우는 이 옵션 없이 그대로 유지된다.
+ *   판정·잠금·UPDATE 가 한 트랜잭션 안에 있어야 하므로 호출부가 아니라 여기서 받는다.
+ */
 export async function revokeServiceAdminRoleWithLock(
   runner: RoleRevokeTxRunner,
   userId: string,
-  role: string
+  role: string,
+  options: { allowLastAdmin?: boolean } = {}
 ): Promise<ServiceAdminRevokeOutcome> {
   return runner.transaction(async (manager) => {
     const holders: Array<{ user_id: string }> = await manager.query(
@@ -133,7 +179,7 @@ export async function revokeServiceAdminRoleWithLock(
     }
     // 비활성 assignment 는 is_active = true 필터로 이미 제외된다.
     // 다른 서비스의 admin 은 role 문자열이 다르므로 애초에 집합에 들어오지 않는다.
-    if (holderIds.filter((id) => id !== userId).length === 0) {
+    if (!options.allowLastAdmin && holderIds.filter((id) => id !== userId).length === 0) {
       return { status: 'last_admin' as const };
     }
 
