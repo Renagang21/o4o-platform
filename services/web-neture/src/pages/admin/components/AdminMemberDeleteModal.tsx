@@ -59,7 +59,8 @@ export function AdminMemberDeleteModal({ userId, userName, onClose, onDeleted }:
     setDeleting(true);
     setDeleteError(null);
     try {
-      await api.delete(`/operator/members/${userId}?mode=hard`);
+      // WO-O4O-SERVICE-MEMBERSHIP-TERMINATION-GLOBAL-IDENTITY-DECOUPLING-V1: 대상 서비스를 명시한다 — 없으면 서버가 거부한다(전 서비스 종료 방지).
+      await api.delete(`/operator/members/${userId}?mode=hard&serviceKey=neture`);
       onDeleted();
       onClose();
     } catch (e: unknown) {

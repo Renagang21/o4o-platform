@@ -178,7 +178,7 @@ export default function UsersPage() {
           user={user}
           onClose={onClose}
           onDeleted={onDeleted}
-          execute={(userId) => api.delete(`/operator/members/${userId}?mode=soft`).then(() => undefined)}
+          execute={(userId) => api.delete(`/operator/members/${userId}?mode=soft&serviceKey=k-cosmetics`).then(() => undefined)}
           title="탈퇴 처리 확인"
           confirmText="탈퇴 처리"
           buildMessage={(displayName, u) =>
@@ -266,7 +266,7 @@ export default function UsersPage() {
             users.filter((u) => ['active', 'approved', 'suspended', 'pending'].includes(u.status)).map((u) => u.id),
           executeBatch: async (ids) => {
             const settled = await Promise.allSettled(
-              ids.map((id) => api.delete(`/operator/members/${id}?mode=soft`)),
+              ids.map((id) => api.delete(`/operator/members/${id}?mode=soft&serviceKey=k-cosmetics`)),
             );
             return {
               data: {

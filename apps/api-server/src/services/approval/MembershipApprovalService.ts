@@ -1359,6 +1359,20 @@ export class MembershipApprovalService {
    */
   async deleteMember(params: DeleteMemberParams): Promise<boolean> {
     const { userId, deletedBy, isPlatformAdmin, serviceKeys, mode = 'soft' } = params;
+
+    // WO-O4O-SERVICE-MEMBERSHIP-TERMINATION-GLOBAL-IDENTITY-DECOUPLING-V1 — Authorization capability ≠ Mutation target scope
+    //
+    //   `platform:super_admin` 은 **어느 서비스든 처리할 수 있다**는 뜻이지
+    //   "한 서비스 탈퇴 요청이 모든 서비스를 종료한다" 는 뜻이 아니다.
+    //   이전 구현은 요청자가 platform admin 이면 membership 삭제 · role 정리 · KPA 정리를
+    //   **전 서비스로 확대**했다. 서비스 콘솔의 "탈퇴 처리" 가 다른 서비스 관계까지 끊었다.
+    //
+    //   변경 대상은 **호출자가 명시한 serviceKeys 로만** 정한다.
+    //   범위가 비어 있으면 전 서비스 fallback 대신 **거부**한다(fail-closed).
+    if (!Array.isArray(serviceKeys) || serviceKeys.length === 0) {
+      logger.warn('[ApprovalService] DELETE_REJECTED_NO_SCOPE', { userId, deletedBy, isPlatformAdmin, mode });
+      return false;
+    }
     const queryRunner = AppDataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
@@ -1382,19 +1396,12 @@ export class MembershipApprovalService {
         // serviceKey 범위의 데이터만 정리한다.
         // 다른 서비스 membership/role/profile은 건드리지 않는다.
 
-        // STEP H1: service_memberships — 해당 서비스 범위만 삭제
-        if (isPlatformAdmin) {
-          // platform admin 전체 삭제 시에도 users row는 유지
-          await queryRunner.query(
-            `DELETE FROM service_memberships WHERE user_id = $1`,
-            [userId]
-          );
-        } else {
-          await queryRunner.query(
-            `DELETE FROM service_memberships WHERE user_id = $1 AND service_key = ANY($2)`,
-            [userId, serviceKeys]
-          );
-        }
+        // STEP H1: service_memberships — **요청 범위(serviceKeys)만** 삭제
+        //   요청자가 platform admin 이어도 범위를 넓히지 않는다(WO-O4O-SERVICE-MEMBERSHIP-TERMINATION-GLOBAL-IDENTITY-DECOUPLING-V1).
+        await queryRunner.query(
+          `DELETE FROM service_memberships WHERE user_id = $1 AND service_key = ANY($2)`,
+          [userId, serviceKeys]
+        );
 
         // STEP H1b: WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1
         //   service_credentials 동반 폐기는 은퇴했다. credential orphan 문제
@@ -1404,12 +1411,11 @@ export class MembershipApprovalService {
 
         // STEP H2: role_assignments — 해당 서비스 prefix 역할만 삭제
         // 플랫폼 역할(super_admin, admin, operator)은 절대 건드리지 않음
-        const ALL_SERVICE_KEYS_H = ['kpa-society', 'k-cosmetics', 'neture'] as const;
-        const hardPrefixes = isPlatformAdmin
-          ? ALL_SERVICE_KEYS_H.map((k) => `${resolveRolePrefixFromCanonicalServiceKey(k)}:`)
-          : serviceKeys
-              .map((k) => `${resolveRolePrefixFromCanonicalServiceKey(k)}:`)
-              .filter((p) => p !== ':');
+
+        // WO-O4O-SERVICE-MEMBERSHIP-TERMINATION-GLOBAL-IDENTITY-DECOUPLING-V1: role 정리도 요청 범위로만 좁힌다(요청자 권한으로 넓히지 않는다).
+        const hardPrefixes = serviceKeys
+          .map((k) => `${resolveRolePrefixFromCanonicalServiceKey(k)}:`)
+          .filter((p) => p !== ':');
 
         for (const prefix of hardPrefixes) {
           await queryRunner.query(
@@ -1419,7 +1425,9 @@ export class MembershipApprovalService {
         }
 
         // STEP H3: organization_members — KPA scope는 kpa_members를 통해 org_id 특정
-        const hardHasKpa = serviceKeys.includes('kpa-society') || isPlatformAdmin;
+        // WO-O4O-SERVICE-MEMBERSHIP-TERMINATION-GLOBAL-IDENTITY-DECOUPLING-V1: KPA profile/organization 정리는 **대상 serviceKey 가 KPA 일 때만** 한다.
+        //   요청자가 platform admin 이라는 사실은 대상 범위와 무관하다.
+        const hardHasKpa = serviceKeys.includes('kpa-society');
         if (hardHasKpa) {
           const kpaOrgRowsH = await queryRunner.query(
             `SELECT organization_id FROM kpa_members WHERE user_id = $1 AND organization_id IS NOT NULL LIMIT 1`,
@@ -1441,23 +1449,28 @@ export class MembershipApprovalService {
           );
         }
 
-        // STEP H4: users — 절대 삭제 금지
-        // 남은 service_memberships가 없으면 users를 비활성화(soft-deactivate)만 수행
+        // STEP H4: users — **건드리지 않는다**
+        //
+        // WO-O4O-SERVICE-MEMBERSHIP-TERMINATION-GLOBAL-IDENTITY-DECOUPLING-V1:
+        //   이전 구현은 남은 service_memberships 가 0 이면
+        //   `UPDATE users SET status='deleted', "isActive"=false` 를 실행했다.
+        //   `requireAuth` 가 매 요청 `users.isActive` 를 검사하므로 결과는 **계정 정지**였고,
+        //   Google 로그인까지 차단됐다(2026-09-25 실측 — 테스트 계정이 이 경로로 죽었다).
+        //
+        //   `users` 는 **전역 Identity**, `service_memberships` 는 **서비스 관계**다.
+        //   서비스와의 관계가 0개가 되어도 O4O User Identity 는 존재할 수 있어야 한다.
+        //   계정 정지/탈퇴는 **명시적인 플랫폼 경로**(관리자 계정 관리)에서만 일어난다.
         const remainingMemberships = await queryRunner.query(
           `SELECT 1 FROM service_memberships WHERE user_id = $1 LIMIT 1`,
           [userId]
         );
-        if (remainingMemberships.length === 0) {
-          await queryRunner.query(
-            `UPDATE users SET status = 'deleted', "isActive" = false, "updatedAt" = NOW() WHERE id = $1`,
-            [userId]
-          );
-        }
 
         await queryRunner.commitTransaction();
         logger.info('[ApprovalService] HARD_DELETE_SUCCESS', {
           userId, deletedBy, serviceKeys, isPlatformAdmin,
-          usersDeactivated: remainingMemberships.length === 0,
+          // 관계가 0개여도 Identity 는 유지된다(의도).
+          remainingMemberships: remainingMemberships.length,
+          usersDeactivated: false,
         });
       } else {
         // Soft delete: 비활성화만 수행 (users row 삭제 없음)
@@ -1469,41 +1482,32 @@ export class MembershipApprovalService {
         //   requireAuth 가 매 요청 users.isActive 를 검사하므로(authentication.middleware.ts),
         //   한 서비스 운영자의 탈퇴 처리가 그 사용자의 **다른 서비스 진행 중 세션까지** 끊었다.
         //
-        //   서비스 운영자 = 자기 서비스 membership 종료만. users 는 건드리지 않는다.
-        //   플랫폼 관리자 = 계정 전체 탈퇴(기존 계약 보존).
-        //   role 정리는 아래 prefixesToClean 이 이미 권한별로 스코프하고 있어 그대로 둔다.
-        if (isPlatformAdmin) {
-          await queryRunner.query(
-            `UPDATE users SET status = 'deleted', "isActive" = false, "updatedAt" = NOW() WHERE id = $1`,
-            [userId]
-          );
-          // WO-O4O-SM-WITHDRAWN-STATUS-CANONICAL-ALIGNMENT-V1:
-          //   soft delete 도 lifecycle 종료 status 'withdrawn' 으로 일원화.
-          //   withdrawMembership() 과 동일 enum 사용 (별도 'inactive' 분리 금지).
-          await queryRunner.query(
-            `UPDATE service_memberships SET status = 'withdrawn', updated_at = NOW() WHERE user_id = $1`,
-            [userId]
-          );
-        } else {
-          await queryRunner.query(
-            `UPDATE service_memberships SET status = 'withdrawn', updated_at = NOW()
-             WHERE user_id = $1 AND service_key = ANY($2)`,
-            [userId, serviceKeys]
-          );
-        }
+        //   (요청자 권한에 따라 범위가 달라지던 잔재는 아래 WO-O4O-SERVICE-MEMBERSHIP-TERMINATION-GLOBAL-IDENTITY-DECOUPLING-V1 절에서 제거했다.)
+        // WO-O4O-SERVICE-MEMBERSHIP-TERMINATION-GLOBAL-IDENTITY-DECOUPLING-V1:
+        //   이전에는 platform admin 분기에서 `UPDATE users SET status='deleted', "isActive"=false` 를
+        //   실행하고 **전 서비스** membership 을 종료했다. 요청자 권한이 계정 탈퇴 의도나
+        //   변경 범위를 뜻하지는 않는다 — 서비스 콘솔의 "탈퇴 처리" 도 super_admin 이면 그리로 갔다.
+        //   이제 users 는 건드리지 않고 membership 도 **요청 범위만** 종료한다.
+        //
+        // WO-O4O-SM-WITHDRAWN-STATUS-CANONICAL-ALIGNMENT-V1:
+        //   soft delete 도 lifecycle 종료 status 'withdrawn' 으로 일원화.
+        //   withdrawMembership() 과 동일 enum 사용 (별도 'inactive' 분리 금지).
+        await queryRunner.query(
+          `UPDATE service_memberships SET status = 'withdrawn', updated_at = NOW()
+           WHERE user_id = $1 AND service_key = ANY($2)`,
+          [userId, serviceKeys]
+        );
 
         // WO-O4O-SOFT-DELETE-ROLE-CLEANUP-V1: role_assignments 서비스 prefix 범위 내 비활성화.
         // 플랫폼 역할(super_admin, admin, operator)은 절대 자동 비활성화하지 않는다.
-        // isPlatformAdmin: 전체 서비스 prefix 정리 / 서비스 operator: 해당 서비스 prefix만 정리.
+        // WO-O4O-SERVICE-MEMBERSHIP-TERMINATION-GLOBAL-IDENTITY-DECOUPLING-V1:
+        //   이전에는 `isPlatformAdmin` 이면 **전 서비스 prefix** 를 정리했다. 요청자 권한은
+        //   "처리할 수 있다" 는 뜻이지 변경 범위가 아니다 — 요청 범위(serviceKeys)로만 정리한다.
         // WO-O4O-CANONICAL-SERVICE-KEY-REVERSE-MAP-V1: canonical service_key → role prefix 는
         //   @o4o/security-core SSOT 위임. SQL LIKE 패턴의 ':' 는 호출처에서 조립.
-        const ALL_SERVICE_KEYS = ['kpa-society', 'k-cosmetics', 'neture'] as const;
-
-        const prefixesToClean = isPlatformAdmin
-          ? ALL_SERVICE_KEYS.map((k) => `${resolveRolePrefixFromCanonicalServiceKey(k)}:`)
-          : serviceKeys
-              .map((k) => `${resolveRolePrefixFromCanonicalServiceKey(k)}:`)
-              .filter((p) => p !== ':');  // safety: empty key 방어
+        const prefixesToClean = serviceKeys
+          .map((k) => `${resolveRolePrefixFromCanonicalServiceKey(k)}:`)
+          .filter((p) => p !== ':');  // safety: empty key 방어
 
         for (const prefix of prefixesToClean) {
           await queryRunner.query(

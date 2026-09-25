@@ -126,7 +126,8 @@ async function kcosFetchDeleteRisk(userId: string): Promise<NormalizedDeleteRisk
 }
 
 async function kcosExecuteDelete(userId: string, mode: 'soft' | 'hard'): Promise<void> {
-  await api.delete(`/operator/members/${userId}?mode=${mode}`);
+  // WO-O4O-SERVICE-MEMBERSHIP-TERMINATION-GLOBAL-IDENTITY-DECOUPLING-V1: 대상 서비스를 명시한다 — 없으면 서버가 거부한다(전 서비스 종료 방지).
+  await api.delete(`/operator/members/${userId}?mode=${mode}&serviceKey=k-cosmetics`);
   toast.success(mode === 'hard' ? '완전 삭제 완료' : '탈퇴 처리 완료');
 }
 

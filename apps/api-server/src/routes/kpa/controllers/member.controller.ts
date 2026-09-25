@@ -1788,17 +1788,13 @@ export function createMemberController(
           // kpa_members 삭제 (CASCADE: kpa_member_services 자동 삭제)
           await memberRepo.remove(member);
 
-          // users: 절대 삭제 금지 — 남은 서비스 멤버십 없으면 비활성화만 수행
-          const remainingMemberships = await queryRunner.query(
-            `SELECT 1 FROM service_memberships WHERE user_id = $1 LIMIT 1`,
-            [member.user_id]
-          );
-          if (remainingMemberships.length === 0) {
-            await queryRunner.query(
-              `UPDATE users SET status = 'deleted', "isActive" = false, "updatedAt" = NOW() WHERE id = $1`,
-              [member.user_id]
-            );
-          }
+          // users: 절대 삭제 금지이며 **비활성화도 하지 않는다**
+          //
+          // WO-O4O-SERVICE-MEMBERSHIP-TERMINATION-GLOBAL-IDENTITY-DECOUPLING-V1:
+          //   이전에는 남은 service_memberships 가 0 이면 users 를 `status='deleted'` ·
+          //   `isActive=false` 로 내렸다. `requireAuth` 가 `isActive` 를 보므로 계정이 죽고
+          //   Google 로그인까지 막혔다. KPA 회원 삭제는 **KPA 관계 종료**이지 O4O 계정 탈퇴가 아니다.
+          //   계정 정지/탈퇴는 명시적인 플랫폼 경로(관리자 계정 관리)에서만 한다.
 
           await queryRunner.commitTransaction();
         } catch (txError: any) {

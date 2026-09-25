@@ -95,8 +95,13 @@ describe('service_credentials 수명주기 — hard delete', () => {
     expect(credentialWrites()).toHaveLength(0);
   });
 
-  it('platform admin hard delete 는 전 서비스 membership 을 폐기하고 credential 은 무접촉이다', async () => {
-    await service.deleteMember({
+  it('platform admin 도 대상 서비스를 명시해야 한다 — 범위 없는 요청은 거부(write 0)', async () => {
+    // WO-O4O-SERVICE-MEMBERSHIP-TERMINATION-GLOBAL-IDENTITY-DECOUPLING-V1:
+    //   구 계약은 "platform admin 이면 serviceKeys 없이도 전 서비스 membership 을 폐기한다" 였고
+    //   이 테스트가 그 확대의 **존재**를 단정했다. 요청자 권한은 "어느 서비스든 처리할 수 있다" 는
+    //   뜻이지 변경 범위가 아니다 — 범위가 비면 전 서비스 fallback 대신 거부한다(fail-closed).
+    //   계약을 지우지 않고 **뒤집어** 고정한다.
+    const ok = await service.deleteMember({
       userId: USER,
       deletedBy: 'admin-1',
       isPlatformAdmin: true,
@@ -104,24 +109,51 @@ describe('service_credentials 수명주기 — hard delete', () => {
       mode: 'hard',
     });
 
-    // 전 서비스 membership 은 지우되 credential 은 건드리지 않는다(은퇴 계약).
-    expect(membershipDeletes().length).toBeGreaterThan(0);
+    expect(ok).toBe(false);
+    expect(membershipDeletes()).toHaveLength(0);
     expect(credentialWrites()).toHaveLength(0);
   });
 
-  it('hard delete 후에도 users row 는 삭제하지 않는다 (Identity 보존)', async () => {
+  it('platform admin 이 명시한 서비스만 폐기하고 credential 은 무접촉이다', async () => {
     await service.deleteMember({
       userId: USER,
       deletedBy: 'admin-1',
       isPlatformAdmin: true,
-      serviceKeys: [],
+      serviceKeys: ['kpa-society'],
+      mode: 'hard',
+    });
+
+    const smDel = membershipDeletes();
+    expect(smDel).toHaveLength(1);
+    expect(smDel[0].params).toEqual([USER, ['kpa-society']]);
+    expect(credentialWrites()).toHaveLength(0);
+  });
+
+  it('hard delete 후에도 users row 는 삭제하지 않고 **비활성화도 하지 않는다** (Identity 보존)', async () => {
+    await service.deleteMember({
+      userId: USER,
+      deletedBy: 'admin-1',
+      isPlatformAdmin: true,
+      serviceKeys: ['kpa-society'],
       mode: 'hard',
     });
 
     expect(queries.some((q) => /DELETE FROM users/i.test(q.sql))).toBe(false);
+
+    // WO-O4O-SERVICE-MEMBERSHIP-TERMINATION-GLOBAL-IDENTITY-DECOUPLING-V1:
+    //   구 계약은 "남은 membership 이 0 이면 users 를 status='deleted' 로 내린다" 였고
+    //   이 테스트가 그 UPDATE 의 **존재**를 단정했다. requireAuth 가 isActive 를 보므로
+    //   결과는 계정 정지였고 Google 로그인까지 막혔다(2026-09-25 실측).
+    //   users 는 전역 Identity, service_memberships 는 서비스 관계다 —
+    //   관계가 0개가 되어도 Identity 는 존재할 수 있어야 한다.
+    //   계약을 지우지 않고 **뒤집어** 고정한다: 부수효과가 되살아나면 여기서 먼저 깨진다.
     expect(
       queries.some((q) => /UPDATE users SET status = 'deleted'/i.test(q.sql)),
-    ).toBe(true);
+    ).toBe(false);
+    expect(queries.some((q) => /UPDATE users SET[^;]*"isActive" = false/i.test(q.sql))).toBe(false);
+
+    // membership 종료 자체는 그대로 일어난다(기능을 지운 것이 아니다).
+    expect(membershipDeletes().length).toBeGreaterThan(0);
   });
 
   it('password 축 부활 감지 — hard delete 트랜잭션에 credential write 가 없다', async () => {
