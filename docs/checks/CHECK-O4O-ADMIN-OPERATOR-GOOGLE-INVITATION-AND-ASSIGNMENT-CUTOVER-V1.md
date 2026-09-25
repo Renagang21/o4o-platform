@@ -450,6 +450,21 @@ memberships  k-cosmetics active 유지 · neture active 유지
 production 에서 직접 증명한다(neture 종료 → 로그인 가능 → 마지막 k-cosmetics 종료 → memberships 0 →
 여전히 로그인 가능).
 
+**fixture 준비 완료 — 실측 (2026-09-25 · read-only)**
+
+| 항목 | 목표 | 실측 |
+|---|---|---|
+| test user row | 1 | **1** (`322667c8`) |
+| `users.status` / `isActive` | active / true | **active / t** |
+| `linked_accounts.google` | 1 | **1** · sub `112789***` (초대 시점과 동일) |
+| **active roles** | **0** | **0** — `cosmetics:operator` · `neture:operator` 모두 `is_active=false`(이력 보존) |
+| memberships | k-cosmetics · neture 유지 | **둘 다 active** (active_memberships **2**) |
+| 기존 admin | 불변 | `cfd2a5e7` active · roles **11** · super_admin **1** · memberships **5** |
+| 전역 `users` | 참고 | **2** (관리자 + 테스트) — TEST FIXTURE FINAL 의 수치는 **테스트 사용자 기준**이다 |
+
+`neture:operator` 회수는 canonical 경로(`DELETE /admin/users/:userId/role-assignments/:role`)로 했고,
+**membership · users · Google 연결을 전혀 건드리지 않았다**는 것이 이 실측으로 확인됐다.
+
 ## 8. 미해결 · 후속 인계
 
 - ~~§28 Legacy Password/Auth 제거는 별도 WO~~ → **완료 (2026-09-25)**:
