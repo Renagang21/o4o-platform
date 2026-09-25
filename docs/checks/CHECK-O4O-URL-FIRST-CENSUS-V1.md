@@ -4,7 +4,7 @@
 - 단계: **G0 (현재 상태) · G1 (데이터/외부 환경 실측)**. 구현 A~F 는 이 결과 검토 후 별도 지시로 진행한다.
 - 선행: [`IR-O4O-URL-FIRST-SERVICE-RESTRUCTURE-ADDENDUM-V1`](../investigations/IR-O4O-URL-FIRST-SERVICE-RESTRUCTURE-ADDENDUM-V1.md) §0~§11 (결정 8건 = §11).
 - 변경: 코드 · 운영 DB · DNS · LB · 배포 설정 **변경 0**. 운영 DB 는 Cloud SQL Auth Proxy + `default_transaction_read_only=on` 세션으로 **집계 SELECT 만** 실행(개인정보 미출력). GCP 는 `describe`/`list` 만.
-- 판정: **G0 PASS · G1 PARTIAL** (사용자 동의 2026-09-25 · 결정 = §9 · PH 대응 설계 = §10 · 커뮤니티 권한 설계 = §11) — 저장소 밖 콘솔 3건(Google · Toss · Gabia 관리 화면)과 발송 메일 · 설치 PC 현장 확인이 미확인.
+- 판정: **G0 PASS · G1 PARTIAL** (사용자 동의 2026-09-25 · 결정 = §9 · PH 대응 설계 = §10 · 커뮤니티 권한 설계 = §11 · 2차 결정 = §12 · B 모델 = §13 · 결제 = §14 · 운영자 권한 = §15 · 호스트 진입 = §16 · Store Hub = §17 · 커뮤니티 모델 = §18 · 현재 결함 = §19 · 다음 판단 = §20) — 저장소 밖 콘솔 3건(Google · Toss · Gabia 관리 화면)과 발송 메일 · 설치 PC 현장 확인이 미확인.
 
 ---
 
@@ -403,3 +403,258 @@
 - 대안: (i) 현행 유지(삭제 · 수정 모두 차단) — 구현 0, 가입 전 작성자가 자기 글을 못 내림. (ii) 삭제 · 수정 모두 허용 — 미가입자가 수정으로 내용을 바꿀 수 있음.
 - 구현 시 필요: `write` 배열 분리(작성 · 댓글 · 좋아요 = 커뮤니티 가드, 삭제 = 작성자 확인만), KPA `pharmacyWrite` 동일 분리, PH 프론트 읽기 `MembershipGate` 제거로 백엔드와 일치, `resolveCommunityAccess` 를 커뮤니티 membership 원장으로 교체, `ForumPostController.ts:90` 하드코딩 정리. → 권한 · API 계약 변경이므로 **구현 시 승인 대상**.
 - 영향 규모(실측): 기존 게시글 kpa-society 6 · neture 1 · PH 0 · kcos 0, 사용자 2명.
+
+---
+
+## 12. 결정 기록 (2026-09-25, 2차)
+
+| 항목 | 결정 |
+|---|---|
+| PharmacyHub opt-in 채널 | **현재 경로 유지 · 약국 서비스 전환 보류.** PH 별도 서비스 존속의 최종 결정은 아니다. B안("승인 **또는** opt-in")을 **이 통합 작업 안에서** 검토하고, KPA 승인 정책 · 매장 노출 권한 · 오퍼 소유권을 함께 설명할 수 있을 때 전환. **A · C 안을 임시 우회책으로 쓰지 않는다.** 별도 WO 없음 |
+| 기존 글 본인 권한 | **삭제만 가입 상태와 분리.** 비회원 · 대기 · 정지 · 탈퇴에서도 작성자 본인 확인 후 기존 글 삭제 가능. 수정 · 새 글 · 댓글은 승인된 커뮤니티 회원만. 구현 시 삭제 방식 · 감사 기록 · 첨부 · 댓글 영향 명시. 공개 열람은 현행 유지 |
+| 의약품 오퍼 6건 | **B 구조 검토 1단계에서 거래 차단 정책과 대조**(별도 WO 없음). 오퍼별 현재/신구조 상태를 기록하고, **정책상 차단 대상이 전환 때문에 주문 가능해지지 않는 것**을 검증 조건으로 삼는다(§13-5) |
+| 관리자 영역 | `admin.neture.co.kr` 진입을 넓히려고 O4O 운영자에게 **`platform:super_admin` 을 부여하지 않는다.** 공급자 · 펀딩 · 커뮤니티 업무 범위만 가진 운영자 권한 · 경로를 설계하고 기존 관리자 권한 · 서버 검사와 분리. 권한 변경은 구현 전 검토(§15) |
+| 유지 | 현재 PharmacyHub 경로 · QR 유지. A~F 코드 구현 · 배포는 이 설계 검토 후 개방 |
+
+---
+
+## 13. opt-in 모델 B 설계 (KPA = 승인 **또는** 공급자 opt-in)
+
+### 13-1. 현재 불변식 (B 가 건드리는 것)
+
+- `APPROVAL_ELIGIBLE_SERVICE_KEYS = ['kpa-society','k-cosmetics']`(`approval-service-keys.ts:18-21`) · `SUPPLIER_OPTIN_SERVICE_KEYS = ['pharmacy-hub']`(`supplier-optin-services.ts:37`) · 두 목록 교집합이 있으면 **서버 기동 실패**(`offer-exposure-strategy.ts:42-51`).
+- 계약 문서 `O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1`: S2(두 공급 축 "섞지 않는다") · C3("승인축 서비스는 `service_keys` opt-in 만으로 주문할 수 없다") · C4(교집합 0) · §13-7 #4.
+- F8 `NETURE-DISTRIBUTION-ENGINE-FREEZE-V1` §7: **Checkout Guard 조건 변경 · Listing 자동 활성화 정책 변경 · Tier 자동 확산 · 캐스케이드 변경 = WO + 구조 검토**.
+- 결론: B 는 **계약 C3 · C4 · S2 · §13-7 #4 개정 + F8 구조 검토**가 선행돼야 하는 변경이다(구현 시 중지 조건).
+
+### 13-2. KPA 승인 정책 · 노출 · 소유권 — 현재 2단 구조
+
+| 단 | 원장 | 결정자 | 역할 |
+|---|---|---|---|
+| 1단 (오퍼 × 서비스) | `offer_service_approvals`(osa) | **Neture 운영자**(`neture:operator`, `/operator/product-service-approvals`) | KPA 카탈로그 · `/orderable` · checkout 노출의 **유일한 권한** |
+| 2단 (매장 × 오퍼) | `product_approvals`(v2) | **KPA 운영자**(`/kpa/operator/product-applications`) | SERVICE/PRIVATE 오퍼의 매장 취급 신청 승인 → 활성 listing 생성 |
+| 연결 | osa approved 시 KPA 2차 심사 큐에 pending 자동 생성(`offer-service-approval.service.ts:467-478`) | — | — |
+
+- 오퍼 소유 = `supplier_product_offers.supplier_id`. 가격 = `offer_service_prices(offer_id, service_key)` 1행/서비스 → B 에서는 두 채널이 **같은 `kpa-society` 가격 1행**을 공유(채널 무관 동일가).
+
+### 13-3. opt-in 표시 방식 — 별도 테이블 권고
+
+| 후보 | 판정 | 이유 |
+|---|---|---|
+| (i) `service_keys` 에 `kpa-society` | **불가** | 이미 "승인 채널 신청" 의미. pending/rejected 오퍼도 키를 유지하므로 opt-in 판정에 쓰면 **미승인 · 반려 KPA 오퍼가 즉시 노출**(C3 위반) |
+| (ii-a) osa 에 새 상태/출처 | **위험** | `UNIQUE(offer_id, service_key)` 로 승인행과 공존 불가 · sync 가 미지 상태를 REJECTED 로 보고 **전 서비스 listing 비활성 cascade** · 관리자 일괄 승인/반려가 덮어씀 |
+| (ii-b) `product_approvals` 새 type | **부적합** | 매장 단위 원장(단위 불일치) · ENUM 변경 = F8 동결 |
+| **(iii) 새 테이블 `offer_service_optins`** | **권고** | `(offer_id, service_key, status active/withdrawn/revoked, enabled_by/at, revoked_by/at, reason, UNIQUE(offer_id, service_key))`. `service_keys` 의미 · osa sync · cascade · 일괄 처리를 건드리지 않음. KPA 운영자 거부권 = `revoked` |
+
+### 13-4. 주체별 권한 (B)
+
+- **공급자**: opt-in 켜기/끄기(소유 오퍼만). 새 메서드(예: `setServiceOptin`)로 분리 — 기존 `setServiceDelivery` 의 승인키 거부(`SERVICE_KEY_REQUIRES_APPROVAL_FLOW`)는 유지.
+- **KPA 운영자**: opt-in 오퍼 목록 · **철회(revoke)**. 철회 시 opt-in 경로로 생긴 listing 만 비활성(현재 listing 에 채널 컬럼이 없으므로 채널 기록 또는 노출 재계산 필요 — osa 승인도 가진 오퍼는 유지).
+- **Neture 운영자**: osa 승인(현행 유지).
+- **매장**: opt-in 오퍼를 카탈로그에서 보고 취급 신청. **결정 필요**: opt-in 오퍼 취급 신청을 (a) 즉시 활성 listing(PH 와 동일 · F8 listing 자동 활성화) 로 할지 (b) KPA 2단 심사 큐로 보낼지.
+
+### 13-5. 의약품 오퍼 — 오퍼별 현재/신구조 상태와 검증 조건
+
+실측(운영 DB read-only, 2026-09-25): PH opt-in 오퍼 19건 전부 공급자 1곳 · `SERVICE` · 활성 · 활성 listing 1건씩(구성원 없는 PH 조직 1곳).
+
+| 오퍼(id 앞 8자리) | 규제 유형 | 현재(PH) 조회 · 취급등록 | 현재 장바구니 · 주문 | B 전환 후 KPA | 검증 조건 |
+|---|---|---|---|---|---|
+| 1b3fb24c · 7b417c3e · 91c2223a · c28fe05f · f1754b2a · fc353ddb | **DRUG** (6) | 가능 | **불가** — 장바구니 403 `DRUG_COMMERCE_FORBIDDEN`(`store-cart.service.ts:200-210`), 주문 생성 전 차단(`checkout.service.ts:146-164`). 서비스 · 역할 무관 절대 차단 | 조회 · 취급등록 가능 / **장바구니 · 주문 불가 유지** | ① 6건 각각 KPA 장바구니 추가 → 403 ② `createOrder` 경로 직접 호출 → 차단 ③ opt-in 켜기 시 `assertDrugOfferAllowed(['kpa-society'])` 통과(약국 대상 서비스) · PUBLIC 전환 시 거부 |
+| 10fa44aa · 370840ea · 54d82e90 · 65da2603 · 7df629d6 · c336a52f | 건강기능식품 (6) | 가능 | 가능(PH) | 가능 | 기존 흐름 회귀 |
+| 361a1f06 · 39fea5f0 · 3dd46a73 · 4e9724ca · 875afc41 · 959b5e92 | COSMETIC (6) | 가능 | 가능(PH) | 가능 — **약국 서비스 노출이 사업상 맞는지 확인 필요** | 기존 흐름 회귀 |
+| 3bb54519 | GENERAL · `approval_status` PENDING · PH 가격행 있음 | 가능(PH opt-in 게이트는 전역 approval_status 를 보지 않음) | 가능(PH) | B 의 게이트 정의에 따름 | PENDING 오퍼의 노출 여부를 B 규칙으로 명시 |
+
+- 정책 근거: `docs/ir/IR-O4O-DRUG-ACCESS-POLICY-DECISION-AND-LIVE-EXPOSURE-AUDIT-V1.md` §4(:166, DRUG 장바구니 · 주문 · 결제 = 모든 역할 거부 · 약국 서비스는 조회/상세/intake 허용), 구현 `CHECK-O4O-DRUG-COMMERCE-ABSOLUTE-BLOCK-V1.md`(058831274, **main 반영됨** — 문서 본문의 "main 미병합" 표기는 stale).
+- 부수 발견: 이 오퍼 18건에 `offer_service_approvals(service_key='pharmacy-hub', approved)` 행이 있다. `pharmacy-hub` 는 승인 채널 키가 아니므로 현행 opt-in 게이트에는 영향이 없지만, B 에서 osa 를 노출 판정에 섞으면 오해석될 수 있어 **B 구현 전 이 행들의 출처 확인 필요**.
+- UX 결손: PH 상품 화면이 DRUG 필터 칩 · 취급등록을 제공하지만 장바구니에서 403 — 정책과는 일치하나 화면이 완료할 수 없는 행동을 제시.
+
+### 13-6. 영향표
+
+| 구성요소 | 현재 | B 적용 후 | 동결 · 계약 영향 | 필요한 테스트 |
+|---|---|---|---|---|
+| `offer-exposure-strategy.ts` | 키 상호배타 · 승인 = osa | 새 전략(osa approved **OR** opt-in active) · 행별 채널 게이트 | F8 Checkout Guard · 계약 C3/C4/S2/§13-7 | pending/rejected osa + service_keys 는 **통과 못 함** · revoke 된 opt-in 거부 · PRIVATE opt-in 거부 |
+| KPA `/catalog` · `findApplicableOffer` | PUBLIC OR osa | + opt-in(비PRIVATE · master ACTIVE) — 단일 SQL 조각(KCos 공용 빌더 주의) | 노출 SSOT | KCos 무영향 회귀 |
+| `/apply` | SERVICE → 매장 심사 큐 | opt-in 처리 방식 결정(§13-4) | F8 listing 자동 활성화 | 멱등 · 서비스키 `kpa-society` |
+| `/orderable` | SERVICE 는 osa 필요 · 표시가격이 osp 무시 | + opt-in · osp 사용 | 계약 parity | 카탈로그/주문가능/결제 가격 일치 |
+| checkout-confirm-b2b | 승인 전략(PUBLIC 도 osa 필요) | 새 전략 · **PUBLIC 처리 명시** | F8 | 채널별 성공/거부 |
+| `deriveDistributionType` | `is_public` + `service_keys` | active opt-in 도 SERVICE 로 계산 | F8 distribution 의미 | KPA 전용 opt-in 오퍼가 PRIVATE 로 떨어지지 않음 |
+| 가격 `setPrices` | **다른 서비스 가격행 삭제(결함, §19)** | 선수정 필요 | — | 승인 가격 저장 시 PH 행 보존 |
+| KPA 운영자 화면 | product_approvals 만 | opt-in 목록 + revoke | PH baseline(PH 는 승인 능력 금지) · KPA 는 결정 필요 | revoke 는 opt-in 유래 listing 만 |
+| 공급자 주문 가시성 | `neture` 만 | kpa-society 포함(§14 G5) | 계약 S1 | 공급자가 KPA 주문 확인 |
+| 의약품 | 조회 · 등록 가능, 주문 불가 | 동일 | 없음 | §13-5 검증 조건 |
+
+### 13-7. 전환 조건 (결정 문구 기준)
+
+아래가 모두 설명 · 검증될 때 PH opt-in → 약국 서비스 전환: ① 계약 · F8 개정안 승인 ② KPA 운영자 권한(철회) 확정 ③ 매장 취급 신청 방식 확정 ④ §13-5 검증 조건 통과 ⑤ §14 G5(공급자 가시성) 해결 ⑥ 가격 삭제 결함 수정.
+
+---
+
+## 14. 결제 기능 차이 설계 (PH 단일 결제 ↔ KPA B2B)
+
+KPA 는 주문 생성 · prepare/confirm · 결제완료 핸들러 · fulfillment bridge · 결제 전 단건 취소를 **이미 갖췄다**. 차이는 아래.
+
+| # | 차이 | 설계안 | 주요 파일 | 결정 필요 |
+|---|---|---|---|---|
+| G1 | KPA 결제 후 그룹 취소 · 환불 없음(`store-order-cancel.service.ts:149-156` 409 `ALREADY_PAID`) | PH `cancelAfterPayment` 를 서비스 파라미터화한 공용 서비스로 추출(`serviceKeys` · `sources`), factory 에 `POST /:paymentGroupId/cancel`. 이벤트 특가 재고 복원 포함. **PH 코드를 그대로 복제하지 않는다**(G2) | `b2b-payment-controller.factory.ts` · 신규 공용 서비스 | 1 · 4 · 5 · 6 |
+| G2 | **PH 환불 코드 결함**(§19-2) | PAID 결제행만 선택 · 그룹 `neture_orders` 를 `FOR UPDATE` 로 잠그고 조건부 전이 확인 후 PG 환불 · PG 성공/DB 실패 보정 로그 | `PharmacyHubPaymentController.ts:331-384` · `TypeORMPaymentRepository` | 없음(정합성) |
+| G3 | 부분 환불 | 범위 밖 — Toss `cancelAmount` · PaymentCore 부분환불 상태 필요 | `packages/payment-core` · Toss 어댑터 | 2 |
+| G4 | 공급자 수락 후 환불 | PH 규칙대로 `requiresOperator` 반환 + `kpa:operator` 환불 경로 | 신규 운영자 컨트롤러 | 1 · 3 · 9 |
+| G5 | **공급자가 KPA 주문을 못 봄**(§19-4) | `fulfillment-service-scope.ts` 에 공급자 작업공간 서비스키 집합(neture + 승인키 + 이벤트특가 키) + `= ANY()` 헬퍼, 공급자 KPI · 목록 · 통합목록 · 비활성화 가드 적용. 정산은 정책 결정 전까지 neture 유지 | `supplier-order.service.ts` · `supplier-unified-order.service.ts` · `supplier.service.ts` | 8 |
+| G6 | KPA 운영자 정체 주문 복구 없음(super_admin 만) | `CheckoutFulfillmentRecoveryService`(이미 범위 파라미터 보유) 위에 `requireKpaScope('kpa:operator')` 컨트롤러 | `kpa.routes.ts` · 신규 컨트롤러 | kpa-groupbuy 포함 여부 |
+| G7 | bridge 중복 생성 경쟁 | `neture_orders((metadata->>'checkoutOrderId'))` 부분 unique index + 23505 → ALREADY_BRIDGED | migration(**중지 조건**) | 없음 |
+| G8 | KPA 구매자 목록에 결제그룹 · 공급자 · 배송상태 없음 | 응답 필드 추가 | `kpa-checkout.controller.ts` | 없음 |
+| G9 | KPA 운영자 주문 목록이 kpa-groupbuy 제외 | 키 추가 · bridge 상태 | `operator-summary.controller.ts:56` | 가시성 |
+| G10 | 결제 전 단건 취소 후 그룹 결제 불가(PH · KPA) | 그룹 합계에서 cancelled 제외 또는 그룹 취소 | factory · PH | 허용 여부 |
+| G11 | 알림 없음 | PAYMENT_REFUNDED 구독 등 | 핸들러 | 7 |
+
+**금액 관련 사업 결정(CLAUDE.md: 결제 · 정산 판단은 사용자)**: 1) 공급자가 하나라도 수락한 뒤 구매자 자가 환불 허용? 2) 부분 환불(공급자별 · 품목별)? 3) 수락 후 환불 결정 주체(KPA 운영자 · 공급자 · 플랫폼)? 4) 배송비 전액 환불? 5) 이벤트 특가 주문 환불 · 재고 복원? 6) 환불 기한? 7) 구매자 · 공급자 알림? 8) KPA 주문 정산 포함? 9) 운영자 대리 환불?
+
+**PH 단일 결제 경로를 닫는 조건**: G1 · G2 · G5 · G6 완료 + 결정 1 · 3 · 5 확정.
+
+---
+
+## 15. O4O 운영자 권한 설계 (admin.neture.co.kr, super_admin 비부여)
+
+### 15-1. 사실
+
+- admin-dashboard 전체가 `AdminProtectedRoute requiredRoles=['platform:super_admin']`(`App.tsx:180-203`). 이 floor 는 **CLOSED 결정 2건**(`WO-O4O-ADMIN-PLATFORM-ONLY-ACCESS-AND-POST-REFACTOR-FINAL-CLOSURE-V1-CHECK` · IA 재편 CHECK)과 **회귀 테스트 4개**로 고정: floor 정확히 1개, `neture:operator` 진입 거부, 메뉴 선언은 `PLATFORM_ADMIN_ROLES` 만, 서비스 전용 업무(포럼 등) 복귀 금지.
+- 로그인은 역할 무관하게 성공하고(`google-auth.controller.ts:50-63`) floor 에서만 막힌다.
+- 세 업무 API 는 이미 `neture:operator` 로 가드: 공급자 승인 `requireNetureScope('neture:operator')`(`operator-supplier.controller.ts:56-57`) · 펀딩 승인(`market-trial-operator.routes.ts:26-27`) · 포럼 운영(`operator-forum.routes.ts`, `serviceCode=neture`). `requireNetureScope` 는 **활성 neture membership 을 서버에서 확인**하고, `neture:operator` 는 `neture:admin` · `platform:super_admin` 전용 API 에 닿지 못한다.
+- 플랫폼 수준 운영자 역할은 없다(`platform:admin`/`platform:operator` 는 코드에서 제거, `RBAC-ROLE-CATALOG-V1.md:41-42`).
+- **커뮤니티 회원 승인 API 는 아직 없다**(결정 6 미구현).
+
+### 15-2. 안
+
+| 안 | 내용 | 장점 | 한계 |
+|---|---|---|---|
+| **P1. `neture:operator` 재사용 + `/ops/*` 별도 진입** (권고) | 기존 `/*` platform floor 는 그대로. 형제 경로 `/ops/*` 를 `requiredRoles=['neture:operator','neture:admin','platform:super_admin']` + **neture membership 필수**로 추가. 전용 메뉴 · 레이아웃(`admin-ops-menu`, deny-by-default) · 로그인 후 역할별 착지(super_admin → `/admin`, 운영자 → `/ops`) | 새 역할 · DB · security-core 변경 0. 서버 가드 그대로. platform 메뉴는 여전히 platform 전용 | `neture:operator` 는 **Neture 운영 전체 범위**(회원 · 매장 · 주문 · 상품 승인 · 홈 CMS · 서비스 약관/문의 · cafe24 연결)를 가진다 → "세 업무만"으로 서버에서 좁혀지지 않음 |
+| P2. 새 역할 `o4o:operator` | 세 업무 API 만 허용하는 새 prefix/scope | 서버에서 정확히 세 업무로 제한 | 새 ServiceKey · security-core scope(F1) · RBAC F9 §4 5단계 · F11 membership(`o4o` membership 행 또는 bypass 금지) · roles 마이그레이션 · 모든 가드 수정 |
+
+- 결정 문구("필요한 범위만 가진 운영자 권한")를 **엄격히** 적용하면 P2, 현행 Neture 운영자가 곧 O4O 운영자라는 해석이면 P1. **P1 로 시작하고, 세 업무 외 Neture 운영 API 를 `/ops` 메뉴에 노출하지 않는 것**을 권고하되, 서버 차원의 좁은 범위가 필요하면 P2 — **사용자 판단 필요.**
+- 두 안 공통: 기존 관리자 권한 · 서버 검사(`requireAdmin` = super_admin, DB 확인)는 변경 없음.
+
+### 15-3. 영향표 (P1 기준)
+
+| 파일 | 변경 | 동결 · 계약 영향 |
+|---|---|---|
+| `apps/admin-dashboard/src/App.tsx` | `/ops/*` 형제 경로(기존 floor 문자열 불변) | CLOSED 결정("우회 진입점 무증식") 번복 → **사용자 승인** |
+| `packages/auth-context/AdminProtectedRoute.tsx` · `adminRouteAccess.ts` | `requireMembership` 추가(super_admin 면제) | 공용 패키지(소비처 admin-dashboard 1곳) |
+| `Login.tsx` · `InitialRedirect.tsx` | 역할별 착지 | 프론트만 |
+| 신규 `admin-ops-menu` · `opsMenuPermissions` · `OpsLayout` · `routes/ops.routes.tsx` · `pages/ops/*` · `api/ops/*` | 운영자 화면(쿠키 클라이언트) | 신규. `/forum*` · `pages/forum` 경로명 금지(IA 테스트) |
+| 회귀 테스트 4개 | `/ops` 는 neture:operator+membership 허용 · `kpa:*` 거부 · platform 메뉴는 여전히 platform 전용 | 테스트 계약 변경 |
+| `operator-registration.controller.ts:25-29` | (선택) `requireNetureScope` 로 정렬 — 현재 membership 확인 없음 · 레거시 역할 포함 | API 계약 변경 |
+| `operator-forum.routes.ts` `requireServiceOperator` | (선택) membership 확인 — 현재 역할만 봄(F11 "role 만으로 operator 판단 금지"와 불일치) | API 계약 변경 |
+| 데이터 | 실제 O4O 운영자 계정에 `neture:operator` + neture membership | 실계정 데이터 쓰기(승인 대상) |
+
+- 선결 결함: **admin 세션 교체 결함(§19-1)**을 `/ops` 개방 전에 해결해야 한다. 운영자가 늘어나면 영향 계정이 늘어난다.
+
+---
+
+## 16. supplier · funding 호스트 진입 설계 (neture-web 재사용)
+
+판정: **기존 번들로 가능하나 그대로는 부족**. 페이지가 전부 lazy 라 번들 분리는 불필요.
+
+| # | 필요 변경 | 성격 |
+|---|---|---|
+| 1 | `window.location.hostname` → 호스트 프로필(supplier · funding · 기본), 호스트별 `<Routes>` 트리(같은 lazy 컴포넌트 재사용, 경로 형태 `/supplier/*` · `/market-trial/*` 유지 → 내부 링크 약 135개 수정 불필요). `/` 만 호스트 착지, `PostLoginRedirect` 호스트 인지 | 프론트 |
+| 2 | `hostHref(path)` 헬퍼로 호스트 간 링크 약 30곳(공급자 사이드바 `/mypage/business-profile` · "O4O 홈으로" · `/guide` · `/forum/post` · 약관 · 헤더/유저메뉴/하단 내비 · 커뮤니티 카드) | 프론트 |
+| 3 | **handoff 대상 추가**: 현재 neture.co.kr → supplier 호스트로 세션을 옮길 방법이 없다(`'neture'` 대표 진입은 `returnPath='/'` 강제 · origin 을 neture.co.kr/www 로 고정). store 작업공간처럼 supplier · funding 전용 대상 + origin lock | **백엔드 · 인증(승인 대상)** |
+| 4 | CORS 에 `supplier.neture.co.kr` 추가(funding 은 이미 있음) | 백엔드 · API 재배포 |
+| 5 | Google JS origin 2개 추가 | 콘솔 |
+| 6 | DNS · 인증서(호스트별 별도) · LB host rule → 기존 `backend-neture-web-http` | 인프라 |
+| 7 | 호스트별 robots/noindex · canonical · `og:url` (현재 `robots.txt` · sitemap 이 모든 호스트에서 동일 → 중복 색인) | 프론트/서빙 |
+| 8 | Chrome 확장 · local agent 허용 목록 — 공급자 화면은 확장을 쓰지 않음(가져오기 도우미는 붙여넣기 방식). **현재 불필요** | 선택 |
+
+- 권한 분리: supplier 호스트에서 `/admin` · `/operator` · `/store` 등을 숨기는 것은 UX 이며, 서버는 이미 `requireActiveSupplier` · `requireNetureScope` 로 강제한다.
+- 펀딩 참여는 로그인만 필요(`market-trial.routes.ts:33`) · 다른 서비스 의존 없음.
+- 위험: handoff(3) 없이는 호스트마다 따로 로그인 · 로그아웃도 전파 안 됨 / 새 호스트도 `.neture.co.kr` 쿠키 범위 → §19-1 결함 노출 확대.
+- 부수 결함: 펀딩 화면이 `/login?redirect=` 를 쓰는데 로그인 리다이렉트는 `returnUrl` 만 읽음 → 로그인 후 원래 화면으로 못 돌아옴(§19).
+
+---
+
+## 17. Store Hub C안 · `/my-store` 설계
+
+### 17-1. 현재 구조의 한계 (C안 구현 전 해결 대상)
+
+1. **선택한 매장이 백엔드로 전달되지 않는다.** web-store 는 organizationId 를 보내지 않고, 서비스 API 는 사용자+서비스로 매장을 추정 → 같은 서비스에 매장이 2개 이상이면 409 모호, 선택 화면의 매장과 API 가 읽는 매장이 다를 수 있다.
+2. **"공통" 화면이 실제로는 한 서비스 API 에 묶여 있다**(우선순위 KPA → KCos → PH). 복수 가입 매장은 공통 화면에서 KCos · PH 데이터를 보지 못한다.
+3. PH API 경로 형태(`/store-owner/*`)가 달라 **PH 만 가입한 매장은 공통 화면 대부분이 404**.
+4. KCos 에 없는 마운트(`/pharmacy/info` · `/store-assets` · 동영상 · `/groupbuy`) · KPA 하드코딩(사이니지 미디어/스케줄 · 장바구니 · 제품설명).
+5. POP · 블로그 · 동영상 · 다국어 · 장바구니 · 플레이리스트가 `service_key` 를 가진 테이블 → "매장 공통"으로 합치려면 **제품 결정 또는 데이터 이관**.
+6. `/work-scope/store-services` 는 enrollment 만 읽는데 KPA 매장은 slug 에만 기록된 경우가 있음 → `/work/kpa-society` 미노출 가능(실데이터 확인 필요).
+
+### 17-2. 제안 정보 구조
+
+| 상단 메뉴 | 경로 | 데이터 범위 | API 방향 |
+|---|---|---|---|
+| 홈 | `/` | 매장 | `/work-scope/*` |
+| 내 매장 — 정보 · 제품 · 자체상품 · QR · 태블릿 · 상담 · 자료함 · 분석 | `/my-store/*` | **매장(조직)** | 중립 `/api/v1/store/*` + **명시적 organizationId** (현재 KPA 전용 `/pharmacy/info` 등은 중립 API 로) |
+| 내 매장 — POP · 블로그 · 동영상 · 다국어 · 사이니지 | `/my-store/*` | 현재 **서비스 키 데이터** | 결정: 매장 단위로 이관 vs 서비스 필터/탭 |
+| 매장 HUB — 콘텐츠 라이브러리 | `/hub/*` | 가입 서비스 합집합 또는 서비스 필터 | `/api/v1/hub?serviceKey=` 반복 |
+| 매장 HUB — 상품 카탈로그 · 이벤트 특가 · 장바구니 | `/hub/b2b` 등 → `/work/:svc/*` 로 이동 권고 | **서비스** (승인/opt-in 채널이 서비스별) | 서비스별 기존 API |
+| 서비스 업무 | `/work/:serviceKey/*` | 서비스 × 매장 | 기존 |
+| 호환 | `/store/*` → `/my-store/*` · `/store-hub/*` → `/hub/*` | — | 리다이렉트 |
+
+- 이름 변경 영향: web-store 약 34파일의 내비 리터럴(API 경로 `/store/...` 는 **바꾸지 않음**) + `store-ui-core` `unifiedStoreHandoff.ts` RULES(**F3 동결 패키지 → 명시적 WO 필요**). 백엔드 returnTo 검사는 경로 prefix 를 보지 않아 변경 불필요.
+- **테스트 매장 문제**: 로컬 API `.env` 가 운영 DB 프록시(5442)를 가리키고, 복수 가입 시드 · web-store e2e 가 없으며, 운영 smoke 계정 2개는 정지 상태 · 각 1개 매장만 연결. → 복수 서비스 테스트 매장은 **격리 PG 컨테이너 수동 시드** 또는 **승인된 운영 데이터 쓰기** 중 선택 필요.
+
+---
+
+## 18. 커뮤니티 독립 회원 · 삭제 분리 설계 보강
+
+### 18-1. 데이터 모델 (권고: 별도 테이블)
+
+`service_memberships` 에 `community:*` 키로 넣으면 안 된다 — 약 75개 파일이 서비스 필터 없이 membership 을 순회 · 계산하고(매장 게이트 통과 · 서비스키 추론 · 플랫폼 관리자 일괄 정지/탈퇴가 커뮤니티 행까지 처리), 승인 서비스가 `users.status` 를 바꾸고 역할을 부여한다.
+
+`community_memberships`: `id` · `user_id`(FK users) · `community_key`(`pharmacist`/`retail` — `retail` 은 **키가 아닌 URL/표시명**으로만 쓰는 원칙에 따라 키 명명 재확인 필요) · `status`(pending/active/suspended/rejected/withdrawn) · `applied_at` · `reviewed_by/at` · `rejection_reason` · `suspension_reason` · `operator_notes` · `qualification_type` · `qualification_ref` · `qualification_snapshot`(jsonb) · `created_at/updated_at` · `UNIQUE(user_id, community_key)`.
+
+- 약사 자격: `kpa_pharmacist_profiles` 를 참조할 수 있으나 **`license_verified=true` 를 설정하는 코드가 없다** → 자격 "검증 완료"를 요건으로 걸 수 없음. 승인자가 심사 시 면허번호 · 활동유형을 확인하고 `qualification_snapshot` 에 남기는 방식 권고(이후 프로필 변경과 무관하게 결정 근거 보존).
+- 커뮤니티 승인 서비스는 `users.status` · `role_assignments` 를 건드리지 않는다.
+- 승인자 = §15 의 O4O 운영자(P1 이면 `neture:operator`). 포럼 거버넌스(`operator-forum.routes.ts` 서비스 맵 · `hasForumModerationOverride` · `checkClosedForumAccess`)에 커뮤니티 운영자 분기 추가.
+- 호스트: `community.neture.co.kr` = neture-web 호스트 진입(§16 방식), API 는 경로에 커뮤니티 키(`/api/v1/communities/:key/forum`) — F6 "serviceKey 는 URL 경로에서만" 준수.
+
+### 18-2. 삭제만 가입 상태와 분리 — 구현 명세
+
+| 항목 | 현재 사실 | 명세 |
+|---|---|---|
+| 삭제 방식 | 글 삭제 = `status=ARCHIVED` 로 변경(soft) · 작성자 또는 플랫폼 관리자만(`ForumPostController.ts:545-555`) · 댓글 삭제 = `CommentStatus.DELETED`(soft) | soft delete 유지. 가드만 분리: 삭제 경로는 **인증 + 작성자 확인**만, 커뮤니티 참여 가드 제외 |
+| 감사 기록 | 글 삭제 메서드에 **감사 기록 호출 없음**(상태만 변경) | 삭제 시 행위자 · 시각 · 당시 커뮤니티 회원 상태(비회원/대기/정지/탈퇴/회원)를 기록 — 기존 감사 테이블 재사용 여부는 구현 시 확인 |
+| 댓글 영향 | 글을 ARCHIVED 로 바꿔도 **댓글 행은 그대로** | 글 삭제 시 댓글 표시 정책 명시 필요(글과 함께 비노출 권고, 데이터는 보존) |
+| 첨부 | `ForumPost` 엔티티에 별도 첨부 컬럼 없음(본문 블록 안 이미지 URL 형태로 추정 — 구현 시 확인) | 삭제는 글 상태만 바꾸고 미디어 파일은 지우지 않음. 파일 삭제가 필요하면 별도 정책 |
+| 수정 · 새 글 · 댓글 | 참여 가드 → 서비스 membership | 커뮤니티 membership `active` 만 |
+| 공개 열람 | 백엔드 공개 · PH 프론트만 읽기 차단 | 현행 공개 유지, PH 프론트 차이는 커뮤니티 이전 시 정리 |
+
+---
+
+## 19. 이번 조사에서 확인된 현재 결함 (URL 재구성과 무관 · 별도 추적)
+
+| # | 결함 | 확인 수준 | 현재 운영 영향 | 비고 |
+|---|---|---|---|---|
+| 19-1 | **관리자 세션 교체**: neture.co.kr · store · study 의 handoff 페이지가 `credentials:'include'` 로 exchange → 넘겨받은 사용자 토큰이 `.neture.co.kr` 쿠키로 기록 → 쿠키만 쓰는 admin-dashboard 가 **경고 없이 그 사용자로 바뀜**(`AuthProvider.tsx:130` 은 다른 사용자를 그대로 채택) | 코드 확인(HandoffPage 3곳 · `handoff.controller.ts:478` · admin `strategy:'cookie'` · AuthProvider). **실브라우저 재현 미실시** | 같은 브라우저에서 관리자와 다른 사용자가 번갈아 쓰는 경우 | 새 호스트 추가 시 노출 호스트 3 → 7. **보안 · 인증 변경이므로 수정은 승인 대상**. 재현 절차는 아래 |
+| 19-2 | **PH 결제 후 환불 행 선택 결함**: 정렬 없는 `findByOrderId` 가 PAID 가 아닌 결제행을 고르면 PG 환불은 건너뛰고 원장은 `paymentStatus=refunded` 로 바뀜 | 코드 확인(`TypeORMPaymentRepository.ts:55-58` · `PharmacyHubPaymentController.ts:358-372`) | 운영 PH 결제완료 주문 0 → 현재 피해 0 | 금액 결함. 수락/환불 경쟁 조건도 동반(§14 G2) |
+| 19-3 | **공급자 가격 저장 시 PH 가격행 삭제**: `setPrices` 가 목록 외 가격행 전체 DELETE | 코드 확인(`offer-service-price.service.ts:84-91`) | PH 가격행 보유 오퍼 1건 | |
+| 19-4 | **공급자가 KPA · KCos B2B / 이벤트특가 주문을 목록 · KPI · 정산 · 비활성화 가드에서 못 봄**(`neture` 만 조회). ID 를 알면 상세 처리는 가능 | 코드 조사(서브조사 · 필터 헬퍼 `fulfillment-service-scope.ts`) | `neture_orders` kpa-society 0 → 현재 0 | 첫 KPA B2B 결제부터 발생 |
+| 19-5 | 매장 상품 라이브러리가 서비스 구분 없이 전역 `approval_status='APPROVED'` 로 등록 허용 | 코드 확인(`store-product-library.controller.ts:194-200`) | 미측정 | 서비스 경계 누수 |
+| 19-6 | `/neture/operator/registrations` 가드에 membership 확인 없음 · 레거시 역할 포함 / 포럼 운영자 가드가 역할만 확인 | 코드 조사 | — | F11 불일치 |
+| 19-7 | 펀딩 화면 `/login?redirect=` 무시(로그인 리다이렉트는 `returnUrl` 만) | 코드 조사 | 로그인 후 원 화면 복귀 실패 | |
+| 19-8 | bridge 중복 생성 경쟁(unique index 없음) | 코드 조사 | 동시 복구 · 지연 이벤트 시 | |
+| 19-9 | `CHECK-O4O-DRUG-COMMERCE-ABSOLUTE-BLOCK-V1.md` 의 "main 미병합" 표기가 stale(058831274 는 main 에 있음) | git 확인(서브조사) | 문서만 | 기록물 · 보고만 |
+
+**19-1 재현 절차 (브라우저 검증용)**
+1. 탭1: admin.neture.co.kr 에 계정 A(super_admin)로 로그인 → `.neture.co.kr` 쿠키 확인, `/auth/status` user = A.
+2. 탭2(같은 브라우저): kpa-society.co.kr 에 계정 B 로 로그인 → "O4O 홈" 복귀 또는 store 작업공간 handoff 실행.
+3. 탭2 Network: `/auth/handoff/exchange` 응답에 `Set-Cookie: accessToken=...; Domain=.neture.co.kr` → 쿠키가 B 로 바뀌었는지 확인.
+4. 탭1(새로고침 없이) 관리자 API 호출 → **실패 신호: 요청이 B 로 인증**(헤더 표시는 여전히 A).
+5. 탭1 새로고침 → **실패 신호: `/auth/status` 가 B**, 화면이 B 로 바뀌거나 권한 없음 표시.
+6. 대조군: 탭2 에서 handoff 없이 일반 Google 로그인만 → 응답 쿠키가 저장되지 않아 탭1 은 A 유지가 정상.
+
+---
+
+## 20. 다음 단계 제안 (구현 개방 전 사용자 판단)
+
+1. **§19-1 관리자 세션 교체**: 브라우저 재현 → 수정 방향(handoff exchange 에서 쿠키 미설정 · admin 사용자 불일치 시 로그아웃 등) 결정. 운영 보안 사안이라 URL 재구성보다 먼저 다루기를 권고.
+2. **§15 운영자 권한**: P1(`neture:operator` 재사용 + `/ops`) vs P2(새 역할) 선택, CLOSED 결정 번복 승인.
+3. **§13 B 모델**: 계약 C3/C4/S2 · F8 개정안 작성 승인, 매장 취급 신청 방식(§13-4) · PUBLIC 처리 결정.
+4. **§14 결제**: 금액 결정 9개 중 최소 1 · 3 · 5.
+5. **§17 Store Hub**: 서비스 키 데이터(POP · 블로그 등)의 공통화 방식, 테스트 매장 준비 방식(격리 DB vs 운영 쓰기).
+6. §18 커뮤니티 키 명명(`retail` 키 금지 원칙과 `community.neture.co.kr/retail` 경로의 관계).
