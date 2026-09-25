@@ -84,7 +84,7 @@ const PASSWORD_INPUT_ALLOWLIST = [
   'apps/admin-dashboard/src/components/cms/forms/InputText.tsx',
   'apps/admin-dashboard/src/pages/settings/AppServices.tsx',
   'apps/admin-dashboard/src/pages/settings/EmailSettings.tsx',
-  'apps/admin-dashboard/src/pages/settings/OAuthSettings.tsx',
+  // WO-O4O-GOOGLE-ONLY-AUTH-CLEANUP-V1: OAuthSettings 화면은 제거됐다(passport 은퇴로 소비처 0 · clientSecret 노출면 동반 폐쇄).
   'apps/admin-dashboard/src/pages/__debug__/LoginDiagnostic.tsx',
   'apps/admin-dashboard/src/pages/__debug__/AuthBootstrapDebug.tsx',
   'apps/admin-dashboard/src/pages/__debug__/AuthStateJsonDebug.tsx',
