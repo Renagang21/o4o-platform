@@ -1,7 +1,7 @@
 # CHECK-O4O-ADMIN-OPERATOR-GOOGLE-INVITATION-AND-ASSIGNMENT-CUTOVER-V1
 
 > WO: [`WO-O4O-ADMIN-OPERATOR-GOOGLE-INVITATION-AND-ASSIGNMENT-CUTOVER-V1`](../work-orders/WO-O4O-ADMIN-OPERATOR-GOOGLE-INVITATION-AND-ASSIGNMENT-CUTOVER-V1.md)
-> 작성일: 2026-09-23 · 상태: **SMOKE_B_PASS — Smoke A 진행 중 (§7-4)** · 배포·가드·schema 는 §7-2 까지 확인 완료
+> 작성일: 2026-09-23 · 상태: **`COMPLETE`** (2026-09-25) — Smoke B(초대) · Smoke A(직접 지정) 모두 실사용 PASS (§7-4 · §7-6)
 
 ---
 
@@ -233,7 +233,7 @@ invited_by_user_id · accepted_user_id · created_at · updated_at · accepted_a
 | `POST /api/v1/admin/operator-assignments` (비인증) | **PASS** — 401 |
 | `GET /api/v1/admin/operator-invitations` (비인증) | **PASS** — 401 |
 | `https://neture.co.kr/operator-invitations/accept?token=<invalid>` 실브라우저 | **PASS** — 수락 화면 렌더 · "유효하지 않은 초대 링크입니다." 안내 · **비밀번호 입력 없음** · 외부 이동 없음 |
-| **Smoke A — 기존 Google 사용자 직접 지정 (실 role write)** | **PENDING_USER_ACTION** — 관리자 로그인이 Google 인증이라 사용자가 직접 수행해야 하고, 실제 권한 부여 write 는 사용자 승인 대상이다. `renagang21` 을 임의로 operator 로 만들지 않았다 |
+| **Smoke A — 기존 Google 사용자 직접 지정 (실 role write)** | **PASS (2026-09-25 · §7-6)** |
 | **Smoke B — 초대 E2E (메일 → Google 수락 → 권한 부여)** | **PASS (2026-09-25 · §7-4)** |
 
 → 본 WO 는 **구현 · 배포 · 인증 가드 · schema · census 까지 확인 완료**이며,
@@ -407,18 +407,83 @@ frontend  const raw = res.data?.data ?? [];              // → { candidates: [.
 
 **이 수정은 admin-dashboard 재배포가 필요하다.** 배포 전까지 Smoke A 는 진행할 수 없다.
 
+### 7-6. **Smoke A — 기존 Google 사용자 직접 지정 = PASS** (2026-09-25 02:36Z)
+
+§7-5a 수정 배포(`01313-h7l` · traffic 100% · `DEPLOY_ENABLED` 02:31:08Z 복귀) 후, 사용자가 Admin
+화면에서 **후보 검색 → 테스트 계정 선택 → `neture` / `neture:operator` 지정**을 수행했다.
+판정은 **DB read-only**(이 세션 production write 0).
+
+| # | 검증 | 실측 |
+|---|---|---|
+| 1 | 신규 user 생성 **0** | `users` **2** 그대로 · `linked_accounts` **2** 그대로(google 2) |
+| 2 | 기존 identity 재사용 | `322667c8` 그대로 · Google sub **`112789***`** 그대로 · `linkedAt` 00:14:55(초대 시점) **불변** |
+| 3 | 신규 role | **`neture:operator` active** · `assigned_at` 02:36:28 · **`assigned_by = cfd2a5e7`** — 직접 지정 경로는 부여자를 기록한다(초대 경로는 NULL · §7-4b) |
+| 4 | 신규 membership | `neture` **active** (02:36:28) |
+| 5 | 초대 산출물 보존 | `k-cosmetics` membership **그대로** · `operator_invitations` 행 **무변경**(`accepted` · `accepted_at` 동일) |
+| 6 | 회수 반영 | `cosmetics:operator` **`is_active=false`** — 행은 이력으로 남고 비활성(§7-4a 의 좁힌 회수) |
+| 7 | password 계열 | 스키마 password 컬럼 **0** · `service_credentials`/`password_reset_tokens` 테이블 **0** → 생성 **구조적으로 불가** |
+| 8 | 기존 관리자 불변 | `cfd2a5e7` roles **11** · `platform:super_admin` **1** · memberships **5** |
+| 9 | 실사용 | 테스트 계정으로 **`neture.co.kr/operator` 진입 성공** — 운영자 대시보드 렌더 |
+
+**두 경로가 분리되어 실증됐다.**
+
+```text
+초대 (B)      신규 Google 사용자 → user 생성 + linked_accounts + cosmetics:operator + k-cosmetics
+직접 지정 (A) 기존 Google 사용자 → userId 로 지정 → neture:operator + neture
+              (user·연결 생성 0 · assigned_by 기록)
+```
+
+### 7-7. 테스트 계정 — **다음 WO 의 acceptance fixture 로 보존** (사용자 확정)
+
+membership 은 제거하지 않는다(§7-4a 의 lifecycle 결함 때문에 제거하면 계정이 죽는다).
+Smoke A 가 만든 `neture:operator` 만 안전 경로(`DELETE /admin/users/:userId/role-assignments/:role`)로 회수한다.
+
+목표 최종 상태:
+
+```text
+users row 유지 · linked_accounts.google 유지 · Google sub 유지 · status active · isActive true
+active roles 총 0          (cosmetics:operator 0 · neture:operator 0)
+memberships  k-cosmetics active 유지 · neture active 유지
+```
+
+이 계정으로 후속 WO 수정 후 **"서비스 0개인 사용자도 O4O Identity 로 존재할 수 있다"** 를
+production 에서 직접 증명한다(neture 종료 → 로그인 가능 → 마지막 k-cosmetics 종료 → memberships 0 →
+여전히 로그인 가능).
+
 ## 8. 미해결 · 후속 인계
 
-- §28 Legacy Password/Auth 제거는 **별도 WO**: `service_credentials` 5행 처분 · 서비스 password login reader/writer 제거 ·
-  각 서비스 email/password 로그인 UI · password signup · ForgotPassword/ResetPassword 잔재 ·
-  operator PasswordModal 전수 제거 · `PUT /operator/members/:id` password 경로 · password policy ·
-  `loginAttempts`/`lockedUntil` · E2E Auth Runtime 재정의 · 문서/개인정보 정책 정합.
-- **실 Google Smoke B→A (§7-3 ②~⑥)** 는 미사용 Google 계정 확보 시 수행한다. 그 전까지 이 WO 는 COMPLETE 가 아니다.
-  현재 `users` 는 관리자 1행뿐이며 테스트 계정은 존재하지 않는다.
+- ~~§28 Legacy Password/Auth 제거는 별도 WO~~ → **완료 (2026-09-25)**:
+  `WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1` 이 런타임(Phase A) · 스키마 의존(B-1) · **물리 제거**(B-2)까지 닫았다.
+  `service_credentials` · `password_reset_tokens` · `users.password`/`reset_password_*`/lockout 컬럼 **전부 DROP**.
+- ~~실 Google Smoke B→A 는 미사용 Google 계정 확보 시 수행~~ → **완료 (2026-09-25)**:
+  Smoke B **PASS**(§7-4) · Smoke A **PASS**(§7-6). 테스트 계정은 §7-7 대로 **후속 WO fixture 로 보존**한다.
+- **FOLLOW_UP (이 WO 에서 고치지 않음)**
+  - `role_assignments.assigned_by` — 초대 수락 경로는 **NULL**, 직접 지정 경로는 지정 관리자 id 를 기록한다(§7-4b · §7-6).
+    감사 추적은 `operator_invitations.invited_by_user_id` 로 가능하므로 현재 요구는 깨지지 않는다.
+  - `service_memberships.role` **표기 혼재** — `operator`(무접두)와 `neture:operator`(접두)가 공존한다.
+    인가는 `role_assignments`(접두)로 하므로 영향 없음. 기존 구조적 debt.
+- **후속 WO 로 분리**: `WO-O4O-SERVICE-MEMBERSHIP-TERMINATION-GLOBAL-IDENTITY-DECOUPLING-V1` —
+  마지막 `service_membership` 제거가 `users.status='deleted'` · `isActive=false` 를 유발해
+  **전역 O4O Identity 를 죽인다**(§7-4a). Google 단일 Identity 원칙과 충돌하므로 별도로 정리한다.
 - `signage-player-web-deployment-contract.spec.ts` 실패는 **다른 세션 소관**(§5-1). 이 WO 에서 고치지 않았다.
 - 교차 세션 유출(§6)은 이번에 복구했으나 구조적 재발 가능성이 남아 있다 — 커밋 직전
   `node scripts/git/check-staged-scope.mjs <경로...>` 를 반드시 통과시킨다.
 
 ---
 
-문서 정합: 발견 0건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 1건(§28 Legacy Password 제거)
+## 판정
+
+`WO-O4O-ADMIN-OPERATOR-GOOGLE-INVITATION-AND-ASSIGNMENT-CUTOVER-V1 = COMPLETE` (2026-09-25)
+
+| 축 | 결과 |
+|---|---|
+| Smoke B — 신규 Google 사용자 초대/수락/실접근 | **PASS** (§7-4) |
+| Smoke A — 기존 Google-linked 사용자 `userId` 직접 지정/실접근 | **PASS** (§7-6) |
+| 후보 검색 **dead-path 결함** | Smoke A 착수 시 발견 → 수정 → **실제 Smoke A 로 실증**(§7-5a). 재유입 차단 guard 6 tests |
+| password / `service_credentials` 생성 | **구조적으로 불가**(스키마에 없음) |
+| 기존 관리자 계정 | **불변**(roles 11 · super_admin 1 · memberships 5) |
+| FOLLOW_UP | `assigned_by` 경로별 차이 · `service_memberships.role` 표기 혼재 |
+| 후속 WO 분리 | 마지막 membership 제거가 전역 Identity 를 죽이는 문제 |
+
+문서 정합: 발견 2건(§28 Legacy Password 항목 · Smoke 미완 항목 — 둘 다 완료로 정정) /
+SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 1건(Membership Termination Decoupling)
