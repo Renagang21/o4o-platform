@@ -4,7 +4,7 @@
 - 단계: **G0 (현재 상태) · G1 (데이터/외부 환경 실측)**. 구현 A~F 는 이 결과 검토 후 별도 지시로 진행한다.
 - 선행: [`IR-O4O-URL-FIRST-SERVICE-RESTRUCTURE-ADDENDUM-V1`](../investigations/IR-O4O-URL-FIRST-SERVICE-RESTRUCTURE-ADDENDUM-V1.md) §0~§11 (결정 8건 = §11).
 - 변경: 코드 · 운영 DB · DNS · LB · 배포 설정 **변경 0**. 운영 DB 는 Cloud SQL Auth Proxy + `default_transaction_read_only=on` 세션으로 **집계 SELECT 만** 실행(개인정보 미출력). GCP 는 `describe`/`list` 만.
-- 판정: **G0 PASS · G1 PARTIAL** — 저장소 밖 콘솔 3건(Google · Toss · Gabia 관리 화면)과 발송 메일 · 설치 PC 현장 확인이 미확인.
+- 판정: **G0 PASS · G1 PARTIAL** (사용자 동의 2026-09-25 · 결정 = §9 · PH 대응 설계 = §10 · 커뮤니티 권한 설계 = §11) — 저장소 밖 콘솔 3건(Google · Toss · Gabia 관리 화면)과 발송 메일 · 설치 PC 현장 확인이 미확인.
 
 ---
 
@@ -58,7 +58,7 @@
 | **cosmetics.neture.co.kr · k-cosmetics.neture.co.kr** | **NXDOMAIN** | — | 서버가 다국어/제휴 QR · 대시보드 링크에 쓰는 호스트 → **현재 결함** |
 | **neture.o4o.kr** | **NXDOMAIN** | — | 상품 QR 기본 호스트 → **현재 결함** |
 | branch.kpa-society.co.kr | NXDOMAIN | — | `platform_services.entry_url` 값 → 결함 |
-| 메일 MX (`k-cosmetics.site` · `neture.co.kr`) | **MX 없음** (SOA 만) | — | 화면에 표기된 `support@`·`info@`·`partner@`·`tour@k-cosmetics.site`, `support@neture.co.kr` 등은 **현재 수신 불가** |
+| 메일 MX (`k-cosmetics.site` · `neture.co.kr`) | **MX 없음** (SOA 만) | — | **MX 없음, 실제 수신 미검증.** MX 가 없으면 SMTP 는 도메인 주소(A) 레코드로 배달을 시도할 수 있으므로 수신 불가로 확정할 수 없다. 표기 주소(`support@`·`info@`·`partner@`·`tour@k-cosmetics.site`, `support@neture.co.kr` 등)별 실제 수신 시험 또는 메일 운영 설정 확인으로 판정 |
 
 경로 probe (GET): `/qr/<없는 slug>` 는 세 옛 호스트 모두 200 SPA 셸 — 착지 route 존재 여부와 무관하게 200 이므로 **HTTP 코드로는 QR 동작 판정 불가**(실 slug 브라우저 검증 필요). `www.neture.co.kr/hospital` → **neture-web 셸**(병원 앱 아님).
 
@@ -136,7 +136,7 @@
 | P11 | /view/:snapshotId(/print) (kpa) | kpa-society-web | consumer | kpa-society | 스냅샷 | 미측정 | 없음 | 없음 | — | — | KEEP | 확정 |
 | P12 | /public/signage · /signage/play/* (kpa) | kpa-society-web | device | kpa-society | `signage_playlists` 1 | 재생 로그 0 | 없음 | 새 호스트 동일 경로 | 재생 | 원복 | KEEP + REPOINT | 확정 |
 | P13 | /store/marketing/signage/play/:id (kpa · kcos · store) · /store-owner/signage/play/:id (PH) | 각 | store_owner · device | 각 | playlists | 재생 0 | 로그인 | `/my-store` 재편 시 호환 경로 | 재생 | 원복 | KEEP (호환) | 확정 |
-| P14 | signage-player-web `/signage/:serviceKey/channel/*` (run.app 만) | signage-player-web | device | path param | `channel_heartbeats` 0 | 0 | 없음 | 공개 호스트 부여 여부 결정 | — | — | KEEP | 미정(호스트 필요 여부) |
+| P14 | signage-player-web `/signage/:serviceKey/channel/*` (run.app 만) | signage-player-web | device | path param | `channel_heartbeats` 0 | 0 | 없음 | **새 공개 도메인 배정 안 함**(결정 2026-09-25) | — | — | KEEP | 확정 |
 | P15 | neture.co.kr/hospital/* | hospital-pharmacy-web | device(`EnrollmentGate`) · /manage=super_admin | hospital-pharmacy | `hospital_devices` 0 | 0 | 쿠키 `hospitalDeviceToken` · localStorage | `www.neture.co.kr` 에 `/hospital` 규칙 누락(결함) · `hospital.neture.co.kr` 잔재 | 병원 화면 | — | KEEP | 확정 |
 | P16 | neture.co.kr/hospital-drug | neture-web | device | — | localStorage 키 공유 | 미측정 | local agent | Neture 화면 · 전용 분기만 삭제, 공유 키 · surface 보존 | 병원 앱 회귀 | revision 원복 | REMOVE | 확정(범위 E) |
 | P17 | neture.co.kr/cafe24 · api.neture.co.kr/api/v1/admin/cafe24/callback · /api/v1/cafe24-b2b/* | neture-web · API | 외부 앱 | cafe24-b2b | cafe24 연결 | 미측정 | Cafe24 OAuth | 없음 | — | — | KEEP | 확정 |
@@ -152,7 +152,7 @@
 | A5 | 인증 쿠키 `.neture.co.kr` | API | — | — | — | admin 은 쿠키 전략 | 기존 공유 존재 | pharmacy · retail 추가 시 세션 동작 재현 | 로그인/로그아웃 교차 | — | 검증 대상 | 확정(A 묶음) |
 | A6 | API CORS (`setup-middlewares.ts:39-102` 하드코딩) | API | — | — | — | — | — | 새 호스트 추가 · API 재배포 | preflight | revision 원복 | 신규 | 확정 |
 | A7 | 가입 /join/pharmacy (kpa) · /join · /join/status (PH) · /kpa/join (branch) | 각 | public | 각 | `service_memberships` | pending 0 | — | 새 호스트 동일 | 가입 흐름 | — | KEEP + 새 호스트 | 확정 |
-| A8 | 표기 메일 `@k-cosmetics.site`(Footer · Contact) · `@neture.co.kr` | kcos · 공통 | — | — | — | — | **MX 없음 → 수신 불가(현재 결함)** | 메일 수신 설정 또는 표기 교체 | 수신 테스트 | — | 결함 추적 | 미정(사용자: 메일 운영 방식) |
+| A8 | 표기 메일 `@k-cosmetics.site`(Footer · Contact) · `@neture.co.kr` | kcos · 공통 | — | — | — | — | **MX 없음, 실제 수신 미검증** | 주소별 수신 시험 결과에 따라 결정 | 주소별 수신 시험 | — | 검증 대상 | 미정(수신 시험) |
 
 ### 4-3. 커뮤니티
 
@@ -191,9 +191,9 @@
 
 | ID | 현재 → 목표 | 앱 | 역할·가드 | key | 원장 | 소비자·수량 | 의존 | 필요 수정 | 검증 | 복원 | 처분 | 상태 |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| O1 | neture.co.kr/operator/* (약 37: 회원 · 가입승인 · 포럼 · 상품승인 · **공급자 승인** · **펀딩 승인** · 홈 CMS) | neture-web | OperatorRoute(`neture:operator`+) | neture | 각 | 알림 `/operator` neture 6 | — | 위치 결정: neture 유지 vs admin.neture.co.kr 흡수 | 권한 | — | KEEP | 미정 |
-| O2 | neture.co.kr/admin/* (약 57: AI 제어 · 역할 · 정산 · 상품마스터 · 약관) | neture-web | AdminRoute(`neture:admin`+) | neture | 각 | — | — | admin-dashboard 와 중복(상품마스터 · 사용자) 정리 여부 | 권한 상승 없음 | — | KEEP | 미정 |
-| O3 | neture.co.kr/admin/platform/* | neture-web | PlatformRoute(super_admin) | platform | — | — | — | admin-dashboard `/users` 등과 중복 | — | — | KEEP | 미정 |
+| O1 | neture.co.kr/operator/* (약 37: 회원 · 가입승인 · 포럼 · 상품승인 · **공급자 승인** · **펀딩 승인** · 홈 CMS) | neture-web | OperatorRoute(`neture:operator`+) | neture | 각 | 알림 `/operator` neture 6 | — | 목표 = admin.neture.co.kr (O4O 운영). **기능별 소유자 · 이전 경로 확인 전까지 유지.** 선결: admin-dashboard 는 `platform:super_admin` 전용이라 `neture:operator` 진입 불가 → 운영자 진입 허용은 권한 · route 변경(중지 조건) | 권한 | — | KEEP (→ 기능별 이전) | 확정(방향) · 시점 미정 |
+| O2 | neture.co.kr/admin/* (약 57: AI 제어 · 역할 · 정산 · 상품마스터 · 약관) | neture-web | AdminRoute(`neture:admin`+) | neture | 각 | — | — | 목표 = admin.neture.co.kr. 중복(상품마스터 · 사용자) 기능별 소유자 확정 후 이전 | 권한 상승 없음 | — | KEEP (→ 기능별 이전) | 확정(방향) · 시점 미정 |
+| O3 | neture.co.kr/admin/platform/* | neture-web | PlatformRoute(super_admin) | platform | — | — | — | admin-dashboard `/users` 등과 중복 — 기능별 대조 후 정리 | — | — | KEEP | 확정(방향) · 시점 미정 |
 | O4 | admin.neture.co.kr/* | o4o-admin-dashboard | `platform:super_admin` 만 | platform | — | — | 쿠키 전략 | 없음 · 쿠키 세션 재현(A5) | 교차 로그아웃 | — | KEEP | 확정 |
 | O5 | kpa-society.co.kr/operator/* (약 65) · /admin/* → pharmacy.neture.co.kr 동일 경로 | kpa-society-web | `kpa:operator`/`kpa:admin` | kpa-society · `kpa:` | — | 알림 16 | — | 호스트만 이동(F2 5-Block 유지) | 권한 | LB 원복 | REDIRECT(호스트) | 확정(시점 미정) |
 | O6 | k-cosmetics.site/operator/* (약 50) · /admin/* → retail.neture.co.kr | k-cosmetics-web | `cosmetics:operator`/`admin` | k-cosmetics · `cosmetics:` | — | 알림 4 | — | 동일 | 권한 | — | REDIRECT(호스트) | 확정(시점 미정) |
@@ -276,7 +276,7 @@
 1. `cosmetics.neture.co.kr` · `k-cosmetics.neture.co.kr` NXDOMAIN — 서버가 생성하는 화장품 다국어/제휴 QR · 대시보드 링크가 열리지 않음. K-Cosmetics 앱에 `/qr` · `/multilingual-products` · `/foreign-visitor` route 없음.
 2. `neture.o4o.kr` NXDOMAIN — Neture 상품 QR/전단 기본 호스트(`neture.routes.ts:550-555`) · `SellerQRGuidePage.tsx:18`.
 3. `www.neture.co.kr/hospital` 이 병원 앱이 아닌 neture-web 으로 연결(LB `path-matcher-neture` 에 `/hospital` 규칙 없음).
-4. `k-cosmetics.site` · `neture.co.kr` MX 레코드 없음 — 화면에 표기된 문의 메일 주소 수신 불가.
+4. `k-cosmetics.site` · `neture.co.kr` MX 레코드 없음 — **실제 수신 미검증**(MX 부재만으로 수신 불가 확정 아님). 표기 주소별 수신 시험 필요.
 5. `platform_services.entry_url` 의 `https://branch.kpa-society.co.kr` NXDOMAIN.
 6. web-store 가 존재하지 않는 `/qr` · `/tablet` URL 을 `window.location.origin` 으로 만들어 복사 제공.
 7. 잔재: LB `glucoseview.co.kr` · `api.glucoseview.co.kr` · `hospital.neture.co.kr` rule, `cm-cert-siteguide`, Cloud Run `glucoseview-web`.
@@ -293,3 +293,113 @@
 | local agent · 확장 설치 PC | 현장 또는 `/health` | 사용자 |
 | 발송 메일 로그 | 메일 발송 기록 소스 조사 | 다음 조사 |
 | 기준 문서 개정 승인 | ROLE-WORKSPACE V2 등 개정 범위 승인 | 사용자 |
+
+---
+
+## 9. 결정 기록 (2026-09-25, G0/G1 검토 후 사용자 판정)
+
+| 항목 | 결정 |
+|---|---|
+| 판정 | G0 PASS · G1 PARTIAL 동의. 활성 QR 53 · 스캔 기록이 있으므로 **옛 주소 HTTPS 접근 계속 보호** |
+| PharmacyHub | **§6-1 B안 수정 진행** — 별도 서비스로 존속시키지 않고 약국 서비스로 기능 흡수. **직접 공급(opt-in) 채널과 단일 결제의 동작 · 데이터는 없애지 않는다.** `pharmacy-hub` 키는 기존 QR · 오퍼 · 주문을 읽는 호환 식별자로 보존, 신규 가입 서비스로 노출하지 않음. 대응이 안전하지 않은 기능은 **기존 경로 유지 · 전환 보류** |
+| 기존 커뮤니티 참여자 | **§6-2 B안** — 자동 가입 없음. 커뮤니티별 신청 · 승인. 기존 글 · 작성자 연결 보존. 가입 전 열람 · 본인 글 수정 권한을 명시 설계(§11) |
+| Store Hub | **§6-3 C안 혼합형** — `/hub` · `/my-store` 상위 진입, 서비스 고유 주문 · 결제는 `/work/:serviceKey`. 복수 서비스 가입 테스트 매장으로 화면 · 권한 검증 |
+| 운영 영역 | 약국 · 소매 서비스 운영자 = 각 서비스 호스트. 공급자 · 펀딩 · 커뮤니티 등 O4O 운영 = **기존 `admin.neture.co.kr`**. Neture `/operator` · `/admin` 은 기능별 소유자 · 이전 경로 확인 전까지 유지(O1~O3 반영) |
+| signage-player-web | 새 공개 도메인 배정 안 함(P14 반영) |
+| 메일 | "MX 없음 → 수신 불가" 표현 정정 → **MX 없음, 실제 수신 미검증**. 주소별 수신 시험으로 판정(§2-1 · A8 · §7 반영) |
+| 게이트 | Google · Toss · DNS 콘솔 증빙과 QR 인쇄 여부는 **해당 호스트 실제 전환 전 게이트**로 유지. 그동안 코드 경로 · 권한 설계 조사 계속 |
+| 구현 · 배포 | A~F 구현 · 배포 **미착수 유지** |
+
+**운영 영역 결정에서 드러난 선결 제약**: `admin.neture.co.kr`(admin-dashboard)은 전체가 `AdminProtectedRoute requiredRoles=['platform:super_admin']` 이라 `neture:operator` 는 들어갈 수 없다. O4O 운영 업무를 옮기려면 admin-dashboard 에 운영자 진입 · 역할별 메뉴를 여는 **권한 · route 변경**이 필요하다(CLAUDE.md 중지 조건 → 해당 구현 시 승인 요청).
+
+---
+
+## 10. PharmacyHub → 약국 서비스 대응 설계
+
+### 10-1. 실측 (운영 DB read-only 집계, 2026-09-25)
+
+| 대상 | 실측 | 함의 |
+|---|---|---|
+| PH 매장 조직 (`organizations` type=pharmacy, code `ph-pharm-*`) | **8곳 · 활성 구성원 0곳** (`organization_members` 활성 행 0) · 사업자번호 보유 1 · KPA 조직과 사업자번호 충돌 0 · KPA enrollment/slug 0 · PH slug 8 | **옮길 매장 경영자가 없다.** 조직 · 자산만 남은 상태(사용자 reset 이후 고아 조직) |
+| PH 매장 경영자 준비도 | owner/admin/manager 0명 → KPA 이관 대상 0 · 409 모호성 대상 0 | 사람 단위 이관 작업 없음 |
+| `service_memberships` pharmacy-hub | 1행 · role `pharmacy-hub:operator` · 동일 사용자 KPA active | 운영자 1명(KPA 운영자 겸임) |
+| `role_assignments` | `pharmacy-hub:admin` 1 · `pharmacy-hub:operator` 1 (/ `kpa:admin` · `kpa:operator` · `kpa:store_owner` 각 1) | PH 운영 권한 보유자가 KPA 운영 권한도 보유 |
+| opt-in 오퍼 | **19건 · 공급자 1곳** · 전부 `distribution_type=SERVICE` · 키는 `pharmacy-hub` 만 · KPA 승인 0 · PH 가격행 1 · **의약품 규제(`regulatory_type` DRUG) 6건** | KPA 로 흡수 시 오퍼 19건의 노출 경로 설계 필요. 의약품 6건은 별도 정책 대조 |
+| PH 조직 listing | 19건 · 1개 조직(구성원 없음) · 전부 opt-in 오퍼 | 소유자 없는 조직의 진열 |
+| 장바구니 · 주문 · 결제 | 장바구니 0 · 주문 6(전부 cancelled, 결제그룹 5, 구매자 1) · `o4o_payments` CREATED 6 · `neture_orders` pharmacy-hub/kpa-society 0 | 진행 중 거래 없음 → 읽기 전용 호환 기록 |
+| 조직 단위 자산 | QR 27 · 로컬 상품 4 · 실행 자산 7 · 플레이리스트 1 · 태블릿 5 · 매장 콘텐츠 0 | 조직 키라 조직이 남으면 그대로 보존 |
+| 서비스 키 자산 | POP · 블로그 · 사이니지 미디어/스케줄 · 권한(entitlement) 0 · screen set 5(`service_key` 비어 있음) | 재키잉 대상 사실상 없음 |
+| 콘텐츠 · 법무 | `cms_contents` knowledge 3(archived) · LMS 0 · 알림 0 · 약관 동의 1 · PH 약관/개인정보 문서 published | 문서는 보존 · 신규 동의는 KPA 문서로 |
+
+### 10-2. 대상별 대응
+
+| PH 대상 | 현재 키 · 소유 · 가드 | 약국 서비스 대응 | 판정 |
+|---|---|---|---|
+| 신규 가입 (`POST /pharmacy-hub/join`) | 카탈로그 `joinEnabled` 를 **무시**하는 자체 route | route 차단 + 카탈로그 `joinEnabled=false` + PH 웹 가입 진입 제거. 신규 약사는 KPA 가입 | 확정 방향 · **API 계약 변경 = 구현 시 승인** |
+| PH 회원 · `pharmacy-hub:member` | 활성 0 | 대응 없음. 기록 보존 | 확정 |
+| `pharmacy-hub:store_owner` | 활성 0 | 대응 없음 | 확정 |
+| `pharmacy-hub:operator` · `:admin` (1명, KPA 운영자 겸) | 회원 콘솔 · fulfillment 복구 콘솔 | 회원 승인 → KPA 운영자 콘솔. 단일결제 복구 콘솔 → §10-4 결정 후 pharmacy 호스트 운영 메뉴로 | 방향 확정 · 콘솔 이전은 §10-4 종속 |
+| 매장 조직 8곳 (구성원 0) | `pharmacy-hub` enrollment · slug | **KPA enrollment 를 붙이지 않는다**(소유자 없음 · 모호성 유발 방지). 조직 · slug · 자산은 그대로 두어 옛 QR 이 계속 착지. 소유자가 나타나면 KPA 매장 개설 절차로 신규 조직 생성 후 자산 이관은 별도 판단 | 확정 제안 |
+| 활성 QR 21 (조직 8 소속) | `pharmacyhub.co.kr/qr/{slug}` | 옛 호스트 유지(결정 1). 조직이 소유자 없이 남으므로 착지 페이지는 현행 PH 공개 route | 확정 |
+| opt-in 오퍼 19 · listing 19 | `service_keys` + opt-in 전략 · 공급자 1 | **§10-3 모델 선택 전까지 기존 PH 경로 유지 · 전환 보류** | 보류 |
+| 단일 결제 | PH 어댑터 + 공통 core | §10-4 | 보류 |
+| 주문 6 · 결제 6 (전부 미완료 종결) | `metadata.serviceKey=pharmacy-hub` | 읽기 전용 호환 기록. 키 변경 · 삭제 없음 | 확정 |
+| 콘텐츠 · 포럼 · 약관 | `cms_contents` 3 archived · 포럼 반려 1 · PH 약관 | 보존. 포럼은 이미 약사 커뮤니티 공용(`community-catalog.ts:64`) — 새 커뮤니티 설계(§11)로 흡수 | 확정 |
+| PH 고유 화면 `/news` · `/store-owner/tablets` · `/store-owner/manuals` | PH 웹 | 뉴스 = KPA 뉴스 라우터(데이터 없음) · 태블릿 = KPA/공통 store 태블릿(조직 키) · 매뉴얼 = 직접 대응 없음(가장 가까운 것은 `/api/v1/store/handled-products/qr`) | 매뉴얼만 목적지 미정 |
+| web-store `/work/pharmacy-hub/*` | PH scope guard · enrollment 필요 | 흡수 후 `/work/kpa-society` 로 수렴. **주의**: `serviceContext.ts` 우선순위가 KPA → KCos → PH 라, PH 조직에 KPA enrollment 를 붙이면 공통 화면이 KPA API 로 바뀌어 권한 없는 사용자가 실패 | 확정 제안 |
+
+### 10-3. opt-in 채널 보존 방식 (핵심 결정)
+
+현재 KPA 는 **승인 채널**이다. KPA 카탈로그 · `/orderable` · B2B checkout 이 모두 `offer_service_approvals` approved 행을 요구하고, `setServiceDelivery` 는 승인 채널 키(kpa-society)에 opt-in 을 거부하며, 두 목록이 겹치지 않는다는 불변식이 기동 시 검사된다(`offer-exposure-strategy.ts:42-51`). 따라서 opt-in 오퍼는 지금 KPA 매장에 도달할 수 없다.
+
+| 모델 | 내용 | 영향 |
+|---|---|---|
+| A. 호환 채널 | KPA 매장 안에 `pharmacy-hub` opt-in 채널을 내부 채널로 유지. PH scope guard 가 `kpa:store_owner`+kpa-society membership 을 받도록, PH 조직 resolver 를 KPA linkage 로 변경. checkout 은 `pharmacy-hub` 키 유지 | `pharmacy-hub` 가 "읽기 호환 식별자"를 넘어 **운영 채널 키로 계속 쓰임** → 결정의 "호환 식별자로만 보존"과 부분 충돌. 코드 변경은 가장 작음 |
+| B. 복합 전략 | `kpa-society` 에 "승인 **또는** opt-in" 전략. 공급자가 kpa-society 로 직접 opt-in 가능 | 불변식(두 목록 비중첩) 폐기 · KPA 카탈로그/orderable/apply/checkout · 공급자 주문 route allowlist · `neture_orders` 필터 전부 변경. **F8 "Checkout Guard 조건 변경 = WO + 구조 검토"** 대상. KPA 운영자 승인 없이 들어오는 상품이 생기는 사업 판단 |
+| C. 자동 승인 | 공급자 opt-in 시 kpa-society 승인 행을 자동 생성 | 코드 변경 중간. KPA 운영자 승인 단계를 없애는 정책 변경 · F8 대상 |
+
+**권고: 지금은 기존 PH opt-in 경로 유지 · 전환 보류(결정의 보류 조건 적용), B 를 기준안으로 구조 검토 WO 준비.**
+근거: (1) 이관할 매장 경영자가 0명이고 오퍼 19건은 소유자 없는 조직 1곳에만 진열돼 있어 보류 비용이 거의 없다. (2) A 는 결정 문구와 충돌하고, B · C 는 Frozen F8 구조 검토와 "KPA 운영자 승인 없이 노출" 사업 판단이 필요하다. (3) 의약품 규제 6건이 섞여 있어, 어느 모델이든 KPA 노출 전에 의약품 거래 차단 정책과 대조해야 한다.
+
+### 10-4. 단일 결제 보존
+
+- KPA 에 동등 경로가 **이미 있다**: `POST /api/v1/store/cart/kpa-society/checkout-confirm-b2b`(조직 필수 · `pg_` paymentGroupId) + `/api/v1/kpa/b2b/payments/{prepare,confirm,order/:id}`(serviceKey `kpa-society`·`kpa-groupbuy`).
+- PH 대비 결손 3가지: ① 결제 후 **그룹 단위 취소/환불** 없음 ② **운영자 수준** 정체 fulfillment 복구 없음(super_admin 복구만) ③ 브리지된 `neture_orders(service_key='kpa-society')` 를 **공급자 주문 목록 · 정산이 보지 못함**(`supplier-order.service.ts:43-60` · `supplier-unified-order.service.ts:117-120,173-186` · `neture-settlement.service.ts:186-189` 가 `neture` 만 필터).
+- ③은 흡수와 무관하게 **현재도 KPA B2B 주문이 공급자에게 보이지 않을 수 있는 결함 후보**다(실측: `neture_orders` kpa-society 0행이라 현재 영향 0). 별도 추적.
+- 권고: ①②③을 KPA 쪽에 채운 뒤에만 PH 단일 결제 경로를 닫는다. 그 전까지 PH 결제 경로 유지.
+
+### 10-5. 흡수 순서 제안 (구현 착수 시)
+
+1. PH 신규 가입 차단(route + `joinEnabled`) — 사람 이관 대상 0 이라 먼저 가능.
+2. PH 운영 회원 콘솔 기능을 KPA 운영자 콘솔로 확인 · 정리(운영자 1명 겸임).
+3. KPA B2B 결손 ①②③ 보강.
+4. opt-in 모델 결정(§10-3) → F8 구조 검토 → 구현.
+5. PH 공개 경로(`/qr` · `/tablet` · `/multilingual-products` · `/foreign-visitor/affiliate`)는 **옛 호스트에서 계속 제공**. PH 웹 런타임 종료는 G5 판정.
+
+---
+
+## 11. 커뮤니티 가입 전 열람 · 본인 글 권한 설계
+
+### 11-1. 현재 동작
+
+- **읽기**: 백엔드는 모든 서비스에서 공개(`optionalAuth`). 비공개 포럼만 `checkClosedForumAccess` 로 제한. 단 **PH 프론트는 읽기까지 `MembershipGate`** 로 막아 백엔드보다 엄격 — KPA 회원이 백엔드상 자격이 있어도 PH 화면에선 못 읽는다.
+- **쓰기 · 수정 · 삭제**: 라우트 단계 `requireCommunityAccess`(JWT 의 서비스 membership)가 컨트롤러의 작성자 확인보다 먼저 실행 → 자격 없는 작성자는 **본인 글 수정 · 삭제도 403**. 예외 없음.
+- **작성자 연결**: `forum_post.author_id`(nullable) · `forum_comment.author_id`(NOT NULL) → `users`. membership 과 무관하므로 membership 이 없어져도 연결 · 표시는 유지. PR #235(Identity 분리)가 users 행을 살려 두는 것을 보장.
+- 삭제는 soft delete(글 ARCHIVED · 댓글 DELETED).
+- 부수: `ForumPostController.ts:90` 에 커뮤니티를 모르는 KPA 전용 bypass 역할 목록 하드코딩.
+
+### 11-2. 설계 (결정 B안 기준)
+
+| 행위 | 비회원(로그인 · 미가입) | 가입 신청 중(pending) | 회원(active) | 정지 · 탈퇴 후 |
+|---|---|---|---|---|
+| 공개 포럼 목록 · 글 · 댓글 읽기 | **허용**(현행 공개 read 계약 유지) | 허용 | 허용 | 허용 |
+| 비공개 포럼 읽기 | 포럼 구성원만(현행) | 동일 | 동일 | 동일 |
+| 글 · 댓글 작성 · 좋아요 | 차단 | 차단 | 허용 | 차단 |
+| **본인 기존 글 · 댓글 삭제** | **허용** | 허용 | 허용 | **허용** |
+| 본인 기존 글 · 댓글 수정 | 차단 | 차단 | 허용 | 차단 |
+| 작성자 표시 | 유지 | 유지 | 유지 | 유지 |
+
+- 핵심 선택: **삭제는 자격과 무관하게 작성자에게 허용, 수정은 회원만.** 근거: 자기 글을 내릴 권리는 가입 여부와 무관해야 하고, 수정은 새 게시와 같은 효과(내용 변경)이므로 참여 자격을 따른다.
+- 대안: (i) 현행 유지(삭제 · 수정 모두 차단) — 구현 0, 가입 전 작성자가 자기 글을 못 내림. (ii) 삭제 · 수정 모두 허용 — 미가입자가 수정으로 내용을 바꿀 수 있음.
+- 구현 시 필요: `write` 배열 분리(작성 · 댓글 · 좋아요 = 커뮤니티 가드, 삭제 = 작성자 확인만), KPA `pharmacyWrite` 동일 분리, PH 프론트 읽기 `MembershipGate` 제거로 백엔드와 일치, `resolveCommunityAccess` 를 커뮤니티 membership 원장으로 교체, `ForumPostController.ts:90` 하드코딩 정리. → 권한 · API 계약 변경이므로 **구현 시 승인 대상**.
+- 영향 규모(실측): 기존 게시글 kpa-society 6 · neture 1 · PH 0 · kcos 0, 사용자 2명.
