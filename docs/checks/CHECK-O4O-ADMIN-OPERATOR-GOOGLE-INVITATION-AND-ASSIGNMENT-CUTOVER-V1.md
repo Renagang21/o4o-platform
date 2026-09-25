@@ -377,6 +377,36 @@ Google 단일 Identity 원칙과 충돌한다. 이 WO 에 섞어 고치지 않�
 `assigned_by` = 직접 지정한 관리자 `users.id`.
 마지막으로 테스트 계정으로 `https://neture.co.kr/operator` 진입 성공 시 **Smoke A = PASS**.
 
+#### 7-5a. ⛔ Smoke A 착수 즉시 발견 — **후보 검색이 항상 결과 0** (응답 계약 불일치)
+
+사용자가 `cosmetics:operator` 회수(①)를 마치고 직접 지정 화면에서 테스트 계정 email 로 검색했는데
+**결과가 없었다.** read-only 로 확인한 사실:
+
+| 확인 | 결과 |
+|---|---|
+| 대상 user 존재 | `322667c8` · `status active` · `isActive true` · email ILIKE 매치 **1** |
+| 회수 상태(①) | **active roles 0** · `k-cosmetics` membership **1 유지** · Google link **1** — 의도한 기준선 그대로 |
+| backend 쿼리 | `u.email ILIKE :q OR u.name ILIKE :q` — **status/isActive 필터 없음**(제외될 이유 없음) |
+
+원인은 데이터도 권한도 아니라 **응답 계약 불일치**였다:
+
+```text
+backend   res.json({ success: true, data: { candidates } })
+frontend  const raw = res.data?.data ?? [];              // → { candidates: [...] } (객체)
+          setCandidates(Array.isArray(raw) ? raw : [])   // → 배열이 아니므로 통째로 버림
+```
+
+후보가 몇 명이든 화면은 **늘 "결과 없음"** 이었다. 즉 **직접 지정 경로 자체가 막혀 있었고**,
+초대 경로(Smoke B)는 이 화면을 거치지 않아 드러나지 않았다. §7-2 의 비인증 401 검사로도
+잡히지 않는 층이다(인증·권한이 아니라 소비 지점의 형태 문제).
+
+**수정**: `OperatorsPage.tsx` 가 계약대로 `data.candidates` 를 읽는다(과거 형태가 남은 배포를 대비해
+배열 형태도 함께 허용). **정적 guard 신설** `apps/api-server/src/__tests__/operator-assignment-candidates-contract.spec.ts`
+(6 tests) — C1 backend 가 `data.candidates` 로 내려보낸다 · C2 frontend 가 그 키를 읽고 `data` 를
+배열로 단정하지 않는다(사고 형태 재유입 차단) · C3 지정은 `userId` 로 한다(email 은 지정 인자가 아니다).
+
+**이 수정은 admin-dashboard 재배포가 필요하다.** 배포 전까지 Smoke A 는 진행할 수 없다.
+
 ## 8. 미해결 · 후속 인계
 
 - §28 Legacy Password/Auth 제거는 **별도 WO**: `service_credentials` 5행 처분 · 서비스 password login reader/writer 제거 ·
