@@ -83,10 +83,10 @@ jest.mock('../../../modules/auth/utils/role-cache.js', () => ({
 }));
 
 import { MembershipConsoleController } from '../MembershipConsoleController.js';
-import {
-  LAST_ADMIN_PROTECTED_CODE,
-  SELF_ROLE_REVOKE_FORBIDDEN_CODE,
-} from '../../../utils/role-revoke-safety.js';
+// WO-O4O-PLATFORM-ADMIN-SERVICE-ROLE-RESET-V1:
+//   이 경로의 마지막-admin 보호는 platform admin 에게 더는 적용되지 않는다.
+//   `LAST_ADMIN_PROTECTED_CODE` 회귀는 중앙 경로(비플랫폼 요청자) 테스트가 담당한다.
+import { SELF_ROLE_REVOKE_FORBIDDEN_CODE } from '../../../utils/role-revoke-safety.js';
 
 const controller = new MembershipConsoleController();
 
@@ -149,13 +149,33 @@ beforeEach(() => {
   mockQuery.mockResolvedValue([{ ok: 1 }]);
 });
 
-describe('자기 역할 해제 차단', () => {
-  it('platform admin 이 자기 역할을 해제하면 거절한다', async () => {
+describe('자기 역할 해제 차단 (플랫폼 관리자 예외)', () => {
+  /**
+   * WO-O4O-PLATFORM-ADMIN-SERVICE-ROLE-RESET-V1 — 계약 축소(삭제 아님)
+   *
+   *   종전: 자기 해제는 요청자가 누구든 금지 — 중앙 경로와 같은 문구.
+   *   문제: `platform:super_admin` 은 모든 서비스의 운영자를 지정·해제하는 권한이지
+   *         각 서비스의 admin/operator 를 보유해야 하는 역할이 아니다. 그런데 두 경로가
+   *         모두 자기 해제를 막아 관리자 계정의 불필요한 서비스 역할을 정리할 수 없었다.
+   *
+   *   새 계약: `platform:super_admin` 의 자기 **service-scoped** 역할 해제만 허용한다.
+   */
+  it('플랫폼 관리자는 자기 서비스 역할을 해제할 수 있다', async () => {
     primeRole('neture:admin');
     activeHolders['neture:admin'] = [REQUESTER_ID, OTHER_ID];
     const res = makeRes();
 
     await controller.removeMemberRole(makeReq(REQUESTER_ID, 'neture:admin'), res);
+
+    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ success: true }));
+    expect(activeHolders['neture:admin']).toEqual([OTHER_ID]);
+  });
+
+  it('플랫폼 관리자여도 자기 platform:* 역할 해제는 거절한다', async () => {
+    primeRole('platform:admin');
+    const res = makeRes();
+
+    await controller.removeMemberRole(makeReq(REQUESTER_ID, 'platform:admin'), res);
 
     expect(res.status).toHaveBeenCalledWith(403);
     expect(res.json).toHaveBeenCalledWith(
@@ -167,7 +187,20 @@ describe('자기 역할 해제 차단', () => {
     expect(hasTxUpdate()).toBe(false);
   });
 
-  it('서비스 운영자가 자기 역할을 해제해도 거절한다', async () => {
+  it('플랫폼 관리자여도 prefix 없는 legacy 역할 자기 해제는 거절한다 (fail-closed)', async () => {
+    primeRole('admin');
+    const res = makeRes();
+
+    await controller.removeMemberRole(makeReq(REQUESTER_ID, 'admin'), res);
+
+    expect(res.status).toHaveBeenCalledWith(403);
+    expect(res.json).toHaveBeenCalledWith(
+      expect.objectContaining({ code: SELF_ROLE_REVOKE_FORBIDDEN_CODE }),
+    );
+    expect(mockRemoveRole).not.toHaveBeenCalled();
+  });
+
+  it('플랫폼 관리자가 아닌 서비스 운영자의 자기 역할 해제는 그대로 거절한다', async () => {
     primeRole('neture:seller');
     const res = makeRes();
 
@@ -185,17 +218,35 @@ describe('자기 역할 해제 차단', () => {
 });
 
 describe('마지막 활성 서비스 admin 해제 차단', () => {
-  it('platform admin 이어도 마지막 활성 {service}:admin 은 해제할 수 없다', async () => {
+  /**
+   * WO-O4O-PLATFORM-ADMIN-SERVICE-ROLE-RESET-V1: 보호 대상이 좁아졌다.
+   *   목적은 **서비스 운영자끼리** 서로의 마지막 admin 을 없애 서비스가 관리자 없이
+   *   남는 것을 막는 데 있다. 중앙 관리자(platform:super_admin)는 언제든 다시 지정할 수
+   *   있으므로 복구 불가 상태가 아니다.
+   */
+  it('플랫폼 관리자는 마지막 활성 {service}:admin 도 해제할 수 있다', async () => {
     primeRole('neture:admin');
     activeHolders['neture:admin'] = [TARGET_ID];
     const res = makeRes();
 
     await controller.removeMemberRole(makeReq(TARGET_ID, 'neture:admin'), res);
 
+    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ success: true }));
+    expect(activeHolders['neture:admin']).toEqual([]);
+    // 예외를 열어도 잠금·트랜잭션 계약은 그대로다.
+    expect(hasTxUpdate()).toBe(true);
+    expect(txQueries.some((q) => /FOR UPDATE/i.test(q.sql))).toBe(true);
+  });
+
+  it('비플랫폼 요청자에게는 마지막 활성 {service}:admin 보호가 그대로다', async () => {
+    // tier 가드가 먼저 걸리는 경로라 코드가 다르지만, **해제되지 않는다**는 결과는 같다.
+    primeRole('neture:admin');
+    activeHolders['neture:admin'] = [TARGET_ID];
+    const res = makeRes();
+
+    await controller.removeMemberRole(makeReq(TARGET_ID, 'neture:admin', NETURE_OPERATOR_SCOPE), res);
+
     expect(res.status).toHaveBeenCalledWith(403);
-    expect(res.json).toHaveBeenCalledWith(
-      expect.objectContaining({ success: false, code: LAST_ADMIN_PROTECTED_CODE }),
-    );
     expect(hasTxUpdate()).toBe(false);
     expect(mockRemoveRole).not.toHaveBeenCalled();
     expect(activeHolders['neture:admin']).toEqual([TARGET_ID]);
@@ -215,22 +266,23 @@ describe('마지막 활성 서비스 admin 해제 차단', () => {
     expect(mockInvalidateRoles).toHaveBeenCalledWith(TARGET_ID);
   });
 
-  it('비활성 assignment 는 활성 admin 수에 포함하지 않는다', async () => {
+  it('보유자 판정은 활성 assignment 만 센다 (예외를 열어도 SQL 조건 불변)', async () => {
+    // WO-O4O-PLATFORM-ADMIN-SERVICE-ROLE-RESET-V1: platform admin 은 이제 마지막 admin 도 해제할 수 있으므로 결과는 성공이다.
+    //   보호를 좁힌 것이지 **판정 SQL 을 느슨하게 한 것이 아님**을 여기서 고정한다.
+    //   '마지막 1명 보호' 자체의 회귀는 중앙 경로 테스트(비플랫폼 요청자)가 계속 담당한다.
     primeRole('kpa:admin');
     activeHolders['kpa:admin'] = [TARGET_ID];
     const res = makeRes();
 
     await controller.removeMemberRole(makeReq(TARGET_ID, 'kpa:admin'), res);
 
-    expect(res.json).toHaveBeenCalledWith(
-      expect.objectContaining({ code: LAST_ADMIN_PROTECTED_CODE }),
-    );
+    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ success: true }));
     const select = txQueries.find((q) => /SELECT user_id FROM role_assignments/i.test(q.sql));
     expect(select).toBeDefined();
     expect(select!.sql).toMatch(/is_active\s*=\s*true/);
   });
 
-  it('다른 서비스의 admin 은 해당 서비스의 마지막 admin 수에 포함하지 않는다', async () => {
+  it('판정·해제 대상은 요청한 role 문자열 하나뿐이다 (다른 서비스 admin 무접촉)', async () => {
     primeRole('cosmetics:admin');
     activeHolders['cosmetics:admin'] = [TARGET_ID];
     activeHolders['neture:admin'] = [OTHER_ID, REQUESTER_ID];
@@ -238,13 +290,14 @@ describe('마지막 활성 서비스 admin 해제 차단', () => {
 
     await controller.removeMemberRole(makeReq(TARGET_ID, 'cosmetics:admin'), res);
 
-    expect(res.json).toHaveBeenCalledWith(
-      expect.objectContaining({ code: LAST_ADMIN_PROTECTED_CODE }),
-    );
+    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ success: true }));
     const roleParams = txQueries
       .filter((q) => /SELECT user_id FROM role_assignments/i.test(q.sql))
       .map((q) => q.params[0]);
     expect(roleParams).toEqual(['cosmetics:admin']);
+    // 다른 서비스의 admin 은 그대로 남는다.
+    expect(activeHolders['neture:admin']).toEqual([OTHER_ID, REQUESTER_ID]);
+    expect(activeHolders['cosmetics:admin']).toEqual([]);
   });
 
   it('동시 해제를 막기 위해 활성 보유자를 FOR UPDATE 로 잠그고 같은 트랜잭션에서 UPDATE 한다', async () => {

@@ -103,9 +103,20 @@ function makeRes() {
   return res;
 }
 
-function makeReq(userId: string, role: string, requesterId: string = REQUESTER_ID) {
-  return { params: { userId, role }, user: { id: requesterId } } as any;
+/**
+ * WO-O4O-PLATFORM-ADMIN-SERVICE-ROLE-RESET-V1: 요청자의 roles 가 판정에 들어온다.
+ *   기본값은 **서비스 관리자**(플랫폼 관리자가 아님) — 기존 보호가 그대로 적용되는 쪽이다.
+ */
+function makeReq(
+  userId: string,
+  role: string,
+  requesterId: string = REQUESTER_ID,
+  requesterRoles: string[] = ['neture:admin'],
+) {
+  return { params: { userId, role }, user: { id: requesterId, roles: requesterRoles } } as any;
 }
+
+const PLATFORM = ['platform:super_admin'];
 
 function selectQuery() {
   return txQueries.find((q) => /SELECT user_id FROM role_assignments/i.test(q.sql));
@@ -218,6 +229,23 @@ describe('마지막 활성 서비스 admin 해제 차단', () => {
     );
   });
 
+  it('플랫폼 관리자는 다른 사용자의 마지막 서비스 admin 도 해제할 수 있다', async () => {
+    // WO-O4O-PLATFORM-ADMIN-SERVICE-ROLE-RESET-V1: 보호의 목적은 **서비스 운영자끼리** 서로의 마지막 admin 을 없애
+    //   서비스가 관리자 없이 남는 것을 막는 데 있다. 중앙 관리자는 언제든 다시 지정할 수 있다.
+    activeHolders['kpa:admin'] = [TARGET_ID];
+    const res = makeRes();
+
+    await controller.revokeRoleAssignment(
+      makeReq(TARGET_ID, 'kpa:admin', REQUESTER_ID, PLATFORM),
+      res,
+    );
+
+    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ success: true }));
+    expect(activeHolders['kpa:admin']).toEqual([]);
+    // 예외를 열어도 잠금 절차는 그대로 지난다(동시성 계약 불변).
+    expect(selectQuery()?.sql).toMatch(/FOR UPDATE/i);
+  });
+
   it('동시 해제로 보호가 우회되지 않도록 활성 보유자를 FOR UPDATE 로 잠근다', async () => {
     activeHolders['pharmacy-hub:admin'] = [TARGET_ID, OTHER_ID];
     const res = makeRes();
@@ -231,8 +259,74 @@ describe('마지막 활성 서비스 admin 해제 차단', () => {
   });
 });
 
-describe('자기 자신의 역할 해제 차단', () => {
-  it('요청자가 자기 역할을 해제하면 거절한다', async () => {
+describe('자기 자신의 역할 해제 차단 (플랫폼 관리자 예외)', () => {
+  /**
+   * WO-O4O-PLATFORM-ADMIN-SERVICE-ROLE-RESET-V1 — 계약 축소(삭제 아님)
+   *
+   *   종전: 자기 해제는 **요청자가 누구든** 금지.
+   *   문제: `platform:super_admin` 은 "모든 서비스의 운영자를 지정·해제하는 권한" 이지
+   *         각 서비스의 admin/operator 를 보유해야 하는 역할이 아니다. 그런데 관리자 계정에
+   *         붙은 불필요한 서비스 역할을 **정리할 경로가 없었다** — 두 번째 super_admin 을
+   *         임시로 세우는 우회만 남았다.
+   *
+   *   새 계약: `platform:super_admin` 의 **자기 service-scoped 역할** 해제만 연다.
+   *            자기 `platform:*` 해제는 그대로 금지(복구 불가 상태 방지).
+   */
+  it('플랫폼 관리자는 자기 service operator 역할을 해제할 수 있다', async () => {
+    activeHolders['neture:operator'] = [REQUESTER_ID];
+    const res = makeRes();
+
+    await controller.revokeRoleAssignment(
+      makeReq(REQUESTER_ID, 'neture:operator', REQUESTER_ID, PLATFORM),
+      res,
+    );
+
+    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ success: true }));
+    expect(activeHolders['neture:operator']).toEqual([]);
+  });
+
+  it('플랫폼 관리자는 자기 service admin 역할을 해제할 수 있다 (마지막 1명이어도)', async () => {
+    activeHolders['cosmetics:admin'] = [REQUESTER_ID];
+    const res = makeRes();
+
+    await controller.revokeRoleAssignment(
+      makeReq(REQUESTER_ID, 'cosmetics:admin', REQUESTER_ID, PLATFORM),
+      res,
+    );
+
+    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ success: true }));
+    expect(activeHolders['cosmetics:admin']).toEqual([]);
+  });
+
+  it('플랫폼 관리자여도 자기 platform:* 역할 해제는 거절한다', async () => {
+    activeHolders['platform:admin'] = [REQUESTER_ID, OTHER_ID];
+    const res = makeRes();
+
+    await controller.revokeRoleAssignment(
+      makeReq(REQUESTER_ID, 'platform:admin', REQUESTER_ID, PLATFORM),
+      res,
+    );
+
+    expect(res.status).toHaveBeenCalledWith(403);
+    expect(res.json).toHaveBeenCalledWith(
+      expect.objectContaining({ code: 'SELF_ROLE_REVOKE_FORBIDDEN' }),
+    );
+    expect(activeHolders['platform:admin']).toEqual([REQUESTER_ID, OTHER_ID]);
+  });
+
+  it('플랫폼 관리자여도 prefix 없는 legacy 역할 자기 해제는 거절한다 (fail-closed)', async () => {
+    activeHolders['admin'] = [REQUESTER_ID, OTHER_ID];
+    const res = makeRes();
+
+    await controller.revokeRoleAssignment(makeReq(REQUESTER_ID, 'admin', REQUESTER_ID, PLATFORM), res);
+
+    expect(res.status).toHaveBeenCalledWith(403);
+    expect(res.json).toHaveBeenCalledWith(
+      expect.objectContaining({ code: 'SELF_ROLE_REVOKE_FORBIDDEN' }),
+    );
+  });
+
+  it('플랫폼 관리자가 아닌 요청자의 자기 역할 해제는 그대로 거절한다', async () => {
     activeHolders['neture:admin'] = [REQUESTER_ID, OTHER_ID];
     const res = makeRes();
 
@@ -247,11 +341,14 @@ describe('자기 자신의 역할 해제 차단', () => {
     expect(activeHolders['neture:admin']).toEqual([REQUESTER_ID, OTHER_ID]);
   });
 
-  it('operator 역할이어도 자기 해제는 거절한다', async () => {
+  it('플랫폼 관리자가 아니면 operator 역할도 자기 해제는 거절한다', async () => {
     activeHolders['kpa:operator'] = [REQUESTER_ID];
     const res = makeRes();
 
-    await controller.revokeRoleAssignment(makeReq(REQUESTER_ID, 'kpa:operator', REQUESTER_ID), res);
+    await controller.revokeRoleAssignment(
+      makeReq(REQUESTER_ID, 'kpa:operator', REQUESTER_ID, ['kpa:admin']),
+      res,
+    );
 
     expect(res.status).toHaveBeenCalledWith(403);
     expect(res.json).toHaveBeenCalledWith(
