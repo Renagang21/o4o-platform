@@ -1,6 +1,6 @@
 # IR-O4O-GOOGLE-ONLY-AUTH-SIMPLIFICATION-CENSUS-V1
 
-> 작성일: 2026-09-26 · 상태: **조사 완료 / cleanup WO 대기**
+> 작성일: 2026-09-26 · 갱신: 2026-09-26(결정 반영) · 상태: **조사 완료 · 결정 확정 / cleanup WO 발행**
 > **코드 변경 0건 · migration 0 · production write 0**
 
 ---
@@ -231,9 +231,14 @@ strategy: 'cookie'        →  admin-dashboard 1개
 
 ---
 
-## 6. 판정에 사업 결정이 필요한 2건
+## 6. 사업 결정이 필요했던 2건 — **2026-09-26 확정**
 
-아래 둘은 **코드 근거만으로 KEEP/REMOVE 를 확정할 수 없다.** 기술 판정과 필요한 결정을 함께 적는다.
+| 항목 | 결정 | 실행 기준 |
+|---|---|---|
+| 운영자 이메일 초대 | **REMOVE** | 가입 전 대상에게 초대 메일을 보내는 흐름은 유지하지 않는다. Google 로그인 후 관리자가 직접 지정한다. 초대 코드 · 메일 템플릿 · Admin 탭 · 테이블은 **소비처와 운영 DB 확인 후** 제거 |
+| `mobile-app` | **네이티브 Google 로그인 구현 보류** | 배포 워크플로 0건만으로 즉시 삭제하지 않는다. 배포 · 설치 · 사용 여부를 조사해 처분을 먼저 판정하고, **사용 근거가 없으면 앱과 전용 인증 코드를 함께 은퇴** |
+
+아래는 그 결정의 근거가 된 조사와, 결정 이후 추가로 실측한 내용이다.
 
 ### 6-1. 운영자 이메일 초대 — **REMOVE 권고** (사업 확인 1줄 필요)
 
@@ -244,24 +249,38 @@ strategy: 'cookie'        →  admin-dashboard 1개
 | 대체 경로 | **직접 지정이 이미 있고 Smoke A 로 실증됐다** — 관리자가 사용자 검색 → 서비스 선택 → Operator 지정 |
 | 데이터 | `operator_invitations` 행 수 **미확인**(DB 채널 없음). Smoke B 에서 최소 1건 생성됨 |
 
-기술적으로는 **대체 가능하다.** "운영자가 될 사람에게 먼저 Google 로 가입을 요청하고 관리자가
-지정한다" 로 충분하다면 도메인 전체가 REMOVE 다.
+기술적으로 **대체 가능하다** — "운영자가 될 사람에게 먼저 Google 로 가입을 요청하고 관리자가
+지정한다" 로 충분하다.
 
-**결정이 필요한 질문 하나**: *가입 전 사람에게 초대 메일을 보내는 흐름이 사업상 필요한가?*
-필요 없다 → 888 LOC + 테이블 제거. 필요하다 → KEEP(이 경우에도 3-1~3-7 은 영향 없음).
+> **결정(2026-09-26): REMOVE.** 가입 전 대상에게 초대 메일을 보내는 흐름은 사업상 유지하지 않는다.
 
-### 6-2. Mobile App — **앱 자체의 처분 결정 필요**
+제거 순서는 **소비처 제거 → 테이블 DROP** 이고, 테이블 DROP 은 `operator_invitations` 잔존 행
+실측을 선행 조건으로 둔다(§8-1). Smoke B 의 검증 기록 자체는 CHECK 문서로 **보존**한다.
 
-| 축 | 실측 |
-|---|---|
-| 배포 | `.github/workflows` 에 **mobile 배포 워크플로 0건** · `deploy-web-services.yml` 대상에도 없음 |
-| 로그인 | 비밀번호 폼 제거됨 · "웹에서 로그인하세요" 안내만 |
-| 세션 | `SecureStore` accessToken 복원 코드는 남아 있음 |
-| workspace | `--ignore-workspace` 로만 빌드되는 독립 구성 |
+### 6-2. Mobile App — 네이티브 Google 로그인 **보류**, 처분은 **은퇴 권고**
 
-**배포되지 않는 앱이다.** 여기에 Google 네이티브 로그인을 구현하는 것은 이 조사의 목적과
-반대 방향이다. **판정: 앱을 계속 쓸 것인지부터 결정**하고, 쓰지 않으면 `services/mobile-app`
-전체를 REMOVE 한다. 쓴다면 별도 트랙으로 분리한다 — Google-only 완료를 막지 않는다.
+결정에 따라 "배포 워크플로 0건" 에서 멈추지 않고 **배포 · 설치 · 사용 여부**를 더 조사했다.
+
+| 축 | 실측 | 판독 |
+|---|---|---|
+| 규모 | git-tracked **23 파일** — 화면 10 · API 클라이언트 2 · AuthContext 1 | 소규모 shell |
+| 용도 | 제품 수집(collect · drafts) 전용 — `app/(app)/collect/*` · `drafts/*` | 업무 앱 1종 |
+| 빌드 설정 | `app.json` 만 존재 · **`eas.json` 없음** · Android 전용 · `version 0.1.0` | **빌드 파이프라인 미구성** |
+| 배포 | 워크플로 **0건** · APK/AAB/스토어 참조 **0건**(코드 · 문서 · CI 전수) | **배포된 적 없음** |
+| 전용 백엔드 | `/api/v1/mobile/product-drafts` (controller · service · entity · `mobile_product_drafts` 테이블) · **웹 소비처 0** | 앱이 유일한 소비자 |
+| **운영 트래픽** | Cloud Run 로그 30일: `/api/v1/mobile/*` 요청 **0건**. 같은 필터로 `/auth/google/login` 은 정상 조회됨(쿼리 유효성 대조군) | **실사용 0** |
+| 네이티브 UA | 30일간 `okhttp` 요청 4건 — 전부 `favicon.ico/png` 404(크롤러) | 앱 트래픽 아님 |
+| 이력 | 최초 2026-05-08 · 마지막 기능 커밋 2026-09-23(Expo SDK 54 업그레이드) | 유지보수만 발생 |
+
+> **판정: 사용 근거 없음 → 앱과 전용 인증 코드를 함께 은퇴(REMOVE).**
+> 네이티브 Google 로그인은 **구현하지 않는다**(결정).
+
+**제거 범위**: `services/mobile-app` 전체 · `/api/v1/mobile/product-drafts` route 등록 ·
+`mobile-product-draft.controller.ts` · `.service.ts` · `MobileProductDraft.entity.ts` ·
+`mobile_product_drafts` 테이블(잔존 행 실측 후).
+
+**남은 확인 1건**: `mobile_product_drafts` 행 수. 운영 DB 채널이 열리면 0 인지 확인하고,
+0 이 아니면 데이터 처리 방법을 먼저 정한 뒤 DROP 한다(§8-1).
 
 ---
 
@@ -287,8 +306,8 @@ strategy: 'cookie'        →  admin-dashboard 1개
 | `login_attempts` | **writer 0** | 불필요 | **REMOVE** | entity + 테이블 (**auth-core freeze 승인 필요**) |
 | Admin Login.tsx password 주석 | — | 거짓 서술 | **REMOVE** | 주석 2곳 |
 | `UserActivityLog` PASSWORD_* enum | — | 미확인 | **데이터 실측 후 REMOVE** | enum 값 3 |
-| 운영자 이메일 초대 | 존재 | **사업 확인 1줄** | **REMOVE 권고** | domain 전체 ≈888 LOC + 테이블 |
-| Mobile App | 배포 0 | **처분 결정** | **결정 대기** | 앱 전체 |
+| 운영자 이메일 초대 | 존재 | 불필요(**결정 확정**) | **REMOVE** | domain 전체 ≈888 LOC + 테이블 |
+| Mobile App | **운영 트래픽 30일 0건** | 불필요(**사용 근거 없음**) | **REMOVE** | 앱 전체 + `/api/v1/mobile/*` + 테이블 |
 | Membership termination acceptance fixture | — | Google-only 와 무관 | **REMOVE FROM SCOPE** | 완료조건에서 제외 |
 
 ---
@@ -296,7 +315,9 @@ strategy: 'cookie'        →  admin-dashboard 1개
 ## 8. cleanup WO 로 넘길 때의 순서와 함정
 
 1. **DB 실측 선행** — `operator_invitations` · `linking_sessions` · `email_verification_tokens` ·
-   `refresh_tokens` · `login_attempts` 행 수. 테이블 DROP 은 이것 없이 하지 않는다.
+   `refresh_tokens` · `login_attempts` · `mobile_product_drafts` 행 수.
+   테이블 DROP 은 이것 없이 하지 않는다. 채널은 `gcloud auth application-default login` →
+   Cloud SQL Auth Proxy(SETUP.md).
 2. **코드 제거 → 스키마 제거 2단계** (contract-last). 런타임이 먼저 끊긴 뒤 테이블을 지운다.
    `deploy-api.yml` 이 migration job 을 새 revision 보다 **먼저** 돌리므로 한 창에 섞지 않는다.
 3. **guard 테스트는 지우지 말고 뒤집는다** — `googleIdentityNoEmailMergeGuard` G4(passportDynamic
