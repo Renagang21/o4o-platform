@@ -333,7 +333,13 @@ export default function OperatorsPage() {
     setFormErrors((prev) => ({ ...prev, candidate: '' }));
     try {
       const res = await authClient.api.get('/admin/operator-assignments/candidates', { params: { q } });
-      const raw = res.data?.data ?? [];
+      // WO-O4O-ADMIN-OPERATOR-GOOGLE-INVITATION-AND-ASSIGNMENT-CUTOVER-V1 Smoke A (2026-09-25):
+      //   백엔드 계약은 `{ success, data: { candidates: [...] } }` 인데 여기서는 `data` 를 배열로
+      //   기대해 `Array.isArray` 에서 통째로 버려졌다 — 후보가 몇 명이든 화면은 늘 "결과 없음" 이었고
+      //   직접 지정 경로가 구조적으로 막혀 있었다. 계약대로 `data.candidates` 를 읽는다.
+      //   (과거 응답 형태를 쓰는 배포가 남아 있을 수 있어 배열 형태도 함께 허용한다.)
+      const payload = res.data?.data;
+      const raw = Array.isArray(payload) ? payload : (payload?.candidates ?? []);
       setCandidates(Array.isArray(raw) ? (raw as OperatorCandidate[]) : []);
     } catch (err: any) {
       setFormErrors((prev) => ({
