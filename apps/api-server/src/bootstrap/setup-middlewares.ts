@@ -13,8 +13,6 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import cookieParser from 'cookie-parser';
-import session from 'express-session';
-import passport from '../config/passportDynamic.js';
 
 import { env } from '../utils/env-validator.js';
 import logger from '../utils/logger.js';
@@ -113,9 +111,9 @@ export const getAllowedOrigins = (): string[] => {
  *   6. Security middleware + SQL injection detection
  *   7. Tenant context
  *   8. Cookie parser + body parsing
- *   9. Session (memory store — passport OAuth 전용)
- *  10. Passport initialization
- *  11. HTTP metrics + slow request threshold
+ *   9. HTTP metrics + slow request threshold
+ *
+ * (은퇴) express-session · Passport 초기화 — WO-O4O-GOOGLE-ONLY-AUTH-CLEANUP-V1
  */
 export function setupMiddlewares(app: Application): void {
   // 1. Security headers
@@ -241,25 +239,16 @@ export function setupMiddlewares(app: Application): void {
   app.use(express.json({ limit: '50mb' }));
   app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
-  // 9. Session configuration
-  const sessionConfig: any = {
-    secret: env.getString('SESSION_SECRET', 'o4o-platform-session-secret'),
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-      secure: env.isProduction(),
-      httpOnly: true,
-      maxAge: 24 * 60 * 60 * 1000,
-      domain: env.getString('COOKIE_DOMAIN', undefined),
-      sameSite: 'lax'
-    }
-  };
-
-  // Session middleware for passport (required for OAuth)
-  app.use(session(sessionConfig) as any);
-
-  // 10. Initialize passport
-  app.use(passport.initialize() as any);
+  // 9~10. (은퇴) express-session + passport.initialize()
+  //
+  // WO-O4O-GOOGLE-ONLY-AUTH-CLEANUP-V1 — IR §3-1:
+  //   세션은 주석 그대로 "required for OAuth" 용이었고 Passport 전략 외에는 쓰이지 않았다.
+  //   `req.session` 사용처 0건 · `passport.authenticate` 호출 0건 ·
+  //   전략이 가리키던 `/api/v1/social/*` 콜백은 라우터에 **등록된 적이 없다**.
+  //   로그인 정본은 Google ID token 검증(`/auth/google/login`)이고 세션을 쓰지 않는다.
+  //
+  //   따라서 세션 미들웨어와 Passport 초기화를 함께 제거한다. 쿠키 인증은
+  //   `cookieParser` + httpOnly 토큰 쿠키로 동작하며 이 변경의 영향을 받지 않는다.
 
   // 11. HTTP Metrics
   const httpMetrics = HttpMetricsService.getInstance(prometheusMetrics.registry);

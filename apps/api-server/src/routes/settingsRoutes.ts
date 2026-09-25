@@ -13,8 +13,9 @@ router.get('/customizer', settingsController.getCustomizerSettings.bind(settings
 router.get('/header-builder', settingsController.getHeaderBuilder.bind(settingsController));
 
 // OAuth settings endpoints (admin only) - must be before /:type
-router.get('/oauth/admin', authenticate, requireAdmin, settingsController.getOAuthSettingsAdmin.bind(settingsController));
-router.put('/oauth', authenticate, requireAdmin, settingsController.updateOAuthSettings.bind(settingsController));
+// WO-O4O-GOOGLE-ONLY-AUTH-CLEANUP-V1: OAuth 설정 endpoint 은퇴.
+//   passport 계층 제거로 GOOGLE/KAKAO/NAVER_CLIENT_* 의 소비처가 0이 됐다.
+//   GET 은 clientSecret 을 응답에 실어 보내고 PUT 은 저장조차 하지 않는 안내였다.
 
 // Admin only endpoints
 router.get('/:type', authenticate, requireAdmin, settingsController.getSettings.bind(settingsController));

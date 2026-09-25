@@ -1,7 +1,6 @@
 import { FC } from 'react';
 import { Routes, Route, Navigate, Link, useLocation } from 'react-router-dom'
-import { Key, Package, Bot, Mail, Users, UserCircle } from 'lucide-react'
-import OAuthSettings from './OAuthSettings'
+import { Package, Bot, Mail, Users, UserCircle } from 'lucide-react'
 import AppServices from './AppServices'
 import AiQuerySettings from './AiQuerySettings'
 import EmailSettings from './EmailSettings'
@@ -10,9 +9,10 @@ import AdminAccountsSettings from './AdminAccountsSettings'
 // WO-O4O-GOOGLE-IDENTITY-OPERATOR-EXPLICIT-LINK-V1: 내 계정 › Google 연결(기존 GoogleAccountLink 재사용)
 import MyAccountSettings from './MyAccountSettings'
 
+// WO-O4O-GOOGLE-ONLY-AUTH-CLEANUP-V1: OAuth 탭 은퇴 — 로그인 수단은 Google 하나이고 그 설정은 서버 env
+//   (`GOOGLE_ALLOWED_CLIENT_IDS`)가 정본이다. 화면에서 편집하지 않는다.
 const settingsTabs = [
-  { id: 'oauth', label: 'OAuth', icon: <Key className="w-4 h-4" />, path: '/settings' },
-  { id: 'app-services', label: 'AI Services', icon: <Package className="w-4 h-4" />, path: '/settings/app-services' },
+  { id: 'app-services', label: 'AI Services', icon: <Package className="w-4 h-4" />, path: '/settings' },
   { id: 'ai-query', label: 'AI Query', icon: <Bot className="w-4 h-4" />, path: '/settings/ai-query' },
   { id: 'email', label: 'Email', icon: <Mail className="w-4 h-4" />, path: '/settings/email' },
   { id: 'admin-accounts', label: '관리자 계정', icon: <Users className="w-4 h-4" />, path: '/settings/admin-accounts' },
@@ -56,7 +56,7 @@ const Settings: FC = () => {
 
       {/* Settings Content */}
       <Routes>
-        <Route index element={<OAuthSettings />} />
+        <Route index element={<AppServices />} />
         <Route path="app-services" element={<AppServices />} />
         <Route path="ai-query" element={<AiQuerySettings />} />
         <Route path="email" element={<EmailSettings />} />
