@@ -1221,11 +1221,46 @@ export class MembershipConsoleController {
         }
       }
 
+      // WO-O4O-SERVICE-MEMBERSHIP-TERMINATION-GLOBAL-IDENTITY-DECOUPLING-V1 — Authorization capability ≠ Mutation target scope
+      //
+      //   이전에는 `scope.serviceKeys`(운영자가 보유한 **모든** 서비스)를 그대로 넘겼고,
+      //   요청자가 platform admin 이면 서비스 쪽에서 전 서비스로 확대까지 됐다.
+      //   그래서 k-cosmetics 콘솔의 "탈퇴 처리" 가 그 사용자의 neture 관계까지 끊을 수 있었다.
+      //
+      //   이제 대상은 **명시 `serviceKey` 1개**로만 정한다.
+      //   `scope.serviceKeys`(요청자가 보유한 전체) 로 fallback 하지 않는다 —
+      //   그러면 두 서비스를 운영하는 사람의 "탈퇴 처리" 가 양쪽을 끊는 같은 결함이 남는다.
+      //   platform admin 의 `serviceKeys` 는 `[]` 이므로 fallback 자체가 전 서비스로 열려 있었다.
+      const rawServiceKey =
+        (req.body && (req.body as Record<string, unknown>).serviceKey) ??
+        (req.query as Record<string, unknown>)?.serviceKey;
+      const targetServiceKey = typeof rawServiceKey === 'string' ? rawServiceKey.trim() : '';
+      if (!targetServiceKey || targetServiceKey === 'all') {
+        res.status(400).json({
+          success: false,
+          error: '대상 서비스를 지정해야 합니다 (serviceKey). 범위 없이 전 서비스를 종료하지 않습니다.',
+          code: 'SERVICE_KEY_REQUIRED',
+        });
+        return;
+      }
+
+      // 보유 범위 검증은 다른 write 경로와 같은 규칙(`resolveWriteScope`)에 맡긴다.
+      //   platform admin → [명시 키] · 서비스 운영자 → 보유한 키일 때만 [명시 키], 아니면 []
+      const writeScope = this.resolveWriteScope(req, scope);
+      if (writeScope.serviceKeys.length !== 1 || writeScope.serviceKeys[0] !== targetServiceKey) {
+        res.status(403).json({
+          success: false,
+          error: '해당 서비스에 대한 권한이 없습니다.',
+          code: 'SERVICE_SCOPE_FORBIDDEN',
+        });
+        return;
+      }
+
       const deleted = await approvalService.deleteMember({
         userId,
         deletedBy,
-        isPlatformAdmin: scope.isPlatformAdmin,
-        serviceKeys: scope.serviceKeys,
+        isPlatformAdmin: writeScope.isPlatformAdmin,
+        serviceKeys: [targetServiceKey],
         mode,
       });
 

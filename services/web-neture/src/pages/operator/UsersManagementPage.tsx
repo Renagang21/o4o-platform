@@ -327,7 +327,7 @@ export default function UsersManagementPage() {
           user={user}
           onClose={onClose}
           onDeleted={onDeleted}
-          execute={(userId) => api.delete(`/operator/members/${userId}?mode=soft`).then(() => undefined)}
+          execute={(userId) => api.delete(`/operator/members/${userId}?mode=soft&serviceKey=neture`).then(() => undefined)}
           title="회원 비활성화 확인"
           confirmText="비활성화"
           buildMessage={(displayName, u) =>
@@ -388,7 +388,7 @@ export default function UsersManagementPage() {
             users.filter((u) => ['active', 'suspended', 'pending'].includes(u.status)).map((u) => u.id),
           executeBatch: async (ids) => {
             const settled = await Promise.allSettled(
-              ids.map((id) => api.delete(`/operator/members/${id}?mode=soft`)),
+              ids.map((id) => api.delete(`/operator/members/${id}?mode=soft&serviceKey=neture`)),
             );
             return {
               data: {

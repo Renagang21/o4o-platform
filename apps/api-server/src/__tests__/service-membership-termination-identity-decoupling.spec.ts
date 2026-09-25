@@ -105,6 +105,59 @@ describe('서비스 관계 종료는 전역 Identity 를 건드리지 않는다'
     });
   });
 
+  describe('호출부는 대상 서비스를 명시한다 (Authorization capability != Mutation target scope)', () => {
+    /**
+     * 서버는 `serviceKey` 없는 종료 요청을 400 으로 거부한다(fail-closed).
+     * 그러므로 **호출부가 빠뜨리면 기능이 죽는다** — 새 호출부가 생기면 여기서 먼저 깨지게 고정한다.
+     * role 해제(`/roles/:role`) 와 위험 조회(`/delete-risk`) 는 대상이 이미 특정돼 있어 제외한다.
+     */
+    const REPO = path.resolve(SRC, '..', '..', '..');
+
+    const collectFrontend = (): string[] => {
+      const out: string[] = [];
+      const walk = (dir: string) => {
+        if (!fs.existsSync(dir)) return;
+        for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+          const full = path.join(dir, e.name);
+          if (e.isDirectory()) {
+            if (/(^|[\\/])(node_modules|dist|build|\.next|coverage)([\\/]|$)/.test(full)) continue;
+            walk(full);
+          } else if (/\.(ts|tsx)$/.test(full) && !/\.(spec|test)\.tsx?$/.test(full)) {
+            out.push(full);
+          }
+        }
+      };
+      for (const top of ['services', 'packages']) walk(path.join(REPO, top));
+      return out;
+    };
+
+    it('DELETE /operator/members/:id 호출에 serviceKey 가 빠진 곳이 없다', () => {
+      const files = collectFrontend();
+      // 가드가 빈 집합으로 통과하지 않도록 최소 규모를 함께 고정한다.
+      expect(files.length).toBeGreaterThan(200);
+
+      const offenders: string[] = [];
+      for (const f of files) {
+        const flat = codeOnly(read(f)).replace(/\s+/g, ' ');
+        const re = /\.delete\(\s*`([^`]*operator\/members\/[^`]*)`/g;
+        let m: RegExpExecArray | null;
+        while ((m = re.exec(flat)) !== null) {
+          const url = m[1];
+          if (/\/roles\//.test(url) || /delete-risk/.test(url)) continue;
+          if (!/serviceKey/.test(url)) offenders.push(`${path.relative(REPO, f)} :: ${url}`);
+        }
+      }
+      expect(offenders).toEqual([]);
+    });
+
+    it('실제 종료 호출부를 찾아내고 있다 (정규식이 죽지 않았다)', () => {
+      const hits = collectFrontend().filter((f) =>
+        /\.delete\(\s*`[^`]*operator\/members\//.test(codeOnly(read(f)).replace(/\s+/g, ' ')),
+      );
+      expect(hits.length).toBeGreaterThan(0);
+    });
+  });
+
   describe('명시적 플랫폼 계정 관리 경로는 살아 있다', () => {
     it('관리자 화면의 상태 변경이 남아 있다', () => {
       const code = codeOnly(read(ADMIN_USER));

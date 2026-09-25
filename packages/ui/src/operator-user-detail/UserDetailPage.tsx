@@ -294,7 +294,16 @@ export default function UserDetailPage({
     if (!confirm(`${getUserName(user)} (${user.email}) 사용자를 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.`)) return;
     setActionLoading('delete');
     try {
-      await apiAdapter.delete(`/operator/members/${id}`);
+      // WO-O4O-SERVICE-MEMBERSHIP-TERMINATION-GLOBAL-IDENTITY-DECOUPLING-V1:
+      //   status/reactivate 와 같은 규칙 — 대상 서비스를 명시한다.
+      //   범위 없는 요청은 서버가 거부하므로(전 서비스 종료 방지) 여기서 먼저 막는다.
+      if (!config.serviceKey) {
+        alert('대상 서비스를 알 수 없어 삭제를 중단했습니다.');
+        return;
+      }
+      await apiAdapter.delete(
+        `/operator/members/${id}?serviceKey=${encodeURIComponent(config.serviceKey)}`,
+      );
       navigate(config.listPath ?? '/operator/users');
     } catch (err: any) {
       alert(err.message || '오류가 발생했습니다.');
