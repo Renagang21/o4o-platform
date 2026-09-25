@@ -1,6 +1,6 @@
 # WO-O4O-OFFLINE-REFUND-MANUAL-RECORD-ONLY-V1
 
-> **상태:** 접수 · **정책 확정 · 실행 착수는 별도 명시 지시** (이 문서의 작성 · 커밋은 문서 작업만이며 코드 · 운영 DB · 배포 게이트 · 배포 변경 0)
+> **상태:** 접수 · **정책 확정 · 실행 전 보완 반영(§10) · 코드 실행 범위 미개방** (이 문서의 작성 · 커밋은 문서 작업만이며 코드 · 운영 DB · 배포 게이트 · 배포 변경 0)
 > **작성일:** 2026-09-25
 > **기준 코드:** 작성 시점 `origin/main` `3c0a62665`. 실행은 항상 최신 `origin/main` 에서 시작한다.
 > **선행 조사:** [`CHECK-O4O-URL-FIRST-CENSUS-V1`](../checks/CHECK-O4O-URL-FIRST-CENSUS-V1.md) §14 · §19-2 (이 WO 로 §14 자동 환불 구현 제안은 대체됨)
@@ -79,7 +79,7 @@ P7. 결제 전 주문 취소와 결제 후 환불은 구분한다.
 
 - PH 주문 6건 전부 `cancelled` · `o4o_payments`(pharmacy-hub) 6건 전부 `CREATED` · 결제 완료 0 → **B1 · B3 · R1 로 인한 실제 피해 0**(현재).
 - `neture_orders` kpa-society 0.
-- 레거시 `checkout_payments` 잔존 여부는 **실행 단계 G0 에서 실측**(R-A2 · R-A3 의 실제 도달 가능성 판정).
+- 레거시 `checkout_payments`: 1행 · pending · paymentKey 없음 → R-A2 · R-A3 현재 실행 불가(§10-1 재확인).
 
 ---
 
@@ -101,7 +101,7 @@ P7. 결제 전 주문 취소와 결제 후 환불은 구분한다.
 | 결함 | 조치 |
 |---|---|
 | B1 · B2 · B3 | 경로 자체가 A 로 중지되므로 **코드 수정 대상에서 제외**(410 이후 도달 불가). 테스트로 도달 불가를 고정 |
-| **R1** | 결제 확정 시 주문 상태 검사 추가: PH confirm · B2B factory confirm · Neture B2B confirm 모두 대상 주문이 결제 가능 상태(`isPayableState`)인지 확인, 아니면 PG 승인 전에 거부. **PG 승인 이후에 발견되면 자동 환불하지 않고**(정책 P2) 운영자 확인 대상으로 표시 · 기록 |
+| **R1** | 상태 검사만으로 끝내지 않는다 — **동시 진행(결제 확정 ↔ 결제 전 취소)까지 원자적 상태 전이로 막고**, PG 승인 뒤 불일치가 발견되면 자동 환불 없이 운영자 확인 대상으로 남긴다. 상세 설계 §10-2 |
 
 ## C. 수작업 환불 기록 기능
 
@@ -167,8 +167,8 @@ P7. 결제 전 주문 취소와 결제 후 환불은 구분한다.
 
 # 5. 실행 순서 (실행 착수 지시 후)
 
-1. G0: 최신 `origin/main` · 배포 게이트 상태 · 레거시 `checkout_payments` 행 수 · R-A1~A3 최근 호출 로그(read-only).
-2. D 단계 문서 개정안 작성 → 사용자 승인(B2B 계약 · RBAC).
+1. G0: 최신 `origin/main` · 배포 게이트 상태 · 레거시 `checkout_payments` 행 수 · R-A1~A3 최근 호출 로그(read-only). — **1차 재확인 완료 §10-1**, 실행 착수 시점에 다시 확인.
+2. **D 단계 기준 문서 개정을 코드 변경보다 먼저 확정**한다(§10-4 개정안) → 사용자 승인 → 기준 문서 반영 커밋. **이 단계가 끝나기 전에는 3~5 코드 단계를 시작하지 않는다**(구현자가 상충하는 정본을 받지 않도록).
 3. A: 세 경로 410 은퇴 + 소스 계약 테스트.
 4. B: R1 결제 확정 상태 검사 + 테스트.
 5. C: 스키마안 승인 → migration(CI/CD 자동 실행 원칙) · 운영자 API · 화면 · 테스트.
@@ -201,7 +201,8 @@ P7. 결제 전 주문 취소와 결제 후 환불은 구분한다.
 | V5 | 환불 기록: 운영자만 작성 · 매장/공급자/구매자 403 · 결제 전 주문 기록 거부 · 정정은 새 행 · 원 행 불변 |
 | V6 | 환불 기록 후 재고 · `neture_orders` · 정산 · 알림 · 세금계산서 관련 테이블 **변화 0**(테스트 스냅샷) |
 | V7 | 화면: 실제 환불 완료 시각과 O4O 기록 시각이 분리 표시 · 정정 이력 조회 |
-| V8 | 운영 smoke(배포 후): 410 확인 · 결제 전 취소 동작 · 기록 1건 작성/정정(테스트 주문) |
+| V8a | **격리 환경**(§10-3): 테스트 주문으로 환불 기록 작성 · 정정, 결제-주문 불일치 표시, 동시성 시나리오 |
+| V8b | **운영 환경**(배포 후): 세 경로 410 응답 확인 + 기존 데이터 **읽기 전용** 대조만. 운영에서 테스트 주문 생성 · 기록 작성 · 정정 **금지** |
 
 ---
 
@@ -224,3 +225,151 @@ P7. 결제 전 주문 취소와 결제 후 환불은 구분한다.
 | CHECK 기록물 규칙(§16-1) | `checks/` 는 정비 대상 아님 · 파일 단위 SUPERSEDED 헤더는 기준 문서 전용 | CHECK 는 본문 보존 + 섹션 아래 "대체됨" 인용 한 줄(하우스 선례)로만 표시 |
 | CLAUDE.md 중지 조건 | 결제 · 정산 판단 / DB schema / API contract / Frozen 변경 | 정책 판단은 사용자 확정으로 해소. 나머지는 §6 에 그대로 유지 |
 | COMMERCE-BOUNDARY §15 | 소비자 commerce 모델 변경 절차 | **해당 없음** — 이 WO 는 자동화를 줄이는 방향이며 소비자 commerce 를 도입하지 않음 |
+
+---
+
+# 10. 실행 전 보완 (2026-09-25 · G0 재확인 · 변경안 · 검증 계획)
+
+사용자 보완 지시 3건: ① R1 은 동시 진행까지 검증하고 PG 승인 후 불일치는 자동 환불 없이 운영자 확인 대상으로 ② V8 테스트 주문 작성 · 정정은 격리 환경에서만, 운영은 410 · 읽기 전용 확인만 ③ 기준 문서 충돌을 코드 변경 전에 해소. 아래는 이를 반영한 변경안이며, **410 전환 · 수작업 기록 기능의 코드 실행 범위는 사용자 개방 전까지 닫혀 있다.**
+
+## 10-1. G0 운영 재확인 (read-only, 2026-09-25)
+
+| 항목 | 방법 | 결과 |
+|---|---|---|
+| 세 환불 API 호출 | Cloud Logging `o4o-core-api` 요청 로그, URL 정규식 `refund` 또는 `/store-owner/payments/{id}/cancel` | **0건** — 조회 가능 구간 **2026-08-26 ~ 2026-09-25**(`_Default` 버킷 보존 30일). 동일 구간 요청 로그 존재 확인(빈 저장소 아님). 30일 이전은 로그 없음 → 미확인 |
+| 레거시 `checkout_payments` | 운영 DB 집계 | **1행 · `pending` · `paymentKey` 없음** · SUCCESS 0 → R-A2 · R-A3 은 현재 데이터로 **실행 불가**(필요 조건 불충족) |
+| `o4o_payments` | 〃 | 13행 전부 `CREATED`(neture-b2b 2 · pharmacy-hub 6 · store-service-subscription 5) · **PAID 0 · REFUNDED 0** |
+| `checkout_orders` 환불 상태 | 〃 | `paymentStatus='refunded'` **0** · `refundedAt` 설정 0 · 취소 20건 전부 결제 전(`pending`) |
+| B1 노출(원장만 환불) | 〃 | **0** |
+| R1 노출(취소 주문 + PAID 결제) | 〃 | **0** |
+| `neture_orders` 취소/환불 · `checkout_order_logs` 환불/취소 액션 | 〃 | 0 · 0 |
+| 추가 발견 | 코드 | RBAC 문서의 `STORE_OWNER_REFUND` 대표 경로 `PATCH /api/v1/kpa/checkout/store-orders/:orderId/status` 는 **이미 제거됨**(`kpa-checkout.controller.ts:278-293`, 소비자 commerce 은퇴) — 문서 stale |
+
+**판정**: 세 경로 모두 최근 30일 사용 0 · 자동 환불로 처리된 거래 0 · 결함으로 인한 기존 피해 0. 사용 중지(A)의 중지 조건 A("최근 실제 호출 · 미처리 환불 건")는 **현재 발동하지 않는다.**
+
+## 10-2. R1 — 동시 진행을 포함한 설계
+
+### 현재 경쟁 조건 (코드 확인)
+
+- 결제 전 취소: 상태를 **읽어서 검사한 뒤** 무조건 `UPDATE checkout_orders SET status='cancelled' ... WHERE id = $1`(`store-order-cancel.service.ts`, PH `cancelBeforePayment`) — 검사와 쓰기 사이가 열려 있다.
+- 결제 완료 핸들러: 주문 엔티티를 읽고 `created|pending_payment` 이면 `PAID` 로 **저장**(PH · Store B2B · Neture 핸들러) — 역시 읽기-쓰기 분리.
+- 결제 확정(confirm)은 주문 상태를 보지 않고 PG 승인을 호출(§2.3 R1). `PaymentCoreService.confirm` 은 결제행만 `CREATED → CONFIRMING` 조건부 전이로 보호.
+- 따라서 두 방향 모두 가능: (a) 취소 후 결제 완료 → PG 결제 · 주문 취소 (b) 결제 완료 전이 직후 취소가 덮어씀 → 결제됐는데 주문 취소.
+
+### 설계 — 주문 상태의 원자적 전이로 직렬화
+
+| 단계 | 변경 |
+|---|---|
+| confirm 진입 | PG 승인 **전에** 대상 주문 전부를 `UPDATE checkout_orders SET status='pending_payment' WHERE id = ANY($ids) AND status='created' AND "paymentStatus"='pending' RETURNING id` 로 선점. 반환 행 수 ≠ 대상 수 → **PG 호출 없이 409**(`ORDER_NOT_PAYABLE`) 하고 방금 선점한 행은 `created` 로 되돌림 |
+| PG 승인 실패 | 선점 행을 `pending_payment → created` 로 조건부 복귀 |
+| 결제 전 취소 | `UPDATE ... SET status='cancelled' WHERE id=$1 AND status='created' AND "paymentStatus"='pending' RETURNING` — 0행이면 재조회 후 `pending_payment` 는 **409 `PAYMENT_IN_PROGRESS`**, `paid` 는 409 `ALREADY_PAID` |
+| 결제 완료 핸들러 | `UPDATE ... SET status='paid', "paymentStatus"='paid' WHERE id=$1 AND status IN ('created','pending_payment') RETURNING` — 0행이고 현재 `cancelled` 이면 **불일치 기록**(아래) |
+| 방치된 `pending_payment` | confirm 도중 프로세스 중단 시 잔존 가능 → 운영자 확인 목록에 노출(자동 복귀 여부는 결정 필요: 일정 시간 후 `created` 복귀 vs 운영자 수동) |
+
+- 사실: `pending_payment` 는 enum 에 있으나 **현재 이 상태를 기록하는 코드가 없다**(읽기만: 핸들러 · factory `isPayableState` · Neture 운영 대시보드 `pending` 집계 `operator-dashboard.controller.ts:335`). 따라서 "결제 확정 진행 중" 선점 상태로 쓸 수 있다. 단 결제 전 취소 허용 상태가 현재 `created`·`pending_payment` 둘 다이므로(`store-order-cancel.service.ts:40`, PH `PAYABLE_STATUSES` :40) "결제 진행 중 취소 불가"로 바뀐다 — **API 동작 계약 변경 → 승인 대상**. 운영 대시보드 `pending` 집계 의미도 함께 확인.
+- 세 결제 경로(PH · Store B2B factory · Neture B2B)에 같은 규칙을 공용 헬퍼로 적용.
+
+### PG 승인 뒤 불일치 — 자동 환불 금지, 운영자 확인 대상
+
+- 조건: 결제 `PAID` 인데 주문이 `cancelled`(또는 그룹 일부만 전이).
+- 처리: 주문 · 결제 원장을 **바꾸지 않는다**. `checkout_orders.metadata.paymentOrderMismatch = { paymentId, detectedAt, detectedBy:'payment-handler' }` 표시 + `action_logs` 기록.
+- 운영자 화면: 서비스 운영자용 "결제-주문 불일치" 조회 목록(읽기 전용). 해소는 거래 당사자 오프라인 환불 후 §3-C 수작업 기록으로 한다(표시는 기록이 생기면 해소로 간주).
+- PG 취소 API 는 호출하지 않는다(정책 P2).
+
+## 10-3. 검증 환경 분리 (V8)
+
+| 환경 | 허용 | 방법 |
+|---|---|---|
+| **격리** | 테스트 주문 생성 · 결제 흉내 · 환불 기록 작성/정정 · 불일치 표시 · 동시성 시나리오 | 로컬 PostgreSQL 15 컨테이너 + `scripts/db/build-canonical-schema-baseline.mjs` 스키마 부트스트랩 + 수동 시드(사용자 · 조직 · enrollment · 주문) + PG 어댑터 mock. **로컬 `apps/api-server/.env` 는 운영 DB 프록시를 가리키므로 격리 검증에는 별도 env 를 쓴다**(운영 DB 연결 금지 확인을 검증 첫 단계로) |
+| **운영** | 세 경로 410 응답 확인(요청은 상태를 바꾸지 않음) · 기존 데이터 읽기 전용 대조(§10-1 쿼리 재실행 결과 불변) | curl(인증 쿠키) · Cloud SQL proxy read-only 세션 |
+| 운영 금지 | 테스트 주문 생성 · 환불 기록 작성/정정 · 결제 시도 | — |
+
+## 10-4. 기준 문서 개정안 (코드 변경 전 확정 대상)
+
+### (1) `O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1` §6 취소 계약
+
+현행(:246-253) → 개정안:
+
+```text
+**취소 · 환불 계약 (Axis C 기준)**
+
+| 시점 | 경로 | 범위 |
+|---|---|---|
+| 결제 전 | `POST /store-owner/orders/:orderId/cancel` | 단건 (O4O 가 주문 상태 전이 · 돈 이동 없음) |
+| 결제 진행 중 (`pending_payment`) | 취소 불가 — 409 `PAYMENT_IN_PROGRESS` | — |
+| 결제 후 | **O4O 환불 실행 경로 없음.** 환불 여부 · 금액 · 방법은 거래 당사자가 오프라인에서 결정 · 처리하고, 서비스 운영자가 확인된 결과를 수작업으로 기록한다 (WO-O4O-OFFLINE-REFUND-MANUAL-RECORD-ONLY-V1) | 기록 단위: 주문 |
+| (은퇴) | `POST /store-owner/payments/:paymentGroupId/cancel` | 410 RETIRED |
+
+불변식 R0. O4O 는 PG 취소 · 환불을 실행하지 않는다. 환불 기록은 재고 · 정산 · 알림 · 세금계산서를 자동 처리하지 않는다.
+```
+
+불변식 L0(:255) 보완: "주문 취소는 write 다 — **결제 전 취소에 한해** `checkout_orders` 상태를 바꾸고 이벤트오퍼 예약 재고를 되돌린다. 결제 후 환불 기록은 재고를 바꾸지 않는다."
+
+### (2) `RBAC-CANONICAL-STATE-V1` "환불 authorization 계약"(:243-267, F9)
+
+개정안:
+
+```text
+### 환불 기록 authorization 계약
+
+O4O 는 환불을 실행하지 않는다(WO-O4O-OFFLINE-REFUND-MANUAL-RECORD-ONLY-V1).
+환불 관련 권한은 "확인된 결과를 기록하는 권한" 하나이며, 주체는 거래가 속한 서비스의 운영자다.
+
+| 축 | 주체 | 판정 조건 | 대표 경로 |
+|----|------|----------|-----------|
+| `SERVICE_OPERATOR_REFUND_RECORD` | 서비스 운영자 | active membership + `{service}:operator` | (신설) 주문 환불 기록 작성 · 정정 |
+| `PLATFORM_REFUND_RECORD_OVERRIDE` | 플랫폼 관리자 | `platform:super_admin` | 기록 정정(governance) |
+| (기존 선례) 펀딩 참가자 결제 상태 | 서비스 운영자 | `neture:operator` | `PATCH /api/v1/neture/operator/market-trial/:id/participants/:pid/payment-status` |
+
+은퇴: `POST /api/checkout/refund` · `POST /api/admin/orders/:id/refund` · `POST /store-owner/payments/:paymentGroupId/cancel` (410).
+제거 완료(문서 정정): `PATCH /api/v1/kpa/checkout/store-orders/:orderId/status` (소비자 commerce 은퇴).
+구매자 축은 결제 전 취소 권한만 가진다.
+```
+
+- 같은 문서 :242-244 행(`/api/checkout/refund` super_admin 전용)도 은퇴로 정정.
+- 축 이름은 새 **역할**이 아니라 기존 역할의 판정 규칙 이름이다(F9 §4 새 역할 절차 불요). F9 문서 본문 수정 자체는 동결 대상이므로 **승인 필요**.
+
+### (3) 부수 기록물 · 문서
+
+| 문서 | 조치 |
+|---|---|
+| `CHECK-PHARMACY-HUB-PAYMENT-AND-SUPPLIER-FULFILLMENT-V1` §8 · :18 · :194 | 섹션 아래 "대체됨" 인용 한 줄(본문 보존) |
+| `DROPSHIPPING-STATE-MODEL` · `DROPSHIPPING-SETTLEMENT-MODEL` · `DROPSHIPPING-ORDER-RELAY` | 현행 여부 판정 → 현행이면 환불 자동 역정산 절 개정, 레거시면 SUPERSEDED 표기, 판단 불가면 보고만 |
+| `CHECK-O4O-SUPPLIER-SETTLEMENT-READINESS-GUARD-V1` :68 후속 WO | 대체됨 기록 |
+| `CANONICAL-INDEX` · `CLAUDE.md` SoT 표 | 새 정책 정본 위치 등재(행 변경 = 승인) |
+
+**순서**: (1)(2) 개정안 승인 → 반영 커밋 → (3) → 그다음 코드 단계. (1)(2) 반영 전에는 410 · 기록 기능 코드를 시작하지 않는다.
+
+## 10-5. 코드 변경안 (파일 단위, 실행 개방 후)
+
+| 묶음 | 파일 | 변경 |
+|---|---|---|
+| A 410 | `routes/pharmacy-hub/pharmacy-hub.routes.ts:527-531` | `cancelAfterPayment` 라우트 → 410 스텁(`kpa-payment.controller.ts` 선례 형식) |
+| A 410 | `routes/checkout.routes.ts:22` · `routes/admin-orders.routes.ts:37` | 환불 라우트 → 410 |
+| A 테스트 | 신규 spec | 세 경로 410 · PG mock 호출 0 · `PaymentCoreService.refund` / `cancelPayment` 호출처 허용목록(0) 소스 계약. 기존 `checkout-refund-authorization-canonical-role.spec.ts` 는 410 계약으로 갱신 |
+| B R1 | `services/checkout/store-order-cancel.service.ts` · `PharmacyHubPaymentController.ts`(prepare/confirm/cancelBeforePayment) · `services/payment/b2b/b2b-payment-controller.factory.ts` · `routes/neture/controllers/neture-b2b-payment.controller.ts` · 결제 완료 핸들러 3종 | §10-2 조건부 전이 · 선점 · 불일치 표시. 공용 헬퍼 1개 |
+| B 운영자 조회 | 서비스별 운영자 라우트 | 불일치 목록(읽기 전용) |
+| C 기록 | 신규 migration(`order_refund_records`) · 서비스 · 운영자 API(작성 · 정정 · 조회) · 운영자 화면(주문 상세 섹션) | §3-C. 재고 · 정산 · 알림 · 세금계산서 · PG 호출 0 |
+| 비대상 | `PaymentCoreService` · Toss 어댑터 · `toss-payments.service.ts` | 삭제하지 않음 |
+
+## 10-6. 검증 계획
+
+| # | 대상 | 방법 | 환경 | 통과 기준 |
+|---|---|---|---|---|
+| T1 | 410 | 단위/계약 테스트 | CI | 세 경로 410 · PG mock 0회 |
+| T2 | 호출처 계약 | 소스 스캔 테스트 | CI | refund/cancel PG 호출처 허용목록 외 0 |
+| T3 | R1 순서 시나리오 | 결정적 인터리빙 테스트(취소→confirm, confirm 선점→취소, 핸들러 전이→취소, 취소→핸들러) | CI(모킹) + 격리 DB | 모든 순서에서 "PAID 결제 + 취소 주문"이 **불일치 표시 없이** 생기지 않음 · 결제된 주문이 취소로 덮이지 않음 |
+| T4 | R1 실제 동시성 | 격리 PG 에서 `Promise.all`(취소 · confirm · 핸들러) 반복 N회 | 격리 DB | T3 불변식 위반 0 |
+| T5 | 불일치 처리 | 강제 불일치 주입 | 격리 DB | 원장 불변 · metadata 표시 · action_logs 1건 · PG 취소 호출 0 |
+| T6 | 결제 전 취소 회귀 | 기존 spec + 이벤트 특가 재고 복원 | CI · 격리 | 기존과 동일 |
+| T7 | 환불 기록 권한 | API 테스트 | CI · 격리 | 운영자만 작성 · 매장/공급자/구매자 403 · 결제 전 주문 거부 |
+| T8 | 기록 무부작용 | 기록 전후 스냅샷(재고 · `neture_orders` · 정산 · 알림 · 세금계산서 관련 테이블) | 격리 DB | 변화 0 |
+| T9 | 정정 이력 | 정정 2회 | 격리 DB | 원 행 불변 · 새 행 체인 · 화면에 실제 완료 시각 / 기록 시각 분리 |
+| T10 | 운영 확인 | 배포 후 세 경로 410 · §10-1 쿼리 재실행 결과 불변 | 운영(read-only) | 410 · 데이터 변화 0 |
+
+## 10-7. 사용자 승인이 필요한 결정 (실행 개방 전)
+
+1. §10-4 (1) B2B 계약 · (2) RBAC 개정안 승인.
+2. R1: "결제 진행 중(`pending_payment`) 취소 불가" 동작 계약 변경 승인 · 방치된 `pending_payment` 처리 방식(자동 복귀 시간 vs 운영자 수동).
+3. C: `order_refund_records` 신설 vs `action_logs`+metadata 축소안.
+4. 격리 검증 환경 구성(로컬 컨테이너 · 별도 env) 승인.
