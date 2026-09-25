@@ -9,14 +9,14 @@
 
 ## 0. 결론 요약
 
-원 IR 은 "앱 · 서비스 키 · 기준 문서" 축은 잡았지만 다음 5개 축이 비어 있었다. 모두 **URL 을 옮기는 순간 되돌릴 수 없는 손실**이 생기는 영역이다.
+원 IR 은 "앱 · 서비스 키 · 기준 문서" 축은 잡았지만 다음 5개 축이 비어 있었다. 모두 **전환 설계를 잘못하면 복구가 어려운 손실이 발생할 수 있는** 위험 영역이다. 아래 영향은 확정 결과가 아니라 전환 방식에 따라 범위가 달라지는 위험이다(결정은 §11).
 
 | # | 누락 축 | 심각도 | 요지 |
 |---|---|---|---|
-| A | 물리 매체에 박힌 옛 호스트 (인쇄 QR · POP · 전단 · 제휴 QR) | Critical | 옛 도메인 **영구 301 유지**가 전제. `pharmacyhub.co.kr` "폐지"는 도메인 반납이 아니라 리다이렉트 전용 존치여야 한다 |
-| B | 매장 기기 (태블릿 · 사이니지) · 고객 PC 설치 SW | Critical | origin 단위 localStorage 토큰 → 호스트 이전 시 **전 기기 재페어링**. local agent · Chrome 확장은 허용 origin 이 빌드에 고정 → 재배포 필요 |
-| C | 인증 쿠키 · CORS · Google origin · 로그인 상태 | High | `*.neture.co.kr` 로 모이면 쿠키가 전 서비스 + admin 과 **공유**됨(동작 변화). CORS 는 하드코딩. 전 사용자 1회 로그아웃 |
-| D | 저장된 URL (DB · 알림 · 발송된 메일) | High | `foreign_visitor_partner_qr_codes.landing_url` 절대 URL · **불변 설계**. 알림 `targetUrl` 은 상대경로라 `/store` · `/supplier` · `/market-trial` 경로 변경 시 앱 내 legacy redirect 필요 |
+| A | 물리 매체에 박힌 옛 호스트 (인쇄 QR · POP · 전단 · 제휴 QR) | Critical | 옛 도메인을 반납하면 인쇄 매체가 깨진다. **도메인 · HTTPS 를 유지**하면 살릴 수 있다. 경로별 목적지는 개별 판정 |
+| B | 매장 기기 (태블릿 · 사이니지) · 고객 PC 설치 SW | Critical | origin 단위 localStorage 토큰은 리다이렉트로 옮겨지지 않는다 → 호스트 이전 시 재페어링 또는 토큰 이전 방식 필요. local agent · Chrome 확장은 허용 origin 이 빌드에 고정 → 새 호스트 허용 버전 선배포 필요 |
+| C | 인증 쿠키 · CORS · Google origin · 로그인 상태 | High | `.neture.co.kr` 쿠키 공유는 **이미 존재**(neture · store · study ↔ admin). 이전은 공유 대상에 pharmacy · retail 등을 **추가**하는 변화. CORS 는 하드코딩. localStorage 토큰은 origin 단위라 handoff 설계에 따라 재로그인 범위가 달라진다 |
+| D | 저장된 URL (DB · 알림 · 발송된 메일) | High | `foreign_visitor_partner_qr_codes.landing_url` 은 옛 호스트 절대 URL · 불변 설계 — 옛 호스트 유지 + 리다이렉트로 계속 쓸 수 있는지 먼저 확인(DB 수정은 그 다음 선택지). 알림 `targetUrl` 은 상대경로라 `/store` · `/supplier` · `/market-trial` 경로 변경 시 앱 내 legacy redirect 필요 |
 | E | 기준 문서 · RBAC 식별자 | High | 호스트 기반 서비스 판정은 Boundary F6 Rule 4 문언과 충돌. 독립 커뮤니티 회원은 ROLE-WORKSPACE §5 가 명시적으로 배제. 서비스 키 · role prefix 는 영구 내부 ID 로 유지 권고 |
 
 원 IR §5 실행 순서 1단계("인벤토리 + 기준 문서 개정")는 유지하되, 아래 §7 의 **선결 결정 8건**을 그 단계의 산출물에 포함해야 한다.
@@ -63,8 +63,8 @@
 - 매장 QR(`store_qr_codes`)은 **slug 만 저장**, 호스트는 렌더 시 `getServiceOrigin(serviceKey)` 로 결정. → 카탈로그만 바꾸면 **새로 뽑는 QR 은 새 호스트**, 이미 인쇄된 것은 옛 호스트.
   - 렌더 지점: `store-qr-landing.controller.ts:299,351,465,552` · `store-pop-v2.controller.ts:57-59` · `store-screen-set-qr.service.ts:28` · `PharmacyHubStoreQrController.ts:89-93` (각각 `kpa-society.co.kr` / `pharmacyhub.co.kr` 하드코딩 fallback 보유).
 - 카탈로그를 우회하는 **중복 호스트 표** 2곳: `multilingual-product-content.controller.ts:166-177` · `foreign-visitor-partner-qr-code.service.ts:16-28`.
-- 옛 호스트에서 **경로 · 쿼리 보존 301 을 영구 유지**해야 할 경로: `/qr/*` · `/tablet/*` · `/multilingual-products/*` · `/foreign-visitor/affiliate/*` · `/store/:slug/products|events|blog/*` · `/handoff` · `/auth/verify-email` · `/kpa/*`.
-- 함의: **pharmacyhub.co.kr · kpa-society.co.kr · k-cosmetics.site 는 "폐지" 가 아니라 "리다이렉트 전용 존치"** 가 되어야 한다. 도메인 갱신 비용 · LB rule · 인증서를 계속 유지해야 한다.
+- 옛 호스트에서 **계속 응답해야 하는** 외부 유입 경로(목적지 · 301 여부는 경로별 판정, 경로 · 쿼리 보존 필요): `/qr/*` · `/tablet/*` · `/multilingual-products/*` · `/foreign-visitor/affiliate/*` · `/store/:slug/products|events|blog/*` · `/handoff` · `/auth/verify-email` · `/kpa/*`.
+- 함의: pharmacyhub.co.kr · kpa-society.co.kr · k-cosmetics.site 는 도메인 반납 대상이 아니다. **도메인 · HTTPS · LB rule 을 유지**하고, 인증 · 결제 · 새 목적지가 없는 경로는 일괄 301 하지 않는다(§11-1).
 - 미확인: 실제 인쇄 · 배포된 QR 수(운영 DB `store_qr_codes` 스캔 이력으로 추정 가능).
 
 ### 2-1. 이미 깨져 있는 것 (이전과 무관, 별도 WO 후보)
@@ -92,8 +92,8 @@
 
 ## 4. 축 C — 인증 · 쿠키 · CORS
 
-- **쿠키**: `cookie.utils.ts:20-24` `SERVICE_DOMAINS=['.neture.co.kr','.kpa-society.co.kr','.k-cosmetics.site']`. API 가 `api.neture.co.kr` 이므로 실제로 동작하는 것은 `.neture.co.kr` 뿐. 서비스들이 `*.neture.co.kr` 로 모이면 `accessToken`/`refreshToken`/`sessionId` 쿠키가 **pharmacy · retail · supplier · funding · store · admin 전부 공유**된다. admin-dashboard 는 쿠키 전략이므로 다른 서비스의 handoff/로그아웃이 admin 세션을 덮어쓰거나 지운다. → 의도(SSO 로 볼지, 격리할지) 결정 필요.
-- **토큰 저장**: admin 외 모든 서비스 웹이 localStorage(`o4o_accessToken`). origin 단위이므로 **이전 시 전 사용자 1회 로그아웃**.
+- **쿠키**: `cookie.utils.ts:20-24` `SERVICE_DOMAINS=['.neture.co.kr','.kpa-society.co.kr','.k-cosmetics.site']`. API 가 `api.neture.co.kr` 이므로 실제로 동작하는 것은 `.neture.co.kr` 뿐. **현재도** neture.co.kr · store · study 의 로그인/Google/handoff exchange 가 `.neture.co.kr` 쿠키를 설정하며(`auth-session.controller.ts:86` · `google-auth.controller.ts:114` · `handoff.controller.ts:478`) cookie 전략인 admin-dashboard 와 공유된다. 이전은 이 공유 범위에 pharmacy · retail · supplier · funding 을 **추가**한다. 쿠키 전달 자체는 관리자 권한을 만들지 않으나(권한은 `role_assignments`), 다른 호스트의 로그인/로그아웃이 admin 세션을 덮어쓰거나 지우는 세션 동작은 **현재 이미 발생하는지 먼저 재현**하고, 새로 생기는 문제와 구분해야 한다.
+- **토큰 저장**: admin 외 모든 서비스 웹이 localStorage(`o4o_accessToken`). origin 단위이므로 새 호스트에서는 토큰이 없다. 재로그인 범위는 전환 방식(옛 호스트 → 새 호스트 handoff 제공 여부)에 따라 달라진다.
 - **`isCrossOriginRequest`** (`auth-helpers.ts:17-45`): 같은 base domain 이 되면 로그인 응답 body 에 토큰을 넣지 않는다. auth-client 는 `includeLegacyTokens` 를 보내므로 정상이나, 이 플래그를 빠뜨린 커스텀 fetch 는 깨진다.
 - **CORS**: `setup-middlewares.ts:39-102` exact-match 하드코딩. `CORS_ORIGIN` env 는 배포에서 미설정. 카탈로그에서 파생하지 않음(`getServiceOrigins()` 소비처 0). → 신규 호스트마다 코드 수정 + API 재배포.
 - **handoff**: 소스 판정은 Origin hostname ↔ 카탈로그 domain exact match(`handoff.controller.ts:83-91`). exchange 의 origin lock 은 store(`store-workspace.ts:9`) · 대표 홈(`representative-entry.ts:25-45`) 2곳만.
@@ -106,7 +106,7 @@
 
 | 저장 위치 | 형태 | 처리 |
 |---|---|---|
-| `foreign_visitor_partner_qr_codes.landing_url` | 절대 URL · 생성 후 **불변** 설계(`service.ts:137`) · SVG 를 이 값으로 재생성 | 데이터 rewrite(= DB write, 사용자 승인 대상) + 옛 호스트 301 |
+| `foreign_visitor_partner_qr_codes.landing_url` | 절대 URL · 생성 후 **불변** 설계(`service.ts:137`) · SVG 를 이 값으로 재생성 | 1순위: 옛 호스트 유지 + 해당 경로 리다이렉트로 계속 동작하는지 확인. DB rewrite(사용자 승인 대상)는 그것으로 부족할 때의 선택지 |
 | `notifications.metadata.targetUrl` | 상대경로만(`resolveTarget.ts` 가 절대 URL 차단) — `/supplier/*` · `/market-trial/*` · `/store/*` · `/mypage` · `/operator/*` | 렌더하는 호스트 기준으로 해석됨 → 경로를 바꾸는 앱에 **legacy redirect route** 필수. 호스트 간 이동은 표현 불가 |
 | 발송된 메일 | 절대 URL + token (`/auth/verify-email?token=` · `/operator-invitations/accept?token=`) | 301 이 쿼리 보존해야 함 |
 | `platform_services.entry_url` | `https://pharmacyhub.co.kr` · `https://branch.kpa-society.co.kr`(이미 틀림) | 표시용. 데이터 수정 |
@@ -180,7 +180,7 @@
 
 ## 8. 선결 결정 (통합 WO 전 사용자 판단)
 
-1. 옛 도메인 3개(kpa-society.co.kr · pharmacyhub.co.kr · k-cosmetics.site)를 **301 전용으로 영구 존치**할지 — 인쇄 QR 때문에 사실상 필수.
+1. 옛 도메인 3개(kpa-society.co.kr · pharmacyhub.co.kr · k-cosmetics.site)의 도메인 · HTTPS 를 유지할지, 경로별로 어디로 보낼지 — 인쇄 QR 때문에 유지는 사실상 필수.
 2. `*.neture.co.kr` 쿠키 공유를 SSO 로 받아들일지, admin 을 격리할지.
 3. supplier · funding 을 neture-web 에서 **번들 분리**할지, 호스트 기반 라우팅으로 갈지.
 4. 태블릿 · 사이니지 기기 이전 방식 — 재페어링 공지 vs 토큰 이관 bridge.
@@ -204,3 +204,27 @@
 - Google 콘솔 등록 origin 실제 목록 · Gabia DNS · LB url-map 현재 상태.
 - 설치된 local agent 버전 분포 · Chrome 확장 설치 수.
 - Toss 가맹점 콘솔 도메인 등록 여부.
+- 현재 neture ↔ admin 쿠키 공유로 인한 세션 덮어쓰기/로그아웃 전파가 이미 재현되는지.
+
+---
+
+## 11. 결정 기록 (2026-09-25, 사용자 판단)
+
+§8 선결 결정에 대한 판단. 통합 WO 는 이 결정을 전제로 작성한다.
+
+| # | 항목 | 결정 |
+|---|---|---|
+| 1 | 옛 도메인 3개 | **도메인과 HTTPS 유지.** 인쇄 QR 공개 경로는 새 목적지로 연결하되 **일괄 301 은 하지 않는다**. 새 목적지가 없는 경로(PharmacyHub 등)와 인증 · 결제 경로는 경로별 판정 |
+| 2 | 쿠키 · 관리자 | 플랫폼 로그인 신원은 공유 가능. **관리자 권한 · 세션 동작은 별도 검증**. 기존 공유(neture ↔ admin)에서 이미 생기는 문제와 새 문제를 구분해 재현 |
+| 3 | supplier · funding | **기존 `neture-web` 을 활용한 호스트별 진입을 우선 설계.** 호스트별 첫 화면 · 링크 생성 · 권한 분리가 충분한지 조사 후 번들 분리 여부 확정 |
+| 4 | 태블릿 · 사이니지 | **재연결이 기본안.** 운영 기기 수 실측 후 현장 부담이 크면 안전한 토큰 이전 방식 비교 |
+| 5 | local agent · 확장 | **새 호스트 허용 버전 선배포 → 작동 확인 → 업무 URL 전환.** 설치본 버전 · 보급 현황을 전환 조건에 포함 |
+| 6 | 독립 커뮤니티 | **수용.** 기준 문서(ROLE-WORKSPACE §5) · 서버 권한 개정. 기존 서비스 회원에게 커뮤니티 가입을 자동 부여할지는 별도 데이터 이전 정책으로 명시 |
+| 7 | PharmacyHub | **사이트 종료를 먼저 일정에 넣지 않는다.** 직접 공급 채널 · 결제 · 일반 약사 회원 · 운영 기능 · PH 전용 회원의 목적지를 각각 정한 뒤 이전 |
+| 8 | 서비스 키 · role prefix | **유지.** 공개 호스트 · 표시명만 변경. `retail` 은 공개 URL · 명칭으로만 사용 |
+
+**전환 게이트**: §10 미확인 항목(운영 DB 수치 · DNS · LB · Google 설정 · 기기/설치본 현황)의 실측.
+
+**원 IR 현황 정정**: `admin.neture.co.kr` 은 이미 운영 중 · 분회 새 호스트는 `PLATFORM_HOSTS` 판정 목록에 없음(§7-2) · store 통합 진입 플래그 `VITE_UNIFIED_STORE_HANDOFF` 는 3앱 모두 `false`(§7-5).
+
+**다음 산출물**: 소규모 WO 여러 개가 아니라, 현재 경로 · 저장된 URL · 기기 · 권한의 **전수 대응표와 전환 순서를 포함한 통합 WO** 1건.
