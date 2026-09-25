@@ -29,10 +29,8 @@ import {
   EmailVerificationDto,
   GoogleLoginRequestDto,
   GoogleSignupRequestDto,
-  GoogleAdminBootstrapRequestDto,
 } from '../dto/index.js';
 import { asyncHandler } from '../../../middleware/error-handler.js';
-import { googleAdminBootstrapLimiter } from '../../../config/rate-limiters.config.js';
 
 const router: IRouter = Router();
 
@@ -66,17 +64,9 @@ router.post(
 //   POST /google/link · GET /google/link/status 는 은퇴했다.
 //   users.password 재인증을 전제로 한 전환기 경로이며, 세션은 이미 Google 연결에서만 나온다.
 
-// WO-O4O-GOOGLE-IDENTITY-OPERATOR-EXPLICIT-LINK-V1 §15: 전환기 1회용 Admin Google Bootstrap
-// POST /api/v1/auth/google/bootstrap-admin - { idToken, bootstrapCode }
-//   세션을 요구할 수 없는 유일한 연결 경로(연결 전에는 그 계정으로 로그인 불가)이므로
-//   env 플래그 + 일회용 코드로만 열리고(없으면 404), 대상 users.id 는 서버가 platform:super_admin 으로 결정한다.
-//   성공 후에는 대상에 Google 연결이 존재하므로 재사용 불가(1회성). 세션 발급 없음.
-router.post(
-  '/google/bootstrap-admin',
-  googleAdminBootstrapLimiter,
-  validateDto(GoogleAdminBootstrapRequestDto),
-  asyncHandler(GoogleAuthController.bootstrapAdmin)
-);
+// WO-O4O-GOOGLE-ONLY-AUTH-CLEANUP-V1: Admin Google Bootstrap(전환기 1회용)은 은퇴했다.
+//   목적이던 "기존 관리자 users.id 에 Google 연결"은 완료됐고 1회용이라 재사용 경로가 없다.
+//   운영 env 에 플래그/코드가 없어 이미 fail-closed 로 닫혀 있었다.
 
 // POST /api/v1/auth/refresh - Refresh access token
 router.post(

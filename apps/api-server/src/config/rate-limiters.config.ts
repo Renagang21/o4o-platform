@@ -170,24 +170,6 @@ export const playbackLogLimiter = rateLimit({
   skip: isLocalhost,
 });
 
-// Export all limiters as an object for convenience
-/**
- * Admin Google Bootstrap (WO-O4O-GOOGLE-IDENTITY-OPERATOR-EXPLICIT-LINK-V1 §15)
- * 전환기 1회용 경로 — 코드 추측을 막기 위해 IP 당 시간당 10회로 강하게 제한한다.
- */
-export const googleAdminBootstrapLimiter = rateLimit({
-  windowMs: 60 * 60 * 1000,
-  max: 10,
-  message: {
-    error: 'Too many requests from this IP',
-    code: 'RATE_LIMIT_EXCEEDED'
-  },
-  standardHeaders: true,
-  legacyHeaders: false,
-  keyGenerator: getClientIP,
-  skip: isLocalhost
-});
-
 /**
  * 운영자 초대 공개 경로 (WO-O4O-ADMIN-OPERATOR-GOOGLE-INVITATION-AND-ASSIGNMENT-CUTOVER-V1 §10·§13)
  * `/operator-invitations/preview|accept` — 인증 없이 토큰만으로 접근한다.
@@ -216,6 +198,5 @@ export const rateLimiters = {
   enrollment: enrollmentLimiter,
   adminReview: adminReviewLimiter,
   playbackLog: playbackLogLimiter,
-  googleAdminBootstrap: googleAdminBootstrapLimiter,
   operatorInvitationPublic: operatorInvitationPublicLimiter,
 };

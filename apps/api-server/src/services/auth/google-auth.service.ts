@@ -48,11 +48,6 @@ import {
   type VerifiedGoogleIdentity,
 } from './google-identity.service.js';
 import {
-  loadGoogleAdminBootstrapConfig,
-  GOOGLE_ADMIN_BOOTSTRAP_TARGET_ROLE,
-  type GoogleAdminBootstrapConfig,
-} from '../../config/google-admin-bootstrap.config.js';
-import {
   generateTokensWithContext,
   injectRolesIntoPublicData,
 } from './auth-context.helper.js';
@@ -68,8 +63,6 @@ export type GoogleAuthErrorCode =
   | 'INVALID_USER'
   | 'GOOGLE_ACCOUNT_ALREADY_LINKED'
   | 'GOOGLE_IDENTITY_IN_USE'
-  | 'GOOGLE_ADMIN_BOOTSTRAP_DISABLED'
-  | 'GOOGLE_ADMIN_BOOTSTRAP_CODE_INVALID'
   | 'ADMIN_TARGET_AMBIGUOUS';
 
 const GOOGLE_AUTH_ERROR_STATUS: Record<GoogleAuthErrorCode, number> = {
@@ -81,8 +74,6 @@ const GOOGLE_AUTH_ERROR_STATUS: Record<GoogleAuthErrorCode, number> = {
   INVALID_USER: 401,
   GOOGLE_ACCOUNT_ALREADY_LINKED: 409,
   GOOGLE_IDENTITY_IN_USE: 409,
-  GOOGLE_ADMIN_BOOTSTRAP_DISABLED: 404,
-  GOOGLE_ADMIN_BOOTSTRAP_CODE_INVALID: 401,
   ADMIN_TARGET_AMBIGUOUS: 409,
 };
 
@@ -95,8 +86,6 @@ const GOOGLE_AUTH_ERROR_MESSAGE: Record<GoogleAuthErrorCode, string> = {
   INVALID_USER: '계정 정보를 확인할 수 없습니다.',
   GOOGLE_ACCOUNT_ALREADY_LINKED: '이 계정에는 이미 다른 Google 계정이 연결되어 있습니다.',
   GOOGLE_IDENTITY_IN_USE: '이 Google 계정은 이미 다른 사용자에게 연결되어 있습니다.',
-  GOOGLE_ADMIN_BOOTSTRAP_DISABLED: '요청을 처리할 수 없습니다.',
-  GOOGLE_ADMIN_BOOTSTRAP_CODE_INVALID: '연결 코드가 올바르지 않습니다.',
   ADMIN_TARGET_AMBIGUOUS: '연결 대상 관리자 계정을 특정할 수 없습니다.',
 };
 
@@ -131,17 +120,6 @@ export interface GoogleSignupInput extends GoogleAuthRequestMeta {
 }
 
 /** POST /auth/google/bootstrap-admin — 전환기 1회용. 대상 users.id 는 서버가 role 로 결정한다. */
-export interface GoogleAdminBootstrapInput extends GoogleAuthRequestMeta {
-  idToken: string;
-  bootstrapCode: string;
-}
-
-export interface GoogleAdminBootstrapResult {
-  linked: true;
-  /** 연결된 관리자 users.id — 서버 판정 결과 확인용(호출부 로그/검증). PII 아님. */
-  userId: string;
-}
-
 export interface GoogleAuthSession {
   user: Record<string, unknown>;
   tokens: AuthTokens;
@@ -162,7 +140,6 @@ export interface GoogleAuthServiceDeps {
   dataSource?: Pick<DataSource, 'getRepository' | 'transaction'>;
   issueSession?: SessionIssuer;
   /** Admin bootstrap 게이트 — 테스트에서 주입. 기본값은 요청마다 env 를 다시 읽는다. */
-  adminBootstrap?: GoogleAdminBootstrapConfig;
 }
 
 /** Postgres unique violation 판별 — TypeORM QueryFailedError 는 driverError 에 원본을 둔다. */
@@ -177,20 +154,14 @@ export class GoogleAuthService {
   private readonly identity: Pick<GoogleIdentityService, 'verifyGoogleIdToken' | 'findGoogleIdentityBySub'>;
   private readonly _dataSource?: Pick<DataSource, 'getRepository' | 'transaction'>;
   private readonly issueSession: SessionIssuer;
-  private readonly _adminBootstrap?: GoogleAdminBootstrapConfig;
 
   constructor(deps: GoogleAuthServiceDeps = {}) {
     this.identity = deps.identity ?? googleIdentityService;
     this._dataSource = deps.dataSource;
     this.issueSession = deps.issueSession ?? ((user) => generateTokensWithContext(user));
-    this._adminBootstrap = deps.adminBootstrap;
   }
 
   /** env 는 요청 시점에 읽는다 — 플래그 제거(폐쇄)가 재배포 없이도 즉시 반영되도록. */
-  private get adminBootstrap(): GoogleAdminBootstrapConfig {
-    return this._adminBootstrap ?? loadGoogleAdminBootstrapConfig();
-  }
-
   private get dataSource(): Pick<DataSource, 'getRepository' | 'transaction'> {
     return this._dataSource ?? AppDataSource;
   }
@@ -329,81 +300,8 @@ export class GoogleAuthService {
   //   link() 는 은퇴했다. users.password 재인증을 전제로 한 전환기 경로이며,
   //   password 가 사라진 뒤에는 성공할 수 없다.
 
-  /**
-   * POST /auth/google/bootstrap-admin (WO-O4O-GOOGLE-IDENTITY-OPERATOR-EXPLICIT-LINK-V1 §15)
-   * 전환기 1회용: 세션·비밀번호 없이 기존 `platform:super_admin` users.id 에 검증된 Google sub 를 연결한다.
-   * 순서: 플래그 → 일회용 코드 → ID token 검증 → (트랜잭션) 대상 판정 · 충돌 검사 · INSERT.
-   * users 신설 0 · users.email/password/role/membership/service_credentials 변경 0 · 세션 발급 0.
-   */
-  async bootstrapAdminLink(input: GoogleAdminBootstrapInput): Promise<GoogleAdminBootstrapResult> {
-    const gate = this.adminBootstrap;
-    if (!gate.isEnabled()) {
-      throw new GoogleAuthError('GOOGLE_ADMIN_BOOTSTRAP_DISABLED');
-    }
-    if (!gate.verifyCode(input.bootstrapCode)) {
-      logger.warn('[GoogleAuth] admin bootstrap code rejected', { ipAddress: input.ipAddress });
-      throw new GoogleAuthError('GOOGLE_ADMIN_BOOTSTRAP_CODE_INVALID');
-    }
-
-    const identity = await this.identity.verifyGoogleIdToken(input.idToken);
-
-    const userId = await this.dataSource.transaction(async (manager) => {
-      // 대상은 서버가 결정한다 — role 보유자가 정확히 1명일 때만 진행(parameter binding · Guard Rule 2).
-      const holders: { user_id: string }[] = await manager.query(
-        'SELECT DISTINCT user_id FROM role_assignments WHERE role = $1 AND is_active = true',
-        [GOOGLE_ADMIN_BOOTSTRAP_TARGET_ROLE],
-      );
-      if (holders.length !== 1) {
-        logger.error('[GoogleAuth] admin bootstrap target not unique', { holders: holders.length });
-        throw new GoogleAuthError('ADMIN_TARGET_AMBIGUOUS');
-      }
-      const targetUserId = holders[0].user_id;
-
-      const userRepo = manager.getRepository(User);
-      const target = await userRepo.findOne({ where: { id: targetUserId } });
-      if (!target) {
-        throw new GoogleAuthError('INVALID_USER');
-      }
-
-      const linkedRepo = manager.getRepository(LinkedAccount);
-      const mine = await linkedRepo.findOne({ where: { userId: targetUserId, provider: 'google' } });
-      if (mine) {
-        // 이미 연결됨 = bootstrap 종료 상태. 재사용·교체 없음(1회성).
-        throw new GoogleAuthError('GOOGLE_ACCOUNT_ALREADY_LINKED');
-      }
-      const other = await linkedRepo.findOne({ where: { provider: 'google', providerId: identity.sub } });
-      if (other) {
-        throw new GoogleAuthError('GOOGLE_IDENTITY_IN_USE');
-      }
-
-      const now = new Date();
-      const linked = linkedRepo.create({
-        userId: targetUserId,
-        provider: 'google',
-        providerId: identity.sub,
-        isVerified: true,
-        isPrimary: true,
-        linkedAt: now,
-        lastUsedAt: now,
-      });
-      try {
-        await linkedRepo.save(linked);
-      } catch (error) {
-        const detail = uniqueViolationDetail(error);
-        if (detail !== null && /provider/i.test(detail)) {
-          throw new GoogleAuthError('GOOGLE_IDENTITY_IN_USE');
-        }
-        throw error;
-      }
-      return targetUserId;
-    });
-
-    logger.warn('[GoogleAuth] admin bootstrap link created', { userId, ipAddress: input.ipAddress });
-    this.logActivity(userId, input, true, 'admin_bootstrap', 'link_google')
-      .catch((err) => logger.warn('[GoogleAuth] activity log failed (non-critical)', { err }));
-
-    return { linked: true, userId };
-  }
+  // WO-O4O-GOOGLE-ONLY-AUTH-CLEANUP-V1: bootstrapAdminLink() 은퇴 — 전환기 1회용 경로였고 목적(기존 관리자 계정에
+  //   Google 연결)은 완료됐다. 운영 env 에 플래그/코드가 없어 이미 닫혀 있었다.
 
   // WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1:
   //   getLinkStatus() 는 은퇴했다. `passwordSet` 축이 사라졌고, 로그인된 계정은 정의상 Google 연결을 갖는다.

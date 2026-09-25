@@ -308,16 +308,9 @@ export class AuthClient {
   //   linkGoogle / getGoogleLinkStatus 는 은퇴했다. password 로 재인증하고 Google 을 붙이던
   //   전환기 경로이며, 세션 자체가 이미 Google 연결에서만 나온다.
 
-  /**
-   * WO-O4O-GOOGLE-IDENTITY-OPERATOR-EXPLICIT-LINK-V1 §15 — 전환기 1회용 Admin Google Bootstrap.
-   * 세션 없이 호출한다. 서버가 env 플래그 + 일회용 코드를 확인하고 `platform:super_admin` users.id 에 연결한다.
-   * 실패(404 비활성 · 401 코드 오류 · 409 이미 연결/다른 사용자)는 axios 오류로 전파된다.
-   */
-  async bootstrapAdminGoogle(idToken: string, bootstrapCode: string): Promise<{ linked: boolean }> {
-    const response = await this.api.post('/auth/google/bootstrap-admin', { idToken, bootstrapCode });
-    const data = (response.data as { data?: { linked?: boolean } })?.data;
-    return { linked: data?.linked === true };
-  }
+  // WO-O4O-GOOGLE-ONLY-AUTH-CLEANUP-V1: Admin Google Bootstrap(전환기 1회용)은 은퇴했다.
+  //   목적이던 "기존 관리자 users.id 에 Google 연결"은 완료됐고 1회용이라 재사용 경로가 없다.
+  //   운영 env 에 플래그/코드가 없어 이미 fail-closed 로 닫혀 있었다.
 
   /**
    * 세션 응답 채택 — /auth/login · /auth/google/login · /auth/google/signup 공통.
