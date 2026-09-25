@@ -96,7 +96,6 @@ import {
 // RegisterPage는 RegisterModal로 대체됨 (WO-O4O-AUTH-MODAL-SIGNUP-ROLE-UPDATE-V1)
 // WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: AccountRecoveryPage · ResetPasswordPage 는 은퇴했다.
 // WO-O4O-AUTH-VERIFY-EMAIL-FRONTEND-PAGE-V1: 이메일 인증 결과 페이지
-import VerifyEmailPage from './pages/auth/VerifyEmailPage';
 import { RegisterPendingPage } from './pages/RegisterPendingPage';
 // MyPage 3-split (WO-O4O-NETURE-MYPAGE-SPLIT-V1)
 import MyPageHub from './pages/mypage/MyPageHub';
@@ -678,7 +677,6 @@ function App() {
             {/* WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: 비밀번호 찾기·재설정 경로는 은퇴했다. */}
             <Route path="/forgot-password" element={<Navigate to="/" replace />} />
             <Route path="/reset-password" element={<Navigate to="/" replace />} />
-            <Route path="/auth/verify-email" element={<VerifyEmailPage />} />
             <Route path="/register/pending" element={<RegisterPendingPage />} />
             <Route path="/qr/:slug" element={<QrLandingPage />} />
             <Route path="/p/:publicKey" element={<ProductLandingPage />} />

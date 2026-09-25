@@ -13,7 +13,6 @@ import { Router, type IRouter } from 'express';
 import {
   AuthSessionController,
   AuthAccountController,
-  VerificationController,
 } from '../controllers/index.js';
 import { HandoffController } from '../controllers/handoff.controller.js';
 import { GoogleAuthController } from '../controllers/google-auth.controller.js';
@@ -26,7 +25,6 @@ import {
 } from '../../../common/middleware/auth.middleware.js';
 import {
   RefreshTokenRequestDto,
-  EmailVerificationDto,
   GoogleLoginRequestDto,
   GoogleSignupRequestDto,
 } from '../dto/index.js';
@@ -148,31 +146,10 @@ router.post(
 //   Password Management Routes(/forgot-password · /reset-password · /find-id)는 은퇴했다.
 //   복구할 password 가 없고, 계정 접근 복구는 Google 계정 복구가 담당한다.
 
-/**
- * ========================================
- * Email Verification Routes
- * ========================================
- */
-
-// POST /api/v1/auth/verify-email - Verify email (POST)
-router.post(
-  '/verify-email',
-  validateDto(EmailVerificationDto),
-  asyncHandler(VerificationController.verifyEmail)
-);
-
-// GET /api/v1/auth/verify-email - Verify email (GET - for email links)
-router.get(
-  '/verify-email',
-  asyncHandler(VerificationController.verifyEmailGet)
-);
-
-// POST /api/v1/auth/resend-verification - Resend verification email
-router.post(
-  '/resend-verification',
-  requireAuth,
-  asyncHandler(VerificationController.resendVerification)
-);
+// WO-O4O-GOOGLE-ONLY-AUTH-CLEANUP-V1: 이메일 인증 체인 은퇴.
+//   토큰을 발급하는 주체가 없었다 — `requestEmailVerification` 의 호출부는 resend 엔드포인트
+//   자기 자신뿐이었고 Google 가입 경로는 이 서비스를 부르지 않는다(IR §3-5).
+//   Google 이 이미 이메일을 검증하므로 O4O 가 다시 검증할 근거도 없다.
 
 /**
  * ========================================
@@ -187,11 +164,7 @@ router.get(
   asyncHandler(AuthAccountController.status)
 );
 
-// GET /api/v1/auth/verify - Alias for /status (backward compatibility)
-router.get(
-  '/verify',
-  requireAuth,
-  asyncHandler(AuthAccountController.me)
-);
+// WO-O4O-GOOGLE-ONLY-AUTH-CLEANUP-V1: `/auth/verify` 은퇴 — `/auth/me` 와 **같은 핸들러**였고 소비처가 0이었다.
+//   인증 상태 확인은 `/auth/status`(공개) · 계정 조회는 `/auth/me` 로 일원화한다.
 
 export default router;

@@ -98,7 +98,6 @@ export function resolveExposableAccountStatus(status: unknown): ExposableAccount
 export const RESTRICTED_ALLOWLIST: ReadonlySet<string> = new Set([
   // ── 공통 인증 (로그인 세션 유지 / 로그아웃 / 본인 최소 정보) ──
   'GET /api/v1/auth/me',
-  'GET /api/v1/auth/verify',
   'GET /api/v1/auth/status',
   'POST /api/v1/auth/logout',
   'POST /api/v1/auth/logout-all',

@@ -135,79 +135,9 @@ export class UserController extends BaseController {
   //   changePassword 는 은퇴했다. users.password / service_credentials 축이 사라졌고,
   //   계정 접근 복구는 Google 계정 복구가 담당한다.
 
-  /**
-   * GET /api/v1/users/sessions
-   * Get user sessions
-   */
-  static async getSessions(req: AuthRequest, res: Response): Promise<any> {
-    if (!req.user) {
-      return BaseController.unauthorized(res, 'Not authenticated');
-    }
-
-    try {
-      const { RefreshToken } = await import('../../auth/entities/RefreshToken.js');
-      const sessionRepository = AppDataSource.getRepository(RefreshToken);
-
-      const sessions = await sessionRepository.find({
-        where: { userId: req.user.id },
-        order: { createdAt: 'DESC' },
-      });
-
-      return BaseController.ok(res, {
-        sessions: sessions.map(s => ({
-          id: s.id,
-          deviceId: s.deviceId || 'Unknown device',
-          ipAddress: s.ipAddress,
-          lastActiveAt: s.updatedAt || s.createdAt,
-          createdAt: s.createdAt,
-        })),
-      });
-    } catch (error: any) {
-      logger.error('[UserController.getSessions] Error', {
-        error: error.message,
-        userId: req.user.id,
-      });
-      return BaseController.error(res, 'Failed to get sessions');
-    }
-  }
-
-  /**
-   * DELETE /api/v1/users/sessions/:sessionId
-   * Delete a specific session
-   */
-  static async deleteSession(req: AuthRequest, res: Response): Promise<any> {
-    if (!req.user) {
-      return BaseController.unauthorized(res, 'Not authenticated');
-    }
-
-    const { sessionId } = req.params;
-
-    try {
-      const { RefreshToken } = await import('../../auth/entities/RefreshToken.js');
-      const sessionRepository = AppDataSource.getRepository(RefreshToken);
-
-      const session = await sessionRepository.findOne({
-        where: { id: sessionId, userId: req.user.id },
-      });
-
-      if (!session) {
-        return BaseController.notFound(res, 'Session not found');
-      }
-
-      await sessionRepository.remove(session);
-
-      return BaseController.ok(res, {
-        message: 'Session deleted successfully',
-      });
-    } catch (error: any) {
-      logger.error('[UserController.deleteSession] Error', {
-        error: error.message,
-        userId: req.user.id,
-        sessionId,
-      });
-      return BaseController.error(res, 'Failed to delete session');
-    }
-  }
+  // WO-O4O-GOOGLE-ONLY-AUTH-CLEANUP-V1: getSessions / deleteSession 은퇴.
+  //   `refresh_tokens` 에 INSERT 하는 코드가 0이라 항상 **빈 목록**을 읽었고,
+  //   두 메서드는 라우터에 연결돼 있지도 않았다(IR §3-7).
 
   /**
    * GET /api/v1/users/me/contact

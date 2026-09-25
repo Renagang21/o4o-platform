@@ -36,7 +36,6 @@ import LoginPage from '@/pages/auth/LoginPage';
 import HandoffPage from '@/pages/HandoffPage';
 // WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: AccountRecoveryPage · ResetPasswordPage · RegisterPage 는 은퇴했다.
 // WO-O4O-AUTH-VERIFY-EMAIL-FRONTEND-PAGE-V1: 이메일 인증 결과 페이지
-import VerifyEmailPage from '@/pages/auth/VerifyEmailPage';
 
 // ============================================================================
 // Lazy loaded pages (heavy / rarely accessed)
@@ -541,7 +540,6 @@ function AppRoutes() {
         <Route path="register" element={<Navigate to="/login" replace />} />
         <Route path="forgot-password" element={<Navigate to="/login" replace />} />
         <Route path="reset-password" element={<Navigate to="/login" replace />} />
-        <Route path="auth/verify-email" element={<VerifyEmailPage />} />
         <Route path="contact" element={<ContactPage />} />
         {/* WO-O4O-CROSSSERVICE-POLICY-ROUTES-V1: 공개 약관/개인정보처리방침 (published 만 표시) */}
         <Route path="terms" element={<TermsPage />} />

@@ -393,36 +393,8 @@ export class MailService {
 
   // WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: sendPasswordResetEmail 은퇴 — 재설정할 비밀번호가 없다.
 
-  async sendEmailVerification(email: string, verificationToken: string, serviceUrl?: string, serviceName?: string): Promise<boolean> {
-    // WO-O4O-EMAIL-VERIFICATION-LINK-PRODUCTION-URL-FIX-V1: verify URL 결정 우선순위
-    //   1. 호출자가 명시한 serviceUrl (api-server 가 serviceKey 기반 production origin 으로 주입)
-    //   2. EMAIL_VERIFICATION_DEFAULT_URL — 운영자 명시적 override 환경변수
-    //   3. FRONTEND_URL — 기존 환경변수 (legacy 호환)
-    //   4. NODE_ENV='production' → 'https://neture.co.kr' (안전한 production 기본값)
-    //      그 외 → 'http://localhost:3000' (기존 dev 동작 유지)
-    // V1 legacy 흐름(serviceKey 없는 호출)의 fallback 만 라이브러리가 책임진다.
-    const baseUrl =
-      serviceUrl
-      || process.env.EMAIL_VERIFICATION_DEFAULT_URL
-      || process.env.FRONTEND_URL
-      || (process.env.NODE_ENV === 'production'
-            ? 'https://neture.co.kr'
-            : 'http://localhost:3000');
-    const verifyUrl = `${baseUrl}/auth/verify-email?token=${verificationToken}`;
-    const displayName = serviceName || 'O4O Platform';
-
-    const result = await this.sendEmail({
-      to: email,
-      subject: `Verify Your Email - ${displayName}`,
-      template: 'email-verification',
-      templateData: {
-        verifyUrl,
-        year: new Date().getFullYear(),
-        serviceName: displayName,
-      },
-    });
-    return result.success;
-  }
+  // WO-O4O-GOOGLE-ONLY-AUTH-CLEANUP-V1: sendEmailVerification 은퇴 — 이메일 인증 체인을 제거했다.
+  //   토큰 producer 가 없어 이 메일이 발송될 경로 자체가 없었다(IR §3-5).
 
   async sendSecurityAlert(email: string, alertData: {
     type: 'suspicious_login_attempts' | 'account_locked' | 'password_changed' | 'new_device_login';

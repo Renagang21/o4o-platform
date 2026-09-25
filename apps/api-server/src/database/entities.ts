@@ -19,10 +19,7 @@ import { User } from '../entities/User.js';
 import { AuditLog } from '../entities/AuditLog.js'; // WO-O4O-ADMIN-O4O-PRODUCT-IMAGE-ACTION-V1: 공통 audit 테이블 등록
 import { Role } from '../modules/auth/entities/Role.js';
 import { Permission } from '../modules/auth/entities/Permission.js';
-import { RefreshToken } from '../modules/auth/entities/RefreshToken.js';
 import { LoginAttempt } from '../modules/auth/entities/LoginAttempt.js';
-import { LinkingSession } from '../modules/auth/entities/LinkingSession.js';
-import { EmailVerificationToken } from '../entities/EmailVerificationToken.js';
 import { ApprovalLog } from '../entities/ApprovalLog.js';
 import { ProductApproval } from '../entities/ProductApproval.js';
 import { LinkedAccount } from '../entities/LinkedAccount.js';
@@ -549,15 +546,12 @@ export const entities = [
   AuditLog, // WO-O4O-ADMIN-O4O-PRODUCT-IMAGE-ACTION-V1: 공통 audit_logs
   Role,
   Permission,
-  RefreshToken,
   RoleAssignment,
   ServiceMembership, // WO-O4O-SERVICE-MEMBERSHIP-ARCHITECTURE-V1
   // WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1 Phase B-1: ServiceCredential 등록 해제(소비처 0) · 테이블은 B-2 가 DROP.
   LoginAttempt,
-  LinkingSession,
   // Legacy AUTH entities (to be migrated)
   // WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1 Phase B-1: PasswordResetToken 등록 해제(소비처 0) · 테이블은 B-2 가 DROP.
-  EmailVerificationToken,
   ApprovalLog,
   ProductApproval, // WO-PRODUCT-POLICY-V2-DATA-LAYER-INTRODUCTION-V1
   LinkedAccount,

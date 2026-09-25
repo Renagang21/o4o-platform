@@ -184,9 +184,6 @@ export class User {
   }
 
   // Relations - lazy loaded to prevent circular dependencies
-  @OneToMany('RefreshToken', 'user')
-  refreshTokens?: any[];
-
   @OneToMany('ApprovalLog', 'user')
   approvalLogs?: any[];
 
