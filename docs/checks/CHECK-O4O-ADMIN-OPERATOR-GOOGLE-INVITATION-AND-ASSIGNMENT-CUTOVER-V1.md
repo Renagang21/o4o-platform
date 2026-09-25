@@ -1,7 +1,7 @@
 # CHECK-O4O-ADMIN-OPERATOR-GOOGLE-INVITATION-AND-ASSIGNMENT-CUTOVER-V1
 
 > WO: [`WO-O4O-ADMIN-OPERATOR-GOOGLE-INVITATION-AND-ASSIGNMENT-CUTOVER-V1`](../work-orders/WO-O4O-ADMIN-OPERATOR-GOOGLE-INVITATION-AND-ASSIGNMENT-CUTOVER-V1.md)
-> 작성일: 2026-09-23 · 상태: **DEPLOYED — 테스트 계정 정리 완료 · 실 Google SMOKE A/B 는 PENDING_USER_ACTION (§7-3)**
+> 작성일: 2026-09-23 · 상태: **SMOKE_B_PASS — Smoke A 진행 중 (§7-4)** · 배포·가드·schema 는 §7-2 까지 확인 완료
 
 ---
 
@@ -234,7 +234,7 @@ invited_by_user_id · accepted_user_id · created_at · updated_at · accepted_a
 | `GET /api/v1/admin/operator-invitations` (비인증) | **PASS** — 401 |
 | `https://neture.co.kr/operator-invitations/accept?token=<invalid>` 실브라우저 | **PASS** — 수락 화면 렌더 · "유효하지 않은 초대 링크입니다." 안내 · **비밀번호 입력 없음** · 외부 이동 없음 |
 | **Smoke A — 기존 Google 사용자 직접 지정 (실 role write)** | **PENDING_USER_ACTION** — 관리자 로그인이 Google 인증이라 사용자가 직접 수행해야 하고, 실제 권한 부여 write 는 사용자 승인 대상이다. `renagang21` 을 임의로 operator 로 만들지 않았다 |
-| **Smoke B — 초대 E2E (메일 → Google 수락 → 권한 부여)** | **PENDING_USER_ACTION** — Google 계정 선택 · 동의는 사용자가 직접 수행 |
+| **Smoke B — 초대 E2E (메일 → Google 수락 → 권한 부여)** | **PASS (2026-09-25 · §7-4)** |
 
 → 본 WO 는 **구현 · 배포 · 인증 가드 · schema · census 까지 확인 완료**이며,
 role write 가 실제로 일어나는 Smoke A · B 가 남아 **COMPLETE 가 아니다**.
@@ -295,6 +295,87 @@ smoke 계획은 이후 **B→A 로 개정**되었고 그 실행과 중단 사유
 | 기존 테스트 계정 폐기 + census + postVerify | **PASS** |
 | **Smoke B — 초대 E2E (실 Google 최초 진입)** | **PENDING_USER_ACTION** — 미사용 Google 계정 미보유. 계정 확보 시 이 절의 ②~⑥ 순서로 수행한다 |
 | **Smoke A — 기존 Google 사용자 직접 지정 (실 role write)** | **PENDING_USER_ACTION** — Smoke B 선행 필요(같은 계정을 "기존 사용자"로 만든 뒤 수행) |
+
+### 7-4. **Smoke B — 초대 E2E = PASS** (2026-09-25)
+
+사용자가 테스트 Google 계정으로 초대 메일을 수락하고 로그인했다. 판정은 **DB read-only** 로 했다
+(이 세션의 production write **0**).
+
+**전 구간**
+
+```text
+초대 생성 → 메일 수신 → Google 계정으로 수락 → 신규 O4O user 생성
+→ linked_accounts.google 생성 → cosmetics:operator 부여 → k-cosmetics membership 생성
+→ password credential 0 → 실제 /operator 진입 성공
+```
+
+| # | 검증 | 실측 |
+|---|---|---|
+| 1 | `operator_invitations` | `64174aac` · `tes***@gmail.com` · **`k-cosmetics`** · **`cosmetics:operator`** · status **`accepted`** · `accepted_user_id` = **`322667c8`** · `accepted_at` **2026-09-25 00:14:55.979+00** · `cancelled_at` NULL · 만료 전(2026-10-02) · `invited_by` `cfd2a5e7`. accepted 아닌 초대 **0** |
+| 2 | Identity | `users` **2**(admin + test) · distinct email **2** → **자동 병합 없음**. test user `322667c8` status `active`. `linked_accounts` **google 만 2행/2user**(legacy provider 0). test sub **`112789***`**(관리자 `117391***` 와 **다른 identity**) · `isVerified` true · **연결 행 email 은 NULL**(email 이 조회 키에 들어갈 수 없다) |
+| 3 | 권한 부여 | `role_assignments` `cosmetics:operator` · global · **active 1** / `service_memberships` `k-cosmetics` · **active** · role `operator`. 초대 대조 **`matching_active_role=1` · `matching_active_membership=1`**. **과다 부여 없음** — test user 총 role **1** · 총 membership **1** |
+| 4 | password 계열 | `users.password` 컬럼 **0** · `service_credentials` 테이블 **0** · 스키마 전역 password 컬럼 **0** → credential 생성은 **구조적으로 불가** |
+| 5 | 기존 관리자 불변 | `cfd2a5e7` status `active` · roles active **11** · `platform:super_admin` **1** · memberships active **5** · sub `117391***` — 변화 없음 |
+| 6 | 실사용 | 테스트 계정으로 **`k-cosmetics.site/operator` 진입 성공** — 운영자 대시보드·메뉴 렌더, "운영자는 관리자가 아닙니다" 안내가 역할 계약과 일치(해당 계정은 `cosmetics:operator` 하나만 보유) |
+
+타임스탬프 순서도 일관된다: user 생성 `00:14:55.910` → Google 연결 `.928` → role 부여 `.944` →
+invitation `accepted` `.979`.
+
+#### 7-4a. ⚠️ Smoke A 준비 중 발견 — **마지막 membership 제거가 전역 Identity 를 죽인다**
+
+지시는 "Smoke B 가 만든 role + membership 을 회수하되 users row 와 Google 연결은 유지" 였다.
+canonical 회수 경로를 읽어보니 **그대로 실행하면 계정이 죽는다**:
+
+```text
+MembershipApprovalService.deleteMember (hard)
+  STEP H1  DELETE FROM service_memberships …            ← membership 제거
+  STEP H4  남은 membership 이 0 이면
+           UPDATE users SET status='deleted', "isActive"=false   ← 계정 비활성화
+```
+
+테스트 계정은 membership 이 **k-cosmetics 하나뿐**이라 회수 즉시 잔여 0 → `isActive=false`.
+`requireAuth` 가 매 요청 `isActive` 를 검사하므로 **Google 로그인까지 차단**되어 Smoke A 가 불가능해진다.
+soft delete 도 같다 — 요청자가 `platform:super_admin` 이면 platform-admin 분기를 타
+`UPDATE users SET status='deleted'` 를 실행한다. "자기 서비스 membership 만 종료하고 users 는
+건드리지 않는" 서비스 운영자 분기는 **super_admin 으로는 도달할 수 없다**(`isPlatformAdmin` 이 요청자 scope 에서 나온다).
+
+**그래서 회수 범위를 좁혔다**(사용자 확정):
+
+| 대상 | 처리 | 근거 |
+|---|---|---|
+| `cosmetics:operator` role | **회수** — `DELETE /admin/users/:userId/role-assignments/:role` | 이 경로는 **membership · users · credential 을 건드리지 않는다**(회귀 테스트 `AdminUserController.roleRevokeSafety` 가 고정) |
+| `k-cosmetics` membership | **유지** | 제거하면 계정이 죽어 Smoke A 불가 |
+
+두 경로의 분리는 그대로 성립한다 — k-cosmetics 산출물은 *초대 경로*의 것이고 Smoke A 는
+**다른 서비스(`neture:operator`)** 로 직접 지정하므로 섞이지 않는다.
+
+**이것은 테스트상의 불편이 아니라 실제 lifecycle 결함이다.** `users` 는 전역 Identity 이고
+`service_memberships` 는 서비스 관계인데, **마지막 서비스 탈퇴가 전역 O4O Identity 를 죽인다.**
+Google 단일 Identity 원칙과 충돌한다. 이 WO 에 섞어 고치지 않고 **Smoke A 종결 직후 후속 WO**
+`WO-O4O-SERVICE-MEMBERSHIP-TERMINATION-GLOBAL-IDENTITY-DECOUPLING-V1` 로 잡는다
+(soft/hard · platform admin/service operator 분기 · 마지막 membership 제거 · 재활성화 전수 점검).
+
+#### 7-4b. FOLLOW_UP (Smoke B 실패 사유 아님 · 지금 고치지 않는다)
+
+- `role_assignments.assigned_by` 가 **NULL** — 수락 경로가 부여자를 role 행에 남기지 않는다.
+  감사 추적은 `operator_invitations.invited_by_user_id`(= `cfd2a5e7`)에 남아 있어 현재 요구는 깨지지 않는다.
+- `service_memberships.role` **표기 혼재** — 이번 건은 `operator`(무접두), `neture`·`pharmacy-hub` 는
+  `neture:operator` · `pharmacy-hub:operator`(접두). 인가는 `role_assignments`(접두)로 하므로 영향은 없다.
+  기존 구조적 debt 로 남긴다.
+
+### 7-5. Smoke A — 기존 Google 사용자 직접 지정 (진행 중)
+
+**시작 직전 기준선**(회수 후 확인할 값): active roles **0** · `k-cosmetics` membership **1**(초대 잔존) ·
+`neture` membership **0** · Google link **1** · `users.status` **active** · `isActive` **true**.
+
+**경로**: `POST /api/v1/admin/operator-assignments` `{ userId, serviceKey, role }` —
+지정 키는 **`userId`** 이며 email 은 Identity Key 가 아니라 지정 인자가 아니다(§2-1).
+
+**기대 결과**: 기존 `users.id` 그대로 · 기존 Google sub 그대로 · 신규 user 생성 **0** ·
+`linked_accounts` 추가/변경 **0** · `neture:operator` active **1** · `k-cosmetics` membership **1 유지** ·
+`neture` membership active **1** · password write **구조적으로 0** ·
+`assigned_by` = 직접 지정한 관리자 `users.id`.
+마지막으로 테스트 계정으로 `https://neture.co.kr/operator` 진입 성공 시 **Smoke A = PASS**.
 
 ## 8. 미해결 · 후속 인계
 
