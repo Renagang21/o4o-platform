@@ -19,7 +19,7 @@
 | D | 저장된 URL (DB · 알림 · 발송된 메일) | High | `foreign_visitor_partner_qr_codes.landing_url` 은 옛 호스트 절대 URL · 불변 설계 — 옛 호스트 유지 + 리다이렉트로 계속 쓸 수 있는지 먼저 확인(DB 수정은 그 다음 선택지). 알림 `targetUrl` 은 상대경로라 `/store` · `/supplier` · `/market-trial` 경로 변경 시 앱 내 legacy redirect 필요 |
 | E | 기준 문서 · RBAC 식별자 | High | 호스트 기반 서비스 판정은 Boundary F6 Rule 4 문언과 충돌. 독립 커뮤니티 회원은 ROLE-WORKSPACE §5 가 명시적으로 배제. 서비스 키 · role prefix 는 영구 내부 ID 로 유지 권고 |
 
-원 IR §5 실행 순서 1단계("인벤토리 + 기준 문서 개정")는 유지하되, 아래 §7 의 **선결 결정 8건**을 그 단계의 산출물에 포함해야 한다.
+원 IR §5 실행 순서 1단계("인벤토리 + 기준 문서 개정")는 유지하되, 아래 §8 의 **선결 결정 8건**(판단 결과는 §11)을 그 단계의 산출물에 포함해야 한다.
 
 ---
 
