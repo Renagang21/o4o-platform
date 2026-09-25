@@ -668,14 +668,9 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
       logger.error('Failed to register Product Master Image routes:', masterImageError);
     }
 
-    // 24-e3. Register Mobile Product Draft routes (WO-O4O-MOBILE-PRODUCT-DRAFT-TO-CANDIDATE-V1, Phase 4)
-    try {
-      const { createMobileProductDraftController } = await import('../modules/neture/controllers/mobile-product-draft.controller.js');
-      app.use('/api/v1/mobile/product-drafts', createMobileProductDraftController(dataSource));
-      logger.info('✅ Mobile Product Draft routes registered at /api/v1/mobile/product-drafts');
-    } catch (mobileProductDraftError) {
-      logger.error('Failed to register Mobile Product Draft routes:', mobileProductDraftError);
-    }
+    // 24-e3. (은퇴) Mobile Product Draft routes — WO-O4O-GOOGLE-ONLY-AUTH-CLEANUP-V1
+    //   유일한 소비자였던 `services/mobile-app` 을 은퇴시켰다. 배포된 적이 없고
+    //   운영 로그 30일간 `/api/v1/mobile/*` 요청이 0건이었다(IR §6-2).
 
     // 24-f. Register Operator Store Console routes (WO-O4O-STORE-CONSOLE-V1)
     app.use('/api/v1/operator/stores', operatorStoreRoutes);

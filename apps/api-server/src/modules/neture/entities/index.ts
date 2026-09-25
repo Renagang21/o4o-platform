@@ -28,14 +28,6 @@ export {
   type ProductCandidateSourceType,
   type ProductCandidateStatus,
 } from './ProductCandidate.entity.js';
-// WO-O4O-MOBILE-PRODUCT-DRAFT-TO-CANDIDATE-V1: Mobile Product Draft (Phase 4)
-export {
-  MobileProductDraft,
-  MOBILE_PRODUCT_DRAFT_STATUSES,
-  MOBILE_PRODUCT_DRAFT_SOURCE_APPS,
-  type MobileProductDraftStatus,
-  type MobileProductDraftSourceApp,
-} from './MobileProductDraft.entity.js';
 // WO-O4O-PRODUCT-DRUG-EXTENSION-PERSISTENCE-V1: Drug Extension
 export {
   ProductDrugExtension,
