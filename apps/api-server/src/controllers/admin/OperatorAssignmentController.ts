@@ -16,10 +16,6 @@ import {
   operatorAssignmentService,
   OperatorAssignmentError,
 } from '../../services/admin/operator-assignment.service.js';
-import {
-  operatorInvitationService,
-  OperatorInvitationError,
-} from '../../services/admin/operator-invitation.service.js';
 import { OperatorRoleContractError, ASSIGNABLE_OPERATOR_ROLES } from '../../config/operator-role-catalog.js';
 import logger from '../../utils/logger.js';
 
@@ -41,7 +37,6 @@ function audit(serviceKey: string, userId: string | null, actionKey: string, met
 function fail(res: Response, error: unknown, context: string): void {
   if (
     error instanceof OperatorAssignmentError
-    || error instanceof OperatorInvitationError
     || error instanceof OperatorRoleContractError
   ) {
     res.status(error.statusCode).json({ success: false, error: error.message, code: error.code });
@@ -94,69 +89,8 @@ export class OperatorAssignmentController {
     }
   };
 
-  /** GET /api/v1/admin/operator-invitations?status=pending */
-  listInvitations = async (req: AuthRequest, res: Response): Promise<void> => {
-    try {
-      const status = typeof req.query.status === 'string' ? req.query.status : undefined;
-      const invitations = await operatorInvitationService.list(status);
-      res.json({ success: true, data: { invitations } });
-    } catch (error) {
-      fail(res, error, 'listInvitations');
-    }
-  };
-
-  /** POST /api/v1/admin/operator-invitations — `{ email, serviceKey?, role }`. */
-  createInvitation = async (req: AuthRequest, res: Response): Promise<void> => {
-    try {
-      const { email, serviceKey, role } = req.body ?? {};
-      if (typeof email !== 'string') {
-        res.status(400).json({ success: false, error: '이메일이 필요합니다.', code: 'INVALID_EMAIL' });
-        return;
-      }
-      const actorId = req.user?.id ?? null;
-      const result = await operatorInvitationService.create({
-        email,
-        serviceKey,
-        role,
-        invitedByUserId: actorId,
-      });
-      audit(result.invitation.serviceKey, actorId, 'admin.operator_invitation_created', {
-        invitationId: result.invitation.id,
-        role: result.invitation.role,
-        emailSent: result.emailSent,
-      });
-      res.status(201).json({ success: true, data: result });
-    } catch (error) {
-      fail(res, error, 'createInvitation');
-    }
-  };
-
-  /** POST /api/v1/admin/operator-invitations/:id/resend — 같은 행의 토큰을 회전시켜 다시 보낸다. */
-  resendInvitation = async (req: AuthRequest, res: Response): Promise<void> => {
-    try {
-      const result = await operatorInvitationService.resend(req.params.id);
-      audit(result.invitation.serviceKey, req.user?.id ?? null, 'admin.operator_invitation_resent', {
-        invitationId: result.invitation.id,
-        emailSent: result.emailSent,
-      });
-      res.json({ success: true, data: result });
-    } catch (error) {
-      fail(res, error, 'resendInvitation');
-    }
-  };
-
-  /** POST /api/v1/admin/operator-invitations/:id/cancel — 초대만 취소한다(권한 회수 아님). */
-  cancelInvitation = async (req: AuthRequest, res: Response): Promise<void> => {
-    try {
-      const invitation = await operatorInvitationService.cancel(req.params.id);
-      audit(invitation.serviceKey, req.user?.id ?? null, 'admin.operator_invitation_cancelled', {
-        invitationId: invitation.id,
-      });
-      res.json({ success: true, data: { invitation } });
-    } catch (error) {
-      fail(res, error, 'cancelInvitation');
-    }
-  };
+  // WO-O4O-GOOGLE-ONLY-AUTH-CLEANUP-V1: 초대 endpoint 4종(list · create · resend · cancel) 은퇴.
+  //   운영자 지정은 위 직접 지정 경로로 일원화한다 — 대상자가 Google 로 가입한 뒤 지정한다.
 }
 
 export const operatorAssignmentController = new OperatorAssignmentController();
