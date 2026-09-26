@@ -1163,3 +1163,27 @@ gcloud compute url-maps add-host-rule o4o-global-lb --global --hosts=supplier.ne
 - 서비스 Hub 의 새 위치(`pharmacy.neture.co.kr` · `retail.neture.co.kr`)는 확정 주소 그대로 — 이번 단계에서 옮기지 않는다.
 
 배포 대상 · 순서 변경 없음(코드 `83d44c189` · API → web · `DEPLOY_ENABLED=false`).
+
+### 21-18. 옛 주소 전환 검증 조건 — 서비스 Hub 는 매장 Hub 로 넘어가지 않는다 (2026-09-26 사용자 지시)
+
+**조건 (KPA · K-Cosmetics `/store` 옛 주소 전환 = `VITE_UNIFIED_STORE_HANDOFF` 켜기 전)**: `/store-hub/*`(서비스 Hub)가 `store.neture.co.kr/hub/*`(매장 Hub)로 함께 넘어가지 않음을 확인한다. §21-17 의 두 Hub 구분과 충돌하지 않게 하기 위함.
+**적용 범위**: 옛 주소 전환의 검증 조건. **플래그가 꺼진 첫 코드 배포의 차단 조건은 아니다.** §21-17 의 "전환 판정 때 뺄지 정한다"는 이 조건으로 확정(빼는 쪽).
+
+#### 현재 코드 사실 (조사 · 수정 없음)
+
+| 앱 | `/store` | `/store-hub` | 결과(플래그 켜면) |
+|---|---|---|---|
+| KPA `web-kpa-society/src/App.tsx` | `KpaUnifiedStoreHandoff` | **같은 `KpaUnifiedStoreHandoff`**(L824) | `/store-hub/*` → RULES `/hub$1` 로 handoff |
+| K-Cosmetics `web-k-cosmetics/src/App.tsx` | `KCosUnifiedStoreHandoff` | **같은 `KCosUnifiedStoreHandoff`**(L706) | 동일 |
+
+- 두 앱 모두 `/store` 와 `/store-hub` 가 **한 플래그**에 묶여 있다 → 지금 코드 그대로 플래그를 켜면 조건 위반.
+- 따라서 전환 전에 **코드 조치가 필요**하다(예: `/store-hub` 경로의 handoff gate 제거, 또는 handoff api wrapper 에서 `/store-hub` 를 대상에서 제외). store-ui-core RULES(F3)는 건드리지 않는 방식을 우선한다. 조치 · 검증은 전환 판정 단계에서 수행한다.
+
+#### 전환 검증 항목 (서비스별)
+
+1. `/store`, `/store/*` → `store.neture.co.kr/work/<서비스>/store/*` 로 이동(§21-13 · §21-15 매핑).
+2. `/store-hub`, `/store-hub/*` → 서비스 앱에 **그대로 남는다**(handoff 요청 0 · URL 불변).
+3. `/store/workspace` · `/store/services` 의 목적지는 전환 판정 때 함께 확인.
+4. 공개 · 기기 경로(`/store/:slug/*` · `/qr` · `/tablet` · 송출)는 대상 아님 — 변경 0 확인.
+
+**배포 상태**: 코드 `83d44c189` · 문서 포함 main 은 이 커밋 · 운영 미반영. `DEPLOY_ENABLED=false` 유지(Google origin 확인 전). 확인 후에도 **코드 배포**와 **옛 주소 전환**을 따로 판정한다.
