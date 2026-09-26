@@ -65,25 +65,85 @@ IR 작성 시점과 `main` 이 동일(`23212304f`)하므로 **판정 drift 없�
 
 | # | 항목 | 완료 조건 | 상태 |
 |---|---|---|---|
-| T3-1 | `tsc --noEmit` | api-server + 영향 패키지 rc=0 | `[ ]` |
-| T3-2 | eslint | 변경 파일 0 error · new warning 0 | `[ ]` |
-| T3-3 | 로컬 affected suite | 관련 suite 전부 PASS | `[ ]` |
-| T3-4 | CI + SonarCloud | 새 HEAD 기준 전부 green | `[ ]` |
+| T3-1 | `tsc --noEmit` | 7개 workspace 전부 rc=0 | `[x]` |
+| T3-2 | eslint | 변경 파일 0 error · new warning 0 (`account-access.policy.ts` 의 `no-control-regex` 는 **변경 전부터 있던 기존 결함** — stash 로 원본 확인, 범위 밖이라 미수정) | `[x]` |
+| T3-3 | 로컬 3샤드 전수 | **356 suite · 6,120 PASS · FAIL 0** (샤드 2 는 heap 부족이라 `--max-old-space-size=6144` 로 완주) | `[x]` |
+| T3-4 | CI + SonarCloud | `dc8f61a3e` 기준 **전부 green** (Jest 3샤드 포함) | `[x]` |
 
 ### T4 — 배포
 
 | # | 항목 | 완료 조건 | 상태 |
 |---|---|---|---|
-| T4-1 | detector 실측 | merge SHA 기준 affected 목록 확정 | `[ ]` |
-| T4-2 | 배포 범위 명시 | **PR #236 동반 사실** 포함해 보고 | `[ ]` |
-| T4-3 | 게이트 | `DEPLOY_ENABLED` 는 **사용자만** 변경. 대기 | `[!]` |
-| T4-4 | 배포 3신호 | job 실행 · revision 생성 · **traffic 전환** | `[ ]` |
+| T4-1 | detector 실측 | `23212304..14587a9a` → **`global_or_unknown=true`**. 원인은 루트 2파일(`pnpm-lock.yaml`·`pnpm-workspace.yaml`) — dependency 제거로 9개 웹 이미지의 빌드 입력이 전부 바뀐다 | `[x]` |
+| T4-2 | 배포 범위 명시 | API + Admin + **웹 9개**. **PR #236(RBAC 가드) 동반** — 같은 `main` 선형 이력이라 분리 불가 | `[x]` |
+| T4-3 | 게이트 | 사용자가 `true` → 배포 후 제가 `false` 복구 확인 | `[x]` |
+| T4-4 | 배포 3신호 | job 11개 success · revision 11개 생성 · **6개는 pinning 으로 0% 대기라 명시 `update-traffic` 실행** → 11개 전부 newest == serving 재확인 | `[x]` |
+
+**배포 결과** (태그 `deploy/2026-09-26-google-only-auth-cleanup` · merge `14587a9ad`)
+
+```text
+o4o-core-api          03755-6zf     o4o-admin-dashboard   01315-2wn
+neture-web            01660-xsx     k-cosmetics-web       01168-bqk
+kpa-society-web       02000-d6n     pharmacy-hub-web      00258-nw5
+lecture-web           00017-vlh     store-web             00018-cnm
+kpa-branch-web        00178-sj9     hospital-pharmacy-web 00011-qnr
+signage-player-web    00091-j5m
+```
+
+migration job 정상 실행(`o4o-api-migrations-bsrgj`) · **적용 0**(이번 WO 에 migration 파일 없음 — 테이블 미삭제).
+`api.neture.co.kr/health` = 200.
 
 ### T5 — 실브라우저 검증 (배포 후)
 
-| # | surface | 완료 조건 | 상태 |
+> **T5 전체 PASS 아님.** 아래 4건만 실측됐다. 나머지는 미검증으로 남긴다.
+
+| # | surface | 근거 | 상태 |
 |---|---|---|---|
-| T5-1~8 | Neture · KPA Society · K-Cosmetics · PharmacyHub · KPA Branch · Store · Lecture(안내) · Admin | Google 로그인 성공 · 콘솔 0 이 아니라 **세션 확립까지** 확인 · 전략 변경 없음 | `[ ]` |
+| T5-1 | **Admin** Google 로그인 | 사용자 실측 — 로그인 후 활성 세션 확인 | `[x]` PASS |
+| T5-2 | **Admin 설정** | 사용자 실측 — AI Services 가 첫 탭 · OAuth 탭 없음 | `[x]` PASS |
+| T5-3 | **Admin 운영자 관리** | 사용자 실측 — '초대 대기' 탭 없음 · 등록 화면이 사용자 검색부터 | `[x]` PASS |
+| T5-4 | **Neture** Google 로그인 | 사용자 실측 — 사용자 이름 + '내 업무 공간' 표시 | `[x]` PASS |
+| T5-5 | KPA Society | — | `[ ]` **미검증** |
+| T5-6 | K-Cosmetics | — | `[ ]` **미검증** |
+| T5-7 | PharmacyHub | — | `[ ]` **미검증** |
+| T5-8 | KPA Branch | — | `[ ]` **미검증** |
+| T5-9 | Store | — | `[ ]` **미검증** |
+| T5-10 | Lecture (안내 페이지) | — | `[ ]` **미검증** |
+| T5-11 | Hospital Pharmacy | — | `[ ]` **미검증** |
+
+**왜 제가 이어서 못 하는가**: 로그인 수단이 Google 하나이고 password 경로를 은퇴시켰다.
+프로그램으로 Google 계정 인증을 수행할 수단이 없다 — 이 WO 가 만든 상태의 직접적 결과다.
+브라우저에서 사람이 눌러야 한다.
+
+### T5 를 대신하지는 못하지만, 같은 축에서 실측한 것
+
+**① 운영 API 경로 계약** (`api.neture.co.kr` · 인증 불필요 구간)
+
+| 제거한 경로 | 결과 |
+|---|---|
+| `POST /auth/google/bootstrap-admin` · `POST /auth/verify-email` · `POST /auth/resend-verification` | **404** |
+| `GET /auth/verify-email` · `GET /auth/verify` · `GET /admin/operator-invitations` · `GET /mobile/product-drafts` | **`Cannot GET …`** = 라우터 미등록 |
+
+| 유지한 경로 | 결과 |
+|---|---|
+| `GET /auth/google/config` | `200 { enabled: true, clientId … }` |
+| `GET /auth/status` | `200 { authenticated:false }` |
+| `GET /auth/me` · `/auth/services` | `401 AUTH_REQUIRED` (경로 살아 있음) |
+| `GET /admin/operator-assignments/roles` · `/candidates` | `401` (직접 지정 경로 살아 있음) |
+| `GET /auth/guest/status` | `200 { service:'guest-auth' }` |
+
+**② 배포된 프런트 번들 실측** — 각 서비스의 `index-*.js` 를 받아 검사
+
+| 서비스 | `auth/google/login` | `includeLegacyTokens` | 제거 대상 3종 |
+|---|---|---|---|
+| KPA Society · K-Cosmetics · PharmacyHub · Store · Lecture | **있음** | **있음** | **0건** |
+
+로그인 경로와 현행 토큰 전략이 배포본에 그대로 살아 있고, 제거 대상(초대·이메일 인증·bootstrap)은
+번들에서 사라졌다. **세션 확립 자체는 대체하지 못한다** — 그래서 T5-5~11 은 미검증으로 둔다.
+
+**③ 각 서비스 응답** — `kpa-society.co.kr` · `k-cosmetics.site` · `pharmacyhub.co.kr` ·
+`store.neture.co.kr` · `study.neture.co.kr` · `neture.co.kr/hospital` = **200** ·
+`kpa-branch-web` run.app = **200** (`branch.kpa-society.co.kr` 은 응답 없음 — 도메인 매핑 별건, 이번 변경과 무관)
 
 ### T6 — 운영 DB 실측 `[!] 차단`
 
