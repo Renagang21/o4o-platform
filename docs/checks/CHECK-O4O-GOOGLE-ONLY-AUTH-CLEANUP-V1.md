@@ -141,7 +141,16 @@ migration job 정상 실행(`o4o-api-migrations-bsrgj`) · **적용 0**(이번 W
 **현상**: `https://store.neture.co.kr/login` 에서 Google 로그인 클릭 시 Google 이
 `400: origin_mismatch` 로 차단. **Store T5 = FAIL.**
 
-**원인 = 승인된 JavaScript 원본 등록 누락** (잘못된 클라이언트 ID 사용 아님). 근거:
+**원인 = Store 가 사용한 origin 이 해당 OAuth 클라이언트에 승인돼 있지 않음**
+(잘못된 클라이언트 ID 사용 **아님**).
+
+> **표현의 한계를 지킨다.** 나는 Console 의 승인 목록을 **읽지 못했다**(조회 API 부재 · 아래 참조).
+> 그래서 "`https://store.neture.co.kr` 가 목록에서 빠져 있다" 고 단정하지 않는다.
+> 내가 증거로 말할 수 있는 것은 "**Store 가 쓴 origin 이 승인돼 있지 않다**" 까지다 —
+> 실제 등록 여부와 어떤 형태로 들어 있는지(오타·`http://`·포트·trailing slash 등)는
+> **Console 에서 최종 확인**해야 한다.
+
+근거:
 
 | 실측 | 결과 |
 |---|---|
@@ -153,12 +162,16 @@ migration job 정상 실행(`o4o-api-migrations-bsrgj`) · **적용 0**(이번 W
 같은 클라이언트 ID · 같은 코드 경로인데 Store 만 차단된다 → **다른 것은 origin 하나뿐**이다.
 즉 그 OAuth 클라이언트의 **승인된 JavaScript 원본에 `https://store.neture.co.kr` 가 없다.**
 
-**조치 위치 = Google Cloud Console (코드 변경 0 · 배포 0)**
+**조치 위치 = Google Cloud Console (코드 변경 0 · 배포 0)** — 먼저 **확인**, 없을 때만 추가
 
 ```text
 Google Cloud Console → API 및 서비스 → 사용자 인증 정보
 → OAuth 2.0 클라이언트 ID  117791934476-q2qsk…
-→ 승인된 JavaScript 원본에  https://store.neture.co.kr  추가
+→ 승인된 JavaScript 원본에서 다음 4개를 **대조**하고, 없는 것만 추가
+     https://store.neture.co.kr      (이번 FAIL 대상)
+     https://kpa-society.co.kr       (T5-5 · T5-8 분회는 host 가 이것)
+     https://k-cosmetics.site        (T5-6)
+     https://pharmacyhub.co.kr       (T5-7)
 ```
 
 저장 후 반영에 수 분 걸릴 수 있다. **비밀값(클라이언트 보안 비밀)은 다루지 않는다** — 이 조치는
@@ -168,11 +181,16 @@ Google Cloud Console → API 및 서비스 → 사용자 인증 정보
 > (`gcloud alpha iap oauth-clients` 는 IAP 전용 · OAuth2 client 조회 API 는 404).
 > 따라서 "등록돼 있는지" 는 Console 화면으로만 대조할 수 있다.
 
-**⚠️ 같은 누락이 다른 군 A 서비스에도 있을 수 있다.** 동작이 확인된 origin 은
-`neture.co.kr` · `admin.neture.co.kr` 둘뿐이다. 미검증 4건
-(`kpa-society.co.kr` · `k-cosmetics.site` · `pharmacyhub.co.kr`, 그리고 `kpa-society.co.kr/kpa` 는
-host 가 `kpa-society.co.kr`)도 **같은 목록에 등록돼 있어야** 한다. Console 을 여는 김에 함께 대조하면
-T5 군 A 를 한 번에 정리할 수 있다.
+**⚠️ 같은 상태가 다른 군 A 서비스에도 있을 수 있다.** 승인이 확인된 origin 은
+`neture.co.kr` · `admin.neture.co.kr` 둘뿐이다(그 화면에서 직접 눌러 PASS 했으므로).
+나머지는 **아직 아무것도 증명되지 않았다.**
+
+> **세션 이동 성공은 origin 승인을 증명하지 않는다.**
+> Neture 에서 로그인한 뒤 다른 서비스로 넘어가 화면이 열리는 것은 **세션 공유**의 결과이고,
+> 그 서비스에서 **Google 버튼을 직접 눌렀을 때** Google 이 그 origin 을 받아주는지와는 **별개**다.
+> `origin_mismatch` 는 버튼을 누른 그 순간의 host 로 판정되기 때문이다.
+> 따라서 군 A 5건은 **각 서비스의 로그인 버튼에서 직접 시작**해야 하고,
+> 다른 서비스를 거쳐 들어간 결과로 PASS 를 기록하지 않는다.
 
 **재검증 조건** — origin 추가 후 **Store 로그인 버튼에서 다시 시작**해
 Google 인증 → Store 복귀 → 세션 성립 → 사용자 정보 표시까지 실브라우저로 확인한다.
