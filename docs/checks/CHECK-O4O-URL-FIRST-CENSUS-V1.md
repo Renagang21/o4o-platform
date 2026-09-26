@@ -923,3 +923,43 @@ gcloud compute url-maps add-host-rule o4o-global-lb --global --hosts=supplier.ne
 - 승인된 "공급자 · 펀딩 handoff 대상 추가"는 작업공간 대상을 늘리는 방식인데, `handoff_tokens` 의 CHECK 제약이 `target_workspace = 'store'` 만 허용한다(`1789974015939-AlterHandoffTokensTargetWorkspace.ts:29-33`) → **제약 변경 migration 필요 = 중지 조건(DB schema)**. 코드는 아직 넣지 않았다.
 - 제안: incremental migration 으로 제약을 `target_workspace IN ('store','supplier','funding')` 로 교체(+ `expected-schema-states` · ledger spec 같은 커밋), `HANDOFF_WORKSPACES` 확장, 대상별 exchange origin lock(`supplier.neture.co.kr` · `funding.neture.co.kr` 정확 일치), 대상 URL 생성, Neture 에서 공급자 · 펀딩으로 가는 진입 링크를 handoff 로. 원복 = 이전 제약으로 되돌리는 down migration.
 - 이 전까지: 새 호스트에서 **직접 Google 로그인**은 가능(Google 승인 원본 등록 전제).
+
+### 21-11. 통제 배포 준비 · handoff migration 설계 (2026-09-26 사용자 판정)
+
+**판정(사용자)**: 서브도메인 코드 `236c22dfc` 를 먼저 통제 배포(조건부 승인 — Google 원본 확인 · 배포 직전 SHA/CI/revision 점검 선행, `303221b8b` Supplier 동결 포함 범위), handoff 제약 변경 migration 은 **같은 TODO 의 다음 단계**로 구현 · 운영 적용은 검토 후. 첫 배포(migration 0건)와 DB 변경의 판정은 분리한다.
+
+#### 배포 선행 조건 — Google 승인 원본
+
+| 원본 | 상태 | 근거 |
+|---|---|---|
+| `https://supplier.neture.co.kr` · `https://funding.neture.co.kr` · `https://community.neture.co.kr` · `https://pharmacy.neture.co.kr` · `https://retail.neture.co.kr` · `https://kpa.neture.co.kr` | **미확인** | GCP 콘솔(OAuth 웹 클라이언트) 화면은 gcloud 로 조회 불가 · 이 세션에 브라우저 도구 없음. Google `checkOrigin` 공개 엔드포인트는 등록된 `neture.co.kr` 까지 모두 403 → 증거로 쓸 수 없음 |
+| `https://store.neture.co.kr` | **미확인**(기존) | 동일 |
+
+→ **사용자 콘솔 확인 · 누락분 등록 · 캡처(또는 실제 로그인 결과) 전까지 배포 보류.** 등록 완료로 추정하지 않는다.
+
+#### 배포 직전 점검 절차 (조건 충족 시)
+
+1. `git fetch` → `origin/main` 이 `236c22dfc` 인지 확인. **다르면 중지** — 게이트를 연 동안의 push 는 곧바로 배포된다(push 트리거). 현재 작업트리에 다른 세션의 미커밋 변경(ai-tools · package.json · lockfile)이 있어, 게이트 개방 중 push 가능성을 사용자와 확인한다.
+2. `236c22dfc` CI success 확인(run 36228186534 ✔).
+3. 서비스별 현재 revision · 이미지 태그 기록(원복 대상 = `14587a9ad` 이미지 revision).
+4. `gh variable set DEPLOY_ENABLED --body true` → API workflow dispatch(main) → 배포 3신호(job 실행 · revision 생성 · traffic 100%) 확인 → API 회귀 smoke(`/health` · 기존 로그인 경로 · exchange 응답에 `Set-Cookie` 없음).
+5. 웹 앱 순서 dispatch: neture-web → kpa-branch-web → store-web · k-cosmetics-web · lecture-web · pharmacy-hub-web → o4o-admin-dashboard. 각 단계 기존 호스트 · 새 호스트 실측.
+6. 감시: 같은 시간대 다른 서비스 자동 추종 · 재실행(deploy-web concurrency 상호 취소 주의).
+7. 종료: `gh variable set DEPLOY_ENABLED --body false` → 확인.
+8. 회귀 시: 해당 서비스 `gcloud run services update-traffic <svc> --to-revisions=<이전 revision>=100`.
+9. cutover 플래그(`VITE_HOST_CUTOVER_SUPPLIER` / `_FUNDING`)는 **꺼 둔 채** 배포.
+
+#### handoff 제약 변경 migration — 설계 (구현 승인 · 운영 적용은 검토 후)
+
+**왜 지금 파일을 main 에 넣지 않는가**: 이 저장소는 API 배포 Job 이 migration 을 자동 실행한다. `236c22dfc` 배포 전에 migration 이 main 에 들어가면 첫 배포(= main 기준 dispatch)에 DB 변경이 섞인다. → **첫 배포 완료 후** migration 커밋을 올린다(사용자 지시 "섞지 말 것").
+
+| 항목 | 내용 |
+|---|---|
+| 파일 | `apps/api-server/src/database/migrations/<ts>-ExtendHandoffTokensWorkspaceTargets.ts` + `database/incremental/manifest.ts` 등록 |
+| up | `DROP CONSTRAINT "CHK_handoff_tokens_target_kind"` → 재생성: `(target_service_key IS NOT NULL AND target_workspace IS NULL) OR (target_service_key IS NULL AND target_workspace IS NOT NULL AND target_workspace IN ('store','supplier','funding'))` — `store` 보존, 두 값만 추가, 임의 문자열 금지 · 둘 다 NULL 차단 유지 |
+| down | ① `DELETE FROM handoff_tokens WHERE target_workspace IN ('supplier','funding')` (단일 사용 · 60초 TTL 토큰이라 소비 · 만료된 행은 효력 없음) ② 제약을 `'store'` 전용으로 재생성. **①이 없으면 새 대상 토큰 행이 남아 있는 한 down 이 CHECK 위반으로 실패한다** |
+| 원복 운영 조건 | 새 대상 토큰 발급 중단(코드 원복 배포 또는 해당 진입 비활성) → 60초 + 여유 대기 → 미사용 새 대상 토큰 0 확인(`SELECT count(*) … WHERE target_workspace IN ('supplier','funding') AND consumed_at IS NULL AND expires_at > now()`) → down 실행. 정리 job(`expires_at < now() - 1h` 삭제)이 이미 있다(`handoff-token.service.ts:187`) |
+| 코드 | `HANDOFF_WORKSPACES = ['store','supplier','funding']` · 대상별 exchange origin 정확 일치(`supplier.neture.co.kr` · `funding.neture.co.kr`, 비프로덕션 localhost) · 대상 URL `https://{host}/handoff?token=&returnTo=` · 대상 자격(공급자 = 활성 neture membership + 공급자 역할, 펀딩 = 인증 사용자) — 기존 store 자격 규칙 불변 |
+| 스키마 기대 상태 | `expected-schema-states.ts` 에 새 fingerprint — baseline 2026-09-18-id685 fresh bootstrap + incremental 전체를 **격리 PostgreSQL 15** 에서 산출(운영 DB fingerprint 채택 아님) · ledger spec · agent 테스트 같은 커밋 |
+| 계약 테스트 | 제약: `store` · `supplier` · `funding` 허용, 임의 값 · 둘 다 NULL 거부 / exchange: supplier 토큰을 funding · store · neture origin 에서 교환 → 401 / 기존 store · 서비스 handoff 회귀 0 / down 이 새 대상 행 삭제 후 성공 |
+| 운영 적용 | 배포 Job 자동 실행(CI/CD 원칙). 적용 전 사용자에게 migration · 영향 · 원복 결과 제시 |
