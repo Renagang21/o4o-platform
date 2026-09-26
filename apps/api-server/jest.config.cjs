@@ -40,6 +40,7 @@ module.exports = {
     // WO-O4O-HOSPITAL-PHARMACY-SERVICE-FOUNDATION-V1:
     //   병원약국 얇은 Domain Core(순수). dist 빌드 전 src 로 매핑해 결정론 테스트에서 소비한다.
     '^@o4o/hospital-pharmacy-core$': '<rootDir>/../../packages/hospital-pharmacy-core/src/index.ts',
+    '^@o4o/file-understanding-core$': '<rootDir>/../../packages/file-understanding-core/src/index.ts',
     // WO-O4O-AUTH-ACCOUNT-STATUS-UX-AND-PH-MOBILE-LOGOUT-CLOSURE-V1:
     // BaseController 가 에러코드 SSOT 를 @o4o/types 에서 가져오므로 컨트롤러 단위 테스트에 필요하다.
     '^@o4o/types$': '<rootDir>/../../packages/types/src/index.ts',

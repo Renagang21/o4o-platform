@@ -432,13 +432,13 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
     app.use('/api/ai', aiProxyRoutes);
     logger.info('✅ AI Query + Proxy routes registered at /api/ai');
 
-    // 22-hospital. Hospital Pharmacy — 로그인리스 Device Enrollment + hospital 범위 AI
-    //   (WO-O4O-HOSPITAL-PHARMACY-DEVICE-ENROLLMENT-AND-LOGINLESS-ACCESS-V1)
-    //   공유 /api/ai/* 인증은 건드리지 않는다: 이 라우터가 device-auth 게이트를 두고 기존 공통 Core 를 소비만 한다.
+    // 22-hospital. Hospital Pharmacy — 무로그인 공용 업무 서비스의 bounded AI(조사 · 파일 구조 이해)
+    //   (WO-O4O-HOSPITAL-PHARMACY-V1-FIXED-LOCAL-FILE-AND-LOGINLESS-SIMPLIFICATION)
+    //   공유 /api/ai/* 인증은 건드리지 않는다: 이 라우터가 rate limit 과 좁은 capability 만 열고 공통 Core 를 소비만 한다.
     try {
       const { createHospitalRoutes } = await import('../routes/hospital/hospital.routes.js');
-      app.use('/api/hospital', createHospitalRoutes(dataSource));
-      logger.info('✅ Hospital Pharmacy device routes registered at /api/hospital');
+      app.use('/api/hospital', createHospitalRoutes());
+      logger.info('✅ Hospital Pharmacy routes registered at /api/hospital');
     } catch (error) {
       logger.error('❌ Hospital Pharmacy routes registration failed', {
         error: error instanceof Error ? error.message : String(error),

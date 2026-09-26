@@ -856,7 +856,9 @@ test('W4. auth-client 변경 → 소비 서비스 전부 · 그래도 "9개 하�
   const v = webOf(['M\tpackages/auth-client/src/api.ts']);
   const expected = consumersOf('@o4o/auth-client');
   assert.deepEqual(onOf(v), expected);
-  assert.ok(expected.length >= 8, 'auth 계열은 실제로 거의 전 서비스가 쓴다');
+  // hospital-pharmacy 는 무로그인 V1 로 auth 의존이 없다(WO-O4O-HOSPITAL-PHARMACY-V1-FIXED-LOCAL-FILE-AND-LOGINLESS-SIMPLIFICATION).
+  assert.ok(expected.length >= 7, 'auth 계열은 실제로 거의 전 서비스가 쓴다');
+  assert.ok(!expected.includes('hospital-pharmacy'), 'hospital-pharmacy 는 auth-client 를 소비하지 않는다');
   assert.equal(v.fallback, false, '넓은 판정이어도 fallback 이 아니라 graph 결과다');
 });
 

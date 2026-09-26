@@ -612,6 +612,9 @@ importers:
       '@o4o/education-extension':
         specifier: workspace:*
         version: link:../../packages/education-extension
+      '@o4o/file-understanding-core':
+        specifier: workspace:*
+        version: link:../../packages/file-understanding-core
       '@o4o/forum-core':
         specifier: workspace:*
         version: link:../../packages/forum-core
@@ -1511,6 +1514,16 @@ importers:
         specifier: 5.4.5
         version: 5.4.5
 
+  packages/file-understanding-core:
+    dependencies:
+      xlsx:
+        specifier: 0.18.5
+        version: 0.18.5
+    devDependencies:
+      typescript:
+        specifier: ^5.7.2
+        version: 5.9.3
+
   packages/forum-core:
     dependencies:
       '@o4o/auth-client':
@@ -2344,15 +2357,9 @@ importers:
 
   services/web-hospital-pharmacy:
     dependencies:
-      '@o4o/auth-client':
+      '@o4o/file-understanding-core':
         specifier: workspace:*
-        version: link:../../packages/auth-client
-      '@o4o/auth-react':
-        specifier: workspace:*
-        version: link:../../packages/auth-react
-      '@o4o/auth-utils':
-        specifier: workspace:*
-        version: link:../../packages/auth-utils
+        version: link:../../packages/file-understanding-core
       '@o4o/hospital-pharmacy-core':
         specifier: workspace:*
         version: link:../../packages/hospital-pharmacy-core
@@ -2365,6 +2372,9 @@ importers:
       react-router-dom:
         specifier: ^7.9.6
         version: 7.9.6(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+      xlsx:
+        specifier: 0.18.5
+        version: 0.18.5
     devDependencies:
       '@types/node':
         specifier: ^24.10.1

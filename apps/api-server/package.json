@@ -101,6 +101,7 @@
     "@o4o/capabilities": "workspace:*",
     "@o4o/cpt-registry": "workspace:*",
     "@o4o/education-extension": "workspace:*",
+    "@o4o/file-understanding-core": "workspace:*",
     "@o4o/forum-core": "workspace:*",
     "@o4o/interactive-content-core": "workspace:*",
     "@o4o/lms-core": "workspace:*",
