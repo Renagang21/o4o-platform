@@ -68,7 +68,8 @@ export default function HandoffPage() {
         const response = await fetch(`${API_BASE_URL}/api/v1/auth/handoff/exchange`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
+          // credentials 를 보내지 않는다 — 세션은 body 토큰(localStorage)으로만 복원한다.
+          // 쿠키를 받으면 `.neture.co.kr` 쿠키를 쓰는 admin 세션을 덮어쓴다 (CHECK-O4O-URL-FIRST-CENSUS-V1 §19-1).
           body: JSON.stringify({ token }),
         });
         const data = await response.json().catch(() => null);

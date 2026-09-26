@@ -1,5 +1,17 @@
 # CHECK — O4O URL 중심 서비스 재구성 G0/G1 전수 대응표
 
+> **이 문서는 URL 재구성 통합 작업의 단일 TODO 이다** (2026-09-26 사용자 지시 · 실행 규칙: 큰 목표 1 = 작업 1, 새 문제 발견 ≠ 새 WO). 진행 기록은 §21.
+>
+> **INITIAL_PURPOSE** — 기존 서브디렉토리와 독립 도메인에 흩어진 O4O 기능을 확정된 URL 체계에 배치한다. 서비스별 운영 영역 · 독립 커뮤니티 · 매장 Hub 와 내 매장의 경계를 코드와 주소에서 일치시키고, 기존 QR · 인증 · 주문 경로가 전환 과정에서 끊기지 않게 한다.
+>
+> **CONFIRMED_DECISIONS** — 약국 `pharmacy.neture.co.kr` · 소매 `retail.neture.co.kr` · KPA 분회 `kpa.neture.co.kr/{분회}` · 커뮤니티 `community.neture.co.kr/pharmacist`·`/retail`(서비스 회원과 별도 가입) · 매장 `store.neture.co.kr/hub`·`/my-store`(서비스별 거래 화면은 필요한 범위에서 유지) · 공급자 `supplier.neture.co.kr`(공급자 도메인 기준 재사용) · 파트너 `partner.neture.co.kr` 예약(공급자 기능을 파트너로 되돌리지 않음) · 펀딩 `funding.neture.co.kr` · 병원약국 공개 화면 `neture.co.kr/hospital` · Cafe24 `neture.co.kr/cafe24` 유지 · 운영은 `admin.neture.co.kr` 고려하되 O4O 운영자에게 `platform:super_admin` 비부여. Neture 중복 `/hospital-drug` 제거(병원 앱 공유 저장 키 · 기기 데이터 보존). `pharmacyhub.co.kr` 에 새 독립 서비스 불가, 기존 호스트 HTTPS · QR · 호환 경로 · 데이터 식별자는 안전한 목적지 검증까지 보존. 서비스 키 · role prefix 일괄 변경 금지. **환불은 별도 확정 정책**(오프라인 처리 + 수기 기록, `WO-O4O-OFFLINE-REFUND-MANUAL-RECORD-ONLY-V1`) — PG 자동 환불을 이 작업에 다시 넣지 않는다. 그 밖의 확정 결정은 §9 · §12.
+>
+> **OUT_OF_SCOPE** — 새 사업 기능 개발 · PharmacyHub 데이터의 근거 없는 일괄 이관 · 폐기 · 환불 자동화 · signage 새 공개 도메인 · 운영 DB 무승인 쓰기. 사업 · 계약 판단이 남은 부분(opt-in 채널의 KPA 편입 등)은 현재 기능을 보존하고 결정 · 검증 조건을 이 문서에 표시한다.
+>
+> **DONE_CRITERIA** — ① 확정된 각 주소에서 의도한 앱 · 권한 화면이 열리고 직접 접속 · 새로고침 · 로그인 복귀 통과 ② 기존 인쇄 QR · 보존 대상 링크가 열리고, 인증 · 결제 옛 경로는 경로별 검증 결과 보유 ③ 관리자 세션 사용자 교체 미재현 · O4O 운영자가 관리자 전체 권한을 얻지 않음 ④ 다중 서비스 가입 매장 · 별도 커뮤니티 가입자 · 비로그인 병원 화면 핵심 흐름 검증 ⑤ 환불 자동 실행 경로 신설 0 · 의약품 거래 차단 유지 ⑥ 코드 준비 · 외부 설정 확인 · 운영 배포 결과를 구분 보고, 미확인 콘솔 · 현장 항목이 있으면 해당 전환 **미완료** + 필요한 증빙 명시.
+>
+> 방향 변경 시 먼저 기록: 원래 목적 · 새 발견 · 변경 이유 · 원래 목적과의 관계 · 범위 확대 여부 · 완료 기준 변경 여부.
+
 - 작성일: 2026-09-25
 - 단계: **G0 (현재 상태) · G1 (데이터/외부 환경 실측)**. 구현 A~F 는 이 결과 검토 후 별도 지시로 진행한다.
 - 선행: [`IR-O4O-URL-FIRST-SERVICE-RESTRUCTURE-ADDENDUM-V1`](../investigations/IR-O4O-URL-FIRST-SERVICE-RESTRUCTURE-ADDENDUM-V1.md) §0~§11 (결정 8건 = §11).
@@ -660,3 +672,83 @@ KPA 는 주문 생성 · prepare/confirm · 결제완료 핸들러 · fulfillmen
 4. **§14 결제**: 금액 결정 9개 중 최소 1 · 3 · 5.
 5. **§17 Store Hub**: 서비스 키 데이터(POP · 블로그 등)의 공통화 방식, 테스트 매장 준비 방식(격리 DB vs 운영 쓰기).
 6. §18 커뮤니티 키 명명(`retail` 키 금지 원칙과 `community.neture.co.kr/retail` 경로의 관계).
+
+---
+
+## 21. 통합 작업 진행 기록
+
+### 21-1. 2026-09-26 — 최신 main 대조 (HEAD `cacc2a57d`)
+
+§4 이후 반영된 커밋: Google-only 인증 정리(PR #238), 플랫폼 관리자 역할 가드 수정, membership 종료 분리, Supplier Domain 경계 동결(`O4O-SUPPLIER-DOMAIN-BOUNDARY-V1`, 303221b8b). 이에 따라 낡은 사실:
+
+| 위치 | 이전 | 현재 | 근거 |
+|---|---|---|---|
+| A2 `/auth/verify-email` | KEEP + REPOINT | **제거 완료**(3앱 페이지 · 백엔드 route · 메일 템플릿 전부) → 이관 대상 없음 | `auth.routes.ts:149-152` · `google-only-auth-cleanup.spec.ts:107-108` |
+| A3 `/operator-invitations/accept` | KEEP | **제거 완료**. 대체 = 관리자가 기존 Google 사용자에게 직접 지정(`/admin/operator-assignments`), 메일 초대 없음 | `OperatorAssignmentController.ts:50-66,92` |
+| X3 모바일 앱 | KEEP | **은퇴**(추적 파일 0 · `/api/v1/mobile/*` 제거) → 호스트 의존 없음 | 7595e6d27 |
+| §2-3 발송 메일 게이트 | 미확인 | **해당 없음**(인증 · 초대 메일 자체가 없음) | `mail.service.ts:355` |
+| A6 CORS | `setup-middlewares.ts:39-102` | 내용 동일 · 줄 이동(`:37-99`). funding 있음 · supplier 없음 유지 | — |
+| §19-1 전제 | — | **모두 그대로**(handoff · cookie.utils · AuthProvider 변경 0) | — |
+| 그 외 | — | `service-catalog.ts` · `store-workspace.ts` · `representative-entry.ts` · `tenant.tsx` 변경 0 | — |
+
+**Supplier 기준(`O4O-SUPPLIER-DOMAIN-BOUNDARY-V1`, FROZEN)이 이 작업에 거는 제약**
+- 호스트 · 도메인 규정은 없다(§16 · F1 과 충돌도 확정도 아님). 공급자 호스트 설계는 §16 그대로.
+- 펀딩 호스트의 문구 · SEO · 메뉴는 플랫폼 공통 제품명 **"유통참여형 펀딩"** 유지, 자금 모집 · 정산을 암시하지 않는다(:124). 이름 변경은 플랫폼 어휘 변경이라 이 작업 밖.
+- `/supplier/forum*` · `/supplier/my-forum` 은 legacy deep-link 보존 — 공급자 호스트 route 트리에서 이름 변경 · 리다이렉트 체인 금지(:53).
+- 공급자 영역에 운영자 · 커뮤니티 · Store 운영 기능 신설 금지(§9) · 조직 전환 switcher 금지(§7) → 공급자 호스트에서 `/admin`·`/operator`·`/store` 숨김과 일치.
+- **opt-in 모델 B(§13) 추가 제약**: 공급 가능 판정의 SSOT 는 `offer_service_approvals`(서비스 운영자 소유, 공급자는 읽기만), `distribution_type` 은 `(isPublic, serviceKeys)` 파생만. B 의 "승인 OR opt-in" · opt-in 을 파생에 반영 · 공급자 쓰기 권한은 모두 **이 FROZEN 기준의 명시적 개정**이 필요하다 → 결정 문구대로 현재 기능 보존, 결정 · 검증 조건만 유지.
+- 실제 공급자 계정 smoke 는 `DEFERRED_PENDING_GOOGLE_IDENTITY` → 공급자 호스트 전환 검증도 그 해제 이후.
+
+### 21-2. 인증 게이트 — §19-1 관리자 세션 사용자 교체
+
+**판정: 결함 확정(코드 · 이력), 브라우저 재현 미실시**(두 번째 사용자 계정 필요 · 운영 smoke 계정 정지 상태).
+
+- **근본 원인 = 회귀.** 2026-03-13 handoff 설계(3946b17ee)는 쿠키 전략 앱용으로 exchange 에서 쿠키도 내렸다 → 2026-03-17(adb23b828) 앱들이 localStorage 로 바뀌며 `credentials:'include'` 제거 → **2026-09-14(2464f2494) HandoffPage 재작성 때 `credentials:'include'` 재유입**, 이후 lecture · store 가 복사.
+- **노출 호스트 4곳**: neture.co.kr · store · study(같은 사이트) + **pharmacyhub.co.kr**(쿠키 도메인이 `COOKIE_DOMAIN=.neture.co.kr` 폴백 → 서드파티 쿠키 허용 브라우저에서 저장). kpa-society.co.kr · k-cosmetics.site 는 도메인 불일치로 브라우저가 거부.
+- **exchange 쿠키에 의존하는 운영 앱 없음**: 배포 서비스 8개 전부 localStorage + Bearer, admin-dashboard 는 handoff 대상 아님. 유일한 쿠키 의존은 web-account(미배포 · 카탈로그 미등록).
+
+**조치 (a) — 이번에 구현 (프론트만 · API 계약 불변)**
+- 배포되는 HandoffPage 6곳(neture · store · lecture · pharmacy-hub · k-cosmetics · kpa-branch)에서 `credentials:'include'` 제거 → 브라우저가 exchange 응답 쿠키를 저장하지 않는다. web-account 는 쿠키 전략 앱이라 제외.
+- 테스트: `apps/api-server/src/__tests__/handoff-exchange-no-credentials.spec.ts`(7개 HandoffPage 정적 계약 · PASS 7/7) · web-neture `HandoffPage.staleTokenGuard.test.tsx` 에 exchange 요청 `credentials !== 'include'` 단언 추가(PASS 3/3). eslint 오류 0(kpa-branch 기존 경고 1건은 변경 무관).
+- 한계: 이미 배포된 옛 번들 · 앞으로 복사될 페이지에는 효과 없음 → (b) 필요.
+
+**승인 대기 — (b) · (c)** (CLAUDE.md "권한 · route · API contract 변경" 중지 조건)
+- (b) 서버 `handoff.controller.ts:478` exchange 에서 `setAuthCookies` 제거(body 토큰 응답은 불변). 문서화된 "쿠키 + body 이중" 동작을 바꾸므로 승인 대상. 함께 바꿀 것: 같은 파일 주석 · `unified-store-workspace-handoff.spec.ts:263` 반전 · `representative-entry-return-handoff.spec.ts` 성공 경로 단언 · 신원 아키텍처 문서 문구.
+- (c) admin-dashboard `packages/auth-context/src/AuthProvider.tsx:129-131` — 캐시 사용자와 `/auth/status` 사용자가 다르면 조용히 채택하는 대신 세션 무효화 후 로그인으로(단 `authClient.logout()` 은 호출하지 않는다 — 다른 사용자의 refresh family 를 끊음). 공용 패키지(소비처 admin-dashboard 1곳) · 방어 심층.
+- 쿠키 이름 분리(admin 전용 쿠키) · host-only 쿠키 안은 채택하지 않음(동명 쿠키 공존 시 우선순위 불확정).
+
+**인증 게이트 나머지**
+| 항목 | 상태 |
+|---|---|
+| Store Google 로그인 origin(`https://store.neture.co.kr`) | **미확인** — `WO-O4O-GOOGLE-IDENTITY-STORE-ORIGIN-AND-SMOKE-V1` ACTIVE, CHECK 없음. 콘솔 캡처 필요 |
+| 새 호스트 Google origin · CORS · handoff 대상 | 호스트 구현 단계에서(아래 21-4) |
+| 브라우저 재현(§19-1 절차) | 계정 2개 필요 → 한 계정으로도 가능한 대체 절차: DevTools 에서 `.neture.co.kr` `accessToken` 쿠키 값 · 만료 기록 → 자기 handoff 실행 → 수정 전에는 exchange 응답에 `Set-Cookie … Domain=.neture.co.kr` 가 있고 값이 바뀜, 수정 후에는 없음 |
+
+### 21-3. §19 · §7 결함 재분류 (실행 규칙: 원래 목적 안 → 포함 / 밖 → 사유 기록)
+
+| 결함 | 분류 | 사유 · 처리 |
+|---|---|---|
+| 19-1 관리자 세션 교체 | **포함** | DONE ③. (a) 완료 · (b)(c) 승인 대기 |
+| 19-6 운영자 가드 membership 누락(`/neture/operator/registrations` · 포럼 운영자) | **포함** | DONE ③ "O4O 운영자가 전체 권한을 얻지 않음" · §15 운영자 권한 설계와 같은 작업. API 가드 변경 = 승인 대상 |
+| 19-7 펀딩 `/login?redirect=` 무시 | **포함** | DONE ① 로그인 복귀. 프론트 수정 |
+| 19-3 공급자 가격 저장 시 PH 가격행 삭제 | **포함** | OUT_OF_SCOPE 문구 "현재 기능 보존"의 대상인 PH opt-in 기능을 훼손. Supplier FROZEN 은 버그 수정 허용 |
+| §7-1 화장품 QR 호스트(`cosmetics.neture.co.kr` · `k-cosmetics.neture.co.kr` NXDOMAIN) · KCos 공개 QR route 부재 | **포함** | QR 목적지 = 이 작업의 핵심(DONE ②) |
+| §7-2 상품 QR 기본 호스트 `neture.o4o.kr` | **포함** | 동일 |
+| §7-3 `www.neture.co.kr/hospital` LB 규칙 누락 | **포함** | DONE ④ 비로그인 병원 화면. LB 변경 = 인프라(승인) |
+| §7-5 `platform_services.entry_url` · §7-6 web-store dead QR URL · §7-7 LB/인증서 잔재 | **포함** | URL 정합 |
+| §7-4 메일 MX(수신 미검증) | **포함(검증만)** | 표기 주소가 새 호스트 체계에 남는지 판단 필요. 수신 시험은 사용자 |
+| 19-2 PH 환불 행 선택 · R1 결제 확정 경쟁 | **밖** | 환불은 별도 확정 정책 — `WO-O4O-OFFLINE-REFUND-MANUAL-RECORD-ONLY-V1` 이 처리(410 · R1 설계) |
+| 19-4 공급자가 KPA B2B 주문 미표시 | **밖** | 주문 가시성 문제로 URL 목적과 무관. 현재 영향 0(`neture_orders` kpa-society 0행). PH 흡수 · B 모델 전환 조건(§13-7 ⑤)으로만 추적 — 독립 위험이 현실화(첫 KPA B2B 결제)되기 전 처리 필요, 별도 작업 여부는 그때 판단 |
+| 19-5 매장 상품 라이브러리 전역 승인 누수 · 19-8 bridge 중복 경쟁 | **밖** | 공급 노출 경계(Supplier FROZEN 영역) · fulfillment — URL 목적과 무관. 기록만 |
+| 19-9 · 인증 정리 잔재(swagger `auth.yaml:77` verify-email · `OperatorAssignmentController.ts:2,6` 주석) | **밖(문서)** | 기록물 · 주석 — 보고만 |
+
+### 21-4. 다음 실행 묶음과 필요한 판단
+
+| 묶음 | 내용 | 코드만으로 가능 | 승인 필요 지점 |
+|---|---|---|---|
+| 인증 게이트 마감 | (b) · (c) | — | (b) API 동작 · (c) 공용 패키지 |
+| QR · 호스트 정합(현재 결함) | 화장품 QR 호스트 표 2곳 → 카탈로그 파생 · 상품 QR 기본 호스트 · web-store dead URL · 펀딩 로그인 복귀 | 예 | 없음(프론트 · 서버 내부 계산) |
+| 운영자 권한 | §15 P1(`neture:operator` + `/ops`) 또는 P2 · 19-6 가드 | — | CLOSED 결정 번복 · API 가드 |
+| 호스트 진입 | neture-web 호스트 프로필(supplier · funding · community), 분회 6곳 동시 변경, pharmacy/retail 호스트 | 프론트 준비 가능 | handoff 새 대상(인증) · CORS(API 재배포) · DNS/인증서/LB/Google 콘솔(외부) |
+| 매장 · 커뮤니티 | Store Hub C안 · `/my-store` · 커뮤니티 membership | — | `store-ui-core`(F3) · DB 스키마 · RBAC F9 · ROLE-WORKSPACE V2 |
+| 배포 | 모든 운영 전환 | — | `DEPLOY_ENABLED=false`(2026-09-25T23:02Z 갱신) — 게이트 개방 전 운영 전환 완료 표시 금지 |
