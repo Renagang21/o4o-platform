@@ -151,11 +151,24 @@ B3  검증                          새 계정으로 Google 로그인 → 관리
 | A3 | `renagang21@gmail.com` 의 **내부 사용자 ID** 확인 | `[!]` **차단** — 운영 DB read 채널 없음(ADC 부재) · Admin API 는 세션 필요 |
 | A4 | 운영자 역할 11개 부여 | `[!]` **차단** — Admin 화면 조작 필요(이 세션에 브라우저 도구 없음) |
 | A5 | 관리자 권한 — **정식 경로 설계** | `[x]` §2-3 (가드 지형 실측 · 순서 확정) |
-| B1 | 정식 부여 경로 신설 — **구현·검증 완료** | `[x]` §6 (배포 전) |
-| B2 | 부여 | `[ ]` B1 배포 이후 |
+| B1 | 정식 부여 경로 — API `774803150` (PR #239) | `[x]` §6 |
+| B1-UI | **화면 액션 보완** — `7ec25d2fd` (PR #240) | `[x]` §7 |
+| — | 통합 배포 (Store 트랙과 같은 창) | `[ ]` **게이트 대기** §8 |
+| B2 | 관리자 권한 부여 (새 화면) | `[ ]` 배포 + A4 이후 |
 | B3 | 새 계정 검증 (관리자 화면 · 운영자 화면) | `[ ]` |
 | A6 | 운영자 역할 로그인 후 접근 검증 | `[ ]` A4 이후 |
 | — | (후속) 기존 계정 super_admin 회수 | **이번 범위 아님** |
+
+### 실행 순서가 강제된다
+
+```text
+A4 운영자 11개 부여
+   ↓  (이 목록은 platform:super_admin · neture:admin · neture:operator 보유자만 표시한다.
+       neture:admin/operator 가 없으면 대상이 관리자 계정 화면에 나타나지 않는다)
+통합 배포  (B1 API + UI 가 운영에 올라간다)
+   ↓
+B2 관리자 권한 부여 → B3 접근 검증
+```
 
 ### A3 — 계정 식별을 추정으로 하지 않는다
 
@@ -225,3 +238,73 @@ allowlist 우회 부재). `tsc` rc=0 · 변경 2파일 eslint 0.
 
 **배포** — `DEPLOY_ENABLED` 는 **이 작업만을 위해 열지 않는다.** B1 의 운영 배포는 다른 배포
 트랙의 준비 상태와 함께 조율한다. **배포 전에는 운영 완료로 표시하지 않는다.**
+
+---
+
+## 7. B1-UI 보완 — 화면 액션 (PR #240 · `7ec25d2fd`)
+
+**내가 빠뜨린 것을 고쳤다.** §2-3 설계에 "화면: `/settings/admin-accounts` 에 명시 액션으로 노출"
+이 있었는데 PR #239 는 API 만 만들었다. detector 가 `admin:false` 로 나온 것이 그 증거였고,
+그 상태로는 **B2 를 누가 어떤 화면에서 실행할지 불명확**했다.
+
+| 항목 | 내용 |
+|---|---|
+| 위치 | `/settings/admin-accounts` → 행 액션 **관리자 권한 부여** |
+| 호출 | 정식 경로 `POST /admin/platform-accounts/:id/super-admin` **하나만** |
+| 우회 금지 | 범용 역할 API 로 돌아가지 않는다 |
+| 노출 조건 | 이미 `super_admin` 인 계정에는 **노출하지 않는다** |
+| 오류 표시 | `GOOGLE_LINK_REQUIRED` · `TARGET_INACTIVE` · `changed:false`(멱등) 그대로 |
+| 확인 대화 | "모든 서비스 거버넌스 권한을 갖게 된다" 영향 명시 |
+
+CI: Admin fast path 전부 통과 · CodeQL success · SonarCloud success. `tsc` 0 ·
+eslint **새 경고 0**(기존 `exhaustive-deps` 경고에 이름만 추가된 것 — 변경 전에도 있던 경고).
+
+---
+
+## 8. 통합 배포 — 조건 구분과 게이트
+
+**B1 만 따로 배포할 수 없다.** 현재 운영 API(`14587a9ad`) 이후 `main` 에 쌓인 변경 중
+**`apps/api-server/src` 41파일**이 Store 트랙 것이다(handoff controller · service-catalog ·
+register-routes · setup-middlewares 등). API 를 배포하면 함께 나간다.
+
+**Store 트랙의 배포 조건** (그쪽 CHECK 인용 — `CHECK-O4O-URL-FIRST-CENSUS-V1` §21)
+
+> 운영 배포 | **대기 — Google 승인 원본 7개 미등록**. `DEPLOY_ENABLED=false` 유지. PASS 아님
+
+대상 7개: `supplier` · `funding` · `community` · `pharmacy` · `retail` · `kpa` · `store`
+`.neture.co.kr`. 그 기록상 **7개 모두 미등록**이고, 대조군(`neture.co.kr` · `kpa-society.co.kr` ·
+`k-cosmetics.site` · `pharmacyhub.co.kr` · `admin.neture.co.kr`)은 등록돼 있다.
+
+> **이것이 T5-9 Store `origin_mismatch` 를 설명한다.** `store.neture.co.kr` 미등록이며,
+> 그 트랙 기록도 "현재 운영 store-web 의 Google 로그인도 동작하지 않는 상태" 라고 적고 있다.
+>
+> **인용이지 내 실측이 아니다.** Google `checkOrigin` 조회를 재현하려 했으나 **내 호출은 일괄 403**
+> 으로 차단됐다(결과 판정이 아니라 호출 차단). 그래서 **Console 저장 후 배포 직전에 재확인**한다.
+
+**조건 구분 (요청받은 판단)**
+
+| 조건 | 이 API 배포에 필요한가 |
+|---|---|
+| Google 승인 원본 7개 | **B1 자체에는 불필요** — 새 관리자 API 는 origin 과 무관 · 부여는 서버 간 호출이다. 다만 **함께 실리는 Store 변경이 그 7개를 전제**하므로 **통합 창에는 필요** |
+| Store 트랙 준비 | **필요** — API 41파일이 함께 나간다 |
+| `DEPLOY_ENABLED` | 조건 충족 전까지 **`false` 유지**. 이 작업만을 위해 열지 않는다 |
+
+**배포 순서** — Store 트랙 §21 이 정한 순서를 따른다:
+`API → neture-web → kpa-branch-web → store/k-cosmetics/lecture/pharmacy-hub/kpa-society/hospital-pharmacy → admin`
+→ 3신호(job 실행 · revision 생성 · traffic 전환) → 게이트 즉시 `false`.
+
+> **원본 등록만으로 Store 로그인이 PASS 가 되지 않는다.** 등록 후 **로그인 버튼부터 다시** 시험해야 한다.
+
+---
+
+## 9. 남은 사용자 조작 — 2건
+
+| # | 조작 | 배포 의존 |
+|---|---|---|
+| ① | **Console**: 승인된 JavaScript 원본에 위 7개 등록 | 통합 배포의 게이트 |
+| ② | **Admin 화면**: 운영자 역할 11개 부여 (후보 검색 → Google 연결된 후보 선택) | **무관 — 지금 가능**. B2 의 선행 조건 |
+
+②에서 후보가 **유일하게 식별되지 않으면**(0건 · 동명이인 · Google 미연결) **부여를 중지하고 알린다.**
+
+두 건이 끝나면 나머지는 이어서 마감한다 — 배포 직전 원본 재확인 → 통제 배포 → B2 부여 →
+B3 접근 검증 → 결과표(§4) 작성. **운영 적용과 실제 접근 확인 전에는 DONE 으로 보고하지 않는다.**
