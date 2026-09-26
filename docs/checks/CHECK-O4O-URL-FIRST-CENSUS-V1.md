@@ -1107,3 +1107,32 @@ gcloud compute url-maps add-host-rule o4o-global-lb --global --hosts=supplier.ne
 #### 배포 영향
 
 대상 SHA 재산정 필요(이 커밋). 영향 서비스: **API 없음(이번 절)** · store-web · k-cosmetics-web(handoff wrapper — 플래그 false 라 동작 변화 0). 배포 순서는 §21-14 대로 API(`dc5b16451` 헤더) → web. `DEPLOY_ENABLED=false` 유지.
+
+### 21-16. 방향 변경 기록 — `/hub` 차이는 이번 배포 차단 조건 아님 (2026-09-26 사용자 결정 정정)
+
+| 항목 | 내용 |
+|---|---|
+| 원래 목적 | KPA · K-Cosmetics **매장 경영자용 `/store` 위치 이전**(§21-13 · §21-15) |
+| 새 발견 | K-Cosmetics `/store-hub` 와 통합 공간 `/hub` 의 화면 · 경로가 다르다(아래 표) |
+| 변경 이유 | 사용자 결정 정정 — `/hub` 가 KPA 화면과 일치하는지는 이번 배포의 차단 조건이 아니다. 허브 링크 수정을 선행 작업으로 잡지 않는다 |
+| 목적과의 관계 | `/store` 이전 판정과 분리. 차이는 **Store 통합 리팩토링**(DONE ④-2)에서 처리 |
+| 범위 확대 여부 | 없음(오히려 선행 작업 제외) |
+| 완료 기준 변경 여부 | 없음. **`/hub` 이전 완료로 표시하지 않는다** — `/hub` 는 미완 상태로 남는다 |
+
+**주소 확정 유지**: 소매 `retail.neture.co.kr` · 약국 `pharmacy.neture.co.kr` · 분회 `kpa.neture.co.kr` — 변경 없음.
+
+#### 현재 차이 (코드 조사 · 2026-09-26 · 수정 없음)
+
+| KCos `k-cosmetics.site/store-hub/*` | 통합 공간 `store.neture.co.kr/hub/*` (KCos 문맥) |
+|---|---|
+| 홈 `KCosmeticsHubPage` | KPA `StoreHubPage` 를 `cosmetics` prefix 로 렌더 |
+| `b2b` | KPA `HubB2BCatalogPage` |
+| `content` `HubContentPage` · `signage` `HubSignagePage` | KPA `HubContentLibraryPage` · `HubSignageLibraryPage` |
+| `event-offers` `HubEventOffersPage` | KPA `KpaEventOfferPage` |
+| `blog` · `pop` · `qr` · `cart` | 같은 경로 존재(KPA 화면) |
+| `services/tourists` `TouristHubPage` | **없음 → 404**(handoff RULES `/store-hub/*` → `/hub/*` 대상) |
+| — | KCos 에 없는 경로: `multilingual-product-contents(/my)` · `video` · `screen-set` · `supplier-library` |
+
+- §21-15 이식 화면의 `/hub/b2b` · `/hub/signage` 링크(원본 `/store-hub/*`)도 위 KPA 화면으로 연결된다 — 이번 단계에서 그대로 둔다.
+- 이 차이는 `VITE_UNIFIED_STORE_HANDOFF` 가 꺼져 있는 동안 KCos 사용자에게 노출되지 않는다(KCos `/store-hub/*` 는 KCos 앱이 서빙). **KCos 전환 판정 시** `/store-hub` 를 handoff 대상에서 뺄지 함께 판단한다.
+- 배포 대상 · 순서 변경 없음(§21-14 · §21-15).
