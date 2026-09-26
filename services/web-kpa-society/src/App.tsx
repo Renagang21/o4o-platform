@@ -821,7 +821,9 @@ function App() {
           {/* WO-O4O-HUB-TO-STORE-HUB-RENAMING-V1: /hub → /store-hub */}
           <Route path="/hub" element={<Navigate to="/store-hub" replace />} />
           <Route path="/hub/*" element={<Navigate to="/store-hub" replace />} />
-          <Route path="/store-hub" element={<Layout serviceName={SERVICE_NAME}><HubGuard><KpaUnifiedStoreHandoff><PharmacyHubLayout /></KpaUnifiedStoreHandoff></HubGuard></Layout>}>
+          {/* 서비스 Hub(서비스 운영자 관리)는 매장 Hub(store.neture.co.kr/hub)로 handoff 하지 않는다 — CHECK-O4O-URL-FIRST-CENSUS-V1 §21-17 · §21-18.
+              통합 매장 handoff 플래그를 켜도 /store-hub/* 는 이 앱에 남는다. */}
+          <Route path="/store-hub" element={<Layout serviceName={SERVICE_NAME}><HubGuard><PharmacyHubLayout /></HubGuard></Layout>}>
             <Route index element={<StoreHubPage />} />
             <Route path="b2b" element={<HubB2BCatalogPage />} />
             <Route path="signage" element={<HubSignageLibraryPage />} />

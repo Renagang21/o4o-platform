@@ -180,6 +180,47 @@ describe('K-Cosmetics 매장 화면 이전 — CHECK-O4O-URL-FIRST-CENSUS-V1 §2
   });
 });
 
+describe('옛 주소 전환 범위 — 서비스 Hub · 공개 · 기기 경로는 handoff 하지 않는다(§21-18 · §21-19)', () => {
+  const kpa = read('services/web-kpa-society/src/App.tsx');
+  const kcos = read('services/web-k-cosmetics/src/App.tsx');
+
+  /** 한 줄 또는 여러 줄에 걸친 <Route path=P ...> 선언의 element 영역 */
+  const routeDecl = (src: string, pathAttr: string) => {
+    const i = src.indexOf(pathAttr);
+    expect(i).toBeGreaterThan(-1);
+    const open = src.lastIndexOf('<Route', i);
+    const end = src.indexOf('>\n', src.indexOf('element=', open));
+    return src.slice(open, end + 1);
+  };
+
+  it('서비스 Hub(/store-hub)는 handoff gate 밖(두 앱)', () => {
+    expect(routeDecl(kpa, 'path="/store-hub" element=')).not.toContain('UnifiedStoreHandoff');
+    const kcosHub = kcos.slice(kcos.indexOf('path="store-hub"'), kcos.indexOf('<Route index element={<KCosmeticsHubPage />} />'));
+    expect(kcosHub).toContain('<KCosmeticsHubLayout />');
+    expect(kcosHub).not.toContain('KCosUnifiedStoreHandoff');
+  });
+
+  it('매장 경영자 /store 와 workspace/services 는 여전히 handoff gate 안(플래그로만 동작)', () => {
+    expect(kpa).toContain('<Route path="/store" element={<PharmacyGuard><KpaUnifiedStoreHandoff><KpaStoreLayoutWrapper /></KpaUnifiedStoreHandoff></PharmacyGuard>}>');
+    expect(kpa).toContain('<Route element={<PharmacyGuard><KpaUnifiedStoreHandoff><KpaStoreWorkspaceWrapper /></KpaUnifiedStoreHandoff></PharmacyGuard>}>');
+    expect(kcos).toContain('<KCosUnifiedStoreHandoff><StoreLayoutWrapper /></KCosUnifiedStoreHandoff>');
+    expect(kcos).toContain('<Route element={<StoreOwnerRoute><KCosUnifiedStoreHandoff><StoreWorkspaceWrapper /></KCosUnifiedStoreHandoff></StoreOwnerRoute>}>');
+    expect((kpa.match(/<KpaUnifiedStoreHandoff>/g) ?? []).length).toBe(2);
+    expect((kcos.match(/<KCosUnifiedStoreHandoff>/g) ?? []).length).toBe(2);
+  });
+
+  it('공개 · 기기 경로는 /store gate 밖의 최상위 절대 경로로 선언돼 있다', () => {
+    for (const p of ['/store/marketing/signage/play/:playlistId', '/store/:slug/products/:id', '/store/:slug/blog', '/store/:slug/blog/:postSlug',
+      '/qr/:slug', '/tablet/:slug', '/tablet/setup', '/multilingual-products/:publicKey', '/foreign-visitor/affiliate/:shortCode']) {
+      const decl = routeDecl(kpa, `path="${p}"`);
+      expect(decl).not.toContain('UnifiedStoreHandoff');
+    }
+    for (const p of ['path="/store/marketing/signage/play/:playlistId"', 'path="store/:slug/blog"', 'path="store/:slug/blog/:postSlug"', 'path="tablet/:slug"']) {
+      expect(routeDecl(kcos, p)).not.toContain('UnifiedStoreHandoff');
+    }
+  });
+});
+
 describe('KPA 앱 — 매장 handoff 는 서비스 지정 경로로(플래그 기본 꺼짐 유지)', () => {
   const kpa = read('services/web-kpa-society/src/App.tsx');
   it('handoff api 는 toKpaScopedStorePath 를 거친다', () => {

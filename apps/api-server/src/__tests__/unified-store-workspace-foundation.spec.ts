@@ -203,7 +203,8 @@ describe('§8-4 기존 서비스 매장 진입 → 통합 Store Workspace handof
       expect(src).toContain('isUnifiedStoreHandoffEnabled(import.meta.env.VITE_UNIFIED_STORE_HANDOFF)');
     }
     expect(norm(kpa)).toContain('<PharmacyGuard><KpaUnifiedStoreHandoff><KpaStoreLayoutWrapper /></KpaUnifiedStoreHandoff></PharmacyGuard>');
-    expect(norm(kpa)).toContain('<HubGuard><KpaUnifiedStoreHandoff><PharmacyHubLayout /></KpaUnifiedStoreHandoff></HubGuard>');
+    // 서비스 Hub(/store-hub)는 매장 Hub 로 handoff 하지 않는다 — CHECK-O4O-URL-FIRST-CENSUS-V1 §21-17 · §21-18 (사용자 결정 2026-09-26)
+    expect(norm(kpa)).toContain('<HubGuard><PharmacyHubLayout /></HubGuard>');
     expect(norm(kcos)).toContain('<StoreOwnerRoute> <KCosUnifiedStoreHandoff><StoreLayoutWrapper /></KCosUnifiedStoreHandoff> </StoreOwnerRoute>');
     expect(norm(phShell)).toContain('<PharmacyHubUnifiedStoreHandoff> <ShellLayout /> </PharmacyHubUnifiedStoreHandoff> </StoreOwnerGuard>');
   });

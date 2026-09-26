@@ -1187,3 +1187,69 @@ gcloud compute url-maps add-host-rule o4o-global-lb --global --hosts=supplier.ne
 4. 공개 · 기기 경로(`/store/:slug/*` · `/qr` · `/tablet` · 송출)는 대상 아님 — 변경 0 확인.
 
 **배포 상태**: 코드 `83d44c189` · 문서 포함 main 은 이 커밋 · 운영 미반영. `DEPLOY_ENABLED=false` 유지(Google origin 확인 전). 확인 후에도 **코드 배포**와 **옛 주소 전환**을 따로 판정한다.
+
+### 21-19. 1차 운영 배포 · `/store` 전환 준비 (2026-09-26 사용자 지시 — 통합 TODO 내 단계)
+
+#### 상태 구분 (이 절 기준)
+
+| 축 | 상태 |
+|---|---|
+| 코드 · CI | **준비 완료**(이 절 커밋의 CI 결과는 보고에 기재) — 서브도메인 · KPA/KCos `/store` 이식 · 선택 매장 헤더 · 서비스 Hub handoff 제외 |
+| 운영 배포 | **대기 — Google 승인 원본 7개 미등록**(아래). `DEPLOY_ENABLED=false` 유지. PASS 아님 |
+| 서비스별 `/store` 옛 주소 전환 | **미착수**(첫 배포 실측 PASS 후 KPA · KCos 각각 판정). 플래그 두 앱 모두 `'false'` |
+| Hub 통합(매장 Hub) | **범위 밖** — Store 리팩토링(§21-17). 완료로 표시하지 않음 |
+
+#### 1. 배포 기준 재대조
+
+- `origin/main` = 이 절 커밋 직전 `a6374ea8b`, 그 뒤 다른 세션 커밋 0. 운영 이미지 `14587a9ad` 이후 17커밋(코드 기준 `83d44c189` + 이 절 코드).
+- **이 TODO 밖 커밋 2개가 함께 실린다**: `303221b8b`(Supplier Domain 경계 동결 — Distribution SSOT · Content handoff 멱등성) · `2f4777aca`(병원약국 V1 무로그인 · `file-understanding-core` 신규 패키지 · lockfile 변경). 배포 창에서 두 트랙의 배포 가능 여부를 함께 확인한다(각 트랙 CHECK 기준).
+- **migration 0** (범위 내 migration 파일 없음 — API 배포 Job 의 자동 실행 대상 없음).
+- 영향 서비스: API · admin-dashboard · hospital-pharmacy · k-cosmetics · kpa-branch · kpa-society · lecture · neture · pharmacy-hub · store.
+
+#### 2. 서비스 Hub · 공개 · 기기 경로 handoff 제외 (코드 보완)
+
+- `web-kpa-society` `/store-hub` · `web-k-cosmetics` `store-hub` 에서 `UnifiedStoreHandoff` 게이트 제거 → 플래그를 켜도 서비스 Hub 는 각 앱에 남는다(§21-18 조건 충족). `/store` · `/store/workspace` · `/store/services` 는 게이트 유지(두 앱 각 2곳).
+- 경로 판정 실측: 실제 `App.tsx` 에서 경로를 뽑아 react-router 6.30 `matchRoutes` 로 31 URL 판정 — `/store/*`(owner 화면 · KCos 옛 alias 포함) = 게이트 안 / `/store-hub/*` = 게이트 밖 / 공개 블로그 · 상품(`/store/:slug/*`) · `/qr/:slug` · `/tablet/:slug` · `/tablet/setup` · 송출 `/store/marketing/signage/play/:id` · `/multilingual-products/*` · `/foreign-visitor/affiliate/*` · `/view/*` · `/kpa/store/*` = 게이트 밖(최상위 경로가 우선 매칭). 전부 기대와 일치.
+- 정적 계약 3건 추가(`store-service-scoped-owner-entry.spec.ts`) + 기존 foundation 계약 1줄을 이 결정으로 갱신(`<HubGuard><PharmacyHubLayout /></HubGuard>`).
+- **§21-16 표 정정**: "KCos `/store-hub/services/tourists` → `/hub` 404" 는 잘못된 기록이다 — KCos 의 `TouristHubPage` 는 `store-hub` 밖 최상위 `/services/tourists` 다(`store-hub` 하위 아님). 이번 조치로 `/store-hub/*` 자체가 handoff 대상에서 빠졌으므로 영향 없음.
+
+#### 3. Google 승인 원본 (배포 게이트)
+
+조회: 운영 client ID(공개 `/auth/google/config`)로 Google `iframerpc?action=checkOrigin`. 대조군으로 판별력 확인 — 이미 쓰는 원본은 `valid:true`, 없는 도메인은 `false`.
+
+| 원본 | 결과 |
+|---|---|
+| supplier · funding · community · pharmacy · retail · kpa · store `.neture.co.kr` | **7개 모두 `valid:false` (미등록)** |
+| 대조: `neture.co.kr` · `kpa-society.co.kr` · `k-cosmetics.site` · `pharmacyhub.co.kr` · `admin.neture.co.kr` | `valid:true` |
+| 참고: `www.neture.co.kr` · `study.neture.co.kr` | `valid:false` (이 TODO 대상 아님 — 기록만) |
+
+- 판정: **게이트 미충족 → 운영 배포 대기.** 등록은 Google Cloud Console(OAuth 2.0 웹 클라이언트 → 승인된 JavaScript 원본)에서 사용자 작업. 등록 후 반영까지 시간이 걸릴 수 있어, 배포 직전 같은 조회로 7개 `valid:true` 를 다시 확인한다.
+- `store.neture.co.kr` 미등록 = 현재 운영 store-web 의 Google 로그인도 동작하지 않는 상태(기존 배포분 포함).
+
+#### 4. 운영 검증 절차 (배포 후 · 플래그 false)
+
+계정: `renagang21`(KPA · KCos 매장 경영자 · Google 전용 — `docs/local/TEST-ACCOUNTS.local.md` §3). 운영 실측(read-only): **같은 서비스 복수 매장 사용자 0 · 매장 조직 2개 이상 사용자 0.**
+
+| # | 항목 | KPA | K-Cosmetics |
+|---|---|---|---|
+| V1 | 새 주소 직접 진입 → 로그인 → **원래 경로 복귀** | `store.neture.co.kr/work/kpa-society/store/marketing/qr` | `…/work/k-cosmetics/store/marketing/qr` |
+| V2 | 화면 · API 문맥 | `/api/v1/kpa/*` 호출 | `/api/v1/cosmetics/*` 호출 |
+| V3 | 새로고침 · 사이드바 이동 · 화면 안 `/store/...` 링크 후 URL 이 서비스 경로 유지 | ✓ | ✓ |
+| V4 | 권한 | owner-only 4화면 | 트리 전체 owner · `info` operator 제외 |
+| V5 | 선택 매장 헤더 | 요청에 `X-Store-Organization-Id` = 선택 매장 · 200 | 동일 · 홈이 선택 매장만 표시 |
+| V6 | 헤더 변조(개발자 도구로 다른 UUID) | 권한 확대 없음 — 같은 매장 응답(단일 후보) | 동일 |
+| V7 | 다른 서비스 업무 이동 후 `/store` → 공통 문맥 | ✓ | ✓ |
+| V8 | 옛 주소(플래그 false) | `kpa-society.co.kr/store/*` · `/store-hub/*` 기존 앱 그대로 | `k-cosmetics.site/store/*` · `/store-hub/*` 그대로 |
+| V9 | 공개 · 기기 | 인쇄 QR `/qr/:slug`(활성 샘플) · `/tablet/:slug` · 공개 블로그 | `/tablet/:slug` · 공개 블로그 |
+| V10 | TV 송출 | `/store/marketing/signage/play/:id` | `/work/k-cosmetics/store/marketing/signage/play/:id` |
+
+- **검증 한계(명시)**: 복수 매장 409 해소(선택 매장으로 확정)는 운영 실데이터가 없어 브라우저로 재현 불가 — 단위 테스트(§21-14)로만 확인. 운영 재현이 필요하면 테스트 매장 · 멤버십 추가(DB 쓰기 = 사용자 승인)가 선행된다.
+- 서브도메인 6호스트 · 관리자 세션 교체 실측은 §21-11 절차 그대로.
+
+#### 5. 통제 배포 순서 (게이트 충족 시)
+
+다른 세션 push 정지 확인 → 대상 SHA · CI · 기존 revision 기록 → `DEPLOY_ENABLED=true` → **API** → neture-web → kpa-branch-web → store-web · k-cosmetics-web · lecture-web · pharmacy-hub-web · kpa-society-web · hospital-pharmacy-web → admin → 배포 판정 3신호(job 실행 · revision 생성 · traffic 전환) → 실측(§4 · §21-11) → 회귀 시 해당 서비스 이전 revision 으로 traffic 복귀 → `DEPLOY_ENABLED=false`. 두 앱 `VITE_UNIFIED_STORE_HANDOFF` 는 `'false'` 유지.
+
+#### 6. 옛 `/store` 전환 판정 (첫 배포 실측 PASS 후 · 서비스별)
+
+전환 = 해당 앱 빌드 플래그 `'true'`(workflow 한 줄) 재배포. 검증 = §21-18 항목 1~4 + 인쇄 QR 샘플. 회귀 시 플래그 `'false'` 재배포. KPA · KCos 각각 판정하고 이 절에 결과를 남긴다.

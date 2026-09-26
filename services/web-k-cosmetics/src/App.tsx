@@ -703,7 +703,8 @@ function AppRoutes() {
           path="store-hub"
           element={
             <RoleGuard allowedRoles={['cosmetics:store_owner', 'cosmetics:operator', 'cosmetics:admin', 'platform:super_admin']}>
-              <KCosUnifiedStoreHandoff><KCosmeticsHubLayout /></KCosUnifiedStoreHandoff>
+              {/* 서비스 Hub(서비스 운영자 관리)는 매장 Hub(store.neture.co.kr/hub)로 handoff 하지 않는다 — CHECK-O4O-URL-FIRST-CENSUS-V1 §21-17 · §21-18 */}
+              <KCosmeticsHubLayout />
             </RoleGuard>
           }
         >
