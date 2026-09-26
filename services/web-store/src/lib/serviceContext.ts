@@ -79,9 +79,9 @@ export function writeServiceScope(key: UnifiedServiceKey | null): void {
 /**
  * 서비스 지정 매장 화면이 mount 된 서비스 — App.tsx 의 `/work/<key>/store` route 와 같은 목록이어야 한다.
  * 이 서비스로 고정된 상태에서 화면 안 `/store/...` 링크(약 69개)를 따라가면 `/work/<key>/store/...` 로
- * 바꿔 URL 에서 서비스가 드러나게 한다(§21-14). 현재 KPA 만.
+ * 바꿔 URL 에서 서비스가 드러나게 한다(§21-14). KPA(§21-13) · K-Cosmetics(§21-15).
  */
-export const SERVICE_SCOPED_STORE_KEYS: readonly UnifiedServiceKey[] = ['kpa-society'];
+export const SERVICE_SCOPED_STORE_KEYS: readonly UnifiedServiceKey[] = ['kpa-society', 'k-cosmetics'];
 
 /** `/store...` → `/work/<key>/store...` (고정 서비스에 mount 가 있을 때만, 아니면 null) */
 export function toServiceScopedStorePath(scoped: UnifiedServiceKey | null, pathWithQuery: string): string | null {

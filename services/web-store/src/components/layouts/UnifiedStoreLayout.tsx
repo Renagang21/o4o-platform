@@ -12,7 +12,13 @@
  */
 import { useEffect, type ReactNode } from 'react';
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
-import { StoreDashboardLayout, resolveStoreMenu, useStoreCapabilities, type StoreDashboardConfig } from '@o4o/store-ui-core';
+import {
+  COSMETICS_STORE_CONFIG,
+  StoreDashboardLayout,
+  resolveStoreMenu,
+  useStoreCapabilities,
+  type StoreDashboardConfig,
+} from '@o4o/store-ui-core';
 import { StoreOwnerAgreementGate } from '@o4o/shared-space-ui';
 import { getUserDisplayName } from '@o4o/account-ui';
 import { authClient, useAuth } from '../../contexts/AuthContext';
@@ -89,13 +95,14 @@ function useStoreScopeServiceKey(): string | undefined {
 export function ServiceStoreLayout() {
   const serviceKey = useStoreScopeServiceKey();
   const { workServiceKeys, scopedServiceKey, setServiceScope } = useUnifiedStore();
-  const valid = isUnifiedServiceKey(serviceKey) && workServiceKeys.includes(serviceKey);
+  const mount = isUnifiedServiceKey(serviceKey) ? SERVICE_STORE_MOUNTS[serviceKey] : undefined;
+  const valid = isUnifiedServiceKey(serviceKey) && workServiceKeys.includes(serviceKey) && !!mount;
   if (valid) setActiveServiceContext(serviceKey);
   useEffect(() => {
     if (valid && scopedServiceKey !== serviceKey) setServiceScope(serviceKey);
   }, [valid, serviceKey, scopedServiceKey, setServiceScope]);
 
-  if (!valid) {
+  if (!valid || !mount || !isUnifiedServiceKey(serviceKey)) {
     return (
       <main className="center-card"><section className="card" data-testid="service-store-unavailable">
         <h1>이용할 수 없는 매장 화면입니다</h1>
@@ -105,14 +112,42 @@ export function ServiceStoreLayout() {
     );
   }
   const config: StoreDashboardConfig = {
-    ...UNIFIED_STORE_CONFIG,
+    ...mount.menu,
     serviceName: `${SERVICE_LABEL[serviceKey]} 매장`,
     basePath: `${WORKSPACE_PATHS.serviceWork}/${serviceKey}/store`,
   };
-  return (
+  const body = (
     <StoreAgreementGate serviceKey={serviceKey}>
       <StoreWorkDashboard config={config} withCapabilities />
     </StoreAgreementGate>
+  );
+  return mount.ownerOnly ? <ServiceRoleOnly serviceKey={serviceKey}>{body}</ServiceRoleOnly> : body;
+}
+
+/**
+ * 서비스 지정 매장 화면의 서비스별 차이 — §21-13 · §21-15
+ *   menu      : 사이드바(basePath 는 위에서 서비스 경로로 덮는다). KPA = 공통 트리 메뉴, KCos = 원본 앱 메뉴(`COSMETICS_STORE_CONFIG`).
+ *   ownerOnly : 원본 앱이 `/store` 전체를 매장 경영자 가드로 막았는지(KCos `StoreOwnerGuard`). KPA 는 화면 단위(StoreOwnerOnly).
+ */
+const SERVICE_STORE_MOUNTS: Partial<Record<UnifiedServiceKey, { menu: StoreDashboardConfig; ownerOnly: boolean }>> = {
+  'kpa-society': { menu: UNIFIED_STORE_CONFIG, ownerOnly: false },
+  'k-cosmetics': { menu: COSMETICS_STORE_CONFIG, ownerOnly: true },
+};
+
+/**
+ * 서비스 지정 역할 게이트 — 서비스 문맥 전환(effect) 전 첫 렌더에도 맞는 서비스로 판정하도록 serviceKey 를 직접 받는다.
+ *   roles 미지정 = 매장 경영자 규칙(`isServiceStoreOwner`). 지정 시 그 목록만(예: KCos `/store/info` 는 operator 제외).
+ */
+export function ServiceRoleOnly({ serviceKey, roles, children }: { serviceKey: UnifiedServiceKey; roles?: readonly string[]; children: ReactNode }) {
+  const { user } = useAuth();
+  const ok = roles ? (user?.roles ?? []).some((r) => roles.includes(r)) : isServiceStoreOwner(user?.roles, serviceKey);
+  if (ok) return <>{children}</>;
+  return (
+    <main className="center-card"><section className="card" data-testid="store-owner-only">
+      <h1>매장 경영자만 이용할 수 있습니다</h1>
+      <p>이 화면은 {SERVICE_LABEL[serviceKey]} 매장 경영자 권한이 필요합니다.</p>
+      <Link className="button-link" to={WORKSPACE_PATHS.home}>홈으로</Link>
+    </section></main>
   );
 }
 

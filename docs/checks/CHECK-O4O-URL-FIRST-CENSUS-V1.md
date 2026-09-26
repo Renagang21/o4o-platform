@@ -1057,3 +1057,53 @@ gcloud compute url-maps add-host-rule o4o-global-lb --global --hosts=supplier.ne
 
 - 배포: 이 절로 대상 SHA 갱신 · 영향 서비스에 **API** 추가(헤더 해석 · CORS). 순서 API → web. Google origin 확인 전 게이트 닫힘 유지.
 - 다음: KCos 매장 화면 porting(§21-13 표).
+
+### 21-15. K-Cosmetics 매장 `/store` 화면 이전 (2026-09-26 사용자 지시 — 통합 TODO 내 단계)
+
+**대상**: K-Cosmetics 매장 경영자용 `/store` 화면 트리(§21-13 표 — "링크만으로 옮길 수 없다"). 제외: PH `/store-owner` · `/store-hub` 통합 · 데이터 병합 · 공개/기기 경로(`/store/:slug/blog*` · `/tablet/:slug` · 송출 원본 경로).
+**방식**: 링크 연결이 아니라 **원본 화면 코드 이식** — 기존 선례(`services/kcos/` · 6581dc821: import 경로만 수정)와 같은 방식. 범위 확대 없음 · 완료 기준 불변(§21-12: 이전 = 서비스별 경로 · 권한 · 매장 선택 확인).
+
+#### 이식 (web-store `src/services/kcos/`)
+
+- **대상 산정**: 원본 `App.tsx` 의 `/store` 트리 44 경로(옛 alias 포함) → 화면 29개의 import closure(내부 59 파일 · 약 7.1k 줄). 외부 패키지 13개는 **전부 web-store 기존 의존성** — package.json · lockfile · Dockerfile(선별 COPY closure) 변경 0.
+- **복사 44 파일**(화면 25 · api 12 · 설정/컴포넌트/서비스 7) — import 경로만 재작성(`@/` → 상대).
+- **재사용(복사 안 함)**: 이미 이식된 KCos 화면 4개(상품 · 주문 · 매출 · 관심 요청 = `/work/k-cosmetics/*`)와 그 api 3개 · web-store 의 guide 컴포넌트/client(활성 서비스 문맥으로 동작).
+- **shim 3**: `lib/apiClient` · `contexts/AuthContext` → web-store 의 단일 client · 인증(**선택 매장 헤더 interceptor 공유**, §21-14) / `api/mypage` → 매장 화면이 쓰는 사업자 정보 부분만(내 신청 내역 · forumApi 599줄 미이식).
+
+#### 서비스별 경로 · 권한 · 매장 선택
+
+| 항목 | 원본(k-cosmetics.site) | 이식(store.neture.co.kr) |
+|---|---|---|
+| 경로 | `/store/*` | `/work/k-cosmetics/store/*` — 44 경로 1:1(정적 계약으로 대조). 상품 · 주문 · 매출 · 관심 요청은 `/work/k-cosmetics/…` 서비스 업무 화면으로 redirect(중복 이식 없음) |
+| 사이드바 | `COSMETICS_STORE_CONFIG` | 같은 config · basePath 만 서비스 경로 |
+| 트리 권한 | `StoreOwnerGuard`(cosmetics store_owner 또는 운영자 이상) | `ServiceRoleOnly`(cosmetics store_owner · admin · operator · super_admin) + 서버 store-owner 가드 |
+| `info` 권한 | RoleGuard(store_owner · admin · super_admin — operator 제외) | 같은 목록 |
+| 매장 선택 | 홈이 `/cosmetics/stores/me` **첫 매장 자동 선택** · 자체 selector | 통합 선택 매장만(`organization_id` 일치). 운영 실측(read-only): KCos 매장 2 · 조직 미연결 0 · 복수 매장 사용자 0 |
+| 서비스 문맥 | — | 진입 시 `k-cosmetics` 고정 → 화면 안 `/store/...` 링크는 `/work/k-cosmetics/store/...` 로(§21-14 규칙에 KCos 추가) |
+
+#### store 호스트에서 열리지 않던 대상 정리 (이식 화면만)
+
+- 공개 태블릿 `/tablet/:slug`(설정 화면 링크 · 미리보기 iframe 3곳) → `https://k-cosmetics.site/tablet/…`(원본 앱은 framing 헤더 없음 — `serve` 기본).
+- `/store-hub/b2b` · `/store-hub/signage` → `/hub/b2b` · `/hub/signage`.
+- 홈의 `/operator/*` 링크(원본에서도 매장 경영자에겐 운영자 전용 화면) → 매장 경영자 대응 화면(`/work/k-cosmetics/commerce/products|orders` · `/hub/signage` · 매장 없음 → `/services`). **동작 변경** — 보고 항목.
+- TV 송출: 원본은 `/store/marketing/signage/play/:id` → 이식은 chrome-free `/work/k-cosmetics/store/marketing/signage/play/:id`(`playPathPrefix`).
+- `/guide/*`(이용 방법): web-store 에 없어 KPA 이식 화면에서도 404 였다 → 활성 서비스 공개 사이트로 redirect(KPA · KCos 공통).
+
+#### K-Cosmetics 앱 handoff (플래그 기본 꺼짐 유지)
+
+- `lib/unifiedStoreScope.ts` `toKcosScopedStorePath` — `/store`, `/store/...` 는 **같은 경로를** `/work/k-cosmetics/store/...` 로. `/store/workspace` · `/store/services` · `/store-hub/*` 는 기존 RULES 결과. store-ui-core RULES(F3) 수정 없음(이식 전 공통 트리 기준 표라 KCos 에는 우회).
+- `VITE_UNIFIED_STORE_HANDOFF` 는 `'false'` 그대로 — `k-cosmetics.site/store/*` 는 기존 앱에서 동작.
+
+#### 검증
+
+- tsc: web-store(`tsconfig.app.json`) 0 · web-k-cosmetics 0 · `vite build`(web-store) PASS · eslint 오류 0 · lint ratchet 46 = baseline.
+- api 정적 계약 `store-service-scoped-owner-entry.spec.ts` 7건 추가(경로 44 대조 · 서비스 업무 redirect · 권한 · 단일 client · cockpit 매장 일치 · store 호스트 밖 경로 · KCos handoff/플래그) + KPA 기존 계약 회귀 PASS.
+- 매핑 로직 실행 확인(tsx): KCos 9 경로(`/store` · `/store/` · query 보존 · `channels` · `marketing/pop/library` · commerce · workspace · services · `/store-hub`).
+- `legacy-password-auth-retirement.spec` allowlist 에 이식본 1줄 추가 — 원본과 같은 **태블릿 PIN**(로그인 비밀번호 아님).
+- **미검증**: 브라우저 실측(배포 전 · Google origin 게이트). KPA 경로 · 옛 주소 유지는 코드 · 계약으로만 확인(플래그 false · KPA 계약 회귀 PASS).
+- **표시 차이(기록)**: web-store Tailwind `primary` 는 파랑(KPA 토큰), KCos 는 분홍 — `primary-*` 를 쓰는 일부 요소 색만 다르다(명시적 `pink-*` 는 동일).
+- **중복 코드(의도)**: 원본 앱 화면과 같은 코드가 두 곳에 있다(KPA 이식과 같은 상태). 원본 은퇴 · 공통화는 전환 판정 이후 별도 판단.
+
+#### 배포 영향
+
+대상 SHA 재산정 필요(이 커밋). 영향 서비스: **API 없음(이번 절)** · store-web · k-cosmetics-web(handoff wrapper — 플래그 false 라 동작 변화 0). 배포 순서는 §21-14 대로 API(`dc5b16451` 헤더) → web. `DEPLOY_ENABLED=false` 유지.

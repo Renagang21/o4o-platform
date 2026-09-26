@@ -26,6 +26,7 @@ import { KCosmeticsHubLayout } from '@/components/layouts/KCosmeticsHubLayout';
 import DashboardLayout from '@/components/layouts/DashboardLayout';
 import OperatorLayoutWrapper from '@/components/layouts/OperatorLayoutWrapper';
 import { RoleGuard, OperatorRoute } from '@/components/auth/RoleGuard';
+import { toKcosScopedStorePath } from '@/lib/unifiedStoreScope';
 
 // WO-O4O-STORE-PRODUCTS-SERVICE-ROUTING-V1: 매장 경영자용 매장 상품 관리 (공통 패키지)
 import { StoreProductsManagerPage } from '@o4o/store-products-ui';
@@ -421,9 +422,16 @@ const kcosStoreServicesApi = createStoreServicesApi({
  * 송출 화면(/store/marketing/signage/play/*)은 대상 아님.
  */
 const UNIFIED_STORE_HANDOFF_ENABLED = isUnifiedStoreHandoffEnabled(import.meta.env.VITE_UNIFIED_STORE_HANDOFF);
+/** 매장 화면(/store/...) returnPath → K-Cosmetics 서비스 지정 매장 화면(/work/k-cosmetics/store/...) — §21-15 */
+const kcosStoreHandoffApi = {
+  resolveWorkspaceEntryUrl: (returnPath: string) =>
+    kcosStoreServicesApi.resolveWorkspaceEntryUrl(
+      toKcosScopedStorePath(returnPath, window.location.pathname, window.location.search),
+    ),
+};
 function KCosUnifiedStoreHandoff({ children }: { children: ReactNode }) {
   return (
-    <UnifiedStoreHandoffGate enabled={UNIFIED_STORE_HANDOFF_ENABLED} serviceKey="k-cosmetics" api={kcosStoreServicesApi}>
+    <UnifiedStoreHandoffGate enabled={UNIFIED_STORE_HANDOFF_ENABLED} serviceKey="k-cosmetics" api={kcosStoreHandoffApi}>
       {children}
     </UnifiedStoreHandoffGate>
   );

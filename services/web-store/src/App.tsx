@@ -8,15 +8,16 @@
  * 공통 기능은 KPA canonical 트리(pages/pharmacy)를 서비스 prefix 만 동적으로 바꿔 1회 mount 한다(복사 3벌 금지).
  * 서비스 종속 기능은 /work/<serviceKey> 아래에만 있다. 모든 업무 화면은 StoreGate(매장 선택·서버 재검증) 뒤에 있다.
  */
-import { Suspense, lazy, type ComponentType, type ReactElement } from 'react';
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import { Suspense, lazy, useEffect, type ComponentType, type ReactElement } from 'react';
+import { BrowserRouter, Navigate, Route, Routes, useLocation, useParams } from 'react-router-dom';
 import { StoreProductsManagerPage } from '@o4o/store-products-ui';
 import { AuthProvider } from './contexts/AuthContext';
 import { StoreProvider } from './contexts/StoreContext';
 import { TermsAcceptanceGate } from './components/TermsAcceptanceGate';
 import { StoreGate } from './components/StoreGate';
 import RootShell from './components/RootShell';
-import UnifiedStoreLayout, { ServiceStoreLayout, StoreOwnerOnly } from './components/layouts/UnifiedStoreLayout';
+import UnifiedStoreLayout, { ServiceRoleOnly, ServiceStoreLayout, StoreOwnerOnly } from './components/layouts/UnifiedStoreLayout';
+import { getActiveServicePublicOrigin } from './lib/serviceContext';
 import ServiceWorkLayout, { ServiceWorkHomePage, ServiceWorkIndexPage } from './components/layouts/ServiceWorkLayout';
 import UnifiedHubLayout from './components/layouts/UnifiedHubLayout';
 import HomePage from './pages/HomePage';
@@ -81,6 +82,33 @@ const KcosStoreOrdersPage = lazy(() => import('./services/kcos/pages/StoreOrders
 const KcosStoreRevenueSummaryPage = lazy(() => import('./services/kcos/pages/StoreRevenueSummaryPage'));
 const KcosInterestRequestsPage = lazy(() => import('./services/kcos/pages/InterestRequestsPage'));
 
+// ── K-Cosmetics 매장(서비스 지정 매장 화면 /work/k-cosmetics/store) — web-k-cosmetics `/store` 화면 이식(§21-15) ──
+const KcosStoreCockpitPage = lazy(() => import('./services/kcos/pages/operator/StoreCockpitPage'));
+const KcosStoreChannelsPage = lazy(() => import('./services/kcos/pages/store/StoreChannelsPage'));
+const KcosForeignVisitorSalesSupportPage = lazy(() => import('./services/kcos/pages/store/ForeignVisitorSalesSupportPage'));
+const KcosStoreLocalProductsPage = lazy(() => import('./services/kcos/pages/store/StoreLocalProductsPage'));
+const KcosStoreTabletDisplaysPage = lazy(() => import('./services/kcos/pages/store/StoreTabletDisplaysPage'));
+const KcosStoreRecruitmentApplicationsPage = lazy(() => import('./services/kcos/pages/store/StoreRecruitmentApplicationsPage'));
+const KcosStoreSignagePage = lazy(() => import('./services/kcos/pages/store/StoreSignagePage'));
+const KcosStorePlaylistCreatePage = lazy(() => import('./services/kcos/pages/store/StorePlaylistCreatePage'));
+const KcosSignagePlayerSelectPage = named(() => import('./services/kcos/pages/store/signage/SignagePlayerSelectPage'), 'SignagePlayerSelectPage');
+const KcosSignagePlaybackPage = lazy(() => import('./services/kcos/pages/store/signage/SignagePlaybackPage'));
+const KcosStoreAssetsPage = lazy(() => import('./services/kcos/pages/store/StoreAssetsPage'));
+const KcosStoreSettingsPage = lazy(() => import('./services/kcos/pages/store/StoreSettingsPage'));
+const KcosStoreInfoPage = lazy(() => import('./services/kcos/pages/store/StoreInfoPage'));
+const KcosStoreBlogManagePage = lazy(() => import('./services/kcos/pages/store/StoreBlogManagePage'));
+const KcosStorePopV2Page = lazy(() => import('./services/kcos/pages/store/StorePopV2Page'));
+const KcosStorePopStaffPage = lazy(() => import('./services/kcos/pages/store/StorePopStaffPage'));
+const KcosStoreQrPage = lazy(() => import('./services/kcos/pages/store/StoreQrPage'));
+const KcosStoreMarketingAnalyticsPage = named(() => import('./services/kcos/pages/store/StoreMarketingAnalyticsPage'), 'StoreMarketingAnalyticsPage');
+const KcosStoreLibraryContentsPage = lazy(() => import('./services/kcos/pages/store/StoreLibraryContentsPage'));
+const KcosStoreLibraryResourcesPage = lazy(() => import('./services/kcos/pages/store/StoreLibraryResourcesPage'));
+const KcosStoreProductionMaterialsPage = lazy(() => import('./services/kcos/pages/store/StoreProductionMaterialsPage'));
+const KcosProductionMaterialEditorPage = lazy(() => import('./services/kcos/pages/store/ProductionMaterialEditorPage'));
+const KcosStoreProductDescriptionsPage = lazy(() => import('./services/kcos/pages/store/StoreProductDescriptionsPage'));
+const KcosProductMarketingPage = named(() => import('./services/kcos/pages/store/ProductMarketingPage'), 'ProductMarketingPage');
+const KcosProductPopBuilderPage = named(() => import('./services/kcos/pages/store/ProductPopBuilderPage'), 'ProductPopBuilderPage');
+
 // ── 서비스 업무: PharmacyHub ─────────────────────────────────────────────────
 const PhProductsPage = lazy(() => import('./services/ph/pages/ProductsPage'));
 const PhProductDetailPage = lazy(() => import('./services/ph/pages/ProductDetailPage'));
@@ -113,6 +141,23 @@ const NotFound = <main className="center-card"><section className="card"><h1>페
 const S = WORKSPACE_PATHS.myStore;
 const W = WORKSPACE_PATHS.serviceWork;
 const H = WORKSPACE_PATHS.storeHub;
+const KCOS_STORE_INFO_ROLES = ['cosmetics:store_owner', 'cosmetics:admin', 'platform:super_admin'] as const;
+
+/** `:param` 을 채워 이동 — 원본 앱의 ParamRedirect 와 같은 동작 */
+function ParamRedirect({ to }: { to: string }) {
+  const params = useParams();
+  return <Navigate to={to.replace(/:([A-Za-z]+)/g, (_, k: string) => encodeURIComponent(params[k] ?? ''))} replace />;
+}
+
+/**
+ * 이용 방법(`/guide/*`)은 서비스 앱이 서빙한다 — 이식 화면의 GuideBackLink 가 store 호스트에서 404 가 되지 않게
+ * 현재 서비스 문맥의 공개 사이트로 보낸다(§21-15).
+ */
+function ServiceGuideRedirect() {
+  const { pathname, search } = useLocation();
+  useEffect(() => { window.location.replace(`${getActiveServicePublicOrigin()}${pathname}${search}`); }, [pathname, search]);
+  return null;
+}
 
 /**
  * 내 매장 화면(공통 컴포넌트) — `/store/*` 와 서비스 지정 `/work/<serviceKey>/store/*` 두 곳에 같은 트리를 mount 한다.
@@ -184,6 +229,8 @@ export default function App() {
     <Route path={WORKSPACE_PATHS.handoff} element={<HandoffPage />} />
     {/* 사이니지 재생은 chrome-free (KPA 와 동일하게 layout 밖) */}
     <Route path={`${S}/marketing/signage/play/:playlistId`} element={gated(<SignagePlaybackPage />)} />
+    <Route path={`${W}/k-cosmetics/store/marketing/signage/play/:playlistId`} element={gated(<KcosSignagePlaybackPage />)} />
+    <Route path="/guide/*" element={<ServiceGuideRedirect />} />
 
     <Route element={<RootShell />}>
       <Route path={WORKSPACE_PATHS.login} element={<LoginPage />} />
@@ -205,6 +252,58 @@ export default function App() {
         <Route path="products" element={<Navigate to={`${W}/kpa-society/commerce/products`} replace />} />
         <Route path="products/b2c" element={<Navigate to={`${W}/kpa-society/commerce/products/b2c`} replace />} />
         <Route path="orders" element={<Navigate to={`${W}/kpa-society/commerce/orders`} replace />} />
+      </Route>
+      {/* K-Cosmetics 매장 경영자용 /store 의 새 위치(§21-15) — 원본 앱의 화면 · 경로 · 옛 alias 를 그대로 옮겼다.
+          서비스 업무(상품 · 주문 · 매출 · 관심 요청)는 기존 /work/k-cosmetics 화면으로 보낸다(같은 화면 중복 이식 없음). */}
+      <Route path={`${W}/k-cosmetics/store`} element={gated(<ServiceStoreLayout />)}>
+        <Route index element={<KcosStoreCockpitPage />} />
+        <Route path="my-products" element={<StoreProductsManagerPage title="O4O 주문 가능 상품" description="공급자 또는 운영자 승인 후 매장에서 반복 주문할 수 있는 O4O 공급 상품을 관리합니다." />} />
+        <Route path="channels" element={<KcosStoreChannelsPage />} />
+        <Route path="sales-channels/foreign-visitor" element={<KcosForeignVisitorSalesSupportPage />} />
+        <Route path="commerce/products" element={<Navigate to={`${W}/k-cosmetics/commerce/products`} replace />} />
+        <Route path="commerce/local-products" element={<KcosStoreLocalProductsPage />} />
+        <Route path="commerce/tablet-displays" element={<KcosStoreTabletDisplaysPage />} />
+        <Route path="commerce/orders" element={<Navigate to={`${W}/k-cosmetics/commerce/orders`} replace />} />
+        <Route path="commerce/recruitment-applications" element={<KcosStoreRecruitmentApplicationsPage />} />
+        <Route path="commerce/billing" element={<Navigate to={`${W}/k-cosmetics/commerce/billing`} replace />} />
+        <Route path="commerce/products/:productId/marketing" element={<KcosProductMarketingPage />} />
+        <Route path="commerce/products/:productId/pop" element={<KcosProductPopBuilderPage />} />
+        <Route path="marketing/signage" element={<Navigate to={`${W}/k-cosmetics/store/marketing/signage/playlist`} replace />} />
+        <Route path="marketing/signage/playlist" element={<KcosStoreSignagePage />} />
+        <Route path="marketing/signage/playlist/new" element={<KcosStorePlaylistCreatePage />} />
+        <Route path="marketing/signage/videos" element={<KcosStoreSignagePage />} />
+        <Route path="marketing/signage/schedules" element={<KcosStoreSignagePage />} />
+        <Route path="marketing/signage/player" element={<KcosSignagePlayerSelectPage />} />
+        <Route path="content" element={<KcosStoreAssetsPage />} />
+        <Route path="content/blog" element={<KcosStoreBlogManagePage />} />
+        <Route path="interest-requests" element={<Navigate to={`${W}/k-cosmetics/interest-requests`} replace />} />
+        <Route path="settings" element={<KcosStoreSettingsPage />} />
+        {/* 원본: RoleGuard(cosmetics:store_owner · cosmetics:admin · platform:super_admin) — operator 제외 */}
+        <Route path="info" element={<ServiceRoleOnly serviceKey="k-cosmetics" roles={KCOS_STORE_INFO_ROLES}><KcosStoreInfoPage /></ServiceRoleOnly>} />
+        <Route path="marketing/pop" element={<Navigate to={`${W}/k-cosmetics/store/marketing/pop-v2`} replace />} />
+        <Route path="marketing/pop-v2" element={<KcosStorePopV2Page />} />
+        <Route path="marketing/pop/library" element={<KcosStorePopStaffPage />} />
+        <Route path="marketing/qr" element={<KcosStoreQrPage />} />
+        <Route path="analytics/marketing" element={<KcosStoreMarketingAnalyticsPage />} />
+        <Route path="library/contents" element={<KcosStoreLibraryContentsPage />} />
+        <Route path="library/resources" element={<KcosStoreLibraryResourcesPage />} />
+        <Route path="library/production-materials" element={<KcosStoreProductionMaterialsPage />} />
+        <Route path="library/production-materials/new" element={<KcosProductionMaterialEditorPage />} />
+        <Route path="library/product-descriptions" element={<KcosStoreProductDescriptionsPage />} />
+        {/* 원본 앱의 옛 평면 경로(북마크 · handoff) */}
+        <Route path="local-products" element={<Navigate to={`${W}/k-cosmetics/store/commerce/local-products`} replace />} />
+        <Route path="tablet-displays" element={<Navigate to={`${W}/k-cosmetics/store/commerce/tablet-displays`} replace />} />
+        <Route path="orders" element={<Navigate to={`${W}/k-cosmetics/commerce/orders`} replace />} />
+        <Route path="billing" element={<Navigate to={`${W}/k-cosmetics/commerce/billing`} replace />} />
+        <Route path="signage" element={<Navigate to={`${W}/k-cosmetics/store/marketing/signage/playlist`} replace />} />
+        <Route path="signage/playlist" element={<Navigate to={`${W}/k-cosmetics/store/marketing/signage/playlist`} replace />} />
+        <Route path="signage/videos" element={<Navigate to={`${W}/k-cosmetics/store/marketing/signage/videos`} replace />} />
+        <Route path="signage/schedules" element={<Navigate to={`${W}/k-cosmetics/store/marketing/signage/schedules`} replace />} />
+        <Route path="signage/player" element={<Navigate to={`${W}/k-cosmetics/store/marketing/signage/player`} replace />} />
+        <Route path="signage/play/:playlistId" element={<ParamRedirect to={`${W}/k-cosmetics/store/marketing/signage/play/:playlistId`} />} />
+        <Route path="pop" element={<Navigate to={`${W}/k-cosmetics/store/marketing/pop-v2`} replace />} />
+        <Route path="qr" element={<Navigate to={`${W}/k-cosmetics/store/marketing/qr`} replace />} />
+        <Route path="*" element={NotFound} />
       </Route>
       <Route path={W} element={gated(<ServiceWorkIndexPage />)} />
       <Route path={`${W}/:serviceKey`} element={gated(<ServiceWorkLayout />)}>

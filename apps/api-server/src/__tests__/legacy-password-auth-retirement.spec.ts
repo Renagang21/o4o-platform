@@ -90,6 +90,8 @@ const PASSWORD_INPUT_ALLOWLIST = [
   'apps/admin-dashboard/src/pages/__debug__/AuthStateJsonDebug.tsx',
   // 매장 태블릿 PIN(선택) — 사용자 로그인 비밀번호가 아니다(CHECK §1-6 OUT_OF_SCOPE).
   'services/web-k-cosmetics/src/pages/store/StoreSettingsPage.tsx',
+  // 같은 화면의 store.neture.co.kr 이식본(CHECK-O4O-URL-FIRST-CENSUS-V1 §21-15) — 같은 태블릿 PIN 입력.
+  'services/web-store/src/services/kcos/pages/store/StoreSettingsPage.tsx',
   // SMTP 발신 계정 비밀번호/앱 비밀번호 — 메일 전송 자격이며 로그인 축이 아니다.
   'services/web-neture/src/pages/admin/settings/EmailSettingsPage.tsx',
 ];
