@@ -54,6 +54,10 @@ function mockRes() {
   const res: any = { statusCode: 200, body: undefined };
   res.status = (c: number) => { res.statusCode = c; return res; };
   res.json = (b: unknown) => { res.body = b; return res; };
+  // 쿠키를 내리는 모든 경로를 기록한다 — exchange 는 어떤 것도 호출하지 않아야 한다(URL-FIRST-CENSUS §19-1).
+  res.cookie = jest.fn(() => res);
+  res.setHeader = jest.fn(() => res);
+  res.append = jest.fn(() => res);
   return res;
 }
 const sqlCalls = () => query.mock.calls.map((c) => norm(String(c[0])));
@@ -196,6 +200,12 @@ describe('C. exchangeHandoff', () => {
       expect(res.statusCode).toBe(200);
       expect(res.body.data.targetServiceKey).toBe('neture');
       expect(res.body.data.user.memberships).toEqual(KPA_ONLY_MEMBERSHIPS); // neture membership 이 생기지 않는다
+      // 성공 경로도 쿠키를 내리지 않는다 — body 토큰만(URL-FIRST-CENSUS §19-1 · §21-2)
+      expect(res.body.data.tokens).toEqual(expect.objectContaining({ accessToken: expect.any(String) }));
+      expect(setAuthCookies).not.toHaveBeenCalled();
+      expect(res.cookie).not.toHaveBeenCalled();
+      expect(res.setHeader).not.toHaveBeenCalledWith('Set-Cookie', expect.anything());
+      expect(res.append).not.toHaveBeenCalledWith('Set-Cookie', expect.anything());
       expect(generateTokens).toHaveBeenCalledWith(KPA_ONLY_USER, ['kpa:store_owner'], 'neture.co.kr', KPA_ONLY_MEMBERSHIPS, 'fam-1');
       expect(persistRefreshTokenFamily).toHaveBeenCalledWith('user-1', 'RT');
       // SQL 은 토큰 consume(UPDATE handoff_tokens) + memberships SELECT 뿐 — membership·role 생성/수정 0

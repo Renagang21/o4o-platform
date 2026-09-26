@@ -23,7 +23,7 @@ type GoogleStage = 'loading' | 'disabled' | 'ready';
 
 const Login: FC = () => {
   
-  const { loginWithGoogle, getGoogleAuthConfig, isAuthenticated, error, clearError, isAdmin } = useAuth();
+  const { loginWithGoogle, getGoogleAuthConfig, isAuthenticated, error, clearError, isAdmin, sessionConflict } = useAuth();
   const location = useLocation();
   const [searchParams] = useSearchParams();
 
@@ -153,6 +153,18 @@ const Login: FC = () => {
             ✅ 배포 테스트 v3.0 - {new Date().toLocaleString('ko-KR')}
           </p>
         </div>
+
+        {/* 세션 사용자 교체 안내 — 명시적 재로그인 전까지 기존 화면 · 서버 세션을 쓰지 않는다 */}
+        {sessionConflict && (
+          <div
+            role="alert"
+            data-testid="session-conflict-notice"
+            className="bg-amber-500/15 border border-amber-400/40 rounded-lg p-4 text-sm text-amber-100"
+          >
+            다른 계정의 로그인으로 이 브라우저의 관리자 세션이 바뀌었습니다. 보안을 위해 이전 화면을 닫았습니다.
+            계속하려면 관리자 계정으로 다시 로그인하세요.
+          </div>
+        )}
 
         {/* 로그인 폼 */}
         <div className="bg-white/10 backdrop-blur-md rounded-2xl p-8 shadow-2xl border border-white/20">

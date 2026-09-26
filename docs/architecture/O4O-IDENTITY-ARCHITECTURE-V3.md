@@ -51,7 +51,7 @@ L1 만 L2/L3/L4 의 부모다(FK). L2/L3/L4 사이에 직접 FK 는 없다. 본 
 | §7.4 Handoff 정책 — Identity transport · target `service_memberships.status='active'` 필수 · generate/exchange 양쪽 검증 · Join 과 분리 | **승계** (해석 A 확정. Google 단일 로그인에서는 해석 B 의 근거가 소멸) |
 | §8 Switcher "가입 시 신규 password 입력" | **폐기** — 서비스 가입은 password 없이 L3 row 생성 |
 | §9 Freeze 영향(F10 · F11 명시적 예외 승인 절차) | **승계** — 절차는 그대로, 대상 항목만 §13 표로 교체 |
-| V1 §3-§8 · §10-§15 (서버/JWT/쿠키/Handoff 메커니즘/Switcher/Account Center/CORS/도메인 3축) | **구조적으로 유지** (V2 와 동일) |
+| V1 §3-§8 · §10-§15 (서버/JWT/쿠키/Handoff 메커니즘/Switcher/Account Center/CORS/도메인 3축) | **구조적으로 유지** (V2 와 동일). **예외(2026-09-26):** V1 §8.1 "쿠키 설정" · §8.2 "Cookie domain 자동 감지" 는 승계하지 않는다 — handoff exchange 는 **body 토큰만** 반환하고 인증 쿠키를 설정하지 않는다. exchange 가 내린 `.neture.co.kr` 쿠키가 쿠키 전략인 admin-dashboard 세션을 넘겨받은 사용자로 바꾸는 결함 때문이다(handoff 대상은 전부 localStorage 전략). 근거 [`CHECK-O4O-URL-FIRST-CENSUS-V1`](../checks/CHECK-O4O-URL-FIRST-CENSUS-V1.md) §19-1 · §21-2 |
 | `service_credentials` 테이블 · dual-read 로그인 | **제거 완료 (2026-09-24)** — `WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1` 이 런타임 은퇴(Phase A) → 스키마 의존 0(B-1) → `DROP TABLE`(B-2) 순으로 정리했다. `users.password` 도 같은 migration 에서 DROP |
 
 ---

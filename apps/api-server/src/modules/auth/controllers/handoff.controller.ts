@@ -36,7 +36,6 @@ import { User } from '../entities/User.js';
 import { roleAssignmentService } from '../services/role-assignment.service.js';
 import * as tokenUtils from '../../../utils/token.utils.js';
 import { persistRefreshTokenFamily } from '../../../services/auth/auth-context.helper.js';
-import { setAuthCookies } from '../../../utils/cookie.utils.js';
 import { getService, getServiceOrigin, O4O_SERVICES } from '../../../config/service-catalog.js';
 import { STORE_WORKSPACE_KEY, STORE_WORKSPACE_ORIGIN, isStoreWorkspaceExchangeOrigin } from '../../../config/store-workspace.js';
 import { resolveAccessibleStores } from '../../../utils/service-tenant.resolver.js';
@@ -292,8 +291,10 @@ export class HandoffController extends BaseController {
    *
    * Exchange a handoff token for authentication tokens.
    * Public endpoint — the handoff token itself acts as authentication.
-   * Sets cookies for the target domain (auto-detected from Origin header).
-   * Also returns tokens in body for localStorage-strategy services.
+   * Returns tokens in body only — all handoff targets are localStorage-strategy services.
+   * Does NOT set auth cookies: a `.neture.co.kr` cookie issued here would silently switch
+   * the cookie-strategy admin-dashboard session to the handed-off user
+   * (CHECK-O4O-URL-FIRST-CENSUS-V1 §19-1 · §21-2).
    */
   static async exchangeHandoff(req: Request, res: Response): Promise<any> {
     const { token } = req.body;
@@ -474,10 +475,7 @@ export class HandoffController extends BaseController {
     );
     await persistRefreshTokenFamily(user.id, tokens.refreshToken);
 
-    // 6. Set cookies (domain auto-detected from Origin header via getCookieDomainFromOrigin)
-    setAuthCookies(req, res, tokens);
-
-    // 7. Always include tokens in body (for localStorage-strategy services)
+    // 6. Tokens in body only (localStorage-strategy services). No Set-Cookie — see class doc above.
     return BaseController.ok(res, {
       message: 'Handoff successful',
       user: {

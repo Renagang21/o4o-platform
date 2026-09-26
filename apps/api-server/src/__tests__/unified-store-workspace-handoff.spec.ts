@@ -67,6 +67,10 @@ function mockRes() {
   const res: any = { statusCode: 200, body: undefined };
   res.status = (c: number) => { res.statusCode = c; return res; };
   res.json = (b: unknown) => { res.body = b; return res; };
+  // 쿠키를 내리는 모든 경로를 기록한다 — exchange 는 어떤 것도 호출하지 않아야 한다(URL-FIRST-CENSUS §19-1).
+  res.cookie = jest.fn(() => res);
+  res.setHeader = jest.fn(() => res);
+  res.append = jest.fn(() => res);
   return res;
 }
 const uuid = '11111111-2222-4333-8444-555555555555';
@@ -260,7 +264,12 @@ describe('D. exchangeHandoff — origin 고정 · organization 재검증 · serv
     expect(res.body.data.tokens).toEqual({ accessToken: 'AT', refreshToken: 'RT', expiresIn: 900 });
     expect(generateTokens).toHaveBeenCalledWith(USER, ['store_owner'], 'neture.co.kr', memberships, 'fam-1');
     expect(persistRefreshTokenFamily).toHaveBeenCalledWith('user-1', 'RT');
-    expect(setAuthCookies).toHaveBeenCalledWith(req, res, expect.objectContaining({ accessToken: 'AT' }));
+    // exchange 는 쿠키를 내리지 않는다 — body 토큰만(URL-FIRST-CENSUS §19-1 · §21-2).
+    //   이미 배포된 HandoffPage 가 credentials:'include' 로 호출해도 저장될 쿠키가 없다.
+    expect(setAuthCookies).not.toHaveBeenCalled();
+    expect(res.cookie).not.toHaveBeenCalled();
+    expect(res.setHeader).not.toHaveBeenCalledWith('Set-Cookie', expect.anything());
+    expect(res.append).not.toHaveBeenCalledWith('Set-Cookie', expect.anything());
     expect(resolveAccessibleStores).toHaveBeenCalledWith(expect.anything(), 'user-1');
   });
 

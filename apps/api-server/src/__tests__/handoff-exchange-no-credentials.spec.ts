@@ -40,6 +40,15 @@ const codeOnly = (src: string) =>
     .filter((l) => !l.trim().startsWith('//'))
     .join('\n');
 
+describe('handoff exchange 서버 — 인증 쿠키를 내리지 않는다', () => {
+  it('handoff.controller.ts 는 setAuthCookies · res.cookie 를 호출하지 않는다', () => {
+    const file = path.join(REPO, 'apps/api-server/src/modules/auth/controllers/handoff.controller.ts');
+    const src = codeOnly(fs.readFileSync(file, 'utf-8'));
+    expect(src).not.toMatch(/setAuthCookies\s*\(/);
+    expect(src).not.toMatch(/res\.cookie\s*\(/);
+  });
+});
+
 describe('HandoffPage — exchange 는 credentials 없이 호출한다', () => {
   it.each(HANDOFF_PAGES)('%s', (rel) => {
     const file = path.join(REPO, rel);
