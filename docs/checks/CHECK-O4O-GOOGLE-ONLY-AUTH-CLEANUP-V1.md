@@ -129,8 +129,8 @@ migration job 정상 실행(`o4o-api-migrations-bsrgj`) · **적용 0**(이번 W
 | T5-7 | PharmacyHub | `https://pharmacyhub.co.kr` | 직접 버튼 → 세션 | **미검증** | — |
 | T5-8 | KPA Branch | `https://kpa-society.co.kr/kpa` (origin = `kpa-society.co.kr`) | 진입 + 세션 | **미검증** | — |
 | T5-9 | **Store** | `https://store.neture.co.kr` | 직접 버튼 → 세션 | **FAIL** | `400: origin_mismatch` — 아래 §T5-9 |
-| T5-10 | Lecture | `https://study.neture.co.kr` | 자체 로그인 **없음** + Neture 안내 카드 | **미검증** | — |
-| T5-11 | Hospital Pharmacy | `https://neture.co.kr/hospital` | 공개 진입 + 기기 등록 게이트 | **미검증** | — |
+| T5-10 | Lecture | `https://study.neture.co.kr/login` | 자체 로그인 **없음** + Neture 안내 (**화면 동작**) | **PASS** | 사용자 관찰(아래 출처) — 입력창 없이 "O4O 계정은 Neture에서 통합 관리합니다" 안내 + "Neture에서 계속하기" 버튼 |
+| T5-11 | Hospital Pharmacy | `https://neture.co.kr/hospital` | 공개 진입 + 기기 등록 게이트 (**화면 동작**) | **PASS** | 사용자 관찰(아래 출처) — 공개 진입 후 "이 PC 연결하기" + 기기 등록 코드 입력 화면 |
 
 판정: **PASS** = 인증 후 돌아와 세션 성립(사용자 표시) / **BLOCKED** = 세션은 섰으나 그 서비스
 **권한 미가입**(가입 안내·접근 제한) / **FAIL** = 돌아오지 못하거나 **로그아웃 상태로 남음**.
@@ -145,8 +145,14 @@ migration job 정상 실행(`o4o-api-migrations-bsrgj`) · **적용 0**(이번 W
 > `origin_mismatch` 는 버튼을 누른 그 순간의 host 로 판정된다. 따라서 T5-5~9 는
 > **각 서비스의 로그인 버튼에서 직접 시작**해야 하고, 경유 진입 결과로 PASS 를 기록하지 않는다.
 
-> **T5-10 · T5-11 도 미검증이다.** 이 둘은 Google 인증이 필요 없지만 **렌더 결과를 본 기록이 없다.**
-> 확인하셨다면 결과를 주면 근거와 함께 이 표에 채운다 — 확인 없이 PASS 로 올리지 않는다.
+> **T5-10 · T5-11 의 범위와 출처**
+>
+> 이 두 건은 **화면 동작 확인**이다. 두 서비스에서 **Google 로그인 후 세션을 확인했다는 뜻이 아니다** —
+> 애초에 둘 다 자체 Google 인증을 요구하지 않는 성격이라 확인 대상이 화면 상태였다.
+>
+> **출처**: 내가 브라우저를 조작한 결과가 **아니다.** 이 세션에는 브라우저 도구가 없다.
+> 사용자가 실브라우저에서 직접 관찰해 이 대화로 전달한 결과를 그대로 옮긴 것이다(2026-09-26).
+> 같은 이유로 군 A(T5-5~9)의 세션 성립은 이 두 건으로 대체되지 않는다.
 
 #### 진입 주소 실측 (2026-09-26 · origin 확정)
 
