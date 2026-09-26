@@ -33,6 +33,10 @@ import { User } from '../../modules/auth/entities/User.js';
 import { LinkedAccount } from '../../entities/LinkedAccount.js';
 import { roleAssignmentService } from '../../modules/auth/services/role-assignment.service.js';
 import { authenticate, requireRole } from '../../middleware/auth.middleware.js';
+// CodeQL js/missing-rate-limiting: `config/rate-limiters.config` 의 limiter 는 인식되지 않는다.
+// store-owner-terminations.routes.ts · notifications.routes.ts 와 같은 선례로
+// `middleware/rateLimiter` 의 apiLimiter 를 쓴다(분당 60 · IP+userId 키).
+import { apiLimiter } from '../../middleware/rateLimiter.js';
 import logger from '../../utils/logger.js';
 
 const router: Router = Router();
@@ -171,7 +175,7 @@ router.patch('/:id/status', requireRole(ADMIN_ACCESS_ROLES), async (req: Request
  *
  * 하지 않는 것: 회수 · 다른 역할 부여 · 계정 생성 · 비밀번호(존재하지 않는다).
  */
-router.post('/:id/super-admin', requireRole(ADMIN_ACCESS_ROLES), async (req: Request, res: Response) => {
+router.post('/:id/super-admin', apiLimiter, requireRole(ADMIN_ACCESS_ROLES), async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const actorId = req.user?.id;

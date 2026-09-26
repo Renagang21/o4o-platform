@@ -51,6 +51,8 @@ describe('platform:super_admin 부여 — 정식 경로 계약', () => {
 
   it('G1 super_admin 전용 — requireRole(ADMIN_ACCESS_ROLES) 를 건다', () => {
     expect(grantHandler()).toMatch(/requireRole\(ADMIN_ACCESS_ROLES\)/);
+    // CodeQL js/missing-rate-limiting 대응 — 권한 가드 앞에 rate limiter 를 둔다.
+    expect(grantHandler()).toMatch(/router\.post\('\/:id\/super-admin', apiLimiter, requireRole/);
     // ADMIN_ACCESS_ROLES 자체가 super_admin 하나인지도 함께 고정한다.
     expect(codeOnly).toMatch(/const ADMIN_ACCESS_ROLES = \['platform:super_admin'\]/);
   });
