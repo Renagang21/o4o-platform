@@ -11,19 +11,15 @@ import {
   ForeignVisitorPartnerQrCode,
   type ForeignVisitorQrStatus,
 } from './foreign-visitor-partner-qr-code.entity.js';
+import { getServicePublicOrigin } from '../../config/service-catalog.js';
 
-/** 서비스별 public web origin (landing 도메인). multilingual landing 과 동일 정책. */
-const PUBLIC_WEB_ORIGIN_BY_SERVICE: Record<string, string> = {
-  kpa: 'https://kpa-society.co.kr',
-  cosmetics: 'https://cosmetics.neture.co.kr',
-  // WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §8 (#79):
-  //   PH 를 allowlist 에 넣으면서 origin 을 등록하지 않으면 PH 매장의 제휴 QR 이
-  //   fallback 으로 kpa-society.co.kr 을 가리켜 서비스 경계를 넘는다. 기존 3서비스 값은 불변.
-  'pharmacy-hub': 'https://pharmacyhub.co.kr',
-};
-
+/**
+ * 서비스별 public web origin (landing 도메인). multilingual landing 과 동일 정책 —
+ * 서비스 카탈로그에서 파생한다(kpa · cosmetics · pharmacy-hub alias 해석).
+ * 파일별 호스트 표는 존재하지 않는 `cosmetics.neture.co.kr` 을 찍었다(CHECK-O4O-URL-FIRST-CENSUS-V1 §7-1).
+ */
 export function buildAffiliateLandingUrl(serviceKey: string, shortCode: string): string {
-  const origin = PUBLIC_WEB_ORIGIN_BY_SERVICE[serviceKey] || 'https://kpa-society.co.kr';
+  const origin = getServicePublicOrigin(serviceKey) || 'https://kpa-society.co.kr';
   return `${origin}/foreign-visitor/affiliate/${shortCode}`;
 }
 

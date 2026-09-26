@@ -58,6 +58,7 @@ import { createOperatorRecruitmentExposureController } from './controllers/opera
 import { createOperatorSupplierController } from './controllers/operator-supplier.controller.js';
 import { createOperatorContactController } from './controllers/operator-contact.controller.js';
 import { CategoryMappingService } from './services/category-mapping.service.js';
+import { getServiceOrigin } from '../../config/service-catalog.js';
 
 // Request type
 type AuthenticatedRequest = Request & {
@@ -547,12 +548,14 @@ export default function createNetureModuleRoutes(dataSource: DataSource): Expres
         return res.status(404).json({ success: false, error: 'NOT_FOUND' });
       }
 
-      const publicDomain = process.env.PUBLIC_DOMAIN || 'neture.o4o.kr';
+      // 공개 상품 페이지는 neture-web(neture.co.kr)이 서빙한다 — 호스트는 카탈로그 파생.
+      //   이전 기본값 `neture.o4o.kr`(PUBLIC_DOMAIN 미설정 시)은 NXDOMAIN 이었다(URL-FIRST-CENSUS §7-2).
+      const publicOrigin = getServiceOrigin('neture') ?? 'https://neture.co.kr';
       let qrUrl: string;
       if (product.store_slug && product.product_slug) {
-        qrUrl = `https://${publicDomain}/store/${product.store_slug}/product/${product.product_slug}`;
+        qrUrl = `${publicOrigin}/store/${product.store_slug}/product/${product.product_slug}`;
       } else {
-        qrUrl = `https://${publicDomain}/store/product/${offerId}`;
+        qrUrl = `${publicOrigin}/store/product/${offerId}`;
       }
       if (orgId) {
         qrUrl += `?org=${orgId}`;

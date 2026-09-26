@@ -38,6 +38,7 @@ import AdminLayoutWrapper from './components/layouts/AdminLayoutWrapper';
 import AdminVaultLayout from './components/layouts/AdminVaultLayout';
 import { RoleGuard, OperatorRoute, AdminRoute, PlatformRoute, SupplierRoute } from './components/auth/RoleGuard';
 import { ADMIN_ROLES } from './lib/role-constants';
+import { resolveLoginReturnPath } from './lib/loginReturnPath';
 
 // ============================================================================
 // Neture 메인 페이지 (항상 로드)
@@ -603,7 +604,7 @@ function LoginRedirect() {
   const { openLoginModal } = useLoginModal();
   const location = useLocation();
 
-  const returnUrl = (location.state as any)?.from || new URLSearchParams(location.search).get('returnUrl');
+  const returnUrl = resolveLoginReturnPath(location.state, location.search);
 
   useEffect(() => {
     openLoginModal(returnUrl || undefined);

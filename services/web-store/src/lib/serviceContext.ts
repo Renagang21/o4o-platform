@@ -54,6 +54,22 @@ export function setActiveServiceContext(key: UnifiedServiceKey | null): void {
   activeServiceKey = key;
 }
 
+/**
+ * 서비스별 공개 웹 origin — 소비자용 공개 경로(`/qr/:slug` · `/tablet/*`)는 store.neture.co.kr 이
+ * 아니라 **각 서비스 앱**이 서빙한다. 복사 · 미리보기 URL 을 `window.location.origin`(store 호스트)으로
+ * 만들면 열리지 않는 주소가 된다(CHECK-O4O-URL-FIRST-CENSUS-V1 §7-6).
+ * 서버의 QR 이미지 · 인쇄 URL(`qrPublicOrigin`)과 같은 호스트를 가리킨다.
+ */
+export const SERVICE_PUBLIC_ORIGIN: Readonly<Record<UnifiedServiceKey, string>> = Object.freeze({
+  'kpa-society': 'https://kpa-society.co.kr',
+  'k-cosmetics': 'https://k-cosmetics.site',
+  'pharmacy-hub': 'https://pharmacyhub.co.kr',
+});
+
+export function getActiveServicePublicOrigin(): string {
+  return SERVICE_PUBLIC_ORIGIN[getActiveServiceKey()];
+}
+
 export function getActiveServiceKey(): UnifiedServiceKey {
   // 문맥이 없으면 canonical reference(KPA) 로 둔다 — 백엔드가 enrollment 로 다시 거른다(403 → 화면 안내).
   return activeServiceKey ?? 'kpa-society';

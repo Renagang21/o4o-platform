@@ -400,7 +400,7 @@ function EmptySection({ isAuthenticated }: { isAuthenticated: boolean }) {
         운영자 검토를 거쳐 오픈되며, 모집 기간 동안 참여할 수 있습니다.
       </p>
       {!isAuthenticated && (
-        <Link to="/login?redirect=/market-trial" style={s.emptyCta}>
+        <Link to="/login?returnUrl=/market-trial" style={s.emptyCta}>
           로그인하고 참여하기 →
         </Link>
       )}

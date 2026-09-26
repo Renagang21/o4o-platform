@@ -21,6 +21,8 @@
  *   Workspace 자격이 아니다 — 두 축을 서로 유도하지 않는다.
  */
 
+import { resolveCanonicalServiceKey } from '@o4o/security-core';
+
 /**
  * Service Workspace(매장 · 운영자용 서비스 업무공간) 의 노출 방식 — WO-O4O-SERVICE-TENANT-FOUNDATION-V1
  *
@@ -263,4 +265,13 @@ export function getServiceOrigin(key: string): string | undefined {
   //   basePath 를 가진 서비스(kpa-branch)는 host 루트가 다른 서비스이므로
   //   base URL 에 prefix 를 포함해야 링크가 자기 앱으로 떨어진다.
   return `https://${svc.domain}${svc.basePath ?? ''}`;
+}
+
+/**
+ * 역할 접두 키(`kpa` · `cosmetics`)까지 받아 공식 공개 origin 을 돌려준다.
+ *   QR · 공개 랜딩 URL 을 서버가 만들 때 쓴다. 호스트를 파일마다 따로 적으면
+ *   카탈로그와 어긋난다(예: 존재하지 않는 `cosmetics.neture.co.kr` — CHECK-O4O-URL-FIRST-CENSUS-V1 §7-1).
+ */
+export function getServicePublicOrigin(key: string): string | undefined {
+  return getServiceOrigin(resolveCanonicalServiceKey(key));
 }

@@ -8,6 +8,7 @@ import {
   SupplierStatus,
 } from '../entities/index.js';
 import logger from '../../../utils/logger.js';
+import { getServiceOrigin } from '../../../config/service-catalog.js';
 
 /**
  * NetureDashboardService
@@ -64,7 +65,8 @@ export class NetureDashboardService {
         features: string[];
       }> = {
         'k-cosmetics': {
-          url: 'https://k-cosmetics.neture.co.kr',
+          // 호스트는 카탈로그 파생 — 하드코딩 `k-cosmetics.neture.co.kr` 은 NXDOMAIN 이었다(URL-FIRST-CENSUS §7-1)
+          url: getServiceOrigin('k-cosmetics') ?? '',
           ordersPath: '/supplier/orders',
           supportEmail: 'support@k-cosmetics.kr',
           features: ['주문관리', '배송조회'],

@@ -5,7 +5,7 @@
  *
  * backend = 공통 /api/v1/foreign-visitor (partners/:partnerId/qr-codes, partner-qr-codes/:id...).
  * shortCode / landingUrl 은 **서버가** 생성한다 — PH landing origin 을
- * foreign-visitor-partner-qr-code.service 의 PUBLIC_WEB_ORIGIN_BY_SERVICE 에 등록했으므로
+ * foreign-visitor-partner-qr-code.service 의 buildAffiliateLandingUrl(서비스 카탈로그 파생) 에 등록했으므로
  * pharmacyhub.co.kr 로 떨어진다(서비스 경계 유지).
  * SVG 는 image/svg+xml 이라 JSON 인스턴스 대신 raw fetch 로 받는다.
  */

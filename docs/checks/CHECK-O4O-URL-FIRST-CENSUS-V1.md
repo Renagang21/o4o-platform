@@ -13,7 +13,7 @@
 > 방향 변경 시 먼저 기록: 원래 목적 · 새 발견 · 변경 이유 · 원래 목적과의 관계 · 범위 확대 여부 · 완료 기준 변경 여부.
 
 - 작성일: 2026-09-25
-- 단계: **G0 (현재 상태) · G1 (데이터/외부 환경 실측)**. 구현 A~F 는 이 결과 검토 후 별도 지시로 진행한다.
+- 단계: G0 · G1 조사(§0~§20) 완료 → **2026-09-26 부터 통합 TODO 로 구현 진행 중**(진행 상태 = §21). 운영 전환은 외부 설정 증빙과 `DEPLOY_ENABLED` 개방 후에만 완료로 표시한다.
 - 선행: [`IR-O4O-URL-FIRST-SERVICE-RESTRUCTURE-ADDENDUM-V1`](../investigations/IR-O4O-URL-FIRST-SERVICE-RESTRUCTURE-ADDENDUM-V1.md) §0~§11 (결정 8건 = §11).
 - 변경: 코드 · 운영 DB · DNS · LB · 배포 설정 **변경 0**. 운영 DB 는 Cloud SQL Auth Proxy + `default_transaction_read_only=on` 세션으로 **집계 SELECT 만** 실행(개인정보 미출력). GCP 는 `describe`/`list` 만.
 - 판정: **G0 PASS · G1 PARTIAL** (사용자 동의 2026-09-25 · 결정 = §9 · PH 대응 설계 = §10 · 커뮤니티 권한 설계 = §11 · 2차 결정 = §12 · B 모델 = §13 · 결제 = §14 · 운영자 권한 = §15 · 호스트 진입 = §16 · Store Hub = §17 · 커뮤니티 모델 = §18 · 현재 결함 = §19 · 다음 판단 = §20) — 저장소 밖 콘솔 3건(Google · Toss · Gabia 관리 화면)과 발송 메일 · 설치 PC 현장 확인이 미확인.
@@ -712,7 +712,7 @@ KPA 는 주문 생성 · prepare/confirm · 결제완료 핸들러 · fulfillmen
 - 테스트: `apps/api-server/src/__tests__/handoff-exchange-no-credentials.spec.ts`(7개 HandoffPage 정적 계약 · PASS 7/7) · web-neture `HandoffPage.staleTokenGuard.test.tsx` 에 exchange 요청 `credentials !== 'include'` 단언 추가(PASS 3/3). eslint 오류 0(kpa-branch 기존 경고 1건은 변경 무관).
 - 한계: 이미 배포된 옛 번들 · 앞으로 복사될 페이지에는 효과 없음 → (b) 필요.
 
-**승인 대기 — (b) · (c)** (CLAUDE.md "권한 · route · API contract 변경" 중지 조건)
+**(b) · (c) — 2026-09-26 승인 · 구현 완료(§21-5).** 아래는 승인 전 기록:
 - (b) 서버 `handoff.controller.ts:478` exchange 에서 `setAuthCookies` 제거(body 토큰 응답은 불변). 문서화된 "쿠키 + body 이중" 동작을 바꾸므로 승인 대상. 함께 바꿀 것: 같은 파일 주석 · `unified-store-workspace-handoff.spec.ts:263` 반전 · `representative-entry-return-handoff.spec.ts` 성공 경로 단언 · 신원 아키텍처 문서 문구.
 - (c) admin-dashboard `packages/auth-context/src/AuthProvider.tsx:129-131` — 캐시 사용자와 `/auth/status` 사용자가 다르면 조용히 채택하는 대신 세션 무효화 후 로그인으로(단 `authClient.logout()` 은 호출하지 않는다 — 다른 사용자의 refresh family 를 끊음). 공용 패키지(소비처 admin-dashboard 1곳) · 방어 심층.
 - 쿠키 이름 분리(admin 전용 쿠키) · host-only 쿠키 안은 채택하지 않음(동명 쿠키 공존 시 우선순위 불확정).
@@ -752,3 +752,78 @@ KPA 는 주문 생성 · prepare/confirm · 결제완료 핸들러 · fulfillmen
 | 호스트 진입 | neture-web 호스트 프로필(supplier · funding · community), 분회 6곳 동시 변경, pharmacy/retail 호스트 | 프론트 준비 가능 | handoff 새 대상(인증) · CORS(API 재배포) · DNS/인증서/LB/Google 콘솔(외부) |
 | 매장 · 커뮤니티 | Store Hub C안 · `/my-store` · 커뮤니티 membership | — | `store-ui-core`(F3) · DB 스키마 · RBAC F9 · ROLE-WORKSPACE V2 |
 | 배포 | 모든 운영 전환 | — | `DEPLOY_ENABLED=false`(2026-09-25T23:02Z 갱신) — 게이트 개방 전 운영 전환 완료 표시 금지 |
+
+### 21-5. 인증 게이트 (b) · (c) 구현 (2026-09-26 사용자 승인 → `5fd971083`)
+
+| 항목 | 내용 | 검증 |
+|---|---|---|
+| (b) 서버 | `handoff.controller.ts` exchange 에서 `setAuthCookies` 제거 — body 토큰만. 변경 전 재확인: 배포 서비스 8개 전부 localStorage, 쿠키 전략은 admin-dashboard 뿐(handoff 대상 아님), web-account 는 배포 workflow · 카탈로그 둘 다 없음 | 계약 테스트: workspace · 대표 진입 성공 경로에서 `setAuthCookies` · `res.cookie` · `Set-Cookie` 헤더 **0**(이미 배포된 HandoffPage 가 `credentials:'include'` 로 호출해도 저장될 쿠키가 없음을 서버 쪽에서 고정) · 정적 가드에 서버 `setAuthCookies` 부재 추가 · 관련 4 suite 66 tests PASS |
+| (b) 문서 | `O4O-IDENTITY-ARCHITECTURE-V3` 승계 표에 "V1 §8 쿠키 설정 · Cookie domain 자동 감지 비승계" 예외 기록 | — |
+| (c) admin | `@o4o/auth-context` AuthProvider: 캐시 사용자 ≠ `/auth/status` 사용자 → 새 사용자 **채택 안 함** · 화면 비움(user=null → 보호 화면 unmount, 이후 API 요청 없음) · 재채택 금지 표식(`admin-session-conflict`) 저장 → 새로고침 후에도 서버 세션 비채택 · **명시적 Google 로그인 성공 · 명시적 logout 에서만 해제** · `logout()` 호출 없음 · 창 포커스/가시성 복귀 때 재대조. 로그인 화면에 세션 변경 안내(`data-testid=session-conflict-notice`) | vitest 6건(교체 감지 · 새로고침 후 비채택 · 회귀 2 · 재로그인 해제 · 포커스 재대조) — CI(`ci-pipeline.yml` auth-context step) PASS. 소비처 = admin-dashboard 1곳(auth-react 는 별도 패키지) |
+| CI | `5fd971083` CI Pipeline success (run 36222991651) | — |
+
+**판정 구분 (요청대로 분리 보고)**
+- 코드 · CI: **PASS**.
+- **운영 브라우저에서 사용자 교체 미재현: 미판정** — `DEPLOY_ENABLED=false` 로 운영 미반영(Deploy 워크플로 build-and-deploy · 서비스별 deploy job 전부 skipped). 배포 후 §21-2 의 한 계정 절차(exchange 응답에 `Set-Cookie` 없음 · `.neture.co.kr` 쿠키 불변) + 두 계정 절차(admin 탭 새로고침 · 포커스 시 안내 화면)로 판정한다.
+- 남는 경로: `google-auth` 로그인 · `/auth/refresh` 는 여전히 `.neture.co.kr` 쿠키를 설정한다(admin 자체 로그인에 필요). 서비스 웹은 이 요청에 credentials 를 싣지 않아 쿠키가 저장되지 않는다(§21-2 분석). 새 호스트도 같은 패턴을 따라야 한다(호스트 구현 시 점검 항목).
+
+### 21-6. QR · 호스트 정합 수정 (승인 불요 묶음)
+
+| 결함 | 수정 | 검증 |
+|---|---|---|
+| §7-1 화장품 QR 호스트(`cosmetics.neture.co.kr` NXDOMAIN) — 다국어 · 제휴 QR | 파일별 호스트 표 2곳 삭제 → `getServicePublicOrigin()`(카탈로그 + `resolveCanonicalServiceKey` alias) 파생. kpa · pharmacy-hub 값 불변, cosmetics → `https://k-cosmetics.site` | api spec 13건 PASS(alias 6종 · 미지 키 · 제휴 URL · 하드코딩 재유입 금지) |
+| §7-1 Neture 공급자 대시보드 `k-cosmetics.neture.co.kr` | 카탈로그 파생 | 동일 spec |
+| §7-2 상품 QR/전단 기본 호스트 `neture.o4o.kr` | 서버: `getServiceOrigin('neture')` · `PUBLIC_DOMAIN`(미설정) 의존 제거 / 프론트 `SellerQRGuidePage` → `https://neture.co.kr` | 동일 spec |
+| §7-6 web-store 가 store 호스트로 `/qr` · `/tablet` URL 생성(열리지 않음) | `SERVICE_PUBLIC_ORIGIN` · `getActiveServicePublicOrigin()` 추가, QR 복사 · 미리보기 · 운영 보드 링크 · 태블릿 URL · 태블릿 설정 URL 을 활성 서비스 공개 origin 으로. 미설정 `VITE_KPA_WEB_ORIGIN` 의존 제거 | web-store tsc 0 |
+| §19-7 펀딩 로그인 복귀 | `lib/loginReturnPath.ts` — `state.from` → `?returnUrl` → 레거시 `?redirect` 순, 같은 origin 상대 경로만 허용(`//` · `/\` · 절대 URL 거부). 펀딩 화면 5곳 `?returnUrl=` 로 정정 | vitest 5건 PASS · web-neture tsc 0 |
+
+**남은 것 (이 묶음에서 코드로 끝나지 않음)**
+- 화장품 앱에 공개 route(`/qr/:slug` · `/multilingual-products/:publicKey` · `/foreign-visitor/affiliate/:shortCode` · `/tablet/setup`)가 **없다** → 호스트는 맞아졌지만 착지 화면이 없다. PH 판(가장 작음)을 옮기거나 `store-ui-core` 로 공통화 필요 — 소매 호스트(`retail.neture.co.kr`) 구현 묶음에서 함께 처리(현재 화장품 활성 QR 0 · 다국어/제휴 0).
+- 이미 저장된 제휴 QR `landing_url` 은 운영 0행이라 데이터 조치 불필요(§3 Q2).
+- 공급자 대시보드의 화장품 `ordersPath=/supplier/orders` 는 화장품 앱에서 RoleNotAvailable 화면 — 경로 자체는 공급자 호스트 설계(§16)에서 정리.
+- 배포 전이므로 운영 반영 **미반영**(`DEPLOY_ENABLED=false`).
+
+### 21-7. O4O 운영자 권한 — P2 설계 (2026-09-26 사용자 지시: P2 기준, super_admin 비부여)
+
+**원칙**: `neture:operator` 의 넓은 서버 권한을 `/ops` 메뉴에서 숨기는 방식은 쓰지 않는다. 실제 O4O 운영 업무 API 에만 접근하는 **별도 역할**을 만든다.
+
+#### 21-7-1. 권한표 (허용 = 새 역할 접근, 제외 = 접근 불가)
+
+| 업무 | API (현재 가드) | 새 역할 | 비고 |
+|---|---|---|---|
+| 공급자 승인 · 관리 | `/api/v1/neture/operator/suppliers*` 12개(읽기 6 · 쓰기 6: 목록 · 대기 · 일괄 · 문서 다운로드 · 규제 카테고리 · 기본정보 수정 · 승인 · 반려) — `requireNetureScope('neture:operator')` | **허용** | `GET /suppliers/:id/onboarding` 호출처 없음 |
+| 공급자 비활성/재활성(governance) | `/api/v1/neture/admin/suppliers/*/deactivate · reactivate` — `neture:admin` | **제외(결정 필요)** | 현재 운영자보다 상위 등급 |
+| 펀딩 승인 · 운영 | `/api/v1/neture/operator/market-trial*` 17개(목록 · KPI · 상세 · 참여자 · 상태 · 승인 · 반려 · 포럼 동기화) — `neture:operator` | **허용** | 단 참여자 `settlement-status` · `payment-status`(:118 · :120) 는 **결정 필요**(정산 제외 원칙과 겹침) |
+| 커뮤니티 운영(포럼) | `/api/v1/forum/operator/*`(serviceCode=neture) — 요청 검토 · 일괄 검토 · 삭제 요청 처리 · 카테고리 수정/비활성/활성 · 분석 — `isServiceOperator` (역할만, membership 미확인) | **허용** | **`DELETE /categories/:id/hard`(영구 삭제) 제외** |
+| 포럼 관리자(복원 · 영구삭제 · 감사로그) | `/api/v1/forum/admin/*` — `neture:admin` | 제외 | |
+| 가입 신청 승인 | `/api/v1/neture/operator/registrations*`(목록 · 승인 · 반려 · 메모 · 일괄) — `requireRole` 목록(membership 미확인) | **결정 필요** | 승인이 `neture:supplier` 역할 부여 + 공급자 행 생성 → 사실상 공급자 온보딩. `/registrations/copilot`(AI) 제외 |
+| 커뮤니티 회원 승인(독립 커뮤니티) | **API 없음**(§18 미구현) | 설계 시 허용 대상 | 커뮤니티 membership 구현과 함께 |
+| 회원 · 매장 · 주문 · 상품 승인 · 홈 CMS · 광고/스폰서 · 서비스 약관/문의 · cafe24 · 정산 · AI | 각 `neture:operator`/`neture:admin` | **제외** | 새 역할은 어떤 기존 exact-match 역할 목록에도 들어가지 않는다 |
+
+#### 21-7-2. 안 비교 → 권고
+
+| 안 | 내용 | F9 · F11 대조 | 판정 |
+|---|---|---|---|
+| **Z. `neture:o4o_operator`** (새 역할 · 기존 서비스 키 `neture`) | 로컬 scope 설정 `o4o-operator-scope.middleware.ts`(`createMembershipScopeGuard` 재사용, `scopeRoleMapping['neture:o4o_ops'] = [o4o_operator, operator, admin]`) 를 위 허용 API 에만 적용 | F9 §4: ① `UserRole` 상수 ② `operator-assignment.service`(→ `assignRole`) 로만 부여(두 operator-role-catalog 동기 테스트 존재) ③ 가드 = 로컬 설정 ④ `RBAC-ROLE-CATALOG-V1` 갱신 ⑤ security-core 동결이라 **로컬 설정 예외**(pharmacy-hub · lecture 선례, 카탈로그 :88-91). F11: 부여 시 `service_memberships('neture')` active 자동 보장 · 스코프 가드가 DB 에서 membership 확인. **포럼 · 가입 경로는 역할만 보므로 새 역할에는 membership 확인을 추가**(설정 표 방식, 서비스별 inline 분기 금지) | **권고** — 새 ServiceKey · `platform_services` 행 · security-core/`@core` 변경 0 |
+| Y. `o4o:operator` (새 서비스 키 `o4o`) | 새 ServiceKey · scope config · `service_memberships('o4o')` · `platform_services('o4o')` · 라우트마다 역할별 가드 분기 | 새 서비스 정체성 = 구조 변경(F11 §9 · CLAUDE.md 인프라 목록). `o4o→neture` alias 는 역맵을 깨므로 불가 | 비권고(범위 · 위험 큼) |
+
+- 가드 결합 주의: Express 미들웨어는 AND 라 "기존 가드 OR 새 가드"를 쌓을 수 없다 → 허용 라우트의 라우터 가드를 **하나의 설정**(두 역할 집합을 모두 받는)으로 교체한다. `NETURE_SCOPE_CONFIG` 의 `neture:operator` 매핑에 새 역할을 넣으면 14개 이상 컨트롤러로 번지므로 금지.
+- **선결 구조 문제**: `neture.routes.ts` 에서 운영자 대시보드 라우터(:171)가 `/operator` 전체에 `requireNetureScope('neture:operator')` 를 걸고 먼저 마운트된다 → 새 역할은 공급자 · 가입 라우트에 닿기 전에 403. 공급자 · 가입 컨트롤러를 먼저 마운트하고 가드를 경로 한정으로 바꿔야 한다(모든 `/operator/*` 순서에 영향).
+
+#### 21-7-3. 변경 목록 (Z 기준 · 구현 시)
+
+- API: 새 `middleware/o4o-operator-scope.middleware.ts` · `operator-supplier.controller.ts`(경로 한정 가드) · `neture.routes.ts`(마운트 순서) · `market-trial-operator.routes.ts` · `operator-registration.controller.ts` · `operator-forum.routes.ts`(새 역할 + membership · 영구삭제 거부) · `types/auth.ts` `UserRole` · `types/roles.ts` · `config/operator-role-catalog.ts`.
+- **DB**: `roles` 에 `('neture:o4o_operator', service_key 'neture', role_key 'o4o_operator', is_assignable, not admin)` seed migration(`ON CONFLICT DO UPDATE`) — **migration = 중지 조건**.
+- admin-dashboard: `lib/operator-role-catalog.ts` + 동기 테스트 · `/ops/*` 형제 경로(기존 `/*` platform floor 문자열 불변) · 운영자 메뉴(deny-by-default) · `AdminProtectedRoute` 에 membership 확인 · 역할별 착지 · 회귀 테스트 4개 개정(**`/ops` 진입 범위에서만**: `/ops` 는 새 역할+membership 허용 · `kpa:*` 거부 · platform 메뉴는 여전히 platform 전용).
+- 문서: `RBAC-ROLE-CATALOG-V1`(로컬 설정 예외 · 새 역할) · CLOSED 결정 2건(`WO-O4O-ADMIN-PLATFORM-ONLY-ACCESS…` · IA 재편 CHECK)에 `/ops` 예외 기록.
+- 테스트: 새 역할 403 확인(`/operator/dashboard` · members · stores · 상품 승인 · 포럼 영구삭제 · `/api/v1/admin/*`) · `neture:supplier` 가 새 scope 에 403 · 기존 `neture:operator` 동작 불변.
+
+#### 21-7-4. 실행 전 사용자 결정 (중지 조건)
+
+1. 안 Z 채택 · 역할 이름(`neture:o4o_operator`) · **roles seed migration** 승인.
+2. `/operator/*` 마운트 순서 변경 승인(선결 구조 문제).
+3. 공급자 governance(비활성/재활성, 현재 `neture:admin`) 포함 여부.
+4. 펀딩 참여자 정산 · 결제 상태 변경(:118 · :120) 포함 여부.
+5. 가입 신청 승인(= 공급자 역할 부여) 포함 여부.
+6. 포럼 영구 삭제를 새 역할만 막을지, 기존 `neture:operator` 에게도 막을지.
+7. admin-dashboard `/ops` 개방(CLOSED 결정 · 회귀 테스트 범위 개정) — 지시상 허용 범위이나 구현 착수 확인.

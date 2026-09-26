@@ -64,6 +64,7 @@ import TabletScreenSetManager from './TabletScreenSetManager';
 import { templateLabel, TabletCornerBoard, cornerPrimaryLabel, type TabletCornerItem } from '@o4o/tablet-screen-set-editor';
 // WO-O4O-KPA-TABLET-CORNER-CONTENT-LINK-UI-V1: 코너별 운영 = 코너×콘텐츠 연결 패널(링크 전용)
 import TabletCornerContentsPanel from './TabletCornerContentsPanel';
+import { getActiveServicePublicOrigin } from '../../lib/serviceContext';
 // WO-O4O-KPA-TABLET-STORE-UX-AND-SAMPLE-GUIDE-FIX-V1 §2: 코너 카드에서 바로 여는 '화면 바꾸기'(1동작 교체).
 import TabletCornerSwapModal from './TabletCornerSwapModal';
 
@@ -243,7 +244,8 @@ export default function StoreTabletDisplaysPage() {
   const previewTabletIdRef = useRef<string | null>(null);
 
   const publicTabletUrl = (tabletId: string): string => {
-    const base = (import.meta.env.VITE_KPA_WEB_ORIGIN as string | undefined) || window.location.origin;
+    // 공개 태블릿 경로는 서비스 앱이 서빙한다(store 호스트에는 /tablet 없음) — URL-FIRST-CENSUS §7-6
+    const base = getActiveServicePublicOrigin();
     return `${base}/tablet/${encodeURIComponent(storeSlug ?? '')}?tabletId=${tabletId}`;
   };
 
@@ -1072,7 +1074,7 @@ export default function StoreTabletDisplaysPage() {
               <p>태블릿의 크롬 브라우저에서 아래 주소를 열고 연결 코드를 입력하세요.</p>
               <div className="rounded-xl bg-slate-50 border border-slate-200 px-4 py-3">
                 <div className="text-[11px] text-slate-400">연결 주소</div>
-                <div className="font-mono text-sm break-all select-all">{`${window.location.origin}/tablet/setup`}</div>
+                <div className="font-mono text-sm break-all select-all">{`${getActiveServicePublicOrigin()}/tablet/setup`}</div>
               </div>
               <div className="rounded-xl bg-teal-50 border border-teal-100 px-4 py-4 text-center">
                 <div className="text-[11px] text-teal-700">연결 코드</div>

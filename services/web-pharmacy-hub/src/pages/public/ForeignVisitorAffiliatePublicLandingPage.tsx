@@ -6,7 +6,7 @@
  *   /foreign-visitor/affiliate/:shortCode
  *
  * 파트너 QR payload = https://pharmacyhub.co.kr/foreign-visitor/affiliate/{shortCode}
- * (origin 은 서버의 PUBLIC_WEB_ORIGIN_BY_SERVICE 가 결정한다). 이 화면이 없으면
+ * (origin 은 서버의 buildAffiliateLandingUrl(서비스 카탈로그 파생) 가 결정한다). 이 화면이 없으면
  * 매장이 인쇄한 QR 이 아무 데도 닿지 못하므로 QR 관리와 **같은 WO 에서 함께** 연다.
  *
  * KPA 원본은 여기서 매장 공개 storefront(/store/{slug})로 이어주지만,

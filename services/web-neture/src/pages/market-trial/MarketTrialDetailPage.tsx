@@ -85,7 +85,7 @@ export function MarketTrialDetailPage() {
   const handleJoin = async () => {
     if (!id || !selectedReward || joinLoading) return;
     if (!isAuthenticated) {
-      navigate(`/login?redirect=/market-trial/${id}`);
+      navigate(`/login?returnUrl=/market-trial/${id}`);
       return;
     }
     setJoinLoading(true);
@@ -114,7 +114,7 @@ export function MarketTrialDetailPage() {
       const msg = e?.response?.data?.message || '';
       const status = e?.response?.status;
       if (status === 401) {
-        navigate(`/login?redirect=/market-trial/${id}`);
+        navigate(`/login?returnUrl=/market-trial/${id}`);
         return;
       }
       if (msg.includes('Already participated')) {

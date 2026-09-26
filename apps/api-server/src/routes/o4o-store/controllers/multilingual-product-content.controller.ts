@@ -14,6 +14,7 @@ import { randomBytes } from 'crypto';
 import { asyncHandler } from '../../../middleware/error-handler.js';
 import { createRequireStoreOwner, type StoreOwnerServiceKey } from '../../../utils/store-owner.utils.js';
 import { generateQrSvg } from '../../../services/qr-print.service.js';
+import { getServicePublicOrigin } from '../../../config/service-catalog.js';
 
 type AuthMiddleware = RequestHandler;
 
@@ -163,17 +164,11 @@ function generatePublicKey(): string {
 }
 
 // Public web origin per store service — landing page lives on the service's own domain.
-const PUBLIC_WEB_ORIGIN_BY_SERVICE: Record<string, string> = {
-  kpa: 'https://kpa-society.co.kr',
-  cosmetics: 'https://cosmetics.neture.co.kr',
-  // WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §8 (#76):
-  //   PH 마운트를 추가하면서 origin 을 등록하지 않으면 PH 매장의 QR 이 fallback 으로
-  //   kpa-society.co.kr 을 가리켜 서비스 경계를 넘는다. 기존 3서비스 값은 그대로다.
-  'pharmacy-hub': 'https://pharmacyhub.co.kr',
-};
-
+//   호스트는 서비스 카탈로그에서 파생한다(kpa · cosmetics · pharmacy-hub 모두 alias 해석).
+//   파일별 호스트 표는 카탈로그와 어긋나 존재하지 않는 호스트를 QR 에 찍었다
+//   (`cosmetics.neture.co.kr` NXDOMAIN — CHECK-O4O-URL-FIRST-CENSUS-V1 §7-1).
 function buildLandingUrl(serviceKey: string | undefined, publicKey: string): string {
-  const origin = (serviceKey && PUBLIC_WEB_ORIGIN_BY_SERVICE[serviceKey]) || 'https://kpa-society.co.kr';
+  const origin = (serviceKey && getServicePublicOrigin(serviceKey)) || 'https://kpa-society.co.kr';
   return `${origin}/multilingual-products/${publicKey}`;
 }
 
