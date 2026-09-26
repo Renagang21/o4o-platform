@@ -26,7 +26,10 @@ import {
 import {
   isUnifiedServiceKey,
   pickCommonServiceContext,
+  readServiceScope,
+  resolveEffectiveServiceKey,
   setActiveServiceContext,
+  writeServiceScope,
   type UnifiedServiceKey,
 } from '../lib/serviceContext';
 
@@ -52,6 +55,15 @@ export interface UnifiedStoreContextValue {
   commonServiceKey: UnifiedServiceKey | null;
   /** 서비스 업무(/work/:serviceKey) 진입 가능한 enrollment 의 serviceKey 목록(활성 + workspace 제공) */
   workServiceKeys: UnifiedServiceKey[];
+  /**
+   * 서비스 지정 매장 화면(`/work/<serviceKey>/store/*`)으로 들어와 고정된 서비스(세션 유지).
+   * 이 매장의 활성 서비스가 아니면 무시된다. CHECK-O4O-URL-FIRST-CENSUS-V1 §21-13
+   */
+  scopedServiceKey: UnifiedServiceKey | null;
+  /** 내 매장(/store) · 매장 HUB 가 실제로 쓰는 서비스 문맥 = 고정 서비스 ?? 공통 우선순위 문맥 */
+  effectiveServiceKey: UnifiedServiceKey | null;
+  /** 서비스 고정 설정 · 해제(null) */
+  setServiceScope: (key: UnifiedServiceKey | null) => void;
   error: string | null;
   selectStore: (organizationId: string) => void;
   clearStore: () => void;
@@ -111,16 +123,24 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     return () => { cancelled = true; };
   }, [effectiveId]);
 
+  const [scopeState, setScopeState] = useState<UnifiedServiceKey | null>(() => readServiceScope());
+  const setServiceScope = useCallback((key: UnifiedServiceKey | null) => {
+    writeServiceScope(key);
+    setScopeState(key);
+  }, []);
   const selectStore = useCallback((organizationId: string) => {
     writeSelectedOrganizationId(organizationId);
     setError(null);
     setSelectedId(organizationId);
-  }, []);
+    // 매장을 바꾸면 서비스 고정도 풀린다 — 다른 매장에 이전 서비스 문맥을 끌고 가지 않는다(§21-13)
+    setServiceScope(null);
+  }, [setServiceScope]);
   const clearStore = useCallback(() => {
     clearSelectedOrganizationId();
     setSelectedId(null);
     setServices(null);
-  }, []);
+    setServiceScope(null);
+  }, [setServiceScope]);
   const reload = useCallback(() => setTick((t) => t + 1), []);
 
   const status: StoreContextStatus = !isAuthenticated
@@ -142,8 +162,13 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     [services],
   );
   const commonServiceKey = useMemo(() => pickCommonServiceContext(workServiceKeys), [workServiceKeys]);
-  // 모듈 전역 서비스 문맥의 SSOT — 매장이 바뀌면 공통 문맥도 바뀐다. (/work/:serviceKey 는 ServiceWorkLayout 이 덮어쓴다)
-  useEffect(() => { setActiveServiceContext(commonServiceKey); }, [commonServiceKey]);
+  const scopedServiceKey = scopeState && workServiceKeys.includes(scopeState) ? scopeState : null;
+  const effectiveServiceKey = useMemo(
+    () => resolveEffectiveServiceKey(scopeState, workServiceKeys),
+    [scopeState, workServiceKeys],
+  );
+  // 모듈 전역 서비스 문맥의 SSOT — 매장 · 고정 서비스가 바뀌면 문맥도 바뀐다. (/work/:serviceKey 업무는 ServiceWorkLayout 이 덮어쓴다)
+  useEffect(() => { setActiveServiceContext(effectiveServiceKey); }, [effectiveServiceKey]);
 
   return <StoreContext.Provider value={{
     status,
@@ -153,6 +178,9 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     services: services ?? [],
     commonServiceKey,
     workServiceKeys,
+    scopedServiceKey,
+    effectiveServiceKey,
+    setServiceScope,
     error,
     selectStore,
     clearStore,

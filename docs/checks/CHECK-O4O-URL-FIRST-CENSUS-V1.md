@@ -978,3 +978,48 @@ gcloud compute url-maps add-host-rule o4o-global-lb --global --hosts=supplier.ne
 - 이번 서브도메인 배포(`236c22dfc` 코드)에서 Store 는 **미완료**로 표시한다.
 - 이전 작업의 출발점은 §17(Store Hub C안 · `/my-store` 설계)의 한계 6건: 선택 매장 미전달(organizationId) · 공통 화면의 단일 서비스 API 의존 · PH 경로 형태 불일치(404) · KCos 마운트 부재 · 서비스 키 데이터(POP · 블로그 · 동영상 · 다국어 · 사이니지) 통합 방식 · KPA enrollment 누락 가능 — 그리고 테스트 매장(복수 서비스 가입) 준비 방식 결정.
 - 서비스 앱 쪽 진입 플래그 `VITE_UNIFIED_STORE_HANDOFF` 는 현재 3앱 모두 `false` — 통합 매장 공간으로 옮길 때 경로별로 연다.
+
+### 21-13. 매장 `/store` 위치 이전 (2026-09-26 사용자 지시 — 통합 TODO 내 단계)
+
+**대상**: 각 서비스의 **매장 경영자용 `/store` 화면과 그 진입**. 제외: `/store-hub` · PH `/store-owner` · 공개 · 기기 경로(아래) · 통합 `/hub`/`/my-store` 설계 · 데이터 병합 · 다중 서비스 표시 방식.
+**판정 분리**: 이 단계 = "`/store` 위치 이전". "Store 통합 리팩토링"(DONE ④-2)과 별개로 판정한다 — 이 단계가 끝나도 Store 전체 완료로 표시하지 않는다.
+
+#### 조사 결과 — 구현 방향을 바꾼 사실
+
+| 사실 | 근거 | 영향 |
+|---|---|---|
+| web-store `/store/*` 화면은 **KPA 페이지의 파일 복사본**(대부분 동일, 일부 링크 · prefix 만 수정). 패키지 공유는 `StoreProductsManagerPage` 1개뿐 | `services/web-store/src/pages/pharmacy/*` ↔ `services/web-kpa-society/src/pages/pharmacy/*` | **KPA 는 같은 화면으로 이전 가능** |
+| 공통 `/store/*` 는 서비스를 지정할 수 없다 — 문맥이 우선순위(KPA → KCos → PH)로만 정해짐 | `lib/serviceContext.ts` · `StoreContext.tsx` | 서비스별 경로를 위해 **서비스 고정** 필요 |
+| web-store 가 KPA 의 owner-only 가드를 빠뜨림(`my-products` · `handled-products` · `commerce/local-products` · `products/multilingual/*`) | KPA `PharmacyOwnerOnlyGuard` | 권한 동작 보존을 위해 복원 필요 |
+| **K-Cosmetics**: web-store 의 `/store/*` 는 KCos 화면이 아니라 KPA 화면을 `cosmetics` prefix 로 렌더 — KCos owner 화면 **11개 대응 없음**(cockpit 홈 · channels · 외국인 판매 · settings · info · recruitment-applications · 상품 marketing/pop · POP 라이브러리 · 제작물 목록/새로), 여러 화면이 cosmetics 에 없는 API 호출(`/pharmacy/info` · `/store-assets` · 동영상 staff) · 사이니지 미디어/스케줄은 `kpa-society` 하드코딩 | web-store `App.tsx` · KCos `App.tsx` 대조(이 절 요약) | KCos 는 **링크만으로 옮길 수 없다** — KCos 자체 화면 코드를 web-store 로 옮기는(porting) 작업이 필요 |
+| 옛 handoff 경로 표(`unifiedStoreHandoff.ts` RULES)의 일부 대상이 web-store 에 없음(KPA `/store/dashboard` · `/store/products` · `/store/orders` · `/store/channels/tablet` · `/store/settings/layout|template`, KCos 다수) | store-ui-core(F3 동결) | 전환 시 해당 경로는 404 — 전환 전 보완 대상 |
+
+**방향 기록**: 원래 목적(서비스별 매장 화면을 store 호스트로) 불변 · 범위 확대 없음 · 완료 기준 불변. 단 **서비스별 순서**로 진행한다 — KPA(같은 화면 이전) 먼저, KCos(화면 porting)는 다음. PH `/store-owner` 는 이번 대상 아님.
+
+#### 구현 (KPA · 코드)
+
+- **web-store**
+  - 서비스 지정 매장 화면 `store.neture.co.kr/work/kpa-society/store/*` — 공통 `/store/*` 와 **같은 화면 트리**를 한 번 더 mount(`storeChildRoutes()`), 사이드바 제목 "KPA Society 매장" · basePath 도 서비스 경로. `/work/:serviceKey` 규칙(이 매장의 활성 서비스일 때만)을 그대로 따른다 — 아니면 안내 카드.
+  - **서비스 고정(세션)**: 진입 시 `o4o.store.serviceScope` 에 서비스 저장 → 화면 안의 `/store/...` 링크(약 69곳, 수정 없음)로 이동해도 같은 서비스 API. 고정은 그 매장의 활성 서비스일 때만 유효, 매장 변경 시 해제. 고정이 없으면 기존 우선순위 동작 그대로.
+  - 이용계약(428) 게이트 · `/work/:serviceKey` 업무 복귀 문맥을 고정 서비스 기준으로.
+  - **owner-only 복원**: 위 4개 화면에 `StoreOwnerOnly`(= `{서비스}:store_owner` · `{서비스}:admin` · `{서비스}:operator` · `platform:super_admin`, KPA `PharmacyOwnerOnlyGuard` 와 같은 규칙).
+- **KPA 앱**: 통합 매장 handoff 의 returnPath 중 공통 매장 화면(`/store`, `/store/...`)만 `/work/kpa-society/store/...` 로(`lib/unifiedStoreScope.ts`). `/store/commerce/*` 등 서비스 업무 · `/store-hub` · 워크스페이스 홈은 기존 대상 그대로. store-ui-core RULES 수정 없음(F3).
+- **옛 링크 유지**: `VITE_UNIFIED_STORE_HANDOFF` 는 여전히 `'false'` — KPA `kpa-society.co.kr/store/*` 는 그대로 KPA 앱에서 동작. 공개 · 기기 경로(`/store/:slug/products/:id` · `/store/:slug/blog*` · `/store/marketing/signage/play/*` · `/kpa/store/*` · `/qr` · `/tablet`) 변경 없음.
+- 테스트: KPA vitest 3(경로 대응 — RULES 결과와 결합) · api 정적 계약 7(web-store mount · owner-only · 서비스 고정 · 복원 · KPA handoff · 플래그 false) · 기존 foundation spec 회귀 0 · web-store · KPA tsc 0 · lint 오류 0.
+
+#### 검증 계획 (배포 후 · 서비스별)
+
+| 단계 | KPA 검증 |
+|---|---|
+| 진입 | `store.neture.co.kr/work/kpa-society/store` 직접 접속 |
+| 로그인 · handoff | store 호스트 Google 로그인(**Store Google origin 미확인** — 게이트) · 또는 KPA 앱에서 handoff(플래그 켠 빌드에서만) |
+| 권한 | KPA 매장 경영자 → 화면 · `/api/v1/kpa/*` 호출 / KPA 가입 없는 매장 → 안내 카드 / 경영자 아닌 구성원 → owner-only 4화면 차단 + 서버 403 |
+| 화면 · 새로고침 | 홈 · QR · POP · 사이니지 · 자료함 · 정보 새로고침 후 KPA 문맥 유지 |
+| 다른 서비스 오진입 | KCos 만 가입한 매장이 `/work/kpa-society/store` → 안내 카드 |
+| 옛 주소 | `kpa-society.co.kr/store/*` · 공개 QR · 태블릿 그대로 |
+
+**미해결(이 단계 안)**: 복수 매장 사용자는 매장 선택 후 원래 경로(returnTo)를 잃고 홈으로 간다(`StoreGate` → `/select-store`) · 매장 선택값이 서비스 API 에 전달되지 않는다(서버가 사용자+서비스로 추정 — 같은 서비스에 매장 2개면 409) — KPA 전환 전 보완 여부 판단 필요.
+
+#### 배포 범위 재산정
+
+이 단계 코드가 main 에 들어가므로 첫 서브도메인 배포 대상 SHA 는 이 커밋으로 바뀐다. 영향 서비스 추가: **store-web · kpa-society-web**(둘 다 기존 목록에 있음 — store-web 은 QR URL, kpa-society-web 은 이번이 첫 변경). migration 0 · 플래그 false 유지라 운영 동작 변화는 web-store 의 새 경로 추가와 owner-only 복원뿐이다.

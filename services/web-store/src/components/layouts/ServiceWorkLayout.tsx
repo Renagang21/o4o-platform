@@ -5,7 +5,7 @@
  *   - :serviceKey 가 이 매장의 활성 enrollment(workServiceKeys)에 없으면 안내만 한다(서버가 SSOT — 화면은 표시 분기).
  *   - 렌더 시점에 모듈 전역 서비스 문맥을 그 서비스로 set 한다. 자식 effect 가 부모 effect 보다 먼저 실행되므로
  *     effect 가 아니라 렌더 중에 set 해야 자식 페이지의 첫 fetch 가 올바른 prefix 로 나간다(멱등 대입).
- *   - 벗어나면(cleanup) 공통 문맥(commonServiceKey)으로 되돌린다.
+ *   - 벗어나면(cleanup) 내 매장 문맥(effectiveServiceKey = 고정 서비스 ?? 공통 우선순위)으로 되돌린다(§21-13).
  *   - `key={serviceKey}` 로 서비스가 바뀌면 하위 트리를 다시 mount 한다(이전 서비스 데이터 잔존 방지).
  */
 import { useEffect } from 'react';
@@ -25,12 +25,12 @@ function useWorkServiceKey(): string | undefined {
   return m?.[1];
 }
 
-function ServiceWorkBody({ serviceKey, commonServiceKey }: { serviceKey: UnifiedServiceKey; commonServiceKey: UnifiedServiceKey | null }) {
+function ServiceWorkBody({ serviceKey, restoreServiceKey }: { serviceKey: UnifiedServiceKey; restoreServiceKey: UnifiedServiceKey | null }) {
   setActiveServiceContext(serviceKey);
   useEffect(() => {
     setActiveServiceContext(serviceKey);
-    return () => { setActiveServiceContext(commonServiceKey); };
-  }, [serviceKey, commonServiceKey]);
+    return () => { setActiveServiceContext(restoreServiceKey); };
+  }, [serviceKey, restoreServiceKey]);
   return (
     <StoreAgreementGate serviceKey={serviceKey}>
       <StoreWorkDashboard config={SERVICE_WORK_CONFIGS[serviceKey]} />
@@ -40,7 +40,7 @@ function ServiceWorkBody({ serviceKey, commonServiceKey }: { serviceKey: Unified
 
 export default function ServiceWorkLayout() {
   const serviceKey = useWorkServiceKey();
-  const { workServiceKeys, commonServiceKey } = useUnifiedStore();
+  const { workServiceKeys, effectiveServiceKey } = useUnifiedStore();
   if (!isUnifiedServiceKey(serviceKey) || !workServiceKeys.includes(serviceKey)) {
     return (
       <main className="center-card"><section className="card" data-testid="service-work-unavailable">
@@ -50,7 +50,7 @@ export default function ServiceWorkLayout() {
       </section></main>
     );
   }
-  return <ServiceWorkBody key={serviceKey} serviceKey={serviceKey} commonServiceKey={commonServiceKey} />;
+  return <ServiceWorkBody key={serviceKey} serviceKey={serviceKey} restoreServiceKey={effectiveServiceKey} />;
 }
 
 /** /work 인덱스 — 이 매장의 서비스 업무 진입점 목록 */

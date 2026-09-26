@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate, Link, useNavigate, useLocation, useParams, useSearchParams } from 'react-router-dom';
+import { toKpaScopedStorePath } from './lib/unifiedStoreScope';
 import { useEffect, useState, useRef, lazy, Suspense, type ReactNode } from 'react';
 // WO-O4O-STORE-PRODUCTS-QUERYCLIENT-PROVIDER-ALIGN-V1
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -530,9 +531,13 @@ const kpaStoreServicesApi = createStoreServicesApi({
  * handoff 실패 시 기존 화면으로 fallback — 송출 화면(/store/marketing/signage/play/*)은 대상 아님.
  */
 const UNIFIED_STORE_HANDOFF_ENABLED = isUnifiedStoreHandoffEnabled(import.meta.env.VITE_UNIFIED_STORE_HANDOFF);
+/** 공통 매장 화면(/store/...) returnPath → KPA 서비스 지정 매장 화면(/work/kpa-society/store/...) — §21-13 */
+const kpaStoreHandoffApi = {
+  resolveWorkspaceEntryUrl: (returnPath: string) => kpaStoreServicesApi.resolveWorkspaceEntryUrl(toKpaScopedStorePath(returnPath)),
+};
 function KpaUnifiedStoreHandoff({ children }: { children: ReactNode }) {
   return (
-    <UnifiedStoreHandoffGate enabled={UNIFIED_STORE_HANDOFF_ENABLED} serviceKey="kpa-society" api={kpaStoreServicesApi}>
+    <UnifiedStoreHandoffGate enabled={UNIFIED_STORE_HANDOFF_ENABLED} serviceKey="kpa-society" api={kpaStoreHandoffApi}>
       {children}
     </UnifiedStoreHandoffGate>
   );

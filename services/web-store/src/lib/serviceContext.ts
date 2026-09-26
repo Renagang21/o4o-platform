@@ -47,6 +47,54 @@ export function pickCommonServiceContext(enrolled: readonly string[]): UnifiedSe
   return null;
 }
 
+/**
+ * 서비스 지정 매장 화면(`/work/<serviceKey>/store/*`) — CHECK-O4O-URL-FIRST-CENSUS-V1 §21-13
+ *
+ * 각 서비스의 매장 경영자용 `/store` 를 store.neture.co.kr 로 옮길 때, 공통 `/store/*` 화면이 우선순위
+ * (KPA → KCos → PH)가 아니라 **진입한 서비스**의 API 로 동작해야 한다. 진입 시 서비스를 세션에 고정하고,
+ * 화면 안의 `/store/...` 링크로 이동해도 같은 서비스가 유지되게 한다(링크 수정 불요).
+ * 고정값은 그 매장의 활성 서비스일 때만 쓰인다(StoreContext 가 검증) — 서버 권한 판정은 그대로다.
+ */
+export const SERVICE_SCOPE_STORAGE_KEY = 'o4o.store.serviceScope';
+
+export function readServiceScope(): UnifiedServiceKey | null {
+  try {
+    const v = typeof window !== 'undefined' ? window.sessionStorage.getItem(SERVICE_SCOPE_STORAGE_KEY) : null;
+    return isUnifiedServiceKey(v) ? v : null;
+  } catch {
+    return null;
+  }
+}
+
+export function writeServiceScope(key: UnifiedServiceKey | null): void {
+  try {
+    if (typeof window === 'undefined') return;
+    if (key) window.sessionStorage.setItem(SERVICE_SCOPE_STORAGE_KEY, key);
+    else window.sessionStorage.removeItem(SERVICE_SCOPE_STORAGE_KEY);
+  } catch {
+    // storage 불가 — 이번 화면 문맥만 쓴다
+  }
+}
+
+/** 고정 서비스가 이 매장의 활성 서비스일 때만 그것을, 아니면 공통 우선순위 문맥을 쓴다. */
+export function resolveEffectiveServiceKey(
+  scoped: UnifiedServiceKey | null,
+  workServiceKeys: readonly UnifiedServiceKey[],
+): UnifiedServiceKey | null {
+  if (scoped && workServiceKeys.includes(scoped)) return scoped;
+  return pickCommonServiceContext(workServiceKeys);
+}
+
+/**
+ * 매장 경영자 전용 화면 권한 — 각 서비스 앱의 owner-only 가드와 같은 규칙.
+ *   KPA `PharmacyOwnerOnlyGuard` = `kpa:store_owner` 또는 플랫폼 역할(`kpa:admin` · `kpa:operator` · `platform:super_admin`).
+ */
+export function isServiceStoreOwner(roles: readonly string[] | undefined, serviceKey: UnifiedServiceKey): boolean {
+  const short = SERVICE_SHORT_KEY[serviceKey];
+  const allowed = [`${short}:store_owner`, `${short}:admin`, `${short}:operator`, 'platform:super_admin'];
+  return (roles ?? []).some((r) => allowed.includes(r));
+}
+
 let activeServiceKey: UnifiedServiceKey | null = null;
 
 /** StoreContext 만 호출한다 (매장 선택 · 서비스 업무 진입 시). */

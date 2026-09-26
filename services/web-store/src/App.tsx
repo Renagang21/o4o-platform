@@ -16,7 +16,7 @@ import { StoreProvider } from './contexts/StoreContext';
 import { TermsAcceptanceGate } from './components/TermsAcceptanceGate';
 import { StoreGate } from './components/StoreGate';
 import RootShell from './components/RootShell';
-import UnifiedStoreLayout from './components/layouts/UnifiedStoreLayout';
+import UnifiedStoreLayout, { ServiceStoreLayout, StoreOwnerOnly } from './components/layouts/UnifiedStoreLayout';
 import ServiceWorkLayout, { ServiceWorkHomePage, ServiceWorkIndexPage } from './components/layouts/ServiceWorkLayout';
 import UnifiedHubLayout from './components/layouts/UnifiedHubLayout';
 import HomePage from './pages/HomePage';
@@ -114,38 +114,29 @@ const S = WORKSPACE_PATHS.myStore;
 const W = WORKSPACE_PATHS.serviceWork;
 const H = WORKSPACE_PATHS.storeHub;
 
-export default function App() {
-  return <BrowserRouter><AuthProvider><StoreProvider><TermsAcceptanceGate><Suspense fallback={Loading}><Routes>
-    <Route path={WORKSPACE_PATHS.handoff} element={<HandoffPage />} />
-    {/* 사이니지 재생은 chrome-free (KPA 와 동일하게 layout 밖) */}
-    <Route path={`${S}/marketing/signage/play/:playlistId`} element={gated(<SignagePlaybackPage />)} />
-
-    <Route element={<RootShell />}>
-      <Route path={WORKSPACE_PATHS.login} element={<LoginPage />} />
-      <Route path={WORKSPACE_PATHS.select} element={gated(<StoreSelectorPage />)} />
-      <Route path={WORKSPACE_PATHS.home} element={gated(<HomePage />)} />
-      <Route path={WORKSPACE_PATHS.myServices} element={gated(<MyServicesPage />)} />
-      <Route path={WORKSPACE_PATHS.settings} element={gated(<SettingsPage />)} />
-
-      {/* ── 내 매장(공통 기능 1회) ── */}
-      <Route path={S} element={gated(<UnifiedStoreLayout />)}>
+/**
+ * 내 매장 화면(공통 컴포넌트) — `/store/*` 와 서비스 지정 `/work/<serviceKey>/store/*` 두 곳에 같은 트리를 mount 한다.
+ * CHECK-O4O-URL-FIRST-CENSUS-V1 §21-13 (서비스별 매장 경영자 화면 위치 이전). 경로 · 컴포넌트 · 권한 동작은 그대로다.
+ */
+function storeChildRoutes() {
+  return <>
         <Route index element={<StoreHomePage />} />
         <Route path="info" element={<PharmacyInfoPage />} />
         <Route path="settings" element={<Navigate to={`${S}/info`} replace />} />
         <Route path="execution" element={<StoreExecutionPage />} />
         <Route path="execution/product-info" element={<Navigate to={`${S}/handled-products`} replace />} />
         {/* 매장 제품 */}
-        <Route path="my-products" element={<StoreProductsManagerPage
+        <Route path="my-products" element={<StoreOwnerOnly><StoreProductsManagerPage
           title="내 매장 제품"
           description="O4O 제품 중 매장이 취급 등록한 제품을 관리합니다. 태블릿, QR, 사이니지 등 매장 서비스에 활용합니다."
           registerButtonLabel="O4O 제품 취급 등록"
           infoText="O4O 제품을 매장 경영활용 제품으로 등록할 수 있습니다. 등록한 제품은 태블릿 전시, QR 안내, 사이니지 등에 연결해 활용할 수 있습니다."
           emptyTitle="취급 중인 O4O 제품이 없습니다"
           emptyDescription="O4O 제품을 취급 등록해 태블릿과 매장 안내 서비스에 활용해 주세요."
-        />} />
-        <Route path="handled-products" element={<StoreHandledProductsPage />} />
-        <Route path="commerce/local-products" element={<StoreLocalProductsPage />} />
-        <Route path="products/multilingual/:targetKind/:targetId" element={<StoreProductMultilingualContentPage />} />
+        /></StoreOwnerOnly>} />
+        <Route path="handled-products" element={<StoreOwnerOnly><StoreHandledProductsPage /></StoreOwnerOnly>} />
+        <Route path="commerce/local-products" element={<StoreOwnerOnly><StoreLocalProductsPage /></StoreOwnerOnly>} />
+        <Route path="products/multilingual/:targetKind/:targetId" element={<StoreOwnerOnly><StoreProductMultilingualContentPage /></StoreOwnerOnly>} />
         {/* 매장 경영지원 */}
         <Route path="marketing/product-descriptions" element={<StoreProductDescriptionsPage />} />
         <Route path="marketing/qr" element={<StoreQRPage />} />
@@ -181,9 +172,32 @@ export default function App() {
         <Route path="pop" element={<Navigate to={`${S}/marketing/pop-v2`} replace />} />
         <Route path="signage" element={<Navigate to={`${S}/marketing/signage/playlist`} replace />} />
         <Route path="*" element={NotFound} />
+  </>;
+}
+
+export default function App() {
+  return <BrowserRouter><AuthProvider><StoreProvider><TermsAcceptanceGate><Suspense fallback={Loading}><Routes>
+    <Route path={WORKSPACE_PATHS.handoff} element={<HandoffPage />} />
+    {/* 사이니지 재생은 chrome-free (KPA 와 동일하게 layout 밖) */}
+    <Route path={`${S}/marketing/signage/play/:playlistId`} element={gated(<SignagePlaybackPage />)} />
+
+    <Route element={<RootShell />}>
+      <Route path={WORKSPACE_PATHS.login} element={<LoginPage />} />
+      <Route path={WORKSPACE_PATHS.select} element={gated(<StoreSelectorPage />)} />
+      <Route path={WORKSPACE_PATHS.home} element={gated(<HomePage />)} />
+      <Route path={WORKSPACE_PATHS.myServices} element={gated(<MyServicesPage />)} />
+      <Route path={WORKSPACE_PATHS.settings} element={gated(<SettingsPage />)} />
+
+      {/* ── 내 매장(공통 기능 1회) ── */}
+      <Route path={S} element={gated(<UnifiedStoreLayout />)}>
+        {storeChildRoutes()}
       </Route>
 
       {/* ── 서비스 업무(서비스 종속 기능만) ── */}
+      {/* 서비스 지정 매장 화면 — 각 서비스 앱의 매장 경영자용 /store 의 새 위치(§21-13). 현재 KPA 만. */}
+      <Route path={`${W}/kpa-society/store`} element={gated(<ServiceStoreLayout />)}>
+        {storeChildRoutes()}
+      </Route>
       <Route path={W} element={gated(<ServiceWorkIndexPage />)} />
       <Route path={`${W}/:serviceKey`} element={gated(<ServiceWorkLayout />)}>
         <Route index element={<ServiceWorkHomePage />} />

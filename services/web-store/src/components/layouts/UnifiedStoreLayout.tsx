@@ -10,8 +10,8 @@
  * 공통 매장 API 는 `commonServiceKey` 문맥으로 호출된다(StoreContext 가 모듈 전역에 set). 이 layout 은 문맥을
  * 바꾸지 않는다 — /work/:serviceKey 에서 돌아오면 ServiceWorkLayout 의 cleanup 이 공통 문맥으로 되돌린다.
  */
-import type { ReactNode } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, type ReactNode } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { StoreDashboardLayout, resolveStoreMenu, useStoreCapabilities, type StoreDashboardConfig } from '@o4o/store-ui-core';
 import { StoreOwnerAgreementGate } from '@o4o/shared-space-ui';
 import { getUserDisplayName } from '@o4o/account-ui';
@@ -20,7 +20,13 @@ import { useUnifiedStore } from '../../contexts/StoreContext';
 import { fetchStoreCapabilities } from '../../api/storeHub';
 import { UNIFIED_STORE_CONFIG } from '../../config/storeMenu';
 import { WORKSPACE_PATHS } from '../../config/workspace';
-import { SERVICE_LABEL, type UnifiedServiceKey } from '../../lib/serviceContext';
+import {
+  SERVICE_LABEL,
+  isServiceStoreOwner,
+  isUnifiedServiceKey,
+  setActiveServiceContext,
+  type UnifiedServiceKey,
+} from '../../lib/serviceContext';
 
 export function StoreAgreementGate({ serviceKey, children }: { serviceKey: UnifiedServiceKey | null; children: ReactNode }) {
   const { logout } = useAuth();
@@ -51,10 +57,74 @@ export function StoreWorkDashboard({ config, withCapabilities = false }: { confi
 }
 
 export default function UnifiedStoreLayout() {
-  const { commonServiceKey } = useUnifiedStore();
+  // 서비스 고정(§21-13)이 있으면 그 서비스, 없으면 공통 우선순위 문맥으로 이용계약 게이트를 통과한다.
+  const { effectiveServiceKey } = useUnifiedStore();
   return (
-    <StoreAgreementGate serviceKey={commonServiceKey}>
+    <StoreAgreementGate serviceKey={effectiveServiceKey}>
       <StoreWorkDashboard config={UNIFIED_STORE_CONFIG} withCapabilities />
     </StoreAgreementGate>
+  );
+}
+
+/** `/work/<serviceKey>/store/...` 의 서비스 키 */
+function useStoreScopeServiceKey(): string | undefined {
+  const { pathname } = useLocation();
+  const m = pathname.match(new RegExp(`^${WORKSPACE_PATHS.serviceWork}/([^/]+)/store(?:/|$)`));
+  return m?.[1];
+}
+
+/**
+ * 서비스 지정 매장 화면 — `store.neture.co.kr/work/<serviceKey>/store/*` (CHECK-O4O-URL-FIRST-CENSUS-V1 §21-13)
+ *
+ * 각 서비스 앱의 매장 경영자용 `/store` 화면을 서비스별 경로에서 연다. 화면은 내 매장(/store)과 같은
+ * 컴포넌트이고, 서비스 문맥만 진입한 서비스로 고정한다(세션 유지 → 화면 안 `/store/...` 링크도 같은 서비스).
+ *   - 이 매장의 활성 서비스가 아니면 안내만 한다(서버가 SSOT — 403 은 서버가 판정).
+ *   - 렌더 시점에 문맥을 set 한다(자식 첫 fetch 가 올바른 prefix 로 나가도록 — ServiceWorkLayout 과 같은 이유).
+ */
+export function ServiceStoreLayout() {
+  const serviceKey = useStoreScopeServiceKey();
+  const { workServiceKeys, scopedServiceKey, setServiceScope } = useUnifiedStore();
+  const valid = isUnifiedServiceKey(serviceKey) && workServiceKeys.includes(serviceKey);
+  if (valid) setActiveServiceContext(serviceKey);
+  useEffect(() => {
+    if (valid && scopedServiceKey !== serviceKey) setServiceScope(serviceKey);
+  }, [valid, serviceKey, scopedServiceKey, setServiceScope]);
+
+  if (!valid) {
+    return (
+      <main className="center-card"><section className="card" data-testid="service-store-unavailable">
+        <h1>이용할 수 없는 매장 화면입니다</h1>
+        <p>이 매장이 가입한 서비스가 아니거나 아직 업무공간이 제공되지 않는 서비스입니다.</p>
+        <Link className="button-link" to={WORKSPACE_PATHS.myStore}>내 매장으로 돌아가기</Link>
+      </section></main>
+    );
+  }
+  const config: StoreDashboardConfig = {
+    ...UNIFIED_STORE_CONFIG,
+    serviceName: `${SERVICE_LABEL[serviceKey]} 매장`,
+    basePath: `${WORKSPACE_PATHS.serviceWork}/${serviceKey}/store`,
+  };
+  return (
+    <StoreAgreementGate serviceKey={serviceKey}>
+      <StoreWorkDashboard config={config} withCapabilities />
+    </StoreAgreementGate>
+  );
+}
+
+/**
+ * 매장 경영자 전용 화면 — 각 서비스 앱의 owner-only 가드와 같은 규칙(현재 서비스 문맥 기준).
+ *   KPA 는 `/store/my-products` · `/handled-products` · `/commerce/local-products` · `/products/multilingual/*`
+ *   를 `PharmacyOwnerOnlyGuard` 로 막는다 — 옮긴 화면에서도 같은 권한 동작을 보존한다.
+ */
+export function StoreOwnerOnly({ children }: { children: ReactNode }) {
+  const { user } = useAuth();
+  const { effectiveServiceKey } = useUnifiedStore();
+  if (!effectiveServiceKey || isServiceStoreOwner(user?.roles, effectiveServiceKey)) return <>{children}</>;
+  return (
+    <main className="center-card"><section className="card" data-testid="store-owner-only">
+      <h1>매장 경영자만 이용할 수 있습니다</h1>
+      <p>이 화면은 {SERVICE_LABEL[effectiveServiceKey]} 매장 경영자 권한이 필요합니다.</p>
+      <Link className="button-link" to={WORKSPACE_PATHS.home}>홈으로</Link>
+    </section></main>
   );
 }
