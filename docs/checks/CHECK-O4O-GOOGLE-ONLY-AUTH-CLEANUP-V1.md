@@ -123,16 +123,45 @@ migration job 정상 실행(`o4o-api-migrations-bsrgj`) · **적용 0**(이번 W
 | T5-2 | **Admin 설정** | 사용자 실측 — AI Services 가 첫 탭 · OAuth 탭 없음 | `[x]` PASS |
 | T5-3 | **Admin 운영자 관리** | 사용자 실측 — '초대 대기' 탭 없음 · 등록 화면이 사용자 검색부터 | `[x]` PASS |
 | T5-4 | **Neture** Google 로그인 | 사용자 실측 — 사용자 이름 + '내 업무 공간' 표시 | `[x]` PASS |
-| T5-5 | KPA Society — `https://kpa-society.co.kr` | — | `[ ]` **미검증** |
-| T5-6 | K-Cosmetics — `https://k-cosmetics.site` | — | `[ ]` **미검증** |
-| T5-7 | PharmacyHub — `https://pharmacyhub.co.kr` | — | `[ ]` **미검증** |
-| T5-8 | KPA Branch — `https://kpa-society.co.kr/kpa` | — | `[ ]` **미검증** |
-| T5-9 | Store — `https://store.neture.co.kr` | — | `[ ]` **미검증** |
-| T5-10 | Lecture — `https://study.neture.co.kr` (자체 인증 없음 · Neture 안내) | — | `[ ]` **미검증** |
-| T5-11 | Hospital Pharmacy — `https://neture.co.kr/hospital` | — | `[ ]` **미검증** |
+#### 군 A — Google 인증 후 **세션 성립** 확인 (5건)
 
-진입 주소는 **배포 설정 정본**(`config/service-catalog.ts` 의 `domain` + `basePath`)에서 확인했다.
-추정하지 않았다. 판정 시 **권한 미가입(가입 안내·403)과 로그인 실패(세션 미성립)를 구분**한다.
+| # | 서비스 | 진입 주소 | 상태 |
+|---|---|---|---|
+| T5-5 | KPA Society | `https://kpa-society.co.kr` | `[ ]` **미검증** |
+| T5-6 | K-Cosmetics | `https://k-cosmetics.site` | `[ ]` **미검증** |
+| T5-7 | PharmacyHub | `https://pharmacyhub.co.kr` | `[ ]` **미검증** |
+| T5-8 | KPA Branch | `https://kpa-society.co.kr/kpa` | `[ ]` **미검증** |
+| T5-9 | Store | `https://store.neture.co.kr` | `[ ]` **미검증** |
+
+판정: **PASS** = 인증 후 돌아와 세션 성립(사용자 표시) / **BLOCKED** = 세션은 섰으나 그 서비스
+**권한 미가입**(가입 안내·접근 제한) / **FAIL** = 돌아오지 못하거나 **로그아웃 상태로 남음**.
+
+#### 군 B — 자체 로그인 **없음** 확인 (1건 · Google 인증 불필요)
+
+| # | 서비스 | 진입 주소 | 확인할 것 | 상태 |
+|---|---|---|---|---|
+| T5-10 | Lecture | `https://study.neture.co.kr` | 자체 로그인 폼이 **없고** Neture 안내 카드가 뜨는지 | `[ ]` **미검증** |
+
+#### 군 C — **공개 진입 + 게이트** 확인 (1건 · Google 인증 불필요)
+
+| # | 서비스 | 진입 주소 | 확인할 것 | 상태 |
+|---|---|---|---|---|
+| T5-11 | Hospital Pharmacy | `https://neture.co.kr/hospital` | 공개 진입이 되는지 · **기기 등록 게이트**가 정상 표시되는지 | `[ ]` **미검증** |
+
+진입 주소는 **배포 설정 정본**(`config/service-catalog.ts` 의 `domain` + `basePath`)에서 확인했다 — 추정하지 않았다.
+
+> **FAIL 은 원인 조사 신호다.** FAIL 이 나왔다고 곧바로 이번 cleanup 이 원인이라고 결론짓지 않는다.
+> 먼저 인증 반환 · 세션 쿠키/토큰 · 권한 · 해당 서비스 고유 게이트를 갈라 본다.
+
+#### 내가 수행하지 못한 이유 (2026-09-26 재확인)
+
+이 세션에 **브라우저 자동화 도구가 없다**(Claude-in-Chrome · 내장 브라우저 모두 미탑재).
+`WebFetch` 는 인증 URL 을 열지 못하고, 대상이 전부 **클라이언트 렌더 SPA** 라 서버 응답에는
+셸(HTML `<title>` 수준)만 온다 — 실제로 `study.neture.co.kr` 을 `WebFetch` 로 열어 확인했고
+"O4O 강의 | Neture" 제목 외에 아무 것도 보이지 않았다. **군 B · 군 C 도 렌더 결과는 볼 수 없다.**
+
+참고로 배포 번들 안의 문구는 확인했다(렌더 증명이 아니라 "무엇이 나와야 하는가" 의 근거):
+`study.neture.co.kr` 의 `index-DKAKeHRh.js` 에 **"O4O 계정은 Neture에서 통합 관리합니다"** 문자열이 존재.
 
 **왜 제가 이어서 못 하는가**: 로그인 수단이 Google 하나이고 password 경로를 은퇴시켰다.
 프로그램으로 Google 계정 인증을 수행할 수단이 없다 — 이 WO 가 만든 상태의 직접적 결과다.
