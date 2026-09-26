@@ -17,10 +17,18 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { resolveBranchByHost, type BranchSummary } from './api/branch';
 
-/** 공용(멀티테넌트) 호스트 — 이 목록이 아니면 자체 도메인으로 본다. */
+/**
+ * 공용(멀티테넌트) 호스트 — 이 목록이 아니면 자체 도메인으로 본다.
+ *
+ * `kpa.neture.co.kr` (CHECK-O4O-URL-FIRST-CENSUS-V1 §21-10): 분회 전용 공용 호스트.
+ *   `kpa.neture.co.kr/{slug}` 는 `/kpa` prefix 없이 root 진입이다(detectBasename → '').
+ *   목록에 없으면 자체 도메인으로 오판해 `resolve?host=` 조회 후 "분회 없음" 이 된다.
+ *   옛 공용 경로 `kpa-society.co.kr/kpa/{slug}` 는 그대로 유지한다.
+ */
 const PLATFORM_HOSTS = [
   'kpa-society.co.kr',
   'www.kpa-society.co.kr',
+  'kpa.neture.co.kr',
   'localhost',
   '127.0.0.1',
 ];

@@ -40,6 +40,7 @@ import { RoleGuard, OperatorRoute, AdminRoute, PlatformRoute, SupplierRoute } fr
 import { ADMIN_ROLES } from './lib/role-constants';
 import { resolveLoginReturnPath } from './lib/loginReturnPath';
 import HostBoundary from './components/HostBoundary';
+import { CURRENT_HOST_PROFILE } from './lib/hostProfile';
 
 // ============================================================================
 // Neture 메인 페이지 (항상 로드)
@@ -59,6 +60,7 @@ import {
 import ContactPage from './pages/ContactPage';
 import NotFoundPage from './pages/NotFoundPage';
 import SupplierLandingPage from './pages/SupplierLandingPage';
+import CommunityHostHomePage from './pages/community/CommunityHostHomePage';
 
 // ============================================================================
 // o4o 공통 페이지 (항상 로드)
@@ -696,7 +698,8 @@ function App() {
                 (NetureGlobalHeader/Footer/BottomNav)을 씌우지 않으므로
                 NetureLayout 밖에 배치한다. 기존 Neture 커뮤니티 홈은 /community.
             ================================================================ */}
-            <Route path="/" element={<O4OHomePage />} />
+            {/* 서브도메인(supplier · funding · community)에서는 `/` 가 각 호스트 대표 화면이다(아래 NetureLayout 안). */}
+            {CURRENT_HOST_PROFILE === 'main' && <Route path="/" element={<O4OHomePage />} />}
 
             {/* ================================================================
                 Neture 메인 (NetureLayout)
@@ -705,6 +708,10 @@ function App() {
             <Route element={<NetureLayout />}>
               {/* WO-O4O-COMMON-HOME-PHASE1-V1: `/` 에 있던 CommunityPage 를 이동.
                   페이지 자체는 복제하지 않고 같은 컴포넌트를 그대로 사용한다. */}
+              {/* 서브도메인 대표 화면 — CHECK-O4O-URL-FIRST-CENSUS-V1 §21-10 */}
+              {CURRENT_HOST_PROFILE === 'supplier' && <Route path="/" element={<SupplierLandingPage />} />}
+              {CURRENT_HOST_PROFILE === 'funding' && <Route path="/" element={<MarketTrialHubPage />} />}
+              {CURRENT_HOST_PROFILE === 'community' && <Route path="/" element={<CommunityHostHomePage />} />}
               <Route path="/community" element={<CommunityPage />} />
               {/* MyPage 3-split (WO-O4O-NETURE-MYPAGE-SPLIT-V1) */}
               <Route path="/mypage" element={<MyPageHub />} />

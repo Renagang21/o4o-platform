@@ -889,3 +889,37 @@ gcloud compute url-maps add-host-rule o4o-global-lb --global --hosts=supplier.ne
 ```
 - 관리형 인증서는 DNS 가 LB IP 를 가리켜야 발급된다 → DNS 선행. 발급 전까지 HTTPS 불가.
 - 원복: host rule 제거(`url-maps remove-host-rule`) · map entry 삭제. 기존 호스트 · 인증서 영향 0.
+
+### 21-10. 여섯 호스트 인프라 · 코드 (2026-09-26 · 사용자 지시 "서브도메인 이전 계속")
+
+#### DNS · 인증서 · LB (운영 인프라 — 사용자 승인 범위)
+
+| 호스트 | 공개 DNS(8.8.8.8 · 1.1.1.1) | 인증서(별도 · 관리형) | LB 연결 | HTTPS 실측 | 현재 서빙 |
+|---|---|---|---|---|---|
+| supplier.neture.co.kr | 136.110.132.35 | `cm-cert-supplier-v1` **ACTIVE** | host rule → `path-matcher-neture` → neture-web | 200 | 운영 neture-web(`14587a9ad`) — 새 호스트 코드 **미배포**라 O4O 홈이 보인다 |
+| funding.neture.co.kr | 〃 | `cm-cert-funding-v1` ACTIVE | 〃 | 200 | 〃 |
+| community.neture.co.kr | 〃 | `cm-cert-community-v1` ACTIVE | 〃 | 200 | 〃 |
+| pharmacy.neture.co.kr | 〃 | `cm-cert-pharmacy-v1` ACTIVE | **새 matcher** `path-matcher-pharmacy` → kpa-society-web(`/kpa` 분회 규칙 없음) | 200 | KPA 앱 그대로(호스트 비의존 확인) |
+| retail.neture.co.kr | 〃 | `cm-cert-retail-v1` ACTIVE | host rule → `path-matcher-k-cosmetics` | 200 | K-Cosmetics 앱 그대로(호스트 비의존 확인) |
+| kpa.neture.co.kr | 〃 | `cm-cert-kpa-v1` ACTIVE | **새 matcher** `path-matcher-kpa-host` → kpa-branch-web | 200 · `/kpa/assets/*` 200 | 분회 앱 — 운영 버전은 이 호스트를 자체 도메인으로 오판(수정 코드 **미배포**) |
+
+- 기존 13도메인 인증서(`cm-cert-neture-v2`) 수정 0. 변경 전 URL map export 백업(세션 scratchpad `urlmap-before-20260926.yaml`). 원복 = 추가한 host rule · path matcher · map entry 삭제.
+- 변경 직후 기존 호스트 회귀: neture · www · admin · store · study · kpa-society · k-cosmetics · pharmacyhub `/` 200, `neture.co.kr/hospital` 200, `kpa-society.co.kr/kpa/` · `/kpa/tablet/x` 200, `pharmacyhub.co.kr/qr/x` 200, API `/health` 200. **옛 `/kpa/tablet/*` · `/kpa/store/*` 규칙 변경 없음.**
+
+#### 코드 (이번 커밋)
+
+- web-neture: `/` 를 호스트별 대표 화면으로 **직접 렌더**(supplier = `SupplierLandingPage`, funding = `MarketTrialHubPage`, community = 커뮤니티 진입 화면) — 리다이렉트 없음. `community` 호스트 프로필: `/pharmacist` → `pharmacy.neture.co.kr/forum`, `/retail` → `retail.neture.co.kr/forum`(현재 동작하는 각 서비스 포럼으로 연결). vitest 15건.
+- web-kpa-branch: `PLATFORM_HOSTS` 에 `kpa.neture.co.kr` — `kpa.neture.co.kr/{분회}` root 진입. 옛 `kpa-society.co.kr/kpa/{분회}` 판정 · `/kpa` asset base 불변. 정적 계약 spec 2건.
+- pharmacy · retail: 앱 코드 변경 불요(호스트 의존 코드 없음 — `@k-cosmetics.site` 메일 표기만).
+- 서비스 키 · role prefix · `service-catalog` 도메인 **변경 없음** — 새 호스트 검증 전까지 handoff 대상 · 새 QR 인쇄 호스트는 옛 도메인 유지(옛 QR 보호).
+
+#### 커뮤니티 · Store 표시 기준
+
+- `community.neture.co.kr/pharmacist` · `/retail`: **주소 진입 연결(부분)** — 실제 활동은 각 서비스 포럼. 독립 커뮤니티 가입 · 승인은 **미구현**(§18) → 완료로 표시하지 않는다.
+- `store.neture.co.kr/hub` · `/my-store`: `/hub` 는 기존 동작, `/my-store` 는 **미구현**(현재 `/store`), 다중 서비스 데이터 통합 미구현(§17) → 완료로 표시하지 않는다.
+
+#### 새로 드러난 선결 조건 — handoff 대상 추가는 DB 변경을 요구한다
+
+- 승인된 "공급자 · 펀딩 handoff 대상 추가"는 작업공간 대상을 늘리는 방식인데, `handoff_tokens` 의 CHECK 제약이 `target_workspace = 'store'` 만 허용한다(`1789974015939-AlterHandoffTokensTargetWorkspace.ts:29-33`) → **제약 변경 migration 필요 = 중지 조건(DB schema)**. 코드는 아직 넣지 않았다.
+- 제안: incremental migration 으로 제약을 `target_workspace IN ('store','supplier','funding')` 로 교체(+ `expected-schema-states` · ledger spec 같은 커밋), `HANDOFF_WORKSPACES` 확장, 대상별 exchange origin lock(`supplier.neture.co.kr` · `funding.neture.co.kr` 정확 일치), 대상 URL 생성, Neture 에서 공급자 · 펀딩으로 가는 진입 링크를 handoff 로. 원복 = 이전 제약으로 되돌리는 down migration.
+- 이 전까지: 새 호스트에서 **직접 Google 로그인**은 가능(Google 승인 원본 등록 전제).

@@ -18,8 +18,8 @@ describe('getHostProfile', () => {
 });
 
 describe('supplier 호스트', () => {
-  it('/ → 공급자 첫 화면', () => {
-    expect(decideHost('supplier', loc('/'))).toEqual({ kind: 'home', to: '/supplier' });
+  it('/ 는 그대로 — App 이 공급자 대표 화면을 직접 렌더', () => {
+    expect(decideHost('supplier', loc('/'))).toEqual({ kind: 'stay' });
   });
   it('공급자 경로 · 레거시 deep-link 는 그대로', () => {
     expect(decideHost('supplier', loc('/supplier/dashboard')).kind).toBe('stay');
@@ -49,8 +49,8 @@ describe('supplier 호스트', () => {
 });
 
 describe('funding 호스트', () => {
-  it('/ → 유통참여형 펀딩 첫 화면, 쿼리 보존', () => {
-    expect(decideHost('funding', loc('/', '?ref=a'))).toEqual({ kind: 'home', to: '/market-trial?ref=a' });
+  it('/ 는 그대로 — App 이 펀딩 대표 화면을 직접 렌더', () => {
+    expect(decideHost('funding', loc('/', '?ref=a'))).toEqual({ kind: 'stay' });
   });
   it('펀딩 경로는 그대로 · 공급자 경로는 대표 호스트로', () => {
     expect(decideHost('funding', loc('/market-trial/my')).kind).toBe('stay');
@@ -58,6 +58,23 @@ describe('funding 호스트', () => {
       kind: 'external',
       href: 'https://neture.co.kr/supplier/market-trial/3',
     });
+  });
+});
+
+describe('community 호스트', () => {
+  it('호스트 판정', () => {
+    expect(getHostProfile('community.neture.co.kr')).toBe('community');
+  });
+  it('/ 는 그대로(커뮤니티 진입 화면)', () => {
+    expect(decideHost('community', loc('/')).kind).toBe('stay');
+  });
+  it('/pharmacist · /retail → 현재 동작하는 각 서비스 포럼', () => {
+    expect(decideHost('community', loc('/pharmacist'))).toEqual({ kind: 'external', href: 'https://pharmacy.neture.co.kr/forum' });
+    expect(decideHost('community', loc('/retail/abc'))).toEqual({ kind: 'external', href: 'https://retail.neture.co.kr/forum' });
+  });
+  it('그 밖의 경로는 대표 호스트로 · 로그인은 그 호스트', () => {
+    expect(decideHost('community', loc('/forum'))).toEqual({ kind: 'external', href: 'https://neture.co.kr/forum' });
+    expect(decideHost('community', loc('/login')).kind).toBe('stay');
   });
 });
 
