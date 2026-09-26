@@ -5,6 +5,26 @@
 > 근거: [`IR-O4O-GOOGLE-ONLY-AUTH-SIMPLIFICATION-CENSUS-V1`](../investigations/IR-O4O-GOOGLE-ONLY-AUTH-SIMPLIFICATION-CENSUS-V1.md)
 >
 > **하나의 통합 작업이다.** 단계별로 새 WO 를 만들지 않는다. 이 문서의 TODO 가 진행·최종 보고의 기준이다.
+> T5 · T6 · T7 결과가 채워지기 전에는 **DONE 으로 선언하지 않는다.**
+
+## 0-A. 최초 목적과 확정 정책 (재개 시점 재확인 · 2026-09-26)
+
+**목적** — Google 하나로 통일한 뒤에도 남아 있던 **전환기 · 중복 · 죽은 인증 구조**를 제거한다.
+기능 추가가 아니고 로그인 동작도 바꾸지 않는다. 노린 것은 "쓰지 않기로 한 인증 방식이
+다시 열릴 수 있는 입구"를 닫는 것이다(부팅마다 등록되던 Passport 전략 · clientSecret 을
+응답하던 OAuth 설정 endpoint · 세션 없이 열리던 1회용 bootstrap · producer 가 없는 이메일 인증 체인).
+
+**확정 정책 — 이번 범위에서 바꾸지 않는다**
+
+```text
+유지: localStorage 전략 · includeLegacyTokens   (웹 8개의 현행 로그인 경로)
+유지: Kakao Connected Channel (contact_kakao 계열 — 로그인 축 아님)
+유지: 기존 인쇄 QR 링크
+금지: 인증 전략 변경(cookie 단일화) · 분회 신규 도메인 개설
+```
+
+**차단 조건** — 실측되지 않은 것을 PASS 로 적지 않는다. 미확인을 0 으로 간주하지 않는다.
+인증 우회 · 비밀값 수집을 하지 않는다. 조건 미충족 시 DROP 하지 않고 사유를 남긴다.
 
 ---
 
@@ -103,13 +123,16 @@ migration job 정상 실행(`o4o-api-migrations-bsrgj`) · **적용 0**(이번 W
 | T5-2 | **Admin 설정** | 사용자 실측 — AI Services 가 첫 탭 · OAuth 탭 없음 | `[x]` PASS |
 | T5-3 | **Admin 운영자 관리** | 사용자 실측 — '초대 대기' 탭 없음 · 등록 화면이 사용자 검색부터 | `[x]` PASS |
 | T5-4 | **Neture** Google 로그인 | 사용자 실측 — 사용자 이름 + '내 업무 공간' 표시 | `[x]` PASS |
-| T5-5 | KPA Society | — | `[ ]` **미검증** |
-| T5-6 | K-Cosmetics | — | `[ ]` **미검증** |
-| T5-7 | PharmacyHub | — | `[ ]` **미검증** |
-| T5-8 | KPA Branch | — | `[ ]` **미검증** |
-| T5-9 | Store | — | `[ ]` **미검증** |
-| T5-10 | Lecture (안내 페이지) | — | `[ ]` **미검증** |
-| T5-11 | Hospital Pharmacy | — | `[ ]` **미검증** |
+| T5-5 | KPA Society — `https://kpa-society.co.kr` | — | `[ ]` **미검증** |
+| T5-6 | K-Cosmetics — `https://k-cosmetics.site` | — | `[ ]` **미검증** |
+| T5-7 | PharmacyHub — `https://pharmacyhub.co.kr` | — | `[ ]` **미검증** |
+| T5-8 | KPA Branch — `https://kpa-society.co.kr/kpa` | — | `[ ]` **미검증** |
+| T5-9 | Store — `https://store.neture.co.kr` | — | `[ ]` **미검증** |
+| T5-10 | Lecture — `https://study.neture.co.kr` (자체 인증 없음 · Neture 안내) | — | `[ ]` **미검증** |
+| T5-11 | Hospital Pharmacy — `https://neture.co.kr/hospital` | — | `[ ]` **미검증** |
+
+진입 주소는 **배포 설정 정본**(`config/service-catalog.ts` 의 `domain` + `basePath`)에서 확인했다.
+추정하지 않았다. 판정 시 **권한 미가입(가입 안내·403)과 로그인 실패(세션 미성립)를 구분**한다.
 
 **왜 제가 이어서 못 하는가**: 로그인 수단이 Google 하나이고 password 경로를 은퇴시켰다.
 프로그램으로 Google 계정 인증을 수행할 수단이 없다 — 이 WO 가 만든 상태의 직접적 결과다.
@@ -143,32 +166,79 @@ migration job 정상 실행(`o4o-api-migrations-bsrgj`) · **적용 0**(이번 W
 
 **③ 각 서비스 응답** — `kpa-society.co.kr` · `k-cosmetics.site` · `pharmacyhub.co.kr` ·
 `store.neture.co.kr` · `study.neture.co.kr` · `neture.co.kr/hospital` = **200** ·
-`kpa-branch-web` run.app = **200** (`branch.kpa-society.co.kr` 은 응답 없음 — 도메인 매핑 별건, 이번 변경과 무관)
+**`kpa-society.co.kr/kpa` = 200**(분회 현행 진입) · `kpa-branch-web` run.app = 200
 
-### T6 — 운영 DB 실측 `[!] 차단`
+### ③-1. 분회 주소 정정 — 앞선 '도메인 장애' 판정 철회
 
-| # | 테이블 | 필요 값 | 상태 |
+앞 기록에서 `branch.kpa-society.co.kr` 무응답을 "도메인 매핑 별건"으로 적었다. **이 판정을 철회한다.**
+그 주소는 **만들지 않기로 한 주소**이므로 응답하지 않는 것이 정상이고, 장애도 T5 차단 사유도 아니다.
+
+**출처 확인 결과 — 저장소에 실재한다(내가 지어낸 이름이 아니다).**
+
+| 위치 | 성격 | 조치 |
+|---|---|---|
+| `bootstrap/setup-middlewares.ts:79` | **주석 한 줄** — "공용 진입이 서브도메인(DNS 미연결)에서 `kpa-society.co.kr` 의 `/kpa` path 로 바뀌었다" 는 **경위 설명**. CORS allowlist 에 항목으로 등록돼 있지 **않다** | **유지** — 왜 서브도메인을 쓰지 않는지 설명하는 문장이다 |
+| `migrations/20270305000000-SeedKpaBranchServiceAndRoles.ts:32` | `services.url` seed 값 `'https://branch.kpa-society.co.kr'` | **적용 완료된 과거 migration 은 수정하지 않는다.** 운영 DB 행 값은 T6 에서 함께 확인한다 |
+| CHECK 문서 5건 | 과거 기록물 | 기록물은 고치지 않는다(§16-1) |
+
+**현행 정본은 코드가 이미 갖고 있다** — `config/service-catalog.ts` 의 `kpa-branch` 는
+`domain: 'kpa-society.co.kr'` + `basePath: '/kpa'` 이고, 실제 `https://kpa-society.co.kr/kpa` 가 **200** 이다.
+따라서 T5-8 검증 주소는 **`https://kpa-society.co.kr/kpa`** 로 고정한다.
+장래 구상인 `kpa.neture.co.kr/{분회}` 는 이번 작업에서 열지 않는다.
+
+### T6 — 운영 DB 실측 `[!] 미확인 (차단)`
+
+**2026-09-26 재시도 결과**: ADC 파일 부재(`application_default_credentials.json` 없음) ·
+`gcloud auth application-default print-access-token` 실패. `gcloud` 사용자 계정(`sohae2100@…`)은
+로그인돼 있으나 Cloud SQL Auth Proxy 는 **ADC 를 요구**한다. 채널이 열리지 않았다.
+
+| # | 대상 | 필요 값 | 상태 |
 |---|---|---|---|
-| T6-1 | `operator_invitations` | 행 수 | `[!]` |
-| T6-2 | `linking_sessions` | 행 수 | `[!]` |
-| T6-3 | `email_verification_tokens` | 행 수 | `[!]` |
-| T6-4 | `refresh_tokens` | 행 수 | `[!]` |
-| T6-5 | `mobile_product_drafts` | 행 수 | `[!]` |
-| T6-6 | `login_attempts` | 행 수 | `[!]` |
-| T6-7 | `user_activity_logs` PASSWORD_* | 값별 행 수 | `[!]` |
+| T6-1 | `operator_invitations` | 행 수 · 데이터 성격 | **미확인** |
+| T6-2 | `linking_sessions` | 행 수 | **미확인** |
+| T6-3 | `email_verification_tokens` | 행 수 | **미확인** |
+| T6-4 | `refresh_tokens` | 행 수 | **미확인** |
+| T6-5 | `mobile_product_drafts` | 행 수 · 보존 필요성 | **미확인** |
+| T6-6 | `login_attempts` | 행 수 | **미확인** |
+| T6-7 | `user_activity_logs` PASSWORD_* | 값별 행 수 | **미확인** |
+| T6-8 | `services` 행의 `kpa-branch` **url 값** | seed 의 `branch.kpa-society.co.kr` 가 운영 행에 남아 있는지 | **미확인** (§③-1 에서 파생) |
 
-> **차단 해제에 필요한 것 — 정확히 하나**: 이 PC 에서 `gcloud auth application-default login` 1회 실행.
-> 그 뒤는 `SETUP.md` 절차(Cloud SQL Auth Proxy v2 · 포트 5442)로 제가 read-only 조회합니다.
-> DB 비밀번호가 필요하면 Secret Manager 경로만 알려주시면 되고, 값을 알려주실 필요는 없습니다.
+> **미확인은 0행이 아니다.** 이 표의 어떤 칸도 "없다" 는 뜻으로 읽지 않는다.
+>
+> **차단 해제 — 정확히 한 단계**: 이 PC 에서 `gcloud auth application-default login` 1회 실행.
+> 그 뒤는 `SETUP.md` 절차(Cloud SQL Auth Proxy v2 · 포트 5442)로 read-only 조회한다.
+> DB 자격정보가 필요하면 **Secret Manager 경로만** 알려주면 된다 — 값을 이 문서에 남기지 않는다.
 
-### T7 — 스키마 처분 (WO 단계 B · **실측 후**)
+### T7 — 테이블별 처분 (**T6 수치 대기**)
 
-| # | 항목 | 완료 조건 | 상태 |
-|---|---|---|---|
-| T7-1 | DROP 대상 확정 | 행 수 0 확인된 테이블만 | `[ ]` |
-| T7-2 | migration 작성 | migration + `manifest.ts` + `expected-schema-states.ts` **같은 커밋** · fingerprint 는 격리 PG15 에서 생성 | `[ ]` |
-| T7-3 | `login_attempts` | **auth-core manifest 변경 명시 승인** 없으면 제외하고 그대로 기록 | `[ ]` |
-| T7-4 | 배포 창 분리 | 코드 배포와 **같은 창에 섞지 않는다**(migration job 이 revision 보다 먼저 실행됨) | `[ ]` |
+판정틀만 고정한다. **수치가 없으면 판정하지 않는다** — 빈 칸을 REMOVE 로 채우지 않는다.
+
+| 테이블 | 코드 참조 | 행 수 | 판정 | 판정 규칙 |
+|---|---|---|---|---|
+| `operator_invitations` | **0**(제거 완료·배포됨) | 미확인 | **보류** | 0행 → REMOVE / 행 있으면 성격 확인 후 HOLD |
+| `linking_sessions` | **0** | 미확인 | **보류** | 동일 |
+| `email_verification_tokens` | **0** | 미확인 | **보류** | 동일 |
+| `refresh_tokens` | **0** | 미확인 | **보류** | writer 가 0이었으므로 0행 예상 — 확인 전 단정 금지 |
+| `mobile_product_drafts` | **0** | 미확인 | **보류** | 행 있으면 **업무 데이터**다. 보존·이관 판단 선행 |
+| `login_attempts` | **0** | 미확인 | **보류** | + **auth-core manifest 변경 명시 승인** 필요(CLAUDE.md §3·§14). 승인 없으면 REMOVE 대상에서 제외하고 사유 기록 |
+| `user_activity_logs` PASSWORD_* enum | 값 미사용 | 미확인 | **보류** | 과거 로그 행이 있으면 enum 유지 |
+
+**전제 — 이미 충족**: 코드 제거가 운영에 반영됐다(11개 서비스 배포 · 제거 경로 404 실측 · §①).
+따라서 DROP 은 "코드가 아직 읽는 테이블을 지우는" 위험이 아니다.
+
+**실행 조건(전부 충족 시에만)**
+
+```text
+1. T6 수치 확보          → 0행 또는 보존 불필요 판정
+2. login_attempts        → auth-core manifest 변경 승인 (별도)
+3. migration + manifest + expected-schema-states 를 같은 커밋
+   fingerprint 는 격리 PostgreSQL 15 에서 생성 (운영에서 복사 금지)
+4. **별도 통제 배포 창** — 코드 배포와 섞지 않는다
+   (deploy-api 가 migration job 을 새 revision 보다 먼저 실행한다)
+5. 적용 전후 스키마·서비스 상태 검증 → 게이트 즉시 false 복구
+```
+
+조건 미충족 시 **DROP 하지 않고 차단 사유를 이 표에 남긴다.**
 
 ### T8 — 마감
 
