@@ -26,6 +26,21 @@
 **차단 조건** — 실측되지 않은 것을 PASS 로 적지 않는다. 미확인을 0 으로 간주하지 않는다.
 인증 우회 · 비밀값 수집을 하지 않는다. 조건 미충족 시 DROP 하지 않고 사유를 남긴다.
 
+**제외 범위** — 인증 전략 변경(cookie 단일화) · `includeLegacyTokens`/`localStorage` 동작 변경 ·
+분회 신규 도메인 개설 · Kakao Connected Channel · 기존 인쇄 QR 링크. 이번 작업에서 손대지 않는다.
+
+**완료 기준**
+
+```text
+T5  서비스별 PASS / BLOCKED / FAIL / 미검증 이 근거와 함께 표에 기록
+    Store 는 실브라우저에서 세션이 확인돼야 PASS
+T6  대상 테이블 행 수 + services.url(kpa-branch) 값이 읽기 전용으로 확인
+    확인 못 한 값은 '미확인' 으로 남긴다
+T7  테이블별 KEEP / REMOVE / HOLD 판정 + 근거
+    DROP 은 별도 통제 배포 창에서만. login_attempts 는 auth-core 승인 없이 제거 금지
+=>  스키마 제거 전에는 전체 DONE 선언 금지
+```
+
 ---
 
 ## 0. 착수 전 대조 (2026-09-26 · 코드 수정 전에 수행)
@@ -129,8 +144,8 @@ migration job 정상 실행(`o4o-api-migrations-bsrgj`) · **적용 0**(이번 W
 | T5-7 | PharmacyHub | `https://pharmacyhub.co.kr` | 직접 버튼 → 세션 | **미검증** | — |
 | T5-8 | KPA Branch | `https://kpa-society.co.kr/kpa` (origin = `kpa-society.co.kr`) | 진입 + 세션 | **미검증** | — |
 | T5-9 | **Store** | `https://store.neture.co.kr` | 직접 버튼 → 세션 | **FAIL** | `400: origin_mismatch` — 아래 §T5-9 |
-| T5-10 | Lecture | `https://study.neture.co.kr/login` | 자체 로그인 **없음** + Neture 안내 (**화면 동작**) | **PASS** | 사용자 관찰(아래 출처) — 입력창 없이 "O4O 계정은 Neture에서 통합 관리합니다" 안내 + "Neture에서 계속하기" 버튼 |
-| T5-11 | Hospital Pharmacy | `https://neture.co.kr/hospital` | 공개 진입 + 기기 등록 게이트 (**화면 동작**) | **PASS** | 사용자 관찰(아래 출처) — 공개 진입 후 "이 PC 연결하기" + 기기 등록 코드 입력 화면 |
+| T5-10 | Lecture | `https://study.neture.co.kr/login` | 자체 로그인 **없음** + Neture 안내 (**화면 동작**) | **PASS** | ChatGPT 실브라우저 관찰(아래 출처) — 입력창 없이 "O4O 계정은 Neture에서 통합 관리합니다" 안내 + "Neture에서 계속하기" 버튼 |
+| T5-11 | Hospital Pharmacy | `https://neture.co.kr/hospital` | 공개 진입 + 기기 등록 게이트 (**화면 동작**) | **PASS** | ChatGPT 실브라우저 관찰(아래 출처) — 공개 진입 후 "이 PC 연결하기" + 기기 등록 코드 입력 화면 |
 
 판정: **PASS** = 인증 후 돌아와 세션 성립(사용자 표시) / **BLOCKED** = 세션은 섰으나 그 서비스
 **권한 미가입**(가입 안내·접근 제한) / **FAIL** = 돌아오지 못하거나 **로그아웃 상태로 남음**.
@@ -151,8 +166,9 @@ migration job 정상 실행(`o4o-api-migrations-bsrgj`) · **적용 0**(이번 W
 > 애초에 둘 다 자체 Google 인증을 요구하지 않는 성격이라 확인 대상이 화면 상태였다.
 >
 > **출처**: 내가 브라우저를 조작한 결과가 **아니다.** 이 세션에는 브라우저 도구가 없다.
-> 사용자가 실브라우저에서 직접 관찰해 이 대화로 전달한 결과를 그대로 옮긴 것이다(2026-09-26).
-> 같은 이유로 군 A(T5-5~9)의 세션 성립은 이 두 건으로 대체되지 않는다.
+> **ChatGPT 가 실브라우저에서 확인한 화면 동작**을 사용자가 이 대화로 전달한 것이다(2026-09-26).
+> 따라서 근거의 성격은 '타 도구의 관찰 전달' 이며, 재현이 필요하면 같은 주소를 다시 열어 확인한다.
+> 같은 이유로 군 A(T5-5~9)의 **세션 성립**은 이 두 건으로 대체되지 않는다.
 
 #### 진입 주소 실측 (2026-09-26 · origin 확정)
 
@@ -309,6 +325,50 @@ Google 인증 → Store 복귀 → 세션 성립 → 사용자 정보 표시까�
 > **차단 해제 — 정확히 한 단계**: 이 PC 에서 `gcloud auth application-default login` 1회 실행.
 > 그 뒤는 `SETUP.md` 절차(Cloud SQL Auth Proxy v2 · 포트 5442)로 read-only 조회한다.
 > DB 자격정보가 필요하면 **Secret Manager 경로만** 알려주면 된다 — 값을 이 문서에 남기지 않는다.
+
+**접속 수단 점검 (값 미출력)** — 남은 결손은 ADC 하나뿐이다.
+
+| 요소 | 상태 |
+|---|---|
+| 프록시 바이너리 `bin/cloud-sql-proxy-v2.exe` | **있음** |
+| 인스턴스 · 포트 | `netureyoutube:asia-northeast3:o4o-platform-db` · 로컬 `5442` (SETUP.md) |
+| DB 사용자 · DB 이름 | `o4o_api_v2` · `o4o_platform` (Cloud Run env 에서 확인 — 값은 비밀이 아님) |
+| DB 비밀번호 | Secret Manager `o4o-db-password` (**이름만 확인**. 값은 조회하지 않았고 이 문서에 남기지 않는다) |
+| **ADC** | **없음 → 유일한 차단** (proxy v2 는 `--token` 을 받지 않는다. `--credentials-file` 은 서비스 계정 키가 필요해 채택하지 않는다) |
+
+**실행 준비 완료 — 채널이 열리면 이 쿼리만 돌린다 (SELECT 전용 · write 0)**
+
+```sql
+-- 1) 대상 테이블 존재 여부
+SELECT table_name
+FROM information_schema.tables
+WHERE table_schema = 'public'
+  AND table_name IN ('operator_invitations','linking_sessions','email_verification_tokens',
+                     'refresh_tokens','mobile_product_drafts','login_attempts')
+ORDER BY table_name;
+
+-- 2) 행 수 (존재하는 것만 실행)
+SELECT 'operator_invitations'      AS t, count(*) FROM operator_invitations
+UNION ALL SELECT 'linking_sessions',          count(*) FROM linking_sessions
+UNION ALL SELECT 'email_verification_tokens', count(*) FROM email_verification_tokens
+UNION ALL SELECT 'refresh_tokens',            count(*) FROM refresh_tokens
+UNION ALL SELECT 'mobile_product_drafts',     count(*) FROM mobile_product_drafts
+UNION ALL SELECT 'login_attempts',            count(*) FROM login_attempts;
+
+-- 3) user_activity_logs 의 password 계열 값별 행 수
+SELECT action, count(*)
+FROM user_activity_logs
+WHERE action IN ('password_change','password_reset_request','password_reset_complete')
+GROUP BY action;
+
+-- 4) T6-8 — kpa-branch 의 services.url 현재 값
+SELECT service_key, url FROM services WHERE service_key = 'kpa-branch';
+
+-- 5) 행이 있는 테이블만: 데이터 성격 판단용 최소 표본 (개인정보 컬럼 제외)
+--    예) SELECT id, status, created_at FROM operator_invitations ORDER BY created_at DESC LIMIT 5;
+```
+
+값이 도착하면 T7 표의 '행 수' 칸을 채우고 그 자리에서 KEEP/REMOVE/HOLD 를 판정한다.
 
 ### T7 — 테이블별 처분 (**T6 수치 대기**)
 
