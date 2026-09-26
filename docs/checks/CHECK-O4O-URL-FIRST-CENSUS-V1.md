@@ -827,3 +827,65 @@ KPA 는 주문 생성 · prepare/confirm · 결제완료 핸들러 · fulfillmen
 5. 가입 신청 승인(= 공급자 역할 부여) 포함 여부.
 6. 포럼 영구 삭제를 새 역할만 막을지, 기존 `neture:operator` 에게도 막을지.
 7. admin-dashboard `/ops` 개방(CLOSED 결정 · 회귀 테스트 범위 개정) — 지시상 허용 범위이나 구현 착수 확인.
+
+### 21-8. 방향 변경 기록 — 서브도메인 이전 우선 (2026-09-26 사용자 지시)
+
+| 항목 | 내용 |
+|---|---|
+| 원래 목적 | INITIAL_PURPOSE 그대로(흩어진 기능을 확정 URL 체계에 배치 · 기존 QR · 인증 · 주문 경로 보존) |
+| 현재 발견 | P2 운영자 역할은 roles migration · `/operator/*` 마운트 순서 · CLOSED 결정 번복 등 결정 7건이 남아 있다(§21-7-4). 반면 새 호스트는 전부 NXDOMAIN 이고 `neture.co.kr/supplier` 만 열린다 |
+| 변경 이유 | 사용자가 **서브도메인 이전을 먼저** 진행하도록 우선순위를 바꿨다. 목표는 새 주소에서 기존 기능에 실제 진입 · 사용 가능한 상태(빈 진입 화면은 완료 아님) |
+| 원래 목적과의 관계 | 같은 목적의 실행 순서 변경. P2 운영자 역할 · `/ops` 는 서브도메인 안정화 뒤 **같은 TODO 의 다음 순서** |
+| 범위 확대 | **NO** — 오히려 이번 단계에서 `neture:o4o_operator` · roles migration · `/ops` · 운영자 등록 변경 · 공급자 경계 재설계 · PH 고유 기능 일괄 이관 · 환불 자동화를 제외 |
+| 완료 기준 변경 | **NO** — DONE_CRITERIA 유지. 커뮤니티 별도 가입 · 매장 다중 서비스 데이터는 "주소 이전과 연결된 후속 기능"으로 남은 조건 표시(동작하지 않는 기능을 이전 완료로 표시하지 않음) |
+
+**실행 순서(지시)**: ① 경로 대응표 확정 ② 공급자 · 펀딩 ③ 약국 · 소매 · 분회(`/kpa/tablet/*` · `/kpa/store/*` 보존, 소매 공개 QR 은 실제 열리는 경로만) ④ 커뮤니티 · 매장 링크 ⑤ 호스트별 DNS · 인증서 · LB · CORS · Google origin · handoff · 로그인 복귀(Store Google origin 미확인 상태로 로그인 PASS 금지) ⑥ 옛 주소 경로별 보호(일괄 301 금지).
+**보고 구분**: 코드/CI · DNS/콘솔 설정 · 운영 배포 · 브라우저 실측. `DEPLOY_ENABLED=false` 동안 운영 이전 완료 판정 없음.
+
+### 21-9. 서브도메인 이전 ① 대응표 · ② 공급자 · 펀딩 (2026-09-26)
+
+**출발 상태(실측 §2-1)**: `neture.co.kr/supplier` · `/market-trial` 정상, `supplier.neture.co.kr` · `funding.neture.co.kr` 은 NXDOMAIN(서비스 없음).
+
+#### 대응표 — 공급자 · 펀딩 (나머지 호스트는 §4 행 그대로, 착수 시 이 형식으로 확정)
+
+| 현재 | 새 호스트 | 처리 | 세션 · 인증 |
+|---|---|---|---|
+| `neture.co.kr/supplier` (랜딩) · `/supplier/*` (약 40, `SupplierRoute`) · `/supplier/forum*` 레거시 deep-link · `/account/supplier/*` · `/workspace/*` | `supplier.neture.co.kr` — **경로 형태 그대로**(`/supplier/...`), `/` → `/supplier` | 같은 번들 재사용 · 호스트 경계(`HostBoundary`) | 호스트별 localStorage — 새 호스트에서 Google 로그인 필요(아래 게이트) |
+| `neture.co.kr/market-trial` · `/market-trial/my` · `/market-trial/:id` | `funding.neture.co.kr` — 경로 그대로, `/` → `/market-trial` | 동일 | 참여는 로그인만 필요(`market-trial.routes.ts:33`) |
+| 공급자 호스트에서 소유하지 않은 경로(`/operator` · `/admin` · `/guide` · `/forum` · `/store` · `/` 외 전부) | → `https://neture.co.kr` 같은 경로 · 쿼리 · 해시 | 전체 이동(내부 링크 약 135개 수정 불요) | 대표 호스트 세션 필요 |
+| 모든 새 호스트의 `/handoff` · `/login` · `/register*` · `/terms` · `/privacy` · `/contact` · `/mypage*` | 그 호스트에서 그대로 | — | 그 호스트 세션 |
+| 대표 호스트 `neture.co.kr/supplier*` · `/market-trial*` 옛 링크 · 알림 `targetUrl`(상대경로) | **당분간 대표 호스트에서 그대로 동작**. 새 호스트 검증 후 빌드 플래그(`VITE_HOST_CUTOVER_SUPPLIER` / `_FUNDING`)로만 경로 · 쿼리 보존 이동 | 일괄 301 아님 · 앱 단 전환 | — |
+| 공급자 운영 승인(`/operator/suppliers` · `/operator/market-trial`) | 대표 호스트 유지 | — | P2 운영자 역할은 다음 순서 |
+
+#### 구현 (코드)
+
+- `services/web-neture/src/lib/hostProfile.ts` — 호스트 판정 · 소유/공유 경로 · 판정 함수 · cutover 플래그(기본 꺼짐).
+- `services/web-neture/src/components/HostBoundary.tsx` — `<Routes>` 를 감싸 판정 적용(route 선언 · 경로 불변).
+- API CORS 에 목표 호스트 5개 추가(`supplier` · `pharmacy` · `retail` · `kpa` · `community` `.neture.co.kr`, `funding` 은 기존). 정확 origin 만 · 와일드카드 0 · `partner` 는 예약이라 제외. 쿠키 도메인은 `.neture.co.kr` 자동 판정이라 변경 불요.
+- 테스트: web-neture vitest 11건(호스트 판정 · 소유/공유 · 교차 이동 쿼리 보존 · 접두만 같은 경로 · cutover 플래그) · CORS 계약 spec PASS · web-neture tsc 0.
+- Supplier FROZEN 기준 준수: 공급자 호스트에 운영자 · 커뮤니티 · Store 기능 신설 없음(소유하지 않은 경로는 대표 호스트로), `/supplier/forum*` 경로 · 리다이렉트 체인 변경 없음, 펀딩 명칭 "유통참여형 펀딩" 변경 없음.
+
+#### 남은 게이트 (공급자 · 펀딩 호스트)
+
+| 게이트 | 내용 | 주체 | 상태 |
+|---|---|---|---|
+| DNS | Gabia A 레코드 `supplier` · `funding` → `136.110.132.35` | 사용자(Gabia) | 미실시 |
+| 인증서 | 호스트별 **별도** 관리형 인증서 + cert map entry(`cm-cert-neture-v2` 13도메인 묶음에 추가 금지 — §2-2) | gcloud(운영 인프라 변경) | **승인 대기** |
+| LB | URL map host rule `supplier.neture.co.kr` · `funding.neture.co.kr` → 기존 `backend-neture-web-http`(새 backend · NEG 불요) | gcloud(운영 인프라 변경) | **승인 대기** |
+| Google JS origin | `https://supplier.neture.co.kr` · `https://funding.neture.co.kr` 추가 | 사용자(GCP 콘솔) | 미실시 · Store origin 도 **미확인** |
+| 배포 | neture-web · API(CORS) | `DEPLOY_ENABLED=false` | 미반영 |
+| 대표 → 새 호스트 로그인 이어받기 | 현재 handoff 는 neture 대표 진입이 `returnPath='/'` · origin `neture.co.kr/www` 고정이라 새 호스트로 세션을 옮길 대상이 없다 → 새 호스트에서 직접 Google 로그인은 가능 | handoff 새 대상 추가 = **인증 API 계약 변경(중지 조건)** | 결정 필요 |
+| SEO | 새 호스트가 전체 사이트와 같은 `robots.txt` · sitemap 을 서빙(소유하지 않은 경로는 이동하므로 중복 색인은 제한적) · 호스트별 canonical 은 미구현 | — | 기록 |
+| 브라우저 실측 | 직접 접속 · 새로고침 · 로그인 · 복귀 · 핵심 업무(공급자 대시보드 · 상품 · 주문 / 펀딩 목록 · 상세 · 참여) | — | 배포 후 |
+| 공급자 실계정 | Supplier 기준 §10 `DEFERRED_PENDING_GOOGLE_IDENTITY` — 실제 공급자 로그인 smoke 는 그 해제 뒤 | — | 차단 |
+
+**인증서 · LB 실행 절차(승인 후 · 선례 = store · study)**
+```
+gcloud certificate-manager certificates create cm-cert-supplier-v1 --domains=supplier.neture.co.kr
+gcloud certificate-manager maps entries create cm-entry-supplier --map=o4o-main-cert-map --certificates=cm-cert-supplier-v1 --hostname=supplier.neture.co.kr
+gcloud certificate-manager certificates create cm-cert-funding-v1 --domains=funding.neture.co.kr
+gcloud certificate-manager maps entries create cm-entry-funding --map=o4o-main-cert-map --certificates=cm-cert-funding-v1 --hostname=funding.neture.co.kr
+gcloud compute url-maps add-host-rule o4o-global-lb --global --hosts=supplier.neture.co.kr,funding.neture.co.kr --path-matcher-name=path-matcher-neture
+```
+- 관리형 인증서는 DNS 가 LB IP 를 가리켜야 발급된다 → DNS 선행. 발급 전까지 HTTPS 불가.
+- 원복: host rule 제거(`url-maps remove-host-rule`) · map entry 삭제. 기존 호스트 · 인증서 영향 0.

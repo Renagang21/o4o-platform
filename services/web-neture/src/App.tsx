@@ -39,6 +39,7 @@ import AdminVaultLayout from './components/layouts/AdminVaultLayout';
 import { RoleGuard, OperatorRoute, AdminRoute, PlatformRoute, SupplierRoute } from './components/auth/RoleGuard';
 import { ADMIN_ROLES } from './lib/role-constants';
 import { resolveLoginReturnPath } from './lib/loginReturnPath';
+import HostBoundary from './components/HostBoundary';
 
 // ============================================================================
 // Neture 메인 페이지 (항상 로드)
@@ -667,6 +668,8 @@ function App() {
           {/* WO-O4O-INTEGRATED-TERMS-ACCEPTANCE-AND-SIGNUP-ALIGNMENT-V1 §17: 기존 회원 약관 재동의 게이트 */}
           <TermsAcceptanceGate>
           <Suspense fallback={<PageLoading />}>
+            {/* 서브도메인(supplier · funding) 경계 — CHECK-O4O-URL-FIRST-CENSUS-V1 §21-8 */}
+            <HostBoundary>
             <Routes>
             {/* ================================================================
                 인증 페이지 (레이아웃 없음)
@@ -1201,6 +1204,7 @@ function App() {
             ================================================================ */}
             <Route path="*" element={<NotFoundPage />} />
             </Routes>
+            </HostBoundary>
           </Suspense>
           </TermsAcceptanceGate>
           </WorkScopeProvider>

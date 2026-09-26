@@ -62,6 +62,15 @@ export const getAllowedOrigins = (): string[] => {
     // WO-O4O-UNIFIED-STORE-WORKSPACE-FOUNDATION-V1:
     //   store.neture.co.kr = O4O 공통 Store Workspace(서비스가 아님 · serviceKey 없음). 정확한 origin 만, wildcard 금지.
     "https://store.neture.co.kr",
+    // CHECK-O4O-URL-FIRST-CENSUS-V1 §21-8 (서브도메인 이전): 확정된 목표 호스트.
+    //   DNS 연결 전이라도 등록해 두면 이후 DNS 작업에서 API 재배포가 불필요하다(pharmacyhub 선례).
+    //   정확한 origin 만 — wildcard / credentials 완화 / reflect-origin 은 도입하지 않는다.
+    //   funding.neture.co.kr 은 위에 이미 있다. partner 는 주소 예약만이라 등록하지 않는다.
+    "https://supplier.neture.co.kr",
+    "https://pharmacy.neture.co.kr",
+    "https://retail.neture.co.kr",
+    "https://kpa.neture.co.kr",
+    "https://community.neture.co.kr",
     // Cloud Run service URLs (GCP asia-northeast3)
     "https://neture-web-3e3aws7zqa-du.a.run.app",
     "https://kpa-society-web-3e3aws7zqa-du.a.run.app",
