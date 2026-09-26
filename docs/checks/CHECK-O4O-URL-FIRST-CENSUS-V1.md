@@ -4,7 +4,7 @@
 >
 > **INITIAL_PURPOSE** — 기존 서브디렉토리와 독립 도메인에 흩어진 O4O 기능을 확정된 URL 체계에 배치한다. 서비스별 운영 영역 · 독립 커뮤니티 · 매장 Hub 와 내 매장의 경계를 코드와 주소에서 일치시키고, 기존 QR · 인증 · 주문 경로가 전환 과정에서 끊기지 않게 한다.
 >
-> **CONFIRMED_DECISIONS** — 약국 `pharmacy.neture.co.kr` · 소매 `retail.neture.co.kr` · KPA 분회 `kpa.neture.co.kr/{분회}` · 커뮤니티 `community.neture.co.kr/pharmacist`·`/retail`(서비스 회원과 별도 가입) · 매장 `store.neture.co.kr/hub`·`/my-store`(서비스별 거래 화면은 필요한 범위에서 유지) · 공급자 `supplier.neture.co.kr`(공급자 도메인 기준 재사용) · 파트너 `partner.neture.co.kr` 예약(공급자 기능을 파트너로 되돌리지 않음) · 펀딩 `funding.neture.co.kr` · 병원약국 공개 화면 `neture.co.kr/hospital` · Cafe24 `neture.co.kr/cafe24` 유지 · 운영은 `admin.neture.co.kr` 고려하되 O4O 운영자에게 `platform:super_admin` 비부여. Neture 중복 `/hospital-drug` 제거(병원 앱 공유 저장 키 · 기기 데이터 보존). `pharmacyhub.co.kr` 에 새 독립 서비스 불가, 기존 호스트 HTTPS · QR · 호환 경로 · 데이터 식별자는 안전한 목적지 검증까지 보존. 서비스 키 · role prefix 일괄 변경 금지. **환불은 별도 확정 정책**(오프라인 처리 + 수기 기록, `WO-O4O-OFFLINE-REFUND-MANUAL-RECORD-ONLY-V1`) — PG 자동 환불을 이 작업에 다시 넣지 않는다. 그 밖의 확정 결정은 §9 · §12.
+> **CONFIRMED_DECISIONS** — 약국 `pharmacy.neture.co.kr` · 소매 `retail.neture.co.kr` · KPA 분회 `kpa.neture.co.kr/{분회}` · 커뮤니티 `community.neture.co.kr/pharmacist`·`/retail`(서비스 회원과 별도 가입) · 매장 `store.neture.co.kr/hub`·`/my-store`(서비스별 거래 화면은 필요한 범위에서 유지) · 공급자 `supplier.neture.co.kr`(공급자 도메인 기준 재사용) · 파트너 `partner.neture.co.kr` 예약(공급자 기능을 파트너로 되돌리지 않음) · 펀딩 `funding.neture.co.kr` · 병원약국 공개 화면 `neture.co.kr/hospital` · Cafe24 `neture.co.kr/cafe24` 유지 · 운영은 `admin.neture.co.kr` 고려하되 O4O 운영자에게 `platform:super_admin` 비부여. Neture 중복 `/hospital-drug` 제거(병원 앱 공유 저장 키 · 기기 데이터 보존). `pharmacyhub.co.kr` 에 새 독립 서비스 불가, 기존 호스트 HTTPS · QR · 호환 경로 · 데이터 식별자는 안전한 목적지 검증까지 보존. 서비스 키 · role prefix 일괄 변경 금지. **환불은 별도 확정 정책**(오프라인 처리 + 수기 기록, `WO-O4O-OFFLINE-REFUND-MANUAL-RECORD-ONLY-V1`) — PG 자동 환불을 이 작업에 다시 넣지 않는다. **Hub 두 종류(2026-09-26 정정, §21-17)**: `pharmacy.neture.co.kr` · `retail.neture.co.kr` 의 Hub = 그 **서비스 운영자가 관리하는 서비스 Hub** / `store.neture.co.kr/hub` = **매장 경영자가 참여한 서비스들의 Hub 를 모아 보는 매장 Hub** — 같은 화면 · 같은 서비스 문맥으로 간주하지 않는다. 그 밖의 확정 결정은 §9 · §12.
 >
 > **OUT_OF_SCOPE** — 새 사업 기능 개발 · PharmacyHub 데이터의 근거 없는 일괄 이관 · 폐기 · 환불 자동화 · signage 새 공개 도메인 · 운영 DB 무승인 쓰기. 사업 · 계약 판단이 남은 부분(opt-in 채널의 KPA 편입 등)은 현재 기능을 보존하고 결정 · 검증 조건을 이 문서에 표시한다.
 >
@@ -1136,3 +1136,30 @@ gcloud compute url-maps add-host-rule o4o-global-lb --global --hosts=supplier.ne
 - §21-15 이식 화면의 `/hub/b2b` · `/hub/signage` 링크(원본 `/store-hub/*`)도 위 KPA 화면으로 연결된다 — 이번 단계에서 그대로 둔다.
 - 이 차이는 `VITE_UNIFIED_STORE_HANDOFF` 가 꺼져 있는 동안 KCos 사용자에게 노출되지 않는다(KCos `/store-hub/*` 는 KCos 앱이 서빙). **KCos 전환 판정 시** `/store-hub` 를 handoff 대상에서 뺄지 함께 판단한다.
 - 배포 대상 · 순서 변경 없음(§21-14 · §21-15).
+
+### 21-17. Hub 개념 정정 (2026-09-26 사용자 지시 — §21-16 대체 설명)
+
+| 항목 | 내용 |
+|---|---|
+| 원래 목적 | KPA · K-Cosmetics 매장 경영자용 `/store` 위치 이전(변경 없음) |
+| 새 발견 | §21-16 은 KCos `/store-hub` 와 `store.neture.co.kr/hub` 를 **같은 화면의 대응쌍**처럼 비교했다(사용자 설명 오류에서 비롯 — 사용자 정정) |
+| 변경 이유 | 두 Hub 는 다른 공간이다 — 아래 정의 |
+| 목적과의 관계 | 이번 단계는 `/store` 이전까지. 매장 Hub 의 통합 표시 · 서비스별 자료 구분은 **후속 Store 리팩토링에서 설계 · 검증** |
+| 범위 확대 여부 | 없음 |
+| 완료 기준 변경 여부 | 없음. `/hub` 서비스별 정합성은 이번 `/store` 배포 차단 조건이 아니며, **Hub 이전 완료로도 표시하지 않는다**(§21-16 과 같음) |
+
+| 공간 | 의미 | 관리 주체 |
+|---|---|---|
+| `pharmacy.neture.co.kr` · `retail.neture.co.kr` 의 Hub | 서비스별 Hub | 해당 **서비스 운영자** |
+| `store.neture.co.kr/hub` | 그 매장이 **참여한 서비스들의 Hub 를 모아 보는** 매장 Hub — 어느 서비스의 자료인지 구분해 표시 | 매장 경영자가 보는 공간(자료는 각 서비스 운영자 소관) |
+
+**§21-16 표의 읽는 법(수정 없이 의미만 정정)**: 그 표는 현재 코드의 **경로 재고(inventory)**일 뿐 목표 대응이 아니다. "KPA 화면을 `cosmetics` prefix 로 렌더"는 결함 목록이 아니라, 현재 `/hub` 가 서비스 Hub 하나를 문맥만 바꿔 보여 주는 **임시 구조**라는 사실 기록이다. 매장 Hub 는 KPA Hub 를 K-Cosmetics 에 그대로 보여 주는 화면이 아니다.
+
+**Store 리팩토링으로 넘기는 판단 항목(이번 단계에서 수정 없음)**
+- 매장 Hub 표시 방식: 참여 서비스별 출처 구분 · 통합 목록 여부(§6-3 · §17 의 C안 설계를 이 정의로 재검토).
+- 현재 `/hub` 의 서비스 문맥 전환 구조(활성 서비스 1개 문맥으로 KPA 화면 렌더)를 매장 Hub 로 바꾸는 방법.
+- 옛 handoff 경로 표(store-ui-core RULES)의 `/store-hub/* → /hub/*` — 서비스 Hub 를 매장 Hub 와 같은 것으로 보는 매핑이다. 전환 플래그(`VITE_UNIFIED_STORE_HANDOFF`)가 꺼져 있어 현재 사용자 영향 없음. 각 서비스 전환 판정 때 `/store-hub` 를 handoff 대상에서 뺄지 함께 정한다.
+- §21-13 · §21-15 이식 화면의 Hub 링크(`/hub/b2b` · `/hub/signage` 등 — 원본은 서비스 Hub `/store-hub/*`)의 목적지.
+- 서비스 Hub 의 새 위치(`pharmacy.neture.co.kr` · `retail.neture.co.kr`)는 확정 주소 그대로 — 이번 단계에서 옮기지 않는다.
+
+배포 대상 · 순서 변경 없음(코드 `83d44c189` · API → web · `DEPLOY_ENABLED=false`).
