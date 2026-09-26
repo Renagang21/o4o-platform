@@ -1,6 +1,6 @@
 # IR-O4O-SERVICE-LOGIN-SIGNUP-OPERATOR-STRUCTURE-9-DOMAINS-V1
 
-> 작성일: 2026-09-27 · **조사 전용 — 코드 · DB · 권한 · OAuth 설정 변경 0 · 배포 0**
+> 작성일: 2026-09-27 · 확장: 2026-09-27(커뮤니티 · 분회 · 권한 범위) · **조사 전용 — 코드 · DB · 권한 · OAuth 설정 변경 0 · 배포 0**
 > 선행: [`IR-O4O-OPERATOR-ASSIGNMENT-TARGET-DOMAINS-9-V1`](IR-O4O-OPERATOR-ASSIGNMENT-TARGET-DOMAINS-9-V1.md)
 
 ---
@@ -137,3 +137,133 @@ G1·G2 를 충족하려면 `supplier`·`funding`·`community`(필요시 `store`)
 - 서비스 기능 · Hub 를 옮길 위치 설계 **0** (범위 밖)
 - 새 서비스 키 · 역할 신설 **0**
 - 기존 권한 데이터 변경 **0**
+
+---
+
+# 확장 조사 — 개설 · 승인 · 권한 범위 (2026-09-27)
+
+> 추가 목표: 커뮤니티/분회를 **개설 신청 → 승인 → 운영** 구조로 보고,
+> 권한이 **자기 커뮤니티·자기 분회에 한정**되는지 확인한다.
+> **주소 하나에 운영자 하나라고 가정하지 않았다** — 역할은 `role_assignments` 다대다이므로
+> 같은 `{service}:operator` 를 여러 사용자가 동시에 보유할 수 있다(활성 1행/사용자·역할).
+
+## 8. 권한 범위 4단계 — 코드에 실재하는 축
+
+| 범위 | 저장 | 검사 | 실재 |
+|---|---|---|---|
+| **플랫폼** | `role_assignments` `platform:super_admin` | `requireRole` | **있음** |
+| **서비스** | `role_assignments` `{prefix}:{admin\|operator}` + `service_memberships` | `membership-guard`(`config.serviceKey`) · scope guard | **있음** |
+| **개별 분회** | `branch_memberships.organization_id` | `resolveBranch` → `requireBranchScope` | **있음** |
+| **개별 커뮤니티** | — | — | **없음** |
+| **조직/매장** | `organization_members` · 매장 소유 | store handoff("조직 ≥ 1") · store auth | **있음** |
+
+> **대상 ID 변조 방어**: 분회는 실재한다. `requireBranchScope` 가
+> `active branch_memberships.organization_id === req.branch.id` 를 비교하고 불일치 시
+> `403 BRANCH_SCOPE_MISMATCH` 를 낸다(주석: "분회 A 운영자가 분회 B 회원을 관리할 수 없다" 보장 지점).
+> **커뮤니티는 비교할 소속 자체가 없어 이 검사가 성립하지 않는다.**
+
+## 9. 커뮤니티 — 현재 구현 상태
+
+`config/community-catalog.ts` 가 **SSOT 이고 코드 상수**다(DB 테이블 아님). 등록 3개:
+`pharmacy`(policy=`service_membership_any` [kpa-society, pharmacy-hub]) ·
+`cosmetics`(=[k-cosmetics]) · `o4o-general`(=`authenticated`).
+
+| 목표 기능 | 상태 | 근거 |
+|---|---|---|
+| 개설 **신청** | **없음** | `routes/communities.routes.ts` 에 **GET 2개**(목록·상세)뿐. POST/PATCH/DELETE 0 |
+| 전체 관리자 **승인** | **없음** | 승인 주체·상태·엔드포인트 없음 |
+| 개설자에게 **운영 권한 부여** | **없음** | 커뮤니티 단위 역할(`community:*` · `{key}` 스코프) 0건 |
+| **공개형/회원제** 설정 | **일부** | 정책이 `authenticated` / `service_membership_any` **2종 고정**. "범용 policy engine 금지" 가 설계 의도. 공개형(비로그인 열람)은 없음 |
+| 커뮤니티별 **가입** | **없음** | 커뮤니티 membership 테이블 없음. 참여 자격은 **서비스 membership 으로 대리 판정** |
+| 커뮤니티별 **접근 검사** | **일부** | 위 정책으로 진입 판정. **어느 커뮤니티의 운영자인가** 는 판정하지 않음 |
+| 운영자 **추가·교체·회수** | **없음** | 대상 역할이 없으므로 회수할 것도 없음 |
+| 개설 = 무엇인가 | **코드 수정 + 배포** | 카탈로그가 상수라 새 커뮤니티는 배포로만 생긴다 |
+
+**물리 저장의 함정(코드 주석이 명시)** — Forum 원장 `forum_category_requests.service_code` 는
+Community 파티션이자 **운영자 governance(어느 서비스 운영자가 승인·중재하는가)** 를 겸하는
+**Service scope** 다. `forumStorageCodes` 는 논리→물리 adapter 이며
+**`community == serviceKey` 를 가정하면 안 된다**고 적혀 있다.
+
+> 따라서 현재 커뮤니티 운영은 **그 커뮤니티가 쓰는 원장의 서비스 운영자**가 한다.
+> 예: `pharmacy` 커뮤니티의 중재 권한은 `kpa:*` · `pharmacy-hub:*` 쪽에 있고,
+> **커뮤니티 단위로 좁혀지지 않는다.**
+
+## 10. 약사회 분회 — 현재 구현 상태
+
+| 목표 기능 | 상태 | 근거 |
+|---|---|---|
+| 분회 **개설** | **있음(제한적)** | `POST /kpa-branch/admin/branches` — **`platform:super_admin` 전용**. 주석: "분회를 새로 만드는 일은 서비스 관리자 권한이 아니라 플랫폼 구조 변경" |
+| 개설 **신청**(신청자 제출) | **없음** | 신청 테이블·엔드포인트 0. 존재하는 `/join` 은 **회원 가입**이지 개설이 아니다 |
+| 개설 **승인** 워크플로 | **없음** | 신청이 없으므로 승인 단계도 없음. 생성은 즉시 반영 |
+| 신청 시 **주소 함께 제출** | **없음** | 생성 API 는 registry 만 만든다("site/운영자/회원은 만들지 않는다") |
+| 주소 등록 | **있음** | `branch_domains`(hostname · is_primary · status) · `POST …/operator/domains` · `…/verify-request` |
+| 주소 **상태 전이** | **있음** | `pending → verifying → active / failed / disabled` |
+| 주소 **중복 방지** | **있음(부분)** | `UQ_branch_domains_primary`(분회당 primary 1개) · `CHK_..._hostname_lower`. **호스트명 전역 유일 제약은 확인되지 않음** |
+| 주소 **변경·반려** | **일부** | `failed` · `disabled` 상태는 있으나 "반려 사유 · 재신청" 흐름은 확인되지 않음 |
+| 분회 관리자 **권한 부여** | **있음** | `kpa-branch:operator`(Admin 지정 가능) + `branch_memberships` 소속 |
+| **자기 분회만** 관리 | **있음** | `requireBranchScope` — §8 참조 |
+| 관리자 **추가·교체·회수** | **있음** | 역할 부여/회수 + 소속 변경. 역할은 다대다라 **여러 명 가능** |
+| 다른 분회 접근 차단 | **있음** | `403 BRANCH_SCOPE_MISMATCH` |
+
+> **중요**: `kpa-branch:admin` 과 `platform:super_admin` 은 `requireBranchScope` 를 **그냥 통과**한다
+> (서비스 전체 관리). 즉 분회 경계는 **operator 급에만** 적용된다.
+
+## 11. 구현 상태 통합표 (요청 형식)
+
+| 영역 | 항목 | 상태 |
+|---|---|---|
+| 인증 | Google → `linked_accounts` → `users.id` | **현재 구현됨** |
+| 인증 | 전역 로그인(서비스 무관) | **현재 구현됨** |
+| 인증 | origin 간 세션 전달 handoff (SERVICE · WORKSPACE 2종) | **현재 구현됨** |
+| 인증 | `supplier`·`funding`·`community` 로의 handoff | **없음**(서비스 키 부재) |
+| 가입 | 서비스 가입·승인(`service_memberships`) | **현재 구현됨** |
+| 가입 | 커뮤니티별 가입 | **없음** |
+| 가입 | 분회 가입(`/join` · `branch_memberships`) | **현재 구현됨** |
+| 개설 | 커뮤니티 개설 신청·승인 | **없음** (카탈로그 = 코드 상수) |
+| 개설 | 분회 개설 | **일부** (super_admin 직접 생성 · 신청/승인 없음) |
+| 개설 | 분회 주소 제출·검증 | **일부** (등록·상태전이 있음 · 신청 시 동시 제출/전역 유일/반려 흐름 미확인) |
+| 권한 | 플랫폼 · 서비스 · 분회 · 조직 범위 | **현재 구현됨** |
+| 권한 | 커뮤니티 범위 | **없음** |
+| 권한 | 대상 ID 변조 방어(분회) | **현재 구현됨** |
+| 권한 | 대상 ID 변조 방어(커뮤니티) | **없음**(비교할 소속 없음) |
+| 화면 | Admin 운영자 지정(6서비스 11역할) | **현재 구현됨** |
+| 화면 | Neture 첫 화면 AI 입력창 · 배너 | **배포 후 검증 필요** |
+| 검증 | 각 호스트 실제 로그인 · handoff 왕복 | **배포 후 검증 필요** |
+| 검증 | 분회 주소 호스트명 전역 유일성 | **배포 후 검증 필요**(운영 DB read 차단 중) |
+
+## 12. 권한이 과도하게 공유되는 위험
+
+| # | 위험 | 왜 |
+|---|---|---|
+| R1 | **`neture:operator` 하나가 4개 호스트를 연다** | `neture.co.kr` + `supplier`·`funding`·`community` 가 같은 키. 공급자 영역 운영자에게 준 권한이 펀딩·커뮤니티 호스트까지 미친다 |
+| R2 | **커뮤니티 중재 권한이 서비스 전체 권한과 같다** | 커뮤니티 단위 역할이 없어 `kpa:*` · `cosmetics:*` 로 대리된다. "자기 커뮤니티만" 이 성립하지 않는다 |
+| R3 | **`kpa-branch:admin` 은 모든 분회를 연다** | `requireBranchScope` 를 통과한다. 분회 경계는 operator 급에만 적용 |
+| R4 | 역할 이름 ≠ 도메인 이름 | `pharmacy.neture.co.kr` 운영자는 `kpa:*`. 이름으로 부여하면 엉뚱한 범위가 열린다 |
+| R5 | `store` 는 역할이 아니라 소유 축 | 운영자 지정 화면에 넣으면 **없는 축을 만드는 것** |
+
+## 13. "서비스 키 · role prefix 일괄 변경 금지" 와의 관계
+
+- **분회**는 이미 **서비스 키 1개(`kpa-branch`) + 개체별 소속(`branch_memberships`)** 이라는
+  2층 구조로 해결돼 있다. **키를 늘리지 않고** 개체 경계를 만든 선례다.
+- **커뮤니티**에 같은 패턴을 쓰면(커뮤니티 membership + `resolveCommunity`/`requireCommunityScope`)
+  **새 서비스 키 없이** R2 를 해소할 수 있다 — 위 결정과 충돌하지 않는다.
+- 반면 `supplier`·`funding`·`community` **호스트**를 서비스로 승격하는 것은 키 신설이라
+  결정과 정면으로 부딪친다. R1 해소에는 (a) 키 신설 (b) 호스트 단위 하위 역할
+  (c) 현 상태 수용 중 선택이 필요하다 — **이번 조사는 선택하지 않는다.**
+
+## 14. 한 번에 검토할 설계 결정 (선택하지 않고 제시만)
+
+| # | 결정할 것 | 선택지 | 영향 |
+|---|---|---|---|
+| D1 | 커뮤니티를 **개체**로 만들 것인가 | 카탈로그 상수 유지 / DB 테이블 + membership + 개체 범위 역할 | 후자는 개설·승인·운영자 한정이 전부 가능해지고 **키 신설 불필요**(분회 선례) |
+| D2 | 커뮤니티 **공개형/회원제** | 현 2종 정책 유지 / `visibility` 추가 | 비로그인 열람 필요 여부에 달림 |
+| D3 | 분회 **개설 신청→승인** | super_admin 직접 생성 유지 / 신청 테이블 + 승인 | 주소 동시 제출·반려·재신청이 여기에 붙는다 |
+| D4 | 분회 주소 **전역 유일성** | 현행 유지 / hostname UNIQUE 추가 | 스키마 변경 → migration · 운영 데이터 확인 선행 |
+| D5 | `supplier`·`funding`·`community` **호스트 권한 분리** | 현 상태 수용 / 하위 역할 / 키 신설 | 키 신설만 URL 트랙 결정과 충돌 |
+| D6 | `kpa-branch:admin` 의 전 분회 통과 | 유지 / 좁히기 | 현재는 의도된 설계 |
+| D7 | `store` 운영자 축 | 만들지 않음 / 조직 역할로 표현 | 없는 축을 만들지 않는 편이 단순 |
+
+## 15. 이번 확장에서 하지 않은 것
+
+코드 · DB · 권한 · OAuth 변경 **0** · 배포 **0** · A·B·C 안 확정 **0** ·
+구현 작업 분할 **0** · 서비스 기능/Hub 이전 위치 설계 **0**.
