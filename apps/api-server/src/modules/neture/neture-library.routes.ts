@@ -225,7 +225,10 @@ router.post('/library/:id/handoff', requireAuth, requireActiveSupplier, async (r
       res.status(result.error.status).json({ success: false, error: { code: result.error.code, message: result.error.message } });
       return;
     }
-    res.status(201).json({ success: true, data: result.data });
+    // WO-O4O-SUPPLIER-DOMAIN-SCOPE-FREEZE-AND-FINAL-REALIGNMENT-V1 §7.1:
+    //   이미 제공된 자료를 다시 제공하면 새 수신을 만들지 않는다 → 201 Created 가 아니라 200.
+    //   응답 `reused` 로 호출측이 "이미 제공됨" 을 구분한다.
+    res.status(result.data.reused ? 200 : 201).json({ success: true, data: result.data });
   } catch (error) {
     logger.error('[Neture Library API] Error handing off library item:', error);
     res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: 'Failed to hand off library item' } });

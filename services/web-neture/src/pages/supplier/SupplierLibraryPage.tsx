@@ -88,7 +88,15 @@ export default function SupplierLibraryPage() {
     setHandoffSubmitting(false);
     if (result.success) {
       const target = handoffTargets.find((t) => t.key === handoffServiceKey);
-      setHandoffNotice(`"${handoffItem.title}" 을(를) ${target?.nameKo ?? handoffServiceKey} 운영자에게 제공했습니다. 이후 검토·게시는 해당 서비스 운영자가 진행합니다.`);
+      const targetName = target?.nameKo ?? handoffServiceKey;
+      // WO-O4O-SUPPLIER-DOMAIN-SCOPE-FREEZE-AND-FINAL-REALIGNMENT-V1 §7.1:
+      //   같은 자료를 같은 서비스로 다시 제공하면 수신함에 중복이 쌓이지 않는다.
+      //   "또 보냈다" 처럼 읽히면 사용자가 중복을 걱정하므로 이미 제공된 경우를 구분해 알린다.
+      setHandoffNotice(
+        result.data?.reused
+          ? `"${handoffItem.title}" 은(는) 이미 ${targetName} 운영자에게 제공된 자료입니다. 중복으로 보내지 않았으며, 검토·게시는 해당 서비스 운영자가 진행합니다.`
+          : `"${handoffItem.title}" 을(를) ${targetName} 운영자에게 제공했습니다. 이후 검토·게시는 해당 서비스 운영자가 진행합니다.`,
+      );
       setHandoffItem(null);
     } else {
       setHandoffError(result.error || '제공에 실패했습니다. 잠시 후 다시 시도해 주세요.');

@@ -27,7 +27,21 @@ export interface HandoffUser {
 }
 
 export type HandoffResult =
-  | { data: { contentId: string; serviceKey: string; cmsServiceKey: string; approvalRequestId: string | null; title: string } }
+  | {
+      data: {
+        contentId: string;
+        serviceKey: string;
+        cmsServiceKey: string;
+        approvalRequestId: string | null;
+        title: string;
+        /**
+         * WO-O4O-SUPPLIER-DOMAIN-SCOPE-FREEZE-AND-FINAL-REALIGNMENT-V1 §7.1:
+         *   true = 이미 제공된 자료라 **새로 만들지 않고** 기존 수신을 돌려줬다.
+         *   호출측이 "이미 제공됨" 과 "새로 제공됨" 을 구분해 알릴 수 있게 한다.
+         */
+        reused: boolean;
+      };
+    }
   | { error: { status: number; code: string; message: string } };
 
 /** 원장 content_type → cms type. 문서는 article, 이미지 파일은 image, 그 외 파일은 link. */
@@ -71,6 +85,10 @@ export class SupplierLibraryHandoffService {
       linkUrl: item.fileUrl || undefined,
       contentType,
       serviceKey: target.cmsServiceKey,
+      // WO-O4O-SUPPLIER-DOMAIN-SCOPE-FREEZE-AND-FINAL-REALIGNMENT-V1 §7.1:
+      //   같은 자료를 같은 서비스로 두 번 제공해도 수신함에 중복 행이 쌓이지 않게 한다.
+      //   상태 기계 · lineage 원장 · workflow engine 을 만들지 않는다 — 출처 태그 하나뿐이다.
+      sourceRef: { kind: 'supplier_library_item', id: item.id, supplierId },
     });
 
     if (result.error) return { error: result.error };
@@ -81,6 +99,7 @@ export class SupplierLibraryHandoffService {
         cmsServiceKey: target.cmsServiceKey,
         approvalRequestId: result.data.approvalRequestId ?? null,
         title: result.data.title,
+        reused: result.data.reused === true,
       },
     };
   }
