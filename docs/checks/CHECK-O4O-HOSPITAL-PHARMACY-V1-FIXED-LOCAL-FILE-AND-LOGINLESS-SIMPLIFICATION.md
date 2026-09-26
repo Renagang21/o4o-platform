@@ -93,6 +93,25 @@ rate limit 은 기본 memory store — Cloud Run 인스턴스별로 센다(근�
 | `check-literal-consumers` (cookie.utils · decode) | 살아있는 소비처 0 |
 | 제거 경로 참조(`hospital/enroll`·`hospital/session`·`HOSPITAL_DEVICE_REQUIRED`·`hospital/admin/`·`hospital/manage`) | 코드 0 (docs 기록물만) |
 
+### 5-1. 배포 전 Docker 검증 (2026-09-26 · 로컬 Docker 29.4.3 · 게이트 CLOSED 유지)
+
+`2f4777aca` 를 `git archive` 로 깨끗이 추출한 context(로컬 dist·tsbuildinfo 미포함 = CI checkout 과 동일)에서
+`deploy-hospital-pharmacy` job 과 같은 명령(`--platform linux/amd64` · `-f services/web-hospital-pharmacy/Dockerfile` · context `.`)으로 빌드.
+`VITE_API_BASE_URL` 은 운영 호출 방지를 위해 `http://127.0.0.1:9`.
+
+| 항목 | 결과 |
+|---|---|
+| Docker build | **PASS** — `@o4o/file-understanding-core` 빌드 · `tsc -b && vite build` 포함 전 단계 성공 |
+| base=`/hospital` · asset 경로 | index.html 이 `/hospital/assets/index-*.js` · `/hospital/assets/index-*.css` 참조 → 둘 다 200(`application/javascript` · `text/css`) |
+| 컨테이너 실행 | `serve -s dist -l 8080` 기동 · `/hospital` · `/hospital/` · `/hospital/ward` · `/hospital/pharmacy` · `/hospital/manage` · `/`(Cloud Run root) 전부 200 html |
+| 번들 내용 | 포함: `hospital-drugs.xlsx` · `showDirectoryPicker` · `/api/hospital/ai/structure` · `/api/hospital/ai/request` · 지원 브라우저 문구 · build-arg API(`127.0.0.1:9`). **0건**: `api.neture.co.kr` · `hospitalDeviceToken` · `/api/hospital/enroll` · `/api/hospital/session` · `연결 코드` · `accounts.google.com` · `neture:hospital-drug:local-dataset` |
+| 렌더(headless Chrome · Edge, DevTools 로 3초 대기 후 `innerText`) | 4경로 모두 FolderGate 최초 화면: "이 서비스는 Google Chrome 또는 Microsoft Edge 에서 사용할 수 있습니다 · 원내 약품 파일이 있는 폴더를 연결해 주세요 · 파일명은 hospital-drugs.xlsx · [원내 약품 폴더 연결]" · 헤더 "hospital-drugs.xlsx 미연결" · 로그인/계정/연결코드 문구 없음 · `showDirectoryPicker` 존재 · 비지원 배너 미노출(정상) |
+| 초기 로드 외부 요청 | **0건** — 폴더 연결 전에는 API 를 호출하지 않는다 |
+| `/hospital/manage` | 로그인 화면 없음 — 같은 폴더 게이트(연결 후 `/` 로 이동) |
+| deploy-web-services 정합 | job 이 동일 Dockerfile·context 사용. `detect-affected` 실측: `packages/file-understanding-core/**` → web `hospital-pharmacy` + API 배포 대상 · `services/web-hospital-pharmacy/**` → `hospital-pharmacy` 만 (fallback 아님) |
+
+실제 폴더 선택 · 파일 읽기 · AI 호출은 네이티브 폴더 선택 창과 운영 API 가 필요해 이 단계 범위가 아니다(§6).
+
 ## 6. 운영 smoke (§23) — PENDING
 
 배포 전이라 **미측정**. 게이트 개방 · 배포 후 실제 Chrome/Edge 에서:
@@ -127,6 +146,9 @@ rate limit 은 기본 memory store — Cloud Run 인스턴스별로 센다(근�
 ## 9. 최종 판정 (현재)
 
 ```text
+HOSPITAL_WEB_DOCKER_BUILD     = PASS
+HOSPITAL_WEB_CONTAINER_SMOKE  = PASS (정적 렌더·라우팅 · Chrome/Edge headless)
+DEPLOY_GATE                   = CLOSED 유지
 HOSPITAL_LOGIN_REQUIRED       = NO (코드)
 DEVICE_ENROLLMENT_ACTIVE      = NO (코드 · 테이블은 HISTORICAL_ONLY)
 SUPPORTED_BROWSERS            = CHROME_EDGE
