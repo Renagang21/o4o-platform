@@ -30,6 +30,7 @@
 | [O4O-BUSINESS-PHILOSOPHY-V1](baseline/O4O-BUSINESS-PHILOSOPHY-V1.md) | 사업 철학 SSOT — 공급자 / 운영사업자 / 매장 정의, HUB 철학, AI 역할, Drift 방지. ROLE-WORKSPACE-ARCHITECTURE 와 동급(역할 경계 · 업무공간 · 콘텐츠 유입 경로는 그 문서 우선). 종전 충돌 절(§3 · §4 · §7 · 주의사항) 은 2026-09-17 Final Census 로 본문 정렬 완료 | ACTIVE |
 | [O4O-STORE-COMMERCE-BOUNDARY-V1](baseline/O4O-STORE-COMMERCE-BOUNDARY-V1.md) | 매장 commerce 경계 SSOT — 소비자→매장 O4O commerce 없음 · 판매 실행 = 외부 POS·외부 채널 · legacy commerce 판정 규칙 · 개발 금지선 · **§15 사업 모델 변경 절차**. cart · checkout · orders · payments · refund · PG · POS · tablet · QR 작업 전 **코드보다 먼저 읽는다** | ACTIVE |
 | [O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1](baseline/O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1.md) | 공급자→매장 B2B 주문 정본 — `store_cart_items → checkout_orders` 수렴, actor · ownership · serviceKey · lifecycle · 취소 계약. 위 문서의 B2B 축 쌍 | ACTIVE |
+| [O4O-SUPPLIER-DOMAIN-BOUNDARY-V1](baseline/O4O-SUPPLIER-DOMAIN-BOUNDARY-V1.md) | **Supplier Domain 정본 · FROZEN** (2026-09-26) — Supplier 정의 · 5업무축(Business · Products · Orders · Content · Programs) · Workspace IA · ownership matrix · **Distribution 판정 SSOT**(입력 = `is_public`/`service_keys`/`allowed_seller_ids` + 서비스 승인 · `distribution_type` 은 파생) · Content handoff 계약(멱등성) · Programs 3종 경계 · Identity(`organization_members` canonical) · Business Profile SSOT · 금지선 · DEFERRED(기능 미완성 ≠ architecture 미완성) · 잔재 4분류. 새 Supplier 기능은 이 5축 통과가 선행. 소스 계약 `supplier-domain-boundary.spec.ts` | ACTIVE (FROZEN) |
 
 ## 2. 구조 계약 · Frozen Baselines
 
