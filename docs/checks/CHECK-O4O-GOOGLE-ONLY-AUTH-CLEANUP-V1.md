@@ -115,26 +115,48 @@ migration job 정상 실행(`o4o-api-migrations-bsrgj`) · **적용 0**(이번 W
 
 ### T5 — 실브라우저 검증 (배포 후)
 
-> **T5 전체 PASS 아님.** 아래 4건만 실측됐다. 나머지는 미검증으로 남긴다.
+> **T5 는 열려 있다.** 확인된 것만 PASS 로 적는다. 확인하지 못한 직접 로그인을 **PASS 로 추정하지 않는다.**
+> 서비스별 상태와 근거를 이 표 하나에 모은다.
 
-| # | surface | 근거 | 상태 |
-|---|---|---|---|
-| T5-1 | **Admin** Google 로그인 | 사용자 실측 — 로그인 후 활성 세션 확인 | `[x]` PASS |
-| T5-2 | **Admin 설정** | 사용자 실측 — AI Services 가 첫 탭 · OAuth 탭 없음 | `[x]` PASS |
-| T5-3 | **Admin 운영자 관리** | 사용자 실측 — '초대 대기' 탭 없음 · 등록 화면이 사용자 검색부터 | `[x]` PASS |
-| T5-4 | **Neture** Google 로그인 | 사용자 실측 — 사용자 이름 + '내 업무 공간' 표시 | `[x]` PASS |
-#### 군 A — Google 인증 후 **세션 성립** 확인 (5건)
-
-| # | 서비스 | 진입 주소 | 상태 |
-|---|---|---|---|
-| T5-5 | KPA Society | `https://kpa-society.co.kr` | `[ ]` **미검증** |
-| T5-6 | K-Cosmetics | `https://k-cosmetics.site` | `[ ]` **미검증** |
-| T5-7 | PharmacyHub | `https://pharmacyhub.co.kr` | `[ ]` **미검증** |
-| T5-8 | KPA Branch | `https://kpa-society.co.kr/kpa` | `[ ]` **미검증** |
-| T5-9 | Store | `https://store.neture.co.kr` | `[ ]` **FAIL — 원인 확정 · 조치 대기** (§T5-9 참조) |
+| # | 서비스 | 진입 주소(= Google 이 보는 origin) | 확인 성격 | 상태 | 근거 |
+|---|---|---|---|---|---|
+| T5-1 | **Admin** 로그인 | `admin.neture.co.kr` | Google 인증 → 세션 | **PASS** | 사용자 실측 — 로그인 후 활성 세션 |
+| T5-2 | **Admin** 설정 | 〃 | 화면 구조 | **PASS** | 사용자 실측 — AI Services 첫 탭 · OAuth 탭 없음 |
+| T5-3 | **Admin** 운영자 관리 | 〃 | 화면 구조 | **PASS** | 사용자 실측 — '초대 대기' 탭 없음 · 등록이 사용자 검색부터 |
+| T5-4 | **Neture** 로그인 | `neture.co.kr` | Google 인증 → 세션 | **PASS** | 사용자 실측 — 사용자 이름 + '내 업무 공간' |
+| T5-5 | KPA Society | `https://kpa-society.co.kr` | 직접 버튼 → 세션 | **미검증** | — |
+| T5-6 | K-Cosmetics | `https://k-cosmetics.site` | 직접 버튼 → 세션 | **미검증** | — |
+| T5-7 | PharmacyHub | `https://pharmacyhub.co.kr` | 직접 버튼 → 세션 | **미검증** | — |
+| T5-8 | KPA Branch | `https://kpa-society.co.kr/kpa` (origin = `kpa-society.co.kr`) | 진입 + 세션 | **미검증** | — |
+| T5-9 | **Store** | `https://store.neture.co.kr` | 직접 버튼 → 세션 | **FAIL** | `400: origin_mismatch` — 아래 §T5-9 |
+| T5-10 | Lecture | `https://study.neture.co.kr` | 자체 로그인 **없음** + Neture 안내 카드 | **미검증** | — |
+| T5-11 | Hospital Pharmacy | `https://neture.co.kr/hospital` | 공개 진입 + 기기 등록 게이트 | **미검증** | — |
 
 판정: **PASS** = 인증 후 돌아와 세션 성립(사용자 표시) / **BLOCKED** = 세션은 섰으나 그 서비스
 **권한 미가입**(가입 안내·접근 제한) / **FAIL** = 돌아오지 못하거나 **로그아웃 상태로 남음**.
+**BLOCKED 는 인증 실패가 아니다.**
+
+> **FAIL 은 원인 조사 신호다.** FAIL 이 나왔다고 곧바로 이번 cleanup 이 원인이라고 결론짓지 않는다.
+> 인증 반환 · 세션(쿠키·토큰) · 권한 · 서비스 고유 게이트를 갈라 본다.
+
+> **세션 이동 성공은 origin 승인을 증명하지 않는다.**
+> Neture 에서 로그인한 뒤 다른 서비스로 넘어가 화면이 열리는 것은 **세션 공유**의 결과이고,
+> 그 서비스에서 **Google 버튼을 직접 눌렀을 때** Google 이 그 origin 을 받아주는지와는 **별개**다.
+> `origin_mismatch` 는 버튼을 누른 그 순간의 host 로 판정된다. 따라서 T5-5~9 는
+> **각 서비스의 로그인 버튼에서 직접 시작**해야 하고, 경유 진입 결과로 PASS 를 기록하지 않는다.
+
+> **T5-10 · T5-11 도 미검증이다.** 이 둘은 Google 인증이 필요 없지만 **렌더 결과를 본 기록이 없다.**
+> 확인하셨다면 결과를 주면 근거와 함께 이 표에 채운다 — 확인 없이 PASS 로 올리지 않는다.
+
+#### 진입 주소 실측 (2026-09-26 · origin 확정)
+
+`origin` 은 scheme + host + port 다. 경로는 origin 에 영향을 주지 않는다.
+
+| 요청 | 결과 |
+|---|---|
+| `https://store.neture.co.kr/login` | `200` · **리다이렉트 0** → Google 이 보는 origin 은 정확히 `https://store.neture.co.kr` |
+| `kpa-society.co.kr` · `k-cosmetics.site` · `pharmacyhub.co.kr` | 전부 `200` · 리다이렉트 0 → 각 host 가 그대로 origin |
+| `https://kpa-society.co.kr/kpa` | `200` · 리다이렉트 0 → origin 은 `https://kpa-society.co.kr`. **분회용 별도 origin 등록 불필요** |
 
 #### T5-9 Store — `400: origin_mismatch` 원인 판정 (2026-09-26)
 
@@ -196,23 +218,6 @@ Google Cloud Console → API 및 서비스 → 사용자 인증 정보
 Google 인증 → Store 복귀 → 세션 성립 → 사용자 정보 표시까지 실브라우저로 확인한다.
 실패 시 ① 인증 반환(Google → Store 리다이렉트) ② 세션(쿠키·토큰) ③ 서비스 권한 중
 어디서 멈췄는지 구분한다. **실브라우저 확인 전에는 PASS 로 바꾸지 않는다.**
-
-#### 군 B — 자체 로그인 **없음** 확인 (1건 · Google 인증 불필요)
-
-| # | 서비스 | 진입 주소 | 확인할 것 | 상태 |
-|---|---|---|---|---|
-| T5-10 | Lecture | `https://study.neture.co.kr` | 자체 로그인 폼이 **없고** Neture 안내 카드가 뜨는지 | `[ ]` **미검증** |
-
-#### 군 C — **공개 진입 + 게이트** 확인 (1건 · Google 인증 불필요)
-
-| # | 서비스 | 진입 주소 | 확인할 것 | 상태 |
-|---|---|---|---|---|
-| T5-11 | Hospital Pharmacy | `https://neture.co.kr/hospital` | 공개 진입이 되는지 · **기기 등록 게이트**가 정상 표시되는지 | `[ ]` **미검증** |
-
-진입 주소는 **배포 설정 정본**(`config/service-catalog.ts` 의 `domain` + `basePath`)에서 확인했다 — 추정하지 않았다.
-
-> **FAIL 은 원인 조사 신호다.** FAIL 이 나왔다고 곧바로 이번 cleanup 이 원인이라고 결론짓지 않는다.
-> 먼저 인증 반환 · 세션 쿠키/토큰 · 권한 · 해당 서비스 고유 게이트를 갈라 본다.
 
 #### 내가 수행하지 못한 이유 (2026-09-26 재확인)
 
