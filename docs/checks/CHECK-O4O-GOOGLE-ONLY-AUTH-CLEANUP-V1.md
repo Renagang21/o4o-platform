@@ -131,10 +131,53 @@ migration job 정상 실행(`o4o-api-migrations-bsrgj`) · **적용 0**(이번 W
 | T5-6 | K-Cosmetics | `https://k-cosmetics.site` | `[ ]` **미검증** |
 | T5-7 | PharmacyHub | `https://pharmacyhub.co.kr` | `[ ]` **미검증** |
 | T5-8 | KPA Branch | `https://kpa-society.co.kr/kpa` | `[ ]` **미검증** |
-| T5-9 | Store | `https://store.neture.co.kr` | `[ ]` **미검증** |
+| T5-9 | Store | `https://store.neture.co.kr` | `[ ]` **FAIL — 원인 확정 · 조치 대기** (§T5-9 참조) |
 
 판정: **PASS** = 인증 후 돌아와 세션 성립(사용자 표시) / **BLOCKED** = 세션은 섰으나 그 서비스
 **권한 미가입**(가입 안내·접근 제한) / **FAIL** = 돌아오지 못하거나 **로그아웃 상태로 남음**.
+
+#### T5-9 Store — `400: origin_mismatch` 원인 판정 (2026-09-26)
+
+**현상**: `https://store.neture.co.kr/login` 에서 Google 로그인 클릭 시 Google 이
+`400: origin_mismatch` 로 차단. **Store T5 = FAIL.**
+
+**원인 = 승인된 JavaScript 원본 등록 누락** (잘못된 클라이언트 ID 사용 아님). 근거:
+
+| 실측 | 결과 |
+|---|---|
+| Store 번들에 하드코딩된 client id | **없음** — `/auth/google/config` 호출 1건으로 서버에서 받는다 |
+| 서버가 주는 clientId (`GET /auth/google/config`) | `117791934476-q2qsk…apps.googleusercontent.com` **단일** |
+| neture · kpa-society · k-cosmetics · pharmacy-hub · store 번들 | **5개 전부** `auth/google/config` 호출 = **같은 클라이언트 ID 를 공유** |
+| 같은 클라이언트로 동작하는 곳 | Neture(`neture.co.kr`) · Admin(`admin.neture.co.kr`) **PASS** (T5-1·T5-4) |
+
+같은 클라이언트 ID · 같은 코드 경로인데 Store 만 차단된다 → **다른 것은 origin 하나뿐**이다.
+즉 그 OAuth 클라이언트의 **승인된 JavaScript 원본에 `https://store.neture.co.kr` 가 없다.**
+
+**조치 위치 = Google Cloud Console (코드 변경 0 · 배포 0)**
+
+```text
+Google Cloud Console → API 및 서비스 → 사용자 인증 정보
+→ OAuth 2.0 클라이언트 ID  117791934476-q2qsk…
+→ 승인된 JavaScript 원본에  https://store.neture.co.kr  추가
+```
+
+저장 후 반영에 수 분 걸릴 수 있다. **비밀값(클라이언트 보안 비밀)은 다루지 않는다** — 이 조치는
+공개 origin 목록만 건드린다. Client ID 는 공개값이라 이 문서에 남겨도 된다(secret 아님).
+
+> **읽기 확인은 불가**: 승인된 원본 목록은 `gcloud` 로 조회되지 않는다
+> (`gcloud alpha iap oauth-clients` 는 IAP 전용 · OAuth2 client 조회 API 는 404).
+> 따라서 "등록돼 있는지" 는 Console 화면으로만 대조할 수 있다.
+
+**⚠️ 같은 누락이 다른 군 A 서비스에도 있을 수 있다.** 동작이 확인된 origin 은
+`neture.co.kr` · `admin.neture.co.kr` 둘뿐이다. 미검증 4건
+(`kpa-society.co.kr` · `k-cosmetics.site` · `pharmacyhub.co.kr`, 그리고 `kpa-society.co.kr/kpa` 는
+host 가 `kpa-society.co.kr`)도 **같은 목록에 등록돼 있어야** 한다. Console 을 여는 김에 함께 대조하면
+T5 군 A 를 한 번에 정리할 수 있다.
+
+**재검증 조건** — origin 추가 후 **Store 로그인 버튼에서 다시 시작**해
+Google 인증 → Store 복귀 → 세션 성립 → 사용자 정보 표시까지 실브라우저로 확인한다.
+실패 시 ① 인증 반환(Google → Store 리다이렉트) ② 세션(쿠키·토큰) ③ 서비스 권한 중
+어디서 멈췄는지 구분한다. **실브라우저 확인 전에는 PASS 로 바꾸지 않는다.**
 
 #### 군 B — 자체 로그인 **없음** 확인 (1건 · Google 인증 불필요)
 
