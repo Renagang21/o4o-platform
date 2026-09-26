@@ -1,6 +1,7 @@
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { WORKSPACE_PATHS } from '../config/workspace';
 import { useUnifiedStore } from '../contexts/StoreContext';
+import { readReturnTo } from '../lib/returnTo';
 
 const ROLE_LABEL: Record<string, string> = { owner: '경영자', admin: '관리자', manager: '매니저' };
 
@@ -8,6 +9,7 @@ const ROLE_LABEL: Record<string, string> = { owner: '경영자', admin: '관리�
 export default function StoreSelectorPage() {
   const { stores, organizationId, selectStore, error } = useUnifiedStore();
   const navigate = useNavigate();
+  const returnTo = readReturnTo(useLocation().search);
   return <main className="center-card"><section className="card" data-testid="store-selector">
     <h1>매장 선택</h1>
     <p>이 계정으로 접근할 수 있는 매장이 {stores.length}개 있습니다. 업무를 볼 매장을 선택해 주세요.</p>
@@ -18,7 +20,7 @@ export default function StoreSelectorPage() {
           <button
             type="button"
             className={`option${s.organizationId === organizationId ? ' selected' : ''}`}
-            onClick={() => { selectStore(s.organizationId); navigate(WORKSPACE_PATHS.home, { replace: true }); }}
+            onClick={() => { selectStore(s.organizationId); navigate(returnTo ?? WORKSPACE_PATHS.home, { replace: true }); }}
           >
             <span className="option-name">{s.organizationName || '이름 없는 매장'}</span>
             <span className="option-meta">{ROLE_LABEL[s.memberRole] ?? s.memberRole}</span>

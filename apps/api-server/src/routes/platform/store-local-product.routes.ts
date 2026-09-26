@@ -44,6 +44,7 @@ import { DataSource } from 'typeorm';
 type AuthMiddleware = RequestHandler;
 import type { AuthRequest } from '../../types/auth.js';
 import { resolveStoreAccess } from '../../utils/store-owner.utils.js';
+import { readPreferredStoreOrganizationId } from '../../utils/store-organization.resolver.js';
 import type { StoreOwnerServiceKey } from '../../utils/store-organization.resolver.js';
 import {
   listLocalProducts,
@@ -113,7 +114,7 @@ export function createStoreLocalProductRoutes(
       return null;
     }
     const userRoles: string[] = authReq.user?.roles || [];
-    return await resolveStoreAccess(dataSource, userId, userRoles, serviceKey);
+    return await resolveStoreAccess(dataSource, userId, userRoles, serviceKey, readPreferredStoreOrganizationId(req));
   }
 
   /**

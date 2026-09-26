@@ -1,8 +1,9 @@
-import { Navigate, useNavigate } from 'react-router-dom';
+import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { GoogleContinue } from '@o4o/auth-react';
 import { BRAND, PLATFORM_ORIGIN, WORKSPACE_PATHS } from '../config/workspace';
 import { authClient } from '../lib/apiClient';
 import { useAuth } from '../contexts/AuthContext';
+import { readReturnTo } from '../lib/returnTo';
 
 /**
  * 로그인 — 기존 공통 Google Continue 경로 재사용(serviceKey 없음). 새 인증 방식을 만들지 않는다.
@@ -11,7 +12,9 @@ import { useAuth } from '../contexts/AuthContext';
 export default function LoginPage() {
   const { isAuthenticated, loginWithGoogle, signupWithGoogle } = useAuth();
   const navigate = useNavigate();
-  if (isAuthenticated) return <Navigate to={WORKSPACE_PATHS.home} replace />;
+  // 원래 경로 보존(§21-14) — 같은 앱 경로만
+  const next = readReturnTo(useLocation().search) ?? WORKSPACE_PATHS.home;
+  if (isAuthenticated) return <Navigate to={next} replace />;
   return <main className="center-card"><section className="card">
     <h1>{BRAND.name} 로그인</h1>
     <p>O4O 계정(Google)으로 로그인하면 이 계정으로 접근할 수 있는 매장 업무공간이 열립니다.</p>
@@ -19,7 +22,7 @@ export default function LoginPage() {
       getConfig={() => authClient.getGoogleAuthConfig()}
       loginWithGoogle={loginWithGoogle}
       signupWithGoogle={signupWithGoogle}
-      onSuccess={() => navigate(WORKSPACE_PATHS.home, { replace: true })}
+      onSuccess={() => navigate(next, { replace: true })}
       termsHref={`${PLATFORM_ORIGIN}/terms`}
       privacyHref={`${PLATFORM_ORIGIN}/privacy`}
     />

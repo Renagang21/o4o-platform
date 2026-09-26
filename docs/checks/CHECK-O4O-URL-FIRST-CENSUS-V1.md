@@ -1023,3 +1023,37 @@ gcloud compute url-maps add-host-rule o4o-global-lb --global --hosts=supplier.ne
 #### 배포 범위 재산정
 
 이 단계 코드가 main 에 들어가므로 첫 서브도메인 배포 대상 SHA 는 이 커밋으로 바뀐다. 영향 서비스 추가: **store-web · kpa-society-web**(둘 다 기존 목록에 있음 — store-web 은 QR URL, kpa-society-web 은 이번이 첫 변경). migration 0 · 플래그 false 유지라 운영 동작 변화는 web-store 의 새 경로 추가와 owner-only 복원뿐이다.
+
+### 21-14. KPA 전환 경로 차단 요인 정리 (2026-09-26 사용자 지시 — 통합 TODO 내 단계 · KCos 이전 전 선행)
+
+**대상**: §21-13 의 미해결 3건 + 전환 대상 링크의 404. 새 WO 없음 · 범위 확대 없음 · 완료 기준 불변.
+**배포 판정 분리**: (a) **플래그 꺼진 코드 배포** — 이 절 코드가 운영에 들어가도 `kpa-society.co.kr/store/*` 는 KPA 앱 그대로(`VITE_UNIFIED_STORE_HANDOFF: 'false'`), 새 경로는 `store.neture.co.kr` 에서 직접 열 때만 쓰인다. (b) **KPA 옛→새 전환** — kpa-society-web 빌드 플래그를 켜는 별도 판정(배포 후 실측 PASS 뒤). 이 절은 (b) 를 열지 않는다.
+
+#### 확인한 문제 → 조치
+
+| # | 문제 | 조치 |
+|---|---|---|
+| 1 | 서비스 지정 화면(`/work/kpa-society/store`)에서 화면 안 `/store/...` 링크(약 69곳)를 누르면 URL 이 `/store/...` 로 바뀌어 서비스가 URL 에서 사라짐(데이터 문맥은 세션 고정으로 유지됐음) | `/store/*` mount 가 **고정 서비스에 서비스 지정 mount 가 있으면** `/work/<key>/store/...` 로 `replace` 이동(`toServiceScopedStorePath` · `SERVICE_SCOPED_STORE_KEYS=['kpa-society']` — App.tsx mount 와 같은 목록, 정적 계약으로 고정). 링크 69곳은 수정하지 않음 |
+| 2 | 다른 서비스로 이동 · 계정 변경 · 매장 변경 흐름 | 매장 변경 → 고정 해제(§21-13, 유지). **다른 서비스 업무(`/work/k-cosmetics/*` 등) 진입 → 고정 해제**(이후 `/store` 는 공통 문맥). 같은 서비스 업무(`/work/kpa-society/commerce/*`)는 유지. **같은 탭 계정 변경 → 매장 선택 · 고정 모두 해제**(새로고침 · 최초 로드는 해제하지 않음) |
+| 3 | 복수 매장 사용자가 서비스 경로로 들어오면 `StoreGate` → `/select-store` → 선택 후 홈(`/`)으로 떨어져 원래 경로 유실. 비로그인 → 로그인도 같음 | `?returnTo=` 로 보존(`lib/returnTo.ts`) — 같은 앱 경로만(`/` 시작 · `//` · `\` · 외부 URL · 로그인/선택/handoff 자체 거부). 선택 · 로그인 성공 후 그 경로로 |
+| 4 | 매장을 골라도 선택값이 API 에 전달되지 않아, **같은 서비스에 매장 2개 이상**이면 서버가 409 `AMBIGUOUS_STORE_CONNECTION`(가드) 또는 403(직접 호출 경로) | 아래 "선택 매장 헤더" |
+| 5 | 옛 handoff 경로 표(RULES) 결과 중 web-store 에 없는 KPA 대상 → 404 | 리다이렉트 추가: `/store/dashboard`→`/store` · `/store/settings/layout|template`→`/store/info`(공통 mount) · `/work/kpa-society/store/products`→`/work/kpa-society/commerce/products` · `…/products/b2c`→`…/commerce/products/b2c` · `…/orders`→`…/commerce/orders`(KPA 서비스 지정 mount 에만 — 서비스 업무라 공통 mount 에 두지 않음) · `/work/kpa-society/channels/tablet`→`/work/kpa-society/store/requests`(KPA 앱과 같은 대상). store-ui-core RULES(F3) 수정 없음 |
+
+#### 선택 매장 헤더 (API 동작 변경 — 권한 인접, 확대 없음)
+
+- **헤더 `X-Store-Organization-Id`**(신규 · CORS 허용 목록에 추가). 기존 `X-Organization-Id` 를 쓰지 않은 이유: signage 조회 범위(`extractScope` · signage-role 미들웨어)가 이미 그 헤더를 다른 의미로 읽는다 — 모든 요청에 실으면 기존 화면의 사이니지 조회 범위가 바뀐다.
+- **서버**: `resolveStoreOrganization(…, preferredOrganizationId)` — 값이 **이미 허용된 후보 안에 있을 때만** 그 매장으로 확정. 후보 밖 값은 무시하고 기존 규칙(후보 1개 확정 · 2개 이상 409 · 0개 403) 그대로. UUID 형식만 읽음. 적용 지점: `createRequireStoreOwner` · `requireStoreAuth` · `optionalStoreAuth` · `resolveStoreAccess` 직접 호출 중 KPA 매장 화면이 쓰는 store-playlist(10) · store-handled-products(4) · store-local-product(1).
+- **미적용(기존 동작 유지)**: event-offer(`resolveStoreAccess` 를 서비스 계층에서 호출 — req 없음) · Neture seller · Pharmacy-Hub 전용 해석기 · `/work-scope/*`(자체 `organizationId` 파라미터로 이미 선택 매장 사용). 이 경로들은 복수 매장 사용자에게 여전히 409/403 일 수 있다 — KPA 전환 실측에서 해당 화면 사용 여부 확인.
+- **web-store**: 현재 매장(1개 자동 · 선택 · 복원)을 API origin 으로 가는 요청에만 싣는다(fetch 래퍼 1곳 + axios interceptor — api 모듈 20여 개 개별 수정 없음). 매장 값은 render 중 설정(자식 첫 fetch 가 먼저 실행되므로).
+
+#### 테스트
+
+- api jest: 해석기 · 가드 선택 7건 추가(후보 안 선택 확정 · 후보 밖 = ambiguous 유지 · 단일 후보에서 선택값이 이기지 않음 · 후보 0 = none · serviceKey 미지정 우선순위 · 헤더 파싱(UUID · `X-Organization-Id` 미해석) · 가드 next/409) — 변경 모듈을 참조하는 suite 두 묶음(20 · 8, 일부 중복 · 328 tests) PASS.
+- 정적 계약(`store-service-scoped-owner-entry.spec.ts`) 6건 추가 — mount 목록 일치 · 고정 해제 3경로 · returnTo · 전용 헤더 · 404 리다이렉트.
+- tsc: api-server 0 · web-store(`tsconfig.app.json`) 0 · lint 오류 0.
+- **미검증**: 브라우저 실측(배포 전 · Google origin 게이트) — 복수 매장 계정의 선택 → 원래 경로 복귀 · 헤더 전송 · 409 해소는 배포 후 실측 항목.
+
+#### 남은 것 (이 TODO 안)
+
+- 배포: 이 절로 대상 SHA 갱신 · 영향 서비스에 **API** 추가(헤더 해석 · CORS). 순서 API → web. Google origin 확인 전 게이트 닫힘 유지.
+- 다음: KCos 매장 화면 porting(§21-13 표).

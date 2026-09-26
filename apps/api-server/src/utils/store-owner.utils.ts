@@ -40,6 +40,7 @@ import { policyAcceptanceService } from '../modules/policy-acceptance/policy-acc
 import type { PendingPolicyAcceptance } from '../common/auth/terms-acceptance.policy.js';
 import {
   resolveStoreOrganization,
+  readPreferredStoreOrganizationId,
   type StoreOrganizationResolution,
   type StoreOwnerServiceKey,
 } from './store-organization.resolver.js';
@@ -124,6 +125,7 @@ export async function isStoreOwner(
   dataSource: DataSource,
   userId: string,
   serviceKey?: StoreOwnerServiceKey,
+  preferredOrganizationId?: string | null,
 ): Promise<StoreOwnerCheckResult> {
   const allowedRoles: readonly string[] = serviceKey
     ? STORE_OWNER_ROLES_BY_SERVICE[serviceKey]
@@ -183,7 +185,7 @@ export async function isStoreOwner(
   // WO-O4O-STORE-OWNER-SERVICE-SCOPED-ORGANIZATION-RESOLUTION-V1:
   //   조직 선택은 공통 해석기가 담당한다. serviceKey 가 있으면 그 서비스에 등록된
   //   조직만 후보이며, 2개 이상이면 organizationId 를 주지 않는다(임의 선택 금지).
-  const resolution = await resolveStoreOrganization(dataSource, userId, serviceKey);
+  const resolution = await resolveStoreOrganization(dataSource, userId, serviceKey, preferredOrganizationId);
   const agreementServiceKey = serviceKey ? resolveCanonicalServiceKey(serviceKey) : undefined;
   const pendingAgreements = await policyAcceptanceService.getPendingStoreOwnerAgreementsForUser(userId, agreementServiceKey, dataSource);
   const pendingAgreement = pendingAgreements[0] ?? null;
@@ -277,6 +279,7 @@ export function createRequireStoreOwner(
       dataSource,
       user.id,
       serviceKey,
+      readPreferredStoreOrganizationId(req),
     );
     // WO-O4O-STORE-OWNER-SERVICE-SCOPED-ORGANIZATION-RESOLUTION-V1:
     //   같은 서비스 후보가 2개 이상이면 하나를 골라 통과시키지 않는다.
@@ -336,9 +339,11 @@ export async function resolveStoreAccess(
   userId: string,
   _userRoles: string[],
   serviceKey?: StoreOwnerServiceKey,
+  preferredOrganizationId?: string | null,
 ): Promise<string | null> {
   // ambiguous 는 organizationId 가 null 이므로 자연히 차단된다(임의 선택 없음).
-  const { isOwner, organizationId } = await isStoreOwner(dataSource, userId, serviceKey);
+  // preferredOrganizationId(선택 매장 헤더)는 허용 후보 안에서만 고르는 힌트다(§21-14).
+  const { isOwner, organizationId } = await isStoreOwner(dataSource, userId, serviceKey, preferredOrganizationId);
   if (isOwner) return organizationId;
   return null;
 }

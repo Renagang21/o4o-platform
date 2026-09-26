@@ -12,6 +12,7 @@ import {
   findStoreOrganizationCandidates,
   STORE_MEMBER_ROLES,
   STORE_SERVICE_ORG_LINKAGE,
+  readPreferredStoreOrganizationId,
 } from '../utils/store-organization.resolver.js';
 import { isStoreOwner, createRequireStoreOwner } from '../utils/store-owner.utils.js';
 
@@ -184,5 +185,94 @@ describe('createRequireStoreOwner — guard 응답', () => {
     expect(next).toHaveBeenCalled();
     expect(req.organizationId).toBe('org-kpa');
     expect(req.authContext.memberRole).toBe('owner');
+  });
+});
+
+/**
+ * 선택 매장 헤더 — CHECK-O4O-URL-FIRST-CENSUS-V1 §21-14
+ * `X-Store-Organization-Id` 는 이미 허용된 후보 안에서만 고르는 힌트다. 허용 집합을 넓히지 않는다.
+ */
+describe('선택 매장(X-Store-Organization-Id) — 후보 안에서만 선택', () => {
+  const ORG_A = '11111111-1111-4111-8111-111111111111';
+  const ORG_B = '22222222-2222-4222-8222-222222222222';
+  const FOREIGN = '33333333-3333-4333-8333-333333333333';
+  const twoCandidates = () => [
+    { organization_id: ORG_A, role: 'owner' },
+    { organization_id: ORG_B, role: 'manager' },
+  ];
+
+  it('후보 2개 + 후보 안의 선택 → 그 매장으로 확정', async () => {
+    const { dataSource } = makeDataSource([twoCandidates()]);
+    const r = await resolveStoreOrganization(dataSource, 'user-1', 'kpa', ORG_B);
+    expect(r).toEqual({ status: 'resolved', organizationId: ORG_B, memberRole: 'manager', candidateCount: 2 });
+  });
+
+  it('후보 2개 + 후보 밖 선택 → 여전히 ambiguous(임의 선택 · 권한 확대 없음)', async () => {
+    const { dataSource } = makeDataSource([twoCandidates()]);
+    const r = await resolveStoreOrganization(dataSource, 'user-1', 'kpa', FOREIGN);
+    expect(r.status).toBe('ambiguous');
+    expect(r.organizationId).toBeNull();
+  });
+
+  it('후보 1개 + 후보 밖 선택 → 기존 단일 후보 그대로(선택값이 이기지 않는다)', async () => {
+    const { dataSource } = makeDataSource([[{ organization_id: ORG_A, role: 'owner' }]]);
+    const r = await resolveStoreOrganization(dataSource, 'user-1', 'kpa', FOREIGN);
+    expect(r.organizationId).toBe(ORG_A);
+  });
+
+  it('후보 0개 + 선택 → none(선택값만으로는 접근 불가)', async () => {
+    const { dataSource } = makeDataSource([[]]);
+    const r = await resolveStoreOrganization(dataSource, 'user-1', 'kpa', FOREIGN);
+    expect(r.status).toBe('none');
+  });
+
+  it('serviceKey 미지정: 후보 안의 선택이 결정적 정렬보다 우선 · 후보 밖이면 기존 정렬', async () => {
+    const rows = () => [
+      { organization_id: ORG_A, role: 'owner', is_primary: true, joined_at: '2026-01-01' },
+      { organization_id: ORG_B, role: 'owner', is_primary: false, joined_at: '2026-02-01' },
+    ];
+    const a = makeDataSource([rows()]);
+    expect((await resolveStoreOrganization(a.dataSource, 'user-1', undefined, ORG_B)).organizationId).toBe(ORG_B);
+    const b = makeDataSource([rows()]);
+    expect((await resolveStoreOrganization(b.dataSource, 'user-1', undefined, FOREIGN)).organizationId).toBe(ORG_A);
+  });
+
+  it('헤더 파싱: UUID 만 · 소문자 정규화 · X-Organization-Id 는 읽지 않는다', () => {
+    expect(readPreferredStoreOrganizationId({ headers: { 'x-store-organization-id': ORG_A.toUpperCase() } })).toBe(ORG_A);
+    expect(readPreferredStoreOrganizationId({ headers: { 'x-store-organization-id': 'not-a-uuid' } })).toBeNull();
+    expect(readPreferredStoreOrganizationId({ headers: { 'x-organization-id': ORG_A } })).toBeNull();
+    expect(readPreferredStoreOrganizationId({ headers: {} })).toBeNull();
+    expect(readPreferredStoreOrganizationId(undefined)).toBeNull();
+  });
+
+  it('guard: 후보 2개 + 선택 헤더 → next() + 그 매장 주입 / 후보 밖 헤더 → 409 유지', async () => {
+    const makeRes = () => {
+      const res: any = {};
+      res.status = jest.fn(() => res);
+      res.json = jest.fn(() => res);
+      return res;
+    };
+    const activeMembership = [{ serviceKey: 'kpa-society', status: 'active' }];
+
+    const ok = makeDataSource([MEMBERSHIP_ROW, ROLE_ROW, twoCandidates()]);
+    const req: any = {
+      headers: { 'x-store-organization-id': ORG_B },
+      user: { id: 'u1', memberships: activeMembership, roles: ['kpa:store_owner'] },
+    };
+    const next = jest.fn();
+    await createRequireStoreOwner(ok.dataSource, 'kpa')(req, makeRes(), next);
+    expect(next).toHaveBeenCalled();
+    expect(req.organizationId).toBe(ORG_B);
+
+    const bad = makeDataSource([MEMBERSHIP_ROW, ROLE_ROW, twoCandidates()]);
+    const res = makeRes();
+    const next2 = jest.fn();
+    await createRequireStoreOwner(bad.dataSource, 'kpa')(
+      { headers: { 'x-store-organization-id': FOREIGN }, user: { id: 'u1', memberships: activeMembership } } as any,
+      res,
+      next2,
+    );
+    expect(res.status).toHaveBeenCalledWith(409);
+    expect(next2).not.toHaveBeenCalled();
   });
 });

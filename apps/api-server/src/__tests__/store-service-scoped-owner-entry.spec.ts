@@ -40,13 +40,75 @@ describe('web-store — 서비스 지정 매장 화면', () => {
     expect(svc).toContain('window.sessionStorage');
     expect(norm(svc)).toContain('if (scoped && workServiceKeys.includes(scoped)) return scoped;');
     expect(ctx).toContain('setActiveServiceContext(effectiveServiceKey)');
-    expect((ctx.match(/setServiceScope\(null\)/g) ?? []).length).toBe(2);
+    // 매장 선택 · 매장 해제 · 계정 변경(§21-14) 세 곳
+    expect((ctx.match(/setServiceScope\(null\)/g) ?? []).length).toBe(3);
   });
 
   it('서비스 업무에서 돌아오면 고정 서비스 문맥으로 복원 · 이용계약 게이트도 같은 문맥', () => {
     expect(work).toContain('restoreServiceKey={effectiveServiceKey}');
     expect(norm(layout)).toContain('<StoreAgreementGate serviceKey={effectiveServiceKey}>');
     expect(layout).toContain('data-testid="service-store-unavailable"');
+  });
+});
+
+describe('KPA 전환 차단 요인 정리 — CHECK-O4O-URL-FIRST-CENSUS-V1 §21-14', () => {
+  const app = read('services/web-store/src/App.tsx');
+  const layout = read('services/web-store/src/components/layouts/UnifiedStoreLayout.tsx');
+  const work = read('services/web-store/src/components/layouts/ServiceWorkLayout.tsx');
+  const svc = read('services/web-store/src/lib/serviceContext.ts');
+  const ctx = read('services/web-store/src/contexts/StoreContext.tsx');
+  const gate = read('services/web-store/src/components/StoreGate.tsx');
+  const selector = read('services/web-store/src/pages/StoreSelectorPage.tsx');
+  const login = read('services/web-store/src/pages/LoginPage.tsx');
+  const ret = read('services/web-store/src/lib/returnTo.ts');
+  const hdr = read('services/web-store/src/lib/storeOrganizationHeader.ts');
+  const main = read('services/web-store/src/main.tsx');
+
+  it('고정 서비스에서 `/store/...` 링크를 따라오면 `/work/<key>/store/...` 로 옮긴다 · mount 목록과 일치', () => {
+    expect(svc).toContain("SERVICE_SCOPED_STORE_KEYS: readonly UnifiedServiceKey[] = ['kpa-society']");
+    for (const key of ['kpa-society']) {
+      expect(norm(app)).toContain(`<Route path={\`\${W}/${key}/store\`} element={gated(<ServiceStoreLayout />)}>`);
+    }
+    expect(layout).toContain('toServiceScopedStorePath(scopedServiceKey, `${pathname}${search}${hash}`)');
+    expect(layout).toContain('<Navigate to={scopedPath} replace />');
+  });
+
+  it('다른 서비스 업무로 옮기면 서비스 고정을 푼다', () => {
+    expect(norm(work)).toContain('if (valid && scopedServiceKey && scopedServiceKey !== serviceKey) setServiceScope(null);');
+  });
+
+  it('계정이 바뀌면 이전 계정의 매장 선택 · 서비스 고정을 버린다', () => {
+    expect(ctx).toContain('prevUserIdRef');
+    expect(norm(ctx)).toContain('if (prev === undefined || prev === uid) return; clearSelectedOrganizationId(); setSelectedId(null); setServiceScope(null);');
+  });
+
+  it('매장 선택 · 로그인 뒤 원래 경로로 돌아온다(같은 앱 경로만)', () => {
+    expect(gate).toContain('<Navigate to={withReturnTo(WORKSPACE_PATHS.select, current)} replace />');
+    expect(gate).toContain('to={withReturnTo(WORKSPACE_PATHS.login, current)}');
+    expect(selector).toContain('navigate(returnTo ?? WORKSPACE_PATHS.home, { replace: true })');
+    expect(login).toContain("readReturnTo(useLocation().search) ?? WORKSPACE_PATHS.home");
+    expect(ret).toContain("raw.startsWith('//')");
+    expect(ret).toContain("!raw.startsWith('/')");
+  });
+
+  it('선택 매장을 전용 헤더로 API 요청에 싣는다(X-Organization-Id 재사용 금지)', () => {
+    expect(hdr).toContain("STORE_ORGANIZATION_HEADER = 'X-Store-Organization-Id'");
+    expect(hdr).not.toMatch(/['"]X-Organization-Id['"]/);
+    expect(hdr).toContain('isApiUrl(url)');
+    expect(ctx).toContain('setActiveStoreOrganizationId(effectiveId);');
+    expect(main).toContain('installStoreOrganizationHeader();');
+    expect(read('apps/api-server/src/bootstrap/setup-middlewares.ts')).toContain("'X-Store-Organization-Id'");
+  });
+
+  it('KPA 옛 매장 경로는 404 대신 같은 화면으로', () => {
+    const n = norm(app);
+    expect(n).toContain('<Route path="dashboard" element={<Navigate to={S} replace />} />');
+    expect(n).toContain('<Route path="settings/layout" element={<Navigate to={`${S}/info`} replace />} />');
+    expect(n).toContain('<Route path="settings/template" element={<Navigate to={`${S}/info`} replace />} />');
+    expect(n).toContain('<Route path="products" element={<Navigate to={`${W}/kpa-society/commerce/products`} replace />} />');
+    expect(n).toContain('<Route path="products/b2c" element={<Navigate to={`${W}/kpa-society/commerce/products/b2c`} replace />} />');
+    expect(n).toContain('<Route path="orders" element={<Navigate to={`${W}/kpa-society/commerce/orders`} replace />} />');
+    expect(n).toContain('<Route path="channels/tablet" element={<Navigate to={`${W}/kpa-society/store/requests`} replace />} />');
   });
 });
 

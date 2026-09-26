@@ -10,7 +10,7 @@
  * 서비스 하나를 고정하지 않는다. `createRequireStoreOwner` 의 serviceKey 없는 자동 org 선택(is_primary → joined_at → id)은
  * 이 경로에서 쓰지 않는다 — 후보가 2개 이상이면 반드시 사용자가 고른다.
  */
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useAuth } from './AuthContext';
 import {
   fetchAccessibleStores,
@@ -23,6 +23,7 @@ import {
   readSelectedOrganizationId,
   writeSelectedOrganizationId,
 } from '../lib/storeSelection';
+import { setActiveStoreOrganizationId } from '../lib/storeOrganizationHeader';
 import {
   isUnifiedServiceKey,
   pickCommonServiceContext,
@@ -123,11 +124,27 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     return () => { cancelled = true; };
   }, [effectiveId]);
 
+  // 선택 매장을 API 요청 헤더(`X-Store-Organization-Id`)로 싣는다 — §21-14.
+  //   render 중에 설정한다: 하위 화면의 effect(첫 API 호출)가 이 컴포넌트의 effect 보다 먼저 실행된다.
+  setActiveStoreOrganizationId(effectiveId);
+
   const [scopeState, setScopeState] = useState<UnifiedServiceKey | null>(() => readServiceScope());
   const setServiceScope = useCallback((key: UnifiedServiceKey | null) => {
     writeServiceScope(key);
     setScopeState(key);
   }, []);
+  // 같은 탭에서 계정이 바뀌면 이전 계정의 서비스 고정 · 매장 선택을 끌고 가지 않는다(§21-14).
+  const prevUserIdRef = useRef<string | null | undefined>(undefined);
+  useEffect(() => {
+    if (authLoading) return;
+    const uid = user?.id ?? null;
+    const prev = prevUserIdRef.current;
+    prevUserIdRef.current = uid;
+    if (prev === undefined || prev === uid) return;
+    clearSelectedOrganizationId();
+    setSelectedId(null);
+    setServiceScope(null);
+  }, [authLoading, user?.id, setServiceScope]);
   const selectStore = useCallback((organizationId: string) => {
     writeSelectedOrganizationId(organizationId);
     setError(null);

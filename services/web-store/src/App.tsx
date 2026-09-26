@@ -123,6 +123,10 @@ function storeChildRoutes() {
         <Route index element={<StoreHomePage />} />
         <Route path="info" element={<PharmacyInfoPage />} />
         <Route path="settings" element={<Navigate to={`${S}/info`} replace />} />
+        {/* 서비스 앱의 옛 매장 경로(북마크 · handoff returnPath) — 404 대신 같은 화면으로(§21-14) */}
+        <Route path="dashboard" element={<Navigate to={S} replace />} />
+        <Route path="settings/layout" element={<Navigate to={`${S}/info`} replace />} />
+        <Route path="settings/template" element={<Navigate to={`${S}/info`} replace />} />
         <Route path="execution" element={<StoreExecutionPage />} />
         <Route path="execution/product-info" element={<Navigate to={`${S}/handled-products`} replace />} />
         {/* 매장 제품 */}
@@ -197,6 +201,10 @@ export default function App() {
       {/* 서비스 지정 매장 화면 — 각 서비스 앱의 매장 경영자용 /store 의 새 위치(§21-13). 현재 KPA 만. */}
       <Route path={`${W}/kpa-society/store`} element={gated(<ServiceStoreLayout />)}>
         {storeChildRoutes()}
+        {/* KPA `/store` 의 옛 단축 경로 — KPA 서비스 업무 화면으로(§21-14) */}
+        <Route path="products" element={<Navigate to={`${W}/kpa-society/commerce/products`} replace />} />
+        <Route path="products/b2c" element={<Navigate to={`${W}/kpa-society/commerce/products/b2c`} replace />} />
+        <Route path="orders" element={<Navigate to={`${W}/kpa-society/commerce/orders`} replace />} />
       </Route>
       <Route path={W} element={gated(<ServiceWorkIndexPage />)} />
       <Route path={`${W}/:serviceKey`} element={gated(<ServiceWorkLayout />)}>
@@ -219,6 +227,8 @@ export default function App() {
         <Route path="online-sales/orders" element={<OnlineSalesOrdersRetiredPage />} />
         <Route path="online-sales/orders/:orderId" element={<OnlineSalesOrdersRetiredPage />} />
         <Route path="channels" element={<Navigate to={`${W}/kpa-society/online-sales/settings`} replace />} />
+        {/* KPA `/store/channels/tablet` → `/store/requests` 와 같은 대상(§21-14) */}
+        <Route path="channels/tablet" element={<Navigate to={`${W}/kpa-society/store/requests`} replace />} />
         <Route path="sales-channels/foreign-visitor" element={<ForeignVisitorSalesSupportPage />} />
         <Route path="sales-channels/foreign-visitor/payment/success" element={<ForeignVisitorSalesSupportPaymentSuccessPage />} />
         <Route path="sales-channels/foreign-visitor/payment/fail" element={<ForeignVisitorSalesSupportPaymentFailPage />} />

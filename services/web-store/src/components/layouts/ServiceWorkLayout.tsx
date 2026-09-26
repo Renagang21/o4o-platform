@@ -40,8 +40,13 @@ function ServiceWorkBody({ serviceKey, restoreServiceKey }: { serviceKey: Unifie
 
 export default function ServiceWorkLayout() {
   const serviceKey = useWorkServiceKey();
-  const { workServiceKeys, effectiveServiceKey } = useUnifiedStore();
-  if (!isUnifiedServiceKey(serviceKey) || !workServiceKeys.includes(serviceKey)) {
+  const { workServiceKeys, effectiveServiceKey, scopedServiceKey, setServiceScope } = useUnifiedStore();
+  const valid = isUnifiedServiceKey(serviceKey) && workServiceKeys.includes(serviceKey);
+  // 다른 서비스 업무로 옮기면 이전 서비스의 매장 고정을 푼다 — 이후 `/store` 는 공통 문맥으로 연다(§21-14).
+  useEffect(() => {
+    if (valid && scopedServiceKey && scopedServiceKey !== serviceKey) setServiceScope(null);
+  }, [valid, serviceKey, scopedServiceKey, setServiceScope]);
+  if (!valid || !isUnifiedServiceKey(serviceKey)) {
     return (
       <main className="center-card"><section className="card" data-testid="service-work-unavailable">
         <h1>이용할 수 없는 서비스 업무입니다</h1>
