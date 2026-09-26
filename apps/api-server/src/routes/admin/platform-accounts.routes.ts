@@ -14,13 +14,29 @@
  *   - super_admin 대상 변경은 super_admin 만 가능(SUPER_ADMIN_ONLY)
  *   - 응답에 password 등 민감 필드 미포함
  * V1 범위: 역할 편집 없음(역할 변경은 RBAC Role Assignment 화면에서 관리).
+ *
+ * WO-O4O-SINGLE-GOOGLE-ACCOUNT-ADMIN-OPERATOR-ENROLLMENT-V1:
+ *   `platform:super_admin` **부여**의 정식 경로를 여기에 둔다(아래 POST /:id/super-admin).
+ *   종전에는 부여 경로가 어디에도 없었고, 유일하게 열려 있던 것은 범용 역할 API
+ *   (`POST /operator/members/:id/roles`)가 platform admin 요청자에게 assignability 검사를
+ *   건너뛰는 틈이었다. 그 틈으로 주는 것은 `operator-assignments` allowlist 가
+ *   `platform:*` 을 **의도적으로 제외한** 경계를 우회하는 것이므로 채택하지 않는다.
+ *   플랫폼 계정은 이 화면 소관이라는 기존 선언(`/settings/admin-accounts`)에 맞춰
+ *   **관리자 전용 경로를 명시적으로 신설**한다.
+ *
+ *   회수는 이 WO 범위가 아니다 — 기존 관리자 계정의 역할을 건드리지 않는다.
  */
 import { Router, type Request, type Response } from 'express';
 import { In } from 'typeorm';
 import { AppDataSource } from '../../database/connection.js';
 import { User } from '../../modules/auth/entities/User.js';
+import { LinkedAccount } from '../../entities/LinkedAccount.js';
 import { roleAssignmentService } from '../../modules/auth/services/role-assignment.service.js';
 import { authenticate, requireRole } from '../../middleware/auth.middleware.js';
+// CodeQL js/missing-rate-limiting: `config/rate-limiters.config` 의 limiter 는 인식되지 않는다.
+// store-owner-terminations.routes.ts · notifications.routes.ts 와 같은 선례로
+// `middleware/rateLimiter` 의 apiLimiter 를 쓴다(분당 60 · IP+userId 키).
+import { apiLimiter } from '../../middleware/rateLimiter.js';
 import logger from '../../utils/logger.js';
 
 const router: Router = Router();
@@ -142,6 +158,69 @@ router.patch('/:id/status', requireRole(ADMIN_ACCESS_ROLES), async (req: Request
   } catch (error) {
     logger.error('[platform-accounts] status change failed:', error);
     res.status(500).json({ success: false, error: '상태 변경 실패', code: 'STATUS_CHANGE_FAILED' });
+  }
+});
+
+/**
+ * POST /api/v1/admin/platform-accounts/:id/super-admin — 플랫폼 최고 관리자 권한 **부여**
+ * WO-O4O-SINGLE-GOOGLE-ACCOUNT-ADMIN-OPERATOR-ENROLLMENT-V1
+ *
+ * 가드(프런트 차단에 의존하지 않는다):
+ *   - `requireRole(['platform:super_admin'])` — 부여자는 super_admin 이어야 한다
+ *   - 대상 계정 실재 · 활성(`isActive`) 확인
+ *   - **대상에 Google 연결 필수** — Identity 가 `linked_accounts(provider='google')` 이므로
+ *     연결이 없으면 그 계정으로 관리자 화면에 로그인할 수 없다. 의미 없는 부여를 막는다
+ *   - **멱등** — 이미 활성 보유면 아무 것도 바꾸지 않고 `changed: false`
+ *   - 감사 로그 — 누가 누구에게 부여했는지 남긴다
+ *
+ * 하지 않는 것: 회수 · 다른 역할 부여 · 계정 생성 · 비밀번호(존재하지 않는다).
+ */
+router.post('/:id/super-admin', apiLimiter, requireRole(ADMIN_ACCESS_ROLES), async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const actorId = req.user?.id;
+
+    const repo = AppDataSource.getRepository(User);
+    const target = await repo.findOne({ where: { id } });
+    if (!target) {
+      res.status(404).json({ success: false, error: '계정을 찾을 수 없습니다.', code: 'NOT_FOUND' });
+      return;
+    }
+    if (!target.isActive) {
+      res.status(400).json({
+        success: false,
+        error: '비활성 계정에는 관리자 권한을 부여할 수 없습니다.',
+        code: 'TARGET_INACTIVE',
+      });
+      return;
+    }
+
+    // Identity = Google sub. 연결이 없으면 그 계정으로 로그인 자체가 불가능하다.
+    const linkRepo = AppDataSource.getRepository(LinkedAccount);
+    const googleLink = await linkRepo.findOne({ where: { userId: id, provider: 'google' } });
+    if (!googleLink) {
+      res.status(400).json({
+        success: false,
+        error: 'Google 계정이 연결되지 않은 사용자입니다. 본인이 Google 로 로그인한 뒤 부여할 수 있습니다.',
+        code: 'GOOGLE_LINK_REQUIRED',
+      });
+      return;
+    }
+
+    // 멱등 — 이미 보유하면 변경 없음
+    if (await roleAssignmentService.hasRole(id, SUPER_ADMIN_ROLE)) {
+      res.json({ success: true, data: { changed: false }, message: '이미 관리자 권한을 보유하고 있습니다.' });
+      return;
+    }
+
+    await roleAssignmentService.assignRole({ userId: id, role: SUPER_ADMIN_ROLE, assignedBy: actorId });
+
+    logger.warn('[platform-accounts] SUPER_ADMIN_GRANTED', { targetUserId: id, actorId });
+
+    res.json({ success: true, data: { changed: true }, message: '관리자 권한을 부여했습니다.' });
+  } catch (error) {
+    logger.error('[platform-accounts] super-admin grant failed:', error);
+    res.status(500).json({ success: false, error: '관리자 권한 부여 실패', code: 'GRANT_FAILED' });
   }
 });
 
