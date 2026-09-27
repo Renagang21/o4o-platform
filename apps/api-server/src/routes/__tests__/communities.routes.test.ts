@@ -11,6 +11,9 @@
  *   개설 경로에 개체 가드가 붙으면 첫 커뮤니티를 아무도 만들 수 없고,
  *   가입 승인 경로에 서비스 전체 가드가 붙으면 A 커뮤니티 운영자가 B 를 승인한다.
  */
+import * as fs from 'fs';
+import * as path from 'path';
+
 const calls: string[] = [];
 
 const mark = (name: string) => {
@@ -127,5 +130,35 @@ describe('카탈로그 조회 경로는 종전대로 write 0 · optionalAuth', (
   it('`/requests` 가 `/:communityKey/access` 보다 먼저 등록된다 (param 경로에 먹히지 않는다)', () => {
     const paths = wiring().map((w) => w.path);
     expect(paths.indexOf('/requests')).toBeLessThan(paths.indexOf('/:communityKey/access'));
+  });
+});
+
+/**
+ * rate limit 은 위 배선 검사에 잡히지 않는다 — 그 검사는 mock 으로 표시한 가드만 모으고
+ * `apiLimiter` 는 실제 미들웨어다. 그래서 소스로 따로 고정한다.
+ *
+ * 신청 경로는 인증만 요구하므로 **로그인한 누구나** 호출할 수 있고, 1건마다 slug 조회 +
+ * INSERT 가 나간다. CodeQL(js/missing-rate-limiting)이 같은 종류를 분회 신청 경로에서
+ * high 로 잡았다.
+ */
+describe('rate limit (소스 고정)', () => {
+  const src = fs.readFileSync(path.resolve(__dirname, '..', 'communities.routes.ts'), 'utf-8');
+  const code = src
+    .replace(/\/\*[\s\S]*?\*\//g, '')
+    .split('\n')
+    .filter((l) => !l.trim().startsWith('//'))
+    .join('\n');
+
+  it('CodeQL 이 인식하는 limiter 를 쓴다', () => {
+    expect(code).toMatch(/import \{ apiLimiter \} from '\.\.\/middleware\/rateLimiter\.js'/);
+  });
+
+  it.each([
+    ['개설 신청', /router\.post\(\s*'\/requests',\s*apiLimiter,/],
+    ['가입 신청', /router\.post\(\s*'\/:communitySlug\/join',\s*apiLimiter,/],
+    ['개체 운영자 경계', /const operatorOnly: RequestHandler\[\] = \[apiLimiter,/],
+    ['서비스 심사 경계', /const serviceAdminOnly: RequestHandler\[\] = \[apiLimiter,/],
+  ])('%s 에 limiter 가 붙어 있다', (_label, re) => {
+    expect(code).toMatch(re);
   });
 });

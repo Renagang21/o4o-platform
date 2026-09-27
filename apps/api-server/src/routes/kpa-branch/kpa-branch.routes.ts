@@ -75,6 +75,10 @@ import { Router } from 'express';
 import { getService } from '../../config/service-catalog.js';
 import { SERVICE_KEYS } from '../../constants/service-keys.js';
 import { requireAuth, requireRole } from '../../middleware/auth.middleware.js';
+// CodeQL(js/missing-rate-limiting) 은 `config/rate-limiters.config` 의 limiter 를 인식하지 못한다.
+// 선례(routes/admin/platform-accounts.routes.ts · store-owner-terminations.routes.ts)대로
+// `middleware/rateLimiter` 의 apiLimiter 를 쓴다(분당 60 · IP+userId 키).
+import { apiLimiter } from '../../middleware/rateLimiter.js';
 import { AppDataSource } from '../../database/connection.js';
 import {
   requireKpaBranchScope,
@@ -611,10 +615,12 @@ export function createKpaBranchRoutes(): Router {
   //   역할이어서 개별 분회 운영자도 가지므로, 그 역할로 열면 A 분회 운영자가 B 분회 개설을
   //   승인한다. 개별 분회 한정(resolveBranch + requireBranchScope)은 여기 붙이지 않는다:
   //   대상 분회가 아직 없기 때문이다.
-  router.post('/branch-requests', requireAuth as any, wrap(BranchCreationRequestController.create));
-  router.get('/branch-requests/mine', requireAuth as any, wrap(BranchCreationRequestController.mine));
+  //   신청 경로는 인증만 요구하므로 **로그인한 누구나** 호출할 수 있다 — 신청 1건마다 slug
+  //   조회 + INSERT 가 나가므로 rate limit 을 붙인다(개설 신청 폭주 · DoS 차단).
+  router.post('/branch-requests', apiLimiter as any, requireAuth as any, wrap(BranchCreationRequestController.create));
+  router.get('/branch-requests/mine', apiLimiter as any, requireAuth as any, wrap(BranchCreationRequestController.mine));
 
-  const branchServiceAdminGuards = [requireAuth as any, requireKpaBranchScope(`${SERVICE_KEY}:admin`)];
+  const branchServiceAdminGuards = [apiLimiter as any, requireAuth as any, requireKpaBranchScope(`${SERVICE_KEY}:admin`)];
   router.get(
     '/admin/branch-requests',
     ...branchServiceAdminGuards,

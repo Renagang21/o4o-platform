@@ -36,6 +36,8 @@ import { Router, type RequestHandler, type Response } from 'express';
 import { asyncHandler } from '../middleware/error-handler.js';
 import type { AuthRequest } from '../types/auth.js';
 import { AppDataSource } from '../database/connection.js';
+// CodeQL(js/missing-rate-limiting) 이 인식하는 limiter 를 쓴다(선례: admin/platform-accounts.routes).
+import { apiLimiter } from '../middleware/rateLimiter.js';
 import { resolveCommunity, requireCommunityScope } from '../middleware/community-scope.middleware.js';
 import { requireCommunityServiceScope } from '../middleware/community-service-scope.middleware.js';
 import {
@@ -93,9 +95,9 @@ export function createCommunitiesRoutes(
   const router = Router();
 
   // 개체 운영자 경계: slug -> 행 확인 -> active 가입 -> role='operator'
-  const operatorOnly: RequestHandler[] = [authenticate, resolveCommunity, requireCommunityScope('operator')];
+  const operatorOnly: RequestHandler[] = [apiLimiter, authenticate, resolveCommunity, requireCommunityScope('operator')];
   // 서비스 전체 심사 경계
-  const serviceAdminOnly: RequestHandler[] = [authenticate, requireCommunityServiceScope('community:admin')];
+  const serviceAdminOnly: RequestHandler[] = [apiLimiter, authenticate, requireCommunityServiceScope('community:admin')];
 
   router.get(
     '/',
@@ -107,8 +109,11 @@ export function createCommunitiesRoutes(
   );
 
   // ── 개설 ────────────────────────────────────────────────────────────
+  // 신청은 인증만 요구하므로 **로그인한 누구나** 호출할 수 있다 — 1건마다 slug 조회 + INSERT 가
+  // 나가므로 rate limit 을 붙인다(개설 신청 폭주 · DoS 차단).
   router.post(
     '/requests',
+    apiLimiter,
     authenticate,
     asyncHandler(async (req, res) => {
       const userId = requesterId(req as AuthRequest, res);
@@ -204,6 +209,7 @@ export function createCommunitiesRoutes(
   // ── 가입 ────────────────────────────────────────────────────────────
   router.post(
     '/:communitySlug/join',
+    apiLimiter,
     authenticate,
     resolveCommunity,
     asyncHandler(async (req, res) => {

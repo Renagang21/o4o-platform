@@ -308,8 +308,13 @@ describe('라우트 심사 주체 (소스 고정)', () => {
 
   it('심사는 kpa-branch:admin 이다', () => {
     expect(code).toMatch(
-      /const branchServiceAdminGuards = \[requireAuth as any, requireKpaBranchScope\(`\$\{SERVICE_KEY\}:admin`\)\]/,
+      /const branchServiceAdminGuards = \[apiLimiter as any, requireAuth as any, requireKpaBranchScope\(`\$\{SERVICE_KEY\}:admin`\)\]/,
     );
+  });
+
+  it('신청·심사 경로에 rate limit 이 붙어 있다 (인증만으로 열린 경로의 폭주 차단)', () => {
+    expect(code).toMatch(/router\.post\('\/branch-requests', apiLimiter as any,/);
+    expect(code).toMatch(/const branchServiceAdminGuards = \[apiLimiter as any,/);
   });
 
   it('심사 경로에 개별 분회 가드(resolveBranch · requireBranchScope)를 붙이지 않는다', () => {
@@ -326,9 +331,13 @@ describe('라우트 심사 주체 (소스 고정)', () => {
     expect(code).not.toMatch(/branch-requests[\s\S]{0,200}?\$\{SERVICE_KEY\}:operator/);
   });
 
-  it('신청·내 이력은 인증만 요구한다', () => {
-    expect(code).toMatch(/router\.post\('\/branch-requests', requireAuth as any,/);
-    expect(code).toMatch(/router\.get\('\/branch-requests\/mine', requireAuth as any,/);
+  it('신청·내 이력은 **권한 검사 없이** 인증만 요구한다 (개체·서비스 가드 0)', () => {
+    const requestLines = code.split('\n').filter((l: string) => l.includes("'/branch-requests"));
+    expect(requestLines.length).toBeGreaterThan(0);
+    for (const line of requestLines) {
+      expect(line).toMatch(/requireAuth as any/);
+      expect(line).not.toMatch(/requireKpaBranchScope|resolveBranch|requireBranchScope|requireRole/);
+    }
   });
 
   it('기존 super_admin 직접 생성 경로를 그대로 둔다 (대체가 아니라 병행)', () => {
