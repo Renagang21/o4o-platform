@@ -267,14 +267,35 @@ WO §6 의 미결 질문("platform:super_admin 으로 충분한가 / 별도 역�
 | study(lecture) handoff | 이미 카탈로그 대상(`domain: study.neture.co.kr`). `joinEnabled=false` 라 '가입 가능한 서비스' 제외가 정상 |
 | supplier · funding handoff | 같은 `.neture.co.kr` 쿠키 범위의 neture 축 — 대상 추가 불필요 |
 
-빌드 · 정적 검사:
+### 7-2. 전체 검증 (CI 방식 실행)
 
 ```text
-api-server tsc      0
-web-neture tsc      0
-변경 파일 eslint     0 error
-migration 계약       21 pass / 0 fail
+api-server jest  3분할 전부 green
+  shard 1/3   124 suite · 2,349 PASS
+  shard 2/3   124 suite · 1,957 PASS   ← 첫 실행 5 FAIL → 옛 계약 뒤집기 후 green
+  shard 3/3   122 suite · 2,034 PASS
+  합계        370 suite · 6,340 PASS · 0 FAIL
+
+pnpm run type-check              OK (api-server 포함)
+pnpm run type-check:frontend     OK (9 web)
+pnpm run typecheck:app-store-packages  OK
+node scripts/lint-ratchet.mjs    46 errors = baseline 46 (통과)
+node scripts/check-unsafe-routes.mjs   1,153 파일 · 위반 0
+node scripts/check-typeorm-entities.mjs  DEFINED_BUT_UNREGISTERED 0 · 중복 0 · stale 0
+node scripts/db/check-migration-contract.mjs  21 pass / 0 fail
+변경 파일 eslint                  0 error
 ```
+
+> **lint ratchet 은 파일 단위 lint 로는 보이지 않았다.** 이 WO 의 spec 두 곳이 inline
+> `require` 를 써서 48 > 46 이 됐고, 저장소 전체 ratchet 에서만 드러났다. 수정 후 46 복귀.
+
+### 7-3. 실패했으나 이 변경과 무관한 것
+
+| 게이트 | 판정 |
+|---|---|
+| `type-check:frontend` — `web-hospital-pharmacy` TS2307 ×3 | **환경 문제.** `@o4o/file-understanding-core` 가 package.json 에 있으나 이 워크트리 `node_modules` 에 링크되지 않았다(설치 시점이 그 의존성보다 앞섬). `pnpm install --frozen-lockfile` + `build:packages` 후 **OK**. 추적 파일 변경 0 |
+| `check-forbidden-tables.mjs` — `o4o_payments` · `neture_settlement_orders` | **선행 위반.** 내 diff 에 없는 기존 entity 2개. 현재 변경과 무관한 실패이므로 고치지 않고 보고한다(§9 D4) |
+| `HomeEntryPanel` vitest 4건 | **선행 실패.** 내 변경을 stash 해도 같은 4건이 실패한다(§9 D3) |
 
 ---
 
@@ -325,6 +346,7 @@ npx tsx src/scripts/community-catalog-promotion.ts --apply    # 숫자 확인 �
 | D1 | `'kpa-society:admin'` · `'kpa-society:operator'` 가 3개 컨트롤러의 허용 역할 목록에 남아 있다 (`routes/o4o-store/controllers/store-product-request-admin.controller.ts` · `modules/neture/controllers/product-candidate.controller.ts` · `modules/neture/controllers/product-library.controller.ts`). `requireRole` 은 `role_assignments.role` 과 **정확히 일치**만 보고 정규화하지 않으며 실제 부여 문자열은 `kpa:*` 다 → KPA 운영자에게 실효 0 | **권한 부여 범위 변경**(중지 조건) + 이미 전용 트랙이 있다 — `WO-O4O-KPA-OPERATOR-CANONICAL-ROLE-GUARD-FIX-V1` 이 `routes/operator/membership.routes.ts` 를 같은 이유로 정정했고 cosmetics 는 `6b586fb06` 에서 선행 정정됐다. 그 트랙의 **잔여 3파일** |
 | D2 | `apps/api-server/src/types/roles.ts` 의 지역 `ServiceKey` union 이 `kpa-branch` · `community` 를 모르는 상태로 stale (`@o4o/security-core` 의 것과 별개 union) | 소비처가 `audit-roles.ts` 스크립트뿐이라 런타임 영향 0. 두 union 통합은 구조 변경 |
 | D3 | `services/web-neture/src/components/home/__tests__/HomeEntryPanel.{back-navigation,workspace-cards}.test.tsx` **4건 선행 실패** | 내 변경 전에도 같은 4건이 실패한다(stash 로 확인). 현재 변경과 무관한 실패 |
+| D4 | `check-forbidden-tables.mjs` 위반 2건 — `apps/api-server/src/entities/payment/PlatformPayment.entity.ts`(`o4o_payments`) · `apps/api-server/src/modules/neture/entities/neture-settlement-order.entity.ts`(`neture_settlement_orders`) | 내 diff 에 없는 기존 entity. CLAUDE.md §4 금지 테이블 규칙 위반이지만 **현재 변경과 무관한 실패**이며 결제·정산 구조 판단이 필요하다 |
 
 ---
 
