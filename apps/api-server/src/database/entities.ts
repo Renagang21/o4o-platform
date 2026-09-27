@@ -23,6 +23,9 @@ import { LoginAttempt } from '../modules/auth/entities/LoginAttempt.js';
 import { ApprovalLog } from '../entities/ApprovalLog.js';
 import { ProductApproval } from '../entities/ProductApproval.js';
 import { LinkedAccount } from '../entities/LinkedAccount.js';
+import { Community } from '../entities/Community.js';
+import { CommunityMembership } from '../entities/CommunityMembership.js';
+import { CommunityCreationRequest } from '../entities/CommunityCreationRequest.js';
 // WO-O4O-ADMIN-OPERATOR-GOOGLE-INVITATION-AND-ASSIGNMENT-CUTOVER-V1
 import { AccountActivity } from '../entities/AccountActivity.js';
 import { UserActivityLog } from '../entities/UserActivityLog.js';
@@ -553,6 +556,9 @@ export const entities = [
   ApprovalLog,
   ProductApproval, // WO-PRODUCT-POLICY-V2-DATA-LAYER-INTRODUCTION-V1
   LinkedAccount,
+  Community,
+  CommunityMembership,
+  CommunityCreationRequest,
   AccountActivity,
   UserActivityLog,
   Notification,
