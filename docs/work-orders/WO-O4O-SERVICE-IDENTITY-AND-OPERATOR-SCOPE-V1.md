@@ -170,9 +170,21 @@ requireCommunityScope(level)
 ### 3-3-2. 첫 운영자 부여 범위 — 전체 권한을 주지 않는다
 
 ```text
-개설 승인 시 부여하는 것:  community_memberships(role='operator', status='active')   ← 개체만
-부여하지 않는 것:          community:admin · community:operator (서비스 전체 역할)
+개설 승인 시 부여하는 것:
+  community_memberships(community_id, role='operator', status='active')   ← 개체 운영자
+  service_memberships('community', status='active')                        ← **가입**(진입 자격)
+
+부여하지 않는 것:
+  community:admin · community:operator                                     ← 서비스 전체 역할
 ```
+
+> **가입과 역할은 다른 축이다.** 새 `community` 서비스 키에는 가입 검사(`membership-guard`)가
+> 붙으므로, 개체 운영자 소속만 주면 **첫 운영자가 자기 커뮤니티 관리 화면 진입에서 막힌다.**
+> 그래서 개설 승인 흐름이 **서비스 가입도 함께 active** 로 만든다 — 이것은 **진입 자격**이지
+> 운영 권한이 아니다. 서비스 전체 운영 권한(`community:admin`/`:operator`)은 여전히 주지 않는다.
+>
+> 같은 이유로 **커뮤니티 가입 승인** 흐름도 그 사용자의 `service_memberships('community')` 를
+> active 로 만든다(없으면 생성). 회원은 개체 `role='member'` 일 뿐 운영 권한이 없다.
 
 신청자가 첫 운영자가 되는 것은 **그 커뮤니티에 한정**된다. 전체 서비스 운영 권한이
 따라붙으면 개설만으로 다른 커뮤니티 개설을 승인할 수 있게 된다 — 만들지 않는다.
@@ -273,3 +285,5 @@ S8  CI → 원본 재확인(study 포함) → 통제 배포 → 결과표 → �
 | V5 | `kpa-branch:operator` 만 가진 사용자의 **분회 개설 승인 요청 → 403** | 개별 분회 운영자의 상위 권한 획득 |
 | V6 | A 분회 운영자가 **B 분회** 관리 요청 → **403**(기존 `BRANCH_SCOPE_MISMATCH` 유지) | 기존 경계 회귀 |
 | V7 | 카탈로그 폴백 커뮤니티(`pharmacy`·`cosmetics`·`o4o-general`)의 게시글 경로도 **동일한 가입 승인 검사** | 폴백 우회 |
+| **V8** | **개설 승인 → 첫 운영자 로그인 → 자기 커뮤니티 관리 화면 진입·관리 성공** (`community:admin`/`:operator` **없이**) | 가입 검사가 자기 커뮤니티 운영을 막는 역설 |
+| V8-b | 그 첫 운영자에게 **서비스 전체 운영 권한이 없음**을 같은 테스트에서 함께 단정 | V8 을 위해 전체 권한을 주는 우회 |
