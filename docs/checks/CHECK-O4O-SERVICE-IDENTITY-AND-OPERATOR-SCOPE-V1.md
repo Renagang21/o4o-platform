@@ -286,6 +286,20 @@ migration 계약       21 pass / 0 fail
 
 > **3 을 4 보다 먼저 한다.** V7 게이트가 서빙되기 전에 폴백 커뮤니티 행과 회원이 있어야
 > 한다. 순서가 뒤바뀌면 기존 참여자 전원이 `COMMUNITY_MEMBERSHIP_REQUIRED` 로 막힌다.
+>
+> 반대로 **1 이 2 보다 먼저**여야 한다 — 승격 CLI 가 쓰는 `communities` ·
+> `community_memberships` 는 incremental 6 이 만든다.
+
+승격 CLI 실행 (운영 DB 접속은 Cloud SQL Auth Proxy 경유 — `SETUP.md` 가 정본):
+
+```bash
+cd apps/api-server
+npx tsx src/scripts/community-catalog-promotion.ts            # 측정만 (write 0)
+npx tsx src/scripts/community-catalog-promotion.ts --apply    # 숫자 확인 후
+```
+
+`package.json` 에 스크립트를 추가하지 않았다 — 의존성·스크립트 변경은 중지 조건이다.
+기본값이 dry-run 이므로 `--apply` 없이 실행하면 한 행도 쓰지 않는다.
 
 ---
 
