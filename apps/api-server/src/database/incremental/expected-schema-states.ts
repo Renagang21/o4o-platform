@@ -87,6 +87,16 @@ export const EXPECTED_SCHEMA_STATES: readonly ExpectedSchemaState[] = [
     fingerprint: '6503cfb6ac967ed294f7cd50a56df704fced80777cab75d0dff64b2af602c72c',
     fingerprintLineCount: 5793,
   },
+  // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 (S2) — 커뮤니티 개체 3테이블 신설.
+  // communities · community_creation_requests · community_memberships + 인덱스 6개.
+  // 5793 -> 5854 (+61): 테이블 3 · UNIQUE/부분 UNIQUE 3 · 일반 인덱스 3 · CHECK 4 · FK 7 이 더해진다.
+  // baseline 2026-09-18-id685 fresh bootstrap + incremental 1..6 을 격리 PostgreSQL 15
+  // (docker postgres:15, 로컬 전용 포트 55433, throwaway DB) 에서 산출: 운영 DB fingerprint 채택 아님.
+  {
+    appliedThrough: 'CreateCommunityDomain1790400000000',
+    fingerprint: 'c7ada575b9db6d4e8cbf8a2e158f4754bb86e3afa4ca2333f4e86916f60148e3',
+    fingerprintLineCount: 5854,
+  },
 ] as const;
 
 /** Expected state after `prefixLength` incremental migrations; undefined when not registered. */
