@@ -360,14 +360,14 @@ access token(15분)   폐기 대상이 아니다 — 만료까지 유효하다
 | study(lecture) handoff | 이미 카탈로그 대상(`domain: study.neture.co.kr`). `joinEnabled=false` 라 '가입 가능한 서비스' 제외가 정상 |
 | supplier · funding handoff | 같은 `.neture.co.kr` 쿠키 범위의 neture 축 — 대상 추가 불필요 |
 
-### 7-2. 전체 검증 (CI 방식 실행)
+### 7-2. 전체 검증 (CI 방식 실행 · **리뷰 반영 후 재실행**)
 
 ```text
 api-server jest  3분할 전부 green
-  shard 1/3   124 suite · 2,349 PASS
-  shard 2/3   124 suite · 1,957 PASS   ← 첫 실행 5 FAIL → 옛 계약 뒤집기 후 green
-  shard 3/3   122 suite · 2,034 PASS
-  합계        370 suite · 6,340 PASS · 0 FAIL
+  shard 1/3   124 suite · 2,361 PASS
+  shard 2/3   124 suite · 1,965 PASS
+  shard 3/3   122 suite · 2,039 PASS   ← 첫 실행 1 FAIL → 아래 재검증 지적 후 green
+  합계        370 suite · 6,365 PASS · 0 FAIL
 
 pnpm run type-check              OK (api-server 포함)
 pnpm run type-check:frontend     OK (9 web)
@@ -381,6 +381,13 @@ node scripts/db/check-migration-contract.mjs  21 pass / 0 fail
 
 > **lint ratchet 은 파일 단위 lint 로는 보이지 않았다.** 이 WO 의 spec 두 곳이 inline
 > `require` 를 써서 48 > 46 이 됐고, 저장소 전체 ratchet 에서만 드러났다. 수정 후 46 복귀.
+
+**재검증이 잡은 것 2건** — 둘 다 이번 정정의 부수 효과이며 계약은 유지된다.
+
+| # | 잡힌 것 | 왜 생겼나 | 처리 |
+|---|---|---|---|
+| 1 | `operator-role-catalog.test.ts` — 화면·서버 카탈로그 **순서** 불일치 | 계약이 같은 집합 **그리고 같은 순서**를 요구한다. `supplier`·`funding` 을 admin 에서는 `community` 앞, api 에서는 뒤에 넣었다 | admin 쪽을 `community` 뒤로 정렬 |
+| 2 | `lecture-service-foundation.spec.ts` — `handoff.controller` 에 origin 판정 코드 없음 | 그 판정을 `utils/session-origin` 으로 옮겼다(로그인·로그아웃·handoff 가 같은 답을 써야 한다) | 검사를 새 파일로 옮기고, 부분 문자열 일치 금지를 **두 파일 모두**에 적용. **handoff 가 공용 판정을 쓰는지**도 추가로 고정 |
 
 ### 7-2-b. PR #241 CI — 전부 green
 
