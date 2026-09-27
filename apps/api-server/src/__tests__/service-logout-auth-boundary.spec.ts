@@ -38,6 +38,9 @@ const bump = (userId: string, serviceKey: string) => {
 /** `handoff_tokens` in-memory 대역 */
 let handoffRows: Array<Record<string, unknown>> = [];
 
+/** 값을 넣으면 handoff INSERT 시점에 그 서비스의 세대를 한 번 올린다(TOCTOU 재현). */
+let bumpDuringHandoffInsert: string | null = null;
+
 const query = jest.fn(async (sql: string, params: unknown[] = []) => {
   const q = String(sql).replace(/\s+/g, ' ');
 
@@ -56,15 +59,20 @@ const query = jest.fn(async (sql: string, params: unknown[] = []) => {
     return [{ max_epoch: rows.length ? Math.max(...rows.map((r) => r.epoch)) : null }];
   }
   if (/INSERT INTO handoff_tokens/i.test(q)) {
+    // TOCTOU 재현 훅: 발급 검사가 끝난 **뒤** 원장 기록 사이에 로그아웃이 끼는 상황.
+    if (bumpDuringHandoffInsert) {
+      bump(String(params[0]), bumpDuringHandoffInsert);
+      bumpDuringHandoffInsert = null;
+    }
     const row = {
       id: HANDOFF_ID,
       user_id: params[0],
       source_service_key: params[1],
       target_service_key: params[2],
       target_workspace: params[3],
-      // WO §8 (3차): 발급 시점의 출발 서비스 세대는 INSERT 안의 subquery 로 들어간다
-      //   (별도 SELECT 를 앞세우면 왕복이 늘고 그 사이 로그아웃이 끼어들 틈이 생긴다).
-      source_session_epoch: epochOf(String(params[0]), String(params[1])),
+      // WO §8 (4차): 세대는 **호출자가 검증한 값**으로 넘어온다. 여기서 현재 세대를 다시 읽으면
+      //   발급 검사와 기록 사이에 로그아웃이 끼었을 때 새 세대가 적힌다(그것이 고친 결함이다).
+      source_session_epoch: params[5] ?? null,
       consumed_at: null,
     };
     handoffRows.push(row);
@@ -150,6 +158,10 @@ const accessTokenFor = (serviceKey: string) =>
   tokenUtils.generateTokens(USER, [], 'neture.co.kr', MEMBERSHIPS, 'fam-1', serviceKey, epochOf(USER_ID, serviceKey))
     .accessToken;
 
+/** 이 변경 배포 **전에** 발급된 access token — serviceKey · sessionEpoch claim 이 없다. */
+const legacyAccessToken = () =>
+  tokenUtils.generateTokens(USER, [], 'neture.co.kr', MEMBERSHIPS, 'fam-1', null, null).accessToken;
+
 beforeAll(() => {
   process.env.JWT_SECRET = process.env.JWT_SECRET || 'test-jwt-secret-for-logout-boundary';
   process.env.JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || 'test-jwt-refresh-secret-for-logout-boundary';
@@ -158,6 +170,7 @@ beforeAll(() => {
 beforeEach(() => {
   epochs = [];
   handoffRows = [];
+  bumpDuringHandoffInsert = null;
   query.mockClear();
   findOne.mockReset();
   findOne.mockResolvedValue(USER);
@@ -260,6 +273,100 @@ describe('3. 관리자 화면 origin 도 명시적 세션 범위를 갖는다', 
 // ─────────────────────────────────────────────────────────────────────────────
 // 4. handoff 발급·교환이 세대를 원장에 남긴다 (소스 고정)
 // ─────────────────────────────────────────────────────────────────────────────
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 5. 출발 인증의 일관성 (4차 리뷰)
+// ─────────────────────────────────────────────────────────────────────────────
+
+describe('5. handoff 원장은 **검증된 access token** 의 출발 서비스·세대를 증명한다', () => {
+  /**
+   * 세 경우가 한 뿌리다 — 원장에 적히는 "출발" 이 토큰이 증명한 값이 아니면,
+   * 교환 시점의 세대 비교가 **엉뚱한 서비스**나 **엉뚱한 시점**을 본다.
+   */
+
+  it('5-1 claim 없는 배포 전 토큰으로도 로그아웃 뒤 발급을 막는다', async () => {
+    // claim 이 없으면 검사를 건너뛰던 자리 — 만료 전 최대 15분 동안 옛 경로가 남았다.
+    bump(USER_ID, 'kpa-society'); // A 로그아웃
+
+    const res = mockRes();
+    await HandoffController.generateHandoff(
+      mockReq({ targetServiceKey: 'neture' }, 'https://kpa-society.co.kr', legacyAccessToken()),
+      res,
+    );
+
+    expect([res.statusCode, res.body?.code]).toEqual([401, 'SERVICE_SESSION_REVOKED']);
+    expect(handoffRows).toEqual([]);
+  });
+
+  it('5-1b 폐기 기록이 없으면 배포 전 토큰도 정상 발급된다 (배포만으로 막지 않는다)', async () => {
+    const res = mockRes();
+    await HandoffController.generateHandoff(
+      mockReq({ targetServiceKey: 'neture' }, 'https://kpa-society.co.kr', legacyAccessToken()),
+      res,
+    );
+
+    expect(res.statusCode).toBe(200);
+    expect(handoffRows).toHaveLength(1);
+  });
+
+  it('5-2 Origin 을 다른 서비스로 지정해도 출발 서비스를 바꿀 수 없다', async () => {
+    // 토큰은 A(kpa-society) 인데 Origin 만 B(neture) 라고 주장한다.
+    //   원장이 Origin 을 믿으면 교환 때 **B 의 세대**를 검사하므로, A 에서 로그아웃해도 통과한다.
+    const aToken = accessTokenFor('kpa-society');
+
+    await HandoffController.generateHandoff(
+      mockReq({ targetServiceKey: 'neture' }, 'https://neture.co.kr', aToken),
+      mockRes(),
+    );
+
+    expect(handoffRows).toHaveLength(1);
+    // 원장의 출발은 **토큰이 증명한** 서비스여야 한다.
+    expect(handoffRows[0].source_service_key).toBe('kpa-society');
+
+    // 그래서 A 로그아웃이 이 handoff 를 무효로 만든다.
+    bump(USER_ID, 'kpa-society');
+    const res = mockRes();
+    await HandoffController.exchangeHandoff(mockReq({ token: HANDOFF_ID }, 'https://neture.co.kr'), res);
+    expect([res.statusCode, res.body?.code]).toEqual([401, 'SERVICE_SESSION_REVOKED']);
+  });
+
+  it('5-3 발급 검사와 원장 기록 사이에 로그아웃이 끼어도 교환은 막힌다', async () => {
+    const aToken = accessTokenFor('kpa-society'); // 세대 0 으로 검증된다
+    // 검사 통과 직후, 원장에 쓰이는 순간 로그아웃이 일어난다.
+    bumpDuringHandoffInsert = 'kpa-society';
+
+    await HandoffController.generateHandoff(
+      mockReq({ targetServiceKey: 'neture' }, 'https://kpa-society.co.kr', aToken),
+      mockRes(),
+    );
+
+    expect(handoffRows).toHaveLength(1);
+    // 원장은 **그때의 현재 세대(1)** 가 아니라 **토큰이 증명한 세대(0)** 를 적어야 한다.
+    //   현재 세대를 적으면 이미 로그아웃된 인증으로 시작한 handoff 가 교환에서 통과한다.
+    expect(handoffRows[0].source_session_epoch).toBe(0);
+    expect(epochOf(USER_ID, 'kpa-society')).toBe(1);
+
+    const res = mockRes();
+    await HandoffController.exchangeHandoff(mockReq({ token: HANDOFF_ID }, 'https://neture.co.kr'), res);
+    expect([res.statusCode, res.body?.code]).toEqual([401, 'SERVICE_SESSION_REVOKED']);
+  });
+
+  it('5-4 살아 있는 B 세션에서 A 로 가는 정상 handoff 는 계속 성공한다', async () => {
+    const bToken = accessTokenFor('neture');
+    bump(USER_ID, 'kpa-society'); // 다른 서비스만 로그아웃
+
+    const gen = mockRes();
+    await HandoffController.generateHandoff(
+      mockReq({ targetServiceKey: 'kpa-society' }, 'https://neture.co.kr', bToken),
+      gen,
+    );
+    expect(gen.statusCode).toBe(200);
+
+    const ex = mockRes();
+    await HandoffController.exchangeHandoff(mockReq({ token: HANDOFF_ID }, 'https://kpa-society.co.kr'), ex);
+    expect(ex.statusCode).toBe(200);
+  });
+});
 
 describe('4. handoff 원장이 출발 서비스 세대를 보관한다', () => {
   it('발급 시 source_session_epoch 를 기록한다', async () => {

@@ -92,3 +92,35 @@ export function isSessionEpochLive(tokenEpoch: number | null | undefined, curren
   if (tokenEpoch === null || tokenEpoch === undefined) return currentEpoch <= INITIAL_SESSION_EPOCH;
   return tokenEpoch >= currentEpoch;
 }
+
+/**
+ * 이 사용자에게 기록된 **가장 높은** 세대. 서비스를 식별할 수 없는 토큰의 판정에 쓴다.
+ */
+export async function readMaxSessionEpoch(userId: string, m?: EntityManager): Promise<number> {
+  const rows: Array<{ max_epoch: number | null }> = await manager(m).query(
+    `SELECT max(session_epoch) AS max_epoch FROM service_session_revocations WHERE user_id = $1`,
+    [userId],
+  );
+  return Number(rows[0]?.max_epoch ?? INITIAL_SESSION_EPOCH);
+}
+
+/**
+ * 이 토큰의 세션 범위가 아직 살아 있는가 — **refresh 와 handoff 가 같은 규칙을 쓴다.**
+ *
+ * `serviceKey` 를 모르는 토큰(배포 전 발급분 · origin 판정 실패)은 그 사용자의 최대 세대와
+ * 비교한다. 어느 서비스인지 모르므로 "폐기 기록이 하나라도 있으면 거절" 이 되고, 기록이 아예
+ * 없으면 통과한다(배포만으로 전원을 로그아웃시키지 않는다).
+ *
+ * 두 경로가 이 함수를 공유하는 것이 요점이다 — 한쪽만 느슨해지면 그쪽이 옆길이 된다.
+ */
+export async function isSessionScopeLive(
+  userId: string,
+  serviceKey: string | null | undefined,
+  tokenEpoch: number | null | undefined,
+  m?: EntityManager,
+): Promise<boolean> {
+  const current = serviceKey
+    ? ((await readServiceSessionEpoch(userId, serviceKey, m)) ?? INITIAL_SESSION_EPOCH)
+    : await readMaxSessionEpoch(userId, m);
+  return isSessionEpochLive(tokenEpoch, current);
+}

@@ -31,10 +31,18 @@ jest.mock('../database/connection.js', () => ({
     isInitialized: true,
     query: (...args: unknown[]) => query(...args),
     getRepository: () => ({ findOne: (...args: unknown[]) => findOne(...args) }),
-    // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8: handoff 가 대상 서비스의 세션
-    //   **세대**를 읽어 토큰에 새긴다(같은 초 로그아웃/재로그인을 iat 로는 구별할 수 없어
-    //   시간 비교를 버렸다). 같은 query double 로 위임해 SQL 호출이 그대로 집계된다.
-    manager: { query: (...args: unknown[]) => query(...args) },
+    // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8: handoff 가 세션 **세대**를 읽는다.
+    //   세대 조회는 `query` 의 once 큐를 **소비하지 않는다** — 소비하면 이 spec 들이 순서로
+    //   맞춰 둔 handoff SQL 응답이 한 칸씩 밀려 엉뚱한 값을 받는다(실제로 그렇게 깨졌다).
+    //   여기서는 "폐기 기록 없음"(= 빈 배열)을 돌려주고, 나머지는 그대로 위임한다.
+    //   세대 판정 자체는 전용 spec(service-logout-auth-boundary.spec.ts)이 본다.
+    manager: {
+      query: (...args: unknown[]) => {
+        const sql = String(args[0] ?? '');
+        if (/service_session_revocations/i.test(sql)) return Promise.resolve([]);
+        return query(...args);
+      },
+    },
   },
 }));
 jest.mock('../modules/auth/entities/User.js', () => ({ User: class User {} }));
@@ -162,7 +170,11 @@ describe('B. HandoffTokenService — 두 형태 · 같은 원자 consume', () =>
     expect(norm(sql)).toContain(
       '(user_id, source_service_key, target_service_key, target_workspace, expires_at, source_session_epoch)',
     );
-    expect(norm(sql)).toContain('COALESCE((SELECT session_epoch FROM service_session_revocations');
+    // WO §8 (4차): 세대는 **호출자가 검증한 값**으로 넘어온다($6). 여기서 현재 세대를 다시
+    //   읽으면(subquery 든 별도 SELECT 든) 발급 검사와 기록 사이에 로그아웃이 끼었을 때 새 세대가
+    //   적혀, 이미 로그아웃된 인증으로 시작한 handoff 가 교환에서 통과한다.
+    expect(norm(sql)).toContain("now() + ($5 || ' seconds')::interval, $6)");
+    expect(norm(sql)).not.toContain('SELECT session_epoch FROM service_session_revocations');
     expect(params.slice(0, 4)).toEqual(['user-1', 'neture', 'kpa-society', null]);
   });
 

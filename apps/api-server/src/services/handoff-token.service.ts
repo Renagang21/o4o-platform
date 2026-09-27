@@ -79,6 +79,7 @@ class HandoffTokenService {
     userId: string,
     sourceServiceKey: string,
     target: string | HandoffTarget,
+    sourceSessionEpoch?: number | null,
   ): Promise<string> {
     const resolved: HandoffTarget =
       typeof target === 'string' ? { kind: 'service', targetServiceKey: target } : target;
@@ -100,16 +101,22 @@ class HandoffTokenService {
     }
 
     const rows: Array<{ id: string }> = await AppDataSource.query(
-      // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8 (3차):
-      //   출발 서비스의 현재 세대를 **같은 문장 안에서** 읽어 넣는다. 별도 SELECT 를 앞세우면
-      //   왕복이 늘고 그 사이 로그아웃이 끼어들 틈이 생긴다. 행이 없으면 0(= 아직 로그아웃 없음).
+      // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8 (4차):
+      //   세대를 **호출자가 검증한 값**으로 받는다. 여기서 현재 세대를 다시 읽으면(subquery 든
+      //   별도 SELECT 든) 발급 검사와 기록 사이에 로그아웃이 끼었을 때 새 세대가 적혀,
+      //   이미 로그아웃된 인증으로 시작한 handoff 가 교환에서 통과한다.
       `INSERT INTO handoff_tokens
          (user_id, source_service_key, target_service_key, target_workspace, expires_at, source_session_epoch)
-       VALUES ($1, $2, $3, $4, now() + ($5 || ' seconds')::interval,
-               COALESCE((SELECT session_epoch FROM service_session_revocations
-                          WHERE user_id = $1 AND service_key = $2), 0))
+       VALUES ($1, $2, $3, $4, now() + ($5 || ' seconds')::interval, $6)
        RETURNING id`,
-      [userId, sourceServiceKey, targetServiceKey, targetWorkspace, String(this.TOKEN_TTL)],
+      [
+        userId,
+        sourceServiceKey,
+        targetServiceKey,
+        targetWorkspace,
+        String(this.TOKEN_TTL),
+        sourceSessionEpoch ?? null,
+      ],
     );
 
     const tokenId = rows?.[0]?.id;

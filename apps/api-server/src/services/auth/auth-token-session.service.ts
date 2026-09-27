@@ -8,12 +8,7 @@ import * as cookieUtils from '../../utils/cookie.utils.js';
 import { freshenUserContext } from './auth-context.helper.js';
 import { resolveAccountAccess } from '../../common/auth/account-access.policy.js';
 import logger from '../../utils/logger.js';
-import {
-  INITIAL_SESSION_EPOCH,
-  bumpServiceSessionEpoch,
-  isSessionEpochLive,
-  readServiceSessionEpoch,
-} from './service-session-epoch.js';
+import { bumpServiceSessionEpoch, isSessionScopeLive } from './service-session-epoch.js';
 
 /**
  * AuthTokenSessionService
@@ -223,22 +218,12 @@ export class AuthTokenSessionService {
     serviceKey?: string;
     sessionEpoch?: number;
   }): Promise<void> {
-    const m = this.userRepository.manager;
-
-    if (!payload.serviceKey) {
-      // 서비스를 모르는 토큰 → 이 사용자에게 폐기 기록이 하나라도 있으면 거절.
-      const rows: Array<{ max_epoch: number | null }> = await m.query(
-        `SELECT max(session_epoch) AS max_epoch FROM service_session_revocations WHERE user_id = $1`,
-        [payload.userId],
-      );
-      const maxEpoch = Number(rows[0]?.max_epoch ?? 0);
-      if (isSessionEpochLive(payload.sessionEpoch ?? null, maxEpoch)) return;
-      this.throwServiceSessionRevoked(payload.userId, 'UNKNOWN_LEGACY_TOKEN');
+    // 판정은 `isSessionScopeLive` 하나 — handoff 발급·교환도 같은 함수를 쓴다.
+    //   한쪽만 느슨해지면 그쪽이 옆길이 된다(4차 리뷰에서 실제로 그랬다).
+    if (await isSessionScopeLive(payload.userId, payload.serviceKey, payload.sessionEpoch, this.userRepository.manager)) {
+      return;
     }
-
-    const currentEpoch = await readServiceSessionEpoch(payload.userId, payload.serviceKey, m);
-    if (isSessionEpochLive(payload.sessionEpoch, currentEpoch ?? INITIAL_SESSION_EPOCH)) return;
-    this.throwServiceSessionRevoked(payload.userId, payload.serviceKey!);
+    this.throwServiceSessionRevoked(payload.userId, payload.serviceKey ?? 'UNKNOWN_LEGACY_TOKEN');
   }
 
   private throwServiceSessionRevoked(userId: string, serviceKey: string): never {

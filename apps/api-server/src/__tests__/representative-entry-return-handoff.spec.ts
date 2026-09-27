@@ -20,10 +20,18 @@ jest.mock('../database/connection.js', () => ({
     isInitialized: true,
     query: (...args: unknown[]) => query(...args),
     getRepository: () => ({ findOne: (...args: unknown[]) => findOne(...args) }),
-    // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8: handoff 가 대상 서비스의 세션
-    //   **세대**를 읽어 토큰에 새긴다(같은 초 로그아웃/재로그인을 iat 로는 구별할 수 없어
-    //   시간 비교를 버렸다). 같은 query double 로 위임해 SQL 호출이 그대로 집계된다.
-    manager: { query: (...args: unknown[]) => query(...args) },
+    // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8: handoff 가 세션 **세대**를 읽는다.
+    //   세대 조회는 `query` 의 once 큐를 **소비하지 않는다** — 소비하면 이 spec 들이 순서로
+    //   맞춰 둔 handoff SQL 응답이 한 칸씩 밀려 엉뚱한 값을 받는다(실제로 그렇게 깨졌다).
+    //   여기서는 "폐기 기록 없음"(= 빈 배열)을 돌려주고, 나머지는 그대로 위임한다.
+    //   세대 판정 자체는 전용 spec(service-logout-auth-boundary.spec.ts)이 본다.
+    manager: {
+      query: (...args: unknown[]) => {
+        const sql = String(args[0] ?? '');
+        if (/service_session_revocations/i.test(sql)) return Promise.resolve([]);
+        return query(...args);
+      },
+    },
   },
 }));
 jest.mock('../modules/auth/entities/User.js', () => ({ User: class User {} }));
@@ -236,14 +244,13 @@ describe('C. exchangeHandoff', () => {
       //   로그아웃해도 이 토큰을 지목할 수 없다(서비스 단위 무효화가 무력해진다).
       expect(generateTokens).toHaveBeenCalledWith(KPA_ONLY_USER, ['kpa:store_owner'], 'neture.co.kr', KPA_ONLY_MEMBERSHIPS, 'fam-1', 'neture', 0);
       expect(persistRefreshTokenFamily).toHaveBeenCalledWith('user-1', 'RT');
-      // SQL 은 토큰 consume(UPDATE handoff_tokens) + memberships SELECT + 세션 세대 SELECT 뿐 —
-      //   membership·role 생성/수정 0. 세 번째는 WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8 이
-      //   더한 **읽기**다(대상 서비스의 현재 세대를 토큰에 새긴다). write 0 계약은 그대로다.
+      // SQL 은 토큰 consume(UPDATE handoff_tokens) + memberships SELECT 뿐 — membership·role 생성/수정 0.
+      //   세션 세대 조회는 이 spec 에서 connection double 의 `manager` 가 직접 답하므로 여기 집계에
+      //   들어오지 않는다(세대 판정은 전용 spec 이 본다). write 0 계약은 그대로다.
       const sql = sqlCalls();
-      expect(sql).toHaveLength(3);
+      expect(sql).toHaveLength(2);
       expect(sql[0]).toContain('UPDATE handoff_tokens');
       expect(sql[1]).toMatch(/^SELECT .* FROM service_memberships/);
-      expect(sql[2]).toMatch(/^SELECT session_epoch FROM service_session_revocations/);
       expect(sql.join(' ')).not.toMatch(/INSERT|DELETE|UPDATE service_memberships|role_assignments/);
     });
   });

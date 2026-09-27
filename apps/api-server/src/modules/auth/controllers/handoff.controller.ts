@@ -45,7 +45,7 @@ import { resolveAccountAccess } from '../../../common/auth/account-access.policy
 import { resolveSessionServiceKey } from '../../../utils/session-origin.js';
 import {
   INITIAL_SESSION_EPOCH,
-  isSessionEpochLive,
+  isSessionScopeLive,
   readServiceSessionEpoch,
 } from '../../../services/auth/service-session-epoch.js';
 import { extractToken } from '../../../common/middleware/auth/auth-context.helpers.js';
@@ -79,26 +79,59 @@ import logger from '../../../utils/logger.js';
  */
 const SERVICE_SESSION_REVOKED_CODE = 'SERVICE_SESSION_REVOKED';
 
-/** access token 에 새겨진 세션 귀속. claim 이 없으면(배포 전 토큰) null. */
-function readTokenSessionScope(req: Request): { serviceKey?: string; sessionEpoch?: number } | null {
+/**
+ * 이 요청의 **출발 인증**. 값의 출처가 무엇인지가 핵심이다.
+ *
+ *   serviceKey    access token claim 이 있으면 **그것**(토큰이 증명한 값).
+ *                 없으면(배포 전 토큰) origin 파생값으로 떨어지고, 그래도 없으면 null.
+ *   sessionEpoch  토큰 claim. 배포 전 토큰은 undefined.
+ *
+ * **Origin 을 우선하면 안 된다.** 일반 HTTP 클라이언트는 Origin 을 임의로 지정할 수 있으므로,
+ * 토큰은 A 인데 Origin 만 B 라고 주장하면 원장에 B 가 적히고 교환 때 **B 의 세대**를 본다.
+ * 그러면 A 에서 로그아웃해도 그 handoff 가 살아남는다(4차 리뷰 지적).
+ */
+function readCallerScope(req: Request): { serviceKey: string | null; sessionEpoch?: number } {
   const token = extractToken(req as never);
-  if (!token) return null;
-  const payload = verifyAccessToken(token);
-  if (!payload?.serviceKey) return null;
-  return { serviceKey: payload.serviceKey, sessionEpoch: payload.sessionEpoch };
+  const payload = token ? verifyAccessToken(token) : null;
+  if (payload?.serviceKey) {
+    return { serviceKey: payload.serviceKey, sessionEpoch: payload.sessionEpoch };
+  }
+  // claim 이 없는 배포 전 토큰 — 검사를 **건너뛰지 않는다.** origin 으로 범위를 좁혀 보고,
+  // 그래도 모르면 null 로 두어 `isSessionScopeLive` 의 "최대 세대" 규칙을 따른다.
+  return { serviceKey: resolveSessionServiceKey(req.get('origin')), sessionEpoch: undefined };
 }
 
 /**
- * 그 (user, service) 세대가 아직 살아 있는가.
- * `tokenEpoch` 가 `undefined` = 배포 전 토큰 → `isSessionEpochLive` 의 legacy 규칙을 따른다.
+ * 원장에 적을 **출발**을 확정한다. 살아 있지 않으면 응답을 보내고 `null`.
+ *
+ * 값의 출처가 핵심이다:
+ *   serviceKey    토큰이 증명한 서비스 — **Origin 주장으로 바꿀 수 없다**
+ *   sessionEpoch  **토큰의 세대** (발급 시점의 현재 세대가 아니다).
+ *                 현재 세대를 적으면 검사와 기록 사이에 로그아웃이 끼었을 때 원장에 새 세대가
+ *                 적혀, 이미 로그아웃된 인증으로 시작한 handoff 가 교환에서 통과한다.
+ *                 claim 이 없는 토큰은 검사를 통과했다는 사실이 "폐기 기록 0" 을 뜻하므로 초기 세대다.
+ *
+ * **발급 직전에** 부른다: 잘못된 입력(알 수 없는 대상 등)에 DB 를 쓰지 않고, 검사와 기록 사이
+ * 간격도 가장 좁다.
  */
-async function isServiceSessionLive(
+async function resolveVerifiedHandoffSource(
+  req: Request,
   userId: string,
-  serviceKey: string,
-  tokenEpoch: number | null | undefined,
-): Promise<boolean> {
-  const current = (await readServiceSessionEpoch(userId, serviceKey)) ?? INITIAL_SESSION_EPOCH;
-  return isSessionEpochLive(tokenEpoch, current);
+): Promise<{ serviceKey: string; sessionEpoch: number } | null> {
+  // claim 이 없는 배포 전 토큰도 **건너뛰지 않는다** — 건너뛰면 만료 전 최대 15분 동안
+  // 로그아웃된 서비스의 인증으로 긴 세션을 얻을 수 있다(4차 리뷰 지적).
+  const scope = readCallerScope(req);
+  if (!(await isSessionScopeLive(userId, scope.serviceKey, scope.sessionEpoch))) {
+    logger.warn('[Handoff] Blocked generation — service session revoked', {
+      userId,
+      serviceKey: scope.serviceKey ?? 'UNKNOWN_SCOPE',
+    });
+    return null; // 응답은 호출부가 한다 — BaseController.error 는 subclass 안에서만 쓸 수 있다.
+  }
+  return {
+    serviceKey: scope.serviceKey ?? 'unknown',
+    sessionEpoch: scope.sessionEpoch ?? INITIAL_SESSION_EPOCH,
+  };
 }
 
 const SESSION_REVOKED_CODE = 'HANDOFF_SESSION_REVOKED';
@@ -161,16 +194,6 @@ export class HandoffController extends BaseController {
     // 위 검사는 **사용자 전체** family 만 본다 — 서비스 하나의 로그아웃은 그 값을 유지하므로
     // 여기서 출발 서비스의 세대를 따로 본다. 그러지 않으면 로그아웃된 서비스의 남은
     // access token 으로 수명이 긴 세션을 새로 얻는다.
-    const callerScope = readTokenSessionScope(req);
-    if (callerScope?.serviceKey) {
-      if (!(await isServiceSessionLive(user.id, callerScope.serviceKey, callerScope.sessionEpoch))) {
-        logger.warn('[Handoff] Blocked generation — service session revoked', {
-          userId: user.id,
-          serviceKey: callerScope.serviceKey,
-        });
-        return BaseController.error(res, SESSION_REVOKED_MESSAGE, 401, SERVICE_SESSION_REVOKED_CODE);
-      }
-    }
 
     // §8-2: 대상 종류는 정확히 하나 — targetServiceKey(SERVICE) 또는 targetWorkspace(WORKSPACE)
     const hasServiceTarget = targetServiceKey !== undefined && targetServiceKey !== null && targetServiceKey !== '';
@@ -211,13 +234,16 @@ export class HandoffController extends BaseController {
           return BaseController.error(res, '접근 가능한 매장이 없습니다.', 403, 'HANDOFF_TARGET_NO_MEMBERSHIP');
         }
 
-        const sourceServiceKey = detectSourceServiceKey(req.get('origin') || '');
-        // 발급 시점의 출발 서비스 세대는 서비스가 INSERT 안에서 함께 기록한다 —
-        // 교환 시 현재 세대와 비교해 "발급 뒤 그 서비스에서 로그아웃했는가" 를 판정한다.
-        const handoffToken = await handoffTokenService.generateToken(user.id, sourceServiceKey, {
-          kind: 'workspace',
-          targetWorkspace: STORE_WORKSPACE_KEY,
-        });
+        const source = await resolveVerifiedHandoffSource(req, user.id);
+        if (!source) {
+          return BaseController.error(res, SESSION_REVOKED_MESSAGE, 401, SERVICE_SESSION_REVOKED_CODE);
+        }
+        const handoffToken = await handoffTokenService.generateToken(
+          user.id,
+          source.serviceKey,
+          { kind: 'workspace', targetWorkspace: STORE_WORKSPACE_KEY },
+          source.sessionEpoch,
+        );
         const targetUrl =
           `${STORE_WORKSPACE_ORIGIN}/handoff?token=${handoffToken}` +
           (safeReturnPath ? `&returnTo=${encodeURIComponent(safeReturnPath)}` : '');
@@ -251,8 +277,16 @@ export class HandoffController extends BaseController {
         return BaseController.error(res, 'returnPath must be / for representative entry', 400, 'VALIDATION_ERROR');
       }
       try {
-        const sourceServiceKey = detectSourceServiceKey(req.get('origin') || '');
-        const handoffToken = await handoffTokenService.generateToken(user.id, sourceServiceKey, targetService.key);
+        const source = await resolveVerifiedHandoffSource(req, user.id);
+        if (!source) {
+          return BaseController.error(res, SESSION_REVOKED_MESSAGE, 401, SERVICE_SESSION_REVOKED_CODE);
+        }
+        const handoffToken = await handoffTokenService.generateToken(
+          user.id,
+          source.serviceKey,
+          targetService.key,
+          source.sessionEpoch,
+        );
         const targetOrigin = getServiceOrigin(targetService.key) ?? `https://${targetService.domain}`;
         return BaseController.ok(res, {
           handoffToken,
@@ -400,11 +434,16 @@ export class HandoffController extends BaseController {
       //   "발급 뒤 출발 서비스에서 로그아웃" 을 잡지 못했다 — 발급 시 원장에 남긴 출발 세대를
       //   현재 세대와 비교한다. 살아 있는 다른 서비스에서 온 정상 이동은 영향받지 않는다.
       //   `sourceSessionEpoch` 가 null = 이 컬럼 이전 발급분이므로 판정에서 제외한다(TTL 60초).
+      //   `sourceSessionEpoch` 가 null = 이 컬럼 이전 발급분이므로 판정에서 제외한다(TTL 60초).
+      //   `sourceServiceKey === 'unknown'` = 발급 때 범위를 못 정한 경우 → 최대 세대 규칙을 따른다.
       if (
-        payload.sourceServiceKey &&
         payload.sourceSessionEpoch !== null &&
         payload.sourceSessionEpoch !== undefined &&
-        !(await isServiceSessionLive(user.id, payload.sourceServiceKey, payload.sourceSessionEpoch))
+        !(await isSessionScopeLive(
+          user.id,
+          payload.sourceServiceKey === 'unknown' ? null : payload.sourceServiceKey,
+          payload.sourceSessionEpoch,
+        ))
       ) {
         logger.warn('[Handoff] Blocked exchange — source service session revoked', {
           userId: user.id,
