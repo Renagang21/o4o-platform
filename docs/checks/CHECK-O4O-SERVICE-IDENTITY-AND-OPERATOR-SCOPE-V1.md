@@ -430,6 +430,7 @@ access token(15분)   폐기 대상이 아니다 — 만료까지 유효하다
 | V24 | 로그아웃 폐기 실패는 **성공으로 응답하지 않는다** | PASS |
 | V25 | A 로그아웃 → A 재로그인 → **B refresh 생존** · 로그인이 family 를 승계 | PASS |
 | V26 | supplier·funding 경계가 같은 팩토리를 쓰고 `scopeRoleMapping` 이 값으로 채워져 있다 | PASS |
+| V27 | SonarCloud Quality Gate **OK** — 새 코드 중복 2.96% (155/5242 · 기준 3% 이하) | PASS |
 | V18 | 세 서비스 독립 주소(`community`·`supplier`·`funding`.neture.co.kr) · `basePath` 없음 · origin 3개 등록 | PASS |
 | V19 | handoff 가 **대상 서비스**를 토큰에 새긴다 (SERVICE·WORKSPACE 양쪽) | PASS |
 | V15 | 승격 CLI 안전 성질 4종(기본 dry-run · 증거 AND 자격 · 기존 행 미덮어쓰기 · 파라미터 바인딩) | PASS |
@@ -498,6 +499,10 @@ Analyze (typescript) · CodeQL        pass
 Guard Static Analysis               pass
 Detect affected scope               pass  (api + admin + web:neture · global_or_unknown=false)
 ```
+
+> **체크 상태는 `gh pr view --json statusCheckRollup` 으로 본다.** `gh pr checks` 는
+> SonarCloud 를 나열하지 않아, 그 목록만 보고 "전 체크 pass" 라고 두 번 잘못 보고했다.
+> 목록에 없는 것을 "없다" 로 읽지 말 것.
 
 **CodeQL code-scanning 게이트가 두 번 fail 했다** (workflow 자체는 pass — 별개 게이트).
 
@@ -627,12 +632,38 @@ npx tsx src/scripts/community-catalog-promotion.ts --apply    # 숫자 확인 �
 | 6 | 로그아웃 뒤 access token 으로 handoff 발급 · 발급 후 로그아웃 시 교환 | 두 지점에 세대 검사 추가 (§6-5) |
 | 7 | 관리자 화면 로그아웃이 서버측 폐기를 건너뜀 · DB 오류에도 성공 응답 | `admin` 범위 명시 · 500 응답 (§6-5) |
 | 8 | 한 서비스 재로그인이 다른 서비스 세션을 죽임 | 로그인이 살아 있는 family 를 승계 (§6-6 · **trade-off 기록**) |
-| 9 | **SonarCloud 새 코드 중복 3.1%(기준 3%) 실패** — "전 체크 pass" 가 아니었다 | supplier·funding 경계를 공통 팩토리로 합쳐 중복 제거 |
+| 9 | **SonarCloud 새 코드 중복 3.1%(기준 3%) 실패** — "전 체크 pass" 가 아니었다 | 아래 §11-3 |
 
 > **내 보고가 틀렸다.** "전 체크 pass" 라고 두 번 썼는데 SonarCloud 는 실패 상태였다.
 > `gh pr checks` 가 그 체크를 나열하지 않는데 **그 목록만 보고 단정**했다.
 > 체크 상태는 `gh pr view --json statusCheckRollup` 으로 봐야 한다 — 목록에 없는 것을
 > "없다" 로 읽지 말 것.
+
+### 11-3. SonarCloud 중복 — 짐작으로 고치려다 악화시켰다
+
+```text
+3.10%  (141/4547)  최초 실패
+3.43%  (179/5214)  ← supplier·funding scope guard 를 합친 뒤. **악화**
+2.96%  (155/5242)  ← 파일별 분포를 측정한 뒤 실제 상위 두 곳을 줄여 통과 (Quality Gate OK)
+```
+
+**무엇이 틀렸나.** "거의 같은 두 파일이 있으니 그게 중복일 것" 이라고 짐작해 scope guard 를
+합쳤다. 그런데 `measures/component_tree` 로 파일별 분포를 보니 **그 두 파일은 애초에 중복
+목록에 없었다.** 그 사이 새 테스트가 중복을 더해 수치는 오히려 올라갔다.
+
+**실제 상위 두 곳** (179줄 중 91줄):
+
+| 파일 | 중복 | 원인 | 처리 |
+|---|---|---|---|
+| `config/service-catalog.ts` | 66 | 같은 workspace 자격 리터럴이 5개 서비스에 반복 | `OPERATOR_ONLY_WORKSPACE` 로 추출 — 이름으로 뜻이 드러나고, 한 곳만 고쳐 어긋날 여지가 없어진다 |
+| `services/community/community-lifecycle.service.ts` | 25 | 승인·거절 4경로가 같은 조회·검증 반복 | `loadPendingRequest` · `loadPendingMembership`. 후자는 `communityId` 를 함께 보므로 **월권 방어가 두 경로에서 같은 규칙**이 된다 |
+
+scope guard 통합은 되돌리지 않았다 — 중복 기여는 0 이었지만 `scopeRoleMapping` 을 한쪽만
+고치는 실수(admin 전용 경로가 operator 에게 열리는 종류)를 구조적으로 막는 효과는 유효하다.
+
+> **교훈**: 게이트 수치를 고칠 때도 **어디가 원인인지 먼저 측정**해야 한다. 코드를 읽고
+> "여기가 중복 같다" 고 판단한 것이 틀렸고, 그 수정이 수치를 올렸다.
+> 남은 중복(handoff spec 3개 48줄 — 서로의 mock scaffold)은 기준 안이라 손대지 않았다.
 
 > **테스트로 결함을 가린 것이 더 나쁘다.** 2초 이동은 "통과시키려고" 넣은 것이고, 그 순간
 > 그 테스트는 계약을 지키는 장치가 아니라 결함을 숨기는 장치가 됐다. 지금은 시간을 전혀
