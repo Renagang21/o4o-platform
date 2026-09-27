@@ -459,11 +459,11 @@ access token(15분)   폐기 대상이 아니다 — 만료까지 유효하다
 ### 7-2. 전체 검증 (CI 방식 실행 · **리뷰 반영 후 재실행**)
 
 ```text
-api-server jest  3분할 전부 green (2차 리뷰 반영 후 재실행)
-  shard 1/3   124 suite · 2,336 PASS
-  shard 2/3   124 suite · 1,981 PASS
-  shard 3/3   123 suite · 2,061 PASS
-  합계        371 suite · 6,378 PASS · 0 FAIL
+api-server jest  3분할 전부 green (3차 리뷰 반영 후 재실행)
+  shard 1/3   125 suite · 2,372 PASS
+  shard 2/3   124 suite · 1,956 PASS
+  shard 3/3   123 suite · 2,063 PASS
+  합계        372 suite · 6,391 PASS · 0 FAIL
 
 pnpm run type-check              OK (api-server 포함)
 pnpm run type-check:frontend     OK (9 web)
