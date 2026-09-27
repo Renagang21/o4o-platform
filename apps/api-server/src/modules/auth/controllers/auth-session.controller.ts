@@ -7,6 +7,7 @@
 import { Request, Response } from 'express';
 import { BaseController } from '../../../common/base.controller.js';
 import type { AuthRequest } from '../../../common/middleware/auth.middleware.js';
+import { resolveSessionServiceKey } from '../../../utils/session-origin.js';
 import { authenticationService } from '../../../services/authentication.service.js';
 import logger from '../../../utils/logger.js';
 import { monitoringMetrics } from '../../../common/monitoring/metrics.service.js';
@@ -19,16 +20,22 @@ export class AuthSessionController extends BaseController {
    */
   static async logout(req: AuthRequest, res: Response): Promise<any> {
     const userId = req.user?.id;
+    // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8:
+    //   **요청 origin 의 서비스 세션만** 서버에서 무효화한다. 본문 값을 믿지 않는다 —
+    //   클라이언트가 serviceKey 를 지정할 수 있으면 남의 서비스 세션을 끊을 수 있다.
+    const serviceKey = resolveSessionServiceKey(req.get('origin'));
 
     try {
       if (userId) {
-        await authenticationService.logout(userId);
+        await authenticationService.logout(userId, serviceKey);
       }
 
       authenticationService.clearAuthCookies(req, res);
 
       return BaseController.ok(res, {
         message: 'Logout successful',
+        // 서버측 무효화가 실제로 일어났는지 프런트·검증이 구분할 수 있게 밝힌다.
+        scope: serviceKey ? { serviceKey, serverRevoked: true } : { serviceKey: null, serverRevoked: false },
       });
     } catch (error: any) {
       logger.error('[AuthSessionController.logout] Logout error', {

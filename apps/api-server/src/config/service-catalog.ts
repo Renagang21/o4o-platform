@@ -189,9 +189,11 @@ export const O4O_SERVICES: O4OService[] = [
   /**
    * WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §3 — 커뮤니티 서비스.
    *
-   * domain 은 플랫폼 기본 호스트다. 커뮤니티는 별도 배포가 아니라 web-neture 안의
-   * `/community` 영역이며, 개별 커뮤니티는 그 아래 개체(`communities.slug`)다.
-   * 서브도메인 수만큼 Cloud Run 서비스를 새로 만들지 않는다.
+   * 주소는 **`community.neture.co.kr` 독립 서비스**다. 같은 `neture-web` 을 서빙하지만
+   * (Cloud Run 서비스를 서브도메인 수만큼 만들지 않는다) 주소와 권한 경계는 독립이다.
+   * 호스트 라우팅은 이미 `services/web-neture/src/lib/hostProfile.ts` 가 갖고 있고
+   * `community` 프로필의 `/` 가 진입이므로 `basePath` 를 두지 않는다.
+   * 개별 커뮤니티는 그 아래 개체(`communities.slug`)다.
    *
    * joinEnabled=false — **서비스 단위 자가 가입 경로를 열지 않는다.** 가입은 개별 커뮤니티
    * 단위(승인형 하나)이고, `service_memberships('community')` 는 그 승인의 **결과로** 생긴다
@@ -206,11 +208,48 @@ export const O4O_SERVICES: O4OService[] = [
     key: 'community',
     name: 'O4O Community',
     nameKo: '커뮤니티',
-    domain: 'neture.co.kr',
-    basePath: '/community',
+    domain: 'community.neture.co.kr',
     description: '직역·관심 단위로 정보와 경험을 나누는 커뮤니티 서비스',
     joinEnabled: false,
     // 매장 축 없음. 전체 관리자(community:admin) Operator Workspace 는 존재.
+    workspace: { workspaceMode: 'none', storeWorkspaceEnabled: false, operatorWorkspaceEnabled: true },
+  },
+  /**
+   * WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §4 — 공급자 서비스.
+   *
+   * **사업자 본인의 접근 경계가 아니다.** 공급자 사업자는
+   * `organization_members(role=owner) → organizations(type='supplier') → neture_suppliers`
+   * 로 판정하며 그것이 canonical authorization 이고 FROZEN 이다
+   * (O4O-SUPPLIER-DOMAIN-BOUNDARY-V1 §7 — 이 WO 는 건드리지 않았다).
+   * 이 키는 **그 영역을 운영하는 쪽**의 범위다: 공급자 심사·정지·서류 확인.
+   * 두 축은 서로 다른 질문에 답하므로 인가 축이 둘로 갈라지는 것이 아니다.
+   *
+   * joinEnabled=false — 공급자 입점은 서비스 가입 신청이 아니라 조직 기반 심사다.
+   * 같은 `neture-web` 을 서빙하며 호스트 라우팅은 `hostProfile.ts` 의 `supplier` 프로필이 갖는다.
+   */
+  {
+    key: 'supplier',
+    name: 'O4O Supplier',
+    nameKo: '공급자',
+    domain: 'supplier.neture.co.kr',
+    description: '제품을 등록하고 매장에 공급하는 공급자 서비스',
+    joinEnabled: false,
+    workspace: { workspaceMode: 'none', storeWorkspaceEnabled: false, operatorWorkspaceEnabled: true },
+  },
+  /**
+   * WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §4 — 유통참여형 펀딩.
+   *
+   * 「유통참여형 펀딩」은 플랫폼 공통 제품명(market-trial)이고, 이 키는 그 **서브도메인
+   * 운영자 범위**다. 종전에는 `neture:operator` 하나가 이 영역까지 열었다.
+   * 같은 `neture-web` 을 서빙하며 호스트 라우팅은 `hostProfile.ts` 의 `funding` 프로필이 갖는다.
+   */
+  {
+    key: 'funding',
+    name: 'O4O Funding',
+    nameKo: '유통참여형 펀딩',
+    domain: 'funding.neture.co.kr',
+    description: '매장이 신제품 유통에 참여해 함께 검증하는 펀딩 서비스',
+    joinEnabled: false,
     workspace: { workspaceMode: 'none', storeWorkspaceEnabled: false, operatorWorkspaceEnabled: true },
   },
   {

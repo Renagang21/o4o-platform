@@ -201,10 +201,12 @@ interface ServicePaths {
 //   경로 파생 규칙은 @o4o/store-ui-core resolveStoreWorkspacePaths 와 동일 (KPA·KCos `/store`, PH `/store-owner`).
 const SERVICE_PATHS: Record<string, ServicePaths> = {
   neture: { home: '/community', operator: '/operator', admin: '/admin', join: '/register' },
-  // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1: 커뮤니티는 별도 배포가 아니라 이 앱의 영역이다.
+  // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1: 커뮤니티는 `community.neture.co.kr` 독립
+  //   서비스다(같은 앱을 서빙하더라도 주소·권한 경계는 독립). 호스트 프로필의 `/` 가 진입이다.
   //   join 경로를 두지 않는다 — 가입은 개별 커뮤니티 단위(승인형)이고 서비스 단위 자가 신청이 없다
   //   (service-catalog joinEnabled=false). 그래서 '가입 가능한 서비스' 에도 나타나지 않는다.
-  community: { home: '/community', operator: '/operator' },
+  //   operator 경로도 두지 않는다 — 그 호스트의 커뮤니티 운영 화면이 아직 없다(dead link 0 규칙).
+  community: { home: '/' },
   'kpa-society': { home: '/', myStore: '/store/workspace', operator: '/operator', admin: '/admin', join: '/register' },
   'pharmacy-hub': { home: '/', myStore: '/store-owner/workspace', operator: '/operator', admin: '/admin', join: '/join', joinStatus: '/join/status' },
   'k-cosmetics': { myStore: '/store/workspace', operator: '/operator', admin: '/admin', join: '/register' },
@@ -502,15 +504,6 @@ export function buildHomeEntryModel(user: User, data: HomeEntryData): HomeEntryM
           action: { kind: 'handoff', serviceKey: 'kpa-branch', returnPath: b.slug ? `/${b.slug}` : '/me' },
         });
       }
-      continue;
-    }
-    if (svc.key === 'community') {
-      // 같은 origin 이므로 세션 인계가 필요 없다 — handoff 를 걸면 자기 자신으로 왕복한다.
-      myServices.push({
-        id: 'svc:community',
-        label: nameOf('community'),
-        action: { kind: 'internal', to: SERVICE_PATHS.community.home! },
-      });
       continue;
     }
     if (svc.key === 'cafe24-b2b') continue; // O4O 로그인 회원 대상 화면이 아니다

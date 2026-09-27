@@ -42,6 +42,7 @@ import { resolveAccessibleStores } from '../../../utils/service-tenant.resolver.
 import { isHandoffWorkspace } from '../../../services/handoff-token.service.js';
 import { isRepresentativeEntryTarget, isRepresentativeEntryExchangeOrigin } from '../../../config/representative-entry.js';
 import { resolveAccountAccess } from '../../../common/auth/account-access.policy.js';
+import { resolveSessionServiceKey } from '../../../utils/session-origin.js';
 import logger from '../../../utils/logger.js';
 
 /**
@@ -83,14 +84,14 @@ function isSafeReturnPath(value: unknown): value is string {
  *   compare hostnames exactly. Services sharing one host (e.g. basePath tenants) keep
  *   the catalog's first-host match because Origin headers do not carry a path.
  */
+/**
+ * WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8:
+ *   origin → 서비스 판정을 `utils/session-origin` 하나로 모았다. 로그인·로그아웃·handoff 가
+ *   같은 답을 써야 서비스 단위 세션 폐기가 어긋나지 않는다.
+ *   여기서는 종전 계약대로 판정 불가를 'unknown' 문자열로 유지한다(handoff 원장 컬럼 값).
+ */
 function detectSourceServiceKey(origin: string): string {
-  try {
-    const originHost = new URL(origin).hostname.toLowerCase();
-    const sourceService = O4O_SERVICES.find((svc) => svc.domain.toLowerCase() === originHost);
-    return sourceService?.key ?? 'unknown';
-  } catch {
-    return 'unknown';
-  }
+  return resolveSessionServiceKey(origin) ?? 'unknown';
 }
 
 export class HandoffController extends BaseController {
@@ -470,12 +471,18 @@ export class HandoffController extends BaseController {
     //   handoff 는 새 로그인이 아니라 기존 세션의 교차 서비스 승계다.
     //   새 family 를 발급하면 원 서비스 세션이 family mismatch 로 죽는다 → 기존 family 를 승계한다.
     //   (기존 family 가 없으면 새로 발급하고 아래에서 기록한다.)
+    // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8:
+    //   handoff 로 발급되는 토큰은 **대상 서비스의 세션**이다. 그 서비스에서 로그아웃하면
+    //   이 토큰만 무효가 되고 원 서비스 세션은 살아 있어야 한다.
+    //   WORKSPACE handoff(store)는 서비스가 아니므로 workspace 키를 그대로 쓴다.
+    const sessionServiceKey = target.targetServiceKey ?? target.targetWorkspace ?? null;
     const tokens = tokenUtils.generateTokens(
       user,
       roles,
       'neture.co.kr',
       memberships,
       user.refreshTokenFamily ?? null,
+      sessionServiceKey,
     );
     await persistRefreshTokenFamily(user.id, tokens.refreshToken);
 

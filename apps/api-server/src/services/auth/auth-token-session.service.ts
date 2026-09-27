@@ -93,8 +93,13 @@ export class AuthTokenSessionService {
       throw error;
     }
 
+    // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8: 서비스 단위 폐기 검사.
+    //   전역 family 검사보다 **먼저** 본다 — 이 토큰이 속한 서비스에서 로그아웃했으면
+    //   family 가 살아 있어도(다른 서비스가 쓰는 중) 이 토큰은 무효다.
+    await this.assertServiceSessionNotRevoked(payload);
+
     // WO-O4O-LOGOUT-ALL-TOKEN-INVALIDATION-V1:
-    //   users.refreshTokenFamily 가 비어 있다 = logout / logout-all / 도난 대응으로
+    //   users.refreshTokenFamily 가 비어 있다 = logout-all / 도난 대응으로
     //   해당 사용자의 모든 refresh token 이 폐기된 상태다.
     //   이전에는 이 조건이 family 검사 전체를 우회시켜 logout-all 이 무력했다.
     if (!user.refreshTokenFamily) {
@@ -135,12 +140,15 @@ export class AuthTokenSessionService {
     //   모든 origin 이 TOKEN_FAMILY_REVOKED 로 연쇄 사망했다 (IR-O4O-CROSSSERVICE-HANDOFF-SESSION-PERSISTENCE-V1).
     //   새 로그인 = 새 family / logout·logout-all = family null 계약은 그대로다.
     const ctx = await freshenUserContext(user.id);
+    // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8: 회전은 같은 세션의 연장이므로
+    //   serviceKey 를 **승계**한다. 떨어뜨리면 회전 한 번으로 서비스 단위 로그아웃이 무력해진다.
     const tokens = tokenUtils.generateTokens(
       user,
       ctx.roles,
       'neture.co.kr',
       ctx.memberships,
-      payload.tokenFamily
+      payload.tokenFamily,
+      payload.serviceKey ?? null
     );
 
     // family 는 승계됐으므로 users 갱신이 필요 없다. 방어적으로 값이 다를 때만 저장한다.
@@ -163,26 +171,79 @@ export class AuthTokenSessionService {
   /**
    * Logout user
    */
-  async logout(userId: string): Promise<void> {
+  async logout(userId: string, serviceKey?: string | null): Promise<void> {
     // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8 (S7):
-    //   로그아웃은 **지금 쓰던 서비스의 세션만** 끝낸다. 다른 서비스에 로그인한 상태는 유지된다.
+    //   로그아웃은 **지금 쓰던 서비스의 세션만** 서버에서 무효화한다. 다른 서비스 세션은 유지된다.
     //
-    //   종전에는 여기서 `users.refreshTokenFamily = null` 로 폐기했다. 그 값은 **사용자 전체**
-    //   범위라서, 한 서비스에서 로그아웃하면 9개 주소의 refresh 가 모두 TOKEN_FAMILY_REVOKED 로
-    //   거부됐다 — 즉 `logout` 이 `logout-all` 과 같은 동작이었다. 프런트는 두 경로를 이미
-    //   구분해 부르고 있었으므로(useServiceAuth: logout -> /auth/logout, logoutAll ->
-    //   /auth/logout-all) 차이가 나는 쪽은 서버 하나였다.
+    //   종전 1차: `logoutAll` 위임 → `users.refreshTokenFamily = null`. 그 값은 **사용자 전체**
+    //     범위라서 한 서비스 로그아웃이 9개 주소를 모두 끊었다(= logout-all 과 동일).
+    //   종전 2차: 아무것도 하지 않고 기록만 남겼다. 그러면 **이미 발급된 refresh token 이
+    //     서버에서 계속 유효**하므로 "세션 종료" 가 아니다.
     //
-    //   전역 폐기는 `logoutAll` 의 일이다. 여기서는 세션 원장을 건드리지 않고, 호출자가
-    //   그 요청 origin 의 쿠키를 지운다(clearAuthCookies). origin 별 localStorage 토큰은
-    //   해당 서비스 프런트가 자기 origin 만 정리한다.
-    //
-    //   한계(구조): 데이터 모델에 기기·서비스별 세션 레코드가 없어 서버가 특정 세션 하나만
-    //   무효화할 수단이 없다. 그래서 여기서 할 수 있는 일은 "전역 폐기를 하지 않는 것"이며,
-    //   서버측 즉시 무효화가 필요하면 `logout-all` 을 쓴다. 세션 레코드 도입은 별도 WO 다.
-    //
-    //   `userId` 는 호출 계약(서명)과 감사 로그를 위해 그대로 받는다.
-    logger.info('[logout] service-scoped logout — token family preserved', { userId });
+    //   이제는 `service_session_revocations` 에 그 서비스의 폐기 시각을 남긴다. refresh 는
+    //   토큰의 `iat` 를 이 값과 비교해 거절한다(아래 assertServiceSessionNotRevoked).
+    //   `users.refreshTokenFamily` 는 손대지 않는다 — 그것은 전역 축이고 logout-all 의 것이다.
+    if (!serviceKey) {
+      // 서비스를 식별하지 못하면 **무효화 범위를 정할 수 없다.** 전역 폐기로 확대하지 않고
+      // (그것이 고치려는 결함이다) 쿠키 정리에만 의존한다는 사실을 남긴다.
+      logger.warn('[logout] service could not be resolved — server-side revocation skipped', { userId });
+      return;
+    }
+
+    await this.userRepository.manager.query(
+      `INSERT INTO service_session_revocations (user_id, service_key, revoked_at, updated_at)
+       VALUES ($1, $2, now(), now())
+       ON CONFLICT (user_id, service_key)
+       DO UPDATE SET revoked_at = now(), updated_at = now()`,
+      [userId, serviceKey],
+    );
+    logger.info('[logout] service session revoked', { userId, serviceKey });
+  }
+
+  /**
+   * 이 refresh token 이 속한 서비스 세션이 폐기됐는지.
+   *
+   * 판정은 **발급 시각 대비**다: `iat < revoked_at` 이면 그 로그아웃보다 먼저 발급된
+   * 토큰이므로 거절한다. 로그아웃 뒤 다시 로그인하면 새 토큰의 `iat` 가 더 크므로 통과한다.
+   *
+   * `serviceKey` claim 이 없는 토큰(이 변경 배포 전 발급분)은 **어느 서비스인지 알 수 없다.**
+   * 그것을 통과시키면 배포 직후 최대 7일(refresh 수명) 동안 로그아웃이 무력해진다. 그래서
+   * 그 동안은 **폐기 행이 하나라도 그 iat 보다 나중이면 거절**한다 — 종전(전역 폐기) 동작과
+   * 같은 수준이므로 보안이 후퇴하지 않고, 새 토큰부터는 서비스 단위로 정확해진다.
+   */
+  private async assertServiceSessionNotRevoked(payload: {
+    userId: string;
+    serviceKey?: string;
+    iat?: number;
+  }): Promise<void> {
+    if (!payload.iat) return; // iat 없는 토큰은 verify 단계에서 이미 걸러진다.
+    const issuedAt = new Date(payload.iat * 1000);
+
+    const rows: Array<{ revoked_at: Date }> = payload.serviceKey
+      ? await this.userRepository.manager.query(
+          `SELECT revoked_at FROM service_session_revocations
+            WHERE user_id = $1 AND service_key = $2 AND revoked_at > $3
+            LIMIT 1`,
+          [payload.userId, payload.serviceKey, issuedAt],
+        )
+      : await this.userRepository.manager.query(
+          `SELECT revoked_at FROM service_session_revocations
+            WHERE user_id = $1 AND revoked_at > $2
+            LIMIT 1`,
+          [payload.userId, issuedAt],
+        );
+
+    if (rows.length > 0) {
+      logger.warn('[refreshTokens] refresh rejected — service session revoked', {
+        userId: payload.userId,
+        serviceKey: payload.serviceKey ?? 'UNKNOWN_LEGACY_TOKEN',
+      });
+      const error = new Error('세션이 종료되었습니다. 다시 로그인해 주세요.') as Error & {
+        code: string;
+      };
+      error.code = 'SERVICE_SESSION_REVOKED';
+      throw error;
+    }
   }
 
   /**

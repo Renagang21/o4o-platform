@@ -41,9 +41,12 @@ export async function freshenUserContext(userId: string): Promise<UserContext> {
 export async function generateTokensWithContext(
   user: User,
   domain: string = 'neture.co.kr',
+  serviceKey?: string | null,
 ): Promise<{ tokens: AuthTokens; roles: string[]; memberships: { serviceKey: string; status: string; role?: string }[] }> {
   const ctx = await freshenUserContext(user.id);
-  const tokens = tokenUtils.generateTokens(user, ctx.roles, domain, ctx.memberships);
+  // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8: 어느 서비스에서 로그인했는지 refresh
+  //   token 에 남긴다. 없으면 서비스 단위 로그아웃이 이 세션을 지목할 수 없다.
+  const tokens = tokenUtils.generateTokens(user, ctx.roles, domain, ctx.memberships, null, serviceKey);
   return { tokens, ...ctx };
 }
 

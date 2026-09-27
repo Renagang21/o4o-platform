@@ -53,6 +53,30 @@ export const ASSIGNABLE_ROLES: Record<string, OperatorRoleOption[]> = {
       description: '약사회 분회 운영자 (대상 분회 소속은 분회 운영자 화면에서 별도 지정). 다른 분회 개설을 승인할 수 없습니다.',
     },
   ],
+  supplier: [
+    {
+      value: 'supplier:admin',
+      label: '공급자 관리자',
+      description: '공급자 심사 · 정지 · 서류 확인 (사업자 본인 접근 권한이 아니다)',
+    },
+    {
+      value: 'supplier:operator',
+      label: '공급자 운영자',
+      description: '공급자 영역 운영 업무',
+    },
+  ],
+  funding: [
+    {
+      value: 'funding:admin',
+      label: '펀딩 관리자',
+      description: '유통참여형 펀딩 정책 · 승인',
+    },
+    {
+      value: 'funding:operator',
+      label: '펀딩 운영자',
+      description: '유통참여형 펀딩 운영 업무',
+    },
+  ],
   community: [
     {
       value: 'community:admin',

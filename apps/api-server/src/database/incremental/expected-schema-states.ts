@@ -108,6 +108,17 @@ export const EXPECTED_SCHEMA_STATES: readonly ExpectedSchemaState[] = [
     fingerprint: 'c06a80afbbb9415b499bd94f36ba0a012460672c5afb4d22b36ea67258645f82',
     fingerprintLineCount: 5882,
   },
+  // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 (S7 재작업) — 서비스 단위 세션 폐기 원장 1테이블.
+  // service_session_revocations + 인덱스 1개. PK 는 (user_id, service_key) 복합.
+  // 5882 -> 5891 (+9): 테이블 1 · PK 1 · 일반 인덱스 1 · FK 1 이 더해진다.
+  // baseline 2026-09-18-id685 fresh bootstrap + incremental 1..8 을 격리 PostgreSQL 15
+  // (docker postgres:15, 로컬 전용 포트 55436, throwaway DB) 에서 실제 적용해 산출:
+  // 운영 DB fingerprint 채택 아님.
+  {
+    appliedThrough: 'CreateServiceSessionRevocations1790400000002',
+    fingerprint: '86d966f555577eeb850246a97e433afdef7539a85e147df5d2d5c03fa5eb7bb9',
+    fingerprintLineCount: 5891,
+  },
 ] as const;
 
 /** Expected state after `prefixLength` incremental migrations; undefined when not registered. */

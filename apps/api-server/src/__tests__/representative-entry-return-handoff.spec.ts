@@ -206,7 +206,10 @@ describe('C. exchangeHandoff', () => {
       expect(res.cookie).not.toHaveBeenCalled();
       expect(res.setHeader).not.toHaveBeenCalledWith('Set-Cookie', expect.anything());
       expect(res.append).not.toHaveBeenCalledWith('Set-Cookie', expect.anything());
-      expect(generateTokens).toHaveBeenCalledWith(KPA_ONLY_USER, ['kpa:store_owner'], 'neture.co.kr', KPA_ONLY_MEMBERSHIPS, 'fam-1');
+      // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8: 마지막 인자 = 이 세션이 속한 서비스.
+      //   handoff 로 발급되는 토큰은 **대상 서비스의 세션**이어야 한다. 그러지 않으면 그 서비스에서
+      //   로그아웃해도 이 토큰을 지목할 수 없다(서비스 단위 무효화가 무력해진다).
+      expect(generateTokens).toHaveBeenCalledWith(KPA_ONLY_USER, ['kpa:store_owner'], 'neture.co.kr', KPA_ONLY_MEMBERSHIPS, 'fam-1', 'neture');
       expect(persistRefreshTokenFamily).toHaveBeenCalledWith('user-1', 'RT');
       // SQL 은 토큰 consume(UPDATE handoff_tokens) + memberships SELECT 뿐 — membership·role 생성/수정 0
       const sql = sqlCalls();

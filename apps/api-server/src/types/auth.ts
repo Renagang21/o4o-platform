@@ -188,6 +188,17 @@ export interface RefreshTokenPayload {
   tokenVersion: number;
   sub?: string; // JWT standard claim
   tokenFamily?: string;
+  /**
+   * WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8 — 이 세션이 **어느 서비스의 것인가**.
+   *
+   * 종전 refresh token 에는 서비스 식별자가 없었다(`iss`/`aud` 는 서버 상수다). 그래서 서버가
+   * "이 서비스 세션만 끊어라" 를 실행할 수 없었고 `logout` 이 전역 폐기로 귀결됐다.
+   *
+   * 값의 출처: 로그인은 요청 origin 의 서비스, handoff 는 대상 서비스, 회전은 승계.
+   * 배포 전에 발급된 토큰에는 이 claim 이 **없다** — 그 경우의 처리는
+   * `auth-token-session.service.ts` 의 폐기 검사 주석 참조.
+   */
+  serviceKey?: string;
   // Phase 2.5: Server isolation claims
   iss?: string; // Issuer - identifies the server that issued the token
   aud?: string; // Audience - identifies the intended recipient

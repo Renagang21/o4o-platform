@@ -27,6 +27,9 @@ export const SERVICE_KEYS = [
   //   지정 가능한 역할은 `community:admin` **하나**다 — 개별 커뮤니티 운영은 개체 역할
   //   (`community_memberships.role='operator'`)이며 서비스 전역 operator 를 만들지 않았다.
   'community',
+  // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §4 — 서브도메인 전체 운영자 범위 분리.
+  'supplier',
+  'funding',
 ] as const;
 
 export type ServiceKey = (typeof SERVICE_KEYS)[number];
@@ -46,6 +49,8 @@ export const SERVICES: Record<ServiceKey, ServiceMeta> = {
   lecture: { key: 'lecture', label: 'O4O 강의', badgeClass: 'text-violet-700 bg-violet-50' },
   'kpa-branch': { key: 'kpa-branch', label: '약사회 분회', badgeClass: 'text-sky-700 bg-sky-50' },
   community: { key: 'community', label: '커뮤니티', badgeClass: 'text-emerald-700 bg-emerald-50' },
+  supplier: { key: 'supplier', label: '공급자', badgeClass: 'text-amber-700 bg-amber-50' },
+  funding: { key: 'funding', label: '유통참여형 펀딩', badgeClass: 'text-lime-700 bg-lime-50' },
 };
 
 export interface RoleMeta {

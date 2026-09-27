@@ -42,6 +42,8 @@ import { DropLegacyPasswordAuthSchema1790251584623 } from '../migrations/1790251
 import { CreateCommunityDomain1790400000000 } from '../migrations/1790400000000-CreateCommunityDomain.js';
 // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §5 (branch_creation_requests: 분회 개설 신청 축)
 import { CreateBranchCreationRequests1790400000001 } from '../migrations/1790400000001-CreateBranchCreationRequests.js';
+// WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8 (service_session_revocations: 서비스 단위 세션 폐기)
+import { CreateServiceSessionRevocations1790400000002 } from '../migrations/1790400000002-CreateServiceSessionRevocations.js';
 
 export const INCREMENTAL_MIGRATION_CUTOFF = {
   baselineVersion: '2026-09-18-id685',
@@ -63,6 +65,7 @@ export const INCREMENTAL_MIGRATIONS: readonly MigrationClass[] = [
   DropLegacyPasswordAuthSchema1790251584623,
   CreateCommunityDomain1790400000000,
   CreateBranchCreationRequests1790400000001,
+  CreateServiceSessionRevocations1790400000002,
 ];
 
 export function incrementalMigrationNames(): string[] {

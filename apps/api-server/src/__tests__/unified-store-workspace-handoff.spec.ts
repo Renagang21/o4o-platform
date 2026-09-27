@@ -262,7 +262,9 @@ describe('D. exchangeHandoff — origin 고정 · organization 재검증 · serv
     expect(res.body.data.targetWorkspace).toBe('store');
     expect(res.body.data).not.toHaveProperty('targetServiceKey');
     expect(res.body.data.tokens).toEqual({ accessToken: 'AT', refreshToken: 'RT', expiresIn: 900 });
-    expect(generateTokens).toHaveBeenCalledWith(USER, ['store_owner'], 'neture.co.kr', memberships, 'fam-1');
+    // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8: 마지막 인자 = 이 세션이 속한 대상.
+    //   WORKSPACE handoff 는 서비스가 아니므로 workspace 키('store')를 그대로 새긴다.
+    expect(generateTokens).toHaveBeenCalledWith(USER, ['store_owner'], 'neture.co.kr', memberships, 'fam-1', 'store');
     expect(persistRefreshTokenFamily).toHaveBeenCalledWith('user-1', 'RT');
     // exchange 는 쿠키를 내리지 않는다 — body 토큰만(URL-FIRST-CENSUS §19-1 · §21-2).
     //   이미 배포된 HandoffPage 가 credentials:'include' 로 호출해도 저장될 쿠키가 없다.
@@ -311,7 +313,8 @@ describe('D. exchangeHandoff — origin 고정 · organization 재검증 · serv
     expect(res.statusCode).toBe(200);
     expect(res.body.data.targetServiceKey).toBe('kpa-society');
     expect(res.body.data).not.toHaveProperty('targetWorkspace');
-    expect(generateTokens).toHaveBeenCalledWith(USER, ['store_owner'], 'neture.co.kr', memberships, 'fam-1');
+    // SERVICE handoff 는 대상 서비스 키를 새긴다 — 그 서비스 로그아웃이 이 토큰을 지목할 수 있어야 한다.
+    expect(generateTokens).toHaveBeenCalledWith(USER, ['store_owner'], 'neture.co.kr', memberships, 'fam-1', 'kpa-society');
     expect(resolveAccessibleStores).not.toHaveBeenCalled();
   });
 

@@ -40,6 +40,11 @@ router.use(requireRole([
   //   두 경로를 만들면 승인 주체가 둘로 갈라진다.
   'lecture:admin', 'lecture:operator',
   'community:admin',
+  // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §4:
+  //   두 서비스는 joinEnabled=false 라 자가 가입 신청이 없지만, 운영자 지정으로 만들어진
+  //   membership 의 상태 조회·정지·복구는 각 서비스 운영자가 해야 한다.
+  'supplier:admin', 'supplier:operator',
+  'funding:admin', 'funding:operator',
 ]));
 router.use(injectServiceScope);
 

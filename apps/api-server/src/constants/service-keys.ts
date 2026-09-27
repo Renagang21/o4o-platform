@@ -48,6 +48,20 @@ export const SERVICE_KEYS = {
    * (`community_memberships.role='operator'`)이며 서비스 전역 operator 역할은 없다.
    */
   COMMUNITY: 'community',
+  /**
+   * WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1: 공급자 서비스 (supplier.neture.co.kr).
+   *
+   * **사업자 본인의 접근은 이 키가 판정하지 않는다** — 그것은
+   * `organization_members(role=owner) → organizations(type='supplier') → neture_suppliers`
+   * 가 canonical 이며 FROZEN 이다(O4O-SUPPLIER-DOMAIN-BOUNDARY-V1 §7, 변경 없음).
+   * 이 키는 **그 영역을 운영하는 쪽**의 범위다 — 공급자 심사·정지·서류 확인.
+   */
+  SUPPLIER: 'supplier',
+  /**
+   * WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1: 유통참여형 펀딩 (funding.neture.co.kr).
+   * 「유통참여형 펀딩」은 플랫폼 공통 제품명이고, 이 키는 그 **서브도메인 운영자 범위**다.
+   */
+  FUNDING: 'funding',
 } as const;
 
 export type ServiceKey = typeof SERVICE_KEYS[keyof typeof SERVICE_KEYS];

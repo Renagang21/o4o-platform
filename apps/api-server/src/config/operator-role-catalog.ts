@@ -34,6 +34,13 @@ export const ASSIGNABLE_OPERATOR_ROLES: readonly string[] = Object.freeze([
   // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1: 커뮤니티 전체 관리자(개설 신청 승인). 개별 커뮤니티 운영은
   //   community_memberships 의 개체 역할로만 하며 서비스 전역 operator 역할은 만들지 않는다.
   'community:admin',
+  // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §4 — 서브도메인 전체 운영자 범위 분리.
+  //   종전에는 neture:admin / neture:operator 하나가 supplier · funding 영역까지 열었다.
+  //   공급자 **사업자 본인**의 접근은 이 축이 아니라 organization_members 다(FROZEN §7, 불변).
+  'supplier:admin',
+  'supplier:operator',
+  'funding:admin',
+  'funding:operator',
 ]);
 
 export type OperatorRoleRejectCode =
