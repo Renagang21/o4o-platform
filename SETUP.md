@@ -203,9 +203,10 @@ pnpm run verify               # 레지스트리 검증 (block / CPT)
 > **로컬 green ≠ CI green** 인 대표 사례이므로, clean 체크아웃에서 검증할 때는 위 사전 빌드를 먼저 실행하세요.
 
 **lint 는 완전 blocking 이 아니라 회귀 차단(ratchet) 입니다.**
-기존 오류 **102건**(warning 2,366건)이 baseline 으로 남아 있고,
+기존 오류 **46건**(warning 1,005건)이 baseline 으로 남아 있고,
 `scripts/lint-ratchet.mjs` 가 `pnpm run lint` 와 동일한 설정·범위로 검사해
-**오류 수가 102를 넘으면 실패**합니다. 즉 신규 lint 오류는 CI 를 막습니다.
+**오류 수가 46을 넘으면 실패**합니다. 즉 신규 lint 오류는 CI 를 막습니다.
+숫자의 정본은 `scripts/lint-ratchet.mjs` 의 `ERROR_BASELINE` 이며, 이 문서는 그것을 인용합니다.
 
 - baseline 은 **내리는 방향으로만** 갱신합니다(오류를 실제로 고친 뒤 숫자를 낮춤).
 - 순증 차단이지 1:1 동일성 판정이 아닙니다(1건 고치고 1건 추가하면 통과).

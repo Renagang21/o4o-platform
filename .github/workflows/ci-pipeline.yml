@@ -136,7 +136,8 @@ jobs:
 
     # WO-O4O-CI-BLOCKING-GATE-FINALIZATION-V1
     #
-    # lint 는 아직 **완전 blocking 이 아니다**. 기존 오류 baseline 102건이 남아 있고,
+    # lint 는 아직 **완전 blocking 이 아니다**. 기존 오류 baseline 이 남아 있고(수치 정본은
+    # scripts/lint-ratchet.mjs 의 ERROR_BASELINE),
     # 이를 0 으로 만드는 것(대규모 lint 수정)은 이 WO 의 범위가 아니다.
     # 대신 continue-on-error(= 어떤 회귀도 통과) 를 **회귀 차단 ratchet** 으로 바꾼다:
     # 오류 수가 baseline 을 넘으면 실패한다. 즉 신규 오류는 이제 CI 를 막는다.
