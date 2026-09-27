@@ -1,7 +1,8 @@
 # CHECK-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1
 
-> 시작: 2026-09-27 · 상태: **`CI_GREEN · 병합·운영 적용 대기`**
-> PR: [#241](https://github.com/Renagang21/o4o-platform/pull/241) — `mergeStateStatus = CLEAN`
+> 시작: 2026-09-27 · 상태: **`리뷰 반영 후 재검증 중`**
+> PR: [#241](https://github.com/Renagang21/o4o-platform/pull/241) — 1차 CI green 후
+> **리뷰에서 세 경계가 확정 요구사항과 다르다고 지적돼 같은 PR 에서 정정했다**(§11).
 > WO: [`WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1`](../work-orders/WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1.md)
 >
 > **하나의 작업이다.** S2-1 · S2-2 는 내부 구현 순서일 뿐 보고 단위가 아니다.
@@ -153,21 +154,65 @@ migration 계약 검사 21 pass / 0 fail · 테이블·인덱스·CHECK·FK psql
 
 ---
 
-## 4. 서비스 키 (S4) — **`community` 하나만**
+## 4. 서비스 키 (S4) — **3개 신설 · 독립 주소 · 독립 운영자 범위**
 
-착수 시 설계는 `supplier` · `funding` · `community` 세 키였다. **실측 결과 앞의 둘은
-만들지 않는다.** 방향 변경 기록은 WO §4-0.
+구현 중 "`supplier` · `funding` 은 기존 `neture` 키로 충분하다" 고 판정을 바꿨다가
+**리뷰에서 철회했다.** 최종은 착수 설계와 같은 3키다. 판정 이력은 WO §4-0.
 
-| 대상 | 판정 | 근거(실측) |
-|---|---|---|
-| `community` | **신설** | 개별 커뮤니티 위의 서비스 축이 기존 어떤 키로도 표현되지 않았다. `neture` 로 두면 Neture 회원 전원이 진입 자격을 가져 가입 승인형 결정과 어긋난다 |
-| `supplier` | **신설 안 함** | FROZEN [`O4O-SUPPLIER-DOMAIN-BOUNDARY-V1`](../baseline/O4O-SUPPLIER-DOMAIN-BOUNDARY-V1.md) §7 이 `organization_members → organizations(type='supplier') → neture_suppliers` 를 **canonical authorization** 으로 고정. 라우터는 `/api/v1/neture/supplier/**`, 가드는 `neture-identity.middleware` — 서비스 역할 축이 아니다 |
-| `funding` | **신설 안 함** | 유통참여형 펀딩 = market-trial. 운영자 가드 실측 = `requireNetureScope('neture:operator')` (`routes/market-trial-operator.routes.ts`) |
+| 대상 | 주소 | 운영자 범위 | 사업자·참여자 축(불변) |
+|---|---|---|---|
+| `community` | `community.neture.co.kr` | `community:admin` | 개별 커뮤니티 `community_memberships` |
+| `supplier` | `supplier.neture.co.kr` | `supplier:admin` · `:operator` | `organization_members → organizations(type='supplier') → neture_suppliers` (FROZEN §7 · 이 WO 는 건드리지 않았다) |
+| `funding` | `funding.neture.co.kr` | `funding:admin` · `:operator` | 기존 market-trial 참여 계약 |
 
-FROZEN 도메인에 두 번째 인가 축을 넣는 비용이 새 키의 이득보다 크다.
+세 주소는 같은 `neture-web` 을 서빙한다(Cloud Run 서비스를 서브도메인 수만큼 만들지 않는다).
+호스트 라우팅은 이미 `web-neture/src/lib/hostProfile.ts` 가 갖고 있고 세 프로필의 `/` 가
+진입이므로 `basePath` 를 두지 않는다. CORS 원본 3개는 URL 트랙이 이미 등록해 두었다.
 
-**미해결로 남는 것**: `neture:operator` 하나가 여러 호스트를 연다는 IR §12 R1 은
-해소되지 않는다. 키 추가 문제가 아니라 호스트별 운영 범위 분리 문제이므로 별도 WO 다.
+### 4-0. 왜 중간 판정을 철회했는가
+
+실측 자체는 사실이었다. 틀린 것은 **그 사실이 답하는 질문**이었다.
+
+```text
+FROZEN §7 이 답하는 질문     이 사용자가 **어느 공급자 조직을 소유**하는가
+요구사항이 묻는 질문          누가 그 **서브도메인 영역을 운영**하는가
+```
+
+두 질문을 하나로 묶어 "기존 축으로 충분" 이라 읽었다. 조직 소유권 검사가 있다는 사실은
+서브도메인 전체 운영자 권한을 구분하지 않아도 된다는 뜻이 아니다.
+
+**FROZEN 과 충돌하지 않는다**: 새 키는 조직 소유권 관계를 대체하지 않는다.
+`neture-identity.middleware` 와 `organization_members` 는 그대로이고 추가되는 것은
+운영자측 경계뿐이므로, 같은 질문에 답이 둘이 되는 상황(= 인가 축 분열)이 아니다.
+
+### 4-1. 전환 영향 — 배포 시 반드시 확인
+
+```text
+/suppliers/* 운영자 9경로   neture:admin    → supplier:admin
+market-trial 운영자 라우터   neture:operator → funding:operator
+제품·마스터·카테고리 경로     neture:admin 유지 (Neture 제품 DB 업무 — 옮기지 않았다)
+```
+
+> **기존 `neture:*` 보유자는 이 두 영역 접근을 잃는다.** 배포 전후로 새 역할을 부여해야 한다.
+> `platform:super_admin` 은 platformBypass 로 계속 통과하므로 전면 잠금은 발생하지 않는다.
+
+### 4-2. 카탈로그 · 역할
+
+| 항목 | 내용 |
+|---|---|
+| `ServiceKey` union (`@o4o/security-core`) | `community` · `supplier` · `funding` 추가 — type-only · self-map. 소비처 전수 확인: 다른 세 `Record<ServiceKey,…>` 는 각자 **지역 union** 이라 영향 없음 |
+| `service-catalog` | 3개 등록 · 각자 독립 domain · `basePath` 없음 · **`joinEnabled: false`** |
+| 지정 카탈로그 추가 | `kpa-branch:admin` · `community:admin` · `supplier:{admin,operator}` · `funding:{admin,operator}` |
+| 만들지 않음 | `community:operator` — 개별 커뮤니티 운영은 개체 역할로만 |
+| 기존 11개 역할 | **그대로 둔다**(삭제·이름 변경 없음) |
+
+**`joinEnabled: false` 가 안전 장치다.** `true` 로 두면 범용
+`POST /auth/services/{key}/join` 이 **어느 커뮤니티에도 승인받지 않은** 사람에게
+`service_memberships` 를 만들어 주고, 그 행은 진입 자격이므로 개별 승인을 서비스 단위로
+우회한다. 되돌리면 실패하는 테스트로 고정했다.
+
+`platform_services` 행은 seed 하지 않는다 — 런타임이 그 표를 읽지 않으며 `lecture` 도
+같은 상태다(데이터 전용 migration 은 C22).
 
 ### 4-1. 카탈로그 · 역할
 
@@ -206,22 +251,67 @@ WO §6 의 미결 질문("platform:super_admin 으로 충분한가 / 별도 역�
 
 ---
 
-## 6. 로그아웃 (S7) — 결함 수정
+## 6. 로그아웃 (S7) — 두 번 고쳤다
 
 착수 시점의 전제("`/auth/logout` = 현재 세션 종료")가 **사실이 아니었다.**
 
 ```text
-종전  logout → logoutAll 위임 → users.refreshTokenFamily = null (사용자 전체 범위)
-      = 한 서비스에서 로그아웃하면 모든 주소의 refresh 가 TOKEN_FAMILY_REVOKED
-      프런트는 두 경로를 이미 구분해 불렀다(useServiceAuth) → 차이는 서버 하나
-현재  logout    세션 원장 write 0. 호출자가 그 요청 origin 쿠키를 지운다
-      logoutAll 전역 폐기를 자기 구현으로 (동작 불변)
+착수  logout → logoutAll 위임 → users.refreshTokenFamily = null (사용자 전체 범위)
+      = 한 서비스 로그아웃이 9개 주소를 모두 끊는다. 프런트는 두 경로를 이미 구분해
+        불렀으므로(useServiceAuth) 차이는 서버 하나에 있었다.
+1차   전역 폐기를 제거하고 쿠키 정리에만 의존 → **아무것도 무효화하지 않는다.**
+      이미 발급된 refresh token 이 서버에서 계속 유효하므로 "세션 종료" 가 아니다.
+      (리뷰 지적)
+2차   서버측 **서비스 단위** 무효화를 구현했다 — 아래.
 ```
 
-**남는 구조적 한계**: 기기·서비스별 세션 레코드가 없어 서버가 특정 세션 하나만 무효화할
-수단이 없다. 서버측 즉시 무효화가 필요하면 `logout-all` 을 쓴다. 세션 레코드 도입은 별도 WO.
+### 6-1. 근본 원인
 
-기존 `logout-all` 계약 9건은 변경 없이 통과. `handoff.controller` 의 낡은 주석 정정.
+refresh token 에 **서비스 식별자가 없었다**. `iss`/`aud` 는 서버 상수(`o4o-platform` /
+`o4o-api`)이고 `domain` 인자는 access token 에만 반영됐다. 서버가 "어느 서비스의 세션인가" 를
+모르므로 선택지가 **전역 폐기 아니면 무폐기** 둘뿐이었다.
+
+### 6-2. 구현
+
+```text
+RefreshTokenPayload.serviceKey    발급 3지점 전부 — 로그인(origin 파생) · handoff(대상
+                                  서비스/워크스페이스) · 회전(승계)
+service_session_revocations       (user_id, service_key) → revoked_at
+logout(userId, serviceKey)        그 서비스 행만 갱신
+refresh 검사                       iat < revoked_at 이면 SERVICE_SESSION_REVOKED
+                                  (전역 family 검사보다 **먼저** 본다)
+users.refreshTokenFamily          손대지 않는다 — 전역 축이며 logout-all 의 것이다
+utils/session-origin              origin → 서비스 판정 한 곳 (handoff 의 지역 함수도 교체)
+```
+
+⚠️ **`verifyRefreshToken` 은 payload 를 좁혀 재구성한다.** 거기에 새 claim 을 명시하지 않으면
+조용히 사라지고, 검사가 legacy 경로로 떨어져 "어느 서비스 로그아웃이든 거절" 이 된다
+(= 다른 서비스 세션이 함께 끊긴다). 실제로 이 실수를 했고 테스트가 잡았다.
+
+### 6-3. 판정 규칙
+
+| 상황 | 결과 | 이유 |
+|---|---|---|
+| 토큰 `serviceKey` 있음 · 그 서비스 폐기 뒤 발급 | 통과 | 재로그인은 차단 대상이 아니다 |
+| 토큰 `serviceKey` 있음 · 그 서비스 폐기보다 먼저 발급 | **거절** | 끊으려던 세션이다 |
+| 토큰 `serviceKey` 있음 · **다른** 서비스만 폐기 | 통과 | 서비스 단위 범위의 핵심 |
+| 토큰 `serviceKey` **없음**(배포 전 발급) · 폐기 행 존재 | **거절** | 통과시키면 배포 직후 최대 7일간 로그아웃이 무력해진다. 종전(전역 폐기)과 같은 수준이라 보안 후퇴 아님 |
+| 로그아웃 요청의 서비스 판정 불가 | 폐기 **0건** | 범위를 모르는 채 전역으로 넓히지 않는다 — 그것이 고치려던 결함이다 |
+
+세션 귀속은 **요청 origin 파생**이다. 본문 `serviceKey` 를 쓰지 않는다 — 클라이언트가 자기
+세션을 다른 서비스로 표시해 그 서비스 로그아웃에 끊기게 만들 수 있다.
+
+### 6-4. 남는 한계 (설계상)
+
+```text
+access token(15분)   폐기 대상이 아니다 — 만료까지 유효하다
+무효화 단위          서비스. 기기·세션 단위가 아니다
+```
+
+세션 레코드가 없어 "세션 하나" 를 식별할 축이 없다. 서비스는 토큰 claim 으로 식별할 수 있는
+**가장 좁은 축**이다. 세션 레코드 도입은 별도 WO 다.
+
+기존 `logout-all` 계약 9건은 변경 없이 통과한다.
 
 ---
 
@@ -243,7 +333,9 @@ WO §6 의 미결 질문("platform:super_admin 으로 충분한가 / 별도 역�
 | V11 | 분회 심사 = `kpa-branch:admin` · 심사 경로에 개별 분회 가드 없음 | PASS |
 | V12 | 주소 2회 검사 · 선점 시 미개설(`slug_conflict`) · 임의 주소 개설 0 (커뮤니티 · 분회) | PASS |
 | V13 | `community` `joinEnabled=false` — 서비스 단위 자가 가입이 개별 승인을 우회하지 않음 | PASS |
-| V14 | `logout` 이 family 를 비우지 않음 · 다른 origin refresh 계속 동작 · `logout-all` 은 전역 폐기 유지 | PASS |
+| V14 | **서버측 서비스 단위 무효화** — 그 서비스 토큰은 `SERVICE_SESSION_REVOKED` 로 거절 · 다른 서비스 토큰은 통과 · 회전이 귀속을 승계 · 재로그인 통과 · claim 없는 배포 전 토큰은 거절 · 판정 불가 시 폐기 0 · `logout-all` 전역 폐기 유지 | PASS |
+| V18 | 세 서비스 독립 주소(`community`·`supplier`·`funding`.neture.co.kr) · `basePath` 없음 · origin 3개 등록 | PASS |
+| V19 | handoff 가 **대상 서비스**를 토큰에 새긴다 (SERVICE·WORKSPACE 양쪽) | PASS |
 | V15 | 승격 CLI 안전 성질 4종(기본 dry-run · 증거 AND 자격 · 기존 행 미덮어쓰기 · 파라미터 바인딩) | PASS |
 | V16 | mount 된 커뮤니티 5곳의 key 가 모두 승격 대상 카탈로그 안 (잠금 방지 불변식) | PASS |
 | V17 | `community` 가 Admin RBAC 카탈로그에 있음 (지정 화면이 서비스를 인식) | PASS |
@@ -341,18 +433,25 @@ Detect affected scope               pass  (api + admin + web:neture · global_or
 ### 8-1. 배포 순서 (하드 선행 조건)
 
 ```text
-1. migration job  (incremental 6·7 — 커뮤니티 3테이블 · 분회 신청 1테이블)
+1. migration job  (incremental 6·7·8 — 커뮤니티 3 · 분회 신청 1 · 세션 폐기 1 테이블)
 2. 승격 CLI dry-run  → 숫자 확인(U1 해소)
 3. 승격 CLI --apply  → 폴백 커뮤니티 3개를 DB 행으로 + 증거 기반 회원 이행
 4. API revision 배포 + traffic 전환
 5. web 배포
+6. Admin 화면에서 운영자 역할 부여 —
+     supplier:{admin|operator} · funding:{admin|operator} · community:admin · kpa-branch:admin
 ```
 
 > **3 을 4 보다 먼저 한다.** V7 게이트가 서빙되기 전에 폴백 커뮤니티 행과 회원이 있어야
 > 한다. 순서가 뒤바뀌면 기존 참여자 전원이 `COMMUNITY_MEMBERSHIP_REQUIRED` 로 막힌다.
 >
 > 반대로 **1 이 2 보다 먼저**여야 한다 — 승격 CLI 가 쓰는 `communities` ·
-> `community_memberships` 는 incremental 6 이 만든다.
+> `community_memberships` 는 incremental 6 이 만든다. `service_session_revocations`(8)도
+> 4 보다 먼저 있어야 한다 — 없으면 로그아웃·refresh 가 없는 표를 조회한다.
+>
+> **6 은 4 직후에 한다.** `/suppliers/*` 와 market-trial 운영자 경로가 새 역할을 요구하도록
+> 바뀌므로, 역할을 부여하기 전까지 기존 `neture:*` 보유자는 그 두 영역에 들어갈 수 없다
+> (`platform:super_admin` 은 계속 통과하므로 전면 잠금은 아니다 — §4-1).
 
 승격 CLI 실행 (운영 DB 접속은 Cloud SQL Auth Proxy 경유 — `SETUP.md` 가 정본):
 
@@ -375,6 +474,25 @@ npx tsx src/scripts/community-catalog-promotion.ts --apply    # 숫자 확인 �
 | D2 | `apps/api-server/src/types/roles.ts` 의 지역 `ServiceKey` union 이 `kpa-branch` · `community` 를 모르는 상태로 stale (`@o4o/security-core` 의 것과 별개 union) | 소비처가 `audit-roles.ts` 스크립트뿐이라 런타임 영향 0. 두 union 통합은 구조 변경 |
 | D3 | `services/web-neture/src/components/home/__tests__/HomeEntryPanel.{back-navigation,workspace-cards}.test.tsx` **4건 선행 실패** | 내 변경 전에도 같은 4건이 실패한다(stash 로 확인). 현재 변경과 무관한 실패 |
 | D4 | `check-forbidden-tables.mjs` 위반 2건 — `apps/api-server/src/entities/payment/PlatformPayment.entity.ts`(`o4o_payments`) · `apps/api-server/src/modules/neture/entities/neture-settlement-order.entity.ts`(`neture_settlement_orders`) | 내 diff 에 없는 기존 entity. CLAUDE.md §4 금지 테이블 규칙 위반이지만 **현재 변경과 무관한 실패**이며 결제·정산 구조 판단이 필요하다 |
+
+---
+
+## 11. 리뷰 반영 (PR #241 · 같은 PR 에서 정정)
+
+1차 CI green 뒤 리뷰에서 **구현이 확정 요구사항과 다른 세 곳**이 지적됐다. 테스트 실패가
+아니라 목표와의 차이였다. 새 WO 를 만들지 않고 같은 PR 에서 맞췄다.
+
+| # | 지적 | 정정 |
+|---|---|---|
+| 1 | 커뮤니티를 `neture.co.kr/community` 내부 경로로 등록했다 | `community.neture.co.kr` **독립 서비스**로. `basePath` 제거, 프런트도 내부 이동 대신 다른 서비스와 같은 handoff 경로 (§4) |
+| 2 | 변경된 `/auth/logout` 이 서버 토큰을 무효화하지 않고 기록만 남긴다 | refresh token 에 서비스 claim 을 넣고 `service_session_revocations` 로 **서버측 서비스 단위 무효화**를 구현 (§6) |
+| 3 | `supplier` · `funding` 이 `neture:operator` 범위를 계속 공유한다 | 두 키를 신설하고 운영자 경로를 옮겼다. 조직 소유권 검사는 그대로 (§4 · §4-0) |
+
+> **내 판정이 틀렸던 지점을 남긴다.** 2번은 "구조적 한계라 여기까지가 최선" 이라고 적었는데,
+> 실제 한계는 **refresh token 에 서비스 claim 이 없다**는 것이었고 그것은 claim 을 더하면
+> 해소되는 문제였다. 3번은 FROZEN 정본이 답하는 질문과 요구사항이 묻는 질문을 하나로 묶어
+> 읽었다. 둘 다 "측정했으니 판정도 맞다" 로 넘어간 경우다 — 측정값이 어느 질문에 답하는지를
+> 먼저 확인해야 했다.
 
 ---
 
