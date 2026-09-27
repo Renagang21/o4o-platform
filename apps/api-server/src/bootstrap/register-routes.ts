@@ -978,11 +978,17 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
     }
 
     // 31-d-3. Register Communities routes (WO-O4O-COMMUNITY-WORKSPACE-CATALOG-AND-ACCESS-ALIGNMENT-V1)
-    //   Community Catalog + 참여 자격 판정의 서비스 중립 read contract. write 0.
+    //   Community Catalog + 참여 자격 판정의 서비스 중립 read contract.
+    //   WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1: 개설 신청·승인 · 가입 신청·승인 경로 추가.
+    //   카탈로그 조회 경로는 여전히 write 0 이다.
     try {
       const { createCommunitiesRoutes } = await import('../routes/communities.routes.js');
-      const { optionalAuth: communitiesOptionalAuth } = await import('../middleware/auth.middleware.js');
-      app.use('/api/v1/communities', createCommunitiesRoutes(communitiesOptionalAuth as any));
+      const { optionalAuth: communitiesOptionalAuth, authenticate: communitiesAuthenticate } =
+        await import('../middleware/auth.middleware.js');
+      app.use(
+        '/api/v1/communities',
+        createCommunitiesRoutes(communitiesOptionalAuth as any, communitiesAuthenticate as any),
+      );
       logger.info('✅ Communities routes registered at /api/v1/communities');
     } catch (communitiesError) {
       logger.error('Failed to register Communities routes:', communitiesError);

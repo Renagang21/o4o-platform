@@ -205,3 +205,47 @@ describe('가입 — 승인형 하나', () => {
     ).rejects.toMatchObject({ code: 'MEMBERSHIP_NOT_FOUND' });
   });
 });
+
+describe('거절 — 승인과 같은 주체가, 자격은 만들지 않고', () => {
+  it('개설 거절은 사유를 남기고 커뮤니티를 만들지 않는다', async () => {
+    const r = await service.requestCreation({ requesterUserId: REQUESTER, desiredSlug: 'alpha', name: 'Alpha' });
+    const out = await service.rejectCreation({
+      requestId: r.id,
+      reviewerUserId: REVIEWER,
+      reason: '취지가 기존 커뮤니티와 겹칩니다.',
+    });
+    expect(out.status).toBe('rejected');
+    expect(out.reason).toBe('취지가 기존 커뮤니티와 겹칩니다.');
+    expect(db.communities).toHaveLength(0);
+    expect(membershipOf(REQUESTER)).toBeUndefined();
+  });
+
+  it('거절된 신청을 다시 거절·승인할 수 없다', async () => {
+    const r = await service.requestCreation({ requesterUserId: REQUESTER, desiredSlug: 'alpha', name: 'Alpha' });
+    await service.rejectCreation({ requestId: r.id, reviewerUserId: REVIEWER, reason: 'no' });
+    await expect(
+      service.approveCreation({ requestId: r.id, reviewerUserId: REVIEWER }),
+    ).rejects.toMatchObject({ code: 'REQUEST_NOT_PENDING' });
+  });
+
+  it('가입 거절은 **서비스 가입을 만들지 않는다** (거절이 자격을 주면 안 된다)', async () => {
+    const m = await service.requestJoin({ communityId: 'c1', userId: JOINER });
+    const out = await service.rejectJoin({ communityId: 'c1', membershipId: m.id, reviewerUserId: REVIEWER });
+    expect(out.status).toBe('rejected');
+    expect(serviceMembershipOf(JOINER)).toBeUndefined();
+  });
+
+  it('다른 커뮤니티의 membershipId 로 거절하려 하면 404', async () => {
+    const m = await service.requestJoin({ communityId: 'c1', userId: JOINER });
+    await expect(
+      service.rejectJoin({ communityId: 'c-other', membershipId: m.id, reviewerUserId: REVIEWER }),
+    ).rejects.toMatchObject({ code: 'MEMBERSHIP_NOT_FOUND' });
+  });
+
+  it('거절 뒤에는 다시 가입 신청할 수 있다 (영구 차단이 아니다)', async () => {
+    const m = await service.requestJoin({ communityId: 'c1', userId: JOINER });
+    await service.rejectJoin({ communityId: 'c1', membershipId: m.id, reviewerUserId: REVIEWER });
+    const again = await service.requestJoin({ communityId: 'c1', userId: JOINER });
+    expect(again.status).toBe('pending');
+  });
+});
