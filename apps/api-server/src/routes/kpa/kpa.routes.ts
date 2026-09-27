@@ -162,7 +162,7 @@ import { kpaActionConfig } from './action-definitions.js';
 import { ForumController } from '../../controllers/forum/ForumController.js';
 import { forumContextMiddleware } from '../../middleware/forum-context.middleware.js';
 // WO-O4O-COMMUNITY-WORKSPACE-CATALOG-AND-ACCESS-ALIGNMENT-V1: 약사 커뮤니티 참여 자격 gate (공통)
-import { requireCommunityAccess } from '../forum/service-forum.routes.js';
+import { requireCommunityAccess } from '../../middleware/community-access.middleware.js';
 // WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2:
 //   KPA 는 더 이상 LMS runtime 을 소유하지 않는다. `/api/v1/kpa/lms/*` remount · LMS controller import ·
 //   course-request → LMS course 생성 경로를 제거했다. 강의는 O4O 강의(lecture) 서비스(study.neture.co.kr) 가 담당한다.
