@@ -164,13 +164,25 @@ export class AuthTokenSessionService {
    * Logout user
    */
   async logout(userId: string): Promise<void> {
-    const user = await this.userRepository.findOne({ where: { id: userId } });
-
-    if (user) {
-      // Invalidate token family
-      user.refreshTokenFamily = null;
-      await this.userRepository.save(user);
-    }
+    // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8 (S7):
+    //   로그아웃은 **지금 쓰던 서비스의 세션만** 끝낸다. 다른 서비스에 로그인한 상태는 유지된다.
+    //
+    //   종전에는 여기서 `users.refreshTokenFamily = null` 로 폐기했다. 그 값은 **사용자 전체**
+    //   범위라서, 한 서비스에서 로그아웃하면 9개 주소의 refresh 가 모두 TOKEN_FAMILY_REVOKED 로
+    //   거부됐다 — 즉 `logout` 이 `logout-all` 과 같은 동작이었다. 프런트는 두 경로를 이미
+    //   구분해 부르고 있었으므로(useServiceAuth: logout -> /auth/logout, logoutAll ->
+    //   /auth/logout-all) 차이가 나는 쪽은 서버 하나였다.
+    //
+    //   전역 폐기는 `logoutAll` 의 일이다. 여기서는 세션 원장을 건드리지 않고, 호출자가
+    //   그 요청 origin 의 쿠키를 지운다(clearAuthCookies). origin 별 localStorage 토큰은
+    //   해당 서비스 프런트가 자기 origin 만 정리한다.
+    //
+    //   한계(구조): 데이터 모델에 기기·서비스별 세션 레코드가 없어 서버가 특정 세션 하나만
+    //   무효화할 수단이 없다. 그래서 여기서 할 수 있는 일은 "전역 폐기를 하지 않는 것"이며,
+    //   서버측 즉시 무효화가 필요하면 `logout-all` 을 쓴다. 세션 레코드 도입은 별도 WO 다.
+    //
+    //   `userId` 는 호출 계약(서명)과 감사 로그를 위해 그대로 받는다.
+    logger.info('[logout] service-scoped logout — token family preserved', { userId });
   }
 
   /**
@@ -180,9 +192,18 @@ export class AuthTokenSessionService {
    *   users.refreshTokenFamily 를 비우면 refreshTokens() 가 TOKEN_FAMILY_REVOKED 로
    *   거부하므로, 이미 발급된 모든 기기의 refresh token 이 즉시 무효가 된다.
    *   (현재 데이터 모델에 기기별 세션 레코드가 없어 무효화 단위는 사용자 전체다.)
+   *
+   * WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8: **전역 폐기는 이 경로만 한다.**
+   *   `logout` 에 위임하지 않는다 — 위임하던 동안 서비스 하나의 로그아웃이 전역 폐기였다.
    */
   async logoutAll(userId: string): Promise<void> {
-    await this.logout(userId);
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+
+    if (user) {
+      // Invalidate token family (사용자 전체 범위)
+      user.refreshTokenFamily = null;
+      await this.userRepository.save(user);
+    }
   }
 
   /**

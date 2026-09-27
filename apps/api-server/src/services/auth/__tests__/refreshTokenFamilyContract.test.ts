@@ -11,7 +11,8 @@
  *   refresh (A 또는 B) → 토큰 회전, family 불변, users.refreshTokenFamily 불변
  *   다른 family 토큰   → TOKEN_FAMILY_MISMATCH + family null
  *   family null 이후   → TOKEN_FAMILY_REVOKED
- *   logout / logout-all → family null
+ *   logout (서비스 하나) → family **유지** (다른 서비스 세션은 살아 있다)
+ *   logout-all           → family null
  *
  * ── 이 테스트가 증명하는 것 ────────────────────────────────────────────────
  *   - 정상 세션은 refresh 로 재발급되고 **family 는 유지**된다
@@ -176,5 +177,55 @@ describe('refresh token family 계약 — logout-all 무효화', () => {
 
     const tokens = await service.refreshTokens(handoff);
     expect(tokens.refreshToken).toBeTruthy();
+  });
+
+  // ── WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8 (S7) ────────────────
+  //
+  // 종전에는 `logout` 이 `logoutAll` 에 위임해서 family 를 비웠다. family 는 **사용자 전체**
+  // 범위이므로, 한 서비스에서 로그아웃하면 9개 주소의 refresh 가 모두 거부됐다.
+  // 프런트는 두 경로를 이미 구분해 불렀으므로(useServiceAuth) 차이는 서버 하나에 있었다.
+  describe('S7 · 서비스 하나의 로그아웃은 다른 서비스 세션을 끊지 않는다', () => {
+    it('logout 은 family 를 비우지 않는다', async () => {
+      const before = user.refreshTokenFamily;
+      await service.logout(USER_ID);
+      expect(user.refreshTokenFamily).toBe(before);
+    });
+
+    it('logout 뒤에도 **다른 origin** 의 refresh token 은 계속 동작한다', async () => {
+      // handoff 로 같은 family 를 공유하는 두 origin.
+      const otherOriginToken = makeRefreshTokenForCurrentFamily();
+      const family = user.refreshTokenFamily;
+
+      await service.logout(USER_ID);
+
+      const rotated = await service.refreshTokens(otherOriginToken);
+      expect(tokenUtils.getTokenFamily(rotated.refreshToken)).toBe(family);
+    });
+
+    it('logout 은 세션 원장에 write 하지 않는다 (전역 폐기 아님)', async () => {
+      const save = (service as any)._userRepo.save as jest.Mock;
+      save.mockClear();
+      await service.logout(USER_ID);
+      expect(save).not.toHaveBeenCalled();
+    });
+
+    it('logout-all 은 여전히 전역 폐기다 — 위임이 아니라 자기 구현으로', async () => {
+      const token = user.__loginRefreshToken;
+      await service.logoutAll(USER_ID);
+      expect(user.refreshTokenFamily).toBeNull();
+      await expect(service.refreshTokens(token)).rejects.toMatchObject({
+        code: 'TOKEN_FAMILY_REVOKED',
+      });
+    });
+
+    it('두 경로는 서로 다른 동작이다 (같은 함수로 되돌아가면 실패한다)', async () => {
+      const before = user.refreshTokenFamily;
+      await service.logout(USER_ID);
+      const afterLogout = user.refreshTokenFamily;
+      await service.logoutAll(USER_ID);
+      const afterLogoutAll = user.refreshTokenFamily;
+
+      expect({ afterLogout, afterLogoutAll }).toEqual({ afterLogout: before, afterLogoutAll: null });
+    });
   });
 });
