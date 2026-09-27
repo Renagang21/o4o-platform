@@ -51,6 +51,19 @@ export const UNDECIDED_SERVICE_WORKSPACE: Readonly<ServiceWorkspaceCapability> =
   operatorWorkspaceEnabled: false,
 });
 
+/**
+ * 매장 축이 없고 **운영자 업무 공간만** 있는 서비스의 자격.
+ *
+ * 같은 세 값이 다섯 서비스에 그대로 반복돼 있었다(`lecture` · `kpa-branch` · `cafe24-b2b` ·
+ * `community` · `supplier` · `funding`). 리터럴을 늘어놓으면 한 곳만 고쳐 어긋나기 쉽고,
+ * "이 조합이 무엇을 뜻하는지" 가 이름으로 드러나지 않는다.
+ */
+export const OPERATOR_ONLY_WORKSPACE: Readonly<ServiceWorkspaceCapability> = Object.freeze({
+  workspaceMode: 'none',
+  storeWorkspaceEnabled: false,
+  operatorWorkspaceEnabled: true,
+});
+
 export interface O4OService {
   /** 서비스 식별 키 (DB service_key) */
   key: string;
@@ -148,7 +161,7 @@ export const O4O_SERVICES: O4OService[] = [
     domain: 'study.neture.co.kr',
     description: '강의·학습·평가·수료를 제공하는 O4O 학습 서비스',
     joinEnabled: false,
-    workspace: { workspaceMode: 'none', storeWorkspaceEnabled: false, operatorWorkspaceEnabled: true },
+    workspace: OPERATOR_ONLY_WORKSPACE,
   },
   /**
    * WO-O4O-PHARMACIST-BRANCH-SERVICE-FOUNDATION-DESIGN-AND-IMPLEMENTATION-V1
@@ -175,7 +188,7 @@ export const O4O_SERVICES: O4OService[] = [
     joinEnabled: false,
     // NO_STORE_WORKSPACE — tenant 축이 organization_service_enrollments 가 아니라 kpa_organizations · branch_memberships 다.
     // 매장 linkage 없음. kpa-branch:operator Operator Workspace 는 존재.
-    workspace: { workspaceMode: 'none', storeWorkspaceEnabled: false, operatorWorkspaceEnabled: true },
+    workspace: OPERATOR_ONLY_WORKSPACE,
   },
   /**
    * WO-O4O-CAFE24-B2B-STORE-MEMBER-LOGIN-PILOT-V1
@@ -212,7 +225,7 @@ export const O4O_SERVICES: O4OService[] = [
     description: '직역·관심 단위로 정보와 경험을 나누는 커뮤니티 서비스',
     joinEnabled: false,
     // 매장 축 없음. 전체 관리자(community:admin) Operator Workspace 는 존재.
-    workspace: { workspaceMode: 'none', storeWorkspaceEnabled: false, operatorWorkspaceEnabled: true },
+    workspace: OPERATOR_ONLY_WORKSPACE,
   },
   /**
    * WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §4 — 공급자 서비스.
@@ -234,7 +247,7 @@ export const O4O_SERVICES: O4OService[] = [
     domain: 'supplier.neture.co.kr',
     description: '제품을 등록하고 매장에 공급하는 공급자 서비스',
     joinEnabled: false,
-    workspace: { workspaceMode: 'none', storeWorkspaceEnabled: false, operatorWorkspaceEnabled: true },
+    workspace: OPERATOR_ONLY_WORKSPACE,
   },
   /**
    * WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §4 — 유통참여형 펀딩.
@@ -250,7 +263,7 @@ export const O4O_SERVICES: O4OService[] = [
     domain: 'funding.neture.co.kr',
     description: '매장이 신제품 유통에 참여해 함께 검증하는 펀딩 서비스',
     joinEnabled: false,
-    workspace: { workspaceMode: 'none', storeWorkspaceEnabled: false, operatorWorkspaceEnabled: true },
+    workspace: OPERATOR_ONLY_WORKSPACE,
   },
   {
     key: 'cafe24-b2b',

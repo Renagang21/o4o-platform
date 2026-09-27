@@ -69,6 +69,44 @@ async function slugTaken(m: EntityManager, slug: string): Promise<boolean> {
   return !!pending;
 }
 
+/**
+ * 심사 대상 개설 신청을 **pending 상태로** 가져온다.
+ *
+ * 승인과 거절이 같은 조회·검증을 반복하고 있었다(없으면 404 · pending 아니면 409).
+ * 한쪽만 고치면 "이미 처리된 신청을 다시 처리" 가 한 경로에서만 막힌다.
+ */
+async function loadPendingRequest(m: EntityManager, requestId: string): Promise<CommunityCreationRequest> {
+  const request = await m.getRepository(CommunityCreationRequest).findOne({ where: { id: requestId } });
+  if (!request) {
+    throw new CommunityLifecycleError('REQUEST_NOT_FOUND', '신청을 찾을 수 없습니다.', 404);
+  }
+  if (request.status !== 'pending') {
+    throw new CommunityLifecycleError('REQUEST_NOT_PENDING', '이미 처리된 신청입니다.', 409);
+  }
+  return request;
+}
+
+/**
+ * 심사 대상 가입 신청을 **그 커뮤니티의 pending 행으로** 가져온다.
+ *
+ * `communityId` 를 함께 보는 것이 요점이다 — 다른 커뮤니티의 `membershipId` 를 넘기는
+ * 월권을 여기서 404 로 막는다. 승인·거절 두 경로가 같은 규칙을 쓴다.
+ */
+async function loadPendingMembership(
+  m: EntityManager,
+  communityId: string,
+  membershipId: string,
+): Promise<CommunityMembership> {
+  const membership = await m.getRepository(CommunityMembership).findOne({ where: { id: membershipId } });
+  if (!membership || membership.communityId !== communityId) {
+    throw new CommunityLifecycleError('MEMBERSHIP_NOT_FOUND', '가입 신청을 찾을 수 없습니다.', 404);
+  }
+  if (membership.status !== 'pending') {
+    throw new CommunityLifecycleError('MEMBERSHIP_NOT_PENDING', '이미 처리된 신청입니다.', 409);
+  }
+  return membership;
+}
+
 export class CommunityLifecycleService {
   constructor(private readonly dataSource: DataSource) {}
 
@@ -107,13 +145,7 @@ export class CommunityLifecycleService {
   }): Promise<{ outcome: 'created'; community: Community } | { outcome: 'slug_conflict'; slug: string }> {
     return this.dataSource.transaction(async (m) => {
       const reqRepo = m.getRepository(CommunityCreationRequest);
-      const request = await reqRepo.findOne({ where: { id: input.requestId } });
-      if (!request) {
-        throw new CommunityLifecycleError('REQUEST_NOT_FOUND', '신청을 찾을 수 없습니다.', 404);
-      }
-      if (request.status !== 'pending') {
-        throw new CommunityLifecycleError('REQUEST_NOT_PENDING', '이미 처리된 신청입니다.', 409);
-      }
+      const request = await loadPendingRequest(m, input.requestId);
 
       // 승인 직전 재검사 — pending 인 자기 자신은 제외하고 본다.
       const existing = await m.getRepository(Community).findOne({ where: { slug: request.desiredSlug } });
@@ -197,14 +229,7 @@ export class CommunityLifecycleService {
   }): Promise<CommunityMembership> {
     return this.dataSource.transaction(async (m) => {
       const repo = m.getRepository(CommunityMembership);
-      const membership = await repo.findOne({ where: { id: input.membershipId } });
-      // 다른 커뮤니티의 membershipId 를 넘겨도 여기서 걸린다.
-      if (!membership || membership.communityId !== input.communityId) {
-        throw new CommunityLifecycleError('MEMBERSHIP_NOT_FOUND', '가입 신청을 찾을 수 없습니다.', 404);
-      }
-      if (membership.status !== 'pending') {
-        throw new CommunityLifecycleError('MEMBERSHIP_NOT_PENDING', '이미 처리된 신청입니다.', 409);
-      }
+      const membership = await loadPendingMembership(m, input.communityId, input.membershipId);
       membership.status = 'active';
       membership.approvedByUserId = input.reviewerUserId;
       membership.approvedAt = new Date();
@@ -223,13 +248,7 @@ export class CommunityLifecycleService {
   }): Promise<CommunityCreationRequest> {
     return this.dataSource.transaction(async (m) => {
       const repo = m.getRepository(CommunityCreationRequest);
-      const request = await repo.findOne({ where: { id: input.requestId } });
-      if (!request) {
-        throw new CommunityLifecycleError('REQUEST_NOT_FOUND', '신청을 찾을 수 없습니다.', 404);
-      }
-      if (request.status !== 'pending') {
-        throw new CommunityLifecycleError('REQUEST_NOT_PENDING', '이미 처리된 신청입니다.', 409);
-      }
+      const request = await loadPendingRequest(m, input.requestId);
       request.status = 'rejected';
       request.reviewedByUserId = input.reviewerUserId;
       request.reviewedAt = new Date();
@@ -282,13 +301,7 @@ export class CommunityLifecycleService {
   }): Promise<CommunityMembership> {
     return this.dataSource.transaction(async (m) => {
       const repo = m.getRepository(CommunityMembership);
-      const membership = await repo.findOne({ where: { id: input.membershipId } });
-      if (!membership || membership.communityId !== input.communityId) {
-        throw new CommunityLifecycleError('MEMBERSHIP_NOT_FOUND', '가입 신청을 찾을 수 없습니다.', 404);
-      }
-      if (membership.status !== 'pending') {
-        throw new CommunityLifecycleError('MEMBERSHIP_NOT_PENDING', '이미 처리된 신청입니다.', 409);
-      }
+      const membership = await loadPendingMembership(m, input.communityId, input.membershipId);
       membership.status = 'rejected';
       membership.approvedByUserId = input.reviewerUserId;
       // 거절은 service_memberships 를 만들지 않는다.
