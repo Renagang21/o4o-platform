@@ -27,7 +27,13 @@ export const ASSIGNABLE_OPERATOR_ROLES: readonly string[] = Object.freeze([
   'lecture:operator',
   'cosmetics:admin',
   'cosmetics:operator',
+  // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1: 분회 서비스 전체 관리자. 개별 분회 운영자와 분리된 상위 권한이다.
+  //   분회 개설 승인 주체 — operator 급으로 열면 A 분회 운영자가 B 분회 개설을 승인할 수 있다.
+  'kpa-branch:admin',
   'kpa-branch:operator',
+  // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1: 커뮤니티 전체 관리자(개설 신청 승인). 개별 커뮤니티 운영은
+  //   community_memberships 의 개체 역할로만 하며 서비스 전역 operator 역할은 만들지 않는다.
+  'community:admin',
 ]);
 
 export type OperatorRoleRejectCode =
