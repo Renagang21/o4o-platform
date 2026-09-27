@@ -29,6 +29,17 @@ router.use(requireRole([
   //   공통 API 는 이미 service scope 로 격리되는데 allowlist 에만 pharmacy-hub 가 빠져 있었다.
   //   (injectServiceScope 가 'pharmacy-hub' 를 self-map 하므로 데이터 경계는 그대로다.)
   'pharmacy-hub:admin', 'pharmacy-hub:operator',
+  // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §7:
+  //   study.neture.co.kr(= `lecture`) 와 커뮤니티에는 가입 승인 경로가 없었다. 두 서비스도
+  //   service_memberships 로 가입을 판정하는데 이 allowlist 에만 빠져 있어서, 자기 서비스의
+  //   가입 신청을 승인할 수 있는 사람이 platform:super_admin 뿐이었다.
+  //   데이터 경계는 extractServiceScope 가 role prefix 에서 그대로 파생하므로(범용) 여기
+  //   추가만으로 각자 서비스 membership 밖으로 나가지 않는다.
+  //   `community:operator` 는 없다 — 커뮤니티 개별 운영은 개체 역할이며 서비스 전체 축이 아니다.
+  //   `kpa-branch:*` 는 추가하지 않는다 — 분회는 전용 승인 경로(/admin/service-members)가 있고
+  //   두 경로를 만들면 승인 주체가 둘로 갈라진다.
+  'lecture:admin', 'lecture:operator',
+  'community:admin',
 ]));
 router.use(injectServiceScope);
 

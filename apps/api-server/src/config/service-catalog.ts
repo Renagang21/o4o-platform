@@ -186,6 +186,33 @@ export const O4O_SERVICES: O4OService[] = [
    * 노출되지 않는다. domain 은 플랫폼 기본 호스트다 (별도 배포 없음).
    * platform_services row 는 20270322000000-CreateCafe24MemberLinksAndSeedCafe24B2bService.
    */
+  /**
+   * WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §3 — 커뮤니티 서비스.
+   *
+   * domain 은 플랫폼 기본 호스트다. 커뮤니티는 별도 배포가 아니라 web-neture 안의
+   * `/community` 영역이며, 개별 커뮤니티는 그 아래 개체(`communities.slug`)다.
+   * 서브도메인 수만큼 Cloud Run 서비스를 새로 만들지 않는다.
+   *
+   * joinEnabled=false — **서비스 단위 자가 가입 경로를 열지 않는다.** 가입은 개별 커뮤니티
+   * 단위(승인형 하나)이고, `service_memberships('community')` 는 그 승인의 **결과로** 생긴다
+   * (community-lifecycle.service ensureServiceMembership). 여기를 true 로 두면 범용
+   * `POST /auth/services/community/join` 이 어느 커뮤니티에도 승인받지 않은 사람에게
+   * 서비스 진입 자격을 주어 개별 승인을 우회한다.
+   *
+   * platform_services row 는 seed 하지 않는다 — 런타임이 그 표를 읽지 않으며 `lecture` 도
+   * 같은 상태다. 데이터 전용 migration 은 스키마 지문이 직전 상태와 같아져 C22 에 걸린다.
+   */
+  {
+    key: 'community',
+    name: 'O4O Community',
+    nameKo: '커뮤니티',
+    domain: 'neture.co.kr',
+    basePath: '/community',
+    description: '직역·관심 단위로 정보와 경험을 나누는 커뮤니티 서비스',
+    joinEnabled: false,
+    // 매장 축 없음. 전체 관리자(community:admin) Operator Workspace 는 존재.
+    workspace: { workspaceMode: 'none', storeWorkspaceEnabled: false, operatorWorkspaceEnabled: true },
+  },
   {
     key: 'cafe24-b2b',
     name: 'Cafe24 B2B',

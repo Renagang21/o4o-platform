@@ -40,6 +40,14 @@ export const SERVICE_KEYS = {
    * 다른 서비스의 가입·승인·권한 계약과 섞이면 안 된다.
    */
   CAFE24_B2B: 'cafe24-b2b',
+  /**
+   * WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1: 커뮤니티 서비스.
+   *
+   * 개별 커뮤니티는 `communities` 개체이고, 이 키는 그 **위의 서비스 축**이다
+   * (진입 자격 · 전체 관리자 `community:admin`). 개별 커뮤니티 운영은 개체 역할
+   * (`community_memberships.role='operator'`)이며 서비스 전역 operator 역할은 없다.
+   */
+  COMMUNITY: 'community',
 } as const;
 
 export type ServiceKey = typeof SERVICE_KEYS[keyof typeof SERVICE_KEYS];
