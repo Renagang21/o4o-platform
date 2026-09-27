@@ -10,19 +10,9 @@
  * 펀딩 참여자(매장)의 참여 자격은 이 축이 아니다 — 기존 market-trial 참여 계약 그대로다.
  * 여기서 분리하는 것은 **운영자 권한**뿐이다.
  */
-import type { ServiceScopeGuardConfig } from '@o4o/security-core';
-import { createMembershipScopeGuard } from '../common/middleware/membership-guard.middleware.js';
+import { createSubdomainOperatorScope } from './subdomain-operator-scope.js';
 
-export const FUNDING_SCOPE_CONFIG: ServiceScopeGuardConfig = {
-  serviceKey: 'funding',
-  allowedRoles: ['funding:admin', 'funding:operator'],
-  platformBypass: true,
-  legacyRoles: [],
-  blockedServicePrefixes: ['kpa', 'cosmetics', 'pharmacy-hub', 'lms', 'lecture', 'community'],
-  scopeRoleMapping: {
-    'funding:admin': ['funding:admin'],
-    'funding:operator': ['funding:operator', 'funding:admin'],
-  },
-};
+const { config, guard } = createSubdomainOperatorScope('funding');
 
-export const requireFundingScope = createMembershipScopeGuard(FUNDING_SCOPE_CONFIG);
+export const FUNDING_SCOPE_CONFIG = config;
+export const requireFundingScope = guard;

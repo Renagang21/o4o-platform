@@ -19,6 +19,8 @@
  *   ④ rate limit 제거 (CodeQL js/missing-rate-limiting high).
  */
 import * as fs from 'fs';
+import { SUPPLIER_SCOPE_CONFIG } from '../supplier-service-scope.middleware.js';
+import { FUNDING_SCOPE_CONFIG } from '../funding-service-scope.middleware.js';
 import * as path from 'path';
 
 const SRC = path.resolve(__dirname, '..', '..');
@@ -80,21 +82,52 @@ describe('사업자 본인 축은 건드리지 않았다 (FROZEN §7)', () => {
   });
 
   it('supplier scope guard 는 사업자 판정을 하지 않는다 (역할 축 전용)', () => {
-    const guard = codeOnly(read('middleware/supplier-service-scope.middleware.ts'));
-    expect(guard).toMatch(/allowedRoles: \['supplier:admin', 'supplier:operator'\]/);
-    expect(guard).not.toMatch(/organization_members|neture_suppliers/);
+    // 허용 역할은 **값으로** 본다(구성이 공통 팩토리로 옮겨졌다).
+    expect(SUPPLIER_SCOPE_CONFIG.allowedRoles).toEqual(['supplier:admin', 'supplier:operator']);
+    // 경계 파일과 팩토리 어디에도 조직 소유권 판정이 섞이지 않았다.
+    for (const file of [
+      'middleware/supplier-service-scope.middleware.ts',
+      'middleware/subdomain-operator-scope.ts',
+    ]) {
+      expect(codeOnly(read(file))).not.toMatch(/organization_members|neture_suppliers/);
+    }
   });
 });
 
-describe('두 guard 모두 scopeRoleMapping 을 명시한다', () => {
-  // mapping 이 비면 allowedRoles 전체로 fallback 한다 — admin 전용 경로가 operator 에게 열린다.
+describe('두 경계가 같은 구성을 공유한다 (중복 0 · mapping 누락 0)', () => {
+  /**
+   * 종전에는 두 파일이 키 이름만 다른 같은 코드였다(SonarCloud 중복 + 한쪽만 고치는 실수).
+   * 이제 `createSubdomainOperatorScope` 하나가 만든다 — 값으로 검사하면 두 경계가 실제로
+   * 같은 규칙을 쓰는지 보증된다(소스 문자열 검사보다 강하다).
+   */
   it.each([
-    ['supplier', 'middleware/supplier-service-scope.middleware.ts'],
-    ['funding', 'middleware/funding-service-scope.middleware.ts'],
-  ])('%s', (key, file) => {
-    const guard = codeOnly(read(file));
-    // 정규식을 쓰지 않는다 — 대괄호 이스케이프가 한 겹 벗겨지면 문자 클래스로 읽혀 조용히 통과한다.
-    expect(guard).toContain(`'${key}:admin': ['${key}:admin'],`);
-    expect(guard).toContain(`'${key}:operator': ['${key}:operator', '${key}:admin'],`);
+    ['supplier', SUPPLIER_SCOPE_CONFIG],
+    ['funding', FUNDING_SCOPE_CONFIG],
+  ])('%s — admin ⊃ operator 매핑이 채워져 있다', (key, config) => {
+    // mapping 이 비면 allowedRoles 전체로 fallback 한다 — admin 전용 경로가 operator 에게 열린다.
+    expect(config.scopeRoleMapping).toEqual({
+      [`${key}:admin`]: [`${key}:admin`],
+      [`${key}:operator`]: [`${key}:operator`, `${key}:admin`],
+    });
+    expect(config.serviceKey).toBe(key);
+    expect(config.allowedRoles).toEqual([`${key}:admin`, `${key}:operator`]);
+    // 독립 서브도메인이므로 platform:super_admin 은 통과한다 — 역할 부여 전 전면 잠금 방지.
+    expect(config.platformBypass).toBe(true);
+  });
+
+  it('자기 접두는 차단 목록에 들어가지 않는다 (자기 자신을 막으면 아무도 통과 못 한다)', () => {
+    expect(SUPPLIER_SCOPE_CONFIG.blockedServicePrefixes).not.toContain('supplier');
+    expect(FUNDING_SCOPE_CONFIG.blockedServicePrefixes).not.toContain('funding');
+  });
+
+  it('두 경계는 같은 팩토리를 쓴다 (소스 고정 — 다시 복제되면 실패한다)', () => {
+    for (const file of [
+      'middleware/supplier-service-scope.middleware.ts',
+      'middleware/funding-service-scope.middleware.ts',
+    ]) {
+      const src = codeOnly(read(file));
+      expect(src).toContain("createSubdomainOperatorScope");
+      expect(src).not.toContain('createMembershipScopeGuard');
+    }
   });
 });

@@ -32,7 +32,14 @@ jest.mock('../modules/auth/services/role-assignment.service.js', () => ({
   roleAssignmentService: { getRoleNames: (...a: unknown[]) => getRoleNames(...a) },
 }));
 const generateTokens = jest.fn(() => ({ accessToken: 'AT', refreshToken: 'RT', expiresIn: 900 }));
-jest.mock('../utils/token.utils.js', () => ({ generateTokens: (...a: unknown[]) => generateTokens(...a) }));
+// WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8 (3차): handoff 발급이 access token 의
+//   세션 귀속(serviceKey · sessionEpoch)을 읽는다. 여기 기본값은 **claim 없는 토큰** 이므로
+//   판정에서 제외되고 기존 계약이 그대로 검증된다. 귀속을 보는 시나리오는 전용 spec
+//   (service-logout-auth-boundary.spec.ts)에서 실제 토큰으로 본다.
+jest.mock('../utils/token.utils.js', () => ({
+  generateTokens: (...a: unknown[]) => generateTokens(...a),
+  verifyAccessToken: () => null,
+}));
 const persistRefreshTokenFamily = jest.fn(async () => undefined);
 jest.mock('../services/auth/auth-context.helper.js', () => ({
   persistRefreshTokenFamily: (...a: unknown[]) => persistRefreshTokenFamily(...a),
@@ -54,7 +61,16 @@ const KPA_ONLY_USER = { id: 'user-1', email: 'u@example.test', name: 'U', isActi
 const KPA_ONLY_MEMBERSHIPS = [{ serviceKey: 'kpa-society', status: 'active' }];
 
 function mockReq(body: Record<string, unknown>, origin?: string, user: unknown = KPA_ONLY_USER) {
-  return { body, user, get: (h: string) => (h.toLowerCase() === 'origin' ? origin : undefined) } as any;
+  // 실제 Express req 는 언제나 headers·cookies 를 갖는다. 없으면 토큰 추출이 터진다
+    //   (WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8: handoff 발급이 access token 의
+    //    세션 귀속을 읽는다 — 로그아웃된 서비스의 남은 인증으로 긴 세션을 얻지 못하게).
+    return {
+      body,
+      user,
+      headers: {},
+      cookies: {},
+      get: (h: string) => (h.toLowerCase() === 'origin' ? origin : undefined),
+    } as any;
 }
 function mockRes() {
   const res: any = { statusCode: 200, body: undefined };

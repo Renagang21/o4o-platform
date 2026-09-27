@@ -181,6 +181,35 @@ export interface AccessTokenPayload {
   deviceId?: string;
   /** Guest session ID for tracking guest activity */
   guestSessionId?: string;
+  /**
+   * WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8 (3차) — 세션 귀속.
+   *
+   * refresh token 에만 실으면 **refresh 경로만** 막힌다. 로그아웃 뒤에도 남은 access token
+   * (최대 15분)으로 `POST /auth/handoff` 를 불러 수명이 긴 세션을 새로 얻을 수 있었다.
+   * 긴 세션을 만들어 주는 경로가 이 값으로 "이미 로그아웃된 인증인가" 를 본다.
+   *
+   * 모든 API 요청마다 검사하지 않는다 — `requireAuth` 에 DB 조회를 넣으면 Core 경로 비용이
+   * 요청마다 늘어난다. 막아야 하는 것은 "짧은 인증으로 긴 세션을 새로 만드는 일" 이다.
+   */
+  serviceKey?: string;
+  sessionEpoch?: number;
+}
+
+/**
+ * WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8 (3차) — 세션 귀속 claim 두 개.
+ *
+ * refresh token 에만 있으면 **refresh 경로만** 막힌다. 로그아웃 뒤에도 남은 access token
+ * (최대 15분)으로 `POST /auth/handoff` 를 불러 **수명이 긴 세션을 새로 얻을 수 있었다.**
+ * 그래서 access token 에도 같은 두 값을 싣고, 긴 세션을 만들어 주는 경로가 그것을 검사한다.
+ *
+ * 모든 API 요청마다 검사하지는 않는다 — `requireAuth` 에 DB 조회를 넣으면 Core 경로의 비용이
+ * 요청마다 늘어난다. 막아야 하는 것은 "짧은 인증으로 긴 세션을 새로 만드는 일" 이다.
+ */
+export interface SessionScopeClaims {
+  /** 이 토큰이 속한 서비스(또는 `store`·`admin` 같은 surface) 키 */
+  serviceKey?: string;
+  /** 발급 시점의 `service_session_revocations.session_epoch` */
+  sessionEpoch?: number;
 }
 
 export interface RefreshTokenPayload {

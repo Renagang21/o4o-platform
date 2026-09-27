@@ -73,7 +73,13 @@ function getJwtSecrets() {
  * === Phase 1: Service User 인증 기반 (WO-AUTH-SERVICE-IDENTITY-PHASE1) ===
  * Token includes tokenType: 'user' to distinguish from service tokens
  */
-export function generateAccessToken(user: User, roles: string[], domain: string = 'neture.co.kr', memberships?: { serviceKey: string; status: string; role?: string }[]): string {
+export function generateAccessToken(
+  user: User,
+  roles: string[],
+  domain: string = 'neture.co.kr',
+  memberships?: { serviceKey: string; status: string; role?: string }[],
+  sessionScope?: { serviceKey?: string | null; sessionEpoch?: number | null },
+): string {
   const { jwtSecret, jwtIssuer, jwtAudience } = getJwtConfig();
 
   // Phase3-E PR3: roles from RoleAssignment table (explicit parameter)
@@ -104,6 +110,10 @@ export function generateAccessToken(user: User, roles: string[], domain: string 
     accountAccess: resolveAccountAccess(user.status) === 'normal' ? 'normal' : 'restricted',
     // WO-O4O-AUTH-JWT-SECURITY-REFINE-V1: domain 제거 (미사용, 하드코딩 'neture.co.kr')
     tokenType: 'user',  // Phase 1: Service User 인증 기반
+    // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8 (3차): 세션 귀속.
+    //   sessionEpoch 는 0 도 유효하므로 truthy 검사를 쓰지 않는다.
+    ...(sessionScope?.serviceKey ? { serviceKey: sessionScope.serviceKey } : {}),
+    ...(typeof sessionScope?.sessionEpoch === 'number' ? { sessionEpoch: sessionScope.sessionEpoch } : {}),
     iss: jwtIssuer,     // Phase 2.5: Server isolation
     aud: jwtAudience,   // Phase 2.5: Server isolation
     exp: Math.floor(Date.now() / 1000) + ACCESS_TOKEN_EXPIRES_IN,
@@ -168,7 +178,7 @@ export function generateTokens(user: User, roles: string[], domain: string = 'ne
   //   넘기지 않으면 새 family 를 발급한다 (신규 로그인).
   const tokenFamily = reuseTokenFamily || uuidv4();
 
-  const accessToken = generateAccessToken(user, roles, domain, memberships);
+  const accessToken = generateAccessToken(user, roles, domain, memberships, { serviceKey, sessionEpoch });
   // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8: refresh token 에만 싣는다.
   //   access token(15분)은 폐기 대상이 아니다 — 그 한계는 CHECK §6 에 적혀 있다.
   const refreshToken = generateRefreshToken(user, tokenFamily, serviceKey, sessionEpoch);

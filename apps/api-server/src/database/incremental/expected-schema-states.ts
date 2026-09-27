@@ -121,6 +121,17 @@ export const EXPECTED_SCHEMA_STATES: readonly ExpectedSchemaState[] = [
     fingerprint: '51393b6382a0908b04eeb7ec4670a2b44746ae632b51e952d351114af71034a1',
     fingerprintLineCount: 5893,
   },
+  // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8 (3차) — handoff 원장에 출발 서비스 세대 1컬럼.
+  // 로그아웃 **전에** 받아 둔 handoff 토큰을 로그아웃 뒤 TTL(60초) 안에 교환하는 경로를 막는다.
+  // 5893 -> 5895 (+2): 컬럼 1 · COMMENT 1.
+  // baseline 2026-09-18-id685 fresh bootstrap + incremental 1..9 를 격리 PostgreSQL 15
+  // (docker postgres:15, 로컬 전용 포트 55438, throwaway DB) 에서 실제 적용해 산출:
+  // 운영 DB fingerprint 채택 아님.
+  {
+    appliedThrough: 'AlterHandoffTokensSourceSessionEpoch1790400000003',
+    fingerprint: '7fdd328fe7e488469350bf1e69f5463fcb6e5a746de4c2d86d2d4f2272dd3bd0',
+    fingerprintLineCount: 5895,
+  },
 ] as const;
 
 /** Expected state after `prefixLength` incremental migrations; undefined when not registered. */

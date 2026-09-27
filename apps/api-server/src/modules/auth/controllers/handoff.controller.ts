@@ -43,7 +43,13 @@ import { isHandoffWorkspace } from '../../../services/handoff-token.service.js';
 import { isRepresentativeEntryTarget, isRepresentativeEntryExchangeOrigin } from '../../../config/representative-entry.js';
 import { resolveAccountAccess } from '../../../common/auth/account-access.policy.js';
 import { resolveSessionServiceKey } from '../../../utils/session-origin.js';
-import { readServiceSessionEpoch } from '../../../services/auth/service-session-epoch.js';
+import {
+  INITIAL_SESSION_EPOCH,
+  isSessionEpochLive,
+  readServiceSessionEpoch,
+} from '../../../services/auth/service-session-epoch.js';
+import { extractToken } from '../../../common/middleware/auth/auth-context.helpers.js';
+import { verifyAccessToken } from '../../../utils/token.utils.js';
 import logger from '../../../utils/logger.js';
 
 /**
@@ -57,6 +63,44 @@ import logger from '../../../utils/logger.js';
  * 비우지 않는다(다른 서비스 세션 유지). 따라서 여기서 막는 "폐기된 세션"은 logout-all · 도난 판정
  * 두 경우이며, 한 서비스에서 로그아웃한 뒤 다른 서비스로 handoff 하는 것은 **정상 동작**이다.
  */
+/**
+ * WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8 (3차) — 서비스 단위 로그아웃의 옆길 차단.
+ *
+ * §8 은 refresh 경로만 막았다. 남은 구멍은 **긴 세션을 새로 만들어 주는 경로**였다:
+ *
+ *   ① 로그아웃 뒤에도 남은 access token(최대 15분)으로 handoff 를 새로 발급받을 수 있었다
+ *   ② 로그아웃 **전에** 받아 둔 handoff 토큰을 로그아웃 뒤 TTL(60초) 안에 교환할 수 있었다
+ *
+ * 둘 다 "이미 로그아웃된 A 의 오래된 인증으로 시작한 이동" 이다. 반면 **살아 있는 B 세션에서
+ * A 로 가는 이동은 정상**이므로 막지 않는다 — 판정 기준은 출발 서비스의 세대 하나다.
+ *
+ * `requireAuth` 에 넣지 않는다: 모든 API 요청에 DB 조회를 더하면 Core 경로 비용이 요청마다
+ * 늘고, 막아야 하는 것은 짧은 인증으로 **긴 세션을 새로 만드는 일**이다.
+ */
+const SERVICE_SESSION_REVOKED_CODE = 'SERVICE_SESSION_REVOKED';
+
+/** access token 에 새겨진 세션 귀속. claim 이 없으면(배포 전 토큰) null. */
+function readTokenSessionScope(req: Request): { serviceKey?: string; sessionEpoch?: number } | null {
+  const token = extractToken(req as never);
+  if (!token) return null;
+  const payload = verifyAccessToken(token);
+  if (!payload?.serviceKey) return null;
+  return { serviceKey: payload.serviceKey, sessionEpoch: payload.sessionEpoch };
+}
+
+/**
+ * 그 (user, service) 세대가 아직 살아 있는가.
+ * `tokenEpoch` 가 `undefined` = 배포 전 토큰 → `isSessionEpochLive` 의 legacy 규칙을 따른다.
+ */
+async function isServiceSessionLive(
+  userId: string,
+  serviceKey: string,
+  tokenEpoch: number | null | undefined,
+): Promise<boolean> {
+  const current = (await readServiceSessionEpoch(userId, serviceKey)) ?? INITIAL_SESSION_EPOCH;
+  return isSessionEpochLive(tokenEpoch, current);
+}
+
 const SESSION_REVOKED_CODE = 'HANDOFF_SESSION_REVOKED';
 const SESSION_REVOKED_MESSAGE = '로그인 세션이 종료되었습니다. 다시 로그인해 주세요.';
 function hasLiveSession(user: { refreshTokenFamily?: string | null } | null | undefined): boolean {
@@ -114,6 +158,20 @@ export class HandoffController extends BaseController {
       return BaseController.error(res, SESSION_REVOKED_MESSAGE, 401, SESSION_REVOKED_CODE);
     }
 
+    // 위 검사는 **사용자 전체** family 만 본다 — 서비스 하나의 로그아웃은 그 값을 유지하므로
+    // 여기서 출발 서비스의 세대를 따로 본다. 그러지 않으면 로그아웃된 서비스의 남은
+    // access token 으로 수명이 긴 세션을 새로 얻는다.
+    const callerScope = readTokenSessionScope(req);
+    if (callerScope?.serviceKey) {
+      if (!(await isServiceSessionLive(user.id, callerScope.serviceKey, callerScope.sessionEpoch))) {
+        logger.warn('[Handoff] Blocked generation — service session revoked', {
+          userId: user.id,
+          serviceKey: callerScope.serviceKey,
+        });
+        return BaseController.error(res, SESSION_REVOKED_MESSAGE, 401, SERVICE_SESSION_REVOKED_CODE);
+      }
+    }
+
     // §8-2: 대상 종류는 정확히 하나 — targetServiceKey(SERVICE) 또는 targetWorkspace(WORKSPACE)
     const hasServiceTarget = targetServiceKey !== undefined && targetServiceKey !== null && targetServiceKey !== '';
     const hasWorkspaceTarget = targetWorkspace !== undefined && targetWorkspace !== null && targetWorkspace !== '';
@@ -154,6 +212,8 @@ export class HandoffController extends BaseController {
         }
 
         const sourceServiceKey = detectSourceServiceKey(req.get('origin') || '');
+        // 발급 시점의 출발 서비스 세대는 서비스가 INSERT 안에서 함께 기록한다 —
+        // 교환 시 현재 세대와 비교해 "발급 뒤 그 서비스에서 로그아웃했는가" 를 판정한다.
         const handoffToken = await handoffTokenService.generateToken(user.id, sourceServiceKey, {
           kind: 'workspace',
           targetWorkspace: STORE_WORKSPACE_KEY,
@@ -333,6 +393,24 @@ export class HandoffController extends BaseController {
       if (!hasLiveSession(user)) {
         logger.warn('[Handoff] Blocked exchange — session revoked', { userId: user.id, reason: 'session_revoked' });
         return BaseController.error(res, SESSION_REVOKED_MESSAGE, 401, SESSION_REVOKED_CODE);
+      }
+
+      // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8 (3차):
+      //   위 검사는 **사용자 전체** family 만 본다. 서비스 하나의 로그아웃은 그 값을 유지하므로
+      //   "발급 뒤 출발 서비스에서 로그아웃" 을 잡지 못했다 — 발급 시 원장에 남긴 출발 세대를
+      //   현재 세대와 비교한다. 살아 있는 다른 서비스에서 온 정상 이동은 영향받지 않는다.
+      //   `sourceSessionEpoch` 가 null = 이 컬럼 이전 발급분이므로 판정에서 제외한다(TTL 60초).
+      if (
+        payload.sourceServiceKey &&
+        payload.sourceSessionEpoch !== null &&
+        payload.sourceSessionEpoch !== undefined &&
+        !(await isServiceSessionLive(user.id, payload.sourceServiceKey, payload.sourceSessionEpoch))
+      ) {
+        logger.warn('[Handoff] Blocked exchange — source service session revoked', {
+          userId: user.id,
+          sourceServiceKey: payload.sourceServiceKey,
+        });
+        return BaseController.error(res, SESSION_REVOKED_MESSAGE, 401, SERVICE_SESSION_REVOKED_CODE);
       }
 
       // 3. Load fresh roles from role_assignments

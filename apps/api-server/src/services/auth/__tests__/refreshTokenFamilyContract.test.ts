@@ -28,6 +28,8 @@
  *   User repository 는 in-memory fake 로 대체한다.
  */
 
+import * as fs from 'fs';
+import * as path from 'path';
 import { AuthTokenSessionService } from '../auth-token-session.service.js';
 import * as tokenUtils from '../../../utils/token.utils.js';
 
@@ -368,6 +370,55 @@ describe('refresh token family 계약 — logout-all 무효화', () => {
       await expect(service.refreshTokens(token)).rejects.toMatchObject({
         code: 'TOKEN_FAMILY_REVOKED',
       });
+    });
+
+    /**
+     * 3차 리뷰 시나리오 5 — 서비스 독립성은 **재로그인까지** 성립해야 한다.
+     *
+     * A 로그아웃 직후 B 가 살아 있는 것만으로는 부족하다. A 에서 다시 로그인하면
+     * `establishSession` 이 `users.refreshTokenFamily`(**사용자당 한 칸**)를 새 family 로
+     * 교체하고, 그러면 B 의 다음 refresh 가 family 불일치가 되며 **그 처리가 family 를 비워**
+     * 모든 서비스가 연쇄로 죽는다. 세대 축과 무관한, 기존 단일 family 계약의 문제다.
+     *
+     * 그래서 로그인은 **살아 있는 family 를 승계**한다(handoff 가 이미 그렇게 한다).
+     * family = "이 사용자의 살아 있는 세션 계보" 이고, 서비스 단위 종료는 세대가 담당한다.
+     */
+    it('시나리오 5 · A 로그아웃 → A 재로그인 → **B refresh 가 살아 있다**', async () => {
+      const familyBefore = user.refreshTokenFamily;
+      const bToken = makeServiceToken('kpa-society'); // B 세션
+
+      await service.logout(USER_ID, 'neture'); // A 로그아웃
+
+      // A 재로그인: 실제 로그인 경로와 같이 **살아 있는 family 를 승계**해 발급한다.
+      const aReissued = tokenUtils.generateTokens(
+        user,
+        [],
+        'neture.co.kr',
+        undefined,
+        user.refreshTokenFamily, // 승계 — 새 family 를 만들지 않는다
+        'neture',
+        epochOf('neture'),
+      ).refreshToken;
+      expect(tokenUtils.getTokenFamily(aReissued)).toBe(familyBefore);
+
+      // A 는 새 세대로 통과하고, B 는 family 도 세대도 그대로이므로 통과한다.
+      await expect(service.refreshTokens(aReissued)).resolves.toBeTruthy();
+      await expect(service.refreshTokens(bToken)).resolves.toBeTruthy();
+      expect(user.refreshTokenFamily).toBe(familyBefore);
+    });
+
+    it('로그인 경로가 살아 있는 family 를 승계한다 (소스 고정)', () => {
+      const src = fs.readFileSync(
+        path.resolve(__dirname, '..', 'auth-context.helper.ts'),
+        'utf-8',
+      );
+      // 새 family 를 무조건 만들면 다른 서비스 세션이 family 불일치로 연쇄 사망한다.
+      expect(src).toContain('const reuseFamily = user.refreshTokenFamily ?? null;');
+      // 되돌리면 시나리오 5 가 재발한다 — 정규식 대신 문자열로 본다(이스케이프가 한 겹
+      // 벗겨지면 조용히 통과하는 종류의 검사다).
+      const args = src.replace(/\s+/g, ' ');
+      expect(args).toContain('ctx.memberships, reuseFamily, serviceKey,');
+      expect(args).not.toContain('ctx.memberships, null, serviceKey,');
     });
 
     it('두 경로는 서로 다른 동작이다 (같은 함수로 되돌아가면 실패한다)', async () => {

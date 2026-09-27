@@ -44,6 +44,8 @@ import { CreateCommunityDomain1790400000000 } from '../migrations/1790400000000-
 import { CreateBranchCreationRequests1790400000001 } from '../migrations/1790400000001-CreateBranchCreationRequests.js';
 // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8 (service_session_revocations: 서비스 단위 세션 폐기)
 import { CreateServiceSessionRevocations1790400000002 } from '../migrations/1790400000002-CreateServiceSessionRevocations.js';
+// WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8 (handoff 원장에 출발 서비스 세대 보관)
+import { AlterHandoffTokensSourceSessionEpoch1790400000003 } from '../migrations/1790400000003-AlterHandoffTokensSourceSessionEpoch.js';
 
 export const INCREMENTAL_MIGRATION_CUTOFF = {
   baselineVersion: '2026-09-18-id685',
@@ -66,6 +68,7 @@ export const INCREMENTAL_MIGRATIONS: readonly MigrationClass[] = [
   CreateCommunityDomain1790400000000,
   CreateBranchCreationRequests1790400000001,
   CreateServiceSessionRevocations1790400000002,
+  AlterHandoffTokensSourceSessionEpoch1790400000003,
 ];
 
 export function incrementalMigrationNames(): string[] {

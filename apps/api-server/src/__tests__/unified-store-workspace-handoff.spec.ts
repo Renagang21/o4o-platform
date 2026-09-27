@@ -42,7 +42,14 @@ jest.mock('../modules/auth/services/role-assignment.service.js', () => ({
   roleAssignmentService: { getRoleNames: jest.fn(async () => ['store_owner']) },
 }));
 const generateTokens = jest.fn(() => ({ accessToken: 'AT', refreshToken: 'RT', expiresIn: 900 }));
-jest.mock('../utils/token.utils.js', () => ({ generateTokens: (...a: unknown[]) => generateTokens(...a) }));
+// WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8 (3차): handoff 발급이 access token 의
+//   세션 귀속(serviceKey · sessionEpoch)을 읽는다. 여기 기본값은 **claim 없는 토큰** 이므로
+//   판정에서 제외되고 기존 계약이 그대로 검증된다. 귀속을 보는 시나리오는 전용 spec
+//   (service-logout-auth-boundary.spec.ts)에서 실제 토큰으로 본다.
+jest.mock('../utils/token.utils.js', () => ({
+  generateTokens: (...a: unknown[]) => generateTokens(...a),
+  verifyAccessToken: () => null,
+}));
 const persistRefreshTokenFamily = jest.fn(async () => undefined);
 jest.mock('../services/auth/auth-context.helper.js', () => ({
   persistRefreshTokenFamily: (...a: unknown[]) => persistRefreshTokenFamily(...a),
@@ -63,9 +70,14 @@ const USER = { id: 'user-1', email: 'u@example.test', name: 'U', isActive: true,
 const STORE = { organizationId: 'org-1', organizationName: '가나약국', memberRole: 'owner' };
 
 function mockReq(body: Record<string, unknown>, origin?: string, user: unknown = USER) {
+  // 실제 Express req 는 언제나 headers·cookies 를 갖는다. 없으면 토큰 추출이 터진다
+  //   (WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8: handoff 발급이 access token 의
+  //    세션 귀속을 읽는다 — 로그아웃된 서비스의 남은 인증으로 긴 세션을 얻지 못하게).
   return {
     body,
     user,
+    headers: {},
+    cookies: {},
     get: (h: string) => (h.toLowerCase() === 'origin' ? origin : undefined),
   } as any;
 }
@@ -144,7 +156,13 @@ describe('B. HandoffTokenService — 두 형태 · 같은 원자 consume', () =>
     query.mockResolvedValueOnce([{ id: uuid }]).mockResolvedValueOnce([]);
     await handoffTokenService.generateToken('user-1', 'neture', 'kpa-society');
     const [sql, params] = query.mock.calls[0];
-    expect(norm(sql)).toContain('(user_id, source_service_key, target_service_key, target_workspace, expires_at)');
+    // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8 (3차): source_session_epoch 컬럼이 늘었고
+    //   값은 **같은 문장 안의 subquery** 로 채운다(별도 SELECT 를 앞세우면 왕복이 늘고 그 사이
+    //   로그아웃이 끼어들 틈이 생긴다). 컬럼 목록과 subquery 둘 다 고정한다.
+    expect(norm(sql)).toContain(
+      '(user_id, source_service_key, target_service_key, target_workspace, expires_at, source_session_epoch)',
+    );
+    expect(norm(sql)).toContain('COALESCE((SELECT session_epoch FROM service_session_revocations');
     expect(params.slice(0, 4)).toEqual(['user-1', 'neture', 'kpa-society', null]);
   });
 
@@ -166,12 +184,14 @@ describe('B. HandoffTokenService — 두 형태 · 같은 원자 consume', () =>
     query.mockResolvedValueOnce([[{ user_id: 'user-1', source_service_key: 'kpa-society', target_service_key: null, target_workspace: 'store', created_at: new Date(0) }], 1]);
     const ws = await handoffTokenService.exchangeToken(uuid);
     expect(norm(query.mock.calls[0][0])).toContain('SET consumed_at = now() WHERE id = $1 AND consumed_at IS NULL AND expires_at > now() RETURNING');
-    expect(ws).toEqual({ userId: 'user-1', sourceServiceKey: 'kpa-society', targetWorkspace: 'store', createdAt: new Date(0).toISOString() });
+    // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8 (3차): payload 에 출발 서비스 세대가
+    //   실린다. 이 행에는 컬럼이 없으므로(컬럼 도입 이전 발급분) null — 교환 판정에서 제외된다.
+    expect(ws).toEqual({ userId: 'user-1', sourceServiceKey: 'kpa-society', targetWorkspace: 'store', createdAt: new Date(0).toISOString(), sourceSessionEpoch: null });
     expect(ws).not.toHaveProperty('targetServiceKey');
 
     query.mockResolvedValueOnce([[{ user_id: 'user-1', source_service_key: 'neture', target_service_key: 'kpa-society', target_workspace: null, created_at: '2026-01-01' }], 1]);
     const svc = await handoffTokenService.exchangeToken(uuid);
-    expect(svc).toEqual({ userId: 'user-1', sourceServiceKey: 'neture', targetServiceKey: 'kpa-society', createdAt: '2026-01-01' });
+    expect(svc).toEqual({ userId: 'user-1', sourceServiceKey: 'neture', targetServiceKey: 'kpa-society', createdAt: '2026-01-01', sourceSessionEpoch: null });
     expect(svc).not.toHaveProperty('targetWorkspace');
   });
 });

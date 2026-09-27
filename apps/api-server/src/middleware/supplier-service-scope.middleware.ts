@@ -19,20 +19,9 @@
  * 서브도메인 전체 운영자 권한을 구분하지 않아도 된다는 뜻이 아니다 — 두 질문이 다르다.
  * 종전에는 `neture:admin` 하나가 공급자 심사까지 열었다.
  */
-import type { ServiceScopeGuardConfig } from '@o4o/security-core';
-import { createMembershipScopeGuard } from '../common/middleware/membership-guard.middleware.js';
+import { createSubdomainOperatorScope } from './subdomain-operator-scope.js';
 
-export const SUPPLIER_SCOPE_CONFIG: ServiceScopeGuardConfig = {
-  serviceKey: 'supplier',
-  allowedRoles: ['supplier:admin', 'supplier:operator'],
-  platformBypass: true,
-  legacyRoles: [],
-  blockedServicePrefixes: ['kpa', 'cosmetics', 'pharmacy-hub', 'lms', 'lecture', 'community'],
-  // mapping 이 비면 allowedRoles 전체로 fallback 하므로 명시한다.
-  scopeRoleMapping: {
-    'supplier:admin': ['supplier:admin'],
-    'supplier:operator': ['supplier:operator', 'supplier:admin'],
-  },
-};
+const { config, guard } = createSubdomainOperatorScope('supplier');
 
-export const requireSupplierScope = createMembershipScopeGuard(SUPPLIER_SCOPE_CONFIG);
+export const SUPPLIER_SCOPE_CONFIG = config;
+export const requireSupplierScope = guard;
