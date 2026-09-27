@@ -454,7 +454,7 @@ access token(15분)   폐기 대상이 아니다 — 만료까지 유효하다
 | V24 | 로그아웃 폐기 실패는 **성공으로 응답하지 않는다** | PASS |
 | V25 | A 로그아웃 → A 재로그인 → **B refresh 생존** · 로그인이 family 를 승계 | PASS |
 | V26 | supplier·funding 경계가 같은 팩토리를 쓰고 `scopeRoleMapping` 이 값으로 채워져 있다 | PASS |
-| V27 | SonarCloud Quality Gate **OK** — 새 코드 중복 2.96% (155/5242 · 기준 3% 이하) | PASS |
+| V27 | SonarCloud Quality Gate **OK** — 새 코드 중복 2.05% (113/5508 · 기준 3% 이하) | PASS |
 | V28 | claim 없는 배포 전 access token 으로 로그아웃 뒤 **handoff 발급 불가** | PASS |
 | V29 | 폐기 기록이 없으면 배포 전 토큰도 발급 정상 (배포만으로 막지 않는다) | PASS |
 | V30 | Origin 을 다른 서비스로 지정해도 원장의 출발은 **토큰이 증명한 서비스** | PASS |
@@ -673,8 +673,19 @@ npx tsx src/scripts/community-catalog-promotion.ts --apply    # 숫자 확인 �
 ```text
 3.10%  (141/4547)  최초 실패
 3.43%  (179/5214)  ← supplier·funding scope guard 를 합친 뒤. **악화**
-2.96%  (155/5242)  ← 파일별 분포를 측정한 뒤 실제 상위 두 곳을 줄여 통과 (Quality Gate OK)
+2.96%  (155/5242)  ← 파일별 분포를 측정한 뒤 실제 상위 두 곳을 줄여 통과
+3.10%  (171/5516)  ← 4차 리뷰 수정으로 테스트가 늘며 **재실패**
+2.05%  (113/5508)  ← 다시 측정해 **테스트 복사본**을 줄여 통과 (Quality Gate OK)
 ```
+
+**두 번째 실패의 원인과 처리**: 171줄 중 **100줄이 테스트**였다 — lifecycle spec 2개의 동일한
+저장소 plumbing(18+18)과 handoff spec 3개의 req/res 대역. 두 support 모듈로 뽑았다
+(`__tests__/support/in-memory-repository.ts` · `handoff-http.ts`). `jest.mock` 팩토리는 hoisting
+제약이 있어 옮기지 않았고, `support/` 는 jest testMatch 에 걸리지 않으므로 테스트로 수집되지 않는다.
+
+`config/service-catalog.ts`(67줄)는 **손대지 않았다.** 선언적 데이터이고, 중복 블록이 workspace
+리터럴이 아니라 **항목 전체**라서 `OPERATOR_ONLY_WORKSPACE` 추출로도 줄지 않았다. 팩토리로
+감싸면 카탈로그 가독성을 잃는다 — 기준 안이므로 그대로 둔다.
 
 **무엇이 틀렸나.** "거의 같은 두 파일이 있으니 그게 중복일 것" 이라고 짐작해 scope guard 를
 합쳤다. 그런데 `measures/component_tree` 로 파일별 분포를 보니 **그 두 파일은 애초에 중복
@@ -691,8 +702,8 @@ scope guard 통합은 되돌리지 않았다 — 중복 기여는 0 이었지만
 고치는 실수(admin 전용 경로가 operator 에게 열리는 종류)를 구조적으로 막는 효과는 유효하다.
 
 > **교훈**: 게이트 수치를 고칠 때도 **어디가 원인인지 먼저 측정**해야 한다. 코드를 읽고
-> "여기가 중복 같다" 고 판단한 것이 틀렸고, 그 수정이 수치를 올렸다.
-> 남은 중복(handoff spec 3개 48줄 — 서로의 mock scaffold)은 기준 안이라 손대지 않았다.
+> "여기가 중복 같다" 고 판단한 것이 틀렸고, 그 수정이 수치를 올렸다. 두 번째 실패에서는
+> 바로 `measures/component_tree` 로 파일별 분포를 확인해 한 번에 줄였다.
 
 ### 11-4. 4차 리뷰 (handoff 출발 인증)
 
