@@ -53,6 +53,13 @@ export const ASSIGNABLE_ROLES: Record<string, OperatorRoleOption[]> = {
       description: '약사회 분회 운영자 (대상 분회 소속은 분회 운영자 화면에서 별도 지정). 다른 분회 개설을 승인할 수 없습니다.',
     },
   ],
+  community: [
+    {
+      value: 'community:admin',
+      label: '커뮤니티 전체 관리자',
+      description: '커뮤니티 개설 신청 승인. 개별 커뮤니티 운영은 그 커뮤니티 운영자가 합니다.',
+    },
+  ],
   supplier: [
     {
       value: 'supplier:admin',
@@ -75,13 +82,6 @@ export const ASSIGNABLE_ROLES: Record<string, OperatorRoleOption[]> = {
       value: 'funding:operator',
       label: '펀딩 운영자',
       description: '유통참여형 펀딩 운영 업무',
-    },
-  ],
-  community: [
-    {
-      value: 'community:admin',
-      label: '커뮤니티 전체 관리자',
-      description: '커뮤니티 개설 신청 승인. 개별 커뮤니티 운영은 그 커뮤니티 운영자가 합니다.',
     },
   ],
 };
