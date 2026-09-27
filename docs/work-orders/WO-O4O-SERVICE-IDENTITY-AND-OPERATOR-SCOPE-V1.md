@@ -76,17 +76,18 @@ URL 트랙의 "서비스 키 · role prefix 일괄 변경 금지" 와 **충돌�
 | # | 도메인 | 1층(서비스 키) | 2층(개체 범위) | 이번에 만들 것 |
 |---|---|---|---|---|
 | 1 | `neture` | `neture` 유지 | — | 배너(가입 서비스 목록) · 로그인 전 AI 입력창 노출 |
-| 2 | `supplier` | **`supplier` 신설 필요** | — | §4 충돌 절 참조 |
-| 3 | `funding` | **`funding` 신설 필요** | — | 〃 |
-| 4 | `community` | **`community:admin` 신설**(전체 관리자 축만) | **커뮤니티 개체**(`role`+`status`) | 개설 신청·승인 · 커뮤니티 membership · 범위 가드 |
+| 2 | `supplier` | ~~`supplier` 신설~~ → **`neture` 재사용** (실측 정정 2026-09-27) | — | 없음 — §4 참조 |
+| 3 | `funding` | ~~`funding` 신설~~ → **`neture` 재사용** (실측 정정 2026-09-27) | — | 없음 — §4 참조 |
+| 4 | `community` | **`community` 키 + `community:admin` 신설**(전체 관리자 축만) | **커뮤니티 개체**(`role`+`status`) | 개설 신청·승인 · 커뮤니티 membership · 범위 가드 |
 | 5 | `pharmacy` | `kpa-society` **재사용** | — | 가입 승인 경로 정비 |
 | 6 | `retail` | `k-cosmetics` **재사용** | — | 〃 |
 | 7 | `kpa` | `kpa-branch` **재사용** | **분회 개체(있음)** | 개설 신청·승인 + 주소 2회 검사 + 첫 운영자 |
 | 8 | `store` | 서비스 아님 | 조직·매장 | **전체 운영 권한 범위·진입 경로만 확정** |
 | 9 | `study` | `lecture` **재사용** | — | 가입 승인 경로 정비 |
 
-> **기존 키가 범위를 올바르게 표현하는 곳(5·6·7·9)은 그대로 쓴다.** 새 키는
-> 독립 범위를 표현할 수 없는 곳(2·3·4)에만 만든다 — 지시받은 기준 그대로다.
+> **기존 키가 범위를 올바르게 표현하는 곳은 그대로 쓴다.** 새 키는 독립 범위를 표현할 수
+> 없는 곳에만 만든다 — 지시받은 기준 그대로다. **실측 결과 그곳은 `community` 하나였다**
+> (2·3 은 기존 키가 이미 범위를 올바르게 표현하고 있었다 — §4).
 
 ## 3. 커뮤니티 — 설계
 
@@ -189,15 +190,33 @@ requireCommunityScope(level)
 신청자가 첫 운영자가 되는 것은 **그 커뮤니티에 한정**된다. 전체 서비스 운영 권한이
 따라붙으면 개설만으로 다른 커뮤니티 개설을 승인할 수 있게 된다 — 만들지 않는다.
 
-## 4. ⚠️ 충돌 지점 — `supplier` · `funding` · `community` 서비스 키 신설
+## 4. 서비스 키 판정 — 실측 후 `community` 하나만 신설
+
+### 4-0. 방향 변경 기록 (2026-09-27 · S4 실측)
+
+| 항목 | 내용 |
+|---|---|
+| **바꾼 판정** | `supplier` · `funding` **키 신설 → 신설하지 않음** (`community` 신설은 유지) |
+| **왜** | 두 호스트의 인가 축을 코드로 확인한 결과 **기존 키가 이미 범위를 올바르게 표현**하고 있었다. 새 키를 만들면 인가 축이 둘로 갈라진다 |
+| **근거** | ① `supplier`: FROZEN 정본 [`O4O-SUPPLIER-DOMAIN-BOUNDARY-V1`](../baseline/O4O-SUPPLIER-DOMAIN-BOUNDARY-V1.md) §7 이 `organization_members(role=owner) → organizations(type='supplier') → neture_suppliers` 를 **canonical authorization** 으로 고정. 라우터는 `/api/v1/neture/supplier/**` 이고 가드는 `neture-identity.middleware`(같은 관계를 읽는다) — 서비스 역할 축이 아니다<br>② `funding`: 유통참여형 펀딩 = market-trial. 운영자 가드 실측 = `requireNetureScope('neture:operator')` (`routes/market-trial-operator.routes.ts`) |
+| **영향** | 새 role·카탈로그·CORS 항목이 줄어든다. 두 호스트의 운영자 지정 대상은 기존 `neture:admin` / `neture:operator` 다. Supplier 사업자 본인의 접근은 종전대로 `organization_members` |
+| **되돌릴 조건** | supplier·funding 운영 권한을 `neture` 전체와 **분리해야 할 업무 요구**가 확인되면 그때 키를 만든다. 지금은 그 요구가 확인되지 않았고, FROZEN 도메인에 두 번째 인가 축을 넣는 비용이 더 크다 |
+| **미해결로 남는 것** | `neture:operator` 하나가 여러 호스트를 연다는 IR §12 R1 은 **해소되지 않는다.** 이는 키 추가가 아니라 호스트별 운영 범위 분리 문제이며, 별도 WO 로 분리한다 |
+
+### 4-1. `community` 는 왜 신설했는가
+
+개별 커뮤니티는 개체(`communities`)이고, 그 **위의 서비스 축**(진입 자격 · 전체 관리자)이
+기존 어떤 키로도 표현되지 않았다. `neture` 로 두면 Neture 회원 전원이 커뮤니티 진입 자격을
+갖게 되어 가입 승인형 결정과 어긋난다.
+
+### 4-2. URL 트랙과의 관계
 
 | 축 | 내용 |
 |---|---|
 | **충돌 대상** | `CHECK-O4O-URL-FIRST-CENSUS-V1` CONFIRMED_DECISIONS — **"서비스 키 · role prefix 일괄 변경 금지"** |
-| **왜 필요한가** | 세 호스트가 `neture` 키를 공유해 **`neture:operator` 하나가 4개 호스트를 연다**(IR §12 R1). 지시는 "같은 웹 앱을 쓰더라도 서비스별 가입·운영자·접근 검사는 독립" 이다. 1층을 나누지 않으면 독립이 성립하지 않는다 |
-| **충돌이 아닌 부분** | 금지된 것은 **일괄 이름 변경**이다. 기존 키(`neture`·`kpa-society`·`k-cosmetics`·`lecture`·`kpa-branch`)는 **이름을 바꾸지 않고 그대로 둔다.** 새 키 3개를 **추가**할 뿐이다 |
-| **배포 범위 조율** | 새 키는 카탈로그·역할·CORS·handoff 대상에 영향을 준다. URL 트랙이 같은 호스트를 다루므로 **배포 창을 함께** 잡는다 |
-| **되돌릴 수 있는가** | 새 키는 추가이므로 기존 동작을 바꾸지 않는다. `neture:*` 보유자의 기존 접근은 유지하고, 새 키 역할은 **부여될 때만** 효력이 생긴다 |
+| **충돌이 아닌 이유** | 금지된 것은 **일괄 이름 변경**이다. 기존 키(`neture`·`kpa-society`·`k-cosmetics`·`lecture`·`kpa-branch`)는 이름을 바꾸지 않았고, 추가한 것은 `community` **하나**다 |
+| **배포 범위 조율** | 새 키는 카탈로그·역할·handoff 대상에 영향을 준다. URL 트랙이 같은 호스트를 다루므로 **배포 창을 함께** 잡는다 |
+| **되돌릴 수 있는가** | 추가이므로 기존 동작을 바꾸지 않는다. `community:admin` 은 **부여될 때만** 효력이 생긴다 |
 
 > 이 절이 지시받은 "충돌 지점과 이유를 CHECK 에 명시" 에 해당한다.
 
@@ -235,7 +254,18 @@ branch_creation_requests  id · requester_user_id · desired_slug · desired_hos
 
 ## 7. 로그아웃
 
-현재 `POST /auth/logout` = 현재 세션 종료 · `POST /auth/logout-all` = 전 세션 종료.
+> **실측 정정 (2026-09-27 · S7).** 착수 시점의 "`POST /auth/logout` = 현재 세션 종료" 는
+> **사실이 아니었다.** `AuthTokenSessionService.logout` 이 `logoutAll` 에 위임해
+> `users.refreshTokenFamily`(사용자 전체 범위)를 비웠고, 그래서 한 서비스에서 로그아웃하면
+> 모든 주소의 세션이 끊겼다. 프런트는 두 경로를 이미 구분해 불렀으므로 차이는 서버 하나에
+> 있었다. `logout` 이 세션 원장을 건드리지 않도록 고쳤고 `logoutAll` 은 전역 폐기를 자기
+> 구현으로 갖는다.
+>
+> **남는 구조적 한계**: 기기·서비스별 세션 레코드가 없어 서버가 특정 세션 하나만 무효화할
+> 수단이 없다. `logout` 이 할 수 있는 일은 "전역 폐기를 하지 않는 것"이며, 서버측 즉시
+> 무효화가 필요하면 `logout-all` 을 쓴다. 세션 레코드 도입은 별도 WO 다.
+
+`POST /auth/logout` = 현재 서비스 세션 종료 · `POST /auth/logout-all` = 전 세션 종료.
 **`logout-all` 을 서비스 이동 흐름에 연결하지 않는다.** 화면 로그아웃은 `logout` 만 호출한다.
 Google 계정 세션은 건드리지 않는다(`google.accounts.id.disableAutoSelect` 류 호출 금지).
 
@@ -250,7 +280,8 @@ S1' 권한 경계 보정 (2026-09-27) — 아래 3건. S2 착수 전 완료
       ④ 카탈로그 폴백이 가입 승인 검사를 우회하지 않는다
 S2  커뮤니티 도메인 (테이블 · 신청/승인 · membership · scope guard · 테스트)
 S3  분회 개설 신청/승인 (+ 주소 2회 검사 · 첫 운영자)
-S4  서비스 키 3개 추가 (supplier · funding · community) + 역할 + Admin 지정 대상
+S4  서비스 키 추가 — 실측 후 `community` **하나만** (supplier · funding 은 신설하지 않음, §4-0)
+      + 역할(community:admin · kpa-branch:admin) + Admin 지정 대상
 S5  Neture 배너 · 로그인 전 AI 입력창 노출 · handoff 대상 확장
 S6  Store 전체 운영 권한 범위·진입 확정
 S7  로그아웃 경로 점검
