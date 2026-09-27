@@ -97,6 +97,17 @@ export const EXPECTED_SCHEMA_STATES: readonly ExpectedSchemaState[] = [
     fingerprint: 'c7ada575b9db6d4e8cbf8a2e158f4754bb86e3afa4ca2333f4e86916f60148e3',
     fingerprintLineCount: 5854,
   },
+  // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 (S3) — 분회 개설 신청 원장 1테이블 신설.
+  // branch_creation_requests + 인덱스 3개(부분 UNIQUE 1 · 일반 2).
+  // 5854 -> 5882 (+28): 테이블 1 · 부분 UNIQUE 1 · 일반 인덱스 2 · CHECK 3 · FK 4 가 더해진다.
+  // baseline 2026-09-18-id685 fresh bootstrap + incremental 1..7 을 격리 PostgreSQL 15
+  // (docker postgres:15, 로컬 전용 포트 55435, throwaway DB) 에서 실제 적용해 산출:
+  // 운영 DB fingerprint 채택 아님.
+  {
+    appliedThrough: 'CreateBranchCreationRequests1790400000001',
+    fingerprint: 'c06a80afbbb9415b499bd94f36ba0a012460672c5afb4d22b36ea67258645f82',
+    fingerprintLineCount: 5882,
+  },
 ] as const;
 
 /** Expected state after `prefixLength` incremental migrations; undefined when not registered. */
