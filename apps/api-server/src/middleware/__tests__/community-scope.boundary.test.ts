@@ -8,6 +8,9 @@
  *   `community_id`** 를 갖기 때문에 회원이 가입 승인·중재를 할 수 있게 된다.
  *   판정은 세 조건이다 — 개체 일치 · `status='active'` · (운영자 요구 시) `role='operator'`.
  */
+import * as fs from 'fs';
+import * as path from 'path';
+
 const store: {
   communities: Array<{ id: string; slug: string; name: string; status: string }>;
   memberships: Array<{ id: string; communityId: string; userId: string; role: string; status: string }>;
@@ -136,8 +139,8 @@ describe('커뮤니티 개체 경계', () => {
 
   it('V4 가드는 서비스 전체 역할(community:admin)을 보지 않는다', () => {
     // 전체 관리자가 모든 커뮤니티의 **내부 운영**까지 열지 않도록, 소스에 bypass 가 없음을 고정한다.
-    const src = require('fs').readFileSync(
-      require('path').resolve(__dirname, '..', 'community-scope.middleware.ts'),
+    const src = fs.readFileSync(
+      path.resolve(__dirname, '..', 'community-scope.middleware.ts'),
       'utf-8',
     );
     const code = src
