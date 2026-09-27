@@ -127,7 +127,12 @@ export function generateAccessToken(user: User, roles: string[], domain: string 
  * === Phase 2.5: Server Isolation ===
  * Token includes iss (issuer) and aud (audience) for cross-server protection
  */
-export function generateRefreshToken(user: User, tokenFamily?: string, serviceKey?: string | null): string {
+export function generateRefreshToken(
+  user: User,
+  tokenFamily?: string,
+  serviceKey?: string | null,
+  sessionEpoch?: number | null,
+): string {
   const { jwtRefreshSecret, jwtIssuer, jwtAudience } = getJwtConfig();
 
   const payload: RefreshTokenPayload = {
@@ -138,6 +143,9 @@ export function generateRefreshToken(user: User, tokenFamily?: string, serviceKe
     // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8: 서비스 단위 로그아웃의 판정 축.
     //   값이 없으면 claim 을 넣지 않는다(빈 문자열을 넣으면 '' 서비스가 생긴다).
     ...(serviceKey ? { serviceKey } : {}),
+    //   세대는 0 도 유효한 값이므로 truthy 검사를 쓰지 않는다 — 0 을 빠뜨리면 그 토큰이
+    //   "claim 없음"(= 배포 전 토큰)으로 취급돼 첫 로그아웃 뒤 전부 거절된다.
+    ...(typeof sessionEpoch === 'number' ? { sessionEpoch } : {}),
     iss: jwtIssuer,     // Phase 2.5: Server isolation
     aud: jwtAudience,   // Phase 2.5: Server isolation
     exp: Math.floor(Date.now() / 1000) + REFRESH_TOKEN_EXPIRES_IN,
@@ -154,7 +162,7 @@ export function generateRefreshToken(user: User, tokenFamily?: string, serviceKe
  * @param domain - Domain for the token (default: neture.co.kr)
  * @returns AuthTokens object with both tokens
  */
-export function generateTokens(user: User, roles: string[], domain: string = 'neture.co.kr', memberships?: { serviceKey: string; status: string; role?: string }[], reuseTokenFamily?: string | null, serviceKey?: string | null): AuthTokens {
+export function generateTokens(user: User, roles: string[], domain: string = 'neture.co.kr', memberships?: { serviceKey: string; status: string; role?: string }[], reuseTokenFamily?: string | null, serviceKey?: string | null, sessionEpoch?: number | null): AuthTokens {
   // WO-O4O-LOGOUT-ALL-TOKEN-INVALIDATION-V1:
   //   reuseTokenFamily 를 넘기면 기존 세션 family 를 그대로 승계한다 (교차 서비스 handoff 용).
   //   넘기지 않으면 새 family 를 발급한다 (신규 로그인).
@@ -163,7 +171,7 @@ export function generateTokens(user: User, roles: string[], domain: string = 'ne
   const accessToken = generateAccessToken(user, roles, domain, memberships);
   // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8: refresh token 에만 싣는다.
   //   access token(15분)은 폐기 대상이 아니다 — 그 한계는 CHECK §6 에 적혀 있다.
-  const refreshToken = generateRefreshToken(user, tokenFamily, serviceKey);
+  const refreshToken = generateRefreshToken(user, tokenFamily, serviceKey, sessionEpoch);
 
   return {
     accessToken,
@@ -245,6 +253,7 @@ export function verifyRefreshToken(token: string): RefreshTokenPayload | null {
       //   사라진다. serviceKey 가 사라지면 서비스 단위 폐기 검사가 legacy 경로로 떨어져
       //   "어느 서비스 로그아웃이든 거절" 이 되고, 다른 서비스 세션이 함께 끊긴다.
       serviceKey: payload.serviceKey,
+      sessionEpoch: payload.sessionEpoch,
       exp: payload.exp,
       iat: payload.iat
     };
@@ -285,6 +294,17 @@ export function getTokenFamily(token: string): string | null {
 export function getRefreshTokenServiceKey(token: string): string | null {
   const payload = verifyRefreshToken(token);
   return payload?.serviceKey || null;
+}
+
+/**
+ * refresh token 의 세션 **세대**. claim 이 없으면 `null`(배포 전 발급분).
+ *
+ * `0` 과 `null` 은 다르다 — 0 은 "아직 한 번도 로그아웃하지 않은 세대", null 은 "어느 세대인지
+ * 모른다" 다. `|| null` 로 합치면 0 이 null 이 되어 첫 로그아웃 뒤 정상 토큰까지 거절된다.
+ */
+export function getRefreshTokenSessionEpoch(token: string): number | null {
+  const payload = verifyRefreshToken(token);
+  return typeof payload?.sessionEpoch === 'number' ? payload.sessionEpoch : null;
 }
 
 /**

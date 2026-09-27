@@ -199,6 +199,18 @@ export interface RefreshTokenPayload {
    * `auth-token-session.service.ts` 의 폐기 검사 주석 참조.
    */
   serviceKey?: string;
+  /**
+   * WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8 — 이 세션의 **세대**.
+   *
+   * 서비스 단위 로그아웃 판정은 시각이 아니라 이 값으로 한다. `iat` 는 **초 단위**라
+   * 같은 초의 기존 토큰과 새 토큰을 구별할 수 없고, 그래서 로그아웃한 같은 초에 다시
+   * 로그인하면 새 토큰까지 거절되는 결함이 있었다. 세대는 단조 증가하므로 시각이 같아도
+   * 선후가 갈린다. 발급 시점의 `service_session_revocations.session_epoch` 를 새긴다.
+   *
+   * 배포 전에 발급된 토큰에는 이 claim 이 **없다** — 처리는 `service-session-epoch.ts` 의
+   * `isSessionEpochLive` 주석 참조.
+   */
+  sessionEpoch?: number;
   // Phase 2.5: Server isolation claims
   iss?: string; // Issuer - identifies the server that issued the token
   aud?: string; // Audience - identifies the intended recipient

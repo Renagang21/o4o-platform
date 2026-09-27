@@ -41,12 +41,28 @@ describe('refresh token family 계약 — logout-all 무효화', () => {
 
   let service: AuthTokenSessionService;
   let user: any;
-  let revocations: Array<{ userId: string; serviceKey: string; revokedAt: Date }> = [];
+  /** `service_session_revocations` 의 in-memory 대역 — 판정 축은 세대다. */
+  let revocations: Array<{ userId: string; serviceKey: string; epoch: number }> = [];
 
-  /** 같은 family 안에서 특정 서비스 귀속으로 refresh token 을 만든다. */
-  const makeServiceToken = (serviceKey: string | null): string =>
-    tokenUtils.generateTokens(user, [], 'neture.co.kr', undefined, user.refreshTokenFamily, serviceKey)
-      .refreshToken;
+  const epochOf = (serviceKey: string): number =>
+    revocations.find((r) => r.userId === USER_ID && r.serviceKey === serviceKey)?.epoch ?? 0;
+
+  /**
+   * 같은 family 안에서 특정 서비스 귀속으로 refresh token 을 만든다.
+   *
+   * 세대를 **지금 값으로** 새긴다 = 실제 발급 경로와 같다(로그인·handoff 가 발급 시점의
+   * 세대를 읽어 새긴다). `epoch` 를 명시하면 배포 전 토큰(claim 없음)이나 임의 세대도 만든다.
+   */
+  const makeServiceToken = (serviceKey: string | null, epoch?: number | null): string =>
+    tokenUtils.generateTokens(
+      user,
+      [],
+      'neture.co.kr',
+      undefined,
+      user.refreshTokenFamily,
+      serviceKey,
+      epoch === undefined ? (serviceKey ? epochOf(serviceKey) : null) : epoch,
+    ).refreshToken;
 
   const makeRefreshTokenForCurrentFamily = (): string => {
     const tokens = tokenUtils.generateTokens(user, [], 'neture.co.kr', undefined, user.refreshTokenFamily);
@@ -79,25 +95,26 @@ describe('refresh token family 계약 — logout-all 무효화', () => {
       manager: {
         query: async (sql: string, params: any[] = []) => {
           const q = sql.replace(/\s+/g, ' ');
+          // 로그아웃 = 세대 +1 (없으면 1). 시각은 감사용이라 판정에 쓰지 않는다.
           if (/^INSERT INTO service_session_revocations/i.test(q)) {
             const [userId, serviceKey] = params;
             const found = revocations.find((r) => r.userId === userId && r.serviceKey === serviceKey);
-            if (found) found.revokedAt = new Date();
-            else revocations.push({ userId, serviceKey, revokedAt: new Date() });
-            return [];
+            if (found) found.epoch += 1;
+            else revocations.push({ userId, serviceKey, epoch: 1 });
+            const epoch = found ? found.epoch : 1;
+            return [{ session_epoch: epoch }];
           }
-          if (/FROM service_session_revocations/i.test(q)) {
-            // serviceKey 지정 질의(파라미터 3개)와 legacy 전체 질의(2개)를 구분한다.
-            const perService = params.length === 3;
+          // serviceKey 를 모르는 토큰의 판정 — 그 사용자의 최대 세대.
+          if (/max\(session_epoch\)/i.test(q)) {
             const [userId] = params;
-            const serviceKey = perService ? params[1] : undefined;
-            const issuedAt: Date = perService ? params[2] : params[1];
-            return revocations
-              .filter((r) => r.userId === userId)
-              .filter((r) => (perService ? r.serviceKey === serviceKey : true))
-              .filter((r) => r.revokedAt > issuedAt)
-              .slice(0, 1)
-              .map((r) => ({ revoked_at: r.revokedAt }));
+            const rows = revocations.filter((r) => r.userId === userId);
+            return [{ max_epoch: rows.length ? Math.max(...rows.map((r) => r.epoch)) : null }];
+          }
+          // 현재 세대 단건 조회.
+          if (/SELECT session_epoch FROM service_session_revocations/i.test(q)) {
+            const [userId, serviceKey] = params;
+            const found = revocations.find((r) => r.userId === userId && r.serviceKey === serviceKey);
+            return found ? [{ session_epoch: found.epoch }] : [];
           }
           return [];
         },
@@ -260,19 +277,52 @@ describe('refresh token family 계약 — logout-all 무효화', () => {
       });
     });
 
-    it('로그아웃 **뒤에 새로 로그인**하면 통과한다 (영구 차단이 아니다)', async () => {
+    /**
+     * ⚠ 처음에는 이 케이스를 **재로그인 시각을 2초 뒤로 옮겨** 통과시켰다. 그것은 검사가
+     * 아니라 은폐였다 — 실제로는 `iat` 가 초 단위라서 **같은 초에 재로그인하면 거절**됐다.
+     * 시간 여행 없이, 로그아웃과 재발급이 같은 순간에 일어나도 통과해야 한다.
+     */
+    it('로그아웃 **직후 같은 순간에 재로그인**해도 통과한다 (시간 이동 없음)', async () => {
       await service.logout(USER_ID, 'neture');
-      // 새 로그인 = 더 늦은 iat. 1초 뒤로 발급해 초 단위 iat 가 확실히 커지게 한다.
-      const later = Math.floor(Date.now() / 1000) + 2;
-      jest.spyOn(Date, 'now').mockReturnValue(later * 1000);
-      try {
-        const fresh = makeServiceToken('neture');
-        await expect(service.refreshTokens(fresh)).resolves.toMatchObject({
-          refreshToken: expect.any(String),
-        });
-      } finally {
-        (Date.now as jest.Mock).mockRestore();
-      }
+
+      const fresh = makeServiceToken('neture'); // 발급 시점의 세대를 새긴다 = 올라간 세대
+      await expect(service.refreshTokens(fresh)).resolves.toMatchObject({
+        refreshToken: expect.any(String),
+      });
+    });
+
+    it('같은 순간의 **직전 토큰과 새 토큰이 갈린다** (iat 만으로는 불가능한 판정)', async () => {
+      const before = makeServiceToken('neture'); // 세대 0
+      await service.logout(USER_ID, 'neture'); // 세대 1
+      const after = makeServiceToken('neture'); // 세대 1
+
+      // 두 토큰의 iat 는 같은 초일 수 있다. 세대가 다르므로 정확히 갈린다.
+      expect(tokenUtils.getRefreshTokenSessionEpoch(before)).toBe(0);
+      expect(tokenUtils.getRefreshTokenSessionEpoch(after)).toBe(1);
+
+      await expect(service.refreshTokens(before)).rejects.toMatchObject({
+        code: 'SERVICE_SESSION_REVOKED',
+      });
+      await expect(service.refreshTokens(after)).resolves.toBeTruthy();
+    });
+
+    it('연속 로그아웃도 세대가 계속 올라간다 (같은 순간이어도)', async () => {
+      await service.logout(USER_ID, 'neture');
+      const gen1 = makeServiceToken('neture');
+      await service.logout(USER_ID, 'neture');
+
+      expect(epochOf('neture')).toBe(2);
+      await expect(service.refreshTokens(gen1)).rejects.toMatchObject({
+        code: 'SERVICE_SESSION_REVOKED',
+      });
+      await expect(service.refreshTokens(makeServiceToken('neture'))).resolves.toBeTruthy();
+    });
+
+    it('세대 0 은 유효한 값이다 — claim 없음으로 취급하지 않는다', async () => {
+      // 0 을 truthy 검사로 걸러내면 그 토큰이 '배포 전 토큰' 이 되어 첫 로그아웃 뒤 거절된다.
+      const token = makeServiceToken('neture');
+      expect(tokenUtils.getRefreshTokenSessionEpoch(token)).toBe(0);
+      await expect(service.refreshTokens(token)).resolves.toBeTruthy();
     });
 
     it('logout 은 전역 축(users.refreshTokenFamily)을 건드리지 않는다', async () => {
@@ -295,13 +345,20 @@ describe('refresh token family 계약 — logout-all 무효화', () => {
 
     it('serviceKey claim 이 없는 **배포 전 토큰**은 어느 서비스 로그아웃에도 거절된다 (보안 후퇴 금지)', async () => {
       // 이 변경 배포 전 발급분 = claim 없음. 통과시키면 7일간 로그아웃이 무력해진다.
-      const legacyToken = makeServiceToken(null);
+      const legacyToken = makeServiceToken(null, null);
       expect(tokenUtils.getRefreshTokenServiceKey(legacyToken)).toBeNull();
+      expect(tokenUtils.getRefreshTokenSessionEpoch(legacyToken)).toBeNull();
 
       await service.logout(USER_ID, 'kpa-society');
       await expect(service.refreshTokens(legacyToken)).rejects.toMatchObject({
         code: 'SERVICE_SESSION_REVOKED',
       });
+    });
+
+    it('폐기 기록이 **아예 없으면** 배포 전 토큰도 통과한다 (배포만으로 전원 로그아웃 금지)', async () => {
+      const legacyToken = makeServiceToken(null, null);
+      expect(revocations).toEqual([]);
+      await expect(service.refreshTokens(legacyToken)).resolves.toBeTruthy();
     });
 
     it('logout-all 은 여전히 전역 폐기다 — 위임이 아니라 자기 구현으로', async () => {

@@ -43,6 +43,7 @@ import { isHandoffWorkspace } from '../../../services/handoff-token.service.js';
 import { isRepresentativeEntryTarget, isRepresentativeEntryExchangeOrigin } from '../../../config/representative-entry.js';
 import { resolveAccountAccess } from '../../../common/auth/account-access.policy.js';
 import { resolveSessionServiceKey } from '../../../utils/session-origin.js';
+import { readServiceSessionEpoch } from '../../../services/auth/service-session-epoch.js';
 import logger from '../../../utils/logger.js';
 
 /**
@@ -476,6 +477,9 @@ export class HandoffController extends BaseController {
     //   이 토큰만 무효가 되고 원 서비스 세션은 살아 있어야 한다.
     //   WORKSPACE handoff(store)는 서비스가 아니므로 workspace 키를 그대로 쓴다.
     const sessionServiceKey = target.targetServiceKey ?? target.targetWorkspace ?? null;
+    // 대상 서비스의 **현재 세대**를 새긴다. 원 서비스의 세대가 아니다 — handoff 로 만들어지는
+    // 것은 대상 서비스의 세션이고, 그 서비스에서 로그아웃하면 이 토큰이 끊겨야 한다.
+    const sessionEpoch = await readServiceSessionEpoch(user.id, sessionServiceKey);
     const tokens = tokenUtils.generateTokens(
       user,
       roles,
@@ -483,6 +487,7 @@ export class HandoffController extends BaseController {
       memberships,
       user.refreshTokenFamily ?? null,
       sessionServiceKey,
+      sessionEpoch,
     );
     await persistRefreshTokenFamily(user.id, tokens.refreshToken);
 

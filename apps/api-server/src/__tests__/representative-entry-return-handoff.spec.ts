@@ -11,13 +11,19 @@
  * DB 접속 없음 — AppDataSource / 토큰 유틸은 double. 토큰 소비는 handoff-token.service 의 실제 SQL 경로를 탄다.
  */
 
-const query = jest.fn();
+// 실제 TypeORM `query` 는 언제나 배열을 돌려준다. double 이 undefined 를 주면 호출부가
+// 그것을 '행 0건' 으로 오해하거나 터지므로 기본값을 배열로 둔다 — 개별 테스트가 덮어쓴다.
+const query = jest.fn().mockResolvedValue([]);
 const findOne = jest.fn();
 jest.mock('../database/connection.js', () => ({
   AppDataSource: {
     isInitialized: true,
     query: (...args: unknown[]) => query(...args),
     getRepository: () => ({ findOne: (...args: unknown[]) => findOne(...args) }),
+    // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8: handoff 가 대상 서비스의 세션
+    //   **세대**를 읽어 토큰에 새긴다(같은 초 로그아웃/재로그인을 iat 로는 구별할 수 없어
+    //   시간 비교를 버렸다). 같은 query double 로 위임해 SQL 호출이 그대로 집계된다.
+    manager: { query: (...args: unknown[]) => query(...args) },
   },
 }));
 jest.mock('../modules/auth/entities/User.js', () => ({ User: class User {} }));
@@ -64,6 +70,9 @@ const sqlCalls = () => query.mock.calls.map((c) => norm(String(c[0])));
 
 beforeEach(() => {
   query.mockReset();
+  // mockReset 은 구현까지 지운다 → 기본 반환이 undefined 가 된다. 실제 TypeORM `query` 는
+  // 언제나 배열이므로 기본값을 되돌린다(개별 테스트가 필요하면 다시 덮어쓴다).
+  query.mockResolvedValue([]);
   findOne.mockReset();
   getRoleNames.mockClear();
   generateTokens.mockClear();
@@ -209,13 +218,16 @@ describe('C. exchangeHandoff', () => {
       // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8: 마지막 인자 = 이 세션이 속한 서비스.
       //   handoff 로 발급되는 토큰은 **대상 서비스의 세션**이어야 한다. 그러지 않으면 그 서비스에서
       //   로그아웃해도 이 토큰을 지목할 수 없다(서비스 단위 무효화가 무력해진다).
-      expect(generateTokens).toHaveBeenCalledWith(KPA_ONLY_USER, ['kpa:store_owner'], 'neture.co.kr', KPA_ONLY_MEMBERSHIPS, 'fam-1', 'neture');
+      expect(generateTokens).toHaveBeenCalledWith(KPA_ONLY_USER, ['kpa:store_owner'], 'neture.co.kr', KPA_ONLY_MEMBERSHIPS, 'fam-1', 'neture', 0);
       expect(persistRefreshTokenFamily).toHaveBeenCalledWith('user-1', 'RT');
-      // SQL 은 토큰 consume(UPDATE handoff_tokens) + memberships SELECT 뿐 — membership·role 생성/수정 0
+      // SQL 은 토큰 consume(UPDATE handoff_tokens) + memberships SELECT + 세션 세대 SELECT 뿐 —
+      //   membership·role 생성/수정 0. 세 번째는 WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8 이
+      //   더한 **읽기**다(대상 서비스의 현재 세대를 토큰에 새긴다). write 0 계약은 그대로다.
       const sql = sqlCalls();
-      expect(sql).toHaveLength(2);
+      expect(sql).toHaveLength(3);
       expect(sql[0]).toContain('UPDATE handoff_tokens');
       expect(sql[1]).toMatch(/^SELECT .* FROM service_memberships/);
+      expect(sql[2]).toMatch(/^SELECT session_epoch FROM service_session_revocations/);
       expect(sql.join(' ')).not.toMatch(/INSERT|DELETE|UPDATE service_memberships|role_assignments/);
     });
   });

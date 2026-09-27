@@ -1,5 +1,6 @@
 import { AppDataSource } from '../../database/connection.js';
 import { compatPrimaryRole } from '../../utils/compat-primary-role.js';
+import { readServiceSessionEpoch } from './service-session-epoch.js';
 import { roleAssignmentService } from '../../modules/auth/services/role-assignment.service.js';
 import * as tokenUtils from '../../utils/token.utils.js';
 import type { User } from '../../entities/User.js';
@@ -44,9 +45,19 @@ export async function generateTokensWithContext(
   serviceKey?: string | null,
 ): Promise<{ tokens: AuthTokens; roles: string[]; memberships: { serviceKey: string; status: string; role?: string }[] }> {
   const ctx = await freshenUserContext(user.id);
-  // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8: 어느 서비스에서 로그인했는지 refresh
-  //   token 에 남긴다. 없으면 서비스 단위 로그아웃이 이 세션을 지목할 수 없다.
-  const tokens = tokenUtils.generateTokens(user, ctx.roles, domain, ctx.memberships, null, serviceKey);
+  // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8: 어느 서비스에서 로그인했는지와 그
+  //   서비스의 현재 **세대**를 refresh token 에 남긴다. 서비스가 없으면 세대도 없다.
+  //   세대를 새기지 않으면 로그아웃 뒤 재로그인한 토큰이 "배포 전 토큰" 으로 취급돼 거절된다.
+  const sessionEpoch = await readServiceSessionEpoch(user.id, serviceKey);
+  const tokens = tokenUtils.generateTokens(
+    user,
+    ctx.roles,
+    domain,
+    ctx.memberships,
+    null,
+    serviceKey,
+    sessionEpoch,
+  );
   return { tokens, ...ctx };
 }
 

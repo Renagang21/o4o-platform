@@ -22,13 +22,19 @@ const norm = (s: string) => s.replace(/\s+/g, ' ').trim();
 // Module doubles
 // ─────────────────────────────────────────────────────────────────────────────
 
-const query = jest.fn();
+// 실제 TypeORM `query` 는 언제나 배열을 돌려준다. double 이 undefined 를 주면 호출부가
+// 그것을 '행 0건' 으로 오해하거나 터지므로 기본값을 배열로 둔다 — 개별 테스트가 덮어쓴다.
+const query = jest.fn().mockResolvedValue([]);
 const findOne = jest.fn();
 jest.mock('../database/connection.js', () => ({
   AppDataSource: {
     isInitialized: true,
     query: (...args: unknown[]) => query(...args),
     getRepository: () => ({ findOne: (...args: unknown[]) => findOne(...args) }),
+    // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8: handoff 가 대상 서비스의 세션
+    //   **세대**를 읽어 토큰에 새긴다(같은 초 로그아웃/재로그인을 iat 로는 구별할 수 없어
+    //   시간 비교를 버렸다). 같은 query double 로 위임해 SQL 호출이 그대로 집계된다.
+    manager: { query: (...args: unknown[]) => query(...args) },
   },
 }));
 jest.mock('../modules/auth/entities/User.js', () => ({ User: class User {} }));
@@ -77,6 +83,9 @@ const uuid = '11111111-2222-4333-8444-555555555555';
 
 beforeEach(() => {
   query.mockReset();
+  // mockReset 은 구현까지 지운다 → 기본 반환이 undefined 가 된다. 실제 TypeORM `query` 는
+  // 언제나 배열이므로 기본값을 되돌린다(개별 테스트가 필요하면 다시 덮어쓴다).
+  query.mockResolvedValue([]);
   findOne.mockReset();
   resolveAccessibleStores.mockReset();
   generateTokens.mockClear();
@@ -262,9 +271,10 @@ describe('D. exchangeHandoff — origin 고정 · organization 재검증 · serv
     expect(res.body.data.targetWorkspace).toBe('store');
     expect(res.body.data).not.toHaveProperty('targetServiceKey');
     expect(res.body.data.tokens).toEqual({ accessToken: 'AT', refreshToken: 'RT', expiresIn: 900 });
-    // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8: 마지막 인자 = 이 세션이 속한 대상.
-    //   WORKSPACE handoff 는 서비스가 아니므로 workspace 키('store')를 그대로 새긴다.
-    expect(generateTokens).toHaveBeenCalledWith(USER, ['store_owner'], 'neture.co.kr', memberships, 'fam-1', 'store');
+    // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8: 끝 두 인자 = 이 세션이 속한 대상과
+    //   그 대상의 **현재 세대**. WORKSPACE handoff 는 서비스가 아니므로 workspace 키를 쓴다.
+    //   세대를 새기지 않으면 그 대상에서 로그아웃한 뒤 재발급된 토큰까지 거절된다.
+    expect(generateTokens).toHaveBeenCalledWith(USER, ['store_owner'], 'neture.co.kr', memberships, 'fam-1', 'store', 0);
     expect(persistRefreshTokenFamily).toHaveBeenCalledWith('user-1', 'RT');
     // exchange 는 쿠키를 내리지 않는다 — body 토큰만(URL-FIRST-CENSUS §19-1 · §21-2).
     //   이미 배포된 HandoffPage 가 credentials:'include' 로 호출해도 저장될 쿠키가 없다.
@@ -313,8 +323,9 @@ describe('D. exchangeHandoff — origin 고정 · organization 재검증 · serv
     expect(res.statusCode).toBe(200);
     expect(res.body.data.targetServiceKey).toBe('kpa-society');
     expect(res.body.data).not.toHaveProperty('targetWorkspace');
-    // SERVICE handoff 는 대상 서비스 키를 새긴다 — 그 서비스 로그아웃이 이 토큰을 지목할 수 있어야 한다.
-    expect(generateTokens).toHaveBeenCalledWith(USER, ['store_owner'], 'neture.co.kr', memberships, 'fam-1', 'kpa-society');
+    // SERVICE handoff 는 대상 서비스 키와 그 서비스의 세대를 새긴다 —
+    //   그 서비스 로그아웃이 이 토큰을 지목할 수 있어야 한다.
+    expect(generateTokens).toHaveBeenCalledWith(USER, ['store_owner'], 'neture.co.kr', memberships, 'fam-1', 'kpa-society', 0);
     expect(resolveAccessibleStores).not.toHaveBeenCalled();
   });
 

@@ -8,6 +8,12 @@ import * as cookieUtils from '../../utils/cookie.utils.js';
 import { freshenUserContext } from './auth-context.helper.js';
 import { resolveAccountAccess } from '../../common/auth/account-access.policy.js';
 import logger from '../../utils/logger.js';
+import {
+  INITIAL_SESSION_EPOCH,
+  bumpServiceSessionEpoch,
+  isSessionEpochLive,
+  readServiceSessionEpoch,
+} from './service-session-epoch.js';
 
 /**
  * AuthTokenSessionService
@@ -141,14 +147,16 @@ export class AuthTokenSessionService {
     //   새 로그인 = 새 family / logout·logout-all = family null 계약은 그대로다.
     const ctx = await freshenUserContext(user.id);
     // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8: 회전은 같은 세션의 연장이므로
-    //   serviceKey 를 **승계**한다. 떨어뜨리면 회전 한 번으로 서비스 단위 로그아웃이 무력해진다.
+    //   serviceKey 와 **세대를 그대로 승계**한다. 세대를 다시 읽으면 로그아웃 뒤에도 회전
+    //   한 번으로 최신 세대를 얻어 세션이 부활한다. 떨어뜨리면 반대로 정상 세션이 끊긴다.
     const tokens = tokenUtils.generateTokens(
       user,
       ctx.roles,
       'neture.co.kr',
       ctx.memberships,
       payload.tokenFamily,
-      payload.serviceKey ?? null
+      payload.serviceKey ?? null,
+      payload.sessionEpoch ?? null
     );
 
     // family 는 승계됐으므로 users 갱신이 필요 없다. 방어적으로 값이 다를 때만 저장한다.
@@ -180,8 +188,13 @@ export class AuthTokenSessionService {
     //   종전 2차: 아무것도 하지 않고 기록만 남겼다. 그러면 **이미 발급된 refresh token 이
     //     서버에서 계속 유효**하므로 "세션 종료" 가 아니다.
     //
-    //   이제는 `service_session_revocations` 에 그 서비스의 폐기 시각을 남긴다. refresh 는
-    //   토큰의 `iat` 를 이 값과 비교해 거절한다(아래 assertServiceSessionNotRevoked).
+    //   이제는 `service_session_revocations` 의 **세대를 올린다.** refresh 는 토큰에 새겨진
+    //   세대를 현재 세대와 비교해 거절한다(아래 assertServiceSessionNotRevoked).
+    //
+    //   ⚠ 처음에는 폐기 **시각**과 토큰 `iat` 를 비교했다. `iat` 는 초 단위라 같은 초의 기존
+    //   토큰과 새 토큰을 구별할 수 없고, 로그아웃한 같은 초에 다시 로그인하면 새 토큰까지
+    //   거절됐다. 그래서 시간 비교를 버렸다.
+    //
     //   `users.refreshTokenFamily` 는 손대지 않는다 — 그것은 전역 축이고 logout-all 의 것이다.
     if (!serviceKey) {
       // 서비스를 식별하지 못하면 **무효화 범위를 정할 수 없다.** 전역 폐기로 확대하지 않고
@@ -190,60 +203,51 @@ export class AuthTokenSessionService {
       return;
     }
 
-    await this.userRepository.manager.query(
-      `INSERT INTO service_session_revocations (user_id, service_key, revoked_at, updated_at)
-       VALUES ($1, $2, now(), now())
-       ON CONFLICT (user_id, service_key)
-       DO UPDATE SET revoked_at = now(), updated_at = now()`,
-      [userId, serviceKey],
-    );
-    logger.info('[logout] service session revoked', { userId, serviceKey });
+    const epoch = await bumpServiceSessionEpoch(userId, serviceKey, this.userRepository.manager);
+    logger.info('[logout] service session revoked', { userId, serviceKey, sessionEpoch: epoch });
   }
 
   /**
-   * 이 refresh token 이 속한 서비스 세션이 폐기됐는지.
+   * 이 refresh token 이 속한 서비스 세션이 아직 살아 있는지.
    *
-   * 판정은 **발급 시각 대비**다: `iat < revoked_at` 이면 그 로그아웃보다 먼저 발급된
-   * 토큰이므로 거절한다. 로그아웃 뒤 다시 로그인하면 새 토큰의 `iat` 가 더 크므로 통과한다.
+   * 판정은 **세대 비교**다 — `token.sessionEpoch < 현재 epoch` 이면 그 로그아웃보다 먼저
+   * 발급된 토큰이므로 거절한다. 시각을 보지 않으므로 같은 초·같은 밀리초에 일어난
+   * 로그아웃 → 재로그인도 정확히 갈린다.
    *
-   * `serviceKey` claim 이 없는 토큰(이 변경 배포 전 발급분)은 **어느 서비스인지 알 수 없다.**
-   * 그것을 통과시키면 배포 직후 최대 7일(refresh 수명) 동안 로그아웃이 무력해진다. 그래서
-   * 그 동안은 **폐기 행이 하나라도 그 iat 보다 나중이면 거절**한다 — 종전(전역 폐기) 동작과
-   * 같은 수준이므로 보안이 후퇴하지 않고, 새 토큰부터는 서비스 단위로 정확해진다.
+   * `serviceKey` claim 이 없는 토큰(배포 전 발급분)은 어느 세션인지 알 수 없다. 그 사용자에게
+   * 폐기 기록이 하나라도 있으면 거절한다 — 통과시키면 배포 직후 최대 7일간 로그아웃이
+   * 무력해진다. 폐기 기록이 아예 없으면 통과한다(배포만으로 전원을 로그아웃시키지 않는다).
    */
   private async assertServiceSessionNotRevoked(payload: {
     userId: string;
     serviceKey?: string;
-    iat?: number;
+    sessionEpoch?: number;
   }): Promise<void> {
-    if (!payload.iat) return; // iat 없는 토큰은 verify 단계에서 이미 걸러진다.
-    const issuedAt = new Date(payload.iat * 1000);
+    const m = this.userRepository.manager;
 
-    const rows: Array<{ revoked_at: Date }> = payload.serviceKey
-      ? await this.userRepository.manager.query(
-          `SELECT revoked_at FROM service_session_revocations
-            WHERE user_id = $1 AND service_key = $2 AND revoked_at > $3
-            LIMIT 1`,
-          [payload.userId, payload.serviceKey, issuedAt],
-        )
-      : await this.userRepository.manager.query(
-          `SELECT revoked_at FROM service_session_revocations
-            WHERE user_id = $1 AND revoked_at > $2
-            LIMIT 1`,
-          [payload.userId, issuedAt],
-        );
-
-    if (rows.length > 0) {
-      logger.warn('[refreshTokens] refresh rejected — service session revoked', {
-        userId: payload.userId,
-        serviceKey: payload.serviceKey ?? 'UNKNOWN_LEGACY_TOKEN',
-      });
-      const error = new Error('세션이 종료되었습니다. 다시 로그인해 주세요.') as Error & {
-        code: string;
-      };
-      error.code = 'SERVICE_SESSION_REVOKED';
-      throw error;
+    if (!payload.serviceKey) {
+      // 서비스를 모르는 토큰 → 이 사용자에게 폐기 기록이 하나라도 있으면 거절.
+      const rows: Array<{ max_epoch: number | null }> = await m.query(
+        `SELECT max(session_epoch) AS max_epoch FROM service_session_revocations WHERE user_id = $1`,
+        [payload.userId],
+      );
+      const maxEpoch = Number(rows[0]?.max_epoch ?? 0);
+      if (isSessionEpochLive(payload.sessionEpoch ?? null, maxEpoch)) return;
+      this.throwServiceSessionRevoked(payload.userId, 'UNKNOWN_LEGACY_TOKEN');
     }
+
+    const currentEpoch = await readServiceSessionEpoch(payload.userId, payload.serviceKey, m);
+    if (isSessionEpochLive(payload.sessionEpoch, currentEpoch ?? INITIAL_SESSION_EPOCH)) return;
+    this.throwServiceSessionRevoked(payload.userId, payload.serviceKey!);
+  }
+
+  private throwServiceSessionRevoked(userId: string, serviceKey: string): never {
+    logger.warn('[refreshTokens] refresh rejected — service session revoked', { userId, serviceKey });
+    const error = new Error('세션이 종료되었습니다. 다시 로그인해 주세요.') as Error & {
+      code: string;
+    };
+    error.code = 'SERVICE_SESSION_REVOKED';
+    throw error;
   }
 
   /**
