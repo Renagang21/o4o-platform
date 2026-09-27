@@ -78,7 +78,7 @@ URL 트랙의 "서비스 키 · role prefix 일괄 변경 금지" 와 **충돌�
 | 1 | `neture` | `neture` 유지 | — | 배너(가입 서비스 목록) · 로그인 전 AI 입력창 노출 |
 | 2 | `supplier` | **`supplier` 신설 필요** | — | §4 충돌 절 참조 |
 | 3 | `funding` | **`funding` 신설 필요** | — | 〃 |
-| 4 | `community` | **`community` 신설 필요**(전체 관리자 축) | **커뮤니티 개체** | 개설 신청·승인 · 커뮤니티 membership · 범위 가드 |
+| 4 | `community` | **`community:admin` 신설**(전체 관리자 축만) | **커뮤니티 개체**(`role`+`status`) | 개설 신청·승인 · 커뮤니티 membership · 범위 가드 |
 | 5 | `pharmacy` | `kpa-society` **재사용** | — | 가입 승인 경로 정비 |
 | 6 | `retail` | `k-cosmetics` **재사용** | — | 〃 |
 | 7 | `kpa` | `kpa-branch` **재사용** | **분회 개체(있음)** | 개설 신청·승인 + 주소 2회 검사 + 첫 운영자 |
@@ -97,12 +97,33 @@ communities                 id · slug(UNIQUE) · name · status(pending|active|
                             created_by_user_id · approved_by_user_id · approved_at
 community_creation_requests id · requester_user_id · desired_slug · name · status
                             (pending|approved|rejected|slug_conflict) · reviewed_by · reason
-community_memberships       id · community_id · user_id · role(operator|member)
-                            · status(pending|active|rejected|withdrawn)   UNIQUE(community_id,user_id)
+community_memberships       id · community_id · user_id
+                            role(operator|member)            ← 개체 단위 역할
+                            status(pending|active|rejected|withdrawn)
+                            UNIQUE(community_id, user_id)
 ```
 
+> **운영자 권한은 `community_id` 일치로 결정되지 않는다.** 승인된 일반 회원도 같은
+> `community_id` 를 갖는다. 운영자 판정은 **`role='operator'` AND `status='active'`** 다(§3-3).
+
 기존 `config/community-catalog.ts` 3개(`pharmacy`·`cosmetics`·`o4o-general`)는 **삭제하지 않는다.**
-읽기 경로를 DB 우선 + 카탈로그 폴백으로 두어 기존 진입을 깨지 않는다.
+읽기 경로를 DB 우선 + 카탈로그 폴백으로 두어 **진입(목록·상세)** 은 깨지 않는다.
+
+> **⚠ 폴백이 가입 승인 검사를 우회해서는 안 된다.**
+> 기존 진입을 보존하는 것과 **승인 없이 글을 읽고 쓰게 하는 것은 별개다.**
+>
+> ```text
+> 폴백이 커버하는 것:   커뮤니티 목록 · 상세 조회(메타데이터)
+> 폴백이 커버하지 않는 것: 게시글 읽기 · 작성 · 중재 · 가입 승인
+> ```
+>
+> 카탈로그 3개도 **DB 로 승격**(`communities` 행 생성)하고, 게시글 경로는 **예외 없이**
+> `requireCommunityScope` 를 지난다. 즉 `participationPolicy`(`authenticated` ·
+> `service_membership_any`)가 **게시글 권한을 대신 판정하지 않는다.**
+>
+> **영향**: 지금 서비스 membership 만으로 포럼을 보던 경로가 **가입 승인 필요**로 바뀐다.
+> 현재는 개발·검증 단계이고 일반 사용자가 없어 수용 가능하다. 기존 참여자 처리 방침은
+> S2 에서 실측(대상 행 수) 후 정한다 — **임의 일괄 승인은 하지 않는다.**
 
 ### 3-2. 흐름
 
@@ -120,16 +141,41 @@ community_memberships       id · community_id · user_id · role(operator|membe
 
 ### 3-3. 검사 지점
 
-| 권한 | 검사 |
-|---|---|
-| 개설 승인 | `community:operator`(전체 관리자 축) |
-| 커뮤니티 가입 승인 | `resolveCommunity` → `requireCommunityScope('operator')` — **그 커뮤니티 membership.role='operator'** |
-| 게시글 관리 | 〃 |
-| 게시글 읽기·작성 | 그 커뮤니티 membership `status='active'` |
+| 권한 | 검사 | 범위 |
+|---|---|---|
+| **개설 신청 승인** | `community:admin` (전체 관리자) | 서비스 전체 |
+| **커뮤니티 가입 승인** | `requireCommunityScope('operator')` | **그 커뮤니티만** |
+| **게시글 관리(중재)** | 〃 | 그 커뮤니티만 |
+| **게시글 읽기·작성** | `requireCommunityScope('member')` | 그 커뮤니티만 |
 
-`resolveCommunity` 는 `params.communitySlug`(없으면 Host)로 개체를 확정하고,
-`requireCommunityScope` 가 **`community_memberships.community_id === req.community.id`** 를 비교한다.
-**다른 커뮤니티 ID·URL 을 넘겨도 서버가 거부한다**(분회의 `BRANCH_SCOPE_MISMATCH` 와 같은 형태).
+### 3-3-1. `requireCommunityScope` — ID 일치만으로 통과시키지 않는다
+
+```text
+resolveCommunity   params.communitySlug (없으면 Host) → req.community 확정. 없으면 404
+
+requireCommunityScope(level)
+  1. community_memberships(user_id, community_id = req.community.id) 조회
+  2. 행이 없거나 status !== 'active'                     → 403 COMMUNITY_MEMBERSHIP_REQUIRED
+  3. level === 'operator' 인데 role !== 'operator'        → 403 COMMUNITY_OPERATOR_REQUIRED
+  4. 통과
+```
+
+**세 조건이 모두 필요하다** — 개체 일치 · `status='active'` · (운영자 요구 시) `role='operator'`.
+`community_id` 일치만 보면 **승인된 일반 회원이 운영 기능을 통과**한다. 그것이 이 절의 존재 이유다.
+
+> 다른 커뮤니티의 ID·URL 을 넘기면 1~2 에서 걸린다(분회의 `BRANCH_SCOPE_MISMATCH` 와 같은 형태).
+> `community:admin` 을 여기서 bypass 시킬지는 **열지 않는다** — 전체 관리자는 개설 승인 경로에서만
+> 쓰고, 개별 커뮤니티 운영 기능은 개체 역할로만 통과시킨다.
+
+### 3-3-2. 첫 운영자 부여 범위 — 전체 권한을 주지 않는다
+
+```text
+개설 승인 시 부여하는 것:  community_memberships(role='operator', status='active')   ← 개체만
+부여하지 않는 것:          community:admin · community:operator (서비스 전체 역할)
+```
+
+신청자가 첫 운영자가 되는 것은 **그 커뮤니티에 한정**된다. 전체 서비스 운영 권한이
+따라붙으면 개설만으로 다른 커뮤니티 개설을 승인할 수 있게 된다 — 만들지 않는다.
 
 ## 4. ⚠️ 충돌 지점 — `supplier` · `funding` · `community` 서비스 키 신설
 
@@ -150,8 +196,17 @@ branch_creation_requests  id · requester_user_id · desired_slug · desired_hos
                           · status(pending|approved|rejected|slug_conflict) · reviewed_by · reason
 ```
 
-- 승인 주체: **`kpa-branch:operator`**(= `kpa.neture.co.kr` 운영자). 기존 super_admin 전용
-  `POST /admin/branches` 는 **남긴다**(플랫폼 경로).
+- 승인 주체: **`kpa-branch:admin`** — `kpa.neture.co.kr` **서브도메인 전체 운영자**.
+  기존 super_admin 전용 `POST /admin/branches` 는 **남긴다**(플랫폼 경로).
+
+  > **`kpa-branch:operator` 로 열면 안 된다(실측).** 이 역할은 **서비스 전역 역할**이고,
+  > 개별 분회 한정은 `branch_memberships` + `requireBranchScope` 가 따로 만든다.
+  > 즉 **개별 분회 운영자도 `kpa-branch:operator` 를 갖는다** — 승인을 이 역할로 열면
+  > A 분회 운영자가 B 분회 개설을 승인할 수 있다.
+  >
+  > `kpa-branch:admin` 은 이미 존재한다(`20270305000000-SeedKpaBranchServiceAndRoles`:
+  > "분회 서비스 전체 관리 (분회 registry / 도메인 승인)" · `assignable: true`).
+  > 다만 **Admin 지정 카탈로그에는 없어** 화면에서 줄 수 없다 → §9 에서 추가한다.
 - 주소 검사 2회: 신청 시 + 승인 직전. 충돌 시 `slug_conflict` → 신청자 재제출.
 - 승인 시: `kpa_organizations` 생성 + 신청자를 `branch_memberships(active)` + `kpa-branch:operator` 부여.
 - **`requireBranchScope` 경계 유지** — 새 경로가 다른 분회로 권한을 넓히지 않는지 테스트로 고정.
@@ -176,6 +231,11 @@ Google 계정 세션은 건드리지 않는다(`google.accounts.id.disableAutoSe
 
 ```text
 S1  설계 문서 고정                                  ← 이 문서
+S1' 권한 경계 보정 (2026-09-27) — 아래 3건. S2 착수 전 완료
+      ① requireCommunityScope 가 ID 일치만 검사하지 않는다 (role+status)
+      ② 첫 운영자에게 전체 서비스 역할을 주지 않는다
+      ③ 분회 개설 승인은 kpa-branch:admin (개별 분회 운영자 제외)
+      ④ 카탈로그 폴백이 가입 승인 검사를 우회하지 않는다
 S2  커뮤니티 도메인 (테이블 · 신청/승인 · membership · scope guard · 테스트)
 S3  분회 개설 신청/승인 (+ 주소 2회 검사 · 첫 운영자)
 S4  서비스 키 3개 추가 (supplier · funding · community) + 역할 + Admin 지정 대상
@@ -187,3 +247,29 @@ S8  CI → 원본 재확인(study 포함) → 통제 배포 → 결과표 → �
 
 **migration 원칙**: 새 테이블은 incremental migration + `manifest.ts` + `expected-schema-states.ts`
 를 **같은 커밋**에 넣고, fingerprint 는 격리 PostgreSQL 15 에서 만든다(운영 복사 금지).
+
+---
+
+## 9. Admin 지정 카탈로그 — 추가할 역할
+
+| 역할 | 왜 |
+|---|---|
+| `kpa-branch:admin` | **이미 roles 에 있으나 지정 카탈로그에 없다.** 분회 개설 승인 주체를 화면에서 지정하려면 필요하다. 개별 분회 운영자(`kpa-branch:operator`)와 **분리된 상위 권한**임을 라벨에 명시한다 |
+| `community:admin` | 커뮤니티 전체 관리자(개설 승인). 신설 |
+| `supplier:admin` · `supplier:operator` | §4 새 키 |
+| `funding:admin` · `funding:operator` | 〃 |
+
+**주지 않는 것**: `community:operator` — 개별 커뮤니티 운영은 **개체 membership** 으로만 하고
+서비스 전역 operator 역할을 만들지 않는다(§3-3-2 와 같은 이유).
+
+## 10. 검증 항목 — 권한 경계 (S2 에서 테스트로 고정)
+
+| # | 고정할 것 | 실패 시 의미 |
+|---|---|---|
+| V1 | 승인된 **일반 회원**이 그 커뮤니티 운영 기능에서 **403** | ID 일치만 검사하는 구멍 |
+| V2 | `status='pending'` 회원이 게시글 읽기·작성에서 **403** | 승인 우회 |
+| V3 | A 커뮤니티 운영자가 **B 커뮤니티** ID·URL 로 요청 → **403** | 개체 간 월권 |
+| V4 | 개설 승인으로 만들어진 첫 운영자에게 `community:admin`/`:operator` **미부여** | 권한 승격 |
+| V5 | `kpa-branch:operator` 만 가진 사용자의 **분회 개설 승인 요청 → 403** | 개별 분회 운영자의 상위 권한 획득 |
+| V6 | A 분회 운영자가 **B 분회** 관리 요청 → **403**(기존 `BRANCH_SCOPE_MISMATCH` 유지) | 기존 경계 회귀 |
+| V7 | 카탈로그 폴백 커뮤니티(`pharmacy`·`cosmetics`·`o4o-general`)의 게시글 경로도 **동일한 가입 승인 검사** | 폴백 우회 |
