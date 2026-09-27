@@ -1,8 +1,9 @@
 # CHECK-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1
 
-> 시작: 2026-09-27 · 상태: **`리뷰 반영 후 재검증 중`**
+> 시작: 2026-09-27 · 상태: **`CI_GREEN (리뷰 반영 후) · 병합·운영 적용 대기`**
 > PR: [#241](https://github.com/Renagang21/o4o-platform/pull/241) — 1차 CI green 후
 > **리뷰에서 세 경계가 확정 요구사항과 다르다고 지적돼 같은 PR 에서 정정했다**(§11).
+> 정정 후 재검증: 전 체크 pass · `mergeStateStatus = CLEAN`.
 > WO: [`WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1`](../work-orders/WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1.md)
 >
 > **하나의 작업이다.** S2-1 · S2-2 는 내부 구현 순서일 뿐 보고 단위가 아니다.
@@ -403,7 +404,20 @@ Guard Static Analysis               pass
 Detect affected scope               pass  (api + admin + web:neture · global_or_unknown=false)
 ```
 
-**CodeQL code-scanning 게이트가 첫 푸시에서 fail 했다** (workflow 자체는 pass — 별개 게이트).
+**CodeQL code-scanning 게이트가 두 번 fail 했다** (workflow 자체는 pass — 별개 게이트).
+
+두 번 모두 `js/missing-rate-limiting` **high** 이고 오탐이 아니었다. 2차는 리뷰 반영으로
+`/suppliers/*` 9줄을 고치면서 그 줄이 new code 로 판정돼 떴다 — 그 경로들은 원래
+rate limit 이 없었고 각자 DB 조회·갱신을 한다.
+
+| 회차 | 위치 | 조치 |
+|---|---|---|
+| 1차 | `kpa-branch.routes.ts` 신청 경로 2건 | 분회 신청·심사 5경로 + 커뮤니티 신청·심사 경계에 `apiLimiter` |
+| 2차 | `admin.controller.ts` `/suppliers/*` 9건 | 그 9경로 + funding 운영자 라우터에 `apiLimiter` |
+
+**교훈**: 기존 경로를 다른 축으로 옮기면 그 줄이 new code 가 되어 **그 경로가 원래 갖고 있던
+누락까지 내 책임으로 드러난다.** 가드만 바꾸고 나머지는 그대로일 것이라 가정하면 안 된다.
+
 
 | | 내용 |
 |---|---|
