@@ -164,3 +164,42 @@ describe('게시글 라우트 배선', () => {
     );
   });
 });
+
+/**
+ * 잠금 방지 불변식.
+ *
+ * V7 이후 게시글 경계는 `communities` 행 + `community_memberships` 다. 그 행은 승격 CLI
+ * (`scripts/community-catalog-promotion.ts`)가 **카탈로그의 active 커뮤니티**를 돌며 만든다.
+ * 카탈로그에 없는 communityKey 로 포럼을 mount 하면 승격 대상이 아니므로 행이 영영 생기지
+ * 않고, 그 커뮤니티 이용자 전원이 `COMMUNITY_MEMBERSHIP_REQUIRED` 로 막힌다.
+ */
+describe('mount 된 커뮤니티는 모두 승격 대상이다', () => {
+  const MOUNTS: Array<[string, string]> = [
+    ['routes/kpa/kpa.routes.ts', 'pharmacy'],
+    ['routes/cosmetics/cosmetics.routes.ts', 'cosmetics'],
+    ['routes/neture/neture.routes.ts', 'o4o-general'],
+    ['routes/pharmacy-hub/pharmacy-hub.routes.ts', 'pharmacy'],
+    ['routes/neture/controllers/neture.controller.ts', 'o4o-general'],
+  ];
+
+  const catalogKeys = (() => {
+    const src = fs.readFileSync(
+      path.resolve(__dirname, '..', '..', 'config', 'community-catalog.ts'),
+      'utf-8',
+    );
+    return [...src.matchAll(/key: '([^']+)'/g)].map((m) => m[1]);
+  })();
+
+  it.each(MOUNTS)('%s 의 communityKey %s 가 카탈로그에 있다', (file, key) => {
+    const src = fs.readFileSync(path.resolve(__dirname, '..', '..', file), 'utf-8');
+    // 그 파일이 실제로 이 key 로 mount 한다.
+    expect(src).toContain(`communityKey: '${key}'`);
+    // 그리고 그 key 는 승격 CLI 가 돌 카탈로그 안에 있다.
+    expect(catalogKeys).toContain(key);
+  });
+
+  it('소스에 등장하는 communityKey 집합이 카탈로그를 벗어나지 않는다', () => {
+    const used = new Set(MOUNTS.map(([, key]) => key));
+    for (const key of used) expect(catalogKeys).toContain(key);
+  });
+});
