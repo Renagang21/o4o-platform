@@ -243,6 +243,21 @@ WO §6 의 미결 질문("platform:super_admin 으로 충분한가 / 별도 역�
 | V12 | 주소 2회 검사 · 선점 시 미개설(`slug_conflict`) · 임의 주소 개설 0 (커뮤니티 · 분회) | PASS |
 | V13 | `community` `joinEnabled=false` — 서비스 단위 자가 가입이 개별 승인을 우회하지 않음 | PASS |
 | V14 | `logout` 이 family 를 비우지 않음 · 다른 origin refresh 계속 동작 · `logout-all` 은 전역 폐기 유지 | PASS |
+| V15 | 승격 CLI 안전 성질 4종(기본 dry-run · 증거 AND 자격 · 기존 행 미덮어쓰기 · 파라미터 바인딩) | PASS |
+| V16 | mount 된 커뮤니티 5곳의 key 가 모두 승격 대상 카탈로그 안 (잠금 방지 불변식) | PASS |
+| V17 | `community` 가 Admin RBAC 카탈로그에 있음 (지정 화면이 서비스를 인식) | PASS |
+
+### 7-1. 대체된 옛 계약 — 뒤집었다 (삭제 아님)
+
+`WO-O4O-COMMUNITY-WORKSPACE-CATALOG-AND-ACCESS-ALIGNMENT-V1` 의 계약 5건이 이 WO 로
+무효가 됐다. **전체 테스트가 그것을 잡아냈고**, 지우지 않고 뒤집었다 —
+되돌리면 `community-workspace-catalog-and-access.spec.ts` 가 먼저 실패한다.
+
+| 옛 계약 | 지금 | 유지된 원래 의도 |
+|---|---|---|
+| PH-only → pharmacy write 통과 · authenticated → o4o-general 통과 | `COMMUNITY_MEMBERSHIP_REQUIRED` — catalog policy 는 참여 자격일 뿐 | 참여 자격 없으면 `COMMUNITY_ACCESS_DENIED` · 비로그인 401 (그대로) |
+| 새 Community membership 테이블 **0** | 개체 원장 3테이블 (`service_memberships` 로는 "어느 커뮤니티의 운영자인가" 를 표현할 수 없다) | **Forum Core 복제 금지** — `forum_*` · `community_post` · `community_comment` 재생성 0 |
+| `/api/v1/communities` 조회 전용 | lifecycle write 추가 | 카탈로그 조회 2경로는 여전히 `optionalAuth` 하나 · 모든 write 가 `authenticate` 로 시작(무인증 write 0) |
 
 **측정으로 확인해 구현하지 않은 것** (변경 0):
 
