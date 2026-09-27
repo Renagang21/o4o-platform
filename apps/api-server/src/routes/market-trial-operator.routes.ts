@@ -14,6 +14,8 @@ import { AuthRequest } from '../types/auth.js';
 import { MarketTrialOperatorController } from '../controllers/market-trial/marketTrialOperatorController.js';
 import { requireAuth } from '../middleware/auth.middleware.js';
 import { requireFundingScope } from '../middleware/funding-service-scope.middleware.js';
+// CodeQL 이 인식하는 limiter (선례: routes/admin/platform-accounts.routes.ts).
+import { apiLimiter } from '../middleware/rateLimiter.js';
 
 /**
  * Neture operator 1차 승인 라우터
@@ -27,6 +29,7 @@ export function createNetureOperatorTrialRoutes(): Router {
   //   주소(`funding.neture.co.kr`)가 독립이면 운영자 범위도 독립이어야 한다. 종전에는 Neture
   //   운영자 하나가 이 서브도메인까지 열었다.
   //   `platform:super_admin` 은 platformBypass 로 계속 통과하므로 역할 부여 전에도 잠기지 않는다.
+  router.use(apiLimiter as any);
   router.use(requireAuth as any);
   router.use(requireFundingScope('funding:operator') as any);
 
