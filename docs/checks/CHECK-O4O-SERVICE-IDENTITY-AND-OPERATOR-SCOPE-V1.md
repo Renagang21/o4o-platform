@@ -1,6 +1,7 @@
 # CHECK-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1
 
-> 시작: 2026-09-27 · 상태: **`CODE_COMPLETE · 운영 미적용`**
+> 시작: 2026-09-27 · 상태: **`CI_GREEN · 병합·운영 적용 대기`**
+> PR: [#241](https://github.com/Renagang21/o4o-platform/pull/241) — `mergeStateStatus = CLEAN`
 > WO: [`WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1`](../work-orders/WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1.md)
 >
 > **하나의 작업이다.** S2-1 · S2-2 는 내부 구현 순서일 뿐 보고 단위가 아니다.
@@ -288,6 +289,33 @@ node scripts/db/check-migration-contract.mjs  21 pass / 0 fail
 
 > **lint ratchet 은 파일 단위 lint 로는 보이지 않았다.** 이 WO 의 spec 두 곳이 inline
 > `require` 를 써서 48 > 46 이 됐고, 저장소 전체 ratchet 에서만 드러났다. 수정 후 46 복귀.
+
+### 7-2-b. PR #241 CI — 전부 green
+
+```text
+PR   https://github.com/Renagang21/o4o-platform/pull/241
+     mergeStateStatus = CLEAN · 실패 체크 0
+
+API Server Jest (1/3 · 2/3 · 3/3)   pass
+Code Quality Check                  pass
+Build Applications (admin-dashboard) pass
+Analyze (typescript) · CodeQL        pass
+Guard Static Analysis               pass
+Detect affected scope               pass  (api + admin + web:neture · global_or_unknown=false)
+```
+
+**CodeQL code-scanning 게이트가 첫 푸시에서 fail 했다** (workflow 자체는 pass — 별개 게이트).
+
+| | 내용 |
+|---|---|
+| 경고 | `js/missing-rate-limiting` **high** 2건 · `kpa-branch.routes.ts` 신청 경로 |
+| 판정 | **오탐 아님.** 신청은 인증만 요구하므로 로그인한 누구나 호출할 수 있고, 1건마다 slug 조회 + INSERT 가 나간다 |
+| 조치 | `middleware/rateLimiter` 의 `apiLimiter`(분당 60 · IP+userId). `config/rate-limiters.config` 의 limiter 는 CodeQL 이 인식하지 못한다는 선례(`admin/platform-accounts.routes.ts` · `store-owner-terminations.routes.ts`)를 따랐다 |
+| 범위 | 분회 신청·심사 5경로 + **커뮤니티 개설/가입 신청·심사 경계**(같은 이유가 그대로 성립 — CodeQL 이 아직 지적하지 않은 쪽도 선제 적용) |
+| 테스트 | 배선 검사는 mock 으로 표시한 가드만 모으므로 실제 미들웨어인 `apiLimiter` 를 보지 못한다 → 두 라우터 모두 **소스 수준 검사**를 추가. 누가 떼면 실패한다 |
+
+남아 있는 `js/missing-token-validation`(CSRF · `setup-middlewares.ts:247`)은 2026-03-23
+생성된 **선행 경고**이며 이 PR 의 diff 밖이다.
 
 ### 7-3. 실패했으나 이 변경과 무관한 것
 
