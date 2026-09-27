@@ -22,6 +22,11 @@ export const SERVICE_KEYS = [
   //   약사회 분회 서비스. role prefix = canonical service_key = 'kpa-branch' (security-core self-map).
   //   backend(roles seed · kpa-branch scope guard · Membership) 는 이미 갖춰져 있었고 이 카탈로그만 비어 있었다.
   'kpa-branch',
+  // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1:
+  //   커뮤니티 서비스. role prefix = canonical service_key = 'community' (security-core self-map).
+  //   지정 가능한 역할은 `community:admin` **하나**다 — 개별 커뮤니티 운영은 개체 역할
+  //   (`community_memberships.role='operator'`)이며 서비스 전역 operator 를 만들지 않았다.
+  'community',
 ] as const;
 
 export type ServiceKey = (typeof SERVICE_KEYS)[number];
@@ -40,6 +45,7 @@ export const SERVICES: Record<ServiceKey, ServiceMeta> = {
   'pharmacy-hub': { key: 'pharmacy-hub', label: 'Pharmacy-Hub', badgeClass: 'text-teal-700 bg-teal-50' },
   lecture: { key: 'lecture', label: 'O4O 강의', badgeClass: 'text-violet-700 bg-violet-50' },
   'kpa-branch': { key: 'kpa-branch', label: '약사회 분회', badgeClass: 'text-sky-700 bg-sky-50' },
+  community: { key: 'community', label: '커뮤니티', badgeClass: 'text-emerald-700 bg-emerald-50' },
 };
 
 export interface RoleMeta {
