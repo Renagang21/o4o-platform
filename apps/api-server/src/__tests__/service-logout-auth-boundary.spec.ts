@@ -117,6 +117,8 @@ jest.mock('../utils/service-tenant.resolver.js', () => ({ resolveAccessibleStore
 
 import * as tokenUtils from '../utils/token.utils.js';
 import { HandoffController } from '../modules/auth/controllers/handoff.controller.js';
+// req/res 대역은 공통 support — 세 handoff spec 이 같은 것을 각자 갖고 있었다.
+import { mockHandoffRes } from './support/handoff-http.js';
 import { resolveSessionServiceKey } from '../utils/session-origin.js';
 
 const HANDOFF_ID = '11111111-2222-4333-8444-555555555555';
@@ -143,15 +145,7 @@ function mockReq(body: Record<string, unknown>, origin?: string, accessToken?: s
     get: (h: string) => (h.toLowerCase() === 'origin' ? origin : undefined),
   } as any;
 }
-function mockRes() {
-  const res: any = { statusCode: 200, body: undefined };
-  res.status = (c: number) => { res.statusCode = c; return res; };
-  res.json = (b: unknown) => { res.body = b; return res; };
-  res.cookie = jest.fn(() => res);
-  res.setHeader = jest.fn(() => res);
-  res.append = jest.fn(() => res);
-  return res;
-}
+const mockRes = mockHandoffRes;
 
 /** 그 서비스의 현재 세대를 새긴 access token — 실제 로그인이 만드는 것과 같은 모양. */
 const accessTokenFor = (serviceKey: string) =>

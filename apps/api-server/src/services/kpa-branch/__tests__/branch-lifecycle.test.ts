@@ -12,7 +12,8 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
-type Row = Record<string, any>;
+// 저장소 대역은 공통 support 를 쓴다 — 같은 plumbing 을 두 spec 이 각자 갖고 있었다.
+import { inMemoryRepository, type Row } from '../../../__tests__/support/in-memory-repository.js';
 
 const db: {
   orgs: Row[];
@@ -37,20 +38,7 @@ jest.mock('../../../modules/auth/services/role-assignment.service.js', () => ({
 
 function repoFor(name: string) {
   const list = name === 'KpaOrganization' ? db.orgs : db.branchMemberships;
-  return {
-    create: (o: Row) => ({ ...o }),
-    save: async (o: Row) => {
-      if (!o.id) {
-        o.id = uid();
-        list.push(o);
-      } else if (!list.includes(o)) {
-        list.push(o);
-      }
-      return o;
-    },
-    findOne: async ({ where }: { where: Row }) =>
-      list.find((r) => Object.entries(where).every(([k, v]) => r[k] === v)) ?? null,
-  };
+  return inMemoryRepository(list, uid);
 }
 
 const manager = {

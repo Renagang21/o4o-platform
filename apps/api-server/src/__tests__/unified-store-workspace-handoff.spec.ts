@@ -71,6 +71,8 @@ jest.mock('../utils/service-tenant.resolver.js', () => ({
 }));
 
 import { handoffTokenService, isHandoffWorkspace, HANDOFF_WORKSPACES } from '../services/handoff-token.service.js';
+// req/res 대역은 공통 support — 세 handoff spec 이 같은 것을 각자 갖고 있었다.
+import { mockHandoffRes } from './support/handoff-http.js';
 import { HandoffController } from '../modules/auth/controllers/handoff.controller.js';
 import { isStoreWorkspaceExchangeOrigin, STORE_WORKSPACE_ORIGIN } from '../config/store-workspace.js';
 
@@ -89,16 +91,7 @@ function mockReq(body: Record<string, unknown>, origin?: string, user: unknown =
     get: (h: string) => (h.toLowerCase() === 'origin' ? origin : undefined),
   } as any;
 }
-function mockRes() {
-  const res: any = { statusCode: 200, body: undefined };
-  res.status = (c: number) => { res.statusCode = c; return res; };
-  res.json = (b: unknown) => { res.body = b; return res; };
-  // 쿠키를 내리는 모든 경로를 기록한다 — exchange 는 어떤 것도 호출하지 않아야 한다(URL-FIRST-CENSUS §19-1).
-  res.cookie = jest.fn(() => res);
-  res.setHeader = jest.fn(() => res);
-  res.append = jest.fn(() => res);
-  return res;
-}
+const mockRes = mockHandoffRes;
 const uuid = '11111111-2222-4333-8444-555555555555';
 
 beforeEach(() => {

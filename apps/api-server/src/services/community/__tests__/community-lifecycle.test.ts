@@ -7,7 +7,8 @@
  *   V8   그런데도 자기 커뮤니티를 운영할 수 있다 — 개체 운영자 + **서비스 가입**이 함께 생긴다
  *   가입은 승인형 하나 — 자동 승인하지 않는다
  */
-type Row = Record<string, any>;
+// 저장소 대역은 공통 support 를 쓴다 — 같은 plumbing 을 두 spec 이 각자 갖고 있었다.
+import { inMemoryRepository, type Row } from '../../../__tests__/support/in-memory-repository.js';
 
 const db: {
   communities: Row[];
@@ -23,20 +24,7 @@ const uid = () => `id-${++seq}`;
 function repoFor(name: string) {
   const list =
     name === 'Community' ? db.communities : name === 'CommunityCreationRequest' ? db.requests : db.memberships;
-  return {
-    create: (o: Row) => ({ ...o }),
-    save: async (o: Row) => {
-      if (!o.id) {
-        o.id = uid();
-        list.push(o);
-      } else if (!list.includes(o)) {
-        list.push(o);
-      }
-      return o;
-    },
-    findOne: async ({ where }: { where: Row }) =>
-      list.find((r) => Object.entries(where).every(([k, v]) => r[k] === v)) ?? null,
-  };
+  return inMemoryRepository(list, uid);
 }
 
 const manager = {

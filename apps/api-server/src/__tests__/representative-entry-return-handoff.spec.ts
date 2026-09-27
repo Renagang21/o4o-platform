@@ -57,6 +57,8 @@ jest.mock('../utils/cookie.utils.js', () => ({ setAuthCookies: (...a: unknown[])
 jest.mock('../utils/logger.js', () => ({ __esModule: true, default: { info: jest.fn(), warn: jest.fn(), error: jest.fn() } }));
 jest.mock('../utils/service-tenant.resolver.js', () => ({ resolveAccessibleStores: jest.fn() }));
 
+// req/res 대역은 공통 support — 세 handoff spec 이 같은 것을 각자 갖고 있었다.
+import { mockHandoffRes } from './support/handoff-http.js';
 import { HandoffController } from '../modules/auth/controllers/handoff.controller.js';
 import { isRepresentativeEntryExchangeOrigin, isRepresentativeEntryTarget } from '../config/representative-entry.js';
 import { REPRESENTATIVE_ENTRY_SERVICE_KEY } from '../config/service-catalog.js';
@@ -80,16 +82,7 @@ function mockReq(body: Record<string, unknown>, origin?: string, user: unknown =
       get: (h: string) => (h.toLowerCase() === 'origin' ? origin : undefined),
     } as any;
 }
-function mockRes() {
-  const res: any = { statusCode: 200, body: undefined };
-  res.status = (c: number) => { res.statusCode = c; return res; };
-  res.json = (b: unknown) => { res.body = b; return res; };
-  // 쿠키를 내리는 모든 경로를 기록한다 — exchange 는 어떤 것도 호출하지 않아야 한다(URL-FIRST-CENSUS §19-1).
-  res.cookie = jest.fn(() => res);
-  res.setHeader = jest.fn(() => res);
-  res.append = jest.fn(() => res);
-  return res;
-}
+const mockRes = mockHandoffRes;
 const sqlCalls = () => query.mock.calls.map((c) => norm(String(c[0])));
 
 beforeEach(() => {
