@@ -62,11 +62,16 @@ import HomeEntryPanel from '../components/home/HomeEntryPanel';
 import HomeServiceNews from '../components/home/HomeServiceNews';
 import { PublicLegalFooterInfo } from '@o4o/shared-space-ui';
 import { loadFooterLegal } from '../lib/footerLegal';
+import { HOST_ORIGIN } from '../lib/hostProfile';
 
 // ─── 서비스 안내 (로그인 전) ────────────────────────────────────────────────────
 // 신규 도메인·route 를 만들지 않는다.
-// 외부 항목은 현재 운영 중인 공개 진입 URL(= packages/shared-space-ui/src/O4OHelpSection.tsx
-// cross-service 카탈로그와 동일 값), 내부 항목은 web-neture 의 기존 canonical route.
+// WO-O4O-NETURE-HOME-ENTRY-REFRESH-V1: 서비스 진입은 서브도메인 정본 URL
+// (CHECK-O4O-URL-FIRST-CENSUS-V1 CONFIRMED_DECISIONS · 배포 1 실측). 공급자·커뮤니티는
+// hostProfile 의 HOST_ORIGIN 을 재사용한다. 구 호스트(kpa-society.co.kr · k-cosmetics.site ·
+// pharmacyhub.co.kr)는 인쇄 QR 보존용으로 살아 있을 뿐 대표 홈의 진입 경로가 아니다.
+// '약국 경영'(PharmacyHub)은 약국 서비스에 흡수 · 신규 가입 서비스로 노출하지 않아 제거.
+// 병원약국(/hospital)은 O4O 서비스 진입과 분리된 전문 서비스라 여기 두지 않는다.
 // 로그인 후에는 이 pill 대신 HomeEntryPanel(접근 가능한 기능 · 세션 인계 이동)을 보여준다.
 
 interface HomeEntry {
@@ -76,12 +81,11 @@ interface HomeEntry {
 }
 
 const ENTRIES: HomeEntry[] = [
-  { label: '약국', href: 'https://kpa-society.co.kr/', external: true },
-  { label: '약국 경영', href: 'https://pharmacyhub.co.kr', external: true },
-  { label: '화장품', href: 'https://www.k-cosmetics.site/', external: true },
+  { label: '약국', href: 'https://pharmacy.neture.co.kr/', external: true },
+  { label: '화장품', href: 'https://retail.neture.co.kr/', external: true },
   // WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1: 공개 Partner 진입 pill 은퇴.
-  { label: '공급자', href: '/supplier' },
-  { label: '커뮤니티', href: '/community' },
+  { label: '공급자', href: HOST_ORIGIN.supplier, external: true },
+  { label: '커뮤니티', href: HOST_ORIGIN.community, external: true },
 ];
 
 const PILL_CLASS =
