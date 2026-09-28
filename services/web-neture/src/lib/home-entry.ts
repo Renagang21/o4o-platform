@@ -464,12 +464,15 @@ export function buildHomeEntryModel(user: User, data: HomeEntryData): HomeEntryM
       continue;
     }
     // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1: supplier · funding 운영 화면은 이 앱(대표 호스트)에 있다 —
-    //   handoff 가 아니라 내부 이동. 화면이 요구하는 수준(SUBDOMAIN_OPERATOR_SCREENS)을 scope 가 채울 때만 노출한다
-    //   (supplier:operator 는 supplier:admin 화면에 못 들어가므로 카드를 만들지 않는다 — dead link 0).
+    //   handoff 가 아니라 내부 이동. 화면이 요구하는 수준(SUBDOMAIN_OPERATOR_SCREENS)을 scope 가 채울 때만 노출한다.
+    //   한 서비스에 수준이 다른 화면이 여럿이면 **그 scope 가 들어갈 수 있는 것**을 고른다 —
+    //   admin scope 는 admin 화면, operator scope 는 operator 화면(admin ⊃ operator). 채울 수 없으면
+    //   카드를 만들지 않는다(dead link 0).
     //   community 서비스 전체 관리자 화면은 아직 없어 카드를 만들지 않는다.
-    const screen = SUBDOMAIN_OPERATOR_SCREENS.find((s) => s.key === key);
-    if (screen) {
-      if (screen.level === 'admin' && svc.scope !== 'admin') continue;
+    const screens = SUBDOMAIN_OPERATOR_SCREENS.filter((s) => s.key === key);
+    if (screens.length > 0) {
+      const screen = screens.find((s) => s.level === svc.scope) ?? screens.find((s) => s.level === 'operator');
+      if (!screen) continue;
       operator.push({ id: `operator:${key}:${svc.scope}`, label, note, action: { kind: 'internal', to: screen.path } });
       continue;
     }

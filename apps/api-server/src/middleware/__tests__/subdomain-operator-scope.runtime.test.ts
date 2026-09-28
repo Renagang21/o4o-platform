@@ -6,7 +6,7 @@
  * 이 파일은 그 가드들이 **요청을 실제로 통과/거부하는지**를 운영 DB 없이 고정한다
  * (DataSource 미초기화 = JWT 스냅샷 판정 구간 — 가드 코드가 명시한 단위 테스트 동작).
  *
- *   supplier:admin + supplier membership 만   → 공급자 운영 경로 O · 펀딩 · 커뮤니티 · Neture 운영 X
+ *   supplier:admin + supplier membership 만   → 공급자 운영 경로(상태 관리 + 승인 콘솔) O · 펀딩 · 커뮤니티 · Neture 운영 X
  *   funding:admin  + funding membership 만    → 펀딩 운영 경로 O · 공급자 · 커뮤니티 · Neture 운영 X
  *   community:admin + community membership 만 → 커뮤니티 개설 심사 O · 나머지 X
  *   neture:admin/operator + neture membership → Neture 운영 O · 세 서브도메인 X
@@ -62,6 +62,9 @@ async function passes(handler: RequestHandler, p: Persona): Promise<boolean> {
 
 const ROUTES: Record<string, RequestHandler> = {
   supplierAdmin: requireSupplierScope('supplier:admin') as RequestHandler, // /neture/admin/suppliers* 9경로
+  // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 (잔여 gap): 승인·거절 canonical.
+  // 종전 neture:operator 였다 — governance 만 옮겨 두면 목록은 보이고 승인은 안 된다.
+  supplierOperator: requireSupplierScope('supplier:operator') as RequestHandler, // /neture/operator/suppliers*
   fundingOperator: requireFundingScope('funding:operator') as RequestHandler, // /neture/operator/market-trial/*
   communityAdmin: requireCommunityServiceScope('community:admin') as RequestHandler, // /communities/requests*
   netureAdmin: requireNetureScope('neture:admin') as RequestHandler,
@@ -74,11 +77,29 @@ async function matrix(p: Persona): Promise<Record<string, boolean>> {
   return out;
 }
 
-const NONE = { supplierAdmin: false, fundingOperator: false, communityAdmin: false, netureAdmin: false, netureOperator: false };
+const NONE = {
+  supplierAdmin: false,
+  supplierOperator: false,
+  fundingOperator: false,
+  communityAdmin: false,
+  netureAdmin: false,
+  netureOperator: false,
+};
 
 describe('서브도메인 운영자 경계 — 가드 실제 판정', () => {
-  it('supplier:admin + supplier membership 만 → 공급자 운영 경로만', async () => {
-    expect(await matrix({ roles: ['supplier:admin'], memberships: [['supplier', 'active']] })).toEqual({ ...NONE, supplierAdmin: true });
+  it('supplier:admin + supplier membership 만 → 공급자 운영 경로만 (상태 관리 + 승인 콘솔)', async () => {
+    expect(await matrix({ roles: ['supplier:admin'], memberships: [['supplier', 'active']] })).toEqual({
+      ...NONE,
+      supplierAdmin: true,
+      supplierOperator: true,
+    });
+  });
+
+  it('supplier:operator + supplier membership 만 → 승인 콘솔 O · 상태 관리 X (admin 전용 유지)', async () => {
+    expect(await matrix({ roles: ['supplier:operator'], memberships: [['supplier', 'active']] })).toEqual({
+      ...NONE,
+      supplierOperator: true,
+    });
   });
 
   it('funding:admin + funding membership 만 → 펀딩 운영 경로만 (admin ⊃ operator)', async () => {
@@ -99,6 +120,21 @@ describe('서브도메인 운영자 경계 — 가드 실제 판정', () => {
     expect(await passes(ROUTES.supplierAdmin, { roles: ['supplier:operator'], memberships: [['supplier', 'active']] })).toBe(false);
   });
 
+  it('Neture 운영자 역할만으로는 공급자 승인 콘솔에 못 들어간다 (화면·API 가 같은 축)', async () => {
+    expect(
+      await passes(ROUTES.supplierOperator, { roles: ['neture:admin', 'neture:operator'], memberships: [['neture', 'active']] }),
+    ).toBe(false);
+  });
+
+  it('funding 역할로는 공급자 승인 콘솔에 못 들어간다', async () => {
+    expect(await passes(ROUTES.supplierOperator, { roles: ['funding:admin'], memberships: [['funding', 'active']] })).toBe(false);
+  });
+
+  it('승인 콘솔도 그 서비스 membership 이 active 여야 한다', async () => {
+    expect(await passes(ROUTES.supplierOperator, { roles: ['supplier:operator'], memberships: [] })).toBe(false);
+    expect(await passes(ROUTES.supplierOperator, { roles: ['supplier:operator'], memberships: [['supplier', 'pending']] })).toBe(false);
+  });
+
   it('역할이 있어도 그 서비스 membership 이 없거나 active 가 아니면 거부', async () => {
     expect(await passes(ROUTES.supplierAdmin, { roles: ['supplier:admin'], memberships: [] })).toBe(false);
     expect(await passes(ROUTES.fundingOperator, { roles: ['funding:admin'], memberships: [['funding', 'suspended']] })).toBe(false);
@@ -113,6 +149,7 @@ describe('서브도메인 운영자 경계 — 가드 실제 판정', () => {
     };
     expect(await matrix(planned)).toEqual({
       supplierAdmin: true,
+      supplierOperator: true,
       fundingOperator: true,
       communityAdmin: true,
       netureAdmin: true,
@@ -122,6 +159,6 @@ describe('서브도메인 운영자 경계 — 가드 실제 판정', () => {
 
   it('platform:super_admin → 서브도메인 세 영역 통과 (platformBypass)', async () => {
     const m = await matrix({ roles: ['platform:super_admin'], memberships: [] });
-    expect([m.supplierAdmin, m.fundingOperator, m.communityAdmin]).toEqual([true, true, true]);
+    expect([m.supplierAdmin, m.supplierOperator, m.fundingOperator, m.communityAdmin]).toEqual([true, true, true, true]);
   });
 });

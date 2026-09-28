@@ -125,6 +125,7 @@ export function subdomainOperatorRoles(key: SubdomainOperatorKey, level: Subdoma
 /**
  * 서브도메인 운영자 경계가 걸린 화면 경로 — 가드 · 메뉴 노출 · 대표 홈 진입이 같은 표를 본다.
  *   supplier  `/admin/supplier-governance`  ← `/api/v1/neture/admin/suppliers*` (supplier:admin)
+ *   supplier  `/operator/suppliers`          ← `/api/v1/neture/operator/suppliers*` (supplier:operator)
  *   funding   `/operator/market-trial`       ← `/api/v1/neture/operator/market-trial/*` (funding:operator)
  * community 서비스 전체 관리자(`/api/v1/communities/requests*`) 화면은 아직 없다 — 표에 넣지 않는다.
  */
@@ -134,6 +135,8 @@ export const SUBDOMAIN_OPERATOR_SCREENS: ReadonlyArray<{
   level: SubdomainOperatorLevel;
 }> = Object.freeze([
   { path: '/admin/supplier-governance', key: 'supplier', level: 'admin' },
+  // 승인·거절 canonical. governance 만 옮기면 supplier 운영자가 목록은 보고 승인은 못 한다.
+  { path: '/operator/suppliers', key: 'supplier', level: 'operator' },
   { path: '/operator/market-trial', key: 'funding', level: 'operator' },
 ]);
 

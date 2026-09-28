@@ -136,9 +136,13 @@ describe('buildHomeEntryModel — supplier · funding · community 운영 카드
     ]);
   });
 
-  it('supplier operator → 카드 없음 (supplier:admin 화면이라 dead link 0)', () => {
+  // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 (잔여 gap): 승인 콘솔(/operator/suppliers)이
+  // supplier:operator 축으로 정렬되면서 이 scope 도 들어갈 화면이 생겼다 — 카드가 있어야 한다.
+  it('supplier operator → 공급자 승인 콘솔 (내부 이동)', () => {
     const m = buildHomeEntryModel(user(['supplier:operator']), data([op('supplier', 'operator', 'none')]));
-    expect(operatorGroup(m)).toBeUndefined();
+    expect(operatorGroup(m)!.items.map((i) => [i.id, i.action])).toEqual([
+      ['operator:supplier:operator', { kind: 'internal', to: '/operator/suppliers' }],
+    ]);
   });
 
   it('funding admin · operator → 펀딩 운영 화면 (내부 이동)', () => {
