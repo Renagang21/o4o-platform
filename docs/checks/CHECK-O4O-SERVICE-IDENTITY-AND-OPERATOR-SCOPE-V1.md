@@ -1,6 +1,6 @@
 # CHECK-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1
 
-> 시작: 2026-09-27 · 상태: **`병합 완료(2026-09-28, 880642e9b) · 배포 1(2edfe9b33 · migration 0) 트래픽 전환 완료 · 실제 Google 로그인 미실시로 배포 1 미완료(§8-5) · 배포 2(이 작업) 미배포 · DEPLOY_ENABLED=false · 승격 CLI 결함 정정(§8-2, 95377812e) · 운영 적용·실제 접근 검증 전`**
+> 시작: 2026-09-27 · 상태: **`병합 완료(2026-09-28, 880642e9b) · 배포 1(2edfe9b33 · migration 0) 트래픽 전환 · Google 로그인 7/7 PASS · 새로고침 유지 확인 대기로 배포 1 미완료(§8-5) · 배포 2(이 작업) 미배포 · DEPLOY_ENABLED=false · 승격 CLI 결함 정정(§8-2, 95377812e) · 운영 적용·실제 접근 검증 전`**
 > PR: [#241](https://github.com/Renagang21/o4o-platform/pull/241) — 1차 CI green 후
 > **리뷰에서 세 경계가 확정 요구사항과 다르다고 지적돼 같은 PR 에서 정정했다**(§11).
 > 정정 후 재검증: 전 체크 pass · `mergeStateStatus = CLEAN`.
@@ -709,7 +709,7 @@ npx tsx src/scripts/community-catalog-promotion.ts --apply    # 숫자 확인 �
 
 ### 8-5. 배포 1 실측 (2026-09-28 · `2edfe9b33` · migration 0)
 
-> **판정: 11개 서비스 전환 완료 · 병원약국 smoke PASS · Google 원본 긍정 신호 7/7 · 실제 Google 로그인 미실시 → 배포 1 미완료.**
+> **판정: 11개 서비스 전환 완료 · 병원약국 smoke PASS · 실제 Google 로그인 7/7 PASS(사용자 실측) · 새로고침 후 유지 미확인 → 배포 1 미완료.**
 > 배포 2 · 승격 CLI `--apply` 는 시작하지 않았다.
 
 | 항목 | 실측 |
@@ -752,7 +752,17 @@ npx tsx src/scripts/community-catalog-promotion.ts --apply    # 숫자 확인 �
 | 콘솔 오류 | 0 |
 | 호스트 | `hospital.neture.co.kr` **DNS 미해석(`ERR_NAME_NOT_RESOLVED`)** — Cloud Run 기본 URL 로 검증. 도메인 연결은 병원약국 트랙의 사용자측 잔여 |
 
-**Google 원본 (배포 후 · 로그인 전 단계까지)** — `store` · `supplier` · `funding` · `community` · `pharmacy` · `retail` · `kpa` `.neture.co.kr` 7개 모두 루트 200, 로그인 화면에서 GIS 버튼 iframe `gsi/button` **200** · 렌더 1 · `origin` 관련 콘솔 오류 0. 미등록 원본이면 이 단계에서 거부되므로 §8-0 U2/U3 보다 한 단계 강한 근거다. **그러나 자격 교환 · 세션 발급까지 가는 실제 로그인은 하지 않았다 → U2/U3 최종 PASS 아님.** 사람이 각 호스트에서 Google 로그인 1회 → 세션 확인 후 기록한다.
+**Google 원본 (배포 후 · 로그인 전 단계까지)** — `store` · `supplier` · `funding` · `community` · `pharmacy` · `retail` · `kpa` `.neture.co.kr` 7개 모두 루트 200, 로그인 화면에서 GIS 버튼 iframe `gsi/button` **200** · 렌더 1 · `origin` 관련 콘솔 오류 0. 미등록 원본이면 이 단계에서 거부되므로 §8-0 U2/U3 보다 한 단계 강한 근거다. 자격 교환 · 세션 발급까지 가는 실제 로그인은 내가 하지 않았다(브라우저의 운영 Google 세션으로 운영 서비스 세션을 만들지 않기 위해) → 아래 사용자 실측으로 판정.
+
+**실제 Google 로그인 — 사용자 실측 (2026-09-28)**
+
+| 항목 | 결과 |
+|---|---|
+| 7개 host Google 로그인 → 서비스 화면 진입 | **PASS** (store · supplier · funding · community · pharmacy · retail · kpa). 기존 가입 상태로 바로 진입한 것도 정상 동작 |
+| §8-0 U2 / U3 | **PASS 확정** — 원본 등록이 실제 로그인으로 확인됨 |
+| 새로고침 후 로그인 유지 | **미확인** — 각 host 1회 새로고침 결과 대기 |
+
+**배포 1 마감 조건 잔여: 새로고침 후 로그인 유지 1건.** 별도 미완료(배포 1 마감과 분리): `hospital.neture.co.kr` DNS 연결.
 
 ---
 
