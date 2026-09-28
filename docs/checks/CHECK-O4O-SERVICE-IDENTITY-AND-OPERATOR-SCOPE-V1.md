@@ -1057,6 +1057,32 @@ ADC 는 이 PC 에서 `gcloud auth application-default login` 후 확보됐다(�
 
 → 다음은 **`--apply` 승인 여부 판단**이다. 현재 미승인이며 실행 0.
 
+**apply 직전 재확인 (2026-09-29 · 전부 read-only · `BEGIN READ ONLY` 트랜잭션 SELECT).**
+
+dry-run 출력에서 추론하지 않고 **행 수를 직접 질의**했다. 스키마·데이터가 dry-run 직후와
+같은지 확인하는 것이 목적이다.
+
+| # | 확인 | 결과 |
+|---|---|---|
+| 1 | `communities` 대상 3 row 미존재 | `count = 0` |
+| 2 | `community_memberships` 대상 2행 미존재 | `count = 0` |
+| 3 | `already_active = 0` 유지 | dry-run 재실행: 3개 커뮤니티 모두 `already_active=0` · `row_existed=false` · `would_insert` 1/0/1 · TOTAL 2 · `distinct_target_users=1` — 직후와 동일 |
+| 4 | migration state 9/9 | `typeorm_migrations = 693` (689+4) · 4건이 **각 1회**(`x1`) · 삽입 순서(`id`) 6→7→8→9 |
+| 5 | API traffic | `o4o-core-api-03756-txs` 100% · `latestCreatedRevisionName` 동일(새 revision 0) · migration execution 추가 0(`bjx24` 가 최신) |
+| 6 | `DEPLOY_ENABLED` | `false` (2026-09-28 07:19Z 이후 불변) |
+
+스키마 실물도 같은 트랜잭션에서 확인했다 — 새 테이블 **5/5** · 새 index **10/10** ·
+`handoff_tokens.source_session_epoch` = `integer` · `nullable = YES` ·
+`community_creation_requests` · `branch_creation_requests` · `service_session_revocations`
+모두 `count = 0`(데이터 write 0).
+
+> **§8-7-6 의 유보 하나가 해소됐다.** migration 기록 시점에는 "`typeorm_migrations` 행 수는
+> 689+4 가 되어야 하며 직접 질의하지 않았다" 고 남겼는데, 이번에 **693 으로 실측**했다.
+>
+> 부수 관찰(이번 변경과 무관): `typeorm_migrations` 를 `timestamp` 로 정렬하면 legacy 행
+> (`CreateServicePointBudgets2026052100001` · 2034년 값)이 맨 위에 온다. 기존 legacy history
+> 의 성질이므로 적용 순서 판정은 `id` 로 했다.
+
 ---
 
 ## 9. 범위 밖 발견 — 보고만 (고치지 않음)
