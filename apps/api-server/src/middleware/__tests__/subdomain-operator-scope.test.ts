@@ -60,6 +60,28 @@ describe('공급자 운영자 경로 = supplier 축', () => {
   });
 });
 
+describe('공급자 승인 콘솔(/operator/suppliers) = supplier 축', () => {
+  // 같은 화면 축(공급자 심사·활성화)의 두 endpoint 가 서로 다른 경계를 쓰면
+  // `supplier:admin` 만 가진 계정이 목록은 보고 승인은 못 하는 상태가 된다.
+  // governance(/admin/suppliers/*) 만 옮기고 이쪽을 두면 그 상태가 된다.
+  const code = codeOnly(read('modules/neture/controllers/operator-supplier.controller.ts'));
+
+  it('supplier 축으로 판정하고 neture 축을 쓰지 않는다', () => {
+    expect(code).toContain("requireSupplierScope('supplier:operator')");
+    expect(code).not.toContain('requireNetureScope');
+  });
+
+  it('admin 축 governance 와 같은 서비스 키를 쓴다 (두 endpoint 가 갈라지지 않는다)', () => {
+    const adminCode = codeOnly(read('modules/neture/controllers/admin.controller.ts'));
+    expect(adminCode).toContain('requireSupplierScope');
+    expect(SUPPLIER_SCOPE_CONFIG.serviceKey).toBe('supplier');
+  });
+
+  it('deactivate 는 여기 없다 (operator scope 의 의도적 차이 유지)', () => {
+    expect(code).not.toContain("'/suppliers/:id/deactivate'");
+  });
+});
+
 describe('펀딩 운영자 경로 = funding 축', () => {
   const code = codeOnly(read('routes/market-trial-operator.routes.ts'));
 

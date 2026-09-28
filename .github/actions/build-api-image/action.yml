@@ -1,0 +1,242 @@
+# API 서버 이미지 빌드 · push — 배포 경로와 migration 전용 경로의 **단일 정의**
+#
+# WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 (배포 2 전 경계 보정)
+#
+# 이 파일은 deploy-api.yml 에 인라인으로 있던 4개 step 을 **옮긴 것**이다(복사 아님).
+# migration 만 실행하는 경로(migrate-api.yml)가 같은 이미지를 필요로 하는데 YAML 을
+# 두 벌 두면 한쪽이 뒤처진다 — tsc→백업→tsup→복원 순서나 CACHEBUST 가 한쪽에만 남는
+# 식의 drift 는 조용히 stale dist 를 배포한다(9ef911fde 사고).
+#
+# 호출하는 쪽의 선행 조건: actions/checkout · ./.github/actions/setup-build-env ·
+# google-github-actions/auth · setup-gcloud 가 먼저 실행돼 있어야 한다.
+name: Build and push API image
+description: 'API 서버 이미지를 빌드해 Artifact Registry 에 push 하고 tag·digest 를 돌려준다'
+
+inputs:
+  region:
+    description: 'Artifact Registry · Cloud Run 리전'
+    required: true
+  project_id:
+    description: 'GCP 프로젝트'
+    required: true
+  repository_name:
+    description: 'Artifact Registry 저장소'
+    required: true
+  image_name:
+    description: '이미지 이름'
+    required: true
+  image_tag:
+    description: '이 빌드의 태그 (commit SHA)'
+    required: true
+  push_latest:
+    description: "':latest' 를 이 이미지로 옮길지 — 트래픽을 받는 배포 경로만 'true'"
+    required: false
+    default: 'false'
+
+outputs:
+  image:
+    description: 'push 된 전체 이미지 참조 (tag 포함)'
+    value: ${{ steps.push.outputs.image }}
+  digest:
+    description: 'push 된 이미지의 digest — 태그와 달리 움직이지 않는다'
+    value: ${{ steps.push.outputs.digest }}
+
+runs:
+  using: composite
+  steps:
+    # closure 는 package.json 의 workspace 의존성 그래프에서 나온다 — 목록 하드코딩 금지(drift).
+    # api-server 런타임 코드(테스트 제외)가 import 하는 @o4o 패키지는 전부 package.json 에 선언돼 있다.
+    # --fail-if-no-match: filter 가 아무것도 고르지 못하면 조용히 통과하지 않고 실패한다.
+    - name: Build API-specific packages
+      shell: bash
+      run: |
+        echo "🔨 Building @o4o/api-server workspace dependency closure..."
+        pnpm --fail-if-no-match --filter '@o4o/api-server^...' run build
+        echo "✅ API dependency closure built successfully"
+
+    - name: Build API server (bundled with tsup)
+      shell: bash
+      run: |
+        cd apps/api-server
+
+        # ============================================================
+        # Build Strategy:
+        # 1. First build with tsc (compiles migrations with decorators)
+        # 2. Backup migrations folder
+        # 3. Build with tsup (creates bundled main.js, may clean dist)
+        # 4. Restore migrations from backup
+        # ============================================================
+
+        # Step 1: Build everything with tsc first (handles decorators properly)
+        echo "🔨 Step 1: Building with tsc (includes migrations)..."
+        pnpm run build
+
+        # Step 2: Backup database folder before tsup cleans dist
+        # Backup: migrations/*.js + migration-config.js (all compiled by tsc)
+        echo "📦 Step 2: Backing up database folder (migrations + migration-config)..."
+        mkdir -p /tmp/database-backup/migrations
+
+        # Backup migration-config.js (required for TypeORM CLI)
+        if [ -f "dist/database/migration-config.js" ]; then
+          cp dist/database/migration-config.js /tmp/database-backup/
+          cp dist/database/migration-config.js.map /tmp/database-backup/ 2>/dev/null || true
+          echo "✅ migration-config.js backed up"
+        else
+          echo "⚠️ WARNING: migration-config.js not found!"
+        fi
+
+        # Backup migration files
+        if [ -d "dist/database/migrations" ]; then
+          cp -r dist/database/migrations/* /tmp/database-backup/migrations/ 2>/dev/null || true
+          MIGRATION_COUNT=$(ls /tmp/database-backup/migrations/*.js 2>/dev/null | wc -l)
+          echo "✅ Migrations backed up: ${MIGRATION_COUNT} files"
+        else
+          echo "⚠️ No migrations folder found"
+        fi
+
+        # Step 3: Build with tsup (creates bundled main.js)
+        echo "🔨 Step 3: Building API server with tsup (bundled build)..."
+        pnpm run build:api
+
+        # Step 4: Restore database folder (migrations + migration-config)
+        echo "📦 Step 4: Restoring database folder..."
+
+        # Create database folder structure
+        mkdir -p dist/database/migrations
+
+        # Restore migration-config.js
+        if [ -f "/tmp/database-backup/migration-config.js" ]; then
+          cp /tmp/database-backup/migration-config.js dist/database/
+          cp /tmp/database-backup/migration-config.js.map dist/database/ 2>/dev/null || true
+          echo "✅ migration-config.js restored"
+        else
+          echo "❌ ERROR: migration-config.js not in backup!"
+          exit 1
+        fi
+
+        # Restore migration files
+        if [ -d "/tmp/database-backup/migrations" ]; then
+          cp -r /tmp/database-backup/migrations/* dist/database/migrations/ 2>/dev/null || true
+          RESTORED_COUNT=$(ls dist/database/migrations/*.js 2>/dev/null | wc -l)
+          echo "✅ Migrations restored: ${RESTORED_COUNT} files"
+        fi
+
+        # List database folder contents
+        echo "📋 dist/database/ contents:"
+        ls -la dist/database/
+        echo "📋 dist/database/migrations/ (first 10):"
+        ls dist/database/migrations/*.js 2>/dev/null | head -10
+
+        # Verify build output
+        if [ ! -f "dist/main.js" ]; then
+          echo "❌ Build failed: dist/main.js not found"
+          exit 1
+        fi
+
+        if [ ! -f "dist/migrate.js" ]; then
+          echo "❌ Build failed: dist/migrate.js not found"
+          exit 1
+        fi
+
+        echo "✅ API server build complete"
+
+        # Final verification
+        echo "📋 Final verification:"
+        echo "  - main.js (Service entry): $(du -h dist/main.js | cut -f1)"
+        echo "  - migrate.js (Job entry): $(du -h dist/migrate.js | cut -f1)"
+        echo "  - migration-config.js: $(du -h dist/database/migration-config.js | cut -f1)"
+        FINAL_MIGRATION_COUNT=$(ls dist/database/migrations/*.js 2>/dev/null | wc -l)
+        echo "  - migrations: ${FINAL_MIGRATION_COUNT} files"
+
+        # Verify all required files exist
+        if [ ! -f "dist/database/migration-config.js" ]; then
+          echo "❌ ERROR: migration-config.js missing!"
+          exit 1
+        fi
+
+        if [ "$FINAL_MIGRATION_COUNT" -eq 0 ]; then
+          echo "❌ ERROR: No migration files in final build!"
+          exit 1
+        fi
+
+    - name: Configure Docker for Artifact Registry
+      shell: bash
+      run: |
+        gcloud auth configure-docker ${{ inputs.region }}-docker.pkg.dev --quiet
+
+    - name: Build and Push Docker image
+      id: push
+      shell: bash
+      run: |
+        cd apps/api-server
+
+        # Verify tsup bundles exist (main.js for Service, migrate.js for Job)
+        echo "📂 Checking bundled output:"
+        ls -la dist/main.js dist/main.js.map || (echo "❌ main.js bundle not found!" && exit 1)
+        ls -la dist/migrate.js dist/migrate.js.map || (echo "❌ migrate.js bundle not found!" && exit 1)
+        echo "📦 main.js (Service): $(du -h dist/main.js | cut -f1)"
+        echo "📦 migrate.js (Job): $(du -h dist/migrate.js | cut -f1)"
+
+        # Copy mail-core email templates into build context so Dockerfile can include them
+        echo "📧 Copying email templates into Docker build context..."
+        cp -r ../../packages/mail-core/templates/email ./mail-templates
+        echo "Templates: $(ls mail-templates | wc -l) files"
+
+        IMAGE_TAG="${{ inputs.image_tag }}"
+        FULL_IMAGE="${{ inputs.region }}-docker.pkg.dev/${{ inputs.project_id }}/${{ inputs.repository_name }}/${{ inputs.image_name }}:${IMAGE_TAG}"
+        LATEST_IMAGE="${{ inputs.region }}-docker.pkg.dev/${{ inputs.project_id }}/${{ inputs.repository_name }}/${{ inputs.image_name }}:latest"
+        CACHE_IMAGE="${{ inputs.region }}-docker.pkg.dev/${{ inputs.project_id }}/${{ inputs.repository_name }}/${{ inputs.image_name }}:buildcache"
+
+        # WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 (배포 2 전 경계 보정):
+        #   `:latest` 는 **트래픽을 받는 배포 경로만** 움직인다. migration 전용 실행은
+        #   Cloud Run Job 하나만 고정 SHA 이미지로 돌리고 멈추므로, 그 실행이 `:latest` 를
+        #   옮기면 "무엇이 서빙 중인가" 와 태그가 어긋난다.
+        LATEST_TAG_ARGS=()
+        if [ "${{ inputs.push_latest }}" = "true" ]; then
+          LATEST_TAG_ARGS=(--tag "${LATEST_IMAGE}")
+        fi
+
+        # WO-O4O-API-DOCKER-BUILD-CACHE-AND-OWNERSHIP-V1
+        #
+        # GitHub-hosted runner 는 매번 빈 Docker 로 시작하므로 과거 `--no-cache` 는 실효가 없었고,
+        # 매 배포가 production npm install(≈32s)과 node_modules 레이어 push 를 반복했다.
+        # 여기서는 Artifact Registry 의 `:buildcache` 를 레이어 캐시로 쓴다.
+        #
+        # stale dist 재발 방지(9ef911fde 의 원 사고)는 그대로 유지된다:
+        #   - Dockerfile 의 `RUN echo ${CACHEBUST}` 가 매 빌드 다른 값이라 그 뒤의 모든
+        #     dist/assets/templates COPY 레이어는 캐시에서 재사용될 수 없다.
+        #   - 캐시가 재사용할 수 있는 것은 CACHEBUST 앞(base image · npm install · node_modules)뿐이며
+        #     그 키는 package.production.json 내용이다.
+        # 캐시 ref 가 없거나 읽기 실패면 buildx 는 경고 후 캐시 없이 빌드한다(배포 실패 아님).
+        echo "🐳 Building and pushing Docker image (buildx + registry cache)..."
+        docker buildx create --name o4o-api-builder --driver docker-container --use
+        docker buildx build \
+          --build-arg CACHEBUST=$(date +%s) \
+          --platform linux/amd64 \
+          --cache-from "type=registry,ref=${CACHE_IMAGE}" \
+          --cache-to "type=registry,ref=${CACHE_IMAGE},mode=max,image-manifest=true,oci-mediatypes=true" \
+          --tag "${FULL_IMAGE}" \
+          "${LATEST_TAG_ARGS[@]}" \
+          --file Dockerfile \
+          --push \
+          .
+
+        # Verify the pushed image exists in Artifact Registry.
+        # 이미지 내용(dist/main.js · migrate.js · migrations · ownership)은 Dockerfile 의 RUN 검사가
+        # 빌드 단계에서 실패로 강제한다.
+        echo "🔍 Verifying pushed image..."
+        docker buildx imagetools inspect "${FULL_IMAGE}"
+
+        # 태그는 옮길 수 있으므로 **digest** 를 같이 남긴다 (배포 기록의 고정점).
+        DIGEST=$(docker buildx imagetools inspect "${FULL_IMAGE}" | awk '/^Digest:/ {print $2; exit}')
+        if [ -z "${DIGEST}" ]; then
+          echo "❌ ERROR: could not resolve image digest"
+          exit 1
+        fi
+
+        echo "✅ Image pushed: ${FULL_IMAGE}@${DIGEST}"
+        echo "IMAGE_TAG=${IMAGE_TAG}" >> $GITHUB_ENV
+        echo "IMAGE_DIGEST=${DIGEST}" >> $GITHUB_ENV
+        echo "image=${FULL_IMAGE}" >> $GITHUB_OUTPUT
+        echo "digest=${DIGEST}" >> $GITHUB_OUTPUT
+

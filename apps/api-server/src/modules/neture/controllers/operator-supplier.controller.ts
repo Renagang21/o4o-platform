@@ -24,13 +24,22 @@
  *  - deactivate 는 admin 전용 유지 — ACTIVE 공급자 비활성화는 운영 정책 영향이 크므로
  *    operator scope 에서는 노출하지 않는다.
  *
- * Auth: requireAuth + requireNetureScope('neture:operator')
- *   scopeRoleMapping 에 의해 neture:operator + neture:admin 모두 통과.
+ * Auth: requireAuth + requireSupplierScope('supplier:operator')
+ *   scopeRoleMapping 에 의해 supplier:operator + supplier:admin 이 통과하고,
+ *   platformBypass 로 platform:super_admin 도 통과한다.
+ *
+ * WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §4:
+ *   종전 `requireNetureScope('neture:operator')`. 공급자 상태 관리(/admin/suppliers/governance)
+ *   는 이미 `requireSupplierScope` 로 옮겼는데 **승인 콘솔인 이쪽만 neture 키로 남아 있었다.**
+ *   같은 화면 축(공급자 심사·활성화)의 두 endpoint 가 서로 다른 경계를 쓰면
+ *   `supplier:admin` 만 가진 계정이 목록은 보고 승인은 못 하는 상태가 된다.
+ *   공급자 **사업자 본인**의 인가(organization_members)는 이 축이 아니다 — 여기서 나누는
+ *   것은 그 영역을 운영하는 쪽의 권한뿐이다.
  */
 import { Router, Request, Response } from 'express';
 import type { DataSource } from 'typeorm';
 import { requireAuth } from '../../../middleware/auth.middleware.js';
-import { requireNetureScope } from '../../../middleware/neture-scope.middleware.js';
+import { requireSupplierScope } from '../../../middleware/supplier-service-scope.middleware.js';
 import { NetureService } from '../neture.service.js';
 import { ActionLogService } from '@o4o/action-log-core';
 import { SupplierStatus } from '../entities/index.js';
@@ -52,9 +61,9 @@ export function createOperatorSupplierController(dataSource: DataSource): Router
   const regulatedCategoryService = new SupplierRegulatedCategoryService(dataSource);
   const actionLogService = new ActionLogService(dataSource);
 
-  // Router-level guard: operator scope (admin 도 scopeRoleMapping 으로 통과)
+  // Router-level guard: supplier 서브도메인 운영자 (supplier:admin 도 scopeRoleMapping 으로 통과)
   router.use(requireAuth);
-  router.use(requireNetureScope('neture:operator') as any);
+  router.use(requireSupplierScope('supplier:operator') as any);
 
   /**
    * GET /operator/suppliers

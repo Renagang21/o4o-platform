@@ -89,9 +89,19 @@ describe('8.2 migration owner — deploy workflow 의 migration job 이 유일�
   });
 
   it('migration job 은 "Deploy to Cloud Run" 보다 앞에서 실행된다 (성공이 deploy 의 선행 조건)', () => {
-    expect(idx('Build and Push Docker image')).toBeGreaterThan(-1);
-    expect(idx('Run database migrations')).toBeGreaterThan(idx('Build and Push Docker image'));
+    // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1: 이미지 빌드·push 는 composite action
+    // (.github/actions/build-api-image)으로 **이동**했다. 순서 계약은 그대로다 —
+    // 이미지 push → migration → deploy.
+    expect(idx('Build and push API image')).toBeGreaterThan(-1);
+    expect(idx('Run database migrations')).toBeGreaterThan(idx('Build and push API image'));
     expect(idx('Deploy to Cloud Run')).toBeGreaterThan(idx('Run database migrations'));
+  });
+
+  it('배포 경로의 이미지 빌드는 composite action 을 쓰고 `:latest` 를 옮긴다', () => {
+    const build = steps.find((st) => st.name === 'Build and push API image')!;
+    expect(build.body).toMatch(/uses:\s*\.\/\.github\/actions\/build-api-image/);
+    // 트래픽을 받는 경로만 `:latest` 를 움직인다.
+    expect(build.body).toMatch(/push_latest:\s*'true'/);
   });
 
   it('migration job 실패를 무시하는 설정이 없다', () => {

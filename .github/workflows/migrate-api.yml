@@ -1,0 +1,250 @@
+name: Run API DB Migrations Only (manual)
+
+# 운영 DB migration **만** 실행하고 멈추는 경로.
+#
+# WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 (배포 2 전 경계 보정) item 1
+#
+# ─────────────────────────────────────────────────────────────────────────────
+# 왜 따로 있나
+#
+#   deploy-api.yml 의 `build-and-deploy` 는 build → migration → **Cloud Run deploy** 가
+#   한 job 이다. 그래서 migration 만 운영에 반영하려면
+#     ① `DEPLOY_ENABLED` 를 열어야 하고 — 그러면 main push 가 **다른 코드까지** 배포할 수 있다
+#     ② `environment: production` 승인 대기를 통과해야 한다 — 2026-09-27 시도는 승인 대기 중
+#        required reviewers 규칙이 삭제돼 **미실행으로 종료**됐다(운영 변화 0).
+#   두 조건 모두 migration 반영과 무관한 타이밍에 걸려 있다.
+#
+# 이 workflow 가 하는 일 / 하지 않는 일
+#
+#   한다      : 지정한 commit SHA 로 이미지 빌드·push → Cloud Run **Job** `o4o-api-migrations`
+#               를 그 이미지로 고정 → 1회 실행(--wait) → 결과 기록 → 끝.
+#   하지 않는다: `gcloud run deploy` · `update-traffic` · 새 revision · `:latest` 이동 ·
+#               다른 one-off job 의 이미지 변경 · Web/Admin 배포.
+#
+#   migration 의 **소유자는 그대로 Cloud Run Job 하나**다
+#   (WO-O4O-DATABASE-MIGRATION-OWNERSHIP-...-FINAL-CLOSURE-V1 §8-2).
+#   여기서 늘어나는 것은 그 Job 을 부르는 **경로**뿐이고, 러너(dist/migrate.js)·
+#   history 테이블(typeorm_migrations)·트랜잭션 설정은 동일하다.
+#
+# 이미지 빌드는 deploy 경로와 **같은 composite action** 을 쓴다. YAML 을 두 벌 두면
+# tsc→백업→tsup→복원 순서 같은 것이 한쪽에만 남아 조용히 stale dist 를 만든다.
+
+# deploy-api.yml 과 group 을 공유하지 않는다 — 승인 대기로 멈춰 있는 deploy run 뒤에
+# 줄을 서면 이 경로가 만들려는 "승인 타이밍과 무관" 이라는 성질이 사라진다.
+# 대신 DEPLOY_ENABLED 가 열려 있으면(=배포 경로가 살아 있으면) 아래에서 실행을 거부한다.
+concurrency:
+  group: migrate-api-${{ github.ref }}
+  cancel-in-progress: false
+
+on:
+  # push trigger 를 두지 않는다. 운영 DB 를 바꾸는 경로가 commit 으로 자동 실행되면 안 된다.
+  workflow_dispatch:
+    inputs:
+      image_sha:
+        description: '이미지를 만들 commit SHA (40자 · origin/main 에서 도달 가능해야 한다)'
+        required: true
+      confirm:
+        description: "운영 DB 에 migration 을 적용한다는 확인 — 정확히 'RUN-MIGRATIONS-ON-PRODUCTION'"
+        required: true
+        default: ''
+
+env:
+  PROJECT_ID: netureyoutube
+  REGION: asia-northeast3
+  SERVICE_NAME: o4o-core-api
+  REPOSITORY_NAME: o4o-api
+  IMAGE_NAME: api-server
+  MIGRATION_JOB: o4o-api-migrations
+  CLOUDSQL_INSTANCE: netureyoutube:asia-northeast3:o4o-platform-db
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    # environment 를 붙이지 않는다 — 승인 대기 시점에 의존하지 않는 것이 이 경로의 목적이다.
+    # 대신 게이트는 ① dispatch 전용 ② 확인 문구 ③ SHA 도달성 ④ 배포 게이트 닫힘 확인이다.
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+    - name: Validate inputs and gate
+      env:
+        IMAGE_SHA: ${{ github.event.inputs.image_sha }}
+        CONFIRM: ${{ github.event.inputs.confirm }}
+        DEPLOY_ENABLED: ${{ vars.DEPLOY_ENABLED }}
+      run: |
+        set -euo pipefail
+
+        if [ "${CONFIRM}" != "RUN-MIGRATIONS-ON-PRODUCTION" ]; then
+          echo "❌ confirm 문구가 일치하지 않습니다. 운영 migration 은 실행하지 않았습니다."
+          exit 1
+        fi
+
+        if ! printf '%s' "${IMAGE_SHA}" | grep -Eq '^[0-9a-f]{40}$'; then
+          echo "❌ image_sha 는 40자 소문자 hex commit SHA 여야 합니다: '${IMAGE_SHA}'"
+          exit 1
+        fi
+
+        # 배포 경로가 열려 있으면 이 경로를 쓰지 않는다 — 같은 Job·같은 이미지 태그를
+        # 두 run 이 동시에 건드리면 무엇이 적용됐는지 사후에 증명할 수 없다.
+        if [ "${DEPLOY_ENABLED}" = "true" ]; then
+          echo "❌ DEPLOY_ENABLED='true' — 정상 배포 경로(deploy-api.yml)를 쓰세요."
+          echo "   이 workflow 는 배포 게이트가 닫힌 동안 migration 만 반영하는 경로입니다."
+          exit 1
+        fi
+
+        echo "✅ 입력 검증 통과 (DEPLOY_ENABLED='${DEPLOY_ENABLED}')"
+
+    - name: Checkout target SHA
+      uses: actions/checkout@v6
+      with:
+        ref: ${{ github.event.inputs.image_sha }}
+        fetch-depth: 0
+        # 운영 데이터 매니페스트(≈1.25GB)는 이미지에 쓰이지 않는다 — deploy 경로와 동일.
+        sparse-checkout: |
+          /*
+          !/apps/api-server/src/scripts/data/
+        sparse-checkout-cone-mode: false
+
+    - name: Verify SHA is reachable from origin/main
+      env:
+        IMAGE_SHA: ${{ github.event.inputs.image_sha }}
+      run: |
+        set -euo pipefail
+        git fetch --no-tags --prune origin main
+        if ! git merge-base --is-ancestor "${IMAGE_SHA}" origin/main; then
+          echo "❌ ${IMAGE_SHA} 는 origin/main 에서 도달 가능한 commit 이 아닙니다."
+          echo "   운영 DB 는 main 에 병합된 migration 만 받습니다."
+          exit 1
+        fi
+        echo "✅ ${IMAGE_SHA} 는 origin/main 계보에 있습니다."
+
+    - name: Setup build environment
+      uses: ./.github/actions/setup-build-env
+      with:
+        node-version: '22.18.0'
+        build-packages: 'false'
+
+    - name: Authenticate to Google Cloud
+      uses: google-github-actions/auth@v3
+      with:
+        credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+    - name: Set up Cloud SDK
+      uses: google-github-actions/setup-gcloud@v2
+      with:
+        project_id: ${{ env.PROJECT_ID }}
+        skip_install: true
+
+    # 이 이미지에 **무엇이 함께 들어가는지** 먼저 기록한다. migration 만 실행하더라도
+    # 이미지에는 그 SHA 까지의 모든 코드가 들어 있다 — 범위를 숨기지 않는다.
+    - name: Report code range vs currently serving revision
+      env:
+        IMAGE_SHA: ${{ github.event.inputs.image_sha }}
+      run: |
+        set -euo pipefail
+        SERVING_IMAGE=$(gcloud run services describe "${SERVICE_NAME}" \
+          --region="${REGION}" --project="${PROJECT_ID}" \
+          --format='value(spec.template.spec.containers[0].image)' || echo '')
+        SERVING_TAG="${SERVING_IMAGE##*:}"
+        {
+          echo "### 이 실행이 만드는 이미지의 코드 범위"
+          echo ""
+          echo "- 현재 serving 이미지: \`${SERVING_IMAGE:-확인 실패}\`"
+          echo "- 이번 migration 이미지 SHA: \`${IMAGE_SHA}\`"
+          echo ""
+        } >> "$GITHUB_STEP_SUMMARY"
+
+        if printf '%s' "${SERVING_TAG}" | grep -Eq '^[0-9a-f]{40}$' && git cat-file -e "${SERVING_TAG}^{commit}" 2>/dev/null; then
+          {
+            echo "이미지에 함께 들어가는 commit (serving → 대상):"
+            echo ""
+            echo '```'
+            git log --oneline --no-decorate "${SERVING_TAG}..${IMAGE_SHA}"
+            echo '```'
+            echo ""
+            echo "> 이 코드는 **서빙되지 않는다** — 이 workflow 는 revision 을 만들지 않는다."
+          } >> "$GITHUB_STEP_SUMMARY"
+        else
+          echo "> serving 태그로 commit 범위를 계산할 수 없었다 (\`${SERVING_TAG}\`). 범위는 수동 확인 필요." >> "$GITHUB_STEP_SUMMARY"
+        fi
+
+    - name: Build and push API image
+      id: api_image
+      uses: ./.github/actions/build-api-image
+      with:
+        region: ${{ env.REGION }}
+        project_id: ${{ env.PROJECT_ID }}
+        repository_name: ${{ env.REPOSITORY_NAME }}
+        image_name: ${{ env.IMAGE_NAME }}
+        image_tag: ${{ github.event.inputs.image_sha }}
+        # `:latest` 는 트래픽을 받는 배포 경로만 움직인다.
+        push_latest: 'false'
+
+    # Job 설정(env · secret · Cloud SQL · command)은 deploy 경로와 같은 값이다.
+    # 실패를 삼키는 설정(continue-on-error · || true)을 두지 않는다 — 실패 = run 실패.
+    - name: Point migration job at the pinned image and execute
+      env:
+        FULL_IMAGE: ${{ steps.api_image.outputs.image }}
+        DIGEST: ${{ steps.api_image.outputs.digest }}
+      run: |
+        set -euo pipefail
+        echo "🔄 migration job 고정: ${FULL_IMAGE}@${DIGEST}"
+
+        gcloud run jobs create "${MIGRATION_JOB}" \
+          --image="${FULL_IMAGE}" \
+          --region="${REGION}" \
+          --project="${PROJECT_ID}" \
+          --task-timeout=300 \
+          --max-retries=1 \
+          --set-env-vars="^::^NODE_ENV=production::DB_HOST=/cloudsql/${CLOUDSQL_INSTANCE}::DB_PORT=5432::DB_USERNAME=${{ secrets.GCP_DB_USERNAME }}::DB_NAME=${{ secrets.GCP_DB_NAME }}" \
+          --set-secrets="DB_PASSWORD=o4o-db-password:latest" \
+          --set-cloudsql-instances="${CLOUDSQL_INSTANCE}" \
+          --command="node" \
+          --args="dist/migrate.js" \
+          2>/dev/null || \
+        gcloud run jobs update "${MIGRATION_JOB}" \
+          --image="${FULL_IMAGE}" \
+          --region="${REGION}" \
+          --project="${PROJECT_ID}" \
+          --task-timeout=300 \
+          --max-retries=1 \
+          --set-env-vars="^::^NODE_ENV=production::DB_HOST=/cloudsql/${CLOUDSQL_INSTANCE}::DB_PORT=5432::DB_USERNAME=${{ secrets.GCP_DB_USERNAME }}::DB_NAME=${{ secrets.GCP_DB_NAME }}" \
+          --set-secrets="DB_PASSWORD=o4o-db-password:latest" \
+          --set-cloudsql-instances="${CLOUDSQL_INSTANCE}" \
+          --command="node" \
+          --args="dist/migrate.js"
+
+        echo "🚀 migration job 실행..."
+        gcloud run jobs execute "${MIGRATION_JOB}" \
+          --region="${REGION}" \
+          --project="${PROJECT_ID}" \
+          --wait
+
+        echo "✅ migration 완료"
+
+    # 실행 기록을 요약에 남긴다 — "workflow success" 만으로는 무엇이 돌았는지 알 수 없다.
+    - name: Record execution
+      if: always()
+      env:
+        FULL_IMAGE: ${{ steps.api_image.outputs.image }}
+        DIGEST: ${{ steps.api_image.outputs.digest }}
+      run: |
+        set -uo pipefail
+        {
+          echo ""
+          echo "### migration 전용 실행 결과"
+          echo ""
+          echo "- 이미지: \`${FULL_IMAGE:-미생성}\`"
+          echo "- digest: \`${DIGEST:-미생성}\`"
+          echo "- Cloud Run Job: \`${MIGRATION_JOB}\`"
+          echo "- Cloud Run **서비스 revision 생성 0 · 트래픽 전환 0 · \`:latest\` 이동 0**"
+          echo ""
+          echo "최근 실행 3건:"
+          echo ""
+          echo '```'
+          gcloud run jobs executions list --job="${MIGRATION_JOB}" \
+            --region="${REGION}" --project="${PROJECT_ID}" --limit=3 \
+            --format='table(name,createTime,status.succeededCount,status.failedCount)' || echo '조회 실패'
+          echo '```'
+        } >> "$GITHUB_STEP_SUMMARY"
