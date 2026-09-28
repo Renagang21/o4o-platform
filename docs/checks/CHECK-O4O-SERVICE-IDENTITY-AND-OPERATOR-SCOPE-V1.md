@@ -787,6 +787,8 @@ npx tsx src/scripts/community-catalog-promotion.ts --apply    # 숫자 확인 �
 3. 게이트 `true` → **API 워크플로만** 태그로 dispatch → `build-and-deploy` 가 `waiting`(production 환경 승인 대기) 이 되는 즉시 게이트 `false`. job 수준 `if` 는 승인 대기 진입 전에 평가되므로 이미 대기 중인 job 은 계속되고, 그 뒤의 main push 는 전부 skip. Web · Admin 은 dispatch 하지 않는다(승인 단계 없음 · 배포 1 순서 이탈 재발 방지).
 4. 창 동안 main 에 새 push 가 생겨 API run 이 대기에 들어오면 **승인하지 않고 reject**. 승인은 headBranch = 배포 2 태그 · SHA 일치 run 하나만.
 
+**1차 시도 (2026-09-28) — 미실행 종료 · 운영 변화 0.** 태그 `deploy/2026-09-28-service-identity-deploy2`(`46e5d14b8`) · run `36385737827`. 게이트 06:17:38Z→06:18:17Z(39초) · 창 안 새 run = 이 run 하나. `build-and-deploy` 가 승인 대기 중 **production 환경의 required reviewers 규칙이 삭제**되어(승인 기록 `canceled` · "Required reviewers protection rule deleted") step 0개로 `failure`(07:32:42Z). 확인: migration Job 이미지 = `2edfe9b33` 그대로 · 최근 execution = 배포 1(05:08Z) · API traffic `03756-txs` 100% · 게이트 `false`. 현재 production 환경 보호 규칙 = 없음 → API dispatch 가 승인 없이 곧바로 진행되는 상태. 재시도는 사용자 판단 후.
+
 **멈춘 뒤 확인 · 보고 (쓰기 없음).** migration execution 성공 · `typeorm_migrations` +4 · 새 테이블 존재 · API traffic `03756-txs` 100% 유지 · 새 revision 0% → 승격 CLI **공식 dry-run**(read-only 세션) 수치를 §8-0 U1 예상치(2행 · 1명)와 대조해 보고. **`--apply` · API 트래픽 전환 · Web/Admin 배포는 결과 검토 후 별도 지시.**
 
 ---
