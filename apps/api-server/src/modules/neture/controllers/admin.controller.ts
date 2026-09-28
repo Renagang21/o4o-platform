@@ -18,6 +18,17 @@ import { Router, Request, Response } from 'express';
 import type { DataSource } from 'typeorm';
 import { requireAuth } from '../../../middleware/auth.middleware.js';
 import { requireNetureScope } from '../../../middleware/neture-scope.middleware.js';
+// WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §4:
+//   `/suppliers/*` 는 supplier.neture.co.kr 의 **운영** 업무(심사·정지·서류 확인)다.
+//   주소가 독립이면 운영자 범위도 독립이어야 하므로 supplier 축으로 옮긴다.
+//   제품·마스터·카테고리 경로는 Neture 제품 DB 업무이므로 `neture:admin` 그대로 둔다.
+//   공급자 **사업자 본인**의 접근은 이 축이 아니라 organization_members 다(FROZEN §7, 불변).
+import { requireSupplierScope } from '../../../middleware/supplier-service-scope.middleware.js';
+// CodeQL(js/missing-rate-limiting): supplier 운영자 경로를 이 WO 에서 수정하면서 new code 로
+//   판정돼 high 9건이 떴다. 오탐이 아니다 — 각 경로가 DB 조회·갱신을 한다.
+//   `config/rate-limiters.config` 의 limiter 는 CodeQL 이 인식하지 못하므로 선례대로
+//   `middleware/rateLimiter` 의 apiLimiter 를 쓴다(분당 60 · IP+userId 키).
+import { apiLimiter } from '../../../middleware/rateLimiter.js';
 import { uploadSingleMiddleware } from '../../../middleware/upload.middleware.js';
 import { NetureService } from '../neture.service.js';
 import { ImageStorageService } from '../services/image-storage.service.js';
@@ -70,7 +81,7 @@ export function createAdminController(dataSource: DataSource): Router {
    * WO-O4O-NETURE-SUPPLIER-APPROVAL-CONSOLE-AND-ADMIN-GOVERNANCE-SEPARATION-V1 §5
    * 상태 관리 목록 (ACTIVE/INACTIVE 전용) — 최근 상태 변경 + 진행 주문·미정산 포함.
    */
-  router.get('/suppliers/governance', requireAuth, requireNetureScope('neture:admin'), async (_req: AuthenticatedRequest, res: Response) => {
+  router.get('/suppliers/governance', apiLimiter, requireAuth, requireSupplierScope('supplier:admin'), async (_req: AuthenticatedRequest, res: Response) => {
     try {
       const data = await netureService.getGovernanceSuppliers();
       res.json({ success: true, data });
@@ -85,7 +96,7 @@ export function createAdminController(dataSource: DataSource): Router {
    * WO-O4O-NETURE-SUPPLIER-APPROVAL-CONSOLE-AND-ADMIN-GOVERNANCE-SEPARATION-V1 §6
    * 공급자 비활성화 (ACTIVE → INACTIVE) — admin 전용 governance. 사유 필수 + 주문/정산 가드.
    */
-  router.post('/suppliers/:id/deactivate', requireAuth, requireNetureScope('neture:admin'), async (req: AuthenticatedRequest, res: Response) => {
+  router.post('/suppliers/:id/deactivate', apiLimiter, requireAuth, requireSupplierScope('supplier:admin'), async (req: AuthenticatedRequest, res: Response) => {
     try {
       const { id } = req.params;
       const adminUserId = req.user?.id;
@@ -142,7 +153,7 @@ export function createAdminController(dataSource: DataSource): Router {
    * 공급자 재활성화 (INACTIVE → ACTIVE) — admin 전용 governance. 사유 필수.
    * 접근 상태만 복구하며 상품 승인·진열·게시는 자동 복구하지 않는다.
    */
-  router.post('/suppliers/:id/reactivate', requireAuth, requireNetureScope('neture:admin'), async (req: AuthenticatedRequest, res: Response) => {
+  router.post('/suppliers/:id/reactivate', apiLimiter, requireAuth, requireSupplierScope('supplier:admin'), async (req: AuthenticatedRequest, res: Response) => {
     try {
       const { id } = req.params;
       const adminUserId = req.user?.id;
@@ -181,7 +192,7 @@ export function createAdminController(dataSource: DataSource): Router {
    * GET /admin/suppliers/:id/onboarding
    * 공급자 기본 서류/정산 정보 상세
    */
-  router.get('/suppliers/:id/onboarding', requireAuth, requireNetureScope('neture:admin'), async (req: AuthenticatedRequest, res: Response) => {
+  router.get('/suppliers/:id/onboarding', apiLimiter, requireAuth, requireSupplierScope('supplier:admin'), async (req: AuthenticatedRequest, res: Response) => {
     try {
       const data = await onboardingService.getOnboarding(req.params.id);
       if (!data) {
@@ -197,7 +208,7 @@ export function createAdminController(dataSource: DataSource): Router {
   /**
    * GET /admin/suppliers/:id/documents/:documentType/download
    */
-  router.get('/suppliers/:id/documents/:documentType/download', requireAuth, requireNetureScope('neture:admin'), async (req: AuthenticatedRequest, res: Response) => {
+  router.get('/suppliers/:id/documents/:documentType/download', apiLimiter, requireAuth, requireSupplierScope('supplier:admin'), async (req: AuthenticatedRequest, res: Response) => {
     try {
       const documentType = req.params.documentType as SupplierOnboardingDocumentType;
       const document = await onboardingService.getDocumentForSupplier(req.params.id, documentType);
@@ -224,7 +235,7 @@ export function createAdminController(dataSource: DataSource): Router {
   // ==================== 공급자 품목군 검토 (WO-O4O-SUPPLIER-REGULATED-CATEGORY-DOCUMENTS-V1) ====================
 
   // GET /admin/suppliers/:id/regulated-categories
-  router.get('/suppliers/:id/regulated-categories', requireAuth, requireNetureScope('neture:admin'), async (req: AuthenticatedRequest, res: Response) => {
+  router.get('/suppliers/:id/regulated-categories', apiLimiter, requireAuth, requireSupplierScope('supplier:admin'), async (req: AuthenticatedRequest, res: Response) => {
     try {
       const data = await regulatedCategoryService.listForSupplier(req.params.id);
       res.json({ success: true, data });
@@ -235,7 +246,7 @@ export function createAdminController(dataSource: DataSource): Router {
   });
 
   // PATCH /admin/suppliers/:id/regulated-categories/:category — 상태 변경 + 검토 메모
-  router.patch('/suppliers/:id/regulated-categories/:category', requireAuth, requireNetureScope('neture:admin'), async (req: AuthenticatedRequest, res: Response) => {
+  router.patch('/suppliers/:id/regulated-categories/:category', apiLimiter, requireAuth, requireSupplierScope('supplier:admin'), async (req: AuthenticatedRequest, res: Response) => {
     try {
       const reviewerId = req.user?.id;
       if (!reviewerId) return res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED' } });
@@ -257,7 +268,7 @@ export function createAdminController(dataSource: DataSource): Router {
   });
 
   // GET /admin/suppliers/:id/regulated-categories/:category/document/download
-  router.get('/suppliers/:id/regulated-categories/:category/document/download', requireAuth, requireNetureScope('neture:admin'), async (req: AuthenticatedRequest, res: Response) => {
+  router.get('/suppliers/:id/regulated-categories/:category/document/download', apiLimiter, requireAuth, requireSupplierScope('supplier:admin'), async (req: AuthenticatedRequest, res: Response) => {
     try {
       const document = await regulatedCategoryService.getEvidenceDocument(req.params.id, req.params.category);
       if (!document) {
@@ -285,7 +296,7 @@ export function createAdminController(dataSource: DataSource): Router {
    * WO-NETURE-SUPPLIER-AND-PRODUCT-APPROVAL-BETA-V1
    * 전체 공급자 목록 (상태 필터)
    */
-  router.get('/suppliers', requireAuth, requireNetureScope('neture:admin'), async (req: AuthenticatedRequest, res: Response) => {
+  router.get('/suppliers', apiLimiter, requireAuth, requireSupplierScope('supplier:admin'), async (req: AuthenticatedRequest, res: Response) => {
     try {
       const { status } = req.query;
       const filters: { status?: SupplierStatus } = {};

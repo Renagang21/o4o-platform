@@ -22,13 +22,27 @@ const norm = (s: string) => s.replace(/\s+/g, ' ').trim();
 // Module doubles
 // ─────────────────────────────────────────────────────────────────────────────
 
-const query = jest.fn();
+// 실제 TypeORM `query` 는 언제나 배열을 돌려준다. double 이 undefined 를 주면 호출부가
+// 그것을 '행 0건' 으로 오해하거나 터지므로 기본값을 배열로 둔다 — 개별 테스트가 덮어쓴다.
+const query = jest.fn().mockResolvedValue([]);
 const findOne = jest.fn();
 jest.mock('../database/connection.js', () => ({
   AppDataSource: {
     isInitialized: true,
     query: (...args: unknown[]) => query(...args),
     getRepository: () => ({ findOne: (...args: unknown[]) => findOne(...args) }),
+    // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8: handoff 가 세션 **세대**를 읽는다.
+    //   세대 조회는 `query` 의 once 큐를 **소비하지 않는다** — 소비하면 이 spec 들이 순서로
+    //   맞춰 둔 handoff SQL 응답이 한 칸씩 밀려 엉뚱한 값을 받는다(실제로 그렇게 깨졌다).
+    //   여기서는 "폐기 기록 없음"(= 빈 배열)을 돌려주고, 나머지는 그대로 위임한다.
+    //   세대 판정 자체는 전용 spec(service-logout-auth-boundary.spec.ts)이 본다.
+    manager: {
+      query: (...args: unknown[]) => {
+        const sql = String(args[0] ?? '');
+        if (/service_session_revocations/i.test(sql)) return Promise.resolve([]);
+        return query(...args);
+      },
+    },
   },
 }));
 jest.mock('../modules/auth/entities/User.js', () => ({ User: class User {} }));
@@ -36,7 +50,14 @@ jest.mock('../modules/auth/services/role-assignment.service.js', () => ({
   roleAssignmentService: { getRoleNames: jest.fn(async () => ['store_owner']) },
 }));
 const generateTokens = jest.fn(() => ({ accessToken: 'AT', refreshToken: 'RT', expiresIn: 900 }));
-jest.mock('../utils/token.utils.js', () => ({ generateTokens: (...a: unknown[]) => generateTokens(...a) }));
+// WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8 (3차): handoff 발급이 access token 의
+//   세션 귀속(serviceKey · sessionEpoch)을 읽는다. 여기 기본값은 **claim 없는 토큰** 이므로
+//   판정에서 제외되고 기존 계약이 그대로 검증된다. 귀속을 보는 시나리오는 전용 spec
+//   (service-logout-auth-boundary.spec.ts)에서 실제 토큰으로 본다.
+jest.mock('../utils/token.utils.js', () => ({
+  generateTokens: (...a: unknown[]) => generateTokens(...a),
+  verifyAccessToken: () => null,
+}));
 const persistRefreshTokenFamily = jest.fn(async () => undefined);
 jest.mock('../services/auth/auth-context.helper.js', () => ({
   persistRefreshTokenFamily: (...a: unknown[]) => persistRefreshTokenFamily(...a),
@@ -50,6 +71,8 @@ jest.mock('../utils/service-tenant.resolver.js', () => ({
 }));
 
 import { handoffTokenService, isHandoffWorkspace, HANDOFF_WORKSPACES } from '../services/handoff-token.service.js';
+// req/res 대역은 공통 support — 세 handoff spec 이 같은 것을 각자 갖고 있었다.
+import { mockHandoffRes } from './support/handoff-http.js';
 import { HandoffController } from '../modules/auth/controllers/handoff.controller.js';
 import { isStoreWorkspaceExchangeOrigin, STORE_WORKSPACE_ORIGIN } from '../config/store-workspace.js';
 
@@ -57,26 +80,25 @@ const USER = { id: 'user-1', email: 'u@example.test', name: 'U', isActive: true,
 const STORE = { organizationId: 'org-1', organizationName: '가나약국', memberRole: 'owner' };
 
 function mockReq(body: Record<string, unknown>, origin?: string, user: unknown = USER) {
+  // 실제 Express req 는 언제나 headers·cookies 를 갖는다. 없으면 토큰 추출이 터진다
+  //   (WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8: handoff 발급이 access token 의
+  //    세션 귀속을 읽는다 — 로그아웃된 서비스의 남은 인증으로 긴 세션을 얻지 못하게).
   return {
     body,
     user,
+    headers: {},
+    cookies: {},
     get: (h: string) => (h.toLowerCase() === 'origin' ? origin : undefined),
   } as any;
 }
-function mockRes() {
-  const res: any = { statusCode: 200, body: undefined };
-  res.status = (c: number) => { res.statusCode = c; return res; };
-  res.json = (b: unknown) => { res.body = b; return res; };
-  // 쿠키를 내리는 모든 경로를 기록한다 — exchange 는 어떤 것도 호출하지 않아야 한다(URL-FIRST-CENSUS §19-1).
-  res.cookie = jest.fn(() => res);
-  res.setHeader = jest.fn(() => res);
-  res.append = jest.fn(() => res);
-  return res;
-}
+const mockRes = mockHandoffRes;
 const uuid = '11111111-2222-4333-8444-555555555555';
 
 beforeEach(() => {
   query.mockReset();
+  // mockReset 은 구현까지 지운다 → 기본 반환이 undefined 가 된다. 실제 TypeORM `query` 는
+  // 언제나 배열이므로 기본값을 되돌린다(개별 테스트가 필요하면 다시 덮어쓴다).
+  query.mockResolvedValue([]);
   findOne.mockReset();
   resolveAccessibleStores.mockReset();
   generateTokens.mockClear();
@@ -135,7 +157,17 @@ describe('B. HandoffTokenService — 두 형태 · 같은 원자 consume', () =>
     query.mockResolvedValueOnce([{ id: uuid }]).mockResolvedValueOnce([]);
     await handoffTokenService.generateToken('user-1', 'neture', 'kpa-society');
     const [sql, params] = query.mock.calls[0];
-    expect(norm(sql)).toContain('(user_id, source_service_key, target_service_key, target_workspace, expires_at)');
+    // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8 (3차): source_session_epoch 컬럼이 늘었고
+    //   값은 **같은 문장 안의 subquery** 로 채운다(별도 SELECT 를 앞세우면 왕복이 늘고 그 사이
+    //   로그아웃이 끼어들 틈이 생긴다). 컬럼 목록과 subquery 둘 다 고정한다.
+    expect(norm(sql)).toContain(
+      '(user_id, source_service_key, target_service_key, target_workspace, expires_at, source_session_epoch)',
+    );
+    // WO §8 (4차): 세대는 **호출자가 검증한 값**으로 넘어온다($6). 여기서 현재 세대를 다시
+    //   읽으면(subquery 든 별도 SELECT 든) 발급 검사와 기록 사이에 로그아웃이 끼었을 때 새 세대가
+    //   적혀, 이미 로그아웃된 인증으로 시작한 handoff 가 교환에서 통과한다.
+    expect(norm(sql)).toContain("now() + ($5 || ' seconds')::interval, $6)");
+    expect(norm(sql)).not.toContain('SELECT session_epoch FROM service_session_revocations');
     expect(params.slice(0, 4)).toEqual(['user-1', 'neture', 'kpa-society', null]);
   });
 
@@ -157,12 +189,14 @@ describe('B. HandoffTokenService — 두 형태 · 같은 원자 consume', () =>
     query.mockResolvedValueOnce([[{ user_id: 'user-1', source_service_key: 'kpa-society', target_service_key: null, target_workspace: 'store', created_at: new Date(0) }], 1]);
     const ws = await handoffTokenService.exchangeToken(uuid);
     expect(norm(query.mock.calls[0][0])).toContain('SET consumed_at = now() WHERE id = $1 AND consumed_at IS NULL AND expires_at > now() RETURNING');
-    expect(ws).toEqual({ userId: 'user-1', sourceServiceKey: 'kpa-society', targetWorkspace: 'store', createdAt: new Date(0).toISOString() });
+    // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8 (3차): payload 에 출발 서비스 세대가
+    //   실린다. 이 행에는 컬럼이 없으므로(컬럼 도입 이전 발급분) null — 교환 판정에서 제외된다.
+    expect(ws).toEqual({ userId: 'user-1', sourceServiceKey: 'kpa-society', targetWorkspace: 'store', createdAt: new Date(0).toISOString(), sourceSessionEpoch: null });
     expect(ws).not.toHaveProperty('targetServiceKey');
 
     query.mockResolvedValueOnce([[{ user_id: 'user-1', source_service_key: 'neture', target_service_key: 'kpa-society', target_workspace: null, created_at: '2026-01-01' }], 1]);
     const svc = await handoffTokenService.exchangeToken(uuid);
-    expect(svc).toEqual({ userId: 'user-1', sourceServiceKey: 'neture', targetServiceKey: 'kpa-society', createdAt: '2026-01-01' });
+    expect(svc).toEqual({ userId: 'user-1', sourceServiceKey: 'neture', targetServiceKey: 'kpa-society', createdAt: '2026-01-01', sourceSessionEpoch: null });
     expect(svc).not.toHaveProperty('targetWorkspace');
   });
 });
@@ -219,7 +253,8 @@ describe('C. generateHandoff — workspace 는 organization 축', () => {
     expect(res.statusCode).toBe(200);
     expect(norm(query.mock.calls[0][0])).toContain('SELECT status FROM service_memberships');
     expect(query.mock.calls[0][1]).toEqual(['user-1', 'kpa-society']);
-    expect(query.mock.calls[1][1].slice(0, 4)).toEqual(['user-1', 'neture', 'kpa-society', null]);
+    // 출발은 Origin 이 아니라 토큰 claim 이 증명한다 — 이 대역의 토큰은 claim 이 없으므로 'unknown' (§8 5차).
+    expect(query.mock.calls[1][1].slice(0, 4)).toEqual(['user-1', 'unknown', 'kpa-society', null]);
     expect(res.body.data.targetService.key).toBe('kpa-society');
     expect(res.body.data.targetUrl).toMatch(/^https:\/\/[^/]+\/handoff\?token=/);
     expect(res.body.data.targetUrl).not.toContain('store.neture.co.kr');
@@ -262,7 +297,10 @@ describe('D. exchangeHandoff — origin 고정 · organization 재검증 · serv
     expect(res.body.data.targetWorkspace).toBe('store');
     expect(res.body.data).not.toHaveProperty('targetServiceKey');
     expect(res.body.data.tokens).toEqual({ accessToken: 'AT', refreshToken: 'RT', expiresIn: 900 });
-    expect(generateTokens).toHaveBeenCalledWith(USER, ['store_owner'], 'neture.co.kr', memberships, 'fam-1');
+    // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8: 끝 두 인자 = 이 세션이 속한 대상과
+    //   그 대상의 **현재 세대**. WORKSPACE handoff 는 서비스가 아니므로 workspace 키를 쓴다.
+    //   세대를 새기지 않으면 그 대상에서 로그아웃한 뒤 재발급된 토큰까지 거절된다.
+    expect(generateTokens).toHaveBeenCalledWith(USER, ['store_owner'], 'neture.co.kr', memberships, 'fam-1', 'store', 0);
     expect(persistRefreshTokenFamily).toHaveBeenCalledWith('user-1', 'RT');
     // exchange 는 쿠키를 내리지 않는다 — body 토큰만(URL-FIRST-CENSUS §19-1 · §21-2).
     //   이미 배포된 HandoffPage 가 credentials:'include' 로 호출해도 저장될 쿠키가 없다.
@@ -311,7 +349,9 @@ describe('D. exchangeHandoff — origin 고정 · organization 재검증 · serv
     expect(res.statusCode).toBe(200);
     expect(res.body.data.targetServiceKey).toBe('kpa-society');
     expect(res.body.data).not.toHaveProperty('targetWorkspace');
-    expect(generateTokens).toHaveBeenCalledWith(USER, ['store_owner'], 'neture.co.kr', memberships, 'fam-1');
+    // SERVICE handoff 는 대상 서비스 키와 그 서비스의 세대를 새긴다 —
+    //   그 서비스 로그아웃이 이 토큰을 지목할 수 있어야 한다.
+    expect(generateTokens).toHaveBeenCalledWith(USER, ['store_owner'], 'neture.co.kr', memberships, 'fam-1', 'kpa-society', 0);
     expect(resolveAccessibleStores).not.toHaveBeenCalled();
   });
 

@@ -39,6 +39,13 @@ import { CreateHospitalDeviceTables1790125390245 } from '../migrations/179012539
 //   런타임 의존은 Phase B-1 에서 0 이 됐고(B-1 revision 서빙 상태에서 Google 로그인 회귀 PASS),
 //   deploy 는 migration 이 새 revision 보다 먼저 실행되므로 코드 선행이 필수였다.
 import { DropLegacyPasswordAuthSchema1790251584623 } from '../migrations/1790251584623-DropLegacyPasswordAuthSchema.js';
+import { CreateCommunityDomain1790400000000 } from '../migrations/1790400000000-CreateCommunityDomain.js';
+// WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §5 (branch_creation_requests: 분회 개설 신청 축)
+import { CreateBranchCreationRequests1790400000001 } from '../migrations/1790400000001-CreateBranchCreationRequests.js';
+// WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8 (service_session_revocations: 서비스 단위 세션 폐기)
+import { CreateServiceSessionRevocations1790400000002 } from '../migrations/1790400000002-CreateServiceSessionRevocations.js';
+// WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8 (handoff 원장에 출발 서비스 세대 보관)
+import { AlterHandoffTokensSourceSessionEpoch1790400000003 } from '../migrations/1790400000003-AlterHandoffTokensSourceSessionEpoch.js';
 
 export const INCREMENTAL_MIGRATION_CUTOFF = {
   baselineVersion: '2026-09-18-id685',
@@ -58,6 +65,10 @@ export const INCREMENTAL_MIGRATIONS: readonly MigrationClass[] = [
   CreateOperatorInvitations1790125106065,
   CreateHospitalDeviceTables1790125390245,
   DropLegacyPasswordAuthSchema1790251584623,
+  CreateCommunityDomain1790400000000,
+  CreateBranchCreationRequests1790400000001,
+  CreateServiceSessionRevocations1790400000002,
+  AlterHandoffTokensSourceSessionEpoch1790400000003,
 ];
 
 export function incrementalMigrationNames(): string[] {

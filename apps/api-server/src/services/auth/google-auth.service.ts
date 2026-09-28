@@ -107,6 +107,15 @@ export interface GoogleSignupConsents {
 export interface GoogleAuthRequestMeta {
   ipAddress: string;
   userAgent: string;
+  /**
+   * WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8 — 이 세션이 속한 서비스.
+   *
+   * **요청 origin 에서 파생한 값이며 `GoogleLoginInput.serviceKey`(요청 본문)와 다르다.**
+   * 본문 값은 "가입 상태를 알려 달라" 는 조회 대상이고, 이 값은 발급되는 refresh token 에
+   * 새겨지는 세션 귀속이다. 본문 값을 쓰면 클라이언트가 자기 세션을 다른 서비스로 표시해
+   * 그 서비스의 로그아웃에 끊기게 만들 수 있다.
+   */
+  sessionServiceKey?: string | null;
 }
 
 export interface GoogleLoginInput extends GoogleAuthRequestMeta {
@@ -129,7 +138,10 @@ export interface GoogleAuthSession {
 }
 
 /** 세션 발급 결과 — 테스트에서 주입해 JWT/DB 를 우회한다. */
-export type SessionIssuer = (user: User) => Promise<{
+export type SessionIssuer = (
+  user: User,
+  sessionServiceKey?: string | null,
+) => Promise<{
   tokens: AuthTokens;
   roles: string[];
   memberships: { serviceKey: string; status: string; role?: string }[];
@@ -158,7 +170,9 @@ export class GoogleAuthService {
   constructor(deps: GoogleAuthServiceDeps = {}) {
     this.identity = deps.identity ?? googleIdentityService;
     this._dataSource = deps.dataSource;
-    this.issueSession = deps.issueSession ?? ((user) => generateTokensWithContext(user));
+    this.issueSession =
+      deps.issueSession ??
+      ((user, sessionServiceKey) => generateTokensWithContext(user, 'neture.co.kr', sessionServiceKey));
   }
 
   /** env 는 요청 시점에 읽는다 — 플래그 제거(폐쇄)가 재배포 없이도 즉시 반영되도록. */
@@ -312,7 +326,7 @@ export class GoogleAuthService {
     meta: GoogleAuthRequestMeta,
     isNewUser: boolean,
   ): Promise<GoogleAuthSession> {
-    const { tokens, roles, memberships } = await this.issueSession(user);
+    const { tokens, roles, memberships } = await this.issueSession(user, meta.sessionServiceKey ?? null);
 
     const tokenFamily = tokenUtils.getTokenFamily(tokens.refreshToken);
     await this.userRepository.update(

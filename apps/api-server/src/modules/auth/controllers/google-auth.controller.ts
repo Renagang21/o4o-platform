@@ -8,6 +8,7 @@
  */
 import { Request, Response } from 'express';
 import type { AuthRequest } from '../../../common/middleware/auth.middleware.js';
+import { resolveSessionServiceKey } from '../../../utils/session-origin.js';
 import { getTrustedClientIp } from '../../../utils/trusted-client-ip.js';
 import { BaseController } from '../../../common/base.controller.js';
 import { authenticationService } from '../../../services/authentication.service.js';
@@ -55,6 +56,9 @@ export class GoogleAuthController extends BaseController {
         ...(serviceKey && { serviceKey }),
         ipAddress: getTrustedClientIp(req),
         userAgent: req.headers['user-agent'] || 'Unknown',
+        // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8: 세션 귀속은 origin 파생이다.
+        //   위 body `serviceKey` 는 가입 상태 조회 대상일 뿐 세션 귀속이 아니다.
+        sessionServiceKey: resolveSessionServiceKey(req.get('origin')),
       });
       return GoogleAuthController.respondWithSession(req, res, session, includeLegacyTokens, 'Login successful');
     } catch (error) {
@@ -71,6 +75,7 @@ export class GoogleAuthController extends BaseController {
         consents,
         ipAddress: getTrustedClientIp(req),
         userAgent: req.headers['user-agent'] || 'Unknown',
+        sessionServiceKey: resolveSessionServiceKey(req.get('origin')),
       });
       return GoogleAuthController.respondWithSession(req, res, session, includeLegacyTokens, 'Signup successful', 201);
     } catch (error) {

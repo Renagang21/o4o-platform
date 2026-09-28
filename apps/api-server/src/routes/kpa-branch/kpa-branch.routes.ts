@@ -55,6 +55,11 @@
  *   POST   /api/v1/kpa-branch/branches/:branchSlug/operator/members/:userId/leave               전출
  *   *      /api/v1/kpa-branch/admin/domains/**                               (admin scope)
  *   *      /api/v1/kpa-branch/admin/service-members/**                        (admin scope)  가입 승인
+ *   POST   /api/v1/kpa-branch/branch-requests                                              분회 개설 신청 (인증)
+ *   GET    /api/v1/kpa-branch/branch-requests/mine                                         내 신청 이력 (인증)
+ *   GET    /api/v1/kpa-branch/admin/branch-requests                          (kpa-branch:admin)      승인 대기 목록
+ *   POST   /api/v1/kpa-branch/admin/branch-requests/:requestId/approve       (kpa-branch:admin)      개설 승인 (주소 검사 2회차 · 첫 운영자 지정)
+ *   POST   /api/v1/kpa-branch/admin/branch-requests/:requestId/reject        (kpa-branch:admin)      개설 거절
  *   POST   /api/v1/kpa-branch/admin/branches                                 (platform:super_admin)  신규 분회 생성
  *   PATCH  /api/v1/kpa-branch/admin/branches/:id                             (platform:super_admin)  분회 기본정보 수정 (name/parentId/description/address/phone)
  *   DELETE /api/v1/kpa-branch/admin/branches/:id                             (platform:super_admin)  오생성 분회 정리 (하위 0행일 때만)
@@ -70,6 +75,10 @@ import { Router } from 'express';
 import { getService } from '../../config/service-catalog.js';
 import { SERVICE_KEYS } from '../../constants/service-keys.js';
 import { requireAuth, requireRole } from '../../middleware/auth.middleware.js';
+// CodeQL(js/missing-rate-limiting) 은 `config/rate-limiters.config` 의 limiter 를 인식하지 못한다.
+// 선례(routes/admin/platform-accounts.routes.ts · store-owner-terminations.routes.ts)대로
+// `middleware/rateLimiter` 의 apiLimiter 를 쓴다(분당 60 · IP+userId 키).
+import { apiLimiter } from '../../middleware/rateLimiter.js';
 import { AppDataSource } from '../../database/connection.js';
 import {
   requireKpaBranchScope,
@@ -92,6 +101,7 @@ import { BranchEducationCreditController } from '../../controllers/kpa-branch/Br
 import { BranchEventController } from '../../controllers/kpa-branch/BranchEventController.js';
 import { BranchOfficerController } from '../../controllers/kpa-branch/BranchOfficerController.js';
 import { BranchAdminController } from '../../controllers/kpa-branch/BranchAdminController.js';
+import { BranchCreationRequestController } from '../../controllers/kpa-branch/BranchCreationRequestController.js';
 
 const SERVICE_KEY = SERVICE_KEYS.KPA_BRANCH;
 
@@ -598,6 +608,35 @@ export function createKpaBranchRoutes(): Router {
   // 분회를 새로 만드는 일은 서비스 관리자 권한이 아니라 플랫폼 구조 변경이고, 이전까지는
   // raw SQL 이 유일한 경로였다. 생성만으로 site/운영자/회원은 만들지 않는다 — 온보딩은
   // 기존 canonical 경로(operator/members · admin/service-members · operator/site) 를 그대로 쓴다.
+  // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §5 — 개설 신청·승인 축.
+  //
+  //   신청은 인증만 요구한다: 아직 어느 분회에도 속하지 않은 사람이 신청한다.
+  //   심사는 `kpa-branch:admin`(서비스 전체 운영자)이 한다 — `kpa-branch:operator` 는 전역
+  //   역할이어서 개별 분회 운영자도 가지므로, 그 역할로 열면 A 분회 운영자가 B 분회 개설을
+  //   승인한다. 개별 분회 한정(resolveBranch + requireBranchScope)은 여기 붙이지 않는다:
+  //   대상 분회가 아직 없기 때문이다.
+  //   신청 경로는 인증만 요구하므로 **로그인한 누구나** 호출할 수 있다 — 신청 1건마다 slug
+  //   조회 + INSERT 가 나가므로 rate limit 을 붙인다(개설 신청 폭주 · DoS 차단).
+  router.post('/branch-requests', apiLimiter as any, requireAuth as any, wrap(BranchCreationRequestController.create));
+  router.get('/branch-requests/mine', apiLimiter as any, requireAuth as any, wrap(BranchCreationRequestController.mine));
+
+  const branchServiceAdminGuards = [apiLimiter as any, requireAuth as any, requireKpaBranchScope(`${SERVICE_KEY}:admin`)];
+  router.get(
+    '/admin/branch-requests',
+    ...branchServiceAdminGuards,
+    wrap(BranchCreationRequestController.listPending),
+  );
+  router.post(
+    '/admin/branch-requests/:requestId/approve',
+    ...branchServiceAdminGuards,
+    wrap(BranchCreationRequestController.approve),
+  );
+  router.post(
+    '/admin/branch-requests/:requestId/reject',
+    ...branchServiceAdminGuards,
+    wrap(BranchCreationRequestController.reject),
+  );
+
   const superAdminGuards = [requireAuth as any, requireRole('platform:super_admin') as any];
   router.post('/admin/branches', ...superAdminGuards, wrap(BranchAdminController.create));
   router.patch('/admin/branches/:id', ...superAdminGuards, wrap(BranchAdminController.update));

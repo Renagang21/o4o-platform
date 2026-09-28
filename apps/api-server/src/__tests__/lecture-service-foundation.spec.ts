@@ -13,6 +13,10 @@ describe('Lecture Service Foundation', () => {
   // reference seed 는 migration 이 아니라 CLI (data-only 는 incremental 계약 C22 fingerprint 중복 · MIGRATION-STANDARD 규칙 8)
   const seed = read('scripts/seed-lecture-service-and-roles.ts');
   const join = read('modules/auth/controllers/handoff.controller.ts');
+  // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8:
+  //   origin -> 서비스 판정이 `utils/session-origin` 으로 옮겨졌다(로그인·로그아웃·handoff 가
+  //   같은 답을 써야 서비스 단위 세션 폐기가 어긋나지 않는다). 계약은 그대로다 — 정확 호스트명 일치.
+  const originResolver = read('utils/session-origin.ts');
 
   it('canonical service identity와 study.neture.co.kr을 등록한다', () => {
     expect(serviceKeys).toContain("LECTURE: 'lecture'");
@@ -24,9 +28,21 @@ describe('Lecture Service Foundation', () => {
   });
 
   it('study.neture.co.kr origin을 neture가 아니라 exact hostname으로 판정한다', () => {
-    expect(join).toContain('new URL(origin).hostname.toLowerCase()');
-    expect(join).toContain('svc.domain.toLowerCase() === originHost');
-    expect(join).not.toContain('origin.includes(svc.domain)');
+    expect(originResolver).toContain('new URL(origin).hostname.toLowerCase()');
+    expect(originResolver).toContain('svc.domain.toLowerCase() === host');
+    // 부분 문자열 일치는 study.neture.co.kr 을 neture 로 오판한다 — 어느 파일에서도 금지.
+    for (const src of [originResolver, join]) {
+      expect(src).not.toContain('origin.includes(svc.domain)');
+      expect(src).not.toContain('hostname.includes(');
+    }
+  });
+
+  it('handoff 는 origin→서비스 판정을 자체 구현하지 않는다 (두 답이 갈리지 않는다)', () => {
+    // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8 (5차): handoff 출발은 이제 Origin 이 아니라
+    //   access token claim 이 증명한다(Origin 은 클라이언트가 지정할 수 있다). 그래서 handoff 는
+    //   origin 판정을 아예 쓰지 않고, 자체 host 매칭도 두지 않는다.
+    expect(join).not.toContain('resolveSessionServiceKey');
+    expect(join).not.toMatch(/O4O_SERVICES\.find\([^)]*origin/);
   });
 
   it('Lecture 역할은 3개뿐이고 lecture:member는 만들지 않는다', () => {

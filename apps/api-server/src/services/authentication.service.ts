@@ -69,8 +69,13 @@ export class AuthenticationService {
     return this.tokenSessionService.verifyAccessToken(token);
   }
 
-  async logout(userId: string): Promise<void> {
-    return this.tokenSessionService.logout(userId);
+  /**
+   * WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8:
+   *   `serviceKey` 는 **요청 origin 에서 파생**된 값이다(클라이언트 입력 아님).
+   *   없으면 서버측 무효화를 하지 않는다 — 범위를 모르는 채 전역으로 넓히지 않는다.
+   */
+  async logout(userId: string, serviceKey?: string | null): Promise<void> {
+    return this.tokenSessionService.logout(userId, serviceKey);
   }
 
   async logoutAll(userId: string): Promise<void> {

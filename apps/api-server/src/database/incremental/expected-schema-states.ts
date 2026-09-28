@@ -87,6 +87,51 @@ export const EXPECTED_SCHEMA_STATES: readonly ExpectedSchemaState[] = [
     fingerprint: '6503cfb6ac967ed294f7cd50a56df704fced80777cab75d0dff64b2af602c72c',
     fingerprintLineCount: 5793,
   },
+  // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 (S2) — 커뮤니티 개체 3테이블 신설.
+  // communities · community_creation_requests · community_memberships + 인덱스 6개.
+  // 5793 -> 5854 (+61): 테이블 3 · UNIQUE/부분 UNIQUE 3 · 일반 인덱스 3 · CHECK 4 · FK 7 이 더해진다.
+  // baseline 2026-09-18-id685 fresh bootstrap + incremental 1..6 을 격리 PostgreSQL 15
+  // (docker postgres:15, 로컬 전용 포트 55433, throwaway DB) 에서 산출: 운영 DB fingerprint 채택 아님.
+  {
+    appliedThrough: 'CreateCommunityDomain1790400000000',
+    fingerprint: 'c7ada575b9db6d4e8cbf8a2e158f4754bb86e3afa4ca2333f4e86916f60148e3',
+    fingerprintLineCount: 5854,
+  },
+  // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 (S3) — 분회 개설 신청 원장 1테이블 신설.
+  // branch_creation_requests + 인덱스 3개(부분 UNIQUE 1 · 일반 2).
+  // 5854 -> 5882 (+28): 테이블 1 · 부분 UNIQUE 1 · 일반 인덱스 2 · CHECK 3 · FK 4 가 더해진다.
+  // baseline 2026-09-18-id685 fresh bootstrap + incremental 1..7 을 격리 PostgreSQL 15
+  // (docker postgres:15, 로컬 전용 포트 55435, throwaway DB) 에서 실제 적용해 산출:
+  // 운영 DB fingerprint 채택 아님.
+  {
+    appliedThrough: 'CreateBranchCreationRequests1790400000001',
+    fingerprint: 'c06a80afbbb9415b499bd94f36ba0a012460672c5afb4d22b36ea67258645f82',
+    fingerprintLineCount: 5882,
+  },
+  // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 (S7 재작업) — 서비스 단위 세션 폐기 원장 1테이블.
+  // service_session_revocations + 인덱스 1개. PK 는 (user_id, service_key) 복합.
+  // 판정 축이 시각이 아니라 session_epoch 라서 컬럼·CHECK 가 하나씩 더 있다
+  // (iat 는 초 단위여서 같은 초의 기존·신규 토큰을 구별할 수 없었다 — §8).
+  // 5882 -> 5893 (+11): 테이블 1 · PK 1 · 일반 인덱스 1 · CHECK 1 · FK 1 · DEFAULT 등.
+  // baseline 2026-09-18-id685 fresh bootstrap + incremental 1..8 을 격리 PostgreSQL 15
+  // (docker postgres:15, 로컬 전용 포트 55437, throwaway DB) 에서 실제 적용해 산출:
+  // 운영 DB fingerprint 채택 아님.
+  {
+    appliedThrough: 'CreateServiceSessionRevocations1790400000002',
+    fingerprint: '51393b6382a0908b04eeb7ec4670a2b44746ae632b51e952d351114af71034a1',
+    fingerprintLineCount: 5893,
+  },
+  // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8 (3차) — handoff 원장에 출발 서비스 세대 1컬럼.
+  // 로그아웃 **전에** 받아 둔 handoff 토큰을 로그아웃 뒤 TTL(60초) 안에 교환하는 경로를 막는다.
+  // 5893 -> 5895 (+2): 컬럼 1 · COMMENT 1.
+  // baseline 2026-09-18-id685 fresh bootstrap + incremental 1..9 를 격리 PostgreSQL 15
+  // (docker postgres:15, 로컬 전용 포트 55438, throwaway DB) 에서 실제 적용해 산출:
+  // 운영 DB fingerprint 채택 아님.
+  {
+    appliedThrough: 'AlterHandoffTokensSourceSessionEpoch1790400000003',
+    fingerprint: '7fdd328fe7e488469350bf1e69f5463fcb6e5a746de4c2d86d2d4f2272dd3bd0',
+    fingerprintLineCount: 5895,
+  },
 ] as const;
 
 /** Expected state after `prefixLength` incremental migrations; undefined when not registered. */

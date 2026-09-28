@@ -181,6 +181,35 @@ export interface AccessTokenPayload {
   deviceId?: string;
   /** Guest session ID for tracking guest activity */
   guestSessionId?: string;
+  /**
+   * WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8 (3차) — 세션 귀속.
+   *
+   * refresh token 에만 실으면 **refresh 경로만** 막힌다. 로그아웃 뒤에도 남은 access token
+   * (최대 15분)으로 `POST /auth/handoff` 를 불러 수명이 긴 세션을 새로 얻을 수 있었다.
+   * 긴 세션을 만들어 주는 경로가 이 값으로 "이미 로그아웃된 인증인가" 를 본다.
+   *
+   * 모든 API 요청마다 검사하지 않는다 — `requireAuth` 에 DB 조회를 넣으면 Core 경로 비용이
+   * 요청마다 늘어난다. 막아야 하는 것은 "짧은 인증으로 긴 세션을 새로 만드는 일" 이다.
+   */
+  serviceKey?: string;
+  sessionEpoch?: number;
+}
+
+/**
+ * WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8 (3차) — 세션 귀속 claim 두 개.
+ *
+ * refresh token 에만 있으면 **refresh 경로만** 막힌다. 로그아웃 뒤에도 남은 access token
+ * (최대 15분)으로 `POST /auth/handoff` 를 불러 **수명이 긴 세션을 새로 얻을 수 있었다.**
+ * 그래서 access token 에도 같은 두 값을 싣고, 긴 세션을 만들어 주는 경로가 그것을 검사한다.
+ *
+ * 모든 API 요청마다 검사하지는 않는다 — `requireAuth` 에 DB 조회를 넣으면 Core 경로의 비용이
+ * 요청마다 늘어난다. 막아야 하는 것은 "짧은 인증으로 긴 세션을 새로 만드는 일" 이다.
+ */
+export interface SessionScopeClaims {
+  /** 이 토큰이 속한 서비스(또는 `store`·`admin` 같은 surface) 키 */
+  serviceKey?: string;
+  /** 발급 시점의 `service_session_revocations.session_epoch` */
+  sessionEpoch?: number;
 }
 
 export interface RefreshTokenPayload {
@@ -188,6 +217,29 @@ export interface RefreshTokenPayload {
   tokenVersion: number;
   sub?: string; // JWT standard claim
   tokenFamily?: string;
+  /**
+   * WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8 — 이 세션이 **어느 서비스의 것인가**.
+   *
+   * 종전 refresh token 에는 서비스 식별자가 없었다(`iss`/`aud` 는 서버 상수다). 그래서 서버가
+   * "이 서비스 세션만 끊어라" 를 실행할 수 없었고 `logout` 이 전역 폐기로 귀결됐다.
+   *
+   * 값의 출처: 로그인은 요청 origin 의 서비스, handoff 는 대상 서비스, 회전은 승계.
+   * 배포 전에 발급된 토큰에는 이 claim 이 **없다** — 그 경우의 처리는
+   * `auth-token-session.service.ts` 의 폐기 검사 주석 참조.
+   */
+  serviceKey?: string;
+  /**
+   * WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8 — 이 세션의 **세대**.
+   *
+   * 서비스 단위 로그아웃 판정은 시각이 아니라 이 값으로 한다. `iat` 는 **초 단위**라
+   * 같은 초의 기존 토큰과 새 토큰을 구별할 수 없고, 그래서 로그아웃한 같은 초에 다시
+   * 로그인하면 새 토큰까지 거절되는 결함이 있었다. 세대는 단조 증가하므로 시각이 같아도
+   * 선후가 갈린다. 발급 시점의 `service_session_revocations.session_epoch` 를 새긴다.
+   *
+   * 배포 전에 발급된 토큰에는 이 claim 이 **없다** — 처리는 `service-session-epoch.ts` 의
+   * `isSessionEpochLive` 주석 참조.
+   */
+  sessionEpoch?: number;
   // Phase 2.5: Server isolation claims
   iss?: string; // Issuer - identifies the server that issued the token
   aud?: string; // Audience - identifies the intended recipient

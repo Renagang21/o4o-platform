@@ -21,7 +21,20 @@ export type ServiceKey =
   //   type-only 확장(union 확대). 기존 키의 동작·설정은 변경하지 않는다.
   //   role prefix === service_memberships.service_key (self-map) 이므로
   //   ROLE_PREFIX_TO_CANONICAL_SERVICE_KEY 항목 추가는 불필요하다.
-  | 'kpa-branch';
+  | 'kpa-branch'
+  // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1: 독립 서비스 3개.
+  //   type-only 확장(union 확대). 기존 키의 동작·설정은 변경하지 않는다.
+  //   role prefix === service_memberships.service_key (self-map) 이므로
+  //   ROLE_PREFIX_TO_CANONICAL_SERVICE_KEY 항목 추가는 불필요하다.
+  //
+  //   `supplier` · `funding` 도 독립 키다. 착수 중 "기존 neture 키로 충분하다" 고 판정했다가
+  //   **철회했다**(§4-0). 철회 이유: FROZEN O4O-SUPPLIER-DOMAIN-BOUNDARY-V1 §7 이 고정한 것은
+  //   "이 사용자가 **어느 공급자 조직을 소유**하는가"이고, 여기서 필요한 것은 "누가 그
+  //   **서브도메인 영역을 운영**하는가"다. 서로 다른 질문이므로 두 번째 인가 축이 아니다 —
+  //   조직 소유권 검사(organization_members)는 그대로 두고 운영자 범위만 분리한다.
+  | 'community'
+  | 'supplier'
+  | 'funding';
 
 /** Service-prefixed role format: "service:role" */
 export type PrefixedRole = `${ServiceKey}:${string}`;
