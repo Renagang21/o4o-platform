@@ -15,10 +15,11 @@ const read = (rel: string) => fs.readFileSync(path.join(SRC, rel), 'utf-8');
 
 describe('getServicePublicOrigin — 역할 접두 키 alias 해석', () => {
   it.each([
-    ['kpa', 'https://kpa-society.co.kr'],
-    ['kpa-society', 'https://kpa-society.co.kr'],
-    ['cosmetics', 'https://k-cosmetics.site'],
-    ['k-cosmetics', 'https://k-cosmetics.site'],
+    // WO-O4O-SERVICE-CATALOG-CANONICAL-DOMAIN-AND-PH-JOIN-CLEANUP-V1: 새로 만드는 주소는 canonical 호스트.
+    ['kpa', 'https://pharmacy.neture.co.kr'],
+    ['kpa-society', 'https://pharmacy.neture.co.kr'],
+    ['cosmetics', 'https://retail.neture.co.kr'],
+    ['k-cosmetics', 'https://retail.neture.co.kr'],
     ['pharmacy-hub', 'https://pharmacyhub.co.kr'],
     ['neture', 'https://neture.co.kr'],
   ])('%s → %s', (key, origin) => {
@@ -31,11 +32,11 @@ describe('getServicePublicOrigin — 역할 접두 키 alias 해석', () => {
 });
 
 describe('제휴 QR 랜딩 URL', () => {
-  it('cosmetics 는 카탈로그 호스트(k-cosmetics.site)를 쓴다', () => {
-    expect(buildAffiliateLandingUrl('cosmetics', 'abc')).toBe('https://k-cosmetics.site/foreign-visitor/affiliate/abc');
+  it('cosmetics 는 카탈로그 canonical 호스트(retail.neture.co.kr)를 쓴다', () => {
+    expect(buildAffiliateLandingUrl('cosmetics', 'abc')).toBe('https://retail.neture.co.kr/foreign-visitor/affiliate/abc');
   });
-  it('kpa · pharmacy-hub 값은 이전과 같다', () => {
-    expect(buildAffiliateLandingUrl('kpa', 'x')).toBe('https://kpa-society.co.kr/foreign-visitor/affiliate/x');
+  it('kpa 는 canonical 호스트 · pharmacy-hub 값은 이전과 같다', () => {
+    expect(buildAffiliateLandingUrl('kpa', 'x')).toBe('https://pharmacy.neture.co.kr/foreign-visitor/affiliate/x');
     expect(buildAffiliateLandingUrl('pharmacy-hub', 'x')).toBe('https://pharmacyhub.co.kr/foreign-visitor/affiliate/x');
   });
 });

@@ -121,10 +121,12 @@ export function setActiveServiceContext(key: UnifiedServiceKey | null): void {
  * 아니라 **각 서비스 앱**이 서빙한다. 복사 · 미리보기 URL 을 `window.location.origin`(store 호스트)으로
  * 만들면 열리지 않는 주소가 된다(CHECK-O4O-URL-FIRST-CENSUS-V1 §7-6).
  * 서버의 QR 이미지 · 인쇄 URL(`qrPublicOrigin`)과 같은 호스트를 가리킨다.
+ * WO-O4O-SERVICE-CATALOG-CANONICAL-DOMAIN-AND-PH-JOIN-CLEANUP-V1: 서버 service-catalog 의 canonical 호스트를 따른다.
+ * 옛 호스트(kpa-society.co.kr · k-cosmetics.site)는 인쇄 QR 수용용으로 계속 서빙되지만 새로 만드는 주소에는 쓰지 않는다.
  */
 export const SERVICE_PUBLIC_ORIGIN: Readonly<Record<UnifiedServiceKey, string>> = Object.freeze({
-  'kpa-society': 'https://kpa-society.co.kr',
-  'k-cosmetics': 'https://k-cosmetics.site',
+  'kpa-society': 'https://pharmacy.neture.co.kr',
+  'k-cosmetics': 'https://retail.neture.co.kr',
   'pharmacy-hub': 'https://pharmacyhub.co.kr',
 });
 

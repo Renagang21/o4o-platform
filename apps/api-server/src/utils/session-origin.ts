@@ -9,7 +9,7 @@
  *   로그아웃 어느 서비스의 세션을 끝내는가
  *   handoff  어느 서비스로 넘기는가 (그쪽은 대상이 명시되므로 이 함수가 필요 없다)
  *
- * 판정은 `service-catalog` 의 `domain` 한 곳에서만 나온다 — 호스트 목록을 파일마다
+ * 판정은 `service-catalog` 의 `domain` · `legacyDomains` 한 곳에서만 나온다 — 호스트 목록을 파일마다
  * 따로 적으면 카탈로그와 어긋난다. 서비스가 아닌 **surface** 두 개만 예외로 둔다:
  *
  *   `store.neture.co.kr`   공통 Store Workspace (handoff 의 WORKSPACE 계약과 같은 값)
@@ -49,5 +49,15 @@ export function resolveSessionServiceKey(origin: string | undefined | null): str
   }
   if (host === STORE_WORKSPACE_HOST.toLowerCase()) return STORE_WORKSPACE_KEY;
   if (ADMIN_HOSTS.includes(host)) return ADMIN_SURFACE_KEY;
-  return O4O_SERVICES.find((svc) => svc.domain.toLowerCase() === host)?.key ?? null;
+  // canonical `domain` 과 수용 전용 `legacyDomains` 를 같은 서비스로 본다 — 옛 호스트(인쇄 QR · 북마크)로
+  // 들어온 로그인도 같은 서비스 세션이다. 카탈로그 순서대로 한 번만 훑는다: kpa-society.co.kr 은
+  // kpa-society 의 옛 호스트이면서 kpa-branch 의 domain(`/kpa` path 서빙)이기도 한데, 호스트 루트는
+  // KPA Society 앱이고 종전 판정도 kpa-society 였다. 카탈로그에서 kpa-society 가 앞에 있어 그 답이 유지된다.
+  return (
+    O4O_SERVICES.find(
+      (svc) =>
+        svc.domain.toLowerCase() === host ||
+        (svc.legacyDomains ?? []).some((legacy) => legacy.toLowerCase() === host),
+    )?.key ?? null
+  );
 }

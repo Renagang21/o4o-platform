@@ -168,7 +168,7 @@ function generatePublicKey(): string {
 //   파일별 호스트 표는 카탈로그와 어긋나 존재하지 않는 호스트를 QR 에 찍었다
 //   (`cosmetics.neture.co.kr` NXDOMAIN — CHECK-O4O-URL-FIRST-CENSUS-V1 §7-1).
 function buildLandingUrl(serviceKey: string | undefined, publicKey: string): string {
-  const origin = (serviceKey && getServicePublicOrigin(serviceKey)) || 'https://kpa-society.co.kr';
+  const origin = (serviceKey && getServicePublicOrigin(serviceKey)) || 'https://pharmacy.neture.co.kr';
   return `${origin}/multilingual-products/${publicKey}`;
 }
 

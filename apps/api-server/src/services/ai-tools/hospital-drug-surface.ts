@@ -37,6 +37,7 @@ import type { TaskModality } from './task-modality-router.js';
 import {
   extractProduct,
   extractStrength,
+  mentionsDrugInfoIntent,
   mentionsHospital,
   mentionsSameIngredient,
   queryLocal,
@@ -121,6 +122,8 @@ export function decideHospitalDrugSurfacePlan(
   }
   if (modality === 'research') return 'research';
   if (product) return 'research';
+  // 약품명 어미가 없는 일반 약품 정보 질문("타이레놀 성분이 무어니") — 병원 surface 의 기본값은 조사다(공통 Router 무변경).
+  if (mentionsDrugInfoIntent(message)) return 'research';
   return 'question';
 }
 

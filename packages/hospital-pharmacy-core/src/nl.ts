@@ -87,6 +87,53 @@ export function extractProduct(message: string): string | null {
   return extractDrugNameToken(message);
 }
 
+/**
+ * 약품 정보 질문 의도어 — "타이레놀 성분이 무어니" 처럼 약품명 어미(정·캡슐…)가 없는 일반 약품 질문을 조사로 보내기 위한 병원 도메인 어휘.
+ * 공통 Task Modality Router 에는 넣지 않는다(병원 surface 전용).
+ */
+const DRUG_INFO_INTENT_TOKENS: readonly string[] = [
+  '성분', '효능', '효과', '부작용', '주의사항', '주의점', '용법', '용량', '복용', '금기', '상호작용', '적응증', '약효', '대체약', '제형', '함량', '보관법',
+];
+
+/** 의도어 앞에 와도 "대상 약품"으로 치지 않는 일반어. */
+const DRUG_INFO_NON_SUBJECT: ReadonlySet<string> = new Set([
+  '우리', '원내', '병원', '약국', '이약', '그약', '약', '같은', '동일', '동일한', '무슨', '어떤', '어떻게', '무엇', '뭐', '뭐야', '뭐니',
+  '무어', '무어니', '뭔가요', '뭐예요', '무엇인가요', '알려', '알려줘', '알려주세요', '좀', '해줘', '해주세요', '조사', '조사해', '조사해줘',
+  '설명', '설명해줘', '정리', '정리해줘', '궁금해', '궁금해요', '있어', '있나요', '대해', '대해서', '주요', '주',
+]);
+
+/**
+ * 문장이 **특정 약품의 정보**(성분·효능·부작용·용법 등)를 묻는가.
+ * 의도어와 함께 그 대상이 될 단어(2자 이상 · 일반어 아님 · 숫자만 아님)가 하나 이상 있어야 true.
+ * 붙여 쓴 문장("타이레놀성분이무어니")은 의도어 앞부분을 대상으로 본다. 대상 없이 "성분이 뭐야" 만 있으면 false(되묻기 유지).
+ */
+export function mentionsDrugInfoIntent(message: string): boolean {
+  const text = String(message ?? '');
+  const c = compact(text);
+  if (!DRUG_INFO_INTENT_TOKENS.some((t) => c.includes(t))) return false;
+  const trimChars = new Set(['"', "'", '(', ')', '[', ']', ',', '.', '?', '!', '~', ...QUOTE_PAIRS.flat()]);
+  for (const raw of text.split(/\s+/)) {
+    let token = raw;
+    while (token.length > 0 && trimChars.has(token[0])) token = token.slice(1);
+    while (token.length > 0 && trimChars.has(token[token.length - 1])) token = token.slice(0, -1);
+    const lower = token.toLowerCase();
+    let cut = lower.length;
+    for (const intent of DRUG_INFO_INTENT_TOKENS) {
+      const i = lower.indexOf(intent);
+      if (i >= 0 && i < cut) cut = i;
+    }
+    let candidate = token.slice(0, cut);
+    for (const particle of TRAILING_PARTICLES_KO) {
+      if (candidate.length > particle.length + 1 && candidate.endsWith(particle)) {
+        candidate = candidate.slice(0, -particle.length);
+        break;
+      }
+    }
+    if (candidate.length >= 2 && !DRUG_INFO_NON_SUBJECT.has(candidate) && !/^[0-9.,]+$/.test(candidate)) return true;
+  }
+  return false;
+}
+
 /** 문장에서 함량 하나를 뽑는다. "200mg" · "5 mg" · "1.5g" → 공백 없는 소문자. 없으면 null. */
 export function extractStrength(message: string): string | null {
   const m = /(\d+(?:\.\d+)?)\s?(mg|mcg|g|ml|iu|%)\b/i.exec(String(message ?? ''));
