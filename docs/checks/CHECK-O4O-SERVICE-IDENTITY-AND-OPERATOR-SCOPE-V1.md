@@ -1,6 +1,6 @@
 # CHECK-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1
 
-> 시작: 2026-09-27 · 상태: **`병합 완료(2026-09-28, 880642e9b) · 배포 1(2edfe9b33 · migration 0) 트래픽 전환 · Google 로그인 7/7 PASS · 새로고침 유지 확인 대기로 배포 1 미완료(§8-5) · 배포 2(이 작업) 미배포 · DEPLOY_ENABLED=false · 승격 CLI 결함 정정(§8-2, 95377812e) · 운영 적용·실제 접근 검증 전`**
+> 시작: 2026-09-27 · 상태: **`병합 완료(2026-09-28, 880642e9b) · 배포 1(2edfe9b33 · migration 0) 배포 1 완료(§8-5) · 배포 2 실행 경로 확정(§8-6 · migration 후 API 전환 전 멈춤) · 배포 2(이 작업) 미배포 · DEPLOY_ENABLED=false · 승격 CLI 결함 정정(§8-2, 95377812e) · 운영 적용·실제 접근 검증 전`**
 > PR: [#241](https://github.com/Renagang21/o4o-platform/pull/241) — 1차 CI green 후
 > **리뷰에서 세 경계가 확정 요구사항과 다르다고 지적돼 같은 PR 에서 정정했다**(§11).
 > 정정 후 재검증: 전 체크 pass · `mergeStateStatus = CLEAN`.
@@ -709,7 +709,7 @@ npx tsx src/scripts/community-catalog-promotion.ts --apply    # 숫자 확인 �
 
 ### 8-5. 배포 1 실측 (2026-09-28 · `2edfe9b33` · migration 0)
 
-> **판정: 11개 서비스 전환 완료 · 병원약국 smoke PASS · 실제 Google 로그인 7/7 PASS(사용자 실측) · 새로고침 후 유지 미확인 → 배포 1 미완료.**
+> **판정: 배포 1 완료 — 11개 서비스 전환 · 병원약국 smoke PASS · 실제 Google 로그인 7/7 · 새로고침 유지 7/7 PASS(사용자 실측).**
 > 배포 2 · 승격 CLI `--apply` 는 시작하지 않았다.
 
 | 항목 | 실측 |
@@ -761,9 +761,33 @@ npx tsx src/scripts/community-catalog-promotion.ts --apply    # 숫자 확인 �
 |---|---|
 | 7개 host Google 로그인 → 서비스 화면 진입 | **PASS** (store · supplier · funding · community · pharmacy · retail · kpa). 기존 가입 상태로 바로 진입한 것도 정상 동작 |
 | §8-0 U2 / U3 | **PASS 확정** — 원본 등록이 실제 로그인으로 확인됨 |
-| 새로고침 후 로그인 유지 | **미확인** — 각 host 1회 새로고침 결과 대기 |
+| 새로고침 후 로그인 유지 | **PASS** — 7개 host 모두 새로고침 후 로그인 유지 (사용자 실측) |
 
-**배포 1 마감 조건 잔여: 대상 host 7개의 새로고침 후 로그인 유지 1건.**
+**배포 1 = 완료 (2026-09-28).** deploy job success · 새 revision 11개 · traffic 100% · 병원약국 smoke · Google 실제 로그인 · 새로고침 유지 전부 충족. 게이트 `false` 유지.
+
+### 8-6. 배포 2 실행 경로 — migration 후 · API 전환 전에 멈춘다 (워크플로 변경 0)
+
+**문제.** `deploy-api.yml` 의 `build-and-deploy` 는 한 job 안에서 이미지 push → migration Job → `gcloud run deploy` 를 잇는다. 약속한 순서(`migration → CLI dry-run → 수치 검토 → --apply → API 전환`)를 지키려면 migration 과 API 트래픽 사이에 멈춤 지점이 필요하다.
+
+**해법 — 트래픽 고정을 멈춤 지점으로 쓴다.** 워크플로 변경은 CI 인프라 변경(중지 조건)이므로 하지 않는다.
+
+| 근거 | 확인 |
+|---|---|
+| `o4o-core-api` 는 이름 지정 revision 에 고정 | `spec.traffic = [{revisionName: o4o-core-api-03756-txs, percent: 100}]` — `latestRevision` 항목 없음 |
+| 고정 상태의 `gcloud run deploy` = 새 revision 트래픽 0% | 배포 1 실측: 고정된 `03755-6zf` 가 100% 유지, 새 `03756-txs` 는 0% (§8-5) |
+| migration 은 정해진 Job · 대상 이미지 SHA | step `Run database migrations` 가 `o4o-api-migrations` Job 을 **방금 push 한 `api-server:${github.sha}`** 로 update 후 `execute --wait`. 태그 dispatch 면 `github.sha` = 태그 커밋 |
+| 옛 revision 이 새 스키마에서 기동 가능 | `classifyDatabaseState` · `computeSchemaFingerprint` 호출처 = `migrate.ts` 뿐(비테스트 코드 grep). API 기동은 `connection.ts` `migrationsRun: false` · `startup.service.ts` "API startup 은 migration 을 실행하지 않는다" — 스키마 단언 없음. 6·7·8 = 새 테이블, 9 = nullable 컬럼 추가 → 배포 1 코드와 호환 (§8-4) |
+| 잔여 위험 (수용) | 트래픽 0% 새 revision 도 배포 시 인스턴스가 떠서 `initializeSchedulers` 를 돈다 — 배포 1 의 `03756-txs`(전환 전 0%)와 같은 조건. 새 테이블 3개 · 새 컬럼 1개는 CLI `--apply` 전 행이 없어 스케줄러 경로와 무관 |
+| job 의 나머지 step | one-off Job 이미지 재고정(`--image` 만) · `/health/ready` 검증(= 고정된 옛 revision 응답) — 트래픽 불변 |
+| 배포 2 실린 범위 | `2edfe9b33..origin/main` 의 비문서 커밋 = PR #241 + `95377812e` 뿐. DB 변경 = incremental 6·7·8·9 뿐 |
+
+**다른 push 가 배포를 촉발하지 않게.**
+1. CHECK 등 이 작업의 push 를 **게이트 열기 전에** 모두 끝낸다.
+2. 태그 `deploy/2026-09-28-service-identity-deploy2` 를 그 시점 main tip 에 고정(95377812e 이후 차이 = docs 뿐인지 확인).
+3. 게이트 `true` → **API 워크플로만** 태그로 dispatch → `build-and-deploy` 가 `waiting`(production 환경 승인 대기) 이 되는 즉시 게이트 `false`. job 수준 `if` 는 승인 대기 진입 전에 평가되므로 이미 대기 중인 job 은 계속되고, 그 뒤의 main push 는 전부 skip. Web · Admin 은 dispatch 하지 않는다(승인 단계 없음 · 배포 1 순서 이탈 재발 방지).
+4. 창 동안 main 에 새 push 가 생겨 API run 이 대기에 들어오면 **승인하지 않고 reject**. 승인은 headBranch = 배포 2 태그 · SHA 일치 run 하나만.
+
+**멈춘 뒤 확인 · 보고 (쓰기 없음).** migration execution 성공 · `typeorm_migrations` +4 · 새 테이블 존재 · API traffic `03756-txs` 100% 유지 · 새 revision 0% → 승격 CLI **공식 dry-run**(read-only 세션) 수치를 §8-0 U1 예상치(2행 · 1명)와 대조해 보고. **`--apply` · API 트래픽 전환 · Web/Admin 배포는 결과 검토 후 별도 지시.**
 
 ---
 
