@@ -1,6 +1,6 @@
 # CHECK-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1
 
-> 시작: 2026-09-27 · 상태: **`병합 완료(2026-09-28, 880642e9b) · 운영 미배포(DEPLOY_ENABLED=false) · 승격 CLI 결함 정정(§8-2, 95377812e) · 배포 SHA 분리 확정(§8-4) · 운영 적용·실제 접근 검증 전`**
+> 시작: 2026-09-27 · 상태: **`병합 완료(2026-09-28, 880642e9b) · 배포 1(2edfe9b33 · migration 0) 트래픽 전환 완료 · 실제 Google 로그인 미실시로 배포 1 미완료(§8-5) · 배포 2(이 작업) 미배포 · DEPLOY_ENABLED=false · 승격 CLI 결함 정정(§8-2, 95377812e) · 운영 적용·실제 접근 검증 전`**
 > PR: [#241](https://github.com/Renagang21/o4o-platform/pull/241) — 1차 CI green 후
 > **리뷰에서 세 경계가 확정 요구사항과 다르다고 지적돼 같은 PR 에서 정정했다**(§11).
 > 정정 후 재검증: 전 체크 pass · `mergeStateStatus = CLEAN`.
@@ -706,6 +706,53 @@ npx tsx src/scripts/community-catalog-promotion.ts --apply    # 숫자 확인 �
 
 `package.json` 에 스크립트를 추가하지 않았다 — 의존성·스크립트 변경은 중지 조건이다.
 기본값이 dry-run 이므로 `--apply` 없이 실행하면 한 행도 쓰지 않는다.
+
+### 8-5. 배포 1 실측 (2026-09-28 · `2edfe9b33` · migration 0)
+
+> **판정: 11개 서비스 전환 완료 · 병원약국 smoke PASS · Google 원본 긍정 신호 7/7 · 실제 Google 로그인 미실시 → 배포 1 미완료.**
+> 배포 2 · 승격 CLI `--apply` 는 시작하지 않았다.
+
+| 항목 | 실측 |
+|---|---|
+| 태그 | `deploy/2026-09-28-url-first-deploy1` → `2edfe9b336a44c3f40eea90157504fef6a135690` |
+| 게이트 | `DEPLOY_ENABLED` 04:26:45Z `true` → **05:10:45Z `false` 재폐쇄** (이후 유지 확인) |
+| run | API `36377775299` (`build-and-deploy` success · production 환경 승인 = 사용자 GitHub UI · migration step success, 신규 migration 없음) · Web `36379598238` (`deploy-*` 9개 success) · Admin `36379600930` (deploy success) |
+| main | 배포 창 동안 `8002d3ec1` 고정 — 외부 push 없음 |
+
+**트래픽 — job success ≠ 배포 완료였다.** 6개 서비스가 2026-09-25 통제 배포 때 `update-traffic --to-revisions` 로 이름 지정 revision 에 고정돼 있어(`latestRevision: False`), 워크플로 배포는 새 revision 만 만들고 트래픽 0% 로 남겼다. 사용자가 이 PC 의 `gcloud`(활성 프로젝트 `netureyoutube` 확인)로 API 1건 → 읽기 전용 확인 → 나머지 5건 순서로 전환했다(내 전환 시도는 권한 분류기에 차단 — 우회하지 않음).
+
+| 서비스 | 배포 전 | 배포 1 (traffic 100%) | 전환 |
+|---|---|---|---|
+| o4o-core-api | `03755-6zf` | `03756-txs` (생성 05:09:17Z) | 사용자 수동 |
+| o4o-admin-dashboard | `01315-2wn` | `01316-hhp` | 사용자 수동 |
+| k-cosmetics-web | `01168-bqk` | `01169-4dj` | 사용자 수동 |
+| lecture-web | `00017-vlh` | `00018-pkv` | 사용자 수동 |
+| pharmacy-hub-web | `00258-nw5` | `00259-9mj` | 사용자 수동 |
+| kpa-society-web | `02000-d6n` | `02001-9wc` | 사용자 수동 |
+| neture-web | `01660-xsx` | `01661-mq6` | 자동 |
+| store-web | `00018-cnm` | `00019-x5v` | 자동 |
+| hospital-pharmacy-web | `00011-qnr` | `00012-vbl` | 자동 |
+| kpa-branch-web | `00178-sj9` | `00179-8q4` | 자동 |
+| signage-player-web | `00091-j5m` | `00092-bzl` | 자동 |
+
+롤백 = 같은 명령에 "배포 전" revision `=100`. 수동 전환한 6개는 여전히 이름 지정 고정 상태다 — 다음 배포(배포 2)도 같은 전환 단계가 필요하다.
+
+**순서 이탈 (보고).** 계획은 API → web → admin 이었으나 Web · Admin 워크플로에는 production 환경 승인 단계가 없어 dispatch 즉시 배포됐고, API 는 승인 대기 중이었다. 자동 전환된 web 5개(병원약국 포함)가 API 전환(05:10Z 게이트 폐쇄 이후 · 05:46Z 확인 이전의 사용자 수동 전환) 전까지 옛 API `03755-6zf` 를 호출한 구간이 있었다. 배포 1 은 DB 변경 0 · handoff 플래그 `false` 라 데이터 영향은 없으나, **배포 2 는 API 를 먼저 dispatch·전환한 뒤 web · admin 을 dispatch 한다.**
+
+**API · 병원약국 smoke (읽기 전용 / 실브라우저 Chromium)**
+
+| 항목 | 결과 |
+|---|---|
+| `GET /health` · `/health/ready` | 200 · 200 |
+| `POST /api/hospital/ai/structure` 빈 본문 | **400 `PROFILE_REQUIRED`** — 404 아님(라우트 등록 · 입력 검증 도달). AI 호출 · DB write 없음 |
+| `/hospital` `hospital-drugs.xlsx` 안내 | PASS — "파일명은 hospital-drugs.xlsx 여야 합니다" |
+| "원내 약품 폴더 연결" 버튼 | PASS |
+| 연결 코드 UI | 없음 — PASS |
+| Google 로그인 UI | 없음 — PASS |
+| 콘솔 오류 | 0 |
+| 호스트 | `hospital.neture.co.kr` **DNS 미해석(`ERR_NAME_NOT_RESOLVED`)** — Cloud Run 기본 URL 로 검증. 도메인 연결은 병원약국 트랙의 사용자측 잔여 |
+
+**Google 원본 (배포 후 · 로그인 전 단계까지)** — `store` · `supplier` · `funding` · `community` · `pharmacy` · `retail` · `kpa` `.neture.co.kr` 7개 모두 루트 200, 로그인 화면에서 GIS 버튼 iframe `gsi/button` **200** · 렌더 1 · `origin` 관련 콘솔 오류 0. 미등록 원본이면 이 단계에서 거부되므로 §8-0 U2/U3 보다 한 단계 강한 근거다. **그러나 자격 교환 · 세션 발급까지 가는 실제 로그인은 하지 않았다 → U2/U3 최종 PASS 아님.** 사람이 각 호스트에서 Google 로그인 1회 → 세션 확인 후 기록한다.
 
 ---
 
