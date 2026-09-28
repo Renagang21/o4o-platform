@@ -1,9 +1,10 @@
 # CHECK-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1
 
-> 시작: 2026-09-27 · 상태: **`병합 완료(2026-09-28, 880642e9b) · 배포 1(2edfe9b33 · migration 0) 배포 1 완료(§8-5) · 배포 2 실행 경로 확정(§8-6 · migration 후 API 전환 전 멈춤) · 배포 2(이 작업) 미배포 · DEPLOY_ENABLED=false · 승격 CLI 결함 정정(§8-2, 95377812e) · 운영 적용·실제 접근 검증 전`**
+> 시작: 2026-09-27 · 상태: **`병합 완료(2026-09-28, 880642e9b) · 배포 1(2edfe9b33 · migration 0) 배포 1 완료(§8-5) · 배포 2 실행 경로 확정(§8-6 → **§8-7 MIGRATE-ONLY 로 대체**) · 배포 2 전 경계 보정(§8-7 · 화면 guard · SHA 범위 · CLI 출력) · 배포 2(이 작업) 미배포 · DEPLOY_ENABLED=false · 승격 CLI 결함 정정(§8-2, 95377812e) · 운영 적용·실제 접근 검증 전`**
 > PR: [#241](https://github.com/Renagang21/o4o-platform/pull/241) — 1차 CI green 후
 > **리뷰에서 세 경계가 확정 요구사항과 다르다고 지적돼 같은 PR 에서 정정했다**(§11).
-> 정정 후 재검증: 전 체크 pass · `mergeStateStatus = CLEAN`.
+> 정정 후 재검증: **PR #241 HEAD(`7ba57bcbc`)** 의 체크 전부 pass(SonarCloud 포함) · `mergeStateStatus = CLEAN`.
+> **main 의 SonarCloud 는 별개로 실패 상태**다(배포 1 기준 `2edfe9b33` 부터 · §8-7-5). "전 체크 PASS" 는 PR HEAD 에만 해당한다.
 > WO: [`WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1`](../work-orders/WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1.md)
 >
 > **하나의 작업이다.** S2-1 · S2-2 는 내부 구현 순서일 뿐 보고 단위가 아니다.
@@ -19,7 +20,7 @@
 | S1' | 권한 경계 보정 4건 | **완료** | — |
 | S2 | 커뮤니티 도메인 + 게시글 경계(V7) + 라우트 노출 | **완료(코드)** | `ca4f21530` · `0665c16ae` · `c41468324` |
 | S3 | 분회 개설 신청·승인 | **완료(코드)** | `9250a62dd` |
-| S4 | 서비스 키 — **`community` 하나만** | **완료(코드)** | `c41468324` · `3d5c6b5fa` |
+| S4 | 서비스 키 — **`community` · `supplier` · `funding` 3개 · 각자 독립 주소**(`community` · `supplier` · `funding` `.neture.co.kr`) · 독립 운영자 범위 (§4) | **완료(코드)** · 화면 guard 보정 §8-7 | `c41468324` · `3d5c6b5fa` · PR #241 리뷰 반영 |
 | S5 | Neture 배너 · 로그인 전 입력창 · handoff 대상 | **완료(측정 + 최소 구현)** | `3d5c6b5fa` |
 | S6 | Store 전체 운영 범위·진입 | **완료(판정만 — 기능 0)** | 아래 §5 |
 | S7 | 로그아웃 경로 | **완료(결함 수정)** | `80c219349` |
@@ -218,23 +219,10 @@ market-trial 운영자 라우터   neture:operator → funding:operator
 `platform_services` 행은 seed 하지 않는다 — 런타임이 그 표를 읽지 않으며 `lecture` 도
 같은 상태다(데이터 전용 migration 은 C22).
 
-### 4-1. 카탈로그 · 역할
-
-| 항목 | 내용 |
-|---|---|
-| `ServiceKey` union (`@o4o/security-core`) | `community` 추가 — type-only · self-map. 소비처 전수 확인: 다른 세 `Record<ServiceKey,…>` 는 각자 **지역 union** 이라 영향 없음 |
-| `service-catalog` | `community` 등록 · domain = 플랫폼 기본 호스트 · basePath `/community` · **`joinEnabled: false`** |
-| 지정 카탈로그 추가 | `kpa-branch:admin`(seed 에 있었으나 화면에서 줄 수 없었다) · `community:admin` |
-| 만들지 않음 | `community:operator` — 개별 커뮤니티 운영은 개체 역할로만 |
-| 기존 11개 역할 | **그대로 둔다**(삭제·이름 변경 없음) |
-
-**`joinEnabled: false` 가 안전 장치다.** `true` 로 두면 범용
-`POST /auth/services/community/join` 이 **어느 커뮤니티에도 승인받지 않은** 사람에게
-`service_memberships('community')` 를 만들어 주고, 그 행은 진입 자격이므로 개별 승인을
-서비스 단위로 우회한다. 되돌리면 실패하는 테스트로 고정했다.
-
-`platform_services` 행은 seed 하지 않는다 — 런타임이 그 표를 읽지 않으며 `lecture` 도
-같은 상태다(데이터 전용 migration 은 C22).
+> **정정 (2026-09-28)** — 여기 있던 두 번째 「4-1. 카탈로그 · 역할」 은 **폐기된 중간 설계**
+> (`community` 키 하나 · `neture.co.kr/community` basePath)의 기록이 남은 중복 절이었다. 최종 구현은
+> 위 §4-2(3키 · 각자 독립 domain · basePath 없음 · `joinEnabled: false`)다. 중간 판정 철회 경위는 §4-0 ·
+> WO §4-0. 서브도메인 운영자 **화면** 경계 보정은 §8-7.
 
 ---
 
@@ -767,6 +755,9 @@ npx tsx src/scripts/community-catalog-promotion.ts --apply    # 숫자 확인 �
 
 ### 8-6. 배포 2 실행 경로 — migration 후 · API 전환 전에 멈춘다 (워크플로 변경 0)
 
+> **SUPERSEDED (2026-09-28) → §8-7.** 아래 "게이트를 열고 승인 대기 중 닫는다" 절차는 production 환경의
+> required reviewers 규칙이 삭제되어 쓸 수 없다(1차 시도 기록 참고). 워크플로에 migration 전용 경로를 두었다.
+
 **문제.** `deploy-api.yml` 의 `build-and-deploy` 는 한 job 안에서 이미지 push → migration Job → `gcloud run deploy` 를 잇는다. 약속한 순서(`migration → CLI dry-run → 수치 검토 → --apply → API 전환`)를 지키려면 migration 과 API 트래픽 사이에 멈춤 지점이 필요하다.
 
 **해법 — 트래픽 고정을 멈춤 지점으로 쓴다.** 워크플로 변경은 CI 인프라 변경(중지 조건)이므로 하지 않는다.
@@ -790,6 +781,126 @@ npx tsx src/scripts/community-catalog-promotion.ts --apply    # 숫자 확인 �
 **1차 시도 (2026-09-28) — 미실행 종료 · 운영 변화 0.** 태그 `deploy/2026-09-28-service-identity-deploy2`(`46e5d14b8`) · run `36385737827`. 게이트 06:17:38Z→06:18:17Z(39초) · 창 안 새 run = 이 run 하나. `build-and-deploy` 가 승인 대기 중 **production 환경의 required reviewers 규칙이 삭제**되어(승인 기록 `canceled` · "Required reviewers protection rule deleted") step 0개로 `failure`(07:32:42Z). 확인: migration Job 이미지 = `2edfe9b33` 그대로 · 최근 execution = 배포 1(05:08Z) · API traffic `03756-txs` 100% · 게이트 `false`. 현재 production 환경 보호 규칙 = 없음 → API dispatch 가 승인 없이 곧바로 진행되는 상태. 재시도는 사용자 판단 후.
 
 **멈춘 뒤 확인 · 보고 (쓰기 없음).** migration execution 성공 · `typeorm_migrations` +4 · 새 테이블 존재 · API traffic `03756-txs` 100% 유지 · 새 revision 0% → 승격 CLI **공식 dry-run**(read-only 세션) 수치를 §8-0 U1 예상치(2행 · 1명)와 대조해 보고. **`--apply` · API 트래픽 전환 · Web/Admin 배포는 결과 검토 후 별도 지시.**
+
+### 8-7. 배포 2 전 경계 보정 (2026-09-28 · 같은 WO)
+
+**상태: 코드 보정 완료 · 배포 2 migration 미실행 · `DEPLOY_ENABLED=false` · `--apply` 미승인.**
+
+#### 8-7-0. 시작 시 현재 상태 재확정 (read-only)
+
+| 항목 | 실측 |
+|---|---|
+| origin/main | `773d6c54c` (조사 시점 `81462cadc` 이후 코드 커밋 3 · 문서 커밋 다수) |
+| 배포 2 태그 | `deploy/2026-09-28-service-identity-deploy2` → `46e5d14b8` — **옮기지 않는다**(1차 시도 기록). 새 SHA 는 새 태그로 |
+| 운영 API | `o4o-core-api-03756-txs` 100%(이름 고정 · 배포 1) · 이후 새 revision 없음 |
+| migration Job | 이미지 `api-server:2edfe9b33…`(배포 1) · 최근 execution 05:08Z(배포 1) — 배포 2 흔적 없음 |
+| 게이트 | `DEPLOY_ENABLED=false` |
+| Web | neture-web `01661` · admin `01316` (배포 1) · hospital-pharmacy-web `00013`(별도 태그 `deploy/2026-09-28-hospital-direct-file` → `bb26f3a26` 로 이미 배포) |
+
+#### 8-7-1. migration 과 API 배포 사이의 확실한 중지 지점 — `deploy-api.yml` MIGRATE-ONLY
+
+§8-6 의 "승인 대기 중 게이트 닫기" 는 required reviewers 삭제로 성립하지 않는다(run `36385737827` · step 0 · 운영 변화 0).
+게이트를 여는 방식은 그 사이 main push 가 다른 코드를 배포할 수 있으므로 쓰지 않는다.
+
+| 설계 | 내용 |
+|---|---|
+| 입력 | `workflow_dispatch` 에 `migrate_only`(기본 `'false'`) · `expected_sha` 추가 |
+| 게이트 | migrate_only 는 **`DEPLOY_ENABLED` 와 무관**하게 잡을 연다 → 게이트는 계속 `false` · main push 는 계속 skip |
+| fail-closed | 첫 step 이 ① ref = `refs/tags/deploy/*` ② `expected_sha` 40자 hex ③ `expected_sha == github.sha` 를 검사, 하나라도 어긋나면 exit 1 (태그가 옮겨졌거나 다른 ref) |
+| 이미지 | 태그 SHA 로 빌드 · push 후 **manifest digest 기록** · migration Job 은 `api-server@sha256:…` digest 로 고정 · `:latest` 는 옮기지 않음 |
+| 정지 | migration Job `execute --wait` 성공 뒤 **읽기 전용 기록 step**(API traffic · execution) 만 실행. `Deploy to Cloud Run` · one-off job 재고정 · `Verify deployment` 는 skip |
+| 게이트 안내 job | migrate_only 에서는 "migration 0" 안내를 내지 않음 |
+| 일반 경로 | push/수동 모두 종전 조건 그대로(migrate_only≠true 조건만 추가) — 게이트 · detect · base_sha 재현 · force 동작 불변 |
+
+검증 — `apps/api-server/src/__tests__/deploy-api-migrate-only-path.spec.ts` 가 워크플로의 `if` 식을 **시나리오별로 실제 평가**한다:
+일반 7 시나리오(push 게이트 열림/닫힘/영향 없음 · 수동 열림/닫힘 · base_sha 재현 force 유무) = 종전 판정과 동일 ·
+migrate_only(게이트 열림·닫힘 모두) = 배포 3 step skip · migration 실행 · push 로는 불가 · preflight 가 첫 step · digest 고정 · 정지 step 쓰기 명령 0.
+기존 워크플로 계약 spec 7개(migration 선행 · ref 판정 · readiness · bootstrap 분리 등)와 detect-affected 75건 함께 통과.
+
+#### 8-7-2. 배포 대상 SHA 범위 — 배포 1 `2edfe9b33` → 배포 2 SHA
+
+"배포 2 = PR #241 + CLI 정정뿐" 은 **현재 main 에는 맞지 않는다.** 비문서 변경 전수:
+
+| 커밋 | 트랙 | 영역 | 준비 상태(각 트랙 기록) |
+|---|---|---|---|
+| `880642e9b` PR #241 | 이 WO | API 60 · admin 2 · web-neture 1 · security-core 1 · **migration 6·7·8·9** | 이 CHECK |
+| `95377812e` | 이 WO | 승격 CLI JOIN 정정 | §8-2 · §8-7-4 |
+| `4e34267ef` | NETURE-HOME-ENTRY-REFRESH | web-neture `O4OHomePage` | 코드 완료 · 미배포 |
+| `69e1c5aa8` | SUPPLIER-CANONICAL-RUNTIME | API 19파일(supplier 판정 · `market-trial-operator.routes` 필터 포함) | 그 CHECK §16: **DEPLOY_PENDING — "배포 2 에서" 명시** |
+| `bb26f3a26` | HOSPITAL-PHARMACY DIRECT-FILE | web-hospital-pharmacy 만 | **이미 운영 반영**(별도 태그 · `00013`) — 배포 2 에서 재배포 불필요 |
+| `773d6c54c` | SERVICE-CATALOG-CANONICAL-DOMAIN | API catalog(약국·리테일 canonical 호스트 · PharmacyHub `joinEnabled=false` · session-origin) · web-store · CI env | CODE_COMPLETE · PRODUCTION_SMOKE_PENDING_DEPLOY |
+| 이 절의 보정 커밋 | 이 WO | `deploy-api.yml` · web-neture guard · CLI 출력 · 테스트 | 이 절 |
+
+- **DB 변경은 incremental 6·7·8·9 뿐**(`git diff 2edfe9b33..HEAD -- apps/api-server/src/database` = PR #241 의 4 migration + manifest · expected-states · entities). 다른 트랙 커밋에 migration 없음.
+- 따라서 migrate-only 실행 결과는 다른 트랙 준비 상태와 무관하다. 다른 트랙 코드가 운영에 나가는 시점은 **API · Web 전환(사용자 승인 후)** 이고, 그때 위 표 전체가 함께 나간다.
+- 배포 2 SHA = 이 절을 포함한 push 뒤의 main tip. 새 태그 `deploy/2026-09-28-service-identity-deploy2b` 를 그 SHA 에 고정하고 migrate-only 는 `expected_sha` 로 같은 SHA 를 요구한다. 기존 태그(`…deploy2` → `46e5d14b8`)는 이동 · 삭제하지 않는다.
+- 이미지 digest 는 migrate-only run 이 기록한 값을 여기에 적는다(§8-7-6). API 전환 시에도 **같은 digest** 를 쓰는 것을 원칙으로 한다 — 일반 dispatch 는 같은 SHA 라도 재빌드해 digest 가 달라지므로, 승인 후 API 전환은 그 digest 로 `gcloud run deploy --image=…@sha256:… --no-traffic` → traffic 전환 순서를 제안한다(사용자 판단).
+
+#### 8-7-3. 서브도메인 운영자만 가진 계정의 화면 접근 — 프런트 · 백엔드 경계 일치
+
+**결함(보정 전)**: 백엔드는 `supplier:admin`(`/neture/admin/suppliers*` 9경로) · `funding:operator`(`/neture/operator/market-trial/*`) 로 옮겼는데, web-neture 화면은 `/admin/supplier-governance` = `AdminRoute`(neture admin + neture membership) · `/operator/market-trial` = `OperatorRoute`(neture operator 이상 + neture membership) 그대로였다. web-neture 에 `supplier:` · `funding:` · `community:admin` 참조 0.
+→ 새 역할만 가진 운영자는 자기 화면에 못 들어가고, 새 역할이 없는 Neture 관리자는 화면에 들어가 API 403 만 본다. renagang21 은 Neture 역할도 있어 실브라우저로는 드러나지 않는다(§8-1 에서 "URL 트랙 소관 · 보고만" 으로 두었던 항목 — 이 WO 에서 정정).
+
+| 보정 | 내용 |
+|---|---|
+| `lib/role-constants.ts` | `subdomainOperatorRoles(key, level)` — 백엔드 `scopeRoleMapping` 과 같은 의미(`admin ⊃ operator` · community 는 admin 단일 · `platform:super_admin` 통과 · **neture 역할 미포함**) · 화면 표 `SUBDOMAIN_OPERATOR_SCREENS` 한 곳 |
+| `RoleGuard.tsx` `SubdomainOperatorRoute` | 역할 + **그 서비스** membership active(`MembershipGate serviceKey=supplier/funding`) |
+| `App.tsx` | 공급자 상태 관리(+ alias 2) → supplier:admin 블록 · 펀딩 운영 목록/상세(+ alias 1) → funding:operator 블록. Neture Admin/Operator 블록에서 제거 |
+| `SubdomainOperatorLayoutWrapper` | Neture 역할도 있으면 기존 Neture 레이아웃 그대로 · 서브도메인 역할만이면 자기 화면 1개 사이드바(누르는 곳마다 거부 화면이 되지 않게). 레이아웃은 권한 판정이 아니다 |
+| Neture 사이드바 | 두 항목은 해당 범위 역할이 있을 때만 노출 |
+| 대표 홈 「서비스 운영」 | `operator-services` 의 supplier(admin) · funding(admin/operator) → 내부 이동 카드. supplier:operator 는 카드 없음(admin 화면 — dead link 0) |
+| `MembershipGate` | 안내 문구 서비스명을 키별로(공급자 서비스 · 유통참여형 펀딩 · 커뮤니티) |
+| community 전체 관리자 | **화면 없음**(web-neture · admin-dashboard 모두 `/communities/requests*` 소비처 0). `/admin/community-admin` 은 Neture 커뮤니티 **광고·스폰서**(`/neture/community/manage/*` · neture 축)라 서비스 전체 관리자 화면이 아니다 — neture:admin 블록 그대로. 개설 심사 API 는 `community:admin` + community membership. 서비스 전체 관리자(`community:admin`)와 개별 커뮤니티 운영자(`community_memberships.role`)는 섞지 않았다(§2-2 · `community-scope.middleware` 가 `community:admin` 을 bypass 시키지 않음 — 불변) |
+| 백엔드 | 변경 없음 — 이미 분리돼 있었다. 판정을 **런타임으로** 고정하는 테스트만 추가 |
+
+격리 테스트 (운영 DB · 계정 생성 0):
+
+- web-neture `SubdomainOperatorRoute.test.tsx` — 실제 guard 컴포넌트로 라우팅: supplier-only → 공급자 화면만 · funding-only → 펀딩만 · Neture-only → 두 화면 거부(자기 Neture 화면은 통과) · 역할 O membership X/비활성/다른 서비스 membership → 거부 · supplier:operator → supplier:admin 화면 거부 · super_admin 통과 · 비로그인 → 로그인. 사이드바 필터 · App.tsx 배선(각 경로가 해당 블록에만 1회) 정적 검사.
+- web-neture `home-entry.operator-services.test.ts` +4 — 대표 홈 카드.
+- API `subdomain-operator-scope.runtime.test.ts` — 가드 **실제 판정** 매트릭스(supplier/funding/community/neture admin/neture operator × 6 페르소나 + renagang21 계획 역할 조합).
+- 테스트 환경: `@o4o/auth-react` 와 앱이 `react-router-dom`(같은 7.9.6)을 다른 물리 경로에서 읽어 Router context 가 둘이 되는 문제 → `vitest.config.mjs` 에 `resolve.dedupe` (번들은 이미 하나 — 테스트만 맞춤 · package.json/lockfile 무변경). 이 설정 후 web-neture 전체 **25 files / 203 tests PASS** — §7-3 의 `HomeEntryPanel` 선행 실패 4건도 이제 통과.
+
+#### 8-7-4. 승격 CLI 재확인 · dry-run 출력 보강
+
+- 코드: `EVIDENCE_CTE` 의 댓글 JOIN = `c."postId"` (`95377812e`) 유지 확인 · 회귀 spec 31/31.
+- **dry-run 출력 보강**: 커뮤니티별 `would_insert`(적용 시 실제 새 행 = 승인 대상 중 그 커뮤니티에 행이 아직 없는 사람 · `ON CONFLICT DO NOTHING` 과 같은 판정) · 합계 `distinct_target_users`(한 사람이 여러 커뮤니티 대상일 수 있어 행 수와 사람 수 분리). 쓰기 경로 불변 · id 는 출력하지 않는다.
+- **격리 재검증** (로컬 PostgreSQL 17 일회용 클러스터 · baseline fresh bootstrap + incremental 1~9 · `POST_MIGRATION_SCHEMA_ASSERTION = PASS` · 지문 `7fdd328f…` = expected):
+
+| fixture | 활동 | membership | 결과 |
+|---|---|---|---|
+| A | 글(kpa 원장) + 글(neture 원장) | kpa-society | pharmacy + o4o-general |
+| B | 댓글만(pharmacy-hub 원장) | pharmacy-hub | pharmacy |
+| C | 글(neture) | kpa-society | o4o-general 만 |
+| D | 글(kpa) | 없음 | 없음 |
+| E | 댓글만(neture) | 없음 | o4o-general (authenticated) |
+| F | 댓글만(kpa) | k-cosmetics | 없음 |
+| G | 글(k-cosmetics) | k-cosmetics | cosmetics |
+
+```text
+dry-run   pharmacy ev4/elig2/would2 · cosmetics 1/1/1 · o4o-general 3/3/3
+          TOTAL eligible=6 would_insert=6 inserted=0 distinct_target_users=5
+apply     inserted 2+1+3 = 6
+재 dry-run already_active 2/1/3 · would_insert 0 · 재 apply inserted 0 (멱등)
+행 확인   cosmetics{G} · o4o-general{A,C,E} · pharmacy{A,B} — 전부 기대치 · 클러스터 정지
+```
+
+- **§8-0 U1 의 "2행 · 1명" 은 사전 측정(예상치)일 뿐 확정 수치가 아니다.** 공식 dry-run(migration 6 후) 결과로만 판단한다.
+
+#### 8-7-5. SonarCloud — PR HEAD 와 main 구분
+
+| 대상 | 결과 |
+|---|---|
+| PR #241 HEAD `7ba57bcbc` | **SUCCESS** (pullRequest=241 분석) |
+| main `2edfe9b33`(배포 1 기준) · `880642e9b` · `95377812e` · `773d6c54c` | **Quality Gate failed** (`a20cf16ec` 는 분석 cancelled) |
+| main 실패 조건 (현재) | new_reliability_rating 5 · new_security_rating 5 · new_duplicated_lines_density 16.5% · new_security_hotspots_reviewed 0% (maintainability 만 OK) |
+| main new-code 누적 | BUG 1,259 · VULNERABILITY 387 (생성 2026-09-21~ · 예: `scripts/ci/detect-affected.mjs` S2871 · 워크플로 `npx` S6505/S8543 · web-store S1082 등) |
+
+- **원인 판정**: main 의 new-code 기간에 여러 트랙의 이슈가 누적된 구조적 실패다. 배포 1 기준 커밋에서도 이미 실패했으므로 CLI 한 줄 정정(`95377812e`)이나 이 절의 보정이 원인이라고 볼 근거가 없다(반대로 무관하다고 단정할 근거도 이 조회만으로는 부족 — 커밋별 new issue 귀속은 하지 않았다).
+- **영향 · 배포 판단**: SonarCloud 는 배포 워크플로의 게이트가 아니다(CI Pipeline · deploy 는 별개). 배포 1 도 같은 상태에서 진행됐다. 배포 2 판단에서 "전 체크 PASS" 라고 쓰지 않으며, main Sonar 실패는 **별도 품질 트랙**으로 남긴다.
+
+#### 8-7-6. 운영 실행 기록 (migration 6·7·8·9 · 공식 dry-run)
+
+(이 커밋 시점: 미실행 — 아래는 실행 후 채운다)
 
 ---
 

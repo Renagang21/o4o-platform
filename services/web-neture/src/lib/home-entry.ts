@@ -44,7 +44,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { api } from './apiClient';
-import { PLATFORM_ROLES } from './role-constants';
+import { PLATFORM_ROLES, SUBDOMAIN_OPERATOR_SCREENS } from './role-constants';
 import type { User } from '../contexts/AuthContext';
 
 // ─── API 응답 타입 ────────────────────────────────────────────────────────────
@@ -461,6 +461,16 @@ export function buildHomeEntryModel(user: User, data: HomeEntryData): HomeEntryM
         if (!b.slug) continue;
         operator.push({ id: `operator:kpa-branch:${b.organizationId}`, label: b.name, note: nameOf('kpa-branch'), action: { kind: 'handoff', serviceKey: 'kpa-branch', returnPath: `/${b.slug}/operator/site` } });
       }
+      continue;
+    }
+    // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1: supplier · funding 운영 화면은 이 앱(대표 호스트)에 있다 —
+    //   handoff 가 아니라 내부 이동. 화면이 요구하는 수준(SUBDOMAIN_OPERATOR_SCREENS)을 scope 가 채울 때만 노출한다
+    //   (supplier:operator 는 supplier:admin 화면에 못 들어가므로 카드를 만들지 않는다 — dead link 0).
+    //   community 서비스 전체 관리자 화면은 아직 없어 카드를 만들지 않는다.
+    const screen = SUBDOMAIN_OPERATOR_SCREENS.find((s) => s.key === key);
+    if (screen) {
+      if (screen.level === 'admin' && svc.scope !== 'admin') continue;
+      operator.push({ id: `operator:${key}:${svc.scope}`, label, note, action: { kind: 'internal', to: screen.path } });
       continue;
     }
     const paths = SERVICE_PATHS[key];

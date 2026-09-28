@@ -20,6 +20,8 @@ import {
 } from '../../config/operatorMenuGroups';
 import { NetureGlobalHeader } from '../NetureGlobalHeader';
 import { NetureBottomNav } from '../NetureBottomNav';
+import { useAuth } from '../../contexts/AuthContext';
+import { withoutUnreachableSubdomainOperatorItems } from '../../lib/role-constants';
 
 // WO-O4O-SERVICE-OPERATOR-WORKSPACE-REALIGNMENT-V1: Neture 는 SPECIAL(자체 도메인 IA 유지)이지만
 //   1 Operator : N Services 전환 바는 공통이다 — 출처 GET /api/v1/work-scope/operator-services 하나.
@@ -30,7 +32,9 @@ const netureOperatorServicesApi = createOperatorServicesApi({
 
 export default function OperatorLayoutWrapper() {
   // operator sidebar 는 operator-scope 메뉴만 (admin 항목은 AdminLayoutWrapper 별도) — isAdmin=false 보존.
-  const menuItems = filterMenuByRole(UNIFIED_MENU, false);
+  // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1: 「유통참여형 펀딩」 은 funding:operator 화면 — 그 역할이 있을 때만 노출.
+  const { user } = useAuth();
+  const menuItems = withoutUnreachableSubdomainOperatorItems(filterMenuByRole(UNIFIED_MENU, false), user?.roles);
 
   return (
     <>

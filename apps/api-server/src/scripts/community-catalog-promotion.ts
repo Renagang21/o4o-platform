@@ -90,8 +90,15 @@ interface Measured {
   eligibleUsers: number;
   /** 이미 active 행이 있어 건너뛴 수 */
   alreadyActive: number;
+  /**
+   * 적용하면 실제로 새로 만들어질 행 = 승인 대상 중 그 커뮤니티에 **어떤 상태로든** 행이 아직 없는 사람.
+   * (INSERT … ON CONFLICT (community_id, user_id) DO NOTHING 과 같은 판정 — dry-run 에서도 계산한다)
+   */
+  wouldInsert: number;
   /** 이번에 새로 만든 active 행 (dry-run 이면 0) */
   inserted: number;
+  /** 승인 대상 사용자 id — 커뮤니티를 가로지른 중복 제거 합계에만 쓰고 출력하지 않는다 */
+  eligibleIds: string[];
 }
 
 /** 참여 자격 판정을 SQL 로 — 카탈로그 policy 를 그대로 옮긴다(분기 복제 아님). */
@@ -142,10 +149,11 @@ async function promote(def: CommunityDefinition): Promise<Measured> {
     `${EVIDENCE_CTE} SELECT count(*)::int AS count FROM ev`,
     [codes],
   );
-  const [{ count: eligibleUsers }] = await AppDataSource.query(
-    `${EVIDENCE_CTE} SELECT count(*)::int AS count FROM ev WHERE ${elig.sql}`,
+  const eligibleRows: Array<{ user_id: string }> = await AppDataSource.query(
+    `${EVIDENCE_CTE} SELECT ev.user_id FROM ev WHERE ${elig.sql}`,
     [codes, ...elig.params],
   );
+  const eligibleIds = eligibleRows.map((r) => String(r.user_id));
 
   const existing: Array<{ id: string }> = await AppDataSource.query(
     `SELECT id FROM communities WHERE slug = $1`,
@@ -159,9 +167,12 @@ async function promote(def: CommunityDefinition): Promise<Measured> {
     communityExisted,
     storageCodes: def.forumStorageCodes,
     evidenceUsers,
-    eligibleUsers,
+    eligibleUsers: eligibleIds.length,
     alreadyActive: 0,
+    // 커뮤니티 행이 없으면 회원 행도 있을 수 없다 → 승인 대상 전원이 새 행이다.
+    wouldInsert: eligibleIds.length,
     inserted: 0,
+    eligibleIds,
   };
 
   if (communityExisted) {
@@ -172,6 +183,13 @@ async function promote(def: CommunityDefinition): Promise<Measured> {
       [existing[0].id],
     );
     measured.alreadyActive = count;
+    const [{ count: present }] = await AppDataSource.query(
+      `SELECT count(*)::int AS count
+         FROM community_memberships
+        WHERE community_id = $1 AND user_id = ANY($2::uuid[])`,
+      [existing[0].id, eligibleIds],
+    );
+    measured.wouldInsert = eligibleIds.length - present;
   }
 
   if (!APPLY) return measured;
@@ -224,14 +242,20 @@ async function main() {
           `evidence_users=${r.evidenceUsers}`,
           `eligible_users=${r.eligibleUsers}`,
           `already_active=${r.alreadyActive}`,
+          `would_insert=${r.wouldInsert}`,
           `inserted=${r.inserted}`,
         ].join('  '),
       );
     }
     const totalEligible = results.reduce((a, r) => a + r.eligibleUsers, 0);
+    const totalWouldInsert = results.reduce((a, r) => a + r.wouldInsert, 0);
     const totalInserted = results.reduce((a, r) => a + r.inserted, 0);
+    // 한 사람이 여러 커뮤니티 대상일 수 있다 — 행 수와 사람 수를 따로 낸다.
+    const distinctUsers = new Set(results.flatMap((r) => r.eligibleIds)).size;
     console.log('');
-    console.log(`TOTAL eligible=${totalEligible} inserted=${totalInserted}`);
+    console.log(
+      `TOTAL eligible=${totalEligible} would_insert=${totalWouldInsert} inserted=${totalInserted} distinct_target_users=${distinctUsers}`,
+    );
     if (!APPLY) {
       console.log('no rows written — re-run with --apply after reviewing the numbers above');
     }

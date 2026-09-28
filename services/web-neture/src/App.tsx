@@ -36,7 +36,8 @@ import SupplierOpsLayout from './components/layouts/SupplierOpsLayout';
 import OperatorLayoutWrapper from './components/layouts/OperatorLayoutWrapper';
 import AdminLayoutWrapper from './components/layouts/AdminLayoutWrapper';
 import AdminVaultLayout from './components/layouts/AdminVaultLayout';
-import { RoleGuard, OperatorRoute, AdminRoute, PlatformRoute, SupplierRoute } from './components/auth/RoleGuard';
+import { RoleGuard, OperatorRoute, AdminRoute, PlatformRoute, SupplierRoute, SubdomainOperatorRoute } from './components/auth/RoleGuard';
+import SubdomainOperatorLayoutWrapper from './components/layouts/SubdomainOperatorLayoutWrapper';
 import { ADMIN_ROLES } from './lib/role-constants';
 import { resolveLoginReturnPath } from './lib/loginReturnPath';
 import HostBoundary from './components/HostBoundary';
@@ -1030,12 +1031,9 @@ function App() {
               {/* WO-O4O-NETURE-DIGITAL-SIGNAGE-REMOVAL-V1: /admin/signage/* 제거 (Neture signage 미대상) */}
               <Route path="/admin/homepage-cms" element={<HomepageCmsPage />} />
               <Route path="/admin/analytics" element={<OperatorAnalyticsPage />} />
-              {/* WO-O4O-NETURE-SUPPLIER-CSV-QUALITY-CONSOLE-RETIREMENT-V1: CSV 품질 콘솔 은퇴 → governance canonical */}
-              <Route path="/admin/supplier-quality" element={<Navigate to="/admin/supplier-governance" replace />} />
+              {/* /admin/supplier-quality · /admin/market-trial alias 는 아래 서브도메인 운영자 블록으로 옮겼다 */}
               <Route path="/admin/category-mapping-rules" element={<CategoryMappingRulesPage />} />
               <Route path="/admin/roles" element={<RoleManagementPage />} />
-              {/* WO-CLEANUP-2: /admin/market-trial → /operator/market-trial redirect */}
-              <Route path="/admin/market-trial" element={<Navigate to="/operator/market-trial" replace />} />
               <Route path="/admin/categories" element={<CategoryManagementPage />} />
               <Route path="/admin/brands" element={<BrandManagementPage />} />
               <Route path="/admin/product-cleanup" element={<ProductDataCleanupPage />} />
@@ -1048,10 +1046,7 @@ function App() {
               <Route path="/admin/operators" element={<OperatorsPage />} />
               <Route path="/admin/contact-messages" element={<AdminContactMessagesPage />} />
               <Route path="/admin/service-approvals" element={<AdminServiceApprovalPage />} />
-              {/* WO-O4O-NETURE-SUPPLIER-APPROVAL-CONSOLE-AND-ADMIN-GOVERNANCE-SEPARATION-V1 §5:
-                  구 admin 승인 화면은 governance 로 canonical redirect, 신규 상태 관리 라우트 신설 */}
-              <Route path="/admin/admin-suppliers" element={<Navigate to="/admin/supplier-governance" replace />} />
-              <Route path="/admin/supplier-governance" element={<AdminSupplierGovernancePage />} />
+              {/* /admin/admin-suppliers · /admin/supplier-governance 는 아래 서브도메인 운영자 블록(supplier:admin)으로 옮겼다 */}
               <Route path="/admin/masters" element={<AdminMasterManagementPage />} />
               <Route path="/admin/catalog-import" element={<CatalogImportDashboardPage />} />
               <Route path="/admin/catalog-import/csv" element={<CSVImportPage />} />
@@ -1104,6 +1099,36 @@ function App() {
             </Route>
 
             {/* ================================================================
+                서브도메인 운영자 화면 — WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 (배포 2 전 경계 보정)
+                백엔드가 두 영역의 운영자 경계를 neture:* 에서 독립 키로 옮겼다. 화면도 같은 판정을 쓴다:
+                  공급자 상태 관리  supplier:admin + supplier membership   ← /neture/admin/suppliers*
+                  유통참여형 펀딩    funding:operator(admin 포함) + funding membership ← /neture/operator/market-trial/*
+                Neture 역할만으로는 들어오지 못하고, 서브도메인 역할만으로 들어올 수 있다.
+            ================================================================ */}
+            <Route element={
+              <SubdomainOperatorRoute serviceKey="supplier" level="admin">
+                <SubdomainOperatorLayoutWrapper serviceKey="supplier" area="admin" />
+              </SubdomainOperatorRoute>
+            }>
+              {/* WO-O4O-NETURE-SUPPLIER-APPROVAL-CONSOLE-AND-ADMIN-GOVERNANCE-SEPARATION-V1 §5:
+                  구 admin 승인 화면은 governance 로 canonical redirect */}
+              <Route path="/admin/admin-suppliers" element={<Navigate to="/admin/supplier-governance" replace />} />
+              {/* WO-O4O-NETURE-SUPPLIER-CSV-QUALITY-CONSOLE-RETIREMENT-V1: CSV 품질 콘솔 은퇴 → governance canonical */}
+              <Route path="/admin/supplier-quality" element={<Navigate to="/admin/supplier-governance" replace />} />
+              <Route path="/admin/supplier-governance" element={<AdminSupplierGovernancePage />} />
+            </Route>
+            <Route element={
+              <SubdomainOperatorRoute serviceKey="funding" level="operator">
+                <SubdomainOperatorLayoutWrapper serviceKey="funding" area="operator" />
+              </SubdomainOperatorRoute>
+            }>
+              {/* WO-CLEANUP-2: /admin/market-trial → /operator/market-trial redirect */}
+              <Route path="/admin/market-trial" element={<Navigate to="/operator/market-trial" replace />} />
+              <Route path="/operator/market-trial" element={<MarketTrialApprovalsPage />} />
+              <Route path="/operator/market-trial/:id" element={<MarketTrialApprovalDetailPage />} />
+            </Route>
+
+            {/* ================================================================
                 Operator Dashboard (/operator/*)
                 WO-O4O-ROLE-ROUTE-ISOLATION-V1
                 operator 전용 레이아웃. adminOnly 항목 제외.
@@ -1151,8 +1176,7 @@ function App() {
               {/* WO-O4O-NETURE-SUPPLIER-CSV-QUALITY-CONSOLE-RETIREMENT-V1: CSV 품질 콘솔 은퇴 → 공급자 승인 canonical */}
               <Route path="/operator/supplier-quality" element={<Navigate to="/operator/suppliers" replace />} />
               <Route path="/operator/category-mapping-rules" element={<CategoryMappingRulesPage />} />
-              <Route path="/operator/market-trial" element={<MarketTrialApprovalsPage />} />
-              <Route path="/operator/market-trial/:id" element={<MarketTrialApprovalDetailPage />} />
+              {/* /operator/market-trial · /operator/market-trial/:id 는 위 서브도메인 운영자 블록(funding:operator)으로 옮겼다 */}
               <Route path="/operator/product-service-approvals" element={<ProductServiceApprovalPage />} />
               <Route path="/operator/product-approvals" element={<OperatorProductApprovalPage />} />
               {/* WO-O4O-OPERATOR-PRODUCT-CANDIDATE-REVIEW-UI-V1 (Phase 5) */}

@@ -98,3 +98,70 @@ export const DASHBOARD_B2B_ROLES: string[] = [
   LEGACY_ROLES.SUPPLIER,
   LEGACY_ROLES.SELLER,
 ];
+
+// ─── 서브도메인 운영자 범위 (supplier · funding · community) ────────────────────
+//
+// WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 — 배포 2 전 경계 보정.
+//   백엔드는 세 서브도메인 영역의 운영자 경계를 `neture:*` 에서 독립 키로 옮겼다
+//   (`requireSupplierScope` · `requireFundingScope` · `requireCommunityServiceScope`).
+//   화면 가드가 여전히 `neture:*` + neture membership 을 요구하면 새 역할만 가진 운영자는
+//   자기 화면에 못 들어오고, 새 역할이 없는 Neture 관리자는 화면에 들어와 API 403 만 본다.
+//   아래 값은 백엔드 `subdomain-operator-scope.ts` 의 scopeRoleMapping 과 같은 의미다:
+//     `{key}:operator` ← operator · admin      `{key}:admin` ← admin
+//   `platform:super_admin` 은 백엔드 platformBypass 와 같이 통과한다.
+//   `community` 는 `community:admin` 단일 계층이다(`community:operator` 는 만들지 않았다).
+//   Neture 역할(`neture:admin` · `neture:operator`)은 **포함하지 않는다** — 다른 축이다.
+
+export type SubdomainOperatorKey = 'supplier' | 'funding' | 'community';
+export type SubdomainOperatorLevel = 'admin' | 'operator';
+
+export function subdomainOperatorRoles(key: SubdomainOperatorKey, level: SubdomainOperatorLevel): string[] {
+  if (level === 'operator' && key !== 'community') {
+    return [`${key}:operator`, `${key}:admin`, NETURE_ROLES.PLATFORM_SUPER_ADMIN];
+  }
+  return [`${key}:admin`, NETURE_ROLES.PLATFORM_SUPER_ADMIN];
+}
+
+/**
+ * 서브도메인 운영자 경계가 걸린 화면 경로 — 가드 · 메뉴 노출 · 대표 홈 진입이 같은 표를 본다.
+ *   supplier  `/admin/supplier-governance`  ← `/api/v1/neture/admin/suppliers*` (supplier:admin)
+ *   funding   `/operator/market-trial`       ← `/api/v1/neture/operator/market-trial/*` (funding:operator)
+ * community 서비스 전체 관리자(`/api/v1/communities/requests*`) 화면은 아직 없다 — 표에 넣지 않는다.
+ */
+export const SUBDOMAIN_OPERATOR_SCREENS: ReadonlyArray<{
+  path: string;
+  key: SubdomainOperatorKey;
+  level: SubdomainOperatorLevel;
+}> = Object.freeze([
+  { path: '/admin/supplier-governance', key: 'supplier', level: 'admin' },
+  { path: '/operator/market-trial', key: 'funding', level: 'operator' },
+]);
+
+const hasAny = (roles: readonly string[] | undefined | null, allowed: string[]) =>
+  (roles ?? []).some((r) => allowed.includes(r));
+
+/**
+ * 메뉴 항목 경로가 서브도메인 운영자 화면이면 그 범위 역할이 있을 때만 true.
+ * 그 밖의 경로는 이 함수가 판정하지 않는다(true) — 기존 메뉴 규칙 그대로.
+ */
+export function canSeeSubdomainOperatorPath(roles: readonly string[] | undefined | null, path: string): boolean {
+  const screen = SUBDOMAIN_OPERATOR_SCREENS.find((s) => path === s.path || path.startsWith(`${s.path}/`));
+  if (!screen) return true;
+  return hasAny(roles, subdomainOperatorRoles(screen.key, screen.level));
+}
+
+/**
+ * 사이드바 메뉴에서 **범위 역할이 없는** 서브도메인 운영자 화면 항목을 뺀다.
+ * 빈 그룹은 남기지 않는다(`filterMenuByRole` 과 같은 규칙).
+ */
+export function withoutUnreachableSubdomainOperatorItems<T extends { path: string }>(
+  menu: Partial<Record<string, T[]>>,
+  roles: readonly string[] | undefined | null,
+): Partial<Record<string, T[]>> {
+  const out: Partial<Record<string, T[]>> = {};
+  for (const [group, items] of Object.entries(menu)) {
+    const visible = (items ?? []).filter((item) => canSeeSubdomainOperatorPath(roles, item.path));
+    if (visible.length > 0) out[group] = visible;
+  }
+  return out;
+}

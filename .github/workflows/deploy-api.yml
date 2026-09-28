@@ -46,6 +46,21 @@ on:
         description: '판정 재현용 head SHA (40자)'
         required: false
         default: ''
+      # WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 — 배포 2 전 경계 보정 (migration 만 실행하고 멈추는 경로)
+      #
+      #   이미지 push → migration Job 실행·성공 확인 → **여기서 끝**. API revision · traffic · one-off job 이미지는
+      #   건드리지 않는다. `DEPLOY_ENABLED` 게이트를 열지 않고 실행한다 — 게이트를 열면 그 사이 main push 가
+      #   다른 코드를 배포할 수 있기 때문이다. 대신 아래 세 조건을 모두 요구한다(fail-closed):
+      #     ① workflow_dispatch  ② ref = refs/tags/deploy/*  ③ expected_sha == 그 태그 커밋(40자)
+      #   migration Job 은 방금 push 한 이미지의 **digest** 로 고정한다(같은 태그를 다른 빌드가 덮어써도 영향 없음).
+      migrate_only:
+        description: "'true' = 고정 태그 SHA 로 migration Job 만 실행하고 멈춘다 (API 배포 0 · 게이트 무관)"
+        required: false
+        default: 'false'
+      expected_sha:
+        description: 'migrate_only 전용 — 태그가 가리켜야 하는 커밋 SHA (40자). 다르면 실행하지 않는다'
+        required: false
+        default: ''
 
 env:
   PROJECT_ID: netureyoutube
@@ -64,7 +79,8 @@ jobs:
     #   배포 job 이 skip 되면 run 이 조용히 성공처럼 보여 "왜 반영이 안 되나" 착시가 생긴다.
     #   이 job 은 게이트가 닫혔을 때**만** 돌며, 보류 사유를 Job Summary 에 남긴다.
     #   배포 job 과 의존관계가 없으므로 skip 여부와 무관하게 실행된다.
-    if: vars.DEPLOY_ENABLED != 'true'
+    # migrate_only 실행은 게이트와 무관하게 migration 을 돌리므로 "migration 0" 안내를 내지 않는다.
+    if: vars.DEPLOY_ENABLED != 'true' && github.event.inputs.migrate_only != 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Report deploy hold
@@ -148,18 +164,49 @@ jobs:
     #   이 조건은 Docker build/push · migration Job 실행 · Cloud Run deploy 를 모두 포함하는
     #   이 잡 **전체**에 걸린다 — 보류 중에는 migration 도 실행되지 않는다.
     #   해제는 코드 변경 없이 `gh variable set DEPLOY_ENABLED --body true` 로만 한다.
+    #
+    #   MIGRATE-ONLY (WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1): 두 번째 분기. 게이트 · detect 와 무관하게
+    #   이 잡을 열되, 첫 step 이 태그 ref · SHA 일치를 검사하고 "Deploy to Cloud Run" 이후 step 은 전부 skip 한다.
+    #   일반 경로(첫 분기)는 migrate_only 가 'true' 가 아닐 때만 — push 이벤트에서는 inputs 가 없어 항상 성립.
     if: >-
-      vars.DEPLOY_ENABLED == 'true' &&
-      needs.detect.outputs.api_deploy_affected == 'true' &&
-      (github.event_name != 'workflow_dispatch' ||
-       github.event.inputs.base_sha == '' ||
-       github.event.inputs.force_deploy == 'true')
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.migrate_only == 'true') ||
+      (vars.DEPLOY_ENABLED == 'true' &&
+       needs.detect.outputs.api_deploy_affected == 'true' &&
+       github.event.inputs.migrate_only != 'true' &&
+       (github.event_name != 'workflow_dispatch' ||
+        github.event.inputs.base_sha == '' ||
+        github.event.inputs.force_deploy == 'true'))
 
     permissions:
       contents: read
       id-token: write  # Required for Workload Identity Federation
 
     steps:
+    - name: Migrate-only preflight (tag ref · SHA 고정 검사)
+      if: github.event.inputs.migrate_only == 'true'
+      env:
+        EXPECTED_SHA: ${{ github.event.inputs.expected_sha }}
+      run: |
+        set -euo pipefail
+        echo "ref=${GITHUB_REF} sha=${GITHUB_SHA} expected=${EXPECTED_SHA}"
+        case "${GITHUB_REF}" in
+          refs/tags/deploy/*) ;;
+          *) echo "❌ migrate_only 는 refs/tags/deploy/* 태그 ref 에서만 실행한다 (현재 ${GITHUB_REF})"; exit 1 ;;
+        esac
+        if ! printf '%s' "${EXPECTED_SHA}" | grep -Eq '^[0-9a-f]{40}$'; then
+          echo "❌ expected_sha 는 40자 소문자 hex 여야 한다"; exit 1
+        fi
+        if [ "${EXPECTED_SHA}" != "${GITHUB_SHA}" ]; then
+          echo "❌ 태그 커밋(${GITHUB_SHA}) ≠ expected_sha(${EXPECTED_SHA}) — 태그가 옮겨졌거나 다른 ref 다. 실행하지 않는다"; exit 1
+        fi
+        {
+          echo "## 🧭 MIGRATE-ONLY — migration Job 만 실행하고 멈춘다"
+          echo ""
+          echo "- ref: \`${GITHUB_REF}\`"
+          echo "- SHA: \`${GITHUB_SHA}\` (expected 일치)"
+          echo "- API revision · traffic · one-off job 이미지: **변경 없음**"
+        } >> "$GITHUB_STEP_SUMMARY"
+
     - name: Checkout code
       uses: actions/checkout@v6
       with:
@@ -351,14 +398,18 @@ jobs:
         #     그 키는 package.production.json 내용이다.
         # 캐시 ref 가 없거나 읽기 실패면 buildx 는 경고 후 캐시 없이 빌드한다(배포 실패 아님).
         echo "🐳 Building and pushing Docker image (buildx + registry cache)..."
+        # migrate_only 실행은 배포되지 않는 빌드다 — `:latest` 를 옮기지 않는다.
+        TAG_ARGS=(--tag "${FULL_IMAGE}")
+        if [ "${{ github.event.inputs.migrate_only }}" != "true" ]; then
+          TAG_ARGS+=(--tag "${LATEST_IMAGE}")
+        fi
         docker buildx create --name o4o-api-builder --driver docker-container --use
         docker buildx build \
           --build-arg CACHEBUST=$(date +%s) \
           --platform linux/amd64 \
           --cache-from "type=registry,ref=${CACHE_IMAGE}" \
           --cache-to "type=registry,ref=${CACHE_IMAGE},mode=max,image-manifest=true,oci-mediatypes=true" \
-          --tag "${FULL_IMAGE}" \
-          --tag "${LATEST_IMAGE}" \
+          "${TAG_ARGS[@]}" \
           --file Dockerfile \
           --push \
           .
@@ -369,8 +420,15 @@ jobs:
         echo "🔍 Verifying pushed image..."
         docker buildx imagetools inspect "${FULL_IMAGE}"
 
+        # 방금 push 한 manifest digest — 같은 태그를 나중 빌드가 덮어써도 이 빌드를 가리킨다.
+        IMAGE_DIGEST=$(docker buildx imagetools inspect "${FULL_IMAGE}" --format '{{json .Manifest}}' | jq -r '.digest')
+        echo "📌 Image digest: ${IMAGE_DIGEST}"
+        echo "- image: \`${FULL_IMAGE}\`" >> "$GITHUB_STEP_SUMMARY"
+        echo "- digest: \`${IMAGE_DIGEST}\`" >> "$GITHUB_STEP_SUMMARY"
+
         echo "✅ Image pushed: ${FULL_IMAGE}"
         echo "IMAGE_TAG=${IMAGE_TAG}" >> $GITHUB_ENV
+        echo "IMAGE_DIGEST=${IMAGE_DIGEST}" >> $GITHUB_ENV
 
     # ============================================================
     # WO-O4O-DATABASE-MIGRATION-OWNERSHIP-STARTUP-HEALTH-AND-LEGACY-DEPLOY-TOOLING-FINAL-CLOSURE-V1
@@ -394,6 +452,11 @@ jobs:
         echo "🔄 Running database migrations..."
 
         FULL_IMAGE="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY_NAME }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}"
+        # migrate_only: 태그가 아니라 방금 push 한 digest 로 Job 을 고정한다.
+        if [ "${{ github.event.inputs.migrate_only }}" = "true" ]; then
+          FULL_IMAGE="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY_NAME }}/${{ env.IMAGE_NAME }}@${{ env.IMAGE_DIGEST }}"
+        fi
+        echo "migration image: ${FULL_IMAGE}"
 
         # ============================================================
         # Migration Strategy: Use dedicated migrate.js entry point
@@ -440,7 +503,29 @@ jobs:
 
         echo "✅ Migrations completed successfully"
 
+    # migrate_only 의 끝 — 운영 API 가 그대로인지 기록만 한다 (쓰기 없음).
+    - name: Migrate-only stop (API traffic 불변 기록)
+      if: github.event.inputs.migrate_only == 'true'
+      run: |
+        set -euo pipefail
+        TRAFFIC=$(gcloud run services describe ${{ env.SERVICE_NAME }} \
+          --region=${{ env.REGION }} --project=${{ env.PROJECT_ID }} \
+          --format="value(status.traffic)")
+        EXEC=$(gcloud run jobs executions list --job o4o-api-migrations \
+          --region=${{ env.REGION }} --project=${{ env.PROJECT_ID }} --limit 1 \
+          --format="value(metadata.name,status.succeededCount)")
+        {
+          echo ""
+          echo "### ⏸ migration 후 정지"
+          echo "- migration execution: \`${EXEC}\`"
+          echo "- API traffic (변경 없음): \`${TRAFFIC}\`"
+          echo "- 다음: 공식 CLI dry-run → 사용자 판단 → \`--apply\` · API 전환"
+        } >> "$GITHUB_STEP_SUMMARY"
+        echo "migration execution: ${EXEC}"
+        echo "API traffic: ${TRAFFIC}"
+
     - name: Deploy to Cloud Run
+      if: github.event.inputs.migrate_only != 'true'
       run: |
         FULL_IMAGE="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY_NAME }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}"
 
@@ -503,6 +588,7 @@ jobs:
           --add-cloudsql-instances=netureyoutube:asia-northeast3:o4o-platform-db
 
     - name: Refresh one-off Cloud Run job image references
+      if: github.event.inputs.migrate_only != 'true'
       # ---------------------------------------------------------------
       # WO-O4O-CLOUDRUN-JOB-IMAGE-REFERENCE-RECOVERY-AND-DEPLOYMENT-CONTRACT-V1
       #
@@ -553,6 +639,7 @@ jobs:
         echo "one-off Cloud Run job 이미지 참조 갱신 완료"
 
     - name: Verify deployment
+      if: github.event.inputs.migrate_only != 'true'
       run: |
         echo "🔍 Verifying deployment..."
 

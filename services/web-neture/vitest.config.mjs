@@ -14,6 +14,10 @@ import react from '@vitejs/plugin-react';
 
 export default defineConfig({
   plugins: [react()],
+  // 공통 패키지(@o4o/auth-react 등)와 이 앱이 react-router-dom 을 서로 다른 물리 경로에서 읽으면
+  // 같은 버전이어도 Router context 가 둘이 되어 guard 테스트가 `useLocation() ... <Router>` 로 깨진다.
+  // 번들(vite build)은 이미 하나로 합치므로 테스트도 같게 맞춘다 — WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1.
+  resolve: { dedupe: ['react', 'react-dom', 'react-router', 'react-router-dom'] },
   test: {
     environment: 'jsdom',
     include: ['services/web-neture/src/**/*.test.{ts,tsx}'],
