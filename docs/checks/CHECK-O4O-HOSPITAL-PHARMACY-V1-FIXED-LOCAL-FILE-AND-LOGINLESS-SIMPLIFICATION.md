@@ -8,7 +8,14 @@
 > (device enrollment 방식 — 이 WO 로 active path 에서 제거됨. 그 CHECK 의 §7 C~H · §9 PENDING 은 **이 WO 가 대체**한다.)
 
 - **작성**: 2026-09-26
-- **상태**: 코드 · 테스트 · CI 완결 / **운영 배포 PENDING — 전역 배포 게이트 `DEPLOY_ENABLED=false`** (§7)
+- **상태 갱신(2026-09-28 · 운영 실측)**: 이 WO 의 코드는 통제 배포 1(`2edfe9b33`)로 운영 반영됐다.
+  무로그인 · device enrollment 제거 · 공용 `@o4o/file-understanding-core` · `/api/hospital/ai/structure`(profile 만) 는 **현행 유지**
+  (운영 `POST /api/hospital/ai/structure` 빈 body → 400 검증 응답 · `/api/hospital/enroll` → 404).
+  **폴더 연결 + 고정 파일명 `hospital-drugs.xlsx` 부분은 후속 WO-O4O-HOSPITAL-PHARMACY-V1-DIRECT-FILE-SELECTION-AND-PRODUCTION-CLOSURE
+  (`bb26f3a26`, 파일 직접 선택 `showOpenFilePicker`)로 대체**됐다 — 운영 `hospital-pharmacy-web-00013-2xt`(이미지 `bb26f3a26`, traffic 100%)
+  번들: `showOpenFilePicker` 있음 · `showDirectoryPicker`·`hospital-drugs.xlsx`·`연결 코드`·`/api/hospital/enroll` 0.
+  이하 §4-3 의 폴더·고정 파일명 서술과 §6 smoke 항목(B·C·I 의 폴더/파일명)은 **기록**이며, 운영 smoke 와 FOUNDATION_STATUS 판정은 후속 WO 가 소유한다.
+- **상태(작성 시점)**: 코드 · 테스트 · CI 완결 / **운영 배포 PENDING — 전역 배포 게이트 `DEPLOY_ENABLED=false`** (§7)
 - **FOUNDATION_STATUS**: `PRODUCTION_READY` **아님** — 배포 + 실브라우저 smoke A~J 전까지 올리지 않는다
 
 ---
