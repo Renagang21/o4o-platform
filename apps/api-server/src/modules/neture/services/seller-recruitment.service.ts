@@ -37,6 +37,7 @@ import { ServiceAudienceService } from './service-audience.service.js';
 import { notificationService } from '../../../services/NotificationService.js';
 import type { NotificationType } from '../../../entities/Notification.js';
 import logger from '../../../utils/logger.js';
+import { listOwnedSupplierIds } from '../middleware/supplier-context.resolver.js';
 
 /**
  * WO-O4O-CROSSSERVICE-SELLER-RECRUITMENT-NOTIFICATION-TARGETURL-V1
@@ -259,7 +260,8 @@ export class SellerRecruitmentService {
     if (!masterId) return { success: false as const, error: 'MASTER_ID_REQUIRED' };
     if (serviceKeys.length === 0) return { success: false as const, error: 'SERVICE_KEY_REQUIRED' };
 
-    // offer 해소 (master_id + 공급자 user_id). PRIVATE·APPROVED 우선.
+    // offer 해소 (master_id + 이 사용자의 canonical 공급자 집합). PRIVATE·APPROVED 우선.
+    // WO-O4O-SUPPLIER-CANONICAL-RUNTIME-AND-PRODUCTION-FINAL-CLOSURE-V1: `ns.user_id = $2` → listOwnedSupplierIds.
     const rows: Array<{
       offer_id: string; distribution_type: string; product_name: string;
       manufacturer: string | null; is_regulated: boolean | null; seller_name: string | null;
@@ -271,10 +273,10 @@ export class SellerRecruitmentService {
        JOIN product_masters pm ON pm.id = spo.master_id
        LEFT JOIN product_categories c ON c.id = pm.category_id
        LEFT JOIN organizations org ON org.id = ns.organization_id
-       WHERE spo.master_id = $1 AND ns.user_id = $2 AND spo.deleted_at IS NULL
+       WHERE spo.master_id = $1 AND ns.id = ANY($2::uuid[]) AND spo.deleted_at IS NULL
        ORDER BY (spo.distribution_type = 'PRIVATE') DESC, (spo.approval_status = 'APPROVED') DESC, spo.created_at DESC
        LIMIT 1`,
-      [masterId, supplierUserId],
+      [masterId, await listOwnedSupplierIds(AppDataSource, supplierUserId)],
     );
     if (!rows.length) return { success: false as const, error: 'OFFER_NOT_FOUND' };
     const offer = rows[0];
@@ -548,10 +550,10 @@ export class SellerRecruitmentService {
       `SELECT spo.id
        FROM supplier_product_offers spo
        JOIN neture_suppliers ns ON ns.id = spo.supplier_id
-       WHERE spo.master_id = $1 AND ns.user_id = $2 AND spo.deleted_at IS NULL
+       WHERE spo.master_id = $1 AND ns.id = ANY($2::uuid[]) AND spo.deleted_at IS NULL
        ORDER BY (spo.distribution_type = 'PRIVATE') DESC, (spo.approval_status = 'APPROVED') DESC, spo.created_at DESC
        LIMIT 1`,
-      [recruitment.productId, supplierUserId],
+      [recruitment.productId, await listOwnedSupplierIds(AppDataSource, supplierUserId)],
     );
     if (offerRows.length) {
       const offerId = offerRows[0].id;
@@ -606,10 +608,10 @@ export class SellerRecruitmentService {
          JOIN neture_suppliers ns ON ns.id = spo.supplier_id
          JOIN product_masters pm ON pm.id = spo.master_id
          LEFT JOIN product_categories c ON c.id = pm.category_id
-         WHERE spo.master_id = $1 AND ns.user_id = $2 AND spo.deleted_at IS NULL
+         WHERE spo.master_id = $1 AND ns.id = ANY($2::uuid[]) AND spo.deleted_at IS NULL
          ORDER BY (spo.distribution_type = 'PRIVATE') DESC, (spo.approval_status = 'APPROVED') DESC, spo.created_at DESC
          LIMIT 1`,
-        [recruitment.productId, recruitment.sellerId],
+        [recruitment.productId, await listOwnedSupplierIds(AppDataSource, recruitment.sellerId)],
       );
     if (!offerRows.length) {
       logger.warn(`[C-Bridge] offer not found (master=${recruitment.productId}, supplierUser=${recruitment.sellerId}) — bridge skipped`);

@@ -286,6 +286,103 @@ describe('§8 Identity — organization_members 가 canonical', () => {
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
+// §8-b  Identity runtime 전수 — WO-O4O-SUPPLIER-CANONICAL-RUNTIME-AND-PRODUCTION-FINAL-CLOSURE-V1
+//   resolver 파일만이 아니라 **api-server 전체 runtime** 에서 legacy pointer 로 공급자를 고르는
+//   코드가 다시 생기지 않게 막는다.
+// ─────────────────────────────────────────────────────────────────────────────
+
+/** 테스트 · migration · schema bootstrap 을 제외한 api-server runtime .ts 전부 */
+function listRuntimeSources(): string[] {
+  const out: string[] = [];
+  const walk = (rel: string) => {
+    for (const ent of fs.readdirSync(path.join(REPO_ROOT, rel), { withFileTypes: true })) {
+      const child = `${rel}/${ent.name}`;
+      if (ent.isDirectory()) {
+        if (['__tests__', 'migrations', 'bootstrap', 'node_modules'].includes(ent.name)) continue;
+        walk(child);
+      } else if (/\.ts$/.test(ent.name) && !/\.(spec|test)\.ts$/.test(ent.name)) {
+        out.push(child);
+      }
+    }
+  };
+  walk(API);
+  return out;
+}
+
+/**
+ * legacy pointer(`neture_suppliers.user_id`) 로 공급자를 **찾는** 코드가 허용된 파일.
+ * 새 파일을 추가하려면 이유(census 분류)를 반드시 같이 적는다.
+ */
+const LEGACY_USER_ID_LOOKUP_ALLOWLIST: Record<string, string> = {
+  // LEGACY_FALLBACK — canonical 미해결 시 관측 가능한 fallback(경고 로그). 유일한 공식 경로.
+  [`${API}/modules/neture/middleware/supplier-context.resolver.ts`]: 'LEGACY_FALLBACK',
+  // ONBOARDING_BRIDGE — 가입 승인 멱등성(같은 가입자의 row 재생성 방지) · 운영자 가입 신청 목록 표시.
+  [`${API}/modules/neture/services/operator-registration.service.ts`]: 'ONBOARDING_BRIDGE',
+  // ONBOARDING_BRIDGE — registerSupplier 중복 신청 방지(같은 가입자). 인가 판정 아님.
+  [`${API}/modules/neture/services/supplier.service.ts`]: 'ONBOARDING_BRIDGE',
+  // OPERATOR_FILTER — owner membership 이 하나도 없는 organization 에만 legacy 로 fallback.
+  [`${API}/routes/market-trial-operator.routes.ts`]: 'OPERATOR_FILTER',
+};
+
+const LEGACY_LOOKUP_PATTERNS: RegExp[] = [
+  /FROM\s+neture_suppliers\s+(?:\w+\s+)?WHERE\s+(?:\w+\.)?user_id\s*=/i,
+  /\bns\.user_id\s*=\s*(?:\$|u\.id)/i,
+  /supplierRepo\.findOne\(\{\s*where:\s*\{\s*userId\b/,
+];
+
+describe('§8-b Identity runtime 전수 — legacy user_id 로 공급자를 고르지 않는다', () => {
+  const sources = listRuntimeSources();
+
+  it('runtime 전수 스캔 대상이 비어 있지 않다', () => {
+    expect(sources.length).toBeGreaterThan(100);
+  });
+
+  it('`FROM neture_suppliers WHERE user_id … LIMIT 1` 은 runtime 어디에도 없다', () => {
+    const offenders = sources.filter((f) =>
+      /FROM\s+neture_suppliers\s+(?:\w+\s+)?WHERE\s+(?:\w+\.)?user_id\s*=\s*\$\d+[^`]*?LIMIT\s+1/i.test(stripComments(read(f))),
+    );
+    expect(offenders).toEqual([]);
+  });
+
+  it('legacy user_id lookup 은 allowlist(이유 명시) 파일에만 남는다', () => {
+    const offenders = sources.filter((f) => {
+      if (LEGACY_USER_ID_LOOKUP_ALLOWLIST[f]) return false;
+      const body = stripComments(read(f));
+      return LEGACY_LOOKUP_PATTERNS.some((re) => re.test(body));
+    });
+    expect(offenders).toEqual([]);
+  });
+
+  it('allowlist 의 모든 항목은 실제 파일이며 이유가 적혀 있다 (죽은 예외 금지)', () => {
+    for (const [file, reason] of Object.entries(LEGACY_USER_ID_LOOKUP_ALLOWLIST)) {
+      expect(exists(file)).toBe(true);
+      expect(reason).toMatch(/^(LEGACY_FALLBACK|ONBOARDING_BRIDGE|OPERATOR_FILTER)$/);
+    }
+  });
+
+  it('home/entry 상태는 API guard 와 같은 resolver 를 쓴다 (home == guard)', () => {
+    const state = stripComments(read(`${API}/modules/neture/services/neture-service-state.service.ts`));
+    expect(state).toContain('resolveSupplierForUser(');
+  });
+
+  it('공급자 알림 수신자는 owner membership 집합이다 (legacy 단일 user_id 아님)', () => {
+    for (const f of [
+      `${API}/modules/neture/services/neture-settlement.service.ts`,
+      `${API}/modules/neture/services/offer-service-approval.service.ts`,
+    ]) {
+      expect(stripComments(read(f))).toContain('listSupplierOwnerUserIds(');
+    }
+  });
+
+  it('가입 승인 결과는 organization + owner membership 까지 만든다 (Phase F)', () => {
+    const reg = stripComments(read(`${API}/modules/neture/services/operator-registration.service.ts`));
+    expect(reg).toContain('organizationOpsService.setOwner(');
+    // owner 는 가입 신청 본인이다 — 승인 운영자(approvedBy)를 owner 로 넣지 않는다.
+    expect(reg).not.toMatch(/setOwner\([^)]*approvedBy/);
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
 // §9  Business Profile
 // ─────────────────────────────────────────────────────────────────────────────
 

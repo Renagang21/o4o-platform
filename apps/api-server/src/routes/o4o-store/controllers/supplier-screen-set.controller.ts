@@ -13,7 +13,7 @@
  *   service_key=<주입> · created_by_user_id=<작성자> · status ∈ {draft, active, archived}
  *   (supplier_template 미사용). active 일 때 hub_target_store_type 필수(CHK_stss_hub_target).
  *
- * 권한: 로그인 사용자가 **ACTIVE neture_suppliers** 구성원이어야 한다(user_id 매핑). 자기 원본만 접근.
+ * 권한: 로그인 사용자가 **ACTIVE neture_suppliers** 구성원이어야 한다(canonical: organization_members owner). 자기 원본만 접근.
  *
  * 라우트(mount: /api/v1/{serviceKey}/supplier/screen-sets):
  *   GET    /                                  — 자기 공급자 원본 목록
@@ -42,6 +42,7 @@ import { resolveContentListItems } from '../../platform/store-public/store-publi
 import { createSupplierContentSourceAdapter } from '../../platform/store-public/store-public-tablet-content-source.js';
 import { shapeStaticBlock, resolveTemplateKey } from '../../platform/store-public/store-public-tablet-screen.js';
 import { analyzeScreenSetMedication, medicationPublishTargetAllowed } from '../../platform/store-tablet-medication-guard.js';
+import { resolveSupplierIdForUser, readOrganizationContext } from '../../../modules/neture/middleware/supplier-context.resolver.js';
 
 // WO-O4O-KPA-TABLET-GENERATION-CONSOLIDATION-AND-CANONICAL-REFERENCE-V1 §2: product_content 은퇴.
 const SUPPLIER_SET_BLOCK_TYPES = [
@@ -88,11 +89,9 @@ export function createSupplierScreenSetController(
       res.status(401).json({ success: false, error: 'Authentication required', code: 'AUTH_REQUIRED' });
       return null;
     }
-    const rows = await dataSource.query(
-      `SELECT id FROM neture_suppliers WHERE user_id = $1 AND status = 'ACTIVE' LIMIT 1`,
-      [userId],
-    );
-    const supplierId: string | null = rows?.[0]?.id ?? null;
+    // WO-O4O-SUPPLIER-CANONICAL-RUNTIME-AND-PRODUCTION-FINAL-CLOSURE-V1: canonical resolver 재사용(`user_id LIMIT 1` 제거).
+    const resolved = await resolveSupplierIdForUser(dataSource, userId, readOrganizationContext(req));
+    const supplierId: string | null = resolved && resolved.status === 'ACTIVE' ? resolved.supplierId : null;
     if (!supplierId) {
       res.status(403).json({ success: false, error: 'Active supplier membership required', code: 'SUPPLIER_MEMBERSHIP_REQUIRED' });
       return null;

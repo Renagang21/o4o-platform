@@ -15,6 +15,7 @@
 import type { DataSource } from 'typeorm';
 import logger from '../../../utils/logger.js';
 import { isAdminTierRoleName } from '../../../utils/role-revoke-safety.js';
+import { organizationOpsService } from '../../organization/services/organization-ops.service.js';
 
 export class OperatorRegistrationService {
   constructor(private dataSource: DataSource) {}
@@ -170,6 +171,48 @@ export class OperatorRegistrationService {
           `SELECT id FROM neture_suppliers WHERE user_id = $1`,
           [userId],
         );
+        // WO-O4O-SUPPLIER-CANONICAL-RUNTIME-AND-PRODUCTION-FINAL-CLOSURE-V1 (Phase F):
+        //   승인 결과는 canonical 관계(organizations(type='supplier') + organization_members(owner))
+        //   까지 만들어야 한다. 과거에는 neture_suppliers.user_id 만 채우고 owner membership 을
+        //   만들지 않아 legacy pointer 에만 의존하는 공급자가 생겼다.
+        //   owner = 이 가입 신청의 본인(userId). approved_by(승인 운영자)는 owner 가 아니다.
+        const ensureOrganizationAndOwner = async (
+          supplierId: string,
+          existingOrganizationId: string | null,
+          orgName: string,
+          slugForCode: string,
+          businessNumber: string | null,
+          businessAddress: string | null,
+          addressDetailJson: string | null,
+        ): Promise<void> => {
+          let orgId = existingOrganizationId;
+          if (!orgId) {
+            const orgCode = `neture-${slugForCode}`;
+            const orgPath = `/${orgCode}`;
+            // organizations 테이블은 camelCase 컬럼 (TypeORM SnakeNamingStrategy 미적용),
+            // business_number / address 는 snake_case 컬럼 (organizations schema 기준)
+            const [org] = await queryRunner.query(
+              `INSERT INTO organizations (name, code, type, "isActive", "createdAt", "updatedAt", level, path, "childrenCount", business_number, address, address_detail)
+               VALUES ($1, $2, 'supplier', true, NOW(), NOW(), 0, $3, 0, $4, $5, $6::jsonb)
+               ON CONFLICT (code) DO UPDATE SET
+                 "isActive" = true,
+                 "updatedAt" = NOW(),
+                 business_number = COALESCE(EXCLUDED.business_number, organizations.business_number),
+                 address = COALESCE(EXCLUDED.address, organizations.address),
+                 address_detail = COALESCE(EXCLUDED.address_detail, organizations.address_detail)
+               RETURNING id`,
+              [orgName, orgCode, orgPath, businessNumber, businessAddress, addressDetailJson],
+            );
+            if (!org?.id) return;
+            await queryRunner.query(
+              `UPDATE neture_suppliers SET organization_id = $1 WHERE id = $2 AND organization_id IS NULL`,
+              [org.id, supplierId],
+            );
+            orgId = String(org.id);
+          }
+          await organizationOpsService.setOwner(orgId, userId, queryRunner);
+        };
+
         if (!existingSupplier?.length) {
           const [userRow] = await queryRunner.query(
             `SELECT name, email, phone, "businessInfo" FROM users WHERE id = $1`,
@@ -214,30 +257,13 @@ export class OperatorRegistrationService {
             [userId, slug, contactEmail, contactPhone, representativeName, managerName, managerPhone, businessType, taxInvoiceEmail, approvedBy],
           );
 
-          // organization 연동 (businessName이 있는 경우) — business_number, address org SSOT에 저장
-          if (bizName && insertedSupplier?.id) {
-            const orgCode = `neture-${slug}`;
-            const orgPath = `/${orgCode}`;
-            // organizations 테이블은 camelCase 컬럼 (TypeORM SnakeNamingStrategy 미적용),
-            // business_number / address 는 snake_case 컬럼 (organizations schema 기준)
-            const [org] = await queryRunner.query(
-              `INSERT INTO organizations (name, code, type, "isActive", "createdAt", "updatedAt", level, path, "childrenCount", business_number, address, address_detail)
-               VALUES ($1, $2, 'supplier', true, NOW(), NOW(), 0, $3, 0, $4, $5, $6::jsonb)
-               ON CONFLICT (code) DO UPDATE SET
-                 "isActive" = true,
-                 "updatedAt" = NOW(),
-                 business_number = COALESCE(EXCLUDED.business_number, organizations.business_number),
-                 address = COALESCE(EXCLUDED.address, organizations.address),
-                 address_detail = COALESCE(EXCLUDED.address_detail, organizations.address_detail)
-               RETURNING id`,
-              [bizName, orgCode, orgPath, businessNumber, businessAddress, addressDetailJson],
+          // organization 연동 + owner membership — business_number, address 는 org SSOT 에 저장.
+          // 이름이 비어도 organization 은 반드시 만든다(canonical 관계 없는 공급자 생성 0).
+          if (insertedSupplier?.id) {
+            await ensureOrganizationAndOwner(
+              String(insertedSupplier.id), null, bizName || slug, slug,
+              businessNumber, businessAddress, addressDetailJson,
             );
-            if (org?.id) {
-              await queryRunner.query(
-                `UPDATE neture_suppliers SET organization_id = $1 WHERE id = $2 AND organization_id IS NULL`,
-                [org.id, insertedSupplier.id],
-              );
-            }
           }
 
           logger.info(`[Registration] Auto-created neture_suppliers for user ${userId} (ACTIVE) — approval unified`);
@@ -261,6 +287,22 @@ export class OperatorRegistrationService {
             );
           }
           if (activatedRow?.id) {
+            // 이번 승인으로 ACTIVE 가 된 공급자만 canonical 관계를 보장한다(기존 ACTIVE/REJECTED 는 불변).
+            const [userRow] = await queryRunner.query(
+              `SELECT name, "businessInfo" FROM users WHERE id = $1`,
+              [userId],
+            );
+            const bizInfo = userRow?.businessInfo;
+            const fallbackSlug = `supplier-${userId.substring(0, 8)}`;
+            await ensureOrganizationAndOwner(
+              String(activatedRow.id),
+              activatedRow.organization_id ? String(activatedRow.organization_id) : null,
+              bizInfo?.businessName || userRow?.name || fallbackSlug,
+              fallbackSlug,
+              bizInfo?.businessNumber || null,
+              bizInfo?.businessAddress || bizInfo?.address || null,
+              null,
+            );
             logger.info(`[Registration] Existing PENDING supplier activated with member approval for user ${userId}`);
           }
         }

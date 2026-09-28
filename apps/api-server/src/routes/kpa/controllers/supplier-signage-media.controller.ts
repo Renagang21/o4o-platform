@@ -25,6 +25,7 @@ import type { Request, Response, RequestHandler } from 'express';
 import type { DataSource } from 'typeorm';
 import { extractYouTubeVideoId, getYouTubeThumbnail } from '@o4o/types/signage';
 import { SignageMediaUsageService } from '../../signage/services/media-usage.service.js';
+import { resolveSupplierIdForUser, readOrganizationContext } from '../../../modules/neture/middleware/supplier-context.resolver.js';
 
 const SERVICE_KEY = 'kpa-society';
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -93,18 +94,17 @@ export function createSupplierSignageMediaController(
   // WO-O4O-KPA-SIGNAGE-MEDIA-USAGE-GUARD-AND-SAFE-DELETE-V1 (Scope 7): 사용처 가드
   const usageService = new SignageMediaUsageService(dataSource);
 
-  /** neture_suppliers ACTIVE 확인 (supplier-screen-set.controller 패턴 재사용) */
+  /** ACTIVE 공급자 확인 (canonical 관계 · supplier-screen-set.controller 와 동일) */
   async function requireSupplier(req: AuthedRequest, res: Response): Promise<string | null> {
     const userId = getUserId(req);
     if (!userId) {
       res.status(401).json({ success: false, error: 'Authentication required', code: 'AUTH_REQUIRED' });
       return null;
     }
-    const rows = await dataSource.query(
-      `SELECT id FROM neture_suppliers WHERE user_id = $1 AND status = 'ACTIVE' LIMIT 1`,
-      [userId],
-    );
-    if (!rows?.[0]) {
+    // WO-O4O-SUPPLIER-CANONICAL-RUNTIME-AND-PRODUCTION-FINAL-CLOSURE-V1: ACTIVE 공급자 gate 를 canonical resolver 로.
+    //   소유권 축(createdByUserId)은 불변.
+    const resolved = await resolveSupplierIdForUser(dataSource, userId, readOrganizationContext(req as unknown as Request));
+    if (!resolved || resolved.status !== 'ACTIVE') {
       res.status(403).json({ success: false, error: '활성 공급자만 사용할 수 있습니다.', code: 'SUPPLIER_MEMBERSHIP_REQUIRED' });
       return null;
     }

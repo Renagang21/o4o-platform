@@ -61,7 +61,14 @@ export function createNetureOperatorTrialRoutes(): Router {
         idx++;
       }
       if (supplierUserId) {
-        conditions.push(`ns.user_id = $${idx}`);
+        // WO-O4O-SUPPLIER-CANONICAL-RUNTIME-AND-PRODUCTION-FINAL-CLOSURE-V1: 운영자 필터도 canonical 관계
+        //   (organization_members owner) 로 공급자를 찾는다. legacy user_id 는 owner 가 없는 공급자에 한해 유지.
+        conditions.push(`(ns.organization_id IN (
+            SELECT om.organization_id FROM organization_members om
+             WHERE om.user_id = $${idx} AND om.left_at IS NULL AND om.role = 'owner')
+          OR (ns.user_id = $${idx} AND NOT EXISTS (
+            SELECT 1 FROM organization_members om2
+             WHERE om2.organization_id = ns.organization_id AND om2.left_at IS NULL AND om2.role = 'owner')))`);
         params.push(supplierUserId);
         idx++;
       }

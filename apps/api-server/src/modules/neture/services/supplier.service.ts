@@ -9,6 +9,7 @@ import {
   ContactVisibility,
 } from '../entities/index.js';
 import logger from '../../../utils/logger.js';
+import { listOwnedSupplierIds, resolveSupplierIdForUser } from '../middleware/supplier-context.resolver.js';
 import { roleAssignmentService } from '../../auth/services/role-assignment.service.js';
 import { ServiceMembership } from '../../auth/entities/ServiceMembership.js';
 import { organizationOpsService } from '../../organization/services/organization-ops.service.js';
@@ -55,13 +56,14 @@ export class NetureSupplierService {
 
   // ==================== Supplier Identity ====================
 
+  // WO-O4O-SUPPLIER-CANONICAL-RUNTIME-AND-PRODUCTION-FINAL-CLOSURE-V1:
+  //   이 두 getter 는 Content Library · 상품 이미지 · hub-trigger 의 guard 가 쓴다. `where: { userId }`
+  //   (legacy pointer) 대신 API guard 와 같은 canonical resolver 로 공급자를 찾는다.
+  //   후보 N 개면 null(임의 선택 0) — 호출부는 기존 NO_SUPPLIER 계약을 유지한다.
   async getSupplierIdByUserId(userId: string): Promise<string | null> {
     try {
-      const supplier = await this.supplierRepo.findOne({
-        where: { userId },
-        select: ['id'],
-      });
-      return supplier?.id || null;
+      const resolved = await resolveSupplierIdForUser(AppDataSource, userId);
+      return resolved?.supplierId ?? null;
     } catch (error) {
       logger.error('[NetureSupplierService] Error finding supplier by user ID:', error);
       return null;
@@ -70,8 +72,10 @@ export class NetureSupplierService {
 
   async getSupplierByUserId(userId: string): Promise<NetureSupplier | null> {
     try {
+      const resolved = await resolveSupplierIdForUser(AppDataSource, userId);
+      if (!resolved) return null;
       return await this.supplierRepo.findOne({
-        where: { userId },
+        where: { id: resolved.supplierId },
         relations: ['offers'],
       });
     } catch (error) {
@@ -859,7 +863,9 @@ export class NetureSupplierService {
       // WO-O4O-NETURE-ORG-READ-PATH-SWITCH-V1: org-primary read for name
       const org = await this.getOrgData(supplier.organizationId);
 
-      const isOwner = !!viewerId && supplier.userId === viewerId;
+      // WO-O4O-SUPPLIER-CANONICAL-RUNTIME-AND-PRODUCTION-FINAL-CLOSURE-V1: 소유자 판정 = canonical 관계
+      //   (organization_members owner). `supplier.userId === viewerId` 는 legacy pointer 비교였다.
+      const isOwner = !!viewerId && (await listOwnedSupplierIds(AppDataSource, viewerId)).includes(supplier.id);
       const isApprovedBuyer = !!viewerId && !isOwner
         ? await this.hasApprovedPrivateSupply(supplier.id, viewerId)
         : false;

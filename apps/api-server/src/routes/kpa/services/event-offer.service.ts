@@ -21,6 +21,7 @@ import { SERVICE_KEYS } from '../../../constants/service-keys.js';
 import { CheckoutOrder } from '../../../entities/checkout/CheckoutOrder.entity.js';
 import { checkoutService } from '../../../services/checkout.service.js';
 import { resolveStoreAccess } from '../../../utils/store-owner.utils.js';
+import { listOwnedSupplierIds } from '../../../modules/neture/middleware/supplier-context.resolver.js';
 // WO-O4O-EVENT-OFFER-MULTI-SERVICE-PROPOSAL-V1
 import {
   resolveOrganizationForEventOffer,
@@ -1060,12 +1061,10 @@ export class EventOfferService {
           'OFFER_NOT_OWNED',
         );
       }
-      const ownerRows = await this.dataSource.query(
-        `SELECT 1 FROM neture_suppliers
-         WHERE id = $1 AND user_id = $2 LIMIT 1`,
-        [offer.supplier_id, input.ownerUserId],
-      );
-      if (!ownerRows.length) {
+      // WO-O4O-SUPPLIER-CANONICAL-RUNTIME-AND-PRODUCTION-FINAL-CLOSURE-V1:
+      //   소유권 = canonical 공급자 관계(organization_members owner). legacy user_id 는 resolver 내부 fallback.
+      const ownedSupplierIds = await listOwnedSupplierIds(this.dataSource, input.ownerUserId);
+      if (!ownedSupplierIds.includes(String(offer.supplier_id))) {
         throw new EventOfferCreateError(403, 'Offer not owned', 'OFFER_NOT_OWNED');
       }
     }
