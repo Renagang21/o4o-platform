@@ -1,6 +1,6 @@
 # CHECK-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1
 
-> 시작: 2026-09-27 · 상태: **`5차 리뷰 반영 · 최신 HEAD CI 재확인 대기 · 병합·운영 적용 보류`**
+> 시작: 2026-09-27 · 상태: **`병합 완료(2026-09-28, 880642e9b) · 운영 미배포(DEPLOY_ENABLED=false) · 승격 CLI 결함 1건 발견(§8-2) · 운영 적용·실제 접근 검증 전`**
 > PR: [#241](https://github.com/Renagang21/o4o-platform/pull/241) — 1차 CI green 후
 > **리뷰에서 세 경계가 확정 요구사항과 다르다고 지적돼 같은 PR 에서 정정했다**(§11).
 > 정정 후 재검증: 전 체크 pass · `mergeStateStatus = CLEAN`.
@@ -584,6 +584,50 @@ rate limit 이 없었고 각자 DB 조회·갱신을 한다.
 
 **미확인을 0 으로 간주하지 않는다. 운영 적용을 PASS 로 쓰지 않는다.**
 
+### 8-0. 병합 후 실측 (2026-09-28 · 병합 `880642e9b` · PR HEAD `7ba57bcbc`)
+
+**배포 상태 — 운영 미배포.** 워크플로 "success" 는 deploy job 이 skip 된 결과다.
+
+| 항목 | 실측 |
+|---|---|
+| 병합 직후 워크플로 | API `36369965282` · Web `36369965107` · Admin `36369965142` — 전부 conclusion success 이나 `build-and-deploy` · 각 `deploy-*` · admin deploy = **skipped**, 실행된 것은 detect · `deploy-hold-notice` 뿐 |
+| `DEPLOY_ENABLED` | `false` (2026-09-25T23:02:43Z 갱신) |
+| 운영 revision (전부 traffic 100%) | `o4o-core-api-03755-6zf` · `neture-web-01660-xsx` · `o4o-admin-dashboard-01315-2wn` · `store-web-00018-cnm` · `lecture-web-00017-vlh` · `kpa-branch-web-00178-sj9` 외 — 생성 2026-09-25 22:52~22:55Z(병합 이전) |
+| 운영 API 기준 커밋 | `14587a9ad` (run `36198504033`, 마지막으로 `build-and-deploy` 가 실제 실행된 run) |
+| 운영 migration | `typeorm_migrations` 689행 · 최신 `DropLegacyPasswordAuthSchema1790251584623`. `communities` · `community_memberships` · `service_session_revocations` · 분회 신청 표 **없음** |
+
+| # | 결과 | 근거 · 한계 |
+|---|---|---|
+| U1 | **사전 측정 완료 · 공식 dry-run 미실행** | 승격 CLI 는 dry-run 에서도 `communities` 를 조회하므로 migration 6 전에는 실행 불가. CLI 와 같은 증거·자격 SQL 을 read-only 트랜잭션으로 실행(§8-2 컬럼 정정 적용): `pharmacy` 증거 1 · 자격 1 / `cosmetics` 0 · 0 / `o4o-general` 1 · 1 → **예상 insert 2행 · 대상 사용자 1명(= `platform:super_admin` 보유자)**. 원장: kpa-society 글 6 · 댓글 6 / neture 글 1 / pharmacy-hub 0. 원장 매핑이 없는 글 1건(어느 커뮤니티 증거에도 포함되지 않음). users 전체 3 |
+| U2 | **간접 확인 — `valid:true`** | `iframerpc?action=checkOrigin` 이 이번에는 200 응답. 대조군 판별력 확인: `zz-unregistered-probe.neture.co.kr` · `http://study.neture.co.kr` = `valid:false`. **비공식 endpoint 이므로 Console 확인과 동급으로 쓰지 않는다** — 배포 후 실제 Google 로그인으로 확정 |
+| U3 | **간접 확인 — 7개 모두 `valid:true`** | supplier · funding · community · pharmacy · retail · kpa · store `.neture.co.kr`. URL 트랙 §21-19-3 기록 시점(전부 `false`)과 달라졌다 = 사용자 Console 저장 반영 |
+| U4 | **코드 준비 · 배포 조건 잔존** | 운영 대비 main 미배포 70커밋(first-parent 22). 아래 §8-3 |
+
+### 8-2. 발견 — 승격 CLI 컬럼명 결함 (코드 변경 필요 · 미수정)
+
+```text
+CLI        forum_comment c JOIN forum_post p ON p.id = c.post_id
+실제 스키마  forum_comment."postId"   (canonical-schema-baseline.ts:1542 · 운영 동일)
+```
+
+- 영향: 운영에서 CLI 는 첫 증거 질의에서 `column c.post_id does not exist` 로 **실패**한다(쓰기 전 실패 — 데이터 손상 없음). 배포 순서 2·3 이 막히고, 3 을 건너뛰면 V7 게이트가 기존 참여자를 막는다.
+- §2-4 의 fixture 결과("B 댓글만 → 승인")는 baseline 스키마와 양립하지 않는다 — fixture 가 baseline 이 아닌 표로 만들어졌을 가능성. **§2-4 기록은 재검증 전까지 근거로 쓰지 않는다.**
+- 수정 범위(제안): `EVIDENCE_CTE` 의 `c.post_id` → `c."postId"` 1곳 + baseline fresh bootstrap 위에서 fixture 재실행. 사용자 확인 후 같은 작업 범위에서 처리.
+
+### 8-3. 함께 배포되는 변경 (U4)
+
+| 묶음 | 커밋 | 배포 조건 |
+|---|---|---|
+| 이 작업 | PR #241 (`880642e9b`) | migration incremental 6·7·8·9 · §8-2 선행 |
+| URL 재구성 · Store 이전 | `236c22dfc` · `5c824eb8e` · `aa2be0759` · `ef0f35652` · `dc5b16451` · `83d44c189` · `7dcf85f65` 외 | [`CHECK-O4O-URL-FIRST-CENSUS-V1` §21-19](CHECK-O4O-URL-FIRST-CENSUS-V1.md) — Google 원본 게이트는 U3 로 해소 가능. 플래그(`VITE_UNIFIED_STORE_HANDOFF` · `VITE_HOST_CUTOVER_*`) `'false'` 유지 배포. §21-11 handoff 제약 확장 migration 은 **첫 배포 후** 커밋 예정(main 에 없음 — 정합) |
+| 인증 게이트 b·c | `6b85e6e95` · `5fd971083` | URL 트랙 §21-5 |
+| Supplier Domain 경계 동결 | `303221b8b` | 해당 트랙 CHECK |
+| 병원약국 V1 무로그인 | `2f4777aca` | 신규 패키지 `file-understanding-core` · lockfile 변경 포함 |
+| 관리자 권한 부여 | PR #239 · #240 | — |
+
+- **충돌 지점**: URL 트랙 §21-11 은 "첫 배포에 DB 변경을 섞지 않는다"(사용자 지시)를 전제로 migration 0 배포를 준비했다. 이 작업의 migration 4개가 main 에 들어와 **그 첫 배포에 DB 변경이 섞인다.** 합동 배포 여부는 사용자 판단.
+- 운영자 역할 실측(read-only): 새 역할 `community:admin` · `supplier:*` · `funding:*` · `kpa-branch:admin` 보유 **0명**. 활성 `neture:admin` · `neture:operator` 보유 비-super_admin 1명(검증 계정) — 배포 후 `/suppliers/*` · market-trial 운영자 경로 접근을 잃으므로 §8-1 의 6 필요. 검증 계정은 `kpa-branch:operator` 만 있고 `kpa-branch:admin` 없음.
+
 ### 8-1. 배포 순서 (하드 선행 조건)
 
 ```text
@@ -749,6 +793,8 @@ representative-entry · unified-store-workspace-handoff spec)은 새 계약(`'un
 ## 10. 문서 정합
 
 발견 2건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 1건(D1)
+
+- 2026-09-28 병합 후 실측: 이 CHECK 자체의 §2-4 fixture 기록이 스키마와 불일치(§8-2) — 기록물 내부 정정 표시만, 기준 문서 변경 0.
 
 - WO §2 표 2·3 행 · §4 전면 · §7 · S4 순서를 **실측으로 정정**(WO §4-0 방향 변경 기록 6항목).
 - 정정 사유는 모두 코드 실측이며, 기준 문서(FROZEN 정본)는 수정하지 않았다.
