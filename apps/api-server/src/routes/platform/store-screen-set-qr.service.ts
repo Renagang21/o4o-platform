@@ -25,7 +25,7 @@ const SVC_TO_CATALOG: Record<string, string> = {
 /** Screen Set QR 의 canonical 공개 절대 URL. QR 인코딩/공유용(상대경로 아님). */
 export function buildScreenSetQrUrl(serviceKey: string, slug: string): string {
   const catalogKey = SVC_TO_CATALOG[serviceKey] ?? serviceKey;
-  const domain = getService(catalogKey)?.domain || 'kpa-society.co.kr';
+  const domain = getService(catalogKey)?.domain || 'pharmacy.neture.co.kr';
   return `https://${domain}/qr/${slug}`;
 }
 

@@ -74,8 +74,19 @@ export interface O4OService {
    * WO-PHARMACY-HUB-NEW-SERVICE-FOUNDATION-V1 에서 추가. 기존 서비스는 미지정으로 동작 불변.
    */
   nameKo?: string;
-  /** 서비스 도메인 */
+  /**
+   * 서비스 도메인 — **canonical**. 새로 만드는 모든 URL(handoff · QR · 공개 랜딩 · 메일 링크)의 호스트.
+   */
   domain: string;
+  /**
+   * 옛 호스트 — **수용 전용 (optional)**. WO-O4O-SERVICE-CATALOG-CANONICAL-DOMAIN-AND-PH-JOIN-CLEANUP-V1
+   *
+   *   canonical 로 옮긴 뒤에도 인쇄 QR · 외부 링크 · 북마크 때문에 같은 앱이 계속 서빙하는 호스트다.
+   *   **요청이 들어왔을 때 어느 서비스인지 판정하는 데만 쓴다**(`session-origin`).
+   *   URL 생성에는 쓰지 않는다 — `getServiceOrigin` · `getServicePublicOrigin` 은 `domain` 만 본다.
+   *   여기서 빼는 것은 그 호스트의 로그인 세션 귀속을 끊는 일이므로 DNS · LB 정리와 같은 별도 WO 에서 한다.
+   */
+  legacyDomains?: readonly string[];
   /**
    * 공개 진입 경로 prefix (optional — 미지정 시 host 루트).
    *
@@ -111,7 +122,9 @@ export const O4O_SERVICES: O4OService[] = [
   {
     key: 'kpa-society',
     name: 'KPA Society',
-    domain: 'kpa-society.co.kr',
+    // WO-O4O-SERVICE-CATALOG-CANONICAL-DOMAIN-AND-PH-JOIN-CLEANUP-V1: 로그인 전 진입(대표 홈)과 같은 호스트로 정렬.
+    domain: 'pharmacy.neture.co.kr',
+    legacyDomains: ['kpa-society.co.kr'],
     description: '약사 커뮤니티 서비스',
     joinEnabled: true,
     // STANDARD_CANDIDATE — 매장 linkage(kpa) · kpa:store_owner · kpa:operator 가 현재 runtime 에 있다. 자동 활성화 아님.
@@ -120,7 +133,9 @@ export const O4O_SERVICES: O4OService[] = [
   {
     key: 'k-cosmetics',
     name: 'K-Cosmetics',
-    domain: 'k-cosmetics.site',
+    // WO-O4O-SERVICE-CATALOG-CANONICAL-DOMAIN-AND-PH-JOIN-CLEANUP-V1: 로그인 전 진입(대표 홈)과 같은 호스트로 정렬.
+    domain: 'retail.neture.co.kr',
+    legacyDomains: ['k-cosmetics.site'],
     description: '화장품 유통 플랫폼',
     joinEnabled: true,
     // STANDARD_CANDIDATE — 매장 linkage(cosmetics) · cosmetics:store_owner · cosmetics:operator 존재. 자동 활성화 아님.
@@ -135,6 +150,12 @@ export const O4O_SERVICES: O4OService[] = [
    *   joinEnabled false → true. 가입 신청 write-path(POST /api/v1/pharmacy-hub/join)와
    *   운영자 승인 콘솔(/api/v1/pharmacy-hub/operator/memberships)이 연결되었다.
    *   platform_services row 는 20270216000000-SeedPharmacyHubServiceAndRoles 에서 seed 한다.
+   *
+   * WO-O4O-SERVICE-CATALOG-CANONICAL-DOMAIN-AND-PH-JOIN-CLEANUP-V1:
+   *   joinEnabled true → false. 약국은 KPA Society(pharmacy.neture.co.kr)로 들어가며 Pharmacy-Hub 를
+   *   별도 신규 가입 서비스로 제시하지 않는다(대표 홈 「가입 가능한 서비스」 · 범용 `/auth/services/:key/join`).
+   *   기존 membership · handoff(active 판정) · 서비스 자체 route(`/api/v1/pharmacy-hub/*`)는 이 값을 보지 않으므로 그대로다.
+   *   domain 도 바꾸지 않는다 — 신규 canonical 호스트가 정해지지 않았다.
    */
   {
     key: 'pharmacy-hub',
@@ -142,7 +163,7 @@ export const O4O_SERVICES: O4OService[] = [
     nameKo: '파머시 허브',
     domain: 'pharmacyhub.co.kr',
     description: '약국 경영자·공급자 직접 연결 약국 전문 서비스',
-    joinEnabled: true,
+    joinEnabled: false,
     // STANDARD_CANDIDATE — 매장 linkage(pharmacy-hub) · pharmacy-hub:store_owner · pharmacy-hub:operator 존재. 자동 활성화 아님.
     workspace: { workspaceMode: 'standard', storeWorkspaceEnabled: true, operatorWorkspaceEnabled: true },
   },
@@ -175,6 +196,9 @@ export const O4O_SERVICES: O4OService[] = [
    *   (LB `o4o-global-lb` / path-matcher-kpa-society 의 `/kpa`·`/kpa/*` pathRule).
    *   따라서 domain=kpa-society.co.kr + basePath=/kpa 로 표현한다.
    *   `/kpa` 는 URL prefix 일 뿐 tenant 가 아니다 — 분회는 slug 또는 Host 로만 해석한다.
+   *   WO-O4O-SERVICE-CATALOG-CANONICAL-DOMAIN-AND-PH-JOIN-CLEANUP-V1: kpa-society 가 pharmacy.neture.co.kr 로
+   *   옮겨도 이 항목은 **그대로 둔다(DEFERRED)**. pharmacy.neture.co.kr/kpa 는 분회 앱이 아니고, 목표 호스트
+   *   kpa.neture.co.kr 은 basePath 가 없는 구조라 handoff · 분회 slug 해석을 함께 바꿔야 한다.
    * platform_services row 는 20270305000000-SeedKpaBranchServiceAndRoles 에서 seed 한다.
    * joinEnabled=false — 분회 소속은 자가 신청이 아니라 분회 운영자 승인 경로로만 생성된다.
    */

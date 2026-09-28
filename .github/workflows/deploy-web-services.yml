@@ -66,8 +66,9 @@ env:
   # WO-O4O-DOMAIN-SSOT-CANONICALIZATION-V1: per-service canonical URL injected as build-arg.
   # Values mirror apps/api-server/src/config/service-catalog.ts O4O_SERVICES[].domain.
   VITE_SERVICE_URL_NETURE: https://neture.co.kr
-  VITE_SERVICE_URL_KPA_SOCIETY: https://kpa-society.co.kr
-  VITE_SERVICE_URL_K_COSMETICS: https://k-cosmetics.site
+  # WO-O4O-SERVICE-CATALOG-CANONICAL-DOMAIN-AND-PH-JOIN-CLEANUP-V1: catalog canonical 정렬(옛 호스트는 수용 전용).
+  VITE_SERVICE_URL_KPA_SOCIETY: https://pharmacy.neture.co.kr
+  VITE_SERVICE_URL_K_COSMETICS: https://retail.neture.co.kr
   # WO-PHARMACY-HUB-DEPLOY-BOOTSTRAP-AND-MEMBERSHIP-E2E-V1
   VITE_API_URL_PHARMACY_HUB: https://api.neture.co.kr
   VITE_SERVICE_URL_PHARMACY_HUB: https://pharmacyhub.co.kr

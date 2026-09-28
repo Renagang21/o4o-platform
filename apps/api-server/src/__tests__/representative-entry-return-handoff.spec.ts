@@ -189,7 +189,8 @@ describe('B. generateHandoff', () => {
     const res = mockRes();
     await HandoffController.generateHandoff(mockReq({ targetServiceKey: 'kpa-society' }, 'https://neture.co.kr'), res);
     expect(res.statusCode).toBe(200);
-    expect(res.body.data.targetUrl).toBe(`https://kpa-society.co.kr/handoff?token=${uuid}`);
+    // canonical 호스트로 넘긴다 (WO-O4O-SERVICE-CATALOG-CANONICAL-DOMAIN-AND-PH-JOIN-CLEANUP-V1)
+    expect(res.body.data.targetUrl).toBe(`https://pharmacy.neture.co.kr/handoff?token=${uuid}`);
   });
 
   it.each([['neture'], ['kpa-society']])(
