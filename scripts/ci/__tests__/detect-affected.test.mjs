@@ -797,9 +797,12 @@ test('§11. deploy-api.yml 은 detect → 조건부 build-and-deploy 구조다',
 
 test('§13 · §15. migration/deploy step 은 build-and-deploy 안에만 있고, 재현 dispatch 는 배포하지 않는다', () => {
   const yml = workflowYaml('deploy-api.yml');
-  // 세 가지 production 작업이 모두 같은 잡(build-and-deploy)에 있어야 판정 하나로 0 이 된다
+  // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1: 이미지 빌드·push 는
+  // .github/actions/build-api-image composite action 으로 **이동**했다(복사 아님 —
+  // migration 전용 경로 migrate-api.yml 이 같은 정의를 쓴다). 고정하는 계약은 그대로다:
+  // 세 production 작업이 같은 잡 안에 있어야 판정 하나로 0 이 된다.
   for (const step of [
-    'Build and Push Docker image',
+    'Build and push API image',
     'Run database migrations',
     'Deploy to Cloud Run',
     'Refresh one-off Cloud Run job image references',
@@ -812,6 +815,9 @@ test('§13 · §15. migration/deploy step 은 build-and-deploy 안에만 있고,
   }
   assert.match(yml, /base_sha:/, '판정 재현용 입력이 있어야 한다');
   assert.match(yml, /github\.event\.inputs\.base_sha == ''/, 'base_sha 재현 실행은 배포하지 않는다');
+  // 빌드 정의가 다시 인라인되면(=두 벌이 되면) 실패한다.
+  assert.match(yml, /uses: \.\/\.github\/actions\/build-api-image/, '빌드는 공용 action 을 쓴다');
+  assert.ok(!yml.includes('docker buildx build'), '빌드 절차가 workflow 에 다시 인라인되면 안 된다');
 });
 
 // ---------------------------------------------------------------------------
