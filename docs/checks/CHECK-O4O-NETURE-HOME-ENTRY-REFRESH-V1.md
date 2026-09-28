@@ -89,7 +89,7 @@ E(병원약국): 홈에 링크 **없음**. 그대로 둔다(§5). G(외부): Goo
 
 | # | 잔여 | 이유 | 제안 |
 |---|---|---|---|
-| R1 | 로그인 후 `HomeEntryPanel` 의 가입 링크 · handoff 대상이 서버 `apps/api-server/src/config/service-catalog.ts` domain(kpa-society.co.kr · k-cosmetics.site · pharmacyhub.co.kr)을 쓴다 | catalog 변경은 API · handoff 계약 변경(중지 조건). catalog 에 "새 호스트 검증 전까지" 의도적으로 유지한다고 명시돼 있다 | 별도 WO: service-catalog domain REPOINT (새 호스트 검증 완료 후) |
+| R1 | 로그인 후 `HomeEntryPanel` 의 가입 링크 · handoff 대상이 서버 `apps/api-server/src/config/service-catalog.ts` domain(kpa-society.co.kr · k-cosmetics.site · pharmacyhub.co.kr)을 쓴다 | catalog 변경은 API · handoff 계약 변경(중지 조건). ~~catalog 에 "새 호스트 검증 전까지" 의도적으로 유지한다고 명시돼 있다~~ → **정정(2026-09-28)**: catalog 에 그런 주석은 없다(해당 문구는 `hostProfile.ts` supplier/funding cutover 주석). domain 값은 단순 legacy 값이다 — [IR-O4O-NETURE-HOME-CURRENT-STATE-AND-IA-REDESIGN-V1 §7](../investigations/IR-O4O-NETURE-HOME-CURRENT-STATE-AND-IA-REDESIGN-V1.md) | 별도 WO: service-catalog domain REPOINT (새 호스트 검증 완료 후) |
 | R2 | [`packages/shared-space-ui/src/O4OHelpSection.tsx`](../../packages/shared-space-ui/src/O4OHelpSection.tsx) cross-service 카탈로그가 구 호스트(kpa-society.co.kr · www.k-cosmetics.site)를 가리킨다 | shared module — 소비처 식별 절차가 필요하다 | 별도 WO (Shared Module Change Protocol) |
 | R3 | 대표 홈 로그인 모달 헤더 문구 "Neture 로그인 · 공급자 연결 서비스" 가 O4O 대표 입구 성격과 어긋날 수 있다 | LoginModal 은 supplier 등 다른 host 와 공용. 문구 판단 필요 | 문구 판단 후 별도 WO |
 | R4 | 대표 홈 pill 에 펀딩 · 강의 · 매장 진입이 없다 | 추가는 IA 결정이다(이번 WO 는 기존 링크 정정만) | 다음 IA WO |
