@@ -24,6 +24,13 @@ import {
   type SurfaceResearchResult,
   type HospitalDrugSurfaceDeps,
 } from '../services/ai-tools/hospital-drug-surface.js';
+import {
+  mentionsHospital,
+  mentionsSameIngredient,
+  queryLocalRows,
+  matchLocalByResearchIngredients,
+  type HospitalDrugRecord,
+} from '@o4o/hospital-pharmacy-core';
 
 // ─── 가짜 deps 빌더 ───────────────────────────────────────────────────────────
 
@@ -221,5 +228,44 @@ describe('병원 surface 기본값 — 원내가 명확하지 않고 대상이 �
     expect(r.usedResearch).toBe(true);
     expect(researchCalls).toEqual(['타이레놀 성분이 무어니']);
     expect(localCalls).toEqual([]);
+  });
+});
+
+// ─── /hospital 병동 경로 — 약품명 어미 없는 "타이레놀" 원내 질문 2건 ─────────────────────
+// 병동 화면(web-hospital-pharmacy WardPage)은 원내 판정을 브라우저에서 core 함수로 하고, 원내 행은 사용자가 고른 실제 파일에서 읽는다.
+// 서버는 suppressLocal=true 로 불리며 원내 조회를 열지 않는다. 이 테스트는 그 경로가 쓰는 core 함수 + 서버 판정을 그대로 고정한다.
+describe('/hospital 병동 경로 — "타이레놀"(약품명 어미 없음) 원내 · 동일성분 질문', () => {
+  const rows: HospitalDrugRecord[] = [
+    { product_name: '타이레놀정500mg', ingredient: '아세트아미노펜', strength: '500mg' },
+    { product_name: '세토펜정', ingredient: '아세트아미노펜', strength: '325mg' },
+    { product_name: '아모디핀정', ingredient: '암로디핀', strength: '5mg' },
+  ];
+
+  test('"우리 원내에 타이레놀 있어?" → 원내 조회(브라우저 local_only) · 서버 호출 없음 · 타이레놀 행 매칭', () => {
+    const text = '우리 원내에 타이레놀 있어?';
+    // WardPage: hospitalOnly = mentionsHospital && !mentionsSameIngredient → 서버를 부르지 않고 로컬 행으로 답한다.
+    expect(mentionsHospital(text)).toBe(true);
+    expect(mentionsSameIngredient(text)).toBe(false);
+    // WardPage 의 needle = 조사·불용어를 뗀 2자 이상 토큰 → '타이레놀'.
+    const matches = queryLocalRows(rows, ['타이레놀'], { limit: 50 });
+    expect(matches.map((r) => r.product_name)).toEqual(['타이레놀정500mg']);
+  });
+
+  test('"타이레놀과 같은 성분의 원내약 있어?" → 서버 research(원내 조회 없음) + 브라우저 원내 결합', async () => {
+    const text = '타이레놀과 같은 성분의 원내약 있어?';
+    // WardPage: sameIngredient → 로컬 단독이 아니라 서버 조사 후 결합.
+    expect(mentionsSameIngredient(text)).toBe(true);
+    // 서버(suppressLocal=true): 약품명 어미가 없어도 대상('타이레놀')이 있으므로 question 이 아니라 research.
+    expect(decideHospitalDrugSurfacePlan(text, 'question', true)).toBe('research');
+    const { deps, researchCalls, localCalls } = fakeDeps({
+      research: { content: '타이레놀의 주성분은 아세트아미노펜입니다.', model: 'gemini-3.8-flash' },
+    });
+    const r = await runHospitalDrugSurface(deps, text, 'question', true);
+    expect(r.plan).toBe('research');
+    expect(researchCalls).toEqual([text]);
+    expect(localCalls).toEqual([]); // 원내 파일은 서버로 가지 않는다
+    // 브라우저 결합: 조사 답의 성분(아세트아미노펜)으로 같은 성분 원내 행을 찾는다.
+    const byIngredient = matchLocalByResearchIngredients(rows, r.answer, 50);
+    expect(byIngredient.map((x) => x.product_name)).toEqual(['타이레놀정500mg', '세토펜정']);
   });
 });
