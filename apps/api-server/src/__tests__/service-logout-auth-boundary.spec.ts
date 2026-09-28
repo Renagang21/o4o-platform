@@ -303,6 +303,58 @@ describe('5. handoff 원장은 **검증된 access token** 의 출발 서비스·
     expect(handoffRows).toHaveLength(1);
   });
 
+  it('5-1c claim 없는 토큰은 Origin 으로 범위를 좁히지 않는다 — A 로그아웃 뒤 Origin: B 도 거절', async () => {
+    // A 로그아웃으로 A 세대만 올라갔다. Origin 으로 좁히면 **B 의 세대(0)만** 검사해 통과한다.
+    //   일반 HTTP 클라이언트는 Origin 을 지정할 수 있으므로 claim 없는 토큰은 출발을 증명하지 못한다
+    //   → refresh 와 같은 사용자 전체 최대 세대 규칙.
+    bump(USER_ID, 'kpa-society');
+
+    for (const target of ['neture', 'kpa-society']) {
+      const res = mockRes();
+      await HandoffController.generateHandoff(
+        mockReq({ targetServiceKey: target }, 'https://neture.co.kr', legacyAccessToken()),
+        res,
+      );
+      expect([target, res.statusCode, res.body?.code]).toEqual([target, 401, 'SERVICE_SESSION_REVOKED']);
+    }
+    expect(handoffRows).toEqual([]);
+  });
+
+  it('5-1d claim 없는 토큰의 발급 뒤 어느 서비스든 로그아웃하면 교환도 거절된다', async () => {
+    await HandoffController.generateHandoff(
+      mockReq({ targetServiceKey: 'kpa-society' }, 'https://neture.co.kr', legacyAccessToken()),
+      mockRes(),
+    );
+    expect(handoffRows).toHaveLength(1);
+    // 출발을 모르므로 원장은 Origin(neture) 이 아니라 'unknown' + 초기 세대다.
+    expect([handoffRows[0].source_service_key, handoffRows[0].source_session_epoch]).toEqual(['unknown', 0]);
+
+    bump(USER_ID, 'lecture'); // Origin 과 무관한 서비스의 로그아웃
+    const res = mockRes();
+    await HandoffController.exchangeHandoff(mockReq({ token: HANDOFF_ID }, 'https://kpa-society.co.kr'), res);
+    expect([res.statusCode, res.body?.code]).toEqual([401, 'SERVICE_SESSION_REVOKED']);
+  });
+
+  it('5-1e 일반 서비스 대상 handoff 도 출발 세대를 검사·기록한다 (대표 진입만의 검사가 아니다)', async () => {
+    const staleToken = accessTokenFor('neture');
+    bump(USER_ID, 'neture'); // 출발 B 로그아웃
+
+    const res = mockRes();
+    await HandoffController.generateHandoff(
+      mockReq({ targetServiceKey: 'kpa-society' }, 'https://neture.co.kr', staleToken),
+      res,
+    );
+    expect([res.statusCode, res.body?.code]).toEqual([401, 'SERVICE_SESSION_REVOKED']);
+    expect(handoffRows).toEqual([]);
+
+    // 살아 있는 토큰이면 발급되고, 원장에 토큰의 서비스·세대가 적힌다(null 이면 교환 검사를 건너뛴다).
+    await HandoffController.generateHandoff(
+      mockReq({ targetServiceKey: 'kpa-society' }, 'https://neture.co.kr', accessTokenFor('neture')),
+      mockRes(),
+    );
+    expect([handoffRows[0].source_service_key, handoffRows[0].source_session_epoch]).toEqual(['neture', 1]);
+  });
+
   it('5-2 Origin 을 다른 서비스로 지정해도 출발 서비스를 바꿀 수 없다', async () => {
     // 토큰은 A(kpa-society) 인데 Origin 만 B(neture) 라고 주장한다.
     //   원장이 Origin 을 믿으면 교환 때 **B 의 세대**를 검사하므로, A 에서 로그아웃해도 통과한다.

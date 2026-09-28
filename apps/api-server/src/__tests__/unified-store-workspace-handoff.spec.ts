@@ -253,7 +253,8 @@ describe('C. generateHandoff — workspace 는 organization 축', () => {
     expect(res.statusCode).toBe(200);
     expect(norm(query.mock.calls[0][0])).toContain('SELECT status FROM service_memberships');
     expect(query.mock.calls[0][1]).toEqual(['user-1', 'kpa-society']);
-    expect(query.mock.calls[1][1].slice(0, 4)).toEqual(['user-1', 'neture', 'kpa-society', null]);
+    // 출발은 Origin 이 아니라 토큰 claim 이 증명한다 — 이 대역의 토큰은 claim 이 없으므로 'unknown' (§8 5차).
+    expect(query.mock.calls[1][1].slice(0, 4)).toEqual(['user-1', 'unknown', 'kpa-society', null]);
     expect(res.body.data.targetService.key).toBe('kpa-society');
     expect(res.body.data.targetUrl).toMatch(/^https:\/\/[^/]+\/handoff\?token=/);
     expect(res.body.data.targetUrl).not.toContain('store.neture.co.kr');

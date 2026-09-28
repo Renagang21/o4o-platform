@@ -42,7 +42,6 @@ import { resolveAccessibleStores } from '../../../utils/service-tenant.resolver.
 import { isHandoffWorkspace } from '../../../services/handoff-token.service.js';
 import { isRepresentativeEntryTarget, isRepresentativeEntryExchangeOrigin } from '../../../config/representative-entry.js';
 import { resolveAccountAccess } from '../../../common/auth/account-access.policy.js';
-import { resolveSessionServiceKey } from '../../../utils/session-origin.js';
 import {
   INITIAL_SESSION_EPOCH,
   isSessionScopeLive,
@@ -82,13 +81,16 @@ const SERVICE_SESSION_REVOKED_CODE = 'SERVICE_SESSION_REVOKED';
 /**
  * 이 요청의 **출발 인증**. 값의 출처가 무엇인지가 핵심이다.
  *
- *   serviceKey    access token claim 이 있으면 **그것**(토큰이 증명한 값).
- *                 없으면(배포 전 토큰) origin 파생값으로 떨어지고, 그래도 없으면 null.
+ *   serviceKey    access token claim 이 있으면 **그것**(토큰이 증명한 값). 없으면 null.
  *   sessionEpoch  토큰 claim. 배포 전 토큰은 undefined.
  *
- * **Origin 을 우선하면 안 된다.** 일반 HTTP 클라이언트는 Origin 을 임의로 지정할 수 있으므로,
- * 토큰은 A 인데 Origin 만 B 라고 주장하면 원장에 B 가 적히고 교환 때 **B 의 세대**를 본다.
- * 그러면 A 에서 로그아웃해도 그 handoff 가 살아남는다(4차 리뷰 지적).
+ * **Origin 을 쓰면 안 된다 — 우선순위로도, 대체값으로도.** 일반 HTTP 클라이언트는 Origin 을
+ * 임의로 지정할 수 있으므로 Origin 은 출발 서비스를 증명하지 못한다.
+ *   · claim 이 있을 때 Origin 을 우선하면: 토큰은 A 인데 Origin 만 B 라고 주장해 원장에 B 가
+ *     적히고, A 로그아웃 뒤에도 교환이 통과한다(4차 리뷰).
+ *   · claim 이 없을 때 Origin 으로 좁히면: A 로그아웃 뒤 claim 없는 토큰으로 `Origin: B` 를
+ *     보내 **B 의 세대만** 검사받는다. B 에서 로그아웃한 적 없으면 통과한다(5차 리뷰).
+ * 그래서 claim 없는 토큰은 null 로 두어 refresh 와 같은 **사용자 전체 최대 세대** 규칙을 따른다.
  */
 function readCallerScope(req: Request): { serviceKey: string | null; sessionEpoch?: number } {
   const token = extractToken(req as never);
@@ -96,9 +98,7 @@ function readCallerScope(req: Request): { serviceKey: string | null; sessionEpoc
   if (payload?.serviceKey) {
     return { serviceKey: payload.serviceKey, sessionEpoch: payload.sessionEpoch };
   }
-  // claim 이 없는 배포 전 토큰 — 검사를 **건너뛰지 않는다.** origin 으로 범위를 좁혀 보고,
-  // 그래도 모르면 null 로 두어 `isSessionScopeLive` 의 "최대 세대" 규칙을 따른다.
-  return { serviceKey: resolveSessionServiceKey(req.get('origin')), sessionEpoch: undefined };
+  return { serviceKey: null, sessionEpoch: undefined };
 }
 
 /**
@@ -152,24 +152,6 @@ function isSafeReturnPath(value: unknown): value is string {
   // eslint-disable-next-line no-control-regex
   if (/[\x00-\x1f\x7f]/.test(value)) return false;
   return true;
-}
-
-/**
- * Detect source service from the exact Origin hostname.
- * WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1:
- *   study.neture.co.kr includes the string "neture.co.kr", so substring matching would
- *   misclassify the independent Lecture service as Neture. Origin is host-level data;
- *   compare hostnames exactly. Services sharing one host (e.g. basePath tenants) keep
- *   the catalog's first-host match because Origin headers do not carry a path.
- */
-/**
- * WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8:
- *   origin → 서비스 판정을 `utils/session-origin` 하나로 모았다. 로그인·로그아웃·handoff 가
- *   같은 답을 써야 서비스 단위 세션 폐기가 어긋나지 않는다.
- *   여기서는 종전 계약대로 판정 불가를 'unknown' 문자열로 유지한다(handoff 원장 컬럼 값).
- */
-function detectSourceServiceKey(origin: string): string {
-  return resolveSessionServiceKey(origin) ?? 'unknown';
 }
 
 export class HandoffController extends BaseController {
@@ -355,12 +337,17 @@ export class HandoffController extends BaseController {
         );
       }
 
-      const sourceServiceKey = detectSourceServiceKey(req.get('origin') || '');
-
+      // 대표 진입·workspace 와 같은 출발 검사를 거친다 — 이 경로만 빠져 있으면 로그아웃된
+      // 서비스의 남은 access token 으로 발급받고, 원장 세대가 null 이라 교환 검사도 건너뛴다.
+      const source = await resolveVerifiedHandoffSource(req, user.id);
+      if (!source) {
+        return BaseController.error(res, SESSION_REVOKED_MESSAGE, 401, SERVICE_SESSION_REVOKED_CODE);
+      }
       const handoffToken = await handoffTokenService.generateToken(
         user.id,
-        sourceServiceKey,
+        source.serviceKey,
         targetServiceKey,
+        source.sessionEpoch,
       );
 
       // WO-O4O-KPA-BRANCH-PUBLIC-PATH-ROUTING-AND-CUSTOM-DOMAIN-BASELINE-V1:

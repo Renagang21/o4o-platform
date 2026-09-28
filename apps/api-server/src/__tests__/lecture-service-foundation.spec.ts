@@ -37,9 +37,12 @@ describe('Lecture Service Foundation', () => {
     }
   });
 
-  it('handoff 는 그 판정을 자체 구현하지 않고 공용 판정을 쓴다 (두 답이 갈리지 않는다)', () => {
-    expect(join).toContain("from '../../../utils/session-origin.js'");
-    expect(join).toContain('resolveSessionServiceKey(origin)');
+  it('handoff 는 origin→서비스 판정을 자체 구현하지 않는다 (두 답이 갈리지 않는다)', () => {
+    // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8 (5차): handoff 출발은 이제 Origin 이 아니라
+    //   access token claim 이 증명한다(Origin 은 클라이언트가 지정할 수 있다). 그래서 handoff 는
+    //   origin 판정을 아예 쓰지 않고, 자체 host 매칭도 두지 않는다.
+    expect(join).not.toContain('resolveSessionServiceKey');
+    expect(join).not.toMatch(/O4O_SERVICES\.find\([^)]*origin/);
   });
 
   it('Lecture 역할은 3개뿐이고 lecture:member는 만들지 않는다', () => {

@@ -148,8 +148,9 @@ describe('B. generateHandoff', () => {
     expect(res.body.data.targetUrl).toBe(`https://neture.co.kr/handoff?token=${uuid}&returnTo=%2F`);
     expect(res.body.data.targetService.key).toBe('neture');
     expect(sqlCalls()).not.toEqual(expect.arrayContaining([expect.stringContaining('service_memberships')]));
-    // source 는 Origin host 정확 일치로 판정, target 은 neture 로 고정 기록
-    expect(query.mock.calls[0][1].slice(0, 4)).toEqual(['user-1', 'kpa-society', 'neture', null]);
+    // target 은 neture 로 고정 기록. source 는 Origin 이 아니라 **토큰 claim** 이 증명한다 —
+    //   이 대역의 토큰은 claim 이 없으므로 'unknown'(Origin 은 클라이언트가 지정할 수 있다 · §8 5차).
+    expect(query.mock.calls[0][1].slice(0, 4)).toEqual(['user-1', 'unknown', 'neture', null]);
   });
 
   it("target=neture 는 returnPath '/' 만 허용 — 다른 경로는 400 (범용 redirect 0)", async () => {
