@@ -688,12 +688,20 @@ apply     inserted 2 + 1 + 2 = 5 → 재실행 inserted 0 (멱등)
 
 ```bash
 cd apps/api-server
-npx tsx src/scripts/community-catalog-promotion.ts            # 측정만 (write 0)
-npx tsx src/scripts/community-catalog-promotion.ts --apply    # 숫자 확인 후
+npx tsx --env-file=.env src/scripts/community-catalog-promotion.ts            # 측정만 (write 0)
+npx tsx --env-file=.env src/scripts/community-catalog-promotion.ts --apply    # 숫자 확인 후
 ```
 
 `package.json` 에 스크립트를 추가하지 않았다 — 의존성·스크립트 변경은 중지 조건이다.
 기본값이 dry-run 이므로 `--apply` 없이 실행하면 한 행도 쓰지 않는다.
+
+> **`--env-file=.env` 정정 (2026-09-29 · 실행 실측).** 종전에 적혀 있던
+> `npx tsx src/scripts/community-catalog-promotion.ts` 는 **그대로는 실패한다** — 이 CLI 는
+> `dotenv` 를 불러오지 않으므로(`import` 는 `reflect-metadata` · `typeorm` · community-catalog 뿐)
+> `.env` 가 적용되지 않고 `DB_HOST/USERNAME/PASSWORD/NAME: MISSING` 으로 종료한다.
+> **문서 결함이지 CLI 결함이 아니다** — 값의 존재만 마스킹해 보고하는 그 실패 메시지가 오히려
+> 의도된 fail-closed 동작이다. 그래서 CLI 구현은 고치지 않고 **명령만** 정정했다
+> (`package.json` 스크립트 추가도 하지 않았다).
 
 ### 8-5. 배포 1 실측 (2026-09-28 · `2edfe9b33` · migration 0)
 
@@ -1000,19 +1008,54 @@ POST  LIVE = EXPECTED = 7fdd328f… (5895 lines) · EXPECTED_SCHEMA_STATE = …S
 - PR #243 병합 push run `36435507679` 은 `deploy-hold-notice: success` / `build-and-deploy: skipped` — **병합 자체로 인한 운영 변화 0**.
 - 이미지에는 배포 2 범위 밖 병렬 API 변경(`69e1c5aa8` · `773d6c54c` · 병원약국 `hospital-drug-{surface,composite}`)이 함께 들어 있으나, Job 은 `node dist/migrate.js` 만 실행하고 revision 을 만들지 않으므로 **그 코드는 실행되지 않았고 서빙되지 않는다**(§8-7-1 재확인 항목).
 
-**공식 승격 CLI dry-run = 미실행 (차단).**
+**공식 승격 CLI dry-run = 실행 완료 (2026-09-29 · 운영 DB · write 0 · `--apply` 미실행).**
 
-| 확인 | 결과 |
+경로는 정본 그대로다 — Cloud SQL Auth Proxy v2(`127.0.0.1:5442`) + 로컬 CLI. 별도 실행 경로를
+만들지 않았고 CLI 구현·SQL 도 건드리지 않았다.
+
+```text
+mode: DRY-RUN (measure only)
+
+community=pharmacy     row_existed=false  storage_codes=kpa-society|pharmacy-hub
+                       evidence_users=1  eligible_users=1  already_active=0  would_insert=1  inserted=0
+community=cosmetics    row_existed=false  storage_codes=k-cosmetics
+                       evidence_users=0  eligible_users=0  already_active=0  would_insert=0  inserted=0
+community=o4o-general  row_existed=false  storage_codes=neture
+                       evidence_users=1  eligible_users=1  already_active=0  would_insert=1  inserted=0
+
+TOTAL eligible=2  would_insert=2  inserted=0  distinct_target_users=1
+no rows written — re-run with --apply after reviewing the numbers above
+```
+
+| 항목 | 값 |
 |---|---|
-| 정본 경로 (`SETUP.md`) | 로컬 `npx tsx src/scripts/community-catalog-promotion.ts` + Cloud SQL Auth Proxy v2 |
-| proxy 바이너리 | 메인 체크아웃에 있음 (`o4o-platform/bin/cloud-sql-proxy-v2.exe`) — 이 worktree 에는 없음 |
-| **ADC** | **부재** (`application_default_credentials.json` 없음). 프록시는 ADC 를 쓴다 → 접속 불가 |
-| Cloud Run Job 대안 | 불가 — 이 CLI 는 tsup entry 9개에 없어 **운영 이미지에 들어 있지 않다**. 넣으려면 코드·빌드 변경 + 새 Job 생성이 필요하므로 하지 않았다 |
-| 우회 | 하지 않았다 — `ALLOW_REMOTE_DB` 직접 접속(자격정보 취급) · CLI 재작성 · 별도 실행 경로 모두 금지 범위 |
+| `would_insert` | **2** — pharmacy 1 · cosmetics 0 · o4o-general 1 |
+| `distinct_target_users` | **1** (한 사람이 두 커뮤니티 대상 → 행 2 ≠ 사람 2) |
+| `already_active` | 세 커뮤니티 모두 **0** — 기존 행과 충돌 없음 |
+| `row_existed` | 세 커뮤니티 모두 **false** — `communities` 행은 `--apply` 때 생성된다 |
+| §8-0 U1 사전 예상 (2행 · 1명) | **차이 없음** — 커뮤니티별 분해(1 / 0 / 1)까지 일치. 예상치를 결과에 맞춘 것이 아니라 결과가 예상치와 같았다 |
+| `--apply` | **미실행** |
 
-→ 필요한 사용자 조작 1건: `gcloud auth application-default login` (브라우저 로그인이라 대신 수행할 수 없다).
-그 뒤 프록시를 띄우고 위 명령으로 dry-run 한다. **`--apply` 는 미승인.**
-§8-0 U1 의 "2행 · 1명" 은 여전히 **예상치**이며, 공식 dry-run 수치(`would_insert` · `distinct_target_users` 포함)로만 판단한다.
+**write 0 을 실증했다.** `mode: DRY-RUN` · `inserted=0` · `no rows written` 출력에 더해,
+**연속 2회 실행 결과가 완전히 동일**했다 — 1회차가 썼다면 2회차는 `row_existed=true` ·
+`already_active=1/0/1` 로 바뀐다. 그대로 `false` · `0` 이므로 첫 실행이 한 행도 쓰지 않았다.
+
+이 실행이 가능해진 이유는 migration 6 이 적용됐기 때문이다(§8-0 U1 이 막혀 있던 사유 해소 —
+dry-run 도 `communities` 를 조회한다).
+
+**실행 명령 정정**: 문서에 적혀 있던 `npx tsx src/scripts/community-catalog-promotion.ts` 는
+`.env` 를 읽지 못해 실패한다. 실제 동작한 명령은 아래이며 §8-4 를 같은 값으로 정정했다.
+CLI 코드는 수정하지 않았다.
+
+```bash
+cd apps/api-server
+npx tsx --env-file=.env src/scripts/community-catalog-promotion.ts
+```
+
+ADC 는 이 PC 에서 `gcloud auth application-default login` 후 확보됐다(사용자 실행 ·
+`print-access-token` 검증 OK · 토큰은 기록하지 않는다). 프록시는 측정 후 종료했다.
+
+→ 다음은 **`--apply` 승인 여부 판단**이다. 현재 미승인이며 실행 0.
 
 ---
 
