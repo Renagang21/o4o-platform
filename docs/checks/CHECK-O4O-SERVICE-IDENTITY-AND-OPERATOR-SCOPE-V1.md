@@ -1,6 +1,6 @@
 # CHECK-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1
 
-> 시작: 2026-09-27 · 상태: **`병합 완료(2026-09-28, 880642e9b) · 운영 미배포(DEPLOY_ENABLED=false) · 승격 CLI 결함 1건 발견(§8-2) · 운영 적용·실제 접근 검증 전`**
+> 시작: 2026-09-27 · 상태: **`병합 완료(2026-09-28, 880642e9b) · 운영 미배포(DEPLOY_ENABLED=false) · 승격 CLI 결함 정정(§8-2, 95377812e) · 배포 SHA 분리 확정(§8-4) · 운영 적용·실제 접근 검증 전`**
 > PR: [#241](https://github.com/Renagang21/o4o-platform/pull/241) — 1차 CI green 후
 > **리뷰에서 세 경계가 확정 요구사항과 다르다고 지적돼 같은 PR 에서 정정했다**(§11).
 > 정정 후 재검증: 전 체크 pass · `mergeStateStatus = CLEAN`.
@@ -91,7 +91,10 @@ ID 만 비교하면 회원이 가입 승인·중재를 통과한다. `community:
 증거 없는 일괄 승인은 가입 승인형이라는 결정 자체를 무효로 만든다.
 ```
 
-격리 PostgreSQL 15 fixture 로 **실제 적용해** 확인:
+> **SUPERSEDED (2026-09-28)** — 아래 표·수치는 스키마와 맞지 않는 fixture 에서 나온 기록이라 근거로 쓰지 않는다.
+> 정정 후 baseline fresh bootstrap 위에서 재검증한 결과는 **§8-2** 가 대체한다. 원문은 기록으로 남긴다.
+
+격리 PostgreSQL 15 fixture 로 **실제 적용해** 확인 (옛 기록):
 
 | fixture | 증거 | 자격 | 결과 |
 |---|---|---|---|
@@ -598,21 +601,40 @@ rate limit 이 없었고 각자 DB 조회·갱신을 한다.
 
 | # | 결과 | 근거 · 한계 |
 |---|---|---|
-| U1 | **사전 측정 완료 · 공식 dry-run 미실행** | 승격 CLI 는 dry-run 에서도 `communities` 를 조회하므로 migration 6 전에는 실행 불가. CLI 와 같은 증거·자격 SQL 을 read-only 트랜잭션으로 실행(§8-2 컬럼 정정 적용): `pharmacy` 증거 1 · 자격 1 / `cosmetics` 0 · 0 / `o4o-general` 1 · 1 → **예상 insert 2행 · 대상 사용자 1명(= `platform:super_admin` 보유자)**. 원장: kpa-society 글 6 · 댓글 6 / neture 글 1 / pharmacy-hub 0. 원장 매핑이 없는 글 1건(어느 커뮤니티 증거에도 포함되지 않음). users 전체 3 |
-| U2 | **간접 확인 — `valid:true`** | `iframerpc?action=checkOrigin` 이 이번에는 200 응답. 대조군 판별력 확인: `zz-unregistered-probe.neture.co.kr` · `http://study.neture.co.kr` = `valid:false`. **비공식 endpoint 이므로 Console 확인과 동급으로 쓰지 않는다** — 배포 후 실제 Google 로그인으로 확정 |
-| U3 | **간접 확인 — 7개 모두 `valid:true`** | supplier · funding · community · pharmacy · retail · kpa · store `.neture.co.kr`. URL 트랙 §21-19-3 기록 시점(전부 `false`)과 달라졌다 = 사용자 Console 저장 반영 |
+| U1 | **사전 측정 완료 · 공식 dry-run 미실행** | 승격 CLI 는 dry-run 에서도 `communities` 를 조회하므로 migration 6 전에는 실행 불가. CLI 와 같은 증거·자격 SQL 을 read-only 트랜잭션으로 실행(§8-2 컬럼 정정 적용): `pharmacy` 증거 1 · 자격 1 / `cosmetics` 0 · 0 / `o4o-general` 1 · 1 → **예상치: insert 2행 · 대상 사용자 1명(= `platform:super_admin` 보유자)** — 사용자 결정(2026-09-28)으로 *예상치*로만 기록한다. migration 6 적용 후 **공식 dry-run 수치·대상이 이 예상치와 일치하는지 보고 → 사용자가 `--apply` 승인 여부 결정**. 현재 `--apply` 미승인. 원장: kpa-society 글 6 · 댓글 6 / neture 글 1 / pharmacy-hub 0. 원장 매핑이 없는 글 1건(어느 커뮤니티 증거에도 포함되지 않음). users 전체 3 |
+| U2 | **간접 확인 — `valid:true` · 배포 준비의 긍정적 근거로만 기록** | `iframerpc?action=checkOrigin` 이 이번에는 200 응답. 대조군 판별력 확인: `zz-unregistered-probe.neture.co.kr` · `http://study.neture.co.kr` = `valid:false`. **비공식 endpoint 이므로 Console 확인과 동급으로 쓰지 않는다** — 배포 후 실제 Google 로그인으로 확정 |
+| U3 | **간접 확인 — 7개 모두 `valid:true` · 긍정적 근거(최종 PASS 는 배포 후 실제 로그인)** | supplier · funding · community · pharmacy · retail · kpa · store `.neture.co.kr`. URL 트랙 §21-19-3 기록 시점(전부 `false`)과 달라졌다 = 사용자 Console 저장 반영 |
 | U4 | **코드 준비 · 배포 조건 잔존** | 운영 대비 main 미배포 70커밋(first-parent 22). 아래 §8-3 |
 
-### 8-2. 발견 — 승격 CLI 컬럼명 결함 (코드 변경 필요 · 미수정)
+### 8-2. 발견 → 정정 — 승격 CLI 컬럼명 결함 (`95377812e`)
 
 ```text
-CLI        forum_comment c JOIN forum_post p ON p.id = c.post_id
-실제 스키마  forum_comment."postId"   (canonical-schema-baseline.ts:1542 · 운영 동일)
+CLI(정정 전)  forum_comment c JOIN forum_post p ON p.id = c.post_id
+실제 스키마    forum_comment."postId"   (canonical-schema-baseline.ts:1542 · 운영 동일)
+정정          JOIN forum_post p ON p.id = c."postId"   (EVIDENCE_CTE 1곳)
 ```
 
-- 영향: 운영에서 CLI 는 첫 증거 질의에서 `column c.post_id does not exist` 로 **실패**한다(쓰기 전 실패 — 데이터 손상 없음). 배포 순서 2·3 이 막히고, 3 을 건너뛰면 V7 게이트가 기존 참여자를 막는다.
-- §2-4 의 fixture 결과("B 댓글만 → 승인")는 baseline 스키마와 양립하지 않는다 — fixture 가 baseline 이 아닌 표로 만들어졌을 가능성. **§2-4 기록은 재검증 전까지 근거로 쓰지 않는다.**
-- 수정 범위(제안): `EVIDENCE_CTE` 의 `c.post_id` → `c."postId"` 1곳 + baseline fresh bootstrap 위에서 fixture 재실행. 사용자 확인 후 같은 작업 범위에서 처리.
+- 영향(정정 전): 운영에서 CLI 는 첫 증거 질의에서 `column c.post_id does not exist` 로 **실패**(쓰기 전 실패 — 데이터 손상 없음). 격리 DB 에서 옛 SQL 로 같은 오류 재현 확인.
+- 회귀 테스트: `community-workspace-catalog-and-access.spec.ts` — baseline `forum_comment` 가 `"postId" uuid NOT NULL` 이고 `post_id` 가 없음 + CLI JOIN 이 `c."postId"` 를 씀. 31/31 PASS · 옛 코드로 되돌리면 1건 FAIL 확인 · `tsc --noEmit` 0.
+- **재검증 (격리 PostgreSQL 15 · baseline fresh bootstrap + incremental 1~9 · `POST_MIGRATION_SCHEMA_ASSERTION = PASS`)**
+
+| fixture | 활동 | 서비스 membership | 기대 | 결과 |
+|---|---|---|---|---|
+| A | 글 (kpa · pharmacy-hub 원장) | kpa-society active | pharmacy 승인 | **승인** |
+| B | **댓글만** (pharmacy-hub 원장) | pharmacy-hub active | pharmacy 승인 | **승인** |
+| C | 글 (neture 원장) | kpa-society active | o4o-general 만 · pharmacy 아님 | **o4o-general 만** |
+| D | 글 (kpa 원장) | 없음 | 승인 안 함 | **승인 안 함** |
+| E | **댓글만** (neture 원장) | 없음 | o4o-general(authenticated) 승인 | **승인** |
+| F | **댓글만** (kpa 원장) | k-cosmetics(다른 서비스) | 승인 안 함 | **승인 안 함** |
+| G | 글 (k-cosmetics 원장) | k-cosmetics active | cosmetics 승인 | **승인** |
+
+```text
+dry-run   pharmacy evidence 4 / eligible 2 · cosmetics 1/1 · o4o-general 2/2 · TOTAL eligible=5 inserted=0
+apply     inserted 2 + 1 + 2 = 5 → 재실행 inserted 0 (멱등)
+행 확인    cosmetics{G} · o4o-general{C,E} · pharmacy{A,B}  — 전부 기대치
+```
+
+**판정: 댓글만 쓴 사용자도 자격을 통과하면 승인 대상에 포함된다(B · E). 자격 없는 댓글 작성자는 제외(F).** fixture 컨테이너 정리 완료.
 
 ### 8-3. 함께 배포되는 변경 (U4)
 
@@ -625,31 +647,54 @@ CLI        forum_comment c JOIN forum_post p ON p.id = c.post_id
 | 병원약국 V1 무로그인 | `2f4777aca` | 신규 패키지 `file-understanding-core` · lockfile 변경 포함 |
 | 관리자 권한 부여 | PR #239 · #240 | — |
 
-- **충돌 지점**: URL 트랙 §21-11 은 "첫 배포에 DB 변경을 섞지 않는다"(사용자 지시)를 전제로 migration 0 배포를 준비했다. 이 작업의 migration 4개가 main 에 들어와 **그 첫 배포에 DB 변경이 섞인다.** 합동 배포 여부는 사용자 판단.
+- **충돌 지점**: URL 트랙 §21-11 은 "첫 배포에 DB 변경을 섞지 않는다"(사용자 지시)를 전제로 migration 0 배포를 준비했다. 이 작업의 migration 4개가 main 에 들어와 **main tip 을 그대로 배포하면 그 첫 배포에 DB 변경이 섞인다.** → 사용자 결정(2026-09-28): 조건 유지 · 배포 SHA 를 나눈다(같은 WO) — **§8-4 에서 분리 가능 확인.**
 - 운영자 역할 실측(read-only): 새 역할 `community:admin` · `supplier:*` · `funding:*` · `kpa-branch:admin` 보유 **0명**. 활성 `neture:admin` · `neture:operator` 보유 비-super_admin 1명(검증 계정) — 배포 후 `/suppliers/*` · market-trial 운영자 경로 접근을 잃으므로 §8-1 의 6 필요. 검증 계정은 `kpa-branch:operator` 만 있고 `kpa-branch:admin` 없음.
 
-### 8-1. 배포 순서 (하드 선행 조건)
+### 8-4. 배포 SHA 분리 — URL 트랙 첫 배포(DB 변경 0)와 이 작업의 배포
+
+| | 배포 1 — URL 트랙 첫 배포 | 배포 2 — 이 작업 |
+|---|---|---|
+| SHA | `2edfe9b336a44c3f40eea90157504fef6a135690` (#241 병합 `880642e9b` 의 first parent) | main tip (`95377812e` 이후 — CLI 정정 포함) |
+| 포함 | URL 재구성 · Store 이전(`7dcf85f65` 외) 및 그 이전 main 전체 | + PR #241 + CLI 정정 |
+| DB 변경 | **0** — `git diff 14587a9ad..2edfe9b33 -- apps/api-server/src/database` 가 비어 있음. `expected-schema-states` 끝 = `DropLegacyPasswordAuthSchema1790251584623` = 운영 최신 migration | incremental 6·7·8·9 (Job 이 서비스 배포 전 실행) |
+| 스키마 호환 | 운영 현 스키마 그대로 — fingerprint 단언 통과 조건 충족 | 6·7·8 = 새 테이블 · 9 = `handoff_tokens.source_session_epoch integer` **nullable 추가** → 배포 1 코드가 새 스키마 위에서도 동작 = **배포 2 → 배포 1 롤백 안전** |
+| 배포 방식 | 태그 `deploy/<date>-<name>` 을 그 SHA 에 고정 → 태그 ref 로 `workflow_dispatch` (deploy job 은 `github.sha` = 태그 커밋을 빌드. 선례: `deploy/2026-09-26-google-only-auth-cleanup` → run `36198504033`) | 같은 방식 또는 main dispatch |
+
+- **판정: 분리 가능 · 충돌 없음.** 배포를 멈출 사유 없음(단, 게이트는 사용자가 열 때까지 `false` 유지).
+- 배포 1 에 함께 실리는 다른 트랙: `303221b8b`(Supplier 경계 동결) · `2f4777aca`(병원약국 — 신규 패키지 + lockfile) · PR #239/#240(관리자 권한 부여). 각 준비 상태는 해당 트랙 CHECK 기준. 기존 태그 `deploy/2026-09-26-platform-admin-grant`(→ `774803150`)는 실제 배포된 적 없음.
+
+### 8-1. 배포 순서 (하드 선행 조건 · 2026-09-28 SHA 분리 반영)
 
 ```text
+[배포 1 — 2edfe9b33 · migration 0]
+  URL 트랙 §21-19 순서(API → neture-web → kpa-branch-web → 나머지 web → admin) · 검증 후 게이트 재폐쇄
+
+[배포 2 — main tip]
 1. migration job  (incremental 6·7·8·9 — 커뮤니티 3 · 분회 신청 1 · 세션 폐기 1 테이블 + handoff 세대 컬럼)
-2. 승격 CLI dry-run  → 숫자 확인(U1 해소)
-3. 승격 CLI --apply  → 폴백 커뮤니티 3개를 DB 행으로 + 증거 기반 회원 이행
+2. 승격 CLI dry-run  → 수치·대상이 §8-0 U1 예상치(2행 · 1명)와 일치하는지 보고
+3. 승격 CLI --apply  → **사용자 승인 후에만** (현재 미승인)
 4. API revision 배포 + traffic 전환
-5. web 배포
-6. Admin 화면에서 운영자 역할 부여 —
-     supplier:{admin|operator} · funding:{admin|operator} · community:admin · kpa-branch:admin
+5. web · admin 배포
+6. Admin 화면에서 운영자 역할 부여 (아래 역할 계획)
+7. 실제 브라우저 접근 검증 · Google 실제 로그인(U2/U3 최종 판정)
 ```
 
-> **3 을 4 보다 먼저 한다.** V7 게이트가 서빙되기 전에 폴백 커뮤니티 행과 회원이 있어야
-> 한다. 순서가 뒤바뀌면 기존 참여자 전원이 `COMMUNITY_MEMBERSHIP_REQUIRED` 로 막힌다.
->
-> 반대로 **1 이 2 보다 먼저**여야 한다 — 승격 CLI 가 쓰는 `communities` ·
-> `community_memberships` 는 incremental 6 이 만든다. `service_session_revocations`(8)도
-> 4 보다 먼저 있어야 한다 — 없으면 로그아웃·refresh 가 없는 표를 조회한다.
->
-> **6 은 4 직후에 한다.** `/suppliers/*` 와 market-trial 운영자 경로가 새 역할을 요구하도록
-> 바뀌므로, 역할을 부여하기 전까지 기존 `neture:*` 보유자는 그 두 영역에 들어갈 수 없다
-> (`platform:super_admin` 은 계속 통과하므로 전면 잠금은 아니다 — §4-1).
+**역할 계획 (사용자 결정 2026-09-28)** — 대상 `renagang21@gmail.com`, 역할 4개:
+`community:admin` · `kpa-branch:admin` · `supplier:admin` · `funding:admin`
+
+| 확인 | 결과 (read-only · 2026-09-28) |
+|---|---|
+| 후보 유일성 | 이메일 일치 1건 (유사 접두 포함 1건) — **유일** |
+| 상태 | `status=active` · `isActive=true` · 내부 ID `c0156a4a…` (마스킹) |
+| Google 연결 | `linked_accounts(provider='google')` 1행 · sub 존재 · 그 sub 의 소유자 1명 |
+| `platform:super_admin` | 없음 — 새 경계에서 bypass 없이 역할+membership 으로만 통과해야 하는 계정 |
+| 대상 역할 현재 보유 | 4개 모두 없음 |
+| service_memberships | active: k-cosmetics · kpa-branch · kpa-society · lecture · neture · pharmacy-hub / **없음: community · supplier · funding** |
+
+- **`:admin` ⊃ `:operator` 매핑 (코드 확인)**: `subdomain-operator-scope.ts` 의 `scopeRoleMapping` 이 `{key}:operator → [operator, admin]` · `{key}:admin → [admin]`. `service-scope-guard.ts` 가 이 매핑을 그대로 판정에 쓴다. 실제 경로: `/api/v1/neture/operator/market-trial/*` = `requireFundingScope('funding:operator')` → `funding:admin` 통과 / `/api/v1/neture/admin/suppliers*` 9개 = `requireSupplierScope('supplier:admin')`. `kpa-branch` 도 admin ⊃ operator ⊃ member. `community:admin` 은 단일 계층. **→ 중복 부여 불필요 확인.**
+- **membership 조건 (추가 확인)**: 가드(`createMembershipScopeGuard`)는 super_admin 이 아니면 역할과 **해당 서비스 `service_memberships` active** 를 함께 요구한다(`supplier` · `funding` · `community` 는 키 그대로). 이 계정은 세 서비스 membership 이 없지만, 운영자 지정 경로(`operator-assignment.service` → `ensureServiceMembershipsForRoles`)가 **없으면 active 로 생성**하고 있으면 상태를 보존한다 → 부여 시 community · supplier · funding 은 `CREATED`, kpa-branch 는 기존 active 유지. 부여 응답의 `membershipPolicy` 로 확인한다.
+- **화면 경로**: 두 화면은 아직 `web-neture` 안에 있다 — `/admin/supplier-governance`(프론트 `AdminRoute` = neture admin 역할 + neture membership) · `/operator/market-trial`(`OperatorRoute` = neture operator 이상 + neture membership). 이 계정은 `neture:admin`·`neture:operator`·neture membership 을 이미 가져 프론트 가드는 통과 — 백엔드 새 역할만 부여하면 된다. (새 역할만 가진 계정은 프론트 가드에서 막힌다 — 서브도메인 화면 이전은 URL 트랙 소관, 여기서는 보고만.)
+- 역할 이양·기존 관리자 권한 회수는 이 작업에 섞지 않는다.
 
 승격 CLI 실행 (운영 DB 접속은 Cloud SQL Auth Proxy 경유 — `SETUP.md` 가 정본):
 
@@ -793,6 +838,8 @@ representative-entry · unified-store-workspace-handoff spec)은 새 계약(`'un
 ## 10. 문서 정합
 
 발견 2건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 1건(D1)
+
+- 2026-09-28 CLI 정정 후: §2-4 옛 fixture 기록에 이 CHECK 내부 대체 표시(→ §8-2) — 기록물 내부 표시일 뿐 기준 문서 SUPERSEDED 표기(§16-3)에는 해당하지 않음. 기준 문서 변경 0.
 
 - 2026-09-28 병합 후 실측: 이 CHECK 자체의 §2-4 fixture 기록이 스키마와 불일치(§8-2) — 기록물 내부 정정 표시만, 기준 문서 변경 0.
 
