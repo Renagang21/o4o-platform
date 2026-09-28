@@ -60,6 +60,31 @@ describe('공급자 운영자 경로 = supplier 축', () => {
   });
 });
 
+describe('공급자 승인 콘솔(/operator/suppliers) = supplier 축', () => {
+  // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 (잔여 gap): 상태 관리(admin.controller)만
+  // supplier 축으로 옮기고 이쪽을 neture 축에 두면, supplier 운영자가 목록은 보고 승인은 못 한다.
+  const code = codeOnly(read('modules/neture/controllers/operator-supplier.controller.ts'));
+
+  it('supplier 축으로 판정하고 neture 축을 쓰지 않는다', () => {
+    expect(code).toContain("requireSupplierScope('supplier:operator')");
+    expect(code).not.toContain('requireNetureScope');
+  });
+
+  it('level 을 올리지 않았다 — 종전과 같은 operator 다', () => {
+    expect(code).not.toContain("requireSupplierScope('supplier:admin')");
+  });
+
+  it('admin 전용 조치는 여기 없다 (deactivate · reactivate 는 admin.controller)', () => {
+    expect(code).not.toContain("'/suppliers/:id/deactivate'");
+    expect(code).not.toContain("'/suppliers/:id/reactivate'");
+  });
+
+  it('상태 관리와 같은 서비스 키를 쓴다 (두 endpoint 가 갈라지지 않는다)', () => {
+    expect(codeOnly(read('modules/neture/controllers/admin.controller.ts'))).toContain('requireSupplierScope');
+    expect(SUPPLIER_SCOPE_CONFIG.serviceKey).toBe('supplier');
+  });
+});
+
 describe('펀딩 운영자 경로 = funding 축', () => {
   const code = codeOnly(read('routes/market-trial-operator.routes.ts'));
 

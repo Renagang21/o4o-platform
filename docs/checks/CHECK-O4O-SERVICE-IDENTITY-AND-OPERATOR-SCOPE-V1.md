@@ -848,10 +848,10 @@ migrate_only(게이트 열림·닫힘 모두) = 배포 3 step skip · migration 
 | `App.tsx` | 공급자 상태 관리(+ alias 2) → supplier:admin 블록 · 펀딩 운영 목록/상세(+ alias 1) → funding:operator 블록. Neture Admin/Operator 블록에서 제거 |
 | `SubdomainOperatorLayoutWrapper` | Neture 역할도 있으면 기존 Neture 레이아웃 그대로 · 서브도메인 역할만이면 자기 화면 1개 사이드바(누르는 곳마다 거부 화면이 되지 않게). 레이아웃은 권한 판정이 아니다 |
 | Neture 사이드바 | 두 항목은 해당 범위 역할이 있을 때만 노출 |
-| 대표 홈 「서비스 운영」 | `operator-services` 의 supplier(admin) · funding(admin/operator) → 내부 이동 카드. supplier:operator 는 카드 없음(admin 화면 — dead link 0) |
+| 대표 홈 「서비스 운영」 | `operator-services` 의 supplier · funding → 내부 이동 카드. scope 가 들어갈 수 있는 화면을 고른다(§8-7-3-b 로 supplier:operator 도 카드가 생겼다) |
 | `MembershipGate` | 안내 문구 서비스명을 키별로(공급자 서비스 · 유통참여형 펀딩 · 커뮤니티) |
 | community 전체 관리자 | **화면 없음**(web-neture · admin-dashboard 모두 `/communities/requests*` 소비처 0). `/admin/community-admin` 은 Neture 커뮤니티 **광고·스폰서**(`/neture/community/manage/*` · neture 축)라 서비스 전체 관리자 화면이 아니다 — neture:admin 블록 그대로. 개설 심사 API 는 `community:admin` + community membership. 서비스 전체 관리자(`community:admin`)와 개별 커뮤니티 운영자(`community_memberships.role`)는 섞지 않았다(§2-2 · `community-scope.middleware` 가 `community:admin` 을 bypass 시키지 않음 — 불변) |
-| 백엔드 | 변경 없음 — 이미 분리돼 있었다. 판정을 **런타임으로** 고정하는 테스트만 추가 |
+| 백엔드 | 이 절 범위에서는 변경 없음(이미 분리돼 있었다). 판정을 **런타임으로** 고정하는 테스트만 추가. 단 **승인 콘솔 API 는 아직 neture 축이었다** → §8-7-3-b |
 
 격리 테스트 (운영 DB · 계정 생성 0):
 
@@ -859,6 +859,52 @@ migrate_only(게이트 열림·닫힘 모두) = 배포 3 step skip · migration 
 - web-neture `home-entry.operator-services.test.ts` +4 — 대표 홈 카드.
 - API `subdomain-operator-scope.runtime.test.ts` — 가드 **실제 판정** 매트릭스(supplier/funding/community/neture admin/neture operator × 6 페르소나 + renagang21 계획 역할 조합).
 - 테스트 환경: `@o4o/auth-react` 와 앱이 `react-router-dom`(같은 7.9.6)을 다른 물리 경로에서 읽어 Router context 가 둘이 되는 문제 → `vitest.config.mjs` 에 `resolve.dedupe` (번들은 이미 하나 — 테스트만 맞춤 · package.json/lockfile 무변경). 이 설정 후 web-neture 전체 **25 files / 203 tests PASS** — §7-3 의 `HomeEntryPanel` 선행 실패 4건도 이제 통과.
+
+#### 8-7-3-b. 잔여 gap 보정 — 공급자 **승인 콘솔** (2026-09-28 후속)
+
+§8-7-3 은 공급자 **상태 관리**(`/admin/supplier-governance`)만 supplier 축으로 옮겼다.
+같은 업무 축의 **승인·거절 canonical**(`/operator/suppliers`)은 프런트도 백엔드도 neture 축에
+남아 있었다. 실측:
+
+```text
+보정 전 (main)
+  /admin/supplier-governance    SubdomainOperatorRoute supplier:admin   → supplier 운영자 O
+  /operator/suppliers           OperatorRoute (neture 역할 + neture membership) → supplier 운영자 X
+  /neture/operator/suppliers*   requireNetureScope('neture:operator')          → supplier 운영자 403
+결과  supplier:admin + supplier membership 만 가진 계정은 **목록은 보고 승인은 못 한다**
+```
+
+| 보정 | 내용 |
+|---|---|
+| `role-constants.ts` | `SUBDOMAIN_OPERATOR_SCREENS` 에 `{ '/operator/suppliers', supplier, operator }` 추가 — 가드 · 사이드바 · 대표 홈이 같은 표를 본다 |
+| `App.tsx` | `/operator/suppliers` + alias `/operator/supplier-quality` 를 Neture operator 블록에서 **supplier:operator 블록으로 이동**(복제 아님 · 경로별 선언 1회) |
+| `SubdomainOperatorLayoutWrapper` | supplier 전용 사이드바에 「공급자 승인」 추가 |
+| `home-entry.ts` | 한 서비스에 수준이 다른 화면이 여럿이면 **그 scope 가 들어갈 수 있는 것**을 고른다(admin→admin 화면 · operator→operator 화면). 종전 `find` 는 첫 항목만 봐서 supplier:operator 가 카드 0 이 됐다 |
+| `operator-supplier.controller.ts` | `requireNetureScope('neture:operator')` → `requireSupplierScope('supplier:operator')`. **level 을 올리지 않았다** — 종전과 같은 operator 다. admin 전용 조치(deactivate · reactivate)는 `admin.controller` 에 그대로 |
+
+**새 가드 컴포넌트를 만들지 않았다.** main 의 `SubdomainOperatorRoute` ·
+`SubdomainOperatorLayoutWrapper` · `SUBDOMAIN_OPERATOR_SCREENS` 를 그대로 쓴다.
+PR #242 의 중복 구현(별도 workflow · 별도 가드 · Neture 역할 fallback)은 병합하지 않았다 —
+`1ca2ea981` 계열이 정본이고, **migration 실행 경로를 두 벌로 만들지 않는다.**
+
+검증 (운영 DB · 계정 생성 0):
+
+| 확인 | 결과 |
+|---|---|
+| `supplier:admin` + supplier membership | 상태 관리 O · **승인 콘솔 O** · 펀딩 X · Neture 화면 X |
+| `supplier:operator` + supplier membership | 승인 콘솔 O · 상태 관리 X(admin 전용 유지) · 펀딩 X |
+| Neture 역할만 | 승인 콘솔 **화면 X · API X** · 사이드바 항목 비노출(누를 곳이 403 이 되지 않는다) |
+| `funding` 역할 | 공급자 승인 콘솔 X (교차 0) |
+| `supplier` 역할 | 펀딩 운영 화면 X (교차 0) |
+| membership `pending`·없음·다른 서비스 | 전부 거부 |
+| `platform:super_admin` | 통과 (platformBypass 동일) |
+| 프런트 · 백엔드 축 일치 | 화면 `supplier:operator` ↔ API `requireSupplierScope('supplier:operator')` |
+
+- API `subdomain-operator-scope.runtime.test.ts` 12 PASS(매트릭스에 `supplierOperator` 축 추가) ·
+  `subdomain-operator-scope.test.ts` 15 PASS(배선 · level 미상승 · admin 전용 조치 부재 고정)
+- web-neture 전체 **25 files / 207 tests PASS** (`SubdomainOperatorRoute.test.tsx` 18 ·
+  사이드바 노출 정정 · 대표 홈 카드 정정 포함)
+- 실계정 브라우저 확인은 **역할 부여 뒤에만 가능**하다(사용자 판단 대기) — 여기까지는 격리 판정이다.
 
 #### 8-7-4. 승격 CLI 재확인 · dry-run 출력 보강
 
@@ -884,6 +930,12 @@ apply     inserted 2+1+3 = 6
 행 확인   cosmetics{G} · o4o-general{A,C,E} · pharmacy{A,B} — 전부 기대치 · 클러스터 정지
 ```
 
+- **정적 회귀 가드 추가**(`community-catalog-promotion.schema.test.ts` 21 컬럼 · 27 PASS): CLI SQL 이 참조하는
+  모든 (테이블, 컬럼)을 스키마 정본(`canonical-schema-baseline.ts` · migration 6)에서 대조한다.
+  위 PG17 실측을 **대체하지 않고**(그것은 그 시점의 실측), `forum_comment."postId"` 계열 회귀가 다시
+  들어오는 것을 막는다 — fixture 를 만들지 않으므로 내가 만든 fixture 를 상대로 통과할 수 없고 Docker 도
+  필요 없다. 한계: 컬럼의 **존재**만 본다(타입 · NULL · 조인 의미는 dry-run 실측이 답한다).
+  CLI 구현 · SQL · migration · 실행 경로는 건드리지 않았다.
 - **§8-0 U1 의 "2행 · 1명" 은 사전 측정(예상치)일 뿐 확정 수치가 아니다.** 공식 dry-run(migration 6 후) 결과로만 판단한다.
 
 #### 8-7-5. SonarCloud — PR HEAD 와 main 구분

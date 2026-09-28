@@ -23,7 +23,12 @@ import OperatorLayoutWrapper from './OperatorLayoutWrapper';
 type Area = 'admin' | 'operator';
 
 const SCOPED_MENU: Readonly<Record<'supplier' | 'funding', Partial<Record<OperatorGroupKey, OperatorMenuItem[]>>>> = {
-  supplier: { approvals: [{ label: '공급자 상태 관리', path: '/admin/supplier-governance' }] },
+  supplier: {
+    approvals: [
+      { label: '공급자 승인', path: '/operator/suppliers' },
+      { label: '공급자 상태 관리', path: '/admin/supplier-governance' },
+    ],
+  },
   funding: { approvals: [{ label: '유통참여형 펀딩', path: '/operator/market-trial' }] },
 };
 

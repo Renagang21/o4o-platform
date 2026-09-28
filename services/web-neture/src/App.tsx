@@ -1102,6 +1102,7 @@ function App() {
                 서브도메인 운영자 화면 — WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 (배포 2 전 경계 보정)
                 백엔드가 두 영역의 운영자 경계를 neture:* 에서 독립 키로 옮겼다. 화면도 같은 판정을 쓴다:
                   공급자 상태 관리  supplier:admin + supplier membership   ← /neture/admin/suppliers*
+                  공급자 승인·거절  supplier:operator(admin 포함) + supplier membership ← /neture/operator/suppliers*
                   유통참여형 펀딩    funding:operator(admin 포함) + funding membership ← /neture/operator/market-trial/*
                 Neture 역할만으로는 들어오지 못하고, 서브도메인 역할만으로 들어올 수 있다.
             ================================================================ */}
@@ -1116,6 +1117,16 @@ function App() {
               {/* WO-O4O-NETURE-SUPPLIER-CSV-QUALITY-CONSOLE-RETIREMENT-V1: CSV 품질 콘솔 은퇴 → governance canonical */}
               <Route path="/admin/supplier-quality" element={<Navigate to="/admin/supplier-governance" replace />} />
               <Route path="/admin/supplier-governance" element={<AdminSupplierGovernancePage />} />
+            </Route>
+            <Route element={
+              <SubdomainOperatorRoute serviceKey="supplier" level="operator">
+                <SubdomainOperatorLayoutWrapper serviceKey="supplier" area="operator" />
+              </SubdomainOperatorRoute>
+            }>
+              {/* WO-O4O-NETURE-SUPPLIER-CSV-QUALITY-CONSOLE-RETIREMENT-V1: CSV 품질 콘솔 은퇴 → 공급자 승인 canonical */}
+              <Route path="/operator/supplier-quality" element={<Navigate to="/operator/suppliers" replace />} />
+              {/* WO-O4O-NETURE-SUPPLIER-ACTIVATION-VISIBILITY-AND-ACTION-QUEUE-FIX-V1: operator scope supplier activation */}
+              <Route path="/operator/suppliers" element={<OperatorSupplierApprovalPage />} />
             </Route>
             <Route element={
               <SubdomainOperatorRoute serviceKey="funding" level="operator">
@@ -1173,8 +1184,6 @@ function App() {
               {/* Guide Contents (WO-O4O-OPERATOR-GUIDE-CONTENTS-CORE-EXTRACTION-V1) */}
               <Route path="/operator/guide-contents" element={<OperatorGuideContentsPage />} />
               <Route path="/operator/analytics" element={<OperatorAnalyticsPage />} />
-              {/* WO-O4O-NETURE-SUPPLIER-CSV-QUALITY-CONSOLE-RETIREMENT-V1: CSV 품질 콘솔 은퇴 → 공급자 승인 canonical */}
-              <Route path="/operator/supplier-quality" element={<Navigate to="/operator/suppliers" replace />} />
               <Route path="/operator/category-mapping-rules" element={<CategoryMappingRulesPage />} />
               {/* /operator/market-trial · /operator/market-trial/:id 는 위 서브도메인 운영자 블록(funding:operator)으로 옮겼다 */}
               <Route path="/operator/product-service-approvals" element={<ProductServiceApprovalPage />} />
@@ -1183,8 +1192,7 @@ function App() {
               <Route path="/operator/product-candidates" element={<ProductCandidateReviewPage />} />
               {/* WO-NETURE-CURATION-PHASE3-FULL-REMOVAL-V1: /operator/curation 라우트 제거 */}
               <Route path="/operator/actions" element={<OperatorActionQueuePage />} />
-              {/* WO-O4O-NETURE-SUPPLIER-ACTIVATION-VISIBILITY-AND-ACTION-QUEUE-FIX-V1: operator scope supplier activation */}
-              <Route path="/operator/suppliers" element={<OperatorSupplierApprovalPage />} />
+              {/* /operator/suppliers · /operator/supplier-quality 는 위 서브도메인 운영자 블록(supplier:operator)으로 옮겼다 */}
               {/* WO-O4O-NETURE-OPERATOR-CONTACT-MESSAGES-OPERATOR-SCOPE-V1: operator scope contact messages */}
               <Route path="/operator/contact-messages" element={<OperatorContactMessagesPage />} />
             </Route>
