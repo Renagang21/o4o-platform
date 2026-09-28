@@ -750,7 +750,7 @@ npx tsx src/scripts/community-catalog-promotion.ts --apply    # 숫자 확인 �
 | 연결 코드 UI | 없음 — PASS |
 | Google 로그인 UI | 없음 — PASS |
 | 콘솔 오류 | 0 |
-| 호스트 | `hospital.neture.co.kr` **DNS 미해석(`ERR_NAME_NOT_RESOLVED`)** — Cloud Run 기본 URL 로 검증. 도메인 연결은 병원약국 트랙의 사용자측 잔여 |
+| 검증 범위 | **Cloud Run 기본 URL**(`hospital-pharmacy-web` 서비스 URL `/hospital`)에서 검증한 범위만 PASS. 별도 사용자 도메인은 배포 1 대상이 아니다 |
 
 **Google 원본 (배포 후 · 로그인 전 단계까지)** — `store` · `supplier` · `funding` · `community` · `pharmacy` · `retail` · `kpa` `.neture.co.kr` 7개 모두 루트 200, 로그인 화면에서 GIS 버튼 iframe `gsi/button` **200** · 렌더 1 · `origin` 관련 콘솔 오류 0. 미등록 원본이면 이 단계에서 거부되므로 §8-0 U2/U3 보다 한 단계 강한 근거다. 자격 교환 · 세션 발급까지 가는 실제 로그인은 내가 하지 않았다(브라우저의 운영 Google 세션으로 운영 서비스 세션을 만들지 않기 위해) → 아래 사용자 실측으로 판정.
 
@@ -762,7 +762,7 @@ npx tsx src/scripts/community-catalog-promotion.ts --apply    # 숫자 확인 �
 | §8-0 U2 / U3 | **PASS 확정** — 원본 등록이 실제 로그인으로 확인됨 |
 | 새로고침 후 로그인 유지 | **미확인** — 각 host 1회 새로고침 결과 대기 |
 
-**배포 1 마감 조건 잔여: 새로고침 후 로그인 유지 1건.** 별도 미완료(배포 1 마감과 분리): `hospital.neture.co.kr` DNS 연결.
+**배포 1 마감 조건 잔여: 대상 host 7개의 새로고침 후 로그인 유지 1건.**
 
 ---
 
