@@ -103,8 +103,9 @@ export function mentionsSameIngredient(message: string): boolean {
 }
 
 /**
- * 약품 정보 질문 의도어 — 약품명 어미(정·캡슐…)가 없는 일반 약품 질문("타이레놀 성분이 무어니")을 조사로 보내기 위한
- * 병원 surface 어휘. 공통 Task Modality Router 에는 넣지 않는다. `@o4o/hospital-pharmacy-core` nl.ts 와 같은 규칙.
+ * 약품 정보 의도어 — 질문을 **분류하는 목록이 아니다**. 붙여 쓴 문장("타이레놀성분이무어니")에서 대상을 잘라 내고
+ * "성분이 뭐야" 의 '성분' 을 대상으로 오인하지 않기 위해서만 쓴다. 공통 Task Modality Router 에는 넣지 않는다.
+ * `@o4o/hospital-pharmacy-core` nl.ts 와 같은 규칙.
  */
 const DRUG_INFO_INTENT_TOKENS: readonly string[] = [
   '성분', '효능', '효과', '부작용', '주의사항', '주의점', '용법', '용량', '복용', '금기', '상호작용', '적응증', '약효', '대체약', '제형', '함량', '보관법',
@@ -115,20 +116,21 @@ const DRUG_INFO_NON_SUBJECT: ReadonlySet<string> = new Set([
   '우리', '원내', '병원', '약국', '이약', '그약', '약', '같은', '동일', '동일한', '무슨', '어떤', '어떻게', '무엇', '뭐', '뭐야', '뭐니',
   '무어', '무어니', '뭔가요', '뭐예요', '무엇인가요', '알려', '알려줘', '알려주세요', '좀', '해줘', '해주세요', '조사', '조사해', '조사해줘',
   '설명', '설명해줘', '정리', '정리해줘', '궁금해', '궁금해요', '있어', '있나요', '대해', '대해서', '주요', '주',
+  // 대상 없는 인사 · 도움 요청 · 막연한 질문 — 이것만 있으면 되묻는다.
+  '안녕', '안녕하세요', '반가워', '반갑습니다', '감사', '감사합니다', '고마워', '고맙습니다', '도와줘', '도와주세요', '질문', '문의',
+  '테스트', '시작', '안내', '사용법', '이용', '너는', '누구', '뭐해', '약이야', '약인가요', '약이에요', '약이니',
 ]);
 
 const DRUG_INFO_TRAILING_PARTICLES: readonly string[] = ['이랑', '하고', '으로', '을', '를', '이', '가', '은', '는', '도', '과', '와', '의', '로', '랑'];
 const DRUG_INFO_TRIM_CHARS: ReadonlySet<string> = new Set(['"', "'", '(', ')', '[', ']', ',', '.', '?', '!', '~', '“', '”', '‘', '’', '「', '」']);
 
 /**
- * 문장이 **특정 약품의 정보**(성분·효능·부작용·용법 등)를 묻는가.
- * 의도어와 함께 대상 단어(2자 이상 · 일반어 아님 · 숫자만 아님)가 있어야 true. 붙여 쓴 문장은 의도어 앞부분을 대상으로 본다.
- * 대상 없이 "성분이 뭐야" 만 있으면 false(되묻기 유지).
+ * 문장에 **물어볼 대상**(약품명 등)이 있는가 — 병원 surface 의 "원내가 명확하지 않으면 조사" 기본값을 위한 판정.
+ * 키워드로 질문 형태를 쫓지 않는다: 대상 단어(2자 이상 · 일반어 아님 · 숫자만 아님)가 있으면 true → 조사가 답한다.
+ * 대상 없이 인사·도움 요청·"성분이 뭐야" 만 있으면 false(되묻기).
  */
-export function mentionsDrugInfoIntent(message: string): boolean {
+export function looksLikeDrugQuestion(message: string): boolean {
   const text = String(message ?? '');
-  const c = compact(text);
-  if (!DRUG_INFO_INTENT_TOKENS.some((t) => c.includes(t))) return false;
   for (const raw of text.split(/\s+/)) {
     let token = raw;
     while (token.length > 0 && DRUG_INFO_TRIM_CHARS.has(token[0])) token = token.slice(1);

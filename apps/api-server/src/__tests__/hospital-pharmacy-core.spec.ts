@@ -17,7 +17,7 @@ import {
   extractStrength,
   mentionsHospital,
   mentionsSameIngredient,
-  mentionsDrugInfoIntent,
+  looksLikeDrugQuestion,
   queryLocalRows,
   matchLocalByResearchIngredients,
   renderLocalContextBlock,
@@ -148,13 +148,13 @@ describe('hospital-pharmacy-core · surface plan (§1·§5·§6)', () => {
     expect(decideHospitalSurfacePlan('도와줘', 'question', true)).toBe('question');
   });
 
-  it('일반 약품 정보 질문(약품명 어미 없음) → research · 대상 없으면 question', () => {
-    for (const text of ['타이레놀 성분이 무어니', '타이레놀성분이무어니', '아스피린 부작용 알려줘', '게보린 효능']) {
-      expect(mentionsDrugInfoIntent(text)).toBe(true);
+  it('원내가 명확하지 않고 대상이 있으면 research · 대상 없으면 question', () => {
+    for (const text of ['타이레놀 성분이 무어니', '타이레놀성분이무어니', '아스피린 부작용 알려줘', '게보린 효능', '타이레놀은 무슨 약이야?', '아세트아미노펜 주의사항?']) {
+      expect(looksLikeDrugQuestion(text)).toBe(true);
       expect(decideHospitalSurfacePlan(text, 'question', true)).toBe('research');
     }
-    for (const text of ['성분이 뭐야?', '부작용 알려줘', '안녕하세요']) {
-      expect(mentionsDrugInfoIntent(text)).toBe(false);
+    for (const text of ['성분이 뭐야?', '부작용 알려줘', '안녕하세요', '무슨 약이야?', '도와줘']) {
+      expect(looksLikeDrugQuestion(text)).toBe(false);
       expect(decideHospitalSurfacePlan(text, 'question', true)).toBe('question');
     }
   });

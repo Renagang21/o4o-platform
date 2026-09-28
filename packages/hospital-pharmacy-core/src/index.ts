@@ -28,7 +28,7 @@ export {
 export {
   mentionsHospital,
   mentionsSameIngredient,
-  mentionsDrugInfoIntent,
+  looksLikeDrugQuestion,
   extractDrugNameToken,
   extractProduct,
   extractStrength,

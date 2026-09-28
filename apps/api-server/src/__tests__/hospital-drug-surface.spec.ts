@@ -189,7 +189,7 @@ describe('question — 되묻기(공통 question modality 보존)', () => {
   });
 });
 
-describe('일반 약품 정보 질문 fallback — 약품명 어미 없어도 조사(병원 surface 전용 · 공통 Router 무변경)', () => {
+describe('병원 surface 기본값 — 원내가 명확하지 않고 대상이 있으면 조사(병원 surface 전용 · 공통 Router 무변경)', () => {
   test.each([
     '타이레놀 성분이 무어니',
     '타이레놀 성분이 뭐야?',
@@ -197,12 +197,15 @@ describe('일반 약품 정보 질문 fallback — 약품명 어미 없어도 �
     '아스피린 부작용 알려줘',
     '이부프로펜 복용법',
     '게보린 효능',
+    '타이레놀은 무슨 약이야?',
+    '타이레놀 부작용 알려줘',
+    '아세트아미노펜 주의사항?',
   ])('%s → research (suppressLocal 무관)', (text) => {
     expect(decideHospitalDrugSurfacePlan(text, 'question', true)).toBe('research');
     expect(decideHospitalDrugSurfacePlan(text, 'question', false)).toBe('research');
   });
 
-  test.each(['안녕하세요', '성분이 뭐야?', '부작용 알려줘', '도와줘'])('%s → question (대상 약품 없음)', (text) => {
+  test.each(['안녕하세요', '성분이 뭐야?', '부작용 알려줘', '도와줘', '무슨 약이야?', '감사합니다'])('%s → question (대상 약품 없음)', (text) => {
     expect(decideHospitalDrugSurfacePlan(text, 'question', true)).toBe('question');
   });
 

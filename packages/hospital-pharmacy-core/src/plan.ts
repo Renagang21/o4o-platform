@@ -18,7 +18,7 @@
  * 살아 있는 기존 /hospital-drug 호환 경로다.
  */
 
-import { extractProduct, mentionsDrugInfoIntent, mentionsHospital, mentionsSameIngredient } from './nl';
+import { extractProduct, looksLikeDrugQuestion, mentionsHospital, mentionsSameIngredient } from './nl';
 
 export type HospitalSurfacePlan = 'research' | 'research_and_local' | 'local_only' | 'question';
 
@@ -40,8 +40,8 @@ export function decideHospitalSurfacePlan(
   }
   if (modality === 'research') return 'research';
   if (product) return 'research';
-  // 약품명 어미가 없는 일반 약품 정보 질문("타이레놀 성분이 무어니") — 조사가 기본값이다.
-  if (mentionsDrugInfoIntent(message)) return 'research';
+  // 원내가 명확한 요청이 아니면 대상이 있는 질문은 조사(Gemini)에 맡긴다("타이레놀은 무슨 약이야?"). 대상이 없을 때만 되묻는다.
+  if (looksLikeDrugQuestion(message)) return 'research';
   return 'question';
 }
 

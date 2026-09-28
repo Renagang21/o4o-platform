@@ -37,7 +37,7 @@ import type { TaskModality } from './task-modality-router.js';
 import {
   extractProduct,
   extractStrength,
-  mentionsDrugInfoIntent,
+  looksLikeDrugQuestion,
   mentionsHospital,
   mentionsSameIngredient,
   queryLocal,
@@ -122,8 +122,8 @@ export function decideHospitalDrugSurfacePlan(
   }
   if (modality === 'research') return 'research';
   if (product) return 'research';
-  // 약품명 어미가 없는 일반 약품 정보 질문("타이레놀 성분이 무어니") — 병원 surface 의 기본값은 조사다(공통 Router 무변경).
-  if (mentionsDrugInfoIntent(message)) return 'research';
+  // 병원 surface: 원내가 명확한 요청이 아니면 대상이 있는 질문은 조사(Gemini)에 맡긴다. 대상이 없을 때만 되묻는다(공통 Router 무변경).
+  if (looksLikeDrugQuestion(message)) return 'research';
   return 'question';
 }
 
