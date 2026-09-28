@@ -1,6 +1,10 @@
 # WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1
 
-> 발행: 2026-09-27 · 상태: **설계 확정 / 구현 착수**
+> 발행: 2026-09-27 · 상태: **병합 완료 · 배포 2 전 경계 보정 완료 · 운영 배포 대기**
+>
+> 진행 기록은 [`CHECK-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1`](../checks/CHECK-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1.md) 하나다.
+> 배포 2 전 단계(migration 전용 실행 경로 · 배포 SHA 범위 · 서브도메인 운영자 화면 경계)는
+> 같은 작업의 계속이며 CHECK §8-7 에 있다 — **별도 WO 로 나누지 않았다.**
 > 근거: [`IR-O4O-SERVICE-LOGIN-SIGNUP-OPERATOR-STRUCTURE-9-DOMAINS-V1`](../investigations/IR-O4O-SERVICE-LOGIN-SIGNUP-OPERATOR-STRUCTURE-9-DOMAINS-V1.md)
 >
 > **하나의 작업이다.** 서비스별 WO 로 나누지 않는다. 호스트 이름만 Admin 화면에 추가하고 완료로 판정하지 않는다.
