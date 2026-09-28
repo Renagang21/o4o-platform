@@ -388,3 +388,25 @@ describe('Community Core 재사용 · 복제 0 · 새 membership 테이블 0 (WO
     expect(home).not.toMatch(/community:neture|community:kpa-society|community:pharmacy-hub/);
   });
 });
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 승격 CLI 의 원장 컬럼 = baseline 스키마 (WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 CHECK §8-2)
+//   운영 적용 직전 `c.post_id`(존재하지 않는 컬럼)로 dry-run 이 실패하던 결함의 회귀 방지.
+//   댓글 작성자도 참여 증거이므로 이 JOIN 이 깨지면 댓글만 쓴 참여자가 이행에서 빠진다.
+// ─────────────────────────────────────────────────────────────────────────────
+
+describe('승격 CLI — forum_comment 원장 컬럼이 baseline 스키마와 일치', () => {
+  const baseline = read('apps/api-server/src/database/bootstrap/canonical-schema-baseline.ts');
+  const commentTable = baseline.match(/CREATE TABLE public\.forum_comment \(([\s\S]*?)\n\s*\);/)?.[1] ?? '';
+  const cli = code('apps/api-server/src/scripts/community-catalog-promotion.ts');
+
+  it('baseline 의 forum_comment 글 참조 컬럼은 "postId" 다', () => {
+    expect(commentTable).toMatch(/"postId" uuid NOT NULL/);
+    expect(commentTable).not.toMatch(/\bpost_id\b/);
+  });
+
+  it('CLI 의 댓글 증거 JOIN 은 c."postId" 를 쓴다', () => {
+    expect(cli).toContain('JOIN forum_post p ON p.id = c."postId"');
+    expect(cli).not.toMatch(/c\.post_id\b/);
+  });
+});

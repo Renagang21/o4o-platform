@@ -114,6 +114,9 @@ function eligibilityClause(def: CommunityDefinition, paramIndex: number): { sql:
 /**
  * 원장 코드 집합에서 글 또는 댓글을 쓴 사용자.
  *
+ * 컬럼명 주의: `forum_comment` 의 글 참조는 camelCase `"postId"` 다(baseline · 운영 동일).
+ * `forum_post` 의 `author_id` · `forum_id` 와 표기가 다르다.
+ *
  * `forum_post.forum_id → forum_category_requests.id → service_code` 가 Community 파티션이다
  * (community-catalog 의 adapter seam). 댓글은 그 글의 원장을 따른다.
  */
@@ -126,7 +129,7 @@ const EVIDENCE_CTE = `
     UNION
     SELECT DISTINCT c.author_id AS user_id
       FROM forum_comment c
-      JOIN forum_post p ON p.id = c.post_id
+      JOIN forum_post p ON p.id = c."postId"
       JOIN forum_category_requests r ON r.id = p.forum_id
      WHERE r.service_code = ANY($1) AND c.author_id IS NOT NULL
   )`;
