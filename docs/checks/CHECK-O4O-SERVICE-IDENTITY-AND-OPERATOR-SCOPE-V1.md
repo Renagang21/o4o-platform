@@ -751,6 +751,7 @@ npx tsx src/scripts/community-catalog-promotion.ts --apply    # 숫자 확인 �
 | Google 로그인 UI | 없음 — PASS |
 | 콘솔 오류 | 0 |
 | 검증 범위 | **Cloud Run 기본 URL**(`hospital-pharmacy-web` 서비스 URL `/hospital`)에서 검증한 범위만 PASS. 별도 사용자 도메인은 배포 1 대상이 아니다 |
+| 정본 진입 `https://neture.co.kr/hospital` (서브디렉토리 · 2026-09-22 결정) | 같은 기준 재확인 PASS — xlsx 안내 · 폴더 연결 버튼 1 · 연결 코드 없음 · Google 로그인 UI 없음 · 콘솔 오류 0 |
 
 **Google 원본 (배포 후 · 로그인 전 단계까지)** — `store` · `supplier` · `funding` · `community` · `pharmacy` · `retail` · `kpa` `.neture.co.kr` 7개 모두 루트 200, 로그인 화면에서 GIS 버튼 iframe `gsi/button` **200** · 렌더 1 · `origin` 관련 콘솔 오류 0. 미등록 원본이면 이 단계에서 거부되므로 §8-0 U2/U3 보다 한 단계 강한 근거다. 자격 교환 · 세션 발급까지 가는 실제 로그인은 내가 하지 않았다(브라우저의 운영 Google 세션으로 운영 서비스 세션을 만들지 않기 위해) → 아래 사용자 실측으로 판정.
 
