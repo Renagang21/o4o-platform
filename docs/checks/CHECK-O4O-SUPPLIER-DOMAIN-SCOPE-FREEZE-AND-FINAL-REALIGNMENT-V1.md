@@ -139,14 +139,38 @@ SUPPLIER_BUSINESS_PROFILE = CLOSED / MIGRATION_DEFERRED
 
 ## 12. 배포 / smoke
 
-runtime 변경이 있으므로 배포 대상이다. 다만 WO §19 에 따라 **전역 `DEPLOY_ENABLED` 를 이 WO 단독 이유로 열지 않았다** — 다음 자연스러운 배포 창에 합친다.
+runtime 변경이 있으므로 배포 대상이다. WO §19 에 따라 **전역 `DEPLOY_ENABLED` 를 이 WO 단독 이유로 열지 않았고**, 다음 자연스러운 배포 창에 합쳤다.
+
+### 12.1 배포 — **DONE (2026-09-28)**
+
+작성 시점에는 `DEPLOY = PENDING` 이었다. 2026-09-28 배포 창에서 실제로 반영됐으므로 사실에 맞게 갱신한다.
 
 ```text
-DEPLOY        = PENDING (다음 배포 창)
-BROWSER_SMOKE = PENDING (배포 후)
+배포 SHA            2edfe9b33  (303221b8b 를 조상으로 포함 — git merge-base 로 확인)
+API   run 36377775299  build-and-deploy = success
+                       revision o4o-core-api-03755-6zf · traffic 100% (05:09Z)
+Web   run 36379598238  deploy-neture    = success (04:53Z)
 ```
 
-배포 후 확인할 것: 같은 Library 자료를 같은 서비스로 두 번 제공 → 두 번째가 **200 + "이미 제공된 자료"** 문구이고 수신함 행이 늘지 않는지.
+`deploy-hold-notice` 만 도는 run 과 구분해 **job 실행 · revision 생성 · traffic 전환 3신호**로 확인했다. 이후 `DEPLOY_ENABLED` 는 다시 `false` 로 닫혔다.
+
+### 12.2 Content handoff 멱등성 smoke — `BLOCKED_BY_SUPPLIER_ACCOUNT`
+
+```text
+BROWSER_SMOKE = PENDING
+```
+
+배포가 아니라 **실행 주체가 없어서** 막혀 있다. 운영에 공급자 관계를 가진 Google 사용자가 0명이고([`CHECK-O4O-SUPPLIER-CANONICAL-RUNTIME-AND-PRODUCTION-FINAL-CLOSURE-V1`](CHECK-O4O-SUPPLIER-CANONICAL-RUNTIME-AND-PRODUCTION-FINAL-CLOSURE-V1.md) §10 · 운영 3건 전부 **B 보존**), Google user 를 DB 에 직접 만드는 것은 금지다. `SUPPLIER_IDENTITY_DATA = DEFERRED_PENDING_GOOGLE_IDENTITY` 와 **같은 gate** 다.
+
+재개 조건과 확인할 것:
+
+```text
+실제 사업자가 Google 가입 → 운영자 승인 → owner membership 생성 확인
+→ 같은 Library 자료를 같은 서비스로 두 번 제공
+→ 두 번째가 HTTP 200 + "이미 제공된 자료" 문구이고 수신함 행이 늘지 않는지
+```
+
+멱등성 계약 자체는 `supplier-domain-boundary.spec.ts` §6 이 소스 계약으로 고정하고 있다.
 
 ## 13. STOP / DEFER
 
