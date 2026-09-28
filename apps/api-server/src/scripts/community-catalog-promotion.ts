@@ -251,10 +251,10 @@ async function main() {
     const totalWouldInsert = results.reduce((a, r) => a + r.wouldInsert, 0);
     const totalInserted = results.reduce((a, r) => a + r.inserted, 0);
     // 한 사람이 여러 커뮤니티 대상일 수 있다 — 행 수와 사람 수를 따로 낸다.
-    const distinctUsers = new Set(results.flatMap((r) => r.eligibleIds)).size;
+    const totalDistinctUsers = new Set(results.flatMap((r) => r.eligibleIds)).size;
     console.log('');
     console.log(
-      `TOTAL eligible=${totalEligible} would_insert=${totalWouldInsert} inserted=${totalInserted} distinct_target_users=${distinctUsers}`,
+      `TOTAL eligible=${totalEligible} would_insert=${totalWouldInsert} inserted=${totalInserted} distinct_target_users=${totalDistinctUsers}`,
     );
     if (!APPLY) {
       console.log('no rows written — re-run with --apply after reviewing the numbers above');
