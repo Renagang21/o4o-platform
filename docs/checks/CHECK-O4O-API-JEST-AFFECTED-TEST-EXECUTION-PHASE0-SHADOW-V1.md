@@ -13,6 +13,9 @@ API Jest affected selector 를 구현해 **CI 로그·artifact 로만** 남기�
 **실제 Jest 실행 범위는 전혀 줄이지 않았다** — `api-tests` 는 계속 `npx jest --maxWorkers=1`
 전체를 돌린다. 함께 정기(일 1회) full API Jest workflow 를 추가했다.
 
+**2026-09-28 현재**: §25 4항목 전부 PASS (13-6) · 정기 workflow `first scheduled event verified` ·
+shadow 관측 5일 경과(종료 예정 2026-10-07) · **Phase 1 미적용 유지**.
+
 ---
 
 ## 1. §4 — W1 (migration append 취약 단언) 상태
@@ -169,6 +172,12 @@ full 이 실패하면 그 실패 suite 이름을 artifact 의 `specs` 와 대조
 - Docker · Cloud Run · migration Job 과 **연결하지 않는다** (회귀 테스트 J18 이 고정)
 - 일반 push 의 docs/admin fast path 는 **손대지 않았다** (별도 workflow)
 
+**상태 (2026-09-28)**: `cron configured` / `dispatch verified` /
+**`first scheduled event verified`** — `event == "schedule"` run **5건 전부 success**
+(최초 `35918884183` 2026-09-23 20:52:53Z → `36058307016` → `36188453312` →
+`36269398934` → `36348735702` 2026-09-27 20:37:44Z). 5일 연속 정상 기동했으므로
+§17 은 추가 관찰 없이 충족이다.
+
 ## 11. §20 · §21 — Phase 1 전환 조건 (미충족 · 대기)
 
 - 최소 2 주 shadow **또는** API full Jest failure 5 건 이상 관측
@@ -230,15 +239,18 @@ Phase 0 계약이 코드로 깨지는 것을 막는다.
 
 ### 13-4. 실제 GitHub Actions 검증 (§25)
 
-#### 판정 요약 (2026-09-23 12:20 UTC 기준)
+#### 판정 요약 (**2026-09-28 갱신** · 최초 작성 2026-09-23 12:20 UTC)
 
 | # | 항목 | 판정 | 근거 |
 |---|---|---|---|
 | ① | base SHA 조회 · `git diff` 성공 · 변경 파일 탐지 | **PASS** | 수정 이후 shadow run 4건 전부 `changedFiles` 실제 수집 (2 / 302 / 194 / 194) — 아래 C |
-| ② | **`mode=selected` 실작동 · `selectedSuiteCount > 0`** | **PENDING** | 수정 이후 shadow run 4건이 **전부 정당한 `global_or_unknown`** — 아래 D |
+| ② | **`mode=selected` 실작동 · `selectedSuiteCount > 0`** | **PASS** (2026-09-28) | run `35869445367`: `selected 241 / 356 (67.7%)` · components 전항목 실수치 — 아래 13-6 |
 | ③ | artifact 보존 | **PASS** | `api-jest-shadow-<run>-<attempt>` 4건 업로드·미만료(30일) — 아래 C |
 | ④ | full Jest green (Phase 0 불변식) | **PASS** | run `35856452802`: `cd apps/api-server && npx jest --maxWorkers=1` → 350 passed / 4 skipped, 6,010 tests |
 
+> ②는 2026-09-28 재확인에서 **인위적 변경 없이** 정상 `api-server` 변경 run 에서 입증됐다(13-6).
+> 다음 변동은 아래 원문을 그대로 남긴다 — 이 기준은 Phase 1 전까지 유지된다.
+>
 > **②가 로그·artifact로 입증되기 전에는 Phase 0 구현 검증 완료가 아니다.**
 > 수치를 만들기 위한 인위적 `api-server` 변경, detector·fast path·Jest 명령 수정은
 > 하지 않았다(§28). 다음 정상 `api-server` 변경 run 에서 아래 E 절차로 바로 판정한다.
@@ -339,7 +351,7 @@ Test Suites: 4 skipped, 350 passed, 350 of 354 total
 Tests:       32 skipped, 5978 passed, 6010 total
 ```
 
-#### D. ② 가 아직 PENDING 인 이유
+#### D. ② 가 아직 PENDING 인 이유 (**2026-09-23 시점 기록 · 현재 해소됨 → 13-6**)
 
 수정 이후 main 에 들어온 변경이 다음 셋 중 하나였다.
 
@@ -410,6 +422,107 @@ E2~E6 이 모두 통과해야 ② PASS 다. E7 은 매 run 누적 집계 대상�
 **하지 말 것** — 수치 확보 목적의 `api-server` 코드/테스트 변경, detector 로직 수정,
 fast path 조건 수정, Jest 명령 수정. 어느 하나라도 하면 그 run 은 증거가 아니라 조작이다.
 
+### 13-6. 2026-09-28 재확인 — ② PASS 확정 · shadow 관측 진행 상황
+
+조사 시점 `origin/main` = `916fd4ad1`. 이 절의 수치는 전부 GitHub Actions 로그 실측이며,
+**이 절을 위해 코드·workflow·테스트를 수정하지 않았다** (§28).
+
+#### ②의 입증 run
+
+| 항목 | 값 |
+|---|---|
+| run | `35869445367` (**수정 이후 최초의 `mode=selected` run**) |
+| commit · event | `f951ad841` · push (`feat(commerce): 승인축 B2B·Event Offer payment-first canonicalization`) |
+| 시각 | 2026-09-23 13:46:40Z (= 22:46 KST) |
+| `mode` | **`selected`** |
+| `changedFiles` | 20 |
+| `selectedSuiteCount / fullSuiteCount` | **241 / 356 (67.7%)** |
+| `components` | `{findRelated:129, staticImport:131, routeInventory:20, importerBridge:1, rawSource:113, alwaysRun:58, migration:0, changedTests:2}` |
+| 같은 run 의 실제 Jest | `cd apps/api-server && npx jest --maxWorkers=1` → **352 passed / 4 skipped / 0 failed**, 6,063 tests, job `success` |
+
+즉 selector 는 241개를 "돌리면 됐다"고 계산했지만 CI 는 **356개 전부를 그대로 돌렸다** —
+§3 불변식(실제 실행 범위 축소 없음)이 유지됐다. `components` 가 8개 축 모두 실수치를
+가지므로 §25 ② 의 "per-component 숫자" 요건도 충족이다.
+
+#### 관측 시작일 정정
+
+`35831578605`(= C 절의 관측 시작점, `mode=full`)은 **유효한 관측**이지만,
+사용자 지시의 "유효한 shadow run"을 `mode=selected` 가 실제로 산출된 run 으로 읽으면
+**관측 시작점은 `35869445367` (2026-09-23 13:46:40Z)** 이다. 최소 2주 관측 종료 예정일은
+**2026-10-07** 이고, 2026-09-28 기준 **5일 경과**다. 두 해석 모두 시작일이 2026-09-23 이라
+종료 예정일은 같다.
+
+#### 관측 전수 집계 (2026-09-23 13:46Z ~ 2026-09-28, `ci-pipeline.yml` · branch `main`)
+
+| 구분 | 건수 |
+|---|---|
+| 전체 run | 77 |
+| `api-tests` 자체 skip (docs/admin fast path) | 38 |
+| `api-tests` 실행 | **39** |
+| └ `mode=selected` | **22** |
+| └ `mode=full` (mandatory fallback) | **17** |
+
+`mode=full` 17건의 fallback 사유는 **전부 정당**하며 미분류·수집 실패는 0건이다.
+
+| fallback 사유 | 건수 |
+|---|---|
+| `global_or_unknown — 전역/미분류 경로 변경` | 16 |
+| `Jest/빌드 설정 변경 — apps/api-server/package.json` | 1 |
+
+`selected` 22건의 선별 비율 분포 (`selectedSuiteCount / fullSuiteCount`):
+
+| 통계 | 값 |
+|---|---|
+| n | 22 |
+| min | 17.9% (`35932511327`, 64 / 357) |
+| p25 | 23.0% |
+| **p50** | **26.0%** |
+| p75 | 34.5% |
+| p90 | 39.5% |
+| max | 73.8% (`36135346501`, 265 / 359) |
+| mean | 31.7% |
+
+`fullSuiteCount` 는 관측 기간 중 **356 → 366** 으로 자연 증가했다(다른 세션의 신규 spec).
+`alwaysRun` 도 선언 수정 없이 58 → 62 로 함께 움직였다 — §10 의 "규칙 도출" 선택이
+의도대로 동작하고 있다는 추가 증거다.
+
+> **이 분포를 Phase 1 승인 근거로 바로 쓰지 않는다.** §21 의 false-negative 판정은
+> 선별 비율이 아니라 **실제 실패 suite 가 선별 집합에 들어 있었는지**로 한다.
+> 관측 기간 중 `api-tests` 실패 run 이 없어(전부 success) 아직 그 대조 표본이 0건이다.
+
+#### 정기 full Jest — `first scheduled event verified`
+
+| run | event | 시각 | 결과 |
+|---|---|---|---|
+| `35829209575` | workflow_dispatch | 2026-09-23 06:57:17Z | success |
+| **`35918884183`** | **schedule** | 2026-09-23 20:52:53Z | success ← 최초 실기동 |
+| `36058307016` | schedule | 2026-09-24 20:57:19Z | success |
+| `36188453312` | schedule | 2026-09-25 20:53:38Z | success |
+| `36269398934` | schedule | 2026-09-26 20:24:12Z | success |
+| `36348735702` | schedule | 2026-09-27 20:37:44Z | success |
+
+§17 상태는 `first scheduled event pending` → **`first scheduled event verified`** 로 확정한다.
+
+#### 다른 세션의 변경이 Phase 0 에 준 영향 (범위 밖 · 보고만)
+
+관측 기간 중 다른 세션이 `WO-O4O-CI-API-JEST-SHARD-PARALLELIZATION-V1` 으로
+`api-tests` 를 **3 shard 분할** (`--shard=${{ matrix.shard }}/3`, `fail-fast: false`) 로 바꿨다.
+검토 결과 **Phase 0 불변식은 깨지지 않았다.**
+
+| 확인 항목 | 결과 |
+|---|---|
+| 실행 범위 | `--shard=i/3` 은 선별이 아니라 분할 — 3 shard 합집합 = 전체. run `36248001192` 에서 1/3·2/3·3/3 모두 `success` |
+| OOM 보호 | shard 내부는 계속 `--maxWorkers=1` |
+| shadow selector | shard 1 에서만 1회 계산·업로드 (artifact 이름 충돌 방지) |
+| `fetch-depth: 0` | shard 1 에 그대로 보존 (`WO-O4O-CI-SPARSE-CHECKOUT-DATA-EXCLUSION-V1` 이 shard 1 을 의도적으로 예외 처리) |
+| J17 | `--shard` 분모와 matrix 목록의 연속성까지 검사하도록 갱신됨 |
+| detector 회귀 | 최신 main 기준 **75 / 75 PASS** (72 → 75, 증가분 3건은 다른 세션) |
+
+단, **§13-2 의 원가 산정 기준선(단일 러너 614s)은 더 이상 현행이 아니다.**
+shard 3분할로 `api-tests` 의 wall-clock 과 러너-분(runner-minute) 관계가 바뀌었으므로
+**−29% 라는 수치도 shard 체제 기준으로 재산정해야 한다.** 이는 이번 범위 밖이므로
+수치를 고치지 않고 §16 한계로만 남기고 별도 WO 로 제안한다.
+
 ## 14. §23 · §24 — 섞지 않은 것
 
 - env-gated 6 suite(`MEDIA_V2_TEST_PORT` · `O4O_ISOLATED_PG_URL`) — **손대지 않았다** (W3 미포함)
@@ -434,9 +547,16 @@ fast path 조건 수정, Jest 명령 수정. 어느 하나라도 하면 그 run 
 2. `ci-install-lockfile-contract.spec.ts` 는 runtime trace 상 `packages/**` 를 읽지만
    그 읽기는 jest 의 module resolution 부산물로 보인다. 현재는 ALWAYS_RUN 규칙
    (workspace manifest 를 읽는다) 으로 포함된다.
-3. ground truth 자체가 **한 번의 runtime 계측**이다. 조건부 분기로만 도달하는 파일 읽기는
+3. **§13-2 의 원가 수치(−29%, 기준선 614s)는 단일 러너 전제다.** 2026-09-26 경
+   다른 세션이 `api-tests` 를 3 shard 분할로 바꿨고(`WO-O4O-CI-API-JEST-SHARD-PARALLELIZATION-V1`)
+   Phase 0 불변식은 유지되지만 wall-clock / 러너-분 관계가 달라졌다. Phase 1 승인 시
+   **shard 체제 기준으로 재산정**해야 한다 — 이번 범위 밖(별도 WO 제안).
+4. 관측 기간 중 `api-tests` 실패 run 이 0건이라 **§21 의 false-negative 실증 대조 표본이
+   아직 없다.** 260 commit 재현(13-1)의 0/86 은 재현 표본이고, 실 CI 실패 표본은 별개다.
+5. ground truth 자체가 **한 번의 runtime 계측**이다. 조건부 분기로만 도달하는 파일 읽기는
    포착되지 않았을 수 있다. shadow 기간이 이것을 실증으로 보완한다.
 
 ---
 
-*작성: 2026-09-23 · Phase 0 (shadow) · Phase 1 미적용*
+*작성: 2026-09-23 · 갱신: 2026-09-28 (13-6 추가 · §25 ② PASS · §17 schedule 실기동 확인)*
+*Phase 0 (shadow) · **Phase 1 미적용** — Phase 0 완료는 Phase 1 적용 완료가 아니다 (§27)*
