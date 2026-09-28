@@ -33,7 +33,7 @@ function extractLocalNeedles(text: string): string[] {
 }
 
 export default function WardPage() {
-  // 원내 Context = 실제 hospital-drugs.xlsx 에서 읽어 메모리에 둔 행(§8). FolderGate 안이므로 항상 연결 상태.
+  // 원내 Context = 사용자가 고른 실제 파일에서 읽어 메모리에 둔 행(§11). DrugFileGate 안이므로 항상 연결 상태.
   const { file, ensureFresh } = useLocalDrugs();
   const [input, setInput] = useState('');
   const [question, setQuestion] = useState<string | null>(null);
@@ -48,7 +48,7 @@ export default function WardPage() {
     setQuestion(text);
     setAnswer(null);
     try {
-      // 조회 직전 — 파일이 같은 이름으로 덮어써졌으면 여기서 다시 읽는다(§5).
+      // 조회 직전 — 같은 파일이 새 내용으로 저장됐으면 여기서 다시 읽는다(§7).
       const rows = (await ensureFresh()) ?? [];
       const hasLocal = rows.length > 0;
       const sameIngredient = hasLocal ? mentionsSameIngredient(text) : false;
@@ -110,7 +110,7 @@ export default function WardPage() {
         <div className="ds">
           <div className="meta">
             {file
-              ? <>원내 약품 파일 연결됨 — <b>{file.fileName}</b> · {file.rows.length}건</>
+              ? <>원내 약품 파일 연결됨 — <b>{file.fileName}</b> · {file.rows.length}개 품목</>
               : <>원내 약품 파일을 읽는 중입니다…</>}
           </div>
           <Link to="/pharmacy" className="btn ghost" style={{ textDecoration: 'none' }}>원내 약품 파일</Link>

@@ -1,11 +1,14 @@
 /**
- * 원내 약품 폴더 연결 저장소 — IndexedDB (§4)
+ * 원내 약품 파일 연결 저장소 — IndexedDB
  *
- * 저장하는 것: 폴더 directory handle · 구조 fingerprint 별 GFU mapping(inference) · 최소 metadata.
- * 저장하지 않는 것: **원내 약품 데이터 자체**. 정본은 PC 의 실제 hospital-drugs.xlsx 이고,
- * 정규화된 행은 브라우저 메모리(Local Context)에만 둔다(§8). localStorage 도 쓰지 않는다.
+ * WO-O4O-HOSPITAL-PHARMACY-V1-DIRECT-FILE-SELECTION-AND-PRODUCTION-CLOSURE §4·§5
  *
- * directory handle 은 structured clone 가능 객체라 IndexedDB 에만 넣을 수 있다(localStorage 불가).
+ * 저장하는 것: 사용자가 직접 고른 파일의 FileSystemFileHandle · 실제 파일명 · 최소 metadata(lastModified · size) ·
+ *              구조 fingerprint 별 GFU mapping(inference).
+ * 저장하지 않는 것: **원내 약품 데이터 자체**. 정본은 PC 의 실제 선택 파일이고, 정규화된 행은 브라우저 메모리
+ * (Local Context)에만 둔다(§11). localStorage 도 쓰지 않는다.
+ *
+ * file handle 은 structured clone 가능 객체라 IndexedDB 에만 넣을 수 있다(localStorage 불가).
  * private/차단 환경에서 IndexedDB 가 실패할 수 있으므로 모든 호출을 try/catch 로 감싸 null 로 보수 처리한다.
  */
 import type { FileStructureInference } from '@o4o/file-understanding-core';
@@ -14,10 +17,22 @@ const DB_NAME = 'o4o-hospital-pharmacy';
 const DB_VERSION = 1;
 const STORE = 'kv';
 
-const KEY_FOLDER = 'drug-folder';
+const KEY_FILE = 'drug-file';
 const KEY_MAPPING = 'drug-mapping';
+/** 폐기된 폴더 연결 방식의 directory handle 키 — 읽지 않고 지우기만 한다(§12). */
+const KEY_LEGACY_FOLDER = 'drug-folder';
 
-/** 구조 fingerprint 별 GFU 매핑 캐시 — 같은 구조면 AI 를 다시 부르지 않는다(§15). */
+/** 연결된 원내 약품 파일 — handle 과 식별용 metadata 뿐. 행 데이터 필드는 두지 않는다(§5). */
+export interface StoredDrugFile {
+  handle: FileSystemFileHandle;
+  /** 사용자가 고른 실제 파일명(고정 이름 없음 · §8). */
+  fileName: string;
+  lastModified: number | null;
+  size: number | null;
+  connectedAt: string;
+}
+
+/** 구조 fingerprint 별 GFU 매핑 캐시 — 같은 구조면 AI 를 다시 부르지 않는다. */
 export interface StoredMapping {
   fingerprint: string;
   targetSchemaId: string;
@@ -78,9 +93,9 @@ async function kvDelete(key: string): Promise<void> {
   }
 }
 
-export const loadFolderHandle = () => kvGet<FileSystemDirectoryHandle>(KEY_FOLDER);
-export const saveFolderHandle = (handle: FileSystemDirectoryHandle) => kvSet(KEY_FOLDER, handle);
-export const clearFolderHandle = () => kvDelete(KEY_FOLDER);
+export const loadDrugFile = () => kvGet<StoredDrugFile>(KEY_FILE);
+export const saveDrugFile = (record: StoredDrugFile) => kvSet(KEY_FILE, record);
+export const clearLegacyFolderHandle = () => kvDelete(KEY_LEGACY_FOLDER);
 
 export const loadMapping = () => kvGet<StoredMapping>(KEY_MAPPING);
 export const saveMapping = (mapping: StoredMapping) => kvSet(KEY_MAPPING, mapping);
