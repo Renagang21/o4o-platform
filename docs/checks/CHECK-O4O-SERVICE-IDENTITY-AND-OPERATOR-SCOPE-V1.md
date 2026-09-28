@@ -952,7 +952,67 @@ apply     inserted 2+1+3 = 6
 
 #### 8-7-6. 운영 실행 기록 (migration 6·7·8·9 · 공식 dry-run)
 
-(이 커밋 시점: 미실행 — 아래는 실행 후 채운다)
+**migration = 적용 완료 (2026-09-28 14:42Z · 사용자 승인 · API 배포 0).**
+
+| 항목 | 값 |
+|---|---|
+| 대상 SHA | `c5a3db0cdb87941719ef39f66c934eb572978e1a` (PR #243 병합 커밋) |
+| 태그 | `deploy/2026-09-28-service-identity-deploy2-r2` → 같은 SHA (remote ref API 확인) |
+| 1차 시도 태그 | `deploy/2026-09-28-service-identity-deploy2` = `46e5d14b8` — **이동·재사용 0** |
+| 실행 경로 | main 정본 `deploy-api.yml` · `workflow_dispatch` · `migrate_only=true` · `expected_sha` 일치. 별도 workflow 0 |
+| run | `36437441255` (dispatch 14:37:57Z · ref = 태그 · sha = `c5a3db0cd`) |
+| 실행된 step | preflight → build/push → **Run database migrations** → Migrate-only stop |
+| skip 된 step | **Deploy to Cloud Run · Refresh one-off job images · Verify deployment** |
+| execution | `o4o-api-migrations-bjx24` 14:42:32Z · succeeded 1 · failed 0 · `exit(0)` |
+
+실행 전/후 판정 (Job 로그 실측):
+
+```text
+PRE   CLASSIFICATION = LEGACY_ESTABLISHED · typeorm_migrations 689 rows
+      legacy history fingerprint MATCH · o4o_schema_baselines absent
+      CURRENT_INCREMENTAL_PREFIX = 5 / 9 · INCREMENTAL_PENDING = 4
+      LIVE = EXPECTED = 6503cfb6… (5793 lines) → PRE_MIGRATION_SCHEMA_ASSERTION = PASS
+      BOOTSTRAP_EXECUTION = SKIPPED · HISTORICAL_REPLAY = ZERO
+RUN   INCREMENTAL_EXECUTED = 4 (순서대로 · 각 1회)
+        1. CreateCommunityDomain1790400000000
+        2. CreateBranchCreationRequests1790400000001
+        3. CreateServiceSessionRevocations1790400000002
+        4. AlterHandoffTokensSourceSessionEpoch1790400000003
+POST  LIVE = EXPECTED = 7fdd328f… (5895 lines) · EXPECTED_SCHEMA_STATE = …SourceSessionEpoch1790400000003
+      POST_MIGRATION_SCHEMA_ASSERTION = PASS · MIGRATION_JOB = SUCCESS
+```
+
+- **예상하지 않은 migration 0** — pending 목록 4건과 실행 4건이 같고, 그 밖의 실행 기록이 없다.
+- **기존 history 훼손 0** — legacy history fingerprint 가 실행 전 MATCH 이고, 지문이 state 9 expected 와 정확히 일치한다(fingerprint 는 스키마 전체를 본다). `typeorm_migrations` 행 수는 689 + 4 가 되어야 하며, 행 수 직접 질의는 하지 않았다(운영 DB read 채널 부재 — 아래).
+- 적용된 것: 새 테이블 5(`communities` · `community_creation_requests` · `community_memberships` · `branch_creation_requests` · `service_session_revocations`) · index 9 · `handoff_tokens.source_session_epoch integer` **nullable** 1. 전부 additive — 서빙 중인 배포 1 코드와 호환.
+
+운영 불변 확인 (실행 전 → 후):
+
+| 항목 | before | after |
+|---|---|---|
+| API traffic | `o4o-core-api-03756-txs` 100% | **동일** |
+| latestReady / latestCreated revision | `03756-txs` / `03756-txs` | **동일** → 새 revision 생성 **0** |
+| migration Job image | `api-server:2edfe9b336a44c…` | `api-server@sha256:62a4aaa93eea895faa689787f7ad9f7e2dbbc3d92e886d293926bc72881fabdb` (migrate-only 설계상 허용) |
+| `DEPLOY_ENABLED` | `false` | `false` (07:19:34Z 이후 불변) |
+| Web · Admin · Store 배포 | — | **0** |
+| 역할 부여 · 애플리케이션 데이터 write | — | **0** |
+
+- PR #243 병합 push run `36435507679` 은 `deploy-hold-notice: success` / `build-and-deploy: skipped` — **병합 자체로 인한 운영 변화 0**.
+- 이미지에는 배포 2 범위 밖 병렬 API 변경(`69e1c5aa8` · `773d6c54c` · 병원약국 `hospital-drug-{surface,composite}`)이 함께 들어 있으나, Job 은 `node dist/migrate.js` 만 실행하고 revision 을 만들지 않으므로 **그 코드는 실행되지 않았고 서빙되지 않는다**(§8-7-1 재확인 항목).
+
+**공식 승격 CLI dry-run = 미실행 (차단).**
+
+| 확인 | 결과 |
+|---|---|
+| 정본 경로 (`SETUP.md`) | 로컬 `npx tsx src/scripts/community-catalog-promotion.ts` + Cloud SQL Auth Proxy v2 |
+| proxy 바이너리 | 메인 체크아웃에 있음 (`o4o-platform/bin/cloud-sql-proxy-v2.exe`) — 이 worktree 에는 없음 |
+| **ADC** | **부재** (`application_default_credentials.json` 없음). 프록시는 ADC 를 쓴다 → 접속 불가 |
+| Cloud Run Job 대안 | 불가 — 이 CLI 는 tsup entry 9개에 없어 **운영 이미지에 들어 있지 않다**. 넣으려면 코드·빌드 변경 + 새 Job 생성이 필요하므로 하지 않았다 |
+| 우회 | 하지 않았다 — `ALLOW_REMOTE_DB` 직접 접속(자격정보 취급) · CLI 재작성 · 별도 실행 경로 모두 금지 범위 |
+
+→ 필요한 사용자 조작 1건: `gcloud auth application-default login` (브라우저 로그인이라 대신 수행할 수 없다).
+그 뒤 프록시를 띄우고 위 명령으로 dry-run 한다. **`--apply` 는 미승인.**
+§8-0 U1 의 "2행 · 1명" 은 여전히 **예상치**이며, 공식 dry-run 수치(`would_insert` · `distinct_target_users` 포함)로만 판단한다.
 
 ---
 
