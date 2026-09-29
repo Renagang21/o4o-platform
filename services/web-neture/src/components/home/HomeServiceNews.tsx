@@ -30,13 +30,22 @@ const SHORTCUT =
 interface HomeServiceNewsProps {
   /** 로그인 후 HomeEntryPanel 안에서는 섹션 간격을 패널 규칙에 맞추고, 로그인 전에는 독립 블록으로 둔다 */
   className?: string;
+  /**
+   * 글이 있을 때만 섹션을 그린다 — WO-O4O-NETURE-PUBLIC-HOME-IA-REFRESH-V1 (로그인 전 공개 홈).
+   *   첫 로딩 중        : 그리지 않는다(빈 자리를 먼저 차지하지 않는다 — "0건" 이라고 말하지도 않는다)
+   *   0건으로 확정       : 그리지 않는다
+   *   오류              : 그대로 보인다(재시도 가능 — "글 없음" 과 구분)
+   */
+  hideWhenEmpty?: boolean;
 }
 
-export default function HomeServiceNews({ className = '' }: HomeServiceNewsProps) {
+export default function HomeServiceNews({ className = '', hideWhenEmpty = false }: HomeServiceNewsProps) {
   const { data, loading, error, reload } = useHomeNews();
   const forum = data?.forum ?? null;
   const posts = data?.posts ?? [];
   const viewAllHref = forum ? forumListPath(forum) : '/forum';
+
+  if (hideWhenEmpty && !error && posts.length === 0) return null;
 
   return (
     <section className={className} aria-labelledby="home-service-news-title" data-testid="home-service-news">

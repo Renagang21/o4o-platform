@@ -13,6 +13,20 @@ import { X } from 'lucide-react';
 import { GoogleContinue } from '@o4o/auth-react';
 import { useAuth } from '../contexts';
 import type { User } from '../contexts/AuthContext';
+import { CURRENT_HOST_PROFILE, type HostProfile } from '../lib/hostProfile';
+
+/**
+ * 모달 보조 문구 — WO-O4O-NETURE-PUBLIC-HOME-IA-REFRESH-V1.
+ * 이 모달은 대표 호스트(neture.co.kr = O4O 대표 진입)와 supplier · funding · community 호스트가 함께 쓴다.
+ * 계정은 호스트와 무관하게 하나(Google)이므로 제목은 「O4O 로그인」, 보조 문구만 호스트별로 둔다.
+ * 종전 「Neture 로그인 · 공급자 연결 서비스」 는 대표 홈에서 O4O 전체 진입과 맞지 않았다.
+ */
+const LOGIN_SUBTITLE: Readonly<Record<HostProfile, string>> = {
+  main: 'O4O 서비스 통합 로그인',
+  supplier: '공급자 서비스',
+  funding: '유통참여형 펀딩',
+  community: '커뮤니티',
+};
 
 // WO-O4O-CROSSSERVICE-PRODUCTION-RESIDUAL-404-AUTH-AND-LEGAL-CLEANUP-V1:
 //   App.tsx 의 동명 상수와 같은 값. App 이 LoginModal 을 import 하므로 역방향 import 는
@@ -84,8 +98,8 @@ export default function LoginModal({ isOpen, onClose, returnUrl }: LoginModalPro
           <div className="flex items-center gap-3">
             <span className="text-2xl">🌿</span>
             <div>
-              <h2 className="text-lg font-bold text-gray-900">Neture 로그인</h2>
-              <p className="text-xs text-gray-500">공급자 연결 서비스</p>
+              <h2 className="text-lg font-bold text-gray-900">O4O 로그인</h2>
+              <p className="text-xs text-gray-500">{LOGIN_SUBTITLE[CURRENT_HOST_PROFILE]}</p>
             </div>
           </div>
           <button

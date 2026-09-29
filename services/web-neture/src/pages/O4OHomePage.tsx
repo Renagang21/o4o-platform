@@ -36,12 +36,20 @@
  *   입력(파일 첨부: 이미지 · PDF · DOCX · TXT/MD · XLSX/XLS/CSV — 같은 파이프라인 / 내 PC 자료 연결: PHASE 3 자리).
  *   첨부는 이번 요청에서만 쓰고 저장하지 않는다. `/home-chat` · `/work-agent/run` 클라이언트는 그대로 두었다(회귀 금지).
  *
+ * WO-O4O-NETURE-PUBLIC-HOME-IA-REFRESH-V1:
+ *   로그인 전과 후의 역할을 나눴다. 위 "검색엔진 초기 화면형 · 로그인 전 pill" 설명은 로그인 후 화면에만 남는다.
+ *     로그인 전 = O4O 이해 → 서비스 발견 → Google 로 시작
+ *       O4O 소개 · [Google로 시작] → 주요 서비스(약국 · 리테일 · 공급자, 설명형) → O4O AI(같은 Composer)
+ *       → 참여 · 학습(커뮤니티 · O4O 강의 · 유통참여형 펀딩, 보조) → 서비스 소식(글이 있을 때만)
+ *     로그인 후 = AI + 내 업무 시작 — 워드마크 · Composer · HomeEntryPanel 그대로
+ *   Composer 는 하나(composerArea)이고 위치만 다르다. 첫 사용 안내는 로그인 후에만.
+ *
  * Neture 전용 chrome(NetureGlobalHeader / Footer / NetureBottomNav)은 쓰지 않는다 —
  * `/` 는 App.tsx 에서 NetureLayout 밖에 배치되어 있고, 기존 Neture 영역
  * (`/community`, `/mypage`, `/market-trial` 등)은 NetureLayout 을 그대로 유지한다.
  */
 
-import { useEffect, useRef, useState, type ClipboardEvent, type DragEvent, type FormEvent } from 'react';
+import { useEffect, useRef, useState, type ClipboardEvent, type DragEvent, type FormEvent, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { UserCircle, Loader2, ArrowUp, Plus, Paperclip, HardDrive, FileText, Image as ImageIcon, Table2, X, LogOut, ChevronDown } from 'lucide-react';
 import { useAuth, useLoginModal, useWorkScope } from '../contexts';
@@ -72,38 +80,97 @@ import { HOST_ORIGIN } from '../lib/hostProfile';
 // pharmacyhub.co.kr)는 인쇄 QR 보존용으로 살아 있을 뿐 대표 홈의 진입 경로가 아니다.
 // '약국 경영'(PharmacyHub)은 약국 서비스에 흡수 · 신규 가입 서비스로 노출하지 않아 제거.
 // 병원약국(/hospital)은 O4O 서비스 진입과 분리된 전문 서비스라 여기 두지 않는다.
-// 로그인 후에는 이 pill 대신 HomeEntryPanel(접근 가능한 기능 · 세션 인계 이동)을 보여준다.
+// 로그인 후에는 이 목록 대신 HomeEntryPanel(접근 가능한 기능 · 세션 인계 이동)을 보여준다.
 
-interface HomeEntry {
+//
+// WO-O4O-NETURE-PUBLIC-HOME-IA-REFRESH-V1: 서비스를 같은 위계로 나열하지 않는다.
+//   주요 서비스(가입 · 업무)  약국 · 리테일 · 공급자 — 설명형 진입
+//   참여 · 학습              커뮤니티 · O4O 강의 · 유통참여형 펀딩 — 보조 진입
+// 대표 홈의 분류명은 「리테일」 이다(서비스 내부 브랜드는 바꾸지 않는다). 내 매장(store.neture.co.kr)은
+// 가입 서비스가 아니라 로그인 후 업무 공간이라 여기 두지 않는다(로그인 후 HomeEntryPanel 이 진입을 만든다).
+// 문구는 현재 제공 기능만 말한다 — 모집 여부 · 강좌 수 같은 동적 사실을 정적 문구로 박지 않는다.
+
+interface HomeService {
   label: string;
+  description: string;
   href: string;
-  external?: boolean;
 }
 
-const ENTRIES: HomeEntry[] = [
-  { label: '약국', href: 'https://pharmacy.neture.co.kr/', external: true },
-  { label: '화장품', href: 'https://retail.neture.co.kr/', external: true },
-  // WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1: 공개 Partner 진입 pill 은퇴.
-  { label: '공급자', href: HOST_ORIGIN.supplier, external: true },
-  { label: '커뮤니티', href: HOST_ORIGIN.community, external: true },
+const PRIMARY_SERVICES: readonly HomeService[] = [
+  { label: '약국', description: '약사와 약국을 위한 커뮤니티와 매장 지원 서비스', href: 'https://pharmacy.neture.co.kr/' },
+  { label: '리테일', description: '전문매장을 위한 매장 콘텐츠와 운영 지원 서비스', href: 'https://retail.neture.co.kr/' },
+  // WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1: 공개 Partner 진입은 은퇴.
+  { label: '공급자', description: '제품과 콘텐츠를 등록해 매장에 공급하는 공급자 업무 공간', href: HOST_ORIGIN.supplier },
 ];
 
-const PILL_CLASS =
-  'rounded-full border border-slate-200 bg-white px-4 py-2 text-sm text-slate-700 no-underline ' +
-  'transition-colors hover:border-slate-400 hover:text-slate-900';
+const PARTICIPATION_SERVICES: readonly HomeService[] = [
+  { label: '커뮤니티', description: '직역·관심 단위로 정보와 경험을 나누는 공간', href: HOST_ORIGIN.community },
+  { label: 'O4O 강의', description: '강의 · 학습 서비스', href: 'https://study.neture.co.kr' },
+  { label: '유통참여형 펀딩', description: '매장이 신제품 유통에 함께 참여하는 방식', href: HOST_ORIGIN.funding },
+];
 
-function EntryPill({ entry }: { entry: HomeEntry }) {
-  if (entry.external) {
-    return (
-      <a href={entry.href} target="_blank" rel="noopener noreferrer" className={PILL_CLASS}>
-        {entry.label}
-      </a>
-    );
-  }
+/** 다른 서비스(서브도메인)로 가는 공개 링크 — 대표 홈은 그대로 두고 새 탭에서 연다. */
+function ExternalLink({ href, className, children }: { href: string; className: string; children: ReactNode }) {
   return (
-    <Link to={entry.href} className={PILL_CLASS}>
-      {entry.label}
-    </Link>
+    <a href={href} target="_blank" rel="noopener noreferrer" className={className}>
+      {children}
+    </a>
+  );
+}
+
+/**
+ * 주요 서비스 — 로그인 전 화면과 로그인 후 개인화 조회 실패 시 공개 안내에 같이 쓴다.
+ * 모바일은 1열(세로), sm 이상은 3열. 이미지 없이 이름 · 한 줄 설명 · 진입으로 완결된다.
+ */
+function PrimaryServices() {
+  return (
+    <section aria-labelledby="home-primary-services-title" className="w-full max-w-3xl">
+      <h2 id="home-primary-services-title" className="m-0 text-center text-lg font-semibold text-slate-900">
+        서비스를 찾으세요
+      </h2>
+      <nav aria-label="주요 서비스" className="mt-5">
+        <ul className="m-0 grid list-none gap-3 p-0 sm:grid-cols-3">
+          {PRIMARY_SERVICES.map((s) => (
+            <li key={s.href}>
+              <ExternalLink
+                href={s.href}
+                className="flex h-full flex-col rounded-2xl border border-slate-200 bg-white px-5 py-4 text-left no-underline transition-colors hover:border-slate-400"
+              >
+                <span className="text-base font-semibold text-slate-900">{s.label}</span>
+                <span className="mt-1 flex-1 text-sm leading-relaxed text-slate-500">{s.description}</span>
+                <span className="mt-3 text-sm text-slate-700">서비스 보기 →</span>
+              </ExternalLink>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    </section>
+  );
+}
+
+/** 참여 · 학습 — 주요 서비스보다 낮은 위계의 보조 진입(카드 없이 이름 + 짧은 설명). */
+function ParticipationServices({ className = '' }: { className?: string }) {
+  return (
+    <section aria-labelledby="home-participation-title" className={`w-full max-w-3xl ${className}`}>
+      <h2 id="home-participation-title" className="m-0 text-center text-xs font-medium uppercase tracking-wide text-slate-400">
+        참여 · 학습
+      </h2>
+      <nav aria-label="참여 · 학습">
+        <ul className="m-0 mt-3 grid list-none gap-2 p-0 sm:grid-cols-3">
+          {PARTICIPATION_SERVICES.map((s) => (
+            <li key={s.href}>
+              <ExternalLink
+                href={s.href}
+                className="block rounded-xl px-3 py-2 text-center no-underline transition-colors hover:bg-slate-50"
+              >
+                <span className="block text-sm font-medium text-slate-800">{s.label}</span>
+                <span className="block text-xs text-slate-500">{s.description}</span>
+              </ExternalLink>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    </section>
   );
 }
 
@@ -115,7 +182,7 @@ const AUTOMATION_INTRO_SEEN_KEY = 'neture:automation:intro-seen:v1';
 
 export default function O4OHomePage() {
   const { user, isAuthenticated, isLoading: authLoading, logout } = useAuth();
-  const { openLoginModal, openRegisterModal } = useLoginModal();
+  const { openLoginModal } = useLoginModal();
   // WO-O4O-NETURE-UNIFIED-ENTRY-UI-PHASE1-V1 — 로그인 후에만 조회. 실패는 미가입이 아니라 오류로 보여준다.
   const entry = useHomeEntry(isAuthenticated && !!user);
   // Phase 3 연결점 — 현재 업무 컨텍스트를 그대로 AI 요청에 싣는다.
@@ -324,11 +391,290 @@ export default function O4OHomePage() {
   const hasThread = question !== null || answer !== null || error !== null || workResult !== null || confirm !== null;
   const ATTACH_ICON = { image: ImageIcon, document: FileText, spreadsheet: Table2 } as const;
 
+  // FIRST_USE_GUIDANCE — 로그인 후에만 보인다(로그인 전에는 O4O 소개 · 서비스 발견을 가리지 않는다).
+  const introBanner = isAuthenticated && user ? (
+    <>
+      {/*
+        FIRST_USE_GUIDANCE — WO-O4O-COMMON-AUTOMATION-CORE-USER-COLLABORATION-AND-QUESTION-FLOW-V1 §2·§4·§6.
+        첫 사용 시 한 번만·가볍게. 목표만 적으면 된다는 점, 진행 중 짧게 물어볼 수 있다는 점(질문=정상)만 알린다.
+        사이트/PC/파일 유형 선택 · 모델/도구/제공자 선택 UI 를 두지 않는다. Composer 는 그대로.
+      */}
+      {!introSeen && (
+        <div
+          data-testid="automation-intro"
+          className="mt-4 w-full max-w-xl rounded-2xl border border-slate-200 bg-slate-50/80 px-4 py-3 text-left text-sm text-slate-600"
+        >
+          <div className="flex items-start justify-between gap-3">
+            <p className="m-0 leading-relaxed">
+              하고 싶은 일을 한 문장으로 적어 주세요. O4O 가 할 수 있는 데까지 진행하고,
+              더 필요한 정보가 있으면 <span className="font-medium text-slate-800">짧게 물어봅니다</span> — 질문은 정상 진행이에요.
+            </p>
+            <button
+              type="button"
+              onClick={dismissIntro}
+              aria-label="안내 닫기"
+              data-testid="automation-intro-dismiss"
+              className="-mr-1 -mt-1 flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-slate-400 transition-colors hover:bg-slate-200 hover:text-slate-700"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+      )}
+    </>
+  ) : null;
+
+  // AI Composer 는 하나다 — 로그인 전후로 **위치만** 다르다(복제하지 않는다).
+  const composerArea = (
+    <>
+      {/*
+        AI 입력 — WO-O4O-AI-COMPOSER-UNIFIED-REQUEST-AND-ATTACHMENT-UX-V1 §3·§8·§9.
+        [＋] 자료 입력 · 입력창 · [↑] 하나. 요청 유형을 고르는 버튼 · 모드 스위치는 없다. 단일 행 입력이라 Enter 가 곧 submit.
+        PC · 모바일 같은 구조 — 공간만 tailwind 반응형으로 줄어든다.
+      */}
+      <form
+        onSubmit={handleSubmit}
+        onDragOver={(e) => {
+          e.preventDefault();
+          if (!pending) setDragOver(true);
+        }}
+        onDragLeave={() => setDragOver(false)}
+        onDrop={handleDrop}
+        className="mt-5 w-full max-w-xl"
+        data-testid="home-composer"
+      >
+        <div className={`relative rounded-full transition-shadow ${dragOver ? 'ring-2 ring-slate-400' : ''}`}>
+          {/* ＋ 범용 자료 입력 진입점 — 파일 첨부 · 내 PC 자료 연결 */}
+          <div ref={plusMenuRef} className="absolute left-2 top-1/2 -translate-y-1/2">
+            <button
+              type="button"
+              onClick={() => setPlusMenuOpen((v) => !v)}
+              disabled={pending}
+              aria-label="자료 추가"
+              aria-haspopup="menu"
+              aria-expanded={plusMenuOpen}
+              title="파일 첨부 · 내 PC 자료 연결"
+              data-testid="home-composer-plus"
+              className="flex h-9 w-9 items-center justify-center rounded-full text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900 disabled:cursor-not-allowed disabled:text-slate-300"
+            >
+              <Plus className="h-5 w-5" />
+            </button>
+            {plusMenuOpen && (
+              <div role="menu" data-testid="home-composer-plus-menu" className="absolute left-0 top-11 z-40 w-64 rounded-xl border border-slate-200 bg-white py-1 text-left shadow-lg">
+                <button
+                  type="button"
+                  role="menuitem"
+                  onClick={() => {
+                    setPlusMenuOpen(false);
+                    fileInputRef.current?.click();
+                  }}
+                  className="flex w-full items-start gap-2.5 px-3 py-2 text-left hover:bg-slate-50"
+                >
+                  <Paperclip className="mt-0.5 h-4 w-4 shrink-0 text-slate-500" />
+                  <span>
+                    <span className="block text-sm text-slate-900">파일 첨부</span>
+                    <span className="block text-xs text-slate-500">이미지 · PDF · DOCX · TXT/MD · XLSX/XLS/CSV — 이번 요청에서만 사용</span>
+                  </span>
+                </button>
+                {/* PHASE 3 Local Data Source 진입 자리(§3). 반복 사용 자료 연결은 별도 계약 — 여기서는 구분만 보여준다. */}
+                <button
+                  type="button"
+                  role="menuitem"
+                  aria-disabled="true"
+                  onClick={() => {
+                    setPlusMenuOpen(false);
+                    setAttachError('내 PC 자료 연결(반복 사용 자료)은 준비 중입니다. 지금은 [파일 첨부]로 이번 요청에 사용할 수 있습니다.');
+                  }}
+                  className="flex w-full items-start gap-2.5 px-3 py-2 text-left hover:bg-slate-50"
+                >
+                  <HardDrive className="mt-0.5 h-4 w-4 shrink-0 text-slate-400" />
+                  <span>
+                    <span className="block text-sm text-slate-500">내 PC 자료 연결</span>
+                    <span className="block text-xs text-slate-400">원내 약품 목록 · 재고 · 가격표처럼 반복해서 쓰는 자료 — 준비 중</span>
+                  </span>
+                </button>
+              </div>
+            )}
+          </div>
+          <input
+            type="text"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            maxLength={HOME_CHAT_MAX_MESSAGE_LENGTH}
+            disabled={pending}
+            onPaste={handlePaste}
+            aria-label="무엇을 도와드릴까요?"
+            placeholder="무엇을 도와드릴까요?"
+            data-testid="home-composer-input"
+            className="w-full rounded-full border border-slate-200 bg-white py-4 pl-14 pr-14 text-base text-slate-900 shadow-sm outline-none transition-colors placeholder:text-slate-400 focus:border-slate-400 disabled:bg-slate-50 disabled:text-slate-400"
+          />
+          {/* 사용자가 고른 파일만 처리한다. 형식은 탐색기에서 고른다 — 종류별 메뉴를 두지 않는다(§3). */}
+          <input
+            ref={fileInputRef}
+            type="file"
+            multiple
+            accept={UNIFIED_ATTACHMENT_ACCEPT}
+            className="hidden"
+            data-testid="home-composer-file"
+            onChange={(e) => {
+              takeFiles(Array.from(e.target.files ?? []));
+              e.target.value = '';
+            }}
+          />
+          <button
+            type="submit"
+            disabled={!trimmed || blocked}
+            aria-label="요청 실행"
+            title="요청 실행"
+            data-testid="home-composer-submit"
+            className="absolute right-2 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-slate-900 text-white transition-opacity hover:opacity-80 disabled:cursor-not-allowed disabled:bg-slate-200"
+          >
+            {pending ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArrowUp className="h-4 w-4" />}
+          </button>
+        </div>
+      </form>
+
+      {/* 첨부 chip — 종류별 아이콘 하나로 같은 목록. 제거만 가능. */}
+      {attachments.length > 0 && (
+        <ul className="mt-2 flex w-full max-w-xl flex-wrap gap-1.5" data-testid="home-composer-attachments">
+          {attachments.map((a) => {
+            const Icon = ATTACH_ICON[a.kind];
+            return (
+              <li key={a.id} className="flex max-w-full items-center gap-1.5 rounded-full border border-slate-200 bg-slate-50 py-1 pl-2.5 pr-1 text-xs text-slate-700">
+                <Icon className="h-3.5 w-3.5 shrink-0 text-slate-500" />
+                <span className="truncate">{a.name}</span>
+                <button
+                  type="button"
+                  onClick={() => setAttachments((cur) => cur.filter((x) => x.id !== a.id))}
+                  disabled={pending}
+                  aria-label={`${a.name} 제거`}
+                  className="rounded-full p-0.5 text-slate-400 hover:text-slate-700 disabled:cursor-not-allowed"
+                >
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              </li>
+            );
+          })}
+          <li className="self-center text-xs text-slate-400">이번 요청에서만 사용 · 저장되지 않음</li>
+        </ul>
+      )}
+      {attachError && (
+        <p className="mt-2 w-full max-w-xl rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-800" role="status" data-testid="home-composer-attach-error">
+          {attachError}
+          <span className="sr-only"> 지원 형식: {UNIFIED_ATTACHMENT_EXTENSIONS.join(', ')}</span>
+        </p>
+      )}
+
+      {/*
+        답변 영역 — 있을 때만 렌더한다. 항상 존재하는 빈 컨테이너를 두면
+        justify-center 때문에 대기 상태에서 워드마크가 밀린다.
+        Markdown 렌더러는 web-neture 에 없으므로(의존성 추가 금지) 줄 단위 문단으로 표시한다.
+      */}
+      {hasThread && (
+        <div className="mt-6 w-full max-w-xl text-left">
+          {question && (
+            <p className="m-0 mb-3 text-sm font-medium text-slate-500">{question}</p>
+          )}
+          {pending && (
+            <p className="m-0 flex items-center gap-2 text-sm text-slate-400" data-testid="home-composer-pending">
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              처리 중... (화면에서 작업이 필요하면 열려 있는 화면을 그대로 두세요)
+            </p>
+          )}
+          {/* 서버가 "작업인지 모호" 로 되물은 경우 — 실행하지 않았다. [진행] 은 같은 문장을 다시 보낸다(§5-2). */}
+          {confirm && !pending && (
+            <div className="rounded-2xl border border-slate-200 bg-white px-5 py-4 text-sm text-slate-700" data-testid="home-composer-confirm">
+              <p className="m-0">{confirm.message}</p>
+              <div className="mt-3 flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => void submit(confirm.text, 'work')}
+                  className="rounded-full bg-slate-900 px-4 py-2 text-sm text-white transition-opacity hover:opacity-80"
+                >
+                  진행
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setConfirm(null)}
+                  className="rounded-full border border-slate-300 px-4 py-2 text-sm text-slate-700 transition-colors hover:border-slate-500"
+                >
+                  아니요, 질문을 고칠게요
+                </button>
+              </div>
+            </div>
+          )}
+          {/* WO-O4O-GOAL-DRIVEN-MULTIMODAL-WORK-AGENT-V0 §19·§20 — 결과와 인계 안내. 실제 화면은 Chrome/프로그램에 그대로 있다. */}
+          {workResult && !pending && (
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4 text-[0.95rem] leading-relaxed text-slate-800" data-testid="home-composer-work-result">
+              <p className="m-0 whitespace-pre-wrap">{workResult.message}</p>
+              <p className="m-0 mt-2 text-xs text-slate-500">
+                {workResult.goal.displayName} · 행동 {workResult.stepCount}단계 · AI 판단 {workResult.aiPlanCount}회
+                {workResult.takeover ? ` · 인계 사유 ${workResult.takeover.reason}` : ''}
+                {workResult.path ? ` · 현재 경로 ${workResult.path}` : ''}
+              </p>
+              {workResult.progress === 'needs_user' && !workResult.resumable && (
+                <p className="m-0 mt-2 text-sm text-slate-700">
+                  {workResult.target?.targetType === 'windows_app'
+                    ? '프로그램의 현재 화면에서 직접 이어서 진행하세요.'
+                    : 'Chrome 의 현재 화면에서 직접 이어서 진행하세요.'}{' '}
+                  필요하면 다음 문장으로 다시 요청할 수 있습니다.
+                </p>
+              )}
+              {workResult.resumable && (
+                <p className="m-0 mt-2 text-sm text-slate-700">답을 입력하면 같은 작업을 이어서 진행합니다.</p>
+              )}
+            </div>
+          )}
+          {error && !pending && (
+            <p className="m-0 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>
+          )}
+          {answer && !pending && (
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4 text-[0.95rem] leading-relaxed text-slate-800">
+              {answer.split('\n').map((line, i) => (
+                <p key={i} className="m-0 whitespace-pre-wrap">
+                  {line || <br />}
+                </p>
+              ))}
+              {attachmentsUsed.length > 0 && (
+                <p className="m-0 mt-3 text-xs text-slate-500">
+                  참고한 첨부:{' '}
+                  {attachmentsUsed.map((a) => `${a.name}${a.readable ? '' : '(읽지 못함)'}`).join(' · ')}
+                </p>
+              )}
+            </div>
+          )}
+          {/* WO-O4O-BROWSER-CONTROL-V0 §19 — 사이트가 열렸을 때만. 로그인은 사용자가 직접 한다. */}
+          {openedSite && !pending && (
+            <div className="mt-3 rounded-2xl border border-slate-200 bg-white px-5 py-4 text-sm text-slate-700">
+              {loginReady ? (
+                <p className="m-0">로그인 완료를 확인했습니다.</p>
+              ) : (
+                <>
+                  <p className="m-0">{openedSite.displayName} 사이트를 열었습니다.</p>
+                  <p className="m-0 mt-1 text-slate-500">
+                    로그인이 필요한 경우 사이트에서 직접 로그인해 주세요. 이미 로그인되어 있으면 바로 눌러 주세요.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setLoginReady(true)}
+                    className="mt-3 rounded-full bg-slate-900 px-4 py-2 text-sm text-white transition-opacity hover:opacity-80"
+                  >
+                    로그인 완료
+                  </button>
+                </>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+    </>
+  );
+
   return (
     <div className="flex min-h-screen flex-col bg-white">
       {/* 최소 계정 영역만. 상단 navigation·서비스 메뉴바 없음.
           WO-O4O-NETURE-MAIN-ACCOUNT-AND-SUPPLIER-PARTNER-SERVICE-SEPARATION-V1 §4:
-          로그인 전 = 로그인 · 회원가입(기존 모달) / 로그인 후 = 이름 · 계정 메뉴(내 정보 · O4O 로그아웃).
+          로그인 전 = 로그인 하나(Google — 가입 겸용) / 로그인 후 = 이름 · 계정 메뉴(내 정보 · O4O 로그아웃).
           모바일도 같은 메뉴(작은 계정 메뉴). */}
       <div className="flex justify-end px-4 py-4 text-sm sm:px-6">
         {isAuthenticated && user ? (
@@ -379,303 +725,30 @@ export default function O4OHomePage() {
             )}
           </div>
         ) : (
-          <div className="flex items-center gap-3">
-            <button
-              type="button"
-              onClick={() => openLoginModal()}
-              className="flex items-center gap-1.5 text-slate-600 hover:text-slate-900"
-            >
-              <UserCircle className="h-5 w-5" />
-              <span>로그인</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => openRegisterModal()}
-              className="rounded-md border border-slate-300 px-2.5 py-1 text-slate-700 hover:bg-slate-50"
-            >
-              회원가입
-            </button>
-          </div>
+          // 로그인 · 회원가입은 같은 Google 흐름이다(미등록 계정은 약관 동의 → 가입) — 버튼 하나.
+          <button
+            type="button"
+            onClick={() => openLoginModal()}
+            data-testid="home-login-button"
+            className="flex items-center gap-1.5 text-slate-600 hover:text-slate-900"
+          >
+            <UserCircle className="h-5 w-5" />
+            <span>로그인</span>
+          </button>
         )}
       </div>
 
-      {/* 중앙 집중 — 워드마크 / 안내 / 입력 / 진입 배너 */}
-      <main className="flex flex-1 flex-col items-center justify-center px-4 pb-24">
-        <h1 className="m-0 text-5xl font-semibold tracking-tight text-slate-900 sm:text-6xl">O4O</h1>
+      {isAuthenticated && user ? (
+        /* 로그인 후 = AI + 내 업무 시작 (WO-O4O-NETURE-PUBLIC-HOME-IA-REFRESH-V1 — 구조 불변) */
+        <main className="flex flex-1 flex-col items-center justify-center px-4 pb-24">
+          <h1 className="m-0 text-5xl font-semibold tracking-tight text-slate-900 sm:text-6xl">O4O</h1>
 
-        <p className="mt-6 mb-0 text-base text-slate-500">무엇을 도와드릴까요?</p>
+          <p className="mt-6 mb-0 text-base text-slate-500">무엇을 도와드릴까요?</p>
 
-        {/*
-          FIRST_USE_GUIDANCE — WO-O4O-COMMON-AUTOMATION-CORE-USER-COLLABORATION-AND-QUESTION-FLOW-V1 §2·§4·§6.
-          첫 사용 시 한 번만·가볍게. 목표만 적으면 된다는 점, 진행 중 짧게 물어볼 수 있다는 점(질문=정상)만 알린다.
-          사이트/PC/파일 유형 선택 · 모델/도구/제공자 선택 UI 를 두지 않는다. Composer 는 그대로.
-        */}
-        {!introSeen && (
-          <div
-            data-testid="automation-intro"
-            className="mt-4 w-full max-w-xl rounded-2xl border border-slate-200 bg-slate-50/80 px-4 py-3 text-left text-sm text-slate-600"
-          >
-            <div className="flex items-start justify-between gap-3">
-              <p className="m-0 leading-relaxed">
-                하고 싶은 일을 한 문장으로 적어 주세요. O4O 가 할 수 있는 데까지 진행하고,
-                더 필요한 정보가 있으면 <span className="font-medium text-slate-800">짧게 물어봅니다</span> — 질문은 정상 진행이에요.
-              </p>
-              <button
-                type="button"
-                onClick={dismissIntro}
-                aria-label="안내 닫기"
-                data-testid="automation-intro-dismiss"
-                className="-mr-1 -mt-1 flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-slate-400 transition-colors hover:bg-slate-200 hover:text-slate-700"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            </div>
-          </div>
-        )}
+          {introBanner}
+          {composerArea}
 
-        {/*
-          AI 입력 — WO-O4O-AI-COMPOSER-UNIFIED-REQUEST-AND-ATTACHMENT-UX-V1 §3·§8·§9.
-          [＋] 자료 입력 · 입력창 · [↑] 하나. 요청 유형을 고르는 버튼 · 모드 스위치는 없다. 단일 행 입력이라 Enter 가 곧 submit.
-          PC · 모바일 같은 구조 — 공간만 tailwind 반응형으로 줄어든다.
-        */}
-        <form
-          onSubmit={handleSubmit}
-          onDragOver={(e) => {
-            e.preventDefault();
-            if (!pending) setDragOver(true);
-          }}
-          onDragLeave={() => setDragOver(false)}
-          onDrop={handleDrop}
-          className="mt-5 w-full max-w-xl"
-          data-testid="home-composer"
-        >
-          <div className={`relative rounded-full transition-shadow ${dragOver ? 'ring-2 ring-slate-400' : ''}`}>
-            {/* ＋ 범용 자료 입력 진입점 — 파일 첨부 · 내 PC 자료 연결 */}
-            <div ref={plusMenuRef} className="absolute left-2 top-1/2 -translate-y-1/2">
-              <button
-                type="button"
-                onClick={() => setPlusMenuOpen((v) => !v)}
-                disabled={pending}
-                aria-label="자료 추가"
-                aria-haspopup="menu"
-                aria-expanded={plusMenuOpen}
-                title="파일 첨부 · 내 PC 자료 연결"
-                data-testid="home-composer-plus"
-                className="flex h-9 w-9 items-center justify-center rounded-full text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900 disabled:cursor-not-allowed disabled:text-slate-300"
-              >
-                <Plus className="h-5 w-5" />
-              </button>
-              {plusMenuOpen && (
-                <div role="menu" data-testid="home-composer-plus-menu" className="absolute left-0 top-11 z-40 w-64 rounded-xl border border-slate-200 bg-white py-1 text-left shadow-lg">
-                  <button
-                    type="button"
-                    role="menuitem"
-                    onClick={() => {
-                      setPlusMenuOpen(false);
-                      fileInputRef.current?.click();
-                    }}
-                    className="flex w-full items-start gap-2.5 px-3 py-2 text-left hover:bg-slate-50"
-                  >
-                    <Paperclip className="mt-0.5 h-4 w-4 shrink-0 text-slate-500" />
-                    <span>
-                      <span className="block text-sm text-slate-900">파일 첨부</span>
-                      <span className="block text-xs text-slate-500">이미지 · PDF · DOCX · TXT/MD · XLSX/XLS/CSV — 이번 요청에서만 사용</span>
-                    </span>
-                  </button>
-                  {/* PHASE 3 Local Data Source 진입 자리(§3). 반복 사용 자료 연결은 별도 계약 — 여기서는 구분만 보여준다. */}
-                  <button
-                    type="button"
-                    role="menuitem"
-                    aria-disabled="true"
-                    onClick={() => {
-                      setPlusMenuOpen(false);
-                      setAttachError('내 PC 자료 연결(반복 사용 자료)은 준비 중입니다. 지금은 [파일 첨부]로 이번 요청에 사용할 수 있습니다.');
-                    }}
-                    className="flex w-full items-start gap-2.5 px-3 py-2 text-left hover:bg-slate-50"
-                  >
-                    <HardDrive className="mt-0.5 h-4 w-4 shrink-0 text-slate-400" />
-                    <span>
-                      <span className="block text-sm text-slate-500">내 PC 자료 연결</span>
-                      <span className="block text-xs text-slate-400">원내 약품 목록 · 재고 · 가격표처럼 반복해서 쓰는 자료 — 준비 중</span>
-                    </span>
-                  </button>
-                </div>
-              )}
-            </div>
-            <input
-              type="text"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              maxLength={HOME_CHAT_MAX_MESSAGE_LENGTH}
-              disabled={pending}
-              onPaste={handlePaste}
-              aria-label="무엇을 도와드릴까요?"
-              placeholder="무엇을 도와드릴까요?"
-              data-testid="home-composer-input"
-              className="w-full rounded-full border border-slate-200 bg-white py-4 pl-14 pr-14 text-base text-slate-900 shadow-sm outline-none transition-colors placeholder:text-slate-400 focus:border-slate-400 disabled:bg-slate-50 disabled:text-slate-400"
-            />
-            {/* 사용자가 고른 파일만 처리한다. 형식은 탐색기에서 고른다 — 종류별 메뉴를 두지 않는다(§3). */}
-            <input
-              ref={fileInputRef}
-              type="file"
-              multiple
-              accept={UNIFIED_ATTACHMENT_ACCEPT}
-              className="hidden"
-              data-testid="home-composer-file"
-              onChange={(e) => {
-                takeFiles(Array.from(e.target.files ?? []));
-                e.target.value = '';
-              }}
-            />
-            <button
-              type="submit"
-              disabled={!trimmed || blocked}
-              aria-label="요청 실행"
-              title="요청 실행"
-              data-testid="home-composer-submit"
-              className="absolute right-2 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-slate-900 text-white transition-opacity hover:opacity-80 disabled:cursor-not-allowed disabled:bg-slate-200"
-            >
-              {pending ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArrowUp className="h-4 w-4" />}
-            </button>
-          </div>
-        </form>
-
-        {/* 첨부 chip — 종류별 아이콘 하나로 같은 목록. 제거만 가능. */}
-        {attachments.length > 0 && (
-          <ul className="mt-2 flex w-full max-w-xl flex-wrap gap-1.5" data-testid="home-composer-attachments">
-            {attachments.map((a) => {
-              const Icon = ATTACH_ICON[a.kind];
-              return (
-                <li key={a.id} className="flex max-w-full items-center gap-1.5 rounded-full border border-slate-200 bg-slate-50 py-1 pl-2.5 pr-1 text-xs text-slate-700">
-                  <Icon className="h-3.5 w-3.5 shrink-0 text-slate-500" />
-                  <span className="truncate">{a.name}</span>
-                  <button
-                    type="button"
-                    onClick={() => setAttachments((cur) => cur.filter((x) => x.id !== a.id))}
-                    disabled={pending}
-                    aria-label={`${a.name} 제거`}
-                    className="rounded-full p-0.5 text-slate-400 hover:text-slate-700 disabled:cursor-not-allowed"
-                  >
-                    <X className="h-3.5 w-3.5" />
-                  </button>
-                </li>
-              );
-            })}
-            <li className="self-center text-xs text-slate-400">이번 요청에서만 사용 · 저장되지 않음</li>
-          </ul>
-        )}
-        {attachError && (
-          <p className="mt-2 w-full max-w-xl rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-800" role="status" data-testid="home-composer-attach-error">
-            {attachError}
-            <span className="sr-only"> 지원 형식: {UNIFIED_ATTACHMENT_EXTENSIONS.join(', ')}</span>
-          </p>
-        )}
-
-        {/*
-          답변 영역 — 있을 때만 렌더한다. 항상 존재하는 빈 컨테이너를 두면
-          justify-center 때문에 대기 상태에서 워드마크가 밀린다.
-          Markdown 렌더러는 web-neture 에 없으므로(의존성 추가 금지) 줄 단위 문단으로 표시한다.
-        */}
-        {hasThread && (
-          <div className="mt-6 w-full max-w-xl text-left">
-            {question && (
-              <p className="m-0 mb-3 text-sm font-medium text-slate-500">{question}</p>
-            )}
-            {pending && (
-              <p className="m-0 flex items-center gap-2 text-sm text-slate-400" data-testid="home-composer-pending">
-                <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                처리 중... (화면에서 작업이 필요하면 열려 있는 화면을 그대로 두세요)
-              </p>
-            )}
-            {/* 서버가 "작업인지 모호" 로 되물은 경우 — 실행하지 않았다. [진행] 은 같은 문장을 다시 보낸다(§5-2). */}
-            {confirm && !pending && (
-              <div className="rounded-2xl border border-slate-200 bg-white px-5 py-4 text-sm text-slate-700" data-testid="home-composer-confirm">
-                <p className="m-0">{confirm.message}</p>
-                <div className="mt-3 flex gap-2">
-                  <button
-                    type="button"
-                    onClick={() => void submit(confirm.text, 'work')}
-                    className="rounded-full bg-slate-900 px-4 py-2 text-sm text-white transition-opacity hover:opacity-80"
-                  >
-                    진행
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setConfirm(null)}
-                    className="rounded-full border border-slate-300 px-4 py-2 text-sm text-slate-700 transition-colors hover:border-slate-500"
-                  >
-                    아니요, 질문을 고칠게요
-                  </button>
-                </div>
-              </div>
-            )}
-            {/* WO-O4O-GOAL-DRIVEN-MULTIMODAL-WORK-AGENT-V0 §19·§20 — 결과와 인계 안내. 실제 화면은 Chrome/프로그램에 그대로 있다. */}
-            {workResult && !pending && (
-              <div className="rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4 text-[0.95rem] leading-relaxed text-slate-800" data-testid="home-composer-work-result">
-                <p className="m-0 whitespace-pre-wrap">{workResult.message}</p>
-                <p className="m-0 mt-2 text-xs text-slate-500">
-                  {workResult.goal.displayName} · 행동 {workResult.stepCount}단계 · AI 판단 {workResult.aiPlanCount}회
-                  {workResult.takeover ? ` · 인계 사유 ${workResult.takeover.reason}` : ''}
-                  {workResult.path ? ` · 현재 경로 ${workResult.path}` : ''}
-                </p>
-                {workResult.progress === 'needs_user' && !workResult.resumable && (
-                  <p className="m-0 mt-2 text-sm text-slate-700">
-                    {workResult.target?.targetType === 'windows_app'
-                      ? '프로그램의 현재 화면에서 직접 이어서 진행하세요.'
-                      : 'Chrome 의 현재 화면에서 직접 이어서 진행하세요.'}{' '}
-                    필요하면 다음 문장으로 다시 요청할 수 있습니다.
-                  </p>
-                )}
-                {workResult.resumable && (
-                  <p className="m-0 mt-2 text-sm text-slate-700">답을 입력하면 같은 작업을 이어서 진행합니다.</p>
-                )}
-              </div>
-            )}
-            {error && !pending && (
-              <p className="m-0 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>
-            )}
-            {answer && !pending && (
-              <div className="rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4 text-[0.95rem] leading-relaxed text-slate-800">
-                {answer.split('\n').map((line, i) => (
-                  <p key={i} className="m-0 whitespace-pre-wrap">
-                    {line || <br />}
-                  </p>
-                ))}
-                {attachmentsUsed.length > 0 && (
-                  <p className="m-0 mt-3 text-xs text-slate-500">
-                    참고한 첨부:{' '}
-                    {attachmentsUsed.map((a) => `${a.name}${a.readable ? '' : '(읽지 못함)'}`).join(' · ')}
-                  </p>
-                )}
-              </div>
-            )}
-            {/* WO-O4O-BROWSER-CONTROL-V0 §19 — 사이트가 열렸을 때만. 로그인은 사용자가 직접 한다. */}
-            {openedSite && !pending && (
-              <div className="mt-3 rounded-2xl border border-slate-200 bg-white px-5 py-4 text-sm text-slate-700">
-                {loginReady ? (
-                  <p className="m-0">로그인 완료를 확인했습니다.</p>
-                ) : (
-                  <>
-                    <p className="m-0">{openedSite.displayName} 사이트를 열었습니다.</p>
-                    <p className="m-0 mt-1 text-slate-500">
-                      로그인이 필요한 경우 사이트에서 직접 로그인해 주세요. 이미 로그인되어 있으면 바로 눌러 주세요.
-                    </p>
-                    <button
-                      type="button"
-                      onClick={() => setLoginReady(true)}
-                      className="mt-3 rounded-full bg-slate-900 px-4 py-2 text-sm text-white transition-opacity hover:opacity-80"
-                    >
-                      로그인 완료
-                    </button>
-                  </>
-                )}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* 로그인 후 개인화 영역 — WO-O4O-NETURE-UNIFIED-ENTRY-UI-PHASE1-V1 */}
-        {isAuthenticated && user && (
+          {/* 로그인 후 개인화 영역 — WO-O4O-NETURE-UNIFIED-ENTRY-UI-PHASE1-V1 */}
           <HomeEntryPanel
             user={user}
             data={entry.data}
@@ -684,45 +757,65 @@ export default function O4OHomePage() {
             onReload={entry.reload}
             newsSlot={<HomeServiceNews />}
           />
-        )}
 
-        {/* 로그인 전(또는 세션 복구 중 · 개인화 조회 실패 시 공개 안내 대체) — 서비스 안내 · 로그인 · 회원가입 */}
-        {(!isAuthenticated || entry.error) && (
-          <>
-            {!isAuthenticated && !authLoading && (
-              <div className="mt-8 flex flex-col items-center gap-3 text-center">
-                <p className="m-0 max-w-md text-sm text-slate-500">
-                  O4O 는 약국 · 화장품 매장 · 공급자 · 서비스 운영자가 한 곳에서 일하는 서비스입니다. 로그인하면 이용 중인
-                  서비스와 업무 화면을 바로 열 수 있습니다.
-                </p>
-                <div className="flex gap-2">
-                  <button
-                    type="button"
-                    onClick={() => openLoginModal()}
-                    className="rounded-full bg-slate-900 px-5 py-2 text-sm text-white transition-opacity hover:opacity-80"
-                  >
-                    로그인
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => openRegisterModal()}
-                    className="rounded-full border border-slate-300 px-5 py-2 text-sm text-slate-700 transition-colors hover:border-slate-500"
-                  >
-                    회원가입
-                  </button>
-                </div>
-              </div>
+          {/* 개인화 조회 실패 시 공개 서비스 안내로 대체 — 이동 수단을 잃지 않게 */}
+          {entry.error && (
+            <div className="mt-10 flex w-full flex-col items-center">
+              <PrimaryServices />
+              <ParticipationServices className="mt-10" />
+            </div>
+          )}
+        </main>
+      ) : (
+        /*
+          로그인 전 = O4O 이해 → 서비스 발견 → Google 로 시작 (WO-O4O-NETURE-PUBLIC-HOME-IA-REFRESH-V1)
+            ① O4O 소개 + Google 로 시작  ② 주요 서비스  ③ O4O AI  ④ 참여 · 학습  ⑤ 서비스 소식(글이 있을 때만)
+          세션 복구 중에도 같은 공개 화면이다 — CTA 만 복구가 끝난 뒤 보인다.
+        */
+        <main className="flex flex-1 flex-col items-center px-4 pb-16 pt-6 [word-break:keep-all] sm:pt-14">
+          <section aria-labelledby="home-intro-title" className="flex w-full max-w-2xl flex-col items-center text-center">
+            <h1 id="home-intro-title" className="m-0 text-5xl font-semibold tracking-tight text-slate-900 sm:text-6xl">O4O</h1>
+            <p className="mt-6 mb-0 text-xl font-medium leading-relaxed text-slate-800 sm:text-2xl">
+              온라인의 정보와 콘텐츠를
+              <br />
+              오프라인 매장의 활동으로 연결합니다.
+            </p>
+            <p className="mt-3 mb-0 max-w-md text-sm leading-relaxed text-slate-500">
+              약국 · 전문매장 · 공급자가 정보와 콘텐츠를 실제 매장 업무에 활용할 수 있도록 연결합니다.
+            </p>
+            {!authLoading && (
+              <button
+                type="button"
+                onClick={() => openLoginModal()}
+                data-testid="home-google-start"
+                className="mt-7 rounded-full bg-slate-900 px-6 py-2.5 text-sm font-medium text-white transition-opacity hover:opacity-80"
+              >
+                Google로 시작
+              </button>
             )}
-            <nav aria-label="서비스 안내" className="mt-6 flex max-w-2xl flex-wrap items-center justify-center gap-2">
-              {ENTRIES.map((e) => (
-                <EntryPill key={e.href} entry={e} />
-              ))}
-            </nav>
-            {/* 로그인 전 공개 소식 — 공개 서비스 안내 아래. 로그인 후와 같은 컴포넌트 (WO-O4O-NETURE-HOME-SERVICE-NEWS-FORUM-V1) */}
-            <HomeServiceNews className="mt-8 w-full max-w-2xl text-left" />
-          </>
-        )}
-      </main>
+          </section>
+
+          <div className="mt-14 flex w-full flex-col items-center">
+            <PrimaryServices />
+          </div>
+
+          {/* O4O AI — 실제 기능(질문 · 파일 분석 · 지원되는 업무). 비로그인 제출은 실행하지 않고 로그인으로 보낸다. */}
+          <section aria-labelledby="home-ai-title" className="mt-14 flex w-full max-w-xl flex-col items-center text-center">
+            <h2 id="home-ai-title" className="m-0 text-lg font-semibold text-slate-900">O4O AI</h2>
+            <p className="mt-2 mb-0 text-sm leading-relaxed text-slate-500">
+              O4O AI로 질문하고 업무를 시작할 수 있습니다. 로그인하면 질문 · 파일 분석과 지원되는 업무 기능을 이용할 수 있습니다.
+            </p>
+            {composerArea}
+          </section>
+
+          <div className="mt-14 flex w-full flex-col items-center">
+            <ParticipationServices />
+          </div>
+
+          {/* 공개 소식 — 실제 글이 있을 때만(0건이면 빈 섹션을 두지 않는다). 로딩 · 오류는 그대로 보인다. */}
+          <HomeServiceNews hideWhenEmpty className="mt-12 w-full max-w-2xl text-left" />
+        </main>
+      )}
 
       {/* 법정 고지 링크만. 홍보·뉴스·통계 섹션 없음. */}
       <footer className="px-4 pb-6 text-center text-xs text-slate-400 sm:px-6">
