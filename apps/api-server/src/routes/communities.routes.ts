@@ -13,6 +13,7 @@
  *   GET  /requests                             승인 대기 목록        — community:admin
  *   POST /requests/:requestId/approve          개설 승인 (검사 2회차) — community:admin
  *   POST /requests/:requestId/reject           개설 거절             — community:admin
+ *   GET  /operating                            내가 운영하는 커뮤니티 (가입 심사 화면 진입 목록)
  *   POST /:communitySlug/join                  가입 신청 (승인형 하나)
  *   GET  /:communitySlug/memberships           가입 신청·회원 목록    — 그 커뮤니티 operator
  *   POST /:communitySlug/memberships/:membershipId/approve  가입 승인 — 그 커뮤니티 operator
@@ -87,6 +88,9 @@ function requesterId(req: AuthRequest, res: Response): string | null {
   }
   return id;
 }
+
+const MEMBERSHIP_STATUSES = ['pending', 'active', 'rejected', 'withdrawn'] as const;
+type MembershipStatus = (typeof MEMBERSHIP_STATUSES)[number];
 
 const bodyOf = (req: { body?: unknown }): Record<string, unknown> =>
   (req.body ?? {}) as Record<string, unknown>;
@@ -260,6 +264,23 @@ export function createCommunitiesRoutes(
   );
 
   // ── 가입 ────────────────────────────────────────────────────────────
+  /**
+   * 내가 운영하는 커뮤니티 — 가입 심사 화면의 진입 목록.
+   * 인증만 요구한다: 대상은 **세션 사용자 자신의** 개체 운영 행뿐이라 다른 사람 · 다른 커뮤니티가
+   * 섞이지 않는다. 심사 자체는 여전히 `/:communitySlug/memberships*`(개체 운영자 가드)가 판정한다.
+   * `/:communitySlug/...` 파라미터 경로와 겹치지 않도록 먼저 등록한다.
+   */
+  router.get(
+    '/operating',
+    apiLimiter,
+    authenticate,
+    asyncHandler(async (req, res) => {
+      const userId = requesterId(req as AuthRequest, res);
+      if (!userId) return;
+      res.json({ success: true, data: { communities: await lifecycle().listOperatedCommunities(userId) } });
+    }),
+  );
+
   router.post(
     '/:communitySlug/join',
     apiLimiter,
@@ -281,13 +302,18 @@ export function createCommunitiesRoutes(
     '/:communitySlug/memberships',
     ...operatorOnly,
     asyncHandler(async (req, res) => {
-      const status = req.query.status;
+      const raw = req.query.status;
+      const status = typeof raw === 'string' && raw ? raw : undefined;
+      if (status && !MEMBERSHIP_STATUSES.includes(status as MembershipStatus)) {
+        res.status(400).json({ success: false, error: '알 수 없는 가입 상태입니다.', code: 'INVALID_STATUS' });
+        return;
+      }
       res.json({
         success: true,
         data: {
-          memberships: await lifecycle().listMemberships({
+          memberships: await lifecycle().listMembershipsForReview({
             communityId: req.community!.id,
-            status: typeof status === 'string' ? (status as 'pending' | 'active' | 'rejected' | 'withdrawn') : undefined,
+            status: status as MembershipStatus | undefined,
           }),
         },
       });

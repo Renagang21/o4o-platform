@@ -11,10 +11,15 @@
  *   - 최근 활동 섹션 (빈 상태)
  *   - 하단 아이콘형 바로가기 메뉴
  * 공급자 업무 메뉴(상품/주문/정산 등)는 /supplier 대시보드에서 접근.
+ *
+ * WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1: 개별 커뮤니티 운영자에게만 "커뮤니티 가입 심사"
+ * 바로가기를 보인다. 운영자는 서비스 역할이 아니라 개체 행이라 roles 로 판정할 수 없어
+ * `GET /communities/operating` 결과로 판정한다(조회 실패 시 카드를 숨길 뿐, 권한 판정은 backend).
  */
 
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { UserCog, MessageSquare, Building2, Settings } from 'lucide-react';
+import { UserCog, MessageSquare, Building2, Settings, UsersRound } from 'lucide-react';
 import { useAuth, getNetureDashboardRoute, getNetureRoleLabel } from '../../contexts';
 import { useLoginModal } from '../../contexts/LoginModalContext';
 import {
@@ -31,11 +36,24 @@ import {
 import { getServiceMembershipStatus } from '../../lib/membershipGate';
 import { SUPPLIER_ONLY_ROLES } from '../../lib/role-constants';
 import { getNetureMyPageNavItems } from './navItems';
+import { listOperatedCommunities } from '../../lib/api/communityOperator';
 
 export default function MyPageHub() {
   const { user, isAuthenticated, isLoading, logout } = useAuth();
   const { openLoginModal } = useLoginModal();
   const navigate = useNavigate();
+  const [operatesCommunity, setOperatesCommunity] = useState(false);
+
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    let alive = true;
+    listOperatedCommunities()
+      .then((list) => alive && setOperatesCommunity(list.length > 0))
+      .catch(() => alive && setOperatesCommunity(false));
+    return () => {
+      alive = false;
+    };
+  }, [isAuthenticated]);
 
   /**
    * WO-O4O-CROSS-SERVICE-MYPAGE-FINAL-AUDIT-AND-CLOSURE-V1:
@@ -138,6 +156,13 @@ export default function MyPageHub() {
             href: '/mypage/business-profile',
             icon: <Building2 className="w-5 h-5" />,
             visible: isSupplier,
+          },
+          {
+            key: 'community-operator',
+            title: '커뮤니티 가입 심사',
+            href: '/mypage/communities',
+            icon: <UsersRound className="w-5 h-5" />,
+            visible: operatesCommunity,
           },
           { key: 'settings', title: '설정', href: '/mypage/settings', icon: <Settings className="w-5 h-5" /> },
         ]}

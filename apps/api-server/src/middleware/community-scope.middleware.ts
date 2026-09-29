@@ -38,6 +38,10 @@ export type CommunityScopeLevel = 'member' | 'operator';
 export const COMMUNITY_NOT_FOUND = 'COMMUNITY_NOT_FOUND';
 export const COMMUNITY_MEMBERSHIP_REQUIRED = 'COMMUNITY_MEMBERSHIP_REQUIRED';
 export const COMMUNITY_OPERATOR_REQUIRED = 'COMMUNITY_OPERATOR_REQUIRED';
+export const COMMUNITY_SERVICE_MEMBERSHIP_REQUIRED = 'COMMUNITY_SERVICE_MEMBERSHIP_REQUIRED';
+
+/** 커뮤니티 진입 자격 서비스 키 (community-lifecycle.service 의 COMMUNITY_SERVICE_KEY 와 같다). */
+const COMMUNITY_SERVICE_KEY = 'community';
 
 /**
  * `:communitySlug` 로 개체를 확정한다. 없으면 404.
@@ -73,7 +77,10 @@ export const resolveCommunity: RequestHandler = async (req: Request, res: Respon
  * 개체 경계. `resolveCommunity` 다음에 쓴다.
  *
  *   level='member'    active 가입자만 (게시글 읽기·작성)
- *   level='operator'  active + role='operator' (가입 승인 · 중재)
+ *   level='operator'  active + role='operator' + 커뮤니티 서비스 가입 active (가입 승인 · 중재)
+ *
+ * 운영자 수준은 서비스 가입(`service_memberships('community')`)도 본다. 서비스 이용이 정지된
+ * 계정이 개체 행만 남아 있다고 심사 권한을 쓰면 안 된다(운영자 지정 경로와 같은 규칙).
  */
 export function requireCommunityScope(level: CommunityScopeLevel): RequestHandler {
   return async (req: Request, res: Response, next: NextFunction) => {
@@ -114,6 +121,22 @@ export function requireCommunityScope(level: CommunityScopeLevel): RequestHandle
           code: COMMUNITY_OPERATOR_REQUIRED,
         });
         return;
+      }
+
+      // ④ 운영자 요구 시 서비스 가입 — 정지·탈퇴·미가입 계정은 개체 운영 기능을 쓸 수 없다.
+      if (level === 'operator') {
+        const sm: Array<{ status: string }> = await AppDataSource.query(
+          `SELECT status FROM service_memberships WHERE user_id = $1 AND service_key = $2 LIMIT 1`,
+          [user.id, COMMUNITY_SERVICE_KEY],
+        );
+        if (sm?.[0]?.status !== 'active') {
+          res.status(403).json({
+            success: false,
+            error: '커뮤니티 서비스 이용이 정상(active)인 운영자만 할 수 있습니다.',
+            code: COMMUNITY_SERVICE_MEMBERSHIP_REQUIRED,
+          });
+          return;
+        }
       }
 
       next();

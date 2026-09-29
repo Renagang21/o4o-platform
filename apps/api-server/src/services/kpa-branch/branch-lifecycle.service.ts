@@ -35,9 +35,15 @@ const SLUG_RE = /^[a-z0-9]+(-[a-z0-9]+)*$/;
 const SLUG_MIN = 2;
 const SLUG_MAX = 80;
 
+// 예약어 주소 정책은 의존성 없는 모듈에 둔다 — BranchAdminController(super_admin 직접 생성)도 같은 목록을 쓴다.
+export { RESERVED_BRANCH_SLUGS, isReservedBranchSlug, reservedSlugMessage } from './branch-slug-policy.js';
+import { isReservedBranchSlug, reservedSlugMessage } from './branch-slug-policy.js';
+
 export type BranchLifecycleErrorCode =
   | 'INVALID_SLUG'
+  | 'RESERVED_SLUG'
   | 'SLUG_TAKEN'
+  | 'REQUESTER_SUSPENDED'
   | 'REQUEST_NOT_FOUND'
   | 'REQUEST_NOT_PENDING'
   | 'PARENT_NOT_FOUND';
@@ -60,6 +66,9 @@ export function normalizeBranchSlug(raw: unknown): string {
       'INVALID_SLUG',
       `주소는 영문 소문자·숫자와 하이픈으로 ${SLUG_MIN}~${SLUG_MAX}자여야 합니다.`,
     );
+  }
+  if (isReservedBranchSlug(slug)) {
+    throw new BranchLifecycleError('RESERVED_SLUG', reservedSlugMessage(slug), 409);
   }
   return slug;
 }
@@ -149,7 +158,7 @@ export class BranchLifecycleService {
     reviewerUserId: string;
   }): Promise<
     | { outcome: 'created'; branch: KpaOrganization; request: BranchCreationRequestRow }
-    | { outcome: 'slug_conflict'; slug: string }
+    | { outcome: 'slug_conflict'; slug: string; reason: 'taken' | 'reserved' }
   > {
     return this.dataSource.transaction(async (m) => {
       const found: BranchCreationRequestRow[] = await m.query(
@@ -164,8 +173,13 @@ export class BranchLifecycleService {
         throw new BranchLifecycleError('REQUEST_NOT_PENDING', '이미 처리된 신청입니다.', 409);
       }
 
-      const existing = await m.getRepository(KpaOrganization).findOne({ where: { slug: request.desired_slug } });
-      if (existing) {
+      // 재검사: 선점 + 예약어. 예약어는 신청 시 막지만, 예약어 목록이 신청 뒤에 늘었거나
+      // 목록 도입 전에 들어온 pending 신청이 있을 수 있다 — 승인 직전에 다시 본다.
+      const reserved = isReservedBranchSlug(request.desired_slug);
+      const existing = reserved
+        ? null
+        : await m.getRepository(KpaOrganization).findOne({ where: { slug: request.desired_slug } });
+      if (reserved || existing) {
         await m.query(
           `UPDATE branch_creation_requests
               SET status = 'slug_conflict', reviewed_by_user_id = $2, reviewed_at = now(),
@@ -174,11 +188,20 @@ export class BranchLifecycleService {
           [
             request.id,
             input.reviewerUserId,
-            `승인 직전 주소가 선점되었습니다(${request.desired_slug}). 새 주소로 다시 신청해 주세요.`,
+            reserved
+              ? reservedSlugMessage(request.desired_slug)
+              : `승인 직전 주소가 선점되었습니다(${request.desired_slug}). 새 주소로 다시 신청해 주세요.`,
           ],
         );
-        return { outcome: 'slug_conflict' as const, slug: request.desired_slug };
+        return {
+          outcome: 'slug_conflict' as const,
+          slug: request.desired_slug,
+          reason: reserved ? ('reserved' as const) : ('taken' as const),
+        };
       }
+
+      // 정지된 서비스 가입자는 승인으로 되살리지 않는다 — 분회를 만들기 전에 판정한다.
+      await assertRequesterNotSuspended(m, request.requester_user_id);
 
       // 분회 개체 — type·is_active 는 서버가 고정한다(BranchAdminController 와 같은 계약).
       const orgRepo = m.getRepository(KpaOrganization);
@@ -240,10 +263,22 @@ export class BranchLifecycleService {
     });
   }
 
-  async listPendingRequests(): Promise<BranchCreationRequestRow[]> {
-    return this.dataSource.query(
-      `SELECT * FROM branch_creation_requests WHERE status = 'pending' ORDER BY created_at ASC`,
-    );
+  /**
+   * 승인 대기 목록 — 심사 화면. 신청자 이름 · 이메일을 함께 준다(심사자가 누구의 신청인지 알아야 한다).
+   * `reserved_slug` 는 예약어 주소 신청을 화면이 미리 표시하게 한다(승인하면 slug_conflict 로 돌아간다).
+   */
+  async listPendingRequests(): Promise<
+    Array<BranchCreationRequestRow & { requester_name: string | null; requester_email: string | null; reserved_slug: boolean }>
+  > {
+    const rows: Array<BranchCreationRequestRow & { requester_name: string | null; requester_email: string | null }> =
+      await this.dataSource.query(
+        `SELECT r.*, u.name AS requester_name, u.email AS requester_email
+           FROM branch_creation_requests r
+           LEFT JOIN users u ON u.id = r.requester_user_id
+          WHERE r.status = 'pending'
+          ORDER BY r.created_at ASC`,
+      );
+    return rows.map((r) => ({ ...r, reserved_slug: isReservedBranchSlug(r.desired_slug) }));
   }
 
   /** 내 신청 이력 — `slug_conflict` 재신청 안내가 신청자에게 도달하는 경로. */
@@ -275,7 +310,7 @@ export class BranchLifecycleService {
       await repo.save(repo.create({ user_id: userId, organization_id: branchId, status: 'active' }));
     }
 
-    // 서비스 접근 자격.
+    // 서비스 접근 자격. 정지(suspended)는 approveCreation 이 먼저 막았다 — 여기 오는 것은 없음·pending·active 등.
     await m.query(
       `INSERT INTO service_memberships (user_id, service_key, status, created_at, updated_at)
        VALUES ($1, $2, 'active', NOW(), NOW())
@@ -290,6 +325,26 @@ export class BranchLifecycleService {
     await roleAssignmentService.assignRole(
       { userId, role: KPA_BRANCH_OPERATOR_ROLE, assignedBy: reviewerUserId },
       m,
+    );
+  }
+}
+
+/**
+ * 신청자의 분회 서비스 가입이 정지(suspended) 상태면 승인하지 않는다.
+ *
+ * 첫 운영자 부여는 `service_memberships` 를 active 로 upsert 한다. 정지된 가입을 그대로 두면
+ * 개설 승인이 **정지 처분을 되살리는 우회 경로**가 된다. 신청은 pending 으로 남고 심사자는 거절할 수 있다.
+ */
+async function assertRequesterNotSuspended(m: EntityManager, userId: string): Promise<void> {
+  const rows: Array<{ status: string }> = await m.query(
+    `SELECT status FROM service_memberships WHERE user_id = $1 AND service_key = $2 LIMIT 1`,
+    [userId, KPA_BRANCH_SERVICE_KEY],
+  );
+  if (rows?.[0]?.status === 'suspended') {
+    throw new BranchLifecycleError(
+      'REQUESTER_SUSPENDED',
+      '신청자의 분회 서비스 이용이 정지된 상태라 승인할 수 없습니다. 거절하거나 정지를 먼저 해소하세요.',
+      409,
     );
   }
 }

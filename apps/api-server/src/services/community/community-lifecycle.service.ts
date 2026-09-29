@@ -35,6 +35,7 @@ export type LifecycleErrorCode =
   | 'ALREADY_MEMBER'
   | 'MEMBERSHIP_NOT_FOUND'
   | 'MEMBERSHIP_NOT_PENDING'
+  | 'SERVICE_MEMBERSHIP_SUSPENDED'
   | 'REQUEST_FORBIDDEN';
 
 export class CommunityLifecycleError extends Error {
@@ -158,6 +159,9 @@ export class CommunityLifecycleService {
         return { outcome: 'slug_conflict' as const, slug: request.desiredSlug };
       }
 
+      // 정지된 신청자를 개설 승인으로 되살리지 않는다 — 커뮤니티를 만들기 전에 판정한다.
+      await assertNotSuspended(m, request.requesterUserId, '신청자');
+
       const community = await m.getRepository(Community).save(
         m.getRepository(Community).create({
           slug: request.desiredSlug,
@@ -230,6 +234,8 @@ export class CommunityLifecycleService {
     return this.dataSource.transaction(async (m) => {
       const repo = m.getRepository(CommunityMembership);
       const membership = await loadPendingMembership(m, input.communityId, input.membershipId);
+      // 정지된 가입자를 가입 승인으로 되살리지 않는다 — 신청은 pending 으로 남고 거절할 수 있다.
+      await assertNotSuspended(m, membership.userId, '신청자');
       membership.status = 'active';
       membership.approvedByUserId = input.reviewerUserId;
       membership.approvedAt = new Date();
@@ -292,6 +298,79 @@ export class CommunityLifecycleService {
     });
   }
 
+  /**
+   * 가입 심사 화면용 목록 — 그 커뮤니티 행만, 신청자 이름 · **가린 이메일** · 서비스 가입 상태와 함께.
+   *
+   * 심사자는 서비스 전체 관리자가 아니라 **개체 운영자**(같은 커뮤니티의 회원)다. 신청자를 알아볼 만큼만
+   * 보여 주고 이메일 원문은 주지 않는다. `serviceMembershipStatus='suspended'` 면 승인은 409 로 막힌다.
+   */
+  async listMembershipsForReview(input: {
+    communityId: string;
+    status?: CommunityMembership['status'];
+  }): Promise<
+    Array<{
+      id: string;
+      userId: string;
+      role: string;
+      status: string;
+      createdAt: Date;
+      name: string | null;
+      emailMasked: string | null;
+      serviceMembershipStatus: string | null;
+    }>
+  > {
+    const params: unknown[] = [input.communityId, COMMUNITY_SERVICE_KEY];
+    let statusFilter = '';
+    if (input.status) {
+      params.push(input.status);
+      statusFilter = ` AND cm.status = $3`;
+    }
+    const rows: any[] = await this.dataSource.query(
+      `SELECT cm.id, cm.user_id, cm.role, cm.status, cm.created_at,
+              u.name AS user_name, u.email AS user_email, sm.status AS service_status
+         FROM community_memberships cm
+         LEFT JOIN users u ON u.id = cm.user_id
+         LEFT JOIN service_memberships sm ON sm.user_id = cm.user_id AND sm.service_key = $2
+        WHERE cm.community_id = $1${statusFilter}
+        ORDER BY cm.created_at ASC`,
+      params,
+    );
+    return rows.map((r) => ({
+      id: r.id,
+      userId: r.user_id,
+      role: r.role,
+      status: r.status,
+      createdAt: r.created_at,
+      name: r.user_name ?? null,
+      emailMasked: maskEmail(r.user_email),
+      serviceMembershipStatus: r.service_status ?? null,
+    }));
+  }
+
+  /**
+   * 내가 운영하는 커뮤니티 — 가입 심사 화면의 진입 목록.
+   *
+   * 개체 운영자 판정(`requireCommunityScope('operator')`)과 같은 조건이다: 커뮤니티 active ·
+   * 내 가입 active · role='operator' · 내 커뮤니티 서비스 가입 active. 서비스 가입이 active 가
+   * 아니면 빈 목록이다(심사 경로가 어차피 403 이므로 화면에 들이지 않는다).
+   */
+  async listOperatedCommunities(userId: string): Promise<
+    Array<{ id: string; slug: string; name: string; pendingCount: number }>
+  > {
+    const rows: any[] = await this.dataSource.query(
+      `SELECT c.id, c.slug, c.name,
+              (SELECT COUNT(*)::int FROM community_memberships p
+                WHERE p.community_id = c.id AND p.status = 'pending') AS pending_count
+         FROM community_memberships cm
+         JOIN communities c ON c.id = cm.community_id
+         JOIN service_memberships sm ON sm.user_id = cm.user_id AND sm.service_key = $2 AND sm.status = 'active'
+        WHERE cm.user_id = $1 AND cm.status = 'active' AND cm.role = 'operator' AND c.status = 'active'
+        ORDER BY c.name ASC`,
+      [userId, COMMUNITY_SERVICE_KEY],
+    );
+    return rows.map((r) => ({ id: r.id, slug: r.slug, name: r.name, pendingCount: Number(r.pending_count ?? 0) }));
+  }
+
   /** 가입 거절 — 승인과 같은 개체 운영자가 한다. */
   async rejectJoin(input: {
     communityId: string;
@@ -307,6 +386,33 @@ export class CommunityLifecycleService {
       // 거절은 service_memberships 를 만들지 않는다.
       return repo.save(membership);
     });
+  }
+}
+
+/** 이메일을 알아볼 만큼만 남긴다 — `ab***@example.com`. */
+export function maskEmail(email: unknown): string | null {
+  if (typeof email !== 'string' || !email.includes('@')) return null;
+  const [local, domain] = email.split('@');
+  return `${local.slice(0, 2)}***@${domain}`;
+}
+
+/**
+ * 커뮤니티 서비스 가입이 정지(suspended)면 승인하지 않는다.
+ *
+ * `ensureServiceMembership` 은 active 로 upsert 한다. 정지 행을 그대로 두면 가입·개설 승인이
+ * **정지 처분을 되살리는 우회 경로**가 된다. 운영자 지정 경로(SERVICE_MEMBERSHIP_NOT_ACTIVE)와 같은 방향이다.
+ */
+async function assertNotSuspended(m: EntityManager, userId: string, who: string): Promise<void> {
+  const rows: Array<{ status: string }> = await m.query(
+    `SELECT status FROM service_memberships WHERE user_id = $1 AND service_key = $2 LIMIT 1`,
+    [userId, COMMUNITY_SERVICE_KEY],
+  );
+  if (rows?.[0]?.status === 'suspended') {
+    throw new CommunityLifecycleError(
+      'SERVICE_MEMBERSHIP_SUSPENDED',
+      `${who}의 커뮤니티 서비스 이용이 정지된 상태라 승인할 수 없습니다. 거절하거나 정지를 먼저 해소하세요.`,
+      409,
+    );
   }
 }
 
