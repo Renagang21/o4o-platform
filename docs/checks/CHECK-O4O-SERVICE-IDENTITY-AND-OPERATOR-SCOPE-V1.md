@@ -1224,7 +1224,31 @@ migration 6·7·8·9 와 커뮤니티 승격 CLI `--apply` 는 §8-7-6 · §8-7-
 
 #### 8-8-3. 배포 — 미실행 (승인 대기)
 
-이 절의 코드가 병합된 SHA 로 census 를 다시 하고(API 새 이미지 · neture-web · admin · web-kpa-branch) 한 번의 배포 판단 패키지를 제시한다. 승인 전 게이트 변경 · revision/traffic 전환 · Web/Admin 배포 · 역할 부여 **0**.
+승인 전 게이트 변경 · revision/traffic 전환 · Web/Admin 배포 · 역할 부여 **0**.
+
+**PR · 게이트 (최종 코드 HEAD 기준).**
+
+| 대상 | 결과 |
+|---|---|
+| PR [#250](https://github.com/Renagang21/o4o-platform/pull/250) HEAD `1f8a0251b` | CI 11 pass / 3 skipped(경로 무관) · CodeQL pass · `mergeStateStatus=CLEAN` |
+| SonarCloud PR #250 (분석 SHA `1f8a0251b`) | **Quality Gate OK** — 신규 bug 0 · vulnerability 0 · 중복 0.0% · hotspot 100% · code smell 9(S3358 중첩 삼항 8 · S1128 미사용 import 1, 게이트 비차단) |
+| 병합 | `af4bf1715` (main) — main CI Pipeline `36512695601` success · CodeQL success |
+| main SonarCloud | ERROR (§8-7-5 · §8-7-8 의 기존 누적 상태 그대로 — PR 게이트 통과 ≠ main 게이트 통과) |
+| 병합 push 로 뜬 배포 run | API `36512695625` · Admin `36512695619` · Web `36512695616` — 전부 `deploy-hold-notice` 만, deploy job **skipped**(실측) |
+
+**배포 census (fixed SHA `af4bf1715` · read-only · 2026-09-29).**
+
+| 항목 | 값 |
+|---|---|
+| 게이트 | `DEPLOY_ENABLED=false` |
+| 현재 서빙(전부 100%) | `o4o-core-api-03756-txs` · `neture-web-01661-mq6` · `o4o-admin-dashboard-01316-hhp` · `kpa-branch-web-00179-8q4` — 네 서비스 모두 배포 1 이미지(`2edfe9b33`) |
+| 롤백 revision | 위 4개 그대로 |
+| 배포 대상 | **API(새 이미지 필요 — runtime 변경) · neture-web · admin · kpa-branch-web** |
+| migration | `2edfe9b33..af4bf1715` 신규 migration = 6·7·8·9 뿐(§8-7-6 에서 적용 완료). API 배포의 migration Job 은 no-op 이어야 한다 — 새 migration 0 |
+| API 에 섞이는 다른 트랙(분리 불가) | §8-7-8 과 같음: Supplier `69e1c5aa8` · Catalog `773d6c54c` · Hospital core `46a803dbc` · `9b8579ac8` (+ `1a11d0eb7` 테스트뿐) |
+| neture-web 에 섞이는 변경 | §8-7-8 과 같음: `4e34267ef` 대표 홈 진입 URL · `773d6c54c`(테스트 파일뿐) |
+| kpa-branch-web 변경 | `2edfe9b33` 이후 `1f8a0251b` 하나뿐. 의존 패키지(`auth-client` · `auth-react` · `auth-utils` · `types`) 변경 0 |
+| 배포하지 않음 | web-store · kpa-society · k-cosmetics · pharmacy-hub · lecture · signage · hospital |
 
 #### 8-8-4. 서비스 운영자 지정 — 미실행
 
