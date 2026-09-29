@@ -38,7 +38,8 @@ test('1. DB 자동 생성 — 열면 local.db 파일과 핵심 테이블이 생�
   assert.equal(h.ok, true);
   assert.ok(fs.existsSync(path.join(tmpHome, 'local.db')));
   // local_ prefix 테이블: V0 핵심 7(meta·migrations·settings·mappings·imports·exports·work_state) + V1 datasets 2
-  //   + PHASE 1 same-run(WEB-AUTOMATION-RESUME-V1) work_runs 1 + 게이트2(HOSPITAL-DRUG) source_bindings 1 = 11.
+  //   + PHASE 1 same-run(WEB-AUTOMATION-RESUME-V1) work_runs 1 + 게이트2(HOSPITAL-DRUG) source_bindings 1
+  //   + PHASE 2 work_run_steps · workflow_candidates 2 = 13.
   //   고정 숫자 대신 실측 대조 — migration 추가 시 stale 방지.
   const actualTables = db.openLocalDb()
     .prepare("SELECT COUNT(*) AS n FROM sqlite_master WHERE type='table' AND name LIKE 'local\\_%' ESCAPE '\\'")
@@ -232,4 +233,92 @@ test('local.data.* 는 #appId 형태를 허용하지 않는다', async () => {
   const r = await handlers.runAction('local.data.health#windows.notepad', {}, undefined);
   assert.equal(r.status, 'denied');
   assert.equal(r.errorCode, 'DENIED_UNKNOWN_ACTION');
+});
+
+// ─── PHASE 2 Workflow Candidate (WEB-AUTOMATION-RESUME-V1 · IR §8·§9-2·§9-3) ─────────────
+// 값 없는 semantic 단계 + 요청 템플릿만 저장하고, 대조는 이 PC 에서 한다. 돌려주는 것은 이번 요청의 값을 채운 재생 단계뿐이다.
+
+const WF_STEPS = [
+  { actionKind: 'set_input', locator: { role: 'searchbox', name: '약물의 제품명 또는 성분명을 입력하세요.' }, slot: 1, expect: { navigated: false, changed: false }, path: '/' },
+  { actionKind: 'click', locator: { role: 'button', name: '검 색' }, expect: { navigated: true, changed: true }, path: '/' },
+];
+
+test('PHASE 2: candidate_save → candidate_match 는 이번 요청 값을 채운 단계만 돌려준다(템플릿 · 통계 미반환)', async () => {
+  const saved = await handlers.runAction('local.data.work_run_candidate_save', {}, {
+    runId: 'g_wf1', targetId: 'healthkr', template: '약학정보원에서 {{1}} 검색해줘', steps: WF_STEPS,
+  });
+  assert.equal(saved.status, 'success');
+  assert.equal(saved.data.saved, true);
+  assert.match(saved.data.candidateId, /^wc_[a-z0-9]{6,32}$/);
+
+  const hit = await handlers.runAction('local.data.work_run_candidate_match', {}, { targetId: 'healthkr', request: '약학정보원에서 아스피린 검색해줘' });
+  assert.equal(hit.status, 'success');
+  assert.equal(hit.data.matched, true);
+  assert.equal(hit.data.candidateId, saved.data.candidateId);
+  assert.deepEqual(hit.data.steps, [
+    { actionKind: 'set_input', locator: WF_STEPS[0].locator, expect: WF_STEPS[0].expect, value: '아스피린' },
+    { actionKind: 'click', locator: WF_STEPS[1].locator, expect: WF_STEPS[1].expect },
+  ]);
+  // 과거 요청 템플릿 · 통계 · source run 은 응답에 없다.
+  const text = JSON.stringify(hit.data);
+  assert.equal(text.includes('{{1}}'), false);
+  assert.equal(text.includes('g_wf1'), false);
+  assert.equal(/success_count|failure_count|template/.test(text), false);
+
+  // 형태가 다른 요청 · 다른 대상은 맞지 않는다.
+  const miss = await handlers.runAction('local.data.work_run_candidate_match', {}, { targetId: 'healthkr', request: '아스피린 부작용 알려줘' });
+  assert.equal(miss.data.matched, false);
+
+  // 저장된 단계 원장(run 단계)과 Candidate 에 입력값이 없다.
+  const rows = db.openLocalDb().prepare('SELECT steps_json, request_template FROM local_workflow_candidates').all();
+  assert.equal(rows.length, 1);
+  assert.equal(rows[0].steps_json.includes('타이레놀'), false);
+  assert.equal(db.openLocalDb().prepare("SELECT COUNT(*) AS n FROM local_work_run_steps WHERE run_id='g_wf1'").get().n, 2);
+});
+
+test('PHASE 2: 같은 (대상, 템플릿) 재저장은 갱신 · 재생 결과가 반복 실패면 Candidate 를 끈다', async () => {
+  const again = await handlers.runAction('local.data.work_run_candidate_save', {}, {
+    runId: 'g_wf2', targetId: 'healthkr', template: '약학정보원에서 {{1}} 검색해줘', steps: WF_STEPS,
+  });
+  const id = again.data.candidateId;
+  assert.equal(db.openLocalDb().prepare('SELECT COUNT(*) AS n FROM local_workflow_candidates').get().n, 1);
+  for (let i = 0; i < 3; i += 1) {
+    const r = await handlers.runAction('local.data.work_run_candidate_result', {}, { candidateId: id, outcome: 'replay_diverged' });
+    assert.equal(r.status, 'success');
+  }
+  const status = db.openLocalDb().prepare('SELECT status FROM local_workflow_candidates WHERE candidate_id=?').get(id).status;
+  assert.equal(status, 'disabled');
+  const off = await handlers.runAction('local.data.work_run_candidate_match', {}, { targetId: 'healthkr', request: '약학정보원에서 게보린 검색해줘' });
+  assert.equal(off.data.matched, false);
+  // 같은 형태를 다시 성공하면(AI 가 고친 경로) 다시 켠다.
+  await handlers.runAction('local.data.work_run_candidate_save', {}, { runId: 'g_wf3', targetId: 'healthkr', template: '약학정보원에서 {{1}} 검색해줘', steps: WF_STEPS });
+  const on = await handlers.runAction('local.data.work_run_candidate_match', {}, { targetId: 'healthkr', request: '약학정보원에서 게보린 검색해줘' });
+  assert.equal(on.data.matched, true);
+});
+
+test('PHASE 2: candidate_* 는 형상 밖 인자를 거부한다(좌표 · elementRef · 값 · 미등재 대상 · 자리 불일치)', async () => {
+  const bad = [
+    { runId: 'g_x', targetId: 'healthkr', template: '{{1}} 검색', steps: [{ ...WF_STEPS[0], elementRef: 'e_2' }, WF_STEPS[1]] },
+    { runId: 'g_x', targetId: 'healthkr', template: '{{1}} 검색', steps: [{ ...WF_STEPS[1], x: 0.3, y: 0.4 }] },
+    { runId: 'g_x', targetId: 'healthkr', template: '{{1}} 검색', steps: [{ ...WF_STEPS[0], value: '타이레놀' }] },
+    { runId: 'g_x', targetId: 'not_registered', template: '{{1}} 검색', steps: WF_STEPS },
+    { runId: 'g_x', targetId: 'healthkr', template: '{{2}} 검색', steps: WF_STEPS },
+    { runId: 'g_x', targetId: 'healthkr', template: '{{1}}', steps: WF_STEPS },
+    { runId: 'g_x', targetId: 'healthkr', template: '{{1}} 검색', steps: [{ ...WF_STEPS[1], locator: { role: 'button', name: '<script>' } }] },
+  ];
+  for (const args of bad) {
+    const r = await handlers.runAction('local.data.work_run_candidate_save', {}, args);
+    assert.equal(r.status, 'denied', JSON.stringify(args));
+  }
+  const badMatch = await handlers.runAction('local.data.work_run_candidate_match', {}, { targetId: 'healthkr', request: 'x', extra: 1 });
+  assert.equal(badMatch.status, 'denied');
+  const badResult = await handlers.runAction('local.data.work_run_candidate_result', {}, { candidateId: 'wc_abcdef', outcome: 'deleted' });
+  assert.equal(badResult.status, 'denied');
+});
+
+test('PHASE 2: matchWorkflowTemplate — 공백 정규화 · 같은 자리 같은 값 · 빈 값 거부', () => {
+  assert.deepEqual(db.matchWorkflowTemplate('{{1}} 검색해줘', '  타이레놀   500mg  검색해줘 '), ['타이레놀 500mg']);
+  assert.deepEqual(db.matchWorkflowTemplate('{{1}}에서 {{2}} 찾아줘', '약학정보원에서 아스피린 찾아줘'), ['약학정보원', '아스피린']);
+  assert.equal(db.matchWorkflowTemplate('{{1}} 검색해줘', '타이레놀 찾아줘'), null);
+  assert.equal(db.matchWorkflowTemplate('{{1}} 과 {{1}} 비교', '타이레놀 과 아스피린 비교'), null);
 });

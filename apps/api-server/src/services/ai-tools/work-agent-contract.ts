@@ -33,6 +33,11 @@
  *     · Cloud 에는 **최소 coordination**(runId · 소유자 · device · status · version · 만료)만 둔다 —
  *       goal/질문/답변 원문 · DOM · 관찰 · trajectory · step 전문은 cloud 에 넣지 않고, cloud 는 Local 을 read-back 하지 않는다.
  *     · 재개 = 같은 runId + **현재 화면 재관찰** + planner re-prime. 저장된 관찰을 되살리지 않는다.
+ *   PHASE 2(Workflow Candidate · IR §8·§9-3·§9-4)가 더 허용하는 것도 이것뿐이다:
+ *     · 성공 run 의 **값 없는 semantic 단계**(행동 종류 · role·name|text · 예상 변화) + 요청 템플릿을 Local SQLite 에 저장한다
+ *       (서버 → Local write, 명령 인자로 한 번 지나갈 뿐 cloud 에 저장하지 않는다).
+ *     · 재생용 조회는 Local 이 템플릿을 대조해 **이번 요청의 값을 채운 단계만** 돌려준다 — 과거 요청 문장 · 템플릿 · 통계는
+ *       돌아오지 않는다. 재생은 같은 loop 안의 bounded prefix 이며(현재 화면 재검증 · 어긋나면 AI loop), 엔진이 아니다.
  *   `automation_jobs` 는 이 축에 재사용하지 않는다(video 트랙 전용). 다음은 PHASE 1 이후로도 계속 금지한다:
  *     scheduler · background queue · executor · general workflow engine · agent loop · retry orchestration ·
  *     planner state machine · tool execution queue · background worker · 사이트별 사전 정의 workflow ·

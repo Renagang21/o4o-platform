@@ -8,6 +8,7 @@
  * cloud 로 되돌아오는 것은 runId 반향 · 상태 enum · saved 플래그뿐이다(goal/note 원문은 통과하지 않는다).
  *
  * 이 executor 는 **cloud → local write** 만 한다. local run 내용을 cloud 로 read-back 하는 경로는 없다(§조건 4).
+ * 단 하나의 예외는 PHASE 2 `candidate_match` 다 — 재생에 필요한 semantic 단계(이번 요청의 값을 채운 것)만 돌려받는다(IR §9-3).
  */
 
 import type { DataSource } from 'typeorm';
@@ -15,6 +16,7 @@ import logger from '../../utils/logger.js';
 import { LOCAL_AGENT_ACTIONS, pickSafeResultData } from '../local-agent/local-agent-protocol.js';
 import { awaitCommandResult, issueCommand } from '../local-agent/local-agent-service.js';
 import type { WorkRunStatus } from './work-run-coordination-service.js';
+import type { ReplayStep, WorkflowStep } from './workflow-candidate.js';
 
 const WORK_RUN_TOOL = 'work.run.ledger';
 
@@ -61,6 +63,47 @@ export async function issueWorkRunUpsert(
   if (input.goalSummary !== undefined) args.goalSummary = input.goalSummary;
   if (input.note !== undefined) args.note = input.note;
   return issue(dataSource, ctx.userId, ctx.deviceId, LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_UPSERT, args);
+}
+
+// ─── PHASE 2 — Workflow Candidate (IR §8·§9-2·§9-3) ─────────────────────────
+//   save: 성공 run 의 값 없는 semantic 단계 + 요청 템플릿을 Local 에 저장(cloud→local write).
+//   match: Local 이 템플릿을 대조해 이번 요청의 값을 채운 재생 단계만 돌려준다 — 과거 요청 문장·템플릿·통계는 돌아오지 않는다
+//          (pickSafeWorkflowMatchInfo). IR §9-3 이 허용한 "재생용 조회" 이며 원문 read-back 이 아니다.
+//   result: 재생 결과 enum 만.
+
+/** 성공 run → Candidate 저장. */
+export async function issueWorkflowCandidateSave(
+  dataSource: DataSource,
+  ctx: { userId: string; deviceId: string },
+  input: { runId: string; targetId: string; template: string; steps: WorkflowStep[]; replayedCandidateId?: string },
+): Promise<WorkRunLedgerResult> {
+  const args: Record<string, unknown> = { runId: input.runId, targetId: input.targetId, template: input.template, steps: input.steps };
+  if (input.replayedCandidateId !== undefined) args.replayedCandidateId = input.replayedCandidateId;
+  return issue(dataSource, ctx.userId, ctx.deviceId, LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_CANDIDATE_SAVE, args);
+}
+
+/** 이번 요청과 맞는 Candidate 대조(Local). matched 면 재생 단계(값 채움)를 돌려준다. */
+export async function issueWorkflowCandidateMatch(
+  dataSource: DataSource,
+  ctx: { userId: string; deviceId: string },
+  input: { targetId: string; request: string },
+): Promise<{ status: string; errorCode?: string; candidateId: string | null; steps: ReplayStep[] | null }> {
+  const r = await issue(dataSource, ctx.userId, ctx.deviceId, LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_CANDIDATE_MATCH, {
+    targetId: input.targetId, request: input.request,
+  });
+  if (r.status !== 'success' || r.safe.matched !== true) return { status: r.status, errorCode: r.errorCode, candidateId: null, steps: null };
+  return { status: r.status, candidateId: String(r.safe.candidateId), steps: r.safe.steps as ReplayStep[] };
+}
+
+/** 재생 결과 반영(성공/어긋남). */
+export async function issueWorkflowCandidateResult(
+  dataSource: DataSource,
+  ctx: { userId: string; deviceId: string },
+  input: { candidateId: string; outcome: 'replay_completed' | 'replay_diverged' },
+): Promise<WorkRunLedgerResult> {
+  return issue(dataSource, ctx.userId, ctx.deviceId, LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_CANDIDATE_RESULT, {
+    candidateId: input.candidateId, outcome: input.outcome,
+  });
 }
 
 /** logical run 상태 전이(complete/expire/taken_over/active/waiting_for_user). */

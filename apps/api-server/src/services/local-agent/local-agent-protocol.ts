@@ -37,6 +37,12 @@ import { WINDOWS_APP_IDS } from './windows-app-registry.js';
 import { pickSafeUiaInfo, validateUiaClickArgs, validateUiaInvokeArgs, validateUiaKeyArgs, validateUiaSetValueArgs, type UiaActionArgs } from './windows-uia-contract.js';
 import { BROWSER_SITE_IDS } from './browser-site-registry.js';
 import {
+  isValidRequestTemplate,
+  validateReplaySteps,
+  validateWorkflowSteps,
+  type WorkflowStep,
+} from '../ai-tools/workflow-candidate.js';
+import {
   COMPUTER_ALLOWED_KEYS,
   validateClickArgs,
   validateKeyArgs,
@@ -135,6 +141,13 @@ export const LOCAL_AGENT_ACTIONS = {
   DATA_WORK_RUN_UPSERT: 'local.data.work_run_upsert',
   /** logical Work Run 의 상태를 전이한다(complete/expire/taken_over 포함). */
   DATA_WORK_RUN_SET_STATUS: 'local.data.work_run_set_status',
+  // ── Workflow Candidate 정본 (WEB-AUTOMATION-RESUME-V1 PHASE 2 · IR §8·§9-2·§9-3) ──
+  /** 성공 run 의 semantic 단계 + 요청 템플릿을 Candidate 로 저장한다(값 없음). generic row write 아님. */
+  DATA_WORK_RUN_CANDIDATE_SAVE: 'local.data.work_run_candidate_save',
+  /** 이번 요청과 맞는 Candidate 를 Local 에서 대조해, 이번 요청의 값을 채운 재생 단계만 돌려준다(과거 요청 문장 반환 없음). */
+  DATA_WORK_RUN_CANDIDATE_MATCH: 'local.data.work_run_candidate_match',
+  /** 재생 결과(성공/어긋남)를 Candidate 통계에 반영한다. 반복 실패 Candidate 는 Local 이 끈다. */
+  DATA_WORK_RUN_CANDIDATE_RESULT: 'local.data.work_run_candidate_result',
 } as const;
 
 export type LocalAgentAction = (typeof LOCAL_AGENT_ACTIONS)[keyof typeof LOCAL_AGENT_ACTIONS];
@@ -256,6 +269,9 @@ export const DATA_TARGET_ACTIONS: readonly string[] = Object.freeze([
   LOCAL_AGENT_ACTIONS.DATA_SET_SETTING,
   LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_UPSERT,
   LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_SET_STATUS,
+  LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_CANDIDATE_SAVE,
+  LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_CANDIDATE_MATCH,
+  LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_CANDIDATE_RESULT,
 ]);
 
 /**
@@ -420,7 +436,84 @@ export interface DataWorkRunSetStatusArgs {
   status: string;
   note?: string;
 }
-export type DataActionArgs = DataGetMetaArgs | DataQueryArgs | DataSetSettingArgs | DataWorkRunUpsertArgs | DataWorkRunSetStatusArgs;
+export interface DataWorkRunCandidateSaveArgs {
+  runId: string;
+  targetId: string;
+  template: string;
+  steps: WorkflowStep[];
+  /** 이번 run 이 이 Candidate 를 재생했다면 그 id(성공 통계 반영). */
+  replayedCandidateId?: string;
+}
+export interface DataWorkRunCandidateMatchArgs {
+  targetId: string;
+  request: string;
+}
+export interface DataWorkRunCandidateResultArgs {
+  candidateId: string;
+  outcome: 'replay_completed' | 'replay_diverged';
+}
+export type DataActionArgs =
+  | DataGetMetaArgs
+  | DataQueryArgs
+  | DataSetSettingArgs
+  | DataWorkRunUpsertArgs
+  | DataWorkRunSetStatusArgs
+  | DataWorkRunCandidateSaveArgs
+  | DataWorkRunCandidateMatchArgs
+  | DataWorkRunCandidateResultArgs;
+
+/** Candidate id — Local 이 발급(`wc_` + 소문자·숫자). */
+const LOCAL_WORKFLOW_CANDIDATE_ID_RE = /^wc_[a-z0-9]{6,32}$/;
+export function isValidWorkflowCandidateId(value: unknown): value is string {
+  return typeof value === 'string' && LOCAL_WORKFLOW_CANDIDATE_ID_RE.test(value);
+}
+const WORKFLOW_RESULT_OUTCOMES: readonly string[] = Object.freeze(['replay_completed', 'replay_diverged']);
+
+function onlyKeys(src: Record<string, unknown>, allowed: readonly string[]): boolean {
+  return Object.keys(src).every((k) => allowed.includes(k));
+}
+
+/** `{ runId, targetId, template, steps, replayedCandidateId? }` — 값 없는 semantic 단계 + 요청 템플릿만. */
+export function validateDataWorkRunCandidateSaveArgs(args: unknown): { ok: boolean; args?: DataWorkRunCandidateSaveArgs } {
+  if (!args || typeof args !== 'object' || Array.isArray(args)) return { ok: false };
+  const src = args as Record<string, unknown>;
+  if (!onlyKeys(src, ['runId', 'targetId', 'template', 'steps', 'replayedCandidateId'])) return { ok: false };
+  if (!isValidLocalWorkRunId(src.runId) || !isRegisteredWorkTarget(src.targetId) || !isValidRequestTemplate(src.template)) return { ok: false };
+  const steps = validateWorkflowSteps(src.steps);
+  if (!steps) return { ok: false };
+  // 템플릿의 값 자리와 단계의 slot 이 서로 맞아야 한다(없는 자리를 쓰는 단계 · 안 쓰이는 자리 금지).
+  const templateSlots = new Set([...(src.template as string).matchAll(/\{\{(\d)\}\}/g)].map((m) => Number(m[1])));
+  const usedSlots = new Set(steps.filter((s) => s.slot !== undefined).map((s) => s.slot as number));
+  if (templateSlots.size !== usedSlots.size || [...usedSlots].some((n) => !templateSlots.has(n))) return { ok: false };
+  const out: DataWorkRunCandidateSaveArgs = { runId: src.runId as string, targetId: src.targetId as string, template: src.template as string, steps };
+  if (src.replayedCandidateId !== undefined) {
+    if (!isValidWorkflowCandidateId(src.replayedCandidateId)) return { ok: false };
+    out.replayedCandidateId = src.replayedCandidateId;
+  }
+  return { ok: true, args: out };
+}
+
+/** `{ targetId, request }` — 대조는 Local 이 한다. 요청은 정규화·절단(목표 요약과 같은 상한). */
+export function validateDataWorkRunCandidateMatchArgs(args: unknown): { ok: boolean; args?: DataWorkRunCandidateMatchArgs } {
+  if (!args || typeof args !== 'object' || Array.isArray(args)) return { ok: false };
+  const src = args as Record<string, unknown>;
+  if (!onlyKeys(src, ['targetId', 'request'])) return { ok: false };
+  if (!isRegisteredWorkTarget(src.targetId)) return { ok: false };
+  const request = sanitizeWorkRunText(src.request);
+  if (!request || request !== src.request) return { ok: false };
+  return { ok: true, args: { targetId: src.targetId as string, request } };
+}
+
+/** `{ candidateId, outcome }` — 재생 결과 enum 만. */
+export function validateDataWorkRunCandidateResultArgs(args: unknown): { ok: boolean; args?: DataWorkRunCandidateResultArgs } {
+  if (!args || typeof args !== 'object' || Array.isArray(args)) return { ok: false };
+  const src = args as Record<string, unknown>;
+  const keys = Object.keys(src).sort();
+  if (keys.length !== 2 || keys[0] !== 'candidateId' || keys[1] !== 'outcome') return { ok: false };
+  if (!isValidWorkflowCandidateId(src.candidateId)) return { ok: false };
+  if (typeof src.outcome !== 'string' || !WORKFLOW_RESULT_OUTCOMES.includes(src.outcome)) return { ok: false };
+  return { ok: true, args: { candidateId: src.candidateId, outcome: src.outcome as DataWorkRunCandidateResultArgs['outcome'] } };
+}
 
 /** `{ key }` — allowlist 된 meta 키 하나. 그 밖의 키·추가 필드는 실패. */
 export function validateDataGetMetaArgs(args: unknown): { ok: boolean; args?: DataGetMetaArgs } {
@@ -551,6 +644,18 @@ export function validateLocalCommandArgs(
   }
   if (base === LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_SET_STATUS) {
     const r = validateDataWorkRunSetStatusArgs(args);
+    return r.ok && r.args ? { ok: true, args: r.args } : { ok: false };
+  }
+  if (base === LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_CANDIDATE_SAVE) {
+    const r = validateDataWorkRunCandidateSaveArgs(args);
+    return r.ok && r.args ? { ok: true, args: r.args } : { ok: false };
+  }
+  if (base === LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_CANDIDATE_MATCH) {
+    const r = validateDataWorkRunCandidateMatchArgs(args);
+    return r.ok && r.args ? { ok: true, args: r.args } : { ok: false };
+  }
+  if (base === LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_CANDIDATE_RESULT) {
+    const r = validateDataWorkRunCandidateResultArgs(args);
     return r.ok && r.args ? { ok: true, args: r.args } : { ok: false };
   }
   if (base === LOCAL_AGENT_ACTIONS.COMPUTER_CLICK) {
@@ -1139,7 +1244,23 @@ export function pickSafeDataInfo(data: unknown): Record<string, unknown> {
   // Work Run 쓰기 verb 확인용 — runId 반향 + 상태 enum 만. goal/note/화면 텍스트는 통과하지 않는다.
   if (isValidLocalWorkRunId(src.runId)) out.runId = src.runId;
   if (typeof src.runStatus === 'string' && LOCAL_WORK_RUN_STATUSES.includes(src.runStatus)) out.runStatus = src.runStatus;
+  // Candidate 저장·결과 확인용 — id 반향 + 결과 enum 만.
+  if (isValidWorkflowCandidateId(src.candidateId)) out.candidateId = src.candidateId;
+  if (typeof src.candidateStatus === 'string' && ['active', 'disabled'].includes(src.candidateStatus)) out.candidateStatus = src.candidateStatus;
   return out;
+}
+
+/**
+ * `local.data.work_run_candidate_match` 응답 화이트리스트. matched · candidateId · **재생 단계(값 채움)** 만.
+ * 단계는 validateReplaySteps 형상을 통과해야 한다 — 과거 요청 문장 · 템플릿 · 통계 · 임의 필드는 통과하지 않는다.
+ */
+export function pickSafeWorkflowMatchInfo(data: unknown): Record<string, unknown> {
+  if (!data || typeof data !== 'object' || Array.isArray(data)) return { matched: false };
+  const src = data as Record<string, unknown>;
+  if (src.matched !== true || !isValidWorkflowCandidateId(src.candidateId)) return { matched: false };
+  const steps = validateReplaySteps(src.steps);
+  if (!steps) return { matched: false };
+  return { matched: true, candidateId: src.candidateId, steps };
 }
 
 /**
@@ -1244,6 +1365,9 @@ export function pickSafeResultData(action: string, data: unknown): Record<string
   }
   if (base === LOCAL_AGENT_ACTIONS.DATA_QUERY) {
     return pickSafeDataQueryInfo(data);
+  }
+  if (base === LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_CANDIDATE_MATCH) {
+    return pickSafeWorkflowMatchInfo(data);
   }
   if (DATA_TARGET_ACTIONS.includes(base)) {
     return pickSafeDataInfo(data);

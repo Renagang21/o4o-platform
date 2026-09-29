@@ -1,7 +1,7 @@
 # CHECK-O4O-WEB-AUTOMATION-USER-GUIDED-RESUME-AND-WORKFLOW-CANDIDATE-REPLAY-V1
 
 > **WO**: `WO-O4O-WEB-AUTOMATION-USER-GUIDED-RESUME-AND-WORKFLOW-CANDIDATE-REPLAY-V1`
-> **상태**: **PHASE 1 구현 + self 검증(tsc · 단위 124/124) 완료** — 실 web smoke A~F = **PENDING_USER_VERIFICATION**(§58). PHASE 2(trajectory·Candidate·replay) 미착수. WO 종료 판단은 사용자 몫.
+> **상태**: **PHASE 1 구현 + self 검증(tsc · 단위 124/124) 완료** — 실 web smoke A~F = **PENDING_USER_VERIFICATION**(§58). **PHASE 2(trajectory·Candidate·replay) 구현 + self 검증 완료(§9, 2026-09-29)** — 실 replay smoke G~K = PENDING_USER_VERIFICATION. WO 종료 판단은 사용자 몫(CLOSED 전 PHASE 1 · PHASE 2 실 smoke 모두 필요).
 > **작성일**: 2026-09-16
 > **선행**: `WO-O4O-PHARMACY-WEB-AUTOMATION-CORE-AND-HEALTHKR-ADAPTER-V0` · `WO-O4O-COMPUTER-USE-V0` · `WO-O4O-AUTOMATION-EXECUTION-LAYER-REALIGNMENT-V1` · PHASE 0 preflight IR(commit `52a9df42a`)
 > **commit**: `d9b11d204` (PHASE 1 코드 · 테스트 · migration · manifest) · 본 문서
@@ -106,5 +106,70 @@ npx jest work-agent local-agent-runtime local-agent-oneclick-pairing
 ## 8. 남은 것
 
 - PHASE 1 실 web smoke A~F(사용자 검증).
-- PHASE 2: trajectory 캡처 → semantic Workflow Candidate → 재검증형 결정론적 재생 → self-healing 전환(WO §3·§4·§5).
+- ~~PHASE 2: trajectory 캡처 → semantic Workflow Candidate → 재검증형 결정론적 재생 → self-healing 전환(WO §3·§4·§5).~~ → §9 구현 완료. 실 replay smoke G~K 남음.
 - coordination service · executor · 스키마의 실 Postgres 왕복(격리 PG 또는 production smoke)은 별도 표기.
+
+---
+
+## 9. PHASE 2 — Workflow Candidate & Deterministic Replay (2026-09-29)
+
+**사용자 결정(2026-09-29)**: ① PHASE 1 실 smoke 와 병행해 PHASE 2 코드 착수(CLOSED 전 PHASE 1 · PHASE 2 실 smoke 모두 필요) ② IR §9-2·§9-3 초안 승인 — Local SQLite v5 + guarded verb, **Cloud 테이블·migration 0**.
+
+핵심 원칙: **클릭 매크로가 아니라 semantic trajectory 를 저장한다** — "첫 실행은 AI, 반복은 Workflow, 예외에서만 AI".
+
+### 9-1. 흐름
+
+| 단계 | 동작 | 위치 |
+|---|---|---|
+| 기록 | 성공한 DOM 행동(set_input · select_option · click)마다 **행동 전 관찰의 같은 요소** → `{actionKind, locator(role·name\|text), expect(navigated·changed), path(pathname만)}` | `work-agent-runtime.ts` `execActOnce` → `buildTrajectoryEntry` |
+| 일반화 | 완료된 새 run → 입력값을 요청 문장 안의 자리로 바꾼 **요청 템플릿**(`약학정보원에서 {{1}} 검색해줘`) + 값 없는 단계(set_input 은 `slot` 번호, 요청에 없는 select_option 은 고정 UI 라벨). 값이 요청에서 오지 않으면 저장 안 함(`not_generalizable`) | `workflow-candidate.ts` `buildWorkflowCandidate` |
+| 저장 | `local.data.work_run_candidate_save` → Local `local_work_run_steps`(run 원장) + `local_workflow_candidates`((대상, 템플릿) 하나 = 하나, 다시 성공하면 최신 경로로 갱신 · 재활성) | agent `local-db.mjs` v5 |
+| 대조 | 새 run(재개·사용자 힌트·이미지 아님, DOM 표면) 첫 관찰 뒤 `local.data.work_run_candidate_match` — **대조는 Local 이 한다**. 돌아오는 것은 candidateId + 이번 요청의 값을 채운 단계뿐(템플릿·통계·source run 미반환, `pickSafeWorkflowMatchInfo`) | agent `LocalWorkflowCandidateRepository.match` |
+| 재생 | 단계마다 **현재 화면에서** `find(role·name\|text)` → 정확히 같은 이름이 하나일 때만 대상(`pickReplayTarget`) → 같은 `validateWorkProposal` → 같은 `execActOnce`(안전 경계·COMMIT·credential 인계 그대로) → checkpoint(저장 때 이동했던 단계가 이동하지 않으면 어긋남) | runtime 재생 prefix |
+| self-healing | 찾지 못함 · 모호 · 검증 거절 · 실패 · checkpoint 불일치 → 즉시 멈추고 전체 화면 재관찰 뒤 **AI loop 가 이어받음**. 완료되면 AI 가 고친 경로로 같은 템플릿 Candidate 갱신 | runtime |
+| 완료 판단 | 재생이 하지 않는다 — 재생 뒤에도 Planner 가 확인(보통 계획 1회). 맹목 재생 금지 | runtime |
+| 통계 | 재생 run 이 완료로 저장되면 재생 Candidate 성공 +1, 완료되지 않으면 `candidate_result(replay_diverged)`. 실패 ≥3 이고 성공보다 많으면 Local 이 `disabled` | agent |
+
+### 9-2. 저장 경계
+
+- **Cloud(Postgres)**: 신규 테이블·컬럼·migration **0**. `work_run_coordination` 무변경.
+- **Local SQLite v5 `workflow_candidates_v1`**: `local_work_run_steps(run_id, step_index, action_kind, step_json)` · `local_workflow_candidates(candidate_id, target_id, request_template, steps_json, source_run_id, success_count, failure_count, status)`. 좌표 · elementRef · snapshot · DOM 전문 · 캡처 · **입력값** · 인증정보 · 개인정보 컬럼 없음.
+- 명령 인자는 기존 명령과 같이 `local_agent_commands.result_data` 를 한 번 지나가고 전달 즉시 wipe(저장 아님).
+- 개인 범위 전용 — 공유 workflow 자동 승격 없음. UIA(windows_app) 표면은 이번 범위 밖(DOM 우선, WO).
+- 새 verb 3개는 `local.data.work_run_candidate_{save,match,result}` — 서버·agent 양쪽 형상 검증(알 수 없는 키 · 값 · 좌표 · elementRef · 미등재 대상 · 템플릿 자리 불일치 거부). 서버 `workflow-candidate.ts` ↔ agent `handlers.mjs`/`local-db.mjs` 규칙은 손 복제이며 spec 이 상수·action 이름·DDL 을 대조한다.
+- 계약 완화(IR §9-4)는 `work-agent-contract.ts` 머리 주석에 PHASE 2 범위만 추가 — scheduler · queue · workflow engine · `automation_jobs` 사용 금지는 그대로.
+
+### 9-3. 결과 · 측정 신호
+
+- `WorkAgentRunResult.workflow = { replay: none|completed|diverged, replayedSteps, candidate: none|saved|not_generalizable|skipped|failed }` — HTTP 응답 `data.workflow` · 로그 `work-agent workflow`(enum · 개수 · aiPlanCount 만).
+- 결정적 테스트 기준 AI 계획 횟수: 첫 성공 **3회** → 같은 형태 재생 **1회**(완료 확인만).
+
+### 9-4. self 검증 (이번 세션 실측)
+
+| 검증 | 결과 |
+|---|---|
+| 신규 `workflow-candidate.spec.ts` | **15/15 PASS** — 템플릿 일반화·대조 · semantic 단계(값·elementRef·좌표 없음) · 재생 대상 선택 · protocol 검증기 · match 응답 화이트리스트 · 서버↔agent 복제 정합 · runtime(저장 / 재생 AI 3→1 / 어긋남 → AI 이어받음 + self-healing 저장 / 미완료 → diverged 반영 / not_generalizable · 힌트 run skip / 회귀) |
+| 자동화 관련 server suite 14개(work-agent · llm-closure · recovery · visual-fastloop · target-discovery · windows × 2 · local-data-bridge · local-agent-runtime · computer-use · browser-dom-control · unified-request × 2 · workflow-candidate) | **257/257 PASS** |
+| agent `node --test test/*.test.mjs` | **123/123 PASS**(local-db 신규 4건: 저장→대조 값 채움·템플릿 미반환 / 재저장 갱신·반복 실패 disabled·재성공 재활성 / 형상 밖 인자 거부 / 템플릿 대조 규칙) |
+| api `tsc --noEmit` | 0 |
+| ESLint(변경 파일) · lint ratchet | 0 · 46(기준선 불변) |
+| `handlers.mjs` 제어문자 | 추가 0(기존 2 그대로) |
+
+### 9-5. 실 replay smoke G~K = PENDING_USER_VERIFICATION
+
+Local Agent 가 연결된 PC + 실 Chrome + 등재 사이트에서, **Agent 가 조작**해야 성립한다(PHASE 1 A~F 와 같은 창에서 함께).
+
+- **G**. 첫 요청(예: "약학정보원에서 타이레놀 검색해줘") 완료 → 응답 `workflow.candidate=saved` · Local `local_workflow_candidates` 1행(입력값 없음).
+- **H**. 같은 형태 요청("…아스피린 검색해줘") → `workflow.replay=completed` · `aiPlanCount` 감소 · 실제 검색 결과 화면 도달.
+- **I**. 화면이 달라 재생이 어긋나는 경우 → `replay=diverged` → AI 가 이어서 완료 · Candidate 갱신.
+- **J**. Cloud DB 에 trajectory · 템플릿 · 값 저장 없음(`work_run_coordination` 컬럼 불변, `local_agent_commands.result_data` wipe).
+- **K**. 반복 실패 Candidate 는 Local 에서 disabled → 다음 요청은 AI 가 처음부터.
+
+### 9-6. 남은 것
+
+- PHASE 1 A~F + PHASE 2 G~K 실 smoke(사용자 · Local Agent 연결 PC). 둘 다 PASS 전에는 WO CLOSED 아님.
+- 사용자 힌트로 푼 분기(decisionPoint)의 일반화 — 이번 구현은 재개·힌트 run 을 Candidate 로 만들지 않는다(`skipped`). 다음 단계.
+- UIA(windows_app) 표면 재생 — DOM 우선 원칙에 따라 이번 범위 밖.
+- 배포: API · agent 배포 대상. Cloud migration 없음. Local SQLite v5 는 agent 기동 시 자동 적용(백업 선행 기존 절차).
+
+**문서 정합**: 발견 0건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 0건 — 기준 문서(`O4O-AI-AUTOMATION-EVOLUTION-PRINCIPLES-V1`)와 충돌 없음(사이트별 업무 사전 정의 없음 · 사용자 성공에서 학습 · 재생은 현재 화면 재검증).

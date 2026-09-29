@@ -214,10 +214,11 @@ describe('5~8. 좁은 structured args 강제 (§6·§11)', () => {
 // ─── 9~11. allowlist · registry (§12·§18) ────────────────────────────────────
 
 describe('9~11. tool 등록부 · allowlist', () => {
-  it('9. 데이터 축은 V1 3개 + 좁은 조회 query 1개 + PHASE 1 work_run ledger 2개뿐 — allowlist 에 접미사 없이 그대로 있고, #appId 형태는 없다', () => {
+  it('9. 데이터 축은 V1 3개 + 좁은 조회 query 1개 + PHASE 1 work_run ledger 2개 + PHASE 2 candidate 3개뿐 — allowlist 에 접미사 없이 그대로 있고, #appId 형태는 없다', () => {
     // PHASE 1 same-run(WEB-AUTOMATION-RESUME-V1)이 cloud→local write 전용 ledger 명령 2개를 더했다.
     // COMPOSITE-QUERY-ORCHESTRATION-V1 이 원내 약품 좁은 조회 read-only 명령 1개(query)를 더했다 — 임의 SQL 이 아니라
-    // 등재 dataset(hospital_drug_list) + 등재 필드 화이트리스트 안의 field/value 조회다. 그 밖의 확장은 없다.
+    // 등재 dataset(hospital_drug_list) + 등재 필드 화이트리스트 안의 field/value 조회다.
+    // PHASE 2(IR §9-3)가 Workflow Candidate 명령 3개를 더했다 — 값 없는 semantic 단계 저장 · Local 대조 · 결과 enum. 그 밖의 확장은 없다.
     expect(DATA_TARGET_ACTIONS).toEqual([
       LOCAL_AGENT_ACTIONS.DATA_HEALTH,
       LOCAL_AGENT_ACTIONS.DATA_GET_META,
@@ -225,6 +226,9 @@ describe('9~11. tool 등록부 · allowlist', () => {
       LOCAL_AGENT_ACTIONS.DATA_SET_SETTING,
       LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_UPSERT,
       LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_SET_STATUS,
+      LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_CANDIDATE_SAVE,
+      LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_CANDIDATE_MATCH,
+      LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_CANDIDATE_RESULT,
     ]);
     for (const a of DATA_TARGET_ACTIONS) {
       expect(isAllowedLocalAction(a)).toBe(true);
@@ -436,11 +440,13 @@ describe('V1. health 확장 · 실패 원인 구분 · agent 경계', () => {
     const handlers = readAgentSrc('handlers.mjs');
     expect(handlers).not.toContain('local-data-cli');
     expect(handlers).not.toContain("'node:fs'");
-    // 서버 계약의 데이터 action 은 V1 3개 + 좁은 조회 query 1개 + PHASE 1 work_run ledger 2개 — import/export/backup 은 여전히 cloud 명령이 아니라 로컬 CLI 다(§63).
+    // 서버 계약의 데이터 action 은 V1 3개 + 좁은 조회 query 1개 + PHASE 1 work_run ledger 2개 + PHASE 2 candidate 3개 — import/export/backup 은 여전히 cloud 명령이 아니라 로컬 CLI 다(§63).
     expect(Object.values(LOCAL_AGENT_ACTIONS).filter((a) => a.startsWith('local.data.'))).toEqual([
       LOCAL_AGENT_ACTIONS.DATA_HEALTH, LOCAL_AGENT_ACTIONS.DATA_GET_META, LOCAL_AGENT_ACTIONS.DATA_QUERY,
       LOCAL_AGENT_ACTIONS.DATA_SET_SETTING,
       LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_UPSERT, LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_SET_STATUS,
+      LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_CANDIDATE_SAVE, LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_CANDIDATE_MATCH,
+      LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_CANDIDATE_RESULT,
     ]);
     const cli = readAgentSrc('local-data-cli.mjs');
     expect(cli).toContain('args.file');

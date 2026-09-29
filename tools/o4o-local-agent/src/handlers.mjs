@@ -43,7 +43,7 @@ import {
   validateKeyArgs,
   validateTextArgs,
 } from './computer-use-limits.mjs';
-import { LocalMetaRepository, LocalSettingsRepository, LocalWorkRunRepository, LocalDatasetRepository, DATASET_NAME_RE, FIELD_NAME_RE, WORK_RUN_ID_RE, WORK_RUN_STATUSES, localDbHealth, LocalDbError } from './local-db.mjs';
+import { LocalMetaRepository, LocalSettingsRepository, LocalWorkRunRepository, LocalWorkflowCandidateRepository, LocalDatasetRepository, DATASET_NAME_RE, FIELD_NAME_RE, WORK_RUN_ID_RE, WORK_RUN_STATUSES, WORKFLOW_CANDIDATE_ID_RE, localDbHealth, LocalDbError } from './local-db.mjs';
 import { backupSummary } from './local-db-backup.mjs';
 import { prepareTarget, resolveRegisteredTarget } from './work-target.mjs';
 import { uiaInspect, uiaSetValue, uiaInvoke, uiaKey, uiaClick } from './windows-uia.mjs';
@@ -102,6 +102,9 @@ export const ACTIONS = {
   DATA_QUERY: 'local.data.query',
   DATA_WORK_RUN_UPSERT: 'local.data.work_run_upsert',
   DATA_WORK_RUN_SET_STATUS: 'local.data.work_run_set_status',
+  DATA_WORK_RUN_CANDIDATE_SAVE: 'local.data.work_run_candidate_save',
+  DATA_WORK_RUN_CANDIDATE_MATCH: 'local.data.work_run_candidate_match',
+  DATA_WORK_RUN_CANDIDATE_RESULT: 'local.data.work_run_candidate_result',
 };
 
 /**
@@ -749,6 +752,161 @@ function validateWorkRunUpsertArgs(args) {
   return { ok: true, args: out };
 }
 
+// ── Workflow Candidate (WEB-AUTOMATION-RESUME-V1 PHASE 2 · IR §8·§9-3) ─────────
+// 서버 workflow-candidate.ts · local-agent-protocol.ts 와 같은 형상 규칙(손 복제 — agent 는 TS 를 import 하지 않는다).
+// 저장은 값 없는 semantic 단계 + 요청 템플릿만. 대조 결과로는 이번 요청의 값을 채운 재생 단계만 돌려준다.
+const WORKFLOW_ACTION_KINDS = Object.freeze(['set_input', 'select_option', 'click']);
+const WORKFLOW_FIND_ROLES = Object.freeze([
+  'button', 'link', 'textbox', 'searchbox', 'combobox', 'checkbox', 'radio', 'heading', 'table', 'tab', 'menuitem', 'listitem',
+]);
+const WORKFLOW_MAX_STEPS = 12;
+const WORKFLOW_MAX_SLOTS = 4;
+const WORKFLOW_LOCATOR_MAX = 100;
+const WORKFLOW_TEMPLATE_MAX = 300;
+const WORKFLOW_OPTION_MAX = 100;
+const WORKFLOW_PATH_MAX = 120;
+const WORKFLOW_REQUEST_MAX = 500;
+
+/** 제어문자 → 공백 · 공백 1칸 · trim. 정규식에 제어문자를 두지 않는다(char code 비교). */
+function workflowNormalize(value) {
+  if (typeof value !== 'string') return '';
+  let s = '';
+  for (const ch of value) {
+    const code = ch.charCodeAt(0);
+    s += code < 0x20 || code === 0x7f ? ' ' : ch;
+  }
+  return s.replace(/\s+/g, ' ').trim();
+}
+
+function isWorkflowText(value, max) {
+  return typeof value === 'string' && value.length > 0 && value.length <= max && workflowNormalize(value) === value && !/[<>{}]/.test(value);
+}
+
+function validateWorkflowLocator(raw) {
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return null;
+  for (const k of Object.keys(raw)) if (!['role', 'name', 'text'].includes(k)) return null;
+  const out = {};
+  if (raw.role !== undefined) {
+    if (!WORKFLOW_FIND_ROLES.includes(raw.role)) return null;
+    out.role = raw.role;
+  }
+  for (const k of ['name', 'text']) {
+    if (raw[k] === undefined) continue;
+    if (!isWorkflowText(raw[k], WORKFLOW_LOCATOR_MAX)) return null;
+    out[k] = raw[k];
+  }
+  if (!out.name && !out.text) return null;
+  return out;
+}
+
+function validateWorkflowExpect(raw) {
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return null;
+  const keys = Object.keys(raw).sort();
+  if (keys.length !== 2 || keys[0] !== 'changed' || keys[1] !== 'navigated') return null;
+  if (typeof raw.navigated !== 'boolean' || typeof raw.changed !== 'boolean') return null;
+  return { navigated: raw.navigated, changed: raw.changed };
+}
+
+function validateWorkflowSteps(raw) {
+  if (!Array.isArray(raw) || raw.length === 0 || raw.length > WORKFLOW_MAX_STEPS) return null;
+  const out = [];
+  for (const item of raw) {
+    if (!item || typeof item !== 'object' || Array.isArray(item)) return null;
+    for (const k of Object.keys(item)) if (!['actionKind', 'locator', 'slot', 'option', 'expect', 'path'].includes(k)) return null;
+    if (!WORKFLOW_ACTION_KINDS.includes(item.actionKind)) return null;
+    const locator = validateWorkflowLocator(item.locator);
+    const expect = validateWorkflowExpect(item.expect);
+    if (!locator || !expect) return null;
+    const step = { actionKind: item.actionKind, locator, expect };
+    if (item.slot !== undefined) {
+      if (!Number.isInteger(item.slot) || item.slot < 1 || item.slot > WORKFLOW_MAX_SLOTS) return null;
+      step.slot = item.slot;
+    }
+    if (item.option !== undefined) {
+      if (!isWorkflowText(item.option, WORKFLOW_OPTION_MAX)) return null;
+      step.option = item.option;
+    }
+    if (item.path !== undefined) {
+      if (typeof item.path !== 'string' || !item.path.startsWith('/') || /[?#\s]/.test(item.path) || item.path.length > WORKFLOW_PATH_MAX) return null;
+      step.path = item.path;
+    }
+    if (step.actionKind === 'set_input' && (step.slot === undefined || step.option !== undefined)) return null;
+    if (step.actionKind === 'select_option' && (step.slot === undefined) === (step.option === undefined)) return null;
+    if (step.actionKind === 'click' && (step.slot !== undefined || step.option !== undefined)) return null;
+    out.push(step);
+  }
+  return out;
+}
+
+function isValidWorkflowTemplate(value) {
+  if (typeof value !== 'string' || value.length === 0 || value.length > WORKFLOW_TEMPLATE_MAX) return false;
+  if (workflowNormalize(value) !== value) return false;
+  const slots = [...value.matchAll(/\{\{(\d)\}\}/g)].map((m) => Number(m[1]));
+  if (slots.some((n) => n < 1 || n > WORKFLOW_MAX_SLOTS)) return false;
+  const rest = value.replace(/\{\{\d\}\}/g, '');
+  if (rest.includes('{') || rest.includes('}')) return false;
+  return rest.replace(/\s+/g, '').length >= 2;
+}
+
+/** candidate_save 인자 검사 — 서버 validateDataWorkRunCandidateSaveArgs 와 동일 규칙. */
+function validateCandidateSaveArgs(args) {
+  if (!args || typeof args !== 'object' || Array.isArray(args)) return { ok: false };
+  for (const k of Object.keys(args)) if (!['runId', 'targetId', 'template', 'steps', 'replayedCandidateId'].includes(k)) return { ok: false };
+  if (typeof args.runId !== 'string' || !WORK_RUN_ID_RE.test(args.runId)) return { ok: false };
+  if (!resolveRegisteredTarget(args.targetId)) return { ok: false };
+  if (!isValidWorkflowTemplate(args.template)) return { ok: false };
+  const steps = validateWorkflowSteps(args.steps);
+  if (!steps) return { ok: false };
+  const templateSlots = new Set([...args.template.matchAll(/\{\{(\d)\}\}/g)].map((m) => Number(m[1])));
+  const usedSlots = new Set(steps.filter((s) => s.slot !== undefined).map((s) => s.slot));
+  if (templateSlots.size !== usedSlots.size || [...usedSlots].some((n) => !templateSlots.has(n))) return { ok: false };
+  const out = { runId: args.runId, targetId: args.targetId, template: args.template, steps };
+  if (args.replayedCandidateId !== undefined) {
+    if (typeof args.replayedCandidateId !== 'string' || !WORKFLOW_CANDIDATE_ID_RE.test(args.replayedCandidateId)) return { ok: false };
+    out.replayedCandidateId = args.replayedCandidateId;
+  }
+  return { ok: true, args: out };
+}
+
+/** candidate_match 인자 검사 — `{ targetId, request }`. */
+function validateCandidateMatchArgs(args) {
+  if (!args || typeof args !== 'object' || Array.isArray(args)) return { ok: false };
+  for (const k of Object.keys(args)) if (!['targetId', 'request'].includes(k)) return { ok: false };
+  if (!resolveRegisteredTarget(args.targetId)) return { ok: false };
+  if (typeof args.request !== 'string' || args.request.length === 0 || args.request.length > WORKFLOW_REQUEST_MAX) return { ok: false };
+  if (workflowNormalize(args.request) !== args.request) return { ok: false };
+  return { ok: true, args: { targetId: args.targetId, request: args.request } };
+}
+
+/** candidate_result 인자 검사 — `{ candidateId, outcome }`. */
+function validateCandidateResultArgs(args) {
+  if (!args || typeof args !== 'object' || Array.isArray(args)) return { ok: false };
+  const keys = Object.keys(args).sort();
+  if (keys.length !== 2 || keys[0] !== 'candidateId' || keys[1] !== 'outcome') return { ok: false };
+  if (typeof args.candidateId !== 'string' || !WORKFLOW_CANDIDATE_ID_RE.test(args.candidateId)) return { ok: false };
+  if (!['replay_completed', 'replay_diverged'].includes(args.outcome)) return { ok: false };
+  return { ok: true, args: { candidateId: args.candidateId, outcome: args.outcome } };
+}
+
+/** `local.data.work_run_candidate_save` — 저장 확인만 돌려준다(id · 상태). */
+function dataCandidateSave(args) {
+  const r = LocalWorkflowCandidateRepository.save(args);
+  return { status: 'success', data: { saved: true, candidateId: r.candidateId, candidateStatus: r.candidateStatus } };
+}
+
+/** `local.data.work_run_candidate_match` — 대조는 여기서. 템플릿 · 통계 · source run 은 돌려주지 않는다. */
+function dataCandidateMatch(args) {
+  const r = LocalWorkflowCandidateRepository.match(args);
+  if (!r.matched) return { status: 'success', data: { matched: false } };
+  return { status: 'success', data: { matched: true, candidateId: r.candidateId, steps: r.steps } };
+}
+
+/** `local.data.work_run_candidate_result` — 재생 결과 반영(id · 상태만). */
+function dataCandidateResult(args) {
+  const r = LocalWorkflowCandidateRepository.recordResult(args);
+  return { status: 'success', data: { saved: true, candidateId: r.candidateId, candidateStatus: r.candidateStatus } };
+}
+
 /** work_run_set_status 인자 검사 — `{ runId, status, note? }`. */
 function validateWorkRunSetStatusArgs(args) {
   if (!args || typeof args !== 'object' || Array.isArray(args)) return { ok: false };
@@ -839,6 +997,9 @@ const DATA_HANDLERS = {
   [ACTIONS.DATA_QUERY]: { validate: validateDataQueryArgs, run: (args) => dataQuery(args) },
   [ACTIONS.DATA_WORK_RUN_UPSERT]: { validate: validateWorkRunUpsertArgs, run: (args) => dataWorkRunUpsert(args) },
   [ACTIONS.DATA_WORK_RUN_SET_STATUS]: { validate: validateWorkRunSetStatusArgs, run: (args) => dataWorkRunSetStatus(args) },
+  [ACTIONS.DATA_WORK_RUN_CANDIDATE_SAVE]: { validate: validateCandidateSaveArgs, run: (args) => dataCandidateSave(args) },
+  [ACTIONS.DATA_WORK_RUN_CANDIDATE_MATCH]: { validate: validateCandidateMatchArgs, run: (args) => dataCandidateMatch(args) },
+  [ACTIONS.DATA_WORK_RUN_CANDIDATE_RESULT]: { validate: validateCandidateResultArgs, run: (args) => dataCandidateResult(args) },
 };
 
 /**

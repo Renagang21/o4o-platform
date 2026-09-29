@@ -342,6 +342,8 @@ async function performWorkAgentRun(userId: string, body: Record<string, unknown>
         errorCode: result.errorCode ?? null,
         // WORK-TARGET-DISCOVERY-V0 §33·§54 — 대상 준비 요약(안전 필드만). 경로 · 탭 제목 · 실행 경로 없음.
         target: result.target,
+        // PHASE 2 — Workflow 재생/저장 요약(enum · 개수만). 단계 내용 · 템플릿 · 값은 응답에 싣지 않는다.
+        workflow: result.workflow ?? null,
       },
     },
   };

@@ -75,7 +75,21 @@ import {
   type WorkRunCoordinationRow,
   type WorkRunStatus,
 } from './work-run-coordination-service.js';
-import { issueWorkRunSetStatus, issueWorkRunUpsert } from './work-run-executor.js';
+import {
+  issueWorkRunSetStatus,
+  issueWorkRunUpsert,
+  issueWorkflowCandidateMatch,
+  issueWorkflowCandidateResult,
+  issueWorkflowCandidateSave,
+} from './work-run-executor.js';
+import {
+  buildTrajectoryEntry,
+  buildWorkflowCandidate,
+  normalizeWorkflowText,
+  pickReplayTarget,
+  replayFindQuery,
+  type TrajectoryEntry,
+} from './workflow-candidate.js';
 
 /**
  * QUESTION 성격의 인계 사유(§조건 5) — 사용자의 판단/답만 있으면 같은 logical run 으로 이어갈 수 있는 국면.
@@ -427,6 +441,19 @@ export interface WorkAgentRunResult {
   message: string;
   /** WORK-TARGET-DISCOVERY-V0 §33·§54 — 대상 준비 결과(재사용/열림/사용자 요청). 조사 전이면 null. */
   target: WorkTargetOutcome | null;
+  /** PHASE 2 — 이 run 의 Workflow 재생/저장 요약(enum · 개수만). 없으면 Workflow 경로를 타지 않은 run. */
+  workflow?: WorkflowRunSummary;
+}
+
+/**
+ * PHASE 2 Workflow 요약 — 결과·로그용 enum 과 개수만(단계 내용 · 템플릿 · 값 없음).
+ *   replay: none(재생 없음) · completed(모든 단계 재생 후 AI 가 이어 확인) · diverged(중간에 어긋나 AI 가 이어받음)
+ *   candidate: none(저장할 행동 없음) · saved · not_generalizable(입력값이 요청에서 오지 않음 등) · skipped(재개·사용자 힌트 run) · failed
+ */
+export interface WorkflowRunSummary {
+  replay: 'none' | 'completed' | 'diverged';
+  replayedSteps: number;
+  candidate: 'none' | 'saved' | 'not_generalizable' | 'skipped' | 'failed';
 }
 
 /** 문장 또는 힌트에서 등재 site 를 정한다(V0 호환 — browser 대상만). 공통 해석은 `resolveWorkTarget`. */
@@ -483,6 +510,12 @@ export async function runWorkAgent(
   let recoveryGiveupKind: 'question' | 'takeover' = 'takeover';
   let runCreated = false;
   let coordinationVersion: number | null = null;
+  // PHASE 2 — Workflow Candidate. trajectory 는 요청 메모리 전용(성공 DOM 행동의 semantic 형상 + 템플릿용 값).
+  // 값은 Candidate 템플릿을 만들 때만 쓰고 저장하지 않는다. 재생은 새 run(재개·힌트·이미지 없음)의 DOM 표면에서만.
+  const trajectory: TrajectoryEntry[] = [];
+  const workflow: WorkflowRunSummary = { replay: 'none', replayedSteps: 0, candidate: 'none' };
+  let replayedCandidateId: string | null = null;
+  let resumedRun = false;
 
   /**
    * 종료 상태를 정본(Local SQLite, set_status) + 최소 coordination(Cloud, transition) 에 남긴다(§조건 1·2·4).
@@ -506,6 +539,44 @@ export async function runWorkAgent(
     }
   };
 
+  /**
+   * PHASE 2 — run 끝에서 Workflow 정본(Local SQLite)을 갱신한다. best-effort: 실패해도 사용자 응답은 막지 않는다.
+   *   완료 + 새 run(재개·사용자 힌트 아님) → trajectory 를 Candidate 로 일반화해 저장(재생했으면 그 Candidate 성공 반영).
+   *   그 밖에 재생을 했다면 → 재생 결과만 반영(완료로 이어진 전체 재생 = completed, 그 외 = diverged).
+   */
+  const persistWorkflow = async (kind: WorkGoalStatus): Promise<void> => {
+    if (!goal.runId || !deviceId || targetRef.targetType === 'windows_app') return;
+    const ledgerCtx = { userId: ctx.userId, deviceId };
+    let saved = false;
+    try {
+      if (kind === 'completed' && trajectory.length > 0) {
+        if (resumedRun || recoveryHint) {
+          workflow.candidate = 'skipped';
+        } else {
+          const built = buildWorkflowCandidate(goal.request, trajectory);
+          // strictNullChecks off — 판별 union 의 negation narrowing 이 안 먹으므로 reason 은 좁은 캐스트로 읽는다.
+          if (built.ok === false) {
+            workflow.candidate = (built as { reason: string }).reason === 'empty' ? 'none' : 'not_generalizable';
+          } else {
+            const r = await issueWorkflowCandidateSave(dataSource, ledgerCtx, {
+              runId: goal.runId, targetId: siteId, template: built.template, steps: built.steps,
+              ...(replayedCandidateId ? { replayedCandidateId } : {}),
+            });
+            saved = r.status === 'success' && r.safe.saved === true;
+            workflow.candidate = saved ? 'saved' : 'failed';
+          }
+        }
+      }
+      if (replayedCandidateId && !saved) {
+        const outcome = kind === 'completed' && workflow.replay === 'completed' ? 'replay_completed' : 'replay_diverged';
+        await issueWorkflowCandidateResult(dataSource, ledgerCtx, { candidateId: replayedCandidateId, outcome });
+      }
+    } catch (e) {
+      if (workflow.candidate === 'none' && kind === 'completed' && trajectory.length > 0) workflow.candidate = 'failed';
+      logger.warn('work-agent workflow persist failed', { code: (e as { code?: string })?.code ?? null });
+    }
+  };
+
   const finish = async (): Promise<WorkAgentRunResult> => {
     // goal.status ← 진행/종료 종류. QUESTION=waiting_for_user, TAKEOVER=taken_over, 완료=completed, 그 밖 중지=stopped.
     // run 이 열리기 전(대상 준비 실패 등)에는 종전대로 progress 기준으로만 매핑한다 — QUESTION/TAKEOVER 구분은 logical run 이 있어야 의미가 있다.
@@ -520,14 +591,20 @@ export async function runWorkAgent(
     // QUESTION 만 같은 logical run 으로 이어갈 수 있다 — run 이 실제로 열렸을 때만(runId 존재).
     const resumable = kind === 'waiting_for_user' && !!goal.runId;
     if (runCreated && goal.runId) await persistTerminalRun(kind);
+    if (runCreated && goal.runId) await persistWorkflow(kind);
     // §22·§23 usage signal — 허용 키만. goal 원문 · 관찰 · 입력값 · 이미지는 실리지 않는다. 복구 신호는 §60 화이트리스트만.
     logger.info('work-agent run', buildWorkAgentUsageEvent(state, inputMode, new Date(), recoveryStatus));
+    // PHASE 2 — 재생/저장 결과는 enum · 개수만(AI 계획 횟수 감소 측정용). 단계 내용 · 템플릿 · 값은 싣지 않는다.
+    if (workflow.replay !== 'none' || workflow.candidate !== 'none') {
+      logger.info('work-agent workflow', { ...workflow, aiPlanCount: state.aiPlanCount, goalStatus: kind });
+    }
     return {
       ok: state.progress === 'completed' || state.progress === 'needs_user' || state.progress === 'progress',
       goal, siteId, displayName, progress: state.progress, takeover: state.takeover, neededInput, resumable,
       stepCount: state.stepCount, aiPlanCount: state.aiPlanCount, path: state.observation?.path ?? null, history: state.history,
       message: renderWorkAgentMessage(state, displayName, neededInput, targetOutcome, resumable),
       target: targetOutcome,
+      workflow: { ...workflow },
     };
   };
   /** QUESTION — AI 가 막혀 사용자 판단/답이 필요하다. logical run 유지 · 답하면 같은 runId 로 재개(§조건 5·검증 A). */
@@ -645,6 +722,7 @@ export async function runWorkAgent(
     }
     coordinationVersion = claimed.version;
     runCreated = true;
+    resumedRun = true;
   } else {
     goal.runId = goal.goalId; // 새 logical run — goalId 가 곧 runId 앵커.
     const created = await createWorkRun(dataSource, { runId: goal.runId, userId: ctx.userId, deviceId });
@@ -820,6 +898,13 @@ export async function runWorkAgent(
     record.errorCode = outcome.errorCode;
     record.navigated = outcome.safe.navigated === true;
     record.changed = isVisual ? true : outcome.safe.changed === true;
+    // PHASE 2 — 성공한 DOM 행동은 semantic trajectory 로 남긴다(행동 전 관찰의 같은 elementRef 요소 → role·name|text).
+    // 좌표·elementRef·snapshot 은 trajectory 에 들어가지 않는다. 값은 run 끝의 템플릿 일반화에만 쓴다.
+    if (surface === 'dom' && outcome.status === 'success') {
+      const el = (state.observation?.elements ?? []).find((e) => e.elementRef === act.elementRef);
+      const entry = buildTrajectoryEntry(act, el, record, state.observation?.path);
+      if (entry) trajectory.push(entry);
+    }
     state.history.push(record);
     state.lastResult = record;
 
@@ -871,6 +956,69 @@ export async function runWorkAgent(
     const r = await finish();
     r.errorCode = first.errorCode ?? WORK_AGENT_ERROR.SITE_NOT_READY;
     return r;
+  }
+
+  // ── PHASE 2 결정론적 재생(IR §8 재생 규칙) — 같은 대상의 같은 형태 요청이면 저장된 Workflow 를 먼저 빠르게 재생한다. ──
+  //   Local 이 템플릿을 대조해 이번 요청의 값을 채운 semantic 단계만 돌려준다. 각 단계는 **현재 화면에서** locator(role·name|text)로
+  //   다시 찾고(find · 유일할 때만), 같은 제안 검증(validateWorkProposal)과 같은 실행 경로(execActOnce · 안전 경계 그대로)를 거친다.
+  //   찾지 못함 · 모호함 · 검증 거절 · 실패 · 예상 변화(이동) 불일치면 즉시 멈추고 AI loop 가 현재 화면에서 이어받는다(self-healing).
+  //   완료 판단은 재생이 하지 않는다 — 재생 뒤에도 loop 의 Planner 가 확인한다(보통 계획 1회). 맹목 재생 금지.
+  if (surface === 'dom' && !resumedRun && !recoveryHint && !image) {
+    let match: Awaited<ReturnType<typeof issueWorkflowCandidateMatch>> | null = null;
+    try {
+      match = await issueWorkflowCandidateMatch(dataSource, { userId: ctx.userId, deviceId }, {
+        targetId: siteId, request: normalizeWorkflowText(goal.request).slice(0, 500),
+      });
+    } catch (e) {
+      logger.warn('work-agent workflow match failed', { code: (e as { code?: string })?.code ?? null });
+    }
+    if (match?.candidateId && match.steps) {
+      replayedCandidateId = match.candidateId;
+      workflow.replay = 'completed';
+      let observationFresh = true; // 마지막 관찰이 전체 inspect 인가(find 후보로 바뀌면 false).
+      for (const step of match.steps) {
+        // find 1 + 행동 1 + 재관찰 2 + loop 첫 계획 여유 — 예산이 모자라면 재생을 멈추고 AI 에 맡긴다.
+        if (overTime() || budgetLeft() < 5) { workflow.replay = 'diverged'; break; }
+        const f = await dom(LOCAL_AGENT_ACTIONS.DOM_FIND, { query: replayFindQuery(step.locator) });
+        if (f.status !== 'success') {
+          if (f.errorCode === LOCAL_AGENT_ERROR.DOM_USER_ACTION_REQUIRED) return takeover('credential_required', 'needs_user');
+          workflow.replay = 'diverged';
+          break;
+        }
+        const matches = (Array.isArray(f.safe.matches) ? f.safe.matches : []) as SafeDomElement[];
+        const ref = pickReplayTarget(step.locator, matches);
+        if (!ref) { workflow.replay = 'diverged'; break; }
+        const prev = state.observation as WorkObservation & { snapshotId?: string };
+        const findSnapshot = String(f.safe.snapshotId ?? prev.snapshotId ?? '');
+        state.observation = {
+          ...prev, elements: matches, elementCount: matches.length, fingerprint: fingerprintObservation(prev.path, matches), snapshotId: findSnapshot,
+        } as WorkObservation;
+        observationFresh = false;
+        const action: WorkAction =
+          step.actionKind === 'click' ? { kind: 'click', elementRef: ref }
+          : step.actionKind === 'set_input' ? { kind: 'set_input', elementRef: ref, text: step.value }
+          : { kind: 'select_option', elementRef: ref, option: step.value };
+        const checked = validateWorkProposal({ assessment: 'progress', action }, state.observation);
+        if (!checked.ok || !checked.proposal) { workflow.replay = 'diverged'; break; }
+        const dir = await execActOnce(checked.proposal.action, findSnapshot);
+        if (dir.do === 'takeover') return takeover(dir.reason, dir.progress);
+        if (dir.do === 'reject' || state.lastResult?.status !== 'success') { workflow.replay = 'diverged'; break; }
+        workflow.replayedSteps += 1;
+        if (dir.do === 'observe') {
+          if (dir.navigated) await sleep(NAVIGATION_SETTLE_MS);
+          const o = await observe({ afterNavigation: dir.navigated });
+          if (!o.ok) return observeFailed(o);
+          observationFresh = true;
+        }
+        // checkpoint — 저장 때 이동했던 단계가 이번엔 이동하지 않았다면 화면 흐름이 달라졌다.
+        if (step.expect.navigated && state.lastResult?.navigated !== true) { workflow.replay = 'diverged'; break; }
+      }
+      // Planner 는 전체 화면을 봐야 한다 — 재생이 find 후보 관찰로 끝났으면 한 번 새로 관찰한다.
+      if (!observationFresh) {
+        const o = await observe();
+        if (!o.ok) return observeFailed(o);
+      }
+    }
   }
 
   // ── loop ──────────────────────────────────────────────────────────────────
