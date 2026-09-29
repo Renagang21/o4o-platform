@@ -17,11 +17,7 @@ import { GlobalHeader, filterContextualNav } from '@o4o/ui';
 import { NotificationBell, useNotifications, getUserDisplayName } from '@o4o/account-ui';
 import type { NotificationItem } from '@o4o/account-ui';
 import { notificationsApi, NOTIFICATION_SERVICE_KEY } from '../lib/api/notifications';
-import {
-  ADMIN_ROLES,
-  OPERATOR_OR_ABOVE_ROLES,
-  SUPPLIER_ONLY_ROLES,
-} from '../lib/role-constants';
+import { SUPPLIER_ONLY_ROLES } from '../lib/role-constants';
 import { useAuth } from '../contexts/AuthContext';
 import { useLoginModal } from '../contexts/LoginModalContext';
 import {
@@ -71,16 +67,12 @@ export function NetureGlobalHeader() {
     [navigate],
   );
 
-  const isAdmin = isAuthenticated && user?.roles?.some((r: string) => ADMIN_ROLES.includes(r));
-  const isOperator = isAuthenticated && user?.roles?.some((r: string) => OPERATOR_OR_ABOVE_ROLES.includes(r));
   const isSupplier = isAuthenticated && user?.roles?.some((r: string) => SUPPLIER_ONLY_ROLES.includes(r));
 
-  // WO-O4O-COMMON-MENU-VISIBILITY-POLICY-IMPL-V1: operator/admin은 모든 메뉴를 본다
-  const contextualNav = filterContextualNav(
-    NETURE_CONTEXTUAL_NAV,
-    { supplier: !!isSupplier },
-    { showAll: !!(isAdmin || isOperator) },
-  );
+  // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1: contextual nav 는 진입 가능한 사람에게만 보인다.
+  //   유일 항목 '공급자 대시보드'(SupplierRoute)는 operator/admin 역할로 통과하지 못하므로
+  //   operator/admin showAll(WO-O4O-COMMON-MENU-VISIBILITY-POLICY-IMPL-V1)을 이 서비스에서는 쓰지 않는다.
+  const contextualNav = filterContextualNav(NETURE_CONTEXTUAL_NAV, { supplier: !!isSupplier });
 
   const headerUser = user
     ? { displayName: getUserDisplayName(user), email: user.email }

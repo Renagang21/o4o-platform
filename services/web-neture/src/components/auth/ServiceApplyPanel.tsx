@@ -11,6 +11,10 @@
  *   suspended / withdrawn → 안내만
  * 상태 출처는 서버 serviceStates 뿐이다 (role 문자열로 판정하지 않는다).
  * WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1: 파트너 서비스 신청 은퇴.
+ *
+ * WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1: 관리자 우회 분기 제거.
+ *   `neture:admin` · `platform:super_admin` 도 공급자 업무 공간(SupplierRoute)을 역할만으로 통과하지 못한다.
+ *   관리자 역할로 폼을 숨기고 거부될 업무 링크를 보이던 분기를 없애고, 모든 회원이 서비스 이용 상태로 판정받는다.
  */
 
 import { useState, type FormEvent } from 'react';
@@ -18,7 +22,6 @@ import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { api } from '../../lib/apiClient';
-import { ADMIN_ROLES } from '../../lib/role-constants';
 import { NETURE_SERVICE_INFO, SERVICE_STATUS_LABELS } from '../../lib/home-entry';
 import { useNetureServiceStates } from '../../lib/neture-service-state';
 
@@ -33,8 +36,7 @@ const ERROR_MESSAGES: Record<string, string> = {
 
 export function ServiceApplyPanel({ service }: { service: ServiceKey }) {
   const { user, isAuthenticated } = useAuth();
-  const isAdmin = (user?.roles ?? []).some((r) => ADMIN_ROLES.includes(r));
-  const { states, loading, error, reload } = useNetureServiceStates(isAuthenticated && !isAdmin);
+  const { states, loading, error, reload } = useNetureServiceStates(isAuthenticated);
   const info = NETURE_SERVICE_INFO[service];
 
   const [name, setName] = useState('');
@@ -46,17 +48,6 @@ export function ServiceApplyPanel({ service }: { service: ServiceKey }) {
   if (!isAuthenticated) return null;
 
   const box = 'bg-white/95 text-gray-900 rounded-xl p-6 text-left max-w-lg mx-auto shadow-lg';
-
-  if (isAdmin) {
-    return (
-      <div className={box} data-testid={`service-apply-${service}-admin`}>
-        <p className="text-sm text-gray-600 mb-3">관리자 계정입니다. 운영 목적으로 {info.workLabel} 공간에 들어갈 수 있습니다.</p>
-        <Link to={info.work} className="inline-flex items-center px-5 py-2.5 bg-gray-900 text-white text-sm font-semibold rounded-lg hover:bg-gray-800">
-          {info.workLabel}로 이동 <ArrowRight className="ml-2 w-4 h-4" />
-        </Link>
-      </div>
-    );
-  }
 
   if (loading || (!states && !error)) {
     return <div className={box}><p className="text-sm text-gray-500">서비스 이용 상태를 확인하는 중...</p></div>;
