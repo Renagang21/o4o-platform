@@ -6,6 +6,10 @@
  * 그 다음 업무 — 서비스 가입 승인·반려, 개별 분회 운영자 지정·해제 — 는 이 화면에서
  * 분회 서비스 관리자가 한다. Admin 메뉴의 "분회 서비스 가입 승인" 은 이 화면으로 옮겼다.
  *
+ * 분회 개설 신청 심사도 여기서 한다: 승인하면 신청자가 첫 분회 운영자가 된다. 주소가 이미 쓰이거나
+ * 서비스 화면 예약어면 backend 가 개설하지 않고 신청을 `slug_conflict` 로 돌려보낸다 — 관리자가 주소를
+ * 바꾸거나 대신 분회를 만들지 않는다.
+ *
  * 분회 운영자 지정은 **대상 분회에 한정**한다: 후보는 그 분회의 active 소속 회원뿐이고,
  * 서비스 가입이 active 가 아니면 지정하지 않는다. 판정은 backend 가 한다(프론트 게이트는 UX 안내).
  */
@@ -14,20 +18,25 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { ROLES, satisfiesRole } from '../../config/service';
 import { listBranches, type BranchSummary } from '../../lib/api/branch';
+import { approveResultMessage } from '../../lib/branchRequest';
 import {
+  approveBranchRequest,
   approveServiceMember,
   designateBranchOperator,
   errorMessage,
   listBranchOperators,
+  listBranchRequests,
   listServiceMembers,
+  rejectBranchRequest,
   rejectServiceMember,
   releaseBranchOperator,
   type BranchOperatorCandidate,
+  type PendingBranchRequest,
   type ServiceMemberRow,
   type ServiceMemberStatus,
 } from '../../lib/api/serviceAdmin';
 
-type Tab = 'members' | 'operators';
+type Tab = 'members' | 'requests' | 'operators';
 
 const STATUS_TABS: { key: ServiceMemberStatus; label: string }[] = [
   { key: 'pending', label: '승인 대기' },
@@ -169,6 +178,127 @@ function ServiceMembersPanel() {
       ) : (
         <p className="mt-4 text-sm text-gray-500">해당 상태의 가입 신청이 없습니다.</p>
       )}
+    </section>
+  );
+}
+
+// ── 분회 개설 신청 심사 ───────────────────────────────────────────────────────
+
+function BranchRequestsPanel() {
+  const [rows, setRows] = useState<PendingBranchRequest[] | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
+  const [busyId, setBusyId] = useState<string | null>(null);
+
+  const load = useCallback(() => {
+    setRows(null);
+    setError(null);
+    listBranchRequests()
+      .then(setRows)
+      .catch((e) => setError(errorMessage(e, '개설 신청 목록을 불러오지 못했습니다.')));
+  }, []);
+
+  useEffect(load, [load]);
+
+  const approve = async (row: PendingBranchRequest) => {
+    setBusyId(row.id);
+    setNotice(null);
+    setError(null);
+    try {
+      setNotice(approveResultMessage(await approveBranchRequest(row.id)));
+      load();
+    } catch (e) {
+      setError(errorMessage(e, '개설 승인에 실패했습니다.'));
+    } finally {
+      setBusyId(null);
+    }
+  };
+
+  const reject = async (row: PendingBranchRequest) => {
+    const reason = window.prompt('거절 사유를 입력하세요. 신청자에게 표시됩니다.');
+    if (reason === null) return;
+    if (!reason.trim()) {
+      setError('거절 사유가 필요합니다.');
+      return;
+    }
+    setBusyId(row.id);
+    setNotice(null);
+    setError(null);
+    try {
+      await rejectBranchRequest(row.id, reason.trim());
+      setNotice('개설 신청을 거절했습니다.');
+      load();
+    } catch (e) {
+      setError(errorMessage(e, '개설 거절에 실패했습니다.'));
+    } finally {
+      setBusyId(null);
+    }
+  };
+
+  return (
+    <section className="mt-6 text-sm">
+      <p className="text-xs text-gray-400">
+        승인하면 분회가 개설되고 신청자가 첫 분회 운영자가 됩니다. 주소가 이미 쓰이거나 예약어면 개설하지 않고
+        신청자에게 다른 주소로 재신청을 요청합니다(주소를 대신 바꾸지 않습니다).
+      </p>
+      {notice && <p className="mt-3 text-green-700">{notice}</p>}
+      {error && <p className="mt-3 text-red-600">{error}</p>}
+      {rows === null && !error && <p className="mt-4 text-gray-500">불러오는 중입니다…</p>}
+      {rows && rows.length > 0 && (
+        <div className="mt-4 overflow-x-auto">
+          <table className="w-full border-collapse">
+            <thead>
+              <tr className="border-b border-gray-200 text-left text-xs text-gray-500">
+                <th className="py-2">분회 이름</th>
+                <th className="py-2">희망 주소</th>
+                <th className="py-2">신청자</th>
+                <th className="py-2">신청일</th>
+                <th className="py-2 text-right">처리</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((r) => (
+                <tr key={r.id} className="border-b border-gray-100 align-top">
+                  <td className="py-2 text-gray-800">
+                    {r.name}
+                    {r.description && <p className="text-xs text-gray-500">{r.description}</p>}
+                  </td>
+                  <td className="py-2 text-gray-700">
+                    /{r.desired_slug}
+                    {r.reserved_slug && (
+                      <span className="ml-2 rounded bg-amber-100 px-1.5 py-0.5 text-xs text-amber-800">예약어</span>
+                    )}
+                  </td>
+                  <td className="py-2 text-gray-600">
+                    {r.requester_name ?? '-'}
+                    {r.requester_email && <p className="text-xs text-gray-400">{r.requester_email}</p>}
+                  </td>
+                  <td className="py-2 text-gray-600">{fmtDate(r.created_at)}</td>
+                  <td className="whitespace-nowrap py-2 text-right">
+                    <button
+                      type="button"
+                      disabled={busyId === r.id}
+                      onClick={() => approve(r)}
+                      className="rounded bg-primary-600 px-3 py-1 text-xs text-white disabled:opacity-50"
+                    >
+                      승인
+                    </button>
+                    <button
+                      type="button"
+                      disabled={busyId === r.id}
+                      onClick={() => reject(r)}
+                      className="ml-2 rounded border border-gray-300 px-3 py-1 text-xs text-gray-700 disabled:opacity-50"
+                    >
+                      거절
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+      {rows?.length === 0 && <p className="mt-4 text-gray-500">심사 대기 중인 개설 신청이 없습니다.</p>}
     </section>
   );
 }
@@ -323,12 +453,13 @@ export default function ServiceAdminPage() {
     <div className="mx-auto max-w-4xl px-4 py-12">
       <h1 className="text-xl font-bold text-gray-900">분회 서비스 관리</h1>
       <p className="mt-1 text-xs text-gray-500">
-        서비스 가입 승인과 개별 분회 운영자 지정은 분회 서비스 관리자가 이 화면에서 처리합니다.
+        서비스 가입 승인, 분회 개설 신청 심사, 개별 분회 운영자 지정은 분회 서비스 관리자가 이 화면에서 처리합니다.
       </p>
       <div className="mt-6 flex gap-4 border-b border-gray-200 text-sm">
         {(
           [
             ['members', '서비스 가입 승인'],
+            ['requests', '분회 개설 신청 심사'],
             ['operators', '분회 운영자 지정'],
           ] as const
         ).map(([key, label]) => (
@@ -344,7 +475,9 @@ export default function ServiceAdminPage() {
           </button>
         ))}
       </div>
-      {tab === 'members' ? <ServiceMembersPanel /> : <BranchOperatorsPanel />}
+      {tab === 'members' && <ServiceMembersPanel />}
+      {tab === 'requests' && <BranchRequestsPanel />}
+      {tab === 'operators' && <BranchOperatorsPanel />}
     </div>
   );
 }

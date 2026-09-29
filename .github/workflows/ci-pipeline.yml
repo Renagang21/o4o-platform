@@ -309,6 +309,14 @@ jobs:
     - name: Run tests (web-neture Vitest)
       run: npx vitest run --config services/web-neture/vitest.config.mjs
 
+    # WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1
+    # services/web-kpa-branch 에는 테스트 실행 경로가 없었다. 분회 개설 신청의 예약어 주소
+    # (backend branch-slug-policy · App.tsx 고정 route 와의 정합) · 심사/신청 API 경로 ·
+    # 서비스 관리자 화면 게이트를 고정한다. 예약어가 어긋나면 분회 주소가 고정 화면을 가린다. blocking.
+    # DB · secret 불필요. 루트에 설치된 vitest/jsdom 을 그대로 쓴다.
+    - name: Run tests (web-kpa-branch Vitest)
+      run: pnpm exec vitest run --config services/web-kpa-branch/vitest.config.mjs
+
   # 2. API Jest regression gate
   # The suite remains fully blocking and serial (--maxWorkers=1) to preserve the
   # existing OOM protection. Moving it to its own runner only changes wall-clock

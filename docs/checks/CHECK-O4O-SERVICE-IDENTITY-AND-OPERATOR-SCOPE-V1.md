@@ -1216,11 +1216,62 @@ migration 6·7·8·9 와 커뮤니티 승격 CLI `--apply` 는 §8-7-6 · §8-7-
 | web-neture vitest(`--config services/web-neture/vitest.config.mjs`) · `tsc --noEmit` | 26 files / 241 PASS · 0 — 권한 매트릭스에 community 3행(admin+active O · pending X · neture:admin 대체 X) · 셸 메뉴 2건 · App.tsx 배선 1건 추가 |
 | web-kpa-branch `tsc -b` · `vite build` | 0 · build 성공. **단위 테스트 러너 없음**(의존성 추가 금지 — 중지 조건) → 화면 검증은 §8-8-5 실계정 확인으로 한다 |
 
-**남는 gap (보고만).**
+**남는 gap (당시 보고) → §8-8-2-b 에서 같은 WO 로 구현.**
 
-- 분회 **개설 신청** 심사 화면(`/kpa-branch/admin/branch-requests`)은 API 만 있고 화면이 없다 — 이번 4개 지점 밖.
-- 개별 커뮤니티 운영자가 **자기 커뮤니티의 가입 신청**을 승인하는 화면(`operatorOnly` API 는 있음)은 없다 — 개체 운영자 업무 화면이라 이번 범위 밖.
-- 분회 slug 예약어 없음 — `service-admin` 이라는 slug 의 분회가 생기면 공용 경로 `/service-admin` 이 우선한다(`/me` · `/login` · `/join` 과 같은 기존 상태). slug 규칙 변경은 계약 변경이라 보고만.
+- ~~분회 **개설 신청** 심사 화면 없음~~ → §8-8-2-b ①
+- ~~개별 커뮤니티 운영자의 **자기 커뮤니티 가입 신청** 심사 화면 없음~~ → §8-8-2-b ②
+- ~~분회 slug 예약어 없음~~ → §8-8-2-b ③
+
+#### 8-8-2-b. 남은 운영 업무 화면 3건 (2026-09-29 · 같은 WO · 사용자 지시)
+
+지시: 새 WO · 별도 TODO 로 나누지 않는다. 원칙은 §8-8 그대로 — Admin 은 서비스 운영자만 지정하고, 개설 심사 · 개별 개체 가입 심사는 서비스 · 개체 운영자가 자기 서비스 화면에서 한다.
+
+**① 분회 개설 신청 심사 — `kpa-branch:admin` · web-kpa-branch `/service-admin`.**
+
+- 기존 API(`GET /kpa-branch/admin/branch-requests` · `POST …/:requestId/approve|reject`, `branchServiceAdminGuards`) 그대로. 화면에 "분회 개설 신청 심사" 탭 추가 — 신청자 이름 · 이메일 · 희망 주소 · 예약어 배지 · 승인 · 거절(사유 필수, 신청자에게 표시).
+- 승인 결과 안내: `created` → "신청자가 첫 분회 운영자로 지정" / `slug_conflict(taken|reserved)` → "개설하지 않았다 · 재신청 요청". 관리자가 주소를 바꾸거나 대신 분회를 만드는 경로 없음.
+- 목록 응답에 `requester_name` · `requester_email` · `reserved_slug` 추가(users LEFT JOIN · 파라미터 없음). API 계약은 **필드 추가만**(기존 필드 · 경로 · guard 무변경).
+- 승인 시 신청자의 `kpa-branch` 서비스 가입이 `suspended` 면 409 `REQUESTER_SUSPENDED` — 분회 · 소속 · 역할 0, 신청은 pending 유지(거절은 가능). 첫 운영자 3축(분회 · 소속 · 역할) 부여는 기존 `grantFirstOperator` 그대로.
+- **신청자 화면이 없었다** — `/me` 에 "분회 개설 신청" 폼 + "내 신청"(상태 · 사유, `slug_conflict` 사유가 여기서 신청자에게 도달) 추가. `POST /kpa-branch/branch-requests` · `GET …/mine`(기존, 인증만).
+- `/me` 의 서비스 관리 링크 문구에 "개설 신청 심사" 추가.
+
+**② 개별 커뮤니티 가입 신청 심사 — 그 커뮤니티 운영자 · web-neture `/mypage/communities`.**
+
+- 배치: `community.neture.co.kr` 은 공용 prefix(`/mypage` · `/login` …) 외 경로를 소유하지 않으므로 공용 `/mypage` 아래에 둔다 → 대표 · community 두 호스트 모두에서 열린다. 호스트 소유 경로 변경 0.
+- 신규 `GET /communities/operating`(인증만) — **세션 사용자 자신의** `community_memberships` 중 `status='active' AND role='operator'` · 커뮤니티 active · `community` 서비스 가입 active 인 것만(대기 건수 포함). 다른 사람 · 다른 커뮤니티가 섞일 입력이 없다. `/:communitySlug` 파라미터 라우트보다 먼저 등록(순서 테스트).
+- 심사는 기존 `GET /:communitySlug/memberships` · `POST …/:membershipId/approve|reject` — `resolveCommunity` → `requireCommunityScope('operator')`. 목록은 `status` 쿼리 검증(400 `INVALID_STATUS`) · 이름 · **가린 이메일**(`ab***@domain`, 원문 미전송) · 서비스 가입 상태를 준다.
+- **`requireCommunityScope('operator')` 강화**: 개체 일치 · 개체 가입 active · `role='operator'` 에 더해 **`community` 서비스 가입 active** 를 요구(정지 · 가입 없음 → 403 `COMMUNITY_SERVICE_MEMBERSHIP_REQUIRED`). 개체 행만 남은 정지 계정이 심사 권한을 쓰지 못한다. `community:admin` bypass 없음(기존 계약 불변). member 수준 경로는 무변경.
+- `approveJoin` · `approveCreation`: 신청자 서비스 가입이 `suspended` 면 409 `SERVICE_MEMBERSHIP_SUSPENDED`(가입 · 개설 0, pending 유지). 거절은 가능 · 탈퇴(withdrawn) 뒤 재가입은 승인으로 active.
+- 마지막 운영자 보호(`LAST_OPERATOR_PROTECTED`, §8-8-2 ③)는 불변 — 가입 심사는 `member` 행만 다룬다.
+- 진입: 마이페이지 홈에 "커뮤니티 가입 심사" 카드 — `GET /communities/operating` 결과가 있을 때만(운영자는 전역 역할이 아니라 개체 행이라 roles 로 판정 불가). 조회 실패 시 카드만 숨긴다.
+
+**③ 분회 주소 충돌 방어 — 예약어 + 승인 시 재검사.**
+
+- 신규 `services/kpa-branch/branch-slug-policy.ts`(의존성 없음): `kpa`(플랫폼 호스트 basename) · `assets`(정적) · `login` · `join` · `reset-password` · `handoff` · `me` · `service-admin`(App.tsx 고정 route).
+- 신청 시점: `normalizeBranchSlug` 가 409 `RESERVED_SLUG`(신청 행 0). super_admin 직접 생성(`BranchAdminController.create`)도 같은 목록으로 409.
+- 승인 시점 재검사: 예약어 또는 선점이면 `slug_conflict`(`reason: reserved|taken`) + 사유 기록 — 분회 · 소속 · 역할 0. 예약어 도입 전 pending 신청(`me` 등)도 여기서 걸린다.
+- drift 방지: API 테스트가 `services/web-kpa-branch/src/App.tsx` 의 고정 첫 segment route 가 모두 예약어인지 확인 · web-kpa-branch 테스트가 프런트 안내 목록과 backend 목록의 동일성을 확인.
+- 운영 DB read-only 확인(`BEGIN READ ONLY … ROLLBACK`): 예약어 slug 분회 0 · `branch_creation_requests` 0행 → 기존 데이터 충돌 0, 데이터 정리 불필요.
+- **URL 계약 영향**: 예약어 8개는 이미 고정 route 가 가리던 주소라 실제로 열리던 분회 주소를 막지 않는다(분회 0건 확인).
+
+**web-kpa-branch 테스트 수단 (CI 변경 — 보고).**
+
+- `services/web-kpa-branch/vitest.config.mjs` 신설 — 루트의 vitest · jsdom 을 쓴다(web-neture · web-kpa-society 와 같은 방식). **package.json · lockfile 무변경**.
+- `tsconfig.app.json` 에 `exclude: src/**/*.test.ts(x)` (web-neture 와 같음 — `tsc -b` 가 테스트 파일을 빌드하지 않게).
+- `.github/workflows/ci-pipeline.yml` 에 step 1개 추가: `Run tests (web-kpa-branch Vitest)` (blocking, 기존 web-neture step 바로 뒤). **CI 파이프라인 변경**이므로 명시 보고한다 — 다른 job · 게이트 · 배포 workflow 무변경.
+
+**검증 (격리 테스트 · DB 쓰기 0 · 계정 생성 0).**
+
+| 대상 | 결과 |
+|---|---|
+| api-server `tsc --noEmit` | 0 |
+| api-server jest — 분회 | `branch-lifecycle` 46 PASS(예약어 8종 · 대소문자 · 부분 포함 허용 · 신청 시 거부 · 기존 pending 예약어 → slug_conflict(reserved) 생성 0 · 목록 `reserved_slug` · App.tsx drift · 정지 신청자 409 생성 0 · pending 서비스 가입 → 승인 시 active) · 신규 `branch-request-review.boundary` 10 PASS(실 guard: admin+active 통과 · operator · member · kpa:admin · 역할 없음 403 · admin 이라도 pending/suspended/rejected/withdrawn 403 · 비로그인 401) |
+| api-server jest — 커뮤니티 | 4 suites 82 PASS(정지 운영자 · 서비스 가입 없는 운영자 403 · withdrawn 운영자 403 · 정지 신청자 승인 409 · 거절 가능 · 재가입 · 개설 승인 정지 409 · 이메일 마스킹 · 목록 SQL binding · 운영 목록 조건 · `/operating` guard · 등록 순서) |
+| api-server jest 전체 | 전체 jest 380 suites pass · 4 skipped / 6593 tests pass · 32 skipped · 실패 0 |
+| web-kpa-branch vitest(신규) · `tsc -b` · `vite build` | 1 file / 18 PASS · 0 · 성공 |
+| web-neture vitest(CI 방식) · `tsc --noEmit` | 27 files / 250 PASS · 0 — 신규 `MyCommunityOperatorPage` 9(비로그인 호출 0 · 운영 커뮤니티만 · 가린 이메일 · 정지 신청자 승인 버튼 닫힘 · 개체 경로 · 거절 사유 · backend 403 메시지 표시 · 운영 커뮤니티 0 · 조회 실패 삼킴 금지) |
+
+**운영 현황 (read-only).** 커뮤니티 3개 active · `community_memberships` 는 active member 2행뿐 — **커뮤니티 운영자 0명**. 따라서 ② 의 실계정 검증은 `community:admin` 이 먼저 개별 커뮤니티 운영자를 지정해야 가능하다(§8-8-4 · §8-8-5).
 
 #### 8-8-3. 배포 — 미실행 (승인 대기)
 
@@ -1388,6 +1439,8 @@ representative-entry · unified-store-workspace-handoff spec)은 새 계약(`'un
 ---
 
 ## 10. 문서 정합
+
+- 2026-09-29 §8-8-2-b: §8-8-2 gap 3건을 같은 WO 에서 구현하고 이 CHECK 내부 기록을 취소선 + 대체 절로 정정. 기준 문서 변경 0 — 발견 0건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 0건.
 
 - 2026-09-29 §8-8: 이 CHECK 내부 §8-7-8 의 지정 방식 기록에 정정 문단 추가(기록물 내부 정정). 기준 문서 변경 0 — 발견 0건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 0건(§8-8-2 gap 3건은 보고만).
 

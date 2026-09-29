@@ -84,6 +84,16 @@ const manager = {
       }
       return [row];
     }
+    if (/^SELECT status FROM service_memberships/i.test(s)) {
+      return db.serviceMemberships
+        .filter((r) => r.user_id === params[0] && r.service_key === params[1])
+        .map((r) => ({ status: r.status }));
+    }
+    if (/^SELECT r\.\*, u\.name AS requester_name/i.test(s)) {
+      return db.requests
+        .filter((r) => r.status === 'pending')
+        .map((r) => ({ ...r, requester_name: `name-${r.requester_user_id}`, requester_email: null }));
+    }
     if (/INSERT INTO service_memberships/i.test(s)) {
       const [userId, serviceKey] = params;
       const found = db.serviceMemberships.find((r) => r.user_id === userId && r.service_key === serviceKey);
@@ -104,6 +114,7 @@ import {
   BranchLifecycleService,
   BranchLifecycleError,
   normalizeBranchSlug,
+  RESERVED_BRANCH_SLUGS,
   KPA_BRANCH_OPERATOR_ROLE,
   KPA_BRANCH_SERVICE_KEY,
 } from '../branch-lifecycle.service.js';
@@ -139,6 +150,83 @@ describe('주소 규칙', () => {
 
   it('80자를 넘는 주소는 거절한다 (컬럼 varchar(80))', () => {
     expect(() => normalizeBranchSlug('a'.repeat(81))).toThrow(BranchLifecycleError);
+  });
+});
+
+describe('예약어 주소 — 고정 route · basename · 정적 경로와 겹치지 않는다', () => {
+  it.each(['service-admin', 'me', 'login', 'join', 'reset-password', 'handoff', 'kpa', 'assets'])(
+    '%s 는 형식이 맞아도 RESERVED_SLUG(409) 로 거절한다',
+    (slug) => {
+      expect(() => normalizeBranchSlug(slug)).toThrow(
+        expect.objectContaining({ code: 'RESERVED_SLUG', statusCode: 409 }),
+      );
+    },
+  );
+
+  it('대소문자·공백을 정규화한 뒤에 판정한다 (Service-Admin · " ME ")', () => {
+    expect(() => normalizeBranchSlug('Service-Admin')).toThrow(expect.objectContaining({ code: 'RESERVED_SLUG' }));
+    expect(() => normalizeBranchSlug(' ME ')).toThrow(expect.objectContaining({ code: 'RESERVED_SLUG' }));
+  });
+
+  it('예약어를 **포함**하는 주소는 막지 않는다 (me-seoul · login-branch 는 첫 경로 조각이 다르다)', () => {
+    expect(normalizeBranchSlug('me-seoul')).toBe('me-seoul');
+    expect(normalizeBranchSlug('login-branch')).toBe('login-branch');
+  });
+
+  it('신청 시 신청자에게 다른 주소를 요청하는 문구로 알린다 — 신청 행을 만들지 않는다', async () => {
+    await expect(
+      service.requestCreation({ requesterUserId: REQUESTER, desiredSlug: 'service-admin', name: 'x' }),
+    ).rejects.toMatchObject({ code: 'RESERVED_SLUG', message: expect.stringMatching(/다른 주소로 신청/) });
+    expect(db.requests).toEqual([]);
+  });
+
+  it('승인 직전 재검사 — 예약어 주소 pending 신청은 개설하지 않고 slug_conflict(reserved) 로 돌린다', async () => {
+    // 목록 도입 전 · 목록 확장 전에 들어온 신청을 흉내낸다(신청 경로를 거치지 않은 pending 행).
+    db.requests.push({
+      id: 'legacy-req',
+      requester_user_id: REQUESTER,
+      desired_slug: 'me',
+      name: '예전 신청',
+      parent_id: null,
+      status: 'pending',
+    });
+    const out = await service.approveCreation({ requestId: 'legacy-req', reviewerUserId: REVIEWER });
+
+    expect(out).toEqual({ outcome: 'slug_conflict', slug: 'me', reason: 'reserved' });
+    expect(db.requests[0]).toMatchObject({ status: 'slug_conflict', reviewed_by_user_id: REVIEWER });
+    expect(db.requests[0].reason).toMatch(/다른 주소로 신청/);
+    // 관리자가 주소를 바꾸거나 분회를 만들지 않는다 — 운영자 3축도 0.
+    expect(db.orgs).toEqual([]);
+    expect(db.branchMemberships).toEqual([]);
+    expect(db.serviceMemberships).toEqual([]);
+    expect(db.assignedRoles).toEqual([]);
+  });
+
+  it('심사 목록은 예약어 주소 신청을 reserved_slug=true 로 표시한다', async () => {
+    await ask();
+    db.requests.push({ id: 'legacy-req', requester_user_id: 'u2', desired_slug: 'login', name: 'x', status: 'pending' });
+    const rows = await service.listPendingRequests();
+    expect(rows.map((r) => [r.desired_slug, r.reserved_slug])).toEqual([
+      ['gangnam', false],
+      ['login', true],
+    ]);
+    expect(rows[0].requester_name).toBe(`name-${REQUESTER}`);
+  });
+
+  /**
+   * drift 방지 — web-kpa-branch 의 첫 경로 조각 고정 route 가 늘면 예약어도 늘어야 한다.
+   * `/:branchSlug/*` 와 같은 자리에 있는 고정 route 를 App.tsx 에서 읽어 목록과 대조한다.
+   */
+  it('web-kpa-branch App.tsx 의 최상위 고정 route 는 전부 예약어다', () => {
+    const appSrc = fs.readFileSync(
+      path.resolve(__dirname, '..', '..', '..', '..', '..', '..', 'services', 'web-kpa-branch', 'src', 'App.tsx'),
+      'utf-8',
+    );
+    const fixed = Array.from(appSrc.matchAll(/<Route\s+path="\/([a-z0-9-]+)(?:\/\*)?"/g)).map((m) => m[1]);
+    expect(fixed.length).toBeGreaterThan(0);
+    for (const seg of new Set(fixed)) {
+      expect(RESERVED_BRANCH_SLUGS).toContain(seg);
+    }
   });
 });
 
@@ -235,13 +323,37 @@ describe('개설 승인 — 검사 2회차 + 첫 운영자 3축', () => {
 
     const out = await service.approveCreation({ requestId: r.id, reviewerUserId: REVIEWER });
 
-    expect(out).toEqual({ outcome: 'slug_conflict', slug: 'gangnam' });
+    expect(out).toEqual({ outcome: 'slug_conflict', slug: 'gangnam', reason: 'taken' });
     expect(r.status).toBe('slug_conflict');
     expect(r.reason).toMatch(/새 주소로 다시 신청/);
     // 새 분회도, 운영자도 만들지 않았다.
     expect(db.orgs).toHaveLength(1);
     expect(db.branchMemberships).toEqual([]);
     expect(db.assignedRoles).toEqual([]);
+  });
+
+  it('신청자의 분회 서비스 가입이 **정지(suspended)** 면 승인하지 않는다 — 정지 처분을 되살리지 않는다', async () => {
+    const r = await ask();
+    db.serviceMemberships.push({ user_id: REQUESTER, service_key: KPA_BRANCH_SERVICE_KEY, status: 'suspended' });
+
+    await expect(service.approveCreation({ requestId: r.id, reviewerUserId: REVIEWER })).rejects.toMatchObject({
+      code: 'REQUESTER_SUSPENDED',
+      statusCode: 409,
+    });
+    expect(db.serviceMemberships[0].status).toBe('suspended');
+    expect(db.orgs).toEqual([]);
+    expect(db.assignedRoles).toEqual([]);
+    // 신청은 pending 으로 남는다 — 심사자가 거절할 수 있다.
+    expect(r.status).toBe('pending');
+  });
+
+  it('신청자의 pending 서비스 가입은 첫 운영자 승인으로 active 가 된다 (기존 계약 유지)', async () => {
+    const r = await ask();
+    db.serviceMemberships.push({ user_id: REQUESTER, service_key: KPA_BRANCH_SERVICE_KEY, status: 'pending' });
+    await service.approveCreation({ requestId: r.id, reviewerUserId: REVIEWER });
+    expect(db.serviceMemberships).toEqual([
+      { user_id: REQUESTER, service_key: KPA_BRANCH_SERVICE_KEY, status: 'active' },
+    ]);
   });
 
   it('이미 처리된 신청은 409', async () => {

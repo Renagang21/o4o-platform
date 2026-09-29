@@ -30,6 +30,12 @@ function repoFor(name: string) {
 const manager = {
   getRepository: (e: { name?: string }) => repoFor(e?.name ?? ''),
   query: async (sql: string, params: any[]) => {
+    if (/^\s*SELECT status FROM service_memberships/i.test(sql)) {
+      const [userId, serviceKey] = params;
+      return db.serviceMemberships
+        .filter((r) => r.user_id === userId && r.service_key === serviceKey)
+        .map((r) => ({ status: r.status }));
+    }
     // service_memberships upsert 만 흉내낸다.
     if (/INSERT INTO service_memberships/i.test(sql)) {
       const [userId, serviceKey] = params;
@@ -50,6 +56,7 @@ import {
   CommunityLifecycleService,
   CommunityLifecycleError,
   COMMUNITY_SERVICE_KEY,
+  maskEmail,
   normalizeSlug,
 } from '../community-lifecycle.service.js';
 
@@ -191,6 +198,101 @@ describe('가입 — 승인형 하나', () => {
     await expect(
       service.approveJoin({ communityId: 'c-other', membershipId: m.id, reviewerUserId: REVIEWER }),
     ).rejects.toMatchObject({ code: 'MEMBERSHIP_NOT_FOUND' });
+  });
+});
+
+describe('정지(suspended) 회원을 승인 경로가 되살리지 않는다', () => {
+  const suspend = (userId: string) =>
+    db.serviceMemberships.push({ user_id: userId, service_key: COMMUNITY_SERVICE_KEY, status: 'suspended' });
+
+  it('가입 승인 — 신청자의 커뮤니티 서비스 이용이 정지면 409, 가입은 pending 으로 남는다', async () => {
+    const m = await service.requestJoin({ communityId: 'c1', userId: JOINER });
+    suspend(JOINER);
+    await expect(
+      service.approveJoin({ communityId: 'c1', membershipId: m.id, reviewerUserId: REVIEWER }),
+    ).rejects.toMatchObject({ code: 'SERVICE_MEMBERSHIP_SUSPENDED', statusCode: 409 });
+    expect(serviceMembershipOf(JOINER)!.status).toBe('suspended');
+    expect(membershipOf(JOINER)!.status).toBe('pending');
+  });
+
+  it('정지 회원의 가입 신청은 거절할 수 있다 (심사가 막히지 않는다)', async () => {
+    const m = await service.requestJoin({ communityId: 'c1', userId: JOINER });
+    suspend(JOINER);
+    const out = await service.rejectJoin({ communityId: 'c1', membershipId: m.id, reviewerUserId: REVIEWER });
+    expect(out.status).toBe('rejected');
+    expect(serviceMembershipOf(JOINER)!.status).toBe('suspended');
+  });
+
+  it('탈퇴(withdrawn) 뒤 재가입은 승인으로 다시 active 가 된다 — 막는 것은 정지뿐', async () => {
+    db.serviceMemberships.push({ user_id: JOINER, service_key: COMMUNITY_SERVICE_KEY, status: 'withdrawn' });
+    const m = await service.requestJoin({ communityId: 'c1', userId: JOINER });
+    await service.approveJoin({ communityId: 'c1', membershipId: m.id, reviewerUserId: REVIEWER });
+    expect(serviceMembershipOf(JOINER)!.status).toBe('active');
+  });
+
+  it('개설 승인 — 신청자가 정지면 커뮤니티·첫 운영자를 만들지 않는다', async () => {
+    const r = await service.requestCreation({ requesterUserId: REQUESTER, desiredSlug: 'alpha', name: 'Alpha' });
+    suspend(REQUESTER);
+    await expect(service.approveCreation({ requestId: r.id, reviewerUserId: REVIEWER })).rejects.toMatchObject({
+      code: 'SERVICE_MEMBERSHIP_SUSPENDED',
+    });
+    expect(db.communities).toEqual([]);
+    expect(membershipOf(REQUESTER)).toBeUndefined();
+    expect(r.status).toBe('pending');
+  });
+});
+
+describe('가입 심사 화면 조회 — 개체 한정 · 이메일 가림', () => {
+  it('이메일은 앞 2자만 남긴다', () => {
+    expect(maskEmail('abcdef@example.com')).toBe('ab***@example.com');
+    expect(maskEmail('a@x.kr')).toBe('a***@x.kr');
+    expect(maskEmail(null)).toBeNull();
+    expect(maskEmail('no-at-sign')).toBeNull();
+  });
+
+  it('listMembershipsForReview 는 그 커뮤니티를 $1 로 묶고 상태도 binding 한다 (문자열 보간 없음)', async () => {
+    const calls: Array<{ sql: string; params: unknown[] }> = [];
+    const svc = new CommunityLifecycleService({
+      query: async (sql: string, params: unknown[]) => {
+        calls.push({ sql, params });
+        return [
+          {
+            id: 'm1',
+            user_id: 'u1',
+            role: 'member',
+            status: 'pending',
+            created_at: new Date(0),
+            user_name: '홍길동',
+            user_email: 'hong@example.com',
+            service_status: null,
+          },
+        ];
+      },
+    } as any);
+    const rows = await svc.listMembershipsForReview({ communityId: 'c1', status: 'pending' });
+    expect(calls[0].params).toEqual(['c1', COMMUNITY_SERVICE_KEY, 'pending']);
+    expect(calls[0].sql).toMatch(/WHERE cm\.community_id = \$1 AND cm\.status = \$3/);
+    expect(calls[0].sql).not.toMatch(/'pending'/);
+    expect(rows).toEqual([
+      expect.objectContaining({ name: '홍길동', emailMasked: 'ho***@example.com', serviceMembershipStatus: null }),
+    ]);
+    expect(JSON.stringify(rows)).not.toMatch(/hong@example\.com/);
+  });
+
+  it('listOperatedCommunities 는 세션 사용자의 active operator 행 + active 서비스 가입만 본다', async () => {
+    const calls: Array<{ sql: string; params: unknown[] }> = [];
+    const svc = new CommunityLifecycleService({
+      query: async (sql: string, params: unknown[]) => {
+        calls.push({ sql, params });
+        return [{ id: 'c1', slug: 'alpha', name: 'Alpha', pending_count: 2 }];
+      },
+    } as any);
+    const out = await svc.listOperatedCommunities('u-op');
+    expect(out).toEqual([{ id: 'c1', slug: 'alpha', name: 'Alpha', pendingCount: 2 }]);
+    const sql = calls[0].sql.replace(/\s+/g, ' ');
+    expect(calls[0].params).toEqual(['u-op', COMMUNITY_SERVICE_KEY]);
+    expect(sql).toMatch(/cm\.user_id = \$1 AND cm\.status = 'active' AND cm\.role = 'operator' AND c\.status = 'active'/);
+    expect(sql).toMatch(/sm\.service_key = \$2 AND sm\.status = 'active'/);
   });
 });
 

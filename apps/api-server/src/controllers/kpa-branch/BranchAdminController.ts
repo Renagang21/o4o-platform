@@ -22,6 +22,7 @@
  */
 import type { Request, Response } from 'express';
 import { AppDataSource } from '../../database/connection.js';
+import { isReservedBranchSlug, reservedSlugMessage } from '../../services/kpa-branch/branch-slug-policy.js';
 import {
   KpaOrganization,
   BRANCH_ORG_TYPE,
@@ -139,6 +140,10 @@ export class BranchAdminController {
         `slug 는 소문자 영숫자와 하이픈(-)으로 된 ${SLUG_MIN}~${SLUG_MAX}자여야 합니다.`,
         'INVALID_SLUG',
       );
+    }
+    // 고정 route · basename · 정적 경로와 겹치는 주소는 분회 화면이 열리지 않는다(개설 신청 경로와 같은 목록).
+    if (isReservedBranchSlug(slug)) {
+      return res.status(409).json({ success: false, error: reservedSlugMessage(slug), code: 'RESERVED_SLUG' });
     }
 
     const desc = optionalText(res, body, 'description', DESCRIPTION_MAX, 'INVALID_DESCRIPTION');

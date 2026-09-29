@@ -119,6 +119,20 @@ describe('가입 — 그 커뮤니티 운영자가 심사한다', () => {
   });
 });
 
+describe('내가 운영하는 커뮤니티 — 가입 심사 화면 진입 목록', () => {
+  it('GET /operating 은 인증만 (대상이 세션 사용자 자신의 운영 행뿐이다)', () => {
+    expect(find('GET', '/operating').guards).toEqual(['authenticate']);
+  });
+
+  it('`/:communitySlug/...` 파라미터 경로보다 먼저 등록된다', () => {
+    const order = wiring().map((w) => `${w.method} ${w.path}`);
+    const operating = order.indexOf('GET /operating');
+    const slug = order.findIndex((k) => k.includes('/:communitySlug'));
+    expect(operating).toBeGreaterThan(-1);
+    expect(operating).toBeLessThan(slug);
+  });
+});
+
 describe('카탈로그 조회 경로는 종전대로 write 0 · optionalAuth', () => {
   it.each([
     ['GET', '/'],
@@ -156,6 +170,7 @@ describe('rate limit (소스 고정)', () => {
   it.each([
     ['개설 신청', /router\.post\(\s*'\/requests',\s*apiLimiter,/],
     ['가입 신청', /router\.post\(\s*'\/:communitySlug\/join',\s*apiLimiter,/],
+    ['운영 커뮤니티 목록', /router\.get\(\s*'\/operating',\s*apiLimiter,/],
     ['개체 운영자 경계', /const operatorOnly: RequestHandler\[\] = \[apiLimiter,/],
     ['서비스 심사 경계', /const serviceAdminOnly: RequestHandler\[\] = \[apiLimiter,/],
   ])('%s 에 limiter 가 붙어 있다', (_label, re) => {

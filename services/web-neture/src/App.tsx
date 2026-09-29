@@ -107,6 +107,8 @@ import MyProfilePage from './pages/mypage/MyProfilePage';
 import MySettingsPage from './pages/mypage/MySettingsPage';
 // WO-O4O-SUPPLIER-MYPAGE-CANONICAL-PROFILE-ALIGNMENT-V1
 import MyBusinessProfilePage from './pages/mypage/MyBusinessProfilePage';
+// WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1: 개별 커뮤니티 운영자의 가입 심사 (/mypage 는 community 호스트 공용 prefix)
+import MyCommunityOperatorPage from './pages/mypage/MyCommunityOperatorPage';
 
 
 // Forum Pages
@@ -721,6 +723,7 @@ function App() {
               <Route path="/mypage/settings" element={<MySettingsPage />} />
               {/* WO-O4O-SUPPLIER-MYPAGE-CANONICAL-PROFILE-ALIGNMENT-V1: 사업자 정보 */}
               <Route path="/mypage/business-profile" element={<MyBusinessProfilePage />} />
+              <Route path="/mypage/communities" element={<MyCommunityOperatorPage />} />
               <Route path="/supplier" element={<SupplierLandingPage />} />
               <Route path="/contact" element={<ContactPage />} />
               {/* WO-O4O-CROSSSERVICE-LEGAL-POLICY-PRODUCTION-COMPLETION-V1:

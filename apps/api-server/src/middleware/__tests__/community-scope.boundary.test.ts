@@ -14,10 +14,16 @@ import * as path from 'path';
 const store: {
   communities: Array<{ id: string; slug: string; name: string; status: string }>;
   memberships: Array<{ id: string; communityId: string; userId: string; role: string; status: string }>;
-} = { communities: [], memberships: [] };
+  serviceMemberships: Array<{ userId: string; status: string }>;
+} = { communities: [], memberships: [], serviceMemberships: [] };
 
 jest.mock('../../database/connection.js', () => ({
   AppDataSource: {
+    // 운영자 수준의 서비스 가입 조회만 흉내낸다 (service_key 는 'community' 고정).
+    query: async (_sql: string, params: string[]) =>
+      params[1] === 'community'
+        ? store.serviceMemberships.filter((s) => s.userId === params[0]).map((s) => ({ status: s.status }))
+        : [],
     getRepository: (entity: { name?: string }) => {
       const name = entity?.name ?? '';
       if (name === 'Community') {
@@ -42,6 +48,7 @@ import {
   COMMUNITY_MEMBERSHIP_REQUIRED,
   COMMUNITY_OPERATOR_REQUIRED,
   COMMUNITY_NOT_FOUND,
+  COMMUNITY_SERVICE_MEMBERSHIP_REQUIRED,
 } from '../community-scope.middleware.js';
 
 const C_A = 'aaaaaaaa-1111-4111-8111-aaaaaaaaaaaa';
@@ -49,6 +56,9 @@ const C_B = 'bbbbbbbb-2222-4222-8222-bbbbbbbbbbbb';
 const OPERATOR_A = 'u-operator-a';
 const MEMBER_A = 'u-member-a';
 const PENDING_A = 'u-pending-a';
+const SUSPENDED_OP_A = 'u-suspended-operator-a';
+const NO_SERVICE_OP_A = 'u-no-service-operator-a';
+const WITHDRAWN_A = 'u-withdrawn-operator-a';
 
 function seed() {
   store.communities = [
@@ -59,6 +69,15 @@ function seed() {
     { id: 'm1', communityId: C_A, userId: OPERATOR_A, role: 'operator', status: 'active' },
     { id: 'm2', communityId: C_A, userId: MEMBER_A, role: 'member', status: 'active' },
     { id: 'm3', communityId: C_A, userId: PENDING_A, role: 'member', status: 'pending' },
+    { id: 'm4', communityId: C_A, userId: SUSPENDED_OP_A, role: 'operator', status: 'active' },
+    { id: 'm5', communityId: C_A, userId: NO_SERVICE_OP_A, role: 'operator', status: 'active' },
+    { id: 'm6', communityId: C_A, userId: WITHDRAWN_A, role: 'operator', status: 'withdrawn' },
+  ];
+  store.serviceMemberships = [
+    { userId: OPERATOR_A, status: 'active' },
+    { userId: MEMBER_A, status: 'active' },
+    { userId: SUSPENDED_OP_A, status: 'suspended' },
+    { userId: WITHDRAWN_A, status: 'active' },
   ];
 }
 
@@ -135,6 +154,25 @@ describe('커뮤니티 개체 경계', () => {
     const { passed, res } = await run('alpha', undefined, 'member');
     expect(passed).toBe(false);
     expect(res.status).toHaveBeenCalledWith(401);
+  });
+
+  it('운영자 행이 있어도 커뮤니티 서비스 이용이 **정지**면 운영 기능에서 403', async () => {
+    const { passed, res } = await run('alpha', SUSPENDED_OP_A, 'operator');
+    expect(passed).toBe(false);
+    expect(res.status).toHaveBeenCalledWith(403);
+    expect(codeOf(res)).toBe(COMMUNITY_SERVICE_MEMBERSHIP_REQUIRED);
+  });
+
+  it('커뮤니티 서비스 가입 행이 **없는** 운영자도 403', async () => {
+    const { passed, res } = await run('alpha', NO_SERVICE_OP_A, 'operator');
+    expect(passed).toBe(false);
+    expect(codeOf(res)).toBe(COMMUNITY_SERVICE_MEMBERSHIP_REQUIRED);
+  });
+
+  it('개체 가입이 withdrawn 인 전 운영자는 role 이 operator 로 남아 있어도 403', async () => {
+    const { passed, res } = await run('alpha', WITHDRAWN_A, 'operator');
+    expect(passed).toBe(false);
+    expect(codeOf(res)).toBe(COMMUNITY_MEMBERSHIP_REQUIRED);
   });
 
   it('V4 가드는 서비스 전체 역할(community:admin)을 보지 않는다', () => {
