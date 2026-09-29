@@ -1,6 +1,6 @@
 # CHECK-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1
 
-> 시작: 2026-09-27 · 상태: **`병합 완료(2026-09-28, 880642e9b) · 배포 1(2edfe9b33 · migration 0) 배포 1 완료(§8-5) · 배포 2 실행 경로 확정(§8-6 → **§8-7 MIGRATE-ONLY 로 대체**) · 배포 2 전 경계 보정(§8-7 · 화면 guard · SHA 범위 · CLI 출력) · 배포 2(이 작업) 미배포 · DEPLOY_ENABLED=false · 승격 CLI 결함 정정(§8-2, 95377812e) · migration 6~9 적용(§8-7-6) · 승격 CLI --apply 적용 완료(§8-7-7 · 3+2행) · 서빙 전환·실제 접근 검증 전`**
+> 시작: 2026-09-27 · 상태: **`병합 완료(2026-09-28, 880642e9b) · 배포 1(2edfe9b33 · migration 0) 배포 1 완료(§8-5) · 배포 2 실행 경로 확정(§8-6 → **§8-7 MIGRATE-ONLY 로 대체**) · 배포 2 전 경계 보정(§8-7 · 화면 guard · SHA 범위 · CLI 출력) · 배포 2(이 작업) 미배포 · DEPLOY_ENABLED=false · 승격 CLI 결함 정정(§8-2, 95377812e) · migration 6~9 적용(§8-7-6) · 승격 CLI --apply 적용 완료(§8-7-7 · 3+2행) · PR #243 화면 3건·Sonar 해소(PR #247 · 895b07f8b · §8-7-8) · 서빙 배포 **보류**(2026-09-29 사용자 판단 · §8-7-8) · 서빙 전환·역할 부여·실제 접근 검증 전 — DONE 아님`**
 > PR: [#241](https://github.com/Renagang21/o4o-platform/pull/241) — 1차 CI green 후
 > **리뷰에서 세 경계가 확정 요구사항과 다르다고 지적돼 같은 PR 에서 정정했다**(§11).
 > 정정 후 재검증: **PR #241 HEAD(`7ba57bcbc`)** 의 체크 전부 pass(SonarCloud 포함) · `mergeStateStatus = CLEAN`.
@@ -1055,7 +1055,7 @@ npx tsx --env-file=.env src/scripts/community-catalog-promotion.ts
 ADC 는 이 PC 에서 `gcloud auth application-default login` 후 확보됐다(사용자 실행 ·
 `print-access-token` 검증 OK · 토큰은 기록하지 않는다). 프록시는 측정 후 종료했다.
 
-→ 다음은 **`--apply` 승인 여부 판단**이다. 현재 미승인이며 실행 0.
+→ (이 시점 기록) `--apply` 는 당시 미승인이었고, **이후 사용자 승인으로 적용 완료**됐다(2026-09-29 · §8-7-7). 재실행하지 않는다 — 재실행해도 추가 행 0(§8-7-7 멱등 확인).
 
 **apply 직전 재확인 (2026-09-29 · 전부 read-only · `BEGIN READ ONLY` 트랜잭션 SELECT).**
 
@@ -1103,7 +1103,60 @@ API 트래픽 전환 · Web/Admin 배포 · 역할 부여는 **포함하지 않�
 - 예상(§8-0 U1 · §8-7-6)과의 차이 **0**. cosmetics 는 참여 증거 0명이라 개체 행만 생기고 회원 행은 없다(설계대로).
 - 운영 변화: 위 5행뿐. 스키마 · migration 기록 · 서빙 revision · `DEPLOY_ENABLED=false` 불변.
 
-→ 다음은 **서빙 배포 판단**(API 트래픽 · Web/Admin)과 운영자 4 역할 부여 — 별도 승인. PR #243 에서 제기된 공급자 화면 연결 3건 · SonarCloud 실패 해결·검증이 선행.
+→ 다음은 **서빙 배포 판단**(API 트래픽 · Web/Admin)과 운영자 4 역할 부여 — 별도 승인. PR #243 에서 제기된 공급자 화면 연결 3건 · SonarCloud 실패 해결·검증이 선행. → 선행 2건은 §8-7-8 에서 해소, 서빙 배포는 보류.
+
+#### 8-7-8. PR #243 화면 연결 3건 · SonarCloud · 배포 census · 서빙 배포 판단 (2026-09-29)
+
+**화면 연결 3건 — PR [#247](https://github.com/Renagang21/o4o-platform/pull/247) (HEAD `7528ae864` · 병합 `895b07f8b`).** 원칙: 공급자 조직 소유권 검사와 `supplier:admin` · `supplier:operator` 구분은 그대로, **Neture 역할 fallback 없음**, 백엔드 guard 변경 0. 화면 진입 판정은 기존 `canSeeSubdomainOperatorPath`(`web-neture/src/lib/role-constants.ts`) 하나를 재사용했다.
+
+| # | 재현(최신 main) | 정정 |
+|---|---|---|
+| ① | Neture 회원 관리(`UsersManagementPage`)가 `neture:operator` 만 가진 계정에서도 공급자 목록을 조회하고 공급자 열 · 콘솔 안내를 그렸다 → 백엔드 `supplier:operator` guard 에서 거부되는 호출 | `supplier:operator`(=`/operator/suppliers` 진입 가능)일 때만 조회 · 열 · 안내 CTA |
+| ② | Neture 운영자 대시보드(KPI · action queue · quick actions · 축 링크)와 admin 대시보드(policies · structure actions)에 백엔드가 내려주는 `/operator/suppliers` · `/operator/market-trial` · `/admin/supplier-governance` 링크가 범위 역할 없이도 노출 | `withoutUnreachableSubdomainOperatorLinks` 로 도달 불가 링크 제거(빈 축 그룹도 제거) |
+| ③ | 서브도메인 운영자 셸 메뉴에서 `supplier:operator` 에게 admin 전용 항목(`/admin/supplier-governance`)이 보임 | 셸 메뉴도 같은 판정으로 필터 |
+
+- 재현 증거: 정정을 되돌린 상태에서 ① · ③ 신규 테스트 FAIL, 정정 후 PASS.
+- 검증: `SubdomainOperatorEntryLinks.test.tsx` 11건 신설 · 권한 매트릭스(`SubdomainOperatorRoute.test.tsx`, 9행 `it.each` + super_admin · 비로그인) PASS · web-neture 전체 Vitest 26 파일 / 218 PASS · `tsc --noEmit` 0 · PR CI 11 pass / 3 skipped(경로 무관) · `mergeStateStatus=CLEAN`.
+- `vitest.config.mjs` 에 `@` alias 추가(테스트 전용 — 앱 빌드 설정 무변경).
+
+**SonarCloud — PR 과 main 을 분리해 기록한다.**
+
+| 대상 | 게이트 | 근거 |
+|---|---|---|
+| PR #243 HEAD `79930ce71` (병합됨) | **ERROR** — 신규 중복 3.8% | `api/measures/component_tree` 실측: 중복 파일 = `SubdomainOperatorRoute.test.tsx` 1개 · 11줄. 짐작 없이 이 파일을 테이블(`it.each`) 매트릭스로 재구성 |
+| PR #247 HEAD `7528ae864` | **OK** — 신규 360줄 · 중복 0.0% · 신규 이슈 0 · hotspot 100% | 1차 분석(`fca1342e8`)에서 S6759(props read-only) 1건 → 같은 PR 에서 정정 후 재분석 OK. GitHub check `SonarCloud Code Analysis = success` |
+| main | **ERROR (기존 · 이 변경과 별개)** | new code period = `previous_version`(2026-02-05) 누적: 중복 16.5% · reliability 5 · security 5 · hotspot 0%. PR 게이트 통과 ≠ main 게이트 통과 |
+
+**배포 census (fixed SHA `895b07f8b` 기준 · read-only).**
+
+| 항목 | 값 |
+|---|---|
+| 현재 서빙(전부 100%) | API `o4o-core-api-03756-txs`(배포 1) · `neture-web-01661-mq6` · `o4o-admin-dashboard-01316-hhp` — 그 외 web 도 배포 1 revision 또는 별도 트랙(hospital `00013-2xt`) 그대로 |
+| API 이미지 | `c5a3db0cd` 빌드(digest `62a4aaa9…`, Artifact Registry 존재 확인). `c5a3db0cd..895b07f8b` 의 api-server · packages 소스 차이 = 테스트 파일 1개(`hospital-drug-surface.spec.ts`) → runtime 동일, 재빌드 불요 |
+| 실제 배포 대상 | **API · neture-web · admin 3개만** |
+| 배포하지 않음 | web-store(`773d6c54c` 포함이지만 이 WO 대상 아님) · kpa-* · k-cosmetics · pharmacy-hub · lecture · signage · hospital(별도 배포 완료) |
+| API 이미지에 섞인 다른 트랙(분리 불가) | ⓐ Supplier `69e1c5aa8`(그 트랙의 배포 2가 함께 서빙됨) ⓑ Catalog `773d6c54c`(`/auth/services` 약국 · 리테일 도메인 → `pharmacy` · `retail.neture.co.kr`, PharmacyHub 신규 가입 비노출, session-origin 확장 — 현 대표 홈에 즉시 반영) ⓒ Hospital core `46a803dbc` · `9b8579ac8`(자연어 질문 fallback) |
+| neture-web 에 섞인 변경(분리 불가) | `4e34267ef` 대표 홈 진입 URL 서브도메인 정본화(대상 호스트 200 확인). `773d6c54c` 의 web-neture 변경은 테스트 파일뿐 |
+| admin 에 섞인 변경 | PR #241 의 RBAC 지정 카탈로그뿐(`0ce49bc71` · `804b0899f` · `f0e1374a7` · `d757bc7d2`) |
+| 전환 순서(계획) | API `--no-traffic` → 트래픽 전환 → API 검증 → neture-web + admin(tag 배포, web 은 배포 즉시 100%) → 역할 부여 → 실계정 검증 → `DEPLOY_ENABLED=false` 확인 |
+| 롤백 revision | API `03756-txs` · neture-web `01661-mq6` · admin `01316-hhp` |
+| 게이트 | `DEPLOY_ENABLED=false`. PR #247 병합 push 로 뜬 `Deploy Web Services` run `36504815617` 은 `deploy-hold-notice` 만 실행 · 모든 deploy job skipped(실측) |
+
+**역할 부여 대상 — 추정 없이 확인(read-only).** `renagang21@gmail.com`(`c0156a4a…`): 동일 이메일 사용자 1명 · Google `linked_accounts` 1행 · sub 유일 · active. 현재 대상 4 역할(`community:admin` · `supplier:admin` · `funding:admin` · `kpa-branch:admin`) 없음. 부여 경로 = 정식 `POST /admin/operator-assignments`(역할 1개/호출 · audit · membership ensure). 새 4 역할은 **API 배포 후에야** 서버 allowlist(`operator-role-catalog.ts`)에 들어가고 admin UI 목록은 admin 배포 후 보인다. 사용자가 대상과 방식(Playwright 창에서 사용자가 super_admin Google 로그인 → 에이전트가 지정 조작)을 확인했다.
+
+**서빙 배포 판단 = 보류 (2026-09-29 사용자 판단).** 위 census 로 한 번 승인을 요청했고 사용자가 **보류**를 선택했다. 따라서:
+
+| 구분 | 상태 |
+|---|---|
+| job | 서빙 배포 job 실행 0 |
+| revision | 새 revision 생성 0 (API · neture-web · admin 모두 위 서빙 revision 그대로) |
+| traffic | 변경 0 |
+| 로그인 | 미검증(실행 전) |
+| service membership | 역할 부여 전 — membership ensure 실행 0 |
+| 권한 동작 | 미검증(실행 전) |
+| 게이트 | `DEPLOY_ENABLED=false` 유지 |
+
+→ **DONE 아님.** 남은 것 = 서빙 배포 승인 → 위 순서 실행 → 4 역할 부여 → 실계정 화면 · API 검증 → 이 절에 job · revision · traffic · 로그인 · membership · 권한 동작을 분리 기록.
 
 ## 9. 범위 밖 발견 — 보고만 (고치지 않음)
 
@@ -1112,6 +1165,7 @@ API 트래픽 전환 · Web/Admin 배포 · 역할 부여는 **포함하지 않�
 | D1 | `'kpa-society:admin'` · `'kpa-society:operator'` 가 3개 컨트롤러의 허용 역할 목록에 남아 있다 (`routes/o4o-store/controllers/store-product-request-admin.controller.ts` · `modules/neture/controllers/product-candidate.controller.ts` · `modules/neture/controllers/product-library.controller.ts`). `requireRole` 은 `role_assignments.role` 과 **정확히 일치**만 보고 정규화하지 않으며 실제 부여 문자열은 `kpa:*` 다 → KPA 운영자에게 실효 0 | **권한 부여 범위 변경**(중지 조건) + 이미 전용 트랙이 있다 — `WO-O4O-KPA-OPERATOR-CANONICAL-ROLE-GUARD-FIX-V1` 이 `routes/operator/membership.routes.ts` 를 같은 이유로 정정했고 cosmetics 는 `6b586fb06` 에서 선행 정정됐다. 그 트랙의 **잔여 3파일** |
 | D2 | `apps/api-server/src/types/roles.ts` 의 지역 `ServiceKey` union 이 `kpa-branch` · `community` 를 모르는 상태로 stale (`@o4o/security-core` 의 것과 별개 union) | 소비처가 `audit-roles.ts` 스크립트뿐이라 런타임 영향 0. 두 union 통합은 구조 변경 |
 | D3 | `services/web-neture/src/components/home/__tests__/HomeEntryPanel.{back-navigation,workspace-cards}.test.tsx` **4건 선행 실패** | 내 변경 전에도 같은 4건이 실패한다(stash 로 확인). 현재 변경과 무관한 실패 |
+| D5 | `POST /neture/operator/registrations/:id/approve` 는 Neture `requireRole` 로 보호되며 회원 가입 승인 시 `neture_suppliers` 도 활성화한다("회원 가입 승인 = 공급자 승인" 설계). 즉 `supplier:operator` 없이 Neture 운영자가 공급자를 활성화하는 경로가 남아 있다 | 설계상 의도된 계약(Supplier canonical 트랙)이며 바꾸면 **권한 · API contract 변경**(중지 조건). PR #247 은 화면 진입만 정렬했고 이 경로는 건드리지 않았다 — 필요 시 별도 WO |
 | D4 | `check-forbidden-tables.mjs` 위반 2건 — `apps/api-server/src/entities/payment/PlatformPayment.entity.ts`(`o4o_payments`) · `apps/api-server/src/modules/neture/entities/neture-settlement-order.entity.ts`(`neture_settlement_orders`) | 내 diff 에 없는 기존 entity. CLAUDE.md §4 금지 테이블 규칙 위반이지만 **현재 변경과 무관한 실패**이며 결제·정산 구조 판단이 필요하다 |
 
 ---
@@ -1232,6 +1286,8 @@ representative-entry · unified-store-workspace-handoff spec)은 새 계약(`'un
 ---
 
 ## 10. 문서 정합
+
+- 2026-09-29 §8-7-8: 이 CHECK 내부의 stale 문구(`--apply` 승인 여부 판단) 정정 · 범위 밖 발견 D5 추가(보고만). 기준 문서 변경 0 — 발견 1건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 1건(D5, 필요 시).
 
 발견 2건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 1건(D1)
 
