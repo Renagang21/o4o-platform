@@ -20,6 +20,8 @@ import { OperatorDashboardLayout, type OperatorDashboardConfig } from '@o4o/oper
 import { AxisNavigationSection, type OperatorAxisGroup } from '@o4o/operator-core-ui';
 import { fetchOperatorDashboard } from '../../lib/api/operatorDashboard';
 import { buildNetureOperatorConfig } from './operatorConfig';
+import { useAuth } from '../../contexts/AuthContext';
+import { withoutUnreachableSubdomainOperatorLinks } from '../../lib/role-constants';
 
 // WO-O4O-OPERATOR-DASHBOARD-AUX-SECTION-P1-ALIGNMENT-V1:
 //   타 3서비스와 동일하게 2축 운영 네비게이션 추가 (frontend-only, route 무변경).
@@ -53,7 +55,34 @@ const NETURE_AXES: OperatorAxisGroup[] = [
   },
 ];
 
+/**
+ * WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1: 공급자 승인(`/operator/suppliers`) · 펀딩
+ * (`/operator/market-trial`) 은 `supplier:*` · `funding:*` 범위 화면이다. Neture 운영자라도 그
+ * 범위 역할이 없으면 진입 링크(축 · KPI · 대기열 · AI 요약 · 바로가기)를 보여주지 않는다.
+ */
+export function withReachableLinks(
+  config: OperatorDashboardConfig,
+  roles: readonly string[] | undefined | null,
+): OperatorDashboardConfig {
+  return {
+    ...config,
+    kpis: withoutUnreachableSubdomainOperatorLinks(config.kpis, roles),
+    aiSummary: withoutUnreachableSubdomainOperatorLinks(config.aiSummary, roles),
+    actionQueue: withoutUnreachableSubdomainOperatorLinks(config.actionQueue, roles),
+    activityLog: withoutUnreachableSubdomainOperatorLinks(config.activityLog, roles),
+    quickActions: withoutUnreachableSubdomainOperatorLinks(config.quickActions, roles),
+  };
+}
+
+export function reachableNetureAxes(roles: readonly string[] | undefined | null): OperatorAxisGroup[] {
+  return NETURE_AXES.map((axis) => ({
+    ...axis,
+    links: withoutUnreachableSubdomainOperatorLinks(axis.links, roles),
+  })).filter((axis) => axis.links.length > 0);
+}
+
 export default function NetureOperatorDashboard() {
+  const { user } = useAuth();
   const [config, setConfig] = useState<OperatorDashboardConfig | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -105,8 +134,8 @@ export default function NetureOperatorDashboard() {
   return (
     <OperatorDashboardLayout
       config={{
-        ...config,
-        aboveBlocks: <AxisNavigationSection axes={NETURE_AXES} />,
+        ...withReachableLinks(config, user?.roles),
+        aboveBlocks: <AxisNavigationSection axes={reachableNetureAxes(user?.roles)} />,
       }}
     />
   );

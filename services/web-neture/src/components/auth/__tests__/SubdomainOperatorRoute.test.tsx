@@ -71,78 +71,42 @@ const sees = (at: string, id: string) => {
   return found;
 };
 
+// 권한 매트릭스 — 계정(역할 · membership) × 화면 5곳. 행마다 **열리는 화면 목록 전체** 를 적는다
+// (목록에 없는 화면은 막혀야 한다). 개별 expect 나열 대신 표 한 장으로 고정한다.
+const SCREENS = {
+  governance: ['/admin/supplier-governance', 'supplier-governance'],
+  approvals: ['/operator/suppliers', 'supplier-approvals'],
+  funding: ['/operator/market-trial', 'funding'],
+  netureAdmin: ['/admin', 'neture-admin'],
+  netureOperator: ['/operator', 'neture-operator'],
+} as const;
+type Screen = keyof typeof SCREENS;
+
+const MATRIX: Array<[string, string[], Array<[string, string]>, Screen[]]> = [
+  ['supplier:admin + supplier → 상태 관리 + 승인 콘솔', ['supplier:admin'], [['supplier', 'active']], ['governance', 'approvals']],
+  // 상태 관리만 옮겨 두면 supplier 운영자가 목록은 보고 승인은 못 한다 — 화면과 API 가 같은 축이어야 한다.
+  ['supplier:operator + supplier → 승인 콘솔만 (상태 관리는 admin 전용)', ['supplier:operator'], [['supplier', 'active']], ['approvals']],
+  ['funding:admin + funding → 펀딩만 (admin ⊃ operator · 공급자 교차 0)', ['funding:admin'], [['funding', 'active']], ['funding']],
+  ['funding:operator + funding → 펀딩', ['funding:operator'], [['funding', 'active']], ['funding']],
+  ['Neture 관리자·운영자만 → 서브도메인 화면 0 · 자기 Neture 화면은 그대로', ['neture:admin', 'neture:operator'], [['neture', 'active']], ['netureAdmin', 'netureOperator']],
+  ['neture:operator + supplier:operator → 승인 콘솔은 supplier 축으로 열린다', ['neture:operator', 'supplier:operator'], [['neture', 'active'], ['supplier', 'active']], ['approvals', 'netureOperator']],
+  ['역할은 있으나 그 서비스 membership 이 없으면 막힌다', ['supplier:admin'], [['neture', 'active']], []],
+  ['membership 이 active 가 아니면 막힌다', ['funding:admin'], [['funding', 'suspended']], []],
+  ['다른 서비스 membership 으로는 대신할 수 없다 (supplier 역할 + funding membership)', ['supplier:admin'], [['funding', 'active']], []],
+];
+
 describe('서브도메인 운영자 화면 guard', () => {
   afterEach(() => cleanup());
 
-  it('supplier:admin + supplier membership 만 → 공급자 화면 두 곳을 연다 (상태 관리 + 승인 콘솔)', () => {
-    authState.user = user(['supplier:admin'], [['supplier', 'active']]);
-    expect(sees('/admin/supplier-governance', 'supplier-governance')).toBe(true);
-    expect(sees('/operator/suppliers', 'supplier-approvals')).toBe(true);
-    expect(sees('/operator/market-trial', 'funding')).toBe(false);
-    expect(sees('/admin', 'neture-admin')).toBe(false);
-    expect(sees('/operator', 'neture-operator')).toBe(false);
+  it.each(MATRIX)('%s', (_label, roles, memberships, expected) => {
+    authState.user = user(roles, memberships);
+    const opened = (Object.keys(SCREENS) as Screen[]).filter((k) => sees(...SCREENS[k]));
+    expect(opened).toEqual(expected);
   });
 
-  // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 (잔여 gap): 상태 관리만 옮겨 두면
-  // supplier 운영자가 **목록은 보고 승인은 못 하는** 상태가 된다 — 화면과 API 가 같은 축이어야 한다.
-  it('supplier:operator + supplier membership 만 → 승인 콘솔 O · 상태 관리 X', () => {
-    authState.user = user(['supplier:operator'], [['supplier', 'active']]);
-    expect(sees('/operator/suppliers', 'supplier-approvals')).toBe(true);
-    expect(sees('/admin/supplier-governance', 'supplier-governance')).toBe(false);
-    expect(sees('/operator/market-trial', 'funding')).toBe(false);
-    expect(sees('/operator', 'neture-operator')).toBe(false);
-  });
-
-  it('funding:admin + funding membership 만 → 펀딩 운영 화면만 연다 (admin ⊃ operator)', () => {
-    authState.user = user(['funding:admin'], [['funding', 'active']]);
-    expect(sees('/operator/market-trial', 'funding')).toBe(true);
-    expect(sees('/admin/supplier-governance', 'supplier-governance')).toBe(false);
-    expect(sees('/admin', 'neture-admin')).toBe(false);
-    expect(sees('/operator', 'neture-operator')).toBe(false);
-  });
-
-  it('funding:operator 도 펀딩 운영 화면에 들어온다', () => {
-    authState.user = user(['funding:operator'], [['funding', 'active']]);
-    expect(sees('/operator/market-trial', 'funding')).toBe(true);
-  });
-
-  it('supplier:operator 는 공급자 상태 관리(supplier:admin 화면)에 못 들어온다', () => {
-    authState.user = user(['supplier:operator'], [['supplier', 'active']]);
-    expect(sees('/admin/supplier-governance', 'supplier-governance')).toBe(false);
-  });
-
-  it('Neture 관리자·운영자 역할만 → 세 화면 모두 막힌다 (자기 Neture 화면은 그대로)', () => {
-    authState.user = user(['neture:admin', 'neture:operator'], [['neture', 'active']]);
-    expect(sees('/admin/supplier-governance', 'supplier-governance')).toBe(false);
-    expect(sees('/operator/suppliers', 'supplier-approvals')).toBe(false);
-    expect(sees('/operator/market-trial', 'funding')).toBe(false);
-    expect(sees('/admin', 'neture-admin')).toBe(true);
-    expect(sees('/operator', 'neture-operator')).toBe(true);
-  });
-
-  it('역할은 있으나 그 서비스 membership 이 없거나 active 가 아니면 막힌다', () => {
-    authState.user = user(['supplier:admin'], [['neture', 'active']]);
-    expect(sees('/admin/supplier-governance', 'supplier-governance')).toBe(false);
-    authState.user = user(['funding:admin'], [['funding', 'suspended']]);
-    expect(sees('/operator/market-trial', 'funding')).toBe(false);
-  });
-
-  it('다른 서비스 membership 으로는 대신할 수 없다 (supplier 역할 + funding membership)', () => {
-    authState.user = user(['supplier:admin'], [['funding', 'active']]);
-    expect(sees('/admin/supplier-governance', 'supplier-governance')).toBe(false);
-    expect(sees('/operator/suppliers', 'supplier-approvals')).toBe(false);
-  });
-
-  it('funding 역할로는 공급자 승인 콘솔에 못 들어온다 (교차 0)', () => {
-    authState.user = user(['funding:admin'], [['funding', 'active']]);
-    expect(sees('/operator/suppliers', 'supplier-approvals')).toBe(false);
-  });
-
-  it('platform:super_admin 은 통과한다 (백엔드 platformBypass 와 같음)', () => {
+  it('platform:super_admin 은 서브도메인 화면 세 곳을 통과한다 (백엔드 platformBypass 와 같음)', () => {
     authState.user = user(['platform:super_admin'], []);
-    expect(sees('/admin/supplier-governance', 'supplier-governance')).toBe(true);
-    expect(sees('/operator/suppliers', 'supplier-approvals')).toBe(true);
-    expect(sees('/operator/market-trial', 'funding')).toBe(true);
+    for (const k of ['governance', 'approvals', 'funding'] as const) expect(sees(...SCREENS[k])).toBe(true);
   });
 
   it('비로그인 → 로그인 화면', () => {

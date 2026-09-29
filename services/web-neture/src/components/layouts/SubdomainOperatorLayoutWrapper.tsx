@@ -16,7 +16,12 @@ import { NETURE_OPERATOR_DOMAIN_IA } from '../../config/operatorMenuGroups';
 import { NetureGlobalHeader } from '../NetureGlobalHeader';
 import { NetureBottomNav } from '../NetureBottomNav';
 import { useAuth } from '../../contexts/AuthContext';
-import { ADMIN_ROLES, OPERATOR_OR_ABOVE_ROLES, type SubdomainOperatorKey } from '../../lib/role-constants';
+import {
+  ADMIN_ROLES,
+  OPERATOR_OR_ABOVE_ROLES,
+  withoutUnreachableSubdomainOperatorItems,
+  type SubdomainOperatorKey,
+} from '../../lib/role-constants';
 import AdminLayoutWrapper from './AdminLayoutWrapper';
 import OperatorLayoutWrapper from './OperatorLayoutWrapper';
 
@@ -50,7 +55,9 @@ export default function SubdomainOperatorLayoutWrapper({
     <>
       <OperatorAreaShell
         header={<NetureGlobalHeader />}
-        menuItems={SCOPED_MENU[serviceKey]}
+        // 같은 서브도메인 안에서도 단계가 다르다 — `supplier:operator` 에게 admin 전용
+        // `/admin/supplier-governance` 항목을 보여주지 않는다.
+        menuItems={withoutUnreachableSubdomainOperatorItems(SCOPED_MENU[serviceKey], roles)}
         capabilities={ENABLED_CAPABILITIES}
         domainIAConfig={NETURE_OPERATOR_DOMAIN_IA}
       />
