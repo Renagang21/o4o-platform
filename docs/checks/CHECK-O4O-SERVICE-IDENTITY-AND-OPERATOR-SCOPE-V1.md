@@ -1287,7 +1287,7 @@ migration 6·7·8·9 와 커뮤니티 승격 CLI `--apply` 는 §8-7-6 · §8-7-
 | main SonarCloud | ERROR (§8-7-5 · §8-7-8 의 기존 누적 상태 그대로 — PR 게이트 통과 ≠ main 게이트 통과) |
 | 병합 push 로 뜬 배포 run | API `36512695625` · Admin `36512695619` · Web `36512695616` — 전부 `deploy-hold-notice` 만, deploy job **skipped**(실측) |
 
-**배포 census (fixed SHA `af4bf1715` · read-only · 2026-09-29).**
+**배포 census (fixed SHA `af4bf1715` · read-only · 2026-09-29) — SUPERSEDED: 아래 `f838fd036` census 로 대체.**
 
 | 항목 | 값 |
 |---|---|
@@ -1300,6 +1300,30 @@ migration 6·7·8·9 와 커뮤니티 승격 CLI `--apply` 는 §8-7-6 · §8-7-
 | neture-web 에 섞이는 변경 | §8-7-8 과 같음: `4e34267ef` 대표 홈 진입 URL · `773d6c54c`(테스트 파일뿐) |
 | kpa-branch-web 변경 | `2edfe9b33` 이후 `1f8a0251b` 하나뿐. 의존 패키지(`auth-client` · `auth-react` · `auth-utils` · `types`) 변경 0 |
 | 배포하지 않음 | web-store · kpa-society · k-cosmetics · pharmacy-hub · lecture · signage · hospital |
+
+**배포 census 재작성 (fixed SHA `f838fd036` · read-only · 2026-09-29) — 위 `af4bf1715` census 를 대체한다.**
+
+§8-8-2-b(운영자 업무 화면 ①②③)가 PR [#252](https://github.com/Renagang21/o4o-platform/pull/252) 로 병합되어 배포 대상 SHA 가 바뀌었다. `af4bf1715` 는 더 이상 배포 대상이 아니다.
+
+| 항목 | 값 |
+|---|---|
+| PR #252 최종 HEAD | `2a47b8d35` — CI 전 job pass(API Jest 3/3 · admin build · Code Quality · Guard) · CodeQL pass · `mergeStateStatus=CLEAN` |
+| SonarCloud PR #252 | 첫 HEAD `83404d94e` **ERROR**(new_security_rating 3 — 신규 CI 단계의 `npx` S6505 · S8543 + S3358 6 · S6759 1) → `2a47b8d35` 에서 `pnpm exec` 로 교체 · 삼항 분리 · Readonly → **Quality Gate OK · issue 0** |
+| main SonarCloud | ERROR 유지(reliability 5 · security 5 · 중복 16.5% · hotspot 0% — 기존 누적 상태. PR 게이트 통과 ≠ main 게이트 통과) |
+| 병합 | `f838fd036` (main) — main CI Pipeline `36519001752` success · CodeQL `36519001715` success |
+| 병합 push 로 뜬 배포 run | API `36519001781` · Web `36519001799` — `deploy-hold-notice` 만, build-and-deploy · deploy-* 전부 **skipped**(실측). Admin 배포 run 은 이 병합에서 트리거되지 않음(admin 경로 변경 0) |
+| 게이트 | `DEPLOY_ENABLED=false` |
+| 현재 서빙(전부 100% · 병합 후 재확인) | `o4o-core-api-03756-txs` · `neture-web-01661-mq6` · `o4o-admin-dashboard-01316-hhp` · `kpa-branch-web-00179-8q4` — 모두 배포 1 이미지(`2edfe9b33`) |
+| 롤백 revision | 위 4개 그대로 |
+| 배포 대상 | **API · neture-web · admin · kpa-branch-web** (`2edfe9b33..f838fd036` 비병합 커밋 80) |
+| migration | 범위 안 신규 migration = 6·7·8·9(`1790400000000`~`…0003`)뿐 — §8-7-6 에서 적용 완료. PR #252 는 migration · entity · manifest 변경 0 → API 배포의 migration Job 은 no-op 이어야 한다. **재실행 지시 아님** |
+| API 에 섞이는 다른 트랙(분리 불가) | Supplier `69e1c5aa8` · `acbd33a22` · Catalog `773d6c54c` · Hospital `46a803dbc` · `9b8579ac8` (+ `1a11d0eb7` 테스트뿐) |
+| neture-web 에 섞이는 변경 | `4e34267ef` 대표 홈 진입 URL · `773d6c54c` · `acbd33a22` · `fca1342e8` · `7528ae864` |
+| admin 변경 | `0ce49bc71` · `804b0899f` · `d757bc7d2` · `f0e1374a7` · `1f8a0251b` — PR #252 에서 admin 변경 0 |
+| kpa-branch-web 변경 | `1f8a0251b` · `83404d94e` · `2a47b8d35`. 의존 패키지 변경은 `packages/` 의 hospital · community 경로뿐(auth-client · auth-react · auth-utils · types 변경 0) |
+| 배포 순서(보고만 · 미실행) | tag `deploy/*` → gate true → deploy-api(migration Job no-op 확인 → 서비스 배포) → deploy-admin → deploy-web-services(neture · kpa-branch) → gate false. 완료 판정 = job success + 새 revision + traffic 100% |
+| 배포하지 않음 | web-store · kpa-society · k-cosmetics · pharmacy-hub · lecture · signage · hospital |
+| 실계정 검증 전제 | 운영 DB 기준 커뮤니티 운영자 0명 · 분회 개설 신청 0건 · 예약어 slug 분회 0 — 배포 후 사용자가 Admin UI 에서 서비스 운영자를 지정해야 ①②의 실제 심사 검증이 가능 |
 
 #### 8-8-4. 서비스 운영자 지정 — 미실행
 
