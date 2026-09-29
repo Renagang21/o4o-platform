@@ -1,6 +1,6 @@
 # CHECK-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1
 
-> 시작: 2026-09-27 · 상태: **`병합 완료(2026-09-28, 880642e9b) · 배포 1(2edfe9b33 · migration 0) 배포 1 완료(§8-5) · 배포 2 실행 경로 확정(§8-6 → **§8-7 MIGRATE-ONLY 로 대체**) · 배포 2 전 경계 보정(§8-7 · 화면 guard · SHA 범위 · CLI 출력) · 배포 2(이 작업) 미배포 · DEPLOY_ENABLED=false · 승격 CLI 결함 정정(§8-2, 95377812e) · 운영 적용·실제 접근 검증 전`**
+> 시작: 2026-09-27 · 상태: **`병합 완료(2026-09-28, 880642e9b) · 배포 1(2edfe9b33 · migration 0) 배포 1 완료(§8-5) · 배포 2 실행 경로 확정(§8-6 → **§8-7 MIGRATE-ONLY 로 대체**) · 배포 2 전 경계 보정(§8-7 · 화면 guard · SHA 범위 · CLI 출력) · 배포 2(이 작업) 미배포 · DEPLOY_ENABLED=false · 승격 CLI 결함 정정(§8-2, 95377812e) · migration 6~9 적용(§8-7-6) · 승격 CLI --apply 적용 완료(§8-7-7 · 3+2행) · 서빙 전환·실제 접근 검증 전`**
 > PR: [#241](https://github.com/Renagang21/o4o-platform/pull/241) — 1차 CI green 후
 > **리뷰에서 세 경계가 확정 요구사항과 다르다고 지적돼 같은 PR 에서 정정했다**(§11).
 > 정정 후 재검증: **PR #241 HEAD(`7ba57bcbc`)** 의 체크 전부 pass(SonarCloud 포함) · `mergeStateStatus = CLEAN`.
@@ -1058,6 +1058,26 @@ ADC 는 이 PC 에서 `gcloud auth application-default login` 후 확보됐다(�
 → 다음은 **`--apply` 승인 여부 판단**이다. 현재 미승인이며 실행 0.
 
 ---
+
+#### 8-7-7. 승격 CLI `--apply` 운영 실행 기록 (2026-09-29 · 사용자 승인)
+
+**`--apply` = 적용 완료 (2026-09-29 00:06:55Z).** 승인 범위 = `communities` 3행 + `community_memberships` 2행 생성뿐.
+API 트래픽 전환 · Web/Admin 배포 · 역할 부여는 **포함하지 않았고 실행 0**.
+
+경로는 dry-run 과 같다 — Cloud SQL Auth Proxy v2(로컬 포트) + 로컬 CLI(main `80b5ca87e` 의 `community-catalog-promotion.ts`), 접속값은 Secret Manager 에서 환경변수로만 전달(기록 0).
+
+| 단계 | 결과 |
+|---|---|
+| 적용 전 read-only | `typeorm_migrations` 693 · `communities` 0 · `community_memberships` 0 |
+| 적용 직전 dry-run 재대조 | pharmacy 1 · cosmetics 0 · o4o-general 1 · `would_insert=2` · `distinct_target_users=1` · `row_existed=false`×3 — §8-7-6 공식 dry-run 과 **동일** |
+| `--apply` | `mode: APPLY` · `inserted` 1 / 0 / 1 · `TOTAL eligible=2 would_insert=2 inserted=2 distinct_target_users=1` |
+| 적용 후 read-only | `communities` 3행(cosmetics · o4o-general · pharmacy, 전부 `active`) · `community_memberships` 2행(o4o-general · pharmacy, `member` · `active` · `approved_at` 있음) · distinct user 1 · `typeorm_migrations` 693 불변 |
+| 멱등 재실행(dry-run) | `row_existed=true`×3 · `already_active` 1 / 0 / 1 · `would_insert=0` · `inserted=0` — 재실행해도 추가 행 0 |
+
+- 예상(§8-0 U1 · §8-7-6)과의 차이 **0**. cosmetics 는 참여 증거 0명이라 개체 행만 생기고 회원 행은 없다(설계대로).
+- 운영 변화: 위 5행뿐. 스키마 · migration 기록 · 서빙 revision · `DEPLOY_ENABLED=false` 불변.
+
+→ 다음은 **서빙 배포 판단**(API 트래픽 · Web/Admin)과 운영자 4 역할 부여 — 별도 승인. PR #243 에서 제기된 공급자 화면 연결 3건 · SonarCloud 실패 해결·검증이 선행.
 
 ## 9. 범위 밖 발견 — 보고만 (고치지 않음)
 
