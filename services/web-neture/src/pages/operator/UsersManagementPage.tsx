@@ -185,10 +185,10 @@ const netureMembersClient: MembersConsoleClient = {
 function SupplierTwoStepGuide({
   pendingSupplierCount,
   canOpenSupplierConsole,
-}: {
+}: Readonly<{
   pendingSupplierCount: number;
   canOpenSupplierConsole: boolean;
-}) {
+}>) {
   return (
     <div className="mb-4 rounded-lg border border-slate-200 bg-slate-50 p-3">
       <div className="flex items-start gap-2">
