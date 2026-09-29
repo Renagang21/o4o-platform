@@ -130,6 +130,14 @@ const DRUG_INFO_TRIM_CHARS: ReadonlySet<string> = new Set(['"', "'", '(', ')', '
  * 대상 없이 인사·도움 요청·"성분이 뭐야" 만 있으면 false(되묻기).
  */
 export function looksLikeDrugQuestion(message: string): boolean {
+  return extractDrugQuestionSubject(message) !== null;
+}
+
+/**
+ * 문장에서 **물어볼 대상**(첫 번째 대상 단어)을 뽑는다. 없으면 null.
+ * '원내'로 시작하는 말(원내에·원내약)은 대상이 아니다 — 원내 보유는 브라우저 Local 이 판단하는 영역이다.
+ */
+export function extractDrugQuestionSubject(message: string): string | null {
   const text = String(message ?? '');
   for (const raw of text.split(/\s+/)) {
     let token = raw;
@@ -148,9 +156,38 @@ export function looksLikeDrugQuestion(message: string): boolean {
         break;
       }
     }
-    if (candidate.length >= 2 && !DRUG_INFO_NON_SUBJECT.has(candidate) && !/^[0-9.,]+$/.test(candidate)) return true;
+    if (
+      candidate.length >= 2 &&
+      !DRUG_INFO_NON_SUBJECT.has(candidate) &&
+      !candidate.startsWith('원내') &&
+      !/^[0-9.,]+$/.test(candidate)
+    ) {
+      return candidate;
+    }
   }
-  return false;
+  return null;
+}
+
+/** research 가 원내 재고를 지어내지 않도록 모든 병원 질의에 붙이는 금지 문구. */
+export const HOSPITAL_RESEARCH_NO_INVENTORY =
+  '특정 병원의 원내 보유·재고·구비 여부는 알 수 없으므로 판단하거나 언급하지 마세요.';
+
+/**
+ * 병원 surface 의 research 질의 — 원내/동일성분 질문은 원문을 그대로 넘기지 않는다.
+ *
+ * 서버는 사용자의 원내 파일을 모른다. "타이레놀과 같은 성분의 원내약 있어?" 를 그대로 조사에 넘기면 Gemini 가
+ * "원내에 있습니다" 같은 보유 사실을 지어낼 수 있다. 원내 보유의 정본은 브라우저가 읽은 실제 파일뿐이므로,
+ * 원내·동일성분 문장은 **약품 정보만 묻는 질의**로 바꾸고 보유 여부 언급을 금지한다. 그 밖의 일반 질문은 원문 그대로.
+ */
+export function buildHospitalResearchQuery(message: string): string {
+  const sameIngredient = mentionsSameIngredient(message);
+  if (!sameIngredient && !mentionsHospital(message)) return message;
+  const subject = extractProduct(message) ?? extractDrugQuestionSubject(message);
+  if (!subject) return `의약품 정보만 조사해 주세요. ${HOSPITAL_RESEARCH_NO_INVENTORY}`;
+  if (sameIngredient) {
+    return `${subject}의 유효성분(주성분)을 확인하고, 같은 유효성분을 가진 의약품(제품명·제형·함량)을 조사해 주세요. ${HOSPITAL_RESEARCH_NO_INVENTORY}`;
+  }
+  return `${subject}에 대한 의약품 정보(유효성분·효능·주의사항)를 조사해 주세요. ${HOSPITAL_RESEARCH_NO_INVENTORY}`;
 }
 
 /** 따옴표 구절 → 제품명 토큰 순으로 제품 하나를 뽑는다. 없으면 null. */

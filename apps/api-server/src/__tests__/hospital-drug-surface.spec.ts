@@ -17,7 +17,12 @@ jest.mock('../utils/logger.js', () => ({
 }));
 
 import { AI_TOOL_NAMES } from '../services/ai-tools/ai-tool-contract.js';
-import type { CompositeToolExecutor, CompositeToolResult } from '../services/ai-tools/hospital-drug-composite.js';
+import {
+  buildHospitalResearchQuery,
+  HOSPITAL_RESEARCH_NO_INVENTORY,
+  type CompositeToolExecutor,
+  type CompositeToolResult,
+} from '../services/ai-tools/hospital-drug-composite.js';
 import {
   decideHospitalDrugSurfacePlan,
   runHospitalDrugSurface,
@@ -143,7 +148,9 @@ describe('§8-C research_and_local — 조사 + 원내 Context 결합(Source 강
     expect(r.usedLocal).toBe(true);
     expect(r.answer).toContain('동일성분(아세트아미노펜)');
     expect(r.answer).toContain('원내');
-    expect(researchCalls).toEqual([C]);
+    // 동일성분·원내 문장은 원문이 아니라 bounded 질의로 조사한다(원내 보유 언급 금지).
+    expect(researchCalls).toEqual([buildHospitalResearchQuery(C)]);
+    expect(researchCalls[0]).toContain(HOSPITAL_RESEARCH_NO_INVENTORY);
     expect(localCalls).toEqual([{ field: 'product_name', value: '타이레놀정' }]);
     // Source 이름을 강제하지 않는다.
     expect(r.answer).not.toContain('health.kr');
@@ -172,7 +179,7 @@ describe('suppressLocal — 원내를 클라이언트가 처리(localSource=clie
     expect(r.plan).toBe('research');
     expect(r.usedResearch).toBe(true);
     expect(r.usedLocal).toBe(false);
-    expect(researchCalls).toEqual([C]);
+    expect(researchCalls).toEqual([buildHospitalResearchQuery(C)]);
     expect(localCalls).toEqual([]); // 원내 파일은 서버로 오지 않는다.
   });
 
@@ -262,10 +269,56 @@ describe('/hospital 병동 경로 — "타이레놀"(약품명 어미 없음) �
     });
     const r = await runHospitalDrugSurface(deps, text, 'question', true);
     expect(r.plan).toBe('research');
-    expect(researchCalls).toEqual([text]);
+    expect(researchCalls).toEqual([buildHospitalResearchQuery(text)]);
     expect(localCalls).toEqual([]); // 원내 파일은 서버로 가지 않는다
     // 브라우저 결합: 조사 답의 성분(아세트아미노펜)으로 같은 성분 원내 행을 찾는다.
     const byIngredient = matchLocalByResearchIngredients(rows, r.answer, 50);
     expect(byIngredient.map((x) => x.product_name)).toEqual(['타이레놀정500mg', '세토펜정']);
+  });
+});
+
+// ─── 결함 A — research 가 원내 재고를 지어내지 않게 한다(원내 보유의 정본 = 브라우저 Local) ─────
+describe('병원 research 질의 — 원내·동일성분 문장은 원문 대신 bounded 질의(원내 보유 언급 금지)', () => {
+  test.each([
+    ['타이레놀과 같은 성분의 원내약 있어?', '타이레놀'],
+    ['아모디핀정과 같은 성분의 원내약 있어?', '아모디핀정'],
+  ])('동일성분+원내 %s → 성분·동일성분 정보만 묻고 원내 보유 판단 금지', async (text, subject) => {
+    const q = buildHospitalResearchQuery(text);
+    expect(q).toContain(`${subject}의 유효성분`);
+    expect(q).toContain('같은 유효성분을 가진 의약품');
+    expect(q).toContain(HOSPITAL_RESEARCH_NO_INVENTORY);
+    // 사용자 원문("원내약 있어?")을 그대로 넘기지 않는다.
+    expect(q).not.toContain('원내약');
+    expect(q).not.toContain('있어?');
+    const { deps, researchCalls } = fakeDeps({});
+    await runHospitalDrugSurface(deps, text, 'question', true);
+    expect(researchCalls).toEqual([q]);
+  });
+
+  test('원내 보유 문장이 서버 research 로 오더라도 보유 여부를 묻지 않는다', () => {
+    const q = buildHospitalResearchQuery('우리 원내에 타이레놀 있어?');
+    expect(q).toContain('타이레놀에 대한 의약품 정보');
+    expect(q).toContain(HOSPITAL_RESEARCH_NO_INVENTORY);
+    expect(q).not.toContain('원내에');
+  });
+
+  test.each(['타이레놀 성분이 무어니', '타이레놀은 무슨 약이야?', '아세트아미노펜 주의사항?', A])(
+    '일반 research %s → 원문 그대로',
+    async (text) => {
+      expect(buildHospitalResearchQuery(text)).toBe(text);
+      const { deps, researchCalls } = fakeDeps({});
+      await runHospitalDrugSurface(deps, text, text === A ? 'research' : 'question', true);
+      expect(researchCalls).toEqual([text]);
+    },
+  );
+
+  test('판정 회귀 없음 — 원내·동일성분·question 분기 그대로', () => {
+    expect(decideHospitalDrugSurfacePlan('원내에 아모디핀정 있어?', 'question', false)).toBe('local_only');
+    expect(decideHospitalDrugSurfacePlan('아모디핀정과 같은 성분의 원내약 있어?', 'question', false)).toBe('research_and_local');
+    expect(decideHospitalDrugSurfacePlan('타이레놀과 같은 성분의 원내약 있어?', 'question', true)).toBe('research');
+    expect(decideHospitalDrugSurfacePlan('성분이 뭐야?', 'question', true)).toBe('question');
+    // 브라우저 결합 판정(core)도 그대로.
+    expect(mentionsSameIngredient('타이레놀과 같은 성분의 원내약 있어?')).toBe(true);
+    expect(mentionsHospital('우리 원내에 타이레놀 있어?')).toBe(true);
   });
 });
