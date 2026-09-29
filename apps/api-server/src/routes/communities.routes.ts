@@ -44,6 +44,10 @@ import {
   CommunityLifecycleService,
   CommunityLifecycleError,
 } from '../services/community/community-lifecycle.service.js';
+import {
+  CommunityOperatorDesignationError,
+  CommunityOperatorDesignationService,
+} from '../services/community/community-operator-designation.service.js';
 import { freshenUserContext } from '../services/auth/auth-context.helper.js';
 import {
   listCommunitiesForUser,
@@ -105,6 +109,55 @@ export function createCommunitiesRoutes(
     asyncHandler(async (req, res) => {
       const user = await currentCommunityUser(req as AuthRequest);
       res.json({ success: true, data: { communities: listCommunitiesForUser(user) } });
+    }),
+  );
+
+  // ── 개별 커뮤니티 운영자 지정·해제 (커뮤니티 서비스 운영자) ──────────────
+  // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 — Admin 은 서비스 운영자(community:admin)만 지정한다.
+  //   개별 커뮤니티 운영자(community_memberships.role)는 서비스 운영자가 각 커뮤니티의 승인된 회원 중에서
+  //   지정·해제한다. 가입 승인 자체는 여전히 개체 운영자(operatorOnly) 경로다.
+  //   `/:communitySlug/...` 파라미터 라우트보다 먼저 등록한다.
+  const designation = () => new CommunityOperatorDesignationService(AppDataSource);
+  const sendDesignationError = (res: Response, error: unknown): boolean => {
+    if (!(error instanceof CommunityOperatorDesignationError)) return false;
+    res.status(error.statusCode).json({ success: false, error: error.message, code: error.code });
+    return true;
+  };
+
+  router.get(
+    '/admin/communities',
+    ...serviceAdminOnly,
+    asyncHandler(async (_req, res) => {
+      res.json({ success: true, data: { communities: await designation().listCommunities() } });
+    }),
+  );
+
+  router.get(
+    '/admin/communities/:communityId/members',
+    ...serviceAdminOnly,
+    asyncHandler(async (req, res) => {
+      try {
+        res.json({ success: true, data: await designation().listMembers(req.params.communityId) });
+      } catch (error) {
+        if (!sendDesignationError(res, error)) throw error;
+      }
+    }),
+  );
+
+  router.post(
+    '/admin/communities/:communityId/members/:membershipId/role',
+    ...serviceAdminOnly,
+    asyncHandler(async (req, res) => {
+      try {
+        const data = await designation().setRole({
+          communityId: req.params.communityId,
+          membershipId: req.params.membershipId,
+          role: trimmed(bodyOf(req).role) as 'operator' | 'member',
+        });
+        res.json({ success: true, data });
+      } catch (error) {
+        if (!sendDesignationError(res, error)) throw error;
+      }
     }),
   );
 

@@ -1,5 +1,5 @@
 /**
- * SubdomainOperatorLayoutWrapper — 서브도메인 운영자 화면(supplier · funding)의 레이아웃
+ * SubdomainOperatorLayoutWrapper — 서브도메인 운영자 화면(supplier · funding · community)의 레이아웃
  *
  * WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 — 배포 2 전 경계 보정.
  *   화면 guard 는 `SubdomainOperatorRoute` 가 한다. 이 파일은 **크롬만** 고른다:
@@ -27,7 +27,7 @@ import OperatorLayoutWrapper from './OperatorLayoutWrapper';
 
 type Area = 'admin' | 'operator';
 
-const SCOPED_MENU: Readonly<Record<'supplier' | 'funding', Partial<Record<OperatorGroupKey, OperatorMenuItem[]>>>> = {
+const SCOPED_MENU: Readonly<Record<SubdomainOperatorKey, Partial<Record<OperatorGroupKey, OperatorMenuItem[]>>>> = {
   supplier: {
     approvals: [
       { label: '공급자 승인', path: '/operator/suppliers' },
@@ -35,13 +35,14 @@ const SCOPED_MENU: Readonly<Record<'supplier' | 'funding', Partial<Record<Operat
     ],
   },
   funding: { approvals: [{ label: '유통참여형 펀딩', path: '/operator/market-trial' }] },
+  community: { approvals: [{ label: '커뮤니티 서비스 관리', path: '/admin/communities' }] },
 };
 
 export default function SubdomainOperatorLayoutWrapper({
   serviceKey,
   area,
 }: {
-  serviceKey: Extract<SubdomainOperatorKey, 'supplier' | 'funding'>;
+  serviceKey: SubdomainOperatorKey;
   area: Area;
 }) {
   const { user } = useAuth();
@@ -57,7 +58,7 @@ export default function SubdomainOperatorLayoutWrapper({
         header={<NetureGlobalHeader />}
         // 같은 서브도메인 안에서도 단계가 다르다 — `supplier:operator` 에게 admin 전용
         // `/admin/supplier-governance` 항목을 보여주지 않는다.
-        menuItems={withoutUnreachableSubdomainOperatorItems(SCOPED_MENU[serviceKey], roles)}
+        menuItems={withoutUnreachableSubdomainOperatorItems(SCOPED_MENU[serviceKey], user)}
         capabilities={ENABLED_CAPABILITIES}
         domainIAConfig={NETURE_OPERATOR_DOMAIN_IA}
       />

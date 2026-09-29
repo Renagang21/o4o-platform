@@ -54,7 +54,6 @@ const PLATFORM_SCOPED_SCREENS = [
   // WO-O4O-KPA-BRANCH-SERVICE-MEMBER-APPROVAL-UI-V1
   //   백엔드는 adminGuards(kpa-branch:admin · platformBypass) 지만 이 사이트 floor 가
   //   platform:super_admin 이라 route 도 같은 경계를 선언한다.
-  { menuId: 'core-kpa-branch-service-members', path: '/admin/kpa-branch/service-members', source: USERS_ROUTES },
 ];
 
 describe('계층 3 — 백엔드 경계가 프런트 상수와 일치한다', () => {

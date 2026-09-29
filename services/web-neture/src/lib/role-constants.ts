@@ -7,6 +7,8 @@
  * 기능 동작 변경 없음.
  */
 
+import { isServiceAccessAllowed, type UserLike } from './membershipGate';
+
 // ─── Role Strings ──────────────────────────────────────────────────────────
 
 export const NETURE_ROLES = {
@@ -127,7 +129,7 @@ export function subdomainOperatorRoles(key: SubdomainOperatorKey, level: Subdoma
  *   supplier  `/admin/supplier-governance`  ← `/api/v1/neture/admin/suppliers*` (supplier:admin)
  *   supplier  `/operator/suppliers`          ← `/api/v1/neture/operator/suppliers*` (supplier:operator)
  *   funding   `/operator/market-trial`       ← `/api/v1/neture/operator/market-trial/*` (funding:operator)
- * community 서비스 전체 관리자(`/api/v1/communities/requests*`) 화면은 아직 없다 — 표에 넣지 않는다.
+ *   community `/admin/communities`           ← `/api/v1/communities/requests*` · `/communities/admin/communities*` (community:admin)
  */
 export const SUBDOMAIN_OPERATOR_SCREENS: ReadonlyArray<{
   path: string;
@@ -138,19 +140,27 @@ export const SUBDOMAIN_OPERATOR_SCREENS: ReadonlyArray<{
   // 승인·거절 canonical. governance 만 옮기면 supplier 운영자가 목록은 보고 승인은 못 한다.
   { path: '/operator/suppliers', key: 'supplier', level: 'operator' },
   { path: '/operator/market-trial', key: 'funding', level: 'operator' },
+  // 개설 심사 · 개별 커뮤니티 운영자 지정 — Admin 은 community:admin 만 지정하고 이후는 이 화면이다.
+  { path: '/admin/communities', key: 'community', level: 'admin' },
 ]);
 
 const hasAny = (roles: readonly string[] | undefined | null, allowed: string[]) =>
   (roles ?? []).some((r) => allowed.includes(r));
 
+/** 화면 진입 판정에 필요한 사용자 정보 — 역할과 서비스 membership. */
+export type SubdomainOperatorViewer = UserLike | null | undefined;
+
 /**
- * 메뉴 항목 경로가 서브도메인 운영자 화면이면 그 범위 역할이 있을 때만 true.
+ * 메뉴 항목 경로가 서브도메인 운영자 화면이면 **`SubdomainOperatorRoute` 와 같은 조건**일 때만 true:
+ *   범위 역할(`{key}:{level}`, admin ⊃ operator) **그리고** 그 서비스 membership active.
+ *   `platform:super_admin` 은 membership 없이 통과(MembershipGate · 백엔드 platformBypass 와 같음).
+ * 역할만 남고 membership 이 없거나 pending · suspended 인 계정은 route 에서 막히므로 링크도 숨긴다.
  * 그 밖의 경로는 이 함수가 판정하지 않는다(true) — 기존 메뉴 규칙 그대로.
  */
-export function canSeeSubdomainOperatorPath(roles: readonly string[] | undefined | null, path: string): boolean {
+export function canSeeSubdomainOperatorPath(viewer: SubdomainOperatorViewer, path: string): boolean {
   const screen = SUBDOMAIN_OPERATOR_SCREENS.find((s) => path === s.path || path.startsWith(`${s.path}/`));
   if (!screen) return true;
-  return hasAny(roles, subdomainOperatorRoles(screen.key, screen.level));
+  return hasAny(viewer?.roles, subdomainOperatorRoles(screen.key, screen.level)) && isServiceAccessAllowed(viewer, screen.key);
 }
 
 /**
@@ -159,11 +169,11 @@ export function canSeeSubdomainOperatorPath(roles: readonly string[] | undefined
  */
 export function withoutUnreachableSubdomainOperatorItems<T extends { path: string }>(
   menu: Partial<Record<string, T[]>>,
-  roles: readonly string[] | undefined | null,
+  viewer: SubdomainOperatorViewer,
 ): Partial<Record<string, T[]>> {
   const out: Partial<Record<string, T[]>> = {};
   for (const [group, items] of Object.entries(menu)) {
-    const visible = (items ?? []).filter((item) => canSeeSubdomainOperatorPath(roles, item.path));
+    const visible = (items ?? []).filter((item) => canSeeSubdomainOperatorPath(viewer, item.path));
     if (visible.length > 0) out[group] = visible;
   }
   return out;
@@ -176,8 +186,8 @@ export function withoutUnreachableSubdomainOperatorItems<T extends { path: strin
  */
 export function withoutUnreachableSubdomainOperatorLinks<
   T extends { link?: string; actionUrl?: string; href?: string },
->(items: readonly T[] | undefined | null, roles: readonly string[] | undefined | null): T[] {
+>(items: readonly T[] | undefined | null, viewer: SubdomainOperatorViewer): T[] {
   return (items ?? []).filter((item) =>
-    [item.link, item.actionUrl, item.href].every((p) => !p || canSeeSubdomainOperatorPath(roles, p)),
+    [item.link, item.actionUrl, item.href].every((p) => !p || canSeeSubdomainOperatorPath(viewer, p)),
   );
 }

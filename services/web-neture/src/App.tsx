@@ -455,6 +455,7 @@ const HomepageCmsPage = lazy(() => import('./pages/operator/HomepageCmsPage'));
 const OperatorGuideContentsPage = lazy(() => import('./pages/operator/OperatorGuideContentsPage'));
 // WO-O4O-NETURE-SUPPLIER-ACTIVATION-VISIBILITY-AND-ACTION-QUEUE-FIX-V1
 const OperatorSupplierApprovalPage = lazy(() => import('./pages/operator/OperatorSupplierApprovalPage'));
+const CommunityServiceAdminPage = lazy(() => import('./pages/admin/CommunityServiceAdminPage'));
 // WO-O4O-NETURE-OPERATOR-CONTACT-MESSAGES-OPERATOR-SCOPE-V1
 const OperatorContactMessagesPage = lazy(() => import('./pages/operator/OperatorContactMessagesPage'));
 
@@ -1104,6 +1105,7 @@ function App() {
                   공급자 상태 관리  supplier:admin + supplier membership   ← /neture/admin/suppliers*
                   공급자 승인·거절  supplier:operator(admin 포함) + supplier membership ← /neture/operator/suppliers*
                   유통참여형 펀딩    funding:operator(admin 포함) + funding membership ← /neture/operator/market-trial/*
+                  커뮤니티 서비스 관리 community:admin + community membership ← /communities/requests* · /communities/admin/*
                 Neture 역할만으로는 들어오지 못하고, 서브도메인 역할만으로 들어올 수 있다.
             ================================================================ */}
             <Route element={
@@ -1137,6 +1139,13 @@ function App() {
               <Route path="/admin/market-trial" element={<Navigate to="/operator/market-trial" replace />} />
               <Route path="/operator/market-trial" element={<MarketTrialApprovalsPage />} />
               <Route path="/operator/market-trial/:id" element={<MarketTrialApprovalDetailPage />} />
+            </Route>
+            <Route element={
+              <SubdomainOperatorRoute serviceKey="community" level="admin">
+                <SubdomainOperatorLayoutWrapper serviceKey="community" area="admin" />
+              </SubdomainOperatorRoute>
+            }>
+              <Route path="/admin/communities" element={<CommunityServiceAdminPage />} />
             </Route>
 
             {/* ================================================================

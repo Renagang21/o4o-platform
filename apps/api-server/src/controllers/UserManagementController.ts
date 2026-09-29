@@ -6,6 +6,25 @@ import type { AuthRequest } from '../types/auth.js';
 import { Parser } from 'json2csv';
 import { roleAssignmentService } from '../modules/auth/services/role-assignment.service.js';
 import logger from '../utils/logger.js';
+// WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1: Admin 은 서비스 운영자 역할만 추가·해제한다.
+import { AdminRoleEditForbiddenError, applyAdminRoleEdit } from '../services/admin/admin-role-edit.js';
+import { isPlatformAdmin } from '../utils/role.utils.js';
+import { OperatorRoleContractError } from '../config/operator-role-catalog.js';
+
+/** Admin 역할 편집 요청자 맥락 — 해제 안전장치는 요청자 권한에서 파생한다. */
+function editRequester(req: Request) {
+  const user = (req as AuthRequest).user as { id?: string; roles?: string[] } | undefined;
+  return { id: user?.id, isPlatformSuperAdmin: isPlatformAdmin(user?.roles ?? []) };
+}
+
+/** 역할 편집 경계 위반을 계약 코드로 응답한다(400 ROLE_NOT_ASSIGNABLE · 403 SELF_ROLE_REVOKE_FORBIDDEN · LAST_ADMIN_PROTECTED). */
+function sendRoleEditError(res: Response, error: unknown): boolean {
+  if (error instanceof OperatorRoleContractError || error instanceof AdminRoleEditForbiddenError) {
+    res.status(error.statusCode).json({ success: false, error: error.message, code: error.code });
+    return true;
+  }
+  return false;
+}
 
 export class UserManagementController {
   private userRepository: UserRepository;
@@ -145,7 +164,9 @@ export class UserManagementController {
   // Create new user
   createUser = async (req: Request, res: Response): Promise<void> => {
     try {
-      const { email, firstName, lastName, role, roles, status } = req.body;
+      // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1: 생성 시 역할을 받지 않는다(`User.roles` 는 비영속
+      //   필드라 종전에도 저장되지 않았다). 서비스 운영자 지정은 `POST /admin/operator-assignments` 만 쓴다.
+      const { email, firstName, lastName, status } = req.body;
 
       // Check if user already exists
       const existingUser = await this.userRepository.findOne({ where: { email } });
@@ -163,7 +184,6 @@ export class UserManagementController {
         email,
         firstName,
         lastName,
-        roles: roles || [role || 'customer'],
         status: status || 'pending'
       });
 
@@ -219,9 +239,9 @@ export class UserManagementController {
       if (firstName !== undefined) user.firstName = firstName;
       if (lastName !== undefined) user.lastName = lastName;
       if (status) user.status = status;
-      if (roles) {
-        await roleAssignmentService.removeAllRoles(user.id);
-        await roleAssignmentService.assignRoles(user.id, roles);
+      // 요청 배열로 덮어쓰지 않는다 — 서비스 운영자 역할만 차이로 추가·해제, 회원 역할 등은 그대로.
+      if (Array.isArray(roles)) {
+        await applyAdminRoleEdit(user.id, roles, editRequester(req));
       }
 
       const updatedUser = await this.userRepository.save(user);
@@ -231,6 +251,7 @@ export class UserManagementController {
         data: updatedUser.toPublicData()
       });
     } catch (error) {
+      if (sendRoleEditError(res, error)) return;
       logger.error('Error updating user:', error);
       res.status(500).json({
         success: false,
@@ -402,13 +423,20 @@ export class UserManagementController {
       const { id } = req.params;
       const { roles } = req.body;
 
-      const user = await this.userRepository.updateUserRoles(id, roles);
+      // 종전 `updateUserRoles`(removeAllRoles → assignRoles) 대신 같은 경계를 쓴다.
+      const user = await this.userRepository.findOne({ where: { id } });
+      if (!user) {
+        res.status(404).json({ success: false, error: 'User not found' });
+        return;
+      }
+      await applyAdminRoleEdit(user.id, Array.isArray(roles) ? roles : [], editRequester(req));
 
       res.json({
         success: true,
         data: user.toPublicData()
       });
     } catch (error) {
+      if (sendRoleEditError(res, error)) return;
       logger.error('Error updating user roles:', error);
       res.status(500).json({
         success: false,

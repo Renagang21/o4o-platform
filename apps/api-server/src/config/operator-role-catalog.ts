@@ -10,7 +10,8 @@
  *   - `platform:*` 은 절대 포함하지 않는다. `platform:super_admin` 신규 부여 기능은 만들지 않는다.
  *   - role prefix → `service_memberships.service_key` 변환은 `@o4o/security-core` SSOT
  *     (`resolveCanonicalServiceKey`) 에만 위임한다. 로컬 매핑 상수를 만들지 않는다.
- *   - `kpa-branch:operator` 부여는 분회 소속(`branch_memberships`) 부여가 **아니다**.
+ *   - Admin 은 **서비스 범위 운영자만** 지정한다. 개별 분회 운영자(`kpa-branch:operator`)와 개별
+ *     커뮤니티 운영자(`community_memberships.role`)는 여기 없다 — 그 서비스 관리자가 자기 서비스에서 지정한다.
  *   - 프런트 카탈로그와의 일치는 테스트(`operator-role-catalog.test.ts`)가 강제한다.
  */
 import { resolveCanonicalServiceKey } from '@o4o/security-core';
@@ -30,7 +31,9 @@ export const ASSIGNABLE_OPERATOR_ROLES: readonly string[] = Object.freeze([
   // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1: 분회 서비스 전체 관리자. 개별 분회 운영자와 분리된 상위 권한이다.
   //   분회 개설 승인 주체 — operator 급으로 열면 A 분회 운영자가 B 분회 개설을 승인할 수 있다.
   'kpa-branch:admin',
-  'kpa-branch:operator',
+  // `kpa-branch:operator`(개별 분회 운영자)는 **여기서 부여하지 않는다** — 대상 분회는 branch_memberships 로
+  //   정해지는 개체 운영자이고, 지정·해제는 분회 서비스 관리자(kpa-branch:admin)가 분회 서비스 화면에서 한다
+  //   (`/kpa-branch/admin/branches/:branchId/operators`). Admin 은 서비스 범위 운영자만 지정한다.
   // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1: 커뮤니티 전체 관리자(개설 신청 승인). 개별 커뮤니티 운영은
   //   community_memberships 의 개체 역할로만 하며 서비스 전역 operator 역할은 만들지 않는다.
   'community:admin',

@@ -21,7 +21,7 @@ import { AxisNavigationSection, type OperatorAxisGroup } from '@o4o/operator-cor
 import { fetchOperatorDashboard } from '../../lib/api/operatorDashboard';
 import { buildNetureOperatorConfig } from './operatorConfig';
 import { useAuth } from '../../contexts/AuthContext';
-import { withoutUnreachableSubdomainOperatorLinks } from '../../lib/role-constants';
+import { withoutUnreachableSubdomainOperatorLinks, type SubdomainOperatorViewer } from '../../lib/role-constants';
 
 // WO-O4O-OPERATOR-DASHBOARD-AUX-SECTION-P1-ALIGNMENT-V1:
 //   타 3서비스와 동일하게 2축 운영 네비게이션 추가 (frontend-only, route 무변경).
@@ -62,22 +62,22 @@ const NETURE_AXES: OperatorAxisGroup[] = [
  */
 export function withReachableLinks(
   config: OperatorDashboardConfig,
-  roles: readonly string[] | undefined | null,
+  viewer: SubdomainOperatorViewer,
 ): OperatorDashboardConfig {
   return {
     ...config,
-    kpis: withoutUnreachableSubdomainOperatorLinks(config.kpis, roles),
-    aiSummary: withoutUnreachableSubdomainOperatorLinks(config.aiSummary, roles),
-    actionQueue: withoutUnreachableSubdomainOperatorLinks(config.actionQueue, roles),
-    activityLog: withoutUnreachableSubdomainOperatorLinks(config.activityLog, roles),
-    quickActions: withoutUnreachableSubdomainOperatorLinks(config.quickActions, roles),
+    kpis: withoutUnreachableSubdomainOperatorLinks(config.kpis, viewer),
+    aiSummary: withoutUnreachableSubdomainOperatorLinks(config.aiSummary, viewer),
+    actionQueue: withoutUnreachableSubdomainOperatorLinks(config.actionQueue, viewer),
+    activityLog: withoutUnreachableSubdomainOperatorLinks(config.activityLog, viewer),
+    quickActions: withoutUnreachableSubdomainOperatorLinks(config.quickActions, viewer),
   };
 }
 
-export function reachableNetureAxes(roles: readonly string[] | undefined | null): OperatorAxisGroup[] {
+export function reachableNetureAxes(viewer: SubdomainOperatorViewer): OperatorAxisGroup[] {
   return NETURE_AXES.map((axis) => ({
     ...axis,
-    links: withoutUnreachableSubdomainOperatorLinks(axis.links, roles),
+    links: withoutUnreachableSubdomainOperatorLinks(axis.links, viewer),
   })).filter((axis) => axis.links.length > 0);
 }
 
@@ -134,8 +134,8 @@ export default function NetureOperatorDashboard() {
   return (
     <OperatorDashboardLayout
       config={{
-        ...withReachableLinks(config, user?.roles),
-        aboveBlocks: <AxisNavigationSection axes={reachableNetureAxes(user?.roles)} />,
+        ...withReachableLinks(config, user),
+        aboveBlocks: <AxisNavigationSection axes={reachableNetureAxes(user)} />,
       }}
     />
   );

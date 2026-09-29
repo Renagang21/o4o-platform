@@ -16,10 +16,8 @@ const OperatorsPage = lazy(() => import('@/pages/operators'));
 //     · backend `/api/v1/admin/enrollments*` · `/api/v1/admin/roles/applications*` 부재
 //       (backend 에 있는 것은 `/api/v2/roles/applications/my` 뿐 — 신청자 본인 조회).
 //     · 메뉴 노출 0 · 프로덕션 30일 호출 0 · 위젯 hook 은 `count: 0` 영구 stub.
-//   역할 신청 승인의 살아 있는 정본은 서비스별 admin 화면
-//   (`/admin/kpa-branch/service-members` 등)이다.
-// WO-O4O-KPA-BRANCH-SERVICE-MEMBER-APPROVAL-UI-V1: kpa-branch 서비스 가입 승인
-const BranchServiceMembersPage = lazy(() => import('@/pages/kpa/BranchServiceMembersPage'));
+//   역할 신청 승인의 살아 있는 정본은 각 서비스 운영자 화면이다
+//   (WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1: 분회 가입 승인은 web-kpa-branch `/admin/service-members` 로 이전).
 // WO-KPA-OPERATOR-SCOPE-ASSIGNMENT-OPS-V1: Operator Policy
 const MyPolicyPage = lazy(() => import('@/pages/operator/MyPolicyPage'));
 
@@ -105,18 +103,6 @@ export function UserRoutes() {
       <AdminProtectedRoute requiredRoles={[...PLATFORM_ADMIN_ROLES]} requiredPermissions={['users:update']}>
         <Suspense fallback={<PageLoader />}>
           <UserForm />
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
-
-    // WO-O4O-KPA-BRANCH-SERVICE-MEMBER-APPROVAL-UI-V1: kpa-branch 서비스 가입 승인/반려
-    //   백엔드 `/api/v1/kpa-branch/admin/service-members*` = adminGuards(kpa-branch:admin · platformBypass).
-    //   이 사이트의 진입 floor 가 platform:super_admin 이므로 같은 경계를 route 에도 선언한다.
-    //   kpa-branch member/operator 는 floor 에서 이미 막히고, 백엔드도 403 이다 (UI 숨김 ≠ 보안).
-    <Route key="/admin/kpa-branch/service-members" path="/admin/kpa-branch/service-members" element={
-      <AdminProtectedRoute requiredRoles={[...PLATFORM_ADMIN_ROLES]}>
-        <Suspense fallback={<PageLoader />}>
-          <BranchServiceMembersPage />
         </Suspense>
       </AdminProtectedRoute>
     } />,

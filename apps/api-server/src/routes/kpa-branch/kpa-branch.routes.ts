@@ -102,6 +102,7 @@ import { BranchEventController } from '../../controllers/kpa-branch/BranchEventC
 import { BranchOfficerController } from '../../controllers/kpa-branch/BranchOfficerController.js';
 import { BranchAdminController } from '../../controllers/kpa-branch/BranchAdminController.js';
 import { BranchCreationRequestController } from '../../controllers/kpa-branch/BranchCreationRequestController.js';
+import { BranchOperatorDesignationController } from '../../controllers/kpa-branch/BranchOperatorDesignationController.js';
 
 const SERVICE_KEY = SERVICE_KEYS.KPA_BRANCH;
 
@@ -635,6 +636,25 @@ export function createKpaBranchRoutes(): Router {
     '/admin/branch-requests/:requestId/reject',
     ...branchServiceAdminGuards,
     wrap(BranchCreationRequestController.reject),
+  );
+
+  // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 — 개별 분회 운영자 지정·해제.
+  //   Admin 은 서비스 운영자만 지정한다. 개별 분회 운영자(`kpa-branch:operator`)는 분회 서비스 관리자가
+  //   여기서 **대상 분회 active 소속자에 한정해** 지정·해제한다. 런타임 분회 한정(requireBranchScope)은 그대로다.
+  router.get(
+    '/admin/branches/:branchId/operators',
+    ...branchServiceAdminGuards,
+    wrap(BranchOperatorDesignationController.list),
+  );
+  router.post(
+    '/admin/branches/:branchId/operators',
+    ...branchServiceAdminGuards,
+    wrap(BranchOperatorDesignationController.designate),
+  );
+  router.delete(
+    '/admin/branches/:branchId/operators/:userId',
+    ...branchServiceAdminGuards,
+    wrap(BranchOperatorDesignationController.release),
   );
 
   const superAdminGuards = [requireAuth as any, requireRole('platform:super_admin') as any];

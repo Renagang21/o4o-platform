@@ -16,11 +16,11 @@ import {
   type BranchMembership,
   type BranchSummary,
 } from '../lib/api/branch';
-import { ROLE_LABELS } from '../config/service';
+import { ROLE_LABELS, ROLES, satisfiesRole } from '../config/service';
 import { useAuth } from '../contexts/AuthContext';
 
 export default function MyBranchPage() {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { user, isAuthenticated, isLoading } = useAuth();
   const [access, setAccess] = useState<BranchAccess | null>(null);
   const [history, setHistory] = useState<BranchMembership[] | null>(null);
   const [branches, setBranches] = useState<Record<string, BranchSummary>>({});
@@ -58,6 +58,13 @@ export default function MyBranchPage() {
   return (
     <div className="mx-auto max-w-3xl px-4 py-12">
       <h1 className="text-xl font-bold text-gray-900">내 분회</h1>
+      {satisfiesRole((user?.roles as string[] | undefined) ?? [], ROLES.admin) && (
+        <p className="mt-2 text-sm">
+          <Link to="/service-admin" className="text-primary-700 hover:underline">
+            분회 서비스 관리 (가입 승인 · 분회 운영자 지정)
+          </Link>
+        </p>
+      )}
       {error && <p className="mt-4 text-sm text-red-600">{error}</p>}
 
       <section className="mt-6 rounded border border-gray-200 p-4 text-sm">
