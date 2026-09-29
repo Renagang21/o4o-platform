@@ -148,6 +148,13 @@ import {
   ensureServiceMembershipsForRoles,
   type MembershipPolicy,
 } from '../../services/admin/service-membership-ensure.js';
+// WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1: Admin 은 서비스 운영자 역할만 추가·해제한다.
+import {
+  AdminRoleEditForbiddenError,
+  applyAdminRoleEdit,
+  assertAdminAssignableRoles,
+} from '../../services/admin/admin-role-edit.js';
+import { OperatorRoleContractError } from '../../config/operator-role-catalog.js';
 
 export {
   resolveMembershipPolicy,
@@ -326,7 +333,10 @@ export class AdminUserController {
       }
 
       const userRepo = AppDataSource.getRepository(User);
-      const rolesToAssign = Array.isArray(rolesArray) && rolesArray.length > 0 ? rolesArray : [role];
+      // 서비스 범위 운영자 역할만 받는다 — 일반 회원 역할 · 개별 분회 운영자는 거절(ROLE_NOT_ASSIGNABLE).
+      const rolesToAssign = assertAdminAssignableRoles(
+        Array.isArray(rolesArray) && rolesArray.length > 0 ? rolesArray : [role],
+      );
 
       // 대상 서비스 확정 — 여기서 걸리면 아무것도 쓰지 않는다(멀티 서비스 · serviceKey 모순 거절).
       const target = resolveOperatorTargetServiceKey(rolesToAssign, req.body?.serviceKey);
@@ -384,6 +394,10 @@ export class AdminUserController {
           error: error.message,
           code: error.code,
         });
+        return;
+      }
+      if (error instanceof OperatorRoleContractError) {
+        res.status(error.statusCode).json({ success: false, error: error.message, code: error.code });
         return;
       }
       logger.error('Error creating user:', error);
@@ -465,15 +479,15 @@ export class AdminUserController {
       if (firstName) user.firstName = firstName;
       if (lastName) user.lastName = lastName;
       if (name) user.name = name;
-      // WO-OPERATOR-FIX-V1: Support multiple roles from frontend
-      if (Array.isArray(rolesArray) && rolesArray.length > 0) {
-        await roleAssignmentService.removeAllRoles(user.id);
-        for (const r of rolesArray) {
-          await roleAssignmentService.assignRole({ userId: user.id, role: r });
-        }
-      } else if (role) {
-        await roleAssignmentService.removeAllRoles(user.id);
-        await roleAssignmentService.assignRole({ userId: user.id, role });
+      // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1: 요청 배열로 역할을 **덮어쓰지 않는다**.
+      //   서비스 운영자 역할만 차이로 추가·해제하고, 카탈로그 밖 역할(회원 역할 등)은 그대로 둔다.
+      const requestedRoles = Array.isArray(rolesArray) && rolesArray.length > 0 ? rolesArray : role ? [role] : null;
+      if (requestedRoles) {
+        await applyAdminRoleEdit(user.id, requestedRoles, {
+          id: (req as any).user?.id,
+          isPlatformSuperAdmin: isPlatformAdmin((req as any).user?.roles ?? []),
+        });
+        invalidateRoles(user.id);
       }
       if (status !== undefined) user.status = status;
       if (isActive !== undefined) user.isActive = isActive;
@@ -486,6 +500,10 @@ export class AdminUserController {
         message: 'User updated successfully'
       });
     } catch (error) {
+      if (error instanceof OperatorRoleContractError || error instanceof AdminRoleEditForbiddenError) {
+        res.status(error.statusCode).json({ success: false, error: error.message, code: error.code });
+        return;
+      }
       logger.error('Error updating user:', error);
       res.status(500).json({
         success: false,

@@ -38,8 +38,9 @@ describe('V5 — 분회 상위 권한이 지정 가능하다', () => {
     });
   });
 
-  it('개별 분회 운영자 역할도 그대로 남아 있다 (둘은 다른 권한이다)', () => {
-    expect(ASSIGNABLE_OPERATOR_ROLES).toContain('kpa-branch:operator');
+  it('개별 분회 운영자(kpa-branch:operator)는 Admin 지정 대상이 아니다 — 분회 서비스 관리자가 분회 화면에서 지정', () => {
+    expect(ASSIGNABLE_OPERATOR_ROLES).not.toContain('kpa-branch:operator');
+    expect(() => resolveOperatorRole('kpa-branch:operator', 'kpa-branch')).toThrow(/부여할 수 없는 역할/);
   });
 
   it('roles seed 가 kpa-branch:admin 을 서비스 전체 관리로 정의한다', () => {

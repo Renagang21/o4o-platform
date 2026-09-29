@@ -21,7 +21,11 @@ import { AdminDashboardLayout, type AdminDashboardConfig } from '@o4o/admin-ux-c
 import { fetchAdminDashboard } from '../../lib/api/dashboard';
 // WO-O4O-PLATFORM-ADMIN-ROLE-BASED-ENTRYPOINT-V1: platform 권한자 전용 진입점
 import { useAuth } from '../../contexts/AuthContext';
-import { hasPlatformAdminRole, withoutUnreachableSubdomainOperatorLinks } from '../../lib/role-constants';
+import {
+  hasPlatformAdminRole,
+  withoutUnreachableSubdomainOperatorLinks,
+  type SubdomainOperatorViewer,
+} from '../../lib/role-constants';
 
 /** platform 권한자에게만 보이는 /admin/platform 진입 카드 (neture:admin 단독엔 미노출). */
 function PlatformEntryCard() {
@@ -50,13 +54,13 @@ function PlatformEntryCard() {
  */
 export function withReachableAdminLinks(
   config: AdminDashboardConfig,
-  roles: readonly string[] | undefined | null,
+  viewer: SubdomainOperatorViewer,
 ): AdminDashboardConfig {
   return {
     ...config,
-    policies: withoutUnreachableSubdomainOperatorLinks(config.policies, roles),
-    governanceAlerts: withoutUnreachableSubdomainOperatorLinks(config.governanceAlerts, roles),
-    structureActions: withoutUnreachableSubdomainOperatorLinks(config.structureActions, roles),
+    policies: withoutUnreachableSubdomainOperatorLinks(config.policies, viewer),
+    governanceAlerts: withoutUnreachableSubdomainOperatorLinks(config.governanceAlerts, viewer),
+    structureActions: withoutUnreachableSubdomainOperatorLinks(config.structureActions, viewer),
   };
 }
 
@@ -120,7 +124,7 @@ export default function AdminDashboardPage() {
         <p className="text-sm text-slate-500 mt-1">구조 지표 · 정책 현황 · 거버넌스 경고</p>
       </div>
       {showPlatform && <PlatformEntryCard />}
-      <AdminDashboardLayout config={withReachableAdminLinks(config, user?.roles)} />
+      <AdminDashboardLayout config={withReachableAdminLinks(config, user)} />
     </div>
   );
 }

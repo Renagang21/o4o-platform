@@ -32,8 +32,9 @@ export default function AdminLayoutWrapper() {
   //   `/api/ai/**` = requireAdmin(platform:super_admin) 이므로 플랫폼 AI 항목은
   //   platform 권한자에게만 노출한다 (neture:admin 메뉴 클릭 → 403 빈화면 제거).
   const { user } = useAuth();
-  // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1: 「공급자 상태 관리」 는 supplier:admin 화면 — 그 역할이 있을 때만 노출.
-  const menuItems = withoutUnreachableSubdomainOperatorItems(getAdminMenu(hasPlatformAdminRole(user?.roles)), user?.roles);
+  // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1: 「공급자 상태 관리」 는 supplier:admin 화면 — 그 역할과
+  //   supplier membership active 가 있을 때만 노출(route guard 와 같은 조건).
+  const menuItems = withoutUnreachableSubdomainOperatorItems(getAdminMenu(hasPlatformAdminRole(user?.roles)), user);
 
   return (
     <>

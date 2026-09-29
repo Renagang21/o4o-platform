@@ -1144,6 +1144,8 @@ API 트래픽 전환 · Web/Admin 배포 · 역할 부여는 **포함하지 않�
 
 **역할 부여 대상 — 추정 없이 확인(read-only).** `renagang21@gmail.com`(`c0156a4a…`): 동일 이메일 사용자 1명 · Google `linked_accounts` 1행 · sub 유일 · active. 현재 대상 4 역할(`community:admin` · `supplier:admin` · `funding:admin` · `kpa-branch:admin`) 없음. 부여 경로 = 정식 `POST /admin/operator-assignments`(역할 1개/호출 · audit · membership ensure). 새 4 역할은 **API 배포 후에야** 서버 allowlist(`operator-role-catalog.ts`)에 들어가고 admin UI 목록은 admin 배포 후 보인다. 사용자가 대상과 방식(Playwright 창에서 사용자가 super_admin Google 로그인 → 에이전트가 지정 조작)을 확인했다.
 
+> **정정 (2026-09-29 · §8-8):** 지정 방식은 위와 다르다. 에이전트는 대상 계정과 역할만 알리고, **사용자가 Admin UI(Service Operators)에서 직접 지정**한다. 에이전트는 지정 결과를 read-only 로 확인하고, 그 운영자로 자기 서비스 업무를 검증한다(Admin 관리자가 대신 수행하는 검증 금지).
+
 **서빙 배포 판단 = 보류 (2026-09-29 사용자 판단).** 위 census 로 한 번 승인을 요청했고 사용자가 **보류**를 선택했다. 따라서:
 
 | 구분 | 상태 |
@@ -1157,6 +1159,82 @@ API 트래픽 전환 · Web/Admin 배포 · 역할 부여는 **포함하지 않�
 | 게이트 | `DEPLOY_ENABLED=false` 유지 |
 
 → **DONE 아님.** 남은 것 = 서빙 배포 승인 → 위 순서 실행 → 4 역할 부여 → 실계정 화면 · API 검증 → 이 절에 job · revision · traffic · 로그인 · membership · 권한 동작을 분리 기록.
+
+### 8-8. 권한 경계 정리 — "Admin 은 서비스 운영자만 지정, 이후는 서비스 운영자" (2026-09-29 · 같은 WO)
+
+원칙 한 줄: **Admin(admin.neture.co.kr)은 서비스 운영자만 지정·해제한다. 서비스 회원의 가입 승인 · 역할, 개별 분회 · 커뮤니티 운영자 지정·해제는 그 서비스 운영자가 자기 서비스 화면에서 한다.** 화면과 API 를 같은 기준으로 정렬했고, 서빙 배포 판단은 이 경계가 구현 · 검증된 SHA 기준이다.
+
+| 영역 | 책임자 | 화면 | API · guard |
+|---|---|---|---|
+| 서비스 운영자 지정·해제 | Admin 관리자 | admin `/operators` | `POST/DELETE /admin/operator-assignments` (카탈로그 `ASSIGNABLE_OPERATOR_ROLES`) |
+| 분회 서비스 가입 승인·반려 | `kpa-branch:admin` | web-kpa-branch `/service-admin` (서비스 가입 승인 탭) | `GET/PATCH /kpa-branch/admin/service-members*` — `requireKpaBranchScope('kpa-branch:admin')` (기존) |
+| 개별 분회 운영자 지정·해제 | `kpa-branch:admin` | web-kpa-branch `/service-admin` (분회 운영자 지정 탭) | **신규** `GET/POST /kpa-branch/admin/branches/:branchId/operators` · `DELETE …/operators/:userId` — `branchServiceAdminGuards` |
+| 커뮤니티 개설 심사 | `community:admin` | web-neture `/admin/communities` (개설 신청 심사 탭) | `GET /communities/requests` · `POST …/:id/approve|reject` (기존 API · 화면 신규) |
+| 개별 커뮤니티 운영자 지정·해제 | `community:admin` | web-neture `/admin/communities` (커뮤니티 운영자 지정 탭) | **신규** `GET /communities/admin/communities` · `GET …/:communityId/members` · `POST …/members/:membershipId/role` — `serviceAdminOnly` |
+
+#### 8-8-1. DB — 완료분(반복하지 않음)
+
+migration 6·7·8·9 와 커뮤니티 승격 CLI `--apply` 는 §8-7-6 · §8-7-7 에 기록된 그대로 완료다. 이 절에서 **DB 쓰기 · migration · seed 0**, 기존 역할 데이터 일괄 삭제 0.
+
+#### 8-8-2. 코드
+
+**① Admin 역할 편집 제거 (화면 + 서버).**
+
+- admin `UserForm` 에서 역할 체크박스 · payload 제거. 대신 "역할은 Service Operators 화면 / 해당 서비스 운영자" 안내 카드.
+- 서버 공통 헬퍼 `apps/api-server/src/services/admin/admin-role-edit.ts` — Admin 역할 쓰기 경로(`AdminUserController.createUser/updateUser`, `UserManagementController.updateUser/updateUserRoles`)가 모두 이것만 쓴다:
+  - 카탈로그(`ASSIGNABLE_OPERATOR_ROLES`) 역할만 추가·제거. **카탈로그 밖 보유 역할은 건드리지 않는다**(일괄 삭제 0 — 종전 `removeAllRoles` 경로 제거).
+  - 카탈로그 밖 역할을 새로 요청하면 400 `ROLE_NOT_ASSIGNABLE`(예: `kpa-branch:operator` · `kpa-branch:member` · `kpa:store_owner` · `platform:super_admin`).
+  - 제거는 `revokeRoleAssignment` 와 같은 안전장치: 자기 역할 제거 403 `SELF_ROLE_REVOKE_FORBIDDEN`(쓰기 전 판정) · 서비스 admin 역할은 `revokeServiceAdminRoleWithLock` + 마지막 admin 403 `LAST_ADMIN_PROTECTED`(super_admin 은 허용) · 추가 후 `ensureServiceMembershipsForRoles`.
+  - `UserManagementController.createUser` 는 더 이상 `role/roles` 를 받지 않는다(비영속 필드였다).
+
+**② 분회 운영자 — Admin 카탈로그에서 제거, 분회 서비스 화면으로.**
+
+- `operator-role-catalog.ts`(API · admin 두 벌)에서 `kpa-branch:operator` 제거. `kpa-branch:admin` 은 유지.
+- `BranchOperatorDesignationService`: 대상은 **그 분회의 active `branch_memberships` 행**이 있는 사람뿐(다른 분회 소속 → 409 `NOT_BRANCH_MEMBER`) · 지정은 `kpa-branch` service membership active 필수(pending · suspended · 없음 → 409 `SERVICE_MEMBERSHIP_NOT_ACTIVE`, 여기서 되살리지 않음) · 역할 쓰기는 `roleAssignmentService`(RBAC SSOT 직접 INSERT 0) · 멱등(이미 운영자면 200 `assigned:false`) · 해제는 운영자가 아니면 404 `NOT_OPERATOR`.
+- 기존 분회 소속 판정(`requireBranchScope` 가 요청 분회와 유일 active 소속 비교)은 그대로 — 새 축을 만들지 않았다.
+
+**③ 커뮤니티 운영자 — `community:admin` 이 각 커뮤니티의 승인된 회원 중에서.**
+
+- `CommunityOperatorDesignationService`: `community_memberships.role` 만 바꾼다(`role_assignments` 무변경) · 대상은 그 커뮤니티의 active 가입 행(pending · rejected → 409 `MEMBERSHIP_NOT_ACTIVE`, 다른 커뮤니티 행 → 404) · 지정은 `community` service membership active 필수 · **마지막 운영자 해제 409 `LAST_OPERATOR_PROTECTED`** — 같은 커뮤니티 운영자 행을 `FOR UPDATE` 로 잠그고 판정 · UPDATE 를 한 트랜잭션에서.
+- `requireCommunityScope` 는 DB 를 매 요청 읽으므로 지정·해제가 즉시 반영된다. `community:admin` 이 개체 운영자 경계를 bypass 하지 않는 기존 계약은 불변.
+- 라우트는 `/:communitySlug/...` 파라미터 라우트보다 먼저 등록(등록 순서 테스트로 고정).
+
+**④ 분회 서비스 가입 승인 — Admin 메뉴에서 제거.**
+
+- admin: 메뉴 `core-kpa-branch-service-members` · `rolePermissions` 항목 · 라우트 · `BranchServiceMembersPage.tsx` 삭제. 메뉴 수 테스트 23→22 clickable · 29→28 nodes.
+- web-kpa-branch `/service-admin` 이 같은 API 로 승인 · 반려(반려 사유 필수)를 한다. 진입 링크: `/me` 에 `kpa-branch:admin`(+ super_admin) 일 때만.
+
+**web-neture 연결.** `SUBDOMAIN_OPERATOR_SCREENS` 에 `{ '/admin/communities', community, admin }` 추가 → 같은 표를 가드(`SubdomainOperatorRoute`) · 셸 메뉴 · 대표 홈 "서비스 운영" 카드가 본다(종전 "community admin → 카드 없음" 테스트를 "커뮤니티 서비스 관리로 내부 이동" 으로 뒤집음). 화면은 대표 호스트에 있다(공급자 상태 관리와 같은 배치 — `community.neture.co.kr` 소유 경로 무변경).
+
+**검증 (운영 DB · 계정 생성 0 · 격리 테스트).**
+
+| 대상 | 결과 |
+|---|---|
+| api-server `tsc --noEmit` | 0 |
+| api-server jest (`controllers · services/admin · services/kpa-branch · services/community · config · utils · routes · middleware`) | 54 suites / 669 tests PASS — 신규 `admin-role-edit` · `branch-operator-designation` · `community-operator-designation` · communities 라우트 guard 배선 · `statusPreservation`(`kpa:store_owner` 요청 → 400 · 저장 0) 포함 |
+| admin-dashboard vitest(CI 방식) · `tsc` | 15 files / 338 PASS · 0 |
+| web-neture vitest(`--config services/web-neture/vitest.config.mjs`) · `tsc --noEmit` | 26 files / 241 PASS · 0 — 권한 매트릭스에 community 3행(admin+active O · pending X · neture:admin 대체 X) · 셸 메뉴 2건 · App.tsx 배선 1건 추가 |
+| web-kpa-branch `tsc -b` · `vite build` | 0 · build 성공. **단위 테스트 러너 없음**(의존성 추가 금지 — 중지 조건) → 화면 검증은 §8-8-5 실계정 확인으로 한다 |
+
+**남는 gap (보고만).**
+
+- 분회 **개설 신청** 심사 화면(`/kpa-branch/admin/branch-requests`)은 API 만 있고 화면이 없다 — 이번 4개 지점 밖.
+- 개별 커뮤니티 운영자가 **자기 커뮤니티의 가입 신청**을 승인하는 화면(`operatorOnly` API 는 있음)은 없다 — 개체 운영자 업무 화면이라 이번 범위 밖.
+- 분회 slug 예약어 없음 — `service-admin` 이라는 slug 의 분회가 생기면 공용 경로 `/service-admin` 이 우선한다(`/me` · `/login` · `/join` 과 같은 기존 상태). slug 규칙 변경은 계약 변경이라 보고만.
+
+#### 8-8-3. 배포 — 미실행 (승인 대기)
+
+이 절의 코드가 병합된 SHA 로 census 를 다시 하고(API 새 이미지 · neture-web · admin · web-kpa-branch) 한 번의 배포 판단 패키지를 제시한다. 승인 전 게이트 변경 · revision/traffic 전환 · Web/Admin 배포 · 역할 부여 **0**.
+
+#### 8-8-4. 서비스 운영자 지정 — 미실행
+
+배포 후 에이전트는 대상 계정과 역할만 알린다. **지정은 사용자가 Admin UI 에서 직접** 한다. 에이전트는 read-only 로 결과를 확인한다.
+
+#### 8-8-5. 실계정 검증 — 미실행
+
+그 운영자 계정으로 서비스 안에서 가입 승인 · 회원 역할 · 개체 운영자 지정을 검증한다. Admin 관리자가 대신 수행하는 방식은 검증으로 인정하지 않는다.
+
+→ **DONE 아님.** §8-8-3 ~ §8-8-5 가 남았다.
 
 ## 9. 범위 밖 발견 — 보고만 (고치지 않음)
 
@@ -1286,6 +1364,8 @@ representative-entry · unified-store-workspace-handoff spec)은 새 계약(`'un
 ---
 
 ## 10. 문서 정합
+
+- 2026-09-29 §8-8: 이 CHECK 내부 §8-7-8 의 지정 방식 기록에 정정 문단 추가(기록물 내부 정정). 기준 문서 변경 0 — 발견 0건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 0건(§8-8-2 gap 3건은 보고만).
 
 - 2026-09-29 §8-7-8: 이 CHECK 내부의 stale 문구(`--apply` 승인 여부 판단) 정정 · 범위 밖 발견 D5 추가(보고만). 기준 문서 변경 0 — 발견 1건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 1건(D5, 필요 시).
 

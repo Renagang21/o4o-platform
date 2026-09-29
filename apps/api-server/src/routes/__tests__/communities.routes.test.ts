@@ -162,3 +162,23 @@ describe('rate limit (소스 고정)', () => {
     expect(code).toMatch(re);
   });
 });
+
+describe('개별 커뮤니티 운영자 지정·해제 — 커뮤니티 서비스 운영자(community:admin)', () => {
+  // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 (권한 경계 정리)
+  //   Admin 은 서비스 운영자만 지정한다. 개별 커뮤니티 운영자는 서비스 운영자가 여기서 지정·해제한다.
+  it.each([
+    ['GET', '/admin/communities'],
+    ['GET', '/admin/communities/:communityId/members'],
+    ['POST', '/admin/communities/:communityId/members/:membershipId/role'],
+  ])('%s %s 는 서비스 전체 가드만 쓴다 (개체 가드 없음)', (method, p) => {
+    expect(find(method, p).guards).toEqual(['authenticate', 'serviceScope:community:admin']);
+  });
+
+  it('파라미터 라우트(/:communitySlug/...)보다 먼저 등록된다', () => {
+    const order = wiring().map((w) => `${w.method} ${w.path}`);
+    const first = order.indexOf('GET /admin/communities/:communityId/members');
+    const slug = order.findIndex((k) => k.includes('/:communitySlug'));
+    expect(first).toBeGreaterThan(-1);
+    expect(first).toBeLessThan(slug);
+  });
+});

@@ -152,8 +152,10 @@ describe('buildHomeEntryModel — supplier · funding · community 운영 카드
     }
   });
 
-  it('community admin → 카드 없음 (서비스 전체 관리자 화면이 아직 없다)', () => {
+  it('community admin → 커뮤니티 서비스 관리 (개설 심사 · 커뮤니티 운영자 지정, 내부 이동)', () => {
     const m = buildHomeEntryModel(user(['community:admin']), data([op('community', 'admin', 'none')]));
-    expect(operatorGroup(m)).toBeUndefined();
+    expect(operatorGroup(m)!.items.map((i) => [i.id, i.action])).toEqual([
+      ['operator:community:admin', { kind: 'internal', to: '/admin/communities' }],
+    ]);
   });
 });

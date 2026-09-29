@@ -10,7 +10,8 @@
  *   - `platform:*` 은 포함하지 않는다. `platform:super_admin` 부여 기능은 만들지 않는다
  *     (플랫폼 계정은 `/settings/admin-accounts` 소관).
  *   - role prefix → canonical service_key 변환은 `@o4o/security-core` SSOT 에만 위임한다.
- *   - `kpa-branch:operator` 부여는 분회 소속(`branch_memberships`) 지정이 **아니다**.
+ *   - 서비스 범위 운영자만 다룬다. 개별 분회 운영자는 분회 서비스 관리자가 분회 화면에서,
+ *     개별 커뮤니티 운영자는 커뮤니티 서비스 관리자가 커뮤니티 화면에서 지정한다.
  */
 
 export interface OperatorRoleOption {
@@ -45,12 +46,7 @@ export const ASSIGNABLE_ROLES: Record<string, OperatorRoleOption[]> = {
     {
       value: 'kpa-branch:admin',
       label: '분회 서비스 관리자',
-      description: '분회 registry · 도메인 · **개설 신청 승인**. 개별 분회 운영자보다 상위 권한입니다.',
-    },
-    {
-      value: 'kpa-branch:operator',
-      label: '분회 운영자',
-      description: '약사회 분회 운영자 (대상 분회 소속은 분회 운영자 화면에서 별도 지정). 다른 분회 개설을 승인할 수 없습니다.',
+      description: '분회 개설 승인 · 가입 승인 · 개별 분회 운영자 지정 (분회 서비스 화면에서)',
     },
   ],
   community: [

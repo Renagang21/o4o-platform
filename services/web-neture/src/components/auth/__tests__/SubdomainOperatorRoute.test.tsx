@@ -53,6 +53,9 @@ function mount(at: string) {
         <Route element={<SubdomainOperatorRoute serviceKey="funding" level="operator"><Outlet /></SubdomainOperatorRoute>}>
           <Route path="/operator/market-trial" element={<div data-testid="funding" />} />
         </Route>
+        <Route element={<SubdomainOperatorRoute serviceKey="community" level="admin"><Outlet /></SubdomainOperatorRoute>}>
+          <Route path="/admin/communities" element={<div data-testid="community-admin" />} />
+        </Route>
         <Route element={<AdminRoute><Outlet /></AdminRoute>}>
           <Route path="/admin" element={<div data-testid="neture-admin" />} />
         </Route>
@@ -77,6 +80,7 @@ const SCREENS = {
   governance: ['/admin/supplier-governance', 'supplier-governance'],
   approvals: ['/operator/suppliers', 'supplier-approvals'],
   funding: ['/operator/market-trial', 'funding'],
+  community: ['/admin/communities', 'community-admin'],
   netureAdmin: ['/admin', 'neture-admin'],
   netureOperator: ['/operator', 'neture-operator'],
 } as const;
@@ -91,8 +95,13 @@ const MATRIX: Array<[string, string[], Array<[string, string]>, Screen[]]> = [
   ['Neture 관리자·운영자만 → 서브도메인 화면 0 · 자기 Neture 화면은 그대로', ['neture:admin', 'neture:operator'], [['neture', 'active']], ['netureAdmin', 'netureOperator']],
   ['neture:operator + supplier:operator → 승인 콘솔은 supplier 축으로 열린다', ['neture:operator', 'supplier:operator'], [['neture', 'active'], ['supplier', 'active']], ['approvals', 'netureOperator']],
   ['역할은 있으나 그 서비스 membership 이 없으면 막힌다', ['supplier:admin'], [['neture', 'active']], []],
-  ['membership 이 active 가 아니면 막힌다', ['funding:admin'], [['funding', 'suspended']], []],
+  ['membership 이 active 가 아니면 막힌다 (suspended)', ['funding:admin'], [['funding', 'suspended']], []],
+  ['membership 이 active 가 아니면 막힌다 (pending)', ['supplier:operator'], [['supplier', 'pending']], []],
   ['다른 서비스 membership 으로는 대신할 수 없다 (supplier 역할 + funding membership)', ['supplier:admin'], [['funding', 'active']], []],
+  // 권한 경계 정리: 커뮤니티 서비스 관리(개설 심사 · 개별 커뮤니티 운영자 지정)는 community:admin 의 자기 서비스 화면이다.
+  ['community:admin + community → 커뮤니티 서비스 관리만', ['community:admin'], [['community', 'active']], ['community']],
+  ['community:admin 이어도 community membership pending → 막힌다', ['community:admin'], [['community', 'pending']], []],
+  ['Neture 관리자는 커뮤니티 서비스 관리를 대신 열 수 없다', ['neture:admin'], [['neture', 'active'], ['community', 'active']], ['netureAdmin', 'netureOperator']],
 ];
 
 describe('서브도메인 운영자 화면 guard', () => {
@@ -106,7 +115,7 @@ describe('서브도메인 운영자 화면 guard', () => {
 
   it('platform:super_admin 은 서브도메인 화면 세 곳을 통과한다 (백엔드 platformBypass 와 같음)', () => {
     authState.user = user(['platform:super_admin'], []);
-    for (const k of ['governance', 'approvals', 'funding'] as const) expect(sees(...SCREENS[k])).toBe(true);
+    for (const k of ['governance', 'approvals', 'funding', 'community'] as const) expect(sees(...SCREENS[k])).toBe(true);
   });
 
   it('비로그인 → 로그인 화면', () => {
@@ -126,7 +135,13 @@ describe('역할 표 — 백엔드 scopeRoleMapping 과 같은 의미', () => {
   });
 });
 
-describe('사이드바 노출', () => {
+describe('사이드바 노출 — route guard 와 같은 조건 (범위 역할 + 그 서비스 membership active)', () => {
+  const ALL_ACTIVE = [
+    { serviceKey: 'neture', status: 'active' },
+    { serviceKey: 'supplier', status: 'active' },
+    { serviceKey: 'funding', status: 'active' },
+  ];
+  const v = (roles: string[], memberships = ALL_ACTIVE) => ({ roles, memberships });
   const menu = {
     approvals: [
       { label: '공급자 상태 관리', path: '/admin/supplier-governance' },
@@ -137,24 +152,46 @@ describe('사이드바 노출', () => {
   };
 
   it('Neture 역할만 → 서브도메인 항목을 숨기고 나머지는 그대로', () => {
-    const out = withoutUnreachableSubdomainOperatorItems(menu, ['neture:admin']);
+    const out = withoutUnreachableSubdomainOperatorItems(menu, v(['neture:admin']));
     expect(out.approvals?.map((i) => i.path)).toEqual(['/admin/service-approvals']);
     // 공급자 승인도 supplier 축이 됐다 — 메뉴에 남겨 두면 누를 때마다 API 403 이다.
     expect(out.users).toBeUndefined();
   });
 
   it('supplier 운영자에게는 공급자 승인이 보인다', () => {
-    const out = withoutUnreachableSubdomainOperatorItems(menu, ['supplier:operator', 'supplier:admin']);
+    const out = withoutUnreachableSubdomainOperatorItems(menu, v(['supplier:operator', 'supplier:admin']));
     expect(out.users?.map((i) => i.path)).toEqual(['/operator/suppliers']);
     expect(out.approvals?.map((i) => i.path)).toEqual(['/admin/supplier-governance', '/admin/service-approvals']);
   });
 
   it('범위 역할이 있으면 보인다 (상세 경로 포함)', () => {
-    expect(canSeeSubdomainOperatorPath(['funding:operator'], '/operator/market-trial/abc')).toBe(true);
-    expect(canSeeSubdomainOperatorPath(['supplier:admin'], '/admin/supplier-governance')).toBe(true);
-    expect(canSeeSubdomainOperatorPath(['supplier:admin'], '/operator/market-trial')).toBe(false);
-    expect(canSeeSubdomainOperatorPath(['supplier:operator'], '/operator/suppliers')).toBe(true);
-    expect(canSeeSubdomainOperatorPath(['neture:operator'], '/operator/suppliers')).toBe(false);
+    expect(canSeeSubdomainOperatorPath(v(['funding:operator']), '/operator/market-trial/abc')).toBe(true);
+    expect(canSeeSubdomainOperatorPath(v(['supplier:admin']), '/admin/supplier-governance')).toBe(true);
+    expect(canSeeSubdomainOperatorPath(v(['supplier:admin']), '/operator/market-trial')).toBe(false);
+    expect(canSeeSubdomainOperatorPath(v(['supplier:operator']), '/operator/suppliers')).toBe(true);
+    expect(canSeeSubdomainOperatorPath(v(['neture:operator']), '/operator/suppliers')).toBe(false);
+  });
+
+  // PR #247 리뷰(Codex P2) — 역할만 남은 계정은 route 에서 막히므로 사이드바에도 없다.
+  it.each([
+    ['membership 없음', []],
+    ['pending', [{ serviceKey: 'supplier', status: 'pending' }]],
+    ['suspended', [{ serviceKey: 'supplier', status: 'suspended' }]],
+  ])('supplier 역할 + supplier membership %s → 숨긴다', (_label, memberships) => {
+    const out = withoutUnreachableSubdomainOperatorItems(menu, v(['supplier:admin', 'supplier:operator'], memberships));
+    expect(out.users).toBeUndefined();
+    expect(out.approvals?.map((i) => i.path)).toEqual(['/admin/service-approvals']);
+    expect(canSeeSubdomainOperatorPath(v(['supplier:admin'], memberships), '/admin/supplier-governance')).toBe(false);
+  });
+
+  it('platform:super_admin 은 membership 없이 보인다 (기존 예외 유지)', () => {
+    expect(canSeeSubdomainOperatorPath(v(['platform:super_admin'], []), '/operator/suppliers')).toBe(true);
+    expect(canSeeSubdomainOperatorPath(v(['platform:super_admin'], []), '/operator/market-trial')).toBe(true);
+  });
+
+  it('로그인 전(사용자 없음) → 숨긴다', () => {
+    expect(canSeeSubdomainOperatorPath(null, '/operator/suppliers')).toBe(false);
+    expect(canSeeSubdomainOperatorPath(undefined, '/admin/market-trial-x')).toBe(true); // 범위 화면이 아닌 경로는 판정 대상 아님
   });
 });
 
@@ -187,5 +224,11 @@ describe('App.tsx 배선 (정적)', () => {
       expect(block).toContain(`path="${p}"`);
       expect(app.split(`path="${p}"`).length - 1).toBe(1);
     }
+  });
+
+  it('커뮤니티 서비스 관리 화면은 community:admin 블록 안에만 있다', () => {
+    const block = blockOf('<SubdomainOperatorRoute serviceKey="community" level="admin">');
+    expect(block).toContain('path="/admin/communities"');
+    expect(app.split('path="/admin/communities"').length - 1).toBe(1);
   });
 });

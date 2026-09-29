@@ -205,7 +205,7 @@ const SERVICE_PATHS: Record<string, ServicePaths> = {
   //   서비스다(같은 앱을 서빙하더라도 주소·권한 경계는 독립). 호스트 프로필의 `/` 가 진입이다.
   //   join 경로를 두지 않는다 — 가입은 개별 커뮤니티 단위(승인형)이고 서비스 단위 자가 신청이 없다
   //   (service-catalog joinEnabled=false). 그래서 '가입 가능한 서비스' 에도 나타나지 않는다.
-  //   operator 경로도 두지 않는다 — 그 호스트의 커뮤니티 운영 화면이 아직 없다(dead link 0 규칙).
+  //   서비스 운영 화면(`/admin/communities`)은 대표 호스트에 있고 SUBDOMAIN_OPERATOR_SCREENS 로 진입한다.
   community: { home: '/' },
   'kpa-society': { home: '/', myStore: '/store/workspace', operator: '/operator', admin: '/admin', join: '/register' },
   'pharmacy-hub': { home: '/', myStore: '/store-owner/workspace', operator: '/operator', admin: '/admin', join: '/join', joinStatus: '/join/status' },
@@ -468,7 +468,7 @@ export function buildHomeEntryModel(user: User, data: HomeEntryData): HomeEntryM
     //   한 서비스에 수준이 다른 화면이 여럿이면 **그 scope 가 들어갈 수 있는 것**을 고른다 —
     //   admin scope 는 admin 화면, operator scope 는 operator 화면(admin ⊃ operator). 채울 수 없으면
     //   카드를 만들지 않는다(dead link 0).
-    //   community 서비스 전체 관리자 화면은 아직 없어 카드를 만들지 않는다.
+    //   community 는 admin 단일 계층 — `/admin/communities`(개설 심사 · 커뮤니티 운영자 지정).
     const screens = SUBDOMAIN_OPERATOR_SCREENS.filter((s) => s.key === key);
     if (screens.length > 0) {
       const screen = screens.find((s) => s.level === svc.scope) ?? screens.find((s) => s.level === 'operator');

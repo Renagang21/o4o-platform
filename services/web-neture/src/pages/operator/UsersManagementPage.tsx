@@ -224,10 +224,10 @@ export default function UsersManagementPage() {
   // 표시 보강용 — 실패해도 회원 목록 자체에는 영향 없음(컬럼만 '—' 로 표시).
   // WO-O4O-NETURE-OPERATOR-MEMBERS-TABLE-COLUMN-SIMPLIFY-V1: 회사명 컬럼 표시를 위해 name 도 함께 매핑.
   // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1: 출처 API(`/neture/operator/suppliers`)는
-  //   `supplier:operator` + 공급자 조직 소속을 요구한다. 그 역할이 없으면 호출하지 않고(403 을 '—' 로
+  //   `supplier:operator` + supplier membership active 를 요구한다. 둘 중 하나라도 없으면 호출하지 않고(403 을 '—' 로
   //   삼키지 않는다) 공급자 컬럼 · CTA 도 그리지 않는다. Neture 역할로 대신 열지 않는다.
   const { user } = useAuth();
-  const canSeeSupplierConsole = canSeeSubdomainOperatorPath(user?.roles, '/operator/suppliers');
+  const canSeeSupplierConsole = canSeeSubdomainOperatorPath(user, '/operator/suppliers');
   const [supplierStatusMap, setSupplierStatusMap] = useState<
     Map<string, { status: string; companyName?: string }>
   >(new Map());

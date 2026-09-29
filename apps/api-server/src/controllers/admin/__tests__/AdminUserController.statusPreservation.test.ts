@@ -175,9 +175,11 @@ describe('A. 기존 suspended 사용자 — role 추가로 되살아나지 않�
     expect(payload.user.isActive).toBe(false);
   });
 
-  it('실제 회귀 케이스: 정지된 검증 계정에 kpa:store_owner 를 다시 부여해도 suspended 유지', async () => {
-    // WO-O4O-KPA-STORE-ORGANIZATION-ENROLLMENT-BACKFILL-AND-PRODUCTION-VERIFY-V1 에서
-    // 관측된 시나리오를 회귀 케이스로 고정한다.
+  it('실제 회귀 케이스: 정지된 검증 계정에 kpa:store_owner 를 다시 부여하는 요청은 이제 400 으로 거절된다', async () => {
+    // WO-O4O-KPA-STORE-ORGANIZATION-ENROLLMENT-BACKFILL-AND-PRODUCTION-VERIFY-V1 에서 관측된 시나리오.
+    // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1: Admin 은 서비스 운영자 역할만 지정한다 — 회원 역할
+    //   (kpa:store_owner)은 서비스 운영자가 자기 서비스에서 관리하므로 이 경로는 쓰기 전에 거절한다.
+    //   suspended 보존 계약은 위 운영자 역할 케이스가 계속 고정한다.
     const rec = install({
       existingUser: { ...SUSPENDED_USER, email: 'o4o-smoke-mystore@example.com' },
       existingCredential: { userId: SUSPENDED_USER.id, serviceKey: 'kpa-society' },
@@ -188,11 +190,9 @@ describe('A. 기존 suspended 사용자 — role 추가로 되살아나지 않�
       res,
     );
 
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.json.mock.calls[0][0]).toMatchObject({ success: false, code: 'ROLE_NOT_ASSIGNABLE' });
     expect(rec.userSaves).toHaveLength(0);
-    const payload = res.json.mock.calls[0][0];
-    expect(payload.user.status).toBe('suspended');
-    // credential 은 읽지도 쓰지도 않는다 — 운영자 인증은 Google 하나다 (§18)
-    expect(payload.credentialPolicy).toBe('NOT_APPLICABLE');
     expect(rec.credentials).toHaveLength(0);
   });
 });

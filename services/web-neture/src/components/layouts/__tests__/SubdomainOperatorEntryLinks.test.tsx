@@ -7,6 +7,11 @@
  *      AI 요약 · 바로가기 · 정책 · 구조 조치)를 보여주지 않는다.
  *   ③ 서브도메인 전용 셸 — `supplier:operator` 에게 admin 전용 「공급자 상태 관리」 를 보여주지 않는다.
  * Neture 역할로 범위 화면을 대신 열지 않는다(fallback 0). 운영 DB · 네트워크 0.
+ *
+ * PR #247 리뷰(Codex P2) — 링크 · 메뉴 · 조회 판정은 `SubdomainOperatorRoute` 와 **같은 조건**이다:
+ *   범위 역할 **그리고** 그 서비스 membership active. 역할만 남고 membership 이 없거나
+ *   pending · suspended 이면 route 에서 막히므로 링크 · 메뉴 · 조회 호출도 없다.
+ *   `platform:super_admin` 은 membership 없이 통과(기존 예외 유지).
  */
 import { describe, it, expect, vi, afterEach, beforeEach } from 'vitest';
 import { render, screen, cleanup, waitFor } from '@testing-library/react';
@@ -15,16 +20,24 @@ import type { OperatorDashboardConfig } from '@o4o/operator-ux-core';
 import type { AdminDashboardConfig } from '@o4o/admin-ux-core';
 
 const { authState, getSuppliers, consoleProps, shellProps } = vi.hoisted(() => ({
-  authState: { roles: [] as string[] },
+  authState: { roles: [] as string[], memberships: [] as Array<{ serviceKey: string; status: string }> },
   getSuppliers: vi.fn(),
   consoleProps: {} as { extraColumns?: Array<{ key: string }> },
   shellProps: {} as { menuItems?: Record<string, Array<{ label: string; path: string }>> },
 }));
 vi.mock('../../../contexts/AuthContext', () => ({
-  useAuth: () => ({ user: { id: 'u1', roles: authState.roles }, isAuthenticated: true, isLoading: false }),
+  useAuth: () => ({
+    user: { id: 'u1', roles: authState.roles, memberships: authState.memberships },
+    isAuthenticated: true,
+    isLoading: false,
+  }),
 }));
 vi.mock('@/contexts/AuthContext', () => ({
-  useAuth: () => ({ user: { id: 'u1', roles: authState.roles }, isAuthenticated: true, isLoading: false }),
+  useAuth: () => ({
+    user: { id: 'u1', roles: authState.roles, memberships: authState.memberships },
+    isAuthenticated: true,
+    isLoading: false,
+  }),
 }));
 
 vi.mock('@/lib/api/admin', () => ({ operatorSupplierApi: { getSuppliers: () => getSuppliers() } }));
@@ -100,6 +113,15 @@ const adminConfig = (): AdminDashboardConfig =>
 
 const links = (items: Array<{ link?: string }> | undefined) => (items ?? []).map((i) => i.link);
 
+type Membership = { serviceKey: string; status: string };
+const active = (...keys: string[]): Membership[] => keys.map((serviceKey) => ({ serviceKey, status: 'active' }));
+/** 역할 검사용 기본 사용자 — 관련 서비스 membership 은 모두 active(역할 축만 본다). */
+const u = (roles: string[], memberships: Membership[] = active('neture', 'supplier', 'funding')) => ({ roles, memberships });
+const signIn = (roles: string[], memberships: Membership[] = active('neture', 'supplier', 'funding')) => {
+  authState.roles = roles;
+  authState.memberships = memberships;
+};
+
 afterEach(() => cleanup());
 
 describe('링크 필터 헬퍼', () => {
@@ -110,35 +132,35 @@ describe('링크 필터 헬퍼', () => {
       { id: 'c' },
       { id: 'd', link: '/operator/orders' },
     ];
-    expect(withoutUnreachableSubdomainOperatorLinks(items, ['neture:admin']).map((i) => i.id)).toEqual(['c', 'd']);
-    expect(withoutUnreachableSubdomainOperatorLinks(items, ['supplier:admin']).map((i) => i.id)).toEqual(['a', 'b', 'c', 'd']);
+    expect(withoutUnreachableSubdomainOperatorLinks(items, u(['neture:admin'])).map((i) => i.id)).toEqual(['c', 'd']);
+    expect(withoutUnreachableSubdomainOperatorLinks(items, u(['supplier:admin'])).map((i) => i.id)).toEqual(['a', 'b', 'c', 'd']);
   });
 });
 
 describe('② Neture 운영자 대시보드', () => {
   it('neture:operator 만 → 공급자 승인 · 펀딩 링크를 모든 블록에서 뺀다 (나머지는 그대로)', () => {
-    const c = withReachableLinks(operatorConfig(), ['neture:operator']);
+    const c = withReachableLinks(operatorConfig(), u(['neture:operator']));
     expect(links(c.kpis)).toEqual(['/operator/all-registered-products', undefined]);
     expect(c.aiSummary).toEqual([]);
     expect(links(c.actionQueue)).toEqual(['/operator/product-approvals']);
     expect(links(c.quickActions)).toEqual(['/operator/orders']);
-    const axisHrefs = reachableNetureAxes(['neture:operator']).flatMap((a) => a.links.map((l) => l.href));
+    const axisHrefs = reachableNetureAxes(u(['neture:operator'])).flatMap((a) => a.links.map((l) => l.href));
     expect(axisHrefs).not.toContain('/operator/suppliers');
     expect(axisHrefs).toContain('/operator/orders');
   });
 
   it('neture:admin 도 supplier 역할이 없으면 공급자 승인 링크를 못 본다 (Neture fallback 0)', () => {
-    const c = withReachableLinks(operatorConfig(), ['neture:admin']);
+    const c = withReachableLinks(operatorConfig(), u(['neture:admin']));
     expect(links(c.quickActions)).not.toContain('/operator/suppliers');
   });
 
   it('supplier:operator 가 있으면 공급자 승인 링크가 보이고, 펀딩은 funding 역할이 있어야 보인다', () => {
-    const c = withReachableLinks(operatorConfig(), ['neture:operator', 'supplier:operator']);
+    const c = withReachableLinks(operatorConfig(), u(['neture:operator', 'supplier:operator']));
     expect(links(c.quickActions)).toEqual(['/operator/suppliers', '/operator/orders']);
     expect(links(c.actionQueue)).toContain('/operator/suppliers');
-    const both = withReachableLinks(operatorConfig(), ['neture:operator', 'supplier:operator', 'funding:operator']);
+    const both = withReachableLinks(operatorConfig(), u(['neture:operator', 'supplier:operator', 'funding:operator']));
     expect(links(both.quickActions)).toEqual(['/operator/suppliers', '/operator/market-trial', '/operator/orders']);
-    expect(reachableNetureAxes(['neture:operator', 'supplier:operator']).flatMap((a) => a.links.map((l) => l.href))).toContain(
+    expect(reachableNetureAxes(u(['neture:operator', 'supplier:operator'])).flatMap((a) => a.links.map((l) => l.href))).toContain(
       '/operator/suppliers',
     );
   });
@@ -146,16 +168,16 @@ describe('② Neture 운영자 대시보드', () => {
 
 describe('② Neture 관리자 대시보드', () => {
   it('neture:admin 만 → 공급자 상태 관리 링크를 정책 · 구조 조치에서 뺀다', () => {
-    const c = withReachableAdminLinks(adminConfig(), ['neture:admin']);
+    const c = withReachableAdminLinks(adminConfig(), u(['neture:admin']));
     expect(links(c.policies)).toEqual(['/admin/applications']);
     expect(links(c.structureActions)).toEqual(['/admin/users']);
   });
 
   it('supplier:operator 로는 부족하다 — supplier:admin 이어야 보인다', () => {
-    expect(links(withReachableAdminLinks(adminConfig(), ['neture:admin', 'supplier:operator']).structureActions)).toEqual([
+    expect(links(withReachableAdminLinks(adminConfig(), u(['neture:admin', 'supplier:operator'])).structureActions)).toEqual([
       '/admin/users',
     ]);
-    expect(links(withReachableAdminLinks(adminConfig(), ['neture:admin', 'supplier:admin']).structureActions)).toEqual([
+    expect(links(withReachableAdminLinks(adminConfig(), u(['neture:admin', 'supplier:admin'])).structureActions)).toEqual([
       '/admin/users',
       '/admin/supplier-governance',
     ]);
@@ -166,22 +188,36 @@ describe('③ 서브도메인 전용 셸 메뉴', () => {
   const menuPaths = () => Object.values(shellProps.menuItems ?? {}).flat().map((i) => i.path);
 
   it('supplier:operator 만 → 공급자 승인만 보이고 admin 전용 공급자 상태 관리는 숨긴다', () => {
-    authState.roles = ['supplier:operator'];
+    signIn(['supplier:operator']);
     render(<SubdomainOperatorLayoutWrapper serviceKey="supplier" area="operator" />);
     expect(screen.getByTestId('scoped-shell')).toBeTruthy();
     expect(menuPaths()).toEqual(['/operator/suppliers']);
   });
 
   it('supplier:admin → 두 항목 모두 보인다', () => {
-    authState.roles = ['supplier:admin'];
+    signIn(['supplier:admin']);
     render(<SubdomainOperatorLayoutWrapper serviceKey="supplier" area="admin" />);
     expect(menuPaths()).toEqual(['/operator/suppliers', '/admin/supplier-governance']);
   });
 
   it('funding:operator → 펀딩 항목', () => {
-    authState.roles = ['funding:operator'];
+    signIn(['funding:operator']);
     render(<SubdomainOperatorLayoutWrapper serviceKey="funding" area="operator" />);
     expect(menuPaths()).toEqual(['/operator/market-trial']);
+  });
+
+  // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 (권한 경계 정리): community:admin 은 자기 서비스 화면
+  //   (개설 심사 · 개별 커뮤니티 운영자 지정) 하나를 본다.
+  it('community:admin → 커뮤니티 서비스 관리 항목', () => {
+    signIn(['community:admin'], active('community'));
+    render(<SubdomainOperatorLayoutWrapper serviceKey="community" area="admin" />);
+    expect(menuPaths()).toEqual(['/admin/communities']);
+  });
+
+  it('community:admin 이어도 community membership 이 active 가 아니면 항목이 없다', () => {
+    signIn(['community:admin'], [{ serviceKey: 'community', status: 'pending' }]);
+    render(<SubdomainOperatorLayoutWrapper serviceKey="community" area="admin" />);
+    expect(menuPaths()).toEqual([]);
   });
 });
 
@@ -203,7 +239,7 @@ describe('① Neture 회원 관리의 공급자 정보', () => {
     );
 
   it('neture:operator 만 → 공급자 조회 API 를 부르지 않고 공급자 컬럼 · 승인 CTA 가 없다', async () => {
-    authState.roles = ['neture:operator'];
+    signIn(['neture:operator']);
     mountPage();
     await waitFor(() => expect(screen.getByTestId('members-console')).toBeTruthy());
     expect(getSuppliers).not.toHaveBeenCalled();
@@ -212,11 +248,69 @@ describe('① Neture 회원 관리의 공급자 정보', () => {
   });
 
   it('supplier:operator 가 있으면 조회하고 회사명 · 공급자 프로필 컬럼과 대기 CTA 를 그린다', async () => {
-    authState.roles = ['neture:operator', 'supplier:operator'];
+    signIn(['neture:operator', 'supplier:operator']);
     mountPage();
     await waitFor(() => expect(screen.getByText(/공급자 승인 관리로 이동/)).toBeTruthy());
     expect(getSuppliers).toHaveBeenCalledTimes(1);
     expect(consoleProps.extraColumns?.map((c) => c.key)).toEqual(['companyName', 'supplierProfile']);
     expect(screen.getByText(/공급 승인 대기 1건/)).toBeTruthy();
+  });
+});
+
+describe('membership 상태 — 역할만 남은 계정 (route guard 와 같은 조건)', () => {
+  const STATES: Array<[string, Membership[]]> = [
+    ['supplier membership 없음', active('neture')],
+    ['supplier pending', [...active('neture'), { serviceKey: 'supplier', status: 'pending' }]],
+    ['supplier suspended', [...active('neture'), { serviceKey: 'supplier', status: 'suspended' }]],
+  ];
+  const menuPaths = () => Object.values(shellProps.menuItems ?? {}).flat().map((i) => i.path);
+
+  beforeEach(() => {
+    getSuppliers.mockReset();
+    getSuppliers.mockResolvedValue([{ userId: 'u-p', status: 'PENDING', name: '대기 공급사' }]);
+    consoleProps.extraColumns = undefined;
+    shellProps.menuItems = undefined;
+  });
+
+  it.each(STATES)('%s → supplier:admin 역할이 있어도 대시보드 · 관리자 링크를 숨긴다', (_label, memberships) => {
+    const roles = ['neture:admin', 'supplier:admin'];
+    expect(links(withReachableLinks(operatorConfig(), u(roles, memberships)).quickActions)).not.toContain('/operator/suppliers');
+    expect(links(withReachableAdminLinks(adminConfig(), u(roles, memberships)).structureActions)).toEqual(['/admin/users']);
+    expect(
+      reachableNetureAxes(u(roles, memberships)).flatMap((a) => a.links.map((l) => l.href)),
+    ).not.toContain('/operator/suppliers');
+  });
+
+  it.each(STATES)('%s → 서브도메인 셸 메뉴에 공급자 항목이 없다', (_label, memberships) => {
+    signIn(['supplier:admin'], memberships);
+    render(<SubdomainOperatorLayoutWrapper serviceKey="supplier" area="admin" />);
+    expect(menuPaths()).toEqual([]);
+  });
+
+  it.each(STATES)('%s → 회원 관리가 공급자 조회를 부르지 않는다', async (_label, memberships) => {
+    signIn(['neture:operator', 'supplier:operator'], memberships);
+    render(
+      <MemoryRouter>
+        <UsersManagementPage />
+      </MemoryRouter>,
+    );
+    await waitFor(() => expect(screen.getByTestId('members-console')).toBeTruthy());
+    expect(getSuppliers).not.toHaveBeenCalled();
+    expect(consoleProps.extraColumns).toEqual([]);
+  });
+
+  it('funding 은 funding membership 을 본다 — supplier active 만으로는 펀딩 링크가 없다', () => {
+    const c = withReachableLinks(operatorConfig(), u(['neture:operator', 'funding:operator'], active('neture', 'supplier')));
+    expect(links(c.quickActions)).not.toContain('/operator/market-trial');
+  });
+
+  it('platform:super_admin 은 membership 없이도 보인다 (기존 예외 유지)', () => {
+    const viewer = u(['platform:super_admin'], []);
+    expect(links(withReachableLinks(operatorConfig(), viewer).quickActions)).toEqual([
+      '/operator/suppliers',
+      '/operator/market-trial',
+      '/operator/orders',
+    ]);
+    expect(links(withReachableAdminLinks(adminConfig(), viewer).structureActions)).toContain('/admin/supplier-governance');
   });
 });
