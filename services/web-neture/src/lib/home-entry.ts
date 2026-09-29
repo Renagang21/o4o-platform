@@ -200,7 +200,11 @@ interface ServicePaths {
 //   대표 홈 "내 매장" 진입 = 각 서비스 Store Workspace Home (`<basePath>/workspace`) — Home / My Store / Store Hub / My Services 상위 구조로 들어간다.
 //   경로 파생 규칙은 @o4o/store-ui-core resolveStoreWorkspacePaths 와 동일 (KPA·KCos `/store`, PH `/store-owner`).
 const SERVICE_PATHS: Record<string, ServicePaths> = {
-  neture: { home: '/community', operator: '/operator', admin: '/admin', join: '/register' },
+  // WO-O4O-NETURE-REGISTER-AUTHENTICATED-LOOP-FIX-V1: neture 는 join 경로를 두지 않는다.
+  //   `/register` 는 비로그인 전용 진입(= Google 로그인 모달)이라 로그인 사용자에게는 가입 화면이 아니고,
+  //   `service_memberships('neture')` 는 운영자 지정 · 공급자 승인 등으로 생긴다(자가 가입 화면 없음).
+  //   그래서 '가입 가능한 서비스' 에 Neture 가 나타나지 않는다. membership 자체와 상태 안내는 그대로다.
+  neture: { home: '/community', operator: '/operator', admin: '/admin' },
   // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1: 커뮤니티는 `community.neture.co.kr` 독립
   //   서비스다(같은 앱을 서빙하더라도 주소·권한 경계는 독립). 호스트 프로필의 `/` 가 진입이다.
   //   join 경로를 두지 않는다 — 가입은 개별 커뮤니티 단위(승인형)이고 서비스 단위 자가 신청이 없다

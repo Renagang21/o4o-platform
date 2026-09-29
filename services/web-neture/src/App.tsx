@@ -37,6 +37,7 @@ import OperatorLayoutWrapper from './components/layouts/OperatorLayoutWrapper';
 import AdminLayoutWrapper from './components/layouts/AdminLayoutWrapper';
 import AdminVaultLayout from './components/layouts/AdminVaultLayout';
 import { RoleGuard, OperatorRoute, AdminRoute, PlatformRoute, SupplierRoute, SubdomainOperatorRoute } from './components/auth/RoleGuard';
+import { RegisterRedirect } from './components/auth/RegisterRedirect';
 import SubdomainOperatorLayoutWrapper from './components/layouts/SubdomainOperatorLayoutWrapper';
 import { ADMIN_ROLES } from './lib/role-constants';
 import { resolveLoginReturnPath } from './lib/loginReturnPath';
@@ -620,16 +621,8 @@ function LoginRedirect() {
   return <Navigate to="/" replace />;
 }
 
-// /register 경로 접근 시 홈으로 리다이렉트하고 회원가입 모달 열기
-function RegisterRedirect() {
-  const { openRegisterModal } = useLoginModal();
-
-  useEffect(() => {
-    openRegisterModal();
-  }, [openRegisterModal]);
-
-  return <Navigate to="/" replace />;
-}
+// /register 는 components/auth/RegisterRedirect — 비로그인에게만 가입(=로그인) 모달을 연다
+//   (WO-O4O-NETURE-REGISTER-AUTHENTICATED-LOOP-FIX-V1)
 
 const ProtectedRoute = RoleGuard;
 
