@@ -1,6 +1,9 @@
 # CHECK-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1
 
-> 시작: 2026-09-27 · 상태: **`병합 완료(2026-09-28, 880642e9b) · 배포 1(2edfe9b33 · migration 0) 배포 1 완료(§8-5) · 배포 2 실행 경로 확정(§8-6 → **§8-7 MIGRATE-ONLY 로 대체**) · 배포 2 전 경계 보정(§8-7 · 화면 guard · SHA 범위 · CLI 출력) · 배포 2(이 작업) 미배포 · DEPLOY_ENABLED=false · 승격 CLI 결함 정정(§8-2, 95377812e) · migration 6~9 적용(§8-7-6) · 승격 CLI --apply 적용 완료(§8-7-7 · 3+2행) · PR #243 화면 3건·Sonar 해소(PR #247 · 895b07f8b · §8-7-8) · 서빙 배포 **보류**(2026-09-29 사용자 판단 · §8-7-8) · 서빙 전환·역할 부여·실제 접근 검증 전 — DONE 아님`**
+> 시작: 2026-09-27 · 상태: **`병합 완료(880642e9b) · 배포 1 완료(§8-5) · migration 6~9 적용(§8-7-6) · 승격 CLI --apply 적용 완료(§8-7-7 · 3+2행) · 서빙 배포 실행됨(2026-09-29 · API o4o-core-api-03757-k7k / f838fd036 · neture-web · admin · kpa-branch-web · §8-9-1) · 서비스 운영자 3역할 지정 완료(community·supplier·funding — kpa-branch:admin 미지정) · DEPLOY_ENABLED=false · **Google 로그인·인증 범위 마감(§8-9 · 2026-09-29)** — 로그인·유지·서비스 간 이동·서비스 단위 로그아웃·권한 경계 전부 운영 PASS / WO 전체는 후속 관리자 기능이 남아 DONE 아님`**
+>
+> **§8-7-8 · §8-8-3~5 의 "미실행 · 보류 · 역할 없음" 문구는 그 시점 기록이다.** 현재 배포·역할 상태의
+> 정본은 **§8-9** 이며, 각 자리에 정정 표시를 달았다.
 > PR: [#241](https://github.com/Renagang21/o4o-platform/pull/241) — 1차 CI green 후
 > **리뷰에서 세 경계가 확정 요구사항과 다르다고 지적돼 같은 PR 에서 정정했다**(§11).
 > 정정 후 재검증: **PR #241 HEAD(`7ba57bcbc`)** 의 체크 전부 pass(SonarCloud 포함) · `mergeStateStatus = CLEAN`.
@@ -1144,9 +1147,18 @@ API 트래픽 전환 · Web/Admin 배포 · 역할 부여는 **포함하지 않�
 
 **역할 부여 대상 — 추정 없이 확인(read-only).** `renagang21@gmail.com`(`c0156a4a…`): 동일 이메일 사용자 1명 · Google `linked_accounts` 1행 · sub 유일 · active. 현재 대상 4 역할(`community:admin` · `supplier:admin` · `funding:admin` · `kpa-branch:admin`) 없음. 부여 경로 = 정식 `POST /admin/operator-assignments`(역할 1개/호출 · audit · membership ensure). 새 4 역할은 **API 배포 후에야** 서버 allowlist(`operator-role-catalog.ts`)에 들어가고 admin UI 목록은 admin 배포 후 보인다. 사용자가 대상과 방식(Playwright 창에서 사용자가 super_admin Google 로그인 → 에이전트가 지정 조작)을 확인했다.
 
+> **정정 (2026-09-29 · §8-9 실측):** "현재 대상 4 역할 없음" 은 그 시점 사실이고 **지금은 아니다.**
+> `role_assignments` 실측: `community:admin` · `supplier:admin` · `funding:admin` **부여됨** ·
+> `kpa-branch:admin` **미부여**(`kpa-branch:operator` 만 있음 — 후속 관리자 기능 범위).
+> `service_memberships` 도 `community` · `supplier` · `funding` 전부 `active`.
+
 > **정정 (2026-09-29 · §8-8):** 지정 방식은 위와 다르다. 에이전트는 대상 계정과 역할만 알리고, **사용자가 Admin UI(Service Operators)에서 직접 지정**한다. 에이전트는 지정 결과를 read-only 로 확인하고, 그 운영자로 자기 서비스 업무를 검증한다(Admin 관리자가 대신 수행하는 검증 금지).
 
 **서빙 배포 판단 = 보류 (2026-09-29 사용자 판단).** 위 census 로 한 번 승인을 요청했고 사용자가 **보류**를 선택했다. 따라서:
+
+> **정정 (2026-09-29 이후 · §8-9 실측):** 이 보류는 그 시점 판단이고 **그 뒤 배포가 실행됐다.**
+> 아래 표(job 0 · revision 0 · traffic 변경 0 · 로그인 미검증)는 **그 시점 기록**으로만 읽는다.
+> 현재 서빙 상태는 §8-9 에 있다.
 
 | 구분 | 상태 |
 |---|---|
@@ -1273,9 +1285,14 @@ migration 6·7·8·9 와 커뮤니티 승격 CLI `--apply` 는 §8-7-6 · §8-7-
 
 **운영 현황 (read-only).** 커뮤니티 3개 active · `community_memberships` 는 active member 2행뿐 — **커뮤니티 운영자 0명**. 따라서 ② 의 실계정 검증은 `community:admin` 이 먼저 개별 커뮤니티 운영자를 지정해야 가능하다(§8-8-4 · §8-8-5).
 
-#### 8-8-3. 배포 — 미실행 (승인 대기)
+#### 8-8-3. 배포 — **실행됨** (2026-09-29 · 이 절 작성 시점 이후)
 
-승인 전 게이트 변경 · revision/traffic 전환 · Web/Admin 배포 · 역할 부여 **0**.
+> **정정 (2026-09-29 · §8-9 실측).** 이 절은 "미실행 (승인 대기)" 로 작성됐고 아래 census 의
+> "현재 서빙 = 배포 1 이미지" 도 **그 시점 사실**이다. 그 뒤 사용자 승인으로 4개 서비스가
+> 배포됐다 — 현재 서빙 revision · 이미지 · 역할 부여 결과는 §8-9 가 정본이다.
+> 아래 census 의 **대상 · 범위 · 섞이는 트랙** 분석은 그대로 유효하다.
+
+작성 시점 기준: 승인 전 게이트 변경 · revision/traffic 전환 · Web/Admin 배포 · 역할 부여 **0**.
 
 **PR · 게이트 (최종 코드 HEAD 기준).**
 
@@ -1325,15 +1342,122 @@ migration 6·7·8·9 와 커뮤니티 승격 CLI `--apply` 는 §8-7-6 · §8-7-
 | 배포하지 않음 | web-store · kpa-society · k-cosmetics · pharmacy-hub · lecture · signage · hospital |
 | 실계정 검증 전제 | 운영 DB 기준 커뮤니티 운영자 0명 · 분회 개설 신청 0건 · 예약어 slug 분회 0 — 배포 후 사용자가 Admin UI 에서 서비스 운영자를 지정해야 ①②의 실제 심사 검증이 가능 |
 
-#### 8-8-4. 서비스 운영자 지정 — 미실행
+#### 8-8-4. 서비스 운영자 지정 — **부분 완료** (3/4)
 
 배포 후 에이전트는 대상 계정과 역할만 알린다. **지정은 사용자가 Admin UI 에서 직접** 한다. 에이전트는 read-only 로 결과를 확인한다.
 
-#### 8-8-5. 실계정 검증 — 미실행
+> **정정 (2026-09-29 · read-only 실측):** `community:admin` · `supplier:admin` · `funding:admin`
+> **지정 완료**(해당 service membership 도 `active`). `kpa-branch:admin` 은 **미지정** —
+> 후속 관리자 기능 범위이며 이 때문에 인증 범위 마감을 보류하지 않는다(§8-9).
+
+#### 8-8-5. 실계정 검증 — **부분 완료**
 
 그 운영자 계정으로 서비스 안에서 가입 승인 · 회원 역할 · 개체 운영자 지정을 검증한다. Admin 관리자가 대신 수행하는 방식은 검증으로 인정하지 않는다.
 
-→ **DONE 아님.** §8-8-3 ~ §8-8-5 가 남았다.
+> **정정 (2026-09-29):** Supplier · Funding 운영 화면은 **역할 지정 전 403 → 지정 후 200**
+> 을 사용자가 실계정으로 확인했고, 공급자 신청 화면 수정본도 실계정으로 확인했다(사용자 실측).
+> 반면 **가입 승인 · 개설 심사의 성공 경로는 미검증**이다 — 운영 DB 실측으로
+> `community_creation_requests` 0건 · `branch_creation_requests` 0건이라 심사할 대상이 없다.
+> 신청 데이터 생성은 이 범위가 아니므로 **미검증으로 남긴다**(후속 관리자 기능 범위).
+
+→ **WO 전체는 DONE 아님.** 남은 것은 후속 관리자 기능(§8-9 의 "후속 범위" 표)이다.
+인증 범위의 판정은 §8-9 에 있다.
+
+### 8-9. Google 로그인 · 인증 범위 마감 판정 (2026-09-29 · 같은 WO)
+
+이 절의 대상은 **Google 단일 로그인 · 로그인 유지 · 서비스 간 인증 세션 전달 · 서비스 단위
+로그아웃 · 이미 실계정으로 확인된 운영자 권한 경계** 뿐이다. 관리자 기능(심사 · 회원 역할 ·
+카탈로그)은 대상이 아니다.
+
+**증거의 출처를 섞지 않는다.** 아래 표의 `근거` 열은 세 가지만 쓴다 —
+`운영 실측(에이전트 read-only)` · `사용자 실측(실브라우저)` · `자동 테스트`.
+
+#### 8-9-1. 기준 재확정 — 운영 실측 (read-only · 2026-09-29)
+
+| 항목 | 값 |
+|---|---|
+| `origin/main` | `3f94c685c` |
+| API | `o4o-core-api-03757-k7k` 100% · 이미지 `api-server:f838fd036…` — **배포 1 이미지가 아니다** |
+| neture-web | `neture-web-01663-7p9` 100% · 이미지 `neture-web:fe2a3ec35…` |
+| admin | `o4o-admin-dashboard-01317-9bx` 100% |
+| kpa-branch-web | `kpa-branch-web-00180-nlb` 100% |
+| 배포 run | API `36538…`(dispatch · tag `deploy/2026-09-29-service-identity-operator-scope` · `f838fd036` · success) · Web 동 tag success · 이후 `fe2a3ec35` · `3f94c685c` push 배포 success |
+| `DEPLOY_ENABLED` | `false` (마지막 변경 2026-09-29 07:40Z — 그 사이 열렸다 닫힌 것으로 보인다) |
+| 역할 (`role_assignments`) | `community:admin` · `supplier:admin` · `funding:admin` **있음** / `kpa-branch:admin` **없음**(`kpa-branch:operator` 만) |
+| membership (`service_memberships`) | `community` · `supplier` · `funding` 모두 `active` |
+| 승격 결과 | `communities` 3(`cosmetics` · `o4o-general` · `pharmacy`) · `community_memberships` 2(둘 다 `member`/`active`) · 대상 사용자 1 — §8-7-7 `--apply` 기록과 일치 |
+| migration | `typeorm_migrations` 693 · 추가 0 (재실행하지 않았다) |
+| 신청 데이터 | `community_creation_requests` 0 · `branch_creation_requests` 0 |
+
+이 절에서 **재실행한 것은 없다** — migration · 승격 CLI · 배포 · 역할 부여 모두 손대지 않았다.
+
+#### 8-9-2. 인증 항목별 판정
+
+| # | 항목 | 판정 | 근거 |
+|---|---|---|---|
+| A1 | 7개 호스트 Google 단일 로그인 성공 | **운영 PASS** | 사용자 실측 (§8-5 · 배포 1 revision) |
+| A2 | 새로고침 후 로그인 유지 | **운영 PASS(현 revision 확인)** | 사용자 실측 — 배포 1(§8-5) 에 이어 현 revision `03757-k7k` 에서도 정상. refresh 경로가 이 WO 에서 바뀌었으므로(세대 claim) 이 재확인이 필요했다 |
+| A3 | 현 revision(`03757-k7k`)에서 Google 로그인 | **운영 PASS** | 사용자 실측 — 운영자 권한 확인(A6) 과정에서 이 revision 에 로그인해 화면·API 가 200 을 냈다 |
+| A4 | 서비스 간 이동 시 인증 세션 전달 (handoff) | **운영 PASS** | 사용자 실측(재로그인 없이 이동) + 운영 실측 원장 대조 — §8-9-4 |
+| A5 | 서비스 단위 로그아웃 (출발 서비스만 종료 · 다른 서비스 유지 · 재로그인) | **운영 PASS** | 사용자 실측(3가지 결과 정상) + 운영 실측 원장 대조 — §8-9-4 |
+| A6 | Supplier · Funding 운영 화면 · API 경계 | **운영 PASS** | 사용자 실측 — 역할 지정 **전 403 → 후 200**. 자동 테스트(runtime 매트릭스 12 · 화면 guard 18)와 방향 일치 |
+| A7 | 공급자 신청 화면 수정본 | **운영 PASS** | 사용자 실측 (`f1f912c87` 배포 후) |
+| A8 | Neture 역할만 가진 계정의 서브도메인 화면 거부 | **자동 테스트만 PASS** | 실계정으로는 확인 불가 — 대상 계정이 Neture 역할을 함께 가진다(§8-7-3) |
+
+#### 8-9-3. 판정
+
+```text
+Google 단일 로그인 · 로그인 유지        A1 · A2 · A3   운영 PASS
+서비스 간 인증 세션 전달                A4             운영 PASS
+서비스 단위 로그아웃                    A5             운영 PASS
+운영자 권한 경계(실계정 확인분)          A6 · A7        운영 PASS
+```
+
+→ **판정: Google 로그인 · 인증 범위 마감 (2026-09-29).**
+
+A4 · A5 는 2026-09-29 12:36~12:37Z 사용자 조작으로 **현 서빙 코드에서 처음 실행**됐고, 원장이
+그 동작을 그대로 기록했다(§8-9-4). 남은 A8 은 **자동 테스트만 PASS** 로 유지한다 — 대상 계정이
+Neture 역할을 함께 가져 실계정으로는 재현할 수 없고, 이 한 항목 때문에 범위를 열어 두지 않는다.
+
+**WO 전체는 DONE 이 아니다.** 남은 것은 §8-9-5 의 후속 관리자 기능이다.
+
+#### 8-9-4. 인증 실측 — 사용자 조작 1회 + 원장 대조 (2026-09-29)
+
+**사용자 실측 (실브라우저 · 3단계 전부 정상).**
+
+```text
+1) neture.co.kr Google 로그인 → 새로고침 1회      정상 (A2)
+2) 대표 홈 「서비스 운영」 카드로 다른 서비스 이동   재로그인 없이 진입 (A4)
+3) 그 서비스에서 로그아웃                          ① 그 서비스 종료 ② 처음 서비스 유지
+                                                  ③ 재로그인 정상 (A5)
+```
+
+**원장 대조 (에이전트 read-only · 같은 창의 조작을 서버가 어떻게 적었는지).**
+
+| 원장 | 실측 | 무엇을 증명하나 |
+|---|---|---|
+| `handoff_tokens` | 1행 — `neture` → `kpa-society` · `source_session_epoch` = **0**(non-NULL) · `consumed_at` **있음** · 09-29 12:36 | 발급·교환이 **현 구현으로** 성립했다. 종전 2행(09-28)은 `source_session_epoch` NULL 이었다 → 세대를 기록하는 경로가 운영에서 처음 돌았다. `epoch = 0` 은 정상값이다(폐기 기록이 없던 시점의 초기 세대 — 구현이 0 을 "없음" 으로 취급하지 않는 것이 V14 의 계약) |
+| `service_session_revocations` | 1행 — `kpa-society` · `session_epoch` = **2** · 09-29 12:37 | 로그아웃이 **그 서비스에만** 서버측 폐기를 남겼다. `neture` 행은 **없다** → 다른 서비스 세션을 건드리지 않았다(사용자 실측 ②와 일치). 세대가 올라갔으므로 그 이전 토큰은 거절된다 |
+| 시각 순서 | handoff 12:36 → 로그아웃 12:37 | 발급 시점에는 폐기 기록이 없어 `epoch = 0`, 그 뒤 로그아웃이 세대를 올렸다 — 일관 |
+
+> **09-28 handoff 2행이 사라진 것은 정상이다.** `handoff-token.service.ts` 가 발급 시
+> `DELETE FROM handoff_tokens WHERE expires_at < now() - interval '1 hour'` 로 만료분을
+> 정리한다. 12:36 발급이 그 두 행을 치웠다 — 데이터 유실이 아니라 설계된 청소다.
+
+이 확인에서 **운영 데이터 생성 · 게이트 변경 · 배포 · 역할 부여는 0**이다(사용자의 로그인 ·
+이동 · 로그아웃이 남긴 인증 원장 3행이 전부이며, 그것이 검증 대상이었다).
+
+#### 8-9-5. 후속 범위 (이 마감의 대상이 아니다)
+
+| 항목 | 이유 |
+|---|---|
+| `kpa-branch:admin` 지정 | 후속 관리자 기능. 인증 경계와 무관 |
+| Admin 운영자 지정 화면 · 카탈로그 디버깅 | 같음 |
+| 각 서비스 회원 역할 관리 | 같음 |
+| 분회 · 커뮤니티 개설/가입 신청의 실제 심사 | 운영 신청 **0건** — 심사할 대상이 없어 성공 경로 미검증. 신청 데이터 생성은 이 범위가 아니다 |
+| main SonarCloud ERROR | 기존 누적 · 별도 품질 트랙 (§8-7-5) |
+
+---
 
 ## 9. 범위 밖 발견 — 보고만 (고치지 않음)
 
@@ -1463,6 +1587,16 @@ representative-entry · unified-store-workspace-handoff spec)은 새 계약(`'un
 ---
 
 ## 10. 문서 정합
+
+- 2026-09-29 §8-9 확정: 사용자 실측 3단계 + 원장 대조로 A2 · A4 · A5 를 운영 PASS 로 확정하고
+  **Google 로그인·인증 범위 마감** 으로 판정했다. A8 은 자동 테스트만 PASS 로 남긴다(실계정 재현 불가).
+  기준 문서 변경 0 · 코드 변경 0 · 운영 write 0.
+
+- 2026-09-29 §8-9(Google 로그인·인증 범위 마감 판정): 이 CHECK 내부의 stale 문구를 **그 자리에서** 정정했다 —
+  헤더 상태줄 · §8-7-8 「역할 4건 없음」 · §8-7-8 「서빙 배포 보류」 · §8-8-3 「배포 미실행」 ·
+  §8-8-4 「지정 미실행」 · §8-8-5 「실계정 검증 미실행」. 원문은 지우지 않고 "그 시점 기록" 으로
+  표시하고 현재 사실을 §8-9 에 모았다. 기준 문서 변경 0 · 코드 변경 0 —
+  발견 0건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 0건(후속 관리자 기능은 §8-9-5 에 범위로 기록).
 
 - 2026-09-29 §8-8-2-b: §8-8-2 gap 3건을 같은 WO 에서 구현하고 이 CHECK 내부 기록을 취소선 + 대체 절로 정정. 기준 문서 변경 0 — 발견 0건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 0건.
 
