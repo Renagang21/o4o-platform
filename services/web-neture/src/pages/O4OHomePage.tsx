@@ -12,10 +12,9 @@
  *   AI 입력 → Work Scope → (후속) Local Work Agent
  *
  * WO-O4O-COMMON-HOME-AI-INPUT-V0:
- *   중앙 입력창을 실제 AI 질의응답 진입점으로 활성화했다.
- *   **텍스트 응답 전용** — tool 실행 · Local Agent · 브라우저 조작은 하지 않는다.
- *   대화는 저장하지 않는다(새로고침하면 사라진다). 화면은 검색 초기화면형을 유지하며
- *   답변이 있을 때만 입력창 아래에 영역이 나타난다(대기 상태 레이아웃 불변).
+ *   중앙 입력창을 실제 AI 질의응답 진입점으로 활성화했다(당시 텍스트 응답 전용).
+ *   현재는 아래 UNIFIED-REQUEST 이후 첨부 · Work 경로 · confirm · composite 응답 · 사이트 열기까지 한다.
+ *   대화는 저장하지 않는다(새로고침하면 사라진다). 답변이 있을 때만 입력창 아래에 영역이 나타난다.
  *
  * WO-O4O-NETURE-UNIFIED-ENTRY-UI-PHASE1-V1:
  *   neture.co.kr 을 O4O 대표 진입으로 삼는다. 로그인 후에는 같은 화면 안에
@@ -39,8 +38,9 @@
  * WO-O4O-NETURE-PUBLIC-HOME-IA-REFRESH-V1:
  *   로그인 전과 후의 역할을 나눴다. 위 "검색엔진 초기 화면형 · 로그인 전 pill" 설명은 로그인 후 화면에만 남는다.
  *     로그인 전 = O4O 이해 → 서비스 발견 → Google 로 시작
- *       O4O 소개 · [Google로 시작] → 주요 서비스(약국 · 리테일 · 공급자, 설명형) → O4O AI(같은 Composer)
- *       → 참여 · 학습(커뮤니티 · O4O 강의 · 유통참여형 펀딩, 보조) → 서비스 소식(글이 있을 때만)
+ *       O4O 소개 · [Google로 시작] → 주요 서비스(약국 · 리테일 · 공급자, 설명형)
+ *       → 함께 이용하는 서비스(커뮤니티 · 강의 · 유통참여형 펀딩, 보조) → O4O AI(같은 Composer)
+ *       → 서비스 소식(글이 있을 때만)
  *     로그인 후 = AI + 내 업무 시작 — 워드마크 · Composer · HomeEntryPanel 그대로
  *   Composer 는 하나(composerArea)이고 위치만 다르다. 첫 사용 안내는 로그인 후에만.
  *
@@ -84,8 +84,8 @@ import { HOST_ORIGIN } from '../lib/hostProfile';
 
 //
 // WO-O4O-NETURE-PUBLIC-HOME-IA-REFRESH-V1: 서비스를 같은 위계로 나열하지 않는다.
-//   주요 서비스(가입 · 업무)  약국 · 리테일 · 공급자 — 설명형 진입
-//   참여 · 학습              커뮤니티 · O4O 강의 · 유통참여형 펀딩 — 보조 진입
+//   주요 서비스(가입 · 업무)   약국 · 리테일 · 공급자 — 설명형 진입
+//   함께 이용하는 서비스       커뮤니티 · 강의 · 유통참여형 펀딩 — 보조 진입
 // 대표 홈의 분류명은 「리테일」 이다(서비스 내부 브랜드는 바꾸지 않는다). 내 매장(store.neture.co.kr)은
 // 가입 서비스가 아니라 로그인 후 업무 공간이라 여기 두지 않는다(로그인 후 HomeEntryPanel 이 진입을 만든다).
 // 문구는 현재 제공 기능만 말한다 — 모집 여부 · 강좌 수 같은 동적 사실을 정적 문구로 박지 않는다.
@@ -97,16 +97,17 @@ interface HomeService {
 }
 
 const PRIMARY_SERVICES: readonly HomeService[] = [
-  { label: '약국', description: '약사와 약국을 위한 커뮤니티와 매장 지원 서비스', href: 'https://pharmacy.neture.co.kr/' },
-  { label: '리테일', description: '전문매장을 위한 매장 콘텐츠와 운영 지원 서비스', href: 'https://retail.neture.co.kr/' },
+  { label: '약국', description: '약사와 약국을 위한 정보와 매장 서비스를 이용합니다.', href: 'https://pharmacy.neture.co.kr/' },
+  { label: '리테일', description: '전문매장을 위한 제품 정보와 매장 서비스를 이용합니다.', href: 'https://retail.neture.co.kr/' },
   // WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1: 공개 Partner 진입은 은퇴.
-  { label: '공급자', description: '제품과 콘텐츠를 등록해 매장에 공급하는 공급자 업무 공간', href: HOST_ORIGIN.supplier },
+  { label: '공급자', description: '제품과 콘텐츠를 등록하고 매장과 연결합니다.', href: HOST_ORIGIN.supplier },
 ];
 
-const PARTICIPATION_SERVICES: readonly HomeService[] = [
-  { label: '커뮤니티', description: '직역·관심 단위로 정보와 경험을 나누는 공간', href: HOST_ORIGIN.community },
-  { label: 'O4O 강의', description: '강의 · 학습 서비스', href: 'https://study.neture.co.kr' },
-  { label: '유통참여형 펀딩', description: '매장이 신제품 유통에 함께 참여하는 방식', href: HOST_ORIGIN.funding },
+// 강의 · 펀딩은 강좌 수 · 모집 여부를 말하지 않는다(현재 0건일 수 있다) — 서비스 성격만.
+const COMPANION_SERVICES: readonly HomeService[] = [
+  { label: '커뮤니티', description: '현장의 정보와 경험을 나눕니다.', href: HOST_ORIGIN.community },
+  { label: '강의', description: '공개된 강의와 학습 콘텐츠를 둘러봅니다.', href: 'https://study.neture.co.kr/' },
+  { label: '유통참여형 펀딩', description: '새로운 제품과 유통 참여 기회를 확인합니다.', href: `${HOST_ORIGIN.funding}/` },
 ];
 
 /** 다른 서비스(서브도메인)로 가는 공개 링크 — 대표 홈은 그대로 두고 새 탭에서 연다. */
@@ -126,7 +127,7 @@ function PrimaryServices() {
   return (
     <section aria-labelledby="home-primary-services-title" className="w-full max-w-3xl">
       <h2 id="home-primary-services-title" className="m-0 text-center text-lg font-semibold text-slate-900">
-        서비스를 찾으세요
+        주요 서비스
       </h2>
       <nav aria-label="주요 서비스" className="mt-5">
         <ul className="m-0 grid list-none gap-3 p-0 sm:grid-cols-3">
@@ -138,7 +139,7 @@ function PrimaryServices() {
               >
                 <span className="text-base font-semibold text-slate-900">{s.label}</span>
                 <span className="mt-1 flex-1 text-sm leading-relaxed text-slate-500">{s.description}</span>
-                <span className="mt-3 text-sm text-slate-700">서비스 보기 →</span>
+                <span className="mt-3 text-sm font-medium text-slate-700">{s.label} 서비스 →</span>
               </ExternalLink>
             </li>
           ))}
@@ -148,16 +149,16 @@ function PrimaryServices() {
   );
 }
 
-/** 참여 · 학습 — 주요 서비스보다 낮은 위계의 보조 진입(카드 없이 이름 + 짧은 설명). */
-function ParticipationServices({ className = '' }: { className?: string }) {
+/** 함께 이용하는 서비스 — 주요 서비스보다 낮은 위계의 보조 진입(카드 없이 이름 + 짧은 설명). */
+function CompanionServices({ className = '' }: { className?: string }) {
   return (
-    <section aria-labelledby="home-participation-title" className={`w-full max-w-3xl ${className}`}>
-      <h2 id="home-participation-title" className="m-0 text-center text-xs font-medium uppercase tracking-wide text-slate-400">
-        참여 · 학습
+    <section aria-labelledby="home-companion-title" className={`w-full max-w-3xl ${className}`}>
+      <h2 id="home-companion-title" className="m-0 text-center text-sm font-medium text-slate-500">
+        함께 이용하는 서비스
       </h2>
-      <nav aria-label="참여 · 학습">
+      <nav aria-label="함께 이용하는 서비스">
         <ul className="m-0 mt-3 grid list-none gap-2 p-0 sm:grid-cols-3">
-          {PARTICIPATION_SERVICES.map((s) => (
+          {COMPANION_SERVICES.map((s) => (
             <li key={s.href}>
               <ExternalLink
                 href={s.href}
@@ -762,14 +763,14 @@ export default function O4OHomePage() {
           {entry.error && (
             <div className="mt-10 flex w-full flex-col items-center">
               <PrimaryServices />
-              <ParticipationServices className="mt-10" />
+              <CompanionServices className="mt-10" />
             </div>
           )}
         </main>
       ) : (
         /*
           로그인 전 = O4O 이해 → 서비스 발견 → Google 로 시작 (WO-O4O-NETURE-PUBLIC-HOME-IA-REFRESH-V1)
-            ① O4O 소개 + Google 로 시작  ② 주요 서비스  ③ O4O AI  ④ 참여 · 학습  ⑤ 서비스 소식(글이 있을 때만)
+            ① O4O 소개 + Google 로 시작  ② 주요 서비스  ③ 함께 이용하는 서비스  ④ O4O AI  ⑤ 서비스 소식(글이 있을 때만)
           세션 복구 중에도 같은 공개 화면이다 — CTA 만 복구가 끝난 뒤 보인다.
         */
         <main className="flex flex-1 flex-col items-center px-4 pb-16 pt-6 [word-break:keep-all] sm:pt-14">
@@ -781,7 +782,7 @@ export default function O4OHomePage() {
               오프라인 매장의 활동으로 연결합니다.
             </p>
             <p className="mt-3 mb-0 max-w-md text-sm leading-relaxed text-slate-500">
-              약국 · 전문매장 · 공급자가 정보와 콘텐츠를 실제 매장 업무에 활용할 수 있도록 연결합니다.
+              약국 · 전문매장 · 공급자가 정보를 나누고 실제 매장에서 활용할 수 있도록 연결합니다.
             </p>
             {!authLoading && (
               <button
@@ -799,18 +800,16 @@ export default function O4OHomePage() {
             <PrimaryServices />
           </div>
 
+          <div className="mt-12 flex w-full flex-col items-center">
+            <CompanionServices />
+          </div>
+
           {/* O4O AI — 실제 기능(질문 · 파일 분석 · 지원되는 업무). 비로그인 제출은 실행하지 않고 로그인으로 보낸다. */}
           <section aria-labelledby="home-ai-title" className="mt-14 flex w-full max-w-xl flex-col items-center text-center">
             <h2 id="home-ai-title" className="m-0 text-lg font-semibold text-slate-900">O4O AI</h2>
-            <p className="mt-2 mb-0 text-sm leading-relaxed text-slate-500">
-              O4O AI로 질문하고 업무를 시작할 수 있습니다. 로그인하면 질문 · 파일 분석과 지원되는 업무 기능을 이용할 수 있습니다.
-            </p>
+            <p className="mt-2 mb-0 text-sm leading-relaxed text-slate-500">질문하거나 필요한 업무를 요청할 수 있습니다.</p>
             {composerArea}
           </section>
-
-          <div className="mt-14 flex w-full flex-col items-center">
-            <ParticipationServices />
-          </div>
 
           {/* 공개 소식 — 실제 글이 있을 때만(0건이면 빈 섹션을 두지 않는다). 로딩 · 오류는 그대로 보인다. */}
           <HomeServiceNews hideWhenEmpty className="mt-12 w-full max-w-2xl text-left" />

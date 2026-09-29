@@ -76,13 +76,14 @@ describe('로그인 전 — O4O 이해 → 서비스 발견 → Google 로 시�
     expect(screen.queryByText('무엇을 도와드릴까요?', { selector: 'p' })).toBeNull();
   });
 
-  it('순서: 소개 → 주요 서비스 → O4O AI → 참여 · 학습 → 소식', () => {
+  it('순서: 소개 → 주요 서비스 → 함께 이용하는 서비스 → O4O AI → 소식', () => {
     mount();
     const order = [
       screen.getByText(/오프라인 매장의 활동으로 연결합니다/),
       screen.getByRole('navigation', { name: '주요 서비스' }),
+      screen.getByRole('navigation', { name: '함께 이용하는 서비스' }),
       screen.getByRole('heading', { name: 'O4O AI' }),
-      screen.getByRole('navigation', { name: '참여 · 학습' }),
+      screen.getByTestId('home-composer'),
       screen.getByTestId('news'),
     ];
     for (let i = 0; i < order.length - 1; i += 1) expect(before(order[i], order[i + 1])).toBe(true);
@@ -96,24 +97,26 @@ describe('로그인 전 — O4O 이해 → 서비스 발견 → Google 로 시�
       'https://retail.neture.co.kr/',
       'https://supplier.neture.co.kr',
     ]);
-    ['약국', '리테일', '공급자'].forEach((label, i) => expect(links[i].text.startsWith(label)).toBe(true));
+    ['약국', '리테일', '공급자'].forEach((label, i) => {
+      expect(links[i].text.startsWith(label)).toBe(true);
+      expect(links[i].text).toContain(`${label} 서비스`);
+    });
     for (const l of links) {
-      expect(l.text).toContain('서비스 보기');
       expect(l.target).toBe('_blank');
       expect(l.rel).toContain('noopener');
     }
   });
 
-  it('참여 · 학습 3개 — 커뮤니티 · O4O 강의 · 유통참여형 펀딩 (보조 진입)', () => {
+  it('함께 이용하는 서비스 3개 — 커뮤니티 · 강의 · 유통참여형 펀딩 (보조 진입)', () => {
     mount();
-    expect(linksOf('참여 · 학습').map((l) => l.href)).toEqual([
+    expect(linksOf('함께 이용하는 서비스').map((l) => l.href)).toEqual([
       'https://community.neture.co.kr',
-      'https://study.neture.co.kr',
-      'https://funding.neture.co.kr',
+      'https://study.neture.co.kr/',
+      'https://funding.neture.co.kr/',
     ]);
-    const text = linksOf('참여 · 학습').map((l) => l.text).join(' ');
+    const text = linksOf('함께 이용하는 서비스').map((l) => l.text).join(' ');
     expect(text).toContain('커뮤니티');
-    expect(text).toContain('O4O 강의');
+    expect(text).toContain('강의');
     expect(text).toContain('유통참여형 펀딩');
     // 동적 사실을 정적 문구로 박지 않는다
     for (const claim of ['지금 참여', '모집 중', '지금 학습', '수강하세요']) expect(text).not.toContain(claim);
@@ -121,7 +124,7 @@ describe('로그인 전 — O4O 이해 → 서비스 발견 → Google 로 시�
 
   it('구 호스트 · 하위경로 · 은퇴 진입 · 병원약국 · 내 매장 · 「화장품」 분류명을 노출하지 않는다', () => {
     mount();
-    const hrefs = [...linksOf('주요 서비스'), ...linksOf('참여 · 학습')].map((l) => l.href);
+    const hrefs = [...linksOf('주요 서비스'), ...linksOf('함께 이용하는 서비스')].map((l) => l.href);
     for (const bad of ['kpa-society.co.kr', 'k-cosmetics.site', 'pharmacyhub.co.kr', '/hospital', 'partner', 'store.neture.co.kr']) {
       expect(hrefs.some((h) => h.includes(bad))).toBe(false);
     }
