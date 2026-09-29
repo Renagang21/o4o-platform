@@ -132,6 +132,16 @@ export const EXPECTED_SCHEMA_STATES: readonly ExpectedSchemaState[] = [
     fingerprint: '7fdd328fe7e488469350bf1e69f5463fcb6e5a746de4c2d86d2d4f2272dd3bd0',
     fingerprintLineCount: 5895,
   },
+  // WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1 §2 — 이메일·비밀번호 인증 3테이블 신규.
+  // user_password_credentials(PK+FK+CHECK) · email_verification_tokens(+UNIQUE+index) ·
+  // password_reset_tokens(+UNIQUE+index) · COMMENT 5.
+  // baseline 2026-09-18-id685 fresh bootstrap + incremental 1..10 을 격리 PostgreSQL 17
+  // (로컬 17.9 · throwaway DB) 에서 실제 적용해 산출: 운영 DB fingerprint 채택 아님.
+  {
+    appliedThrough: 'CreateEmailPasswordAuthTables1790683000000',
+    fingerprint: '914406ef47f415155a4a1c83a49398c7b668c043803bd55da3cc9dc37386d8d5',
+    fingerprintLineCount: 5924,
+  },
 ] as const;
 
 /** Expected state after `prefixLength` incremental migrations; undefined when not registered. */
