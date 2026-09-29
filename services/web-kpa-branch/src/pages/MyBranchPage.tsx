@@ -112,9 +112,10 @@ function BranchRequestSection() {
 
       <h3 className="mt-5 text-xs font-semibold text-gray-700">내 신청</h3>
       {loadError && <p className="mt-2 text-red-600">{loadError}</p>}
-      {mine === null && !loadError ? (
+      {mine === null && !loadError && (
         <p className="mt-2 text-gray-500">불러오는 중입니다…</p>
-      ) : mine && mine.length > 0 ? (
+      )}
+      {mine && mine.length > 0 && (
         <ul className="mt-2 space-y-2">
           {mine.map((r) => (
             <li key={r.id} className="rounded border border-gray-100 p-2">
@@ -127,9 +128,8 @@ function BranchRequestSection() {
             </li>
           ))}
         </ul>
-      ) : (
-        <p className="mt-2 text-gray-500">신청 이력이 없습니다.</p>
       )}
+      {mine?.length === 0 && <p className="mt-2 text-gray-500">신청 이력이 없습니다.</p>}
     </section>
   );
 }

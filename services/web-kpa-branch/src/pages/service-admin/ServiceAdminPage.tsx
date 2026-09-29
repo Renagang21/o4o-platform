@@ -243,9 +243,8 @@ function BranchRequestsPanel() {
       </p>
       {notice && <p className="mt-3 text-green-700">{notice}</p>}
       {error && <p className="mt-3 text-red-600">{error}</p>}
-      {rows === null && !error ? (
-        <p className="mt-4 text-gray-500">불러오는 중입니다…</p>
-      ) : rows && rows.length > 0 ? (
+      {rows === null && !error && <p className="mt-4 text-gray-500">불러오는 중입니다…</p>}
+      {rows && rows.length > 0 && (
         <div className="mt-4 overflow-x-auto">
           <table className="w-full border-collapse">
             <thead>
@@ -298,9 +297,8 @@ function BranchRequestsPanel() {
             </tbody>
           </table>
         </div>
-      ) : (
-        <p className="mt-4 text-gray-500">심사 대기 중인 개설 신청이 없습니다.</p>
       )}
+      {rows?.length === 0 && <p className="mt-4 text-gray-500">심사 대기 중인 개설 신청이 없습니다.</p>}
     </section>
   );
 }
@@ -477,13 +475,9 @@ export default function ServiceAdminPage() {
           </button>
         ))}
       </div>
-      {tab === 'members' ? (
-        <ServiceMembersPanel />
-      ) : tab === 'requests' ? (
-        <BranchRequestsPanel />
-      ) : (
-        <BranchOperatorsPanel />
-      )}
+      {tab === 'members' && <ServiceMembersPanel />}
+      {tab === 'requests' && <BranchRequestsPanel />}
+      {tab === 'operators' && <BranchOperatorsPanel />}
     </div>
   );
 }

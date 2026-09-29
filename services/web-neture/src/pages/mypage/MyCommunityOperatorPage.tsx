@@ -32,7 +32,10 @@ const SERVICE_STATUS_LABEL: Record<string, string> = {
   withdrawn: '탈퇴',
 };
 
-function JoinRequestsPanel({ community, onChanged }: { community: OperatedCommunity; onChanged: () => void }) {
+function JoinRequestsPanel({
+  community,
+  onChanged,
+}: Readonly<{ community: OperatedCommunity; onChanged: () => void }>) {
   const [rows, setRows] = useState<JoinRequestRow[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
@@ -75,9 +78,8 @@ function JoinRequestsPanel({ community, onChanged }: { community: OperatedCommun
     <section className="mt-4 text-sm">
       {notice && <p className="mt-2 text-green-700">{notice}</p>}
       {error && <p className="mt-2 text-red-600">{error}</p>}
-      {rows === null && !error ? (
-        <p className="mt-3 text-gray-500">불러오는 중입니다…</p>
-      ) : rows && rows.length > 0 ? (
+      {rows === null && !error && <p className="mt-3 text-gray-500">불러오는 중입니다…</p>}
+      {rows && rows.length > 0 && (
         <div className="mt-3 overflow-x-auto">
           <table className="w-full border-collapse">
             <thead>
@@ -122,9 +124,8 @@ function JoinRequestsPanel({ community, onChanged }: { community: OperatedCommun
             </tbody>
           </table>
         </div>
-      ) : (
-        <p className="mt-3 text-gray-500">심사 대기 중인 가입 신청이 없습니다.</p>
       )}
+      {rows?.length === 0 && <p className="mt-3 text-gray-500">심사 대기 중인 가입 신청이 없습니다.</p>}
     </section>
   );
 }
@@ -180,9 +181,8 @@ export default function MyCommunityOperatorPage() {
         내가 운영자로 있는 커뮤니티의 가입 신청만 심사합니다. 서비스 이용이 정지된 신청자는 승인되지 않습니다.
       </p>
       {error && <p className="mt-3 text-red-600">{error}</p>}
-      {communities === null && !error ? (
-        <p className="mt-4 text-gray-500">불러오는 중입니다…</p>
-      ) : communities && communities.length > 0 ? (
+      {communities === null && !error && <p className="mt-4 text-gray-500">불러오는 중입니다…</p>}
+      {communities && communities.length > 0 && (
         <>
           <div className="mt-4 flex flex-wrap gap-2">
             {communities.map((c) => (
@@ -201,7 +201,8 @@ export default function MyCommunityOperatorPage() {
           </div>
           {current && <JoinRequestsPanel key={current.slug} community={current} onChanged={load} />}
         </>
-      ) : error ? null : (
+      )}
+      {communities?.length === 0 && !error && (
         <p className="mt-4 text-gray-500">운영자로 지정된 커뮤니티가 없습니다.</p>
       )}
     </div>,

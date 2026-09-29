@@ -315,7 +315,7 @@ jobs:
     # 서비스 관리자 화면 게이트를 고정한다. 예약어가 어긋나면 분회 주소가 고정 화면을 가린다. blocking.
     # DB · secret 불필요. 루트에 설치된 vitest/jsdom 을 그대로 쓴다.
     - name: Run tests (web-kpa-branch Vitest)
-      run: npx vitest run --config services/web-kpa-branch/vitest.config.mjs
+      run: pnpm exec vitest run --config services/web-kpa-branch/vitest.config.mjs
 
   # 2. API Jest regression gate
   # The suite remains fully blocking and serial (--maxWorkers=1) to preserve the
