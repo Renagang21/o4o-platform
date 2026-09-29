@@ -168,3 +168,16 @@ export function withoutUnreachableSubdomainOperatorItems<T extends { path: strin
   }
   return out;
 }
+
+/**
+ * 대시보드 카드 · 대기열 · 바로가기처럼 **링크를 가진 항목** 에서 범위 역할이 없는
+ * 서브도메인 운영자 화면으로 가는 항목을 뺀다. 링크 필드(`link` · `actionUrl` · `href`) 중
+ * 하나라도 닿을 수 없는 화면이면 뺀다. 링크가 없는 항목은 그대로 둔다.
+ */
+export function withoutUnreachableSubdomainOperatorLinks<
+  T extends { link?: string; actionUrl?: string; href?: string },
+>(items: readonly T[] | undefined | null, roles: readonly string[] | undefined | null): T[] {
+  return (items ?? []).filter((item) =>
+    [item.link, item.actionUrl, item.href].every((p) => !p || canSeeSubdomainOperatorPath(roles, p)),
+  );
+}
