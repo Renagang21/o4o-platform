@@ -36,7 +36,8 @@ export type NetureContextualNavItem = ContextualNavItem<'supplier' | 'operator' 
 // WO-O4O-NETURE-CONTEXTUAL-NAV-SUPPLIER-PARTNER-INTEGRATION-V1
 // supplier 역할 사용자가 상단 nav 에서 자신의 워크스페이스(대시보드)로 바로 진입.
 // WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1: 파트너 대시보드 항목 은퇴.
-// operator/admin 은 filterContextualNav 정책상 항목 전체 노출(전체 진입 허용).
+// WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1: operator/admin 전체 노출(showAll)은 쓰지 않는다 —
+//   공급자 대시보드는 SupplierRoute 가 공급자 역할만 통과시키므로 진입 가능한 사람에게만 보인다.
 export const NETURE_CONTEXTUAL_NAV: NetureContextualNavItem[] = [
   { label: '공급자 대시보드', href: '/supplier/dashboard', visibleWhen: 'supplier' },
 ];
