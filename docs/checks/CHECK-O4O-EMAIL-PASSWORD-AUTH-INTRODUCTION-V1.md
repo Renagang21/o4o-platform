@@ -57,7 +57,7 @@
 | auth-react · auth-client · auth-utils · web-neture vitest | PASS (이전 실행, 이번 보완에서 해당 코드 무변경) |
 | 운영 적용 · 실계정 가입/로그인 | **미실시** — 배포 승인 필요 |
 
-CI(최종 HEAD) 결과는 PR #257 코멘트 · 완료 보고에 기록한다.
+CI(코드 최종 HEAD `ac9411795`): API Server Jest 1/3 · 2/3 · 3/3 · Code Quality · Guard Static Analysis · admin-dashboard build · Detect ×2 · Size Labels · SonarCloud **통과** / Admin Fast · Docs Fast 조건부 skip / **CodeQL Analyze 실패** — 분석 완료(1711/1711 TS 파일) · SARIF artifact 793건 · 이번 수정 파일 경유 0건, 실패 원인은 SARIF 업로드("Code scanning is not enabled")뿐. **"CI 전체 통과" 가 아니다.** 이 저장소는 개인 계정 private 이라 code scanning 을 켤 수 없다(공개 저장소 또는 조직 + 유료 Code Security 필요) — 해소는 `ci-security.yml` `upload: never` 등 별도 CI WO.
 
 저장 검사(V10): 해시 경로는 `PasswordCredentialService` 테스트로 bcrypt 해시 저장 · 평문 비교 불가를 확인했다. `chk_upc_hash_len` 은 **해시 길이 하한 검사**일 뿐 해시 여부를 보장하지 않는다.
 
@@ -151,4 +151,4 @@ repo 에 code scanning 이 켜져 있지 않아 SARIF 업로드가 실패한다(
 
 ## 6. 남은 절차
 
-CI green · SARIF 판정 → 배포 범위 보고(§5-2-1: `o4o-core-api` + migration 10 · 11 · `neture-web` 만) → 사용자 배포 승인 → 운영 적용(직전 §3 재확인) → Google 로그인 회귀 · 실계정 가입 · 확인 메일 · 로그인 · 새로고침 유지 · handoff · 로그아웃 · 아이디 찾기 · 비밀번호 재설정 → DONE.
+CI(CodeQL 업로드 실패 1건 기록 · 나머지 통과) · SARIF 판정 → 배포 범위 보고(§5-2-1: `o4o-core-api` + migration 10 · 11 · `neture-web` 만) → 사용자 배포 승인 → 운영 적용(직전 §3 재확인) → Google 로그인 회귀 · 실계정 가입 · 확인 메일 · 로그인 · 새로고침 유지 · handoff · 로그아웃 · 아이디 찾기 · 비밀번호 재설정 → DONE.
