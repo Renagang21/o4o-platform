@@ -15,7 +15,7 @@ DEPLOY_FREEZE_CANONICAL         = PASS   (정확히 'false' 만 배포 · 부재
 DEPLOY_ENABLED_RETIRED          = PASS   (결정 로직 참조 0 · 저장소 변수 삭제 2026-09-30 17:2xZ)
 CI_GATE                         = PASS
 RISK_ENFORCEMENT                = PASS   (shadow → deploy-auto enforcement · 기록 유지)
-LEVEL1_NO_DEPLOY                = PASS   (cutover commit 실 run 36750835710 · 11개 NO_DEPLOY · dispatch 0)
+LEVEL1_NO_DEPLOY                = PASS   (freeze 중 run 36750835710 · unfreeze 후 자연 L1 run 36752404450 — 둘 다 11개 NO_DEPLOY · dispatch 0)
 LEVEL2_AUTODEPLOY               = READY  (결정 실측: fixture 31202e731 → AUTO_DEPLOY. 실 dispatch 는 첫 자연 L2 변경에서)
 LEVEL3_BLOCK                    = PASS   (#257 fixture → 전 서비스 AUTO_DEPLOY_BLOCKED reason=LEVEL_3)
 ROLLOUT_PENDING_GUARD           = PASS   (단위 · 6개 서비스 rollout_pending 유지 확인)
@@ -106,6 +106,7 @@ cutover commit 자체를 판정기에 넣었더니 API 가 `deploy-config` L3 �
 | 11 | — | fixture 혼합 `773d6c54c` run `36751640107` | api L3 BLOCKED → store L2 **HELD_API_NOT_DEPLOYED** |
 | 12 | 17:29:33 | **비상 freeze** `DEPLOY_FREEZE=true` → fixture L2 run `36751759746` | neture **BLOCKED_DEPLOY_FREEZE** |
 | 13 | 17:30:35 | `DEPLOY_FREEZE=false` 복구 | 반영 확인 |
+| 14 | — | 이 CHECK push `c655749ea`(docs) → **unfreeze 상태 첫 자연 LEVEL_1** deploy-auto run `36752404450` (ENFORCEMENT) | CI GREEN · frozen=false · target==HEAD · **11개 NO_DEPLOY · dispatch 0** · 배포 workflow 실행 0 · CodeQL success |
 
 fixture 모드(base/head)는 스크립트가 dry-run 을 강제한다 — 실측 중 dispatch · 태그 생성 0 (`deploy/auto-*` 태그 0개 확인).
 
