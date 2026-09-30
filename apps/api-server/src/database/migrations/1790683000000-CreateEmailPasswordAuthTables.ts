@@ -32,8 +32,10 @@ import { MigrationInterface, QueryRunner } from 'typeorm';
  * ─────────────────────────────────────────────────────────────────────────────
  * 안전 장치
  *
- *   `chk_upc_hash_len` — 해시 길이 하한. 평문이나 짧은 다이제스트가 들어오면 **DB 가 거절**한다.
- *   애플리케이션 버그를 조용히 통과시키지 않기 위한 마지막 방어선이다(정책 검사는 코드에 있다).
+ *   `chk_upc_hash_len` — **해시 길이 하한 검사**일 뿐이다. 20자 미만 문자열을 거절할 뿐,
+ *   평문 저장을 증명하거나 막지 **못한다**(긴 평문은 이 조건을 통과한다).
+ *   단방향 해시 적용은 저장 경로(`password-credential.service` 가 bcrypt 해시만 쓴다)와
+ *   그 테스트(저장값이 원문과 다르고 `$2` bcrypt 형식이며 compare 로만 검증됨)가 보장한다.
  *   `ON DELETE CASCADE` — 계정 삭제 시 인증 수단·토큰이 남지 않는다(orphan 0).
  */
 export class CreateEmailPasswordAuthTables1790683000000 implements MigrationInterface {

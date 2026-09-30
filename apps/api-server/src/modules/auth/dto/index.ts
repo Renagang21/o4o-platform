@@ -23,3 +23,6 @@ export * from './guest-auth.dto.js';
 
 // Google-only Signup/Login DTOs (WO-O4O-GOOGLE-ONLY-SIGNUP-LOGIN-V1)
 export * from './google-auth.dto.js';
+
+// Email/Password DTOs (WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1)
+export * from './email-auth.dto.js';

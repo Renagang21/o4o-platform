@@ -103,9 +103,13 @@ describe('Google-only 인증 정리 — 되살아나면 먼저 깨진다', () =>
       expect(offenders(/AccountLinkingService|LinkingSession|linking_sessions/)).toEqual([]);
     });
 
-    it('이메일 인증 체인', () => {
-      expect(offenders(/EmailVerificationService|EmailVerificationToken|email_verification_tokens/)).toEqual([]);
+    it('이메일 인증 체인 (옛 구조)', () => {
+      // WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1: 이메일 확인은 새 구조로 다시 생겼다 — 해시 토큰
+      //   테이블 `email_verification_tokens`(재생성)는 `services/auth/email-auth.service.ts` 한 곳만 쓴다.
+      //   옛 서비스·entity·경로 이름은 여전히 금지다.
+      expect(offenders(/EmailVerificationService|EmailVerificationToken/)).toEqual([]);
       expect(offenders(/resend-verification|verifyEmailGet/)).toEqual([]);
+      expect(offenders(/email_verification_tokens/)).toEqual([path.join('services', 'auth', 'email-auth.service.ts')]);
     });
 
     it('refresh_tokens 소비', () => {

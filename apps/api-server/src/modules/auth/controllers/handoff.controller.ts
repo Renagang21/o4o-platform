@@ -36,6 +36,11 @@ import { User } from '../entities/User.js';
 import { roleAssignmentService } from '../services/role-assignment.service.js';
 import * as tokenUtils from '../../../utils/token.utils.js';
 import { persistRefreshTokenFamily } from '../../../services/auth/auth-context.helper.js';
+import {
+  isPasswordSessionAllowed,
+  PASSWORD_SESSION_NOT_ALLOWED_CODE,
+  PASSWORD_SESSION_NOT_ALLOWED_MESSAGE,
+} from '../../../common/auth/password-session.policy.js';
 import { getService, getServiceOrigin, O4O_SERVICES } from '../../../config/service-catalog.js';
 import { STORE_WORKSPACE_KEY, STORE_WORKSPACE_ORIGIN, isStoreWorkspaceExchangeOrigin } from '../../../config/store-workspace.js';
 import { resolveAccessibleStores } from '../../../utils/service-tenant.resolver.js';
@@ -560,6 +565,15 @@ export class HandoffController extends BaseController {
     }
   }
 
+  /** 이 계정에 Google 수단이 연결돼 있는가 (`linked_accounts` · provider='google' · 사용자당 최대 1행) */
+  private static async hasGoogleIdentity(userId: string): Promise<boolean> {
+    const rows: unknown[] = await AppDataSource.query(
+      `SELECT 1 FROM linked_accounts WHERE "userId" = $1 AND provider = 'google' LIMIT 1`,
+      [userId],
+    );
+    return rows.length > 0;
+  }
+
   /**
    * exchange 공통 후반부 (SERVICE / WORKSPACE 동일): 토큰 발급 · family 승계 · 쿠키 · body.
    */
@@ -584,6 +598,20 @@ export class HandoffController extends BaseController {
     // 대상 서비스의 **현재 세대**를 새긴다. 원 서비스의 세대가 아니다 — handoff 로 만들어지는
     // 것은 대상 서비스의 세션이고, 그 서비스에서 로그아웃하면 이 토큰이 끊겨야 한다.
     const sessionEpoch = await readServiceSessionEpoch(user.id, sessionServiceKey);
+
+    // WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1 §2-4: handoff 로 **관리자 경계를 우회하지 못하게** 한다.
+    //   handoff 원장(`handoff_tokens`)은 출발 세션의 수단을 기록하지 않는다(스키마 변경 없이 간다).
+    //   그래서 수단을 계정에서 보수적으로 판정한다: Google 연결이 없는 계정 = 비밀번호 전용 →
+    //   대상 세션도 비밀번호 세션으로 발급한다. Google 연결이 있으면 종전과 같다(claim 부재).
+    //   한계(CHECK 기록): 두 수단을 다 가진 계정의 비밀번호 세션이 handoff 하면 대상 세션은 표식이
+    //   없다. 그 계정은 로그인 시점에 `platform:*` 역할이 없었으므로(발급 거절) 경계 우회가 되려면
+    //   "비밀번호 로그인 → 역할 부여 → handoff" 가 60초 안에 겹쳐야 한다.
+    const authMethod = (await HandoffController.hasGoogleIdentity(user.id)) ? null : ('password' as const);
+    if (authMethod === 'password' && !isPasswordSessionAllowed(sessionServiceKey, roles)) {
+      logger.warn('[Handoff] Blocked exchange — password session admin boundary', { userId: user.id });
+      return BaseController.error(res, PASSWORD_SESSION_NOT_ALLOWED_MESSAGE, 403, PASSWORD_SESSION_NOT_ALLOWED_CODE);
+    }
+
     const tokens = tokenUtils.generateTokens(
       user,
       roles,
@@ -592,6 +620,7 @@ export class HandoffController extends BaseController {
       user.refreshTokenFamily ?? null,
       sessionServiceKey,
       sessionEpoch,
+      authMethod,
     );
     await persistRefreshTokenFamily(user.id, tokens.refreshToken);
 

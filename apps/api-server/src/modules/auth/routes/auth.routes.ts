@@ -8,6 +8,12 @@
  *   password 인증 경로(/login · /register · /signup · /check-email ·
  *   /forgot-password · /reset-password · /find-id)를 제거했다.
  *   인증 정본은 Google sub → users.id 하나다. email 은 인증 키가 아니다.
+ *
+ * CORE_CHANGE: WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1 (2026-09-29 사용자 승인)
+ *   이메일·비밀번호 가입·로그인을 **새 경로**로 도입한다(/email/* · /password/* · /account/find-id).
+ *   위에서 은퇴한 경로 이름은 되살리지 않는다 — 옛 구조(users.password · service_credentials ·
+ *   서비스별 password 축)의 부활이 아니며, 계정은 여전히 users.id 하나다.
+ *   Admin · platform:* 은 Google 전용을 유지한다(password-session.policy).
  */
 import { Router, type IRouter } from 'express';
 import {
@@ -16,6 +22,7 @@ import {
 } from '../controllers/index.js';
 import { HandoffController } from '../controllers/handoff.controller.js';
 import { GoogleAuthController } from '../controllers/google-auth.controller.js';
+import { EmailAuthController } from '../controllers/email-auth.controller.js';
 import {
   validateDto,
 } from '../../../common/middleware/validation.middleware.js';
@@ -27,8 +34,22 @@ import {
   RefreshTokenRequestDto,
   GoogleLoginRequestDto,
   GoogleSignupRequestDto,
+  EmailSignupRequestDto,
+  EmailLoginRequestDto,
+  EmailAddressRequestDto,
+  EmailTokenRequestDto,
+  PasswordResetRequestDto,
+  PasswordSetRequestDto,
+  FindLoginIdRequestDto,
 } from '../dto/index.js';
 import { asyncHandler } from '../../../middleware/error-handler.js';
+import {
+  emailLoginLimiter,
+  emailSignupLimiter,
+  emailMailLimiter,
+  emailTokenLimiter,
+  findLoginIdLimiter,
+} from '../../../middleware/rateLimiter.js';
 
 const router: IRouter = Router();
 
@@ -66,6 +87,22 @@ router.post(
 //   목적이던 "기존 관리자 users.id 에 Google 연결"은 완료됐고 1회용이라 재사용 경로가 없다.
 //   운영 env 에 플래그/코드가 없어 이미 fail-closed 로 닫혀 있었다.
 
+// WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1: 이메일·비밀번호 가입·로그인
+// POST /api/v1/auth/email/signup     - { email, password, name, phone, consents } → 계정 + 확인 메일 (세션 없음)
+// POST /api/v1/auth/email/verify     - { token } → 이메일 확인 완료 (자동 로그인 없음)
+// POST /api/v1/auth/email/resend     - { email } → 확인 메일 재발송 (존재 여부 비노출)
+// POST /api/v1/auth/email/login      - { email, password } → 세션 (Google 로그인과 같은 응답 계약)
+// POST /api/v1/auth/password/forgot  - { email } → 재설정 메일 (존재 여부 비노출)
+// POST /api/v1/auth/password/reset   - { token, newPassword } → 새 비밀번호 + 전역 세션 폐기
+// POST /api/v1/auth/account/find-id  - { name, phone } → 가린 이메일 힌트 | 일반 안내
+router.post('/email/signup', emailSignupLimiter, validateDto(EmailSignupRequestDto), asyncHandler(EmailAuthController.signup));
+router.post('/email/verify', emailTokenLimiter, validateDto(EmailTokenRequestDto), asyncHandler(EmailAuthController.verify));
+router.post('/email/resend', emailMailLimiter, validateDto(EmailAddressRequestDto), asyncHandler(EmailAuthController.resend));
+router.post('/email/login', emailLoginLimiter, validateDto(EmailLoginRequestDto), asyncHandler(EmailAuthController.login));
+router.post('/password/forgot', emailMailLimiter, validateDto(EmailAddressRequestDto), asyncHandler(EmailAuthController.forgot));
+router.post('/password/reset', emailTokenLimiter, validateDto(PasswordResetRequestDto), asyncHandler(EmailAuthController.reset));
+router.post('/account/find-id', findLoginIdLimiter, validateDto(FindLoginIdRequestDto), asyncHandler(EmailAuthController.findId));
+
 // POST /api/v1/auth/refresh - Refresh access token
 router.post(
   '/refresh',
@@ -92,6 +129,15 @@ router.patch(
   '/me/profile',
   requireAuth,
   asyncHandler(AuthAccountController.updateProfile)
+);
+
+// POST /api/v1/auth/password - 로그인 사용자의 비밀번호 설정·변경 (WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1)
+router.post(
+  '/password',
+  requireAuth,
+  emailTokenLimiter,
+  validateDto(PasswordSetRequestDto),
+  asyncHandler(EmailAuthController.setPassword)
 );
 
 // POST /api/v1/auth/logout - Logout current session

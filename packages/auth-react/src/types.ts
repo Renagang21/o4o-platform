@@ -51,6 +51,12 @@ export interface AuthClientLike {
   loginWithGoogle(idToken: string, options?: { serviceKey?: string }): Promise<unknown>;
   signupWithGoogle(idToken: string, consents: GoogleSignupConsents): Promise<unknown>;
   getGoogleAuthConfig(): Promise<{ enabled: boolean; clientId: string | null }>;
+  /**
+   * WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1: 이메일(로그인 ID) + 비밀번호 → 세션.
+   * 선택 항목 — 없으면 `loginWithEmail` 이 실패 result 를 돌려준다(기존 목·소비처 계약 무변경).
+   * 은퇴한 `login(email+password)`(service_credentials 기반)의 부활이 아니다 — 단일 user_password_credentials 경로다.
+   */
+  loginWithEmail?(email: string, password: string): Promise<unknown>;
   logout(): Promise<unknown>;
   api: {
     get(url: string): Promise<{ data: unknown }>;
@@ -140,6 +146,8 @@ export interface ServiceAuthCore<TUser> {
   loginWithGoogle: (idToken: string) => Promise<AuthLoginResult<TUser>>;
   /** 약관·개인정보(+마케팅) 동의와 함께 Google 계정 생성 → 세션. */
   signupWithGoogle: (idToken: string, consents: GoogleSignupConsents) => Promise<AuthLoginResult<TUser>>;
+  /** WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1: 이메일 + 비밀번호 로그인(인증 완료 이메일만). */
+  loginWithEmail: (email: string, password: string) => Promise<AuthLoginResult<TUser>>;
   logout: () => Promise<void>;
   logoutAll: () => Promise<void>;
   /** 세션 재확인(기존 KPA `checkAuth` 와 동일 의미). */

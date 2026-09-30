@@ -69,6 +69,56 @@ export const ipBurstLimiter = rateLimit({
   keyGenerator: (req: Request) => getTrustedClientIp(req),
 });
 
+// WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1 §2-5: 이메일·비밀번호 인증 경로 제한.
+//   키는 신뢰 가능한 클라이언트 IP(`getTrustedClientIp`) — 프록시 IP 하나로 전원이 묶이지 않는다.
+//   ⚠ 메모리 저장소다(Redis 은퇴). Cloud Run 인스턴스마다 따로 센다 — 인스턴스 N 개면 실제 상한은 N 배.
+//     대입 공격의 근본 방어는 bcrypt 비용(1회 수백 ms)과 일반화된 실패 응답이며, 이 제한은 그 위의 상한이다.
+function emailAuthLimiter(windowMs: number, max: number, message: string) {
+  return rateLimit({
+    windowMs,
+    max,
+    message: { success: false, error: message, code: 'RATE_LIMITED' },
+    standardHeaders: true,
+    legacyHeaders: false,
+    keyGenerator: (req: Request) => getTrustedClientIp(req),
+  });
+}
+
+/** 로그인 — IP 당 15분 20회 (성공도 센다: 성공 뒤 대입을 계속하는 경우를 막는다) */
+export const emailLoginLimiter = emailAuthLimiter(
+  15 * 60 * 1000,
+  20,
+  '로그인 시도가 너무 많습니다. 15분 뒤 다시 시도해 주세요.',
+);
+
+/** 가입 — IP 당 1시간 10회 */
+export const emailSignupLimiter = emailAuthLimiter(
+  60 * 60 * 1000,
+  10,
+  '가입 요청이 너무 많습니다. 잠시 뒤 다시 시도해 주세요.',
+);
+
+/** 메일 발송(확인 재발송 · 비밀번호 찾기) — IP 당 1시간 10회 */
+export const emailMailLimiter = emailAuthLimiter(
+  60 * 60 * 1000,
+  10,
+  '메일 요청이 너무 많습니다. 잠시 뒤 다시 시도해 주세요.',
+);
+
+/** 토큰 소비(확인 · 재설정) · 비밀번호 변경 — IP 당 15분 30회 */
+export const emailTokenLimiter = emailAuthLimiter(
+  15 * 60 * 1000,
+  30,
+  '요청이 너무 많습니다. 잠시 뒤 다시 시도해 주세요.',
+);
+
+/** 아이디 찾기 — IP 당 1시간 10회 (이름·전화 대입으로 가입 여부를 훑는 것을 늦춘다) */
+export const findLoginIdLimiter = emailAuthLimiter(
+  60 * 60 * 1000,
+  10,
+  '아이디 찾기 요청이 너무 많습니다. 1시간 뒤 다시 시도해 주세요.',
+);
+
 // 파일 업로드 레이트 리밋
 export const uploadLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1시간
