@@ -61,7 +61,8 @@ jobs:
         id: ci
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: node scripts/ci/ci-gate.mjs --target "$TARGET_SHA"
+        # GitHub API 가 막 끝난 run 을 잠깐 0건으로 돌려줄 수 있다(2026-09-30 실측) — 기록 정확도를 위해 짧게 재조회.
+        run: node scripts/ci/ci-gate.mjs --target "$TARGET_SHA" --missing-wait-seconds 120 --interval-seconds 20
 
       - name: Authenticate to Google Cloud (read-only 조회용)
         uses: google-github-actions/auth@v3

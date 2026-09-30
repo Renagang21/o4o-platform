@@ -214,6 +214,7 @@ jobs:
         scripts/ci/__tests__/cloud-run-rollout.test.mjs
         scripts/ci/__tests__/cloud-run-env.test.mjs
         scripts/ci/__tests__/deploy-workflow-gates.test.mjs
+        scripts/ci/__tests__/deploy-workflow-diff.test.mjs
 
     # WO-O4O-LOCAL-DATA-TOOL-BRIDGE-CLOSURE-V1 §22
     # Local Work Agent 는 런타임 의존성 0(package.json 없음)이라 jest 대상이 아니다.

@@ -32,6 +32,7 @@ import { appendFileSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { DEPLOY_WORKFLOWS, analyzeWorkflowChange } from './deploy-workflow-diff.mjs';
 import {
   REPO_ROOT,
   WEB_SERVICES,
@@ -231,7 +232,8 @@ export const LEVEL3_RULES = [
       f.startsWith(`${API_SRC}services/auth/`) ||
       f === `${API_SRC}config/google-identity.config.ts` ||
       f === `${API_SRC}types/auth.ts` ||
-      (f.startsWith(API_SRC) && (/token/i.test(basename(f)) || AUTH_NAME.test(basename(f)))),
+      // session: 세션 · 로그인 origin 판정(replay 미탐: utils/session-origin.ts — 773d6c54c)
+      (f.startsWith(API_SRC) && (/token|session/i.test(basename(f)) || AUTH_NAME.test(basename(f)))),
   },
   {
     id: 'auth-package',
@@ -275,16 +277,17 @@ export const LEVEL3_RULES = [
     category: 'payment-sensitive runtime',
     test: (f) => f.startsWith('packages/payment-core/') || (f.startsWith(API_SRC) && PAYMENT_NAME.test(f.slice(API_SRC.length))),
   },
-  // ── 배포 기계 · 인프라 ───────────────────────────────────────────────────
+  // ── 빌드 · 인프라 (artifact 를 바꾼다) ────────────────────────────────────
+  // WO-O4O-CICD-CI-GATE-STABILIZATION-AND-RISK-DETECTOR-REFINEMENT-V1:
+  //   deploy workflow 파일은 여기서 통째로 L3 로 보지 않는다 — deploy-workflow-diff.mjs 가 job/줄 단위로
+  //   control · build · config · rollout 을 가른다. ci-gate · deploy-risk 같은 판정/게이트 스크립트는 control
+  //   (artifact · 설정 불변). rollout 방식 파일은 ROLLOUT_MECHANISM 으로 따로 다룬다.
   {
-    id: 'deploy-pipeline',
-    category: 'Cloud infrastructure / deploy pipeline',
+    id: 'deploy-infra',
+    category: 'Cloud infrastructure / build input',
     test: (f) =>
-      /^\.github\/workflows\/deploy-[^/]+\.ya?ml$/.test(f) ||
-      f.startsWith('.github/actions/') ||
-      f === 'scripts/ci/deploy-risk.mjs' ||
-      f === 'scripts/ci/ci-gate.mjs' ||
-      f === 'scripts/ci/cloud-run-rollout.mjs' ||
+      f.startsWith('.github/actions/setup-build-env/') ||
+      f.startsWith('.github/actions/setup-node-safe/') ||
       f.startsWith('infra/') ||
       /(^|\/)Dockerfile[^/]*$/.test(f) ||
       /(^|\/)nginx[^/]*\.conf$/.test(f) ||
@@ -304,6 +307,31 @@ export function matchLevel3(file, status = 'M') {
   return hits.length > 0 ? hits.map((r) => ({ rule: r.id, category: r.category, file })) : [];
 }
 
+/**
+ * rollout 방식(트래픽 전환 · env 주입 해석) — artifact · runtime 설정을 바꾸지 않는다.
+ * 바뀌어도 **배포가 필요하지 않다.** 다만 이 서비스들의 **다음 배포**는 바뀐 방식으로 처음 도는 것이므로 통제(L3).
+ */
+export const ROLLOUT_MECHANISM = [
+  { match: (f) => f === 'scripts/ci/cloud-run-rollout.mjs', services: 'all' },
+  { match: (f) => f.startsWith('.github/actions/cloud-run-verified-rollout/'), services: 'web+admin' },
+  { match: (f) => f === 'scripts/ci/cloud-run-env.mjs', services: ['api'] },
+];
+/** 판정 · 게이트 · 기록만 하는 파일 — 배포 결과에 영향 없음 */
+export const CONTROL_ONLY = new Set([
+  'scripts/ci/ci-gate.mjs',
+  'scripts/ci/deploy-risk.mjs',
+  'scripts/ci/deploy-workflow-diff.mjs',
+  '.github/workflows/cd-risk-gate-shadow.yml',
+]);
+
+/**
+ * 위험을 **없애는** 삭제 (WO §10 · §11).
+ * 삭제된 DB write 진입점은 실행 경로를 제거한다. 단 같은 diff 에 같은 규칙의 추가/수정 파일이 있으면
+ * (이동 · rename 우회 가능성) downgrade 하지 않는다. migration · auth · RBAC · middleware 삭제는 대상이 아니다
+ * — guard/middleware 삭제는 오히려 접근을 여는 변경일 수 있다.
+ */
+export const RISK_REDUCING_DELETE_RULES = new Set(['db-write-runtime']);
+
 // ---------------------------------------------------------------------------
 // 한 diff 판정
 // ---------------------------------------------------------------------------
@@ -318,7 +346,7 @@ export function matchLevel3(file, status = 'M') {
  */
 export function assessRisk(changedFiles, graph, opts = {}) {
   const services = Object.fromEntries(
-    DEPLOY_TARGETS.map((t) => [t.key, { affected: false, level: LEVEL_1, reasons: [], level3: [] }]),
+    DEPLOY_TARGETS.map((t) => [t.key, { affected: false, level: LEVEL_1, reasons: [], level3: [], rollout: [] }]),
   );
   const base = {
     deploy_required: false,
@@ -327,6 +355,7 @@ export function assessRisk(changedFiles, graph, opts = {}) {
     services,
     level3_hits: [],
     pipeline_hits: [],
+    risk_reducing: [],
     advisories: [],
     non_runtime_files: 0,
     changed_files: Array.isArray(changedFiles) ? changedFiles.length : 0,
@@ -335,7 +364,10 @@ export function assessRisk(changedFiles, graph, opts = {}) {
     return { ...base, advisories: ['변경 파일 0건 — 배포할 변경 없음'] };
   }
 
+  const webKeys = WEB_SERVICES.map((s) => s.key);
   const runtime = [];
+  const workflowFiles = [];
+  const rolloutFiles = [];
   for (const f of changedFiles) {
     if (isNonRuntimeFile(f.path)) {
       base.non_runtime_files += 1;
@@ -344,33 +376,115 @@ export function assessRisk(changedFiles, graph, opts = {}) {
       }
       continue;
     }
+    if (CONTROL_ONLY.has(f.path)) {
+      base.advisories.push(`판정/게이트 전용 변경 — 배포 무영향: ${f.path}`);
+      continue;
+    }
+    if (DEPLOY_WORKFLOWS[f.path]) {
+      workflowFiles.push(f);
+      continue;
+    }
+    const mech = ROLLOUT_MECHANISM.find((m) => m.match(f.path));
+    if (mech) {
+      rolloutFiles.push({ f, mech });
+      continue;
+    }
     runtime.push(f);
+  }
+
+  // ── deploy workflow: job/줄 단위 의미 분석 ────────────────────────────────
+  //   분석 성공 → 서비스별 build(artifact) / config(설정, L3) / rollout(방식) / control(무영향)
+  //   원문 불가 · 신규 · 삭제 → 종전처럼 classifier 에 넘겨 전 서비스 판정 + deploy-config L3 (보수)
+  const workflowEffects = [];
+  for (const f of workflowFiles) {
+    const analysis =
+      f.status === 'A' || f.status === 'D'
+        ? null
+        : analyzeWorkflowChange(f.path, opts.readFile?.('base', f.path), opts.readFile?.('head', f.path), {
+            webKeys,
+            consumes: opts.consumes,
+          });
+    if (!analysis) {
+      runtime.push(f);
+      base.advisories.push(`workflow 의미 분석 불가 — 보수 판정: ${f.path}`);
+      workflowEffects.push({ file: f.path, fallback: true });
+      continue;
+    }
+    workflowEffects.push({ file: f.path, analysis });
   }
 
   // LEVEL_3 hit 는 runtime 파일에만 건다 (테스트 · 문서는 위험이 아니다).
   const hitsByFile = new Map();
   for (const f of runtime) {
     const hits = matchLevel3(f.path, f.status);
+    if (DEPLOY_WORKFLOWS[f.path]) hits.push({ rule: 'deploy-config', category: 'Cloud infrastructure / deploy config', file: f.path });
     if (hits.length > 0) hitsByFile.set(f.path, { status: f.status, hits });
+  }
+  // 위험 감소 삭제 — 같은 규칙의 추가/수정이 없을 때만 (이동 우회 방지)
+  for (const [file, entry] of [...hitsByFile]) {
+    if (entry.status !== 'D') continue;
+    const keep = entry.hits.filter((h) => {
+      if (!RISK_REDUCING_DELETE_RULES.has(h.rule)) return true;
+      const replaced = [...hitsByFile].some(([p, e]) => p !== file && e.status !== 'D' && e.hits.some((x) => x.rule === h.rule));
+      if (replaced) return true;
+      base.risk_reducing.push({ ...h, note: '삭제 — 실행 경로 제거 · 대체 진입점 없음' });
+      return false;
+    });
+    if (keep.length === 0) hitsByFile.delete(file);
+    else entry.hits = keep;
   }
   base.level3_hits = [...hitsByFile.values()].flatMap((v) => v.hits);
 
-  if (runtime.length === 0) {
-    base.advisories.unshift('runtime 파일 변경 없음 (테스트 · 문서 · 운영 CLI 만)');
+  const hasWorkflowEffect = workflowEffects.length > 0 || rolloutFiles.length > 0;
+  if (runtime.length === 0 && !hasWorkflowEffect) {
+    base.advisories.unshift('runtime 파일 변경 없음 (테스트 · 문서 · 운영 CLI · 판정 스크립트 만)');
     return base;
   }
 
-  const api = classifyApiDeploy(runtime, graph, opts);
-  const web = classifyWebDeploy(runtime, graph, opts);
-  const admin = classifyAdminDeploy(runtime, graph, opts);
-  services.api.affected = api.api_deploy_affected;
-  services.api.reasons = api.reasons.filter((r) => !/무영향/.test(r));
-  services.admin.affected = admin.admin_deploy_affected;
-  services.admin.reasons = admin.reasons;
-  for (const svc of WEB_SERVICES) {
-    services[svc.key].affected = web.services[svc.key] === true;
-    services[svc.key].reasons = web.reasons.filter((r) => r.startsWith(`${svc.key}`) || /전 서비스/.test(r));
+  if (runtime.length > 0) {
+    const api = classifyApiDeploy(runtime, graph, opts);
+    const web = classifyWebDeploy(runtime, graph, opts);
+    const admin = classifyAdminDeploy(runtime, graph, opts);
+    services.api.affected = api.api_deploy_affected;
+    services.api.reasons = api.reasons.filter((r) => !/무영향/.test(r));
+    services.admin.affected = admin.admin_deploy_affected;
+    services.admin.reasons = admin.reasons;
+    for (const svc of WEB_SERVICES) {
+      services[svc.key].affected = web.services[svc.key] === true;
+      services[svc.key].reasons = web.reasons.filter((r) => r.startsWith(`${svc.key}`) || /전 서비스/.test(r));
+    }
   }
+
+  // workflow 분석 결과 반영
+  for (const eff of workflowEffects) {
+    if (!eff.analysis) continue;
+    for (const [key, a] of Object.entries(eff.analysis)) {
+      const s = services[key];
+      if (!s) continue;
+      for (const n of a.notes) s.reasons.push(n);
+      if (a.build.length > 0) {
+        s.affected = true;
+        s.reasons.push(`build 입력 변경 (${eff.file}): ${a.build.slice(0, 3).join(' | ')}`);
+      }
+      if (a.config.length > 0) {
+        s.affected = true;
+        s.reasons.push(`배포 설정 변경 (${eff.file}): ${a.config.slice(0, 3).join(' | ')}`);
+        s.level3.push({ rule: 'deploy-config', category: 'Cloud infrastructure / deploy config', file: eff.file, detail: a.config.slice(0, 5) });
+      }
+      if (a.auth.length > 0) {
+        s.level3.push({ rule: 'auth-build-input', category: 'auth', file: eff.file, detail: a.auth.slice(0, 5) });
+      }
+      if (a.rollout.length > 0) s.rollout.push(`${eff.file}: ${a.rollout.slice(0, 3).join(' | ')}`);
+      if (a.control > 0 && a.build.length + a.config.length + a.rollout.length === 0 && a.notes.length === 0) {
+        s.reasons.push(`control-only 변경 ${a.control}건 (${eff.file}) — 배포 무영향`);
+      }
+    }
+  }
+  for (const { f, mech } of rolloutFiles) {
+    const keys = mech.services === 'all' ? DEPLOY_TARGETS.map((t) => t.key) : mech.services === 'web+admin' ? [...webKeys, 'admin'] : mech.services;
+    for (const k of keys) services[k].rollout.push(f.path);
+  }
+  base.level3_hits.push(...Object.values(services).flatMap((s) => s.level3.filter((h) => h.rule === 'deploy-config' || h.rule === 'auth-build-input')));
 
   // LEVEL_3 hit 를 서비스에 귀속한다 — 그 파일 하나만으로 해당 서비스가 영향받는가.
   // 어느 서비스에도 귀속되지 않는 배포 기계 변경(pipeline)은 영향받는 **모든** 서비스의 다음 배포를 통제한다.
@@ -390,10 +504,17 @@ export function assessRisk(changedFiles, graph, opts = {}) {
   }
 
   for (const [key, s] of Object.entries(services)) {
-    if (!s.affected) continue;
-    s.level = s.level3.length > 0 || base.pipeline_hits.length > 0 ? LEVEL_3 : LEVEL_2;
+    if (!s.affected) {
+      // artifact · 설정 불변 — rollout 방식만 바뀌었으면 배포는 필요 없고, 다음 배포에서만 통제된다.
+      if (s.rollout.length > 0) s.reasons.push('rollout 방식만 변경 — 배포 불필요 · 다음 배포 1회는 통제(L3)');
+      continue;
+    }
+    s.level = s.level3.length > 0 || base.pipeline_hits.length > 0 || s.rollout.length > 0 ? LEVEL_3 : LEVEL_2;
     if (s.level3.length === 0 && base.pipeline_hits.length > 0) {
       s.reasons.push('배포 기계 변경 이후 첫 배포 — 통제 배포 대상');
+    }
+    if (s.level3.length === 0 && s.rollout.length > 0) {
+      s.reasons.push(`rollout 방식 변경 이후 첫 배포 — 통제 배포 대상 (${s.rollout[0]})`);
     }
     base.affected_services.push(key);
   }
@@ -422,7 +543,38 @@ export const gitDiffProvider = {
     const out = gitRun(['show', `${rev}:pnpm-lock.yaml`]);
     return out.status === 0 ? out.stdout : undefined;
   },
+  readFile: (rev, file) => {
+    const out = gitRun(['show', `${rev}:${file}`]);
+    return out.status === 0 ? out.stdout : undefined;
+  },
+  consumesAt: (rev, graph) => consumesFactory(rev, graph),
 };
+
+/**
+ * build-arg 소비 판정 (WO §9) — "그 ARG 이름을 서비스 소스(자기 + workspace closure)가 읽는가".
+ * 정적 분석은 하지 않는다: 이름이 runtime 파일에 한 번이라도 나오면 소비로 본다(보수).
+ * Dockerfile(`ARG` · `ENV` 선언)과 테스트는 소비가 아니다. git 실패 = null(모름 → 소비로 취급).
+ */
+export function consumesFactory(rev, graph) {
+  return (argName, serviceKey) => {
+    const svc = WEB_SERVICES.find((s) => s.key === serviceKey);
+    if (!svc || !/^[A-Z][A-Z0-9_]*$/.test(argName)) return null;
+    const name = graph.byDir.get(svc.dir);
+    const dirs = new Set([svc.dir]);
+    for (const pkg of name ? dependencyClosure(graph, name) : []) {
+      const d = graph.byName.get(pkg)?.dir;
+      if (d) dirs.add(d);
+    }
+    const out = gitRun(['grep', '-l', '-w', argName, rev, '--', ...dirs]);
+    if (out.status !== 0 && out.status !== 1) return null;
+    const files = out.stdout
+      .split(/\r?\n/)
+      .filter(Boolean)
+      .map((l) => l.slice(l.indexOf(':') + 1))
+      .filter((p) => !/(^|\/)Dockerfile[^/]*$/.test(p) && !isNonRuntimeFile(p) && !/\.env(\.|$)/.test(p));
+    return files.length > 0;
+  };
+}
 
 /**
  * 서비스별 판정.
@@ -467,8 +619,13 @@ export function assessServingGap(target, serving, graph, provider = gitDiffProvi
       if (!read.ok) {
         cache.set(s.sha, { error: read.reason });
       } else {
-        const readLock = (which) => provider.readLock(which === 'base' ? s.sha : target);
-        cache.set(s.sha, { result: assessRisk(read.files, graph, { readLock }), files: read.files.length });
+        const revOf = (which) => (which === 'base' ? s.sha : target);
+        const opts = {
+          readLock: (which) => provider.readLock(revOf(which)),
+          readFile: provider.readFile ? (which, file) => provider.readFile(revOf(which), file) : undefined,
+          consumes: provider.consumesAt ? provider.consumesAt(target, graph) : undefined,
+        };
+        cache.set(s.sha, { result: assessRisk(read.files, graph, opts), files: read.files.length });
       }
     }
     const got = cache.get(s.sha);
@@ -485,6 +642,8 @@ export function assessServingGap(target, serving, graph, provider = gitDiffProvi
       changed_files: got.files,
       reasons: svc.reasons.slice(0, 8),
       level3: svc.level3.concat(svc.affected ? got.result.pipeline_hits : []),
+      rollout_pending: svc.rollout.length > 0,
+      risk_reducing: got.result.risk_reducing.slice(0, 5),
       advisories: got.result.advisories.slice(0, 5),
     };
   }
@@ -653,7 +812,7 @@ function main() {
   } else {
     let files;
     let label;
-    let readLock;
+    let opts = {};
     if (args['files-from']) {
       files = parseFileList(readFileSync(args['files-from'], 'utf-8'));
       label = args['files-from'];
@@ -667,9 +826,14 @@ function main() {
       }
       files = read.files;
       label = `${String(args.base).slice(0, 9)}..${String(args.head).slice(0, 9)}`;
-      readLock = (which) => gitDiffProvider.readLock(which === 'base' ? args.base : args.head);
+      const revOf = (which) => (which === 'base' ? args.base : args.head);
+      opts = {
+        readLock: (which) => gitDiffProvider.readLock(revOf(which)),
+        readFile: (which, file) => gitDiffProvider.readFile(revOf(which), file),
+        consumes: gitDiffProvider.consumesAt(args.head, graph),
+      };
     }
-    report = assessRisk(files, graph, { readLock });
+    report = assessRisk(files, graph, opts);
     report.label = label;
     text = renderDiffReport(label, report);
   }

@@ -106,6 +106,10 @@ describe('R. risk_level 분류', () => {
     assert.equal(risk('services/web-neture/src/components/AuthorCard.tsx').risk_level, LEVEL_2);
   });
 
+  it('R6e 세션 origin 판정은 인증 경계다 (refinement replay 미탐: 773d6c54c utils/session-origin.ts)', () => {
+    assert.equal(risk('apps/api-server/src/utils/session-origin.ts').risk_level, LEVEL_3);
+  });
+
   it('R6d 콘텐츠 handoff 는 인증이 아니다 (replay 오탐 보정)', () => {
     assert.equal(risk('apps/api-server/src/modules/neture/services/supplier-library-handoff.service.ts').risk_level, LEVEL_2);
     assert.equal(risk('apps/api-server/src/services/handoff-token.service.ts').risk_level, LEVEL_3);
@@ -133,12 +137,27 @@ describe('R. risk_level 분류', () => {
     assert.equal(risk('apps/api-server/package.production.json').risk_level, LEVEL_3);
   });
 
-  it('R8b 배포 기계만 바뀜(서비스 무영향) → LEVEL_3 기록 · 배포 없음, 이후 서비스 배포는 통제', () => {
+  it('R8b rollout 방식만 바뀜 → 배포 불필요(L1) · 다음 배포는 통제(L3) (refinement: 종전 전체 L3)', () => {
     const only = risk('scripts/ci/cloud-run-rollout.mjs');
-    assert.equal(only.risk_level, LEVEL_3);
+    assert.equal(only.risk_level, LEVEL_1);
     assert.equal(only.deploy_required, false);
+    assert.ok(only.services.neture.rollout.length > 0, 'rollout 방식 변경은 기록된다');
     const withFe = risk('scripts/ci/cloud-run-rollout.mjs', 'services/web-neture/src/pages/HomePage.tsx');
-    assert.equal(withFe.services.neture.level, LEVEL_3, '배포 기계 변경 뒤 첫 배포는 통제 대상');
+    assert.equal(withFe.services.neture.level, LEVEL_3, 'rollout 방식 변경 뒤 첫 배포는 통제 대상');
+    assert.equal(withFe.services.store.affected, false, '다른 서비스는 배포되지 않는다');
+  });
+
+  it('R8c 판정/게이트 스크립트(ci-gate · deploy-risk · shadow workflow) → control-only L1', () => {
+    const r = risk('scripts/ci/ci-gate.mjs', 'scripts/ci/deploy-risk.mjs', '.github/workflows/cd-risk-gate-shadow.yml');
+    assert.equal(r.risk_level, LEVEL_1);
+    assert.equal(r.deploy_required, false);
+  });
+
+  it('R8d deploy workflow 원문을 못 읽으면 종전처럼 보수 판정(L3)', () => {
+    const r = risk('.github/workflows/deploy-web-services.yml');
+    assert.equal(r.risk_level, LEVEL_3);
+    assert.equal(r.services.neture.level, LEVEL_3);
+    assert.ok(r.advisories.some((a) => a.includes('의미 분석 불가')));
   });
 
   it('R9 결제 민감 runtime · 스케줄 job(DB write) → LEVEL_3', () => {
