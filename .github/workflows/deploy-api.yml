@@ -146,9 +146,11 @@ jobs:
 
   build-and-deploy:
     runs-on: ubuntu-latest
-    # WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 §20 — 배포 승인 게이트.
-    #   environment 가 붙은 job 은 required reviewer 승인 전에는 runner 가 배정되지 않는다
-    #   (변수 게이트는 skip, environment 는 waiting — build · migration · deploy 가 시작도 안 된다).
+    # `environment: production` — 배포 기록 분류용 표기이며 승인 게이트가 아니다.
+    #   현재 GitHub `production` Environment 에는 required reviewer · 배포 branch 제한 · environment secret 이
+    #   없다(2026-09-30 확인) — job 은 대기 없이 바로 실행된다. 본래 §20(WO-O4O-LECTURE-INDEPENDENT-SERVICE-
+    #   SEPARATION-V1)의 reviewer 규칙은 삭제됐다. 실제 운영 게이트는 이 job `if:` 의 `DEPLOY_ENABLED`
+    #   (기본 false · 변수 부재/공백도 차단 = fail-closed) 하나다.
     environment: production
     needs: [detect]
     # WO-O4O-API-CD-RUNTIME-AFFECTED-DEPLOY-GATE-V1 §11 · §13 · §15
@@ -179,7 +181,7 @@ jobs:
 
     permissions:
       contents: read
-      id-token: write  # Required for Workload Identity Federation
+      id-token: write  # 현재 GCP 인증은 WIF 가 아니라 credentials_json(secrets.GCP_SA_KEY) — 이 권한을 요구하지 않는다
 
     steps:
     - name: Migrate-only preflight (tag ref · SHA 고정 검사)

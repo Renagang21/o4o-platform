@@ -21,6 +21,10 @@
 | `deploy-web-services.yml` | 서비스별 웹 5종 (변경 감지 후 선별 배포) |
 | `deploy-admin.yml` | `o4o-admin-dashboard` |
 
+배포 게이트는 저장소 변수 `DEPLOY_ENABLED`(평상시 `false` · fail-closed) 하나다.
+job 의 `environment: production` 은 승인 게이트가 아니다 — 현재 required reviewer 가 없다.
+예외 경로(`migrate_only`)와 변경 원칙은 루트 [`README.md`](../../README.md) "배포" · "Production 변경 원칙" 절이 정본이다.
+
 ## 자동화
 
 | 워크플로 | 역할 |

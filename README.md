@@ -103,20 +103,45 @@ lint 만 기존 오류 102건을 baseline 으로 둔 **회귀 차단(ratchet)** 
 
 ## 배포
 
-GCP Cloud Run으로 배포하며, GitHub Actions가 `main` 기준으로 자동 실행합니다.
+GCP Cloud Run으로 배포합니다. 아래 워크플로는 `main` push 에 반응하지만, **실제 배포 여부는
+저장소 변수 `DEPLOY_ENABLED` 하나가 결정합니다.**
 
 | 워크플로 | 대상 |
 |---|---|
-| `deploy-api.yml` | `o4o-core-api` |
+| `deploy-api.yml` | `o4o-core-api` (+ 마이그레이션 Job) |
 | `deploy-web-services.yml` | 서비스별 웹 |
 | `deploy-admin.yml` | 관리자 대시보드 |
 
-DB 마이그레이션은 `main` 배포 시 CI/CD에서 자동 실행됩니다.
+- `DEPLOY_ENABLED` 는 평상시 `false` 입니다. 정확히 `'true'` 가 아니면(부재 · 공백 포함) 배포 job 은
+  skip 되고 "배포 보류" 요약만 남습니다(fail-closed). 이때는 migration 도 실행되지 않습니다.
+- DB 마이그레이션은 배포가 열렸을 때 CI/CD 가 실행합니다
+  ([PRODUCTION-MIGRATION-STANDARD](docs/baseline/operations/PRODUCTION-MIGRATION-STANDARD.md)).
+  예외로 `deploy-api.yml` 의 `migrate_only` 수동 실행(`refs/tags/deploy/*` 태그 + `expected_sha` 일치)은
+  `DEPLOY_ENABLED` 와 무관하게 migration 만 실행합니다.
+- 배포 job 에 붙은 `environment: production` 은 **승인 게이트가 아닙니다.** 현재 GitHub `production`
+  Environment 에는 required reviewer · 배포 branch 제한 · environment secret 이 없습니다.
+- GCP 인증은 저장소 수준 secret(`GCP_SA_KEY`)을 씁니다. 저장소 쓰기 권한이 있는 사람은 기술적으로
+  production 에 닿을 수 있으므로, 아래 **Production 변경 원칙**이 실제 통제 수단입니다.
 
 ## 기여
 
-현재 운영 단계에서는 `main` 직접 작업이 기본입니다. 브랜치 전략·작업 절차·검증 기준은
-[CLAUDE.md](CLAUDE.md) §1을 따릅니다.
+소유자 · AI 세션의 브랜치 전략·작업 절차·검증 기준은 [CLAUDE.md](CLAUDE.md) §1 을 따릅니다.
+
+### Production 변경 원칙 (공동개발자 포함 · 전원 적용)
+
+이 저장소는 개인 계정 Private 저장소라 branch protection · ruleset · 배포 승인(required reviewer)을
+강제할 수 없습니다. 그래서 다음은 **사람과 AI 모두에게 적용되는 합의 규칙**입니다. "사용자"는 저장소
+소유자(Renagang21)입니다.
+
+1. `main` 이 저장소 정본입니다. 공동개발자는 별도 branch 에서 작업하고 PR 로 `main` 에 반영합니다.
+2. `.github/workflows/**` 는 production 에 영향을 줄 수 있으므로 사용자 승인 없이 변경하지 않습니다.
+   다른 branch 에 올린 workflow 도 저장소 secret 으로 실행되므로 branch 라고 예외가 아닙니다.
+3. 사용자 승인 없이 하지 않는 것:
+   - production 배포 설정 변경 · `DEPLOY_ENABLED` 변경
+   - production 배포 실행 (`workflow_dispatch` 포함)
+   - production migration 실행 (`migrate_only` 포함) · `deploy/*` 태그 생성 · push
+   - production DB write
+4. Repository · Environment · Actions secret 과 production credential 은 임의로 변경 · 열람 · 반출하지 않습니다.
 
 ### 커밋 메시지 규칙
 
