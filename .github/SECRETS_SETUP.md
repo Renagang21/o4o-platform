@@ -30,7 +30,7 @@
 
 | 이름 | 용도 |
 |---|---|
-| `DEPLOY_ENABLED` | 배포 게이트. 정확히 `'true'` 일 때만 배포 job 실행 (평상시 `false` · fail-closed) |
+| `DEPLOY_FREEZE` | 배포 게이트(비상 정지). 정확히 `'false'` 일 때만 배포 — 정상 운영값 `false`. 부재 · 공백 · `true` · 오타 = freeze (fail-closed). `DEPLOY_ENABLED` 는 2026-10-01 은퇴 |
 | `GOOGLE_WEB_CLIENT_ID` | API `GOOGLE_WEB_CLIENT_ID` · `GOOGLE_ALLOWED_CLIENT_IDS` |
 | `AI_DEFAULT_PROVIDER` · `AI_DEFAULT_MODEL_OPENAI` | API AI 기본값 (미등록 시 빈 값 → 서버 기본값) |
 

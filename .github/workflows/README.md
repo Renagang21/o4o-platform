@@ -20,11 +20,11 @@
 | `deploy-api.yml` | `o4o-core-api` (+ 마이그레이션 Job) |
 | `deploy-web-services.yml` | 서비스별 웹 9종 (변경 감지 후 선별 배포) — `neture-web` · `k-cosmetics-web` · `kpa-society-web` · `pharmacy-hub-web` · `lecture-web` · `hospital-pharmacy-web` · `store-web` · `kpa-branch-web` · `signage-player-web` |
 | `deploy-admin.yml` | `o4o-admin-dashboard` |
-| `cd-risk-gate-shadow.yml` | 배포 없음 — main CI 완료마다 서비스별 위험 판정(LEVEL 1/2/3) 기록 (shadow) |
+| `deploy-auto.yml` | **자동 배포 진입점** — main CI 완료마다 서비스별 위험 판정 → LEVEL 2 만 위 workflow 를 태그 ref 로 dispatch |
 
-배포 게이트는 저장소 변수 `DEPLOY_ENABLED`(평상시 `false` · fail-closed) 하나다.
-게이트가 열려도 각 deploy workflow 의 `ci-gate` job 이 target SHA 의 `CI Pipeline` green 을 요구한다(Phase 1 · enforced).
-`cd-risk-gate-shadow.yml` 은 서비스별 serving SHA → target SHA 위험 판정을 **기록만** 한다(배포 0 · 쓰기 0).
+배포 게이트는 저장소 변수 `DEPLOY_FREEZE`(정상 `false` · 부재/공백/오타 = freeze · fail-closed) 하나다. `DEPLOY_ENABLED` 는 은퇴했다.
+deploy workflow 3종은 push 에 반응하지 않는다 — `deploy-auto.yml` 의 dispatch(LEVEL 2) 또는 사람의 통제 dispatch(LEVEL 3)로만 실행된다.
+각 deploy workflow 의 `ci-gate` job 이 target SHA 의 `CI Pipeline` green 을 요구하고, rollout 은 서비스 단위 concurrency 로 1개씩이다.
 job 의 `environment: production` 은 승인 게이트가 아니다 — 현재 required reviewer 가 없다.
 예외 경로(`migrate_only`)와 변경 원칙은 루트 [`README.md`](../../README.md) "배포" · "Production 변경 원칙" 절이 정본이다.
 

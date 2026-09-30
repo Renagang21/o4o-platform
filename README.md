@@ -104,29 +104,41 @@ lint 만 기존 오류 102건을 baseline 으로 둔 **회귀 차단(ratchet)** 
 
 ## 배포
 
-GCP Cloud Run으로 배포합니다. 아래 워크플로는 `main` push 에 반응하지만, **실제 배포 여부는
-저장소 변수 `DEPLOY_ENABLED` 하나가 결정합니다.**
+GCP Cloud Run으로 배포합니다. **일상 배포는 자동**이고, 위험한 변경과 비상 상황에만 사람이 개입합니다
+([CHECK-O4O-CICD-DEPLOY-FREEZE-CUTOVER-V1](docs/checks/CHECK-O4O-CICD-DEPLOY-FREEZE-CUTOVER-V1.md)).
+
+```text
+main push → CI Pipeline → Deploy Auto (deploy-auto.yml) → 서비스별 "서빙 중인 SHA → 이 commit" 판정
+  LEVEL 1  runtime 무영향 (문서 · CI · 테스트 · 판정 스크립트)         → 배포 없음
+  LEVEL 2  일반 runtime 변경                                         → 자동 verified 배포
+  LEVEL 3  migration · 인증 · 권한 · 결제 · 배포 설정 · 판정 불가      → 자동 배포 차단 → 사람이 통제 배포
+비상 · 정비 → 저장소 변수 DEPLOY_FREEZE=true (정상 운영값 false)
+```
 
 | 워크플로 | 대상 |
 |---|---|
+| `deploy-auto.yml` | 자동 배포 진입점 — 판정 · 결정 기록 · LEVEL 2 dispatch |
 | `deploy-api.yml` | `o4o-core-api` (+ 마이그레이션 Job) |
 | `deploy-web-services.yml` | 서비스별 웹 |
 | `deploy-admin.yml` | 관리자 대시보드 |
 
-- `DEPLOY_ENABLED` 는 평상시 `false` 입니다. 정확히 `'true'` 가 아니면(부재 · 공백 포함) 배포 job 은
-  skip 되고 "배포 보류" 요약만 남습니다(fail-closed). 이때는 migration 도 실행되지 않습니다.
-- DB 마이그레이션은 배포가 열렸을 때 CI/CD 가 실행합니다
+- **DEPLOY_FREEZE**: 배포의 유일한 게이트. 정확히 `'false'`(대소문자 무관)일 때만 배포합니다. 변수 부재 · 공백 ·
+  `true` · 오타는 전부 **freeze**(fail-closed) — 새 배포 job 이 시작되지 않고 "frozen" 요약만 남습니다(migration 포함).
+  진행 중이던 rollout 은 그 run 안에서 검증 · rollback 까지 마칩니다.
+- **자동 배포(LEVEL 2)**: target 은 CI 가 성공한 정확한 commit 으로 고정됩니다(`deploy/auto-<sha12>` 태그).
+  API 가 함께 바뀌면 API 를 먼저 배포하고 성공을 확인한 뒤 프런트를 배포합니다. API 가 차단되면 프런트도 보류됩니다.
+  main 에 더 새 commit 이 있으면 그 commit 의 cycle 이 누적 변경을 처리합니다.
+- **통제 배포(LEVEL 3 · 배포 방식 변경 뒤 첫 배포)**: 사용자 승인 → `deploy/*` 태그 → 해당 workflow 를 수동 dispatch.
+  deploy workflow 들은 더 이상 push 에 반응하지 않습니다.
+- DB 마이그레이션은 API 배포가 실행합니다
   ([PRODUCTION-MIGRATION-STANDARD](docs/baseline/operations/PRODUCTION-MIGRATION-STANDARD.md)).
-  예외로 `deploy-api.yml` 의 `migrate_only` 수동 실행(`refs/tags/deploy/*` 태그 + `expected_sha` 일치)은
-  `DEPLOY_ENABLED` 와 무관하게 migration 만 실행합니다.
-- **CI gate**: 게이트가 열려도 target commit 의 `CI Pipeline` 이 green 이 아니면(실패 · 취소 · 진행 중 · 부재)
-  배포 job 은 실행되지 않습니다 (`migrate_only` 포함). 각 workflow 의 `ci-gate` job 이 red 로 남습니다.
-- **rollout_mode**: 수동 실행 입력. 기본 `legacy` 는 종전 동작 그대로이고, `verified` 는 새 revision 을
-  traffic 0% 로 올려 직접 검사(web · admin = tag URL HTTP, API = revision Ready)한 뒤에만 전환합니다.
-  검사 실패 시 기존 revision 이 그대로 서빙되고, API 는 전환 후 `/health/ready` 실패 시 이전 revision 으로 되돌립니다.
-- **위험 판정(shadow)**: `Deploy Risk Gate (shadow)` workflow 가 main CI 완료마다 "서빙 중인 SHA → 이 commit"
-  을 서비스별로 LEVEL 1/2/3 로 판정해 기록합니다. **배포 결정에는 쓰이지 않습니다** (cutover 는 별도 결정).
-  근거: [CHECK-O4O-CICD-SAFE-AUTODEPLOY-AND-RISK-GATE-V1](docs/checks/CHECK-O4O-CICD-SAFE-AUTODEPLOY-AND-RISK-GATE-V1.md)
+  migration 이 포함된 변경은 LEVEL 3 이므로 자동 배포되지 않습니다. `deploy-api.yml` 의 `migrate_only` 수동 실행
+  (`refs/tags/deploy/*` 태그 + `expected_sha` 일치)은 migration 만 실행합니다(freeze 적용).
+- **CI gate**: target commit 의 `CI Pipeline` 이 green 이 아니면(실패 · 취소 · 진행 중 · 부재 — 부재와 진행 중은 제한 시간 재조회)
+  배포 job 은 실행되지 않습니다 (`migrate_only` 포함).
+- **rollout_mode**: 기본 `verified` — 새 revision 을 traffic 0% 로 올려 직접 검사(web · admin = tag URL HTTP,
+  API = revision Ready)한 뒤에만 전환합니다. 검사 실패 시 기존 revision 이 그대로 서빙되고, API 는 전환 후
+  `/health/ready` 실패 시 이전 revision 으로 되돌립니다. `legacy` 는 종전 방식(수동 실행 전용).
 - 배포 job 에 붙은 `environment: production` 은 **승인 게이트가 아닙니다.** 현재 GitHub `production`
   Environment 에는 required reviewer · 배포 branch 제한 · environment secret 이 없습니다.
 - GCP 인증은 저장소 수준 secret(`GCP_SA_KEY`)을 씁니다. 저장소 쓰기 권한이 있는 사람은 기술적으로
@@ -146,8 +158,8 @@ GCP Cloud Run으로 배포합니다. 아래 워크플로는 `main` push 에 반�
 2. `.github/workflows/**` 는 production 에 영향을 줄 수 있으므로 사용자 승인 없이 변경하지 않습니다.
    다른 branch 에 올린 workflow 도 저장소 secret 으로 실행되므로 branch 라고 예외가 아닙니다.
 3. 사용자 승인 없이 하지 않는 것:
-   - production 배포 설정 변경 · `DEPLOY_ENABLED` 변경
-   - production 배포 실행 (`workflow_dispatch` 포함)
+   - production 배포 설정 변경 · `DEPLOY_FREEZE` 해제(`false` 로 변경) — 비상 시 `true` 설정은 누구나 즉시 해도 된다
+   - production 통제 배포 실행 (LEVEL 3 · 첫 rollout 의 `workflow_dispatch` 포함 — LEVEL 2 자동 배포는 승인 불필요)
    - production migration 실행 (`migrate_only` 포함) · `deploy/*` 태그 생성 · push
    - production DB write
 4. Repository · Environment · Actions secret 과 production credential 은 임의로 변경 · 열람 · 반출하지 않습니다.

@@ -6,7 +6,8 @@
  *   종전 경로(`build-and-deploy` 한 잡 = 이미지 → migration → API 배포)에는 migration 과 API 사이에
  *   멈춤 지점이 없고, 승인 대기(required reviewers)에 기대던 절차는 그 규칙이 삭제되며 쓸 수 없게 됐다.
  *   그래서 `workflow_dispatch` 입력 `migrate_only=true` 를 두었다:
- *     - `DEPLOY_ENABLED` 게이트를 열지 않고 실행 (게이트를 열면 그 사이 main push 가 다른 코드를 배포한다)
+ *     - (당시) `DEPLOY_ENABLED` 게이트를 열지 않고 실행. WO-O4O-CICD-DEPLOY-FREEZE-CUTOVER-V1 이후 게이트는
+ *       `DEPLOY_FREEZE` 이며 migrate_only 에도 적용된다(freeze 중 = migration 0). push trigger 는 은퇴했다.
  *     - 태그 ref(`refs/tags/deploy/*`) + expected_sha 일치를 먼저 검사 (fail-closed)
  *     - migration Job 을 방금 push 한 이미지 digest 로 고정
  *     - Deploy · Verify step 은 실행하지 않는다
@@ -23,6 +24,7 @@ const WF = YAML.parse(WF_TEXT);
 
 type Ctx = {
   eventName: 'push' | 'workflow_dispatch';
+  /** 'true' = 배포 가능(DEPLOY_FREEZE='false') · 그 외 = freeze */
   gate: string;
   affected?: string;
   inputs?: Record<string, string>;
@@ -36,7 +38,8 @@ function evaluate(expr: string, c: Ctx): boolean {
   const inputs = c.eventName === 'workflow_dispatch' ? { force_deploy: 'false', base_sha: '', head_sha: '', migrate_only: 'false', expected_sha: '', ...c.inputs } : undefined;
   const js = expr
     .replace(/\s+/g, ' ')
-    .replace(/vars\.DEPLOY_ENABLED/g, '__gate')
+    // DEPLOY_FREEZE: 'false' 일 때만 배포 가능 — gate 'true' ↔ freeze 'false'
+    .replace(/vars\.DEPLOY_FREEZE/g, "(__gate === 'true' ? 'false' : 'true')")
     .replace(/needs\.detect\.outputs\.api_deploy_affected/g, '__affected')
     .replace(/github\.event_name/g, '__event')
     .replace(/github\.event\.inputs\.(\w+)/g, (_m, k: string) => `__in(${JSON.stringify(k)})`);
@@ -49,7 +52,7 @@ function evaluate(expr: string, c: Ctx): boolean {
 }
 
 const job = WF.jobs['build-and-deploy'];
-const holdNotice = WF.jobs['deploy-hold-notice'];
+const holdNotice = WF.jobs['freeze-notice'];
 const steps: Array<{ name: string; if?: string; run?: string }> = job.steps;
 const stepRuns = (name: string, c: Ctx) => {
   const s = steps.find((x) => x.name === name);
@@ -67,11 +70,10 @@ describe('입력 계약', () => {
     expect(inputs.expected_sha.default).toBe('');
   });
 
-  it('push trigger 는 그대로다 (main · 같은 paths)', () => {
-    expect(WF.on.push.branches).toEqual(['main']);
-    expect(WF.on.push.paths).toEqual(
-      expect.arrayContaining(['apps/api-server/**', 'packages/**', '.github/workflows/deploy-api.yml']),
-    );
+  it('push trigger 는 은퇴했다 — 자동 배포는 deploy-auto.yml 의 dispatch 로만 (WO-O4O-CICD-DEPLOY-FREEZE-CUTOVER-V1)', () => {
+    expect(WF.on.push).toBeUndefined();
+    expect(WF.on.workflow_dispatch).toBeDefined();
+    expect(WF.on.workflow_dispatch.inputs.rollout_mode.default).toBe('verified');
   });
 });
 
@@ -109,9 +111,13 @@ describe('MIGRATE-ONLY 경로', () => {
     inputs: { migrate_only: 'true', expected_sha: 'b'.repeat(40) },
   });
 
-  it('게이트가 닫혀 있어도 잡이 열린다 (게이트를 열 필요가 없다)', () => {
-    expect(evaluate(job.if, mo('false'))).toBe(true);
-    expect(evaluate(job.if, { ...mo('false'), affected: 'false' })).toBe(true);
+  it('freeze 가 아니면 잡이 열린다 (detect 결과와 무관)', () => {
+    expect(evaluate(job.if, mo('true'))).toBe(true);
+    expect(evaluate(job.if, { ...mo('true'), affected: 'false' })).toBe(true);
+  });
+
+  it('DEPLOY_FREEZE 중에는 migrate_only 도 열리지 않는다 (cutover 정책 — freeze = migration 0)', () => {
+    expect(evaluate(job.if, mo('false'))).toBe(false);
   });
 
   it('게이트가 열려 있어도 배포 step 은 돌지 않는다 — migration 후 정지', () => {
@@ -123,8 +129,9 @@ describe('MIGRATE-ONLY 경로', () => {
     }
   });
 
-  it('게이트 닫힘 안내("migration 0")를 내지 않는다', () => {
-    expect(evaluate(holdNotice.if, mo('false'))).toBe(false);
+  it('freeze 안내는 freeze 일 때만 — migrate_only 여부와 무관 (freeze 중 migration 도 0 이므로 안내가 맞다)', () => {
+    expect(evaluate(holdNotice.if, mo('false'))).toBe(true);
+    expect(evaluate(holdNotice.if, mo('true'))).toBe(false);
   });
 
   it('push 이벤트로는 migrate-only 가 될 수 없다', () => {

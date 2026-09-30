@@ -31,7 +31,7 @@ jobs:
           echo "사유: Lecture Phase 2 cutover 전"
   deploy-kpa-society:
     needs: detect-changes
-    if: vars.DEPLOY_ENABLED == 'true'
+    if: vars.DEPLOY_FREEZE == 'false'
     steps:
       - name: Build and push Docker image
         run: |
@@ -67,7 +67,7 @@ describe('W. deploy workflow 변경 분류 (§8)', () => {
   it('W1 CONTROL-ONLY — 주석 · hold 문구 · if · needs 만 → 모든 서비스 영향 0', () => {
     const head = mutate([
       ['echo "사유: Lecture Phase 2 cutover 전"', 'echo "Production deploy currently paused by deployment gate"'],
-      ["if: vars.DEPLOY_ENABLED == 'true'", "if: vars.DEPLOY_ENABLED == 'true' && needs.ci-gate.result == 'success'"],
+      ["if: vars.DEPLOY_FREEZE == 'false'", "if: vars.DEPLOY_FREEZE == 'false' && needs.ci-gate.result == 'success'"],
       ['    needs: detect-changes\n    if:', '    needs: [detect-changes, ci-gate]\n    # CI gate 추가\n    if:'],
     ]);
     const a = analyze(head);

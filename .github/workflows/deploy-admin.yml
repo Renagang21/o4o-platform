@@ -4,7 +4,8 @@ name: Deploy Admin Dashboard (Cloud Run)
 # Migrated from AWS Lightsail SSH to GCP Cloud Run (2025-12-29)
 
 concurrency:
-  group: deploy-admin-${{ github.ref }}
+  # 서비스 단위 1개 rollout (WO-O4O-CICD-DEPLOY-FREEZE-CUTOVER-V1 §18)
+  group: deploy-admin-production
   cancel-in-progress: false
 
 # WO-O4O-ADMIN-CI-CD-AFFECTED-SCOPE-AND-DUPLICATE-WORK-REDUCTION-V1
@@ -18,18 +19,9 @@ concurrency:
 #   - root manifest / lockfile / setup-build-env 는 Admin build 결과를 실제로 바꾸는데도
 #     trigger 에 없어 배포되지 않았다(false negative). census 근거로 추가한다.
 on:
-  push:
-    branches: [ main ]
-    paths:
-      - 'apps/admin-dashboard/**'
-      - 'packages/**'
-      # root 의존성 · 설치 · 빌드 환경 — Admin 산출물에 직접 영향을 준다.
-      - 'package.json'
-      - 'pnpm-lock.yaml'
-      - 'pnpm-workspace.yaml'
-      - '.npmrc'
-      - '.github/actions/setup-build-env/**'
-      - '.github/workflows/deploy-admin.yml'
+  # WO-O4O-CICD-DEPLOY-FREEZE-CUTOVER-V1: push trigger 은퇴. 자동 배포는 `deploy-auto.yml`(main CI 성공 → 위험 판정 →
+  #   LEVEL_2 만 이 workflow 를 `deploy/auto-<sha>` 태그 ref 로 dispatch) 이 유일한 진입점이다. 사람은 통제 배포(LEVEL_3 ·
+  #   첫 rollout)만 이 workflow 를 직접 dispatch 한다. 게이트는 `DEPLOY_FREEZE` 하나 — 정확히 'false' 일 때만 배포.
   workflow_dispatch:
     inputs:
       force_deploy:
@@ -46,9 +38,9 @@ on:
         default: ''
       # WO-O4O-CICD-SAFE-AUTODEPLOY-AND-RISK-GATE-V1 Phase 4 — 기본 legacy = 종전 동작 그대로.
       rollout_mode:
-        description: "'legacy'(기본 · 종전) | 'verified'(0% 배포 → tag URL smoke → 전환)"
+        description: "'verified'(기본 · 0% 배포 → 검증 → 전환 → 실패 시 복귀) | 'legacy'(종전 — 새 revision 즉시 서빙/pin 유지)"
         required: false
-        default: 'legacy'
+        default: 'verified'
 
 env:
   PROJECT_ID: netureyoutube
@@ -56,27 +48,24 @@ env:
   REPOSITORY_NAME: o4o-api
 
 jobs:
-  deploy-hold-notice:
-    # WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 §19 (2026-09-23 INCIDENT)
-    #   배포 job 이 skip 되면 run 이 조용히 성공처럼 보여 "왜 반영이 안 되나" 착시가 생긴다.
-    #   이 job 은 게이트가 닫혔을 때**만** 돌며, 보류 사유를 Job Summary 에 남긴다.
-    #   배포 job 과 의존관계가 없으므로 skip 여부와 무관하게 실행된다.
-    if: vars.DEPLOY_ENABLED != 'true'
+  freeze-notice:
+    # WO-O4O-CICD-DEPLOY-FREEZE-CUTOVER-V1 — DEPLOY_FREEZE 가 'false' 가 아니면(부재 · 공백 · true · 오타 포함 = fail-closed)
+    #   이 job 만 돌고 배포 job 은 전부 skip 된다. GitHub 식의 문자열 비교는 대소문자를 구분하지 않는다.
+    if: vars.DEPLOY_FREEZE != 'false'
     runs-on: ubuntu-latest
     steps:
-      - name: Report deploy hold
+      - name: Report deploy freeze
         run: |
           {
-            echo "## ⛔ Production deploy currently paused by deployment gate"
+            echo "## 🧊 Production deploy frozen — DEPLOY_FREEZE != 'false'"
             echo ""
-            echo "이 워크플로의 배포 job 은 실행되지 않았습니다 (build · Cloud Run deploy 0)."
+            echo "이 워크플로의 배포 job 은 실행되지 않았습니다 (build · migration · Cloud Run deploy 0)."
             echo ""
-            echo "- 게이트: 저장소 변수 \`DEPLOY_ENABLED\` = '${{ vars.DEPLOY_ENABLED }}'  (정확히 'true' 가 아니면 차단 · 부재/공백 포함 = fail-closed)"
-            echo "- 운영 방식: 평상시 닫힘. 배포는 사용자 승인 후 통제된 창(workflow_dispatch)으로만 연다 — README \"배포\" 절."
-            echo "- 위험 판정(shadow): 같은 commit 의 \`Deploy Risk Gate (shadow)\` run 요약 참조"
+            echo "- DEPLOY_FREEZE = '${{ vars.DEPLOY_FREEZE }}'  (정확히 'false' 일 때만 배포 · 부재/공백/오타 = freeze)"
+            echo "- 정상 운영값은 false. 비상 · 정비 시에만 true — README \"배포\" 절."
             echo "- commit: ${{ github.sha }}"
           } >> "$GITHUB_STEP_SUMMARY"
-          echo "DEPLOY_HOLD_ACTIVE=1 (DEPLOY_ENABLED='${{ vars.DEPLOY_ENABLED }}')"
+          echo "DEPLOY_FREEZE_ACTIVE=1 (DEPLOY_FREEZE='${{ vars.DEPLOY_FREEZE }}')"
 
   # 판정 전용 경량 잡 — checkout + node 만 쓴다. pnpm install · GCP 인증 없음.
   # 판정기는 `scripts/ci/detect-affected.mjs` 로 CI Pipeline 과 **같은 단일 지점**이다.
@@ -108,7 +97,7 @@ jobs:
     name: CI gate (target SHA must be green)
     needs: [detect]
     if: >-
-      vars.DEPLOY_ENABLED == 'true' &&
+      vars.DEPLOY_FREEZE == 'false' &&
       (needs.detect.outputs.admin_affected == 'true' || github.event.inputs.force_deploy == 'true')
     runs-on: ubuntu-latest
     timeout-minutes: 40
@@ -132,18 +121,18 @@ jobs:
     # `environment: production` — 배포 기록 분류용 표기이며 승인 게이트가 아니다.
     #   현재 GitHub `production` Environment 에는 required reviewer · 배포 branch 제한 · environment secret 이
     #   없다(2026-09-30 확인) — job 은 대기 없이 바로 실행된다. 본래 §20(WO-O4O-LECTURE-INDEPENDENT-SERVICE-
-    #   SEPARATION-V1)의 reviewer 규칙은 삭제됐다. 실제 운영 게이트는 이 job `if:` 의 `DEPLOY_ENABLED`
-    #   (기본 false · 변수 부재/공백도 차단 = fail-closed) 하나다.
+    #   SEPARATION-V1)의 reviewer 규칙은 삭제됐다. 실제 운영 게이트는 이 job `if:` 의 `DEPLOY_FREEZE`
+    #   (정확히 'false' 일 때만 배포 · 부재/공백/오타 = freeze = fail-closed) 와 ci-gate 다.
     environment: production
     # ci-gate skip(게이트 닫힘) · 실패(CI not green) → 이 job 도 skip
     needs: [detect, ci-gate]
     # Admin 과 무관한 변경에서는 install / build / Docker push / Cloud Run deploy 가
     # 한 줄도 실행되지 않는다. 수동 강제 배포는 force_deploy 로 계속 가능하다.
     # WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 §19 (2026-09-23 INCIDENT)
-    #   DEPLOY GATE (fail-closed): `DEPLOY_ENABLED` 가 'true' 일 때만. 변수 부재/공백 = 차단.
+    #   DEPLOY GATE (fail-closed): `DEPLOY_FREEZE` 가 정확히 'false' 일 때만. 변수 부재/공백/오타 = freeze.
     #   force_deploy 수동 실행보다도 우선한다(괄호로 묶어 AND).
     if: >-
-      vars.DEPLOY_ENABLED == 'true' &&
+      vars.DEPLOY_FREEZE == 'false' &&
       (needs.detect.outputs.admin_affected == 'true' || github.event.inputs.force_deploy == 'true')
 
     permissions:

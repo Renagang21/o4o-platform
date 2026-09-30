@@ -184,7 +184,8 @@ describe('services/web-store 조립 계층 (WO §3-①·⑥)', () => {
 
   it('deploy-web-services.yml 에 store-web 이 등록되어 있다', () => {
     const wf = readRepo('.github/workflows/deploy-web-services.yml');
-    expect(wf).toContain("- 'services/web-store/**'");
+    // WO-O4O-CICD-DEPLOY-FREEZE-CUTOVER-V1: push path trigger 은퇴 → 자동 배포 대상의 정본은 판정기 registry
+    expect(readRepo('scripts/ci/detect-affected.mjs')).toContain("{ key: 'store', dir: 'services/web-store' }");
     expect(wf).toContain('VITE_SERVICE_URL_STORE: https://store.neture.co.kr');
     expect(wf).toContain('deploy-store:');
     expect(wf).toContain('gcloud run deploy store-web');

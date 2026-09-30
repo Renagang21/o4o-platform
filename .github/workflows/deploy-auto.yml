@@ -1,0 +1,112 @@
+name: Deploy Auto (risk-gated)
+
+# WO-O4O-CICD-DEPLOY-FREEZE-CUTOVER-V1 — production 자동 배포의 **유일한 진입점**
+#
+#   main push → CI Pipeline 완료 → 이 workflow
+#     → CI gate (target SHA green)          실패/미확정 → BLOCKED_CI_NOT_GREEN
+#     → DEPLOY_FREEZE                        'false' 가 아니면(부재 · 공백 · 오타 포함) → BLOCKED_DEPLOY_FREEZE
+#     → target == main HEAD                  아니면 SUPERSEDED (더 새 commit 의 cycle 이 누적 diff 로 처리)
+#     → 서비스별 serving SHA → target 판정
+#         LEVEL_1 → NO_DEPLOY
+#         LEVEL_2 → AUTO_DEPLOY (verified rollout) — API 먼저, 성공 확인 뒤 web · admin
+#         LEVEL_2 + rollout_pending → CONTROLLED_FIRST_ROLLOUT_REQUIRED
+#         LEVEL_3 → AUTO_DEPLOY_BLOCKED reason=LEVEL_3 (사람이 통제 배포)
+#         API 가 배포 대상인데 자동 배포 안 됨 → 프런트도 HELD_API_NOT_DEPLOYED
+#     → 배포는 `deploy/auto-<sha12>` 태그 ref 로 deploy-api/web-services/admin 을 dispatch
+#       (target SHA 고정 · 서비스별 concurrency 로 rollout 1개씩)
+#
+#   판정 · 결정 · 결과는 Job Summary 와 artifact(JSON, 30일)로 남는다 — 이전 shadow 기록을 대체한다.
+#   근거: docs/checks/CHECK-O4O-CICD-DEPLOY-FREEZE-CUTOVER-V1.md
+
+on:
+  workflow_run:
+    workflows: ['CI Pipeline']
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      target_sha:
+        description: '판정할 target SHA (40자 · 비우면 현재 ref)'
+        required: false
+        default: ''
+      dry_run:
+        description: "'true'(기본) = 판정만 · dispatch 0 / 'false' = 결정대로 배포"
+        required: false
+        default: 'true'
+      base_sha:
+        description: '(fixture) base SHA — head_sha 와 함께 주면 모든 서비스가 base 를 서빙한다고 보고 판정만 한다'
+        required: false
+        default: ''
+      head_sha:
+        description: '(fixture) head SHA'
+        required: false
+        default: ''
+
+# 한 번에 한 판정. 진행 중 run 은 끝까지, 대기 run 은 더 새 것으로 대체된다(새 target 의 누적 diff 가 이전 것을 포함).
+concurrency:
+  group: deploy-auto
+  cancel-in-progress: false
+
+permissions:
+  contents: write   # target SHA 에 deploy/auto-<sha12> 태그 생성
+  actions: write    # deploy workflow dispatch
+
+jobs:
+  decide-and-deploy:
+    name: Risk-gated auto deploy
+    # main push 로 돈 CI 만 (PR run 은 branches 필터로 빠진다). CI 실패도 기록을 위해 돈다(결정 = BLOCKED_CI_NOT_GREEN).
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.event == 'push'
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      TARGET_SHA: ${{ github.event.workflow_run.head_sha || github.event.inputs.target_sha || github.sha }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ env.TARGET_SHA }}
+          fetch-depth: 0
+          sparse-checkout: |
+            /*
+            !/apps/api-server/src/scripts/data/
+          sparse-checkout-cone-mode: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.18.0'
+
+      - name: Authenticate to Google Cloud (read-only serving 조회)
+        uses: google-github-actions/auth@v3
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: netureyoutube
+          skip_install: true
+
+      - name: Decide and deploy
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DEPLOY_FREEZE_RAW: ${{ vars.DEPLOY_FREEZE }}
+          DRY_RUN: ${{ github.event.inputs.dry_run || 'false' }}
+          BASE_SHA: ${{ github.event.inputs.base_sha }}
+          HEAD_SHA: ${{ github.event.inputs.head_sha }}
+        run: |
+          ARGS=(--freeze "$DEPLOY_FREEZE_RAW" --dry-run "$DRY_RUN" --json "$RUNNER_TEMP/deploy-auto.json")
+          if [ -n "$BASE_SHA" ] && [ -n "$HEAD_SHA" ]; then
+            ARGS+=(--base "$BASE_SHA" --head "$HEAD_SHA")
+          else
+            ARGS+=(--target "$TARGET_SHA")
+          fi
+          node scripts/ci/deploy-orchestrate.mjs "${ARGS[@]}"
+
+      - name: Upload decision record
+        if: always()
+        uses: actions/upload-artifact@v4
+        continue-on-error: true
+        with:
+          name: deploy-auto-${{ env.TARGET_SHA }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/deploy-auto.json
+          retention-days: 30
+          if-no-files-found: ignore

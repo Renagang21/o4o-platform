@@ -2,7 +2,8 @@
  * WO-O4O-CICD-SAFE-AUTODEPLOY-AND-RISK-GATE-V1 — 배포 workflow 배선 계약 (텍스트 정적 검사 · 의존성 0)
  *
  * 스크립트 단위 시험만으로는 workflow 가 그 스크립트를 **실제로 호출하는지** 를 보장하지 못한다.
- * 여기서는 세 deploy workflow · shadow workflow 의 배선이 조용히 빠지거나 바뀌는 회귀를 막는다.
+ * 여기서는 세 deploy workflow · deploy-auto 의 배선이 조용히 빠지거나 바뀌는 회귀를 막는다.
+ * WO-O4O-CICD-DEPLOY-FREEZE-CUTOVER-V1: 게이트 = DEPLOY_FREEZE · push trigger 은퇴 · 서비스 단위 concurrency.
  */
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -43,11 +44,11 @@ describe('Phase 2 — 배포되는 모든 revision 에 commit SHA label 을 남�
   }
 });
 
-describe('Phase 4 — verified rollout 은 선택형이고 기본은 종전 동작이다', () => {
+describe('Phase 4 — verified rollout (cutover 후 기본값)', () => {
   for (const file of DEPLOY) {
-    it(`${file}: rollout_mode 기본 legacy · verified 에서만 --no-traffic --tag`, () => {
+    it(`${file}: rollout_mode 기본 verified · verified 에서만 --no-traffic --tag`, () => {
       const wf = read(file);
-      assert.match(wf, /rollout_mode:\n\s+description: [^\n]+\n\s+required: false\n\s+default: 'legacy'/);
+      assert.match(wf, /rollout_mode:\n\s+description: [^\n]+\n\s+required: false\n\s+default: 'verified'/);
       assert.match(wf, /if \[ "\$\{\{ github\.event\.inputs\.rollout_mode \}\}" = "verified" \]; then\s+ROLLOUT_ARGS=\(--no-traffic "--tag=sha-\$\{GITHUB_SHA:0:12\}"\)/);
     });
   }
@@ -73,12 +74,47 @@ describe('Phase 4 — verified rollout 은 선택형이고 기본은 종전 동�
   });
 });
 
-describe('§21 · §22 — hold 문구 · optional env', () => {
+describe('DEPLOY_FREEZE cutover — 게이트 · trigger · 동시성 (WO-O4O-CICD-DEPLOY-FREEZE-CUTOVER-V1)', () => {
   for (const file of DEPLOY) {
-    it(`${file}: hold 문구에 종료된 과거 사유(Lecture Phase 2)가 없다`, () => {
-      const hold = /deploy-hold-notice:[\s\S]*?(?=\n {2}[a-z-]+:\n)/.exec(read(file))?.[0] ?? '';
-      assert.match(hold, /Production deploy currently paused by deployment gate/);
-      assert.doesNotMatch(hold, /Lecture Phase 2|data cutover/);
+    it(`${file}: DEPLOY_ENABLED 참조 0 · push trigger 0 (자동 배포는 deploy-auto 만)`, () => {
+      const wf = read(file);
+      assert.doesNotMatch(wf, /DEPLOY_ENABLED/);
+      assert.doesNotMatch(wf, /^ {2}push:/m);
+      assert.match(wf, /^ {2}workflow_dispatch:/m);
+    });
+
+    it(`${file}: 배포 · ci-gate job 은 DEPLOY_FREEZE == 'false' 일 때만 (fail-closed) · freeze-notice 는 그 반대`, () => {
+      const wf = read(file);
+      const deployIfs = count(wf, /vars\.DEPLOY_FREEZE == 'false'/g);
+      const expected = file.endsWith('web-services.yml') ? 10 : 2; // web: ci-gate 1 + deploy 9 · api/admin: ci-gate 1 + deploy 1
+      assert.equal(deployIfs, expected);
+      assert.match(wf, /^ {2}freeze-notice:\n(?: {4}#.*\n)* {4}if: vars\.DEPLOY_FREEZE != 'false'\n/m);
+      assert.doesNotMatch(wf, /DEPLOY_FREEZE == 'true'|DEPLOY_FREEZE != 'true'/, '"true" 비교는 부재 · 오타를 허용으로 만든다');
+    });
+
+    it(`${file}: 서비스 단위 concurrency (ref 단위 아님)`, () => {
+      const group = /concurrency:\n(?: {2}#.*\n)* {2}group: ([^\n]+)\n {2}cancel-in-progress: false/.exec(read(file))?.[1];
+      assert.ok(group, 'concurrency group 없음');
+      assert.doesNotMatch(group, /github\.ref/);
+    });
+  }
+
+  it('web concurrency 는 서비스 입력별 group', () => {
+    assert.match(read(DEPLOY[1]), /group: deploy-web-\$\{\{ github\.event\.inputs\.service \|\| 'all' \}\}/);
+  });
+
+  it('api migrate_only 도 freeze 가 적용된다', () => {
+    const job = /\n {2}build-and-deploy:[\s\S]*?\n {4}if: >-\n([\s\S]*?)\n\n/.exec(read(DEPLOY[0]))?.[1] ?? '';
+    assert.match(job, /^\s+vars\.DEPLOY_FREEZE == 'false' &&\n\s+\(\(github\.event_name == 'workflow_dispatch' && github\.event\.inputs\.migrate_only == 'true'\) \|\|/);
+  });
+});
+
+describe('§21 · §22 — freeze 안내 · optional env', () => {
+  for (const file of DEPLOY) {
+    it(`${file}: 안내 문구에 종료된 과거 사유(Lecture Phase 2)가 없다`, () => {
+      const notice = /freeze-notice:[\s\S]*?(?=\n {2}[a-z-]+:\n)/.exec(read(file))?.[0] ?? '';
+      assert.match(notice, /Production deploy frozen/);
+      assert.doesNotMatch(notice, /Lecture Phase 2|data cutover|DEPLOY_ENABLED/);
     });
   }
 
@@ -90,17 +126,32 @@ describe('§21 · §22 — hold 문구 · optional env', () => {
   });
 });
 
-describe('shadow workflow — 기록만 한다', () => {
-  const wf = read('.github/workflows/cd-risk-gate-shadow.yml');
-  it('CI Pipeline 완료(main)에 반응하고 판정기를 shadow 로 실행한다', () => {
+describe('deploy-auto — 자동 배포의 유일한 진입점', () => {
+  const wf = read('.github/workflows/deploy-auto.yml');
+  it('main CI Pipeline 완료에 반응하고 오케스트레이터를 실행한다 (shadow workflow 대체)', () => {
     assert.match(wf, /workflow_run:\n\s+workflows: \['CI Pipeline'\]\n\s+types: \[completed\]\n\s+branches: \[main\]/);
-    assert.match(wf, /deploy-risk\.mjs[\s\S]*--serving-from-gcloud/);
-    assert.doesNotMatch(wf, /--enforce/);
+    assert.match(wf, /node scripts\/ci\/deploy-orchestrate\.mjs "\$\{ARGS\[@\]\}"/);
+    assert.match(wf, /DEPLOY_FREEZE_RAW: \$\{\{ vars\.DEPLOY_FREEZE \}\}/);
+    assert.throws(() => read('.github/workflows/cd-risk-gate-shadow.yml'), 'shadow workflow 는 은퇴');
   });
-  it('쓰기 명령 0 — deploy · update-traffic · jobs execute · variable set 없음', () => {
-    assert.doesNotMatch(wf, /gcloud run deploy|update-traffic|jobs execute|gh variable set|cloud-run-rollout\.mjs (switch|rollback)/);
+  it('target SHA 는 CI 가 성공한 commit (workflow_run.head_sha) — github.sha 가 아니다', () => {
+    assert.match(wf, /TARGET_SHA: \$\{\{ github\.event\.workflow_run\.head_sha \|\|/);
+    assert.match(wf, /ref: \$\{\{ env\.TARGET_SHA \}\}/);
   });
-  it('이름이 deploy-* 가 아니다 (판정기의 배포 기계 규칙 · 배포 workflow 목록과 섞이지 않음)', () => {
-    assert.ok(!path.basename('.github/workflows/cd-risk-gate-shadow.yml').startsWith('deploy-'));
+  it('수동 실행은 기본 dry-run · 자동(workflow_run)은 enforcement', () => {
+    assert.match(wf, /dry_run:\n\s+description: [^\n]+\n\s+required: false\n\s+default: 'true'/);
+    assert.match(wf, /DRY_RUN: \$\{\{ github\.event\.inputs\.dry_run \|\| 'false' \}\}/);
+  });
+  it('판정은 한 번에 하나 · 직접 배포 명령 0 (배포는 deploy workflow dispatch 로만)', () => {
+    assert.match(wf, /concurrency:\n\s+group: deploy-auto\n\s+cancel-in-progress: false/);
+    assert.doesNotMatch(wf, /gcloud run deploy|update-traffic|jobs execute|gh variable set/);
+  });
+});
+
+describe('저장소 전체 — DEPLOY_ENABLED 는 배포 결정에 쓰이지 않는다', () => {
+  it('workflow · actions 에 DEPLOY_ENABLED 참조 0', () => {
+    for (const f of [...DEPLOY, '.github/workflows/deploy-auto.yml', '.github/workflows/ci-pipeline.yml', '.github/actions/cloud-run-verified-rollout/action.yml']) {
+      assert.doesNotMatch(read(f), /DEPLOY_ENABLED/, f);
+    }
   });
 });

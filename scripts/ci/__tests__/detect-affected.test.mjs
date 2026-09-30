@@ -789,11 +789,19 @@ test('§11. deploy-api.yml 은 detect → 조건부 build-and-deploy 구조다',
     'heavy deploy 는 판정에 걸려 있어야 한다',
   );
   assert.match(yml, /fetch-depth: 0/, 'push batch 전체를 봐야 한다');
-  // §12 — trigger 자체를 좁혀 workflow 가 안 뜨게 만들지 않는다
-  assert.match(yml, /- 'apps\/api-server\/\*\*'/);
-  assert.match(yml, /- 'packages\/\*\*'/);
-  assert.match(yml, /- 'pnpm-lock\.yaml'/);
+  // §12 — trigger 자체를 좁혀 workflow 가 안 뜨게 만들지 않는다.
+  // WO-O4O-CICD-DEPLOY-FREEZE-CUTOVER-V1: push trigger 은퇴 — 자동 배포 진입점은 deploy-auto.yml 이며
+  //   main CI 완료마다 **경로 필터 없이** 돈다(serving SHA 누적 diff 로 판정). 같은 보장을 그쪽에서 고정한다.
+  assert.doesNotMatch(yml, /^ {2}push:/m, '자동 배포는 deploy-auto 만');
+  assertAutoDeployCoversAllMainCommits();
 });
+
+/** cutover 후: deploy-auto 는 main CI 완료 전체에 반응하고 paths 필터가 없다 (silent false-negative 방지) */
+function assertAutoDeployCoversAllMainCommits() {
+  const auto = workflowYaml('deploy-auto.yml');
+  assert.match(auto, /workflow_run:\n\s+workflows: \['CI Pipeline'\]\n\s+types: \[completed\]\n\s+branches: \[main\]/);
+  assert.doesNotMatch(auto, /^\s+paths(-ignore)?:/m, 'deploy-auto 에 paths 필터를 두면 root 입력 변경이 조용히 빠진다');
+}
 
 test('§13 · §15. migration/deploy step 은 build-and-deploy 안에만 있고, 재현 dispatch 는 배포하지 않는다', () => {
   const yml = workflowYaml('deploy-api.yml');
@@ -969,10 +977,10 @@ test('W12 · W13. deploy-web-services.yml 계약 — dispatch all/단일 배포�
     assert.ok(yml.includes(`      - deploy-${key}`), `summary needs 누락: deploy-${key}`);
     assert.ok(yml.includes(`needs.detect-changes.outputs.${key} }}"`), `summary 출력 누락: ${key}`);
   }
-  // §17 — root build 입력이 trigger 에 있어야 silent false-negative 가 없다
-  for (const trigger of ["- 'package.json'", "- 'pnpm-lock.yaml'", "- 'pnpm-workspace.yaml'"]) {
-    assert.ok(yml.includes(trigger), `push trigger 누락: ${trigger}`);
-  }
+  // §17 — root build 입력 변경이 silent false-negative 가 되지 않아야 한다.
+  // WO-O4O-CICD-DEPLOY-FREEZE-CUTOVER-V1: push trigger 은퇴 → deploy-auto 가 필터 없이 모든 main commit 을 판정한다.
+  assert.doesNotMatch(yml, /^ {2}push:/m, '자동 배포는 deploy-auto 만');
+  assertAutoDeployCoversAllMainCommits();
 });
 
 test('§23. 9개 서비스의 실제 @o4o import 는 전부 선언된 dependency closure 안에 있다', () => {

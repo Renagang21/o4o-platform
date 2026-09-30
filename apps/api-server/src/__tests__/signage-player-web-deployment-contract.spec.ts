@@ -61,8 +61,11 @@ describe('STATIC CONTRACT: signage-player-web 배포 채택 (§30)', () => {
   });
 
   // ---- 2. workflow 채택 3요소 ----
-  it('push path trigger 에 player 경로가 있다', () => {
-    expect(read(WORKFLOW)).toContain("- 'services/signage-player-web/**'");
+  // WO-O4O-CICD-DEPLOY-FREEZE-CUTOVER-V1: deploy workflow 의 push path trigger 은퇴 — 자동 배포 대상 여부의 정본은
+  //   deploy-auto 가 쓰는 판정기 registry(WEB_SERVICES)다. 막는 회귀(player 가 자동 배포 대상에서 빠짐)는 그대로다.
+  it('자동 배포 판정 registry 에 player 가 등록돼 있고 push trigger 는 없다', () => {
+    expect(read(path.join(ROOT, 'scripts/ci/detect-affected.mjs'))).toContain("{ key: 'signage-player', dir: 'services/signage-player-web' }");
+    expect(read(WORKFLOW)).not.toMatch(/^ {2}push:/m);
   });
 
   // WO-O4O-WEB-SERVICES-CD-DEPENDENCY-AFFECTED-DEPLOY-GATE-V1:

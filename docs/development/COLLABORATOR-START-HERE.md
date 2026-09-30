@@ -113,7 +113,8 @@ DB 의 `o4o_api` 는 로그인 계정이 아니라 **NOLOGIN owner role** 이다
 **사용자(저장소 소유자) 승인 없이 하지 않는 것:**
 
 - `.github/workflows/**` 변경 (다른 branch 에 올려도 저장소 secret 으로 실행된다)
-- `DEPLOY_ENABLED` 변경 · production 배포 실행 · `workflow_dispatch` 로 하는 production 작업
+- `DEPLOY_FREEZE` 해제(`false` 로 변경) · production 통제 배포 실행 · `workflow_dispatch` 로 하는 production 작업
+  (비상 시 `DEPLOY_FREEZE=true` 설정은 즉시 해도 된다. 일상 LEVEL 2 배포는 main CI 뒤 자동이다)
 - `deploy/*` tag 생성 · push
 - production migration · production DB write
 - Secret · production credential 의 변경 · 열람 · 반출

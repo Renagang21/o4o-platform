@@ -321,7 +321,9 @@ export const CONTROL_ONLY = new Set([
   'scripts/ci/ci-gate.mjs',
   'scripts/ci/deploy-risk.mjs',
   'scripts/ci/deploy-workflow-diff.mjs',
-  '.github/workflows/cd-risk-gate-shadow.yml',
+  '.github/workflows/cd-risk-gate-shadow.yml', // cutover 로 deploy-auto.yml 에 흡수(삭제) — 삭제도 control
+  'scripts/ci/deploy-orchestrate.mjs',
+  '.github/workflows/deploy-auto.yml',
 ]);
 
 /**
@@ -651,18 +653,19 @@ export function assessServingGap(target, serving, graph, provider = gitDiffProvi
 }
 
 /**
- * shadow 결정 — 향후 enforcement 에서 **무엇이 일어났을지**.
- * 실제 결정(현재 DEPLOY_ENABLED 게이트)은 바꾸지 않는다.
+ * 요약용 결정 (CLI · 로컬 확인). 실제 enforcement 결정의 정본은 deploy-orchestrate.mjs `decideAll`
+ * (WO-O4O-CICD-DEPLOY-FREEZE-CUTOVER-V1 — API 의존 규칙 · target==main HEAD 포함).
  */
 export function wouldBeDecision(entry, { ciGreen, freeze }) {
   if (!entry.deploy_required) return 'NO_DEPLOY';
   if (ciGreen !== true) return 'BLOCKED_CI_NOT_GREEN';
   if (freeze === true) return 'BLOCKED_DEPLOY_FREEZE';
+  if ((entry.level3 ?? []).length === 0 && entry.rollout_pending) return 'CONTROLLED_FIRST_ROLLOUT_REQUIRED';
   if (entry.level === LEVEL_3) return 'BLOCKED_HIGH_RISK_CONTROLLED_DEPLOY_REQUIRED';
   return 'AUTO_DEPLOY_WITH_REVISION_SMOKE';
 }
 
-export function summarizeShadow({ target, perService, ciGreen, freeze, deployEnabled }) {
+export function summarizeShadow({ target, perService, ciGreen, freeze }) {
   const services = Object.entries(perService).map(([key, e]) => ({
     key,
     ...e,
@@ -675,7 +678,6 @@ export function summarizeShadow({ target, perService, ciGreen, freeze, deployEna
     target_sha: target,
     ci_green: ciGreen,
     deploy_freeze: freeze,
-    current_gate: deployEnabled ? 'DEPLOY_ENABLED=true (open)' : 'DEPLOY_ENABLED!=true (hold)',
     risk_level: maxLevel(...services.filter((s) => s.deploy_required).map((s) => s.level)),
     deploy_required: affected.length > 0,
     affected_services: affected,
@@ -805,7 +807,6 @@ function main() {
       perService,
       ciGreen: bool(args['ci-green']),
       freeze: bool(args.freeze) === true,
-      deployEnabled: bool(args['deploy-enabled']) === true,
     });
     report.serving = serving;
     text = renderShadowReport(report);
