@@ -41,9 +41,8 @@ import {
   checkPasswordPolicy,
   PASSWORD_POLICY_MESSAGES,
   maskLoginEmail,
-  normalizePhoneDigits,
-  isPhoneShapeValid,
-} from '../../common/auth/email-credential.rules.js';
+} from '@o4o/auth-utils';
+import { normalizePhoneDigits, isPhoneShapeValid } from '../../common/auth/phone-shape.js';
 import { ADMIN_SURFACE_KEY } from '../../utils/session-origin.js';
 import { getServiceOrigin } from '../../config/service-catalog.js';
 import { generateTokensWithContext, injectRolesIntoPublicData } from './auth-context.helper.js';

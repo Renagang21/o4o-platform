@@ -60,9 +60,10 @@ const generateTokens = jest.fn(() => ({ accessToken: 'AT', refreshToken: 'RT', e
 //   세션 귀속(serviceKey · sessionEpoch)을 읽는다. 여기 기본값은 **claim 없는 토큰** 이므로
 //   판정에서 제외되고 기존 계약이 그대로 검증된다. 귀속을 보는 시나리오는 전용 spec
 //   (service-logout-auth-boundary.spec.ts)에서 실제 토큰으로 본다.
+const verifyAccessToken = jest.fn((_token: string): unknown => null);
 jest.mock('../utils/token.utils.js', () => ({
   generateTokens: (...a: unknown[]) => generateTokens(...a),
-  verifyAccessToken: () => null,
+  verifyAccessToken: (t: string) => verifyAccessToken(t),
 }));
 const persistRefreshTokenFamily = jest.fn(async () => undefined);
 jest.mock('../services/auth/auth-context.helper.js', () => ({
@@ -108,6 +109,8 @@ beforeEach(() => {
   query.mockResolvedValue([]);
   linkedAccountsQuery.mockReset();
   linkedAccountsQuery.mockResolvedValue(GOOGLE_LINKED);
+  verifyAccessToken.mockReset();
+  verifyAccessToken.mockReturnValue(null);
   findOne.mockReset();
   resolveAccessibleStores.mockReset();
   generateTokens.mockClear();
@@ -268,6 +271,53 @@ describe('C. generateHandoff — workspace 는 organization 축', () => {
     expect(res.body.data.targetUrl).toMatch(/^https:\/\/[^/]+\/handoff\?token=/);
     expect(res.body.data.targetUrl).not.toContain('store.neture.co.kr');
     expect(resolveAccessibleStores).not.toHaveBeenCalled();
+  });
+});
+
+// WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1 보완 3: 원장이 출발 수단을 기록하지 않으므로
+//   Google 연결 계정의 **비밀번호 세션**은 발급 단계에서 닫는다 — 대상 세션이 표식 없는 세션이 되지 않게.
+describe('C-2. generateHandoff — 두 수단 계정의 비밀번호 세션은 발급 거절', () => {
+  function passwordSessionReq(body: Record<string, unknown>) {
+    const req = mockReq(body, 'https://neture.co.kr');
+    req.headers = { authorization: 'Bearer PW-SESSION' };
+    return req;
+  }
+  beforeEach(() => {
+    verifyAccessToken.mockImplementation((t: string) =>
+      t === 'PW-SESSION' ? { userId: 'user-1', serviceKey: 'neture', sessionEpoch: 0, authMethod: 'password' } : null,
+    );
+  });
+
+  it.each([
+    ['service', { targetServiceKey: 'kpa-society' }],
+    ['workspace', { targetWorkspace: 'store' }],
+    ['대표 진입', { targetServiceKey: 'neture' }],
+  ])('%s handoff: Google 연결 + 비밀번호 세션 → 403 · 원장 INSERT 0', async (_label, body) => {
+    resolveAccessibleStores.mockResolvedValue([STORE]);
+    query.mockResolvedValue([{ status: 'active' }]);
+    const res = mockRes();
+    await HandoffController.generateHandoff(passwordSessionReq(body), res);
+    expect([res.statusCode, res.body.code]).toEqual([403, 'HANDOFF_PASSWORD_SESSION_NOT_ALLOWED']);
+    expect(query.mock.calls.map((c) => norm(c[0]))).not.toEqual(
+      expect.arrayContaining([expect.stringContaining('INSERT INTO handoff_tokens')]),
+    );
+  });
+
+  it('비밀번호 전용 계정(Google 연결 없음)의 비밀번호 세션은 발급된다 — 교환 쪽이 비밀번호 세션으로 발급', async () => {
+    linkedAccountsQuery.mockResolvedValue([]);
+    query.mockResolvedValueOnce([{ status: 'active' }]).mockResolvedValueOnce([{ id: uuid }]).mockResolvedValueOnce([]);
+    const res = mockRes();
+    await HandoffController.generateHandoff(passwordSessionReq({ targetServiceKey: 'kpa-society' }), res);
+    expect(res.statusCode).toBe(200);
+    expect(query.mock.calls[1][1].slice(0, 3)).toEqual(['user-1', 'neture', 'kpa-society']);
+  });
+
+  it('Google 세션(authMethod claim 없음)은 Google 연결 계정이어도 종전대로 발급된다', async () => {
+    verifyAccessToken.mockImplementation(() => ({ userId: 'user-1', serviceKey: 'neture', sessionEpoch: 0 }));
+    query.mockResolvedValueOnce([{ status: 'active' }]).mockResolvedValueOnce([{ id: uuid }]).mockResolvedValueOnce([]);
+    const res = mockRes();
+    await HandoffController.generateHandoff(passwordSessionReq({ targetServiceKey: 'kpa-society' }), res);
+    expect(res.statusCode).toBe(200);
   });
 });
 

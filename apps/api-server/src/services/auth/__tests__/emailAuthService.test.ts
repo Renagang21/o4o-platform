@@ -193,6 +193,7 @@ function makeHarness(opts: { roles?: Record<string, string[]>; now?: Date } = {}
     },
     sql,
     mails,
+    mailer,
     passwords,
     revoked,
     order,
@@ -357,6 +358,27 @@ describe('EmailAuthService', () => {
       expect(second).not.toBe(first);
       await expectCode(h.service.verifyEmail(first), 'INVALID_OR_EXPIRED_TOKEN');
       await expect(h.service.verifyEmail(second)).resolves.toBeDefined();
+    });
+
+    // PR #257 보완 5 — 발송 실패는 계정을 되돌리지 않고, 재발송이 새 링크로 복구한다.
+    let h0: ReturnType<typeof makeHarness>;
+    it.each([
+      ['success:false 응답', () => h0.mailer.sendEmail.mockImplementationOnce(async () => ({ success: false, error: 'smtp down' }))],
+      ['예외', () => h0.mailer.sendEmail.mockImplementationOnce(async () => { throw new Error('smtp down'); })],
+    ])('발송 실패(%s) → mailSent:false · 계정 유지 · 재발송 링크로 확인 완료', async (_label, failOnce) => {
+      h0 = makeHarness();
+      failOnce();
+      const res = await h0.service.signup(signupInput());
+      expect(res.mailSent).toBe(false);
+      expect(h0.store.users).toHaveLength(1);
+      expect(h0.store.creds.size).toBe(1);
+      expect(h0.lastLinkToken('/verify-email')).toBe('');
+
+      await h0.service.resendVerification('new.user@example.com', META);
+      const token = h0.lastLinkToken('/verify-email');
+      expect(token).not.toBe('');
+      await expect(h0.service.verifyEmail(token)).resolves.toBeDefined();
+      expect(h0.store.users[0].isEmailVerified).toBe(true);
     });
 
     it('형태가 아닌 토큰은 DB 를 조회하지 않고 거절', async () => {

@@ -5,7 +5,7 @@ import { Type } from 'class-transformer';
  * 이메일·비밀번호 인증 DTOs (WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1)
  *
  * 여기서는 **형태**(문자열 · 필수 · 상한)만 거절한다. 이메일 형태 · 비밀번호 정책 · 휴대전화 형태는
- * `email-credential.rules` 가 서비스 계층에서 판정한다(화면과 같은 규칙 · 같은 안내 문구).
+ * 서비스 계층이 판정한다 — 이메일 · 비밀번호는 `@o4o/auth-utils`(화면과 같은 정본 · 같은 안내 문구), 휴대전화는 `common/auth/phone-shape`.
  * userId · role · membership · serviceKey 등 권한 필드는 `validateDto`(forbidNonWhitelisted) 가 400 으로 거절한다.
  */
 

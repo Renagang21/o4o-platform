@@ -1,7 +1,10 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
 /**
- * 이메일·비밀번호 인증 저장 구조 — **신규** 3테이블
+ * 이메일·비밀번호 인증 저장 구조 — 3테이블
+ *
+ *   신규 CREATE 2: `user_password_credentials` · `password_reset_tokens`
+ *   DROP 후 재생성 1: `email_verification_tokens` (기존 고아 테이블 · 0행 · 소비처 0 — 아래 2번 · 가드 포함)
  *
  * WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1 §2 (사용자 승인 2026-09-29)
  *
@@ -74,6 +77,31 @@ export class CreateEmailPasswordAuthTables1790683000000 implements MigrationInte
     //      · 같은 일을 하는 테이블을 둘로 만들지 않는다 — 한쪽이 뒤처지는 구조를 피한다
     //    평문 컬럼을 nullable 로 낮춰 남기는 선택도 가능하지만, 쓰지 않는 평문 토큰 컬럼을
     //    스키마에 남기는 것은 재유입 경로가 된다.
+    //
+    //    적용 직전 조건이 달라졌으면 **DROP 하지 않고 멈춘다**(PR #257 보완 4). 행이 하나라도 있거나
+    //    예상한 옛 형태(평문 `token` 컬럼)가 아니면 migration 을 실패시켜 트랜잭션 전체를 되돌린다
+    //    (migrate.ts: transaction 'each') — 데이터를 지운 뒤에 알게 되는 일이 없게 한다.
+    const legacyRows: Array<{ n: string | number }> = await q.query(
+      `SELECT count(*) AS n FROM email_verification_tokens`,
+    );
+    const legacyCount = Number(legacyRows?.[0]?.n ?? 0);
+    if (legacyCount !== 0) {
+      throw new Error(
+        `[CreateEmailPasswordAuthTables] email_verification_tokens has ${legacyCount} row(s) — refusing to DROP. ` +
+          'Investigate the rows and consumers before applying this migration.',
+      );
+    }
+    const legacyCols: Array<{ column_name: string }> = await q.query(
+      `SELECT column_name FROM information_schema.columns
+        WHERE table_schema = current_schema() AND table_name = 'email_verification_tokens'`,
+    );
+    const legacyColNames = new Set(legacyCols.map((c) => c.column_name));
+    if (!legacyColNames.has('token') || legacyColNames.has('token_hash')) {
+      throw new Error(
+        '[CreateEmailPasswordAuthTables] email_verification_tokens is not the expected legacy shape ' +
+          `(${[...legacyColNames].sort().join(', ')}) — refusing to DROP.`,
+      );
+    }
     await q.query(`DROP TABLE email_verification_tokens`);
     await q.query(`
       CREATE TABLE email_verification_tokens (
