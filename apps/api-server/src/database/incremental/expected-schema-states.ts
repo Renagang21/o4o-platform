@@ -142,6 +142,16 @@ export const EXPECTED_SCHEMA_STATES: readonly ExpectedSchemaState[] = [
     fingerprint: '914406ef47f415155a4a1c83a49398c7b668c043803bd55da3cc9dc37386d8d5',
     fingerprintLineCount: 5924,
   },
+  // WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1 최종 보완 1 — handoff 원장에 출발 세션 인증 수단 1컬럼.
+  // 5924 -> 5927 (+3): 컬럼 1 · CHECK 1 · COMMENT 1.
+  // baseline 2026-09-18-id685 fresh bootstrap + incremental 1..11 을 격리 PostgreSQL 15
+  // (docker postgres:15 = 15.17, 로컬 전용 포트 55439, throwaway DB) 에서 실제 적용해 산출:
+  // 운영 DB fingerprint 채택 아님. 같은 격리 PG 15 에서 incremental 10 상태 = 위 914406ef… 재확인.
+  {
+    appliedThrough: 'AddHandoffTokenSourceAuthMethod1790684000000',
+    fingerprint: 'a110d33587f14d7bc46dc6361e6fa640e57e3be749747ad6298647fe50d5370a',
+    fingerprintLineCount: 5927,
+  },
 ] as const;
 
 /** Expected state after `prefixLength` incremental migrations; undefined when not registered. */

@@ -113,3 +113,15 @@ jobs:
         category: "/language:${{matrix.language}}"
         ram: 6000
         threads: 2
+        # 분석 결과 SARIF 를 알려진 위치에 남긴다 — code scanning 업로드가 실패해도 결과를 볼 수 있게.
+        output: codeql-sarif
+
+    # 업로드 성공 여부와 무관하게 SARIF 를 artifact 로 보존한다(분석 · 업로드 동작은 그대로).
+    - name: Preserve CodeQL SARIF
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: codeql-sarif-${{ matrix.language }}
+        path: codeql-sarif
+        if-no-files-found: warn
+        retention-days: 14

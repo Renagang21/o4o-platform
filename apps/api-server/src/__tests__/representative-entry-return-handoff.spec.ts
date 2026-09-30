@@ -14,17 +14,11 @@
 // 실제 TypeORM `query` 는 언제나 배열을 돌려준다. double 이 undefined 를 주면 호출부가
 // 그것을 '행 0건' 으로 오해하거나 터지므로 기본값을 배열로 둔다 — 개별 테스트가 덮어쓴다.
 const query = jest.fn().mockResolvedValue([]);
-// WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1 §2-4: exchange 가 "Google 수단 연결 여부"를 읽는다
-//   (연결 없음 = 비밀번호 전용 → 대상 세션도 authMethod 'password'). 이 조회도 once 큐를 소비하지
-//   않게 따로 받는다. 기본값 = Google 연결 있음 → 종전 계약(authMethod claim 없음 = null) 그대로.
-const GOOGLE_LINKED = [{ '?column?': 1 }];
-const linkedAccountsQuery = jest.fn().mockResolvedValue(GOOGLE_LINKED);
 const findOne = jest.fn();
 jest.mock('../database/connection.js', () => ({
   AppDataSource: {
     isInitialized: true,
-    query: (...args: unknown[]) =>
-      /FROM linked_accounts/i.test(String(args[0] ?? '')) ? linkedAccountsQuery(...args) : query(...args),
+    query: (...args: unknown[]) => query(...args),
     getRepository: () => ({ findOne: (...args: unknown[]) => findOne(...args) }),
     // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8: handoff 가 세션 **세대**를 읽는다.
     //   세대 조회는 `query` 의 once 큐를 **소비하지 않는다** — 소비하면 이 spec 들이 순서로
@@ -96,8 +90,6 @@ beforeEach(() => {
   // mockReset 은 구현까지 지운다 → 기본 반환이 undefined 가 된다. 실제 TypeORM `query` 는
   // 언제나 배열이므로 기본값을 되돌린다(개별 테스트가 필요하면 다시 덮어쓴다).
   query.mockResolvedValue([]);
-  linkedAccountsQuery.mockReset();
-  linkedAccountsQuery.mockResolvedValue(GOOGLE_LINKED);
   findOne.mockReset();
   getRoleNames.mockClear();
   generateTokens.mockClear();
@@ -217,8 +209,9 @@ describe('B. generateHandoff', () => {
 
 // ─────────────────────────────────────────────────────────────────────────────
 describe('C. exchangeHandoff', () => {
+  // 원장 수단 = Google 세션 출발(종전 계약: claim 없음 = null). 수단 승계 자체는 unified-store-workspace-handoff.spec D.
   const consumed = (target: string, source = 'kpa-society') =>
-    query.mockResolvedValueOnce([[{ user_id: 'user-1', source_service_key: source, target_service_key: target, target_workspace: null, created_at: new Date(0) }], 1]);
+    query.mockResolvedValueOnce([[{ user_id: 'user-1', source_service_key: source, target_service_key: target, target_workspace: null, created_at: new Date(0), source_auth_method: 'google' }], 1]);
   const withProduction = async (fn: () => Promise<void>) => {
     const prev = process.env.NODE_ENV;
     process.env.NODE_ENV = 'production';

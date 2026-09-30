@@ -162,5 +162,15 @@ export class CreateEmailPasswordAuthTables1790683000000 implements MigrationInte
         "createdAt" timestamp without time zone DEFAULT now() NOT NULL
       )
     `);
+    // 제약 · 인덱스도 baseline 과 같은 이름으로 복원한다 — 빠지면 되돌린 뒤 스키마 지문이
+    // 이전 상태와 달라진다(격리 PostgreSQL 15 에서 확인: 5895 → 5889 줄).
+    await q.query(`ALTER TABLE ONLY email_verification_tokens
+      ADD CONSTRAINT "PK_email_verification_tokens" PRIMARY KEY (id)`);
+    await q.query(`ALTER TABLE ONLY email_verification_tokens
+      ADD CONSTRAINT "UQ_email_verification_tokens_token" UNIQUE (token)`);
+    await q.query(`CREATE INDEX "IDX_email_verification_tokens_userId_createdAt"
+      ON email_verification_tokens USING btree ("userId", "createdAt")`);
+    await q.query(`ALTER TABLE ONLY email_verification_tokens
+      ADD CONSTRAINT "FK_email_verification_tokens_user" FOREIGN KEY ("userId") REFERENCES users(id) ON DELETE CASCADE`);
   }
 }

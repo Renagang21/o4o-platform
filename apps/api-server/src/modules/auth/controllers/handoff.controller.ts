@@ -44,7 +44,7 @@ import {
 import { getService, getServiceOrigin, O4O_SERVICES } from '../../../config/service-catalog.js';
 import { STORE_WORKSPACE_KEY, STORE_WORKSPACE_ORIGIN, isStoreWorkspaceExchangeOrigin } from '../../../config/store-workspace.js';
 import { resolveAccessibleStores } from '../../../utils/service-tenant.resolver.js';
-import { isHandoffWorkspace } from '../../../services/handoff-token.service.js';
+import { isHandoffWorkspace, type HandoffAuthMethod } from '../../../services/handoff-token.service.js';
 import { isRepresentativeEntryTarget, isRepresentativeEntryExchangeOrigin } from '../../../config/representative-entry.js';
 import { resolveAccountAccess } from '../../../common/auth/account-access.policy.js';
 import {
@@ -96,14 +96,24 @@ const SERVICE_SESSION_REVOKED_CODE = 'SERVICE_SESSION_REVOKED';
  *   · claim 이 없을 때 Origin 으로 좁히면: A 로그아웃 뒤 claim 없는 토큰으로 `Origin: B` 를
  *     보내 **B 의 세대만** 검사받는다. B 에서 로그아웃한 적 없으면 통과한다(5차 리뷰).
  * 그래서 claim 없는 토큰은 null 로 두어 refresh 와 같은 **사용자 전체 최대 세대** 규칙을 따른다.
+ *
+ *   authMethod    WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1 (최종 보완 1): 검증된 토큰의 `authMethod`
+ *                 claim. 'password' 면 password, claim 이 없는 검증된 토큰은 Google 세션이다
+ *                 (refresh 와 같은 해석). 토큰을 검증하지 못하면 password 로 둔다(fail-closed).
+ *                 body · Origin · 계정의 Google 연결 여부로 정하지 않는다.
  */
-function readCallerScope(req: Request): { serviceKey: string | null; sessionEpoch?: number } {
+function readCallerScope(req: Request): {
+  serviceKey: string | null;
+  sessionEpoch?: number;
+  authMethod: HandoffAuthMethod;
+} {
   const token = extractToken(req as never);
   const payload = token ? verifyAccessToken(token) : null;
+  const authMethod: HandoffAuthMethod = payload && payload.authMethod !== 'password' ? 'google' : 'password';
   if (payload?.serviceKey) {
-    return { serviceKey: payload.serviceKey, sessionEpoch: payload.sessionEpoch };
+    return { serviceKey: payload.serviceKey, sessionEpoch: payload.sessionEpoch, authMethod };
   }
-  return { serviceKey: null, sessionEpoch: undefined };
+  return { serviceKey: null, sessionEpoch: undefined, authMethod };
 }
 
 /**
@@ -122,7 +132,7 @@ function readCallerScope(req: Request): { serviceKey: string | null; sessionEpoc
 async function resolveVerifiedHandoffSource(
   req: Request,
   userId: string,
-): Promise<{ serviceKey: string; sessionEpoch: number } | null> {
+): Promise<{ serviceKey: string; sessionEpoch: number; authMethod: HandoffAuthMethod } | null> {
   // claim 이 없는 배포 전 토큰도 **건너뛰지 않는다** — 건너뛰면 만료 전 최대 15분 동안
   // 로그아웃된 서비스의 인증으로 긴 세션을 얻을 수 있다(4차 리뷰 지적).
   const scope = readCallerScope(req);
@@ -136,12 +146,11 @@ async function resolveVerifiedHandoffSource(
   return {
     serviceKey: scope.serviceKey ?? 'unknown',
     sessionEpoch: scope.sessionEpoch ?? INITIAL_SESSION_EPOCH,
+    authMethod: scope.authMethod,
   };
 }
 
 const SESSION_REVOKED_CODE = 'HANDOFF_SESSION_REVOKED';
-const HANDOFF_PASSWORD_SESSION_CODE = 'HANDOFF_PASSWORD_SESSION_NOT_ALLOWED';
-const HANDOFF_PASSWORD_SESSION_MESSAGE = 'Google 이 연결된 계정은 Google 로 로그인한 뒤 서비스를 이동할 수 있습니다.';
 const SESSION_REVOKED_MESSAGE = '로그인 세션이 종료되었습니다. 다시 로그인해 주세요.';
 function hasLiveSession(user: { refreshTokenFamily?: string | null } | null | undefined): boolean {
   return typeof user?.refreshTokenFamily === 'string' && user.refreshTokenFamily.length > 0;
@@ -223,8 +232,6 @@ export class HandoffController extends BaseController {
           return BaseController.error(res, '접근 가능한 매장이 없습니다.', 403, 'HANDOFF_TARGET_NO_MEMBERSHIP');
         }
 
-        const passwordBlocked = await HandoffController.rejectPasswordSessionOfGoogleLinkedAccount(req, res, user.id);
-        if (passwordBlocked) return passwordBlocked;
         const source = await resolveVerifiedHandoffSource(req, user.id);
         if (!source) {
           return BaseController.error(res, SESSION_REVOKED_MESSAGE, 401, SERVICE_SESSION_REVOKED_CODE);
@@ -234,6 +241,7 @@ export class HandoffController extends BaseController {
           source.serviceKey,
           { kind: 'workspace', targetWorkspace: STORE_WORKSPACE_KEY },
           source.sessionEpoch,
+          source.authMethod,
         );
         const targetUrl =
           `${STORE_WORKSPACE_ORIGIN}/handoff?token=${handoffToken}` +
@@ -268,8 +276,6 @@ export class HandoffController extends BaseController {
         return BaseController.error(res, 'returnPath must be / for representative entry', 400, 'VALIDATION_ERROR');
       }
       try {
-        const passwordBlocked = await HandoffController.rejectPasswordSessionOfGoogleLinkedAccount(req, res, user.id);
-        if (passwordBlocked) return passwordBlocked;
         const source = await resolveVerifiedHandoffSource(req, user.id);
         if (!source) {
           return BaseController.error(res, SESSION_REVOKED_MESSAGE, 401, SERVICE_SESSION_REVOKED_CODE);
@@ -279,6 +285,7 @@ export class HandoffController extends BaseController {
           source.serviceKey,
           targetService.key,
           source.sessionEpoch,
+          source.authMethod,
         );
         const targetOrigin = getServiceOrigin(targetService.key) ?? `https://${targetService.domain}`;
         return BaseController.ok(res, {
@@ -350,8 +357,6 @@ export class HandoffController extends BaseController {
 
       // 대표 진입·workspace 와 같은 출발 검사를 거친다 — 이 경로만 빠져 있으면 로그아웃된
       // 서비스의 남은 access token 으로 발급받고, 원장 세대가 null 이라 교환 검사도 건너뛴다.
-      const passwordBlocked = await HandoffController.rejectPasswordSessionOfGoogleLinkedAccount(req, res, user.id);
-      if (passwordBlocked) return passwordBlocked;
       const source = await resolveVerifiedHandoffSource(req, user.id);
       if (!source) {
         return BaseController.error(res, SESSION_REVOKED_MESSAGE, 401, SERVICE_SESSION_REVOKED_CODE);
@@ -361,6 +366,7 @@ export class HandoffController extends BaseController {
         source.serviceKey,
         targetServiceKey,
         source.sessionEpoch,
+        source.authMethod,
       );
 
       // WO-O4O-KPA-BRANCH-PUBLIC-PATH-ROUTING-AND-CUSTOM-DOMAIN-BASELINE-V1:
@@ -484,7 +490,7 @@ export class HandoffController extends BaseController {
         }
         return HandoffController.issueHandoffSession(req, res, user, roles, memberships, {
           targetWorkspace: payload.targetWorkspace,
-        });
+        }, payload.sourceAuthMethod);
       }
 
       // ── REPRESENTATIVE ENTRY RETURN (neture.co.kr) ──────────────────────────
@@ -508,7 +514,7 @@ export class HandoffController extends BaseController {
         }
         return HandoffController.issueHandoffSession(req, res, user, roles, memberships, {
           targetServiceKey: payload.targetServiceKey,
-        });
+        }, payload.sourceAuthMethod);
       }
 
       // ── SERVICE HANDOFF (기존 로직 불변) ────────────────────────────────────
@@ -566,43 +572,11 @@ export class HandoffController extends BaseController {
 
       return HandoffController.issueHandoffSession(req, res, user, roles, memberships, {
         targetServiceKey: payload.targetServiceKey,
-      });
+      }, payload.sourceAuthMethod);
     } catch (err: any) {
       logger.error('[Handoff] Token exchange failed', err);
       return BaseController.error(res, 'Handoff exchange failed', 500, 'HANDOFF_EXCHANGE_FAILED');
     }
-  }
-
-  /**
-   * WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1 보완 3: 두 수단을 가진 계정의 **비밀번호 세션**은 handoff 를 발급받지 못한다.
-   *
-   * handoff 원장은 출발 세션의 수단을 기록하지 않고(스키마 변경 없음), exchange 는 수단을 계정의 Google 연결
-   * 여부로 추정한다. Google 이 연결된 계정의 비밀번호 세션이 통과하면 대상 세션이 **표식 없는(Google 과 같은)
-   * 세션**이 되어 이후 부여된 관리자 권한을 쓸 수 있다. 그래서 발급 시점에 닫는다 — 이 차단이 있으면
-   * "Google 연결 = Google 세션에서 출발" 이 성립해 exchange 의 추정이 정확해진다.
-   * 수단은 **검증된 access token 의 claim** 에서만 읽는다(body · Origin 불신).
-   * 비밀번호 전용 계정의 handoff 는 막지 않는다(대상 세션도 비밀번호 세션으로 발급된다).
-   */
-  private static async rejectPasswordSessionOfGoogleLinkedAccount(
-    req: Request,
-    res: Response,
-    userId: string,
-  ): Promise<any | null> {
-    const token = extractToken(req as never);
-    const payload = token ? verifyAccessToken(token) : null;
-    if (payload?.authMethod !== 'password') return null;
-    if (!(await HandoffController.hasGoogleIdentity(userId))) return null;
-    logger.warn('[Handoff] Blocked generation — password session of Google-linked account', { userId });
-    return BaseController.error(res, HANDOFF_PASSWORD_SESSION_MESSAGE, 403, HANDOFF_PASSWORD_SESSION_CODE);
-  }
-
-  /** 이 계정에 Google 수단이 연결돼 있는가 (`linked_accounts` · provider='google' · 사용자당 최대 1행) */
-  private static async hasGoogleIdentity(userId: string): Promise<boolean> {
-    const rows: unknown[] = await AppDataSource.query(
-      `SELECT 1 FROM linked_accounts WHERE "userId" = $1 AND provider = 'google' LIMIT 1`,
-      [userId],
-    );
-    return rows.length > 0;
   }
 
   /**
@@ -615,6 +589,7 @@ export class HandoffController extends BaseController {
     roles: string[],
     memberships: { serviceKey: string; status: string }[],
     target: { targetServiceKey?: string; targetWorkspace?: string },
+    sourceAuthMethod: HandoffAuthMethod,
   ): Promise<any> {
     // 5. Generate auth tokens
     // WO-O4O-LOGOUT-ALL-TOKEN-INVALIDATION-V1:
@@ -630,13 +605,12 @@ export class HandoffController extends BaseController {
     // 것은 대상 서비스의 세션이고, 그 서비스에서 로그아웃하면 이 토큰이 끊겨야 한다.
     const sessionEpoch = await readServiceSessionEpoch(user.id, sessionServiceKey);
 
-    // WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1 §2-4: handoff 로 **관리자 경계를 우회하지 못하게** 한다.
-    //   handoff 원장(`handoff_tokens`)은 출발 세션의 수단을 기록하지 않는다(스키마 변경 없이 간다).
-    //   그래서 수단을 계정에서 보수적으로 판정한다: Google 연결이 없는 계정 = 비밀번호 전용 →
-    //   대상 세션도 비밀번호 세션으로 발급한다. Google 연결이 있으면 종전과 같다(claim 부재).
-    //   두 수단을 다 가진 계정의 비밀번호 세션은 **발급 단계에서 거절**된다
-    //   (`rejectPasswordSessionOfGoogleLinkedAccount`) — 그래서 Google 연결 계정의 원장은 Google 세션 출발이다.
-    const authMethod = (await HandoffController.hasGoogleIdentity(user.id)) ? null : ('password' as const);
+    // WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1 §2-4 · 최종 보완 1: 교환 세션은 **원장에 남은 출발 수단**을 승계한다.
+    //   수단은 발급 시점에 검증된 access token claim 에서 온 값이다. 교환 시점의 Google 연결 여부 ·
+    //   역할로 다시 추정하지 않는다 — 그 사이 Google 이 연결되거나 역할이 붙어도 비밀번호 세션이
+    //   Google 세션으로 승격되지 않는다. NULL(컬럼 이전 발급분)은 원장 읽기에서 password 로 온다.
+    //   비밀번호 세션이면 **지금의 역할**로 관리자 경계(Admin 화면 · platform:*)를 다시 본다.
+    const authMethod = sourceAuthMethod === 'google' ? null : ('password' as const);
     if (authMethod === 'password' && !isPasswordSessionAllowed(sessionServiceKey, roles)) {
       logger.warn('[Handoff] Blocked exchange — password session admin boundary', { userId: user.id });
       return BaseController.error(res, PASSWORD_SESSION_NOT_ALLOWED_MESSAGE, 403, PASSWORD_SESSION_NOT_ALLOWED_CODE);

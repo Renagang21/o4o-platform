@@ -1,7 +1,7 @@
 # CHECK-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1
 
 > 대상 WO: [`WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1`](../work-orders/WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1.md)
-> 작성: 2026-09-30 · 갱신: 2026-09-30 (PR #257 병합·배포 전 보완 1~6) · 상태: **구현 · 로컬 검증 완료 / 운영 적용 · 실계정 확인 전 (DONE 아님)**
+> 작성: 2026-09-30 · 갱신: 2026-09-30 (PR #257 병합·배포 전 보완 1~6 · 배포 전 최종 보완 1~4) · 상태: **구현 · 로컬 검증 완료 / 운영 적용 · 실계정 확인 전 (DONE 아님)**
 
 ---
 
@@ -13,7 +13,7 @@
 | API | `EmailAuthService` · `PasswordCredentialService`(bcryptjs cost 12 · bcrypt 사용 파일은 이것 하나) · `email-auth.controller` — `POST /auth/email/{signup,verify,resend,login}` · `POST /auth/password/{forgot,reset}` · `POST /auth/account/find-id` · 로그인 사용자 `/auth/password` |
 | 규칙 정본 | 이메일 정규화 · 형태 · 비밀번호 정책 · 안내 문구 · 가림 = `@o4o/auth-utils` 하나(화면 · 서버 공용 · tsup 이 번들에 인라인). 휴대전화 형태만 서버 `common/auth/phone-shape` |
 | 세션 경계 | 토큰 claim `authMethod:'password'` · `password-session.policy` 가 login · refresh · middleware 에서 Admin 화면 · `platform:*` 역할 거부. 서비스 `:admin`(`supplier:admin` · `neture:admin` 등)은 거부 대상 아님 |
-| handoff | 비밀번호 세션이면서 Google 이 연결된 계정은 handoff **생성 단계에서 403** `HANDOFF_PASSWORD_SESSION_NOT_ALLOWED` (service · workspace · 대표 진입 3경로). 비밀번호만 가진 계정 · Google 세션은 종전대로 발급 |
+| handoff | **원장이 출발 세션의 실제 수단을 보관한다** — migration `1790684000000-AddHandoffTokenSourceAuthMethod` 로 `handoff_tokens.source_auth_method`(varchar(16) · nullable · CHECK google/password) 추가. 발급 시 수단은 **서버가 검증한 access token claim 에서만** 파생(claim `password` → password · 검증된 토큰에 claim 없음 → google · 검증 불가 → password). body · Origin · Google 연결 여부는 쓰지 않는다. 교환 세션은 원장 값을 승계(`google` 외 값 · NULL → password)하고, password 이면 교환 시점의 새 역할로 `isPasswordSessionAllowed` 를 다시 적용(`platform:*` → 403 `PASSWORD_SESSION_NOT_ALLOWED`). 이전 보완의 "Google 연결 계정의 비밀번호 세션 handoff 403"은 **제거** — 정상적인 서비스 이동을 막지 않는다 |
 | 입력 오류 응답 | 공통 `validateDto` · `validateQuery` · `validateParams` 400 응답이 민감 필드(password · passwordConfirm · currentPassword · newPassword · token · refreshToken 등)의 `value` 를 싣지 않는다. 그 밖의 값은 `redactSensitive` 경유 |
 | 세션 서비스 | 요청 Origin → `resolveSessionServiceKey` 로 파생. body `serviceKey` 받지 않음 |
 | 공통 UI | `@o4o/auth-react` `email/` — `EmailLoginForm` · `EmailSignupForm` · `EmailSentNotice` · `VerifyEmailView` · `ForgotPasswordForm` · `ResetPasswordForm` · `FindLoginIdForm` · `PasswordInput`(보기/숨기기) · `PasswordPolicyHints` |
@@ -31,8 +31,26 @@
 | api-server Jest (auth 관련 18 suites) | PASS |
 | — `validation-sensitive-echo.test.ts` (신규) | 비정상 입력 9종(200자 초과 · 비문자열 password · 허용 밖 `passwordConfirm` · verify/reset token · newPassword · currentPassword · refreshToken) → 400, 응답 본문에 입력 표식 0 · `value` 키 0. 일반 필드 값은 유지 · 중첩 token 은 `[REDACTED]` |
 | — `refreshTokenFamilyContract.test.ts` P1~P4 (추가) | refresh 회전 후 `authMethod` 유지 · 나중에 붙은 `platform:*` 역할은 refresh 거부 · `supplier:admin`/`neture:admin` 허용 · Google 세션은 platform 역할이어도 회전 |
-| — `unified-store-workspace-handoff.spec.ts` C-2 (추가) | 3경로 × Google 연결 비밀번호 세션 → 403 · INSERT 0 / 비밀번호 전용 · Google 세션 → 발급 |
-| — `email-password-auth-migration-guard.spec.ts` (신규) | 0행 · 옛 형태 → DROP 후 재생성 / 행 존재 · 예상 밖 형태 2종 → DROP 전 실패. **QueryRunner 대역** — 실 PostgreSQL 왕복 아님(격리 PG 기동이 권한으로 거부됨) |
+| — `unified-store-workspace-handoff.spec.ts` C-2 · D (재작성) | 발급: 3경로 × 비밀번호 세션 → 200 · 원장 `password` · `linked_accounts` 조회 0 / Google 세션 → `google` / 위조 토큰 + body 주장 → `password`. 교환: 원장 password → 대상 세션 password(교환 시 Google 연결돼 있어도) · NULL → password · password + 발급 뒤 `platform:*` 추가 → 403 · 토큰 발급 0 · password + `kpa-society:admin` → 허용 · google + `platform:super_admin` → Google 세션(claim 없음) |
+| — `email-password-auth-migration-guard.spec.ts` (신규) | 0행 · 옛 형태 → DROP 후 재생성 / 행 존재 · 예상 밖 형태 2종 → DROP 전 실패 (QueryRunner 대역). 실 PostgreSQL 검증은 §2-1 |
+| 계약 검사 `scripts/db/check-migration-contract.mjs` | 21 pass / 0 fail (baseline + incremental 11 state 등록) |
+
+### 2-1. 격리 PostgreSQL 실검증 (2026-09-30)
+
+운영 DB 가 아닌 로컬 docker `postgres:15.17`(운영 15.18 과 같은 major) · loopback 전용 포트 · 임시 DB · 무작위 비밀번호(미기록). 실제 `migrate.ts`(`transaction:'each'` · 사전/사후 fingerprint 단언)로 실행했다.
+
+| 시나리오 | 결과 |
+|---|---|
+| S1 신규 bootstrap + incremental 11 | exit 0 · POST PASS (state 11 = `a110d335…` / 5927 lines) |
+| S4 운영 경로: state 9(운영 현재)에서 10 · 11 적용 | exit 0 · PRE PASS(state 9) · POST PASS |
+| S2 state 9 + `email_verification_tokens` 1행 | exit 1 "has 1 row(s) — refusing to DROP". 이후 `typeorm_migrations` 9행 그대로 · 신규 테이블 없음 · 행 보존 · `source_auth_method` 없음(11 미실행) · fingerprint 불변 → **전체 롤백** |
+| S3a 예상 밖 형태(`token_hash` 컬럼 추가) · `migrate.ts` | 사전 단언 FAILED `UNKNOWN_PARTIAL` → migration 하나도 실행 안 함 |
+| S3b · S3c 가드 직접 실행(`token_hash` 존재 · `token` 이름 변경) | "not the expected legacy shape — refusing to DROP" |
+| S5 재실행(S1 · S4 뒤) | pending 0 · PRE/POST PASS |
+| `down()` 11 → 10 → 9 | 정확히 state 10(`914406ef…`/5924) · state 9(`7fdd328f…`/5895) 복귀 |
+| CHECK 제약 | google · password · NULL 삽입 OK · `'GOOGLE'` → check violation |
+
+발견 · 수정 1건: email migration `down()` 이 옛 `email_verification_tokens` 를 PK · UNIQUE · 인덱스 · FK 없이 재생성하고 있었다(5889 ≠ 5895). baseline 이름 그대로 복원하도록 고쳤다(운영 미적용 migration 이라 수정 가능). 적용된 migration 은 수정하지 않았다.
 | — `emailAuthService.test.ts` (추가) | 발송 실패(`success:false` · 예외) → `mailSent:false` · 계정 유지 · 재발송 링크로 확인 완료 |
 | auth-react · auth-client · auth-utils · web-neture vitest | PASS (이전 실행, 이번 보완에서 해당 코드 무변경) |
 | 운영 적용 · 실계정 가입/로그인 | **미실시** — 배포 승인 필요 |
@@ -71,7 +89,7 @@ Guard spec: `google-only-auth-cleanup.spec` · `legacy-password-auth-retirement.
 ## 5. 알려진 한계
 
 1. 아이디 찾기는 가린 이메일 힌트를 준다 — 가입 여부의 완전한 은닉은 목표가 아니다(WO §2-3).
-2. ~~handoff 수단 표식 미유지~~ → **보완**: Google 연결 계정의 비밀번호 세션은 handoff 생성 거부. 남은 창: 생성과 교환 사이(60초) 에 Google 이 새로 연결되면 교환 측은 Google 세션으로 추정한다(`handoff_tokens` 에 수단 컬럼 추가 = 스키마 변경이라 하지 않음).
+2. ~~handoff 수단 표식 미유지~~ → **해소**: 원장 `source_auth_method` 승계(§1). 발급과 교환 사이에 Google 이 연결되거나 역할이 바뀌어도 password 가 google 로 승격되지 않는다. 배포 창 주의: migration 적용 ~ 새 revision traffic 전환 사이(약 1분)에 옛 코드가 발급한 handoff 는 NULL → password 로 교환된다(fail-closed). 이 창에 handoff 하는 `platform:*` Google 사용자는 403 을 받고 다시 시도하면 된다.
 3. 재설정 후 기존 access token 은 만료(15분)까지 유효 — refresh 는 즉시 무효.
 4. 횟수 제한은 인스턴스별 메모리 limiter — Cloud Run 다중 인스턴스에서 합산되지 않는다.
 5. bcrypt 72바이트 초과 부분은 비교에 쓰이지 않는다.
@@ -79,8 +97,23 @@ Guard spec: `google-only-auth-cleanup.spec` · `legacy-password-auth-retirement.
 7. ~~`validateDto` 400 응답의 `value` 되돌림~~ → **보완**: 민감 필드 `value` 제외(§1 · §2).
 8. 메일 링크는 항상 neture origin 으로 간다(`resolveMailLinkOrigin`).
 9. `/register` 는 여전히 로그인 모달을 연다(이메일 가입 링크는 모달 안에 있다).
-10. migration 가드는 실 PostgreSQL 이 아니라 대역으로 검증했다 — 운영 적용 로그로 최종 확인.
+10. ~~migration 가드 대역 검증만~~ → **해소**: 격리 PG 15.17 실검증(§2-1). 운영 적용 로그로 최종 확인은 여전히 필요.
+11. CodeQL 은 `apps/api-server/src` 만 분석한다(web · packages 미분석). PR 분석은 diff-informed.
+
+## 5-1. CodeQL 결과 보존
+
+repo 에 code scanning 이 켜져 있지 않아 SARIF 업로드가 실패한다(설정 · 공개 범위 · 유료 기능 변경은 범위 밖). `ci-security.yml` 에 `output: codeql-sarif` + `if: always()` artifact(`codeql-sarif-typescript`, 14일) 만 추가했다. 결과 판정은 최종 HEAD 의 SARIF 를 직접 읽어 완료 보고에 기록한다 — 분석 완료만으로 보안 PASS 로 기록하지 않는다.
+
+## 5-2. 롤백
+
+- `deploy-api.yml` 순서: 이미지 build/push → **Run database migrations**(`gcloud run jobs execute o4o-api-migrations --wait`, `continue-on-error` 없음) → **Deploy to Cloud Run** → 검증. migration 실패 시 step 실패로 workflow 가 멈춰 **새 revision 배포 · traffic 전환이 일어나지 않고** 기존 revision 이 계속 서비스한다. 자동 revert · `down()` 경로는 없다.
+- 기본 롤백 = API · web-neture 를 직전 revision 으로 traffic 복귀(`gcloud run services update-traffic`). 추가된 컬럼(nullable) · 신규 테이블은 옛 코드와 호환된다.
+- **가입 데이터가 생긴 뒤에는 migration `down()` 을 실행하지 않는다** — `user_password_credentials` · `password_reset_tokens` · 인증 토큰을 DROP 한다. 필요 시 별도 WO.
+
+## 5-3. 후속
+
+- `SMTP_PASS` 를 plain env 에서 Secret Manager 참조(`--update-secrets`)로 이전 — 별도 WO(비밀값 미기재).
 
 ## 6. 남은 절차
 
-CI green → 배포 범위 보고(API + migration · web-neture · 공통 패키지 소비 서비스) → 사용자 배포 승인 → 운영 적용(직전 §3 재확인) → Google 로그인 회귀 · 실계정 가입 · 확인 메일 · 로그인 · 새로고침 유지 · handoff · 로그아웃 · 아이디 찾기 · 비밀번호 재설정 → DONE.
+CI green · SARIF 판정 → 배포 범위 보고(API + migration 10 · 11 · web-neture · 공통 패키지 소비 서비스) → 사용자 배포 승인 → 운영 적용(직전 §3 재확인) → Google 로그인 회귀 · 실계정 가입 · 확인 메일 · 로그인 · 새로고침 유지 · handoff · 로그아웃 · 아이디 찾기 · 비밀번호 재설정 → DONE.
