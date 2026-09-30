@@ -15,6 +15,7 @@
 | 세션 경계 | 토큰 claim `authMethod:'password'` · `password-session.policy` 가 login · refresh · middleware 에서 Admin 화면 · `platform:*` 역할 거부. 서비스 `:admin`(`supplier:admin` · `neture:admin` 등)은 거부 대상 아님 |
 | handoff | **원장이 출발 세션의 실제 수단을 보관한다** — migration `1790684000000-AddHandoffTokenSourceAuthMethod` 로 `handoff_tokens.source_auth_method`(varchar(16) · nullable · CHECK google/password) 추가. 발급 시 수단은 **서버가 검증한 access token claim 에서만** 파생(claim `password` → password · 검증된 토큰에 claim 없음 → google · 검증 불가 → password). body · Origin · Google 연결 여부는 쓰지 않는다. 교환 세션은 원장 값을 승계(`google` 외 값 · NULL → password)하고, password 이면 교환 시점의 새 역할로 `isPasswordSessionAllowed` 를 다시 적용(`platform:*` → 403 `PASSWORD_SESSION_NOT_ALLOWED`). 이전 보완의 "Google 연결 계정의 비밀번호 세션 handoff 403"은 **제거** — 정상적인 서비스 이동을 막지 않는다 |
 | 입력 오류 응답 | 공통 `validateDto` · `validateQuery` · `validateParams` 400 응답이 민감 필드(password · passwordConfirm · currentPassword · newPassword · token · refreshToken 등)의 `value` 를 싣지 않는다. 그 밖의 값은 `redactSensitive` 경유 |
+| 교차 사이트 요청 | 신규 route 8개(`/auth/email/*` · `/auth/password/{forgot,reset}` · `/auth/account/find-id` · `POST /auth/password`)는 `requireJsonBody` — JSON 외 본문은 415 `UNSUPPORTED_MEDIA_TYPE`(§5-1) |
 | 세션 서비스 | 요청 Origin → `resolveSessionServiceKey` 로 파생. body `serviceKey` 받지 않음 |
 | 공통 UI | `@o4o/auth-react` `email/` — `EmailLoginForm` · `EmailSignupForm` · `EmailSentNotice` · `VerifyEmailView` · `ForgotPasswordForm` · `ResetPasswordForm` · `FindLoginIdForm` · `PasswordInput`(보기/숨기기) · `PasswordPolicyHints` |
 | 클라이언트 | `@o4o/auth-client` `loginWithEmail` 외 6 메서드 · `useServiceAuth.loginWithEmail` |
@@ -98,16 +99,28 @@ Guard spec: `google-only-auth-cleanup.spec` · `legacy-password-auth-retirement.
 8. 메일 링크는 항상 neture origin 으로 간다(`resolveMailLinkOrigin`).
 9. `/register` 는 여전히 로그인 모달을 연다(이메일 가입 링크는 모달 안에 있다).
 10. ~~migration 가드 대역 검증만~~ → **해소**: 격리 PG 15.17 실검증(§2-1). 운영 적용 로그로 최종 확인은 여전히 필요.
-11. CodeQL 은 `apps/api-server/src` 만 분석한다(web · packages 미분석). PR 분석은 diff-informed.
+11. CodeQL 은 `apps/api-server/src` 만 분석한다(web · packages 미분석). PR 실행도 결과는 저장소 전체(793)다.
 
 ## 5-1. CodeQL 결과 보존
 
 repo 에 code scanning 이 켜져 있지 않아 SARIF 업로드가 실패한다(설정 · 공개 범위 · 유료 기능 변경은 범위 밖). `ci-security.yml` 에 `output: codeql-sarif` + `if: always()` artifact(`codeql-sarif-typescript`, 14일) 만 추가했다. 결과 판정은 SARIF 를 직접 읽어 기록한다 — 분석 완료만으로 보안 PASS 로 기록하지 않는다.
 
-**`ed57dfcf1` SARIF (run 36672957743)**: 분석 성공(`executionSuccessful:true`) · step 실패 원인 = 업로드("Code scanning is not enabled") 뿐. 결과 793건 — `js/missing-rate-limiting` 757 · `incomplete-multi-character-sanitization` 14 · `incomplete-url-substring-sanitization` 6 · `double-escaping` 5 · `bad-tag-filter` 3 · `clear-text-storage-of-sensitive-data` 2 · `missing-token-validation` · `biased-cryptographic-random` · `insecure-helmet-configuration` · `sensitive-get-query` · `client-exposed-cookie` · `clear-text-cookie` 각 1.
-- 이 PR 이 바꾼 api-server 파일에 걸린 것은 `auth.routes.ts` 의 `missing-rate-limiting` 12건뿐이며, 모두 **기존 route**(Google login · refresh · me · logout 등) 줄이다. PR hunk(신규 email/password route 7 + `POST /auth/password`) 안의 결과는 0 — 신규 route 는 전부 limiter 를 거친다.
-- 나머지 781건은 이 PR 이 건드리지 않은 파일의 기존 결과다. 기존 결과 정리는 범위 밖 — 별도 WO 제안(특히 `missing-token-validation` · `clear-text-storage` · `insecure-helmet-configuration` 우선 triage).
-- 판정: **이 PR 의 신규 결과 0 · 기존 결과 미해결** (보안 전체 PASS 아님).
+**수치 정합** (`727fb78f6` 기준. `requireJsonBody` 보완 커밋 이후 SARIF 재확인은 PR #257 코멘트 · 완료 보고)
+
+`727fb78f6` SARIF(run 36673875507): 분석 성공(`executionSuccessful:true`) · step 실패 원인 = 업로드("Code scanning is not enabled") 뿐. 결과 **793건**(PR 전체 저장소 결과 — diff 로 좁혀지지 않았다) — `js/missing-rate-limiting` 757 · `incomplete-multi-character-sanitization` 14 · `incomplete-url-substring-sanitization` 6 · `double-escaping` 5 · `bad-tag-filter` 3 · `clear-text-storage-of-sensitive-data` 2 · `missing-token-validation` · `biased-cryptographic-random` · `insecure-helmet-configuration` · `sensitive-get-query` · `client-exposed-cookie` · `clear-text-cookie` 각 1.
+
+- 비교 기준: 병합 기준점 `bfa48c135`(main 분기점 = 현 운영 API · web-neture 이미지) ↔ PR HEAD 의 `git diff -U0` 변경 줄. main 에는 SARIF 보존 step 이 없어 **SARIF 대 SARIF 비교는 불가** — 위치 대조로 판정한다.
+- 판정 방법: 각 결과의 **대표 위치 + relatedLocations + codeFlows 전 위치**를 변경 줄과 대조한다.
+- 793 = **12**(대표 위치가 PR 이 바꾼 파일 `auth.routes.ts` 에 있으나 변경되지 않은 기존 route 줄 — `missing-rate-limiting`, 관련 위치도 변경 줄 밖) + **781**(대표 위치가 PR 이 바꾸지 않은 파일).
+- 대표 위치가 PR 변경 줄에 있는 결과 = 0. **그러나 관련 위치 · 흐름이 PR 변경 줄을 지나는 결과 3건**이 있다 — 이전 보고의 "신규 0"은 대표 위치만 본 판정이라 정정한다. 3건 모두 대표 위치는 변경되지 않은 파일(기존 결과)이며, 이 PR 이 새 경로를 보탰다.
+
+| 결과 | 대표 위치 | PR 관련 위치 | 판정 |
+|---|---|---|---|
+| `js/missing-token-validation` (CSRF) | `bootstrap/setup-middlewares.ts:247` `cookieParser()` | 관련 handler 1140 중 신규 route 8(`auth.routes.ts` 100~106 · `/password`) | **관련 · 보완함**. 쿠키는 운영 `SameSite=None` · `express.urlencoded` 활성 → 교차 사이트 form 이 쿠키를 싣고 도착 가능. 1차 방어 = CORS(비허용 Origin 은 `callback(new Error)` → handler 전 중단). 특히 `POST /auth/password` 는 비밀번호 없는 계정에 현재 비밀번호 없이 첫 비밀번호를 설정하므로 2차 방어로 `requireJsonBody`(JSON 외 415 · handler 미실행) 를 신규 route 8개에 적용 → 교차 출처 요청은 반드시 preflight(CORS 거부)를 거친다. 테스트 `middleware/__tests__/require-json-body.test.ts` 13. 전역 CSRF token 도입은 전 서비스 계약 변경이라 범위 밖 — CodeQL 규칙은 token middleware 만 인정하므로 이 결과 자체는 남는다 |
+| `js/clear-text-storage-of-sensitive-data` ×2 | `utils/cookie.utils.ts:86` · `:92` (`setAuthCookies` 의 access · refresh 쿠키) | 흐름: `email-auth.service.ts:248` `generateTokensWithContext` → `:439` · `:455` → `email-auth.controller.ts:94~95` | **관련 · 설계상 유지**. 저장되는 값은 비밀번호가 아니라 세션 토큰이며, Google 로그인과 같은 sink(기존 결과). 쿠키는 `httpOnly:true` · 운영 `secure:true`. 비밀번호 원문 · 해시는 흐름에 없다. 토큰을 쿠키에 두는 세션 구조 변경은 범위 밖 |
+| `js/insecure-helmet-configuration` | `src/server.ts:25` | 없음 | **무관**. `server.ts` 는 tsup entry 가 아니고 import 하는 곳 0 → 운영 번들 밖. 게다가 production 에서는 CSP 켜짐(`undefined`). 운영 진입점 `main.ts` → `setupMiddlewares` 는 CSP directive · `frameAncestors 'none'` · `frameguard deny`. API 는 JSON 만 응답 — 신규 화면(`/signup` 등)은 web-neture 컨테이너가 서빙 |
+
+기존 결과 전체 정비(781 + 위 3건의 전역 측면)는 후속 보안 작업.
 
 ## 5-2. 롤백
 
@@ -115,10 +128,26 @@ repo 에 code scanning 이 켜져 있지 않아 SARIF 업로드가 실패한다(
 - 기본 롤백 = API · web-neture 를 직전 revision 으로 traffic 복귀(`gcloud run services update-traffic`). 추가된 컬럼(nullable) · 신규 테이블은 옛 코드와 호환된다.
 - **가입 데이터가 생긴 뒤에는 migration `down()` 을 실행하지 않는다** — `user_password_credentials` · `password_reset_tokens` · 인증 토큰을 DROP 한다. 필요 시 별도 WO.
 
+## 5-2-1. 배포 대상 (서비스명 확정)
+
+`DEPLOY_ENABLED=false` 인 채로 병합하면 push 기반 배포는 모두 보류된다. 배포는 **서비스 지정 수동 실행**으로만 한다 — detector 는 `@o4o/auth-react` · `@o4o/auth-client` 소비처 8개(web 7 + admin)를 영향으로 판정하므로 자동 전체 배포를 쓰지 않는다.
+
+| 대상 | 재배포 | 근거 |
+|---|---|---|
+| `o4o-core-api` (+ job `o4o-api-migrations`: incremental 10 `CreateEmailPasswordAuthTables1790683000000` · 11 `AddHandoffTokenSourceAuthMethod1790684000000`) | **필요** | 신규 route · 세션 정책 · handoff 원장. `@o4o/auth-utils` 는 번들에 인라인 |
+| `neture-web` | **필요** | 이메일 로그인 모달 · `/signup` · `/verify-email` · `/find-id` · `/forgot-password` · `/reset-password` (메일 링크 origin = neture.co.kr) |
+| `kpa-society-web` · `k-cosmetics-web` · `pharmacy-hub-web` · `lecture-web` · `store-web` · `kpa-branch-web` | 불필요 | 공통 패키지 변경은 추가형(새 컴포넌트 · 선택 메서드 `loginWithEmail?`). 이 서비스들은 이메일 로그인 화면이 없다. 비밀번호 세션은 handoff 로만 도착하며 교환 · refresh · `/me` 응답 형태는 변경 없음(`authMethod` 는 JWT claim 안에만). 비밀번호 세션 refresh 는 claim 을 유지하며 회전(P1 테스트) |
+| `o4o-admin-dashboard` | 불필요 | 비밀번호 세션은 Admin 화면에서 교환 403 · middleware 403 — 옛 화면도 서버 판정으로 막힌다(의도) |
+| `hospital-pharmacy-web` · `signage-player-web` · `glucoseview-web` | 불필요 | 공통 인증 패키지 비소비 또는 무관 |
+
+현 운영(2026-09-30 read-only): `o4o-core-api-03758-wdt` 100% · `neture-web-01664-t5r` 100% · migration job 이미지 `bfa48c135` (= PR 병합 기준점). 운영 DB: `typeorm_migrations` 693(= KEEP 684 + incremental 9) · `email_verification_tokens` 0행 · 옛 형태 컬럼 · 참조 FK 0 · 신규 테이블 0 · `handoff_tokens.source_auth_method` 없음.
+
+배포 순서: ① 직전 read-only 재확인(위 항목) ② `DEPLOY_ENABLED=true` → `deploy-api` 수동 실행(migration 10 · 11 → 새 revision → 100%) ③ 확인 후 `deploy-web-services` `service=neture` ④ `DEPLOY_ENABLED=false` 복귀. 게이트가 열린 동안의 다른 main push 는 자동 배포 대상이 될 수 있으므로 창을 짧게 둔다.
+
 ## 5-3. 후속
 
 - `SMTP_PASS` 를 plain env 에서 Secret Manager 참조(`--update-secrets`)로 이전 — 별도 WO(비밀값 미기재).
 
 ## 6. 남은 절차
 
-CI green · SARIF 판정 → 배포 범위 보고(API + migration 10 · 11 · web-neture · 공통 패키지 소비 서비스) → 사용자 배포 승인 → 운영 적용(직전 §3 재확인) → Google 로그인 회귀 · 실계정 가입 · 확인 메일 · 로그인 · 새로고침 유지 · handoff · 로그아웃 · 아이디 찾기 · 비밀번호 재설정 → DONE.
+CI green · SARIF 판정 → 배포 범위 보고(§5-2-1: `o4o-core-api` + migration 10 · 11 · `neture-web` 만) → 사용자 배포 승인 → 운영 적용(직전 §3 재확인) → Google 로그인 회귀 · 실계정 가입 · 확인 메일 · 로그인 · 새로고침 유지 · handoff · 로그아웃 · 아이디 찾기 · 비밀번호 재설정 → DONE.

@@ -50,6 +50,7 @@ import {
   emailTokenLimiter,
   findLoginIdLimiter,
 } from '../../../middleware/rateLimiter.js';
+import { requireJsonBody } from '../../../middleware/require-json-body.middleware.js';
 
 const router: IRouter = Router();
 
@@ -95,13 +96,14 @@ router.post(
 // POST /api/v1/auth/password/forgot  - { email } → 재설정 메일 (존재 여부 비노출)
 // POST /api/v1/auth/password/reset   - { token, newPassword } → 새 비밀번호 + 전역 세션 폐기
 // POST /api/v1/auth/account/find-id  - { name, phone } → 가린 이메일 힌트 | 일반 안내
-router.post('/email/signup', emailSignupLimiter, validateDto(EmailSignupRequestDto), asyncHandler(EmailAuthController.signup));
-router.post('/email/verify', emailTokenLimiter, validateDto(EmailTokenRequestDto), asyncHandler(EmailAuthController.verify));
-router.post('/email/resend', emailMailLimiter, validateDto(EmailAddressRequestDto), asyncHandler(EmailAuthController.resend));
-router.post('/email/login', emailLoginLimiter, validateDto(EmailLoginRequestDto), asyncHandler(EmailAuthController.login));
-router.post('/password/forgot', emailMailLimiter, validateDto(EmailAddressRequestDto), asyncHandler(EmailAuthController.forgot));
-router.post('/password/reset', emailTokenLimiter, validateDto(PasswordResetRequestDto), asyncHandler(EmailAuthController.reset));
-router.post('/account/find-id', findLoginIdLimiter, validateDto(FindLoginIdRequestDto), asyncHandler(EmailAuthController.findId));
+// 모두 JSON 본문만 받는다(requireJsonBody) — 교차 사이트 form 요청 방어
+router.post('/email/signup', requireJsonBody, emailSignupLimiter, validateDto(EmailSignupRequestDto), asyncHandler(EmailAuthController.signup));
+router.post('/email/verify', requireJsonBody, emailTokenLimiter, validateDto(EmailTokenRequestDto), asyncHandler(EmailAuthController.verify));
+router.post('/email/resend', requireJsonBody, emailMailLimiter, validateDto(EmailAddressRequestDto), asyncHandler(EmailAuthController.resend));
+router.post('/email/login', requireJsonBody, emailLoginLimiter, validateDto(EmailLoginRequestDto), asyncHandler(EmailAuthController.login));
+router.post('/password/forgot', requireJsonBody, emailMailLimiter, validateDto(EmailAddressRequestDto), asyncHandler(EmailAuthController.forgot));
+router.post('/password/reset', requireJsonBody, emailTokenLimiter, validateDto(PasswordResetRequestDto), asyncHandler(EmailAuthController.reset));
+router.post('/account/find-id', requireJsonBody, findLoginIdLimiter, validateDto(FindLoginIdRequestDto), asyncHandler(EmailAuthController.findId));
 
 // POST /api/v1/auth/refresh - Refresh access token
 router.post(
@@ -134,6 +136,7 @@ router.patch(
 // POST /api/v1/auth/password - 로그인 사용자의 비밀번호 설정·변경 (WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1)
 router.post(
   '/password',
+  requireJsonBody,
   requireAuth,
   emailTokenLimiter,
   validateDto(PasswordSetRequestDto),
