@@ -2,25 +2,26 @@
 
 > **WO**: WO-O4O-PRODUCTION-PENDING-DELTA-CENSUS-AND-CONTROLLED-RELEASE-V1
 > **target SHA**: `e2e1be6cc` (main HEAD, 2026-09-30) · `CI Pipeline` success (run 36714220555) · CodeQL success
-> **상태**: **CENSUS 완료 · 배포 계획 사용자 승인 대기 (WO §24)** — production 변경 0
+> **상태**: **CONTROLLED RELEASE 완료 (2026-09-30 13:04–13:52Z · 사용자 승인)** — 5개 서비스 배포 · DB write 0 · `DEPLOY_ENABLED=false` 복구
 > **선행**: [CHECK-O4O-CICD-SAFE-AUTODEPLOY-AND-RISK-GATE-V1](CHECK-O4O-CICD-SAFE-AUTODEPLOY-AND-RISK-GATE-V1.md)
 
 ---
 
-## 0. 판정 (census 단계)
+## 0. 최종 판정
 
 ```text
 PENDING_DELTA_CENSUS       = PASS
-MIGRATION_SAFETY           = PASS     (serving → target 사이 migration · DB 경로 0 · 운영 DB INCREMENTAL_PENDING=0)
+MIGRATION_SAFETY           = PASS     (diff DB 경로 0 · 배포 시 migration Job wr98c: PENDING 0 · EXECUTED 0 · 9/9 · fingerprint MATCH)
 AUTH_RBAC_SAFETY           = PASS     (auth · RBAC · middleware · guard · auth package 변경 0)
-CONTROLLED_RELEASE         = NOT_EXECUTED (승인 대기)
-WEB_VERIFIED_DEPLOY        = NOT_EXECUTED
-PIN_SERVICE_VERIFIED       = NOT_EXECUTED
-API_VERIFIED_DEPLOY        = NOT_EXECUTED
-ROLLBACK_VERIFICATION      = NOT_EXECUTED
-SHADOW_CONTINUITY          = PASS     (shadow run 36713802794 기록 유지)
-DEPLOY_ENABLED_FINAL       = FALSE
+CONTROLLED_RELEASE         = PASS     (계획한 5개 전부 · 나머지 6개는 실효 변경 없음으로 비대상)
+WEB_VERIFIED_DEPLOY        = PASS     (neture · store · hospital-pharmacy — latest 추종 보존)
+PIN_SERVICE_VERIFIED       = PASS     (kpa-society web · o4o-core-api — pin 보존)
+API_VERIFIED_DEPLOY        = PASS     (Ready → 전환 → /health/ready 200 · rollback 불필요) — 1차 dispatch 는 CI gate 가 fail-closed 차단(§8-3)
+ROLLBACK_VERIFICATION      = PASS     (neture: 이전 revision 100% → 옛 번들 서빙 확인 → 재전환 → 새 번들 확인)
+SHADOW_CONTINUITY          = PASS     (재실행 36724810709: 배포 5개 UP_TO_DATE · API serving SHA 가 label 로 해소)
+DEPLOY_ENABLED_FINAL       = FALSE    (13:51:55Z 확인 · 진행/대기 run 0)
 AUTODEPLOY_CUTOVER         = NOT_EXECUTED
+PRODUCTION_DB_WRITE        = 0
 ```
 
 ---
@@ -120,4 +121,86 @@ detector(`scripts/ci/deploy-risk.mjs`) 를 그대로 쓰고, LEVEL_3 사유를 *
 
 **남는 위험**: 창이 열린 동안 다른 세션이 main 에 push 하면 그 commit 도 (CI green 후) 배포된다 — 창을 짧게 유지, 창 시작 전 병행 세션 확인.
 
-(§8 이후는 실행 후 기록)
+사용자 조정(승인 시): pin 대상 web 검증으로 **kpa-society 를 추가**(실효 runtime 변경 없음 · cutover 선행 검증 목적).
+
+---
+
+## 8. 실행 기록
+
+### 8-0. 창 · 고정
+
+| 항목 | 값 |
+|---|---|
+| 태그 | `deploy/2026-09-30-pending-delta-release` (annotated) → `e2e1be6cc` |
+| target CI | `CI Pipeline` run 36714220555 success |
+| 게이트 | 13:04:33Z `true` 설정(13:04:41 반영 확인) → 13:51:54Z `false` (13:51:55 확인) — 약 47분 |
+| main | 창 전 · 중 · 후 `ce5830861` 고정 (예상 밖 push 0) |
+| 순서 | 한 번에 하나씩 — 앞 단계 실제 상태 확인 후 다음 dispatch |
+
+### 8-1. 서비스별 결과 (판정 근거 = Cloud Run traffic · revision label · job 로그. gcloud 배포 출력 문구는 근거로 쓰지 않음)
+
+| # | service | run | old revision | new revision | label | revision 직접 검사 | 전환 | 공개 확인 |
+|---|---|---|---|---|---|---|---|---|
+| 1 | neture-web | 36719084850 | `01665-7wf` | `01666-qam` | `e2e1be6cc` | tag URL `sha-e2e1be6ccf08---neture-web…` `/` HTML PASS | `--to-latest` (latest 추종 보존) · tag 제거 | 200 · 번들 ↓ |
+| 3 | store-web | 36720755113 | `00019-x5v` | `00020-lez` | `e2e1be6cc` | tag URL PASS | `--to-latest` · tag 제거 | store.neture.co.kr 200 |
+| 4 | hospital-pharmacy-web | 36721407626 | `00013-2xt` | `00014-dof` | `e2e1be6cc` | tag URL PASS | `--to-latest` · tag 제거 | neture.co.kr/hospital 200 |
+| 5 | kpa-society-web (pin) | 36722733255 | `02001-9wc` | `02008-wiz` | `e2e1be6cc` | tag URL PASS | **pin 보존** `--to-revisions 02008-wiz=100` · tag 제거 | pharmacy.neture.co.kr · kpa-society.co.kr 200 |
+| 6 | o4o-core-api (pin) | 36723753741 | `03758-wdt` | `03774-qeq` | `e2e1be6cc` | revision Ready=True (traffic 0%) | **pin 보존** `03774-qeq=100` · tag 제거 | LB `/health/ready` 200 (workflow + 수동) |
+
+- 모든 run 의 `CI gate` job success(6번은 재시도 run) — **CI gate 의 첫 실운영**.
+- neture 번들 확인: 운영 entry `index-mqUwf5ew.js` 의 `localhost:3002` 1건은 배포 **전** 번들(`index-CtKBFBcN.js`)에도 있던 `@o4o/auth-client` 의 `window.location.hostname === 'localhost'` 조건부 fallback(`packages/auth-client/src/client.ts:464`). 이번 변경의 `apiBaseUrl.ts` 상수는 production 번들에서 제거됨(배포 전 동일 SHA · 동일 build-arg 로컬 production 빌드로 선확인). 운영 API 는 `api.neture.co.kr`. 기준을 "부재"가 아니라 **"새로 들이지 않음"** 으로 판정 — composite 은 smoke 와 전환 사이에 멈추지 않으므로 이 확인은 배포 전(로컬 빌드) + 배포 후(운영 번들) 두 번 했다.
+- API optional env: 4개 모두 `omit` (값 없음 · 현재 빈 값) — 빈 문자열 덮어쓰기 중단 실측.
+- API migration Job `o4o-api-migrations-wr98c`: `DATABASE_STATE=LEGACY_ESTABLISHED` · `CURRENT_INCREMENTAL_PREFIX=9/9` · `INCREMENTAL_PENDING=0` · `INCREMENTAL_EXECUTED=0` · fingerprint MATCH · SUCCESS.
+
+### 8-2. neture rollback 실측
+
+| 시각(Z) | 동작 | traffic | HTTP | 서빙 entry |
+|---|---|---|---|---|
+| 13:17:58 | `update-traffic --to-revisions neture-web-01665-7wf=100` | 01665-7wf 100% | 200 ×3 | `index-CtKBFBcN.js` (옛 번들 — 실제로 되돌아감) |
+| 13:18:23 | `update-traffic --to-latest` | LATEST = 01666-qam 100% | 200 ×3 | `index-mqUwf5ew.js` (새 번들) |
+
+약 25초. latest 추종 방식까지 복원. 장애 유발 0.
+
+### 8-3. API 1차 dispatch 차단 (fail-closed 실측)
+
+- run 36723445876: `CI gate` → `DEPLOY_BLOCKED: TARGET_SHA_CI_NOT_GREEN` · `CI_REASON=REQUIRED_CI_MISSING (CI Pipeline)` → `build-and-deploy` skipped (빌드 · migration · 배포 0).
+- 같은 SHA 에 대해 직전 web run 4건은 GREEN, 직후 수동 재조회 3회도 `total_count=1 · 36714220555:success` → **GitHub API 가 일시적으로 run 0건을 돌려준 것**(이날 502 · 목록 불일치 다수 관측).
+- 조치: 실제 CI green 확인 후 **1회 재시도** → run 36723753741 성공.
+- **결함 (보완 과제)**: `ci-gate.mjs` 는 PENDING 만 재조회하고 MISSING 은 즉시 차단한다. push 직후 CI run 이 아직 생성되지 않은 경우에도 같은 차단이 난다 → cutover 전 **MISSING 도 wait 창 안에서 재조회**하도록 수정 필요 (창 중에는 target 고정을 위해 코드 수정하지 않음).
+
+### 8-4. shadow 재실행 (run 36724810709, target `e2e1be6cc`)
+
+| service | serving SHA (source) | 배포 전 → 후 |
+|---|---|---|
+| api | `e2e1be6cc` (**revision-label**) | UNKNOWN L3 → **UP_TO_DATE** |
+| neture · store · hospital-pharmacy · kpa-society | `e2e1be6cc` (revision-label) | BEHIND L3 → **UP_TO_DATE** |
+| admin · kpa-branch | `f838fd036` (registry-tag) | BEHIND L3 (A 만) |
+| k-cosmetics · pharmacy-hub · lecture · signage-player | `2edfe9b33` (registry-tag) | BEHIND L3 (A 만) |
+
+11개 전부 L3 → **6개 L3(전부 배포 기계 변경 A 뿐)** 로 축소. 남은 6개는 실효 runtime 변경이 없는데도 detector 가 `deploy-web-services.yml` · `deploy-admin.yml` 변경을 "해당 서비스 전부 배포 필요"로 본다(classifyWebDeploy 의 workflow 자체 변경 = 전 서비스 true) → 배포 전까지 L3/BLOCKED 로 남는다.
+
+### 8-5. 서비스별 최종 serving
+
+| service | revision | SHA |
+|---|---|---|
+| o4o-core-api | `03774-qeq` (pin) | `e2e1be6cc` |
+| neture-web | `01666-qam` (latest) | `e2e1be6cc` |
+| store-web | `00020-lez` (latest) | `e2e1be6cc` |
+| hospital-pharmacy-web | `00014-dof` (latest) | `e2e1be6cc` |
+| kpa-society-web | `02008-wiz` (pin) | `e2e1be6cc` |
+| o4o-admin-dashboard | `01317-9bx` (pin) | `f838fd036` (실효 변경 없음) |
+| kpa-branch-web | `00180-nlb` | `f838fd036` (〃) |
+| k-cosmetics · pharmacy-hub · lecture · signage-player | 변경 없음 | `2edfe9b33` (〃) |
+| glucoseview-web | 변경 없음 (LEGACY) | — |
+
+**web-neture ↔ API 불일치 해소**: 둘 다 `e2e1be6cc` label revision 이 100% 서빙 (§1 ※1 의 "프런트만 `4a1bec70e` 반영" 상태 종료). `CHECK-O4O-MAIN-AUTOMATION-RESUME-AND-REPLAY-PREFLIGHT-FIX-V1` §3 실 PC 재검증의 선행조건("api traffic 이 4a1bec70e 포함 revision 으로 100% 승격")이 충족됐다 — 재검증 자체는 그 WO 소관.
+
+## 9. 남은 backlog · 후속
+
+- 실효 runtime backlog: **0** (남은 6개는 배포 기계 변경만).
+- cutover 전 보완 (별도 WO):
+  1. `ci-gate.mjs` — MISSING 을 wait 창 안에서 재조회 (§8-3).
+  2. detector — deploy workflow 의 **env/build-arg 변경**을 서비스별로 귀속하고, 주석 · 게이트 로직만 바뀐 workflow 변경은 "전 서비스 배포 필요"로 만들지 않기 (§6-1 · §8-4).
+  3. detector — 삭제(D)된 DB write 진입점은 L3 로 보지 않기 (§6-2).
+- 0% 로 남은 과거 revision(`o4o-core-api-03759-cgw` 등)은 트래픽 0 · 무해 — 정리는 선택.
+- #257 HOLD · glucoseview-web LEGACY · `origin/wo/service-identity-deploy2-boundary` 미처리 — 변동 없음.
