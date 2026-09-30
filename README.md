@@ -92,6 +92,7 @@ lint 만 기존 오류 102건을 baseline 으로 둔 **회귀 차단(ratchet)** 
 
 | 문서 | 내용 |
 |---|---|
+| [docs/development/COLLABORATOR-START-HERE.md](docs/development/COLLABORATOR-START-HERE.md) | **새 공동개발자는 여기서 시작** — 관점 · 저장소 읽는 법 · 첫 대상 · Production 경계 |
 | [CLAUDE.md](CLAUDE.md) | 개발 규칙 · 아키텍처 경계 · 운영 정책 |
 | [SETUP.md](SETUP.md) | 로컬 실행환경 정본 (설치 · 인증 · DB · 검증 · CI 게이트) |
 | [docs/baseline/operations/O4O-GIT-PARALLEL-WORK-SAFETY-V1.md](docs/baseline/operations/O4O-GIT-PARALLEL-WORK-SAFETY-V1.md) | Git 병렬 작업 · PC 이동 정본 |

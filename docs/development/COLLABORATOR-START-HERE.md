@@ -127,7 +127,7 @@ DB 의 `o4o_api` 는 로그인 계정이 아니라 **NOLOGIN owner role** 이다
 1. 이 문서
 2. [O4O-BUSINESS-PHILOSOPHY-V1](../baseline/O4O-BUSINESS-PHILOSOPHY-V1.md) · [O4O-AI-AUTOMATION-EVOLUTION-PRINCIPLES-V1](../baseline/O4O-AI-AUTOMATION-EVOLUTION-PRINCIPLES-V1.md)
 3. [README.md](../../README.md) — 기여 · Production 변경 원칙
-4. [SETUP.md](../../SETUP.md) — 로컬 개발환경 · 검증 명령 · DB
+4. [SETUP.md](../../SETUP.md) — 로컬 개발환경 · 검증 명령 · DB. 공동개발 로컬환경(로컬 API + web-neture, 운영 credential 불필요)은 [§3-1](../../SETUP.md#3-1-공동개발-로컬환경--로컬-api--web-neture)
 5. [O4O-API-SERVER-SCRIPTS-INVENTORY-V1](../baseline/operations/O4O-API-SERVER-SCRIPTS-INVENTORY-V1.md)
 6. O4O Agent 1차 작업요청서 — 별도로 전달 예정
 7. 필요할 때: [docs/CANONICAL-INDEX.md](../CANONICAL-INDEX.md) — 전체 정본 지도. 특히 역할 경계는 [O4O-ROLE-WORKSPACE-ARCHITECTURE-V1](../baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md), 매장 commerce 경계는 [O4O-STORE-COMMERCE-BOUNDARY-V1](../baseline/O4O-STORE-COMMERCE-BOUNDARY-V1.md)
