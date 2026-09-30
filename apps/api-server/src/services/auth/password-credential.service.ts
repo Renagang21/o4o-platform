@@ -16,6 +16,7 @@
  *
  * 옛 `service_credentials`(서비스별 password 축)의 부활이 아니다: 계정(`users.id`)당 1행이다.
  */
+import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
 import type { EntityManager } from 'typeorm';
 import { AppDataSource } from '../../database/connection.js';
@@ -28,7 +29,7 @@ export const PASSWORD_HASH_ALGO = 'bcrypt';
  * 계정 없음과 비밀번호 틀림의 **응답 시간 차이**를 줄이기 위한 고정 해시.
  * 어떤 비밀번호와도 일치하지 않는 임의 문자열의 해시다(원문은 코드에 없다).
  */
-const TIMING_DUMMY_HASH = bcrypt.hashSync(`timing-dummy-${Math.random()}-${Date.now()}`, PASSWORD_HASH_COST);
+const TIMING_DUMMY_HASH = bcrypt.hashSync(crypto.randomBytes(32).toString('base64url'), PASSWORD_HASH_COST);
 
 type Queryable = Pick<EntityManager, 'query'>;
 
