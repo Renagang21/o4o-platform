@@ -153,6 +153,16 @@ API 서버는 **`apps/api-server/.env`** 만 읽습니다 (루트 `.env` 아님)
 
 운영 DB에 대한 write는 CLAUDE.md §0의 승인 규칙을 그대로 따릅니다 (read-only 검증만 자유).
 
+**운영 DB identity** (2026-09-30 기준):
+
+| role | 성격 | 사용처 |
+|---|---|---|
+| `o4o_api_v2` | **login / runtime identity** (비밀번호 = Secret Manager `o4o-db-password`) | `o4o-core-api` · migration Job `o4o-api-migrations` · 운영 DB read-only 조회 |
+| `o4o_api` | **NOLOGIN owner role** — 운영 스키마 객체(테이블 · 시퀀스 · enum · 함수 등)의 소유자 | 직접 접속하지 않는다. `o4o_api_v2` 가 member 이며 role 설정(`SET role=o4o_api`)으로 세션이 이 role 권한으로 동작한다 |
+
+`o4o_api` 로 직접 로그인하는 스크립트 · Job 은 없다. `apps/api-server/src/scripts/**` 일부에 남은
+`DB_USERNAME || 'o4o_api'` 기본값은 정리 대상 legacy 이며, 운영 접속 시 `DB_USERNAME` 을 명시한다.
+
 다른 인스턴스에 연결하려면 `start-cloud-sql-proxy.cmd`의
 `INSTANCE_CONNECTION_NAME`을 수정합니다. 현재 이 프로젝트의 Cloud SQL 인스턴스는
 `o4o-platform-db` 하나뿐입니다 (`neture-db` 는 2026-08-18 영구 삭제).
