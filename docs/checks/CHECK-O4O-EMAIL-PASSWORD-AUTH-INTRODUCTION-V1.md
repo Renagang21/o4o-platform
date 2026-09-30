@@ -19,7 +19,7 @@
 | 세션 서비스 | 요청 Origin → `resolveSessionServiceKey` 로 파생. body `serviceKey` 받지 않음 |
 | 공통 UI | `@o4o/auth-react` `email/` — `EmailLoginForm` · `EmailSignupForm` · `EmailSentNotice` · `VerifyEmailView` · `ForgotPasswordForm` · `ResetPasswordForm` · `FindLoginIdForm` · `PasswordInput`(보기/숨기기) · `PasswordPolicyHints` |
 | 클라이언트 | `@o4o/auth-client` `loginWithEmail` 외 6 메서드 · `useServiceAuth.loginWithEmail` |
-| web-neture | 로그인 모달(이메일 폼 → "또는" → Google) · `/signup` · `/verify-email` · `/find-id` · `/forgot-password` · `/reset-password` |
+| web-neture | 로그인 모달(이메일 폼 → "또는" → Google) · **`/signup` = 가입 화면 정본(이메일 + Google 병행)** · `/register` → `/signup` · `/verify-email` · `/find-id` · `/forgot-password` · `/reset-password` |
 
 비밀번호 정책: 8자 이상 · **UTF-8 72바이트 이하** + 영문자 · 숫자 · 특수기호 각 1자 이상 · 대소문자 요구 없음(보존). 특수기호 = Unicode 문장부호(P) · 기호(S) — 한글 등 일반 문자는 특수기호가 아니다. 72바이트 상한은 공통 검사(`checkPasswordPolicy` `too_long`) · 화면 안내 · 저장(`setPassword` 거절) · 검증(`verifyPassword` 불일치)에 모두 적용된다. 가입은 계정만 생성 — 서비스 가입 · 조직 · 역할 부여 0.
 
@@ -98,7 +98,11 @@ Guard spec: `google-only-auth-cleanup.spec` · `legacy-password-auth-retirement.
 6. `lower(email)` 조회에 함수 인덱스 없음 — 현재 규모에서는 영향 없음.
 7. ~~`validateDto` 400 응답의 `value` 되돌림~~ → **보완**: 민감 필드 `value` 제외(§1 · §2).
 8. 메일 링크는 항상 neture origin 으로 간다(`resolveMailLinkOrigin`).
-9. `/register` 는 여전히 로그인 모달을 연다(이메일 가입 링크는 모달 안에 있다).
+9. ~~`/register` 는 여전히 로그인 모달을 연다~~ → **해소**: `/signup` 을 **가입 화면 정본**으로 만들고
+   (이메일 폼 → "또는" → 「Google 로 계속하기」 · 로그인 모달과 같은 순서·구분선) `/register` 는 그
+   화면으로 보낸다. WO 「확정된 사용자 흐름」의 "가입 화면은 두 방식을 함께 제공한다" 를 충족하고,
+   가입 진입점이 모달과 `/signup` 두 곳으로 갈라지던 상태를 없앤다. 로그인 상태 판정은 그대로
+   유지한다(로그인 사용자는 홈 · 세션 복구 중 이동 보류 — 루프 방지 계약 불변).
 10. ~~migration 가드 대역 검증만~~ → **해소**: 격리 PG 15.17 실검증(§2-1). 운영 적용 로그로 최종 확인은 여전히 필요.
 11. CodeQL 은 `apps/api-server/src` 만 분석한다(web · packages 미분석). PR 실행도 결과는 저장소 전체(793)다.
 

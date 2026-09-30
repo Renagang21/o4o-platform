@@ -1,7 +1,7 @@
 /**
  * 이메일·비밀번호 인증 페이지 — WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1
  *
- *   /signup            이메일 회원가입 → 확인 메일 안내(재발송 · 로그인 링크)
+ *   /signup            **가입 화면(정본)** — 이메일 회원가입 + 「Google 로 계속하기」 병행
  *   /verify-email      메일 링크 토큰으로 이메일 확인
  *   /find-id           이름 + 휴대전화 → 가린 이메일 힌트
  *   /forgot-password   비밀번호 재설정 메일
@@ -9,11 +9,16 @@
  *
  * 화면 본체는 전부 @o4o/auth-react 공통 컴포넌트다. 이 파일은 카드 레이아웃 · 라우팅 연결만 한다.
  * 로그인은 기존 로그인 모달(`/login` → 모달)을 쓴다. 이미 로그인한 사용자는 가입 화면 대신 홈으로 보낸다.
+ *
+ * WO §"확정된 사용자 흐름": **가입 화면은 Google 가입과 이메일·비밀번호 가입을 함께 제공한다.**
+ * 그래서 `/signup` 이 두 수단을 한 화면에 둔다(로그인 모달과 같은 순서 · 같은 구분선).
+ * `/register` 는 이 화면으로 보낸다 — 가입 진입점이 두 곳으로 갈라지지 않게.
  * 메일 링크의 1회용 토큰은 읽은 즉시 주소창에서 지운다(기록 · Referer 로 남지 않게).
  */
 import { useEffect, useState, type ReactNode } from 'react';
 import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import {
+  GoogleContinue,
   EmailSignupForm,
   VerifyEmailView,
   FindLoginIdForm,
@@ -22,6 +27,7 @@ import {
   type EmailAuthLinks,
 } from '@o4o/auth-react';
 import { useAuth } from '../../contexts/AuthContext';
+import type { User } from '../../contexts/AuthContext';
 import { authClient } from '../../lib/apiClient';
 
 function AuthCard({ title, subtitle, children }: { title: string; subtitle?: string; children: ReactNode }) {
@@ -63,13 +69,36 @@ function useOneTimeToken(): string | null {
 }
 
 export function SignupPage() {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, loginWithGoogle, signupWithGoogle, getGoogleAuthConfig } = useAuth();
   const links = useAuthLinks();
+  const navigate = useNavigate();
+  const [googleError, setGoogleError] = useState<string | null>(null);
   if (isLoading) return null;
   if (isAuthenticated) return <Navigate to="/" replace />;
   return (
-    <AuthCard title="이메일로 회원가입" subtitle="Google 계정 없이 이메일로 가입합니다">
+    <AuthCard title="회원가입" subtitle="이메일로 가입하거나 Google 계정으로 계속합니다">
       <EmailSignupForm api={authClient} links={links} termsHref="/terms" privacyHref="/privacy" />
+
+      <div className="my-5 flex items-center gap-3 text-xs text-gray-400">
+        <span className="h-px flex-1 bg-gray-200" />
+        또는
+        <span className="h-px flex-1 bg-gray-200" />
+      </div>
+
+      {/* 미등록 Google 계정은 이 버튼에서 약관 동의 → 계정 생성까지 간다(로그인 모달과 같은 계약). */}
+      <GoogleContinue<User>
+        getConfig={getGoogleAuthConfig}
+        loginWithGoogle={loginWithGoogle}
+        signupWithGoogle={signupWithGoogle}
+        onStart={() => setGoogleError(null)}
+        onSuccess={() => { setGoogleError(null); navigate('/', { replace: true }); }}
+        onError={({ message }) => setGoogleError(message)}
+        termsHref="/terms"
+        privacyHref="/privacy"
+      />
+      {googleError && (
+        <p role="alert" className="mt-3 text-sm text-red-600">{googleError}</p>
+      )}
     </AuthCard>
   );
 }
