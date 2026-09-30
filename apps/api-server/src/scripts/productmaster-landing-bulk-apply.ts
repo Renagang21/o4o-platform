@@ -20,7 +20,7 @@
  *   - 누락이 0 이면 dry-run toCreate=0, apply 해도 write 0 (멱등).
  *
  * 실행(읽기 전용 dry-run):
- *   DB_HOST=127.0.0.1 DB_PORT=15432 DB_USERNAME=o4o_api DB_PASSWORD=... DB_NAME=o4o_platform \
+ *   DB_HOST=127.0.0.1 DB_PORT=15432 DB_USERNAME=<login identity, SETUP.md §4> DB_PASSWORD=... DB_NAME=o4o_platform \
  *     npx tsx src/scripts/productmaster-landing-bulk-apply.ts [--limit N] [--out r.json]
  * 실제 발급(승인 후):
  *   ... npx tsx src/scripts/productmaster-landing-bulk-apply.ts --apply --batch-id landing-seed-YYYYMMDD [--batch-size 1000]

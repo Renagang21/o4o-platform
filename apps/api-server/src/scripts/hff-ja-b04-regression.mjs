@@ -19,6 +19,7 @@
 import fs from 'node:fs';
 import crypto from 'node:crypto';
 import pg from 'pg';
+import { requireDbUsername } from './require-db-username.mjs';
 import { build, parityBreak, PARITY } from './hff-ja-b01-build.mjs';
 import { clearMemo } from './hff-ja-b01-translate.mjs';
 import { scanDocument } from './hff-ja-b04-gate.mjs';
@@ -42,7 +43,7 @@ for (const f of fs.readdirSync(D).filter((x) => /^hff-ja-fix154-targets.*\.json$
   }
 }
 
-const c = new pg.Client({ host: '127.0.0.1', port: parseInt(process.env.PROXY_PORT ?? '5471', 10), user: 'o4o_api', password: process.env.PGPW, database: 'o4o_platform', statement_timeout: 1800000 });
+const c = new pg.Client({ host: '127.0.0.1', port: parseInt(process.env.PROXY_PORT ?? '5471', 10), user: requireDbUsername(), password: process.env.PGPW, database: 'o4o_platform', statement_timeout: 1800000 });
 await c.connect();
 await c.query('SET default_transaction_read_only = on');
 if ((await c.query('SHOW transaction_read_only')).rows[0].transaction_read_only !== 'on') { console.error('NOT_READ_ONLY'); process.exit(1); }

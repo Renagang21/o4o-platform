@@ -160,8 +160,10 @@ API 서버는 **`apps/api-server/.env`** 만 읽습니다 (루트 `.env` 아님)
 | `o4o_api_v2` | **login / runtime identity** (비밀번호 = Secret Manager `o4o-db-password`) | `o4o-core-api` · migration Job `o4o-api-migrations` · 운영 DB read-only 조회 |
 | `o4o_api` | **NOLOGIN owner role** — 운영 스키마 객체(테이블 · 시퀀스 · enum · 함수 등)의 소유자 | 직접 접속하지 않는다. `o4o_api_v2` 가 member 이며 role 설정(`SET role=o4o_api`)으로 세션이 이 role 권한으로 동작한다 |
 
-`o4o_api` 로 직접 로그인하는 스크립트 · Job 은 없다. `apps/api-server/src/scripts/**` 일부에 남은
-`DB_USERNAME || 'o4o_api'` 기본값은 정리 대상 legacy 이며, 운영 접속 시 `DB_USERNAME` 을 명시한다.
+`o4o_api` 로 직접 로그인하는 현행 스크립트 · Job 은 없다. 운영 스크립트는 로그인 identity 기본값을 두지 않고
+`DB_USERNAME` 이 없으면 즉시 실패한다(`apps/api-server/src/scripts/require-db-username.mjs`). 운영 접속 시 `DB_USERNAME` 을 명시한다.
+어떤 스크립트가 현행(ACTIVE · PAUSED)이고 어떤 것이 실행 금지 legacy 인지는
+[O4O-API-SERVER-SCRIPTS-INVENTORY-V1](docs/baseline/operations/O4O-API-SERVER-SCRIPTS-INVENTORY-V1.md) 이 정본이다.
 
 다른 인스턴스에 연결하려면 `start-cloud-sql-proxy.cmd`의
 `INSTANCE_CONNECTION_NAME`을 수정합니다. 현재 이 프로젝트의 Cloud SQL 인스턴스는

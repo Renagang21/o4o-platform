@@ -16,7 +16,7 @@
  *     다르며 필요 시 개정 대상. (초안의 "QR=Resource / 설명없으면 QR없음 / /r/{id} 최종" 결론은 폐기.)
  *
  * 로컬 실행(읽기 전용): cloud-sql-proxy(127.0.0.1:15432) 기동 후
- *   DB_HOST=127.0.0.1 DB_PORT=15432 DB_USERNAME=o4o_api DB_PASSWORD=... DB_NAME=o4o_platform \
+ *   DB_HOST=127.0.0.1 DB_PORT=15432 DB_USERNAME=<login identity, SETUP.md §4> DB_PASSWORD=... DB_NAME=o4o_platform \
  *   npx tsx src/scripts/productmaster-global-qr-dryrun.ts [--out report.json] [--sample 10]
  */
 

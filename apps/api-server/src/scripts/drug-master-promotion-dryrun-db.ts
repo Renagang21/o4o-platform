@@ -7,7 +7,7 @@
  * **write 0** — ProductMaster/ProductIdentifier 생성 없음. 기존 catalog 선적재 + candidate 페이지 스캔(배치).
  *
  * 로컬 실행(읽기 전용): cloud-sql-proxy(127.0.0.1:15432) 기동 후
- *   DB_HOST=127.0.0.1 DB_PORT=15432 DB_USERNAME=o4o_api DB_PASSWORD=... DB_NAME=o4o_platform \
+ *   DB_HOST=127.0.0.1 DB_PORT=15432 DB_USERNAME=<login identity, SETUP.md §4> DB_PASSWORD=... DB_NAME=o4o_platform \
  *   npx tsx src/scripts/drug-master-promotion-dryrun-db.ts --source-label 2025-10-31 [--out report.json] [--limit N]
  *
  * 안전: SELECT 만 수행. --apply 개념 없음(존재 자체가 dry-run).

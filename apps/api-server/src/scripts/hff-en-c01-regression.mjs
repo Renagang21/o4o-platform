@@ -11,6 +11,7 @@
  */
 import fs from 'node:fs';
 import pg from 'pg';
+import { requireDbUsername } from './require-db-username.mjs';
 import { SEC, SLOT_G, HANGUL, specSlots, norm, numericLoss } from './hff-en-c01-lib.mjs';
 
 const D = 'apps/api-server/src/scripts/data';
@@ -19,7 +20,7 @@ const WO = 'WO-O4O-HFF-EN-C01-LABELLED-STANDARD-40896-FULL-TRANSLATION-REPAIR-V1
 const prior = JSON.parse(fs.readFileSync(process.env.C01_PRIOR ?? `${CACHE}/hff-en-c01-rollback-cycle1.json`, 'utf8'));
 const priorIds = prior.rows.map((r) => r.enId);
 
-const c = new pg.Client({ host: '127.0.0.1', port: parseInt(process.env.PROXY_PORT ?? '5641', 10), user: 'o4o_api', password: process.env.PGPW, database: 'o4o_platform', statement_timeout: 1800000 });
+const c = new pg.Client({ host: '127.0.0.1', port: parseInt(process.env.PROXY_PORT ?? '5641', 10), user: requireDbUsername(), password: process.env.PGPW, database: 'o4o_platform', statement_timeout: 1800000 });
 await c.connect();
 await c.query('SET default_transaction_read_only = on');
 if ((await c.query('SHOW transaction_read_only')).rows[0].transaction_read_only !== 'on') { console.error('NOT_READ_ONLY'); process.exit(1); }
