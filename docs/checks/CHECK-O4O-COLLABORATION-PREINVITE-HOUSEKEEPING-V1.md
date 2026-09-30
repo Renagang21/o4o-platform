@@ -12,7 +12,7 @@
 | DEAD_DEVELOP_DEPLOY_TRIGGER | **REMOVED** |
 | SECRETS_SETUP_LEGACY_DRIFT | **CLEANED** |
 | WORKFLOW_README_SERVICE_COUNT | **CURRENT** (9종 + 서비스 목록) |
-| SECRET_SCAN_SCRATCH | **MANUAL_DELETE_REQUIRED** (삭제 권한 거부 — 우회하지 않음) |
+| SECRET_SCAN_SCRATCH | **DELETED** (에이전트 삭제 권한 거부 → 사용자 수동 삭제, §5 후속 확인) |
 | DEPLOY_BEHAVIOR_REGRESSION | **0** |
 | PRODUCTION_CHANGE | **0** |
 | COLLABORATION_READY | **READY_WITH_KNOWN_LIMITATION** (변동 없음) |
@@ -63,6 +63,8 @@
 | 임시 스크립트 (scratchpad 밖) | `C:\Users\home\AppData\Local\Temp\yamleq.mjs` |
 
 수동 명령 (PowerShell): `Remove-Item -Recurse -Force '<scratchpad 절대경로>\*'` · `Remove-Item 'C:\Users\home\AppData\Local\Temp\yamleq.mjs'`
+
+**후속 (2026-09-30)**: 사용자가 수동 삭제 완료. 확인 결과 scratchpad 항목 0 · `yamleq.mjs` 부재 → **SECRET_SCAN_SCRATCH = DELETED**.
 
 ## 6. workflow semantic comparison
 
