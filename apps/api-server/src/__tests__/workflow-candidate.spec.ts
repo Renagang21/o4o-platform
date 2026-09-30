@@ -27,6 +27,8 @@ import {
 } from '../services/local-agent/local-agent-protocol.js';
 import {
   WORKFLOW_LIMITS,
+  assessReplayValue,
+  replayPreflight,
   buildRequestTemplate,
   buildTrajectoryEntry,
   buildWorkflowCandidate,
@@ -41,6 +43,30 @@ import { runWorkAgent, type WorkPlanner, type PlannerInput } from '../services/a
 import { AI_TOOL_NAMES, type VerifiedToolContext } from '../services/ai-tools/ai-tool-contract.js';
 import { submitCommandResult } from '../services/local-agent/local-agent-service.js';
 import { makeDb, connected, pairAndRegister, type LocalAgentDb } from './helpers/local-agent-db-stub.js';
+
+describe('A-2. replay preflight — 값의 의미 검증', () => {
+  it('지시·불특정 표현은 ambiguous', () => {
+    for (const v of ['내가 먹을 약', '이 약', '어떤 영양제', '그거', '아무거나', '평소 먹는 약', '약?', '약']) {
+      expect([v, assessReplayValue(v)]).toEqual([v, 'ambiguous']);
+    }
+  });
+
+  it('구체적인 이름·번호는 concrete', () => {
+    for (const v of ['아모디핀', '게보린', '타이레놀 500mg', '뉴로케이', '아스피린 프로텍트']) {
+      expect([v, assessReplayValue(v)]).toEqual([v, 'concrete']);
+    }
+  });
+
+  it('요청에서 온 입력값만 본다 — 요청에 없는 고정 선택값은 무시', () => {
+    const steps = [
+      { actionKind: 'select_option', locator: { role: 'combobox', name: '구분' }, value: '전체', expect: { navigated: false, changed: false } },
+      { actionKind: 'set_input', locator: { role: 'searchbox', name: 'q' }, value: '아모디핀', expect: { navigated: false, changed: false } },
+    ] as any;
+    expect(replayPreflight('약학정보원에서 아모디핀 검색해줘', steps)).toBe('ok');
+    const bad = [{ ...steps[1], value: '내가 먹을 약' }] as any;
+    expect(replayPreflight('약학정보원에서 내가 먹을 약 검색해줘', bad)).toBe('ambiguous');
+  });
+});
 
 const agentSrc = (f: string) => readFileSync(join(__dirname, '..', '..', '..', '..', 'tools', 'o4o-local-agent', 'src', f), 'utf8');
 
@@ -224,6 +250,27 @@ async function drive(db: LocalAgentDb, script: Script, ledger: Ledger, max = 60)
   return seen;
 }
 
+/** 재개 테스트용 — cloud coordination 원장에 이 사용자의 waiting_for_user run 하나를 둔다(stub 은 이 테이블을 모른다). */
+function waitingRun(db: LocalAgentDb, runId: string) {
+  const row: Record<string, unknown> = {
+    run_id: runId, user_id: 'user-1', device_id: null, status: 'waiting_for_user', version: 3,
+    created_at: new Date(), updated_at: new Date(), expires_at: new Date(Date.now() + 600_000),
+  };
+  const base = (db.dataSource.query as jest.Mock).getMockImplementation()!;
+  (db.dataSource.query as jest.Mock).mockImplementation(async (sql: string, params: any[] = []) => {
+    const s = sql.replace(/\s+/g, ' ').trim();
+    if (s.startsWith('SELECT run_id, user_id') && s.includes('FROM work_run_coordination') && params[0] === runId) return [{ ...row }];
+    if (s.startsWith('UPDATE work_run_coordination') && params[0] === runId) {
+      if (['completed', 'taken_over', 'expired'].includes(String(row.status))) return [[], 0];
+      row.status = params[1];
+      row.version = Number(row.version) + 1;
+      return [[{ ...row }], 1];
+    }
+    return base(sql, params);
+  });
+  return row;
+}
+
 function scripted(proposals: unknown[]): WorkPlanner & { calls: PlannerInput[] } {
   const calls: PlannerInput[] = [];
   let i = 0;
@@ -239,10 +286,11 @@ function scripted(proposals: unknown[]): WorkPlanner & { calls: PlannerInput[] }
   };
 }
 
-async function run(request: string, planner: WorkPlanner, script: Script, matchReply: Record<string, unknown> = { matched: false }, extra: { runId?: string; recoveryHint?: string } = {}) {
+async function run(request: string, planner: WorkPlanner, script: Script, matchReply: Record<string, unknown> = { matched: false }, extra: { runId?: string; recoveryHint?: string; targetHint?: string } = {}) {
   const db = makeDb();
   await pairAndRegister(db);
   await connected(db);
+  if (extra.runId) waitingRun(db, extra.runId);
   const ledger: Ledger = { saves: [], matches: [], results: [], matchReply };
   const [result, seen] = await Promise.all([runWorkAgent(db.dataSource, ctx(), { request, ...extra }, planner), drive(db, script, ledger)]);
   return { result, seen, ledger };
@@ -365,6 +413,51 @@ describe('C. runtime — 첫 성공은 AI · 반복은 Workflow · 예외에서�
     expect(b.ledger.matches).toHaveLength(0);
     expect(b.ledger.saves).toHaveLength(0);
     expect(b.result.workflow?.candidate).toBe('skipped');
+  });
+
+  it('preflight — 재생 값이 지시적·불특정이면 어떤 입력/클릭도 하기 전에 QUESTION(재개 가능)', async () => {
+    const planner = scripted([{ assessment: 'progress', action: { kind: 'takeover', reason: 'goal_sufficiently_advanced' } }]);
+    const reply = { ...REPLAY_REPLY, steps: [{ ...REPLAY_REPLY.steps[0], value: '내가 먹을 약' }, REPLAY_REPLY.steps[1]] };
+    const { result, seen, ledger } = await run('약학정보원에서 내가 먹을 약 검색해줘', planner, searchScript(), reply);
+    expect(result.goal.status).toBe('waiting_for_user');
+    expect(result.progress).toBe('needs_user');
+    expect(result.resumable).toBe(true);
+    expect(result.goal.runId).toBeTruthy();
+    expect(result.neededInput).toBeTruthy();
+    expect(seen.filter((s) => ['find', 'set_input', 'click', 'select_option'].includes(s.base))).toHaveLength(0);
+    expect(planner.calls).toHaveLength(0); // 실행 후 AI 판단이 아니라 실행 전 차단
+    expect(ledger.results).toHaveLength(0);
+    expect(ledger.saves).toHaveLength(0);
+  });
+
+  it('재개 — 짧은 답("게보린") + runId 는 답에서 대상을 찾지 않고 원래 run 대상을 상속, 같은 runId 로 현재 화면을 새로 관찰한다', async () => {
+    const planner = scripted([
+      { assessment: 'progress', action: { kind: 'set_input', elementRef: 'e_2', text: '게보린' } },
+      { assessment: 'progress', action: { kind: 'click', elementRef: 'e_3' } },
+      { assessment: 'progress', action: { kind: 'takeover', reason: 'goal_sufficiently_advanced' } },
+    ]);
+    const { result, seen, ledger } = await run('게보린', planner, searchScript(), REPLAY_REPLY, { runId: 'g_wait01', targetHint: SITE });
+    expect(result.errorCode ?? null).not.toBe('WORK_AGENT_SITE_UNRESOLVED');
+    expect(result.goal.runId).toBe('g_wait01'); // 같은 logical run
+    expect(result.siteId).toBe(SITE); // 원래 대상 상속
+    expect(result.goal.status).toBe('completed');
+    // 과거 관찰 재사용 없음 — 재개 run 에서 새로 get_context · inspect 한 뒤 행동했다.
+    const bases = seen.map((s) => s.base);
+    expect(bases.indexOf('inspect')).toBeGreaterThanOrEqual(0);
+    expect(bases.indexOf('inspect')).toBeLessThan(bases.indexOf('set_input'));
+    expect(seen.find((s) => s.base === 'set_input')?.args.text).toBe('게보린');
+    // 재개 run 은 Candidate 대조·재생을 하지 않는다(기존 규칙 유지).
+    expect(ledger.matches).toHaveLength(0);
+    expect(seen.filter((s) => s.base === 'find')).toHaveLength(0);
+  });
+
+  it('재개 — 상속할 대상이 없으면 답변 문장으로 대상을 추측하지 않고 재개를 거부한다', async () => {
+    const planner = scripted([{ assessment: 'progress', action: { kind: 'takeover', reason: 'goal_sufficiently_advanced' } }]);
+    const { result, seen } = await run('약학정보원 게보린', planner, searchScript(), { matched: false }, { runId: 'g_wait02' });
+    expect(result.errorCode).toBe('WORK_AGENT_RESUME_REJECTED');
+    expect(result.resumable).toBe(false);
+    expect(seen).toHaveLength(0);
+    expect(planner.calls).toHaveLength(0);
   });
 
   it('회귀 — Candidate 대조가 없으면(matched:false) 기존 AI loop 와 같다', async () => {
