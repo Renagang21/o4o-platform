@@ -241,7 +241,7 @@ PRODUCTION_CUTOVER_EXECUTED = NO
 - verified rollout 전 구간(0% 배포 → tag URL smoke → 전환 → tag 제거) 실제 1회
 - API readiness → 전환 → LB 실패 시 rollback 실제 1회
 - revision label 전파 (다음 배포 revision 의 `o4o-commit-sha`)
-- shadow workflow 의 GitHub Actions 상 첫 실행 (push 후 CI 완료 시 발생)
+- ~~shadow workflow 의 GitHub Actions 상 첫 실행~~ → §14 에서 실측 완료
 
 ---
 
@@ -279,6 +279,21 @@ PRODUCTION_CUTOVER_EXECUTED = NO
 
 - 이 commit 은 `deploy-*.yml` 자체를 바꾸므로 push 시 세 deploy workflow 가 뜬다. `DEPLOY_ENABLED=false` 이므로 **ci-gate skip → 배포 job skip → hold notice 만** 남는다 (push 직전 변수 값 재확인).
 - shadow workflow 는 main 에 들어간 뒤부터 CI 완료 시 동작한다.
+
+## 14. push 후 실측 (`8526b64e1`, 2026-09-30 12:04 UTC)
+
+| run | 결과 |
+|---|---|
+| Deploy API `36712459311` | `CI gate` skipped → `build-and-deploy` skipped → hold notice. migration 0 · deploy 0 |
+| Deploy Web `36712459276` | `CI gate` skipped → deploy job 9개 전부 skipped → hold notice |
+| Deploy Admin `36712459275` | `CI gate` skipped → `deploy` skipped → hold notice |
+| CI Pipeline `36712459360` | **success** (새 node:test 5개 포함 full 경로) |
+| CodeQL `36712459289` | failure — 분석 완료(TS 1702 파일) 후 **SARIF upload 단계** "Code scanning is not enabled for this repository". #259 가 다루는 기존 문제이며 이 변경(`apps/api-server/src` 미수정)과 무관. CI gate 에서는 advisory |
+| **Deploy Risk Gate (shadow)** `36713802794` | **success** — `workflow_run` 첫 트리거. `CI_STATE=GREEN` · risk **LEVEL_3** · 11개 서비스 전부 `BLOCKED_HIGH_RISK_CONTROLLED_DEPLOY_REQUIRED` · artifact `deploy-risk-shadow-8526b64e1…` 생성 |
+
+shadow 판정 해석: 로컬 실측(§5, target `cd8c7ab3e`)에서 L2 였던 neture 가 L3 가 됐다 — 이 commit 이 `deploy-web-services.yml` 을 바꿨으므로 "배포 기계 변경 뒤 첫 배포는 통제"(§4) 규칙이 설계대로 동작한 것이다. api 는 여전히 serving SHA UNKNOWN(label 전 배포).
+
+production 변경 0 확인: 세 deploy run 모두 배포 job skipped · `DEPLOY_ENABLED=false` 유지.
 
 ## 13. 문서 정합
 
