@@ -1,6 +1,6 @@
 name: Deploy Web Services (Cloud Run)
 
-# Deploy web services to Cloud Run on push to main/develop
+# Deploy web services to Cloud Run on push to main
 # H9-0: Docker(Container) 배포 방식으로 전환
 # 변경된 웹서버만 배포됨
 
@@ -12,7 +12,6 @@ on:
   push:
     branches:
       - main
-      - develop
     paths:
       - 'services/web-neture/**'
       - 'services/web-k-cosmetics/**'

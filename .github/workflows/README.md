@@ -18,7 +18,7 @@
 | 워크플로 | 대상 |
 |---|---|
 | `deploy-api.yml` | `o4o-core-api` (+ 마이그레이션 Job) |
-| `deploy-web-services.yml` | 서비스별 웹 5종 (변경 감지 후 선별 배포) |
+| `deploy-web-services.yml` | 서비스별 웹 9종 (변경 감지 후 선별 배포) — `neture-web` · `k-cosmetics-web` · `kpa-society-web` · `pharmacy-hub-web` · `lecture-web` · `hospital-pharmacy-web` · `store-web` · `kpa-branch-web` · `signage-player-web` |
 | `deploy-admin.yml` | `o4o-admin-dashboard` |
 
 배포 게이트는 저장소 변수 `DEPLOY_ENABLED`(평상시 `false` · fail-closed) 하나다.

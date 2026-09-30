@@ -19,7 +19,7 @@ concurrency:
 #     trigger 에 없어 배포되지 않았다(false negative). census 근거로 추가한다.
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ main ]
     paths:
       - 'apps/admin-dashboard/**'
       - 'packages/**'
