@@ -203,8 +203,17 @@ jobs:
     # 판정 불가 입력이 전부 full CI 로 fallback 하는지 · multi-commit push batch 를
     # 놓치지 않는지를 고정한다. 의존성 · DB · secret 0 (Node 22 내장 runner).
     # `scripts/**` 변경은 판정기가 global 로 취급하므로 이 단계는 항상 이 잡에서 돈다.
+    # WO-O4O-CICD-SAFE-AUTODEPLOY-AND-RISK-GATE-V1: 배포 위험 판정 · CI gate · revision rollout · optional env
+    # 회귀 시험을 같은 runner 로 blocking 연결한다 (의존성 · 네트워크 · GCP 0 — gcloud/HTTP 는 주입 대체).
     - name: Run tests (CI affected-scope detector node:test)
-      run: node --test scripts/ci/__tests__/detect-affected.test.mjs
+      run: >-
+        node --test
+        scripts/ci/__tests__/detect-affected.test.mjs
+        scripts/ci/__tests__/deploy-risk.test.mjs
+        scripts/ci/__tests__/ci-gate.test.mjs
+        scripts/ci/__tests__/cloud-run-rollout.test.mjs
+        scripts/ci/__tests__/cloud-run-env.test.mjs
+        scripts/ci/__tests__/deploy-workflow-gates.test.mjs
 
     # WO-O4O-LOCAL-DATA-TOOL-BRIDGE-CLOSURE-V1 §22
     # Local Work Agent 는 런타임 의존성 0(package.json 없음)이라 jest 대상이 아니다.

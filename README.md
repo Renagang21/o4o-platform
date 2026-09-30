@@ -119,6 +119,14 @@ GCP Cloud Run으로 배포합니다. 아래 워크플로는 `main` push 에 반�
   ([PRODUCTION-MIGRATION-STANDARD](docs/baseline/operations/PRODUCTION-MIGRATION-STANDARD.md)).
   예외로 `deploy-api.yml` 의 `migrate_only` 수동 실행(`refs/tags/deploy/*` 태그 + `expected_sha` 일치)은
   `DEPLOY_ENABLED` 와 무관하게 migration 만 실행합니다.
+- **CI gate**: 게이트가 열려도 target commit 의 `CI Pipeline` 이 green 이 아니면(실패 · 취소 · 진행 중 · 부재)
+  배포 job 은 실행되지 않습니다 (`migrate_only` 포함). 각 workflow 의 `ci-gate` job 이 red 로 남습니다.
+- **rollout_mode**: 수동 실행 입력. 기본 `legacy` 는 종전 동작 그대로이고, `verified` 는 새 revision 을
+  traffic 0% 로 올려 직접 검사(web · admin = tag URL HTTP, API = revision Ready)한 뒤에만 전환합니다.
+  검사 실패 시 기존 revision 이 그대로 서빙되고, API 는 전환 후 `/health/ready` 실패 시 이전 revision 으로 되돌립니다.
+- **위험 판정(shadow)**: `Deploy Risk Gate (shadow)` workflow 가 main CI 완료마다 "서빙 중인 SHA → 이 commit"
+  을 서비스별로 LEVEL 1/2/3 로 판정해 기록합니다. **배포 결정에는 쓰이지 않습니다** (cutover 는 별도 결정).
+  근거: [CHECK-O4O-CICD-SAFE-AUTODEPLOY-AND-RISK-GATE-V1](docs/checks/CHECK-O4O-CICD-SAFE-AUTODEPLOY-AND-RISK-GATE-V1.md)
 - 배포 job 에 붙은 `environment: production` 은 **승인 게이트가 아닙니다.** 현재 GitHub `production`
   Environment 에는 required reviewer · 배포 branch 제한 · environment secret 이 없습니다.
 - GCP 인증은 저장소 수준 secret(`GCP_SA_KEY`)을 씁니다. 저장소 쓰기 권한이 있는 사람은 기술적으로

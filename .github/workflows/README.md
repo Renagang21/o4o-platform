@@ -20,8 +20,11 @@
 | `deploy-api.yml` | `o4o-core-api` (+ 마이그레이션 Job) |
 | `deploy-web-services.yml` | 서비스별 웹 9종 (변경 감지 후 선별 배포) — `neture-web` · `k-cosmetics-web` · `kpa-society-web` · `pharmacy-hub-web` · `lecture-web` · `hospital-pharmacy-web` · `store-web` · `kpa-branch-web` · `signage-player-web` |
 | `deploy-admin.yml` | `o4o-admin-dashboard` |
+| `cd-risk-gate-shadow.yml` | 배포 없음 — main CI 완료마다 서비스별 위험 판정(LEVEL 1/2/3) 기록 (shadow) |
 
 배포 게이트는 저장소 변수 `DEPLOY_ENABLED`(평상시 `false` · fail-closed) 하나다.
+게이트가 열려도 각 deploy workflow 의 `ci-gate` job 이 target SHA 의 `CI Pipeline` green 을 요구한다(Phase 1 · enforced).
+`cd-risk-gate-shadow.yml` 은 서비스별 serving SHA → target SHA 위험 판정을 **기록만** 한다(배포 0 · 쓰기 0).
 job 의 `environment: production` 은 승인 게이트가 아니다 — 현재 required reviewer 가 없다.
 예외 경로(`migrate_only`)와 변경 원칙은 루트 [`README.md`](../../README.md) "배포" · "Production 변경 원칙" 절이 정본이다.
 
@@ -36,6 +39,9 @@ job 의 `environment: production` 은 승인 게이트가 아니다 — 현재 r
 
 `.github/actions/setup-build-env/action.yml` — pnpm/Node 셋업 + 의존성 설치 + 공유 패키지 빌드.
 `strict-lockfile: 'true'` 로 opt-in 하면 lockfile drift 를 실패로 만든다(CI Pipeline 이 사용).
+
+`.github/actions/cloud-run-verified-rollout/action.yml` — `rollout_mode=verified` 전용. 배포 전 traffic 기록(plan) ·
+traffic 0% 새 revision 의 tag URL smoke → PASS 일 때만 전환(finish). 로직은 `scripts/ci/cloud-run-rollout.mjs`.
 
 ## 규칙
 
