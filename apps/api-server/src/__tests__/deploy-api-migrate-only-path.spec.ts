@@ -9,7 +9,7 @@
  *     - `DEPLOY_ENABLED` 게이트를 열지 않고 실행 (게이트를 열면 그 사이 main push 가 다른 코드를 배포한다)
  *     - 태그 ref(`refs/tags/deploy/*`) + expected_sha 일치를 먼저 검사 (fail-closed)
  *     - migration Job 을 방금 push 한 이미지 digest 로 고정
- *     - Deploy · one-off job 재고정 · Verify step 은 실행하지 않는다
+ *     - Deploy · Verify step 은 실행하지 않는다
  *
  * 이 spec 은 조건식을 시나리오별로 **실제 평가**해 두 경로를 고정한다. 네트워크 · DB 0.
  */
@@ -57,7 +57,7 @@ const stepRuns = (name: string, c: Ctx) => {
   return s.if ? evaluate(s.if, c) : true;
 };
 
-const DEPLOY_STEPS = ['Deploy to Cloud Run', 'Refresh one-off Cloud Run job image references', 'Verify deployment'];
+const DEPLOY_STEPS = ['Deploy to Cloud Run', 'Verify deployment'];
 const MIGRATE_ONLY_STEPS = ['Migrate-only preflight (tag ref · SHA 고정 검사)', 'Migrate-only stop (API traffic 불변 기록)'];
 
 describe('입력 계약', () => {

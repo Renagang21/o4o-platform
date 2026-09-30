@@ -797,12 +797,11 @@ test('§11. deploy-api.yml 은 detect → 조건부 build-and-deploy 구조다',
 
 test('§13 · §15. migration/deploy step 은 build-and-deploy 안에만 있고, 재현 dispatch 는 배포하지 않는다', () => {
   const yml = workflowYaml('deploy-api.yml');
-  // 세 가지 production 작업이 모두 같은 잡(build-and-deploy)에 있어야 판정 하나로 0 이 된다
+  // production 작업이 모두 같은 잡(build-and-deploy)에 있어야 판정 하나로 0 이 된다
   for (const step of [
     'Build and Push Docker image',
     'Run database migrations',
     'Deploy to Cloud Run',
-    'Refresh one-off Cloud Run job image references',
   ]) {
     assert.ok(yml.includes(step), `step 이 있어야 한다: ${step}`);
     assert.ok(
