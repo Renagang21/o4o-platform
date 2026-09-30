@@ -27,6 +27,8 @@ export {
   PASSWORD_POLICY_HINT,
   checkPasswordPolicy,
   isPasswordPolicyMet,
+  passwordUtf8ByteLength,
+  isPasswordWithinByteLimit,
   maskLoginEmail,
 } from './emailCredential.js';
 

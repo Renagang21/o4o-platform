@@ -501,6 +501,7 @@ describe('EmailAuthService', () => {
       await h.service.requestPasswordReset('new.user@example.com', META);
       const token = h.lastLinkToken('/reset-password');
       await expectCode(h.service.resetPassword(token, 'short'), 'PASSWORD_POLICY_VIOLATION');
+      await expectCode(h.service.resetPassword(token, 'a1!' + 'x'.repeat(70)), 'PASSWORD_POLICY_VIOLATION');
       await expect(h.service.resetPassword(token, 'newpass99$')).resolves.toBeUndefined();
     });
 
@@ -559,6 +560,9 @@ describe('EmailAuthService', () => {
       [{ phone: '02-123-4567' }, 'INVALID_PHONE'],
       [{ password: 'abcdefgh1' }, 'PASSWORD_POLICY_VIOLATION'],
       [{ password: 'abc!1' }, 'PASSWORD_POLICY_VIOLATION'],
+      [{ password: 'abcdef1가' }, 'PASSWORD_POLICY_VIOLATION'],
+      [{ password: 'a1!' + 'x'.repeat(70) }, 'PASSWORD_POLICY_VIOLATION'],
+      [{ password: 'a1!' + '가'.repeat(24) }, 'PASSWORD_POLICY_VIOLATION'],
     ])('%j → %s', async (over, code) => {
       const h = makeHarness();
       await expectCode(h.service.signup(signupInput(over)), code);
@@ -578,6 +582,8 @@ describe('EmailAuthService', () => {
     it('수단이 없으면 현재 비밀번호 없이 추가, 있으면 현재 비밀번호 필수·일치', async () => {
       const h = makeHarness();
       const g = h.addUser({ email: 'g@example.com' });
+      await expectCode(h.service.setPasswordForUser(g.id, { newPassword: 'a1!' + '가'.repeat(24) }), 'PASSWORD_POLICY_VIOLATION');
+      expect(h.store.creds.has(g.id)).toBe(false);
       await h.service.setPasswordForUser(g.id, { newPassword: GOOD_PW });
       expect(h.store.creds.has(g.id)).toBe(true);
 

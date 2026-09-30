@@ -5,9 +5,10 @@
 import { checkPasswordPolicy, PASSWORD_POLICY_MESSAGES, type PasswordViolation } from '@o4o/auth-utils';
 import { styles } from './shared';
 
-const ORDER: PasswordViolation[] = ['too_short', 'no_letter', 'no_digit', 'no_symbol'];
+const ORDER: PasswordViolation[] = ['too_short', 'too_long', 'no_letter', 'no_digit', 'no_symbol'];
 const LABEL: Record<PasswordViolation, string> = {
   too_short: '8자 이상',
+  too_long: '72바이트 이하',
   no_letter: '영문자 포함',
   no_digit: '숫자 포함',
   no_symbol: '특수기호 포함',
@@ -18,7 +19,7 @@ export function PasswordPolicyHints({ id, password, confirm }: { id?: string; pa
   const touched = password.length > 0;
   return (
     <div id={id} style={{ display: 'flex', flexDirection: 'column', gap: 2 }} data-testid="password-policy-hints">
-      <p style={styles.hint}>8자 이상 · 영문자 · 숫자 · 특수기호를 각각 1개 이상 (대소문자 구분 요구 없음)</p>
+      <p style={styles.hint}>8자 이상 · 영문자 · 숫자 · 특수기호를 각각 1개 이상 (대소문자 구분 요구 없음) · 최대 72바이트(영문 72자 · 한글 24자)</p>
       {touched && (
         <p style={{ margin: 0, fontSize: 12, display: 'flex', flexWrap: 'wrap', gap: 8 }}>
           {ORDER.map((v) => (

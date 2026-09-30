@@ -6,10 +6,11 @@
  *  H2 저장된 값으로 원문 compare 는 true, 다른 값은 false (대소문자·공백을 변형하지 않는다)
  *  H3 수단이 없으면 false 이고, 그 경우에도 compare 를 한 번 수행한다(시간 차이 억제)
  *  H4 같은 원문도 매번 다른 해시(salt)
+ *  H5 · H6 UTF-8 72바이트 초과 원문은 저장 거절 · 검증 불일치 (bcrypt 가 잘라 보는 부분으로 인증하지 않는다)
  */
 import bcrypt from 'bcryptjs';
 import { AppDataSource } from '../../../database/connection.js';
-import { passwordCredentialService, PASSWORD_HASH_COST } from '../password-credential.service.js';
+import { passwordCredentialService, PASSWORD_HASH_COST, PasswordTooLongError } from '../password-credential.service.js';
 
 const PLAIN = 'Abcd1234! ';
 
@@ -63,6 +64,28 @@ describe('passwordCredentialService — 저장 경로', () => {
     expect(await passwordCredentialService.verifyPassword(null, PLAIN)).toBe(false);
     expect(spy).toHaveBeenCalledTimes(2);
     expect(await passwordCredentialService.hasPassword('nobody')).toBe(false);
+  });
+
+  it('H5 72바이트 초과 원문은 저장하지 않는다 — ASCII 73 · 한글 경계', async () => {
+    const at72 = 'a1!' + 'x'.repeat(69);
+    await expect(passwordCredentialService.setPassword('u1', at72)).resolves.toBeUndefined();
+    await expect(passwordCredentialService.setPassword('u2', at72 + 'x')).rejects.toBeInstanceOf(PasswordTooLongError);
+    await expect(passwordCredentialService.setPassword('u3', 'a1!' + '가'.repeat(24))).rejects.toBeInstanceOf(PasswordTooLongError);
+    expect(hashes.has('u2')).toBe(false);
+    expect(hashes.has('u3')).toBe(false);
+  });
+
+  it('H6 앞 72바이트가 같고 끝만 다른 원문은 인증되지 않는다 (bcrypt 절단 비의존)', async () => {
+    const at72 = 'a1!' + 'x'.repeat(69);
+    await passwordCredentialService.setPassword('u1', at72);
+    // bcrypt 자체는 73바이트째 이후를 무시한다 — 이 사실이 상한이 필요한 이유다.
+    expect(await bcrypt.compare(at72 + 'tail', hashes.get('u1')!)).toBe(true);
+    const spy = jest.spyOn(bcrypt, 'compare');
+    expect(await passwordCredentialService.verifyPassword('u1', at72)).toBe(true);
+    expect(await passwordCredentialService.verifyPassword('u1', at72 + 'tail')).toBe(false);
+    expect(await passwordCredentialService.verifyPassword('u1', at72 + '가')).toBe(false);
+    // 초과 입력도 같은 비용의 compare 를 한 번 수행한다(분기 비용 동일).
+    expect(spy).toHaveBeenCalledTimes(3);
   });
 
   it('H4 같은 원문도 매번 다른 해시', async () => {

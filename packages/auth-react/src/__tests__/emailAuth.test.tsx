@@ -124,6 +124,18 @@ describe('EmailSignupForm', () => {
     expect(submit().disabled).toBe(true);
   });
 
+  it('한글은 특수기호가 아니고 72바이트 초과는 제출 불가', () => {
+    render(<EmailSignupForm api={{ signupWithEmail: vi.fn(), resendVerificationEmail: vi.fn() }} termsHref="/t" privacyHref="/p" />);
+    screen.getAllByRole('checkbox').slice(0, 2).forEach((b) => fireEvent.click(b));
+    fill({ pw: 'abcdef1가', confirm: 'abcdef1가' });
+    expect(screen.getByText(/특수기호 포함/).textContent).toContain('✕');
+    expect(submit().disabled).toBe(true);
+    const tooLong = 'a1!' + '가'.repeat(24);
+    fill({ pw: tooLong, confirm: tooLong });
+    expect(screen.getByText(/72바이트 이하/).textContent).toContain('✕');
+    expect(submit().disabled).toBe(true);
+  });
+
   it('대소문자 요구 없음 — 소문자만으로 통과', () => {
     render(<EmailSignupForm api={{ signupWithEmail: vi.fn(), resendVerificationEmail: vi.fn() }} termsHref="/t" privacyHref="/p" />);
     fill({ pw: 'abcd123!', confirm: 'abcd123!' });

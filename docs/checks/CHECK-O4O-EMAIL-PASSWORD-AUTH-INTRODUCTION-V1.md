@@ -21,7 +21,7 @@
 | 클라이언트 | `@o4o/auth-client` `loginWithEmail` 외 6 메서드 · `useServiceAuth.loginWithEmail` |
 | web-neture | 로그인 모달(이메일 폼 → "또는" → Google) · `/signup` · `/verify-email` · `/find-id` · `/forgot-password` · `/reset-password` |
 
-비밀번호 정책: 8자 이상 + 영문자 · 숫자 · 특수기호 각 1자 이상 · 대소문자 요구 없음(보존). 가입은 계정만 생성 — 서비스 가입 · 조직 · 역할 부여 0.
+비밀번호 정책: 8자 이상 · **UTF-8 72바이트 이하** + 영문자 · 숫자 · 특수기호 각 1자 이상 · 대소문자 요구 없음(보존). 특수기호 = Unicode 문장부호(P) · 기호(S) — 한글 등 일반 문자는 특수기호가 아니다. 72바이트 상한은 공통 검사(`checkPasswordPolicy` `too_long`) · 화면 안내 · 저장(`setPassword` 거절) · 검증(`verifyPassword` 불일치)에 모두 적용된다. 가입은 계정만 생성 — 서비스 가입 · 조직 · 역할 부여 0.
 
 ## 2. 검증 결과 (2026-09-30)
 
@@ -34,6 +34,7 @@
 | — `refreshTokenFamilyContract.test.ts` P1~P4 (추가) | refresh 회전 후 `authMethod` 유지 · 나중에 붙은 `platform:*` 역할은 refresh 거부 · `supplier:admin`/`neture:admin` 허용 · Google 세션은 platform 역할이어도 회전 |
 | — `unified-store-workspace-handoff.spec.ts` C-2 · D (재작성) | 발급: 3경로 × 비밀번호 세션 → 200 · 원장 `password` · `linked_accounts` 조회 0 / Google 세션 → `google` / 위조 토큰 + body 주장 → `password`. 교환: 원장 password → 대상 세션 password(교환 시 Google 연결돼 있어도) · NULL → password · password + 발급 뒤 `platform:*` 추가 → 403 · 토큰 발급 0 · password + `kpa-society:admin` → 허용 · google + `platform:super_admin` → Google 세션(claim 없음) |
 | — `email-password-auth-migration-guard.spec.ts` (신규) | 0행 · 옛 형태 → DROP 후 재생성 / 행 존재 · 예상 밖 형태 2종 → DROP 전 실패 (QueryRunner 대역). 실 PostgreSQL 검증은 §2-1 |
+| — 기존 리뷰 2건 회귀 (추가) | `abcdef1가` → `no_symbol` 거절 · `abcdef1!` 통과 · ASCII 기호 32개 전부 인정 / ASCII 72바이트 통과 · 73 거절 · 한글 `a1!`+23자(72바이트) 통과 · +24자(75) 거절 · 71바이트 뒤 ASCII 1자 통과 · 한글 1자 거절 / 저장 경로 73바이트 · 한글 초과 → `PasswordTooLongError` · 해시 미저장 / 앞 72바이트 같은 `+tail` → 검증 false(bcrypt 원형은 true 임을 함께 단언) · compare 1회 유지 / signup · reset · setPassword 모두 `PASSWORD_POLICY_VIOLATION` / 가입 화면 `72바이트 이하 ✕` · 제출 불가 |
 | 계약 검사 `scripts/db/check-migration-contract.mjs` | 21 pass / 0 fail (baseline + incremental 11 state 등록) |
 
 ### 2-1. 격리 PostgreSQL 실검증 (2026-09-30)
@@ -93,7 +94,7 @@ Guard spec: `google-only-auth-cleanup.spec` · `legacy-password-auth-retirement.
 2. ~~handoff 수단 표식 미유지~~ → **해소**: 원장 `source_auth_method` 승계(§1). 발급과 교환 사이에 Google 이 연결되거나 역할이 바뀌어도 password 가 google 로 승격되지 않는다. 배포 창 주의: migration 적용 ~ 새 revision traffic 전환 사이(약 1분)에 옛 코드가 발급한 handoff 는 NULL → password 로 교환된다(fail-closed). 이 창에 handoff 하는 `platform:*` Google 사용자는 403 을 받고 다시 시도하면 된다.
 3. 재설정 후 기존 access token 은 만료(15분)까지 유효 — refresh 는 즉시 무효.
 4. 횟수 제한은 인스턴스별 메모리 limiter — Cloud Run 다중 인스턴스에서 합산되지 않는다.
-5. bcrypt 72바이트 초과 부분은 비교에 쓰이지 않는다.
+5. ~~bcrypt 72바이트 초과 부분은 비교에 쓰이지 않는다~~ → **해소**: UTF-8 72바이트 상한을 정책 · 화면 · 저장 · 검증에 적용(§1 · §2). 잘라 인증하지 않는다.
 6. `lower(email)` 조회에 함수 인덱스 없음 — 현재 규모에서는 영향 없음.
 7. ~~`validateDto` 400 응답의 `value` 되돌림~~ → **보완**: 민감 필드 `value` 제외(§1 · §2).
 8. 메일 링크는 항상 neture origin 으로 간다(`resolveMailLinkOrigin`).

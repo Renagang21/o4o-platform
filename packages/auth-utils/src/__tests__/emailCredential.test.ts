@@ -17,6 +17,8 @@ import {
   PASSWORD_POLICY_MESSAGES,
   checkPasswordPolicy,
   isPasswordPolicyMet,
+  passwordUtf8ByteLength,
+  isPasswordWithinByteLimit,
   maskLoginEmail,
 } from '../emailCredential.js';
 
@@ -57,6 +59,7 @@ describe('이메일 형태 검사', () => {
 describe('비밀번호 정책 — 8자 · 영문자 · 숫자 · 특수기호', () => {
   it('정책 상수가 이 WO 의 확정값이다', () => {
     expect(PASSWORD_POLICY.minLength).toBe(8);
+    expect(PASSWORD_POLICY.maxBytes).toBe(72);
     expect(PASSWORD_POLICY.requireLetter).toBe(true);
     expect(PASSWORD_POLICY.requireDigit).toBe(true);
     expect(PASSWORD_POLICY.requireSymbol).toBe(true);
@@ -104,9 +107,61 @@ describe('비밀번호 정책 — 8자 · 영문자 · 숫자 · 특수기호', 
     expect(Object.keys(PASSWORD_POLICY)).not.toContain('normalize');
   });
 
+  it('한글 등 일반 문자는 특수기호가 아니다 (리뷰 회귀)', () => {
+    expect(checkPasswordPolicy('abcdef1가')).toEqual(['no_symbol']);
+    expect(checkPasswordPolicy('abcdef1!')).toEqual([]);
+    for (const notSymbol of ['abcdef1漢', 'abcdef1é', 'abcdef1ß', 'abcdef1١']) {
+      expect(checkPasswordPolicy(notSymbol)).toEqual(['no_symbol']);
+    }
+  });
+
+  it('ASCII 기호 32개는 모두 특수기호다', () => {
+    const ascii = String.raw`!"#$%&'()*+,-./:;<=>?@[\]^_` + '`{|}~';
+    expect(ascii.length).toBe(32);
+    for (const ch of ascii) expect(checkPasswordPolicy('abcdef1' + ch)).toEqual([]);
+  });
+
   it('null · undefined 는 전부 위반', () => {
     expect(isPasswordPolicyMet(null)).toBe(false);
     expect(isPasswordPolicyMet(undefined)).toBe(false);
+  });
+});
+
+describe('비밀번호 72바이트 상한 — bcrypt 가 잘라 보는 부분을 받지 않는다 (리뷰 회귀)', () => {
+  const base = 'a1!'; // 3바이트
+
+  it('UTF-8 바이트를 센다 — ASCII 1 · é 2 · 한글 3 · 이모지 4 · 짝 없는 surrogate 3', () => {
+    expect(passwordUtf8ByteLength('abc')).toBe(3);
+    expect(passwordUtf8ByteLength('é')).toBe(2);
+    expect(passwordUtf8ByteLength('가')).toBe(3);
+    expect(passwordUtf8ByteLength('😀')).toBe(4);
+    expect(passwordUtf8ByteLength('\uD800')).toBe(3);
+    expect(passwordUtf8ByteLength(null)).toBe(0);
+  });
+
+  it('ASCII 경계 — 72바이트 통과 · 73바이트 거절', () => {
+    const at72 = base + 'x'.repeat(69);
+    const at73 = base + 'x'.repeat(70);
+    expect(passwordUtf8ByteLength(at72)).toBe(72);
+    expect(checkPasswordPolicy(at72)).toEqual([]);
+    expect(checkPasswordPolicy(at73)).toEqual(['too_long']);
+    expect(isPasswordWithinByteLimit(at73)).toBe(false);
+  });
+
+  it('한글 경계 — 글자 수가 아니라 바이트로 판정한다', () => {
+    const at72 = base + '가'.repeat(23); // 3 + 69 = 72바이트 · 26자
+    const at75 = base + '가'.repeat(24); // 3 + 72 = 75바이트
+    expect(passwordUtf8ByteLength(at72)).toBe(72);
+    expect(checkPasswordPolicy(at72)).toEqual([]);
+    expect(checkPasswordPolicy(at75)).toEqual(['too_long']);
+    // 71바이트 뒤: ASCII 1자는 72 = 통과, 한글 1자는 74 = 거절
+    const at71 = base + 'x'.repeat(68);
+    expect(checkPasswordPolicy(at71 + 'x')).toEqual([]);
+    expect(checkPasswordPolicy(at71 + '가')).toEqual(['too_long']);
+  });
+
+  it('상한 위반에도 안내 문구가 있다', () => {
+    expect(PASSWORD_POLICY_MESSAGES.too_long).toContain('72바이트');
   });
 });
 
