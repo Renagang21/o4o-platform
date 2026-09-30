@@ -1454,6 +1454,9 @@ Neture 역할을 함께 가져 실계정으로는 재현할 수 없고, 이 한 
 API 를 호출하고 화면을 열었다. 주소창 직접 호출의 401 은 역할 거부가 아니므로 쓰지 않았다.
 토큰 만료로 난 401 `INVALID_TOKEN` 은 거부로 세지 않고, 세션 갱신 뒤 다시 측정했다.
 
+> 이 절은 §8-9-3 의 **Google 로그인·인증 범위 마감**을 보완하는 기록이다. 아래 미검증 항목은
+> 후속 관리자 기능(§8-9-5)이며, 이 인증 세션은 그것을 기다리지 않고 종료한다(2026-09-30).
+
 **① 공급자 신청 화면 결함 (PR [#254](https://github.com/Renagang21/o4o-platform/pull/254) · `f1f912c87` · 병합 `fe2a3ec35`).**
 배포 1 뒤 실계정 `/supplier` 가 서비스 가입 없는 `neture:admin` 계정에 "관리자 계정입니다" 와
 「공급자 업무로 이동」(→ `/supplier/dashboard` 접근 거부)을 보였다. 원인은 `ServiceApplyPanel` 의
@@ -1505,7 +1508,7 @@ auth vitest 41 PASS · `tsc` 0 · `vite build` 성공 · PR CI 전부 pass.
 |---|---|
 | 커뮤니티 · 분회 개설 신청의 승인/거절 | `community_creation_requests` 0 · `branch_creation_requests` 0 |
 | 커뮤니티 개체 운영자의 가입 승인 성공 경로 | `community_memberships` 는 active member 2행뿐 · 운영자 0 · pending 0 · 대상 계정은 커뮤니티 가입 없음 |
-| 분회 심사 화면 허용 경로(403 → 200) | `kpa-branch:admin` 미부여 |
+| 분회 심사 화면 허용 경로(403 → 200) | `kpa-branch:admin` 미부여 — 지정은 후속 관리자 기능(§8-9-5). 인증 범위 마감을 막지 않는다 |
 | 예약어 slug | 인증 범위 밖 · 자동 테스트만 (§8-8-2) |
 | 개별 운영자 지정 | 실회원 권한을 바꾸는 작업 — 사용자 지시로 **버그 처리 라운드로 미룸**(운영자 지정 코드의 결함 포함) |
 
