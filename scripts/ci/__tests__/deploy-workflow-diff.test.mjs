@@ -125,6 +125,21 @@ describe('W. deploy workflow 변경 분류 (§8)', () => {
     assert.equal(k.build.length + k.config.length, 0);
   });
 
+  it('W10 if 조건식(한 줄 · 여러 줄)은 migrate/gcloud 단어가 있어도 control (cutover 자가 검증 오탐)', () => {
+    const head = mutate([
+      ["    if: vars.DEPLOY_FREEZE == 'false'\n    steps:\n      - name: Build", "    if: >-\n      vars.DEPLOY_FREEZE == 'false' &&\n      ((github.event.inputs.migrate_only == 'true') || needs.detect.outputs.x == 'true')\n    steps:\n      - name: Build"],
+    ]);
+    const k = analyze(head)['kpa-society'];
+    assert.equal(k.config.length + k.build.length + k.rollout.length, 0, JSON.stringify(k));
+    assert.ok(k.control > 0);
+    // 조건식이 끝난 뒤의 실제 설정 변경은 여전히 config 로 잡힌다
+    const both = mutate([
+      ["    if: vars.DEPLOY_FREEZE == 'false'\n    steps:\n      - name: Build", "    if: >-\n      github.event.inputs.migrate_only == 'true'\n    steps:\n      - name: Build"],
+      ['--memory=256Mi \\\n            --max-instances=5\n  deploy-neture', '--memory=512Mi \\\n            --max-instances=5\n  deploy-neture'],
+    ]);
+    assert.equal(analyze(both)['kpa-society'].config.length, 2);
+  });
+
   it('W8 판정 불가 — 원문 없음 · jobs 없음 → null (호출자 보수 fallback)', () => {
     assert.equal(analyzeWorkflowChange(WF, undefined, BASE, { webKeys }), null);
     assert.equal(analyzeWorkflowChange(WF, BASE, 'not a workflow', { webKeys }), null);

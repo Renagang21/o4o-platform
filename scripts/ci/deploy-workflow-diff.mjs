@@ -54,7 +54,14 @@ export function parseWorkflow(text) {
   let top = 'top:other';
   let job = null;
   let inJobs = false;
+  // `if:` 조건식(한 줄 · `if: >-` 여러 줄)은 실행 여부만 정한다 — artifact · 설정이 아니다 (cutover 자가 검증 오탐:
+  //   build-and-deploy 의 if 안 `migrate_only` 가 CONFIG_LINE 의 `migrat` 에 걸렸다).
+  let ifIndent = -1;
   for (const rawLine of text.split(/\r?\n/)) {
+    const indent = rawLine.length - rawLine.trimStart().length;
+    if (ifIndent >= 0 && rawLine.trim() !== '' && indent <= ifIndent) ifIndent = -1;
+    const inIfBlock = ifIndent >= 0 && rawLine.trim() !== '';
+    if (/^\s*if:\s*[>|]-?\s*$/.test(rawLine)) ifIndent = indent;
     if (/^[A-Za-z_][\w-]*:/.test(rawLine)) {
       // top-level key
       inJobs = /^jobs:/.test(rawLine);
@@ -77,6 +84,10 @@ export function parseWorkflow(text) {
     s.raw += `${rawLine}\n`;
     const trimmed = rawLine.trim();
     if (trimmed === '' || trimmed.startsWith('#')) continue; // 주석 · 빈 줄 = control
+    if (inIfBlock || /^if:/.test(trimmed)) {
+      s.lines.push(`if-expr ${trimmed}`); // 조건식은 flag 토큰 추출 없이 통째로 control
+      continue;
+    }
     const tokens = [];
     const stripped = trimmed
       .replace(FLAG_TOKEN, (m, tok) => {
@@ -117,6 +128,7 @@ const BUILD_TOKEN = /^(--build-arg|--file|-f|--build-context|--cache-from|--cach
 export const AUTH_BUILD_INPUT = /HANDOFF|AUTH|LOGIN|OAUTH|CLIENT_ID|GOOGLE/;
 
 export function classifyLine(line) {
+  if (line.startsWith('if-expr ')) return 'control';
   if (ROLLOUT_LINE.test(line)) return 'rollout';
   if (CONFIG_LINE.test(line)) return 'config';
   if (BUILD_LINE.test(line)) return 'build';
