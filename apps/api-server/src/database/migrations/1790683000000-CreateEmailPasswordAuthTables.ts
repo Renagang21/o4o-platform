@@ -99,7 +99,7 @@ export class CreateEmailPasswordAuthTables1790683000000 implements MigrationInte
     if (!legacyColNames.has('token') || legacyColNames.has('token_hash')) {
       throw new Error(
         '[CreateEmailPasswordAuthTables] email_verification_tokens is not the expected legacy shape ' +
-          `(${[...legacyColNames].sort().join(', ')}) — refusing to DROP.`,
+          `(${[...legacyColNames].sort((a, b) => a.localeCompare(b)).join(', ')}) — refusing to DROP.`,
       );
     }
     await q.query(`DROP TABLE email_verification_tokens`);
