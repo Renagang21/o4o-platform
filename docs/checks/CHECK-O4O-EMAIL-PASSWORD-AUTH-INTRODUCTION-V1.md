@@ -31,7 +31,7 @@
 | web-neture vitest | PASS 280/280 |
 | auth-react 소비처 tsc (web-k-cosmetics · web-kpa-branch · web-kpa-society · web-lecture · web-pharmacy-hub · web-store · admin-dashboard · web-neture) | PASS (exit 0) |
 | web-neture `vite build` | PASS |
-| CI | **미확인** (PR 후) |
+| CI (PR #257 · `2d29ee338`) | Jest 3 shard · Code Quality · Guard Static · admin-dashboard build · SonarCloud **PASS**. `Analyze (typescript)`(CodeQL) **FAIL** — 분석은 완료, SARIF 업로드가 "Code scanning is not enabled for this repository" 로 거절(저장소 설정 · 코드 무관 · 필수 check 아님). 1차 실행의 Jest 2 spec(handoff 대역) · SonarCloud S2245 실패는 `2d29ee338` 로 수정 |
 | 운영 적용 · 실계정 가입/로그인 | **미실시** — 배포 승인 필요 |
 
 V1~V12 는 서비스 단위 테스트로 고정했고(`emailAuthService.test.ts` · `passwordCredentialService.test.ts` · `passwordSessionBoundary.test.ts`), **실환경 확인은 운영 적용 후** 이 문서에 추가한다.
