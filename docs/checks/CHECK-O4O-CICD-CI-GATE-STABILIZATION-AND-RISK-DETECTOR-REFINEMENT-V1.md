@@ -140,7 +140,16 @@ top env 값이 바뀌면 그 env 를 참조하는 job 만 영향. job 안의 `--
 
 ## 9. push 후 확인
 
-(push 후 기록)
+commit `87a0cf73b`:
+
+| run | 결과 |
+|---|---|
+| CI Pipeline | success (새 node:test 파일 포함 full 경로) |
+| CodeQL | failure — 분석 후 SARIF upload "Code scanning is not enabled for this repository" (기존 #259 문제 · CI gate advisory) |
+| Deploy Risk Gate (shadow) `36730996970` | success — `CI_STATE=GREEN` · `CI_ATTEMPTS=1` · 11개 서비스 전부 `BEHIND_NO_RUNTIME_CHANGE · LEVEL_1 · NO_DEPLOY` · risk LEVEL_1 (로컬 판정 §7 과 일치) |
+| deploy workflow 3종 | trigger 없음 (paths 비해당) — 배포 0 |
+
+`DEPLOY_ENABLED=false` 유지 확인.
 
 ## 10. 불변
 
