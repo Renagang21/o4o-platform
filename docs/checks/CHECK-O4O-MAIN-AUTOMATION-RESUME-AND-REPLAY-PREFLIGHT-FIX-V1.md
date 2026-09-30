@@ -3,7 +3,7 @@
 > **WO**: [`WO-O4O-MAIN-AUTOMATION-RESUME-AND-REPLAY-PREFLIGHT-FIX-V1`](../work-orders/WO-O4O-MAIN-AUTOMATION-RESUME-AND-REPLAY-PREFLIGHT-FIX-V1.md)
 > **선행 판정**: [`CHECK-O4O-WEB-AUTOMATION-USER-GUIDED-RESUME-AND-WORKFLOW-CANDIDATE-REPLAY-V1`](CHECK-O4O-WEB-AUTOMATION-USER-GUIDED-RESUME-AND-WORKFLOW-CANDIDATE-REPLAY-V1.md) §10 — `BLOCKED` (FAIL 1 SAME_RUN_RESUME_SHORT_ANSWER · FAIL 2 REPLAY_PRE_EXECUTION_SEMANTIC_VALIDATION)
 > **작성일**: 2026-09-30
-> **현재 판정**: `CODE_COMPLETE` · 실 PC 재검증 **PENDING** → `MAIN_AUTOMATION_WORKFLOW_STATUS = BLOCKED` 유지(재검증 PASS 시 `PRODUCTION_READY`)
+> **현재 판정**: `CODE_COMPLETE` · 배포 `DEPLOY_PAUSED`(web-neture 반영 · api traffic 미승격, §3-1) · 실 PC 재검증 **PENDING** → `MAIN_AUTOMATION_WORKFLOW_STATUS = BLOCKED` 유지(재검증 PASS 시 `PRODUCTION_READY`)
 
 ---
 
@@ -49,5 +49,15 @@
 | A | 약학정보원에서 내가 먹을 약 검색해줘 | **입력·클릭 전** QUESTION(행동 0) · Candidate 결과 미기록 | PENDING |
 | H 회귀 | G/H 기존 흐름 | 결과 동일 | PENDING |
 | 안전 회귀 | TAKEOVER 재개 불가 · Cloud 저장 경계 | 변화 없음 | PENDING |
+
+### 3-1. 배포 시도 기록 (2026-09-30) — `DEPLOY_PAUSED` (사용자 지시: 배포 과정 정비 후 재개)
+
+- 선행 보안 조치: 노출 판단된 Local Agent device 1행 revoke(`status='revoked'`, `revoked_at` 기록 · 사용자 승인 단건 UPDATE) → 사용자가 설정 > 이 PC 연결로 re-pairing → 새 device 발급 확인.
+- 배포 SHA `21e965436` (4a1bec70e 포함 · 이후 커밋은 scripts/tests/docs, migration 0).
+- web-neture: `neture-web-01665-7wf` traffic 100% (image `21e965436`). 다른 웹 서비스 skip.
+- api-server: 새 revision `o4o-core-api-03759-cgw`(image `21e965436`) Ready 이나 **traffic 0%**. 서비스 traffic 이 2026-09-30 02:07Z 에 `o4o-core-api-03758-wdt`(bfa48c135) 100% 로 **revision 고정**돼 있어 workflow 배포가 트래픽을 옮기지 않았다. 고정 의도 미확인 → `update-traffic` 미실행.
+- 첫 API dispatch 는 게이트 개방 직후 생성돼 `DEPLOY_ENABLED='false'` 로 읽혀 skip(변수 반영 지연) → 재실행으로 build-and-deploy 성공. 현재 `DEPLOY_ENABLED=false`.
+- 실 PC 재검증 미실행 — api 변경(A·B)이 serving 되지 않아 무효. `PRODUCTION_READY` 미판정.
+- 재개 조건: api traffic 이 `4a1bec70e` 포함 revision 으로 100% 승격된 뒤 §3 표 전체.
 
 **배포 선행 필요**: A · B 는 api-server(`o4o-core-api`), B · C 는 web-neture 변경이다. 선행 CHECK §10 smoke 는 운영 serving revision(`o4o-core-api-03758-wdt`, image `bfa48c135`)을 대상으로 했으므로, 이번 수정의 실 PC 재검증은 **두 서비스 배포 뒤에만 유효**하다. `DEPLOY_ENABLED=false` 유지 · 이번 WO 에서 배포하지 않음 — 배포는 별도 지시 대기.
