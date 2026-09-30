@@ -102,7 +102,12 @@ Guard spec: `google-only-auth-cleanup.spec` · `legacy-password-auth-retirement.
 
 ## 5-1. CodeQL 결과 보존
 
-repo 에 code scanning 이 켜져 있지 않아 SARIF 업로드가 실패한다(설정 · 공개 범위 · 유료 기능 변경은 범위 밖). `ci-security.yml` 에 `output: codeql-sarif` + `if: always()` artifact(`codeql-sarif-typescript`, 14일) 만 추가했다. 결과 판정은 최종 HEAD 의 SARIF 를 직접 읽어 완료 보고에 기록한다 — 분석 완료만으로 보안 PASS 로 기록하지 않는다.
+repo 에 code scanning 이 켜져 있지 않아 SARIF 업로드가 실패한다(설정 · 공개 범위 · 유료 기능 변경은 범위 밖). `ci-security.yml` 에 `output: codeql-sarif` + `if: always()` artifact(`codeql-sarif-typescript`, 14일) 만 추가했다. 결과 판정은 SARIF 를 직접 읽어 기록한다 — 분석 완료만으로 보안 PASS 로 기록하지 않는다.
+
+**`ed57dfcf1` SARIF (run 36672957743)**: 분석 성공(`executionSuccessful:true`) · step 실패 원인 = 업로드("Code scanning is not enabled") 뿐. 결과 793건 — `js/missing-rate-limiting` 757 · `incomplete-multi-character-sanitization` 14 · `incomplete-url-substring-sanitization` 6 · `double-escaping` 5 · `bad-tag-filter` 3 · `clear-text-storage-of-sensitive-data` 2 · `missing-token-validation` · `biased-cryptographic-random` · `insecure-helmet-configuration` · `sensitive-get-query` · `client-exposed-cookie` · `clear-text-cookie` 각 1.
+- 이 PR 이 바꾼 api-server 파일에 걸린 것은 `auth.routes.ts` 의 `missing-rate-limiting` 12건뿐이며, 모두 **기존 route**(Google login · refresh · me · logout 등) 줄이다. PR hunk(신규 email/password route 7 + `POST /auth/password`) 안의 결과는 0 — 신규 route 는 전부 limiter 를 거친다.
+- 나머지 781건은 이 PR 이 건드리지 않은 파일의 기존 결과다. 기존 결과 정리는 범위 밖 — 별도 WO 제안(특히 `missing-token-validation` · `clear-text-storage` · `insecure-helmet-configuration` 우선 triage).
+- 판정: **이 PR 의 신규 결과 0 · 기존 결과 미해결** (보안 전체 PASS 아님).
 
 ## 5-2. 롤백
 
