@@ -97,15 +97,36 @@ export function autoTagName(sha) {
   return `deploy/auto-${sha.slice(0, 12)}`;
 }
 
-export function githubClient(repo, token, fetchImpl = fetch) {
+// 연결 계층 오류 — 응답을 받기 전에 끊긴 경우만. HTTP 오류 status 는 여기 해당하지 않는다.
+// 실측: serving 판정(~1분) 동안 놀던 keep-alive 소켓을 재사용하다 `UND_ERR_SOCKET other side closed`.
+const NETWORK_ERROR_CODES = new Set(['UND_ERR_SOCKET', 'UND_ERR_CLOSED', 'UND_ERR_CONNECT_TIMEOUT', 'ECONNRESET', 'ECONNREFUSED', 'EPIPE', 'ETIMEDOUT', 'EAI_AGAIN']);
+export function isNetworkError(err) {
+  return err instanceof TypeError && NETWORK_ERROR_CODES.has(err.cause?.code);
+}
+
+/**
+ * GitHub REST client. 연결 오류 재시도는 **GET 만** (멱등). POST 는 재시도하지 않는다 —
+ * 요청이 서버에 닿았는지 모르는 채 다시 보내면 dispatch 가 중복될 수 있다.
+ * 예외: 태그 생성 POST 가 연결 오류면 GET 으로 실제 생성 여부를 확인한다.
+ */
+export function githubClient(repo, token, fetchImpl = fetch, { sleep = (ms) => new Promise((r) => setTimeout(r, ms)), getAttempts = 3 } = {}) {
   const call = async (method, url, body) => {
-    const res = await fetchImpl(`https://api.github.com/repos/${repo}${url}`, {
-      method,
-      headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28', 'Content-Type': 'application/json' },
-      body: body ? JSON.stringify(body) : undefined,
-    });
-    const text = await res.text();
-    return { status: res.status, ok: res.ok, json: text ? JSON.parse(text) : null };
+    const attempts = method === 'GET' ? getAttempts : 1;
+    for (let i = 1; ; i += 1) {
+      try {
+        const res = await fetchImpl(`https://api.github.com/repos/${repo}${url}`, {
+          method,
+          headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28', 'Content-Type': 'application/json' },
+          body: body ? JSON.stringify(body) : undefined,
+        });
+        const text = await res.text();
+        return { status: res.status, ok: res.ok, json: text ? JSON.parse(text) : null };
+      } catch (err) {
+        if (i >= attempts || !isNetworkError(err)) throw err;
+        console.log(`GitHub API ${method} ${url} 연결 오류(${err.cause.code}) — 재시도 ${i}/${attempts - 1}`);
+        await sleep(1_000 * i);
+      }
+    }
   };
   return {
     headSha: async () => (await call('GET', '/git/ref/heads/main')).json?.object?.sha ?? null,
@@ -115,7 +136,15 @@ export function githubClient(repo, token, fetchImpl = fetch) {
         if (got.json?.object?.sha !== sha) throw new Error(`태그 ${tag} 가 다른 SHA 를 가리킴 (${got.json?.object?.sha})`);
         return 'exists';
       }
-      const made = await call('POST', '/git/refs', { ref: `refs/tags/${tag}`, sha });
+      let made;
+      try {
+        made = await call('POST', '/git/refs', { ref: `refs/tags/${tag}`, sha });
+      } catch (err) {
+        if (!isNetworkError(err)) throw err;
+        const check = await call('GET', `/git/ref/tags/${tag}`);
+        if (check.ok && check.json?.object?.sha === sha) return 'created';
+        throw err;
+      }
       if (!made.ok) throw new Error(`태그 생성 실패 ${made.status}`);
       return 'created';
     },

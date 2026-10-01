@@ -4,7 +4,7 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import { FRONTENDS, autoTagName, decideAll, decideOne, executeDecisions, isFrozen } from '../deploy-orchestrate.mjs';
+import { FRONTENDS, autoTagName, decideAll, decideOne, executeDecisions, githubClient, isFrozen, isNetworkError } from '../deploy-orchestrate.mjs';
 import { DEPLOY_TARGETS, LEVEL_1, LEVEL_2, LEVEL_3 } from '../deploy-risk.mjs';
 
 const SHA = 'c'.repeat(40);
@@ -140,5 +140,68 @@ describe('X. 실행 순서 · target 고정', () => {
     const f = fakeGh({ tagSha: 'd'.repeat(40) });
     await assert.rejects(executeDecisions(decisions(['neture']), SHA, f.gh, { sleep: f.sleep, now: f.now, log: () => {} }));
     assert.equal(f.calls.filter((c) => c[0] === 'dispatch').length, 0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// WO-O4O-CICD-DEPLOY-AUTO-GITHUB-API-CONNECTION-RETRY-V1 — 연결 오류 재시도 (GET 만)
+// ---------------------------------------------------------------------------
+
+const socketErr = (code = 'UND_ERR_SOCKET') => Object.assign(new TypeError('fetch failed'), { cause: Object.assign(new Error('other side closed'), { code }) });
+const res = (status, json) => ({ status, ok: status >= 200 && status < 300, text: async () => (json === undefined ? '' : JSON.stringify(json)) });
+// 응답 · 예외를 차례로 돌려주는 fetch 대역
+const scripted = (steps) => {
+  const calls = [];
+  const fetchImpl = async (url, init) => {
+    calls.push(`${init.method} ${url.replace('https://api.github.com/repos/o/r', '')}`);
+    const step = steps.shift();
+    if (step instanceof Error) throw step;
+    return step;
+  };
+  return { calls, fetchImpl };
+};
+const client = (fetchImpl) => githubClient('o/r', 't', fetchImpl, { sleep: async () => {} });
+const TAG = 'deploy/auto-cccccccccccc';
+
+describe('R. GitHub API 연결 오류 재시도', () => {
+  it('연결 오류 판정: undici 소켓 계열만 · HTTP 오류 · 일반 예외는 아님', () => {
+    assert.equal(isNetworkError(socketErr()), true);
+    assert.equal(isNetworkError(socketErr('ECONNRESET')), true);
+    assert.equal(isNetworkError(new TypeError('fetch failed')), false);
+    assert.equal(isNetworkError(new SyntaxError('bad json')), false);
+  });
+
+  it('실측 재현: ensureTag 의 첫 GET 이 끊긴 소켓 → 재시도 후 태그 생성', async () => {
+    const { calls, fetchImpl } = scripted([socketErr(), res(404, { message: 'Not Found' }), res(201, { ref: `refs/tags/${TAG}` })]);
+    assert.equal(await client(fetchImpl).ensureTag(TAG, SHA), 'created');
+    assert.deepEqual(calls, [`GET /git/ref/tags/${TAG}`, `GET /git/ref/tags/${TAG}`, 'POST /git/refs']);
+  });
+
+  it('GET 은 최대 3회 — 계속 끊기면 원래 오류를 던진다', async () => {
+    const { calls, fetchImpl } = scripted([socketErr(), socketErr(), socketErr(), res(200, {})]);
+    await assert.rejects(client(fetchImpl).headSha(), (err) => isNetworkError(err));
+    assert.equal(calls.length, 3);
+  });
+
+  it('HTTP 오류 status 는 재시도하지 않고 그대로 돌려준다', async () => {
+    const { calls, fetchImpl } = scripted([res(500, { message: 'x' })]);
+    assert.equal(await client(fetchImpl).headSha(), null);
+    assert.equal(calls.length, 1);
+  });
+
+  it('dispatch POST 는 연결 오류여도 재시도하지 않는다 (중복 배포 방지)', async () => {
+    const { calls, fetchImpl } = scripted([socketErr(), res(204)]);
+    await assert.rejects(client(fetchImpl).dispatch('deploy-api.yml', TAG, {}), (err) => isNetworkError(err));
+    assert.deepEqual(calls, ['POST /actions/workflows/deploy-api.yml/dispatches']);
+  });
+
+  it('태그 생성 POST 가 연결 오류: 실제 생성됐으면 created, 아니면 원래 오류', async () => {
+    const made = scripted([res(404, {}), socketErr(), res(200, { object: { sha: SHA } })]);
+    assert.equal(await client(made.fetchImpl).ensureTag(TAG, SHA), 'created');
+    assert.equal(made.calls.filter((c) => c.startsWith('POST')).length, 1);
+
+    const notMade = scripted([res(404, {}), socketErr(), res(404, {})]);
+    await assert.rejects(client(notMade.fetchImpl).ensureTag(TAG, SHA), (err) => isNetworkError(err));
+    assert.equal(notMade.calls.filter((c) => c.startsWith('POST')).length, 1);
   });
 });
