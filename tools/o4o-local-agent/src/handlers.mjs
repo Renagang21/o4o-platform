@@ -43,7 +43,7 @@ import {
   validateKeyArgs,
   validateTextArgs,
 } from './computer-use-limits.mjs';
-import { LocalMetaRepository, LocalSettingsRepository, LocalWorkRunRepository, LocalWorkflowCandidateRepository, LocalDatasetRepository, DATASET_NAME_RE, FIELD_NAME_RE, WORK_RUN_ID_RE, WORK_RUN_STATUSES, WORKFLOW_CANDIDATE_ID_RE, localDbHealth, LocalDbError } from './local-db.mjs';
+import { LocalMetaRepository, LocalSettingsRepository, LocalWorkRunRepository, LocalWorkflowCandidateRepository, LocalWorkRunExperienceRepository, LocalDatasetRepository, DATASET_NAME_RE, FIELD_NAME_RE, WORK_RUN_ID_RE, WORK_RUN_STATUSES, WORKFLOW_CANDIDATE_ID_RE, localDbHealth, LocalDbError } from './local-db.mjs';
 import { backupSummary } from './local-db-backup.mjs';
 import { prepareTarget, resolveRegisteredTarget } from './work-target.mjs';
 import { uiaInspect, uiaSetValue, uiaInvoke, uiaKey, uiaClick } from './windows-uia.mjs';
@@ -105,6 +105,7 @@ export const ACTIONS = {
   DATA_WORK_RUN_CANDIDATE_SAVE: 'local.data.work_run_candidate_save',
   DATA_WORK_RUN_CANDIDATE_MATCH: 'local.data.work_run_candidate_match',
   DATA_WORK_RUN_CANDIDATE_RESULT: 'local.data.work_run_candidate_result',
+  DATA_WORK_RUN_EXPERIENCE_RECORD: 'local.data.work_run_experience_record',
 };
 
 /**
@@ -907,6 +908,164 @@ function dataCandidateResult(args) {
   return { status: 'success', data: { saved: true, candidateId: r.candidateId, candidateStatus: r.candidateStatus } };
 }
 
+// ─── Experience 원장 (WO-O4O-AUTOMATION-LOCAL-EXPERIENCE-MINIMUM-STORAGE-V1) ──────
+// 서버 validateDataWorkRunExperienceRecordArgs 와 같은 규칙(손으로 복제). enum · 정수 · semantic locator 만 받는다 —
+// 자유 텍스트 칸이 없다(입력 내용 · 사용자 답변 · 화면 글 · 모델 근거가 실릴 자리가 형상에 없다).
+const EXPERIENCE_END_STATES = Object.freeze(['completed', 'waiting_for_user', 'taken_over', 'stopped', 'resume_failed']);
+const EXPERIENCE_TARGET_KINDS = Object.freeze(['browser_site', 'windows_app']);
+const EXPERIENCE_OUTCOME_STATUSES = Object.freeze(['SUCCESS', 'PARTIAL_SUCCESS', 'USER_COMPLETED', 'BLOCKED', 'FAILED', 'CANCELLED', 'ABANDONED']);
+const EXPERIENCE_EVIDENCE = Object.freeze(['system_verified', 'user_confirmed', 'agent_inferred']);
+const EXPERIENCE_STAGES = Object.freeze(['observe', 'read', 'input', 'activate']);
+const EXPERIENCE_ACTION_KINDS = Object.freeze([
+  'inspect', 'find', 'read_text', 'read_table', 'set_input', 'select_option', 'click', 'takeover', 'done', 'key', 'visual_click', 'visual_type', 'visual_key',
+]);
+const EXPERIENCE_METHODS = Object.freeze(['browser_dom', 'windows_uia', 'computer_use']);
+const EXPERIENCE_ACTORS = Object.freeze(['deterministic', 'ai_normal', 'ai_strong']);
+const EXPERIENCE_RESULT_STATUSES = Object.freeze(['success', 'failed', 'denied', 'rejected']);
+const EXPERIENCE_LAYERS = Object.freeze(['runtime', 'ui_change', 'business_knowledge', 'input_missing', 'judgment', 'policy_risk']);
+const EXPERIENCE_FAILURE_CLASSES = Object.freeze([
+  'DISCOVERY_FAILURE', 'TARGET_FAILURE', 'OBSERVATION_FAILURE', 'PLANNING_FAILURE', 'ACTION_FAILURE', 'NO_PROGRESS',
+  'AMBIGUOUS_STATE', 'UNSUPPORTED_UI', 'USER_INTERFERENCE', 'RISK_BLOCKED', 'EXTERNAL_CHANGE',
+]);
+const EXPERIENCE_RECOVERY_TIERS = Object.freeze(['normal_retry', 'strong_model', 'user_assistance']);
+const EXPERIENCE_RECOVERY_RESULTS = Object.freeze([
+  'recovered_by_normal_retry', 'recovered_by_strong_model', 'recovered_by_user_hint', 'recovered_by_user_action', 'not_recovered',
+]);
+const EXPERIENCE_MAX_STEPS = 60;
+const EXPERIENCE_MAX_FAILURES = 20;
+const EXPERIENCE_MS_MAX = 86_400_000;
+const EXPERIENCE_COUNT_MAX = 10_000;
+const EXPERIENCE_ISO_RE = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,3})?Z$/;
+const EXPERIENCE_ERROR_CODE_RE = /^[A-Z][A-Z0-9_]{1,63}$/;
+const EXPERIENCE_METRIC_KEYS = Object.freeze([
+  'totalMs', 'aiMs', 'aiCalls', 'commandWaitMs', 'executionMs', 'settleMs', 'actionCount', 'stepCount', 'retryCount',
+]);
+
+function expPlain(v) {
+  return !!v && typeof v === 'object' && !Array.isArray(v);
+}
+function expExactKeys(v, keys) {
+  const own = Object.keys(v);
+  return own.length === keys.length && own.every((k) => keys.includes(k));
+}
+function expEnumOrNull(v, list) {
+  return v === null || (typeof v === 'string' && list.includes(v));
+}
+function expIntOrNull(v, max) {
+  return v === null || (Number.isInteger(v) && v >= 0 && v <= max);
+}
+function expErrorCodeOrNull(v) {
+  return v === null || (typeof v === 'string' && EXPERIENCE_ERROR_CODE_RE.test(v));
+}
+
+function validateExperienceStep(raw, index) {
+  if (!expPlain(raw)) return null;
+  if (!expExactKeys(raw, ['seq', 'stage', 'actionKind', 'method', 'locator', 'actor', 'resultStatus', 'resultEvidence', 'errorCode', 'durationMs'])) return null;
+  if (raw.seq !== index + 1) return null;
+  if (!expEnumOrNull(raw.stage, EXPERIENCE_STAGES)) return null;
+  if (!EXPERIENCE_ACTION_KINDS.includes(raw.actionKind)) return null;
+  if (!expEnumOrNull(raw.method, EXPERIENCE_METHODS)) return null;
+  if (!expEnumOrNull(raw.actor, EXPERIENCE_ACTORS)) return null;
+  if (!EXPERIENCE_RESULT_STATUSES.includes(raw.resultStatus)) return null;
+  if (!expEnumOrNull(raw.resultEvidence, EXPERIENCE_EVIDENCE)) return null;
+  if (!expErrorCodeOrNull(raw.errorCode)) return null;
+  if (!expIntOrNull(raw.durationMs, EXPERIENCE_MS_MAX)) return null;
+  let locator = null;
+  if (raw.locator !== null) {
+    // semantic locator 는 DOM 단계에만(역할 + 접근 이름/보이는 이름). 좌표 · elementRef · 입력 내용은 형상에 없다.
+    if (raw.method !== 'browser_dom') return null;
+    locator = validateWorkflowLocator(raw.locator);
+    if (!locator) return null;
+  }
+  return {
+    seq: raw.seq, stage: raw.stage, actionKind: raw.actionKind, method: raw.method, locator, actor: raw.actor,
+    resultStatus: raw.resultStatus, resultEvidence: raw.resultEvidence, errorCode: raw.errorCode, durationMs: raw.durationMs,
+  };
+}
+
+function validateExperienceFailure(raw, stepCount) {
+  if (!expPlain(raw)) return null;
+  if (!expExactKeys(raw, ['stepSeq', 'stage', 'layer', 'failureClass', 'errorCode', 'method', 'recoveryTier', 'recoveryResult', 'uiChangeSuspected'])) return null;
+  if (raw.stepSeq !== null && !(Number.isInteger(raw.stepSeq) && raw.stepSeq >= 1 && raw.stepSeq <= stepCount)) return null;
+  if (!expEnumOrNull(raw.stage, EXPERIENCE_STAGES)) return null;
+  if (!expEnumOrNull(raw.layer, EXPERIENCE_LAYERS)) return null;
+  if (!expEnumOrNull(raw.failureClass, EXPERIENCE_FAILURE_CLASSES)) return null;
+  if (!expErrorCodeOrNull(raw.errorCode)) return null;
+  if (!expEnumOrNull(raw.method, EXPERIENCE_METHODS)) return null;
+  if (!expEnumOrNull(raw.recoveryTier, EXPERIENCE_RECOVERY_TIERS)) return null;
+  if (!expEnumOrNull(raw.recoveryResult, EXPERIENCE_RECOVERY_RESULTS)) return null;
+  if (typeof raw.uiChangeSuspected !== 'boolean') return null;
+  return {
+    stepSeq: raw.stepSeq, stage: raw.stage, layer: raw.layer, failureClass: raw.failureClass, errorCode: raw.errorCode, method: raw.method,
+    recoveryTier: raw.recoveryTier, recoveryResult: raw.recoveryResult, uiChangeSuspected: raw.uiChangeSuspected,
+  };
+}
+
+/** experience_record 인자 검사 — `{ runId, segment, target, outcome, metric, steps, failures }`. 서버와 동일 규칙. */
+function validateExperienceRecordArgs(args) {
+  if (!expPlain(args)) return { ok: false };
+  if (!expExactKeys(args, ['runId', 'segment', 'target', 'outcome', 'metric', 'steps', 'failures'])) return { ok: false };
+  if (typeof args.runId !== 'string' || !WORK_RUN_ID_RE.test(args.runId)) return { ok: false };
+  const seg = args.segment;
+  if (!expPlain(seg) || !expExactKeys(seg, ['startedAt', 'endedAt', 'endState', 'resumed'])) return { ok: false };
+  if (typeof seg.startedAt !== 'string' || !EXPERIENCE_ISO_RE.test(seg.startedAt)) return { ok: false };
+  if (typeof seg.endedAt !== 'string' || !EXPERIENCE_ISO_RE.test(seg.endedAt)) return { ok: false };
+  if (Date.parse(seg.endedAt) < Date.parse(seg.startedAt)) return { ok: false };
+  if (!EXPERIENCE_END_STATES.includes(seg.endState) || typeof seg.resumed !== 'boolean') return { ok: false };
+  const tg = args.target;
+  if (!expPlain(tg) || !expExactKeys(tg, ['targetId', 'targetKind'])) return { ok: false };
+  if (!resolveRegisteredTarget(tg.targetId) || !EXPERIENCE_TARGET_KINDS.includes(tg.targetKind)) return { ok: false };
+  let outcome = null;
+  if (args.outcome !== null) {
+    const oc = args.outcome;
+    if (!expPlain(oc) || !expExactKeys(oc, ['status', 'evidence'])) return { ok: false };
+    if (!EXPERIENCE_OUTCOME_STATUSES.includes(oc.status) || !EXPERIENCE_EVIDENCE.includes(oc.evidence)) return { ok: false };
+    // 최종 결과는 종료 segment 에만 붙는다 — 사용자 대기 · 재개 실패 segment 는 결과가 아니다.
+    if (seg.endState === 'waiting_for_user' || seg.endState === 'resume_failed') return { ok: false };
+    outcome = { status: oc.status, evidence: oc.evidence };
+  }
+  const mt = args.metric;
+  if (!expPlain(mt) || !expExactKeys(mt, EXPERIENCE_METRIC_KEYS)) return { ok: false };
+  for (const k of EXPERIENCE_METRIC_KEYS) {
+    if (!expIntOrNull(mt[k], k.endsWith('Ms') ? EXPERIENCE_MS_MAX : EXPERIENCE_COUNT_MAX)) return { ok: false };
+  }
+  if (!Array.isArray(args.steps) || args.steps.length > EXPERIENCE_MAX_STEPS) return { ok: false };
+  const steps = [];
+  for (let i = 0; i < args.steps.length; i += 1) {
+    const s = validateExperienceStep(args.steps[i], i);
+    if (!s) return { ok: false };
+    steps.push(s);
+  }
+  if (!Array.isArray(args.failures) || args.failures.length > EXPERIENCE_MAX_FAILURES) return { ok: false };
+  const failures = [];
+  for (const f of args.failures) {
+    const v = validateExperienceFailure(f, steps.length);
+    if (!v) return { ok: false };
+    failures.push(v);
+  }
+  return {
+    ok: true,
+    args: {
+      runId: args.runId,
+      segment: { startedAt: seg.startedAt, endedAt: seg.endedAt, endState: seg.endState, resumed: seg.resumed },
+      target: { targetId: tg.targetId, targetKind: tg.targetKind },
+      outcome,
+      metric: Object.fromEntries(EXPERIENCE_METRIC_KEYS.map((k) => [k, mt[k]])),
+      steps,
+      failures,
+    },
+  };
+}
+
+/** `local.data.work_run_experience_record` — 기록 확인(segment 번호 · 건수)만 돌려준다. */
+function dataExperienceRecord(args) {
+  const r = LocalWorkRunExperienceRepository.record(args);
+  return {
+    status: 'success',
+    data: { saved: r.recorded, duplicate: r.duplicate === true, segmentIndex: r.segmentIndex, stepCount: r.stepCount ?? 0, failureCount: r.failureCount ?? 0 },
+  };
+}
+
 /** work_run_set_status 인자 검사 — `{ runId, status, note? }`. */
 function validateWorkRunSetStatusArgs(args) {
   if (!args || typeof args !== 'object' || Array.isArray(args)) return { ok: false };
@@ -1000,6 +1159,7 @@ const DATA_HANDLERS = {
   [ACTIONS.DATA_WORK_RUN_CANDIDATE_SAVE]: { validate: validateCandidateSaveArgs, run: (args) => dataCandidateSave(args) },
   [ACTIONS.DATA_WORK_RUN_CANDIDATE_MATCH]: { validate: validateCandidateMatchArgs, run: (args) => dataCandidateMatch(args) },
   [ACTIONS.DATA_WORK_RUN_CANDIDATE_RESULT]: { validate: validateCandidateResultArgs, run: (args) => dataCandidateResult(args) },
+  [ACTIONS.DATA_WORK_RUN_EXPERIENCE_RECORD]: { validate: validateExperienceRecordArgs, run: (args) => dataExperienceRecord(args) },
 };
 
 /**

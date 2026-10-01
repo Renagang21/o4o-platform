@@ -277,6 +277,9 @@ function validateLocator(raw: unknown): WorkflowLocator | null {
   return out;
 }
 
+/** Experience 단계 locator 검증에 같은 규칙을 쓴다(WO-O4O-AUTOMATION-LOCAL-EXPERIENCE-MINIMUM-STORAGE-V1). */
+export const validateWorkflowLocator = validateLocator;
+
 function validateExpect(raw: unknown): { navigated: boolean; changed: boolean } | null {
   if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return null;
   const src = raw as Record<string, unknown>;

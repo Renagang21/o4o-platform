@@ -81,7 +81,25 @@ import {
   issueWorkflowCandidateMatch,
   issueWorkflowCandidateResult,
   issueWorkflowCandidateSave,
+  issueWorkRunExperienceRecord,
+  measureSegmentCommandTiming,
 } from './work-run-executor.js';
+import {
+  buildExperienceSteps,
+  buildStepFailures,
+  experienceCount,
+  experienceFailureClassOf,
+  experienceLayerOf,
+  experienceLocatorOf,
+  experienceMs,
+  experienceOutcomeOf,
+  isRuntimeLayerCode,
+  safeErrorCode,
+  type ExperienceActor,
+  type ExperienceEndState,
+  type ExperienceFailure,
+  type ExperienceStepMeta,
+} from './work-experience.js';
 import {
   buildTrajectoryEntry,
   buildWorkflowCandidate,
@@ -521,6 +539,34 @@ export async function runWorkAgent(
   const workflow: WorkflowRunSummary = { replay: 'none', replayedSteps: 0, candidate: 'none' };
   let replayedCandidateId: string | null = null;
   let resumedRun = false;
+  // ── Local Experience 최소 저장(WO-O4O-AUTOMATION-LOCAL-EXPERIENCE-MINIMUM-STORAGE-V1) — 요청 메모리 전용 계측. ──
+  //   단계 부가정보(행위자 · semantic locator · 소요)는 history 기록과 짝으로만 둔다. 값 · 화면 글 · 관찰은 담지 않는다.
+  const stepMeta = new WeakMap<WorkStepRecord, ExperienceStepMeta>();
+  let replaying = false;
+  let aiMs = 0;
+  let aiCalls = 0;
+  let settleMs = 0;
+  let retryCount = 0;
+  /** 종료(인계) 직전 실패의 오류 코드 — 근거가 있는 곳에서만 정한다. */
+  let terminalErrorCode: string | null = null;
+  /** 인계를 Planner 가 제안했는가(Outcome 근거 = agent_inferred). */
+  let plannerTakeover = false;
+  /** 재생 전 의미 검증이 요청 값 부족으로 멈췄는가(layer=input_missing). */
+  let inputMissing = false;
+  /** 재생 이탈 원인(있으면). code 는 명령 오류 코드일 때만. */
+  let replayDiverge: { cause: 'budget' | 'find_failed' | 'locator_not_found' | 'validation_rejected' | 'step_failed' | 'expect_mismatch'; code: string | null; stepSeq: number | null } | null = null;
+  /** execActOnce 가 이번 호출에서 남긴 단계 기록(실행 전 인계면 null). */
+  let lastActRecord: WorkStepRecord | null = null;
+  const currentActor = (): ExperienceActor =>
+    replaying ? 'deterministic' : strongPlanner && activePlanner === strongPlanner ? 'ai_strong' : 'ai_normal';
+  const settle = async (): Promise<void> => {
+    const t = Date.now();
+    await sleep(NAVIGATION_SETTLE_MS);
+    settleMs += Date.now() - t;
+  };
+  /** 실패 종료가 실행 환경(runtime) 층인가 — Candidate 실패 통계에서 뺀다(D7 · §11). */
+  const endedByRuntime = (): boolean =>
+    isRuntimeLayerCode(terminalErrorCode) || state.takeover?.reason === 'site_not_ready';
 
   /**
    * 종료 상태를 정본(Local SQLite, set_status) + 최소 coordination(Cloud, transition) 에 남긴다(§조건 1·2·4).
@@ -574,11 +620,92 @@ export async function runWorkAgent(
       }
       if (replayedCandidateId && !saved) {
         const outcome = kind === 'completed' && workflow.replay === 'completed' ? 'replay_completed' : 'replay_diverged';
-        await issueWorkflowCandidateResult(dataSource, ledgerCtx, { candidateId: replayedCandidateId, outcome });
+        // D7 — 실행 환경(runtime) 실패는 Procedure 결함이 아니다. 재생 이탈 원인이 runtime 이거나, 이탈 없이 runtime 으로
+        // 끝났으면 Candidate failure_count 에 넣지 않는다(WO-O4O-AUTOMATION-LOCAL-EXPERIENCE-MINIMUM-STORAGE-V1 §11).
+        const runtimeOnly = outcome === 'replay_diverged' && (replayDiverge ? isRuntimeLayerCode(replayDiverge.code) : endedByRuntime());
+        if (!runtimeOnly) await issueWorkflowCandidateResult(dataSource, ledgerCtx, { candidateId: replayedCandidateId, outcome });
       }
     } catch (e) {
       if (workflow.candidate === 'none' && kind === 'completed' && trajectory.length > 0) workflow.candidate = 'failed';
       logger.warn('work-agent workflow persist failed', { code: (e as { code?: string })?.code ?? null });
+    }
+  };
+
+  /**
+   * 이번 segment 의 구조화 Experience 를 Local 에 쓴다(write only · best-effort — 실패해도 사용자 응답은 막지 않는다).
+   * 싣는 것: enum · 정수 · semantic locator · 오류 코드뿐. 요청/답변 원문 · 입력값 · 화면 글 · 관찰 · 이미지는 없다(§9).
+   */
+  const recordExperience = async (kind: WorkGoalStatus): Promise<void> => {
+    if (!deviceId) return; // 기기를 못 정했으면 쓸 곳이 없다(한계).
+    const runId = goal.runId ?? resumeRow?.runId ?? goal.goalId;
+    try {
+      const end = kind as Exclude<WorkGoalStatus, 'active'>; // finish 는 active 를 내지 않는다.
+      const endState: ExperienceEndState = runCreated ? end : resumeRow ? 'resume_failed' : end === 'waiting_for_user' ? 'taken_over' : end;
+      const reason = state.takeover?.reason ?? null;
+      const steps = buildExperienceSteps(surface, state.history, (r) => stepMeta.get(r));
+      const failures: ExperienceFailure[] = buildStepFailures(steps);
+      // 종료 실패 이벤트 — 인계 · 질문 · 중지로 끝났을 때. 복구가 소진됐으면 그 tier/결과를 함께 싣는다.
+      if (endState !== 'completed' && (reason || terminalErrorCode)) {
+        const code = safeErrorCode(terminalErrorCode);
+        const notRecovered = state.recovery.result === 'not_recovered';
+        failures.push({
+          stepSeq: null, stage: null,
+          layer: experienceLayerOf(reason, code, { inputMissing }),
+          failureClass: experienceFailureClassOf(reason, code),
+          errorCode: code, method: surface === 'uia' ? (visualFallback ? 'computer_use' : 'windows_uia') : 'browser_dom',
+          recoveryTier: notRecovered ? state.recovery.tier : null,
+          recoveryResult: notRecovered ? 'not_recovered' : null,
+          uiChangeSuspected: false,
+        });
+      }
+      // 복구 국면 뒤 완료 — 무엇으로 복구됐는지(§27).
+      if (endState === 'completed' && state.recovery.result && state.recovery.result !== 'not_recovered') {
+        failures.push({
+          stepSeq: null, stage: null, layer: null, failureClass: state.recovery.lastClass, errorCode: null,
+          method: surface === 'uia' ? 'windows_uia' : 'browser_dom',
+          recoveryTier: state.recovery.escalatedToStrong ? 'strong_model' : 'normal_retry', recoveryResult: state.recovery.result,
+          uiChangeSuspected: false,
+        });
+      }
+      // 재생 이탈 — 저장된 절차가 현재 화면에서 맞지 않았다. runtime 코드면 runtime 층, 아니면 층은 모른다(null).
+      // AI 가 이어받아 완료했는데 locator/기대 변화가 어긋났다면 화면 변경을 의심만 한다(확정 아님).
+      if (replayDiverge && replayDiverge.cause !== 'budget') {
+        const code = safeErrorCode(replayDiverge.code);
+        const runtime = isRuntimeLayerCode(code);
+        failures.push({
+          stepSeq: replayDiverge.stepSeq !== null && replayDiverge.stepSeq <= steps.length ? replayDiverge.stepSeq : null,
+          stage: replayDiverge.cause === 'find_failed' || replayDiverge.cause === 'locator_not_found' ? 'read' : null,
+          layer: runtime ? 'runtime' : null,
+          failureClass: code ? experienceFailureClassOf(null, code) : replayDiverge.cause === 'expect_mismatch' ? 'EXTERNAL_CHANGE' : 'TARGET_FAILURE',
+          errorCode: code, method: 'browser_dom', recoveryTier: null,
+          recoveryResult: endState === 'completed' ? 'recovered_by_normal_retry' : null,
+          uiChangeSuspected: !runtime && endState === 'completed' && (replayDiverge.cause === 'locator_not_found' || replayDiverge.cause === 'expect_mismatch'),
+        });
+      }
+      const endedAt = new Date();
+      const timing = await measureSegmentCommandTiming(dataSource, { userId: ctx.userId, deviceId }, { from: new Date(state.startedAt), to: endedAt });
+      const actionCount = steps.filter((x) => x.stage === 'input' || x.stage === 'activate').length;
+      await issueWorkRunExperienceRecord(dataSource, { userId: ctx.userId, deviceId }, {
+        runId,
+        segment: { startedAt: new Date(state.startedAt).toISOString(), endedAt: endedAt.toISOString(), endState, resumed: resumedRun },
+        target: { targetId: siteId, targetKind: targetRef.targetType === 'windows_app' ? 'windows_app' : 'browser_site' },
+        outcome: experienceOutcomeOf({ endState, reason, plannerProposed: plannerTakeover }),
+        metric: {
+          totalMs: experienceMs(endedAt.getTime() - state.startedAt),
+          aiMs: aiCalls ? experienceMs(aiMs) : null,
+          aiCalls: experienceCount(aiCalls),
+          commandWaitMs: experienceMs(timing.commandWaitMs),
+          executionMs: experienceMs(timing.executionMs),
+          settleMs: experienceMs(settleMs),
+          actionCount: experienceCount(actionCount),
+          stepCount: experienceCount(state.stepCount),
+          retryCount: experienceCount(retryCount),
+        },
+        steps,
+        failures: failures.slice(0, 20),
+      });
+    } catch (e) {
+      logger.warn('work-agent experience record failed', { code: (e as { code?: string })?.code ?? null });
     }
   };
 
@@ -597,6 +724,7 @@ export async function runWorkAgent(
     const resumable = kind === 'waiting_for_user' && !!goal.runId;
     if (runCreated && goal.runId) await persistTerminalRun(kind);
     if (runCreated && goal.runId) await persistWorkflow(kind);
+    if (surfaceReady) await recordExperience(kind);
     // §22·§23 usage signal — 허용 키만. goal 원문 · 관찰 · 입력값 · 이미지는 실리지 않는다. 복구 신호는 §60 화이트리스트만.
     logger.info('work-agent run', buildWorkAgentUsageEvent(state, inputMode, new Date(), recoveryStatus));
     // PHASE 2 — 재생/저장 결과는 enum · 개수만(AI 계획 횟수 감소 측정용). 단계 내용 · 템플릿 · 값은 싣지 않는다.
@@ -634,8 +762,15 @@ export async function runWorkAgent(
   const stuckEnd = (reason: TakeoverReason, progress: WorkProgress): Promise<WorkAgentRunResult> =>
     recoveryGiveupKind === 'question' ? question(reason) : takeover(reason, progress);
   /** 행동 뒤 재관찰 실패의 인계 사유 — 예산 소진은 loop_limit, 그 밖(탭 없음 · 등재 밖 이동 등)은 site_not_ready. */
-  const observeFailed = (o: { errorCode?: string }): Promise<WorkAgentRunResult> =>
-    o.errorCode === WORK_AGENT_ERROR.LOOP_LIMIT ? takeover('loop_limit', 'no_progress') : takeover('site_not_ready', 'needs_user');
+  const observeFailed = (o: { errorCode?: string }): Promise<WorkAgentRunResult> => {
+    terminalErrorCode = o.errorCode ?? null;
+    return o.errorCode === WORK_AGENT_ERROR.LOOP_LIMIT ? takeover('loop_limit', 'no_progress') : takeover('site_not_ready', 'needs_user');
+  };
+  /** 명령 오류 코드가 근거인 인계 — 코드를 Experience 실패 이벤트에 남긴다. */
+  const takeoverWith = (code: string | undefined, reason: TakeoverReason, progress: WorkProgress): Promise<WorkAgentRunResult> => {
+    terminalErrorCode = code ?? null;
+    return takeover(reason, progress);
+  };
 
   // ── 실패→복구 계층 (WO-O4O-AUTOMATION-FAILURE-ESCALATION §4·§11·§16·§22·§27·§67) ──
   //   실패를 무작정 반복하지 않는다. 분류(classify) → 판단(decideRecovery): 더 강한 추론(strong)으로 올릴지,
@@ -658,9 +793,10 @@ export async function runWorkAgent(
       state.invalidProposals = 0;
       sameObservationRun = 0;
       repeatedActionRun = 0;
+      retryCount += 1;
       return 'retry';
     }
-    if (!decision.askUser && !opts.normalSpent && strongPlanner) return 'retry'; // normal_retry(throw 경로) — strong 이 있을 때만 재시도 이득.
+    if (!decision.askUser && !opts.normalSpent && strongPlanner) { retryCount += 1; return 'retry'; } // normal_retry(throw 경로) — strong 이 있을 때만 재시도 이득.
     noteNotRecovered(state.recovery);
     recoveryStatus = decision.useStrongModel ? RECOVERY_ERROR.PROVIDER_UNAVAILABLE : RECOVERY_ERROR.USER_HELP_REQUIRED;
     // 복구 소진의 끝: escalatable 하고 사용자에게 넘기는 국면이면 QUESTION(답하면 같은 run 재개), 아니면 TAKEOVER(§조건 5).
@@ -676,6 +812,13 @@ export async function runWorkAgent(
     }
   };
 
+  // WINDOWS-UI-AUTOMATION-V0 — 표면 선택. windows_app 은 UIA(같은 Planner 어휘 · 같은 검증 · 다른 실행층).
+  const surface: WorkSurface = targetRef.targetType === 'windows_app' ? 'uia' : 'dom';
+  // Experience 기록은 기기 · 재개 검증을 지나 대상 준비에 들어간 뒤부터만(그 전 종료는 기록할 run 이 없다).
+  let surfaceReady = false;
+  let visualFallback = false; // 시각 모드 여부(아래 Visual Computer Use 절) — Experience 기록이 대상 준비 실패에서도 읽으므로 여기서 선언.
+  let resumeRow: WorkRunCoordinationRow | null = null;
+
   const resolution = await resolveTargetDevice(dataSource, ctx.userId);
   if (resolution.status !== 'ok') {
     state.progress = 'needs_user';
@@ -688,7 +831,6 @@ export async function runWorkAgent(
 
   // ── PHASE 1 same-run resume(§조건 5·검증 A·B·F) — 재개 요청 runId 를 먼저 읽기 전용으로 검증한다(claim 은 대상 준비 뒤).
   //    유효하지 않은(종료·만료·비소유·비대기) runId 는 여기서 즉시 거부한다 — 대상 준비 비용을 쓰기 전에.
-  let resumeRow: WorkRunCoordinationRow | null = null;
   if (input.runId !== undefined) {
     if (!isValidRunId(input.runId)) return finishNoState(WORK_AGENT_ERROR.RESUME_REJECTED, resumeRejectMessage('not_found'), 'needs_user');
     const check = await checkResumable(dataSource, { runId: input.runId, userId: ctx.userId });
@@ -708,7 +850,8 @@ export async function runWorkAgent(
   if (targetOutcome.state !== 'ready') {
     // 사용자 요청(열어 주세요 · 로그인 · 여러 탭 중 선택) 또는 준비 실패 — 둘 다 loop 를 시작하지 않는다.
     // 아직 run 을 열지 않았다(runCreated=false) — 재개 요청이면 coordination row 는 waiting_for_user 로 그대로 남아 재시도 가능.
-    const r = await takeover('site_not_ready', 'needs_user');
+    surfaceReady = true;
+    const r = await takeoverWith(targetOutcome.errorCode ?? WORK_AGENT_ERROR.SITE_NOT_READY, 'site_not_ready', 'needs_user');
     r.errorCode = targetOutcome.errorCode ?? WORK_AGENT_ERROR.SITE_NOT_READY;
     return r;
   }
@@ -734,14 +877,13 @@ export async function runWorkAgent(
     coordinationVersion = created?.version ?? 1;
     runCreated = true;
   }
+  surfaceReady = true;
   // Local SQLite 정본에 run 을 기록한다(cloud→local write only). semantic 만 — 대상 id·짧은 목표 요약(원문 관찰/DOM 없음).
   await issueWorkRunUpsert(dataSource, { userId: ctx.userId, deviceId }, {
     // 재개 답변(짧은 답)으로 원래 목표 요약을 덮지 않는다.
     runId: goal.runId, status: 'active', targetId: siteId, goalSummary: resumedRun ? undefined : goal.request.slice(0, 200),
   });
 
-  // WINDOWS-UI-AUTOMATION-V0 — 표면 선택. windows_app 은 UIA(같은 Planner 어휘 · 같은 검증 · 다른 실행층).
-  const surface: WorkSurface = targetRef.targetType === 'windows_app' ? 'uia' : 'dom';
 
   const budgetLeft = () => WORK_LOOP_LIMITS.maxSteps - state.stepCount;
   const overTime = () => Date.now() - state.startedAt > WORK_LOOP_LIMITS.maxDurationMs;
@@ -761,7 +903,6 @@ export async function runWorkAgent(
   // ── Visual Computer Use (§4·§4-1) — UIA 가 요소를 못 볼 때만 켜지는 시각 모드. ──
   //   visualFallback 이 켜지면 관찰마다 등재 앱 foreground client 를 캡처해 Planner 에 이미지로 넘긴다.
   //   base64 는 이 함수 지역(visualImage)에만 살고 로그·DB·state·history 에 절대 쓰지 않는다(SENSITIVE_IMAGE_PERSISTENCE 0).
-  let visualFallback = false;
   let visualImage: WorkImageInput | null = null;
   let visualFailureRun = 0; // 연속 visual 행동 실패 → 인계(§4 반복 visual 실패).
   const VISUAL_FAILURE_MAX = 2;
@@ -830,13 +971,13 @@ export async function runWorkAgent(
     const previousDocId = state.observation?.docId;
     const attempts = opts.afterNavigation ? 10 : 3; // 이동 뒤 최대 ~7 s(실 health.kr 폼 이동이 4 s 를 넘긴다)
     for (let attempt = 0; attempt < attempts; attempt += 1) {
-      if (attempt > 0) await sleep(NAVIGATION_SETTLE_MS);
+      if (attempt > 0) await settle();
       if (budgetLeft() < 2) return { ok: false, errorCode: WORK_AGENT_ERROR.LOOP_LIMIT };
       const c = await dom(LOCAL_AGENT_ACTIONS.DOM_GET_CONTEXT);
       // 아직 쓸 수 없는 문서(미도달 · 로딩 중 · 옛 문서)를 다시 두드린 probe 는 행동 예산을 쓰지 않는다 —
       // 예산은 "행동 + 유효 관찰" 의 상한이고, 대기 자체는 attempts · maxDuration 이 막는다(실 smoke 에서 이동 대기
       // probe 4회가 예산을 잠식해 결과 화면 직전에 loop_limit 에 걸린 결함).
-      const unspend = () => { state.stepCount -= 1; };
+      const unspend = () => { state.stepCount -= 1; retryCount += 1; };
       if (c.status !== 'success') {
         if (c.errorCode === LOCAL_AGENT_ERROR.DOM_CONTENT_UNAVAILABLE) { unspend(); continue; }
         return { ok: false, errorCode: c.errorCode };
@@ -882,6 +1023,10 @@ export async function runWorkAgent(
     if ((act.kind === 'key' || act.kind === 'visual_key') && (act.key === 'ENTER' || act.key === 'CTRL+ENTER') && !isSubmitWindowNamedInGoal(state.observation, goal.request)) {
       return { do: 'reject', reason: 'WINDOW_NOT_NAMED_IN_GOAL' };
     }
+    lastActRecord = null;
+    const t0 = Date.now();
+    const actEl = (state.observation?.elements ?? []).find((e) => e.elementRef === act.elementRef);
+    const actLocator = experienceLocatorOf(surface, act, actEl);
     const record: WorkStepRecord = { step: state.stepCount + 1, action: act, status: 'failed' };
     let outcome: { status: string; errorCode?: string; safe: Record<string, unknown> };
     if (surface === 'uia') {
@@ -913,6 +1058,8 @@ export async function runWorkAgent(
     }
     state.history.push(record);
     state.lastResult = record;
+    stepMeta.set(record, { actor: currentActor(), locator: actLocator, durationMs: Date.now() - t0 });
+    lastActRecord = record;
 
     if (outcome.status !== 'success') {
       if (isVisual) {
@@ -959,6 +1106,7 @@ export async function runWorkAgent(
   if (!first.ok) {
     state.progress = 'needs_user';
     state.takeover = { reason: first.errorCode === LOCAL_AGENT_ERROR.DOM_CROSS_ORIGIN_BLOCKED ? 'unsupported_control' : 'site_not_ready', step: state.stepCount };
+    terminalErrorCode = first.errorCode ?? WORK_AGENT_ERROR.SITE_NOT_READY;
     const r = await finish();
     r.errorCode = first.errorCode ?? WORK_AGENT_ERROR.SITE_NOT_READY;
     return r;
@@ -983,24 +1131,27 @@ export async function runWorkAgent(
     if (match?.candidateId && match.steps && replayPreflight(goal.request, match.steps) === 'ambiguous') {
       logger.info('work-agent workflow preflight', { result: 'ambiguous', aiPlanCount: state.aiPlanCount });
       neededInput = '무엇을 찾거나 입력할지 구체적인 이름이나 번호로 알려 주세요.';
+      inputMissing = true;
       return question('user_judgment_required');
     }
     if (match?.candidateId && match.steps) {
       replayedCandidateId = match.candidateId;
       workflow.replay = 'completed';
       let observationFresh = true; // 마지막 관찰이 전체 inspect 인가(find 후보로 바뀌면 false).
+      replaying = true;
       for (const step of match.steps) {
         // find 1 + 행동 1 + 재관찰 2 + loop 첫 계획 여유 — 예산이 모자라면 재생을 멈추고 AI 에 맡긴다.
-        if (overTime() || budgetLeft() < 5) { workflow.replay = 'diverged'; break; }
+        if (overTime() || budgetLeft() < 5) { workflow.replay = 'diverged'; replayDiverge = { cause: 'budget', code: null, stepSeq: null }; break; }
         const f = await dom(LOCAL_AGENT_ACTIONS.DOM_FIND, { query: replayFindQuery(step.locator) });
         if (f.status !== 'success') {
-          if (f.errorCode === LOCAL_AGENT_ERROR.DOM_USER_ACTION_REQUIRED) return takeover('credential_required', 'needs_user');
+          if (f.errorCode === LOCAL_AGENT_ERROR.DOM_USER_ACTION_REQUIRED) return takeoverWith(f.errorCode, 'credential_required', 'needs_user');
           workflow.replay = 'diverged';
+          replayDiverge = { cause: 'find_failed', code: f.errorCode ?? null, stepSeq: null };
           break;
         }
         const matches = (Array.isArray(f.safe.matches) ? f.safe.matches : []) as SafeDomElement[];
         const ref = pickReplayTarget(step.locator, matches);
-        if (!ref) { workflow.replay = 'diverged'; break; }
+        if (!ref) { workflow.replay = 'diverged'; replayDiverge = { cause: 'locator_not_found', code: null, stepSeq: null }; break; }
         const prev = state.observation as WorkObservation & { snapshotId?: string };
         const findSnapshot = String(f.safe.snapshotId ?? prev.snapshotId ?? '');
         state.observation = {
@@ -1012,20 +1163,31 @@ export async function runWorkAgent(
           : step.actionKind === 'set_input' ? { kind: 'set_input', elementRef: ref, text: step.value }
           : { kind: 'select_option', elementRef: ref, option: step.value };
         const checked = validateWorkProposal({ assessment: 'progress', action }, state.observation);
-        if (!checked.ok || !checked.proposal) { workflow.replay = 'diverged'; break; }
+        if (!checked.ok || !checked.proposal) { workflow.replay = 'diverged'; replayDiverge = { cause: 'validation_rejected', code: null, stepSeq: null }; break; }
         const dir = await execActOnce(checked.proposal.action, findSnapshot);
-        if (dir.do === 'takeover') return takeover(dir.reason, dir.progress);
-        if (dir.do === 'reject' || state.lastResult?.status !== 'success') { workflow.replay = 'diverged'; break; }
+        if (dir.do === 'takeover') return takeoverWith(lastActRecord?.errorCode, dir.reason, dir.progress);
+        if (dir.do === 'reject' || state.lastResult?.status !== 'success') {
+          workflow.replay = 'diverged';
+          replayDiverge = dir.do === 'reject'
+            ? { cause: 'validation_rejected', code: null, stepSeq: null }
+            : { cause: 'step_failed', code: state.lastResult?.errorCode ?? null, stepSeq: state.history.length };
+          break;
+        }
         workflow.replayedSteps += 1;
         if (dir.do === 'observe') {
-          if (dir.navigated) await sleep(NAVIGATION_SETTLE_MS);
+          if (dir.navigated) await settle();
           const o = await observe({ afterNavigation: dir.navigated });
           if (!o.ok) return observeFailed(o);
           observationFresh = true;
         }
         // checkpoint — 저장 때 이동했던 단계가 이번엔 이동하지 않았다면 화면 흐름이 달라졌다.
-        if (step.expect.navigated && state.lastResult?.navigated !== true) { workflow.replay = 'diverged'; break; }
+        if (step.expect.navigated && state.lastResult?.navigated !== true) {
+          workflow.replay = 'diverged';
+          replayDiverge = { cause: 'expect_mismatch', code: null, stepSeq: state.history.length };
+          break;
+        }
       }
+      replaying = false;
       // Planner 는 전체 화면을 봐야 한다 — 재생이 find 후보 관찰로 끝났으면 한 번 새로 관찰한다.
       if (!observationFresh) {
         const o = await observe();
@@ -1046,6 +1208,8 @@ export async function runWorkAgent(
     // Plan (§8)
     let raw: unknown;
     state.aiPlanCount += 1;
+    const planT0 = Date.now();
+    aiCalls += 1;
     try {
       raw = await activePlanner.plan({
         goal, siteDisplayName: displayName, observation: state.observation as WorkObservation, history: state.history, lastRead,
@@ -1054,7 +1218,9 @@ export async function runWorkAgent(
         recoveryHint,
         stepsLeft: budgetLeft(),
       });
+      aiMs += Date.now() - planT0;
     } catch {
+      aiMs += Date.now() - planT0;
       // planner 호출 실패(PLANNING_FAILURE) — 정상 재시도 → strong → 사용자(§16). strong 없으면 기존대로 즉시 인계.
       if (recover({ plannerFault: true }) === 'giveup') return takeover('planner_unavailable', 'failed');
       continue;
@@ -1063,7 +1229,9 @@ export async function runWorkAgent(
     if (!checked.ok || !checked.proposal) {
       state.invalidProposals += 1;
       lastRejectReason = checked.reason;
-      state.history.push({ step: state.stepCount, action: { kind: 'inspect' }, status: 'rejected', rejectReason: checked.reason });
+      const rejected: WorkStepRecord = { step: state.stepCount, action: { kind: 'inspect' }, status: 'rejected', rejectReason: checked.reason };
+      state.history.push(rejected);
+      stepMeta.set(rejected, { actor: currentActor(), locator: null, durationMs: null });
       if (state.invalidProposals >= WORK_LOOP_LIMITS.maxInvalidProposals) {
         // 정상 planner 가 계속 무효 제안 — 정상 재시도 소진으로 보고 strong 부터 판단(§16). strong 없으면 기존대로 인계.
         if (recover({ plannerFault: true }, { normalSpent: true }) === 'giveup') return takeover('planner_unavailable', 'failed');
@@ -1086,6 +1254,7 @@ export async function runWorkAgent(
         if (v.ok) { lastRejectReason = undefined; continue; }
       }
       if (reason === 'goal_sufficiently_advanced') markRecovered();
+      plannerTakeover = true;
       return takeover(reason, reason === 'goal_sufficiently_advanced' ? 'completed' : 'needs_user');
     }
     if (proposal.action.kind === 'done' || proposal.assessment === 'completed') {
@@ -1093,7 +1262,7 @@ export async function runWorkAgent(
       markRecovered();
       return finish();
     }
-    if (proposal.assessment === 'needs_user') return takeover('user_judgment_required', 'needs_user');
+    if (proposal.assessment === 'needs_user') { plannerTakeover = true; return takeover('user_judgment_required', 'needs_user'); }
 
     // 반복 행동 감지(§36) — 같은 행동을 무작정 반복하지 않는다. 복구 판단: strong 이 있으면 다른 계획을 세우게 하고, 없으면 인계.
     if (sameWorkAction(state.lastResult?.action, proposal.action)) {
@@ -1112,10 +1281,12 @@ export async function runWorkAgent(
     // ── inspect — 두 표면 공통: 재관찰. ──
     if (a.kind === 'inspect') {
       const rec: WorkStepRecord = { step: state.stepCount + 1, action: a, status: 'failed' };
+      const t0 = Date.now();
       const o = await observe();
       rec.status = o.ok ? 'success' : 'failed';
       rec.errorCode = o.errorCode;
       state.history.push(rec);
+      stepMeta.set(rec, { actor: currentActor(), locator: null, durationMs: Date.now() - t0 });
       state.lastResult = rec;
       if (!o.ok) return observeFailed(o);
       continue;
@@ -1136,6 +1307,7 @@ export async function runWorkAgent(
       lastRead = matches.length ? matches.slice(0, 20).map(describeObservationElement).join('\n') : '(일치하는 요소 없음)';
       const rec: WorkStepRecord = { step: state.stepCount + 1, action: a, status: 'success' };
       state.history.push(rec);
+      stepMeta.set(rec, { actor: currentActor(), locator: null, durationMs: 0 });
       state.lastResult = rec;
       continue;
     }
@@ -1144,12 +1316,15 @@ export async function runWorkAgent(
       lastRead = String(el?.text ?? el?.name ?? '').slice(0, READ_SUMMARY_MAX);
       const rec: WorkStepRecord = { step: state.stepCount + 1, action: a, status: 'success' };
       state.history.push(rec);
+      stepMeta.set(rec, { actor: currentActor(), locator: null, durationMs: 0 });
       state.lastResult = rec;
       continue;
     }
     // ── dom 표면 읽기 — find · read_text · read_table 은 local.dom.* 명령. ──
     if (surface === 'dom' && (a.kind === 'find' || a.kind === 'read_text' || a.kind === 'read_table')) {
       const rec: WorkStepRecord = { step: state.stepCount + 1, action: a, status: 'failed' };
+      const t0 = Date.now();
+      const readLocator = a.kind === 'find' ? null : experienceLocatorOf(surface, a, (state.observation?.elements ?? []).find((e) => e.elementRef === a.elementRef));
       let outcome: Awaited<ReturnType<typeof issueDomCommand>>;
       if (a.kind === 'find') outcome = await dom(LOCAL_AGENT_ACTIONS.DOM_FIND, { query: a.query });
       else if (a.kind === 'read_text') outcome = await dom(LOCAL_AGENT_ACTIONS.DOM_READ_TEXT, { elementRef: a.elementRef, snapshotId });
@@ -1158,10 +1333,11 @@ export async function runWorkAgent(
       rec.errorCode = outcome.errorCode;
       state.history.push(rec);
       state.lastResult = rec;
+      stepMeta.set(rec, { actor: currentActor(), locator: readLocator, durationMs: Date.now() - t0 });
       if (outcome.status !== 'success') {
-        if (outcome.errorCode === LOCAL_AGENT_ERROR.DOM_USER_ACTION_REQUIRED) return takeover('credential_required', 'needs_user');
-        if (outcome.errorCode === LOCAL_AGENT_ERROR.DOM_ACTION_NOT_ALLOWED && outcome.safe.riskLevel === 'COMMIT') return takeover('commit_required', 'needs_user');
-        if (outcome.errorCode === LOCAL_AGENT_ERROR.DOM_CROSS_ORIGIN_BLOCKED) return takeover('unsupported_control', 'needs_user');
+        if (outcome.errorCode === LOCAL_AGENT_ERROR.DOM_USER_ACTION_REQUIRED) return takeoverWith(outcome.errorCode, 'credential_required', 'needs_user');
+        if (outcome.errorCode === LOCAL_AGENT_ERROR.DOM_ACTION_NOT_ALLOWED && outcome.safe.riskLevel === 'COMMIT') return takeoverWith(outcome.errorCode, 'commit_required', 'needs_user');
+        if (outcome.errorCode === LOCAL_AGENT_ERROR.DOM_CROSS_ORIGIN_BLOCKED) return takeoverWith(outcome.errorCode, 'unsupported_control', 'needs_user');
         const o = await observe();
         if (!o.ok) return observeFailed(o);
         continue;
@@ -1195,12 +1371,14 @@ export async function runWorkAgent(
     for (let bi = 0; bi < steps.length; bi += 1) {
       if (overTime() || budgetLeft() < 1) return takeover('loop_limit', 'no_progress');
       const dir = await execActOnce(steps[bi], snapshotId);
-      if (dir.do === 'takeover') return takeover(dir.reason, dir.progress);
+      if (dir.do === 'takeover') return takeoverWith(lastActRecord?.errorCode, dir.reason, dir.progress);
       if (dir.do === 'reject') {
         // 제출 창 미지정 등 — 실행하지 않았다. 무효 제안으로 세고 배치를 끊는다(다음은 재계획).
         state.invalidProposals += 1;
         lastRejectReason = dir.reason;
-        state.history.push({ step: state.stepCount, action: steps[bi], status: 'rejected', rejectReason: dir.reason });
+        const rejected: WorkStepRecord = { step: state.stepCount, action: steps[bi], status: 'rejected', rejectReason: dir.reason };
+        state.history.push(rejected);
+        stepMeta.set(rejected, { actor: currentActor(), locator: null, durationMs: null });
         if (state.invalidProposals >= WORK_LOOP_LIMITS.maxInvalidProposals) return takeover('user_judgment_required', 'needs_user');
         batchInterrupted = true;
         break;
@@ -1214,7 +1392,7 @@ export async function runWorkAgent(
     }
     if (batchInterrupted) continue;
     if (pendingObserve) {
-      if (pendingObserve.navigated) await sleep(NAVIGATION_SETTLE_MS);
+      if (pendingObserve.navigated) await settle();
       const o = await observe({ afterNavigation: pendingObserve.navigated });
       if (!o.ok) return observeFailed(o);
     }

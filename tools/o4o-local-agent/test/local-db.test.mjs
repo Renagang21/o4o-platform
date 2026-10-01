@@ -322,3 +322,150 @@ test('PHASE 2: matchWorkflowTemplate — 공백 정규화 · 같은 자리 같�
   assert.equal(db.matchWorkflowTemplate('{{1}} 검색해줘', '타이레놀 찾아줘'), null);
   assert.equal(db.matchWorkflowTemplate('{{1}} 과 {{1}} 비교', '타이레놀 과 아스피린 비교'), null);
 });
+
+// ─── Experience 원장 (WO-O4O-AUTOMATION-LOCAL-EXPERIENCE-MINIMUM-STORAGE-V1) ──────
+
+const EXP_METRIC = { totalMs: 4200, aiMs: 1800, aiCalls: 2, commandWaitMs: null, executionMs: null, settleMs: 300, actionCount: 2, stepCount: 3, retryCount: 0 };
+const expStep = (seq, over = {}) => ({
+  seq, stage: 'activate', actionKind: 'click', method: 'browser_dom', locator: { role: 'button', name: '검 색' }, actor: 'ai_normal',
+  resultStatus: 'success', resultEvidence: 'system_verified', errorCode: null, durationMs: 120, ...over,
+});
+const expFailure = (over = {}) => ({
+  stepSeq: null, stage: null, layer: null, failureClass: null, errorCode: null, method: null, recoveryTier: null, recoveryResult: null, uiChangeSuspected: false, ...over,
+});
+const expArgs = (over = {}) => ({
+  runId: 'g_exp1',
+  segment: { startedAt: '2026-10-01T01:00:00.000Z', endedAt: '2026-10-01T01:00:04.200Z', endState: 'completed', resumed: false },
+  target: { targetId: 'healthkr', targetKind: 'browser_site' },
+  outcome: { status: 'SUCCESS', evidence: 'agent_inferred' },
+  metric: EXP_METRIC,
+  steps: [
+    expStep(1, { stage: 'observe', actionKind: 'inspect', locator: null }),
+    expStep(2, { stage: 'input', actionKind: 'set_input', locator: { role: 'searchbox', name: '약물의 제품명 또는 성분명을 입력하세요.' } }),
+    expStep(3),
+  ],
+  failures: [],
+  ...over,
+});
+
+test('Experience: 성공 run — Run · Segment · Step(전 단계) · Metric · Outcome 이 남는다', async () => {
+  const r = await handlers.runAction('local.data.work_run_experience_record', {}, expArgs());
+  assert.equal(r.status, 'success');
+  assert.deepEqual(r.data, { saved: true, duplicate: false, segmentIndex: 1, stepCount: 3, failureCount: 0 });
+  const e = db.LocalWorkRunExperienceRepository.get('g_exp1');
+  assert.equal(e.run.outcome_status, 'SUCCESS');
+  assert.equal(e.run.outcome_evidence, 'agent_inferred');
+  assert.equal(e.run.target_id, 'healthkr');
+  assert.equal(e.run.target_kind, 'browser_site');
+  assert.equal(e.run.task_key, null);
+  assert.equal(e.run.task_provisional, 1);
+  assert.equal(e.run.segment_count, 1);
+  assert.equal(e.run.started_at, '2026-10-01T01:00:00.000Z');
+  assert.equal(e.run.ended_at, '2026-10-01T01:00:04.200Z');
+  assert.equal(e.segments.length, 1);
+  assert.equal(e.segments[0].ai_ms, 1800);
+  assert.equal(e.segments[0].command_wait_ms, null, '근거 없는 metric 은 추정하지 않고 NULL');
+  assert.equal(e.segments[0].user_wait_ms, null);
+  assert.deepEqual(e.steps.map((s) => [s.seq, s.stage, s.action_kind, s.result_status]), [
+    [1, 'observe', 'inspect', 'success'],
+    [2, 'input', 'set_input', 'success'],
+    [3, 'activate', 'click', 'success'],
+  ]);
+  assert.deepEqual(JSON.parse(e.steps[2].locator_json), { role: 'button', name: '검 색' });
+  // 같은 segment 재전송은 중복으로 무시된다(idempotent).
+  const again = await handlers.runAction('local.data.work_run_experience_record', {}, expArgs());
+  assert.equal(again.data.duplicate, true);
+  assert.equal(db.LocalWorkRunExperienceRepository.get('g_exp1').steps.length, 3);
+});
+
+test('Experience: 실패 step · runtime 실패 이벤트 · run 상태는 건드리지 않는다', async () => {
+  db.LocalWorkRunRepository.upsert({ runId: 'g_exp2', status: 'active', targetId: 'healthkr', goalSummary: '약학정보원 검색' });
+  db.LocalWorkRunRepository.setStatus('g_exp2', 'taken_over');
+  const r = await handlers.runAction('local.data.work_run_experience_record', {}, expArgs({
+    runId: 'g_exp2',
+    segment: { startedAt: '2026-10-01T02:00:00.000Z', endedAt: '2026-10-01T02:00:09.000Z', endState: 'taken_over', resumed: false },
+    outcome: { status: 'FAILED', evidence: 'system_verified' },
+    steps: [expStep(1, { stage: 'observe', actionKind: 'inspect', locator: null, resultStatus: 'failed', errorCode: 'DOM_CONTENT_UNAVAILABLE' })],
+    failures: [
+      expFailure({ stepSeq: 1, stage: 'observe', layer: 'runtime', failureClass: 'OBSERVATION_FAILURE', errorCode: 'DOM_CONTENT_UNAVAILABLE', method: 'browser_dom', recoveryTier: 'normal_retry', recoveryResult: 'not_recovered' }),
+    ],
+  }));
+  assert.equal(r.status, 'success');
+  const e = db.LocalWorkRunExperienceRepository.get('g_exp2');
+  assert.equal(e.run.status, 'taken_over', 'experience 기록은 run 상태 전이를 하지 않는다');
+  assert.equal(e.run.outcome_status, 'FAILED');
+  assert.equal(e.steps[0].error_code, 'DOM_CONTENT_UNAVAILABLE');
+  assert.equal(e.failures.length, 1);
+  assert.equal(e.failures[0].layer, 'runtime');
+  assert.equal(e.failures[0].step_seq, 1);
+  assert.equal(e.failures[0].ui_change_suspected, 0);
+  // goal_summary 는 기존 그대로 — 복제하지 않는다.
+  assert.equal(db.LocalWorkRunRepository.get('g_exp2').goal_summary, '약학정보원 검색');
+});
+
+test('Experience: QUESTION 대기 → 재개는 같은 run · segment 2개 · 사용자 대기 시간 분리 · seq 이어짐', async () => {
+  const wait = await handlers.runAction('local.data.work_run_experience_record', {}, expArgs({
+    runId: 'g_exp3',
+    segment: { startedAt: '2026-10-01T03:00:00.000Z', endedAt: '2026-10-01T03:00:05.000Z', endState: 'waiting_for_user', resumed: false },
+    outcome: null,
+    steps: [expStep(1, { stage: 'observe', actionKind: 'inspect', locator: null })],
+  }));
+  assert.equal(wait.data.segmentIndex, 1);
+  let e = db.LocalWorkRunExperienceRepository.get('g_exp3');
+  assert.equal(e.run.outcome_status, null, '대기 segment 는 최종 결과가 아니다');
+  const resumed = await handlers.runAction('local.data.work_run_experience_record', {}, expArgs({
+    runId: 'g_exp3',
+    segment: { startedAt: '2026-10-01T03:01:05.000Z', endedAt: '2026-10-01T03:01:08.000Z', endState: 'completed', resumed: true },
+    steps: [expStep(1), expStep(2, { stage: 'read', actionKind: 'read_text', locator: null })],
+  }));
+  assert.equal(resumed.data.segmentIndex, 2);
+  e = db.LocalWorkRunExperienceRepository.get('g_exp3');
+  assert.equal(e.run.segment_count, 2);
+  assert.equal(e.run.started_at, '2026-10-01T03:00:00.000Z');
+  assert.equal(e.run.ended_at, '2026-10-01T03:01:08.000Z');
+  assert.equal(e.run.outcome_status, 'SUCCESS');
+  assert.equal(e.segments[1].resumed, 1);
+  assert.equal(e.segments[1].user_wait_ms, 60_000);
+  assert.deepEqual(e.steps.map((s) => [s.seq, s.segment_index]), [[1, 1], [2, 2], [3, 2]]);
+});
+
+test('Experience: 형상 밖 인자는 거부 — 자유 텍스트 · 입력값 · 좌표 · elementRef · 대기 segment 의 결과 · 미등재 대상', async () => {
+  const bad = [
+    expArgs({ note: '사용자 답변 원문' }),
+    expArgs({ steps: [expStep(1, { value: '타이레놀' })] }),
+    expArgs({ steps: [expStep(1, { locator: { role: 'button', name: '검 색', x: 0.3 } })] }),
+    expArgs({ steps: [expStep(1, { locator: { role: 'button', name: '검 색' }, elementRef: 'e_2' })] }),
+    expArgs({ steps: [expStep(1, { method: 'windows_uia' })] }),
+    expArgs({ steps: [expStep(2)] }),
+    expArgs({ steps: [expStep(1, { stage: 'confirm_payment' })] }),
+    expArgs({ steps: [expStep(1, { errorCode: 'password=1234' })] }),
+    expArgs({ failures: [expFailure({ layer: 'network_glitch' })] }),
+    expArgs({ failures: [expFailure({ stepSeq: 9 })] }),
+    expArgs({ failures: [expFailure({ reason: '화면에 보인 글' })] }),
+    expArgs({ segment: { startedAt: '2026-10-01T01:00:00.000Z', endedAt: '2026-10-01T01:00:04.200Z', endState: 'waiting_for_user', resumed: false } }),
+    expArgs({ target: { targetId: 'not_registered', targetKind: 'browser_site' } }),
+    expArgs({ outcome: { status: 'SUCCESS', evidence: 'llm_said_so' } }),
+    expArgs({ metric: { ...EXP_METRIC, aiMs: 1.5 } }),
+    expArgs({ metric: { ...EXP_METRIC, prompt: 'x' } }),
+  ];
+  for (const args of bad) {
+    const r = await handlers.runAction('local.data.work_run_experience_record', {}, args);
+    assert.equal(r.status, 'denied', JSON.stringify(args).slice(0, 200));
+  }
+});
+
+test('Experience: 민감 sentinel 이 어디에도 저장되지 않는다 · Candidate 원장(local_work_run_steps)과 분리', async () => {
+  // 인자 형상에 값 자리가 없으므로, 거부된 시도의 sentinel 이 DB 어느 테이블에도 남지 않아야 한다.
+  for (const sentinel of ['SENTINEL_SLOT_VALUE_타이레놀', 'SENTINEL_USER_ANSWER', 'pw=SENTINEL_PASSWORD', 'Bearer SENTINEL_TOKEN']) {
+    await handlers.runAction('local.data.work_run_experience_record', {}, expArgs({ runId: 'g_exp_s', steps: [expStep(1, { value: sentinel })] }));
+    await handlers.runAction('local.data.work_run_experience_record', {}, expArgs({ runId: 'g_exp_s', answer: sentinel }));
+  }
+  const h = db.openLocalDb();
+  const tables = h.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name LIKE 'local\\_%' ESCAPE '\\'").all().map((t) => t.name);
+  for (const t of tables) {
+    const dump = JSON.stringify(h.prepare(`SELECT * FROM ${t}`).all());
+    assert.equal(/SENTINEL_/.test(dump), false, t);
+  }
+  // experience 단계는 Candidate 저장의 run 단계 원장에 섞이지 않는다.
+  assert.equal(h.prepare("SELECT COUNT(*) AS n FROM local_work_run_steps WHERE run_id LIKE 'g_exp%'").get().n, 0);
+});

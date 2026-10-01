@@ -290,6 +290,93 @@ export const MIGRATIONS = Object.freeze([
       `);
     },
   },
+  {
+    version: 6,
+    name: 'work_experience_v1',
+    up(db) {
+      // WO-O4O-AUTOMATION-LOCAL-EXPERIENCE-MINIMUM-STORAGE-V1 (Experience Model V1 Phase 1 · §15 최소 집합)
+      // 성공·실패·사용자 대기 run 모두가 남기는 **구조화된 경험** — 쓰기 전용(recall·승격·공유 없음).
+      //   local_work_runs (확장)          — task/target 식별 · 시작/종료 · segment 수 · Outcome(상태 + 근거 등급).
+      //   local_work_run_segments         — 요청 1회 = segment 1개. 시간 분해 metric(근거 없으면 NULL).
+      //   local_work_run_experience_steps — run 의 **모든** 단계(성공·실패·거절). stage · 수단 · semantic locator · 결과.
+      //   local_work_run_failures         — 실패 이벤트. 원인 층(runtime/ui_change/...) · 회복 tier/결과.
+      // local_work_run_steps(v5) 는 Candidate 저장이 run 단위로 지우고 다시 쓰는 성공 경로 원장이라 재사용하지 않는다.
+      // 저장 금지(Experience Model §15·§9): 입력한 업무 내용 · 사용자 답변 원문 · 화면 글 · DOM · 캡처 · 프롬프트 ·
+      //   모델 근거 · 결과 데이터 · 개인/환자 정보 · 인증정보. cloud 는 이 테이블을 읽지 않는다(ARCHITECTURE §5-1).
+      const has = (table, col) => db.prepare(`PRAGMA table_info(${table})`).all().some((c) => c.name === col);
+      const addRunColumns = [
+        ['task_key', 'TEXT'],
+        ['task_provisional', 'INTEGER'],
+        ['target_kind', 'TEXT'],
+        ['started_at', 'TEXT'],
+        ['ended_at', 'TEXT'],
+        ['segment_count', 'INTEGER NOT NULL DEFAULT 0'],
+        ['outcome_status', 'TEXT'],
+        ['outcome_evidence', 'TEXT'],
+      ];
+      for (const [col, type] of addRunColumns) {
+        if (!has('local_work_runs', col)) db.exec(`ALTER TABLE local_work_runs ADD COLUMN ${col} ${type}`);
+      }
+      db.exec(`
+        CREATE TABLE IF NOT EXISTS local_work_run_segments (
+          run_id           TEXT NOT NULL,
+          segment_index    INTEGER NOT NULL,
+          started_at       TEXT NOT NULL,
+          ended_at         TEXT NOT NULL,
+          end_state        TEXT NOT NULL,
+          resumed          INTEGER NOT NULL DEFAULT 0,
+          user_wait_ms     INTEGER,
+          total_ms         INTEGER,
+          ai_ms            INTEGER,
+          ai_calls         INTEGER,
+          command_wait_ms  INTEGER,
+          execution_ms     INTEGER,
+          settle_ms        INTEGER,
+          action_count     INTEGER,
+          step_count       INTEGER,
+          retry_count      INTEGER,
+          created_at       TEXT NOT NULL,
+          PRIMARY KEY (run_id, segment_index),
+          UNIQUE (run_id, started_at)
+        );
+
+        CREATE TABLE IF NOT EXISTS local_work_run_experience_steps (
+          run_id            TEXT NOT NULL,
+          seq               INTEGER NOT NULL,
+          segment_index     INTEGER NOT NULL,
+          stage             TEXT,
+          stage_provisional INTEGER NOT NULL DEFAULT 1,
+          action_kind       TEXT NOT NULL,
+          method            TEXT,
+          locator_json      TEXT,
+          decided_by        TEXT,
+          result_status     TEXT NOT NULL,
+          result_evidence   TEXT,
+          error_code        TEXT,
+          duration_ms       INTEGER,
+          created_at        TEXT NOT NULL,
+          PRIMARY KEY (run_id, seq)
+        );
+
+        CREATE TABLE IF NOT EXISTS local_work_run_failures (
+          run_id              TEXT NOT NULL,
+          seq                 INTEGER NOT NULL,
+          segment_index       INTEGER NOT NULL,
+          step_seq            INTEGER,
+          stage               TEXT,
+          layer               TEXT,
+          failure_class       TEXT,
+          error_code          TEXT,
+          method              TEXT,
+          recovery_tier       TEXT,
+          recovery_result     TEXT,
+          ui_change_suspected INTEGER NOT NULL DEFAULT 0,
+          created_at          TEXT NOT NULL,
+          PRIMARY KEY (run_id, seq)
+        );
+      `);
+    },
+  },
 ]);
 
 /** DB 스키마 버전 = 체크인된 마지막 migration 의 version(§11). 따로 손으로 올리지 않는다. */
@@ -717,6 +804,111 @@ export const LocalWorkRunRepository = {
     return openLocalDb()
       .prepare('SELECT run_id, status, target_id, goal_summary, note, created_at, updated_at FROM local_work_runs WHERE run_id=?')
       .get(String(runId)) || null;
+  },
+};
+
+/**
+ * Experience 원장(Experience Model V1 Phase 1 · §15 최소 집합). **쓰기 전용** — cloud 로 read-back 하지 않는다.
+ * 요청(segment) 하나가 끝날 때마다 한 번 기록한다. 형상 검증은 handlers.mjs 가 먼저 한다.
+ *   - run row 가 없으면 만든다(대상 준비 전 실패한 새 run). 있으면 status 는 건드리지 않는다(상태 전이는 upsert/set_status 몫).
+ *   - segment_index · step seq · failure seq 는 이 run 의 기존 최대값 뒤로 잇는다 — 재개(QUESTION→resume)도 같은 run.
+ *   - user_wait_ms = 직전 segment 가 사용자 대기로 끝났을 때 그 종료 ~ 이번 시작(대기 시간은 실행 시간과 분리).
+ *   - 같은 (run, 시작 시각) segment 가 이미 있으면 중복 전송으로 보고 아무것도 쓰지 않는다.
+ *   - Outcome 은 넘긴 경우에만 갱신(대기 segment 는 최종 결과가 아니다).
+ */
+export const LocalWorkRunExperienceRepository = {
+  record({ runId, segment, target, outcome, metric, steps, failures }) {
+    const db = openLocalDb();
+    const id = String(runId);
+    const now = nowIso();
+    const nn = (v) => (v === undefined || v === null ? null : v);
+    db.exec('BEGIN');
+    try {
+      const dup = db.prepare('SELECT segment_index FROM local_work_run_segments WHERE run_id=? AND started_at=?').get(id, segment.startedAt);
+      if (dup) {
+        db.exec('COMMIT');
+        return { recorded: false, duplicate: true, segmentIndex: dup.segment_index };
+      }
+      db.prepare(
+        'INSERT INTO local_work_runs(run_id, status, target_id, created_at, updated_at) VALUES(?, ?, ?, ?, ?) ' +
+          'ON CONFLICT(run_id) DO NOTHING',
+      ).run(id, segment.endState === 'completed' ? 'completed' : 'taken_over', nn(target?.targetId), now, now);
+      const prev = db
+        .prepare('SELECT segment_index, ended_at, end_state FROM local_work_run_segments WHERE run_id=? ORDER BY segment_index DESC LIMIT 1')
+        .get(id);
+      const segmentIndex = prev ? prev.segment_index + 1 : 1;
+      let userWaitMs = null;
+      if (prev && prev.end_state === 'waiting_for_user') {
+        const gap = Date.parse(segment.startedAt) - Date.parse(prev.ended_at);
+        if (Number.isFinite(gap) && gap >= 0) userWaitMs = gap;
+      }
+      const m = metric || {};
+      db.prepare(
+        'INSERT INTO local_work_run_segments(run_id, segment_index, started_at, ended_at, end_state, resumed, user_wait_ms, total_ms, ai_ms, ai_calls, ' +
+          'command_wait_ms, execution_ms, settle_ms, action_count, step_count, retry_count, created_at) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      ).run(
+        id, segmentIndex, segment.startedAt, segment.endedAt, segment.endState, segment.resumed ? 1 : 0, userWaitMs,
+        nn(m.totalMs), nn(m.aiMs), nn(m.aiCalls), nn(m.commandWaitMs), nn(m.executionMs), nn(m.settleMs),
+        nn(m.actionCount), nn(m.stepCount), nn(m.retryCount), now,
+      );
+      const stepBase = db.prepare('SELECT COALESCE(MAX(seq), 0) AS n FROM local_work_run_experience_steps WHERE run_id=?').get(id).n;
+      const insStep = db.prepare(
+        'INSERT INTO local_work_run_experience_steps(run_id, seq, segment_index, stage, stage_provisional, action_kind, method, locator_json, ' +
+          'decided_by, result_status, result_evidence, error_code, duration_ms, created_at) VALUES(?, ?, ?, ?, 1, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      );
+      for (const s of steps || []) {
+        insStep.run(
+          id, stepBase + s.seq, segmentIndex, nn(s.stage), s.actionKind, nn(s.method), s.locator ? JSON.stringify(s.locator) : null,
+          nn(s.actor), s.resultStatus, nn(s.resultEvidence), nn(s.errorCode), nn(s.durationMs), now,
+        );
+      }
+      const failBase = db.prepare('SELECT COALESCE(MAX(seq), 0) AS n FROM local_work_run_failures WHERE run_id=?').get(id).n;
+      const insFail = db.prepare(
+        'INSERT INTO local_work_run_failures(run_id, seq, segment_index, step_seq, stage, layer, failure_class, error_code, method, ' +
+          'recovery_tier, recovery_result, ui_change_suspected, created_at) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      );
+      (failures || []).forEach((f, i) => {
+        insFail.run(
+          id, failBase + i + 1, segmentIndex, f.stepSeq == null ? null : stepBase + f.stepSeq, nn(f.stage), nn(f.layer), nn(f.failureClass),
+          nn(f.errorCode), nn(f.method), nn(f.recoveryTier), nn(f.recoveryResult), f.uiChangeSuspected ? 1 : 0, now,
+        );
+      });
+      const hasOutcome = !!outcome;
+      db.prepare(
+        'UPDATE local_work_runs SET ' +
+          'target_id=COALESCE(target_id, ?), target_kind=COALESCE(?, target_kind), task_provisional=1, ' +
+          'started_at=COALESCE(started_at, ?), ended_at=?, segment_count=segment_count+1, ' +
+          (hasOutcome ? 'outcome_status=?, outcome_evidence=?, ' : '') +
+          'updated_at=? WHERE run_id=?',
+      ).run(
+        ...[nn(target?.targetId), nn(target?.targetKind), segment.startedAt, segment.endedAt],
+        ...(hasOutcome ? [outcome.status, nn(outcome.evidence)] : []),
+        now, id,
+      );
+      db.exec('COMMIT');
+      return { recorded: true, segmentIndex, stepCount: (steps || []).length, failureCount: (failures || []).length };
+    } catch (e) {
+      db.exec('ROLLBACK');
+      throw e;
+    }
+  },
+  /** agent 내부 진단·테스트용 조회. cloud 로 read-back 하지 않는다. */
+  get(runId) {
+    const db = openLocalDb();
+    const id = String(runId);
+    const run = db
+      .prepare(
+        'SELECT run_id, status, target_id, task_key, task_provisional, target_kind, started_at, ended_at, segment_count, outcome_status, outcome_evidence ' +
+          'FROM local_work_runs WHERE run_id=?',
+      )
+      .get(id);
+    if (!run) return null;
+    return {
+      run,
+      segments: db.prepare('SELECT * FROM local_work_run_segments WHERE run_id=? ORDER BY segment_index').all(id),
+      steps: db.prepare('SELECT * FROM local_work_run_experience_steps WHERE run_id=? ORDER BY seq').all(id),
+      failures: db.prepare('SELECT * FROM local_work_run_failures WHERE run_id=? ORDER BY seq').all(id),
+    };
   },
 };
 

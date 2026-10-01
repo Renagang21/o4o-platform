@@ -17,6 +17,7 @@ import { LOCAL_AGENT_ACTIONS, pickSafeResultData } from '../local-agent/local-ag
 import { awaitCommandResult, issueCommand } from '../local-agent/local-agent-service.js';
 import type { WorkRunStatus } from './work-run-coordination-service.js';
 import type { ReplayStep, WorkflowStep } from './workflow-candidate.js';
+import type { DataWorkRunExperienceRecordArgs } from './work-experience.js';
 
 const WORK_RUN_TOOL = 'work.run.ledger';
 
@@ -115,4 +116,48 @@ export async function issueWorkRunSetStatus(
   const args: Record<string, unknown> = { runId: input.runId, status: input.status };
   if (input.note !== undefined) args.note = input.note;
   return issue(dataSource, ctx.userId, ctx.deviceId, LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_SET_STATUS, args);
+}
+
+// ─── Local Experience 최소 저장 (WO-O4O-AUTOMATION-LOCAL-EXPERIENCE-MINIMUM-STORAGE-V1) ──────
+//   run segment 1개의 구조화 Experience 를 Local 에 쓴다(write only). 결과는 저장 확인(saved)만 돌아온다 — read-back 없음.
+
+/** segment Experience 기록. args 는 work-experience 형상(enum · 정수 · semantic locator). */
+export async function issueWorkRunExperienceRecord(
+  dataSource: DataSource,
+  ctx: { userId: string; deviceId: string },
+  args: DataWorkRunExperienceRecordArgs,
+): Promise<WorkRunLedgerResult> {
+  return issue(dataSource, ctx.userId, ctx.deviceId, LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_EXPERIENCE_RECORD, args as unknown as Record<string, unknown>);
+}
+
+/**
+ * segment 동안 이 device 에 발행된 실행 명령(local.data.* 원장 명령 제외)의 시간 분해 — Cloud 자신의 명령 원장(local_agent_commands)
+ * 타임스탬프만 쓴다(Local 을 읽지 않는다).
+ *   commandWaitMs = Σ(delivered_at − issued_at)  — agent 가 명령을 가져가기까지(poll 대기)
+ *   executionMs   = Σ(completed_at − delivered_at) — agent 가 받아 결과를 돌려주기까지(실행 + 결과 전송)
+ * 근거가 없으면(조회 실패 · 시각 없음) null — 추정하지 않는다. 같은 device 의 동시 run 이 있으면 합산이 섞인다(한계).
+ */
+export async function measureSegmentCommandTiming(
+  dataSource: DataSource,
+  ctx: { userId: string; deviceId: string },
+  window: { from: Date; to: Date },
+): Promise<{ commandWaitMs: number | null; executionMs: number | null }> {
+  try {
+    const rows = (await dataSource.query(
+      `SELECT COUNT(*)::int AS n,
+              SUM(EXTRACT(EPOCH FROM (delivered_at - issued_at)) * 1000) AS wait_ms,
+              SUM(EXTRACT(EPOCH FROM (completed_at - delivered_at)) * 1000) AS exec_ms
+         FROM local_agent_commands
+        WHERE user_id = $1 AND device_id = $2 AND issued_at >= $3 AND issued_at <= $4
+          AND action NOT LIKE 'local.data.%'
+          AND delivered_at IS NOT NULL AND completed_at IS NOT NULL`,
+      [ctx.userId, ctx.deviceId, window.from.toISOString(), window.to.toISOString()],
+    )) as { n: number; wait_ms: string | number | null; exec_ms: string | number | null }[];
+    const row = Array.isArray(rows) ? rows[0] : null;
+    if (!row || !Number(row.n)) return { commandWaitMs: null, executionMs: null };
+    const num = (v: string | number | null) => (v === null || v === undefined || !Number.isFinite(Number(v)) || Number(v) < 0 ? null : Math.round(Number(v)));
+    return { commandWaitMs: num(row.wait_ms), executionMs: num(row.exec_ms) };
+  } catch {
+    return { commandWaitMs: null, executionMs: null };
+  }
 }

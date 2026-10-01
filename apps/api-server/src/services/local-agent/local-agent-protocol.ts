@@ -42,6 +42,7 @@ import {
   validateWorkflowSteps,
   type WorkflowStep,
 } from '../ai-tools/workflow-candidate.js';
+import { validateWorkExperienceRecordShape, type DataWorkRunExperienceRecordArgs } from '../ai-tools/work-experience.js';
 import {
   COMPUTER_ALLOWED_KEYS,
   validateClickArgs,
@@ -148,6 +149,9 @@ export const LOCAL_AGENT_ACTIONS = {
   DATA_WORK_RUN_CANDIDATE_MATCH: 'local.data.work_run_candidate_match',
   /** 재생 결과(성공/어긋남)를 Candidate 통계에 반영한다. 반복 실패 Candidate 는 Local 이 끈다. */
   DATA_WORK_RUN_CANDIDATE_RESULT: 'local.data.work_run_candidate_result',
+  // ── Local Experience 최소 저장 (WO-O4O-AUTOMATION-LOCAL-EXPERIENCE-MINIMUM-STORAGE-V1 · EXPERIENCE-MODEL-V1) ──
+  /** run segment 1개의 구조화 Experience(Run · Step · Failure · Metric · Outcome)를 기록한다. write only — 결과는 확인 건수만. */
+  DATA_WORK_RUN_EXPERIENCE_RECORD: 'local.data.work_run_experience_record',
 } as const;
 
 export type LocalAgentAction = (typeof LOCAL_AGENT_ACTIONS)[keyof typeof LOCAL_AGENT_ACTIONS];
@@ -272,6 +276,7 @@ export const DATA_TARGET_ACTIONS: readonly string[] = Object.freeze([
   LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_CANDIDATE_SAVE,
   LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_CANDIDATE_MATCH,
   LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_CANDIDATE_RESULT,
+  LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_EXPERIENCE_RECORD,
 ]);
 
 /**
@@ -460,7 +465,8 @@ export type DataActionArgs =
   | DataWorkRunSetStatusArgs
   | DataWorkRunCandidateSaveArgs
   | DataWorkRunCandidateMatchArgs
-  | DataWorkRunCandidateResultArgs;
+  | DataWorkRunCandidateResultArgs
+  | DataWorkRunExperienceRecordArgs;
 
 /** Candidate id — Local 이 발급(`wc_` + 소문자·숫자). */
 const LOCAL_WORKFLOW_CANDIDATE_ID_RE = /^wc_[a-z0-9]{6,32}$/;
@@ -513,6 +519,14 @@ export function validateDataWorkRunCandidateResultArgs(args: unknown): { ok: boo
   if (!isValidWorkflowCandidateId(src.candidateId)) return { ok: false };
   if (typeof src.outcome !== 'string' || !WORKFLOW_RESULT_OUTCOMES.includes(src.outcome)) return { ok: false };
   return { ok: true, args: { candidateId: src.candidateId, outcome: src.outcome as DataWorkRunCandidateResultArgs['outcome'] } };
+}
+
+/** `{ runId, segment, target, outcome, metric, steps, failures }` — enum · 정수 · semantic locator 만(자유 텍스트 칸 없음). */
+export function validateDataWorkRunExperienceRecordArgs(args: unknown): { ok: boolean; args?: DataWorkRunExperienceRecordArgs } {
+  const r = validateWorkExperienceRecordShape(args);
+  if (!r.ok || !r.args) return { ok: false };
+  if (!isValidLocalWorkRunId(r.args.runId) || !isRegisteredWorkTarget(r.args.target.targetId)) return { ok: false };
+  return { ok: true, args: r.args };
 }
 
 /** `{ key }` — allowlist 된 meta 키 하나. 그 밖의 키·추가 필드는 실패. */
@@ -656,6 +670,10 @@ export function validateLocalCommandArgs(
   }
   if (base === LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_CANDIDATE_RESULT) {
     const r = validateDataWorkRunCandidateResultArgs(args);
+    return r.ok && r.args ? { ok: true, args: r.args } : { ok: false };
+  }
+  if (base === LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_EXPERIENCE_RECORD) {
+    const r = validateDataWorkRunExperienceRecordArgs(args);
     return r.ok && r.args ? { ok: true, args: r.args } : { ok: false };
   }
   if (base === LOCAL_AGENT_ACTIONS.COMPUTER_CLICK) {
