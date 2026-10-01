@@ -39,12 +39,12 @@
 
 ## 2. 기능별 Canonical 위치 매트릭스
 
-| 기능 | Identity V2 Layer | Canonical 위치 |
+| 기능 | Identity Layer ([V3](../architecture/O4O-IDENTITY-ARCHITECTURE-V3.md) §1) | Canonical 위치 |
 |---|:---:|---|
 | 이름 / 닉네임 / 연락처 수정 | L1 Identity | **각 service `/mypage/profile`** (`PUT /users/profile`) |
-| 비밀번호 설정 / 변경 | L1 Identity (계정 단위 · 서비스 무관) | **각 service `/mypage/settings`** (`POST /auth/password` · 로그인 상태 · 기존 비밀번호가 있으면 현재 비밀번호 필수, 없으면 Google 가입자도 비밀번호 수단을 **추가** — 같은 users.id, 병합 아님 · Admin / `platform:*` 역할은 거부). 은퇴한 `PUT /users/password`(serviceKey 별, 2026-09-23)는 복원하지 않는다. 2026-09-29 기준 API 만 있고 `/mypage/settings` UI 는 미구현(후속) |
-| 비밀번호 재설정 (이메일) | L1 Identity | **각 service `/forgot-password` → `/reset-password`** (`POST /auth/password/forgot` — 존재 여부 비노출 · 재설정 메일은 비밀번호 수단이 있거나 이메일 인증된 계정에만 발송 / `POST /auth/password/reset` — 30분 · 1회용 토큰, 성공 시 전역 세션 폐기) · Admin / `platform:*` 대상 제외 |
-| 로그인 수단 (Google · 이메일/비밀번호 병행) | L1 Identity | **각 service 로그인 화면** — Google: `GoogleContinue` (`POST /auth/google/login` · 미등록 계정은 동의 후 `/auth/google/signup`) / 이메일: `POST /auth/email/login` · 가입 `/signup`(`POST /auth/email/signup`, 계정만 생성 — membership·role 없음). 이메일 동일성으로 Google 계정과 자동 병합하지 않는다. **Admin 은 Google 전용** (password 세션 서버 거부) |
+| 비밀번호 설정 / 변경 | L2 Auth Identity (계정 단위 · 서비스 무관) | **각 service `/mypage/settings`** (`POST /auth/password` · 로그인 상태 · 기존 비밀번호가 있으면 현재 비밀번호 필수, 없으면 Google 가입자도 비밀번호 수단을 **추가** — 같은 users.id, 병합 아님 · Admin / `platform:*` 역할은 거부). 은퇴한 `PUT /users/password`(serviceKey 별, 2026-09-23)는 복원하지 않는다. 2026-09-29 기준 API 만 있고 `/mypage/settings` UI 는 미구현(후속) |
+| 비밀번호 재설정 (이메일) | L2 Auth Identity (계정 단위) | **각 service `/forgot-password` → `/reset-password`** (`POST /auth/password/forgot` — 존재 여부 비노출 · 재설정 메일은 비밀번호 수단이 있거나 이메일 인증된 계정에만 발송 / `POST /auth/password/reset` — 30분 · 1회용 토큰, 성공 시 전역 세션 폐기) · Admin / `platform:*` 대상 제외 |
+| 로그인 수단 (Google · 이메일/비밀번호 병행) | L2 Auth Identity | **각 service 로그인 화면** — Google: `GoogleContinue` (`POST /auth/google/login` · 미등록 계정은 동의 후 `/auth/google/signup`) / 이메일: `POST /auth/email/login` · 가입 `/signup`(`POST /auth/email/signup`, 계정만 생성 — membership·role 없음). 이메일 동일성으로 Google 계정과 자동 병합하지 않는다. **Admin 은 Google 전용** (password 세션 서버 거부) |
 | 이메일 인증 | L1 Identity | **각 service `/auth/verify-email`** (토큰 도착지) |
 | 서비스 가입 신청 | L3 Membership | **각 service Register 흐름** |
 | 서비스 이용 상태 (active/pending) 보기 | L3 Membership | **각 service `/mypage` 의 status 배지** + (선택) web-account 의 통합 view |
@@ -75,7 +75,7 @@
 
 | 금지 기능 | 사유 |
 |---|---|
-| 비밀번호 변경 UI | V2 L2 service-scoped — "어느 서비스의 비밀번호?" UX 어색 |
+| 비밀번호 설정 · 변경 UI | 계정 관리 UI 는 각 service `/mypage/settings` canonical (§2). 비밀번호는 계정(`users.id`) 단위 하나지만 web-account 는 자격(로그인 수단) UI 를 두지 않는다 (§4 원칙 4). ~~V2 L2 service-scoped 근거~~는 2026-09-23 소멸 |
 | 프로필 수정 UI (`PUT /users/profile`) | API 는 공통이나 UI 진입은 각 service `/mypage/profile` canonical |
 | 알림 설정 / 보안 설정 / 2FA | 향후 결정 (별건) — 본 baseline 시점에는 금지 |
 | 서비스 가입 신청 UI | 가입 = 서비스별 사업자 승인 흐름. 각 service Register 가 canonical |
@@ -90,9 +90,10 @@
 1. 그 기능이 §2 매트릭스의 어느 항목에 해당하는가?
    - 기존 항목에 해당 → 매트릭스의 canonical 위치에 추가
    - 기존 항목에 없음 → 아래 2 로 진행
-2. 기능의 Identity V2 Layer 를 식별:
+2. 기능의 Identity Layer 를 식별 ([V3](../architecture/O4O-IDENTITY-ARCHITECTURE-V3.md) 기준):
    - L1 (공통 Identity) → 각 service `/mypage/profile` 권장 (UI 진입 일관성)
-   - L2 (service-scoped credential) → **반드시** 각 service `/mypage/settings`
+   - 로그인 수단 · 비밀번호(계정 단위, `POST /auth/password`) → 각 service `/mypage/settings` (web-account 금지)
+   - ~~L2 (service-scoped credential)~~ → 은퇴(2026-09-23). 서비스별 자격 축은 없으며 되살리지 않는다
    - L3 (membership) → 각 service `/mypage` (도메인별)
    - L4 (role) → 각 service (권한별)
    - 도메인 데이터 (LMS / Pharmacy / Store 등) → 각 service `/mypage/*`
@@ -122,7 +123,7 @@
 | 영역 | 정합 상태 | 근거 |
 |---|:---:|---|
 | 3 service `/mypage` (KPA / K-Cos / Neture) | ✅ Option D 와 일치 | 현재 구현 |
-| 4 service `/mypage/settings` 의 비밀번호 변경 | ✅ V2 Phase 2 적용 (`serviceKey` 명시) | `WO-O4O-IDENTITY-V2-PHASE2-CHANGE-PASSWORD-SERVICE-SCOPE-V1` |
+| 4 service `/mypage/settings` 의 비밀번호 변경 | ~~✅ V2 Phase 2 적용 (`serviceKey` 명시)~~ → **은퇴 (2026-09-23)** · 현행(2026-09-29 정책): 계정 단위 `POST /auth/password` API 만 있고 `/mypage/settings` UI 는 미구현(후속) | ~~`WO-O4O-IDENTITY-V2-PHASE2-CHANGE-PASSWORD-SERVICE-SCOPE-V1`~~ · `WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1` · `WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1` |
 | 4 service `/mypage/profile` 의 프로필 수정 | ✅ `PUT /users/profile` 직접 호출 | 현재 구현 |
 | web-account 코드 | ✅ 최소 계정센터 형태 (서비스 목록 + Handoff) | 현재 구현 |
 | web-account 배포 | ⏭ 미배포 (별건 IR) | placeholder revision (2026-03-13) |
@@ -142,11 +143,11 @@ canonical route 로 사용한다. 아래는 **현재 구현 사실의 기록**�
 | Shell | `@o4o/account-ui` 의 `MyPageShell` 채택 (`basePath='/account'`) |
 | nav 축 | `PHARMACY_HUB_ACCOUNT_NAV_ITEMS` — 내 프로필(`/account`) · 가입 상태(`/join/status`) |
 | 프로필 수정 | `PATCH /users/me/profile` — §2 매트릭스 L1 항목과 동일 계약 |
-| 비밀번호 변경 | `PUT /users/password` with `serviceKey='pharmacy-hub'` — §2 매트릭스 L2 항목과 동일 계약 |
+| 비밀번호 변경 | ~~`PUT /users/password` with `serviceKey='pharmacy-hub'`~~ → **은퇴 (2026-09-23)** (`changeAccountPassword` 제거). 현행 계약은 §2 의 계정 단위 `POST /auth/password` 이며 `/account` UI 는 미구현(후속) |
 | `/store-owner/account` | 매장 셸 URL 유지용 **thin wrapper**(`withShell={false}`). 같은 화면을 두 벌 구현하지 않으며 공통 Shell 을 이중으로 씌우지 않는다. 이 URL 은 store-ui-core 사이드바(설정 › 내 계정)가 가리키므로 **제거·강제 redirect 하지 않는다.** |
 
 즉 Pharmacy-Hub 는 **route 이름만 `/mypage` 대신 `/account`** 일 뿐, §4 Drift 방지 원칙
-(서비스별 계정 UI · service-scoped credential · web-account 금지 범위)은 그대로 지킨다.
+(서비스별 계정 UI · web-account 금지 범위)은 그대로 지킨다. ~~service-scoped credential~~ 은 2026-09-23 은퇴 — 비밀번호는 계정 단위다.
 route 명칭 통일 여부는 본 baseline 이 결정하지 않는다(별건).
 
 근거: `WO-O4O-CROSS-SERVICE-PROFILE-COMMONIZATION-V1` §13 ·
@@ -155,12 +156,12 @@ route 명칭 통일 여부는 본 baseline 이 결정하지 않는다(별건).
 
 ---
 
-## 6. Identity V2 정합성
+## 6. Identity 정합성 (V2 → V3 갱신 2026-10-01)
 
 | 차원 | Option D 적용 시 |
 |---|:---:|
 | L1 (Identity) 분리 정합 | ✅ |
-| L2 (Credential) service-scoped 정합 | ✅ |
+| ~~L2 (Credential) service-scoped 정합~~ → 로그인 수단 계정 단위(V3 L2: Google · 이메일·비밀번호) 정합 — 계정 관리 UI 는 각 service, web-account 금지 | ✅ |
 | L3 (Membership) service-scoped 정합 | ✅ |
 | L4 (Role) service-scoped 정합 | ✅ |
 | 본인 view 와 운영자 view 분리 | ✅ |
@@ -187,7 +188,7 @@ route 명칭 통일 여부는 본 baseline 이 결정하지 않는다(별건).
 - 탈퇴 / 계정 중지 UX 의 canonical 위치 → 미구현, 향후 별건
 - 통합 알림 설정 / 보안 / 2FA → 미구현, 향후 별건
 - `@o4o/account-ui` 공통 패키지 확장 → Operator Core Design 영역
-- backend API (`/users/profile`, `/users/password`) 의 변경 → Identity V2 Phase 3+ 의 책임
+- backend API (`/users/profile`, `/auth/password`) 의 변경 → Identity 정본([V3](../architecture/O4O-IDENTITY-ARCHITECTURE-V3.md)) 과 해당 WO 의 책임 (`/users/password` 는 2026-09-23 은퇴)
 
 ---
 

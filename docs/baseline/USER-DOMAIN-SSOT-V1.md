@@ -11,7 +11,8 @@
 ## 0. Identity 축 (2026-09-24 현행)
 
 WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1 로 password 인증이 **런타임·스키마 양쪽에서 제거**됐다.
-현재 identity 관계는 다음 하나다.
+아래는 그 뒤의 Google 축이다. 2026-09-29 정책(`WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1`)으로
+계정 단위 이메일·비밀번호 수단이 병행된다 — 아래 `users.email` 항목 참조(옛 password 축의 복원이 아니다).
 
 ```
 users                       = O4O 내부 사용자 identity (PK: users.id)
@@ -23,9 +24,12 @@ linked_accounts             = "어떻게 로그인하는가"
         └──────────────▶ users.id      (조회 키는 (provider, providerId) 하나)
 
 users.email                 = 프로필 · 연락 필드
-                              **인증 키가 아니다.** email 로 users/linked_accounts 를
-                              조회하지 않으며(자동 병합 금지), 로그인 계정 주소와
-                              다를 수 있다.
+                              Google 축의 인증 키가 아니다. Google 로그인은 email 로
+                              users/linked_accounts 를 조회하지 않으며(자동 병합 금지),
+                              Google 계정 주소와 다를 수 있다.
+                              단, 이메일·비밀번호 수단(2026-09-29)에서는 users.email 이
+                              로그인 ID 다 → user_password_credentials(user_id 1:1).
+                              이메일 동일성만으로 계정을 병합하지 않는다.
 ```
 
 제거된 것(물리 컬럼·테이블): `users.password` · `users.reset_password_token` ·
@@ -53,7 +57,7 @@ users.email                 = 프로필 · 연락 필드
 │ DROPPED: role, roles (→ role_assignments)                   │
 │ DROPPED: password, reset_password_token,                     │
 │          reset_password_expires, loginAttempts, lockedUntil  │
-│          (2026-09-24 · Google 단일 로그인)                    │
+│          (2026-09-24 · 이메일 수단은 2026-09-29 신규 테이블)  │
 └─────────────────┬───────────────────────────────────────────┘
                   │
     ┌─────────────┼─────────────────────┐
