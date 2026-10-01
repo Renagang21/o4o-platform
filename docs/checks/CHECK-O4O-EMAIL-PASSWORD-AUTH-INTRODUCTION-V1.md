@@ -1,7 +1,7 @@
 # CHECK-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1
 
 > 대상 WO: [`WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1`](../work-orders/WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1.md)
-> 작성: 2026-09-30 · 갱신: 2026-09-30 (PR #257 병합·배포 전 보완 1~6 · 배포 전 최종 보완 1~4) · 상태: **구현 · 로컬 검증 완료 / 운영 적용 · 실계정 확인 전 (DONE 아님)**
+> 작성: 2026-09-30 · 갱신: 2026-10-01 (운영 적용 · neture-web 통제 배포 · 화면 1차 확인) · 상태: **운영 반영 완료 / 실계정 전 과정 검증 전 (DONE 아님)**
 
 ---
 
@@ -171,6 +171,66 @@ repo 에 code scanning 이 켜져 있지 않아 SARIF 업로드가 실패한다(
   - 로그인 상태 비밀번호 변경(`POST /auth/password` · `setPasswordForUser`) 성공 후에도 기존 미소비 재설정 토큰이 살아 있어, 남은 유효시간 동안 옛 링크로 새 비밀번호를 덮어쓸 수 있음 — password credential 변경 성공 시 같은 트랜잭션에서 해당 사용자의 미소비 password reset token 전부 무효화(2026-10-01 Codex 재리뷰 P2 @3cbab5012, 비차단 — 링크는 확인된 메일함으로만 간다).
 - `SMTP_PASS` 를 plain env 에서 Secret Manager 참조(`--update-secrets`)로 이전 — 별도 WO(비밀값 미기재).
 
-## 6. 남은 절차
+## 6. 운영 적용 (2026-10-01)
 
-CI(CodeQL 업로드 실패 1건 기록 · 나머지 통과) · SARIF 판정 → 배포 범위 보고(§5-2-1: `o4o-core-api` + migration 10 · 11 · `neture-web` 만) → 사용자 배포 승인 → 운영 적용(직전 §3 재확인) → Google 로그인 회귀 · 실계정 가입 · 확인 메일 · 로그인 · 새로고침 유지 · handoff · 로그아웃 · 아이디 찾기 · 비밀번호 재설정 → DONE.
+### 6-1. 두 단계로 나뉘어 반영됐다 — 그 사이 **화면 없는 창**이 있었다
+
+| 시점 | API | neture-web | 상태 |
+|---|---|---|---|
+| 1단계 | `api-server:ac601b0d7`(PR #257 포함) · migration 10 · 11 적용 | `neture-web:e2e1be6cc`(**PR #257 미포함**) | **반쪽** — 엔드포인트는 공개로 살아 있는데 화면이 없다 |
+| 2단계 | 동일 | `neture-web:eab0474f0`(포함) | 정렬 |
+
+**1단계에서 실제 피해는 0 이었다**(실측): `user_password_credentials` 0행 · `email_verification_tokens` 0행 ·
+`password_reset_tokens` 0행 · `users` 3명 그대로. 다만 그 창에서 누군가 API 로 직접 가입했다면
+확인 메일 링크(`/verify-email#token=`)가 **없는 화면**을 가리켰을 것이다.
+
+> **배운 것**: 배포 대상이 API + web 둘인데 한쪽만 먼저 나가면, 공개 엔드포인트가 화면보다 앞선다.
+> 다음부터 이 WO 계열은 **web 을 먼저 또는 같은 창에서** 내보낸다.
+
+라이브 엔드포인트 확인(2026-10-01 · 쓰기 0): `POST /auth/email/login` → **401**(경로 존재) ·
+`POST /auth/password/forgot` 비JSON → **415**(`requireJsonBody` 동작) · 없는 경로 → **404**(대조군).
+
+### 6-2. neture-web 통제 배포 (verified rollout)
+
+| 항목 | 값 |
+|---|---|
+| 태그 | `deploy/2026-10-01-email-password-auth-web` → `eab0474f0`(annotated) |
+| API 태그 | `deploy/2026-10-01-email-password-auth` → `ac601b0d7` — **이동 없음** |
+| 사전 게이트 | `eab0474f0` ⊂ `origin/main`(exit 0) · PR #257 포함(exit 0) · `ac601b0d7..eab0474f0` 의 `services/web-neture/src` · `packages/` 변경 **0**(CI·안전장치뿐) |
+| run | `36856407423` **success** — build/push → traffic 기록 → deploy → 신 revision smoke 후 전환 → verify |
+| revision | `neture-web-01671-xil`(종전 `01663-7p9`) · serving = latestCreated = latestReady |
+| label | `o4o-commit-sha=eab0474f0b74c0efc898c7a0c6e25dc15313e6c0` · 이미지 동일 SHA |
+| traffic | 100% 단일 |
+| rollback | **미발동**(해당 step 실행 0) |
+| public | `https://neture.co.kr/` 200 · `/signup` 200 |
+| 번들 실측 | entry `/assets/index-D0QEE1JA.js`(839,251 B)에 `/signup` · `/verify-email` · `/find-id` · `/forgot-password` · `/reset-password` 문자열 포함 |
+
+### 6-3. 화면 1차 확인 (사용자 실측 · 2026-10-01)
+
+로그인 모달 운영 화면을 사용자가 확인했다. 관측된 것:
+
+```text
+이메일 입력 · 비밀번호 입력(보기 토글) · [로그인]
+회원가입 · 아이디 찾기 · 비밀번호 찾기 링크
+"또는" 구분선
+Google 계정 선택 버튼 + "Google 로 처음이신가요? 같은 Google 버튼으로 약관 동의 후 계정이 만들어집니다."
+```
+
+→ **이메일 로그인 UI 노출 · Google 병행 유지(회귀 없음) · 두 수단의 순서·구분선이 설계대로**.
+
+**아직 확인되지 않은 것**(화면 노출과 구분해 적는다):
+
+| 항목 | 상태 |
+|---|---|
+| 실제 이메일 로그인 성공 | **미확인** — 입력 상태만 관측 |
+| 브라우저 콘솔 치명 오류 | **미확인** |
+| `/signup` · `/verify-email` · `/find-id` · `/forgot-password` · `/reset-password` 화면 렌더 | **미확인**(번들 포함은 확인) |
+| 가입 → 확인 메일 → 로그인 전 과정 | **미확인** |
+| 새로고침 유지 · handoff · 로그아웃 · 아이디 찾기 · 재설정 | **미확인** |
+
+번들에 문자열이 있다는 사실을 화면 PASS 로 바꿔 적지 않는다.
+
+## 6-4. 남은 절차
+
+운영 로그인 smoke(위 미확인 항목) → canonical Demo 계정 2개 생성 및 기존 테스트 데이터 연결
+→ 전 과정 실계정 검증 → DONE. **Demo 계정 생성은 운영 데이터 write 이므로 별도 승인 단계다.**
