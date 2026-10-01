@@ -141,7 +141,20 @@ deploy-auto `AUTO_DEPLOY_DISPATCHED` → deploy run 의 CI gate → verified(0% 
 
 ## 13. 후속 기록
 
-(첫 자연 L2 자동 배포 후 기록)
+### 13-1. 운영 관찰 (2026-10-01 10:3xZ 조회 · main `6cd618217`)
+
+| 항목 | 관찰 |
+|---|---|
+| **LEVEL_3 실운영 차단** | PR #257(이메일·비밀번호 인증) merge `138657460` 이후 deploy-auto 가 api(`auth-backend`) · admin · 7 web(`auth-package packages/auth-client`) 를 `AUTO_DEPLOY_BLOCKED reason=LEVEL_3` 로 차단 — fixture 가 아닌 실제 변경에서의 첫 L3 차단. API 는 다른 세션이 통제 배포(`deploy/2026-10-01-email-password-auth` → `ac601b0d7`, run 36828422738)로 반영. web · admin 은 여전히 L3 BLOCKED(통제 배포 대기 — 그 WO 소관) |
+| deploy-auto 장애 · 수정 | 10-01 02:19–05:44Z run 6건 failure — `ensureTag` 첫 GET 이 idle keep-alive 소켓 재사용으로 `UND_ERR_SOCKET`. 다른 세션이 `ac601b0d7`(WO-O4O-CICD-DEPLOY-AUTO-GITHUB-API-CONNECTION-RETRY-V1: GET 3회 재시도 · POST 비재시도)로 수정. 이후 run 전부 success. **fail-closed 확인**: 실패 run 은 dispatch 0 |
+| 전환 후 검증 확장 | 다른 세션 `eab0474f0`(WO-O4O-CICD-WEB-VERIFIED-ROLLOUT-POST-SWITCH-VERIFY-ROLLBACK-V1) — neture verified 에 전환 후 공개 검증 · serving SHA 검증 · 자동 rollback |
+| rollout_pending 확산 | `eab0474f0` 이 `scripts/ci/cloud-run-rollout.mjs`(ROLLOUT_MECHANISM = 전 서비스)를 바꿔, 6cd618217 판정에서 **api 도 `CONTROLLED_FIRST_ROLLOUT_REQUIRED`** — 설계대로이나, rollout 스크립트를 고칠 때마다 전 서비스의 다음 배포가 통제로 바뀐다는 운영 비용이 드러났다 (아래 제안) |
+| 자동 배포 | `deploy/auto-*` 태그 0 — **첫 LEVEL_2 자동 배포 아직 없음** (#257 auth-package 변경으로 web 전부 L3 · api 는 rollout_pending) |
+| DEPLOY_FREEZE | `false` 유지 |
+
+`FIRST_RUNTIME_AUTO_DEPLOY = PENDING` 유지. web · admin 의 #257 통제 배포가 끝나야 L2 자동 배포가 가능한 상태가 된다.
+
+**제안 (별도 WO 후보 · 이 문서에서 구현하지 않음)**: `cloud-run-rollout.mjs` 변경을 "전 서비스 rollout_pending" 으로 보지 않고, 바뀐 하위 명령(`verify` 만 · `smoke` 만 등)이나 실제로 그 경로를 쓰는 서비스(예: `verify-url` 입력이 있는 job)에만 귀속하는 정밀화. 지금은 안전 방향(과잉 통제)이다.
 
 ## 14. 불변 · 남은 것
 
