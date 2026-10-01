@@ -8,7 +8,7 @@
 - **근거 조사(기록물 · 본 문서가 대체하지 않음):** [IR Census](../investigations/IR-O4O-PRIVACY-DATA-CENSUS-V1.md) · [IR Phase 1 Target Model](../investigations/IR-O4O-PRIVACY-IDENTITY-TARGET-MODEL-V1.md) · [IR Decision Closure (D1~D7)](../investigations/IR-O4O-PRIVACY-IDENTITY-TARGET-MODEL-DECISION-CLOSURE-V1.md)
 - **성격:** **방향 · 계약 문서**. 본 채택은 코드 · DB · migration · production 데이터 · API 계약을 변경하지 않는다. 구현은 §16 Phase 순서에 따른 별도 WO 의 책임이며, 동결 Core(F10 · F11) 와 organization-core 를 건드리는 항목은 각 Freeze 의 명시적 예외 승인 절차를 거친다.
 
-> **정책 변경 (2026-09-30 · [`WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1`](../work-orders/WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1.md) §5 승인 2):**
+> **정책 변경 (2026-09-29 · [`WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1`](../work-orders/WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1.md) §5 승인 2):**
 > 서비스 회원 로그인은 **Google 과 이메일·비밀번호 두 방식 병행**이다. 아래 본문의 "Google 단일 로그인" 서술은 이 변경으로 정정된다.
 > - 이메일·비밀번호 수단 = `user_password_credentials` (bcrypt 해시 · `users.id` 1:1) + `email_verification_tokens` · `password_reset_tokens` (1회용 · 해시 저장). 옛 `service_credentials` · 서비스별 password 구조의 **복원이 아니다** — 수단은 `users.id` 하나에 붙고 서비스 독립성은 L3/L4 그대로다.
 > - 이메일 수단에서만 `users.email` 이 **로그인 아이디**가 된다. Google 수단의 조회 키는 여전히 `(provider, providerId)` 이며, **같은 이메일이어도 자동 연결 · 병합하지 않는다**(중복 이메일 가입 거부 + 안내).
@@ -21,7 +21,7 @@
 
 ```text
 O4O User(users.id, 최소 개인정보)
-  ├─ Auth Identity      : Google sub → linked_accounts → users.id          (로그인 = Google · 이메일·비밀번호 병행, 2026-09-30)
+  ├─ Auth Identity      : Google sub → linked_accounts → users.id          (로그인 = Google · 이메일·비밀번호 병행, 2026-09-29)
   │                       이메일 → user_password_credentials → users.id   (Admin 은 Google 전용)
   ├─ Professional Cred. : O4O Professional Credential Domain (초기 물리 kpa_pharmacist_profiles)
   ├─ Relationship       : organization_members · branch_memberships · branch_officers · service_memberships

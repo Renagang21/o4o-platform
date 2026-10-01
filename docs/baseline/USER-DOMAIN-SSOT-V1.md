@@ -40,7 +40,7 @@ users.email                 = 프로필 · 연락 필드
 `service_credentials` · 옛 `password_reset_tokens`(2026-09-29 정책의 동명 신규 테이블과 별개).
 남은 것: `login_attempts` 테이블(FROZEN `auth-core` 소유 · 0행) · `users.email`.
 
-> **정책 변경 (2026-09-30 · [`WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1`](../work-orders/WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1.md)):**
+> **정책 변경 (2026-09-29 · [`WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1`](../work-orders/WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1.md)):**
 > 위 Google 축에 **이메일·비밀번호 수단 축**이 추가됐다(서비스 회원용 · Admin 은 Google 전용).
 >
 > ```
