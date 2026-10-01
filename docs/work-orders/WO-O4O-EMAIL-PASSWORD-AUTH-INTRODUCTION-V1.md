@@ -1,6 +1,6 @@
 # WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1
 
-> 발행: 2026-09-29 · 상태: **조사 완료 / 설계 확정 / §5 승인 3건 확정 → 구현 진행**
+> 발행: 2026-09-29 · 상태: **조사 완료 / 설계 확정 / §5 승인 3건 확정 → 구현 · 로컬 검증 완료 (2026-09-30) · CI · 운영 적용 · 실계정 확인 대기**
 > 진행 기록: `docs/checks/CHECK-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1.md` (구현 시 생성)
 >
 > **하나의 작업이다.** 서버 · 화면 · 문서 정정을 서비스별·단계별 WO 로 나누지 않는다.
@@ -275,4 +275,4 @@ POST /auth/account/find-id         전화번호 → 가린 이메일 힌트 (또
 ---
 
 *Created: 2026-09-29*
-*Status: 조사 완료 · 설계 확정 · 구현 착수 전 (§5 승인 대기)*
+*Status: 구현 · 로컬 검증 완료 — CI · 운영 적용 · 실계정 확인 대기 (DONE 아님) · 검증 기록 [`CHECK-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1`](../checks/CHECK-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1.md)*

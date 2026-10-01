@@ -231,12 +231,14 @@ RBAC: `authMethod` 는 **거부에만** 쓰인다. PR diff 에서 `roles[0]` · 
 | 시나리오 | 현재 동작 (PR #257) |
 |---|---|
 | A. password 사용자가 이후 Google 연결 | **불가** — Google 로그인은 `GOOGLE_SIGNUP_REQUIRED`, Google 가입은 `EMAIL_IN_USE` (대소문자가 정확히 같을 때) |
-| B. Google 사용자가 이후 password 설정 | ① 로그인 상태에서 `POST /auth/password` (기존 수단이 없으면 현재 비밀번호 불필요) ② `/password/forgot` → reset 으로 같은 `users.id` 에 credential 생성 + `isEmailVerified=true` (테스트 V8, 의도된 동작) |
+| B. Google 사용자가 이후 password 설정 | ① 로그인 상태에서 `POST /auth/password` (기존 수단이 없으면 현재 비밀번호 불필요) ② `/password/forgot` → reset 으로 같은 `users.id` 에 credential 생성 + `isEmailVerified=true` (테스트 V8, 의도된 동작 — **조사 시점 기록. 2026-10-01 정책 변경으로 ② 폐지**: forgot/reset 은 기존 수단 복구 전용, 첫 추가는 ① 뿐. 테스트 V8 · S1-P2 반전) |
 | C. 같은 이메일의 다른 Google 계정 | `EMAIL_IN_USE` 409 — 자동 병합 없음 |
 | D. Google 이메일 = password 이메일 | 먼저 가입한 쪽이 이메일을 점유. 뒤에 오는 쪽은 409 |
 | E. Google sub 는 다르고 이메일이 같음 | C 와 같음 |
 
 "이메일만으로 동일인으로 추정하지 않는다"는 원칙은 **가입 단계에서는 지켜진다.** 단 B-② 는 "메일함 소유 = 해당 users.id 의 소유자"로 본다. 이 가정이 깨지는 조건이 §12-1 이다.
+
+> **2026-10-01 정책 변경 (사후 주석 · 본문은 조사 시점 기록으로 보존)**: B-② 자체를 폐지했다 — 메일함 소유만으로 새 로그인 수단을 만들지 않는다. 현행 계약은 [IDENTITY-V3 §3](../architecture/O4O-IDENTITY-ARCHITECTURE-V3.md) 「인증 수단 추가 경계」.
 
 ---
 
@@ -312,6 +314,8 @@ RBAC: `authMethod` 는 **거부에만** 쓰인다. PR diff 에서 `roles[0]` · 
 | **S1** | **Google 미인증 이메일과 비밀번호 재설정이 결합된다.** main 은 `email_verified=false` 인 Google 가입을 허용하고 claim 이메일을 `users.email` 로 저장한다(`isEmailVerified=false`). PR 의 `/password/forgot` 은 credential 이 없는 Google 전용 사용자에게도 그 주소로 재설정 메일을 보낸다. reset 하면 같은 `users.id` 에 비밀번호가 생기고 `isEmailVerified=true` 가 된다. 결과적으로 **Google sub 소유자와 그 이메일 주소의 실제 메일함 소유자가 서로 다른 사람인데도 한 계정을 공유**할 수 있다. | `google-auth.service.ts:236-276` · PR `email-auth.service.ts:461-506` | 미인증 사용자 **0건** (현재 실현된 사례 없음) |
 
 처리 후보 (결정은 사용자): ① Google 가입 시 `email_verified !== true` 이면 거절 ② forgot 은 credential 이 있는 사용자이거나 `isEmailVerified=true` 인 경우에만 메일 발송. 둘 다 적용하는 것이 가장 단순하다. 이 조사에서는 수정하지 않았다.
+
+> **처리 기록**: ① · ② 모두 S1 수정(`61a44a337`)으로 적용됐다. 이후 2026-10-01 정책 변경으로 ② 의 "또는 `isEmailVerified=true`" 는 폐지 — forgot 은 credential 보유 사용자에게만 발송한다.
 
 ### 12-2. 판단 필요 (전환을 막지는 않지만 정책 결정 대상)
 

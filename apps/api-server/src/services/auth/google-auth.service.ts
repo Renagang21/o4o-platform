@@ -42,6 +42,7 @@ import { UserStatus } from '../../types/auth.js';
 import type { AuthTokens } from '../../types/auth.js';
 import { resolveAccountAccess } from '../../common/auth/account-access.policy.js';
 import { AccountInactiveError } from '../../errors/AuthErrors.js';
+import { normalizeLoginEmail } from '@o4o/auth-utils';
 import {
   googleIdentityService,
   type GoogleIdentityService,
@@ -58,6 +59,7 @@ export type GoogleAuthErrorCode =
   | 'GOOGLE_SIGNUP_REQUIRED'
   | 'GOOGLE_ALREADY_REGISTERED'
   | 'GOOGLE_EMAIL_MISSING'
+  | 'GOOGLE_EMAIL_UNVERIFIED'
   | 'EMAIL_IN_USE'
   | 'CONSENT_REQUIRED'
   | 'INVALID_USER'
@@ -69,6 +71,7 @@ const GOOGLE_AUTH_ERROR_STATUS: Record<GoogleAuthErrorCode, number> = {
   GOOGLE_SIGNUP_REQUIRED: 404,
   GOOGLE_ALREADY_REGISTERED: 409,
   GOOGLE_EMAIL_MISSING: 400,
+  GOOGLE_EMAIL_UNVERIFIED: 400,
   EMAIL_IN_USE: 409,
   CONSENT_REQUIRED: 400,
   INVALID_USER: 401,
@@ -81,6 +84,7 @@ const GOOGLE_AUTH_ERROR_MESSAGE: Record<GoogleAuthErrorCode, string> = {
   GOOGLE_SIGNUP_REQUIRED: '등록되지 않은 Google 계정입니다. 약관 동의 후 계정을 생성해 주세요.',
   GOOGLE_ALREADY_REGISTERED: '이미 등록된 Google 계정입니다. 로그인해 주세요.',
   GOOGLE_EMAIL_MISSING: 'Google 계정에서 이메일을 확인할 수 없어 계정을 생성할 수 없습니다.',
+  GOOGLE_EMAIL_UNVERIFIED: 'Google 에서 인증되지 않은 이메일의 계정으로는 가입할 수 없습니다. 이메일 인증을 마친 Google 계정을 사용해 주세요.',
   EMAIL_IN_USE: '이미 사용 중인 이메일입니다. 기존 계정은 자동으로 연결되지 않습니다.',
   CONSENT_REQUIRED: '이용약관과 개인정보 처리방침에 동의해야 합니다.',
   INVALID_USER: '계정 정보를 확인할 수 없습니다.',
@@ -256,6 +260,16 @@ export class GoogleAuthService {
     identity: VerifiedGoogleIdentity,
     consents: GoogleSignupConsents,
   ): Promise<User> {
+    // WO-O4O-EMAIL-PASSWORD-AUTH-S1-CLOSURE-V1: Google 이 소유를 확인하지 않은 주소로는 users 를 만들지 않는다.
+    //   미확인 주소가 users.email 을 점유하면 그 메일함 주인이 비밀번호 재설정으로 같은 users.id 에 수단을 붙일 수 있다.
+    //   생성 경로 하나에 둔다 — 운영자 초대 수락도 이 함수를 쓴다(위 §11). 기존 sub 의 로그인은 영향 없음.
+    if (!identity.email) {
+      throw new GoogleAuthError('GOOGLE_EMAIL_MISSING');
+    }
+    if (identity.emailVerified !== true) {
+      throw new GoogleAuthError('GOOGLE_EMAIL_UNVERIFIED');
+    }
+
     const linkedRepo = manager.getRepository(LinkedAccount);
     const userRepo = manager.getRepository(User);
 
@@ -264,14 +278,28 @@ export class GoogleAuthService {
       throw new GoogleAuthError('GOOGLE_ALREADY_REGISTERED');
     }
 
+    // WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1: 이메일 로그인과 같은 정규화로 저장한다.
+    //   `IDX_users_email` 은 대소문자를 구분하므로, 원문 저장이면 `A@x.com`(Google) 과 `a@x.com`(비밀번호)이
+    //   두 users 행이 되고 비밀번호 로그인이 모호해져 막힌다.
+    //   대소문자만 다른 기존 주소가 있으면 **거절만** 한다 — 그 users 를 반환 · 연결 · 병합하지 않는다(Identity=sub).
+    //   정규화 저장 덕분에 동시 가입 경쟁은 users.email UNIQUE 가 마지막으로 막는다(아래 EMAIL_IN_USE).
+    const email = normalizeLoginEmail(identity.email);
+    const caseVariant: unknown[] = await manager.query(
+      `SELECT 1 FROM users WHERE lower(email) = $1 LIMIT 1`,
+      [email],
+    );
+    if (caseVariant.length > 0) {
+      throw new GoogleAuthError('EMAIL_IN_USE');
+    }
+
     const now = new Date();
     const user = userRepo.create({
       // WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1 Phase B-1: `password: null` write 제거 — 컬럼이 B-2 에서 사라진다.
-      email: identity.email!,
+      email,
       name: null,
       status: UserStatus.ACTIVE,
       isActive: true,
-      isEmailVerified: identity.emailVerified === true,
+      isEmailVerified: true,
       tosAcceptedAt: now,
       privacyAcceptedAt: now,
       marketingAccepted: consents.marketing === true,

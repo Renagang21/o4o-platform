@@ -36,10 +36,15 @@ import { User } from '../entities/User.js';
 import { roleAssignmentService } from '../services/role-assignment.service.js';
 import * as tokenUtils from '../../../utils/token.utils.js';
 import { persistRefreshTokenFamily } from '../../../services/auth/auth-context.helper.js';
+import {
+  isPasswordSessionAllowed,
+  PASSWORD_SESSION_NOT_ALLOWED_CODE,
+  PASSWORD_SESSION_NOT_ALLOWED_MESSAGE,
+} from '../../../common/auth/password-session.policy.js';
 import { getService, getServiceOrigin, O4O_SERVICES } from '../../../config/service-catalog.js';
 import { STORE_WORKSPACE_KEY, STORE_WORKSPACE_ORIGIN, isStoreWorkspaceExchangeOrigin } from '../../../config/store-workspace.js';
 import { resolveAccessibleStores } from '../../../utils/service-tenant.resolver.js';
-import { isHandoffWorkspace } from '../../../services/handoff-token.service.js';
+import { isHandoffWorkspace, type HandoffAuthMethod } from '../../../services/handoff-token.service.js';
 import { isRepresentativeEntryTarget, isRepresentativeEntryExchangeOrigin } from '../../../config/representative-entry.js';
 import { resolveAccountAccess } from '../../../common/auth/account-access.policy.js';
 import {
@@ -91,14 +96,24 @@ const SERVICE_SESSION_REVOKED_CODE = 'SERVICE_SESSION_REVOKED';
  *   · claim 이 없을 때 Origin 으로 좁히면: A 로그아웃 뒤 claim 없는 토큰으로 `Origin: B` 를
  *     보내 **B 의 세대만** 검사받는다. B 에서 로그아웃한 적 없으면 통과한다(5차 리뷰).
  * 그래서 claim 없는 토큰은 null 로 두어 refresh 와 같은 **사용자 전체 최대 세대** 규칙을 따른다.
+ *
+ *   authMethod    WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1 (최종 보완 1): 검증된 토큰의 `authMethod`
+ *                 claim. 'password' 면 password, claim 이 없는 검증된 토큰은 Google 세션이다
+ *                 (refresh 와 같은 해석). 토큰을 검증하지 못하면 password 로 둔다(fail-closed).
+ *                 body · Origin · 계정의 Google 연결 여부로 정하지 않는다.
  */
-function readCallerScope(req: Request): { serviceKey: string | null; sessionEpoch?: number } {
+function readCallerScope(req: Request): {
+  serviceKey: string | null;
+  sessionEpoch?: number;
+  authMethod: HandoffAuthMethod;
+} {
   const token = extractToken(req as never);
   const payload = token ? verifyAccessToken(token) : null;
+  const authMethod: HandoffAuthMethod = payload && payload.authMethod !== 'password' ? 'google' : 'password';
   if (payload?.serviceKey) {
-    return { serviceKey: payload.serviceKey, sessionEpoch: payload.sessionEpoch };
+    return { serviceKey: payload.serviceKey, sessionEpoch: payload.sessionEpoch, authMethod };
   }
-  return { serviceKey: null, sessionEpoch: undefined };
+  return { serviceKey: null, sessionEpoch: undefined, authMethod };
 }
 
 /**
@@ -117,7 +132,7 @@ function readCallerScope(req: Request): { serviceKey: string | null; sessionEpoc
 async function resolveVerifiedHandoffSource(
   req: Request,
   userId: string,
-): Promise<{ serviceKey: string; sessionEpoch: number } | null> {
+): Promise<{ serviceKey: string; sessionEpoch: number; authMethod: HandoffAuthMethod } | null> {
   // claim 이 없는 배포 전 토큰도 **건너뛰지 않는다** — 건너뛰면 만료 전 최대 15분 동안
   // 로그아웃된 서비스의 인증으로 긴 세션을 얻을 수 있다(4차 리뷰 지적).
   const scope = readCallerScope(req);
@@ -131,6 +146,7 @@ async function resolveVerifiedHandoffSource(
   return {
     serviceKey: scope.serviceKey ?? 'unknown',
     sessionEpoch: scope.sessionEpoch ?? INITIAL_SESSION_EPOCH,
+    authMethod: scope.authMethod,
   };
 }
 
@@ -225,6 +241,7 @@ export class HandoffController extends BaseController {
           source.serviceKey,
           { kind: 'workspace', targetWorkspace: STORE_WORKSPACE_KEY },
           source.sessionEpoch,
+          source.authMethod,
         );
         const targetUrl =
           `${STORE_WORKSPACE_ORIGIN}/handoff?token=${handoffToken}` +
@@ -268,6 +285,7 @@ export class HandoffController extends BaseController {
           source.serviceKey,
           targetService.key,
           source.sessionEpoch,
+          source.authMethod,
         );
         const targetOrigin = getServiceOrigin(targetService.key) ?? `https://${targetService.domain}`;
         return BaseController.ok(res, {
@@ -348,6 +366,7 @@ export class HandoffController extends BaseController {
         source.serviceKey,
         targetServiceKey,
         source.sessionEpoch,
+        source.authMethod,
       );
 
       // WO-O4O-KPA-BRANCH-PUBLIC-PATH-ROUTING-AND-CUSTOM-DOMAIN-BASELINE-V1:
@@ -471,7 +490,7 @@ export class HandoffController extends BaseController {
         }
         return HandoffController.issueHandoffSession(req, res, user, roles, memberships, {
           targetWorkspace: payload.targetWorkspace,
-        });
+        }, payload.sourceAuthMethod);
       }
 
       // ── REPRESENTATIVE ENTRY RETURN (neture.co.kr) ──────────────────────────
@@ -495,7 +514,7 @@ export class HandoffController extends BaseController {
         }
         return HandoffController.issueHandoffSession(req, res, user, roles, memberships, {
           targetServiceKey: payload.targetServiceKey,
-        });
+        }, payload.sourceAuthMethod);
       }
 
       // ── SERVICE HANDOFF (기존 로직 불변) ────────────────────────────────────
@@ -553,7 +572,7 @@ export class HandoffController extends BaseController {
 
       return HandoffController.issueHandoffSession(req, res, user, roles, memberships, {
         targetServiceKey: payload.targetServiceKey,
-      });
+      }, payload.sourceAuthMethod);
     } catch (err: any) {
       logger.error('[Handoff] Token exchange failed', err);
       return BaseController.error(res, 'Handoff exchange failed', 500, 'HANDOFF_EXCHANGE_FAILED');
@@ -570,6 +589,7 @@ export class HandoffController extends BaseController {
     roles: string[],
     memberships: { serviceKey: string; status: string }[],
     target: { targetServiceKey?: string; targetWorkspace?: string },
+    sourceAuthMethod: HandoffAuthMethod,
   ): Promise<any> {
     // 5. Generate auth tokens
     // WO-O4O-LOGOUT-ALL-TOKEN-INVALIDATION-V1:
@@ -584,6 +604,18 @@ export class HandoffController extends BaseController {
     // 대상 서비스의 **현재 세대**를 새긴다. 원 서비스의 세대가 아니다 — handoff 로 만들어지는
     // 것은 대상 서비스의 세션이고, 그 서비스에서 로그아웃하면 이 토큰이 끊겨야 한다.
     const sessionEpoch = await readServiceSessionEpoch(user.id, sessionServiceKey);
+
+    // WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1 §2-4 · 최종 보완 1: 교환 세션은 **원장에 남은 출발 수단**을 승계한다.
+    //   수단은 발급 시점에 검증된 access token claim 에서 온 값이다. 교환 시점의 Google 연결 여부 ·
+    //   역할로 다시 추정하지 않는다 — 그 사이 Google 이 연결되거나 역할이 붙어도 비밀번호 세션이
+    //   Google 세션으로 승격되지 않는다. NULL(컬럼 이전 발급분)은 원장 읽기에서 password 로 온다.
+    //   비밀번호 세션이면 **지금의 역할**로 관리자 경계(Admin 화면 · platform:*)를 다시 본다.
+    const authMethod = sourceAuthMethod === 'google' ? null : ('password' as const);
+    if (authMethod === 'password' && !isPasswordSessionAllowed(sessionServiceKey, roles)) {
+      logger.warn('[Handoff] Blocked exchange — password session admin boundary', { userId: user.id });
+      return BaseController.error(res, PASSWORD_SESSION_NOT_ALLOWED_MESSAGE, 403, PASSWORD_SESSION_NOT_ALLOWED_CODE);
+    }
+
     const tokens = tokenUtils.generateTokens(
       user,
       roles,
@@ -592,6 +624,7 @@ export class HandoffController extends BaseController {
       user.refreshTokenFamily ?? null,
       sessionServiceKey,
       sessionEpoch,
+      authMethod,
     );
     await persistRefreshTokenFamily(user.id, tokens.refreshToken);
 

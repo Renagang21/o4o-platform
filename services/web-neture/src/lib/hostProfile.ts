@@ -56,6 +56,10 @@ const SHARED_PREFIXES: readonly string[] = [
   '/handoff',
   '/login',
   '/register',
+  // WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1: 이메일 가입 · 확인 · 아이디 찾기
+  '/signup',
+  '/verify-email',
+  '/find-id',
   '/forgot-password',
   '/reset-password',
   '/terms',

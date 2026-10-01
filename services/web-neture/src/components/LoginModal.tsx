@@ -3,14 +3,18 @@
  * 현재 페이지 위에 오버레이로 표시되어 메뉴 등이 보임
  * WO-O4O-LOGIN-STANDARDIZATION-V1: 전체 서비스 로그인 표준화
  * WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1:
- *   로그인 수단은 'Google 로 계속하기' 하나다. 이메일/비밀번호 입력 · 비밀번호 찾기 ·
- *   별도 회원가입 모달은 은퇴했다(미등록 Google 계정은 같은 버튼에서 약관 동의 → 가입).
+ *   서비스별 비밀번호(service_credentials) 로그인은 은퇴했다.
+ * WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1:
+ *   이메일(로그인 ID)·비밀번호 로그인을 공통 <EmailLoginForm /> 으로 다시 둔다(단일 user_password_credentials).
+ *   아래 회원가입 · 아이디 찾기 · 비밀번호 찾기는 별도 페이지(/signup · /find-id · /forgot-password)다.
+ *   'Google 로 계속하기' 는 그대로 — 미등록 Google 계정은 같은 버튼에서 약관 동의 → 가입(Google 한정 안내).
  */
 
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { X } from 'lucide-react';
-import { GoogleContinue } from '@o4o/auth-react';
+import { GoogleContinue, EmailLoginForm } from '@o4o/auth-react';
+import { authClient } from '../lib/apiClient';
 import { useAuth } from '../contexts';
 import type { User } from '../contexts/AuthContext';
 
@@ -27,7 +31,7 @@ interface LoginModalProps {
 
 export default function LoginModal({ isOpen, onClose, returnUrl }: LoginModalProps) {
   const navigate = useNavigate();
-  const { loginWithGoogle, signupWithGoogle, getGoogleAuthConfig } = useAuth();
+  const { loginWithEmail, loginWithGoogle, signupWithGoogle, getGoogleAuthConfig } = useAuth();
   const [error, setError] = useState<string | null>(null);
   // WO-O4O-LOGIN-SERVICE-NOT-MEMBER-UX-V1:
   //   서비스 미가입(SERVICE_NOT_MEMBER) 차단은 인증 실패와 시각적으로 구분한다.
@@ -60,6 +64,12 @@ export default function LoginModal({ isOpen, onClose, returnUrl }: LoginModalPro
       navigate(returnUrl);
     }
     onClose();
+  };
+
+  // 계정 도움말 링크 — 모달을 닫고 해당 페이지로 이동한다.
+  const handleNavigate = (href: string) => {
+    onClose();
+    navigate(href);
   };
 
   const handleGoToApply = () => {
@@ -97,8 +107,22 @@ export default function LoginModal({ isOpen, onClose, returnUrl }: LoginModalPro
         </div>
 
         <div className="p-6">
-              {/* WO-O4O-GOOGLE-ONLY-SIGNUP-LOGIN-V1: Google 로 계속하기(기본) — 미등록이면 약관 동의 → 계정 생성 */}
-              <div className="mb-6">
+              {/* WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1: 이메일 + 비밀번호 로그인(공통 폼) */}
+              <EmailLoginForm<User>
+                onLogin={loginWithEmail}
+                api={authClient}
+                onSuccess={() => { setError(null); setIsNotMember(false); handleLoginSuccess(); }}
+                links={{ signup: '/signup', findId: '/find-id', forgotPassword: '/forgot-password', onNavigate: handleNavigate }}
+              />
+
+              <div className="my-6 flex items-center gap-3 text-xs text-gray-400" aria-hidden>
+                <span className="h-px flex-1 bg-gray-200" />
+                또는
+                <span className="h-px flex-1 bg-gray-200" />
+              </div>
+
+              {/* WO-O4O-GOOGLE-ONLY-SIGNUP-LOGIN-V1: Google 로 계속하기 — 미등록이면 약관 동의 → 계정 생성 */}
+              <div className="mb-4">
                 <GoogleContinue<User>
                   getConfig={getGoogleAuthConfig}
                   loginWithGoogle={loginWithGoogle}
@@ -139,8 +163,9 @@ export default function LoginModal({ isOpen, onClose, returnUrl }: LoginModalPro
                 )
               )}
 
-              <p className="mt-6 pt-6 border-t border-gray-200 text-center text-xs text-gray-500">
-                처음이신가요? 같은 버튼으로 약관 동의 후 계정이 만들어집니다.
+              {/* 이 안내는 Google 버튼에만 해당한다 — 이메일 가입은 위 '회원가입' 페이지에서 한다. */}
+              <p className="mt-4 text-center text-xs text-gray-500">
+                Google 로 처음이신가요? 같은 Google 버튼으로 약관 동의 후 계정이 만들어집니다.
               </p>
         </div>
       </div>

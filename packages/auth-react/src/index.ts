@@ -29,6 +29,8 @@ export {
 } from './useO4OHomeReturn';
 export type { O4OHomeReturnOptions, O4OHomeReturn, O4OHomeButtonProps, O4OHomeApiLike } from './useO4OHomeReturn';
 export type { GoogleContinueProps } from './GoogleContinue';
+// WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1: 이메일(로그인 ID)·비밀번호 가입·로그인 공통 UI
+export * from './email';
 // WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: GoogleAccountLink 는 은퇴했다(비밀번호 재인증 기반 연결 카드).
 export type {
   AuthLoginResult,

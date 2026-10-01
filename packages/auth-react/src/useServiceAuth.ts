@@ -124,7 +124,13 @@ export function useServiceAuth<TUser>(config: ServiceAuthConfig<TUser>): Service
    * 서비스별 안내 UX 가 분기할 수 있게 한다.
    */
   const adoptSession = useCallback(
-    async (request: () => Promise<unknown>, failMessage: string): Promise<AuthLoginResult<TUser>> => {
+    async (
+      request: () => Promise<unknown>,
+      failMessage: string,
+      // WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1: 이메일 로그인 오류 문구는 서버가 확정한다(EmailAuthError).
+      //   공통 코드표(AUTH_ERROR_MESSAGES)에 이메일 코드를 넣지 않고 서버 `error` 를 그대로 쓴다.
+      preferServerMessage = false,
+    ): Promise<AuthLoginResult<TUser>> => {
       setIsLoading(true);
       try {
         const result = (await request()) as { user?: unknown };
@@ -142,7 +148,10 @@ export function useServiceAuth<TUser>(config: ServiceAuthConfig<TUser>): Service
         if (data) {
           return {
             success: false,
-            error: resolveAuthError(data as never, status ?? 0),
+            error:
+              preferServerMessage && typeof data.error === 'string' && data.error && status !== 429
+                ? data.error
+                : resolveAuthError(data as never, status ?? 0),
             code: typeof data.code === 'string' ? data.code : undefined,
             // WO-O4O-AUTH-ACCOUNT-STATUS-UX-AND-PH-MOBILE-LOGOUT-CLOSURE-V1
             accountStatus:
@@ -177,6 +186,23 @@ export function useServiceAuth<TUser>(config: ServiceAuthConfig<TUser>): Service
   const signupWithGoogle = useCallback(
     (idToken: string, consents: { terms: boolean; privacy: boolean; marketing?: boolean }): Promise<AuthLoginResult<TUser>> =>
       adoptSession(() => authClient.signupWithGoogle(idToken, consents), 'Google 계정 생성에 실패했습니다.'),
+    [adoptSession, authClient],
+  );
+
+  /**
+   * WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1: 이메일(로그인 ID) + 비밀번호 로그인.
+   * 인증 전 이메일은 `code === 'EMAIL_NOT_VERIFIED'` — 호출부는 확인 메일 재발송을 안내한다.
+   * 관리자(platform 역할)는 비밀번호 세션을 받지 못한다(서버 판정 · Google 전용).
+   */
+  const loginWithEmail = useCallback(
+    (email: string, password: string): Promise<AuthLoginResult<TUser>> => {
+      if (!authClient.loginWithEmail) {
+        return Promise.resolve({ success: false, error: '이메일 로그인을 사용할 수 없습니다.' });
+      }
+      const login = authClient.loginWithEmail.bind(authClient);
+      // 세션 서비스는 서버가 요청 Origin 으로 판정한다(body serviceKey 를 받지 않는다 — Guard Rule 4).
+      return adoptSession(() => login(email, password), '로그인에 실패했습니다.', true);
+    },
     [adoptSession, authClient],
   );
 
@@ -240,6 +266,7 @@ export function useServiceAuth<TUser>(config: ServiceAuthConfig<TUser>): Service
     acceptPendingPolicies,
     loginWithGoogle,
     signupWithGoogle,
+    loginWithEmail,
     logout,
     logoutAll,
     refresh,

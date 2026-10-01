@@ -32,6 +32,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { AuthTokenSessionService } from '../auth-token-session.service.js';
 import * as tokenUtils from '../../../utils/token.utils.js';
+import { freshenUserContext } from '../auth-context.helper.js';
 
 jest.mock('../auth-context.helper.js', () => ({
   freshenUserContext: jest.fn(async () => ({ roles: [], memberships: [] })),
@@ -429,6 +430,39 @@ describe('refresh token family 계약 — logout-all 무효화', () => {
       const afterLogoutAll = user.refreshTokenFamily;
 
       expect({ afterLogout, afterLogoutAll }).toEqual({ afterLogout: before, afterLogoutAll: null });
+    });
+  });
+
+  // WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1 보완 3: 수단 표식은 **로그인한 수단**을 따른다 —
+  //   계정에 Google 이 연결돼 있는지는 보지 않는다(refresh 경로는 linked_accounts 를 읽지 않는다).
+  describe('P · 비밀번호 세션의 refresh — 표식 승계 · 관리자 경계', () => {
+    const makePasswordToken = (serviceKey: string): string =>
+      tokenUtils.generateTokens(user, [], 'neture.co.kr', undefined, user.refreshTokenFamily, serviceKey, 0, 'password')
+        .refreshToken;
+
+    it('P1 회전 후에도 authMethod=password 가 access · refresh 양쪽에 남는다', async () => {
+      const rotated = await service.refreshTokens(makePasswordToken('neture'));
+      expect((tokenUtils.verifyAccessToken(rotated.accessToken) as any)?.authMethod).toBe('password');
+      expect((tokenUtils.verifyRefreshToken(rotated.refreshToken) as any)?.authMethod).toBe('password');
+    });
+
+    it('P2 발급 뒤 platform 역할이 붙으면 회전 거절 — PASSWORD_SESSION_NOT_ALLOWED', async () => {
+      jest.mocked(freshenUserContext).mockResolvedValueOnce({ roles: ['platform:super_admin'], memberships: [] } as any);
+      await expect(service.refreshTokens(makePasswordToken('neture'))).rejects.toMatchObject({
+        code: 'PASSWORD_SESSION_NOT_ALLOWED',
+      });
+    });
+
+    it('P3 서비스 :admin 역할(supplier:admin 등)은 거절 대상이 아니다', async () => {
+      jest.mocked(freshenUserContext).mockResolvedValueOnce({ roles: ['supplier:admin', 'neture:admin'], memberships: [] } as any);
+      const rotated = await service.refreshTokens(makePasswordToken('neture'));
+      expect((tokenUtils.verifyAccessToken(rotated.accessToken) as any)?.authMethod).toBe('password');
+    });
+
+    it('P4 Google 세션(표식 없음)은 platform 역할이 있어도 종전대로 회전된다', async () => {
+      jest.mocked(freshenUserContext).mockResolvedValueOnce({ roles: ['platform:super_admin'], memberships: [] } as any);
+      const rotated = await service.refreshTokens(user.__loginRefreshToken);
+      expect((tokenUtils.verifyAccessToken(rotated.accessToken) as any)?.authMethod).toBeUndefined();
     });
   });
 });

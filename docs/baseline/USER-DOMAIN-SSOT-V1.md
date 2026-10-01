@@ -40,6 +40,18 @@ users.email                 = 프로필 · 연락 필드
 `service_credentials` · 옛 `password_reset_tokens`(2026-09-29 정책의 동명 신규 테이블과 별개).
 남은 것: `login_attempts` 테이블(FROZEN `auth-core` 소유 · 0행) · `users.email`.
 
+> **정책 변경 (2026-09-29 · [`WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1`](../work-orders/WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1.md)):**
+> 위 Google 축에 **이메일·비밀번호 수단 축**이 추가됐다(서비스 회원용 · Admin 은 Google 전용).
+>
+> ```
+> user_password_credentials   = 이메일·비밀번호 수단 (user_id 1:1 → users.id · bcrypt 해시만 저장)
+> email_verification_tokens   = 가입 이메일 확인 1회용 토큰 (해시 저장 · 24시간)
+> password_reset_tokens       = 비밀번호 재설정 1회용 토큰 (해시 저장 · 30분) — 옛 동명 테이블의 복원이 아니라 새 구조
+> ```
+>
+> 이메일 수단에서는 `users.email` 이 로그인 아이디로 쓰인다. Google 축의 조회 키 · "email 로 자동 병합 금지" 원칙은 그대로다.
+> `service_credentials` · 서비스별 password · `users.password` 컬럼은 **되살리지 않는다**.
+
 권한 정본은 `role_assignments` 이며 **배열 전체**로 판정한다 — 대표 역할을 배열 순서로 정하지 않는다
 (WO-O4O-IDENTITY-ACCOUNT-DISPLAY-AND-DOCUMENT-ALIGNMENT-V1).
 

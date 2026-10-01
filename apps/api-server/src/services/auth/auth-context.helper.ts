@@ -4,7 +4,7 @@ import { readServiceSessionEpoch } from './service-session-epoch.js';
 import { roleAssignmentService } from '../../modules/auth/services/role-assignment.service.js';
 import * as tokenUtils from '../../utils/token.utils.js';
 import type { User } from '../../entities/User.js';
-import type { AuthTokens } from '../../types/auth.js';
+import type { AuthTokens, SessionAuthMethod } from '../../types/auth.js';
 
 /**
  * Shared auth context helper
@@ -43,6 +43,7 @@ export async function generateTokensWithContext(
   user: User,
   domain: string = 'neture.co.kr',
   serviceKey?: string | null,
+  authMethod?: SessionAuthMethod | null,
 ): Promise<{ tokens: AuthTokens; roles: string[]; memberships: { serviceKey: string; status: string; role?: string }[] }> {
   const ctx = await freshenUserContext(user.id);
   // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8: 어느 서비스에서 로그인했는지와 그
@@ -73,6 +74,8 @@ export async function generateTokensWithContext(
     reuseFamily,
     serviceKey,
     sessionEpoch,
+    // WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1 §2-4: Google 경로는 넘기지 않는다(claim 부재).
+    authMethod ?? null,
   );
   return { tokens, ...ctx };
 }

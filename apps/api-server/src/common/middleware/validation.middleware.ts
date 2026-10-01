@@ -1,6 +1,23 @@
 import { plainToInstance } from 'class-transformer';
 import { validate, ValidationError } from 'class-validator';
 import { Request, Response, NextFunction } from 'express';
+import { isSensitiveKey, redactSensitive } from '../../utils/security-log-redaction.js';
+
+/**
+ * 400 응답의 `details` — 실패 필드의 `value` 를 돌려주되 **민감 필드 값은 돌려주지 않는다**
+ * (WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1 보완 2).
+ *
+ * 비밀번호 · 비밀번호 확인 · 인증 토큰(password · passwordConfirm · newPassword · token ·
+ * refreshToken …)은 `value` 키 자체를 빼고, 나머지 값도 중첩된 민감 키는 `[REDACTED]` 로 바꾼다.
+ * 판정 기준은 보안 로그와 같은 `isSensitiveKey` 하나다.
+ */
+export function formatValidationErrors(errors: ValidationError[]) {
+  return errors.map((error) =>
+    isSensitiveKey(error.property)
+      ? { property: error.property, constraints: error.constraints }
+      : { property: error.property, constraints: error.constraints, value: redactSensitive(error.value) },
+  );
+}
 
 /**
  * DTO Validation Middleware
@@ -41,12 +58,8 @@ export function validateDto(dtoClass: any) {
       });
 
       if (errors.length > 0) {
-        // Format validation errors
-        const formattedErrors = errors.map((error) => ({
-          property: error.property,
-          constraints: error.constraints,
-          value: error.value,
-        }));
+        // Format validation errors (민감 필드 값은 되돌려 주지 않는다)
+        const formattedErrors = formatValidationErrors(errors);
 
         return res.status(400).json({
           success: false,
@@ -86,11 +99,7 @@ export function validateQuery(dtoClass: any) {
       });
 
       if (errors.length > 0) {
-        const formattedErrors = errors.map((error) => ({
-          property: error.property,
-          constraints: error.constraints,
-          value: error.value,
-        }));
+        const formattedErrors = formatValidationErrors(errors);
 
         return res.status(400).json({
           success: false,
@@ -126,11 +135,7 @@ export function validateParams(dtoClass: any) {
       const errors: ValidationError[] = await validate(dtoInstance as object);
 
       if (errors.length > 0) {
-        const formattedErrors = errors.map((error) => ({
-          property: error.property,
-          constraints: error.constraints,
-          value: error.value,
-        }));
+        const formattedErrors = formatValidationErrors(errors);
 
         return res.status(400).json({
           success: false,

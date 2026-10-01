@@ -4,6 +4,8 @@ import type {
   GoogleAuthResponse,
   GoogleAuthConfig,
   GoogleSignupConsents,
+  EmailSignupRequest,
+  EmailAuthNotice,
 } from './types.js';
 import {
   getAccessToken,
@@ -296,6 +298,56 @@ export class AuthClient {
       ...(this.strategy === 'localStorage' && { includeLegacyTokens: true }),
     });
     return this.adoptSessionResponse(response.data as { success?: boolean; data?: any });
+  }
+
+  // ── WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1: 이메일·비밀번호 ──────────────────────────
+  //   옛 `login(email,password)` 의 부활이 아니다 — 새 경로 `/auth/email/*` · `/auth/password/*` 이며
+  //   세션 채택은 Google 과 같은 `adoptSessionResponse` 한 곳이다. 비밀번호·토큰은 로그·저장소에 두지 않는다.
+
+  /** POST /auth/email/login — 확인된 이메일 계정 → 세션. 실패는 axios 오류로 전파(code: INVALID_CREDENTIALS · EMAIL_NOT_VERIFIED …). */
+  async loginWithEmail(email: string, password: string): Promise<GoogleAuthResponse> {
+    const response = await this.api.post('/auth/email/login', {
+      email,
+      password,
+      ...(this.strategy === 'localStorage' && { includeLegacyTokens: true }),
+    });
+    return this.adoptSessionResponse(response.data as { success?: boolean; data?: any });
+  }
+
+  /** POST /auth/email/signup — 계정 생성 + 확인 메일. **세션을 열지 않는다.** */
+  async signupWithEmail(request: EmailSignupRequest): Promise<EmailAuthNotice> {
+    const response = await this.api.post('/auth/email/signup', request);
+    return ((response.data as { data?: EmailAuthNotice })?.data ?? {}) as EmailAuthNotice;
+  }
+
+  /** POST /auth/email/verify — 메일 링크의 토큰으로 주소 확인(자동 로그인 없음). */
+  async verifyEmail(token: string): Promise<EmailAuthNotice> {
+    const response = await this.api.post('/auth/email/verify', { token });
+    return ((response.data as { data?: EmailAuthNotice })?.data ?? {}) as EmailAuthNotice;
+  }
+
+  /** POST /auth/email/resend — 확인 메일 재발송(계정 존재 여부와 무관하게 같은 응답). */
+  async resendVerificationEmail(email: string): Promise<EmailAuthNotice> {
+    const response = await this.api.post('/auth/email/resend', { email });
+    return ((response.data as { data?: EmailAuthNotice })?.data ?? {}) as EmailAuthNotice;
+  }
+
+  /** POST /auth/password/forgot — 재설정 메일(계정 존재 여부와 무관하게 같은 응답). */
+  async requestPasswordReset(email: string): Promise<EmailAuthNotice> {
+    const response = await this.api.post('/auth/password/forgot', { email });
+    return ((response.data as { data?: EmailAuthNotice })?.data ?? {}) as EmailAuthNotice;
+  }
+
+  /** POST /auth/password/reset — 새 비밀번호 저장 + 모든 기기 로그아웃. */
+  async resetPassword(token: string, newPassword: string): Promise<EmailAuthNotice> {
+    const response = await this.api.post('/auth/password/reset', { token, newPassword });
+    return ((response.data as { data?: EmailAuthNotice })?.data ?? {}) as EmailAuthNotice;
+  }
+
+  /** POST /auth/account/find-id — 이름 + 휴대전화 → 가린 이메일 힌트. */
+  async findLoginId(name: string, phone: string): Promise<EmailAuthNotice> {
+    const response = await this.api.post('/auth/account/find-id', { name, phone });
+    return ((response.data as { data?: EmailAuthNotice })?.data ?? {}) as EmailAuthNotice;
   }
 
   /** GET /auth/google/config — 공개 Client ID(secret 아님). 실패·미설정은 `{ enabled: false, clientId: null }`. */

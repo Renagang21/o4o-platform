@@ -8,13 +8,20 @@
 - **근거 조사(기록물 · 본 문서가 대체하지 않음):** [IR Census](../investigations/IR-O4O-PRIVACY-DATA-CENSUS-V1.md) · [IR Phase 1 Target Model](../investigations/IR-O4O-PRIVACY-IDENTITY-TARGET-MODEL-V1.md) · [IR Decision Closure (D1~D7)](../investigations/IR-O4O-PRIVACY-IDENTITY-TARGET-MODEL-DECISION-CLOSURE-V1.md)
 - **성격:** **방향 · 계약 문서**. 본 채택은 코드 · DB · migration · production 데이터 · API 계약을 변경하지 않는다. 구현은 §16 Phase 순서에 따른 별도 WO 의 책임이며, 동결 Core(F10 · F11) 와 organization-core 를 건드리는 항목은 각 Freeze 의 명시적 예외 승인 절차를 거친다.
 
+> **정책 변경 (2026-09-29 · [`WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1`](../work-orders/WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1.md) §5 승인 2):**
+> 서비스 회원 로그인은 **Google 과 이메일·비밀번호 두 방식 병행**이다. 아래 본문의 "Google 단일 로그인" 서술은 이 변경으로 정정된다.
+> - 이메일·비밀번호 수단 = `user_password_credentials` (bcrypt 해시 · `users.id` 1:1) + `email_verification_tokens` · `password_reset_tokens` (1회용 · 해시 저장). 옛 `service_credentials` · 서비스별 password 구조의 **복원이 아니다** — 수단은 `users.id` 하나에 붙고 서비스 독립성은 L3/L4 그대로다.
+> - 이메일 수단에서만 `users.email` 이 **로그인 아이디**가 된다. Google 수단의 조회 키는 여전히 `(provider, providerId)` 이며, **같은 이메일이어도 자동 연결 · 병합하지 않는다**(중복 이메일 가입 거부 + 안내).
+> - 비밀번호 수단으로 발급된 세션(`authMethod:'password'`)은 Admin · `platform:*` 역할 경로에서 **서버가 거부**한다 — Admin 은 Google 전용(§5 승인 3).
+> - 가입은 계정만 만든다 — 서비스 가입 · 조직 · 역할을 부여하지 않는다. 과거 실행 기록(`WO/CHECK-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1` 등)은 보존한다.
+
 ---
 
 ## 0. 한 줄 요약
 
 ```text
 O4O User(users.id, 최소 개인정보)
-  ├─ Auth Identity      : Google sub → linked_accounts → users.id          (로그인 = Google · 이메일·비밀번호 병행, 2026-09-30)
+  ├─ Auth Identity      : Google sub → linked_accounts → users.id          (로그인 = Google · 이메일·비밀번호 병행, 2026-09-29)
   │                       이메일 → user_password_credentials → users.id   (Admin 은 Google 전용)
   ├─ Professional Cred. : O4O Professional Credential Domain (초기 물리 kpa_pharmacist_profiles)
   ├─ Relationship       : organization_members · branch_memberships · branch_officers · service_memberships
@@ -82,6 +89,7 @@ L1 만 L2/L3/L4 의 부모다(FK). L2/L3/L4 사이에 직접 FK 는 없다. 본 
   관리자 계정은 1회용 bootstrap 으로 기존 `users.id` 에 Google `sub` 를 연결했다. 2026-09-24 시점의 로그인 경로는
   `/auth/google/login` · `/auth/google/signup` 둘뿐이었다. 2026-09-29 정책으로 이메일 경로(PR #257 병합 · 배포 후 활성 — `/auth/email/signup` · `/auth/email/verify` · `/auth/email/resend` · `/auth/email/login` ·
   `/auth/password` · `/auth/password/forgot` · `/auth/password/reset` · `/auth/account/find-id`. 가입은 미확인 계정만 만들고 verify 완료 후 로그인)가 추가된다 — 옛 password 축의 부활이 아니라 계정 단위 신규 수단이다.
+- **인증 수단 추가 경계** — **정책 변경 2026-10-01** (PR #257 Codex 재리뷰 P1 · 사용자 승인): forgot/reset 은 **이미 `user_password_credentials` 가 있는 계정의 복구 전용**이다. 비밀번호 수단이 없는 계정(Google 전용 등)은 주소가 확인돼 있어도 재설정 메일 · 토큰을 만들지 않고, reset 도 첫 비밀번호를 만들지 않는다. **첫 비밀번호 추가는 로그인 상태의 `POST /auth/password` 뿐** — 이메일 동일성이나 메일함 소유만으로 새 로그인 수단을 부여하지 않는다. 종전(2026-09-29 승인 · S1)의 "비밀번호 수단 보유 **또는 이메일 인증된 계정**에 발송" 은 이 변경으로 대체됐다.
 - `linked_accounts` 를 **초기 Auth Identity 물리 구조로 재사용**한다: provider = `google` 고정, providerId = `sub`, `(provider, providerId)` unique. email/displayName/profileImage/providerData 스냅샷 컬럼은 저장하지 않는다(자동 병합 유혹 제거). 테이블 rename 은 요구하지 않는다.
 - **Kakao · Naver 등 다른 소셜은 로그인 Identity 대상이 아니다.** KakaoTalk / LINE / WhatsApp 은 §9 의 업무 채널이다.
 - JWT `sub` 는 `users.id` 를 유지한다. Google `sub` 는 토큰에 싣지 않는다.

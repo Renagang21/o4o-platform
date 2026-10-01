@@ -9,6 +9,11 @@ import { freshenUserContext } from './auth-context.helper.js';
 import { resolveAccountAccess } from '../../common/auth/account-access.policy.js';
 import logger from '../../utils/logger.js';
 import { bumpServiceSessionEpoch, isSessionScopeLive } from './service-session-epoch.js';
+import {
+  isPasswordSessionAllowed,
+  PASSWORD_SESSION_NOT_ALLOWED_CODE,
+  PASSWORD_SESSION_NOT_ALLOWED_MESSAGE,
+} from '../../common/auth/password-session.policy.js';
 
 /**
  * AuthTokenSessionService
@@ -141,6 +146,16 @@ export class AuthTokenSessionService {
     //   모든 origin 이 TOKEN_FAMILY_REVOKED 로 연쇄 사망했다 (IR-O4O-CROSSSERVICE-HANDOFF-SESSION-PERSISTENCE-V1).
     //   새 로그인 = 새 family / logout·logout-all = family null 계약은 그대로다.
     const ctx = await freshenUserContext(user.id);
+
+    // WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1 §2-4: 비밀번호 세션은 관리자 경계 밖에서만 산다.
+    //   발급 뒤 `platform:*` 역할이 붙었으면 회전으로 연장하지 않는다(Google 로 다시 로그인).
+    if (payload.authMethod === 'password' && !isPasswordSessionAllowed(payload.serviceKey, ctx.roles)) {
+      logger.warn('[refreshTokens] password session rejected by admin boundary', { userId: user.id });
+      const error = new Error(PASSWORD_SESSION_NOT_ALLOWED_MESSAGE) as Error & { code: string };
+      error.code = PASSWORD_SESSION_NOT_ALLOWED_CODE;
+      throw error;
+    }
+
     // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8: 회전은 같은 세션의 연장이므로
     //   serviceKey 와 **세대를 그대로 승계**한다. 세대를 다시 읽으면 로그아웃 뒤에도 회전
     //   한 번으로 최신 세대를 얻어 세션이 부활한다. 떨어뜨리면 반대로 정상 세션이 끊긴다.
@@ -151,7 +166,9 @@ export class AuthTokenSessionService {
       ctx.memberships,
       payload.tokenFamily,
       payload.serviceKey ?? null,
-      payload.sessionEpoch ?? null
+      payload.sessionEpoch ?? null,
+      // WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1 §2-4: 수단 표식도 승계한다.
+      payload.authMethod ?? null
     );
 
     // family 는 승계됐으므로 users 갱신이 필요 없다. 방어적으로 값이 다를 때만 저장한다.

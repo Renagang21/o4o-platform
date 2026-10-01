@@ -112,6 +112,26 @@ export interface GoogleAuthResponse extends AuthResponse {
   serviceMembership?: { serviceKey: string; status: string | null };
 }
 
+/**
+ * WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1 — 이메일·비밀번호 가입 요청.
+ * email 이 로그인 아이디다. phone 은 아이디 찾기 대조용이며 본인 인증이 아니다.
+ */
+export interface EmailSignupRequest {
+  email: string;
+  password: string;
+  name: string;
+  phone: string;
+  consents: GoogleSignupConsents;
+}
+
+/** 가입·재발송·찾기 등 세션을 열지 않는 이메일 인증 요청의 결과(서버 `data`). */
+export interface EmailAuthNotice {
+  message?: string;
+  maskedEmail?: string | null;
+  mailSent?: boolean;
+  found?: boolean;
+}
+
 /** 서버가 미등록 Google 계정에 돌려주는 코드 — 호출부는 이 코드로 가입(동의) 흐름으로 분기한다. */
 export const GOOGLE_SIGNUP_REQUIRED_CODE = 'GOOGLE_SIGNUP_REQUIRED';
 

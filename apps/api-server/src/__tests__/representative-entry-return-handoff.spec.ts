@@ -209,8 +209,9 @@ describe('B. generateHandoff', () => {
 
 // ─────────────────────────────────────────────────────────────────────────────
 describe('C. exchangeHandoff', () => {
+  // 원장 수단 = Google 세션 출발(종전 계약: claim 없음 = null). 수단 승계 자체는 unified-store-workspace-handoff.spec D.
   const consumed = (target: string, source = 'kpa-society') =>
-    query.mockResolvedValueOnce([[{ user_id: 'user-1', source_service_key: source, target_service_key: target, target_workspace: null, created_at: new Date(0) }], 1]);
+    query.mockResolvedValueOnce([[{ user_id: 'user-1', source_service_key: source, target_service_key: target, target_workspace: null, created_at: new Date(0), source_auth_method: 'google' }], 1]);
   const withProduction = async (fn: () => Promise<void>) => {
     const prev = process.env.NODE_ENV;
     process.env.NODE_ENV = 'production';
@@ -237,7 +238,7 @@ describe('C. exchangeHandoff', () => {
       // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8: 마지막 인자 = 이 세션이 속한 서비스.
       //   handoff 로 발급되는 토큰은 **대상 서비스의 세션**이어야 한다. 그러지 않으면 그 서비스에서
       //   로그아웃해도 이 토큰을 지목할 수 없다(서비스 단위 무효화가 무력해진다).
-      expect(generateTokens).toHaveBeenCalledWith(KPA_ONLY_USER, ['kpa:store_owner'], 'neture.co.kr', KPA_ONLY_MEMBERSHIPS, 'fam-1', 'neture', 0);
+      expect(generateTokens).toHaveBeenCalledWith(KPA_ONLY_USER, ['kpa:store_owner'], 'neture.co.kr', KPA_ONLY_MEMBERSHIPS, 'fam-1', 'neture', 0, null);
       expect(persistRefreshTokenFamily).toHaveBeenCalledWith('user-1', 'RT');
       // SQL 은 토큰 consume(UPDATE handoff_tokens) + memberships SELECT 뿐 — membership·role 생성/수정 0.
       //   세션 세대 조회는 이 spec 에서 connection double 의 `manager` 가 직접 답하므로 여기 집계에

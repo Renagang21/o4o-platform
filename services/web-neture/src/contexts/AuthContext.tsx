@@ -41,9 +41,11 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   /**
-   * WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1:
-   *   email+password login 은 은퇴했다. Neture 로그인 진입은 Google 하나다.
+   * WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1 에서 은퇴한 것은 서비스별 service_credentials 비밀번호다.
+   * WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1: 이메일(로그인 ID)·비밀번호는 단일 user_password_credentials
+   *   경로로 새로 도입했다 — Google 과 병행. 관리자(platform 역할)는 서버가 비밀번호 세션을 거부한다.
    */
+  loginWithEmail: (email: string, password: string) => Promise<AuthLoginResult<User>>;
   loginWithGoogle: (idToken: string) => Promise<AuthLoginResult<User>>;
   signupWithGoogle: (idToken: string, consents: GoogleSignupConsents) => Promise<AuthLoginResult<User>>;
   getGoogleAuthConfig: () => Promise<GoogleAuthConfig>;
@@ -128,6 +130,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         user,
         isAuthenticated: core.isAuthenticated,
         isLoading: core.isLoading,
+        loginWithEmail: core.loginWithEmail,
         loginWithGoogle: core.loginWithGoogle,
         signupWithGoogle: core.signupWithGoogle,
         getGoogleAuthConfig,

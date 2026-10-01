@@ -46,6 +46,10 @@ import { CreateBranchCreationRequests1790400000001 } from '../migrations/1790400
 import { CreateServiceSessionRevocations1790400000002 } from '../migrations/1790400000002-CreateServiceSessionRevocations.js';
 // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8 (handoff 원장에 출발 서비스 세대 보관)
 import { AlterHandoffTokensSourceSessionEpoch1790400000003 } from '../migrations/1790400000003-AlterHandoffTokensSourceSessionEpoch.js';
+// WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1 §2 (이메일·비밀번호 인증 저장 구조 3테이블 · 신규)
+import { CreateEmailPasswordAuthTables1790683000000 } from '../migrations/1790683000000-CreateEmailPasswordAuthTables.js';
+// WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1 최종 보완 1 (handoff 원장에 출발 세션 인증 수단 보관)
+import { AddHandoffTokenSourceAuthMethod1790684000000 } from '../migrations/1790684000000-AddHandoffTokenSourceAuthMethod.js';
 
 export const INCREMENTAL_MIGRATION_CUTOFF = {
   baselineVersion: '2026-09-18-id685',
@@ -69,6 +73,8 @@ export const INCREMENTAL_MIGRATIONS: readonly MigrationClass[] = [
   CreateBranchCreationRequests1790400000001,
   CreateServiceSessionRevocations1790400000002,
   AlterHandoffTokensSourceSessionEpoch1790400000003,
+  CreateEmailPasswordAuthTables1790683000000,
+  AddHandoffTokenSourceAuthMethod1790684000000,
 ];
 
 export function incrementalMigrationNames(): string[] {
