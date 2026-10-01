@@ -1,7 +1,7 @@
 # O4O-AUTOMATION-AGENT-ARCHITECTURE-V1
 
 > **상태**: ACTIVE — O4O 자동화 아키텍처 정본 (`CANONICAL-INDEX` §6)
-> **작성일**: 2026-10-01 · **최종 갱신**: 2026-10-01 (사용자 검토 반영 · DRAFT → ACTIVE · §5-1 질의형 recall 명확화 · §10-2 갱신)
+> **작성일**: 2026-10-01 · **최종 갱신**: 2026-10-01 (사용자 검토 반영 · DRAFT → ACTIVE · §5-1 질의형 recall 명확화 · §10-2 갱신 · `WO-O4O-AI-AUTOMATION-PRINCIPLES-USER-CORRECTION-KNOWLEDGE-AND-MODEL-ROUTING-ALIGNMENT-V1`: §2-3 User Convenience First · §7-2-5 · §8 항목 6 RPA 관계 · §10-1 Correction · Knowledge Watch 위치)
 > **근거 WO/IR**: [`IR-O4O-AUTOMATION-AGENT-ARCHITECTURE-REALIGNMENT-V1`](../investigations/IR-O4O-AUTOMATION-AGENT-ARCHITECTURE-REALIGNMENT-V1.md) (작성) · `WO-O4O-AUTOMATION-AGENT-ARCHITECTURE-ACTIVATION-V1` (사용자 검토 확정 · 활성화, 2026-10-01)
 > **상위 정본**: [`O4O-AI-AUTOMATION-EVOLUTION-PRINCIPLES-V1`](O4O-AI-AUTOMATION-EVOLUTION-PRINCIPLES-V1.md) — 이 문서는 그 원칙을 **대체하지 않고**, 원칙이 요구하는 시스템을 **어떤 계층으로 만드는가**를 고정한다. EVOLUTION = 왜 그렇게 발전해야 하는가 · 이 문서 = 그것을 어떤 계층으로 구현하는가. 둘이 충돌하면 EVOLUTION-PRINCIPLES 가 우선한다.
 > **적용 범위**: O4O 의 모든 반복 업무 자동화 — 약국 · 매장 · 공급자 · 운영자 · 그 밖의 참여 주체. 특정 사이트(health.kr 등)·특정 프로그램·특정 모델에 묶이지 않는다.
@@ -80,6 +80,20 @@ Discovery → 실행 → 결과 → 사용자 도움/교정 → 성공/실패 �
 ```
 
 Experience 저장은 민감한 원문 데이터 저장을 뜻하지 않는다 — 구조화된 경험만 남긴다(§4-2-2, §5).
+
+### 2-3. User Convenience First — 수행자 선택 기준 (2026-10-01 사용자 확정)
+
+> **사용자 편의성과 업무 성공 가능성이 AI 비용보다 우선한다.**
+
+1. Lower-cost Agent 로 충분하다는 **근거**(검증된 Skill · 신뢰할 만한 Experience)가 있으면 그것을 쓴다.
+2. 다음 경우에는 Strong Discovery Agent 가 기본이다: 새 업무 · 처음 보는 상황 · 불확실성이 큼 · 기존 Experience 의 신뢰도가 낮음 · 기존 Skill 이 현재 화면과 맞지 않음.
+3. **Strong 이 필요한지 Lower-cost 로 충분한지 판단하기 어려우면 Strong 을 쓴다.** "싼 수행자로 먼저 해 보고 실패하면 올린다" 는 기본 정책이 아니다(§2-1 과 같은 원칙).
+4. 비용 절감을 위해 사용자 편의를 희생하지 않는다. 다음은 금지되는 방향이다:
+   - 비용을 줄이려고 사용자에게 자세한 prompt 를 요구
+   - 사용자에게 AI 모델 선택을 요구
+   - 사용자에게 자동화 절차를 미리 구조화해 입력하도록 요구
+   - 싼 수행자를 먼저 쓰려고 불필요한 실패를 허용
+5. 수행자 선택은 사용자가 아니라 O4O 가 Experience 근거로 한다(§7). 모델 routing 의 구현은 이 원칙 아래 별도 WO 가 정한다.
 
 ---
 
@@ -183,6 +197,16 @@ Cloud Run ◄── 이번 Run 에 필요한 최소 구조만 응답 ──┘
 2. 업무 전체가 한 수준에 있을 필요는 없다. 단계마다 수준이 다를 수 있다(로그인 확인 L4 · 검색어 판단 L3 · 낯선 팝업 L1).
 3. **강등은 즉시, 승격은 신중히.** 결정적 실행이 어긋나면 그 run 안에서 바로 판단 가능한 수준으로 되돌아가고, 그 사건 자체가 경험으로 남는다.
 4. 사용자 도움 빈도가 내려가는 것도 비용 절감이다 — 사용자 시간이 가장 비싼 자원이다.
+5. **한 번 비싸게 해결한 문제를 같은 방식으로 계속 비싸게 해결하지 않는 것이 O4O 의 비용 최적화다.** 기본 경로:
+
+   ```text
+   처음 / 불확실     → Strong Agent
+   Experience 축적   → 판단 감소
+   검증된 Skill      → Lower-cost Agent
+   판단 불필요       → Deterministic Executor
+   ```
+
+   비용은 이 이동으로 낮춘다 — 사용자 편의를 줄여서 낮추지 않는다(§2-3).
 
 ---
 
@@ -193,6 +217,12 @@ Cloud Run ◄── 이번 Run 에 필요한 최소 구조만 응답 ──┘
 3. 실행 계층은 **어느 수준(L1~L4)에서 오는 지시든 같은 방식으로** 수행한다. 수준별로 다른 손을 만들지 않는다.
 4. 수단 선택은 결정론 우선(API → 구조적 DOM/UIA → 시각 fallback)이며, 선택 근거·fallback 사유는 경험으로 남는다.
 5. 실행 계층의 안정화(연결 · 지연 · 탭/창 준비 · 재개)는 필요한 작업이다. 그러나 **실행 계층의 완성도를 Automation Agent 의 완성도로 보지 않는다.** 실행 계층 smoke PASS 수는 진척 지표가 아니다.
+6. **RPA 는 O4O AI Automation 과 경쟁하는 별도 개념이 아니라, AI Automation 이 업무 수행을 위해 선택할 수 있는 실행 수단 중 하나다.** API · WebMCP · Browser DOM · Windows UIA · Computer Use · Script 도 같다. AI Automation 은 다음 전체 순환이며, 실행 수단은 그 안의 "실행" 칸만 맡는다:
+
+   ```text
+   사용자 요구 → 목적·맥락 이해 → 개인 Experience 확인 → Knowledge 확인 → 기존 Skill 확인
+     → 필요한 판단 → 실행 방법 결정 → 실제 실행 → 결과 관찰 → Experience 생성 → 다음 업무 개선
+   ```
 
 ---
 
@@ -239,14 +269,15 @@ Cloud Run ◄── 이번 Run 에 필요한 최소 구조만 응답 ──┘
 
 ```text
 1. Experience Model
-2. User Assistance
+2. User Assistance (+ User Correction)
 3. Strong Discovery
-4. Manual / Knowledge
+4. Manual / Knowledge (→ Knowledge Watch)
 5. Promotion
 6. Shared Experience
 ```
 
 - 앞 번호가 뒤 번호의 근거 데이터를 만든다. 순서를 바꾸려면 이 절을 고치는 명시적 WO 가 필요하다.
+- 2026-10-01 정렬(`WO-…-USER-CORRECTION-KNOWLEDGE-AND-MODEL-ROUTING-ALIGNMENT-V1`): 순서는 바뀌지 않았다. User Correction 은 2 에, Knowledge Watch 는 4 의 뒤에 붙는다. 구현 Phase 대응은 [EXPERIENCE-MODEL §20](O4O-AUTOMATION-EXPERIENCE-MODEL-V1.md). 실제 구현에서 선행관계가 달리 확인되면 보고 후 조정한다.
 - **Execution Runtime 은 별도의 0번 트랙이다.**
   - 진행 중인 runtime 결함 → 필요한 만큼 마감한다.
   - 새로운 runtime 최적화 → Experience 계층보다 선행하지 않는다.
@@ -264,6 +295,8 @@ Cloud Run ◄── 이번 Run 에 필요한 최소 구조만 응답 ──┘
 ~~`WO-O4O-AUTOMATION-EXPERIENCE-MODEL-DESIGN-V1`~~ — **완료(2026-10-01)**: [`O4O-AUTOMATION-EXPERIENCE-MODEL-V1`](O4O-AUTOMATION-EXPERIENCE-MODEL-V1.md) ACTIVE (Experience 개념 모델 · 저장 계약 · D1~D8 확정).
 
 다음 개발 작업은 **Phase 1 — Local Experience 최소 저장**(EXPERIENCE-MODEL §20 · §22) 이며 별도 WO 로 진행한다 — 성공이든 실패든 실제 Run 이 Local Experience 에 남는 것이 첫 구현이다.
+
+- 2026-10-01 상태: Phase 1 **코드 완료 · 실 PC smoke PENDING**(배포 승인 대기) — [`CHECK-O4O-AUTOMATION-LOCAL-EXPERIENCE-MINIMUM-STORAGE-V1`](../checks/CHECK-O4O-AUTOMATION-LOCAL-EXPERIENCE-MINIMUM-STORAGE-V1.md). 새 설계보다 Phase 1 실환경 closure 가 먼저다. 그 다음이 Phase 2(User Assistance + User Correction).
 
 ---
 

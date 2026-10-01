@@ -135,9 +135,13 @@ AI = 발견 / 판단 / 예외 대응        O4O Runtime = 검증된 실행
 
 이는 [`AUTOMATION-EXECUTION-LAYER`](../checks/CHECK-O4O-AUTOMATION-EXECUTION-LAYER-REALIGNMENT-V1.md) 의 **Deterministic First**(api → browser_dom → windows_uia → computer_use) 와 같은 방향이다.
 
+> API · WebMCP · Browser DOM · Windows UIA · Computer Use · RPA · Script 는 모두 **실행 수단**이다. RPA 는 AI Automation 과 경쟁하는 별도 개념이 아니라 AI Automation 이 고를 수 있는 실행 수단 중 하나다 — 자동화 전체 순환은 [`ARCHITECTURE`](O4O-AUTOMATION-AGENT-ARCHITECTURE-V1.md) §8 항목 6. (2026-10-01)
+
 ## §12. 초기 비용과 속도
 
 새로운 사이트/프로그램/업무에서는 초기에 `AI 호출 많음 · 화면 관찰 많음 · 잘못된 경로 진입 · 사용자 takeover 많음 · 속도 느림 · 비용 높음` 이 발생할 수 있다. 이는 허용한다. 단순 운영 낭비가 아니라 **Workflow 를 발견하기 위한 학습 비용**이다.
+
+> **사용자 편의성과 업무 성공 가능성이 AI 비용보다 우선한다.** 비용을 줄이려고 사용자에게 자세한 prompt · AI 모델 선택 · 절차 사전 구조화를 요구하거나 불필요한 실패를 허용하지 않는다. 비용은 "한 번 비싸게 해결한 문제를 계속 비싸게 풀지 않는 것" 으로 낮춘다 — [`ARCHITECTURE`](O4O-AUTOMATION-AGENT-ARCHITECTURE-V1.md) §2-3 · §7-2. 사용자 교정 · 매뉴얼 · 공식 웹 Knowledge 의 기록 단위는 [`EXPERIENCE-MODEL`](O4O-AUTOMATION-EXPERIENCE-MODEL-V1.md) §7-5 · §7-6 · §8-1~8-4. (2026-10-01)
 
 ## §13. 시간이 갈수록 개선되어야 한다
 

@@ -1,7 +1,7 @@
 # O4O-AUTOMATION-EXPERIENCE-MODEL-V1
 
 > **상태**: ACTIVE — Experience 개념 모델 · 저장 계약 정본 (`CANONICAL-INDEX` §6)
-> **작성일**: 2026-10-01 · **최종 갱신**: 2026-10-01 (사용자 검토 D1~D8 확정 · DRAFT → ACTIVE)
+> **작성일**: 2026-10-01 · **최종 갱신**: 2026-10-01 (사용자 검토 D1~D8 확정 · DRAFT → ACTIVE · `WO-O4O-AI-AUTOMATION-PRINCIPLES-USER-CORRECTION-KNOWLEDGE-AND-MODEL-ROUTING-ALIGNMENT-V1`: §7-5 User Correction · §7-6 Preferred/Avoid Pattern · §8-1~8-4 Knowledge 출처 · Manual · 공식 웹 Knowledge · Knowledge Watch · 사례 D · §20 순서 보강)
 > **근거 WO**: `WO-O4O-AUTOMATION-CANONICAL-ENTRYPOINT-ALIGNMENT-AND-EXPERIENCE-MODEL-DESIGN-V1` Phase B (= `WO-O4O-AUTOMATION-EXPERIENCE-MODEL-DESIGN-V1`)
 > **상위 정본**: [`O4O-AUTOMATION-AGENT-ARCHITECTURE-V1`](O4O-AUTOMATION-AGENT-ARCHITECTURE-V1.md) §4 (Experience as Asset) · §5 (Local/Shared) · §9 (Promotion) — 그 위 [`O4O-AI-AUTOMATION-EVOLUTION-PRINCIPLES-V1`](O4O-AI-AUTOMATION-EVOLUTION-PRINCIPLES-V1.md)
 > **근거 census**: [`IR-O4O-AUTOMATION-AGENT-ARCHITECTURE-REALIGNMENT-V1`](../investigations/IR-O4O-AUTOMATION-AGENT-ARCHITECTURE-REALIGNMENT-V1.md) §3·§5 + 이 문서 부록 A 의 코드 재확인
@@ -210,6 +210,47 @@ Experience: ask=메뉴 위치 · stage="거래명세서 화면 진입" · struct
 - 값 확인 답(예: "게보린")은 slot state 로만 들어가고 Experience 의 재사용 지식이 되지 않는다.
 - 구조화된 내용에 고객명·환자명·금액 같은 업무 데이터가 섞이면 그 필드는 버린다(§16).
 
+### 7-5. User Correction — 구조화된 교정 (2026-10-01 정렬)
+
+§7-2 의 "사용자 교정" 행을 구조로 고정한다. 교정은 **"이 Task × Target × Stage 에서 AI 가 고른 방법이 틀렸고, 더 나은 방법은 이것이다"** 라는 Assistance Event 의 한 종류다.
+
+```text
+AI 의 방법 → 사용자 교정 → 더 나은 방법 → 실제 실행 → 결과 검증 → Experience
+```
+
+| 구분 | 의미 |
+|---|---|
+| 무엇이 잘못됐나 | AI 가 택한 경로 · 방법(구조로) |
+| 왜 잘못됐나 | 사용자가 준 이유(구조화 가능한 것만 — 원문 미저장, D4) |
+| 어느 단계 | stage |
+| 어떤 전략 | 그때 쓴 수행자 수준 · Procedure/Skill · 수단(decided_by · method) |
+| 사용자의 대안 | 더 나은 경로 · 방법(구조로) |
+| 실제 성공 여부 | 대안으로 실행한 Step 의 Result · 근거 등급(§9) |
+| 재사용 가능성 | 다음 Run 에서 다시 쓸 수 있는지(§7-1 reusability) |
+
+- 교정 자체는 Failure 층의 **판단 오류**(§10-2) 와 같은 Run · stage 에 연결된다. 교정 = 사용자 잘못이 아니다.
+- 교정만으로는 "대안이 맞다" 가 확정되지 않는다 — 대안으로 실제 성공해야 Experience 가 된다(D5 절차 도움 규칙과 같다).
+
+### 7-6. Preferred Pattern / Avoid Pattern
+
+교정에서 두 가지가 나온다.
+
+- **Preferred Pattern**: 같은 Task × Target × Stage 에서 다음에 **먼저 쓸** 방법.
+- **Avoid Pattern**: 같은 Task × Target × Stage 에서 **다시 고르지 않을** 방법.
+
+범위 규칙:
+1. 둘 다 **Task × Target × Stage 범위**다. 다른 Task · 다른 사이트로 번지지 않는다.
+2. **한 번의 교정은 Shared Skill 이나 전역 금지 규칙을 만들지 않는다.** 단일 Run 은 공용 규칙이 아니다(EVOLUTION §9 · ARCHITECTURE §9-2).
+3. Avoid Pattern 은 "그 방법이 어디서나 틀렸다" 가 아니라 "이 업무 · 이 대상 · 이 단계에서 더 나은 방법이 확인됐다" 는 뜻이다.
+
+승격 흐름:
+
+```text
+User Correction → Correction Knowledge 후보 → 실제 Run 검증 → Local Experience(Preferred/Avoid)
+  → 반복 검증 → Procedure / Skill 의 단계 → sanitization + 사용자 동의 → Shared Experience
+  → 다른 사용자에게는 Knowledge 로 도착해 그 사용자의 Run 에서 다시 검증(§17)
+```
+
 ---
 
 ## 8. Knowledge / Manual
@@ -234,6 +275,50 @@ Knowledge(주장, 미검증) ──Decision 근거로 사용──► Step 성�
                                          └──► Step 실패 ──► claim contradicted (+Failure: 업무 지식층)
 여러 Run 에서 confirmed + 안정 ──► Procedure / Skill 후보의 단계
 ```
+
+### 8-1. Knowledge 출처와 신뢰 (2026-10-01 정렬)
+
+| 출처 | 예 | 성격 |
+|---|---|---|
+| Official Knowledge | 공식 Help · FAQ · Release Note · Update Notice | 외부 · 공식 |
+| Manual Knowledge | 프로그램 기준 매뉴얼(§8-2) | 외부 · 문서 |
+| User-provided Knowledge | 사용자 설명 · 업무 문서 | 사용자 |
+| User Correction Knowledge | 교정에서 나온 Preferred/Avoid 후보(§7-5 · §7-6) | 사용자 · 이 Task×Target×Stage 한정 |
+| Local Experience | 이 사용자 PC 의 실제 Run | 관찰된 사실 |
+| Shared Experience | 다른 사용자에서 검증 · 공유된 Digest | 다른 환경의 사실 → 여기서는 Knowledge(§17) |
+
+- 출처마다 신뢰가 다르지만 **최종 검증 기준은 이 사용자의 실제 Run Experience** 다. 어떤 출처도 Run 검증 없이 Skill 이 되지 않는다.
+
+### 8-2. PC 프로그램 기준 매뉴얼
+
+1. 프로그램마다 **기준 매뉴얼 하나**를 Initial Knowledge 로 둔다. 버전별 매뉴얼을 모두 갖추는 것을 전제로 하지 않는다.
+2. 사용자의 실제 버전은 매뉴얼보다 오래됐거나 · 같거나 · 새롭거나 · 알 수 없을 수 있다. **버전 차이는 자동화를 막는 조건이 아니다.**
+3. 흐름:
+
+   ```text
+   Source Manual → Initial Knowledge(claims) → Run → Experience
+     → claim 별 confirmed / contradicted / supplemented → O4O Knowledge 보완
+   ```
+
+   - `supplemented`: 매뉴얼에 없던 단계 · 화면을 Run 이 채운 경우.
+4. **AI 는 Source Manual 원본을 수정하지 않는다.** 보완은 O4O Knowledge(추출된 claim) 쪽에만 쌓는다.
+5. 한 claim 이 contradicted 돼도 **"프로그램 전체가 바뀌었다" 로 판단하지 않는다** — 그 stage 의 claim 만 낮춘다.
+6. 버전은 **선택적 환경 정보**다. 필수 입력이 아니며, 사용자에게 반복해서 묻지 않는다.
+
+### 8-3. 공식 웹 Knowledge
+
+- 공식 Help · Manual · FAQ · Release Note · Update Notice · 공식 사용 설명은 Knowledge 출처다(§8-1).
+- **기본적으로 매 Run 마다 실시간 조회하지 않는다.** Strong Discovery 중 필요하면 조회할 수 있다(ARCHITECTURE §3).
+- 조회한 내용도 미검증 claim 이며 Run 으로 검증한다.
+
+### 8-4. Knowledge Watch (향후 · 미구현)
+
+공식 업데이트를 지켜 Knowledge 를 갱신 후보로 올리는 기능. 이 문서는 방향만 정한다.
+
+- 우선순위 신호: 사용 빈도 · 사용자 수 · 업무 중요도 · 최근 실패 증가 · UI 변경 신호 · 공식 업데이트.
+- 흐름: `Official Update → Knowledge Candidate → Experience 검증 → Knowledge / Skill 보완`.
+- **공식 업데이트만으로 Skill 을 자동 변경하지 않는다.**
+- 위치: Manual / Knowledge ingestion 뒤(§20 · ARCHITECTURE §10-1 의 4).
 
 ---
 
@@ -495,6 +580,25 @@ Run R9  L4 Deterministic (Procedure P1, DOM 수단)
   runtime 층 실패였다면(site_not_ready 등): P1 신뢰도는 그대로, Target runtime 지표만 기록
 ```
 
+### 사례 D — 사용자 교정 (health.kr 동일성분 제품 탐색)
+
+```text
+요청: "이 약이랑 성분이 같은 제품 찾아줘"
+Run R12 AI 방법: 성분 확인 → 성분명 재검색 → 결과에서 추정
+  사용자 교정: "제품을 검색해서 상세에 들어가면 '동일성분' 탭이 있다"
+  대안 실행: 제품 검색 → 제품 상세 → 동일성분 탭 → 성공(system_verified)
+기록:
+  Failure     : stage="동일성분 탐색" · 층=판단 오류(사용자 교정)
+  Correction  : wrong=성분명 재추출·재검색 / alt=제품 상세→동일성분 기능 / 성공 여부=성공 / reusable
+  Task        : 동일성분 제품 탐색 · Target: health.kr
+  Preferred   : 제품 상세 → 동일성분 기능
+  Avoid 후보  : 성분명 재추출 → 재검색 (이 Task × Target × Stage 한정)
+  slot        : 제품명은 slot 값 — Experience 에 남기지 않는다(D3)
+의미:
+  복합제처럼 성분명 재검색으로는 정확히 찾기 어려운 경우, 사이트 고유 기능이 더 적합한 방법이다.
+  이 1회 교정으로 Skill 이나 전역 금지를 만들지 않는다 — 다음 Run 들에서 검증된 뒤 Procedure 단계 후보(§7-6).
+```
+
 ---
 
 ## 19. 기존 자산 재사용 방향
@@ -520,12 +624,14 @@ Run R9  L4 Deterministic (Procedure P1, DOM 수단)
 | Phase | 내용 | 완료 기준 |
 |---|---|---|
 | 1 Local Experience 최소 저장 | Run(Outcome+근거 · segments) · Step(모든 run · stage · 결과) · Failure Event(층) 를 Local 에 additive 저장 | 성공/실패/도움 run 모두 Run+Step 이 남는다 |
-| 2 User Assistance 연결 | Assistance Event 기록 · 재개 시 Task·slot state 이어받기 · reusable 도움을 다음 run Decision 근거로 recall | 사례 B 에서 두 번째 run 이 메뉴를 묻지 않는다 |
+| 2 User Assistance + User Correction 연결 | Assistance Event 기록 · User Correction 구조(§7-5) · Preferred/Avoid Pattern(§7-6) · 재개 시 Task·slot state 이어받기 · reusable 도움을 다음 run Decision 근거로 recall | 사례 B 에서 두 번째 run 이 메뉴를 묻지 않는다 · 사례 D 에서 다음 run 이 Avoid 경로를 다시 고르지 않는다 |
 | 3 Candidate 연결 | 도움 run skip 해제 · Candidate 를 Procedure 하위 수단으로 연결 · runtime 층 실패 분리 | 사례 A 도움 run 이 Candidate 성공으로 집계 |
 | 4 Metrics 연결 | 시간 분해(user wait · AI · command wait · exec · settle) · 호출 수 · 비용 | B run 수준의 분해가 자동으로 남는다 |
 | 5 Strong Discovery 연결 | provisional Task/Target · Discovery run 이 Experience 를 생성(ARCHITECTURE §2-2 완성 조건) | 처음 보는 업무 1건이 Experience + Procedure 후보를 남긴다 |
 
-이후: Manual/Knowledge ingestion → Promotion Engine → Shared Digest (ARCHITECTURE §10-1 순서).
+이후: Manual/Knowledge ingestion → Knowledge Watch(§8-4) → Promotion Engine → Shared Digest (ARCHITECTURE §10-1 순서).
+
+Phase 1 구조와의 관계(2026-10-01 판정): Phase 1 v6 테이블은 Correction · Knowledge · Preferred/Avoid 를 막지 않는다. `local_work_run_experience_steps` 의 `decided_by` · `stage`, `local_work_run_failures` 의 판단 오류 층, 예약된 `task_key` 에 run_id · seq · stage 로 연결되는 테이블 · 컬럼을 **additive** 로 더하면 된다. Phase 1 은 재설계하지 않는다.
 
 ---
 
@@ -547,6 +653,8 @@ Run R9  L4 Deterministic (Procedure P1, DOM 수단)
 다음 구현 작업은 **`Phase 1 — Local Experience 최소 저장`**(§20) 이며 별도 WO 로 진행한다. 이 문서의 활성화 작업에서는 시작하지 않는다.
 
 개발 중심이 "자동화를 더 잘 실행하는 코드" 에서 **"자동화하면서 경험을 남기는 코드"** 로 처음 이동하는 단계다 — 성공이든 실패든 실제 Run 이 Local Experience 에 남고(무엇을 했는지 · 어디서 실패했는지 · 얼마나 걸렸는지 · 어떤 근거로 성공했는지), 다음 단계(Assistance 연결 · recall)가 그것을 활용한다.
+
+2026-10-01 상태: Phase 1 코드 완료 · 실 PC smoke PENDING. 다음은 Phase 1 실환경 closure, 그 다음 Phase 2(Assistance + Correction).
 
 ---
 
