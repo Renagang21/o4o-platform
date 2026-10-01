@@ -1,7 +1,7 @@
 # O4O-AUTOMATION-EXPERIENCE-MODEL-V1
 
-> **상태**: DRAFT — 사용자 검토 대기 (§17 결정 사항 확정 후 ACTIVE 전환 · `CANONICAL-INDEX` 등재는 그때)
-> **작성일**: 2026-10-01 · **최종 갱신**: 2026-10-01
+> **상태**: ACTIVE — Experience 개념 모델 · 저장 계약 정본 (`CANONICAL-INDEX` §6)
+> **작성일**: 2026-10-01 · **최종 갱신**: 2026-10-01 (사용자 검토 D1~D8 확정 · DRAFT → ACTIVE)
 > **근거 WO**: `WO-O4O-AUTOMATION-CANONICAL-ENTRYPOINT-ALIGNMENT-AND-EXPERIENCE-MODEL-DESIGN-V1` Phase B (= `WO-O4O-AUTOMATION-EXPERIENCE-MODEL-DESIGN-V1`)
 > **상위 정본**: [`O4O-AUTOMATION-AGENT-ARCHITECTURE-V1`](O4O-AUTOMATION-AGENT-ARCHITECTURE-V1.md) §4 (Experience as Asset) · §5 (Local/Shared) · §9 (Promotion) — 그 위 [`O4O-AI-AUTOMATION-EVOLUTION-PRINCIPLES-V1`](O4O-AI-AUTOMATION-EVOLUTION-PRINCIPLES-V1.md)
 > **근거 census**: [`IR-O4O-AUTOMATION-AGENT-ARCHITECTURE-REALIGNMENT-V1`](../investigations/IR-O4O-AUTOMATION-AGENT-ARCHITECTURE-REALIGNMENT-V1.md) §3·§5 + 이 문서 부록 A 의 코드 재확인
@@ -125,7 +125,7 @@ Target ┘     │       ├─ Assistance Event (막힘 → 질문 → 제공 �
 |---|---|
 | run identity | runId (재개 시 유지) |
 | task · target | §3 · §4 참조 |
-| slot state | 각 slot 이 채워졌는가 · 어디서 왔는가(요청 / 사용자 답 / 기본값 / Knowledge) — **값은 Local 에만, 공유 안 함** |
+| slot state | 각 slot 이 채워졌는가 · 어디서 왔는가(요청 / 사용자 답 / 기본값 / Knowledge) — **값은 실행 중 Local 에만 두고 Run 종료 시 삭제 · 공유 안 함**(D3) |
 | startedAt · endedAt · segments | 재개로 나뉜 구간들(사용자 대기는 segment 사이) |
 | execution level | 이 Run 이 시작한 수준(L1~L4)과 단계별 실제 수준 |
 | executor | 단계별 수행자(Strong / Lower-cost / Deterministic / User) |
@@ -174,7 +174,7 @@ Result      : 입력 반영됨 · 검증 = system_verified
 무엇을 물었는가        ask kind        : 아래 7-2
 사용자가 준 정보 종류   provided kind   : value · target · path · procedure · document · confirmation · takeover
 구조화된 내용          structured      : 정보 종류별 정규형 (예: menu path ["거래관리", "거래명세서"])
-원문                  raw             : 기본 저장 안 함 (§7-4)
+원문                  raw             : 저장 안 함 (§7-4 · D4)
 무엇이 풀렸는가        resolution      : resolved / partially / not_resolved + 이후 몇 step 이 진행됐는가
 다음에 다시 물어야 하나 reusability     : reusable_knowledge / per_run_value / personal_preference / not_reusable
 ```
@@ -204,7 +204,7 @@ Result      : 입력 반영됨 · 검증 = system_verified
           ↓ 구조화 (Run 중 Agent 가 수행)
 Experience: ask=메뉴 위치 · stage="거래명세서 화면 진입" · structured.menu_path=["거래관리","거래명세서"]
             · hint.region="왼쪽 아래" · resolution=resolved · reusability=reusable_knowledge
-원문: 저장 안 함(기본). 구조화 실패 시에만 Local 에 짧게, 보존 기한부(§17 결정 D4)
+원문: 실행 중에만 사용 · 저장 안 함. 구조화에 실패하면 그 도움은 Experience 로 남기지 않는다(D4)
 ```
 
 - 값 확인 답(예: "게보린")은 slot state 로만 들어가고 Experience 의 재사용 지식이 되지 않는다.
@@ -398,8 +398,8 @@ ARCHITECTURE §9-1 판단 신호 ↔ 이 모델의 출처:
 | Target environment(브라우저 · 버전 등급) | **OPTIONAL** | 환경 차이 판단 시작 시 MUST |
 | AI cost 추정 | **OPTIONAL** | 호출 수가 있으면 계산 가능 |
 | phrasing alias(템플릿) | **OPTIONAL** | 기존 request_template 재사용 |
-| slot 값 | **OPTIONAL · LOCAL_ONLY · 기한부** | 재개용. Run 종료 후 보존 여부는 §17 결정 |
-| Assistance 원문 | **DO_NOT_STORE(기본)** | 구조화 실패 시 예외 — §17 결정 |
+| slot 값 | **LOCAL_ONLY · Run 중에만** | 재개용. Run 종료 시 삭제(D3). 개인 기본값은 별도 personal preference(V1 범위 밖) |
+| Assistance 원문 | **DO_NOT_STORE** | 구조화 실패 원문 포함(D4). 향후 필요 시 opt-in + 짧은 TTL 로 별도 검토 |
 | 요청 원문 | 현행 `goal_summary`(≤200자) 유지 · LOCAL_ONLY | 공유 금지 |
 | 화면 텍스트 · DOM 전문 · screenshot · prompt 전문 · 결과 데이터 | **DO_NOT_STORE** | |
 | 비밀번호 · OTP · 토큰 · 인증 정보 | **DO_NOT_STORE** | 어디에도 |
@@ -416,9 +416,9 @@ ARCHITECTURE §9-1 판단 신호 ↔ 이 모델의 출처:
 | 평균 소요시간 · 성공률 · 실패 층 분포 · 도움 의미 분포 | SHAREABLE_AFTER_SANITIZATION (집계 · 구간화) |
 | 구조화된 "금액 입력 단계가 있다" · "기간 선택이 먼저" | SHAREABLE_AFTER_SANITIZATION |
 | 매뉴얼에서 추출한 일반 claim | SHAREABLE_AFTER_SANITIZATION (저작권 원문 제외) |
-| slot 값(약품명 · 거래처 · 기간 · 금액) | LOCAL_ONLY (또는 저장 불필요) |
+| slot 값(약품명 · 거래처 · 기간 · 금액) | LOCAL_ONLY · Run 종료 시 삭제(D3) |
 | 사용자의 실제 거래금액 · 거래처 실명 | LOCAL_ONLY 또는 DO_NOT_STORE |
-| 요청 원문 · 사용자 답변 원문 | LOCAL_ONLY(요청 요약) / DO_NOT_STORE(답변 원문 기본) |
+| 요청 원문 · 사용자 답변 원문 | LOCAL_ONLY(요청 요약) / DO_NOT_STORE(답변 원문 — D4) |
 | 개인 환경(PC 이름 · 경로 · 계정 식별자) | LOCAL_ONLY |
 | 환자명 · 고객명 · 주민번호 · 연락처 · 처방 내용 | DO_NOT_STORE |
 | 비밀번호 · OTP · 인증서 · 토큰 | DO_NOT_STORE |
@@ -432,7 +432,7 @@ ARCHITECTURE §9-1 판단 신호 ↔ 이 모델의 출처:
 - 공유 단위: **Experience Digest** — Task × Target(public) 하나에 대한 정제된 요약.
   - Task identity · Target identity(public 만) · stage 경로와 semantic locator · reusable Assistance/Knowledge 의 구조화 내용 · 실패 층 분포 · 시간 · 성공률(구간화) · 환경 등급.
 - 정제 순서: ① SHAREABLE 필드만 선택 → ② 값·원문·개인 환경 제거 → ③ 수치 구간화 → ④ 사용자 동의 → ⑤ 명시적 publish.
-- 서버는 Local 을 read-back 하지 않는다. Digest 는 Local 이 만들어 올린다.
+- 서버는 Local 원장을 read-back · 동기화하지 않는다. Digest 는 Local 이 만들어 올린다. (현재 Run 을 위한 질의형 recall 은 공유가 아니다 — D1 · ARCHITECTURE §5-1)
 - 수신 측에서 공유 Digest 는 **Knowledge(미검증 주장)** 로 들어온다 — 다른 사용자 PC 에서 바로 Skill 로 쓰지 않는다(ARCHITECTURE §5).
 
 ---
@@ -449,7 +449,7 @@ Run R1  segment 1
                  resolution=(대기) · reusability=per_run_value
   Outcome(중간): QUESTION — 사용자 대기 시작
 Run R1  segment 2 (같은 runId · targetHint 로 대상 상속)
-  A1.resolution = resolved (slot 채움 · 값은 Local slot state 에만)
+  A1.resolution = resolved (slot 채움 · 값은 Run 중 Local slot state 에만 · 종료 시 삭제)
   Step S1 stage="검색어 입력"  Decision=slot 바인딩  Action=dom.set_input  Result=system_verified
   Step S2 stage="검색 실행"    Action=dom.click  Result=이동 · 결과 8건 (내용 저장 안 함)
   Outcome: SUCCESS · 근거=agent_inferred (expected outcome "결과 목록 표시" 정의되면 system_verified)
@@ -529,18 +529,24 @@ Run R9  L4 Deterministic (Procedure P1, DOM 수단)
 
 ---
 
-## 21. DRAFT — 사용자가 결정해야 할 사항
+## 21. 확정 결정 (2026-10-01 사용자 검토 · D1~D8)
 
-| # | 결정 | 선택지 | 제안 |
+| # | 결정 | 확정 | 근거 · 의미 |
 |---|---|---|---|
-| D1 | **재개·다음 run 에서 Local Experience 를 어떻게 불러오나** — 현행 불변식 "cloud 는 Local 을 read-back 하지 않는다" 와의 관계 | (a) 질의형 recall: 서버가 Task×Target 을 묻고 Local 이 필요한 구조 정보만 돌려줌(현재 Candidate 대조와 같은 방식) (b) 서버 단기 저장(coordination 에 구조 정보만) (c) recall 없음 | **(a)** — 이미 Candidate 재생이 같은 형태. 불변식을 "전체 read-back 금지 · 질의형 recall 허용" 으로 명확화 필요 |
-| D2 | Task identity 를 누가 정하나 | (a) Discovery Agent 가 제안 + Local alias 누적 (b) 운영자가 정의한 목록 (c) 혼합 | **(a)** — 사전 정의 금지(EVOLUTION §14). 공유 단계에서 정규화 |
-| D3 | slot 값 보존 | (a) Run 종료 시 삭제 (b) Local 에 기한부 보존(재개·개인 기본값용) | (a) 기본 + 개인 기본값은 별도 personal_preference 로 |
-| D4 | Assistance 원문 | (a) 저장 안 함 (b) 구조화 실패 시만 Local 기한부 | **(b)** — 기한 짧게(예: 30일). 공유 금지 |
-| D5 | 도움 run 을 Candidate/Procedure 출처로 인정하는 범위 | (a) 모든 도움 run (b) 값 확인 도움만 즉시, 절차 도움은 검증 1회 후 | (b) |
-| D6 | Outcome 근거 agent_inferred 의 반영 | (a) 집계하되 승격 신호 제외 (b) 낮은 가중 | (a) |
-| D7 | runtime 층 실패의 Candidate failure_count 반영 | (a) 제외 (b) 별도 카운터 | (a) — Target runtime 지표로만 |
-| D8 | 사내·개인 시스템 Target 판정 | (a) 사용자가 표시 (b) 자동(사설 IP · 인트라넷 패턴) + 사용자 확인 | (b) |
+| D1 | 다음 run 에서 Local Experience 를 쓰는 방식 | **(a) 질의형 recall** | Cloud 는 Local 원장을 직접 read-back · 동기화하지 않는다. 현재 업무 수행을 위해 Task × Target 등 **제한된 조건으로 Local Agent 에 질의**하고, Local Agent 가 Local 에서 검색 · 선택해 **그 Run 에 필요한 최소 구조화 Experience 만** 반환한다. 서버가 Local DB 를 임의 조회하거나 전체 Experience 를 가져가는 의미가 아니다. 정본 문구: [ARCHITECTURE §5-1](O4O-AUTOMATION-AGENT-ARCHITECTURE-V1.md) |
+| D2 | Task identity 결정 주체 | **(a) Discovery Agent 제안 + Local alias 누적** | 사이트별 업무 사전 정의 금지(EVOLUTION §14). 정규화는 공유 단계에서 |
+| D3 | slot 값 보존 | **(a) Run 종료 시 삭제(기본)** | "게보린" · "지난달" · 실제 거래처명 · 실제 금액처럼 이번 업무에 쓴 값은 Experience 가 아니다. "나는 보통 A도매를 쓴다" 같은 **개인 기본값은 Experience 가 아닌 별도 personal preference 개념**으로, 사용자가 명시적으로 원할 때 후속 설계에서 다룬다(V1 범위 밖) |
+| D4 | Assistance 원문 | **(a) 저장하지 않음** — 제안안 (b) 불채택 | 사용자가 가르치는 문장에는 거래처명 · 환자명 · 직원명 · 내부 메뉴명 · 업무 데이터가 의도치 않게 섞일 수 있다. 원문은 실행 중에만 쓰고, 구조화에 성공한 것만 Experience 로 남긴다. **구조화에 실패한 원문도 저장하지 않는다**(Experience 로 남기지 않음). 실측으로 필요가 확인되면 **명시적 opt-in + 짧은 TTL** 방식으로 별도 검토 |
+| D5 | 도움 run 의 Candidate/Procedure 출처 인정 범위 | **(b) 값 확인 도움은 즉시 · 절차 도움은 검증 후** | 사용자 설명("거래관리 → 거래명세서")은 먼저 Knowledge(미검증)이고, 그 경로로 실제 성공하면 Experience, 여러 실행에서 검증되면 Skill(§8 · §13) |
+| D6 | agent_inferred 근거의 반영 | **(a) 집계하되 승격 신호에서 제외** | LLM 단독 완료 판정만으로 Skill 신뢰도를 올리지 않는다(§9) |
+| D7 | runtime 층 실패의 Candidate failure_count 반영 | **(a) 제외** — Target runtime 지표로만 | 확장 연결 끊김 · site_not_ready 가 "업무 절차가 틀렸다" 는 학습으로 오염되지 않게(§10-2) |
+| D8 | 사내 · 개인 시스템 Target 판정 | **(b) 자동 판정 + 사용자 확인** | 사설 IP · 인트라넷 패턴으로 제안, 사용자가 확인. 애매하면 LOCAL_ONLY(§16) |
+
+## 22. 다음 작업
+
+다음 구현 작업은 **`Phase 1 — Local Experience 최소 저장`**(§20) 이며 별도 WO 로 진행한다. 이 문서의 활성화 작업에서는 시작하지 않는다.
+
+개발 중심이 "자동화를 더 잘 실행하는 코드" 에서 **"자동화하면서 경험을 남기는 코드"** 로 처음 이동하는 단계다 — 성공이든 실패든 실제 Run 이 Local Experience 에 남고(무엇을 했는지 · 어디서 실패했는지 · 얼마나 걸렸는지 · 어떤 근거로 성공했는지), 다음 단계(Assistance 연결 · recall)가 그것을 활용한다.
 
 ---
 

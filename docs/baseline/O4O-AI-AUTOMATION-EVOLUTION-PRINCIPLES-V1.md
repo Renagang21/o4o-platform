@@ -97,6 +97,8 @@ O4O 가 학습할 것은 민감한 업무 내용이 아니라 **구조적 이벤
 |---|---|
 | target · workflow goal · entryPoint · automation steps · takeover step · user correction count · completion state · duration · success/failure | 환자정보 · 처방내용 · 비밀번호 · OTP · 전체 화면 내용 · 사이트 전체 데이터 · 민감한 입력값 |
 
+> 구조적 경험의 저장 위치는 사용자 PC(Local) 다. 서버는 Local 원장을 read-back · 동기화하지 않으며, 현재 업무 수행을 위한 **질의형 recall**(제한된 조건 질의 → Local 이 최소 구조만 반환)만 허용한다 — [`O4O-AUTOMATION-AGENT-ARCHITECTURE-V1`](O4O-AUTOMATION-AGENT-ARCHITECTURE-V1.md) §5-1 · 기록 단위는 [`O4O-AUTOMATION-EXPERIENCE-MODEL-V1`](O4O-AUTOMATION-EXPERIENCE-MODEL-V1.md). (2026-10-01)
+
 ## §8. 여러 사용자 경험을 비교한다
 
 전문매장 사용자들이 쓰는 프로그램 · 사이트 · 업무 유형은 비교적 유사하다. 한 사용자의 개선 경험은 다른 사용자에게 재사용될 가능성이 높다.

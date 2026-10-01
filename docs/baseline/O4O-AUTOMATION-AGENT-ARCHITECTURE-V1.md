@@ -1,7 +1,7 @@
 # O4O-AUTOMATION-AGENT-ARCHITECTURE-V1
 
 > **상태**: ACTIVE — O4O 자동화 아키텍처 정본 (`CANONICAL-INDEX` §6)
-> **작성일**: 2026-10-01 · **최종 갱신**: 2026-10-01 (사용자 검토 반영 · DRAFT → ACTIVE)
+> **작성일**: 2026-10-01 · **최종 갱신**: 2026-10-01 (사용자 검토 반영 · DRAFT → ACTIVE · §5-1 질의형 recall 명확화 · §10-2 갱신)
 > **근거 WO/IR**: [`IR-O4O-AUTOMATION-AGENT-ARCHITECTURE-REALIGNMENT-V1`](../investigations/IR-O4O-AUTOMATION-AGENT-ARCHITECTURE-REALIGNMENT-V1.md) (작성) · `WO-O4O-AUTOMATION-AGENT-ARCHITECTURE-ACTIVATION-V1` (사용자 검토 확정 · 활성화, 2026-10-01)
 > **상위 정본**: [`O4O-AI-AUTOMATION-EVOLUTION-PRINCIPLES-V1`](O4O-AI-AUTOMATION-EVOLUTION-PRINCIPLES-V1.md) — 이 문서는 그 원칙을 **대체하지 않고**, 원칙이 요구하는 시스템을 **어떤 계층으로 만드는가**를 고정한다. EVOLUTION = 왜 그렇게 발전해야 하는가 · 이 문서 = 그것을 어떤 계층으로 구현하는가. 둘이 충돌하면 EVOLUTION-PRINCIPLES 가 우선한다.
 > **적용 범위**: O4O 의 모든 반복 업무 자동화 — 약국 · 매장 · 공급자 · 운영자 · 그 밖의 참여 주체. 특정 사이트(health.kr 등)·특정 프로그램·특정 모델에 묶이지 않는다.
@@ -133,11 +133,27 @@ Experience 저장은 민감한 원문 데이터 저장을 뜻하지 않는다 �
 |---|---|---|
 | 담는 것 | 개인 업무 순서, 자주 쓰는 값의 형태, 개인 환경, 자기 run 의 상세, 사용자 교정·도움 기록 | 업무 유형 · 대상별 일반 절차, 메뉴 구조, 자주 실패하는 지점과 복구법, 매뉴얼에서 얻은 일반 지식, 성공률·평균시간 같은 집계 |
 | 담지 않는 것 | — (단, 비밀번호·인증정보는 어디에도 저장하지 않는다) | 계정·비밀번호·인증정보, 개인정보, 고객·환자 정보, 업무 원문 데이터, 개인 식별 가능한 행동 기록 |
-| 생성 | 실행 중 Local 이 직접 기록 | Local 이 **정제·익명화한 요약을 명시적으로 올린 것**만 (서버가 Local 을 읽어 가지 않는다) |
+| 생성 | 실행 중 Local 이 직접 기록 | Local 이 **정제·익명화한 요약을 명시적으로 올린 것**만 (서버가 Local 원장을 읽어 가거나 동기화하지 않는다 — §5-1) |
 | 승격 | — | 한 사용자의 한 번 성공으로 공유 절차가 되지 않는다. 여러 사용자·여러 run 의 근거와 검증을 거친다 |
 
 - 공유 대상에는 **동의**가 전제된다. 동의 정책·익명화 기준·보존 기간은 별도 정책 문서가 정한다.
 - 공유 경험은 다른 사용자의 첫 시도에 **참고**로 쓰인다 — 다른 사용자 PC 에서 검증 없이 바로 결정적으로 실행하지 않는다.
+
+### 5-1. Local read-back 금지와 질의형 recall (2026-10-01 사용자 확정)
+
+**Cloud 는 Local Experience 원장을 직접 read-back 하거나 동기화하지 않는다.** 단, 사용자의 **현재 업무 수행**을 위해 Task × Target 등 **제한된 조건**으로 Local Agent 에 질의하고, Local Agent 가 그 Run 에 필요한 **최소 구조화 Experience** 를 반환하는 **질의형 recall** 은 허용한다.
+
+```text
+Cloud ── "이 Task × Target 에 쓸 경험이 있나?" ──► Local Agent
+                                                    ├─ Local Experience 검색
+                                                    ├─ 필요한 구조만 선택
+Cloud Run ◄── 이번 Run 에 필요한 최소 구조만 응답 ──┘
+```
+
+- 서버가 Local DB 를 임의 조회하거나, 전체 Experience 를 가져가거나, 원장을 복제하는 의미가 아니다.
+- 반환 범위는 구조화된 경험(stage 경로 · semantic locator · reusable 도움 · 실패 층 등)이며 값 · 원문은 포함하지 않는다.
+- recall 결과는 그 Run 에서만 쓰이고 서버에 축적되지 않는다. 축적 · 공유는 위 표의 명시적 publish 경로만 따른다.
+- 현재 Workflow Candidate 대조(Local 이 대조 결과만 돌려줌)가 같은 형태의 선례다. 세부 계약: [`O4O-AUTOMATION-EXPERIENCE-MODEL-V1`](O4O-AUTOMATION-EXPERIENCE-MODEL-V1.md) §21 D1.
 
 ---
 
@@ -245,7 +261,9 @@ Experience 저장은 민감한 원문 데이터 저장을 뜻하지 않는다 �
 
 ### 10-2. 다음 작업
 
-이 문서 활성화 다음 개발 작업은 **`WO-O4O-AUTOMATION-EXPERIENCE-MODEL-DESIGN-V1`** 이다 — 한 번의 업무 경험에서 무엇을 남겨야 다음 작업이 실제로 더 좋아지는가를 정의한다. DB 테이블보다 개념·기록 단위 정의가 먼저다.
+~~`WO-O4O-AUTOMATION-EXPERIENCE-MODEL-DESIGN-V1`~~ — **완료(2026-10-01)**: [`O4O-AUTOMATION-EXPERIENCE-MODEL-V1`](O4O-AUTOMATION-EXPERIENCE-MODEL-V1.md) ACTIVE (Experience 개념 모델 · 저장 계약 · D1~D8 확정).
+
+다음 개발 작업은 **Phase 1 — Local Experience 최소 저장**(EXPERIENCE-MODEL §20 · §22) 이며 별도 WO 로 진행한다 — 성공이든 실패든 실제 Run 이 Local Experience 에 남는 것이 첫 구현이다.
 
 ---
 
@@ -262,10 +280,11 @@ Experience 저장은 민감한 원문 데이터 저장을 뜻하지 않는다 �
 
 이 표는 시점 기록이다. 갱신 시 이 부록만 고치고 본문 원칙은 바꾸지 않는다.
 
-**사용자 검토 확정 (2026-10-01)**: ① 처음 보는 대상 거절 = MISALIGNED 유지 ② 사용자 도움 run 의 Experience 제외 = MISALIGNED 유지(도움 run 은 오염이 아니라 핵심 학습 자산 — 원문이 아닌 구조화된 경험으로 저장) ③ §5 Local/Shared 경계 승인(서버의 Local read-back 없음) ④ §9-3 고위험 최종 확정 제외 승인.
+**사용자 검토 확정 (2026-10-01)**: ① 처음 보는 대상 거절 = MISALIGNED 유지 ② 사용자 도움 run 의 Experience 제외 = MISALIGNED 유지(도움 run 은 오염이 아니라 핵심 학습 자산 — 원문이 아닌 구조화된 경험으로 저장) ③ §5 Local/Shared 경계 승인(서버의 Local read-back 없음 — 현재 Run 을 위한 질의형 recall 은 허용, §5-1) ④ §9-3 고위험 최종 확정 제외 승인.
 
 ## 부록 B. 관련 문서
 
 - [`O4O-AI-AUTOMATION-EVOLUTION-PRINCIPLES-V1`](O4O-AI-AUTOMATION-EVOLUTION-PRINCIPLES-V1.md) — 상위 철학
 - [`IR-O4O-AUTOMATION-AGENT-ARCHITECTURE-REALIGNMENT-V1`](../investigations/IR-O4O-AUTOMATION-AGENT-ARCHITECTURE-REALIGNMENT-V1.md) — 근거 census
+- [`O4O-AUTOMATION-EXPERIENCE-MODEL-V1`](O4O-AUTOMATION-EXPERIENCE-MODEL-V1.md) — 하위 정본: Experience 개념 모델 · 저장 계약 (§4 · §5 · §9 의 상세)
 - [`O4O-BUSINESS-PHILOSOPHY-V1`](O4O-BUSINESS-PHILOSOPHY-V1.md) — AI 역할 · 참여 주체
