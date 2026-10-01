@@ -152,7 +152,10 @@ async function run(): Promise<void> {
     }
 
     // 비밀번호 — 이미 있으면 덮어쓰지 않는다.
-    let pwAction = 'skip(no user yet)';
+    // dry-run 은 user 를 만들지 않으므로 이후 단계가 전부 skip 으로 보인다 — 그러면 계획을 읽을 수 없다.
+    // 그래서 '사용자가 생길 예정' 이면 의존 단계를 CREATE(plan) 으로 보고한다(쓰기는 여전히 0).
+    const willHaveUser = Boolean(userId) || (!existing && !APPLY);
+    let pwAction = willHaveUser ? 'CREATE(plan)' : 'skip';
     if (userId) {
       const has = await passwordCredentialService.hasPassword(userId, ds);
       pwAction = has ? 'exists(keep)' : 'CREATE';
@@ -163,7 +166,7 @@ async function run(): Promise<void> {
     }
 
     // registry
-    let regAction = 'skip(no user yet)';
+    let regAction = willHaveUser ? 'CREATE(plan)' : 'skip';
     if (userId) {
       const reg = await one(`SELECT id FROM demo_accounts WHERE user_id = $1`, [userId]);
       regAction = reg ? 'exists' : 'CREATE';
@@ -201,7 +204,7 @@ async function run(): Promise<void> {
     }
 
     // ownership — 추가만 한다. 기존 행(삭제된 사용자의 orphan 포함)은 건드리지 않는다.
-    let ownerAction = 'skip';
+    let ownerAction = willHaveUser ? 'CREATE(plan)' : 'skip';
     if (userId && orgId) {
       const member = await one(
         `SELECT id FROM organization_members WHERE organization_id = $1 AND user_id = $2`,
@@ -218,7 +221,8 @@ async function run(): Promise<void> {
     }
 
     // supplier runtime record — 공급자 축은 neture_suppliers 가 조직을 가리킨다(FROZEN §7).
-    let supplierAction = '-';
+    // dry-run 에서는 조직이 아직 없어 orgId 가 null 이다 — 계획만 적는다.
+    let supplierAction = demo.demoType === 'SUPPLIER' && !orgId ? 'CREATE(plan)' : '-';
     if (demo.demoType === 'SUPPLIER' && orgId) {
       const sup = await one(`SELECT id FROM neture_suppliers WHERE organization_id = $1`, [orgId]);
       supplierAction = sup ? 'exists' : 'CREATE';
@@ -236,7 +240,11 @@ async function run(): Promise<void> {
     // 운영자 권한 축이며 Demo 는 사업자/매장 축으로 들어간다(정책 §18 platform:* 0).
     const memberships: string[] = [];
     for (const key of demo.serviceKeys) {
-      if (!userId) break;
+      if (!userId) {
+        // 사용자가 아직 없다(dry-run). 계획만 적는다 — 쓰기는 0 이다.
+        memberships.push(`${key}:${willHaveUser ? 'CREATE(plan)' : 'skip'}`);
+        continue;
+      }
       const m = await one(`SELECT id FROM service_memberships WHERE user_id = $1 AND service_key = $2`, [userId, key]);
       memberships.push(`${key}:${m ? 'exists' : 'CREATE'}`);
       if (!m && APPLY) {
