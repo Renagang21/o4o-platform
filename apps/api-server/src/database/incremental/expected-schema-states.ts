@@ -152,6 +152,15 @@ export const EXPECTED_SCHEMA_STATES: readonly ExpectedSchemaState[] = [
     fingerprint: 'a110d33587f14d7bc46dc6361e6fa640e57e3be749747ad6298647fe50d5370a',
     fingerprintLineCount: 5927,
   },
+  // WO-O4O-CANONICAL-DEMO-ACCOUNT-FOUNDATION-AND-EXPERIENCE-LOGIN-V1 Phase B-A — demo_accounts registry.
+  // 테이블 1 · PK · UNIQUE(user_id) · FK · CHECK(demo_type) · 부분 UNIQUE(활성 유형 1) · COMMENT 3.
+  // baseline 2026-09-18-id685 fresh bootstrap + incremental 1..12 를 격리 PostgreSQL 17
+  // (로컬 17.9 · throwaway DB) 에서 실제 적용해 산출: 운영 DB fingerprint 채택 아님.
+  {
+    appliedThrough: 'CreateDemoAccounts1790940000000',
+    fingerprint: '09d5a9176224a93959b680ef23558629c2e2fe42c4cf2edefeffcda941ca0e43',
+    fingerprintLineCount: 5944,
+  },
 ] as const;
 
 /** Expected state after `prefixLength` incremental migrations; undefined when not registered. */
