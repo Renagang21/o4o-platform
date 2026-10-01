@@ -28,14 +28,16 @@ users.email                 = 프로필 · 연락 필드
                               users/linked_accounts 를 조회하지 않으며(자동 병합 금지),
                               Google 계정 주소와 다를 수 있다.
                               단, 이메일·비밀번호 수단(2026-09-29)에서는 users.email 이
-                              로그인 ID 다 → user_password_credentials(user_id 1:1).
+                              로그인 ID 다 → user_password_credentials(user_id 1:1)
+                              + email_verification_tokens · password_reset_tokens(신규,
+                              1회용 해시). 승인 = WO §5 승인 1.
                               이메일 동일성만으로 계정을 병합하지 않는다.
                               (구현 = PR #257 — 병합·배포 전 runtime 에는 없다)
 ```
 
 제거된 것(물리 컬럼·테이블): `users.password` · `users.reset_password_token` ·
 `users.reset_password_expires` · `users."loginAttempts"` · `users."lockedUntil"` ·
-`service_credentials` · `password_reset_tokens`.
+`service_credentials` · 옛 `password_reset_tokens`(2026-09-29 정책의 동명 신규 테이블과 별개).
 남은 것: `login_attempts` 테이블(FROZEN `auth-core` 소유 · 0행) · `users.email`.
 
 권한 정본은 `role_assignments` 이며 **배열 전체**로 판정한다 — 대표 역할을 배열 순서로 정하지 않는다
