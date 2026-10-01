@@ -223,6 +223,12 @@ describe('R. GitHub API 연결 오류 재시도', () => {
     await assert.rejects(client(notMade.fetchImpl).ensureTag(TAG, SHA), (err) => isNetworkError(err));
     assert.equal(notMade.calls.filter((c) => c.startsWith('POST')).length, 1);
   });
+
+  it('commit status POST 는 멱등 — 연결 오류면 재시도한다 (실측 066dde821: 판정 뒤 첫 POST fetch failed)', async () => {
+    const { calls, fetchImpl } = scripted([socketErr(), res(201, { state: 'pending' })]);
+    await client(fetchImpl).setStatus(SHA, { state: 'pending', context: 'production', description: 'x' });
+    assert.deepEqual(calls, [`POST /statuses/${SHA}`, `POST /statuses/${SHA}`]);
+  });
 });
 
 // ---------------------------------------------------------------------------

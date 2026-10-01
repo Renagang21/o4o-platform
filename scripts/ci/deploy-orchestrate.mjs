@@ -429,8 +429,9 @@ export function isNetworkError(err) {
  * 예외: 태그 생성 POST 가 연결 오류면 GET 으로 실제 생성 여부를 확인한다.
  */
 export function githubClient(repo, token, fetchImpl = fetch, { sleep = (ms) => new Promise((r) => setTimeout(r, ms)), getAttempts = 3 } = {}) {
-  const call = async (method, url, body) => {
-    const attempts = method === 'GET' ? getAttempts : 1;
+  // idempotent: 같은 요청을 다시 보내도 결과가 같은 POST (commit status = 같은 context 를 덮어쓴다) — GET 처럼 재시도한다.
+  const call = async (method, url, body, { idempotent = false } = {}) => {
+    const attempts = method === 'GET' || idempotent ? getAttempts : 1;
     for (let i = 1; ; i += 1) {
       try {
         const res = await fetchImpl(`https://api.github.com/repos/${repo}${url}`, {
@@ -477,9 +478,13 @@ export function githubClient(repo, token, fetchImpl = fetch, { sleep = (ms) => n
       return runs[0] ?? null;
     },
     runStatus: async (id) => (await call('GET', `/actions/runs/${id}`)).json,
-    /** commit status (statuses: write). 가시성 전용 — 실패해도 배포 판정에 영향 없다. */
+    /**
+     * commit status (statuses: write). 가시성 전용 — 실패해도 배포 판정에 영향 없다.
+     * 멱등(같은 context 덮어쓰기)이라 연결 오류 재시도를 허용한다 — 실측: 판정(~1분) 뒤 첫 POST 가 idle 소켓 재사용으로
+     * `fetch failed` (066dde821 Deploy Auto run 36872673189). dispatch POST 는 종전대로 재시도 0.
+     */
     setStatus: async (sha, body) => {
-      const r = await call('POST', `/statuses/${sha}`, body);
+      const r = await call('POST', `/statuses/${sha}`, body, { idempotent: true });
       if (!r.ok) throw new Error(`commit status 실패 ${r.status}`);
     },
   };
