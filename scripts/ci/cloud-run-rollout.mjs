@@ -12,7 +12,10 @@
  *   smoke     tag URL(= 새 revision 전용 주소)로 직접 HTTP 검사 · 또는 revision Ready 조건 검사
  *   switch    PASS 일 때만 전환. 이전이 latest 추종이면 --to-latest, pin 이면 --to-revisions <new>=100
  *   verify    (선택) 전환 후 공개 URL 검사 → 실패 시 rollback
+ *             --expect-sha 를 주면 serving 상태도 검사한다: traffic 단일 100% · (--expect-revision) 그 revision ·
+ *             serving revision label `o4o-commit-sha` == 기대 SHA. 하나라도 어긋나면 rollback.
  *   rollback  plan 에 기록된 이전 revision 으로 트래픽 복귀 (DB migration 은 되돌리지 않는다)
+ *             복귀 뒤 실제 traffic 이 plan 과 같은지 다시 읽어 확인한다.
  *
  * smoke 실패 = switch 를 실행하지 않는다 = 기존 serving revision 유지.
  *   출력: `DEPLOY_FAILED_BEFORE_TRAFFIC_SWITCH SERVICE=<svc> REVISION=<rev>`
@@ -98,6 +101,32 @@ export function evaluateSmoke(results) {
   return { ok: failures.length === 0 && results.length > 0, failures: results.length === 0 ? ['검사 경로 0개'] : failures };
 }
 
+/**
+ * 전환 후 serving 상태 판정 (WO-O4O-CICD-WEB-VERIFIED-ROLLOUT-POST-SWITCH-VERIFY-ROLLBACK-V1).
+ * @param {object} service   `gcloud run services describe --format=json`
+ * @param {object} revision  serving revision 의 `gcloud run revisions describe --format=json` (없으면 null)
+ */
+export function evaluateServing(service, revision, { expectRevision, expectSha } = {}) {
+  const serving = planFromService(service).previous;
+  const failures = [];
+  if (!(serving.length === 1 && serving[0].percent === 100)) {
+    failures.push(`traffic 단일 100% 아님: ${serving.map((p) => `${p.revision}=${p.percent}%`).join(', ') || '(없음)'}`);
+  } else if (expectRevision && serving[0].revision !== expectRevision) {
+    failures.push(`serving revision ${serving[0].revision} ≠ 새 revision ${expectRevision}`);
+  }
+  if (expectSha) {
+    const label = revision?.metadata?.labels?.['o4o-commit-sha'];
+    if (label !== expectSha) failures.push(`serving revision o4o-commit-sha=${label ?? '(없음)'} ≠ ${expectSha}`);
+  }
+  return { ok: failures.length === 0, failures, revision: serving.length === 1 ? serving[0].revision : null };
+}
+
+/** rollback 뒤 실제 traffic 이 plan.previous 와 같은가 (순서 무관). */
+export function rollbackConfirmed(service, plan) {
+  const key = (list) => list.map((p) => `${p.revision}=${p.percent}`).sort().join(',');
+  return key(planFromService(service).previous) === key(plan?.previous ?? []);
+}
+
 /** revision Ready 조건 판정 (readiness 모드). */
 export function evaluateReadiness(revision) {
   const cond = (revision?.status?.conditions ?? []).find((c) => c.type === 'Ready');
@@ -144,6 +173,19 @@ function summary(lines) {
 function output(pairs) {
   if (!process.env.GITHUB_OUTPUT) return;
   appendFileSync(process.env.GITHUB_OUTPUT, `${Object.entries(pairs).map(([k, v]) => `${k}=${v}`).join('\n')}\n`);
+}
+
+/** plan 의 이전 분배로 traffic 복귀 → 실제 상태를 다시 읽어 확인. 확인 결과(boolean)를 돌려준다. */
+function doRollback(svc, plan, run) {
+  gcloudWrite(rollbackArgs(svc, plan), run);
+  const confirmed = rollbackConfirmed(gcloudJson(['run', 'services', 'describe', svc], run), plan);
+  const spec = plan.previous.map((p) => `${p.revision}=${p.percent}%`).join(', ');
+  summary([
+    confirmed
+      ? `↩️ ${svc} traffic 복귀 확인: ${spec} (DB migration 은 되돌리지 않음)`
+      : `❌ ${svc} traffic 복귀 확인 실패 — 기대 ${spec} · 수동 확인 필요`,
+  ]);
+  return confirmed;
 }
 
 export async function runCommand(cmd, args, { run = defaultRun, get = httpGet, wait = sleep } = {}) {
@@ -218,27 +260,39 @@ export async function runCommand(cmd, args, { run = defaultRun, get = httpGet, w
 
   if (cmd === 'verify') {
     const attempts = Number(args.attempts ?? 5);
+    const plan = JSON.parse(readFileSync(args.plan, 'utf-8'));
     let last = null;
+    let publicOk = false;
     for (let i = 1; i <= attempts; i += 1) {
       last = await get(args.url);
       if (last.status >= 200 && last.status < 300) {
-        summary([`✅ ${svc} 전환 후 공개 검사 PASS: ${args.url} (HTTP ${last.status})`]);
-        return { ok: true };
+        publicOk = true;
+        break;
       }
       if (i < attempts) await wait(10_000);
     }
-    summary([`❌ ${svc} 전환 후 공개 검사 FAIL: ${args.url} (HTTP ${last?.status}) — rollback 실행`]);
-    const plan = JSON.parse(readFileSync(args.plan, 'utf-8'));
-    gcloudWrite(rollbackArgs(svc, plan), run);
-    summary([`↩️ ${svc} traffic 복귀: ${plan.previous.map((p) => `${p.revision}=${p.percent}%`).join(', ')} (DB migration 은 되돌리지 않음)`]);
-    return { ok: false, rolledBack: true };
+    if (!publicOk) {
+      summary([`❌ ${svc} 전환 후 공개 검사 FAIL: ${args.url} (HTTP ${last?.status}) — rollback 실행`]);
+      return { ok: false, rolledBack: true, rollbackConfirmed: doRollback(svc, plan, run) };
+    }
+    summary([`✅ ${svc} 전환 후 공개 검사 PASS: ${args.url} (HTTP ${last.status})`]);
+    if (args['expect-sha']) {
+      const service = gcloudJson(['run', 'services', 'describe', svc], run);
+      const servingRev = planFromService(service).previous;
+      const revision = servingRev.length === 1 ? gcloudJson(['run', 'revisions', 'describe', servingRev[0].revision], run) : null;
+      const s = evaluateServing(service, revision, { expectRevision: args['expect-revision'], expectSha: args['expect-sha'] });
+      if (!s.ok) {
+        summary([`❌ ${svc} serving 검증 FAIL — rollback 실행`, ...s.failures.map((f) => `  - ${f}`)]);
+        return { ok: false, rolledBack: true, rollbackConfirmed: doRollback(svc, plan, run) };
+      }
+      summary([`✅ ${svc} serving 검증 PASS: \`${s.revision}\` 단일 100% · o4o-commit-sha=${args['expect-sha']}`]);
+    }
+    return { ok: true };
   }
 
   if (cmd === 'rollback') {
     const plan = JSON.parse(readFileSync(args.plan, 'utf-8'));
-    gcloudWrite(rollbackArgs(svc, plan), run);
-    summary([`↩️ ${svc} traffic 복귀: ${plan.previous.map((p) => `${p.revision}=${p.percent}%`).join(', ')}`]);
-    return { ok: true };
+    return { ok: doRollback(svc, plan, run) };
   }
 
   throw new Error(`알 수 없는 명령: ${cmd}`);

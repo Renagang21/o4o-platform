@@ -4,6 +4,7 @@ description: >-
   phase=plan: 배포 전 traffic(pin/latest · 이전 revision) 기록.
   phase=finish: traffic 0% 로 배포된 새 revision 을 tag URL 로 직접 smoke → PASS 일 때만 전환(방식 보존).
   smoke 실패 = 전환 없음 = 기존 serving revision 유지 (DEPLOY_FAILED_BEFORE_TRAFFIC_SWITCH).
+  verify-url 을 주면 전환 뒤 공개 검사 + serving SHA 검증 → 실패 시 이전 revision 으로 자동 rollback.
   호출 job 은 `gcloud run deploy ... --no-traffic --tag=sha-<sha12>` 로 배포해야 하며 GCP 인증이 끝나 있어야 한다.
 
 inputs:
@@ -17,6 +18,13 @@ inputs:
     description: "smoke 경로 (쉼표 구분). '/' 는 HTML 이어야 PASS"
     required: false
     default: '/'
+  verify-url:
+    description: >-
+      (선택) 전환 후 공개 URL. 주면 finish 가 전환 뒤 공개 검사 + serving 검증(단일 100% · 새 revision ·
+      label o4o-commit-sha == GITHUB_SHA)을 하고, 실패하면 plan 의 이전 revision 으로 자동 rollback → 복귀 확인 → 실패 종료.
+      전환 단계 자체가 실패해도 rollback 한다. 비우면 종전 동작 그대로(전환까지만).
+    required: false
+    default: ''
 
 runs:
   using: composite
@@ -31,11 +39,24 @@ runs:
       run: node scripts/ci/cloud-run-rollout.mjs plan --service "${{ inputs.service }}" --out "$RUNNER_TEMP/rollout-plan-${{ inputs.service }}.json"
 
     - name: Smoke new revision (tag URL, traffic 0%)
+      id: smoke
       if: inputs.phase == 'finish'
       shell: bash
       run: node scripts/ci/cloud-run-rollout.mjs smoke --service "${{ inputs.service }}" --tag "sha-${GITHUB_SHA:0:12}" --paths "${{ inputs.paths }}" --attempts 3
 
     - name: Switch traffic to verified revision
+      id: switch
       if: inputs.phase == 'finish'
       shell: bash
       run: node scripts/ci/cloud-run-rollout.mjs switch --service "${{ inputs.service }}" --tag "sha-${GITHUB_SHA:0:12}" --plan "$RUNNER_TEMP/rollout-plan-${{ inputs.service }}.json"
+
+    # WO-O4O-CICD-WEB-VERIFIED-ROLLOUT-POST-SWITCH-VERIFY-ROLLBACK-V1 — verify-url 을 준 서비스만.
+    - name: Verify after switch (public URL · serving SHA · rollback on failure)
+      if: inputs.phase == 'finish' && inputs.verify-url != ''
+      shell: bash
+      run: node scripts/ci/cloud-run-rollout.mjs verify --service "${{ inputs.service }}" --url "${{ inputs.verify-url }}" --plan "$RUNNER_TEMP/rollout-plan-${{ inputs.service }}.json" --attempts 5 --expect-sha "$GITHUB_SHA" --expect-revision "${{ steps.smoke.outputs.new_revision }}"
+
+    - name: Rollback after failed switch
+      if: failure() && inputs.phase == 'finish' && inputs.verify-url != '' && steps.switch.outcome == 'failure'
+      shell: bash
+      run: node scripts/ci/cloud-run-rollout.mjs rollback --service "${{ inputs.service }}" --plan "$RUNNER_TEMP/rollout-plan-${{ inputs.service }}.json"

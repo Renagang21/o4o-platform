@@ -298,6 +298,8 @@ jobs:
           echo "neture-web deployed successfully!"
 
       # verified 모드: 새 revision 을 tag URL 로 직접 smoke → PASS 일 때만 전환. 실패 = 전환 없음 = 기존 revision 유지.
+      #   전환 뒤 공개 URL + serving SHA 검증 → 실패(전환 실패 포함) 시 이전 revision 으로 자동 rollback
+      #   (WO-O4O-CICD-WEB-VERIFIED-ROLLOUT-POST-SWITCH-VERIFY-ROLLBACK-V1 · 현재 neture 만).
       - name: Smoke new revision and switch traffic (verified rollout)
         if: github.event.inputs.rollout_mode == 'verified'
         uses: ./.github/actions/cloud-run-verified-rollout
@@ -305,6 +307,7 @@ jobs:
           phase: finish
           service: neture-web
           paths: '/'
+          verify-url: ${{ env.VITE_SERVICE_URL_NETURE }}
 
       - name: Verify deployment
         run: |
