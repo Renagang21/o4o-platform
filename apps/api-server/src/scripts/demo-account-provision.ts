@@ -47,7 +47,7 @@ const APPLY = process.argv.includes('--apply');
 const DEMOS = [
   {
     demoType: 'STORE_OWNER' as const,
-    email: 'teststoreowner@gmail.com',
+    email: 'teststoreowner@example.com',
     name: '매장 경영자 Demo',
     /** 기존 "테스트 약국" 재사용 — 샘플 콘텐츠 15 · 플레이리스트 5 가 이미 붙어 있다. */
     organizationId: '9c87f46b',
@@ -55,7 +55,7 @@ const DEMOS = [
   },
   {
     demoType: 'SUPPLIER' as const,
-    email: 'testsupplier@gmail.com',
+    email: 'testsupplier@example.com',
     name: '공급자 Demo',
     /** 기존 조직을 쓰지 않는다 — 셋 다 실제 주문·실제 신청과 얽혀 있다(§주석 상단). 새로 만든다. */
     organizationId: null,

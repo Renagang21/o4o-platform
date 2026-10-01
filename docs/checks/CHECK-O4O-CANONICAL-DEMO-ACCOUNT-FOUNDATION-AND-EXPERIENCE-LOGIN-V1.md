@@ -109,7 +109,7 @@ CHECK(demo_type IN ('STORE_OWNER','SUPPLIER'))
 
 | 결정 | 이유 |
 |---|---|
-| **email · password 를 넣지 않는다** | 정본 키는 `user_id` 다. 로그인은 기존 `users.email` + `user_password_credentials` 를 그대로 쓴다. 이 표의 존재 이유가 `if (email === 'teststoreowner@gmail.com')` 확산을 막는 것이다 |
+| **email · password 를 넣지 않는다** | 정본 키는 `user_id` 다. 로그인은 기존 `users.email` + `user_password_credentials` 를 그대로 쓴다. 이 표의 존재 이유가 `if (email === 'teststoreowner@example.com')` 확산을 막는 것이다 |
 | `demo_type` 은 2값으로 시작 | INFLUENCER · PARTNER · OPERATOR_SANDBOX 는 그 기능이 설계될 때 CHECK 에 더한다. 지금 넣으면 쓰지 않는 값이 정본인 척한다 |
 | `UNIQUE(demo_type)` 전체가 아니라 **부분** | 유형당 1개는 지금의 운영 방침이지 구조 제약이 아니다. 비활성 기록을 보존하면서 활성 중복만 막는다 |
 | `demo_organizations` **만들지 않음** | Demo Account → owner → Demo Organization → Sample Data 로 개념은 구분하되, 이번 relink 요구는 `organization_members` 로 충족된다. 필요해지면 그때 만든다 |
@@ -160,7 +160,7 @@ supplier 조직 7개 중 `neture_suppliers` 행이 있는 것은 3개다.
 | # | 대상 | 작업 | 예상 행 |
 |---|---|---|---|
 | 1 | `demo_accounts` | migration 적용(배포 경로) | 테이블 1 |
-| 2 | `users` | Demo 2명 생성 (`teststoreowner@gmail.com` · `testsupplier@gmail.com`) | **+2** |
+| 2 | `users` | Demo 2명 생성 (`teststoreowner@example.com` · `testsupplier@example.com`) | **+2** |
 | 3 | `user_password_credentials` | bcrypt(`PasswordCredentialService` 동일 정책) 2건 | **+2** |
 | 4 | `demo_accounts` | STORE_OWNER · SUPPLIER 등록 | **+2** |
 | 5 | `role_assignments` | canonical 역할만 (store owner 축 · supplier 축) | 미확정 — B-A 직전 재확인 |

@@ -21,7 +21,7 @@ import * as tokenUtils from '../../../utils/token.utils.js';
 
 // ── in-memory fake DB ───────────────────────────────────────────────────────
 type Row = Record<string, any>;
-type Store = { users: Row[]; linked: Row[]; activities: Row[] };
+type Store = { users: Row[]; linked: Row[]; activities: Row[]; demoUserIds: string[] };
 
 let seq = 0;
 const uuid = () => `00000000-0000-4000-8000-${String(++seq).padStart(12, '0')}`;
@@ -81,7 +81,7 @@ function makeDataSource(store: Store) {
     getRepository: jest.fn(getRepository),
     // 트랜잭션: 스냅샷 위에서 실행하고 성공 시에만 커밋한다(실패 → orphan 0 증명).
     transaction: jest.fn(async (fn: (manager: any) => Promise<any>) => {
-      const staged: Store = { users: [...store.users], linked: [...store.linked], activities: [...store.activities] };
+        const staged: Store = { users: [...store.users], linked: [...store.linked], activities: [...store.activities], demoUserIds: [...store.demoUserIds] };
       const stagedRepos = new Map<unknown, ReturnType<typeof repoFor>>();
       const manager = {
         getRepository: (entity: unknown) => {
@@ -90,6 +90,14 @@ function makeDataSource(store: Store) {
         },
         // 가입 시 대소문자만 다른 기존 주소 확인(`lower(email) = $1`) — 그 외 raw SQL 은 쓰지 않는다.
         query: jest.fn(async (sql: string, params: unknown[]) => {
+          // Demo 계정 판정(`demo_accounts` JOIN `users`) — 판정 정본은 user_id 다.
+          if (/FROM demo_accounts/.test(sql)) {
+            const target = String(params[0]);
+            return staged.users
+              .filter((u) => staged.demoUserIds.includes(String(u.id)) && String(u.email).toLowerCase() === target)
+              .slice(0, 1)
+              .map(() => ({ '?column?': 1 }));
+          }
           if (!/FROM users WHERE lower\(email\) = \$1/.test(sql)) throw new Error(`unexpected query: ${sql}`);
           return staged.users.filter((u) => String(u.email).toLowerCase() === params[0]).slice(0, 1).map(() => ({ '?column?': 1 }));
         }),
@@ -161,7 +169,7 @@ describe('GoogleAuthService — Google-only Signup/Login', () => {
   };
 
   beforeEach(() => {
-    store = { users: [], linked: [], activities: [] };
+    store = { users: [], linked: [], activities: [], demoUserIds: [] };
     ds = makeDataSource(store);
   });
 
@@ -348,7 +356,7 @@ describe('GoogleAuthService — Google-only Signup/Login', () => {
     // sub 중복 사전 확인은 통과하지만 insert 에서 unique 충돌이 나는 race 를 재현한다.
     identity.findGoogleIdentityBySub.mockResolvedValue(null);
     ds.transaction.mockImplementationOnce(async (fn: any) => {
-      const staged: Store = { users: [], linked: [], activities: [] };
+      const staged: Store = { users: [], linked: [], activities: [], demoUserIds: [] };
       const manager = {
         getRepository: (entity: unknown) => {
           const repo = repoFor(staged, entity);
@@ -433,5 +441,31 @@ describe('GoogleAuthService — Google-only Signup/Login', () => {
     // 타입 계약 고정: 컴파일 타임 검증. 런타임은 validateDto(forbidNonWhitelisted) 가 담당.
     const input: Parameters<GoogleAuthService['login']>[0] = { idToken: 't', serviceKey: 'neture', ...META };
     expect(Object.keys(input).sort()).toEqual(['idToken', 'ipAddress', 'serviceKey', 'userAgent']);
+  });
+  // WO-O4O-CANONICAL-DEMO-ACCOUNT-FOUNDATION-AND-EXPERIENCE-LOGIN-V1
+  //   Demo 계정의 인증 수단은 비밀번호 하나로 고정이다 — Google 연결을 만들지 않는다.
+  describe('Demo 계정 보호', () => {
+    it('Demo 주소로 Google 가입 → DEMO_ACCOUNT_FORBIDDEN · users 증가 0 · 연결 0', async () => {
+      const demo = seedUser(store, { email: 'teststoreowner@example.com' });
+      store.demoUserIds.push(String(demo.id));
+      build({ 'tok-b': { sub: SUB_B, email: 'TestStoreOwner@Example.com' } });
+
+      await expect(svc.signup({ idToken: 'tok-b', consents: CONSENTS, ...META }))
+        .rejects.toMatchObject({ code: 'DEMO_ACCOUNT_FORBIDDEN', statusCode: 403 });
+
+      // 사유가 "이미 쓰는 주소"(EMAIL_IN_USE)가 아니라 Demo 보호로 끝난다 — 순서가 지켜진다.
+      expect(store.users).toEqual([demo]);
+      expect(store.linked).toHaveLength(0);
+    });
+
+    it('registry 행이 없으면 같은 주소도 일반 계정 규칙을 따른다 — 판정은 user_id 다', async () => {
+      const existing = seedUser(store, { email: 'teststoreowner@example.com' });
+      build({ 'tok-b': { sub: SUB_B, email: 'teststoreowner@example.com' } });
+
+      // 이메일 문자열 비교였다면 여기서도 DEMO_ACCOUNT_FORBIDDEN 이 났을 것이다.
+      await expect(svc.signup({ idToken: 'tok-b', consents: CONSENTS, ...META }))
+        .rejects.toMatchObject({ code: 'EMAIL_IN_USE' });
+      expect(store.users).toEqual([existing]);
+    });
   });
 });

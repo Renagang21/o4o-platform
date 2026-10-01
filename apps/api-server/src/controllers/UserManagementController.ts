@@ -9,6 +9,12 @@ import logger from '../utils/logger.js';
 // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1: Admin 은 서비스 운영자 역할만 추가·해제한다.
 import { AdminRoleEditForbiddenError, applyAdminRoleEdit } from '../services/admin/admin-role-edit.js';
 import { isPlatformAdmin } from '../utils/role.utils.js';
+// WO-O4O-CANONICAL-DEMO-ACCOUNT-FOUNDATION-AND-EXPERIENCE-LOGIN-V1
+import {
+  demoAccountService,
+  DEMO_ACCOUNT_FORBIDDEN_CODE,
+  DEMO_ACCOUNT_FORBIDDEN_MESSAGE,
+} from '../services/auth/demo-account.service.js';
 import { OperatorRoleContractError } from '../config/operator-role-catalog.js';
 
 /** Admin 역할 편집 요청자 맥락 — 해제 안전장치는 요청자 권한에서 파생한다. */
@@ -271,6 +277,18 @@ export class UserManagementController {
         res.status(404).json({
           success: false,
           error: 'User not found'
+        });
+        return;
+      }
+
+      // WO-O4O-CANONICAL-DEMO-ACCOUNT-FOUNDATION-AND-EXPERIENCE-LOGIN-V1:
+      //   Demo 계정은 개발 표본 데이터의 정본 소유자다 — 삭제하면 그 데이터가 다시 주인을 잃는다.
+      //   판정은 `demo_accounts.user_id` 한 곳만 본다(이메일 문자열 비교 금지).
+      if (await demoAccountService.isDemoAccount(id)) {
+        res.status(403).json({
+          success: false,
+          error: DEMO_ACCOUNT_FORBIDDEN_MESSAGE,
+          code: DEMO_ACCOUNT_FORBIDDEN_CODE,
         });
         return;
       }

@@ -17,8 +17,8 @@ canonical Demo account 2개를 구축하고, 기존 테스트 데이터를 가�
 ## CONFIRMED_DECISIONS
 
 ```text
-Store Owner Demo   teststoreowner@gmail.com / testmail1!   매장 경영자 체험 + 매장 샘플 데이터 owner
-Supplier Demo      testsupplier@gmail.com    / testmail1!   공급자 체험 + 공급자 샘플 데이터 owner
+Store Owner Demo   teststoreowner@example.com / testmail1!   매장 경영자 체험 + 매장 샘플 데이터 owner
+Supplier Demo      testsupplier@example.com    / testmail1!   공급자 체험 + 공급자 샘플 데이터 owner
 
 두 email 은 실제 메일 송수신 주소가 아니다 — O4O 내부 Demo identifier 다
 생성 방식    일반 /signup 이 아니라 운영자 관리 canonical system account

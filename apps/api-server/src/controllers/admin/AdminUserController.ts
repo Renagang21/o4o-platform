@@ -16,6 +16,12 @@ import { sanitizeAdminUser } from './admin-user-sanitizer.js';
 // WO-O4O-CENTRAL-OPERATOR-ROLE-REVOKE-SAFETY-GUARDS-V1
 import { invalidateRoles } from '../../modules/auth/utils/role-cache.js';
 import { isPlatformAdmin } from '../../utils/role.utils.js';
+// WO-O4O-CANONICAL-DEMO-ACCOUNT-FOUNDATION-AND-EXPERIENCE-LOGIN-V1
+import {
+  demoAccountService,
+  DEMO_ACCOUNT_FORBIDDEN_CODE,
+  DEMO_ACCOUNT_FORBIDDEN_MESSAGE,
+} from '../../services/auth/demo-account.service.js';
 import {
   canRevokeOwnRole,
   getServiceAdminRoleServiceKey,
@@ -578,6 +584,18 @@ export class AdminUserController {
           success: false,
           error: 'Cannot delete or deactivate a platform super admin account',
           code: 'SUPER_ADMIN_PROTECTED',
+        });
+        return;
+      }
+
+      // WO-O4O-CANONICAL-DEMO-ACCOUNT-FOUNDATION-AND-EXPERIENCE-LOGIN-V1:
+      //   Demo 계정은 개발 표본 데이터의 정본 소유자다 — 삭제하면 그 데이터가 다시 주인을 잃는다.
+      //   판정은 `demo_accounts.user_id` 한 곳만 본다(이메일 문자열 비교 금지).
+      if (await demoAccountService.isDemoAccount(id)) {
+        res.status(403).json({
+          success: false,
+          error: DEMO_ACCOUNT_FORBIDDEN_MESSAGE,
+          code: DEMO_ACCOUNT_FORBIDDEN_CODE,
         });
         return;
       }
