@@ -89,6 +89,7 @@ L1 만 L2/L3/L4 의 부모다(FK). L2/L3/L4 사이에 직접 FK 는 없다. 본 
   관리자 계정은 1회용 bootstrap 으로 기존 `users.id` 에 Google `sub` 를 연결했다. 2026-09-24 시점의 로그인 경로는
   `/auth/google/login` · `/auth/google/signup` 둘뿐이었다. 2026-09-29 정책으로 이메일 경로(PR #257 병합 · 배포 후 활성 — `/auth/email/signup` · `/auth/email/verify` · `/auth/email/resend` · `/auth/email/login` ·
   `/auth/password` · `/auth/password/forgot` · `/auth/password/reset` · `/auth/account/find-id`. 가입은 미확인 계정만 만들고 verify 완료 후 로그인)가 추가된다 — 옛 password 축의 부활이 아니라 계정 단위 신규 수단이다.
+- **인증 수단 추가 경계** — **정책 변경 2026-10-01** (PR #257 Codex 재리뷰 P1 · 사용자 승인): forgot/reset 은 **이미 `user_password_credentials` 가 있는 계정의 복구 전용**이다. 비밀번호 수단이 없는 계정(Google 전용 등)은 주소가 확인돼 있어도 재설정 메일 · 토큰을 만들지 않고, reset 도 첫 비밀번호를 만들지 않는다. **첫 비밀번호 추가는 로그인 상태의 `POST /auth/password` 뿐** — 이메일 동일성이나 메일함 소유만으로 새 로그인 수단을 부여하지 않는다. 종전(2026-09-29 승인 · S1)의 "비밀번호 수단 보유 **또는 이메일 인증된 계정**에 발송" 은 이 변경으로 대체됐다.
 - `linked_accounts` 를 **초기 Auth Identity 물리 구조로 재사용**한다: provider = `google` 고정, providerId = `sub`, `(provider, providerId)` unique. email/displayName/profileImage/providerData 스냅샷 컬럼은 저장하지 않는다(자동 병합 유혹 제거). 테이블 rename 은 요구하지 않는다.
 - **Kakao · Naver 등 다른 소셜은 로그인 Identity 대상이 아니다.** KakaoTalk / LINE / WhatsApp 은 §9 의 업무 채널이다.
 - JWT `sub` 는 `users.id` 를 유지한다. Google `sub` 는 토큰에 싣지 않는다.

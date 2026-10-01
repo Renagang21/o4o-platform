@@ -467,10 +467,12 @@ export class EmailAuthService {
     if (!user || resolveAccountAccess(user.status) === 'blocked') return;
     // 관리자는 비밀번호 수단을 쓰지 않는다 — 재설정으로 새 수단을 만들게 하지 않는다.
     if (hasPlatformRole(await this.readRoles(user.id))) return;
-    // WO-O4O-EMAIL-PASSWORD-AUTH-S1-CLOSURE-V1: 비밀번호 수단이 없는 계정은 주소 소유가 확인된 경우에만
-    //   재설정(=새 수단 추가)을 허용한다. 미확인 주소의 메일함 주인이 남의 users.id 에 비밀번호를 붙이지 못하게 한다.
+    // 2026-10-01 정책 변경 (PR #257 Codex 재리뷰 P1): forgot/reset 은 **이미 비밀번호 수단이 있는 계정의 복구**에만 쓴다.
+    //   비밀번호가 없는 계정(Google 전용 등)은 주소가 확인돼 있어도 메일 · 토큰을 만들지 않는다 —
+    //   메일함 접근만으로 새 로그인 수단을 만들 수 없다. 첫 비밀번호 추가는 로그인 상태의 `POST /auth/password` 뿐.
+    //   (종전 S1-CLOSURE 는 "확인된 주소면 재설정으로 첫 수단 추가 허용"이었다 — 이 줄로 대체.)
     //   다른 조용한 return 과 같은 결과 — 발송 여부로 계정 존재를 추론할 수 없다.
-    if (user.isEmailVerified !== true && !(await this.passwords.hasPassword(user.id))) return;
+    if (!(await this.passwords.hasPassword(user.id))) return;
 
     const plain = await this.issueToken('reset', user.id, RESET_TOKEN_TTL_MS);
     const resetUrl = `${resolveMailLinkOrigin(meta.sessionServiceKey ?? null)}/reset-password#token=${encodeURIComponent(plain)}`;
@@ -488,7 +490,7 @@ export class EmailAuthService {
   }
 
   /**
-   * POST /auth/password/reset — 토큰 소비 → 새 해시 → 전역 세션 폐기.
+   * POST /auth/password/reset — 토큰 소비 → (기존 수단 확인) → 전역 세션 폐기 → 새 해시.
    * 메일 링크를 열었다는 것은 주소 소유 확인이므로 `isEmailVerified=true` 도 함께 세운다.
    */
   async resetPassword(plainToken: string, newPassword: string): Promise<void> {
@@ -501,6 +503,9 @@ export class EmailAuthService {
     const row = await this.consumeToken('reset', plainToken);
     if (!row) throw new EmailAuthError('INVALID_OR_EXPIRED_TOKEN');
     if (hasPlatformRole(await this.readRoles(row.user_id))) throw new EmailAuthError(PASSWORD_SESSION_NOT_ALLOWED_CODE);
+    // 재설정은 기존 수단의 교체만 한다 — 수단이 없는 계정에 첫 비밀번호를 만들지 않는다(forgot 의 발급 조건과 같은 축의
+    //   2차 방어. 정책 변경 전에 발급된 토큰 · 다른 경로로 생긴 토큰도 막는다). 세션 폐기보다 먼저 거절한다.
+    if (!(await this.passwords.hasPassword(row.user_id))) throw new EmailAuthError('INVALID_OR_EXPIRED_TOKEN');
 
     // 전역 폐기는 `logoutAll` 한 경로만 한다(auth-token-session.service). 폐기를 **먼저** 한다 —
     // 뒤의 저장이 실패해도 "비밀번호는 그대로인데 세션만 끊긴" 안전한 쪽으로 남는다.
@@ -514,6 +519,7 @@ export class EmailAuthService {
   /**
    * POST /auth/password — 로그인한 사용자의 비밀번호 설정·변경.
    * Google 로만 가입한 사용자도 비밀번호 수단을 **추가**할 수 있다(같은 users.id — 병합이 아니다).
+   * 첫 비밀번호 추가는 **이 경로(로그인 상태)뿐**이다 — forgot/reset 은 기존 수단의 복구 전용(2026-10-01 정책 변경).
    * 변경 시 전역 폐기는 하지 않는다(본인 세션 안의 조작) — 필요하면 사용자가 logout-all 을 쓴다.
    */
   async setPasswordForUser(userId: string, input: { currentPassword?: string; newPassword: string }): Promise<void> {

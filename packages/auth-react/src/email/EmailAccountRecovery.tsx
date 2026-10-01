@@ -108,7 +108,7 @@ export function ForgotPasswordForm({ api, links, className }: ForgotPasswordForm
     <form onSubmit={handleSubmit} style={styles.box} className={className} noValidate data-testid="forgot-password-form">
       <p style={styles.hint}>
         가입한 이메일(로그인 아이디)을 입력하면 비밀번호 재설정 링크를 보냅니다. 링크는 30분 동안 유효합니다.
-        Google 로 가입한 계정도 여기서 비밀번호를 만들 수 있습니다.
+        비밀번호를 만든 적이 없는 Google 가입 계정은 재설정 메일이 가지 않습니다 — Google 로 로그인해 주세요.
       </p>
       <div style={styles.field}>
         <label htmlFor="o4o-forgot-email" style={styles.label}>이메일</label>

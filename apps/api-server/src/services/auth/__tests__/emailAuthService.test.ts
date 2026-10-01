@@ -10,6 +10,8 @@
  *  V6 관리자 화면 · platform 역할은 비밀번호 세션 거절
  *  V7 세션 토큰에 authMethod='password' claim · refresh family 기록
  *  V8 재설정은 전역 폐기를 **먼저** 하고 새 해시 저장 · 이전 비밀번호 무효
+ *     forgot/reset 은 **기존 비밀번호 수단의 복구 전용** — 수단이 없는 계정(Google 전용)에 첫 비밀번호를 만들지 않는다
+ *     (2026-10-01 정책 변경, PR #257 Codex 재리뷰 P1). 첫 추가는 로그인 상태의 `POST /auth/password`(V12) 뿐.
  *  V9 resend / forgot 은 계정 존재 여부와 무관하게 조용하다
  *  V10 아이디 찾기는 정확히 1건일 때만 가린 힌트
  *  V11 정책 위반 · 동의 누락 · 형태 오류는 저장 전에 거절
@@ -443,6 +445,21 @@ describe('EmailAuthService', () => {
       await expectCode(h2.service.setPasswordForUser(admin.id, { newPassword: GOOD_PW }), 'PASSWORD_SESSION_NOT_ALLOWED');
       expect(h2.store.creds.size).toBe(0);
     });
+
+    it('platform 역할은 비밀번호 수단 행이 있어도 재설정 메일 0 · reset 거절 (수단 보유 조건보다 관리자 경계가 먼저)', async () => {
+      const h = makeHarness();
+      const admin = h.addUser({ email: 'admin@example.com' });
+      const h2 = makeHarness({ roles: { [admin.id]: ['platform:super_admin'] } });
+      h2.store.users.push(admin);
+      h2.store.creds.set(admin.id, 'fakehash:x');
+      await h2.service.requestPasswordReset('admin@example.com', META);
+      expect(h2.mails).toHaveLength(0);
+      expect(h2.store.prt).toHaveLength(0);
+      const token: string = await (h2.service as any).issueToken('reset', admin.id, 30 * 60 * 1000);
+      await expectCode(h2.service.resetPassword(token, 'newpass99$'), 'PASSWORD_SESSION_NOT_ALLOWED');
+      expect(h2.store.creds.get(admin.id)).toBe('fakehash:x');
+      expect(h2.revoked).toEqual([]);
+    });
   });
 
   describe('V7 세션', () => {
@@ -505,13 +522,38 @@ describe('EmailAuthService', () => {
       await expect(h.service.resetPassword(token, 'newpass99$')).resolves.toBeUndefined();
     });
 
-    it('재설정 메일 링크를 연 Google 전용 사용자는 같은 users.id 에 수단이 추가된다(새 계정 0)', async () => {
+    // 2026-10-01 정책 변경 — 종전 계약("재설정 링크로 Google 전용 사용자에게 수단 추가")을 반전한다.
+    it('Google 전용(확인된 주소 · 수단 없음) → forgot 은 메일 0 · 토큰 0 · 수단 0', async () => {
       const h = makeHarness();
-      const g = h.addUser({ email: 'google.only@example.com' });
-      await h.service.requestPasswordReset('google.only@example.com', META);
-      await h.service.resetPassword(h.lastLinkToken('/reset-password'), 'newpass99$');
+      h.addUser({ email: 'google.only@example.com', isEmailVerified: true });
+      await expect(h.service.requestPasswordReset('Google.Only@example.com', META)).resolves.toBeUndefined();
+      expect(h.mails).toHaveLength(0);
+      expect(h.store.prt).toHaveLength(0);
+      expect(h.store.creds.size).toBe(0);
+    });
+
+    it('Google 전용(수단 없음)은 유효한 reset 토큰이 있어도 첫 비밀번호를 만들 수 없다 — 세션 폐기 0 · 수단 0', async () => {
+      const h = makeHarness();
+      const g = h.addUser({ email: 'google.only@example.com', isEmailVerified: true });
+      // 정책 변경 전에 발급된 토큰 등 — forgot 을 거치지 않은 토큰을 직접 만든다
+      const token: string = await (h.service as any).issueToken('reset', g.id, 30 * 60 * 1000);
+      await expectCode(h.service.resetPassword(token, 'newpass99$'), 'INVALID_OR_EXPIRED_TOKEN');
+      expect(h.store.creds.size).toBe(0);
+      expect(h.revoked).toEqual([]);
       expect(h.store.users).toHaveLength(1);
+      await expectCode(h.service.login({ email: 'google.only@example.com', password: 'newpass99$', ...META }), 'INVALID_CREDENTIALS');
+    });
+
+    it('로그인한 Google 사용자가 `POST /auth/password` 로 첫 비밀번호를 추가하면 그 뒤로는 forgot/reset 이 동작한다', async () => {
+      const h = makeHarness();
+      const g = h.addUser({ email: 'google.only@example.com', isEmailVerified: true });
+      await h.service.setPasswordForUser(g.id, { newPassword: GOOD_PW });
       expect([...h.store.creds.keys()]).toEqual([g.id]);
+      await h.service.requestPasswordReset('google.only@example.com', META);
+      expect(h.mails).toHaveLength(1);
+      await h.service.resetPassword(h.lastLinkToken('/reset-password'), 'newpass99$');
+      await expect(h.service.login({ email: 'google.only@example.com', password: 'newpass99$', ...META })).resolves.toBeDefined();
+      expect(h.store.users).toHaveLength(1);
     });
   });
 
@@ -557,6 +599,7 @@ describe('EmailAuthService', () => {
   });
 
   // WO-O4O-EMAIL-PASSWORD-AUTH-S1-CLOSURE-V1 — 재설정 메일은 수단 보유 또는 확인된 주소에만.
+  //   → 2026-10-01 정책 변경: **수단 보유자에게만**(확인된 주소라도 수단이 없으면 발송 0). S1-P2 를 반전했다.
   describe('S1 forgot 발송 대상', () => {
     it('S1-P1 비밀번호 수단 보유 사용자 → 발송 (미확인 상태여도 본인 수단 복구는 허용)', async () => {
       const h = makeHarness();
@@ -567,11 +610,12 @@ describe('EmailAuthService', () => {
       expect(h.store.prt).toHaveLength(1);
     });
 
-    it('S1-P2 확인된 Google 전용 사용자 → 발송', async () => {
+    it('S1-P2 확인된 Google 전용 사용자(수단 없음) → 발송 0 (2026-10-01 정책 변경 — 종전 "발송")', async () => {
       const h = makeHarness();
       h.addUser({ email: 'g.verified@example.com', isEmailVerified: true });
       await h.service.requestPasswordReset('g.verified@example.com', META);
-      expect(h.mails).toHaveLength(1);
+      expect(h.mails).toHaveLength(0);
+      expect(h.store.prt).toHaveLength(0);
     });
 
     it('S1-P3 미확인 Google 전용 사용자 → 메일 0 · 토큰 0 · 수단 0', async () => {
@@ -583,16 +627,20 @@ describe('EmailAuthService', () => {
       expect(h.store.creds.size).toBe(0);
     });
 
-    it('S1-P4 없는 주소 · 미확인 · 발송 대상의 서비스 결과가 같다 (발송 여부로 존재 추론 불가)', async () => {
+    it('S1-P4 없는 주소 · 미확인 · Google 전용 · 발송 대상의 서비스 결과가 같다 (발송 여부로 존재 추론 불가)', async () => {
       const h = makeHarness();
       h.addUser({ email: 'g.unverified@example.com', isEmailVerified: false });
       h.addUser({ email: 'g.verified@example.com', isEmailVerified: true });
+      const c = h.addUser({ email: 'has.cred@example.com', isEmailVerified: true });
+      h.store.creds.set(c.id, 'fakehash:x');
       const results = await Promise.all([
         h.service.requestPasswordReset('nobody@example.com', META),
         h.service.requestPasswordReset('g.unverified@example.com', META),
         h.service.requestPasswordReset('g.verified@example.com', META),
+        h.service.requestPasswordReset('has.cred@example.com', META),
       ]);
-      expect(results).toEqual([undefined, undefined, undefined]);
+      expect(results).toEqual([undefined, undefined, undefined, undefined]);
+      expect(h.mails.map((m) => m.to)).toEqual(['has.cred@example.com']);
     });
   });
 
