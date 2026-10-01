@@ -50,6 +50,8 @@ import { AlterHandoffTokensSourceSessionEpoch1790400000003 } from '../migrations
 import { CreateEmailPasswordAuthTables1790683000000 } from '../migrations/1790683000000-CreateEmailPasswordAuthTables.js';
 // WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1 최종 보완 1 (handoff 원장에 출발 세션 인증 수단 보관)
 import { AddHandoffTokenSourceAuthMethod1790684000000 } from '../migrations/1790684000000-AddHandoffTokenSourceAuthMethod.js';
+// WO-O4O-CANONICAL-DEMO-ACCOUNT-FOUNDATION-AND-EXPERIENCE-LOGIN-V1 Phase B-A (demo_accounts registry)
+import { CreateDemoAccounts1790940000000 } from '../migrations/1790940000000-CreateDemoAccounts.js';
 
 export const INCREMENTAL_MIGRATION_CUTOFF = {
   baselineVersion: '2026-09-18-id685',
@@ -75,6 +77,7 @@ export const INCREMENTAL_MIGRATIONS: readonly MigrationClass[] = [
   AlterHandoffTokensSourceSessionEpoch1790400000003,
   CreateEmailPasswordAuthTables1790683000000,
   AddHandoffTokenSourceAuthMethod1790684000000,
+  CreateDemoAccounts1790940000000,
 ];
 
 export function incrementalMigrationNames(): string[] {
