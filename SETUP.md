@@ -183,9 +183,18 @@ API 상태 확인: `curl http://localhost:3002/health`
 **로그인 · AI 호출 (실제 기능 smoke 에만 필요)**
 
 - 화면 기동 자체에는 Google OAuth 도 AI key 도 필요 없습니다.
-- 로그인은 Google 로그인뿐입니다. 로컬 로그인 smoke 에는 JavaScript origin 에 `http://localhost:3000` 이 등록된
-  **개발용 OAuth Client** 가 필요합니다(`GOOGLE_CLIENT_ID` · `GOOGLE_ALLOWED_CLIENT_IDS`). 운영 OAuth credential 은 제공하지 않으며,
-  개발용 Client 제공 방식은 별도로 안내합니다.
+- 로그인은 Google 로그인뿐입니다(GIS popup → ID token → API 가 `aud` 검증). 로컬 로그인 smoke 에는
+  Authorized JavaScript origin 에 `http://localhost:3000` 이 등록된 **개발용 OAuth Client ID** 하나가 필요합니다.
+  `apps/api-server/.env` 에 아래 한 줄만 넣습니다. web-neture 에는 Google 설정이 없습니다(Client ID 는 API 의 `/auth/google/config` 가 내려줍니다).
+
+  ```bash
+  GOOGLE_ALLOWED_CLIENT_IDS=<개발용 OAuth Client ID>
+  ```
+
+  - popup 방식이라 **redirect URI 는 필요 없고, Client Secret 도 쓰지 않습니다.**
+  - `GOOGLE_CLIENT_ID` · `GOOGLE_CLIENT_SECRET` 은 은퇴한 passport 설정이라 넣어도 효과가 없습니다.
+  - `GOOGLE_WEB_CLIENT_ID` 는 선택입니다. 비우면 `GOOGLE_ALLOWED_CLIENT_IDS` 의 첫 항목을 씁니다.
+  - 운영 OAuth Client 는 제공하지 않으며, 개발용 Client ID 제공 방식은 별도로 안내합니다.
 - O4O Agent 의 실제 AI 요청(`/api/ai/*`)은 로그인이 필요하고, **개발용 Gemini 또는 OpenAI key**(`GEMINI_API_KEY` / `OPENAI_API_KEY`)가
   있어야 합니다. key 가 없으면 `AI_NOT_CONFIGURED` 로 실패합니다. 운영 AI key 는 제공하지 않습니다.
 
