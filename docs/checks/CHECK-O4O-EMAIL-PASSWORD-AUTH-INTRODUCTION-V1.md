@@ -163,11 +163,12 @@ repo 에 code scanning 이 켜져 있지 않아 SARIF 업로드가 실패한다(
 
 - 이메일 로그인 화면을 web-neture 외 서비스(kpa-society · kpa-branch · k-cosmetics · pharmacy-hub · store)에도 연결 — 별도 WO(2026-10-01 Codex 재리뷰 P1, 비차단 · Demo 계정 작업 전 검토).
 - 로그인 상태 비밀번호 추가 · 변경(`POST /auth/password`)의 `auth-client` 메서드 · `AccountSecuritySettings` UI — 별도 WO(같은 리뷰 P2, 비차단). 그 전까지 V2 는 운영 화면으로 검증할 수 없다.
-- **Token Lifecycle Hardening (별도 WO 1건으로 묶음 · #257 병합 blocker 아님)** — 토큰의 발급 · 소비 · 트랜잭션 원자성. 아래 4건:
+- **Token Lifecycle Hardening (별도 WO 1건으로 묶음 · #257 병합 blocker 아님)** — 토큰의 발급 · 소비 · 트랜잭션 원자성. 아래 5건:
   - 같은 사용자 동시 forgot · 재발송 시 미소비 토큰 2개가 살 수 있음 — 새 토큰 발급 시(또는 소비 시) 같은 사용자 · 같은 목적의 미소비 토큰 전부 무효화. 보안 hardening 별도 WO(2026-10-01 Codex 재리뷰 P2 #2, 비차단 — 두 링크 모두 같은 확인된 메일함으로만 간다).
   - 재설정 도중 일시 장애 시 토큰이 이미 소비돼 같은 링크로 재시도 불가 — reliability/UX 별도 WO(같은 리뷰 P2 #3, 비차단 — 선소비는 보안상 보수적).
   - 새 토큰 발급 후 메일 발송이 실패하면 기존 토큰까지 이미 무효 — 계정 확인 · 복구 중단. 발송 확인 뒤 기존 토큰 폐기, 또는 실패 시 새 행 제거 · 기존 상태 보존(2026-10-01 Codex 재리뷰 P2, 비차단).
   - 확인(verify) 도중 일시 장애 시 토큰이 이미 소비돼 같은 링크로 재시도 불가 — 사용자 · 이메일 검증 · `isEmailVerified` 갱신 · 최종 소비를 한 트랜잭션으로(2026-10-01 Codex 재리뷰 P2 (b), 비차단 — 확인 메일 재발송으로 복구 가능).
+  - 로그인 상태 비밀번호 변경(`POST /auth/password` · `setPasswordForUser`) 성공 후에도 기존 미소비 재설정 토큰이 살아 있어, 남은 유효시간 동안 옛 링크로 새 비밀번호를 덮어쓸 수 있음 — password credential 변경 성공 시 같은 트랜잭션에서 해당 사용자의 미소비 password reset token 전부 무효화(2026-10-01 Codex 재리뷰 P2 @3cbab5012, 비차단 — 링크는 확인된 메일함으로만 간다).
 - `SMTP_PASS` 를 plain env 에서 Secret Manager 참조(`--update-secrets`)로 이전 — 별도 WO(비밀값 미기재).
 
 ## 6. 남은 절차
