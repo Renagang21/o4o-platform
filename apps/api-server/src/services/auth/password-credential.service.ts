@@ -21,7 +21,11 @@ import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
 import type { EntityManager } from 'typeorm';
 import { isPasswordWithinByteLimit } from '@o4o/auth-utils';
-import { AppDataSource } from '../../database/connection.js';
+// `AppDataSource` 를 **최상단에서 import 하지 않는다** — WO-O4O-CANONICAL-DEMO-ACCOUNT-…-V1
+//   `database/connection.js` 는 전체 entity 를 끌어온다. 그래서 이 모듈을 import 하는 것만으로
+//   entity 가 로드됐고, `manager` 를 직접 주입하는 호출자(entity 를 싣지 않는 CLI)가
+//   tsx(esbuild — `emitDecoratorMetadata` 미지원)에서 `ColumnTypeUndefinedError` 로 죽었다.
+//   아래 `resolveDb()` 가 **manager 가 없을 때만** 동적 import 한다 — 인증 정책·외부 API 는 그대로다.
 
 /** bcrypt cost. 운영 Cloud Run 1 vCPU 에서 1회 ≈ 수백 ms — 로그인 횟수 제한과 함께 쓴다. */
 export const PASSWORD_HASH_COST = 12;
@@ -44,13 +48,20 @@ export class PasswordTooLongError extends Error {
 }
 
 class PasswordCredentialService {
-  private db(manager?: Queryable): Queryable {
-    return manager ?? AppDataSource;
+  /**
+   * 질의에 쓸 연결을 고른다.
+   *   manager 있음 → 그대로 쓴다. **`database/connection.js` 를 로드하지 않는다.**
+   *   manager 없음 → 그때 기본 `AppDataSource` 를 동적 import 한다(기존 동작과 동일).
+   */
+  private async resolveDb(manager?: Queryable): Promise<Queryable> {
+    if (manager) return manager;
+    const { AppDataSource } = await import('../../database/connection.js');
+    return AppDataSource;
   }
 
   /** 수단 보유 여부 — 행 존재 = 비밀번호 수단을 가졌다 */
   async hasPassword(userId: string, manager?: Queryable): Promise<boolean> {
-    const rows: unknown[] = await this.db(manager).query(
+    const rows: unknown[] = await (await this.resolveDb(manager)).query(
       `SELECT 1 FROM user_password_credentials WHERE user_id = $1`,
       [userId],
     );
@@ -64,7 +75,7 @@ class PasswordCredentialService {
   async setPassword(userId: string, plain: string, manager?: Queryable): Promise<void> {
     if (!isPasswordWithinByteLimit(plain)) throw new PasswordTooLongError();
     const hash = await bcrypt.hash(plain, PASSWORD_HASH_COST);
-    await this.db(manager).query(
+    await (await this.resolveDb(manager)).query(
       `INSERT INTO user_password_credentials (user_id, password_hash, algo, password_changed_at, created_at, updated_at)
        VALUES ($1, $2, $3, now(), now(), now())
        ON CONFLICT (user_id) DO UPDATE
@@ -83,7 +94,7 @@ class PasswordCredentialService {
   async verifyPassword(userId: string | null, plain: string): Promise<boolean> {
     let hash: string | null = null;
     if (userId) {
-      const rows: Array<{ password_hash: string }> = await AppDataSource.query(
+      const rows: Array<{ password_hash: string }> = await (await this.resolveDb()).query(
         `SELECT password_hash FROM user_password_credentials WHERE user_id = $1`,
         [userId],
       );
