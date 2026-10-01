@@ -532,6 +532,46 @@ describe('EmailAuthService', () => {
     });
   });
 
+  // WO-O4O-EMAIL-PASSWORD-AUTH-S1-CLOSURE-V1 — 재설정 메일은 수단 보유 또는 확인된 주소에만.
+  describe('S1 forgot 발송 대상', () => {
+    it('S1-P1 비밀번호 수단 보유 사용자 → 발송 (미확인 상태여도 본인 수단 복구는 허용)', async () => {
+      const h = makeHarness();
+      const u = h.addUser({ email: 'has.cred@example.com', isEmailVerified: false });
+      h.store.creds.set(u.id, 'fakehash:x');
+      await h.service.requestPasswordReset('has.cred@example.com', META);
+      expect(h.mails).toHaveLength(1);
+      expect(h.store.prt).toHaveLength(1);
+    });
+
+    it('S1-P2 확인된 Google 전용 사용자 → 발송', async () => {
+      const h = makeHarness();
+      h.addUser({ email: 'g.verified@example.com', isEmailVerified: true });
+      await h.service.requestPasswordReset('g.verified@example.com', META);
+      expect(h.mails).toHaveLength(1);
+    });
+
+    it('S1-P3 미확인 Google 전용 사용자 → 메일 0 · 토큰 0 · 수단 0', async () => {
+      const h = makeHarness();
+      h.addUser({ email: 'g.unverified@example.com', isEmailVerified: false });
+      await expect(h.service.requestPasswordReset('g.unverified@example.com', META)).resolves.toBeUndefined();
+      expect(h.mails).toHaveLength(0);
+      expect(h.store.prt).toHaveLength(0);
+      expect(h.store.creds.size).toBe(0);
+    });
+
+    it('S1-P4 없는 주소 · 미확인 · 발송 대상의 서비스 결과가 같다 (발송 여부로 존재 추론 불가)', async () => {
+      const h = makeHarness();
+      h.addUser({ email: 'g.unverified@example.com', isEmailVerified: false });
+      h.addUser({ email: 'g.verified@example.com', isEmailVerified: true });
+      const results = await Promise.all([
+        h.service.requestPasswordReset('nobody@example.com', META),
+        h.service.requestPasswordReset('g.unverified@example.com', META),
+        h.service.requestPasswordReset('g.verified@example.com', META),
+      ]);
+      expect(results).toEqual([undefined, undefined, undefined]);
+    });
+  });
+
   describe('V10 아이디 찾기', () => {
     it('이름+휴대전화가 정확히 1건이면 가린 힌트, 하이픈 무관', async () => {
       const h = makeHarness();

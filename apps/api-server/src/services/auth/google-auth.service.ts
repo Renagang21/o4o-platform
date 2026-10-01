@@ -58,6 +58,7 @@ export type GoogleAuthErrorCode =
   | 'GOOGLE_SIGNUP_REQUIRED'
   | 'GOOGLE_ALREADY_REGISTERED'
   | 'GOOGLE_EMAIL_MISSING'
+  | 'GOOGLE_EMAIL_UNVERIFIED'
   | 'EMAIL_IN_USE'
   | 'CONSENT_REQUIRED'
   | 'INVALID_USER'
@@ -69,6 +70,7 @@ const GOOGLE_AUTH_ERROR_STATUS: Record<GoogleAuthErrorCode, number> = {
   GOOGLE_SIGNUP_REQUIRED: 404,
   GOOGLE_ALREADY_REGISTERED: 409,
   GOOGLE_EMAIL_MISSING: 400,
+  GOOGLE_EMAIL_UNVERIFIED: 400,
   EMAIL_IN_USE: 409,
   CONSENT_REQUIRED: 400,
   INVALID_USER: 401,
@@ -81,6 +83,7 @@ const GOOGLE_AUTH_ERROR_MESSAGE: Record<GoogleAuthErrorCode, string> = {
   GOOGLE_SIGNUP_REQUIRED: '등록되지 않은 Google 계정입니다. 약관 동의 후 계정을 생성해 주세요.',
   GOOGLE_ALREADY_REGISTERED: '이미 등록된 Google 계정입니다. 로그인해 주세요.',
   GOOGLE_EMAIL_MISSING: 'Google 계정에서 이메일을 확인할 수 없어 계정을 생성할 수 없습니다.',
+  GOOGLE_EMAIL_UNVERIFIED: 'Google 에서 인증되지 않은 이메일의 계정으로는 가입할 수 없습니다. 이메일 인증을 마친 Google 계정을 사용해 주세요.',
   EMAIL_IN_USE: '이미 사용 중인 이메일입니다. 기존 계정은 자동으로 연결되지 않습니다.',
   CONSENT_REQUIRED: '이용약관과 개인정보 처리방침에 동의해야 합니다.',
   INVALID_USER: '계정 정보를 확인할 수 없습니다.',
@@ -256,6 +259,16 @@ export class GoogleAuthService {
     identity: VerifiedGoogleIdentity,
     consents: GoogleSignupConsents,
   ): Promise<User> {
+    // WO-O4O-EMAIL-PASSWORD-AUTH-S1-CLOSURE-V1: Google 이 소유를 확인하지 않은 주소로는 users 를 만들지 않는다.
+    //   미확인 주소가 users.email 을 점유하면 그 메일함 주인이 비밀번호 재설정으로 같은 users.id 에 수단을 붙일 수 있다.
+    //   생성 경로 하나에 둔다 — 운영자 초대 수락도 이 함수를 쓴다(위 §11). 기존 sub 의 로그인은 영향 없음.
+    if (!identity.email) {
+      throw new GoogleAuthError('GOOGLE_EMAIL_MISSING');
+    }
+    if (identity.emailVerified !== true) {
+      throw new GoogleAuthError('GOOGLE_EMAIL_UNVERIFIED');
+    }
+
     const linkedRepo = manager.getRepository(LinkedAccount);
     const userRepo = manager.getRepository(User);
 
@@ -267,11 +280,11 @@ export class GoogleAuthService {
     const now = new Date();
     const user = userRepo.create({
       // WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1 Phase B-1: `password: null` write 제거 — 컬럼이 B-2 에서 사라진다.
-      email: identity.email!,
+      email: identity.email,
       name: null,
       status: UserStatus.ACTIVE,
       isActive: true,
-      isEmailVerified: identity.emailVerified === true,
+      isEmailVerified: true,
       tosAcceptedAt: now,
       privacyAcceptedAt: now,
       marketingAccepted: consents.marketing === true,

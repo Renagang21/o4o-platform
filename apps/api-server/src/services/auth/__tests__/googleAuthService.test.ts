@@ -108,7 +108,9 @@ function identityFor(map: Record<string, Partial<VerifiedGoogleIdentity> | Googl
       if (!entry) throw new GoogleIdTokenError('SIGNATURE_INVALID');
       if (entry instanceof GoogleIdTokenError) throw entry;
       return {
+        // 기본 fixture 는 Google 이 이메일을 확인한 계정이다 — 미확인은 테스트가 명시한다(S1).
         sub: SUB_A, audience: 'web', issuer: 'https://accounts.google.com', expiresAt: new Date(Date.now() + 3600_000),
+        emailVerified: true,
         ...entry,
       } as VerifiedGoogleIdentity;
     }),
@@ -209,6 +211,46 @@ describe('GoogleAuthService — Google-only Signup/Login', () => {
       .rejects.toMatchObject({ code: 'GOOGLE_EMAIL_MISSING', statusCode: 400 });
     expect(store.users).toHaveLength(0);
     expect(store.linked).toHaveLength(0);
+  });
+
+  // WO-O4O-EMAIL-PASSWORD-AUTH-S1-CLOSURE-V1 — Google 이 확인한 주소만 users 를 만든다.
+  it('S1-G1 signup · email_verified=true → 가입 허용, isEmailVerified=true', async () => {
+    build({ 'tok-a': { sub: SUB_A, email: 'verified@example.test', emailVerified: true } });
+    await svc.signup({ idToken: 'tok-a', consents: CONSENTS, ...META });
+    expect(store.users).toHaveLength(1);
+    expect(store.users[0].isEmailVerified).toBe(true);
+    expect(store.linked).toHaveLength(1);
+  });
+
+  it.each([
+    ['false', false],
+    ['claim 없음', undefined],
+  ])('S1-G2 signup · email_verified=%s → GOOGLE_EMAIL_UNVERIFIED, users/linked_accounts 0, 세션 0', async (_l, emailVerified) => {
+    build({ 'tok-a': { sub: SUB_A, email: 'unverified@example.test', emailVerified } });
+    await expect(svc.signup({ idToken: 'tok-a', consents: CONSENTS, ...META }))
+      .rejects.toMatchObject({ code: 'GOOGLE_EMAIL_UNVERIFIED', statusCode: 400 });
+    expect(store.users).toHaveLength(0);
+    expect(store.linked).toHaveLength(0);
+  });
+
+  it('S1-G2 createGoogleUser 직접 호출(초대 수락 경로)도 미확인 주소는 거절', async () => {
+    build({});
+    const manager = { getRepository: (e: unknown) => ds.getRepository(e) };
+    await expect(svc.createGoogleUser(manager as any, {
+      sub: SUB_A, email: 'invitee@example.test', emailVerified: false,
+      audience: 'web', issuer: 'https://accounts.google.com', expiresAt: new Date(Date.now() + 3600_000),
+    } as VerifiedGoogleIdentity, CONSENTS)).rejects.toMatchObject({ code: 'GOOGLE_EMAIL_UNVERIFIED' });
+    expect(store.users).toHaveLength(0);
+    expect(store.linked).toHaveLength(0);
+  });
+
+  it('S1-G3 이미 가입한 sub 의 login 은 email_verified=false 토큰이어도 영향 없음', async () => {
+    build({ 'tok-a': { sub: SUB_A, email: 'existing.g@example.test', emailVerified: true } });
+    await svc.signup({ idToken: 'tok-a', consents: CONSENTS, ...META });
+    build({ 'tok-a2': { sub: SUB_A, email: 'existing.g@example.test', emailVerified: false } });
+    const session = await svc.login({ idToken: 'tok-a2', ...META });
+    expect(session.isNewUser).toBe(false);
+    expect(store.users).toHaveLength(1);
   });
 
   it('signup · 같은 sub 재가입 → GOOGLE_ALREADY_REGISTERED, users 증가 0', async () => {

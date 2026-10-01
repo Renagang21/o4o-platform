@@ -465,6 +465,10 @@ export class EmailAuthService {
     if (!user || resolveAccountAccess(user.status) === 'blocked') return;
     // 관리자는 비밀번호 수단을 쓰지 않는다 — 재설정으로 새 수단을 만들게 하지 않는다.
     if (hasPlatformRole(await this.readRoles(user.id))) return;
+    // WO-O4O-EMAIL-PASSWORD-AUTH-S1-CLOSURE-V1: 비밀번호 수단이 없는 계정은 주소 소유가 확인된 경우에만
+    //   재설정(=새 수단 추가)을 허용한다. 미확인 주소의 메일함 주인이 남의 users.id 에 비밀번호를 붙이지 못하게 한다.
+    //   다른 조용한 return 과 같은 결과 — 발송 여부로 계정 존재를 추론할 수 없다.
+    if (user.isEmailVerified !== true && !(await this.passwords.hasPassword(user.id))) return;
 
     const plain = await this.issueToken('reset', user.id, RESET_TOKEN_TTL_MS);
     const resetUrl = `${resolveMailLinkOrigin(meta.sessionServiceKey ?? null)}/reset-password?token=${encodeURIComponent(plain)}`;
