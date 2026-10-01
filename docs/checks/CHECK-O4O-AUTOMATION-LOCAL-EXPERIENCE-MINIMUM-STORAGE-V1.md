@@ -3,7 +3,7 @@
 > **WO**: WO-O4O-AUTOMATION-LOCAL-EXPERIENCE-MINIMUM-STORAGE-V1 (Experience Model Phase 1)
 > **기준**: [O4O-AUTOMATION-EXPERIENCE-MODEL-V1](../baseline/O4O-AUTOMATION-EXPERIENCE-MODEL-V1.md) (ACTIVE, D1~D8) · [O4O-AUTOMATION-AGENT-ARCHITECTURE-V1](../baseline/O4O-AUTOMATION-AGENT-ARCHITECTURE-V1.md) §5-1 · §10-2
 > **일자**: 2026-10-01
-> **판정**: **CODE_COMPLETE · REAL_PC_SMOKE_PENDING (배포 승인 대기)** — 상세 §10
+> **판정**: **PHASE1_PASS (실 PC closure 2026-10-01)** — 상세 §10 · 이전 판정 CODE_COMPLETE · REAL_PC_SMOKE_PENDING
 
 ---
 
@@ -94,14 +94,55 @@ action `local.data.work_run_experience_record` — 인자는 정해진 키만:
 - 복사본에 대기→재개 2 segment 기록: segment_count 2 · user_wait_ms 60000(대기 segment 만 근거) · step seq 1~3 이어짐 · 재개 segment outcome PARTIAL_SUCCESS/agent_inferred
 - (복사본 스크립트는 backup 함수를 넘기지 않아 `backupStatus=skipped` — 실제 agent 진입점은 `createBackup` 을 넘긴다, test 로 `created` 확인)
 
-## 10. 실 PC smoke — PENDING
+## 10. 실 PC closure — PASS (2026-10-01)
 
-WO §16 의 실 PC smoke(성공 · runtime 실패 · QUESTION→재개 중 2개 이상)는 **미실행**이다. 실행하려면 다음이 필요하고, 둘 다 사용자 승인 사항이다.
+### 10-1. 배포 · 재기동
 
-1. API 배포(`deploy-api.yml` 은 workflow_dispatch + deploy 태그 전용 — push 로 배포되지 않음)
-2. 실 PC Local Agent 재기동(새 코드 → 실 local.db v6 승격, pre-migration 백업 생성)
+- API: 수동 통제 배포(사용자 승인). tag `deploy/2026-10-01-local-experience-phase1` @ `486fec89c`(⊇ `c387789ee`) → `deploy-api.yml` run 36821756659 success → revision `o4o-core-api-03777-mav` traffic 100% · `/health/ready` ready · pending migration 없음.
+  - `deploy-auto.yml` 의 자동 dispatch 는 `ensureTag` fetch 단계 `SocketError: other side closed` 로 실패(runs 36809929512 · 36811339114 · 36821204059 ×2). **이번 범위에서 수정하지 않음** → 별도 CI/CD WO 제안.
+- Local Agent: 정상 종료 → 재기동. 실 local.db **v5→v6** 승격, pre-migration 백업 `local-20261001T055915-pre-migration.db` 생성. local.db · credential · pairing 삭제/초기화 없음.
+- 기존 데이터 보존: runs 12 · steps 10 · candidates 2(success 합 3 · failure 합 1) 그대로.
+- pairing spec: agent 정지 상태에서 25/25 PASS(앞선 8 실패는 실행 중 agent 와의 포트 충돌).
+- Chrome bridge: stale native host 1개 종료 → extension 자동 재연결(기존 절차). runtime 코드 수정 없음.
 
-승인 후 절차: 배포 job success + 새 revision traffic 100% 확인 → agent 재기동 → Agent 가 약학정보원 검색(성공) 1회 + 대기→재개 1회 수행 → local.db 를 read-only 로 열어 §5 의 행 · NULL 규칙 · 민감 원문 부재 확인.
+### 10-2. 실 Run — 성공 `약학정보원에서 타이레놀 검색해줘` (run `g_mup59b3b`)
+
+| 항목 | 기록 | 판정 |
+|---|---|---|
+| run | status `completed` · target_kind `browser_site` · task_key NULL(provisional 1, Phase 2 규칙 전) · started/ended · segment_count 1 | 계약대로 |
+| Outcome | `PARTIAL_SUCCESS` / `agent_inferred` — 완료 사유 `goal_sufficiently_advanced`(§5 규칙) | 계약대로(D6 승격 없음) |
+| segment 1 | end_state `completed` · resumed 0 · total 23,269ms · ai 8,933ms(2회) · command_wait 6,613 · execution 3,733 · settle 700 · action 2 · step_count 10 · retry 0 · user_wait NULL | 계약대로. step_count=명령 예산 기준(관찰 포함), action=입력·클릭 |
+| steps | ① input/`set_input`/browser_dom/locator{role,name}/`deterministic`/success/`system_verified` ② activate/`click`/browser_dom/locator{role,name}/`ai_normal`/success/`system_verified` | 계약대로. locator = 검색창 label · 버튼 이름(입력 값 아님) |
+| failure | stage `read` · layer NULL · `TARGET_FAILURE` · `recovered_by_normal_retry` · ui_change_suspected 1 | 저장된 절차 재생 중 locator 불일치 → AI 이어받아 완료. 화면 변경 **의심만** 표기(확정 아님) |
+
+### 10-3. 미종료 QUESTION Run (run `g_mup5awlb`) — 강제 resume · completed 처리 안 함
+
+두 번째 smoke `약학정보원에서 내가 먹을 약 검색해줘` 는 **사용자 결정으로 중단**했다. 테스트 문장 자체가 업무적으로 부적절했다(약학정보원은 개인 복약내역 조회 대상이 아님). **Phase 1 기능 실패로 판정하지 않는다.** 기록 상태만 read-only 로 확인했다.
+
+- run status `waiting_for_user` · outcome_status/evidence **NULL**(대기 segment 는 최종 결과 아님 — §5 규칙)
+- segment 1: end_state `waiting_for_user` · resumed 0 · user_wait NULL(재개 없음) · ai_calls 0 · action 0 · step_count 2
+- experience steps 0(실행 행동 없음) · failure 1: layer `input_missing` · `AMBIGUOUS_STATE` · recovery NULL
+
+### 10-4. 금지 데이터 (§9) — Experience 저장 영역 0건
+
+v6 테이블 3종(segments · experience_steps · failures) 전 텍스트 컬럼과 run 신규 컬럼(task_key · target_kind · outcome_*)에서 `타이레놀` · `게보린` · `내가 먹을` · `먹을 약` · `<html` · `<div` · password · token · cookie · prompt **전부 0건**. locator 는 `{role,name}` 2키(검색창 placeholder label · `검색` 버튼)뿐. v5 원장(local_work_run_steps · local_workflow_candidates)에도 slot 값 0건.
+
+- **발견(Phase 1 회귀 아님)**: v5 기존 컬럼 `local_work_runs.goal_summary` 는 요청 문장을 담는다(14행 전부, 이번 2 run 포함). v6 이전부터의 run 원장 동작이며 Phase 1 이 추가한 것이 아니다. Experience §9 와의 관계(보존 · 축약 · 제거) 판정은 **별도 WO 제안**.
+
+### 10-5. Candidate · replay 회귀 · D7
+
+- candidates 2 → 2. success 합 3 → 4(타이레놀 Candidate: 재생 이탈 후 AI 완료 경로가 `replayedCandidateId` 로 같은 Candidate 에 재저장 — 기존 v5 규칙), failure 합 **1 → 1**.
+- `c387789ee` 의 재생 경로 변경은 이탈 원인 표기(`replayDiverge`)와 D7 runtime 제외 분기뿐 — 재생 판정 · break 조건은 불변(diff 확인).
+- 한계: 이번 실 Run 에는 runtime 층 실패가 발생하지 않아 D7(runtime 실패 → failure_count 제외)은 실 PC 에서 직접 관찰되지 않았다(단위 테스트로 검증, §7). 재생 **완주** 경로도 이번 Run 에서는 관찰되지 않았다(재생 이탈→복구 경로가 관찰됨).
+
+### 10-6. 판정
+
+① v6 migration 실 PC 안전 PASS · ② 실 Run Experience 저장 PASS · ③ 민감 원문 · 값 Experience 영역 0건 PASS · ④ 기존 자동화(Candidate 원장 · 재생 → 복구 → 재저장) 회귀 없음 PASS → **PHASE1_PASS**.
+
+### 10-7. Phase 2 User Correction 검증 사례 후보 (구현하지 않음)
+
+- 사례: `약학정보원에서 내가 먹을 약 검색해줘` → Agent 는 **slot 부족**(`input_missing`)으로 해석해 질문했으나, 실제로는 **Task × Target 의미 자체가 맞지 않는** 요청이었다(해당 Target 은 개인 복약내역을 조회하지 않음). 사용자 교정 유형 = "의미 불일치".
+- Phase 2 제안: 교정 종류를 **Task/Intent 교정 · Target 교정 · Procedure 교정 · 결과 교정**으로 구분한다. Request/Intent 층에서 slot 을 묻기 전에 **Target 이 그 목적을 수행할 수 있는지** 먼저 확인한다.
 
 ## 11. 한계 (Phase 1 범위에서 의도적으로 남김)
 
@@ -116,6 +157,7 @@ WO §16 의 실 PC smoke(성공 · runtime 실패 · QUESTION→재개 중 2개 
 - 질의형 recall(D1=a): 현재 Run 을 위한 최소 구조 조회 — 이번 테이블의 target · stage · locator · failure layer 를 대상으로. cloud read-back · 동기화는 여전히 금지.
 - Task 정체성(`task_key`) 채우기 규칙, `USER_COMPLETED` 종료 신호(D8=b 자동판정+사용자 확인) 정의.
 - `business_knowledge` 층 판정 신호 정의.
+- §10-7 User Correction 사례(Task × Target 의미 불일치)를 Phase 2 User Assistance + User Correction 의 검증 사례로 사용.
 
 ## 13. 변경 파일
 
