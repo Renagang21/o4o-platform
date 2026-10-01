@@ -3,7 +3,7 @@
 > **WO**: [`WO-O4O-MAIN-AUTOMATION-RESUME-AND-REPLAY-PREFLIGHT-FIX-V1`](../work-orders/WO-O4O-MAIN-AUTOMATION-RESUME-AND-REPLAY-PREFLIGHT-FIX-V1.md)
 > **선행 판정**: [`CHECK-O4O-WEB-AUTOMATION-USER-GUIDED-RESUME-AND-WORKFLOW-CANDIDATE-REPLAY-V1`](CHECK-O4O-WEB-AUTOMATION-USER-GUIDED-RESUME-AND-WORKFLOW-CANDIDATE-REPLAY-V1.md) §10 — `BLOCKED` (FAIL 1 SAME_RUN_RESUME_SHORT_ANSWER · FAIL 2 REPLAY_PRE_EXECUTION_SEMANTIC_VALIDATION)
 > **작성일**: 2026-09-30
-> **현재 판정**: `CODE_COMPLETE` · 배포 serving 확인(api `03774-qeq` · web `01666-qam`, `e2e1be6cc` ⊇ 4a1bec70e, §3-1-a) · 실 PC 재검증 **PENDING** → `MAIN_AUTOMATION_WORKFLOW_STATUS = BLOCKED` 유지(재검증 PASS 시 `PRODUCTION_READY`)
+> **현재 판정**: `CODE_COMPLETE` · 배포 serving 확인(api `03774-qeq` · web `01666-qam`, `e2e1be6cc` ⊇ 4a1bec70e, §3-1-a) · 실 PC 재검증 **A · B PASS**(2026-10-01, §3) · H1 · C(재개 실패 유지) · 회귀 **보류** — 선행 [Local Agent polling 지연 WO](CHECK-O4O-LOCAL-AGENT-COMMAND-POLLING-LATENCY-V1.md) 뒤 재개 → `PRODUCTION_READY` 미판정
 
 ---
 
@@ -37,18 +37,33 @@
 | 변경 파일 ESLint | error 0 · warning 1(`O4OHomePage.tsx:282` unused eslint-disable — 기존 줄, 이번 diff 밖) |
 | api `tsc --noEmit` | 변경 파일 오류 0. 무관 오류 3건(`community/funding/supplier-service-scope.middleware.ts` ServiceKey) — `@o4o/security-core` dist 가 src 보다 오래됨(build:deps 미실행). 이번 변경과 무관 |
 
-## 3. 실 PC 최소 재검증 — PENDING
+## 3. 실 PC 최소 재검증 — A · B PASS · 나머지 보류
 
 선행: 노출됐던 agentCredential 을 **사용자가 revoke 후 재-pairing**(자동화 안 함). 대상앱 조작은 Agent 가 한다.
 
 | # | 입력 | 기대 | 결과 |
 |---|---|---|---|
-| B-1 | QUESTION 유도 | `waiting_for_user` · runId 발급 | PENDING |
-| B-2 | 짧은 답 "게보린" | **같은 runId** · 대상(약학정보원) 상속 · 재관찰 후 전진 | PENDING |
-| H1 | 약학정보원에서 아모디핀 검색해줘 | 기존 Candidate `replay=completed` | PENDING |
-| A | 약학정보원에서 내가 먹을 약 검색해줘 | **입력·클릭 전** QUESTION(행동 0) · Candidate 결과 미기록 | PENDING |
-| H 회귀 | G/H 기존 흐름 | 결과 동일 | PENDING |
-| 안전 회귀 | TAKEOVER 재개 불가 · Cloud 저장 경계 | 변화 없음 | PENDING |
+| B-1 | QUESTION 유도 | `waiting_for_user` · runId 발급 | **PASS** (A 실행이 겸함 — run `g_muovtsol` 발급 · `needs_user`) |
+| B-2 | 짧은 답 "게보린" | **같은 runId** · 대상(약학정보원) 상속 · 재관찰 후 전진 | **PASS** — 같은 run `g_muovtsol` 이 completed · modality reason `target_hint` · 기존 탭 재사용 · 재관찰 → 입력 → 클릭 → 결과 8건 · 행동 2 · AI 계획 2 |
+| H1 | 약학정보원에서 아모디핀 검색해줘 | 기존 Candidate `replay=completed` | 보류 |
+| A | 약학정보원에서 내가 먹을 약 검색해줘 | **입력·클릭 전** QUESTION(행동 0) · Candidate 결과 미기록 | **PASS** — `workflow preflight result=ambiguous` · actionCount 0 · aiPlanCount 0 · Candidate 2건 success/failure 9/30 값 불변 |
+| C | 일시적 재개 실패 뒤 runId 유지 | 앵커 유지 · 다음 답으로 같은 run 재개 | 보류 |
+| H 회귀 | G/H 기존 흐름 | 결과 동일 | 보류 |
+| 안전 회귀 | TAKEOVER 재개 불가 · Cloud 저장 경계 | 변화 없음 | 보류 |
+
+- 선행 조치: Chrome 확장 미연결(`extension_not_connected`)로 첫 A 시도 BLOCKED — native host 가 agent 보다 먼저 떠서 relay 에 한 번만 붙고 재시도하지 않는 구조(`bridge-relay.mjs` `connectBridgeRelay`). agent 실행 후 확장 새로고침으로 해소. 재시도 부재는 사용성 결함으로 기록만(별도 WO).
+- 관찰: B 재개 run 은 Candidate `skipped` · `local_work_run_steps` 0행(재개 run 은 학습 대상 아님으로 보임). 판정 영향 없음.
+
+#### 3-0. 실행 시간 실측 (2026-10-01, read-only — api 로그 + local.db)
+
+| run | 구간 | 시간 | 구성 |
+|---|---|---|---|
+| A | 요청 → 응답 | **30.36 s** | Local 명령 6(탭 준비 · 원장 upsert · get_context · inspect · candidate_match · set_status) ≈ 30.3 s · AI 0 |
+| B | 요청 → 응답 | **48.69 s** | Local 명령 9 = 44.0 s · AI 계획 2 ≈ 8.0 s(5.1 + 2.9) · 이동 settle 0.7 s |
+
+- 명령당 PC 실처리는 수십~수백 ms. 명령당 ≈5.1 s 는 agent 의 **고정 5 s heartbeat 대기**(`POLL_INTERVAL_MS`) — 서버는 명령을 순차로 내려보내므로 명령마다 최대 5 s 공백.
+- 2순위 AI ≈8 s · 관찰 2명령(get_context + inspect) · 원장 명령 별도 dispatch 는 후속 후보(이번 범위 밖).
+- 조치: [`WO-O4O-LOCAL-AGENT-COMMAND-POLLING-LATENCY-V1`](CHECK-O4O-LOCAL-AGENT-COMMAND-POLLING-LATENCY-V1.md) 로 분리 · 이 WO 의 나머지 smoke 보다 먼저.
 
 ### 3-1. 배포 시도 기록 (2026-09-30) — `DEPLOY_PAUSED` (사용자 지시: 배포 과정 정비 후 재개)
 

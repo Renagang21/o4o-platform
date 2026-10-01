@@ -29,10 +29,10 @@ import { automationSummary } from './windows-automation-safety.mjs';
 import { loadCredentials, saveCredentials, credentialsLocation } from './credentials.mjs';
 import { startLocalServer, LOCAL_AGENT_PORT } from './local-server.mjs';
 import { startBridgeRelay } from './bridge-relay.mjs';
+import { nextPollDelayMs } from './poll-schedule.mjs';
 
 const API_BASE = process.env.O4O_API_BASE || 'https://api.neture.co.kr';
-/** 명령을 물어보러 가는 주기. 짧으면 반응이 빠르고, 길면 조용하다. */
-const POLL_INTERVAL_MS = 5000;
+// 명령을 물어보러 가는 주기는 poll-schedule.mjs — 명령을 받은 직후엔 짧게, idle 이면 5 s.
 /** 연결이 끊겼을 때의 재시도 간격 (§32). 지수 백오프로 늘어난다. */
 const RECONNECT_MIN_MS = 3000;
 const RECONNECT_MAX_MS = 60000;
@@ -207,6 +207,8 @@ async function commandRun() {
   let sessionToken = null;
   let backoff = RECONNECT_MIN_MS;
   let running = true;
+  /** 마지막으로 명령을 받아 처리한 시각. 이것에서 멀어질수록 heartbeat 간격이 idle(5 s)로 돌아간다. */
+  let lastCommandAt = null;
 
   const stop = () => {
     if (!running) return;
@@ -267,8 +269,9 @@ async function commandRun() {
     for (const command of commands) {
       await handleCommand(command, context, sessionToken);
     }
+    if (commands.length > 0) lastCommandAt = Date.now();
 
-    await sleep(POLL_INTERVAL_MS);
+    await sleep(nextPollDelayMs(lastCommandAt, Date.now()));
   }
 }
 
