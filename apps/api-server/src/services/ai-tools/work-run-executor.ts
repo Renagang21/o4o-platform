@@ -18,6 +18,7 @@ import { awaitCommandResult, issueCommand } from '../local-agent/local-agent-ser
 import type { WorkRunStatus } from './work-run-coordination-service.js';
 import type { ReplayStep, WorkflowStep } from './workflow-candidate.js';
 import type { DataWorkRunExperienceRecordArgs } from './work-experience.js';
+import type { DataWorkRunAssistanceRecordArgs, DataWorkRunContextSaveArgs } from './work-assistance.js';
 
 const WORK_RUN_TOOL = 'work.run.ledger';
 
@@ -128,6 +129,46 @@ export async function issueWorkRunExperienceRecord(
   args: DataWorkRunExperienceRecordArgs,
 ): Promise<WorkRunLedgerResult> {
   return issue(dataSource, ctx.userId, ctx.deviceId, LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_EXPERIENCE_RECORD, args as unknown as Record<string, unknown>);
+}
+
+// ─── User Assistance · Correction (WO-O4O-AUTOMATION-USER-ASSISTANCE-AND-CORRECTION-V1 · Phase 2) ──────
+//   QUESTION 시점 원래 업무 구조 저장 · 재개 시 recall · 도움/교정 기록 · D1 질의형 recall(Task × Target).
+//   read-back 은 구조(task · stage · ask · 방법)와 재생 단계뿐 — 원래 요청 문장 · 답변 원문은 돌아오지 않는다.
+
+export async function issueWorkRunContextSave(
+  dataSource: DataSource,
+  ctx: { userId: string; deviceId: string },
+  args: DataWorkRunContextSaveArgs,
+): Promise<WorkRunLedgerResult> {
+  return issue(dataSource, ctx.userId, ctx.deviceId, LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_CONTEXT_SAVE, args as unknown as Record<string, unknown>);
+}
+
+/** slotValue 는 막힌 재생 단계를 채우는 데만 쓰인다(Local 미저장). */
+export async function issueWorkRunContextRecall(
+  dataSource: DataSource,
+  ctx: { userId: string; deviceId: string },
+  input: { runId: string; targetId: string; slotValue: string | null },
+): Promise<WorkRunLedgerResult> {
+  return issue(dataSource, ctx.userId, ctx.deviceId, LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_CONTEXT_RECALL, {
+    runId: input.runId, targetId: input.targetId, slotValue: input.slotValue,
+  });
+}
+
+export async function issueWorkRunAssistanceRecord(
+  dataSource: DataSource,
+  ctx: { userId: string; deviceId: string },
+  args: DataWorkRunAssistanceRecordArgs,
+): Promise<WorkRunLedgerResult> {
+  return issue(dataSource, ctx.userId, ctx.deviceId, LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_ASSISTANCE_RECORD, args as unknown as Record<string, unknown>);
+}
+
+/** taskKey null → 대상의 업무 키 목록 · taskKey → 그 업무의 verified Preferred/Avoid. */
+export async function issueExperienceRecall(
+  dataSource: DataSource,
+  ctx: { userId: string; deviceId: string },
+  input: { targetId: string; taskKey: string | null },
+): Promise<WorkRunLedgerResult> {
+  return issue(dataSource, ctx.userId, ctx.deviceId, LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_EXPERIENCE_RECALL, { targetId: input.targetId, taskKey: input.taskKey });
 }
 
 /**

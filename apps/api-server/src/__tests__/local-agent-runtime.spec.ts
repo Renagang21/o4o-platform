@@ -601,6 +601,8 @@ describe('15~16. 원격 제어 수단이 존재하지 않는다', () => {
       './local-db.mjs',
       // LOCAL-DATA-RUNTIME V1: health 의 백업 요약(개수·최근 시각)만 — 이 모듈의 fs 는 자기 backups/ 디렉터리에 한정된다.
       './local-db-backup.mjs',
+      // USER-ASSISTANCE-AND-CORRECTION-V1: 도움·교정 기록 인자 경계 검사(순수 — local-db·work-target 만 import).
+      './work-assistance.mjs',
       // WORK-TARGET-DISCOVERY-V0: 대상 발견·활성화 계층(순수 — 창 제어 모듈과 bridge 를 통해서만 밖에 닿는다).
       './work-target.mjs',
       // WINDOWS-UI-AUTOMATION-V0: UIA 실행층(순수 — 창 제어 모듈의 단일 execFile 지점을 통해서만 밖에 닿는다).

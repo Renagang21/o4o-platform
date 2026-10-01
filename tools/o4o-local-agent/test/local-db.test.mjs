@@ -469,3 +469,176 @@ test('Experience: 민감 sentinel 이 어디에도 저장되지 않는다 · Can
   // experience 단계는 Candidate 저장의 run 단계 원장에 섞이지 않는다.
   assert.equal(h.prepare("SELECT COUNT(*) AS n FROM local_work_run_steps WHERE run_id LIKE 'g_exp%'").get().n, 0);
 });
+
+// ─── Assistance · Correction (WO-O4O-AUTOMATION-USER-ASSISTANCE-AND-CORRECTION-V1 · Phase 2) ──────
+// 원래 업무 구조(context) · 도움/교정 원장 · 검증된 Preferred/Avoid · 최소 recall. 원문 · slot 값은 어디에도 남지 않는다.
+
+const asEvent = (over = {}) => ({
+  kind: 'assistance', stageKey: 'search_input', askKind: 'value_confirmation', providedKind: 'value', structured: { slots: ['drug_name'] },
+  resolution: 'resolved', progressedSteps: 2, reusability: 'per_run_value', correction: null,
+  validation: { result: 'not_verified', evidence: null }, ...over,
+});
+
+test('Phase 2 fixture A(값 확인): context 저장 → 재개 recall 이 원래 요청으로 Candidate 를 다시 대조해 막힌 자리만 채운다', async () => {
+  const saved = await handlers.runAction('local.data.work_run_candidate_save', {}, {
+    runId: 'g_as_src', targetId: 'healthkr', template: '약학정보원에서 {{1}} 검색해줘', steps: WF_STEPS,
+  });
+  assert.equal(saved.status, 'success');
+  const candidateId = saved.data.candidateId;
+  // 원래 요청 — 불특정 표현. run 원장의 goal_summary(Phase 1 이전부터 있던 칸)에만 있다.
+  const up = await handlers.runAction('local.data.work_run_upsert', {}, { runId: 'g_as1', status: 'waiting_for_user', targetId: 'healthkr', goalSummary: '약학정보원에서 내가 먹을 약 검색해줘' });
+  assert.equal(up.status, 'success');
+  const ctx = await handlers.runAction('local.data.work_run_context_save', {}, {
+    runId: 'g_as1', targetId: 'healthkr', taskKey: 'drug_info.lookup', stageKey: 'search_input',
+    ask: { kind: 'value_confirmation', slots: ['drug_name'] }, strategy: { ops: [{ op: 'search' }] }, replay: { candidateId, stepIndex: 0 },
+  });
+  assert.equal(ctx.status, 'success');
+
+  const r = await handlers.runAction('local.data.work_run_context_recall', {}, { runId: 'g_as1', targetId: 'healthkr', slotValue: '게보린' });
+  assert.equal(r.status, 'success');
+  assert.equal(r.data.found, true);
+  assert.equal(r.data.taskKey, 'drug_info.lookup');
+  assert.deepEqual(r.data.ask, { kind: 'value_confirmation', slots: ['drug_name'] });
+  assert.equal(r.data.candidateId, candidateId);
+  assert.equal(r.data.steps[0].value, '게보린');
+  assert.equal(r.data.steps[1].actionKind, 'click');
+  // slot 없이 recall → 구조만(재생 단계 없음). 다른 대상으로는 찾지 못한다.
+  const bare = await handlers.runAction('local.data.work_run_context_recall', {}, { runId: 'g_as1', targetId: 'healthkr', slotValue: null });
+  assert.equal(bare.data.steps, undefined);
+  const other = await handlers.runAction('local.data.work_run_context_recall', {}, { runId: 'g_as1', targetId: 'naver', slotValue: null });
+  assert.notEqual(other.status === 'success' && other.data.found, true);
+
+  // 값 확인 도움 기록 — per_run_value · 패턴 없음.
+  const rec = await handlers.runAction('local.data.work_run_assistance_record', {}, { runId: 'g_as1', targetId: 'healthkr', taskKey: 'drug_info.lookup', event: asEvent() });
+  assert.equal(rec.status, 'success');
+  assert.equal(rec.data.patternCount, 0);
+  // 값 확인을 재사용 지식으로 올리려는 시도는 경계에서 거절한다.
+  const bad = await handlers.runAction('local.data.work_run_assistance_record', {}, { runId: 'g_as1', targetId: 'healthkr', taskKey: 'drug_info.lookup', event: asEvent({ reusability: 'reusable_knowledge' }) });
+  assert.equal(bad.status, 'denied');
+  const st = db.LocalWorkRunAssistanceRepository.get('g_as1');
+  assert.equal(st.assistance.length, 1);
+  assert.equal(st.assistance[0].reusability, 'per_run_value');
+  assert.equal(JSON.stringify(st).includes('게보린'), false);
+  assert.equal(JSON.stringify(st).includes('내가 먹을'), false);
+});
+
+test('Phase 2 fixture B(의미 교정 Task/Intent · Target): 교정으로 기록되지만 Preferred/Avoid 를 만들지 않는다', async () => {
+  for (const type of ['task_intent', 'target']) {
+    const r = await handlers.runAction('local.data.work_run_assistance_record', {}, {
+      runId: `g_cr_${type}`, targetId: 'healthkr', taskKey: 'drug_info.side_effect',
+      event: asEvent({
+        kind: 'correction', stageKey: 'search_result', askKind: 'success_confirmation', providedKind: 'correction', structured: null,
+        reusability: 'reusable_knowledge', validation: { result: 'verified', evidence: 'system_verified' },
+        correction: { type, reason: type === 'target' ? 'wrong_target' : 'wrong_intent', wrong: null, alternative: null },
+      }),
+    });
+    assert.equal(r.status, 'success');
+    assert.equal(r.data.patternCount, 0);
+    const c = db.LocalWorkRunAssistanceRepository.get(`g_cr_${type}`).corrections;
+    assert.equal(c.length, 1);
+    assert.equal(c[0].correction_type, type);
+  }
+  const rec = await handlers.runAction('local.data.work_run_experience_recall', {}, { targetId: 'healthkr', taskKey: 'drug_info.side_effect' });
+  assert.deepEqual(rec.data.patterns, []);
+});
+
+test('Phase 2 fixture D(health.kr 동일성분 · 방법 교정): 검증 전엔 패턴 없음 → 실제 성공 후 Preferred/Avoid · recall 은 verified 만', async () => {
+  const wrong = { ops: [{ op: 'extract_field' }, { op: 're_search' }] };
+  const altNoLabel = { ops: [{ op: 'search' }, { op: 'open_detail' }, { op: 'open_tab' }] };
+  const alt = { ops: [{ op: 'search' }, { op: 'open_detail' }, { op: 'open_tab', label: '동일성분' }] };
+  const corr = (validation, alternative) => asEvent({
+    kind: 'correction', stageKey: 'same_ingredient_search', askKind: 'success_confirmation', providedKind: 'correction', structured: null,
+    reusability: 'reusable_knowledge', validation, correction: { type: 'procedure_method', reason: 'site_feature_exists', wrong, alternative },
+  });
+  // 1) 교정만 받고 아직 검증 전 — label 없는 방법만 받고 패턴은 없다.
+  const pre = await handlers.runAction('local.data.work_run_assistance_record', {}, {
+    runId: 'g_d1', targetId: 'healthkr', taskKey: 'drug_info.same_ingredient', event: corr({ result: 'not_verified', evidence: null }, altNoLabel),
+  });
+  assert.equal(pre.status, 'success');
+  assert.equal(pre.data.patternCount, 0);
+  // 검증 전인데 label(화면 이름)을 실으면 거절.
+  const preLabel = await handlers.runAction('local.data.work_run_assistance_record', {}, {
+    runId: 'g_d1', targetId: 'healthkr', taskKey: 'drug_info.same_ingredient', event: corr({ result: 'not_verified', evidence: null }, alt),
+  });
+  assert.equal(preLabel.status, 'denied');
+  let recall = await handlers.runAction('local.data.work_run_experience_recall', {}, { targetId: 'healthkr', taskKey: 'drug_info.same_ingredient' });
+  assert.deepEqual(recall.data.patterns, []);
+
+  // 2) 대안으로 실제 성공 → verified → Preferred(대안) + Avoid(틀린 방법).
+  const ok = await handlers.runAction('local.data.work_run_assistance_record', {}, {
+    runId: 'g_d1', targetId: 'healthkr', taskKey: 'drug_info.same_ingredient', event: corr({ result: 'verified', evidence: 'system_verified' }, alt),
+  });
+  assert.equal(ok.data.patternCount, 2);
+  recall = await handlers.runAction('local.data.work_run_experience_recall', {}, { targetId: 'healthkr', taskKey: 'drug_info.same_ingredient' });
+  const byPol = Object.fromEntries(recall.data.patterns.map((p) => [p.polarity, p]));
+  assert.deepEqual(byPol.preferred.strategy, alt);
+  assert.deepEqual(byPol.avoid.strategy, wrong);
+  assert.equal(byPol.avoid.stageKey, 'same_ingredient_search');
+  // recall 은 구조만 — 출처 run · 시각 · pattern id 없음.
+  assert.equal(/g_d1|lp_|created_at|source_run/.test(JSON.stringify(recall.data)), false);
+  // 업무 키 목록에 나타난다. 다른 대상 · 다른 업무로 번지지 않는다.
+  const keys = await handlers.runAction('local.data.work_run_experience_recall', {}, { targetId: 'healthkr', taskKey: null });
+  assert.ok(keys.data.taskKeys.includes('drug_info.same_ingredient'));
+  const otherTask = await handlers.runAction('local.data.work_run_experience_recall', {}, { targetId: 'healthkr', taskKey: 'drug_info.lookup' });
+  assert.deepEqual(otherTask.data.patterns, []);
+
+  // 3) 같은 방법 재검증 → 같은 행의 verified_count 증가(중복 행 없음).
+  await handlers.runAction('local.data.work_run_assistance_record', {}, {
+    runId: 'g_d2', targetId: 'healthkr', taskKey: 'drug_info.same_ingredient', event: corr({ result: 'verified', evidence: 'system_verified' }, alt),
+  });
+  const h = db.openLocalDb();
+  const rows = h.prepare("SELECT polarity, verified_count FROM local_experience_patterns WHERE task_key='drug_info.same_ingredient' ORDER BY polarity").all();
+  assert.deepEqual(rows.map((x) => [x.polarity, x.verified_count]), [['avoid', 2], ['preferred', 2]]);
+  for (const t of ['local_work_run_assistance', 'local_work_run_corrections', 'local_experience_patterns', 'local_work_run_context']) {
+    assert.equal(JSON.stringify(h.prepare(`SELECT * FROM ${t}`).all()).includes('게보린'), false, t);
+  }
+});
+
+test('Phase 2: 메뉴 위치 도움(reusable · verified) → Preferred 경로 · 개인 선호는 패턴 없음', async () => {
+  const menuPath = { ops: [{ op: 'open_menu', label: '거래관리' }, { op: 'open_menu', label: '거래명세서' }] };
+  const r = await handlers.runAction('local.data.work_run_assistance_record', {}, {
+    runId: 'g_menu1', targetId: 'healthkr', taskKey: 'wholesale.statement_download',
+    event: asEvent({ stageKey: 'statement_menu', askKind: 'menu_location', providedKind: 'path', structured: { strategy: menuPath }, reusability: 'reusable_knowledge', validation: { result: 'verified', evidence: 'system_verified' } }),
+  });
+  assert.equal(r.status, 'success');
+  assert.equal(r.data.patternCount, 1);
+  const pref = await handlers.runAction('local.data.work_run_experience_recall', {}, { targetId: 'healthkr', taskKey: 'wholesale.statement_download' });
+  assert.deepEqual(pref.data.patterns.map((p) => [p.polarity, p.stageKey]), [['preferred', 'statement_menu']]);
+  const pp = await handlers.runAction('local.data.work_run_assistance_record', {}, {
+    runId: 'g_menu2', targetId: 'healthkr', taskKey: 'wholesale.vendor',
+    event: asEvent({ stageKey: 'vendor_choice', askKind: 'target_confirmation', providedKind: 'target', structured: null, reusability: 'personal_preference', validation: { result: 'verified', evidence: 'system_verified' } }),
+  });
+  assert.equal(pp.status, 'success');
+  assert.equal(pp.data.patternCount, 0);
+});
+
+test('Phase 2 경계: 정해진 키 · 어휘 · 형식 밖 인자는 거절 · sentinel 미저장', async () => {
+  const base = { runId: 'g_bad', targetId: 'healthkr', taskKey: 'drug_info.lookup' };
+  const corrEv = (correction, extra = {}) => asEvent({ kind: 'correction', providedKind: 'correction', askKind: 'success_confirmation', structured: null, reusability: 'reusable_knowledge', correction, ...extra });
+  const bad = [
+    ['local.data.work_run_assistance_record', { ...base, event: asEvent({ answer: 'SENTINEL_ANSWER' }) }],
+    ['local.data.work_run_assistance_record', { ...base, answer: 'SENTINEL_ANSWER', event: asEvent() }],
+    ['local.data.work_run_assistance_record', { ...base, taskKey: 'SENTINEL 값', event: asEvent() }],
+    ['local.data.work_run_assistance_record', { ...base, event: asEvent({ stageKey: 'SENTINEL_STAGE 값' }) }],
+    ['local.data.work_run_assistance_record', { ...base, event: asEvent({ structured: { slots: ['drug_name'], value: 'SENTINEL_VALUE' } }) }],
+    ['local.data.work_run_assistance_record', { ...base, event: corrEv({ type: 'procedure_method', reason: null, wrong: { ops: [{ op: 'run_sql' }] }, alternative: null }) }],
+    ['local.data.work_run_assistance_record', { ...base, event: corrEv({ type: 'procedure_method', reason: null, wrong: null, alternative: { ops: [{ op: 'open_tab', label: '<b>SENTINEL</b>' }] } }, { validation: { result: 'verified', evidence: 'system_verified' } }) }],
+    ['local.data.work_run_assistance_record', { ...base, event: corrEv({ type: 'procedure_method', reason: null, wrong: { ops: [{ op: 'open_tab', label: 'SENTINEL' }] }, alternative: null }) }],
+    ['local.data.work_run_assistance_record', { ...base, event: corrEv({ type: 'procedure_method', reason: 'SENTINEL', wrong: null, alternative: null }) }],
+    ['local.data.work_run_assistance_record', { ...base, event: corrEv({ type: 'procedure_method', reason: null, wrong: null, alternative: null, note: 'SENTINEL' }) }],
+    ['local.data.work_run_assistance_record', { ...base, targetId: 'not_registered', event: asEvent() }],
+    ['local.data.work_run_context_save', { runId: 'g_bad', targetId: 'healthkr', taskKey: null, stageKey: null, ask: null, strategy: null, replay: null, goal: 'SENTINEL_GOAL' }],
+    ['local.data.work_run_context_save', { runId: 'g_bad', targetId: 'healthkr', taskKey: null, stageKey: null, ask: { kind: 'value_confirmation', slots: ['SENTINEL 값'] }, strategy: null, replay: null }],
+    ['local.data.work_run_context_save', { runId: 'g_bad', targetId: 'healthkr', taskKey: null, stageKey: null, ask: null, strategy: { ops: [{ op: 'search', label: 'SENTINEL' }] }, replay: null }],
+    ['local.data.work_run_context_recall', { runId: 'g_bad', targetId: 'healthkr', slotValue: '<script>SENTINEL' }],
+    ['local.data.work_run_experience_recall', { targetId: 'healthkr', taskKey: 'SELECT * FROM' }],
+    ['local.data.work_run_experience_recall', { targetId: 'healthkr' }],
+  ];
+  for (const [action, args] of bad) {
+    const r = await handlers.runAction(action, {}, args);
+    assert.equal(r.status, 'denied', `${action} ${JSON.stringify(args).slice(0, 200)}`);
+  }
+  const h = db.openLocalDb();
+  const tables = h.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name LIKE 'local%'").all().map((t) => t.name);
+  for (const t of tables) assert.equal(/SENTINEL/.test(JSON.stringify(h.prepare(`SELECT * FROM ${t}`).all())), false, t);
+});

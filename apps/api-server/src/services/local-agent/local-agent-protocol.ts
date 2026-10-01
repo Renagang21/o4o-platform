@@ -44,6 +44,18 @@ import {
 } from '../ai-tools/workflow-candidate.js';
 import { validateWorkExperienceRecordShape, type DataWorkRunExperienceRecordArgs } from '../ai-tools/work-experience.js';
 import {
+  pickRecalledContext,
+  pickSafeExperienceRecall,
+  validateAssistanceRecordShape,
+  validateContextRecallShape,
+  validateContextSaveShape,
+  validateExperienceRecallShape,
+  type DataExperienceRecallArgs,
+  type DataWorkRunAssistanceRecordArgs,
+  type DataWorkRunContextRecallArgs,
+  type DataWorkRunContextSaveArgs,
+} from '../ai-tools/work-assistance.js';
+import {
   COMPUTER_ALLOWED_KEYS,
   validateClickArgs,
   validateKeyArgs,
@@ -152,6 +164,15 @@ export const LOCAL_AGENT_ACTIONS = {
   // ── Local Experience 최소 저장 (WO-O4O-AUTOMATION-LOCAL-EXPERIENCE-MINIMUM-STORAGE-V1 · EXPERIENCE-MODEL-V1) ──
   /** run segment 1개의 구조화 Experience(Run · Step · Failure · Metric · Outcome)를 기록한다. write only — 결과는 확인 건수만. */
   DATA_WORK_RUN_EXPERIENCE_RECORD: 'local.data.work_run_experience_record',
+  // ── User Assistance · Correction (WO-O4O-AUTOMATION-USER-ASSISTANCE-AND-CORRECTION-V1 · EXPERIENCE-MODEL-V1 Phase 2) ──
+  /** QUESTION 시점의 원래 업무 구조(task · stage · ask · 방법 · 재생 위치)를 저장한다. 원문 · 값 없음. */
+  DATA_WORK_RUN_CONTEXT_SAVE: 'local.data.work_run_context_save',
+  /** 재개 시 같은 run 의 원래 업무 구조를 돌려준다. slotValue 가 있으면 막힌 재생 단계만 그 값으로 채운다(저장 안 함). */
+  DATA_WORK_RUN_CONTEXT_RECALL: 'local.data.work_run_context_recall',
+  /** 도움 · 교정 이벤트 1건(구조)을 기록한다. 검증된 reusable 방법만 Local Preferred/Avoid 가 된다. */
+  DATA_WORK_RUN_ASSISTANCE_RECORD: 'local.data.work_run_assistance_record',
+  /** D1 질의형 recall — 대상의 업무 키 목록 또는 Task × Target 의 verified Preferred/Avoid 만. dump 없음. */
+  DATA_WORK_RUN_EXPERIENCE_RECALL: 'local.data.work_run_experience_recall',
 } as const;
 
 export type LocalAgentAction = (typeof LOCAL_AGENT_ACTIONS)[keyof typeof LOCAL_AGENT_ACTIONS];
@@ -277,6 +298,10 @@ export const DATA_TARGET_ACTIONS: readonly string[] = Object.freeze([
   LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_CANDIDATE_MATCH,
   LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_CANDIDATE_RESULT,
   LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_EXPERIENCE_RECORD,
+  LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_CONTEXT_SAVE,
+  LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_CONTEXT_RECALL,
+  LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_ASSISTANCE_RECORD,
+  LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_EXPERIENCE_RECALL,
 ]);
 
 /**
@@ -466,7 +491,11 @@ export type DataActionArgs =
   | DataWorkRunCandidateSaveArgs
   | DataWorkRunCandidateMatchArgs
   | DataWorkRunCandidateResultArgs
-  | DataWorkRunExperienceRecordArgs;
+  | DataWorkRunExperienceRecordArgs
+  | DataWorkRunContextSaveArgs
+  | DataWorkRunContextRecallArgs
+  | DataWorkRunAssistanceRecordArgs
+  | DataExperienceRecallArgs;
 
 /** Candidate id — Local 이 발급(`wc_` + 소문자·숫자). */
 const LOCAL_WORKFLOW_CANDIDATE_ID_RE = /^wc_[a-z0-9]{6,32}$/;
@@ -526,6 +555,28 @@ export function validateDataWorkRunExperienceRecordArgs(args: unknown): { ok: bo
   const r = validateWorkExperienceRecordShape(args);
   if (!r.ok || !r.args) return { ok: false };
   if (!isValidLocalWorkRunId(r.args.runId) || !isRegisteredWorkTarget(r.args.target.targetId)) return { ok: false };
+  return { ok: true, args: r.args };
+}
+
+/** Phase 2 형상(work-assistance.ts) + runId 형식 · 대상 등재. */
+export function validateDataWorkRunContextSaveArgs(args: unknown): { ok: boolean; args?: DataWorkRunContextSaveArgs } {
+  const r = validateContextSaveShape(args);
+  if (!r.ok || !r.args || !isValidLocalWorkRunId(r.args.runId) || !isRegisteredWorkTarget(r.args.targetId)) return { ok: false };
+  return { ok: true, args: r.args };
+}
+export function validateDataWorkRunContextRecallArgs(args: unknown): { ok: boolean; args?: DataWorkRunContextRecallArgs } {
+  const r = validateContextRecallShape(args);
+  if (!r.ok || !r.args || !isValidLocalWorkRunId(r.args.runId) || !isRegisteredWorkTarget(r.args.targetId)) return { ok: false };
+  return { ok: true, args: r.args };
+}
+export function validateDataWorkRunAssistanceRecordArgs(args: unknown): { ok: boolean; args?: DataWorkRunAssistanceRecordArgs } {
+  const r = validateAssistanceRecordShape(args);
+  if (!r.ok || !r.args || !isValidLocalWorkRunId(r.args.runId) || !isRegisteredWorkTarget(r.args.targetId)) return { ok: false };
+  return { ok: true, args: r.args };
+}
+export function validateDataExperienceRecallArgs(args: unknown): { ok: boolean; args?: DataExperienceRecallArgs } {
+  const r = validateExperienceRecallShape(args);
+  if (!r.ok || !r.args || !isRegisteredWorkTarget(r.args.targetId)) return { ok: false };
   return { ok: true, args: r.args };
 }
 
@@ -674,6 +725,22 @@ export function validateLocalCommandArgs(
   }
   if (base === LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_EXPERIENCE_RECORD) {
     const r = validateDataWorkRunExperienceRecordArgs(args);
+    return r.ok && r.args ? { ok: true, args: r.args } : { ok: false };
+  }
+  if (base === LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_CONTEXT_SAVE) {
+    const r = validateDataWorkRunContextSaveArgs(args);
+    return r.ok && r.args ? { ok: true, args: r.args } : { ok: false };
+  }
+  if (base === LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_CONTEXT_RECALL) {
+    const r = validateDataWorkRunContextRecallArgs(args);
+    return r.ok && r.args ? { ok: true, args: r.args } : { ok: false };
+  }
+  if (base === LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_ASSISTANCE_RECORD) {
+    const r = validateDataWorkRunAssistanceRecordArgs(args);
+    return r.ok && r.args ? { ok: true, args: r.args } : { ok: false };
+  }
+  if (base === LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_EXPERIENCE_RECALL) {
+    const r = validateDataExperienceRecallArgs(args);
     return r.ok && r.args ? { ok: true, args: r.args } : { ok: false };
   }
   if (base === LOCAL_AGENT_ACTIONS.COMPUTER_CLICK) {
@@ -1232,7 +1299,7 @@ export function pickSafeCaptureResultData(data: unknown): Record<string, unknown
 // 여전히 경로 · 파일명 · 행 데이터는 없다 — 상태 enum · 정수 · ISO 시각뿐.
 const SAFE_DATA_INFO_STRING_FIELDS: readonly string[] = Object.freeze(['key', 'value', 'migrationStatus', 'integrityStatus', 'lastBackupAt']);
 const SAFE_DATA_INFO_BOOLEAN_FIELDS: readonly string[] = Object.freeze(['ok', 'saved', 'ready']);
-const SAFE_DATA_INFO_NUMBER_FIELDS: readonly string[] = Object.freeze(['schemaVersion', 'latestMigration', 'pendingMigrations', 'backupCount']);
+const SAFE_DATA_INFO_NUMBER_FIELDS: readonly string[] = Object.freeze(['schemaVersion', 'latestMigration', 'pendingMigrations', 'backupCount', 'seq', 'patternCount']);
 const SAFE_DATA_MIGRATION_STATUS: readonly string[] = Object.freeze(['current', 'behind', 'failed', 'too_new']);
 const SAFE_DATA_INTEGRITY_STATUS: readonly string[] = Object.freeze(['ok', 'failed', 'unknown']);
 const ISO_INSTANT_RE = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?Z$/;
@@ -1279,6 +1346,22 @@ export function pickSafeWorkflowMatchInfo(data: unknown): Record<string, unknown
   const steps = validateReplaySteps(src.steps);
   if (!steps) return { matched: false };
   return { matched: true, candidateId: src.candidateId, steps };
+}
+
+/**
+ * `local.data.work_run_context_recall` 응답 화이트리스트 — 구조(task · stage · ask · 방법) + 재생 단계(형상 통과 시)만.
+ * 원래 요청 문장 · 템플릿 · 시각은 통과하지 않는다.
+ */
+export function pickSafeContextRecallInfo(data: unknown): Record<string, unknown> {
+  const c = pickRecalledContext(data);
+  if (!c.found) return { found: false };
+  const out: Record<string, unknown> = { found: true, taskKey: c.taskKey, stageKey: c.stageKey, ask: c.ask, strategy: c.strategy };
+  const steps = c.candidateId ? validateReplaySteps(c.steps) : null;
+  if (c.candidateId && steps) {
+    out.candidateId = c.candidateId;
+    out.steps = steps;
+  }
+  return out;
 }
 
 /**
@@ -1386,6 +1469,12 @@ export function pickSafeResultData(action: string, data: unknown): Record<string
   }
   if (base === LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_CANDIDATE_MATCH) {
     return pickSafeWorkflowMatchInfo(data);
+  }
+  if (base === LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_CONTEXT_RECALL) {
+    return pickSafeContextRecallInfo(data);
+  }
+  if (base === LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_EXPERIENCE_RECALL) {
+    return pickSafeExperienceRecall(data);
   }
   if (DATA_TARGET_ACTIONS.includes(base)) {
     return pickSafeDataInfo(data);

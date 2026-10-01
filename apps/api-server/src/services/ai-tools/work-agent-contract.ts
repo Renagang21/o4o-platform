@@ -57,6 +57,16 @@ import {
   type RecoveryUsageFields,
 } from './automation-recovery-contract.js';
 import { findWindowsApp } from '../local-agent/windows-app-registry.js';
+import {
+  sanitizeAsk,
+  sanitizeStageKey,
+  sanitizeStrategy,
+  sanitizeTaskKey,
+  sanitizeUserInput,
+  type ProposalAsk,
+  type ProposalUserInput,
+  type Strategy,
+} from './work-assistance.js';
 import { COMPUTER_ALLOWED_KEYS, textDenyReason as computerTextDenyReason } from '../local-agent/computer-use-contract.js';
 
 // ─── Goal (§5) ──────────────────────────────────────────────────────────────
@@ -254,6 +264,17 @@ export interface WorkProposal {
   rationale?: string;
   /** 지금 필요한 사용자 입력이 무엇인지(§11 need-based). */
   neededInput?: string;
+  // ── Phase 2 업무 구조 선언(WO-O4O-AUTOMATION-USER-ASSISTANCE-AND-CORRECTION-V1). 선택 · 잘못되면 그 칸만 버린다. ──
+  /** 업무 키(snake_case 점 표기, 예: drug_info.same_ingredient). 값이 들어갈 수 없는 형식. */
+  task?: string;
+  /** 지금 단계 키(snake_case). */
+  stage?: string;
+  /** 이번 단계에서 쓰려는 방법(op 어휘 나열). Avoid 대조 대상. */
+  strategy?: Strategy;
+  /** 질문(needs_user)일 때 무엇을 묻는가 + 채울 자리 키. */
+  ask?: ProposalAsk;
+  /** 사용자 입력(재개 답변 · 요청 안의 방법 지시)을 분류한 구조. 원문 없음. */
+  userInput?: ProposalUserInput;
 }
 
 export type ProposalRejectReason =
@@ -270,7 +291,9 @@ export type ProposalRejectReason =
   | 'KEY_INVALID'
   | 'USER_ACTION_WINDOW'
   | 'WINDOW_NOT_NAMED_IN_GOAL'
-  | 'SAFETY_REJECT';
+  | 'SAFETY_REJECT'
+  /** 이 Task × Target × stage 에서 검증된 Avoid 방법을 다시 쓰려 했다(Phase 2 §7-6). runtime 이 판정한다. */
+  | 'AVOID_PATTERN';
 
 /** URL · selector · JS · shell · credential 을 실어 오는 키 — 있으면 proposal 전체를 거절한다(§10·§47). */
 export const FORBIDDEN_PROPOSAL_KEYS: readonly string[] = Object.freeze([
@@ -443,7 +466,11 @@ function validateSingleAction(act: Record<string, unknown>, observation: WorkObs
  *   - `action` 하나를 validateSingleAction 으로 검증한다.
  *   - `actions`(배치, §7 Fast Loop)가 있으면 각 항목을 같은 규칙으로 검증한다 — 실행 행동만, 최대 WORK_BATCH_MAX.
  */
-export function validateWorkProposal(raw: unknown, observation: WorkObservation | null): { ok: boolean; proposal?: WorkProposal; reason?: ProposalRejectReason } {
+export function validateWorkProposal(
+  raw: unknown,
+  observation: WorkObservation | null,
+  meta: { forbiddenValues?: readonly string[] } = {},
+): { ok: boolean; proposal?: WorkProposal; reason?: ProposalRejectReason } {
   if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return { ok: false, reason: 'SHAPE' };
   if (hasForbiddenKey(raw)) return { ok: false, reason: 'FORBIDDEN_KEY' };
   const r = raw as Record<string, unknown>;
@@ -471,6 +498,22 @@ export function validateWorkProposal(raw: unknown, observation: WorkObservation 
     }
     out.batch = batch;
   }
+  // Phase 2 업무 구조 — 형식 밖이면 그 칸만 버린다(실행 행동 검증과 무관 · proposal 거절 사유가 아니다).
+  // label 에는 이번 run 의 입력값(사용자 답변 · 입력/선택 텍스트)이 들어갈 수 없다.
+  const forbidden = [
+    ...(meta.forbiddenValues ?? []),
+    ...[out.action, ...(out.batch ?? [])].flatMap((x) => [x.text, x.option]).filter((v): v is string => typeof v === 'string'),
+  ];
+  const task = sanitizeTaskKey(r.task);
+  if (task) out.task = task;
+  const stage = sanitizeStageKey(r.stage);
+  if (stage) out.stage = stage;
+  const strategy = sanitizeStrategy(r.strategy, forbidden);
+  if (strategy) out.strategy = strategy;
+  const ask = sanitizeAsk(r.ask);
+  if (ask) out.ask = ask;
+  const userInput = sanitizeUserInput(r.userInput, forbidden);
+  if (userInput) out.userInput = userInput;
   return { ok: true, proposal: out };
 }
 
@@ -534,6 +577,8 @@ export interface WorkAgentState {
   takeover: { reason: TakeoverReason; step: number } | null;
   /** 실패→복구 계층 상태(WO-O4O-AUTOMATION-FAILURE-ESCALATION). 요청 안에서만 산다. */
   recovery: RecoveryState;
+  /** 이번 요청에서 분류된 사용자 교정 수(Phase 2 · 구조 분류 기준). */
+  userCorrectionCount?: number;
   startedAt: number;
 }
 
@@ -562,7 +607,7 @@ export interface WorkAgentUsageEvent extends RecoveryUsageFields {
   aiPlanCount: number;
   takeoverReason: TakeoverReason | null;
   takeoverStep: number | null;
-  /** V0 는 클라이언트가 보고하지 않으므로 0. 계약만 둔다(§22). */
+  /** Phase 2: runtime 이 사용자 입력을 교정(kind=correction)으로 분류한 수. 그 밖에는 0. */
   userCorrectionCount: number;
   completionState: WorkProgress;
   durationMs: number;
@@ -582,7 +627,7 @@ export function buildWorkAgentUsageEvent(
     aiPlanCount: state.aiPlanCount,
     takeoverReason: state.takeover?.reason ?? null,
     takeoverStep: state.takeover?.step ?? null,
-    userCorrectionCount: 0,
+    userCorrectionCount: state.userCorrectionCount ?? 0,
     completionState: state.progress,
     durationMs: Math.max(0, now.getTime() - state.startedAt),
     timestamp: now.toISOString(),

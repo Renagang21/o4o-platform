@@ -43,8 +43,9 @@ import {
   validateKeyArgs,
   validateTextArgs,
 } from './computer-use-limits.mjs';
-import { LocalMetaRepository, LocalSettingsRepository, LocalWorkRunRepository, LocalWorkflowCandidateRepository, LocalWorkRunExperienceRepository, LocalDatasetRepository, DATASET_NAME_RE, FIELD_NAME_RE, WORK_RUN_ID_RE, WORK_RUN_STATUSES, WORKFLOW_CANDIDATE_ID_RE, localDbHealth, LocalDbError } from './local-db.mjs';
+import { LocalMetaRepository, LocalSettingsRepository, LocalWorkRunRepository, LocalWorkflowCandidateRepository, LocalWorkRunExperienceRepository, LocalWorkRunContextRepository, LocalWorkRunAssistanceRepository, LocalExperiencePatternRepository, LocalDatasetRepository, DATASET_NAME_RE, FIELD_NAME_RE, WORK_RUN_ID_RE, WORK_RUN_STATUSES, WORKFLOW_CANDIDATE_ID_RE, localDbHealth, LocalDbError } from './local-db.mjs';
 import { backupSummary } from './local-db-backup.mjs';
+import { validateContextSaveArgs, validateContextRecallArgs, validateAssistanceRecordArgs, validateExperienceRecallArgs } from './work-assistance.mjs';
 import { prepareTarget, resolveRegisteredTarget } from './work-target.mjs';
 import { uiaInspect, uiaSetValue, uiaInvoke, uiaKey, uiaClick } from './windows-uia.mjs';
 import {
@@ -106,6 +107,11 @@ export const ACTIONS = {
   DATA_WORK_RUN_CANDIDATE_MATCH: 'local.data.work_run_candidate_match',
   DATA_WORK_RUN_CANDIDATE_RESULT: 'local.data.work_run_candidate_result',
   DATA_WORK_RUN_EXPERIENCE_RECORD: 'local.data.work_run_experience_record',
+  // WO-O4O-AUTOMATION-USER-ASSISTANCE-AND-CORRECTION-V1 (Experience Model V1 Phase 2)
+  DATA_WORK_RUN_CONTEXT_SAVE: 'local.data.work_run_context_save',
+  DATA_WORK_RUN_CONTEXT_RECALL: 'local.data.work_run_context_recall',
+  DATA_WORK_RUN_ASSISTANCE_RECORD: 'local.data.work_run_assistance_record',
+  DATA_WORK_RUN_EXPERIENCE_RECALL: 'local.data.work_run_experience_recall',
 };
 
 /**
@@ -1066,6 +1072,39 @@ function dataExperienceRecord(args) {
   };
 }
 
+// ─── Assistance · Correction (WO-O4O-AUTOMATION-USER-ASSISTANCE-AND-CORRECTION-V1) ──────
+// 형상 검사는 work-assistance.mjs. 응답에는 확인값 · 구조만 담는다(원문 · 값 · 출처 run · 시각 없음).
+
+/** `local.data.work_run_context_save` — QUESTION 시점 원래 업무 구조. */
+function dataContextSave(args) {
+  LocalWorkRunContextRepository.save(args);
+  return { status: 'success', data: { saved: true, runId: args.runId } };
+}
+
+/** `local.data.work_run_context_recall` — 같은 run 의 원래 업무 구조(+ 막힌 자리를 채운 재생 단계). */
+function dataContextRecall(args) {
+  const r = LocalWorkRunContextRepository.recall(args);
+  if (!r.found) return { status: 'success', data: { found: false } };
+  const data = { found: true, taskKey: r.taskKey, stageKey: r.stageKey, ask: r.ask, strategy: r.strategy };
+  if (r.replaySteps) {
+    data.candidateId = r.replayCandidateId;
+    data.steps = r.replaySteps;
+  }
+  return { status: 'success', data };
+}
+
+/** `local.data.work_run_assistance_record` — 도움 · 교정 기록 + 검증된 Preferred/Avoid. */
+function dataAssistanceRecord(args) {
+  const r = LocalWorkRunAssistanceRepository.record(args);
+  return { status: 'success', data: { saved: r.recorded, seq: r.seq, patternCount: r.patternCount } };
+}
+
+/** `local.data.work_run_experience_recall` — 최소 recall(업무 키 목록 또는 한 Task × Target 의 verified 패턴). */
+function dataExperienceRecall(args) {
+  const r = LocalExperiencePatternRepository.recall(args);
+  return { status: 'success', data: args.taskKey ? { patterns: r.patterns } : { taskKeys: r.taskKeys } };
+}
+
 /** work_run_set_status 인자 검사 — `{ runId, status, note? }`. */
 function validateWorkRunSetStatusArgs(args) {
   if (!args || typeof args !== 'object' || Array.isArray(args)) return { ok: false };
@@ -1160,6 +1199,10 @@ const DATA_HANDLERS = {
   [ACTIONS.DATA_WORK_RUN_CANDIDATE_MATCH]: { validate: validateCandidateMatchArgs, run: (args) => dataCandidateMatch(args) },
   [ACTIONS.DATA_WORK_RUN_CANDIDATE_RESULT]: { validate: validateCandidateResultArgs, run: (args) => dataCandidateResult(args) },
   [ACTIONS.DATA_WORK_RUN_EXPERIENCE_RECORD]: { validate: validateExperienceRecordArgs, run: (args) => dataExperienceRecord(args) },
+  [ACTIONS.DATA_WORK_RUN_CONTEXT_SAVE]: { validate: validateContextSaveArgs, run: (args) => dataContextSave(args) },
+  [ACTIONS.DATA_WORK_RUN_CONTEXT_RECALL]: { validate: validateContextRecallArgs, run: (args) => dataContextRecall(args) },
+  [ACTIONS.DATA_WORK_RUN_ASSISTANCE_RECORD]: { validate: validateAssistanceRecordArgs, run: (args) => dataAssistanceRecord(args) },
+  [ACTIONS.DATA_WORK_RUN_EXPERIENCE_RECALL]: { validate: validateExperienceRecallArgs, run: (args) => dataExperienceRecall(args) },
 };
 
 /**
