@@ -5,7 +5,7 @@
 > 본 문서는 [IR-O4O-MYPAGE-VS-ACCOUNT-CENTER-CANONICAL-V1](../investigations/IR-O4O-MYPAGE-VS-ACCOUNT-CENTER-CANONICAL-V1.md) 의 **Option D** 채택을 baseline 으로 승격하여, 향후 web-account 에 비밀번호 / 프로필 / 서비스별 기능을 과도하게 추가하는 drift 를 방지한다.
 
 - **버전:** V1 (2026-05-24)
-- **상태:** Baseline (Locked) — **부분 갱신 2026-09-23**: `WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1` 로 password 인증이 은퇴해 §2 매트릭스의 비밀번호 2행을 정정했다. **canonical 위치 결정(Option D: web-account = 서비스 목록 + Handoff outbound 전용, 계정 관리는 각 service `/mypage`)은 불변**이며, 근거였던 "비밀번호가 서비스별" 논거만 소멸했다(결론은 그대로 — 인증 자체가 Google 단일이 되어 web-account 에 로그인/자격 UI 를 둘 이유가 더 없다). **부분 갱신 2026-09-29**: `WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1` 정책(§5 승인)으로 로그인이 **Google + 이메일·비밀번호 병행**이 되어 §2 비밀번호 2행 · 로그인 수단 행 · §4 원칙 2 를 다시 정정했다. 새 비밀번호는 `user_password_credentials`(users.id 1:1) 단일 경로이며 은퇴한 `service_credentials`·서비스별 password 의 부활이 아니다. Option D 결정은 그대로 불변이다(web-account 에 로그인/자격 UI 를 두지 않는다).
+- **상태:** Baseline (Locked) — **부분 갱신 2026-09-23**: `WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1` 로 password 인증이 은퇴해 §2 매트릭스의 비밀번호 2행을 정정했다. **canonical 위치 결정(Option D: web-account = 서비스 목록 + Handoff outbound 전용, 계정 관리는 각 service `/mypage`)은 불변**이며, 근거였던 "비밀번호가 서비스별" 논거만 소멸했다(결론은 그대로 — 인증 자체가 Google 단일이 되어 web-account 에 로그인/자격 UI 를 둘 이유가 더 없다). **부분 갱신 2026-09-29**: `WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1` 정책(§5 승인)으로 로그인이 **Google + 이메일·비밀번호 병행**이 되어 §2 비밀번호 2행 · 로그인 수단 행 · §4 원칙 2 를 다시 정정했다. 새 비밀번호는 `user_password_credentials`(users.id 1:1) 단일 경로이며 은퇴한 `service_credentials`·서비스별 password 의 부활이 아니다. Option D 결정은 그대로 불변이다(web-account 에 로그인/자격 UI 를 두지 않는다). 아래 이메일·비밀번호 관련 API 는 **승인된 계약**이며 구현은 PR #257 — 그 병합 · 배포 전 runtime 에는 없다.
 - **선행 산출물:** [IR-O4O-MYPAGE-VS-ACCOUNT-CENTER-CANONICAL-V1](../investigations/IR-O4O-MYPAGE-VS-ACCOUNT-CENTER-CANONICAL-V1.md)
 - **상위 SSOT:**
   - `CLAUDE.md` (사업 철학 priority chain)
@@ -42,7 +42,7 @@
 | 기능 | Identity Layer ([V3](../architecture/O4O-IDENTITY-ARCHITECTURE-V3.md) §1) | Canonical 위치 |
 |---|:---:|---|
 | 이름 / 닉네임 / 연락처 수정 | L1 Identity | **각 service `/mypage/profile`** (`PUT /users/profile`) |
-| 비밀번호 설정 / 변경 | L2 Auth Identity (계정 단위 · 서비스 무관) | **각 service `/mypage/settings`** (`POST /auth/password` · 로그인 상태 · 기존 비밀번호가 있으면 현재 비밀번호 필수, 없으면 Google 가입자도 비밀번호 수단을 **추가** — 같은 users.id, 병합 아님 · Admin / `platform:*` 역할은 거부). 은퇴한 `PUT /users/password`(serviceKey 별, 2026-09-23)는 복원하지 않는다. 2026-09-29 기준 API 만 있고 `/mypage/settings` UI 는 미구현(후속) |
+| 비밀번호 설정 / 변경 | L2 Auth Identity (계정 단위 · 서비스 무관) | **각 service `/mypage/settings`** (`POST /auth/password` · 로그인 상태 · 기존 비밀번호가 있으면 현재 비밀번호 필수, 없으면 Google 가입자도 비밀번호 수단을 **추가** — 같은 users.id, 병합 아님 · Admin / `platform:*` 역할은 거부). 은퇴한 `PUT /users/password`(serviceKey 별, 2026-09-23)는 복원하지 않는다. 구현 상태: API = PR #257(병합 · 배포 후 활성) · `/mypage/settings` UI = 미구현(후속) |
 | 비밀번호 재설정 (이메일) | L2 Auth Identity (계정 단위) | **각 service `/forgot-password` → `/reset-password`** (`POST /auth/password/forgot` — 존재 여부 비노출 · 재설정 메일은 비밀번호 수단이 있거나 이메일 인증된 계정에만 발송 / `POST /auth/password/reset` — 30분 · 1회용 토큰, 성공 시 전역 세션 폐기) · Admin / `platform:*` 대상 제외 |
 | 로그인 수단 (Google · 이메일/비밀번호 병행) | L2 Auth Identity | **각 service 로그인 화면** — Google: `GoogleContinue` (`POST /auth/google/login` · 미등록 계정은 동의 후 `/auth/google/signup`) / 이메일: `POST /auth/email/login` · 가입 `/signup`(`POST /auth/email/signup`, 계정만 생성 — membership·role 없음). 이메일 동일성으로 Google 계정과 자동 병합하지 않는다. **Admin 은 Google 전용** (password 세션 서버 거부) |
 | 이메일 인증 | L1 Identity | **각 service `/auth/verify-email`** (토큰 도착지) |
@@ -123,7 +123,7 @@
 | 영역 | 정합 상태 | 근거 |
 |---|:---:|---|
 | 3 service `/mypage` (KPA / K-Cos / Neture) | ✅ Option D 와 일치 | 현재 구현 |
-| 4 service `/mypage/settings` 의 비밀번호 변경 | ~~✅ V2 Phase 2 적용 (`serviceKey` 명시)~~ → **은퇴 (2026-09-23)** · 현행(2026-09-29 정책): 계정 단위 `POST /auth/password` API 만 있고 `/mypage/settings` UI 는 미구현(후속) | ~~`WO-O4O-IDENTITY-V2-PHASE2-CHANGE-PASSWORD-SERVICE-SCOPE-V1`~~ · `WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1` · `WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1` |
+| 4 service `/mypage/settings` 의 비밀번호 변경 | ~~✅ V2 Phase 2 적용 (`serviceKey` 명시)~~ → **은퇴 (2026-09-23)** · 승인된 계약(2026-09-29 정책): 계정 단위 `POST /auth/password` — API 는 PR #257 병합 · 배포 후 활성, `/mypage/settings` UI 는 미구현(후속) | ~~`WO-O4O-IDENTITY-V2-PHASE2-CHANGE-PASSWORD-SERVICE-SCOPE-V1`~~ · `WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1` · `WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1` |
 | 4 service `/mypage/profile` 의 프로필 수정 | ✅ `PUT /users/profile` 직접 호출 | 현재 구현 |
 | web-account 코드 | ✅ 최소 계정센터 형태 (서비스 목록 + Handoff) | 현재 구현 |
 | web-account 배포 | ⏭ 미배포 (별건 IR) | placeholder revision (2026-03-13) |
@@ -143,7 +143,7 @@ canonical route 로 사용한다. 아래는 **현재 구현 사실의 기록**�
 | Shell | `@o4o/account-ui` 의 `MyPageShell` 채택 (`basePath='/account'`) |
 | nav 축 | `PHARMACY_HUB_ACCOUNT_NAV_ITEMS` — 내 프로필(`/account`) · 가입 상태(`/join/status`) |
 | 프로필 수정 | `PATCH /users/me/profile` — §2 매트릭스 L1 항목과 동일 계약 |
-| 비밀번호 변경 | ~~`PUT /users/password` with `serviceKey='pharmacy-hub'`~~ → **은퇴 (2026-09-23)** (`changeAccountPassword` 제거). 현행 계약은 §2 의 계정 단위 `POST /auth/password` 이며 `/account` UI 는 미구현(후속) |
+| 비밀번호 변경 | ~~`PUT /users/password` with `serviceKey='pharmacy-hub'`~~ → **은퇴 (2026-09-23)** (`changeAccountPassword` 제거). 승인된 계약은 §2 의 계정 단위 `POST /auth/password`(PR #257 병합 · 배포 후 활성)이며 `/account` UI 는 미구현(후속) |
 | `/store-owner/account` | 매장 셸 URL 유지용 **thin wrapper**(`withShell={false}`). 같은 화면을 두 벌 구현하지 않으며 공통 Shell 을 이중으로 씌우지 않는다. 이 URL 은 store-ui-core 사이드바(설정 › 내 계정)가 가리키므로 **제거·강제 redirect 하지 않는다.** |
 
 즉 Pharmacy-Hub 는 **route 이름만 `/mypage` 대신 `/account`** 일 뿐, §4 Drift 방지 원칙

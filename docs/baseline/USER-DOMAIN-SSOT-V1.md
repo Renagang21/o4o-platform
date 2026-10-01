@@ -30,6 +30,7 @@ users.email                 = 프로필 · 연락 필드
                               단, 이메일·비밀번호 수단(2026-09-29)에서는 users.email 이
                               로그인 ID 다 → user_password_credentials(user_id 1:1).
                               이메일 동일성만으로 계정을 병합하지 않는다.
+                              (구현 = PR #257 — 병합·배포 전 runtime 에는 없다)
 ```
 
 제거된 것(물리 컬럼·테이블): `users.password` · `users.reset_password_token` ·
