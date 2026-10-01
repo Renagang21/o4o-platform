@@ -5,7 +5,7 @@
 > 본 문서는 [IR-O4O-MYPAGE-VS-ACCOUNT-CENTER-CANONICAL-V1](../investigations/IR-O4O-MYPAGE-VS-ACCOUNT-CENTER-CANONICAL-V1.md) 의 **Option D** 채택을 baseline 으로 승격하여, 향후 web-account 에 비밀번호 / 프로필 / 서비스별 기능을 과도하게 추가하는 drift 를 방지한다.
 
 - **버전:** V1 (2026-05-24)
-- **상태:** Baseline (Locked) — **부분 갱신 2026-09-23**: `WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1` 로 password 인증이 은퇴해 §2 매트릭스의 비밀번호 2행을 정정했다. **canonical 위치 결정(Option D: web-account = 서비스 목록 + Handoff outbound 전용, 계정 관리는 각 service `/mypage`)은 불변**이며, 근거였던 "비밀번호가 서비스별" 논거만 소멸했다(결론은 그대로 — 인증 자체가 Google 단일이 되어 web-account 에 로그인/자격 UI 를 둘 이유가 더 없다).
+- **상태:** Baseline (Locked) — **부분 갱신 2026-09-23**: `WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1` 로 password 인증이 은퇴해 §2 매트릭스의 비밀번호 2행을 정정했다. **canonical 위치 결정(Option D: web-account = 서비스 목록 + Handoff outbound 전용, 계정 관리는 각 service `/mypage`)은 불변**이며, 근거였던 "비밀번호가 서비스별" 논거만 소멸했다(결론은 그대로 — 인증 자체가 Google 단일이 되어 web-account 에 로그인/자격 UI 를 둘 이유가 더 없다). **부분 갱신 2026-09-29**: `WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1` 정책(§5 승인)으로 로그인이 **Google + 이메일·비밀번호 병행**이 되어 §2 비밀번호 2행 · 로그인 수단 행 · §4 원칙 2 를 다시 정정했다. 새 비밀번호는 `user_password_credentials`(users.id 1:1) 단일 경로이며 은퇴한 `service_credentials`·서비스별 password 의 부활이 아니다. Option D 결정은 그대로 불변이다(web-account 에 로그인/자격 UI 를 두지 않는다).
 - **선행 산출물:** [IR-O4O-MYPAGE-VS-ACCOUNT-CENTER-CANONICAL-V1](../investigations/IR-O4O-MYPAGE-VS-ACCOUNT-CENTER-CANONICAL-V1.md)
 - **상위 SSOT:**
   - `CLAUDE.md` (사업 철학 priority chain)
@@ -42,9 +42,9 @@
 | 기능 | Identity V2 Layer | Canonical 위치 |
 |---|:---:|---|
 | 이름 / 닉네임 / 연락처 수정 | L1 Identity | **각 service `/mypage/profile`** (`PUT /users/profile`) |
-| ~~비밀번호 변경~~ | ~~L2 Credential~~ | **은퇴 (2026-09-23)** — `PUT /users/password` 및 서비스별 password 변경 UI 제거. 로그인 수단은 Google 계정 하나이므로 변경할 비밀번호가 없다 |
-| ~~비밀번호 재설정 (이메일)~~ | ~~L2 Credential~~ | **은퇴 (2026-09-23)** — `/auth/forgot-password` · `/auth/reset-password` 및 각 서비스 "비밀번호 찾기" 진입 제거 |
-| 로그인 수단 (Google 계정) | L1 Identity | **각 service 로그인 화면의 `GoogleContinue`** (`POST /auth/google/login` · 미등록 계정은 동의 후 `/auth/google/signup`) |
+| 비밀번호 설정 / 변경 | L1 Identity (계정 단위 · 서비스 무관) | **각 service `/mypage/settings`** (`POST /auth/password` · 로그인 상태 · 기존 비밀번호가 있으면 현재 비밀번호 필수, 없으면 Google 가입자도 비밀번호 수단을 **추가** — 같은 users.id, 병합 아님 · Admin / `platform:*` 역할은 거부). 은퇴한 `PUT /users/password`(serviceKey 별, 2026-09-23)는 복원하지 않는다. 2026-09-29 기준 API 만 있고 `/mypage/settings` UI 는 미구현(후속) |
+| 비밀번호 재설정 (이메일) | L1 Identity | **각 service `/forgot-password` → `/reset-password`** (`POST /auth/password/forgot` — 존재 여부 비노출 · 재설정 메일은 비밀번호 수단이 있거나 이메일 인증된 계정에만 발송 / `POST /auth/password/reset` — 30분 · 1회용 토큰, 성공 시 전역 세션 폐기) · Admin / `platform:*` 대상 제외 |
+| 로그인 수단 (Google · 이메일/비밀번호 병행) | L1 Identity | **각 service 로그인 화면** — Google: `GoogleContinue` (`POST /auth/google/login` · 미등록 계정은 동의 후 `/auth/google/signup`) / 이메일: `POST /auth/email/login` · 가입 `/signup`(`POST /auth/email/signup`, 계정만 생성 — membership·role 없음). 이메일 동일성으로 Google 계정과 자동 병합하지 않는다. **Admin 은 Google 전용** (password 세션 서버 거부) |
 | 이메일 인증 | L1 Identity | **각 service `/auth/verify-email`** (토큰 도착지) |
 | 서비스 가입 신청 | L3 Membership | **각 service Register 흐름** |
 | 서비스 이용 상태 (active/pending) 보기 | L3 Membership | **각 service `/mypage` 의 status 배지** + (선택) web-account 의 통합 view |
@@ -104,7 +104,9 @@
 
 ```text
 1. 계정 관리 UI 는 각 service /mypage canonical.
-2. 비밀번호 변경 없음 — password 인증 은퇴(2026-09-24). 로그인 수단은 Google 계정 하나다.
+2. 로그인 수단은 Google + 이메일·비밀번호 병행(2026-09-29). 비밀번호 설정·변경은 POST /auth/password,
+   재설정은 /auth/password/forgot·reset — 계정(users.id) 단위 하나이며 서비스별 비밀번호는 없다.
+   Admin / platform:* 은 Google 전용.
 3. 프로필 수정은 PUT /users/profile — API 가 공통이므로 어디서 호출하든 OK,
    단 UI 진입은 각 service /mypage/profile 유지.
 4. web-account 는 본인 view (서비스 목록 + Handoff) 만 — 자격(로그인 수단) / 프로필 UI 추가 금지.
