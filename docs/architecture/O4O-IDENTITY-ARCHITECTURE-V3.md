@@ -71,7 +71,7 @@ L1 만 L2/L3/L4 의 부모다(FK). L2/L3/L4 사이에 직접 FK 는 없다. 본 
 ## 3. B. Authentication Identity (L2)
 
 - **O4O 로그인 = Google + 이메일·비밀번호 병행** (2026-09-29 · `WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1` §5 승인 2 — 채택 시 "Google 단일 로그인"을 정정). Google 수단의 외부 Identity 기준은 **Google `sub`** 다.
-  **구현 상태:** 승인된 계약이며 구현은 PR #257 — 그 병합 · 배포 전 runtime 에는 이메일 경로 · `user_password_credentials` 가 없다.
+  **구현 상태:** 승인된 계약이며 구현은 PR #257(S1 보안 수정 `61a44a337` 포함 — Google 가입 `email_verified` 필수 · forgot 발송 조건. [IR §12-1](../investigations/IR-O4O-GOOGLE-AND-ID-AUTH-FINAL-STATUS-AUDIT-V1.md) 의 blocker 는 이 수정으로 닫힘) — 그 병합 · 배포 전 runtime 에는 이메일 경로 · `user_password_credentials` 가 없다.
 - 연결 경로: Google = `Google ID token 검증 → sub 로 linked_accounts 조회 → users.id → 세션 발급` / 이메일 = `users.email(로그인 ID) + user_password_credentials 검증 → users.id → 세션 발급`. 두 수단 모두 같은 `users.id` 에 붙는다.
 - **Admin · `platform:*` 은 Google 전용** — 비밀번호 수단으로 발급된 세션(`authMethod:'password'`)은 서버가 거부한다.
 - **가입은 계정만 만든다** — 어느 수단으로 가입해도 서비스 membership · 조직 · role 을 자동 부여하지 않는다(L3/L4 는 별도 흐름).
@@ -80,8 +80,8 @@ L1 만 L2/L3/L4 의 부모다(FK). L2/L3/L4 사이에 직접 FK 는 없다. 본 
 - ~~기존 email+password 사용자는 로그인 상태에서 본인이 Google 을 명시 연결한다(재인증 후 `linked_accounts` insert).~~
   → **전환 완료 (2026-09-24)**. 명시 연결 경로(`/auth/google/link`)는 password 가 사라지면서 도달 불가가 되어 은퇴했고,
   관리자 계정은 1회용 bootstrap 으로 기존 `users.id` 에 Google `sub` 를 연결했다. 2026-09-24 시점의 로그인 경로는
-  `/auth/google/login` · `/auth/google/signup` 둘뿐이었다. 2026-09-29 정책으로 이메일 경로(PR #257 병합 · 배포 후 활성 — `/auth/email/signup` · `/auth/email/login` ·
-  `/auth/password` · `/auth/password/forgot` · `/auth/password/reset`)가 추가된다 — 옛 password 축의 부활이 아니라 계정 단위 신규 수단이다.
+  `/auth/google/login` · `/auth/google/signup` 둘뿐이었다. 2026-09-29 정책으로 이메일 경로(PR #257 병합 · 배포 후 활성 — `/auth/email/signup` · `/auth/email/verify` · `/auth/email/resend` · `/auth/email/login` ·
+  `/auth/password` · `/auth/password/forgot` · `/auth/password/reset` · `/auth/account/find-id`. 가입은 미확인 계정만 만들고 verify 완료 후 로그인)가 추가된다 — 옛 password 축의 부활이 아니라 계정 단위 신규 수단이다.
 - `linked_accounts` 를 **초기 Auth Identity 물리 구조로 재사용**한다: provider = `google` 고정, providerId = `sub`, `(provider, providerId)` unique. email/displayName/profileImage/providerData 스냅샷 컬럼은 저장하지 않는다(자동 병합 유혹 제거). 테이블 rename 은 요구하지 않는다.
 - **Kakao · Naver 등 다른 소셜은 로그인 Identity 대상이 아니다.** KakaoTalk / LINE / WhatsApp 은 §9 의 업무 채널이다.
 - JWT `sub` 는 `users.id` 를 유지한다. Google `sub` 는 토큰에 싣지 않는다.
