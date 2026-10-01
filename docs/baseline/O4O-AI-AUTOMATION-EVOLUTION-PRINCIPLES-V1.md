@@ -229,22 +229,46 @@ Workflow 는 고정된 영구 규칙이 아니다. 사이트가 변하거나 더
 | Pharmacy Web Automation Core · health.kr | [`CHECK-O4O-PHARMACY-WEB-AUTOMATION-CORE-AND-HEALTHKR-ADAPTER-V0`](../checks/CHECK-O4O-PHARMACY-WEB-AUTOMATION-CORE-AND-HEALTHKR-ADAPTER-V0.md) | §14·§15 — EntryPoint Registry 는 seed, 확장은 usage 에서 (§25 참조) |
 | AI 활용 흐름 · 사업 철학 | [`O4O-AI-USAGE-FLOW-BASELINE-V1`](O4O-AI-USAGE-FLOW-BASELINE-V1.md) · [`O4O-BUSINESS-PHILOSOPHY-V1`](O4O-BUSINESS-PHILOSOPHY-V1.md) §6 | 상위: "AI 는 사람의 검수 없이 최종 기준을 결정하지 않는다" 와 일치 |
 
-## §25. 현행 구현과의 정렬 상태 — 충돌 · 격차 (2026-09-12 조사)
+## §25. 현행 구현과의 정렬 상태 — 충돌 · 격차 (2026-09-12 조사 · 2026-10-01 갱신)
 
 코드 · 아키텍처를 임의로 바꾸지 않는다. 아래는 **보고**이며 각 항목은 후속 WO 의 입력이다.
+2026-10-01 갱신 근거: [`IR-O4O-AUTOMATION-AGENT-ARCHITECTURE-REALIGNMENT-V1`](../investigations/IR-O4O-AUTOMATION-AGENT-ARCHITECTURE-REALIGNMENT-V1.md) census. 계층별 구현 방향은 하위 정본 [`O4O-AUTOMATION-AGENT-ARCHITECTURE-V1`](O4O-AUTOMATION-AGENT-ARCHITECTURE-V1.md) 이 정한다.
 
-| # | 현행 | 판정 | 후속 반영 |
+### 25-1. 2026-09-12 항목의 현재 상태
+
+| # | 2026-09-12 현행 | 당시 판정 | 2026-10-01 상태 |
 |---|---|---|---|
-| 1 | Pharmacy Web Core 의 EntryPoint Registry 가 **코드 상수로 사전 정의**(약학정보원 4개)된다 | **긴장(충돌 아님)** — §14 는 seed 를 허용하되 확장은 usage 에서 나와야 한다. 현재 "usage → 신규 EntryPoint 승격" 경로가 없다 | usage event 집계 → EntryPoint/Workflow 후보 승격 절차(§9·§15) |
-| 2 | Pharmacy Web usage event 키 = `siteId · entryPointId · intent · status · errorCode · durationMs · domCommands · timestamp(·inputMode)` | **격차** — §7 의 `takeover step · user correction count · completion state` 가 없다 | usage event 확장(내용 아닌 구조만) |
-| 3 | 의도 해석이 키워드 결정론이고 AI 판단(§10)이 tool 선택에 개입하지 않는다(ai-core F1: native tool calling 없음) | **격차** — §10 의 "화면 해석 · 경로 비교 · 예외 판단" 미실현. 결정적 runtime(§11)은 먼저 섰다 | AI 판단 층 도입 시 "AI 판단 → runtime 검증" 구조 유지 |
-| 4 | 상세 진입(`td onclick`) · 색상/모양 커스텀 컨트롤은 DOM V0 밖 → 사용자가 이어서 한다 | **일치** — §4·§6 takeover 모델. 다만 takeover 지점이 기록되지 않는다(#2) | Browser DOM V1 + takeover 이벤트 |
-| 5 | Adapter 결과가 "값 요약" 으로 프롬프트에 가고, 실제 화면은 사용자 탭에 남는다 | **일치(§5)** — 다만 UI 가 "그 화면으로 가기" 를 안내하지 않는다 | 결과 화면 인계 UX |
-| 6 | 진행 중이던 이미지 식별 WO 초안이 "Vision → 구조화된 특징 → EntryPoint 입력" 순이다 | **긴장** — §18 은 "업무 목적 + 현재 화면 → 필요한 정보 결정" 을 우선한다. 초안도 Adapter 가 적용 가능한 조건(식별문자)만 넘기고 나머지를 미적용으로 표기하므로 방향은 같다 | 재개 시 "현재 화면이 요구하는 조건 → 추출" 순서로 명시 정렬 |
-| 7 | CHECK 문서의 완료 기준이 smoke PASS 개수 중심이고 §22 지표(완료시간 · 조작 감소 · 재사용률)를 측정할 구조가 없다 | **격차** | 지표 정의 + 집계 채널(새 DB 없이 로그 집계부터) |
-| 8 | Automation Execution Layer · Browser DOM · Computer Use 의 "structured first · fallback 추적 · COMMIT 미실행 · credential 0" | **일치(§10·§11·§7)** | — |
+| 1 | Pharmacy Web Core 의 EntryPoint Registry 가 코드 상수로 사전 정의(약학정보원 4개) | 긴장(충돌 아님) | **그대로** — 사이트 registry 도 코드 상수(TS · agent · 확장 3곳 중복). "usage → EntryPoint/Workflow 승격" 경로 여전히 없음 |
+| 2 | usage event 에 `takeover step · user correction count · completion state` 없음 | 격차 | **일부 해소** — work-agent usage event 에 takeoverReason/Step · completionState · failureClass · recoveryTier · durationMs · aiPlanCount 추가. **`userCorrectionCount` 는 상수 0(미기록)**. 저장은 로그뿐(DB·집계 없음) |
+| 3 | 의도 해석이 키워드 결정론, AI 판단(§10)이 개입하지 않음 | 격차 | **일부 해소** — 등재 대상 안에서 AI planner(관찰 → 계획 → runtime 검증 → 실행) 동작. 요청 분기·대상 해석은 여전히 키워드 결정론이고, **처음 보는 대상은 탐색하지 않고 거절**(§14 와 긴장) |
+| 4 | DOM V0 밖 컨트롤 → 사용자가 이어 함, takeover 지점 미기록 | 일치 | **개선** — QUESTION(재개 가능) ↔ TAKEOVER(종료) 분리, takeover 지점은 usage event 에 기록 |
+| 5 | Adapter 결과 "값 요약" 전달, 화면은 사용자 탭에 | 일치(§5) | 변화 없음 |
+| 6 | 이미지 식별 WO 초안 순서 | 긴장 | 변화 없음(재개 안 됨) |
+| 7 | CHECK 완료 기준이 smoke PASS 중심, §22 지표 측정 구조 없음 | 격차 | **그대로** — 최근 CHECK 다수가 runtime 결함 마감. 지표 집계 채널 없음 |
+| 8 | structured first · fallback 추적 · COMMIT 미실행 · credential 0 | 일치 | 일치 유지. 단 Deterministic First 순서는 수단 **선택**이 아니라 fallback 기록·위험 게이트에만 쓰인다(수단은 대상 유형으로 결정) |
 
-충돌로 판정된 항목은 없다. 무단 코드 수정 · 아키텍처 재설계는 하지 않았다.
+### 25-2. 2026-09-12 이후 구현된 것
+
+| 구현 | 원칙 대응 |
+|---|---|
+| resume / runId — 같은 run 이어가기(version-checked) | §4·§6 — 사람이 이어받은 지점에서 다시 이어간다 |
+| User Assistance QUESTION / resume — QUESTION ≠ 실패, 재개 가능 | §6 |
+| Workflow Candidate — 성공 run 을 입력 슬롯 템플릿으로 Local 저장 · 결정적 replay · 어긋나면 AI 로 복귀 | §9·§11·§20 (개인 범위 · 단일 실행 공유 승격 없음) |
+| replay preflight — 불특정 입력이면 재생 전 질문 | §9 — 검증 없이 재생하지 않는다 |
+| targetHint — 재개 시 대상 승계 | §4 |
+
+### 25-3. 2026-10-01 현재 격차
+
+| # | 현행 | 판정 | 후속 |
+|---|---|---|---|
+| 9 | Experience 구조 부족 — 저장되는 학습 산출물은 성공 DOM 경로(Workflow Candidate)뿐. 실패·복구·사용자 답변/교정·참조 자료·지표는 run 과 묶여 남지 않는다. **사용자 도움·재개 run 은 Candidate 저장에서 제외**된다 | **격차 (§6·§7 와 어긋남)** | Experience Model 설계 (ARCHITECTURE §10-2) |
+| 10 | Promotion 없음 — 수준(단계적 자동화 §17) 개념 · 승격 조건 · 저가 수행자 전환 없음. 결정적 경로는 Candidate replay 하나, 강등은 실패 누적 disable 하나 | **격차 (§9·§13·§17)** | Experience 축적 뒤 Promotion |
+| 11 | 재개 시 원래 업무 목표가 planner 에 돌아오지 않는다(답변문이 새 요청이 됨) | 격차 (§6) | User Assistance 보강 |
+| 12 | Execution layer 가 가장 성숙 — 실행 계열 ≈21k LOC vs 학습 계열 ≈0.7k LOC. 진행 중 runtime 결함(명령 polling · relay 재연결 · content script 미주입 site_not_ready) | **일치하나 편중** — 실행 계층 완성도는 §22 지표가 아니다 | runtime 은 필요한 만큼만 마감(ARCHITECTURE §10-1 0번 트랙) |
+| 13 | 매뉴얼 · 업무 문서 ingestion 없음(문서 첨부는 대화로 분기) | 격차 (§18) | Manual / Knowledge |
+| 14 | 사용자 간 경험 비교·공유 없음(Local 전용, 서버는 상태·명령·로그만) | 격차 (§8) | Shared Experience (동의·익명화 정책 선행) |
+
+충돌로 판정된 항목은 없다(처음 보는 대상 거절은 하위 정본에서 MISALIGNED 로 판정 — 원칙 변경이 아니라 구현 정렬 대상). 무단 코드 수정 · 아키텍처 재설계는 하지 않았다.
 
 ---
 

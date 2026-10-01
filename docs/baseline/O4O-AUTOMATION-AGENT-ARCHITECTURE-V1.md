@@ -1,9 +1,9 @@
 # O4O-AUTOMATION-AGENT-ARCHITECTURE-V1
 
-> **상태**: DRAFT — 사용자 검토 대기 (검토 후 ACTIVE 전환 · `CANONICAL-INDEX` §6 등재는 별도 승인)
-> **작성일**: 2026-10-01 · **최종 갱신**: 2026-10-01
-> **근거 WO/IR**: [`IR-O4O-AUTOMATION-AGENT-ARCHITECTURE-REALIGNMENT-V1`](../investigations/IR-O4O-AUTOMATION-AGENT-ARCHITECTURE-REALIGNMENT-V1.md) (사용자 지시 2026-10-01 "O4O Automation Agent 아키텍처 재정렬 조사 및 정본 문서화")
-> **상위 정본**: [`O4O-AI-AUTOMATION-EVOLUTION-PRINCIPLES-V1`](O4O-AI-AUTOMATION-EVOLUTION-PRINCIPLES-V1.md) — 이 문서는 그 원칙을 **대체하지 않고**, 원칙이 요구하는 시스템을 **어떤 계층으로 만드는가**를 고정한다. 둘이 충돌하면 EVOLUTION-PRINCIPLES 가 우선한다.
+> **상태**: ACTIVE — O4O 자동화 아키텍처 정본 (`CANONICAL-INDEX` §6)
+> **작성일**: 2026-10-01 · **최종 갱신**: 2026-10-01 (사용자 검토 반영 · DRAFT → ACTIVE)
+> **근거 WO/IR**: [`IR-O4O-AUTOMATION-AGENT-ARCHITECTURE-REALIGNMENT-V1`](../investigations/IR-O4O-AUTOMATION-AGENT-ARCHITECTURE-REALIGNMENT-V1.md) (작성) · `WO-O4O-AUTOMATION-AGENT-ARCHITECTURE-ACTIVATION-V1` (사용자 검토 확정 · 활성화, 2026-10-01)
+> **상위 정본**: [`O4O-AI-AUTOMATION-EVOLUTION-PRINCIPLES-V1`](O4O-AI-AUTOMATION-EVOLUTION-PRINCIPLES-V1.md) — 이 문서는 그 원칙을 **대체하지 않고**, 원칙이 요구하는 시스템을 **어떤 계층으로 만드는가**를 고정한다. EVOLUTION = 왜 그렇게 발전해야 하는가 · 이 문서 = 그것을 어떤 계층으로 구현하는가. 둘이 충돌하면 EVOLUTION-PRINCIPLES 가 우선한다.
 > **적용 범위**: O4O 의 모든 반복 업무 자동화 — 약국 · 매장 · 공급자 · 운영자 · 그 밖의 참여 주체. 특정 사이트(health.kr 등)·특정 프로그램·특정 모델에 묶이지 않는다.
 
 ---
@@ -59,7 +59,27 @@
 2. "새로움"은 경험(계층 4)이 판정한다: 같은 업무 유형 × 같은 대상에 신뢰할 만한 경험이 없으면 새 업무다. 표현이 다르다고 새 업무가 되지 않고, 대상 UI 가 바뀌었으면 익숙한 업무라도 불확실 상황이다.
 3. 첫 실행의 목표는 **결과 + 경험 획득**이다. 그래서 초기 비용(강한 모델·긴 관찰·질문)은 허용된다(EVOLUTION §12). 대신 그 비용으로 얻은 것은 반드시 계층 4 에 남아야 한다 — 남기지 않는 강한 실행은 낭비다.
 4. **등재 목록은 발견의 문이 아니다.** 처음 보는 사이트·프로그램이라고 거절하지 않는다. 다만 "어디서 할 일인지" 가 불명확하면 묻고(계층 3), 안전 경계(§9-3)를 벗어나는 대상은 거부한다. 대상 등재는 "실행을 허락받은 범위" 와 "이미 경험이 있는 범위" 를 기록하는 장치이지, 업무를 미리 정의하는 장치가 아니다(EVOLUTION §14).
+   - 이것은 처음 보는 PC·사이트를 **무제한으로 조작한다는 뜻이 아니다.** 안전 경계 안에서 관찰·추론하고, 필요하면 사용자에게 물어 가며 진행한다. 위험 행동 차단(§8-2)과 최종 확정 제외(§9-3)는 처음 보는 대상에도 그대로 적용된다.
 5. Discovery 는 실행보다 넉넉한 관찰 수단·예산을 가질 수 있다. 예산 크기는 업무 위험과 사용자 시간 가치로 정하며 정책 문서가 정한다.
+
+### 2-1. Discovery 비용은 투자다
+
+> **새로운 업무에서 Strong Discovery Agent 사용 비용은 절감 대상이 아니라 Experience 를 획득하기 위한 투자 비용으로 본다. 비용 최적화는 경험이 축적된 이후에 시작한다.**
+
+- 특정 모델·공급사에 묶이지 않는다. "Strong" 은 그 시점에 관찰·추론·질문을 가장 잘 하는 수행자를 뜻한다.
+- 경험이 없는 업무에서 저가 수행자를 먼저 쓰는 것은 절감이 아니라 경험 손실이다(§7-2-1, §10-4).
+
+### 2-2. Experience 없는 Discovery 는 미완성이다
+
+> **Experience 가 저장되지 않는 Strong Discovery 실행은 원칙적으로 미완성 구현으로 본다.**
+
+Strong Agent 를 호출했다는 것 자체는 진척이 아니다. 다음이 끊김 없이 이어져야 완성이다.
+
+```text
+Discovery → 실행 → 결과 → 사용자 도움/교정 → 성공/실패 → 시간/비용 → Experience
+```
+
+Experience 저장은 민감한 원문 데이터 저장을 뜻하지 않는다 — 구조화된 경험만 남긴다(§4-2-2, §5).
 
 ---
 
@@ -111,7 +131,7 @@
 
 | | Local Experience (개인 · PC) | Shared Experience (O4O 서버) |
 |---|---|---|
-| 담는 것 | 개인 업무 순서, 자주 쓰는 값의 형태, 개인 환경, 자기 run 의 상세 | 업무 유형 · 대상별 일반 절차, 메뉴 구조, 자주 실패하는 지점과 복구법, 매뉴얼에서 얻은 일반 지식, 성공률·평균시간 같은 집계 |
+| 담는 것 | 개인 업무 순서, 자주 쓰는 값의 형태, 개인 환경, 자기 run 의 상세, 사용자 교정·도움 기록 | 업무 유형 · 대상별 일반 절차, 메뉴 구조, 자주 실패하는 지점과 복구법, 매뉴얼에서 얻은 일반 지식, 성공률·평균시간 같은 집계 |
 | 담지 않는 것 | — (단, 비밀번호·인증정보는 어디에도 저장하지 않는다) | 계정·비밀번호·인증정보, 개인정보, 고객·환자 정보, 업무 원문 데이터, 개인 식별 가능한 행동 기록 |
 | 생성 | 실행 중 Local 이 직접 기록 | Local 이 **정제·익명화한 요약을 명시적으로 올린 것**만 (서버가 Local 을 읽어 가지 않는다) |
 | 승격 | — | 한 사용자의 한 번 성공으로 공유 절차가 되지 않는다. 여러 사용자·여러 run 의 근거와 검증을 거친다 |
@@ -199,6 +219,34 @@
 6. **개인정보·인증정보 경계를 먼저 정한다.** 공유 경험·매뉴얼 수집처럼 데이터가 PC 밖으로 나가는 작업은 경계 정책이 선행한다.
 7. 완료 판단은 EVOLUTION §22 지표(시간 절감 · 개입 감소 · 성공률)로 한다.
 
+### 10-1. 개발 순서 (고정 · 2026-10-01 사용자 확정)
+
+```text
+1. Experience Model
+2. User Assistance
+3. Strong Discovery
+4. Manual / Knowledge
+5. Promotion
+6. Shared Experience
+```
+
+- 앞 번호가 뒤 번호의 근거 데이터를 만든다. 순서를 바꾸려면 이 절을 고치는 명시적 WO 가 필요하다.
+- **Execution Runtime 은 별도의 0번 트랙이다.**
+  - 진행 중인 runtime 결함 → 필요한 만큼 마감한다.
+  - 새로운 runtime 최적화 → Experience 계층보다 선행하지 않는다.
+  - Runtime 의 목적은 **Experience 를 얻을 수 있을 정도의 안정성 확보**다.
+- 다음 흐름으로 다시 빠지지 않는다:
+
+  ```text
+  site_not_ready → 새로운 runtime 기능 → 새로운 DOM 기능 → 새로운 browser 최적화 → 또 runtime 최적화
+  ```
+
+  runtime 결함을 고칠 때는 "이 수정이 어느 Experience 획득을 막고 있었는가" 를 WO 에 적는다. 적을 수 없으면 0번 트랙의 범위가 아니다.
+
+### 10-2. 다음 작업
+
+이 문서 활성화 다음 개발 작업은 **`WO-O4O-AUTOMATION-EXPERIENCE-MODEL-DESIGN-V1`** 이다 — 한 번의 업무 경험에서 무엇을 남겨야 다음 작업이 실제로 더 좋아지는가를 정의한다. DB 테이블보다 개념·기록 단위 정의가 먼저다.
+
 ---
 
 ## 부록 A. 현재 구현과의 대응 (2026-10-01 census 요약)
@@ -213,6 +261,8 @@
 | 6 Execution | IMPLEMENTED (runtime 안정화 진행 중) | IR §3 · §7 |
 
 이 표는 시점 기록이다. 갱신 시 이 부록만 고치고 본문 원칙은 바꾸지 않는다.
+
+**사용자 검토 확정 (2026-10-01)**: ① 처음 보는 대상 거절 = MISALIGNED 유지 ② 사용자 도움 run 의 Experience 제외 = MISALIGNED 유지(도움 run 은 오염이 아니라 핵심 학습 자산 — 원문이 아닌 구조화된 경험으로 저장) ③ §5 Local/Shared 경계 승인(서버의 Local read-back 없음) ④ §9-3 고위험 최종 확정 제외 승인.
 
 ## 부록 B. 관련 문서
 

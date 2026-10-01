@@ -125,6 +125,7 @@
 | [O4O-AI-USAGE-FLOW-BASELINE-V1](baseline/O4O-AI-USAGE-FLOW-BASELINE-V1.md) | O4O AI 활용 흐름 baseline (Home AI · 편집기 AI 계약 · §15 매장 콘텐츠 AI 위치) | ACTIVE |
 | [O4O-STORE-CONTENT-PRODUCTION-OPERATING-PRINCIPLES-V1](baseline/O4O-STORE-CONTENT-PRODUCTION-OPERATING-PRINCIPLES-V1.md) | **매장 콘텐츠 제작 운영 원칙 SSOT** — 사용자 외부 AI(ChatGPT/Gemini/Claude)=Creative/Strategy · O4O=표준 제작환경(Execute/Manage/Reuse) · 내부 AI=선택적 보조(필수 단계 아님) · provider 중립 · Media Library/VIDEO Job/Temp Output 재사용 · 파일럿 ≠ Canonical | ACTIVE |
 | [O4O-AI-AUTOMATION-EVOLUTION-PRINCIPLES-V1](baseline/O4O-AI-AUTOMATION-EVOLUTION-PRINCIPLES-V1.md) | **AI 자동화 진화 원칙 SSOT** — 사용자 행동은 학습 자료 · 목적/결과가 기준 · 완전 자동화가 아닌 시간 절감 · takeover 는 학습 신호 · 사이트별 업무 사전 정의 금지 · AI=발견/판단, Runtime=검증된 실행. Local Agent · Browser DOM · Computer Use · Site Adapter · Workflow · 주문/회계 자동화 등 **모든 자동화 WO 의 상위 기준** (§25 현행 정렬 상태) | ACTIVE |
+| [O4O-AUTOMATION-AGENT-ARCHITECTURE-V1](baseline/O4O-AUTOMATION-AGENT-ARCHITECTURE-V1.md) | **O4O Automation Agent 아키텍처 정본** — EVOLUTION-PRINCIPLES 의 하위(왜 → 어떤 계층으로). 6계층(Request · Discovery · Assistance · **Experience(중심)** · Promotion · Execution) · Strong-first Discovery(비용=경험 투자) · 사용자 도움=학습 자산 · Local/Shared 경계 · L1~L4 승격 · 실행≠두뇌 · 고위험 최종 확정 제외 · **개발 순서 고정(§10-1, Runtime=0번 트랙)**. 약국 · 매장 · 공급자 · 운영자 자동화 공통 | ACTIVE |
 
 ## 7. 운영 · 환경 · 절차
 

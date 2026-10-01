@@ -1,6 +1,6 @@
 # IR-O4O-AUTOMATION-AGENT-ARCHITECTURE-REALIGNMENT-V1
 
-> **상태**: COMPLETED (조사) — 판정의 정본 승격 대상 = [`O4O-AUTOMATION-AGENT-ARCHITECTURE-V1`](../baseline/O4O-AUTOMATION-AGENT-ARCHITECTURE-V1.md) (**DRAFT · 사용자 검토 대기**)
+> **상태**: COMPLETED (조사) — 판정의 정본 승격 대상 = [`O4O-AUTOMATION-AGENT-ARCHITECTURE-V1`](../baseline/O4O-AUTOMATION-AGENT-ARCHITECTURE-V1.md) (**ACTIVE** — 2026-10-01 사용자 검토 확정, `WO-O4O-AUTOMATION-AGENT-ARCHITECTURE-ACTIVATION-V1`)
 > **작성일**: 2026-10-01
 > **근거**: 사용자 지시 "O4O Automation Agent 아키텍처 재정렬 조사 및 정본 문서화" (2026-10-01, WO 문서 없음 — 이 IR 이 기록)
 > **기준 커밋**: `origin/main` 146ef5eb6
