@@ -18,7 +18,7 @@ import { MigrationInterface, QueryRunner } from 'typeorm';
  * ─────────────────────────────────────────────────────────────────────────────
  * 정본 키는 `user_id` 다 — 이메일이 아니다
  *
- *   `if (email === 'teststoreowner@gmail.com')` 같은 비교가 코드 곳곳에 퍼지는 것을 막는 것이
+ *   `if (email === 'teststoreowner@example.com')` 같은 비교가 코드 곳곳에 퍼지는 것을 막는 것이
  *   이 테이블의 존재 이유다. 그래서 **email · password 를 여기 저장하지 않는다.**
  *   로그인은 기존 `users.email` + `user_password_credentials` 를 그대로 쓰고,
  *   Demo 판정은 `demo_accounts.user_id → users.id` 하나만 본다.

@@ -26,8 +26,8 @@ O4O 의 Demo 계정은 **테스트 로그인 계정이 아니다.** 공개 체�
 
 | 구분 | 로그인 아이디 | 비밀번호 | 용도 | 데이터 축 |
 |---|---|---|---|---|
-| **Store Owner Demo** | `teststoreowner@gmail.com` | `testmail1!` | 매장 경영자 체험 | 매장 · 약국 · POP · 사이니지 · 매장 콘텐츠 · 주문 작업대 · 상품 진열 |
-| **Supplier Demo** | `testsupplier@gmail.com` | `testmail1!` | 공급자 체험 | 공급자 · 상품 · B2B 콘텐츠 · 상품 승인 · 서비스 배포 |
+| **Store Owner Demo** | `teststoreowner@example.com` | `testmail1!` | 매장 경영자 체험 | 매장 · 약국 · POP · 사이니지 · 매장 콘텐츠 · 주문 작업대 · 상품 진열 |
+| **Supplier Demo** | `testsupplier@example.com` | `testmail1!` | 공급자 체험 | 공급자 · 상품 · B2B 콘텐츠 · 상품 승인 · 서비스 배포 |
 
 ---
 
@@ -81,6 +81,26 @@ platform role 획득 · 관리자 계정 전환
 ```
 
 frontend 전용 보호가 아니라 **서버 정책**이어야 한다.
+
+### 8-1. 구현 현황 (2026-10-01)
+
+판정 정본은 `demo_accounts.user_id` 하나다 — 이메일 문자열 비교는 금지한다
+(`apps/api-server/src/services/auth/demo-account.service.ts`). 조회가 실패하면 "Demo 아님"으로
+넘기지 않고 예외를 올린다(fail-closed).
+
+| 차단 대상 | 상태 | 지점 |
+|---|---|---|
+| 비밀번호 변경 (`POST /auth/password`) | **구현** | `email-auth.service.ts` `setPasswordForUser` — 403 `DEMO_ACCOUNT_FORBIDDEN` |
+| forgot (`/auth/password/forgot`) | **구현** | 토큰 0 · 메일 0 · 응답 문구는 일반 계정과 동일(Demo 여부 비노출) |
+| reset (`/auth/password/reset`) | **구현** | 과거 발급 토큰도 소비 단계에서 403 · 세션 폐기 0 |
+| 계정 삭제 | **구현** | `AdminUserController.deleteUser` · `UserManagementController.deleteUser` — 삭제 **전** 403 |
+| Google 계정 연결 | **구현** | `google-auth.service.ts` `createGoogleUser` — 403 (`EMAIL_IN_USE` 로 뭉개지 않는다) |
+| platform role 획득 · 관리자 전환 | **기존 보호로 충족** | `POST /admin/platform-accounts/:id/super-admin` 은 Google 연결을 요구한다(`GOOGLE_LINK_REQUIRED`) — Demo 는 연결이 없다 |
+| 이메일 변경 · role 변경 · ownership 해제 | **미구현** | 별도 WO. 이 표에 적힌 것만 서버가 막는다 |
+
+로그인은 막지 않는다 — 체험 입구이므로 비밀번호 로그인은 그대로 된다.
+계약 테스트: `services/auth/__tests__/demoAccountGuard.contract.test.ts` ·
+`emailAuthService.test.ts` V13 · `googleAuthService.test.ts` 'Demo 계정 보호'.
 
 ## 9. 허용하는 것 / 막는 것
 
@@ -138,8 +158,8 @@ REUSE_AND_RELINK · DELETE_AFTER_RELINK · KEEP · UNKNOWN
 ## 15. 개발 데이터 생성 원칙
 
 ```text
-매장 데이터가 필요하면   → teststoreowner@gmail.com
-공급자 데이터가 필요하면 → testsupplier@gmail.com
+매장 데이터가 필요하면   → teststoreowner@example.com
+공급자 데이터가 필요하면 → testsupplier@example.com
 ```
 
 에이전트가 `test1@` · `supplier123@` · `storetest@` 같은 사용자를 계속 만들지 않는다.

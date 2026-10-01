@@ -32,6 +32,8 @@ interface Store {
   evt: Row[];
   prt: Row[];
   activities: Row[];
+  /** Demo 보호 판정용 — 이 목록에 있는 user 는 demo_accounts 에 활성 행이 있는 셈이다. */
+  demoUserIds: string[];
 }
 
 let seq = 0;
@@ -43,10 +45,11 @@ const clone = (s: Store): Store => ({
   evt: s.evt.map((r) => ({ ...r })),
   prt: s.prt.map((r) => ({ ...r })),
   activities: [...s.activities],
+  demoUserIds: [...s.demoUserIds],
 });
 
 function makeHarness(opts: { roles?: Record<string, string[]>; now?: Date } = {}) {
-  let store: Store = { users: [], creds: new Map(), evt: [], prt: [], activities: [] };
+  let store: Store = { users: [], creds: new Map(), evt: [], prt: [], activities: [], demoUserIds: [] };
   const sql: Array<{ q: string; p: unknown[] }> = [];
   const nowRef = { t: opts.now ?? new Date('2026-09-30T00:00:00Z') };
 
@@ -56,6 +59,16 @@ function makeHarness(opts: { roles?: Record<string, string[]>; now?: Date } = {}
   const query = jest.fn(async (q: string, p: any[] = []) => {
     sql.push({ q, p });
     const s = q.replace(/\s+/g, ' ').trim();
+    // WO-O4O-CANONICAL-DEMO-ACCOUNT-…-V1: Demo 보호 판정(demo_accounts).
+    //   기본은 'Demo 아님'(빈 배열). Demo 를 흉내 내려면 store.demoUserIds 에 넣는다.
+    if (s.includes('FROM demo_accounts')) {
+      const target = String(p[0] ?? '');
+      const byEmail = s.includes('JOIN users');
+      const hit = byEmail
+        ? store.users.some((u) => u.email.toLowerCase() === target && store.demoUserIds.includes(u.id))
+        : store.demoUserIds.includes(target);
+      return hit ? [{ demo_type: 'STORE_OWNER' }] : [];
+    }
     if (s.startsWith('SELECT id FROM users WHERE lower(email)')) {
       return store.users.filter((u) => u.email.toLowerCase() === p[0]).slice(0, 2).map((u) => ({ id: u.id }));
     }
@@ -720,6 +733,103 @@ describe('EmailAuthService', () => {
       expect(dump).not.toContain('wrong1234!');
       expect(h.store.activities.length).toBeGreaterThan(0);
       expect(h.store.activities.every((a) => a.email === null)).toBe(true);
+    });
+  });
+  /**
+   * V13 Demo 계정 보호 — WO-O4O-CANONICAL-DEMO-ACCOUNT-FOUNDATION-AND-EXPERIENCE-LOGIN-V1
+   *
+   *   Demo 계정의 비밀번호는 **문서에 적힌 공개 credential** 이다. 막지 않으면 그 비밀번호를
+   *   아는 누구나 `POST /auth/password` 로 바꿔 공개 체험 계정을 사유화할 수 있다.
+   *   판정은 `demo_accounts.user_id` 한 곳만 본다 — 여기서 `store.demoUserIds` 가 그 행이다.
+   */
+  describe('V13 Demo 계정 보호', () => {
+    /** Demo 1명 + 비밀번호 수단 보유 상태 — 일반 사용자와 **같은** 조건에서 차이를 본다. */
+    const demoHarness = () => {
+      const h = makeHarness();
+      const demo = h.addUser({ email: 'teststoreowner@example.com' });
+      const normal = h.addUser({ email: 'normal@example.com' });
+      h.store.creds.set(demo.id, `fakehash:${hashToken(GOOD_PW)}`);
+      h.store.creds.set(normal.id, `fakehash:${hashToken(GOOD_PW)}`);
+      h.store.demoUserIds.push(demo.id);
+      return { h, demo, normal };
+    };
+
+    it('비밀번호 변경은 거절된다 — 저장된 해시가 그대로 남는다', async () => {
+      const { h, demo } = demoHarness();
+      const before = h.store.creds.get(demo.id);
+
+      await expectCode(
+        h.service.setPasswordForUser(demo.id, { currentPassword: GOOD_PW, newPassword: 'other999$x' }),
+        'DEMO_ACCOUNT_FORBIDDEN',
+      );
+
+      // 403 이고, 공개 비밀번호가 바뀌지 않았다(정책 검사 · 현재 비밀번호 확인보다 먼저 거절).
+      expect(h.store.creds.get(demo.id)).toBe(before);
+      expect(h.passwords.setPassword).not.toHaveBeenCalled();
+    });
+
+    it('forgot 은 토큰 · 메일을 만들지 않는다 — 응답 문구는 일반 계정과 같다', async () => {
+      const { h, demo } = demoHarness();
+
+      await h.service.requestPasswordReset('TestStoreOwner@Example.com', META);
+
+      expect(h.store.prt).toHaveLength(0);
+      expect(h.mails).toHaveLength(0);
+      // 존재하지 않는 주소와 구별되지 않는다(조용한 return — Demo 여부가 드러나지 않는다).
+      await h.service.requestPasswordReset('nobody@example.com', META);
+      expect(h.mails).toHaveLength(0);
+      expect(demo.id).toBeTruthy();
+    });
+
+    it('이미 발급된 reset 토큰도 소비 단계에서 거절된다 — 세션 폐기 0', async () => {
+      const { h, demo } = demoHarness();
+      // Demo 지정 **전에** 발급된 과거 토큰을 재현한다.
+      h.store.demoUserIds.splice(0, h.store.demoUserIds.length);
+      await h.service.requestPasswordReset('teststoreowner@example.com', META);
+      const token = h.lastLinkToken('/reset-password');
+      expect(token).not.toBe('');
+      h.store.demoUserIds.push(demo.id);
+      const before = h.store.creds.get(demo.id);
+
+      await expectCode(h.service.resetPassword(token, 'other999$x'), 'DEMO_ACCOUNT_FORBIDDEN');
+
+      expect(h.store.creds.get(demo.id)).toBe(before);
+      expect(h.revoked).toEqual([]);
+    });
+
+    it('로그인은 막지 않는다 — 체험 입구이므로 비밀번호 로그인은 그대로 된다', async () => {
+      const { h } = demoHarness();
+      const result = await h.service.login({ email: 'teststoreowner@example.com', password: GOOD_PW, ...META });
+      expect(result.tokens.accessToken).toBeTruthy();
+    });
+
+    it('일반 사용자 동작은 불변 — 같은 호출이 모두 성공한다', async () => {
+      const { h, normal } = demoHarness();
+
+      await h.service.setPasswordForUser(normal.id, { currentPassword: GOOD_PW, newPassword: 'other999$x' });
+      expect(h.store.creds.get(normal.id)).toBe(`fakehash:${hashToken('other999$x')}`);
+
+      await h.service.requestPasswordReset('normal@example.com', META);
+      expect(h.mails).toHaveLength(1);
+      const token = h.lastLinkToken('/reset-password');
+      await h.service.resetPassword(token, 'third999$x');
+      expect(h.store.creds.get(normal.id)).toBe(`fakehash:${hashToken('third999$x')}`);
+      expect(h.revoked).toEqual([normal.id]);
+    });
+
+    it('판정은 user_id 로 한다 — 같은 주소라도 registry 행이 없으면 일반 계정이다', async () => {
+      const h = makeHarness();
+      // 주소는 Demo 와 같지만 `demo_accounts` 에 행이 없다(이메일 문자열 비교였다면 여기서 막혔을 것이다).
+      const u = h.addUser({ email: 'teststoreowner@example.com' });
+      h.store.creds.set(u.id, `fakehash:${hashToken(GOOD_PW)}`);
+
+      await h.service.setPasswordForUser(u.id, { currentPassword: GOOD_PW, newPassword: 'other999$x' });
+
+      expect(h.store.creds.get(u.id)).toBe(`fakehash:${hashToken('other999$x')}`);
+      const demoSql = h.sql.filter((x) => x.q.includes('demo_accounts'));
+      expect(demoSql.length).toBeGreaterThan(0);
+      // 질의 파라미터는 user_id 다 — 상수 이메일을 코드에서 비교하지 않는다.
+      expect(demoSql.some((x) => x.p[0] === u.id)).toBe(true);
     });
   });
 });

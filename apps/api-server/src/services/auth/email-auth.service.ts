@@ -49,6 +49,12 @@ import { ADMIN_SURFACE_KEY } from '../../utils/session-origin.js';
 import { getServiceOrigin } from '../../config/service-catalog.js';
 import { generateTokensWithContext, injectRolesIntoPublicData } from './auth-context.helper.js';
 import { passwordCredentialService } from './password-credential.service.js';
+// Demo 보호 — 판정 정본은 demo_accounts.user_id 하나다(이메일 문자열 비교 금지).
+import {
+  demoAccountService,
+  DEMO_ACCOUNT_FORBIDDEN_CODE,
+  DEMO_ACCOUNT_FORBIDDEN_MESSAGE,
+} from './demo-account.service.js';
 import * as tokenUtils from '../../utils/token.utils.js';
 import logger from '../../utils/logger.js';
 
@@ -69,6 +75,7 @@ export type EmailAuthErrorCode =
   | 'INVALID_OR_EXPIRED_TOKEN'
   | 'CURRENT_PASSWORD_REQUIRED'
   | 'CURRENT_PASSWORD_MISMATCH'
+  | typeof DEMO_ACCOUNT_FORBIDDEN_CODE
   | typeof PASSWORD_SESSION_NOT_ALLOWED_CODE;
 
 const STATUS: Record<EmailAuthErrorCode, number> = {
@@ -84,6 +91,7 @@ const STATUS: Record<EmailAuthErrorCode, number> = {
   INVALID_OR_EXPIRED_TOKEN: 400,
   CURRENT_PASSWORD_REQUIRED: 400,
   CURRENT_PASSWORD_MISMATCH: 400,
+  DEMO_ACCOUNT_FORBIDDEN: 403,
   PASSWORD_SESSION_NOT_ALLOWED: 403,
 };
 
@@ -103,6 +111,7 @@ const MESSAGE: Record<EmailAuthErrorCode, string> = {
   INVALID_OR_EXPIRED_TOKEN: '링크가 만료되었거나 이미 사용되었습니다. 다시 요청해 주세요.',
   CURRENT_PASSWORD_REQUIRED: '현재 비밀번호를 입력해 주세요.',
   CURRENT_PASSWORD_MISMATCH: '현재 비밀번호가 올바르지 않습니다.',
+  DEMO_ACCOUNT_FORBIDDEN: DEMO_ACCOUNT_FORBIDDEN_MESSAGE,
   PASSWORD_SESSION_NOT_ALLOWED: PASSWORD_SESSION_NOT_ALLOWED_MESSAGE,
 };
 
@@ -465,6 +474,9 @@ export class EmailAuthService {
     if (!isLoginEmailShapeValid(email)) return;
     const user = await this.findUserByLoginEmail(email);
     if (!user || resolveAccountAccess(user.status) === 'blocked') return;
+    // Demo 계정: 비밀번호가 고정이고 메일을 받지 않는다 — 토큰·메일을 만들지 않는다.
+    //   응답은 기존 일반 안내 그대로다(여기서 다른 문구를 내면 Demo 여부가 드러난다).
+    if (await demoAccountService.isDemoAccount(user.id, this.dataSource)) return;
     // 관리자는 비밀번호 수단을 쓰지 않는다 — 재설정으로 새 수단을 만들게 하지 않는다.
     if (hasPlatformRole(await this.readRoles(user.id))) return;
     // 2026-10-01 정책 변경 (PR #257 Codex 재리뷰 P1): forgot/reset 은 **이미 비밀번호 수단이 있는 계정의 복구**에만 쓴다.
@@ -502,6 +514,8 @@ export class EmailAuthService {
     }
     const row = await this.consumeToken('reset', plainToken);
     if (!row) throw new EmailAuthError('INVALID_OR_EXPIRED_TOKEN');
+    // forgot 이 Demo 토큰을 만들지 않지만, 과거에 발급된 토큰이 남아 있을 수 있다 — 여기서도 막는다.
+    if (await demoAccountService.isDemoAccount(row.user_id, this.dataSource)) throw new EmailAuthError(DEMO_ACCOUNT_FORBIDDEN_CODE);
     if (hasPlatformRole(await this.readRoles(row.user_id))) throw new EmailAuthError(PASSWORD_SESSION_NOT_ALLOWED_CODE);
     // 재설정은 기존 수단의 교체만 한다 — 수단이 없는 계정에 첫 비밀번호를 만들지 않는다(forgot 의 발급 조건과 같은 축의
     //   2차 방어. 정책 변경 전에 발급된 토큰 · 다른 경로로 생긴 토큰도 막는다). 세션 폐기보다 먼저 거절한다.
@@ -523,6 +537,9 @@ export class EmailAuthService {
    * 변경 시 전역 폐기는 하지 않는다(본인 세션 안의 조작) — 필요하면 사용자가 logout-all 을 쓴다.
    */
   async setPasswordForUser(userId: string, input: { currentPassword?: string; newPassword: string }): Promise<void> {
+    // Demo 계정의 비밀번호는 공개 credential 이고 고정이다 — 로그인했더라도 바꿀 수 없다.
+    //   막지 않으면 공개 비밀번호를 아는 사람이 체험 계정을 사유화할 수 있다.
+    if (await demoAccountService.isDemoAccount(userId, this.dataSource)) throw new EmailAuthError(DEMO_ACCOUNT_FORBIDDEN_CODE);
     if (hasPlatformRole(await this.readRoles(userId))) throw new EmailAuthError(PASSWORD_SESSION_NOT_ALLOWED_CODE);
 
     const violations = checkPasswordPolicy(input.newPassword);

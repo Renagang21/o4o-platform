@@ -44,6 +44,11 @@ import { resolveAccountAccess } from '../../common/auth/account-access.policy.js
 import { AccountInactiveError } from '../../errors/AuthErrors.js';
 import { normalizeLoginEmail } from '@o4o/auth-utils';
 import {
+  demoAccountService,
+  DEMO_ACCOUNT_FORBIDDEN_CODE,
+  DEMO_ACCOUNT_FORBIDDEN_MESSAGE,
+} from './demo-account.service.js';
+import {
   googleIdentityService,
   type GoogleIdentityService,
   type VerifiedGoogleIdentity,
@@ -65,7 +70,8 @@ export type GoogleAuthErrorCode =
   | 'INVALID_USER'
   | 'GOOGLE_ACCOUNT_ALREADY_LINKED'
   | 'GOOGLE_IDENTITY_IN_USE'
-  | 'ADMIN_TARGET_AMBIGUOUS';
+  | 'ADMIN_TARGET_AMBIGUOUS'
+  | typeof DEMO_ACCOUNT_FORBIDDEN_CODE;
 
 const GOOGLE_AUTH_ERROR_STATUS: Record<GoogleAuthErrorCode, number> = {
   GOOGLE_SIGNUP_REQUIRED: 404,
@@ -78,6 +84,7 @@ const GOOGLE_AUTH_ERROR_STATUS: Record<GoogleAuthErrorCode, number> = {
   GOOGLE_ACCOUNT_ALREADY_LINKED: 409,
   GOOGLE_IDENTITY_IN_USE: 409,
   ADMIN_TARGET_AMBIGUOUS: 409,
+  DEMO_ACCOUNT_FORBIDDEN: 403,
 };
 
 const GOOGLE_AUTH_ERROR_MESSAGE: Record<GoogleAuthErrorCode, string> = {
@@ -91,6 +98,7 @@ const GOOGLE_AUTH_ERROR_MESSAGE: Record<GoogleAuthErrorCode, string> = {
   GOOGLE_ACCOUNT_ALREADY_LINKED: '이 계정에는 이미 다른 Google 계정이 연결되어 있습니다.',
   GOOGLE_IDENTITY_IN_USE: '이 Google 계정은 이미 다른 사용자에게 연결되어 있습니다.',
   ADMIN_TARGET_AMBIGUOUS: '연결 대상 관리자 계정을 특정할 수 없습니다.',
+  DEMO_ACCOUNT_FORBIDDEN: DEMO_ACCOUNT_FORBIDDEN_MESSAGE,
 };
 
 export class GoogleAuthError extends Error {
@@ -284,6 +292,14 @@ export class GoogleAuthService {
     //   대소문자만 다른 기존 주소가 있으면 **거절만** 한다 — 그 users 를 반환 · 연결 · 병합하지 않는다(Identity=sub).
     //   정규화 저장 덕분에 동시 가입 경쟁은 users.email UNIQUE 가 마지막으로 막는다(아래 EMAIL_IN_USE).
     const email = normalizeLoginEmail(identity.email);
+    // WO-O4O-CANONICAL-DEMO-ACCOUNT-…-V1: Demo 계정은 인증 수단이 비밀번호 하나로 고정이다 —
+    //   Google 연결을 만들지 않는다. (Demo 주소는 예약 도메인이라 실제로 도달하기 어렵지만,
+    //   보호는 도메인이 아니라 registry 판정에 둔다.)
+    //   `EMAIL_IN_USE`(아래 대소문자 확인)로도 결과는 같지만, 그 문구는 사실과 다르다 —
+    //   "이미 쓰는 주소"가 아니라 "고정된 테스트 계정"이 거절 사유다. 사유를 그대로 응답한다.
+    if (await demoAccountService.isDemoLoginEmail(email, manager)) {
+      throw new GoogleAuthError(DEMO_ACCOUNT_FORBIDDEN_CODE);
+    }
     const caseVariant: unknown[] = await manager.query(
       `SELECT 1 FROM users WHERE lower(email) = $1 LIMIT 1`,
       [email],
