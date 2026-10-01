@@ -92,6 +92,7 @@ lint 만 기존 오류 102건을 baseline 으로 둔 **회귀 차단(ratchet)** 
 
 | 문서 | 내용 |
 |---|---|
+| [docs/development/COLLABORATOR-START-HERE.md](docs/development/COLLABORATOR-START-HERE.md) | **새 공동개발자는 여기서 시작** — 관점 · 저장소 읽는 법 · 첫 대상 · Production 경계 |
 | [CLAUDE.md](CLAUDE.md) | 개발 규칙 · 아키텍처 경계 · 운영 정책 |
 | [SETUP.md](SETUP.md) | 로컬 실행환경 정본 (설치 · 인증 · DB · 검증 · CI 게이트) |
 | [docs/baseline/operations/O4O-GIT-PARALLEL-WORK-SAFETY-V1.md](docs/baseline/operations/O4O-GIT-PARALLEL-WORK-SAFETY-V1.md) | Git 병렬 작업 · PC 이동 정본 |
@@ -103,20 +104,65 @@ lint 만 기존 오류 102건을 baseline 으로 둔 **회귀 차단(ratchet)** 
 
 ## 배포
 
-GCP Cloud Run으로 배포하며, GitHub Actions가 `main` 기준으로 자동 실행합니다.
+GCP Cloud Run으로 배포합니다. **일상 배포는 자동**이고, 위험한 변경과 비상 상황에만 사람이 개입합니다
+([CHECK-O4O-CICD-DEPLOY-FREEZE-CUTOVER-V1](docs/checks/CHECK-O4O-CICD-DEPLOY-FREEZE-CUTOVER-V1.md)).
+
+```text
+main push → CI Pipeline → Deploy Auto (deploy-auto.yml) → 서비스별 "서빙 중인 SHA → 이 commit" 판정
+  LEVEL 1  runtime 무영향 (문서 · CI · 테스트 · 판정 스크립트)         → 배포 없음
+  LEVEL 2  일반 runtime 변경                                         → 자동 verified 배포
+  LEVEL 3  migration · 인증 · 권한 · 결제 · 배포 설정 · 판정 불가      → 자동 배포 차단 → 사람이 통제 배포
+비상 · 정비 → 저장소 변수 DEPLOY_FREEZE=true (정상 운영값 false)
+```
 
 | 워크플로 | 대상 |
 |---|---|
-| `deploy-api.yml` | `o4o-core-api` |
+| `deploy-auto.yml` | 자동 배포 진입점 — 판정 · 결정 기록 · LEVEL 2 dispatch |
+| `deploy-api.yml` | `o4o-core-api` (+ 마이그레이션 Job) |
 | `deploy-web-services.yml` | 서비스별 웹 |
 | `deploy-admin.yml` | 관리자 대시보드 |
 
-DB 마이그레이션은 `main` 배포 시 CI/CD에서 자동 실행됩니다.
+- **DEPLOY_FREEZE**: 배포의 유일한 게이트. 정확히 `'false'`(대소문자 무관)일 때만 배포합니다. 변수 부재 · 공백 ·
+  `true` · 오타는 전부 **freeze**(fail-closed) — 새 배포 job 이 시작되지 않고 "frozen" 요약만 남습니다(migration 포함).
+  진행 중이던 rollout 은 그 run 안에서 검증 · rollback 까지 마칩니다.
+- **자동 배포(LEVEL 2)**: target 은 CI 가 성공한 정확한 commit 으로 고정됩니다(`deploy/auto-<sha12>` 태그).
+  API 가 함께 바뀌면 API 를 먼저 배포하고 성공을 확인한 뒤 프런트를 배포합니다. API 가 차단되면 프런트도 보류됩니다.
+  main 에 더 새 commit 이 있으면 그 commit 의 cycle 이 누적 변경을 처리합니다.
+- **통제 배포(LEVEL 3 · 배포 방식 변경 뒤 첫 배포)**: 사용자 승인 → `deploy/*` 태그 → 해당 workflow 를 수동 dispatch.
+  deploy workflow 들은 더 이상 push 에 반응하지 않습니다.
+- DB 마이그레이션은 API 배포가 실행합니다
+  ([PRODUCTION-MIGRATION-STANDARD](docs/baseline/operations/PRODUCTION-MIGRATION-STANDARD.md)).
+  migration 이 포함된 변경은 LEVEL 3 이므로 자동 배포되지 않습니다. `deploy-api.yml` 의 `migrate_only` 수동 실행
+  (`refs/tags/deploy/*` 태그 + `expected_sha` 일치)은 migration 만 실행합니다(freeze 적용).
+- **CI gate**: target commit 의 `CI Pipeline` 이 green 이 아니면(실패 · 취소 · 진행 중 · 부재 — 부재와 진행 중은 제한 시간 재조회)
+  배포 job 은 실행되지 않습니다 (`migrate_only` 포함).
+- **rollout_mode**: 기본 `verified` — 새 revision 을 traffic 0% 로 올려 직접 검사(web · admin = tag URL HTTP,
+  API = revision Ready)한 뒤에만 전환합니다. 검사 실패 시 기존 revision 이 그대로 서빙되고, API 는 전환 후
+  `/health/ready` 실패 시 이전 revision 으로 되돌립니다. `legacy` 는 종전 방식(수동 실행 전용).
+- 배포 job 에 붙은 `environment: production` 은 **승인 게이트가 아닙니다.** 현재 GitHub `production`
+  Environment 에는 required reviewer · 배포 branch 제한 · environment secret 이 없습니다.
+- GCP 인증은 저장소 수준 secret(`GCP_SA_KEY`)을 씁니다. 저장소 쓰기 권한이 있는 사람은 기술적으로
+  production 에 닿을 수 있으므로, 아래 **Production 변경 원칙**이 실제 통제 수단입니다.
 
 ## 기여
 
-현재 운영 단계에서는 `main` 직접 작업이 기본입니다. 브랜치 전략·작업 절차·검증 기준은
-[CLAUDE.md](CLAUDE.md) §1을 따릅니다.
+소유자 · AI 세션의 브랜치 전략·작업 절차·검증 기준은 [CLAUDE.md](CLAUDE.md) §1 을 따릅니다.
+
+### Production 변경 원칙 (공동개발자 포함 · 전원 적용)
+
+이 저장소는 개인 계정 Private 저장소라 branch protection · ruleset · 배포 승인(required reviewer)을
+강제할 수 없습니다. 그래서 다음은 **사람과 AI 모두에게 적용되는 합의 규칙**입니다. "사용자"는 저장소
+소유자(Renagang21)입니다.
+
+1. `main` 이 저장소 정본입니다. 공동개발자는 별도 branch 에서 작업하고 PR 로 `main` 에 반영합니다.
+2. `.github/workflows/**` 는 production 에 영향을 줄 수 있으므로 사용자 승인 없이 변경하지 않습니다.
+   다른 branch 에 올린 workflow 도 저장소 secret 으로 실행되므로 branch 라고 예외가 아닙니다.
+3. 사용자 승인 없이 하지 않는 것:
+   - production 배포 설정 변경 · `DEPLOY_FREEZE` 해제(`false` 로 변경) — 비상 시 `true` 설정은 누구나 즉시 해도 된다
+   - production 통제 배포 실행 (LEVEL 3 · 첫 rollout 의 `workflow_dispatch` 포함 — LEVEL 2 자동 배포는 승인 불필요)
+   - production migration 실행 (`migrate_only` 포함) · `deploy/*` 태그 생성 · push
+   - production DB write
+4. Repository · Environment · Actions secret 과 production credential 은 임의로 변경 · 열람 · 반출하지 않습니다.
 
 ### 커밋 메시지 규칙
 

@@ -52,6 +52,32 @@ export interface WorkAgentResult {
   resumable?: boolean;
 }
 
+/** 서버가 재개를 확정적으로 거부했다(없음 · 비소유 · 종료 · 만료 · 비대기 · 경합). */
+export const WORK_AGENT_RESUME_REJECTED = 'WORK_AGENT_RESUME_REJECTED';
+
+/** 재개 앵커 — 대기 중인 run 과 그 run 의 원래 대상(opaque). 다음 요청에 runId · targetHint 로 싣는다. */
+export interface ResumeAnchor {
+  runId: string;
+  targetId: string | null;
+}
+
+/**
+ * Work 응답 뒤 다음 요청에 실을 재개 앵커(WO-O4O-MAIN-AUTOMATION-RESUME-AND-REPLAY-PREFLIGHT-FIX-V1 §2-B·§2-C).
+ * 재개 시도 한 번 실패로 대기 중인 run 을 잃지 않는다:
+ *   - 이번 응답이 QUESTION(resumable) → 그 runId + 그 run 의 대상(goal.siteId)
+ *   - 재개 거부(RESUME_REJECTED) · run 이 열린 채 끝남(완료 · 인계 · 중지) → 해제
+ *   - run 을 열기 전에 멈춤(runId 없음 — 대상 준비 실패 등) → 서버 run 은 그대로 대기 중이므로 직전 앵커 유지
+ */
+export function nextResumeAnchor(
+  prev: ResumeAnchor | null,
+  work: Pick<WorkAgentResult, 'runId' | 'resumable' | 'errorCode'> & { goal?: Pick<WorkAgentResult['goal'], 'siteId'> },
+): ResumeAnchor | null {
+  if (work.resumable && work.runId) return { runId: work.runId, targetId: work.goal?.siteId ?? prev?.targetId ?? null };
+  if (work.errorCode === WORK_AGENT_RESUME_REJECTED) return null;
+  if (work.runId) return null;
+  return prev;
+}
+
 export class WorkAgentError extends Error {
   constructor(message: string, readonly code: string, readonly status?: number) {
     super(message);

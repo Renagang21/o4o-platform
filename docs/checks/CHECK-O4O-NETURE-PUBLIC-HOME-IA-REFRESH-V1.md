@@ -3,7 +3,7 @@
 > **WO**: WO-O4O-NETURE-PUBLIC-HOME-IA-REFRESH-V1 — **수정판 기준**(전달본이 §24 「CHECK」 중간에서 끊겼다. §1~§23 과 §24 의 CHECK 경로까지 따랐다)
 > **선행**: [IR-O4O-NETURE-HOME-CURRENT-STATE-AND-IA-REDESIGN-V1](../investigations/IR-O4O-NETURE-HOME-CURRENT-STATE-AND-IA-REDESIGN-V1.md) · [CHECK-O4O-NETURE-HOME-ENTRY-REFRESH-V1](CHECK-O4O-NETURE-HOME-ENTRY-REFRESH-V1.md) · WO-O4O-NETURE-REGISTER-AUTHENTICATED-LOOP-FIX-V1(`3f94c685c`)
 > **작성일**: 2026-09-29
-> **판정**: **CODE_COMPLETE · PRODUCTION_SMOKE_PENDING_DEPLOY** (배포는 이 WO 범위 밖)
+> **판정**: **CODE_COMPLETE · 운영 반영됨(로그인 전 PASS) · 로그인 후 실측 PENDING_USER_VERIFICATION** (§7-1 · 2026-09-30)
 
 ---
 
@@ -113,6 +113,27 @@ Footer (불변)
 3. 비로그인 AI 제출 → 모달 · 요청 실행 0
 4. 소식: 운영 글 유무에 따라 표시/비표시
 5. 로그인 후: 계정 메뉴 · AI · 내 업무 공간 4카드 · 플랫폼 관리 · 내 서비스 · 가입 · 이용 상태 · 가입 가능한 서비스 · handoff · Neture 가입 미노출 · `/register` 루프 없음
+
+### 7-1. 운영 실측 (2026-09-30 · 읽기만 · 로그인 · AI 요청 실행 0)
+
+**배포 경위** — 이 WO 가 배포하지 않았다. 다른 트랙이 `21e965436` 을 배포하며 함께 반영됐다
+(Deploy Web run `36683501888` · `deploy-neture` success · `neture-web-01665-7wf` 생성 07:27Z · traffic 100% · `3017b4c90` 은 `21e965436` 의 조상).
+
+`https://neture.co.kr/` · Chromium · 비로그인:
+
+| 항목 | Desktop 1280 | Mobile 390 |
+|---|---|---|
+| 순서(문서 y 좌표) 소개 → 주요 → 함께 → O4O AI → Composer | 192 → 486 → 705 → 829 → 908 | 148 → 443 → 942 → 1170 → 1249 |
+| 주요 서비스 href | pharmacy `/` · retail `/` · supplier — 일치 | 일치 |
+| 함께 이용하는 서비스 href | community · study `/` · funding `/` — 일치 | 일치 |
+| 「회원가입」 버튼 · 첫 사용 안내 · 구 호스트/병원약국 링크 · 「화장품」 | 없음 | 없음 |
+| [Google로 시작] → 모달 | 열림(「Neture 로그인」 — R3 그대로) · Google GIS iframe 1 | 같음 |
+| AI 입력 제출 → 모달 · 입력 유지 | 열림 · 유지 | 같음 |
+| 소식 섹션 | 비표시 — `GET /api/v1/neture/home/news` = `posts: []`(0건 확정 · 오류 아님) | 같음 |
+| 페이지 오류 · 콘솔 error · 가로 overflow | 0 · 0 · 없음 | 0 · 0 · 없음 |
+
+**로그인 후(§7 의 5)** — 실제 Google 로그인이 필요해 하지 않았다 → **PENDING_USER_VERIFICATION**
+(계정 메뉴 · AI · 내 업무 공간 4카드 · 내 서비스 · 가입 · 이용 상태 · 가입 가능한 서비스에 Neture 없음 · `/register` 루프 없음).
 
 ## 8. 잔여 · 범위 밖
 

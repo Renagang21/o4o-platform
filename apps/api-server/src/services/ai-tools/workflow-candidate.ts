@@ -356,6 +356,57 @@ export function validateReplaySteps(raw: unknown): ReplayStep[] | null {
   return out;
 }
 
+// ─── 재생 전 의미 검증(preflight) ─────────────────────────────────────────────
+//
+// WO-O4O-MAIN-AUTOMATION-RESUME-AND-REPLAY-PREFLIGHT-FIX-V1 §2-A — 템플릿이 맞았다고 바로 재생하지 않는다.
+// 값 자리에 들어온 요청 값이 **무엇을 가리키는지 스스로 정해진 값**(이름 · 명칭 · 번호)일 때만 재생한다.
+// "내가 먹을 약" · "이 약" · "어떤 영양제" 처럼 사용자 맥락 없이는 대상을 알 수 없는 값은 실행 전에 묻는다(QUESTION).
+// 사이트 · 업무별 사전이 아니라 한국어 지시 · 부정 · 관형 표현만 본다(AUTOMATION-EVOLUTION 원칙: 사이트별 업무 사전 정의 금지).
+// 오판은 안전한 쪽(묻기)으로 기운다 — 구체 값을 모호로 보면 한 번 더 물을 뿐이고, 모호 값을 실행하지는 않는다.
+
+/** 가리키는 대상이 사용자 맥락에 달린 말(인칭 · 지시 · 시점). 뒤에 붙은 조사는 떼고 본다. */
+const REFERENTIAL_WORDS: ReadonlySet<string> = new Set([
+  '나', '내', '제', '저', '저희', '우리', '너', '네', '당신', '본인', '자기',
+  '이', '그', '이거', '그거', '저거', '이것', '그것', '저것', '여기', '거기', '저기',
+  '그때', '아까', '전에', '평소', '늘', '항상',
+]);
+/** 대상을 정하지 않는 말(부정 · 의문 · 평가). */
+const INDEFINITE_WORDS: ReadonlySet<string> = new Set([
+  '어떤', '어느', '아무', '아무거나', '무슨', '뭐', '뭔가', '뭐든', '무엇', '무엇이든', '누구', '어디', '몇',
+  '적당한', '알맞은', '좋은', '괜찮은', '필요한', '추천', '비슷한', '다른', '여러', '특정',
+]);
+const TRAILING_PARTICLE = /(가|이|의|는|은|를|을|도|만|께서|에게)$/;
+/** 관형형 어미(먹을 · 먹는 · 먹은 · 복용할 · 쓰던) — 뒤 명사를 사용자 행동으로 한정한다. 마지막 낱말에는 적용하지 않는다. */
+const MODIFIER_ENDING = /(는|을|은|할|한|될|된|던)$/;
+
+/** 재생할 요청 값 하나가 구체적인가. */
+export function assessReplayValue(value: unknown): 'concrete' | 'ambiguous' {
+  const v = normalizeWorkflowText(value);
+  if (v.replace(/\s+/g, '').length < 2 || /[?？]/.test(v)) return 'ambiguous';
+  const tokens = v.split(' ');
+  for (let i = 0; i < tokens.length; i += 1) {
+    const t = tokens[i];
+    const base = t.length >= 2 ? t.replace(TRAILING_PARTICLE, '') : t;
+    if (REFERENTIAL_WORDS.has(t) || REFERENTIAL_WORDS.has(base) || INDEFINITE_WORDS.has(t) || INDEFINITE_WORDS.has(base)) return 'ambiguous';
+    if (i < tokens.length - 1 && t.length >= 2 && MODIFIER_ENDING.test(t)) return 'ambiguous';
+  }
+  return 'concrete';
+}
+
+/**
+ * 재생 단계 중 **요청에서 온 값**(set_input 값 · 요청 문장에 들어 있는 select_option 값)이 모두 구체적이어야 재생한다.
+ * 요청에 없는 고정 선택지(UI 라벨)는 사용자가 준 값이 아니므로 보지 않는다.
+ */
+export function replayPreflight(request: string, steps: readonly ReplayStep[]): 'ok' | 'ambiguous' {
+  const req = normalizeWorkflowText(request);
+  for (const s of steps) {
+    if (s.value === undefined) continue;
+    const fromRequest = s.actionKind === 'set_input' || req.includes(s.value);
+    if (fromRequest && assessReplayValue(s.value) === 'ambiguous') return 'ambiguous';
+  }
+  return 'ok';
+}
+
 /** DOM find 조건 — role(있으면) + name 또는 text. */
 export function replayFindQuery(locator: WorkflowLocator): Record<string, string> {
   const q: Record<string, string> = {};

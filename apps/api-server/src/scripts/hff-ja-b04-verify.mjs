@@ -10,6 +10,7 @@
  */
 import fs from 'node:fs';
 import pg from 'pg';
+import { requireDbUsername } from './require-db-username.mjs';
 import { lostNums, KEEP_PROPER, SIMPLIFIED_ONLY } from './hff-ja-b01-translate.mjs';
 
 const D = 'apps/api-server/src/scripts/data';
@@ -22,7 +23,7 @@ const QUEUE = fs.existsSync(`${D}/hff-ja-deferred-issue-queue-v1.jsonl`)
   : [];
 
 const HANGUL = /[가-힣ㄱ-ㅎㅏ-ㅣ]/;
-const c = new pg.Client({ host: '127.0.0.1', port: parseInt(process.env.PROXY_PORT ?? '5472', 10), user: 'o4o_api', password: process.env.PGPW, database: 'o4o_platform', statement_timeout: 900000 });
+const c = new pg.Client({ host: '127.0.0.1', port: parseInt(process.env.PROXY_PORT ?? '5472', 10), user: requireDbUsername(), password: process.env.PGPW, database: 'o4o_platform', statement_timeout: 900000 });
 await c.connect();
 await c.query('SET default_transaction_read_only = on');
 if ((await c.query('SHOW transaction_read_only')).rows[0].transaction_read_only !== 'on') { console.error('NOT_READ_ONLY'); process.exit(1); }

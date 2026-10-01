@@ -11,6 +11,7 @@
 import fs from 'node:fs';
 import crypto from 'node:crypto';
 import pg from 'pg';
+import { requireDbUsername } from './require-db-username.mjs';
 
 const D = 'apps/api-server/src/scripts/data';
 const sha = (s) => crypto.createHash('sha256').update(s ?? '').digest('hex');
@@ -20,7 +21,7 @@ if (RENDER.verdict !== 'PASS') { console.error('RENDER_NOT_PASS'); process.exit(
 if (TARGETS.length !== RENDER.batchSize) { console.error(`TARGETS_NOT_BATCH_SIZE:${TARGETS.length}/${RENDER.batchSize}`); process.exit(1); }
 
 const APPLY = process.argv.includes('--apply') && process.env.HFF_JA_B04_APPLY_CONFIRM === 'YES';
-const c = new pg.Client({ host: '127.0.0.1', port: parseInt(process.env.PROXY_PORT ?? '5472', 10), user: 'o4o_api', password: process.env.PGPW, database: 'o4o_platform', statement_timeout: 900000 });
+const c = new pg.Client({ host: '127.0.0.1', port: parseInt(process.env.PROXY_PORT ?? '5472', 10), user: requireDbUsername(), password: process.env.PGPW, database: 'o4o_platform', statement_timeout: 900000 });
 await c.connect();
 
 const globals = async () => (await c.query(`

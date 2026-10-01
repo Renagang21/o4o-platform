@@ -1447,6 +1447,79 @@ Neture 역할을 함께 가져 실계정으로는 재현할 수 없고, 이 한 
 이 확인에서 **운영 데이터 생성 · 게이트 변경 · 배포 · 역할 부여는 0**이다(사용자의 로그인 ·
 이동 · 로그아웃이 남긴 인증 원장 3행이 전부이며, 그것이 검증 대상이었다).
 
+#### 8-9-6. 운영자 권한 경계 — 에이전트 실계정 측정 · 배포 2 · 결함 정정 (2026-09-29 ~ 09-30)
+
+§8-9-2 A6 · A7 의 세부 기록이다. 측정 방법: 사용자가 Playwright 창에 **한 번** Google 로그인 →
+에이전트가 그 창의 인증 세션(`localStorage` access token 을 Bearer 로 · 토큰 값 기록 없음)으로
+API 를 호출하고 화면을 열었다. 주소창 직접 호출의 401 은 역할 거부가 아니므로 쓰지 않았다.
+토큰 만료로 난 401 `INVALID_TOKEN` 은 거부로 세지 않고, 세션 갱신 뒤 다시 측정했다.
+
+> 이 절은 §8-9-3 의 **Google 로그인·인증 범위 마감**을 보완하는 기록이다. 아래 미검증 항목은
+> 후속 관리자 기능(§8-9-5)이며, 이 인증 세션은 그것을 기다리지 않고 종료한다(2026-09-30).
+
+**① 공급자 신청 화면 결함 (PR [#254](https://github.com/Renagang21/o4o-platform/pull/254) · `f1f912c87` · 병합 `fe2a3ec35`).**
+배포 1 뒤 실계정 `/supplier` 가 서비스 가입 없는 `neture:admin` 계정에 "관리자 계정입니다" 와
+「공급자 업무로 이동」(→ `/supplier/dashboard` 접근 거부)을 보였다. 원인은 `ServiceApplyPanel` 의
+관리자 우회 분기와 `NetureGlobalHeader` 의 관리자 전체 nav 노출(`showAll`)이었다. 둘 다 제거했다 —
+관리자도 **자신의 공급자 서비스 상태**대로 신청 · 대기 · 활성 화면을 본다.
+자동 테스트: `ServiceApplyPanel.test.tsx` 신규 5건 — 구 코드에서 3건 실패 · 신 코드에서 5/5 PASS.
+auth vitest 41 PASS · `tsc` 0 · `vite build` 성공 · PR CI 전부 pass.
+
+**② 배포 2 (사용자 승인 · neture-web 한 서비스).**
+
+| 항목 | 값 |
+|---|---|
+| tag | `deploy/2026-09-29-neture-supplier-landing-fix` → `fe2a3ec35` |
+| run | `36537790733` success — deploy-neture 만 실행 · 나머지 서비스 skipped |
+| revision | `neture-web-01662-mgp` → **`neture-web-01663-7p9`** traffic 100% · `/supplier` 200 |
+| 게이트 | 배포 직후 `DEPLOY_ENABLED=false` 로 되돌림 · 게이트가 열린 동안 실행된 run 은 이것 하나 |
+| 롤백 revision | `neture-web-01662-mgp` |
+
+회귀 확인(실계정 · 에이전트): `/supplier` 에 testid `service-apply-supplier-none` · "공급자 서비스 · 미신청" ·
+입력 3 · 「공급자 서비스 신청」 버튼이 나오고, "관리자 계정입니다" · 「공급자 업무로 이동」은 없다.
+`/supplier` · `/operator` · `/` 에 `/supplier/dashboard` 링크 없음. **신청은 제출하지 않았다**(운영 데이터 생성 0).
+
+**③ 역할 변경 이력 (사용자가 Admin UI 로 변경 · 에이전트 read-only 확인 — `role_assignments` · `service_memberships` · `action_logs` · API 요청 로그).**
+
+| 시각 (UTC 09-29) | 변경 | 비고 |
+|---|---|---|
+| 07:50:48 | `community:admin` 부여 | `action_logs` `admin.operator_role_assigned` · service membership 자동 생성(active · admin) |
+| 07:51:19 | `supplier:admin` 부여 | 같음 |
+| 07:51:49 | `funding:admin` 부여 | 같음 |
+| 07:52:01 · 07:52:05 | `cosmetics:admin` · `cosmetics:operator` 해제 | Admin UI DELETE 2건. **사용자 의도적 해제**(현재 운영하지 않는 서비스) |
+| — | `kpa-branch:admin` | **미부여** (2026-09-30 재확인 — 역할 목록에 `kpa-branch:operator` 만) |
+
+**④ 허용 · 거부 경계 — 실계정 (에이전트 측정).**
+
+| 경로 | 지정 전 | 지정 후 |
+|---|---|---|
+| `/neture/operator/suppliers` · `/suppliers/pending` · `/neture/admin/suppliers/governance` | 403 `MEMBERSHIP_NOT_FOUND` | **200** (3건 · 1건 · 2건) |
+| `/neture/operator/market-trial` · `/kpi` | 403 | **200** |
+| 화면 `/operator/suppliers` · `/admin/supplier-governance` · `/operator/market-trial` | "접근 권한이 없습니다" | **열림** |
+| `/communities/requests` · `/communities/admin/communities` · `/communities/operating` | — | **200** (0건 · 3건 · 0건) · 화면 `/admin/communities` 열림 |
+| `/kpa-branch/admin/branch-requests` | 403 | **403 유지** — `kpa-branch:admin` 미부여와 일치(거부 경로 PASS) |
+| `/communities/pharmacy/memberships?status=pending` · `/communities/o4o-general/memberships` | — | **403 `COMMUNITY_MEMBERSHIP_REQUIRED`** — `community:admin` 은 개별 커뮤니티 운영자 자격이 아니다(설계대로 · 거부 경로 PASS) |
+
+지정 전 측정은 배포 2 전과 후 모두에서 같았다. `/operator` 는 두 시점 모두 Neture 운영자 대시보드로 열린다.
+
+**⑤ 미검증 (운영 데이터 없음 — 만들지 않았다).**
+
+| 항목 | 이유 |
+|---|---|
+| 커뮤니티 · 분회 개설 신청의 승인/거절 | `community_creation_requests` 0 · `branch_creation_requests` 0 |
+| 커뮤니티 개체 운영자의 가입 승인 성공 경로 | `community_memberships` 는 active member 2행뿐 · 운영자 0 · pending 0 · 대상 계정은 커뮤니티 가입 없음 |
+| 분회 심사 화면 허용 경로(403 → 200) | `kpa-branch:admin` 미부여 — 지정은 후속 관리자 기능(§8-9-5). 인증 범위 마감을 막지 않는다 |
+| 예약어 slug | 인증 범위 밖 · 자동 테스트만 (§8-8-2) |
+| 개별 운영자 지정 | 실회원 권한을 바꾸는 작업 — 사용자 지시로 **버그 처리 라운드로 미룸**(운영자 지정 코드의 결함 포함) |
+
+**⑥ 관찰 (보고만 · 고치지 않음).**
+
+- Neture 운영자 대시보드에 "공급사 승인 대기 1건" 이 보이고 `/operator/supply` → `/operator/all-registered-products` 로 연결된다. 건수만 나오고 공급자 레코드는 보이지 않는다 — 이 카드의 역할(`supplier:*` 경계 안인지)은 **미결정**.
+- 역할 해제(`DELETE /api/v1/admin/users/:userId/role-assignments/:role`)는 `is_active=false` 만 하고 `action_logs` 에 남지 않는다(logger 만). 부여는 남는다 — 감사 기록이 비대칭이다.
+- `cosmetics:*` 해제 뒤에도 `k-cosmetics` service membership 은 active · admin 그대로 남는다.
+- 공급자 신청이 거절 · 철회된 뒤 재신청 경로가 막혀 있다(dead end) — 미해결 · 기록만.
+- 운영자 지정 코드의 결함은 사용자가 확인했고 **버그 처리 라운드에서 함께 처리**한다(이 절의 범위 아님).
+
 #### 8-9-5. 후속 범위 (이 마감의 대상이 아니다)
 
 | 항목 | 이유 |
@@ -1587,6 +1660,11 @@ representative-entry · unified-store-workspace-handoff spec)은 새 계약(`'un
 ---
 
 ## 10. 문서 정합
+
+- 2026-09-30 §8-9-6: 에이전트 실계정 허용·거부 측정 · 배포 2 · PR #254 결함 정정 · 역할 변경 이력 · 미검증 · 관찰을
+  기록했다. 기준 문서 변경 0 · 코드 변경 0 · 이번 문서 기록 작업의 에이전트 운영 write 0 — 발견 0건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 0건
+  사용자 Admin UI의 역할 부여 3건·해제 2건은 §8-9-6 ③에 별도 기록했다.
+  (관찰 5건은 버그 처리 라운드 · 후속 관리자 기능 범위로 기록만).
 
 - 2026-09-29 §8-9 확정: 사용자 실측 3단계 + 원장 대조로 A2 · A4 · A5 를 운영 PASS 로 확정하고
   **Google 로그인·인증 범위 마감** 으로 판정했다. A8 은 자동 테스트만 PASS 로 남긴다(실계정 재현 불가).

@@ -113,10 +113,13 @@ jobs:
         category: "/language:${{matrix.language}}"
         ram: 6000
         threads: 2
-        # 분석 결과 SARIF 를 알려진 위치에 남긴다 — code scanning 업로드가 실패해도 결과를 볼 수 있게.
+        # 이 저장소(개인 계정 private)는 code scanning 을 켤 수 없어 SARIF 업로드가
+        # "Code scanning is not enabled" 로 step 을 실패시킨다. 분석은 그대로 수행하고
+        # (분석 실패는 여전히 step 실패), 업로드만 하지 않는다. 결과는 아래 artifact 로 본다.
+        upload: never
         output: codeql-sarif
 
-    # 업로드 성공 여부와 무관하게 SARIF 를 artifact 로 보존한다(분석 · 업로드 동작은 그대로).
+    # 분석 결과 SARIF 를 artifact 로 보존한다 — code scanning 대신 결과를 확인하는 경로.
     - name: Preserve CodeQL SARIF
       if: always()
       uses: actions/upload-artifact@v4

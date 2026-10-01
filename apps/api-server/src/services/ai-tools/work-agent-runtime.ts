@@ -88,6 +88,7 @@ import {
   normalizeWorkflowText,
   pickReplayTarget,
   replayFindQuery,
+  replayPreflight,
   type TrajectoryEntry,
 } from './workflow-candidate.js';
 
@@ -480,7 +481,11 @@ export async function runWorkAgent(
   if (!isValidWorkGoalRequest(goal.request)) return finishNoState(WORK_AGENT_ERROR.GOAL_INVALID, '무엇을 하려는지 한 문장으로 알려 주세요.', 'needs_user');
   if (!imageCheck.ok) return finishNoState(WORK_AGENT_ERROR.IMAGE_INVALID, 'JPEG · PNG · WebP 이미지만 첨부할 수 있습니다(최대 10MB).', 'needs_user');
   // WORK-TARGET-DISCOVERY-V0 §6·§34 — 어디서 할 일인지(등재 사이트 또는 등재 프로그램)를 먼저 정한다. 못 정하면 묻는다.
-  const targetRef: WorkTargetRef | null = resolveWorkTarget(goal.request, input.targetHint);
+  // 재개(runId)는 짧은 답변 문장에서 대상을 다시 찾지 않는다 — 원래 run 의 대상(targetHint 로 상속)만 쓴다
+  // (WO-O4O-MAIN-AUTOMATION-RESUME-AND-REPLAY-PREFLIGHT-FIX-V1 §2-B). 상속할 대상이 없으면 이어갈 수 없으므로 재개를 거부한다.
+  const resuming = input.runId !== undefined;
+  const targetRef: WorkTargetRef | null = resuming ? resolveWorkTarget('', input.targetHint) : resolveWorkTarget(goal.request, input.targetHint);
+  if (!targetRef && resuming) return finishNoState(WORK_AGENT_ERROR.RESUME_REJECTED, '이어갈 작업의 대상을 확인하지 못했습니다. 처음 요청부터 다시 입력해 주세요.', 'needs_user');
   if (!targetRef) return finishNoState(WORK_AGENT_ERROR.SITE_UNRESOLVED, '어느 사이트나 프로그램에서 할 일인지 알려 주세요(예: 약학정보원에서 …).', 'needs_user');
   const siteId = targetRef.targetId;
   if (input.targetHint) goal.targetHint = siteId;
@@ -731,7 +736,8 @@ export async function runWorkAgent(
   }
   // Local SQLite 정본에 run 을 기록한다(cloud→local write only). semantic 만 — 대상 id·짧은 목표 요약(원문 관찰/DOM 없음).
   await issueWorkRunUpsert(dataSource, { userId: ctx.userId, deviceId }, {
-    runId: goal.runId, status: 'active', targetId: siteId, goalSummary: goal.request.slice(0, 200),
+    // 재개 답변(짧은 답)으로 원래 목표 요약을 덮지 않는다.
+    runId: goal.runId, status: 'active', targetId: siteId, goalSummary: resumedRun ? undefined : goal.request.slice(0, 200),
   });
 
   // WINDOWS-UI-AUTOMATION-V0 — 표면 선택. windows_app 은 UIA(같은 Planner 어휘 · 같은 검증 · 다른 실행층).
@@ -971,6 +977,13 @@ export async function runWorkAgent(
       });
     } catch (e) {
       logger.warn('work-agent workflow match failed', { code: (e as { code?: string })?.code ?? null });
+    }
+    // 재생 전 의미 검증(FIX-V1 §2-A) — 템플릿 일치만으로 실행하지 않는다. 요청 값이 대상을 스스로 정하지 못하면(모호)
+    // 입력 · 클릭 전에 QUESTION 으로 멈춘다. 재생을 시도하지 않았으므로 Candidate 통계에는 넣지 않는다(replayedCandidateId 미설정).
+    if (match?.candidateId && match.steps && replayPreflight(goal.request, match.steps) === 'ambiguous') {
+      logger.info('work-agent workflow preflight', { result: 'ambiguous', aiPlanCount: state.aiPlanCount });
+      neededInput = '무엇을 찾거나 입력할지 구체적인 이름이나 번호로 알려 주세요.';
+      return question('user_judgment_required');
     }
     if (match?.candidateId && match.steps) {
       replayedCandidateId = match.candidateId;

@@ -281,6 +281,13 @@ describe('POST /api/ai/request', () => {
     expect(runWorkAgentMock.mock.calls[1][2].runId).toBe('g_2');
   });
 
+  it('⑧-2 재개는 원래 run 대상(targetHint)을 함께 넘기고, 재개가 아니면 targetHint 를 무시한다(FIX-V1 §2-B)', async () => {
+    await request(app).post('/api/ai/request').send({ text: '게보린', runId: 'g_3', targetHint: 'healthkr' });
+    expect(runWorkAgentMock.mock.calls[0][2]).toMatchObject({ request: '게보린', runId: 'g_3', targetHint: 'healthkr' });
+    await request(app).post('/api/ai/request').send({ text: '약학정보원에서 게보린 검색해줘', targetHint: 'healthkr' });
+    expect(runWorkAgentMock.mock.calls[1][2].targetHint).toBeUndefined();
+  });
+
   it('⑥ 모호한 요청 → confirm (본체 미호출) → routeHint:work → work', async () => {
     const r = await request(app).post('/api/ai/request').send({ text: '닥터스 반납' });
     expect(r.status).toBe(200);

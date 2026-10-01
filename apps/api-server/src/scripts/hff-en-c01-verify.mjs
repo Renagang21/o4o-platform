@@ -10,6 +10,7 @@
  */
 import fs from 'node:fs';
 import pg from 'pg';
+import { requireDbUsername } from './require-db-username.mjs';
 import { SEC, SLOT_G, HANGUL, specSlots, norm, numericLoss } from './hff-en-c01-lib.mjs';
 
 const D = 'apps/api-server/src/scripts/data';
@@ -19,7 +20,7 @@ const applied = JSON.parse(fs.readFileSync(`${D}/hff-en-c01-apply-result-v1.json
 const updatedIds = new Set(JSON.parse(fs.readFileSync(`${CACHE}/hff-en-c01-updated-ids.json`, 'utf8')));
 const survey = JSON.parse(fs.readFileSync(`${D}/hff-en-c01-survey-v1.json`, 'utf8'));
 
-const c = new pg.Client({ host: '127.0.0.1', port: parseInt(process.env.PROXY_PORT ?? '5621', 10), user: 'o4o_api', password: process.env.PGPW, database: 'o4o_platform', statement_timeout: 1800000 });
+const c = new pg.Client({ host: '127.0.0.1', port: parseInt(process.env.PROXY_PORT ?? '5621', 10), user: requireDbUsername(), password: process.env.PGPW, database: 'o4o_platform', statement_timeout: 1800000 });
 await c.connect();
 await c.query('SET default_transaction_read_only = on');
 if ((await c.query('SHOW transaction_read_only')).rows[0].transaction_read_only !== 'on') { console.error('NOT_READ_ONLY'); process.exit(1); }

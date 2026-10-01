@@ -2187,7 +2187,7 @@ async function performHospitalDrugRequest(
 // POST /api/ai/request — 단일 자연어 요청 진입점 (Unified Request Router)
 // WO-O4O-AI-COMPOSER-UNIFIED-REQUEST-AND-ATTACHMENT-UX-V1 §4·§5·§6
 //
-//   { text, attachments?: [{ name, mimeType, base64 }], runId?, routeHint?: 'work', workScope? }
+//   { text, attachments?: [{ name, mimeType, base64 }], runId?, targetHint?(runId 와 함께만), routeHint?: 'work', workScope? }
 //
 //   사용자는 "질문 / 작업 수행" 을 고르지 않는다. 서버 라우터(unified-request-router, 결정론적 · AI 호출 없음)가
 //   판정해 기존 두 본체(performHomeChat · performWorkAgentRun) 중 하나로 보낸다. 응답은 `data.kind` 로 갈린다:
@@ -2277,7 +2277,9 @@ router.post('/request', authenticate, dynamicLimiter('free'), async (req, res: R
     const image = firstImageAttachment(attachments);
     const workBody: Record<string, unknown> = { request: text };
     if (image) workBody.image = image;
+    // 재개는 원래 run 의 대상을 상속한다 — work-agent/run 의 기존 targetHint 를 재개 요청에서만 전달한다(FIX-V1 §2-B).
     if (runId) workBody.runId = runId;
+    if (runId && typeof body.targetHint === 'string') workBody.targetHint = body.targetHint;
     if (typeof body.recoveryHint === 'string') workBody.recoveryHint = body.recoveryHint;
     const reply = await performWorkAgentRun(userId, workBody);
     if (reply.status !== 200) return res.status(reply.status).json(reply.body);

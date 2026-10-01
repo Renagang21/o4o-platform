@@ -55,7 +55,7 @@ import { UserCircle, Loader2, ArrowUp, Plus, Paperclip, HardDrive, FileText, Ima
 import { useAuth, useLoginModal, useWorkScope } from '../contexts';
 import { getUserDisplayName } from '@o4o/account-ui';
 import { HOME_CHAT_MAX_MESSAGE_LENGTH } from '../lib/ai/home-chat';
-import { type WorkAgentResult } from '../lib/ai/work-agent';
+import { nextResumeAnchor, type ResumeAnchor, type WorkAgentResult } from '../lib/ai/work-agent';
 import {
   addPendingAttachments,
   sendUnifiedRequest,
@@ -212,7 +212,7 @@ export default function O4OHomePage() {
    *   attachments  : ＋ · drag&drop · 붙여넣기로 들어온 범용 첨부(이미지 · 문서 · 표). 이번 요청에서만 쓰고 저장하지 않는다(§7).
    *   workResult   : 서버가 Work 경로로 판정해 수행한 결과(WO-O4O-GOAL-DRIVEN-MULTIMODAL-WORK-AGENT-V0 §23 — React state 뿐).
    *   confirm      : 서버가 "작업인지 모호" 로 되물은 상태. [진행] 은 같은 문장을 routeHint 로 다시 보낸다 — 모드 스위치가 아니다.
-   *   resumeRunId  : 직전 Work 응답이 QUESTION(resumable)이면 다음 요청을 같은 업무로 잇는 앵커(PHASE 1 same-run).
+   *   resumeAnchor : 직전 Work 응답이 QUESTION(resumable)이면 다음 요청을 같은 업무로 잇는 앵커(runId + 원래 대상, PHASE 1 same-run).
    *   attachmentsUsed : 서버가 어떤 첨부를 읽었는지(이름 · 종류 · 읽힘 여부만).
    */
   const [attachments, setAttachments] = useState<PendingAttachment[]>([]);
@@ -221,7 +221,7 @@ export default function O4OHomePage() {
   const [dragOver, setDragOver] = useState(false);
   const [workResult, setWorkResult] = useState<WorkAgentResult | null>(null);
   const [confirm, setConfirm] = useState<{ text: string; message: string } | null>(null);
-  const [resumeRunId, setResumeRunId] = useState<string | null>(null);
+  const [resumeAnchor, setResumeAnchor] = useState<ResumeAnchor | null>(null);
   const [attachmentsUsed, setAttachmentsUsed] = useState<{ name: string; kind: string; readable: boolean }[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const plusMenuRef = useRef<HTMLDivElement>(null);
@@ -269,7 +269,7 @@ export default function O4OHomePage() {
     setPlusMenuOpen(false);
     setWorkResult(null);
     setConfirm(null);
-    setResumeRunId(null);
+    setResumeAnchor(null);
     setAttachmentsUsed([]);
   };
   const userId = user?.id ?? null;
@@ -349,9 +349,11 @@ export default function O4OHomePage() {
     setOpenedSite(null);
     setLoginReady(false);
     const gen = aiGenRef.current;
-    const runId = resumeRunId ?? undefined;
+    const anchor = resumeAnchor;
+    const runId = anchor?.runId;
+    const resumeTargetId = anchor?.targetId ?? undefined;
     try {
-      const result: UnifiedRequestResult = await sendUnifiedRequest({ text, attachments, workScope, runId, routeHint });
+      const result: UnifiedRequestResult = await sendUnifiedRequest({ text, attachments, workScope, runId, resumeTargetId, routeHint });
       if (gen !== aiGenRef.current) return; // 로그아웃 · 사용자 변경 후 도착한 응답은 버린다
       if (result.kind === 'confirm') {
         // 실행하지 않았다. 입력 · 첨부는 그대로 두고 [진행] 을 기다린다.
@@ -363,19 +365,20 @@ export default function O4OHomePage() {
       setAttachError(null);
       if (result.kind === 'work') {
         setWorkResult(result.work);
-        setResumeRunId(result.work.resumable && result.work.runId ? result.work.runId : null);
+        // 재개 실패 한 번으로 대기 중인 run 을 버리지 않는다 — 종료 · 거부가 확정될 때만 해제(FIX-V1 §2-C).
+        setResumeAnchor(nextResumeAnchor(anchor, result.work));
         return;
       }
       // §9 — 원내약 + 약학정보원 결합 응답. 서버가 이미 하나로 합친 한국어 답을 그대로 보여 준다.
       if (result.kind === 'composite') {
         setAnswer(result.composite.message);
-        setResumeRunId(null);
+        setResumeAnchor(null);
         return;
       }
       setAnswer(result.chat.message);
       setOpenedSite(result.chat.browserSiteOpened ?? null);
       setAttachmentsUsed(result.chat.attachments ?? []);
-      setResumeRunId(null);
+      setResumeAnchor(null);
     } catch (err) {
       if (gen !== aiGenRef.current) return;
       setAnswer(null);

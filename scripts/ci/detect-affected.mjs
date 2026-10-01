@@ -494,10 +494,10 @@ export function classify(changedFiles, graph, opts = {}) {
  *   api_deploy_affected — production **image/runtime/schema** 가 바뀌는가
  *
  * 후자가 거짓이면 Docker build/push · Cloud Run migration Job 실행 ·
- * 새 revision · one-off job image 재고정이 **전부 불필요한 프로덕션 작업**이다.
+ * 새 revision 이 **전부 불필요한 프로덕션 작업**이다.
  *
  * production image 실측 구성 (Dockerfile · tsup.config.ts · deploy-api.yml 조사):
- *   dist/main.js · dist/migrate.js · one-off job entry 7개 (tsup 번들)
+ *   dist/main.js · dist/migrate.js (tsup 번들)
  *   dist/database/** (tsc 산출 migration + migration-config)
  *   src/assets/** · packages/mail-core/templates/email
  * 이 중 어디에도 test 파일은 들어가지 않는다.
@@ -530,7 +530,7 @@ const API_NON_DEPLOY_PATTERNS = [
  * 조사 근거(census):
  *   - `apps/api-server/tsconfig.build.json` 이 `*.spec.ts` · `*.test.ts` ·
  *     `src/__tests__/**` 를 exclude 한다 → tsc migration 산출물에 없다.
- *   - `tsup.config.ts` entry 9개(main · migrate · *-job)에서 test 파일로 가는
+ *   - `tsup.config.ts` entry 2개(main · migrate)에서 test 파일로 가는
  *     import 경로가 없다. production source 가 `__tests__`/`tests/` 에서
  *     import 하는 사례 **0건**.
  *   - production source 가 test 파일을 raw text 로 읽는 사례 **0건**
