@@ -182,7 +182,7 @@ Phase 1 IR 의 REVIEW-1~7 은 [IR Phase 1 §7](../investigations/IR-O4O-PRIVACY-
 | 정본 | 관계 |
 |---|---|
 | [`O4O-CORE-FREEZE-V1`](O4O-CORE-FREEZE-V1.md) (F10) | §5-A 의 "Identity V2 명시적 예외 승인 절차" 는 **V3 구현 WO 에 그대로 적용**된다. 대상 항목은 `service_credentials` 신설이 아니라 REVIEW-8 · REVIEW-11 · 자동 병합 제거 · Google 연결 흐름이다. F10 본문 정정은 별도 WO |
-| [`USER-OPERATOR-FREEZE-V1`](USER-OPERATOR-FREEZE-V1.md) (F11) | 3축(`users` · `service_memberships` · `role_assignments`) 은 V3 에서도 그대로다. §10 의 L2 = `service_credentials` 해석은 V3 에서 L2 = `linked_accounts`(기존 테이블) 로 바뀌므로 **신규 테이블 추가 없음**. F11 Forbidden Pattern 전부 유지. §10 본문 정정은 별도 WO |
+| [`USER-OPERATOR-FREEZE-V1`](USER-OPERATOR-FREEZE-V1.md) (F11) | 3축(`users` · `service_memberships` · `role_assignments`) 은 V3 에서도 그대로다. §10 의 L2 = `service_credentials` 해석은 V3 에서 L2 = `linked_accounts`(기존 테이블) 로 바뀌어 채택 시점(2026-09-17)에는 신규 테이블이 없었다. **2026-09-29 정책으로 L2 에 신규 테이블 3개**(`user_password_credentials` · `email_verification_tokens` · `password_reset_tokens`, 구현 PR #257)가 추가된다 — 근거는 `WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1` §5 승인 1(사용자 명시 승인). 이것이 F11 §10.3~10.4 예외 절차(사유 명시 · 3축 무결성 검증)를 충족한 기록인지는 **미판정 — 별도 확인 대상**. F11 Forbidden Pattern 전부 유지. §10 본문 정정은 별도 WO |
 | [`RBAC-FREEZE-DECLARATION-V1`](../rbac/RBAC-FREEZE-DECLARATION-V1.md) (F9) | 충돌 없음 — `role_assignments` SSOT 유지(§7) |
 | [`O4O-BOUNDARY-POLICY-V1`](O4O-BOUNDARY-POLICY-V1.md) (F6) | 충돌 없음 — `organizationId` / `storeId` = Store row id 유지(§5) |
 | [`O4O-ROLE-WORKSPACE-ARCHITECTURE-V1`](../baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md) | 충돌 없음 — Service Identity(카탈로그) · Community Identity 는 본 문서의 User Identity 와 다른 축. `1 Store : N Services` 유지 |

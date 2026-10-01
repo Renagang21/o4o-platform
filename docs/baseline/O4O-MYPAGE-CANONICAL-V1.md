@@ -9,7 +9,7 @@
 - **선행 산출물:** [IR-O4O-MYPAGE-VS-ACCOUNT-CENTER-CANONICAL-V1](../investigations/IR-O4O-MYPAGE-VS-ACCOUNT-CENTER-CANONICAL-V1.md)
 - **상위 SSOT:**
   - `CLAUDE.md` (사업 철학 priority chain)
-  - [O4O-IDENTITY-ARCHITECTURE-V2](../architecture/O4O-IDENTITY-ARCHITECTURE-V2.md) (4-Layer 모델)
+  - [O4O-IDENTITY-ARCHITECTURE-V3](../architecture/O4O-IDENTITY-ARCHITECTURE-V3.md) (4-Layer 모델 · 현행 Identity SSOT) — ~~[V2](../architecture/O4O-IDENTITY-ARCHITECTURE-V2.md)~~ 는 SUPERSEDED(2026-09-17), 역사적 참조로만 남긴다
   - [O4O-BUSINESS-PHILOSOPHY-V1](O4O-BUSINESS-PHILOSOPHY-V1.md) (독립 사업자 원칙)
 
 ---
@@ -197,7 +197,7 @@ route 명칭 통일 여부는 본 baseline 이 결정하지 않는다(별건).
 본 baseline 의 §1 (결정), §2 (매트릭스), §3 (허용/금지), §4 (원칙) 변경은:
 
 1. 별도 IR 로 변경 사유 + 영향 분석 작성
-2. Identity V2 architecture 와의 정합 재확인
+2. Identity architecture [V3](../architecture/O4O-IDENTITY-ARCHITECTURE-V3.md) 와의 정합 재확인 (V2 는 SUPERSEDED — 기준으로 쓰지 않는다)
 3. WO 로 본 baseline 갱신 (V1 → V2 등 버전 증가)
 4. 영향받는 frontend 코드 정렬 WO 별도 진행
 
@@ -209,7 +209,7 @@ route 명칭 통일 여부는 본 baseline 이 결정하지 않는다(별건).
 
 - 결정 근거 IR: [IR-O4O-MYPAGE-VS-ACCOUNT-CENTER-CANONICAL-V1](../investigations/IR-O4O-MYPAGE-VS-ACCOUNT-CENTER-CANONICAL-V1.md)
 - 위치 규정 CHECK: [CHECK-O4O-WEB-ACCOUNT-ENTRY-FLOW-REGRESSION-V1](../archive/checks/CHECK-O4O-WEB-ACCOUNT-ENTRY-FLOW-REGRESSION-V1.md)
-- Identity V2: [O4O-IDENTITY-ARCHITECTURE-V2](../architecture/O4O-IDENTITY-ARCHITECTURE-V2.md)
+- Identity (현행): [O4O-IDENTITY-ARCHITECTURE-V3](../architecture/O4O-IDENTITY-ARCHITECTURE-V3.md) · 역사적 참조: [O4O-IDENTITY-ARCHITECTURE-V2](../architecture/O4O-IDENTITY-ARCHITECTURE-V2.md) (SUPERSEDED)
 - Handoff 정책: [IR-O4O-AUTH-HANDOFF-POLICY-AUDIT-V1](../investigations/IR-O4O-AUTH-HANDOFF-POLICY-AUDIT-V1.md)
 - Boundary Policy: `docs/architecture/O4O-BOUNDARY-POLICY-V1.md`
 - 사업 철학: [O4O-BUSINESS-PHILOSOPHY-V1](O4O-BUSINESS-PHILOSOPHY-V1.md)
