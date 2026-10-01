@@ -119,11 +119,16 @@ baseline fresh bootstrap + incremental 1..12 → **5927 → 5944 (+17)** ·
 `LIVE = EXPECTED = 09d5a917…` · `POST_MIGRATION_SCHEMA_ASSERTION = PASS` ·
 재실행 pending 0 / executed 0(멱등) · DB 제거 · migration contract **21 pass / 0 fail** · tsc 0.
 
-### 2-2. 판정 helper (코드 · 아직 미작성)
+### 2-2. 판정 helper — **구현 완료** (2026-10-01)
 
 ```text
-isDemoAccount(userId) · getDemoAccountType(userId)
+services/auth/demo-account.service.ts
+  isDemoAccount(userId, manager?) · getDemoAccountType(userId, manager?)
+  isDemoLoginEmail(normalizedEmail, manager?)   # 로그인 전 경로(forgot · Google 가입) 전용
 ```
+
+`isDemoLoginEmail` 도 `users` → `demo_accounts` 를 거친다 — 상수 이메일과 비교하지 않으므로
+판정 정본은 여전히 `user_id` 다. 조회 실패는 통과로 바꾸지 않는다(fail-closed).
 
 비밀번호 변경 차단 · forgot/reset 차단 · Google 연결 차단 · 계정 삭제 차단 · 위험 API 차단 ·
 Demo 배지가 **전부 같은 정본**을 보게 한다. 이메일 비교는 쓰지 않는다.
@@ -196,6 +201,84 @@ product_masters 272,040       공공데이터 seed
 
 ---
 
+## 2-5. Phase C — 서버 보호 구현 (2026-10-01 · PR #264 · 운영 write 0)
+
+공개 credential 이므로 **비밀번호를 아는 사람이 그것을 바꿀 수 있다**는 것이 가장 큰 구멍이었다.
+화면에서 버튼을 숨기는 것으로는 막히지 않는다 — 서버에서 요청 자체를 거절한다.
+
+| 경로 | 구현 | 결과 |
+|---|---|---|
+| `POST /auth/password` | `email-auth.service.ts` `setPasswordForUser` | 403 `DEMO_ACCOUNT_FORBIDDEN` — 정책 검사·현재 비밀번호 확인보다 **먼저** |
+| `POST /auth/password/forgot` | `requestPasswordReset` | 토큰 0 · 메일 0 · 응답 문구는 일반 계정과 동일(Demo 여부 비노출) |
+| `POST /auth/password/reset` | `resetPassword` | 과거 발급 토큰도 소비 단계에서 403 · 세션 폐기 0 |
+| 계정 삭제 | `AdminUserController.deleteUser` · `UserManagementController.deleteUser` | 삭제 **전** 403 (계약 테스트가 호출 순서를 본다) |
+| Google 연결 | `google-auth.service.ts` `createGoogleUser` | 403. `EMAIL_IN_USE` 로 뭉개지 않는다 — 사유가 "이미 쓰는 주소"가 아니라 "고정된 테스트 계정"이다 |
+| platform role 획득 | 기존 보호로 충족 | `POST /admin/platform-accounts/:id/super-admin` 은 Google 연결을 요구한다(`GOOGLE_LINK_REQUIRED`) · Demo 는 연결이 없다 |
+
+**막지 않은 것** — 이메일 변경 · role 변경 · ownership 해제. 정책 §8 의 최소 목록 중 남은 3건이며
+별도 WO 다. 정책 정본 §8-1 에 현황 표로 적었다(구현 범위를 문서가 넘겨 말하지 않게).
+
+**로그인은 막지 않는다** — 체험 입구이므로 비밀번호 로그인은 그대로 된다.
+
+### 검증
+
+```text
+jest src/services/auth src/scripts/__tests__     13 suites · 232 tests PASS
+tsc --noEmit                                     PASS
+eslint (변경 9파일)                               신규 경고 0 (기존 warning 4건은 내 줄 아님)
+```
+
+**변이 검사** — 판정을 상시 `false` 로 바꾸고 재실행하면 **8개 테스트가 실패**한다:
+
+```text
+V13 비밀번호 변경 거절 / forgot 토큰·메일 0 / reset 거절 / 판정은 user_id
+Google 가입 403
+계약 D2(활성 행·바인딩) / 유형 반환 / D3(fail-closed)
+```
+
+보호 없이 통과하는 테스트가 0 임을 이것으로 확인했다(통과만 보고 PASS 로 적지 않기 위해서).
+
+### 식별자 정정
+
+`teststoreowner@example.com` · `testsupplier@example.com` — 예약 도메인이라 실제 메일함이 없다
+(공개 credential 이 실재 주소를 가리키지 않게). CLI 상수 · 정책 정본 · WO · CHECK 일괄 정정.
+`normalizeLoginEmail` · `isLoginEmailShapeValid` · 마스킹(`t***@e***.com`) 모두 통과 확인.
+
+### 구축 CLI dry-run 재실행 (2026-10-01 · 식별자 정정 후 · **write 0**)
+
+```text
+mode: DRY-RUN (measure only)
+STORE_OWNER  user=CREATE password=CREATE(plan) registry=CREATE(plan) org=reuse(테스트 약국)
+             owner=CREATE(plan) supplier=-            memberships=[kpa-society neture]
+SUPPLIER     user=CREATE password=CREATE(plan) registry=CREATE(plan) org=CREATE
+             owner=CREATE(plan) supplier=CREATE(plan) memberships=[supplier neture]
+TOTAL writes=0
+```
+
+식별자 정정 전 계획과 **같다** — 두 계정 모두 신규 생성, 매장 조직은 기존 `9c87f46b`(테스트 약국)
+재사용, 공급자 조직만 신규. 보호 대상(실사용자 2명 · `322667c8` · Sohae 약국 · 기존 supplier 조직
+3개 · `checkout_orders`)은 계획에 **등장하지 않는다**.
+
+병합(`01214353e`) 뒤 같은 명령을 다시 돌려 **같은 계획**을 얻었고, 운영 행수도 그대로다
+(read-only · `BEGIN READ ONLY`):
+
+```text
+demo_accounts 0 · users 3 · user_password_credentials 0 · organizations 25 · checkout_orders 23
+```
+
+### 배포 상태 — **guard 는 운영에 없다**
+
+```text
+merge        01214353e (main)
+운영 API     o4o-core-api-03783-jex · image 5f12c4acd  ← 내 병합 이전 빌드
+DEPLOY_FREEZE = true (잠김 · 사용자 결정)
+```
+
+병합만으로는 배포되지 않는다. 보호가 운영에 올라가기 전에 `--apply` 를 돌리면 **보호 없는
+공개 credential 이 운영에 존재하는 창**이 생긴다 — 그래서 순서는 배포 → 계정 생성이다.
+
+---
+
 ## 3. 운영 write 승인 대기 목록
 
 ```text
@@ -207,11 +290,25 @@ demo 식별 구조(migration) 생성
 기존 test user / E2E 조직 삭제
 ```
 
-현재까지 운영 **write 0** — 조회만 했다.
+현재까지 운영 **write 0** — 조회만 했다. `demo_accounts` migration 은 적용됐고(테이블 0행),
+서버 보호는 코드에만 있다(PR #264). 계정 생성(`--apply`)은 **승인 대기**다.
 
 ---
 
 ## 4. 다음
 
-Phase A 결과 보고 → 사용자 승인 → Demo 식별 구조 결정 → Phase B(생성) → C(보호) → D(relink)
-→ F(체험 로그인 UI) → G(위험 기능 census) → H(smoke) → DONE.
+Phase A(census) · 식별 구조(`demo_accounts` 적용) · **C(서버 보호 · PR #264)** 완료.
+
+남은 것:
+
+```text
+B  계정 생성        --apply 승인 대기 (dry-run 계획은 2-5 에 기록)
+   배포             guard 가 운영에 반영되려면 API 배포 필요 — DEPLOY_FREEZE=true 로 잠겨 있다(사용자 결정)
+D  relink           B 검증 후
+F  체험 로그인 UI
+G  위험 기능 census
+H  smoke            Demo 계정 생성 전에는 불가(현재 store-owner·supplier 계정 0)
+```
+
+순서 주의: **보호가 운영에 올라간 뒤에 계정을 만든다**. 계정이 먼저 생기면 보호 없는
+공개 credential 이 운영에 존재하는 창이 생긴다.
