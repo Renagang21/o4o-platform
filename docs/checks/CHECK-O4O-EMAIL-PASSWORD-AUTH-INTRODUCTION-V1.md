@@ -16,6 +16,7 @@
 | handoff | **원장이 출발 세션의 실제 수단을 보관한다** — migration `1790684000000-AddHandoffTokenSourceAuthMethod` 로 `handoff_tokens.source_auth_method`(varchar(16) · nullable · CHECK google/password) 추가. 발급 시 수단은 **서버가 검증한 access token claim 에서만** 파생(claim `password` → password · 검증된 토큰에 claim 없음 → google · 검증 불가 → password). body · Origin · Google 연결 여부는 쓰지 않는다. 교환 세션은 원장 값을 승계(`google` 외 값 · NULL → password)하고, password 이면 교환 시점의 새 역할로 `isPasswordSessionAllowed` 를 다시 적용(`platform:*` → 403 `PASSWORD_SESSION_NOT_ALLOWED`). 이전 보완의 "Google 연결 계정의 비밀번호 세션 handoff 403"은 **제거** — 정상적인 서비스 이동을 막지 않는다 |
 | 입력 오류 응답 | 공통 `validateDto` · `validateQuery` · `validateParams` 400 응답이 민감 필드(password · passwordConfirm · currentPassword · newPassword · token · refreshToken 등)의 `value` 를 싣지 않는다. 그 밖의 값은 `redactSensitive` 경유 |
 | 교차 사이트 요청 | 신규 route 8개(`/auth/email/*` · `/auth/password/{forgot,reset}` · `/auth/account/find-id` · `POST /auth/password`)는 `requireJsonBody` — JSON 외 본문은 415 `UNSUPPORTED_MEDIA_TYPE`(§5-1) |
+| 횟수 제한 | `rateLimiter.ts` 메모리 limiter · 키 = 신뢰 클라이언트 IP. 아이디 찾기만 **IP · 입력값 두 limiter 독립 적용**(WO §2-3, 2026-10-01 Codex 재리뷰 지적 보완): IP 당 1시간 10회 + 이름·전화 조합당 1시간 5회. 입력값 키 = `findid:` + sha256(이름 trim · 전화 숫자만 — `findLoginId` 대조 규칙과 같음) — 원문 미저장. 계정 유무와 무관하게 모두 센다(429 가 가입 단서가 되지 않음) · 응답 계약 불변. 테스트 `middleware/__tests__/find-login-id-limiter.test.ts` |
 | 세션 서비스 | 요청 Origin → `resolveSessionServiceKey` 로 파생. body `serviceKey` 받지 않음 |
 | 공통 UI | `@o4o/auth-react` `email/` — `EmailLoginForm` · `EmailSignupForm` · `EmailSentNotice` · `VerifyEmailView` · `ForgotPasswordForm` · `ResetPasswordForm` · `FindLoginIdForm` · `PasswordInput`(보기/숨기기) · `PasswordPolicyHints` |
 | 클라이언트 | `@o4o/auth-client` `loginWithEmail` 외 6 메서드 · `useServiceAuth.loginWithEmail` |
@@ -151,6 +152,8 @@ repo 에 code scanning 이 켜져 있지 않아 SARIF 업로드가 실패한다(
 
 ## 5-3. 후속
 
+- 이메일 로그인 화면을 web-neture 외 서비스(kpa-society · kpa-branch · k-cosmetics · pharmacy-hub · store)에도 연결 — 별도 WO(2026-10-01 Codex 재리뷰 P1, 비차단 · Demo 계정 작업 전 검토).
+- 로그인 상태 비밀번호 추가 · 변경(`POST /auth/password`)의 `auth-client` 메서드 · `AccountSecuritySettings` UI — 별도 WO(같은 리뷰 P2, 비차단). 그 전까지 V2 는 운영 화면으로 검증할 수 없다.
 - `SMTP_PASS` 를 plain env 에서 Secret Manager 참조(`--update-secrets`)로 이전 — 별도 WO(비밀값 미기재).
 
 ## 6. 남은 절차

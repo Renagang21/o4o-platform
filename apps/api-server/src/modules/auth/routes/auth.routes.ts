@@ -49,6 +49,7 @@ import {
   emailMailLimiter,
   emailTokenLimiter,
   findLoginIdLimiter,
+  findLoginIdInputLimiter,
 } from '../../../middleware/rateLimiter.js';
 import { requireJsonBody } from '../../../middleware/require-json-body.middleware.js';
 
@@ -95,7 +96,7 @@ router.post(
 // POST /api/v1/auth/email/login      - { email, password } → 세션 (Google 로그인과 같은 응답 계약)
 // POST /api/v1/auth/password/forgot  - { email } → 재설정 메일 (존재 여부 비노출)
 // POST /api/v1/auth/password/reset   - { token, newPassword } → 새 비밀번호 + 전역 세션 폐기
-// POST /api/v1/auth/account/find-id  - { name, phone } → 가린 이메일 힌트 | 일반 안내
+// POST /api/v1/auth/account/find-id  - { name, phone } → 가린 이메일 힌트 | 일반 안내 (IP · 입력값 기준 제한 둘 다)
 // 모두 JSON 본문만 받는다(requireJsonBody) — 교차 사이트 form 요청 방어
 router.post('/email/signup', requireJsonBody, emailSignupLimiter, validateDto(EmailSignupRequestDto), asyncHandler(EmailAuthController.signup));
 router.post('/email/verify', requireJsonBody, emailTokenLimiter, validateDto(EmailTokenRequestDto), asyncHandler(EmailAuthController.verify));
@@ -103,7 +104,7 @@ router.post('/email/resend', requireJsonBody, emailMailLimiter, validateDto(Emai
 router.post('/email/login', requireJsonBody, emailLoginLimiter, validateDto(EmailLoginRequestDto), asyncHandler(EmailAuthController.login));
 router.post('/password/forgot', requireJsonBody, emailMailLimiter, validateDto(EmailAddressRequestDto), asyncHandler(EmailAuthController.forgot));
 router.post('/password/reset', requireJsonBody, emailTokenLimiter, validateDto(PasswordResetRequestDto), asyncHandler(EmailAuthController.reset));
-router.post('/account/find-id', requireJsonBody, findLoginIdLimiter, validateDto(FindLoginIdRequestDto), asyncHandler(EmailAuthController.findId));
+router.post('/account/find-id', requireJsonBody, findLoginIdLimiter, validateDto(FindLoginIdRequestDto), findLoginIdInputLimiter, asyncHandler(EmailAuthController.findId));
 
 // POST /api/v1/auth/refresh - Refresh access token
 router.post(

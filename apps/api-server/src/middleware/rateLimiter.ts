@@ -7,6 +7,7 @@
  */
 
 // WO-O4O-TRUSTED-CLIENT-IP-AND-SECURITY-LOG-REDACTION-V1
+import { createHash } from 'node:crypto';
 import { getTrustedClientIp } from '../utils/trusted-client-ip.js';
 import rateLimit, { Store, MemoryStore } from 'express-rate-limit';
 import { Request, Response, NextFunction } from 'express';
@@ -73,14 +74,19 @@ export const ipBurstLimiter = rateLimit({
 //   키는 신뢰 가능한 클라이언트 IP(`getTrustedClientIp`) — 프록시 IP 하나로 전원이 묶이지 않는다.
 //   ⚠ 메모리 저장소다(Redis 은퇴). Cloud Run 인스턴스마다 따로 센다 — 인스턴스 N 개면 실제 상한은 N 배.
 //     대입 공격의 근본 방어는 bcrypt 비용(1회 수백 ms)과 일반화된 실패 응답이며, 이 제한은 그 위의 상한이다.
-function emailAuthLimiter(windowMs: number, max: number, message: string) {
+function emailAuthLimiter(
+  windowMs: number,
+  max: number,
+  message: string,
+  keyGenerator: (req: Request) => string = (req) => getTrustedClientIp(req),
+) {
   return rateLimit({
     windowMs,
     max,
     message: { success: false, error: message, code: 'RATE_LIMITED' },
     standardHeaders: true,
     legacyHeaders: false,
-    keyGenerator: (req: Request) => getTrustedClientIp(req),
+    keyGenerator,
   });
 }
 
@@ -112,12 +118,37 @@ export const emailTokenLimiter = emailAuthLimiter(
   '요청이 너무 많습니다. 잠시 뒤 다시 시도해 주세요.',
 );
 
-/** 아이디 찾기 — IP 당 1시간 10회 (이름·전화 대입으로 가입 여부를 훑는 것을 늦춘다) */
-export const findLoginIdLimiter = emailAuthLimiter(
-  60 * 60 * 1000,
-  10,
-  '아이디 찾기 요청이 너무 많습니다. 1시간 뒤 다시 시도해 주세요.',
-);
+// 아이디 찾기 — WO §2-3 "조회 횟수를 IP · 입력값 기준으로 제한한다".
+//   ① IP 기준   : IP 당 1시간 10회 — 한 IP 에서 여러 이름·전화를 대입하는 것을 늦춘다.
+//   ② 입력값 기준: 같은 이름·전화 조합당 1시간 5회 — 여러 IP 로 나눠 같은 조합을 반복하는 것을 늦춘다.
+//   두 limiter 는 각각 독립 적용된다(어느 하나만 넘어도 429).
+//   입력값 키는 `findLoginId` 의 대조 규칙(이름 trim · 전화 숫자만)과 같게 정규화한 뒤 SHA-256 으로만 남긴다 —
+//   같은 조회가 되는 입력은 같은 키, 원문 이름·전화는 저장소 키에 남지 않는다.
+//   계정 존재 여부와 무관하게 모든 요청을 센다(skipSuccessfulRequests 없음) — 429 발생 자체가 가입 단서가 되지 않는다.
+const FIND_LOGIN_ID_WINDOW_MS = 60 * 60 * 1000;
+const FIND_LOGIN_ID_MESSAGE = '아이디 찾기 요청이 너무 많습니다. 1시간 뒤 다시 시도해 주세요.';
+
+/** 아이디 찾기 입력값 limiter 키 — `findid:` + sha256(trim(name) + '\0' + 전화 숫자) */
+export function findLoginIdInputKey(body: unknown): string {
+  const b = (body ?? {}) as { name?: unknown; phone?: unknown };
+  const name = typeof b.name === 'string' ? b.name.trim() : '';
+  const phone = typeof b.phone === 'string' ? b.phone.replace(/\D/g, '') : '';
+  return `findid:${createHash('sha256').update(`${name}\u0000${phone}`, 'utf8').digest('hex')}`;
+}
+
+/** 아이디 찾기 limiter 한 쌍 — 각 호출이 별도 저장소를 갖는다(테스트는 새로 만든다) */
+export function createFindLoginIdLimiters() {
+  return {
+    ip: emailAuthLimiter(FIND_LOGIN_ID_WINDOW_MS, 10, FIND_LOGIN_ID_MESSAGE),
+    input: emailAuthLimiter(FIND_LOGIN_ID_WINDOW_MS, 5, FIND_LOGIN_ID_MESSAGE, (req) => findLoginIdInputKey(req.body)),
+  };
+}
+
+const findLoginIdLimiters = createFindLoginIdLimiters();
+/** 아이디 찾기 — IP 기준 (IP 당 1시간 10회) */
+export const findLoginIdLimiter = findLoginIdLimiters.ip;
+/** 아이디 찾기 — 입력값 기준 (이름·전화 조합당 1시간 5회) */
+export const findLoginIdInputLimiter = findLoginIdLimiters.input;
 
 // 파일 업로드 레이트 리밋
 export const uploadLimiter = rateLimit({
