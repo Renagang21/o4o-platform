@@ -182,7 +182,7 @@ function makeHarness(opts: { roles?: Record<string, string[]>; now?: Date } = {}
   const lastLinkToken = (path: string) => {
     const m = [...mails].reverse().find((x) => (x.data?.verifyUrl ?? x.html ?? '').includes(path));
     const src: string = m?.data?.verifyUrl ?? m?.html ?? '';
-    const match = src.match(new RegExp(`${path}\\?token=([A-Za-z0-9_%-]+)`));
+    const match = src.match(new RegExp(`${path}#token=([A-Za-z0-9_%-]+)`));
     return match ? decodeURIComponent(match[1]) : '';
   };
 
@@ -252,7 +252,7 @@ describe('EmailAuthService', () => {
 
       expect(h.mails).toHaveLength(1);
       expect(h.mails[0].template).toBe('email-verification');
-      expect(h.mails[0].data.verifyUrl).toMatch(/\/verify-email\?token=/);
+      expect(h.mails[0].data.verifyUrl).toMatch(/\/verify-email#token=/);
     });
 
     it('역할·멤버십·조직 테이블을 건드리지 않는다', async () => {
@@ -512,6 +512,30 @@ describe('EmailAuthService', () => {
       await h.service.resetPassword(h.lastLinkToken('/reset-password'), 'newpass99$');
       expect(h.store.users).toHaveLength(1);
       expect([...h.store.creds.keys()]).toEqual([g.id]);
+    });
+  });
+
+  describe('링크 토큰 위치 — query 가 아닌 fragment', () => {
+    // fragment(`#...`)는 HTTP 요청에 실리지 않는다 → 웹 서버 · Cloud Run 요청 로그에 토큰이 남지 않는다.
+    it('확인 링크는 `/verify-email#token=` 이고 `?token=` 이 없다', async () => {
+      const h = makeHarness();
+      await h.service.signup(signupInput());
+      const url = new URL(h.mails[0].data.verifyUrl);
+      expect(url.pathname).toBe('/verify-email');
+      expect(url.search).toBe('');
+      expect(url.hash).toMatch(/^#token=[A-Za-z0-9_%-]{20,}$/);
+      expect(JSON.stringify(h.mails[0])).not.toContain('?token=');
+    });
+
+    it('재설정 링크는 `/reset-password#token=` 이고 `?token=` 이 없다', async () => {
+      const h = makeHarness();
+      await h.service.signup(signupInput());
+      await h.service.verifyEmail(h.lastLinkToken('/verify-email'));
+      await h.service.requestPasswordReset('New.User@example.com', META);
+      const mail = JSON.stringify(h.mails[h.mails.length - 1]);
+      expect(mail).toContain('/reset-password#token=');
+      expect(mail).not.toContain('?token=');
+      expect(h.lastLinkToken('/reset-password').length).toBeGreaterThan(20);
     });
   });
 

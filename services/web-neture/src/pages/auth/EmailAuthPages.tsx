@@ -13,9 +13,10 @@
  * WO §"확정된 사용자 흐름": **가입 화면은 Google 가입과 이메일·비밀번호 가입을 함께 제공한다.**
  * 그래서 `/signup` 이 두 수단을 한 화면에 둔다(로그인 모달과 같은 순서 · 같은 구분선).
  * `/register` 는 이 화면으로 보낸다 — 가입 진입점이 두 곳으로 갈라지지 않게.
- * 메일 링크의 1회용 토큰은 읽은 즉시 주소창에서 지운다(기록 · Referer 로 남지 않게).
+ * 메일 링크의 1회용 토큰은 URL fragment(`#token=`)로 받고, 읽은 즉시 주소창에서 지운다
+ * (서버 요청 로그 · 방문 기록 · Referer 로 남지 않게).
  */
-import { useEffect, useState, type ReactNode } from 'react';
+import { useLayoutEffect, useState, type ReactNode } from 'react';
 import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import {
   GoogleContinue,
@@ -58,13 +59,28 @@ function useAuthLinks(): EmailAuthLinks {
   };
 }
 
-/** 쿼리의 token 을 한 번 읽고 주소창에서 지운다. */
+/**
+ * 메일 링크 fragment(`#token=...`)의 1회용 토큰을 읽는다. query(`?token=`)는 읽지 않는다.
+ * fragment 는 HTTP 요청에 실리지 않으므로 웹 서버 · 인프라 요청 로그에 토큰이 남지 않는다.
+ */
+export function readHashToken(hash: string): string | null {
+  const raw = hash.startsWith('#') ? hash.slice(1) : hash;
+  const token = new URLSearchParams(raw).get('token');
+  return token ? token : null;
+}
+
+/**
+ * 토큰을 메모리(state)에 확보한 직후 주소창 · history 에서 fragment 를 지운다.
+ * useLayoutEffect 라 하위 화면의 API 호출(useEffect)보다 먼저 실행된다 — 응답을 기다리지 않는다.
+ */
 function useOneTimeToken(): string | null {
   const location = useLocation();
-  const [token] = useState(() => new URLSearchParams(location.search).get('token'));
-  useEffect(() => {
-    if (token) window.history.replaceState(window.history.state, '', location.pathname);
-  }, [token, location.pathname]);
+  const [token] = useState(() => readHashToken(location.hash));
+  useLayoutEffect(() => {
+    // router navigate 는 첫 렌더에서 무시되므로 주소창(history)을 직접 바꾼다. history.state(router idx)는 유지.
+    const { hash, pathname, search } = window.location;
+    if (hash) window.history.replaceState(window.history.state, '', `${pathname}${search}`);
+  }, []);
   return token;
 }
 

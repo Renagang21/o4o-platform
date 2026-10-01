@@ -17,6 +17,8 @@
  *      판정은 `password-session.policy` 한 곳이다.
  *   ④ 평문 비밀번호 · 평문 토큰 · 메일 링크 URL 을 **로그 · DB · 응답에 남기지 않는다.**
  *      토큰은 SHA-256 해시만 저장한다. 링크의 평문 토큰은 메일 본문에만 존재한다.
+ *      링크는 토큰을 query 가 아닌 **fragment(`#token=`)** 에 싣는다 — fragment 는 HTTP 요청에 실리지 않아
+ *      웹 서버 · Cloud Run 요청 로그에 남지 않는다. 화면이 fragment 에서 읽어 JSON body 로 보낸다.
  *   ⑤ 확인 메일이 가는 곳만 확인된 주소다. 로그인은 `users.isEmailVerified=true` 일 때만 발급한다.
  *   ⑥ 비밀번호 재설정은 `logoutAll` 을 호출해 전역 폐기(`refreshTokenFamily=null`)를 한다.
  */
@@ -394,7 +396,7 @@ export class EmailAuthService {
 
   private async sendVerificationMail(user: User, sessionServiceKey: string | null): Promise<boolean> {
     const plain = await this.issueToken('verification', user.id, VERIFICATION_TOKEN_TTL_MS, normalizeLoginEmail(user.email));
-    const verifyUrl = `${resolveMailLinkOrigin(sessionServiceKey)}/verify-email?token=${encodeURIComponent(plain)}`;
+    const verifyUrl = `${resolveMailLinkOrigin(sessionServiceKey)}/verify-email#token=${encodeURIComponent(plain)}`;
     try {
       const mailer = await this.mailer();
       const result = await mailer.sendEmail({
@@ -471,7 +473,7 @@ export class EmailAuthService {
     if (user.isEmailVerified !== true && !(await this.passwords.hasPassword(user.id))) return;
 
     const plain = await this.issueToken('reset', user.id, RESET_TOKEN_TTL_MS);
-    const resetUrl = `${resolveMailLinkOrigin(meta.sessionServiceKey ?? null)}/reset-password?token=${encodeURIComponent(plain)}`;
+    const resetUrl = `${resolveMailLinkOrigin(meta.sessionServiceKey ?? null)}/reset-password#token=${encodeURIComponent(plain)}`;
     try {
       const mailer = await this.mailer();
       const result = await mailer.sendEmail({

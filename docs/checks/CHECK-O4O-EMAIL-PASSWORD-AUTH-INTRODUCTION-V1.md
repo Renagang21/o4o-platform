@@ -17,6 +17,7 @@
 | 입력 오류 응답 | 공통 `validateDto` · `validateQuery` · `validateParams` 400 응답이 민감 필드(password · passwordConfirm · currentPassword · newPassword · token · refreshToken 등)의 `value` 를 싣지 않는다. 그 밖의 값은 `redactSensitive` 경유 |
 | 교차 사이트 요청 | 신규 route 8개(`/auth/email/*` · `/auth/password/{forgot,reset}` · `/auth/account/find-id` · `POST /auth/password`)는 `requireJsonBody` — JSON 외 본문은 415 `UNSUPPORTED_MEDIA_TYPE`(§5-1) |
 | 횟수 제한 | `rateLimiter.ts` 메모리 limiter · 키 = 신뢰 클라이언트 IP. 아이디 찾기만 **IP · 입력값 두 limiter 독립 적용**(WO §2-3, 2026-10-01 Codex 재리뷰 지적 보완): IP 당 1시간 10회 + 이름·전화 조합당 1시간 5회. 입력값 키 = `findid:` + sha256(이름 trim · 전화 숫자만 — `findLoginId` 대조 규칙과 같음) — 원문 미저장. 계정 유무와 무관하게 모두 센다(429 가 가입 단서가 되지 않음) · 응답 계약 불변. 테스트 `middleware/__tests__/find-login-id-limiter.test.ts` |
+| 메일 링크 토큰 위치 | 확인 · 재설정 링크는 **`/verify-email#token=…` · `/reset-password#token=…`** — query(`?token=`) 아님(2026-10-01 Codex 재리뷰 P1 보완). fragment 는 HTTP 요청에 실리지 않아 `neture-web` 등 웹 서버 · Cloud Run 요청 로그에 토큰이 남지 않는다. 화면(`EmailAuthPages.tsx` `useOneTimeToken`)은 fragment 에서 토큰을 읽어 state(메모리)에 두고, **API 응답을 기다리지 않고** `useLayoutEffect` 에서 `history.replaceState` 로 주소창 · history 의 fragment 를 지운다(하위 화면의 API 호출보다 먼저). API 는 기존대로 JSON body(`/auth/email/verify` `{token}` · `/auth/password/reset` `{token,newPassword}`) — 계약 불변. query 토큰 fallback 없음(운영 미배포라 호환 대상 없음) |
 | 세션 서비스 | 요청 Origin → `resolveSessionServiceKey` 로 파생. body `serviceKey` 받지 않음 |
 | 공통 UI | `@o4o/auth-react` `email/` — `EmailLoginForm` · `EmailSignupForm` · `EmailSentNotice` · `VerifyEmailView` · `ForgotPasswordForm` · `ResetPasswordForm` · `FindLoginIdForm` · `PasswordInput`(보기/숨기기) · `PasswordPolicyHints` |
 | 클라이언트 | `@o4o/auth-client` `loginWithEmail` 외 6 메서드 · `useServiceAuth.loginWithEmail` |
@@ -61,6 +62,12 @@
 CI(코드 최종 HEAD `ac9411795`): API Server Jest 1/3 · 2/3 · 3/3 · Code Quality · Guard Static Analysis · admin-dashboard build · Detect ×2 · Size Labels · SonarCloud **통과** / Admin Fast · Docs Fast 조건부 skip / **CodeQL Analyze 실패** — 분석 완료(1711/1711 TS 파일) · SARIF artifact 793건 · 이번 수정 파일 경유 0건, 실패 원인은 SARIF 업로드("Code scanning is not enabled")뿐. **"CI 전체 통과" 가 아니다.** 이 저장소는 개인 계정 private 이라 code scanning 을 켤 수 없다(공개 저장소 또는 조직 + 유료 Code Security 필요) — 해소는 `ci-security.yml` `upload: never` 등 별도 CI WO.
 
 저장 검사(V10): 해시 경로는 `PasswordCredentialService` 테스트로 bcrypt 해시 저장 · 평문 비교 불가를 확인했다. `chk_upc_hash_len` 은 **해시 길이 하한 검사**일 뿐 해시 여부를 보장하지 않는다.
+
+URL · 로그 토큰 노출(V10, 2026-10-01 재확인 · fragment 보완 뒤):
+- 생성 링크: `email-auth.service.ts` 의 확인 · 재설정 링크 2곳 모두 `#token=` — `?token=` 생성 0건. `emailAuthService.test.ts` "링크 토큰 위치" 2건이 `URL.search === ''` · `hash` 형식 · 메일 전체(`data` · `html`)에 `?token=` 없음을 고정.
+- 화면: `EmailAuthPages.token.test.tsx` 8건(실제 `window.location` + `BrowserRouter`) — hash 토큰 읽기 · 렌더 직후 주소창 fragment 0 · **API 호출 시점에 이미 fragment 0** · verify body 전달 · reset body 전달 · `?token=` 무시 · 토큰 없음 · 잘못된 토큰 회귀.
+- 서버 로그: email-auth service · controller 의 `logger` 호출은 고정 문구 + 오류 메시지 · 이름 · 코드뿐 — 토큰 · 링크 URL · body 미포함. API 요청 URL 을 남기는 `[SlowRequest]`(`req.originalUrl`)는 토큰 소비가 POST body 라 URL 에 토큰이 없다. mail-core 는 EmailLog 에 수신자 · 제목 · 상태 · template 만 기록(본문 · 링크 미기록), 개발용 `jsonTransport` 는 출력하지 않는다.
+- 화면 쪽 console · 오류 메시지에 토큰 · 비밀번호를 넣는 경로 없음(추가 0).
 
 Guard spec: `google-only-auth-cleanup.spec` · `legacy-password-auth-retirement.spec` 는 이 WO 의 새 구조를 허용하도록 갱신했고, `service_credentials` · 서비스별 password 구조 · `users.password` 부활은 계속 차단한다.
 
