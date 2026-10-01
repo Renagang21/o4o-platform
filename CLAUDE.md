@@ -20,7 +20,7 @@
 | **매장 commerce 경계** (cart · checkout · orders · payments · refund · PG · POS · tablet · QR · 외부 판매채널) | [`O4O-STORE-COMMERCE-BOUNDARY-V1`](docs/baseline/O4O-STORE-COMMERCE-BOUNDARY-V1.md) — **코드보다 먼저 읽는다** |
 | 공급자→매장 B2B 주문 (위 문서의 B2B 축 쌍) | [`O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1`](docs/baseline/O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1.md) |
 | 3자 Canonical Flow | [`O4O-3-ROLE-FLOW-BASELINE-V1`](docs/baseline/O4O-3-ROLE-FLOW-BASELINE-V1.md) — **§2 · §6 충돌 절 SUPERSEDED (판정 확정 2026-09-16)**, ROLE-WORKSPACE-ARCHITECTURE §2-1 · §6 이 대체. §4 · §5 만 참고 — [`CANONICAL-INDEX` §9](docs/CANONICAL-INDEX.md) |
-| **AI 자동화 진화 원칙** (Local Agent · Browser DOM · Computer Use · Site Adapter · Workflow · 주문/회계 자동화 WO 의 상위 기준) | [`O4O-AI-AUTOMATION-EVOLUTION-PRINCIPLES-V1`](docs/baseline/O4O-AI-AUTOMATION-EVOLUTION-PRINCIPLES-V1.md) — 사용자 행동은 학습 자료, 목적/결과가 기준 · 완전 자동화가 아닌 시간 절감 · 사이트별 업무 사전 정의 금지 |
+| **AI 자동화 진화 원칙** (Local Agent · Browser DOM · Computer Use · Site Adapter · Workflow · 주문/회계 자동화 WO 의 상위 기준) | [`O4O-AI-AUTOMATION-EVOLUTION-PRINCIPLES-V1`](docs/baseline/O4O-AI-AUTOMATION-EVOLUTION-PRINCIPLES-V1.md) — 사용자 행동은 학습 자료, 목적/결과가 기준 · 완전 자동화가 아닌 시간 절감 · 사이트별 업무 사전 정의 금지 · 계층 구현(6계층 · Experience 중심 · 개발 순서 §10-1)은 하위 정본 [`O4O-AUTOMATION-AGENT-ARCHITECTURE-V1`](docs/baseline/O4O-AUTOMATION-AGENT-ARCHITECTURE-V1.md) |
 | Domain Boundary · Guard Rules 5종 | [`O4O-BOUNDARY-POLICY-V1`](docs/architecture/O4O-BOUNDARY-POLICY-V1.md) |
 | Core 동결 범위 | [`O4O-CORE-FREEZE-V1`](docs/architecture/O4O-CORE-FREEZE-V1.md) |
 | 공통 모듈 변경 절차 | [`O4O-SHARED-MODULE-CHANGE-PROTOCOL-V1`](docs/baseline/O4O-SHARED-MODULE-CHANGE-PROTOCOL-V1.md) |
