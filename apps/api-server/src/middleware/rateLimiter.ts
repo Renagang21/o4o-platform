@@ -79,6 +79,7 @@ function emailAuthLimiter(
   max: number,
   message: string,
   keyGenerator: (req: Request) => string = (req) => getTrustedClientIp(req),
+  skipSuccessfulRequests = false,
 ) {
   return rateLimit({
     windowMs,
@@ -87,15 +88,29 @@ function emailAuthLimiter(
     standardHeaders: true,
     legacyHeaders: false,
     keyGenerator,
+    skipSuccessfulRequests,
   });
 }
 
-/** 로그인 — IP 당 15분 20회 (성공도 센다: 성공 뒤 대입을 계속하는 경우를 막는다) */
-export const emailLoginLimiter = emailAuthLimiter(
-  15 * 60 * 1000,
-  20,
-  '로그인 시도가 너무 많습니다. 15분 뒤 다시 시도해 주세요.',
-);
+// 로그인 — WO §2-1 "`strictLimiter` 축": 15분 · **실패 5회** · 성공은 세지 않는다.
+//   `strictLimiter` 와 같은 설정(windowMs · max · skipSuccessfulRequests)이되 인스턴스는 따로 둔다 —
+//   `strictLimiter` 는 키가 express 기본 `req.ip` 이고 429 본문이 문자열이라
+//   신뢰 클라이언트 IP 키 · `{ success:false, code:'RATE_LIMITED' }` 계약을 맞추지 못한다.
+//   실패 = 응답 status ≥ 400(express-rate-limit 기본 판정). 성공(2xx)은 자기 카운트를 되돌릴 뿐
+//   앞선 실패를 지우지 않는다 — 실패는 창(15분)이 끝날 때까지 유지(`strictLimiter` 와 같은 정책).
+/** 이메일 로그인 limiter — 각 호출이 별도 저장소를 갖는다(테스트는 새로 만든다) */
+export function createEmailLoginLimiter() {
+  return emailAuthLimiter(
+    15 * 60 * 1000,
+    5,
+    '로그인 실패가 너무 많습니다. 15분 뒤 다시 시도해 주세요.',
+    (req) => getTrustedClientIp(req),
+    true,
+  );
+}
+
+/** 로그인 — IP 당 15분 실패 5회 (성공 로그인은 세지 않음) */
+export const emailLoginLimiter = createEmailLoginLimiter();
 
 /** 가입 — IP 당 1시간 10회 */
 export const emailSignupLimiter = emailAuthLimiter(
