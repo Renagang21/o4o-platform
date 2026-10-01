@@ -3,7 +3,7 @@
 > **WO**: WO-O4O-AUTOMATION-USER-ASSISTANCE-AND-CORRECTION-V1 (Experience Model V1 Phase 2 — User Assistance · Correction)
 > **기준**: [O4O-AUTOMATION-EXPERIENCE-MODEL-V1](../baseline/O4O-AUTOMATION-EXPERIENCE-MODEL-V1.md) (ACTIVE, D1~D8 · §7) · [O4O-AUTOMATION-AGENT-ARCHITECTURE-V1](../baseline/O4O-AUTOMATION-AGENT-ARCHITECTURE-V1.md) §5-1 · §10-1 · Phase 1 [CHECK](CHECK-O4O-AUTOMATION-LOCAL-EXPERIENCE-MINIMUM-STORAGE-V1.md)(PHASE1_PASS · 재설계 없음)
 > **일자**: 2026-10-01
-> **판정**: **CODE_COMPLETE · REAL_PC_SMOKE_PENDING** — 실 PC 검증은 배포 승인 + agent 재기동 뒤(§9)
+> **판정**: **CODE_COMPLETE · API_DEPLOYED · REAL_PC_SMOKE_PENDING** — API 통제 배포 완료(§9-1), 실 PC 검증은 Phase 1 PC 에서(§9-2)
 
 ---
 
@@ -101,6 +101,20 @@
 5. 4테이블 read-only 조회 — 답변 원문 · 제품명 · slot 값 0건.
 
 대상 앱 조작은 Agent 가 한다(사람은 Composer 입력만). runtime 결함으로 막히면 확장하지 않고 BLOCKED 로 원인만 보고.
+
+### 9-1. API 통제 배포 — DONE (2026-10-01, 사용자 승인)
+
+- 사전 확인: HEAD == origin/main `5f12c4acd` ⊇ `6cd618217`. API serving `ac601b0d7` → 함께 반영되는 API runtime 변경은 `6cd618217`(이 WO) + `5f12c4acd`(Web Research 시간 예산, 다른 세션 · CI green) 2건. migration 추가 0. deploy-auto 판정 `CONTROLLED_FIRST_ROLLOUT_REQUIRED`(`eab0474f0` rollout 스크립트 변경) → 정본 통제 배포 절차.
+- tag `deploy/2026-10-01-automation-assistance-correction` @ `5f12c4acd` → `deploy-api.yml` run 36859720054 (`rollout_mode=verified`) success. migration Job 성공(신규 0).
+- serving: revision `o4o-core-api-03783-jex` traffic 100% · label `o4o-commit-sha=5f12c4acd…` · `/health/ready` ready · `/health` 200.
+- 다른 서비스 배포 · CI/CD 수정 0.
+
+### 9-2. 실 PC smoke — Phase 1 PC 에서 진행 (인계)
+
+- 배포를 수행한 PC 의 local.db 는 **schema v2 · runs/Candidate/Experience 0건**(9/13 이후 미사용)이라 v6→v7 · Phase 1 보존 확인이 불가 → 사용자 결정으로 **Phase 1 실 PC(schema v6 · runs 12 · candidates 2)** 에서 §9 를 수행한다. 이 PC 의 local.db · agent · credential 은 건드리지 않았다(schema 조회는 스크래치 복사본에서만).
+- Experience 를 PC 간 복사하지 않는다(Local-first).
+- 그 PC 에서: `git pull --ff-only`(⊇ `6cd618217`) → agent 정상 종료 · 재기동 → `schemaVersion=7` · pre-migration 백업 · runs/candidates/Phase 1 Experience 행 수 불변 → Chrome bridge 연결 → §9 ①~⑤.
+- smoke 문장: Claude Code 가 실제 사이트 화면을 먼저 관찰해 제안하고 사용자가 Composer 에 한 단계씩 입력. health.kr 동일성분은 실제 UI 에 해당 기능이 있을 때만 사용(fixture 에 맞춰 해석 금지). `약학정보원에서 내가 먹을 약 검색해줘` 는 Assistance fixture 로 쓰지 않는다.
 
 ## 10. 변경 파일
 
