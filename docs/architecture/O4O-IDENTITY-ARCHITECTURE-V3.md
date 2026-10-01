@@ -1,6 +1,6 @@
 # O4O Platform Identity Architecture V3 — Privacy · Identity Target Model
 
-> **Canonical Identity & Privacy Baseline.** 본 문서는 O4O 의 **사용자 · 인증 Identity · 자격(Credential) · 사업자/매장 관계 · 권한 · Claim · 연락/연결 채널 · 동의 · 증빙 · 세션** 의 공식 기준 문서다. [V2](O4O-IDENTITY-ARCHITECTURE-V2.md) 의 "서비스별 password credential" 모델을 **Google 단일 로그인 + 최소 개인정보 User** 모델로 대체한다.
+> **Canonical Identity & Privacy Baseline.** 본 문서는 O4O 의 **사용자 · 인증 Identity · 자격(Credential) · 사업자/매장 관계 · 권한 · Claim · 연락/연결 채널 · 동의 · 증빙 · 세션** 의 공식 기준 문서다. [V2](O4O-IDENTITY-ARCHITECTURE-V2.md) 의 "서비스별 password credential" 모델을 **Google 단일 로그인 + 최소 개인정보 User** 모델로 대체한다(2026-09-17 채택 시점). **2026-09-29 부터 로그인은 Google + 이메일·비밀번호 병행**이다(§3 · `WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1`) — 계정 단위 수단이며 서비스별 password 모델의 복원이 아니다.
 
 - **상태:** **CANONICAL** (Adopted) — 이후 모든 Identity · 개인정보 관련 IR / WO / 설계 판단은 본 문서를 기준으로 한다
 - **채택일:** 2026-09-17 · **채택 WO:** [`WO-O4O-PRIVACY-IDENTITY-TARGET-MODEL-CANONICALIZATION-V1`](../work-orders/WO-O4O-PRIVACY-IDENTITY-TARGET-MODEL-CANONICALIZATION-V1.md)
@@ -14,7 +14,8 @@
 
 ```text
 O4O User(users.id, 최소 개인정보)
-  ├─ Auth Identity      : Google sub → linked_accounts → users.id          (로그인 = Google 단일)
+  ├─ Auth Identity      : Google sub → linked_accounts → users.id          (로그인 = Google · 이메일·비밀번호 병행, 2026-09-30)
+  │                       이메일 → user_password_credentials → users.id   (Admin 은 Google 전용)
   ├─ Professional Cred. : O4O Professional Credential Domain (초기 물리 kpa_pharmacist_profiles)
   ├─ Relationship       : organization_members · branch_memberships · branch_officers · service_memberships
   ├─ Authorization      : role_assignments (SSOT)   —  접근 = Role ∧ Credential 조건 ∧ Relationship 조건
@@ -35,7 +36,7 @@ V2 의 4-Layer 골격은 유지하되 **L1 · L2 의 정의를 교체**한다.
 | Layer | 책임 | 물리(현행/초기) | Key | V2 대비 |
 |---|---|---|---|---|
 | **L1 O4O User** | "이 계정은 누구인가" — 시스템 주체. 개인정보 원본이 아니다 | `users` | `users.id` | **변경** — V2 `email` 전역 키 폐기 |
-| **L2 Google Auth Identity** | "어떻게 로그인하는가" — 외부 Identity ↔ User 연결 | `linked_accounts` (provider `google` · providerId = `sub`) | `(provider, provider_user_id)` unique | **변경** — V2 `service_credentials.password_hash` 폐기 |
+| **L2 Auth Identity** (Google · 이메일·비밀번호) | "어떻게 로그인하는가" — 로그인 수단 ↔ User 연결 | Google: `linked_accounts` (provider `google` · providerId = `sub`) / 이메일: `user_password_credentials` (`users.id` 1:1 · bcrypt, 2026-09-29) | Google `(provider, provider_user_id)` unique / 이메일 `user_id` unique | **변경** — V2 `service_credentials.password_hash`(서비스별) 폐기. 이메일 수단은 계정 단위이며 그 복원이 아니다 |
 | **L3 Service Membership** | "어느 서비스의 회원인가 · 어떤 상태인가" | `service_memberships` | `(user_id, service_key)` | 유지 (V2 그대로) |
 | **L4 Role Assignment / Authorization** | "무엇을 할 수 있는가" | `role_assignments` | `(user_id, role, is_active)` | 유지 (V2 · F9 그대로) |
 
@@ -47,8 +48,8 @@ L1 만 L2/L3/L4 의 부모다(FK). L2/L3/L4 사이에 직접 FK 는 없다. 본 
 |---|---|
 | 원칙 2 서비스 = 독립 사업자 · 원칙 3 회원의 서비스 범위 독립 · 원칙 5 Role 의 서비스 범위 독립 | **승계** |
 | 원칙 1 `1 Email = 1 Identity` | **폐기** → `1 users.id = 1 User`, `1 Google sub = 1 Auth Identity`. 이메일은 Identity Key 가 아니다(§2) |
-| 원칙 4 Credential 의 서비스 범위 독립(서비스별 password) | **폐기** → 로그인 자격은 Google 단일. 서비스 독립성은 L3/L4 로 충분히 성립한다 |
-| §7.4 Handoff 정책 — Identity transport · target `service_memberships.status='active'` 필수 · generate/exchange 양쪽 검증 · Join 과 분리 | **승계** (해석 A 확정. Google 단일 로그인에서는 해석 B 의 근거가 소멸) |
+| 원칙 4 Credential 의 서비스 범위 독립(서비스별 password) | **폐기** → 로그인 자격은 계정(`users.id`) 단위다(채택 시 Google 단일 → 2026-09-29 Google + 이메일·비밀번호 병행). 서비스별 자격은 없으며 서비스 독립성은 L3/L4 로 충분히 성립한다 |
+| §7.4 Handoff 정책 — Identity transport · target `service_memberships.status='active'` 필수 · generate/exchange 양쪽 검증 · Join 과 분리 | **승계** (해석 A 확정. 로그인 자격이 계정 단위라 서비스별 자격을 전제한 해석 B 의 근거가 소멸) |
 | §8 Switcher "가입 시 신규 password 입력" | **폐기** — 서비스 가입은 password 없이 L3 row 생성 |
 | §9 Freeze 영향(F10 · F11 명시적 예외 승인 절차) | **승계** — 절차는 그대로, 대상 항목만 §13 표로 교체 |
 | V1 §3-§8 · §10-§15 (서버/JWT/쿠키/Handoff 메커니즘/Switcher/Account Center/CORS/도메인 3축) | **구조적으로 유지** (V2 와 동일). **예외(2026-09-26):** V1 §8.1 "쿠키 설정" · §8.2 "Cookie domain 자동 감지" 는 승계하지 않는다 — handoff exchange 는 **body 토큰만** 반환하고 인증 쿠키를 설정하지 않는다. exchange 가 내린 `.neture.co.kr` 쿠키가 쿠키 전략인 admin-dashboard 세션을 넘겨받은 사용자로 바꾸는 결함 때문이다(handoff 대상은 전부 localStorage 전략). 근거 [`CHECK-O4O-URL-FIRST-CENSUS-V1`](../checks/CHECK-O4O-URL-FIRST-CENSUS-V1.md) §19-1 · §21-2 |
@@ -59,7 +60,7 @@ L1 만 L2/L3/L4 의 부모다(FK). L2/L3/L4 사이에 직접 FK 는 없다. 본 
 ## 2. A. 최소 User (L1)
 
 - `users` 의 **필수 컬럼은 `id · status · created_at · updated_at`** 뿐이다. **필수 개인정보는 없다.**
-- `email · name · nickname · phone` 은 **optional profile / contact** 다. **Identity Key 가 아니며** 로그인 · 계정 동일성 · 병합 판단에 쓰지 않는다.
+- `email · name · nickname · phone` 은 **optional profile / contact** 다. **Identity Key 가 아니며** 계정 동일성 · 병합 판단에 쓰지 않는다. 예외: 이메일·비밀번호 수단에서는 `users.email` 이 **로그인 ID** 다(§3) — 그래도 Google 계정과의 동일성 · 병합 판단에는 쓰지 않는다.
 - Google 가입 직후 **추가 개인정보 입력 없이 계정이 성립**한다. 프로필 · 연락처는 서비스가 필요할 때 사용자가 채운다.
 - 현행 물리 제약: `users.email NOT NULL UNIQUE` **만 남아 있다**. `password` 컬럼은 2026-09-24 에 DROP 됐고
   (`DropLegacyPasswordAuthSchema1790251584623`), `name` 은 Google 가입에서 NULL 로 생성된다.
@@ -69,13 +70,18 @@ L1 만 L2/L3/L4 의 부모다(FK). L2/L3/L4 사이에 직접 FK 는 없다. 본 
 
 ## 3. B. Authentication Identity (L2)
 
-- **O4O 로그인 = Google 단일 로그인.** 외부 Identity 기준은 **Google `sub`** 다.
-- 연결 경로: `Google ID token 검증 → sub 로 linked_accounts 조회 → users.id → 세션 발급`.
-- **이메일로 Identity 를 판정하지 않는다.** `sub` miss 일 때 이메일로 기존 `users` 를 찾아 붙이는 **자동 병합은 금지**한다(현행 `socialAuthService` 의 이메일 자동 병합은 Phase 2 첫 제거 대상).
+- **O4O 로그인 = Google + 이메일·비밀번호 병행** (2026-09-29 · `WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1` §5 승인 2 — 채택 시 "Google 단일 로그인"을 정정). Google 수단의 외부 Identity 기준은 **Google `sub`** 다.
+  **구현 상태:** 승인된 계약이며 구현은 PR #257(S1 보안 수정 `61a44a337` 포함 — Google 가입 `email_verified` 필수 · forgot 발송 조건. [IR §12-1](../investigations/IR-O4O-GOOGLE-AND-ID-AUTH-FINAL-STATUS-AUDIT-V1.md) 의 blocker 는 이 수정으로 닫힘) — 그 병합 · 배포 전 runtime 에는 이메일 경로 · `user_password_credentials` 가 없다.
+- 연결 경로: Google = `Google ID token 검증 → sub 로 linked_accounts 조회 → users.id → 세션 발급` / 이메일 = `users.email(로그인 ID) + user_password_credentials 검증 → users.id → 세션 발급`. 두 수단 모두 같은 `users.id` 에 붙는다.
+- **Admin · `platform:*` 은 Google 전용** — 비밀번호 수단으로 발급된 세션(`authMethod:'password'`)은 서버가 거부한다.
+- **가입은 계정만 만든다** — 어느 수단으로 가입해도 서비스 membership · 조직 · role 을 자동 부여하지 않는다(L3/L4 는 별도 흐름).
+- 신규 `user_password_credentials` · `email_verification_tokens` · `password_reset_tokens` 는 2026-09-24 에 제거된 `service_credentials` · `users.password` · 옛 `password_reset_tokens` 의 **복원이 아니다**(계정 단위 · 해시 저장 · 서비스별 password 없음).
+- **이메일 동일성으로 Identity 를 판정 · 병합하지 않는다.** `sub` miss 일 때 이메일로 기존 `users` 를 찾아 붙이는 **자동 병합은 금지**한다(현행 `socialAuthService` 의 이메일 자동 병합은 Phase 2 첫 제거 대상).
 - ~~기존 email+password 사용자는 로그인 상태에서 본인이 Google 을 명시 연결한다(재인증 후 `linked_accounts` insert).~~
   → **전환 완료 (2026-09-24)**. 명시 연결 경로(`/auth/google/link`)는 password 가 사라지면서 도달 불가가 되어 은퇴했고,
-  관리자 계정은 1회용 bootstrap 으로 기존 `users.id` 에 Google `sub` 를 연결했다. 현재 로그인 경로는
-  `/auth/google/login` · `/auth/google/signup` 둘뿐이다.
+  관리자 계정은 1회용 bootstrap 으로 기존 `users.id` 에 Google `sub` 를 연결했다. 2026-09-24 시점의 로그인 경로는
+  `/auth/google/login` · `/auth/google/signup` 둘뿐이었다. 2026-09-29 정책으로 이메일 경로(PR #257 병합 · 배포 후 활성 — `/auth/email/signup` · `/auth/email/verify` · `/auth/email/resend` · `/auth/email/login` ·
+  `/auth/password` · `/auth/password/forgot` · `/auth/password/reset` · `/auth/account/find-id`. 가입은 미확인 계정만 만들고 verify 완료 후 로그인)가 추가된다 — 옛 password 축의 부활이 아니라 계정 단위 신규 수단이다.
 - `linked_accounts` 를 **초기 Auth Identity 물리 구조로 재사용**한다: provider = `google` 고정, providerId = `sub`, `(provider, providerId)` unique. email/displayName/profileImage/providerData 스냅샷 컬럼은 저장하지 않는다(자동 병합 유혹 제거). 테이블 rename 은 요구하지 않는다.
 - **Kakao · Naver 등 다른 소셜은 로그인 Identity 대상이 아니다.** KakaoTalk / LINE / WhatsApp 은 §9 의 업무 채널이다.
 - JWT `sub` 는 `users.id` 를 유지한다. Google `sub` 는 토큰에 싣지 않는다.
@@ -176,13 +182,13 @@ Phase 1 IR 의 REVIEW-1~7 은 [IR Phase 1 §7](../investigations/IR-O4O-PRIVACY-
 | 정본 | 관계 |
 |---|---|
 | [`O4O-CORE-FREEZE-V1`](O4O-CORE-FREEZE-V1.md) (F10) | §5-A 의 "Identity V2 명시적 예외 승인 절차" 는 **V3 구현 WO 에 그대로 적용**된다. 대상 항목은 `service_credentials` 신설이 아니라 REVIEW-8 · REVIEW-11 · 자동 병합 제거 · Google 연결 흐름이다. F10 본문 정정은 별도 WO |
-| [`USER-OPERATOR-FREEZE-V1`](USER-OPERATOR-FREEZE-V1.md) (F11) | 3축(`users` · `service_memberships` · `role_assignments`) 은 V3 에서도 그대로다. §10 의 L2 = `service_credentials` 해석은 V3 에서 L2 = `linked_accounts`(기존 테이블) 로 바뀌므로 **신규 테이블 추가 없음**. F11 Forbidden Pattern 전부 유지. §10 본문 정정은 별도 WO |
+| [`USER-OPERATOR-FREEZE-V1`](USER-OPERATOR-FREEZE-V1.md) (F11) | 3축(`users` · `service_memberships` · `role_assignments`) 은 V3 에서도 그대로다. §10 의 L2 = `service_credentials` 해석은 V3 에서 L2 = `linked_accounts`(기존 테이블) 로 바뀌어 채택 시점(2026-09-17)에는 신규 테이블이 없었다. **2026-09-29 정책으로 L2 에 신규 테이블 3개**(`user_password_credentials` · `email_verification_tokens` · `password_reset_tokens`, 구현 PR #257)가 추가된다 — 근거는 `WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1` §5 승인 1(사용자 명시 승인). 이것이 F11 §10.3~10.4 예외 절차(사유 명시 · 3축 무결성 검증)를 충족한 기록인지는 **미판정 — 별도 확인 대상**. F11 Forbidden Pattern 전부 유지. §10 본문 정정은 별도 WO |
 | [`RBAC-FREEZE-DECLARATION-V1`](../rbac/RBAC-FREEZE-DECLARATION-V1.md) (F9) | 충돌 없음 — `role_assignments` SSOT 유지(§7) |
 | [`O4O-BOUNDARY-POLICY-V1`](O4O-BOUNDARY-POLICY-V1.md) (F6) | 충돌 없음 — `organizationId` / `storeId` = Store row id 유지(§5) |
 | [`O4O-ROLE-WORKSPACE-ARCHITECTURE-V1`](../baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md) | 충돌 없음 — Service Identity(카탈로그) · Community Identity 는 본 문서의 User Identity 와 다른 축. `1 Store : N Services` 유지 |
 | [`O4O-PRIVACY-DATA-RETENTION-POLICY-V1`](../baseline/O4O-PRIVACY-DATA-RETENTION-POLICY-V1.md) | 충돌 없음 — 보유기간은 그 문서, 구조는 본 문서 |
-| [`USER-DOMAIN-SSOT-V1`](../baseline/USER-DOMAIN-SSOT-V1.md) | `users = Identity SSOT` · `service_memberships = SSOT` 유지. `users.password` 를 포함한 컬럼 나열은 현행 기록이며 Phase 2/5 후 정정 |
-| [`O4O-MYPAGE-CANONICAL-V1`](../baseline/O4O-MYPAGE-CANONICAL-V1.md) · [`OPERATOR-DASHBOARD-STANDARD-V1`](../platform/operator/OPERATOR-DASHBOARD-STANDARD-V1.md) §3-3 | 서비스별 비밀번호 변경 UI/권한을 V2 근거로 기술 — **현행 runtime 기록으로는 유효**, Google 전환 완료 후 소멸. 정정은 Phase 2 실행계획 WO 에 포함 |
+| [`USER-DOMAIN-SSOT-V1`](../baseline/USER-DOMAIN-SSOT-V1.md) | `users = Identity SSOT` · `service_memberships = SSOT` 유지. `users.password` 컬럼 나열은 2026-09-24 DROP 반영으로 정정 완료 · 이메일·비밀번호 수단 축(2026-09-29)도 같은 문서 §0 에 기록 |
+| [`O4O-MYPAGE-CANONICAL-V1`](../baseline/O4O-MYPAGE-CANONICAL-V1.md) · [`OPERATOR-DASHBOARD-STANDARD-V1`](../platform/operator/OPERATOR-DASHBOARD-STANDARD-V1.md) §3-3 | 서비스별 비밀번호 변경 UI/권한(V2 근거)은 2026-09-23 은퇴로 소멸. MYPAGE 는 계정 단위 비밀번호(`POST /auth/password` · forgot/reset, 2026-09-29)로 정정됨 — OPERATOR-DASHBOARD §3-3 은 별도 확인 대상 |
 
 ## 15. 문서 계층
 
