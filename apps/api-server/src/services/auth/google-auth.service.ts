@@ -42,6 +42,7 @@ import { UserStatus } from '../../types/auth.js';
 import type { AuthTokens } from '../../types/auth.js';
 import { resolveAccountAccess } from '../../common/auth/account-access.policy.js';
 import { AccountInactiveError } from '../../errors/AuthErrors.js';
+import { normalizeLoginEmail } from '@o4o/auth-utils';
 import {
   googleIdentityService,
   type GoogleIdentityService,
@@ -277,10 +278,24 @@ export class GoogleAuthService {
       throw new GoogleAuthError('GOOGLE_ALREADY_REGISTERED');
     }
 
+    // WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1: 이메일 로그인과 같은 정규화로 저장한다.
+    //   `IDX_users_email` 은 대소문자를 구분하므로, 원문 저장이면 `A@x.com`(Google) 과 `a@x.com`(비밀번호)이
+    //   두 users 행이 되고 비밀번호 로그인이 모호해져 막힌다.
+    //   대소문자만 다른 기존 주소가 있으면 **거절만** 한다 — 그 users 를 반환 · 연결 · 병합하지 않는다(Identity=sub).
+    //   정규화 저장 덕분에 동시 가입 경쟁은 users.email UNIQUE 가 마지막으로 막는다(아래 EMAIL_IN_USE).
+    const email = normalizeLoginEmail(identity.email);
+    const caseVariant: unknown[] = await manager.query(
+      `SELECT 1 FROM users WHERE lower(email) = $1 LIMIT 1`,
+      [email],
+    );
+    if (caseVariant.length > 0) {
+      throw new GoogleAuthError('EMAIL_IN_USE');
+    }
+
     const now = new Date();
     const user = userRepo.create({
       // WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1 Phase B-1: `password: null` write 제거 — 컬럼이 B-2 에서 사라진다.
-      email: identity.email,
+      email,
       name: null,
       status: UserStatus.ACTIVE,
       isActive: true,

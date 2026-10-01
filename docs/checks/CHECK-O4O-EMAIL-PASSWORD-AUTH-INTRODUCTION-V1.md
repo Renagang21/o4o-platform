@@ -17,6 +17,7 @@
 | 입력 오류 응답 | 공통 `validateDto` · `validateQuery` · `validateParams` 400 응답이 민감 필드(password · passwordConfirm · currentPassword · newPassword · token · refreshToken 등)의 `value` 를 싣지 않는다. 그 밖의 값은 `redactSensitive` 경유 |
 | 교차 사이트 요청 | 신규 route 8개(`/auth/email/*` · `/auth/password/{forgot,reset}` · `/auth/account/find-id` · `POST /auth/password`)는 `requireJsonBody` — JSON 외 본문은 415 `UNSUPPORTED_MEDIA_TYPE`(§5-1) |
 | 횟수 제한 | `rateLimiter.ts` 메모리 limiter · 키 = 신뢰 클라이언트 IP. **로그인 = WO §2-1 `strictLimiter` 축: 15분 · 실패 5회 · 성공 미산입**(2026-10-01 Codex 재리뷰 P2 보완 — 종전 15분 20회 · 성공 포함은 WO 불일치). 실패 = status ≥ 400. 성공은 앞선 실패를 지우지 않고 창 끝까지 유지(`strictLimiter` 와 같은 정책). `strictLimiter` 인스턴스 자체는 키가 기본 `req.ip` · 429 본문이 문자열이라 같은 설정의 전용 인스턴스(`createEmailLoginLimiter`)로 둔다 — Google 로그인 경로(limiter 없음) 무영향. 테스트 `middleware/__tests__/email-login-limiter.test.ts`. 아이디 찾기만 **IP · 입력값 두 limiter 독립 적용**(WO §2-3, 2026-10-01 Codex 재리뷰 지적 보완): IP 당 1시간 10회 + 이름·전화 조합당 1시간 5회. 입력값 키 = `findid:` + sha256(이름 trim · 전화 숫자만 — `findLoginId` 대조 규칙과 같음) — 원문 미저장. 계정 유무와 무관하게 모두 센다(429 가 가입 단서가 되지 않음) · 응답 계약 불변. 테스트 `middleware/__tests__/find-login-id-limiter.test.ts` |
+| 이메일 대소문자 정규화 (Google 가입) | `createGoogleUser` 도 `normalizeLoginEmail()`(trim · 소문자)로 저장하고, 저장 전 `lower(email) = $1` 로 대소문자만 다른 기존 users 를 확인해 있으면 **`EMAIL_IN_USE` 로 거절만** 한다 — 그 users 를 반환 · 연결 · 병합하지 않는다(Identity = Google sub 유지)(2026-10-01 Codex 재리뷰 P2 (a) 보완, #257 병합 blocker). 종전에는 원문 저장이라 `A@x.com`(Google) + `a@x.com`(비밀번호) 두 행이 생기고 `findUserByLoginEmail()` 이 모호 → 비밀번호 로그인 불능. 정규화 저장으로 동시 가입 경쟁은 기존 `users.email` UNIQUE 가 마지막으로 막는다. DB schema · migration · `lower(email)` unique index 추가 없음(운영 read-only 2026-10-01: users 3행 · `email <> lower(btrim(email))` 0 · 대소문자 중복 그룹 0 → 데이터 정리 불요). 기존 Google sub 로그인 · 저장된 주소는 재기록하지 않음. 테스트 `googleAuthService.test.ts` "이메일 대소문자 정규화" 6건 |
 | 메일 링크 토큰 위치 | 확인 · 재설정 링크는 **`/verify-email#token=…` · `/reset-password#token=…`** — query(`?token=`) 아님(2026-10-01 Codex 재리뷰 P1 보완). fragment 는 HTTP 요청에 실리지 않아 `neture-web` 등 웹 서버 · Cloud Run 요청 로그에 토큰이 남지 않는다. 화면(`EmailAuthPages.tsx` `useOneTimeToken`)은 fragment 에서 토큰을 읽어 state(메모리)에 두고, **API 응답을 기다리지 않고** `useLayoutEffect` 에서 `history.replaceState` 로 주소창 · history 의 fragment 를 지운다(하위 화면의 API 호출보다 먼저). API 는 기존대로 JSON body(`/auth/email/verify` `{token}` · `/auth/password/reset` `{token,newPassword}`) — 계약 불변. query 토큰 fallback 없음(운영 미배포라 호환 대상 없음) |
 | 세션 서비스 | 요청 Origin → `resolveSessionServiceKey` 로 파생. body `serviceKey` 받지 않음 |
 | 공통 UI | `@o4o/auth-react` `email/` — `EmailLoginForm` · `EmailSignupForm` · `EmailSentNotice` · `VerifyEmailView` · `ForgotPasswordForm` · `ResetPasswordForm` · `FindLoginIdForm` · `PasswordInput`(보기/숨기기) · `PasswordPolicyHints` |
@@ -161,8 +162,10 @@ repo 에 code scanning 이 켜져 있지 않아 SARIF 업로드가 실패한다(
 
 - 이메일 로그인 화면을 web-neture 외 서비스(kpa-society · kpa-branch · k-cosmetics · pharmacy-hub · store)에도 연결 — 별도 WO(2026-10-01 Codex 재리뷰 P1, 비차단 · Demo 계정 작업 전 검토).
 - 로그인 상태 비밀번호 추가 · 변경(`POST /auth/password`)의 `auth-client` 메서드 · `AccountSecuritySettings` UI — 별도 WO(같은 리뷰 P2, 비차단). 그 전까지 V2 는 운영 화면으로 검증할 수 없다.
-- 같은 사용자 동시 forgot · 재발송 시 미소비 토큰 2개가 살 수 있음 — 새 토큰 발급 시(또는 소비 시) 같은 사용자 · 같은 목적의 미소비 토큰 전부 무효화. 보안 hardening 별도 WO(2026-10-01 Codex 재리뷰 P2 #2, 비차단 — 두 링크 모두 같은 확인된 메일함으로만 간다).
-- 재설정 도중 일시 장애 시 토큰이 이미 소비돼 같은 링크로 재시도 불가 — reliability/UX 별도 WO(같은 리뷰 P2 #3, 비차단 — 선소비는 보안상 보수적).
+- **Token Lifecycle Hardening (별도 WO 1건으로 묶음 · #257 병합 blocker 아님)** — 토큰의 발급 · 소비 · 트랜잭션 원자성. 아래 3건:
+  - 같은 사용자 동시 forgot · 재발송 시 미소비 토큰 2개가 살 수 있음 — 새 토큰 발급 시(또는 소비 시) 같은 사용자 · 같은 목적의 미소비 토큰 전부 무효화. 보안 hardening 별도 WO(2026-10-01 Codex 재리뷰 P2 #2, 비차단 — 두 링크 모두 같은 확인된 메일함으로만 간다).
+  - 재설정 도중 일시 장애 시 토큰이 이미 소비돼 같은 링크로 재시도 불가 — reliability/UX 별도 WO(같은 리뷰 P2 #3, 비차단 — 선소비는 보안상 보수적).
+  - 확인(verify) 도중 일시 장애 시 토큰이 이미 소비돼 같은 링크로 재시도 불가 — 사용자 · 이메일 검증 · `isEmailVerified` 갱신 · 최종 소비를 한 트랜잭션으로(2026-10-01 Codex 재리뷰 P2 (b), 비차단 — 확인 메일 재발송으로 복구 가능).
 - `SMTP_PASS` 를 plain env 에서 Secret Manager 참조(`--update-secrets`)로 이전 — 별도 WO(비밀값 미기재).
 
 ## 6. 남은 절차

@@ -88,6 +88,11 @@ function makeDataSource(store: Store) {
           if (!stagedRepos.has(entity)) stagedRepos.set(entity, repoFor(staged, entity));
           return stagedRepos.get(entity)!;
         },
+        // 가입 시 대소문자만 다른 기존 주소 확인(`lower(email) = $1`) — 그 외 raw SQL 은 쓰지 않는다.
+        query: jest.fn(async (sql: string, params: unknown[]) => {
+          if (!/FROM users WHERE lower\(email\) = \$1/.test(sql)) throw new Error(`unexpected query: ${sql}`);
+          return staged.users.filter((u) => String(u.email).toLowerCase() === params[0]).slice(0, 1).map(() => ({ '?column?': 1 }));
+        }),
       };
       const result = await fn(manager);
       store.users.splice(0, store.users.length, ...staged.users);
@@ -253,6 +258,65 @@ describe('GoogleAuthService — Google-only Signup/Login', () => {
     expect(store.users).toHaveLength(1);
   });
 
+  // WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1 — Google 가입도 로그인 이메일 정규화를 쓴다(대소문자 중복 users 0 · 병합 0).
+  describe('이메일 대소문자 정규화', () => {
+    it('Google `A@X.com` 가입 → users.email 은 `a@x.com` 으로 저장', async () => {
+      build({ 'tok-a': { sub: SUB_A, email: ' New.User@Example.TEST ' } });
+      await svc.signup({ idToken: 'tok-a', consents: CONSENTS, ...META });
+      expect(store.users.map((u) => u.email)).toEqual(['new.user@example.test']);
+      expect(store.linked).toHaveLength(1);
+    });
+
+    it('기존 비밀번호 계정 `a@x.com` + Google `A@X.com` 가입 → EMAIL_IN_USE · users 증가 0 · 연결 0 · 세션 0', async () => {
+      const existing = seedUser(store, { email: 'same@example.test' });
+      build({ 'tok-b': { sub: SUB_B, email: 'Same@Example.TEST' } });
+      await expect(svc.signup({ idToken: 'tok-b', consents: CONSENTS, ...META }))
+        .rejects.toMatchObject({ code: 'EMAIL_IN_USE', statusCode: 409 });
+      expect(store.users).toEqual([existing]);
+      expect(store.linked).toHaveLength(0); // 기존 users.id 로 자동 연결하지 않는다
+      expect(existing.refreshTokenFamily).toBeUndefined();
+      expect(existing.lastLoginAt).toBeUndefined();
+    });
+
+    it('기존 Google `a@x.com` + 다른 sub 의 Google `A@X.com` 가입 → EMAIL_IN_USE · 기존 연결만 유지', async () => {
+      build({
+        'tok-a': { sub: SUB_A, email: 'shared@example.test' },
+        'tok-b': { sub: SUB_B, email: 'SHARED@example.test' },
+      });
+      await svc.signup({ idToken: 'tok-a', consents: CONSENTS, ...META });
+      await expect(svc.signup({ idToken: 'tok-b', consents: CONSENTS, ...META }))
+        .rejects.toMatchObject({ code: 'EMAIL_IN_USE' });
+      expect(store.users).toHaveLength(1);
+      expect(store.linked.map((l) => l.providerId)).toEqual([SUB_A]);
+    });
+
+    it('정규화 전 저장된 기존 행 `A@x.com` 도 같은 주소로 본다 → EMAIL_IN_USE', async () => {
+      seedUser(store, { email: 'Legacy@Example.test' });
+      build({ 'tok-b': { sub: SUB_B, email: 'legacy@example.test' } });
+      await expect(svc.signup({ idToken: 'tok-b', consents: CONSENTS, ...META }))
+        .rejects.toMatchObject({ code: 'EMAIL_IN_USE' });
+      expect(store.users).toHaveLength(1);
+      expect(store.linked).toHaveLength(0);
+    });
+
+    it('기존 Google sub 로그인은 영향 없음 — 저장된 원문 대소문자 주소도 그대로 · 재기록 0', async () => {
+      const u = seedUser(store, { email: 'Old.Case@Example.test' });
+      store.linked.push({ id: uuid(), userId: u.id, provider: 'google', providerId: SUB_A, isVerified: true, isPrimary: true });
+      build({ 'tok-a': { sub: SUB_A, email: 'Old.Case@Example.test' } });
+      const session = await svc.login({ idToken: 'tok-a', ...META });
+      expect(session.isNewUser).toBe(false);
+      expect(session.user.id).toBe(u.id);
+      expect(u.email).toBe('Old.Case@Example.test');
+    });
+
+    it('S1 차단 유지 — 대소문자와 무관하게 email_verified=false 는 GOOGLE_EMAIL_UNVERIFIED', async () => {
+      build({ 'tok-a': { sub: SUB_A, email: 'Unverified@Example.test', emailVerified: false } });
+      await expect(svc.signup({ idToken: 'tok-a', consents: CONSENTS, ...META }))
+        .rejects.toMatchObject({ code: 'GOOGLE_EMAIL_UNVERIFIED' });
+      expect(store.users).toHaveLength(0);
+    });
+  });
+
   it('signup · 같은 sub 재가입 → GOOGLE_ALREADY_REGISTERED, users 증가 0', async () => {
     build({ 'tok-a': { sub: SUB_A, email: 'new@example.test' } });
     await svc.signup({ idToken: 'tok-a', consents: CONSENTS, ...META });
@@ -293,6 +357,7 @@ describe('GoogleAuthService — Google-only Signup/Login', () => {
           }
           return repo;
         },
+        query: jest.fn(async () => []), // 대소문자만 다른 기존 주소 없음
       };
       try {
         return await fn(manager);
