@@ -3,7 +3,7 @@
 > **WO**: [`WO-O4O-MAIN-AUTOMATION-RESUME-AND-REPLAY-PREFLIGHT-FIX-V1`](../work-orders/WO-O4O-MAIN-AUTOMATION-RESUME-AND-REPLAY-PREFLIGHT-FIX-V1.md)
 > **선행 판정**: [`CHECK-O4O-WEB-AUTOMATION-USER-GUIDED-RESUME-AND-WORKFLOW-CANDIDATE-REPLAY-V1`](CHECK-O4O-WEB-AUTOMATION-USER-GUIDED-RESUME-AND-WORKFLOW-CANDIDATE-REPLAY-V1.md) §10 — `BLOCKED` (FAIL 1 SAME_RUN_RESUME_SHORT_ANSWER · FAIL 2 REPLAY_PRE_EXECUTION_SEMANTIC_VALIDATION)
 > **작성일**: 2026-09-30
-> **현재 판정**: `CODE_COMPLETE` · 배포 `DEPLOY_PAUSED`(web-neture 반영 · api traffic 미승격, §3-1) · 실 PC 재검증 **PENDING** → `MAIN_AUTOMATION_WORKFLOW_STATUS = BLOCKED` 유지(재검증 PASS 시 `PRODUCTION_READY`)
+> **현재 판정**: `CODE_COMPLETE` · 배포 serving 확인(api `03774-qeq` · web `01666-qam`, `e2e1be6cc` ⊇ 4a1bec70e, §3-1-a) · 실 PC 재검증 **PENDING** → `MAIN_AUTOMATION_WORKFLOW_STATUS = BLOCKED` 유지(재검증 PASS 시 `PRODUCTION_READY`)
 
 ---
 
@@ -59,5 +59,15 @@
 - 첫 API dispatch 는 게이트 개방 직후 생성돼 `DEPLOY_ENABLED='false'` 로 읽혀 skip(변수 반영 지연) → 재실행으로 build-and-deploy 성공. 현재 `DEPLOY_ENABLED=false`.
 - 실 PC 재검증 미실행 — api 변경(A·B)이 serving 되지 않아 무효. `PRODUCTION_READY` 미판정.
 - 재개 조건: api traffic 이 `4a1bec70e` 포함 revision 으로 100% 승격된 뒤 §3 표 전체.
+
+#### 3-1-a. serving 상태 read-only 재확인 (2026-10-01) — 재개 조건 충족, traffic 변경 불요
+
+- 배경: DEPLOY_FREEZE cutover(`WO-O4O-CICD-DEPLOY-FREEZE-CUTOVER-V1`)로 `DEPLOY_ENABLED` 은퇴. 이 WO 가 아닌 배포 정비 작업의 dispatch(run `36723753741`, SHA `e2e1be6cc`)가 api · web-neture 를 새로 올렸다.
+- api: `o4o-core-api-03774-qeq` (2026-09-30T13:49:52Z) **100%** — spec.traffic 은 여전히 revisionName 고정(대상만 03774-qeq). image digest `sha256:cb687003…` = 해당 run 로그의 `exporting manifest` digest, 그 manifest list `sha256:fa5c3a12…` = registry tag `e2e1be6cc` · `latest`(digest 불일치는 index ↔ platform manifest 차이). `e2e1be6cc` 는 `4a1bec70e` 를 포함(`git merge-base --is-ancestor` 확인).
+- web-neture: `neture-web-01666-qam` 100% (`e2e1be6cc`).
+- `o4o-core-api-03759-cgw`(21e965436)로 전환하는 것은 **롤백**이므로 하지 않음. traffic 변경 0.
+- 롤백 후보(필요 시 사용자 승인): `o4o-core-api-03759-cgw`(21e965436) → `o4o-core-api-03758-wdt`(bfa48c135).
+- api `/health` HTTP 200.
+- 남은 것: §3 실 PC 재검증(사용자가 Local Agent 실행 · Composer 입력, Agent 가 대상앱 조작).
 
 **배포 선행 필요**: A · B 는 api-server(`o4o-core-api`), B · C 는 web-neture 변경이다. 선행 CHECK §10 smoke 는 운영 serving revision(`o4o-core-api-03758-wdt`, image `bfa48c135`)을 대상으로 했으므로, 이번 수정의 실 PC 재검증은 **두 서비스 배포 뒤에만 유효**하다. `DEPLOY_ENABLED=false` 유지 · 이번 WO 에서 배포하지 않음 — 배포는 별도 지시 대기.
