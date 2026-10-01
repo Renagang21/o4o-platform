@@ -818,7 +818,8 @@ test('§13 · §15. migration/deploy step 은 build-and-deploy 안에만 있고,
     );
   }
   assert.match(yml, /base_sha:/, '판정 재현용 입력이 있어야 한다');
-  assert.match(yml, /github\.event\.inputs\.base_sha == ''/, 'base_sha 재현 실행은 배포하지 않는다');
+  // `inputs.*` = workflow_dispatch · workflow_call 공통 (WO-O4O-CICD-UNIFIED-DELIVERY-PIPELINE-V1)
+  assert.match(yml, /\binputs\.base_sha == ''/, 'base_sha 재현 실행은 배포하지 않는다');
 });
 
 // ---------------------------------------------------------------------------

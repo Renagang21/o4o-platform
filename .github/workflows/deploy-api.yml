@@ -63,6 +63,33 @@ on:
         description: "'verified'(기본 · 0% 배포 → 검증 → 전환 → 실패 시 복귀) | 'legacy'(종전 — 새 revision 즉시 서빙/pin 유지)"
         required: false
         default: 'verified'
+  # WO-O4O-CICD-UNIFIED-DELIVERY-PIPELINE-V1 — Unified Delivery(`delivery.yml` · `promote.yml`)의 자동 · 승인 진입점.
+  #   태그 · dispatch 없이 호출된다. target SHA = 호출자의 `github.sha` — 호출자가 target == github.sha == main HEAD 를
+  #   강제하므로 아래 build · migration · deploy · verify step 은 dispatch 경로와 **같은 줄**을 그대로 쓴다.
+  #   migrate_only · expected_sha 는 수동(dispatch) 전용이라 여기서는 노출하지 않는다(호출 시 null → 일반 경로).
+  workflow_call:
+    inputs:
+      rollout_mode:
+        type: string
+        required: false
+        default: 'verified'
+      force_deploy:
+        type: string
+        required: false
+        default: 'false'
+      base_sha:
+        type: string
+        required: false
+        default: ''
+      head_sha:
+        type: string
+        required: false
+        default: ''
+      dry_run:
+        description: "'true' = 배선 검증 — detect 까지만 (ci-gate · build · migration · deploy 0)"
+        type: string
+        required: false
+        default: 'false'
 
 env:
   PROJECT_ID: netureyoutube
@@ -128,8 +155,8 @@ jobs:
     - name: Classify changed scope
       id: scope
       env:
-        BASE_SHA: ${{ github.event.inputs.base_sha || github.event.before }}
-        HEAD_SHA: ${{ github.event.inputs.head_sha || github.sha }}
+        BASE_SHA: ${{ inputs.base_sha || github.event.before }}
+        HEAD_SHA: ${{ inputs.head_sha || github.sha }}
       run: node scripts/ci/detect-affected.mjs
 
     - name: Summary
@@ -154,9 +181,10 @@ jobs:
   ci-gate:
     name: CI gate (target SHA must be green)
     needs: [detect]
+    # dry_run(배선 검증 · workflow_call 전용) 이면 게이트를 열지 않는다 → build-and-deploy 도 needs 로 skip.
     if: >-
-      vars.DEPLOY_FREEZE == 'false' &&
-      (github.event.inputs.migrate_only == 'true' || needs.detect.outputs.api_deploy_affected == 'true')
+      vars.DEPLOY_FREEZE == 'false' && inputs.dry_run != 'true' &&
+      (inputs.migrate_only == 'true' || needs.detect.outputs.api_deploy_affected == 'true')
     runs-on: ubuntu-latest
     timeout-minutes: 40
     permissions:
@@ -203,12 +231,12 @@ jobs:
     #   일반 경로(첫 분기)는 migrate_only 가 'true' 가 아닐 때만 — push 이벤트에서는 inputs 가 없어 항상 성립.
     if: >-
       vars.DEPLOY_FREEZE == 'false' &&
-      ((github.event_name == 'workflow_dispatch' && github.event.inputs.migrate_only == 'true') ||
+      ((github.event_name == 'workflow_dispatch' && inputs.migrate_only == 'true') ||
        (needs.detect.outputs.api_deploy_affected == 'true' &&
-        github.event.inputs.migrate_only != 'true' &&
+        inputs.migrate_only != 'true' &&
         (github.event_name != 'workflow_dispatch' ||
-         github.event.inputs.base_sha == '' ||
-         github.event.inputs.force_deploy == 'true')))
+         inputs.base_sha == '' ||
+         inputs.force_deploy == 'true')))
 
     permissions:
       contents: read
@@ -216,9 +244,9 @@ jobs:
 
     steps:
     - name: Migrate-only preflight (tag ref · SHA 고정 검사)
-      if: github.event.inputs.migrate_only == 'true'
+      if: inputs.migrate_only == 'true'
       env:
-        EXPECTED_SHA: ${{ github.event.inputs.expected_sha }}
+        EXPECTED_SHA: ${{ inputs.expected_sha }}
       run: |
         set -euo pipefail
         echo "ref=${GITHUB_REF} sha=${GITHUB_SHA} expected=${EXPECTED_SHA}"
@@ -433,7 +461,7 @@ jobs:
         echo "🐳 Building and pushing Docker image (buildx + registry cache)..."
         # migrate_only 실행은 배포되지 않는 빌드다 — `:latest` 를 옮기지 않는다.
         TAG_ARGS=(--tag "${FULL_IMAGE}")
-        if [ "${{ github.event.inputs.migrate_only }}" != "true" ]; then
+        if [ "${{ inputs.migrate_only }}" != "true" ]; then
           TAG_ARGS+=(--tag "${LATEST_IMAGE}")
         fi
         docker buildx create --name o4o-api-builder --driver docker-container --use
@@ -486,7 +514,7 @@ jobs:
 
         FULL_IMAGE="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY_NAME }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}"
         # migrate_only: 태그가 아니라 방금 push 한 digest 로 Job 을 고정한다.
-        if [ "${{ github.event.inputs.migrate_only }}" = "true" ]; then
+        if [ "${{ inputs.migrate_only }}" = "true" ]; then
           FULL_IMAGE="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY_NAME }}/${{ env.IMAGE_NAME }}@${{ env.IMAGE_DIGEST }}"
         fi
         echo "migration image: ${FULL_IMAGE}"
@@ -538,7 +566,7 @@ jobs:
 
     # migrate_only 의 끝 — 운영 API 가 그대로인지 기록만 한다 (쓰기 없음).
     - name: Migrate-only stop (API traffic 불변 기록)
-      if: github.event.inputs.migrate_only == 'true'
+      if: inputs.migrate_only == 'true'
       run: |
         set -euo pipefail
         TRAFFIC=$(gcloud run services describe ${{ env.SERVICE_NAME }} \
@@ -562,7 +590,7 @@ jobs:
     #   이제: 값 있음 → 설정 · 없음 + 현재 Cloud Run 값 있음 → 유지 · 둘 다 없음 → 생략. 값을 만들거나 추측하지 않는다.
     #   (코드는 네 값 모두 `|| 기본값` / `?.trim()` 으로 읽는다 — 빈 값과 부재가 같은 동작이다.)
     - name: Resolve optional env (no empty overwrite)
-      if: github.event.inputs.migrate_only != 'true'
+      if: inputs.migrate_only != 'true'
       env:
         OPTENV_AI_DEFAULT_PROVIDER: ${{ vars.AI_DEFAULT_PROVIDER }}
         OPTENV_AI_DEFAULT_MODEL_OPENAI: ${{ vars.AI_DEFAULT_MODEL_OPENAI }}
@@ -576,11 +604,11 @@ jobs:
 
     # WO-O4O-CICD-SAFE-AUTODEPLOY-AND-RISK-GATE-V1 Phase 4 — verified 모드에서만. 배포 전 traffic(pin/latest · 이전 revision)을 기록한다.
     - name: Record traffic before deploy (verified rollout)
-      if: github.event.inputs.migrate_only != 'true' && github.event.inputs.rollout_mode == 'verified'
+      if: inputs.migrate_only != 'true' && inputs.rollout_mode == 'verified'
       run: node scripts/ci/cloud-run-rollout.mjs plan --service ${{ env.SERVICE_NAME }} --out "$RUNNER_TEMP/rollout-plan.json"
 
     - name: Deploy to Cloud Run
-      if: github.event.inputs.migrate_only != 'true'
+      if: inputs.migrate_only != 'true'
       run: |
         FULL_IMAGE="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY_NAME }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}"
 
@@ -590,11 +618,11 @@ jobs:
 
         # verified 모드: 새 revision 은 traffic 0% · 전용 tag 주소. 전환은 검증 뒤 별도 step 이 한다.
         ROLLOUT_ARGS=()
-        if [ "${{ github.event.inputs.rollout_mode }}" = "verified" ]; then
+        if [ "${{ inputs.rollout_mode }}" = "verified" ]; then
           ROLLOUT_ARGS=(--no-traffic "--tag=sha-${GITHUB_SHA:0:12}")
         fi
 
-        echo "🚀 Deploying to Cloud Run... (rollout_mode=${{ github.event.inputs.rollout_mode || 'legacy' }})"
+        echo "🚀 Deploying to Cloud Run... (rollout_mode=${{ inputs.rollout_mode || 'legacy' }})"
 
         # ============================================================
         # WO-O4O-API-DATABASE-READINESS-AND-COLD-START-TRAFFIC-GATE-FINAL-CLOSURE-V1
@@ -654,7 +682,7 @@ jobs:
     # legacy 모드 전용. verified 모드는 아래 세 step 이 새 revision 을 직접 확인한 뒤 전환하고 전환 후 검사한다.
     # (pin 서비스에서 이 step 은 트래픽을 받는 **옛** revision 을 본다 — CHECK-O4O-CICD-PRODUCTION-DEPLOY-CENSUS §A-7)
     - name: Verify deployment
-      if: github.event.inputs.migrate_only != 'true' && github.event.inputs.rollout_mode != 'verified'
+      if: inputs.migrate_only != 'true' && inputs.rollout_mode != 'verified'
       run: |
         echo "🔍 Verifying deployment..."
 
@@ -725,13 +753,13 @@ jobs:
     #   DB migration 은 되돌리지 않는다 (LEVEL 3 runbook 대상).
     # =========================================================================
     - name: Smoke new revision before traffic (verified · readiness)
-      if: github.event.inputs.migrate_only != 'true' && github.event.inputs.rollout_mode == 'verified'
+      if: inputs.migrate_only != 'true' && inputs.rollout_mode == 'verified'
       run: node scripts/ci/cloud-run-rollout.mjs smoke --service ${{ env.SERVICE_NAME }} --tag "sha-${GITHUB_SHA:0:12}" --mode readiness
 
     - name: Switch traffic to verified revision
-      if: github.event.inputs.migrate_only != 'true' && github.event.inputs.rollout_mode == 'verified'
+      if: inputs.migrate_only != 'true' && inputs.rollout_mode == 'verified'
       run: node scripts/ci/cloud-run-rollout.mjs switch --service ${{ env.SERVICE_NAME }} --tag "sha-${GITHUB_SHA:0:12}" --plan "$RUNNER_TEMP/rollout-plan.json"
 
     - name: Verify after switch (rollback on failure)
-      if: github.event.inputs.migrate_only != 'true' && github.event.inputs.rollout_mode == 'verified'
+      if: inputs.migrate_only != 'true' && inputs.rollout_mode == 'verified'
       run: node scripts/ci/cloud-run-rollout.mjs verify --service ${{ env.SERVICE_NAME }} --url "${{ env.PUBLIC_API_URL }}/health/ready" --plan "$RUNNER_TEMP/rollout-plan.json" --attempts 5

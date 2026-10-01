@@ -17,6 +17,13 @@ name: Deploy Auto (risk-gated)
 #
 #   판정 · 결정 · 결과는 Job Summary 와 artifact(JSON, 30일)로 남는다 — 이전 shadow 기록을 대체한다.
 #   근거: docs/checks/CHECK-O4O-CICD-DEPLOY-FREEZE-CUTOVER-V1.md
+#
+#   WO-O4O-CICD-UNIFIED-DELIVERY-PIPELINE-V1 P0 (가시성 · 배포 동작 불변):
+#     run 이름 = 실제 판정 target SHA (workflow_run run 은 목록에 main 최신 commit 으로 표시돼 다른 commit 의 판정처럼 보였다)
+#     commit status `production` = target commit 에 결과 1줄 (NO_DEPLOY · DEPLOYING · HELD_LEVEL_3 · BLOCKED_FREEZE …)
+#   이 workflow 는 Unified Delivery(`delivery.yml`) cutover 때 비활성화된다 — 그 전까지 자동 경로의 권한은 여기 있다.
+
+run-name: Deploy Auto ${{ github.event.workflow_run.head_sha || inputs.target_sha || github.sha }}
 
 on:
   workflow_run:
@@ -50,6 +57,7 @@ concurrency:
 permissions:
   contents: write   # target SHA 에 deploy/auto-<sha12> 태그 생성
   actions: write    # deploy workflow dispatch
+  statuses: write   # commit status `production` (P0 가시성)
 
 jobs:
   decide-and-deploy:
@@ -94,6 +102,8 @@ jobs:
           HEAD_SHA: ${{ github.event.inputs.head_sha }}
         run: |
           ARGS=(--freeze "$DEPLOY_FREEZE_RAW" --dry-run "$DRY_RUN" --json "$RUNNER_TEMP/deploy-auto.json")
+          # 실제 판정(dry-run 아님)만 target commit 에 상태를 남긴다 — 수동 재현 · fixture 는 기록하지 않는다
+          if [ "$DRY_RUN" = "false" ] && [ -z "$BASE_SHA" ]; then ARGS+=(--status-context production); fi
           if [ -n "$BASE_SHA" ] && [ -n "$HEAD_SHA" ]; then
             ARGS+=(--base "$BASE_SHA" --head "$HEAD_SHA")
           else

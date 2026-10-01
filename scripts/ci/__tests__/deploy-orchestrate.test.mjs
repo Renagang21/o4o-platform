@@ -4,8 +4,27 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import { FRONTENDS, autoTagName, decideAll, decideOne, executeDecisions, githubClient, isFrozen, isNetworkError } from '../deploy-orchestrate.mjs';
-import { DEPLOY_TARGETS, LEVEL_1, LEVEL_2, LEVEL_3 } from '../deploy-risk.mjs';
+import {
+  FRONTENDS,
+  STATE_OF,
+  annotatePendingLevel3,
+  autoTagName,
+  buildPlan,
+  commitStatus,
+  computeApiDependency,
+  decideAll,
+  decideOne,
+  decidePromote,
+  executeDecisions,
+  finalizeStates,
+  githubClient,
+  isFrozen,
+  isNetworkError,
+  promoteCommand,
+  wiringPlan,
+} from '../deploy-orchestrate.mjs';
+import { DEPLOY_TARGETS, LEVEL_1, LEVEL_2, LEVEL_3, assessRisk } from '../deploy-risk.mjs';
+import { buildWorkspaceGraph } from '../detect-affected.mjs';
 
 const SHA = 'c'.repeat(40);
 const ok = { frozen: false, ciGreen: true, headIsTarget: true };
@@ -203,5 +222,275 @@ describe('R. GitHub API 연결 오류 재시도', () => {
     const notMade = scripted([res(404, {}), socketErr(), res(404, {})]);
     await assert.rejects(client(notMade.fetchImpl).ensureTag(TAG, SHA), (err) => isNetworkError(err));
     assert.equal(notMade.calls.filter((c) => c.startsWith('POST')).length, 1);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// WO-O4O-CICD-UNIFIED-DELIVERY-PIPELINE-V1 — Unified Delivery 판정 (fixture §31 · 네트워크 0 · git 주입)
+// ---------------------------------------------------------------------------
+
+const graph = buildWorkspaceGraph();
+const BASE = 'b'.repeat(40);
+const TARGET = 'f'.repeat(40);
+const C = (n) => String(n).repeat(40).slice(0, 40);
+
+/** 실제 판정기(assessRisk)로 base → target 변경 파일을 판정해 서비스별 entry 를 만든다 (모든 서비스가 BASE 를 서빙) */
+function fromFiles(paths, over = {}) {
+  const r = assessRisk(paths.map((p) => ({ status: 'M', path: p })), graph, {});
+  return all((k) => {
+    const s = r.services[k];
+    return {
+      serving_sha: BASE,
+      serving_source: 'fixture',
+      status: s.affected ? 'BEHIND' : 'BEHIND_NO_RUNTIME_CHANGE',
+      deploy_required: s.affected,
+      level: s.affected ? s.level : LEVEL_1,
+      level3: s.affected ? s.level3.concat(r.pipeline_hits) : [],
+      rollout_pending: s.rollout.length > 0,
+      reasons: s.reasons,
+      ...(over[k] ?? {}),
+    };
+  });
+}
+
+/** git 이력 대역: commits = [{ sha, files, keys }] (오래된 것부터, BASE..TARGET) */
+function fakeHistory(commits) {
+  const bySha = new Map(commits.map((c) => [c.sha, c]));
+  return {
+    history: {
+      firstParentCommits: () => ({ ok: true, commits: commits.map((c) => c.sha) }),
+      parent: (sha) => `p${sha.slice(1)}`,
+      workKeys: (sha) => new Set(bySha.get(sha)?.keys ?? []),
+      originOf: (_b, _t, file) => {
+        const c = [...commits].reverse().find((x) => x.files.includes(file));
+        return c ? { sha: c.sha, subject: `subject ${c.sha.slice(0, 4)}` } : null;
+      },
+    },
+    provider: {
+      changedFiles: (_parent, sha) => (bySha.has(sha) ? { ok: true, files: bySha.get(sha).files.map((p) => ({ status: 'M', path: p })) } : { ok: false }),
+      readLock: () => undefined,
+    },
+  };
+}
+
+const API_FILE = 'apps/api-server/src/routes/health.ts';
+const MIGRATION = 'apps/api-server/src/database/migrations/20271001000000-X.ts';
+const NETURE_FILE = 'services/web-neture/src/pages/HomePage.tsx';
+const STORE_FILE = 'services/web-store/src/pages/HomePage.tsx';
+
+describe('U1. fixture §31 — LEVEL 판정 → Delivery 결정 · 계획', () => {
+  it('L1 docs only → 전 서비스 NO_DEPLOY · 계획 0', () => {
+    const d = decideAll(fromFiles(['docs/x.md']), ok, {});
+    assert.ok(Object.values(d).every((x) => x.decision === 'NO_DEPLOY'));
+    assert.deepEqual(buildPlan(d, {}), { deploy_api: false, admin_after_api: false, admin_parallel: false, web_after_api: [], web_parallel: [] });
+  });
+  it('L1 CI control only (판정 스크립트 · delivery/promote workflow) → NO_DEPLOY', () => {
+    const per = fromFiles(['scripts/ci/deploy-orchestrate.mjs', '.github/workflows/delivery.yml', '.github/workflows/promote.yml']);
+    assert.ok(Object.values(decideAll(per, ok, {})).every((x) => x.decision === 'NO_DEPLOY'));
+  });
+  it('L2 web only → 그 서비스만 병렬 배포', () => {
+    const d = decideAll(fromFiles([NETURE_FILE]), ok, {});
+    assert.equal(d.neture.decision, 'AUTO_DEPLOY');
+    assert.deepEqual(buildPlan(d, {}).web_parallel, ['neture']);
+  });
+  it('L2 API only → API 만', () => {
+    const d = decideAll(fromFiles([API_FILE]), ok, {});
+    assert.equal(d.api.decision, 'AUTO_DEPLOY');
+    assert.equal(buildPlan(d, {}).deploy_api, true);
+  });
+  it('L2 API + web (같은 commit) → 둘 다 배포 · web 은 API 성공 뒤', () => {
+    const { history, provider } = fakeHistory([{ sha: C(1), files: [API_FILE, NETURE_FILE], keys: ['WO-A-V1'] }]);
+    const per = fromFiles([API_FILE, NETURE_FILE]);
+    const deps = computeApiDependency(TARGET, per, graph, { history, provider });
+    assert.equal(deps.neture.dependent, true);
+    const plan = buildPlan(decideAll(per, ok, deps), deps);
+    assert.equal(plan.deploy_api, true);
+    assert.deepEqual(plan.web_after_api, ['neture']);
+    assert.deepEqual(plan.web_parallel, []);
+  });
+  for (const [label, file, rule] of [
+    ['L3 auth', 'apps/api-server/src/modules/auth/auth.controller.ts', 'auth-backend'],
+    ['L3 migration', MIGRATION, 'db-migration'],
+    ['L3 RBAC', 'apps/api-server/src/config/service-scopes.ts', 'rbac'],
+  ]) {
+    it(`${label} → API HOLD (HELD_LEVEL_3) · 계획 0`, () => {
+      const per = fromFiles([file]);
+      const d = decideAll(per, ok, {});
+      assert.equal(d.api.decision, 'AUTO_DEPLOY_BLOCKED');
+      assert.equal(STATE_OF[d.api.decision], 'HELD_LEVEL_3');
+      assert.ok(per.api.level3.some((h) => h.rule === rule), `${rule} hit`);
+      assert.equal(buildPlan(d, {}).deploy_api, false);
+    });
+  }
+  it('rollout_pending → HELD_ROLLOUT_PENDING', () => {
+    const d = decideAll(fromFiles([NETURE_FILE], { neture: { rollout_pending: true } }), ok, {});
+    assert.equal(STATE_OF[d.neture.decision], 'HELD_ROLLOUT_PENDING');
+  });
+  it('freeze → BLOCKED_FREEZE (L2 도) · CI failure → BLOCKED_CI', () => {
+    const per = fromFiles([NETURE_FILE]);
+    assert.equal(STATE_OF[decideAll(per, { ...ok, frozen: true }, {}).neture.decision], 'BLOCKED_FREEZE');
+    assert.equal(STATE_OF[decideAll(per, { ...ok, ciGreen: false }, {}).neture.decision], 'BLOCKED_CI');
+  });
+});
+
+describe('U2. API ↔ 프런트 의존 정밀화 (§17)', () => {
+  it('API held + 의존 web(같은 WO) → HELD_API_NOT_DEPLOYED · 무관 web(다른 WO) → 독립 배포', () => {
+    const { history, provider } = fakeHistory([
+      { sha: C(1), files: [MIGRATION], keys: ['WO-A-V1'] },
+      { sha: C(2), files: [NETURE_FILE], keys: ['WO-A-V1'] },
+      { sha: C(3), files: [STORE_FILE], keys: ['WO-B-V1'] },
+    ]);
+    const per = fromFiles([MIGRATION, NETURE_FILE, STORE_FILE]);
+    const deps = computeApiDependency(TARGET, per, graph, { history, provider });
+    assert.equal(deps.neture.dependent, true);
+    assert.match(deps.neture.reason, /같은 작업 WO-A-V1/);
+    assert.equal(deps.store.dependent, false);
+    const d = decideAll(per, ok, deps);
+    assert.equal(d.api.decision, 'AUTO_DEPLOY_BLOCKED');
+    assert.equal(d.neture.decision, 'HELD_API_NOT_DEPLOYED');
+    assert.equal(d.store.decision, 'AUTO_DEPLOY');
+    assert.deepEqual(buildPlan(d, deps).web_parallel, ['store']);
+  });
+  it('API 와 같은 commit 에서 바뀐 web → 의존', () => {
+    const { history, provider } = fakeHistory([{ sha: C(1), files: [MIGRATION, NETURE_FILE], keys: ['WO-A-V1'] }]);
+    const deps = computeApiDependency(TARGET, fromFiles([MIGRATION, NETURE_FILE]), graph, { history, provider });
+    assert.equal(deps.neture.dependent, true);
+    assert.match(deps.neture.reason, /같은 commit/);
+  });
+  it('WO 키 없는 commit 이 있으면 관련성 판단 불가 → 의존 (fail-closed)', () => {
+    const noKeyWeb = fakeHistory([
+      { sha: C(1), files: [MIGRATION], keys: ['WO-A-V1'] },
+      { sha: C(3), files: [STORE_FILE], keys: [] },
+    ]);
+    assert.equal(computeApiDependency(TARGET, fromFiles([MIGRATION, STORE_FILE]), graph, noKeyWeb).store.dependent, true);
+    const noKeyApi = fakeHistory([
+      { sha: C(1), files: [MIGRATION], keys: [] },
+      { sha: C(3), files: [STORE_FILE], keys: ['WO-B-V1'] },
+    ]);
+    assert.equal(computeApiDependency(TARGET, fromFiles([MIGRATION, STORE_FILE]), graph, noKeyApi).store.dependent, true);
+  });
+  it('git 판정 실패 · serving 불명 → 의존 (fail-closed)', () => {
+    const broken = fakeHistory([{ sha: C(1), files: [MIGRATION], keys: ['WO-A-V1'] }]);
+    broken.history.firstParentCommits = () => ({ ok: false });
+    assert.equal(computeApiDependency(TARGET, fromFiles([MIGRATION, STORE_FILE]), graph, broken).store.dependent, true);
+    const fine = fakeHistory([
+      { sha: C(1), files: [MIGRATION], keys: ['WO-A-V1'] },
+      { sha: C(3), files: [STORE_FILE], keys: ['WO-B-V1'] },
+    ]);
+    const per = fromFiles([MIGRATION, STORE_FILE], { store: { serving_sha: null } });
+    assert.equal(computeApiDependency(TARGET, per, graph, fine).store.dependent, true);
+  });
+  it('공유 계약 package(@o4o/types) 변경은 API · 프런트를 같은 commit 에서 바꾼다 → 의존', () => {
+    const TYPES = 'packages/types/src/index.ts';
+    const { history, provider } = fakeHistory([{ sha: C(1), files: [TYPES], keys: ['WO-A-V1'] }]);
+    const deps = computeApiDependency(TARGET, fromFiles([TYPES]), graph, { history, provider });
+    assert.ok(Object.keys(deps).length > 0);
+    for (const [k, v] of Object.entries(deps)) assert.equal(v.dependent, true, k);
+  });
+  it('API 배포 대상이 아니면 의존 없음 · deps 없는 decideAll = 종전 규칙(프런트 전부 보류)', () => {
+    assert.equal(computeApiDependency(TARGET, fromFiles([NETURE_FILE]), graph, fakeHistory([])).neture.dependent, false);
+    assert.equal(decideAll(fromFiles([MIGRATION, STORE_FILE]), ok).store.decision, 'HELD_API_NOT_DEPLOYED');
+  });
+});
+
+describe('U3. LEVEL_3 누적 표시 (§15)', () => {
+  it('이전 commit 의 L3 때문에 막힌 L2 → BLOCKED_BY_PENDING_LEVEL3 since <sha>', () => {
+    const AUTH = 'packages/auth-client/src/client.ts';
+    const { history } = fakeHistory([
+      { sha: C(1), files: [AUTH], keys: ['WO-A-V1'] },
+      { sha: TARGET, files: [NETURE_FILE], keys: ['WO-B-V1'] },
+    ]);
+    const per = fromFiles([AUTH, NETURE_FILE]);
+    const d = annotatePendingLevel3(decideAll(per, ok, {}), per, TARGET, history);
+    assert.match(d.neture.reason, new RegExp(`^BLOCKED_BY_PENDING_LEVEL3 since ${C(1).slice(0, 9)}`));
+    assert.equal(d.neture.pending_level3.since, C(1));
+  });
+  it('target 자신이 L3 면 누적 표시 없음', () => {
+    const { history } = fakeHistory([{ sha: TARGET, files: [MIGRATION], keys: ['WO-A-V1'] }]);
+    const per = fromFiles([MIGRATION]);
+    assert.doesNotMatch(annotatePendingLevel3(decideAll(per, ok, {}), per, TARGET, history).api.reason, /PENDING_LEVEL3/);
+  });
+});
+
+describe('U4. promote — SHA 하나로 승인 (§13 · §14)', () => {
+  it('L3 · 첫 rollout · L2 를 함께 승격 · 최신 서비스는 NO_DEPLOY', () => {
+    const per = fromFiles([MIGRATION, NETURE_FILE], { store: { rollout_pending: true, deploy_required: true, status: 'BEHIND', level: LEVEL_2 } });
+    const d = decidePromote(per, ok, undefined);
+    assert.equal(d.api.decision, 'PROMOTE');
+    assert.match(d.api.reason, /승인된 LEVEL_3 \(db-migration/);
+    assert.equal(d.store.decision, 'PROMOTE');
+    assert.match(d.store.reason, /첫 verified rollout/);
+    assert.equal(d.neture.decision, 'PROMOTE');
+    assert.equal(d['kpa-society'].decision, 'NO_DEPLOY');
+    const plan = buildPlan(d, undefined);
+    assert.equal(plan.deploy_api, true);
+    assert.deepEqual([...plan.web_after_api].sort(), ['neture', 'store']);
+  });
+  it('SHA ≠ main HEAD → 거절 (승인 범위 고정)', () => {
+    assert.equal(decidePromote(fromFiles([MIGRATION]), { ...ok, headIsTarget: false }).api.decision, 'PROMOTE_REFUSED_NOT_HEAD');
+  });
+  it('freeze · CI 실패 → 승인으로도 배포 0', () => {
+    assert.equal(decidePromote(fromFiles([MIGRATION]), { ...ok, frozen: true }).api.decision, 'BLOCKED_DEPLOY_FREEZE');
+    assert.equal(decidePromote(fromFiles([MIGRATION]), { ...ok, ciGreen: false }).api.decision, 'BLOCKED_CI_NOT_GREEN');
+  });
+  it('serving 불명(UNKNOWN) 서비스는 승인으로도 배포하지 않는다', () => {
+    const per = fromFiles([MIGRATION], { api: { status: 'UNKNOWN', serving_sha: null, reasons: ['serving SHA 판정 불가'] } });
+    assert.equal(decidePromote(per, ok).api.decision, 'PROMOTE_REFUSED_UNKNOWN_SERVING');
+  });
+  it('services 입력으로 좁히기 · API 를 빼면 의존 프런트는 보류', () => {
+    const d = decidePromote(fromFiles([MIGRATION, NETURE_FILE]), ok, undefined, { services: ['neture'] });
+    assert.equal(d.api.decision, 'NOT_SELECTED');
+    assert.equal(d.neture.decision, 'HELD_API_NOT_DEPLOYED');
+  });
+});
+
+describe('U5. 상태 표현 · commit status · report (§10 · §26 · §27)', () => {
+  const st = (pairs) => Object.entries(pairs).map(([key, state]) => ({ key, state }));
+  it('HOLD → pending + promote 명령 1줄 (≤140자)', () => {
+    const s = commitStatus(st({ api: 'HELD_LEVEL_3', neture: 'DEPLOYING', admin: 'HELD_LEVEL_3', store: 'HELD_LEVEL_3', 'kpa-society': 'HELD_LEVEL_3', 'k-cosmetics': 'HELD_LEVEL_3' }), TARGET);
+    assert.equal(s.overall, 'HELD_LEVEL_3');
+    assert.equal(s.state, 'pending');
+    assert.ok(s.description.endsWith(promoteCommand(TARGET)));
+    assert.ok(s.description.length <= 140, `${s.description.length}`);
+  });
+  it('freeze · CI 차단에는 promote 안내를 붙이지 않는다', () => {
+    assert.doesNotMatch(commitStatus(st({ api: 'BLOCKED_FREEZE' }), TARGET).description, /promote/);
+    assert.equal(commitStatus(st({ api: 'BLOCKED_CI' }), TARGET).state, 'failure');
+  });
+  it('NO_DEPLOY · DEPLOYED · SUPERSEDED → success · FAILED → failure', () => {
+    assert.equal(commitStatus(st({ api: 'NO_DEPLOY' }), TARGET).state, 'success');
+    assert.equal(commitStatus(st({ api: 'DEPLOYED', neture: 'NO_DEPLOY' }), TARGET).overall, 'DEPLOYED');
+    assert.equal(commitStatus(st({ api: 'SUPERSEDED' }), TARGET).state, 'success');
+    assert.equal(commitStatus(st({ api: 'DEPLOYED', neture: 'FAILED' }), TARGET).state, 'failure');
+  });
+  it('report: serving == target → DEPLOYED · 아니면 FAILED · API 실패 뒤 의존 프런트 → HELD_DEPENDENCY', () => {
+    const record = {
+      target_sha: TARGET,
+      execute: true,
+      plan: { deploy_api: true, web_after_api: ['neture'], web_parallel: ['store'], admin_after_api: false, admin_parallel: false },
+      services: [
+        { key: 'api', decision: 'AUTO_DEPLOY' },
+        { key: 'neture', decision: 'AUTO_DEPLOY' },
+        { key: 'store', decision: 'AUTO_DEPLOY' },
+        { key: 'lecture', decision: 'NO_DEPLOY' },
+      ],
+    };
+    const good = finalizeStates(record, { api: { sha: TARGET }, neture: { sha: TARGET }, store: { sha: TARGET } });
+    assert.deepEqual(good.map((s) => s.state), ['DEPLOYED', 'DEPLOYED', 'DEPLOYED', 'NO_DEPLOY']);
+    const apiFail = finalizeStates(record, { api: { sha: BASE }, neture: { sha: BASE }, store: { sha: TARGET } });
+    assert.deepEqual(apiFail.map((s) => s.state), ['FAILED', 'HELD_DEPENDENCY', 'DEPLOYED', 'NO_DEPLOY']);
+  });
+  it('배선 검증 계획: api 포함 → 프런트는 after-api · 미포함 → 병렬 · 항상 dry_call', () => {
+    assert.deepEqual(wiringPlan(['api', 'neture', 'admin']), {
+      execute: 'true',
+      dry_call: 'true',
+      deploy_api: 'true',
+      admin_after_api: 'true',
+      admin_parallel: 'false',
+      web_after_api: ['neture'],
+      web_parallel: [],
+      state: 'WIRING_TEST',
+    });
+    assert.deepEqual(wiringPlan(['store']).web_parallel, ['store']);
   });
 });

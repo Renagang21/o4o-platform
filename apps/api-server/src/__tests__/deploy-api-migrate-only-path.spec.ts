@@ -23,7 +23,10 @@ const WF_TEXT = fs.readFileSync(path.join(REPO, '.github', 'workflows', 'deploy-
 const WF = YAML.parse(WF_TEXT);
 
 type Ctx = {
-  eventName: 'push' | 'workflow_dispatch';
+  /** workflow_call 이면 호출자의 이벤트 이름이 들어온다 (Unified Delivery = workflow_run · promote = workflow_dispatch) */
+  eventName: 'push' | 'workflow_dispatch' | 'workflow_run';
+  /** true = workflow_call(Unified Delivery) 로 호출됨 — inputs 는 workflow_call 입력 정의(기본값)를 따른다 */
+  call?: boolean;
   /** 'true' = 배포 가능(DEPLOY_FREEZE='false') · 그 외 = freeze */
   gate: string;
   affected?: string;
@@ -32,23 +35,30 @@ type Ctx = {
 
 /**
  * GitHub Actions 식을 이 워크플로가 쓰는 부분집합으로만 평가한다.
- * (문자열 비교 · && · || · 괄호. `github.event.inputs` 는 push 에서 null.)
+ * (문자열 비교 · && · || · 괄호. `inputs` 는 push 에서 null.)
+ * WO-O4O-CICD-UNIFIED-DELIVERY-PIPELINE-V1: 워크플로는 `inputs.*` 를 쓴다(dispatch · workflow_call 공통).
+ *   workflow_call 은 migrate_only · expected_sha 를 정의하지 않으므로 그 값은 null 이다.
  */
 function evaluate(expr: string, c: Ctx): boolean {
-  const inputs = c.eventName === 'workflow_dispatch' ? { force_deploy: 'false', base_sha: '', head_sha: '', migrate_only: 'false', expected_sha: '', ...c.inputs } : undefined;
+  const inputs = c.call
+    ? { rollout_mode: 'verified', force_deploy: 'false', base_sha: '', head_sha: '', dry_run: 'false', ...c.inputs }
+    : c.eventName === 'workflow_dispatch'
+      ? { force_deploy: 'false', base_sha: '', head_sha: '', migrate_only: 'false', expected_sha: '', ...c.inputs }
+      : undefined;
   const js = expr
     .replace(/\s+/g, ' ')
     // DEPLOY_FREEZE: 'false' 일 때만 배포 가능 — gate 'true' ↔ freeze 'false'
     .replace(/vars\.DEPLOY_FREEZE/g, "(__gate === 'true' ? 'false' : 'true')")
     .replace(/needs\.detect\.outputs\.api_deploy_affected/g, '__affected')
     .replace(/github\.event_name/g, '__event')
-    .replace(/github\.event\.inputs\.(\w+)/g, (_m, k: string) => `__in(${JSON.stringify(k)})`);
+    .replace(/github\.event\.inputs\.(\w+)/g, (_m, k: string) => `__in(${JSON.stringify(k)})`)
+    .replace(/\binputs\.(\w+)/g, (_m, k: string) => `__in(${JSON.stringify(k)})`);
   if (/[a-z_]+\.[a-z_]+/i.test(js.replace(/'[^']*'/g, '').replace(/__in\("[^"]*"\)/g, ''))) {
     throw new Error(`평가기가 모르는 식: ${expr}`);
   }
   // GH: null != 'true' → true, null == 'true' → false (JS == 와 같은 결과만 쓴다)
   const fn = new Function('__gate', '__affected', '__event', '__in', `return (${js});`);
-  return Boolean(fn(c.gate, c.affected ?? 'true', c.eventName, (k: string) => (inputs ? inputs[k] : null)));
+  return Boolean(fn(c.gate, c.affected ?? 'true', c.eventName, (k: string) => (inputs ? ((inputs as Record<string, string>)[k] ?? null) : null)));
 }
 
 const job = WF.jobs['build-and-deploy'];
@@ -86,8 +96,29 @@ describe('일반 배포 경로 — 종전과 같다', () => {
     ['수동 · 게이트 열림 → 실행', { eventName: 'workflow_dispatch', gate: 'true' }, true],
     ['판정 재현(base_sha) · force 없음 → skip', { eventName: 'workflow_dispatch', gate: 'true', inputs: { base_sha: 'a'.repeat(40) } }, false],
     ['판정 재현(base_sha) · force → 실행', { eventName: 'workflow_dispatch', gate: 'true', inputs: { base_sha: 'a'.repeat(40), force_deploy: 'true' } }, true],
+    // WO-O4O-CICD-UNIFIED-DELIVERY-PIPELINE-V1 — workflow_call (Delivery 자동 = workflow_run · promote = workflow_dispatch)
+    ['Delivery 호출 · 게이트 열림 → 실행', { eventName: 'workflow_run', call: true, gate: 'true' }, true],
+    ['Delivery 호출 · 게이트 닫힘 → skip', { eventName: 'workflow_run', call: true, gate: 'false' }, false],
+    ['promote 호출 · 게이트 열림 → 실행 (migrate_only 아님)', { eventName: 'workflow_dispatch', call: true, gate: 'true' }, true],
   ])('%s', (_label, c, expected) => {
     expect(evaluate(job.if, c)).toBe(expected);
+  });
+
+  it('workflow_call 진입점: migrate_only · expected_sha 는 노출하지 않는다 (수동 전용) · rollout_mode 기본 verified', () => {
+    const call = WF.on.workflow_call.inputs;
+    expect(call.migrate_only).toBeUndefined();
+    expect(call.expected_sha).toBeUndefined();
+    expect(call.rollout_mode.default).toBe('verified');
+    expect(call.dry_run.default).toBe('false');
+  });
+
+  it('workflow_call 로 호출되면 일반 배포 step 이 돌고 migrate-only step 은 돌지 않는다', () => {
+    for (const c of [{ eventName: 'workflow_run', call: true, gate: 'true' }, { eventName: 'workflow_dispatch', call: true, gate: 'true' }] as Ctx[]) {
+      for (const s of ['Deploy to Cloud Run', 'Run database migrations']) expect(stepRuns(s, c)).toBe(true);
+      for (const s of MIGRATE_ONLY_STEPS) expect(stepRuns(s, c)).toBe(false);
+      // verified 경로 — legacy Verify 는 돌지 않는다
+      expect(stepRuns('Verify deployment', c)).toBe(false);
+    }
   });
 
   it('일반 실행에서는 배포 step 이 전부 돌고 migrate-only step 은 돌지 않는다', () => {

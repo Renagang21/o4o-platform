@@ -62,6 +62,7 @@ jobs:
       docs_fast_eligible: ${{ steps.scope.outputs.docs_fast_eligible }}
       global_or_unknown: ${{ steps.scope.outputs.global_or_unknown }}
       fallback: ${{ steps.scope.outputs.fallback }}
+      web_build_dirs: ${{ steps.scope.outputs.web_build_dirs }}
 
     steps:
     - uses: actions/checkout@v6
@@ -504,6 +505,60 @@ jobs:
           apps/${{ matrix.app }}/dist
           apps/${{ matrix.app }}/build
         retention-days: 7
+
+  # 3-b. Web production build (affected)
+  #
+  # WO-O4O-CICD-UNIFIED-DELIVERY-PIPELINE-V1 P4 — "CI green ≠ 배포 가능" 해소의 최소안.
+  #   Web 서비스의 production 산출물은 각 Dockerfile 의 `npx vite build` 에서만 만들어졌다 — CI 는 tsc 까지만 봐서
+  #   vite build 실패(번들 · 자산 · 플러그인 · import 해석)가 **배포 job 에서 처음** 드러났다.
+  #   여기서 Dockerfile 과 같은 명령(`npx vite build`)을 **배포 판정과 같은 축**(detect-affected 의 web 배포 영향)으로
+  #   affected 서비스만 돌린다. CI 의 build 잡(admin ≈2.5분)처럼 critical path(Code Quality ≈10분) 옆에서 병렬이다.
+  #   산출물은 버리고 판정만 한다 — 같은 artifact 를 승격하는 것은 WO-O4O-CICD-ARTIFACT-PROMOTION-V1 범위다.
+  #   build-arg(VITE_*)는 주입하지 않는다 — vite 는 미지정 env 를 undefined 로 inline 하며 빌드 성패에 영향이 없다.
+  web-build:
+    name: Web production build (affected)
+    runs-on: ubuntu-latest
+    needs: [detect]
+    if: >-
+      needs.detect.outputs.admin_only != 'true' && needs.detect.outputs.docs_fast_eligible != 'true' &&
+      needs.detect.outputs.web_build_dirs != '' && needs.detect.outputs.web_build_dirs != '[]'
+    timeout-minutes: 30
+    steps:
+    - uses: actions/checkout@v6
+      with:
+        sparse-checkout: |
+          /*
+          !/apps/api-server/src/scripts/data/
+        sparse-checkout-cone-mode: false
+
+    - name: Setup build environment
+      uses: ./.github/actions/setup-build-env
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        strict-lockfile: 'true'
+        build-packages: 'false'
+
+    - name: Build affected web services (dependency closure → vite build)
+      env:
+        WEB_BUILD_DIRS: ${{ needs.detect.outputs.web_build_dirs }}
+      run: |
+        set -euo pipefail
+        mapfile -t DIRS < <(node -e 'for (const d of JSON.parse(process.env.WEB_BUILD_DIRS)) console.log(d)')
+        FILTERS=()
+        for d in "${DIRS[@]}"; do
+          name=$(node -p "require('./$d/package.json').name")
+          FILTERS+=(--filter "${name}^...")
+        done
+        echo "🔨 dependency closure: ${FILTERS[*]}"
+        pnpm "${FILTERS[@]}" run build
+        for d in "${DIRS[@]}"; do
+          echo "::group::vite build ${d}"
+          start=$(date +%s)
+          (cd "$d" && npx vite build --outDir "$RUNNER_TEMP/web-build/$(basename "$d")" --emptyOutDir)
+          echo "::endgroup::"
+          echo "| ${d} | ✅ $(( $(date +%s) - start ))s |" >> "$RUNNER_TEMP/web-build.md"
+        done
+        { echo "### Web production build (affected)"; echo ""; echo "| service | vite build |"; echo "|---|---|"; cat "$RUNNER_TEMP/web-build.md"; } >> "$GITHUB_STEP_SUMMARY"
 
   # ===========================================================================
   # 4. Docs-only fast path

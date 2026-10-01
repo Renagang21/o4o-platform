@@ -49,7 +49,8 @@ describe('Phase 4 — verified rollout (cutover 후 기본값)', () => {
     it(`${file}: rollout_mode 기본 verified · verified 에서만 --no-traffic --tag`, () => {
       const wf = read(file);
       assert.match(wf, /rollout_mode:\n\s+description: [^\n]+\n\s+required: false\n\s+default: 'verified'/);
-      assert.match(wf, /if \[ "\$\{\{ github\.event\.inputs\.rollout_mode \}\}" = "verified" \]; then\s+ROLLOUT_ARGS=\(--no-traffic "--tag=sha-\$\{GITHUB_SHA:0:12\}"\)/);
+      // `inputs.*` — workflow_dispatch · workflow_call(Unified Delivery) 양쪽에서 같은 값 (github.event.inputs 는 호출 시 호출자 것)
+      assert.match(wf, /if \[ "\$\{\{ inputs\.rollout_mode \}\}" = "verified" \]; then\s+ROLLOUT_ARGS=\(--no-traffic "--tag=sha-\$\{GITHUB_SHA:0:12\}"\)/);
     });
   }
 
@@ -70,7 +71,7 @@ describe('Phase 4 — verified rollout (cutover 후 기본값)', () => {
     assert.ok(i('--mode readiness') > i('- name: Deploy to Cloud Run'));
     assert.ok(i('cloud-run-rollout.mjs switch') > i('--mode readiness'));
     assert.ok(i('cloud-run-rollout.mjs verify') > i('cloud-run-rollout.mjs switch'));
-    assert.match(wf, /- name: Verify deployment\n\s+if: github\.event\.inputs\.migrate_only != 'true' && github\.event\.inputs\.rollout_mode != 'verified'/);
+    assert.match(wf, /- name: Verify deployment\n\s+if: inputs\.migrate_only != 'true' && inputs\.rollout_mode != 'verified'/);
   });
 });
 
@@ -100,12 +101,86 @@ describe('DEPLOY_FREEZE cutover — 게이트 · trigger · 동시성 (WO-O4O-CI
   }
 
   it('web concurrency 는 서비스 입력별 group', () => {
-    assert.match(read(DEPLOY[1]), /group: deploy-web-\$\{\{ github\.event\.inputs\.service \|\| 'all' \}\}/);
+    assert.match(read(DEPLOY[1]), /group: deploy-web-\$\{\{ inputs\.service \|\| 'all' \}\}/);
   });
 
   it('api migrate_only 도 freeze 가 적용된다', () => {
     const job = /\n {2}build-and-deploy:[\s\S]*?\n {4}if: >-\n([\s\S]*?)\n\n/.exec(read(DEPLOY[0]))?.[1] ?? '';
-    assert.match(job, /^\s+vars\.DEPLOY_FREEZE == 'false' &&\n\s+\(\(github\.event_name == 'workflow_dispatch' && github\.event\.inputs\.migrate_only == 'true'\) \|\|/);
+    assert.match(job, /^\s+vars\.DEPLOY_FREEZE == 'false' &&\n\s+\(\(github\.event_name == 'workflow_dispatch' && inputs\.migrate_only == 'true'\) \|\|/);
+  });
+});
+
+describe('Unified Delivery — reusable deploy 진입점 (WO-O4O-CICD-UNIFIED-DELIVERY-PIPELINE-V1)', () => {
+  const callInputs = (wf) => /\n {2}workflow_call:\n {4}inputs:\n([\s\S]*?)\n(?=\S)/.exec(wf)?.[1] ?? '';
+  for (const file of DEPLOY) {
+    it(`${file}: workflow_call 진입점 — rollout_mode 기본 verified · dry_run 기본 'false' · migrate_only 미노출`, () => {
+      const inputs = callInputs(read(file));
+      assert.match(inputs, /rollout_mode:\n\s+type: string\n\s+required: false\n\s+default: 'verified'/);
+      assert.match(inputs, /dry_run:\n(?:\s+description: [^\n]+\n)?\s+type: string\n\s+required: false\n\s+default: 'false'/);
+      assert.doesNotMatch(inputs, /migrate_only|expected_sha/, 'migrate_only 는 수동(dispatch) 전용');
+    });
+    it(`${file}: github.event.inputs 참조 0 (workflow_call 에서는 호출자 이벤트의 입력이 된다)`, () => {
+      assert.doesNotMatch(read(file), /github\.event\.inputs/);
+    });
+    it(`${file}: dry_run 이면 ci-gate 가 열리지 않는다 (→ build · migration · deploy 0)`, () => {
+      const gate = /\n {2}ci-gate:\n[\s\S]*?\n {4}if: (>-\n[\s\S]*?\n {4}runs-on|[^\n]+)/.exec(read(file))?.[1] ?? '';
+      assert.match(gate, /vars\.DEPLOY_FREEZE == 'false' && inputs\.dry_run != 'true'/);
+    });
+  }
+
+  it('web: 서비스 지정은 입력 유무로 판단 (workflow_call 에서 event_name 은 호출자 것)', () => {
+    const wf = read(DEPLOY[1]);
+    assert.match(wf, /if \[ -n "\$\{\{ inputs\.service \}\}" \]; then/);
+    assert.doesNotMatch(wf, /"\$\{\{ github\.event_name \}\}" = "workflow_dispatch"/);
+    assert.match(callInputs(wf), /service:\n\s+type: string\n\s+required: true/);
+  });
+});
+
+describe('Unified Delivery — delivery.yml · promote.yml', () => {
+  const wf = read('.github/workflows/delivery.yml');
+  const promote = read('.github/workflows/promote.yml');
+
+  it('main CI Pipeline 완료에 반응하고 run 이름 = 실제 target SHA', () => {
+    assert.match(wf, /workflow_run:\n\s+workflows: \['CI Pipeline'\]\n\s+types: \[completed\]\n\s+branches: \[main\]/);
+    assert.match(wf, /^run-name: Delivery \$\{\{ github\.event\.workflow_run\.head_sha \|\| inputs\.target_sha \}\}$/m);
+    assert.match(wf, /if: github\.event_name != 'workflow_run' \|\| github\.event\.workflow_run\.event == 'push'/);
+  });
+
+  it('TARGET_SHA identity — workflow SHA(github.sha)를 판정기에 넘긴다 (target ≠ github.sha 면 SUPERSEDED)', () => {
+    assert.match(wf, /--plan-only --target "\$TARGET_SHA" --workflow-sha "\$GITHUB_SHA"/);
+    assert.match(wf, /ref: \$\{\{ env\.TARGET_SHA \}\}/);
+  });
+
+  it('자동 경로에 태그 · dispatch · 직접 배포 명령 0 — reusable workflow 호출만', () => {
+    assert.doesNotMatch(wf, /git tag|refs\/tags|deploy\/auto|\/dispatches|gh workflow run|gcloud run deploy|update-traffic|jobs execute|gh variable set/);
+    assert.match(wf, /uses: \.\/\.github\/workflows\/deploy-api\.yml/);
+    assert.equal(count(wf, /uses: \.\/\.github\/workflows\/deploy-web-services\.yml/g), 2);
+    assert.match(wf, /uses: \.\/\.github\/workflows\/deploy-admin\.yml/);
+    assert.equal(count(wf, /secrets: inherit/g), 4);
+  });
+
+  it('API 에 의존하는 프런트는 API 성공 뒤에만 · 독립 프런트는 병렬', () => {
+    assert.match(wf, /deploy-web-after-api:[\s\S]*?needs: \[classify, deploy-api\][\s\S]*?needs\.deploy-api\.result == 'success'/);
+    assert.match(wf, /deploy-web-parallel:[\s\S]*?needs: classify\n/);
+    assert.match(wf, /deploy-admin:[\s\S]*?admin_after_api == 'true' && needs\.deploy-api\.result == 'success'/);
+  });
+
+  it('cutover 전 SHADOW — DELIVERY_ENFORCE 가 아니면 판정만 (배포 job 실행 0 · commit status 0)', () => {
+    assert.match(wf, /DELIVERY_ENFORCE: '(true|false)'/);
+    assert.match(wf, /\[ "\$EVENT" = "workflow_run" \] && \[ "\$DELIVERY_ENFORCE" = "true" \]; then\n\s+ARGS\+=\(--dry-run false --status-context "\$STATUS_CONTEXT"\)/);
+    assert.match(wf, /ARGS\+=\(--shadow --dry-run true\)/);
+  });
+
+  it('자동 경로는 한 번에 한 판정 · promote 는 별도 group (자동 대기열을 밀어내지 않는다)', () => {
+    assert.match(wf, /group: \$\{\{ github\.event_name == 'workflow_run' && 'delivery-production' \|\| format\('delivery-\{0\}', github\.run_id\) \}\}/);
+    assert.match(promote, /concurrency:\n\s+group: promote-production\n\s+cancel-in-progress: false/);
+  });
+
+  it('promote: 입력은 SHA 하나(필수) — delivery 를 mode=promote 로 호출, 태그 · dispatch 0', () => {
+    assert.match(promote, /sha:\n\s+description: [^\n]+\n\s+required: true/);
+    assert.match(promote, /uses: \.\/\.github\/workflows\/delivery\.yml\n\s+with:\n\s+mode: promote\n\s+target_sha: \$\{\{ inputs\.sha \}\}/);
+    assert.doesNotMatch(promote, /rollout_mode|deploy\/|git tag/);
+    assert.match(promote, /statuses: write/);
   });
 });
 

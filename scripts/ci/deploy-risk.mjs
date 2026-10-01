@@ -324,6 +324,10 @@ export const CONTROL_ONLY = new Set([
   '.github/workflows/cd-risk-gate-shadow.yml', // cutover 로 deploy-auto.yml 에 흡수(삭제) — 삭제도 control
   'scripts/ci/deploy-orchestrate.mjs',
   '.github/workflows/deploy-auto.yml',
+  // WO-O4O-CICD-UNIFIED-DELIVERY-PIPELINE-V1 — 판정 · 오케스트레이션(reusable 호출 · 승인 진입점). artifact · runtime 설정 불변.
+  //   실제 build · deploy · rollout 줄은 deploy-*.yml 에 남아 deploy-workflow-diff 가 그대로 분석한다.
+  '.github/workflows/delivery.yml',
+  '.github/workflows/promote.yml',
 ]);
 
 /**

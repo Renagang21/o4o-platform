@@ -1,0 +1,54 @@
+name: Promote
+
+# WO-O4O-CICD-UNIFIED-DELIVERY-PIPELINE-V1 §13 · §14 — LEVEL_3 · 첫 verified rollout 의 **승인 1회**.
+#
+#   사람이 하는 일:  gh workflow run promote.yml -f sha=<40자 SHA>
+#                   (Delivery 의 commit status `production` 이 HOLD 일 때 그 description 에 이 명령이 그대로 적힌다)
+#   사람이 다시 입력하지 않는 것: 서비스 목록 · 태그 · rollout mode · serving SHA · migration 여부 — 전부 SHA 에서 다시 계산한다.
+#
+#   안전 조건 (delivery.yml classify · deploy-orchestrate.mjs decidePromote):
+#     - CI Pipeline 이 그 SHA 에서 green · DEPLOY_FREEZE == 'false'
+#     - SHA == main HEAD == 이 run 의 workflow SHA — 승인 범위(serving → SHA)를 정확히 고정한다.
+#       HEAD 가 움직였으면 거절 → 최신 SHA 로 다시 승인 (뒤에 쌓인 commit 이 승인 없이 섞이지 않는다)
+#     - serving SHA 를 모르는 서비스는 승인으로도 배포하지 않는다 (break-glass = 각 deploy workflow 수동 실행)
+#     - 배포 경로 = Delivery 와 동일 (reusable deploy · API 먼저 · verified rollout · rollback · migration Job 선행)
+#
+#   선택 입력: services (쉼표 — 그 서비스만) · dry_run ('true' = 판정만, 배포 0)
+
+run-name: Promote ${{ inputs.sha }}${{ inputs.dry_run == 'true' && ' (dry-run)' || '' }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      sha:
+        description: '승격할 commit SHA (40자 · main HEAD 와 같아야 한다)'
+        required: true
+      services:
+        description: '(선택) 쉼표 목록 — 그 서비스만 승격. 비우면 승격 가능한 전부'
+        required: false
+        default: ''
+      dry_run:
+        description: "'true' = 판정만 (배포 0)"
+        required: false
+        default: 'false'
+
+concurrency:
+  group: promote-production
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  actions: read
+  statuses: write
+  id-token: write
+
+jobs:
+  promote:
+    name: Promote
+    uses: ./.github/workflows/delivery.yml
+    with:
+      mode: promote
+      target_sha: ${{ inputs.sha }}
+      services: ${{ inputs.services }}
+      dry_run: ${{ inputs.dry_run }}
+    secrets: inherit

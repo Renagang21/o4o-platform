@@ -41,6 +41,32 @@ on:
         description: "'verified'(기본 · 0% 배포 → 검증 → 전환 → 실패 시 복귀) | 'legacy'(종전 — 새 revision 즉시 서빙/pin 유지)"
         required: false
         default: 'verified'
+  # WO-O4O-CICD-UNIFIED-DELIVERY-PIPELINE-V1 — Unified Delivery(`delivery.yml` · `promote.yml`)의 자동 · 승인 진입점.
+  #   태그 · dispatch 없음. target SHA = 호출자의 `github.sha`(호출자가 target == github.sha == main HEAD 를 강제).
+  #   GITHUB_REF 는 호출자 것(refs/heads/main) — 아래 production 설정 분기가 그대로 성립한다.
+  workflow_call:
+    inputs:
+      rollout_mode:
+        type: string
+        required: false
+        default: 'verified'
+      force_deploy:
+        type: string
+        required: false
+        default: 'false'
+      base_sha:
+        type: string
+        required: false
+        default: ''
+      head_sha:
+        type: string
+        required: false
+        default: ''
+      dry_run:
+        description: "'true' = 배선 검증 — detect 까지만 (ci-gate · build · deploy 0)"
+        type: string
+        required: false
+        default: 'false'
 
 env:
   PROJECT_ID: netureyoutube
@@ -87,8 +113,8 @@ jobs:
     - name: Classify changed scope
       id: scope
       env:
-        BASE_SHA: ${{ github.event.inputs.base_sha || github.event.before }}
-        HEAD_SHA: ${{ github.event.inputs.head_sha || github.sha }}
+        BASE_SHA: ${{ inputs.base_sha || github.event.before }}
+        HEAD_SHA: ${{ inputs.head_sha || github.sha }}
       run: node scripts/ci/detect-affected.mjs
 
   # WO-O4O-CICD-SAFE-AUTODEPLOY-AND-RISK-GATE-V1 Phase 1 — CI success gate (enforced)
@@ -96,9 +122,10 @@ jobs:
   ci-gate:
     name: CI gate (target SHA must be green)
     needs: [detect]
+    # dry_run(배선 검증 · workflow_call 전용) 이면 게이트를 열지 않는다 → deploy 도 needs 로 skip.
     if: >-
-      vars.DEPLOY_FREEZE == 'false' &&
-      (needs.detect.outputs.admin_affected == 'true' || github.event.inputs.force_deploy == 'true')
+      vars.DEPLOY_FREEZE == 'false' && inputs.dry_run != 'true' &&
+      (needs.detect.outputs.admin_affected == 'true' || inputs.force_deploy == 'true')
     runs-on: ubuntu-latest
     timeout-minutes: 40
     permissions:
@@ -133,7 +160,7 @@ jobs:
     #   force_deploy 수동 실행보다도 우선한다(괄호로 묶어 AND).
     if: >-
       vars.DEPLOY_FREEZE == 'false' &&
-      (needs.detect.outputs.admin_affected == 'true' || github.event.inputs.force_deploy == 'true')
+      (needs.detect.outputs.admin_affected == 'true' || inputs.force_deploy == 'true')
 
     permissions:
       contents: read
@@ -316,7 +343,7 @@ jobs:
 
     # WO-O4O-CICD-SAFE-AUTODEPLOY-AND-RISK-GATE-V1 Phase 4 — verified 모드에서만 배포 전 traffic 기록
     - name: Record traffic before deploy (verified rollout)
-      if: github.event.inputs.rollout_mode == 'verified'
+      if: inputs.rollout_mode == 'verified'
       uses: ./.github/actions/cloud-run-verified-rollout
       with:
         phase: plan
@@ -325,7 +352,7 @@ jobs:
     - name: Deploy to Cloud Run
       run: |
         ROLLOUT_ARGS=()
-        if [ "${{ github.event.inputs.rollout_mode }}" = "verified" ]; then ROLLOUT_ARGS=(--no-traffic "--tag=sha-${GITHUB_SHA:0:12}"); fi
+        if [ "${{ inputs.rollout_mode }}" = "verified" ]; then ROLLOUT_ARGS=(--no-traffic "--tag=sha-${GITHUB_SHA:0:12}"); fi
         FULL_IMAGE="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY_NAME }}/${{ steps.config.outputs.image_name }}:${{ env.IMAGE_TAG }}"
 
         echo "🚀 Deploying to Cloud Run..."
@@ -347,7 +374,7 @@ jobs:
 
     # verified 모드: 새 revision 을 tag URL 로 직접 smoke → PASS 일 때만 전환. 실패 = 전환 없음 = 기존 revision 유지.
     - name: Smoke new revision and switch traffic (verified rollout)
-      if: github.event.inputs.rollout_mode == 'verified'
+      if: inputs.rollout_mode == 'verified'
       uses: ./.github/actions/cloud-run-verified-rollout
       with:
         phase: finish

@@ -7,7 +7,7 @@ name: Deploy Web Services (Cloud Run)
 concurrency:
   # 서비스 단위 1개 rollout — 서비스마다 독립 group. 진행 중 run 은 끝까지, 대기 run 은 더 새 것으로 대체.
   #   (service=all 수동 실행은 개별 서비스 run 과 같은 group 이 아니다 — 동시에 쓰지 않는다)
-  group: deploy-web-${{ github.event.inputs.service || 'all' }}
+  group: deploy-web-${{ inputs.service || 'all' }}
   cancel-in-progress: false
 
 on:
@@ -34,6 +34,31 @@ on:
         description: "'verified'(기본 · 0% 배포 → 검증 → 전환 → 실패 시 복귀) | 'legacy'(종전 — 새 revision 즉시 서빙/pin 유지)"
         required: false
         default: 'verified'
+  # WO-O4O-CICD-UNIFIED-DELIVERY-PIPELINE-V1 — Unified Delivery(`delivery.yml` · `promote.yml`)의 자동 · 승인 진입점.
+  #   서비스 1개 = 호출 1개(matrix). 태그 · dispatch 없음. target SHA = 호출자의 `github.sha`(호출자가 target == github.sha ==
+  #   main HEAD 를 강제) — 아래 build · deploy · verified rollout step 은 dispatch 경로와 같은 줄을 그대로 쓴다.
+  workflow_call:
+    inputs:
+      service:
+        type: string
+        required: true
+      rollout_mode:
+        type: string
+        required: false
+        default: 'verified'
+      base_sha:
+        type: string
+        required: false
+        default: ''
+      head_sha:
+        type: string
+        required: false
+        default: ''
+      dry_run:
+        description: "'true' = 배선 검증 — detect 까지만 (ci-gate · build · deploy 0)"
+        type: string
+        required: false
+        default: 'false'
 
 env:
   PROJECT_ID: netureyoutube
@@ -118,15 +143,16 @@ jobs:
         id: changes
         run: |
           # 판정 재현 모드 — base/head 를 명시하면 detector 를 그대로 돌린다 (§24).
-          if [ -n "${{ github.event.inputs.base_sha }}" ] && [ -n "${{ github.event.inputs.head_sha }}" ]; then
-            echo "replay mode: ${{ github.event.inputs.base_sha }}..${{ github.event.inputs.head_sha }}"
-            BASE_SHA="${{ github.event.inputs.base_sha }}" HEAD_SHA="${{ github.event.inputs.head_sha }}"               node scripts/ci/detect-affected.mjs
+          if [ -n "${{ inputs.base_sha }}" ] && [ -n "${{ inputs.head_sha }}" ]; then
+            echo "replay mode: ${{ inputs.base_sha }}..${{ inputs.head_sha }}"
+            BASE_SHA="${{ inputs.base_sha }}" HEAD_SHA="${{ inputs.head_sha }}"               node scripts/ci/detect-affected.mjs
             exit 0
           fi
 
-          # For workflow_dispatch with specific service
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            SERVICE="${{ github.event.inputs.service }}"
+          # 서비스 지정 실행 — workflow_dispatch(수동 · 기본 'all') 와 workflow_call(Unified Delivery · 서비스 1개).
+          #   workflow_call 에서는 github.event_name 이 호출자 것(workflow_run · workflow_dispatch)이라 입력 유무로 가른다.
+          if [ -n "${{ inputs.service }}" ]; then
+            SERVICE="${{ inputs.service }}"
             if [ "$SERVICE" = "all" ]; then
               echo "neture=true" >> $GITHUB_OUTPUT
               echo "k-cosmetics=true" >> $GITHUB_OUTPUT
@@ -189,7 +215,8 @@ jobs:
   ci-gate:
     name: CI gate (target SHA must be green)
     needs: detect-changes
-    if: vars.DEPLOY_FREEZE == 'false' && contains(toJSON(needs.detect-changes.outputs), '"true"')
+    # dry_run(배선 검증 · workflow_call 전용) 이면 게이트를 열지 않는다 → deploy-* 도 needs 로 skip.
+    if: vars.DEPLOY_FREEZE == 'false' && inputs.dry_run != 'true' && contains(toJSON(needs.detect-changes.outputs), '"true"')
     runs-on: ubuntu-latest
     timeout-minutes: 40
     permissions:
@@ -269,7 +296,7 @@ jobs:
 
       # WO-O4O-CICD-SAFE-AUTODEPLOY-AND-RISK-GATE-V1 Phase 4 — verified 모드에서만 배포 전 traffic 기록
       - name: Record traffic before deploy (verified rollout)
-        if: github.event.inputs.rollout_mode == 'verified'
+        if: inputs.rollout_mode == 'verified'
         uses: ./.github/actions/cloud-run-verified-rollout
         with:
           phase: plan
@@ -279,7 +306,7 @@ jobs:
         run: |
           # verified 모드: 새 revision 은 traffic 0% · 전용 tag 주소 (전환은 다음 step 이 smoke 뒤에 한다)
           ROLLOUT_ARGS=()
-          if [ "${{ github.event.inputs.rollout_mode }}" = "verified" ]; then ROLLOUT_ARGS=(--no-traffic "--tag=sha-${GITHUB_SHA:0:12}"); fi
+          if [ "${{ inputs.rollout_mode }}" = "verified" ]; then ROLLOUT_ARGS=(--no-traffic "--tag=sha-${GITHUB_SHA:0:12}"); fi
 
           echo "Deploying neture-web to Cloud Run..."
 
@@ -301,7 +328,7 @@ jobs:
       #   전환 뒤 공개 URL + serving SHA 검증 → 실패(전환 실패 포함) 시 이전 revision 으로 자동 rollback
       #   (WO-O4O-CICD-WEB-VERIFIED-ROLLOUT-POST-SWITCH-VERIFY-ROLLBACK-V1 · 현재 neture 만).
       - name: Smoke new revision and switch traffic (verified rollout)
-        if: github.event.inputs.rollout_mode == 'verified'
+        if: inputs.rollout_mode == 'verified'
         uses: ./.github/actions/cloud-run-verified-rollout
         with:
           phase: finish
@@ -387,7 +414,7 @@ jobs:
 
       # WO-O4O-CICD-SAFE-AUTODEPLOY-AND-RISK-GATE-V1 Phase 4 — verified 모드에서만 배포 전 traffic 기록
       - name: Record traffic before deploy (verified rollout)
-        if: github.event.inputs.rollout_mode == 'verified'
+        if: inputs.rollout_mode == 'verified'
         uses: ./.github/actions/cloud-run-verified-rollout
         with:
           phase: plan
@@ -397,7 +424,7 @@ jobs:
         run: |
           # verified 모드: 새 revision 은 traffic 0% · 전용 tag 주소 (전환은 다음 step 이 smoke 뒤에 한다)
           ROLLOUT_ARGS=()
-          if [ "${{ github.event.inputs.rollout_mode }}" = "verified" ]; then ROLLOUT_ARGS=(--no-traffic "--tag=sha-${GITHUB_SHA:0:12}"); fi
+          if [ "${{ inputs.rollout_mode }}" = "verified" ]; then ROLLOUT_ARGS=(--no-traffic "--tag=sha-${GITHUB_SHA:0:12}"); fi
 
           echo "Deploying k-cosmetics-web to Cloud Run..."
 
@@ -417,7 +444,7 @@ jobs:
 
       # verified 모드: 새 revision 을 tag URL 로 직접 smoke → PASS 일 때만 전환. 실패 = 전환 없음 = 기존 revision 유지.
       - name: Smoke new revision and switch traffic (verified rollout)
-        if: github.event.inputs.rollout_mode == 'verified'
+        if: inputs.rollout_mode == 'verified'
         uses: ./.github/actions/cloud-run-verified-rollout
         with:
           phase: finish
@@ -496,7 +523,7 @@ jobs:
 
       # WO-O4O-CICD-SAFE-AUTODEPLOY-AND-RISK-GATE-V1 Phase 4 — verified 모드에서만 배포 전 traffic 기록
       - name: Record traffic before deploy (verified rollout)
-        if: github.event.inputs.rollout_mode == 'verified'
+        if: inputs.rollout_mode == 'verified'
         uses: ./.github/actions/cloud-run-verified-rollout
         with:
           phase: plan
@@ -506,7 +533,7 @@ jobs:
         run: |
           # verified 모드: 새 revision 은 traffic 0% · 전용 tag 주소 (전환은 다음 step 이 smoke 뒤에 한다)
           ROLLOUT_ARGS=()
-          if [ "${{ github.event.inputs.rollout_mode }}" = "verified" ]; then ROLLOUT_ARGS=(--no-traffic "--tag=sha-${GITHUB_SHA:0:12}"); fi
+          if [ "${{ inputs.rollout_mode }}" = "verified" ]; then ROLLOUT_ARGS=(--no-traffic "--tag=sha-${GITHUB_SHA:0:12}"); fi
 
           echo "Deploying kpa-society-web to Cloud Run..."
 
@@ -526,7 +553,7 @@ jobs:
 
       # verified 모드: 새 revision 을 tag URL 로 직접 smoke → PASS 일 때만 전환. 실패 = 전환 없음 = 기존 revision 유지.
       - name: Smoke new revision and switch traffic (verified rollout)
-        if: github.event.inputs.rollout_mode == 'verified'
+        if: inputs.rollout_mode == 'verified'
         uses: ./.github/actions/cloud-run-verified-rollout
         with:
           phase: finish
@@ -608,7 +635,7 @@ jobs:
 
       # WO-O4O-CICD-SAFE-AUTODEPLOY-AND-RISK-GATE-V1 Phase 4 — verified 모드에서만 배포 전 traffic 기록
       - name: Record traffic before deploy (verified rollout)
-        if: github.event.inputs.rollout_mode == 'verified'
+        if: inputs.rollout_mode == 'verified'
         uses: ./.github/actions/cloud-run-verified-rollout
         with:
           phase: plan
@@ -618,7 +645,7 @@ jobs:
         run: |
           # verified 모드: 새 revision 은 traffic 0% · 전용 tag 주소 (전환은 다음 step 이 smoke 뒤에 한다)
           ROLLOUT_ARGS=()
-          if [ "${{ github.event.inputs.rollout_mode }}" = "verified" ]; then ROLLOUT_ARGS=(--no-traffic "--tag=sha-${GITHUB_SHA:0:12}"); fi
+          if [ "${{ inputs.rollout_mode }}" = "verified" ]; then ROLLOUT_ARGS=(--no-traffic "--tag=sha-${GITHUB_SHA:0:12}"); fi
 
           echo "Deploying pharmacy-hub-web to Cloud Run..."
 
@@ -638,7 +665,7 @@ jobs:
 
       # verified 모드: 새 revision 을 tag URL 로 직접 smoke → PASS 일 때만 전환. 실패 = 전환 없음 = 기존 revision 유지.
       - name: Smoke new revision and switch traffic (verified rollout)
-        if: github.event.inputs.rollout_mode == 'verified'
+        if: inputs.rollout_mode == 'verified'
         uses: ./.github/actions/cloud-run-verified-rollout
         with:
           phase: finish
@@ -707,7 +734,7 @@ jobs:
           docker push gcr.io/${{ env.PROJECT_ID }}/lecture-web:latest
       # WO-O4O-CICD-SAFE-AUTODEPLOY-AND-RISK-GATE-V1 Phase 4 — verified 모드에서만 배포 전 traffic 기록
       - name: Record traffic before deploy (verified rollout)
-        if: github.event.inputs.rollout_mode == 'verified'
+        if: inputs.rollout_mode == 'verified'
         uses: ./.github/actions/cloud-run-verified-rollout
         with:
           phase: plan
@@ -717,7 +744,7 @@ jobs:
         run: |
           # verified 모드: 새 revision 은 traffic 0% · 전용 tag 주소 (전환은 다음 step 이 smoke 뒤에 한다)
           ROLLOUT_ARGS=()
-          if [ "${{ github.event.inputs.rollout_mode }}" = "verified" ]; then ROLLOUT_ARGS=(--no-traffic "--tag=sha-${GITHUB_SHA:0:12}"); fi
+          if [ "${{ inputs.rollout_mode }}" = "verified" ]; then ROLLOUT_ARGS=(--no-traffic "--tag=sha-${GITHUB_SHA:0:12}"); fi
 
           gcloud run deploy lecture-web \
             --image=gcr.io/${{ env.PROJECT_ID }}/lecture-web:${{ github.sha }} \
@@ -733,7 +760,7 @@ jobs:
 
       # verified 모드: 새 revision 을 tag URL 로 직접 smoke → PASS 일 때만 전환. 실패 = 전환 없음 = 기존 revision 유지.
       - name: Smoke new revision and switch traffic (verified rollout)
-        if: github.event.inputs.rollout_mode == 'verified'
+        if: inputs.rollout_mode == 'verified'
         uses: ./.github/actions/cloud-run-verified-rollout
         with:
           phase: finish
@@ -800,7 +827,7 @@ jobs:
           docker push gcr.io/${{ env.PROJECT_ID }}/hospital-pharmacy-web:latest
       # WO-O4O-CICD-SAFE-AUTODEPLOY-AND-RISK-GATE-V1 Phase 4 — verified 모드에서만 배포 전 traffic 기록
       - name: Record traffic before deploy (verified rollout)
-        if: github.event.inputs.rollout_mode == 'verified'
+        if: inputs.rollout_mode == 'verified'
         uses: ./.github/actions/cloud-run-verified-rollout
         with:
           phase: plan
@@ -810,7 +837,7 @@ jobs:
         run: |
           # verified 모드: 새 revision 은 traffic 0% · 전용 tag 주소 (전환은 다음 step 이 smoke 뒤에 한다)
           ROLLOUT_ARGS=()
-          if [ "${{ github.event.inputs.rollout_mode }}" = "verified" ]; then ROLLOUT_ARGS=(--no-traffic "--tag=sha-${GITHUB_SHA:0:12}"); fi
+          if [ "${{ inputs.rollout_mode }}" = "verified" ]; then ROLLOUT_ARGS=(--no-traffic "--tag=sha-${GITHUB_SHA:0:12}"); fi
 
           gcloud run deploy hospital-pharmacy-web \
             --image=gcr.io/${{ env.PROJECT_ID }}/hospital-pharmacy-web:${{ github.sha }} \
@@ -826,7 +853,7 @@ jobs:
 
       # verified 모드: 새 revision 을 tag URL 로 직접 smoke → PASS 일 때만 전환. 실패 = 전환 없음 = 기존 revision 유지.
       - name: Smoke new revision and switch traffic (verified rollout)
-        if: github.event.inputs.rollout_mode == 'verified'
+        if: inputs.rollout_mode == 'verified'
         uses: ./.github/actions/cloud-run-verified-rollout
         with:
           phase: finish
@@ -893,7 +920,7 @@ jobs:
           docker push gcr.io/${{ env.PROJECT_ID }}/store-web:latest
       # WO-O4O-CICD-SAFE-AUTODEPLOY-AND-RISK-GATE-V1 Phase 4 — verified 모드에서만 배포 전 traffic 기록
       - name: Record traffic before deploy (verified rollout)
-        if: github.event.inputs.rollout_mode == 'verified'
+        if: inputs.rollout_mode == 'verified'
         uses: ./.github/actions/cloud-run-verified-rollout
         with:
           phase: plan
@@ -903,7 +930,7 @@ jobs:
         run: |
           # verified 모드: 새 revision 은 traffic 0% · 전용 tag 주소 (전환은 다음 step 이 smoke 뒤에 한다)
           ROLLOUT_ARGS=()
-          if [ "${{ github.event.inputs.rollout_mode }}" = "verified" ]; then ROLLOUT_ARGS=(--no-traffic "--tag=sha-${GITHUB_SHA:0:12}"); fi
+          if [ "${{ inputs.rollout_mode }}" = "verified" ]; then ROLLOUT_ARGS=(--no-traffic "--tag=sha-${GITHUB_SHA:0:12}"); fi
 
           gcloud run deploy store-web \
             --image=gcr.io/${{ env.PROJECT_ID }}/store-web:${{ github.sha }} \
@@ -919,7 +946,7 @@ jobs:
 
       # verified 모드: 새 revision 을 tag URL 로 직접 smoke → PASS 일 때만 전환. 실패 = 전환 없음 = 기존 revision 유지.
       - name: Smoke new revision and switch traffic (verified rollout)
-        if: github.event.inputs.rollout_mode == 'verified'
+        if: inputs.rollout_mode == 'verified'
         uses: ./.github/actions/cloud-run-verified-rollout
         with:
           phase: finish
@@ -988,7 +1015,7 @@ jobs:
 
       # WO-O4O-CICD-SAFE-AUTODEPLOY-AND-RISK-GATE-V1 Phase 4 — verified 모드에서만 배포 전 traffic 기록
       - name: Record traffic before deploy (verified rollout)
-        if: github.event.inputs.rollout_mode == 'verified'
+        if: inputs.rollout_mode == 'verified'
         uses: ./.github/actions/cloud-run-verified-rollout
         with:
           phase: plan
@@ -998,7 +1025,7 @@ jobs:
         run: |
           # verified 모드: 새 revision 은 traffic 0% · 전용 tag 주소 (전환은 다음 step 이 smoke 뒤에 한다)
           ROLLOUT_ARGS=()
-          if [ "${{ github.event.inputs.rollout_mode }}" = "verified" ]; then ROLLOUT_ARGS=(--no-traffic "--tag=sha-${GITHUB_SHA:0:12}"); fi
+          if [ "${{ inputs.rollout_mode }}" = "verified" ]; then ROLLOUT_ARGS=(--no-traffic "--tag=sha-${GITHUB_SHA:0:12}"); fi
 
           echo "Deploying kpa-branch-web to Cloud Run..."
 
@@ -1008,7 +1035,7 @@ jobs:
 
       # verified 모드: 새 revision 을 tag URL 로 직접 smoke → PASS 일 때만 전환. 실패 = 전환 없음 = 기존 revision 유지.
       - name: Smoke new revision and switch traffic (verified rollout)
-        if: github.event.inputs.rollout_mode == 'verified'
+        if: inputs.rollout_mode == 'verified'
         uses: ./.github/actions/cloud-run-verified-rollout
         with:
           phase: finish
@@ -1088,7 +1115,7 @@ jobs:
 
       # WO-O4O-CICD-SAFE-AUTODEPLOY-AND-RISK-GATE-V1 Phase 4 — verified 모드에서만 배포 전 traffic 기록
       - name: Record traffic before deploy (verified rollout)
-        if: github.event.inputs.rollout_mode == 'verified'
+        if: inputs.rollout_mode == 'verified'
         uses: ./.github/actions/cloud-run-verified-rollout
         with:
           phase: plan
@@ -1098,7 +1125,7 @@ jobs:
         run: |
           # verified 모드: 새 revision 은 traffic 0% · 전용 tag 주소 (전환은 다음 step 이 smoke 뒤에 한다)
           ROLLOUT_ARGS=()
-          if [ "${{ github.event.inputs.rollout_mode }}" = "verified" ]; then ROLLOUT_ARGS=(--no-traffic "--tag=sha-${GITHUB_SHA:0:12}"); fi
+          if [ "${{ inputs.rollout_mode }}" = "verified" ]; then ROLLOUT_ARGS=(--no-traffic "--tag=sha-${GITHUB_SHA:0:12}"); fi
 
           echo "Deploying signage-player-web to Cloud Run..."
 
@@ -1118,7 +1145,7 @@ jobs:
 
       # verified 모드: 새 revision 을 tag URL 로 직접 smoke → PASS 일 때만 전환. 실패 = 전환 없음 = 기존 revision 유지.
       - name: Smoke new revision and switch traffic (verified rollout)
-        if: github.event.inputs.rollout_mode == 'verified'
+        if: inputs.rollout_mode == 'verified'
         uses: ./.github/actions/cloud-run-verified-rollout
         with:
           phase: finish

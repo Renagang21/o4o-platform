@@ -1761,6 +1761,8 @@ function main() {
         `api_deploy_affected=${verdict.api_deploy_affected}`,
         // Web 서비스 판정은 workflow output key 와 동일한 이름으로 그대로 내보낸다.
         ...WEB_SERVICES.map((svc) => `${svc.key}=${verdict.web_deploy?.[svc.key] === true}`),
+        // WO-O4O-CICD-UNIFIED-DELIVERY-PIPELINE-V1 P4 — CI 의 Web production build 대상 (배포 판정과 같은 축 · JSON 배열)
+        `web_build_dirs=${JSON.stringify(WEB_SERVICES.filter((svc) => verdict.web_deploy?.[svc.key] === true).map((svc) => svc.dir))}`,
         `docs_only=${verdict.docs_only}`,
         `docs_fast_eligible=${verdict.docs_fast_eligible}`,
         `global_or_unknown=${verdict.global_or_unknown}`,
