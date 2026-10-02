@@ -401,6 +401,51 @@ TOTAL writes=0
 운영 행수(read-only · `BEGIN READ ONLY`): `demo_accounts 0 · users 3 · user_password_credentials 0 ·
 organizations 25 · checkout_orders 23` — 2-5 기록과 동일. Demo 이메일 users 0.
 
+## 2-8. Phase B `--apply` + 검증 (2026-10-02 · write 14 · **STOP: 약관 게이트**)
+
+`--apply` 는 사용자가 직접 1회 실행했다(Claude Code 권한 정책이 에이전트 실행을 차단) — `TOTAL writes=14`.
+
+### 데이터 (read-only 재조회 · 사전 snapshot 대비)
+
+```text
+증가분   users +2 · user_password_credentials +2 · demo_accounts +2 · organizations +1
+         organization_members +2 · neture_suppliers +1 · service_memberships +4   = 14
+불변     role_assignments 27(전체 hash 동일) · linked_accounts 3 · password_reset_tokens 0
+         checkout_orders 23(전체 hash 동일) · signage_media(org NULL) 7(hash 동일)
+         기존 supplier 3 · 322667c8 · Sohae 약국 · 9c87f46b 조직행 · 기존 owner 행 2 — 행 hash 동일
+         기존 service_memberships 17 — Demo 행 제외 hash 가 사전과 동일
+Demo     role_assignments 0 · platform:* 0 · linked_accounts 0 · credential 각 1 · registry 각 1 ACTIVE
+재 dry-run  전 단계 exists · TOTAL writes=0 (멱등)
+```
+
+| 식별자 | 값 |
+|---|---|
+| Store Demo `users.id` | `a0989cc7-07c7-49f8-b67c-4cb882976dd1` (demo_accounts `ce6ca2ea-dfb9-44cd-96d6-992d8693ff5d`) |
+| Supplier Demo `users.id` | `31f350c9-0bea-4f69-bd52-d909870c964b` (demo_accounts `983c3c4b-5fe3-45fd-91f8-4ac0f9fc4bce`) |
+| Store 조직 | `9c87f46b-57a1-4afe-80bd-60782c49ce96` 테스트 약국 · owner · primary |
+| Supplier 조직 | `d71c8a32-e024-44ff-957f-9203181db8b5` O4O 공급자 Demo · `O4O-SUPPLIER-DEMO` · owner · primary |
+| `neture_suppliers` | `8e33fdd8-f4e0-41d9-bdbd-42240ff3c06c` · slug `o4o-supplier-demo` · ACTIVE · user_id NULL(조직 경유) |
+| service_memberships | Store: kpa-society · neture / Supplier: supplier · neture — 전부 active · role `customer`(기본값) |
+
+### runtime smoke (api.neture.co.kr · curl)
+
+```text
+로그인            두 계정 200 · /auth/me 200(users.id 일치) · logout 200 → /auth/me 401 → 재로그인 200
+POST /auth/password  두 계정 428 TERMS_ACCEPTANCE_REQUIRED — Demo guard 앞에서 약관 게이트가 거절
+                  비밀번호 불변(직후 재로그인 200 · credential updated 0)
+forgot            Demo 2 · 미존재 주소 1 모두 같은 200 문구 · password_reset_tokens 0
+```
+
+### STOP 사유 — 약관 acceptance 게이트
+
+`requireAuth` 안의 약관 게이트(`terms-acceptance.policy.ts` · default-deny + allowlist)는 active
+service_membership 이 있고 `user_policy_acceptances` 가 없는 사용자를 **allowlist 밖 모든 인증 경로에서 428** 로
+막는다. Demo 두 계정은 membership active · acceptance 0 이므로 매장 · 공급자 화면 API 가 전부 428 이 된다.
+화면 진입 · 콘텐츠 15 · playlist 5 visibility · 공급자 화면 진입 · Demo guard 운영 응답은 **실측하지 않았다**.
+
+Demo 의 약관 승낙을 어떻게 다룰지(사전 승낙 행 생성 · 방문자가 화면에서 승낙 · 게이트의 Demo 예외)는
+사용자 결정이 필요하다 — 추가 write 0.
+
 ---
 
 ## 3. 운영 write 승인 대기 목록
