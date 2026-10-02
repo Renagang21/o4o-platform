@@ -104,3 +104,70 @@ PRODUCTION_DEPLOY               = 0
 DEPLOY_FREEZE_FINAL             = TRUE
 API                             = LEVEL_3 (#266 · NOT_SELECTED)
 ```
+
+---
+
+## 8. 실행 (2026-10-02, target `37d63e859`) — PASS
+
+### 8-1. 대기 · 재승인
+
+- 사용자가 `b4d5de46a` 를 "API 격리 배포 종료 후" 실행으로 승인. 그동안 다른 세션이 `release/demo-terms-enforced-pending-api` (`fd3a7c8b5` = 353c11d04 + #266 런타임) 로 API 를 격리 배포했다 (run `36969275459`, API `03786-lec → 03789-gic`, migration job `lkmwf` 05:35Z — 이 WO 와 무관).
+- 진행 중 run 0 (05:55Z~) 확인 시점에 main HEAD = `37d63e859` (`b4d5de46a..37d63e859` = Demo CHECK · WO 문서 2건, runtime 0) → 조건 불일치로 실행하지 않고 보고 → 사용자 `37d63e859` 실행 승인.
+- `37d63e859` Delivery `36970766776`: 프런트 7 = L3 (#257 `138657460` auth packages 14 파일만) · api = UNKNOWN serving(`fd3a7c8b5` 는 main 계보 밖) L3.
+
+### 8-2. 실행 타임라인 (UTC)
+
+| 시각 | 사건 |
+|---|---|
+| 06:20:10 | 사전 점검 통과 (non-PR in_progress 0 · HEAD == `37d63e859`) → `DEPLOY_FREEZE=false` |
+| 06:20:13 | `promote.yml` dispatch — sha=`37d63e859` · services=`admin,k-cosmetics,kpa-society,pharmacy-hub,lecture,store,kpa-branch` · dry_run=false → run `36973056431` |
+| 06:22:51 | `DEPLOY_FREEZE=true` 복구 (window 약 2분 41초) |
+| ~06:3x | run 완료 success |
+
+window 중 foreign Delivery 0. `Promote / API` = **skipped** · `Web (after API)` = skipped.
+
+**스크립트 결함 (기록):** 잠금 조건 "deploy job 8 개 started" 가 `completed|skipped` 형제 deploy job 까지 세어, store · kpa-branch 의 CI gate 진행 중에 freeze 를 복구했다. 그럼에도 두 서비스 deploy job 은 success — **run 시작 시점의 `vars` 가 run 전체에 고정**되는 것으로 관측된다. 따라서 §2-1 의 "deploy job 시작 뒤 복구" 보정은 불필요했고, dispatch 직후(run 생성 확인 즉시) 복구해도 해당 run 은 영향받지 않는다 (차기 window 단축 근거, 단 1회 관측).
+
+### 8-3. 결과 (Report job)
+
+| service | decision | final | serving after |
+|---|---|---|---|
+| admin | PROMOTE | DEPLOYED | `37d63e859` · `o4o-admin-dashboard-01328-juh` |
+| k-cosmetics | PROMOTE | DEPLOYED | `37d63e859` · `k-cosmetics-web-01176-fun` |
+| kpa-society | PROMOTE | DEPLOYED | `37d63e859` · `kpa-society-web-02011-kiq` |
+| pharmacy-hub | PROMOTE | DEPLOYED | `37d63e859` · `pharmacy-hub-web-00266-rij` |
+| lecture | PROMOTE | DEPLOYED | `37d63e859` · `lecture-web-00025-tir` |
+| store | PROMOTE | DEPLOYED | `37d63e859` · `store-web-00023-jev` |
+| kpa-branch | PROMOTE | DEPLOYED | `37d63e859` · `kpa-branch-web-00181-pur` |
+| api | PROMOTE_REFUSED_UNKNOWN_SERVING | HELD_LEVEL_3 | 불변 (`03789-gic` · `fd3a7c8b5`) |
+| neture · signage-player · hospital-pharmacy | NO_DEPLOY | NO_DEPLOY | 불변 |
+
+- api 는 services 지정 밖이지만 판정상 `NOT_SELECTED` 가 아니라 `PROMOTE_REFUSED_UNKNOWN_SERVING` 로 표기됐다 (serving 미상 검사가 선택 여부보다 먼저 적용). 어느 쪽이든 배포 0 · job skipped.
+- 독립 확인 (`gcloud run services describe`): 7 개 모두 image tag · label `o4o-commit-sha=37d63e859` · traffic 100% · Ready=True. 비대상 서비스 revision 불변.
+- commit status `production` = `HELD_LEVEL_3` (api 때문).
+- migration: Cloud Run job execution 최신 = `lkmwf` (05:35Z, 다른 세션 API 배포) — 06:20Z 이후 0. 프런트 workflow 에는 migration · DB 단계 없음.
+- `rollout_pending` 은 판정기가 serving → target diff 로 매번 계산하는 값 (수동 ledger 아님) — 별도 갱신 없음.
+
+### 8-4. 사후 재판정 (§14)
+
+HEAD `61a3047aa` (다른 세션: `demo-account-provision.ts` + 문서) Delivery `36974292713` = BLOCKED_FREEZE:
+
+- 프런트 7 = serving `37d63e859` · `BEHIND_NO_RUNTIME_CHANGE` · **LEVEL_1 · NO_DEPLOY** — #257 L3 pending 해소.
+- api = serving `fd3a7c8b5` · UNKNOWN · LEVEL_3 — #266 은 격리 배포로 반영됐으나 serving SHA 가 main 계보 밖이라 판정기가 관계를 계산하지 못한다. freeze 해제 전 별도 정리 필요 (예: main 의 해당 SHA 로 API 통제 promote).
+- neture · signage-player · hospital-pharmacy = LEVEL_1 · NO_DEPLOY.
+
+### 8-5. 판정
+
+```text
+FRONTEND_257_PROMOTION          = PASS
+AFFECTED_SERVICES               = 7 (admin · k-cosmetics · kpa-society · pharmacy-hub · lecture · store · kpa-branch)
+MIGRATION_EXECUTED              = 0
+PRODUCTION_DB_WRITE             = 0
+VERIFIED_ROLLOUT                = PASS (7/7 — serving 37d63e859 · traffic 100% · Ready)
+ROLLOUT_PENDING_UPDATED         = NOT_APPLICABLE (판정기 계산값 · 재판정에서 프런트 7 해소)
+PENDING_257_L3_AFTER_PROMOTION  = 0
+DEPLOY_FREEZE_FINAL             = TRUE (06:22:52Z)
+API_AUTO_DEPLOY                 = NOT_EXECUTED (skipped · HELD_LEVEL_3 · UNKNOWN serving fd3a7c8b5)
+```
+
+남은 것 (별도 지시): api serving 을 main 계보로 정렬 (#266 포함 main SHA 의 API 통제 promote) → 그 뒤 freeze 해제 검토.
