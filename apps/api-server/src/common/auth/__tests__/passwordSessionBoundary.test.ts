@@ -18,7 +18,7 @@ jest.mock('../../../modules/auth/services/role-assignment.service.js', () => ({
   roleAssignmentService: { getRoleNames },
 }));
 jest.mock('../../../modules/policy-acceptance/policy-acceptance.service.js', () => ({
-  policyAcceptanceService: { getPendingForUser: jest.fn(async () => []) },
+  policyAcceptanceService: { getEnforcedPendingForUser: jest.fn(async () => []) },
 }));
 jest.mock('../../../utils/token.utils.js', () => ({
   verifyAccessToken: (t: string) => verifyAccessToken(t),

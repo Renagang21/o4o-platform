@@ -12,6 +12,8 @@
  * DB 미사용 — AppDataSource.query 를 SQL 접두로 분기하는 스텁으로 대체한다.
  */
 
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import express from 'express';
 import request from 'supertest';
 
@@ -33,12 +35,19 @@ let membershipRows: any[] = [];
 /** user_policy_acceptances policy_document_id set for USER_ID */
 let acceptedIds: string[] = [];
 let queryShouldThrow = false;
+/** demo_accounts 활성 user_id 목록 · 조회 실패 스위치 */
+let demoUserIds: string[] = [];
+let demoQueryShouldThrow = false;
 const queryLog: string[] = [];
 
 async function fakeQuery(sql: string, params: any[] = []): Promise<any> {
   queryLog.push(sql.replace(/\s+/g, ' ').trim());
   if (queryShouldThrow) throw new Error('db down');
   const q = sql.replace(/\s+/g, ' ');
+  if (q.includes('FROM demo_accounts')) {
+    if (demoQueryShouldThrow) throw new Error('demo registry down');
+    return demoUserIds.includes(params[0]) ? [{ '?column?': 1 }] : [];
+  }
   if (q.includes('FROM service_policy_documents WHERE id = $1')) {
     return publishedRows.filter((r) => r.id === params[0]);
   }
@@ -113,6 +122,8 @@ beforeEach(() => {
   membershipRows = [];
   acceptedIds = [];
   queryShouldThrow = false;
+  demoUserIds = [];
+  demoQueryShouldThrow = false;
   queryLog.length = 0;
   policyAcceptanceService.invalidateAll();
 });
@@ -329,5 +340,114 @@ describe('requireAuth 약관 게이트', () => {
     queryShouldThrow = true;
     const res = await request(makeApp()).get('/api/v1/kpa/x').set('Authorization', `Bearer ${makeToken()}`);
     expect(res.status).toBe(200);
+  });
+});
+
+// ─────────────────────────────────────────────────────
+// Demo 계정 예외 — raw pending ≠ enforced pending
+// (WO-O4O-CANONICAL-DEMO-ACCOUNT-FOUNDATION-AND-EXPERIENCE-LOGIN-V1 · 정본 O4O-CANONICAL-DEMO-ACCOUNTS-V1 §8-2)
+// ─────────────────────────────────────────────────────
+
+describe('Demo 계정 약관 예외 (enforced pending)', () => {
+  const demoQueries = () => queryLog.filter((q) => q.includes('FROM demo_accounts'));
+
+  beforeEach(() => {
+    publishedRows = [publishedDoc(DOC_KPA, 'kpa-society'), publishedDoc(DOC_NETURE, 'neture')];
+    membershipRows = [{ serviceKey: 'kpa-society', status: 'active' }, { serviceKey: 'neture', status: 'active' }];
+  });
+
+  it('활성 Demo + raw pending 존재 → enforced pending [] · raw pending 은 그대로 · acceptance 기록 0', async () => {
+    demoUserIds = [USER_ID];
+    expect(await policyAcceptanceService.getPendingForUser(USER_ID)).toHaveLength(2);
+    expect(await policyAcceptanceService.getEnforcedPendingForUser(USER_ID)).toEqual([]);
+    expect(acceptedIds).toEqual([]);
+    expect(queryLog.some((q) => q.startsWith('INSERT') || q.startsWith('UPDATE'))).toBe(false);
+  });
+
+  it('Demo 판정은 demo_accounts.user_id 로만 한다 (email 비교 0)', async () => {
+    demoUserIds = [USER_ID];
+    await policyAcceptanceService.getEnforcedPendingForUser(USER_ID);
+    expect(demoQueries()).toHaveLength(1);
+    expect(demoQueries()[0]).toContain('WHERE user_id = $1');
+    expect(demoQueries()[0]).not.toMatch(/email/i);
+  });
+
+  it('활성 Demo → 보호 API 는 약관 428 없이 다음 단계로 진행 (POST /auth/password 포함)', async () => {
+    demoUserIds = [USER_ID];
+    const app = makeApp();
+    const auth = `Bearer ${makeToken()}`;
+    const api = await request(app).get('/api/v1/kpa/forum/posts').set('Authorization', auth);
+    expect(api.status).toBe(200);
+    expect(api.body.reached).toBe(true);
+    const pw = await request(app).post('/api/v1/auth/password').set('Authorization', auth).send({});
+    expect(pw.status).toBe(200);
+    expect(pw.body.reached).toBe(true);
+  });
+
+  it('GET /auth/policy-acceptances 는 raw 정책 상태를 그대로 보여 준다 (Demo 도 동의로 바꾸지 않는다)', async () => {
+    demoUserIds = [USER_ID];
+    const res = await request(makeApp()).get('/api/v1/auth/policy-acceptances').set('Authorization', `Bearer ${makeToken()}`);
+    expect(res.status).toBe(200);
+    expect(res.body.data.pending).toHaveLength(2);
+  });
+
+  it('일반 사용자 + 미동의 → enforced = raw · 428 유지', async () => {
+    const raw = await policyAcceptanceService.getPendingForUser(USER_ID);
+    expect(await policyAcceptanceService.getEnforcedPendingForUser(USER_ID)).toEqual(raw);
+    const res = await request(makeApp()).get('/api/v1/kpa/x').set('Authorization', `Bearer ${makeToken()}`);
+    expect(res.status).toBe(428);
+    expect(res.body.pendingPolicyAcceptances).toHaveLength(2);
+  });
+
+  it('일반 사용자 + 동의 완료 → 통과 · Demo registry 조회 0', async () => {
+    acceptedIds = [DOC_KPA, DOC_NETURE];
+    expect(await policyAcceptanceService.getEnforcedPendingForUser(USER_ID)).toEqual([]);
+    const res = await request(makeApp()).get('/api/v1/kpa/x').set('Authorization', `Bearer ${makeToken()}`);
+    expect(res.status).toBe(200);
+    expect(demoQueries()).toHaveLength(0);
+  });
+
+  it('raw pending 0 (published terms 0) → Demo registry 조회 0', async () => {
+    publishedRows = [];
+    demoUserIds = [USER_ID];
+    expect(await policyAcceptanceService.getEnforcedPendingForUser(USER_ID)).toEqual([]);
+    expect(demoQueries()).toHaveLength(0);
+  });
+
+  it('Demo registry 조회 실패 + raw pending → 예외를 열지 않는다 (raw 유지 · 428)', async () => {
+    demoUserIds = [USER_ID];
+    demoQueryShouldThrow = true;
+    expect(await policyAcceptanceService.getEnforcedPendingForUser(USER_ID)).toHaveLength(2);
+    const res = await request(makeApp()).get('/api/v1/kpa/x').set('Authorization', `Bearer ${makeToken()}`);
+    expect(res.status).toBe(428);
+  });
+
+  it('비활성 Demo 기록(is_active=false)은 예외 대상이 아니다 — 조회 SQL 이 is_active 를 건다', async () => {
+    await policyAcceptanceService.getEnforcedPendingForUser(USER_ID);
+    expect(demoQueries()[0]).toMatch(/is_active/);
+  });
+});
+
+// ─────────────────────────────────────────────────────
+// 소비처 계약 — 서비스 접근을 강제하는 3 경로는 enforced pending 을 쓴다
+// ─────────────────────────────────────────────────────
+
+describe('enforced pending 소비처 계약', () => {
+  const read = (rel: string) => readFileSync(resolve(__dirname, '../..', rel), 'utf8');
+
+  it.each([
+    'common/middleware/auth/authentication.middleware.ts',
+    'modules/auth/controllers/email-auth.controller.ts',
+    'modules/auth/controllers/auth-account.controller.ts',
+  ])('%s 는 getEnforcedPendingForUser 를 쓰고 raw getPendingForUser 를 직접 부르지 않는다', (rel) => {
+    const src = read(rel);
+    expect(src).toContain('getEnforcedPendingForUser(');
+    expect(src).not.toMatch(/\.getPendingForUser\(/);
+  });
+
+  it('Demo 예외 판정에 email 문자열 비교가 없다', () => {
+    const src = read('modules/policy-acceptance/policy-acceptance.service.ts');
+    expect(src).not.toMatch(/@example\.com/);
+    expect(src).not.toMatch(/isDemoLoginEmail/);
   });
 });

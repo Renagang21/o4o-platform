@@ -446,6 +446,44 @@ service_membership 이 있고 `user_policy_acceptances` 가 없는 사용자를 
 Demo 의 약관 승낙을 어떻게 다룰지(사전 승낙 행 생성 · 방문자가 화면에서 승낙 · 게이트의 Demo 예외)는
 사용자 결정이 필요하다 — 추가 write 0.
 
+## 2-9. 약관 게이트 Demo 예외 — enforced pending (2026-10-02 · 운영 DB write 0)
+
+### read-only census (결정 근거)
+
+- `user_policy_acceptances.acceptance_kind` CHECK = agreement · acknowledgement · consent — Demo provisioning
+  을 표현할 정식 값 없음. 기존 10행 전부 `terms v1 · agreement`.
+- published terms = k-cosmetics · kpa-society · neture · pharmacy-hub 각 v1 · `supplier` 서비스 terms 없음.
+- Demo raw pending 3건: Store(kpa-society · neture) · Supplier(neture).
+
+### 결정 (사용자 · 이전 "bypass 금지" 판단을 명시 변경)
+
+사전 acceptance 생성 안 함 · 방문자 동의 안 받음 · Demo 는 약관 **강제** 대상에서 제외(Terms Acceptance Gate 한정).
+정본: [`O4O-CANONICAL-DEMO-ACCOUNTS-V1` §8-2](../baseline/O4O-CANONICAL-DEMO-ACCOUNTS-V1.md).
+
+1차 승인 범위(`enforceTermsAcceptance` 한 곳)로는 로그인 응답 · `/auth/me` 의 pending 목록 때문에 프론트가
+닫을 수 없는 재동의 화면을 띄운다는 사실을 확인해 멈췄고, 확장 범위(4 파일)로 재승인받았다.
+
+### 구현
+
+| 파일 | 변경 |
+|---|---|
+| `policy-acceptance.service.ts` | `getEnforcedPendingForUser` 추가 — raw 0 이면 Demo 조회 0 · 활성 Demo 면 `[]` · 조회 실패면 raw 유지 |
+| `authentication.middleware.ts` | `enforceTermsAcceptance` → enforced |
+| `email-auth.controller.ts` | 로그인 응답 pending → enforced |
+| `auth-account.controller.ts` | `/auth/me` pending → enforced |
+| `policy-acceptance.routes.ts` | 주석만 — `GET /auth/policy-acceptances` 는 raw 정책 상태 |
+
+불변: `terms-acceptance.policy.ts` · role/membership/ownership/password-session · Demo write guard · 프론트 ·
+Google 경로 · DB schema/data.
+
+### 검증 (로컬)
+
+- `terms-acceptance-gate.spec.ts` 37/37 (신규: Demo 예외 9 · 소비처 계약 4) · `passwordSessionBoundary.test.ts` mock 갱신 6/6
+- `src/services/auth` · `src/modules/auth` · `src/modules/policy-acceptance` 14 suites 203/203
+- `tsc --noEmit` 오류 0 · 변경 파일 eslint error 0
+
+운영 배포 · runtime smoke 결과는 아래에 이어 적는다.
+
 ---
 
 ## 3. 운영 write 승인 대기 목록
