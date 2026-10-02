@@ -120,6 +120,28 @@ const GLOBAL_PREFIXES = [
 /** 추가·수정일 때 중립으로 취급하는 경로 (삭제·이동은 중립이 아니다). */
 const NEUTRAL_PREFIXES = ['docs/'];
 
+/**
+ * WO-O4O-CICD-PRODUCTION-STATE-RECONCILIATION-AND-LEVEL3-RULE-PRECISION-V1 §12 · §13 — **배포 축 전용** NON_RUNTIME_GLOBAL.
+ * workspace 매핑이 없는 root 경로 중 어떤 이미지 · 빌드 컨텍스트 · runtime 에도 닿지 않는 것만 (census 근거: Dockerfile 은
+ * 서비스 · package 디렉터리만 COPY, API 이미지는 dist bundle 만). 이 목록 밖의 매핑 없는 경로는 종전대로 전 서비스 fallback(UNKNOWN).
+ * 빌드 컨텍스트(.dockerignore · .gcloudignore) · checkout 바이트(.gitattributes) · env · _generated 는 의도적으로 넣지 않는다.
+ * CI 축(classify)의 full fallback 은 건드리지 않는다.
+ */
+const NON_RUNTIME_GLOBAL_EXACT = new Set([
+  '.gitignore',
+  '.editorconfig',
+  '.lighthouserc.json',
+  'sonar-project.properties',
+  'start-chrome-debug.sh',
+]);
+const NON_RUNTIME_GLOBAL_PREFIXES = ['.claude/', '.playwright-mcp/', '.idx/'];
+/** root 최상위 문서(README · AGENTS · CLAUDE · SETUP · CHANGELOG) · root 로컬 도구 스크립트(*.cmd) */
+const NON_RUNTIME_GLOBAL_ROOT = /^[^/]+\.(md|cmd)$/i;
+
+export function isNonRuntimeGlobal(file) {
+  return NON_RUNTIME_GLOBAL_EXACT.has(file) || hasPrefix(file, NON_RUNTIME_GLOBAL_PREFIXES) || NON_RUNTIME_GLOBAL_ROOT.test(file);
+}
+
 /** docs fast path 대상 확장자 — Markdown 문서만. */
 const DOCS_FAST_EXTENSIONS = ['.md'];
 /** docs 경로 안이어도 문서가 아니라 **데이터 자산**으로 보는 세그먼트. */
@@ -705,6 +727,10 @@ export function classifyApiDeploy(changedFiles, graph, opts = {}) {
       continue;
     }
 
+    if (isNonRuntimeGlobal(file)) {
+      reasons.push(`non-runtime global(이미지 · 빌드 컨텍스트 밖) — 배포 무영향: ${file}`);
+      continue;
+    }
     const wsDir = workspaceDirOf(graph, file);
     if (!wsDir) {
       affected = true;
@@ -889,6 +915,10 @@ export function classifyWebDeploy(changedFiles, graph, opts = {}) {
       continue;
     }
 
+    if (isNonRuntimeGlobal(file)) {
+      reasons.push(`non-runtime global(이미지 · 빌드 컨텍스트 밖) — Web 이미지 무영향: ${file}`);
+      continue;
+    }
     const wsDir = workspaceDirOf(graph, file);
     if (!wsDir) {
       return allTrue(`Web 판정 불가(workspace 매핑 없음) — 안전 fallback: ${file}`, reasons);

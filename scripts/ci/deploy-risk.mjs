@@ -40,6 +40,7 @@ import {
   classifyApiDeploy,
   classifyWebDeploy,
   dependencyClosure,
+  isNonRuntimeGlobal,
   lockfileDeployImpact,
   parseFileList,
   readChangedFiles,
@@ -159,6 +160,7 @@ export function classifyAdminDeploy(changedFiles, graph, opts = {}) {
     if (ADMIN_ROOT_BUILD_INPUTS.has(file)) { hit(`admin root build 입력: ${file}`); continue; }
     if (/^[^/]+\.md$/.test(file)) continue;
     if (ADMIN_NEUTRAL_PREFIXES.some((p) => file.startsWith(p))) continue;
+    if (isNonRuntimeGlobal(file)) continue;
     const wsDir = workspaceDirOf(graph, file);
     if (!wsDir) { hit(`admin 판정 불가(workspace 매핑 없음) — 안전 fallback: ${file}`); continue; }
     const pkgName = graph.byDir.get(wsDir);
@@ -338,6 +340,87 @@ export const CONTROL_ONLY = new Set([
  */
 export const RISK_REDUCING_DELETE_RULES = new Set(['db-write-runtime']);
 
+/**
+ * 로그인 화면 표현층 (WO-O4O-CICD-PRODUCTION-STATE-RECONCILIATION-AND-LEVEL3-RULE-PRECISION-V1 §9 · §10 · §11).
+ *
+ * 대상은 **이름 · 경로만으로 auth 로 잡힌 화면 컴포넌트**뿐이다:
+ *   - `auth-frontend` (서비스 · admin 화면)  ·  `auth-package` 중 `packages/auth-react/src/` 의 컴포넌트
+ *   - auth-client · auth-core · auth-context · auth-utils · security-core 는 전부 token · session · credential 축 — 대상 아님
+ *   - backend auth · RBAC · access-control · secret · migration · payment 규칙이 하나라도 함께 걸리면 대상 아님
+ *   - hook(use*) · Context · Provider · Guard · client · api · token · session · storage · handoff · callback · redirect 파일은 대상 아님
+ * 그리고 **바뀐 줄(추가 + 삭제) 전부**가 아래 민감 구문을 하나도 갖지 않아야 한다. 결정적 정규식이며 AI 판정이 아니다.
+ * 과탐(L3 유지)은 허용, 미탐은 금지 — 애매한 단어는 민감 쪽에 둔다.
+ */
+export const PRESENTATION_ELIGIBLE_RULES = new Set(['auth-frontend', 'auth-package']);
+const PRESENTATION_EXT = /\.(tsx|jsx|css|scss|less)$/;
+const PRESENTATION_EXCLUDED_DIR = /(^|\/)(contexts?|hooks|lib|api|services|stores?|utils|providers?|guards?|middleware|config)\//;
+const PRESENTATION_EXCLUDED_NAME =
+  /(^use[A-Z]|Context|Provider|Guard|[Cc]lient|(^|[^a-z])[Aa]pi[A-Z.]|[Tt]oken|[Ss]ession|[Ss]torage|[Hh]andoff|[Cc]allback|[Rr]edirect|[Oo][Aa]uth|[Ss]so[A-Z.])/;
+
+export function isAuthPresentationCandidate(file) {
+  if (!PRESENTATION_EXT.test(file)) return false;
+  if (!(isFrontendSource(file) || file.startsWith('packages/auth-react/src/'))) return false;
+  const rel = file.startsWith('packages/auth-react/src/') ? file.slice('packages/auth-react/src/'.length) : file.replace(/^.*?\/src\//, '');
+  return !PRESENTATION_EXCLUDED_DIR.test(rel) && !PRESENTATION_EXCLUDED_NAME.test(basename(file));
+}
+
+/** 바뀐 줄에 하나라도 있으면 표현층이 아니다 — token · session · credential · 요청 · 이동 · 권한 · 실행 · 모듈 경계 */
+export const AUTH_SENSITIVE_CONSTRUCT = new RegExp(
+  [
+    // 저장소 · 토큰 · 세션 · 자격정보
+    'localStorage', 'sessionStorage', 'indexedDB', '[Cc]ookie', '[Tt]oken', '[Ss]ession', '[Cc]redential', '[Ss]ecret',
+    '[Pp]ass(word|wd|code)', '\\bOTP\\b', '\\botp\\b', '[Pp]in[Cc]ode',
+    // identity provider · 토큰 교환
+    '[Oo][Aa]uth', '[Gg]oogle', '[Kk]akao', '[Nn]aver', '[Aa]pple', 'Authorization', 'Bearer', '[Hh]andoff', '[Ii]dentity',
+    // 요청 · 인증 동작
+    '\\bfetch\\s*\\(', 'axios', 'XMLHttpRequest', '\\.api\\b', '[Cc]lient\\b', '[Cc]lient\\.', '\\.(get|post|put|patch|delete)\\s*\\(',
+    '\\blogin', '\\bLogin[A-Z(]', 'signup', 'signUp', 'signIn', 'signin', 'signOut', 'logout', 'logOut', '[Rr]efresh',
+    'adoptSession', 'setUser', 'checkAuth', 'useAuth', 'useServiceAuth', 'onSubmit', 'handleSubmit',
+    // 동작 배선 · 상태 — 표현층은 문구 · 스타일 · 마크업뿐이다 (replay: fc02334fd `onStart={() => setError(null)}` 는 동작 변경)
+    '\\bon[A-Z]\\w*\\s*=', '\\bset[A-Z]\\w*\\s*\\(', '\\buse[A-Z]\\w*\\s*\\(', '=>', '\\bawait\\b', '\\basync\\b', '\\bfunction\\b',
+    // 이동 · 창 · 외부 실행
+    '[Rr]edirect', 'return(Url|To|Path)', 'window\\.', 'location\\.', 'navigate', '<Navigate', 'history\\.', 'postMessage',
+    // 권한
+    '\\b[Rr]oles?\\b', '[Pp]ermission', '[Ss]cope', '[Mm]embership', 'isAdmin', 'isPlatform', 'isOperator', '[Gg]uard',
+    // 실행 · 주입
+    'dangerouslySetInnerHTML', 'innerHTML', '\\beval\\s*\\(', 'new Function', '[Cc]rypto', '[Ee]ncrypt', '[Hh]ash',
+    // 모듈 경계 · 환경 — 새 의존 · 새 export 는 의미 변경일 수 있다
+    '\\bimport\\b', '\\brequire\\s*\\(', '\\bexport\\b', 'process\\.env', 'import\\.meta',
+  ].join('|'),
+);
+
+const DIFF_CELL_LIMIT = 4_000_000;
+/**
+ * 파일의 바뀐 줄(추가 + 삭제, 공백만 다른 줄 제외 안 함). LCS 기반 — 줄 이동도 변경으로 잡는다.
+ * 원문을 못 읽거나 diff 가 너무 크면 null (호출부는 L3 유지).
+ */
+export function changedLinesOf(status, file, readFile) {
+  if (typeof readFile !== 'function') return null;
+  const base = status === 'A' ? '' : readFile('base', file);
+  const head = status === 'D' ? '' : readFile('head', file);
+  if (typeof base !== 'string' || typeof head !== 'string') return null;
+  const a = base === '' ? [] : base.split(/\r?\n/);
+  const b = head === '' ? [] : head.split(/\r?\n/);
+  if ((a.length + 1) * (b.length + 1) > DIFF_CELL_LIMIT) return null;
+  const n = a.length;
+  const m = b.length;
+  const dp = Array.from({ length: n + 1 }, () => new Uint32Array(m + 1));
+  for (let i = n - 1; i >= 0; i -= 1) {
+    for (let j = m - 1; j >= 0; j -= 1) dp[i][j] = a[i] === b[j] ? dp[i + 1][j + 1] + 1 : Math.max(dp[i + 1][j], dp[i][j + 1]);
+  }
+  const out = [];
+  let i = 0;
+  let j = 0;
+  while (i < n && j < m) {
+    if (a[i] === b[j]) { i += 1; j += 1; }
+    else if (dp[i + 1][j] >= dp[i][j + 1]) out.push(a[i++]);
+    else out.push(b[j++]);
+  }
+  while (i < n) out.push(a[i++]);
+  while (j < m) out.push(b[j++]);
+  return out;
+}
+
 // ---------------------------------------------------------------------------
 // 한 diff 판정
 // ---------------------------------------------------------------------------
@@ -362,6 +445,7 @@ export function assessRisk(changedFiles, graph, opts = {}) {
     level3_hits: [],
     pipeline_hits: [],
     risk_reducing: [],
+    presentation_only: [],
     advisories: [],
     non_runtime_files: 0,
     changed_files: Array.isArray(changedFiles) ? changedFiles.length : 0,
@@ -438,6 +522,19 @@ export function assessRisk(changedFiles, graph, opts = {}) {
     });
     if (keep.length === 0) hitsByFile.delete(file);
     else entry.hits = keep;
+  }
+  // 로그인 화면 표현층 (WO-O4O-CICD-PRODUCTION-STATE-RECONCILIATION-AND-LEVEL3-RULE-PRECISION-V1 §9 D · §10 C)
+  //   auth 이름/경로 규칙에만 걸린 **화면 컴포넌트**이고, 바뀐 줄 전부에 민감 구문이 없을 때만 LEVEL_2 로 둔다.
+  //   원문을 못 읽거나(rename · 공급자 없음) diff 가 크면 그대로 LEVEL_3 (fail-closed).
+  for (const [file, entry] of [...hitsByFile]) {
+    if (!entry.hits.every((h) => PRESENTATION_ELIGIBLE_RULES.has(h.rule)) || !isAuthPresentationCandidate(file)) continue;
+    const changed = changedLinesOf(entry.status, file, opts.readFile);
+    if (!changed) continue;
+    const sensitive = changed.find((line) => AUTH_SENSITIVE_CONSTRUCT.test(line));
+    if (sensitive !== undefined) continue;
+    hitsByFile.delete(file);
+    base.presentation_only.push({ file, rules: entry.hits.map((h) => h.rule), changed_lines: changed.length });
+    base.advisories.push(`로그인 화면 표현층만 변경(민감 구문 0 · ${changed.length}줄) — LEVEL_3 아님: ${file}`);
   }
   base.level3_hits = [...hitsByFile.values()].flatMap((v) => v.hits);
 
