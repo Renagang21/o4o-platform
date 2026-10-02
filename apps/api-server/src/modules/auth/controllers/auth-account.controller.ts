@@ -117,6 +117,9 @@ export class AuthAccountController extends BaseController {
         ud.pendingPolicyAcceptances = await policyAcceptanceService.getEnforcedPendingForUser(req.user.id);
       } catch { ud.pendingPolicyAcceptances = []; }
 
+      // WO-O4O-DEMO-LOGIN-ENTRY-AND-EXPERIENCE-UX-V1: Demo 배지 · 안내용 (판정 정본 demo_accounts.user_id · 실패 시 isDemo:false).
+      ud.demo = await demoAccountService.getDemoMetadata(req.user.id);
+
       // WO-O4O-RESTRICTED-LOGIN-FOR-PENDING-REJECTED-V1 §5-D:
       //   restricted 계정은 role/scope 를 노출하지 않는다 (membership 상태만 유지).
       if (resolveAccountAccess(req.user.status) === 'restricted') {

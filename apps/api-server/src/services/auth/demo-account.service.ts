@@ -29,6 +29,12 @@ type Queryable = Pick<EntityManager, 'query'>;
 
 export type DemoAccountType = 'STORE_OWNER' | 'SUPPLIER';
 
+/** 응답 `user.demo` — 일반 사용자는 `{ isDemo:false, demoType:null }`. */
+export interface DemoAccountMetadata {
+  isDemo: boolean;
+  demoType: DemoAccountType | null;
+}
+
 /** Demo 계정이 막는 동작 — 호출부가 사유를 그대로 응답에 쓴다. */
 export const DEMO_ACCOUNT_FORBIDDEN_CODE = 'DEMO_ACCOUNT_FORBIDDEN';
 export const DEMO_ACCOUNT_FORBIDDEN_MESSAGE =
@@ -111,6 +117,24 @@ class DemoAccountService {
       [userId],
     );
     return rows[0]?.demo_type ?? null;
+  }
+
+  /**
+   * 응답 표시용 metadata — `/auth/me` · email 로그인 응답의 `user.demo`.
+   * WO-O4O-DEMO-LOGIN-ENTRY-AND-EXPERIENCE-UX-V1: 배지 · 안내 문구 전용이다(보호 판정에 쓰지 않는다).
+   * 보호와 반대로 **fail-open** — 조회 실패가 로그인을 막지 않게 `{ isDemo:false }` 로 내린다.
+   * registry id · 기타 컬럼은 싣지 않는다.
+   */
+  async getDemoMetadata(
+    userId: string | null | undefined,
+    manager?: Queryable,
+  ): Promise<DemoAccountMetadata> {
+    try {
+      const demoType = await this.getDemoAccountType(userId, manager);
+      return { isDemo: demoType !== null, demoType };
+    } catch {
+      return { isDemo: false, demoType: null };
+    }
   }
 
   /**

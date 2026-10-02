@@ -15,6 +15,7 @@ import { getTrustedClientIp } from '../../../utils/trusted-client-ip.js';
 import { BaseController } from '../../../common/base.controller.js';
 import { authenticationService } from '../../../services/authentication.service.js';
 import { policyAcceptanceService } from '../../policy-acceptance/policy-acceptance.service.js';
+import { demoAccountService } from '../../../services/auth/demo-account.service.js';
 import {
   emailAuthService,
   EmailAuthError,
@@ -106,6 +107,8 @@ export class EmailAuthController extends BaseController {
       } catch {
         user.pendingPolicyAcceptances = [];
       }
+      // WO-O4O-DEMO-LOGIN-ENTRY-AND-EXPERIENCE-UX-V1: Demo 배지 · 안내용 (판정 정본 demo_accounts.user_id · 실패 시 isDemo:false).
+      user.demo = await demoAccountService.getDemoMetadata(String(user.id));
 
       const includeTokensInBody = includeLegacyTokens || isCrossOriginRequest(req);
       return BaseController.ok(res, {
