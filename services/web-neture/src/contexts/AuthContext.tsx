@@ -15,6 +15,7 @@ import { buildPlatformUser } from '@o4o/auth-utils';
 import { getAccessToken, type GoogleAuthConfig } from '@o4o/auth-client';
 import { useServiceAuth, useRoleSelection, type AuthLoginResult, type GoogleSignupConsents, type PendingPolicyAcceptance, type PolicyAcceptanceResult } from '@o4o/auth-react';
 import { authClient } from '../lib/apiClient';
+import { readDemoMetadata, type DemoMetadata } from '../lib/demoAccounts';
 
 // Re-export for consumers that import getAccessToken from AuthContext
 export { getAccessToken };
@@ -34,6 +35,8 @@ export interface User {
   name: string;
   roles: UserRole[];
   memberships?: { serviceKey: string; status: string }[];
+  /** WO-O4O-DEMO-LOGIN-ENTRY-AND-EXPERIENCE-UX-V1: 서버 판정(demo_accounts) — 배지 · 안내 전용 */
+  demo?: DemoMetadata;
 }
 
 interface AuthContextType {
@@ -76,7 +79,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         serviceKey: 'neture',
         authClient,
         getAccessToken,
-        toUser: (apiUser) => buildPlatformUser(apiUser as never) as User,
+        toUser: (apiUser) => ({ ...(buildPlatformUser(apiUser as never) as User), demo: readDemoMetadata(apiUser) }),
         // 기존 동작 보존: 서버 호출만 하고 로컬 user 는 비우지 않는다.
         clearSessionOnLogoutAll: false,
       }),

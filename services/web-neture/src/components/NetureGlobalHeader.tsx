@@ -20,6 +20,7 @@ import { notificationsApi, NOTIFICATION_SERVICE_KEY } from '../lib/api/notificat
 import { SUPPLIER_ONLY_ROLES } from '../lib/role-constants';
 import { useAuth } from '../contexts/AuthContext';
 import { useLoginModal } from '../contexts/LoginModalContext';
+import { DEMO_NOTICE } from '../lib/demoAccounts';
 import {
   NETURE_PUBLIC_NAV,
   NETURE_CONTEXTUAL_NAV,
@@ -95,6 +96,17 @@ export function NetureGlobalHeader() {
       logoutLabel="O4O 로그아웃"
       utilitySlot={
         <>
+          {/* WO-O4O-DEMO-LOGIN-ENTRY-AND-EXPERIENCE-UX-V1: 서버 판정(user.demo) 기준 Demo 배지 — modal 없음 */}
+          {isAuthenticated && user?.demo?.isDemo && (
+            <span
+              role="status"
+              title={DEMO_NOTICE}
+              className="inline-flex items-center rounded-full border border-amber-300 bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-800 whitespace-nowrap"
+            >
+              Demo 계정
+              <span className="sr-only"> — {DEMO_NOTICE}</span>
+            </span>
+          )}
           {isAuthenticated && user && (
             <NotificationBell
               unreadCount={notif.unreadCount}

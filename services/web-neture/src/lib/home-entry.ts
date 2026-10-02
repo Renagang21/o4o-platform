@@ -261,6 +261,39 @@ export interface UseHomeEntryResult {
 }
 
 /**
+ * 홈 진입 데이터 조회 — `useHomeEntry` 와 Demo 매장 자동 진입이 같은 출처 · 같은 검증을 쓴다.
+ * 어느 한쪽이라도 실패하면 throw (부분 데이터로 "미가입" 처럼 보이지 않게).
+ */
+export async function fetchHomeEntryData(): Promise<HomeEntryData> {
+  const [servicesRes, entryRes, operatorRes, communitiesRes] = await Promise.all([
+    api.get('/auth/services'),
+    api.get('/neture/home/entry'),
+    // WO-O4O-SERVICE-OPERATOR-WORKSPACE-REALIGNMENT-V1: 운영자 서비스 목록의 유일한 출처
+    api.get('/work-scope/operator-services'),
+    // WO-O4O-COMMUNITY-WORKSPACE-CATALOG-AND-ACCESS-ALIGNMENT-V1: 커뮤니티 목록·참여 판정의 유일한 출처.
+    //   배포 간극(web 먼저 · API 나중) 동안 404 면 커뮤니티 그룹만 비운다 — 홈 전체를 error 로 만들지 않는다.
+    //   (다른 출처는 종전대로 하나라도 실패하면 전체 error.)
+    api.get('/communities').catch(() => null),
+  ]);
+  const services = servicesRes.data?.data?.services;
+  const entry = entryRes.data?.data;
+  const operatorServices = operatorRes.data?.data?.services;
+  const communitiesRaw = communitiesRes?.data?.data?.communities;
+  const communities = Array.isArray(communitiesRaw) ? communitiesRaw : [];
+  if (!Array.isArray(services) || !entry || !entry.serviceStates || !Array.isArray(operatorServices)) {
+    throw new Error('bad response');
+  }
+  return {
+    services,
+    stores: Array.isArray(entry.stores) ? entry.stores : [],
+    branches: Array.isArray(entry.branches) ? entry.branches : [],
+    serviceStates: normalizeServiceStates(entry.serviceStates),
+    operatorServices,
+    communities,
+  };
+}
+
+/**
  * 로그인 상태에서만 조회한다. 어느 한쪽이라도 실패하면 전체를 error 로 둔다 —
  * 부분 데이터로 "미가입" 처럼 보이는 화면을 만들지 않기 위해서다.
  */
@@ -284,33 +317,9 @@ export function useHomeEntry(enabled: boolean): UseHomeEntryResult {
     setError(null);
     (async () => {
       try {
-        const [servicesRes, entryRes, operatorRes, communitiesRes] = await Promise.all([
-          api.get('/auth/services'),
-          api.get('/neture/home/entry'),
-          // WO-O4O-SERVICE-OPERATOR-WORKSPACE-REALIGNMENT-V1: 운영자 서비스 목록의 유일한 출처
-          api.get('/work-scope/operator-services'),
-          // WO-O4O-COMMUNITY-WORKSPACE-CATALOG-AND-ACCESS-ALIGNMENT-V1: 커뮤니티 목록·참여 판정의 유일한 출처.
-          //   배포 간극(web 먼저 · API 나중) 동안 404 면 커뮤니티 그룹만 비운다 — 홈 전체를 error 로 만들지 않는다.
-          //   (다른 출처는 종전대로 하나라도 실패하면 전체 error.)
-          api.get('/communities').catch(() => null),
-        ]);
-        const services = servicesRes.data?.data?.services;
-        const entry = entryRes.data?.data;
-        const operatorServices = operatorRes.data?.data?.services;
-        const communitiesRaw = communitiesRes?.data?.data?.communities;
-        const communities = Array.isArray(communitiesRaw) ? communitiesRaw : [];
-        if (!Array.isArray(services) || !entry || !entry.serviceStates || !Array.isArray(operatorServices)) {
-          throw new Error('bad response');
-        }
+        const next = await fetchHomeEntryData();
         if (cancelled) return;
-        setData({
-          services,
-          stores: Array.isArray(entry.stores) ? entry.stores : [],
-          branches: Array.isArray(entry.branches) ? entry.branches : [],
-          serviceStates: normalizeServiceStates(entry.serviceStates),
-          operatorServices,
-          communities,
-        });
+        setData(next);
       } catch {
         if (cancelled) return;
         setData(null);
@@ -370,6 +379,19 @@ export async function resolveServiceEntryUrl(serviceKey: string, returnPath?: st
 /** 발급 + 즉시 이동. 성공하면 현재 탭이 대상 서비스로 바뀐다. */
 export async function openServiceEntry(serviceKey: string, returnPath?: string): Promise<void> {
   window.location.assign(await resolveServiceEntryUrl(serviceKey, returnPath));
+}
+
+/**
+ * WO-O4O-DEMO-LOGIN-ENTRY-AND-EXPERIENCE-UX-V1 — 로그인 직후 Store Workspace 로 바로 가는 URL.
+ * 홈 매장 카드와 **같은 계산**(`buildHomeEntryModel` 의 store 항목)과 **같은 handoff**(`resolveServiceEntryUrl`)다 —
+ * 새 경로 · 우회 없음. 매장이 정확히 하나일 때만 이동한다(복수 매장 자동 선택 금지 원칙 유지).
+ */
+export async function resolveSingleStoreWorkspaceUrl(user: User): Promise<string> {
+  const data = await fetchHomeEntryData();
+  const items = buildHomeEntryModel(user, data).groups.find((g) => g.id === 'store')?.items ?? [];
+  const only = items.length === 1 ? items[0].action : null;
+  if (!only || only.kind !== 'handoff') throw new ServiceEntryError('이동할 매장을 하나로 정하지 못했습니다.');
+  return resolveServiceEntryUrl(only.serviceKey, only.returnPath);
 }
 
 /** 공개 안내 URL (로그인 · handoff 없이 열리는 주소) */
