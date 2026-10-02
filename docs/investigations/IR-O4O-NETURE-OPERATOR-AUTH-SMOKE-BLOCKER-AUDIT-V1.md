@@ -49,7 +49,7 @@ endpoint: GET /api/v1/neture/operator/dashboard
 |---|---|---|---|---|---|
 | `sohae2100@gmail.com` | ❌ (문서 PW 불일치) | — | active(파생) | ✅ 완전 자격 | (토큰 미획득) |
 | `renagang21@gmail.com` | ❌ (문서 PW 불일치) | — | — | — | — |
-| `sohae21@naver.com` | ✅ (`Seochuran1!` 유효) | kpa:store_owner, supplier | active(supplier) | ❌ (neture:operator **is_active=f**) | **403** |
+| `sohae21@naver.com` | ✅ (`[REDACTED — rotated]` 유효) | kpa:store_owner, supplier | active(supplier) | ❌ (neture:operator **is_active=f**) | **403** |
 
 - **serviceKey 필요 여부**: **불필요**. 로그인 payload는 `{email, password}`(+`includeLegacyTokens`)뿐 — login은 서비스 중립(global `users`). serviceKey 누락은 원인 아님.
 - **sohae2100 DB 상태 (read-only 확인)**: `id=cfd2a5e7-…`, `status=active`, bcrypt hash 존재(length 60), 생성 2026-05-15. role_assignments 10건 전부 `is_active=t` (neture:operator·neture:admin·platform:super_admin 포함). **계정·권한 완전 정상.**

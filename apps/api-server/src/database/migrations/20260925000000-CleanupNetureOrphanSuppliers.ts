@@ -5,7 +5,7 @@
  *   neture_suppliers 테이블에 users가 없는 고아(orphan) 행이 존재한다.
  *   - user_id IS NULL: 더미/seed 데이터 (farmfresh-korea, health-plus, daily-essentials)
  *   - user_id NOT IN users: users가 삭제된 후 남은 잔재
- *     (pharmabase@nate.com, chojj22@naver.com, ir-* 테스트 계정)
+ *     ([REDACTED_EMAIL], [REDACTED_EMAIL], ir-* 테스트 계정)
  *
  *   이런 고아 supplier는 운영자 회원 리스트에 보이지 않고,
  *   관리·승인·대시보드 접근 모두 불가능하다.

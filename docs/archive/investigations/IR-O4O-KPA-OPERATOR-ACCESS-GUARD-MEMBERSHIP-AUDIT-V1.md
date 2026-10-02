@@ -183,7 +183,7 @@ function resolveMembershipKey(scopeServiceKey: string): string {
 
 → **새 bootstrap migration 으로 생성된 계정은 `service_memberships.service_key='kpa-society'` 가 정확히 들어감**. 이들 계정은 가드를 통과해야 정상.
 
-**비밀번호**: `process.env.SEED_BOOTSTRAP_PASSWORD || 'O4oBootstrap1!'` (line 37). 프로덕션에선 환경변수로 override 필수.
+**비밀번호**: `process.env.SEED_BOOTSTRAP_PASSWORD || '[REDACTED]'` (line 37). 프로덕션에선 환경변수로 override 필수.
 
 ---
 

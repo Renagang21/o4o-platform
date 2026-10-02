@@ -40,13 +40,13 @@ End-to-end tests for the O4O Platform Customizer using Playwright.
    Set environment variables for authentication:
    ```bash
    export E2E_TEST_EMAIL="test@example.com"
-   export E2E_TEST_PASSWORD="test123456"
+   export E2E_TEST_PASSWORD="<test-account-password>"
    ```
 
    Or create a `.env.test` file in the admin-dashboard root:
    ```env
    E2E_TEST_EMAIL=test@example.com
-   E2E_TEST_PASSWORD=test123456
+   E2E_TEST_PASSWORD=<test-account-password>
    ```
 
 3. **Dev Server Running**

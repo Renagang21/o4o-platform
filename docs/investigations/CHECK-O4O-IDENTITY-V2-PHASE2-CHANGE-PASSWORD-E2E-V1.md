@@ -54,20 +54,20 @@
 
 | 항목 | 값 |
 |------|---|
-| Email | `sohae2100+v2check@gmail.com` |
+| Email | `[REDACTED_EMAIL]` |
 | User ID | `f0ba48fa-8ada-41d4-ba5b-f64f4c50f51f` |
 | Memberships | kpa-society (active) |
-| Test A 결과 후 상태 | KPA credential = V2CheckC!2026 (Test A 가 갱신) credential = 불확실, ACCOUNT_LOCKED (06:13Z 까지) |
+| Test A 결과 후 상태 | KPA credential = [REDACTED] (Test A 가 갱신) credential = 불확실, ACCOUNT_LOCKED (06:13Z 까지) |
 
 ### Account #3 (본 Phase 2 검증용, fresh) — Test B-I
 
 | 항목 | 값 |
 |------|---|
-| Email | `sohae2100+v2check2@gmail.com` |
+| Email | `[REDACTED_EMAIL]` |
 | User ID | `c12c1f59-1708-4346-a341-2657e0f45e6e` |
 | Memberships | kpa-society (active) |
-| 초기 password | V2Check2X!2026 (양쪽 서비스 + users.password 모두 동일) |
-| 검증 후 상태 | users.password = V2Check2L!2026 / KPA cred = V2Check2X!2026 cred = V2Check2Y!2026 (두 곳 모두 다른 값) |
+| 초기 password | [REDACTED] (양쪽 서비스 + users.password 모두 동일) |
+| 검증 후 상태 | users.password = [REDACTED] / KPA cred = [REDACTED] cred = [REDACTED] (두 곳 모두 다른 값) |
 
 > Account #3 의 최종 상태는 **V2 모델의 핵심 — 같은 사용자 3개의 password 가 storage location 별로 독립 운영** — 을 그대로 실증한다.
 
@@ -77,14 +77,14 @@
 
 ### A. KPA 비밀번호 변경 (Account #2) — 부분 PASS
 
-**검증 방법:** Phase 1 검증 상태 (KPA cred=V2CheckA!2026 cred=V2CheckB!2026) 에서 KPA 변경 후 cross-credential 확인.
+**검증 방법:** Phase 1 검증 상태 (KPA cred=[REDACTED] cred=[REDACTED]) 에서 KPA 변경 후 cross-credential 확인.
 
 | # | Step | Expected | Actual | 결과 |
 |---|---|---|---|---|
-| A1 | Login KPA + V2CheckA!2026 (session 확보) | success | success | ✅ |
-| A2 | changePassword KPA: V2CheckA → V2CheckC | success | success ("Password changed successfully") | ✅ |
+| A1 | Login KPA + [REDACTED] (session 확보) | success | success | ✅ |
+| A2 | changePassword KPA: [REDACTED] → V2CheckC | success | success ("Password changed successfully") | ✅ |
 | A3 | Login KPA + V2CheckC | success | success | ✅ |
-| A4 | Login KPA + V2CheckA | INVALID_CREDENTIALS | INVALID_CREDENTIALS | ✅ |
+| A4 | Login KPA + [REDACTED] | INVALID_CREDENTIALS | INVALID_CREDENTIALS | ✅ |
 | **A6** | Login V2CheckC | INVALID_CREDENTIALS | INVALID_CREDENTIALS | — |
 | A5 | Login V2CheckB | success | INVALID_CREDENTIALS | — |
 
@@ -111,7 +111,7 @@
 
 | # | Step | Expected | Actual | 결과 |
 |---|---|---|---|---|
-| D-1 | changePassword KPA: current=V2Check2WRONG!2026, new=V2Check2BAD!2026 | 400 "Current password is incorrect" | `success:false, msg: "Current password is incorrect"` | ✅ |
+| D-1 | changePassword KPA: current=[REDACTED], new=[REDACTED] | 400 "Current password is incorrect" | `success:false, msg: "Current password is incorrect"` | ✅ |
 | D-2 | Login KPA + V2Check2X | success (변경 안 됨) | success | ✅ (no credential overwrite) |
 
 **판정:** ✅ PASS — bcrypt 검증 실패 시 credential.upsert 호출 안 됨.
@@ -187,8 +187,8 @@ credential 미존재 시 user.password 로 자동 fallback — 코드경로로 �
 
 | Storage | Value | 설정 경로 |
 |---|---|---|
-| `users.password` | V2Check2L!2026 | Test F (V1 fallback path) |
-| `service_credentials[kpa-society]` | V2Check2X!2026 | Phase 1 register dual-write (변경 없음) |
+| `users.password` | [REDACTED] | Test F (V1 fallback path) |
+| `service_credentials[kpa-society]` | [REDACTED] | Phase 1 register dual-write (변경 없음) |
 
 → 3개의 다른 password 가 3개의 다른 storage 에서 독립 운영 — **V2 Identity 모델의 4-Layer 의 실증 데이터**.
 
@@ -216,8 +216,8 @@ credential 미존재 시 user.password 로 자동 fallback — 코드경로로 �
 | Email | User ID | 현재 상태 |
 |---|---|---|
 | `identityv2-check-20260523-032218@example.test` (Account #1, Phase 1) | `8eefe5a4-...` | kpa-society active pending — Phase 1 흔적 |
-| `sohae2100+v2check@gmail.com` (Account #2, Phase 1 + Phase 2 부분) | `f0ba48fa-...` | KPA cred=V2CheckC!2026 cred=불확실 / ACCOUNT_LOCKED until 06:13Z |
-| `sohae2100+v2check2@gmail.com` (Account #3, Phase 2) | `c12c1f59-...` | users.password=L / KPA=X=Y |
+| `[REDACTED_EMAIL]` (Account #2, Phase 1 + Phase 2 부분) | `f0ba48fa-...` | KPA cred=[REDACTED] cred=불확실 / ACCOUNT_LOCKED until 06:13Z |
+| `[REDACTED_EMAIL]` (Account #3, Phase 2) | `c12c1f59-...` | users.password=L / KPA=X=Y |
 
 **정리 옵션:**
 - (a) 운영자 화면 "정지/삭제"

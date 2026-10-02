@@ -93,6 +93,8 @@ O4O Platform repository의 Codex 및 일반 coding agent를 위한 독립 진입
   코드 수정 승인만으로 운영 DB write까지 승인되었다고 간주하지 않는다.
 - 실제 DB host / password / 계정값을 문서·로그·커밋·스크린샷에 기록하지 않는다.
   운영 데이터 보고는 요약·마스킹한다. 접속·migration 절차는 §7의 정본을 따른다.
+- **이 저장소는 Public이다.** CHECK·WO·IR·주석에 비밀번호(과거·테스트 값 포함)·실제 사용자 이메일·실명·전화번호·실제 약국/사업자명·production 응답 원문을 쓰지 않는다.
+  credential은 secret 이름만, 사람은 `[사용자 A]`·`[REDACTED_EMAIL]` 같은 placeholder로 적는다.
 
 **진단·debug 안전 경계:**
 

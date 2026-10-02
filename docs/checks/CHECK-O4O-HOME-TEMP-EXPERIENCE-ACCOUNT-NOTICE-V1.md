@@ -28,15 +28,15 @@
 ## 4. 로그인 화면 autofill 정비
 | 서비스 | 이전 | 이후 |
 |--------|------|------|
-| "🧪 테스트 약국" (renagang21@gmail.com / `3Lz157727791!`) | 라벨만 "🧪 체험용 약국 경영자 계정". 계정/비번 불변 |
-| KPA | "약국 경영자" (renagang21@gmail.com / **`seochuran1!`**) | "🧪 체험용 약국 경영자 계정" + 비번 **`3Lz157727791!`로 수정** |
-| KCos | (autofill 없음) | "🧪 체험용 매장 경영자 계정" (renagang21@gmail.com / `3Lz157727791!`) **신규 추가** |
+| "🧪 테스트 약국" (renagang21@gmail.com / `[REDACTED — rotated]`) | 라벨만 "🧪 체험용 약국 경영자 계정". 계정/비번 불변 |
+| KPA | "약국 경영자" (renagang21@gmail.com / **`[REDACTED — rotated]`**) | "🧪 체험용 약국 경영자 계정" + 비번 **`[REDACTED — rotated]`로 수정** |
+| KCos | (autofill 없음) | "🧪 체험용 매장 경영자 계정" (renagang21@gmail.com / `[REDACTED — rotated]`) **신규 추가** |
 
-- **KPA 스테일 비밀번호 수정:** SSOT(TEST-ACCOUNTS.local.md) 기준 renagang21 현재 비번 = `3Lz157727791!`(2026-06-06 reset). KPA가 박고 있던 `seochuran1!`는 스테일 → 기존 KPA 체험 로그인은 실패 상태였음. 동작하는 값으로 정렬(계정 자체 reset 아님, 코드 표기 수정).
+- **KPA 스테일 비밀번호 수정:** SSOT(TEST-ACCOUNTS.local.md) 기준 renagang21 현재 비번 = `[REDACTED — rotated]`(2026-06-06 reset). KPA가 박고 있던 `[REDACTED — rotated]`는 스테일 → 기존 KPA 체험 로그인은 실패 상태였음. 동작하는 값으로 정렬(계정 자체 reset 아님, 코드 표기 수정).
 
 ## 5. 보안 판단 (사용자 결정 기록)
 - 이 계정은 여러 사람이 함께 쓰도록 **임시 제공하는 공용 체험 계정**이며 곧 제거 예정. 사용자 결정에 따라 **비밀번호 하드코딩 제거/별도 demo 계정 생성/rotation은 본 WO 범위 밖**.
-- ⚠️ **기록(사용자 위험 수용):** autofill 비밀번호 `3Lz157727791!`는 SSOT상 `sohae2100@gmail.com`(4서비스 admin/operator + `platform:super_admin`) 비밀번호와 **동일** → 클라이언트 JS·git에 노출됨. 데모 계정 삭제만으로는 닫히지 않으며, 안전화하려면 super_admin 비밀번호를 데모와 분리해야 함(후속, 사용자 영역).
+- ⚠️ **기록(사용자 위험 수용):** autofill 비밀번호 `[REDACTED — rotated]`는 SSOT상 `sohae2100@gmail.com`(4서비스 admin/operator + `platform:super_admin`) 비밀번호와 **동일** → 클라이언트 JS·git에 노출됨. 데모 계정 삭제만으로는 닫히지 않으며, 안전화하려면 super_admin 비밀번호를 데모와 분리해야 함(후속, 사용자 영역).
 - ⚠️ **KCos role caveat:** `renagang21`은 `cosmetics:store_owner` role 부재(SSOT §43-54) → KCos autofill 로그인은 되나 `/store` 매장 경영자 기능은 게이트됨. 실제 체험까지 되려면 RBAC role 부여(F9/F11, DB, 별도 승인) 필요. 본 WO는 frontend 안내/autofill만.
 - operator/admin/supplier 계정 **미노출**(KPA autofill은 약국 경영자 1개, KCos는 매장 경영자 1개만).
 

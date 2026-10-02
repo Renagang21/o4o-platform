@@ -177,7 +177,7 @@ LEFT JOIN role_assignments ra
        ON ra.user_id = u.id AND ra.role = 'supplier' AND ra.is_active = true
 LEFT JOIN neture_suppliers ns
        ON ns.user_id = u.id
-WHERE u.email IN ('test@test.com', 'aop80@naver.com');  -- + 실제 문제 계정 추가
+WHERE u.email IN ('test@test.com', '[REDACTED_EMAIL]');  -- + 실제 문제 계정 추가
 ```
 
 **판정 가이드**:

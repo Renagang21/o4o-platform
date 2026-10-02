@@ -223,7 +223,7 @@ BASE="https://api.neture.co.kr/api/v1"
 
 # 두 계정 로그인
 curl -X POST "$BASE/auth/login" -H "Content-Type: application/json" \
-  -d '{"email":"neture-operator@o4o.com","password":"O4oBootstrap1!"}' -c op.jar
+  -d '{"email":"neture-operator@o4o.com","password":"[REDACTED]"}' -c op.jar
 curl -X POST "$BASE/auth/login" -H "Content-Type: application/json" \
   -d '{"email":"<admin>","password":"<pwd>"}' -c admin.jar
 

@@ -39,8 +39,8 @@ platform_store_slugs(service_key='kpa', is_active=true) 행: 9
 |---|---|---|---|---|---:|---:|---|
 | 1 | `9c87f46b…ce96` | 테스트 약국 | pharmacy | 네뚜레-약국 | 2 | 2 | (없음) |
 | 2 | `c92b857f…55fd` | 테스트 약국 | pharmacy | 테스트-약국 | 0 | 0 | — |
-| 3 | `c5982508…9711` | 피앤디 약국 | pharmacy | 피앤디-약국 | 1 | 1 | (없음) |
-| 4 | `8712bff0…f0c4` | 중앙약국 | pharmacy | 중앙약국 | 1 | 1 | (없음) |
+| 3 | `c5982508…9711` | [약국 B] | pharmacy | 피앤디-약국 | 1 | 1 | (없음) |
+| 4 | `8712bff0…f0c4` | [약국 A] | pharmacy | [약국 A] | 1 | 1 | (없음) |
 | 5 | `ec596c46…e099` | 테스트 약국 (E2E) | **association** | e2e | 0 | 0 | (없음) |
 | 6 | `aed9eda9…5ec` | Renagang 약국 | pharmacy | renagang-약국 | 0 | 0 | (없음) |
 | 7 | `c9beb4a2…c048` | Sohae 약국 | pharmacy | sohae-약국 | 1 | 1 | (없음) |
@@ -136,8 +136,8 @@ service_key drift: 0   ('kpa' / 'kpa-society' 혼재 신규 발생 없음)
 
 | 계정 | BEFORE (slug 조건만) | AFTER (enrollment OR slug) | 해석된 조직 |
 |---|:---:|:---:|---|
-| `dearfrnd@naver.com` | 1 · resolved | 1 · resolved | 중앙약국 |
-| `pradix@naver.com` | 1 · resolved | 1 · resolved | 피앤디 약국 |
+| `[REDACTED_EMAIL]` | 1 · resolved | 1 · resolved | [약국 A] |
+| `[REDACTED_EMAIL]` | 1 · resolved | 1 · resolved | [약국 B] |
 | `sohae2100@gmail.com` | 1 · resolved | 1 · resolved | Sohae 약국 |
 | `renagang21@gmail.com` | 1 · resolved | 1 · resolved | **테스트 약국** (KPA) |
 | `o4o-smoke-mystore@…`(검증용) | 1 · resolved | 1 · resolved | 테스트 약국 |

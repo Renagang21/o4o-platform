@@ -37,7 +37,7 @@ Neture B2B canonical end-to-end positive smoke 를 위한 테스트 공급자 �
 
 ### Phase 1 — 사전 상태 (read-only)
 - `renagang21@gmail.com` Neture 로그인 성공. 이미 **linked supplier** 존재 (supplierId 91169739, name "(주)네뚜레 공급자 테스트", **status PENDING**, products 0). → 신규 가입 불필요, **운영자 승인부터 진행**.
-- 자격증명 정정: WO 기재 `seochuran1!` 은 renagang21 에 대해 401(실패). 실제 비번은 SSOT 값(검증 200). `Seochuran1!` 은 `sohae21@naver.com` 의 비번. → renagang21 은 SSOT 비번으로 진행.
+- 자격증명 정정: WO 기재 `[REDACTED — rotated]` 은 renagang21 에 대해 401(실패). 실제 비번은 SSOT 값(검증 200). `[REDACTED — rotated]` 은 `sohae21@naver.com` 의 비번. → renagang21 은 SSOT 비번으로 진행.
 
 ### Phase 2 — 회원가입
 - 생략 (supplier record 이미 존재).

@@ -40,7 +40,7 @@
 |---|:---:|:---:|:---:|---|
 | `renagang21@gmail.com` | 401 | **200 OK** | active | Neture 공급자 `supplier-6967ebe0` ACTIVE |
 | `sohae21@naver.com` | 401 `ACCOUNT_NOT_ACTIVE` | 동일 | **deleted** | 공급자 `supplier-52a4c1e6` 는 ACTIVE 이나 유저가 삭제됨 |
-| `yyoon1103@naver.com` | 미실행 | 미실행 | — | 공급자 status `PENDING` |
+| `[REDACTED_EMAIL]` | 미실행 | 미실행 | — | 공급자 status `PENDING` |
 
 프로덕션 Neture 공급자 3건 중 **실사용 가능한 공급자 계정은 1개**다.
 
@@ -118,7 +118,7 @@ DB 직접 update · 비밀번호 재설정 · 관리 스크립트 실행 모두 
 | # | 내용 |
 |---|---|
 | 1 | `sohae21@naver.com` — 유저 `deleted` 인데 공급자 `supplier-52a4c1e6` 는 ACTIVE 이고 `[E2E_TEST]` offer 2건을 보유. 공급자 계정 lifecycle 정합 이슈로 보이며 별도 WO 후보 |
-| 2 | `yyoon1103@naver.com` 공급자 `PENDING` 상태 장기 방치 |
+| 2 | `[REDACTED_EMAIL]` 공급자 `PENDING` 상태 장기 방치 |
 
 ---
 

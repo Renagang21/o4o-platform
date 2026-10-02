@@ -240,7 +240,7 @@ WO-O4O-KPA-PHARMACY-OWNER-ROLE-CONSISTENCY-AUDIT-V1
 # 1. renagang21 현 상태 (read-only API)
 TOKEN=$(curl -sv -X POST "https://api.neture.co.kr/api/v1/auth/login" \
   -H "Content-Type: application/json" \
-  -d '{"email":"renagang21@gmail.com","password":"seochuran1!"}' 2>&1 \
+  -d '{"email":"renagang21@gmail.com","password":"[REDACTED — rotated]"}' 2>&1 \
   | grep "set-cookie: accessToken=" | sed 's/.*accessToken=//; s/;.*//')
 curl -s -H "Authorization: Bearer $TOKEN" https://api.neture.co.kr/api/v1/kpa/members/me
 

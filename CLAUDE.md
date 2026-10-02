@@ -92,6 +92,7 @@
 - read-only 검증(SELECT · 마이그레이션 이력 · 상태 조회)은 승인된 채널(`gcloud` · Admin API · Console)로 직접 수행 가능.
 - **UPDATE / DELETE / DDL · 대량 write · migration 수동 적용은 사용자 명시 승인 필요.** 마이그레이션은 CI/CD 자동 실행이 원칙 ([`PRODUCTION-MIGRATION-STANDARD`](docs/baseline/operations/PRODUCTION-MIGRATION-STANDARD.md)).
 - 실제 DB host · password · 계정값을 문서 · 로그 · 커밋 · 스크린샷에 기록하지 않는다. 운영 데이터 보고 시 민감정보는 요약 · 마스킹한다.
+- **이 저장소는 Public 이다.** CHECK · WO · IR · 주석에 비밀번호(과거 · 테스트 값 포함) · 실제 사용자 이메일 · 실명 · 전화번호 · 실제 약국/사업자명 · production 응답 원문을 쓰지 않는다 — credential 은 secret 이름만, 사람은 `[사용자 A]` · `[REDACTED_EMAIL]` 같은 placeholder 로.
 - 진단 · seed · repair route 의 안전 규칙은 §8.
 
 ## 검증 · 완료 보고

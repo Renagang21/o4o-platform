@@ -41,7 +41,7 @@ WO 중지 조건 **"별도 플랫폼 Super Admin 계정이 없거나 로그인 �
 
 - `super-admin@o4o.com` 의 비밀번호는 **자격증명 SSOT(`docs/local/TEST-ACCOUNTS.local.md`, CLAUDE.md §15)
   에 등재되어 있지 않다.** 해당 문서는 sohae2100 / renagang21 / sohae21@naver.com 3계정만 관리한다.
-- 코드상 시드 값은 `BOOTSTRAP_PASSWORD = process.env.SEED_BOOTSTRAP_PASSWORD || 'O4oBootstrap1!'`
+- 코드상 시드 값은 `BOOTSTRAP_PASSWORD = process.env.SEED_BOOTSTRAP_PASSWORD || '[REDACTED]'`
   (`20260927100000-BootstrapCanonicalSeedAccounts.ts:39`). 프로덕션 생성 시점에 env 가 설정되었는지
   **로컬에서 알 수 없어**, fallback 값이 유효하다고 단정할 수 없다.
 - 해당 평문은 `TEST-ACCOUNTS.local.md` 가 이미 **보안 cleanup 대상**으로 지정한 항목이다

@@ -77,7 +77,7 @@ QR 관련 문구 미사용 (후속 단계 안내만 약하게 표기).
 **판정: 회귀/관찰성 PASS.** 신규 summary API 정상 배포·200 응답, 빈 상태 정상, 콘솔/네트워크 클린.
 
 ### 5.3 데이터 표시 smoke (2026-06-22, 테스트 데이터 생성 승인 후 — [PILOT] prefix)
-운영자(sohae2100=kpa:admin) → store-owner(체험 약국 경영자=renagang21, 실제 password `3Lz157727791!`) 2계정 UI 흐름으로 실제 연결 데이터를 만들어 표시 경로 검증.
+운영자(sohae2100=kpa:admin) → store-owner(체험 약국 경영자=renagang21, 실제 password `[REDACTED — rotated]`) 2계정 UI 흐름으로 실제 연결 데이터를 만들어 표시 경로 검증.
 
 생성·연결 흐름:
 1. 운영자: `[PILOT] 다국어 배지 스모크 콘텐츠` 그룹 생성 → ko/en 페이지 발행 → 그룹 발행(HUB 노출)
@@ -100,7 +100,7 @@ QR 관련 문구 미사용 (후속 단계 안내만 약하게 표기).
 - 매장 취급 상품 → UI 비활성화 (목록 0건)
 - 운영자 그룹 → UI 보관(archived) 처리 (HUB 비노출)
 
-> 참고: `docs/local/TEST-ACCOUNTS.local.md` 의 KPA 약국 경영자 password 가 실제와 불일치(`seochuran1!` → 실제 체험계정 `3Lz157727791!`). 별도 갱신 권장.
+> 참고: `docs/local/TEST-ACCOUNTS.local.md` 의 KPA 약국 경영자 password 가 실제와 불일치(`[REDACTED — rotated]` → 실제 체험계정 `[REDACTED — rotated]`). 별도 갱신 권장.
 
 ## 6. 최종 판정
 
