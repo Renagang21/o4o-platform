@@ -484,6 +484,64 @@ Google 경로 · DB schema/data.
 
 운영 배포 · runtime smoke 결과는 아래에 이어 적는다.
 
+## 2-10. 격리 배포 + runtime smoke (2026-10-02 · 운영 DB write 0 · **STOP: Demo role 0 으로 화면 접근 불가**)
+
+### 배포 SHA ≠ main merge SHA (사용자 결정 — 선택지 3)
+
+PR #266 의 main squash `dab919a84` 는 production 기준 `353c11d04` 이후의 **미승인 런타임 변경
+`87ebdb074`(Automation Strong-First Discovery routing · `work-agent-runtime.ts`)** 를 함께 끌고 온다.
+사용자는 "merge SHA 그대로 배포" 대신 **"승인된 변경만 포함한 정확히 검증된 deployment SHA"** 원칙을 택했다.
+
+| 항목 | 값 |
+|---|---|
+| 배포 SHA | **`fd3a7c8b5`** (`fd3a7c8b50615fd2e3aa64e5271fbd7506999d9e`) · branch `release/demo-terms-enforced-pending-api` |
+| 구성 | `353c11d04` + `dab919a84` cherry-pick — 런타임 4 · 테스트 2 · routes 주석 1 · 정본 §8-2. CHECK 문서는 충돌로 base 판 유지(배포 무관) |
+| 동일성 | 8 파일 모두 `dab919a84` 판과 byte 동일 · `353c11d04..dab919a84` 에서 이 파일을 건드린 커밋은 #266 하나 |
+| 제외 | `87ebdb074` 포함 0 (`work-agent-runtime.ts` diff 0) — **Automation Discovery 는 계속 미배포** |
+| main merge SHA | `dab919a84` (main 에는 그대로 존재 · 배포 SHA 와 다르다) |
+| CI | CI Pipeline run `36968598909` success (full · Jest 3/3 · Code Quality · admin build · web build) · CodeQL `36968601877` success · `ci-gate.mjs` GREEN. SonarCloud 는 dispatch 대상이 아니라 미실행(PR #266 에서 pass) |
+| tag | annotated `deploy/2026-10-02-demo-terms-enforced-pending-api` → `fd3a7c8b5` |
+| 배포 | Deploy API Server run `36969275459` (dispatch · tag ref · `rollout_mode=verified`) success |
+| freeze 창 | `DEPLOY_FREEZE=false` 05:30:53Z → `true` 05:31:48Z (**55초** · build-and-deploy in_progress 확인 직후 복구). 창 안 다른 run 0 · 직전 main CI 진행 0 |
+| 서빙 | image `api-server:fd3a7c8b5…` · revision `o4o-core-api-03789-gic` traffic **100%** 단일 · `/health` 200 · `/health/ready` 200 |
+
+### runtime smoke
+
+```text
+API (curl · api.neture.co.kr)
+  Store/Supplier Demo  login 200 pending=0 · /auth/me 200 pending=0 · logout → 401 → 재로그인 200 pending=0   PASS
+  POST /auth/password  두 계정 403 DEMO_ACCOUNT_FORBIDDEN (이전 428 → 이제 Demo guard 도달)                  PASS
+                       probe 는 틀린 currentPassword 로 보냈다 — guard 가 없었어도 write 불가
+  GET /auth/policy-acceptances  raw pending 유지 (Store 2 · Supplier 1) — 정책 상태 불변                       PASS (설계대로)
+  428 응답            모든 호출에서 0                                                                         PASS
+  Supplier API        /neture/supplier/profile 200 (supplier 8e33fdd8 o4o-supplier-demo ACTIVE) · dashboard/summary ·
+                      products(0) · orders/summary · orders/kpi(전부 0) · onboarding 200                     PASS
+  운영 주문 비노출     supplier orders 0 · /cosmetics/orders 0 · pharmacy-hub orders 403                       PASS
+  Store 콘텐츠/playlist  /kpa/store-contents 403 NO_ORG · /kpa/store-playlists 200 [] (0)                      FAIL (기대 15 · 5)
+
+Browser (headless Chromium · 실제 로그인 UI)
+  neture.co.kr        Store Demo 이메일 로그인 → O4O 홈 렌더 · 약관 화면 0 · 428 0                              PASS
+                      단 '매장' 카드 = "이용 중인 항목이 없습니다"
+  neture.co.kr        Supplier Demo 로그인 → /supplier/dashboard = "접근 권한이 없습니다"                        FAIL
+  store.neture.co.kr  로그인 화면이 Google 전용 — Demo(Google 연결 금지)는 UI 로 진입 경로 없음                 NOT EXERCISED
+```
+
+### STOP 사유 — Demo role_assignments 0
+
+약관 게이트는 해소됐다. 남은 차단은 **역할**이다. Phase B 는 승인된 계획대로 `role_assignments` 를 만들지 않았고
+(§2-8 · 금지 목록), 매장 콘텐츠 경로(`isStoreOwner(…, 'kpa')` → role_assignments · `kpa_members` fallback)와
+공급자 화면 RoleGuard 는 role 을 요구한다. 그래서 데이터는 있지만 보이지 않는다.
+
+```text
+read-only 재조회   kpa_store_contents(9c87f46b) 15 · store_playlists(9c87f46b) 5 — 데이터 그대로
+                  Demo role_assignments 0 · 전체 27(불변) · checkout_orders 23(불변)
+                  Demo user_policy_acceptances 0 · credential updated_at = 생성 시각(03:02Z) 그대로
+```
+
+해소하려면 role write(현재 금지 목록) 또는 접근 판정 코드 변경 중 하나가 필요하다 — 둘 다 이번 승인 범위 밖이다.
+**추가 수정 · write 없이 STOP · 사용자 결정 대기.** Phase F(로그인 화면 Demo 버튼)도 아직 없다 — 이메일 로그인
+UI 는 neture.co.kr 에만 있다.
+
 ---
 
 ## 3. 운영 write 승인 대기 목록

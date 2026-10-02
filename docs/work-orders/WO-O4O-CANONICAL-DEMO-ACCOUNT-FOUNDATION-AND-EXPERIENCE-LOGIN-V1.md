@@ -1,6 +1,6 @@
 # WO-O4O-CANONICAL-DEMO-ACCOUNT-FOUNDATION-AND-EXPERIENCE-LOGIN-V1
 
-> 발행: 2026-10-01 · 상태: **Phase A · C 완료 · 운영 배포(353c11d04) · B 계정 생성(write 14, 2026-10-02) — 약관 게이트 428 로 smoke STOP · 사용자 결정 대기**
+> 발행: 2026-10-01 · 상태: **Phase A · C 완료 · B 계정 생성(write 14) · 약관 Demo 예외 격리 배포(fd3a7c8b5 ≠ main dab919a84, 2026-10-02) — 약관 해소 · Demo role 0 으로 매장 콘텐츠 · 공급자 화면 접근 불가 → smoke STOP · 사용자 결정 대기**
 > 정책 정본: [`O4O-CANONICAL-DEMO-ACCOUNTS-V1`](../baseline/O4O-CANONICAL-DEMO-ACCOUNTS-V1.md)
 > 진행 기록: `docs/checks/CHECK-O4O-CANONICAL-DEMO-ACCOUNT-FOUNDATION-AND-EXPERIENCE-LOGIN-V1.md`
 >
