@@ -8,6 +8,12 @@
 
 ---
 
+## 세션 시작 규칙
+- 세션 시작 시 HANDOFF.md가 있으면 먼저 읽을 것
+- 진행 상황은 CLAUDE.md가 아니라 HANDOFF.md에 기록할 것
+
+---
+
 ## Source of Truth
 
 시작 전 확인하는 정본:

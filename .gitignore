@@ -140,7 +140,8 @@ storybook-static
 # IDE-specific files
 .idea/
 .vscode/
-.claude/
+.claude/*
+!.claude/commands/
 
 # Codex per-machine local configuration
 .codex/
