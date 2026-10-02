@@ -544,7 +544,7 @@ UI 는 neture.co.kr 에만 있다.
 
 ---
 
-## 2-11. Demo 최소 service-scoped role 부여 + runtime smoke (2026-10-02 · write 2 · **STOP: playlist 기대값 불일치**)
+## 2-11. Demo 최소 service-scoped role 부여 + runtime smoke (2026-10-02 · write 2 · **FOUNDATION PASS** — playlist 기대값 정정)
 
 사용자 결정: 접근 판정 코드를 Demo 전용으로 우회하지 않고, **Demo 2 계정에 필요한 최소 service role 만 정상 부여**한다.
 Demo 여부 = `demo_accounts` · 화면 접근 = `role_assignments` · 데이터 범위 = organization ownership.
@@ -582,13 +582,35 @@ read-only Demo role 2 (global · active) · role_assignments 27 → 29 · Demo p
 |---|---|
 | Store login · `/auth/me` | **PASS** — 200 · roles `["kpa:store_owner"]` · pending 0 |
 | `GET /kpa/store-contents` | **PASS** — 200 · 15건 · id 집합이 `kpa_store_contents(9c87f46b)` 15건과 완전 일치(타 매장 0) |
-| `GET /kpa/store-playlists` | **FAIL(기대값 불일치)** — 200 · **0건**. 원인: 9c87f46b 의 5건이 전부 `is_active=false`(draft), 목록 쿼리는 `is_active = true` 만 반환 — 코드 동작은 정상, §2-10 의 "5" 는 비활성 포함 raw 수였다 |
+| `GET /kpa/store-playlists` | **PASS(재분류)** — 200 · 활성 0건. 최초 판정 FAIL(기대 5) → 원인: 9c87f46b 의 5건이 전부 `is_active=false`(draft), 목록 쿼리는 `is_active = true` 만 반환 — 코드 동작은 정상, §2-10 의 "5" 는 비활성 포함 raw 수였다 |
 | Supplier `/supplier/dashboard` | **PASS** — 실 LoginModal 로그인 후 진입 · AccessDenied 없음 · 약관 게이트 없음 · 428 0 · API 4xx/5xx 0 |
 | Supplier 데이터 범위 | **PASS** — profile `8e33fdd8` / `o4o-supplier-demo` / ACTIVE · orders kpi total 0 · orders 0 · settlements 0 · event-offers 0 · copilot 0 → 운영 주문 22 비노출 |
 | store.neture.co.kr | NOT EXERCISED — Google 전용 로그인(후속 "email/password login adoption") |
 
-**STOP.** playlist 가 기대 5 와 다르다. 5건을 보이게 하려면 `store_playlists.is_active` UPDATE(데이터 write,
-승인 범위 밖) 또는 Demo 용 신규 playlist 생성이 필요하다 — 추가 수정 없이 사용자 판단 대기.
+최초 판정은 STOP(기대 5 ≠ 0)이었다. 사용자 판정 확정(2026-10-02):
+
+```text
+/kpa/store-playlists 200 / 0건 → PASS 재분류
+  이유     테스트 약국 playlist DB 전체 5 · active 0 — API 는 active 만 반환, 현재 동작이 정본과 일치
+  기대값   "5건 visibility" → "active playlist 0건, API 정상" 으로 정정
+금지       기존 5건 활성화 · 삭제 · 이번 WO 안의 Demo playlist 신규 생성 (테스트 숫자에 데이터를 맞추지 않는다)
+보존       비활성 5건은 그대로 — Demo Sample Data / Experience Content 단계의 후보로만 기록
+```
+
+**Foundation closure 판정**
+
+```text
+CANONICAL_DEMO_ACCOUNT_FOUNDATION = PASS
+DEMO_STORE_ACCESS                 = PASS   (kpa:store_owner · store-contents 15 · 범위 일치)
+DEMO_SUPPLIER_ACCESS              = PASS   (neture:supplier · /supplier/dashboard)
+DEMO_DATA_ISOLATION               = PASS   (공급자 orders 0 · 운영 주문 22 비노출 · 타 매장 콘텐츠 0)
+```
+
+구조: Demo 도 정상 권한 모델(service role + ownership)을 쓰고, Demo 여부(`demo_accounts`)는 보호 · 약관 예외에만 쓴다.
+route guard 우회 0.
+
+후속(별도 WO): ① Demo 로그인 버튼 / 체험 UX(Phase F) ② store.neture.co.kr email/password login adoption
+③ 필요 시 Demo sample playlist · content 보강(신규 생성, 비활성 5건 재활성화 아님).
 
 ---
 
