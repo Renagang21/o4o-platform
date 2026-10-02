@@ -353,6 +353,54 @@ Sonar      신규 코드 중복 8.3% (기준 ≤3%) — 10개 suite 의 "Demo �
 
 1·2 는 정책 §8 목록("권한 변경 · 사업자 변경")의 경계 판단이 필요하다 — 별도 WO 제안.
 
+## 2-7. 통제 API 배포 + 배포 코드 dry-run (2026-10-02 · 운영 DB write 0)
+
+### 배포
+
+```text
+tag          deploy/2026-10-02-demo-account-write-guards-api (annotated) → 353c11d04 (PR #265 merge)
+run          Deploy API Server 36955274975 · rollout_mode=verified · 전 job success
+             Detect scope ✓ · CI gate(대상 SHA green) ✓ · build-and-deploy ✓
+DEPLOY_FREEZE  false 02:21:49Z(dispatch 직전) → true 02:22:54Z(build-and-deploy in_progress 확인 즉시) · 약 65초
+             해제 창 동안 시작된 다른 deploy/Delivery run 0
+             이후 Delivery(da1cbcfe1 · 36955643445)는 freeze 상태로 API/Web/Admin 전부 skipped
+포함 범위     5f12c4acd..353c11d04 — API runtime 변경은 이 WO 의 것뿐(main tip ecee107da 이후 커밋 미포함)
+```
+
+### 배포 후 확인
+
+| 항목 | 결과 |
+|---|---|
+| serving image | `api-server:353c11d04e3e…` |
+| revision · traffic | `o4o-core-api-03786-lec` 100% 단일 (이전 `03783-jex` · 5f12c4acd) |
+| `/health` · `/health/ready` (LB) | 200 `alive` · 200 `ready` |
+| guard 코드 | image = 소스 SHA 353c11d04 — `rejectDemoAccountTarget(` · `isDemoAccount(` 호출 파일 14(테스트 제외) |
+| `demo_accounts` schema | 컬럼 6 · index 3 · constraint 4 — 배포 전과 동일 · 최신 migration `CreateDemoAccounts1790940000000` |
+| Demo rows | 0 |
+
+Demo 계정이 아직 없으므로 guard 의 **운영 응답**(403)은 확인할 수 없다 — 코드 포함 여부만 확인했다.
+
+### 배포 코드 기준 provision dry-run (`--apply` 미실행)
+
+```text
+mode: DRY-RUN (measure only)
+STORE_OWNER  user=CREATE password=CREATE(plan) registry=CREATE(plan) org=reuse(테스트 약국)
+             owner=CREATE(plan) supplier=- memberships=[kpa-society neture]
+SUPPLIER     user=CREATE password=CREATE(plan) registry=CREATE(plan) org=CREATE
+             owner=CREATE(plan) supplier=CREATE(plan) memberships=[supplier neture]
+TOTAL writes=0
+```
+
+| 기대 | 결과 |
+|---|---|
+| user 2 · credential 2 · registry 2 CREATE | 일치 |
+| Store org `9c87f46b` 재사용 · Supplier org `O4O 공급자 Demo` 신규 | 일치 (`9c87f46b` 1행 존재 · `O4O 공급자 Demo` 0행) |
+| role_assignments 0 · linked_accounts 0 · checkout_orders 0 · platform:* 0 | 일치 — 스크립트 INSERT 대상은 users · demo_accounts · organizations · organization_members · neture_suppliers · service_memberships(+ credential service) 뿐 |
+| 계획 write | 2-5 의 계획과 동일 |
+
+운영 행수(read-only · `BEGIN READ ONLY`): `demo_accounts 0 · users 3 · user_password_credentials 0 ·
+organizations 25 · checkout_orders 23` — 2-5 기록과 동일. Demo 이메일 users 0.
+
 ---
 
 ## 3. 운영 write 승인 대기 목록
@@ -378,9 +426,8 @@ Phase A(census) · 식별 구조(`demo_accounts` 적용) · **C(서버 보호 ·
 남은 것:
 
 ```text
-C' 잔여 3건         이메일 · role · ownership guard 구현(2-6) — 병합 후 통제 배포 승인됨
-B  계정 생성        --apply 는 배포 검증 후 별도 승인 (dry-run 계획은 2-5 에 기록)
-   배포             guard 완료 후 1회 통제 배포 — DEPLOY_FREEZE=true 유지(dispatch 직전 최소 시간만 해제)
+C' 잔여 3건         이메일 · role · ownership guard 구현(2-6) — 운영 배포 완료(2-7 · 03786-lec)
+B  계정 생성        --apply 는 별도 승인 대기 (배포 코드 dry-run 계획은 2-7 에 기록)
 D  relink           B 검증 후
 F  체험 로그인 UI
 G  위험 기능 census
