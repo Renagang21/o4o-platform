@@ -2,8 +2,8 @@
 
 > **WO**: WO-O4O-CICD-UNIFIED-DELIVERY-PIPELINE-V1
 > **선행**: [CHECK-O4O-CICD-PUSH-TO-PRODUCTION-FLOW-REDESIGN-AUDIT-V1](../investigations/CHECK-O4O-CICD-PUSH-TO-PRODUCTION-FLOW-REDESIGN-AUDIT-V1.md)
-> **구현 commit**: `066dde821` · `b70f9ac0b`(commit status 재시도) (2026-10-01)
-> **상태**: P0 · P1 · P2 · P4 구현 + 실측 · **P3 cutover = NOT_EXECUTED (§17 STOP — 사용자 승인 대기)**
+> **구현 commit**: `066dde821` · `b70f9ac0b`(commit status 재시도) (2026-10-01) · **P3 cutover `ecee107da`** (2026-10-02)
+> **상태**: P0 · P1 · P2 · P4 구현 + 실측 · **P3 cutover = DONE (§21 — freeze 상태 실측 PASS · STOP)**
 
 ---
 
@@ -25,9 +25,9 @@
 | DEPLOY_FREEZE | **PASS** | 모든 진입점 fail-closed 유지 · 이 WO 는 값을 바꾸지 않음(현재 `true`) |
 | CI_PRODUCTION_BUILD_COVERAGE | **PARTIAL** | §13 — vite production build 은 CI 에서 검증(9개 205초 · 병렬) · Docker 이미지 빌드는 배포 시점 |
 | LEVEL3_FALSE_NEGATIVE | **0** | §15 — 300 commit × (단일 · 10-commit 누적) |
-| DEPLOY_AUTO_RETIRED | **NO** | cutover 미실행 — §17 |
+| DEPLOY_AUTO_RETIRED | **YES** | §21 — `ecee107da` workflow_run 제거 · job `if: false` · 권한 read |
 | PRODUCTION_CHANGE | **0** | DEPLOY_FREEZE=true · Delivery SHADOW · 배선 검증은 dry_run |
-| UNIFIED_DELIVERY_CUTOVER | **NOT_EXECUTED** | §17 승인 대기 |
+| UNIFIED_DELIVERY_CUTOVER | **DONE** | §21 — `DELIVERY_ENFORCE: 'true'` · 같은 commit |
 
 ---
 
@@ -281,6 +281,65 @@ API 를 배포할 때: 의존 프런트 = API 성공 뒤(needs) · 독립 프런
 2. WO-O4O-CICD-LEVEL3-RULE-PRECISION-REVIEW-V1 — 현재 누적 L3(#257 auth-client → 7개 프런트 · #262 migration → API) 해소는 promote 1회로 가능하지만, 재발 빈도는 규칙 정밀도 문제.
 3. WO-O4O-CICD-ARTIFACT-PROMOTION-V1 — P4 job 의 vite 산출물 / 이미지 digest 승격.
 4. 범위 밖 발견: 로컬 `apps/main-site/{dist,node_modules}` 잔여(이 PC) — junction 확인 후 정리 필요(사용자 판단).
+
+## 21. P3 cutover 실행 (2026-10-02 · 사용자 승인)
+
+승인 범위: `DELIVERY_ENFORCE=true` + deploy-auto 자동 경로 은퇴. **미승인**: DEPLOY_FREEZE=false · LEVEL_3 promote · migration · DB write · traffic 변경 · 실제 Unified Delivery 배포.
+
+### 21-1. 변경 (`ecee107da`, 한 commit)
+
+| 파일 | 변경 |
+|---|---|
+| `delivery.yml` | `DELIVERY_ENFORCE: 'false'` → `'true'` (header 주석 갱신) |
+| `deploy-auto.yml` | `workflow_run` trigger 제거 · job `if: false`(수동 dispatch 로도 실행 0) · 권한 `contents: write · actions: write · statuses: write` → `contents: read` |
+| 계약 테스트 | deploy-auto 은퇴 고정 · "main CI 전수 반응 · paths 필터 0" 보장을 delivery.yml 로 이전 — `scripts/ci/__tests__` **281 / 281** |
+| README 2곳 | 자동 경로 = delivery · promote / deploy-auto 은퇴 |
+
+reusable deploy workflow 3종 · `deploy-orchestrate.mjs` · `deploy-risk.mjs` 변경 **0**. 이 commit 의 파일은 전부 CONTROL_ONLY / 문서 / 테스트 → LEVEL_1.
+
+### 21-2. 실측 (DEPLOY_FREEZE=true 상태)
+
+| # | 확인 | 결과 |
+|---|---|---|
+| 1 | Delivery 자동 생성 | ✅ CI Pipeline `36953632831` success → **Delivery `36955042013`** (workflow_run) success |
+| 2 | run 이름 = 실제 TARGET_SHA | ✅ `Delivery ecee107da32545c96459f99c29ebeaef54962018` |
+| 3 | target == cutover commit | ✅ `target==main HEAD: true (main HEAD ecee107da · workflow ecee107da · ref refs/heads/main)` |
+| 4 | deploy-auto 자동 run 없음 | ✅ 마지막 Deploy Auto run = `36946668664`(3e6f7b7ad, cutover 전). 이후 0 |
+| 5 | Delivery 판정 정상 | ✅ enforcement 분기(`--dry-run false --status-context production`) · Classify success |
+| 6 | freeze 로 deploy 미실행 | ✅ API · Web · Web(after API) · Admin · Report job 전부 skipped · 11 서비스 `BLOCKED_DEPLOY_FREEZE` |
+| 7 | commit status `production` | ✅ `pending · BLOCKED_FREEZE` → run 36955042013 (POST 소켓 오류 1회 → 재시도 성공 — `b70f9ac0b` 재시도가 실제로 동작) |
+| 8 | `deploy/auto-*` 태그 | ✅ 0 |
+| 9 | Delivery 발 workflow_dispatch | ✅ 0 (Delivery 는 workflow_call 만) |
+| 10 | Delivery 발 Production traffic 변경 | ✅ 0 |
+
+추가 관찰: `353c11d04`(다른 세션 · cutover 직전 push)의 CI 는 cutover **뒤**에 끝나 새 경로로 처리됐다 — Delivery `36954120297`, `target==main HEAD: false` → 배포 0, status `BLOCKED_FREEZE`(freeze 가 SUPERSEDED 보다 먼저 판정된다). deploy-auto 는 반응하지 않았다 → 전환 순간 중복 자동 경로 0 확인.
+
+### 21-3. 서비스별 판정 (freeze 아래에 가려진 실제 원인 — 판정 JSON artifact)
+
+| service | serving | LEVEL | 원인 (원인 commit) |
+|---|---|---|---|
+| api | `5f12c4acd` | L3 | db-migration `CreateDemoAccounts` · manifest (#262 `69233c347` · `01214353e`) · auth-backend · rbac (Demo 계정 `01214353e` · `353c11d04` · `b776b616a`) · deploy-config `deploy-api.yml` `inputs.*` (이 WO `066dde821`) · fallback `.gitignore` (`e242fc800`) |
+| admin · kpa-branch | `f838fd036` | L3 | auth-package `packages/auth-client` · `auth-react` · secret-handling `auth-utils/emailCredential.ts` (#257 `138657460`) · admin 은 `.gitignore` fallback 도 |
+| k-cosmetics · pharmacy-hub · lecture · signage-player | `2edfe9b33` | L3 | #257 auth-package (signage-player 는 rollout_pending — 아래) |
+| kpa-society · store · hospital-pharmacy | `e2e1be6cc` | L3 | #257 auth-package · hospital-pharmacy 는 rollout_pending |
+| neture | `eab0474f0` | L3 | rollout_pending — `deploy-web-services.yml` rollout 방식 변경 뒤 첫 배포 (`066dde821`) |
+
+API 의존: 10 프런트 모두 **의존** — `e242fc800`(`.gitignore` 변경)이 API 와 같은 commit 으로 잡힌다(전역 fallback → 보수 판정). 구조 오류 아님 · L3 정밀화 후보.
+
+### 21-4. ⚠️ cutover 직후 관찰된 외부 변경 (이 WO 가 한 것이 아님)
+
+- `DEPLOY_FREEZE` = **`false`** (갱신 2026-10-02T02:21:47Z) — Delivery 실측(02:18~02:20Z, freeze=true) **이후**.
+- 2초 뒤 `deploy-api.yml` **수동 workflow_dispatch** run `36955274975` — ref `deploy/2026-10-02-demo-account-write-guards-api`(= `353c11d04`) · freeze-notice skipped · CI gate success · `build-and-deploy` in_progress(확인 시점). Demo 계정 WO 의 통제 배포(break-glass 태그 경로)로 보인다.
+- 이후 `DEPLOY_FREEZE` = **`true`** 로 복원 (2026-10-02T02:22:53Z) — false 구간 약 1분. 이 구간에 Delivery run 0 (자동 경로가 배포한 것 없음). 수동 run 은 freeze 검사를 이미 통과해 계속 진행.
+- 이 WO 는 변수 · 해당 run 에 손대지 않았다. freeze=false 와 ENFORCE=true 가 겹치면 다음 main commit 의 Delivery 가 실제 enforcement 판정을 한다는 점만 기록한다.
+
+### 21-5. 이 WO 의 Production 변경
+
+Production deploy **0** · traffic 변경 **0** · DB write **0** · DEPLOY_FREEZE 변경 **0** · promote **0**.
+
+### 21-6. rollback
+
+`ecee107da` revert (workflow_run 복원 + `DELIVERY_ENFORCE: 'false'`, 한 commit). runtime 과 별개.
 
 ## 20. 문서 정합
 
