@@ -30,6 +30,8 @@ import {
   type PendingPolicyAcceptance,
   type PublishedTermsDocument,
 } from '../../common/auth/terms-acceptance.policy.js';
+import { demoAccountService } from '../../services/auth/demo-account.service.js';
+import logger from '../../utils/logger.js';
 
 type Queryable = Pick<DataSource, 'query'> | Pick<EntityManager, 'query'>;
 
@@ -194,7 +196,10 @@ export class PolicyAcceptanceService {
       }));
   }
 
-  /** 사용자의 pending 목록 (WO §15 · §16). published terms 0 → 즉시 [] (테이블 미조회). */
+  /**
+   * **raw pending** — 약관 데이터 기준 미승낙 목록 (WO §15 · §16). published terms 0 → 즉시 [] (테이블 미조회).
+   * 서비스 접근 강제에는 이것이 아니라 `getEnforcedPendingForUser` 를 쓴다 (Demo 예외 반영).
+   */
   async getPendingForUser(userId: string): Promise<PendingPolicyAcceptance[]> {
     if (!userId) return [];
     const published = await this.listPublishedTerms();
@@ -229,6 +234,32 @@ export class PolicyAcceptanceService {
 
     const pending = computePendingPolicyAcceptances(relevant, published, acceptedIds);
     if (pending.length === 0) this.userOkCache.set(userId, Date.now());
+    return pending;
+  }
+
+  /**
+   * **enforced pending** — 서비스 접근을 실제로 막는 약관 목록 (requireAuth 게이트 · 로그인 응답 · /auth/me).
+   *
+   * WO-O4O-CANONICAL-DEMO-ACCOUNT-FOUNDATION-AND-EXPERIENCE-LOGIN-V1 · 정본 `O4O-CANONICAL-DEMO-ACCOUNTS-V1` §8-2
+   *
+   *   raw pending      = `getPendingForUser` — 약관 데이터 기준 미승낙 (정책 상태 그대로)
+   *   enforced pending = raw pending 에서 Demo 예외만 뺀 것. 일반 사용자는 둘이 같다.
+   *
+   * 활성 Demo 계정(`demo_accounts.user_id`)은 실제 개인·계약 주체가 아닌 공유 체험 계정이라 약관 동의
+   * 강제 대상이 아니다. acceptance 를 만들거나 raw 상태를 바꾸지 않는다 — 여기서만 []로 본다.
+   * raw pending 이 없으면 Demo 조회도 하지 않는다. Demo 조회가 실패하면 예외를 열지 않고 raw 를 돌려준다.
+   */
+  async getEnforcedPendingForUser(userId: string): Promise<PendingPolicyAcceptance[]> {
+    const pending = await this.getPendingForUser(userId);
+    if (pending.length === 0) return pending;
+    try {
+      if (await demoAccountService.isDemoAccount(userId, this.db())) return [];
+    } catch (error) {
+      logger.warn('[termsAcceptance] demo registry check failed — exemption not applied', {
+        userId,
+        error: error instanceof Error ? error.message : String(error),
+      });
+    }
     return pending;
   }
 
