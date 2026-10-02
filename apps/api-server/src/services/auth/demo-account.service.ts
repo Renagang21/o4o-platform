@@ -133,3 +133,13 @@ class DemoAccountService {
 }
 
 export const demoAccountService = new DemoAccountService();
+
+/**
+ * controller 용: 대상이 활성 Demo 계정이면 403 을 쓰고 true — write **전에** 부른다.
+ * 조회 실패는 그대로 올린다(fail-closed · 호출부 catch 가 500).
+ */
+export async function rejectDemoAccountTarget(res: JsonResponse, userId: string | null | undefined): Promise<boolean> {
+  if (!(await demoAccountService.isDemoAccount(userId))) return false;
+  respondDemoAccountForbidden(res);
+  return true;
+}

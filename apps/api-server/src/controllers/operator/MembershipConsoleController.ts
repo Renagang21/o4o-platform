@@ -37,7 +37,7 @@ import { invalidateRoles } from '../../modules/auth/utils/role-cache.js';
 import {
   demoAccountService,
   DEMO_ACCOUNT_FORBIDDEN_CODE,
-  respondDemoAccountForbidden,
+  rejectDemoAccountTarget,
   sendDemoAccountForbidden,
 } from '../../services/auth/demo-account.service.js';
 
@@ -609,10 +609,7 @@ export class MembershipConsoleController {
       }
 
       // Demo 계정 보호(정책 §8 role 변경 · ownership 해제): write **전에** 막는다.
-      if (await demoAccountService.isDemoAccount(userId)) {
-        respondDemoAccountForbidden(res);
-        return;
-      }
+      if (await rejectDemoAccountTarget(res, userId)) return;
 
       if (status === 'approved' || status === 'active') {
         // Delegate to MembershipApprovalService for atomic 3-table consistency
@@ -960,10 +957,7 @@ export class MembershipConsoleController {
       }
 
       // Demo 계정 보호(정책 §8 role 변경 · ownership 해제): write **전에** 막는다.
-      if (await demoAccountService.isDemoAccount(userId)) {
-        respondDemoAccountForbidden(res);
-        return;
-      }
+      if (await rejectDemoAccountTarget(res, userId)) return;
 
       const result = await approvalService.reactivateMembership({
         userId,
@@ -1051,10 +1045,7 @@ export class MembershipConsoleController {
           return;
         }
         // Demo 계정 보호(정책 §8 role 변경): 회원 유형 변경도 write **전에** 막는다.
-        if (await demoAccountService.isDemoAccount(userId)) {
-          respondDemoAccountForbidden(res);
-          return;
-        }
+        if (await rejectDemoAccountTarget(res, userId)) return;
         // Platform admin은 scope.serviceKeys가 빈 배열 → 프론트에서 전달한 키 사용
         const serviceKey = req.body.membershipServiceKey || scope.serviceKeys[0];
         if (serviceKey) {
@@ -1289,10 +1280,7 @@ export class MembershipConsoleController {
       }
 
       // Demo 계정 보호(정책 §8 role 변경 · ownership 해제): write **전에** 막는다.
-      if (await demoAccountService.isDemoAccount(userId)) {
-        respondDemoAccountForbidden(res);
-        return;
-      }
+      if (await rejectDemoAccountTarget(res, userId)) return;
 
       const deleted = await approvalService.deleteMember({
         userId,
@@ -1341,10 +1329,7 @@ export class MembershipConsoleController {
       }
 
       // Demo 계정 보호(정책 §8 role 변경 · ownership 해제): write **전에** 막는다.
-      if (await demoAccountService.isDemoAccount(userId)) {
-        respondDemoAccountForbidden(res);
-        return;
-      }
+      if (await rejectDemoAccountTarget(res, userId)) return;
 
       // DB-based role validation (WO-O4O-ROLE-SYSTEM-DB-DESIGN-V1)
       // WO-NETURE-ROLE-NORMALIZATION-V1: cross-service collision 해결
@@ -1479,10 +1464,7 @@ export class MembershipConsoleController {
       }
 
       // Demo 계정 보호(정책 §8 role 변경 · ownership 해제): write **전에** 막는다.
-      if (await demoAccountService.isDemoAccount(userId)) {
-        respondDemoAccountForbidden(res);
-        return;
-      }
+      if (await rejectDemoAccountTarget(res, userId)) return;
 
       // DB-based role validation (WO-O4O-ROLE-SYSTEM-DB-DESIGN-V1)
       // WO-NETURE-ROLE-NORMALIZATION-V1: cross-service collision 해결

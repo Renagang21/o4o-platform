@@ -295,6 +295,7 @@ DEPLOY_FREEZE = true (잠김 · 사용자 결정)
 | | 분회 `branch-operator-designation.service` designate/release · `branch-lifecycle.service` approveCreation | 403 (`BranchOperatorDesignationError` / `BranchLifecycleError` statusCode) |
 | | Neture `operator-registration.service` approve/reject | 403 |
 | | Cosmetics `cosmetics-store.service` 신청 심사(approve/reject 공통) | 403 |
+| | 커뮤니티 `community-operator-designation.service` setRole · `community-lifecycle.service` approveCreation (PR #265 Codex P2 반영) | 403 |
 | ownership 해제 · 변경 | `MembershipApprovalService` withdraw · deleteMember | 403 |
 | | `store-owner-termination.service` createCase/terminateCase/purgeCase | 403 |
 | | Neture `supplier.service` approve/reject/deactivate/reactivate — `user_id` **또는** owner 조직(`isDemoOrganization`) | result `DEMO_ACCOUNT_FORBIDDEN` → controller 403 |
@@ -329,6 +330,18 @@ M2 조회 오류를 false 로 삼킴(try/catch)            → W3 5건 + 계약 
 ```
 
 두 변이 모두 원복 후 전체 PASS.
+
+### PR #265 리뷰 반영
+
+```text
+Codex P2   커뮤니티 개체 role 경로 누락 — setRole · approveCreation 에 guard 추가
+           community 테스트에 Demo 거절 · fail-closed 4건 추가 · D5 에 2행 추가
+           변이(M1) → community Demo 거절 3건 실패 확인 후 원복
+Sonar      신규 코드 중복 8.3% (기준 ≤3%) — 10개 suite 의 "Demo 아님" 고정 블록을
+           `src/__tests__/support/not-demo-account.ts` 하나로 모음 ·
+           MembershipConsoleController 의 5줄 guard 6곳을 `rejectDemoAccountTarget(res, userId)` 한 줄로
+재실행      tsc --noEmit PASS · 관련 99 suites / 1534 tests PASS
+```
 
 ### 범위 밖 발견 (보고만 · 수정 0)
 

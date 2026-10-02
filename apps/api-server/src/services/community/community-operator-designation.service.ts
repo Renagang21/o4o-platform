@@ -14,6 +14,11 @@
  *     같은 커뮤니티의 운영자 행을 `FOR UPDATE` 로 잠그고 판정·UPDATE 를 한 트랜잭션에서 한다.
  */
 import { COMMUNITY_SERVICE_KEY } from './community-lifecycle.service.js';
+import {
+  demoAccountService,
+  DEMO_ACCOUNT_FORBIDDEN_CODE,
+  DEMO_ACCOUNT_FORBIDDEN_MESSAGE,
+} from '../auth/demo-account.service.js';
 
 export type CommunityMemberRole = 'operator' | 'member';
 
@@ -140,6 +145,11 @@ export class CommunityOperatorDesignationService {
         );
       }
       if (target.role === input.role) return { membershipId: target.id, role: input.role, changed: false };
+      // Demo 계정의 개체 role 은 바꾸지 않는다 — UPDATE 전에 거절
+      // (WO-O4O-CANONICAL-DEMO-ACCOUNT-FOUNDATION-AND-EXPERIENCE-LOGIN-V1 · 판정 정본 demo_accounts.user_id).
+      if (await demoAccountService.isDemoAccount(target.user_id, m)) {
+        throw new CommunityOperatorDesignationError(403, DEMO_ACCOUNT_FORBIDDEN_CODE, DEMO_ACCOUNT_FORBIDDEN_MESSAGE);
+      }
 
       if (input.role === 'operator') {
         const sm = await m.query(
