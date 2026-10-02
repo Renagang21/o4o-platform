@@ -11,9 +11,9 @@ name: Delivery
 #
 #   promote.yml(LEVEL_3 · 첫 rollout 승인)이 같은 workflow 를 mode=promote 로 호출한다 — 판정 · 배포 · 검증 경로 하나.
 #
-#   ⚠️ 전환 상태: DELIVERY_ENFORCE='false' = SHADOW. 자동 경로의 권한은 아직 deploy-auto.yml 에 있다(중복 배포 방지).
-#      shadow 에서는 판정 · Job Summary · 판정 JSON 만 남기고 배포 job 은 돌지 않으며 commit status 도 쓰지 않는다.
-#      cutover = 이 값을 'true' 로 + deploy-auto.yml 비활성 — **같은 commit 에서** (CHECK-O4O-CICD-UNIFIED-DELIVERY-PIPELINE-V1).
+#   전환 상태: DELIVERY_ENFORCE='true' = **자동 경로의 유일한 권한** (P3 cutover 2026-10-02 · deploy-auto.yml 은 같은 commit 에서 은퇴).
+#      'false'(SHADOW)면 판정 · Job Summary · 판정 JSON 만 남기고 배포 job 0 · commit status 0 — rollback 은 이 값 + deploy-auto 복원을 같은 commit 으로.
+#      DEPLOY_FREEZE 는 별도 비상 정지로 그대로 fail-closed (CHECK-O4O-CICD-UNIFIED-DELIVERY-PIPELINE-V1).
 #   근거: docs/investigations/CHECK-O4O-CICD-PUSH-TO-PRODUCTION-FLOW-REDESIGN-AUDIT-V1.md
 
 run-name: Delivery ${{ github.event.workflow_run.head_sha || inputs.target_sha }}
@@ -64,8 +64,8 @@ permissions:
   id-token: write   # reusable deploy job 이 요구 (현재 GCP 인증은 credentials_json)
 
 env:
-  # SHADOW → cutover 시 'true'. 이 값 하나가 자동 경로의 배포 여부를 정한다 (DEPLOY_FREEZE 는 그대로 별도 비상 정지).
-  DELIVERY_ENFORCE: 'false'
+  # 'true' = enforcement (P3 cutover) · 'false' = SHADOW. 이 값 하나가 자동 경로의 배포 여부를 정한다 (DEPLOY_FREEZE 는 그대로 별도 비상 정지).
+  DELIVERY_ENFORCE: 'true'
   STATUS_CONTEXT: production
 
 jobs:

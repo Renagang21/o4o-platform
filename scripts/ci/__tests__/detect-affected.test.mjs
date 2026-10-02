@@ -790,17 +790,19 @@ test('§11. deploy-api.yml 은 detect → 조건부 build-and-deploy 구조다',
   );
   assert.match(yml, /fetch-depth: 0/, 'push batch 전체를 봐야 한다');
   // §12 — trigger 자체를 좁혀 workflow 가 안 뜨게 만들지 않는다.
-  // WO-O4O-CICD-DEPLOY-FREEZE-CUTOVER-V1: push trigger 은퇴 — 자동 배포 진입점은 deploy-auto.yml 이며
+  // WO-O4O-CICD-DEPLOY-FREEZE-CUTOVER-V1: push trigger 은퇴 — 자동 배포 진입점은 delivery.yml 이며
+  //   (WO-O4O-CICD-UNIFIED-DELIVERY-PIPELINE-V1 P3 cutover 로 deploy-auto.yml 에서 이전)
   //   main CI 완료마다 **경로 필터 없이** 돈다(serving SHA 누적 diff 로 판정). 같은 보장을 그쪽에서 고정한다.
-  assert.doesNotMatch(yml, /^ {2}push:/m, '자동 배포는 deploy-auto 만');
+  assert.doesNotMatch(yml, /^ {2}push:/m, '자동 배포는 delivery 만');
   assertAutoDeployCoversAllMainCommits();
 });
 
-/** cutover 후: deploy-auto 는 main CI 완료 전체에 반응하고 paths 필터가 없다 (silent false-negative 방지) */
+/** cutover 후: 자동 경로(delivery)는 main CI 완료 전체에 반응하고 paths 필터가 없다 (silent false-negative 방지) */
 function assertAutoDeployCoversAllMainCommits() {
-  const auto = workflowYaml('deploy-auto.yml');
+  const auto = workflowYaml('delivery.yml');
   assert.match(auto, /workflow_run:\n\s+workflows: \['CI Pipeline'\]\n\s+types: \[completed\]\n\s+branches: \[main\]/);
-  assert.doesNotMatch(auto, /^\s+paths(-ignore)?:/m, 'deploy-auto 에 paths 필터를 두면 root 입력 변경이 조용히 빠진다');
+  assert.doesNotMatch(auto, /^\s+paths(-ignore)?:/m, 'delivery 에 paths 필터를 두면 root 입력 변경이 조용히 빠진다');
+  assert.doesNotMatch(workflowYaml('deploy-auto.yml'), /^\s+workflow_run:/m, '은퇴한 deploy-auto 가 다시 main CI 에 반응하면 중복 자동 경로');
 }
 
 test('§13 · §15. migration/deploy step 은 build-and-deploy 안에만 있고, 재현 dispatch 는 배포하지 않는다', () => {

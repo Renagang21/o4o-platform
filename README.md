@@ -105,19 +105,22 @@ lint 만 기존 오류 102건을 baseline 으로 둔 **회귀 차단(ratchet)** 
 ## 배포
 
 GCP Cloud Run으로 배포합니다. **일상 배포는 자동**이고, 위험한 변경과 비상 상황에만 사람이 개입합니다
-([CHECK-O4O-CICD-DEPLOY-FREEZE-CUTOVER-V1](docs/checks/CHECK-O4O-CICD-DEPLOY-FREEZE-CUTOVER-V1.md)).
+([CHECK-O4O-CICD-DEPLOY-FREEZE-CUTOVER-V1](docs/checks/CHECK-O4O-CICD-DEPLOY-FREEZE-CUTOVER-V1.md) ·
+자동 경로 Unified Delivery: [CHECK-O4O-CICD-UNIFIED-DELIVERY-PIPELINE-V1](docs/checks/CHECK-O4O-CICD-UNIFIED-DELIVERY-PIPELINE-V1.md)).
 
 ```text
-main push → CI Pipeline → Deploy Auto (deploy-auto.yml) → 서비스별 "서빙 중인 SHA → 이 commit" 판정
+main push → CI Pipeline → Delivery (delivery.yml) → 서비스별 "서빙 중인 SHA → 이 commit" 판정
   LEVEL 1  runtime 무영향 (문서 · CI · 테스트 · 판정 스크립트)         → 배포 없음
   LEVEL 2  일반 runtime 변경                                         → 자동 verified 배포
-  LEVEL 3  migration · 인증 · 권한 · 결제 · 배포 설정 · 판정 불가      → 자동 배포 차단 → 사람이 통제 배포
+  LEVEL 3  migration · 인증 · 권한 · 결제 · 배포 설정 · 판정 불가      → 자동 배포 차단 → promote 1회 (통제 배포)
 비상 · 정비 → 저장소 변수 DEPLOY_FREEZE=true (정상 운영값 false)
 ```
 
 | 워크플로 | 대상 |
 |---|---|
-| `deploy-auto.yml` | 자동 배포 진입점 — 판정 · 결정 기록 · LEVEL 2 dispatch |
+| `delivery.yml` | 자동 배포 진입점 — 판정 → 아래 workflow 를 `workflow_call` 로 호출 → serving SHA 확인 → commit status `production` |
+| `promote.yml` | LEVEL 3 · 첫 rollout 승인 1회 — `gh workflow run promote.yml -f sha=<40자 main HEAD>` |
+| `deploy-auto.yml` | **은퇴**(2026-10-02 P3 cutover) — 종전 태그 + dispatch 자동 경로. 실행되지 않음 |
 | `deploy-api.yml` | `o4o-core-api` (+ 마이그레이션 Job) |
 | `deploy-web-services.yml` | 서비스별 웹 |
 | `deploy-admin.yml` | 관리자 대시보드 |
@@ -125,10 +128,11 @@ main push → CI Pipeline → Deploy Auto (deploy-auto.yml) → 서비스별 "�
 - **DEPLOY_FREEZE**: 배포의 유일한 게이트. 정확히 `'false'`(대소문자 무관)일 때만 배포합니다. 변수 부재 · 공백 ·
   `true` · 오타는 전부 **freeze**(fail-closed) — 새 배포 job 이 시작되지 않고 "frozen" 요약만 남습니다(migration 포함).
   진행 중이던 rollout 은 그 run 안에서 검증 · rollback 까지 마칩니다.
-- **자동 배포(LEVEL 2)**: target 은 CI 가 성공한 정확한 commit 으로 고정됩니다(`deploy/auto-<sha12>` 태그).
+- **자동 배포(LEVEL 2)**: target 은 CI 가 성공한 정확한 commit 으로 고정됩니다(Delivery 가 reusable workflow 에 직접 전달 · 태그 · dispatch 없음).
   API 가 함께 바뀌면 API 를 먼저 배포하고 성공을 확인한 뒤 프런트를 배포합니다. API 가 차단되면 프런트도 보류됩니다.
   main 에 더 새 commit 이 있으면 그 commit 의 cycle 이 누적 변경을 처리합니다.
-- **통제 배포(LEVEL 3 · 배포 방식 변경 뒤 첫 배포)**: 사용자 승인 → `deploy/*` 태그 → 해당 workflow 를 수동 dispatch.
+- **통제 배포(LEVEL 3 · 배포 방식 변경 뒤 첫 배포)**: 사용자 승인 → `promote.yml` 1회 (commit status `production` 에 명령이 적힌다).
+  `deploy/*` 태그 → 해당 workflow 수동 dispatch 는 break-glass 로만 남습니다.
   deploy workflow 들은 더 이상 push 에 반응하지 않습니다.
 - DB 마이그레이션은 API 배포가 실행합니다
   ([PRODUCTION-MIGRATION-STANDARD](docs/baseline/operations/PRODUCTION-MIGRATION-STANDARD.md)).

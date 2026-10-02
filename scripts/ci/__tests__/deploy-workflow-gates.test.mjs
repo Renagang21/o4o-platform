@@ -165,7 +165,7 @@ describe('Unified Delivery — delivery.yml · promote.yml', () => {
     assert.match(wf, /deploy-admin:[\s\S]*?admin_after_api == 'true' && needs\.deploy-api\.result == 'success'/);
   });
 
-  it('cutover 전 SHADOW — DELIVERY_ENFORCE 가 아니면 판정만 (배포 job 실행 0 · commit status 0)', () => {
+  it('DELIVERY_ENFORCE 일 때만 자동 배포 · 아니면 SHADOW 판정만 (배포 job 실행 0 · commit status 0)', () => {
     assert.match(wf, /DELIVERY_ENFORCE: '(true|false)'/);
     assert.match(wf, /\[ "\$EVENT" = "workflow_run" \] && \[ "\$DELIVERY_ENFORCE" = "true" \]; then\n\s+ARGS\+=\(--dry-run false --status-context "\$STATUS_CONTEXT"\)/);
     assert.match(wf, /ARGS\+=\(--shadow --dry-run true\)/);
@@ -201,24 +201,23 @@ describe('§21 · §22 — freeze 안내 · optional env', () => {
   });
 });
 
-describe('deploy-auto — 자동 배포의 유일한 진입점', () => {
+describe('deploy-auto — 은퇴 (Unified Delivery P3 cutover)', () => {
   const wf = read('.github/workflows/deploy-auto.yml');
-  it('main CI Pipeline 완료에 반응하고 오케스트레이터를 실행한다 (shadow workflow 대체)', () => {
-    assert.match(wf, /workflow_run:\n\s+workflows: \['CI Pipeline'\]\n\s+types: \[completed\]\n\s+branches: \[main\]/);
-    assert.match(wf, /node scripts\/ci\/deploy-orchestrate\.mjs "\$\{ARGS\[@\]\}"/);
-    assert.match(wf, /DEPLOY_FREEZE_RAW: \$\{\{ vars\.DEPLOY_FREEZE \}\}/);
+  const delivery = read('.github/workflows/delivery.yml');
+  it('main CI 에 반응하지 않는다 — workflow_run trigger 0 (자동 경로는 delivery.yml 하나)', () => {
+    assert.doesNotMatch(wf, /^\s+workflow_run:/m);
+    assert.match(delivery, /workflow_run:\n\s+workflows: \['CI Pipeline'\]\n\s+types: \[completed\]\n\s+branches: \[main\]/);
     assert.throws(() => read('.github/workflows/cd-risk-gate-shadow.yml'), 'shadow workflow 는 은퇴');
   });
-  it('target SHA 는 CI 가 성공한 commit (workflow_run.head_sha) — github.sha 가 아니다', () => {
-    assert.match(wf, /TARGET_SHA: \$\{\{ github\.event\.workflow_run\.head_sha \|\|/);
-    assert.match(wf, /ref: \$\{\{ env\.TARGET_SHA \}\}/);
+  it('job 은 수동 dispatch 로도 실행되지 않는다 (if: false) · 태그 · dispatch 권한 없음', () => {
+    assert.match(wf, /decide-and-deploy:[\s\S]*?\n\s+if: false\n/);
+    assert.match(wf, /permissions:\n\s+contents: read\n/);
+    assert.doesNotMatch(wf, /contents: write|actions: write|statuses: write/);
   });
-  it('수동 실행은 기본 dry-run · 자동(workflow_run)은 enforcement', () => {
-    assert.match(wf, /dry_run:\n\s+description: [^\n]+\n\s+required: false\n\s+default: 'true'/);
-    assert.match(wf, /DRY_RUN: \$\{\{ github\.event\.inputs\.dry_run \|\| 'false' \}\}/);
+  it('cutover 는 같은 commit — delivery.yml 은 enforcement (두 자동 경로가 동시에 배포 권한을 갖지 않는다)', () => {
+    assert.match(delivery, /DELIVERY_ENFORCE: 'true'/);
   });
-  it('판정은 한 번에 하나 · 직접 배포 명령 0 (배포는 deploy workflow dispatch 로만)', () => {
-    assert.match(wf, /concurrency:\n\s+group: deploy-auto\n\s+cancel-in-progress: false/);
+  it('직접 배포 명령 0', () => {
     assert.doesNotMatch(wf, /gcloud run deploy|update-traffic|jobs execute|gh variable set/);
   });
 });

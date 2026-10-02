@@ -1,5 +1,12 @@
-name: Deploy Auto (risk-gated)
+name: Deploy Auto (risk-gated) — RETIRED
 
+# ⛔ RETIRED (WO-O4O-CICD-UNIFIED-DELIVERY-PIPELINE-V1 P3 cutover, 2026-10-02)
+#   자동 배포 경로는 `delivery.yml`(Unified Delivery) 하나다. 이 workflow 는 main CI 에 반응하지 않고(workflow_run 제거)
+#   job 은 `if: false` 로 수동 실행도 하지 않는다 — 두 자동 경로가 동시에 배포 권한을 갖는 순간을 없애기 위해
+#   delivery.yml `DELIVERY_ENFORCE: 'true'` 와 **같은 commit** 에서 전환했다.
+#   rollback: 이 commit 을 revert (workflow_run 복원 + DELIVERY_ENFORCE 'false') — 배포 runtime 과는 별개.
+#   아래 설명은 은퇴 전 동작 기록이다.
+#
 # WO-O4O-CICD-DEPLOY-FREEZE-CUTOVER-V1 — production 자동 배포의 **유일한 진입점**
 #
 #   main push → CI Pipeline 완료 → 이 workflow
@@ -26,10 +33,7 @@ name: Deploy Auto (risk-gated)
 run-name: Deploy Auto ${{ github.event.workflow_run.head_sha || inputs.target_sha || github.sha }}
 
 on:
-  workflow_run:
-    workflows: ['CI Pipeline']
-    types: [completed]
-    branches: [main]
+  # workflow_run(CI Pipeline · main) trigger 은퇴 — 자동 경로는 delivery.yml
   workflow_dispatch:
     inputs:
       target_sha:
@@ -54,16 +58,16 @@ concurrency:
   group: deploy-auto
   cancel-in-progress: false
 
+# 은퇴 — 태그 생성 · dispatch · commit status 권한을 내려놓는다
 permissions:
-  contents: write   # target SHA 에 deploy/auto-<sha12> 태그 생성
-  actions: write    # deploy workflow dispatch
-  statuses: write   # commit status `production` (P0 가시성)
+  contents: read
 
 jobs:
   decide-and-deploy:
     name: Risk-gated auto deploy
     # main push 로 돈 CI 만 (PR run 은 branches 필터로 빠진다). CI 실패도 기록을 위해 돈다(결정 = BLOCKED_CI_NOT_GREEN).
-    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.event == 'push'
+    # RETIRED — 수동 dispatch 로도 실행하지 않는다 (태그 · dispatch 자동 경로 부활 방지)
+    if: false
     runs-on: ubuntu-latest
     timeout-minutes: 90
     env:
