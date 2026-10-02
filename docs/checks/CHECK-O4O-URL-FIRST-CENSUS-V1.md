@@ -1245,6 +1245,7 @@ gcloud compute url-maps add-host-rule o4o-global-lb --global --hosts=supplier.ne
 
 - **검증 한계(명시)**: 복수 매장 409 해소(선택 매장으로 확정)는 운영 실데이터가 없어 브라우저로 재현 불가 — 단위 테스트(§21-14)로만 확인. 운영 재현이 필요하면 테스트 매장 · 멤버십 추가(DB 쓰기 = 사용자 승인)가 선행된다.
 - 서브도메인 6호스트 · 관리자 세션 교체 실측은 §21-11 절차 그대로.
+- **V1 운영 실측 발견 · 수정(2026-09-28 발견 · 2026-10-02 커밋)**: store-web 상단 nav `로그인` 링크가 `WORKSPACE_PATHS.login` 고정이라 원래 경로를 잃었다(본문 카드 · gate 만 보존). `RootShell.tsx` 를 `withReturnTo(WORKSPACE_PATHS.login, pathname+search+hash)` 로 수정 + `store-service-scoped-owner-entry.spec.ts` 정적 계약 1줄. 검증: spec 22/22 · web-store `tsc --noEmit` 0. **운영 반영은 다음 store-web 배포 시** — V1 재실측은 그 뒤.
 
 #### 5. 통제 배포 순서 (게이트 충족 시)
 

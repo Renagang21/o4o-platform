@@ -85,6 +85,8 @@ describe('KPA 전환 차단 요인 정리 — CHECK-O4O-URL-FIRST-CENSUS-V1 §21
   it('매장 선택 · 로그인 뒤 원래 경로로 돌아온다(같은 앱 경로만)', () => {
     expect(gate).toContain('<Navigate to={withReturnTo(WORKSPACE_PATHS.select, current)} replace />');
     expect(gate).toContain('to={withReturnTo(WORKSPACE_PATHS.login, current)}');
+    // 상단 nav 로그인도 보존(§21-19 운영 실측 발견)
+    expect(read('services/web-store/src/components/RootShell.tsx')).toContain('<Link to={withReturnTo(WORKSPACE_PATHS.login, `${pathname}${search}${hash}`)}>로그인</Link>');
     expect(selector).toContain('navigate(returnTo ?? WORKSPACE_PATHS.home, { replace: true })');
     expect(login).toContain("readReturnTo(useLocation().search) ?? WORKSPACE_PATHS.home");
     expect(ret).toContain("raw.startsWith('//')");
