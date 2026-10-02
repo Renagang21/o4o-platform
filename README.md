@@ -143,10 +143,12 @@ main push → CI Pipeline → Delivery (delivery.yml) → 서비스별 "서빙 �
 - **rollout_mode**: 기본 `verified` — 새 revision 을 traffic 0% 로 올려 직접 검사(web · admin = tag URL HTTP,
   API = revision Ready)한 뒤에만 전환합니다. 검사 실패 시 기존 revision 이 그대로 서빙되고, API 는 전환 후
   `/health/ready` 실패 시 이전 revision 으로 되돌립니다. `legacy` 는 종전 방식(수동 실행 전용).
-- 배포 job 에 붙은 `environment: production` 은 **승인 게이트가 아닙니다.** 현재 GitHub `production`
-  Environment 에는 required reviewer · 배포 branch 제한 · environment secret 이 없습니다.
-- GCP 인증은 저장소 수준 secret(`GCP_SA_KEY`)을 씁니다. 저장소 쓰기 권한이 있는 사람은 기술적으로
-  production 에 닿을 수 있으므로, 아래 **Production 변경 원칙**이 실제 통제 수단입니다.
+- 배포 job 에 붙은 `environment: production` 은 **배포 ref 경계**입니다(승인 게이트 아님 · required reviewer 없음).
+  GitHub `production` Environment 는 배포 ref 를 `main` branch · `deploy/*` tag 로 제한하며, production credential
+  (`GCP_SA_KEY` 등)은 이 environment 의 secret 으로 둡니다 — collaborator branch · PR 의 workflow 는 받지 못합니다.
+  > **이행 상태**: environment ref 제한은 적용됨. credential 의 저장소 수준 → environment secret 이전 · 저장소 수준
+  > 사본 삭제는 소유자 작업으로 **진행 전**입니다(그 전까지는 저장소 쓰기 권한자가 branch workflow 로 secret 에 닿을 수 있음).
+- 수동 배포(`workflow_dispatch` · promote 경유)는 **저장소 소유자만** 게이트를 엽니다. 다른 계정이 실행하면 배포 job 은 skip 됩니다.
 
 ## 기여
 
@@ -154,13 +156,15 @@ main push → CI Pipeline → Delivery (delivery.yml) → 서비스별 "서빙 �
 
 ### Production 변경 원칙 (공동개발자 포함 · 전원 적용)
 
-이 저장소는 개인 계정 Private 저장소라 branch protection · ruleset · 배포 승인(required reviewer)을
-강제할 수 없습니다. 그래서 다음은 **사람과 AI 모두에게 적용되는 합의 규칙**입니다. "사용자"는 저장소
-소유자(Renagang21)입니다.
+이 저장소는 **Public** 입니다. 강제 수단(ruleset · environment)과 아래 **합의 규칙**을 함께 씁니다.
+"사용자"는 저장소 소유자(Renagang21)입니다.
 
-1. `main` 이 저장소 정본입니다. 공동개발자는 별도 branch 에서 작업하고 PR 로 `main` 에 반영합니다.
+- 강제: `main` ruleset — 삭제 · force push 금지, PR + 승인 1 필요(소유자 bypass). `deploy/*` tag 생성 · 변경은
+  소유자만. `production` Environment 는 `main` · `deploy/*` 에서만. 수동 배포 게이트는 소유자만.
+
+1. `main` 이 저장소 정본입니다. 공동개발자는 별도 branch 에서 작업하고 PR 로 `main` 에 반영합니다(소유자 승인 후 merge).
 2. `.github/workflows/**` 는 production 에 영향을 줄 수 있으므로 사용자 승인 없이 변경하지 않습니다.
-   다른 branch 에 올린 workflow 도 저장소 secret 으로 실행되므로 branch 라고 예외가 아닙니다.
+   PR 의 workflow 변경도 merge 전에 사용자가 검토합니다.
 3. 사용자 승인 없이 하지 않는 것:
    - production 배포 설정 변경 · `DEPLOY_FREEZE` 해제(`false` 로 변경) — 비상 시 `true` 설정은 누구나 즉시 해도 된다
    - production 통제 배포 실행 (LEVEL 3 · 첫 rollout 의 `workflow_dispatch` 포함 — LEVEL 2 자동 배포는 승인 불필요)

@@ -73,6 +73,9 @@ jobs:
     name: Classify (CI · freeze · serving → target · risk)
     # main push 로 돈 CI 만 (PR run 은 branches 필터 + 이 조건으로 빠진다). CI 실패도 기록을 위해 돈다(BLOCKED_CI).
     if: github.event_name != 'workflow_run' || github.event.workflow_run.event == 'push'
+    # GCP_SA_KEY 는 `production` environment secret 이다 — main(workflow_run · promote) 에서만 받는다
+    #   (WO-O4O-PUBLIC-COLLABORATOR-PRODUCTION-BOUNDARY-AND-MAIN-PROTECTION-V1).
+    environment: production
     runs-on: ubuntu-latest
     timeout-minutes: 30
     outputs:
@@ -211,6 +214,9 @@ jobs:
     name: Report (serving SHA · commit status)
     needs: [classify, deploy-api, deploy-web-after-api, deploy-web-parallel, deploy-admin]
     if: always() && needs.classify.outputs.execute == 'true' && needs.classify.outputs.dry_call != 'true'
+    # GCP_SA_KEY 는 `production` environment secret 이다 — main(workflow_run · promote) 에서만 받는다
+    #   (WO-O4O-PUBLIC-COLLABORATOR-PRODUCTION-BOUNDARY-AND-MAIN-PROTECTION-V1).
+    environment: production
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:

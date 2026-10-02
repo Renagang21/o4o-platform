@@ -123,8 +123,11 @@ jobs:
     name: CI gate (target SHA must be green)
     needs: [detect]
     # dry_run(배선 검증 · workflow_call 전용) 이면 게이트를 열지 않는다 → deploy 도 needs 로 skip.
+    # WO-O4O-PUBLIC-COLLABORATOR-PRODUCTION-BOUNDARY-AND-MAIN-PROTECTION-V1 — 수동 실행(직접 dispatch · promote 경유)은 저장소 소유자만.
+    #   collaborator 가 dispatch 하면 게이트를 열지 않는다(→ 배포 job 전부 skip). 자동 경로(workflow_run)는 그대로.
     if: >-
       vars.DEPLOY_FREEZE == 'false' && inputs.dry_run != 'true' &&
+      (github.event_name != 'workflow_dispatch' || github.triggering_actor == github.repository_owner) &&
       (needs.detect.outputs.admin_affected == 'true' || inputs.force_deploy == 'true')
     runs-on: ubuntu-latest
     timeout-minutes: 40
@@ -145,11 +148,11 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
-    # `environment: production` — 배포 기록 분류용 표기이며 승인 게이트가 아니다.
-    #   현재 GitHub `production` Environment 에는 required reviewer · 배포 branch 제한 · environment secret 이
-    #   없다(2026-09-30 확인) — job 은 대기 없이 바로 실행된다. 본래 §20(WO-O4O-LECTURE-INDEPENDENT-SERVICE-
-    #   SEPARATION-V1)의 reviewer 규칙은 삭제됐다. 실제 운영 게이트는 이 job `if:` 의 `DEPLOY_FREEZE`
-    #   (정확히 'false' 일 때만 배포 · 부재/공백/오타 = freeze = fail-closed) 와 ci-gate 다.
+    # `environment: production` — 배포 ref 경계다(WO-O4O-PUBLIC-COLLABORATOR-PRODUCTION-BOUNDARY-AND-MAIN-PROTECTION-V1).
+    #   GitHub `production` Environment 는 배포 ref 를 `main` branch · `deploy/*` tag 로 제한하고, production credential 은
+    #   environment secret 으로 둔다 — 그 밖의 ref(collaborator branch · PR)에서는 이 job 이 시작되지 않는다. required reviewer 는
+    #   없다(대기 없이 실행). 배포 게이트는 그대로 이 job `if:` 의 `DEPLOY_FREEZE`(정확히 'false' 일 때만 · 부재/공백/오타 = freeze)
+    #   와 ci-gate(수동 실행 = 소유자만)다.
     environment: production
     # ci-gate skip(게이트 닫힘) · 실패(CI not green) → 이 job 도 skip
     needs: [detect, ci-gate]

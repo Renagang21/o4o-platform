@@ -229,3 +229,26 @@ describe('저장소 전체 — DEPLOY_ENABLED 는 배포 결정에 쓰이지 않
     }
   });
 });
+
+// WO-O4O-PUBLIC-COLLABORATOR-PRODUCTION-BOUNDARY-AND-MAIN-PROTECTION-V1
+// production credential 은 `production` environment secret(배포 ref = main · deploy/* tag) 이다.
+// credential 을 쓰는 job 이 environment 를 잃으면 secret 을 못 받거나, repository secret 으로 되돌아가는 회귀가 된다.
+describe('Public collaborator 경계 — production credential 은 environment 안에서만 · 수동 실행은 소유자만', () => {
+  const OWNER = "(github.event_name != 'workflow_dispatch' || github.triggering_actor == github.repository_owner)";
+  const jobsUsingCredential = (wf) =>
+    wf.split(/\n(?= {2}[a-z][a-z0-9-]*:\n)/).filter((b) => /secrets\.(?!GITHUB_TOKEN\b)[A-Z]/.test(b));
+
+  for (const file of [...DEPLOY, '.github/workflows/delivery.yml']) {
+    it(`${file}: credential 을 쓰는 job 은 모두 environment: production`, () => {
+      const blocks = jobsUsingCredential(read(file));
+      assert.ok(blocks.length > 0, file);
+      for (const b of blocks) assert.match(b, /^ {4}environment: production$/m, b.split('\n')[0]);
+    });
+  }
+  for (const file of DEPLOY) {
+    it(`${file}: ci-gate 는 직접 dispatch 를 소유자에게만 연다`, () => {
+      const gate = read(file).split(/\n(?= {2}ci-gate:\n)/)[1].split(/\n(?= {2}[a-z][a-z0-9-]*:\n)/)[0];
+      assert.ok(gate.includes(OWNER), file);
+    });
+  }
+});

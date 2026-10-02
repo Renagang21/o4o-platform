@@ -10,9 +10,14 @@
 - **관리자 대시보드**: GCP Cloud Run `o4o-admin-dashboard` — `deploy-admin.yml`
 - **데이터베이스**: GCP Cloud SQL (PostgreSQL). DB 비밀번호는 GitHub secret 이 아니라 **GCP Secret Manager `o4o-db-password`** 를 Cloud Run 이 직접 참조한다.
 
-모든 secret 은 **저장소(repository) 수준**이다. `production` Environment 에는 environment secret 이 없다.
+**목표 구조 (WO-O4O-PUBLIC-COLLABORATOR-PRODUCTION-BOUNDARY-AND-MAIN-PROTECTION-V1)**: 아래 secret 은 전부 **`production` Environment secret** 이다.
+`production` Environment 는 배포 ref 를 `main` branch · `deploy/*` tag 로 제한한다(required reviewer 없음) — collaborator branch · PR 의 workflow 는 받지 못한다.
+secret 을 쓰는 job 은 모두 `environment: production` 을 선언한다(`scripts/ci/__tests__/deploy-workflow-gates.test.mjs` 가 검사).
 
-## Repository secrets (workflow 가 참조하는 것)
+> **이행 상태 (2026-10-02)**: environment ref 제한 적용됨 · environment secret 0 — 값 이전(`gh secret set <NAME> --env production`, 소유자)과
+> 저장소 수준 사본 삭제는 **진행 전**. 이전 전까지는 저장소 수준 secret 이 그대로 쓰인다.
+
+## Production secrets (workflow 가 참조하는 것)
 
 | 이름 | 용도 | 참조 workflow |
 |---|---|---|

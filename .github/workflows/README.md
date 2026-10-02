@@ -29,7 +29,7 @@ deploy workflow 3종은 push 에 반응하지 않는다 — `delivery.yml`/`prom
 cutover(`DELIVERY_ENFORCE: 'true'` + `deploy-auto.yml` 비활성, 같은 commit · 2026-10-02) 로 자동 경로는 `delivery.yml` 하나다 — 절차와 상태는
 [`CHECK-O4O-CICD-UNIFIED-DELIVERY-PIPELINE-V1`](../../docs/checks/CHECK-O4O-CICD-UNIFIED-DELIVERY-PIPELINE-V1.md).
 각 deploy workflow 의 `ci-gate` job 이 target SHA 의 `CI Pipeline` green 을 요구하고, rollout 은 서비스 단위 concurrency 로 1개씩이다.
-job 의 `environment: production` 은 승인 게이트가 아니다 — 현재 required reviewer 가 없다.
+job 의 `environment: production` 은 승인 게이트가 아니라 배포 ref 경계다 — `main` · `deploy/*` 에서만 실행되고 production credential 은 environment secret 이다(required reviewer 없음). 수동 dispatch 는 소유자만 `ci-gate` 를 연다.
 예외 경로(`migrate_only`)와 변경 원칙은 루트 [`README.md`](../../README.md) "배포" · "Production 변경 원칙" 절이 정본이다.
 
 ## 자동화

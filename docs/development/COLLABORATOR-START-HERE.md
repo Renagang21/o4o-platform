@@ -108,11 +108,15 @@ DB 의 `o4o_api` 는 로그인 계정이 아니라 **NOLOGIN owner role** 이다
 
 ## 6. Production 경계
 
-이 저장소는 개인 계정의 Private 저장소이며, branch protection 이나 배포 승인을 **강제하지 않는다.** Production 통제는 명시적인 합의 규칙과 신뢰로 유지된다.
+이 저장소는 **Public** 이다. 공동개발자 작업 경로는 **본인 branch → PR → 소유자 승인 → `main`** 이다.
+
+- `main` 은 ruleset 으로 보호된다(직접 push · force push · 삭제 불가, PR 승인 1 필요).
+- Production 은 소유자 통제다: `production` Environment 는 `main` · `deploy/*` tag 에서만 실행되고, `deploy/*` tag 는 소유자만 만들 수 있으며, 수동 배포는 소유자가 실행할 때만 게이트가 열린다.
+- production credential 은 `production` environment secret 으로 둔다 — 공동개발자 branch · PR 의 workflow 는 받지 못한다(이행 상태는 [README — 배포](../../README.md)).
 
 **사용자(저장소 소유자) 승인 없이 하지 않는 것:**
 
-- `.github/workflows/**` 변경 (다른 branch 에 올려도 저장소 secret 으로 실행된다)
+- `.github/workflows/**` 변경 (PR 로 올려도 merge 전 소유자 검토)
 - `DEPLOY_FREEZE` 해제(`false` 로 변경) · production 통제 배포 실행 · `workflow_dispatch` 로 하는 production 작업
   (비상 시 `DEPLOY_FREEZE=true` 설정은 즉시 해도 된다. 일상 LEVEL 2 배포는 main CI 뒤 자동이다)
 - `deploy/*` tag 생성 · push
