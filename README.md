@@ -145,7 +145,11 @@ main push → CI Pipeline → Delivery (delivery.yml) → 서비스별 "서빙 �
   `/health/ready` 실패 시 이전 revision 으로 되돌립니다. `legacy` 는 종전 방식(수동 실행 전용).
 - 배포 job 에 붙은 `environment: production` 은 **배포 ref 경계**입니다(승인 게이트 아님 · required reviewer 없음).
   GitHub `production` Environment 는 배포 ref 를 `main` branch · `deploy/*` tag 로 제한하며, production credential
-  (`GCP_SA_KEY` 등)은 이 environment 의 secret 으로 둡니다 — collaborator branch · PR 의 workflow 는 받지 못합니다.
+  은 이 environment 의 secret 으로 둡니다 — collaborator branch · PR 의 workflow 는 받지 못합니다.
+- **GCP 인증은 WIF** 입니다(장기 SA key `GCP_SA_KEY` 없음 · 2026-10-02). GitHub OIDC → Workload Identity Federation →
+  `github-actions` SA impersonation 이며, provider 조건이 repository · `environment: production` · ref(`main` · `deploy/*`) ·
+  허용 workflow · 소유자 dispatch 를 요구합니다 — collaborator branch 의 workflow 는 GCP 에 인증할 수 없습니다
+  ([SECRETS_SETUP](.github/SECRETS_SETUP.md)). 공동개발자에게 production GCP credential 은 제공하지 않습니다.
   > **이행 상태**: environment ref 제한은 적용됨. credential 의 저장소 수준 → environment secret 이전 · 저장소 수준
   > 사본 삭제는 소유자 작업으로 **진행 전**입니다(그 전까지는 저장소 쓰기 권한자가 branch workflow 로 secret 에 닿을 수 있음).
 - 수동 배포(`workflow_dispatch` · promote 경유)는 **저장소 소유자만** 게이트를 엽니다. 다른 계정이 실행하면 배포 job 은 skip 됩니다.

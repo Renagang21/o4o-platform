@@ -10,6 +10,19 @@
 - **관리자 대시보드**: GCP Cloud Run `o4o-admin-dashboard` — `deploy-admin.yml`
 - **데이터베이스**: GCP Cloud SQL (PostgreSQL). DB 비밀번호는 GitHub secret 이 아니라 **GCP Secret Manager `o4o-db-password`** 를 Cloud Run 이 직접 참조한다.
 
+## GCP 인증 — Workload Identity Federation (2026-10-02 · WO-O4O-GITHUB-ACTIONS-GCP-WIF-CUTOVER-V1)
+
+GitHub Actions 의 GCP 인증은 **장기 SA key 없이** GitHub OIDC → WIF → `github-actions@netureyoutube.iam.gserviceaccount.com` impersonation 이다.
+`GCP_SA_KEY` secret 과 그 SA 의 user-managed key 는 폐기됐다 — 새로 만들지 않는다.
+
+- provider: `projects/117791934476/locations/global/workloadIdentityPools/github-actions/providers/o4o-platform` (식별자 · 비밀 아님 → workflow 상수)
+- provider 조건: `repository_id` · `repository_owner_id` 일치 · `environment == production` · `ref` = `refs/heads/main` 또는 `refs/tags/deploy/*` ·
+  `event_name` ∈ {`workflow_run`, `workflow_dispatch`} · `workflow_dispatch` 는 소유자 `actor_id` 만 ·
+  `job_workflow_ref` ∈ {`delivery` · `deploy-api` · `deploy-admin` · `deploy-web-services` · `gcp-wif-auth-smoke`}.yml @ main · deploy/*
+- SA 에 부여한 것은 그 repository principalSet 의 `roles/iam.workloadIdentityUser` 하나 (SA 의 프로젝트 역할은 무변경).
+- 인증 확인: `gcp-wif-auth-smoke.yml` (수동 · 소유자 · read-only). 계약: `scripts/ci/__tests__/deploy-workflow-gates.test.mjs`.
+- 다른 workflow 에서 GCP 인증이 필요해지면 provider 조건의 허용 workflow 목록을 먼저 바꿔야 한다(소유자 · GCP 측 변경).
+
 **목표 구조 (WO-O4O-PUBLIC-COLLABORATOR-PRODUCTION-BOUNDARY-AND-MAIN-PROTECTION-V1)**: 아래 secret 은 전부 **`production` Environment secret** 이다.
 `production` Environment 는 배포 ref 를 `main` branch · `deploy/*` tag 로 제한한다(required reviewer 없음) — collaborator branch · PR 의 workflow 는 받지 못한다.
 secret 을 쓰는 job 은 모두 `environment: production` 을 선언한다(`scripts/ci/__tests__/deploy-workflow-gates.test.mjs` 가 검사).
@@ -21,7 +34,6 @@ secret 을 쓰는 job 은 모두 `environment: production` 을 선언한다(`scr
 
 | 이름 | 용도 | 참조 workflow |
 |---|---|---|
-| `GCP_SA_KEY` | GCP 서비스 계정 JSON 키 — `google-github-actions/auth` 의 `credentials_json` (build · push · Cloud Run 배포 · migration Job) | `deploy-api` · `deploy-web-services` · `deploy-admin` |
 | `GCP_DB_USERNAME` | Cloud SQL 사용자명 → API `DB_USERNAME` | `deploy-api` |
 | `GCP_DB_NAME` | Cloud SQL 데이터베이스명 → API `DB_NAME` | `deploy-api` |
 | `GCP_JWT_SECRET` | API `JWT_SECRET` · `JWT_REFRESH_SECRET` | `deploy-api` |
@@ -49,6 +61,7 @@ secret 을 쓰는 job 은 모두 `environment: production` 을 선언한다(`scr
 ## 은퇴한 항목
 
 - 구 웹서버(Nginx 정적 호스팅) 와 `WEB_SERVER_SSH_KEY` 기반 SSH 배포는 Cloud Run 전환으로 은퇴했다. 어떤 workflow 도 참조하지 않는다.
+- `GCP_SA_KEY`(GCP 서비스 계정 JSON 키 · `credentials_json`) 는 2026-10-02 WIF 전환으로 은퇴했다 — repository secret 삭제 · SA user-managed key 폐기.
 
 ## Secret 추가 · 변경
 
@@ -58,3 +71,4 @@ Settings → Secrets and variables → Actions. **Production 변경 원칙에 �
 
 1. 실제 값을 코드 · 문서 · 로그 · 커밋에 포함하지 않는다.
 2. 저장소 쓰기 권한자는 workflow 를 통해 위 secret 에 기술적으로 접근할 수 있다(known limitation) — 규칙은 루트 README 가 정본이다.
+   GCP 인증은 WIF provider 조건으로 막히지만(위 절), 위 표의 secret 은 environment secret 이전 전까지 이 한계가 그대로다.
