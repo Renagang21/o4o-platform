@@ -1,6 +1,6 @@
 # WO-O4O-CANONICAL-DEMO-ACCOUNT-FOUNDATION-AND-EXPERIENCE-LOGIN-V1
 
-> 발행: 2026-10-01 · 상태: **Phase A(census) 착수**
+> 발행: 2026-10-01 · 상태: **Phase A · C 완료(코드) — 통제 API 배포 → B(--apply) 승인 대기**
 > 정책 정본: [`O4O-CANONICAL-DEMO-ACCOUNTS-V1`](../baseline/O4O-CANONICAL-DEMO-ACCOUNTS-V1.md)
 > 진행 기록: `docs/checks/CHECK-O4O-CANONICAL-DEMO-ACCOUNT-FOUNDATION-AND-EXPERIENCE-LOGIN-V1.md`
 >
@@ -120,6 +120,10 @@ email 변경 · account delete · Google auth 연결
 ```
 
 frontend 숨김과 **별개로** 서버 guard 를 둔다.
+
+2026-10-02 추가(정책 §8 잔여): **이메일 변경 · role 변경 · organization/store ownership 해제·변경** —
+실제 존재하는 write 경로에만 guard. 판정 정본 `demo_accounts.user_id` · write 전 거절 · fail-closed.
+기록: CHECK §2-6.
 
 ## Phase D — relink
 

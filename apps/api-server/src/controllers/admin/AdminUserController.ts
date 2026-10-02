@@ -21,6 +21,7 @@ import {
   demoAccountService,
   DEMO_ACCOUNT_FORBIDDEN_CODE,
   DEMO_ACCOUNT_FORBIDDEN_MESSAGE,
+  respondDemoAccountForbidden,
 } from '../../services/auth/demo-account.service.js';
 import {
   canRevokeOwnRole,
@@ -368,6 +369,12 @@ export class AdminUserController {
         return;
       }
 
+      // Demo 계정 보호(정책 §8 role 변경): 기존 계정에 역할을 더하기 **전에** 막는다.
+      if (await demoAccountService.isDemoAccount(existingUser.id)) {
+        respondDemoAccountForbidden(res);
+        return;
+      }
+
       let membershipPolicy: MembershipPolicy = 'NOT_APPLICABLE';
       let membershipStatuses: Record<string, string> = {};
 
@@ -480,6 +487,17 @@ export class AdminUserController {
         }
       }
 
+      const requestedRoles = Array.isArray(rolesArray) && rolesArray.length > 0 ? rolesArray : role ? [role] : null;
+
+      // Demo 계정 보호(정책 §8 이메일 변경 · role 변경): 어떤 write 보다도 **먼저** 막는다.
+      //   이름 등 나머지 필드만 바꾸는 요청은 판정 질의 없이 종전대로 간다.
+      if ((email && email !== user.email) || requestedRoles) {
+        if (await demoAccountService.isDemoAccount(user.id)) {
+          respondDemoAccountForbidden(res);
+          return;
+        }
+      }
+
       // Update fields
       if (email) user.email = email;
       if (firstName) user.firstName = firstName;
@@ -487,7 +505,6 @@ export class AdminUserController {
       if (name) user.name = name;
       // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1: 요청 배열로 역할을 **덮어쓰지 않는다**.
       //   서비스 운영자 역할만 차이로 추가·해제하고, 카탈로그 밖 역할(회원 역할 등)은 그대로 둔다.
-      const requestedRoles = Array.isArray(rolesArray) && rolesArray.length > 0 ? rolesArray : role ? [role] : null;
       if (requestedRoles) {
         await applyAdminRoleEdit(user.id, requestedRoles, {
           id: (req as any).user?.id,
@@ -678,6 +695,12 @@ export class AdminUserController {
       const user = await userRepo.findOne({ where: { id: userId } });
       if (!user) {
         res.status(404).json({ success: false, error: 'User not found' });
+        return;
+      }
+
+      // Demo 계정 보호(정책 §8 role 변경): 해제 **전에** 막는다.
+      if (await demoAccountService.isDemoAccount(userId)) {
+        respondDemoAccountForbidden(res);
         return;
       }
 

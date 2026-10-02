@@ -3,6 +3,11 @@ import type { DataSource, EntityManager } from 'typeorm';
 import { AppDataSource } from '../database/connection.js';
 import { MediaLibraryService } from '../modules/media/services/media-library.service.js';
 import logger from '../utils/logger.js';
+import {
+  demoAccountService,
+  DEMO_ACCOUNT_FORBIDDEN_CODE,
+  DEMO_ACCOUNT_FORBIDDEN_MESSAGE,
+} from './auth/demo-account.service.js';
 
 export const STORE_OWNER_CONTRACT_SERVICES = ['kpa-society', 'k-cosmetics', 'pharmacy-hub'] as const;
 export type StoreOwnerContractServiceKey = typeof STORE_OWNER_CONTRACT_SERVICES[number];
@@ -81,6 +86,16 @@ export class StoreOwnerTerminationError extends Error {
   }
 }
 
+/**
+ * Demo 계정 보호(정책 §8 store ownership 해제 · role 변경) — 종료 · 파기의 write **전에** 부른다.
+ * 판정 정본은 `demo_accounts.user_id` · 조회 실패는 그대로 올린다(fail-closed).
+ */
+async function assertNotDemoStoreOwner(db: Pick<DataSource, 'query'>, userId: string): Promise<void> {
+  if (await demoAccountService.isDemoAccount(userId, db)) {
+    throw new StoreOwnerTerminationError(DEMO_ACCOUNT_FORBIDDEN_CODE, DEMO_ACCOUNT_FORBIDDEN_MESSAGE, 403);
+  }
+}
+
 function configFor(serviceKey: string): ServiceConfig {
   if (!STORE_OWNER_CONTRACT_SERVICES.includes(serviceKey as StoreOwnerContractServiceKey)) {
     throw new StoreOwnerTerminationError('STORE_OWNER_TERMINATION_SERVICE_NOT_ALLOWED', '매장 경영자 계약 종료 대상 서비스가 아닙니다.');
@@ -152,6 +167,8 @@ export class StoreOwnerTerminationService {
     if (!role) {
       throw new StoreOwnerTerminationError('STORE_OWNER_ROLE_NOT_ACTIVE', '대상 사용자의 매장 경영자 역할이 활성 상태가 아닙니다.', 409);
     }
+
+    await assertNotDemoStoreOwner(this.dataSource, input.userId);
 
     const returnRequested = !!input.returnRequested;
     const status: CaseStatus = returnRequested ? 'return_pending' : 'termination_scheduled';
@@ -370,6 +387,7 @@ export class StoreOwnerTerminationService {
     if (effectiveAt.getTime() > now.getTime()) {
       throw new StoreOwnerTerminationError('TERMINATION_NOT_DUE', '아직 계약 종료 예정일이 되지 않았습니다.', 409);
     }
+    await assertNotDemoStoreOwner(this.dataSource, c.userId);
 
     await this.dataSource.transaction(async (m) => {
       // 일반 서비스 회원자격은 유지한다. 매장 경영자 역할과 해당 Store↔Service 연결만 종료한다.
@@ -600,6 +618,7 @@ export class StoreOwnerTerminationService {
     }
 
     const cfg = configFor(c.serviceKey);
+    await assertNotDemoStoreOwner(this.dataSource, c.userId);
 
     try {
       /**

@@ -38,6 +38,7 @@ import { authenticate, requireRole } from '../../middleware/auth.middleware.js';
 // `middleware/rateLimiter` 의 apiLimiter 를 쓴다(분당 60 · IP+userId 키).
 import { apiLimiter } from '../../middleware/rateLimiter.js';
 import logger from '../../utils/logger.js';
+import { demoAccountService, respondDemoAccountForbidden } from '../../services/auth/demo-account.service.js';
 
 const router: Router = Router();
 
@@ -192,6 +193,12 @@ router.post('/:id/super-admin', apiLimiter, requireRole(ADMIN_ACCESS_ROLES), asy
         error: '비활성 계정에는 관리자 권한을 부여할 수 없습니다.',
         code: 'TARGET_INACTIVE',
       });
+      return;
+    }
+
+    // Demo 계정 보호(정책 §8 platform role 획득): Google 연결 요구와 별개로 서버가 명시적으로 막는다.
+    if (await demoAccountService.isDemoAccount(id)) {
+      respondDemoAccountForbidden(res);
       return;
     }
 

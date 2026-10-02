@@ -55,6 +55,7 @@ import {
 } from '../services/supplier-onboarding.service.js';
 import { SupplierRegulatedCategoryService } from '../services/supplier-regulated-category.service.js';
 import logger from '../../../utils/logger.js';
+import { DEMO_ACCOUNT_FORBIDDEN_CODE } from '../../../services/auth/demo-account.service.js';
 
 type AuthenticatedRequest = Request & {
   user?: { id: string; role: string };
@@ -372,7 +373,7 @@ export function createOperatorSupplierController(dataSource: DataSource): Router
 
       const result = await netureService.approveSupplier(id, approvedBy);
       if (!result.success) {
-        const status = result.error === 'SUPPLIER_NOT_FOUND' ? 404 : 400;
+        const status = result.error === 'SUPPLIER_NOT_FOUND' ? 404 : result.error === DEMO_ACCOUNT_FORBIDDEN_CODE ? 403 : 400;
         // WO-O4O-NETURE-SUPPLIER-ACTIVATION-GATE-ALIGN-AND-ERROR-SURFACE-V1:
         // 구조화된 누락 필드를 함께 반환 — 프론트가 사람이 읽을 메시지로 변환.
         return res.status(status).json({
@@ -408,7 +409,7 @@ export function createOperatorSupplierController(dataSource: DataSource): Router
       const { reason } = req.body || {};
       const result = await netureService.rejectSupplier(id, rejectedBy, reason);
       if (!result.success) {
-        const status = result.error === 'SUPPLIER_NOT_FOUND' ? 404 : 400;
+        const status = result.error === 'SUPPLIER_NOT_FOUND' ? 404 : result.error === DEMO_ACCOUNT_FORBIDDEN_CODE ? 403 : 400;
         return res.status(status).json({ success: false, error: { code: result.error, message: result.error } });
       }
 

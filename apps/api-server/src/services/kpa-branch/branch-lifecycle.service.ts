@@ -38,6 +38,11 @@ const SLUG_MAX = 80;
 // 예약어 주소 정책은 의존성 없는 모듈에 둔다 — BranchAdminController(super_admin 직접 생성)도 같은 목록을 쓴다.
 export { RESERVED_BRANCH_SLUGS, isReservedBranchSlug, reservedSlugMessage } from './branch-slug-policy.js';
 import { isReservedBranchSlug, reservedSlugMessage } from './branch-slug-policy.js';
+import {
+  demoAccountService,
+  DEMO_ACCOUNT_FORBIDDEN_CODE,
+  DEMO_ACCOUNT_FORBIDDEN_MESSAGE,
+} from '../auth/demo-account.service.js';
 
 export type BranchLifecycleErrorCode =
   | 'INVALID_SLUG'
@@ -46,7 +51,8 @@ export type BranchLifecycleErrorCode =
   | 'REQUESTER_SUSPENDED'
   | 'REQUEST_NOT_FOUND'
   | 'REQUEST_NOT_PENDING'
-  | 'PARENT_NOT_FOUND';
+  | 'PARENT_NOT_FOUND'
+  | typeof DEMO_ACCOUNT_FORBIDDEN_CODE;
 
 export class BranchLifecycleError extends Error {
   constructor(
@@ -171,6 +177,10 @@ export class BranchLifecycleService {
       }
       if (request.status !== 'pending') {
         throw new BranchLifecycleError('REQUEST_NOT_PENDING', '이미 처리된 신청입니다.', 409);
+      }
+      // Demo 계정은 승인으로 운영자 role 을 얻지 않는다 — write 전에 거절.
+      if (await demoAccountService.isDemoAccount(request.requester_user_id, m)) {
+        throw new BranchLifecycleError(DEMO_ACCOUNT_FORBIDDEN_CODE, DEMO_ACCOUNT_FORBIDDEN_MESSAGE, 403);
       }
 
       // 재검사: 선점 + 예약어. 예약어는 신청 시 막지만, 예약어 목록이 신청 뒤에 늘었거나

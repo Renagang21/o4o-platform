@@ -14,6 +14,7 @@ import { roleAssignmentService } from '../../auth/services/role-assignment.servi
 import { ServiceMembership } from '../../auth/entities/ServiceMembership.js';
 import { organizationOpsService } from '../../organization/services/organization-ops.service.js';
 import { notificationService } from '../../../services/NotificationService.js';
+import { demoAccountService, DEMO_ACCOUNT_FORBIDDEN_CODE } from '../../../services/auth/demo-account.service.js';
 // WO-O4O-BUSINESSINFO-JSON-COLUMN-CONCAT-RUNTIME-FAILURE-FIX-V1: json 컬럼 안전 부분 갱신
 
 /**
@@ -136,6 +137,9 @@ export class NetureSupplierService {
       const supplier = await this.supplierRepo.findOne({ where: { id: supplierId } });
       if (!supplier) return { success: false, error: 'SUPPLIER_NOT_FOUND' };
       if (supplier.status !== SupplierStatus.PENDING) return { success: false, error: 'INVALID_STATUS' };
+      if (await this.isDemoSupplier(supplier.userId, supplier.organizationId)) {
+        return { success: false, error: DEMO_ACCOUNT_FORBIDDEN_CODE };
+      }
 
       // WO-O4O-NETURE-SUPPLIER-APPROVAL-AND-PROFILE-COMPLETION-SEPARATION-V1:
       // 승인은 서비스 이용 자격만 판단한다. 대표자명/담당자명/담당자 연락처 등 프로필 정보는
@@ -200,6 +204,9 @@ export class NetureSupplierService {
       const supplier = await this.supplierRepo.findOne({ where: { id: supplierId } });
       if (!supplier) return { success: false, error: 'SUPPLIER_NOT_FOUND' };
       if (supplier.status !== SupplierStatus.PENDING) return { success: false, error: 'INVALID_STATUS' };
+      if (await this.isDemoSupplier(supplier.userId, supplier.organizationId)) {
+        return { success: false, error: DEMO_ACCOUNT_FORBIDDEN_CODE };
+      }
 
       supplier.status = SupplierStatus.REJECTED;
       supplier.approvedBy = rejectedByUserId;
@@ -242,6 +249,22 @@ export class NetureSupplierService {
       logger.error('[NetureSupplierService] Error rejecting supplier:', error);
       throw error;
     }
+  }
+
+  /**
+   * WO-O4O-CANONICAL-DEMO-ACCOUNT-FOUNDATION-AND-EXPERIENCE-LOGIN-V1:
+   * Demo 공급자는 `neture_suppliers.user_id` 가 NULL 일 수 있다 — 연결 user 와 조직 owner 를 함께 본다.
+   * 판정 정본은 `demo_accounts.user_id`. 조회 실패는 그대로 올린다(fail-closed).
+   */
+  private async isDemoSupplier(
+    userId: string | null | undefined,
+    organizationId: string | null | undefined,
+    manager?: EntityManager,
+  ): Promise<boolean> {
+    return (
+      (await demoAccountService.isDemoAccount(userId, manager)) ||
+      (await demoAccountService.isDemoOrganization(organizationId, manager))
+    );
   }
 
   /**
@@ -344,6 +367,9 @@ export class NetureSupplierService {
         const locked = lockedRows[0];
         if (!locked) return { success: false, error: 'SUPPLIER_NOT_FOUND' };
         if (locked.status !== SupplierStatus.ACTIVE) return { success: false, error: 'INVALID_STATUS' };
+        if (await this.isDemoSupplier(locked.user_id, locked.organization_id, manager)) {
+          return { success: false, error: DEMO_ACCOUNT_FORBIDDEN_CODE };
+        }
 
         // §6: 서버 측 주문·정산 재검증 (강제 override 없음)
         const guard = await this.countSupplierObligations(supplierId, manager);
@@ -461,6 +487,9 @@ export class NetureSupplierService {
         const locked = lockedRows[0];
         if (!locked) return { success: false, error: 'SUPPLIER_NOT_FOUND' };
         if (locked.status !== SupplierStatus.INACTIVE) return { success: false, error: 'INVALID_STATUS' };
+        if (await this.isDemoSupplier(locked.user_id, locked.organization_id, manager)) {
+          return { success: false, error: DEMO_ACCOUNT_FORBIDDEN_CODE };
+        }
 
         await manager.query(
           `UPDATE neture_suppliers SET status = $2, updated_at = NOW() WHERE id = $1`,

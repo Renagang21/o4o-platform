@@ -34,6 +34,12 @@ import {
   SELF_ROLE_REVOKE_FORBIDDEN_MESSAGE,
 } from '../../utils/role-revoke-safety.js';
 import { invalidateRoles } from '../../modules/auth/utils/role-cache.js';
+import {
+  demoAccountService,
+  DEMO_ACCOUNT_FORBIDDEN_CODE,
+  respondDemoAccountForbidden,
+  sendDemoAccountForbidden,
+} from '../../services/auth/demo-account.service.js';
 
 const approvalService = new MembershipApprovalService();
 
@@ -505,6 +511,7 @@ export class MembershipConsoleController {
       }).catch(() => {});
       res.json({ success: true, message: 'Membership approved', membership });
     } catch (error) {
+      if (sendDemoAccountForbidden(res, error)) return;
       if (error instanceof StoreOwnerBusinessInfoRequiredError) {
         res.status(error.httpStatus).json({
           success: false,
@@ -557,6 +564,7 @@ export class MembershipConsoleController {
       }).catch(() => {});
       res.json({ success: true, message: 'Membership rejected', membership });
     } catch (error) {
+      if (sendDemoAccountForbidden(res, error)) return;
       logger.error('[MembershipConsole] rejectMembership error', {
         membershipId: req.params.membershipId,
         error: error instanceof Error ? error.message : String(error),
@@ -598,6 +606,12 @@ export class MembershipConsoleController {
           res.status(404).json({ success: false, error: 'User not found' });
           return;
         }
+      }
+
+      // Demo 계정 보호(정책 §8 role 변경 · ownership 해제): write **전에** 막는다.
+      if (await demoAccountService.isDemoAccount(userId)) {
+        respondDemoAccountForbidden(res);
+        return;
       }
 
       if (status === 'approved' || status === 'active') {
@@ -807,6 +821,12 @@ export class MembershipConsoleController {
             }
           }
 
+          // Demo 계정 보호(정책 §8 role 변경): 이 사용자만 건너뛴다(조회 실패는 아래 catch 로 failed).
+          if (await demoAccountService.isDemoAccount(userId)) {
+            results.push({ id: userId, status: 'failed', error: DEMO_ACCOUNT_FORBIDDEN_CODE });
+            continue;
+          }
+
           if (targetStatus === 'approved') {
             const pendingMemberships = writeScope.isPlatformAdmin
               ? await AppDataSource.query(
@@ -939,6 +959,12 @@ export class MembershipConsoleController {
         }
       }
 
+      // Demo 계정 보호(정책 §8 role 변경 · ownership 해제): write **전에** 막는다.
+      if (await demoAccountService.isDemoAccount(userId)) {
+        respondDemoAccountForbidden(res);
+        return;
+      }
+
       const result = await approvalService.reactivateMembership({
         userId,
         reactivatedBy,
@@ -1022,6 +1048,11 @@ export class MembershipConsoleController {
             error: '운영 권한(operator/admin)은 회원 유형으로 저장할 수 없습니다. 운영 권한은 별도 경로에서 관리됩니다.',
             code: 'INVALID_MEMBERSHIP_ROLE',
           });
+          return;
+        }
+        // Demo 계정 보호(정책 §8 role 변경): 회원 유형 변경도 write **전에** 막는다.
+        if (await demoAccountService.isDemoAccount(userId)) {
+          respondDemoAccountForbidden(res);
           return;
         }
         // Platform admin은 scope.serviceKeys가 빈 배열 → 프론트에서 전달한 키 사용
@@ -1257,6 +1288,12 @@ export class MembershipConsoleController {
         return;
       }
 
+      // Demo 계정 보호(정책 §8 role 변경 · ownership 해제): write **전에** 막는다.
+      if (await demoAccountService.isDemoAccount(userId)) {
+        respondDemoAccountForbidden(res);
+        return;
+      }
+
       const deleted = await approvalService.deleteMember({
         userId,
         deletedBy,
@@ -1300,6 +1337,12 @@ export class MembershipConsoleController {
 
       if (!role || typeof role !== 'string') {
         res.status(400).json({ success: false, error: 'role is required' });
+        return;
+      }
+
+      // Demo 계정 보호(정책 §8 role 변경 · ownership 해제): write **전에** 막는다.
+      if (await demoAccountService.isDemoAccount(userId)) {
+        respondDemoAccountForbidden(res);
         return;
       }
 
@@ -1432,6 +1475,12 @@ export class MembershipConsoleController {
           error: SELF_ROLE_REVOKE_FORBIDDEN_MESSAGE,
           code: SELF_ROLE_REVOKE_FORBIDDEN_CODE,
         });
+        return;
+      }
+
+      // Demo 계정 보호(정책 §8 role 변경 · ownership 해제): write **전에** 막는다.
+      if (await demoAccountService.isDemoAccount(userId)) {
+        respondDemoAccountForbidden(res);
         return;
       }
 

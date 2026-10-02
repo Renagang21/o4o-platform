@@ -16,6 +16,7 @@ import type { DataSource } from 'typeorm';
 import logger from '../../../utils/logger.js';
 import { isAdminTierRoleName } from '../../../utils/role-revoke-safety.js';
 import { organizationOpsService } from '../../organization/services/organization-ops.service.js';
+import { demoAccountService } from '../../../services/auth/demo-account.service.js';
 
 export class OperatorRegistrationService {
   constructor(private dataSource: DataSource) {}
@@ -117,6 +118,9 @@ export class OperatorRegistrationService {
       if (!userRow) {
         throw new Error('USER_NOT_FOUND');
       }
+
+      // Demo 계정의 role · membership 은 고정 — write 전에 거절(WO-O4O-CANONICAL-DEMO-ACCOUNT-FOUNDATION-AND-EXPERIENCE-LOGIN-V1).
+      await demoAccountService.assertNotDemoAccount(userId, queryRunner.manager);
 
       // 2. service_memberships 승인 (RETURNING 없음)
       await queryRunner.query(
@@ -325,6 +329,7 @@ export class OperatorRegistrationService {
    * service_memberships.status → 'rejected'
    */
   async rejectRegistration(userId: string, rejectedBy: string, reason?: string) {
+    await demoAccountService.assertNotDemoAccount(userId, this.dataSource);
     const result = await this.dataSource.query(
       `UPDATE service_memberships
        SET status = 'rejected',

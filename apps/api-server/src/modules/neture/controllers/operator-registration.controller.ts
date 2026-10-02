@@ -17,6 +17,7 @@ import type { ActionLogService } from '@o4o/action-log-core';
 import { requireAuth, requireRole } from '../../../middleware/auth.middleware.js';
 import { OperatorRegistrationService } from '../services/operator-registration.service.js';
 import logger from '../../../utils/logger.js';
+import { sendDemoAccountForbidden } from '../../../services/auth/demo-account.service.js';
 
 /**
  * Operator/Admin role guard — DB-based (role_assignments 실시간 조회)
@@ -85,6 +86,7 @@ export function createOperatorRegistrationController(dataSource: DataSource, act
         }).catch(() => {});
         res.json({ success: true, data: result });
       } catch (error: any) {
+        if (sendDemoAccountForbidden(res, error)) return;
         // WO-O4O-ROLE-ASSIGNMENT-CONTRACT-CONSISTENCY-AUDIT-AND-HARDENING-V1 (1):
         //   가입 승인 경로에서 admin/operator 승격이 시도된 경우. 승인 트랜잭션은
         //   롤백되며(회원 상태 변경 없음), 운영자·관리자 부여는 중앙 `/operators` 전용이다.
@@ -139,6 +141,7 @@ export function createOperatorRegistrationController(dataSource: DataSource, act
         }).catch(() => {});
         res.json({ success: true, data: result });
       } catch (error: any) {
+        if (sendDemoAccountForbidden(res, error)) return;
         if (error?.message === 'REGISTRATION_NOT_FOUND') {
           res.status(404).json({
             success: false,

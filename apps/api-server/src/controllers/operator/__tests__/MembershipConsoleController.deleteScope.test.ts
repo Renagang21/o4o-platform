@@ -19,6 +19,20 @@
 
 const mockDeleteMember = jest.fn(async () => true);
 
+// WO-O4O-CANONICAL-DEMO-ACCOUNT-FOUNDATION-AND-EXPERIENCE-LOGIN-V1: 이 suite 의 대상은 Demo 가 아니다 — 판정은 "Demo 아님" 으로 고정.
+//   Demo 거절 · write 0 · fail-closed 는 `services/auth/__tests__/demoAccountWriteGuard.behavior.test.ts` 가 본다.
+jest.mock('../../../services/auth/demo-account.service.js', () => {
+  const actual = jest.requireActual('../../../services/auth/demo-account.service.js');
+  return {
+    ...actual,
+    demoAccountService: {
+      isDemoAccount: jest.fn(async () => false),
+      isDemoOrganization: jest.fn(async () => false),
+      assertNotDemoAccount: jest.fn(async () => undefined),
+    },
+  };
+});
+
 jest.mock('../../../database/connection.js', () => ({
   AppDataSource: {
     isInitialized: false,

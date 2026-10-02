@@ -18,6 +18,7 @@ import {
 } from '../../services/admin/operator-assignment.service.js';
 import { OperatorRoleContractError, ASSIGNABLE_OPERATOR_ROLES } from '../../config/operator-role-catalog.js';
 import logger from '../../utils/logger.js';
+import { DemoAccountForbiddenError } from '../../services/auth/demo-account.service.js';
 
 let actionLogService: ActionLogService | undefined;
 function getActionLogService(): ActionLogService | undefined {
@@ -38,6 +39,7 @@ function fail(res: Response, error: unknown, context: string): void {
   if (
     error instanceof OperatorAssignmentError
     || error instanceof OperatorRoleContractError
+    || error instanceof DemoAccountForbiddenError
   ) {
     res.status(error.statusCode).json({ success: false, error: error.message, code: error.code });
     return;

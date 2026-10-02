@@ -19,6 +19,11 @@
 import { roleAssignmentService } from '../../modules/auth/services/role-assignment.service.js';
 import { BRANCH_ORG_TYPE } from '../../routes/kpa-branch/entities/kpa-organization.entity.js';
 import { KPA_BRANCH_OPERATOR_ROLE, KPA_BRANCH_SERVICE_KEY } from './branch-lifecycle.service.js';
+import {
+  demoAccountService,
+  DEMO_ACCOUNT_FORBIDDEN_CODE,
+  DEMO_ACCOUNT_FORBIDDEN_MESSAGE,
+} from '../auth/demo-account.service.js';
 
 export interface BranchOperatorQueryRunner {
   query: (sql: string, params?: unknown[]) => Promise<any>;
@@ -111,6 +116,13 @@ export class BranchOperatorDesignationService {
     };
   }
 
+  /** Demo 계정의 role 은 고정 — 판정 정본은 `demo_accounts.user_id`(조회 실패는 그대로 올린다). */
+  private async rejectDemoAccount(userId: string): Promise<void> {
+    if (await demoAccountService.isDemoAccount(userId, this.db)) {
+      throw new BranchOperatorDesignationError(403, DEMO_ACCOUNT_FORBIDDEN_CODE, DEMO_ACCOUNT_FORBIDDEN_MESSAGE);
+    }
+  }
+
   /** 지정 — 이 분회 active 소속 + 서비스 membership active 인 사람만. 이미 운영자면 그대로(멱등). */
   async designate(branchId: string, userId: string, actorUserId: string): Promise<{ assigned: boolean }> {
     await this.requireBranch(branchId);
@@ -126,6 +138,7 @@ export class BranchOperatorDesignationService {
         '분회 서비스 가입이 승인된(active) 회원만 운영자로 지정할 수 있습니다. 먼저 서비스 가입 승인을 처리하세요.',
       );
     }
+    await this.rejectDemoAccount(userId);
     if (await roleAssignmentService.hasRole(userId, KPA_BRANCH_OPERATOR_ROLE)) return { assigned: false };
     await roleAssignmentService.assignRole({ userId, role: KPA_BRANCH_OPERATOR_ROLE, assignedBy: actorUserId });
     return { assigned: true };
@@ -138,6 +151,7 @@ export class BranchOperatorDesignationService {
     if (!(await roleAssignmentService.hasRole(userId, KPA_BRANCH_OPERATOR_ROLE))) {
       throw new BranchOperatorDesignationError(404, 'NOT_OPERATOR', '이 회원은 분회 운영자가 아닙니다.');
     }
+    await this.rejectDemoAccount(userId);
     await roleAssignmentService.removeRole(userId, KPA_BRANCH_OPERATOR_ROLE);
     return { removed: true };
   }

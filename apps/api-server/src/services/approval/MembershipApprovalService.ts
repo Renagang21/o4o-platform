@@ -17,6 +17,7 @@ import { AppDataSource } from '../../database/connection.js';
 import logger from '../../utils/logger.js';
 import { resolveRolePrefixFromCanonicalServiceKey } from '@o4o/security-core';
 import { isAdminTierRoleName } from '../../utils/role-revoke-safety.js';
+import { demoAccountService } from '../auth/demo-account.service.js';
 
 /**
  * WO-O4O-KPA-MEMBERSHIP-STATUS-SINGLE-TRANSACTION-CONVERGENCE-V1
@@ -436,6 +437,9 @@ export class MembershipApprovalService {
         throw new Error(`CRITICAL: service_memberships.user_id is null for id=${membershipId}`);
       }
 
+      // Demo 계정 보호(정책 §8 role 변경): 승인으로 역할이 붙기 **전에** 막는다.
+      await demoAccountService.assertNotDemoAccount(userId, queryRunner);
+
       // WO-O4O-STORE-OWNER-AGREEMENT-PUBLISH-PREREQUISITES-V1 §4:
       // K-Cosmetics / PharmacyHub store_owner 는 활성화 직전 사업자정보 5항목을 서버에서 재검증한다.
       // pending 신청 자체는 허용하되 불완전한 정보로 active role 이 부여되는 경로는 차단한다.
@@ -625,6 +629,9 @@ export class MembershipApprovalService {
         statusBefore,
       });
 
+      // Demo 계정 보호(정책 §8 role 변경): 반려로 역할이 내려가기 **전에** 막는다.
+      await demoAccountService.assertNotDemoAccount(userId, queryRunner);
+
       // STEP1: Reject membership
       await queryRunner.query(
         `UPDATE service_memberships
@@ -743,6 +750,9 @@ export class MembershipApprovalService {
     params: SuspendParams
   ): Promise<SuspendResult | null> {
     const { userId, suspendedBy, isPlatformAdmin, serviceKeys } = params;
+
+    // Demo 계정 보호(정책 §8 role 변경 · ownership 해제): write **전에** 막는다 — 판정 정본은 demo_accounts.user_id.
+    await demoAccountService.assertNotDemoAccount(userId, queryRunner);
 
     try {
       // STEP0: SELECT active memberships FOR UPDATE
@@ -908,6 +918,9 @@ export class MembershipApprovalService {
     params: ReactivateParams
   ): Promise<ReactivateResult | null> {
     const { userId, reactivatedBy, isPlatformAdmin, serviceKeys } = params;
+
+    // Demo 계정 보호(정책 §8 role 변경 · ownership 해제): write **전에** 막는다 — 판정 정본은 demo_accounts.user_id.
+    await demoAccountService.assertNotDemoAccount(userId, queryRunner);
 
     try {
       // STEP0: SELECT reactivatable memberships FOR UPDATE
@@ -1152,6 +1165,9 @@ export class MembershipApprovalService {
   ): Promise<WithdrawResult | null> {
     const { userId, withdrawnBy, isPlatformAdmin, serviceKeys } = params;
 
+    // Demo 계정 보호(정책 §8 role 변경 · ownership 해제): write **전에** 막는다 — 판정 정본은 demo_accounts.user_id.
+    await demoAccountService.assertNotDemoAccount(userId, queryRunner);
+
     try {
       // STEP0: SELECT eligible memberships FOR UPDATE
       logger.info('[WITHDRAW][STEP0] SELECT eligible memberships FOR UPDATE', {
@@ -1373,6 +1389,8 @@ export class MembershipApprovalService {
       logger.warn('[ApprovalService] DELETE_REJECTED_NO_SCOPE', { userId, deletedBy, isPlatformAdmin, mode });
       return false;
     }
+    // Demo 계정 보호(정책 §8 role 변경 · ownership 해제): transaction 을 열기 **전에** 막는다.
+    await demoAccountService.assertNotDemoAccount(userId);
     const queryRunner = AppDataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();

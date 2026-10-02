@@ -17,6 +17,7 @@ import {
 import { CosmeticsProduct } from '../entities/index.js';
 import { organizationOpsService } from '../../../modules/organization/services/organization-ops.service.js';
 import { RoleAssignmentService } from '../../../modules/auth/services/role-assignment.service.js';
+import { demoAccountService } from '../../../services/auth/demo-account.service.js';
 
 export class CosmeticsStoreService {
   private repository: CosmeticsStoreRepository;
@@ -101,6 +102,8 @@ export class CosmeticsStoreService {
     if (application.status !== CosmeticsStoreApplicationStatus.SUBMITTED) {
       throw new Error('APPLICATION_NOT_PENDING');
     }
+    // Demo 계정의 role · ownership 은 고정 — 승인 · 반려 모두 write 전에 거절.
+    await demoAccountService.assertNotDemoAccount(application.applicantUserId, this.dataSource);
 
     if (action === 'approve') {
       // Check business_number not already taken by another store

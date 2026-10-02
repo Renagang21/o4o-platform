@@ -6,6 +6,7 @@ import { roleAssignmentService } from '../../auth/services/role-assignment.servi
 import { hasLectureAdminRole, isLectureCourse, LECTURE_INSTRUCTOR_ROLE } from '../middleware/lecture-access.js';
 import { applyCourseScopeToQuery, resolveScopeOrRespond } from '../utils/lms-scope-guard.js';
 import logger from '../../../utils/logger.js';
+import { demoAccountService, respondDemoAccountForbidden } from '../../../services/auth/demo-account.service.js';
 // WO-O4O-LMS-ASSIGNMENT-GRADING-V1
 import { AssignmentService } from '../services/AssignmentService.js';
 import { LessonService } from '../services/LessonService.js';
@@ -159,6 +160,11 @@ export class InstructorController extends BaseController {
 
       if (application.status !== 'pending') {
         return BaseController.badRequest(res, `이미 처리된 신청입니다 (현재: ${application.status})`);
+      }
+
+      // Demo 계정 보호(정책 §8 role 변경): 승인 write 전에 막는다.
+      if (await demoAccountService.isDemoAccount(application.userId)) {
+        return respondDemoAccountForbidden(res);
       }
 
       // 1. 신청 승인
