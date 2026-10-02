@@ -52,6 +52,8 @@ const DEMOS = [
     /** 기존 "테스트 약국" 재사용 — 샘플 콘텐츠 15 · 플레이리스트 5 가 이미 붙어 있다. */
     organizationId: '9c87f46b',
     serviceKeys: ['kpa-society', 'neture'],
+    /** isStoreOwner('kpa') 의 STORE_OWNER_ROLES_BY_SERVICE.kpa — store-contents · store-playlists 진입 자격. */
+    roles: ['kpa:store_owner'],
   },
   {
     demoType: 'SUPPLIER' as const,
@@ -61,12 +63,22 @@ const DEMOS = [
     organizationId: null,
     newOrganization: { name: 'O4O 공급자 Demo', code: 'O4O-SUPPLIER-DEMO', type: 'supplier' },
     serviceKeys: ['supplier', 'neture'],
+    /** web-neture SupplierRoute 의 SUPPLIER_ROLES 정본(NETURE_ROLES.SUPPLIER). 데이터 범위는 위 ownership 이 정한다. */
+    roles: ['neture:supplier'],
   },
 ];
 
 /** 절대 대상이 아닌 식별자 — 실행 전에 교차 확인한다. */
 const FORBIDDEN_ORG_PREFIXES = ['95aad740', '69e985ae', 'a79e18fd', 'c9beb4a2'];
 const FORBIDDEN_USER_PREFIXES = ['cfd2a5e7', 'c0156a4a', '322667c8'];
+
+/**
+ * Demo 에 부여해도 되는 service-scoped role — 이 목록 밖은 실행 전에 거절한다.
+ * platform:* · admin · operator · 은퇴 역할(pharmacist · partner 등)은 Demo 대상이 아니다.
+ * Demo 여부는 demo_accounts 가, 화면 접근은 이 role 이, 데이터 범위는 ownership 이 정한다
+ * (route guard 를 Demo 라는 이유로 우회하지 않는다).
+ */
+const ALLOWED_DEMO_ROLES: ReadonlySet<string> = new Set(['kpa:store_owner', 'neture:supplier']);
 
 function createDataSource(): DataSource {
   const { DB_HOST, DB_PORT, DB_USERNAME, DB_PASSWORD, DB_NAME } = process.env;
@@ -111,6 +123,9 @@ async function assertPreconditions(): Promise<void> {
   for (const d of DEMOS) {
     if (d.organizationId && FORBIDDEN_ORG_PREFIXES.some((p) => d.organizationId!.startsWith(p))) {
       throw new Error(`금지된 조직을 대상으로 삼았다: ${d.organizationId}`);
+    }
+    for (const role of d.roles) {
+      if (!ALLOWED_DEMO_ROLES.has(role)) throw new Error(`Demo 에 허용되지 않은 role: ${role}`);
     }
   }
 }
@@ -236,8 +251,7 @@ async function run(): Promise<void> {
       }
     }
 
-    // service membership — 화면 진입 자격. 역할(role_assignments)은 부여하지 않는다:
-    // 운영자 권한 축이며 Demo 는 사업자/매장 축으로 들어간다(정책 §18 platform:* 0).
+    // service membership — 서비스 가입 상태. 화면 접근 role 은 아래 role_assignments 단계가 맡는다.
     const memberships: string[] = [];
     for (const key of demo.serviceKeys) {
       if (!userId) {
@@ -256,9 +270,32 @@ async function run(): Promise<void> {
       }
     }
 
+    // service-scoped role — 화면 접근 자격(RBAC SSOT = role_assignments). 활성 행이 있으면 그대로 둔다.
+    // 비활성 이력 행은 되살리지 않고 새 활성 행만 추가한다(ux_role_assignments_user_role_active).
+    const roleActions: string[] = [];
+    for (const role of demo.roles) {
+      if (!userId) {
+        roleActions.push(`${role}:${willHaveUser ? 'CREATE(plan)' : 'skip'}`);
+        continue;
+      }
+      const r = await one(
+        `SELECT id FROM role_assignments WHERE user_id = $1 AND role = $2 AND is_active = true`,
+        [userId, role],
+      );
+      roleActions.push(`${role}:${r ? 'exists' : 'CREATE'}`);
+      if (!r && APPLY) {
+        await ds.query(
+          `INSERT INTO role_assignments (user_id, role, is_active, valid_from, assigned_at, created_at, updated_at)
+           VALUES ($1, $2, true, NOW(), NOW(), NOW(), NOW())`,
+          [userId, role],
+        );
+        writes += 1;
+      }
+    }
+
     summary.push(
       `${demo.demoType}  user=${userAction} password=${pwAction} registry=${regAction} ` +
-        `org=${orgAction} owner=${ownerAction} supplier=${supplierAction} memberships=[${memberships.join(' ')}]`,
+        `org=${orgAction} owner=${ownerAction} supplier=${supplierAction} memberships=[${memberships.join(' ')}] roles=[${roleActions.join(' ')}]`,
     );
   }
 
