@@ -218,13 +218,46 @@ REUSE_AND_RELINK · DELETE_AFTER_RELINK · KEEP · UNKNOWN
 Demo 계정에 `linked_accounts(provider='google')` 를 **만들지 않는다.**
 인증 수단은 password credential 하나뿐이다.
 
-## 18. Admin 정책
+## 18. Admin 정책 · role 허용 범위
 
 ```text
 platform:* 없음 · admin-dashboard 접근 금지
 ```
 
 현재의 "password 세션은 Admin Google 전용" 정책을 그대로 따른다.
+
+### 18-1. service-scoped role allowlist (2026-10-02 확정)
+
+Demo 는 **role 을 가진다.** §5 의 "role · membership · ownership 연결" 이 그것이고, 그게 없으면
+체험 화면에 들어가지 못한다. 다만 **허용 범위는 이 둘로 고정**한다.
+
+| | role | 쓰는 곳 |
+|---|---|---|
+| Store Owner Demo | `kpa:store_owner` | `isStoreOwner('kpa')` — store-contents · store-playlists 진입 |
+| Supplier Demo | `neture:supplier` | web-neture `SupplierRoute` 의 `SUPPLIER_ROLES` |
+
+```text
+금지  platform:*  ·  admin  ·  operator  ·  *:admin  ·  *:operator  ·  그 밖의 모든 role
+```
+
+**"role 자체를 주지 않는다" 가 아니다.** 체험이 목적이므로 화면 접근 자격은 준다. 대신 그 자격이
+운영 권한으로 번지지 않게 **허용값을 좁게 적는다** — Demo 는 공개 credential 을 쓰므로, 역할이
+하나 넓어지면 그만큼이 공개된다.
+
+데이터 범위는 role 이 아니라 **ownership** 이 정한다. route guard 를 "Demo 니까" 로 우회하지 않는다.
+
+구현 · 계약:
+
+```text
+CLI      apps/api-server/src/scripts/demo-account-provision.ts
+         ALLOWED_DEMO_ROLES = { kpa:store_owner, neture:supplier }
+         목록 밖 role 은 DB 를 건드리기 전(assertPreconditions)에 거절한다
+계약     src/scripts/__tests__/demo-account-provision.contract.test.ts ⑦
+         allowlist 값 · 실제 부여 role · 금지 prefix · 선행 거절 · INSERT guard 순서를 고정
+```
+
+§8 의 server-side 보호(비밀번호 변경 · 삭제 · Google 연결 차단)와 **다른 축**이다. 저쪽은 Demo
+계정을 지키는 것이고, 이쪽은 Demo 계정이 **가질 수 있는 권한의 상한**이다.
 
 ## 19. 실제 이메일 가입 E2E 와 분리
 
