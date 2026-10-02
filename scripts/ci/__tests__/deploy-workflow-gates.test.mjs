@@ -305,3 +305,33 @@ describe('GCP 인증 = WIF — 장기 SA key 0', () => {
     assert.doesNotMatch(wf, /secrets\.|gcloud run deploy|update-traffic|jobs execute|print-access-token|print-identity-token|token_format/);
   });
 });
+
+// WO-O4O-PRODUCTION-SECRET-ENVIRONMENT-MIGRATION-AND-COLLABORATOR-SAFETY-CLOSURE-V1
+// production credential 의 resolve scope 검증 — 값 출력 0 · 배포 · GCP 0 · 소유자만. repository-scope job 은 일부러
+// environment 밖이다(collaborator branch workflow 와 같은 시야 — 이전 후 ABSENT 여야 한다).
+describe('Production secret resolution check — 값 노출 0', () => {
+  const FILE = '.github/workflows/production-secret-resolution-check.yml';
+  // 주석(판정 안내 — `gh secret list --env production` 등)은 제외하고 실행 줄만 본다
+  const wf = read(FILE)
+    .split('\n')
+    .filter((l) => !l.trim().startsWith('#'))
+    .join('\n');
+  const NAMES = ['GCP_DB_NAME', 'GCP_DB_USERNAME', 'GCP_JWT_SECRET', 'SMTP_USER', 'SMTP_PASS', 'GEMINI_API_KEY', 'OPENAI_API_KEY'];
+
+  it('수동 · 두 job 모두 소유자만 · environment-scope 만 production environment', () => {
+    assert.match(wf, /^on:\n {2}workflow_dispatch:\n/m);
+    assert.equal(count(wf, /if: github\.triggering_actor == github\.repository_owner/g), 2);
+    assert.equal(count(wf, /^ {4}environment: production$/gm), 1);
+    assert.match(wf, /\n {2}environment-scope:\n[\s\S]*?\n {4}environment: production\n/);
+  });
+  it('production credential 7개를 두 scope 에서 같은 이름으로 읽는다', () => {
+    for (const n of NAMES) assert.equal(count(wf, new RegExp(`${n}: \\$\\{\\{ secrets\\.${n} \\}\\}`, 'g')), 2, n);
+    assert.doesNotMatch(wf, /GCP_SA_KEY|GCP_DB_PASSWORD|E2E_/);
+  });
+  it('원문 · 전체 digest 출력 0 — fingerprint 는 sha256 앞 6자만 · 배포 · GCP · token 0', () => {
+    assert.equal(count(wf, /digest\("hex"\)\.slice\(0, 6\)/g), 2);
+    assert.doesNotMatch(wf, /echo "?\$\{?(GCP|SMTP|GEMINI|OPENAI)|console\.log\(v\)|console\.log\(process\.env\[n\]\)|base64/);
+    assert.doesNotMatch(wf, /google-github-actions\/auth@|gcloud |id-token: write|gh secret|gh variable/);
+    assert.match(wf, /^permissions:\n {2}contents: read\n/m);
+  });
+});
