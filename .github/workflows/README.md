@@ -30,6 +30,8 @@ cutover(`DELIVERY_ENFORCE: 'true'` + `deploy-auto.yml` 비활성, 같은 commit 
 [`CHECK-O4O-CICD-UNIFIED-DELIVERY-PIPELINE-V1`](../../docs/checks/CHECK-O4O-CICD-UNIFIED-DELIVERY-PIPELINE-V1.md).
 각 deploy workflow 의 `ci-gate` job 이 target SHA 의 `CI Pipeline` green 을 요구하고, rollout 은 서비스 단위 concurrency 로 1개씩이다.
 job 의 `environment: production` 은 승인 게이트가 아니라 배포 ref 경계다 — `main` · `deploy/*` 에서만 실행되고 production credential 은 environment secret 이다(required reviewer 없음). 수동 dispatch 는 소유자만 `ci-gate` 를 연다.
+production credential 7개는 `production` Environment 에만 있고 repository secret 은 0개다(2026-10-02 이전 완료). DB 비밀번호 runtime source 는 Secret Manager `o4o-db-password`.
+scope 검증은 `production-secret-resolution-check.yml`(수동 · 소유자 · 값 출력 0) — 이름 · 용도는 [`SECRETS_SETUP.md`](../SECRETS_SETUP.md).
 GCP 인증은 WIF(`workload_identity_provider` + `service_account` · 장기 key 없음)다 — provider 조건과 인증 smoke(`gcp-wif-auth-smoke.yml`)는 [`SECRETS_SETUP.md`](../SECRETS_SETUP.md).
 예외 경로(`migrate_only`)와 변경 원칙은 루트 [`README.md`](../../README.md) "배포" · "Production 변경 원칙" 절이 정본이다.
 

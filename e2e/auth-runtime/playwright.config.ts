@@ -6,12 +6,10 @@
  * 대상: 4개 배포 서비스의 공통 auth runtime regression 검증
  * 실행: npx playwright test --config=e2e/auth-runtime/playwright.config.ts
  *
- * 자격증명: docs/local/TEST-ACCOUNTS.local.md 참조
- * 환경변수 설정 — **서비스별 분리** (공용 E2E_ADMIN_* 는 폐기):
- *   E2E_KPA_ADMIN_EMAIL    / E2E_KPA_ADMIN_PASSWORD
- *   E2E_KCOS_ADMIN_EMAIL   / E2E_KCOS_ADMIN_PASSWORD
- *   E2E_NETURE_ADMIN_EMAIL / E2E_NETURE_ADMIN_PASSWORD
- * 이유는 helpers/auth.helpers.ts 상단 credential 계약 주석 참조.
+ * 자격증명: 없음 — Google-only 재정의(WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1)로 서비스별 관리자 email/password
+ * 환경변수 계약은 은퇴했고, 그 GitHub repository secret 6개도 2026-10-02 삭제됐다
+ * (WO-O4O-PRODUCTION-SECRET-ENVIRONMENT-MIGRATION-AND-COLLABORATOR-SAFETY-CLOSURE-V1). 남은 환경변수는 E2E_API_BASE_URL(선택) 뿐.
+ * 이유는 helpers/auth.helpers.ts 상단 주석 참조. (변수 이름을 여기 적지 않는다 — e2e-auth-runtime.yml 의 재도입 차단 grep 대상)
  */
 
 import { defineConfig, devices } from '@playwright/test';
