@@ -544,6 +544,54 @@ UI 는 neture.co.kr 에만 있다.
 
 ---
 
+## 2-11. Demo 최소 service-scoped role 부여 + runtime smoke (2026-10-02 · write 2 · **STOP: playlist 기대값 불일치**)
+
+사용자 결정: 접근 판정 코드를 Demo 전용으로 우회하지 않고, **Demo 2 계정에 필요한 최소 service role 만 정상 부여**한다.
+Demo 여부 = `demo_accounts` · 화면 접근 = `role_assignments` · 데이터 범위 = organization ownership.
+
+**read-only census — role key 는 코드 정본 그대로**
+
+```text
+Store Demo     /kpa/store-contents · /kpa/store-playlists → isStoreOwner(…, 'kpa')
+               STORE_OWNER_ROLES_BY_SERVICE.kpa = ['kpa:store_owner']  (utils/store-owner.utils.ts)
+               + active service_memberships(kpa-society) — 이미 있음 · ownership 9c87f46b owner — 이미 있음
+               store_owner_agreement 게시 문서 0 → 약정 게이트 미발동
+Supplier Demo  web-neture SupplierRoute → SUPPLIER_ROLES = [NETURE_ROLES.SUPPLIER='neture:supplier', legacy 2]
+               + requireMembership 'neture' — 이미 있음
+               backend /neture/supplier/* = createRequireSupplier → organization_members ownership(role 무관)
+role 정의      types/roles.ts — 'kpa:store_owner' · 'neture:supplier' 모두 deprecated:false
+운영 사례      kpa:store_owner 활성 1(scope_type global) · neture:supplier 0
+canonical 경로 roleAssignmentService.assignRole / kpa-store-organization.provisioning(4단계)와 같은 형태
+```
+
+**write 경로** — `demo-account-provision.ts` 에 role 단계 추가(4a3f1335d, 기본 dry-run, CLI 우선 §8).
+허용 목록 `ALLOWED_DEMO_ROLES = {kpa:store_owner, neture:supplier}` 밖은 실행 전 거절. 활성 행이 있으면 유지,
+비활성 이력 행은 되살리지 않는다.
+
+```text
+dry-run   STORE_OWNER roles=[kpa:store_owner:CREATE] · SUPPLIER roles=[neture:supplier:CREATE] · 그 외 전부 exists · writes 0
+--apply   writes=2 (예상 2 와 일치)
+재 dry-run roles 둘 다 exists · writes 0 (멱등)
+read-only Demo role 2 (global · active) · role_assignments 27 → 29 · Demo platform:*/admin/operator 0
+          다른 사용자 role 최근 1h 변경 0 · checkout_orders 23 · Demo acceptances 0
+```
+
+**runtime smoke** (운영 API · neture.co.kr 실브라우저 headless · Demo 공개 식별자)
+
+| 항목 | 결과 |
+|---|---|
+| Store login · `/auth/me` | **PASS** — 200 · roles `["kpa:store_owner"]` · pending 0 |
+| `GET /kpa/store-contents` | **PASS** — 200 · 15건 · id 집합이 `kpa_store_contents(9c87f46b)` 15건과 완전 일치(타 매장 0) |
+| `GET /kpa/store-playlists` | **FAIL(기대값 불일치)** — 200 · **0건**. 원인: 9c87f46b 의 5건이 전부 `is_active=false`(draft), 목록 쿼리는 `is_active = true` 만 반환 — 코드 동작은 정상, §2-10 의 "5" 는 비활성 포함 raw 수였다 |
+| Supplier `/supplier/dashboard` | **PASS** — 실 LoginModal 로그인 후 진입 · AccessDenied 없음 · 약관 게이트 없음 · 428 0 · API 4xx/5xx 0 |
+| Supplier 데이터 범위 | **PASS** — profile `8e33fdd8` / `o4o-supplier-demo` / ACTIVE · orders kpi total 0 · orders 0 · settlements 0 · event-offers 0 · copilot 0 → 운영 주문 22 비노출 |
+| store.neture.co.kr | NOT EXERCISED — Google 전용 로그인(후속 "email/password login adoption") |
+
+**STOP.** playlist 가 기대 5 와 다르다. 5건을 보이게 하려면 `store_playlists.is_active` UPDATE(데이터 write,
+승인 범위 밖) 또는 Demo 용 신규 playlist 생성이 필요하다 — 추가 수정 없이 사용자 판단 대기.
+
+---
+
 ## 3. 운영 write 승인 대기 목록
 
 ```text
