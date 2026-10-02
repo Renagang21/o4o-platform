@@ -140,6 +140,44 @@ import {
  */
 const QUESTION_TAKEOVER_REASONS = new Set<TakeoverReason>(['user_judgment_required']);
 
+// ── STRONG-FIRST-DISCOVERY-ROUTING-V1 A — 질문 이유 분리 ──
+//   정보 부족 · 사용자 결정은 바로 묻는다/넘긴다. 방법 부족은 사용자에게 넘기기 전에 Discovery 가 현재 화면을 다시 보고 직접 찾는다.
+//   credential · commit 은 이 분류 전에 별도 인계(never-escalate)로 끝나므로 여기 오지 않는다.
+export type QuestionBasis = 'information_missing' | 'method_missing' | 'user_decision';
+const METHOD_ASK_KINDS: ReadonlySet<string> = new Set(['menu_location', 'procedure_order', 'manual_request']);
+const INFORMATION_ASK_KINDS: ReadonlySet<string> = new Set(['value_confirmation', 'target_confirmation']);
+/** 한 run 에서 "방법을 몰라 묻기" 를 Discovery 재시도로 돌리는 상한 — 넘으면 원래대로 묻는다(무한 탐색 금지). */
+export const METHOD_DISCOVERY_MAX = 2;
+
+/**
+ * 질문의 이유. 근거는 Planner 가 선언한 ask.kind 와 neededInput 뿐이다.
+ * 이유를 알 수 없는 질문(ask 없음 · neededInput 없음)은 사용자 결정으로 본다 — AI 가 억지로 풀지 않는 쪽이 안전하다.
+ */
+export function classifyQuestionBasis(ask: ProposalAsk | null | undefined, neededInput?: string | null): QuestionBasis {
+  if (ask && METHOD_ASK_KINDS.has(ask.kind)) return 'method_missing';
+  if (ask && INFORMATION_ASK_KINDS.has(ask.kind)) return 'information_missing';
+  if (!ask && neededInput) return 'information_missing';
+  return 'user_decision';
+}
+
+// ── STRONG-FIRST-DISCOVERY-ROUTING-V1 B — Planner 역할(mode) routing ──
+//   모델 교체가 아니다. 같은 모델이어도 Discovery 역할(strongPlanner 경로)과 Experienced execution 역할(normal planner 경로)을
+//   국면으로 고른다. 새 업무 · 경험 없음 · 기존 방법 불일치 · Method Correction 직후는 Discovery. 검증된 방법이 있을 때만 Experienced.
+export type PlannerMode = 'discovery' | 'experienced';
+export function choosePlannerMode(s: {
+  /** 이 Task × Target 의 verified Preferred 패턴이 있다. */
+  hasVerifiedPreferred: boolean;
+  /** 저장된 Workflow 재생이 어긋남 없이 끝났다. */
+  replayCompleted: boolean;
+  /** 이번 run 에 사용자 교정(Method Correction 포함)이 들어왔다. */
+  correctionSeen: boolean;
+  /** 기존 방법이 맞지 않았다(재생 이탈 · 방법 탐색 · 복구 escalation). */
+  methodMismatch: boolean;
+}): PlannerMode {
+  if (s.correctionSeen || s.methodMismatch) return 'discovery';
+  return s.hasVerifiedPreferred || s.replayCompleted ? 'experienced' : 'discovery';
+}
+
 /** 재개 거부 사유 → 사용자 안내 한 줄. runId·원문·상태 enum 은 노출하지 않는다(§20). */
 function resumeRejectMessage(reason: ResumeRejectReason): string {
   switch (reason) {
@@ -182,6 +220,8 @@ export interface PlannerInput {
   knownTaskKeys?: readonly string[];
   /** 이 업무의 검증된 방법(Preferred) · 피할 방법(Avoid) — Task × Target × stage. */
   patterns?: readonly RecalledPattern[];
+  /** 방법을 몰라 물으려던 직후의 Discovery 재시도(STRONG-FIRST-DISCOVERY A). 구조만 — 원문 없음. */
+  methodDiscovery?: { attempt: number; askKind: string };
 }
 
 export interface WorkPlanner {
@@ -223,8 +263,11 @@ export const WORK_PLANNER_SYSTEM_PROMPT = [
   '규칙:',
   '- elementRef 는 관찰 목록에 있는 것만 쓴다. URL · CSS selector · XPath · JavaScript · 명령어 · 좌표는 절대 쓰지 않는다.',
   '- 로그인 · 비밀번호 · 인증번호 · 결제 · 주문 확정 · 삭제 · 게시(COMMIT 표시) 는 하지 않는다 → takeover(credential_required 또는 commit_required).',
-  '- 사용자가 가장 많이 얻는 지점(예: 검색 결과 화면)에 닿으면 끝까지 대신하려 하지 말고 takeover(goal_sufficiently_advanced) 로 화면을 넘긴다. 후보가 여럿이어도 좋다.',
-  '- 결과가 모호하거나 판단이 필요하면 takeover(user_judgment_required · ambiguous_result). 같은 행동을 반복하지 않는다.',
+  '- 목적이 요구하는 정보 · 화면에 실제로 닿았을 때 takeover(goal_sufficiently_advanced) 로 화면을 넘긴다. 목적이 목록의 한 항목 안 내용(상세 · 하위 탭의 정보)을 요구하면 목록에서 멈추지 말고 그 항목을 열어 이어간다. 어느 항목인지 사용자만 정할 수 있으면 그때 묻는다(target_confirmation).',
+  '- 질문 이유를 구분한다. ① 정보가 없다(값 · 대상을 사용자만 안다) → 바로 묻는다(value_confirmation · target_confirmation). ② 사용자가 결정해야 한다(로그인 · 인증번호 · 결제 · 제출 · 서명 · 본질적 선택 · 결과 확인) → 바로 넘긴다(credential_required · commit_required · success_confirmation). ③ 방법을 모른다(어디를 눌러야 하는지 · 메뉴 위치 · 절차) → 묻기 전에 직접 찾는다.',
+  '- 방법을 모른다는 이유만으로 사용자에게 넘기지 않는다. 관찰 목록의 링크 · 버튼(스크립트로 눌리는 표 칸 · 목록 행도 button 으로 보인다) · 탭 · 목록 항목 · 표를 업무 의미로 살피고, find · read_text · read_table 로 확인한 뒤 맞는 항목을 열어 본다. 그래도 방법을 찾지 못할 때만 ask.kind=menu_location · procedure_order · manual_request 로 묻는다.',
+  '- 후보가 보인다는 이유만으로 누르지 않는다 — 목적에 맞는 항목인지 이름 · 텍스트로 판단한 뒤 행동한다. 같은 행동을 반복하지 않는다.',
+  '- 결과가 모호해 사용자 판단이 필요하면 takeover(user_judgment_required · ambiguous_result).',
   '- 입력이 필요한데 사용자 입력(문장 · 이미지)에 값이 없으면 지어내지 말고 takeover(user_judgment_required) 하고 neededInput 에 무엇이 필요한지 적는다.',
   '- Windows 앱 표면: 메시지·글을 보내는(제출하는) 창의 제목이 사용자 요청에 이름으로 들어 있지 않으면 제출하지 말고 takeover(user_judgment_required). 로그인/인증 창(USER_ACTION)에는 아무것도 입력하지 않는다. 제출 뒤에는 입력창이 비었는지로 결과를 확인한다.',
   '- 이미지가 있으면 **현재 화면이 요구하는 입력에 필요한 부분만** 읽는다(예: 입력란이 식별문자를 요구하면 각인만). 이미지 전체를 구조화하지 않는다. 확신이 없으면 가능한 값으로 진행하고 후보가 여럿 나와도 된다.',
@@ -284,6 +327,10 @@ export function buildPlannerUserPrompt(input: PlannerInput): string {
       return `- step ${s.step}: ${what} → ${s.status}${s.errorCode ? ` ${s.errorCode}` : ''}${s.navigated ? ' (페이지 이동)' : s.changed ? ' (화면 변화)' : ''}`;
     });
     lines.push(`## 지금까지의 행동\n${h.join('\n')}`);
+  }
+  if (input.methodDiscovery) {
+    // A — 방법을 몰라 물으려던 국면. 사용자에게 넘기기 전에 Discovery 가 현재 화면을 다시 보고 직접 찾는다.
+    lines.push(`## 방법 탐색 (Discovery · 사용자에게 묻기 전 · 시도 ${input.methodDiscovery.attempt}/${METHOD_DISCOVERY_MAX})\n직전 제안은 방법을 몰라 사용자에게 물으려 했다(ask.kind=${input.methodDiscovery.askKind}). 현재 화면을 다시 관찰했다. 아래 관찰 목록의 링크 · 버튼(스크립트로 눌리는 칸 포함) · 탭 · 목록 항목 · 표를 업무 의미로 살펴 방법을 직접 찾아 다음 행동을 낸다. 필요하면 find · read_text · read_table 로 확인한다. 값이 없거나 로그인 · 인증 · 결제 · 제출 · 본질적 선택이면 억지로 하지 말고 그때 묻는다.`);
   }
   if (input.lastRejectReason) lines.push(`## 직전 제안 거절 사유\n${input.lastRejectReason}${input.lastSafetyReason ? ` (${input.lastSafetyReason})` : ''} — 같은 제안을 반복하지 말 것. SAFETY_REJECT 면 창을 앞으로 가져오거나(window click) 다시 관찰한 뒤 진행하고, 해결되지 않으면 takeover.`);
   // 사용자 힌트(source=user · 신뢰). 권한·위험은 못 바꾼다 — 그래도 로그인/결제/제출 금지 규칙이 우선한다(§65).
@@ -594,7 +641,12 @@ export async function runWorkAgent(
   let lastSafetyReason = '';
   // 실패→복구 계층(WO-O4O-AUTOMATION-FAILURE-ESCALATION). strongPlanner 없으면 escalation 없이 기존대로 동작한다.
   const strongPlanner = options.strongPlanner;
-  let activePlanner: WorkPlanner = planner;
+  // B — 경험 없는 시작은 Discovery 역할이다(아래 loop 진입 때 경험 근거로 다시 정한다). strongPlanner 가 없으면 같은 planner 가 맡는다.
+  let plannerMode: PlannerMode = 'discovery';
+  let activePlanner: WorkPlanner = strongPlanner ?? planner;
+  /** A — 이번 run 의 방법 탐색 재시도 횟수와, 다음 계획에 실을 탐색 맥락(한 번 쓰고 비운다). */
+  let methodDiscoveryAttempts = 0;
+  let methodDiscovery: PlannerInput['methodDiscovery'] = undefined;
   const recoveryHint = sanitizeRecoveryHint(input.recoveryHint) ?? undefined;
   let recoveryStatus: string | null = null;
   // PHASE 1 — QUESTION↔TAKEOVER 분리 · 재개 원장(§조건 5). QUESTION 은 waiting_for_user(같은 runId 재개 가능),
@@ -646,8 +698,23 @@ export async function runWorkAgent(
   let userInput: ProposalUserInput | null = null;
   /** 재생 전 의미 검증이 멈춘 자리 — 재개 답이 값이면 그 자리만 채워 결정적으로 잇는다. */
   let questionReplay: { candidateId: string; stepIndex: number } | null = null;
+  // Experience 의 actor 는 실제로 계획한 planner 경로다 — Discovery(strongPlanner) 는 ai_strong, Experienced 는 ai_normal.
   const currentActor = (): ExperienceActor =>
     replaying ? 'deterministic' : strongPlanner && activePlanner === strongPlanner ? 'ai_strong' : 'ai_normal';
+  /** B — 경험 근거로 planner 역할을 다시 정한다. 시작 시와 바뀔 때만 enum 로그를 남긴다. */
+  const refreshPlannerMode = (why: 'start' | 'patterns' | 'correction' | 'method_discovery' | 'escalation'): void => {
+    const next = choosePlannerMode({
+      hasVerifiedPreferred: patterns.some((p) => p.polarity === 'preferred'),
+      replayCompleted: workflow.replay === 'completed',
+      correctionSeen: userInput?.kind === 'correction',
+      methodMismatch: workflow.replay === 'diverged' || methodDiscoveryAttempts > 0 || state.recovery.escalatedToStrong,
+    });
+    const nextPlanner = next === 'discovery' && strongPlanner ? strongPlanner : planner;
+    if (why !== 'start' && next === plannerMode && nextPlanner === activePlanner) return; // 시작 역할은 늘 남긴다(실 PC 확인용).
+    plannerMode = next;
+    activePlanner = nextPlanner;
+    logger.info('work-agent planner mode', { mode: next, why, aiPlanCount: state.aiPlanCount });
+  };
   const settle = async (): Promise<void> => {
     const t = Date.now();
     await sleep(NAVIGATION_SETTLE_MS);
@@ -973,6 +1040,8 @@ export async function runWorkAgent(
     const decision = decideRecovery(state.recovery, cls);
     if (decision.useStrongModel && strongPlanner) {
       activePlanner = strongPlanner;
+      if (plannerMode !== 'discovery') logger.info('work-agent planner mode', { mode: 'discovery', why: 'escalation', aiPlanCount: state.aiPlanCount });
+      plannerMode = 'discovery'; // 막힘 → Discovery 역할로 되돌린다(B). 기록 actor 도 ai_strong.
       recoveryStatus = RECOVERY_ERROR.ESCALATED;
       state.invalidProposals = 0;
       sameObservationRun = 0;
@@ -1437,6 +1506,8 @@ export async function runWorkAgent(
   }
 
   // ── loop ──────────────────────────────────────────────────────────────────
+  // B — 새 업무 · 경험 없음 · 재생 불일치 · 교정 직후는 Discovery 역할로 시작한다. 검증 경험이 있으면 Experienced.
+  refreshPlannerMode('start');
   while (true) {
     if (overTime() || budgetLeft() < 1) return takeover('loop_limit', 'no_progress');
     if (state.aiPlanCount >= WORK_LOOP_LIMITS.maxAiPlans) return takeover('loop_limit', 'no_progress');
@@ -1460,7 +1531,9 @@ export async function runWorkAgent(
         ...(resumedRun ? { userAnswer: goal.request, resumeFrame } : {}),
         ...(knownTaskKeys.length ? { knownTaskKeys } : {}),
         ...(patterns.length ? { patterns } : {}),
+        ...(methodDiscovery ? { methodDiscovery } : {}),
       });
+      methodDiscovery = undefined;
       aiMs += Date.now() - planT0;
     } catch {
       aiMs += Date.now() - planT0;
@@ -1487,11 +1560,15 @@ export async function runWorkAgent(
     if (proposal.stage) declaredStage = proposal.stage;
     if (proposal.strategy) declaredStrategy = proposal.strategy;
     if (proposal.ask) declaredAsk = proposal.ask;
-    if (proposal.userInput && !userInput) userInput = proposal.userInput;
+    if (proposal.userInput && !userInput) {
+      userInput = proposal.userInput;
+      if (userInput.kind === 'correction') refreshPlannerMode('correction');
+    }
     // 처음 선언된 업무면 그 Task × Target 의 검증 패턴을 한 번 읽고, 있으면 이 제안은 실행하지 않고 패턴을 보여 주며 다시 계획한다.
     if (declaredTask && patternsRecalledFor !== declaredTask) {
       await recallExperience(declaredTask);
       patternsRecalledFor = declaredTask;
+      refreshPlannerMode('patterns');
       if (patterns.length) { lastRejectReason = undefined; continue; }
     }
     // 검증된 Avoid 와 같은 방법(같은 단계)은 실행하지 않는다 — 사용자가 교정하고 실제로 대안이 성공한 방법을 되풀이하지 않는다.
@@ -1512,6 +1589,24 @@ export async function runWorkAgent(
       }
     }
     lastRejectReason = undefined;
+    // A — 사용자에게 묻기 전에 질문 이유를 나눈다. 방법 부족(menu_location · procedure_order · manual_request)이면
+    // 바로 넘기지 않고 Discovery 역할로 현재 화면을 다시 관찰해 스스로 찾게 한다(상한 METHOD_DISCOVERY_MAX).
+    // 정보 부족(값 · 대상) · 사용자 결정 · 인증 · 고위험은 이 경로를 타지 않는다.
+    const asksUser = (proposal.action.kind === 'takeover' && proposal.action.reason === 'user_judgment_required')
+      || (proposal.assessment === 'needs_user' && proposal.action.kind !== 'takeover' && proposal.action.kind !== 'done');
+    if (asksUser && classifyQuestionBasis(proposal.ask, proposal.neededInput) === 'method_missing'
+      && methodDiscoveryAttempts < METHOD_DISCOVERY_MAX && budgetLeft() > 1) {
+      methodDiscoveryAttempts += 1;
+      refreshPlannerMode('method_discovery');
+      declaredAsk = null;
+      const keepRun = sameObservationRun; // 다시 보기는 무진전으로 세지 않는다.
+      const o = await observe();
+      sameObservationRun = keepRun;
+      if (!o.ok) return observeFailed(o);
+      methodDiscovery = { attempt: methodDiscoveryAttempts, askKind: proposal.ask?.kind ?? 'unknown' };
+      logger.info('work-agent method discovery', { attempt: methodDiscoveryAttempts, askKind: methodDiscovery.askKind, aiPlanCount: state.aiPlanCount });
+      continue;
+    }
     if (proposal.neededInput) neededInput = proposal.neededInput;
     state.plannedAction = proposal.action;
 

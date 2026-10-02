@@ -105,7 +105,15 @@
     'button, a[href], input, select, textarea, ' +
     '[role="button"], [role="link"], [role="checkbox"], [role="radio"], [role="tab"], [role="menuitem"], ' +
     '[role="textbox"], [role="combobox"], [role="searchbox"], [role="listitem"], ' +
-    'h1, h2, h3, h4, h5, h6, p, li, table, [role="table"], [role="grid"]';
+    'h1, h2, h3, h4, h5, h6, p, li, table, [role="table"], [role="grid"], ' +
+    // WO-O4O-AUTOMATION-STRONG-FIRST-DISCOVERY-ROUTING-V1 D — 명시적 scripted interaction(onclick · 키보드 포커스)도 후보다.
+    // 사이트 전용 selector 가 아니다. 후보가 됐다고 자동 클릭하지 않는다 — Agent 가 업무 의미를 판단한 뒤 행동한다.
+    '[onclick], [tabindex]';
+  /** scripted 후보 안에 이미 실제 컨트롤이 있으면 그 컨트롤이 대상이다(바깥 container 를 버튼으로 보지 않는다). */
+  const NATIVE_CONTROL_SELECTOR =
+    'a[href], button, input, select, textarea, [role="button"], [role="link"], [role="checkbox"], [role="radio"], [role="tab"], [role="menuitem"]';
+  /** scripted 후보가 될 수 없는 큰 container — 위임 handler 가 붙어 있어도 한 행동의 대상이 아니다. */
+  const SCRIPTED_CONTAINER_TAGS = ['html', 'body', 'form', 'table', 'tbody', 'thead', 'tfoot', 'ul', 'ol', 'main', 'section', 'nav', 'header', 'footer', 'iframe'];
   const TABLE_SELECTOR = 'table, [role="table"], [role="grid"]';
   const PASSWORD_IN_FORM_SELECTOR = 'input[type="password"]';
   const CREDENTIAL_HINT_RE = /passw|pwd|otp|pin\b|security|secur|cvc|cvv|card|인증번호|비밀번호|비번|암호|보안카드|공동인증|공인인증/i;
@@ -128,11 +136,28 @@
     return rect.width > 0 && rect.height > 0;
   }
 
+  /**
+   * 명시적 scripted interaction 요소인가 — 의미 태그 · ARIA role 이 없지만 스크립트로 눌리는 칸(목록 행 · 표 칸 등).
+   * 근거는 명시 신호만: onclick 속성, 또는 tabindex>=0(키보드로 고를 수 있음) + pointer cursor(보조 신호).
+   * pointer cursor 단독은 후보가 되지 않는다(장식 · 상속 cursor 오탐).
+   */
+  function isScriptedInteractive(el) {
+    const onclick = el.hasAttribute('onclick');
+    if (!onclick && !el.hasAttribute('tabindex')) return false;
+    if (SCRIPTED_CONTAINER_TAGS.includes(el.tagName.toLowerCase())) return false;
+    if (el.querySelector(NATIVE_CONTROL_SELECTOR)) return false;
+    if (onclick) return true;
+    const ti = Number(el.getAttribute('tabindex'));
+    if (!Number.isFinite(ti) || ti < 0) return false;
+    return getComputedStyle(el).cursor === 'pointer';
+  }
+
   function roleOf(el) {
     const tag = el.tagName.toLowerCase();
     const aria = (el.getAttribute('role') || '').toLowerCase();
     if (aria) {
       if (['button', 'link', 'checkbox', 'radio', 'tab', 'menuitem', 'textbox', 'combobox', 'searchbox', 'listitem', 'table', 'grid', 'heading'].includes(aria)) {
+        if ((aria === 'listitem' || aria === 'heading') && isScriptedInteractive(el)) return 'button';
         return aria === 'grid' ? 'table' : aria;
       }
     }
@@ -141,6 +166,8 @@
     if (tag === 'select') return 'combobox';
     if (tag === 'textarea') return 'textarea';
     if (tag === 'table') return 'table';
+    // scripted 요소는 클릭 가능한 버튼으로 노출한다 — 새 role 을 만들지 않는다(서버 · agent 계약 불변).
+    if (tag !== 'input' && isScriptedInteractive(el)) return 'button';
     if (/^h[1-6]$/.test(tag)) return 'heading';
     if (tag === 'li') return 'listitem';
     if (tag === 'p') return 'paragraph';

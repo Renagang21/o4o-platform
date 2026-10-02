@@ -362,13 +362,35 @@ test('F1. content script: querySelector 인자는 상수/리터럴뿐 · eval/ne
   assert.ok(calls.length > 0);
   for (const call of calls) {
     const arg = call.replace(/^querySelector(?:All)?\(/, '').replace(/\)$/, '').trim();
-    assert.match(arg, /^('[^']*'|CANDIDATE_SELECTOR|TABLE_SELECTOR|PASSWORD_IN_FORM_SELECTOR)$/, `selector arg must be literal/constant: ${call}`);
+    assert.match(arg, /^('[^']*'|CANDIDATE_SELECTOR|TABLE_SELECTOR|PASSWORD_IN_FORM_SELECTOR|NATIVE_CONTROL_SELECTOR)$/, `selector arg must be literal/constant: ${call}`);
   }
   for (const bad of ['eval(', 'new Function', 'document.evaluate', 'XPath', 'executeScript', 'innerHTML', 'outerHTML', 'document.cookie', 'localStorage', 'sessionStorage', 'fetch(', 'import(']) {
     assert.ok(!src.includes(bad), `content script must not contain ${bad}`);
   }
   // payload 값이 selector 로 흘러가는 형태가 없다.
   assert.ok(!/querySelector(?:All)?\((payload|msg|q|query)/.test(src));
+});
+
+test('F1b. content script: scripted interaction 후보는 일반 신호뿐 — 사이트 전용 selector 없음 · 새 role 없음 · pointer 단독 불가 (STRONG-FIRST-DISCOVERY D)', () => {
+  const src = readCode(path.join(EXT_SRC, 'content-script.js'));
+  const cand = src.match(/const CANDIDATE_SELECTOR =([\s\S]*?);/)[1];
+  assert.ok(cand.includes("[onclick]"));
+  assert.ok(cand.includes("[tabindex]"));
+  // 사이트 이름 · id · class 를 집는 selector 가 없다.
+  assert.ok(!/health|kr|#|\.[a-z]/i.test(cand.replace(/\/\/.*$/gm, '')), 'no site-specific selector');
+  // scripted 요소는 기존 clickable role(button)로 노출 — 서버 · agent role 계약 불변.
+  assert.ok(src.includes("isScriptedInteractive(el)) return 'button'"));
+  assert.ok(!/return 'clickable'|return 'scripted'/.test(src));
+  // pointer cursor 는 tabindex 와 함께일 때만 쓰는 보조 신호다.
+  const fn = src.match(/function isScriptedInteractive\(el\) \{([\s\S]*?)\n  \}/)[1];
+  const pointerAt = fn.indexOf("cursor === 'pointer'");
+  assert.ok(pointerAt > fn.indexOf("getAttribute('tabindex')"));
+  assert.ok(fn.indexOf("if (!onclick && !el.hasAttribute('tabindex')) return false;") >= 0);
+  // 안에 실제 컨트롤이 있는 container 와 큰 container 는 후보가 아니다.
+  assert.ok(fn.includes('NATIVE_CONTROL_SELECTOR'));
+  assert.ok(fn.includes('SCRIPTED_CONTAINER_TAGS'));
+  // 클릭 거절 경로(COMMIT · 로그인 form)는 scripted 요소에도 그대로다 — role 이 button 이므로 같은 actClick 경로를 탄다.
+  assert.ok(src.includes("if (!['button', 'link', 'checkbox', 'radio', 'tab', 'menuitem'].includes(role))"));
 });
 
 test('F2. content script: password/OTP 거절 · COMMIT 클릭 거절 · cross-origin 링크 거절 · form-with-password submit 거절 경로가 있다', () => {
