@@ -13,6 +13,14 @@
  *   ④ 삭제가 없다 — orphan 정리는 이 스크립트의 일이 아니다
  *   ⑤ 비밀번호는 전용 서비스로만 저장한다(평문 INSERT 0)
  *   ⑥ 멱등 — 있으면 두고 없으면 만든다
+ *   ⑦ role 은 service-scoped allowlist 안에서만 — platform · admin · operator 는 Demo 대상이 아니다
+ *
+ * ⑦ 은 2026-10-02 에 좁혔다(WO-O4O-DEMO-ACCOUNT-ROLE-CONTRACT-UPDATE-AND-CI-RECOVERY-V1).
+ * 종전 단언은 "소스에 `role_assignments` 라는 글자가 없다" 였다 — 그 때는 CLI 가 role 을 아예
+ * 부여하지 않았기 때문이다. 이후 정본 정책이 **service-scoped role 허용**으로 바뀌어 CLI 가
+ * `kpa:store_owner` · `neture:supplier` 를 부여하게 되자, 코드가 아니라 **이 테스트가** 틀린
+ * 것이 되어 main CI 를 red 로 만들었다. 지금은 금지를 넓게 거는 대신 **허용값을 정확히** 묶는다
+ * — 보호는 약해지지 않고 더 구체적이 된다.
  */
 import * as fs from 'fs';
 import * as path from 'path';
@@ -124,13 +132,109 @@ describe('⑥ 멱등 · 선행 조건', () => {
     expect(CODE).toMatch(/rows\.length !== 1/);
   });
 
-  it('Demo 는 platform 역할이나 role_assignments 를 만들지 않는다', () => {
-    expect(CODE).not.toContain('role_assignments');
-    expect(CODE).not.toContain('platform:');
-  });
-
   it('Google 연결을 만들지 않는다', () => {
     expect(CODE).not.toContain('linked_accounts');
+  });
+});
+/**
+ * ⑦ Demo role — service-scoped allowlist (정본: `O4O-CANONICAL-DEMO-ACCOUNTS-V1` §18)
+ *
+ * 허용: `kpa:store_owner` · `neture:supplier` — 체험 화면에 들어가려면 필요하다.
+ * 금지: `platform:*` · `admin` · `operator` · 그 밖의 모든 role.
+ *
+ * 이 블록은 "글자가 있다/없다" 로 정책을 정의하지 않는다. 소스에서 **실제 값**(allowlist 집합 ·
+ * DEMOS 가 부여하는 role)을 뽑아 비교하고, 뽑지 못하면 **실패한다** — 파서가 빈손이면 단언이
+ * 통과해 버려 아무것도 지키지 못하기 때문이다.
+ */
+describe('⑦ Demo role — service-scoped allowlist', () => {
+  /** 정본 허용값. 바뀌면 baseline §18 과 CLI 를 함께 고쳐야 한다. */
+  const CANONICAL_ALLOWED = ['kpa:store_owner', 'neture:supplier'];
+
+  /** 권한 상승 성격의 role — naming convention(`<service>:<role>`) 기준 deterministic rule. */
+  const isPrivileged = (role: string) =>
+    role === 'admin' ||
+    role === 'operator' ||
+    role.startsWith('platform:') ||
+    /:(admin|operator|super_admin)$/.test(role);
+
+  /** CLI 의 allowlist 집합 리터럴에서 값을 뽑는다. */
+  const parseAllowlist = (): string[] => {
+    const m = CODE.match(/ALLOWED_DEMO_ROLES[^=]*=\s*new Set\(\[([\s\S]*?)\]\)/);
+    if (!m) throw new Error('ALLOWED_DEMO_ROLES 집합을 찾지 못했다 — 계약을 검증할 수 없다');
+    return [...m[1].matchAll(/'([^']+)'/g)].map((x) => x[1]);
+  };
+
+  /** DEMOS 가 실제로 부여하는 role 전부(`roles: [...]`). */
+  const parseGranted = (): string[] => {
+    const hits = [...CODE.matchAll(/\broles:\s*\[([\s\S]*?)\]/g)];
+    if (hits.length === 0) throw new Error('DEMOS 의 roles 를 찾지 못했다 — 계약을 검증할 수 없다');
+    return hits.flatMap((h) => [...h[1].matchAll(/'([^']+)'/g)].map((x) => x[1]));
+  };
+
+  it('allowlist 는 정확히 2개 — kpa:store_owner · neture:supplier', () => {
+    expect([...parseAllowlist()].sort()).toEqual([...CANONICAL_ALLOWED].sort());
+  });
+
+  it('실제로 부여하는 role 이 allowlist 를 벗어나지 않는다', () => {
+    const granted = parseGranted();
+    expect(granted.length).toBeGreaterThan(0);
+    expect([...new Set(granted)].sort()).toEqual([...CANONICAL_ALLOWED].sort());
+    // 한 Demo 가 두 역할을 겸하지 않는다 — 각 1개씩이다.
+    expect(granted).toHaveLength(2);
+  });
+
+  it('platform:* · admin · operator 는 어느 자리에도 없다', () => {
+    const offenders = [...parseAllowlist(), ...parseGranted()].filter(isPrivileged);
+    expect(offenders).toEqual([]);
+    // 소스 어디에도 platform role 문자열을 쓰지 않는다(주석 제거된 CODE 기준).
+    expect(CODE).not.toContain('platform:');
+    // deterministic rule 자체가 동작하는지 — 규칙이 무력해지면 위 단언이 의미를 잃는다.
+    for (const bad of ['platform:super_admin', 'admin', 'operator', 'kpa:admin', 'neture:operator']) {
+      expect(isPrivileged(bad)).toBe(true);
+    }
+    for (const ok of CANONICAL_ALLOWED) expect(isPrivileged(ok)).toBe(false);
+  });
+
+  it('allowlist 밖 role 은 **실행 전에** 거절한다 — DB 를 건드리기 전이다', () => {
+    // 선행 검사(assertPreconditions) 안에서 집합 조회 + throw 가 함께 있어야 한다.
+    const pre = CODE.slice(CODE.indexOf('async function assertPreconditions'));
+    const body = pre.slice(0, pre.indexOf('\nasync function', 1));
+    expect(body).toMatch(/ALLOWED_DEMO_ROLES\.has\(/);
+    expect(body).toMatch(/throw new Error\(`Demo 에 허용되지 않은 role/);
+    // 그리고 그 검사가 어떤 INSERT 보다 앞에 온다.
+    expect(CODE.indexOf('ALLOWED_DEMO_ROLES.has(')).toBeLessThan(CODE.indexOf('INSERT INTO'));
+  });
+
+  it('role INSERT 는 allowlist 를 통과한 상수 role 만 쓴다 — 외부 입력이 아니다', () => {
+    const at = CODE.indexOf('INSERT INTO role_assignments');
+    expect(at).toBeGreaterThan(-1);
+    const stmt = CODE.slice(at, at + 400);
+    // 파라미터는 루프 변수 둘뿐이다(문자열 보간 0 · argv/env 유래 0).
+    expect(stmt).toMatch(/\[userId, role\]/);
+    expect(stmt).not.toMatch(/process\.(argv|env)/);
+    // role 은 DEMOS 상수를 도는 루프에서만 나온다.
+    const loop = CODE.slice(Math.max(0, at - 600), at);
+    expect(loop).toMatch(/for \(const role of demo\.roles\)/);
+  });
+
+  it('활성 행 확인 뒤에만 부여한다 — 이미 있으면 그대로 두고 비활성 이력은 되살리지 않는다', () => {
+    const at = CODE.indexOf('INSERT INTO role_assignments');
+    const before = CODE.slice(Math.max(0, at - 600), at);
+    expect(before).toMatch(/SELECT id FROM role_assignments WHERE user_id = \$1 AND role = \$2 AND is_active = true/);
+    expect(before).toMatch(/if \(!r && APPLY\)/);
+  });
+
+  it('role 보다 먼저 사용자 · demo_accounts · membership 이 갖춰진다', () => {
+    const order = (needle: string) => {
+      const i = CODE.indexOf(needle);
+      expect(i).toBeGreaterThan(-1);
+      return i;
+    };
+    const roleAt = order('INSERT INTO role_assignments');
+    expect(order("table_name='demo_accounts'")).toBeLessThan(roleAt);
+    expect(order('INSERT INTO demo_accounts')).toBeLessThan(roleAt);
+    expect(order('INSERT INTO service_memberships')).toBeLessThan(roleAt);
+    expect(order('INSERT INTO organization_members')).toBeLessThan(roleAt);
   });
 });
 
