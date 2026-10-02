@@ -101,7 +101,8 @@ async function enforceTermsAcceptance(req: AuthRequest, res: Response, user: { i
   if (isTermsPendingRequestAllowed(req.method, req.originalUrl)) return false;
   let pending;
   try {
-    pending = await policyAcceptanceService.getPendingForUser(user.id);
+    // enforced pending — Demo 계정 예외만 반영(정본 O4O-CANONICAL-DEMO-ACCOUNTS-V1 §8-2). 판정 로직은 불변.
+    pending = await policyAcceptanceService.getEnforcedPendingForUser(user.id);
   } catch (error) {
     logger.warn('[termsAcceptance] pending check failed (fail-open)', {
       userId: user.id,

@@ -112,8 +112,9 @@ export class AuthAccountController extends BaseController {
       // WO-O4O-INTEGRATED-TERMS-ACCEPTANCE-AND-SIGNUP-ALIGNMENT-V1 §16:
       //   현재 published 이용약관 중 이 사용자가 아직 승낙하지 않은 것(본문 없음 · 식별자만).
       //   프론트는 이 목록이 비어 있지 않으면 닫을 수 없는 재동의 화면으로 전환한다. 판정 실패는 [] (hot path).
+      //   enforced pending — 서버 게이트와 같은 값(Demo 계정 예외 · 정본 O4O-CANONICAL-DEMO-ACCOUNTS-V1 §8-2).
       try {
-        ud.pendingPolicyAcceptances = await policyAcceptanceService.getPendingForUser(req.user.id);
+        ud.pendingPolicyAcceptances = await policyAcceptanceService.getEnforcedPendingForUser(req.user.id);
       } catch { ud.pendingPolicyAcceptances = []; }
 
       // WO-O4O-RESTRICTED-LOGIN-FOR-PENDING-REJECTED-V1 §5-D:

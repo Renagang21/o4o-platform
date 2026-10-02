@@ -5,6 +5,8 @@
  *
  * mount: /api/v1/auth/policy-acceptances (register-routes.ts — Core auth.routes.ts 는 수정하지 않는다)
  *   GET  /   → { pending: PendingPolicyAcceptance[] }             (본인 · allowlist 경로)
+ *              pending 은 **raw** 정책 상태다(Demo 예외 미반영). 서비스 접근을 실제로 강제하는 값은
+ *              `policyAcceptanceService.getEnforcedPendingForUser` (requireAuth 게이트 · 로그인 응답 · /auth/me).
  *   POST /   → { serviceKey, policyDocumentId, version? }         (본인 · allowlist 경로)
  *              → { accepted: { serviceKey, policyDocumentId, version, created }, pending: [...] }
  *

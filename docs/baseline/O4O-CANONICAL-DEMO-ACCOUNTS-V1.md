@@ -108,6 +108,39 @@ owner 행을 거쳐 같은 registry 를 본다 — `isDemoOrganization`). Frozen
 `demoAccountWriteGuard.behavior.test.ts`(이메일 · role · ownership 거절 · 일반 사용자 불변 · fail-closed) ·
 `emailAuthService.test.ts` V13 · `googleAuthService.test.ts` 'Demo 계정 보호'.
 
+### 8-2. 약관 동의(Terms Acceptance) 강제 제외 — 2026-10-02 사용자 확정
+
+> 이전의 "약관 게이트에 Demo bypass 를 넣지 않는다" 판단을 **명시적으로 변경한 최종 결정**이다.
+> 근거: 운영 smoke 에서 canonical Demo 계정이 약관 게이트(428 `TERMS_ACCEPTANCE_REQUIRED`) 때문에
+> 서비스 기능 API 를 쓸 수 없음이 확인됐다 (CHECK §2-8).
+
+```text
+Demo Account 는 실제 개인 사용자나 계약 주체가 아니라 O4O 서비스 체험을 위한 공유형 시스템 계정이다.
+따라서 Demo Account 에는 일반 사용자용 약관 동의 절차를 요구하지 않는다.
+예외 범위는 Terms Acceptance Gate 에 한정한다 — 인증 · service membership · ownership · role ·
+Demo write guard(§8-1) · password/session 정책은 일반 경로와 동일하게 적용한다.
+```
+
+**raw pending 과 enforced pending 을 구분한다.**
+
+| 용어 | 의미 | 일반 사용자 | Demo |
+|---|---|---|---|
+| raw pending | 약관 데이터 기준 아직 동의하지 않은 정책 (`getPendingForUser`) | 같다 | 존재할 수 있다 |
+| enforced pending | 서비스 접근을 실제로 막는 정책 (`getEnforcedPendingForUser`) | 같다 | `[]` |
+
+- 하지 않는 것: `user_policy_acceptances` 사전 생성 · 위조 · "동의한 것"으로 기록 · raw 상태 삭제.
+  방문자에게 공용 계정의 약관 동의를 맡기지도 않는다.
+- 예외는 **enforced pending 계산 한 곳**(`policy-acceptance.service.ts` `getEnforcedPendingForUser`)에서만
+  적용한다. 판정 정본은 `demo_accounts.user_id`(활성) — 이메일 문자열 비교 금지.
+- enforced pending 을 쓰는 경로: requireAuth 게이트(`enforceTermsAcceptance`) · 이메일 로그인 응답 ·
+  `GET /auth/me` (프론트의 재동의 화면은 이 목록으로 그려진다). `GET /api/v1/auth/policy-acceptances`
+  는 raw 정책 상태를 그대로 보여 준다.
+- raw pending 이 없으면 Demo 조회를 하지 않는다. Demo 조회가 실패하면 예외를 **열지 않는다** — raw 를
+  그대로 강제한다(428 유지).
+- 일반 사용자 약관 정책(`terms-acceptance.policy.ts`)은 바뀌지 않는다. 약관 버전이 올라가도 Demo 는
+  별도 준비가 필요 없다.
+- 계약 테스트: `__tests__/security/terms-acceptance-gate.spec.ts` 'Demo 계정 약관 예외' · '소비처 계약'.
+
 ## 9. 허용하는 것 / 막는 것
 
 ```text
