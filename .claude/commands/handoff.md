@@ -12,7 +12,10 @@ description: 작업 종료 - 인수인계 메모 작성 후 커밋, push
    - 주의할 점, 미해결 문제, 내린 결정과 그 이유
 2. CLAUDE.md에는 진행 상황을 쓰지 마. "세션 시작 시 HANDOFF.md를 먼저 읽을 것" 안내가 있는지만 확인하고, 없으면 추가해.
 3. git branch --show-current 로 현재 브랜치를 확인해. main이 아니면 멈추고 보고해.
-4. git status 로 변경 사항을 보여주고, HANDOFF.md를 포함해 모두 커밋해. 커밋 메시지는 작업 내용에 맞게 작성해.
+4. git status 로 변경 사항을 보여줘. 그 다음
+   - HANDOFF.md와 이 세션에서 내가 요청해 수정한 파일만 경로를 지정해서 stage 해. git add . 이나 git add -A 는 쓰지 마.
+   - 이 세션에서 수정하지 않은 변경 파일이 보이면 커밋하지 말고 목록으로 보고해.
+   - 커밋 메시지는 작업 내용에 맞게 작성해.
 5. git push origin main
    - 원격에 새 커밋이 있어 push가 거부되면 멈추고 보고해. 임의로 force push 하지 마.
 6. push 결과와 HANDOFF.md 요약을 알려줘.
