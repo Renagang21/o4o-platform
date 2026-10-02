@@ -112,10 +112,23 @@ for (const role of d.roles) {
 jest src/scripts/__tests__/demo-account-provision.contract.test.ts    26 PASS (종전 20 + ⑦ 7 − 낡은 1)
 jest src/scripts/__tests__ src/services/auth                          15 suites · 263 PASS
 tsc --noEmit                                                          PASS (rc=0)
-main CI (API Jest 포함)                                               <PR 결과 기록>
+main CI (API Jest 포함)                                               GREEN
 ```
 
 docs-fast green 은 인정하지 않는다 — API test job 이 실제로 실행된 run 으로 판정한다.
+
+### main run 실측 (병합 `5245da862` · PR #267)
+
+```text
+run 37012150561  completed/success
+  success  API Server Jest (1/3)
+  success  API Server Jest (2/3)   ← 종전 red 지점
+  success  API Server Jest (3/3)
+  success  Code Quality Check · Build Applications (admin-dashboard) · Detect affected scope
+  skipped  Admin Fast · Docs Fast · Web production build (affected)
+```
+
+API test job 이 실제로 실행된 run 이다 — docs-fast skip 으로 얻은 green 이 아니다.
 
 ---
 
@@ -143,7 +156,7 @@ CLI_CHANGE                    = 0
 PRODUCTION_DB_WRITE           = 0
 PRODUCTION_DEPLOY             = 0
 DEPLOY_FREEZE_FINAL           = TRUE
-MAIN_API_JEST                 = <PR CI 결과>
+MAIN_API_JEST                 = GREEN (run 37012150561 · 3 shard success)
 ```
 
 ---
@@ -155,3 +168,17 @@ main API Jest 가 GREEN 이면:
 1. `WO-O4O-PRODUCTION-SECRET-ENVIRONMENT-MIGRATION-AND-COLLABORATOR-SAFETY-CLOSURE-V1`
 2. Demo API · neture-web 배포는 **새 merge SHA 기준으로 diff 를 다시 확인한 뒤** 판단한다.
    `824f66722` 는 더 이상 배포 기준이 아니다(그 SHA 의 CI 가 red 이고, 이번 수정이 뒤에 붙는다).
+
+### 재판정 — `5245da862` 기준 runtime diff (2026-10-02 · 배포 0)
+
+| | 기준(운영 serving) | runtime 변경 | 귀속 |
+|---|---|---|---|
+| `o4o-core-api` | `21a413fde` (03792-ded) | 3파일 — `auth-account.controller` · `email-auth.controller` · `demo-account.service` | `37a9b2196` 1건 |
+| `neture-web` | `eab0474f0` (01671-xil) | 5파일 — `LoginModal` · `NetureGlobalHeader` · `AuthContext` · `lib/demoAccounts` · `lib/home-entry` | `824f66722` 1건 |
+
+**`824f66722` 때와 같다.** 그 뒤 main 에 붙은 것들(이번 계약 수정 · WIF cutover `c8b9ff4bf` ·
+store-web nav fix `03b9c8bc4` · docs)은 API · neture-web 이미지의 runtime 을 바꾸지 않는다.
+store-web 변경은 `services/web-store` 라 `service=neture` dispatch 로는 빌드되지 않는다.
+
+즉 `824f66722` 를 고집하지 않아도 **같은 코드**가 나가고, 차이는 SHA 라벨과 **CI 가 green 이라는
+점**뿐이다. 배포 여부는 사용자 판단이다 — `DEPLOY_FREEZE` 는 `true` 그대로 두었다.
