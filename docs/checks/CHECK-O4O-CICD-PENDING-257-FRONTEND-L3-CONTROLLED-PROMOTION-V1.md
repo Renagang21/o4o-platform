@@ -78,3 +78,29 @@ PENDING_257_L3_AFTER_PROMOTION  = NONZERO (7)
 DEPLOY_FREEZE_FINAL             = TRUE
 API_AUTO_DEPLOY                 = NOT_EXECUTED
 ```
+
+---
+
+## 7. 재개 시도 (2026-10-02, 저장소 public 전환 후) — HOLD
+
+| 시각 (UTC) | 사건 |
+|---|---|
+| ~04:5x | 사용자가 저장소를 private → **public** 으로 전환 (Actions billing 차단 해소). workflow 점검: `pull_request_target` · `self-hosted` 0 · Delivery classify 는 `workflow_run.event == 'push'` 만 |
+| — | billing 차단 중 실패한 HEAD `38850e50f` CI 를 rerun (attempt 2) → success · 후속 Delivery `36966309593` BLOCKED_FREEZE · 배포 0 |
+| — | `38850e50f` dry-run = 이전과 동일 (차이는 이 CHECK 문서 1건) |
+| 04:54 | window 사전 점검에서 STOP (freeze 변경 전) — 다른 세션 push `dab919a84` (#266) CI 진행 중 |
+| — | `dab919a84` CI success · Delivery `36967118383` BLOCKED_FREEZE · 배포 0 |
+
+`dab919a84` dry-run (services = 프런트 7):
+
+- 프런트 7 = 이전과 동일 (PROMOTE · L3 `auth-package packages/auth-client/src/client.ts` · API 와 독립) · `plan: api=false`
+- **api = LEVEL_3** (`NOT_SELECTED`) — #266 이 `authentication.middleware.ts` · `email-auth.controller.ts` · `auth-account.controller.ts` · `policy-acceptance.*` 를 바꿨다 (API 전용, 프런트 파일 0). freeze 해제 뒤에도 API 는 자동 배포되지 않고 promote 대상이다.
+
+§5 (승인 외 commit 유입 → 승인 재사용 금지) 에 따라 새 SHA 실행 여부를 확인 → 사용자 결정 **보류**. promote · freeze 변경 없음.
+
+```text
+FRONTEND_257_PROMOTION          = HOLD (사용자 보류 · dab919a84 승인 대기)
+PRODUCTION_DEPLOY               = 0
+DEPLOY_FREEZE_FINAL             = TRUE
+API                             = LEVEL_3 (#266 · NOT_SELECTED)
+```
