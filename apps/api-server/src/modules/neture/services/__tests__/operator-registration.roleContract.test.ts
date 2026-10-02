@@ -11,6 +11,11 @@
  *   입력 원천은 사라졌지만, 방어적으로 승격 자체를 차단한다.
  */
 
+// Demo 판정은 "Demo 아님" 으로 고정 (WO-O4O-CANONICAL-DEMO-ACCOUNT-FOUNDATION-AND-EXPERIENCE-LOGIN-V1 · 근거는 support 헬퍼).
+jest.mock('../../../../services/auth/demo-account.service.js', () =>
+  jest.requireActual('../../../../__tests__/support/not-demo-account.js').notDemoAccountModule(),
+);
+
 import { OperatorRegistrationService } from '../operator-registration.service.js';
 
 interface FakeRunner {

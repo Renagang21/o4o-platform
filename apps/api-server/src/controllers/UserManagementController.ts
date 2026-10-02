@@ -14,6 +14,7 @@ import {
   demoAccountService,
   DEMO_ACCOUNT_FORBIDDEN_CODE,
   DEMO_ACCOUNT_FORBIDDEN_MESSAGE,
+  respondDemoAccountForbidden,
 } from '../services/auth/demo-account.service.js';
 import { OperatorRoleContractError } from '../config/operator-role-catalog.js';
 
@@ -240,6 +241,15 @@ export class UserManagementController {
         return;
       }
 
+      // Demo 계정 보호(정책 §8 이메일 변경 · role 변경): 어떤 write 보다도 **먼저** 막는다.
+      //   이름 등 나머지 필드만 바꾸는 요청은 판정 질의 없이 종전대로 간다.
+      if ((email && email !== user.email) || Array.isArray(roles)) {
+        if (await demoAccountService.isDemoAccount(user.id)) {
+          respondDemoAccountForbidden(res);
+          return;
+        }
+      }
+
       // Update user fields
       if (email) user.email = email;
       if (firstName !== undefined) user.firstName = firstName;
@@ -445,6 +455,11 @@ export class UserManagementController {
       const user = await this.userRepository.findOne({ where: { id } });
       if (!user) {
         res.status(404).json({ success: false, error: 'User not found' });
+        return;
+      }
+      // Demo 계정 보호(정책 §8 role 변경): 역할 편집 **전에** 막는다.
+      if (await demoAccountService.isDemoAccount(user.id)) {
+        respondDemoAccountForbidden(res);
         return;
       }
       await applyAdminRoleEdit(user.id, Array.isArray(roles) ? roles : [], editRequester(req));

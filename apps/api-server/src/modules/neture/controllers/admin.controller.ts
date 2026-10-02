@@ -43,6 +43,7 @@ import {
 import { SupplierRegulatedCategoryService } from '../services/supplier-regulated-category.service.js';
 import sharp from 'sharp';
 import logger from '../../../utils/logger.js';
+import { DEMO_ACCOUNT_FORBIDDEN_CODE } from '../../../services/auth/demo-account.service.js';
 
 // Extended Request type with user info
 type AuthenticatedRequest = Request & {
@@ -121,7 +122,7 @@ export function createAdminController(dataSource: DataSource): Router {
             },
           });
         }
-        const status = result.error === 'SUPPLIER_NOT_FOUND' ? 404 : 400;
+        const status = result.error === 'SUPPLIER_NOT_FOUND' ? 404 : result.error === DEMO_ACCOUNT_FORBIDDEN_CODE ? 403 : 400;
         return res.status(status).json({ success: false, error: { code: result.error, message: result.error } });
       }
 
@@ -165,7 +166,7 @@ export function createAdminController(dataSource: DataSource): Router {
 
       const result = await netureService.reactivateSupplier(id, adminUserId, reason);
       if (!result.success) {
-        const status = result.error === 'SUPPLIER_NOT_FOUND' ? 404 : 400;
+        const status = result.error === 'SUPPLIER_NOT_FOUND' ? 404 : result.error === DEMO_ACCOUNT_FORBIDDEN_CODE ? 403 : 400;
         return res.status(status).json({ success: false, error: { code: result.error, message: result.error } });
       }
 

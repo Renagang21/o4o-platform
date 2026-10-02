@@ -18,6 +18,11 @@
  * 가입은 **승인형 하나**다. 오픈형·자동가입 분기를 만들지 않는다.
  */
 import type { DataSource, EntityManager } from 'typeorm';
+import {
+  demoAccountService,
+  DEMO_ACCOUNT_FORBIDDEN_CODE,
+  DEMO_ACCOUNT_FORBIDDEN_MESSAGE,
+} from '../auth/demo-account.service.js';
 import { Community } from '../../entities/Community.js';
 import { CommunityMembership } from '../../entities/CommunityMembership.js';
 import { CommunityCreationRequest } from '../../entities/CommunityCreationRequest.js';
@@ -36,7 +41,8 @@ export type LifecycleErrorCode =
   | 'MEMBERSHIP_NOT_FOUND'
   | 'MEMBERSHIP_NOT_PENDING'
   | 'SERVICE_MEMBERSHIP_SUSPENDED'
-  | 'REQUEST_FORBIDDEN';
+  | 'REQUEST_FORBIDDEN'
+  | typeof DEMO_ACCOUNT_FORBIDDEN_CODE;
 
 export class CommunityLifecycleError extends Error {
   constructor(
@@ -147,6 +153,12 @@ export class CommunityLifecycleService {
     return this.dataSource.transaction(async (m) => {
       const reqRepo = m.getRepository(CommunityCreationRequest);
       const request = await loadPendingRequest(m, input.requestId);
+
+      // Demo 계정에 개체 운영자 role 을 주지 않는다 — 신청 행 갱신을 포함한 어떤 write 보다 먼저
+      // (WO-O4O-CANONICAL-DEMO-ACCOUNT-FOUNDATION-AND-EXPERIENCE-LOGIN-V1 · 판정 정본 demo_accounts.user_id).
+      if (await demoAccountService.isDemoAccount(request.requesterUserId, m)) {
+        throw new CommunityLifecycleError(DEMO_ACCOUNT_FORBIDDEN_CODE, DEMO_ACCOUNT_FORBIDDEN_MESSAGE, 403);
+      }
 
       // 승인 직전 재검사 — pending 인 자기 자신은 제외하고 본다.
       const existing = await m.getRepository(Community).findOne({ where: { slug: request.desiredSlug } });

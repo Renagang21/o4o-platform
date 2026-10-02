@@ -16,7 +16,9 @@ const db: {
   memberships: Row[];
   serviceMemberships: Row[];
   roleWrites: string[];
-} = { communities: [], requests: [], memberships: [], serviceMemberships: [], roleWrites: [] };
+  demoUsers: string[];
+  demoLookupFails: boolean;
+} = { communities: [], requests: [], memberships: [], serviceMemberships: [], roleWrites: [], demoUsers: [], demoLookupFails: false };
 
 let seq = 0;
 const uid = () => `id-${++seq}`;
@@ -30,6 +32,10 @@ function repoFor(name: string) {
 const manager = {
   getRepository: (e: { name?: string }) => repoFor(e?.name ?? ''),
   query: async (sql: string, params: any[]) => {
+    if (/FROM demo_accounts/i.test(sql)) {
+      if (db.demoLookupFails) throw new Error('db down');
+      return db.demoUsers.includes(params[0]) ? [{ '?column?': 1 }] : [];
+    }
     if (/^\s*SELECT status FROM service_memberships/i.test(sql)) {
       const [userId, serviceKey] = params;
       return db.serviceMemberships
@@ -71,6 +77,8 @@ beforeEach(() => {
   db.memberships = [];
   db.serviceMemberships = [];
   db.roleWrites = [];
+  db.demoUsers = [];
+  db.demoLookupFails = false;
   seq = 0;
 });
 
@@ -112,6 +120,29 @@ describe('개설 신청 — 검사 1회차', () => {
     await expect(
       service.requestCreation({ requesterUserId: 'other', desiredSlug: 'alpha', name: 'A2' }),
     ).rejects.toMatchObject({ code: 'SLUG_TAKEN' });
+  });
+});
+
+describe('개설 승인 — Demo 계정 보호 (WO-O4O-CANONICAL-DEMO-ACCOUNT-FOUNDATION-AND-EXPERIENCE-LOGIN-V1)', () => {
+  it('신청자가 Demo 면 403 — 커뮤니티 · 운영자 행 · 서비스 가입 · 신청 갱신 0', async () => {
+    const r = await service.requestCreation({ requesterUserId: REQUESTER, desiredSlug: 'alpha', name: 'Alpha' });
+    db.demoUsers = [REQUESTER];
+    await expect(service.approveCreation({ requestId: r.id, reviewerUserId: REVIEWER })).rejects.toMatchObject({
+      statusCode: 403,
+      code: 'DEMO_ACCOUNT_FORBIDDEN',
+    });
+    expect(db.communities).toHaveLength(0);
+    expect(membershipOf(REQUESTER)).toBeUndefined();
+    expect(serviceMembershipOf(REQUESTER)).toBeUndefined();
+    expect(r.status).toBe('pending');
+  });
+
+  it('Demo 조회가 실패하면 승인하지 않는다 (fail-closed)', async () => {
+    const r = await service.requestCreation({ requesterUserId: REQUESTER, desiredSlug: 'alpha', name: 'Alpha' });
+    db.demoLookupFails = true;
+    await expect(service.approveCreation({ requestId: r.id, reviewerUserId: REVIEWER })).rejects.toThrow('db down');
+    expect(db.communities).toHaveLength(0);
+    expect(membershipOf(REQUESTER)).toBeUndefined();
   });
 });
 

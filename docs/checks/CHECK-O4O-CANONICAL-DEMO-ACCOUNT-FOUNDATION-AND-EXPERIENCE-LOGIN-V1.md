@@ -277,6 +277,82 @@ DEPLOY_FREEZE = true (잠김 · 사용자 결정)
 병합만으로는 배포되지 않는다. 보호가 운영에 올라가기 전에 `--apply` 를 돌리면 **보호 없는
 공개 credential 이 운영에 존재하는 창**이 생긴다 — 그래서 순서는 배포 → 계정 생성이다.
 
+## 2-6. Phase C 잔여 3건 — 이메일 변경 · role 변경 · ownership 해제 (2026-10-02 · 운영 write 0)
+
+사용자 결정(2026-10-02): API 배포 HOLD → 정책 §8 의 남은 3건을 먼저 닫는다.
+원칙: 판정 정본은 `demo_accounts.user_id` · email 문자열 비교 0 · write **전에** 거절 · 일반 사용자 동작 불변 ·
+기존 admin/super-admin 보호 유지 · Frozen `role-assignment.service.ts` 무수정(호출부에서 거절).
+
+### Fresh census — 실제로 존재하는 write 경로
+
+| 축 | 경로 | guard |
+|---|---|---|
+| 이메일 변경 | `AdminUserController.updateUser` · `UserManagementController.updateUser` | email 이 실제로 바뀌는 요청이면 403 |
+| role 변경 | Admin `updateUser`(roles) · `updateUserRoles` · `revokeRoleAssignment` · `routes/admin/platform-accounts.routes.ts` | 403 |
+| | `operator-assignment.service` (`OperatorAssignmentController`) | 403 |
+| | `MembershipApprovalService` approve/reject/suspend/reactivate · `MembershipConsoleController` · `BranchServiceMembershipController` · `PharmacyHubMembershipConsoleController` | 403 |
+| | KPA `member.controller` · `auth-account.controller` · LMS `InstructorController` | 403 |
+| | 분회 `branch-operator-designation.service` designate/release · `branch-lifecycle.service` approveCreation | 403 (`BranchOperatorDesignationError` / `BranchLifecycleError` statusCode) |
+| | Neture `operator-registration.service` approve/reject | 403 |
+| | Cosmetics `cosmetics-store.service` 신청 심사(approve/reject 공통) | 403 |
+| | 커뮤니티 `community-operator-designation.service` setRole · `community-lifecycle.service` approveCreation (PR #265 Codex P2 반영) | 403 |
+| ownership 해제 · 변경 | `MembershipApprovalService` withdraw · deleteMember | 403 |
+| | `store-owner-termination.service` createCase/terminateCase/purgeCase | 403 |
+| | Neture `supplier.service` approve/reject/deactivate/reactivate — `user_id` **또는** owner 조직(`isDemoOrganization`) | result `DEMO_ACCOUNT_FORBIDDEN` → controller 403 |
+
+간접 보호(호출부가 막혀 있으므로 별도 guard 없음): PharmacyHub `provisionStoreSubject` ·
+`ensureStoreContextForOwner` · `ensureKpaStoreOrganization`.
+
+**guard 하지 않은 것** — Cafe24 B2B provisioning: 사용자를 결정론적 synthetic email 또는 member link 로만
+찾으므로 Demo 사용자에 도달할 수 없다.
+
+### 검증
+
+```text
+신규 demoAccountWriteGuard.behavior.test.ts     18 tests PASS
+  W1 Demo 대상 → 403 · write 0 (email · role · withdraw · deleteMember · termination · supplier
+     비활성화(user_id NULL · owner 조직 경유) · 분회 지정/해제)
+  W2 일반 사용자 → 기존 동작 그대로
+  W3 demo_accounts 조회 실패 → 예외 전파(fail-closed) · write 0
+demoAccountGuard.contract.test.ts D5/D5b        guard 가 메서드 첫 write 보다 앞 · controller 403 매핑 — 9 tests PASS
+관련 suite 전체                                  737 tests: 736 PASS · 1 skipped · 0 failed
+tsc --noEmit                                     PASS (auth-utils · types · security-core dist 재빌드 후)
+```
+
+기존 suite 10개는 mock DB 가 새 `demo_accounts` 조회에 답하지 못해 실패했다 — 각 suite 에서
+`demoAccountService` 를 "Demo 아님"으로 고정했다(일반 사용자 경로 회귀 검증이라는 원래 목적 유지).
+
+**변이 검사**
+
+```text
+M1 isDemoAccount · isDemoOrganization 상시 false   → W1 8건 실패
+M2 조회 오류를 false 로 삼킴(try/catch)            → W3 5건 + 계약 D3 실패
+```
+
+두 변이 모두 원복 후 전체 PASS.
+
+### PR #265 리뷰 반영
+
+```text
+Codex P2   커뮤니티 개체 role 경로 누락 — setRole · approveCreation 에 guard 추가
+           community 테스트에 Demo 거절 · fail-closed 4건 추가 · D5 에 2행 추가
+           변이(M1) → community Demo 거절 3건 실패 확인 후 원복
+Sonar      신규 코드 중복 8.3% (기준 ≤3%) — 10개 suite 의 "Demo 아님" 고정 블록을
+           `src/__tests__/support/not-demo-account.ts` 하나로 모음 ·
+           MembershipConsoleController 의 5줄 guard 6곳을 `rejectDemoAccountTarget(res, userId)` 한 줄로
+재실행      tsc --noEmit PASS · 관련 99 suites / 1534 tests PASS
+```
+
+### 범위 밖 발견 (보고만 · 수정 0)
+
+```text
+1 KPA PATCH /kpa/organizations/:id  isActive=false — Demo owner 조직 비활성화 미차단
+2 Admin updateUser  status/isActive 변경 — Demo 사용자 정지 미차단 (정책 §8 최소 목록 밖)
+3 Cosmetics removeMember · adminDeactivateMember — Demo 구축 계획에 cosmetics 행 없음 → 해당 없음
+```
+
+1·2 는 정책 §8 목록("권한 변경 · 사업자 변경")의 경계 판단이 필요하다 — 별도 WO 제안.
+
 ---
 
 ## 3. 운영 write 승인 대기 목록
@@ -302,8 +378,9 @@ Phase A(census) · 식별 구조(`demo_accounts` 적용) · **C(서버 보호 ·
 남은 것:
 
 ```text
-B  계정 생성        --apply 승인 대기 (dry-run 계획은 2-5 에 기록)
-   배포             guard 가 운영에 반영되려면 API 배포 필요 — DEPLOY_FREEZE=true 로 잠겨 있다(사용자 결정)
+C' 잔여 3건         이메일 · role · ownership guard 구현(2-6) — 병합 후 통제 배포 승인됨
+B  계정 생성        --apply 는 배포 검증 후 별도 승인 (dry-run 계획은 2-5 에 기록)
+   배포             guard 완료 후 1회 통제 배포 — DEPLOY_FREEZE=true 유지(dispatch 직전 최소 시간만 해제)
 D  relink           B 검증 후
 F  체험 로그인 UI
 G  위험 기능 census

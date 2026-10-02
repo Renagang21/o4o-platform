@@ -10,6 +10,8 @@
  *   D2 조회는 활성 행만 본다(`is_active`) · 파라미터 바인딩만 쓴다(문자열 보간 0 — Guard Rule 2).
  *   D3 DB 오류를 "Demo 아님"으로 바꾸지 않는다(fail-closed) — 모르는 채로 통과시키면 보호가 사라진다.
  *   D4 계정 삭제 2경로에 보호가 **코드에** 있다 — 화면에서 버튼을 숨기는 것으로는 막히지 않는다.
+ *   D5 이메일 변경 · role 변경 · ownership 해제/변경 경로에 보호가 **write 보다 앞에** 있다(§8 남은 3종).
+ *      동작(거절 · write 0 · 일반 사용자 불변 · fail-closed)은 `demoAccountWriteGuard.behavior.test.ts` 가 본다.
  *
  * 동작 계약(비밀번호 변경 · forgot · reset · Google 연결)은 각 서비스 spec 이 본다:
  *   `emailAuthService.test.ts` V13 · `googleAuthService.test.ts` 'Demo 계정 보호'.
@@ -127,6 +129,69 @@ describe('Demo 계정 보호 계약', () => {
       if (!(guardAt >= 0 && deleteAt >= 0 && guardAt < deleteAt)) missing.push(`${rel}: 판정이 삭제보다 뒤에 있다`);
     }
     expect(missing).toEqual([]);
+  });
+
+  // ── D5 ────────────────────────────────────────────────────────────────────
+  // [파일, 판정 호출 패턴, 그 판정보다 **뒤에** 와야 하는 첫 write 패턴, (선택) 검사를 시작할 method]
+  const WRITE_GUARDS: Array<[string, RegExp, RegExp, string?]> = [
+    // 이메일 · role 변경
+    ['controllers/admin/AdminUserController.ts', /isDemoAccount\(user\.id\)/, /applyAdminRoleEdit\(user\.id/],
+    ['controllers/UserManagementController.ts', /isDemoAccount\(/, /applyAdminRoleEdit\(/],
+    ['routes/admin/platform-accounts.routes.ts', /isDemoAccount\(/, /assignRole\(/],
+    ['services/admin/operator-assignment.service.ts', /assertNotDemoAccount\(/, /assignRole\(/],
+    ['modules/auth/controllers/auth-account.controller.ts', /assertNotDemoAccount\(/, /UPDATE role_assignments/],
+    ['modules/lms/controllers/InstructorController.ts', /isDemoAccount\(/, /repo\.save\(/, 'async approveApplication('],
+    ['modules/neture/services/operator-registration.service.ts', /assertNotDemoAccount\(/, /UPDATE service_memberships/],
+    ['services/kpa-branch/branch-lifecycle.service.ts', /isDemoAccount\(request\.requester_user_id/, /UPDATE branch_creation_requests\s+SET status = 'slug_conflict'/],
+    ['services/kpa-branch/branch-operator-designation.service.ts', /rejectDemoAccount\(userId\)/, /roleAssignmentService\.assignRole\(/],
+    ['routes/cosmetics/services/cosmetics-store.service.ts', /assertNotDemoAccount\(application\.applicantUserId/, /manager\.update\(/],
+    ['routes/kpa/controllers/member.controller.ts', /assertNotDemoMember\(/, /INSERT INTO/],
+    ['services/community/community-lifecycle.service.ts', /isDemoAccount\(request\.requesterUserId/, /reqRepo\.save\(/, 'async approveCreation('],
+    ['services/community/community-operator-designation.service.ts', /isDemoAccount\(target\.user_id/, /UPDATE community_memberships/],
+    // role · membership · ownership 해제/변경
+    ['services/approval/MembershipApprovalService.ts', /assertNotDemoAccount\(/, /UPDATE service_memberships/],
+    ['services/store-owner-termination.service.ts', /assertNotDemoStoreOwner\(this\.dataSource, input\.userId\)/, /INSERT INTO store_owner_termination_cases/],
+    ['modules/neture/services/supplier.service.ts', /isDemoSupplier\(supplier\.userId/, /supplierRepo\.save\(supplier\)/, 'async approveSupplier('],
+    ['modules/neture/services/supplier.service.ts', /isDemoSupplier\(locked\.user_id/, /UPDATE neture_suppliers SET status/, 'async deactivateSupplier('],
+    ['modules/neture/services/supplier.service.ts', /isDemoSupplier\(locked\.user_id/, /UPDATE neture_suppliers SET status/, 'async reactivateSupplier('],
+    ['controllers/operator/MembershipConsoleController.ts', /rejectDemoAccountTarget\(|isDemoAccount\(/, /UPDATE service_memberships/],
+  ];
+
+  it('D5 이메일 · role · ownership write 경로에 판정이 write 보다 앞에 있다', () => {
+    const problems: string[] = [];
+    for (const [rel, guard, write, from] of WRITE_GUARDS) {
+      const whole = read(rel);
+      const start = from ? whole.indexOf(from) : 0;
+      if (start < 0) {
+        problems.push(`${rel}: ${from} 없음`);
+        continue;
+      }
+      const src = whole.slice(start);
+      const g = src.search(guard);
+      const w = src.search(write);
+      if (g < 0) problems.push(`${rel}: 판정 호출 없음`);
+      else if (w < 0) problems.push(`${rel}: 기준 write 를 찾지 못함(패턴 갱신 필요)`);
+      else if (g > w) problems.push(`${rel}: 판정이 write 보다 뒤에 있다`);
+    }
+    expect(problems).toEqual([]);
+  });
+
+  it('D5 서비스 계층 거절은 각 호출 controller 가 403 으로 싣는다', () => {
+    const mapped = [
+      'controllers/admin/OperatorAssignmentController.ts',
+      'controllers/operator/MembershipConsoleController.ts',
+      'controllers/kpa-branch/BranchServiceMembershipController.ts',
+      'controllers/pharmacy-hub/PharmacyHubMembershipConsoleController.ts',
+      'modules/auth/controllers/auth-account.controller.ts',
+      'modules/neture/controllers/operator-registration.controller.ts',
+      'routes/cosmetics/controllers/cosmetics-store.controller.ts',
+    ];
+    const missing = mapped.filter((rel) => !/DemoAccountForbiddenError|sendDemoAccountForbidden\(/.test(read(rel)));
+    expect(missing).toEqual([]);
+    // 결과 객체로 돌려주는 공급자 경로는 코드로 403 을 고른다.
+    for (const rel of ['modules/neture/controllers/admin.controller.ts', 'modules/neture/controllers/operator-supplier.controller.ts']) {
+      expect(read(rel)).toMatch(/DEMO_ACCOUNT_FORBIDDEN_CODE \? 403/);
+    }
   });
 
   it('사유 코드 · 문구는 한 곳에서만 정의된다', () => {

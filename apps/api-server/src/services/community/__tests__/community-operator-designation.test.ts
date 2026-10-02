@@ -18,12 +18,18 @@ const M_PEND = 'cccccccc-cccc-4ccc-8ccc-cccccccccccc';
 type Row = { id: string; community_id: string; user_id: string; role: string; status: string };
 let rows: Row[];
 let service: Record<string, string>;
+let demoUsers: string[];
+let demoLookupFails: boolean;
 const sql: string[] = [];
 
 const tx = {
   query: async (q: string, p: any[] = []) => {
     const s = q.replace(/\s+/g, ' ').trim();
     sql.push(s);
+    if (s.includes('FROM demo_accounts')) {
+      if (demoLookupFails) throw new Error('db down');
+      return demoUsers.includes(p[0]) ? [{ '?column?': 1 }] : [];
+    }
     if (s.startsWith('SELECT id, name FROM communities')) return [C1, C2].includes(p[0]) ? [{ id: p[0], name: 'c' }] : [];
     if (s.startsWith('SELECT id, user_id, role, status FROM community_memberships')) {
       expect(s).toContain('FOR UPDATE');
@@ -49,6 +55,30 @@ beforeEach(() => {
     { id: M_PEND, community_id: C1, user_id: 'u-pend', role: 'member', status: 'pending' },
   ];
   service = { 'u-op': 'active', 'u-mem': 'active', 'u-pend': 'active' };
+  demoUsers = [];
+  demoLookupFails = false;
+});
+
+// WO-O4O-CANONICAL-DEMO-ACCOUNT-FOUNDATION-AND-EXPERIENCE-LOGIN-V1 — Demo 의 개체 role 은 고정
+it.each([
+  ['지정', M_MEM, 'u-mem', 'operator', 'member'],
+  ['해제', M_OP, 'u-op', 'member', 'operator'],
+])('Demo 계정 %s → 403 · UPDATE 0', async (_label, membershipId, userId, role, before) => {
+  rows.push({ id: 'dddddddd-dddd-4ddd-8ddd-dddddddddddd', community_id: C1, user_id: 'u-op2', role: 'operator', status: 'active' });
+  demoUsers = [userId];
+  await expect(svc().setRole({ communityId: C1, membershipId, role: role as any })).rejects.toMatchObject({
+    statusCode: 403,
+    code: 'DEMO_ACCOUNT_FORBIDDEN',
+  });
+  expect(rows.find((r) => r.id === membershipId)!.role).toBe(before);
+  expect(sql.some((s) => s.startsWith('UPDATE'))).toBe(false);
+});
+
+it('Demo 조회가 실패하면 바꾸지 않는다 (fail-closed)', async () => {
+  demoLookupFails = true;
+  await expect(svc().setRole({ communityId: C1, membershipId: M_MEM, role: 'operator' })).rejects.toThrow('db down');
+  expect(rows.find((r) => r.id === M_MEM)!.role).toBe('member');
+  expect(sql.some((s) => s.startsWith('UPDATE'))).toBe(false);
 });
 
 const set = (communityId: string, membershipId: string, role: any) => svc().setRole({ communityId, membershipId, role });

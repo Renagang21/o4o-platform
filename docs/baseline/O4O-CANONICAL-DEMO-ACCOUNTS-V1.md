@@ -82,7 +82,7 @@ platform role 획득 · 관리자 계정 전환
 
 frontend 전용 보호가 아니라 **서버 정책**이어야 한다.
 
-### 8-1. 구현 현황 (2026-10-01)
+### 8-1. 구현 현황 (2026-10-02)
 
 판정 정본은 `demo_accounts.user_id` 하나다 — 이메일 문자열 비교는 금지한다
 (`apps/api-server/src/services/auth/demo-account.service.ts`). 조회가 실패하면 "Demo 아님"으로
@@ -96,10 +96,16 @@ frontend 전용 보호가 아니라 **서버 정책**이어야 한다.
 | 계정 삭제 | **구현** | `AdminUserController.deleteUser` · `UserManagementController.deleteUser` — 삭제 **전** 403 |
 | Google 계정 연결 | **구현** | `google-auth.service.ts` `createGoogleUser` — 403 (`EMAIL_IN_USE` 로 뭉개지 않는다) |
 | platform role 획득 · 관리자 전환 | **기존 보호로 충족** | `POST /admin/platform-accounts/:id/super-admin` 은 Google 연결을 요구한다(`GOOGLE_LINK_REQUIRED`) — Demo 는 연결이 없다 |
-| 이메일 변경 · role 변경 · ownership 해제 | **미구현** | 별도 WO. 이 표에 적힌 것만 서버가 막는다 |
+| 이메일 변경 | **구현** (2026-10-02) | `AdminUserController.updateUser` · `UserManagementController.updateUser` — email 이 바뀌는 요청이면 write **전** 403 |
+| role 변경 | **구현** (2026-10-02) | Admin `updateUser`(roles) · `updateUserRoles` · `revokeRoleAssignment` · `platform-accounts.routes` · `operator-assignment.service` · membership console/approval(KPA · 분회 · PharmacyHub) · KPA member · 분회 운영자 지정/해제 · 분회 생성 승인 · Neture 운영자 등록 승인/반려 · Cosmetics 매장 신청 심사 · LMS 강사 · `auth-account.controller` · 커뮤니티 개체 운영자 지정/해제(`setRole`) · 커뮤니티 개설 승인(`approveCreation`) |
+| ownership 해제 · 변경 | **구현** (2026-10-02) | membership `withdraw` · `deleteMember` · 매장 경영자 해지 `createCase`/`terminateCase`/`purgeCase` · Neture 공급자 승인/반려/비활성화/재활성화(user_id 또는 owner 조직 경유) |
 
 로그인은 막지 않는다 — 체험 입구이므로 비밀번호 로그인은 그대로 된다.
-계약 테스트: `services/auth/__tests__/demoAccountGuard.contract.test.ts` ·
+**이 표에 적힌 것만 서버가 막는다.** 판정은 `demo_accounts.user_id` 만 본다(대상이 조직 id 로만 들어오면
+owner 행을 거쳐 같은 registry 를 본다 — `isDemoOrganization`). Frozen `role-assignment.service.ts` 는
+고치지 않고 호출부에서 거절한다.
+계약 테스트: `services/auth/__tests__/demoAccountGuard.contract.test.ts`(D5 — guard 가 첫 write 보다 앞) ·
+`demoAccountWriteGuard.behavior.test.ts`(이메일 · role · ownership 거절 · 일반 사용자 불변 · fail-closed) ·
 `emailAuthService.test.ts` V13 · `googleAuthService.test.ts` 'Demo 계정 보호'.
 
 ## 9. 허용하는 것 / 막는 것

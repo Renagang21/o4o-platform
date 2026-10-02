@@ -42,6 +42,11 @@ const mockManager = {
   }),
 };
 
+// Demo 판정은 "Demo 아님" 으로 고정 (WO-O4O-CANONICAL-DEMO-ACCOUNT-FOUNDATION-AND-EXPERIENCE-LOGIN-V1 · 근거는 support 헬퍼).
+jest.mock('../../../services/auth/demo-account.service.js', () =>
+  jest.requireActual('../../../__tests__/support/not-demo-account.js').notDemoAccountModule(),
+);
+
 jest.mock('../../../database/connection.js', () => ({
   AppDataSource: {
     // false 로 두면 컨트롤러가 ActionLogService 를 만들지 않는다(기존 테스트와 동일).

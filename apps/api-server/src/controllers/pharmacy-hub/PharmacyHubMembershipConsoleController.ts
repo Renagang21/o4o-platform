@@ -30,6 +30,7 @@ import { ActionLogService } from '@o4o/action-log-core';
 // WO-PHARMACY-HUB-STORE-SUBJECT-PROVISIONING-V1: 승인 후 매장 주체(organization/owner/slug) 보장
 import { PharmacyHubStoreProvisioningService } from '../../services/pharmacy-hub/PharmacyHubStoreProvisioningService.js';
 import logger from '../../utils/logger.js';
+import { sendDemoAccountForbidden } from '../../services/auth/demo-account.service.js';
 
 const SERVICE_KEY = SERVICE_KEYS.PHARMACY_HUB;
 /** 이 콘솔이 접근할 수 있는 유일한 서비스 범위 — 요청 값에서 유도하지 않는다. */
@@ -281,6 +282,7 @@ export class PharmacyHubMembershipConsoleController {
         },
       });
     } catch (error) {
+      if (sendDemoAccountForbidden(res, error)) return;
       if (error instanceof StoreOwnerBusinessInfoRequiredError) {
         return res.status(error.httpStatus).json({
           success: false,
@@ -349,6 +351,7 @@ export class PharmacyHubMembershipConsoleController {
         },
       });
     } catch (error) {
+      if (sendDemoAccountForbidden(res, error)) return;
       logger.error('[PharmacyHubMembershipConsole] reject error', {
         membershipId,
         error: error instanceof Error ? error.message : String(error),
