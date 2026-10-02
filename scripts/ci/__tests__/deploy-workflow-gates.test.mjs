@@ -236,7 +236,9 @@ describe('저장소 전체 — DEPLOY_ENABLED 는 배포 결정에 쓰이지 않
 describe('Public collaborator 경계 — production credential 은 environment 안에서만 · 수동 실행은 소유자만', () => {
   const OWNER = "(github.event_name != 'workflow_dispatch' || github.triggering_actor == github.repository_owner)";
   const jobsUsingCredential = (wf) =>
-    wf.split(/\n(?= {2}[a-z][a-z0-9-]*:\n)/).filter((b) => /secrets\.(?!GITHUB_TOKEN\b)[A-Z]/.test(b));
+    wf
+      .split(/\n(?= {2}[a-z][a-z0-9-]*:\n)/)
+      .filter((b) => /secrets\.(?!GITHUB_TOKEN\b)[A-Z]|google-github-actions\/auth@/.test(b));
 
   for (const file of [...DEPLOY, '.github/workflows/delivery.yml']) {
     it(`${file}: credential 을 쓰는 job 은 모두 environment: production`, () => {
@@ -251,4 +253,55 @@ describe('Public collaborator 경계 — production credential 은 environment �
       assert.ok(gate.includes(OWNER), file);
     });
   }
+});
+
+// WO-O4O-GITHUB-ACTIONS-GCP-WIF-CUTOVER-V1
+// GCP 인증은 GitHub OIDC → WIF → github-actions SA impersonation 하나다. 장기 SA key(GCP_SA_KEY · credentials_json) 회귀를 막는다.
+// provider 조건(repository_id · owner_id · environment=production · ref · 소유자 dispatch · 허용 workflow)은 GCP 쪽에 있다.
+describe('GCP 인증 = WIF — 장기 SA key 0', () => {
+  const PROVIDER = 'projects/117791934476/locations/global/workloadIdentityPools/github-actions/providers/o4o-platform';
+  const SA = 'github-actions@netureyoutube.iam.gserviceaccount.com';
+  const SMOKE = '.github/workflows/gcp-wif-auth-smoke.yml';
+  const WIF_USERS = [...DEPLOY, '.github/workflows/delivery.yml', SMOKE];
+  const ALL = [
+    ...WIF_USERS,
+    '.github/workflows/deploy-auto.yml',
+    '.github/workflows/promote.yml',
+    '.github/workflows/ci-pipeline.yml',
+    '.github/actions/cloud-run-verified-rollout/action.yml',
+    '.github/actions/setup-build-env/action.yml',
+  ];
+  const jobs = (wf) => wf.split(/\n(?= {2}[a-z][a-z0-9-]*:\n)/).filter((b) => /google-github-actions\/auth@/.test(b));
+
+  it('workflow · action 에 GCP_SA_KEY · credentials_json 참조 0', () => {
+    for (const f of ALL) assert.doesNotMatch(read(f), /GCP_SA_KEY|credentials_json/, f);
+  });
+
+  for (const file of WIF_USERS) {
+    it(`${file}: 모든 auth step 이 같은 WIF provider · SA 를 쓴다`, () => {
+      const wf = read(file);
+      const auths = count(wf, /uses: google-github-actions\/auth@/g);
+      assert.ok(auths > 0, file);
+      assert.equal(count(wf, new RegExp(`workload_identity_provider: ${PROVIDER}$`, 'gm')), auths);
+      assert.equal(count(wf, new RegExp(`service_account: ${SA.replace(/[.]/g, '\\.')}$`, 'gm')), auths);
+    });
+
+    it(`${file}: auth 를 쓰는 job 은 id-token: write 를 갖는다 (job 또는 workflow 수준)`, () => {
+      const wf = read(file);
+      const top = wf.split(/\njobs:\n/)[0];
+      for (const b of jobs(wf)) {
+        const jobPerms = b.match(/^ {4}permissions:\n((?: {6}.+\n)+)/m);
+        const perms = jobPerms ? jobPerms[1] : top;
+        assert.match(perms, /id-token: write/, b.split('\n')[0]);
+      }
+    });
+  }
+
+  it('smoke workflow: 수동 · 소유자 · production environment · read-only (배포 · secret · token 출력 0)', () => {
+    const wf = read(SMOKE);
+    assert.match(wf, /^on:\n {2}workflow_dispatch:\n/m);
+    assert.match(wf, /if: github\.triggering_actor == github\.repository_owner/);
+    assert.match(wf, /^ {4}environment: production$/m);
+    assert.doesNotMatch(wf, /secrets\.|gcloud run deploy|update-traffic|jobs execute|print-access-token|print-identity-token|token_format/);
+  });
 });
