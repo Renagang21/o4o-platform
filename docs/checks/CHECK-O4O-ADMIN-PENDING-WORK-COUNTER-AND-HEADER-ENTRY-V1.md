@@ -38,5 +38,8 @@ admin-dashboard 헤더에 필요한 것은 "알림"이 아니라 **관리자가 
 |---|---|
 | `apps/admin-dashboard` `tsc --noEmit` | PASS (error 0) |
 | `apps/api-server` `tsc --noEmit` | PASS (error 0) |
-| 배포 후 API live smoke | 배포 후 기록 |
-| 배포 후 헤더 browser smoke | 배포 후 기록 |
+| CI Pipeline · CodeQL (`e7fb42992`) | PASS |
+| Delivery — API build-and-deploy · Admin deploy | PASS |
+| 비인증 `GET /api/v1/admin/pending-tasks/summary` | PASS — 401 `AUTH_REQUIRED` |
+| 라이브 admin 번들에 `pending-tasks/summary` 호출 · "검토 대기" 포함 | PASS |
+| super_admin 인증 응답 · 비-admin 403 · 헤더 browser smoke | **미실행** — 플랫폼 로그인이 Google / 신규 이메일 로그인으로 전환돼 테스트 문서 비밀번호로 세션 생성 불가(`INVALID_CREDENTIALS`). `renariver21` 은 사용자 로컬 직접 로그인 계정 → 사용자 브라우저 확인 필요 |
