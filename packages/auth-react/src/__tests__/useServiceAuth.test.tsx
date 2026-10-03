@@ -138,7 +138,7 @@ describe('useServiceAuth — password login 은퇴 계약 (WO-O4O-LEGACY-PASSWOR
     const { hook, client } = setup({ token: null });
     await waitFor(() => expect(hook.result.current.isLoading).toBe(false));
 
-    expect((hook.result.current as Record<string, unknown>).login).toBeUndefined();
+    expect((hook.result.current as unknown as Record<string, unknown>).login).toBeUndefined();
     // authClient 에 login 대역이 있어도 훅은 그것을 호출하지 않는다.
     expect(client.login).not.toHaveBeenCalled();
   });
@@ -150,7 +150,7 @@ describe('useServiceAuth — password login 은퇴 계약 (WO-O4O-LEGACY-PASSWOR
     expect(typeof hook.result.current.loginWithGoogle).toBe('function');
     expect(typeof hook.result.current.signupWithGoogle).toBe('function');
     for (const retired of ['login', 'register', 'resetPassword', 'changePassword']) {
-      expect((hook.result.current as Record<string, unknown>)[retired]).toBeUndefined();
+      expect((hook.result.current as unknown as Record<string, unknown>)[retired]).toBeUndefined();
     }
   });
 });
