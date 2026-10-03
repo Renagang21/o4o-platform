@@ -163,21 +163,34 @@ Chrome native host · Chrome Extension · 실제 browser session(Playwright 프�
 - Agent start / restart · `local.db` migration · credential / pairing 변경 · Extension reload · 실 PC smoke 는
   동시에 한 세션만 수행한다. 실 PC 검증 전 다른 세션의 사용 여부를 확인한다.
 
-**(i) 생명주기 · 정리**
+**(i) 생명주기 · 종료 정리**
 
 ```text
 최신 origin/main → 전용 worktree + branch → 작업 → 검증 → commit / push → PR → CI · Codex
 → 보고 · STOP → 사용자 승인 → main 통합(PR merge) → post-merge CI
-→ (필요 시) deploy / smoke → closure → WORKTREE_DISPOSITION 판정 → 승인 시 제거
+→ (필요 시) deploy / smoke → 종료 정리(아래) → 트랙 종료
 ```
 
-- 작업이 끝나도 worktree · branch(로컬 · 원격)를 **자동 삭제하지 않는다.** 먼저 read-only 로 판정한다:
-  `SAFE_TO_REMOVE` / `KEEP` / `UNCERTAIN`.
-- 최소 확인: 작업 commit 이 main 에 모두 포함(`git log origin/main..wo/<slug>` 비어 있음) · branch-only commit 없음 ·
-  uncommitted 0 · untracked 0 · 다른 세션 사용 없음 · 남은 deploy / smoke / closure 없음 · 보존할 CHECK / log / artifact 없음 ·
-  후속 작업이 그 branch 를 필요로 하지 않음.
-- `UNCERTAIN` 이면 삭제하지 않는다. `SAFE_TO_REMOVE` 여도 실제 삭제(`git worktree remove` · `git branch -d` ·
-  `git push origin --delete`)는 사용자 승인 후에 한다.
+**PR merge 후 자기 세션이 만든 worktree 의 정리는 표준 종료 절차다.** 즉시 삭제하지 않고 아래 순서로 점검한 뒤 삭제한다.
+
+1. **main 반영 확인** — post-merge CI 확인 · 작업 commit 이 모두 main 에 포함(`git log origin/main..wo/<slug>` 비어 있음.
+   squash merge 라 비어 있지 않으면 `git diff origin/main wo/<slug> -- <내 작업 경로>` 차이 0 으로 확인).
+2. **worktree clean** — uncommitted 0 · untracked 0 · 진행 중 operation(`MERGE_HEAD` · rebase 등) 없음.
+3. **남은 일 없음** — deploy / smoke / closure 없음 · 보존할 CHECK / log / artifact 없음 · 다른 세션 사용 없음 ·
+   후속 작업이 그 branch 를 필요로 하지 않음.
+4. **reparse point 안전 점검 (Windows · 필수)** — worktree 아래 **모든 깊이**의 junction / symlink(특히 `node_modules`)를 나열하고,
+   각 링크를 비재귀로 해제(PowerShell `[System.IO.Directory]::Delete(<path>)`)한 뒤 **재스캔 0** 을 확인한다.
+   Git Bash 의 `cmd rmdir` 은 경로 인용 오류로 조용히 실패한다. 하나라도 해제되지 않으면 삭제하지 않는다.
+   근거: Windows git 은 junction 을 따라 재귀 삭제한다 — 2026-09-12 `node_modules` junction 을 남긴 채
+   `git worktree remove` 를 실행해 기준 저장소의 `packages/` 소스가 삭제된 사고.
+5. **삭제** — `git worktree remove <path>` → `git worktree prune`.
+6. **손상 검증** — 기준 main checkout 에서 `git status --short` 에 삭제(` D`) 항목이 없는지 확인한다(`node_modules` 개수가 아니라).
+7. **branch 정리** — main 에 포함된 로컬 `wo/<slug>` 는 `git branch -d`(강제 `-D` 금지). 원격 branch 는 PR merge 시
+   `--delete-branch` 또는 merge 후 삭제한다.
+
+- 판정은 `SAFE_TO_REMOVE` / `KEEP` / `UNCERTAIN` 이다. 1~4 를 모두 통과한 `SAFE_TO_REMOVE` 는 별도 승인 없이 5~7 까지 진행한다
+  (main 통합 승인이 트랙 종료를 포함한다). `KEEP` / `UNCERTAIN` 이면 삭제하지 않고 이유를 보고한다.
+- **다른 세션 · 다른 PC 가 만든 worktree / branch 는 정리 대상이 아니다** — 판정만 보고한다.
 
 **(j) 완료 보고**
 

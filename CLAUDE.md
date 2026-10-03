@@ -55,10 +55,11 @@
 
 ```text
 조사 → 문제확정 → 최소 수정 → 검증 → 정본 반영 · (필요 시) CHECK/IR → path-specific stage → commit → push → PR → CI · Codex → 완료 보고 · STOP
-→ (사용자 "main 통합 진행" 승인 시) PR merge → post-merge 확인
+→ (사용자 "main 통합 진행" 승인 시) PR merge → post-merge 확인 → worktree 종료 정리 → 트랙 종료
 ```
 
 - **작업 완료와 main 통합은 별개다.** main 통합은 사용자의 명시 승인 후에만 PR merge 로 한다 — owner direct push · bypass 로 우회하지 않는다. 경로 · gate 상세는 [`AGENTS.md` §4-1(e)](AGENTS.md#4-1-parallel-session--worktree-policy).
+- **merge 후 자기 worktree 정리는 표준 종료 절차다.** 즉시 삭제하지 않는다 — main 포함 · clean · 남은 일 없음 · **junction / reparse point 해제와 재스캔 0** 을 확인한 뒤 삭제 → `git worktree prune` → branch 정리. 다른 세션의 worktree 는 대상이 아니다. 절차 상세는 [`AGENTS.md` §4-1(i)](AGENTS.md#4-1-parallel-session--worktree-policy).
 
 - CHECK 는 운영 반영 증적 · smoke 결과 · 트랙 최종 판정 · 미해결 사항이 있을 때만 쓴다. 그 밖에는 커밋 메시지로 충분하다. 새 문서 위치 · 헤더 · 민감정보 규칙: [`DOCUMENT-LIFECYCLE-AND-ARCHIVE-RULES-V1` §10](docs/rules/DOCUMENT-LIFECYCLE-AND-ARCHIVE-RULES-V1.md).
 
