@@ -1,7 +1,7 @@
 # CHECK-O4O-DOCS-4AXIS-CLASSIFICATION-AND-PUBLIC-SECURITY-CENSUS-V1
 
 > **상태**: ACTIVE
-> **작성일**: 2026-10-03 · **최종 갱신**: 2026-10-03
+> **작성일**: 2026-10-03 · **최종 갱신**: 2026-10-04
 > **근거 WO/IR**: WO-O4O-DOCS-4AXIS-CLASSIFICATION-AND-PUBLIC-SECURITY-CENSUS-V1 · 선행 [`IR-O4O-DOCUMENTATION-CENSUS-AND-SECURITY-CLASSIFICATION-V1`](../investigations/IR-O4O-DOCUMENTATION-CENSUS-AND-SECURITY-CLASSIFICATION-V1.md) (데이터 분리 전 · `809b512ca`)
 
 docs Markdown 4축 분류(CANONICAL · DEVELOPER · INTERNAL_SECURITY · HISTORY) · PUBLIC 저장소 전제 보안 census. 후속 문서 정비 WO 의 입력 자료이며 미해결 판단 사항을 포함한다 (LIFECYCLE-RULES §10-2 ④).
@@ -124,13 +124,13 @@ checks 1,713 · investigations 727 · work-orders 149 · ir 33 · 기타 3 (audi
 | ① 대 · 소문자 · 숫자 · 기호 혼합 8~40자 토큰 (마크다운 강조 `*` · URL `&` 포함 토큰 제외) | **5 / 5** | 링크 앵커 · URL 인코딩 | 실제값 0 (알려진 5건 외) |
 | ② 계정 · 비밀번호 문맥 줄의 영문 · 숫자 · 기호 토큰 | **2 / 5** — 표 헤더에만 문맥어가 있고 값은 다음 행인 표 3행을 놓침 | 패키지명 · 경로 · 이메일 · 강조 표기 · 비밀번호 정책 테스트 입력값 · 패키지 버전 (106) | 보조 규칙으로만 사용 |
 
-- 결론은 규칙 ① 에 근거한다: **알려진 5건 외 추가 평문 비밀번호 없음.**
-- 규칙 ① 은 대문자 또는 기호가 없는 비밀번호를 잡지 못한다 — 그 형태는 정규식 전수 판정이 불가능하다.
+- 결론은 **탐지 범위로 한정**한다: 규칙 ① 이 잡는 형태(대 · 소문자 · 숫자 · 기호를 모두 포함하고 `*` · `&` 가 없는 8~40자 토큰)에서는 알려진 5건 외 추가 평문 비밀번호가 없다.
+- **사각지대 (미검사)**: 대문자 또는 기호가 없는 비밀번호 · `*` · `&` 를 포함한 비밀번호 · 7자 이하 또는 41자 이상 · 표에서 문맥어가 헤더에만 있는 행의 짧은 값. 이 형태들은 정규식으로 전수 판정할 수 없어 "없음"을 주장하지 않는다. 신규 문서는 LIFECYCLE-RULES §10-4 에 따라 작성자가 지키고, 기존 기록물은 후속 정비에서 문서를 열 때 확인한다.
 - 범위 한계: docs 밖 코드(seed · 테스트 · migration)의 비밀번호 리터럴은 이 census 범위가 아니다 — 선행 [`IR-O4O-PRIVACY-DATA-CENSUS-V1`](../investigations/IR-O4O-PRIVACY-DATA-CENSUS-V1.md) 이 다룬다.
 
 해당 없음으로 판정한 것:
 
-- Demo 계정 2건 비밀번호 — [`O4O-CANONICAL-DEMO-ACCOUNTS-V1`](../baseline/O4O-CANONICAL-DEMO-ACCOUNTS-V1.md) 이 **의도적 공개(secret 아님)** 로 정함 → KEEP. 전제: Demo 계정 role 최소화 유지 (현재 `kpa:store_owner` · `neture:supplier` 만)
+- Demo 계정 2건 비밀번호 — [`O4O-CANONICAL-DEMO-ACCOUNTS-V1`](../baseline/O4O-CANONICAL-DEMO-ACCOUNTS-V1.md) 이 **의도적 공개(서비스 체험 기능의 일부)** 로 정함 → KEEP. 근거는 role 이름이 아니라 **ownership 경계**다 — Demo 사용자는 일반 사용자와 같은 identity 구조로 로그인하고, 보는 데이터는 그 Demo 사용자에게 귀속되어 다른 사용자 데이터와 연결되지 않는다. 사용자 확정(2026-10-04)에 따라 LIFECYCLE-RULES §10-4 에 "공개 Demo credential 예외" 를 명시하고 baseline §4 에 격리 근거를 적었다 (이 PR). 예외는 그 정본의 Demo 2계정에 한정되며, 일반 · 운영자 · 관리자 · 실제 테스트 계정 비밀번호는 여전히 금지다.
 - 개인 이메일 0 (`274e90be7` 마스킹 후)
 - 휴대전화 5 hit — 전부 예시값
 - 공인 IP — 공개 DNS 리졸버 · 문서 예시 대역 · 이미 /16 마스킹된 값 · `CLAUDE.md` 의 은퇴한 구 IP(금지 대상 명시용)
@@ -176,5 +176,6 @@ checks 1,713 · investigations 727 · work-orders 149 · ir 33 · 기타 3 (audi
 
 ## 6. 문서 정합 (CLAUDE.md §16)
 
-- 발견: SUPERSEDED 정본 3 · 상태 헤더 없는 정본 69 · 계약/정산 공개 적합성 미판정 4 · 과거 보고서 비밀번호 평문 1 파일(계정 5)
-- 인라인 수정 0 건 (조사 전용) · 별도 WO 제안 3 건 (§5)
+- 발견: SUPERSEDED 정본 3 · 상태 헤더 없는 정본 69 · 계약/정산 공개 적합성 미판정 4 · 과거 보고서 비밀번호 평문 1 파일(계정 5) · Demo 공개 credential ↔ LIFECYCLE-RULES §10-4 충돌 1
+- 정본 수정 2 건 (사용자 확정 2026-10-04): `rules/DOCUMENT-LIFECYCLE-AND-ARCHIVE-RULES-V1` §10-4 Demo 예외 · `baseline/O4O-CANONICAL-DEMO-ACCOUNTS-V1` §4 격리 근거 — 충돌 해소
+- 별도 WO 제안 3 건 (§5)
