@@ -90,8 +90,6 @@
 
 ### 3-B. KPA 운영자 회원 관리 비밀번호 변경 도달 불가 (FIX-3)
 
-> **[2026-10-03 · 주소 의미 정합]** 아래 "KPA 운영자 회원 관리" 는 serviceKey `kpa-society`(`kpa:operator`)의 운영자 화면이다. 현재 이 서비스의 주소는 `pharmacy.neture.co.kr`(옛 `kpa-society.co.kr`)이며, `kpa.neture.co.kr` 은 분회 서비스(`kpa-branch`, 약사 개인 대상)라 이 화면의 주소가 아니다. 본문 URL 은 기록 원문 그대로 둔다. 정본: [`O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1`](../baseline/O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1.md).
-
 프로덕션 `https://kpa.neture.co.kr/operator/members` 에서 어떤 회원을 선택해도 비밀번호 변경 모달이
 "이 회원의 비밀번호를 변경할 수 있는 서비스가 없습니다 / 내가 관리하는 서비스 중 이 회원이 가입한 서비스가 없습니다"
 만 표시하고 서비스 선택 `<select>` 가 0개였다(`[REDACTED_EMAIL]`, `[REDACTED_EMAIL_B]` 실측).
