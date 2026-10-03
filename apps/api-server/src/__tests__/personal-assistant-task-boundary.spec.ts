@@ -92,7 +92,7 @@ const ds = {} as any;
 
 /** run 을 여는 실행 본체 흉내 — 실제 runtime 처럼 coordination row 를 만든다(Task 없이). */
 function executor(goalStatus: string, runId: string | null = `g_${++seq}`, status = 200) {
-  return jest.fn(async (userId: string, _body: Record<string, unknown>): Promise<WorkExecutionReply> => {
+  return jest.fn(async (userId: string): Promise<WorkExecutionReply> => {
     if (status !== 200) return { status, body: { success: false, code: 'WORK_AGENT_NOT_AVAILABLE' } };
     if (runId && !runs.has(runId)) runs.set(runId, { userId, taskId: null });
     return {

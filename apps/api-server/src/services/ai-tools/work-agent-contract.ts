@@ -43,7 +43,20 @@
  *     planner state machine · tool execution queue · background worker · 사이트별 사전 정의 workflow ·
  *     단일 실행의 공용 workflow 자동 승격 · Safety/Risk/capability 완화.
  *   `automation_jobs is a lightweight persistent work record. It is not a scheduler, executor, workflow engine,
- *    agent runtime, or tool execution queue. The PHASE 1 run ledger is Local-canonical; cloud holds coordination only.`
+ *    agent runtime, or tool execution queue.`
+ *
+ * ─────────────────────────────────────────────────────────────────────────────
+ * V2 정렬 (2026-10-03 · WO-O4O-PERSONAL-ASSISTANT-PHASE-A-TASK-FOUNDATION-V1)
+ *
+ *   정본이 `O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2` 로 바뀌었다(AGENT-ARCHITECTURE-V1 SUPERSEDED).
+ *   · 위 "Local SQLite(정본)" · "Cloud 에는 최소 coordination" 은 **현재 구현의 저장 위치**를 적은 것이다. V2 의 원칙은
+ *     Local-first 가 아니라 Ownership-first(V2 §9) — 기억은 organization · user · run 에, 실행환경 상태만 node 에 속한다.
+ *     실제 저장 위치 이동은 V2 §17 Legal / Data Processing Gate 이후(단계 C)이며 Phase A 는 옮기지 않는다.
+ *   · Cloud 에 새로 생긴 것은 Personal Assistant 의 **Task**(`assistant_tasks` — 구조 metadata 만)와
+ *     run → Task 연결(`work_run_coordination.task_id`, Task 1 : N run)뿐이다. goal/질문/답변 원문 · 관찰 · step 전문은
+ *     여전히 cloud 에 넣지 않는다. Task 는 위 금지 목록의 어느 것(scheduler · queue · workflow engine · planner state
+ *     machine 등)도 아니다 — 실행 순서를 정하지 않고, 대기열이 아니며, 재시도를 orchestrate 하지 않는다.
+ *   · 업무 판단(Assistant Planning)과 화면 조작 판단(Execution Planning)의 분리는 V2 §18 단계 B 이며 여기서 하지 않는다.
  */
 
 import type { DomFindQuery, SafeDomElement } from '../local-agent/browser-dom-contract.js';

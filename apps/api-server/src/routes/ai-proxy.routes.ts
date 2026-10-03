@@ -60,6 +60,7 @@ import { runWebResearch } from '../services/ai/web-research.service.js';
 import { readAttachments, renderAttachmentTextBlocks } from '../services/ai-tools/attachment-reader.js';
 import { executeMultimodalChat } from '../services/ai-tools/multimodal-chat.js';
 import { resolveWorkScopeStore, STORE_SCOPED_WORKSPACES } from '../utils/work-scope-store-resolution.js';
+import { runAssistantWorkTask } from '../services/assistant/personal-assistant.js';
 import {
   selectToolInvocationForRequest,
   executeAiTool,
@@ -271,6 +272,8 @@ router.post('/vision/analyze', authenticate, async (req, res: Response) => {
 interface RouteReply {
   status: number;
   body: Record<string, unknown>;
+  /** 직렬화되지 않는 실행 요약 — Personal Assistant 가 Task 에 올리는 구조 키만(Phase A). */
+  execution?: { taskKey: string | null };
 }
 
 async function performWorkAgentRun(userId: string, body: Record<string, unknown>): Promise<RouteReply> {
@@ -346,6 +349,7 @@ async function performWorkAgentRun(userId: string, body: Record<string, unknown>
         workflow: result.workflow ?? null,
       },
     },
+    execution: { taskKey: result.taskKey ?? null },
   };
 }
 
@@ -2197,6 +2201,10 @@ async function performHospitalDrugRequest(
 //   첨부: 이미지는 두 경로 모두(Work Agent 는 첫 이미지 1장 — 기존 계약), 문서 · 표는 chat 경로에서만 읽는다.
 //   안전: Work 경로의 COMMIT · credential · never-escalate 판정은 runtime 그대로 — 라우터는 권한을 넓히지 않는다.
 //   저장: 첨부 · 텍스트 · 응답 어느 것도 DB · 파일 · 로그에 쓰지 않는다. 로그는 route 판정 이름과 첨부 개수뿐이다.
+//     예외(Personal Assistant Phase A): work 요청은 `assistant_tasks` 에 **구조 metadata 만**(소유 · 대상 id · 상태 ·
+//     provisional Task type) 남기고 run 을 그 Task 에 붙인다. 요청 원문 · 첨부 · 답변은 여전히 저장하지 않는다.
+//     응답: work 일 때만 data.taskId · data.taskStatus(additive). chat · confirm 에는 Task 가 없다.
+//     요청: taskId?(이어갈 Task — 요청자 본인 · 미종결일 때만 쓰인다).
 // ===========================================
 router.post('/request', authenticate, dynamicLimiter('free'), async (req, res: Response) => {
   const authReq = req as AuthRequest;
@@ -2281,9 +2289,25 @@ router.post('/request', authenticate, dynamicLimiter('free'), async (req, res: R
     if (runId) workBody.runId = runId;
     if (runId && typeof body.targetHint === 'string') workBody.targetHint = body.targetHint;
     if (typeof body.recoveryHint === 'string') workBody.recoveryHint = body.recoveryHint;
-    const reply = await performWorkAgentRun(userId, workBody);
-    if (reply.status !== 200) return res.status(reply.status).json(reply.body);
-    return res.json({ success: true, data: { kind: 'work', route: decision.route, reason: decision.reason, work: reply.body.data } });
+    // Personal Assistant Phase A — Assistant → Task → Execution. 실행 본체(performWorkAgentRun)는 그대로이고,
+    // Task 는 구조만 남긴다(원문 미저장). taskId 는 additive — 기존 work 필드의 의미는 바뀌지 않는다.
+    const { reply, task } = await runAssistantWorkTask(
+      AppDataSource,
+      { userId, workBody, requestedTaskId: body.taskId, workScope: body.workScope },
+      performWorkAgentRun,
+    );
+    if (reply.status !== 200) return res.status(reply.status).json(task ? { ...reply.body, taskId: task.taskId } : reply.body);
+    return res.json({
+      success: true,
+      data: {
+        kind: 'work',
+        route: decision.route,
+        reason: decision.reason,
+        taskId: task?.taskId ?? null,
+        taskStatus: task?.status ?? null,
+        work: reply.body.data,
+      },
+    });
   }
 
   const reply = await performHomeChat(userId, { message: text, workScope: body.workScope, provider: body.provider }, attachments);

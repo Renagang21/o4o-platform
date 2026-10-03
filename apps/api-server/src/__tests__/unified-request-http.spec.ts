@@ -17,6 +17,9 @@
  *   ⑩  Local Agent 미연결 + work → 403 WORK_AGENT_NOT_AVAILABLE (기존 계약 그대로 통과)
  *   ⑪  기존 endpoint 회귀: /home-chat · /work-agent/run 은 그대로 동작한다
  *   ⑫  로그에 base64 · 본문이 실리지 않는다
+ *   ⑬  Personal Assistant Phase A — work 응답에 taskId · taskStatus(additive) · chat/confirm 에는 Task 없음 ·
+ *       403 에도 taskId · 재요청 taskId 로 같은 Task · 원문이 Task 저장 경로에 닿지 않는다
+ *       (WO-O4O-PERSONAL-ASSISTANT-PHASE-A-TASK-FOUNDATION-V1)
  */
 
 import express from 'express';
@@ -73,6 +76,39 @@ jest.mock('../services/ai-tools/hospital-drug-surface.js', () => ({
 jest.mock('../services/ai/web-research.service.js', () => ({
   runWebResearch: (...a: unknown[]) => runWebResearchMock(...a),
 }));
+// ⑬ Personal Assistant Phase A — Task 저장소는 메모리로 바꾼다(SQL 계약은 personal-assistant-task-store.spec).
+const taskStoreCalls: unknown[] = [];
+const memTasks = new Map<string, { status: string; requestedByUserId: string }>();
+let memTaskSeq = 0;
+jest.mock('../services/assistant/task-ownership.js', () => ({
+  resolveTaskOwnership: jest.fn(async () => ({ scope: 'USER', organizationId: null, serviceKey: null })),
+}));
+jest.mock('../services/assistant/assistant-task-store.js', () => {
+  const actual = jest.requireActual('../services/assistant/assistant-task-store.js');
+  const row = (taskId: string) => ({ taskId, ...memTasks.get(taskId)!, ownershipScope: 'USER' });
+  return {
+    ...actual,
+    createAssistantTask: jest.fn(async (_ds: unknown, input: any) => {
+      taskStoreCalls.push(['create', input]);
+      const taskId = `00000000-0000-4000-8000-${String(++memTaskSeq).padStart(12, '0')}`;
+      memTasks.set(taskId, { status: 'running', requestedByUserId: input.requestedByUserId });
+      return row(taskId);
+    }),
+    getAssistantTaskForRequester: jest.fn(async (_ds: unknown, taskId: string, userId: string) => {
+      taskStoreCalls.push(['get', taskId]);
+      return memTasks.get(taskId)?.requestedByUserId === userId ? row(taskId) : null;
+    }),
+    findTaskIdByRun: jest.fn(async () => null),
+    attachRunToTask: jest.fn(async (_ds: unknown, input: any) => { taskStoreCalls.push(['attach', input]); return true; }),
+    updateAssistantTask: jest.fn(async (_ds: unknown, input: any) => {
+      taskStoreCalls.push(['update', input]);
+      const t = memTasks.get(input.taskId);
+      if (!t) return null;
+      t.status = input.status;
+      return row(input.taskId);
+    }),
+  };
+});
 
 import router from '../routes/ai-proxy.routes.js';
 import { AI_TOOL_NAMES } from '../services/ai-tools/ai-tool-contract.js';
@@ -351,5 +387,57 @@ describe('POST /api/ai/request', () => {
     const all = JSON.stringify([...logInfo.mock.calls, ...logWarn.mock.calls, ...logError.mock.calls]);
     expect(all).not.toContain(b64('SECRETIMG'));
     expect(all).not.toContain('비밀문장');
+  });
+});
+
+describe('⑬ Personal Assistant Phase A — Task (additive)', () => {
+  beforeEach(() => {
+    taskStoreCalls.length = 0;
+    memTasks.clear();
+  });
+
+  it('work → taskId · taskStatus 추가, 기존 work 필드는 그대로 · run 이 Task 에 붙는다', async () => {
+    const r = await request(app).post('/api/ai/request').send({ text: '약학정보원에서 타이레놀 검색해줘' });
+    expect(r.status).toBe(200);
+    expect(r.body.data.kind).toBe('work');
+    expect(r.body.data.taskId).toMatch(/^[0-9a-f-]{36}$/);
+    expect(r.body.data.taskStatus).toBe('completed');
+    expect(r.body.data.work.runId).toBe('g_1');
+    expect(r.body.data.work.goal.status).toBe('completed');
+    expect(r.body.data.work).not.toHaveProperty('taskKey'); // 내부 요약은 응답에 싣지 않는다
+    expect(taskStoreCalls).toContainEqual(['attach', { taskId: r.body.data.taskId, runId: 'g_1', userId: '00000000-0000-4000-8000-000000000001' }]);
+  });
+
+  it('chat · confirm 에는 Task 가 없다 (저장 0)', async () => {
+    const chat = await request(app).post('/api/ai/request').send({ text: 'UDCA가 뭐야?' });
+    expect(chat.body.data.kind).toBe('chat');
+    expect(chat.body.data).not.toHaveProperty('taskId');
+    const confirm = await request(app).post('/api/ai/request').send({ text: '닥터스 반납' });
+    expect(confirm.body.data.kind).toBe('confirm');
+    expect(confirm.body.data).not.toHaveProperty('taskId');
+    expect(taskStoreCalls).toHaveLength(0);
+  });
+
+  it('403(기기 미연결) → 기존 오류 계약 + taskId · Task 는 blocked', async () => {
+    resolveTargetDeviceMock.mockResolvedValue({ status: 'not_registered' });
+    const r = await request(app).post('/api/ai/request').send({ text: '약학정보원에서 우루사정 찾아줘' });
+    expect(r.status).toBe(403);
+    expect(r.body.code).toBe('WORK_AGENT_NOT_AVAILABLE');
+    expect(memTasks.get(r.body.taskId)?.status).toBe('blocked');
+  });
+
+  it('taskId 로 다시 요청 → 같은 Task 를 이어간다 (미종결일 때)', async () => {
+    runWorkAgentMock.mockResolvedValueOnce(workResult({ goal: { goalId: 'g_9', runId: 'g_9', status: 'waiting_for_user' }, resumable: true }));
+    const first = await request(app).post('/api/ai/request').send({ text: '약학정보원에서 타이레놀 검색해줘' });
+    expect(first.body.data.taskStatus).toBe('waiting_for_user');
+    const again = await request(app).post('/api/ai/request').send({ text: '약학정보원에서 타이레놀 검색해줘', taskId: first.body.data.taskId });
+    expect(again.body.data.taskId).toBe(first.body.data.taskId);
+    expect(memTasks.size).toBe(1);
+  });
+
+  it('요청 원문은 Task 저장 경로에 닿지 않는다(실행 본체로만 간다)', async () => {
+    await request(app).post('/api/ai/request').send({ text: '약학정보원에서 비밀약품SENTINEL 검색해줘', workScope: { workspace: 'home', organizationId: 'x' } });
+    expect(runWorkAgentMock.mock.calls[0][2].request).toContain('비밀약품SENTINEL');
+    expect(JSON.stringify(taskStoreCalls)).not.toContain('SENTINEL');
   });
 });
