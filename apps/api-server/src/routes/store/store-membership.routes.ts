@@ -6,6 +6,7 @@
  *
  * API Namespace: `/api/v1/store` (공통 Store Workspace mount — serviceKey 없는 서비스 중립 표면)
  *
+ *   POST   /enrollment                      사업자 가입 — 매장 생성/연결 후 Owner 확보
  *   GET    /membership                      내 접근 자격 (owner · member · none)
  *   GET    /members                         구성원 목록                      — Owner
  *   POST   /members/invite                  초대 (기존 가입자만 · 메일 0)     — Owner
@@ -27,6 +28,11 @@ import { asyncHandler } from '../../middleware/error-handler.js';
 import { readPreferredStoreOrganizationId } from '../../utils/store-organization.resolver.js';
 import type { StoreOwnerServiceKey } from '../../utils/store-owner.utils.js';
 import {
+  StoreEnrollmentError,
+  enrollStoreBusiness,
+  ENROLLABLE_SERVICE_KEYS,
+} from '../../services/store/store-enrollment.service.js';
+import {
   StoreMemberError,
   acceptStoreInvitation,
   inviteStoreMember,
@@ -46,7 +52,7 @@ function readServiceKey(req: Request): StoreOwnerServiceKey | undefined {
 const sessionUserId = (req: Request): string => ((req as AuthRequest).user?.id as string) ?? '';
 
 function sendError(res: Response, error: unknown): void {
-  if (error instanceof StoreMemberError) {
+  if (error instanceof StoreMemberError || error instanceof StoreEnrollmentError) {
     res.status(error.status).json({ success: false, error: error.message, code: error.code });
     return;
   }
@@ -55,6 +61,38 @@ function sendError(res: Response, error: unknown): void {
 
 export function createStoreMembershipRoutes(dataSource: DataSource, requireAuth: RequestHandler): Router {
   const router = Router();
+
+  /**
+   * 사업자 가입 — 로그인 사용자가 자기 매장을 연다.
+   * 멱등: 이미 이 서비스의 매장을 가지고 있으면 아무 것도 만들지 않고 그 매장을 돌려준다.
+   * 후보가 둘 이상이면 고르지 않고 409 로 거절한다(임의 병합 금지).
+   */
+  router.post(
+    '/enrollment',
+    requireAuth,
+    asyncHandler(async (req: Request, res: Response) => {
+      const serviceKey = typeof req.body?.serviceKey === 'string' ? req.body.serviceKey : '';
+      const businessName = typeof req.body?.businessName === 'string' ? req.body.businessName : '';
+      if (!(ENROLLABLE_SERVICE_KEYS as readonly string[]).includes(serviceKey)) {
+        res.status(400).json({
+          success: false,
+          error: '매장을 열 서비스를 선택해 주세요.',
+          code: 'SERVICE_NOT_ENROLLABLE',
+        });
+        return;
+      }
+      try {
+        const data = await enrollStoreBusiness(dataSource, {
+          userId: sessionUserId(req),
+          serviceKey: serviceKey as StoreOwnerServiceKey,
+          businessName,
+        });
+        res.json({ success: true, data });
+      } catch (e) {
+        sendError(res, e);
+      }
+    }),
+  );
 
   // 내 자격 — 화면이 Owner/Member 를 추측하지 않도록 서버가 확정해 돌려준다.
   router.get(

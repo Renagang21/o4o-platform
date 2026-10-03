@@ -27,6 +27,7 @@ import StoreSelectorPage from './pages/StoreSelectorPage';
 // WO-O4O-STORE-BUSINESS-ENROLLMENT-AND-MEMBER-ACCESS-V1
 import StoreMembersPage from './pages/StoreMembersPage';
 import StoreInvitationsPage from './pages/StoreInvitationsPage';
+import StoreEnrollmentPage from './pages/StoreEnrollmentPage';
 import MyServicesPage from './pages/MyServicesPage';
 import SettingsPage from './pages/SettingsPage';
 import { WORKSPACE_PATHS } from './config/workspace';
@@ -249,6 +250,8 @@ export default function App() {
         막혀 수락 자체를 못 한다(PR #277 리뷰 P1). 로그인만 요구한다.
       */}
       <Route path={WORKSPACE_PATHS.invitations} element={<StoreInvitationsPage />} />
+      {/* 매장 시작하기(사업자 가입) — 매장이 없는 사용자가 쓰는 화면이라 StoreGate 밖이다 */}
+      <Route path={WORKSPACE_PATHS.enrollment} element={<StoreEnrollmentPage />} />
 
       {/* ── 내 매장(공통 기능 1회) ── */}
       <Route path={S} element={gated(<UnifiedStoreLayout />)}>

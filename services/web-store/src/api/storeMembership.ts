@@ -11,6 +11,15 @@ import { coreApiClient } from './client';
 
 export type StoreAccessLevel = 'owner' | 'member' | 'none';
 
+/** 자가 가입이 가능한 업종. 서버의 ENROLLABLE_SERVICE_KEYS 와 같은 목록이다. */
+export type EnrollableServiceKey = 'kpa' | 'cosmetics' | 'pharmacy-hub';
+
+export interface StoreEnrollmentResult {
+  organizationId: string;
+  serviceKey: EnrollableServiceKey;
+  outcome: 'created' | 'connected' | 'existing';
+}
+
 export interface StoreAccess {
   level: StoreAccessLevel;
   organizationId: string | null;
@@ -36,6 +45,15 @@ type Envelope<T> = { success: boolean; data: T };
 const withService = (serviceKey?: string) => (serviceKey ? { serviceKey } : undefined);
 
 export const storeMembershipApi = {
+  /** 사업자 가입 — 조직·역할은 서버가 공용 helper 로 만든다(화면이 만들지 않는다). */
+  async enroll(serviceKey: EnrollableServiceKey, businessName: string): Promise<StoreEnrollmentResult> {
+    const res = await coreApiClient.post<Envelope<StoreEnrollmentResult>>('/store/enrollment', {
+      serviceKey,
+      businessName,
+    });
+    return res.data;
+  },
+
   /** 내 접근 자격 — 화면이 Owner/Member 를 추측하지 않게 서버 판정을 그대로 쓴다. */
   async getMyAccess(serviceKey?: string): Promise<StoreAccess> {
     const res = await coreApiClient.get<Envelope<StoreAccess>>('/store/membership', withService(serviceKey));

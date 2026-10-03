@@ -92,6 +92,38 @@ owner role 과 같은 `{prefix}:{role}` 규약이다. 수락이 발급하고 해
 
 ---
 
+## 3-A. 사업자 가입 (자가 가입)
+
+로그인한 사용자가 `store.neture.co.kr` 에서 직접 매장을 연다.
+
+```text
+로그인 → 업종(서비스) · 사업자 이름 입력
+      → 기존 사업자 연결 또는 신규 생성
+      → organization_members(role='owner')
+      → organization_service_enrollments(active)
+      → service_memberships (status 보존 ensure)
+      → role_assignments({prefix}:store_owner)
+      → Store Workspace
+```
+
+**새 프로비저닝을 만들지 않았다.** 조직·소유·서비스 참여는 PharmacyHub·Cafe24 B2B 가 쓰는
+공용 helper `organizationOpsService.ensureOrganizationWithOwnerAndService()` 가 그대로 한다.
+이 경로는 **계기가 다른 새 채널**일 뿐이다(외부 로그인·운영자 승인이 아니라 본인 신청).
+
+| 상황 | 결과 |
+|---|---|
+| 이미 이 서비스의 경영자 | `existing` — **아무 것도 만들지 않는다** |
+| 내 조직이 이 서비스에 1개 연결됨 | `connected` — 그 조직에 붙인다(중복 생성 0) |
+| 후보 0 | `created` — 새로 만든다 |
+| 후보 2개 이상 | **409 `AMBIGUOUS_ORGANIZATION`** — 고르지 않는다 |
+
+마지막 줄이 핵심이다. 어느 사업자인지는 사람이 정할 문제이고, 코드가 추측하면 남의 매장에 붙는다.
+
+가입 가능 업종은 `kpa` · `cosmetics` · `pharmacy-hub` 다. `cafe24-b2b` 는 외부 로그인으로만 생기는
+채널이라 자가 가입 대상이 아니다.
+
+---
+
 ## 4. 초대 · 수락 · 해제
 
 ```text
@@ -105,6 +137,7 @@ Owner → 해제
 
 | API (`/api/v1/store`) | 자격 |
 |---|---|
+| `POST /enrollment` | 로그인 — 사업자 가입(멱등) |
 | `GET /membership` | 로그인 — 내 자격을 서버가 확정해 돌려준다 |
 | `GET /members` | Owner |
 | `POST /members/invite` | Owner |
@@ -131,8 +164,8 @@ Member → 초대 · 해제 · 구성원 목록            → 403 STORE_OWNER_R
 관계 행만 있고 role 이 없는 사용자 → 매장 진입  → none (Identity V3 §7-1)
 ```
 
-초대 수락 화면(`/invitations`)은 **Store gate 밖**이다. 초대받은 사람은 수락 전까지 접근 가능한
-매장이 0 이라, gate 안에 두면 "매장 없음" 화면에 막혀 수락 자체를 못 한다.
+초대 수락(`/invitations`)과 매장 시작하기(`/start-store`)는 **Store gate 밖**이다. 둘 다 매장이
+아직 없는 사용자가 쓰는 화면이라, gate 안에 두면 "매장 없음" 화면에 막혀 아무 것도 못 한다.
 
 계약 테스트: `services/store/__tests__/storeMembership.test.ts` (M1~M6).
 변이 검사로 확인했다 — 수락의 본인 확인 · 업종 경계 · 해제 역할 제한을 각각 제거하면 테스트가 깨진다.
@@ -144,7 +177,7 @@ Member → 초대 · 해제 · 구성원 목록            → 403 STORE_OWNER_R
 | 한계 | 왜 |
 |---|---|
 | **미가입자 초대 불가** | 토큰·메일 발송이 필요하고, 은퇴한 초대 도메인을 되살리지 않기로 했다. 초대 대상은 먼저 가입해야 한다 |
-| **사업자 가입(Store 신규 생성) 미포함** | 조직·매장 생성 경로는 서비스별 프로비저닝이 이미 갖고 있다(`PharmacyHubStoreProvisioningService` · `Cafe24B2bStoreProvisioningService` · cosmetics · KPA). 공통 생성 경로를 새로 만들면 중복이 된다 — 별도 WO |
+| **사업자번호 검증 없음** | V1 은 이름만 받는다. 사업자 identity 확인은 각 서비스의 승인 절차가 갖고 있다 |
 | **권한 등급 2개** | owner / member 뿐. 세분화는 실제 요구가 나온 뒤에 한다 |
 | **다중 Store** | 읽기는 이미 지원된다(`resolveAccessibleStores`). Member 의 다중 매장 선택 UI 는 V1 범위 밖 |
 
