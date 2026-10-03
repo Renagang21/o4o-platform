@@ -1,7 +1,7 @@
 # O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2
 
 > **상태**: ACTIVE — O4O AI 업무 비서 · 자동화 **구조 정본** (`CANONICAL-INDEX` §6)
-> **작성일**: 2026-10-03
+> **작성일**: 2026-10-03 · **개정**: 2026-10-04 §0-1 개인화 원칙(P3) 신설 · §4-4 · §7 · §8-3 · §10 · §19 · §22 정렬 (`WO-O4O-PERSONAL-ASSISTANT-PERSONALIZATION-PRINCIPLE-ALIGNMENT-V1`)
 > **근거 WO**: `WO-O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2-CANONICALIZATION` + `WO-O4O-PERSONAL-ASSISTANT-V2-ENVIRONMENT-REFRESH-AND-CANONICALIZATION-UPDATE` (사용자 확정 2026-10-03)
 > **근거 IR**: [`IR-…-V2-GAP-CENSUS`](../investigations/IR-O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2-GAP-CENSUS.md) (코드 vs 목표) · [`IR-…-V2-CANONICAL-CONSISTENCY-REVIEW`](../investigations/IR-O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2-CANONICAL-CONSISTENCY-REVIEW.md) (초안 vs 정본) · [`IR-…-V2-ENVIRONMENT-REFRESH`](../investigations/IR-O4O-PERSONAL-ASSISTANT-V2-ENVIRONMENT-REFRESH.md) (환경 기준선)
 > **상위 정본**: [`O4O-AI-AUTOMATION-EVOLUTION-PRINCIPLES-V1`](O4O-AI-AUTOMATION-EVOLUTION-PRINCIPLES-V1.md) (2026-10-03 부분 개정으로 이 문서와 정합). EVOLUTION = 왜 그렇게 발전해야 하는가 · 이 문서 = 그것을 어떤 구조로 만드는가. 둘이 충돌하면 EVOLUTION 이 우선하며, 충돌은 개정 WO 로 해소한다.
@@ -21,6 +21,29 @@
 > 매장 업무의 기억은 organization, 개인 선호 · 교정은 user, 진행 중 업무의 상태는 run 에 속한다. node 에는 실행환경 상태(credential · 로그인 세션 · 현재 화면 · 로컬 파일 경로)만 속한다(§9).
 
 두 원칙은 EVOLUTION 의 세 문장(사용자 행동은 학습 자료 · 업무를 미리 정의하지 않는다 · 완전 자동화가 아닌 시간 절감)을 바꾸지 않는다. 그 원칙이 작동하는 **제품 구조**를 정한다.
+
+### 0-1. 개인화 원칙 — 표준 Workflow 를 만들지 않는다 (2026-10-04 사용자 확정)
+
+> **P3. O4O 는 사용자를 하나의 표준 자동화 프로세스에 맞추지 않는다.**
+> 여러 사용자의 Experience 는 다른 사용자에게 **추천 · 후보 · 판단 근거**가 될 수 있지만, 모든 사용자가 따라야 하는 공통 Workflow 나 강제 규칙이 되지 않는다.
+> O4O 가 학습하는 목적은 표준 Workflow 를 만드는 것이 아니라, **각 사용자의 Assistant 가 그 사용자의 Experience 와 현재 상황에 맞는 방법을 더 잘 고르게** 하는 것이다.
+
+1. **판단 근거의 자리.** 그 사용자(와 그 매장)의 Experience · Correction 이 그 사용자의 Assistant 가 방법을 고르는 **가장 가까운 근거**다. 다른 사용자들의 반복된 성공은 **Shared Candidate · Knowledge · Evidence** 로만 쓰인다(§10).
+2. **처음 쓰는 사용자.** 자기 Experience 가 아직 부족하면 Manual · Shared Candidate · 다른 사용자의 정제된 Experience(Digest) · AI Discovery 를 초기 근거로 쓴다. 이것들은 출발점일 뿐이다. 그 사용자의 Run 에서 다시 검증되며, 쓸수록 그 사용자 · 매장의 Experience 가 근거의 중심이 된다.
+
+   ```text
+   처음      Manual · Shared Candidate · Digest · Discovery  → 이 사용자의 Run 에서 검증
+   반복      이 사용자의 Experience · Correction 이 쌓인다    → 이 사용자에게 맞는 방법
+   이후      이 사용자의 Procedure / Skill                    → Shared 는 참고 · 비교 근거로 남음
+   ```
+
+3. **추천 ≠ 강제.** 많이 쓰이거나 반복 검증된 방법은 추천하거나 우선 후보로 고려할 수 있다. 그러나 사용자에게 강제하지 않고, 그 사용자의 검증된 방법 · 교정을 덮어쓰지 않는다. 사용자가 다른 방법을 고르거나 교정하면 그 사용자의 Experience 가 우선한다.
+4. **교정은 그 사용자의 것.** User Correction 은 그 사용자(또는 그 매장)의 Task type × Target × Stage 범위에서만 효력을 갖는다. 다른 사용자에게 자동으로 적용되지 않는다. 공유되더라도 동의 · 익명화 · publish 를 거쳐 상대에게 **후보(Knowledge)** 로만 도착한다(§10).
+5. **Skill 은 공통 RPA Workflow 가 아니다.** Skill / Procedure 는 Assistant 가 상황에 따라 **고르고 조합하는 재사용 수행 능력**이다(§7). 같은 Task type 에 여러 Skill 이 공존할 수 있고, 사용자 · 매장마다 다른 Skill 을 쓸 수 있다.
+6. **Task 소유 ≠ 절차 선택.** Task 의 소유 범위(`USER` / `ORGANIZATION` — §4 · §9)는 그 업무와 기억이 누구에게 속하는가다. 어떤 Procedure 로 수행할지는 별개로, Assistant 가 그 소유 주체의 Experience 와 현재 상황으로 고른다. ORGANIZATION 소유 Task 라고 매장 전원이 하나의 고정 절차를 따라야 하는 것은 아니다.
+7. **하나의 Assistant 가 이어진다.** 사용자 · 업무공간(Work Context) · 요청 채널 · 실행 노드가 달라졌다는 이유로 서로 다른 자동화 체계를 만들지 않는다. 같은 사용자의 Assistant 와 그 기억은 여러 공간과 접점에서 지속된다(§3 · §11 · §14). 다르게 처리되는 것은 소유 경계(§9) 와 노드 capability(§11) 뿐이다.
+
+**설계 금지**: 다수 사용자의 성공 경로를 모아 하나의 표준 Workflow 로 만들고 모든 사용자에게 적용하는 설계. "가장 많이 성공한 경로" 는 추천 근거이지 정답이 아니다.
 
 ---
 
@@ -98,7 +121,7 @@ Assistant 가 Experience 를 대체하지 않는다. Assistant 는 Experience �
 ### 4-4. Task type 은 미리 정하지 않는다
 
 - `REPLENISHMENT_REVIEW` · `HEALTHKR_PRODUCT_SEARCH` 같은 이름은 **예시**다. Task type 과 Skill 은 운영자가 미리 정하는 목록이 아니라 **실제 사용 → Experience → 검증 승격(§7 · §8)** 으로 생긴다(EVOLUTION §14 · §15 · EXPERIENCE-MODEL D2).
-- Task type 결정 주체: Discovery 가 제안 + alias 누적, 정규화는 공유 단계에서(EXPERIENCE-MODEL D2 유지).
+- Task type 결정 주체: Discovery 가 제안 + alias 누적, 정규화는 공유 단계에서(EXPERIENCE-MODEL D2 유지). 여기서 정규화는 **업무 유형의 이름 · 식별을 맞추는 것**이지 수행 절차를 하나로 통일하는 것이 아니다(§0-1).
 
 ---
 
@@ -166,7 +189,7 @@ Strong Discovery 는 V1 에서 최상위 진입점이었다. V2 에서는 **Assi
 
 ## 7. Skill — 검증된 Experience 의 승격 형태
 
-1. **Skill 은 검증된 Experience 에서 승격되는 업무 Procedure 다.** "이 업무를 이 대상에서 하려면, 이런 입력을 받아, 이런 순서로, 이런 확인을 거친다."
+1. **Skill 은 검증된 Experience 에서 승격되는 업무 Procedure 다.** "이 업무를 이 대상에서 하려면, 이런 입력을 받아, 이런 순서로, 이런 확인을 거친다." Skill 은 **Assistant 가 상황에 따라 고르고 조합하는 재사용 수행 능력**이며, 모든 사용자가 따라야 하는 RPA Workflow 가 아니다(§0-1). 같은 Task type 에 여러 Skill 이 공존할 수 있다.
 2. Skill 은 좌표 · DOM 경로의 녹화가 아니다. **stage + 각 stage 의 의미적 대상 + 입력 슬롯 + 성공 판정 + 알려진 실패와 복구** 로 표현한다.
 3. Skill 은 사용자 도움 · 매뉴얼에서 얻은 단계도 포함한다.
 4. Skill 은 항상 현재 화면으로 재검증하며 실행하고, 어긋나면 Discovery 로 되돌아간다.
@@ -218,7 +241,7 @@ Lower-cost Reasoning 단계는 유지한다. "속도는 약한 모델로 해결�
 2. 업무 전체가 한 수준일 필요는 없다. **stage 별로 수준이 섞일 수 있다.**
 3. **강등은 즉시, 승격은 신중히.** 한 번의 성공으로 승격하지 않는다(EVOLUTION §9).
 4. 승격 신호: 성공률 · 실패율 · 최근 실패 · UI 안정성 · 입력값 변화 폭 · 사용자 개입 빈도 · 평균 소요시간과 편차 · 환경 차이 · 남은 판단 필요성. 실행 횟수만으로 승격하지 않는다.
-5. **개인(소유 주체) 범위 승격과 공유 범위 승격은 다르다.** 공유 승격은 더 높은 근거와 검증을 요구한다.
+5. **개인(소유 주체) 범위 승격과 공유 범위 승격은 다르다.** 공유 승격은 더 높은 근거와 검증을 요구한다. 공유 범위로 승격된 것은 **Shared Candidate**(다른 사용자에게 추천 · 우선 후보가 되는 상태)이지 전 사용자 표준이 아니다(§0-1 · §10).
 6. 승격 상태와 근거는 기록된다. LLM 단독 완료 판정은 승격 신호에서 제외한다(EXPERIENCE-MODEL D6).
 
 ---
@@ -266,7 +289,8 @@ Lower-cost Reasoning 단계는 유지한다. "속도는 약한 모델로 해결�
 2. 공유 단위는 **Experience Digest** — 정제 순서: SHAREABLE 필드만 선택 → 값 · 원문 · 개인 환경 제거 → 수치 구간화 → 동의 → publish.
 3. 수신 측에서 공유 Digest 는 **Knowledge(미검증 주장)** 로 들어온다. 다른 사용자 · 매장에서 검증 없이 바로 결정적으로 실행하지 않는다.
 4. 한 사용자의 한 번 성공으로 공유 절차가 되지 않는다.
-5. 공유 승격이 이용계약상 "학습 · 데이터 재사용" 에 해당하는지의 해석은 §17 Gate 대상이다.
+5. **공유는 강제가 아니다.** 여러 사용자 · 매장에서 반복 검증된 방법은 Shared Candidate 로서 추천 순위 · 우선 후보 · 처음 쓰는 사용자의 출발점이 될 수 있다. 수신 측 사용자의 검증된 방법 · 교정을 덮어쓰지 않고, 수신 측에서 다시 검증된 뒤에야 그 사용자의 Experience 가 된다(§0-1).
+6. 공유 승격이 이용계약상 "학습 · 데이터 재사용" 에 해당하는지의 해석은 §17 Gate 대상이다.
 
 ---
 
@@ -435,7 +459,7 @@ EVOLUTION §22 를 그대로 쓴다.
 
 | 핵심 KPI 가 **아닌** 것 | 더 중요한 지표 |
 |---|---|
-| 지원 사이트 수 · 사전 정의 Workflow/Skill 수 · AI 자동 완료율 · 실행 계층 smoke PASS 수 | 동일 업무 완료시간 감소 · 사용자 수동 조작 감소 · takeover 위치 변화 · 반복 질문/수정 감소 · Skill 재사용률 · 새 업무 적응 속도 · AI 판단 호출 감소 · 결정적 실행 비율 증가 · 다른 노드/채널에서도 같은 기억이 쓰이는 비율 |
+| 지원 사이트 수 · 사전 정의 Workflow/Skill 수 · AI 자동 완료율 · 실행 계층 smoke PASS 수 · 사용자 간 절차 통일도(표준 Workflow 채택률) | 동일 업무 완료시간 감소 · 사용자 수동 조작 감소 · takeover 위치 변화 · 반복 질문/수정 감소 · Skill 재사용률 · 새 업무 적응 속도 · AI 판단 호출 감소 · 결정적 실행 비율 증가 · 다른 노드/채널에서도 같은 기억이 쓰이는 비율 |
 
 ---
 
@@ -497,7 +521,8 @@ V1 에서 **승계하지 않는 것**: Local-first 저장 원칙(ARCH §5 의 Lo
 |---|---|
 | Assistant | L1. 사용자 한 명의 업무 비서 |
 | Task / Task type | §4-1 |
-| Skill / Procedure | §7. 검증된 Experience 의 승격 형태 |
+| Skill / Procedure | §7. 검증된 Experience 의 승격 형태 · Assistant 가 고르고 조합하는 재사용 수행 능력(공통 Workflow 아님) |
+| Shared Candidate | §0-1 · §10. 여러 사용자에서 반복 검증돼 다른 사용자에게 추천 · 우선 후보가 되는 방법. 강제 규칙 · 표준 아님 |
 | Discovery capability | §5. 모르는 업무를 푸는 하위 capability. Strong Discovery Agent 가 기본 수행자 |
 | Execution Node | §11. 실행 환경 — PC · Cloud Browser 등 |
 | Request Device | 요청이 들어온 기기 · 채널 |
