@@ -114,10 +114,11 @@ READ_ONLY_AUTH_BOUNDARY  = PASS
 MIGRATION_EXECUTED       = 0
 PRODUCTION_DB_WRITE      = 0
 
-STORE_ENROLLMENT_RUNTIME_E2E = PENDING_WRITE_APPROVAL
-STORE_MEMBER_INVITE_E2E      = PENDING_WRITE_APPROVAL
-STORE_MEMBER_ACCEPT_E2E      = PENDING_WRITE_APPROVAL
-STORE_MEMBER_REMOVE_E2E      = PENDING_WRITE_APPROVAL
+STORE_ENROLLMENT_RUNTIME_E2E = PASS   (2026-10-03 · 사용자 승인 후 실행)
+STORE_MEMBER_INVITE_E2E      = PASS
+STORE_MEMBER_ACCEPT_E2E      = PASS
+STORE_MEMBER_REMOVE_E2E      = PASS
+ROLE_RELATIONSHIP_RUNTIME    = PASS   (운영에서 Role ∧ Relationship 성립 실측)
 ```
 
 ---
@@ -171,4 +172,61 @@ INSERT 2 · UPDATE 2 · DELETE 0. 모두 **Demo 계정과 Demo 조직 안**에�
 Owner 는 전 과정에서 자기 매장만 본다
 ```
 
-**이 단계는 운영 DB write 라 사용자 승인 전에는 실행하지 않는다.**
+---
+
+## 7. write E2E smoke 실행 결과 (2026-10-03 · 사용자 승인 후)
+
+각 단계마다 **운영 DB 를 직접 읽어** 예상 row 변화와 대조했다. 쓰기는 전부 운영 API 가 했고,
+조회는 `BEGIN READ ONLY` 로만 했다.
+
+| # | 동작 | HTTP · 응답 | DB 실측 |
+|---|---|---|---|
+| 0 | 기준 | — | owner 1 · `staff\|invited` 0 · `*:store_member` 0 · orders 23 |
+| 1 | Owner `/store/enrollment` (kpa) | 200 · `outcome=existing` | **STEP 0 과 완전히 동일 — write 0** |
+| 2 | Owner → Supplier 초대 | 200 · `role=invited` | `organization_members` **+1**(`invited`) · role 0 |
+| 3 | Supplier 수락 | 200 · `role=staff` · `services=["kpa"]` | 그 행 `role→staff` · `kpa:store_member` **+1 active** |
+| 4 | Owner → Supplier 해제 | 200 | 그 행 `active=false` · `kpa:store_member` **active=false** |
+
+예상(INSERT 2 · UPDATE 2 · DELETE 0)과 **일치**했다. 예상 밖 row 변화는 없었다.
+
+### Role ∧ Relationship 이 운영에서 성립하는가 — 이번 기능의 핵심
+
+Supplier Demo 의 `accessible-stores` 를 세 시점에 읽었다.
+
+```text
+수락 전   [O4O 공급자 Demo(owner)]                      ← 테스트 약국 없음
+수락 후   [O4O 공급자 Demo(owner), 테스트 약국(staff)]   ← 나타남
+해제 후   [O4O 공급자 Demo(owner)]                      ← 다시 사라짐
+```
+
+`membership?serviceKey=kpa` 도 같은 축으로 `none → member → none` 이었다.
+**초대 행(`invited`)만으로는 아무 접근도 생기지 않았다** — 수락이 role 을 발급해야 접근이 생긴다.
+
+권한 분리도 운영에서 확인했다: Member 상태의 Supplier 가 `GET /store/members` 를 부르면
+**403 `STORE_OWNER_REQUIRED`**(매장은 해석되지만 Owner 가 아니다).
+
+### 영향 경계
+
+```text
+다른 조직의 staff|invited   0 → 0      checkout_orders  23 → 23 (불변)
+실사용자 2명                 미접촉     기존 owner 행     미접촉
+Supplier Demo 의 공급자 조직  미접촉 (전 과정에서 owner 로 그대로 보인다)
+Owner 최종 회귀              level=owner · accessible-stores 1건 · members 1명 — 시작과 동일
+```
+
+### 남은 상태
+
+```text
+활성 'staff'|'invited' 행   0   (smoke 전과 같다)
+활성 *:store_member         0   (비활성 이력 1건 — 설계상 행을 지우지 않는다)
+테스트 약국 members          owner active + testsupplier role=staff active=false (이력)
+```
+
+접근은 완전히 원복됐고, 남은 것은 **이력 2건**(비활성 membership 행 · 비활성 role)뿐이다.
+이 설계는 행을 지우지 않고 `left_at` · `is_active` 로 끈다 — 누가 언제 있었는지가 남는다.
+
+### 관측 1건 — curl 411 (제품 결함 아님)
+
+본문 없는 `POST .../accept` 를 curl 로 보내면 LB 가 **411 Length Required** 를 돌려준다.
+`Content-Length: 0` 을 붙이면 정상 200 이다. 브라우저 `fetch` 는 본문 없는 POST 에 그 헤더를
+스스로 붙이므로 화면 경로에는 영향이 없다. 운영 API 호출을 curl 로 재현할 때만 주의한다.
