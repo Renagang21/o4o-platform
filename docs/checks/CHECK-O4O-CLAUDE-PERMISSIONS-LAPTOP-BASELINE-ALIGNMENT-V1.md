@@ -14,8 +14,8 @@
 ```text
 PERMISSION_CENSUS                = PASS
 RULE_COUNT_BEFORE                = allow 764 (user 498 · project 259 · local 7) · ask 0 · deny 0
-RULE_COUNT_AFTER                 = allow 254 (user 169 · project 85 · local 0) · ask 104 · deny 90   (적용본)
-RULE_COUNT_AFTER_BARE_PATCH      = allow 288 (user 169 · project 119 · local 0) · ask 114 · deny 104 (§6 패치 — 사용자 적용 대기)
+RULE_COUNT_AFTER                 = allow 288 (user 169 · project 119 · local 0) · ask 114 · deny 104 (§6 bare 패치 적용 후 최종)
+  (1차 적용본                    = allow 254 (user 169 · project 85 · local 0) · ask 104 · deny 90)
 
 SENSITIVE_LITERAL_BEFORE         = 30 규칙 (password 11 · DB endpoint 11 · 계정 email 15 — 한 규칙이 여러 종류 포함)
 SENSITIVE_LITERAL_AFTER          = 0
@@ -25,10 +25,13 @@ SENSITIVE_LITERAL_AFTER          = 0
 
 BROAD_MUTATION_ALLOW_AFTER       = 0
 
+MISMATCH                         = 0 (시뮬레이션 89건 + bare 회귀 10건 · 적용된 실제 파일 기준)
+BARE_GIT_C_DENY                  = PASS (§6-2 실측)
+
 AUTO_SMOKE                       = PASS
-ASK_STATIC_MATCH                 = PASS (인자 있는 형태) · 맨 명령 `git -C <dir> push|tag|rebase` 3종 GAP → §6 패치로 해소 (시뮬레이션 MISMATCH 0)
-ASK_UI_SMOKE                     = 이 CHECK 의 `git push origin main` 승인 창 (§5-3)
-DENY_SMOKE                       = PASS (실측 8건) · 맨 명령 `git -C <dir> reset --hard` GAP 1건 실측 → §6 패치
+ASK_STATIC_MATCH                 = PASS
+ASK_UI_SMOKE                     = PASS (`git push origin main` 승인 창 — 사용자 직접 승인 확인)
+DENY_SMOKE                       = PASS (1차 8건 + bare 회귀 3건 실측 · 1차 GAP 1건은 §6 패치로 해소)
 
 GIT_PUSH_POLICY                  = ASK
 COLON_REFSPEC_DELETE             = ASK / ACCEPTED_MATCHER_LIMITATION
@@ -36,11 +39,11 @@ PRODUCTION_MUTATION_POLICY       = ASK
 DB_POLICY                        = ASK
 SECRET_MUTATION_POLICY           = ASK
 
-BARE_FORM_PATCH                  = PREPARED / PENDING_USER_APPLY
+BARE_FORM_PATCH                  = APPLIED (사용자 직접) / VERIFIED
 
 ROTATION_REVIEW_REQUIRED         = YES
 
-O4O_CLAUDE_PERMISSION_BASELINE   = CLEAN / LEAST_PRIVILEGE (맨 명령 GAP 4종은 패치 적용 시 해소)
+O4O_CLAUDE_PERMISSION_BASELINE   = CLEAN / LEAST_PRIVILEGE
 DEVICE                           = LAPTOP
 ```
 
@@ -123,7 +126,7 @@ deny     push: --force(-with-lease 포함) · -f · +refspec · --delete · -d �
 ### 5-3. ASK
 
 - **정적 판정** (적용 파일 · deny > ask > allow): `git push origin main|feature/x|HEAD:main` · `gh variable set DEPLOY_FREEZE --body false|true` · `gh workflow run promote.yml` · `gh api …` · `gh secret set|list` · `gcloud run deploy` · `services update(-traffic)` · `jobs execute` · `gcloud sql connect|instances list` · `psql` · `gcloud secrets versions access|add` · `gcloud auth login` · `git tag` · `git rebase` · `cloud-sql-proxy` → 전부 ASK. production · DB · secret 명령은 **실행하지 않음**.
-- **UI 실측**: 이 CHECK 커밋의 `git push origin main` 이 승인 요청 창을 띄우는지가 ASK_UI_SMOKE.
+- **UI 실측**: 이 CHECK 1차 커밋(`30e6149e0`)의 `git push origin main` 에서 승인 요청 창 표시 → 사용자 직접 승인 (**ASK_UI_SMOKE = PASS**).
 
 ## 6. 발견 — 맨 명령(bare) 매칭 GAP 과 패치
 
@@ -133,7 +136,26 @@ deny     push: --force(-with-lease 포함) · -f · +refspec · --delete · -d �
 - `Bash(git -C * reset --hard *)` → `git -C <dir> reset --hard` **미매칭**(위 5-2). 같은 이유로 `git -C <dir> push` · `tag` · `rebase` 맨 명령은 ASK 가 아니라 분류기로 간다(시뮬레이션 재현).
 
 조치(가산만 · 제거 0): 중간 `*` + 끝 ` *` 형태 규칙 옆에 맨 명령 변형을 추가 — ask +10 · deny +14 (user) · `git -C */o4o-platform <조회>` allow +34 (project). 그 밖 중간 `*` allow(`pnpm --filter * build *` 등)는 맨 형태를 넣지 않는다(최소 권한).
-시뮬레이션 89건: 현재 적용본 MISMATCH 5 → **패치본 MISMATCH 0**. 패치 스크립트(`patch-bare.mjs`, dry-run 기본 · `--apply` 시 백업 후 기록)는 로컬 scratchpad 에 준비 — **사용자 적용 대기**.
+시뮬레이션 89건: 1차 적용본 MISMATCH 5 → **패치본 MISMATCH 0**. 패치 스크립트(`patch-bare.mjs`, dry-run 기본 · `--apply` 시 백업 후 기록).
+
+### 6-1. 패치 적용
+
+사용자 직접 적용 — 결과 user allow 169 / ask 114 / deny 104 · project allow 119 · local 0 · JSON 정상. 적용 파일 = 패치본과 동일 확인.
+적용 직전 백업 `*-settings.before-bare-patch.json` 2개 추가(같은 백업 디렉터리 · 같은 취급 규칙).
+
+### 6-2. bare 회귀 재검증 (영향 0 대상만)
+
+| 명령 | 기대 | 실측 | 정적 판정 |
+|---|---|---|---|
+| `git -C <없는 dir> reset --hard` | DENY | 실행 전 거부 | DENY |
+| `git -C <없는 dir> branch -D` | DENY | 실행 전 거부 | DENY |
+| `git -C <없는 dir> push --force` | DENY | 실행 전 거부 | DENY |
+| `git -C <없는 dir> push` (Bash · PowerShell) | ASK | — (정적만) | ASK |
+| `git -C <없는 dir> tag` | ASK | — (정적만) | ASK |
+| `git -C <없는 dir> rebase` | ASK | — (정적만) | ASK |
+| `git -C <repo> status -sb` · `log --oneline -2` · `diff`(맨 명령) | AUTO | 승인 요청 없이 실행 | ALLOW |
+
+회귀 10건 MISMATCH 0 · 전체 89건 MISMATCH 0.
 
 참고: 집 PC 설정에 `git -C * push *` 류 중간 `*` 규칙이 있다면 같은 GAP 이 있을 수 있다 — 집 PC 측 확인 필요(별도).
 
@@ -150,8 +172,9 @@ O4O 전용 규칙은 project 에, 범용 도구는 user 에, local 은 비운다
 
 ## 8. 남은 것
 
-1. **§6 bare 패치 적용** (사용자 직접) → 재시작 → `git -C <없는 dir> reset --hard` 거부 재실측.
-2. **credential 회전 검토 (별도 WO)** — password literal 11 규칙의 값(운영 DB · E2E 계정)이 permission 파일에 저장돼 있었고, 정리 과정의 채팅 · 세션 출력에도 노출됨. 현재 유효성 확인 후 회전.
-3. 집 PC 측 §6 GAP 여부 확인.
+노트북 permission 정비는 **CLOSED**. 이후 별도 작업:
+
+1. **집 PC bare-command matcher 회귀 감사** — 집 PC 설정의 중간 `*` + 끝 ` *` ask/deny 규칙에 §6 GAP 이 있는지.
+2. **credential 회전 검토 + 민감 백업 삭제 (별도 WO)** — password literal 11 규칙의 값(운영 DB · E2E 계정)이 permission 파일에 저장돼 있었고, 정리 과정의 채팅 · 세션 출력에도 노출됨. 현재 유효성 확인 후 회전, 회전 뒤 `permission-backups/2026-10-03-laptop/` 삭제.
 
 `문서 정합: 해당 없음`
