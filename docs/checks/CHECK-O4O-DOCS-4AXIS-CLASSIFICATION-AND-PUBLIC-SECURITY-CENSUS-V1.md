@@ -12,7 +12,7 @@ docs Markdown 4축 분류(CANONICAL · DEVELOPER · INTERNAL_SECURITY · HISTORY
 
 ## 0. 결론
 
-1. 판정: **SECURITY_REMEDIATION_REQUIRED** — public HEAD 의 기록물 1 파일에 **테스트 계정 비밀번호 평문**이 남아 있다(§3-2). 계정 활성 여부와 관계없이 과거 · 테스트 비밀번호도 문서에 둘 수 없으므로(LIFECYCLE-RULES §10-4) 이 판정이 문서 정비보다 앞선다.
+1. 판정: **SECURITY_REMEDIATION_REQUIRED** — public HEAD 의 기록물 1 파일에 **테스트 계정 4건 + 운영자(admin 역할) 계정 1건의 비밀번호 평문**이 남아 있다(§3-2). 계정 활성 여부와 관계없이 과거 · 테스트 비밀번호도 문서에 둘 수 없으므로(LIFECYCLE-RULES §10-4) 이 판정이 문서 정비보다 앞선다.
    - 처리 순서: HEAD 평문 제거(별도 보안 PR) → 계정 로그인 불가 여부 read-only 확인 → 필요 시 폐기 · 교체 → 이 CHECK 판정 갱신 → 문서 정비 착수. history rewrite 는 범위 밖.
    - 그 밖에는 HEAD 와 git history 모두에서 key · token 류 실제 secret 을 찾지 못했다(§3-1).
 2. 대상 `.md` 3,730 (docs 3,726 + 루트 4) 중 **HISTORY 성격 3,431 (92%)**. 현재 기준 문서는 CANONICAL 220 + DEVELOPER 79 = 299.
@@ -90,9 +90,15 @@ CANONICAL 품질:
 
 | 위치 | 내용 | 판정 |
 |---|---|---|
-| `archive/work-orders/` 의 과거 E2E 보고서 1건 (경로는 `docs/local/` 미추적 목록에만 기록) | 과거 E2E 테스트 계정 4건의 비밀번호 평문 | **HEAD 평문 제거 필수** — 별도 보안 PR(PR #279) 에서 `[REDACTED_PASSWORD]` 로 치환. 레거시 password hash 축 DROP 으로 로그인 불가로 추정되나 **DB 미확인**. history 잔존은 수용(선행 IR 판단 D3) |
+| `archive/work-orders/` 의 과거 E2E 보고서 1건 (경로는 `docs/local/` 미추적 목록에만 기록) | 과거 E2E 테스트 계정 4건 + **운영자(admin 역할) 계정 1건**의 비밀번호 평문 (운영자 건은 최초 census 의 정규식이 놓쳤고 PR #279 Codex 리뷰가 발견) | **HEAD 평문 제거 필수** — 별도 보안 PR(PR #279) 에서 `[REDACTED_PASSWORD]` 로 치환. 레거시 password hash 축 DROP 으로 로그인 불가로 추정되나 **DB 미확인**. history 잔존은 수용(선행 IR 판단 D3) |
 
-해소 조건: ① 보안 PR main 반영 ② 해당 계정 로그인 불가 read-only 확인 (필요 시 폐기 · 교체). 둘 다 끝나면 이 절과 §0 판정을 갱신한다.
+해소 조건: ① 보안 PR main 반영 ② 해당 계정 로그인 불가 read-only 확인 — **운영자(admin 역할) 계정을 최우선** (필요 시 폐기 · 교체). 둘 다 끝나면 이 절과 §0 판정을 갱신한다.
+
+재스캔 (운영자 건 발견 후, docs 전체 `.md`):
+
+- 대소문자 · 숫자 · 기호 혼합 8~40자 토큰 전수 → 링크 앵커 · URL 인코딩뿐 (실제값 0)
+- 계정 · 비밀번호 문맥 줄의 영문 · 숫자 · 기호 토큰 106 hit 전수 → 패키지명 · 경로 · 이메일 · 강조 표기 · 비밀번호 정책 테스트 입력값 · 패키지 버전뿐 (실제값 0)
+- 범위 한계: docs 밖 코드(seed · 테스트 · migration)의 비밀번호 리터럴은 이 census 범위가 아니다 — 선행 [`IR-O4O-PRIVACY-DATA-CENSUS-V1`](../investigations/IR-O4O-PRIVACY-DATA-CENSUS-V1.md) 이 다룬다.
 
 해당 없음으로 판정한 것:
 
@@ -141,5 +147,5 @@ CANONICAL 품질:
 
 ## 6. 문서 정합 (CLAUDE.md §16)
 
-- 발견: SUPERSEDED 정본 3 · 상태 헤더 없는 정본 69 · 계약/정산 공개 적합성 미판정 4 · 과거 보고서 비밀번호 평문 1
+- 발견: SUPERSEDED 정본 3 · 상태 헤더 없는 정본 69 · 계약/정산 공개 적합성 미판정 4 · 과거 보고서 비밀번호 평문 1 파일(계정 5)
 - 인라인 수정 0 건 (조사 전용) · 별도 WO 제안 3 건 (§5)
