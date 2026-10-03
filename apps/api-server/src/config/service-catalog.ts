@@ -125,6 +125,9 @@ export const O4O_SERVICES: O4OService[] = [
     // WO-O4O-SERVICE-CATALOG-CANONICAL-DOMAIN-AND-PH-JOIN-CLEANUP-V1: 로그인 전 진입(대표 홈)과 같은 호스트로 정렬.
     domain: 'pharmacy.neture.co.kr',
     legacyDomains: ['kpa-society.co.kr'],
+    // 사업 의미 = 약국 사업자 대상 세미프랜차이즈 운영 서비스 (docs/baseline/O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1.md).
+    //   role prefix `kpa:*` 는 이 키의 legacy 이름이며 KPA 분회(`kpa-branch` · kpa.neture.co.kr)가 아니다.
+    //   아래 description 은 사용자 노출 문자열이라 이번 문서 정렬에서 바꾸지 않았다(변경은 별도 WO).
     description: '약사 커뮤니티 서비스',
     joinEnabled: true,
     // STANDARD_CANDIDATE — 매장 linkage(kpa) · kpa:store_owner · kpa:operator 가 현재 runtime 에 있다. 자동 활성화 아님.
@@ -136,6 +139,7 @@ export const O4O_SERVICES: O4OService[] = [
     // WO-O4O-SERVICE-CATALOG-CANONICAL-DOMAIN-AND-PH-JOIN-CLEANUP-V1: 로그인 전 진입(대표 홈)과 같은 호스트로 정렬.
     domain: 'retail.neture.co.kr',
     legacyDomains: ['k-cosmetics.site'],
+    // 사업 의미 = 화장품 · 일반 소매 사업자 대상 세미프랜차이즈 운영 서비스 (O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1).
     description: '화장품 유통 플랫폼',
     joinEnabled: true,
     // STANDARD_CANDIDATE — 매장 linkage(cosmetics) · cosmetics:store_owner · cosmetics:operator 존재. 자동 활성화 아님.
@@ -203,6 +207,7 @@ export const O4O_SERVICES: O4OService[] = [
    * joinEnabled=false — 분회 소속은 자가 신청이 아니라 분회 운영자 승인 경로로만 생성된다.
    */
   {
+    // 사업 의미 = 약사 개인 대상 KPA 분회 서비스 (O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1). 매장 서비스가 아니다.
     key: 'kpa-branch',
     name: 'KPA Branch',
     nameKo: '약사회 분회',
