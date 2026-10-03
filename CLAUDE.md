@@ -54,13 +54,16 @@
 ## 실행 원칙
 
 ```text
-조사 → 문제확정 → 최소 수정 → 검증 → 정본 반영 · (필요 시) CHECK/IR → path-specific stage → commit → push → 완료 보고
+조사 → 문제확정 → 최소 수정 → 검증 → 정본 반영 · (필요 시) CHECK/IR → path-specific stage → commit → push → PR → CI · Codex → 완료 보고 · STOP
+→ (사용자 "main 통합 진행" 승인 시) PR merge → post-merge 확인
 ```
+
+- **작업 완료와 main 통합은 별개다.** main 통합은 사용자의 명시 승인 후에만 PR merge 로 한다 — owner direct push · bypass 로 우회하지 않는다. 경로 · gate 상세는 [`AGENTS.md` §4-1(e)](AGENTS.md#4-1-parallel-session--worktree-policy).
 
 - CHECK 는 운영 반영 증적 · smoke 결과 · 트랙 최종 판정 · 미해결 사항이 있을 때만 쓴다. 그 밖에는 커밋 메시지로 충분하다. 새 문서 위치 · 헤더 · 민감정보 규칙: [`DOCUMENT-LIFECYCLE-AND-ARCHIVE-RULES-V1` §10](docs/rules/DOCUMENT-LIFECYCLE-AND-ARCHIVE-RULES-V1.md).
 
 - WO 가 **조사 전용**이면 구현하지 않는다.
-- WO 가 **구현을 명시**하면 조사 후 안전 범위 안에서 검증까지 불필요한 중간 승인 없이 진행한다.
+- WO 가 **구현을 명시**하면 조사 후 안전 범위 안에서 검증까지 불필요한 중간 승인 없이 진행한다. 승인된 범위 안의 review finding 처리 · 스레드 정리 · 상태 조회 같은 기계적 단계는 사용자에게 묻지 않는다.
 - **작업 범위 외 수정 금지.** 범위 밖에서 발견한 문제는 고치지 말고 보고 후 별도 WO 로 분리한다.
 
 ## 중지 조건
@@ -90,7 +93,7 @@ stage · commit · push 절차의 정본은 [`O4O-GIT-PARALLEL-WORK-SAFETY-V1`](
 - **커밋에도 pathspec 을 붙인다.** foreign staged 파일이 있으면 pathspec 없는 `git commit` 금지 — 커밋 직전 `node scripts/git/check-staged-scope.mjs <내 작업 경로...>` → `git commit -m "..." -- <내 파일...>`.
 - 다른 세션의 수정 · 미추적 · staged 파일은 **불가침** (판단 · 커밋 · 정리 · `restore` · `reset` · `stash` 대상 아님).
 - **`--force` push 금지.** 공유 `main` 이력은 재작성하지 않는다(오타 정정도 후속 커밋으로).
-- 완료 조건은 저장소 전체 clean 이 아니라 **`이번 WO 범위의 미커밋 변경 0건` + 내 커밋이 `origin/main` 에 포함**.
+- 완료 조건은 저장소 전체 clean 이 아니라 **`이번 WO 범위의 미커밋 변경 0건` + 내 커밋이 push 된 PR 이 integration-ready**. `origin/main` 포함은 사용자가 통합을 승인해 merge 한 뒤의 확인 항목이다 — 완료 조건을 채우려고 먼저 merge 하지 않는다.
 
 ## DB · 보안 경계
 
@@ -258,6 +261,6 @@ forum · lms · signage 는 **플랫폼 공통 구조**. KPA 가 reference imple
 
 ---
 
-*Updated: 2026-10-03*
-*Version: 9.2*
+*Updated: 2026-10-04*
+*Version: 9.3*
 *Status: Active — Claude Code Entry Point*
