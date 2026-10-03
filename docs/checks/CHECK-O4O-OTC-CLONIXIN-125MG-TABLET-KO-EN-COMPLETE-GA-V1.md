@@ -39,7 +39,7 @@
 - source_ref `01994863` 공유 ko canonical **55** (26 target + **29 out**). out 29 EN canonical **LIVE**(uniform md5 `67144df254a3d2a4ce92efc34ecd4a59`, summary **null**). target 26 기존 EN **0**(clean).
 
 ### 번역 (그룹당 1건 · 검토완료 EN 재사용)
-- 배치 전용 파일: [`otc-en-translations-clonixin-125mg-jeong-v1.json`](../../docs/guides/products/drug/pilot-en-design/translations/otc-en-translations-clonixin-125mg-jeong-v1.json). GUIDE V0.5·GLOSSARY V0.2·TEST-LOG 포함.
+- 배치 전용 파일: [`otc-en-translations-clonixin-125mg-jeong-v1.json`](../../apps/api-server/src/scripts/data/product-descriptions/drug/pilot-en-design/translations/otc-en-translations-clonixin-125mg-jeong-v1.json). GUIDE V0.5·GLOSSARY V0.2·TEST-LOG 포함.
 - struct = bulk **batch-01** 번역(`otc-en-translations-batch-01-v1.json`)의 동일 groupKey entry(title **"Clonixin Lysinate 125 mg Tablet"**) 그대로 채택 → `buildDrugOtcEnConsumerHtml` 산출 md5 `67144df2` = live out 29 en **byte-identical(diff 0)**.
 - **동일 약물 증명**: ko content out-29 md5 == target-26 md5 (`c1c0bede8e6de07e5f2b0df3f4b2b858`) → ko 에 없는 medical fact 0. 125mg 연질캡슐 EN(md5 `d359211f`, "Soft Capsule")은 **함량만 같은 별개 제형 → 재사용 금지**, title "Tablet" 로 구분.
 - TEST-LOG: `one to two tablets (125–250 mg) three times a day`·다른 소염진통제 병용금지 보존 · 금기(소화성궤양·NSAID/아스피린 알레르기·천식/두드러기·CABG·중증 간/신·중증 심부전·IBD·임부) · 주의(고혈압·심부전·기관지천식·간/신 → 약사 상담) — 대상·강도 보존.

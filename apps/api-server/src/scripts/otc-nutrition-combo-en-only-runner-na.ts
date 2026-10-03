@@ -30,7 +30,7 @@ import { buildDrugOtcEnConsumerHtml, type DrugOtcEnTranslation } from '../module
 
 const md5 = (s: string) => crypto.createHash('md5').update(s).digest('hex');
 const DATA_DIR = path.resolve(process.cwd(), 'src/scripts/data');
-const TRANSLATIONS_DIR = path.resolve(process.cwd(), '../../docs/guides/products/drug/pilot-en-design/translations');
+const TRANSLATIONS_DIR = path.resolve(process.cwd(), 'src/scripts/data/product-descriptions/drug/pilot-en-design/translations');
 const retRows = <T = { id?: string }>(res: unknown): T[] => (Array.isArray(res) && Array.isArray(res[0]) ? res[0] : (res as unknown[])) as T[];
 const arg = (k: string) => (process.argv.find((a) => a.startsWith(`--${k}=`)) || '').split('=').slice(1).join('=');
 

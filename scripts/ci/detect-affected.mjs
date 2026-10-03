@@ -57,8 +57,8 @@
  *     - 변경 전체가 `docs/**` 안
  *     - 상태가 A(추가) · M(수정) 뿐 — 삭제 · 이동은 기록물 존재를 단언하는
  *       정적 spec 이 있으므로 기존 full fallback 유지
- *     - 확장자가 `.md` 뿐 — `docs/checks/data/**` 의 JSON fixture 처럼
- *       **코드·테스트가 읽는 데이터 자산**은 문서가 아니다
+ *     - 확장자가 `.md` 뿐 — JSON fixture 처럼 **코드·테스트가 읽는 데이터 자산**은 문서가 아니다
+ *       (docs 안의 데이터는 2026-10-03 `apps/api-server/src/scripts/data/` 로 분리됐지만 규칙은 유지한다)
  *     - 경로에 `data/` 세그먼트가 없음 (같은 이유의 보수적 여유)
  *   나머지는 전부 기존 경로다. 애매하면 full CI 한 번을 선택한다.
  */
@@ -296,8 +296,7 @@ export function workspaceDirOf(graph, filePath) {
  *   docs_only          변경 전체가 `docs/**` 안
  *   docs_fast_eligible docs_only + 상태 A/M + 확장자 `.md` + data 세그먼트 없음
  *
- * `.md` 가 아니거나(예: `docs/checks/data/**.json` guard fixture,
- * `docs/guides/.../translations/*.json`) 삭제·이동이면 fast 대상이 아니다.
+ * `.md` 가 아니거나(예: docs 에 다시 들어온 JSON fixture · 번역 JSON) 삭제·이동이면 fast 대상이 아니다.
  * 이 경우 docs_only 는 참일 수 있지만 docs_fast_eligible 은 거짓이며,
  * 호출자는 기존 full 경로를 그대로 탄다.
  *
@@ -1016,7 +1015,7 @@ export function selectPathGuardSpecs(changedFiles, graph, root = REPO_ROOT) {
  *
  * 문서를 **실제로 읽는** test 는 top-level `src/__tests__/*.spec.ts` 에만 있지 않다.
  * 전수 조사에서 nested test(`src/modules/content-guard/__tests__/liquid-guard.test.ts`)가
- * `docs/checks/data/**` 를 읽는 사례가 확인됐다. 따라서 docs 축 선별은
+ * 당시 `docs/checks/data/**` 를 읽는 사례가 확인됐다(2026-10-03 fixture 는 테스트 옆으로 이동). 따라서 docs 축 선별은
  * `apps/api-server/src` 전체를 재귀로 훑는다.
  *
  * Admin 축(`selectPathGuardSpecs`)의 탐색 범위는 **바꾸지 않는다** —

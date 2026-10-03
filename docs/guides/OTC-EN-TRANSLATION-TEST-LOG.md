@@ -26,7 +26,7 @@
 
 > T-6~T-10 은 **DB 저장까지 수행**한 첫 사례다(en · STORE · `needs_review` 5 rows). 판정 = [CHECK-...-EN-TRANSLATION-PERSIST-PILOT-V1](../checks/CHECK-O4O-OTC-EN-TRANSLATION-PERSIST-PILOT-V1.md)
 
-> 시안: [TRANSLATION-DRAFTS-V1](products/drug/pilot-en-design/TRANSLATION-DRAFTS-V1.md) · 판정: [CHECK-...-PILOT-VALIDATION-V1](../checks/CHECK-O4O-OTC-EN-DESIGN-PILOT-VALIDATION-V1.md)
+> 시안: [TRANSLATION-DRAFTS-V1](../../apps/api-server/src/scripts/data/product-descriptions/drug/pilot-en-design/TRANSLATION-DRAFTS-V1.md) · 판정: [CHECK-...-PILOT-VALIDATION-V1](../checks/CHECK-O4O-OTC-EN-DESIGN-PILOT-VALIDATION-V1.md)
 > ⚠️ 5건 모두 **DB 저장 없음**. 한국어 초안이 `needs_review` 라 영문은 시안 지위다.
 
 ---
@@ -229,7 +229,7 @@
 
 ### T-11 — 배치 37그룹 (2026-07-16, GUIDE V0.5 / GLOSSARY V0.4)
 
-A군 37그룹 전량. **신규 32건 번역 + 파일럿 5건 재사용**(재번역 안 함). 산출물 = [otc-en-translations-v1.json](products/drug/pilot-en-design/translations/otc-en-translations-v1.json).
+A군 37그룹 전량. **신규 32건 번역 + 파일럿 5건 재사용**(재번역 안 함). 산출물 = [otc-en-translations-v1.json](../../apps/api-server/src/scripts/data/product-descriptions/drug/pilot-en-design/translations/otc-en-translations-v1.json).
 
 **자동 검수 — 전건 통과**
 

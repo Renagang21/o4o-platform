@@ -122,7 +122,7 @@ OTC 에서 유의할 점만:
 | 태블릿 가로 | 1024 | **996** | **3열** | **860 상한** | 44px | 17px |
 | PC | 1280 | **1252** | **3열** | **860 상한** | 44px | 17px |
 
-> **검증됨**: 파일럿 시안 5건 × 4폭 = **20 측정 전건 일치**, 가로 스크롤 0 — [CHECK-...-PILOT-VALIDATION-V1](../checks/CHECK-O4O-OTC-EN-DESIGN-PILOT-VALIDATION-V1.md) · [측정 원본](products/drug/pilot-en-design/evidence/measurements-v1.json).
+> **검증됨**: 파일럿 시안 5건 × 4폭 = **20 측정 전건 일치**, 가로 스크롤 0 — [CHECK-...-PILOT-VALIDATION-V1](../checks/CHECK-O4O-OTC-EN-DESIGN-PILOT-VALIDATION-V1.md) · [측정 원본](../../apps/api-server/src/scripts/data/product-descriptions/drug/pilot-en-design/evidence/measurements-v1.json).
 > **태블릿 가로와 PC 는 결과가 같다** — 카드가 860 에서 멈추고 중앙 정렬되므로.
 
 **슬롯 폭이 분기를 결정한다 (실측)**
@@ -218,8 +218,8 @@ OTC 에서 유의할 점만:
 | `sd-chips` / `sd-badge` (알약) | 긴 단어가 알약을 뚫음 |
 
 > ✅ **해결됨 (2026-07-15).** 렌더러가 `overflow-wrap:anywhere; word-break:normal` 로 긴 문자열을 **자동 줄바꿈**한다 — 계약이 보장하는 안전망이다([클래스 계약 §3-1](content-authoring/STORE-DESCRIPTION-CLASS-CONTRACT.md)).
-> 수정 전: `sd-hero h1` **scrollWidth 594 vs clientWidth 301** → 가로 스크롤 0으로 **잘려 사라짐**([증거](products/drug/pilot-en-design/evidence/P-3-long-english-word-clipped-375px.png)).
-> 수정 후: **594 → 301 = clientWidth**, 잘림 0 · 27/27 PASS([증거](products/drug/pilot-en-design/evidence/P-3-FIXED-long-english-word-wraps-375px.png) · [CHECK](../checks/CHECK-O4O-SD-HERO-LONG-TEXT-OVERFLOW-FIX-V1.md)).
+> 수정 전: `sd-hero h1` **scrollWidth 594 vs clientWidth 301** → 가로 스크롤 0으로 **잘려 사라짐**([증거](../../apps/api-server/src/scripts/data/product-descriptions/drug/pilot-en-design/evidence/P-3-long-english-word-clipped-375px.png)).
+> 수정 후: **594 → 301 = clientWidth**, 잘림 0 · 27/27 PASS([증거](../../apps/api-server/src/scripts/data/product-descriptions/drug/pilot-en-design/evidence/P-3-FIXED-long-english-word-wraps-375px.png) · [CHECK](../checks/CHECK-O4O-SD-HERO-LONG-TEXT-OVERFLOW-FIX-V1.md)).
 
 **저자 대응 (권장 — 안전망과 별개)**: 줄바꿈은 보장되지만, 제목·태그·알약에 **긴 단일 단어를 넣지 않는 편이 읽기 좋다**. 긴 성분명은 본문(`p`)에 둔다. 번역 GUIDE T-07(재표현 허용) 범위에서 짧게 쓰되, **정보를 줄이지는 않는다**(T-03).
 

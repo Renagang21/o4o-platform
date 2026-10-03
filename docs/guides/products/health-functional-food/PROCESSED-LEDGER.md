@@ -1,6 +1,6 @@
 # 매장 설명서 처리 원장 (PROCESSED LEDGER)
 
-> **⚠️ 방향 전환 (2026-07-11)**: **정본 데이터원 = 식약처(MFDS) 건기식**(41,261 후보). 파이프라인 = 후보 상품명 웹 검색 → **시판 중이면** 회사 홈페이지 보조 + 식약처 인정 기능성으로 설명서, **검색 안 되면 SKIP**(허가만/퇴출). 언어 = **ko + en**(zh 아님). 디자인 = **반응형 `@container`**(폰 1열 / 태블릿 2~3열). 상세: [AGENT-KICKOFF](AGENT-KICKOFF.md). 정본 예제: [examples/byeonenjang.semantic.html](examples/byeonenjang.semantic.html) (기존 `byeonenjang-probiotics.responsive.html` 은 deprecated 보관).
+> **⚠️ 방향 전환 (2026-07-11)**: **정본 데이터원 = 식약처(MFDS) 건기식**(41,261 후보). 파이프라인 = 후보 상품명 웹 검색 → **시판 중이면** 회사 홈페이지 보조 + 식약처 인정 기능성으로 설명서, **검색 안 되면 SKIP**(허가만/퇴출). 언어 = **ko + en**(zh 아님). 디자인 = **반응형 `@container`**(폰 1열 / 태블릿 2~3열). 상세: [AGENT-KICKOFF](AGENT-KICKOFF.md). 정본 예제: [examples/byeonenjang.semantic.html](../../../../apps/api-server/src/scripts/data/product-descriptions/health-functional-food/examples/byeonenjang.semantic.html) (기존 `byeonenjang-probiotics.responsive.html` 은 deprecated 보관).
 > **아래 표의 사진(photo) 배치 제품들은 임시 예제(문장 예시용)** — 정본으로 사용하지 않으며, 향후 보존·정리 여부는 별도 결정한다. STORE/B2B는 ko+zh로 만들어져 있으나 정본 언어정책(ko+en)과 다름.
 
 
@@ -9,13 +9,13 @@
 > **정본은 프로덕션 DB**(`shared_product_descriptions`, STORE canonical). 이 원장은 커버리지·중복 방지·이어받기용 목록.
 > 새 제품 저장 시 이 표에 **append**. 저장 전 존재 가드([AGENT-KICKOFF §7](AGENT-KICKOFF.md#7-작업-큐--재작업-방지--멀티-머신))로 목표 언어(ko/en) canonical 있으면 skip — 언어 정책은 **ko+en**(zh 아님).
 
-진입: [AGENT-KICKOFF](AGENT-KICKOFF.md) · 예제: [examples/](examples/)
+진입: [AGENT-KICKOFF](AGENT-KICKOFF.md) · 예제: [examples/](../../../../apps/api-server/src/scripts/data/product-descriptions/health-functional-food/examples/)
 
 ---
 
 ## 2026-07-11 — 렌더러 디자인 시스템 전환 + 변엔장 첫 시맨틱 저장
 
-> **형식 변경**: 설명서 콘텐츠는 이제 **`<style>` 없는 시맨틱 HTML(sd-* 클래스)** 로 저장한다. 저장 sanitizer가 `<style>`을 제거하므로, 반응형 디자인은 공용 렌더러 `ContentRenderer variant="store-description"` 가 담당한다. (WO-O4O-STORE-DESCRIPTION-RENDERER-DESIGN-SYSTEM-V1, commit 6650956b3) — [AGENT-KICKOFF §5](AGENT-KICKOFF.md) + 예제 [examples/byeonenjang.semantic.html](examples/byeonenjang.semantic.html).
+> **형식 변경**: 설명서 콘텐츠는 이제 **`<style>` 없는 시맨틱 HTML(sd-* 클래스)** 로 저장한다. 저장 sanitizer가 `<style>`을 제거하므로, 반응형 디자인은 공용 렌더러 `ContentRenderer variant="store-description"` 가 담당한다. (WO-O4O-STORE-DESCRIPTION-RENDERER-DESIGN-SYSTEM-V1, commit 6650956b3) — [AGENT-KICKOFF §5](AGENT-KICKOFF.md) + 예제 [examples/byeonenjang.semantic.html](../../../../apps/api-server/src/scripts/data/product-descriptions/health-functional-food/examples/byeonenjang.semantic.html).
 > 아래 photo 배치 표(ko+zh, `<style>` fragment)는 구형식 — 재작성 시 시맨틱으로.
 
 | # | 제품 | 분류 | master id | 언어 | 형식 | 날짜 | 비고 |
@@ -92,5 +92,5 @@
 
 ## 다음 세션 이어받기
 
-1. [AGENT-KICKOFF](AGENT-KICKOFF.md) → [examples/](examples/) → 이 원장 읽기.
+1. [AGENT-KICKOFF](AGENT-KICKOFF.md) → [examples/](../../../../apps/api-server/src/scripts/data/product-descriptions/health-functional-food/examples/) → 이 원장 읽기.
 2. 새 제품: 저장 전 **존재 가드**(zh 있으면 skip) → 없으면 자동 완주 → 이 표 append.

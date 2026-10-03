@@ -37,7 +37,7 @@
 **초기 5건을 회귀 표본에 포함한 이유**: 같은 그룹(유산균 장건강)·같은 형식(시맨틱 `sd-*`)이면서 **가드 도입 이전에 작성된 유일한 대조군**이다. "가드 없이 만든 산출물이 실제로 어떤가"를 측정할 수 있는 표본이므로 제외하지 않았다. 실제로 이 5건에서 최다 위반이 나왔다(§3).
 
 **20건 대상 그룹**: 감사 정규화 **882** 그룹(`유산균증식및유해균억제･배변활동원활･장건강에도움을줄수있음|프로바이오틱스`) ∩ **소비자 완제품 257** 풀. 제조사 18곳. 동의 그룹(`·` 339 등) 통합은 범위 밖.
-→ 선정·풀 근거: [GROUNDING-20-A](../guides/products/health-functional-food/pilot-probiotics-20/GROUNDING-20-A.md) · 감사 정정: [CHECK-…-INGREDIENT-COMPOSITION-GROUPING-AUDIT-V1 §10](CHECK-O4O-HFF-CANDIDATE-INGREDIENT-COMPOSITION-GROUPING-AUDIT-V1.md)
+→ 선정·풀 근거: [GROUNDING-20-A](../../apps/api-server/src/scripts/data/product-descriptions/health-functional-food/pilot-probiotics-20/GROUNDING-20-A.md) · 감사 정정: [CHECK-…-INGREDIENT-COMPOSITION-GROUPING-AUDIT-V1 §10](CHECK-O4O-HFF-CANDIDATE-INGREDIENT-COMPOSITION-GROUPING-AUDIT-V1.md)
 
 **무변경 확인**
 ```text
@@ -65,7 +65,7 @@ a2 "실온보관 — 별도 냉장 조건이 표시되어 있지 않습니다" �
 a2 는 **초기 5건 파일럿(뉴로랩스)에서 이미 잡아 문서화한 유형의 반복**이다.
 
 → **작성 전 가드 도입(20-B~D) 이후 실제 위반 0 이 3소배치 연속 재현.**
-상세: [GUARD-20-A-KO](../guides/products/health-functional-food/pilot-probiotics-20/GUARD-20-A-KO.md) · [GUARD-20-A-EN](../guides/products/health-functional-food/pilot-probiotics-20/GUARD-20-A-EN.md) · [GUARD-20-B](../guides/products/health-functional-food/pilot-probiotics-20/GUARD-20-B.md) · [GUARD-20-C](../guides/products/health-functional-food/pilot-probiotics-20/GUARD-20-C.md) · [GUARD-20-D](../guides/products/health-functional-food/pilot-probiotics-20/GUARD-20-D.md)
+상세: [GUARD-20-A-KO](../../apps/api-server/src/scripts/data/product-descriptions/health-functional-food/pilot-probiotics-20/GUARD-20-A-KO.md) · [GUARD-20-A-EN](../../apps/api-server/src/scripts/data/product-descriptions/health-functional-food/pilot-probiotics-20/GUARD-20-A-EN.md) · [GUARD-20-B](../../apps/api-server/src/scripts/data/product-descriptions/health-functional-food/pilot-probiotics-20/GUARD-20-B.md) · [GUARD-20-C](../../apps/api-server/src/scripts/data/product-descriptions/health-functional-food/pilot-probiotics-20/GUARD-20-C.md) · [GUARD-20-D](../../apps/api-server/src/scripts/data/product-descriptions/health-functional-food/pilot-probiotics-20/GUARD-20-D.md)
 
 ### 파일럿이 실증한 데이터 사실 (제작 규칙에 반영됨)
 
@@ -97,7 +97,7 @@ d4 생유산균 알파 = 원문이 **어린이 질식 위험**을 경고 → 어
 | **제형에서 부재·편의성 추론** | (20-A a2) | `"실온보관 — 별도 냉장 조건이 표시되어 있지 않습니다"` |
 
 > **락토핏 "1일 200억"은 그 파일럿이 REVIEW 에서 "이번 파일럿의 최대 수확"이라고 선언한 항목 자체**였다.
-> → **자체 검수는 자기가 세운 가정을 검사하지 못한다.** ([REVIEW-V1 §2 Q2 정정](../guides/products/health-functional-food/pilot-probiotics/REVIEW-V1.md))
+> → **자체 검수는 자기가 세운 가정을 검사하지 못한다.** ([REVIEW-V1 §2 Q2 정정](../../apps/api-server/src/scripts/data/product-descriptions/health-functional-food/pilot-probiotics/REVIEW-V1.md))
 
 전량 정정 후 수작업 전수 재검사(25제품·50파일): **A-추가 0 / 연령-추가 0 / en 강화 0**, 잔여 검출은 전부 오탐 → **"실제 위반 0" 선언**.
 

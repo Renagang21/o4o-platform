@@ -571,7 +571,7 @@ jobs:
   # 무엇을 **줄이지 않았는지** 명시한다:
   #   - 변경 문서를 **실제로 읽는** api-server test 는 전부 선별해 그대로 돌린다
   #     (`--mode=docs-specs`. 전수 조사 §9 결과: 기록물 보존 guard · 정본 존재 단언 ·
-  #      docs/checks/data fixture 를 읽는 nested content-guard test)
+  #      nested 위치의 test 까지 재귀 탐색)
   #   - 판정기 자체의 회귀 시험(node:test)은 여기서도 blocking 으로 돈다
   #   - 문서 **삭제 · 이동**, docs 안의 **데이터 자산(JSON/CSV/YAML)**, 코드 혼합은
   #     이 경로로 오지 않는다 — 전부 위의 기존 full/affected 경로다

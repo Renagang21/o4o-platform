@@ -24,7 +24,7 @@ AI 코딩 에이전트는 [`/CLAUDE.md`](../CLAUDE.md) 또는 [`/AGENTS.md`](../
 
 ---
 
-## 2. 이 폴더의 세 종류 문서
+## 2. 이 폴더의 두 종류 문서
 
 ### 기준 문서 — 현재 판단의 근거
 
@@ -57,15 +57,18 @@ AI 코딩 에이전트는 [`/CLAUDE.md`](../CLAUDE.md) 또는 [`/AGENTS.md`](../
 - 파일명 prefix(WO · CHECK · IR)와 폴더가 일치하지 않는 경우가 많다.
 - 코드 주석이 `WO-…` · `CHECK-…` 식별자를 인용하면, 그 이름으로 검색해 해당 기록을 찾는다.
 
-### 데이터 자산 — 문서가 아님
+### 데이터 자산은 여기 두지 않는다
 
-| 경로 | 내용 |
+스크립트가 읽고 쓰는 데이터는 `docs` 밖에 있다 (2026-10-03 분리).
+
+| 데이터 | 위치 |
 |---|---|
-| `guides/products/**` 의 HTML · JSON | 상품 설명 산출물 (약 10,600 파일) |
-| `checks/data/**` | 검증 · 적용 스크립트의 입출력 JSON |
-| `investigations/samples/**` | 조사용 샘플 데이터 |
+| 상품 설명 산출물 (HTML · JSON · 배치별 근거 메모) | `apps/api-server/src/scripts/data/product-descriptions/` |
+| 검증 · 적용 스크립트의 입출력 JSON | `apps/api-server/src/scripts/data/check-data/` |
+| 조사용 샘플 데이터 | `apps/api-server/src/scripts/data/investigation-samples/` |
+| 테스트 fixture | 테스트 옆 `__tests__/fixtures/` |
 
-`apps/api-server/src/scripts/**` 가 이 경로를 직접 읽는다. 문서 검색 시 제외하고 보면 된다. `docs` 밖으로 분리하는 작업은 별도로 예정되어 있다.
+상품 설명의 **저작 규칙 문서**는 그대로 `guides/products/` 에 있다.
 
 ### 로컬 전용
 
@@ -90,5 +93,5 @@ AI 코딩 에이전트는 [`/CLAUDE.md`](../CLAUDE.md) 또는 [`/AGENTS.md`](../
 | 진입 문서 | 이 문서 · 리팩토링 현황 · 서비스 색인 | 완료 (2026-10-03) |
 | 유입 규칙 | 새 문서 위치 · 헤더 · CHECK 작성 기준 · 민감정보 CI 검사 — [규칙 §10](rules/DOCUMENT-LIFECYCLE-AND-ARCHIVE-RULES-V1.md) | 완료 (2026-10-03) |
 | 보안 분리 | 기록물의 개인 메일 · 전화 · 공인 IP 마스킹 (현재 파일 기준, git history 는 유지) | 완료 (2026-10-03). Private 운영 문서 공간은 이관할 문서가 생길 때 만든다 |
-| 데이터 분리 | 위 데이터 자산을 `docs` 밖으로 | 예정 |
+| 데이터 분리 | 비문서 데이터를 `apps/api-server/src/scripts/data/` · 테스트 fixture 로 이동, 경로 consumer 수정 | 완료 (2026-10-03) |
 | 정본 흡수 | 주제별 WO · CHECK · IR 결과를 정본 문서로 | 예정 |

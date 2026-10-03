@@ -3,7 +3,7 @@
 - 기준: `CHECK-O4O-HFF-SINGLE-LINE-MULTI-INGREDIENT-ABSORPTION-PLATFORM-AUDIT-A-V1` (commit `1f55b943e`) 추정 224건을 **제품별 검증 가능한 교정 큐**로 확정.
 - 상위 WO: `WO-O4O-HFF-SINGLE-NUTRIENT-MULTI-INGREDIENT-MISCLASSIFICATION-AUDIT-AND-LUTEIN-CORRECTION-V1` §3(교정 설계).
 - 성격: **read-only 설계 · DB write 0 · canonical 변경 0 · 부분 apply 0**. 교정 실행은 승인·이중게이트 후 별도.
-- 큐 산출물: [`data/product-description-guard/hff-single-line-absorption-correction-queue.json`](data/product-description-guard/hff-single-line-absorption-correction-queue.json) — 제품별 `baseSpecSet / mainFnctnAttributed / verifiedFullSet / category / action / registryReady` 259행.
+- 큐 산출물: [`data/product-description-guard/hff-single-line-absorption-correction-queue.json`](../../apps/api-server/src/scripts/data/check-data/product-description-guard/hff-single-line-absorption-correction-queue.json) — 제품별 `baseSpecSet / mainFnctnAttributed / verifiedFullSet / category / action / registryReady` 259행.
 
 ---
 

@@ -17,7 +17,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { buildDrugOtcEnConsumerHtml, type DrugOtcEnTranslation } from '../modules/neture/drug-import/drug-otc-en-consumer-html.js';
 
-const EN_PATH = path.resolve(process.cwd(), '../../docs/guides/products/drug/pilot-en-design/translations/otc-en-translations-herbal-v1.json');
+const EN_PATH = path.resolve(process.cwd(), 'src/scripts/data/product-descriptions/drug/pilot-en-design/translations/otc-en-translations-herbal-v1.json');
 const SOURCE_TYPE = 'mfds_drug_otc';
 const GROUPS: Array<{ key: string; expect: number }> = [
   { key: '은행엽건조엑스|80밀리그램|정', expect: 203 },

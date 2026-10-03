@@ -24,7 +24,7 @@
 | **D-7** | **저장된 영문 5건** (en · needs_review) | en | 모바일·태블릿세로·태블릿가로·PC | 375/768/1024/1280 | **20/20 PASS** | 미반영(기준 그대로) |
 | **D-6** | 긴 영문 제목 잘림 **수정 검증** | en·ko | 위 4폭 + 640경계·200%줌·KPA모달·Neture랜딩 | 9종 × 3콘텐츠 | **27/27 PASS** | GUIDE V0.5 (§8-D 해소) · 계약 V1.1 §3-1 |
 
-> 근거: [CHECK-O4O-OTC-EN-DESIGN-PILOT-VALIDATION-V1](../checks/CHECK-O4O-OTC-EN-DESIGN-PILOT-VALIDATION-V1.md) · 측정 원본 [measurements-v1.json](products/drug/pilot-en-design/evidence/measurements-v1.json)
+> 근거: [CHECK-O4O-OTC-EN-DESIGN-PILOT-VALIDATION-V1](../checks/CHECK-O4O-OTC-EN-DESIGN-PILOT-VALIDATION-V1.md) · 측정 원본 [measurements-v1.json](../../apps/api-server/src/scripts/data/product-descriptions/drug/pilot-en-design/evidence/measurements-v1.json)
 
 ---
 
@@ -36,7 +36,7 @@
 |---|---|---|---|
 | P-1 | **B 모달(PC)이 1열로 뜬다** (컨테이너 ~576 < 640) | ✅ **확인** | 슬롯 604 → 컨테이너 **576** → **1열**. PC인데 폰 레이아웃 — 의도된 동작 |
 | P-2 | **A 랜딩이 640 경계에 4px 차로 걸침** (~644) | ✅ **확인** | 슬롯 672 → 컨테이너 **644** → 2열. 경계 실측: **639=1열 / 641=2열** → **여백 4px 늘면 1열로 붕괴** |
-| P-3 | **긴 영문 단어가 잘림** | ✅ 확인 (결함) → **✅ 수정 완료 (D-6)** | 수정 전 `sd-hero h1` scrollWidth **594** vs clientWidth **301**, 카드 `overflow:hidden` → **가로 스크롤 0, 글자가 잘려 사라짐**([증거](products/drug/pilot-en-design/evidence/P-3-long-english-word-clipped-375px.png)). 수정 후 **594 → 301**([증거](products/drug/pilot-en-design/evidence/P-3-FIXED-long-english-word-wraps-375px.png)) |
+| P-3 | **긴 영문 단어가 잘림** | ✅ 확인 (결함) → **✅ 수정 완료 (D-6)** | 수정 전 `sd-hero h1` scrollWidth **594** vs clientWidth **301**, 카드 `overflow:hidden` → **가로 스크롤 0, 글자가 잘려 사라짐**([증거](../../apps/api-server/src/scripts/data/product-descriptions/drug/pilot-en-design/evidence/P-3-long-english-word-clipped-375px.png)). 수정 후 **594 → 301**([증거](../../apps/api-server/src/scripts/data/product-descriptions/drug/pilot-en-design/evidence/P-3-FIXED-long-english-word-wraps-375px.png)) |
 | P-4 | **C 키오스크가 무스타일** (variant 미지정) | ✅ **확인** | `TabletKioskPage.tsx:699,711` — `ContentRenderer` 에 `variant` 없음(기본 분기) |
 | P-5 | **D 다국어 랜딩이 다르게 보임** | ✅ **확인** | `MultilingualProductPublicLandingPage.tsx` — `ContentRenderer` 사용 **0회**, 자체 `prose` 마크업 |
 | P-6 | 200% 확대 시 좁은 레이아웃 정상 전환 | ✅ **PASS** | PC 1280 @200% → 컨테이너 **612** → 1열, 가로 오버플로 **0** |
@@ -137,7 +137,7 @@
 
 ### D-1~D-5 — 파일럿 P1~P5 (en 시안, 2026-07-15)
 
-- 대상: [P1~P5 sd-* 시안](products/drug/pilot-en-design/drafts/) · 언어: **en** · GUIDE **V0.3** 사용
+- 대상: [P1~P5 sd-* 시안](../../apps/api-server/src/scripts/data/product-descriptions/drug/pilot-en-design/drafts/) · 언어: **en** · GUIDE **V0.3** 사용
 - 방법: 렌더러 CSS 추출 + Playwright 실측 (4폭 × 5건 = **20 측정**)
 
 **반응형 분기 — 20/20 기대치 일치**
@@ -248,7 +248,7 @@
 | PC 1280 | 1252 | 3열 | 0 | 없음 |
 
 **20/20 PASS** — GUIDE §4.3 기준과 동일. `<table>` 0 · `sd-card` 5/5.
-증거: [EN-PERSIST-dexibuprofen-375px.png](products/drug/pilot-en-design/evidence/EN-PERSIST-dexibuprofen-375px.png)
+증거: [EN-PERSIST-dexibuprofen-375px.png](../../apps/api-server/src/scripts/data/product-descriptions/drug/pilot-en-design/evidence/EN-PERSIST-dexibuprofen-375px.png)
 
 > **§8-D 수정 효과 확인**: 영문 성분명(`Saccharomyces boulardii`·`Dexibuprofen`)이 잘림 없이 줄바꿈된다.
 > `summaryTable` 6항목 → `sd-core` 6 item → 3열 구간에서 **2행 정확히 채움**(빈 칸 0).

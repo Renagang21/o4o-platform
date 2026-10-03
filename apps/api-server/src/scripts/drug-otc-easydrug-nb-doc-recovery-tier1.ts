@@ -4,7 +4,7 @@
  * e약은요 유실 SPD(ko canonical) 의 크레아티닌 청소율 값·닫는 괄호를 NB_DOC 근거로 최소 복원.
  * dry-run 기본 / apply 는 이중 게이트(`--apply` + DRUG_OTC_NB_RECOVERY_TIER1_CONFIRM=YES).
  *
- * 화이트리스트: docs/investigations/samples/nb-doc-bulk-v1/recovery-whitelist.json
+ * 화이트리스트: apps/api-server/src/scripts/data/investigation-samples/nb-doc-bulk-v1/recovery-whitelist.json
  *   - 20 item_seq / ko 108 master / en 0 (dry-run CHECK 검증완료)
  *   - 항목별 { item_seq, find:'크레아티닌 청소율 ', replace:'크레아티닌 청소율 &lt; 10 mL/min)' }
  *
@@ -21,7 +21,7 @@ import path from 'node:path';
 
 const WL_PATH = path.resolve(
   process.cwd(),
-  '../../docs/investigations/samples/nb-doc-bulk-v1/recovery-whitelist.json',
+  'src/scripts/data/investigation-samples/nb-doc-bulk-v1/recovery-whitelist.json',
 );
 const EXPECTED_ITEM_SEQ = 20;
 const EXPECTED_ROWS = 108;

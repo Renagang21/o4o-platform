@@ -5,7 +5,7 @@
  * (유실된 경우) 문단 경계 `\n\n` 를 NB_DOC 근거로 복원.
  * dry-run 기본 / apply 는 이중 게이트(`--apply` + DRUG_OTC_NB_RECOVERY_TIER2_CONFIRM=YES).
  *
- * 화이트리스트: docs/investigations/samples/nb-doc-bulk-v1/recovery-whitelist-tier2.json
+ * 화이트리스트: apps/api-server/src/scripts/data/investigation-samples/nb-doc-bulk-v1/recovery-whitelist-tier2.json
  *   - 86 item_seq / ko 354 master / en 0 (dry-run CHECK 검증완료)
  *   - 항목별 { item_seq, find, replace, breakSurvived }
  *     · breakSurvived=false(75): replace 끝에 `\n\n` (경계 유실 → 문단 분리 복원)
@@ -24,7 +24,7 @@ import path from 'node:path';
 
 const WL_PATH = path.resolve(
   process.cwd(),
-  '../../docs/investigations/samples/nb-doc-bulk-v1/recovery-whitelist-tier2.json',
+  'src/scripts/data/investigation-samples/nb-doc-bulk-v1/recovery-whitelist-tier2.json',
 );
 const EXPECTED_ITEM_SEQ = 86;
 const EXPECTED_ROWS = 354;

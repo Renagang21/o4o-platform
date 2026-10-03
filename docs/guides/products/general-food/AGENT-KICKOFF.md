@@ -41,7 +41,7 @@
 
 ## 산출물·저장 규칙
 
-- 위치: `docs/guides/products/general-food/samples/`
+- 위치: `apps/api-server/src/scripts/data/product-descriptions/general-food/samples/` (2026-10-03 docs 밖으로 분리)
 - 파일명: `{브랜드}-{제품}.html` (한국어), `{...}.zh.html` (중국어) — 예: `elamor-liposome-collagen-glutathione.html`
 - HTML은 **self-contained**(inline CSS), 제품 패키지 톤 반영, 8단 구조.
 - 커밋: **main 직접**, `git commit -- <경로>` 로 해당 파일만(동시 세션 안전). 끝나면 push.

@@ -35,7 +35,7 @@ ko runner + en-complete runner 각 최소 등재.
 - source_ref `01a231cd` 공유 ko canonical **63** (37 target + **26 out**). out 26 EN canonical **LIVE**(uniform md5 `8e5a52ffd631fe32252ddc7b847530de`). target 37 기존 EN **0**.
 
 ### 번역 (그룹당 1건 · 충실 번역)
-- 배치 전용 파일: [`otc-en-translations-almagate-500mg-v1.json`](../../docs/guides/products/drug/pilot-en-design/translations/otc-en-translations-almagate-500mg-v1.json) (공유 파일 미수정). GUIDE V0.5·GLOSSARY V0.2·TEST-LOG 포함.
+- 배치 전용 파일: [`otc-en-translations-almagate-500mg-v1.json`](../../apps/api-server/src/scripts/data/product-descriptions/drug/pilot-en-design/translations/otc-en-translations-almagate-500mg-v1.json) (공유 파일 미수정). GUIDE V0.5·GLOSSARY V0.2·TEST-LOG 포함.
 - 동일 약물 out 26 검증본(`otc-en-translations-v1.json` verbatim) → `buildDrugOtcEnConsumerHtml` md5 `8e5a52ff` = live out en **byte-identical** → **ko 에 없는 medical fact 0**.
 - TEST-LOG: `chew two tablets (1 g) three times a day`·식후 30분~1시간·취침 전 추가 용법 보존 · `12 or older` 연령 보존 · 금기(과민·알츠하이머·치질·부종·임신중독증·설사·미진단 소화관 출혈) · 병용금기(tetracycline계) · 2주 미개선 중단 — 대상·강도 보존.
 

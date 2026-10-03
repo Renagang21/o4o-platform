@@ -11,7 +11,7 @@ const SPD_SOURCE_TYPE = 'o4o_hff_generated';
 const REGULATORY_TYPE = '건강기능식품';
 const EXPECT = 271;
 const SP = 'C:/Users/sohae/AppData/Local/Temp/claude/c--Users-sohae-o4o-platform/30d2fee8-8e25-4e6d-8656-fa0ee7713bfa/scratchpad';
-const DATA = 'C:/Users/sohae/o4o-platform/docs/checks/data/product-description-guard';
+const DATA = 'src/scripts/data/check-data/product-description-guard';
 
 (async () => {
   const manifest = JSON.parse(fs.readFileSync(`${SP}/rg-apply-rollback-manifest.json`, 'utf8'));
