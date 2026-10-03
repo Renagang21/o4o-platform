@@ -8,6 +8,7 @@ O4O 의 서비스 목록과 서비스별 기준 문서를 찾는 색인이다. �
 
 - **서비스 목록 · 도메인 · 가입 허용 여부의 정본은 코드다** — [`apps/api-server/src/config/service-catalog.ts`](../../apps/api-server/src/config/service-catalog.ts) (`O4O_SERVICES`). 각 항목의 주석에 서비스의 성격과 근거 WO 가 적혀 있다.
 - 서비스 데이터는 `serviceKey` 로 격리되고, forum · lms · signage 등은 플랫폼 공통 구조를 쓴다 ([o4o-common-structure](../o4o-common-structure.md)).
+- **주소(`*.neture.co.kr`)별 사업 의미**는 [SUBDOMAIN-SERVICE-SEMANTICS](../baseline/O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1.md) 가 정한다 — serviceKey · role prefix 이름에서 의미를 추론하지 않는다(예: `kpa-society` = 약국 사업자 서비스 `pharmacy.neture.co.kr`, 분회는 `kpa-branch` = `kpa.neture.co.kr`).
 - 역할 경계 · 업무공간은 서비스보다 상위 기준이다 ([ROLE-WORKSPACE-ARCHITECTURE](../baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md)).
 
 ---
@@ -19,7 +20,7 @@ O4O 의 서비스 목록과 서비스별 기준 문서를 찾는 색인이다. �
 | `neture` | `services/web-neture` | [NETURE-DOMAIN-ARCHITECTURE-FREEZE-V3](../baseline/NETURE-DOMAIN-ARCHITECTURE-FREEZE-V3.md) · [SUPPLIER-DOMAIN-BOUNDARY](../baseline/O4O-SUPPLIER-DOMAIN-BOUNDARY-V1.md) · [NETURE-DISTRIBUTION-ENGINE-FREEZE](../baseline/NETURE-DISTRIBUTION-ENGINE-FREEZE-V1.md) |
 | `community` · `supplier` · `funding` | `services/web-neture` (호스트별 프로필 — `src/lib/hostProfile.ts`) | 각 키는 **해당 영역의 운영자 범위**다. 근거: [WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1](../work-orders/WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1.md). 공급자 사업자 본인의 인가는 SUPPLIER-DOMAIN-BOUNDARY 가 정한다 |
 | `kpa-society` | `services/web-kpa-society` | [KPA-SOCIETY-SERVICE-STRUCTURE](../baseline/KPA-SOCIETY-SERVICE-STRUCTURE.md) · [KPA-UX-BASELINE](../baseline/KPA-UX-BASELINE-V1.md) · [KPA-ROLE-MATRIX](../baseline/KPA-ROLE-MATRIX-V1.md) · [KPA-SIGNAGE-STRUCTURE](../baseline/KPA-SIGNAGE-STRUCTURE-V1.md) |
-| `kpa-branch` | `services/web-kpa-branch` | 약사회 분회 홈페이지. 정본 없음 — catalog 주석과 [SERVICE-IDENTITY CHECK](../checks/CHECK-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1.md) |
+| `kpa-branch` | `services/web-kpa-branch` | 약사회 분회 홈페이지 — 주소 의미는 [SUBDOMAIN-SERVICE-SEMANTICS](../baseline/O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1.md) §2. 구조 정본 없음 — catalog 주석과 [SERVICE-IDENTITY CHECK](../checks/CHECK-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1.md) |
 | `k-cosmetics` | `services/web-k-cosmetics` | [COSMETICS-DOMAIN-RULES](../architecture/COSMETICS-DOMAIN-RULES.md) · [cosmetics/service-definition](cosmetics/service-definition.md) |
 | `pharmacy-hub` | `services/web-pharmacy-hub` | [PHARMACY-HUB-SERVICE-MODEL-BASELINE](../baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) |
 | `lecture` | `services/web-lecture` | O4O 강의 — neture 에서 분리된 독립 서비스. 정본 없음 — [WO](../work-orders/WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1.md) · [CHECK](../checks/CHECK-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1.md) |

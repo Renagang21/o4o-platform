@@ -3,6 +3,7 @@
 - 작성일: 2026-09-25
 - 상위 문서: `IR-O4O-URL-FIRST-SERVICE-RESTRUCTURE-2026-09-24` (저장소 미수록 · 사용자 제공). 그 IR 의 §1 목적지 표 · §4 확인 항목을 전제로, **빠져 있던 조사 축**만 보강한다.
 - 성격: 조사 전용. 코드 · DB · DNS · LB · 배포 변경 0. 소스 기준 `origin/main` = `26ac02a60`.
+- 주소 의미 정합 (2026-10-03): 이 IR 은 2026-09-25 전환 설계 시점 기록이다("현재 호스트" 열 = 당시 값). 확정된 주소별 사업 의미의 정본은 [`O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1`](../baseline/O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1.md), 전환 진행은 `CHECK-O4O-URL-FIRST-CENSUS-V1` §21.
 - 범위 한계: 운영 DB 행 수 · 실제 인쇄 QR 수 · 설치된 local agent 수 · Google 콘솔 · Gabia DNS 는 직접 확인하지 않았다(아래 "미확인" 표기).
 
 ---

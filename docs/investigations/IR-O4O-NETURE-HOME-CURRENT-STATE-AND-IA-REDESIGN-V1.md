@@ -3,6 +3,7 @@
 > **유형**: READ-ONLY 조사 (코드 · 설정 · DB · 배포 변경 0)
 > **작성일**: 2026-09-28 · **기준**: origin/main `4e34267ef` + production(neture.co.kr 외 서브도메인 7개) 실브라우저 실측
 > **선행**: [`CHECK-O4O-NETURE-HOME-ENTRY-REFRESH-V1`](../checks/CHECK-O4O-NETURE-HOME-ENTRY-REFRESH-V1.md) (로그인 전 pill URL 정정 — 코드 완료 · **미배포**)
+> **주소 의미 정합 (2026-10-03)**: §7 · §10 의 서비스 대상 · 성격은 2026-09-28 화면 실측(당시 헤더 브랜드 「KPA-Society 약사 전문 플랫폼」 등)이다. 현재 사업 의미 — `pharmacy` · `retail` = 사업자 대상 세미프랜차이즈 운영 서비스 · `kpa` = 약사 개인 대상 분회 · `store` = 공통 Store Workspace — 는 [`O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1`](../baseline/O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1.md) 를 따른다.
 > **결론 형식**: 최종 IA 선택 · 구현 · 이미지 제작은 하지 않는다. KEEP/MODIFY/REMOVE/ADD **후보**와 IA 대안 3개까지만 제시한다.
 
 ### 조사 방법과 한계

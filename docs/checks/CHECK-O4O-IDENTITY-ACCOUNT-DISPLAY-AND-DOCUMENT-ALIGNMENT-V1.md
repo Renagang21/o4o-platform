@@ -195,6 +195,8 @@ PR #231 1차에서 **SonarCloud 만 fail** 했다(나머지 체크 전부 pass).
 ※ 처음 `kpa.neture.co.kr` · `pharmacy.neture.co.kr` 로 찍어 000 이 났는데 **내가 도메인을 잘못 짚은 것**이었다
 (정본은 `kpa-society.co.kr` · `pharmacyhub.co.kr`). 장애가 아니다.
 
+> **[2026-10-03 · HISTORICAL / SUPERSEDED]** 위 "정본" 은 2026-09-24 시점 사실이다. 현재 canonical: `kpa-society` 앱 = `pharmacy.neture.co.kr`(옛 `kpa-society.co.kr` 보존) · `pharmacyhub.co.kr` = 호환 호스트 · `kpa.neture.co.kr` = 분회 서비스(별도 앱). 최신 정본: [`O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1`](../baseline/O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1.md).
+
 ### 6-4. smoke 중 발견 — `계정: 승인대기` **거짓 표시** (같은 WO 에서 수정)
 
 Admin 계정 메뉴의 계정 상태가 **항상 노란색 "승인대기"** 였다. 원인:

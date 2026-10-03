@@ -7,6 +7,8 @@
 **작성자:** Claude Code (정적 분석)  
 **대상 서비스:** KPA Society — `/store/info` (약국 정보 페이지)
 
+> **[2026-10-03 · 주소 의미 정합]** 이 IR 의 "KPA Society · KPA 약국 경영자 · `kpa:store_owner`" 는 serviceKey `kpa-society` 의 약국 사업자 영역이다 — 현재 주소 `pharmacy.neture.co.kr`, 매장 운영 공간은 공통 Store Workspace `store.neture.co.kr`. KPA 분회(`kpa.neture.co.kr`, 약사 개인 대상)와 무관하다. 본문은 2026-05-19 시점 기록이며 수정하지 않았다. 정본: [`O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1`](../baseline/O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1.md).
+
 ---
 
 ## 1. 증상 요약

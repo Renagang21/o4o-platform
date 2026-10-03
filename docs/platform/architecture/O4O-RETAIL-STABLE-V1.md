@@ -19,6 +19,8 @@
 > 거치기 전까지 이 loop 은 `UNKNOWN` 이며, **기능을 복구·확장하지 않는다.**
 > 본 문서의 FROZEN 상태와 본문은 변경하지 않았다.
 >
+> **[2026-10-03 · 명칭 구분]** 이 문서의 "Retail" 은 위 소비자 결제 loop 의 이름이다. 화장품 · 일반 소매 **사업자 대상** 세미프랜차이즈 운영 서비스인 `retail.neture.co.kr`(serviceKey `k-cosmetics`)과 같은 것이 아니다 — [`O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1`](../../baseline/O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1.md).
+>
 > ---
 
 > **Status**: FROZEN
