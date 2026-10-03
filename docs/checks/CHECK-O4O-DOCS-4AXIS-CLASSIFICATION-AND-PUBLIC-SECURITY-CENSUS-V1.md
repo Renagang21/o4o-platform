@@ -1,22 +1,25 @@
 # CHECK-O4O-DOCS-4AXIS-CLASSIFICATION-AND-PUBLIC-SECURITY-CENSUS-V1
 
-docs Markdown 4축 분류(CANONICAL · DEVELOPER · INTERNAL_SECURITY · HISTORY) · PUBLIC 저장소 전제 보안 census
+> **상태**: ACTIVE
+> **작성일**: 2026-10-03 · **최종 갱신**: 2026-10-03
+> **근거 WO/IR**: WO-O4O-DOCS-4AXIS-CLASSIFICATION-AND-PUBLIC-SECURITY-CENSUS-V1 · 선행 [`IR-O4O-DOCUMENTATION-CENSUS-AND-SECURITY-CLASSIFICATION-V1`](../investigations/IR-O4O-DOCUMENTATION-CENSUS-AND-SECURITY-CLASSIFICATION-V1.md) (데이터 분리 전 · `809b512ca`)
 
-> **상태**: ACTIVE — 판정 **SECURITY_REMEDIATION_REQUIRED** · 후속 문서 정비 WO 의 입력 자료 (미해결 판단 사항 포함, LIFECYCLE-RULES §10-2 ④)
-> **기준**: `origin/main` @ `35979b119` · 2026-10-03 — PR #275(`d5e87b18e`, docs 데이터 12,108 파일 분리) 반영 후
-> **선행**: [`IR-O4O-DOCUMENTATION-CENSUS-AND-SECURITY-CLASSIFICATION-V1`](../investigations/IR-O4O-DOCUMENTATION-CENSUS-AND-SECURITY-CLASSIFICATION-V1.md) (데이터 분리 전 · `809b512ca`)
-> **하지 않은 것**: 문서 수정 · 이동 · 삭제 · rename · DB 조회 · secret 값 기록 · history rewrite
-> **방법**: `git archive` 로 docs + 루트 진입 문서 4개를 저장소 밖에 추출 → 위치 기반 4축 판정 + 상태 헤더 + 현행 문서 역참조(상대 링크 · WO/CHECK/IR 식별자) + 보안 패턴 스캔(값은 형태만 기록) → 보안 hit 전수 수동 판정. 전체 git history 는 고신뢰 secret 패턴으로 별도 스캔.
+docs Markdown 4축 분류(CANONICAL · DEVELOPER · INTERNAL_SECURITY · HISTORY) · PUBLIC 저장소 전제 보안 census. 후속 문서 정비 WO 의 입력 자료이며 미해결 판단 사항을 포함한다 (LIFECYCLE-RULES §10-2 ④).
+
+- **판정**: `SECURITY_REMEDIATION_REQUIRED` — 해소 조건 ① 보안 PR #279 main 반영 대기 · ② 로그인 불가 확인 완료 (§3-2)
+- **기준**: `origin/main` @ `35979b119` · 2026-10-03 — PR #275(`d5e87b18e`, docs 데이터 12,108 파일 분리) 반영 후
+- **하지 않은 것**: 문서 이동 · 삭제 · rename · DB write · credential 변경 · secret 값 기록 · history rewrite
+- **방법**: `git archive` 로 docs + 루트 진입 문서 4개를 저장소 밖에 추출 → 위치 기반 4축 판정 + 상단 상태 표기 + 현행 문서 역참조(상대 링크 · WO/CHECK/IR 식별자) + 보안 패턴 스캔(값은 형태만 기록) → 보안 hit 전수 수동 판정. 전체 git history 는 고신뢰 secret 패턴으로 별도 스캔. 계정 로그인 가능 여부는 운영 DB read-only SELECT(Auth Proxy · `default_transaction_read_only=on`).
 
 ---
 
 ## 0. 결론
 
-1. 판정: **SECURITY_REMEDIATION_REQUIRED** — public HEAD 의 기록물 1 파일에 **테스트 계정 4건 + 운영자(admin 역할) 계정 1건의 비밀번호 평문**이 남아 있다(§3-2). 계정 활성 여부와 관계없이 과거 · 테스트 비밀번호도 문서에 둘 수 없으므로(LIFECYCLE-RULES §10-4) 이 판정이 문서 정비보다 앞선다.
-   - 처리 순서: HEAD 평문 제거(별도 보안 PR) → 계정 로그인 불가 여부 read-only 확인 → 필요 시 폐기 · 교체 → 이 CHECK 판정 갱신 → 문서 정비 착수. history rewrite 는 범위 밖.
-   - 그 밖에는 HEAD 와 git history 모두에서 key · token 류 실제 secret 을 찾지 못했다(§3-1).
+1. 판정 **SECURITY_REMEDIATION_REQUIRED** — public HEAD 의 기록물 1 파일에 **테스트 계정 4건 + 운영자(admin 역할) 계정 1건의 비밀번호 평문**이 남아 있다(§3-2). 계정 활성 여부와 관계없이 과거 · 테스트 비밀번호도 문서에 둘 수 없으므로(LIFECYCLE-RULES §10-4) 이 판정이 문서 정비보다 앞선다.
+   - 운영 DB read-only 확인 결과 **이 평문들로 로그인 가능한 계정은 없다** (§3-2). 남은 조건은 HEAD 평문 제거(PR #279) 의 main 반영뿐이다.
+   - 그 밖에는 HEAD 와 git history 모두에서 key · token 류 실제 secret 을 찾지 못했다(§3-1). history rewrite 는 범위 밖.
 2. 대상 `.md` 3,730 (docs 3,726 + 루트 4) 중 **HISTORY 성격 3,431 (92%)**. 현재 기준 문서는 CANONICAL 220 + DEVELOPER 79 = 299.
-3. HISTORY 중 **345 건은 현재 정본 · 진입 문서 · 리팩토링 상태판이 참조 중**이다. 나머지 3,086 은 **위치 기준 1차 후보군일 뿐 이동 가능 목록이 아니다** — 그중 종료 상태를 명시한 문서는 662 건뿐이고 98 건은 여전히 진행 · 대기 상태를 적고 있다(§2). 실제 archive/move 후보는 문서별 상태와 트랙 종료 확인 후 별도 WO 에서 산출한다.
+3. HISTORY 중 **345 건은 현재 정본 · 진입 문서 · 리팩토링 상태판이 참조 중**이다. `docs/archive/**` 의 461 건은 이미 archive 위치다. 나머지 **2,625 는 위치 기준 1차 후보군일 뿐 이동 가능 목록이 아니다** — 그중 종료 상태를 명시한 문서는 512 건이고 73 건은 여전히 진행 · 대기 상태를 적고 있다(§2). 실제 archive/move 후보는 문서별 상태와 트랙 종료 확인 후 별도 WO 에서 산출한다.
 4. 문제의 본질은 "읽어야 할 문서가 많다" 가 아니라 **기록물이 `docs/` 전면에 노출된 것**이다.
 5. 같은 저장소 안의 `internal/` 폴더는 보안 경계가 아니다 (저장소 PUBLIC). INTERNAL 후보는 저장소 밖 이관 여부를 판정해야 한다.
 
@@ -40,7 +43,9 @@ CANONICAL 품질:
 
 ---
 
-## 2. HISTORY 예외 — 현재 참조 중 (이동 보류)
+## 2. HISTORY 분해
+
+### 2-1. 현재 참조 중 (이동 보류) — 345
 
 | 사유 | 수 |
 |---|---:|
@@ -51,15 +56,21 @@ CANONICAL 품질:
 
 폴더별: work-orders 129 · checks 128 · investigations 62 · archive 23 · ir 3.
 
-**나머지 3,086 — 위치 기준 1차 후보군 (이동 가능 목록 아님)** — checks 1,713 · investigations 727 · archive 461 · work-orders 149 · ir 33 · 기타 3.
+### 2-2. 이미 archive 위치 — 461
+
+`docs/archive/**` 의 나머지 461 건은 lifecycle 상 이미 archive 위치에 있으므로 위치 이전 후보가 아니다 (archive 전체 484 = 참조 중 23 + 461).
+
+### 2-3. 위치 이전 1차 후보군 — 2,625 (이동 가능 목록 아님)
+
+checks 1,713 · investigations 727 · work-orders 149 · ir 33 · 기타 3 (audits · data-audits · handoffs).
 
 [`DOCUMENT-LIFECYCLE-AND-ARCHIVE-RULES-V1`](../rules/DOCUMENT-LIFECYCLE-AND-ARCHIVE-RULES-V1.md) 은 폴더 · prefix · 날짜만으로 archive 후보를 정하지 않고 **문서별 종료를 확인**하도록 한다. 1차 후보군을 문서 상단 상태 표기로 나누면:
 
 | 상단 상태 표기 | 수 | 의미 |
 |---|---:|---|
-| 종료 명시 (COMPLETE · DONE · CLOSED · SUPERSEDED · 완료 등) | 662 | 이동 후보 검토 가능 — 그래도 트랙 종료는 별도 확인 |
-| 진행 · 대기 명시 (ACTIVE · PENDING · HOLD · 진행 · 대기 등) | 98 | **이동 금지** — 예: 상태 `ACTIVE` 인 PharmacyHub community content resource CHECK |
-| 상태 표기 없음 · 판독 불가 | 2,326 | 판정 불가 → 현 위치 유지 (CLAUDE.md §16-6) |
+| 종료 명시 (COMPLETE · DONE · CLOSED · SUPERSEDED · 완료 등) | 512 | 이동 후보 검토 가능 — 그래도 트랙 종료는 별도 확인 |
+| 진행 · 대기 명시 (ACTIVE · PENDING · HOLD · 진행 · 대기 등) | 73 | **이동 금지** — 예: 상태 `ACTIVE` 인 PharmacyHub community content resource CHECK |
+| 상태 표기 없음 · 판독 불가 | 2,040 | 판정 불가 → 현 위치 유지 (CLAUDE.md §16-6) |
 
 상태 판독은 상단 3,000자의 `상태:` 표기를 정규식으로 읽은 근사치다. 실제 archive/move 후보는 별도 WO 에서 문서별 상태와 소속 트랙의 종료 여부를 확인해 산출한다.
 
@@ -82,27 +93,44 @@ CANONICAL 품질:
 | 노출 | 현재 | 확인 |
 |---|---|---|
 | 과거 DB 비밀번호 | rotated / invalidated — [`CHECK-O4O-CLOUDSQL-AND-RUNTIME-SECRET-HARDENING-V1`](CHECK-O4O-CLOUDSQL-AND-RUNTIME-SECRET-HARDENING-V1.md) | 기록으로 확인 |
-| 운영 관리자 계정 평문(과거 migration) | 레거시 password hash 축 DROP([`CHECK-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1`](CHECK-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1.md)), 새 email/password 는 별도 credential 테이블 → **구조적으로 무효 추정** | **DB read 확인 권장** |
+| 운영 관리자 계정 평문(과거 migration) | 레거시 password 저장 위치 제거([`CHECK-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1`](CHECK-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1.md)) · 현재 비밀번호 credential 보유 계정에 admin/operator 역할 0 | **DB read 로 확인** (§3-2 와 같은 쿼리) |
 
 한계: 일반 비밀번호 문자열은 정규식으로 history 전수 판정이 불가능하다.
 
 ### 3-2. Git 에 있으면 안 됨 — 1 파일 → **SECURITY_REMEDIATION_REQUIRED**
 
-| 위치 | 내용 | 판정 |
+| 위치 | 내용 | 조치 |
 |---|---|---|
-| `archive/work-orders/` 의 과거 E2E 보고서 1건 (경로는 `docs/local/` 미추적 목록에만 기록) | 과거 E2E 테스트 계정 4건 + **운영자(admin 역할) 계정 1건**의 비밀번호 평문 (운영자 건은 최초 census 의 정규식이 놓쳤고 PR #279 Codex 리뷰가 발견) | **HEAD 평문 제거 필수** — 별도 보안 PR(PR #279) 에서 `[REDACTED_PASSWORD]` 로 치환. 레거시 password hash 축 DROP 으로 로그인 불가로 추정되나 **DB 미확인**. history 잔존은 수용(선행 IR 판단 D3) |
+| `archive/work-orders/` 의 과거 E2E 보고서 1건 (경로는 `docs/local/` 미추적 목록에만 기록) | 과거 E2E 테스트 계정 4건 + **운영자(admin 역할) 계정 1건**의 비밀번호 평문 (운영자 건은 최초 census 의 정규식이 놓쳤고 PR #279 Codex 리뷰가 발견) | 별도 보안 PR #279 에서 `[REDACTED_PASSWORD]` 로 치환 (main 반영 대기). 같은 값은 저장소의 다른 파일에 없다. history 잔존은 수용(선행 IR 판단 D3) |
 
-해소 조건: ① 보안 PR main 반영 ② 해당 계정 로그인 불가 read-only 확인 — **운영자(admin 역할) 계정을 최우선** (필요 시 폐기 · 교체). 둘 다 끝나면 이 절과 §0 판정을 갱신한다.
+**로그인 가능 여부 — 운영 DB read-only 확인 (2026-10-03)**:
 
-재스캔 (운영자 건 발견 후, docs 전체 `.md`):
+| 확인 | 결과 |
+|---|---|
+| 레거시 `users.password` 컬럼 | 없음 |
+| 레거시 `service_credentials` 테이블 | 없음 |
+| 그 밖의 password 계열 컬럼 | 없음 |
+| 현행 비밀번호 credential 테이블 행 수 | 2 — 2건 모두 공개 Demo 계정([`O4O-CANONICAL-DEMO-ACCOUNTS-V1`](../baseline/O4O-CANONICAL-DEMO-ACCOUNTS-V1.md)), 2026-10-02 생성 |
+| credential 보유 계정의 활성 역할 | `kpa:store_owner` · `neture:supplier` — admin/operator 역할 0 |
 
-- 대소문자 · 숫자 · 기호 혼합 8~40자 토큰 전수 → 링크 앵커 · URL 인코딩뿐 (실제값 0)
-- 계정 · 비밀번호 문맥 줄의 영문 · 숫자 · 기호 토큰 106 hit 전수 → 패키지명 · 경로 · 이메일 · 강조 표기 · 비밀번호 정책 테스트 입력값 · 패키지 버전뿐 (실제값 0)
+→ 비밀번호 hash 가 존재할 수 있는 곳은 현행 credential 테이블뿐이고, 그 보유자는 공개 Demo 계정 2개뿐이다. Demo 비밀번호는 노출된 평문들과 길이부터 다르다. **노출된 5개 평문으로 로그인 가능한 계정은 없다.** credential 폐기 · 교체는 필요 없다. 조회는 집계 · 존재 여부만 출력했고 이메일 · hash 는 출력하지 않았다 (Demo 계정 식별자는 baseline 에 이미 공개).
+
+해소 조건: ① PR #279 main 반영 (대기) ② 로그인 불가 확인 (**완료**). ① 이 끝나면 이 절과 §0 판정을 갱신한다.
+
+**재스캔 — 탐지 규칙 검증 포함**: 운영자 건 발견 후 docs 전체 `.md` 를 두 규칙으로 다시 스캔했다. 알려진 양성 5건이 남아 있는 main 기준 tree(redact 전)에서 돌려 규칙이 실제로 잡는지 먼저 확인했다.
+
+| 규칙 | 알려진 양성 5건 검출 | 그 외 hit | 판정 |
+|---|---|---|---|
+| ① 대 · 소문자 · 숫자 · 기호 혼합 8~40자 토큰 (마크다운 강조 `*` · URL `&` 포함 토큰 제외) | **5 / 5** | 링크 앵커 · URL 인코딩 | 실제값 0 (알려진 5건 외) |
+| ② 계정 · 비밀번호 문맥 줄의 영문 · 숫자 · 기호 토큰 | **2 / 5** — 표 헤더에만 문맥어가 있고 값은 다음 행인 표 3행을 놓침 | 패키지명 · 경로 · 이메일 · 강조 표기 · 비밀번호 정책 테스트 입력값 · 패키지 버전 (106) | 보조 규칙으로만 사용 |
+
+- 결론은 규칙 ① 에 근거한다: **알려진 5건 외 추가 평문 비밀번호 없음.**
+- 규칙 ① 은 대문자 또는 기호가 없는 비밀번호를 잡지 못한다 — 그 형태는 정규식 전수 판정이 불가능하다.
 - 범위 한계: docs 밖 코드(seed · 테스트 · migration)의 비밀번호 리터럴은 이 census 범위가 아니다 — 선행 [`IR-O4O-PRIVACY-DATA-CENSUS-V1`](../investigations/IR-O4O-PRIVACY-DATA-CENSUS-V1.md) 이 다룬다.
 
 해당 없음으로 판정한 것:
 
-- Demo 계정 2건 비밀번호 — [`O4O-CANONICAL-DEMO-ACCOUNTS-V1`](../baseline/O4O-CANONICAL-DEMO-ACCOUNTS-V1.md) 이 **의도적 공개(secret 아님)** 로 정함 → KEEP. 전제: Demo 계정 role 최소화 유지
+- Demo 계정 2건 비밀번호 — [`O4O-CANONICAL-DEMO-ACCOUNTS-V1`](../baseline/O4O-CANONICAL-DEMO-ACCOUNTS-V1.md) 이 **의도적 공개(secret 아님)** 로 정함 → KEEP. 전제: Demo 계정 role 최소화 유지 (현재 `kpa:store_owner` · `neture:supplier` 만)
 - 개인 이메일 0 (`274e90be7` 마스킹 후)
 - 휴대전화 5 hit — 전부 예시값
 - 공인 IP — 공개 DNS 리졸버 · 문서 예시 대역 · 이미 /16 마스킹된 값 · `CLAUDE.md` 의 은퇴한 구 IP(금지 대상 명시용)
@@ -129,19 +157,20 @@ CANONICAL 품질:
 | 후보 | 수 | 방식 |
 |---|---:|---|
 | 삭제 | 0 | 확정 근거 없음 |
-| 기록물 위치 이전 1차 후보군 | 3,086 | **이동 가능 목록 아님.** 종료 명시 662 만 검토 대상 · 진행/대기 98 이동 금지 · 판독 불가 2,326 유지. 확정은 별도 WO (문서별 상태 + 트랙 종료 확인) |
+| 기록물 위치 이전 1차 후보군 | 2,625 | **이동 가능 목록 아님.** 종료 명시 512 만 검토 대상 · 진행/대기 73 이동 금지 · 판독 불가 2,040 유지. 확정은 별도 WO (문서별 상태 + 트랙 종료 확인) |
+| 이미 archive 위치 | 461 | 이전 대상 아님 |
 | 이동 보류 (현재 참조) | 345 | 유지 |
 | SUPERSEDED 정본 → archive | 3 | 별도 WO |
-| HEAD redact | 1 | **선행 필수** — 보안 PR(PR #279) |
+| HEAD redact | 1 | **선행 필수** — PR #279 |
 | 저장소 밖 이관 내용 판정 | 현행 4 + 기록 17 | 계약 · 정산 서술 |
 
 ---
 
 ## 5. 후속 WO 제안
 
-1. **보안 remediation (최우선)** — HEAD 평문 제거(PR #279) → 과거 관리자 계정 · E2E 테스트 계정 로그인 불가 read-only 확인 → 필요 시 폐기 · 교체 → 이 CHECK 판정 갱신
+1. **보안 remediation 마무리 (최우선)** — PR #279 main 반영 → 이 CHECK §0 · §3-2 판정 갱신 (로그인 불가 확인은 완료)
 2. **현재 기준 문서 집합 확정** — CANONICAL 상태 헤더 없음 69 판정 · SUPERSEDED 3 archive · 계약/정산 4건 공개 적합성 판정
-3. **기록물 이동 후보 확정** — 1차 후보군 3,086 에서 문서별 상태 · 트랙 종료를 확인해 실제 후보를 산출한 뒤 위치 이전 (리팩토링 안정 후, 링크 · 테스트 동반)
+3. **기록물 이동 후보 확정** — 1차 후보군 2,625 에서 문서별 상태 · 트랙 종료를 확인해 실제 후보를 산출한 뒤 위치 이전 (리팩토링 안정 후, 링크 · 테스트 동반)
 
 ---
 
