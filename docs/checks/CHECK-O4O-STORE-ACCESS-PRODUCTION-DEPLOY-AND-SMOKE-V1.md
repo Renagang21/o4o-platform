@@ -1,8 +1,10 @@
 # CHECK-O4O-STORE-ACCESS-PRODUCTION-DEPLOY-AND-SMOKE-V1
 
-> WO: `WO-O4O-STORE-BUSINESS-ENROLLMENT-AND-MEMBER-ACCESS-PRODUCTION-DEPLOY-AND-SMOKE-V1`
-> 기능 정본: [`O4O-STORE-ACCESS-AND-MEMBERSHIP-V1`](../baseline/O4O-STORE-ACCESS-AND-MEMBERSHIP-V1.md)
-> 2026-10-03 · **운영 DB write 0**
+> **상태**: COMPLETED
+> **작성일**: 2026-10-03 · **최종 갱신**: 2026-10-03
+> **근거 WO/IR**: `WO-O4O-STORE-BUSINESS-ENROLLMENT-AND-MEMBER-ACCESS-PRODUCTION-DEPLOY-AND-SMOKE-V1`
+
+기능 정본: [`O4O-STORE-ACCESS-AND-MEMBERSHIP-V1`](../baseline/O4O-STORE-ACCESS-AND-MEMBERSHIP-V1.md)
 
 ---
 
@@ -150,12 +152,23 @@ Member  Supplier Demo      (testsupplier@example.com)   · 현재 매장 0
 | # | 동작 | 변화 | 원복 |
 |---|---|---|---|
 | 1 | Owner 가 `/start-store` 로 kpa 가입 시도 | **0** — 이미 경영자라 `outcome=existing` (멱등 경로 확인) | 불필요 |
-| 2 | Owner → Supplier 초대 | `organization_members` **+1행** (`role='invited'`, org=9c87f46b) | 3-b |
-| 3 | Supplier 수락 | 그 행 `role` → `'staff'` · `role_assignments` **+1행** (`kpa:store_member`) | 3-b |
-| 3-b | Owner → Supplier 해제 | 그 행 `left_at` 설정 · `kpa:store_member` 비활성화 | — |
+| 2 | Owner → Supplier 초대 | `organization_members` **INSERT 1** (`role='invited'`, org=9c87f46b) | 4 |
+| 3 | Supplier 수락 | `organization_members.role` → `'staff'` **UPDATE 1** · `role_assignments` **INSERT 1**(`kpa:store_member`) | 4 |
+| 4 | Owner → Supplier 해제 | `organization_members.left_at` **UPDATE 1** · `role_assignments.is_active=false` **UPDATE 1** | — |
 
-INSERT 2 · UPDATE 2 · DELETE 0. 모두 **Demo 계정과 Demo 조직 안**에서만 일어나고, 3-b 로 접근이
-원복된다(행은 이력으로 남는다 — 이 설계가 행을 지우지 않는다).
+**INSERT 2 · UPDATE 3 · DELETE 0.**
+
+UPDATE 를 3으로 세는 이유 — 해제는 두 테이블을 건드린다. `removeStoreMember()` 가 `left_at` 을
+세우고, 이어서 `roleAssignmentService.removeRole()` 이 role 행을 **지우지 않고 비활성화**한다
+(`deactivate()` + `save()`). 비활성화도 write 다.
+
+이 분류는 **사전 상태에 의존한다.** `assignRole()` 은 같은 role 의 비활성 행이 있으면 그 행을
+되살린다(INSERT 가 아니라 UPDATE). 그래서 활성 수만 세지 않고 **비활성 포함 전체 행**을 먼저 읽었다
+— `*:store_member` 가 `is_active` 무관 **0행**이라 3단계는 INSERT 가 맞다. 비활성 행이 있었다면
+같은 동작이 `INSERT 1 · UPDATE 4` 가 된다.
+
+모두 **Demo 계정과 Demo 조직 안**에서만 일어나고, 4 로 접근이 원복된다(행은 이력으로 남는다 —
+이 설계가 행을 지우지 않는다).
 
 ### 건드리지 않는 것
 
@@ -187,7 +200,16 @@ Owner 는 전 과정에서 자기 매장만 본다
 | 3 | Supplier 수락 | 200 · `role=staff` · `services=["kpa"]` | 그 행 `role→staff` · `kpa:store_member` **+1 active** |
 | 4 | Owner → Supplier 해제 | 200 | 그 행 `active=false` · `kpa:store_member` **active=false** |
 
-예상(INSERT 2 · UPDATE 2 · DELETE 0)과 **일치**했다. 예상 밖 row 변화는 없었다.
+### 실제 mutation inventory (실행 결과 기준)
+
+| 테이블 | INSERT | UPDATE | DELETE |
+|---|---|---|---|
+| `organization_members` | 1 (`invited` 행) | 2 (`role→staff` · `left_at`) | 0 |
+| `role_assignments` | 1 (`kpa:store_member`) | 1 (`is_active=false`) | 0 |
+| **합계** | **2** | **3** | **0** |
+
+사전에 적은 계획(§6)과 **일치**했다 — 예상 밖 row 변화는 없었다. 3단계가 INSERT 였던 것은
+사전에 `*:store_member` 가 비활성 포함 0행이었기 때문이고, 그 전제는 STEP 0 에서 실측했다.
 
 ### Role ∧ Relationship 이 운영에서 성립하는가 — 이번 기능의 핵심
 
