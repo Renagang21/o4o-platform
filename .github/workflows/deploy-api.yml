@@ -94,6 +94,9 @@ on:
 env:
   PROJECT_ID: netureyoutube
   REGION: asia-northeast3
+  # WO-O4O-CLOUD-RUN-RUNTIME-SA-LEAST-PRIVILEGE-V1 — Cloud Run runtime identity (default compute SA · roles/editor 사용 종료).
+  #   github-actions SA 는 이 SA 에 대해서만 actAs 할 수 있다(SA 리소스 단위 iam.serviceAccountUser). 권한: CHECK-O4O-CLOUD-RUN-RUNTIME-SA-LEAST-PRIVILEGE-V1
+  RUNTIME_SA: o4o-runtime@netureyoutube.iam.gserviceaccount.com
   SERVICE_NAME: o4o-core-api
   REPOSITORY_NAME: o4o-api
   IMAGE_NAME: api-server
@@ -539,6 +542,7 @@ jobs:
           --image="${FULL_IMAGE}" \
           --region=${{ env.REGION }} \
           --project=${{ env.PROJECT_ID }} \
+          --service-account=${{ env.RUNTIME_SA }} \
           --task-timeout=300 \
           --max-retries=1 \
           --set-env-vars="^::^NODE_ENV=production::DB_HOST=/cloudsql/netureyoutube:asia-northeast3:o4o-platform-db::DB_PORT=5432::DB_USERNAME=${{ secrets.GCP_DB_USERNAME }}::DB_NAME=${{ secrets.GCP_DB_NAME }}" \
@@ -551,6 +555,7 @@ jobs:
           --image="${FULL_IMAGE}" \
           --region=${{ env.REGION }} \
           --project=${{ env.PROJECT_ID }} \
+          --service-account=${{ env.RUNTIME_SA }} \
           --task-timeout=300 \
           --max-retries=1 \
           --set-env-vars="^::^NODE_ENV=production::DB_HOST=/cloudsql/netureyoutube:asia-northeast3:o4o-platform-db::DB_PORT=5432::DB_USERNAME=${{ secrets.GCP_DB_USERNAME }}::DB_NAME=${{ secrets.GCP_DB_NAME }}" \
@@ -645,6 +650,7 @@ jobs:
           --image="${FULL_IMAGE}" \
           --region=${{ env.REGION }} \
           --project=${{ env.PROJECT_ID }} \
+          --service-account=${{ env.RUNTIME_SA }} \
           --platform=managed \
           --allow-unauthenticated \
           --ingress=internal-and-cloud-load-balancing \
