@@ -178,4 +178,5 @@ checks 1,713 · investigations 727 · work-orders 149 · ir 33 · 기타 3 (audi
 
 - 발견: SUPERSEDED 정본 3 · 상태 헤더 없는 정본 69 · 계약/정산 공개 적합성 미판정 4 · 과거 보고서 비밀번호 평문 1 파일(계정 5) · Demo 공개 credential ↔ LIFECYCLE-RULES §10-4 충돌 1
 - 정본 수정 2 건 (사용자 확정 2026-10-04): `rules/DOCUMENT-LIFECYCLE-AND-ARCHIVE-RULES-V1` §10-4 Demo 예외 · `baseline/O4O-CANONICAL-DEMO-ACCOUNTS-V1` §4 격리 근거 — 충돌 해소
+- 진입점 포인터 2 건 (사용자 승인 2026-10-04): `CLAUDE.md` DB · 보안 경계 절 · `AGENTS.md` 비밀번호 금지 줄에 "예외는 공개 Demo credential 하나뿐 — 조건은 LIFECYCLE-RULES §10-4" 한 줄씩. 예외 조건은 복제하지 않고 §10-4 를 SSOT 로 둔다
 - 별도 WO 제안 3 건 (§5)

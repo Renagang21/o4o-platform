@@ -224,6 +224,7 @@ verdict: SAFE_TO_REMOVE | KEEP | UNCERTAIN
   운영 데이터 보고는 요약·마스킹한다. 접속·migration 절차는 §7의 정본을 따른다.
 - **이 저장소는 Public이다.** CHECK·WO·IR·주석에 비밀번호(과거·테스트 값 포함)·실제 사용자 이메일·실명·전화번호·실제 약국/사업자명·production 응답 원문을 쓰지 않는다.
   credential은 secret 이름만, 사람은 `[사용자 A]`·`[REDACTED_EMAIL]` 같은 placeholder로 적는다.
+  예외는 정본이 의도적으로 공개한 Demo credential 하나뿐이다 — 조건은 [`DOCUMENT-LIFECYCLE-AND-ARCHIVE-RULES-V1` §10-4](docs/rules/DOCUMENT-LIFECYCLE-AND-ARCHIVE-RULES-V1.md)가 정본.
 
 **진단·debug 안전 경계:**
 
