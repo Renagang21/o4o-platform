@@ -95,7 +95,7 @@ POST /api/ai/request
 
 - 관련 24 suites 1차(기본 worker 수): **23 PASS · 1 FAIL**(`work-agent-recovery-runtime.spec.ts` 2건, 보고 소요 5992 s — 병렬 부하 아래 시간 의존 테스트로 보임). 422 중 420 통과.
 - 같은 spec 단독 재실행 **5/5 PASS 2회** — 이번 변경(결과 객체에 `taskKey` 1필드 추가)으로 재현되지 않음.
-- worker 2개 재실행: 커밋 시점 **진행 중** — 결과는 통합 단계에서 다시 확인한다(미확인을 PASS 로 적지 않는다).
+- worker 2개(`--maxWorkers=2`) 재실행: **24 suites · 422 tests 전부 PASS** — 1차 실패는 병렬 부하 아래 시간 의존 flake 로 판정.
 
 ## 5. 하지 않은 것
 
