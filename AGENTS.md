@@ -119,6 +119,8 @@ O4O Platform repository의 Codex 및 일반 coding agent를 위한 독립 진입
 - 긴 diff 대신 변경 / 검증 / 미해결 / Git 상태 중심으로 보고한다.
 - **조사 전용·무수정 요청은 CHECK/IR 생성이나 commit/push를 완료 조건으로 요구하지 않는다.**
   문서 기록 생성·갱신은 현재 작업 지시에 필요한 경우에만 수행한다.
+- 새 문서의 위치·헤더·CHECK 작성 기준·민감정보 규칙은 [DOCUMENT-LIFECYCLE-AND-ARCHIVE-RULES-V1 §10](docs/rules/DOCUMENT-LIFECYCLE-AND-ARCHIVE-RULES-V1.md)을 따른다.
+  docs의 개인 메일·전화번호·공인 IP는 CI가 막는다(`node scripts/check-doc-sensitive.mjs`).
 - 완료 보고에 **`문서 정합`** 한 줄을 포함한다. 발견이 없으면 `해당 없음`이라고 쓴다.
 
 ## 7. 작업별 canonical 진입점

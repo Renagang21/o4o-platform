@@ -774,6 +774,28 @@ jobs:
           cd apps/api-server && npx jest --maxWorkers=1 $SPECS
         fi
 
+  # Docs 민감정보 guard — WO-O4O-DOCS-SECURITY-SEPARATION-AND-INTAKE-RULES-V1
+  #
+  #   저장소가 Public 이므로 docs 의 개인 메일 · 휴대전화 · 공인 IP 를 막는다. 규칙 본문은
+  #   scripts/check-doc-sensitive.mjs 상단 주석. affected scope 와 무관하게 **항상** 실행한다 —
+  #   docs fast · admin fast · full 어느 경로로 가도 같은 검사를 받는다. 의존성 설치 없이 node 내장 모듈과 git 만 쓴다.
+  docs-sensitive-guard:
+    name: Docs sensitive info guard
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+    - uses: actions/checkout@v6
+      with:
+        sparse-checkout: |
+          /docs/
+          /scripts/check-doc-sensitive.mjs
+        sparse-checkout-cone-mode: false
+    - uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+    - name: Guard docs sensitive info
+      run: node scripts/check-doc-sensitive.mjs
+
   # 최종 CI Gate — WO-O4O-CI-CANONICAL-FINAL-GATE-AND-REQUIRED-CHECK-READINESS-V1
   #
   #   위 job 들은 affected scope 에 따라 서로 배타적으로 skip 되고, matrix job 은 표시 이름이 바뀐다.
@@ -787,7 +809,7 @@ jobs:
   ci-gate:
     name: CI Gate
     runs-on: ubuntu-latest
-    needs: [detect, quality-check, api-tests, build, web-build, docs-fast-validate, admin-fast-validate, admin-fast-guards]
+    needs: [detect, quality-check, api-tests, build, web-build, docs-fast-validate, admin-fast-validate, admin-fast-guards, docs-sensitive-guard]
     if: always()
     timeout-minutes: 5
     steps:

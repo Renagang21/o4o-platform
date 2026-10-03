@@ -1,7 +1,7 @@
 # 문서 생명주기 · archive 규칙 V1
 
 > **WO-O4O-DOCUMENTATION-INDEX-AND-LIFECYCLE-BASELINE-V1**
-> **작성일**: 2026-08-06 · **적용 범위**: `docs/**` 의 추적 `.md` 문서 (2026-08-06 기준 2,952개)
+> **작성일**: 2026-08-06 · **최종 갱신**: 2026-10-03 (§5-5 마스킹 예외 · §10 새 문서 유입 규칙) · **적용 범위**: `docs/**` 의 추적 `.md` 문서 (2026-08-06 기준 2,952개)
 > **성격**: 문서 관리 규칙. `CLAUDE.md` 및 영역별 Freeze/Baseline 문서에 **종속**하며 이를 대체하지 않는다.
 
 ---
@@ -144,6 +144,7 @@ DRAFT → ACTIVE → SUPERSEDED(대체 ADR 명시)
 3. **`CLAUDE.md` 링크 문서 경로 변경 금지.** 옮기려면 `CLAUDE.md` 수정이 필요하고, 그것은 별도 WO 대상이다.
 4. **문서 삭제 금지.** archive 이동만 한다. 삭제는 별도 IR 판정 후에만 수행한다.
 5. **archive 문서 수정 금지.** archive 는 이력이다. 내용이 틀렸으면 현재 문서 쪽을 고친다.
+   - **예외: 민감정보 마스킹.** 개인정보 · 접속 흔적(§10-4)을 `[REDACTED_*]` 로 바꾸는 것은 archive 를 포함한 모든 기록물에 허용한다. 값 외의 본문은 바꾸지 않는다.
 6. **자동 스크립트 일괄 이동 금지.** 후보 산출은 자동화할 수 있으나, 이동은 사람이 트랙 단위로 승인한다.
 7. **archive 를 삭제 대기열로 쓰지 않는다.** archive 는 보존 위치이지 폐기 예정 위치가 아니다.
 
@@ -195,3 +196,58 @@ DRAFT → ACTIVE → SUPERSEDED(대체 ADR 명시)
 - [`../checks/README.md`](../checks/README.md) · [`../investigations/README.md`](../investigations/README.md) · [`../ir/README.md`](../ir/README.md) — 폴더별 진입 문서
 - [`../work-orders/README.md`](../work-orders/README.md) — WO 분류·유지 대상 규칙
 - `../../CLAUDE.md §14` — Frozen Baselines (기준 문서 수정 조건)
+
+---
+
+## 10. 새 문서 유입 규칙
+
+> **WO-O4O-DOCS-SECURITY-SEPARATION-AND-INTAKE-RULES-V1** (2026-10-03). 근거: [`IR-O4O-DOCUMENTATION-CENSUS-AND-SECURITY-CLASSIFICATION-V1`](../investigations/IR-O4O-DOCUMENTATION-CENSUS-AND-SECURITY-CLASSIFICATION-V1.md). 기존 문서를 소급해 고치지 않는다 — **새로 쓰는 문서**에 적용한다.
+
+### 10-1. 위치
+
+| 문서 | 위치 |
+|---|---|
+| 기준 문서 (정책 · 구조 · 절차) | `baseline/` · `architecture/` · `rbac/` · `platform/` · `rules/` · `guides/` |
+| 작업요청서 (WO) | `work-orders/` |
+| 검증 기록 (CHECK) | `checks/` |
+| 조사 기록 (IR) | `investigations/` — `ir/` 에는 새로 쓰지 않는다 (역할 중복) |
+| 결정 기록 | `adr/` |
+
+- 새 최상위 폴더를 만들지 않는다. 서비스 문서는 [`services/README.md`](../services/README.md) 색인에서 찾을 수 있게 한다.
+- 데이터 자산(JSON · CSV · HTML 산출물)의 **새 경로**를 `docs/` 에 만들지 않는다. 기존 경로(`guides/products/**` · `checks/data/**` · `investigations/samples/**`)는 데이터 분리 단계까지 유지한다.
+
+### 10-2. CHECK 는 필요할 때만 쓴다
+
+CHECK 는 아래 중 하나에 해당할 때 작성한다.
+
+1. 운영 반영 증적 — 배포 · migration · 운영 데이터 write 의 결과
+2. 브라우저 · 실계정 smoke 결과
+3. 여러 커밋에 걸친 트랙의 최종 판정
+4. 후속 판단이 필요한 미해결 사항
+
+그 밖의 작업(단건 수정 · 문서 수정 · 작은 리팩토링)은 **커밋 메시지와 PR 설명으로 충분하다.** 같은 트랙의 회차를 문서마다 새로 만들지 않고 기존 CHECK 에 절을 추가한다.
+
+### 10-3. 결과는 정본에 반영한다
+
+WO · CHECK · IR 은 정본이 아니다. 작업 결과가 현행 기준을 바꾸면 해당 기준 문서를 갱신하고, 기록에는 그 기준 문서를 링크한다.
+
+### 10-4. 민감정보
+
+이 저장소는 Public 이다. 아래는 어떤 문서에도 쓰지 않는다.
+
+| 쓰지 않는 것 | 대체 표기 |
+|---|---|
+| 개인 메일 주소 · 실제 사용자 이메일 | `[REDACTED_EMAIL]` (구분이 필요하면 `[REDACTED_EMAIL_A]` …) |
+| 휴대전화 번호 | `[REDACTED_PHONE]` |
+| 공인 IP (접속 IP · 허용 네트워크 · 리소스 IP) | `[REDACTED_IP]` |
+| 비밀번호 · 토큰 · key (과거 · 테스트 값 포함) | secret **이름**만 |
+| 실명 · 실제 약국/사업자명 · production 응답 원문 | `[사용자 A]` 같은 placeholder · 요약 |
+
+- 메일 · 전화 · 공인 IP 는 CI 가 검사한다 — [`scripts/check-doc-sensitive.mjs`](../../scripts/check-doc-sensitive.mjs) (`ci-pipeline.yml` 의 `Docs sensitive info guard`). 로컬에서 `node scripts/check-doc-sensitive.mjs` 로 먼저 확인한다.
+- 나머지(비밀번호 · 실명 · 응답 원문)는 패턴으로 잡히지 않으므로 작성자가 지킨다.
+
+### 10-5. 헤더와 상태
+
+- §6 헤더 형식을 쓴다. 상태는 §2 의 6종(DRAFT · ACTIVE · SUPERSEDED · COMPLETED · ARCHIVED · OBSOLETE)만 쓴다.
+- `DONE` · `CLOSED` · `COMPLETE` · `FINAL` 같은 변형을 새로 쓰지 않는다. 세부 결과(PASS · smoke 대기 등)는 상태 줄이 아니라 본문에 적는다.
+- 파일명에 상태 · 회차(`-FINAL-` · `-CLOSURE-` · `-R3-` 등)를 넣지 않는다.
