@@ -226,6 +226,32 @@ export async function findAnyServiceStoreOrganizationCandidates(
 }
 
 /**
+ * Store Member(사업자가 허가한 사용자)의 매장 후보.
+ *
+ * WO-O4O-STORE-BUSINESS-ENROLLMENT-AND-MEMBER-ACCESS-V1
+ *
+ * `STORE_MEMBER_ROLES`(owner/admin/manager)를 **넓히지 않는다** — 그 집합은 owner 조직 해석이
+ * 쓰는 것이라 값을 더하면 소유 판정까지 같이 넓어진다. Member 는 별도 집합(`'staff'`)으로 본다.
+ *
+ * 인가는 호출 측이 `role_assignments`(`{prefix}:store_member`)로 확인한다 — 이 함수는
+ * **관계 후보만** 돌려준다(Identity V3 §7: Relationship 은 조건, Role 이 권한).
+ */
+export async function findStoreMemberOrganizationCandidates(
+  dataSource: DataSource,
+  userId: string,
+): Promise<StoreOrganizationCandidate[]> {
+  if (!userId) return [];
+  const rows = (await dataSource.query(
+    `SELECT organization_id, role
+       FROM organization_members
+      WHERE user_id = $1 AND left_at IS NULL AND role = 'staff'
+      ORDER BY is_primary DESC, joined_at ASC, organization_id ASC`,
+    [userId],
+  )) as Array<{ organization_id: string; role: string }>;
+  return rows.map((r) => ({ organizationId: r.organization_id, memberRole: r.role }));
+}
+
+/**
  * 매장 조직 확정.
  *
  * @param serviceKey 지정 시 해당 서비스에 등록된 조직만 후보가 된다.

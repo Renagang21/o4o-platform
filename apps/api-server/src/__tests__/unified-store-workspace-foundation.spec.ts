@@ -46,18 +46,27 @@ const memberRow = (organizationId: string, role = 'owner') => ({
 // ─────────────────────────────────────────────────────────────────────────────
 
 describe('resolveAccessibleStores — Store Selector 입력 (WO §3-③)', () => {
-  it('후보 집합은 organization_members(서비스 조건 없음) 이고, 이름은 organizations 에서 붙인다 — 2 질의', async () => {
+  // WO-O4O-STORE-BUSINESS-ENROLLMENT-AND-MEMBER-ACCESS-V1:
+  //   Store Member(사업자가 허가한 사용자)도 자기 매장을 봐야 하므로 후보 질의가 하나 늘었다.
+  //   owner 후보 집합(owner/admin/manager)은 **그대로** 두고 member 후보('staff')를 따로 구한다 —
+  //   그 배열을 넓히면 owner 조직 해석까지 같이 넓어진다.
+  it('후보는 owner · member 두 질의, 이름은 organizations 에서 붙인다 — 3 질의', async () => {
     const { dataSource, calls } = makeDataSource([
       [memberRow(STORE_B), memberRow(STORE_A, 'manager')],
+      [], // member 후보 없음
       [{ id: STORE_A, name: '가나약국' }, { id: STORE_B, name: '다라약국' }],
     ]);
     const stores = await resolveAccessibleStores(dataSource, USER_X);
-    expect(calls).toHaveLength(2);
+    expect(calls).toHaveLength(3);
     expect(norm(calls[0].sql)).toContain('organization_members');
     expect(norm(calls[0].sql)).not.toContain('organization_service_enrollments');
     expect(calls[0].params[0]).toBe(USER_X);
-    expect(norm(calls[1].sql)).toContain('FROM organizations');
-    expect(calls[1].params).toEqual([[STORE_B, STORE_A]]);
+    // owner 후보는 종전 역할 집합 그대로, member 후보는 'staff' 만 본다.
+    expect(calls[0].params[1]).toEqual(['owner', 'admin', 'manager']);
+    expect(norm(calls[1].sql)).toContain('organization_members');
+    expect(norm(calls[1].sql)).toContain("role = 'staff'");
+    expect(norm(calls[2].sql)).toContain('FROM organizations');
+    expect(calls[2].params).toEqual([[STORE_B, STORE_A]]);
     // 자동 선택 없음 — 2개 모두 돌려주고 이름 오름차순
     expect(stores).toEqual([
       { organizationId: STORE_A, organizationName: '가나약국', memberRole: 'manager' },
@@ -68,6 +77,7 @@ describe('resolveAccessibleStores — Store Selector 입력 (WO §3-③)', () =>
   it('이름이 같으면 organizationId 오름차순 · 이름 없는 조직은 빈 문자열', async () => {
     const { dataSource } = makeDataSource([
       [memberRow(STORE_B), memberRow(STORE_A)],
+      [],
       [{ id: STORE_B, name: null }],
     ]);
     const stores = await resolveAccessibleStores(dataSource, USER_X);
@@ -75,9 +85,23 @@ describe('resolveAccessibleStores — Store Selector 입력 (WO §3-③)', () =>
   });
 
   it('접근 가능한 매장 0 이면 organizations 를 조회하지 않고 [] (가입 안내 분기)', async () => {
-    const { dataSource, calls } = makeDataSource([[]]);
+    const { dataSource, calls } = makeDataSource([[], []]);
     expect(await resolveAccessibleStores(dataSource, USER_X)).toEqual([]);
-    expect(calls).toHaveLength(1);
+    // owner · member 후보를 각각 한 번씩만 보고, 비면 organizations 는 건드리지 않는다.
+    expect(calls).toHaveLength(2);
+  });
+
+  it('Member 매장도 목록에 들어간다 — owner 와 합치고 중복은 제거한다', async () => {
+    const { dataSource } = makeDataSource([
+      [memberRow(STORE_A, 'owner')],
+      [{ organization_id: STORE_B, role: 'staff' }, { organization_id: STORE_A, role: 'staff' }],
+      [{ id: STORE_A, name: '가나약국' }, { id: STORE_B, name: '다라약국' }],
+    ]);
+    const stores = await resolveAccessibleStores(dataSource, USER_X);
+    expect(stores).toEqual([
+      { organizationId: STORE_A, organizationName: '가나약국', memberRole: 'owner' },
+      { organizationId: STORE_B, organizationName: '다라약국', memberRole: 'staff' },
+    ]);
   });
 
   it('userId 가 비어 있으면 질의 없이 []', async () => {
@@ -87,7 +111,11 @@ describe('resolveAccessibleStores — Store Selector 입력 (WO §3-③)', () =>
   });
 
   it('응답 필드는 organizationId · organizationName · memberRole 뿐 (§15 최소 필드)', async () => {
-    const { dataSource } = makeDataSource([[memberRow(STORE_A)], [{ id: STORE_A, name: 'A', business_number: 'x' }]]);
+    const { dataSource } = makeDataSource([
+      [memberRow(STORE_A)],
+      [],
+      [{ id: STORE_A, name: 'A', business_number: 'x' }],
+    ]);
     const [s] = await resolveAccessibleStores(dataSource, USER_X);
     expect(Object.keys(s).sort()).toEqual(['memberRole', 'organizationId', 'organizationName']);
   });
