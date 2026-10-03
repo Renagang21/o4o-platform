@@ -506,11 +506,21 @@ test('변경 문서를 raw text 로 읽는 api-server test 가 선별된다 (nes
     checks.includes('src/__tests__/archive-retention-and-tracked-backup-disposition.spec.ts'),
     `archive-retention guard 가 선별되어야 한다: ${checks.join(' ')}`,
   );
-  // top-level 만 훑으면 놓치는 nested consumer (docs/checks/data/ JSON 을 읽는다)
-  assert.ok(
-    checks.includes('src/modules/content-guard/__tests__/liquid-guard.test.ts'),
-    `nested docs consumer 가 선별되어야 한다: ${checks.join(' ')}`,
-  );
+  // top-level 만 훑으면 놓치는 nested consumer — 실제 nested 사례(liquid-guard fixture)는
+  // 2026-10-03 docs 밖으로 옮겨졌으므로 임시 트리로 재귀 탐색 자체를 고정한다.
+  const nestedRoot = mkdtempSync(path.join(tmpdir(), 'o4o-docs-consumer-'));
+  const nestedRel = 'apps/api-server/src/modules/x/__tests__/nested.test.ts';
+  mkdirSync(path.join(nestedRoot, ...path.dirname(nestedRel).split('/')), { recursive: true });
+  writeFileSync(path.join(nestedRoot, ...nestedRel.split('/')), "readFileSync('docs/checks/x.json')\n", 'utf-8');
+  try {
+    assert.deepEqual(
+      selectDocsConsumerSpecs(parseFileList('M\tdocs/checks/CHECK-X.md'), nestedRoot),
+      ['src/modules/x/__tests__/nested.test.ts'],
+      'nested docs consumer 가 선별되어야 한다',
+    );
+  } finally {
+    rmSync(nestedRoot, { recursive: true, force: true });
+  }
 
   const baseline = selectDocsConsumerSpecs(
     parseFileList('M\tdocs/baseline/O4O-SIGNAGE-CANONICAL-PLAYBACK-PATH-V1.md'),

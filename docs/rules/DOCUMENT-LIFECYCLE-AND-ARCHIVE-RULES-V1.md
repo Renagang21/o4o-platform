@@ -214,7 +214,7 @@ DRAFT → ACTIVE → SUPERSEDED(대체 ADR 명시)
 | 결정 기록 | `adr/` |
 
 - 새 최상위 폴더를 만들지 않는다. 서비스 문서는 [`services/README.md`](../services/README.md) 색인에서 찾을 수 있게 한다.
-- 데이터 자산(JSON · CSV · HTML 산출물)의 **새 경로**를 `docs/` 에 만들지 않는다. 기존 경로(`guides/products/**` · `checks/data/**` · `investigations/samples/**`)는 데이터 분리 단계까지 유지한다.
+- 데이터 자산(JSON · CSV · HTML 산출물)을 `docs/` 에 두지 않는다. 스크립트 데이터는 `apps/api-server/src/scripts/data/`(상품 설명 산출물 `product-descriptions/` · 검증 입출력 `check-data/` · 조사 샘플 `investigation-samples/`), 테스트 fixture 는 테스트 옆 `__tests__/fixtures/` 에 둔다 (2026-10-03 분리, `WO-O4O-DOCS-DATA-SEPARATION-AND-PATH-MIGRATION-V1`).
 
 ### 10-2. CHECK 는 필요할 때만 쓴다
 

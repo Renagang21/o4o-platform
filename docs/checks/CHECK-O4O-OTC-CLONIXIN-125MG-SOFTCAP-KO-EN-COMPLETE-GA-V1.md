@@ -34,7 +34,7 @@
 - source_ref `03de1849` 공유 ko canonical **34** (27 target + **7 out**). out 7 EN canonical **LIVE**(uniform md5 `d359211f77019739e5f0ec8d5b46931d`, summary **null**). target 27 기존 EN **0**.
 
 ### 번역 (그룹당 1건 · 검토완료 EN 재사용)
-- 배치 전용 파일: [`otc-en-translations-clonixin-125mg-softcap-v1.json`](../../docs/guides/products/drug/pilot-en-design/translations/otc-en-translations-clonixin-125mg-softcap-v1.json). GUIDE V0.5·GLOSSARY V0.2·TEST-LOG 포함.
+- 배치 전용 파일: [`otc-en-translations-clonixin-125mg-softcap-v1.json`](../../apps/api-server/src/scripts/data/product-descriptions/drug/pilot-en-design/translations/otc-en-translations-clonixin-125mg-softcap-v1.json). GUIDE V0.5·GLOSSARY V0.2·TEST-LOG 포함.
 - **표준 번역 파일에 entry 부재** → 동일 약물 out 7 의 **live en canonical HTML 에서 `DrugOtcEnTranslation` 필드를 역구성**, `buildDrugOtcEnConsumerHtml` 산출 md5 `d359211f` = live out en **byte-identical(diff 0)** 확인 → 검토완료 EN 재사용으로 **ko 에 없는 medical fact 0** 증명.
 - TEST-LOG: `one to two capsules (125–250 mg) three times a day`·다른 소염진통제 병용금지 보존 · 금기(소화성궤양·NSAID 알레르기·CABG·임부·중증 간/신·심부전·IBD) · 주의(고혈압·기관지천식·간/신) — 대상·강도 보존.
 

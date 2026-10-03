@@ -22,10 +22,10 @@ WO: `WO-O4O-OTC-EN-DESIGN-PILOT-VALIDATION-V1` · 일자: 2026-07-15 · 상태: 
 
 | 산출물 | 위치 |
 |---|---|
-| 영문 번역 시안 5건 | [pilot-en-design/TRANSLATION-DRAFTS-V1.md](../guides/products/drug/pilot-en-design/TRANSLATION-DRAFTS-V1.md) |
-| `sd-*` HTML 시안 5건 | [pilot-en-design/drafts/](../guides/products/drug/pilot-en-design/drafts/) |
-| 측정 원본 (20건) | [evidence/measurements-v1.json](../guides/products/drug/pilot-en-design/evidence/measurements-v1.json) |
-| 잘림 증거 스크린샷 | [evidence/P-3-...png](../guides/products/drug/pilot-en-design/evidence/P-3-long-english-word-clipped-375px.png) |
+| 영문 번역 시안 5건 | [pilot-en-design/TRANSLATION-DRAFTS-V1.md](../../apps/api-server/src/scripts/data/product-descriptions/drug/pilot-en-design/TRANSLATION-DRAFTS-V1.md) |
+| `sd-*` HTML 시안 5건 | [pilot-en-design/drafts/](../../apps/api-server/src/scripts/data/product-descriptions/drug/pilot-en-design/drafts/) |
+| 측정 원본 (20건) | [evidence/measurements-v1.json](../../apps/api-server/src/scripts/data/product-descriptions/drug/pilot-en-design/evidence/measurements-v1.json) |
+| 잘림 증거 스크린샷 | [evidence/P-3-...png](../../apps/api-server/src/scripts/data/product-descriptions/drug/pilot-en-design/evidence/P-3-long-english-word-clipped-375px.png) |
 | 번역 TEST-LOG | [OTC-EN-TRANSLATION-TEST-LOG §3](../guides/OTC-EN-TRANSLATION-TEST-LOG.md) T-1~T-5 |
 | 디자인 TEST-LOG | [OTC-DESCRIPTION-DESIGN-TEST-LOG §2·§4](../guides/OTC-DESCRIPTION-DESIGN-TEST-LOG.md) D-1~D-5 |
 

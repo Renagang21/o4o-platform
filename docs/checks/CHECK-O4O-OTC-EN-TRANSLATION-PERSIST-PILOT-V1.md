@@ -104,7 +104,7 @@ uniq_shared_product_descriptions_canonical_per_master_type_lang
 | 1024 | 996 | 3열 | ✅ |
 | 1280 | 1252 | 3열 | ✅ |
 
-증거: [EN-PERSIST-dexibuprofen-375px.png](../guides/products/drug/pilot-en-design/evidence/EN-PERSIST-dexibuprofen-375px.png)
+증거: [EN-PERSIST-dexibuprofen-375px.png](../../apps/api-server/src/scripts/data/product-descriptions/drug/pilot-en-design/evidence/EN-PERSIST-dexibuprofen-375px.png)
 
 > **§8-D 수정 효과 확인**: `Saccharomyces boulardii`·`Dexibuprofen` 등 긴 영문 성분명이 **잘림 없이 줄바꿈**.
 > `summaryTable` 6항목 → `sd-core` 6 item → **3열 2행 정확히 채움**(빈 칸 0).

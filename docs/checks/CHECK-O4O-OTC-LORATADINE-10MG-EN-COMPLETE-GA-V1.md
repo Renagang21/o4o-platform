@@ -22,7 +22,7 @@
 
 ## 2. 번역 (그룹당 1건 · 충실 번역)
 
-- 배치 전용 파일: [`otc-en-translations-loratadine-10mg-v1.json`](../../docs/guides/products/drug/pilot-en-design/translations/otc-en-translations-loratadine-10mg-v1.json) (공유 파일 미수정).
+- 배치 전용 파일: [`otc-en-translations-loratadine-10mg-v1.json`](../../apps/api-server/src/scripts/data/product-descriptions/drug/pilot-en-design/translations/otc-en-translations-loratadine-10mg-v1.json) (공유 파일 미수정).
 - GUIDE `V0.5` · GLOSSARY `V0.2` · TEST-LOG(수치·용량·연령경계·금기·병용금기 대조) 포함.
 - 번역 = grounded ko canonical(source_ref `0a7dee0b`) 충실 번역. **동일 약물 out 13 의 검증본(`otc-en-translations-v1.json` 로부터 verbatim 채용)** — `buildDrugOtcEnConsumerHtml` 산출 md5 `056512e1…` = live out en **byte-identical** → **ko 에 없는 medical fact 0** 증명.
 - TEST-LOG 요지: `10 mg / once a day` · `6 to under 12 · 30 kg 경계 / half a tablet` 수치 보존 · 금기 `Do not take this if …`(과민·6세미만·임부/수유·유전질환) 강도 보존 · 주의 `Talk to a pharmacist before …`(간·신) · 병용금기(cimetidine·erythromycin·ketoconazole) 대상 보존.

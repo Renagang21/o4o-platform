@@ -211,7 +211,7 @@ en 발췌: `The labelled standard for this product is at least 200 million CFU o
 
 ## 6. 범위 밖 · 후속
 
-- **복합형(MULTI_FUNCTIONAL)** 은 별건([복합형 파일럿](../guides/products/health-functional-food/pilot-multi-fiber/)) — 본 WO 무관.
+- **복합형(MULTI_FUNCTIONAL)** 은 별건([복합형 파일럿](../../apps/api-server/src/scripts/data/product-descriptions/health-functional-food/pilot-multi-fiber/)) — 본 WO 무관.
 - SOURCE_ABNORMAL / GROUNDING(원문 의존) 은 원문 정정·보완 트랙(본 WO 무관).
 - 타 기능성 그룹(면역·항산화 등)의 액상은 이 8건 확장 검증 후 동일 모델로 편입 검토.
 - ProductMaster·SPD·canonical 저장은 승인·이중게이트 후 별도(F12 baseline · HFF-R10).

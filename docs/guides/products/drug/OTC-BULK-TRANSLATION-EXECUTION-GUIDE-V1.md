@@ -55,7 +55,7 @@
 | Rule | CR-004·AR-002 위반 | CR-002 원문 우선 준수 |
 
 - **판별 기준 = "이 산출물이 ko canonical 에 없는 새 medical fact 를 만드는가?"** → YES 면 금지(초안 창작), NO(의미 보존 형식 변환)면 허용(번역).
-- 번역은 GUIDE/GLOSSARY(§3-3) + TEST-LOG 수치·금기 대조 검수(§3-6) + 이중 게이트(§6)를 거친다. `translatorNote`·`bodyMarkdown` 주석은 소비자 비노출이되 **번역자는 반드시 열람**(오역·안전정보 소실 방지, [TRANSLATION-DRAFTS-V1 §6](pilot-en-design/TRANSLATION-DRAFTS-V1.md)).
+- 번역은 GUIDE/GLOSSARY(§3-3) + TEST-LOG 수치·금기 대조 검수(§3-6) + 이중 게이트(§6)를 거친다. `translatorNote`·`bodyMarkdown` 주석은 소비자 비노출이되 **번역자는 반드시 열람**(오역·안전정보 소실 방지, [TRANSLATION-DRAFTS-V1 §6](../../../../apps/api-server/src/scripts/data/product-descriptions/drug/pilot-en-design/TRANSLATION-DRAFTS-V1.md)).
 
 ### 0-B-3. 수치·금기·주의·첨가제 보존 게이트 (요약)
 
