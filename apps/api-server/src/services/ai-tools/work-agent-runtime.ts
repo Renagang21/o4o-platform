@@ -579,6 +579,11 @@ export interface WorkAgentRunResult {
   target: WorkTargetOutcome | null;
   /** PHASE 2 — 이 run 의 Workflow 재생/저장 요약(enum · 개수만). 없으면 Workflow 경로를 타지 않은 run. */
   workflow?: WorkflowRunSummary;
+  /**
+   * Personal Assistant Phase A — planner 가 선언한 provisional Task type(TASK_KEY_RE 구조 키) 또는 null.
+   * Assistant 가 Task 에 올리는 용도다(HTTP 응답에는 싣지 않는다). 원문 · 값이 아니다.
+   */
+  taskKey?: string | null;
 }
 
 /**
@@ -989,6 +994,7 @@ export async function runWorkAgent(
       message: renderWorkAgentMessage(state, displayName, neededInput, targetOutcome, resumable),
       target: targetOutcome,
       workflow: { ...workflow },
+      taskKey: declaredTask ?? resumeFrame?.taskKey ?? null,
     };
   };
   /** QUESTION — AI 가 막혀 사용자 판단/답이 필요하다. logical run 유지 · 답하면 같은 runId 로 재개(§조건 5·검증 A). */
