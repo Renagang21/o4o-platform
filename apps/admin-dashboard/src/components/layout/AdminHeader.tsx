@@ -1,6 +1,6 @@
 
 import { useState, useEffect, FC } from 'react';
-import { Menu, Bell, User, LogOut, Settings as SettingsIcon, Shield, Clock } from 'lucide-react';
+import { Menu, User, LogOut, Settings as SettingsIcon, Shield, Clock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth, buildAccountDisplayInfo } from '@o4o/auth-context';
 import toast from 'react-hot-toast';
@@ -145,14 +145,6 @@ const AdminHeader: FC<AdminHeaderProps> = ({ onMenuClick }) => {
             <Clock className="w-3 h-3" />
             <span>세션: {getSessionStatusText()}</span>
           </div>
-
-          {/* Notifications */}
-          <button className="p-2 rounded-md text-o4o-text-secondary hover:text-o4o-text-primary hover:bg-o4o-bg-tertiary relative">
-            <Bell className="w-6 h-6" />
-            <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
-              3
-            </span>
-          </button>
 
           {/* User menu */}
           <DropdownMenu>
