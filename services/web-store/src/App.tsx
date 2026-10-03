@@ -24,6 +24,9 @@ import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import HandoffPage from './pages/HandoffPage';
 import StoreSelectorPage from './pages/StoreSelectorPage';
+// WO-O4O-STORE-BUSINESS-ENROLLMENT-AND-MEMBER-ACCESS-V1
+import StoreMembersPage from './pages/StoreMembersPage';
+import StoreInvitationsPage from './pages/StoreInvitationsPage';
 import MyServicesPage from './pages/MyServicesPage';
 import SettingsPage from './pages/SettingsPage';
 import { WORKSPACE_PATHS } from './config/workspace';
@@ -213,6 +216,10 @@ function storeChildRoutes() {
         <Route path="marketing/signage/videos" element={<StoreSignagePage />} />
         <Route path="marketing/signage/schedules" element={<StoreSignagePage />} />
         <Route path="marketing/signage/player" element={<SignagePlayerSelectPage />} />
+        {/* 매장 구성원 — Owner 전용 화면. 권한은 서버가 판정한다(StoreOwnerOnly 는 화면 가드일 뿐) */}
+        <Route path="members" element={<StoreOwnerOnly><StoreMembersPage /></StoreOwnerOnly>} />
+        {/* 받은 초대 수락 — Owner 가 아닌 사용자도 열 수 있어야 한다 */}
+        <Route path="invitations" element={<StoreInvitationsPage />} />
         {/* 분석 */}
         <Route path="analytics/marketing" element={<MarketingAnalyticsPage />} />
         <Route path="analytics" element={<Navigate to={`${S}/analytics/marketing`} replace />} />

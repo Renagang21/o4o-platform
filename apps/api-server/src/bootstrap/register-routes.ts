@@ -971,6 +971,18 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
     // 31-d-2. Register Work Scope routes (WO-O4O-WORK-SCOPE-STORE-RESOLUTION-V0)
     //   cross-service read-only scope 해석. serviceKey 가 파라미터라 특정 서비스
     //   membership 가드를 걸지 않고 핸들러가 요청 serviceKey 로 직접 확인한다.
+    // WO-O4O-STORE-BUSINESS-ENROLLMENT-AND-MEMBER-ACCESS-V1:
+    //   매장 구성원(Store Member) 초대 · 수락 · 해제. 쓰기 경로의 조직은 요청이 고르지 않고
+    //   `isStoreOwner()` 해석 결과만 쓴다 — 다른 매장 id 를 넣어도 자기 매장 밖으로 못 나간다.
+    try {
+      const { createStoreMembershipRoutes } = await import('../routes/store/store-membership.routes.js');
+      const { requireAuth: storeMembershipAuth } = await import('../middleware/auth.middleware.js');
+      app.use('/api/v1/store', createStoreMembershipRoutes(dataSource, storeMembershipAuth as any));
+      logger.info('✅ Store Membership routes registered at /api/v1/store/members · /invitations');
+    } catch (storeMembershipError) {
+      logger.error('Failed to register Store Membership routes:', storeMembershipError);
+    }
+
     try {
       const { createWorkScopeRoutes } = await import('../routes/work-scope.routes.js');
       const { requireAuth: workScopeAuth } = await import('../middleware/auth.middleware.js');
