@@ -11,7 +11,8 @@
 ## 0. 판정
 
 ```text
-STATE                     = READY_TO_INTEGRATE  (main 미통합 · 배포 0 · production migration 0)
+STATE                     = DEPLOYED · PRODUCTION_SMOKE PARTIAL (2026-10-03 · §7) — Task 생성 PASS · run↔task 연결 production 관찰 PENDING (실 PC + 확장 연결 필요)
+(이전 판정)                = READY_TO_INTEGRATE  (main 미통합 · 배포 0 · production migration 0)
 ASSISTANT_ENTITY          = NONE (논리 계층 · Assistant = f(userId))
 TASK_PERSISTENCE          = assistant_tasks (신규) + work_run_coordination.task_id (nullable · additive)
 TASK_RUN_RELATION         = Task 1 : N run · run 1 : N segment (현행 유지)
@@ -110,5 +111,23 @@ main merge · production migration · 배포 · 실 PC smoke · worktree 제거 
    POST assertion `42e44a34…`(5972) PASS 확인 → API verified rollout.
 4. 배포 후 smoke: work 요청 1건 → 응답 `taskId` · `assistant_tasks` 1행(구조만) · run `task_id` 연결 (read-only 확인).
 5. 웹 클라이언트는 `taskId` 를 아직 쓰지 않는다(additive · 기존 동작 불변). 재시도 시 같은 Task 이어가기는 후속 클라이언트 작업.
+
+## 7. 통합 · 배포 · production 검증 (2026-10-03)
+
+| 단계 | 결과 |
+|---|---|
+| 통합 준비 | 새 worktree `../o4o-wt/pa-phase-a` (첫 경로의 미완성 디렉터리는 보존 · housekeeping 대상). main 앞선 5 commit = docs 데이터 이동 · 스크립트 경로(migration 0 · Phase A 파일 겹침 0) → fingerprint 재산출 불필요. `git merge origin/main` 충돌 0 |
+| 재검증 | Phase A 4 spec + unified-request-http + incremental 분리 계약 — 5 suites · 68 tests PASS |
+| main 통합 | ff push `193173237` (owner 경로 · AGENTS.md §4-1(e)) · CI Pipeline · CodeQL success |
+| Delivery | `HELD_LEVEL_3` — api(L3 · db-migration) 자동 배포 차단 · web/admin LEVEL 1 NO_DEPLOY |
+| 승인 · SHA | 소유자 승인 `193173237` → 실행 직전 main HEAD 가 `35979b119`(PR #274 · 문서 · 주석 · spec, migration 0)로 이동 → promote 미실행 · 재승인 `35979b119` |
+| promote | run `37123488762` success — CI gate PASS · migration Job `o4o-api-migrations-wmj9s` success · API revision `o4o-core-api-03804-viw` verified 전환 · kpa-branch-web `00184-pef`(PR #274 주석 변경분) 전환 · serving = `35979b119` |
+| migration | `INCREMENTAL_PENDING = 1` → `INCREMENTAL_EXECUTED = 1` (`CreateAssistantTasks1791012819443` 만) · PRE assertion PASS(`09d5a917…` 5944) · POST assertion PASS · LIVE == EXPECTED `42e44a34…` (5972) |
+| health | `/health/ready` 200 (rollout 직후 workflow 검사 + 수동 재확인) |
+| smoke — 요청 | Demo 매장 경영자 계정(email 로그인 · `user.demo.isDemo=true`) · `POST /api/ai/request` work 요청 2회 → **403 `WORK_AGENT_NOT_AVAILABLE` (`CAPABILITY_MISSING`) + 응답 최상위 `taskId`** — "403 에도 taskId" 계약 일치 |
+| smoke — DB (read-only) | `assistant_tasks` 컬럼 12 = §1 설계와 일치 · 원문 컬럼 없음 · `work_run_coordination.task_id` uuid NULL 허용 · 행 2 = smoke 2회(`blocked` · `USER` · 같은 요청자 1명 · organization/service/target/task_type 전부 NULL) |
+| run↔task 연결 | **production 미관찰** — 이 계정에 연결된 Local Agent · 확장이 없어 run 이 생성되지 않음(`runs_with_task = 0`). 격리 PG 실DB 9/9(§4)로만 검증됨. 실 PC smoke 는 공유 자원(AGENTS.md §4-1(g)(h))이라 이번에 수행하지 않음 |
+
+smoke 가 만든 production 행: `assistant_tasks` 2행(구조만 · 원문 없음). 삭제하지 않았다.
 
 `문서 정합: 해당 없음`
