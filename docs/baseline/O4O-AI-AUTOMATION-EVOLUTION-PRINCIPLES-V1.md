@@ -6,9 +6,9 @@
 > 기능 구현 문서가 아니며, 개별 WO/CHECK 는 이 문서의 원칙 아래에 놓인다.
 
 *Status: Active Baseline*
-*Date: 2026-09-12*
+*Date: 2026-09-12 · 부분 개정 2026-10-03 (`WO-O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2-CANONICALIZATION` — §5 원격 요청 인계 · §7 주석 Ownership-first · §14 Task type/Skill · §24 Local Work Agent 행 · 하위 정본 포인터. 핵심 원칙 세 문장 불변)*
 *상위 문서: [`CLAUDE.md`](../../CLAUDE.md) · [`O4O-BUSINESS-PHILOSOPHY-V1`](O4O-BUSINESS-PHILOSOPHY-V1.md) §6 (AI 의 역할) · [`O4O-3-ROLE-FLOW-BASELINE-V1`](O4O-3-ROLE-FLOW-BASELINE-V1.md) §5 (AI 개입)*
-*하위 문서: §24 표의 자동화 계열 WO/CHECK*
+*하위 정본: [`O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2`](O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2.md) (구조 — Personal Work Assistant) → [`O4O-AUTOMATION-EXPERIENCE-MODEL-V1`](O4O-AUTOMATION-EXPERIENCE-MODEL-V1.md) (Experience) · §24 표의 자동화 계열 WO/CHECK*
 
 ---
 
@@ -79,6 +79,8 @@ AI 가 사이트에서 작업 → 원하는 결과 화면까지 이동 → 그 �
 
 AI 요약 화면만 보여주고 원본 업무 화면을 숨기는 구조는 기본값이 아니다. 사용자는 필요하면 바로 추가 작업을 한다.
 
+> **원격 요청 (2026-10-03)** — 요청한 기기와 실행 노드가 다를 때(예: 휴대폰 · 메신저로 요청 → 사무실 PC 에서 실행)는 실제 화면을 그 자리에서 인계할 수 없다. 이때 기본값은 **결과 요약 + 실행 노드의 실제 화면으로 가는 경로**(노드에 결과 화면을 열어 둔 채 유지)다. 요약만 남기고 원본 화면을 닫지 않는다 — [`PERSONAL-ASSISTANT-ARCHITECTURE-V2`](O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2.md) §12.
+
 ## §6. 사용자 Takeover 는 실패가 아니다
 
 사용자가 AI 작업 이후 직접 이어서 작업하는 것은 실패가 아니라 **중요한 학습 신호**다.
@@ -97,7 +99,9 @@ O4O 가 학습할 것은 민감한 업무 내용이 아니라 **구조적 이벤
 |---|---|
 | target · workflow goal · entryPoint · automation steps · takeover step · user correction count · completion state · duration · success/failure | 환자정보 · 처방내용 · 비밀번호 · OTP · 전체 화면 내용 · 사이트 전체 데이터 · 민감한 입력값 |
 
-> 구조적 경험의 저장 위치는 사용자 PC(Local) 다. 서버는 Local 원장을 read-back · 동기화하지 않으며, 현재 업무 수행을 위한 **질의형 recall**(제한된 조건 질의 → Local 이 최소 구조만 반환)만 허용한다 — [`O4O-AUTOMATION-AGENT-ARCHITECTURE-V1`](O4O-AUTOMATION-AGENT-ARCHITECTURE-V1.md) §5-1 · 기록 단위는 [`O4O-AUTOMATION-EXPERIENCE-MODEL-V1`](O4O-AUTOMATION-EXPERIENCE-MODEL-V1.md). (2026-10-01)
+> **저장 위치 — Ownership-first / Purpose-based Placement (2026-10-03 개정)**: 구조적 경험은 실행 위치가 아니라 **그 의미의 소유 주체**(organization · user · run)에 귀속되고, 실행 노드(PC 등)에는 credential · 로그인 세션 · 현재 화면 · 로컬 파일 경로 같은 실행환경 상태만 둔다. Cloud-first 로의 반전이 아니며, 위 표의 "수집하지 않는다(내용)" 와 구조만 남기는 원칙은 저장 위치와 무관하게 그대로다. 실제 저장 위치 이동은 Legal / Data Processing Gate 통과 후에만 한다 — [`PERSONAL-ASSISTANT-ARCHITECTURE-V2`](O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2.md) §9 · §17. 기록 단위는 [`O4O-AUTOMATION-EXPERIENCE-MODEL-V1`](O4O-AUTOMATION-EXPERIENCE-MODEL-V1.md).
+>
+> ~~구조적 경험의 저장 위치는 사용자 PC(Local) 다. 서버는 Local 원장을 read-back · 동기화하지 않으며, 질의형 recall 만 허용한다 (2026-10-01)~~ — Local-first 는 V2 에서 폐기됐다.
 
 ## §8. 여러 사용자 경험을 비교한다
 
@@ -135,13 +139,13 @@ AI = 발견 / 판단 / 예외 대응        O4O Runtime = 검증된 실행
 
 이는 [`AUTOMATION-EXECUTION-LAYER`](../checks/CHECK-O4O-AUTOMATION-EXECUTION-LAYER-REALIGNMENT-V1.md) 의 **Deterministic First**(api → browser_dom → windows_uia → computer_use) 와 같은 방향이다.
 
-> API · WebMCP · Browser DOM · Windows UIA · Computer Use · RPA · Script 는 모두 **실행 수단**이다. RPA 는 AI Automation 과 경쟁하는 별도 개념이 아니라 AI Automation 이 고를 수 있는 실행 수단 중 하나다 — 자동화 전체 순환은 [`ARCHITECTURE`](O4O-AUTOMATION-AGENT-ARCHITECTURE-V1.md) §8 항목 6. (2026-10-01)
+> API · WebMCP · Browser DOM · Windows UIA · Computer Use · RPA · Script 는 모두 **실행 수단**이다. RPA 는 AI Automation 과 경쟁하는 별도 개념이 아니라 AI Automation 이 고를 수 있는 실행 수단 중 하나다 — [`PERSONAL-ASSISTANT-ARCHITECTURE-V2`](O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2.md) §11-3. (2026-10-01 · 포인터 2026-10-03)
 
 ## §12. 초기 비용과 속도
 
 새로운 사이트/프로그램/업무에서는 초기에 `AI 호출 많음 · 화면 관찰 많음 · 잘못된 경로 진입 · 사용자 takeover 많음 · 속도 느림 · 비용 높음` 이 발생할 수 있다. 이는 허용한다. 단순 운영 낭비가 아니라 **Workflow 를 발견하기 위한 학습 비용**이다.
 
-> **사용자 편의성과 업무 성공 가능성이 AI 비용보다 우선한다.** 비용을 줄이려고 사용자에게 자세한 prompt · AI 모델 선택 · 절차 사전 구조화를 요구하거나 불필요한 실패를 허용하지 않는다. 비용은 "한 번 비싸게 해결한 문제를 계속 비싸게 풀지 않는 것" 으로 낮춘다 — [`ARCHITECTURE`](O4O-AUTOMATION-AGENT-ARCHITECTURE-V1.md) §2-3 · §7-2. 사용자 교정 · 매뉴얼 · 공식 웹 Knowledge 의 기록 단위는 [`EXPERIENCE-MODEL`](O4O-AUTOMATION-EXPERIENCE-MODEL-V1.md) §7-5 · §7-6 · §8-1~8-4. (2026-10-01)
+> **사용자 편의성과 업무 성공 가능성이 AI 비용보다 우선한다.** 비용을 줄이려고 사용자에게 자세한 prompt · AI 모델 선택 · 절차 사전 구조화를 요구하거나 불필요한 실패를 허용하지 않는다. 비용은 "한 번 비싸게 해결한 문제를 계속 비싸게 풀지 않는 것" 으로 낮춘다 — [`PERSONAL-ASSISTANT-ARCHITECTURE-V2`](O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2.md) §5-3 · §8-3. 사용자 교정 · 매뉴얼 · 공식 웹 Knowledge 의 기록 단위는 [`EXPERIENCE-MODEL`](O4O-AUTOMATION-EXPERIENCE-MODEL-V1.md) §7-5 · §7-6 · §8-1~8-4. (2026-10-01)
 
 ## §13. 시간이 갈수록 개선되어야 한다
 
@@ -152,6 +156,8 @@ AI = 발견 / 판단 / 예외 대응        O4O Runtime = 검증된 실행
 O4O 운영자가 수백 개 사이트/프로그램을 일일이 조사하여 "이 사이트의 주요 기능 5개 · 이 프로그램의 핵심 업무 8개" 를 미리 정하는 구조를 **기본으로 하지 않는다**. 그 방식은 수백 개 서비스 수동 조사 · 지속 유지보수 · 사전 기획 의존 · SI 화로 이어진다.
 
 > 등재부(EntryPoint Registry 등)는 **검증된 Workflow 의 저장 형태**다. 첫 사이트를 여는 최소 seed 는 허용하지만, 그 이후의 확장은 §15 의 실제 사용에서 나와야 한다.
+>
+> **Task type · Skill (2026-10-03)**: Personal Assistant 의 Task type 과 Skill 도 같다. 이름 붙은 Task type · Skill 은 운영자가 미리 정하는 목록이 아니라 실제 사용 → Experience → 검증 승격으로 생기며, Skill registry 는 승격된 Experience 의 저장 형태다. 기존 결정론 adapter 는 seed 다. 등록된 Skill 개수는 §22 의 지표가 아니다 — [`PERSONAL-ASSISTANT-ARCHITECTURE-V2`](O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2.md) §4-4 · §7.
 
 ## §15. 실제 사용이 우선순위를 만든다
 
@@ -225,7 +231,7 @@ Workflow 는 고정된 영구 규칙이 아니다. 사이트가 변하거나 더
 
 | 계열 | 문서 | 이 원칙과의 관계 |
 |---|---|---|
-| Local Work Agent | [`CHECK-O4O-LOCAL-WORK-AGENT-V0`](../checks/CHECK-O4O-LOCAL-WORK-AGENT-V0.md) · [`…-ONECLICK-PAIRING-V1`](../checks/CHECK-O4O-LOCAL-WORK-AGENT-ONECLICK-PAIRING-V1.md) | §5·§7 — 사용자 PC 에서 사용자 세션으로 실행, credential 불수집 |
+| Local Work Agent | [`CHECK-O4O-LOCAL-WORK-AGENT-V0`](../checks/CHECK-O4O-LOCAL-WORK-AGENT-V0.md) · [`…-ONECLICK-PAIRING-V1`](../checks/CHECK-O4O-LOCAL-WORK-AGENT-ONECLICK-PAIRING-V1.md) | §5·§7 — 사용자 PC 에서 사용자 세션으로 실행, credential 불수집. V2 에서 **Execution Node** 로 재배치(기억의 소유자 아님 — [V2](O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2.md) §9 · §11) |
 | AI Capability / Tool Routing | [`CHECK-O4O-AI-CAPABILITY-TOOL-ROUTING-V0`](../checks/CHECK-O4O-AI-CAPABILITY-TOOL-ROUTING-V0.md) | §10·§11 — AI 는 판단, runtime 이 검증·실행 |
 | Automation Execution Layer | [`CHECK-O4O-AUTOMATION-EXECUTION-LAYER-REALIGNMENT-V1`](../checks/CHECK-O4O-AUTOMATION-EXECUTION-LAYER-REALIGNMENT-V1.md) | §11 — Deterministic First, computer_use 는 마지막 fallback |
 | Browser Control · DOM · Chrome Bridge | [`CHECK-O4O-BROWSER-CONTROL-V0`](../checks/CHECK-O4O-BROWSER-CONTROL-V0.md) · [`CHECK-O4O-BROWSER-DOM-CONTROL-V0`](../checks/CHECK-O4O-BROWSER-DOM-CONTROL-V0.md) · [`CHECK-O4O-CHROME-EXTENSION-NATIVE-BRIDGE-V0`](../checks/CHECK-O4O-CHROME-EXTENSION-NATIVE-BRIDGE-V0.md) | §5 — 사용자의 실제 탭에서 실행하고 그 화면을 남긴다 |
@@ -238,7 +244,7 @@ Workflow 는 고정된 영구 규칙이 아니다. 사이트가 변하거나 더
 ## §25. 현행 구현과의 정렬 상태 — 충돌 · 격차 (2026-09-12 조사 · 2026-10-01 갱신)
 
 코드 · 아키텍처를 임의로 바꾸지 않는다. 아래는 **보고**이며 각 항목은 후속 WO 의 입력이다.
-2026-10-01 갱신 근거: [`IR-O4O-AUTOMATION-AGENT-ARCHITECTURE-REALIGNMENT-V1`](../investigations/IR-O4O-AUTOMATION-AGENT-ARCHITECTURE-REALIGNMENT-V1.md) census. 계층별 구현 방향은 하위 정본 [`O4O-AUTOMATION-AGENT-ARCHITECTURE-V1`](O4O-AUTOMATION-AGENT-ARCHITECTURE-V1.md) 이 정한다.
+2026-10-01 갱신 근거: [`IR-O4O-AUTOMATION-AGENT-ARCHITECTURE-REALIGNMENT-V1`](../investigations/IR-O4O-AUTOMATION-AGENT-ARCHITECTURE-REALIGNMENT-V1.md) census. 계층별 구현 방향은 하위 정본 [`O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2`](O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2.md) 이 정한다(2026-10-03 — [`ARCHITECTURE-V1`](O4O-AUTOMATION-AGENT-ARCHITECTURE-V1.md) SUPERSEDED). 아래 표의 "ARCHITECTURE §n" 은 작성 시점 기록이며 현재 위치는 V2 §21 승계표로 찾는다.
 
 ### 25-1. 2026-09-12 항목의 현재 상태
 

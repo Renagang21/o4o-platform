@@ -3,7 +3,8 @@
 > **상태**: ACTIVE — Experience 개념 모델 · 저장 계약 정본 (`CANONICAL-INDEX` §6)
 > **작성일**: 2026-10-01 · **최종 갱신**: 2026-10-01 (사용자 검토 D1~D8 확정 · DRAFT → ACTIVE · `WO-O4O-AI-AUTOMATION-PRINCIPLES-USER-CORRECTION-KNOWLEDGE-AND-MODEL-ROUTING-ALIGNMENT-V1`: §7-5 User Correction · §7-6 Preferred/Avoid Pattern · §8-1~8-4 Knowledge 출처 · Manual · 공식 웹 Knowledge · Knowledge Watch · 사례 D · §20 순서 보강)
 > **근거 WO**: `WO-O4O-AUTOMATION-CANONICAL-ENTRYPOINT-ALIGNMENT-AND-EXPERIENCE-MODEL-DESIGN-V1` Phase B (= `WO-O4O-AUTOMATION-EXPERIENCE-MODEL-DESIGN-V1`)
-> **상위 정본**: [`O4O-AUTOMATION-AGENT-ARCHITECTURE-V1`](O4O-AUTOMATION-AGENT-ARCHITECTURE-V1.md) §4 (Experience as Asset) · §5 (Local/Shared) · §9 (Promotion) — 그 위 [`O4O-AI-AUTOMATION-EVOLUTION-PRINCIPLES-V1`](O4O-AI-AUTOMATION-EVOLUTION-PRINCIPLES-V1.md)
+> **상위 정본**: [`O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2`](O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2.md) §6 (Experience 계층화) · §7 (Skill) · §8 (Promotion) · §9 (Memory Ownership) · §10 (Shared) — 그 위 [`O4O-AI-AUTOMATION-EVOLUTION-PRINCIPLES-V1`](O4O-AI-AUTOMATION-EVOLUTION-PRINCIPLES-V1.md). (2026-10-03 변경 · 종전 상위 [`AGENT-ARCHITECTURE-V1`](O4O-AUTOMATION-AGENT-ARCHITECTURE-V1.md) 은 SUPERSEDED)
+> **V2 정합 개정 (2026-10-03)**: 아래 "V2 정합" 절이 이 문서의 해당 조항보다 우선한다. 본문의 "ARCHITECTURE §n" 참조는 작성 시점 기록이며 현재 위치는 [V2 §21 승계표](O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2.md)로 찾는다.
 > **근거 census**: [`IR-O4O-AUTOMATION-AGENT-ARCHITECTURE-REALIGNMENT-V1`](../investigations/IR-O4O-AUTOMATION-AGENT-ARCHITECTURE-REALIGNMENT-V1.md) §3·§5 + 이 문서 부록 A 의 코드 재확인
 > **성격**: **개념 모델 + 저장 계약**. DB 테이블 · enum · API · 구현이 아니다. 이름은 의미를 고정하기 위한 것이며 코드 식별자는 구현 WO 가 정한다.
 
@@ -14,6 +15,21 @@
 > **오늘 사용자가 Agent 에게 무언가를 가르쳐 줬다면, 내일 Agent 는 무엇을 알고 있어야 같은 질문을 하지 않는가?**
 
 더 넓게: 한 번의 실행에서 무엇을 남겨야 다음 실행이 **더 빠르고 · 더 정확하고 · 사용자 도움이 적고 · AI 비용이 낮아지는가**.
+
+### 0-1. V2 정합 (2026-10-03 · `WO-O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2-CANONICALIZATION`)
+
+[`PERSONAL-ASSISTANT-ARCHITECTURE-V2`](O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2.md) ACTIVE 에 맞춰 아래 조항을 이렇게 읽는다. 개념 모델(§1~§14)과 D2~D8 은 그대로 유효하다.
+
+| 조항 | V2 이후 |
+|---|---|
+| **D1 질의형 recall** (§21) | **유일한 사용 방식이 아니다.** Experience 의 저장 위치는 V2 §9 Ownership-first(organization · user · run · node)로 정한다. Experience 가 실행 노드에 있는 동안(배치 이동 전 · 또는 node 소유 항목)에는 질의형 recall 이 그 노드에서 쓰는 방식으로 남는다. "Cloud 는 Local 원장을 read-back · 동기화하지 않는다" 는 **소유 주체 밖으로의 무단 복제 · 공유 금지**로 읽는다 |
+| D2 Task identity | 유지. V2 §4 의 Task(인스턴스)와 구분해 이 문서의 Task 는 **Task type** 이다(V2 §4-1) |
+| D3 · D4 | 유지 — 저장 위치와 무관하게 적용(V2 §6-2 · §9-3) |
+| §15 Local 최소 저장 집합 | 집합(MUST · SHOULD · OPTIONAL · DO_NOT_STORE)은 유지한다. "Local" 은 V1 시점의 저장 위치 이름이며, 각 항목의 위치는 V2 §9-2 소유 주체 배치를 따른다. 실제 이동은 V2 §17 Gate 통과 후 |
+| §16 `LOCAL_ONLY` | "실행 PC 에만" 이 아니라 **소유 주체 전용 · 공유 금지**로 읽는다. 단 개인 환경(PC 이름 · 경로 · 계정 식별자)은 node 소유다. `DO_NOT_STORE` 는 그대로 — 어디에도 저장하지 않는다 |
+| §17 Shared Experience | 유지(V2 §10). Digest 는 소유 주체가 동의 · 익명화 후 명시적으로 publish 한다 |
+| §20 구현 Phase · §22 다음 작업 | Phase 1 = 완료 자산 승계 · Phase 2 = KEEP_BUT_REPOSITION · Phase 3~5 동결. 다음 작업은 V2 §18 의 단계 A(Assistant + Task Foundation) |
+| Experience ≠ 업무 데이터 | 유지 · 강조(V2 §6-3). 재고 · 판매 · 가격은 Experience 가 아닌 업무 데이터 영역 |
 
 ---
 
@@ -621,6 +637,8 @@ Run R12 AI 방법: 성분 확인 → 성분명 재검색 → 결과에서 추정
 
 ## 20. 구현 Phase 제안 (설계 승인 이후 · 이번 작업에서 구현하지 않음)
 
+> **2026-10-03 V2 전환으로 동결** — Phase 1 = 완료 자산 승계 · Phase 2 = KEEP_BUT_REPOSITION · Phase 3~5 는 진행하지 않는다. 현재 개발 순서는 [V2 §18](O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2.md). 아래 표는 V1 시점 기록이다.
+
 | Phase | 내용 | 완료 기준 |
 |---|---|---|
 | 1 Local Experience 최소 저장 | Run(Outcome+근거 · segments) · Step(모든 run · stage · 결과) · Failure Event(층) 를 Local 에 additive 저장 | 성공/실패/도움 run 모두 Run+Step 이 남는다 |
@@ -636,6 +654,8 @@ Phase 1 구조와의 관계(2026-10-01 판정): Phase 1 v6 테이블은 Correcti
 ---
 
 ## 21. 확정 결정 (2026-10-01 사용자 검토 · D1~D8)
+
+> **2026-10-03**: D1 은 V2 Ownership-first 로 범위가 바뀌었다(§0-1). D2~D8 은 유지.
 
 | # | 결정 | 확정 | 근거 · 의미 |
 |---|---|---|---|
@@ -655,6 +675,8 @@ Phase 1 구조와의 관계(2026-10-01 판정): Phase 1 v6 테이블은 Correcti
 개발 중심이 "자동화를 더 잘 실행하는 코드" 에서 **"자동화하면서 경험을 남기는 코드"** 로 처음 이동하는 단계다 — 성공이든 실패든 실제 Run 이 Local Experience 에 남고(무엇을 했는지 · 어디서 실패했는지 · 얼마나 걸렸는지 · 어떤 근거로 성공했는지), 다음 단계(Assistance 연결 · recall)가 그것을 활용한다.
 
 2026-10-01 상태: Phase 1 코드 완료 · 실 PC smoke PENDING. 다음은 Phase 1 실환경 closure, 그 다음 Phase 2(Assistance + Correction).
+
+**2026-10-03 갱신**: V1 트랙은 V2 전환 시점에서 동결됐다(§0-1). 다음 작업은 [V2 §18](O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2.md) 단계 A — Assistant + Task Foundation. V1 구조를 전제로 한 Phase 1 실 PC smoke · 추가 확장은 하지 않는다.
 
 ---
 

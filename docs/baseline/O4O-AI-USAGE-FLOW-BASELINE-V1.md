@@ -452,6 +452,7 @@ WorkScope 타입의 `executionMode: 'local' | 'hybrid'` 와 capability `local_re
 | `ai_query_policy.default_model` | 값이 `gemini-3.0-flash` 인데 `MODEL_WHITELIST.gemini` 에 없어 `resolveEditingModel()` 이 fallback `gemini-2.5-flash` 로 되돌린다 — admin 이 고른 모델이 조용히 무시된다 | **후속 정비 대상** |
 | `/api/ai/query` | `column AiSettings.apikey does not exist` | **후속 정비 대상** (§12) |
 | AI 키 주입 | Cloud Run **평문 env** 로 주입 (DB 비밀번호·encryption key 와 달리 Secret Manager 미경유) | 구조 개선 후보 |
+| §13 "현재 불가능" 목록 · §14 | Local Work Agent · Browser control · Computer Use · tool calling 은 work-agent 경로(Home AI 업무 요청 → Local Agent · Chrome 확장 · UIA)로 이미 구현돼 있다 — 이 목록은 **Home AI 텍스트 응답 축** 기준으로만 유효하다. 업무 비서 · 자동화 축의 정본은 [`O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2`](O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2.md) (2026-10-03 표기) | **stale — 본문 재정렬은 별도 WO** |
 
 ---
 
