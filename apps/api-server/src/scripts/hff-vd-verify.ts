@@ -9,7 +9,7 @@ import fs from 'node:fs';
 import { runGuard } from '../modules/content-guard/product-description-guard.js';
 import type { GuardProductInput } from '../modules/content-guard/product-description-guard.types.js';
 
-const DATA = 'C:/Users/sohae/o4o-platform/docs/checks/data/product-description-guard';
+const DATA = 'src/scripts/data/check-data/product-description-guard';
 const SCR = 'C:/Users/sohae/AppData/Local/Temp/claude/c--Users-sohae-o4o-platform/2b5935f9-9c75-483f-8206-e3385235d4d4/scratchpad';
 const rd = (p: string) => JSON.parse(fs.readFileSync(p, 'utf8'));
 

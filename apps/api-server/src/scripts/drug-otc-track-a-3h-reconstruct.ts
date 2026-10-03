@@ -17,7 +17,7 @@ import { buildDrugOtcEnConsumerHtml, type DrugOtcEnTranslation } from '../module
 
 const OUT_DIR = path.resolve(process.cwd(), 'src/scripts/data');
 const BRIDGE = path.resolve(OUT_DIR, 'otc-full-corpus-authored-bridge-groups-v1.json');
-const TR_DIR = path.resolve(process.cwd(), '../../docs/guides/products/drug/pilot-en-design/translations');
+const TR_DIR = path.resolve(process.cwd(), 'src/scripts/data/product-descriptions/drug/pilot-en-design/translations');
 const BUCKET = 'authored그대로확장';
 const SENSITIVE_RE = /아스피린|아세틸살리실산|와파린|클로피도그렐|헤파린|덱사메타손|프레드니솔론|하이드로코르티손|모르핀|코데인|메칠페니데이트|인슐린|레보티록신/;
 const AUTHORED_SOURCES = ['mfds_drug_otc', 'nutrition_combo'];

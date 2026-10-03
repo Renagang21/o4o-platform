@@ -30,7 +30,7 @@ const md5 = (s: string): string => crypto.createHash('md5').update(s).digest('he
 const OUT_DIR = path.resolve(process.cwd(), 'src/scripts/data');
 const OUT_FILE = 'otc-trimebutine-100mg-en-complete.run.json';
 const KO_RUN = path.join(OUT_DIR, 'otc-grounded-upgrade-trimebutine-100mg-jeong.run.json');
-const EN_TRANSLATION = path.resolve(process.cwd(), '../../docs/guides/products/drug/pilot-en-design/translations/otc-en-translations-trimebutine-100mg-v1.json');
+const EN_TRANSLATION = path.resolve(process.cwd(), 'src/scripts/data/product-descriptions/drug/pilot-en-design/translations/otc-en-translations-trimebutine-100mg-v1.json');
 
 const GROUP_KEY = '트리메부틴말레산염|100밀리그램|정';
 const CANDIDATE = '003beef8-82c4-4897-a176-d0ea8a695699';

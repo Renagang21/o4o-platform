@@ -6,7 +6,7 @@
 const fs = require('fs');
 const SP = __dirname;
 const raw = JSON.parse(fs.readFileSync(SP + '/lut31-raw.json', 'utf8'));
-const parsed = JSON.parse(fs.readFileSync('c:/Users/home/coding/o4o-platform/docs/checks/data/product-description-guard/hff-lut31-rederived.json', 'utf8'));
+const parsed = JSON.parse(fs.readFileSync('src/scripts/data/check-data/product-description-guard/hff-lut31-rederived.json', 'utf8'));
 const byStmt = Object.fromEntries(raw.map(r => [r.stmt, r]));
 
 // ── 독립 정규화(파서와 별개 구현) ──

@@ -8,7 +8,7 @@ import path from 'node:path';
 import { runGuard } from '../modules/content-guard/product-description-guard.js';
 import type { GuardProductInput } from '../modules/content-guard/product-description-guard.types.js';
 
-const D = 'C:/Users/sohae/o4o-platform/docs/checks/data/product-description-guard';
+const D = 'src/scripts/data/check-data/product-description-guard';
 const parts = ['20', '30', '60', '100'];
 
 const written: GuardProductInput[] = [];

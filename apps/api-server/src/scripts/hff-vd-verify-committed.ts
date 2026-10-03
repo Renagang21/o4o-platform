@@ -9,7 +9,7 @@ import { DataSource } from 'typeorm';
 
 const PROXY_HOST = process.env.PROXY_HOST ?? '127.0.0.1';
 const PROXY_PORT = parseInt(process.env.PROXY_PORT ?? '5433', 10);
-const DATA = 'C:/Users/sohae/o4o-platform/docs/checks/data/product-description-guard';
+const DATA = 'src/scripts/data/check-data/product-description-guard';
 const SP = 'C:/Users/sohae/AppData/Local/Temp/claude/c--Users-sohae-o4o-platform/2b5935f9-9c75-483f-8206-e3385235d4d4/scratchpad';
 
 const preload: Array<{ statementNo: string }> = JSON.parse(fs.readFileSync(`${DATA}/hff-vitamin-d-preload-417.json`, 'utf8'));

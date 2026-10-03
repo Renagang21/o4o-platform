@@ -15,7 +15,7 @@ import { buildDrugOtcEnConsumerHtml, type DrugOtcEnTranslation } from '../module
 
 const md5 = (s: string): string => crypto.createHash('md5').update(s).digest('hex');
 const DATA = path.resolve(process.cwd(), 'src/scripts/data');
-const TRANS = path.resolve(process.cwd(), '../../docs/guides/products/drug/pilot-en-design/translations');
+const TRANS = path.resolve(process.cwd(), 'src/scripts/data/product-descriptions/drug/pilot-en-design/translations');
 
 interface G { groupKey: string; candidate: string; koRunBase: string; srcFile: string }
 const GROUPS: G[] = [

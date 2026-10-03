@@ -1,7 +1,7 @@
 /**
  * 홍삼 다기능 표준형 271건 — STORE 설명서 canonical 적재 (dry-run 기본 · --apply env 이중게이트)
  *
- * 대상: docs/checks/data/product-description-guard/hff-red-ginseng-production.json (271, BLOCKED 0)
+ * 대상: apps/api-server/src/scripts/data/check-data/product-description-guard/hff-red-ginseng-production.json (271, BLOCKED 0)
  * 계약(유산균 경로 재사용): master(barcode NULL, regulatory_type=건강기능식품, mfds_permit_number=STTEMNT_NO)
  *   + candidate approved_new_master 링크 + SPD STORE canonical ko/en (source_type=o4o_hff_generated)
  * canonical 불변식 = (master, description_type, coalesce(language,'ko')) partial-unique where canonical
@@ -29,7 +29,7 @@ const SPD_SOURCE_TYPE = 'o4o_hff_generated';
 const REGULATORY_TYPE = '건강기능식품';
 const EXPECT = 271;
 const SP = 'C:/Users/sohae/AppData/Local/Temp/claude/c--Users-sohae-o4o-platform/30d2fee8-8e25-4e6d-8656-fa0ee7713bfa/scratchpad';
-const DATA = 'C:/Users/sohae/o4o-platform/docs/checks/data/product-description-guard';
+const DATA = 'src/scripts/data/check-data/product-description-guard';
 
 function loadTargets(): any[] {
   return JSON.parse(fs.readFileSync(`${DATA}/hff-red-ginseng-production.json`, 'utf8'));

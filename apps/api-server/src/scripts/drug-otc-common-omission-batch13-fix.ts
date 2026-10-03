@@ -6,7 +6,7 @@
  *
  * ⚠️ 공개 중인 canonical 을 UPDATE 한다(11그룹, ko+en).
  *
- * 화이트리스트: docs/guides/products/drug/pilot-en-design/translations/otc-batch13-omission-whitelist.json
+ * 화이트리스트: apps/api-server/src/scripts/data/product-descriptions/drug/pilot-en-design/translations/otc-batch13-omission-whitelist.json
  *   각 edit = {field, lang, find(유일), repl}. 근거는 허가 원문 전 변형 공통(why 필드).
  *
  * 변경 증명(2겹):
@@ -36,11 +36,11 @@ const CHUNK = 200;
 
 const WL_PATH = path.resolve(
   process.cwd(),
-  '../../docs/guides/products/drug/pilot-en-design/translations/otc-batch13-omission-whitelist.json',
+  'src/scripts/data/product-descriptions/drug/pilot-en-design/translations/otc-batch13-omission-whitelist.json',
 );
 const EN_PATH = path.resolve(
   process.cwd(),
-  '../../docs/guides/products/drug/pilot-en-design/translations/otc-en-translations-v1.json',
+  'src/scripts/data/product-descriptions/drug/pilot-en-design/translations/otc-en-translations-v1.json',
 );
 
 interface Edit { field: 'caution' | 'usage' | 'efficacy'; lang: 'ko' | 'en'; find: string; repl: string; why: string }

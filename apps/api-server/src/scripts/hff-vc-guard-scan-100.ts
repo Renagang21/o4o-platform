@@ -7,7 +7,7 @@ import fs from 'node:fs';
 import { runGuard } from '../modules/content-guard/product-description-guard.js';
 import type { GuardProductInput } from '../modules/content-guard/product-description-guard.types.js';
 
-const F = 'C:/Users/sohae/o4o-platform/docs/checks/data/product-description-guard/hff-vitamin-c-100.json';
+const F = 'src/scripts/data/check-data/product-description-guard/hff-vitamin-c-100.json';
 const items = JSON.parse(fs.readFileSync(F, 'utf8')) as GuardProductInput[];
 
 let blocked = 0, review = 0, pass = 0;

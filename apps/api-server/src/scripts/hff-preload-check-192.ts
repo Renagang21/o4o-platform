@@ -8,7 +8,7 @@ import path from 'node:path';
 import { runGuard } from '../modules/content-guard/product-description-guard.js';
 import type { GuardProductInput } from '../modules/content-guard/product-description-guard.types.js';
 
-const D = 'C:/Users/sohae/o4o-platform/docs/checks/data/product-description-guard';
+const D = 'src/scripts/data/check-data/product-description-guard';
 const batches = [...Array(10)].map((_, i) => `prod-a-cp${String(i + 1).padStart(2, '0')}`);
 
 const written: GuardProductInput[] = [];
