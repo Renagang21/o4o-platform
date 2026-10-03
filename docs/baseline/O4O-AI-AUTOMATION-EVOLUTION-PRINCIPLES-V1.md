@@ -6,7 +6,7 @@
 > 기능 구현 문서가 아니며, 개별 WO/CHECK 는 이 문서의 원칙 아래에 놓인다.
 
 *Status: Active Baseline*
-*Date: 2026-09-12 · 부분 개정 2026-10-03 (`WO-O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2-CANONICALIZATION` — §5 원격 요청 인계 · §7 주석 Ownership-first · §14 Task type/Skill · §24 Local Work Agent 행 · 하위 정본 포인터. 핵심 원칙 세 문장 불변)*
+*Date: 2026-09-12 · 부분 개정 2026-10-03 (`WO-O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2-CANONICALIZATION` — §5 원격 요청 인계 · §7 주석 Ownership-first · §14 Task type/Skill · §24 Local Work Agent 행 · 하위 정본 포인터. 핵심 원칙 세 문장 불변) · 부분 개정 2026-10-04 (`WO-O4O-PERSONAL-ASSISTANT-PERSONALIZATION-PRINCIPLE-ALIGNMENT-V1` — §8 비교 목적 · §9 "표준 Workflow 승격" → Shared Candidate. 핵심 원칙 세 문장 불변)*
 *상위 문서: [`CLAUDE.md`](../../CLAUDE.md) · [`O4O-BUSINESS-PHILOSOPHY-V1`](O4O-BUSINESS-PHILOSOPHY-V1.md) §6 (AI 의 역할) · [`O4O-3-ROLE-FLOW-BASELINE-V1`](O4O-3-ROLE-FLOW-BASELINE-V1.md) §5 (AI 개입)*
 *하위 정본: [`O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2`](O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2.md) (구조 — Personal Work Assistant) → [`O4O-AUTOMATION-EXPERIENCE-MODEL-V1`](O4O-AUTOMATION-EXPERIENCE-MODEL-V1.md) (Experience) · §24 표의 자동화 계열 WO/CHECK*
 
@@ -109,17 +109,21 @@ O4O 가 학습할 것은 민감한 업무 내용이 아니라 **구조적 이벤
 
 ```text
 사용자 A: Workflow A · 8단계 · 70초 · 수정 3회
-사용자 B: Workflow B · 5단계 · 38초 · 수정 1회     → 더 좋은 Workflow 후보 발견
+사용자 B: Workflow B · 5단계 · 38초 · 수정 1회     → 사용자 A 에게 추천할 후보 발견
 ```
+
+비교의 목적은 **모든 사용자를 하나의 Workflow 로 통일하는 것이 아니라, 각 사용자의 Assistant 가 더 나은 방법을 후보로 알게 하는 것**이다. 사용자 A 가 B 의 방법을 쓸지는 A 의 Assistant 가 A 의 Experience 와 상황으로 판단하고, A 의 Run 에서 다시 검증된다(2026-10-04 개정 — [`PERSONAL-ASSISTANT-ARCHITECTURE-V2`](O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2.md) §0-1).
 
 ## §9. 반복 패턴 → Workflow 후보
 
 ```text
 실제 사용 → 반복 패턴 발견 → 개선 Workflow 후보 생성 → 검증 → 제한적 적용
-        → 성공 여부 비교 → 표준 Workflow 승격
+        → 성공 여부 비교 → Shared Candidate 승격 (다른 사용자에게 추천 · 우선 후보)
 ```
 
-**금지**: 사용자 행동 1회 → 즉시 공통 자동화 규칙 변경.
+- 승격의 끝은 **표준 Workflow 가 아니라 Shared Candidate** 다. 반복 검증된 방법은 추천하거나 우선 후보로 고려할 수 있지만 사용자에게 강제하지 않고, 그 사용자의 검증된 방법 · 교정을 덮어쓰지 않는다(2026-10-04 개정 — 종전 "표준 Workflow 승격").
+
+**금지**: 사용자 행동 1회 → 즉시 공통 자동화 규칙 변경. 다수 사용자의 성공 경로를 하나의 표준 Workflow 로 만들어 모든 사용자에게 적용하는 것.
 
 ## §10. AI 의 역할
 

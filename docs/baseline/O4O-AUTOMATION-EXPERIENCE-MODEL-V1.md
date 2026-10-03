@@ -1,7 +1,7 @@
 # O4O-AUTOMATION-EXPERIENCE-MODEL-V1
 
 > **상태**: ACTIVE — Experience 개념 모델 · 저장 계약 정본 (`CANONICAL-INDEX` §6)
-> **작성일**: 2026-10-01 · **최종 갱신**: 2026-10-01 (사용자 검토 D1~D8 확정 · DRAFT → ACTIVE · `WO-O4O-AI-AUTOMATION-PRINCIPLES-USER-CORRECTION-KNOWLEDGE-AND-MODEL-ROUTING-ALIGNMENT-V1`: §7-5 User Correction · §7-6 Preferred/Avoid Pattern · §8-1~8-4 Knowledge 출처 · Manual · 공식 웹 Knowledge · Knowledge Watch · 사례 D · §20 순서 보강)
+> **작성일**: 2026-10-01 · **개정**: 2026-10-04 §0-1 개인화 행 · §8 표 문구 (`WO-O4O-PERSONAL-ASSISTANT-PERSONALIZATION-PRINCIPLE-ALIGNMENT-V1`) · **최종 갱신**: 2026-10-01 (사용자 검토 D1~D8 확정 · DRAFT → ACTIVE · `WO-O4O-AI-AUTOMATION-PRINCIPLES-USER-CORRECTION-KNOWLEDGE-AND-MODEL-ROUTING-ALIGNMENT-V1`: §7-5 User Correction · §7-6 Preferred/Avoid Pattern · §8-1~8-4 Knowledge 출처 · Manual · 공식 웹 Knowledge · Knowledge Watch · 사례 D · §20 순서 보강)
 > **근거 WO**: `WO-O4O-AUTOMATION-CANONICAL-ENTRYPOINT-ALIGNMENT-AND-EXPERIENCE-MODEL-DESIGN-V1` Phase B (= `WO-O4O-AUTOMATION-EXPERIENCE-MODEL-DESIGN-V1`)
 > **상위 정본**: [`O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2`](O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2.md) §6 (Experience 계층화) · §7 (Skill) · §8 (Promotion) · §9 (Memory Ownership) · §10 (Shared) — 그 위 [`O4O-AI-AUTOMATION-EVOLUTION-PRINCIPLES-V1`](O4O-AI-AUTOMATION-EVOLUTION-PRINCIPLES-V1.md). (2026-10-03 변경 · 종전 상위 [`AGENT-ARCHITECTURE-V1`](O4O-AUTOMATION-AGENT-ARCHITECTURE-V1.md) 은 SUPERSEDED)
 > **V2 정합 개정 (2026-10-03)**: 아래 "V2 정합" 절이 이 문서의 해당 조항보다 우선한다. 본문의 "ARCHITECTURE §n" 참조는 작성 시점 기록이며 현재 위치는 [V2 §21 승계표](O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2.md)로 찾는다.
@@ -27,7 +27,8 @@
 | D3 · D4 | 유지 — 저장 위치와 무관하게 적용(V2 §6-2 · §9-3) |
 | §15 Local 최소 저장 집합 | 집합(MUST · SHOULD · OPTIONAL · DO_NOT_STORE)은 유지한다. "Local" 은 V1 시점의 저장 위치 이름이며, 각 항목의 위치는 V2 §9-2 소유 주체 배치를 따른다. 실제 이동은 V2 §17 Gate 통과 후 |
 | §16 `LOCAL_ONLY` | "실행 PC 에만" 이 아니라 **소유 주체 전용 · 공유 금지**로 읽는다. 단 개인 환경(PC 이름 · 경로 · 계정 식별자)은 node 소유다. `DO_NOT_STORE` 는 그대로 — 어디에도 저장하지 않는다 |
-| §17 Shared Experience | 유지(V2 §10). Digest 는 소유 주체가 동의 · 익명화 후 명시적으로 publish 한다 |
+| §17 Shared Experience | 유지(V2 §10). Digest 는 소유 주체가 동의 · 익명화 후 명시적으로 publish 한다. 수신 측에서는 **Shared Candidate(추천 · 우선 후보)** 이며 강제 규칙 · 표준 절차가 아니다 — 수신 사용자의 검증된 방법 · 교정을 덮어쓰지 않는다(V2 §0-1 · 2026-10-04) |
+| 개인화 (2026-10-04 · V2 §0-1) | 이 문서의 승격 · 공유 흐름(§7-6 · §13 · §14 · §17)은 **사용자 공통 Workflow 를 만드는 흐름이 아니다.** Procedure / Skill 은 소유 주체마다 다를 수 있고, 같은 Task type 에 여러 Procedure 가 공존한다. §3 의 alias "수렴" · D2 "정규화" 는 업무 유형의 식별을 맞추는 것이지 수행 절차를 통일하는 것이 아니다 |
 | §20 구현 Phase · §22 다음 작업 | Phase 1 = 완료 자산 승계 · Phase 2 = KEEP_BUT_REPOSITION · Phase 3~5 동결. 다음 작업은 V2 §18 의 단계 A(Assistant + Task Foundation) |
 | Experience ≠ 업무 데이터 | 유지 · 강조(V2 §6-3). 재고 · 판매 · 가격은 Experience 가 아닌 업무 데이터 영역 |
 
@@ -275,7 +276,7 @@ User Correction → Correction Knowledge 후보 → 실제 Run 검증 → Local 
 |---|---|---|---|
 | 정의 | 외부에서 얻은 설명 · 매뉴얼 · 문서 · 사용자 설명 | 실제 실행에서 확인된 사실 | 반복 경험으로 신뢰도가 오른 실행 방법 |
 | 신뢰 | 미검증 주장 | 관찰된 사실(근거 등급 있음) | 조건부 신뢰(승격 상태 보유) |
-| 예 | "거래관리 → 거래명세서" (매뉴얼 p.12) | 그 경로로 실제 진입 성공(run X) | 여러 run 성공 → 표준 단계 후보 |
+| 예 | "거래관리 → 거래명세서" (매뉴얼 p.12) | 그 경로로 실제 진입 성공(run X) | 여러 run 성공 → 그 소유 주체의 Procedure 단계 후보 |
 
 **Knowledge Item** 개념:
 - source: manual / 업무 문서 / 사용자 설명(Assistance 에서 승격) / web research / 공유 Experience
