@@ -335,3 +335,22 @@ describe('Production secret resolution check — 값 노출 0', () => {
     assert.match(wf, /^permissions:\n {2}contents: read\n/m);
   });
 });
+
+// WO-O4O-CLOUD-RUN-RUNTIME-SA-LEAST-PRIVILEGE-V1
+// Cloud Run runtime identity = 전용 최소권한 SA. 플래그가 빠지면 새 서비스 · job 생성이 default compute SA(roles/editor) 로 돌아간다
+// (github-actions 는 compute SA 에 actAs 권한이 없어 그 경로는 실패한다 — 명시 고정으로 막는다).
+describe('Cloud Run runtime SA — 모든 deploy · job create/update 에 전용 SA 명시', () => {
+  const RUNTIME_SA = 'o4o-runtime@netureyoutube.iam.gserviceaccount.com';
+  for (const file of DEPLOY) {
+    it(`${file}: env RUNTIME_SA = ${RUNTIME_SA}`, () => {
+      assert.match(read(file), new RegExp(`^ {2}RUNTIME_SA: ${RUNTIME_SA.replace(/[.]/g, '\\.')}$`, 'm'));
+    });
+    it(`${file}: gcloud run deploy · jobs create · jobs update 수 == --service-account=\${{ env.RUNTIME_SA }} 수`, () => {
+      const wf = read(file);
+      const cmds = count(wf, /gcloud run (deploy|jobs create|jobs update) /g);
+      assert.ok(cmds > 0, file);
+      assert.equal(count(wf, /--service-account=\$\{\{ env\.RUNTIME_SA \}\}/g), cmds);
+      assert.doesNotMatch(wf, /-compute@developer\.gserviceaccount\.com/);
+    });
+  }
+});

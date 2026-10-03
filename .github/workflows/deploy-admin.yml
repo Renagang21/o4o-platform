@@ -71,6 +71,9 @@ on:
 env:
   PROJECT_ID: netureyoutube
   REGION: asia-northeast3
+  # WO-O4O-CLOUD-RUN-RUNTIME-SA-LEAST-PRIVILEGE-V1 — Cloud Run runtime identity (default compute SA · roles/editor 사용 종료).
+  #   github-actions SA 는 이 SA 에 대해서만 actAs 할 수 있다(SA 리소스 단위 iam.serviceAccountUser). 권한: CHECK-O4O-CLOUD-RUN-RUNTIME-SA-LEAST-PRIVILEGE-V1
+  RUNTIME_SA: o4o-runtime@netureyoutube.iam.gserviceaccount.com
   REPOSITORY_NAME: o4o-api
 
 jobs:
@@ -364,6 +367,7 @@ jobs:
           --image="${FULL_IMAGE}" \
           --region=${{ env.REGION }} \
           --project=${{ env.PROJECT_ID }} \
+          --service-account=${{ env.RUNTIME_SA }} \
           --platform=managed \
           --allow-unauthenticated \
           --port=8080 \
