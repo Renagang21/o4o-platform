@@ -2,7 +2,7 @@
 
 > **이 문서는 Claude Code 가 이 저장소에서 안전하게 작업하기 위한 진입점 · 안전 경계 · 정본 지도다.**
 > 규칙의 원문은 canonical 문서에 있다. 이 파일은 그것을 **복사하지 않고 가리킨다.**
-> Codex / 일반 에이전트의 진입점은 [`AGENTS.md`](AGENTS.md) 이며 두 문서는 **동급**이다 — 한쪽이 다른 쪽을 import 하거나 선행 조건으로 요구하지 않는다. 공통 지식은 [`docs/CANONICAL-INDEX.md`](docs/CANONICAL-INDEX.md) 와 각 정본에 둔다.
+> Codex / 일반 에이전트의 진입점은 [`AGENTS.md`](AGENTS.md) 이며 두 문서는 **동급**이다 — 한쪽이 다른 쪽을 import 하거나 선행 조건으로 요구하지 않는다. 단 저장소 공통 실행 규칙인 **Parallel Session / Worktree Policy** 의 정본은 `AGENTS.md` §4-1 에 두고 이 파일은 그것을 가리킨다. 공통 지식은 [`docs/CANONICAL-INDEX.md`](docs/CANONICAL-INDEX.md) 와 각 정본에 둔다.
 >
 > **§ 번호(§0~§16, §13-A)는 고정이다.** 소스 주석과 기준 문서가 `CLAUDE.md §N` 으로 참조한다. 부록의 번호·순서를 바꾸지 않는다.
 
@@ -31,7 +31,8 @@
 | Core 동결 범위 | [`O4O-CORE-FREEZE-V1`](docs/architecture/O4O-CORE-FREEZE-V1.md) |
 | 공통 모듈 변경 절차 | [`O4O-SHARED-MODULE-CHANGE-PROTOCOL-V1`](docs/baseline/O4O-SHARED-MODULE-CHANGE-PROTOCOL-V1.md) |
 | 개발환경 · 검증 명령 · CI 게이트 · DB 접속 절차 | [`SETUP.md`](SETUP.md) |
-| Git 병렬 작업 · PC 이동 | [`O4O-GIT-PARALLEL-WORK-SAFETY-V1`](docs/baseline/operations/O4O-GIT-PARALLEL-WORK-SAFETY-V1.md) |
+| **세션 격리 · worktree · branch · main 통합 · 공유 runtime 직렬화** | [`AGENTS.md` §4-1 Parallel Session / Worktree Policy](AGENTS.md#4-1-parallel-session--worktree-policy) — 저장소 공통 정본 |
+| Git 병렬 작업(stage · commit · push) · PC 이동 | [`O4O-GIT-PARALLEL-WORK-SAFETY-V1`](docs/baseline/operations/O4O-GIT-PARALLEL-WORK-SAFETY-V1.md) |
 | 프로덕션 마이그레이션 | [`PRODUCTION-MIGRATION-STANDARD`](docs/baseline/operations/PRODUCTION-MIGRATION-STANDARD.md) |
 
 충돌 시 우선순위:
@@ -78,15 +79,18 @@
 
 ## Git · 병렬 작업 안전
 
-**다중 PC · 다중 세션(사람 + AI)이 같은 `main` 에 직접 커밋**하는 환경이다. 절차의 정본은 [`O4O-GIT-PARALLEL-WORK-SAFETY-V1`](docs/baseline/operations/O4O-GIT-PARALLEL-WORK-SAFETY-V1.md). 아래는 예외 없이 지킨다.
+**다중 PC · 다중 세션(사람 + AI)이 같은 `main` 을 향해 작업**하는 환경이다.
+
+> **병렬 / 독립 작업을 시작하기 전에 [`AGENTS.md` §4-1 Parallel Session / Worktree Policy](AGENTS.md#4-1-parallel-session--worktree-policy) 를 확인하고 따른다.** 독립 작업은 최신 `origin/main` 에서 만든 전용 worktree · 전용 branch 에서 수행하고, 기준 main checkout 이나 다른 세션의 worktree · branch 를 변경하지 않는다. main 통합 경로와 공유 runtime / production 자원 변경의 직렬화도 그 정책을 따른다. (상세는 그곳에만 둔다.)
+
+stage · commit · push 절차의 정본은 [`O4O-GIT-PARALLEL-WORK-SAFETY-V1`](docs/baseline/operations/O4O-GIT-PARALLEL-WORK-SAFETY-V1.md). 아래는 예외 없이 지킨다.
 
 - 작업 전 `git fetch origin` → `git status -sb`. **pull(merge/rebase)은 작업트리가 clean 할 때만.**
 - **`git add .` · `git add -A` · `git commit -am` 금지.** path-specific stage 만 사용한다.
 - **커밋에도 pathspec 을 붙인다.** foreign staged 파일이 있으면 pathspec 없는 `git commit` 금지 — 커밋 직전 `node scripts/git/check-staged-scope.mjs <내 작업 경로...>` → `git commit -m "..." -- <내 파일...>`.
 - 다른 세션의 수정 · 미추적 · staged 파일은 **불가침** (판단 · 커밋 · 정리 · `restore` · `reset` · `stash` 대상 아님).
 - **`--force` push 금지.** 공유 `main` 이력은 재작성하지 않는다(오타 정정도 후속 커밋으로).
-- 완료 조건은 저장소 전체 clean 이 아니라 **`이번 WO 범위의 미커밋 변경 0건` + `HEAD == origin/main`**.
-- feature 브랜치는 명시적 요청 또는 대규모 리팩토링 · 실험적 변경에서만.
+- 완료 조건은 저장소 전체 clean 이 아니라 **`이번 WO 범위의 미커밋 변경 0건` + 내 커밋이 `origin/main` 에 포함**.
 
 ## DB · 보안 경계
 
@@ -118,7 +122,7 @@
 
 ## 1. 개발 기본 규칙
 
-- 브랜치: 현재(2026-09 기준) 운영 단계에서는 **main 직접 작업**이 기본. 규칙은 위 **Git · 병렬 작업 안전** 절.
+- 브랜치: 독립 작업은 전용 worktree · 전용 branch 가 기본(2026-10-03~). 규칙은 위 **Git · 병렬 작업 안전** 절과 [`AGENTS.md` §4-1](AGENTS.md#4-1-parallel-session--worktree-policy).
 - App 계층: `Core → Extension → Feature → Service`. 역방향 의존 금지.
 - API 호출: `authClient.api.get()` / `.post()` 필수. 환경변수 직접 사용 · 하드코딩 URL 금지.
 - 공통 모듈 · config · sidebar · layout · capability map · core+extension contract 수정은 **모든 소비처를 먼저 식별**하고 단일 서비스 기준으로 완료 판단하지 않는다. 식별자 검색만으로 소비처 0 을 선언하지 않는다(`node scripts/quality/check-literal-consumers.mjs --source <파일>`). 절차: [`O4O-SHARED-MODULE-CHANGE-PROTOCOL-V1`](docs/baseline/O4O-SHARED-MODULE-CHANGE-PROTOCOL-V1.md).
@@ -254,6 +258,6 @@ forum · lms · signage 는 **플랫폼 공통 구조**. KPA 가 reference imple
 
 ---
 
-*Updated: 2026-09-15*
-*Version: 9.1*
+*Updated: 2026-10-03*
+*Version: 9.2*
 *Status: Active — Claude Code Entry Point*

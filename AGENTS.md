@@ -51,8 +51,137 @@ O4O Platform repository의 Codex 및 일반 coding agent를 위한 독립 진입
 
 ## 4. Git / 병렬 작업 안전
 
-상세: [O4O-GIT-PARALLEL-WORK-SAFETY-V1](docs/baseline/operations/O4O-GIT-PARALLEL-WORK-SAFETY-V1.md).
-현재 운영 방식은 공유 `main` 직접 작업이다. 브랜치 전략을 작업 편의로 임의 변경하지 않는다.
+- **세션 격리 · worktree · branch · main 통합 · 공유 runtime 직렬화**는 아래 §4-1 이 저장소 공통 정본이다
+  (사람 · Claude Code · Codex · 그 밖의 coding agent 전원 적용).
+- **stage · commit · push 안전**은 §4-2 와 [O4O-GIT-PARALLEL-WORK-SAFETY-V1](docs/baseline/operations/O4O-GIT-PARALLEL-WORK-SAFETY-V1.md).
+  그 문서의 "공유 `main` 직접 작업" 전제와 §4-1 이 다르면 §4-1 이 우선한다.
+
+### 4-1. Parallel Session / Worktree Policy
+
+> 도입: WO-O4O-PARALLEL-SESSION-WORKTREE-POLICY-V1 (2026-10-03).
+> 배경: 여러 세션이 한 `main` checkout · index · branch 를 공유하다 branch 전환 · `CHERRY_PICK_HEAD` 잔류 ·
+> staging 혼입으로 다른 세션의 commit/push 가 중단된 사고.
+
+```text
+1 독립 작업 = 1 세션 + 1 전용 worktree + 1 전용 branch
+개발은 병렬(Parallel Development) → main 통합 · 공유 runtime 변경은 순차(Sequential Integration)
+```
+
+**(a) 시작**
+
+- 먼저 확인: repository · `git worktree list` · 현재 branch · HEAD · `origin/main` · working tree ·
+  진행 중 operation(`CHERRY_PICK_HEAD` · `MERGE_HEAD` · rebase 상태).
+- **새 독립 WO / 개발 작업은 최신 `origin/main` 에서 전용 worktree + 전용 branch 로 시작한다.**
+
+  ```bash
+  git fetch origin
+  git worktree add -b wo/<slug> ../o4o-wt/<slug> origin/main
+  ```
+
+  - branch 는 `wo/<slug>`(기존 관례). worktree 는 저장소 **밖** 형제 디렉터리 `../o4o-wt/<slug>` —
+    저장소 안(`.claude/worktrees/` 등)에 두면 lint · glob 이 사본까지 읽는다.
+  - 새 worktree 에는 `node_modules` · 빌드 산출물이 없다. 검증 전 [SETUP.md](SETUP.md) 설치 절차를 따른다.
+  - branch push 는 이름을 명시한다(`git push -u origin wo/<slug>`).
+- 해당 작업용 worktree 가 이미 명시적으로 준비돼 있으면 중복 생성하지 않는다.
+- 완료된 worktree / branch 를 새 독립 작업의 작업공간으로 재사용하지 않는다(이전 작업의 stale base · history 차단).
+  동일 WO 의 연속 Phase 처럼 같은 branch 유지를 명시한 경우만 예외이며, 예외는 보고 · 커밋 메시지에 기록한다.
+- 자기 worktree 에 예상치 않은 `CHERRY_PICK_HEAD` / `MERGE_HEAD` / rebase 상태가 있으면 새 작업을 시작하지 않는다.
+  자기 세션이 시작한 operation 이 아니면 continue / abort 하지 않고 소유권 · 목적을 확인하거나 보고한다.
+
+**(b) 세션 격리**
+
+- 각 세션은 **자기 worktree 안에서만** 파일을 수정 · stage · commit 한다.
+- 금지: 다른 worktree 파일 수정 · 기준 main checkout 에서 개발 · 공유 checkout 의 branch 전환(`git switch` / `checkout`) ·
+  다른 세션 branch 의 checkout / reset / rebase / cherry-pick · 다른 세션의 staging · stash 변경 / 삭제.
+- 범위 밖 변경(foreign dirty · untracked · staged · 낯선 commit)을 발견하면 소유권을 추측하지 않고
+  **수정 · 삭제 · 원복 · stage/unstage · stash · commit 하지 않는다.** 다른 세션 작업일 가능성을 우선한다.
+  그 때문에 자기 작업을 안전하게 할 수 없으면 STOP 하고 보고한다.
+
+**(c) 기준 main checkout = Integration / Reference Workspace**
+
+- 기대 상태: `branch = main` · `HEAD == origin/main` · working tree clean. 독립 개발 작업장으로 쓰지 않는다.
+- 작업 지시가 main checkout 에서의 maintenance / integration 을 명시한 경우만 예외이며, 그 범위를 명시한다.
+- 기준 checkout 이 기대 상태가 아니면(로컬 전용 commit · dirty) 다른 세션 소유로 보고 정리하지 않고 보고한다.
+
+**(d) `origin/main` 이동**
+
+- 자기 worktree 에서 `git fetch origin` 으로 차이를 보는 것은 자유다.
+- 앞서갔다고 **자동으로 merge · rebase · reset · cherry-pick 하지 않는다.** 충돌 여부 · 통합 필요성 · 현재 통합 정책을
+  먼저 확인한다. 통합 시점(e)에 자기 branch 를 최신 `origin/main` 위로 올리는 것은 자기 branch 에 한해 허용된다.
+
+**(e) main 통합 — 현재 governance 를 따른다**
+
+현재 `main` ruleset: 삭제 · non-fast-forward 금지, PR + 승인 1 + required check `CI Gate`, admin bypass
+(합의 규칙 포함 상세: [README — 기여](README.md#기여)). "모든 작업은 PR" 로 고정하지 않는다.
+
+| 주체 | main 반영 경로 |
+|---|---|
+| 공동개발자(collaborator) | 본인 branch → PR → 승인 1 + `CI Gate` → merge |
+| 소유자(admin) 계정의 세션 · AI 세션 | 자기 branch 를 최신 `origin/main` 위에 정리 → 검증 → **fast-forward push** (`git push origin wo/<slug>:main`). WO 가 리뷰 · PR 을 요구하면 PR |
+
+- **기술적으로 admin bypass 가 가능하다는 사실과 그 작업에서 bypass 를 써야 한다는 것은 별개다.**
+  WO 에 정해진 통합 절차가 우선한다.
+- 자기 branch 의 자기 변경만 commit / push 한다. stage · commit 규칙은 §4-2 그대로다.
+- **통합은 한 번에 하나씩:** `git fetch origin` → 자기 branch 를 `origin/main` 위로 정리
+  (아직 push 하지 않은 branch 는 rebase, 이미 push 한 branch 는 `git merge origin/main` — 원격 branch 이력 재작성 금지)
+  → 필요한 재검증 → ff push. 그 사이 main 이 움직여 거절되면 같은 절차를 반복한다.
+  다른 세션이 통합하는 동안에도 각 세션은 자기 worktree 에서 개발을 계속할 수 있다.
+- 통합에 기준 main checkout 을 쓰지 않는다. 통합은 자기 worktree 에서 ref push 로 끝난다.
+
+**(f) 배포**
+
+- main 반영 ≠ production 배포. 작업별로 현재 Delivery 정책([README — 배포](README.md#배포))에 따라
+  `DEPLOYMENT = REQUIRED | AUTOMATIC | MANUAL/GATED | NOT_APPLICABLE` 을 판정한다.
+- 문서-only 처럼 Delivery 가 배포를 skip 하는 작업은 `NOT_APPLICABLE` 로 기록하고 배포 완료를 기다리지 않는다.
+  배포가 필요한 작업의 closure 는 해당 WO 의 현재 배포 · 검증 정책을 따른다.
+- 과거 운영 방식 · 플래그(`DEPLOY_FREEZE` · `DEPLOY_ENABLED` 등)를 현재 사실 확인 없이 재사용하지 않는다.
+
+**(g) 공유 Mutable Resource — serialized**
+
+> **Code development may be parallel; shared runtime mutation is serialized.**
+
+worktree 를 분리해도 격리되지 않는 자원(최소): Production DB · 공유 staging DB · production 배포 ·
+GitHub ruleset / settings / secret · 실제 Local Agent 와 `local.db` · Local Agent credential / pairing ·
+Chrome native host · Chrome Extension · 실제 browser session(Playwright 프로필 포함) · 실 PC smoke 환경 · 공유 OAuth / Cloud 설정.
+
+- 이 자원을 **변경**하는 작업은 동시에 한 세션만 수행한다. 시작 전 다른 세션의 사용 여부를 확인하고, 불명이면 사용자에게 묻는다.
+- read-only 조회는 각 자원의 기존 경계(§5 DB · 보안 경계 등) 안에서 병렬로 해도 된다.
+
+**(h) Local Agent**
+
+- Local Agent 코드 개발도 예외 없이 전용 worktree / branch 를 쓴다.
+- 실 PC 의 `%LOCALAPPDATA%\o4o-local-agent\` · `local.db` · credential · pairing · Chrome native host · Chrome Extension 은
+  **worktree 별로 분리되지 않는다**고 가정한다.
+- Agent start / restart · `local.db` migration · credential / pairing 변경 · Extension reload · 실 PC smoke 는
+  동시에 한 세션만 수행한다. 실 PC 검증 전 다른 세션의 사용 여부를 확인한다.
+
+**(i) 생명주기 · 정리**
+
+```text
+최신 origin/main → 전용 worktree + branch → 작업 → 검증 → commit / push → main 통합 → CI
+→ (필요 시) deploy / smoke → closure → WORKTREE_DISPOSITION 판정 → 승인 시 제거
+```
+
+- 작업이 끝나도 worktree · branch(로컬 · 원격)를 **자동 삭제하지 않는다.** 먼저 read-only 로 판정한다:
+  `SAFE_TO_REMOVE` / `KEEP` / `UNCERTAIN`.
+- 최소 확인: 작업 commit 이 main 에 모두 포함(`git log origin/main..wo/<slug>` 비어 있음) · branch-only commit 없음 ·
+  uncommitted 0 · untracked 0 · 다른 세션 사용 없음 · 남은 deploy / smoke / closure 없음 · 보존할 CHECK / log / artifact 없음 ·
+  후속 작업이 그 branch 를 필요로 하지 않음.
+- `UNCERTAIN` 이면 삭제하지 않는다. `SAFE_TO_REMOVE` 여도 실제 삭제(`git worktree remove` · `git branch -d` ·
+  `git push origin --delete`)는 사용자 승인 후에 한다.
+
+**(j) 완료 보고**
+
+WO 완료 보고에 가능하면 아래 블록을 붙인다 — 후속 housekeeping 이 처음부터 추적하지 않게 하기 위함이다.
+
+```text
+WORKTREE_DISPOSITION
+worktree: / branch: / base: / main integration: / CI: / deployment: / smoke:
+uncommitted: / untracked: / other session usage: / branch-only commits:
+verdict: SAFE_TO_REMOVE | KEEP | UNCERTAIN
+```
+
+### 4-2. Stage · Commit · Push
 
 - 작업 전 `git status --short` · `git branch --show-current` · `git rev-parse HEAD`로 기준선을 확인한다.
   `git fetch origin` 후 `git status -sb`로 원격과 비교하며, 작업 후에도 상태를 확인한다.
@@ -70,8 +199,8 @@ O4O Platform repository의 Codex 및 일반 coding agent를 위한 독립 진입
 - 커밋 후 `git show --stat --oneline HEAD`로 실제 포함 경로를 확인한다.
 - push 전 다시 fetch하여 `origin/main` 이동을 확인한다. **force push(`--force`) 금지.**
   공유 `main` 이력을 재작성하지 않는다(`amend` 포함). 정정은 후속 커밋으로 한다.
-- commit/push를 수행하는 작업의 완료 조건은 **이번 작업 범위 미커밋 변경 0건 + `HEAD == origin/main`**이다.
-  다른 세션의 변경까지 정리하여 저장소 전체를 clean하게 만들지 않는다.
+- commit/push를 수행하는 작업의 완료 조건은 **이번 작업 범위 미커밋 변경 0건 + 내 커밋이 `origin/main`에 포함**
+  (`git merge-base --is-ancestor HEAD origin/main`)이다. 다른 세션의 변경까지 정리하여 저장소 전체를 clean하게 만들지 않는다.
 
 ## 5. 위험 변경 / 사용자 확인
 
