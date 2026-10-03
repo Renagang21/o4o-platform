@@ -396,7 +396,7 @@ Round 3까지 Playwright 브라우저 자동화 중심 → Round 4에서는 **AP
 | GlucoseView | e2e-r4-glucoseview@o4o.com | [REDACTED_PASSWORD] | `c3e26ac3-...` |
 | K-Cosmetics | e2e-r4-kcosmetics@o4o.com | [REDACTED_PASSWORD] | `20e42f28-...` |
 
-운영자 계정: `O4oGlycoAdmin!2026` (admin 역할, 쿠키 인증)
+운영자 계정: `[REDACTED_PASSWORD]` (admin 역할, 쿠키 인증)
 
 ---
 
