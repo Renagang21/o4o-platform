@@ -104,13 +104,14 @@ merge commit `809b512ca` 의 CI Pipeline(push): `CI Gate` success.
 | #270 | full | `CI Gate` |
 | #271 | frontend-only (green · red) | `CI Gate` |
 | main push `809b512ca` | push | `CI Gate` |
-| 이 CHECK PR | docs-only | §4-3 |
+| #272 (이 CHECK) | docs-only | `CI Gate` |
 
 접미사 · matrix 표기 · 미렌더 expression 없음.
 
-### 4-3. docs-only 결과
+### 4-3. docs-only 결과 — PR #272 (첫 commit `952304a0b`)
 
-(이 PR 의 CI 결과를 확인한 뒤 기록)
+`CI Gate` **pass** — 실행: Detect · Docs Fast / skip: Code Quality · API Jest · Build · Web build · Admin Fast 2 · CodeQL Analyze.
+같은 run 에서 matrix job 은 `API Server Jest (${{ matrix.shard }}/3)` 로 미렌더 표시 — 기존 후보가 탈락한 이유가 그대로 재현됐고, `CI Gate` 는 이름이 고정이다.
 
 ## 5. 정리
 
