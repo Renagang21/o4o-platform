@@ -173,7 +173,8 @@ Chrome native host · Chrome Extension · 실제 browser session(Playwright 프�
 
 **PR merge 후 자기 세션이 만든 worktree 의 정리는 표준 종료 절차다.** 즉시 삭제하지 않고 아래 순서로 점검한 뒤 삭제한다.
 
-1. **main 반영 확인** — post-merge CI 확인 · 작업 commit 이 모두 main 에 포함(`git log origin/main..wo/<slug>` 비어 있음.
+1. **main 반영 확인** — 먼저 `git fetch origin --prune`(GitHub 에서 merge 한 직후 로컬 `origin/main` 은 자동 갱신되지 않는다) →
+   post-merge CI 확인 · 작업 commit 이 모두 main 에 포함(`git log origin/main..wo/<slug>` 비어 있음.
    squash merge 라 비어 있지 않으면 `git diff origin/main wo/<slug> -- <내 작업 경로>` 차이 0 으로 확인).
 2. **worktree clean** — uncommitted 0 · untracked 0 · 진행 중 operation(`MERGE_HEAD` · rebase 등) 없음.
 3. **남은 일 없음** — deploy / smoke / closure 없음 · 보존할 CHECK / log / artifact 없음 · 다른 세션 사용 없음 ·
@@ -185,8 +186,10 @@ Chrome native host · Chrome Extension · 실제 browser session(Playwright 프�
    `git worktree remove` 를 실행해 기준 저장소의 `packages/` 소스가 삭제된 사고.
 5. **삭제** — `git worktree remove <path>` → `git worktree prune`.
 6. **손상 검증** — 기준 main checkout 에서 `git status --short` 에 삭제(` D`) 항목이 없는지 확인한다(`node_modules` 개수가 아니라).
-7. **branch 정리** — main 에 포함된 로컬 `wo/<slug>` 는 `git branch -d`(강제 `-D` 금지). 원격 branch 는 PR merge 시
-   `--delete-branch` 또는 merge 후 삭제한다.
+7. **branch 정리** — main 에 포함된 로컬 `wo/<slug>` 는 `git branch -d`. 원격 branch 는 PR merge 시
+   `--delete-branch` 또는 merge 후 삭제한다. squash merge 는 branch tip 이 main 의 조상이 아니어서 `-d` 가 거절된다 —
+   그 경우에 한해, 1 단계의 경로 diff 0 을 확인했고 PR 이 merged 상태일 때만 `git branch -D wo/<slug>` 를 쓴다.
+   그 밖의 상황에서 강제 삭제(`-D`)는 하지 않는다.
 
 - 판정은 `SAFE_TO_REMOVE` / `KEEP` / `UNCERTAIN` 이다. 1~4 를 모두 통과한 `SAFE_TO_REMOVE` 는 별도 승인 없이 5~7 까지 진행한다
   (main 통합 승인이 트랙 종료를 포함한다). `KEEP` / `UNCERTAIN` 이면 삭제하지 않고 이유를 보고한다.
