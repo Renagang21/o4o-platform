@@ -184,7 +184,7 @@ route 와 기능이 함께 준비된 뒤 노출했으므로 "준비 중 메뉴 0
 
 9개 라우트 중 미인증 통과 **0건**.
 
-### 4-2. 미연결 계정 — `renagang21@gmail.com`
+### 4-2. 미연결 계정 — `[REDACTED_EMAIL_B]`
 
 이 계정은 **PH enrollment 0** 이면서 KPA·Neture 조직을 보유한다.
 공통 `resolveStoreAccess` 의 `LIMIT 1` 폴백이 실제로 무엇을 내주는지까지 같은 시점에 실측했다.

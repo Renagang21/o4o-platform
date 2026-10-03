@@ -110,7 +110,7 @@ docs/checks/CHECK-O4O-ADMIN-PRODUCT-MASTER-STATUS-ACTIONS-V1.md                 
 
 - **배포 확인**: 내 커밋 `8fe7e46c3` 의 **Deploy API Server / Deploy Admin Dashboard 모두 SUCCESS** (병행 세션 `f1bce3172` 시점의 배포 실패 blocker = 미커밋 `product-master-status.controller.ts`/`ProductMasterStatusControls` 였고, 이 두 파일이 내 커밋에 포함되어 **blocker 해소**됨).
 - **브라우저 UI smoke 는 보류**: Playwright 영구 프로필(`C:\Users\home\.playwright-o4o-profile`)이 기존 Chrome 인스턴스에 점유되어 기동 실패(병행 세션/기존 브라우저 추정, 강제 종료 안 함). UI 계층(필터 드롭다운/배지/모달/행 액션)은 typecheck+build PASS 로 정합성 확인, **런타임 동작은 아래 실 API smoke 로 검증**.
-- **인증**: `sohae2100@gmail.com`(roles: platform:super_admin, neture:admin/operator …) → 상태 role-gate 통과.
+- **인증**: `[REDACTED_EMAIL_A]`(roles: platform:super_admin, neture:admin/operator …) → 상태 role-gate 통과.
 - **대상 상품**: `손 부목` (id `00a96718-…7aa84`, barcode `6970398842176`), smoke 전/후 모두 **ACTIVE**.
 
 | # | 검증 | 결과 |

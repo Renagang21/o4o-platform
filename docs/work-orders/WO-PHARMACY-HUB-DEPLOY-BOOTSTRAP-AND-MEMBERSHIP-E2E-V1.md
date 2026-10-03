@@ -70,7 +70,7 @@ E2E 검증을 막는 요인은 3개였다.
 수동 SQL 대신 **멱등 migration** 을 선택했다 — git 이력과 CI/CD 절차 안에 남고,
 환경 재구성·감사에 유리하다.
 
-부여 대상: `sohae2100@gmail.com` (TEST-ACCOUNTS SSOT 의 전 서비스 운영자 계정 축과 동일)
+부여 대상: `[REDACTED_EMAIL_A]` (TEST-ACCOUNTS SSOT 의 전 서비스 운영자 계정 축과 동일)
 
 | 테이블 | 쓰는 값 |
 |--------|---------|
@@ -144,11 +144,11 @@ write-path 규약과 일치한다 — `MembershipApprovalService` 가 이 값을
 > 사용자 승인 아래 `[E2E_TEST]` 전용 store_owner 계정 2개를 기존 API 로 생성해 두 항목을 모두 닫았다.
 > 결과: [`CHECK-PHARMACY-HUB-MEMBERSHIP-JOIN-AND-APPROVAL-V1 §13`](../checks/CHECK-PHARMACY-HUB-MEMBERSHIP-JOIN-AND-APPROVAL-V1.md) (반려 경로 · 결함 3건) ·
 > [`CHECK-PHARMACY-HUB-SUPPLIER-PRODUCT-OFFER-DELIVERY-V1 §11`](../checks/CHECK-PHARMACY-HUB-SUPPLIER-PRODUCT-OFFER-DELIVERY-V1.md) (약국 경영자 조회 200 · 브라우저 진입).
-> `renagang21@gmail.com` 비밀번호 불일치는 **우회**했을 뿐 여전히 유효하다 — 해당 계정은 검증에 쓰지 않는다.
+> `[REDACTED_EMAIL_B]` 비밀번호 불일치는 **우회**했을 뿐 여전히 유효하다 — 해당 계정은 검증에 쓰지 않는다.
 
 | 항목 | 차단 사유 |
 |------|-----------|
-| 약국 경영자 **브라우저** 진입 | `renagang21@gmail.com` 프로덕션 비밀번호가 `TEST-ACCOUNTS.local.md` 값과 불일치 → `401 INVALID_CREDENTIALS`. 문서 45행이 "서비스 시작 전 비번 변경 대상"으로 표기한 계정이며, 문서가 갱신되지 않은 것으로 보인다. 셸 개입 없이 파일 payload 로 재시도해도 동일. 계정 잠금 로직은 없고 `SERVICE_NOT_MEMBER` 와 구분된 코드이므로 bcrypt 불일치 확정. **서버 측 역할 부여(`pharmacy-hub:store_owner` active)는 확인됨** — 사용자 측 진입만 미검증. |
+| 약국 경영자 **브라우저** 진입 | `[REDACTED_EMAIL_B]` 프로덕션 비밀번호가 `TEST-ACCOUNTS.local.md` 값과 불일치 → `401 INVALID_CREDENTIALS`. 문서 45행이 "서비스 시작 전 비번 변경 대상"으로 표기한 계정이며, 문서가 갱신되지 않은 것으로 보인다. 셸 개입 없이 파일 payload 로 재시도해도 동일. 계정 잠금 로직은 없고 `SERVICE_NOT_MEMBER` 와 구분된 코드이므로 bcrypt 불일치 확정. **서버 측 역할 부여(`pharmacy-hub:store_owner` active)는 확인됨** — 사용자 측 진입만 미검증. |
 | 반려 사유 표시 | 두 신청을 모두 승인해 pending 이 없다. 반려 경로 검증에는 제3 신원이 필요하다. |
 
 ### 4-4. 검증 중 발생한 데이터 blemish

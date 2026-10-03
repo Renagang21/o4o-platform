@@ -13,7 +13,7 @@
 | 작업 일시 | 2026-07-07 |
 | 접속 | Cloud SQL Auth Proxy (127.0.0.1:15466) → psql SELECT (read-only) |
 | 인스턴스 / DB | `netureyoutube:asia-northeast3:o4o-platform-db` / `o4o_platform` |
-| 인증 | gcloud ADC(sohae2100@gmail.com) + DB 계정 `o4o_api`(Cloud Run env) |
+| 인증 | gcloud ADC([REDACTED_EMAIL_A]) + DB 계정 `o4o_api`(Cloud Run env) |
 | write | **0** (SELECT/COUNT만) |
 | grounding 원천 | `shared_product_descriptions.content`(`source_type='mfds_easy_drug'`) **원문 텍스트 실조회** |
 

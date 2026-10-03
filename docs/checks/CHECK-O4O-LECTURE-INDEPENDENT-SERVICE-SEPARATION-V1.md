@@ -186,7 +186,7 @@ Cloud SQL Auth Proxy(loopback) · `SELECT` 만. DB timezone UTC.
 
 ### 10.3 `study.neture.co.kr` 도메인 매핑 — **PASS** (2026-09-21 · 인프라 · 코드 변경 0)
 
-구조 확인: 기존 웹 서비스는 Cloud Run domain mapping 이 아니라 **Global External HTTPS LB `o4o-global-lb`(IP `136.110.132.35`) + serverless NEG + Certificate Manager map `o4o-main-cert-map`**, DNS 는 **Gabia** 네임서버(Cloud DNS 없음). 선례 = pharmacyhub(`neg-pharmacy-hub-web` → `backend-pharmacy-hub-web`(HTTPS · EXTERNAL_MANAGED) → host rule → `cm-cert-pharmacyhub` + `cm-entry-pharmacyhub-*`).
+구조 확인: 기존 웹 서비스는 Cloud Run domain mapping 이 아니라 **Global External HTTPS LB `o4o-global-lb`(IP `[REDACTED_IP]`) + serverless NEG + Certificate Manager map `o4o-main-cert-map`**, DNS 는 **Gabia** 네임서버(Cloud DNS 없음). 선례 = pharmacyhub(`neg-pharmacy-hub-web` → `backend-pharmacy-hub-web`(HTTPS · EXTERNAL_MANAGED) → host rule → `cm-cert-pharmacyhub` + `cm-entry-pharmacyhub-*`).
 
 | 단계 | 상태 | 비고 |
 |---|---|---|
@@ -194,7 +194,7 @@ Cloud SQL Auth Proxy(loopback) · `SELECT` 만. DB timezone UTC.
 | ② backend service `backend-lecture-web` | DONE (9/21) | 분류기 차단 → **사용자가 터미널에서 직접 생성**(EXTERNAL_MANAGED · HTTPS · port-name http · timeout 30 · CDN off = `backend-pharmacy-hub-web` 과 동일, describe 로 확인). add-backend `neg-lecture-web` 은 Claude Code |
 | ③ URL map `o4o-global-lb` | DONE (9/21) | `add-path-matcher path-matcher-lecture --default-service=backend-lecture-web --new-hosts=study.neture.co.kr`. 전후 스냅샷(`C:/tmp/lecture-lb-urlmap-before-2.yaml` / `-after.yaml`) diff = fingerprint + 추가 5줄 → **기존 9 host rule · 7 path matcher 변경 0** |
 | ④ 인증서 | DONE (9/21) | 기존 `cm-cert-lecture`(9/18 생성)는 DNS 완전 전파 후에도 마지막 인증 시도가 02:49Z(DNS 등록 전) 에 머물러 1.5h 재시도 없음(backoff). 사용자 승인 하에 **dual-cert 전환**: `cm-cert-lecture-v2` 생성 → entry `cm-entry-lecture-study` 에 old+v2 병행 → v2 AUTHORIZING → **ACTIVE(7분)** → v2 단독 → smoke PASS 후 old 삭제. 다른 17 entry 무접촉(전부 ACTIVE) |
-| ⑤ DNS `study A 136.110.132.35 TTL 600` | DONE (9/21) | 사용자 Gabia 작업. Gabia 권한 서버 · 8.8.8.8 · 1.1.1.1 · 로컬 전부 해석 |
+| ⑤ DNS `study A [REDACTED_IP] TTL 600` | DONE (9/21) | 사용자 Gabia 작업. Gabia 권한 서버 · 8.8.8.8 · 1.1.1.1 · 로컬 전부 해석 |
 
 smoke (2026-09-21 15:28~ KST · 공개 URL · 로그인 0):
 

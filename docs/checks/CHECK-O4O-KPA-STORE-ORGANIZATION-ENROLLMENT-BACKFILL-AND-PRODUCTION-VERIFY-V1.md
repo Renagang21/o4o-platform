@@ -138,8 +138,8 @@ service_key drift: 0   ('kpa' / 'kpa-society' 혼재 신규 발생 없음)
 |---|:---:|:---:|---|
 | `[REDACTED_EMAIL]` | 1 · resolved | 1 · resolved | [약국 A] |
 | `[REDACTED_EMAIL]` | 1 · resolved | 1 · resolved | [약국 B] |
-| `sohae2100@gmail.com` | 1 · resolved | 1 · resolved | Sohae 약국 |
-| `renagang21@gmail.com` | 1 · resolved | 1 · resolved | **테스트 약국** (KPA) |
+| `[REDACTED_EMAIL_A]` | 1 · resolved | 1 · resolved | Sohae 약국 |
+| `[REDACTED_EMAIL_B]` | 1 · resolved | 1 · resolved | **테스트 약국** (KPA) |
 | `o4o-smoke-mystore@…`(검증용) | 1 · resolved | 1 · resolved | 테스트 약국 |
 
 ```text

@@ -31,18 +31,18 @@
 
 ## 2. K-Cosmetics browser 결과 (`https://k-cosmetics.site/mypage/profile`)
 
-계정: `sohae2100@gmail.com` (TEST-ACCOUNTS SSOT). 로그인은 브라우저 저장 세션 / autofill 경유 — 비밀번호를 명령·문서·로그에 남기지 않았다.
+계정: `[REDACTED_EMAIL_A]` (TEST-ACCOUNTS SSOT). 로그인은 브라우저 저장 세션 / autofill 경유 — 비밀번호를 명령·문서·로그에 남기지 않았다.
 
 | 확인 항목 | 결과 |
 |---|---|
 | `/mypage/profile` 진입 | PASS — HTTP 200, 렌더 정상 |
 | `AccountProfileSection` 렌더 | PASS — 이름 / 닉네임(공개 안내문 포함) / 연락처 / 이메일(read-only) / 역할 |
-| 기존 값 표시 | PASS — 이름 `서철환` · 닉네임 `Rena` · 연락처 `01025733743` |
-| 편집 진입 시 prefill | PASS — `["서철환","Rena","01025733743"]` (수정 ① 이전에는 닉네임이 빈 값이었다) |
+| 기존 값 표시 | PASS — 이름 `서철환` · 닉네임 `Rena` · 연락처 `[REDACTED_PHONE]` |
+| 편집 진입 시 prefill | PASS — `["서철환","Rena","[REDACTED_PHONE]"]` (수정 ① 이전에는 닉네임이 빈 값이었다) |
 | 저장 | PASS — `PATCH /api/v1/users/me/profile` 200 |
 | 새로고침 persist | PASS |
 | 원복 | PASS |
-| 원복 재조회 | PASS — `GET /users/me/profile` = name `서철환` · nickname `Rena` · phone `01025733743` · displayName `서철환` |
+| 원복 재조회 | PASS — `GET /users/me/profile` = name `서철환` · nickname `Rena` · phone `[REDACTED_PHONE]` · displayName `서철환` |
 | `editableFields` | `["name","firstName","lastName","nickname","phone"]` (ACCOUNT_CORE allowlist 와 일치) |
 | BusinessProfileSection 회귀 | 회귀 없음 (해당 계정 노출 범위 내) |
 | 404 / 403 / 5xx | **0** |
@@ -62,7 +62,7 @@
 | 저장 | PASS — 200, 헤더 표시명 즉시 반영 |
 | 새로고침 persist | PASS (수정 ②③ 이전에는 **FAIL** — §4 D-2 참조) |
 | 원복 | PASS |
-| 원복 재조회 | PASS — `GET /users/me/profile` name `서철환` · nickname `Rena` · phone `01025733743`, `GET /auth/me` displayName `서철환` |
+| 원복 재조회 | PASS — `GET /users/me/profile` name `서철환` · nickname `Rena` · phone `[REDACTED_PHONE]`, `GET /auth/me` displayName `서철환` |
 | `/mypage/settings` (AccountSecuritySettings) | PASS — 보안 설정 / 비밀번호 변경 / 모든 기기 로그아웃 렌더, 4xx 0 |
 | `/mypage/business-profile` (MyBusinessProfilePage) | 진입 자체는 정상 (HTTP 200). 검증 계정이 공급자가 아니어서 `/neture/supplier/*` 가 401 → "공급자 프로필을 불러오지 못했습니다 / 다시 시도" 표시. **Profile Core 회귀 아님** (권한 기반 정상 동작 · 조회 실패 삼킴 계약대로 오류 노출) |
 | `/supplier/profile` (SupplierProfilePage 축) | 진입 정상 — 비공급자 계정에 `접근 권한이 없습니다` 가드 화면. 회귀 없음 |
@@ -86,7 +86,7 @@ API 계약 자체는 처음부터 정상이었고, 깨진 곳은 (a) 프론트 �
 | 원인 | `packages/auth-utils/src/normalizeUser.ts` 반환 객체에 `nickname` 이 없었다. `...apiUser` spread 없이 이 결과만 쓰는 소비처(`buildPlatformUser` 경로 = Neture · KCos)에서 필드가 사라진다. `/auth/me` 는 nickname 을 정상적으로 내려주고 있었다 |
 | API smoke 로 안 잡히는 이유 | 결함이 서버 응답이 아니라 **클라이언트 정규화 계층**에 있었다. API 만 호출하면 nickname 은 항상 정상으로 보인다 |
 | 수정 | `normalizeUser` 반환에 `nickname` 포함 + `buildPlatformUser` 경유 보존 |
-| 재검증 | KCos 편집 진입 prefill = `["서철환","Rena","01025733743"]` (PASS) |
+| 재검증 | KCos 편집 진입 prefill = `["서철환","Rena","[REDACTED_PHONE]"]` (PASS) |
 
 ### D-2. `displayName` 이 파생 `lastName+firstName` 을 우선함 (backend) — commit `5bc5e3c83` (+ frontend 정합 `becd8e71e`)
 
@@ -152,10 +152,10 @@ DB schema / migration / Identity 재설계 / membership 구조 변경 / 신규 �
 
 | 항목 | 값 |
 |---|---|
-| 대상 | 테스트 계정 `sohae2100@gmail.com` **본인만** |
+| 대상 | 테스트 계정 `[REDACTED_EMAIL_A]` **본인만** |
 | 필드 | ACCOUNT_CORE allowlist (`nickname` @KCos · `name` @Neture) |
 | 절차 | 변경 전 값 기록 → 수정 → 저장 → 새로고침 persist → 원복 → 재조회 |
-| KCos 최종 상태 | name `서철환` · firstName `철환` · lastName `서` · nickname `Rena` · phone `01025733743` · displayName `서철환` |
+| KCos 최종 상태 | name `서철환` · firstName `철환` · lastName `서` · nickname `Rena` · phone `[REDACTED_PHONE]` · displayName `서철환` |
 | Neture 최종 상태 | 동일 (`GET /users/me/profile` · `GET /auth/me` 양쪽 재조회 확인) |
 | 잔존 `QA` 접미사 | **0** — UI · API 양쪽에서 재확인 |
 | role / status / membership / service_credentials / businessInfo / organizations / 타 사용자 | 미접촉 |

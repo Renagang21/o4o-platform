@@ -306,7 +306,7 @@ WITH target_users AS (
   SELECT id, email, name, nickname, "businessInfo", "isActive"
   FROM users
   WHERE email IN (
-    'renagang21@gmail.com', 'pharmacy1@o4o.com', 'sohae2100@gmail.com',
+    '[REDACTED_EMAIL_B]', 'pharmacy1@o4o.com', '[REDACTED_EMAIL_A]',
     'kpa-operator@o4o.com', 'kpa-admin@o4o.com'
   )
 )
@@ -319,40 +319,40 @@ FROM target_users ORDER BY email;
 -- (2) role_assignments 활성 role 전체
 SELECT u.email, ra.role, ra.is_active, ra.scope_type, ra.assigned_at
 FROM role_assignments ra JOIN users u ON u.id = ra.user_id
-WHERE u.email IN ('renagang21@gmail.com','pharmacy1@o4o.com','sohae2100@gmail.com','kpa-operator@o4o.com','kpa-admin@o4o.com')
+WHERE u.email IN ('[REDACTED_EMAIL_B]','pharmacy1@o4o.com','[REDACTED_EMAIL_A]','kpa-operator@o4o.com','kpa-admin@o4o.com')
 ORDER BY u.email, ra.role;
 
 -- (3) service_memberships
 SELECT u.email, sm.service_key, sm.status, sm.role, sm.is_active, sm.approved_at
 FROM service_memberships sm JOIN users u ON u.id = sm.user_id
-WHERE u.email IN ('renagang21@gmail.com','pharmacy1@o4o.com','sohae2100@gmail.com','kpa-operator@o4o.com','kpa-admin@o4o.com')
+WHERE u.email IN ('[REDACTED_EMAIL_B]','pharmacy1@o4o.com','[REDACTED_EMAIL_A]','kpa-operator@o4o.com','kpa-admin@o4o.com')
 ORDER BY u.email, sm.service_key;
 
 -- (4) kpa_members
 SELECT u.email, km.id AS km_id, km.role, km.status, km.membership_type,
        km.activity_type, km.license_number, km.pharmacy_name, km.organization_id
 FROM kpa_members km JOIN users u ON u.id = km.user_id
-WHERE u.email IN ('renagang21@gmail.com','pharmacy1@o4o.com','sohae2100@gmail.com','kpa-operator@o4o.com','kpa-admin@o4o.com')
+WHERE u.email IN ('[REDACTED_EMAIL_B]','pharmacy1@o4o.com','[REDACTED_EMAIL_A]','kpa-operator@o4o.com','kpa-admin@o4o.com')
 ORDER BY u.email;
 
 -- (5) kpa_pharmacist_profiles (activity_type SSOT)
 SELECT u.email, pp.activity_type, pp.license_number, pp.updated_at
 FROM kpa_pharmacist_profiles pp JOIN users u ON u.id = pp.user_id
-WHERE u.email IN ('renagang21@gmail.com','pharmacy1@o4o.com','sohae2100@gmail.com','kpa-operator@o4o.com','kpa-admin@o4o.com')
+WHERE u.email IN ('[REDACTED_EMAIL_B]','pharmacy1@o4o.com','[REDACTED_EMAIL_A]','kpa-operator@o4o.com','kpa-admin@o4o.com')
 ORDER BY u.email;
 
 -- (6) organization_members
 SELECT u.email, om.organization_id, o.name AS org_name, o.type AS org_type, om.role, om.is_primary, om.left_at
 FROM organization_members om JOIN users u ON u.id = om.user_id
 LEFT JOIN organizations o ON o.id = om.organization_id
-WHERE u.email IN ('renagang21@gmail.com','pharmacy1@o4o.com','sohae2100@gmail.com','kpa-operator@o4o.com','kpa-admin@o4o.com')
+WHERE u.email IN ('[REDACTED_EMAIL_B]','pharmacy1@o4o.com','[REDACTED_EMAIL_A]','kpa-operator@o4o.com','kpa-admin@o4o.com')
 ORDER BY u.email;
 
 -- (7) kpa:pharmacist deprecated role 잔존 점검
 SELECT u.email, ra.role, ra.is_active, ra.updated_at
 FROM role_assignments ra JOIN users u ON u.id = ra.user_id
 WHERE ra.role IN ('kpa:pharmacist','kpa:student')
-  AND u.email IN ('renagang21@gmail.com','pharmacy1@o4o.com','sohae2100@gmail.com','kpa-operator@o4o.com','kpa-admin@o4o.com')
+  AND u.email IN ('[REDACTED_EMAIL_B]','pharmacy1@o4o.com','[REDACTED_EMAIL_A]','kpa-operator@o4o.com','kpa-admin@o4o.com')
 ORDER BY u.email, ra.role;
 ```
 
@@ -360,9 +360,9 @@ ORDER BY u.email, ra.role;
 
 | 계정 | 운영자 화면 ‘유형’ 예상 | ‘활동 유형’ 예상 | ‘권한’ chip 예상 | ‘매장 권한’ 예상 |
 |---|---|---|---|---|
-| `renagang21@gmail.com` (운영자 본인 추정) | 약사 또는 미분류 | (선택값) | `관리자` 또는 `운영자` chip + (선택) | 활성/비활성 (선택) |
+| `[REDACTED_EMAIL_B]` (운영자 본인 추정) | 약사 또는 미분류 | (선택값) | `관리자` 또는 `운영자` chip + (선택) | 활성/비활성 (선택) |
 | `pharmacy1@o4o.com` | 약사 | 약국 개설자 | `매장 운영` chip | store_owner 보유 |
-| `sohae2100@gmail.com` | 약사 또는 미분류 | (선택값) | `플랫폼 관리자` 가능성 (super_admin) — 운영자 화면에서 편집 차단 | (선택) |
+| `[REDACTED_EMAIL_A]` | 약사 또는 미분류 | (선택값) | `플랫폼 관리자` 가능성 (super_admin) — 운영자 화면에서 편집 차단 | (선택) |
 | `kpa-operator@o4o.com` | 약사 또는 미분류 | (자유) | `운영자` chip | 없음 (또는 store_owner 겸직) |
 | `kpa-admin@o4o.com` | (자유) | (자유) | `관리자` chip | 없음 |
 

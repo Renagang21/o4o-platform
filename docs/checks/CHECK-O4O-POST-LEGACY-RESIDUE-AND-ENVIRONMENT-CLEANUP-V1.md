@@ -168,15 +168,15 @@ const isDev = (import.meta as unknown as { env?: { DEV?: boolean } }).env?.DEV =
 
 | 계정 | 로그인 | store-hub 접근 | 판정 |
 |---|---|---|---|
-| `renagang21@gmail.com` | **401 `INVALID_CREDENTIALS`** | 검증 불가 | 기록된 비밀번호 무효 |
-| `sohae2100@gmail.com` | 200 | `data: null` / 403 `STORE_OWNER_REQUIRED` | 매장 스코프 없음 |
+| `[REDACTED_EMAIL_B]` | **401 `INVALID_CREDENTIALS`** | 검증 불가 | 기록된 비밀번호 무효 |
+| `[REDACTED_EMAIL_A]` | 200 | `data: null` / 403 `STORE_OWNER_REQUIRED` | 매장 스코프 없음 |
 
 ### 6-2. 구조적 사실 — 역할이 아니라 organization 이 스코프를 결정한다
 
 - `/store-hub/*` 는 `optionalStoreAuth(dataSource, serviceKey)` 로 `req.organizationId` 를 얻으며, 이는 **`{service}:store_owner` 역할을 요구**한다 (서비스 간 유출 방지 가드).
 - 해당 계정들의 `role_assignments."organizationId"` 는 NULL (`scope_type='global'`) 이고, 실제 조직 결속은 **`organization_members`** 에 있다.
 - `service_memberships` 에는 `organization_id` 컬럼이 **없다**. → 서비스 가입 여부만으로 매장 스코프를 판단할 수 없다.
-- 구조적으로 올바른 계정은 `renagang21@gmail.com`(`cosmetics:store_owner` + 약국/매장/공급자 조직 보유)이나 **로그인 불가**.
+- 구조적으로 올바른 계정은 `[REDACTED_EMAIL_B]`(`cosmetics:store_owner` + 약국/매장/공급자 조직 보유)이나 **로그인 불가**.
 
 → WO 의 "무효한 `renagang21` 전제 제거" 지시가 타당함을 확인했다.
 

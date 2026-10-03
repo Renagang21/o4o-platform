@@ -78,9 +78,9 @@ KPA-Society · K-Cosmetics · Neture 코드는 **무변경**(공통 계약 정�
 
 | 계정 / 역할 | 컨텍스트 메뉴 | 역할 셸 header/footer | JS 예외 |
 |---|---|---|:---:|
-| `renagang21@gmail.com` · `pharmacy-hub:store_owner` | `['/', '/forum', '/store-hub', '/store-owner']` | `/store-hub` `/store-owner` `/store-owner/account` header 1 · footer X(의도) | 0 |
-| `sohae2100@gmail.com` · `pharmacy-hub:operator` | `['/', '/forum', '/store-hub', '/operator']` (내 약국 미노출 = 의도) | `/store-hub` `/operator` `/operator/memberships` header 1 · footer X | 0 |
-| `sohae2100@gmail.com` · `kpa-society` 운영자 | `['/', '/store', '/store-hub', '/service-guide', '/about']` | `/operator` header 1 | 0 |
+| `[REDACTED_EMAIL_B]` · `pharmacy-hub:store_owner` | `['/', '/forum', '/store-hub', '/store-owner']` | `/store-hub` `/store-owner` `/store-owner/account` header 1 · footer X(의도) | 0 |
+| `[REDACTED_EMAIL_A]` · `pharmacy-hub:operator` | `['/', '/forum', '/store-hub', '/operator']` (내 약국 미노출 = 의도) | `/store-hub` `/operator` `/operator/memberships` header 1 · footer X | 0 |
+| `[REDACTED_EMAIL_A]` · `kpa-society` 운영자 | `['/', '/store', '/store-hub', '/service-guide', '/about']` | `/operator` header 1 | 0 |
 
 ## 6. 문서 정합
 

@@ -111,7 +111,7 @@
 > 1. **1차 게이트(내용 확인)** — 한국어 본문을 사람에게 보여주고 확정받는다(§작업순서 4). 확인 없이 저장 API 호출 금지.
 > 2. **2차 게이트(승인 저장)** — 확정된 내용만 아래 저장(canonical 승격)으로 진행한다. 저장은 admin 인증 경로이며, 승인 없이 임의 canonical 저장을 하지 않는다.
 
-**자격증명**: admin `sohae2100@gmail.com`(neture:admin), 비번은 **SSOT([docs/local/TEST-ACCOUNTS.local.md](../../../local/TEST-ACCOUNTS.local.md))에서 런타임 read** — 로그/커밋 노출 금지. host=`o4o-core-api` Cloud Run.
+**자격증명**: admin `[REDACTED_EMAIL_A]`(neture:admin), 비번은 **SSOT([docs/local/TEST-ACCOUNTS.local.md](../../../local/TEST-ACCOUNTS.local.md))에서 런타임 read** — 로그/커밋 노출 금지. host=`o4o-core-api` Cloud Run.
 
 1. 로그인 → `POST /api/v1/auth/login` `{email,password,includeLegacyTokens:true}` → `data.tokens.accessToken`.
 2. master 등록(바코드 없이) → `POST /api/v1/admin/o4o-product-db/masters` `{name, regulatoryType:'건강기능식품', specification, originCountry, tags}` → `data.id` (barcode=NULL, 정체성=UUID).

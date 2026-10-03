@@ -137,7 +137,7 @@ return (
 
 ---
 
-## 5. sohae21@naver.com 계정 — 근본 원인 및 전후 상태
+## 5. [REDACTED_EMAIL_C] 계정 — 근본 원인 및 전후 상태
 
 ### 5.1 근본 원인 (정적 분석 확정)
 
@@ -162,7 +162,7 @@ return (
 ```sql
 SELECT status, representative_name, manager_name, manager_phone
 FROM neture_suppliers s JOIN users u ON u.id = s.user_id
-WHERE u.email = 'sohae21@naver.com';
+WHERE u.email = '[REDACTED_EMAIL_C]';
 -- 유사 케이스 집계 (담당자 정보 null 인 PENDING supplier 수)
 SELECT count(*) FROM neture_suppliers
 WHERE status='PENDING' AND (manager_name IS NULL OR manager_phone IS NULL);

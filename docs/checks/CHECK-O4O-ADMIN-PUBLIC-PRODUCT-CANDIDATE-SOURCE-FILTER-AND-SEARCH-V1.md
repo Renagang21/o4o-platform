@@ -39,7 +39,7 @@ ILIKE 파라미터는 `%` `_` `\` 를 리터럴 이스케이프 후 `%term%` 바
 | admin-dashboard (page/api) | **PASS** (`tsc --noEmit`, 변경 파일 오류 0) |
 
 ### 2.2 Backend read-only smoke (프로덕션, findCandidates 동일 WHERE 의 psql count)
-> 방화벽 임시 오픈(실행 IP) → 단일 연결 조회 → **원복 확인**(`124.194.156.36/32` only). DB write 0.
+> 방화벽 임시 오픈(실행 IP) → 단일 연결 조회 → **원복 확인**(`[REDACTED_IP]/32` only). DB write 0.
 
 | 쿼리 | 기대 | 실측 |
 |---|---:|---:|

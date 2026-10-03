@@ -123,7 +123,7 @@ filterContextualNav<TCondition>(items, conditions, { showAll? }): GlobalHeaderNa
 - KPA `/store-hub` 에서 `내 약국(/store)` 과 `약국 운영 허브(/store-hub)` 가 **동시에 활성** 표시된다.
   `GlobalHeader` 내부 `isActive()` 의 prefix 판정(`/store-hub`.startsWith(`/store`)) 때문이며,
   본 WO 는 `isActive()` 를 수정하지 않았다. 변경 전과 동일한 동작이므로 별도 문제 큐로 유지한다.
-- Neture 공급자 계정 `sohae21@naver.com` 은 현재 Neture 서비스 이용 권한이 없어 401 이다.
+- Neture 공급자 계정 `[REDACTED_EMAIL_C]` 은 현재 Neture 서비스 이용 권한이 없어 401 이다.
   공급자 smoke 는 `테스트 공급자` 계정으로 수행했다. 계정 상태 문제이며 메뉴·라우팅과 무관하다.
 
 ## 7. 범위 밖 — 별도 문제 큐 유지

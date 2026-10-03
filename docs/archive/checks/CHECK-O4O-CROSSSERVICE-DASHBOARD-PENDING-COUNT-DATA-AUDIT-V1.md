@@ -1,7 +1,7 @@
 # CHECK-O4O-CROSSSERVICE-DASHBOARD-PENDING-COUNT-DATA-AUDIT-V1
 
 **검증 일자**: 2026-05-30
-**검증 환경**: production `o4o-platform-db` (host 34.64.96.252, POSTGRES_15, RUNNABLE)
+**검증 환경**: production `o4o-platform-db` (host [REDACTED_IP], POSTGRES_15, RUNNABLE)
 **검증 방식**: read-only SELECT only (gcloud sql IP allowlist + 직접 psql 17 client). DDL/DML/migration 일절 없음
 **선행 IR**: [IR-O4O-CROSSSERVICE-OPERATOR-ADMIN-DASHBOARD-CANONICAL-AUDIT-V1](IR-O4O-CROSSSERVICE-OPERATOR-ADMIN-DASHBOARD-CANONICAL-AUDIT-V1.md) §9
 **Tier**: 5 (데이터 검증 CHECK)

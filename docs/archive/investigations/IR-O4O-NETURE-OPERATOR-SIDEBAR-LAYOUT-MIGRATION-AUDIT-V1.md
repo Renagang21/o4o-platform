@@ -231,7 +231,7 @@ Neture 축에 맞는 domain 후보 (설계 결정 대상):
   - 공급/유통·커머스·정산 등 Neture 도메인 항목 노출 (가입 승인 / 공급자 활성화 / 상품 관리 / 주문 / 파트너 / AI 리포트 등)
   - profile dropdown: 관리자/운영/**공급자/파트너** 대시보드 href + 마이페이지/설정
   - active route / collapse / footer 유무
-  - operator 계정: SSOT 의 Neture operator(`operator-neture@o4o.com` 또는 통합 운영자 `sohae2100@gmail.com`) — 단, smoke 단일계정 cross-origin 특성 확인 필요
+  - operator 계정: SSOT 의 Neture operator(`operator-neture@o4o.com` 또는 통합 운영자 `[REDACTED_EMAIL_A]`) — 단, smoke 단일계정 cross-origin 특성 확인 필요
 - baseline: 이행 전 Neture flat sidebar 스냅샷을 **사전 캡처(out-neture-before)** 후 이행 후와 비교 (단, flat→domain 변화는 의도된 diff 이므로 항목 집합 동등성 위주 비교).
 
 ---

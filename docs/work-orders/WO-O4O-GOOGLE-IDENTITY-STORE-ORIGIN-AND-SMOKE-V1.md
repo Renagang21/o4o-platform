@@ -17,7 +17,7 @@ https://store.neture.co.kr
 인프라는 정상(Unified Store 트랙 실측):
 
 ```text
-DNS      store.neture.co.kr → 136.110.132.35        PASS
+DNS      store.neture.co.kr → [REDACTED_IP]        PASS
 GCLB / HTTPS proxy / certificate map                PASS
 cm-entry-store                                      ACTIVE
 cm-cert-store-v1                                    ACTIVE

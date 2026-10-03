@@ -183,7 +183,7 @@ schema/migration 없음, AI 기능 재설계 없음, Neture 외 서비스 의미
 ## 배포 후 재검증
 
 - commit: `f8c9aedfc` (main), 배포 workflow **Deploy API Server (Cloud Run) success / Deploy Web Services (Cloud Run) success**
-- 검증: 2026-08-26, actor `renariver21@gmail.com` (`platform:super_admin`)
+- 검증: 2026-08-26, actor `[REDACTED_EMAIL_D]` (`platform:super_admin`)
 
 ### production API (24/24)
 
@@ -226,7 +226,7 @@ schema/migration 없음, AI 기능 재설계 없음, Neture 외 서비스 의미
 | 주체 | 결과 |
 |---|---|
 | 미인증 | `/dashboard,/engines,/policy,/usage,/quotas,/billing` **전부 401** |
-| `sohae2100@gmail.com` (`neture:admin`,`neture:operator`,`cosmetics:admin/operator`,`kpa:admin/operator`,`pharmacy-hub:admin/operator`,`kpa-branch:operator`,`kpa:store_owner`) | 위 4개 + `/ops/*`,`/analytics/*`,`/quotas*`,`/billing` **전부 403** |
+| `[REDACTED_EMAIL_A]` (`neture:admin`,`neture:operator`,`cosmetics:admin/operator`,`kpa:admin/operator`,`pharmacy-hub:admin/operator`,`kpa-branch:operator`,`kpa:store_owner`) | 위 4개 + `/ops/*`,`/analytics/*`,`/quotas*`,`/billing` **전부 403** |
 | `platform:super_admin` | 200 |
 
 **cross-service leak = 0.** 타 서비스 admin/operator 를 다수 보유한 계정도 200 을 받지 못한다. 권한을 넓히지 않았다(§4 준수).

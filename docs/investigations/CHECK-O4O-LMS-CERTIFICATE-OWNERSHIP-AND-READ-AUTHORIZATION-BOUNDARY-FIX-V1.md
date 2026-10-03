@@ -137,7 +137,7 @@ certificate 가 0건이라 "본인 200 / 타인 404 / cross-service 404" 를 프
 3. 배포된 endpoint 의 기본 동작 실측 (아래)
 4. DB 0건 실측 (§7)
 
-배포 후 런타임 실측 (계정 `sohae2100@gmail.com` / `kpa-society`, write 0):
+배포 후 런타임 실측 (계정 `[REDACTED_EMAIL_A]` / `kpa-society`, write 0):
 
 | 검증 | 결과 |
 |---|---|

@@ -18,7 +18,7 @@ https://www.pharmacyhub.co.kr    ← 동일 Web 제공 (현재 리디렉션 미�
 |------|-----|
 | Web 서비스 | Cloud Run `pharmacy-hub-web` (asia-northeast3) |
 | API 주소 | `https://api.neture.co.kr` (변경 없음) |
-| LB 진입 IP | `136.110.132.35` (`o4o-global-lb-forwarding-rule-2`, 443) |
+| LB 진입 IP | `[REDACTED_IP]` (`o4o-global-lb-forwarding-rule-2`, 443) |
 | `run.app` 노출 | 사용자-facing 링크에 없음 (LB 경유만) |
 
 ---
@@ -40,8 +40,8 @@ https://www.pharmacyhub.co.kr    ← 동일 Web 제공 (현재 리디렉션 미�
 
 | 호스트 | 유형 | 값 |
 |--------|------|-----|
-| `@` | A | `136.110.132.35` |
-| `www` | A | `136.110.132.35` |
+| `@` | A | `[REDACTED_IP]` |
+| `www` | A | `[REDACTED_IP]` |
 | `_acme-challenge` | CNAME | `a74bae62-….2.authorize.certificatemanager.goog.` |
 | `_acme-challenge.www` | CNAME | `a3834445-….18.authorize.certificatemanager.goog.` |
 
@@ -90,8 +90,8 @@ www.pharmacyhub.co.kr
 
 | 레코드 | 유형 | 기대값 | 권한 NS 3곳 | 8.8.8.8 | 1.1.1.1 |
 |--------|:----:|--------|:---:|:---:|:---:|
-| `pharmacyhub.co.kr` | A | `136.110.132.35` | ✅ | ✅ | ✅ |
-| `www.pharmacyhub.co.kr` | A | `136.110.132.35` | ✅ | ✅ | ✅ |
+| `pharmacyhub.co.kr` | A | `[REDACTED_IP]` | ✅ | ✅ | ✅ |
+| `www.pharmacyhub.co.kr` | A | `[REDACTED_IP]` | ✅ | ✅ | ✅ |
 | `_acme-challenge.pharmacyhub.co.kr` | CNAME | authorization 값 | ✅ | ✅ | ✅ |
 | `_acme-challenge.www.pharmacyhub.co.kr` | CNAME | authorization 값 | ✅ | ✅ | ✅ |
 

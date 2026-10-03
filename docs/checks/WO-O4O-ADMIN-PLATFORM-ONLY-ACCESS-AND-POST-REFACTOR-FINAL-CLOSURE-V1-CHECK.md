@@ -30,10 +30,10 @@
 | 항목 | 실측 |
 |---|---|
 | `platform:super_admin` role 존재 | YES |
-| ACTIVE 보유자 (변경 전) | `super-admin@o4o.com` · `renariver21@gmail.com` (2계정) |
-| `sohae2100@gmail.com` users.id | `cfd2a5e7-db28-4842-bd5c-4814cba49ca5` (active) |
-| `sohae2100@gmail.com` 보유 역할 | ACTIVE 서비스 역할 10건 + `platform:super_admin` **`is_active=false`** |
-| 관리자 사이트 실제 로그인 계정 | `renariver21@gmail.com` (TEST-ACCOUNTS SSOT 기준) |
+| ACTIVE 보유자 (변경 전) | `super-admin@o4o.com` · `[REDACTED_EMAIL_D]` (2계정) |
+| `[REDACTED_EMAIL_A]` users.id | `cfd2a5e7-db28-4842-bd5c-4814cba49ca5` (active) |
+| `[REDACTED_EMAIL_A]` 보유 역할 | ACTIVE 서비스 역할 10건 + `platform:super_admin` **`is_active=false`** |
+| 관리자 사이트 실제 로그인 계정 | `[REDACTED_EMAIL_D]` (TEST-ACCOUNTS SSOT 기준) |
 
 핵심 사실: `sohae2100` 의 `platform:super_admin` assignment 는 **행 자체는 이미 존재**했고
 `is_active=false` 로 비활성화되어 있었다 (비활성 시점 2026-07-26). 신규 부여가 아니라 재활성이 필요한 상태였다.
@@ -57,7 +57,7 @@
 
 ### 1.4 변경 후 `platform:super_admin` ACTIVE 보유자
 
-`super-admin@o4o.com` · `renariver21@gmail.com` · `sohae2100@gmail.com` — **3계정**
+`super-admin@o4o.com` · `[REDACTED_EMAIL_D]` · `[REDACTED_EMAIL_A]` — **3계정**
 
 ---
 
@@ -170,7 +170,7 @@ lint 10건은 이번 변경과 무관한 기존 결함이므로 중지 조건으
 
 별도 브라우저 세션. 배포본 확인: 로그인 화면 배포 스탬프 `2026-09-10`.
 
-### 5.1 플랫폼 관리자 (`renariver21@gmail.com`)
+### 5.1 플랫폼 관리자 (`[REDACTED_EMAIL_D]`)
 
 | 확인 | 결과 |
 |---|---|
@@ -202,7 +202,7 @@ lint 10건은 이번 변경과 무관한 기존 결함이므로 중지 조건으
 - 죽은 컴포넌트 재렌더 **없음**
 - 콘솔 에러 **0**
 
-### 5.3 서비스 역할 전용 계정 (`renagang21@gmail.com`)
+### 5.3 서비스 역할 전용 계정 (`[REDACTED_EMAIL_B]`)
 
 실측 보유 역할 8건 — `platform:super_admin` **없음**:
 `user` · `kpa:store_owner` · `cosmetics:store_owner` · `lms:instructor` · `pharmacy` · `supplier` · `pharmacy-hub:store_owner` · `kpa-branch:member`

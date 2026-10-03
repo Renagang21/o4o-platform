@@ -135,8 +135,8 @@ migration 0 · 신규 테이블 0 · 신규 컬럼 0 · 신규 role 0
 
 ## 8. 배포 · E2E (프로덕션 실측)
 
-인증은 `renariver21@gmail.com`(`platform:super_admin`) — `PHARMACY_HUB_SCOPE_CONFIG.platformBypass=true`
-로 store_owner scope 를 통과한다. 대조군은 `sohae21@naver.com`(공급자, store_owner 아님).
+인증은 `[REDACTED_EMAIL_D]`(`platform:super_admin`) — `PHARMACY_HUB_SCOPE_CONFIG.platformBypass=true`
+로 store_owner scope 를 통과한다. 대조군은 `[REDACTED_EMAIL_C]`(공급자, store_owner 아님).
 
 ### 8-1. 권한
 

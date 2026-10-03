@@ -104,14 +104,14 @@ if ((distributionChanged || activating) && PRIVATE && sellerIds 비어있음) �
 
 | 계정 | 결과 |
 |---|---|
-| `renagang21@gmail.com` (WO §9 지정 계정, Neture 공급자2) | **401 `INVALID_CREDENTIALS`** |
-| `sohae2100@gmail.com` (Neture admin/operator) | **401 `INVALID_CREDENTIALS`** |
-| `sohae21@naver.com` (Neture 공급자) | **401 `ACCOUNT_NOT_ACTIVE`** — `users.status='deleted'` |
+| `[REDACTED_EMAIL_B]` (WO §9 지정 계정, Neture 공급자2) | **401 `INVALID_CREDENTIALS`** |
+| `[REDACTED_EMAIL_A]` (Neture admin/operator) | **401 `INVALID_CREDENTIALS`** |
+| `[REDACTED_EMAIL_C]` (Neture 공급자) | **401 `ACCOUNT_NOT_ACTIVE`** — `users.status='deleted'` |
 
-- `renagang21@gmail.com` 은 `users.status='active'` · password 존재이므로 계정 문제가 아니라
+- `[REDACTED_EMAIL_B]` 은 `users.status='active'` · password 존재이므로 계정 문제가 아니라
   **`docs/local/TEST-ACCOUNTS.local.md` 의 값이 현재 프로덕션과 불일치**한다 (해당 문서에 실측 메모 추가).
 - 직전 WO 의 브라우저 smoke 는 Playwright 프로필에 남아 있던 **기존 세션**으로 수행된 것이며,
-  현재 그 프로필의 세션은 `sohae2100@gmail.com`(공급자 아님) 으로 바뀌어 있다.
+  현재 그 프로필의 세션은 `[REDACTED_EMAIL_A]`(공급자 아님) 으로 바뀌어 있다.
 - 비밀번호 추측·DB 직접 보정·비밀번호 재설정은 모두 WO §3 금지 범위 / 상시 제약에 해당하므로 수행하지 않았다.
 
 따라서 §9 ① ② ⑤ ⑥ ⑦ ⑧ ⑨ (등록 · 수정 저장 · master/offer 유지 · 설명서 draft · 검수요청 · 정리)
@@ -192,7 +192,7 @@ FROM supplier_product_offers WHERE deleted_at IS NULL;
 
 | # | 내용 | 필요 조치 |
 |---|---|---|
-| a | 공급자 계정 실데이터 write smoke (§9 ① ② ⑤ ⑥ ⑦ ⑧ ⑨) | `renagang21@gmail.com` 프로덕션 비밀번호 확인·갱신 후 재실행 |
+| a | 공급자 계정 실데이터 write smoke (§9 ① ② ⑤ ⑥ ⑦ ⑧ ⑨) | `[REDACTED_EMAIL_B]` 프로덕션 비밀번호 확인·갱신 후 재실행 |
 | b | `docs/local/TEST-ACCOUNTS.local.md` 비밀번호 3건 불일치 | 사용자만 갱신 가능 (git 미추적) |
 
 ## 13. 문서 정합

@@ -169,7 +169,7 @@ Screen Set / Signage / SPD 백엔드 계약 0.
 
 ## 7. 실브라우저 smoke (프로덕션 `https://neture.co.kr`)
 
-계정: Neture 공급자 (`renagang21@gmail.com`). 자격증명은 env 주입 — 스크립트·문서에 literal 없음.
+계정: Neture 공급자 (`[REDACTED_EMAIL_B]`). 자격증명은 env 주입 — 스크립트·문서에 literal 없음.
 
 ### 7.1 결과
 
@@ -206,7 +206,7 @@ POST /api/v1/auth/login
 - curl 로 재현했다. 응답 코드가 `INVALID_CREDENTIALS`(비밀번호 불일치)라 **원인 오인 위험**이 크다 — 실제로는 자격증명 문제가 아니다.
 - 본 WO 는 프론트 IA 변경만 했고 인증 코드를 건드리지 않았다. **범위 밖이라 수정하지 않고 분리 보고**한다.
 - smoke 는 페이지 컨텍스트에서 `serviceKey` 없이 로그인해 쿠키·`o4o_accessToken` 을 확보하는 우회로 진행했다.
-- 참고: `docs/local/TEST-ACCOUNTS.local.md` 의 `sohae21@naver.com` 비밀번호도 프로덕션과 불일치(401) — 문서 drift.
+- 참고: `docs/local/TEST-ACCOUNTS.local.md` 의 `[REDACTED_EMAIL_C]` 비밀번호도 프로덕션과 불일치(401) — 문서 drift.
 
 > 이 두 건은 후속 §9 에 WO 후보로 올린다.
 

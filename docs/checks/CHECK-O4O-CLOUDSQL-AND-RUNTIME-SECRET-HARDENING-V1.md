@@ -193,7 +193,7 @@ serviceAccount:117791934476-compute@developer.gserviceaccount.com
 | public IP (`ipv4Enabled`) | **true** |
 | private IP (`privateNetwork`) | **없음 (null)** |
 | PSC | 미설정 |
-| authorizedNetworks | **`124.194.156.36/32` 1건** |
+| authorizedNetworks | **`[REDACTED_IP]/32` 1건** |
 | sslMode | **`ALLOW_UNENCRYPTED_AND_ENCRYPTED`** |
 | requireSsl | false |
 | VPC connector (Cloud Run) | 없음 (`--clear-vpc-connector`) |
@@ -370,7 +370,7 @@ CLOUDSQL_RUNTIME_SECRET_HARDENING = NOT_CLOSED
 
 ### BASELINE (변경 전) — 2026-08-25
 - instance: netureyoutube:asia-northeast3:o4o-platform-db (POSTGRES_15, RUNNABLE)
-- ipConfiguration: ipv4Enabled=true, authorizedNetworks=[124.194.156.36/32],
+- ipConfiguration: ipv4Enabled=true, authorizedNetworks=[[REDACTED_IP]/32],
   sslMode=ALLOW_UNENCRYPTED_AND_ENCRYPTED, requireSsl=false
 - NOTE: *.run.app URL은 라우팅되지 않아 404. 검증 기준 호스트 = https://api.neture.co.kr
 - /health           = 200 status:alive v0.5.0

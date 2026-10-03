@@ -92,7 +92,7 @@
 
 프로덕션 `https://kpa.neture.co.kr/operator/members` 에서 어떤 회원을 선택해도 비밀번호 변경 모달이
 "이 회원의 비밀번호를 변경할 수 있는 서비스가 없습니다 / 내가 관리하는 서비스 중 이 회원이 가입한 서비스가 없습니다"
-만 표시하고 서비스 선택 `<select>` 가 0개였다(`[REDACTED_EMAIL]`, `renagang21@gmail.com` 실측).
+만 표시하고 서비스 선택 `<select>` 가 0개였다(`[REDACTED_EMAIL]`, `[REDACTED_EMAIL_B]` 실측).
 
 원인은 백엔드가 아니다. 공통 `OperatorMembersConsolePage` 의 PasswordModal 은 후보 서비스를
 `user.memberships` 에서만 도출하는데(L120-124), KPA wrapper 의 `kpaMemberToUserData()` 가 그 필드를
@@ -150,6 +150,6 @@
 | commit | `ea1f501e6` (FIX-1/FIX-2 + 테스트) · `4ab837016` (FIX-3) — 둘 다 push 완료 |
 | 배포 | admin run 31565195772 success · api run 31565195766 success · web(kpa-society) run 31566282532 **success** |
 | KPA `/operator/members` → 더보기 → 비밀번호 변경 (`[REDACTED_EMAIL]`) | **PASS** — "대상 서비스 **KPA-Society** / 이 서비스의 로그인 비밀번호만 변경됩니다" 표시. 수정 전에는 후보 0 안내였다. |
-| 동상 (`renagang21@gmail.com`) | **PASS** — 동일하게 KPA-Society 자동 확정 |
+| 동상 (`[REDACTED_EMAIL_B]`) | **PASS** — 동일하게 KPA-Society 자동 확정 |
 | 실제 비밀번호 제출 | **수행하지 않음.** 후보 확정까지만 확인했고 `변경` 은 누르지 않았다(운영 데이터 write 회피). |
 | `/users/:id/edit` 비밀번호 입력란 제거 확인 | **미실시.** 이 화면은 `platform:super_admin` 전용인데 `docs/local/TEST-ACCOUNTS.local.md` 에 해당 계정의 비밀번호가 없어 로그인할 수 없다. 코드·타입체크·jest 3케이스로만 검증했다. |

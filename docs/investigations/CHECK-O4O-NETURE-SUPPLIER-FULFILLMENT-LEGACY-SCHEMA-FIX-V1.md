@@ -34,7 +34,7 @@
 | no-auth 요청 | — | `AUTH_REQUIRED` 차단(가드 유지) |
 | `GET /orders/unified` (회귀) | success | **success 유지(회귀 없음)** |
 
-- api-server `tsc` PASS. smoke 계정: `sohae21@naver.com`(linked Neture supplier, 주문 0건) — 0건 정상 응답으로 500 해소 실증.
+- api-server `tsc` PASS. smoke 계정: `[REDACTED_EMAIL_C]`(linked Neture supplier, 주문 0건) — 0건 정상 응답으로 500 해소 실증.
 - read-only(조회 전용). 데이터 변경 없음.
 
 ---

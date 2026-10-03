@@ -46,11 +46,11 @@ contract IR가 "operator view-only API는 `checkout_orders + metadata.serviceKey
 
 ## 4. 프로덕션 DB read-only 검증 가능 여부
 
-**시도:** `o4o-platform-db`(POSTGRES_15, 34.64.96.252, db `o4o_platform`) 대상으로 read-only SELECT(테이블 존재/count/serviceKey 분포)를 (1) `gcloud sql connect`(IP allowlist 후 psql), (2) 직접 `psql -h 34.64.96.252`(SSL) 두 경로로 시도.
+**시도:** `o4o-platform-db`(POSTGRES_15, [REDACTED_IP], db `o4o_platform`) 대상으로 read-only SELECT(테이블 존재/count/serviceKey 분포)를 (1) `gcloud sql connect`(IP allowlist 후 psql), (2) 직접 `psql -h [REDACTED_IP]`(SSL) 두 경로로 시도.
 
 **결과: 미도달(차단).**
 - `gcloud sql connect`: "Allowlisting your IP …done. Connecting…"까지 진행 후 psql 단계에서 **무응답(hang)** — sandbox egress가 5432로 도달하지 못함.
-- 직접 psql: **`Connection timed out` (TCP 34.64.96.252:5432)** — CLAUDE.md §0 명시(프로덕션 DB 방화벽 직접 TCP 차단)와 일치.
+- 직접 psql: **`Connection timed out` (TCP [REDACTED_IP]:5432)** — CLAUDE.md §0 명시(프로덕션 DB 방화벽 직접 TCP 차단)와 일치.
 
 **판정:** WO 규정대로 **"운영 DB read-only 확인 필요"로 기록하고 코드/마이그레이션 근거로 판정**한다. 단 **테이블 존재 여부는 마이그레이션으로 확정 가능**(아래 §5·§6)하므로 핵심 결론에는 영향 없음.
 

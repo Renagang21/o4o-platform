@@ -28,7 +28,7 @@ WO 의 "완료 선언하지 말고 차단 원인을 보고한다" 조항은 차�
 
 ## 1. 계정·credential 상태 조사 (WO 1단계)
 
-- 운영자 계정: `sohae2100@gmail.com` / user id `cfd2a5e7-db28-4842-bd5c-4814cba49ca5` / status `active`
+- 운영자 계정: `[REDACTED_EMAIL_A]` / user id `cfd2a5e7-db28-4842-bd5c-4814cba49ca5` / status `active`
 - credential SSOT: `docs/local/TEST-ACCOUNTS.local.md` (gitignored — 본 문서에 비밀번호를 기록하지 않는다)
 - 보유 role (`/auth/status` 실측):
 

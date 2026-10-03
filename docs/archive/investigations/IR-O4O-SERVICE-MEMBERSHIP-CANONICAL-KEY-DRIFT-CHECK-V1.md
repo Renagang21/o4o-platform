@@ -29,10 +29,10 @@ related:
 | DB | `o4o_platform` (instance `o4o-platform-db`, region `asia-northeast3`) |
 | 접근 방식 | `gcloud sql instances patch --authorized-networks` 로 임시 allowlist → `psql -f` read-only SELECT → 원본 authorized_networks 복원 |
 | service_memberships 총 row 수 | 12 (active=11, pending=4) — Q1 합산 |
-| **Legacy drift row 수** | **`service_key='kpa'` 1 row** (active) — sohae2100@gmail.com |
+| **Legacy drift row 수** | **`service_key='kpa'` 1 row** (active) — [REDACTED_EMAIL_A] |
 | **Legacy `cosmetics` drift** | **0 row** (영향 없음) |
 | 충돌 (legacy + canonical 양쪽 보유) | **0 user** |
-| canonical active 누락 사용자 | **1 user** (kpa: sohae2100@gmail.com) / cosmetics: 0 user |
+| canonical active 누락 사용자 | **1 user** (kpa: [REDACTED_EMAIL_A]) / cosmetics: 0 user |
 | Phase 2 마이그레이션 필요 여부 | **YES (소규모)** — kpa 1 row 만 UPDATE 대상 |
 | 위험도 | **낮음** — 영향 row 1 개 + 충돌 0 |
 | 권장 조치 | Phase 1 deploy 우선, 그 후 Phase 2 small migration (kpa→kpa-society 1 row UPDATE, soft) |
@@ -46,10 +46,10 @@ related:
 ### 1-1. 접근 채널
 - CLAUDE.md §0 정책에 따라 read-only 검증은 Claude Code 가 직접 수행 가능.
 - 본 검사는 다음 순서로 수행:
-  1. `gcloud sql instances describe` 로 기존 authorized_networks 확인 (`124.194.156.36/32` 단일 항목)
-  2. `gcloud sql instances patch --authorized-networks=124.194.156.36/32,<현재IP>/32` 로 현재 IP 임시 추가
-  3. `PGPASSWORD='...' psql -h 34.64.96.252 -U o4o_api -d o4o_platform -f /c/tmp/drift-check.sql` 로 SELECT 실행
-  4. `gcloud sql instances patch --authorized-networks=124.194.156.36/32` 로 임시 IP 제거 — 원본 상태로 복원
+  1. `gcloud sql instances describe` 로 기존 authorized_networks 확인 (`[REDACTED_IP]/32` 단일 항목)
+  2. `gcloud sql instances patch --authorized-networks=[REDACTED_IP]/32,<현재IP>/32` 로 현재 IP 임시 추가
+  3. `PGPASSWORD='...' psql -h [REDACTED_IP] -U o4o_api -d o4o_platform -f /c/tmp/drift-check.sql` 로 SELECT 실행
+  4. `gcloud sql instances patch --authorized-networks=[REDACTED_IP]/32` 로 임시 IP 제거 — 원본 상태로 복원
 - 사용한 DB 계정: `o4o_api` (Cloud Run 에서 사용 중인 read/write 계정. 본 검사에서는 SELECT only).
 - 결과 파일: `/c/tmp/drift-output.txt` (로컬 임시, repo 미포함).
 - 변경된 운영 구성: 없음 (authorized_networks 는 원본으로 복원 완료).
@@ -110,12 +110,12 @@ cosmetics (legacy) : 0 rows
 ```
                user_id                |        email        |        kpa_roles         | kpa_society_status | kpa_legacy_status
 --------------------------------------+---------------------+--------------------------+--------------------+-------------------
- cfd2a5e7-db28-4842-bd5c-4814cba49ca5 | sohae2100@gmail.com | {kpa:admin,kpa:operator} |                    | active
+ cfd2a5e7-db28-4842-bd5c-4814cba49ca5 | [REDACTED_EMAIL_A] | {kpa:admin,kpa:operator} |                    | active
 (1 row)
 ```
 
 **해석**:
-- `sohae2100@gmail.com` 1 명만 누락.
+- `[REDACTED_EMAIL_A]` 1 명만 누락.
 - canonical `kpa-society` row 없음, legacy `kpa` row 만 active.
 - 본 사용자는 IR-O4O-SERVICE-OPERATOR-ROLE-MEMBERSHIP-CONSISTENCY-AUDIT-V1 §9 의 정확한 케이스.
 
@@ -135,14 +135,14 @@ cosmetics (legacy) : 0 rows
 
 **해석**: 마이그레이션 시 UPDATE 충돌 가능성 없음. 단순 `UPDATE … SET service_key='kpa-society' WHERE service_key='kpa'` 로 안전.
 
-### Q7. sohae2100@gmail.com 상세 상태 (IR §9 검증)
+### Q7. [REDACTED_EMAIL_A] 상세 상태 (IR §9 검증)
 
 ```
         email        |     role     | is_active | service_key | membership_status
 ---------------------+--------------+-----------+-------------+-------------------
- sohae2100@gmail.com | kpa:admin    | t         | kpa         | active
- sohae2100@gmail.com | kpa:operator | t         | kpa         | active
- sohae2100@gmail.com | super_admin  | t         | kpa         | active
+ [REDACTED_EMAIL_A] | kpa:admin    | t         | kpa         | active
+ [REDACTED_EMAIL_A] | kpa:operator | t         | kpa         | active
+ [REDACTED_EMAIL_A] | super_admin  | t         | kpa         | active
 (3 rows)
 ```
 
@@ -174,12 +174,12 @@ cosmetics (legacy) : 0 rows
 
 ### 3-1. drift 규모
 - 영향 row: **1 row** (`service_memberships.service_key='kpa'`)
-- 영향 사용자: **1 명** (sohae2100@gmail.com)
+- 영향 사용자: **1 명** ([REDACTED_EMAIL_A])
 - 충돌 사용자: **0 명**
 - cosmetics 쪽 영향: **0**
 
 ### 3-2. 본 사용자 의 실사용 영향
-- sohae2100@gmail.com 은 `super_admin` (unprefixed) role 보유. KPA-Society 의 RoleGuard 는 `allowedRoles` 에 `platform:super_admin` 만 포함하지만 `super_admin` 매칭 여부는 RoleGuard 구현에 따라 다름 (별건).
+- [REDACTED_EMAIL_A] 은 `super_admin` (unprefixed) role 보유. KPA-Society 의 RoleGuard 는 `allowedRoles` 에 `platform:super_admin` 만 포함하지만 `super_admin` 매칭 여부는 RoleGuard 구현에 따라 다름 (별건).
 - MembershipGate 는 `kpa-society` 검색 → 실패. UI 차단.
 - 그러나 본 사용자는 admin.neture.co.kr 의 user 전수 검증 케이스이므로, 일반 운영자 시나리오의 대표성을 갖는다 — IR-V1 §9 의 가설을 실측으로 확인.
 
@@ -252,8 +252,8 @@ WHERE service_key = 'kpa';
 
 - 운영 DB read-only SELECT 8 회 (Q1 ~ Q8).
 - `gcloud sql instances patch` 2 회:
-  1. authorized_networks 임시 추가 (`124.194.156.36/32` + `112.153.205.95/32`)
-  2. 원본 복원 (`124.194.156.36/32` 단일)
+  1. authorized_networks 임시 추가 (`[REDACTED_IP]/32` + `[REDACTED_IP]/32`)
+  2. 원본 복원 (`[REDACTED_IP]/32` 단일)
 - 로컬 임시 파일: `/c/tmp/drift-check.sql`, `/c/tmp/drift-output.txt` (repo 미포함, .gitignore 무관).
 - 데이터 변경 없음.
 

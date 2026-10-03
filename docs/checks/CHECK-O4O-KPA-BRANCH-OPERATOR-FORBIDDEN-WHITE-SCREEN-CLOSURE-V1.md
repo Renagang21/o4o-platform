@@ -53,7 +53,7 @@
 
 ## 3. 검증 절차 (영구 계정, fixture 신규 생성 0)
 
-`renagang21@gmail.com`(kpa-branch 영구 회원) 에 admin UI 로 operator 재부여 → 상태별 브라우저 smoke → 제품 API 로 원복. 스크립트 `w20_e2e.mjs`(grant/join/revoke/leave 재사용) + `w21_smoke.mjs`(Playwright, 세션 scratchpad).
+`[REDACTED_EMAIL_B]`(kpa-branch 영구 회원) 에 admin UI 로 operator 재부여 → 상태별 브라우저 smoke → 제품 API 로 원복. 스크립트 `w20_e2e.mjs`(grant/join/revoke/leave 재사용) + `w21_smoke.mjs`(Playwright, 세션 scratchpad).
 
 | 순서 | 조작 | 결과 |
 |---|---|---|

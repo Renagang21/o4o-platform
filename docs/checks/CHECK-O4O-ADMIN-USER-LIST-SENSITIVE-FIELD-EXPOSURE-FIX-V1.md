@@ -151,7 +151,7 @@ admin frontend build 생략 — 프론트 소스 변경 0 이고 제거 필드�
 ## 8. 프로덕션 스모크
 
 배포 `6ca8f5073` → Deploy API Server (Cloud Run) **success**.
-인증 `renariver21@gmail.com`(`platform:super_admin`). **민감 필드 값은 기록하지 않고 key 존재 여부만** 남긴다.
+인증 `[REDACTED_EMAIL_D]`(`platform:super_admin`). **민감 필드 값은 기록하지 않고 key 존재 여부만** 남긴다.
 
 ### 8-1. 권한
 

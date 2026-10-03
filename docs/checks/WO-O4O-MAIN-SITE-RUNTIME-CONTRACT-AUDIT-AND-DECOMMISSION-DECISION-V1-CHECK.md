@@ -64,7 +64,7 @@
 | 분류 | 건수 | 근거 |
 |---|---:|---|
 | **CI self-smoke** | **8** | `curl/8.5.0` · Azure IP(20.x · 52.x · 4.x · 128.24.x · 172.185.x) = GitHub Actions runner. **8건 전부 `deploy-main-site.yml` 실행 시각 + 약 3분** 에 정확히 대응 → 워크플로의 `Verify deployment` 단계가 자기 자신을 curl 한 것 |
-| **scanner/bot** | 2 | `Mozilla/5.0 (compatible)` · AWS IP(23.23.253.54 · 3.224.234.70) · run.app URL 직접 |
+| **scanner/bot** | 2 | `Mozilla/5.0 (compatible)` · AWS IP([REDACTED_IP] · [REDACTED_IP]) · run.app URL 직접 |
 | **점검 curl** | 1 | 2026-08-19 `curl/8.12.1` (국내 IP) — 선행 WO 검증 중 발생 |
 | **실사용자 브라우저** | **0** | 실제 브라우저 UA(Chrome/Safari/Edge) 요청 **0건** |
 

@@ -32,7 +32,7 @@
 
 ## 5. 모바일 프로필 ('내정보' 시트, 검증 결과)
 
-- 사용자 정보: `서철환님` / `sohae2100@gmail.com`
+- 사용자 정보: `서철환님` / `[REDACTED_EMAIL_A]`
 - 역할별 메뉴(보유 역할): 관리자 대시보드(/admin) / 운영 대시보드(/operator) / 내 매장(/store)
 - 계정 메뉴: 마이페이지(/mypage) / 설정(/mypage/settings)
 - 로그아웃 버튼

@@ -45,7 +45,7 @@ KPA 4개 영역 14개 화면에 걸쳐 카드형 UI → 표준 테이블(`@o4o/u
 | OperatorPopListPage | 카드형 | DataTable | ✅ | ✅ | 발행/보관/삭제 | ⚠️ BLOCKED |
 | OperatorQrListPage | 카드형 | DataTable | ✅ | ✅ | 발행/보관/삭제 | ⚠️ BLOCKED |
 
-> BLOCKED 사유: admin 계정(`sohae2100@gmail.com`) 과다 로그인 시도로 일시 잠금. 사용자 직접 검증 예정.
+> BLOCKED 사유: admin 계정(`[REDACTED_EMAIL_A]`) 과다 로그인 시도로 일시 잠금. 사용자 직접 검증 예정.
 
 ### 3-2. 매장 HUB 영역 (`/store-hub/*`)
 
@@ -122,7 +122,7 @@ KPA 4개 영역 14개 화면에 걸쳐 카드형 UI → 표준 테이블(`@o4o/u
 | `/operator/pop` | ⚠️ 사용자 직접 검증 예정 |
 | `/operator/qr` | ⚠️ 사용자 직접 검증 예정 |
 
-- 사유: admin 계정(`sohae2100@gmail.com`) 일시 잠금으로 자동 검증 불가
+- 사유: admin 계정(`[REDACTED_EMAIL_A]`) 일시 잠금으로 자동 검증 불가
 - 코드 자체는 구현 완료 — smoke만 미검증 상태
 
 ### R2 — Production smoke 계정 정합성

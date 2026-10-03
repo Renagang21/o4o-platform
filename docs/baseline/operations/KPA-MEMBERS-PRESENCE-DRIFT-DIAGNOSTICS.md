@@ -89,7 +89,7 @@ LEFT JOIN kpa_pharmacist_profiles pp ON pp.user_id = u.id
 LEFT JOIN service_memberships sm ON sm.user_id = u.id
 LEFT JOIN role_assignments ra ON ra.user_id = u.id
 LEFT JOIN organization_members om ON om.user_id = u.id
-WHERE u.email = $1   -- 예: 'sohae2100@gmail.com'
+WHERE u.email = $1   -- 예: '[REDACTED_EMAIL_A]'
 GROUP BY
   u.id, u.email, u."businessInfo",
   km.id, km.status, km.activity_type, km.pharmacy_name, km.membership_type,

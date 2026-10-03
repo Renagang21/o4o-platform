@@ -53,7 +53,7 @@
 
 ## 5. E2E (프로덕션 · Playwright · `w19_e2e.mjs`)
 
-fixture = 영구 계정 `renagang21@gmail.com`(사용자 결정: 기존 계정 join 1건, 새 계정 생성·삭제 없음). membership `c172f920-27d1-47fb-889a-1002c9247c2e`.
+fixture = 영구 계정 `[REDACTED_EMAIL_B]`(사용자 결정: 기존 계정 join 1건, 새 계정 생성·삭제 없음). membership `c172f920-27d1-47fb-889a-1002c9247c2e`.
 
 | # | WO 필수 항목 | 실측 | 결과 |
 |---|---|---|---|
@@ -101,4 +101,4 @@ fixture = 영구 계정 `renagang21@gmail.com`(사용자 결정: 기존 계정 j
 
 ## 10. 영구 계정 기록
 
-`renagang21@gmail.com` 은 이번 WO 로 kpa-branch 서비스 **영구 회원(active · `kpa-branch:member` · credential 보유)** 이 됐다. 삭제하지 않는다. 분회 소속(`branch_memberships`)은 없음 — 이후 분회 소속 지정 E2E 의 fixture 로 재사용 가능.
+`[REDACTED_EMAIL_B]` 은 이번 WO 로 kpa-branch 서비스 **영구 회원(active · `kpa-branch:member` · credential 보유)** 이 됐다. 삭제하지 않는다. 분회 소속(`branch_memberships`)은 없음 — 이후 분회 소속 지정 E2E 의 fixture 로 재사용 가능.

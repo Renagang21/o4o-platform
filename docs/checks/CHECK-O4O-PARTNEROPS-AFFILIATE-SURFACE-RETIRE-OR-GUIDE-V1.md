@@ -123,7 +123,7 @@ catch-all 이 Dashboard 였던 기존 동작(임의 경로가 실패 화면을 �
 
 ## 7. 실브라우저 smoke
 
-계정: `sohae2100@gmail.com` (admin) — 자격증명 SSOT `docs/local/TEST-ACCOUNTS.local.md`
+계정: `[REDACTED_EMAIL_A]` (admin) — 자격증명 SSOT `docs/local/TEST-ACCOUNTS.local.md`
 배포 스탬프: `배포 테스트 v3.0 · 2026. 8. 11. 오전 9:47:42` (commit `dace0ed0a` 리비전)
 가드: `AdminProtectedRoute` → `AppRouteGuard appId="partnerops"` 통과 — app-disabled 리다이렉트 0건
 

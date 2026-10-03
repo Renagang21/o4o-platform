@@ -17,7 +17,7 @@
 
 | 항목 | 값 |
 |---|---|
-| 계정 | `renagang21@gmail.com` (Neture 공급자2 · 테스트공급자) |
+| 계정 | `[REDACTED_EMAIL_B]` (Neture 공급자2 · 테스트공급자) |
 | 조직 | (주)네뚜레 공급자 테스트 (supplier / owner) |
 | 로그인 | **UI 정상 로그인 성공** → `/supplier/dashboard` |
 | SSOT | `docs/local/TEST-ACCOUNTS.local.md` (git 추적 제외) |

@@ -15,7 +15,7 @@ Scope: 100그룹 확장 전 후보 산출 기준(표기변형 정규화 / 투여
 | 조사 일시 | 2026-07-07 |
 | 접속 | Cloud SQL Auth Proxy (`google-cloud-sdk/bin/cloud-sql-proxy.exe`, 127.0.0.1:15433) → psql SELECT (`o4o_platform`) |
 | 인스턴스 | `netureyoutube:asia-northeast3:o4o-platform-db` |
-| 인증 | gcloud ADC(sohae2100@gmail.com) + DB 계정 `o4o_api`(Cloud Run env에서 read-only 추출) |
+| 인증 | gcloud ADC([REDACTED_EMAIL_A]) + DB 계정 `o4o_api`(Cloud Run env에서 read-only 추출) |
 | write | **0** (SELECT/COUNT/GROUP BY 전용) |
 
 ## 2. 사용한 선행 문서

@@ -315,8 +315,8 @@ M-1 은 미반영(§6 참조).
 ### A-3. 인증 계정 — 해소 (기록 보존)
 
 1차에서는 문서의 두 계정이 모두 실패해 인증 E2E 를 중지했다
-(`sohae21@naver.com` 403 `ACCOUNT_NOT_ACTIVE` / `sohae2100@gmail.com` 401 `INVALID_CREDENTIALS`).
-사용자가 `docs/local/TEST-ACCOUNTS.local.md` 를 갱신해 `renagang21@gmail.com` 로 **로그인 성공**,
+(`[REDACTED_EMAIL_C]` 403 `ACCOUNT_NOT_ACTIVE` / `[REDACTED_EMAIL_A]` 401 `INVALID_CREDENTIALS`).
+사용자가 `docs/local/TEST-ACCOUNTS.local.md` 를 갱신해 `[REDACTED_EMAIL_B]` 로 **로그인 성공**,
 아래 A-6 · A-7 로 인증 E2E 를 완료했다.
 
 로그인 직후 확인(중지 조건 점검):
@@ -374,7 +374,7 @@ M-1 은 `listStoreQrCodes` / `findStoreQrCode`(인증 경로)만 바꿨고 공�
 ## 8-B. 인증 프로덕션 E2E (최종 재개 — 별도 worktree)
 
 작업 환경: worktree `C:/Users/sohae/o4o-kpa-qr-e2e`, 브랜치 `work/kpa-qr-screenset-e2e`.
-계정 `renagang21@gmail.com` / 매장 org `9c87f46b…`(테스트 약국).
+계정 `[REDACTED_EMAIL_B]` / 매장 org `9c87f46b…`(테스트 약국).
 
 > **worktree 부트스트랩 함정 2건**(기록): 새 worktree 는 ① `pnpm` 자체가 실행되지 않는다
 > (메인 저장소는 `node_modules/.bin/pnpm` 으로 해결되는데 새 worktree 엔 그게 없다 →

@@ -17,7 +17,7 @@ smoke CHECK (코드/스키마/마이그레이션/API/UI/설정 변경 금지). �
 
 ## 3. 테스트 전제 확인 결과 (먼저 수행 — WO §4/§12)
 
-배포 기준: `o4o-core-api-02068` (code `08e2a67a3`). 계정: `sohae2100@gmail.com` (kpa admin/operator).
+배포 기준: `o4o-core-api-02068` (code `08e2a67a3`). 계정: `[REDACTED_EMAIL_A]` (kpa admin/operator).
 
 | 확인 | 방법 | 결과 |
 |------|------|------|

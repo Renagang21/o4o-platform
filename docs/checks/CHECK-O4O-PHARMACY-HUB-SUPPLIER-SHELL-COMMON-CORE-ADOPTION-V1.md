@@ -94,7 +94,7 @@ WO 작업순서 1·2 에 따라 4개 서비스와 공통 package 를 먼저 조�
 ## 5. 브라우저 smoke (실 브라우저 · 프로덕션 API)
 
 `vite preview` (port 5173) + `https://api.neture.co.kr` 실 API.
-계정: `sohae2100@gmail.com` (pharmacy-hub membership **active**, role = `pharmacy-hub:operator`).
+계정: `[REDACTED_EMAIL_A]` (pharmacy-hub membership **active**, role = `pharmacy-hub:operator`).
 
 | # | 확인 | 결과 |
 |:-:|---|:---:|

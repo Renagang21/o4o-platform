@@ -40,7 +40,7 @@
 
 | # | 기준 | 실측 | 판정 |
 |---|---|---|---|
-| 1 | 유의미 트래픽 0 | 24h 2건 / 7d 3건. 1건 `curl/8.5.0` + Azure IP `172.174.110.132` = GitHub Actions self-smoke, 2건 = 본 작업 워크스테이션 IP `124.194.156.36` (`https://api.ipify.org` 로 자기 IP 대조). **외부 사용자 트래픽 0** | PASS |
+| 1 | 유의미 트래픽 0 | 24h 2건 / 7d 3건. 1건 `curl/8.5.0` + Azure IP `[REDACTED_IP]` = GitHub Actions self-smoke, 2건 = 본 작업 워크스테이션 IP `[REDACTED_IP]` (`https://api.ipify.org` 로 자기 IP 대조). **외부 사용자 트래픽 0** | PASS |
 | 2 | GCLB backend 연결 0 | backendService 중 `o4o-main-site` 대상 0건 | PASS |
 | 3 | serverless NEG 0 | 프로젝트 NEG 8건 전수 resolve → 전부 타 서비스 | PASS |
 | 4 | domain mapping 0 | `gcloud run domain-mappings list` 프로젝트 전역 0건 | PASS |

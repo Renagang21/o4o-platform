@@ -8,7 +8,7 @@
 | 작성일 | 2026-06-03 |
 | 분류 | CHECK (live smoke) |
 | 환경 | production — https://k-cosmetics.site / API https://api.neture.co.kr |
-| 계정 | `sohae2100@gmail.com` (cosmetics:admin/operator + platform:super_admin) |
+| 계정 | `[REDACTED_EMAIL_A]` (cosmetics:admin/operator + platform:super_admin) |
 | 도구 | Playwright MCP (direct-node 런처 수정 후 정상 작동) |
 | **판정(최초)** | **NEEDS-FOLLOWUP** — 화면 대부분 정상 렌더, 단 실제 결함 2건 |
 | **판정(재검증 후)** | **CONDITIONAL PASS** — P0-1·P0-2 배포·라이브 해소 확인. 잔여: orders 500(P1) + store_owner 데이터 경험 미관측(계정 부재). §9 참조 |

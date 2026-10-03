@@ -214,7 +214,7 @@ text/html 로 응답된 /api/* 요청  0건   ← 이번 WO 가 제거한 실패
 ## 10. 실브라우저 smoke 결과
 
 **환경**: Playwright(chromium, headless) · `https://admin.neture.co.kr` · 리비전 `01102-79g`
-**계정**: `renariver21@gmail.com` (`platform:super_admin`) — 정식 폼 로그인 **200**, `/home` 착지
+**계정**: `[REDACTED_EMAIL_D]` (`platform:super_admin`) — 정식 폼 로그인 **200**, `/home` 착지
 
 | 대상 | 최종 URL | 화면 | 콘솔 | 비-2xx | vendor/products |
 |---|---|---|:---:|:---:|:---:|

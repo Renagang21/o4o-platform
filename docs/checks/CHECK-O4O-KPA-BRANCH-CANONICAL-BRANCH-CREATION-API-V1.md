@@ -62,11 +62,11 @@
 
 | 역할 | 계정 | 용도 |
 |---|---|---|
-| `platform:super_admin` | `renariver21@gmail.com` (kpa-branch 소속·credential 없음) | 생성·삭제 호출 |
-| 비-super_admin (로그인 가능) | `renagang21@gmail.com` (`kpa-society` credential · `kpa:store_owner` 등, platform 역할 없음) | 403 음성 테스트 |
+| `platform:super_admin` | `[REDACTED_EMAIL_D]` (kpa-branch 소속·credential 없음) | 생성·삭제 호출 |
+| 비-super_admin (로그인 가능) | `[REDACTED_EMAIL_B]` (`kpa-society` credential · `kpa:store_owner` 등, platform 역할 없음) | 403 음성 테스트 |
 | anonymous | — | 401 |
 
-`sohae2100@gmail.com` 은 `platform:super_admin` 을 겸해 음성 테스트에 부적합. `kpa-branch:admin` 단독 계정은 없어 정책상 만들지 않았다 — `kpa-branch:admin` 차단은 가드가 `requireKpaBranchScope` 가 아니라 `requireRole('platform:super_admin')` 이라는 정적 근거로 대체한다.
+`[REDACTED_EMAIL_A]` 은 `platform:super_admin` 을 겸해 음성 테스트에 부적합. `kpa-branch:admin` 단독 계정은 없어 정책상 만들지 않았다 — `kpa-branch:admin` 차단은 가드가 `requireKpaBranchScope` 가 아니라 `requireRole('platform:super_admin')` 이라는 정적 근거로 대체한다.
 
 ## 4. E2E 실측 (`w17_e2e.mjs` 34/34 PASS · 프로덕션)
 

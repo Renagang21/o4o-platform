@@ -90,7 +90,7 @@
 
 - `success: true`
 - `data.user.id`: `cfd2a5e7-db28-4842-bd5c-4814cba49ca5`
-- `data.user.email`: `sohae2100@gmail.com`
+- `data.user.email`: `[REDACTED_EMAIL_A]`
 - `data.user.roles`: 10 role (`kpa:store_owner`, `platform:super_admin`, `cosmetics:admin/operator`, **`kpa:admin`**, **`kpa:operator`**, `neture:admin/operator`)
 - `Set-Cookie: accessToken=...` (HttpOnly, Secure, SameSite=None, Max-Age=900)
 - `Set-Cookie: refreshToken=...` (Max-Age=604800, tokenFamily 포함)
@@ -272,7 +272,7 @@ backend response 에 `operatorRoleGuideCard` / `roleGuideCard` 키 없음. **I1 
 
 ### 9.1 사용 계정
 
-- email: sohae2100@gmail.com
+- email: [REDACTED_EMAIL_A]
 - 본 검증 관련 role: **`kpa:admin`** + **`platform:super_admin`** 보유 → backend `isAdmin = true` 분기 트리거
 
 ### 9.2 isAdmin 분기 결과

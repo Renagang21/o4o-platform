@@ -9,7 +9,7 @@
 | 감사일 | 2026-08-05 |
 | 환경 | 프로덕션 `https://pharmacyhub.co.kr` (리비전 `pharmacy-hub-web-00033-85b`, 2026-08-05T03:38Z) |
 | 감사 기준 커밋 | `932ee4bae` (감사 범위 마지막 앱 코드 변경) · 감사 시점 HEAD `cd4451920` |
-| 로그인 계정 | `renagang21@gmail.com` (PH 매장 미연결 계정 — read-only) |
+| 로그인 계정 | `[REDACTED_EMAIL_B]` (PH 매장 미연결 계정 — read-only) |
 | 결과 | **COMPLETE (부분 문구 결함 2건 · 후속 WO 분리)** |
 
 ---
@@ -20,7 +20,7 @@
 |------|------|------|
 | 작업 트리 clean | **not clean** — 병행 세션(HFF-ZH / easy-drug) 파일만 dirty. 감사 범위(`services/web-pharmacy-hub`, `packages/store-ui-core`, `docs/checks`)는 clean | 감사는 read-only이고 산출물은 신규 CHECK 1개뿐 → 상태를 명시 기록하고 진행 |
 | 배포 리비전 ≠ main HEAD | 감사 범위 diff `932ee4bae..HEAD -- services/web-pharmacy-hub packages/store-ui-core` = **0 파일**. HEAD 이후 커밋(`5704631b8` docs, `cd4451920` easy-drug)은 PH 앱 코드 미포함 | **배포 코드 = HEAD 코드** (감사 범위) → 진행 |
-| 안전한 테스트 계정 | `renagang21@gmail.com` — PH enrollment 0, write 유발 동작 미수행 | 진행 |
+| 안전한 테스트 계정 | `[REDACTED_EMAIL_B]` — PH enrollment 0, write 유발 동작 미수행 | 진행 |
 | callback 검증에 실거래 필요 | 불필요 (아래 §4 근거) | 진행 |
 | route inventory ≠ 배포 화면 | 불일치 0 (§1) | 진행 |
 

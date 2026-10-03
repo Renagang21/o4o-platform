@@ -154,7 +154,7 @@ naive DB `COUNT/OFFSET` 은 비약국 노출수와 **안전히 일치하지 않�
 ### 배포 · 프로덕션 smoke (§11) — 완료 2026-07-29
 
 - 배포: commit `4ef0d2f80` push → CI Deploy Web(run 30409411066 success) + Deploy API(run 30409411119 success). 프로덕션 반영 확인.
-- **검증 방식**: 브라우저 렌더 smoke는 playwright 전용 프로필이 동시 세션 Chrome(선점)에 락되어 있어, 그 브라우저를 강제 종료하지 않고 **CLAUDE.md §8 명시 허용 채널 "API 직접 호출"** 로 계약을 실증했다. 인증 = store-owner 세션(`sohae2100@gmail.com`, role `kpa:store_owner`, userId `cfd2a5e7…` → 매장 Sohae 약국, 약국 유형) JWT Bearer.
+- **검증 방식**: 브라우저 렌더 smoke는 playwright 전용 프로필이 동시 세션 Chrome(선점)에 락되어 있어, 그 브라우저를 강제 종료하지 않고 **CLAUDE.md §8 명시 허용 채널 "API 직접 호출"** 로 계약을 실증했다. 인증 = store-owner 세션(`[REDACTED_EMAIL_A]`, role `kpa:store_owner`, userId `cfd2a5e7…` → 매장 Sohae 약국, 약국 유형) JWT Bearer.
 - **실측 결과 (프로덕션 `o4o-core-api`)**:
 
 | 호출 | HTTP | success | data | pagination |

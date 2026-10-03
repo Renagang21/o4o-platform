@@ -17,7 +17,7 @@ cart item 은 주문/재고/정산을 건드리지 않으므로 테스트 계정
 |------|-----|
 | API | `https://o4o-core-api-117791934476.asia-northeast3.run.app` |
 | 배포 리비전 | `o4o-core-api-02062-k64` (2026-06-09T01:00:59Z, foundation commit 이후) |
-| 계정 | `sohae2100@gmail.com` (인증 사용자 = buyer) |
+| 계정 | `[REDACTED_EMAIL_A]` (인증 사용자 = buyer) |
 | serviceKey | `neture` |
 
 ## 3. 검증 항목 및 결과

@@ -299,7 +299,7 @@ SELECT u.email, ra.role, ra.is_active, sm.service_key, sm.status AS membership_s
 FROM users u
 LEFT JOIN role_assignments ra ON ra.user_id = u.id AND ra.is_active = true
 LEFT JOIN service_memberships sm ON sm.user_id = u.id
-WHERE u.email = 'sohae2100@gmail.com'
+WHERE u.email = '[REDACTED_EMAIL_A]'
 ORDER BY ra.role, sm.service_key;
 ```
 
@@ -396,7 +396,7 @@ CLAUDE.md §0 read-only 검증 정책에 따라 Claude Code 가 직접 `gcloud s
 ## 9. 참고 — 동일 사용자 (sohae2100) 의 현재 admin 화면 표시
 
 [admin.neture.co.kr/users](https://admin.neture.co.kr/users) 검증 결과 (2026-05-15):
-- `sohae2100@gmail.com` 의 role_assignments: `kpa:admin`, `kpa:operator`, `platform:super_admin`
+- `[REDACTED_EMAIL_A]` 의 role_assignments: `kpa:admin`, `kpa:operator`, `platform:super_admin`
 - assignment-row UI 에 3 row 로 정상 표시 (Service: KPA / KPA / Platform)
 - 추정 service_memberships: `service_key='kpa'` (canonical 아님)
 - KPA-Society `/operator` 접속 → MembershipGate 의 `kpa-society` 검색 실패 → 차단 (단, `platform:super_admin` 보유로 실제 사용자는 super_admin bypass 통과 가능)

@@ -167,7 +167,7 @@ groups = [ public,
 
 ### 6-2. C9 — 비회원에게 회원 nav 노출 (수정)
 
-`renagang21@gmail.com` 은 `POST /auth/login` (serviceKey=kpa-branch) 이 `401 SERVICE_NOT_MEMBER` 다.
+`[REDACTED_EMAIL_B]` 은 `POST /auth/login` (serviceKey=kpa-branch) 이 `401 SERVICE_NOT_MEMBER` 다.
 그런데 형제 서비스(kpa-society) 세션으로 분회 화면에 들어오면 `isAuthenticated=true` 가 되어
 회원 메뉴 6개가 모두 떴다. 실제로는 `/me/*` 가 전부 403 이라 전부 막힌 링크였다.
 

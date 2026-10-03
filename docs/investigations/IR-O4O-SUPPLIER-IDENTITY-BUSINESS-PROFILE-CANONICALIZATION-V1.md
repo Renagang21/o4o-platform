@@ -208,7 +208,7 @@ lifecycle: 공급자 선택(`not_requested`) → 증빙 제출(`submitted`) → 
 | `approved_by` | `cfd2a5e7` — **승인 운영자**이지 소유자 아님 |
 | 현존 users | **1건**(`cfd2a5e7` = 운영자) |
 
-세 supplier 를 **어느 사용자에게 연결해야 하는지 DB 안에 근거가 없다.** `docs/local/TEST-ACCOUNTS.local.md` 는 `sohae21@naver.com` 을 "(주)쓰라이프존 공급자" 로 적지만 **그 계정은 현재 users 에 없다**(1건뿐). 즉 복구하려면 계정 생성이 선행되고, 이는 추측이 아니라 **사용자 확인 사항**이다.
+세 supplier 를 **어느 사용자에게 연결해야 하는지 DB 안에 근거가 없다.** `docs/local/TEST-ACCOUNTS.local.md` 는 `[REDACTED_EMAIL_C]` 을 "(주)쓰라이프존 공급자" 로 적지만 **그 계정은 현재 users 에 없다**(1건뿐). 즉 복구하려면 계정 생성이 선행되고, 이는 추측이 아니라 **사용자 확인 사항**이다.
 
 > **REPAIR PLAN READY (실행 금지)** — 승인 시 다음 순서. ① 각 supplier 의 실제 소유자 이메일을 **사용자가 지정** ② 해당 Google 계정 로그인으로 users 행 생성 확인 ③ `organization_members`(role=owner) 생성 ④ (호환 기간 동안) `neture_suppliers.user_id` 설정 ⑤ ACTIVE 2건만 우선, PENDING 1건(`초윤`)은 승인 절차와 함께. **이 IR 은 UPDATE 를 실행하지 않았다.**
 >

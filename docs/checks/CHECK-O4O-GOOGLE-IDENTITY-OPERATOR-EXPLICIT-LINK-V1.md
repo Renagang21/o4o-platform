@@ -4,7 +4,7 @@
 > **종결:** 2026-09-22 — 관리자 Google 연결(1회 bootstrap) 실행·검증 · 창 폐쇄 · Admin legacy password 폐기까지 완료(§3-F)
 > **일자:** 2026-09-18 · **WO:** [`WO-O4O-GOOGLE-IDENTITY-OPERATOR-EXPLICIT-LINK-V1`](../work-orders/WO-O4O-GOOGLE-IDENTITY-OPERATOR-EXPLICIT-LINK-V1.md)
 > **용어:** 운영자 계정 = `sohae2100` · 테스트 계정 = `renagang21`(Google-only)
-> **전제 정정(2026-09-21 · 사용자 확정):** "운영자 계정 = `sohae2100`" 은 **현재 `platform:super_admin` 을 보유한 기존 `users.id`** 를 뜻한다. 이 user 의 관리자용 내부 email 은 **`renariver21@gmail.com`** 으로 정정됐다(§3-A). 본문의 `sohae2100`·`cfd2a5e7` 은 모두 이 **동일 users.id** 다. Google Identity 는 email 과 별개(연결은 검증된 `sub` 기준 · email 일치 불요). 전환기 정책 전문은 [WO 상단 "전제 정정"](../work-orders/WO-O4O-GOOGLE-IDENTITY-OPERATOR-EXPLICIT-LINK-V1.md).
+> **전제 정정(2026-09-21 · 사용자 확정):** "운영자 계정 = `sohae2100`" 은 **현재 `platform:super_admin` 을 보유한 기존 `users.id`** 를 뜻한다. 이 user 의 관리자용 내부 email 은 **`[REDACTED_EMAIL_D]`** 으로 정정됐다(§3-A). 본문의 `sohae2100`·`cfd2a5e7` 은 모두 이 **동일 users.id** 다. Google Identity 는 email 과 별개(연결은 검증된 `sub` 기준 · email 일치 불요). 전환기 정책 전문은 [WO 상단 "전제 정정"](../work-orders/WO-O4O-GOOGLE-IDENTITY-OPERATOR-EXPLICIT-LINK-V1.md).
 
 ---
 
@@ -30,21 +30,21 @@
 
 ## 3-A. 관리자 내부 email 정정 (2026-09-21 · 사용자 명시 승인 · production write A)
 
-전환기 정책 확정에 따라 Google 연결(B) 전에 **기존 super_admin user 1행의 `users.email` 만** `renariver21@gmail.com` 으로 정정했다. 실행은 psql 단일 트랜잭션(대상 = handle `sohae2100` AND `platform:super_admin` 보유 · 대상 행 수 1 이 아니면 UPDATE 0 · `ON_ERROR_STOP`).
+전환기 정책 확정에 따라 Google 연결(B) 전에 **기존 super_admin user 1행의 `users.email` 만** `[REDACTED_EMAIL_D]` 으로 정정했다. 실행은 psql 단일 트랜잭션(대상 = handle `sohae2100` AND `platform:super_admin` 보유 · 대상 행 수 1 이 아니면 UPDATE 0 · `ON_ERROR_STOP`).
 
 | 단계 | 결과 |
 |---|---|
 | 사전(read-only) | users 2 · 대상 1행 · 새 email 중복 users 0 / linked_accounts 0 · roles 11 / creds 5 / memb 5 · password set · loginAttempts 1 · 잠금 없음 · Google 연결 0 · `users.email` unique index 2개 존재 |
-| UPDATE | `UPDATE users SET email='renariver21@gmail.com', "updatedAt"=now() WHERE id IN (대상)` → **`UPDATE 1`** · COMMIT |
+| UPDATE | `UPDATE users SET email='[REDACTED_EMAIL_D]', "updatedAt"=now() WHERE id IN (대상)` → **`UPDATE 1`** · COMMIT |
 | 사후 | 새 email 행 1 · 옛 handle 행 0 · **users.id 동일**(1) · users 2 · roles **11** · `platform:super_admin` 1 · creds **5** · memb **5** · password set 유지 · 테스트 계정(`renagang21` · password NULL) 무접촉 · linked_accounts 1(불변) |
 
 코드 근거: 로그인 조회는 `users.email` → `user.id` → `service_credentials(user_id, service_key)` 순([auth-login.service.ts:131-199](../../apps/api-server/src/services/auth/auth-login.service.ts)) 이라 email 변경 후에도 기존 credential/password 층이 그대로 이어진다. `service_credentials` 에는 email 컬럼이 없다(`user_id`·`service_key`·`password_hash`).
 
-**이후 로그인 식별자 = `renariver21@gmail.com`.** 비밀번호 층은 변경 없음 — `neture.co.kr`(serviceKey=neture · credential 존재) = `service_credentials(neture)` 해시, `/auth/google/link` currentPassword = `users.password`. (`admin.neture.co.kr` 도 `users.password` 라고 적었으나 **오기** — 당시 Admin Login.tsx 는 `serviceKey:'neture'` 를 보내 credential 층을 검증했다. §3-B 에서 제거해 이제 `users.password` 가 맞다.) 09-21 04:59Z admin forgot-password 로 `users.password` 만 재설정됐고(토큰 1건 사용 완료 · service_key NULL) `service_credentials` 는 정렬하지 않는다(사용자 결정: 추가 reset·정렬 중단). §3 의 "주의(WO §3)" 단락의 `PUT /users/password` 정렬 제안은 **폐기**.
+**이후 로그인 식별자 = `[REDACTED_EMAIL_D]`.** 비밀번호 층은 변경 없음 — `neture.co.kr`(serviceKey=neture · credential 존재) = `service_credentials(neture)` 해시, `/auth/google/link` currentPassword = `users.password`. (`admin.neture.co.kr` 도 `users.password` 라고 적었으나 **오기** — 당시 Admin Login.tsx 는 `serviceKey:'neture'` 를 보내 credential 층을 검증했다. §3-B 에서 제거해 이제 `users.password` 가 맞다.) 09-21 04:59Z admin forgot-password 로 `users.password` 만 재설정됐고(토큰 1건 사용 완료 · service_key NULL) `service_credentials` 는 정렬하지 않는다(사용자 결정: 추가 reset·정렬 중단). §3 의 "주의(WO §3)" 단락의 `PUT /users/password` 정렬 제안은 **폐기**.
 
 ## 3-B. B smoke 결함 — Admin 인증 계약 불일치 정정 (2026-09-21 · WO §8-A · 사용자 지시)
 
-**현상:** `admin.neture.co.kr` 에서 `renariver21@gmail.com` + 09-21 재설정 `users.password` 로 로그인 → "비밀번호가 올바르지 않습니다". 같은 화면 Google 버튼은 연결 전이라 당연히 불가(관리자 users.id 에 Google sub 없음 → 어느 user 인지 찾을 수 없음).
+**현상:** `admin.neture.co.kr` 에서 `[REDACTED_EMAIL_D]` + 09-21 재설정 `users.password` 로 로그인 → "비밀번호가 올바르지 않습니다". 같은 화면 Google 버튼은 연결 전이라 당연히 불가(관리자 users.id 에 Google sub 없음 → 어느 user 인지 찾을 수 없음).
 
 **원인(코드 확인):** [`Login.tsx`](../../apps/admin-dashboard/src/pages/auth/Login.tsx) 이메일 로그인이 `login({ email, password, serviceKey: 'neture' })` 로 호출 → 서버 dual-read([`auth-login.service.ts`](../../apps/api-server/src/services/auth/auth-login.service.ts))는 serviceKey + credential 존재 시 **`service_credentials(neture)` 해시**를 검증하고 `users.password` 는 보지 않는다. 사용자 입력 오류가 아니라 Admin(platform surface)이 Neture 서비스 credential 을 인증 근거로 쓰던 계약 불일치. 추가 로그인 시도 · password 재설정 · credential 정렬은 하지 않았다(재시도 금지 원칙).
 
@@ -178,7 +178,7 @@ baseline(2026-09-21 3-A 이후): users 2 · linked_accounts 1(테스트 계정) 
 
 | # | Smoke | 기대 | 결과 |
 |---|---|---|---|
-| 1 | `admin.neture.co.kr` 이메일 로그인 `renariver21@gmail.com` + **`users.password`(09-21 재설정 값)** | 200 · Admin 진입(serviceKey 없음 → users.password 검증) | PENDING |
+| 1 | `admin.neture.co.kr` 이메일 로그인 `[REDACTED_EMAIL_D]` + **`users.password`(09-21 재설정 값)** | 200 · Admin 진입(serviceKey 없음 → users.password 검증) | PENDING |
 | 2 | 헤더 "계정 설정" → `/settings/my-account` → [Google 계정 연결] → 현재 비밀번호 = 같은 `users.password` → Google `sohae2100` 선택 | "Google 계정 연결됨 ✓" · users **2 유지** · linked_accounts 1→**2** · 관리자 users.id/password/creds 5/memb 5/roles 11 불변 · `link_google` activity 1건 | PENDING |
 | 3 | 로그아웃 → [Google로 계속하기] → 같은 Google 계정 | signup 화면 없음 → **기존 admin users.id** · `platform:super_admin` 유지 · Admin 정상 진입 · `login_google` +1 | PENDING |
 | 4 | 로그아웃 → 이메일 로그인 1회 더(1과 동일) | 200 · password 로그인 병행 유지 | PENDING |

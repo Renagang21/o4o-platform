@@ -3,7 +3,7 @@
 | 항목 | 값 |
 |------|------|
 | 목적 | W9 정상 경로 검증에 필요한 PH 매장 조직을, W1 정식 경로로 **안전하게** 확보할 수 있는지 판정 |
-| 대상 | `renagang21@gmail.com` (`6967ebe0-2f87-4cab-809b-8c7190493cef`) |
+| 대상 | `[REDACTED_EMAIL_B]` (`6967ebe0-2f87-4cab-809b-8c7190493cef`) |
 | 조사일 | 2026-08-08 |
 | 수행 범위 | **read-only** — 코드 변경 0 · DB write 0 · migration 0 · 수동 INSERT/UPDATE 0 · 배포 0 |
 | 채널 | Cloud SQL Auth Proxy + `SELECT` 전용 쿼리 (프로덕션 `o4o_platform`) |

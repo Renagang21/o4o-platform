@@ -235,7 +235,7 @@ WO STATUS = CLOSED_WITH_KNOWN_KCOS_LIBRARY_SCOPE_DEFECT
 
 console error 0 / pageerror 0 / dead link 0 / 4xx·5xx **0**.
 
-### K-Cosmetics (`https://k-cosmetics.site`, `renagang21@gmail.com` = `cosmetics:store_owner`)
+### K-Cosmetics (`https://k-cosmetics.site`, `[REDACTED_EMAIL_B]` = `cosmetics:store_owner`)
 
 | # | caller | 경로 | 결과 |
 |---|---|---|---|

@@ -68,7 +68,7 @@ WO-O4O-KPA-OPERATOR-DASHBOARD-AUTHENTICATED-VIEWPORT-SMOKE-V1 수행 결과 (202
 
 - 대상: `https://kpa-society.co.kr/operator` (프로덕션)
 - 브라우저: Playwright MCP, 실제 로그인 세션
-- 계정: `sohae2100@gmail.com` (CLAUDE.md §15 → `docs/local/TEST-ACCOUNTS.local.md`)
+- 계정: `[REDACTED_EMAIL_A]` (CLAUDE.md §15 → `docs/local/TEST-ACCOUNTS.local.md`)
 - 로그인 경로: `/operator` 접근 → 미인증 `/login` redirect → 폼 로그인 → `/operator` 복귀
 - `/api/v1/auth/status` 확인 roles: `kpa:operator`, `kpa:admin`, `platform:super_admin` 등 보유
 

@@ -16,7 +16,7 @@
 ## 2. 실행 환경 / 자원
 
 - 환경: production (api.neture.co.kr)
-- 실행 계정 (buyer=supplier owner): `renagang21@gmail.com` (userId `6967ebe0-2f87-4cab-809b-8c7190493cef`) — 비번 SSOT 참조
+- 실행 계정 (buyer=supplier owner): `[REDACTED_EMAIL_B]` (userId `6967ebe0-2f87-4cab-809b-8c7190493cef`) — 비번 SSOT 참조
 - supplier: `91169739-6291-4bed-b1e9-b3d4a93d65eb` (ACTIVE)
 - SPO: `d10c68ae-e6f9-4d07-a734-60feccadf653` "[E2E_TEST]" (priceGeneral 12000, PRIVATE, allowed_seller_ids [6967ebe0…])
 - 배송정책: base 3000 / free 50000 / dispatch 2
@@ -45,7 +45,7 @@
   UPDATE supplier_product_offers SET approval_status='APPROVED'
    WHERE id='d10c68ae-e6f9-4d07-a734-60feccadf653' AND approval_status='PENDING';  -- 1 row
   ```
-  - 채널: `gcloud sql connect` allowlist → 직접 psql (host 34.64.96.252, user o4o_api, db o4o_platform). 검증 SELECT: approval_status=APPROVED / is_active=t / PRIVATE / allowed_seller_ids {6967ebe0…}.
+  - 채널: `gcloud sql connect` allowlist → 직접 psql (host [REDACTED_IP], user o4o_api, db o4o_platform). 검증 SELECT: approval_status=APPROVED / is_active=t / PRIVATE / allowed_seller_ids {6967ebe0…}.
   - **운영 일반 상품 승인 정책 변경 없음. 테스트 SPO 1행 한정.**
 - **2차 시도 (보정 후): 성공** ✅
   - paymentGroupId **`pg_08e1501d-f84c-4782-af84-a7229ed4cc9b`**
@@ -100,7 +100,7 @@ checkout  checkout_order 5a038670-e32d-4c00-b182-f7f97eb9c1d3 (ORD-20260611-6689
 payment   paymentGroupId pg_08e1501d-f84c-4782-af84-a7229ed4cc9b (group 슬롯, 미결제)
 cart      item 287651b8... — checkout-confirm-b2b 성공으로 제거됨(소비). 재smoke 시 재생성 필요
 supplier  91169739-..., SPO d10c68ae-... — seed CHECK 정리 목록과 동일
-account   renagang21@gmail.com — KPA 약국 공유, 비번 변경/공급자 비활성화 권장
+account   [REDACTED_EMAIL_B] — KPA 약국 공유, 비번 변경/공급자 비활성화 권장
 ```
 
 ---

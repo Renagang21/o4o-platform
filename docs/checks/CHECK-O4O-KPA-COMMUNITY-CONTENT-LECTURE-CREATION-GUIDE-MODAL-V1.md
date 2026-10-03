@@ -43,7 +43,7 @@ KPA 커뮤니티 콘텐츠 작성 화면과 강의 작성/편집 화면에도 �
 
 - `services/web-kpa-society`: `tsc --noEmit` PASS
 
-## 브라우저 smoke (kpa-society.co.kr, KPA operator = sohae2100@gmail.com)
+## 브라우저 smoke (kpa-society.co.kr, KPA operator = [REDACTED_EMAIL_A])
 
 | Case | 화면 | 내용 | 결과 |
 |------|------|------|------|

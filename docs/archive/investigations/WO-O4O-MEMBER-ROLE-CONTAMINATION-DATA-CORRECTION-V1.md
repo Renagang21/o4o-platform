@@ -25,9 +25,9 @@ Neture 2 · KCos 2 · KPA 1, 전부 bare·active). 대상 row(보정 실행분) 
 
 | email | service_key | 현재 role | canonical role_assignment | 참여유형 근거 | 보정 | 처리 |
 |---|---|---|---|---|---|---|
-| sohae21@naver.com | neture | operator | `neture:operator`(active) | **`supplier`(active)** | operator→**supplier** | **실행됨** |
-| sohae2100@gmail.com | kpa-society | admin | super_admin 전체(a) | 없음 | — | 보류 |
-| sohae2100@gmail.com | neture | operator | super_admin 전체(a) | 없음 | — | 보류 |
+| [REDACTED_EMAIL_C] | neture | operator | `neture:operator`(active) | **`supplier`(active)** | operator→**supplier** | **실행됨** |
+| [REDACTED_EMAIL_A] | kpa-society | admin | super_admin 전체(a) | 없음 | — | 보류 |
+| [REDACTED_EMAIL_A] | neture | operator | super_admin 전체(a) | 없음 | — | 보류 |
 | kcos-admin@o4o.com | k-cosmetics | admin | `cosmetics:admin`**(inactive)** | — | — | 테스트 별도 트랙 |
 | kcos-operator@o4o.com | k-cosmetics | operator | `cosmetics:operator`**(inactive)** | — | — | 테스트 별도 트랙 |
 
@@ -72,7 +72,7 @@ WHERE user_id = '52a4c1e6-6fba-4a41-a020-a47637e8ca3a'
 | K-Cosmetics | 2 | 2 (테스트 별도 트랙) |
 | KPA-Society | 1 | 1 (sohae2100 보류) |
 
-보정 결과 sohae21@naver.com: 회원 유형=**공급자**(membership=supplier), 운영 권한=**운영자**(neture:operator), 두 축이 **데이터 레벨에서도 분리** 정합. (UI 표시는 기존에도 token 기반으로 공급자/운영자였으나, 이제 membership.role 원천도 정상.)
+보정 결과 [REDACTED_EMAIL_C]: 회원 유형=**공급자**(membership=supplier), 운영 권한=**운영자**(neture:operator), 두 축이 **데이터 레벨에서도 분리** 정합. (UI 표시는 기존에도 token 기반으로 공급자/운영자였으나, 이제 membership.role 원천도 정상.)
 
 ## 10. 후속 cleanup 필요 여부
 
@@ -84,7 +84,7 @@ WHERE user_id = '52a4c1e6-6fba-4a41-a020-a47637e8ca3a'
 ## 11. 격리 무결성
 
 - DB 변경: **승인된 1 row UPDATE만**. SELECT 외 다른 write 0. role_assignments/users 미변경.
-- authorized-networks 임시 추가(기존 보존) 후 **원복 확인**(124.194.156.36/32만 잔존).
+- authorized-networks 임시 추가(기존 보존) 후 **원복 확인**([REDACTED_IP]/32만 잔존).
 - 코드 수정 0. 본 문서 1건만 신설.
 
 *프로덕션 데이터 변경은 사용자 명시 승인(1 row) 하에 수행. 사전/사후 SELECT 검증 완료.*

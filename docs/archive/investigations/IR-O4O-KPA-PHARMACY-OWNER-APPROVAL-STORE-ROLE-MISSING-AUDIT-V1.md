@@ -2,7 +2,7 @@
 
 > **조사 보고서 (read-only) — 코드·UI·DB·migration 변경 없음.**
 >
-> renagang21@gmail.com (약국 경영자, activity_type=pharmacy_owner) 가 운영자 승인 후에도 `kpa:store_owner` 권한 ("매장 운영") 이 표시되지 않는 원인 — 승인 흐름 단계별 데이터 정합성 audit.
+> [REDACTED_EMAIL_B] (약국 경영자, activity_type=pharmacy_owner) 가 운영자 승인 후에도 `kpa:store_owner` 권한 ("매장 운영") 이 표시되지 않는 원인 — 승인 흐름 단계별 데이터 정합성 audit.
 
 - **작성일:** 2026-05-30
 - **사전 동기화:** origin/main 와 0 commits 차이
@@ -44,11 +44,11 @@
 
 ---
 
-## 3. renagang21@gmail.com 현재 데이터 (production read-only API)
+## 3. [REDACTED_EMAIL_B] 현재 데이터 (production read-only API)
 
 | 항목 | 값 | 평가 |
 |---|---|:---:|
-| users.email | renagang21@gmail.com | — |
+| users.email | [REDACTED_EMAIL_B] | — |
 | users.id | 6967ebe0-2f87-4cab-809b-8c7190493cef | — |
 | kpa_members.id | 3965dff9-880d-4171-aa9d-81b88e59ad64 | — |
 | kpa_members.status | **active** | ✓ |
@@ -240,7 +240,7 @@ WO-O4O-KPA-PHARMACY-OWNER-ROLE-CONSISTENCY-AUDIT-V1
 # 1. renagang21 현 상태 (read-only API)
 TOKEN=$(curl -sv -X POST "https://api.neture.co.kr/api/v1/auth/login" \
   -H "Content-Type: application/json" \
-  -d '{"email":"renagang21@gmail.com","password":"[REDACTED — rotated]"}' 2>&1 \
+  -d '{"email":"[REDACTED_EMAIL_B]","password":"[REDACTED — rotated]"}' 2>&1 \
   | grep "set-cookie: accessToken=" | sed 's/.*accessToken=//; s/;.*//')
 curl -s -H "Authorization: Bearer $TOKEN" https://api.neture.co.kr/api/v1/kpa/members/me
 

@@ -25,8 +25,8 @@ gcloud run services describe o4o-core-api ... → env 21건, URL/FRONT 매칭 0�
 
 | 도메인 | DNS A | HTTP | 실체 |
 |---|---|---|---|
-| `k-cosmetics.site` | `136.110.132.35` (= `neture-static-ip`, O4O GCLB) | 200 | **O4O 정본 production** |
-| `k-cosmetics.co.kr` | `203.245.12.100/113/126`, `183.111.139.237` | 200 | **제3자 Cafe24 몰** (`Server: openresty`, mall_id `anbkorea2017`) |
+| `k-cosmetics.site` | `[REDACTED_IP]` (= `neture-static-ip`, O4O GCLB) | 200 | **O4O 정본 production** |
+| `k-cosmetics.co.kr` | `[REDACTED_IP]/113/126`, `[REDACTED_IP]` | 200 | **제3자 Cafe24 몰** (`Server: openresty`, mall_id `anbkorea2017`) |
 | `www.k-cosmetics.co.kr` | 동일 대역 | — | 동일 |
 
 `k-cosmetics.co.kr` 은 **O4O 가 운영하는 서비스가 아니다.** 따라서 §10 의

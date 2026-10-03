@@ -15,7 +15,7 @@
 | `GET /api/v1/admin/users?search=sohae21` | ❌ **500** (검색어 종류 무관) |
 | `GET /api/v1/admin/users/:id` | ✅ 200 |
 
-인증은 `renariver21@gmail.com` (`platform:super_admin`) 토큰 사용.
+인증은 `[REDACTED_EMAIL_D]` (`platform:super_admin`) 토큰 사용.
 
 ## 2. 정확한 원인
 
@@ -149,7 +149,7 @@ Test Suites: 1 passed   Tests: 10 passed
 ## 9. 배포 후 프로덕션 스모크
 
 배포: `32628b03c` → Deploy API Server (Cloud Run) **success**.
-인증 `renariver21@gmail.com`(`platform:super_admin`). 개인정보는 기록하지 않고 status·total·필드 정상 여부만 남긴다.
+인증 `[REDACTED_EMAIL_D]`(`platform:super_admin`). 개인정보는 기록하지 않고 status·total·필드 정상 여부만 남긴다.
 
 ### 9-1. 권한
 

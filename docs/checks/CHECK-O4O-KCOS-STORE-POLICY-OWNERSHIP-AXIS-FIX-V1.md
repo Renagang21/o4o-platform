@@ -66,7 +66,7 @@ Cloud SQL Proxy 실측 (`platform_store_slugs` 활성 15건):
 | `organizations.created_by_user_id` NULL | 24건 중 11건 |
 | 활성 slug service_key 분포 | cosmetics 2 / kpa 7 / pharmacy-hub 6 |
 
-HTTP 실측 (`api.neture.co.kr`, 계정 = `renagang21@gmail.com`, 조직 `테스트 뷰티샵` owner):
+HTTP 실측 (`api.neture.co.kr`, 계정 = `[REDACTED_EMAIL_B]`, 조직 `테스트 뷰티샵` owner):
 
 | 요청 | 수정 전 |
 |---|---|

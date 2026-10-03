@@ -152,9 +152,9 @@ password 진입 · 계정 병합 · 새 auth 방식 **0**. 서버 Identity 계�
 | 2 | backend service `backend-hospital-pharmacy-web`(EXTERNAL_MANAGED · protocol HTTP · portName 없음 = `backend-lecture-web` 와 동일) + NEG 연결 | **생성 완료** |
 | 3 | `o4o-global-lb` url-map 에 host rule `hospital.neture.co.kr` → `path-matcher-hospital` **추가**(additive) | **완료** — 기존 11개 host rule 전수 불변 확인 |
 | 4 | Certificate Manager `cm-cert-hospital` + map entry `cm-entry-hospital`(`o4o-main-cert-map`) — lecture 와 같은 **LB 인증**(DNS authorization 없음) | **생성 완료** · 현재 `PROVISIONING` / entry `PENDING` |
-| 5 | **DNS A 레코드 `hospital.neture.co.kr → 136.110.132.35`** | **PENDING — 사용자 작업**(등록기관 콘솔 · Cloud DNS managed zone 없음). 이 레코드가 생기면 4번 인증서가 자동 발급되어 ACTIVE 가 되고 도메인이 열린다 |
+| 5 | **DNS A 레코드 `hospital.neture.co.kr → [REDACTED_IP]`** | **PENDING — 사용자 작업**(등록기관 콘솔 · Cloud DNS managed zone 없음). 이 레코드가 생기면 4번 인증서가 자동 발급되어 ACTIVE 가 되고 도메인이 열린다 |
 
-LB IP `136.110.132.35` 는 기존 `neture.co.kr`·`study.neture.co.kr`·`store.neture.co.kr` 과 같은 값(실측).
+LB IP `[REDACTED_IP]` 는 기존 `neture.co.kr`·`study.neture.co.kr`·`store.neture.co.kr` 과 같은 값(실측).
 
 ### 7-D-2. **정본 진입 변경 — 서브디렉토리 `https://neture.co.kr/hospital`** (사용자 결정 2026-09-22 · commit `f4e9d5854`)
 

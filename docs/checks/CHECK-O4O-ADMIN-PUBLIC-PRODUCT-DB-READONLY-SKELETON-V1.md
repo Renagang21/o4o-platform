@@ -110,7 +110,7 @@ typecheck 통과. 신규 파일 8개 / 수정 파일 2개, 기존 라우트·메
 ## 7. 브라우저 smoke — PASS
 
 - 배포: `deploy-admin.yml` (push 자동 트리거, run `28701273192`) → 성공, 서비스 `o4o-admin-dashboard`.
-- 검증: Playwright, 계정 `sohae2100@gmail.com` (SSOT `docs/local/TEST-ACCOUNTS.local.md`, env 주입 — 자격증명 미노출).
+- 검증: Playwright, 계정 `[REDACTED_EMAIL_A]` (SSOT `docs/local/TEST-ACCOUNTS.local.md`, env 주입 — 자격증명 미노출).
 - 로그인 랜딩 = `/home`. 보호 라우트는 hard-reload 시 auth 재수화 전 `/login` 리다이렉트되므로(앱 전역 동작) **사이드바 in-app 클릭**으로 검증.
 
 | 항목 | 기대 | 실측 |

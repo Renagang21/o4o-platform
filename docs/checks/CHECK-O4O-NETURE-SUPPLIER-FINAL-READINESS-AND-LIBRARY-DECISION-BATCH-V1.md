@@ -62,7 +62,7 @@
 
 ## 6. 실계정 · 실데이터 smoke 가능 여부
 
-- 계정: `renagang21@gmail.com`(Neture 공급자, 실계정) 로그인 성공.
+- 계정: `[REDACTED_EMAIL_B]`(Neture 공급자, 실계정) 로그인 성공.
 - 상품: **0건** (`/supplier/products` · `/supplier/store-descriptions` 모두 "등록된 상품이 없습니다").
 - 자료: 매장용 상품 설명서 12행(전부 숨김/만료), 태블릿 화면 세트 2건(보관), 사이니지 0건.
 - **운영 데이터 write smoke 미수행** — 대상 상품이 없고, 남은 설명서 행은 과거 운영 이력이라 훼손 위험이 있다(§9 단서 적용). read-only · 정적 · 브라우저 smoke 로 대체 완료. rollback 대상 변경 없음(write 0건).

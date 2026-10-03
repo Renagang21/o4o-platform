@@ -38,8 +38,8 @@
 
 | 계정 | serviceKey 없음 | `serviceKey:"neture"` | users.status | 비고 |
 |---|:---:|:---:|:---:|---|
-| `renagang21@gmail.com` | 401 | **200 OK** | active | Neture 공급자 `supplier-6967ebe0` ACTIVE |
-| `sohae21@naver.com` | 401 `ACCOUNT_NOT_ACTIVE` | 동일 | **deleted** | 공급자 `supplier-52a4c1e6` 는 ACTIVE 이나 유저가 삭제됨 |
+| `[REDACTED_EMAIL_B]` | 401 | **200 OK** | active | Neture 공급자 `supplier-6967ebe0` ACTIVE |
+| `[REDACTED_EMAIL_C]` | 401 `ACCOUNT_NOT_ACTIVE` | 동일 | **deleted** | 공급자 `supplier-52a4c1e6` 는 ACTIVE 이나 유저가 삭제됨 |
 | `[REDACTED_EMAIL]` | 미실행 | 미실행 | — | 공급자 status `PENDING` |
 
 프로덕션 Neture 공급자 3건 중 **실사용 가능한 공급자 계정은 1개**다.
@@ -53,7 +53,7 @@ UI 로그인은 항상 serviceKey 를 보내므로 정상 동작했다. 실패�
 
 ## 3. 선택한 테스트 계정
 
-**`renagang21@gmail.com`** — Neture 공급자 "(주)네뚜레 공급자 테스트" (`supplier-6967ebe0`, status ACTIVE).
+**`[REDACTED_EMAIL_B]`** — Neture 공급자 "(주)네뚜레 공급자 테스트" (`supplier-6967ebe0`, status ACTIVE).
 
 ---
 
@@ -104,7 +104,7 @@ DB 직접 update · 비밀번호 재설정 · 관리 스크립트 실행 모두 
 
 - 직전 WO 가 남긴 "비밀번호 불일치" 메모를 **오해로 정정**
 - `serviceKey` 필수 규칙과 검증 대상 해시 표, curl 예시(❌/✅) 추가
-- Neture 공급자 write smoke 표준 계정 = `renagang21@gmail.com` 명시
+- Neture 공급자 write smoke 표준 계정 = `[REDACTED_EMAIL_B]` 명시
 - 비밀번호 원문은 기존 표에만 유지 (본 CHECK 및 추적 파일에는 없음)
 
 ---
@@ -117,7 +117,7 @@ DB 직접 update · 비밀번호 재설정 · 관리 스크립트 실행 모두 
 
 | # | 내용 |
 |---|---|
-| 1 | `sohae21@naver.com` — 유저 `deleted` 인데 공급자 `supplier-52a4c1e6` 는 ACTIVE 이고 `[E2E_TEST]` offer 2건을 보유. 공급자 계정 lifecycle 정합 이슈로 보이며 별도 WO 후보 |
+| 1 | `[REDACTED_EMAIL_C]` — 유저 `deleted` 인데 공급자 `supplier-52a4c1e6` 는 ACTIVE 이고 `[E2E_TEST]` offer 2건을 보유. 공급자 계정 lifecycle 정합 이슈로 보이며 별도 WO 후보 |
 | 2 | `[REDACTED_EMAIL]` 공급자 `PENDING` 상태 장기 방치 |
 
 ---

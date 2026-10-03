@@ -12,7 +12,7 @@
 선행 WO 로 `product_ai_contents` / `product_ai_tags` / POP 렌더의 접근 판정을
 `resolveGlobalProductResourceAccess()` 로 통일한 뒤, 프로덕션 smoke 에서 다음이 관측되었다.
 
-- `sohae21@naver.com` 은 요청 master(`0a47e0bc-38d0-45ae-9e6a-15a71ff80e1d`) 에 대해
+- `[REDACTED_EMAIL_C]` 은 요청 master(`0a47e0bc-38d0-45ae-9e6a-15a71ff80e1d`) 에 대해
   **active `organization_product_listings` 를 보유**하고 있음에도 POP PDF 가
   `403 PRODUCT_ACCESS_DENIED`.
 - 원인: 해당 사용자가 `neture_suppliers` 링크(ACTIVE)를 **동시에** 보유하고 있어,
@@ -134,7 +134,7 @@ inactive OPL 403 / `supplier_product_offers` 경유 미사용 / 미인증 403 /
 (migration step 포함 — 본 WO 는 신규 migration 0, 기존 이력만 확인).
 본 커밋 `eaefd70d1` 는 배포 head `18d1bcef0` 의 조상임을 `git merge-base --is-ancestor` 로 확인.
 
-계정: `sohae21@naver.com` (user `52a4c1e6-…`, 공급자 링크 ACTIVE + 매장 소속 겸업)
+계정: `[REDACTED_EMAIL_C]` (user `52a4c1e6-…`, 공급자 링크 ACTIVE + 매장 소속 겸업)
 - active OPL master: `0a47e0bc-38d0-45ae-9e6a-15a71ff80e1d` (org `9c87f46b-…`, `is_active=true`)
 - active OPL 없는 master: `f6b37061-9dbc-4263-bb3b-308d21f1d5d9` (실재 master)
 

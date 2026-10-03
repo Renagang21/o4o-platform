@@ -282,7 +282,7 @@ sites ≠ branch_sites
 검증 한계(숨기지 않고 기록):
 
 - `/service/templates` · `/service-admin/templates` 는 `platform:super_admin` 급 권한을 요구한다.
-  `docs/local/TEST-ACCOUNTS.local.md` 에 해당 계정(`renariver21@gmail.com` · `super-admin@o4o.com`) 의
+  `docs/local/TEST-ACCOUNTS.local.md` 에 해당 계정(`[REDACTED_EMAIL_D]` · `super-admin@o4o.com`) 의
   비밀번호가 없어 **200 본문까지는 확인하지 못했다.** 미인증 401 → 로그인 후 403 전이로
   "라우터가 mount 돼 있고 가드까지 도달하며 `sites` 관련 500 이 아니다" 까지만 확증했다.
   이번 WO 의 위험(entity 등록 제거로 인한 부팅/스키마 오류)은 이 범위에서 배제된다.

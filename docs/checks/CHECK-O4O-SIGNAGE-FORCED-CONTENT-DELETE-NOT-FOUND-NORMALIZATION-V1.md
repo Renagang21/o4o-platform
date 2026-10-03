@@ -28,7 +28,7 @@ PATCH /api/signage/:serviceKey/hq/forced-content/<valid-but-missing-uuid>
 
 ## 2. 수정 전 재현 (production · 2026-08-21)
 
-`sohae2100@gmail.com` (operator) 로 3개 서비스 모두 재현. missing UUID 만 사용 →
+`[REDACTED_EMAIL_A]` (operator) 로 3개 서비스 모두 재현. missing UUID 만 사용 →
 **0-row DELETE · 데이터 변경 0**.
 
 | 요청 | kpa-society | k-cosmetics |
@@ -248,7 +248,7 @@ if (affected === 0 || rows.length === 0) { /* 기존 404 분기 */ }
 배포: commit `4a3550360` → Deploy API Server (Cloud Run) **success** →
 리비전 **`o4o-core-api-03413-5vd`** (2026-08-21). 검증은 이 리비전에서 수행했다.
 
-`sohae2100@gmail.com` (operator) · **missing UUID 만 사용 → 0-row · 데이터 변경 0**.
+`[REDACTED_EMAIL_A]` (operator) · **missing UUID 만 사용 → 0-row · 데이터 변경 0**.
 
 | 요청 | k-cosmetics | `cosmetics` (alias) |
 |---|---|---|
@@ -265,13 +265,13 @@ if (affected === 0 || rows.length === 0) { /* 기존 404 분기 */ }
 
 ### kpa-society — operator 경로 production 미검증 (정직 기록)
 
-`sohae2100@gmail.com` + `serviceKey:"kpa-society"` 로그인이 본 검증 시점에 **401
+`[REDACTED_EMAIL_A]` + `serviceKey:"kpa-society"` 로그인이 본 검증 시점에 **401
 `INVALID_CREDENTIALS`** 를 반환했다 (같은 계정·같은 비밀번호로 `k-cosmetics` /
 `ACCOUNT_LOCKED` 가 아닌 자격 불일치이므로
 `service_credentials` 의 kpa-society 행 문제로 보이며, **본 WO 변경과 무관한 계정
 환경 이슈**다. 비밀번호 변경은 WO 범위 밖이라 수행하지 않았다.
 
-대체 검증으로 `renagang21@gmail.com` (`kpa:store_owner`) 로 kpa-society 경로에 접근:
+대체 검증으로 `[REDACTED_EMAIL_B]` (`kpa:store_owner`) 로 kpa-society 경로에 접근:
 
 | 요청 | 결과 |
 |---|---|
@@ -306,7 +306,7 @@ if (affected === 0 || rows.length === 0) { /* 기존 404 분기 */ }
 3. **forced-content 는 service/repository 계층 없이 controller 가 raw SQL 을 직접 실행**한다.
    Signage 의 다른 리소스는 repository 계층을 갖는다. 계층 정합은 별도 WO 후보
    (본 WO 는 "가장 작은 계층에서 수정" 원칙에 따라 계층 신설을 하지 않았다).
-4. **`sohae2100@gmail.com` 의 kpa-society service credential 불일치** (§9) — 검증 계정
+4. **`[REDACTED_EMAIL_A]` 의 kpa-society service credential 불일치** (§9) — 검증 계정
    환경 문제. 코드 결함 아님. `docs/local/TEST-ACCOUNTS.local.md` 갱신 또는 credential
    재설정이 필요하며 본 WO 범위 밖이다.
 

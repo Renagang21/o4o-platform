@@ -525,7 +525,7 @@ Google이 사용하는 하위처리자 및 처리지역에 관한 상세 내용�
 * 성명: 서철환
 * 직위: 대표이사
 * 전화: 1577-2779
-* 이메일: [threelifezone3@nate.com](mailto:threelifezone3@nate.com)
+* 이메일: [[REDACTED_EMAIL_E]](mailto:[REDACTED_EMAIL_E])
 
 **회사 정보**
 
@@ -534,7 +534,7 @@ Google이 사용하는 하위처리자 및 처리지역에 관한 상세 내용�
 * 사업자등록번호: 108-86-02873
 * 주소: 서울특별시 구로구 공원로 47 (도림두산베어스타워) 304호
 * 대표전화: 1577-2779
-* 이메일: [threelifezone3@nate.com](mailto:threelifezone3@nate.com)
+* 이메일: [[REDACTED_EMAIL_E]](mailto:[REDACTED_EMAIL_E])
 
 ---
 

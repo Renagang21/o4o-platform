@@ -11,7 +11,7 @@
 | 항목 | 결과 |
 |---|---|
 | 전용 **스테이징 DB** | **없음** — `apps/api-server/src/database/connection.ts`·워크플로에 staging DB 참조 0. `deploy:staging` 은 금지된 PM2 레거시(CLAUDE.md §6). |
-| 운영 DB | Cloud SQL `o4o-platform-db` (host 34.64.96.252, db `o4o_platform`) — **방화벽**(Cloud Run/Console/`gcloud sql` 외 차단, CLAUDE.md §0) |
+| 운영 DB | Cloud SQL `o4o-platform-db` (host [REDACTED_IP], db `o4o_platform`) — **방화벽**(Cloud Run/Console/`gcloud sql` 외 차단, CLAUDE.md §0) |
 | 로컬 직접 TCP | 불가(방화벽). candidate import CLI(local tsx) 는 **cloud-sql-proxy** 또는 Cloud Run one-off 로만 write 접속 |
 
 **→ 실효 경로 = B (운영에 ProductCandidate 만 선적재).** A(스테이징 우선)는 스테이징 DB 확보 시에만 적용(현재 대상 없음).
@@ -292,7 +292,7 @@ gcloud run jobs execute o4o-drug-seed-promotion-apply --region=asia-northeast3  
 | 항목 | 값 |
 |---|---|
 | 노트북 동기화 | ✅ `68e99e93e → 6df125997` fast-forward, HEAD == origin/main |
-| gcloud | ✅ 인증 `sohae2100@gmail.com`, project `netureyoutube`, Job 존재 확인 |
+| gcloud | ✅ 인증 `[REDACTED_EMAIL_A]`, project `netureyoutube`, Job 존재 확인 |
 | 대용량 공공데이터 파일 | ⚠️ Drive `o4o-platform-local-sync` 는 repo 미러일 뿐, CSV/JSONL 없음 (승격 재개는 GCS 기반이라 무관, 후속 e약은요 작업 전 동기화 필요) |
 | 사전 백업 | ✅ 기존 `1783079396967` (2026-07-03 11:49 UTC, SUCCESSFUL, 현재 부분적용 상태 포함) 를 재개 안전망으로 확정 |
 | Job timeout | ✅ 이미 7200초 적용됨 (재설정 불필요) |
@@ -304,7 +304,7 @@ gcloud run jobs execute o4o-drug-seed-promotion-apply --region=asia-northeast3  
 
 **정적 분석 결론**: 코드는 설계상 멱등이어야 함 — `preloadCatalog`(:318) 이 기존 master 전량을 `mastersByBarcode` 로 로드하고, 스캔은 **순차**(:569) 이며 `createMaster`(:398) 가 즉시 map 갱신 → 기존/동일-run barcode 는 link 판정. 배포 이미지 `6ec364773` 은 HEAD 의 조상이고 db.ts 는 이후 변경 이력 0 → **배포 코드 == 현재 코드**, 멱등 로직 포함. 따라서 중복은 정적으로 재현 불가한 실데이터 edge case 이며 **DB 레벨 진단(실제 충돌 barcode 특정)** 이 필요.
 
-**환경 제약 (중요)**: 이 노트북 네트워크는 **Cloud SQL 5432 아웃바운드가 차단**됨(34.64.96.252:5432 TCP timeout 확인, 443 정상). → `gcloud sql connect` 가 연결 단계에서 무한 대기(인증/쿼리 문제 아님). **이 노트북에서 로컬 read-only SQL 검증 불가.** 검증/진단은 **Cloud Console → SQL → Query Editor**(HTTPS, 서버측 실행) 로만 가능.
+**환경 제약 (중요)**: 이 노트북 네트워크는 **Cloud SQL 5432 아웃바운드가 차단**됨([REDACTED_IP]:5432 TCP timeout 확인, 443 정상). → `gcloud sql connect` 가 연결 단계에서 무한 대기(인증/쿼리 문제 아님). **이 노트북에서 로컬 read-only SQL 검증 불가.** 검증/진단은 **Cloud Console → SQL → Query Editor**(HTTPS, 서버측 실행) 로만 가능.
 
 **다음 진단 (Cloud Console SQL Editor 에서 실행)** — 남은 후보 중 동일 barcode 충돌 규명:
 ```sql

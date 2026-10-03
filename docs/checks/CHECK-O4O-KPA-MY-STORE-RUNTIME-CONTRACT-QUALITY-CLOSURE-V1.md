@@ -65,7 +65,7 @@
 
 ### 다중 서비스 사용자 판정 (프로덕션 실측)
 
-계정 `renagang21@gmail.com` 의 `organization_members`(left_at IS NULL) 5개 조직:
+계정 `[REDACTED_EMAIL_B]` 의 `organization_members`(left_at IS NULL) 5개 조직:
 
 | 조직 | 이름 | 연결 서비스 | is_primary | joined_at |
 |---|---|---|---|---|

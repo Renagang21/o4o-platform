@@ -23,7 +23,7 @@
 
 ## 4. 검증
 - **web-neture tsc 0** ✅
-- **live 브라우저** (neture-web `neture-web-01012`, 공급자 계정 sohae21@naver.com / 쓰리라이프존):
+- **live 브라우저** (neture-web `neture-web-01012`, 공급자 계정 [REDACTED_EMAIL_C] / 쓰리라이프존):
   - `/mypage/business-profile` 배송 정책 섹션에 **⚠️ 미설정 경고 배너 렌더**(이 공급자 baseShippingFee=null → 경고 노출, "배송비 0원으로 계산" 문구 포함) ✅
   - 무료배송 기준/평균 출고일 안내 라인 노출 ✅
   - 갱신된 설명 문구(자동반영 안 됨 → 반영됨) 렌더 ✅

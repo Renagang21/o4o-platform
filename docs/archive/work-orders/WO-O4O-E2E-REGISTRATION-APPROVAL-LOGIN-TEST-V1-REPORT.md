@@ -103,8 +103,8 @@ Login Response: {"success":true} (전체 10개 운영자 계정)
 
 ```
 shop.neture.co.kr → Non-existent domain (NXDOMAIN)
-www.neture.co.kr  → 136.110.132.35 (OK)
-neture.co.kr      → 136.110.132.35 (OK)
+www.neture.co.kr  → [REDACTED_IP] (OK)
+neture.co.kr      → [REDACTED_IP] (OK)
 ```
 
 **영향:** Neture 서비스에 `shop.neture.co.kr`로 접근 불가.

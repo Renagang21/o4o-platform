@@ -139,7 +139,7 @@ PRODUCTION E2E                = PASS
 
 ## 7. Production E2E (§11)
 
-- **환경**: `https://k-cosmetics.site` · 실브라우저(Playwright MCP) · 계정 `renagang21@gmail.com` (serviceKey `cosmetics`) · 조직 **테스트 뷰티샵**
+- **환경**: `https://k-cosmetics.site` · 실브라우저(Playwright MCP) · 계정 `[REDACTED_EMAIL_B]` (serviceKey `cosmetics`) · 조직 **테스트 뷰티샵**
 - **선행**: `066e9545b` 의 `Deploy API Server (Cloud Run)` / `Deploy Web Services` / `Deploy Admin Dashboard` 전부 green 확인 후 착수.
 - **mount 증명**: `/api/v1/cosmetics/pharmacy/pop-v2/documents` → **401**(guard 인터셉트) vs 미마운트 sibling `/api/v1/cosmetics/zzz-not-mounted/foo` → **404**. 401 ≠ 404 이므로 라우터가 실제로 살아 있다.
 

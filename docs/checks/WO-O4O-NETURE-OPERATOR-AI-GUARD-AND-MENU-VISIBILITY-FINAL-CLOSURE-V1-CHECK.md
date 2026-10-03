@@ -79,8 +79,8 @@ viewport: **desktop 1440×900 / mobile 390×844** 양쪽 전수. 실계정 로�
 
 | 계정 | roles | 노출된 AI 메뉴 | 판정 |
 |---|---|---|---|
-| `sohae2100@gmail.com` | `neture:operator` + `neture:admin` (platform 없음) | operator: `/operator/ai-report` **1건뿐** / admin: `/admin/ai-card-rules`, `/admin/ai-business-pack` **2건뿐** | 계약 일치 |
-| `renariver21@gmail.com` | `platform:super_admin` | 위 + `/admin/ai-admin`, `/admin/ai-card-report`, `/admin/ai-operations` | 계약 일치 |
+| `[REDACTED_EMAIL_A]` | `neture:operator` + `neture:admin` (platform 없음) | operator: `/operator/ai-report` **1건뿐** / admin: `/admin/ai-card-rules`, `/admin/ai-business-pack` **2건뿐** | 계약 일치 |
+| `[REDACTED_EMAIL_D]` | `platform:super_admin` | 위 + `/admin/ai-admin`, `/admin/ai-card-report`, `/admin/ai-operations` | 계약 일치 |
 
 → `neture:admin` 에게 platform 전용 AI 3항목 **미노출 확인** = 본 WO 핵심 수정의 production 실증(양방향).
 → operator 사이드바 AI 링크 = `/operator/ai-report` 단 1건(판정 A). `Asset Quality`·dead `adminOnly` 항목 노출 0.

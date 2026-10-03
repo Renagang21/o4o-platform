@@ -3,7 +3,7 @@
 **작성일**: 2026-05-16
 **상태**: Investigation (조사 전용 — 코드/DB 수정 없음)
 **대상**:
-- `https://kpa-society.co.kr/operator/members` 운영자 회원관리 화면의 "KPA 프로필 없음" 표시 (sohae2100@gmail.com 케이스)
+- `https://kpa-society.co.kr/operator/members` 운영자 회원관리 화면의 "KPA 프로필 없음" 표시 ([REDACTED_EMAIL_A] 케이스)
 - 동일 사용자의 `/mypage/profile` 에는 직역/약국 개설자/근무처 정보가 노출됨 — 두 화면의 판정 기준 불일치
 
 **연관 IR/WO**:
@@ -113,14 +113,14 @@ const members = (rows as any[]).map((r) => ({
 
 ---
 
-## 3. DB 기준 비교 — sohae2100@gmail.com 가설 시나리오
+## 3. DB 기준 비교 — [REDACTED_EMAIL_A] 가설 시나리오
 
 본 IR 은 read-only 라 운영 DB 실제 row 미확인. 두 시나리오:
 
 ### 시나리오 A — `kpa_members` row **있음** (LEFT JOIN 매칭 실패)
 | 테이블 | 가설 상태 |
 |---|---|
-| `users` | row 있음, email='sohae2100@gmail.com' |
+| `users` | row 있음, email='[REDACTED_EMAIL_A]' |
 | `kpa_members` | row 있음 (license, pharmacy_name, activity_type 등) |
 | `kpa_pharmacist_profiles` | row 있음 (activity_type='pharmacy_owner') |
 | `users.businessInfo` | metadata.workplace 등 일부 |
@@ -164,7 +164,7 @@ LEFT JOIN kpa_pharmacist_profiles pp ON pp.user_id = u.id
 LEFT JOIN service_memberships sm ON sm.user_id = u.id
 LEFT JOIN role_assignments ra ON ra.user_id = u.id
 LEFT JOIN organization_members om ON om.user_id = u.id
-WHERE u.email = 'sohae2100@gmail.com'
+WHERE u.email = '[REDACTED_EMAIL_A]'
 GROUP BY u.id, u.email, u."businessInfo", km.id, km.status, km.activity_type, km.pharmacy_name, km.membership_type,
          pp.user_id, pp.activity_type, pp.license_number, sm.id, sm.service_key, sm.status, sm.role;
 ```

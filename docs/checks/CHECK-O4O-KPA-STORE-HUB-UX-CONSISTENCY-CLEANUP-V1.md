@@ -264,7 +264,7 @@ WO 는 문구를 2종으로 상정했으나, backend 를 확인하니 **3갈래*
 
 ## 11. 프로덕션 smoke — 10화면
 
-계정: 약국 경영자 `renagang21@gmail.com` / 조직 `테스트 약국 매장`. read-only(가져오기·저장 mutation 없음).
+계정: 약국 경영자 `[REDACTED_EMAIL_B]` / 조직 `테스트 약국 매장`. read-only(가져오기·저장 mutation 없음).
 
 | 화면 | h1 | console error | HTTP 4xx/5xx | 정렬 헤더 | 수제 pager |
 |------|-----|:---:|:---:|:---:|:---:|

@@ -4,7 +4,7 @@
 > **상위:** [`IR-O4O-KPA-OPERATOR-STORE-SHARED-FUNCTION-PARITY-AUDIT-V1`](IR-O4O-KPA-OPERATOR-STORE-SHARED-FUNCTION-PARITY-AUDIT-V1.md) (정적 코드 조사)
 > **작성일:** 2026-06-27
 > **검증 방식:** 배포 운영 사이트 `https://kpa-society.co.kr` 에 **read-only** 자동화(Playwright 1.57) 로 로그인 후 라우트별 사이드바 메뉴명·페이지 제목·버튼명·빈화면 문구·상태 탭을 추출. **생성·수정·삭제 없음**(네비게이션 + DOM 읽기만).
-> **계정:** 운영자 `sohae2100@gmail.com`(kpa:admin+operator), 약국 `renagang21@gmail.com`(약국 경영자) — SSOT `docs/local/TEST-ACCOUNTS.local.md`, 자격증명 env 주입(문서 미기재).
+> **계정:** 운영자 `[REDACTED_EMAIL_A]`(kpa:admin+operator), 약국 `[REDACTED_EMAIL_B]`(약국 경영자) — SSOT `docs/local/TEST-ACCOUNTS.local.md`, 자격증명 env 주입(문서 미기재).
 > **결론 요약:** 정적 조사의 3영역 모델이 **운영 화면에서 그대로 확인**됨. 추가로 정적 조사가 못 본 **사용자 노출 문자열 불일치**가 다수 실측됨 — (1) 상태 라벨 3종 분기, (2) "만들기" 동사 3종 분기, (3) 운영자 사이드바 그룹 **영문** vs 매장 **국문**, (4) "콘텐츠 허브" 명칭 충돌, (5) 빈화면 문구 분기. **명칭/문구 통일(P1)이 가장 체감 큰 1순위**임을 실측 근거로 확정. 테이블 ListColumnDef 수렴은 양쪽 다 탭·컬럼이 있어 **체감 효과 낮음 → 후순위** 확인.
 
 ---

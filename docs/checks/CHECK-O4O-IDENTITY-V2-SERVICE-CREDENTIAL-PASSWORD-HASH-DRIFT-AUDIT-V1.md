@@ -53,7 +53,7 @@ const targetHash = credentialHash ?? user.password;   // credential 이 있으�
 
 ### 1-2. 실측 재현 (프로덕션 API, 비밀번호·해시 미출력)
 
-동일 계정 `renagang21@gmail.com` · 동일 비밀번호(로컬 테스트 계정 문서값, env 주입) · serviceKey 만 차이:
+동일 계정 `[REDACTED_EMAIL_B]` · 동일 비밀번호(로컬 테스트 계정 문서값, env 주입) · serviceKey 만 차이:
 
 | 요청 | 결과 |
 |---|---|
@@ -64,7 +64,7 @@ const targetHash = credentialHash ?? user.password;   // credential 이 있으�
 
 ### 1-3. 대상 계정 DB 실측 (read-only, 해시는 동일성 boolean 으로만 판정)
 
-`renagang21@gmail.com` (`6967ebe0-…`) — `status=active`, `isActive=true`, `loginAttempts=0`, `lockedUntil=NULL`
+`[REDACTED_EMAIL_B]` (`6967ebe0-…`) — `status=active`, `isActive=true`, `loginAttempts=0`, `lockedUntil=NULL`
 
 | service_key | membership | role | credential | `password_hash = users.password` |
 |---|---|---|---|---|
@@ -203,7 +203,7 @@ DB 기본값 `true` 가 남는다. 실측에서 `reason='invalid_password'` 인 
 
 **해제 절차 (데이터 변경 승인 불필요 — 사용자 셀프서비스 경로)**
 
-1. 각 서비스의 `/forgot-password` 에서 `renagang21@gmail.com` 재설정 요청
+1. 각 서비스의 `/forgot-password` 에서 `[REDACTED_EMAIL_B]` 재설정 요청
    → 프런트가 `serviceKey` 를 함께 보내므로 토큰에 serviceKey 가 실린다
 2. 메일 링크로 새 비밀번호 설정
    → `passwordResetService` 가 **해당 서비스 credential 만** 갱신 (`users.password` 무영향)

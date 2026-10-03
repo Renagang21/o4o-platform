@@ -286,7 +286,7 @@ export const NETURE_OPERATOR_DOMAIN_IA = { /* 위 5개를 config 객체로 조�
   - 핵심 항목: 가입 승인 / 유통 참여형 펀딩 / 공급자 활성화 / 상품 관리 / 주문 관리 / 회원 관리 / 포럼 / AI 리포트 / 알림 설정
   - profile dropdown: 관리자·운영·**공급자·파트너** 대시보드 href + 마이페이지/설정
   - active route / collapse / footer 부재
-  - 계정: SSOT Neture 운영자(`sohae2100@gmail.com` 통합 운영자 또는 `operator-neture@o4o.com`)
+  - 계정: SSOT Neture 운영자(`[REDACTED_EMAIL_A]` 통합 운영자 또는 `operator-neture@o4o.com`)
 - baseline: 이행 **전 flat 스냅샷 사전 캡처**(before) 후 항목 집합 동등성 비교 (flat→domain 은 의도된 diff).
 
 ---

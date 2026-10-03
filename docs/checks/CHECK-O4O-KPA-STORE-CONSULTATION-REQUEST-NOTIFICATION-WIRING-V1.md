@@ -121,7 +121,7 @@ SELECT DISTINCT user_id
 ### 9-1. 운영(프로덕션) 브라우저 smoke 결과 — 2026-06-25 PASS
 
 - 환경: `https://kpa-society.co.kr` (배포 리비전 — Deploy API Server / Deploy Web Services 모두 success, 커밋 `9c49a0c9b`)
-- 계정: 로그인 화면 "🧪 체험용 약국 경영자 계정" → 매장 **Sohae 약국**(org `c9beb4a2…`)의 owner(`sohae2100@gmail.com`, userId `cfd2a5e7…`) 세션.
+- 계정: 로그인 화면 "🧪 체험용 약국 경영자 계정" → 매장 **Sohae 약국**(org `c9beb4a2…`)의 owner(`[REDACTED_EMAIL_A]`, userId `cfd2a5e7…`) 세션.
 - 요청 생성: 매장 슬러그 `sohae-약국` 에 태블릿 공개 API(`POST /api/v1/stores/sohae-약국/tablet/interest`, masterId=미네락 600, customerName=스모크검증고객) 호출 → **201**, requestId `e2d524f0…`, status REQUESTED. (해당 매장은 진열 상품 0 이라 태블릿 UI 그리드가 비어 있어, 태블릿 페이지가 호출하는 것과 동일한 공개 엔드포인트로 제출.)
 
 | smoke 단계 | 결과 |

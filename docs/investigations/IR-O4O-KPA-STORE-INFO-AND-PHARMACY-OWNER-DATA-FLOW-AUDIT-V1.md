@@ -193,7 +193,7 @@ FALLBACK #2: users."businessInfo" 조회 (조건: !data.phone || !data.addressDe
 | 대표자명 | ❌ NULL | ❌ | biz.ceoName | ✅ (있으면) |
 | 담당자명 | ❌ NULL | ❌ | biz.contactName | ✅ (있으면) |
 
-> **`renagang21@gmail.com` 계정은 경로 B 사용자** — 사업자번호, 세금계산서 이메일, 개설자 연락처가 공백.
+> **`[REDACTED_EMAIL_B]` 계정은 경로 B 사용자** — 사업자번호, 세금계산서 이메일, 개설자 연락처가 공백.
 
 ---
 
@@ -375,7 +375,7 @@ WHERE om.organization_id = o.id
 | 1 | 신규 약국 경영자 가입 (경로 A: pharmacy-request) | POST `/kpa/pharmacy-requests` 응답 확인 |
 | 2 | 가입 신청 데이터 확인 | 운영자 화면에서 상세정보 표시 여부 |
 | 3 | 승인 후 /store/info 확인 | 어떤 필드가 채워지고 비어 있는지 |
-| 4 | 경로 B (member.controller 경유) 계정 /store/info | renagang21@gmail.com 계정으로 직접 확인 |
+| 4 | 경로 B (member.controller 경유) 계정 /store/info | [REDACTED_EMAIL_B] 계정으로 직접 확인 |
 | 5 | 수정 저장 후 새로고침 | 저장 후 `/store/info` 재조회 시 유지 여부 |
 
 > 브라우저 검증은 별도 WO에서 수정 후 진행 예정.
