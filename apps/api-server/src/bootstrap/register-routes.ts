@@ -47,6 +47,8 @@ import adminOperatorAssignmentsRoutes from '../routes/admin/operator-assignments
 import { createAdminFulfillmentRecoveryRoutes } from '../routes/admin/admin-fulfillment-recovery.routes.js';
 // WO-O4O-ADMIN-PLATFORM-SETTINGS-SUPER-ADMIN-ACCOUNT-MANAGEMENT-V1: 관리자 계정 안전 유지관리(additive)
 import adminPlatformAccountsRoutes from '../routes/admin/platform-accounts.routes.js';
+// WO-O4O-ADMIN-PENDING-WORK-COUNTER-AND-HEADER-ENTRY-V1: 관리자 대기 업무 카운터(read-only COUNT)
+import adminPendingTasksRoutes from '../routes/admin/pending-tasks.routes.js';
 // WO-O4O-PLATFORM-GLOBAL-USERS-READONLY-LIST-V1: 전체 사용자 read-only 조회(투영, additive)
 import adminPlatformUsersRoutes from '../routes/admin/platform-users.routes.js';
 // WO-O4O-SECURITY-IP-BLOCK-TTL-AND-UNBLOCK-V1
@@ -181,6 +183,7 @@ export async function registerCoreRoutes(app: Application): Promise<void> {
   //   기존 Pharmacy-Hub 전용 recovery 는 그대로 유지한다(무회귀).
   app.use('/api/v1/admin/fulfillment', createAdminFulfillmentRecoveryRoutes());
   app.use('/api/v1/admin/platform-accounts', adminPlatformAccountsRoutes);
+  app.use('/api/v1/admin/pending-tasks', adminPendingTasksRoutes);
   app.use('/api/v1/admin/platform-users', adminPlatformUsersRoutes);
   app.use('/api/v1/admin/security', adminSecurityBlockedIpsRoutes);
   // WO-O4O-SERVICE-MONITOR-SITES-TABLE-DEPENDENCY-AUDIT-AND-CLOSURE-V1 (판정 MONITOR_LEGACY_RETIRE):

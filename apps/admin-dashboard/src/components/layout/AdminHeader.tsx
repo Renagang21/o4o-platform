@@ -14,6 +14,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import PendingTasksMenu from './PendingTasksMenu';
 
 interface AdminHeaderProps {
   onMenuClick?: () => void;
@@ -145,6 +146,9 @@ const AdminHeader: FC<AdminHeaderProps> = ({ onMenuClick }) => {
             <Clock className="w-3 h-3" />
             <span>세션: {getSessionStatusText()}</span>
           </div>
+
+          {/* 검토 대기 업무 (WO-O4O-ADMIN-PENDING-WORK-COUNTER-AND-HEADER-ENTRY-V1) */}
+          <PendingTasksMenu />
 
           {/* User menu */}
           <DropdownMenu>
