@@ -560,6 +560,27 @@ test('docs fast job 은 heavy job 과 상호배타다 (ci-pipeline.yml 계약)',
   assert.ok(heavy.length >= 3, `heavy job 게이트가 3개 이상이어야 한다: ${heavy.length}`);
 });
 
+// WO-O4O-CI-CANONICAL-FINAL-GATE-AND-REQUIRED-CHECK-READINESS-V1
+// `CI Gate` 는 main ruleset 의 required status check 대상이다. 이름이 바뀌거나 job 하나가 needs 에서 빠지면
+// 그 job 의 실패가 merge 를 막지 못한다.
+test('CI Gate 는 고정 이름 · always() · 모든 CI job 을 needs 로 묶는다 (ci-pipeline.yml 계약)', () => {
+  const yml = workflowYaml('ci-pipeline.yml');
+  const jobsBlock = yml.slice(yml.indexOf('\njobs:\n'));
+  const jobIds = [...jobsBlock.matchAll(/^ {2}([a-z][a-z0-9-]*):\n/gm)].map((m) => m[1]);
+  assert.ok(jobIds.includes('ci-gate'), 'ci-gate job 이 있어야 한다');
+  const gate = jobsBlock.slice(jobsBlock.indexOf('\n  ci-gate:\n'));
+  assert.match(gate, /\n {4}name: CI Gate\n/, 'job 이름은 정확히 "CI Gate" 여야 한다');
+  assert.doesNotMatch(gate, /matrix|\$\{\{[^}]*\}\}\s*\n\s*runs-on/, 'gate 는 matrix 가 아니어야 한다');
+  assert.match(gate, /\n {4}if: always\(\)\n/, '취소 시 skipped(=통과) 가 되지 않도록 always() 여야 한다');
+  const needs = gate.match(/\n {4}needs: \[([^\]]+)\]/);
+  assert.ok(needs, 'ci-gate needs 목록이 없다');
+  assert.deepEqual(
+    needs[1].split(',').map((s) => s.trim()).sort(),
+    jobIds.filter((id) => id !== 'ci-gate').sort(),
+    'ci-gate needs 는 ci-pipeline.yml 의 다른 job 전부여야 한다',
+  );
+});
+
 
 // ---------------------------------------------------------------------------
 // WO-O4O-API-CD-RUNTIME-AFFECTED-DEPLOY-GATE-V1 §17 — API 배포 영향 판정 회귀 (Case A~K)

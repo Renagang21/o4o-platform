@@ -773,3 +773,33 @@ jobs:
         else
           cd apps/api-server && npx jest --maxWorkers=1 $SPECS
         fi
+
+  # 최종 CI Gate — WO-O4O-CI-CANONICAL-FINAL-GATE-AND-REQUIRED-CHECK-READINESS-V1
+  #
+  #   위 job 들은 affected scope 에 따라 서로 배타적으로 skip 되고, matrix job 은 표시 이름이 바뀐다.
+  #   그래서 PR 마다 항상 같은 이름으로 생기는 check 가 없었다. 이 job 이 그 하나다(required status check 대상).
+  #   새 검사를 하지 않고 결과만 모은다: success · skipped = 통과, failure · cancelled = 실패.
+  #   "실행돼야 했는데 skip" 판정은 detect(detect-affected.mjs) 책임이다 — 여기서 다시 판정하지 않는다.
+  #
+  #   `if: always()` 여야 한다. `!cancelled()` 로 두면 run 취소 시 gate 가 skipped 가 되고,
+  #   GitHub 는 skipped required check 를 통과로 본다 → CI 없이 merge 가능해진다.
+  #   job 을 추가하면 needs 에도 추가한다.
+  ci-gate:
+    name: CI Gate
+    runs-on: ubuntu-latest
+    needs: [detect, quality-check, api-tests, build, web-build, docs-fast-validate, admin-fast-validate, admin-fast-guards]
+    if: always()
+    timeout-minutes: 5
+    steps:
+    - name: Upstream CI job results
+      env:
+        NEEDS: ${{ toJSON(needs) }}
+      run: echo "$NEEDS"
+    # 판정은 외부 도구 없이 expression 하나로 한다 — 도구 부재로 판정이 비면 통과(fail-open)가 되기 때문.
+    - name: Fail when any upstream CI job failed or was cancelled
+      if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')
+      run: |
+        echo "::error::CI Gate FAIL — failure 또는 cancelled 인 upstream job 이 있다 (위 결과 참조)"
+        exit 1
+    - name: CI Gate PASS
+      run: echo "모든 upstream CI job 이 success 또는 skipped"
