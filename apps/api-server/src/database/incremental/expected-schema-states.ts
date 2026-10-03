@@ -161,6 +161,16 @@ export const EXPECTED_SCHEMA_STATES: readonly ExpectedSchemaState[] = [
     fingerprint: '09d5a9176224a93959b680ef23558629c2e2fe42c4cf2edefeffcda941ca0e43',
     fingerprintLineCount: 5944,
   },
+  // WO-O4O-PERSONAL-ASSISTANT-PHASE-A-TASK-FOUNDATION-V1 — assistant_tasks + work_run_coordination.task_id.
+  // 테이블 1 · PK · FK 2 · CHECK 2 · 인덱스 2 · wrc 컬럼 1 · FK 1 · 부분 인덱스 1 · COMMENT 4.
+  // baseline 2026-09-18-id685 fresh bootstrap + incremental 1..13 을 격리 PostgreSQL 17
+  // (로컬 17.10 · 일회용 클러스터 127.0.0.1:55432 · trust) 에서 실제 적용해 산출: 운영 DB fingerprint 채택 아님.
+  // 같은 클러스터에서 state 12(CreateDemoAccounts)가 등록값 09d5a917…(5944) 그대로 재현됨을 먼저 확인했다.
+  {
+    appliedThrough: 'CreateAssistantTasks1791012819443',
+    fingerprint: '42e44a3462e250c85b774fe6e0428da8e68e115b40135ecde615ead25a8a5e20',
+    fingerprintLineCount: 5972,
+  },
 ] as const;
 
 /** Expected state after `prefixLength` incremental migrations; undefined when not registered. */

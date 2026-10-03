@@ -52,6 +52,8 @@ import { CreateEmailPasswordAuthTables1790683000000 } from '../migrations/179068
 import { AddHandoffTokenSourceAuthMethod1790684000000 } from '../migrations/1790684000000-AddHandoffTokenSourceAuthMethod.js';
 // WO-O4O-CANONICAL-DEMO-ACCOUNT-FOUNDATION-AND-EXPERIENCE-LOGIN-V1 Phase B-A (demo_accounts registry)
 import { CreateDemoAccounts1790940000000 } from '../migrations/1790940000000-CreateDemoAccounts.js';
+// WO-O4O-PERSONAL-ASSISTANT-PHASE-A-TASK-FOUNDATION-V1 (assistant_tasks + work_run_coordination.task_id)
+import { CreateAssistantTasks1791012819443 } from '../migrations/1791012819443-CreateAssistantTasks.js';
 
 export const INCREMENTAL_MIGRATION_CUTOFF = {
   baselineVersion: '2026-09-18-id685',
@@ -78,6 +80,7 @@ export const INCREMENTAL_MIGRATIONS: readonly MigrationClass[] = [
   CreateEmailPasswordAuthTables1790683000000,
   AddHandoffTokenSourceAuthMethod1790684000000,
   CreateDemoAccounts1790940000000,
+  CreateAssistantTasks1791012819443,
 ];
 
 export function incrementalMigrationNames(): string[] {
