@@ -16,13 +16,20 @@ REQUIRED_STATUS_CHECK_ENABLED            = YES
 REQUIRED_STATUS_CONTEXT                  = CI Gate (integration_id 15368 = github-actions)
 REQUIRED_STATUS_CONTEXT_STABLE           = PASS (선행 CHECK — full · frontend · docs · red 경로)
 
-OWNER_PR_PENDING_BLOCK                   = §4
-OWNER_PR_GREEN_RELEASE                   = §4
+OWNER_PR_PENDING_BLOCK                   = PASS
+OWNER_PR_GREEN_RELEASE                   = PASS (status 요건 충족 · 남은 차단 = 독립 승인)
 
-COLLABORATOR_INVITATION_ACCEPTED         = §5
-LIVE_SMOKE                               = §5
+COLLABORATOR_INVITATION                  = PENDING (Businnect · write · 미만료)
+COLLABORATOR_INVITATION_ACCEPTED         = NO
+LIVE_SMOKE                               = BLOCKED_BY_ACCEPTANCE
 
-PUBLIC_COLLABORATOR_SECURITY             = §7
+REPOSITORY_SECRET_COUNT                  = 0
+PRODUCTION_ENV_SECRET_COUNT              = 7
+
+RULESET_MUTATION                         = required_status_checks 1건 추가만
+NO_UNINTENDED_PRODUCTION_ACTION          = YES
+
+PUBLIC_COLLABORATOR_SECURITY             = BLOCKED (BLOCKED_BY_ACCEPTANCE — ruleset · owner-side 완료, collaborator 실계정 smoke 대기)
 ```
 
 ---
@@ -53,20 +60,39 @@ PUBLIC_COLLABORATOR_SECURITY             = §7
 선행 CHECK 요약: 기존 job 은 path 별 배타 skip · matrix 이름 변동(`Build Applications (admin-dashboard)` · 미렌더 `API Server Jest (${{ matrix.shard }}/3)`) · `Detect affected scope` 는 판정 job 이고 CodeQL 과 이름 중복 → 후보 없음.
 `CI Gate` = 다른 CI job 8개 전부를 needs · `always()` · success/skipped 통과 · failure/cancelled 실패. PR #270(full) · #271(frontend · red) · #272(docs) · main push 에서 이름 동일 · 판정 정확 · 배포 의존 0.
 
-## 4. Owner-side status smoke
+## 4. Owner-side status smoke — PR #273 (이 CHECK · docs-only)
 
-(이 CHECK 의 PR 에서 기록)
+GraphQL 로 `mergeStateStatus` · `reviewDecision` · `CI Gate` check run 의 `isRequired(pullRequestNumber)` 를 10초 간격 기록:
+
+| 시각 | CI Gate | required | rollup | mergeStateStatus | reviewDecision |
+|---|---|---|---|---|---|
+| 13:44:50 | 아직 생성 전 | — | — | — | — |
+| 13:46:35 | IN_PROGRESS | **true** | PENDING | **BLOCKED** | REVIEW_REQUIRED |
+| 13:46:46 | COMPLETED / SUCCESS | **true** | SUCCESS | BLOCKED | REVIEW_REQUIRED |
+
+- 등록된 context 가 실제 PR 의 check run 과 매칭됨(`isRequired = true`) — 잘못된 이름으로 인한 영구 pending 아님.
+- green 후 남은 차단 사유는 `REVIEW_REQUIRED` 뿐 — status 요건 충족, 독립 승인 1 이 다음 gate.
+- owner 는 admin bypass(always) 라 owner 계정의 실제 merge 시도는 차단 검증이 되지 않는다 → 시도하지 않고 상태 판정으로 확인.
+- red 상태 차단: ruleset 등록 이후 red PR 사례 없음. gate 의 red 판정 자체는 선행 CHECK(#271 · `CI Gate = failure`) 에서 실측 — 등록된 required check 가 failure 일 때 merge 차단은 collaborator PR 에서 확인 예정.
 
 ## 5. Collaborator
 
-(초대 상태 확인 후 기록)
+| 항목 | live 결과 |
+|---|---|
+| 초대 | `Businnect` · permission `write` · expired = false · 2026-10-02 생성 → **PENDING** |
+| direct collaborator | `Renagang21`(admin) 1명 — Businnect 미포함 |
+
+WO §12 에 따라 정지: 초대를 대신 수락하거나 계정에 대신 로그인하지 않는다. §13 이후(실제 권한 · branch push · PR · main push 차단 · deploy tag 차단 · 승인 gate · red 차단 · 수동 배포 · WIF · environment)는 수락 후 재개.
+
+secret 상태(이름 · 개수만): repository **0** · `production` environment **7** (`GCP_DB_NAME` · `GCP_DB_USERNAME` · `GCP_JWT_SECRET` · `GEMINI_API_KEY` · `OPENAI_API_KEY` · `SMTP_PASS` · `SMTP_USER`) — 정본과 일치.
 
 ## 6. 정리
 
-(기록 예정)
+- 원격 smoke branch · tag 생성 0 (collaborator 단계 미진입).
+- 이 CHECK 의 PR branch 는 merge 시 삭제.
 
-## 7. 최종
+## 7. 재개 조건
 
-(기록 예정)
+Businnect 초대 수락 → 이 CHECK 의 WO §13 부터 재개. 그때 이 문서 §0 · §5 를 갱신하고 `PUBLIC_COLLABORATOR_SECURITY = FINAL CLOSED` 여부를 판정한다.
 
 `문서 정합: 해당 없음`
