@@ -1,7 +1,7 @@
 # 문서 생명주기 · archive 규칙 V1
 
 > **WO-O4O-DOCUMENTATION-INDEX-AND-LIFECYCLE-BASELINE-V1**
-> **작성일**: 2026-08-06 · **최종 갱신**: 2026-10-03 (§5-5 마스킹 예외 · §10 새 문서 유입 규칙) · **적용 범위**: `docs/**` 의 추적 `.md` 문서 (2026-08-06 기준 2,952개)
+> **작성일**: 2026-08-06 · **최종 갱신**: 2026-10-04 (§10-4 공개 Demo credential 예외 · 이전: 2026-10-03 §5-5 마스킹 예외 · §10 새 문서 유입 규칙) · **적용 범위**: `docs/**` 의 추적 `.md` 문서 (2026-08-06 기준 2,952개)
 > **성격**: 문서 관리 규칙. `CLAUDE.md` 및 영역별 Freeze/Baseline 문서에 **종속**하며 이를 대체하지 않는다.
 
 ---
@@ -240,11 +240,12 @@ WO · CHECK · IR 은 정본이 아니다. 작업 결과가 현행 기준을 바
 | 개인 메일 주소 · 실제 사용자 이메일 | `[REDACTED_EMAIL]` (구분이 필요하면 `[REDACTED_EMAIL_A]` …) |
 | 휴대전화 번호 | `[REDACTED_PHONE]` |
 | 공인 IP (접속 IP · 허용 네트워크 · 리소스 IP) | `[REDACTED_IP]` |
-| 비밀번호 · 토큰 · key (과거 · 테스트 값 포함) | secret **이름**만 |
+| 비밀번호 · 토큰 · key (과거 · 테스트 값 포함 · 아래 Demo 예외 제외) | secret **이름**만 |
 | 실명 · 실제 약국/사업자명 · production 응답 원문 | `[사용자 A]` 같은 placeholder · 요약 |
 
 - 메일 · 전화 · 공인 IP 는 CI 가 검사한다 — [`scripts/check-doc-sensitive.mjs`](../../scripts/check-doc-sensitive.mjs) (`ci-pipeline.yml` 의 `Docs sensitive info guard`). 로컬에서 `node scripts/check-doc-sensitive.mjs` 로 먼저 확인한다.
 - 나머지(비밀번호 · 실명 · 응답 원문)는 패턴으로 잡히지 않으므로 작성자가 지킨다.
+- **예외 — 공개 Demo credential.** [`O4O-CANONICAL-DEMO-ACCOUNTS-V1`](../baseline/O4O-CANONICAL-DEMO-ACCOUNTS-V1.md) 이 의도적으로 공개한 Demo 계정의 로그인 식별자 · 비밀번호는 서비스 체험 기능의 일부이므로 금지 대상이 아니다. Demo 사용자도 일반 사용자와 같은 identity 구조로 로그인하며, 보는 데이터는 그 Demo 사용자의 ownership 에 귀속되어 다른 사용자 데이터와 연결되지 않는다. 판단 기준은 role 이름이 아니라 이 ownership 경계다. 일반 사용자 · 운영자 · 관리자 · 실제 테스트 계정의 비밀번호는 예외가 아니며, Demo 값도 그 정본 외 문서에 새로 복제하지 않는다.
 
 ### 10-5. 헤더와 상태
 
