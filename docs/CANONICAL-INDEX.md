@@ -135,6 +135,7 @@
 |---|---|---|
 | [SETUP.md](../SETUP.md) | 개발환경 · 설치 · 검증 명령 · CI 게이트 · Cloud SQL Proxy · 포트 — **환경 관련 유일 정본** | ACTIVE |
 | [COLLABORATOR-START-HERE](development/COLLABORATOR-START-HERE.md) | 새 공동개발자(사람) 진입점 — O4O 관점 · 저장소 읽는 법 · 첫 대상(neture.co.kr Main O4O Agent) · Production 경계. 규칙 원문은 정본을 가리키기만 한다 | ACTIVE |
+| [refactoring/status](refactoring/status.md) | 리팩토링 현황 요약(임시) — 정리 완료 · 진행 중 · 판정 대기 · 알려진 legacy. 정본을 대체하지 않고 근거로 링크만 한다. 리팩토링 종료 시 은퇴 (`WO-O4O-DOCS-ONBOARDING-ENTRY-V1`) | ACTIVE |
 | [O4O-GIT-PARALLEL-WORK-SAFETY-V1](baseline/operations/O4O-GIT-PARALLEL-WORK-SAFETY-V1.md) | 다중 PC · 다중 세션 Git 안전 — path-specific stage · Safe Commit · PC 이동 · 완료 조건 | ACTIVE |
 | [PRODUCTION-MIGRATION-STANDARD](baseline/operations/PRODUCTION-MIGRATION-STANDARD.md) | 프로덕션 마이그레이션 표준 (CI/CD 자동 실행 원칙) | ACTIVE |
 | [O4O-API-SERVER-SCRIPTS-INVENTORY-V1](baseline/operations/O4O-API-SERVER-SCRIPTS-INVENTORY-V1.md) | `apps/api-server/src/scripts/**` 상태 분류(ACTIVE · PAUSED · LEGACY) · DB 로그인 identity fail-fast 규칙 | ACTIVE |
