@@ -218,8 +218,6 @@ function storeChildRoutes() {
         <Route path="marketing/signage/player" element={<SignagePlayerSelectPage />} />
         {/* 매장 구성원 — Owner 전용 화면. 권한은 서버가 판정한다(StoreOwnerOnly 는 화면 가드일 뿐) */}
         <Route path="members" element={<StoreOwnerOnly><StoreMembersPage /></StoreOwnerOnly>} />
-        {/* 받은 초대 수락 — Owner 가 아닌 사용자도 열 수 있어야 한다 */}
-        <Route path="invitations" element={<StoreInvitationsPage />} />
         {/* 분석 */}
         <Route path="analytics/marketing" element={<MarketingAnalyticsPage />} />
         <Route path="analytics" element={<Navigate to={`${S}/analytics/marketing`} replace />} />
@@ -245,6 +243,12 @@ export default function App() {
       <Route path={WORKSPACE_PATHS.home} element={gated(<HomePage />)} />
       <Route path={WORKSPACE_PATHS.myServices} element={gated(<MyServicesPage />)} />
       <Route path={WORKSPACE_PATHS.settings} element={gated(<SettingsPage />)} />
+      {/*
+        WO-O4O-STORE-BUSINESS-ENROLLMENT-AND-MEMBER-ACCESS-V1 — 초대 수락은 **StoreGate 밖**이다.
+        초대받은 사용자는 수락 전까지 접근 가능한 매장이 0 이라, gate 안에 두면 NoStorePage 에
+        막혀 수락 자체를 못 한다(PR #277 리뷰 P1). 로그인만 요구한다.
+      */}
+      <Route path={WORKSPACE_PATHS.invitations} element={<StoreInvitationsPage />} />
 
       {/* ── 내 매장(공통 기능 1회) ── */}
       <Route path={S} element={gated(<UnifiedStoreLayout />)}>

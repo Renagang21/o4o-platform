@@ -27,11 +27,27 @@ import {
 // ── 기존 Owner 판정 · linkage 는 각자의 spec 이 본다. 여기서는 경계만 본다. ────────
 const ownerMock = jest.fn();
 const linkedMock = jest.fn();
+const hasAnyRoleMock = jest.fn();
+const assignRoleMock = jest.fn();
+const removeRoleMock = jest.fn();
 jest.mock('../../../utils/store-owner.utils.js', () => ({
   isStoreOwner: (...args: unknown[]) => ownerMock(...args),
 }));
 jest.mock('../../../utils/store-organization.resolver.js', () => ({
   isOrganizationLinkedToService: (...args: unknown[]) => linkedMock(...args),
+  STORE_SERVICE_ORG_LINKAGE: {
+    kpa: { enrollmentCodes: ['kpa-society'], slugKeys: ['kpa'] },
+    cosmetics: { enrollmentCodes: ['k-cosmetics'], slugKeys: ['k-cosmetics'] },
+    'pharmacy-hub': { enrollmentCodes: ['pharmacy-hub'], slugKeys: ['pharmacy-hub'] },
+    'cafe24-b2b': { enrollmentCodes: ['cafe24-b2b'], slugKeys: ['cafe24-b2b'] },
+  },
+}));
+jest.mock('../../../modules/auth/services/role-assignment.service.js', () => ({
+  roleAssignmentService: {
+    hasAnyRole: (...args: unknown[]) => hasAnyRoleMock(...args),
+    assignRole: (...args: unknown[]) => assignRoleMock(...args),
+    removeRole: (...args: unknown[]) => removeRoleMock(...args),
+  },
 }));
 
 const ORG_A = '11111111-1111-4111-8111-111111111111';
@@ -77,6 +93,10 @@ function makeDs(seed: { members?: Row[]; users?: Row[] } = {}) {
       return members
         .filter((m) => m.organization_id === p[0] && m.user_id === p[1] && m.left_at == null)
         .map((m) => ({ role: m.role }));
+    }
+    if (s.startsWith('SELECT 1 FROM organization_members om')) {
+      // 해제 뒤 "같은 서비스에 남은 매장이 있나" — 가짜에서는 linkage 를 참으로 보고 관계만 센다.
+      return members.filter((m) => m.user_id === p[0] && m.left_at == null && m.role === p[1]).slice(0, 1).map(() => ({ ok: 1 }));
     }
     if (s.startsWith('SELECT om.organization_id, o.name')) {
       return members
@@ -129,7 +149,14 @@ const asNotOwner = () =>
 beforeEach(() => {
   ownerMock.mockReset();
   linkedMock.mockReset();
+  hasAnyRoleMock.mockReset();
+  assignRoleMock.mockReset();
+  removeRoleMock.mockReset();
   linkedMock.mockResolvedValue(true);
+  // 기본은 "role 을 가진 사용자" — role 자체의 계약은 아래 M7 이 따로 본다.
+  hasAnyRoleMock.mockResolvedValue(true);
+  assignRoleMock.mockResolvedValue({});
+  removeRoleMock.mockResolvedValue(true);
 });
 
 const expectCode = async (p: Promise<unknown>, code: string) => {
@@ -356,5 +383,67 @@ describe('목록', () => {
     asNotOwner();
     const { ds } = makeDs({ members: [{ organization_id: ORG_A, user_id: STAFF, role: STORE_STAFF_ROLE, left_at: null }] });
     await expectCode(listStoreMembers(ds, STAFF, 'kpa'), 'STORE_OWNER_REQUIRED');
+  });
+});
+
+/**
+ * M7 인가는 role 이 한다 — `O4O-IDENTITY-ARCHITECTURE-V3` §7
+ *   Relationship 행(organization_members)은 **조건**일 뿐이고, 권한은 role_assignments 가 준다.
+ *   PR #277 1차 구현이 관계 행만으로 접근을 줬고(리뷰 P1) 그것을 바로잡은 계약이다.
+ */
+describe('M7 Role ∧ Relationship', () => {
+  it('관계 행이 있어도 role 이 없으면 접근이 아니다', async () => {
+    asNotOwner();
+    hasAnyRoleMock.mockResolvedValue(false);
+    const { ds } = makeDs({ members: [{ organization_id: ORG_A, user_id: STAFF, role: STORE_STAFF_ROLE, left_at: null }] });
+    await expect(resolveStoreAccessLevel(ds, STAFF, 'kpa')).resolves.toMatchObject({ level: 'none' });
+    expect(hasAnyRoleMock).toHaveBeenCalledWith(STAFF, ['kpa:store_member']);
+  });
+
+  it('role 이 있어도 관계 행이 없으면 접근이 아니다', async () => {
+    asNotOwner();
+    hasAnyRoleMock.mockResolvedValue(true);
+    const { ds } = makeDs({ members: [] });
+    await expect(resolveStoreAccessLevel(ds, STAFF, 'kpa')).resolves.toMatchObject({ level: 'none' });
+  });
+
+  it('수락이 role 을 발급한다 — 조직이 등록된 서비스만', async () => {
+    const { ds } = makeDs({
+      members: [{ organization_id: ORG_A, user_id: STAFF, role: STORE_INVITED_ROLE, left_at: null }],
+    });
+    linkedMock.mockImplementation(async (_ds: unknown, _org: string, key: string) => key === 'kpa');
+
+    const r = await acceptStoreInvitation(ds, { userId: STAFF, organizationId: ORG_A });
+
+    expect(r.services).toEqual(['kpa']);
+    expect(assignRoleMock).toHaveBeenCalledTimes(1);
+    expect(assignRoleMock).toHaveBeenCalledWith(expect.objectContaining({ userId: STAFF, role: 'kpa:store_member' }));
+  });
+
+  it('초대가 없으면 role 도 발급되지 않는다', async () => {
+    const { ds } = makeDs();
+    await expectCode(acceptStoreInvitation(ds, { userId: OUTSIDER, organizationId: ORG_A }), 'INVITATION_NOT_FOUND');
+    expect(assignRoleMock).not.toHaveBeenCalled();
+  });
+
+  it('해제는 남은 매장이 없을 때만 role 을 회수한다', async () => {
+    asOwnerOf(ORG_A);
+    linkedMock.mockImplementation(async (_ds: unknown, _org: string, key: string) => key === 'kpa');
+
+    // 이 매장 하나뿐 → 회수한다.
+    const only = makeDs({ members: [{ organization_id: ORG_A, user_id: STAFF, role: STORE_STAFF_ROLE, left_at: null }] });
+    await removeStoreMember(only.ds, { ownerUserId: OWNER, targetUserId: STAFF });
+    expect(removeRoleMock).toHaveBeenCalledWith(STAFF, 'kpa:store_member');
+
+    // 다른 매장에 아직 남아 있으면 → 회수하지 않는다(그쪽 접근까지 끊지 않는다).
+    removeRoleMock.mockClear();
+    const two = makeDs({
+      members: [
+        { organization_id: ORG_A, user_id: STAFF, role: STORE_STAFF_ROLE, left_at: null },
+        { organization_id: ORG_B, user_id: STAFF, role: STORE_STAFF_ROLE, left_at: null },
+      ],
+    });
+    await removeStoreMember(two.ds, { ownerUserId: OWNER, targetUserId: STAFF });
+    expect(removeRoleMock).not.toHaveBeenCalled();
   });
 });

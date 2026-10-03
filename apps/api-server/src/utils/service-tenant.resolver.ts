@@ -50,6 +50,7 @@ import {
 import { getServiceMembershipStatusFromDb } from './service-membership.js';
 import {
   findAnyServiceStoreOrganizationCandidates,
+  findStoreMemberOrganizationCandidates,
   type StoreOrganizationCandidate,
 } from './store-organization.resolver.js';
 
@@ -261,9 +262,19 @@ export async function resolveAccessibleStores(
 ): Promise<AccessibleStore[]> {
   if (!userId) return [];
   const candidates = await findAnyServiceStoreOrganizationCandidates(dataSource, userId);
-  if (candidates.length === 0) return [];
+  // WO-O4O-STORE-BUSINESS-ENROLLMENT-AND-MEMBER-ACCESS-V1:
+  //   Store Member(사업자가 허가한 사용자)도 자기 매장을 볼 수 있어야 한다. 위 후보는 owner 해석기가
+  //   쓰는 집합(owner/admin/manager)이라 member 가 빠진다 — **그 배열을 넓히지 않고** 별도 후보를
+  //   더한다(넓히면 owner 조직 해석까지 같이 넓어진다).
+  //   인가는 role 이 한다: `{prefix}:store_member` 보유자의 활성 'staff' 관계만 후보가 된다.
+  const memberCandidates = await findStoreMemberOrganizationCandidates(dataSource, userId);
+  const merged = [...candidates];
+  for (const m of memberCandidates) {
+    if (!merged.some((c) => c.organizationId === m.organizationId)) merged.push(m);
+  }
+  if (merged.length === 0) return [];
 
-  const ids = candidates.map((c) => c.organizationId);
+  const ids = merged.map((c) => c.organizationId);
   const rows = (await dataSource.query(
     `SELECT id, name
        FROM organizations
@@ -272,7 +283,7 @@ export async function resolveAccessibleStores(
   )) as Array<{ id: string; name: string | null }>;
   const nameById = new Map(rows.map((r) => [r.id, r.name ?? '']));
 
-  return candidates
+  return merged
     .map((c) => ({
       organizationId: c.organizationId,
       organizationName: nameById.get(c.organizationId) ?? '',

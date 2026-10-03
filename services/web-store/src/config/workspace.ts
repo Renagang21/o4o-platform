@@ -32,6 +32,8 @@ export const WORKSPACE_PATHS = {
   select: '/select-store',
   login: '/login',
   handoff: '/handoff',
+  /** 받은 매장 초대 수락 — 매장이 아직 없는 사용자도 열 수 있어야 해서 StoreGate 밖에 둔다. */
+  invitations: '/invitations',
 } as const;
 
 export interface RootNavItem {

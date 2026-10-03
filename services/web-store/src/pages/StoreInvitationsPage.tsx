@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { storeMembershipApi, type StoreInvitation } from '../api/storeMembership';
 import { WORKSPACE_PATHS } from '../config/workspace';
+import { useUnifiedStore } from '../contexts/StoreContext';
 
 /**
  * 받은 매장 초대 — 수락 화면
@@ -20,6 +21,7 @@ const errorMessage = (e: unknown): string =>
 
 export default function StoreInvitationsPage() {
   const navigate = useNavigate();
+  const { reload } = useUnifiedStore();
   const [invitations, setInvitations] = useState<StoreInvitation[] | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -44,7 +46,9 @@ export default function StoreInvitationsPage() {
     setError(null);
     try {
       await storeMembershipApi.accept(invitation.organizationId);
-      // 수락 직후 매장이 생기므로 작업공간으로 보낸다(접근 자격은 서버가 다시 판정한다).
+      // 수락으로 매장이 **방금** 생겼다 — context 의 매장 목록은 로그인 사용자가 바뀔 때만 다시
+      // 읽으므로, 여기서 reload 하지 않으면 홈에 가도 빈 목록이 남아 수동 새로고침이 필요하다.
+      reload();
       navigate(WORKSPACE_PATHS.home, { replace: true });
     } catch (e) {
       setError(errorMessage(e));

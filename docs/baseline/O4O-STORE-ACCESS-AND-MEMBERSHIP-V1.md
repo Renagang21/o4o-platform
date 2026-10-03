@@ -32,7 +32,7 @@
 | 자격 | 뜻 | 판정 |
 |---|---|---|
 | **Store Owner** | 사업자 대표 · 소유 접근 | **기존 판정 그대로** — `role_assignments` 의 `{prefix}:store_owner` + 해당 서비스 active membership + 조직 해석 (`isStoreOwner()`) |
-| **Store Member** | 사업자가 허가한 사용자(직원 · 담당자) | `organization_members` 활성 행의 `role = 'staff'` + 그 조직이 요청 서비스에 연결됨 |
+| **Store Member** | 사업자가 허가한 사용자(직원 · 담당자) | **Role** `role_assignments` 의 `{prefix}:store_member` **∧ Relationship** `organization_members` 활성 `'staff'` 행 **∧** 조직↔서비스 linkage |
 | (없음) | 그 외 전부 | 초대 대기(`'invited'`) 포함 — **수락 전에는 아무 접근도 없다** |
 
 V1 은 이 둘만 둔다. admin · manager 같은 중간 등급을 새로 만들지 않는다 — 기존
@@ -44,9 +44,21 @@ V1 은 이 둘만 둔다. admin · manager 같은 중간 등급을 새로 만들
 1. 세션 사용자        userId 는 세션에서만. body/query 의 userId 는 받지 않는다
 2. 조직 확정          Owner = isStoreOwner() 가 해석한 조직
                      Member = 자기 활성 행의 조직 (요청이 고르지 않는다)
-3. 자격 판정          owner > member > none
-4. 업종 경계          조직 ↔ serviceKey linkage (STORE_SERVICE_ORG_LINKAGE)
+3. Role              role 이 없으면 거부 (Identity V3 §7-1)
+4. Relationship      활성 'staff' 행이 없으면 거부
+5. 업종 경계          조직 ↔ serviceKey linkage (STORE_SERVICE_ORG_LINKAGE)
 ```
+
+**인가는 role 이 한다.** [`O4O-IDENTITY-ARCHITECTURE-V3`](../architecture/O4O-IDENTITY-ARCHITECTURE-V3.md) §7 이
+`role_assignments` 를 Authorization SSOT 로, `organization_members` 같은 Relationship 행을
+**접근 판정의 조건**으로 정한다. 관계 행 하나가 생겼다고 권한이 생기지 않는다.
+
+```text
+kpa:store_member · cosmetics:store_member · pharmacy-hub:store_member · cafe24-b2b:store_member
+```
+
+owner role 과 같은 `{prefix}:{role}` 규약이다. 수락이 발급하고 해제가 회수하되, **같은 서비스의
+다른 매장에 아직 소속돼 있으면 회수하지 않는다**(한 곳에서 빠졌다고 나머지 접근까지 끊지 않는다).
 
 `x-store-organization-id` 선택 힌트는 **허용 후보 안에서만** 고르는 힌트다. 후보에 없는 매장을
 가리키면 그 힌트는 버려지고, 그 매장으로 해석되지 않는다.
@@ -67,7 +79,13 @@ V1 은 이 둘만 둔다. admin · manager 같은 중간 등급을 새로 만들
 
 `'member'` 를 쓰지 않았다: `organization_members.role` 의 **DB 기본값이 'member'** 라 다른 경로가
 만든 기존 행이 이미 그 값일 수 있고, 거기에 접근을 주면 조용한 권한 확대가 된다. `'staff'` 는
-저장소 전체에서 쓰이지 않던 값이다.
+저장소 전체에서 쓰이지 않던 값이다. 그리고 이 역할 값은 **관계**일 뿐이다 — 권한은 §2 의 role 이 준다.
+
+### 매장 목록
+
+`'staff'` 는 owner 조직 해석 집합(`STORE_MEMBER_ROLES` = owner/admin/manager)에 **넣지 않는다**.
+그 배열을 넓히면 소유 판정까지 함께 넓어진다. 대신 `findStoreMemberOrganizationCandidates()` 를
+따로 두고 `/work-scope/accessible-stores` 가 둘을 합쳐 돌려준다.
 
 **은퇴한 이메일 초대 토큰 도메인(`operator_invitations`)을 되살리지 않는다.** 그 테이블은 남아
 있지만 런타임 소비가 0 이고, `google-only-auth-cleanup.spec.ts` 가 참조 자체를 금지한다.
@@ -110,7 +128,11 @@ membership 없는 로그인 사용자 → 매장 진입      → none
 Member → 초대 · 해제 · 구성원 목록            → 403 STORE_OWNER_REQUIRED
 초대받지 않은 사용자 → 수락                   → 404 INVITATION_NOT_FOUND · membership 생성 0
 초대 → 계정 생성                              → 하지 않는다 (404 USER_NOT_FOUND)
+관계 행만 있고 role 이 없는 사용자 → 매장 진입  → none (Identity V3 §7-1)
 ```
+
+초대 수락 화면(`/invitations`)은 **Store gate 밖**이다. 초대받은 사람은 수락 전까지 접근 가능한
+매장이 0 이라, gate 안에 두면 "매장 없음" 화면에 막혀 수락 자체를 못 한다.
 
 계약 테스트: `services/store/__tests__/storeMembership.test.ts` (M1~M6).
 변이 검사로 확인했다 — 수락의 본인 확인 · 업종 경계 · 해제 역할 제한을 각각 제거하면 테스트가 깨진다.

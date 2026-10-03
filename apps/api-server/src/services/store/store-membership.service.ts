@@ -34,18 +34,62 @@
  *
  *   **Owner 판정은 건드리지 않는다.** 기존 `isStoreOwner()`(role_assignments + active service
  *   membership + 조직 해석)가 그대로 정본이고, 이 모듈은 그 아래에 Member 단계를 더한다.
+ *
+ * ─────────────────────────────────────────────────────────────────────────────
+ * 인가는 role 이 한다 — 관계 행만으로 권한을 주지 않는다
+ *
+ *   `O4O-IDENTITY-ARCHITECTURE-V3` §7: **`role_assignments` 가 Authorization SSOT** 이고
+ *   `organization_members` 같은 Relationship 행은 **접근 판정의 조건**일 뿐이다.
+ *   그래서 Store Member 접근은 두 가지를 **모두** 요구한다.
+ *
+ *     Role          role_assignments 의 `{prefix}:store_member` (활성)
+ *     Relationship  organization_members 의 활성 `'staff'` 행 + 조직↔서비스 linkage
+ *
+ *   초대 수락이 role 을 발급하고, 해제가 회수한다. 관계 행 하나가 생겼다고 권한이 생기지 않는다
+ *   — 초기 구현이 그렇게 돼 있었고(PR #277 리뷰 P1) 정본과 어긋나 바로잡았다.
  */
 import type { DataSource } from 'typeorm';
 import { isStoreOwner, type StoreOwnerServiceKey } from '../../utils/store-owner.utils.js';
-import { isOrganizationLinkedToService } from '../../utils/store-organization.resolver.js';
+import {
+  STORE_SERVICE_ORG_LINKAGE,
+  isOrganizationLinkedToService,
+} from '../../utils/store-organization.resolver.js';
+import { roleAssignmentService } from '../../modules/auth/services/role-assignment.service.js';
 
 /** 초대 대기 — 어떤 접근도 주지 않는다. 수락 전까지 매장이 보이지 않는다. */
 export const STORE_INVITED_ROLE = 'invited';
 /** Store Member — 사업자가 허가한 사용자(직원 · 담당자). 소유 변경은 못 한다. */
 export const STORE_STAFF_ROLE = 'staff';
 
-/** 이 모듈이 다루는 역할. 기존 매장 역할(owner/admin/manager)은 건드리지 않는다. */
+/** 이 모듈이 다루는 **관계** 역할. 기존 매장 역할(owner/admin/manager)은 건드리지 않는다. */
 export const STORE_MEMBERSHIP_MANAGED_ROLES: readonly string[] = [STORE_INVITED_ROLE, STORE_STAFF_ROLE];
+
+/**
+ * Store Member 의 **인가 role** — `{prefix}:store_owner` 와 같은 자리에 둔다.
+ * 서비스별로 나누는 이유: 업종이 다른 매장의 자격이 서로 섞이지 않게 하려는 것이고,
+ * 이는 owner role 이 이미 쓰는 규약이다.
+ */
+export const STORE_MEMBER_ROLE_BY_SERVICE: Readonly<Record<StoreOwnerServiceKey, string>> = Object.freeze({
+  kpa: 'kpa:store_member',
+  cosmetics: 'cosmetics:store_member',
+  'pharmacy-hub': 'pharmacy-hub:store_member',
+  'cafe24-b2b': 'cafe24-b2b:store_member',
+});
+
+const ALL_STORE_MEMBER_ROLES: readonly string[] = Object.values(STORE_MEMBER_ROLE_BY_SERVICE);
+
+/** 이 조직이 매장으로 등록된 서비스들. 수락 시 발급할 role 과 해제 시 회수할 role 을 정한다. */
+async function linkedServiceKeys(
+  dataSource: DataSource,
+  organizationId: string,
+): Promise<StoreOwnerServiceKey[]> {
+  const keys = Object.keys(STORE_SERVICE_ORG_LINKAGE) as StoreOwnerServiceKey[];
+  const linked: StoreOwnerServiceKey[] = [];
+  for (const key of keys) {
+    if (await isOrganizationLinkedToService(dataSource, organizationId, key)) linked.push(key);
+  }
+  return linked;
+}
 
 export type StoreAccessLevel = 'owner' | 'member' | 'none';
 
@@ -125,6 +169,12 @@ export async function resolveStoreAccessLevel(
     [userId, STORE_STAFF_ROLE],
   );
   if (rows.length === 0) return { level: 'none', organizationId: null, memberRole: null };
+
+  // **Role 이 없으면 거부** (Identity V3 §7-1). 관계 행만으로는 아무 접근도 주지 않는다.
+  const requiredRoles = serviceKey ? [STORE_MEMBER_ROLE_BY_SERVICE[serviceKey]] : ALL_STORE_MEMBER_ROLES;
+  if (!(await roleAssignmentService.hasAnyRole(userId, [...requiredRoles]))) {
+    return { level: 'none', organizationId: null, memberRole: null };
+  }
 
   const preferred = preferredOrganizationId
     ? rows.find((r) => r.organization_id === preferredOrganizationId)
@@ -258,7 +308,7 @@ export async function listMyInvitations(
 export async function acceptStoreInvitation(
   dataSource: DataSource,
   input: { userId: string; organizationId: string },
-): Promise<{ organizationId: string; role: string }> {
+): Promise<{ organizationId: string; role: string; services: StoreOwnerServiceKey[] }> {
   const result = await dataSource.query(
     `UPDATE organization_members
         SET role = $3, updated_at = now()
@@ -269,7 +319,19 @@ export async function acceptStoreInvitation(
   // UPDATE ... RETURNING 은 [rows, count] 형태로 온다.
   const rows = (Array.isArray(result) && Array.isArray(result[0]) ? result[0] : result) as unknown[];
   if (!rows || rows.length === 0) fail('INVITATION_NOT_FOUND', 404);
-  return { organizationId: input.organizationId, role: STORE_STAFF_ROLE };
+
+  // 관계를 세운 **뒤에** 인가 role 을 발급한다. 이 조직이 매장으로 등록된 서비스만 대상이다.
+  //   발급이 실패하면 관계만 남고 접근은 생기지 않는다(fail-closed) — 반대 순서면 role 만 남아
+  //   관계 없는 권한이 떠돈다.
+  const services = await linkedServiceKeys(dataSource, input.organizationId);
+  for (const key of services) {
+    await roleAssignmentService.assignRole({
+      userId: input.userId,
+      role: STORE_MEMBER_ROLE_BY_SERVICE[key],
+      assignedBy: input.userId,
+    });
+  }
+  return { organizationId: input.organizationId, role: STORE_STAFF_ROLE, services };
 }
 
 /**
@@ -284,7 +346,7 @@ export async function removeStoreMember(
     serviceKey?: StoreOwnerServiceKey;
     preferredOrganizationId?: string | null;
   },
-): Promise<{ organizationId: string; userId: string }> {
+): Promise<{ organizationId: string; userId: string; services: StoreOwnerServiceKey[] }> {
   const organizationId = await requireOwnedOrganization(
     dataSource,
     input.ownerUserId,
@@ -304,5 +366,35 @@ export async function removeStoreMember(
       WHERE organization_id = $1 AND user_id = $2 AND left_at IS NULL AND role = ANY($3::text[])`,
     [organizationId, input.targetUserId, STORE_MEMBERSHIP_MANAGED_ROLES],
   );
-  return { organizationId, userId: input.targetUserId };
+
+  // 인가 role 회수 — **다른 매장에 아직 남아 있으면 회수하지 않는다**.
+  //   한 사람이 같은 서비스의 매장 둘에 소속될 수 있고, 한 곳에서 빠졌다고 나머지 접근까지
+  //   끊으면 안 된다. 그래서 서비스별로 "남은 활성 staff 관계" 를 세고 0 일 때만 지운다.
+  const services = await linkedServiceKeys(dataSource, organizationId);
+  for (const key of services) {
+    const remaining: unknown[] = await dataSource.query(
+      `SELECT 1
+         FROM organization_members om
+        WHERE om.user_id = $1 AND om.left_at IS NULL AND om.role = $2
+          AND (
+            EXISTS (SELECT 1 FROM organization_service_enrollments e
+                     WHERE e.organization_id = om.organization_id
+                       AND e.service_code = ANY($3::text[]) AND e.status = 'active')
+            OR EXISTS (SELECT 1 FROM platform_store_slugs s
+                        WHERE s.store_id = om.organization_id
+                          AND s.service_key = ANY($4::text[]) AND s.is_active = true)
+          )
+        LIMIT 1`,
+      [
+        input.targetUserId,
+        STORE_STAFF_ROLE,
+        STORE_SERVICE_ORG_LINKAGE[key].enrollmentCodes,
+        STORE_SERVICE_ORG_LINKAGE[key].slugKeys,
+      ],
+    );
+    if (!remaining || remaining.length === 0) {
+      await roleAssignmentService.removeRole(input.targetUserId, STORE_MEMBER_ROLE_BY_SERVICE[key]);
+    }
+  }
+  return { organizationId, userId: input.targetUserId, services };
 }

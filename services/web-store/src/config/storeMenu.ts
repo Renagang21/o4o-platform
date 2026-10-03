@@ -55,6 +55,10 @@ export const UNIFIED_STORE_CONFIG: StoreDashboardConfig = {
     ]},
     { label: '설정', items: [
       { key: 'info', label: '매장 정보', subPath: '/info' },
+      // WO-O4O-STORE-BUSINESS-ENROLLMENT-AND-MEMBER-ACCESS-V1:
+      //   화면은 StoreOwnerOnly 가 감싸고 서버도 Owner 를 요구한다. 메뉴가 없으면 경영자가
+      //   URL 을 추측하지 않는 한 초대 기능을 찾지 못해 사실상 없는 기능이 된다.
+      { key: 'members', label: '매장 구성원', subPath: '/members' },
     ]},
   ],
 };
