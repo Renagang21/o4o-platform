@@ -24,14 +24,17 @@ UNKNOWN_AFTER_API_PROMOTION     = 0
 DEPLOY_FREEZE_RELEASE           = PASS
 DEPLOY_FREEZE_FINAL             = FALSE  (2026-10-03T01:03:20Z)
 
-FIRST_NATURAL_L2_OBSERVED       = PENDING
-FIRST_L2_AUTO_DELIVERY          = PENDING
-MANUAL_DISPATCH_USED            = NO (L2 경로 기준 · 아래 §5)
+FIRST_NATURAL_L2_OBSERVED       = YES    (store · 03b9c8bc4 · target ae94763d1)
+FIRST_L2_AUTO_DELIVERY          = PASS   (Delivery run 37084807104 · event workflow_run)
+MANUAL_DISPATCH_USED            = NO
 MANUAL_DEPLOY_TAG_USED          = NO
-VERIFIED_L2_ROLLOUT             = PENDING
+HUMAN_PROMOTE_USED              = NO     (L2 경로 기준 — API L3 정리의 promote 는 사전 정리 단계 §3)
+VERIFIED_L2_ROLLOUT             = PASS
+UNKNOWN_AFTER_L2                = 0
+UNEXPECTED_L3_AFTER_L2          = 0
 
 DEPLOY_OPERATIONAL_STATE        = NORMAL
-FINAL_CLOSURE                   = PENDING_FIRST_NATURAL_L2
+O4O_CICD_PRODUCTION_DEPLOY_REFACTORING = FINAL CLOSED
 ```
 
 ---
@@ -82,7 +85,7 @@ API serving     o4o-core-api-03798-zex · traffic 100% · o4o-commit-sha = 609ee
 
 관찰: classify 의 상태 표기에서 `NOT_SELECTED` 가 `HELD_LEVEL_3` 로 표시된다(commit status 문구 `held: store(L3)`). 판정 · 실행에는 영향 없음 — 표시 정확도 개선 후보(별도).
 
-## 5. 첫 자연 LEVEL_2 자동배포 — PENDING
+## 5. 첫 자연 LEVEL_2 자동배포 — 관찰 계획 (실행 전 기록)
 
 - 대상 후보: `store`(serving `37d63e859` → main) 의 실제 개발 변경 `03b9c8bc4`(store-web 상단 nav 로그인 경로 보존 · LEVEL_2).
 - freeze 해제만으로 지난 Delivery run 이 되살아나지 않는다(§14). **다음 main 변화**에서 Delivery 가 재판정한다.
@@ -92,8 +95,36 @@ API serving     o4o-core-api-03798-zex · traffic 100% · o4o-commit-sha = 609ee
 
 (결과는 이 문서 §6 에 이어서 기록한다.)
 
-## 6. 첫 자연 L2 결과
+## 6. 첫 자연 L2 결과 — PASS
 
-PENDING.
+```text
+trigger         main ae94763d1 (이 문서의 1차 commit · docs-only) → CI Pipeline success → workflow_run
+Delivery        run 37084807104 · event workflow_run · success · run 이름 "Delivery ae94763d1…"
+classify        target ae94763d1 · CI green · DEPLOY_FREEZE false · target == main HEAD == workflow SHA
+                store  serving 37d63e859 → LEVEL_2 · AUTO_DEPLOY (reason LEVEL_2)
+                api    609ee6425 · BEHIND_NO_RUNTIME_CHANGE · NO_DEPLOY · 그 외 9 NO_DEPLOY
+                plan   api=false · web(parallel)=store · admin=-
+                commit status production = DEPLOYING (pending)
+deploy          Web (store) / ci-gate success → deploy-store success (workflow_call · 다른 web job 8 skipped)
+                store-web-00026-jet 0% 배포 → tag URL 직접 smoke PASS(https://sha-ae94763d190b---…) → traffic 전환 100%
+report          serving 재조회 → store DEPLOYED (revision-label ae94763d1 · store-web-00026-jet) · commit status production = DEPLOYED (success)
+직접 확인       store-web traffic store-web-00026-jet 100% · o4o-commit-sha = ae94763d190b… (TARGET) · Ready=True · https://store.neture.co.kr/ 200
+수동 개입       workflow_dispatch 0 · deploy 태그 0(최신 deploy/* 는 10-02 다른 작업) · promote 0 · freeze 조작 0
+rollback        0 (불필요)
+재판정 (ae94763d1)  store UP_TO_DATE · 나머지 10 BEHIND_NO_RUNTIME_CHANGE · 전부 NO_DEPLOY · UNKNOWN 0 · unexpected L3 0
+DEPLOY_FREEZE   false (유지)
+```
+
+배포된 변경은 store 의 실제 개발 commit `03b9c8bc4`(serving 37d63e859 → main 누적분)이고, trigger 가 된 이 문서 commit 은 runtime 변경 0 이다.
+
+## 7. 최종
+
+```text
+O4O_CICD_PRODUCTION_DEPLOY_REFACTORING = FINAL CLOSED
+```
+
+이후 CI/CD 변경은 실제 장애 · 새 서비스 onboarding · 새 배포 요구 · 보안 정책 변경 · 플랫폼 변화 대응으로 제한한다(WO §20).
+후속 후보(별도 · 필요 시): classify 상태 표기 `NOT_SELECTED → HELD_LEVEL_3` 표시 정확도.
+Public collaborator 트랙(Businnect 초대 수락 · 실제 권한 smoke)은 별도로 남아 있다.
 
 `문서 정합: 해당 없음`
