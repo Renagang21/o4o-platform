@@ -50,8 +50,9 @@ export type { StoreOwnerServiceKey } from './store-organization.resolver.js';
 /**
  * 서비스별 store_owner 권한을 가지는 role 목록.
  *
- * - kpa        : `kpa:store_owner` (약사회 가맹 약국 개설자)
- * - cosmetics  : `cosmetics:store_owner`
+ * - kpa        : `kpa:store_owner` (약국 사업자 서비스 `kpa-society` = pharmacy.neture.co.kr 의 매장 경영자.
+ *                `kpa` 는 legacy/internal role prefix 일 뿐 — KPA 분회(kpa.neture.co.kr · `kpa-branch`)와 무관)
+ * - cosmetics  : `cosmetics:store_owner` (화장품 · 일반 소매 사업자 서비스 `k-cosmetics` = retail.neture.co.kr)
  * - pharmacy-hub : `pharmacy-hub:store_owner` (약국 경영자)
  *                WO-O4O-STORE-OWNER-GUARD-PHARMACY-HUB-REGISTRATION-V1:
  *                W1(프로비저닝)이 organizations / organization_members(owner) /

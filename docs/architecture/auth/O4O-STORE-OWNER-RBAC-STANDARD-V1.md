@@ -62,6 +62,20 @@ seller는 독립 역할로 사용하지 않는다.
 
 ---
 
+### 3.4 role prefix ≠ 서비스 주소 의미 (2026-10-03 표기)
+
+role prefix 는 **내부 서비스 범위 이름**이며 현재 주소의 사업 의미와 다를 수 있다. 정본: [`O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1`](../../baseline/O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1.md).
+
+| role | serviceKey | 현재 의미 |
+|---|---|---|
+| `kpa:store_owner` | `kpa-society` | 약국 사업자 서비스(`pharmacy.neture.co.kr`)의 매장 경영자. **KPA 분회(`kpa.neture.co.kr`, 약사 개인 대상)와 무관** |
+| `cosmetics:store_owner` | `k-cosmetics` | 화장품 · 일반 소매 사업자 서비스(`retail.neture.co.kr`)의 매장 경영자 |
+| `pharmacy-hub:store_owner` | `pharmacy-hub` | 호환 식별자로 보존된 PharmacyHub 매장 경영자 (런타임 registry 에 3.1 과 함께 등록됨 — `store-owner.utils.ts` `STORE_OWNER_ROLES_BY_SERVICE`) |
+
+role 문자열은 바꾸지 않는다. 매장 운영 공간 자체는 공통 Store Workspace(`store.neture.co.kr`)이며 serviceKey 를 갖지 않는다.
+
+---
+
 ## 4. 접근 제어 기준
 
 다음 조건을 만족해야 매장 기능 접근이 가능하다.

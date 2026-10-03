@@ -79,6 +79,7 @@ Store Workspace
 - **한 Store 는 여러 Service 에 가입할 수 있어야 한다** (1 Store : N Services). 데이터 모델 판정은 IR §A — `organizations` 는 서비스 중립이며 `organization_service_enrollments`(UNIQUE(organization_id, service_code)) 가 이미 1:N 을 표현한다. 신규 Store-Service 테이블을 만들지 않는다.
 - **My Store 와 Store Hub 의 기존 공통 Core 는 재작성하지 않고 최대한 유지**한다 (`store-core` · `store-ui-core` · `hub-core` · `asset-copy-core` · [`STORE-LAYER-ARCHITECTURE`](../architecture/STORE-LAYER-ARCHITECTURE.md) F3).
 - My Store 는 **Store 소유** 공간이다. Store 자산의 경계는 `organizationId` 이며 서비스로 나뉘지 않는다. 서비스별로 달라지는 것은 My Services (§4) 안에서만 표현한다.
+- **주소 정합 (2026-10-03 표기)**: 이 Store Workspace 의 공통 주소는 `store.neture.co.kr`(serviceKey 없음 · 약국 · 화장품 · 소매 운영 영역 · Store Owner / Store Member 접근 모델)이며, 서비스 운영자의 서비스 Hub(`pharmacy` · `retail`)와 구분한다 — [`O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1`](O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1.md) §3. 아래 §3-1 은 서비스 앱 안 `/store` 기준의 2026-09-16 구현 기록이며, 통합 주소로의 이전 진행은 `CHECK-O4O-URL-FIRST-CENSUS-V1` §21 이 기록한다.
 
 ### 3-1. 구현 상태 (WO-O4O-STORE-WORKSPACE-INTEGRATION-AND-MY-SERVICES-V1 · 2026-09-16)
 

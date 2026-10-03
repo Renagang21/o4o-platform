@@ -134,8 +134,10 @@ requireCosmeticsScope('k-cosmetics:store_owner')
 
 | 서비스 | 표시 용어 | 이유 |
 |--------|---------|------|
-| KPA-Society | 약국 / 약국 경영자 | 약사 대상 서비스, 의미 명확 |
-| K-Cosmetics | 매장 / 매장 경영자 | 비-의약품 서비스 |
+| KPA-Society | 약국 / 약국 경영자 | 약국 사업자 대상 서비스(`pharmacy.neture.co.kr`), 의미 명확 |
+| K-Cosmetics | 매장 / 매장 경영자 | 비-의약품 서비스(`retail.neture.co.kr` — 화장품 · 일반 소매) |
+
+> 서비스 이름(KPA-Society · K-Cosmetics)과 주소 의미의 대응은 [`O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1`](../baseline/O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1.md) 기준 (2026-10-03 표기). KPA 분회(`kpa.neture.co.kr`, 약사 개인 대상)는 매장 서비스가 아니다.
 
 ### 5.3 pharmacy/store 동일 데이터 구조
 
