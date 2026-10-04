@@ -394,6 +394,10 @@ V2 와 이 정본들이 직접 충돌하는 새 사실이 확인되면 구현을
 3. "AI 를 쓰지 않는 방법으로 거부" 경로 · 재동의 필요 여부가 정해졌다.
 4. 사용자(저장소 소유자)가 Gate 통과를 승인했다.
 
+### 17-1-a. Assistant Memory 세부 정책 (2026-10-04)
+
+Gate 의 Memory 쪽 세부(종류별 소유 · 배치 · 보존 · 삭제 · 고지 Gap · 사용자 결정 D1~D5 · Gate 통과 후 구현 범위)는 [`O4O-ASSISTANT-MEMORY-PLACEMENT-POLICY-V1`](O4O-ASSISTANT-MEMORY-PLACEMENT-POLICY-V1.md) 이 정한다(DRAFT — 결정 대기). 그 문서가 ACTIVE 가 되기 전에는 이 절의 Gate 가 닫힌 상태다.
+
 ### 17-2. 범위
 
 - 이 Gate 는 **이 문서의 ACTIVE 자체를 막지 않는다.** 원칙과 구조는 지금 확정하고, 데이터가 실제로 움직이는 구현만 Gate 뒤에 둔다.
