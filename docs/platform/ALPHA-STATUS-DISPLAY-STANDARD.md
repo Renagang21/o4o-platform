@@ -3,6 +3,8 @@
 > **작성일**: 2026-01-20
 > **Work Order**: WO-GLOBAL-ALPHA-STATUS-HERO-V080
 > **적용 버전**: v0.8.0 (운영형 알파)
+>
+> (2026-10-04 정합) **현행 서비스 코드에는 이 배지 · 안내 문구가 없다** — `services/` · `apps/` · `packages/` 에 "운영형 알파" 표시 0건. §7 적용 목록의 `web-glucoseview` 는 현행 `services/` 에 없고, §7.2 · §10 의 파트너 안내 페이지 · 체크리스트는 Legacy Partner 은퇴([ROLE-WORKSPACE-ARCHITECTURE](../baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md) §7)로 소멸했다. 한편 [PLATFORM-CONTENT-POLICY-V1](../baseline/PLATFORM-CONTENT-POLICY-V1.md) §12 는 "0.80 운영형 알파 기준" 을 현행 표기로 쓰며, 단계 종료 · 전환 결정 기록은 없다. **"운영형 알파" 단계의 존속 여부와 Hero 표시 의무(§4 · §8) 유지 여부는 별도 결정 전까지 판정 대기** — 이 문서를 근거로 배지를 새로 추가하지 않는다.
 
 ---
 
@@ -92,6 +94,8 @@ O4O Platform 전체 서비스는 현재 **운영형 알파 (Operational Alpha)**
 | web-k-cosmetics | `src/pages/HomePage.tsx` | ✅ 적용됨 |
 | web-glucoseview | `src/pages/HomePage.tsx` | ✅ 적용됨 |
 | web-kpa-society | `src/components/platform/HeroSection.tsx` | ✅ 적용됨 |
+
+> (2026-10-04 정합) 위 "적용됨" 표기와 아래 §7.2 는 2026-01 시점 기록이다 — 현행 코드에 배지 0건, `web-glucoseview` 서비스 부재, 파트너 안내 페이지(`PartnerManualPage` · `PartnerInfoPage` · `PartnerOverviewInfoPage`)는 web-neture 에 없다.
 
 ### 7.2 파트너 안내 페이지 적용 (WO-V080-PARTNER-STABILITY-CHECKLIST-UPDATE)
 

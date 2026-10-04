@@ -1,5 +1,7 @@
 # PROMOTION_UI_COMPONENT_STRATEGY_V1
 
+> **상태**: DRAFT · 미실행 프론트 전략 — `useSlotContent` · `SlotHeroSlider` · `SlotAdGrid` · `SlotLogoCarousel` · `SlotPromoBanner` 코드 0(문서 끝 `Status: Draft`). 실행 · 폐기 결정 전까지 현재 기준 문서 아님 · **표기일**: 2026-10-04
+
 > 프론트엔드 공통 컴포넌트와 확장앱 렌더링 전략
 
 ---

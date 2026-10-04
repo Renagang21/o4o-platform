@@ -1,5 +1,8 @@
 # O4O-OPERATOR-USER-MANAGEMENT-STANDARD-V1
 
+> **상태**: ACTIVE · **최종 갱신**: 2026-10-04 (본문 정합 — 운영자 비밀번호 변경 은퇴 · 목록 route · GlucoseView 은퇴 반영. 회원관리 API 표준 §4.4~§8 은 `apps/api-server/src/routes/operator/membership.routes.ts` 와 일치)
+> (2026-10-04 정합) **운영자의 회원 비밀번호 변경은 은퇴했다** — `WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1`([CHECK](../../checks/CHECK-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1.md): admin/operator password 변경 surface 0 · PasswordModal 제거). 이후 도입된 이메일 · 비밀번호 로그인([CHECK](../../checks/CHECK-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1.md))은 **사용자 본인**의 인증 수단(가입 · 재설정 · 로그인 상태 `POST /auth/password`)이며 Admin 화면 · `platform:*` 세션은 Google 전용이다. 운영자가 대신 바꾸는 비밀번호 경로는 없다. 아래 §3.2 · §4.2 · §6.1 의 비밀번호 항목은 무효.
+
 > **O4O 운영자 회원관리 표준 v1**
 >
 > 참조 구현: K-Cosmetics (UI/UX)
@@ -30,6 +33,8 @@
 
 모든 서비스 동일 적용.
 
+> (2026-10-04 정합) 현재 K-Cosmetics · KPA Society 는 목록을 `/operator/members` 에 두고 `/operator/users` 는 그쪽으로 redirect 한다(상세는 `/operator/users/:id` 유지). 목록 UI 는 `@o4o/operator-core-ui` 의 `OperatorMembersConsolePage` 공통 구현을 쓴다(K-Cosmetics `UsersPage.tsx`). Neture 는 `/operator/users` 유지.
+
 ---
 
 ## 3. UsersPage (목록) 표준
@@ -55,6 +60,8 @@
 | active/approved | 정지 |
 | suspended | 활성화 |
 | 모든 상태 | 수정, 비밀번호 변경, 삭제 |
+
+> (2026-10-04 정합) "비밀번호 변경" 은 은퇴 — 상단 상태 줄 참조. 현행: 수정 · 삭제.
 
 ### 3.3 행 클릭
 
@@ -92,7 +99,7 @@ onClick={() => navigate(`/operator/users/${user.id}`)}
 - 정지 (active/approved 시)
 - 활성화 (suspended/rejected 시)
 - 정보 수정 (EditUserModal)
-- 비밀번호 변경 (PasswordModal)
+- 비밀번호 변경 (PasswordModal) — (2026-10-04 정합) 은퇴, PasswordModal 코드 0
 - 삭제 (confirm 필수)
 
 ### 4.3 사업자 정보 섹션 (조건부)
@@ -206,7 +213,7 @@ JSON merge — 기본 필드 + businessInfo 필드 함께 전송.
 GET    /api/v1/operator/members                          목록 (page, limit, status, search)
 GET    /api/v1/operator/members/stats                    통계
 GET    /api/v1/operator/members/:userId                  상세
-PUT    /api/v1/operator/members/:userId                  수정 (프로필 + 비밀번호 + businessInfo)
+PUT    /api/v1/operator/members/:userId                  수정 (프로필 + businessInfo — 비밀번호는 2026-09 은퇴)
 PATCH  /api/v1/operator/members/:userId/status           상태 변경
 PATCH  /api/v1/operator/members/:membershipId/approve    멤버십 승인
 PATCH  /api/v1/operator/members/:membershipId/reject     멤버십 거부
@@ -407,6 +414,8 @@ const displayName = (user.lastName && user.firstName)
 | GlucoseView | ✅ | ✅ | ✅ | ✅ | 표준 충족 |
 | Neture | ✅ | ✅ | ✅ | ✅ | 표준 충족 |
 | KPA Society | ❌ | ❌ | ❌ | N/A | 독립 구현 필요 |
+
+> (2026-10-04 정합) 위 표는 2026-03-18 시점 값이다. GlucoseView 는 서비스 은퇴([CHECK](../../checks/CHECK-O4O-GLUCOSEVIEW-FULL-LEGACY-REMOVAL-V1.md)) · KPA Society 는 `MemberManagementPage`(`/operator/members`) + `UserDetailPage`(`/operator/users/:id`) 로 독립 구현돼 있다. PharmacyHub · KPA 분회는 자체 회원 콘솔을 쓴다. 서비스별 현재 적용 상태는 재조사 전 판단 근거로 쓰지 않는다.
 
 ---
 

@@ -3,6 +3,7 @@
 > 성격: 공공 데이터 seed / 상품 DB 정제의 **상위 판단 원칙**. 2026-07-05 확정.
 > 상위 SSOT: [`O4O-BUSINESS-PHILOSOPHY-V1`](O4O-BUSINESS-PHILOSOPHY-V1.md) (본 문서는 그 하위 적용 원칙).
 > 적용 범위: 모든 공공 규제 seed 트랙(의료기기 · 의약외품 · 건강기능식품 · 약가/의약품) 및 ProductMaster/ProductCandidate 정제.
+> **상태**: ACTIVE · **최종 갱신**: 2026-10-04 (본문 전수 검증 — 유통 증거 테이블 `supplier_product_offers` · `organization_product_listings` · `store_local_products` 현행 존재, 삭제는 건별 승인 규칙이 `CLAUDE.md` DB · 보안 경계와 일치, 본문 변경 없음)
 
 ---
 

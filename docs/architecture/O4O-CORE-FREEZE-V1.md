@@ -26,7 +26,7 @@ O4O Core Layer
 | 파일 | 역할 |
 |------|------|
 | `modules/auth/entities/User.ts` | User 엔티티 (Identity) |
-| `modules/auth/entities/RefreshToken.ts` | RefreshToken 엔티티 |
+| ~~`modules/auth/entities/RefreshToken.ts`~~ | ~~RefreshToken 엔티티~~ — (2026-10-04 사실 정정) 파일 없음 · 은퇴. `refresh_tokens` = `DEAD_RETIRE`, refresh 는 stateless JWT + `users.refreshTokenFamily` 가 runtime 기준([IDENTITY-ARCHITECTURE-V3](O4O-IDENTITY-ARCHITECTURE-V3.md) §12 · `WO-O4O-GOOGLE-ONLY-AUTH-CLEANUP-V1` · 부재 고정 spec `auth-core-dead-lifecycle-retired-user-roles-resurrection-closure.spec.ts`). Core 범위 · 동결 정책 변경 아님 |
 | `modules/auth/controllers/auth.controller.ts` | login, register, refresh, logout |
 | `modules/auth/routes/auth.routes.ts` | Auth API 라우트 |
 | `modules/auth/services/user.service.ts` | User 서비스 |

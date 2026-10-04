@@ -1,6 +1,8 @@
 # O4O 플랫폼 — 앱(App) 단위 표준 목록 + 서비스 적용 매트릭스
 
 > v1 · 2026-02-08
+>
+> **상태**: ACTIVE · **최종 갱신**: 2026-10-04 (§4 매트릭스 Neture 사이니지 = 제거됨 정합 · 매트릭스는 작성 시점 스냅샷임을 명시)
 
 ## 목적
 
@@ -62,6 +64,9 @@
 * P : 예정
 
 > 앱은 동일, 서비스는 조합만 다르다
+
+> (2026-10-04 정합) **Neture 사이니지 = X (제거됨).** 2026-06-13 사용자 결정으로 Neture 의 사이니지 surface(운영자 콘솔 · 매장 사이니지 route/menu)를 제거했다 — [`CHECK-O4O-NETURE-DIGITAL-SIGNAGE-REMOVAL-V1`](../investigations/CHECK-O4O-NETURE-DIGITAL-SIGNAGE-REMOVAL-V1.md) · `services/web-neture/src/App.tsx` · `config/operatorMenuGroups.ts` 의 제거 주석. Neture `/supplier/signage` 는 **공급자가 KPA 매장 HUB 에 사이니지를 제공하는 Supplier 업무공간 기능**이지 Neture 서비스의 APP-SIGNAGE 채택이 아니다([`CHECK-O4O-NETURE-SUPPLIER-DIGITAL-SIGNAGE-AUTHORING-HUB-IMPORT-V1`](../checks/CHECK-O4O-NETURE-SUPPLIER-DIGITAL-SIGNAGE-AUTHORING-HUB-IMPORT-V1.md)).
+> 매트릭스의 X(미사용)는 원칙 B · C 위반이나 gap 이 아니다 — 원칙 B · C 는 **채택한 서비스 안에서** 앱 UI 를 갈라치지 않는다는 규칙이다. 그 밖의 칸도 2026-02 작성 시점 스냅샷이며, 서비스별 현행 채택 범위는 각 정본(Community 는 [`O4O-ROLE-WORKSPACE-ARCHITECTURE-V1`](../baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md) §5 · LMS 는 [`APP-LMS-BASELINE`](APP-LMS-BASELINE.md))이 기준이다.
 
 ---
 
