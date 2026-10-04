@@ -314,10 +314,16 @@ export const ROLE_REGISTRY: Record<PrefixedRole, RoleMetadata> = {
   },
   // WO-O4O-KPA-BRANCH-DISTRICT-LEGACY-CLEANUP-V1:
   //   kpa:district_admin / kpa:branch_admin / kpa:branch_operator entries removed.
+  // WO-O4O-STORE-OWNER-RBAC-AND-SERVICE-SEMANTICS-FINAL-ALIGNMENT-V1:
+  //   label 'KPA Store Owner' 는 약사회·분회 소속을 뜻하는 것으로 읽혔다. role 문자열(`kpa:*`)은
+  //   serviceKey 의 legacy 이름이라 바꾸지 않고, 사람이 읽는 label·description 만 현재 의미로 맞춘다.
+  //   정본: docs/baseline/O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1.md
   'kpa:store_owner': {
     role: 'kpa:store_owner',
-    label: 'KPA Store Owner',
-    description: 'KPA pharmacy store owner (WO-O4O-STORE-OWNER-ROLE-BASED-ACCESS-UNIFICATION-V1)',
+    label: '약국 매장 경영자',
+    description:
+      '약국 사업자 매장 운영 서비스(pharmacy.neture.co.kr · serviceKey kpa-society)의 매장 경영자. ' +
+      'KPA 분회(kpa.neture.co.kr)와 무관하다 (WO-O4O-STORE-OWNER-ROLE-BASED-ACCESS-UNIFICATION-V1)',
     service: 'kpa',
     category: 'commerce',
     deprecated: false

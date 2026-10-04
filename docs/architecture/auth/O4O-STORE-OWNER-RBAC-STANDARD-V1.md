@@ -45,8 +45,45 @@ store_owner는 매장 운영 기능을 사용할 수 있는 권한이다.
 
 ### 3.1 서비스별 store_owner
 
-- kpa:store_owner
-- cosmetics:store_owner
+공통 role 게이트(`isStoreOwner()`)가 아는 role 은 **이 3종이 전부**다 —
+런타임 정본은 `apps/api-server/src/utils/store-owner.utils.ts` 의 `STORE_OWNER_ROLES_BY_SERVICE` 다.
+
+- `kpa:store_owner`
+- `cosmetics:store_owner`
+- `pharmacy-hub:store_owner`
+
+`pharmacy-hub:store_owner` 는 2026-10-04 이 목록에 합류한 것이 아니라 **처음부터 registry 에 있었고**
+이 문서만 2종으로 적고 있었다(§3.4 각주에만 언급). 등록 누락은 실제로 사고가 된 적이 있다 —
+registry 에 없으면 `isStoreOwner()` 가 role 게이트에서 끝나 `organizationId` 를 돌려주지 못해
+공통 매장 API 진입이 막힌다(`CHECK-PHARMACY-HUB-STORE-SUBJECT-PROVISIONING-V1` §8-5).
+
+**`cafe24-b2b:store_owner` 는 여기 없다.** 그 role 은 실재하고 Cafe24 프로비저닝이 부여하지만,
+Cafe24 거래처 회원은 **HMAC 서명 쿠키 세션**으로 `/store/*` 에 들어가 공통 role 게이트를 거치지
+않는다(`CHECK-O4O-CAFE24-B2B-STORE-MEMBER-LOGIN-PILOT-V1`). 의도된 제외이며, 넣으면 공통 게이트가
+아는 role 인 것처럼 보인다.
+
+### 3.1-A 서비스별 store_member (2026-10-04 추가)
+
+매장 접근 자격은 **Owner 하나가 아니다.** 사업자가 허가한 사용자(Store Member)가 같은 매장을 쓴다.
+
+- `kpa:store_member`
+- `cosmetics:store_member`
+- `pharmacy-hub:store_member`
+
+owner 와 **같은 3종 집합**이다(런타임: `services/store/store-membership.service.ts`
+`STORE_MEMBER_ROLE_BY_SERVICE`). 초대 수락이 발급하고, 같은 서비스에 남은 매장이 없을 때만 회수한다.
+
+접근 판정은 **Role ∧ Relationship** 이다 — role 만으로도, 관계 행만으로도 들어오지 못한다.
+
+| 자격 | Role | Relationship |
+|---|---|---|
+| Store Owner | `{prefix}:store_owner` + 해당 서비스 active membership | `organization_members` 활성 `owner`·`admin`·`manager` |
+| Store Member | `{prefix}:store_member` | `organization_members` 활성 `'staff'` |
+
+정본: [`O4O-STORE-ACCESS-AND-MEMBERSHIP-V1`](../../baseline/O4O-STORE-ACCESS-AND-MEMBERSHIP-V1.md) ·
+[`O4O-IDENTITY-ARCHITECTURE-V3`](../O4O-IDENTITY-ARCHITECTURE-V3.md) §7.
+
+---
 
 ### 3.2 Neture
 
@@ -109,7 +146,7 @@ role_assignments.role IN ({service}:store_owner)
 
 * activity_type='pharmacy_owner'
 * sub_role='pharmacy_owner'
-* organization_members.role='owner'
+* organization_members.role='owner' (관계 행 **단독**으로는 권한이 아니다 — §3.1-A 의 Role ∧ Relationship 에서 **조건**으로만 쓴다)
 * cosmetics:seller / k-cosmetics:seller
 
 ---

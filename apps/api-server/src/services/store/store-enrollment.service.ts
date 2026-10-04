@@ -41,13 +41,21 @@ import type { StoreOwnerServiceKey } from '../../utils/store-owner.utils.js';
 /** 가입 가능한 업종(서비스). owner role prefix 와 같은 축이다 — 새 prefix 를 만들지 않는다. */
 export const ENROLLABLE_SERVICE_KEYS: readonly StoreOwnerServiceKey[] = ['kpa', 'cosmetics', 'pharmacy-hub'];
 
-/** 가입이 부여하는 소유 role. `{prefix}:store_owner` — 기존 규약 그대로. */
-export const STORE_OWNER_ROLE_BY_SERVICE: Readonly<Record<StoreOwnerServiceKey, string>> = Object.freeze({
-  kpa: 'kpa:store_owner',
-  cosmetics: 'cosmetics:store_owner',
-  'pharmacy-hub': 'pharmacy-hub:store_owner',
-  'cafe24-b2b': 'cafe24-b2b:store_owner',
-});
+/**
+ * 가입이 부여하는 소유 role. `{prefix}:store_owner` — 기존 규약 그대로.
+ *
+ * 키는 공통 owner registry(`store-owner.utils.ts` `STORE_OWNER_ROLES_BY_SERVICE`)와 같은 3종이다.
+ * `cafe24-b2b:store_owner` 는 **실재하는 role 이지만**(Cafe24 프로비저닝이 부여) 그 서비스는
+ * HMAC 서명 쿠키 세션으로 진입해 공통 게이트를 거치지 않으므로 여기 두지 않는다. 자가 가입
+ * 대상도 아니다(`ENROLLABLE_SERVICE_KEYS`).
+ * (WO-O4O-STORE-OWNER-RBAC-AND-SERVICE-SEMANTICS-FINAL-ALIGNMENT-V1)
+ */
+export const STORE_OWNER_ROLE_BY_SERVICE: Readonly<Partial<Record<StoreOwnerServiceKey, string>>> =
+  Object.freeze({
+    kpa: 'kpa:store_owner',
+    cosmetics: 'cosmetics:store_owner',
+    'pharmacy-hub': 'pharmacy-hub:store_owner',
+  });
 
 /** 조직 type — 기존 프로비저닝과 같은 값(매장). */
 const ORGANIZATION_TYPE = 'store';
@@ -121,6 +129,8 @@ export async function enrollStoreBusiness(
   }
 
   const ownerRole = STORE_OWNER_ROLE_BY_SERVICE[serviceKey];
+  // ENROLLABLE_SERVICE_KEYS 가 이미 걸러내지만, 두 목록이 어긋나면 조용히 role 없이 가입되는 것을 막는다.
+  if (!ownerRole) throw new StoreEnrollmentError('SERVICE_NOT_ENROLLABLE', 400, MESSAGES.SERVICE_NOT_ENROLLABLE);
   const alreadyOwner = linked.length === 1 && (await roleAssignmentService.hasRole(userId, ownerRole));
   if (alreadyOwner) {
     return { organizationId: linked[0], serviceKey, outcome: 'existing' };
