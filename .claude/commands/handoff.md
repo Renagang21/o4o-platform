@@ -3,18 +3,21 @@ description: 작업 종료 - 인수인계 메모 작성 후 branch 커밋, push,
 ---
 작업공간을 옮기기 전에 인수인계 메모를 남겨줘. 문제가 생기면 멈추고 보고해.
 main 반영은 PR merge 로만 하고, main 통합은 내가 승인한 뒤에 한다(AGENTS.md §4-1(e)). main 에 직접 push 하지 마.
+기준 main checkout 의 branch 는 바꾸지 않는다(AGENTS.md §4-1(b)(c)).
 
-1. 프로젝트 루트의 HANDOFF.md를 새로 작성해. 기존 내용은 누적하지 말고 덮어써.
+1. 커밋할 작업공간을 정해. `git branch --show-current` 로 확인한다.
+   - 작업 branch(`wo/<slug>` 등)의 전용 worktree 면 그곳에서 진행한다.
+   - main(기준 checkout)이면 branch 를 전환하지 말고 전용 worktree 를 새로 만든다:
+     `git fetch origin` → `git worktree add ../o4o-wt/handoff-<YYYYMMDD> -b wo/handoff-<YYYYMMDD> origin/main`
+     이후 단계는 모두 그 worktree 에서 한다.
+2. 그 작업공간 루트의 HANDOFF.md를 새로 작성해. 기존 내용은 누적하지 말고 덮어써.
    아래 항목을 간결하게 정리해:
    - 마지막 작업 일시와 작업 내용 요약
    - 완료된 것
-   - 진행 중이던 것 (어느 파일, 어느 단계까지 했는지)
+   - 진행 중이던 것 (어느 worktree · branch · PR, 어느 파일, 어느 단계까지 했는지)
    - 다음에 바로 이어서 할 일 (우선순위 순서로)
    - 주의할 점, 미해결 문제, 내린 결정과 그 이유
-2. CLAUDE.md에는 진행 상황을 쓰지 마. "세션 시작 시 HANDOFF.md를 먼저 읽을 것" 안내가 있는지만 확인하고, 없으면 추가해.
-3. git branch --show-current 로 현재 브랜치를 확인해.
-   - 작업 branch(`wo/<slug>` 등)면 그 branch 에 커밋한다.
-   - main 이면 `git switch -c wo/handoff-<YYYYMMDD>` 로 새 branch 를 만든다(기준 main checkout 이 다른 세션과 공유 중이면 멈추고 보고해).
+3. CLAUDE.md에는 진행 상황을 쓰지 마. "세션 시작 시 HANDOFF.md를 먼저 읽을 것" 안내가 있는지만 확인하고, 없으면 추가해.
 4. git status 로 변경 사항을 보여줘. 그 다음
    - HANDOFF.md와 이 세션에서 내가 요청해 수정한 파일만 경로를 지정해서 stage 해. git add . 이나 git add -A 는 쓰지 마.
    - 이 세션에서 수정하지 않은 변경 파일이 보이면 커밋하지 말고 목록으로 보고해.
@@ -22,4 +25,5 @@ main 반영은 PR merge 로만 하고, main 통합은 내가 승인한 뒤에 �
 5. git push -u origin <현재 branch>
    - 거부되면 멈추고 보고해. 임의로 force push 하지 마.
    - 이 branch 의 PR 이 없으면 `gh pr create --base main` 으로 만든다. merge 는 하지 않는다.
+     (다음 작업공간의 `/start` 는 HANDOFF.md 를 포함한 열린 PR 을 찾아 읽는다.)
 6. push 결과 · PR 번호 · HANDOFF.md 요약을 알려줘.
