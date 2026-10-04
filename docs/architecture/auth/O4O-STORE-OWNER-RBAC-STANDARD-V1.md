@@ -69,9 +69,23 @@ Cafe24 거래처 회원은 **HMAC 서명 쿠키 세션**으로 `/store/*` 에 �
 - `kpa:store_member`
 - `cosmetics:store_member`
 - `pharmacy-hub:store_member`
+- `cafe24-b2b:store_member`
 
-owner 와 **같은 3종 집합**이다(런타임: `services/store/store-membership.service.ts`
-`STORE_MEMBER_ROLE_BY_SERVICE`). 초대 수락이 발급하고, 같은 서비스에 남은 매장이 없을 때만 회수한다.
+**owner 게이트(3종)보다 하나 많다.** 초대·수락은 serviceKey 를 파라미터로 받는 **서비스 중립
+표면**이고, 조직↔서비스 linkage(`STORE_SERVICE_ORG_LINKAGE`)가 `cafe24-b2b` 를 포함하기 때문이다.
+그 조직에 초대받은 사람에게 발급할 role 이 없으면 수락이 관계만 `'staff'` 로 바꾸고 role 을 건너뛰어
+**접근 0 · 재수락 불가**인 막다른 상태가 된다.
+
+세 목록이 서로 다른 것은 정상이며, 각각의 기준이 다르다.
+
+| 목록 | 범위 | 기준 |
+|---|---|---|
+| `STORE_OWNER_ROLES_BY_SERVICE` (3) | 공통 role 게이트가 아는 owner role | `isStoreOwner()` 를 거치는 서비스만. cafe24-b2b 는 HMAC 쿠키 세션이라 제외 |
+| `STORE_MEMBER_ROLE_BY_SERVICE` (4) | 초대 수락이 발급하는 member role | 조직↔서비스 linkage 가 있는 서비스 전부 |
+| `ENROLLABLE_SERVICE_KEYS` (3) | 자가 가입 가능 업종 | 외부 로그인 전용 채널(cafe24-b2b) 제외 |
+
+런타임: `services/store/store-membership.service.ts` · `store-enrollment.service.ts`.
+초대 수락이 발급하고, 같은 서비스에 남은 매장이 없을 때만 회수한다.
 
 접근 판정은 **Role ∧ Relationship** 이다 — role 만으로도, 관계 행만으로도 들어오지 못한다.
 

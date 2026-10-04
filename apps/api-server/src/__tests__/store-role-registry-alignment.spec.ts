@@ -1,30 +1,36 @@
 /**
- * Store role registry ↔ 정본 문서 정합
+ * Store role 목록 ↔ 정본 문서 정합
  *
  * WO-O4O-STORE-OWNER-RBAC-AND-SERVICE-SEMANTICS-FINAL-ALIGNMENT-V1
- * 정본: `docs/architecture/auth/O4O-STORE-OWNER-RBAC-STANDARD-V1.md` §3.1 · §3.1-A
- *       `docs/baseline/O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1.md`
+ * 정본: `docs/baseline/O4O-STORE-ACCESS-AND-MEMBERSHIP-V1.md` (Active) ·
+ *       `docs/architecture/auth/O4O-STORE-OWNER-RBAC-STANDARD-V1.md` §3.1 · §3.1-A
  *
  * ─────────────────────────────────────────────────────────────────────────────
- * 왜 이 spec 이 있나
+ * 세 목록은 **서로 다르다. 그게 맞다.**
  *
- *   공통 role 게이트가 아는 role 목록은 **코드 한 곳**(`STORE_OWNER_ROLES_BY_SERVICE`)에 있고,
- *   문서와 다른 map 들이 그것을 따라 적는다. 둘이 어긋나면 조용히 둘 중 하나가 틀린다 —
- *   실제로 `pharmacy-hub:store_owner` 가 registry 에는 있는데 문서 §3.1 에는 없었고(각주에만),
- *   반대로 `cafe24-b2b:store_member` 는 코드 map 에만 있고 seed·소비가 0 이었다.
+ *   STORE_OWNER_ROLES_BY_SERVICE (3)  공통 role 게이트가 아는 owner role
+ *                                     cafe24-b2b 제외 — HMAC 쿠키 세션이라 isStoreOwner() 를 안 거친다
+ *   STORE_MEMBER_ROLE_BY_SERVICE (4)  초대 수락이 발급하는 member role
+ *                                     조직↔서비스 linkage 가 있는 서비스 전부 (cafe24-b2b 포함)
+ *   ENROLLABLE_SERVICE_KEYS      (3)  자가 가입 가능 업종 — 외부 로그인 전용 채널 제외
  *
- *   registry 를 늘리는 것 자체는 막지 않는다. 늘릴 때 **문서와 두 map 을 같이** 고치게 한다.
+ * 이 spec 은 "셋이 같아야 한다" 를 고정하지 않는다. 처음엔 그렇게 적었다가 PR #288 리뷰에서
+ * 틀린 전제임이 드러났다 — member 목록을 3종으로 줄이면 cafe24-b2b 전용 조직의 초대 수락이
+ * 관계만 바꾸고 role 을 건너뛰어 **접근 0 · 재수락 불가**가 된다.
+ * 대신 **각 목록이 자기 기준과 정본 문서에 맞는지**를 고정한다.
  */
 import * as fs from 'fs';
 import * as path from 'path';
 import { STORE_MEMBER_ROLE_BY_SERVICE } from '../services/store/store-membership.service.js';
 import { STORE_OWNER_ROLE_BY_SERVICE, ENROLLABLE_SERVICE_KEYS } from '../services/store/store-enrollment.service.js';
+import { STORE_SERVICE_ORG_LINKAGE } from '../utils/store-organization.resolver.js';
 
 const REPO = path.resolve(__dirname, '..', '..', '..', '..');
 const read = (rel: string) => fs.readFileSync(path.join(REPO, rel), 'utf8');
 
 const OWNER_UTILS = read('apps/api-server/src/utils/store-owner.utils.ts');
 const RBAC_DOC = read('docs/architecture/auth/O4O-STORE-OWNER-RBAC-STANDARD-V1.md');
+const ACCESS_DOC = read('docs/baseline/O4O-STORE-ACCESS-AND-MEMBERSHIP-V1.md');
 
 /** 공통 게이트의 정본 registry 키를 소스에서 읽는다(복사해 적지 않는다). */
 function gateServiceKeys(): string[] {
@@ -33,48 +39,50 @@ function gateServiceKeys(): string[] {
   return [...m[1].matchAll(/^\s*'?([a-z0-9-]+)'?\s*:/gm)].map((x) => x[1]);
 }
 
-describe('공통 게이트 registry 가 정본이다', () => {
-  it('owner · member role map 의 키가 게이트 registry 와 같다', () => {
-    const gate = gateServiceKeys().sort();
-    expect(gate.length).toBeGreaterThan(0);
-    expect(Object.keys(STORE_OWNER_ROLE_BY_SERVICE).sort()).toEqual(gate);
-    expect(Object.keys(STORE_MEMBER_ROLE_BY_SERVICE).sort()).toEqual(gate);
-  });
-
-  it('role 문자열은 {serviceKey}:{store_owner|store_member} 규약을 따른다', () => {
-    for (const [key, role] of Object.entries(STORE_OWNER_ROLE_BY_SERVICE)) {
-      expect(role).toBe(`${key}:store_owner`);
-    }
-    for (const [key, role] of Object.entries(STORE_MEMBER_ROLE_BY_SERVICE)) {
-      expect(role).toBe(`${key}:store_member`);
+describe('각 목록은 자기 기준을 따른다', () => {
+  it('member role 은 linkage 가 있는 서비스 전부에 있다 — 수락이 role 없이 끝나지 않는다', () => {
+    // linkedServiceKeys() 가 linkage 를 돌며 role 을 발급한다. 한 키라도 비면 그 조직의 수락이
+    // 관계만 바꾸고 role 을 건너뛰어 접근 0 · 재수락 불가가 된다(PR #288 리뷰 P1).
+    const linkage = Object.keys(STORE_SERVICE_ORG_LINKAGE).sort();
+    expect(Object.keys(STORE_MEMBER_ROLE_BY_SERVICE).sort()).toEqual(linkage);
+    for (const key of linkage) {
+      expect(STORE_MEMBER_ROLE_BY_SERVICE[key as keyof typeof STORE_MEMBER_ROLE_BY_SERVICE]).toBe(
+        `${key}:store_member`,
+      );
     }
   });
 
-  it('cafe24-b2b 는 공통 게이트 밖이다 — 어느 map 에도 없다', () => {
-    // 그 서비스는 HMAC 서명 쿠키 세션으로 /store/* 에 들어가 isStoreOwner() 를 거치지 않는다.
-    expect(gateServiceKeys()).not.toContain('cafe24-b2b');
-    expect(STORE_OWNER_ROLE_BY_SERVICE).not.toHaveProperty('cafe24-b2b');
-    expect(STORE_MEMBER_ROLE_BY_SERVICE).not.toHaveProperty('cafe24-b2b');
-  });
-
-  it('자가 가입 가능 서비스는 owner role 을 가진 서비스의 부분집합이다', () => {
+  it('자가 가입 owner role 은 ENROLLABLE_SERVICE_KEYS 와 정확히 같다', () => {
+    expect(Object.keys(STORE_OWNER_ROLE_BY_SERVICE).sort()).toEqual([...ENROLLABLE_SERVICE_KEYS].sort());
     for (const key of ENROLLABLE_SERVICE_KEYS) {
       expect(STORE_OWNER_ROLE_BY_SERVICE[key]).toBe(`${key}:store_owner`);
     }
   });
+
+  it('공통 게이트 owner registry 는 자가 가입 목록과 같다 — 가입했는데 못 들어가는 일이 없다', () => {
+    expect(gateServiceKeys().sort()).toEqual([...ENROLLABLE_SERVICE_KEYS].sort());
+  });
+
+  it('cafe24-b2b 는 owner 게이트 밖이지만 member role 은 있다', () => {
+    // 그 서비스는 HMAC 서명 쿠키 세션으로 /store/* 에 들어가 isStoreOwner() 를 거치지 않는다.
+    expect(gateServiceKeys()).not.toContain('cafe24-b2b');
+    expect(ENROLLABLE_SERVICE_KEYS).not.toContain('cafe24-b2b');
+    // 하지만 초대·수락은 서비스 중립 표면이라 발급할 role 이 있어야 한다.
+    expect(STORE_MEMBER_ROLE_BY_SERVICE['cafe24-b2b']).toBe('cafe24-b2b:store_member');
+  });
 });
 
-describe('정본 문서가 registry 와 같은 목록을 적는다', () => {
-  it('§3.1 이 게이트 registry 의 owner role 을 모두 적는다', () => {
+describe('정본 문서가 같은 목록을 적는다', () => {
+  it('RBAC §3.1 이 게이트 owner role 을 모두 적는다', () => {
     const missing = gateServiceKeys().filter((k) => !RBAC_DOC.includes(`${k}:store_owner`));
     expect(missing).toEqual([]);
   });
 
-  it('§3.1-A 가 member role 을 적는다', () => {
-    const missing = Object.values(STORE_MEMBER_ROLE_BY_SERVICE).filter(
-      (role) => typeof role === 'string' && !RBAC_DOC.includes(role),
-    );
-    expect(missing).toEqual([]);
+  it('RBAC §3.1-A 와 접근 정본이 member role 을 모두 적는다', () => {
+    const roles = Object.values(STORE_MEMBER_ROLE_BY_SERVICE);
+    expect(roles.filter((r) => !RBAC_DOC.includes(r))).toEqual([]);
+    // ACTIVE 정본이 SSOT 다 — 코드만 줄이면 drift 가 된다(PR #288 리뷰).
+    expect(roles.filter((r) => !ACCESS_DOC.includes(r))).toEqual([]);
   });
 
   it('Role ∧ Relationship 과 정본 링크가 문서에 있다', () => {
@@ -95,7 +103,7 @@ describe('서비스 의미 표기', () => {
     expect(desc![1]).toContain('약국');
   });
 
-  it("kpa:store_owner label 이 분회 소속으로 읽히지 않는다", () => {
+  it('kpa:store_owner label 이 분회 소속으로 읽히지 않는다', () => {
     const roles = read('apps/api-server/src/types/roles.ts');
     const at = roles.indexOf("'kpa:store_owner': {");
     expect(at).toBeGreaterThan(-1);

@@ -69,22 +69,24 @@ export const STORE_MEMBERSHIP_MANAGED_ROLES: readonly string[] = [STORE_INVITED_
  * 서비스별로 나누는 이유: 업종이 다른 매장의 자격이 서로 섞이지 않게 하려는 것이고,
  * 이는 owner role 이 이미 쓰는 규약이다.
  *
- * **키는 공통 owner registry(`STORE_OWNER_ROLES_BY_SERVICE`)와 같은 집합이다.**
- * `cafe24-b2b` 는 여기 없다 — 그 서비스는 HMAC 서명 쿠키 세션으로 `/store/*` 에 들어가고
- * 공통 role 게이트(`isStoreOwner()`)를 거치지 않는다(`CHECK-O4O-CAFE24-B2B-STORE-MEMBER-LOGIN-PILOT-V1`).
- * 넣어 두면 공통 게이트가 아는 role 인 것처럼 보이고, `cafe24-b2b:store_member` 는 seed 도 소비도
- * 없는 **존재하지 않는 role** 이 된다 (WO-O4O-STORE-OWNER-RBAC-AND-SERVICE-SEMANTICS-FINAL-ALIGNMENT-V1).
+ * **키는 공통 owner registry(`STORE_OWNER_ROLES_BY_SERVICE`, 3종)와 다르다 — 여기는 4종이다.**
+ *   owner 게이트는 `cafe24-b2b` 를 제외한다(그 서비스는 HMAC 서명 쿠키 세션으로 `/store/*` 에
+ *   들어가 `isStoreOwner()` 를 거치지 않는다). 하지만 **초대·수락은 서비스 중립 표면**이고 조직↔서비스
+ *   linkage(`STORE_SERVICE_ORG_LINKAGE`)가 `cafe24-b2b` 를 포함하므로, 그 조직에 초대받은 사람에게도
+ *   발급할 role 이 있어야 한다. 없으면 수락이 관계만 `staff` 로 바꾸고 role 을 건너뛰어 **접근 0 ·
+ *   재수락 불가**인 막다른 상태가 된다.
+ *   정본: `docs/baseline/O4O-STORE-ACCESS-AND-MEMBERSHIP-V1.md` (Active) 가 4종을 명시한다.
+ *   (WO-O4O-STORE-OWNER-RBAC-AND-SERVICE-SEMANTICS-FINAL-ALIGNMENT-V1 — 한 번 3종으로 줄였다가
+ *    PR #288 리뷰로 되돌렸다. 과거 CHECK 는 ACTIVE 정본을 이기지 못한다.)
  */
-export const STORE_MEMBER_ROLE_BY_SERVICE: Readonly<Partial<Record<StoreOwnerServiceKey, string>>> =
-  Object.freeze({
-    kpa: 'kpa:store_member',
-    cosmetics: 'cosmetics:store_member',
-    'pharmacy-hub': 'pharmacy-hub:store_member',
-  });
+export const STORE_MEMBER_ROLE_BY_SERVICE: Readonly<Record<StoreOwnerServiceKey, string>> = Object.freeze({
+  kpa: 'kpa:store_member',
+  cosmetics: 'cosmetics:store_member',
+  'pharmacy-hub': 'pharmacy-hub:store_member',
+  'cafe24-b2b': 'cafe24-b2b:store_member',
+});
 
-const ALL_STORE_MEMBER_ROLES: readonly string[] = Object.values(STORE_MEMBER_ROLE_BY_SERVICE).filter(
-  (r): r is string => typeof r === 'string',
-);
+const ALL_STORE_MEMBER_ROLES: readonly string[] = Object.values(STORE_MEMBER_ROLE_BY_SERVICE);
 
 /** 이 조직이 매장으로 등록된 서비스들. 수락 시 발급할 role 과 해제 시 회수할 role 을 정한다. */
 async function linkedServiceKeys(
@@ -179,10 +181,7 @@ export async function resolveStoreAccessLevel(
   if (rows.length === 0) return { level: 'none', organizationId: null, memberRole: null };
 
   // **Role 이 없으면 거부** (Identity V3 §7-1). 관계 행만으로는 아무 접근도 주지 않는다.
-  // 공통 게이트에 참여하지 않는 서비스(cafe24-b2b)는 member role 자체가 없다 → 접근 아님.
-  const scopedRole = serviceKey ? STORE_MEMBER_ROLE_BY_SERVICE[serviceKey] : undefined;
-  if (serviceKey && !scopedRole) return { level: 'none', organizationId: null, memberRole: null };
-  const requiredRoles = scopedRole ? [scopedRole] : ALL_STORE_MEMBER_ROLES;
+  const requiredRoles = serviceKey ? [STORE_MEMBER_ROLE_BY_SERVICE[serviceKey]] : ALL_STORE_MEMBER_ROLES;
   if (!(await roleAssignmentService.hasAnyRole(userId, [...requiredRoles]))) {
     return { level: 'none', organizationId: null, memberRole: null };
   }
@@ -336,9 +335,11 @@ export async function acceptStoreInvitation(
   //   관계 없는 권한이 떠돈다.
   const services = await linkedServiceKeys(dataSource, input.organizationId);
   for (const key of services) {
-    const role = STORE_MEMBER_ROLE_BY_SERVICE[key];
-    if (!role) continue; // 공통 게이트 밖 서비스 — 발급할 role 이 없다
-    await roleAssignmentService.assignRole({ userId: input.userId, role, assignedBy: input.userId });
+    await roleAssignmentService.assignRole({
+      userId: input.userId,
+      role: STORE_MEMBER_ROLE_BY_SERVICE[key],
+      assignedBy: input.userId,
+    });
   }
   return { organizationId: input.organizationId, role: STORE_STAFF_ROLE, services };
 }
@@ -401,9 +402,8 @@ export async function removeStoreMember(
         STORE_SERVICE_ORG_LINKAGE[key].slugKeys,
       ],
     );
-    const role = STORE_MEMBER_ROLE_BY_SERVICE[key];
-    if (role && (!remaining || remaining.length === 0)) {
-      await roleAssignmentService.removeRole(input.targetUserId, role);
+    if (!remaining || remaining.length === 0) {
+      await roleAssignmentService.removeRole(input.targetUserId, STORE_MEMBER_ROLE_BY_SERVICE[key]);
     }
   }
   return { organizationId, userId: input.targetUserId, services };
