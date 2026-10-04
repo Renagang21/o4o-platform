@@ -217,6 +217,14 @@ Strong Discovery 는 V1 에서 최상위 진입점이었다. V2 에서는 **Assi
 - 세 역할의 호출은 API · 코드다. **O4O 가 외부 생성형 AI 서비스의 사용자 화면을 조작해 Strong Agent 로 삼지 않는다**(orphan O5). 외부 AI 가 O4O 를 호출하는 방향(§14)과는 다르다.
 - 모델 선택은 설정 · 운영의 문제다. 모델을 바꿔도 이 문서는 바뀌지 않는다.
 
+#### 8-1-a. Provider 독립성 (2026-10-04 사용자 확정)
+
+1. 수행자는 **교체 가능**하다 — 상용 AI(OpenAI · Gemini · 이후 등장하는 것) · O4O 가 운영하는 오픈소스 모델 · 자체 호스팅 AI · Local / Private AI · AI 가 필요 없는 Deterministic Executor.
+2. **Assistant · Task · Memory · Experience · Correction · Knowledge · Skill 은 특정 Provider · 모델에 귀속되지 않는다.** O4O 가 쌓는 자산은 특정 모델의 prompt · conversation · thread 가 아니라 **Provider 와 무관한 구조화된 업무 Experience 와 Knowledge** 다(§6-2 "내용이 아니라 구조").
+3. **Provider 를 바꿔도 사용자의 Experience 는 초기화되지 않고, 새 자동화 체계가 생기지 않는다.** Provider 별로 Memory · Skill 을 따로 만들지 않는다.
+4. 수행자 선택은 Task 난이도 · 그 사용자의 Experience · 정확성 · latency · 비용 · privacy · 실행환경으로 달라질 수 있다. 비용 때문에 사용자 편의와 성공 가능성을 희생하지 않는다(§5-3).
+5. 데이터 처리는 **① AI 에 무엇을 보내는가 ② 어느 Provider 가 처리하는가 ③ 어디서 처리되는가(국내 · 국외 Cloud · 자체 호스팅 · 사용자 노드 Local)** 를 따로 판단한다. Provider 나 처리 위치가 바뀔 때의 고지 · 동의 판단 구조는 [`O4O-ASSISTANT-MEMORY-PLACEMENT-POLICY-V1`](O4O-ASSISTANT-MEMORY-PLACEMENT-POLICY-V1.md) §6 이 정한다.
+
 ### 8-2. 기본 경로
 
 ```text
