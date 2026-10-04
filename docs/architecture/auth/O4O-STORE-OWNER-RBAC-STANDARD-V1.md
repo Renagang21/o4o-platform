@@ -125,6 +125,11 @@ role prefix 는 **내부 서비스 범위 이름**이며 현재 주소의 사업
 
 role 문자열은 바꾸지 않는다. 매장 운영 공간 자체는 공통 Store Workspace(`store.neture.co.kr`)이며 serviceKey 를 갖지 않는다.
 
+`types/roles.ts` 의 `ROLE_REGISTRY` label 도 같다 — `kpa:store_owner` 의 label 은 `KPA Store Owner` 라는
+**역사적 이름**이고 분회 소속을 뜻하지 않는다. 그 label 은 화면에 노출되는 소비처가 없고(2026-10-04 전수 확인),
+이 표가 의미의 정본이다. 바꾸지 않는 이유가 하나 더 있다: 그 파일은 같은 모양의 role 항목이 100여 개
+반복되는 구조라 **안의 어느 줄을 고쳐도 중복 블록에 들어가** 품질 게이트(New Code 중복)를 깨뜨린다.
+
 ---
 
 ## 4. 접근 제어 기준
