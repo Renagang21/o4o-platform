@@ -51,6 +51,8 @@ import {
   type WorkElement,
   type WorkSurface,
   type WorkAction,
+  type ExecutionIntent,
+  type ExecutionReport,
 } from './work-agent-contract.js';
 import {
   RECOVERY_ERROR,
@@ -222,6 +224,11 @@ export interface PlannerInput {
   patterns?: readonly RecalledPattern[];
   /** 방법을 몰라 물으려던 직후의 Discovery 재시도(STRONG-FIRST-DISCOVERY A). 구조만 — 원문 없음. */
   methodDiscovery?: { attempt: number; askKind: string };
+  /**
+   * Personal Assistant Phase B — Assistant Planning 이 정한 실행 지시(구조만). 있으면 이 planner 는 그 지시 안에서
+   * 화면 행동만 정한다. 업무 완료 판정은 Assistant 가 실행 근거로 한다(V2 §2-1).
+   */
+  intent?: ExecutionIntent;
 }
 
 export interface WorkPlanner {
@@ -248,7 +255,7 @@ export const WORK_PLANNER_SYSTEM_PROMPT = [
   '- visual_type: (시각 모드에서만) {"text"} 현재 포커스된 입력 위치에 짧은 텍스트를 넣는다(비밀번호·인증번호·명령어 금지).',
   '- visual_key: (시각 모드에서만) {"key"} ENTER · TAB · ESC 하나를 보낸다.',
   '- takeover: {"reason"} 사용자에게 화면을 넘긴다. reason 은 goal_sufficiently_advanced · user_judgment_required · ambiguous_result · unsupported_control · review_required · commit_required · credential_required 중 하나.',
-  '- done: 목적을 이미 충분히 이루었다.',
+  '- done: 목적이 요구하는 결과 화면에 이미 닿았다(실행 결과의 주장 — 업무 완료 판정은 Assistant 가 실행 근거로 한다).',
   '',
   '시각 모드(Visual Computer Use):',
   '- UIA 가 화면 요소를 노출하지 못할 때만 runtime 이 캡처 이미지를 함께 준다("현재 화면 이미지" 표시). 그때만 visual_click/visual_type/visual_key 를 쓸 수 있다.',
@@ -291,6 +298,24 @@ export const WORK_PLANNER_SYSTEM_PROMPT = [
   '출력(JSON 만): {"assessment":"progress|no_progress|needs_user|completed","action":{"kind":"...", ...},"actions":[…선택, 배치일 때만…],"rationale":"짧게","neededInput":"필요할 때만","task"?:"…","stage"?:"…","strategy"?:{"ops":[…]},"ask"?:{…},"userInput"?:{…}}',
 ].join('\n');
 
+/**
+ * Phase B — Assistant 의 실행 지시를 planner 에게 알리는 한 덩어리(구조만 · 원문 없음).
+ * 근거는 모두 참고이며 강제 절차가 아니다(V2 §0-1). Task type 힌트는 같은 업무 키를 쓰게 할 뿐 절차를 정하지 않는다.
+ */
+export function describeExecutionIntent(intent: ExecutionIntent): string {
+  const start = intent.startMode === 'resume' ? '원래 업무를 이어간다(재개)' : '현재 화면에서 방법을 찾으며 시작한다(Discovery)';
+  const own = intent.evidence.find((e) => e.source === 'own_experience');
+  const shared = intent.evidence.find((e) => e.source === 'shared_candidate');
+  return [
+    '## 실행 지시 (Assistant · 구조)',
+    `- 시작: ${start}`,
+    intent.taskTypeHint ? `- 이어가는 업무 키: ${intent.taskTypeHint} (같은 업무면 이 키를 task 로 쓴다 — 절차를 고정하는 키가 아니다)` : '',
+    `- 근거: ${own?.available ? '이 사용자의 확인된 방법이 있으면 먼저 쓰되 현재 화면으로 다시 확인한다' : '이 사용자의 확인된 방법 없음'}${shared?.available ? ' · 다른 사용자 후보는 참고만(강제 아님)' : ''}`,
+    '- 끝: 목적이 요구하는 결과가 화면에 실제로 보이면 멈추고 넘긴다. 업무가 끝났는지는 Assistant 가 실행 근거로 판정한다.',
+    '- 확정 · 결제 · 인증은 언제나 사용자(takeover).',
+  ].filter(Boolean).join('\n');
+}
+
 export function buildPlannerUserPrompt(input: PlannerInput): string {
   const obs = input.observation;
   const lines: string[] = [];
@@ -311,6 +336,7 @@ export function buildPlannerUserPrompt(input: PlannerInput): string {
     lines.push(`## 사용자 목적\n${input.goal.request}`);
   }
   lines.push(`## 대상 사이트\n${input.siteDisplayName} (등록됨) · 현재 경로 ${obs.path} · 준비 ${obs.ready ? '됨' : '안 됨'} · 남은 행동 ${input.stepsLeft}`);
+  if (input.intent) lines.push(describeExecutionIntent(input.intent));
   if (input.knownTaskKeys && input.knownTaskKeys.length) lines.push(`## 이 대상에서 확인된 업무 키\n${input.knownTaskKeys.join(', ')}`);
   if (input.patterns && input.patterns.length) {
     const pref = input.patterns.filter((p) => p.polarity === 'preferred').map((p) => `- [${p.stageKey}] ${describeStrategy(p.strategy)} (확인 ${p.verifiedCount}회)`);
@@ -548,6 +574,8 @@ export interface WorkAgentRunInput {
    * 재개는 저장된 관찰을 되살리지 않는다 — 현재 화면을 새로 관찰하고 planner 를 re-prime 한다.
    */
   runId?: string;
+  /** Personal Assistant Phase B — Assistant Planning 의 실행 지시. 없으면 종전 동작(지시 없이 실행). */
+  intent?: ExecutionIntent;
 }
 
 /** runWorkAgent 선택 의존성. strongPlanner 는 복구 계층의 "더 강한 추론" 경로(§11·§12) — 없으면 escalation 없이 기존대로 동작한다. */
@@ -584,6 +612,11 @@ export interface WorkAgentRunResult {
    * Assistant 가 Task 에 올리는 용도다(HTTP 응답에는 싣지 않는다). 원문 · 값이 아니다.
    */
   taskKey?: string | null;
+  /**
+   * Personal Assistant Phase B — 실행 결과의 주장 + 근거(enum · 불리언). Task 상태가 아니다 — Assistant 가 완료 계약으로 판정한다.
+   * HTTP 응답에는 싣지 않는다.
+   */
+  report?: ExecutionReport;
 }
 
 /**
@@ -995,6 +1028,18 @@ export async function runWorkAgent(
       target: targetOutcome,
       workflow: { ...workflow },
       taskKey: declaredTask ?? resumeFrame?.taskKey ?? null,
+      report: {
+        claim: kind === 'completed' ? 'execution_complete'
+          : kind === 'waiting_for_user' ? 'needs_user'
+          : kind === 'taken_over' ? 'handed_over'
+          : runCreated ? 'stopped' : 'not_started',
+        runOpened: runCreated,
+        resultObserved: state.history.some((h) => h.status === 'success'
+          && (h.navigated === true || h.action.kind === 'read_text' || h.action.kind === 'read_table')),
+        replayVerified: workflow.replay === 'completed',
+        plannerMode,
+        taskTypeProposal: declaredTask ?? resumeFrame?.taskKey ?? null,
+      },
     };
   };
   /** QUESTION — AI 가 막혀 사용자 판단/답이 필요하다. logical run 유지 · 답하면 같은 runId 로 재개(§조건 5·검증 A). */
@@ -1174,6 +1219,9 @@ export async function runWorkAgent(
     }
   };
   await recallExperience(null);
+  // Phase B — 같은 Task 를 이어가면 Assistant 가 이전 run 의 업무 키를 준다. 경험 조회 키를 맞출 뿐 절차를 정하지 않는다.
+  const hintKey = input.intent?.taskTypeHint ?? null;
+  if (hintKey && !knownTaskKeys.includes(hintKey)) knownTaskKeys = [hintKey, ...knownTaskKeys];
   if (resumeFrame?.taskKey) await recallExperience(resumeFrame.taskKey);
   /** 방법 label 에 들어가면 안 되는 이번 run 의 값 — 재개 답 + 지금까지 입력한 글. */
   const forbiddenValues = (): string[] => {
@@ -1538,6 +1586,7 @@ export async function runWorkAgent(
         ...(knownTaskKeys.length ? { knownTaskKeys } : {}),
         ...(patterns.length ? { patterns } : {}),
         ...(methodDiscovery ? { methodDiscovery } : {}),
+        ...(input.intent ? { intent: input.intent } : {}),
       });
       methodDiscovery = undefined;
       aiMs += Date.now() - planT0;

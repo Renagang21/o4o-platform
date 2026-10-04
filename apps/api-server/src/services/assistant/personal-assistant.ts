@@ -14,9 +14,14 @@
  *   2. 실행을 위임한다 — 기존 work-agent 본체를 그대로 호출(planner · runtime 무변경)
  *   3. 결과를 Task 로 올린다 — run 을 Task 에 붙이고(Task 1 : N run) 상태를 갱신
  *
- * 이 모듈이 하지 않는 일 (Phase B 이후)
- *   - 업무 판단(Assistant Planning)과 화면 조작 판단(Execution Planning)의 분리 · 완료 계약의 영속화
- *   - 요청 원문 · 대화 저장 (V2 §17 Gate 대상) — 원문은 실행 본체로만 흘러가고 Task 에는 닿지 않는다
+ * Phase B (WO-O4O-PERSONAL-ASSISTANT-PHASE-B-PLANNING-SEPARATION-V1) — Assistant Planning ≠ Execution Planning
+ *   Assistant → Task → **Assistant Planning(assistant-planning.ts) → ExecutionIntent** → Execution(planner 는 화면 행동만)
+ *   → **ExecutionReport(주장 + 근거)** → Assistant 가 완료 계약으로 Task 상태 판정
+ *   Execution 의 `done` 은 실행 결과의 주장일 뿐 Task 완료가 아니다.
+ *
+ * 이 모듈이 하지 않는 일
+ *   - 완료 계약의 영속화 · Knowledge / Shared Candidate 배선(후속 단계)
+ *   - 요청 원문 · 대화 저장 (V2 §17 Gate 대상) — 원문은 실행 본체로만 흘러가고 Task · 실행 지시에는 닿지 않는다
  *
  * Task 저장이 실패해도 업무 실행은 막지 않는다 — Task 는 Phase A 에서 추적 기반이지 실행 권한의 근거가 아니다.
  * 그 경우 taskId 없이 기존 응답 그대로 돌려주고 로그만 남긴다(값 · 원문 없이).
@@ -36,15 +41,22 @@ import {
   type AssistantTaskStatus,
 } from './assistant-task-store.js';
 import { resolveTaskOwnership } from './task-ownership.js';
+import { judgeTaskStatus, planAssistantTask, type AssistantPlan } from './assistant-planning.js';
+import type { ExecutionIntent, ExecutionReport } from '../ai-tools/work-agent-contract.js';
 
 /** 기존 work-agent 본체의 응답(HTTP 직전 형태). `execution` 은 직렬화되지 않는 내부 요약이다. */
 export interface WorkExecutionReply {
   status: number;
   body: Record<string, unknown>;
-  execution?: { taskKey: string | null };
+  execution?: { taskKey: string | null; report?: ExecutionReport };
 }
 
-export type WorkExecutor = (userId: string, workBody: Record<string, unknown>) => Promise<WorkExecutionReply>;
+/** 실행 위임 — Assistant 가 정한 실행 지시(intent)를 함께 넘긴다. */
+export type WorkExecutor = (
+  userId: string,
+  workBody: Record<string, unknown>,
+  intent?: ExecutionIntent,
+) => Promise<WorkExecutionReply>;
 
 export interface AssistantWorkInput {
   /** 인증 세션의 사용자. */
@@ -65,6 +77,15 @@ export interface AssistantTaskSummary {
 export interface AssistantWorkOutcome {
   reply: WorkExecutionReply;
   task: AssistantTaskSummary | null;
+  /** 이번 실행에 쓴 Assistant Planning 결과(로그 · 테스트용 — 응답에 싣지 않는다). */
+  plan: AssistantPlan;
+}
+
+/** Task 상태 — 실행 보고가 있으면 Assistant 가 완료 계약으로 판정하고, 없으면(403 · 400 등 실행 전 종료) 응답으로 정한다. */
+export function taskStatusFor(plan: AssistantPlan, reply: WorkExecutionReply): AssistantTaskStatus {
+  const report = reply.execution?.report;
+  if (reply.status === 200 && report) return judgeTaskStatus(plan.intent.completion, report);
+  return taskStatusFromWorkReply(reply);
 }
 
 /**
@@ -137,12 +158,28 @@ export async function runAssistantWorkTask(
     });
   }
 
-  // ── Task → Execution (기존 본체 그대로) ──
-  const reply = await execute(input.userId, input.workBody);
-  if (!task) return { reply, task: null };
+  // ── Assistant Planning — 이번 Task 의 수행 방향(구조만 · 원문 없음) ──
+  const plan = planAssistantTask({
+    taskId: task?.taskId ?? null,
+    resuming: typeof input.workBody.runId === 'string' && input.workBody.runId.length > 0,
+    priorTaskTypeKey: task?.taskTypeKey ?? null,
+    userMethodHint: typeof input.workBody.recoveryHint === 'string' && input.workBody.recoveryHint.trim().length > 0,
+    // 자기 Experience 는 아직 실행 노드에 있다(V2 §9-4). 노드가 있으면 Execution 이 현재 화면과 함께 읽는다.
+    nodeExperienceReachable: true,
+  });
+  logger.info('assistant plan', {
+    taskId: plan.intent.taskId,
+    reason: plan.reason,
+    startMode: plan.intent.startMode,
+    taskTypeHint: plan.intent.taskTypeHint !== null,
+  });
 
-  // ── Execution → Task ──
-  const status = taskStatusFromWorkReply(reply);
+  // ── Task → Execution (실행 지시와 함께 위임 · 화면 판단은 Execution 이 한다) ──
+  const reply = await execute(input.userId, input.workBody, plan.intent);
+  if (!task) return { reply, task: null, plan };
+
+  // ── Execution → Task (Assistant 가 완료 계약으로 판정) ──
+  const status = taskStatusFor(plan, reply);
   const data = (reply.body.data ?? {}) as Record<string, unknown>;
   const goal = (data.goal ?? {}) as Record<string, unknown>;
   const target = (data.target ?? {}) as Record<string, unknown>;
@@ -156,20 +193,23 @@ export async function runAssistantWorkTask(
       status,
       targetKind: target.targetType,
       targetId: target.targetId ?? goal.siteId,
-      taskTypeKey: reply.execution?.taskKey ?? null,
+      taskTypeKey: reply.execution?.report?.taskTypeProposal ?? reply.execution?.taskKey ?? null,
     });
+    const report = reply.execution?.report;
     logger.info('assistant task updated', {
       taskId: task.taskId,
       ownershipScope: task.ownershipScope,
       status: updated?.status ?? status,
       runLinked: typeof data.runId === 'string',
+      executionClaim: report?.claim ?? null,
+      resultObserved: report ? report.resultObserved || report.replayVerified : null,
     });
-    return { reply, task: { taskId: task.taskId, status: updated?.status ?? status } };
+    return { reply, task: { taskId: task.taskId, status: updated?.status ?? status }, plan };
   } catch (err) {
     logger.warn('assistant task update failed', {
       taskId: task.taskId,
       error: err instanceof Error ? err.name : 'unknown',
     });
-    return { reply, task: { taskId: task.taskId, status: task.status } };
+    return { reply, task: { taskId: task.taskId, status: task.status }, plan };
   }
 }

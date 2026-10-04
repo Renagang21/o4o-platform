@@ -531,12 +531,12 @@ V1 에서 **승계하지 않는 것**: Local-first 저장 원칙(ARCH §5 의 Lo
 
 ---
 
-## 23. 현재 구현과의 대응 (2026-10-03 · 시점 기록)
+## 23. 현재 구현과의 대응 (2026-10-04 · 시점 기록)
 
 | 계층 | 판정 | 근거 |
 |---|---|---|
-| L1 Personal Assistant | ABSENT | GAP-CENSUS §F |
-| L2 Task | PARTIAL (암묵 — planner 가 선언하는 task key) | GAP-CENSUS §F · §J |
+| L1 Personal Assistant | PARTIAL — 논리 계층(Assistant = f(userId)) · Assistant Planning(결정론 ExecutionIntent) · 완료 판정. 기억 · 대화 맥락 없음(단계 C) | Phase A · B CHECK |
+| L2 Task | EXISTS — `assistant_tasks` 1급 객체 · Task 1:N run · 완료 계약으로 상태 판정(planner `done` 은 주장) | Phase A · B CHECK |
 | L3 Skill / Discovery | PARTIAL (Candidate · adapter seed · Strong-first routing) | GAP-CENSUS §J · §M |
 | L4 Execution | EXISTS | GAP-CENSUS §F |
 | L5 Execution Node | EXISTS (단일 노드 가정 · 다중 노드 `ambiguous`) | GAP-CENSUS §I |
