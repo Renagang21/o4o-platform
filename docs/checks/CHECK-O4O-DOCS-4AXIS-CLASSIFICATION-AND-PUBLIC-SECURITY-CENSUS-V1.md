@@ -6,7 +6,8 @@
 
 docs Markdown 4축 분류(CANONICAL · DEVELOPER · INTERNAL_SECURITY · HISTORY) · PUBLIC 저장소 전제 보안 census. 후속 문서 정비 WO 의 입력 자료이며 미해결 판단 사항을 포함한다 (LIFECYCLE-RULES §10-2 ④).
 
-- **판정**: `SECURITY_REMEDIATION_REQUIRED` — 해소 조건 ① 보안 PR #279 main 반영 대기 · ② 로그인 불가 확인 완료 (§3-2)
+- **판정**: `READY_FOR_DOCUMENT_REFACTOR` (2026-10-04 갱신) — 보안 해소 조건 ① PR #279 main 반영(`f2204b2da`) · ② 로그인 불가 확인 모두 완료. 이전 판정 `SECURITY_REMEDIATION_REQUIRED` 의 근거는 §3-2 에 보존
+- **정본 집합 확정**: §7 (2026-10-04, `WO-O4O-DOCS-CANONICAL-SET-CONFIRMATION-V1`)
 - **기준**: `origin/main` @ `35979b119` · 2026-10-03 — PR #275(`d5e87b18e`, docs 데이터 12,108 파일 분리) 반영 후
 - **하지 않은 것**: 문서 이동 · 삭제 · rename · DB write · credential 변경 · secret 값 기록 · history rewrite
 - **방법**: `git archive` 로 docs + 루트 진입 문서 4개를 저장소 밖에 추출 → 위치 기반 4축 판정 + 상단 상태 표기 + 현행 문서 역참조(상대 링크 · WO/CHECK/IR 식별자) + 보안 패턴 스캔(값은 형태만 기록) → 보안 hit 전수 수동 판정. 전체 git history 는 고신뢰 secret 패턴으로 별도 스캔. 계정 로그인 가능 여부는 운영 DB read-only SELECT(Auth Proxy · `default_transaction_read_only=on`).
@@ -15,8 +16,9 @@ docs Markdown 4축 분류(CANONICAL · DEVELOPER · INTERNAL_SECURITY · HISTORY
 
 ## 0. 결론
 
-1. 판정 **SECURITY_REMEDIATION_REQUIRED** — public HEAD 의 기록물 1 파일에 **테스트 계정 4건 + 운영자(admin 역할) 계정 1건의 비밀번호 평문**이 남아 있다(§3-2). 계정 활성 여부와 관계없이 과거 · 테스트 비밀번호도 문서에 둘 수 없으므로(LIFECYCLE-RULES §10-4) 이 판정이 문서 정비보다 앞선다.
-   - 운영 DB read-only 확인 결과 **이 평문들로 로그인 가능한 계정은 없다** (§3-2). 남은 조건은 HEAD 평문 제거(PR #279) 의 main 반영뿐이다.
+1. 현재 판정 **READY_FOR_DOCUMENT_REFACTOR** (2026-10-04) — 보안 remediation 완료.
+   - 이력: 2026-10-03 판정은 `SECURITY_REMEDIATION_REQUIRED` 였다. public HEAD 의 기록물 1 파일에 테스트 계정 4건 + 운영자(admin 역할) 계정 1건의 비밀번호 평문이 있었기 때문이다(§3-2).
+   - 해소: HEAD 평문 제거 PR #279 main 반영(`f2204b2da`) + 운영 DB read-only 로 **이 평문들로 로그인 가능한 계정 없음** 확인. history 잔존은 수용(rewrite 범위 밖).
    - 그 밖에는 HEAD 와 git history 모두에서 key · token 류 실제 secret 을 찾지 못했다(§3-1). history rewrite 는 범위 밖.
 2. 대상 `.md` 3,730 (docs 3,726 + 루트 4) 중 **HISTORY 성격 3,431 (92%)**. 현재 기준 문서는 CANONICAL 220 + DEVELOPER 79 = 299.
 3. HISTORY 중 **345 건은 현재 정본 · 진입 문서 · 리팩토링 상태판이 참조 중**이다. `docs/archive/**` 의 461 건은 이미 archive 위치다. 나머지 **2,625 는 위치 기준 1차 후보군일 뿐 이동 가능 목록이 아니다** — 그중 종료 상태를 명시한 문서는 512 건이고 73 건은 여전히 진행 · 대기 상태를 적고 있다(§2). 실제 archive/move 후보는 문서별 상태와 트랙 종료 확인 후 별도 WO 에서 산출한다.
@@ -97,11 +99,11 @@ checks 1,713 · investigations 727 · work-orders 149 · ir 33 · 기타 3 (audi
 
 한계: 일반 비밀번호 문자열은 정규식으로 history 전수 판정이 불가능하다.
 
-### 3-2. Git 에 있으면 안 됨 — 1 파일 → **SECURITY_REMEDIATION_REQUIRED**
+### 3-2. Git 에 있으면 안 됨 — 1 파일 → 해소 (2026-10-04 · 당시 판정 `SECURITY_REMEDIATION_REQUIRED`)
 
 | 위치 | 내용 | 조치 |
 |---|---|---|
-| `archive/work-orders/` 의 과거 E2E 보고서 1건 (경로는 `docs/local/` 미추적 목록에만 기록) | 과거 E2E 테스트 계정 4건 + **운영자(admin 역할) 계정 1건**의 비밀번호 평문 (운영자 건은 최초 census 의 정규식이 놓쳤고 PR #279 Codex 리뷰가 발견) | 별도 보안 PR #279 에서 `[REDACTED_PASSWORD]` 로 치환 (main 반영 대기). 같은 값은 저장소의 다른 파일에 없다. history 잔존은 수용(선행 IR 판단 D3) |
+| `archive/work-orders/` 의 과거 E2E 보고서 1건 (경로는 `docs/local/` 미추적 목록에만 기록) | 과거 E2E 테스트 계정 4건 + **운영자(admin 역할) 계정 1건**의 비밀번호 평문 (운영자 건은 최초 census 의 정규식이 놓쳤고 PR #279 Codex 리뷰가 발견) | 별도 보안 PR #279 에서 `[REDACTED_PASSWORD]` 로 치환 — main 반영 완료(`f2204b2da`). 같은 값은 저장소의 다른 파일에 없다. history 잔존은 수용(선행 IR 판단 D3) |
 
 **로그인 가능 여부 — 운영 DB read-only 확인 (2026-10-03)**:
 
@@ -115,7 +117,7 @@ checks 1,713 · investigations 727 · work-orders 149 · ir 33 · 기타 3 (audi
 
 → 비밀번호 hash 가 존재할 수 있는 곳은 현행 credential 테이블뿐이고, 그 보유자는 공개 Demo 계정 2개뿐이다. Demo 비밀번호는 노출된 평문들과 길이부터 다르다. **노출된 5개 평문으로 로그인 가능한 계정은 없다.** credential 폐기 · 교체는 필요 없다. 조회는 집계 · 존재 여부만 출력했고 이메일 · hash 는 출력하지 않았다 (Demo 계정 식별자는 baseline 에 이미 공개).
 
-해소 조건: ① PR #279 main 반영 (대기) ② 로그인 불가 확인 (**완료**). ① 이 끝나면 이 절과 §0 판정을 갱신한다.
+해소 조건: ① PR #279 main 반영 (**완료** · `f2204b2da`) ② 로그인 불가 확인 (**완료**) → 2026-10-04 해소. §0 판정 갱신 완료.
 
 **재스캔 — 탐지 규칙 검증 포함**: 운영자 건 발견 후 docs 전체 `.md` 를 두 규칙으로 다시 스캔했다. 알려진 양성 5건이 남아 있는 main 기준 tree(redact 전)에서 돌려 규칙이 실제로 잡는지 먼저 확인했다.
 
@@ -160,16 +162,16 @@ checks 1,713 · investigations 727 · work-orders 149 · ir 33 · 기타 3 (audi
 | 기록물 위치 이전 1차 후보군 | 2,625 | **이동 가능 목록 아님.** 종료 명시 512 만 검토 대상 · 진행/대기 73 이동 금지 · 판독 불가 2,040 유지. 확정은 별도 WO (문서별 상태 + 트랙 종료 확인) |
 | 이미 archive 위치 | 461 | 이전 대상 아님 |
 | 이동 보류 (현재 참조) | 345 | 유지 |
-| SUPERSEDED 정본 → archive | 3 | 별도 WO |
-| HEAD redact | 1 | **선행 필수** — PR #279 |
-| 저장소 밖 이관 내용 판정 | 현행 4 + 기록 17 | 계약 · 정산 서술 |
+| SUPERSEDED 정본 → archive | 3 | 이동 보류 — 링크 결합으로 history 정비 WO (§7-2) |
+| HEAD redact | 1 | **완료** — PR #279 (`f2204b2da`) |
+| 저장소 밖 이관 내용 판정 | 현행 4 + 기록 17 | 현행 4 = PUBLIC 유지(§7-3) · 기록 17 은 history 정비 때 |
 
 ---
 
 ## 5. 후속 WO 제안
 
-1. **보안 remediation 마무리 (최우선)** — PR #279 main 반영 → 이 CHECK §0 · §3-2 판정 갱신 (로그인 불가 확인은 완료)
-2. **현재 기준 문서 집합 확정** — CANONICAL 상태 헤더 없음 69 판정 · SUPERSEDED 3 archive · 계약/정산 4건 공개 적합성 판정
+1. ~~보안 remediation 마무리~~ — **완료** (2026-10-04 · PR #279 · §0 · §3-2 갱신)
+2. ~~현재 기준 문서 집합 확정~~ — **수행** (2026-10-04 · §7). 남은 항목은 §7-5
 3. **기록물 이동 후보 확정** — 1차 후보군 2,625 에서 문서별 상태 · 트랙 종료를 확인해 실제 후보를 산출한 뒤 위치 이전 (리팩토링 안정 후, 링크 · 테스트 동반)
 
 ---
@@ -180,3 +182,63 @@ checks 1,713 · investigations 727 · work-orders 149 · ir 33 · 기타 3 (audi
 - 정본 수정 2 건 (사용자 확정 2026-10-04): `rules/DOCUMENT-LIFECYCLE-AND-ARCHIVE-RULES-V1` §10-4 Demo 예외 · `baseline/O4O-CANONICAL-DEMO-ACCOUNTS-V1` §4 격리 근거 — 충돌 해소
 - 진입점 포인터 2 건 (사용자 승인 2026-10-04): `CLAUDE.md` DB · 보안 경계 절 · `AGENTS.md` 비밀번호 금지 줄에 "예외는 공개 Demo credential 하나뿐 — 조건은 LIFECYCLE-RULES §10-4" 한 줄씩. 예외 조건은 복제하지 않고 §10-4 를 SSOT 로 둔다
 - 별도 WO 제안 3 건 (§5)
+
+---
+
+## 7. 정본 집합 확정 (2026-10-04 · `WO-O4O-DOCS-CANONICAL-SET-CONFIRMATION-V1`)
+
+기준 `origin/main` @ `bc1a0bcdd`. 대상: canonical 폴더(baseline · architecture · platform · rbac · rules · adr · decisions · reference · design · services · 서비스 소폴더) 중 상단 15줄에 상태 줄이 없는 **82건**(§1 의 69 는 상단 3,000자 기준이었다) + SUPERSEDED 3 + 계약 · 정산 4. 문서별로 앞부분을 읽고 CANONICAL-INDEX · refactoring/status · 코드 존재(`git grep`)와 대조했다. 운영 DB 조회 없음.
+
+### 7-1. 82건 판정
+
+| 판정 | 수 | 조치 |
+|---|---:|---|
+| ACTIVE (미등재) | 28 | 상위 정본 · 더 최신 문서 · 코드와 교차검증한 뒤 나눴다 (7-1-A). **ACTIVE 1** — `O4O-MARKET-TRIAL-OFFLINE-PAYMENT-CONFIRMATION-AUDIT-POLICY-V1`(상위 `OFFLINE-SETTLEMENT-PAYMENT-POLICY` 가 content-only 와의 관계를 명시 정합 · 리뷰 확인). 19건은 §9 판정 대기(충돌 · stale 10 + "등재 후보 — 본문 검증 전" 9) · 등재 불필요 8(폴더 README 2 · Catalog Import 모듈 문서 3 · ADR 1 · HFF 초안 저장 설계 1 · 색인 자신). 함께 미등재였던 현행 SSOT 2건(`O4O-MARKET-TRIAL-CONTENT-ONLY-DOMAIN-BOUNDARY-V1` · `O4O-MARKET-TRIAL-OFFLINE-SETTLEMENT-PAYMENT-POLICY-V1`)을 ACTIVE 로 추가 → 색인 ACTIVE 3행. 색인 §0 에 "새 ACTIVE 등재는 본문 전수 검증 뒤" 규칙 추가 |
+| ACTIVE (등재 · 일치) | 15 | 변경 없음 |
+| 색인 불일치 | 8 | 색인 §9 "판정 대기" 로 이동하고 유효 절 · stale 절을 행에 명시. 본문 정합은 후속 |
+| 기록물이 canonical 폴더에 있음 | 17 | 11건은 `ACTIVE · 기록물 — 현재 기준 정본 아님` 상태 줄 — 제안한 후속 조치의 완료 여부가 미확인이라 COMPLETED 로 닫지 않는다(보류 IR 규칙). 산출물이 구현됐고 후속이 없는 `SERVICE-PRODUCT-LAYER-PREP-V1` 1건만 `COMPLETED`. Promotion 계획 · 매트릭스 2건은 미실행 초안이라 `DRAFT`. MINEROCK600 media-pilot 3건은 진행 중 트랙이라 표기하지 않음 |
+| SUPERSEDED | 2 | `NETURE-DOMAIN-ARCHITECTURE-FREEZE-V1` → V3 · `DECISION-O4O-IDENTITY-ARCHITECTURE-V2-ADOPTION-V1` → IDENTITY V3 상태 줄 |
+| OBSOLETE 후보 | 1 | `ALPHA-STATUS-DISPLAY-STANDARD` — 서비스 코드에서 표시는 사라졌으나 PLATFORM-CONTENT-POLICY 가 같은 단계를 현행으로 사용하고 단계 종료 결정이 없어 OBSOLETE 로 표기하지 않고 색인 §9 판정 대기 (코드 부재만으로 폐기 판정하지 않음) |
+| 판정 불가 | 11 | 상태 줄 없음 = ACTIVE 유지(LIFECYCLE §6 · CLAUDE.md §16-6). 아래 7-4 |
+
+#### 7-1-A. ACTIVE 후보 28건 교차검증
+
+처음에는 문서 앞부분만 보고 28건을 ACTIVE 로 등재하려 했으나, PR 리뷰에서 상위 정본과 충돌하는 문서가 연속으로 나왔다. 그래서 전체를 다시 **문서 전문 · 상위 정본(ROLE-WORKSPACE · COMMERCE-BOUNDARY · SUPPLIER-DOMAIN · IDENTITY-V3 · STORE-ACCESS · Frozen) · 같은 주제의 더 최신 문서 · 코드**와 대조했다. 교차검증 뒤에도 리뷰가 "깨끗" 판정 문서에서 충돌을 추가로 찾았으므로, 오래된 미등재 문서는 **본문 전수 검증 전에는 ACTIVE 로 올리지 않는다**는 기준으로 정리했다(색인 §0).
+
+| 결과 | 문서 |
+|---|---|
+| §9 "등재 후보 — 본문 검증 전" (교차검증에서 충돌 미발견) | SHARED-SPACE-FRAME-PRINCIPLE · SHARED-SPACE-STANDARD-BLOCKS · DISTRIBUTION-EVIDENCE-SEED-PRINCIPLE |
+| §9 "등재 후보 — 본문 검증 전" (리뷰에서 충돌 · stale 발견, 행에 명시) | DESIGN-STORE-LIBRARY-AND-ASSET(`asset_snapshots` 소유 범위) · DATA-CLEANUP-IDENTIFICATION-SAFETY(write probe 절) · STANDARD-LIST-PHASE1(대표 화면 은퇴) · TEMPLATE-PRESETS(preset 소멸 · KPA hero 값) · DESIGN-STORE-EXECUTION-MANAGEMENT(`signage_playlists` 서술) · APP-CONTENT-STANDARD-SPEC(색상 hex 고정 · 없는 API) |
+| ACTIVE | MARKET-TRIAL-OFFLINE-PAYMENT-CONFIRMATION(상위 OFFLINE-SETTLEMENT-PAYMENT-POLICY 가 "오프라인 입금 기록은 content-only 와 충돌하지 않고 보존" 으로 정합 — 처음 충돌로 본 판단을 정정) |
+| §9 판정 대기 (충돌 · stale) | STORE-OWNER-RBAC(내부 모순) · PLAYWRIGHT-MCP(고정 버전 stale) · DISTRIBUTION-FUNDING-INITIAL(제품 정산 · 매장 랜딩 · 첫 주문 추적 절이 content-only 와 충돌) · EventOffer-Operation-Policy(승인 계약과 충돌) · DESIGN-KPA-STORE-PRODUCT-DETAIL(소유권 대체) · APP-STANDARD-LIST-AND-MATRIX(Neture Signage 채택 보류와 충돌) · DESIGN-PRODUCT-AI-CONTENT-OWNERSHIP(§1~§4 · §8 유효, §7 · POP 절 stale) · SIGNAGE-APPROVAL(상태 모델이 구현과 다름) · CONTENT-META(은퇴 테이블을 정본으로 서술) · INTERNAL-BETA-RUNBOOK(없는 endpoint · 미기록 지표) |
+
+추가 발견: `DROPSHIPPING-ORDER-RELAY` · `-SETTLEMENT-MODEL` · `-STATE-MODEL` 3건은 본문에 `Status: Active` 가 있으나 Dropshipping 도메인 코드 0 · 대응 패키지 없음 → 상단에 `OBSOLETE` 상태 줄(원문 Status 줄 보존).
+
+### 7-2. SUPERSEDED 3건 (§1) — archive 이동 보류
+
+`O4O-IDENTITY-ARCHITECTURE-V1` · `-V2` · `O4O-AUTOMATION-AGENT-ARCHITECTURE-V1` 은 SUPERSEDED 상태 줄과 존재하는 대체 문서를 이미 갖췄다. archive 이동은 canonical 문서 13곳 · 기록물 34곳 · 코드 주석 1곳의 링크를 함께 바꿔야 해 **history 정비 WO 로 넘긴다**. 색인 §6 의 AUTOMATION-V1 행(색인 어휘 밖 `SUPERSEDED` 상태)은 제거했다 — 대체 문서 V2 는 등재돼 있다.
+
+### 7-3. 계약 · 정산 4건 — 모두 PUBLIC
+
+`DROPSHIPPING-SETTLEMENT-MODEL` · `DROPSHIPPING-STATE-MODEL` · `O4O-DISTRIBUTION-FUNDING-INITIAL-OPERATION-MODEL-V1` · `O4O-OPERATOR-NON-APPROVAL-UX-BASELINE-V1` 의 정산 · 수수료 서술은 개념(필드 · 규칙)과 예시 금액뿐이다. 실제 계약 요율 · 거래처명 · 단가는 없다 → **저장소 유지(PUBLIC)**. 기록물 17건은 history 정비 때 같은 기준으로 본다.
+
+### 7-4. 판정 불가 11건 (ACTIVE 유지 · 후속 판단 필요)
+
+11건 = 아래 표 10건 + `baseline/CHECKOUT-STABLE-DECLARATION-V1`(문서 스스로 B2C storefront `UNKNOWN` — 색인 §9 판정 대기로 등재).
+
+| 문서 | 이유 |
+|---|---|
+| `architecture/O4O-KPA-OPERATOR-CANONICAL-STATE-V1` | 2026-05 시점 스냅샷인데 SSOT 를 자처 — 역할 업무공간 리팩터링 후 재검증 표기 없음 |
+| `baseline/NETURE-CAMPAIGN-ARCHITECTURE-FREEZE-V2` | 런타임 코드 0(migration 만) — 운영 테이블 존재 확인 전에는 OBSOLETE 판정 보류 |
+| `baseline/NETURE-DOMAIN-BOUNDARY-V1` | Order · Campaign 소유 서술이 SUPPLIER-DOMAIN-BOUNDARY(FROZEN) · B2B 계약과 겹침 |
+| `baseline/operations/KPA-MEMBERS-PRESENCE-DRIFT-DIAGNOSTICS` | backfill WO 산출물 — backfill 종료 여부 미확인 |
+| `platform/operator/O4O-OPERATOR-USER-MANAGEMENT-STANDARD-V1` | 운영자 비밀번호 변경을 표준으로 둠 — 해당 UI 코드 0 |
+| `platform/promotion/` CORE-EXTENSION-BOUNDARY · DATA-MODEL-AND-API-SCOPE · SLOT-CATALOG · UI-COMPONENT-STRATEGY (4) | `/cms/slots` API 는 존재 · 설계한 공통 UI 는 미구현 |
+| `media-pilot/minerock600/CHARACTER-SHEET-…-V1` | 파일럿 산출물(파일럿 ≠ Canonical) — 트랙 진행 중 |
+
+### 7-5. 후속 (별도 WO)
+
+1. §9 판정 대기로 등재한 28건(27행 — 색인 불일치 7 · 7-1-A 의 19 · CHECKOUT-STABLE 1 · ALPHA-STATUS 1. `baseline/README` 는 2번)의 본문 정합 · 판정. 본문 검증을 통과한 문서만 ACTIVE 로 올린다 — 특히 `CLAUDE.md` 가 직접 가리키는 `O4O-STORE-RULES` · `DEBUG-SSR-TEST-PAGE-GUIDE-V1` 우선
+2. `docs/baseline/README.md` 의 상태 표기(3-ROLE-FLOW · KPA-ROLE-MATRIX · ROLE-POLICY · E-COMMERCE)가 색인과 다름 — 색인 기준으로 정렬
+3. `O4O-CORE-FREEZE-V1`(F10) 의 `RefreshToken.ts` 목록 stale(Identity V3 `refresh_tokens=DEAD_RETIRE`) — Frozen 본문이라 명시적 WO
+4. 판정 불가 11건 결정 · SUPERSEDED 3 과 기록물 14건의 위치 이전은 history 정비 WO 에서

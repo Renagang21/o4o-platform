@@ -1,5 +1,7 @@
 # Dropshipping State Model Architecture (DS-4.3)
 
+> **상태**: OBSOLETE · Dropshipping 도메인 코드 0 · 대응 패키지 없음(refactoring/status.md) — 현행 기준 아님. 아래 Status 줄은 원문 보존 · **표기일**: 2026-10-04
+
 > **이 문서는 Dropshipping의 모든 상태 모델에 대한 단일 진실 원본(Single Source of Truth)이다.**
 > 모든 상태 전이는 이 문서에 정의된 규칙만 따른다.
 > 정의되지 않은 상태 전이는 버그로 간주된다.

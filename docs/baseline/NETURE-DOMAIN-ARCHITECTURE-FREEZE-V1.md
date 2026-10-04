@@ -1,5 +1,7 @@
 # DOC-NETURE-DOMAIN-ARCHITECTURE-FREEZE-V1
 
+> **상태**: SUPERSEDED · **대체 문서**: [`NETURE-DOMAIN-ARCHITECTURE-FREEZE-V3`](NETURE-DOMAIN-ARCHITECTURE-FREEZE-V3.md) · **표기일**: 2026-10-04
+
 **Neture Price & Distribution Architecture Freeze Declaration**
 
 > **⚠️ Version Note**: This document (V1, 2026-02-28, Beta 3 stage) has been superseded by

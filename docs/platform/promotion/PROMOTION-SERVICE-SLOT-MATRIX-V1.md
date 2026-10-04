@@ -1,5 +1,7 @@
 # PROMOTION_SERVICE_SLOT_MATRIX_V1
 
+> **상태**: DRAFT · Promotion 슬롯 적용 매트릭스 초안(문서 끝 `Status: Draft`) — 공통 UI 미구현. 실행 · 폐기 결정 전까지 현재 기준 문서 아님 · **표기일**: 2026-10-04
+
 > 서비스별 슬롯 적용 매트릭스
 
 ---
