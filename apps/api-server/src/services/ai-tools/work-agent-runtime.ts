@@ -92,8 +92,11 @@ import {
 } from './work-run-executor.js';
 // Experience Model V1 Phase 2 — User Assistance · Correction(WO-O4O-AUTOMATION-USER-ASSISTANCE-AND-CORRECTION-V1).
 import {
+  deriveVerifiedPatterns,
   describeStrategy,
+  failedAlternativeOf,
   isPlainValueAnswer,
+  mergeRecalledPatterns,
   pickRecalledContext,
   pickSafeExperienceRecall,
   stripLabels,
@@ -102,6 +105,7 @@ import {
   type ProposalAsk,
   type ProposalUserInput,
   type RecalledPattern,
+  type RunResumeFrame,
   type Strategy,
   type WorkAssistanceEvent,
 } from './work-assistance.js';
@@ -736,6 +740,8 @@ export async function runWorkAgent(
   let userInput: ProposalUserInput | null = null;
   /** 재생 전 의미 검증이 멈춘 자리 — 재개 답이 값이면 그 자리만 채워 결정적으로 잇는다. */
   let questionReplay: { candidateId: string; stepIndex: number } | null = null;
+  /** Cloud Continuity — 이번 segment 의 구조화 도움 · 교정 이벤트(노드에 보낸 것과 같은 값). 검증 방법 파생의 근거. */
+  let lastAssistanceEvent: WorkAssistanceEvent | null = null;
   // Experience 의 actor 는 실제로 계획한 planner 경로다 — Discovery(strongPlanner) 는 ai_strong, Experienced 는 ai_normal.
   const currentActor = (): ExperienceActor =>
     replaying ? 'deterministic' : strongPlanner && activePlanner === strongPlanner ? 'ai_strong' : 'ai_normal';
@@ -907,15 +913,19 @@ export async function runWorkAgent(
    * Phase 2 — QUESTION 으로 멈출 때 원래 업무의 **구조**를 Local 에 남긴다(재개 때 짧은 답이 새 목표가 되지 않게).
    * 방법은 label 없이(검증 전 화면 이름 미저장 · D5). 재생 전 의미 검증이 멈춘 자리면 그 위치(candidate · 단계 번호)만.
    */
+  /** 지금 멈춘 자리의 원래 업무 구조 — 노드 저장과 Cloud 재개 구조(M5)가 같은 값을 쓴다. 방법은 label 없이. */
+  const currentRunFrame = (): RunResumeFrame => ({
+    taskKey: declaredTask ?? resumeFrame?.taskKey ?? null,
+    stageKey: declaredStage ?? resumeFrame?.stageKey ?? null,
+    ask: declaredAsk ?? (questionReplay ? { kind: 'value_confirmation', slots: [] } : null),
+    strategy: stripLabels(declaredStrategy),
+  });
   const saveRunContext = async (): Promise<void> => {
     if (!deviceId || !goal.runId) return;
     try {
       await issueWorkRunContextSave(dataSource, { userId: ctx.userId, deviceId }, {
         runId: goal.runId, targetId: siteId,
-        taskKey: declaredTask ?? resumeFrame?.taskKey ?? null,
-        stageKey: declaredStage ?? resumeFrame?.stageKey ?? null,
-        ask: declaredAsk ?? (questionReplay ? { kind: 'value_confirmation', slots: [] } : null),
-        strategy: stripLabels(declaredStrategy),
+        ...currentRunFrame(),
         replay: questionReplay,
       });
     } catch (e) {
@@ -983,6 +993,7 @@ export async function runWorkAgent(
         validation: { result: validationResult, evidence: outcome?.evidence ?? null },
       };
       if (isCorrection) state.userCorrectionCount = (state.userCorrectionCount ?? 0) + 1;
+      lastAssistanceEvent = event;
       const r = await issueWorkRunAssistanceRecord(dataSource, { userId: ctx.userId, deviceId }, {
         runId: goal.runId, targetId: siteId, taskKey: declaredTask ?? resumeFrame?.taskKey ?? null, event,
       });
@@ -1039,6 +1050,15 @@ export async function runWorkAgent(
         replayVerified: workflow.replay === 'completed',
         plannerMode,
         taskTypeProposal: declaredTask ?? resumeFrame?.taskKey ?? null,
+        // Cloud Continuity — 기억 후보(구조만). 저장 여부 · 위치는 Assistant 가 레지스트리로 정한다.
+        memory: runCreated ? {
+          targetId: siteId,
+          targetKind: targetRef.targetType,
+          taskKey: declaredTask ?? resumeFrame?.taskKey ?? null,
+          verifiedPatterns: deriveVerifiedPatterns(declaredTask ?? resumeFrame?.taskKey ?? null, lastAssistanceEvent),
+          failedAlternative: failedAlternativeOf(declaredTask ?? resumeFrame?.taskKey ?? null, lastAssistanceEvent),
+          resumeFrame: kind === 'waiting_for_user' && goal.runId ? currentRunFrame() : null,
+        } : undefined,
       },
     };
   };
@@ -1205,17 +1225,38 @@ export async function runWorkAgent(
     } catch (e) {
       logger.warn('work-agent context recall failed', { code: (e as { code?: string })?.code ?? null });
     }
+    // Cloud Continuity — 이 노드 원장에 원래 업무 구조가 없으면(다른 PC 에서 질문했던 run) Assistant Memory 의 재개 구조를 쓴다.
+    // 재생 단계(Workflow Candidate)는 노드 원장에만 있다 — 다른 PC 에서는 결정적 재생 없이 현재 화면으로 이어간다.
+    const cloudFrame = input.intent?.memory?.resumeFrame ?? null;
+    if (!resumeFrame && cloudFrame) {
+      resumeFrame = { taskKey: cloudFrame.taskKey, stageKey: cloudFrame.stageKey, ask: cloudFrame.ask, strategy: cloudFrame.strategy };
+      logger.info('work-agent resume frame', { source: 'assistant_memory' });
+    }
   }
   /** 업무 키 목록(taskKey 없음) 또는 그 업무의 검증 패턴. 실패해도 계속한다. */
+  /** Cloud Continuity — Assistant Memory 가 넘긴 같은 소유 주체의 검증 방법 중 이 업무 키의 것. */
+  const cloudPatternsFor = (taskKey: string): RecalledPattern[] =>
+    (input.intent?.memory?.patterns ?? [])
+      .filter((p) => p.taskKey === taskKey)
+      .map((p) => ({ stageKey: p.stageKey, polarity: p.polarity, strategy: p.strategy, verifiedCount: p.verifiedCount }));
   const recallExperience = async (taskKey: string | null): Promise<void> => {
+    let nodePatterns: RecalledPattern[] = [];
     try {
       const r = await issueExperienceRecall(dataSource, ledgerCtx, { targetId: siteId, taskKey });
-      if (r.status !== 'success') return;
-      const safe = pickSafeExperienceRecall(r.safe);
-      if (taskKey === null) knownTaskKeys = safe.taskKeys ?? [];
-      else { patterns = safe.patterns ?? []; patternsRecalledFor = taskKey; }
+      if (r.status === 'success') {
+        const safe = pickSafeExperienceRecall(r.safe);
+        if (taskKey === null) knownTaskKeys = safe.taskKeys ?? [];
+        else nodePatterns = safe.patterns ?? [];
+      }
     } catch (e) {
       logger.warn('work-agent experience recall failed', { code: (e as { code?: string })?.code ?? null });
+    }
+    // 노드 원장(그 PC) + 소유 주체 Cloud 기억. 새 PC 라 노드가 비어도 검증된 방법이 이어진다 — 현재 화면으로 다시 검증하며 쓴다(P3).
+    if (taskKey !== null) {
+      const cloud = cloudPatternsFor(taskKey);
+      patterns = mergeRecalledPatterns(nodePatterns, cloud);
+      patternsRecalledFor = taskKey;
+      if (cloud.length) logger.info('work-agent patterns', { node: nodePatterns.length, cloud: cloud.length, merged: patterns.length });
     }
   };
   await recallExperience(null);
