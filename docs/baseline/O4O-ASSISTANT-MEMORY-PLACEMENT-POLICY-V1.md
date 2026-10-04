@@ -1,11 +1,11 @@
 # O4O-ASSISTANT-MEMORY-PLACEMENT-POLICY-V1
 
-> **상태**: DRAFT — **D1 · D2 · D4 결정됨 · D3 · D5 법률 확인 대기** (§8-1, 2026-10-04 사용자 결정). D3 · D5 가 확정되면 ACTIVE 로 바꾸고 V2 §17 Gate 통과를 별도 WO 로 기록한다. 그 전까지 Gate = PENDING · Cloud Memory 저장 구현 금지.
+> **상태**: DRAFT — **D1 · D2 · D4 결정됨 · D3 · D5 법률 확인 대기** (§8-1, 2026-10-04 사용자 결정). **Gate 의미 전환(2026-10-04 사용자 확정)**: V2 §17 은 개발 선행조건이 아니라 **실사용 확대 전 Compliance Gate** 다. §9 구현은 개발 단계에서 진행했고(Cloud Continuity), D3 · D5 의 법적 절차는 정식 운영 · 실사용 확대 전에 확인한다.
 > **작성일**: 2026-10-04
 > **근거 WO**: `WO-O4O-PERSONAL-ASSISTANT-MEMORY-LEGAL-DATA-PLACEMENT-GATE-V1`
 > **상위 정본**: [`O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2`](O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2.md) §0-1 (P3) · §6 · §9 · §10 · §17 — 이 문서는 V2 §9 · §17 의 **세부 배치 · 보존 · 고지 정책**이다. 충돌하면 V2 가 우선한다.
 > **관련 정본**: [`O4O-AUTOMATION-EXPERIENCE-MODEL-V1`](O4O-AUTOMATION-EXPERIENCE-MODEL-V1.md) §15 · §16 · [`O4O-PRIVACY-POLICY-V1.0`](O4O-PRIVACY-POLICY-V1.0.md) · [`O4O-PRIVACY-DATA-RETENTION-POLICY-V1`](O4O-PRIVACY-DATA-RETENTION-POLICY-V1.md) · [`O4O-STORE-OWNER-SERVICE-AGREEMENT-V1.0`](O4O-STORE-OWNER-SERVICE-AGREEMENT-V1.0.md) · [`O4O-ROLE-WORKSPACE-ARCHITECTURE-V1`](O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md)
-> **코드 대응**: `apps/api-server/src/services/assistant/memory-ownership.ts` (레지스트리 · `LEGAL_DATA_PROCESSING_GATE='PENDING'`) — 이 문서가 ACTIVE 가 되면 레지스트리를 §4 판정에 맞춘다(§9).
+> **코드 대응**: `apps/api-server/src/services/assistant/memory-ownership.ts` (레지스트리 — §4 판정과 정렬됨 · `COMPLIANCE_GATE='PENDING'` 은 점검 상태 기록일 뿐 배치 판정에 쓰지 않음) · `procedural-memory-store.ts` · `assistant-memory.ts`.
 > **성격**: 데이터 배치 정책. 법률 판단을 하지 않는다 — 법률 판단이 필요한 지점은 §8 에 선택지로만 둔다.
 
 ---
@@ -210,11 +210,23 @@ OpenAI 격차는 **Memory 배치와 무관하게 이미 존재**하는 현재 �
 | **D4** | 조직 소유 Assistant Memory = **운영기록(반환 대상 아님)** · 단 조직 해지 시 purge 대상. "반환 대상 아님 ≠ O4O 가 계속 보유" | 결정 |
 | **D5** | **AI Provider · 처리 위치 변경을 전제로 한 Provider-neutral 처리 · 고지 원칙(§6-1)을 채택**하고, 그 아래 현재 실제 처리자 OpenAI 의 고지 격차를 해소한다(2026-10-04 수정 — 종전 "OpenAI 고지 여부" 에서 재정의). Gemini 회귀 · 화면 작업 제한은 기본안이 아니다. 순서: 실제 전송 항목 census → 현 처리방침 대조 → §6-1 구조로 문안 → 법적 절차 판단 | **원칙 결정 · OpenAI 항목 법률 확인 대기** |
 
-**Gate 상태**: D3 · D5 의 법적 절차가 확인되기 전까지 `LEGAL_DATA_PROCESSING_GATE = 'PENDING'` 을 유지하고 Cloud Memory 저장(§9-2 이후)을 구현하지 않는다. D1 · D2 · D4 는 그때 그대로 적용한다.
+**Gate 상태**: Compliance Gate = PENDING(실사용 확대 전 점검). 개발 단계에서는 D1 · D2 · D4 를 **설계 기준**으로 적용해 구현하고(법적 확정값으로 다루지 않음), D3 · D5 의 법적 절차(고지 방식 · 재동의 · 보존 연수 확정 · Provider 고지 문구)는 실사용 확대 전에 그 시점의 실제 데이터 흐름으로 정한다. (2026-10-04 정정 — 종전 "Gate PENDING 동안 Cloud Memory 저장 구현 금지" 를 대체)
 
-## 9. Gate 통과 후 구현 범위 (재조사 불필요)
+## 9. 구현 범위 (재조사 불필요)
 
-D1~D4 가 기록되면 한 WO 로 진행한다.
+개발 단계에서 한 WO 로 진행한다(Gate 의미 전환 후). 구현 상태(2026-10-04 · `WO-O4O-PERSONAL-ASSISTANT-MEMORY-CLOUD-CONTINUITY-V1`):
+
+| # | 상태 |
+|---|---|
+| 1 | **DONE(정렬)** — 레지스트리 §4 정렬(assistant_experience · execution_experience = node · request_summary = never · 절차 기억은 공개 사이트 대상만 Cloud). Gate 는 Compliance Gate 로 재정의(`COMPLIANCE_GATE`) — 이 문서 ACTIVE 전환은 D3 · D5 확인 후 |
+| 2 | **DONE** — `assistant_procedural_patterns`(M3 · 소유 주체 CHECK · 부분 unique · CASCADE) · `assistant_run_frames`(M5 · run · task · user CASCADE). 원문 · 값 · Provider 칼럼 없음 |
+| 3 | **DONE** — 서버가 만든 구조화 도움 · 교정 이벤트에서 노드와 같은 규칙으로 파생(`deriveVerifiedPatterns`) · 노드 원장 read-back 없음 |
+| 4 | **DONE** — `recallAssistantMemory` 가 검증 방법 · 재개 구조를 돌려주고 `ExecutionIntent.memory` 로 전달 · Execution 이 노드 원장과 합쳐 재검증(강제 아님). M4 의 결정적 재생 단계(Workflow Candidate)는 노드에 남음 — KNOWN GAP |
+| 5 | **PARTIAL** — 1년 미사용 신뢰 해제는 recall 조건으로 집행 · 재개 구조는 종결 시 삭제 + coordination CASCADE · 소유 주체 삭제 CASCADE. `privacy-retention.service` · 보유기간 정책 행 · 비활성 사용자 fallback · 매장 해지 purge 목록은 Compliance Gate 항목으로 남김 |
+| 6 · 7 | **OPEN** — 노드 정리 · 법정 문서 개정은 Compliance Gate 항목 |
+| 8 | **DONE** — Provider 고유 칼럼 없음 · 수행자를 바꿔도 같은 기억이 recall 되는 테스트 |
+
+원래 항목:
 
 1. **Gate 기록** — 이 문서 ACTIVE · V2 §17 통과 기록 · `LEGAL_DATA_PROCESSING_GATE = 'PASSED'` · 레지스트리 정렬(assistant_experience · execution_experience = node 유지, request_summary = never, procedural_memory 의 사설 대상 제외 조건).
 2. **Cloud 저장소(migration)** — 소유 주체 전용 검증 방법 · 절차 저장(organization_id 또는 requested_by_user_id 경계 · Task type × Target × Stage · strategy op · 검증 횟수 · 마지막 사용 시각) · 재개 구조(run_id · task · stage · slot 종류 · 전략 · 종결 시 삭제). 원문 · 값 칼럼 없음.

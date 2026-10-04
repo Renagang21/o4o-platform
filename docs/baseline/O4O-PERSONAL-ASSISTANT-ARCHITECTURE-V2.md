@@ -286,7 +286,7 @@ Lower-cost Reasoning 단계는 유지한다. "속도는 약한 모델로 해결�
 
 ### 9-4. 배치 전환의 선행 조건
 
-- 현재 구현은 Experience 전부를 실행 PC 의 `local.db` 에 둔다. 이를 §9-2 배치로 옮기는 것은 **§17 Legal / Data Processing Gate 통과 후**에만 한다. 원칙 전환(이 문서 ACTIVE)과 물리 이동(구현)은 다른 단계다.
+- §9-2 배치 이동은 **개발 단계에서 진행한다**(2026-10-04 사용자 확정 — §17 Gate 는 개발 선행조건이 아니라 실사용 확대 전 Compliance Gate). 세부 배치는 [`O4O-ASSISTANT-MEMORY-PLACEMENT-POLICY-V1`](O4O-ASSISTANT-MEMORY-PLACEMENT-POLICY-V1.md) §4 가 정하고, 개발 중에도 설계 경계(구조만 · 소유 주체 경계 · 삭제 가능 · Provider 독립 · 인증정보 · 캡처 금지)는 그대로 지킨다.
 - 저장 정책(Storage · Processing · Retention · Sharing)은 이동 구현보다 먼저 확정한다(V1 §10 "데이터가 PC 밖으로 나가는 작업은 경계 정책이 선행" 승계 · orphan O12).
 
 ---
@@ -393,9 +393,11 @@ V2 와 이 정본들이 직접 충돌하는 새 사실이 확인되면 구현을
 
 ### 17-1. Gate
 
-**Assistant Memory 의 Cloud 이동, 또는 새로운 외부 데이터 처리(새 provider · 화면 캡처 전송 · 외부 채널 결과 전달 등)를 실제로 구현하기 전에 이 Gate 를 반드시 통과한다.**
+**이 Gate 는 개발을 막는 조건이 아니다(2026-10-04 사용자 확정).** Assistant Memory 의 Cloud 배치 · 새로운 외부 데이터 처리(새 provider · 화면 캡처 전송 · 외부 채널 결과 전달 등)를 **정식 운영 · 실사용 확대 전에** 그 시점의 법령 · 실제 데이터 흐름 · 실제 Provider · 실제 계약으로 점검하는 **Compliance Gate** 다. 지금 동의 방식 · 보존 연수 · Provider 문구를 고정하면 법과 Provider 구조가 바뀔 때 다시 해야 하므로, 개발 중에는 아래 설계 경계만 지키고 운영 법무 세부는 이 Gate 에서 정한다.
 
-통과 조건(모두):
+개발 중에도 지키는 설계 경계: 인증정보(password · OTP · credential · cookie) Memory 저장 금지 · 화면 캡처 · DOM 전체 장기 Memory 금지 · 원문보다 구조화 Experience · Provider 독립 Memory(§8-1-a) · User / Organization / Node 소유 경계 · 삭제 가능한 구조 · 개인화와 Shared Candidate 구분.
+
+실사용 확대 전 통과 조건(모두):
 
 1. 개인정보처리방침 · 보유기간 정책 · 국외 이전 고지 · 매장 경영자 이용계약이 해당 처리를 기재하도록 개정됐다(필요 시).
 2. 해당 데이터의 목적 · 근거 · 보유기간(무기한 금지 — 보유기간 정책) · 공유 범위가 정해졌다.
@@ -404,11 +406,11 @@ V2 와 이 정본들이 직접 충돌하는 새 사실이 확인되면 구현을
 
 ### 17-1-a. Assistant Memory 세부 정책 (2026-10-04)
 
-Gate 의 Memory 쪽 세부(종류별 소유 · 배치 · 보존 · 삭제 · 고지 Gap · 사용자 결정 D1~D5 · Gate 통과 후 구현 범위)는 [`O4O-ASSISTANT-MEMORY-PLACEMENT-POLICY-V1`](O4O-ASSISTANT-MEMORY-PLACEMENT-POLICY-V1.md) 이 정한다(DRAFT — 결정 대기). 그 문서가 ACTIVE 가 되기 전에는 이 절의 Gate 가 닫힌 상태다.
+Gate 의 Memory 쪽 세부(종류별 소유 · 배치 · 보존 · 삭제 · 고지 Gap · 사용자 결정 D1~D5 · 구현 범위)는 [`O4O-ASSISTANT-MEMORY-PLACEMENT-POLICY-V1`](O4O-ASSISTANT-MEMORY-PLACEMENT-POLICY-V1.md) 이 정한다. 그 문서의 D1 · D2 · D4 는 설계 기준으로 구현에 쓰고(법적 확정값 아님), D3 · D5 의 법적 절차는 이 Gate(실사용 확대 전)에서 확인한다.
 
 ### 17-2. 범위
 
-- 이 Gate 는 **이 문서의 ACTIVE 자체를 막지 않는다.** 원칙과 구조는 지금 확정하고, 데이터가 실제로 움직이는 구현만 Gate 뒤에 둔다.
+- 이 Gate 는 **이 문서의 ACTIVE 도, 개발 단계의 구현도 막지 않는다.** 막는 것은 정식 운영 · 실사용 확대다(통과 조건 1~4 충족 전).
 - 법률 판단과 처리방침 개정은 이 문서가 하지 않는다.
 
 ### 17-3. KNOWN GAP — `STILL_OPEN`
@@ -439,8 +441,7 @@ V1 구조를 전제로 한 추가 확장 · 최적화 · smoke 는 하지 않는
 ```text
 A  Assistant + Task Foundation   L1 · L2 최소 구조 (Task 1급 객체 · 완료 계약 · 채널 무관 진입)
 B  Planner 분리                   Assistant Planning ≠ Execution Planning
-── Legal / Data Processing Gate (§17) ──
-C  Memory Placement               §9 ownership 배치 이동
+C  Memory Placement               §9 ownership 배치 이동 (설계 경계 준수 · §17 은 실사용 확대 전 점검)
 D  Execution Node 계약            capability · 선택 · 작업 단위 dispatch (구조 — 성능 튜닝 아님)
 E  Skill                          Experience → Skill 승격 · registry = 저장 형태
 F  Hybrid Observation             vision 포함 관찰 (새 provider 전송은 Gate 대상)
@@ -449,7 +450,7 @@ H  ProductMaster 연결             단방향 참조 · 다중 식별자 매칭�
 I  Worker                         업무 단위 병렬 (parent/child run · 탭 격리)
 ```
 
-- A · B 는 Gate 이전에 할 수 있다 — 기억을 PC 밖으로 옮기지 않고도 만들 수 있는 구조다.
+- §17 Compliance Gate 는 단계 사이의 차단선이 아니다 — 어느 단계든 개발은 진행하고, 정식 운영 · 실사용 확대 전에 그때의 데이터 흐름으로 점검한다(2026-10-04 사용자 확정).
 - **Runtime 은 0번 트랙이다**(V1 §10-1 원칙 승계). 진행 중 runtime 결함은 필요한 만큼 마감하되, 새로운 runtime 최적화(polling · vision · 프로토콜 튜닝)는 해당 구조 단계보다 선행하지 않는다. D 를 성능 튜닝으로 시작하면 "더 좋은 RPA" 로 기운 것이다.
 - 순서를 바꾸려면 이 절을 고치는 명시 WO 가 필요하다.
 
@@ -552,7 +553,7 @@ V1 에서 **승계하지 않는 것**: Local-first 저장 원칙(ARCH §5 의 Lo
 | L3 Skill / Discovery | PARTIAL (Candidate · adapter seed · Strong-first routing) | GAP-CENSUS §J · §M |
 | L4 Execution | EXISTS | GAP-CENSUS §F |
 | L5 Execution Node | EXISTS (단일 노드 가정 · 다중 노드 `ambiguous`) | GAP-CENSUS §I |
-| Memory 배치 | 소유 · 배치 레지스트리(`memory-ownership.ts`) 고정 · Task type 이력은 Cloud 에서 노드 무관하게 읽음. 절차 기억 · 재개 frame · 실행 기록은 아직 실행 PC `local.db` (§17 Gate PENDING) | GAP-CENSUS §G · Phase C CHECK |
+| Memory 배치 | **Cloud Continuity 구현** — 소유 주체 전용 Cloud 에 검증된 방법(M3 · 공개 사이트 대상) · 재개 구조(M5)를 저장하고 Assistant Memory 가 recall → ExecutionIntent → Execution 이 노드 원장과 합쳐 현재 화면으로 재검증. Task type 이력도 Cloud. 도움 · 교정 · 실행 원기록(M7 · M8)과 결정적 재생 단계(Workflow Candidate)는 노드. §17 Compliance Gate PENDING(실사용 확대 전 점검) | GAP-CENSUS §G · Phase C CHECK · Cloud Continuity 커밋 |
 
 이 표는 시점 기록이다. 갱신할 때는 이 절만 고치고 본문 원칙은 바꾸지 않는다.
 

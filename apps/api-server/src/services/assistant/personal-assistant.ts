@@ -21,7 +21,11 @@
  *
  * Phase C (WO-O4O-PERSONAL-ASSISTANT-PHASE-C-MEMORY-EXPERIENCE-CONTINUITY-V1) — Assistant Memory
  *   Task → **Assistant Memory(assistant-memory.ts · 실행 노드 무관)** → Assistant Planning(knownTaskTypes) → Execution
- *   기억 종류 · 소유 · 배치는 memory-ownership.ts 레지스트리가 정한다. 절차 기억의 Cloud 이동은 V2 §17 Gate 뒤다.
+ *   기억 종류 · 소유 · 배치는 memory-ownership.ts 레지스트리가 정한다.
+ *
+ * Cloud Continuity (WO-O4O-PERSONAL-ASSISTANT-MEMORY-CLOUD-CONTINUITY-V1)
+ *   Assistant Memory 가 소유 주체의 검증 방법 · 재개 구조까지 돌려주고(→ ExecutionIntent.memory), 실행 뒤에는
+ *   ExecutionReport.memory(구조만)를 소유 주체 기억에 반영한다(rememberExecution). 실행 노드가 바뀌어도 이어진다.
  *
  * 이 모듈이 하지 않는 일
  *   - 완료 계약의 영속화 · Knowledge / Shared Candidate 배선(후속 단계)
@@ -46,7 +50,7 @@ import {
 } from './assistant-task-store.js';
 import { resolveTaskOwnership } from './task-ownership.js';
 import { judgeTaskStatus, planAssistantTask, type AssistantPlan } from './assistant-planning.js';
-import { EMPTY_ASSISTANT_MEMORY, recallAssistantMemory } from './assistant-memory.js';
+import { EMPTY_ASSISTANT_MEMORY, recallAssistantMemory, rememberExecution } from './assistant-memory.js';
 import type { ExecutionIntent, ExecutionReport } from '../ai-tools/work-agent-contract.js';
 import { resolveWorkTarget } from '../ai-tools/work-target-resolver.js';
 
@@ -176,10 +180,12 @@ export async function runAssistantWorkTask(
 
   // ── Assistant Memory (Phase C) — 실행 노드와 무관한 기억. Task 소유 주체 경계 안에서만 읽는다 ──
   const resuming = typeof input.workBody.runId === 'string' && input.workBody.runId.length > 0;
+  const ownership = task ? { scope: task.ownershipScope, organizationId: task.organizationId, serviceKey: task.serviceKey } : null;
   const memory = task ? await recallAssistantMemory(dataSource, {
     userId: input.userId,
-    ownership: { scope: task.ownershipScope, organizationId: task.organizationId, serviceKey: task.serviceKey },
+    ownership,
     targetId: resolveTaskTarget(task, input.workBody, resuming),
+    runId: resuming ? String(input.workBody.runId) : null,
   }) : EMPTY_ASSISTANT_MEMORY;
 
   // ── Assistant Planning — 이번 Task 의 수행 방향(구조만 · 원문 없음) ──
@@ -188,9 +194,10 @@ export async function runAssistantWorkTask(
     resuming,
     priorTaskTypeKey: task?.taskTypeKey ?? null,
     userMethodHint: typeof input.workBody.recoveryHint === 'string' && input.workBody.recoveryHint.trim().length > 0,
-    // 절차 기억(Preferred/Avoid · Candidate)은 Gate 전이라 아직 실행 노드에 있다(V2 §9-4). Execution 이 현재 화면과 함께 읽는다.
+    // 노드 원장의 자기 Experience 는 Execution 이 그 노드에서 현재 화면과 함께 읽는다.
     nodeExperienceReachable: true,
     knownTaskTypes: memory.knownTaskTypes,
+    memory: { patterns: memory.patterns, resumeFrame: memory.resumeFrame },
   });
   logger.info('assistant plan', {
     taskId: plan.intent.taskId,
@@ -198,6 +205,8 @@ export async function runAssistantWorkTask(
     startMode: plan.intent.startMode,
     taskTypeHint: plan.intent.taskTypeHint !== null,
     memoryTaskTypes: plan.intent.knownTaskTypes.length,
+    memoryPatterns: memory.patterns.length,
+    memoryResumeFrame: memory.resumeFrame !== null,
     memorySources: memory.sources.map((s) => `${s.kind}:${s.placement}:${s.readByAssistant ? 'read' : s.note ?? 'skip'}`),
   });
 
@@ -223,6 +232,15 @@ export async function runAssistantWorkTask(
       taskTypeKey: reply.execution?.report?.taskTypeProposal ?? reply.execution?.taskKey ?? null,
     });
     const report = reply.execution?.report;
+    // Cloud Continuity — 실행이 남긴 기억 후보를 소유 주체 기억에 반영(실패해도 결과 불변).
+    const remembered = await rememberExecution(dataSource, {
+      userId: input.userId,
+      taskId: task.taskId,
+      ownership,
+      runId: typeof data.runId === 'string' ? data.runId : null,
+      taskStatus: updated?.status ?? status,
+      memory: report?.memory,
+    });
     logger.info('assistant task updated', {
       taskId: task.taskId,
       ownershipScope: task.ownershipScope,
@@ -230,6 +248,8 @@ export async function runAssistantWorkTask(
       runLinked: typeof data.runId === 'string',
       executionClaim: report?.claim ?? null,
       resultObserved: report ? report.resultObserved || report.replayVerified : null,
+      memoryPatternsWritten: remembered.patternsWritten,
+      memoryResumeFrame: remembered.frame,
     });
     return { reply, task: { taskId: task.taskId, status: updated?.status ?? status }, plan };
   } catch (err) {
