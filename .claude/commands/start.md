@@ -6,14 +6,14 @@ description: 작업 시작 - 동기화, 인수인계 확인, 정비 후 작업 �
 [1단계: 동기화]
 1. git status --short
    - 미커밋 변경이 있으면 멈추고 목록을 보여줘. (커밋/stash/폐기 여부는 내가 결정)
-2. git branch --show-current
-   - main이 아니면 현재 브랜치 이름을 알려주고, 그 브랜치에 push 안 된 커밋이 있는지 확인해서 보고한 뒤 진행해.
-3. git checkout main
-4. git pull --ff-only origin main
-   - fast-forward가 안 되면 멈추고 원인을 보고해. 임의로 merge나 rebase 하지 마.
-5. pnpm install --frozen-lockfile
+2. git branch --show-current — branch 를 전환(`git checkout` / `git switch`)하지 않는다(AGENTS.md §4-1(b)(c)).
+3. 동기화
+   - main(기준 checkout)이면: `git pull --ff-only origin main`. fast-forward가 안 되면 멈추고 원인을 보고해. 임의로 merge나 rebase 하지 마.
+   - 작업 branch 의 전용 worktree 면: `git fetch origin` 만 한다. 그 branch 의 push 안 된 커밋 · `origin/main` 대비 ahead/behind 를 보고하고, 자동으로 merge/rebase 하지 않는다.
+4. pnpm install --frozen-lockfile
    - lockfile 불일치로 실패하면 멈추고 보고해. lockfile을 임의로 수정하지 마.
-6. 이번 pull로 들어온 커밋 목록(git log --oneline)을 간단히 요약해줘.
+5. 이번에 들어온 `origin/main` 커밋 목록(git log --oneline)을 간단히 요약해줘.
+6. 새 작업은 기준 checkout 에서 하지 않는다 — 3단계에서 작업을 시작할 때 최신 `origin/main` 으로 전용 worktree + branch 를 만든다(AGENTS.md §4-1(a)). 이어서 하는 작업이 기존 branch · PR 이면 그 worktree 에서 한다.
 
 [2단계: 인수인계 확인과 정비]
 7. HANDOFF.md를 읽어. 인수인계는 아직 merge 되지 않은 PR 에만 있을 수 있으므로 두 곳을 본다:
