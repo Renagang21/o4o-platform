@@ -4,7 +4,7 @@
 > WO-O4O-SIGNAGE-APPROVAL-ARCHITECTURE-DESIGN-V1
 > 2026-02-24
 >
-> **상태**: 판정 대기 · **표기일**: 2026-10-04 — 상태 집합(`draft|pending|active|archived`) · 값 전환 migration · HQ status 전환 API 는 구현됐으나 전환 권한 규칙이 본문과 다르다(아래 정합 주석). 결정 필요 사항: **HQ(서비스 운영자) 사이니지의 `draft → active` 직접 게시를 Platform Admin 전용으로 막을지(본문), signage operator 전원에게 허용할지(현행 코드)** — 승인 개입은 서비스별 정책([`O4O-ROLE-WORKSPACE-ARCHITECTURE-V1`](../baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md) §2-1).
+> **상태**: ACTIVE · **최종 갱신**: 2026-10-04 · 색인 §9 판정 대기(정책 결정 필요) — 상태 집합(`draft|pending|active|archived`) · 값 전환 migration · HQ status 전환 API 는 구현됐으나 전환 권한 규칙이 본문과 다르다(아래 정합 주석). 결정 필요 사항: **HQ(서비스 운영자) 사이니지의 `draft → active` 직접 게시를 Platform Admin 전용으로 막을지(본문), signage operator 전원에게 허용할지(현행 코드)** — 승인 개입은 서비스별 정책([`O4O-ROLE-WORKSPACE-ARCHITECTURE-V1`](../baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md) §2-1).
 >
 > **(2026-10-04 정합) 구현 현황** — `WO-O4O-SIGNAGE-APPROVAL-IMPLEMENTATION-V1`:
 > - 상태 값 · 데이터 전환 · CHECK 제약: 본문 §9 그대로 구현 (`apps/api-server/src/database/migrations/20260224500000-SignageApprovalStatusModel.ts`).

@@ -2,7 +2,7 @@
 
 > WO-O4O-PLAYWRIGHT-MCP-PORTABLE-CONFIG-V1
 > Claude Code (또는 Playwright MCP를 지원하는 다른 클라이언트)에서 production 화면을 브라우저로 검증할 때 사용.
-> **상태**: ACTIVE · **최종 갱신**: 2026-10-04 (`0.0.30` 고정 · `@latest` 금지 서술을 현행 확인 결과로 정합 — 아래 정합 주석)
+> **상태**: ACTIVE · **최종 갱신**: 2026-10-04 (예제 · 설치 · 확인 명령을 저장소 템플릿 `@latest` 기준으로 정합 — 종전 `0.0.30` 고정은 §1 정합 주석에 기록)
 
 ---
 
@@ -15,14 +15,14 @@
   "mcpServers": {
     "playwright": {
       "command": "npx",
-      "args": ["-y", "@playwright/mcp@0.0.30", "--headless", "--isolated"]
+      "args": ["-y", "@playwright/mcp@latest", "--headless", "--isolated"]
     }
   }
 }
 ```
 
-- **`@playwright/mcp@0.0.30`**: 안정 `playwright@1.54.1`을 의존하는 *유일한* stable 버전. 더 최근 0.0.31~0.0.73은 npm registry에 존재하지 않는 alpha playwright를 의존해서 `npx` 설치 시 `ETARGET` 에러 발생.
-  > (2026-10-04 정합) 위 `ETARGET` 제약은 작성 시점 기록이다. 이후 [`IR-O4O-PLAYWRIGHT-MCP-AND-TEST-ACCOUNT-SMOKE-BLOCKER-AUDIT-V1`](../../investigations/IR-O4O-PLAYWRIGHT-MCP-AND-TEST-ACCOUNT-SMOKE-BLOCKER-AUDIT-V1.md) §2.1 에서 `@playwright/mcp@latest`(0.0.75 resolve, playwright 1.57.0)가 `--help` 정상 동작으로 확인됐고, 저장소 템플릿 [`config/templates/claude-config-template.json`](../../../config/templates/claude-config-template.json) 도 `@playwright/mcp@latest` 를 쓴다. **`0.0.30` 고정은 더 이상 필수가 아니다** — `@latest` 또는 동작 확인된 특정 버전 고정(cold-start 안정화 목적, IR §3) 중 선택한다. 버전을 고정하면 §2 의 chromium 설치 명령도 그 버전이 의존하는 playwright 버전에 맞춘다.
+- **`@playwright/mcp@latest`**: 저장소 템플릿 [`config/templates/claude-config-template.json`](../../../config/templates/claude-config-template.json) 과 같은 값. 특정 버전으로 고정하려면 이 값과 §2 · §3 의 버전을 함께 바꾼다.
+  > (2026-10-04 정합) 이 문서는 처음에 `@playwright/mcp@0.0.30`(playwright 1.54.1 의존) 고정을 요구했다 — 당시 0.0.31~0.0.73 이 존재하지 않는 alpha playwright 를 의존해 `ETARGET` 이 났기 때문이다. 이 제약은 작성 시점 기록이다. 이후 [`IR-O4O-PLAYWRIGHT-MCP-AND-TEST-ACCOUNT-SMOKE-BLOCKER-AUDIT-V1`](../../investigations/IR-O4O-PLAYWRIGHT-MCP-AND-TEST-ACCOUNT-SMOKE-BLOCKER-AUDIT-V1.md) §2.1 에서 `@playwright/mcp@latest`(0.0.75 resolve, playwright 1.57.0)가 `--help` 정상 동작으로 확인됐고, 저장소 템플릿 [`config/templates/claude-config-template.json`](../../../config/templates/claude-config-template.json) 도 `@playwright/mcp@latest` 를 쓴다. **`0.0.30` 고정은 더 이상 필수가 아니다** — `@latest` 또는 동작 확인된 특정 버전 고정(cold-start 안정화 목적, IR §3) 중 선택한다. 버전을 고정하면 §2 의 chromium 설치 명령도 그 버전이 의존하는 playwright 버전에 맞춘다.
 - **`--headless`**: GUI 없이 실행.
 - **`--isolated`**: 매 세션 새 임시 프로필 → OS/사용자 홈 경로 의존 0.
 - 사용자 홈 절대경로, 브라우저 executable 경로 모두 제거 — 어떤 머신에서도 동일하게 동작.
@@ -38,9 +38,12 @@
 각 개발 머신에서 처음 한 번만 (`.mcp.json` 생성 포함):
 
 ```bash
-# Playwright 1.54.1 호환 chromium 다운로드
-npx -y playwright@1.54.1 install chromium
+# MCP 가 의존하는 playwright 버전에 맞는 chromium 다운로드
+PW=$(npm view @playwright/mcp@latest dependencies.playwright)
+npx -y "playwright@$PW" install chromium
 ```
+
+`.mcp.json` 에서 MCP 버전을 고정했다면 `@latest` 자리에 그 버전을 넣는다 — MCP 와 브라우저의 playwright 버전이 어긋나면 `Executable doesn't exist` 가 난다.
 
 설치 위치 (Playwright 기본):
 - Windows: `%LOCALAPPDATA%\ms-playwright\chromium-XXXX\`
@@ -58,7 +61,7 @@ Claude Code 세션에서 Playwright MCP 도구 (`browser_navigate`, `browser_cli
 수동 확인 명령:
 
 ```bash
-npx -y @playwright/mcp@0.0.30 --help
+npx -y @playwright/mcp@latest --help
 ```
 
 옵션 페이지가 출력되면 npm install + cli 로딩이 정상이다.
@@ -86,5 +89,5 @@ npx -y @playwright/mcp@0.0.30 --help
 
 ## 6. 향후 업그레이드
 
-- Microsoft가 stable playwright를 의존하는 새 mcp 버전을 publish하면 `.mcp.json`의 `0.0.30`만 교체. (2026-10-04 정합: 0.0.75 등 stable 의존 버전이 이미 확인됨 — §1 정합 주석)
+- 기본은 `@latest` 다. 특정 버전으로 고정해 둔 경우, 새 버전으로 올릴 때 `.mcp.json` 의 버전과 §2 의 chromium 설치 버전을 함께 바꾼다.
 - 다음 stable 후보 확인: `npm view @playwright/mcp@<version> dependencies.playwright` → alpha/beta가 아닌지 + `npm view playwright@<dep> version`이 존재하는지.

@@ -99,7 +99,7 @@ checkout_orders (metadata.serviceKey = 'kpa-groupbuy')
 - 공급자 제안 시 `is_active=false`로 생성 → 운영자가 노출 전환
 - 운영자 직접 추가 시 `is_active=true`로 즉시 노출
 
-> (2026-10-04 정합) **이 절과 §5 상태 흐름은 [`EVENT-OFFER-COMMON-DOMAIN-V1`](../baseline/EVENT-OFFER-COMMON-DOMAIN-V1.md) §3 · §4 · §5 로 대체되었다.** 현행 상태 모델: DB 저장값 `status` = `pending`(공급자 제안 · 미노출) / `approved` / `canceled` + 런타임 계산 `active` · `ended`(`start_at` · `end_at` · 수량 기준, `resolveEventStatus()`). 공급자 제안은 `status='pending'`, `is_active=false` 로 생성되고, 운영자 승인 시 `status='approved'`, `is_active=true`, 반려 시 `status='rejected'`, `is_active=false` + 반려 사유가 된다. 운영자 직접 추가는 `status='approved'` 로 생성된다. 근거: `apps/api-server/src/routes/kpa/services/event-offer.service.ts`(`createListing` roleType 분기 · approve/reject 의 `status !== 'pending'` 검사) · `apps/api-server/src/routes/kpa/controllers/event-offer-operator.controller.ts`(`WO-O4O-EVENT-OFFER-APPROVAL-PHASE1-V1`).
+> (2026-10-04 정합) **이 절과 §5 상태 흐름은 [`EVENT-OFFER-COMMON-DOMAIN-V1`](../baseline/EVENT-OFFER-COMMON-DOMAIN-V1.md) §3 · §4 · §5 로 대체되었다.** 현행 상태 모델: DB 저장값 `status` = `pending`(공급자 제안 · 미노출) / `approved` / `rejected` / `canceled` + 런타임 계산(approved 분기) `upcoming`(시작 전) · `active` · `sold_out`(매진) · `ended`(`start_at` · `end_at` · 수량 기준, `resolveEventStatus()`). 공급자 제안은 `status='pending'`, `is_active=false` 로 생성되고, 운영자 승인 시 `status='approved'`, `is_active=true`, 반려 시 `status='rejected'`, `is_active=false` + 반려 사유가 된다. 운영자 직접 추가는 `status='approved'` 로 생성된다. 근거: `apps/api-server/src/routes/kpa/services/event-offer.service.ts`(`createListing` roleType 분기 · approve/reject 의 `status !== 'pending'` 검사) · `apps/api-server/src/routes/kpa/controllers/event-offer-operator.controller.ts`(`WO-O4O-EVENT-OFFER-APPROVAL-PHASE1-V1`).
 
 ---
 
