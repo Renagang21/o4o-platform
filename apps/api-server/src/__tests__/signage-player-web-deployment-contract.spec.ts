@@ -6,7 +6,7 @@
  *
  * 이 앱의 유일한 재생 route 는 익명 401 · telemetry endpoint 부재로 동작하지 않았고,
  * 정본 재생 경로는 Tablet ScreenSet(각 web 앱 내부)이다 — O4O-SIGNAGE-CANONICAL-PLAYBACK-PATH-V1.
- * Cloud Run 서비스는 삭제됐다. 배포 경로가 하나라도 되살아나면 다음 배포가 서비스를 재생성한다.
+ * Cloud Run 서비스는 삭제 대상이다. 배포 경로가 하나라도 되살아나면 다음 배포가 서비스를 재생성한다.
  *
  * 이 spec 이 막는 회귀:
  *  1. deploy-web-services.yml 에 player deploy job · output · dispatch 선택지가 다시 생기는 것
