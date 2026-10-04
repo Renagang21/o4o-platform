@@ -354,3 +354,20 @@ describe('Cloud Run runtime SA — 모든 deploy · job create/update 에 전용
     });
   }
 });
+
+// WO-O4O-GITHUB-ACTIONS-RUN-ADMIN-TO-DEVELOPER-V1
+// github-actions = roles/run.developer (setIamPolicy 없음). 배포가 Cloud Run IAM 을 바꾸면 그 배포는 권한 부족으로 실패한다.
+// 공개 접근(allUsers → run.invoker)은 서비스 IAM 에 이미 있고, 새 서비스는 최초 1회 소유자가 부여한다.
+describe('Cloud Run IAM 무변경 배포 — github-actions run.developer', () => {
+  const ALL = [...DEPLOY, '.github/workflows/delivery.yml', '.github/workflows/promote.yml', '.github/actions/cloud-run-verified-rollout/action.yml'];
+  for (const file of ALL) {
+    it(`${file}: --allow-unauthenticated · IAM policy 변경 명령 0`, () => {
+      const wf = read(file);
+      assert.doesNotMatch(wf, /--allow-unauthenticated|add-iam-policy-binding|remove-iam-policy-binding|set-iam-policy|--invoker-iam/);
+    });
+  }
+  it('rollout 스크립트도 IAM 을 바꾸지 않는다 (update-traffic · describe 만)', () => {
+    const src = read('scripts/ci/cloud-run-rollout.mjs');
+    assert.doesNotMatch(src, /iam-policy|setIamPolicy|allow-unauthenticated/);
+  });
+});

@@ -127,8 +127,10 @@ export const O4O_SERVICES: O4OService[] = [
     legacyDomains: ['kpa-society.co.kr'],
     // 사업 의미 = 약국 사업자 대상 세미프랜차이즈 운영 서비스 (docs/baseline/O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1.md).
     //   role prefix `kpa:*` 는 이 키의 legacy 이름이며 KPA 분회(`kpa-branch` · kpa.neture.co.kr)가 아니다.
-    //   아래 description 은 사용자 노출 문자열이라 이번 문서 정렬에서 바꾸지 않았다(변경은 별도 WO).
-    description: '약사 커뮤니티 서비스',
+    //   WO-O4O-STORE-OWNER-RBAC-AND-SERVICE-SEMANTICS-FINAL-ALIGNMENT-V1: description 을 정본 의미로 맞췄다.
+    //   종전 '약사 커뮤니티 서비스' 는 이 서비스 **안의 포럼**(약사 커뮤니티)을 서비스 전체 설명으로 쓴 것이라,
+    //   약국 사업자 대상 운영 서비스라는 현재 의미와 어긋났다. 커뮤니티 자체의 이름은 community-catalog 가 따로 갖는다.
+    description: '약국 사업자 매장 운영 서비스',
     joinEnabled: true,
     // STANDARD_CANDIDATE — 매장 linkage(kpa) · kpa:store_owner · kpa:operator 가 현재 runtime 에 있다. 자동 활성화 아님.
     workspace: { workspaceMode: 'standard', storeWorkspaceEnabled: true, operatorWorkspaceEnabled: true },

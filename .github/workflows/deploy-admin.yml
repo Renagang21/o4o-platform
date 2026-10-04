@@ -74,6 +74,8 @@ env:
   # WO-O4O-CLOUD-RUN-RUNTIME-SA-LEAST-PRIVILEGE-V1 — Cloud Run runtime identity (default compute SA · roles/editor 사용 종료).
   #   github-actions SA 는 이 SA 에 대해서만 actAs 할 수 있다(SA 리소스 단위 iam.serviceAccountUser). 권한: CHECK-O4O-CLOUD-RUN-RUNTIME-SA-LEAST-PRIVILEGE-V1
   RUNTIME_SA: o4o-runtime@netureyoutube.iam.gserviceaccount.com
+  # WO-O4O-GITHUB-ACTIONS-RUN-ADMIN-TO-DEVELOPER-V1 — 배포는 Cloud Run IAM 을 바꾸지 않는다(github-actions = roles/run.developer · setIamPolicy 없음).
+  #   기존 서비스의 공개 접근(allUsers → roles/run.invoker)은 서비스 IAM 에 이미 있고 배포가 유지한다. 새 서비스는 최초 1회 소유자가 부여 — CHECK-O4O-GITHUB-ACTIONS-RUN-ADMIN-TO-DEVELOPER-V1.
   REPOSITORY_NAME: o4o-api
 
 jobs:
@@ -369,7 +371,6 @@ jobs:
           --project=${{ env.PROJECT_ID }} \
           --service-account=${{ env.RUNTIME_SA }} \
           --platform=managed \
-          --allow-unauthenticated \
           --port=8080 \
           --memory=256Mi \
           --cpu=1 \

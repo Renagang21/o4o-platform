@@ -32,7 +32,7 @@ NEXT_ACTION = WO-O4O-DEFAULT-COMPUTE-SA-EDITOR-RETIREMENT-V1 — editor · iam.s
 | 범위 | 역할 / binding |
 |---|---|
 | project | `roles/editor` · `roles/iam.serviceAccountUser` · `roles/run.admin` · `roles/artifactregistry.writer` · `roles/logging.logWriter` |
-| secret | `o4o-encryption-key` 에 SA 단위 binding 1개 (나머지 secret 0) |
+| secret | `o4o-encryption-key` 에 SA 단위 binding 1개 (나머지 secret 0) — **정정(2026-10-04)**: 실제로는 `o4o-db-password` · `cafe24-client-id` · `cafe24-client-secret` 에도 있어 4개였다. 순회가 `\r` 붙은 이름으로 3개를 건너뛰었다. 판단(실행 주체 0)은 불변 · 4개 모두 제거 — [CHECK-O4O-DEFAULT-COMPUTE-SA-EDITOR-RETIREMENT-V1](../checks/CHECK-O4O-DEFAULT-COMPUTE-SA-EDITOR-RETIREMENT-V1.md) §8 |
 | bucket | 0 |
 | user-managed key | 0 |
 | 이 SA 를 actAs 할 수 있는 SA 단위 binding | 0 (2026-10-04 github-actions project 범위 actAs 제거 후) |
