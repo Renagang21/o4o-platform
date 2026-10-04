@@ -1,11 +1,11 @@
 # CHECK-O4O-CLOUD-RUN-RUNTIME-SA-LEAST-PRIVILEGE-V1
 
-> **상태**: ACTIVE
+> **상태**: COMPLETED
 > **작성일**: 2026-10-04 · **최종 갱신**: 2026-10-04
 > **근거 WO/IR**: WO-O4O-CLOUD-RUN-RUNTIME-SA-LEAST-PRIVILEGE-V1 · [IR-O4O-GITHUB-ACTIONS-SA-LEAST-PRIVILEGE-AUDIT-V1](../investigations/IR-O4O-GITHUB-ACTIONS-SA-LEAST-PRIVILEGE-AUDIT-V1.md) · 선행 [CHECK-O4O-GITHUB-ACTIONS-SA-LEAST-PRIVILEGE-REDUCTION-PHASE1-V1](CHECK-O4O-GITHUB-ACTIONS-SA-LEAST-PRIVILEGE-REDUCTION-PHASE1-V1.md)
 
 Cloud Run 서비스 12개와 migration job 이 `roles/editor` 를 가진 default compute SA 로 돌던 구조를 전용 최소권한 runtime SA(`o4o-runtime`)로 전환했다.
-production 전환 · 검증은 완료, workflow 고정(이 PR)은 main 통합 대기다. 남은 실측은 **github-actions 가 좁혀진 actAs 로 배포하는 경로**(§7).
+production 전환 · 검증 완료, workflow 고정은 PR #284 로 main 통합(`c0f9e8710`), **github-actions 가 좁혀진 actAs 로 배포하는 경로도 실측 PASS**(§9).
 
 ---
 
@@ -32,12 +32,12 @@ PRODUCTION_SMOKE                         = PASS (공개 도메인 8개 200)
 
 GITHUB_ACTIONS_ACTAS_SCOPE               = O4O_RUNTIME_ONLY
 GITHUB_ACTIONS_ACTAS_DEFAULT_COMPUTE     = DENIED (IAM readback — §6)
-GITHUB_ACTIONS_DEPLOY_PATH_NARROWED_ACTAS = PENDING (다음 promote / 배포 — §7)
+GITHUB_ACTIONS_DEPLOY_PATH_NARROWED_ACTAS = PASS (promote 37162425503 — 11 배포 job · 권한 오류 0 — §9)
 
 PERMISSION_DENIED_COUNT                  = 0
 ROLLBACK_USED                            = NO
 
-CLOUD_RUN_RUNTIME_SA_LEAST_PRIVILEGE     = VALIDATION_PENDING (§7 실측 후 CLOSED)
+CLOUD_RUN_RUNTIME_SA_LEAST_PRIVILEGE     = CLOSED
 ```
 
 ## 1. 전환 전 / 후
@@ -112,7 +112,7 @@ Policy Troubleshooter API 가 프로젝트에서 비활성(`SERVICE_DISABLED`)�
 상위 조직 · folder 없음(단일 project) · github-actions 에 project 단위 `serviceAccountUser` · `serviceAccountTokenCreator` · `editor` · `owner` 0 ·
 compute SA 의 SA 단위 policy 비어 있음 → **github-actions → compute SA actAs = 경로 없음(DENIED)**.
 
-## 7. 남은 실측 — github-actions 배포 경로 (VALIDATION_PENDING)
+## 7. github-actions 배포 경로 — 실측 계획 (결과는 §9)
 
 위 전환은 소유자 자격으로 수행했다. github-actions 가 **좁혀진 actAs 로** 배포하는 경로는 아직 돌지 않았다.
 
@@ -127,5 +127,25 @@ compute SA 의 SA 단위 policy 비어 있음 → **github-actions → compute S
 2. github-actions `run.admin` → `run.developer` (`--allow-unauthenticated` 반복의 setIamPolicy 제거 선행).
 3. Artifact Registry writer repo 단위 축소 · Cloud Build SA 최소권한화.
 4. `o4o-private-documents` bucket 부재 — 공급자 문서 업로드 경로 정리(별도).
+
+## 9. github-actions 배포 경로 실측 (2026-10-03T23:38~23:5xZ) — PASS
+
+```text
+PR #284 merge   c0f9e8710 (workflow 13개 명령 --service-account=${{ env.RUNTIME_SA }})
+Delivery        run 37162262134 — 11 서비스 LEVEL_3 (deploy-config) AUTO_DEPLOY_BLOCKED → HOLD (예상 동작)
+promote         run 37162425503 (sha c0f9e8710 · 서비스 전체) — success
+                API      AR push → migration Job o4o-api-migrations-mqn4p SUCCESS (INCREMENTAL_PENDING=0 · EXECUTED=0)
+                         → o4o-core-api-03813-feh Ready=True (traffic 0%) → 전환 → /health/ready 200
+                Admin    o4o-admin-dashboard-01340-zes
+                Web 9    neture-web-01680-jaw · k-cosmetics-web-01182-zal · kpa-society-web-02017-mov · pharmacy-hub-web-00272-rov
+                         lecture-web-00031-sox · store-web-00035-rik · kpa-branch-web-00190-luv · signage-player-web-00096-hoc
+                         hospital-pharmacy-web-00020-huf
+                Report   11/11 DEPLOYED (revision-label c0f9e8710) · commit status production = DEPLOYED
+권한 오류       11 배포 job 로그에서 PERMISSION_DENIED · permission denied · actAs · Forbidden 0
+최종 census     Cloud Run services 12/12 · migration job 1/1 = o4o-runtime · /health/ready 200
+```
+
+github-actions 는 project 범위 `iam.serviceAccountUser` 없이(`o4o-runtime` 리소스 단위만) job update · execute 와 11개 서비스 배포를 모두 수행했다.
+legacy `glucoseview-web` 은 workflow 배포 대상이 아니며 §3 의 직접 전환으로 runtime SA 를 쓴다.
 
 `문서 정합: 해당 없음`
