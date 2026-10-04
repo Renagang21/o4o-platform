@@ -45,7 +45,7 @@
 * 사용자: 녹색 (#1e8449)
 * Pinned/Featured: 상단 고정 배지
 
-> (2026-10-04 정합) 위 hex 값의 SSOT 는 코드 상수 **`CONTENT_SOURCE_COLORS`**(`packages/types/src/content.ts`, 키 = `operator` · `supplier` · `pharmacist`(=사용자), 라벨은 `CONTENT_SOURCE_LABELS`)다. 화면은 이 상수(또는 Design Core 테마 변수)를 소비하고 **hex 를 화면 코드에 직접 쓰지 않는다** — [`DESIGN-CORE-GOVERNANCE`](../rules/DESIGN-CORE-GOVERNANCE.md) §2 "디자인 토큰 직접 하드코딩 금지". 값 변경은 상수 한 곳에서 한다.
+> (2026-10-04 정합) 위 hex 값의 SSOT 는 코드 상수 **`CONTENT_SOURCE_COLORS`**(`packages/types/src/content.ts`, 키 = `operator` · `supplier` · `pharmacist`(=사용자), 라벨은 `CONTENT_SOURCE_LABELS`)다. 화면은 이 상수(또는 Design Core 테마 변수)를 소비하고 **hex 를 화면 코드에 직접 쓰지 않는다** — [`DESIGN-CORE-GOVERNANCE`](../rules/DESIGN-CORE-GOVERNANCE.md) §2 "디자인 토큰 직접 하드코딩 금지". 값 변경은 상수 한 곳에서 한다. **미해결 drift**: `packages/ui/src/content-discovery/ContentBadge.tsx` 가 같은 라벨 · hex 를 로컬 상수로 다시 선언해 `ContentMetaBar` → Neture `ContentListPage` · `ContentDetailPage` 에서 소비된다 — 공유 상수로 전환하기 전까지 색을 바꿀 때 두 곳을 함께 바꿔야 한다(전환은 코드 작업 — 후속).
 
 ---
 
