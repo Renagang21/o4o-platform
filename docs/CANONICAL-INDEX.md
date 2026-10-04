@@ -1,12 +1,13 @@
 # O4O Canonical Document Index
 
 > **역할**: AI 도구와 무관한 **정본(canonical) 문서 지도**. [`CLAUDE.md`](../CLAUDE.md) 와 [`AGENTS.md`](../AGENTS.md) 는 규칙을 복사하지 않고 이 색인과 각 정본을 가리킨다.
-> **작성일**: 2026-09-12 · **최종 갱신**: 2026-10-04 (정본 집합 확정 — ACTIVE 10행 추가 · 불일치 · 충돌 문서 19건을 §9 판정 대기로(18행) · 어휘 밖 SUPERSEDED 행 제거) · **출처**: 구 `CLAUDE.md` v8 "상세 규칙 문서 목록" + 본문 링크의 합집합
+> **작성일**: 2026-09-12 · **최종 갱신**: 2026-10-04 (정본 집합 확정 — 현행 SSOT 1행 ACTIVE 추가 · 불일치 · 충돌 · 본문 검증 전 문서 28건을 §9 판정 대기로(27행) · 어휘 밖 SUPERSEDED 행 제거) · **출처**: 구 `CLAUDE.md` v8 "상세 규칙 문서 목록" + 본문 링크의 합집합
 
 ## 0. 이 색인의 규칙
 
 - **기록물은 등재하지 않는다** — `docs/checks/` · `docs/investigations/` · `docs/ir/` · `docs/work-orders/` · `docs/archive/**` 는 과거 시점의 실행 기록이며 현재 정책을 이기지 않는다.
 - **등재 ≠ 정본 승격.** 각 행의 상태 열이 사실을 말한다. 문서 본문은 여기 복사하지 않는다.
+- **새 `ACTIVE` 등재는 본문 전수 검증 뒤에만 한다** — 상위 정본(`CLAUDE.md` Source of Truth) · 같은 주제의 더 최신 문서 · 실제 코드와 충돌하지 않음을 확인한다. 확인 전이거나 충돌 · stale 절이 있으면 §9 `판정 대기`(행에 "등재 후보 — 본문 검증 전" 또는 유효/stale 절 명시)로 둔다.
 - 상태 어휘는 4개뿐:
 
   | 상태 | 뜻 |
@@ -57,7 +58,6 @@
 | — | [STORE-PRODUCTS-CANONICAL-V1](architecture/STORE-PRODUCTS-CANONICAL-V1.md) | Store Products canonical | ACTIVE |
 | — | [STORE-LOCAL-PRODUCT-BOUNDARY-POLICY-V1](baseline/STORE-LOCAL-PRODUCT-BOUNDARY-POLICY-V1.md) | 매장 자체 상품의 Commerce 연결 금지 경계 | ACTIVE |
 | — | [O4O-SIGNAGE-STORE-PLAYLIST-MODEL-BOUNDARY-V1](baseline/O4O-SIGNAGE-STORE-PLAYLIST-MODEL-BOUNDARY-V1.md) | Signage Store Playlist 모델 경계 (KEEP-LEGACY 판정) | ACTIVE |
-| — | [DESIGN-O4O-STORE-LIBRARY-AND-ASSET-CANONICAL-SOURCE-V1](design/DESIGN-O4O-STORE-LIBRARY-AND-ASSET-CANONICAL-SOURCE-V1.md) | 매장 자료함 · 실행 자산 canonical 축 (3서비스 공통) | ACTIVE |
 
 ## 3. Operator · Store UX
 
@@ -73,7 +73,6 @@
 | [OPERATOR-INTEGRATION-STATE-V1](architecture/OPERATOR-INTEGRATION-STATE-V1.md) | Operator 통합 상태 | ACTIVE |
 | [OPERATOR-CORE-DESIGN-V1](architecture/OPERATOR-CORE-DESIGN-V1.md) | Operator Core 설계 (1세대 `@o4o/operator-core` superseded 기록 포함) | ACTIVE |
 | [OPERATOR-DASHBOARD-NAVIGATION](platform/navigation/OPERATOR-DASHBOARD-NAVIGATION.md) | Operator Dashboard 내비게이션 | ACTIVE |
-| [DESIGN-O4O-STORE-EXECUTION-MANAGEMENT-CANONICAL-V1](design/DESIGN-O4O-STORE-EXECUTION-MANAGEMENT-CANONICAL-V1.md) | 매장 실행 관리 — 코너 축 · Placement 모델. 주의: "`signage_playlists` 는 매장에만 묶임" 서술은 stale — 내 매장 playlist 원장은 [SIGNAGE-STORE-PLAYLIST-MODEL-BOUNDARY](baseline/O4O-SIGNAGE-STORE-PLAYLIST-MODEL-BOUNDARY-V1.md)(`store_playlists`)가 기준 | ACTIVE |
 
 ## 4. 사용자 · 권한
 
@@ -102,12 +101,7 @@
 | [DESIGN-CORE-GOVERNANCE](rules/DESIGN-CORE-GOVERNANCE.md) | 모든 신규 화면은 Design Core v1.0 — 독자 디자인 시스템 금지 | ACTIVE |
 | [GLOBAL-HEADER-STANDARD-V1](architecture/ui/GLOBAL-HEADER-STANDARD-V1.md) | 글로벌 헤더 표준 | ACTIVE |
 | [O4O-TABLE-STANDARD-BASELINE-V1](baseline/O4O-TABLE-STANDARD-BASELINE-V1.md) | 테이블 지향 표준 | ASPIRATIONAL |
-| [O4O-STANDARD-LIST-PHASE1-BASELINE-V1](baseline/O4O-STANDARD-LIST-PHASE1-BASELINE-V1.md) | 리스트 6 유형 분류 — 리스트 정비 시 유형 분류 선행. 주의: F 유형 대표 화면 `/admin/product-approvals` 는 은퇴(→ `/operator/product-approvals`) — 규칙만 유효 | ACTIVE |
-| [O4O-SHARED-SPACE-FRAME-PRINCIPLE-V1](architecture/ui-ux/O4O-SHARED-SPACE-FRAME-PRINCIPLE-V1.md) | 공유 공간(홈 등) 프레임 구조 원칙 — `packages/shared-space-ui` | ACTIVE |
-| [O4O-SHARED-SPACE-STANDARD-BLOCKS-V1](architecture/ui-ux/O4O-SHARED-SPACE-STANDARD-BLOCKS-V1.md) | 공유 공간 표준 블록(AppEntry · ContentHighlight 등) | ACTIVE |
-| [O4O-TEMPLATE-PRESETS](design/O4O-TEMPLATE-PRESETS.md) | 서비스 Template Preset (`TemplateProvider`). 주의: "Health Dashboard" preset 은 GlycoPharm 삭제로 소멸 — 현행 `TemplateKey` 는 `kpa` · `kcosmetics` · `referenceA` | ACTIVE |
 | [O4O-MARKET-TRIAL-CONTENT-ONLY-DOMAIN-BOUNDARY-V1](architecture/O4O-MARKET-TRIAL-CONTENT-ONLY-DOMAIN-BOUNDARY-V1.md) | **유통참여형 펀딩(Market Trial) 도메인 경계 SSOT** (2026-06-19) — content-only: 콘텐츠 편집 · 게시 · 참여 신청 · 현황까지. O4O 주문 · 결제 · 정산 · 발송 연결은 폐기 | ACTIVE |
-| [O4O-DISTRIBUTION-EVIDENCE-SEED-PRINCIPLE-V1](baseline/O4O-DISTRIBUTION-EVIDENCE-SEED-PRINCIPLE-V1.md) | 공공데이터 seed 상위 원칙 — 규제 존재 ≠ 유통 정보 | ACTIVE |
 | [O4O-FORM-STANDARD-BASELINE-V1](baseline/O4O-FORM-STANDARD-BASELINE-V1.md) | 폼 지향 표준 | ASPIRATIONAL |
 
 ## 6. 플랫폼 공통 구조 · 콘텐츠 · APP
@@ -119,7 +113,6 @@
 | [O4O-HUB-TEMPLATE-STANDARD-V1](platform/hub/O4O-HUB-TEMPLATE-STANDARD-V1.md) | HUB Template 표준 | ACTIVE |
 | [HUB-UX-GUIDELINES-V1](platform/hub/HUB-UX-GUIDELINES-V1.md) | Hub UX 규칙 | ACTIVE |
 | [EXTENSION-GENERAL-GUIDE](platform/extensions/EXTENSION-GENERAL-GUIDE.md) | Extension 개발 일반 가이드 | ACTIVE |
-| [APP-CONTENT-STANDARD-SPEC](architecture/APP-CONTENT-STANDARD-SPEC.md) | APP-CONTENT 표준 UI 스펙 (`CLAUDE.md` §13-A). 주의: Phase 1 절의 `GET /api/v1/{service}/home/content` 는 없음 — UI 원칙(§0~§5)만 유효 | ACTIVE |
 | [APP-LMS-BASELINE](architecture/APP-LMS-BASELINE.md) | APP-LMS baseline — 백엔드 공통, 프론트 공통화는 후속 (APP-CONTENT / SIGNAGE / FORUM 은 Frozen) | ACTIVE |
 | [LMS-CORE-EXTENSION-PRINCIPLES](platform/lms/LMS-CORE-EXTENSION-PRINCIPLES.md) | LMS Core / Extension 원칙 | ACTIVE |
 | [LMS-SCOPE-GUARD](architecture/LMS-SCOPE-GUARD.md) | LMS Scope Guard 설계 | ACTIVE |
@@ -143,7 +136,6 @@
 | [O4O-GIT-PARALLEL-WORK-SAFETY-V1](baseline/operations/O4O-GIT-PARALLEL-WORK-SAFETY-V1.md) | 다중 PC · 다중 세션 Git 안전 — path-specific stage · Safe Commit · PC 이동 · 완료 조건 | ACTIVE |
 | [PRODUCTION-MIGRATION-STANDARD](baseline/operations/PRODUCTION-MIGRATION-STANDARD.md) | 프로덕션 마이그레이션 표준 (CI/CD 자동 실행 원칙) | ACTIVE |
 | [O4O-API-SERVER-SCRIPTS-INVENTORY-V1](baseline/operations/O4O-API-SERVER-SCRIPTS-INVENTORY-V1.md) | `apps/api-server/src/scripts/**` 상태 분류(ACTIVE · PAUSED · LEGACY) · DB 로그인 identity fail-fast 규칙 | ACTIVE |
-| [O4O-DATA-CLEANUP-IDENTIFICATION-SAFETY-V1](baseline/operations/O4O-DATA-CLEANUP-IDENTIFICATION-SAFETY-V1.md) | 데이터 정비 대상 식별 안전 규칙 — UUID prefix 기반 삭제 금지 | ACTIVE |
 | [DOCUMENT-LIFECYCLE-AND-ARCHIVE-RULES-V1](rules/DOCUMENT-LIFECYCLE-AND-ARCHIVE-RULES-V1.md) | 문서 상태 · archive · 헤더 형식 정본 | ACTIVE |
 | [ESM-CIRCULAR-DEPENDENCY-ANALYSIS-V01](reference/ESM-CIRCULAR-DEPENDENCY-ANALYSIS-V01.md) | TypeORM Entity ESM 규칙(type-only import + 문자열 관계)의 근거 분석 | ACTIVE |
 | [O4O-PRIVACY-DATA-RETENTION-POLICY-V1](baseline/O4O-PRIVACY-DATA-RETENTION-POLICY-V1.md) | 개인정보 보유기간 정책 SSOT (2026-09-17 확정) — 문의 1년 · 이메일 로그 1년 · 로그인 시도 30일 · 접속·감사기록 1년(민감정보 시스템 2년) · AI 메타 1년 · 백업 7일 · 수동 export 30일 · 전자상거래 기록은 거래 개시 시. 처리방침 v1.0 보유기간 항목과 집행 WO 의 단일 기준 | ACTIVE |
@@ -175,6 +167,15 @@
 | [CONTENT-META-PRODUCTION-READY-V1](platform/content/CONTENT-META-PRODUCTION-READY-V1.md) | Content meta 계약. 헤더는 2026-09-16 정렬됐으나 **본문 §1 · §3 · §8 · §9 가 은퇴한 `kpa_working_contents` 를 정본 구조로 서술** — 현행 working copy 는 `kpa_store_contents` · `o4o_asset_snapshots`(`@o4o/types` content-meta), 복사 모델은 ROLE-WORKSPACE §6 | 판정 대기 |
 | [INTERNAL-BETA-RUNBOOK-V1](baseline/operations/INTERNAL-BETA-RUNBOOK-V1.md) | Internal Beta runbook. `BETA_MODE` · `/internal/ops/metrics` 는 존재하나 `GET /health/redis` 없음 · checkout/payment 지표는 상수만 있고 증가 호출 없음 · 소비자 결제는 410 은퇴(COMMERCE-BOUNDARY) — 지표 · 대응 절차 재작성 전에는 운영 근거로 쓰지 않는다 | 판정 대기 |
 | [APP-STANDARD-LIST-AND-MATRIX](architecture/APP-STANDARD-LIST-AND-MATRIX.md) | 앱 단위 표준 목록 · 서비스 매트릭스. **충돌**: Neture Signage 기본 포함 · 서비스별 예외 불허 서술이 [ROLE-WORKSPACE-ARCHITECTURE](baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md)(Neture Signage 채택 보류 · 미채택을 gap 으로 보지 않음)와 충돌 — 후자가 기준 | 판정 대기 |
+| [DESIGN-O4O-STORE-LIBRARY-AND-ASSET-CANONICAL-SOURCE-V1](design/DESIGN-O4O-STORE-LIBRARY-AND-ASSET-CANONICAL-SOURCE-V1.md) | **등재 후보 — 본문 검증 전.** 매장 자료함 · 실행 자산 canonical 축. **충돌**: §1 "매장 소유 자료 = `kpa_store_contents` · `store_execution_assets` 뿐" 서술이 [ROLE-WORKSPACE](baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md) §6(Hub 에서 가져온 `asset_snapshots` 도 Store 소유 독립 사본)과 충돌 — 후자가 기준 | 판정 대기 |
+| [DESIGN-O4O-STORE-EXECUTION-MANAGEMENT-CANONICAL-V1](design/DESIGN-O4O-STORE-EXECUTION-MANAGEMENT-CANONICAL-V1.md) | **등재 후보 — 본문 검증 전.** 매장 실행 관리 — 코너 축 · Placement 모델. **stale**: "`signage_playlists` 는 매장에만 묶임" — 내 매장 playlist 원장은 [SIGNAGE-STORE-PLAYLIST-MODEL-BOUNDARY](baseline/O4O-SIGNAGE-STORE-PLAYLIST-MODEL-BOUNDARY-V1.md)(`store_playlists`) | 판정 대기 |
+| [O4O-STANDARD-LIST-PHASE1-BASELINE-V1](baseline/O4O-STANDARD-LIST-PHASE1-BASELINE-V1.md) | **등재 후보 — 본문 검증 전.** 리스트 6 유형 분류. **stale**: F 유형 대표 화면 `/admin/product-approvals` 은퇴(→ `/operator/product-approvals`, 해당 화면은 표준 리스트 훅 미사용) | 판정 대기 |
+| [O4O-SHARED-SPACE-FRAME-PRINCIPLE-V1](architecture/ui-ux/O4O-SHARED-SPACE-FRAME-PRINCIPLE-V1.md) | **등재 후보 — 본문 검증 전.** 공유 공간(홈 등) 프레임 구조 원칙 — `packages/shared-space-ui`. 교차검증에서 충돌 미발견 · 본문 전수 검증 전 | 판정 대기 |
+| [O4O-SHARED-SPACE-STANDARD-BLOCKS-V1](architecture/ui-ux/O4O-SHARED-SPACE-STANDARD-BLOCKS-V1.md) | **등재 후보 — 본문 검증 전.** 공유 공간 표준 블록. 교차검증에서 충돌 미발견 · 본문 전수 검증 전 | 판정 대기 |
+| [O4O-TEMPLATE-PRESETS](design/O4O-TEMPLATE-PRESETS.md) | **등재 후보 — 본문 검증 전.** 서비스 Template Preset. **stale**: Health Dashboard preset 소멸(현행 `TemplateKey` = `kpa` · `kcosmetics` · `referenceA`) · KPA hero/border 값이 registry(`packages/shared-space-ui/src/templates.ts`, KPA hero tone fix 반영)와 다름 — registry 가 기준 | 판정 대기 |
+| [O4O-DISTRIBUTION-EVIDENCE-SEED-PRINCIPLE-V1](baseline/O4O-DISTRIBUTION-EVIDENCE-SEED-PRINCIPLE-V1.md) | **등재 후보 — 본문 검증 전.** 공공데이터 seed 상위 원칙 — 규제 존재 ≠ 유통 정보. 교차검증에서 충돌 미발견 · 본문 전수 검증 전 | 판정 대기 |
+| [APP-CONTENT-STANDARD-SPEC](architecture/APP-CONTENT-STANDARD-SPEC.md) | **등재 후보 — 본문 검증 전.** APP-CONTENT 표준 UI 스펙. **충돌 · stale**: §2 역할별 색상 hex 고정이 [DESIGN-CORE-GOVERNANCE](rules/DESIGN-CORE-GOVERNANCE.md)(토큰 하드코딩 금지)와 충돌 · Phase 1 의 `GET /api/v1/{service}/home/content` 없음 | 판정 대기 |
+| [O4O-DATA-CLEANUP-IDENTIFICATION-SAFETY-V1](baseline/operations/O4O-DATA-CLEANUP-IDENTIFICATION-SAFETY-V1.md) | **등재 후보 — 본문 검증 전.** 데이터 정비 대상 식별 안전 규칙 — UUID prefix 기반 삭제 금지는 유효. **주의**: 차단 실증용 `UPDATE` · `DELETE` probe 절은 무해 조건 · rollback 계약이 없어 그대로 실행하지 않는다(DB write 는 사용자 승인 — `CLAUDE.md` DB 경계) | 판정 대기 |
 | [CHECKOUT-STABLE-DECLARATION-V1](baseline/CHECKOUT-STABLE-DECLARATION-V1.md) | 문서 스스로 B2C storefront 를 `UNKNOWN` 으로 표기 — RETAIL-STABLE 과 같은 [COMMERCE-BOUNDARY](baseline/O4O-STORE-COMMERCE-BOUNDARY-V1.md) 충돌 후보. **기능 복구·확장 금지** | 판정 대기 |
 | [O4O-STORE-RULES](architecture/O4O-STORE-RULES.md) | **유효**: Store Template · 주문 생성 3중 방어(`CLAUDE.md` §5 가 인용). **stale**: §1 · §3.2 의 Tourism 참조 구현 · `OrderType.TOURISM`(routes/tourism 없음, OrderType 은 E-COMMERCE 행 참조). 본문 정합은 후속 | 판정 대기 |
 | [DEBUG-SSR-TEST-PAGE-GUIDE-V1](platform/debug/DEBUG-SSR-TEST-PAGE-GUIDE-V1.md) | **유효**: Raw JSON SSR 페이지로 원인 확정. **충돌**: "액션은 GET 으로 실행" 서술이 `CLAUDE.md` §8-4(GET 상태 변경 금지) · §8-1(CLI 우선)과 충돌 — §8 이 우선한다. 본문 정합은 후속 | 판정 대기 |
