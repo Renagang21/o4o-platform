@@ -11,7 +11,8 @@
 ## 0. 판정
 
 ```text
-STATE                    = READY_TO_INTEGRATE (main 미통합 · 배포 0)
+STATE                    = CLOSED (2026-10-04 · §6) — main 통합 PR #290 (1497a9d26) · API LEVEL 2 배포 · production 경로 확인. 실 PC 전용 항목은 §6-2 에 분리
+(이전 판정)               = READY_TO_INTEGRATE (main 미통합 · 배포 0)
 ASSISTANT_PLANNING       = services/assistant/assistant-planning.ts — Task 마다 ExecutionIntent(수행 방향) · 결정론(AI 호출 0)
 EXECUTION_PLANNING       = 기존 work-agent planner — 실행 지시 안에서 화면 행동만 · 결과는 ExecutionReport(주장 + 근거)
 COMPLETION_JUDGEMENT     = Assistant(judgeTaskStatus) — 완료 계약(result_observed) + 실행 근거. planner 의 done 은 주장일 뿐
@@ -21,7 +22,7 @@ OWNERSHIP vs PROCEDURE   = USER/ORGANIZATION 은 실행 지시를 바꾸지 않�
 SCHEMA / MIGRATION       = 0 (Phase A 구조로 충분 — §2)
 RAW_TEXT                 = 실행 지시 · plan · Task 저장 경로에 원문 0 (sentinel 테스트 ⑦)
 USER_RESPONSE            = 무변경 — HTTP 응답 형상 · runtime goal.status · 메시지 그대로(Task 상태만 판정 근거가 바뀜)
-DEPLOYMENT (통합 시)      = 예상 LEVEL 2 (API runtime 변경 · migration 0) — Delivery 판정에 따른다
+DEPLOYMENT               = LEVEL 2 AUTO_DEPLOY — o4o-core-api-03816-jiw traffic 100% · /health/ready 200 · migration 실행 0
 ```
 
 ## 1. 무엇을 분리했나
@@ -76,6 +77,26 @@ DEPLOYMENT (통합 시)      = 예상 LEVEL 2 (API runtime 변경 · migration 0
 | Phase B spec 15 tests | PASS — ① 방향 4종 ② 절차 칸 없음 ③ 근거 비구속 · Shared 결정적 실행 불가 ④ 소유 범위 무관 ⑤ 완료 판정 매트릭스 + done-무근거 = handed_over + 이어받기 힌트 ⑥ runtime 실 harness(지시 수신 · 힌트 · report · 지시 없음 회귀) ⑦ sentinel |
 | 회귀 — Phase A 3 spec · work-agent 7 spec · work-assistance · work-experience · work-target-discovery · windows-automation-safety · windows-ui-automation · unified-request-http | **15 suites · 169 tests PASS** (`--maxWorkers=2`) |
 | production · 실 PC smoke | 하지 않음 — 통합 · 배포 뒤 Delivery 판정에 따른다. 실 PC 는 Phase A closure 와 같은 조건(사무실 PC)이 필요 |
+
+## 6. 통합 · 배포 · production 확인 (2026-10-04)
+
+| 단계 | 결과 |
+|---|---|
+| PR | #290 — CI Gate · API Server Jest 3 shard · CodeQL · Code Quality PASS → merge `1497a9d26` (main 은 그사이 docs · `.claude/commands` · AGENTS/CLAUDE 1줄만 이동 — runtime · migration 0, 통합 규칙 변경 없음) |
+| main CI | CI Pipeline · CodeQL success |
+| Delivery | run `37179088557` — api **AUTO_DEPLOY(LEVEL 2) DEPLOYED** · web/admin 배포 없음 |
+| migration Job | `o4o-api-migrations-4q6pm` SUCCESS — `INCREMENTAL_PENDING = 0` · `INCREMENTAL_EXECUTED = 0` · LIVE fingerprint `42e44a34…` (5972) 불변 |
+| rollout | `o4o-core-api-03816-jiw` Ready → traffic 100% (pin 방식 보존) · 전환 후 `/health/ready` 200 (workflow + 수동 재확인) |
+
+### 6-1. production 경로 확인 (read-only 관찰 + work 요청 1건)
+
+- Demo 매장 경영자 계정 `POST /api/ai/request` work 1건 → 403 `WORK_AGENT_NOT_AVAILABLE` + `taskId` (노드 없는 계정 — 예상 경로).
+- 새 revision 로그: `assistant plan` (reason=new_task · startMode=discovery · taskTypeHint=false) → `assistant task updated` (status=blocked · executionClaim=None · runLinked=false). **Assistant Planning 이 production 에서 Task 마다 실행되고, 실행 보고가 없는(실행 전 종료) 경우 응답 기준 판정으로 떨어지는 것을 확인.**
+- 이 요청으로 생긴 production 행: `assistant_tasks` blocked 1행(구조만). 삭제하지 않았다.
+
+### 6-2. 실 PC 에서만 확인 가능한 것 (Phase B closure 조건 밖)
+
+- 실행 지시가 실제 planner 프롬프트에 실리는 것 · ExecutionReport 로 Task 상태가 판정되는 것(`completed` / 근거 없는 완료 = `handed_over`) — 노드(Local Agent + 확장)가 있어야 run 이 열린다. 실 harness 테스트(⑥)로 검증됐고, production 관찰은 Phase A closure smoke 와 같은 조건(사무실 PC)에서 함께 한다.
 
 ## 5. KNOWN GAP / FOLLOW-UP (Phase B 를 막지 않음)
 
