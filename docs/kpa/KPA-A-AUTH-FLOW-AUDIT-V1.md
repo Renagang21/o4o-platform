@@ -1,6 +1,6 @@
 # KPA-a Auth Flow Audit V1
 
-> **상태**: COMPLETED · 기록물(조사 · 계획 · 시점 분석) — 현재 기준 문서 아님. canonical 폴더에 있으나 위치 이전은 history 정비 WO · **표기일**: 2026-10-04
+> **상태**: ACTIVE · 기록물(조사 · 분석 · 설계 의견) — **현재 기준 정본 아님**. 제안한 후속 조치의 완료 여부는 미확인이라 COMPLETED 로 닫지 않는다(LIFECYCLE-RULES 보류 IR 규칙). 위치 이전 · 완료 판정은 history 정비 WO · **표기일**: 2026-10-04
 
 > WO-KPA-A-AUTH-FLOW-AUDIT-V1 | As-Is 조사 결과 | 2026-02-27
 
