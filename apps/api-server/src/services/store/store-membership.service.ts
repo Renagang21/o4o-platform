@@ -68,6 +68,16 @@ export const STORE_MEMBERSHIP_MANAGED_ROLES: readonly string[] = [STORE_INVITED_
  * Store Member 의 **인가 role** — `{prefix}:store_owner` 와 같은 자리에 둔다.
  * 서비스별로 나누는 이유: 업종이 다른 매장의 자격이 서로 섞이지 않게 하려는 것이고,
  * 이는 owner role 이 이미 쓰는 규약이다.
+ *
+ * **키는 공통 owner registry(`STORE_OWNER_ROLES_BY_SERVICE`, 3종)와 다르다 — 여기는 4종이다.**
+ *   owner 게이트는 `cafe24-b2b` 를 제외한다(그 서비스는 HMAC 서명 쿠키 세션으로 `/store/*` 에
+ *   들어가 `isStoreOwner()` 를 거치지 않는다). 하지만 **초대·수락은 서비스 중립 표면**이고 조직↔서비스
+ *   linkage(`STORE_SERVICE_ORG_LINKAGE`)가 `cafe24-b2b` 를 포함하므로, 그 조직에 초대받은 사람에게도
+ *   발급할 role 이 있어야 한다. 없으면 수락이 관계만 `staff` 로 바꾸고 role 을 건너뛰어 **접근 0 ·
+ *   재수락 불가**인 막다른 상태가 된다.
+ *   정본: `docs/baseline/O4O-STORE-ACCESS-AND-MEMBERSHIP-V1.md` (Active) 가 4종을 명시한다.
+ *   (WO-O4O-STORE-OWNER-RBAC-AND-SERVICE-SEMANTICS-FINAL-ALIGNMENT-V1 — 한 번 3종으로 줄였다가
+ *    PR #288 리뷰로 되돌렸다. 과거 CHECK 는 ACTIVE 정본을 이기지 못한다.)
  */
 export const STORE_MEMBER_ROLE_BY_SERVICE: Readonly<Record<StoreOwnerServiceKey, string>> = Object.freeze({
   kpa: 'kpa:store_member',
