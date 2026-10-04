@@ -61,6 +61,7 @@ import { readAttachments, renderAttachmentTextBlocks } from '../services/ai-tool
 import { executeMultimodalChat } from '../services/ai-tools/multimodal-chat.js';
 import { resolveWorkScopeStore, STORE_SCOPED_WORKSPACES } from '../utils/work-scope-store-resolution.js';
 import { runAssistantWorkTask } from '../services/assistant/personal-assistant.js';
+import type { ExecutionIntent, ExecutionReport } from '../services/ai-tools/work-agent-contract.js';
 import {
   selectToolInvocationForRequest,
   executeAiTool,
@@ -272,11 +273,11 @@ router.post('/vision/analyze', authenticate, async (req, res: Response) => {
 interface RouteReply {
   status: number;
   body: Record<string, unknown>;
-  /** 직렬화되지 않는 실행 요약 — Personal Assistant 가 Task 에 올리는 구조 키만(Phase A). */
-  execution?: { taskKey: string | null };
+  /** 직렬화되지 않는 실행 요약 — Personal Assistant 가 Task 에 올리는 구조 키(Phase A) + 실행 보고(Phase B). */
+  execution?: { taskKey: string | null; report?: ExecutionReport };
 }
 
-async function performWorkAgentRun(userId: string, body: Record<string, unknown>): Promise<RouteReply> {
+async function performWorkAgentRun(userId: string, body: Record<string, unknown>, intent?: ExecutionIntent): Promise<RouteReply> {
   const args: Record<string, unknown> = { request: body.request };
   if (body.targetHint !== undefined) args.targetHint = body.targetHint;
   if (body.image !== undefined) args.image = body.image;
@@ -318,6 +319,8 @@ async function performWorkAgentRun(userId: string, body: Record<string, unknown>
       runId: typeof body.runId === 'string' ? body.runId : undefined,
       // 실패 인계 뒤 사용자가 다시 요청하며 준 힌트(§64·§65). runtime 이 sanitize 한다.
       recoveryHint: typeof body.recoveryHint === 'string' ? body.recoveryHint : undefined,
+      // Personal Assistant Phase B — Assistant Planning 의 실행 지시(구조만). /work-agent/run 직접 호출에는 없다.
+      ...(intent ? { intent } : {}),
     },
     plannerProvider ? createLlmPlannerForProvider(AppDataSource, plannerProvider) : createLlmPlanner(AppDataSource),
     // 복구 계층의 strong 추론 경로(§11·§12) — 같은 provider·키, 더 강한 모델. 새 stack 아님.
@@ -349,7 +352,7 @@ async function performWorkAgentRun(userId: string, body: Record<string, unknown>
         workflow: result.workflow ?? null,
       },
     },
-    execution: { taskKey: result.taskKey ?? null },
+    execution: { taskKey: result.taskKey ?? null, report: result.report },
   };
 }
 

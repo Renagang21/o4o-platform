@@ -671,3 +671,71 @@ export const WORK_AGENT_ERROR = Object.freeze({
   /** 재개 요청(runId)이 유효하지 않다 — 이미 종료(taken_over/completed)됐거나 TTL 만료됐거나 소유자가 아니다(PHASE 1). */
   RESUME_REJECTED: 'WORK_AGENT_RESUME_REJECTED',
 } as const);
+
+// ─── Assistant ↔ Execution 경계 (Personal Assistant Phase B) ──────────────────
+//
+// WO-O4O-PERSONAL-ASSISTANT-PHASE-B-PLANNING-SEPARATION-V1 · 정본 V2 §2-1 · §0-1(P3)
+//
+//   Assistant Planning(L1 · L2)이 Task 마다 **ExecutionIntent** 를 정해 Execution 에 넘기고,
+//   Execution Planning(L3 · L4 — 이 runtime 의 planner)은 그 지시 안에서 화면 행동만 정한 뒤 **ExecutionReport** 를 돌려준다.
+//   Task 의 완료는 Execution 의 `done` 이 아니라 Assistant 가 완료 계약과 보고의 근거로 판정한다.
+//
+//   두 타입에는 요청 원문 · 입력값 · 화면 글 · 개인정보가 없다 — enum · 구조 키 · 불리언뿐이다.
+//   ExecutionIntent 에는 "어느 Workflow 를 실행하라" 는 칸이 없다. Task type 은 이어받기 힌트일 뿐 절차 선택 키가 아니다(P3).
+
+/** Execution 의 시작 역할. Assistant 가 정하고, Execution 은 실행 중 근거(어긋남 · 교정)로 Discovery 로만 내려갈 수 있다. */
+export type ExecutionStartMode = 'discovery' | 'resume';
+
+/** Assistant 가 이번 Task 의 방법을 고를 때 참고하는 근거의 출처(V2 §0-1). */
+export type PlanningEvidenceSource = 'own_experience' | 'knowledge' | 'shared_candidate' | 'discovery';
+
+export interface PlanningEvidence {
+  source: PlanningEvidenceSource;
+  /** 이번 Task 에서 실제로 쓸 수 있는가(배선되지 않은 출처는 false). */
+  available: boolean;
+  /**
+   * 그 출처가 Execution 을 구속하는가. **항상 false** — 어떤 근거도 강제 절차가 아니다.
+   * 자기 Experience 도 현재 화면으로 다시 검증하며 쓰고, Shared Candidate 는 추천 후보로만 들어온다(V2 §0-1 · §10).
+   */
+  binding: false;
+  /** 결정적(Experienced) 실행의 근거가 될 수 있는가 — 그 사용자 · 매장 자신의 검증된 Experience 만 true. */
+  mayAuthorizeExperienced: boolean;
+}
+
+/** 완료 계약(V2 §4-3) — 실행 검증 기준이지 KPI 가 아니다. */
+export interface CompletionContract {
+  /** 이 업무가 끝났다고 보려면 Execution 이 남겨야 하는 근거의 종류. */
+  requires: 'result_observed';
+  /** 사용자가 이어서 끝낸 것(USER_COMPLETED) · 부분 완료는 정상 결과다. */
+  acceptsUserCompletion: true;
+}
+
+export interface ExecutionIntent {
+  version: 1;
+  /** 이 지시를 낸 Task(없으면 Task 저장이 실패한 실행 — 지시는 그대로 유효). */
+  taskId: string | null;
+  startMode: ExecutionStartMode;
+  /** 같은 Task 를 이어갈 때 이전 run 이 남긴 provisional Task type — Execution 이 같은 키로 경험을 찾게 하는 힌트. 절차 선택 키가 아니다. */
+  taskTypeHint: string | null;
+  evidence: readonly PlanningEvidence[];
+  completion: CompletionContract;
+  /** 승인 경계(V2 §15). 최종 확정 · 결제 · 인증은 언제나 사용자. */
+  approval: { commit: 'user_only'; credential: 'user_only' };
+}
+
+/** Execution 이 스스로 주장하는 실행 결과. Task 상태가 아니다. */
+export type ExecutionClaim = 'execution_complete' | 'needs_user' | 'handed_over' | 'stopped' | 'not_started';
+
+export interface ExecutionReport {
+  claim: ExecutionClaim;
+  /** logical run 이 열렸는가. */
+  runOpened: boolean;
+  /** 결과 화면에 닿았다는 실행 근거 — 행동 뒤 문서 이동 · 결과 읽기 성공 · 결정적 재생 완료 중 하나 이상. */
+  resultObserved: boolean;
+  /** 결정적 재생(Workflow Candidate)이 어긋남 없이 끝났는가. */
+  replayVerified: boolean;
+  /** 실행 중 실제로 쓴 역할(마지막). */
+  plannerMode: 'discovery' | 'experienced';
+  /** Execution 이 관찰한 provisional Task type(planner 선언) — Assistant 가 Task 에 올린다. */
+  taskTypeProposal: string | null;
+}
