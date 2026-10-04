@@ -7,12 +7,12 @@ description: 작업 시작 - 동기화, 인수인계 확인, 정비 후 작업 �
 1. git status --short
    - 미커밋 변경이 있으면 멈추고 목록을 보여줘. (커밋/stash/폐기 여부는 내가 결정)
 2. git branch --show-current — branch 를 전환(`git checkout` / `git switch`)하지 않는다(AGENTS.md §4-1(b)(c)).
-3. 동기화
+3. 동기화 — 먼저 `git rev-parse origin/main` 으로 현재 값을 기록해 둔다(5번 요약의 시작점).
    - main(기준 checkout)이면: `git pull --ff-only origin main`. fast-forward가 안 되면 멈추고 원인을 보고해. 임의로 merge나 rebase 하지 마.
    - 작업 branch 의 전용 worktree 면: `git fetch origin` 만 한다. 그 branch 의 push 안 된 커밋 · `origin/main` 대비 ahead/behind 를 보고하고, 자동으로 merge/rebase 하지 않는다.
 4. pnpm install --frozen-lockfile
    - lockfile 불일치로 실패하면 멈추고 보고해. lockfile을 임의로 수정하지 마.
-5. 이번에 들어온 `origin/main` 커밋 목록(git log --oneline)을 간단히 요약해줘.
+5. 이번에 들어온 `origin/main` 커밋 목록을 `git log --oneline <3번에서 기록한 SHA>..origin/main` 으로 뽑아 간단히 요약해줘(범위 없는 `git log` 는 현재 HEAD 이력이라 쓰지 않는다).
 6. 새 작업은 기준 checkout 에서 하지 않는다 — 3단계에서 작업을 시작할 때 최신 `origin/main` 으로 전용 worktree + branch 를 만든다(AGENTS.md §4-1(a)). 이어서 하는 작업이 기존 branch · PR 이면 그 worktree 에서 한다. 새로 만든 worktree 에는 `node_modules` 가 없으므로 그 worktree 안에서 4번 설치(필요하면 `pnpm run build:packages`)를 다시 한다 — 절차는 SETUP.md.
 
 [2단계: 인수인계 확인과 정비]

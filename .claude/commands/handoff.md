@@ -9,7 +9,9 @@ main 반영은 PR merge 로만 하고, main 통합은 내가 승인한 뒤에 �
    - 작업 branch(`wo/<slug>` 등)의 전용 worktree 면 그곳에서 진행한다.
    - main(기준 checkout)이면 branch 를 전환하지 말고 전용 worktree 를 새로 만든다:
      `git fetch origin` → `git worktree add ../o4o-wt/handoff-<ID> -b wo/handoff-<ID> origin/main`
-     (`<ID>` = `<YYYYMMDD-HHMMSS>-<PC 이름>` — 같은 날 여러 세션 · PC 가 실행해도 겹치지 않게. 이미 있으면 멈추고 보고해)
+     (`<ID>` = `<YYYYMMDD-HHMMSS>-<PC slug>` — 같은 날 여러 세션 · PC 가 실행해도 겹치지 않게.
+     PC slug = hostname 을 소문자로 바꾸고 영문 · 숫자 · `-` 외 문자는 `-` 로 바꾼 값.
+     만든 이름은 `git check-ref-format --branch wo/handoff-<ID>` 로 검증하고, 실패하거나 이미 있으면 멈추고 보고해)
      이후 단계는 모두 그 worktree 에서 한다.
 2. 그 작업공간 루트의 HANDOFF.md를 새로 작성해. 기존 내용은 누적하지 말고 덮어써.
    아래 항목을 간결하게 정리해:
