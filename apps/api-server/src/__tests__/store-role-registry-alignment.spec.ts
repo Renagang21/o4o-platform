@@ -39,24 +39,36 @@ function gateServiceKeys(): string[] {
   return [...m[1].matchAll(/^\s*'?([a-z0-9-]+)'?\s*:/gm)].map((x) => x[1]);
 }
 
-describe('각 목록은 자기 기준을 따른다', () => {
-  it('member role 은 linkage 가 있는 서비스 전부에 있다 — 수락이 role 없이 끝나지 않는다', () => {
-    // linkedServiceKeys() 가 linkage 를 돌며 role 을 발급한다. 한 키라도 비면 그 조직의 수락이
-    // 관계만 바꾸고 role 을 건너뛰어 접근 0 · 재수락 불가가 된다(PR #288 리뷰 P1).
-    const linkage = Object.keys(STORE_SERVICE_ORG_LINKAGE).sort();
-    expect(Object.keys(STORE_MEMBER_ROLE_BY_SERVICE).sort()).toEqual(linkage);
-    for (const key of linkage) {
-      expect(STORE_MEMBER_ROLE_BY_SERVICE[key as keyof typeof STORE_MEMBER_ROLE_BY_SERVICE]).toBe(
-        `${key}:store_member`,
-      );
-    }
-  });
+/**
+ * 각 목록의 **기준**. 목록끼리 비교하지 않고 "이 목록은 무엇으로 정해지는가" 를 적는다 —
+ * 셋은 서로 다른 것이 정상이고, 같다고 고정하면 PR #288 의 실수를 그대로 굳힌다.
+ */
+const LISTS = [
+  {
+    name: 'member role (수락이 발급)',
+    suffix: 'store_member',
+    actual: () => Object.keys(STORE_MEMBER_ROLE_BY_SERVICE),
+    role: (k: string) => STORE_MEMBER_ROLE_BY_SERVICE[k as keyof typeof STORE_MEMBER_ROLE_BY_SERVICE],
+    // linkedServiceKeys() 가 linkage 를 돌며 발급한다. 한 키라도 비면 그 조직의 수락이 관계만
+    // 바꾸고 role 을 건너뛰어 접근 0 · 재수락 불가가 된다(PR #288 리뷰 P1).
+    expected: () => Object.keys(STORE_SERVICE_ORG_LINKAGE),
+    why: 'linkage 가 있는 서비스 전부',
+  },
+  {
+    name: '자가 가입 owner role',
+    suffix: 'store_owner',
+    actual: () => Object.keys(STORE_OWNER_ROLE_BY_SERVICE),
+    role: (k: string) => STORE_OWNER_ROLE_BY_SERVICE[k as keyof typeof STORE_OWNER_ROLE_BY_SERVICE],
+    expected: () => [...ENROLLABLE_SERVICE_KEYS],
+    why: 'ENROLLABLE_SERVICE_KEYS',
+  },
+] as const;
 
-  it('자가 가입 owner role 은 ENROLLABLE_SERVICE_KEYS 와 정확히 같다', () => {
-    expect(Object.keys(STORE_OWNER_ROLE_BY_SERVICE).sort()).toEqual([...ENROLLABLE_SERVICE_KEYS].sort());
-    for (const key of ENROLLABLE_SERVICE_KEYS) {
-      expect(STORE_OWNER_ROLE_BY_SERVICE[key]).toBe(`${key}:store_owner`);
-    }
+describe('각 목록은 자기 기준을 따른다', () => {
+  it.each(LISTS.map((l) => [l.name, l] as const))('%s — 기준과 키가 같고 role 규약을 따른다', (_n, list) => {
+    const expected = [...list.expected()].sort();
+    expect([...list.actual()].sort()).toEqual(expected);
+    for (const key of expected) expect(list.role(key)).toBe(`${key}:${list.suffix}`);
   });
 
   it('공통 게이트 owner registry 는 자가 가입 목록과 같다 — 가입했는데 못 들어가는 일이 없다', () => {
