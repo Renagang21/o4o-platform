@@ -37,11 +37,21 @@
 
 각 개발 머신에서 처음 한 번만 (`.mcp.json` 생성 포함):
 
+MCP 가 의존하는 playwright 버전에 맞는 chromium 을 받는다. 셸에 맞는 쪽을 쓴다.
+
 ```bash
-# MCP 가 의존하는 playwright 버전에 맞는 chromium 다운로드
+# bash / Git Bash / macOS · Linux
 PW=$(npm view @playwright/mcp@latest dependencies.playwright)
 npx -y "playwright@$PW" install chromium
 ```
+
+```powershell
+# Windows PowerShell
+$PW = npm view @playwright/mcp@latest dependencies.playwright
+npx -y "playwright@$PW" install chromium
+```
+
+`cmd.exe` 에서는 먼저 `npm view @playwright/mcp@latest dependencies.playwright` 로 버전을 확인한 뒤 `npx -y playwright@<그 버전> install chromium` 을 실행한다.
 
 `.mcp.json` 에서 MCP 버전을 고정했다면 `@latest` 자리에 그 버전을 넣는다 — MCP 와 브라우저의 playwright 버전이 어긋나면 `Executable doesn't exist` 가 난다.
 
