@@ -109,7 +109,8 @@ describe('① Assistant Planning — 수행 방향', () => {
 describe('② 실행 지시는 Workflow 선택이 아니다', () => {
   it('ExecutionIntent 에 절차 · workflow · candidate · skill 을 지정하는 칸이 없다', () => {
     const { intent } = planAssistantTask({ ...BASE, priorTaskTypeKey: 'drug_info.search' });
-    expect(Object.keys(intent).sort()).toEqual(['approval', 'completion', 'evidence', 'startMode', 'taskId', 'taskTypeHint', 'version']);
+    // Phase C: knownTaskTypes(Assistant Memory 의 업무 유형 이름) 추가 — 여전히 절차 칸은 없다.
+    expect(Object.keys(intent).sort()).toEqual(['approval', 'completion', 'evidence', 'knownTaskTypes', 'startMode', 'taskId', 'taskTypeHint', 'version']);
     expect(JSON.stringify(intent)).not.toMatch(/workflow|procedure|candidateId|skillId|steps/i);
   });
 

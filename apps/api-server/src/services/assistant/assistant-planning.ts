@@ -41,6 +41,8 @@ export interface AssistantPlanningInput {
   userMethodHint: boolean;
   /** 이 요청이 실행 노드(Local Agent)를 쓸 수 있는가 — 노드에 있는 자기 Experience 를 Execution 이 읽을 수 있는가. */
   nodeExperienceReachable: boolean;
+  /** Phase C — Assistant Memory(Cloud · 노드 무관)가 돌려준 같은 소유 주체 · 같은 대상의 업무 유형. 없으면 빈 배열. */
+  knownTaskTypes?: readonly string[];
 }
 
 export interface AssistantPlan {
@@ -84,6 +86,7 @@ export function planAssistantTask(input: AssistantPlanningInput): AssistantPlan 
       // 그때만 Experienced 로 올린다(근거가 실행 노드에 있기 때문 — 결정은 근거 규칙으로 고정돼 있다).
       startMode: input.resuming ? 'resume' : 'discovery',
       taskTypeHint: input.priorTaskTypeKey,
+      knownTaskTypes: [...(input.knownTaskTypes ?? [])],
       evidence: planningEvidence(input.nodeExperienceReachable),
       completion: COMPLETION,
       approval: { commit: 'user_only', credential: 'user_only' },

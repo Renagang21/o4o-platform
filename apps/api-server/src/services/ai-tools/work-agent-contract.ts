@@ -717,6 +717,11 @@ export interface ExecutionIntent {
   startMode: ExecutionStartMode;
   /** 같은 Task 를 이어갈 때 이전 run 이 남긴 provisional Task type — Execution 이 같은 키로 경험을 찾게 하는 힌트. 절차 선택 키가 아니다. */
   taskTypeHint: string | null;
+  /**
+   * Phase C — Assistant Memory: 같은 소유 주체(본인 USER Task 또는 그 조직의 ORGANIZATION Task) · 같은 대상에서 이전 Task 가
+   * 확인한 업무 유형(Cloud · 실행 노드 무관). 새 노드에서도 같은 업무를 같은 키로 이어가 경험을 찾게 한다. 절차 선택 키가 아니다(P3).
+   */
+  knownTaskTypes: readonly string[];
   evidence: readonly PlanningEvidence[];
   completion: CompletionContract;
   /** 승인 경계(V2 §15). 최종 확정 · 결제 · 인증은 언제나 사용자. */
