@@ -11,7 +11,8 @@
 ## 0. 판정
 
 ```text
-STATE                     = READY_TO_INTEGRATE (main 미통합 · 배포 0) — Gate 허용 범위 구현 완료 · 절차 기억 이동은 LEGAL_GATE_PENDING
+STATE                     = CLOSED (2026-10-04 · §7) — Gate 허용 범위 구현 · main 통합(PR #295 66f5ae11e) · API 배포 · production 확인. 절차 기억 이동은 LEGAL_GATE_PENDING 유지
+(이전 판정)                = READY_TO_INTEGRATE (main 미통합 · 배포 0)
 MEMORY_OWNERSHIP          = services/assistant/memory-ownership.ts — 기억 10종 × 소유 주체 × 배치(allowed · gate_required · never) · 판정 함수 · Gate 상수 PENDING
 ASSISTANT_MEMORY          = services/assistant/assistant-memory.ts — 노드 무관 recall: assistant_tasks 의 Task type 이력(같은 소유 주체 · 같은 대상)
 CONTINUITY (지금)          = 새 노드(Local 원장 빔)에서도 같은 업무를 같은 키로 이어감 → 노드의 절차 기억 조회 키 일치
@@ -20,7 +21,7 @@ NODE_LOCAL_PROMOTION      = 차단 — node_environment · slot_values · raw_co
 SHARED                    = 이번 경로로 오지 않음 — 소유 주체 밖(다른 사용자 · 조직) 조회 0
 SCHEMA / MIGRATION        = 0 (기존 assistant_tasks 읽기 · 기존 인덱스)
 NEW_PERSONAL_DATA_STORAGE = 0 · NEW_EXTERNAL_PROCESSING = 0
-DEPLOYMENT (통합 시)       = 예상 LEVEL 2 (API runtime · migration 0)
+DEPLOYMENT                = LEVEL 2 — 뒤이은 commit bc1a0bcdd(⊇ 66f5ae11e) Delivery 가 api DEPLOYED · o4o-core-api-03822-quk traffic 100% · /health/ready 200 · migration 실행 0
 ```
 
 ## 1. Legal / Data Processing Gate 판정
@@ -114,6 +115,24 @@ Task (Phase A · 소유 범위 USER | ORGANIZATION)
 | 8 | 민감정보 저장 범위 확대 없음 | 충족 — 새 저장 0 |
 | 9 | 테스트 · CHECK | 충족 |
 | 10 | 채널 · 노드가 늘어도 Memory 구조 재작성 불필요 | 충족 — 기억은 소유 주체 축으로 조회(노드 · 채널 인자 없음) |
+
+## 7. 통합 · 배포 · production 확인 (2026-10-04)
+
+| 단계 | 결과 |
+|---|---|
+| 통합 대기 | 다른 세션 #288(Store role registry) CI · #293 Promote(전 서비스) 진행 중 → `WAITING_FOR_INTEGRATION` 으로 순서 대기 후 진행 |
+| PR | #295 — CI Gate · API Server Jest 3 shard · CodeQL · Code Quality PASS → merge `66f5ae11e` |
+| main CI | `66f5ae11e` CI Pipeline · CodeQL success |
+| Delivery | `66f5ae11e` 의 Delivery 는 뒤이어 merge 된 #296 로 `SUPERSEDED` → `bc1a0bcdd`(⊇ 66f5ae11e) Delivery 가 **api DEPLOYED (LEVEL 2)** |
+| rollout | `o4o-core-api-03822-quk` traffic 100% · `/health/ready` 200 · migration Job `INCREMENTAL_EXECUTED = 0` |
+| production 경로 | Demo 매장 경영자 work 요청 1건(403 · 노드 없음 예상 경로) → 새 revision `assistant plan` 로그: `memorySources = [task_type_history:cloud:read, procedural_memory:node:LEGAL_GATE_PENDING]` · `memoryTaskTypes = 0`(이 계정은 이전 Task type 이력 없음). **Assistant Memory 가 production 에서 노드 무관하게 Cloud Task 이력을 읽고, 절차 기억은 Gate 대기로 표시** |
+| 실 PC | 하지 않음 — 이전 Task type 이 있는 계정 · 노드에서 knownTaskKeys 이어짐 관찰은 Phase A closure 와 같은 조건(사무실 PC) |
+| 생성된 production 행 | `assistant_tasks` blocked 1행(구조만) — 삭제하지 않음 |
+
+## 8. 다음 작업 제안 (사용자 방향 2026-10-04 반영)
+
+- **Assistant Memory Legal / Data Placement Gate 정렬 — 큰 목표 1개**: 무엇이 실제로 Cloud Assistant Memory 로 필요한가 · USER/ORGANIZATION 소유 차이 · 절대 Cloud 금지 · 종류별 보존 목적 · 기간 · 삭제/탈퇴/조직 이탈 처리 · 처리방침/이용계약 고지 · 재동의 필요성(법률 판단은 선택지로만 상신) · OpenAI 국외 이전 STILL_OPEN 정리. "여러 노드 연속성 필요" ≠ "모든 실행 흔적 Cloud 저장" — 재개 frame · 실행 기록 전체는 별도 판단.
+- `knownTaskTypes` 는 **첫 연속성 신호**이며 최종 Memory 모델이 아니다. Assistant 가 판단해야 할 기억(선호 · 업무 맥락 · 검증된 방법 · 교정 · 이번 Task 의 차이)은 Gate 정렬 결과로 모델을 정한다.
 
 ## 6. KNOWN GAP
 
