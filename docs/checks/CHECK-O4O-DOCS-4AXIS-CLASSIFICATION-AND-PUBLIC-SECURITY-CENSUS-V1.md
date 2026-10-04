@@ -192,10 +192,10 @@ checks 1,713 · investigations 727 · work-orders 149 · ir 33 · 기타 3 (audi
 
 | 판정 | 수 | 조치 |
 |---|---:|---|
-| ACTIVE (미등재) | 28 | 색인에 21행 추가(§2 · §3 · §4 · §5 · §6 · §7). 폴더 README · 개발자 모듈 문서 · 트랙 한정 문서 7건은 등재 불필요 |
+| ACTIVE (미등재) | 28 | 색인에 19행 추가(§2 · §3 · §5 · §6 · §7). `O4O-STORE-OWNER-RBAC-STANDARD-V1`(본문 내부 모순) · `PLAYWRIGHT-MCP`(고정 버전 stale) 2건은 §9 판정 대기로 등재. 폴더 README · 개발자 모듈 문서 · 트랙 한정 문서 7건은 등재 불필요 |
 | ACTIVE (등재 · 일치) | 15 | 변경 없음 |
 | 색인 불일치 | 8 | 색인 §9 "판정 대기" 로 이동하고 유효 절 · stale 절을 행에 명시. 본문 정합은 후속 |
-| 기록물이 canonical 폴더에 있음 | 17 | 14건 상단에 `COMPLETED · 기록물` 상태 줄. MINEROCK600 media-pilot 3건은 진행 중 트랙이라 표기하지 않음 |
+| 기록물이 canonical 폴더에 있음 | 17 | 12건 상단에 `COMPLETED · 기록물` 상태 줄. Promotion 계획 · 매트릭스 2건은 미실행 초안이라 `DRAFT`. MINEROCK600 media-pilot 3건은 진행 중 트랙이라 표기하지 않음 |
 | SUPERSEDED | 2 | `NETURE-DOMAIN-ARCHITECTURE-FREEZE-V1` → V3 · `DECISION-O4O-IDENTITY-ARCHITECTURE-V2-ADOPTION-V1` → IDENTITY V3 상태 줄 |
 | OBSOLETE | 1 | `ALPHA-STATUS-DISPLAY-STANDARD` (서비스 코드에서 표시 소멸) |
 | 판정 불가 | 11 | 상태 줄 없음 = ACTIVE 유지(LIFECYCLE §6 · CLAUDE.md §16-6). 아래 7-4 |
@@ -224,7 +224,7 @@ checks 1,713 · investigations 727 · work-orders 149 · ir 33 · 기타 3 (audi
 
 ### 7-5. 후속 (별도 WO)
 
-1. 판정 대기로 옮긴 8건의 본문 정합 — 특히 `CLAUDE.md` 가 직접 가리키는 `O4O-STORE-RULES` · `DEBUG-SSR-TEST-PAGE-GUIDE-V1` 우선
+1. 판정 대기로 옮긴 10건(불일치 8 + STORE-OWNER-RBAC · PLAYWRIGHT-MCP)의 본문 정합 — 특히 `CLAUDE.md` 가 직접 가리키는 `O4O-STORE-RULES` · `DEBUG-SSR-TEST-PAGE-GUIDE-V1` 우선
 2. `docs/baseline/README.md` 의 상태 표기(3-ROLE-FLOW · KPA-ROLE-MATRIX · ROLE-POLICY · E-COMMERCE)가 색인과 다름 — 색인 기준으로 정렬
 3. `O4O-CORE-FREEZE-V1`(F10) 의 `RefreshToken.ts` 목록 stale(Identity V3 `refresh_tokens=DEAD_RETIRE`) — Frozen 본문이라 명시적 WO
 4. 판정 불가 11건 결정 · SUPERSEDED 3 과 기록물 14건의 위치 이전은 history 정비 WO 에서
