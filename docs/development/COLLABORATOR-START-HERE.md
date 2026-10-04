@@ -110,7 +110,7 @@ DB 의 `o4o_api` 는 로그인 계정이 아니라 **NOLOGIN owner role** 이다
 
 이 저장소는 **Public** 이다. 공동개발자 작업 경로는 **본인 branch → PR → 소유자 승인 → `main`** 이다.
 
-- `main` 은 ruleset 으로 보호된다(직접 push · force push · 삭제 불가, PR 승인 1 필요).
+- `main` 은 ruleset 으로 보호된다(직접 push · force push · 삭제 불가, PR + required check `CI Gate` 필수). 필수 human approval 은 없고, `main` 반영은 소유자의 통합 승인 후 PR merge 로 한다 — 상세는 [AGENTS.md §4-1(e)](../../AGENTS.md#4-1-parallel-session--worktree-policy).
 - Production 은 소유자 통제다: `production` Environment 는 `main` · `deploy/*` tag 에서만 실행되고, `deploy/*` tag 는 소유자만 만들 수 있으며, 수동 배포는 소유자가 실행할 때만 게이트가 열린다.
 - production credential 은 `production` environment secret 으로 둔다 — 공동개발자 branch · PR 의 workflow 는 받지 못한다(이행 상태는 [README — 배포](../../README.md)).
 - GitHub Actions 의 GCP 인증은 WIF(장기 SA key 없음)이며 소유자 통제 workflow(`main` · `deploy/*` · `production` environment)에서만 성립한다. 공동개발자에게 production GCP credential 은 제공하지 않는다.

@@ -41,6 +41,8 @@ O4O Platform repository의 Codex 및 일반 coding agent를 위한 독립 진입
 - **조사 전용 작업은 파일을 수정하지 않고 보고로 종료한다.**
 - 구현 요청이면 승인된 안전 범위 안에서 불필요한 중간 승인 없이 완료까지 진행한다.
 - 이미 명시적으로 승인된 변경 범위를 같은 이유로 기계적으로 다시 승인받지 않는다.
+  승인된 범위 안의 조사 · 수정 · 검증 · review finding 처리 · 스레드 정리 · 상태 조회는 스스로 판단해 진행한다.
+  사용자에게 올리는 것은 새 정책 · 위험 범위 판단과 main 통합 승인뿐이다(§4-1(e) · §5).
 - 새롭게 발견된 범위 확대나 미승인 위험 변경은 해당 변경 전에 중지하고 보고한다.
 - 범위 밖 문제는 임의 수정하지 않고 보고한다. 무관한 build/test 실패도 임의로 고치지 않는다.
 - 기존 코드 패턴을 우선하고 과도한 추상화·리팩터링을 피한다. 코딩 컨벤션은 [README.md](README.md)를 따른다.
@@ -109,24 +111,30 @@ O4O Platform repository의 Codex 및 일반 coding agent를 위한 독립 진입
 - 앞서갔다고 **자동으로 merge · rebase · reset · cherry-pick 하지 않는다.** 충돌 여부 · 통합 필요성 · 현재 통합 정책을
   먼저 확인한다. 통합 시점(e)에 자기 branch 를 최신 `origin/main` 위로 올리는 것은 자기 branch 에 한해 허용된다.
 
-**(e) main 통합 — 현재 governance 를 따른다**
+**(e) main 통합 — PR merge · 사용자 승인 후**
 
-현재 `main` ruleset: 삭제 · non-fast-forward 금지, PR + 승인 1 + required check `CI Gate`, admin bypass
-(합의 규칙 포함 상세: [README — 기여](README.md#기여)). "모든 작업은 PR" 로 고정하지 않는다.
+```text
+작업 → 검증 → PR → required CI PASS → Codex blocker 없음   = integration-ready
+→ 결과 보고 · STOP → 사용자 "main 통합 진행" → PR merge → post-merge 확인
+```
 
-| 주체 | main 반영 경로 |
-|---|---|
-| 공동개발자(collaborator) | 본인 branch → PR → 승인 1 + `CI Gate` → merge |
-| 소유자(admin) 계정의 세션 · AI 세션 | 자기 branch 를 최신 `origin/main` 위에 정리 → 검증 → **fast-forward push** (`git push origin wo/<slug>:main`). WO 가 리뷰 · PR 을 요구하면 PR |
-
-- **기술적으로 admin bypass 가 가능하다는 사실과 그 작업에서 bypass 를 써야 한다는 것은 별개다.**
-  WO 에 정해진 통합 절차가 우선한다.
+- **기술 gate 는 실제 `main` ruleset 이다.** 설정값은 이 문서에 고정하지 않고 통합 직전 read-only 로 확인한다
+  (`gh api repos/Renagang21/o4o-platform/rulesets`). 2026-10-04 확인값: PR 필수 · required check `CI Gate` ·
+  삭제 · non-fast-forward 금지 · **필수 human approval 0** · admin bypass 가능. 합의 규칙: [README — 기여](README.md#기여).
+- **모든 주체(사람 · Claude Code · Codex · 그 밖의 agent)의 main 반영 경로는 PR merge 하나다.**
+  owner direct push · fast-forward push(`git push origin <branch>:main`) 로 PR 을 우회하지 않는다.
+- **integration-ready 여도 자동으로 merge 하지 않는다.** 상태(HEAD · CI · Codex · 미해결 스레드 · main 대비 위치 · blocker)를
+  보고하고 STOP 한다. 작업을 지시한 사용자가 명시적으로 "main 통합 진행" 을 승인한 뒤에만 merge 한다.
+- **필수 human approval 은 기본 merge gate 가 아니다.** 다른 개발자 review 는 선택적으로 쓴다 — 고위험 구조 변경 ·
+  보안 · 권한 · DB · 공통 Core 변경, 또는 사용자가 요구할 때. 개발자들은 각자 작업공간에서 독립적으로 일하며
+  서로의 상시 승인자가 되지 않는다.
+- **admin bypass 는 정상 경로가 아니다.** ruleset 을 우회할 수 있다는 사실을 merge 허가로 해석하지 않는다.
+  장애 복구 같은 예외도 사용자 사전 확인 후에만 쓴다.
 - 자기 branch 의 자기 변경만 commit / push 한다. stage · commit 규칙은 §4-2 그대로다.
-- **통합은 한 번에 하나씩:** `git fetch origin` → 자기 branch 를 `origin/main` 위로 정리
+- **통합은 한 번에 하나씩:** merge 직전 `git fetch origin` → `origin/main` 이 움직였으면 자기 branch 를 정리
   (아직 push 하지 않은 branch 는 rebase, 이미 push 한 branch 는 `git merge origin/main` — 원격 branch 이력 재작성 금지)
-  → 필요한 재검증 → ff push. 그 사이 main 이 움직여 거절되면 같은 절차를 반복한다.
-  다른 세션이 통합하는 동안에도 각 세션은 자기 worktree 에서 개발을 계속할 수 있다.
-- 통합에 기준 main checkout 을 쓰지 않는다. 통합은 자기 worktree 에서 ref push 로 끝난다.
+  → 필요한 재검증 → PR merge. 다른 세션이 통합하는 동안에도 각 세션은 자기 worktree 에서 개발을 계속할 수 있다.
+- 통합에 기준 main checkout 을 쓰지 않는다.
 
 **(f) 배포**
 
@@ -155,20 +163,37 @@ Chrome native host · Chrome Extension · 실제 browser session(Playwright 프�
 - Agent start / restart · `local.db` migration · credential / pairing 변경 · Extension reload · 실 PC smoke 는
   동시에 한 세션만 수행한다. 실 PC 검증 전 다른 세션의 사용 여부를 확인한다.
 
-**(i) 생명주기 · 정리**
+**(i) 생명주기 · 종료 정리**
 
 ```text
-최신 origin/main → 전용 worktree + branch → 작업 → 검증 → commit / push → main 통합 → CI
-→ (필요 시) deploy / smoke → closure → WORKTREE_DISPOSITION 판정 → 승인 시 제거
+최신 origin/main → 전용 worktree + branch → 작업 → 검증 → commit / push → PR → CI · Codex
+→ 보고 · STOP → 사용자 승인 → main 통합(PR merge) → post-merge CI
+→ (필요 시) deploy / smoke → 종료 정리(아래) → 트랙 종료
 ```
 
-- 작업이 끝나도 worktree · branch(로컬 · 원격)를 **자동 삭제하지 않는다.** 먼저 read-only 로 판정한다:
-  `SAFE_TO_REMOVE` / `KEEP` / `UNCERTAIN`.
-- 최소 확인: 작업 commit 이 main 에 모두 포함(`git log origin/main..wo/<slug>` 비어 있음) · branch-only commit 없음 ·
-  uncommitted 0 · untracked 0 · 다른 세션 사용 없음 · 남은 deploy / smoke / closure 없음 · 보존할 CHECK / log / artifact 없음 ·
-  후속 작업이 그 branch 를 필요로 하지 않음.
-- `UNCERTAIN` 이면 삭제하지 않는다. `SAFE_TO_REMOVE` 여도 실제 삭제(`git worktree remove` · `git branch -d` ·
-  `git push origin --delete`)는 사용자 승인 후에 한다.
+**PR merge 후 자기 세션이 만든 worktree 의 정리는 표준 종료 절차다.** 즉시 삭제하지 않고 아래 순서로 점검한 뒤 삭제한다.
+
+1. **main 반영 확인** — 먼저 `git fetch origin --prune`(GitHub 에서 merge 한 직후 로컬 `origin/main` 은 자동 갱신되지 않는다) →
+   post-merge CI 확인 · 작업 commit 이 모두 main 에 포함(`git log origin/main..wo/<slug>` 비어 있음.
+   squash merge 라 비어 있지 않으면 `git diff origin/main wo/<slug> -- <내 작업 경로>` 차이 0 으로 확인).
+2. **worktree clean** — uncommitted 0 · untracked 0 · 진행 중 operation(`MERGE_HEAD` · rebase 등) 없음.
+3. **남은 일 없음** — deploy / smoke / closure 없음 · 보존할 CHECK / log / artifact 없음 · 다른 세션 사용 없음 ·
+   후속 작업이 그 branch 를 필요로 하지 않음.
+4. **reparse point 안전 점검 (Windows · 필수)** — worktree 아래 **모든 깊이**의 junction / symlink(특히 `node_modules`)를 나열하고,
+   각 링크를 비재귀로 해제(PowerShell `[System.IO.Directory]::Delete(<path>)`)한 뒤 **재스캔 0** 을 확인한다.
+   Git Bash 의 `cmd rmdir` 은 경로 인용 오류로 조용히 실패한다. 하나라도 해제되지 않으면 삭제하지 않는다.
+   근거: Windows git 은 junction 을 따라 재귀 삭제한다 — 2026-09-12 `node_modules` junction 을 남긴 채
+   `git worktree remove` 를 실행해 기준 저장소의 `packages/` 소스가 삭제된 사고.
+5. **삭제** — `git worktree remove <path>` → `git worktree prune`.
+6. **손상 검증** — 기준 main checkout 에서 `git status --short` 에 삭제(` D`) 항목이 없는지 확인한다(`node_modules` 개수가 아니라).
+7. **branch 정리** — main 에 포함된 로컬 `wo/<slug>` 는 `git branch -d`. 원격 branch 는 PR merge 시
+   `--delete-branch` 또는 merge 후 삭제한다. squash merge 는 branch tip 이 main 의 조상이 아니어서 `-d` 가 거절된다 —
+   그 경우에 한해, 1 단계의 경로 diff 0 을 확인했고 PR 이 merged 상태일 때만 `git branch -D wo/<slug>` 를 쓴다.
+   그 밖의 상황에서 강제 삭제(`-D`)는 하지 않는다.
+
+- 판정은 `SAFE_TO_REMOVE` / `KEEP` / `UNCERTAIN` 이다. 1~4 를 모두 통과한 `SAFE_TO_REMOVE` 는 별도 승인 없이 5~7 까지 진행한다
+  (main 통합 승인이 트랙 종료를 포함한다). `KEEP` / `UNCERTAIN` 이면 삭제하지 않고 이유를 보고한다.
+- **다른 세션 · 다른 PC 가 만든 worktree / branch 는 정리 대상이 아니다** — 판정만 보고한다.
 
 **(j) 완료 보고**
 
@@ -199,8 +224,9 @@ verdict: SAFE_TO_REMOVE | KEEP | UNCERTAIN
 - 커밋 후 `git show --stat --oneline HEAD`로 실제 포함 경로를 확인한다.
 - push 전 다시 fetch하여 `origin/main` 이동을 확인한다. **force push(`--force`) 금지.**
   공유 `main` 이력을 재작성하지 않는다(`amend` 포함). 정정은 후속 커밋으로 한다.
-- commit/push를 수행하는 작업의 완료 조건은 **이번 작업 범위 미커밋 변경 0건 + 내 커밋이 `origin/main`에 포함**
-  (`git merge-base --is-ancestor HEAD origin/main`)이다. 다른 세션의 변경까지 정리하여 저장소 전체를 clean하게 만들지 않는다.
+- commit/push를 수행하는 작업의 완료 조건은 **이번 작업 범위 미커밋 변경 0건 + 내 커밋이 작업 branch 에 push 되고 PR 이 integration-ready**(§4-1(e))이다.
+  **작업 완료와 main 통합은 별개다** — 완료 조건을 채우려고 main 에 먼저 merge 하지 않는다. 사용자가 통합을 승인해 merge 한 경우에만
+  `git merge-base --is-ancestor HEAD origin/main` 으로 포함을 확인한다. 다른 세션의 변경까지 정리하여 저장소 전체를 clean하게 만들지 않는다.
 
 ## 5. 위험 변경 / 사용자 확인
 

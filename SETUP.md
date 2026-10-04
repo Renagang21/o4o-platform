@@ -291,10 +291,11 @@ web-neture 테스트를 로컬에서 돌리려면 루트에서 `npx vitest run -
 
 ### Git 절차
 
-브랜치 전략은 [CLAUDE.md](CLAUDE.md) §1(`main` 직접 작업)을 따릅니다.
-**다중 PC · 다중 세션 환경의 stage · 커밋 · PC 이동 절차는
-[docs/baseline/operations/O4O-GIT-PARALLEL-WORK-SAFETY-V1.md](docs/baseline/operations/O4O-GIT-PARALLEL-WORK-SAFETY-V1.md) 가 정본입니다** —
-path-specific stage, 다른 세션 미커밋 변경 불가침, `HEAD == origin/main` 완료 조건,
+**worktree · branch · main 통합 · 종료 정리는 [AGENTS.md §4-1](AGENTS.md#4-1-parallel-session--worktree-policy) 이 정본입니다** —
+독립 작업은 전용 worktree + branch 에서 하고, `main` 반영은 PR merge 로만(사용자 통합 승인 후) 합니다. `main` 직접 작업 · direct push 는 쓰지 않습니다.
+**stage · 커밋 · PC 이동 절차는
+[docs/baseline/operations/O4O-GIT-PARALLEL-WORK-SAFETY-V1.md](docs/baseline/operations/O4O-GIT-PARALLEL-WORK-SAFETY-V1.md) 가 정본입니다**(그 문서의 `main` 직접 작업 전제와 다르면 §4-1 우선) —
+path-specific stage, 다른 세션 미커밋 변경 불가침,
 PC 이동 체크리스트, `.husky/pre-commit` 의 lockfile 검증 계약이 모두 그 문서에 있습니다.
 
 ---
