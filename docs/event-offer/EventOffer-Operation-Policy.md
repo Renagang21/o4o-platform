@@ -218,7 +218,7 @@ checkout_orders (metadata.serviceKey = 'kpa-groupbuy')
 | GET | `/groupbuy-admin/stats` | 집계 통계 | kpa:operator |
 | GET | `/groupbuy-admin/supplier-status` | 공급자 연계 상태 | kpa:operator |
 
-> (2026-10-04 정합) 현행 운영자 API 에는 위 외에 `GET /groupbuy-admin/pending-listings`(승인 대기 목록) · `POST /groupbuy-admin/products/:id/approve` · `POST /groupbuy-admin/products/:id/reject` · `POST /groupbuy-admin/products/:id/order`(노출 순서)가 있다 (`event-offer-operator.controller.ts`). 공개 API 에는 `GET /groupbuy/enriched` 가 있다 (`event-offer.controller.ts`).
+> (2026-10-04 정합) 현행 운영자 API 에는 위 외에 `GET /groupbuy-admin/pending-listings`(승인 대기 목록) · `POST /groupbuy-admin/products/:id/approve` · `POST /groupbuy-admin/products/:id/reject` · `POST /groupbuy-admin/products/:id/order` 가 있다 — 단 `order` 는 **no-op 호환 경로**다(`display_order` 컬럼이 없어 요청 값을 echo 만 하고 목록은 `created_at ASC` 고정, 노출 순서 변경은 미구현) (`event-offer-operator.controller.ts`). 공개 API 에는 `GET /groupbuy/enriched` 가 있다 (`event-offer.controller.ts`).
 
 ### 약국/공개 API (`/api/v1/kpa/groupbuy/*`)
 
