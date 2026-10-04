@@ -66,6 +66,8 @@ env:
   # WO-O4O-CLOUD-RUN-RUNTIME-SA-LEAST-PRIVILEGE-V1 — Cloud Run runtime identity (default compute SA · roles/editor 사용 종료).
   #   github-actions SA 는 이 SA 에 대해서만 actAs 할 수 있다(SA 리소스 단위 iam.serviceAccountUser). 권한: CHECK-O4O-CLOUD-RUN-RUNTIME-SA-LEAST-PRIVILEGE-V1
   RUNTIME_SA: o4o-runtime@netureyoutube.iam.gserviceaccount.com
+  # WO-O4O-GITHUB-ACTIONS-RUN-ADMIN-TO-DEVELOPER-V1 — 배포는 Cloud Run IAM 을 바꾸지 않는다(github-actions = roles/run.developer · setIamPolicy 없음).
+  #   기존 서비스의 공개 접근(allUsers → roles/run.invoker)은 서비스 IAM 에 이미 있고 배포가 유지한다. 새 서비스는 최초 1회 소유자가 부여 — CHECK-O4O-GITHUB-ACTIONS-RUN-ADMIN-TO-DEVELOPER-V1.
   # Default API URL (neture uses this)
   VITE_API_BASE_URL: https://api.neture.co.kr
   # Service-specific API URLs (same-origin for cookie auth)
@@ -325,7 +327,6 @@ jobs:
             --project=${{ env.PROJECT_ID }} \
             --service-account=${{ env.RUNTIME_SA }} \
             --platform=managed \
-            --allow-unauthenticated \
             --port=8080 \
             --memory=256Mi \
             --cpu=1 \
@@ -445,7 +446,6 @@ jobs:
             --project=${{ env.PROJECT_ID }} \
             --service-account=${{ env.RUNTIME_SA }} \
             --platform=managed \
-            --allow-unauthenticated \
             --port=8080 \
             --memory=256Mi \
             --cpu=1 \
@@ -556,7 +556,6 @@ jobs:
             --project=${{ env.PROJECT_ID }} \
             --service-account=${{ env.RUNTIME_SA }} \
             --platform=managed \
-            --allow-unauthenticated \
             --port=8080 \
             --memory=256Mi \
             --cpu=1 \
@@ -670,7 +669,6 @@ jobs:
             --project=${{ env.PROJECT_ID }} \
             --service-account=${{ env.RUNTIME_SA }} \
             --platform=managed \
-            --allow-unauthenticated \
             --port=8080 \
             --memory=256Mi \
             --cpu=1 \
@@ -769,7 +767,6 @@ jobs:
             --project=${{ env.PROJECT_ID }} \
             --service-account=${{ env.RUNTIME_SA }} \
             --platform=managed \
-            --allow-unauthenticated \
             --port=8080 \
             --memory=256Mi \
             --cpu=1 \
@@ -864,7 +861,6 @@ jobs:
             --project=${{ env.PROJECT_ID }} \
             --service-account=${{ env.RUNTIME_SA }} \
             --platform=managed \
-            --allow-unauthenticated \
             --port=8080 \
             --memory=256Mi \
             --cpu=1 \
@@ -959,7 +955,6 @@ jobs:
             --project=${{ env.PROJECT_ID }} \
             --service-account=${{ env.RUNTIME_SA }} \
             --platform=managed \
-            --allow-unauthenticated \
             --port=8080 \
             --memory=256Mi \
             --cpu=1 \
@@ -1052,7 +1047,7 @@ jobs:
 
           echo "Deploying kpa-branch-web to Cloud Run..."
 
-          gcloud run deploy kpa-branch-web             --image=gcr.io/${{ env.PROJECT_ID }}/kpa-branch-web:${{ github.sha }}             --region=${{ env.REGION }}             --project=${{ env.PROJECT_ID }}             --service-account=${{ env.RUNTIME_SA }}             --platform=managed             --allow-unauthenticated             --port=8080             --memory=256Mi             --cpu=1             --min-instances=0             --max-instances=5 "${ROLLOUT_ARGS[@]}" --update-labels="o4o-commit-sha=${{ github.sha }}"
+          gcloud run deploy kpa-branch-web             --image=gcr.io/${{ env.PROJECT_ID }}/kpa-branch-web:${{ github.sha }}             --region=${{ env.REGION }}             --project=${{ env.PROJECT_ID }}             --service-account=${{ env.RUNTIME_SA }}             --platform=managed             --port=8080             --memory=256Mi             --cpu=1             --min-instances=0             --max-instances=5 "${ROLLOUT_ARGS[@]}" --update-labels="o4o-commit-sha=${{ github.sha }}"
 
           echo "kpa-branch-web deployed successfully!"
 
@@ -1159,7 +1154,6 @@ jobs:
             --project=${{ env.PROJECT_ID }} \
             --service-account=${{ env.RUNTIME_SA }} \
             --platform=managed \
-            --allow-unauthenticated \
             --port=8080 \
             --memory=256Mi \
             --cpu=1 \
