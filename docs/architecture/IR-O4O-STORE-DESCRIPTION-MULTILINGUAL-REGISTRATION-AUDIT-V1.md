@@ -1,5 +1,7 @@
 # IR-O4O-STORE-DESCRIPTION-MULTILINGUAL-REGISTRATION-AUDIT-V1
 
+> **상태**: COMPLETED · 기록물(조사 · 계획 · 시점 분석) — 현재 기준 문서 아님. canonical 폴더에 있으나 위치 이전은 history 정비 WO · **표기일**: 2026-10-04
+
 > 성격: **read-only 조사** — 매장용 상품 설명서(STORE)를 상품별·언어별로 등록·활용할 수 있는 현재 구현 상태.
 > Date: 2026-07-22 · 코드·DB·배포 변경 0.
 > 근거: 정적 코드 분석(엔티티·migration·컨트롤러·프론트). 라이브 데이터 카운트는 §7·§10 참조(프로덕션 DB 고부하로 보류).

@@ -6,7 +6,8 @@
 
 docs Markdown 4축 분류(CANONICAL · DEVELOPER · INTERNAL_SECURITY · HISTORY) · PUBLIC 저장소 전제 보안 census. 후속 문서 정비 WO 의 입력 자료이며 미해결 판단 사항을 포함한다 (LIFECYCLE-RULES §10-2 ④).
 
-- **판정**: `SECURITY_REMEDIATION_REQUIRED` — 해소 조건 ① 보안 PR #279 main 반영 대기 · ② 로그인 불가 확인 완료 (§3-2)
+- **판정**: `READY_FOR_DOCUMENT_REFACTOR` (2026-10-04 갱신) — 보안 해소 조건 ① PR #279 main 반영(`f2204b2da`) · ② 로그인 불가 확인 모두 완료. 이전 판정 `SECURITY_REMEDIATION_REQUIRED` 의 근거는 §3-2 에 보존
+- **정본 집합 확정**: §7 (2026-10-04, `WO-O4O-DOCS-CANONICAL-SET-CONFIRMATION-V1`)
 - **기준**: `origin/main` @ `35979b119` · 2026-10-03 — PR #275(`d5e87b18e`, docs 데이터 12,108 파일 분리) 반영 후
 - **하지 않은 것**: 문서 이동 · 삭제 · rename · DB write · credential 변경 · secret 값 기록 · history rewrite
 - **방법**: `git archive` 로 docs + 루트 진입 문서 4개를 저장소 밖에 추출 → 위치 기반 4축 판정 + 상단 상태 표기 + 현행 문서 역참조(상대 링크 · WO/CHECK/IR 식별자) + 보안 패턴 스캔(값은 형태만 기록) → 보안 hit 전수 수동 판정. 전체 git history 는 고신뢰 secret 패턴으로 별도 스캔. 계정 로그인 가능 여부는 운영 DB read-only SELECT(Auth Proxy · `default_transaction_read_only=on`).
@@ -180,3 +181,50 @@ checks 1,713 · investigations 727 · work-orders 149 · ir 33 · 기타 3 (audi
 - 정본 수정 2 건 (사용자 확정 2026-10-04): `rules/DOCUMENT-LIFECYCLE-AND-ARCHIVE-RULES-V1` §10-4 Demo 예외 · `baseline/O4O-CANONICAL-DEMO-ACCOUNTS-V1` §4 격리 근거 — 충돌 해소
 - 진입점 포인터 2 건 (사용자 승인 2026-10-04): `CLAUDE.md` DB · 보안 경계 절 · `AGENTS.md` 비밀번호 금지 줄에 "예외는 공개 Demo credential 하나뿐 — 조건은 LIFECYCLE-RULES §10-4" 한 줄씩. 예외 조건은 복제하지 않고 §10-4 를 SSOT 로 둔다
 - 별도 WO 제안 3 건 (§5)
+
+---
+
+## 7. 정본 집합 확정 (2026-10-04 · `WO-O4O-DOCS-CANONICAL-SET-CONFIRMATION-V1`)
+
+기준 `origin/main` @ `bc1a0bcdd`. 대상: canonical 폴더(baseline · architecture · platform · rbac · rules · adr · decisions · reference · design · services · 서비스 소폴더) 중 상단 15줄에 상태 줄이 없는 **82건**(§1 의 69 는 상단 3,000자 기준이었다) + SUPERSEDED 3 + 계약 · 정산 4. 문서별로 앞부분을 읽고 CANONICAL-INDEX · refactoring/status · 코드 존재(`git grep`)와 대조했다. 운영 DB 조회 없음.
+
+### 7-1. 82건 판정
+
+| 판정 | 수 | 조치 |
+|---|---:|---|
+| ACTIVE (미등재) | 28 | 색인에 21행 추가(§2 · §3 · §4 · §5 · §6 · §7). 폴더 README · 개발자 모듈 문서 · 트랙 한정 문서 7건은 등재 불필요 |
+| ACTIVE (등재 · 일치) | 15 | 변경 없음 |
+| 색인 불일치 | 8 | 색인 §9 "판정 대기" 로 이동하고 유효 절 · stale 절을 행에 명시. 본문 정합은 후속 |
+| 기록물이 canonical 폴더에 있음 | 17 | 14건 상단에 `COMPLETED · 기록물` 상태 줄. MINEROCK600 media-pilot 3건은 진행 중 트랙이라 표기하지 않음 |
+| SUPERSEDED | 2 | `NETURE-DOMAIN-ARCHITECTURE-FREEZE-V1` → V3 · `DECISION-O4O-IDENTITY-ARCHITECTURE-V2-ADOPTION-V1` → IDENTITY V3 상태 줄 |
+| OBSOLETE | 1 | `ALPHA-STATUS-DISPLAY-STANDARD` (서비스 코드에서 표시 소멸) |
+| 판정 불가 | 11 | 상태 줄 없음 = ACTIVE 유지(LIFECYCLE §6 · CLAUDE.md §16-6). 아래 7-4 |
+
+추가 발견: `DROPSHIPPING-ORDER-RELAY` · `-SETTLEMENT-MODEL` · `-STATE-MODEL` 3건은 본문에 `Status: Active` 가 있으나 Dropshipping 도메인 코드 0 · 대응 패키지 없음 → 상단에 `OBSOLETE` 상태 줄(원문 Status 줄 보존).
+
+### 7-2. SUPERSEDED 3건 (§1) — archive 이동 보류
+
+`O4O-IDENTITY-ARCHITECTURE-V1` · `-V2` · `O4O-AUTOMATION-AGENT-ARCHITECTURE-V1` 은 SUPERSEDED 상태 줄과 존재하는 대체 문서를 이미 갖췄다. archive 이동은 canonical 문서 13곳 · 기록물 34곳 · 코드 주석 1곳의 링크를 함께 바꿔야 해 **history 정비 WO 로 넘긴다**. 색인 §6 의 AUTOMATION-V1 행(색인 어휘 밖 `SUPERSEDED` 상태)은 제거했다 — 대체 문서 V2 는 등재돼 있다.
+
+### 7-3. 계약 · 정산 4건 — 모두 PUBLIC
+
+`DROPSHIPPING-SETTLEMENT-MODEL` · `DROPSHIPPING-STATE-MODEL` · `O4O-DISTRIBUTION-FUNDING-INITIAL-OPERATION-MODEL-V1` · `O4O-OPERATOR-NON-APPROVAL-UX-BASELINE-V1` 의 정산 · 수수료 서술은 개념(필드 · 규칙)과 예시 금액뿐이다. 실제 계약 요율 · 거래처명 · 단가는 없다 → **저장소 유지(PUBLIC)**. 기록물 17건은 history 정비 때 같은 기준으로 본다.
+
+### 7-4. 판정 불가 11건 (ACTIVE 유지 · 후속 판단 필요)
+
+| 문서 | 이유 |
+|---|---|
+| `architecture/O4O-KPA-OPERATOR-CANONICAL-STATE-V1` | 2026-05 시점 스냅샷인데 SSOT 를 자처 — 역할 업무공간 리팩터링 후 재검증 표기 없음 |
+| `baseline/NETURE-CAMPAIGN-ARCHITECTURE-FREEZE-V2` | 런타임 코드 0(migration 만) — 운영 테이블 존재 확인 전에는 OBSOLETE 판정 보류 |
+| `baseline/NETURE-DOMAIN-BOUNDARY-V1` | Order · Campaign 소유 서술이 SUPPLIER-DOMAIN-BOUNDARY(FROZEN) · B2B 계약과 겹침 |
+| `baseline/operations/KPA-MEMBERS-PRESENCE-DRIFT-DIAGNOSTICS` | backfill WO 산출물 — backfill 종료 여부 미확인 |
+| `platform/operator/O4O-OPERATOR-USER-MANAGEMENT-STANDARD-V1` | 운영자 비밀번호 변경을 표준으로 둠 — 해당 UI 코드 0 |
+| `platform/promotion/` CORE-EXTENSION-BOUNDARY · DATA-MODEL-AND-API-SCOPE · SLOT-CATALOG · UI-COMPONENT-STRATEGY (4) | `/cms/slots` API 는 존재 · 설계한 공통 UI 는 미구현 |
+| `media-pilot/minerock600/CHARACTER-SHEET-…-V1` | 파일럿 산출물(파일럿 ≠ Canonical) — 트랙 진행 중 |
+
+### 7-5. 후속 (별도 WO)
+
+1. 판정 대기로 옮긴 8건의 본문 정합 — 특히 `CLAUDE.md` 가 직접 가리키는 `O4O-STORE-RULES` · `DEBUG-SSR-TEST-PAGE-GUIDE-V1` 우선
+2. `docs/baseline/README.md` 의 상태 표기(3-ROLE-FLOW · KPA-ROLE-MATRIX · ROLE-POLICY · E-COMMERCE)가 색인과 다름 — 색인 기준으로 정렬
+3. `O4O-CORE-FREEZE-V1`(F10) 의 `RefreshToken.ts` 목록 stale(Identity V3 `refresh_tokens=DEAD_RETIRE`) — Frozen 본문이라 명시적 WO
+4. 판정 불가 11건 결정 · SUPERSEDED 3 과 기록물 14건의 위치 이전은 history 정비 WO 에서

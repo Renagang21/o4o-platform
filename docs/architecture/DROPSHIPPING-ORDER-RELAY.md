@@ -1,5 +1,7 @@
 # Dropshipping Order Relay Architecture (DS-4.1)
 
+> **상태**: OBSOLETE · Dropshipping 도메인 코드 0 · 대응 패키지 없음(refactoring/status.md) — 현행 기준 아님. 아래 Status 줄은 원문 보존 · **표기일**: 2026-10-04
+
 > **이 문서는 Dropshipping 주문 전달(Order Relay)의 개념과 책임 경계를 정의한다.**
 > 구현 전에 반드시 이 문서를 이해하고 따라야 한다.
 > 이 문서를 위반하는 구현은 버그로 간주된다.

@@ -1,5 +1,7 @@
 # SERVICE-PRODUCT-LAYER-PREP-V1
 
+> **상태**: COMPLETED · 기록물(조사 · 계획 · 시점 분석) — 현재 기준 문서 아님. canonical 폴더에 있으나 위치 이전은 history 정비 WO · **표기일**: 2026-10-04
+
 > WO-O4O-SERVICE-PRODUCT-LAYER-PREP-V1 | 2026-03-09
 
 ## Purpose

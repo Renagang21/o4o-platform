@@ -1,5 +1,7 @@
 # DESIGN-O4O-KPA-TABLET-OPERATOR-UX-DIRECTION-V1
 
+> **상태**: COMPLETED · 기록물(조사 · 계획 · 시점 분석) — 현재 기준 문서 아님. canonical 폴더에 있으나 위치 이전은 history 정비 WO · **표기일**: 2026-10-04
+
 > 성격: **설계 방향 의견**(구현 아님). 근거 = 코드 조사 + 배포 실측(→ [IR-O4O-KPA-TABLET-END-TO-END-UX-AND-DATA-FLOW-AUDIT-V1](../ir/IR-O4O-KPA-TABLET-END-TO-END-UX-AND-DATA-FLOW-AUDIT-V1.md)).
 > Date: 2026-07-17
 

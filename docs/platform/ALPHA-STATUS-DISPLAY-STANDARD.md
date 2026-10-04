@@ -1,5 +1,7 @@
 # O4O Platform Alpha 상태 표시 기준
 
+> **상태**: OBSOLETE · Alpha 상태 표시(운영형 알파 · Operational Alpha · AlphaStatus) 가 서비스 코드에서 소멸 — 현행 기준 아님 · **표기일**: 2026-10-04
+
 > **작성일**: 2026-01-20
 > **Work Order**: WO-GLOBAL-ALPHA-STATUS-HERO-V080
 > **적용 버전**: v0.8.0 (운영형 알파)

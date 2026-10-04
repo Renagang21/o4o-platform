@@ -1,5 +1,7 @@
 # KPA-Society Phase 2: Signup and Approval Flow
 
+> **상태**: COMPLETED · 기록물(조사 · 계획 · 시점 분석) — 현재 기준 문서 아님. canonical 폴더에 있으나 위치 이전은 history 정비 WO · **표기일**: 2026-10-04
+
 > **Phase 2 설계 문서 — 구현 코드/SQL 없음**
 >
 > 작성일: 2026-02-06

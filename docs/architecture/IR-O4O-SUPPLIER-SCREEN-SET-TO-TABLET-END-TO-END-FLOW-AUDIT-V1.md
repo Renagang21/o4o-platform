@@ -1,5 +1,7 @@
 # IR-O4O-SUPPLIER-SCREEN-SET-TO-TABLET-END-TO-END-FLOW-AUDIT-V1
 
+> **상태**: COMPLETED · 기록물(조사 · 계획 · 시점 분석) — 현재 기준 문서 아님. canonical 폴더에 있으나 위치 이전은 history 정비 WO · **표기일**: 2026-10-04
+
 > 성격: **read-only 업무 동선 감사** — 공급자 Screen Set 제작·게시 → 매장 HUB 가져오기 → 실제 태블릿 배치·표시.
 > 선행: V2a(편집기 추출)·V2b(공급자 백엔드)·V2c(공급자 UI+매장 HUB 통합) 완료 상태 기준.
 > Date: 2026-07-22 · 코드·DB·배포 변경 0 (조사만).

@@ -1,7 +1,7 @@
 # O4O Canonical Document Index
 
 > **역할**: AI 도구와 무관한 **정본(canonical) 문서 지도**. [`CLAUDE.md`](../CLAUDE.md) 와 [`AGENTS.md`](../AGENTS.md) 는 규칙을 복사하지 않고 이 색인과 각 정본을 가리킨다.
-> **작성일**: 2026-09-12 · **출처**: 구 `CLAUDE.md` v8 "상세 규칙 문서 목록" + 본문 링크의 합집합
+> **작성일**: 2026-09-12 · **최종 갱신**: 2026-10-04 (정본 집합 확정 — 미등재 ACTIVE 21행 추가 · 불일치 8건과 CHECKOUT-STABLE 을 §9 로 · SUPERSEDED 행 제거) · **출처**: 구 `CLAUDE.md` v8 "상세 규칙 문서 목록" + 본문 링크의 합집합
 
 ## 0. 이 색인의 규칙
 
@@ -52,12 +52,13 @@
 | F12 | [O4O-PRODUCT-RESOURCE-ARCHITECTURE-BASELINE-V1](baseline/O4O-PRODUCT-RESOURCE-ARCHITECTURE-BASELINE-V1.md) | 2계층(Product Resource / Store Production Material) + 6불변식. 상세 설계: [IR](architecture/IR-O4O-PRODUCT-CONTENT-RESOURCE-ARCHITECTURE-V1.md) · [Persistence Design](architecture/WO-O4O-PRODUCT-CONTENT-RESOURCE-PERSISTENCE-DESIGN-V1.md) | FROZEN |
 | — | [UX-CORE-FREEZE-V1](baseline/UX-CORE-FREEZE-V1.md) | UX Core 동결 | FROZEN |
 | — | [O4O-SHARED-MODULE-CHANGE-PROTOCOL-V1](baseline/O4O-SHARED-MODULE-CHANGE-PROTOCOL-V1.md) | 공통 모듈 · config · sidebar · capability map 변경 시 전 소비처 식별 절차 (raw-source spec 포함) | ACTIVE |
-| — | [O4O-STORE-RULES](architecture/O4O-STORE-RULES.md) | O4O Store & Order 가드레일 — Store Template · 주문 생성 3중 방어 | ACTIVE |
 | — | [O4O-STORE-PRODUCTION-MATERIAL-CANONICAL-V1](architecture/O4O-STORE-PRODUCTION-MATERIAL-CANONICAL-V1.md) | Store Production Material 논리 canonical (`kpa_store_contents` = legacy 물리명) | ACTIVE |
 | — | [O4O-CONTENT-PRODUCTION-FLOW-CANONICAL-V1](architecture/O4O-CONTENT-PRODUCTION-FLOW-CANONICAL-V1.md) | 매장 콘텐츠 제작 6단계 흐름(대상 선택 → 자료 투입 → 편집기/AI → 용도별 저장 → 템플릿 → 산출물) — AI 단계는 선택(운영 원칙 문서 §3) | ACTIVE |
 | — | [STORE-PRODUCTS-CANONICAL-V1](architecture/STORE-PRODUCTS-CANONICAL-V1.md) | Store Products canonical | ACTIVE |
 | — | [STORE-LOCAL-PRODUCT-BOUNDARY-POLICY-V1](baseline/STORE-LOCAL-PRODUCT-BOUNDARY-POLICY-V1.md) | 매장 자체 상품의 Commerce 연결 금지 경계 | ACTIVE |
 | — | [O4O-SIGNAGE-STORE-PLAYLIST-MODEL-BOUNDARY-V1](baseline/O4O-SIGNAGE-STORE-PLAYLIST-MODEL-BOUNDARY-V1.md) | Signage Store Playlist 모델 경계 (KEEP-LEGACY 판정) | ACTIVE |
+| — | [DESIGN-O4O-PRODUCT-AI-CONTENT-OWNERSHIP-AND-STORE-DESCRIPTION-CONTRACT-V1](design/DESIGN-O4O-PRODUCT-AI-CONTENT-OWNERSHIP-AND-STORE-DESCRIPTION-CONTRACT-V1.md) | `product_ai_contents` = 전역 초안 계약 · 매장 설명서 소유 경계 | ACTIVE |
+| — | [DESIGN-O4O-STORE-LIBRARY-AND-ASSET-CANONICAL-SOURCE-V1](design/DESIGN-O4O-STORE-LIBRARY-AND-ASSET-CANONICAL-SOURCE-V1.md) | 매장 자료함 · 실행 자산 canonical 축 (3서비스 공통) | ACTIVE |
 
 ## 3. Operator · Store UX
 
@@ -73,6 +74,8 @@
 | [OPERATOR-INTEGRATION-STATE-V1](architecture/OPERATOR-INTEGRATION-STATE-V1.md) | Operator 통합 상태 | ACTIVE |
 | [OPERATOR-CORE-DESIGN-V1](architecture/OPERATOR-CORE-DESIGN-V1.md) | Operator Core 설계 (1세대 `@o4o/operator-core` superseded 기록 포함) | ACTIVE |
 | [OPERATOR-DASHBOARD-NAVIGATION](platform/navigation/OPERATOR-DASHBOARD-NAVIGATION.md) | Operator Dashboard 내비게이션 | ACTIVE |
+| [DESIGN-O4O-STORE-EXECUTION-MANAGEMENT-CANONICAL-V1](design/DESIGN-O4O-STORE-EXECUTION-MANAGEMENT-CANONICAL-V1.md) | 매장 실행 관리 — 코너 축 · Placement 모델 | ACTIVE |
+| [DESIGN-O4O-KPA-STORE-PRODUCT-DETAIL-INFORMATION-CANONICAL-ROLE-V1](design/DESIGN-O4O-KPA-STORE-PRODUCT-DETAIL-INFORMATION-CANONICAL-ROLE-V1.md) | 매장 상품 상세 정보의 canonical 역할 | ACTIVE |
 
 ## 4. 사용자 · 권한
 
@@ -84,7 +87,7 @@
 | [RBAC-CANONICAL-STATE-V1](rbac/RBAC-CANONICAL-STATE-V1.md) | RBAC 현행 canonical 상태 | ACTIVE |
 | [RBAC-ROLE-CATALOG-V1](rbac/RBAC-ROLE-CATALOG-V1.md) | 역할 카탈로그 | ACTIVE |
 | [RBAC-RUNBOOK-V1](rbac/RBAC-RUNBOOK-V1.md) | RBAC 운영 runbook | ACTIVE |
-| [KPA-ROLE-MATRIX-V1](baseline/KPA-ROLE-MATRIX-V1.md) | KPA 권한 매트릭스 | ACTIVE |
+| [O4O-STORE-OWNER-RBAC-STANDARD-V1](architecture/auth/O4O-STORE-OWNER-RBAC-STANDARD-V1.md) | 매장 경영자(store_owner) RBAC 표준 — registry 정합 2026-10-04. §2.1 "role_assignments 만" 과 §3.1-A "Role ∧ Relationship" 서술 정합은 후속 | ACTIVE |
 
 ## 5. 도메인 · 서비스
 
@@ -92,8 +95,6 @@
 |---|---|---|
 | [O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1](baseline/O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1.md) | **`*.neture.co.kr` 주소별 사업 의미 SSOT** (2026-10-03) — `kpa` = 약사 대상 분회 · `pharmacy` / `retail` = 사업자 대상 세미프랜차이즈 운영 서비스 · `store` = 공통 Store Workspace(serviceKey 없음 · Owner/Member 접근 모델) · role prefix(`kpa:*` 등) ≠ 주소 의미. 서비스 목록 · 도메인 기술 정본은 `service-catalog.ts` | ACTIVE |
 | [O4O-STORE-ACCESS-AND-MEMBERSHIP-V1](baseline/O4O-STORE-ACCESS-AND-MEMBERSHIP-V1.md) | **공통 Store Workspace 접근 자격 SSOT** (2026-10-03) — Owner(기존 `{prefix}:store_owner` 판정 그대로) / Member(`organization_members.role='staff'`) 두 단계 · 초대는 기존 가입자 조회(메일 0 · 토큰 0) · 'invited' 는 접근 0 · 결정 순서(세션→조직→자격→업종 경계) · 새 테이블 0. 한계: 미가입자 초대 · 사업자 신규 가입 제외 | ACTIVE |
-| [COSMETICS-DOMAIN-RULES](architecture/COSMETICS-DOMAIN-RULES.md) | Cosmetics — 독립 스키마(`cosmetics_` prefix), 주문은 E-commerce Core 경유 | ACTIVE |
-| [BUSINESS-SERVICE-RULES](architecture/BUSINESS-SERVICE-RULES.md) | Business Service — OpenAPI 계약 우선, 서비스 간 직접 호출 / DB 접근 금지 | ACTIVE |
 | [KPA-SOCIETY-SERVICE-STRUCTURE](baseline/KPA-SOCIETY-SERVICE-STRUCTURE.md) | KPA 3개 화면 영역 공존 구조 (커뮤니티 / 분회 / 데모=제거 완료) — 라우트 위치 ≠ 서비스 소속. v1.1(2026-09-17): Forum = 약사 커뮤니티(communityKey=pharmacy, ROLE-WORKSPACE §5) | ACTIVE |
 | [KPA-SIGNAGE-STRUCTURE-V1](baseline/KPA-SIGNAGE-STRUCTURE-V1.md) | KPA Signage 구조 baseline | ACTIVE |
 | [NETURE-DOMAIN-ARCHITECTURE-FREEZE-V3](baseline/NETURE-DOMAIN-ARCHITECTURE-FREEZE-V3.md) | Neture 도메인 아키텍처 (공급자 화면 canonical) | FROZEN |
@@ -104,6 +105,14 @@
 | [DESIGN-CORE-GOVERNANCE](rules/DESIGN-CORE-GOVERNANCE.md) | 모든 신규 화면은 Design Core v1.0 — 독자 디자인 시스템 금지 | ACTIVE |
 | [GLOBAL-HEADER-STANDARD-V1](architecture/ui/GLOBAL-HEADER-STANDARD-V1.md) | 글로벌 헤더 표준 | ACTIVE |
 | [O4O-TABLE-STANDARD-BASELINE-V1](baseline/O4O-TABLE-STANDARD-BASELINE-V1.md) | 테이블 지향 표준 | ASPIRATIONAL |
+| [O4O-STANDARD-LIST-PHASE1-BASELINE-V1](baseline/O4O-STANDARD-LIST-PHASE1-BASELINE-V1.md) | 리스트 6 유형 분류 — 리스트 정비 시 유형 분류 선행 | ACTIVE |
+| [O4O-SHARED-SPACE-FRAME-PRINCIPLE-V1](architecture/ui-ux/O4O-SHARED-SPACE-FRAME-PRINCIPLE-V1.md) | 공유 공간(홈 등) 프레임 구조 원칙 — `packages/shared-space-ui` | ACTIVE |
+| [O4O-SHARED-SPACE-STANDARD-BLOCKS-V1](architecture/ui-ux/O4O-SHARED-SPACE-STANDARD-BLOCKS-V1.md) | 공유 공간 표준 블록(AppEntry · ContentHighlight 등) | ACTIVE |
+| [O4O-TEMPLATE-PRESETS](design/O4O-TEMPLATE-PRESETS.md) | 서비스 Template Preset (`TemplateProvider`) | ACTIVE |
+| [O4O-DISTRIBUTION-FUNDING-INITIAL-OPERATION-MODEL-V1](baseline/O4O-DISTRIBUTION-FUNDING-INITIAL-OPERATION-MODEL-V1.md) | 유통참여형 펀딩(내부 코드명 Market Trial) 초기 운영 모델 SSOT | ACTIVE |
+| [O4O-MARKET-TRIAL-OFFLINE-PAYMENT-CONFIRMATION-AUDIT-POLICY-V1](architecture/O4O-MARKET-TRIAL-OFFLINE-PAYMENT-CONFIRMATION-AUDIT-POLICY-V1.md) | 유통참여형 펀딩 오프라인 입금 확인일 · 감사 정책 | ACTIVE |
+| [O4O-DISTRIBUTION-EVIDENCE-SEED-PRINCIPLE-V1](baseline/O4O-DISTRIBUTION-EVIDENCE-SEED-PRINCIPLE-V1.md) | 공공데이터 seed 상위 원칙 — 규제 존재 ≠ 유통 정보 | ACTIVE |
+| [EventOffer-Operation-Policy](event-offer/EventOffer-Operation-Policy.md) | Event Offer 운영 기준 (`/groupbuy-admin` 운영 경로) | ACTIVE |
 | [O4O-FORM-STANDARD-BASELINE-V1](baseline/O4O-FORM-STANDARD-BASELINE-V1.md) | 폼 지향 표준 | ASPIRATIONAL |
 
 ## 6. 플랫폼 공통 구조 · 콘텐츠 · APP
@@ -115,20 +124,21 @@
 | [O4O-HUB-TEMPLATE-STANDARD-V1](platform/hub/O4O-HUB-TEMPLATE-STANDARD-V1.md) | HUB Template 표준 | ACTIVE |
 | [HUB-UX-GUIDELINES-V1](platform/hub/HUB-UX-GUIDELINES-V1.md) | Hub UX 규칙 | ACTIVE |
 | [EXTENSION-GENERAL-GUIDE](platform/extensions/EXTENSION-GENERAL-GUIDE.md) | Extension 개발 일반 가이드 | ACTIVE |
+| [APP-CONTENT-STANDARD-SPEC](architecture/APP-CONTENT-STANDARD-SPEC.md) | APP-CONTENT 표준 UI 스펙 (`CLAUDE.md` §13-A) | ACTIVE |
+| [APP-STANDARD-LIST-AND-MATRIX](architecture/APP-STANDARD-LIST-AND-MATRIX.md) | 앱 단위 표준 목록 + 서비스 적용 매트릭스 | ACTIVE |
+| [SIGNAGE-APPROVAL-ARCHITECTURE-V1](architecture/SIGNAGE-APPROVAL-ARCHITECTURE-V1.md) | Signage 승인 상태 모델 | ACTIVE |
+| [CONTENT-META-PRODUCTION-READY-V1](platform/content/CONTENT-META-PRODUCTION-READY-V1.md) | Content meta 계약 (`@o4o/types` content-meta) | ACTIVE |
 | [APP-LMS-BASELINE](architecture/APP-LMS-BASELINE.md) | APP-LMS baseline — 백엔드 공통, 프론트 공통화는 후속 (APP-CONTENT / SIGNAGE / FORUM 은 Frozen) | ACTIVE |
 | [LMS-CORE-EXTENSION-PRINCIPLES](platform/lms/LMS-CORE-EXTENSION-PRINCIPLES.md) | LMS Core / Extension 원칙 | ACTIVE |
 | [LMS-SCOPE-GUARD](architecture/LMS-SCOPE-GUARD.md) | LMS Scope Guard 설계 | ACTIVE |
 | [LMS-CLIENT-CONVENTION-V1](architecture/LMS-CLIENT-CONVENTION-V1.md) | LMS Client 규약 | ACTIVE |
 | [O4O-GUIDE-SECTIONKEY-CONFLICT-POLICY-V1](architecture/O4O-GUIDE-SECTIONKEY-CONFLICT-POLICY-V1.md) | Guide sectionKey 충돌 정책 | ACTIVE |
 | [O4O-GUIDE-SCHEMA-VALIDATION-V1](architecture/O4O-GUIDE-SCHEMA-VALIDATION-V1.md) | Guide Schema Validation | ACTIVE |
-| [O4O-GUIDE-SECTIONKEY-MIGRATION-V1](architecture/O4O-GUIDE-SECTIONKEY-MIGRATION-V1.md) | Guide sectionKey Migration | ACTIVE |
-| [O4O-GUIDE-CONTENT-RESEED-GUIDEBLOCK-V1](architecture/O4O-GUIDE-CONTENT-RESEED-GUIDEBLOCK-V1.md) | Guide Content Reseed (GuideBlock) | ACTIVE |
 | [O4O-GUIDE-PAGE-KEY-CATALOG-V1](architecture/O4O-GUIDE-PAGE-KEY-CATALOG-V1.md) | Guide pageKey 카탈로그 | ACTIVE |
 | [O4O-AI-USAGE-FLOW-BASELINE-V1](baseline/O4O-AI-USAGE-FLOW-BASELINE-V1.md) | O4O AI 활용 흐름 baseline (Home AI · 편집기 AI 계약 · §15 매장 콘텐츠 AI 위치) | ACTIVE |
 | [O4O-STORE-CONTENT-PRODUCTION-OPERATING-PRINCIPLES-V1](baseline/O4O-STORE-CONTENT-PRODUCTION-OPERATING-PRINCIPLES-V1.md) | **매장 콘텐츠 제작 운영 원칙 SSOT** — 사용자 외부 AI(ChatGPT/Gemini/Claude)=Creative/Strategy · O4O=표준 제작환경(Execute/Manage/Reuse) · 내부 AI=선택적 보조(필수 단계 아님) · provider 중립 · Media Library/VIDEO Job/Temp Output 재사용 · 파일럿 ≠ Canonical | ACTIVE |
 | [O4O-AI-AUTOMATION-EVOLUTION-PRINCIPLES-V1](baseline/O4O-AI-AUTOMATION-EVOLUTION-PRINCIPLES-V1.md) | **AI 자동화 진화 원칙 SSOT** — 사용자 행동은 학습 자료 · 목적/결과가 기준 · 완전 자동화가 아닌 시간 절감 · takeover 는 학습 신호 · 사이트별 업무 사전 정의 금지 · AI=발견/판단, Runtime=검증된 실행. Local Agent · Browser DOM · Computer Use · Site Adapter · Workflow · 주문/회계 자동화 등 **모든 자동화 WO 의 상위 기준** (§25 현행 정렬 상태) | ACTIVE |
 | [O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2](baseline/O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2.md) | **O4O Personal Work Assistant 구조 정본** — EVOLUTION-PRINCIPLES 의 하위(왜 → 어떤 구조로). 최상위 제품 = Personal Work Assistant · ONE Assistant · 구조의 중심 = Assistant / 자산의 중심 = Experience · Assistant Planning ≠ Execution Planning · Task 1급 객체(완료 계약 ≠ KPI) · Skill = 검증된 Experience 의 승격(사전 정의 금지) · **개인화 P3 — 표준 Workflow 를 만들지 않는다(Shared = 추천 후보 · 강제 아님, §0-1)** · Strong Discovery = 하위 Discovery capability · **Memory Ownership-first(organization/user/run/node)** · PC = Execution Node · Request Device ≠ Execution Device · 발주 확정 = 사용자 직접 승인 · Cloud Browser 인증 세션 불허 · Legal/Data Processing Gate · **개발 순서 §18(A Assistant+Task → …)**. ARCHITECTURE-V1 대체(§21 승계표) | ACTIVE |
-| [O4O-AUTOMATION-AGENT-ARCHITECTURE-V1](baseline/O4O-AUTOMATION-AGENT-ARCHITECTURE-V1.md) | O4O Automation Agent 아키텍처(6계층 · Experience 중심 · Local-first · 개발 순서 §10-1) — 유효 조항은 V2 §21 로 승계 | **SUPERSEDED** (2026-10-03 → PERSONAL-ASSISTANT-ARCHITECTURE-V2) |
 | [O4O-AUTOMATION-EXPERIENCE-MODEL-V1](baseline/O4O-AUTOMATION-EXPERIENCE-MODEL-V1.md) | **Automation Experience 개념 모델 · 저장 계약** — V2 의 하위(Experience 상세). Task type · Target · Run · Step(Observation → Decision → Action → Result, **stage 중심**) · User Assistance(구조만 · 원문 미저장) · Knowledge ≠ Experience ≠ Skill · Outcome 근거 3등급 · Failure 원인 층(runtime 실패는 절차 신뢰도 불감소) · 최소 저장 집합 · 민감정보 분류. **2026-10-03 V2 정합 개정**(§0-1 — D1 범위 축소 · 저장 위치는 V2 §9 · Phase 동결) | ACTIVE |
 
 ## 7. 운영 · 환경 · 절차
@@ -141,7 +151,9 @@
 | [O4O-GIT-PARALLEL-WORK-SAFETY-V1](baseline/operations/O4O-GIT-PARALLEL-WORK-SAFETY-V1.md) | 다중 PC · 다중 세션 Git 안전 — path-specific stage · Safe Commit · PC 이동 · 완료 조건 | ACTIVE |
 | [PRODUCTION-MIGRATION-STANDARD](baseline/operations/PRODUCTION-MIGRATION-STANDARD.md) | 프로덕션 마이그레이션 표준 (CI/CD 자동 실행 원칙) | ACTIVE |
 | [O4O-API-SERVER-SCRIPTS-INVENTORY-V1](baseline/operations/O4O-API-SERVER-SCRIPTS-INVENTORY-V1.md) | `apps/api-server/src/scripts/**` 상태 분류(ACTIVE · PAUSED · LEGACY) · DB 로그인 identity fail-fast 규칙 | ACTIVE |
-| [DEBUG-SSR-TEST-PAGE-GUIDE-V1](platform/debug/DEBUG-SSR-TEST-PAGE-GUIDE-V1.md) | JSON 디버그 SSR 테스트 페이지 작성 가이드 | ACTIVE |
+| [O4O-DATA-CLEANUP-IDENTIFICATION-SAFETY-V1](baseline/operations/O4O-DATA-CLEANUP-IDENTIFICATION-SAFETY-V1.md) | 데이터 정비 대상 식별 안전 규칙 — UUID prefix 기반 삭제 금지 | ACTIVE |
+| [INTERNAL-BETA-RUNBOOK-V1](baseline/operations/INTERNAL-BETA-RUNBOOK-V1.md) | Internal Beta 운영 runbook (`BETA_MODE`) | ACTIVE |
+| [PLAYWRIGHT-MCP](platform/development/PLAYWRIGHT-MCP.md) | Playwright MCP 개발 환경 설정 | ACTIVE |
 | [DOCUMENT-LIFECYCLE-AND-ARCHIVE-RULES-V1](rules/DOCUMENT-LIFECYCLE-AND-ARCHIVE-RULES-V1.md) | 문서 상태 · archive · 헤더 형식 정본 | ACTIVE |
 | [ESM-CIRCULAR-DEPENDENCY-ANALYSIS-V01](reference/ESM-CIRCULAR-DEPENDENCY-ANALYSIS-V01.md) | TypeORM Entity ESM 규칙(type-only import + 문자열 관계)의 근거 분석 | ACTIVE |
 | [O4O-PRIVACY-DATA-RETENTION-POLICY-V1](baseline/O4O-PRIVACY-DATA-RETENTION-POLICY-V1.md) | 개인정보 보유기간 정책 SSOT (2026-09-17 확정) — 문의 1년 · 이메일 로그 1년 · 로그인 시도 30일 · 접속·감사기록 1년(민감정보 시스템 2년) · AI 메타 1년 · 백업 7일 · 수동 export 30일 · 전자상거래 기록은 거래 개시 시. 처리방침 v1.0 보유기간 항목과 집행 WO 의 단일 기준 | ACTIVE |
@@ -162,6 +174,13 @@
 | [O4O-3-ROLE-FLOW-BASELINE-V1](baseline/O4O-3-ROLE-FLOW-BASELINE-V1.md) | 3자 Canonical Flow (책임 매트릭스 · 원천 자료 vs 실행 자산 · AI 개입 지점). **§2 단선 흐름 · §6 첫 항목(공급자 HUB 직접 게시 금지) · §3 공급자 직접 제작 ❌ 는 2026-09-16 판정 확정 → [ROLE-WORKSPACE-ARCHITECTURE](baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md) §2-1 · §6 으로 SUPERSEDED** (헤더 표기, 본문 보존). §4 · §5 는 참고만, 근거로 승격하지 않는다 | 부분 SUPERSEDED (판정 확정) |
 | [O4O-RETAIL-STABLE-V1](platform/architecture/O4O-RETAIL-STABLE-V1.md) | `channel_type='B2C'` storefront closed loop 을 기술 — [COMMERCE-BOUNDARY](baseline/O4O-STORE-COMMERCE-BOUNDARY-V1.md) §2 · §12 와 충돌 후보. 결제 leg 은 이미 `410` 으로 차단. 동 문서 §8 판정 전까지 `UNKNOWN` — **기능 복구·확장 금지** (문서 헤더 2026-08-25 표기 참조) | 판정 대기 |
 | [E-COMMERCE-ORDER-CONTRACT](baseline/E-COMMERCE-ORDER-CONTRACT.md) | 기술 계약. **유효한 부분**: 주문 생성은 `checkoutService.createOrder()` 단일 지점 · `*_orders` / `*_payments` 독립 테이블 금지. **stale 부분**: §3 · §5 · §7.2 의 `OrderType` 열거(DROPSHIPPING 제거 · 엔티티가 `order_type` 컬럼을 매핑하지 않음). 현행 살아있는 주문 축의 정본은 [B2B 계약](baseline/O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1.md). 본문 정리는 후속 docs 정비 | 판정 대기 |
+| [CHECKOUT-STABLE-DECLARATION-V1](baseline/CHECKOUT-STABLE-DECLARATION-V1.md) | 문서 스스로 B2C storefront 를 `UNKNOWN` 으로 표기 — RETAIL-STABLE 과 같은 [COMMERCE-BOUNDARY](baseline/O4O-STORE-COMMERCE-BOUNDARY-V1.md) 충돌 후보. **기능 복구·확장 금지** | 판정 대기 |
+| [O4O-STORE-RULES](architecture/O4O-STORE-RULES.md) | **유효**: Store Template · 주문 생성 3중 방어(`CLAUDE.md` §5 가 인용). **stale**: §1 · §3.2 의 Tourism 참조 구현 · `OrderType.TOURISM`(routes/tourism 없음, OrderType 은 E-COMMERCE 행 참조). 본문 정합은 후속 | 판정 대기 |
+| [DEBUG-SSR-TEST-PAGE-GUIDE-V1](platform/debug/DEBUG-SSR-TEST-PAGE-GUIDE-V1.md) | **유효**: Raw JSON SSR 페이지로 원인 확정. **충돌**: "액션은 GET 으로 실행" 서술이 `CLAUDE.md` §8-4(GET 상태 변경 금지) · §8-1(CLI 우선)과 충돌 — §8 이 우선한다. 본문 정합은 후속 | 판정 대기 |
+| [COSMETICS-DOMAIN-RULES](architecture/COSMETICS-DOMAIN-RULES.md) | **유효**: `cosmetics_` prefix 독립 스키마 · 주문은 §4 경유. **stale**: 별도 `cosmetics-api` · web 구조와 "migration 은 cosmetics-api 만"(현행 = 단일 core-api · deploy Job migration) | 판정 대기 |
+| [BUSINESS-SERVICE-RULES](architecture/BUSINESS-SERVICE-RULES.md) | 별도 business-api(cosmetics · yaksa · dropshipping · tourism) 를 전제 — `apps/` 에는 api-server 하나뿐이고 OpenAPI CI 게이트도 없음. "서비스 간 직접 DB 접근 금지" 원칙만 참고 | 판정 대기 |
+| [KPA-ROLE-MATRIX-V1](baseline/KPA-ROLE-MATRIX-V1.md) | KPA-b(데모) 절은 데모 제거 완료로 stale. `baseline/README` 는 "Frozen" 으로 표기해 불일치 | 판정 대기 |
+| [O4O-GUIDE-SECTIONKEY-MIGRATION-V1](architecture/O4O-GUIDE-SECTIONKEY-MIGRATION-V1.md) · [O4O-GUIDE-CONTENT-RESEED-GUIDEBLOCK-V1](architecture/O4O-GUIDE-CONTENT-RESEED-GUIDEBLOCK-V1.md) | 실체는 WO 실행 기록(변경 목록 · 재등록 실행). 규칙은 [SECTIONKEY-CONFLICT-POLICY](architecture/O4O-GUIDE-SECTIONKEY-CONFLICT-POLICY-V1.md) 가 보유. RESEED §6 절차만 재사용 가치 — 기록물 이동 여부는 history 정비에서 | 판정 대기 |
 
 ---
 

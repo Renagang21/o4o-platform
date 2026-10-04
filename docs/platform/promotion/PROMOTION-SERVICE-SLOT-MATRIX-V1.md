@@ -1,5 +1,7 @@
 # PROMOTION_SERVICE_SLOT_MATRIX_V1
 
+> **상태**: COMPLETED · 기록물(조사 · 계획 · 시점 분석) — 현재 기준 문서 아님. canonical 폴더에 있으나 위치 이전은 history 정비 WO · **표기일**: 2026-10-04
+
 > 서비스별 슬롯 적용 매트릭스
 
 ---
