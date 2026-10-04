@@ -1,23 +1,34 @@
 # CHECK-O4O-GITHUB-ACTIONS-RUN-ADMIN-TO-DEVELOPER-V1
 
-> **상태**: ACTIVE
+> **상태**: COMPLETED
 > **작성일**: 2026-10-04 · **최종 갱신**: 2026-10-04
 > **근거 WO/IR**: WO-O4O-GITHUB-ACTIONS-RUN-ADMIN-TO-DEVELOPER-V1 · [IR-O4O-GITHUB-ACTIONS-SA-LEAST-PRIVILEGE-AUDIT-V1](../investigations/IR-O4O-GITHUB-ACTIONS-SA-LEAST-PRIVILEGE-AUDIT-V1.md)
 
 GitHub Actions production 배포 SA 의 Cloud Run 권한을 `roles/run.admin` → `roles/run.developer` 로 줄이기 위해, 반복 배포의 IAM 변경(`--allow-unauthenticated`)을 먼저 제거한다.
-**1단계(이 PR): workflow 정리** → main 통합 → **2단계: 역할 교체 + promote 실측**(§5).
+1단계 workflow 정리(PR #293 · merge `2bfa3ee55`) → 2단계 역할 교체 + promote 실측(§6) 모두 완료.
 
 ---
 
-## 0. 판정 (1단계 시점)
+## 0. 판정
 
 ```text
-DEPLOY_IAM_MUTATION_DEPENDENCY       = REMOVED (workflow — main 통합 대기)
-PUBLIC_INVOKER_POLICY_PRESERVED      = PASS (현재 12/12 allUsers → run.invoker · 이 PR 은 IAM 을 바꾸지 않는다)
-GITHUB_ACTIONS_RUN_ADMIN_REMOVED     = PENDING (2단계)
-GITHUB_ACTIONS_RUN_DEVELOPER_ADDED   = PENDING (2단계)
-API_DEPLOY · MIGRATION_PATH · WEB_DEPLOY · TRAFFIC_SWITCH · ROLLBACK_PATH · PRODUCTION_SMOKE = PENDING (2단계 promote)
-GITHUB_ACTIONS_RUN_LEAST_PRIVILEGE   = IN_PROGRESS
+GITHUB_ACTIONS_RUN_ADMIN_REMOVED     = YES
+GITHUB_ACTIONS_RUN_DEVELOPER_ADDED   = YES
+
+DEPLOY_IAM_MUTATION_DEPENDENCY       = REMOVED
+PUBLIC_INVOKER_POLICY_PRESERVED      = PASS (12/12 allUsers → run.invoker · 배포 중 Cloud Run SetIamPolicy 호출 0)
+
+API_DEPLOY                           = PASS
+MIGRATION_PATH                       = PASS
+WEB_DEPLOY                           = PASS (Admin 1 · Web 9)
+TRAFFIC_SWITCH                       = PASS
+ROLLBACK_PATH                        = PASS (복귀 = 전환과 같은 update-traffic · run.services.update — §6)
+PRODUCTION_SMOKE                     = PASS (공개 도메인 8개 200)
+
+PERMISSION_DENIED_COUNT              = 0
+ROLLBACK_USED                        = NO
+
+GITHUB_ACTIONS_RUN_LEAST_PRIVILEGE   = CLOSED
 ```
 
 ## 1. run.admin 과 run.developer 차이 (gcloud iam roles describe)
@@ -66,5 +77,31 @@ gcloud run services add-iam-policy-binding <service> --region=asia-northeast3 --
 5. rollback 경로: cloud-run-rollout 의 복귀는 traffic 전환과 같은 update-traffic(run.services.update) — 전환 실측으로 같은 권한 경로를 검증
 실패 시: run.admin 재부여(1줄) 후 원인 기록
 ```
+
+## 6. 2단계 실행 · 실측 (2026-10-04)
+
+```text
+역할 교체   roles/run.developer 추가 → readback(4) → roles/run.admin 제거 → readback
+            github-actions project 역할: artifactregistry.writer · run.developer · serviceusage.serviceUsageConsumer
+Delivery    run 37187018601 (main 2bfa3ee55) — 11 서비스 LEVEL_3 (deploy-config) AUTO_DEPLOY_BLOCKED → HOLD (예상)
+promote     run 37187730630 (sha 2bfa3ee55 · 서비스 전체 · 08:04Z) — success · commit status production = DEPLOYED
+  API       AR push → migration Job o4o-api-migrations-vjr6s SUCCESS (INCREMENTAL_PENDING=0 · EXECUTED=0)
+            → o4o-core-api-03819-del Ready=True (traffic 0%) → 전환 100%(pin) → /health/ready 200
+  Admin·Web o4o-admin-dashboard-01343-kuh · neture-web-01683-fon · k-cosmetics-web-01185-buh · kpa-society-web-02020-zab ·
+            pharmacy-hub-web-00275-yef · lecture-web-00034-siw · store-web-00041-ceq · kpa-branch-web-00193-mar ·
+            signage-player-web-00099-vav · hospital-pharmacy-web-00023-sef — Report 11/11 DEPLOYED (revision-label 2bfa3ee55)
+            예: store-web 0% 배포 → tag URL 직접 smoke → 전환 100%(--to-latest)
+권한 오류   11 배포 job 로그에서 PERMISSION_DENIED · permission denied · setIamPolicy · "Setting IAM policy failed" · Forbidden 0
+IAM 무변경  promote 시간대 Cloud Run SetIamPolicy 감사 로그 0 · 12/12 서비스 allUsers → run.invoker 유지
+공개 smoke  api /health/ready · neture.co.kr · store · pharmacy · retail · pharmacyhub.co.kr · study · admin — 전부 200
+```
+
+rollback 경로: `cloud-run-rollout.mjs` 의 복귀는 `gcloud run services update-traffic --to-revisions=<직전>=100` 으로, 위 전환과 같은 API(`run.services.update`)다.
+그 권한은 이번 전환 11회로 run.developer 에서 실측됐다(복귀만을 위해 배포를 일부러 실패시키지 않았다).
+
+## 7. 후속
+
+1. github-actions Artifact Registry writer 를 repository 단위로 축소.
+2. Cloud Build SA 최소권한화 · default compute SA 비활성화 검토(7일 관찰 후).
 
 `문서 정합: 해당 없음`
