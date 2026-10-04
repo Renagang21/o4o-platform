@@ -13,7 +13,7 @@ description: 작업 시작 - 동기화, 인수인계 확인, 정비 후 작업 �
 4. pnpm install --frozen-lockfile
    - lockfile 불일치로 실패하면 멈추고 보고해. lockfile을 임의로 수정하지 마.
 5. 이번에 들어온 `origin/main` 커밋 목록(git log --oneline)을 간단히 요약해줘.
-6. 새 작업은 기준 checkout 에서 하지 않는다 — 3단계에서 작업을 시작할 때 최신 `origin/main` 으로 전용 worktree + branch 를 만든다(AGENTS.md §4-1(a)). 이어서 하는 작업이 기존 branch · PR 이면 그 worktree 에서 한다.
+6. 새 작업은 기준 checkout 에서 하지 않는다 — 3단계에서 작업을 시작할 때 최신 `origin/main` 으로 전용 worktree + branch 를 만든다(AGENTS.md §4-1(a)). 이어서 하는 작업이 기존 branch · PR 이면 그 worktree 에서 한다. 새로 만든 worktree 에는 `node_modules` 가 없으므로 그 worktree 안에서 4번 설치(필요하면 `pnpm run build:packages`)를 다시 한다 — 절차는 SETUP.md.
 
 [2단계: 인수인계 확인과 정비]
 7. HANDOFF.md를 읽어. 인수인계는 아직 merge 되지 않은 PR 에만 있을 수 있으므로 두 곳을 본다:

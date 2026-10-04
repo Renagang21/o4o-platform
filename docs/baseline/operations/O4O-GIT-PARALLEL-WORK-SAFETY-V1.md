@@ -49,7 +49,7 @@ lockfile 이 어긋난 채 push 되면 실패한다. 즉 lockfile 동기화 요�
 | 2 | **dirty 상태에서 pull 금지** | rebase/merge 가 남의 변경을 끌어들이거나 충돌로 훼손한다 |
 | 3 | **임의 `stash` / `reset` / `restore` 금지** | 다른 세션의 진행 중 작업을 되돌린다 |
 | 4 | **path-specific stage** | `git add <경로>` 만 사용. `git add .` · `git add -A` · `git commit -am` 금지 |
-| 5 | **push 전 원격 이동 확인** | `git fetch origin` → `git status -sb` 로 작업 branch 와 `origin/main` divergence 확인 후 작업 branch 를 push. `main` 으로는 push 하지 않는다 |
+| 5 | **push 전 원격 이동 확인** | `git fetch origin` → `git status -sb`(작업 branch upstream 대비) + `git rev-list --left-right --count origin/main...HEAD`(`origin/main` 대비 — `status -sb` 는 upstream 만 비교한다) 확인 후 작업 branch 를 push. `main` 으로는 push 하지 않는다 |
 | 6 | **`--force` push 금지** | push 한 branch · 공유 `main` 의 이력은 재작성하지 않는다(오타 정정도 후속 커밋으로) |
 
 **작업트리가 dirty 하다는 사실만으로는 중지 사유가 아니다.**
@@ -74,7 +74,7 @@ lockfile 이 어긋난 채 push 되면 실패한다. 즉 lockfile 동기화 요�
 다른 PC 로 옮기기 전 아래를 모두 만족해야 한다.
 
 ```text
-[ ] 작업 worktree 의 추적 파일 clean         (git status --short 에 M/D/R 없음)
+[ ] 작업 worktree 완전 clean                 (git status --short 출력이 비어 있음 — staged A · M · D · R · T · C · U · 미추적 ?? 모두 0)
 [ ] 작업 branch 의 commit 이 원격에 push 됨   (git fetch origin && git log origin/<branch>..HEAD 가 비어 있음)
 [ ] 작업 branch 의 PR 이 열려 있음            (gh pr view <branch> · merge 는 하지 않음)
 [ ] 인계 메모 push 됨                         (/handoff — HANDOFF.md 를 branch · PR 에 커밋)
