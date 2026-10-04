@@ -1221,6 +1221,9 @@ export async function runWorkAgent(
   await recallExperience(null);
   // Phase B — 같은 Task 를 이어가면 Assistant 가 이전 run 의 업무 키를 준다. 경험 조회 키를 맞출 뿐 절차를 정하지 않는다.
   const hintKey = input.intent?.taskTypeHint ?? null;
+  // Phase C — Assistant Memory(Cloud)가 아는 같은 소유 주체 · 같은 대상의 업무 유형. 이 노드의 Local 원장이 비어 있어도(새 PC)
+  // 같은 업무를 같은 키로 이어간다. 노드가 아는 키가 앞, Cloud 기억은 뒤에 붙인다(중복 제거). 절차를 정하지 않는다.
+  for (const k of input.intent?.knownTaskTypes ?? []) if (!knownTaskKeys.includes(k)) knownTaskKeys = [...knownTaskKeys, k];
   if (hintKey && !knownTaskKeys.includes(hintKey)) knownTaskKeys = [hintKey, ...knownTaskKeys];
   if (resumeFrame?.taskKey) await recallExperience(resumeFrame.taskKey);
   /** 방법 label 에 들어가면 안 되는 이번 run 의 값 — 재개 답 + 지금까지 입력한 글. */

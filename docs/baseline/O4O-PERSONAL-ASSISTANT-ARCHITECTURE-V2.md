@@ -540,7 +540,7 @@ V1 에서 **승계하지 않는 것**: Local-first 저장 원칙(ARCH §5 의 Lo
 | L3 Skill / Discovery | PARTIAL (Candidate · adapter seed · Strong-first routing) | GAP-CENSUS §J · §M |
 | L4 Execution | EXISTS | GAP-CENSUS §F |
 | L5 Execution Node | EXISTS (단일 노드 가정 · 다중 노드 `ambiguous`) | GAP-CENSUS §I |
-| Memory 배치 | 전부 실행 PC `local.db` (§9 와 어긋남 — Gate 후 단계 C) | GAP-CENSUS §G |
+| Memory 배치 | 소유 · 배치 레지스트리(`memory-ownership.ts`) 고정 · Task type 이력은 Cloud 에서 노드 무관하게 읽음. 절차 기억 · 재개 frame · 실행 기록은 아직 실행 PC `local.db` (§17 Gate PENDING) | GAP-CENSUS §G · Phase C CHECK |
 
 이 표는 시점 기록이다. 갱신할 때는 이 절만 고치고 본문 원칙은 바꾸지 않는다.
 

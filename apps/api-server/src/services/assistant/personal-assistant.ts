@@ -19,6 +19,10 @@
  *   → **ExecutionReport(주장 + 근거)** → Assistant 가 완료 계약으로 Task 상태 판정
  *   Execution 의 `done` 은 실행 결과의 주장일 뿐 Task 완료가 아니다.
  *
+ * Phase C (WO-O4O-PERSONAL-ASSISTANT-PHASE-C-MEMORY-EXPERIENCE-CONTINUITY-V1) — Assistant Memory
+ *   Task → **Assistant Memory(assistant-memory.ts · 실행 노드 무관)** → Assistant Planning(knownTaskTypes) → Execution
+ *   기억 종류 · 소유 · 배치는 memory-ownership.ts 레지스트리가 정한다. 절차 기억의 Cloud 이동은 V2 §17 Gate 뒤다.
+ *
  * 이 모듈이 하지 않는 일
  *   - 완료 계약의 영속화 · Knowledge / Shared Candidate 배선(후속 단계)
  *   - 요청 원문 · 대화 저장 (V2 §17 Gate 대상) — 원문은 실행 본체로만 흘러가고 Task · 실행 지시에는 닿지 않는다
@@ -42,7 +46,19 @@ import {
 } from './assistant-task-store.js';
 import { resolveTaskOwnership } from './task-ownership.js';
 import { judgeTaskStatus, planAssistantTask, type AssistantPlan } from './assistant-planning.js';
+import { EMPTY_ASSISTANT_MEMORY, recallAssistantMemory } from './assistant-memory.js';
 import type { ExecutionIntent, ExecutionReport } from '../ai-tools/work-agent-contract.js';
+import { resolveWorkTarget } from '../ai-tools/work-target-resolver.js';
+
+/**
+ * 이번 Task 의 대상 — 기억을 대상별로 찾기 위한 구조 식별자만 쓴다(원문은 메모리에서만 읽고 버린다).
+ * 재개는 짧은 답변 문장에서 대상을 다시 찾지 않는다(runtime 과 같은 규칙) — Task 에 기록된 대상 · 힌트만 쓴다.
+ */
+export function resolveTaskTarget(task: AssistantTaskRow, workBody: Record<string, unknown>, resuming: boolean): string | null {
+  const hint = typeof workBody.targetHint === 'string' && workBody.targetHint.length > 0 ? workBody.targetHint : undefined;
+  if (resuming) return task.targetId ?? (hint ? resolveWorkTarget('', hint)?.targetId ?? null : null);
+  return resolveWorkTarget(String(workBody.request ?? ''), hint)?.targetId ?? task.targetId ?? null;
+}
 
 /** 기존 work-agent 본체의 응답(HTTP 직전 형태). `execution` 은 직렬화되지 않는 내부 요약이다. */
 export interface WorkExecutionReply {
@@ -158,20 +174,31 @@ export async function runAssistantWorkTask(
     });
   }
 
+  // ── Assistant Memory (Phase C) — 실행 노드와 무관한 기억. Task 소유 주체 경계 안에서만 읽는다 ──
+  const resuming = typeof input.workBody.runId === 'string' && input.workBody.runId.length > 0;
+  const memory = task ? await recallAssistantMemory(dataSource, {
+    userId: input.userId,
+    ownership: { scope: task.ownershipScope, organizationId: task.organizationId, serviceKey: task.serviceKey },
+    targetId: resolveTaskTarget(task, input.workBody, resuming),
+  }) : EMPTY_ASSISTANT_MEMORY;
+
   // ── Assistant Planning — 이번 Task 의 수행 방향(구조만 · 원문 없음) ──
   const plan = planAssistantTask({
     taskId: task?.taskId ?? null,
-    resuming: typeof input.workBody.runId === 'string' && input.workBody.runId.length > 0,
+    resuming,
     priorTaskTypeKey: task?.taskTypeKey ?? null,
     userMethodHint: typeof input.workBody.recoveryHint === 'string' && input.workBody.recoveryHint.trim().length > 0,
-    // 자기 Experience 는 아직 실행 노드에 있다(V2 §9-4). 노드가 있으면 Execution 이 현재 화면과 함께 읽는다.
+    // 절차 기억(Preferred/Avoid · Candidate)은 Gate 전이라 아직 실행 노드에 있다(V2 §9-4). Execution 이 현재 화면과 함께 읽는다.
     nodeExperienceReachable: true,
+    knownTaskTypes: memory.knownTaskTypes,
   });
   logger.info('assistant plan', {
     taskId: plan.intent.taskId,
     reason: plan.reason,
     startMode: plan.intent.startMode,
     taskTypeHint: plan.intent.taskTypeHint !== null,
+    memoryTaskTypes: plan.intent.knownTaskTypes.length,
+    memorySources: memory.sources.map((s) => `${s.kind}:${s.placement}:${s.readByAssistant ? 'read' : s.note ?? 'skip'}`),
   });
 
   // ── Task → Execution (실행 지시와 함께 위임 · 화면 판단은 Execution 이 한다) ──
