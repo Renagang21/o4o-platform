@@ -1,7 +1,7 @@
 # O4O Canonical Document Index
 
 > **역할**: AI 도구와 무관한 **정본(canonical) 문서 지도**. [`CLAUDE.md`](../CLAUDE.md) 와 [`AGENTS.md`](../AGENTS.md) 는 규칙을 복사하지 않고 이 색인과 각 정본을 가리킨다.
-> **작성일**: 2026-09-12 · **최종 갱신**: 2026-10-04 (정본 집합 확정 — 현행 SSOT 1행 ACTIVE 추가 · 불일치 · 충돌 · 본문 검증 전 문서 28건을 §9 판정 대기로(27행) · 어휘 밖 SUPERSEDED 행 제거) · **출처**: 구 `CLAUDE.md` v8 "상세 규칙 문서 목록" + 본문 링크의 합집합
+> **작성일**: 2026-09-12 · **최종 갱신**: 2026-10-04 (정본 집합 확정 — Market Trial 현행 정책 3행 ACTIVE 추가 · 불일치 · 충돌 · 본문 검증 전 문서 28건을 §9 판정 대기로(27행) · 어휘 밖 SUPERSEDED 행 제거) · **출처**: 구 `CLAUDE.md` v8 "상세 규칙 문서 목록" + 본문 링크의 합집합
 
 ## 0. 이 색인의 규칙
 
@@ -102,6 +102,8 @@
 | [GLOBAL-HEADER-STANDARD-V1](architecture/ui/GLOBAL-HEADER-STANDARD-V1.md) | 글로벌 헤더 표준 | ACTIVE |
 | [O4O-TABLE-STANDARD-BASELINE-V1](baseline/O4O-TABLE-STANDARD-BASELINE-V1.md) | 테이블 지향 표준 | ASPIRATIONAL |
 | [O4O-MARKET-TRIAL-CONTENT-ONLY-DOMAIN-BOUNDARY-V1](architecture/O4O-MARKET-TRIAL-CONTENT-ONLY-DOMAIN-BOUNDARY-V1.md) | **유통참여형 펀딩(Market Trial) 도메인 경계 SSOT** (2026-06-19) — content-only: 콘텐츠 편집 · 게시 · 참여 신청 · 현황까지. O4O 주문 · 결제 · 정산 · 발송 연결은 폐기 | ACTIVE |
+| [O4O-MARKET-TRIAL-OFFLINE-SETTLEMENT-PAYMENT-POLICY-V1](architecture/O4O-MARKET-TRIAL-OFFLINE-SETTLEMENT-PAYMENT-POLICY-V1.md) | 유통참여형 펀딩 settlement/payment 기록 정책 (2026-06-19, content-only 경계 기준) — O4O 정식 결제 · 정산 이력이 아니라 **오프라인 입금 확인 · 참여 처리 상태 기록이며 삭제 대상이 아니다** | ACTIVE |
+| [O4O-MARKET-TRIAL-OFFLINE-PAYMENT-CONFIRMATION-AUDIT-POLICY-V1](architecture/O4O-MARKET-TRIAL-OFFLINE-PAYMENT-CONFIRMATION-AUDIT-POLICY-V1.md) | 위 정책의 하위 — 오프라인 입금 확인일(`paidAt`) 보존 · 감사 정책 | ACTIVE |
 | [O4O-FORM-STANDARD-BASELINE-V1](baseline/O4O-FORM-STANDARD-BASELINE-V1.md) | 폼 지향 표준 | ASPIRATIONAL |
 
 ## 6. 플랫폼 공통 구조 · 콘텐츠 · APP
@@ -159,7 +161,6 @@
 | [O4O-STORE-OWNER-RBAC-STANDARD-V1](architecture/auth/O4O-STORE-OWNER-RBAC-STANDARD-V1.md) | 매장 경영자(store_owner) RBAC 표준. **내부 모순**: §2.1 · 일부 절은 "`role_assignments` 만 · `organization_members` 미조회", §3.1-A 는 "Role ∧ Relationship" — 접근 판단은 [STORE-ACCESS-AND-MEMBERSHIP](baseline/O4O-STORE-ACCESS-AND-MEMBERSHIP-V1.md)(Role ∧ Relationship)를 따른다. 본문 정합은 후속 | 판정 대기 |
 | [PLAYWRIGHT-MCP](platform/development/PLAYWRIGHT-MCP.md) | Playwright MCP 설정 가이드. **stale**: `@playwright/mcp@0.0.30` 고정 · `@latest` 금지 서술이 현행 config 템플릿(`@latest`)과 다름. 갱신 전에는 config 템플릿을 따른다 | 판정 대기 |
 | [O4O-DISTRIBUTION-FUNDING-INITIAL-OPERATION-MODEL-V1](baseline/O4O-DISTRIBUTION-FUNDING-INITIAL-OPERATION-MODEL-V1.md) | 유통참여형 펀딩 초기 운영 모델(2026-06-06). 제품 정산 · 매장 랜딩 · 첫 주문 추적 절은 [MARKET-TRIAL-CONTENT-ONLY-DOMAIN-BOUNDARY](architecture/O4O-MARKET-TRIAL-CONTENT-ONLY-DOMAIN-BOUNDARY-V1.md)(2026-06-19)가 폐기 — 충돌 시 content-only 가 기준 | 판정 대기 |
-| [O4O-MARKET-TRIAL-OFFLINE-PAYMENT-CONFIRMATION-AUDIT-POLICY-V1](architecture/O4O-MARKET-TRIAL-OFFLINE-PAYMENT-CONFIRMATION-AUDIT-POLICY-V1.md) | 오프라인 입금 확인일 · 감사 정책. content-only 경계가 오프라인 정산 ledger 를 V1 범위에서 제외 — 적용 범위 재판정 필요 | 판정 대기 |
 | [EventOffer-Operation-Policy](event-offer/EventOffer-Operation-Policy.md) | "운영자 승인 · 심사 없음 · 노출만 전환" 서술이 [EVENT-OFFER-COMMON-DOMAIN-V1](baseline/EVENT-OFFER-COMMON-DOMAIN-V1.md)(`pending → approved` 승인)과 실제 approve/reject API 와 충돌 — 승인 계약은 COMMON-DOMAIN 이 기준 | 판정 대기 |
 | [DESIGN-O4O-KPA-STORE-PRODUCT-DETAIL-INFORMATION-CANONICAL-ROLE-V1](design/DESIGN-O4O-KPA-STORE-PRODUCT-DETAIL-INFORMATION-CANONICAL-ROLE-V1.md) | 매장 상품 상세 정보 역할. **충돌**: "`product_ai_contents` = 매장 소유 보완 설명" 서술은 이틀 뒤 [PRODUCT-AI-CONTENT-OWNERSHIP 설계](design/DESIGN-O4O-PRODUCT-AI-CONTENT-OWNERSHIP-AND-STORE-DESCRIPTION-CONTRACT-V1.md) §1~§4 · §8(플랫폼 소유 전역 초안 · 매장 쓰기 금지, 구현 완료)로 대체 — 충돌 시 후자의 해당 절이 기준 | 판정 대기 |
 | [DESIGN-O4O-PRODUCT-AI-CONTENT-OWNERSHIP-AND-STORE-DESCRIPTION-CONTRACT-V1](design/DESIGN-O4O-PRODUCT-AI-CONTENT-OWNERSHIP-AND-STORE-DESCRIPTION-CONTRACT-V1.md) | **유효**: §1~§4 · §8 소유권 계약(`product_ai_contents` = 플랫폼 소유 전역 초안 · 매장 쓰기 금지 · `detail_html`) — 구현 완료. **stale**: §7 "매장 편집 화면 내장 AI"(2026-09-19 매장 내부 AI 은퇴 → 외부 LLM 보조) · §5.2 · §6.2 · §12 의 POP 설계(ProductPopBuilderPage 은퇴 · POP V2 만 canonical). 절 단위 정정은 후속 | 판정 대기 |
@@ -176,6 +177,7 @@
 | [O4O-DISTRIBUTION-EVIDENCE-SEED-PRINCIPLE-V1](baseline/O4O-DISTRIBUTION-EVIDENCE-SEED-PRINCIPLE-V1.md) | **등재 후보 — 본문 검증 전.** 공공데이터 seed 상위 원칙 — 규제 존재 ≠ 유통 정보. 교차검증에서 충돌 미발견 · 본문 전수 검증 전 | 판정 대기 |
 | [APP-CONTENT-STANDARD-SPEC](architecture/APP-CONTENT-STANDARD-SPEC.md) | **등재 후보 — 본문 검증 전.** APP-CONTENT 표준 UI 스펙. **충돌 · stale**: §2 역할별 색상 hex 고정이 [DESIGN-CORE-GOVERNANCE](rules/DESIGN-CORE-GOVERNANCE.md)(토큰 하드코딩 금지)와 충돌 · Phase 1 의 `GET /api/v1/{service}/home/content` 없음 | 판정 대기 |
 | [O4O-DATA-CLEANUP-IDENTIFICATION-SAFETY-V1](baseline/operations/O4O-DATA-CLEANUP-IDENTIFICATION-SAFETY-V1.md) | **등재 후보 — 본문 검증 전.** 데이터 정비 대상 식별 안전 규칙 — UUID prefix 기반 삭제 금지는 유효. **주의**: 차단 실증용 `UPDATE` · `DELETE` probe 절은 무해 조건 · rollback 계약이 없어 그대로 실행하지 않는다(DB write 는 사용자 승인 — `CLAUDE.md` DB 경계) | 판정 대기 |
+| [ALPHA-STATUS-DISPLAY-STANDARD](platform/ALPHA-STATUS-DISPLAY-STANDARD.md) | 운영형 알파 상태 표시 기준. 서비스 코드에서 `AlphaStatus` 표시는 사라졌으나 [PLATFORM-CONTENT-POLICY](baseline/PLATFORM-CONTENT-POLICY-V1.md) 가 같은 단계를 현행 기준으로 사용하고 단계 종료 결정은 없다 — 정책 유지 여부 판정 필요 | 판정 대기 |
 | [CHECKOUT-STABLE-DECLARATION-V1](baseline/CHECKOUT-STABLE-DECLARATION-V1.md) | 문서 스스로 B2C storefront 를 `UNKNOWN` 으로 표기 — RETAIL-STABLE 과 같은 [COMMERCE-BOUNDARY](baseline/O4O-STORE-COMMERCE-BOUNDARY-V1.md) 충돌 후보. **기능 복구·확장 금지** | 판정 대기 |
 | [O4O-STORE-RULES](architecture/O4O-STORE-RULES.md) | **유효**: Store Template · 주문 생성 3중 방어(`CLAUDE.md` §5 가 인용). **stale**: §1 · §3.2 의 Tourism 참조 구현 · `OrderType.TOURISM`(routes/tourism 없음, OrderType 은 E-COMMERCE 행 참조). 본문 정합은 후속 | 판정 대기 |
 | [DEBUG-SSR-TEST-PAGE-GUIDE-V1](platform/debug/DEBUG-SSR-TEST-PAGE-GUIDE-V1.md) | **유효**: Raw JSON SSR 페이지로 원인 확정. **충돌**: "액션은 GET 으로 실행" 서술이 `CLAUDE.md` §8-4(GET 상태 변경 금지) · §8-1(CLI 우선)과 충돌 — §8 이 우선한다. 본문 정합은 후속 | 판정 대기 |

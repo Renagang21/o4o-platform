@@ -193,12 +193,12 @@ checks 1,713 · investigations 727 · work-orders 149 · ir 33 · 기타 3 (audi
 
 | 판정 | 수 | 조치 |
 |---|---:|---|
-| ACTIVE (미등재) | 28 | 상위 정본 · 더 최신 문서 · 코드와 교차검증한 뒤 나눴다 (7-1-A). **새 ACTIVE 등재 0** — 20건은 §9 판정 대기(충돌 · stale 11 + "등재 후보 — 본문 검증 전" 9) · 등재 불필요 8(폴더 README 2 · Catalog Import 모듈 문서 3 · ADR 1 · HFF 초안 저장 설계 1 · 색인 자신). 색인 ACTIVE 추가는 이미 SSOT 를 선언한 `O4O-MARKET-TRIAL-CONTENT-ONLY-DOMAIN-BOUNDARY-V1` 1행뿐. 색인 §0 에 "새 ACTIVE 등재는 본문 전수 검증 뒤" 규칙 추가 |
+| ACTIVE (미등재) | 28 | 상위 정본 · 더 최신 문서 · 코드와 교차검증한 뒤 나눴다 (7-1-A). **ACTIVE 1** — `O4O-MARKET-TRIAL-OFFLINE-PAYMENT-CONFIRMATION-AUDIT-POLICY-V1`(상위 `OFFLINE-SETTLEMENT-PAYMENT-POLICY` 가 content-only 와의 관계를 명시 정합 · 리뷰 확인). 19건은 §9 판정 대기(충돌 · stale 10 + "등재 후보 — 본문 검증 전" 9) · 등재 불필요 8(폴더 README 2 · Catalog Import 모듈 문서 3 · ADR 1 · HFF 초안 저장 설계 1 · 색인 자신). 함께 미등재였던 현행 SSOT 2건(`O4O-MARKET-TRIAL-CONTENT-ONLY-DOMAIN-BOUNDARY-V1` · `O4O-MARKET-TRIAL-OFFLINE-SETTLEMENT-PAYMENT-POLICY-V1`)을 ACTIVE 로 추가 → 색인 ACTIVE 3행. 색인 §0 에 "새 ACTIVE 등재는 본문 전수 검증 뒤" 규칙 추가 |
 | ACTIVE (등재 · 일치) | 15 | 변경 없음 |
 | 색인 불일치 | 8 | 색인 §9 "판정 대기" 로 이동하고 유효 절 · stale 절을 행에 명시. 본문 정합은 후속 |
 | 기록물이 canonical 폴더에 있음 | 17 | 11건은 `ACTIVE · 기록물 — 현재 기준 정본 아님` 상태 줄 — 제안한 후속 조치의 완료 여부가 미확인이라 COMPLETED 로 닫지 않는다(보류 IR 규칙). 산출물이 구현됐고 후속이 없는 `SERVICE-PRODUCT-LAYER-PREP-V1` 1건만 `COMPLETED`. Promotion 계획 · 매트릭스 2건은 미실행 초안이라 `DRAFT`. MINEROCK600 media-pilot 3건은 진행 중 트랙이라 표기하지 않음 |
 | SUPERSEDED | 2 | `NETURE-DOMAIN-ARCHITECTURE-FREEZE-V1` → V3 · `DECISION-O4O-IDENTITY-ARCHITECTURE-V2-ADOPTION-V1` → IDENTITY V3 상태 줄 |
-| OBSOLETE | 1 | `ALPHA-STATUS-DISPLAY-STANDARD` (서비스 코드에서 표시 소멸) |
+| OBSOLETE 후보 | 1 | `ALPHA-STATUS-DISPLAY-STANDARD` — 서비스 코드에서 표시는 사라졌으나 PLATFORM-CONTENT-POLICY 가 같은 단계를 현행으로 사용하고 단계 종료 결정이 없어 OBSOLETE 로 표기하지 않고 색인 §9 판정 대기 (코드 부재만으로 폐기 판정하지 않음) |
 | 판정 불가 | 11 | 상태 줄 없음 = ACTIVE 유지(LIFECYCLE §6 · CLAUDE.md §16-6). 아래 7-4 |
 
 #### 7-1-A. ACTIVE 후보 28건 교차검증
@@ -209,7 +209,8 @@ checks 1,713 · investigations 727 · work-orders 149 · ir 33 · 기타 3 (audi
 |---|---|
 | §9 "등재 후보 — 본문 검증 전" (교차검증에서 충돌 미발견) | SHARED-SPACE-FRAME-PRINCIPLE · SHARED-SPACE-STANDARD-BLOCKS · DISTRIBUTION-EVIDENCE-SEED-PRINCIPLE |
 | §9 "등재 후보 — 본문 검증 전" (리뷰에서 충돌 · stale 발견, 행에 명시) | DESIGN-STORE-LIBRARY-AND-ASSET(`asset_snapshots` 소유 범위) · DATA-CLEANUP-IDENTIFICATION-SAFETY(write probe 절) · STANDARD-LIST-PHASE1(대표 화면 은퇴) · TEMPLATE-PRESETS(preset 소멸 · KPA hero 값) · DESIGN-STORE-EXECUTION-MANAGEMENT(`signage_playlists` 서술) · APP-CONTENT-STANDARD-SPEC(색상 hex 고정 · 없는 API) |
-| §9 판정 대기 (충돌 · stale) | STORE-OWNER-RBAC(내부 모순) · PLAYWRIGHT-MCP(고정 버전 stale) · DISTRIBUTION-FUNDING-INITIAL · MARKET-TRIAL-OFFLINE-PAYMENT(둘 다 content-only 경계와 충돌) · EventOffer-Operation-Policy(승인 계약과 충돌) · DESIGN-KPA-STORE-PRODUCT-DETAIL(소유권 대체) · APP-STANDARD-LIST-AND-MATRIX(Neture Signage 채택 보류와 충돌) · DESIGN-PRODUCT-AI-CONTENT-OWNERSHIP(§1~§4 · §8 유효, §7 · POP 절 stale) · SIGNAGE-APPROVAL(상태 모델이 구현과 다름) · CONTENT-META(은퇴 테이블을 정본으로 서술) · INTERNAL-BETA-RUNBOOK(없는 endpoint · 미기록 지표) |
+| ACTIVE | MARKET-TRIAL-OFFLINE-PAYMENT-CONFIRMATION(상위 OFFLINE-SETTLEMENT-PAYMENT-POLICY 가 "오프라인 입금 기록은 content-only 와 충돌하지 않고 보존" 으로 정합 — 처음 충돌로 본 판단을 정정) |
+| §9 판정 대기 (충돌 · stale) | STORE-OWNER-RBAC(내부 모순) · PLAYWRIGHT-MCP(고정 버전 stale) · DISTRIBUTION-FUNDING-INITIAL(제품 정산 · 매장 랜딩 · 첫 주문 추적 절이 content-only 와 충돌) · EventOffer-Operation-Policy(승인 계약과 충돌) · DESIGN-KPA-STORE-PRODUCT-DETAIL(소유권 대체) · APP-STANDARD-LIST-AND-MATRIX(Neture Signage 채택 보류와 충돌) · DESIGN-PRODUCT-AI-CONTENT-OWNERSHIP(§1~§4 · §8 유효, §7 · POP 절 stale) · SIGNAGE-APPROVAL(상태 모델이 구현과 다름) · CONTENT-META(은퇴 테이블을 정본으로 서술) · INTERNAL-BETA-RUNBOOK(없는 endpoint · 미기록 지표) |
 
 추가 발견: `DROPSHIPPING-ORDER-RELAY` · `-SETTLEMENT-MODEL` · `-STATE-MODEL` 3건은 본문에 `Status: Active` 가 있으나 Dropshipping 도메인 코드 0 · 대응 패키지 없음 → 상단에 `OBSOLETE` 상태 줄(원문 Status 줄 보존).
 
@@ -223,6 +224,8 @@ checks 1,713 · investigations 727 · work-orders 149 · ir 33 · 기타 3 (audi
 
 ### 7-4. 판정 불가 11건 (ACTIVE 유지 · 후속 판단 필요)
 
+11건 = 아래 표 10건 + `baseline/CHECKOUT-STABLE-DECLARATION-V1`(문서 스스로 B2C storefront `UNKNOWN` — 색인 §9 판정 대기로 등재).
+
 | 문서 | 이유 |
 |---|---|
 | `architecture/O4O-KPA-OPERATOR-CANONICAL-STATE-V1` | 2026-05 시점 스냅샷인데 SSOT 를 자처 — 역할 업무공간 리팩터링 후 재검증 표기 없음 |
@@ -235,7 +238,7 @@ checks 1,713 · investigations 727 · work-orders 149 · ir 33 · 기타 3 (audi
 
 ### 7-5. 후속 (별도 WO)
 
-1. §9 판정 대기로 등재한 28건(27행 — 색인 불일치 7 · 7-1-A 의 20 · CHECKOUT-STABLE 1. `baseline/README` 는 2번)의 본문 정합 · 판정. 본문 검증을 통과한 문서만 ACTIVE 로 올린다 — 특히 `CLAUDE.md` 가 직접 가리키는 `O4O-STORE-RULES` · `DEBUG-SSR-TEST-PAGE-GUIDE-V1` 우선
+1. §9 판정 대기로 등재한 28건(27행 — 색인 불일치 7 · 7-1-A 의 19 · CHECKOUT-STABLE 1 · ALPHA-STATUS 1. `baseline/README` 는 2번)의 본문 정합 · 판정. 본문 검증을 통과한 문서만 ACTIVE 로 올린다 — 특히 `CLAUDE.md` 가 직접 가리키는 `O4O-STORE-RULES` · `DEBUG-SSR-TEST-PAGE-GUIDE-V1` 우선
 2. `docs/baseline/README.md` 의 상태 표기(3-ROLE-FLOW · KPA-ROLE-MATRIX · ROLE-POLICY · E-COMMERCE)가 색인과 다름 — 색인 기준으로 정렬
 3. `O4O-CORE-FREEZE-V1`(F10) 의 `RefreshToken.ts` 목록 stale(Identity V3 `refresh_tokens=DEAD_RETIRE`) — Frozen 본문이라 명시적 WO
 4. 판정 불가 11건 결정 · SUPERSEDED 3 과 기록물 14건의 위치 이전은 history 정비 WO 에서
