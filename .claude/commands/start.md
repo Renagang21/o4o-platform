@@ -22,6 +22,8 @@ description: 작업 시작 - 동기화, 인수인계 확인, 정비 후 작업 �
      → 가장 최근 것을 checkout 하지 말고 `git fetch origin <headRefName>` → `git show origin/<headRefName>:HANDOFF.md` 로 읽는다.
    둘 다 있으면 더 최근 것을 기준으로 하고 어느 쪽을 읽었는지 알려줘. 둘 다 없으면 없다고 알려주고 8~9번은 건너뛰어.
 8. HANDOFF.md 항목 중 이미 완료됐거나 현재 코드와 맞지 않는 것을 git log와 실제 파일로 확인해서 정리해.
+   HANDOFF · 이전 보고에 나온 PR · branch 상태는 기록 시점 값이다 — 그대로 믿지 말고 **GitHub 현재 상태를 먼저 조회**한다
+   (`gh pr view <번호> --json state,mergeCommit` · `git ls-remote --heads origin <branch>`). 이미 MERGED 인 PR 을 대기 · 통합 대상으로 다시 보고하거나 merge 하려 하지 않는다.
 9. 앞으로도 계속 유효한 규칙이나 결정(아키텍처, 코딩 규칙 등)이 있으면 CLAUDE.md로 옮길지 나에게 먼저 물어봐. 일회성 진행 상황은 CLAUDE.md에 넣지 마.
 10. CLAUDE.md에 중복되거나 오래된 내용, 진행 상황 같은 일시적인 내용이 섞여 있으면 목록으로 보여주고 정리할지 물어봐.
 
