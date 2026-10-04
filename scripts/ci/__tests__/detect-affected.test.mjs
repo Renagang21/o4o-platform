@@ -888,7 +888,7 @@ test('W2. hospital-pharmacy-core 변경 → hospital-pharmacy 만 (기존엔 9�
 test('W3. store-ui-core 변경 → graph consumer 만 · 비소비 서비스는 false', () => {
   const v = webOf(['M\tpackages/store-ui-core/src/index.ts']);
   assert.deepEqual(onOf(v), consumersOf('@o4o/store-ui-core'));
-  for (const key of ['lecture', 'kpa-branch', 'signage-player', 'hospital-pharmacy']) {
+  for (const key of ['lecture', 'kpa-branch', 'hospital-pharmacy']) {
     assert.equal(v.services[key], false, `${key} 는 store-ui-core 를 소비하지 않는다`);
   }
 });
@@ -921,9 +921,17 @@ test('W6. 서비스 변경 + package 변경 → 합집합', () => {
 test('W7. 여러 서비스 동시 변경 → 각각 true, 나머지는 false', () => {
   const v = webOf([
     'M\tservices/web-neture/src/a.tsx',
-    'M\tservices/signage-player-web/src/b.tsx',
+    'M\tservices/web-kpa-branch/src/b.tsx',
   ]);
-  assert.deepEqual(onOf(v), ['neture', 'signage-player']);
+  assert.deepEqual(onOf(v), ['kpa-branch', 'neture']);
+});
+
+test('W7b. 배포 은퇴한 signage-player-web 변경 → Web 배포 0 · fallback 아님 · registry 에 없음', () => {
+  assert.ok(!WEB_SERVICES.some((s) => s.dir === 'services/signage-player-web'), '배포 registry 에 다시 넣지 않는다');
+  const v = webOf(['M\tservices/signage-player-web/src/App.tsx']);
+  assert.deepEqual(onOf(v), []);
+  assert.equal(v.fallback, false);
+  assert.ok(!('signage-player' in v.services));
 });
 
 test('W8. transitive(2단계 이상) dependency 변경도 잡는다', () => {
