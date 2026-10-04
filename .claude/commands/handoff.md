@@ -32,4 +32,6 @@ main 반영은 PR merge 로만 하고, main 통합은 내가 승인한 뒤에 �
    - 거부되면 멈추고 보고해. 임의로 force push 하지 마.
    - 이 branch 의 PR 이 없으면 `gh pr create --base main` 으로 만든다. merge 는 하지 않는다.
      (다음 작업공간의 `/start` 는 HANDOFF.md 를 포함한 열린 PR 을 찾아 읽는다.)
+   - 2번에서 기록한 상태 중 이번 push · PR 생성으로 바뀐 것(이 branch 의 원격 존재 · 새 PR 번호)이 있으면,
+     다시 조회해 HANDOFF.md 를 갱신하고 같은 branch 에 한 번 더 커밋 · push 한다.
 6. push 결과 · PR 번호 · HANDOFF.md 요약을 알려줘.
