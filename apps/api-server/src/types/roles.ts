@@ -321,9 +321,7 @@ export const ROLE_REGISTRY: Record<PrefixedRole, RoleMetadata> = {
   'kpa:store_owner': {
     role: 'kpa:store_owner',
     label: '약국 매장 경영자',
-    description:
-      '약국 사업자 매장 운영 서비스(pharmacy.neture.co.kr · serviceKey kpa-society)의 매장 경영자. ' +
-      'KPA 분회(kpa.neture.co.kr)와 무관하다 (WO-O4O-STORE-OWNER-ROLE-BASED-ACCESS-UNIFICATION-V1)',
+    description: '약국 사업자 매장 운영 서비스(serviceKey kpa-society)의 매장 경영자 — KPA 분회와 무관',
     service: 'kpa',
     category: 'commerce',
     deprecated: false
