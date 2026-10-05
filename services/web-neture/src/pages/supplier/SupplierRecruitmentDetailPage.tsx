@@ -15,6 +15,8 @@ const SERVICE_LABELS: Record<string, string> = {
   'kpa-society': 'KPA Society',
   'k-cosmetics': 'K-Cosmetics',
   neture: 'Neture',
+  // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: 세미프랜차이즈 모집 (참여 단위 = 약국 조직)
+  'neture-pharmacy': 'Neture 약국 (세미프랜차이즈)',
 };
 
 const APP_STATUS: Record<string, { label: string; cls: string }> = {

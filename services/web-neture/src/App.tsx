@@ -268,6 +268,13 @@ import { StoreProductsManagerPage } from '@o4o/store-products-ui';
 import { GuideBackLink } from './components/GuideBackLink';
 // Neture Event Offer — 공급자 현황 허브 (WO-O4O-EVENT-OFFER-NETURE-ROLE-UX-ALIGNMENT-V1)
 const SupplierEventOfferPage = lazy(() => import('./pages/supplier/SupplierEventOfferPage'));
+// WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: Neture 약국 commerce — 기본 가입 심사 · 세미프랜차이즈 · 공급 제안 · 이벤트 · 모집
+const PharmacyMembershipReviewPage = lazy(() => import('./pages/operator/PharmacyMembershipReviewPage'));
+const OperatorSemiFranchisePage = lazy(() => import('./pages/operator/OperatorSemiFranchisePage'));
+const AdminSemiFranchisePage = lazy(() => import('./pages/admin/AdminSemiFranchisePage'));
+const SupplierSupplyProposalsPage = lazy(() => import('./pages/supplier/SupplierSupplyProposalsPage'));
+const SupplierSemiFranchiseEventsPage = lazy(() => import('./pages/supplier/SupplierSemiFranchiseEventsPage'));
+const SupplierSemiFranchiseRecruitmentsPage = lazy(() => import('./pages/supplier/SupplierSemiFranchiseRecruitmentsPage'));
 
 // Admin Dashboard (admin-only pages, now under /operator/*)
 const AiCardExplainPage = lazy(() => import('./pages/admin/AiCardExplainPage'));
@@ -867,6 +874,10 @@ function App() {
               {/* WO-O4O-MARKET-TRIAL-PHASE1-V1 + WO-MARKET-TRIAL-SUPPLIER-RESULTS-AND-FEEDBACK-V1 */}
               {/* Event Offer 현황 — 공급자 지원 허브 (WO-O4O-EVENT-OFFER-NETURE-ROLE-UX-ALIGNMENT-V1) */}
               <Route path="/supplier/event-offers" element={<SupplierEventOfferPage />} />
+              {/* WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: 세미프랜차이즈 공급 제안 · 이벤트 · 모집 */}
+              <Route path="/supplier/supply-proposals" element={<SupplierSupplyProposalsPage />} />
+              <Route path="/supplier/semi-franchise-events" element={<SupplierSemiFranchiseEventsPage />} />
+              <Route path="/supplier/semi-franchise-recruitments" element={<SupplierSemiFranchiseRecruitmentsPage />} />
               <Route path="/supplier/market-trial" element={<SupplierTrialListPage />} />
               <Route path="/supplier/market-trial/new" element={<SupplierTrialCreatePage />} />
               <Route path="/supplier/market-trial/:id" element={<SupplierTrialDetailPage />} />
@@ -1072,6 +1083,8 @@ function App() {
               <Route path="/admin/settings/contact" element={<ServiceContactSettingsPage />} />
               {/* WO-O4O-SERVICE-PHARMACY-AUDIENCE-POLICY-SETTINGS-V1 */}
               <Route path="/admin/settings/service-audience" element={<ServiceAudiencePolicyPage />} />
+              {/* WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: 세미프랜차이즈 관리 (neture:admin) */}
+              <Route path="/admin/semi-franchises" element={<AdminSemiFranchisePage />} />
             </Route>
 
             {/* ================================================================
@@ -1206,6 +1219,9 @@ function App() {
               {/* /operator/suppliers · /operator/supplier-quality 는 위 서브도메인 운영자 블록(supplier:operator)으로 옮겼다 */}
               {/* WO-O4O-NETURE-OPERATOR-CONTACT-MESSAGES-OPERATOR-SCOPE-V1: operator scope contact messages */}
               <Route path="/operator/contact-messages" element={<OperatorContactMessagesPage />} />
+              {/* WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: 약국 기본 가입 심사 · 담당 세미프랜차이즈 (neture:operator) */}
+              <Route path="/operator/pharmacy-memberships" element={<PharmacyMembershipReviewPage />} />
+              <Route path="/operator/semi-franchises" element={<OperatorSemiFranchisePage />} />
             </Route>
 
             {/* ================================================================

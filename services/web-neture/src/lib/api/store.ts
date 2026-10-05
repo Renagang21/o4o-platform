@@ -152,6 +152,10 @@ export interface SupplierOrderSummary {
   note: string | null;
   region: string | null;
   item_count: number;
+  // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1 (DESIGN §8-4): 서비스 · 구매 약국 · 테스트 결제 표식
+  service_key?: string | null;
+  buyer_organization_name?: string | null;
+  test_payment?: boolean;
   // IR-NETURE-B2B-DIRECT-SHIPPING-ORDER-FLOW-AUDIT-V1 Phase 3
   order_type?: NetureOrderType;
   customer_info?: NetureCustomerInfo | null;
