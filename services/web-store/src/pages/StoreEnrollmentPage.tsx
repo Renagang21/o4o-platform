@@ -20,7 +20,6 @@ import { useUnifiedStore } from '../contexts/StoreContext';
 
 const SERVICES: ReadonlyArray<{ key: EnrollableServiceKey; label: string; hint: string }> = [
   { key: 'cosmetics', label: '화장품 · 일반소매', hint: '화장품 · 소매 사업자 운영 서비스' },
-  { key: 'pharmacy-hub', label: '병원 약국', hint: '병원 약국 운영 서비스' },
 ];
 
 const errorMessage = (e: unknown): string =>

@@ -44,7 +44,8 @@ import type { StoreOwnerServiceKey } from '../../utils/store-owner.utils.js';
  * (WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1 · O4O-STORE-ACCESS-AND-MEMBERSHIP-V1 §3-A). 로그인만으로
  * 약국 조직 · kpa:store_owner · active membership 을 만들던 승인 우회 경로를 닫는다.
  */
-export const ENROLLABLE_SERVICE_KEYS: readonly StoreOwnerServiceKey[] = ['cosmetics', 'pharmacy-hub'];
+// Pharmacy-Hub 매장 자가 가입도 은퇴 — 약국 매장은 Neture 기본 가입으로 통합(2026-10-05, 같은 WO).
+export const ENROLLABLE_SERVICE_KEYS: readonly StoreOwnerServiceKey[] = ['cosmetics'];
 
 /**
  * 가입이 부여하는 소유 role. `{prefix}:store_owner` — 기존 규약 그대로.

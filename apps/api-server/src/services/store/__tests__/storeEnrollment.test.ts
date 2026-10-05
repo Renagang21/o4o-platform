@@ -200,7 +200,8 @@ describe('E5 입력 검증은 쓰기 전에 끝난다', () => {
 
   it('가입 가능 서비스 목록은 owner role registry 와 같은 축이다', () => {
     expect(isEnrollableServiceKey('cosmetics')).toBe(true);
-    expect(isEnrollableServiceKey('pharmacy-hub')).toBe(true);
+    // Pharmacy-Hub 매장 자가 가입도 은퇴 — 약국은 Neture 기본 가입으로 통합(WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1).
+    expect(isEnrollableServiceKey('pharmacy-hub')).toBe(false);
     // owner role 은 있지만 자가 가입 대상이 아니다(WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1).
     expect(STORE_OWNER_ROLE_BY_SERVICE.kpa).toBe('kpa:store_owner');
     expect(isEnrollableServiceKey('kpa')).toBe(false);

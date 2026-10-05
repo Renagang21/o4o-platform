@@ -15,7 +15,7 @@ export type StoreAccessLevel = 'owner' | 'member' | 'none';
  * 자가 가입이 가능한 업종. 서버의 ENROLLABLE_SERVICE_KEYS 와 같은 목록이다.
  * 약국(kpa)은 제외 — Neture 약국 기본 가입(`/start-pharmacy`)으로만 연다(WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1).
  */
-export type EnrollableServiceKey = 'cosmetics' | 'pharmacy-hub';
+export type EnrollableServiceKey = 'cosmetics';
 
 export interface StoreEnrollmentResult {
   organizationId: string;

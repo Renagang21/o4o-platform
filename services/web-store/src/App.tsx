@@ -115,12 +115,6 @@ const KcosProductMarketingPage = named(() => import('./services/kcos/pages/store
 const KcosProductPopBuilderPage = named(() => import('./services/kcos/pages/store/ProductPopBuilderPage'), 'ProductPopBuilderPage');
 
 // ── 서비스 업무: PharmacyHub ─────────────────────────────────────────────────
-const PhProductsPage = lazy(() => import('./services/ph/pages/ProductsPage'));
-const PhProductDetailPage = lazy(() => import('./services/ph/pages/ProductDetailPage'));
-const PhCartPage = lazy(() => import('./services/ph/pages/CartPage'));
-const PhOrdersPage = lazy(() => import('./services/ph/pages/OrdersPage'));
-const PhOrderDetailPage = lazy(() => import('./services/ph/pages/OrderDetailPage'));
-const PhPaymentPage = lazy(() => import('./services/ph/pages/PaymentPage'));
 const PhPaymentSuccessPage = lazy(() => import('./services/ph/pages/PaymentSuccessPage'));
 const PhPaymentFailPage = lazy(() => import('./services/ph/pages/PaymentFailPage'));
 
@@ -384,12 +378,14 @@ export default function App() {
       </Route>
       <Route path={`${W}/pharmacy-hub`} element={gated(<ServiceWorkLayout />)}>
         <Route index element={<ServiceWorkHomePage />} />
-        <Route path="products" element={<PhProductsPage />} />
-        <Route path="products/:offerId" element={<PhProductDetailPage />} />
-        <Route path="cart" element={<PhCartPage />} />
-        <Route path="orders" element={<PhOrdersPage />} />
-        <Route path="orders/:orderId" element={<PhOrderDetailPage />} />
-        <Route path="payment" element={<PhPaymentPage />} />
+        {/* WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: Pharmacy-Hub 주문 화면 은퇴 — 약국 주문은 Neture 약국 매장(공급 상품 · 장바구니 · 주문).
+            PG 결제 복귀(success · fail)는 옛 결제 확인 · 기록 경로라 유지한다. */}
+        <Route path="products" element={<Navigate to={`${S}${PP.supply}`} replace />} />
+        <Route path="products/:offerId" element={<Navigate to={`${S}${PP.supply}`} replace />} />
+        <Route path="cart" element={<Navigate to={`${S}${PP.cart}`} replace />} />
+        <Route path="orders" element={<Navigate to={`${S}${PP.orders}`} replace />} />
+        <Route path="orders/:orderId" element={<Navigate to={`${S}${PP.orders}`} replace />} />
+        <Route path="payment" element={<Navigate to={`${S}${PP.orders}`} replace />} />
         <Route path="payment/success" element={<PhPaymentSuccessPage />} />
         <Route path="payment/fail" element={<PhPaymentFailPage />} />
         <Route path="*" element={NotFound} />
