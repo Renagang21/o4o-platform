@@ -767,7 +767,7 @@ export const WEB_SERVICES = [
   { key: 'lecture', dir: 'services/web-lecture' },
   { key: 'store', dir: 'services/web-store' },
   { key: 'kpa-branch', dir: 'services/web-kpa-branch' },
-  { key: 'signage-player', dir: 'services/signage-player-web' },
+  // signage-player-web 은 배포 은퇴(WO-O4O-RETIRED-WEB-SERVICES-DEPLOYMENT-AND-INFRA-CLEANUP-V1) — 다시 넣으면 Cloud Run 이 재생성된다.
   { key: 'hospital-pharmacy', dir: 'services/web-hospital-pharmacy' },
 ];
 
