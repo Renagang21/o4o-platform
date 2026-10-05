@@ -33,7 +33,7 @@
 
 모든 서비스 동일 적용.
 
-> (2026-10-04 정합) 현재 K-Cosmetics · KPA Society 는 목록을 `/operator/members` 에 두고 `/operator/users` 는 그쪽으로 redirect 한다. 상세 canonical 경로는 서비스마다 다르다 — K-Cosmetics = `/operator/members/:id`(`UsersPage.tsx` `fullDetailHref`, `/operator/users/:id` 는 legacy alias), KPA Society = `/operator/users/:id`. 목록 UI 는 `@o4o/operator-core-ui` 의 `OperatorMembersConsolePage` 공통 구현을 쓴다(K-Cosmetics `UsersPage.tsx`). Neture 도 목록 · 상세 canonical 경로가 `/operator/members` · `/operator/members/:id` 이고(`operatorMenuGroups.ts` · `App.tsx`), `/operator/users` 는 legacy alias 다.
+> (2026-10-04 정합) 현재 K-Cosmetics · KPA Society 는 목록을 `/operator/members` 에 두고 `/operator/users` 는 그쪽으로 redirect 한다. 상세 canonical 경로는 서비스마다 다르다 — K-Cosmetics = `/operator/members/:id`(`UsersPage.tsx` `fullDetailHref`, `/operator/users/:id` 는 legacy alias), KPA Society = `/operator/users/:id`. 목록 UI 는 `@o4o/operator-core-ui` 의 `OperatorMembersConsolePage` 공통 구현을 쓴다(K-Cosmetics `UsersPage.tsx`). Neture 는 목록 canonical 경로가 `/operator/members` 다(`operatorMenuGroups.ts` · 대시보드 링크, `/operator/users` 는 legacy alias). 상세는 `App.tsx` 에 `/operator/members/:id` · `/operator/users/:id` 가 모두 등록돼 있으나 실제 화면 흐름은 아직 `/operator/users/:id` 를 생성한다 — `UsersManagementPage.tsx` 가 `fullDetailHref` 를 넘기지 않아 `OperatorMembersConsolePage` 기본값(`/operator/users/:id`)을 쓰고, `UserDetailPage.tsx` 의 `netureConfig` 가 `listPath` 를 생략해 뒤로가기 · 삭제 후 이동도 `/operator/users` 다. 따라서 Neture 상세의 현재 실효 경로는 `/operator/users/:id` 이며, `/operator/members/:id` 로의 소비처 전환은 별도 WO 대상이다.
 
 ---
 
@@ -374,7 +374,7 @@ const displayName = (user.lastName && user.firstName)
 
 | Key | 라벨 |
 |-----|------|
-| glucoseview | GlucoseView |
+| glucoseview | GlucoseView (서비스 은퇴 — 2026-03-18 시점 값) |
 | k-cosmetics | K-Cosmetics |
 | neture | Neture |
 | kpa-society | KPA Society |

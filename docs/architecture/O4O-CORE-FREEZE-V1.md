@@ -114,6 +114,8 @@ Extension (자유 확장)
 └── modules/glucoseview/  — GlucoseView 서비스 확장
 ```
 
+> (2026-10-05 사실 정정) `modules/glucoseview/` 는 GlucoseView 서비스 은퇴로 현행 `apps/api-server/src/modules/` 에 없다 — 위 트리는 Extension Layer 예시이며, Core 범위 · 동결 정책 변경 아님.
+
 ### 3.4 서비스별 Role 확장
 
 허용:
