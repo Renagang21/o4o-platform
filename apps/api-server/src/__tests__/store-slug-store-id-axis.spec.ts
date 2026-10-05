@@ -48,7 +48,7 @@ const EXPECTED: Record<string, string[]> = {
   //   (파일럿 코드를 고친 게 아니라 census 를 실제 호출부 집합에 맞춘 것이다.)
   'services/cafe24-b2b/Cafe24B2bStoreProvisioningService.ts': ['organizationId'],
   // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: Neture 기본 가입 승인 시 매장 공개 주소 — 원장의 organization_id 그대로.
-  'modules/neture-pharmacy/services/pharmacy-store-provisioner.ts': ['organizationId'],
+  'modules/neture-pharmacy/services/pharmacy-store-link.ts': ['organizationId'],
 };
 
 /** 축이 어긋난 것으로 확인된 표현식은 어떤 호출부에서도 다시 나타나면 안 된다. */
