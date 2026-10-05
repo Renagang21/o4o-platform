@@ -19,7 +19,7 @@ Neture(neture.co.kr) 약국 서비스를 **약국별 하나의 내 매장**에�
 - [x] 1-5 내 매장 · HUB · 콘텐츠 · 커뮤니티 접근 현황 조사 — IR §C
 - [x] 1-6 장바구니 · 주문 · 결제 · 공급자 주문 처리 현황 조사 (service_key='neture' 고정 · payment 결함 후보 재확인) — IR §D
 - [x] 1-7 설계 문서 — [`DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1`](../design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md): 8개 관계(약국 조직 ↔ 내 매장 / 기본 가입 / 세미프랜차이즈 가입, 운영자 ↔ 담당 세미프랜차이즈, 제품 ↔ 복수 제안, 제안 ↔ 대상, 제안 ↔ 주문 항목, 주문 · 결제 ↔ 수취 주체) · 승인 조건 · 호출 흐름 · 유지/대체 구분 · 스키마 변경 · 테스트 데이터 초기화 범위
-- [ ] 1-8 충돌하는 정본 문서 절 정비 (구현 기준으로 구체화)
+- [x] 1-8 충돌하는 정본 문서 절 정비 — STORE-ACCESS §3-A · ROLE-WORKSPACE §3 · §5 · §6 · SUBDOMAIN §2 · §3-1. Frozen 예외(Supplier Domain §4 · F8 §7 · B2B §13-2)는 구현 후 6-3 에서. CANONICAL-INDEX 행 추가는 PR #304 통합 후(충돌 회피)
 
 ### 단계 2 — 기본 가입 · 세미프랜차이즈 · 공급자 구조
 - [ ] 2-1 Neture 기본 약국 가입 · 자격 확인 · 운영자 승인

@@ -1,7 +1,7 @@
 # O4O 서브도메인 · 서비스 의미 정본
 
 > **상태**: ACTIVE
-> **작성일**: 2026-10-03 · **최종 갱신**: 2026-10-03
+> **작성일**: 2026-10-03 · **최종 갱신**: 2026-10-05 (§2 세미프랜차이즈 식별 · §3-1 약국 Store Hub 단계 없음)
 > **근거 WO/IR**: WO-O4O-SUBDOMAIN-SERVICE-SEMANTICS-DOCUMENT-ALIGNMENT-V1 · 주소 결정은 [`CHECK-O4O-URL-FIRST-CENSUS-V1`](../checks/CHECK-O4O-URL-FIRST-CENSUS-V1.md) CONFIRMED_DECISIONS · §9 · §12 · §21-17
 
 **`*.neture.co.kr` 각 주소가 사업적으로 무엇이고 누구를 위한 것인가**를 정한다. 주소 · 내부 키 · role prefix 가 서로 다른 시기에 만들어져 이름만으로는 의미가 어긋나므로, 이름에서 의미를 추론하지 말고 이 표를 기준으로 읽는다.
@@ -37,6 +37,8 @@
 | `community.neture.co.kr` | 커뮤니티 회원 | 독립 커뮤니티 — 서비스 가입과 **별도**인 커뮤니티 단위 가입(승인형). `/pharmacist` · `/retail` | `community` | `community:admin` | 없음 | 각 서비스의 `/forum` |
 | `admin.neture.co.kr` | 플랫폼 관리자 | 플랫폼 · 서비스 관리 영역. Demo 대상 아님 | — | `platform:super_admin` | 없음 | — |
 
+**세미프랜차이즈 식별 (2026-10-05, WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1)**: 위 표의 serviceKey 는 도메인 · 앱의 **서비스 식별**이다. 약국 대상 세미프랜차이즈(`pharmacy` 포함)의 식별 · 가입 · 운영 담당은 serviceKey 가 아니라 데이터 행(`semi_franchises` · `semi_franchise_memberships` · `semi_franchise_operators`)이 정한다. `kpa-society` service membership 은 Neture 기본 가입이나 `pharmacy` 세미프랜차이즈 가입의 근거가 아니며, 세미프랜차이즈를 추가할 때 serviceKey 를 만들지 않는다 — [`DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1`](../design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md) §1 · §3.
+
 보조 주소: `study.neture.co.kr` = O4O 강의(`lecture`). `partner.neture.co.kr` = 주소 예약만(공급자 기능을 파트너로 되돌리지 않는다).
 
 ### 2-1. 사업자 실체와 운영자 범위는 다른 축이다
@@ -61,6 +63,8 @@
 | **Store Hub** | `store.neture.co.kr/hub` | 사업자(매장) | 사업자가 참여한 서비스들의 Hub 를 모아 자기 매장을 운영하는 공통 공간 |
 
 같은 화면 · 같은 서비스 문맥으로 간주하지 않는다. 옛 주소 전환에서 서비스 Hub 는 Store Hub 로 넘어가지 않는다.
+
+약국 매장 이용자에게는 Store Hub 를 별도 단계로 두지 않는다(2026-10-05) — 내 매장이 이용 권한이 있는 항목을 직접 보여준다. `store.neture.co.kr/hub` 는 다른 업종 문맥을 위해 보존한다 — [`DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1`](../design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md) §6.
 
 ### 3-2. 하위 운영 영역
 

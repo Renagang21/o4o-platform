@@ -1,7 +1,7 @@
 # O4O-ROLE-WORKSPACE-ARCHITECTURE-V1
 
 > **상태**: ACTIVE
-> **작성일**: 2026-09-15 · **최종 갱신**: 2026-09-17 (§8 PHILOSOPHY · STORE-MENU-CANONICAL-TREE 정정 완료 · §9-1 8단계 Final Census 완료 — `ROLE_WORKSPACE_REFACTOR = CLOSED`) · 2026-09-16 (§2-1 제공 경로 구현 계약 상세화 · §4 Service Identity ≠ Service Workspace · §7 물리 정리 완료 · §9-1 4단계 Supplier Workspace 반영 · §3-1 Store Workspace 구현 상태 · §6 출처 4종↔3+1 경로 대응 · §9-1 5단계 반영 · §4-2 Service Operator Workspace 구현 상태 · §9-1 6단계 반영 · §5 Community Workspace(Community Identity ≠ Service Identity · Industry Community 폐기) · §9-1 7단계 반영)
+> **작성일**: 2026-09-15 · **최종 갱신**: 2026-10-05 (§3 · §5 · §6 Neture 약국 매장 — Store Hub 단계 없음 · 세미프랜차이즈 = 데이터 행 · 세미프랜차이즈 커뮤니티 판정) · 2026-09-17 (§8 PHILOSOPHY · STORE-MENU-CANONICAL-TREE 정정 완료 · §9-1 8단계 Final Census 완료 — `ROLE_WORKSPACE_REFACTOR = CLOSED`) · 2026-09-16 (§2-1 제공 경로 구현 계약 상세화 · §4 Service Identity ≠ Service Workspace · §7 물리 정리 완료 · §9-1 4단계 Supplier Workspace 반영 · §3-1 Store Workspace 구현 상태 · §6 출처 4종↔3+1 경로 대응 · §9-1 5단계 반영 · §4-2 Service Operator Workspace 구현 상태 · §9-1 6단계 반영 · §5 Community Workspace(Community Identity ≠ Service Identity · Industry Community 폐기) · §9-1 7단계 반영)
 > **근거 WO/IR**: `WO-O4O-ROLE-WORKSPACE-REFACTOR-BASELINE-AND-PREFLIGHT-V1` · [`IR-O4O-ROLE-WORKSPACE-REFACTOR-PREFLIGHT-V1`](../ir/IR-O4O-ROLE-WORKSPACE-REFACTOR-PREFLIGHT-V1.md)
 > **위치**: 사업·정책 정본(우선순위 2). [`O4O-BUSINESS-PHILOSOPHY-V1`](O4O-BUSINESS-PHILOSOPHY-V1.md) 과 동급이며, **역할 경계 · 업무공간 구조 · 콘텐츠 유입 경로 · Legacy Partner** 에 관해 두 문서가 충돌하면 **이 문서가 우선**한다 (§8).
 
@@ -81,6 +81,8 @@ Store Workspace
 - My Store 는 **Store 소유** 공간이다. Store 자산의 경계는 `organizationId` 이며 서비스로 나뉘지 않는다. 서비스별로 달라지는 것은 My Services (§4) 안에서만 표현한다.
 - **주소 정합 (2026-10-03 표기)**: 이 Store Workspace 의 공통 주소는 `store.neture.co.kr`(serviceKey 없음 · 약국 · 화장품 · 소매 운영 영역 · Store Owner / Store Member 접근 모델)이며, 서비스 운영자의 서비스 Hub(`pharmacy` · `retail`)와 구분한다 — [`O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1`](O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1.md) §3. 아래 §3-1 은 서비스 앱 안 `/store` 기준의 2026-09-16 구현 기록이며, 통합 주소로의 이전 진행은 `CHECK-O4O-URL-FIRST-CENSUS-V1` §21 이 기록한다.
 
+- **Neture 약국 매장 (2026-10-05, WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1)**: 약국 매장 이용자에게는 **Store Hub 단계가 없다** — 내 매장이 이용 권한이 있는 상품 · 이벤트 · 모집 · 콘텐츠를 직접 판정해 보여주며, "Hub 진열 → 가져오기 → 취급 등록 → 주문" 을 주문 전제로 두지 않는다. 약국 매장 기본 게이트 = Neture 기본 가입 원장, 세미프랜차이즈(pharmacy 포함) = Service 가 아니라 **데이터 행**(`semi_franchises` · 약국 조직 단위 `semi_franchise_memberships`)이며 My Services 의 `organization_service_enrollments` 로 표현하지 않는다. Store Hub 는 다른 서비스 문맥(K-Cosmetics 등)과 공급자 · 운영자 게시 화면을 위해 보존한다. 기준: [`DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1`](../design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md) §1 · §5 · §6.
+
 ### 3-1. 구현 상태 (WO-O4O-STORE-WORKSPACE-INTEGRATION-AND-MY-SERVICES-V1 · 2026-09-16)
 
 - **상위 구조 구현 = 1 (`@o4o/store-ui-core` `workspace/`)** — `resolveStoreWorkspacePaths(config)` 가 서비스 `basePath` 에서 `Home = <base>/workspace` · `My Store = <base>` · `Store Hub = /store-hub`(공통) · `My Services = <base>/services` 를 파생한다 (KPA · KCos `/store`, Pharmacy Hub `/store-owner` — PG callback 경로 불변). 서비스는 `StoreWorkspaceNav` 를 `MyStoreShell.banner` 슬롯과 Store Hub 레이아웃 위에 조립만 하고, Home / My Services 는 `StoreWorkspaceShell` + `StoreWorkspaceHomeView` / `MyServicesView` 조립만 한다. `MyStoreShell` · `StoreHubShell` · `store-core` · `hub-core` · `asset-copy-core` 는 재작성하지 않았다.
@@ -155,6 +157,7 @@ O4O Community Workspace
 - **Community 는 Service 와 독립된 별도 Identity 다.** Service 는 Community 의 소유자가 아니며, Service membership 은 특정 Community 의 **참여 자격 조건 중 하나**일 뿐이다. `Community = Service` · `Community isolation = serviceKey 자체` 는 현행 구조가 아니다.
 - **Community Catalog SSOT = `apps/api-server/src/config/community-catalog.ts` (`O4O_COMMUNITIES`).** 초기 3개는 고정 enum 이 아니라 등록값이다 — 새 Community = Catalog 등록 + participation policy + capabilities(forum/content/resources/education) + UI metadata(entries). Forum / Content / Resources / LMS 공통 Core 는 수정하지 않는다. `key` 는 string 이며 고정 union 을 복제하지 않는다.
 - **Participation policy 는 두 가지뿐**: `authenticated` · `service_membership_any(serviceKeys)`. 범용 policy engine · rule builder · workflow engine 없음. 새 Service 가 약사 커뮤니티에 참여하려면 `pharmacy.participationPolicy.serviceKeys` 에 추가하는 것으로 끝난다.
+  - **예외 1종 — 세미프랜차이즈 커뮤니티 (2026-10-05, WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1)**: `communities.slug` 가 `semi_franchises.community_key` 인 커뮤니티는 별도 커뮤니티 가입 없이 **그 세미프랜차이즈 가입이 `active` 인 약국 조직의 owner/admin/manager** 만 참여한다(정지 · 종료 · 미가입 = 차단). `community_memberships` 행을 만들거나 동기화하지 않는다. 일반 커뮤니티의 독립 가입 정책은 그대로 — [`DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1`](../design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md) §7.
 - **참여 판정 = `resolveCommunityAccess(user, communityKey)` 한 곳** (`utils/community-access.resolver.ts`, 기존 service_memberships 를 **읽기만**). Community 접근을 위해 membership · role · enrollment 를 만들지 않는다 (PH 만 가입한 회원 → 약사 커뮤니티 O, KPA My Services X, KPA membership 생성 0). 읽기 계약은 `GET /api/v1/communities`(목록 + canParticipate) · `/communities/:key/access`. 프런트가 `if (hasKpaMembership)` 를 반복하지 않는다.
 - **참여 자격 ≠ 운영 권한 ≠ 공개 read.** 운영자 권한(승인·중재)은 각 forum 원장의 `service_code` 서비스 운영자가 그대로 맡는다(다중 운영 governance engine 없음). 비로그인 read 정책은 기존 route 계약 그대로다.
 - **약사 커뮤니티는 하나다.** KPA `/kpa/forum` 과 Pharmacy-Hub `/pharmacy-hub/forum` 은 같은 `communityKey=pharmacy` context(원장 코드 kpa-society + pharmacy-hub 합집합)를 소비한다 — URL 이 여러 개여도 데이터 · Identity 는 하나 (PH 별도 약사 Community = 0). O4O 공통 커뮤니티는 종전 Neture 커뮤니티 구현을 **seed** 로 재사용하지만 identity 는 `o4o-general` 이며 "Neture Community" 라는 business identity 는 없다.
@@ -178,6 +181,7 @@ My Services ──┘
 
 - 가져오기는 **Store 소유 독립 사본** 원칙을 유지한다 ([`O4O-STORE-MENU-CANONICAL-TREE-V1`](O4O-STORE-MENU-CANONICAL-TREE-V1.md) §4 · `asset-copy-core`). 원본 변경이 사본에 전파되지 않는다.
 - 위 세 경로 밖의 유입(예: Supplier → 특정 Store 직접 전달)은 §2-2 로 제외한다.
+- **Neture 약국 매장 (2026-10-05)**: "Store Hub → My Store" 는 Hub 진열 화면을 거치지 않는다. 내 매장 자료함이 접근 가능한 콘텐츠(자체 · 일반 커뮤니티 · 가입 세미프랜차이즈 · 공급자)를 출처별로 직접 보여주고 기존 사본 API 를 그대로 호출한다(사본 · provenance 원칙 동일) — [`DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1`](../design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md) §6.
 - 현행 출처 4종과 이 절의 3+1 경로의 대응 (WO-O4O-STORE-WORKSPACE-INTEGRATION-AND-MY-SERVICES-V1 §15 · 2026-09-16 확정, 코드 변경 없음 · 문서 판정만):
 
   | 3+1 경로 | 현행 출처 (`O4O-STORE-MENU-CANONICAL-TREE-V1` §5.1) | 물리 근거 (프로덕션 read-only, 2026-09-16) | 판정 |
