@@ -44,7 +44,7 @@
 |---|---|
 | `infra/artifact-registry/README.md` | 존재하지 않는 `siteguide` repository 행 제거 · "4개 repository" → "위 표의 repository" |
 | `packages/ai-core/README.md` | "별도 저장소 신규 개발 후보로 보류" → 서비스 폐기 확정 |
-| `docs/architecture/O4O-IDENTITY-ARCHITECTURE-V1.md` | siteguide 주석을 "서비스 폐기 확정 · O4O 연결 없음" 으로 갱신 |
+| `docs/architecture/O4O-IDENTITY-ARCHITECTURE-V1.md` | **변경 안 함** — SUPERSEDED 문서(대체: V3)라 본문의 siteguide 주석은 과거 기록으로 둔다. V3 에는 siteguide 서술 없음 |
 
 ## 3. 검증
 
