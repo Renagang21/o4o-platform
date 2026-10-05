@@ -237,6 +237,12 @@ export const MEMBERSHIP_ACTIONS_BY_STATUS: Record<string, Array<{ action: Member
   ],
 };
 
+/**
+ * 사유를 반드시 받는 가입 처리 — 사유는 약국 화면에 그대로 보인다.
+ * docs/baseline/O4O-NETURE-PHARMACY-SIGNUP-APPROVAL-CONTRACT-V1.md §6. 화면 규칙이며 서버는 사유를 선택으로 받는다.
+ */
+export const REASON_REQUIRED_ACTIONS: ReadonlySet<MembershipAction> = new Set<MembershipAction>(['reject', 'suspend', 'terminate']);
+
 
 export const STATUS_LABEL: Record<string, string> = {
   pending: '대기',

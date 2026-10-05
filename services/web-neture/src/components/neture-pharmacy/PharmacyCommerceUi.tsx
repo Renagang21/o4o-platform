@@ -68,10 +68,19 @@ export function ActionButton({
   );
 }
 
-/** 반려 · 정지 · 종료 · 취소처럼 사유가 의미 있는 동작은 사유를 받는다. null = 사용자가 취소. */
-export function askReason(actionLabel: string): string | null {
-  const v = window.prompt(`${actionLabel} 사유를 입력하세요 (선택)`, '');
-  return v === null ? null : v.trim();
+/**
+ * 반려 · 정지 · 종료 · 취소처럼 사유가 의미 있는 동작은 사유를 받는다. null = 사용자가 취소.
+ * `required` 인데 비어 있으면 알리고 null(처리 안 함).
+ */
+export function askReason(actionLabel: string, required = false): string | null {
+  const v = window.prompt(`${actionLabel} 사유를 입력하세요 (${required ? '필수 — 신청자에게 그대로 보입니다' : '선택'})`, '');
+  if (v === null) return null;
+  const reason = v.trim();
+  if (required && !reason) {
+    window.alert(`${actionLabel} 사유를 입력해야 처리할 수 있습니다.`);
+    return null;
+  }
+  return reason;
 }
 
 export function Message({ message }: { message: { type: 'success' | 'error'; text: string } | null }) {

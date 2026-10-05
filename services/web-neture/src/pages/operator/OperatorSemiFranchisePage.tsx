@@ -10,6 +10,7 @@ import { useCallback, useEffect, useState } from 'react';
 import {
   neturePharmacyOperatorApi as api,
   MEMBERSHIP_ACTIONS_BY_STATUS,
+  REASON_REQUIRED_ACTIONS,
   formatDateTime,
   formatWon,
   type SemiFranchise,
@@ -144,10 +145,16 @@ export default function OperatorSemiFranchisePage() {
     load();
   }, [load]);
 
-  const run = async (id: string, label: string, needsReason: boolean, call: (reason?: string) => Promise<unknown>) => {
+  const run = async (
+    id: string,
+    label: string,
+    needsReason: boolean,
+    call: (reason?: string) => Promise<unknown>,
+    reasonRequired = false,
+  ) => {
     let reason: string | undefined;
     if (needsReason) {
-      const r = askReason(label);
+      const r = askReason(label, reasonRequired);
       if (r === null) return;
       reason = r || undefined;
     } else if (!window.confirm(`${label} 처리할까요?`)) {
@@ -265,7 +272,13 @@ export default function OperatorSemiFranchisePage() {
                             action={a.action}
                             disabled={busyId === m.id}
                             onClick={() =>
-                              run(m.id, a.label, !positive(a.action), (reason) => api.decideSfMembership(sfKey, m.id, a.action, reason))
+                              run(
+                                m.id,
+                                a.label,
+                                !positive(a.action),
+                                (reason) => api.decideSfMembership(sfKey, m.id, a.action, reason),
+                                REASON_REQUIRED_ACTIONS.has(a.action),
+                              )
                             }
                           />
                         ))}

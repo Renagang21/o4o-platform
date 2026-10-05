@@ -5,11 +5,13 @@
  *   POST /api/v1/neture/pharmacy/semi-franchises/:key/apply   가입 신청(pending) — `pharmacy` 도 같은 절차
  *   POST /api/v1/neture/pharmacy/semi-franchises/:key/withdraw 탈퇴(terminated)
  * 승인 · 반려 · 정지는 그 세미프랜차이즈 담당 운영자가 한다. 커뮤니티는 가입 active 일 때만 열린다(서버 판정).
+ * 화면 계약: docs/baseline/O4O-NETURE-PHARMACY-SIGNUP-APPROVAL-CONTRACT-V1.md §3-2 — 기본 가입 승인과 별개(C1).
  */
 import { useCallback, useEffect, useState } from 'react';
 import { RefreshCw } from 'lucide-react';
 import { neturePharmacyApi, pharmacyErrorMessage, type SemiFranchiseRow } from '../../api/neturePharmacy';
 import { Notice, PharmacyPage, StatusBadge, btn, formatDate } from './shared';
+import { SEMI_FRANCHISE_STATUS_HELP } from './signupContract';
 
 export default function SemiFranchisesPage() {
   const [rows, setRows] = useState<SemiFranchiseRow[]>([]);
@@ -55,7 +57,7 @@ export default function SemiFranchisesPage() {
   return (
     <PharmacyPage
       title="세미프랜차이즈"
-      description="세미프랜차이즈에 가입하면 그 세미프랜차이즈의 공급 상품 · 이벤트 · 취급매장 모집을 이용할 수 있습니다. 가입은 담당 운영자가 승인합니다."
+      description="세미프랜차이즈에 가입하면 그 세미프랜차이즈의 공급 상품 · 이벤트 · 취급매장 모집을 이용할 수 있습니다. Neture 기본 가입과 별도로, 세미프랜차이즈마다 담당 운영자가 승인합니다."
       actions={<button className={btn.secondary} onClick={load} disabled={loading}><RefreshCw size={14} className={`inline ${loading ? 'animate-spin' : ''}`} /> 새로고침</button>}
     >
       {message && <Notice>{message}</Notice>}
@@ -86,7 +88,8 @@ export default function SemiFranchisesPage() {
                     <td className="px-4 py-3 font-medium text-gray-900">{r.name}</td>
                     <td className="px-4 py-3">
                       {st ? <StatusBadge status={st} /> : <span className="text-gray-400">미가입</span>}
-                      {r.reason && <p className="mt-1 text-xs text-gray-500">사유: {r.reason}</p>}
+                      {st && <p className="mt-1 text-xs text-gray-500">{SEMI_FRANCHISE_STATUS_HELP[st]}</p>}
+                      {r.reason && <p className="mt-1 text-xs text-gray-700">사유: {r.reason}</p>}
                     </td>
                     <td className="px-4 py-3 text-xs text-gray-500">
                       {r.appliedAt ? `신청 ${formatDate(r.appliedAt)}` : '-'}

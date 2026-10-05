@@ -5,12 +5,14 @@
  *   운영자가 신청 원장의 사업자번호 · 약사 면허번호를 검토해 승인 · 반려 · 정지 · 재개 · 종료한다.
  *   자동 검증 · 점수 없음. 기본 승인은 어떤 세미프랜차이즈 가입도 만들지 않는다.
  *   권한 판정은 API(neture:operator) 가 한다.
+ *   화면 계약: docs/baseline/O4O-NETURE-PHARMACY-SIGNUP-APPROVAL-CONTRACT-V1.md §6-1 — 반려 · 정지 · 종료 사유 필수.
  */
 import { useCallback, useEffect, useState } from 'react';
 import {
   neturePharmacyOperatorApi,
   formatDateTime,
   MEMBERSHIP_ACTIONS_BY_STATUS,
+  REASON_REQUIRED_ACTIONS,
   type MembershipAction,
   type PharmacyMembership,
 } from '../../lib/api/neturePharmacy';
@@ -38,6 +40,19 @@ const STATUS_OPTIONS = [
 
 
 const LIMIT = 20;
+
+/** 승인 · 재개 전에 확인받는 항목 — 자동 검증이 없으므로 운영자 확인이 자격 근거다. */
+function confirmText(m: PharmacyMembership, label: string): string {
+  return [
+    `${m.pharmacy_name} — ${label} 처리할까요?`,
+    '',
+    `· 사업자등록번호 ${m.business_number} 를 확인했습니다.`,
+    `· 약사 면허번호 ${m.pharmacist_license_number} 를 확인했습니다.`,
+    '· 기존 KPA 가입 여부는 자격 근거가 아닙니다.',
+    '',
+    '기본 가입 승인은 세미프랜차이즈 가입을 만들지 않습니다.',
+  ].join('\n');
+}
 
 export default function PharmacyMembershipReviewPage() {
   const [status, setStatus] = useState('pending');
@@ -72,10 +87,10 @@ export default function PharmacyMembershipReviewPage() {
   const decide = async (m: PharmacyMembership, action: MembershipAction, label: string) => {
     let reason: string | undefined;
     if (action !== 'approve' && action !== 'reactivate') {
-      const r = askReason(label);
+      const r = askReason(label, REASON_REQUIRED_ACTIONS.has(action));
       if (r === null) return;
       reason = r || undefined;
-    } else if (!window.confirm(`${m.pharmacy_name} — ${label} 처리할까요?`)) {
+    } else if (!window.confirm(confirmText(m, label))) {
       return;
     }
     setBusyId(m.id);
@@ -134,6 +149,7 @@ export default function PharmacyMembershipReviewPage() {
               <th className={TH}>사업자등록번호</th>
               <th className={TH}>약사 면허번호</th>
               <th className={TH}>신청일</th>
+              <th className={TH}>처리일</th>
               <th className={TH}>상태</th>
               <th className={TH}>사유</th>
               <th className={TH}>처리</th>
@@ -141,9 +157,9 @@ export default function PharmacyMembershipReviewPage() {
           </thead>
           <tbody className="divide-y divide-gray-100">
             {loading ? (
-              <EmptyRow colSpan={7} text="불러오는 중..." />
+              <EmptyRow colSpan={8} text="불러오는 중..." />
             ) : items.length === 0 ? (
-              <EmptyRow colSpan={7} text="해당하는 신청이 없습니다." />
+              <EmptyRow colSpan={8} text="해당하는 신청이 없습니다." />
             ) : (
               items.map((m) => (
                 <tr key={m.id}>
@@ -154,6 +170,7 @@ export default function PharmacyMembershipReviewPage() {
                   <td className={TD}>{m.business_number}</td>
                   <td className={TD}>{m.pharmacist_license_number}</td>
                   <td className={TD}>{formatDateTime(m.applied_at)}</td>
+                  <td className={TD}>{formatDateTime(m.decided_at)}</td>
                   <td className={TD}>
                     <StatusBadge status={m.status} />
                   </td>
