@@ -55,7 +55,7 @@
 | 서비스         | 콘텐츠 | 포럼 | 사이니지 | LMS | 상품 |
 | ----------- | --- | -- | ---- | --- | -- |
 | KPA-Society | O   | O  | O    | P   | X  |
-| Neture      | O   | O  | O    | X   | O  |
+| Neture      | O   | O  | X    | X   | O  |
 | K-Cosmetics | W   | X  | O    | X   | O  |
 
 * O : 기본 포함

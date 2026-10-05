@@ -56,7 +56,7 @@ prefix 로 일괄 삭제했다면 운영 콘텐츠와 코드가 참조하는 식
 ## 4. 조사는 read-only 로 하고, read-only 상태를 확인한다
 
 - 세션에 `SET default_transaction_read_only = on` 을 걸고 `SHOW transaction_read_only` 로 확인한다.
-- **운영 DB 에서는 `SHOW transaction_read_only = on` 확인으로 충분하다.** `CREATE TEMP TABLE` / `UPDATE` / `DELETE` 등 write 문을 "차단 실증" 목적으로 운영 DB 에 보내지 않는다 — 운영 write 시도는 [`CLAUDE.md`](../../../CLAUDE.md) DB · 보안 경계에 따라 사용자 명시 승인 대상이다.
+- **운영 DB 에서는 `SHOW transaction_read_only;` 결과가 `on` 인지 확인하는 것으로 충분하다.** `CREATE TEMP TABLE` / `UPDATE` / `DELETE` 등 write 문을 "차단 실증" 목적으로 운영 DB 에 보내지 않는다 — 운영 write 시도는 [`CLAUDE.md`](../../../CLAUDE.md) DB · 보안 경계에 따라 사용자 명시 승인 대상이다.
   > (2026-10-04 정합) 종전 문구("`CREATE TEMP TABLE` / `UPDATE` / `DELETE` 를 시도해 거부되는 것을 기록")는 무해 조건 · rollback 계약 없이 운영 write 를 지시하므로 대체했다. write 거부 동작을 실증해야 하면 격리된 로컬 / 임시 DB 에서만 한다.
 - 조사 SQL 은 저장소에 남겨 **재현 가능**하게 한다 (`scripts/audits/`).
 - 스크립트에 자격증명 literal 을 넣지 않는다.
