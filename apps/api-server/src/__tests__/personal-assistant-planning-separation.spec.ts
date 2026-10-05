@@ -149,8 +149,10 @@ describe('④ Task 소유 범위는 수행 방향을 바꾸지 않는다', () =>
     const e2 = exec();
     const o = await runAssistantWorkTask(ds, { userId: ME, workBody: { request: 'x' }, workScope: { workspace: 'store' } }, e2);
     expect(tasks.get(o.task!.taskId)?.ownershipScope).toBe('ORGANIZATION');
-    const strip = (i: ExecutionIntent) => ({ ...i, taskId: null });
+    // 수행 방향은 같다. 다른 것은 taskId 와 Phase D 노드 원장 경계(node.ownerKey — 소유 주체가 다르면 다른 키)뿐이다.
+    const strip = (i: ExecutionIntent) => ({ ...i, taskId: null, node: undefined });
     expect(strip(e2.mock.calls[0][2])).toEqual(strip(e1.mock.calls[0][2]));
+    expect(e2.mock.calls[0][2].node?.ownerKey).not.toBe(e1.mock.calls[0][2].node?.ownerKey);
     expect(u.plan.intent.taskId).toBe(u.task?.taskId);
   });
 });

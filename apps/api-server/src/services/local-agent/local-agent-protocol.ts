@@ -643,6 +643,27 @@ export function validateDataWorkRunSetStatusArgs(args: unknown): { ok: boolean; 
 }
 
 /**
+ * Phase D — 노드 원장 소유 주체 키(선택 인자). 서버가 소유 주체를 해시해 만든 불투명 값이며 원 사용자/조직 id 가 아니다.
+ * 에이전트 `work-assistance.mjs` OWNER_KEY_RE 와 같은 규칙. 이 키를 받는 것은 local.db v8 에이전트뿐이므로
+ * 보내는 쪽(runtime)이 노드 capability(ownerScopedLedger)를 확인한 뒤에만 싣는다.
+ */
+export const NODE_LEDGER_OWNER_KEY_RE = /^o_[0-9a-f]{32}$/;
+
+/** ownerKey 를 떼어 형식만 보고, 나머지는 각 action 의 기존 검증기를 그대로 통과시킨 뒤 다시 붙인다. */
+function withOwnerKey<T extends object>(
+  args: unknown,
+  validate: (a: unknown) => { ok: boolean; args?: T },
+): { ok: boolean; args?: T & { ownerKey?: string } } {
+  if (!args || typeof args !== 'object' || Array.isArray(args) || !Object.prototype.hasOwnProperty.call(args, 'ownerKey')) {
+    return validate(args);
+  }
+  const { ownerKey, ...rest } = args as Record<string, unknown>;
+  if (typeof ownerKey !== 'string' || !NODE_LEDGER_OWNER_KEY_RE.test(ownerKey)) return { ok: false };
+  const r = validate(rest);
+  return r.ok && r.args ? { ok: true, args: { ...r.args, ownerKey } } : { ok: false };
+}
+
+/**
  * base action 에 맞는 인자 검증. 통과하면 **정규화된 사본**을 돌려준다(원본 객체를 그대로
  * 흘리지 않는다 — 추가 키가 있으면 여기서 이미 실패한다).
  *
@@ -704,7 +725,7 @@ export function validateLocalCommandArgs(
     return r.ok && r.args ? { ok: true, args: r.args } : { ok: false };
   }
   if (base === LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_UPSERT) {
-    const r = validateDataWorkRunUpsertArgs(args);
+    const r = withOwnerKey(args, validateDataWorkRunUpsertArgs);
     return r.ok && r.args ? { ok: true, args: r.args } : { ok: false };
   }
   if (base === LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_SET_STATUS) {
@@ -712,11 +733,11 @@ export function validateLocalCommandArgs(
     return r.ok && r.args ? { ok: true, args: r.args } : { ok: false };
   }
   if (base === LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_CANDIDATE_SAVE) {
-    const r = validateDataWorkRunCandidateSaveArgs(args);
+    const r = withOwnerKey(args, validateDataWorkRunCandidateSaveArgs);
     return r.ok && r.args ? { ok: true, args: r.args } : { ok: false };
   }
   if (base === LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_CANDIDATE_MATCH) {
-    const r = validateDataWorkRunCandidateMatchArgs(args);
+    const r = withOwnerKey(args, validateDataWorkRunCandidateMatchArgs);
     return r.ok && r.args ? { ok: true, args: r.args } : { ok: false };
   }
   if (base === LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_CANDIDATE_RESULT) {
@@ -736,11 +757,11 @@ export function validateLocalCommandArgs(
     return r.ok && r.args ? { ok: true, args: r.args } : { ok: false };
   }
   if (base === LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_ASSISTANCE_RECORD) {
-    const r = validateDataWorkRunAssistanceRecordArgs(args);
+    const r = withOwnerKey(args, validateDataWorkRunAssistanceRecordArgs);
     return r.ok && r.args ? { ok: true, args: r.args } : { ok: false };
   }
   if (base === LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_EXPERIENCE_RECALL) {
-    const r = validateDataExperienceRecallArgs(args);
+    const r = withOwnerKey(args, validateDataExperienceRecallArgs);
     return r.ok && r.args ? { ok: true, args: r.args } : { ok: false };
   }
   if (base === LOCAL_AGENT_ACTIONS.COMPUTER_CLICK) {
