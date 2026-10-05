@@ -68,11 +68,13 @@ export default function LoginModal() {
           onError={(e) => setError(e.message)}
           termsHref="/terms"
           privacyHref="/privacy"
+          // Google 버튼이 보일 때만 렌더된다(준비 중이면 숨김) — WO-O4O-LOGIN-MODAL-GOOGLE-HINT-AND-HEADER-V1
+          hint={
+            <div style={styles.footer}>
+              <span style={styles.footerNote}>처음이신가요? 같은 버튼으로 약관 동의 후 계정이 만들어집니다.</span>
+            </div>
+          }
         />
-
-        <div style={styles.footer}>
-          <span style={styles.footerNote}>처음이신가요? 같은 버튼으로 약관 동의 후 계정이 만들어집니다.</span>
-        </div>
       </div>
     </div>
   );

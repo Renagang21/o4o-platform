@@ -57,6 +57,22 @@ describe('GoogleContinue — 준비 상태', () => {
     await screen.findByTestId('google-continue-disabled');
   });
 
+  it('hint 는 버튼이 보일 때만 렌더한다 — 준비 중 · config 실패에는 없다', async () => {
+    mount({ hint: '처음이신가요?', getConfig: vi.fn(async () => ({ enabled: false, clientId: null })) });
+    await screen.findByTestId('google-continue-disabled');
+    expect(screen.queryByTestId('google-continue-hint')).toBeNull();
+    cleanup();
+
+    mount({ hint: '처음이신가요?', getConfig: vi.fn(async () => { throw new Error('network'); }) });
+    await screen.findByTestId('google-continue-disabled');
+    expect(screen.queryByTestId('google-continue-hint')).toBeNull();
+    cleanup();
+
+    mount({ hint: '처음이신가요?' });
+    await screen.findByTestId('google-continue-button');
+    expect(screen.getByTestId('google-continue-hint').textContent).toBe('처음이신가요?');
+  });
+
   it('enabled 면 공개 clientId 로 GIS 버튼을 렌더한다', async () => {
     mount();
     await waitFor(() => expect(renderGoogleButton).toHaveBeenCalledTimes(1));

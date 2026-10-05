@@ -22,6 +22,19 @@ import { useAuth } from '../contexts';
 import type { User } from '../contexts/AuthContext';
 import { DEMO_ACCOUNTS, DEMO_LOGIN_MESSAGES, demoLoginErrorMessage, type DemoAccountEntry, type DemoAccountType } from '../lib/demoAccounts';
 import { resolveSingleStoreWorkspaceUrl } from '../lib/home-entry';
+import { CURRENT_HOST_PROFILE, type HostProfile } from '../lib/hostProfile';
+
+/**
+ * 헤더 부제 — 이 모달은 main · supplier · funding · community 호스트가 함께 쓴다.
+ * 대표 호스트는 전역 헤더 부제(NetureGlobalHeader)와 같은 O4O 정체성, 서브 호스트는 그 영역 이름.
+ * WO-O4O-LOGIN-MODAL-GOOGLE-HINT-AND-HEADER-V1 (IR-O4O-NETURE-HOME-CURRENT-STATE-AND-IA-REDESIGN-V1 §9 선택 B · R3)
+ */
+const LOGIN_MODAL_SUBTITLE: Readonly<Record<HostProfile, string>> = Object.freeze({
+  main: 'O4O 통합 업무 공간',
+  supplier: '공급자 업무 공간',
+  funding: '유통참여형 펀딩',
+  community: '커뮤니티',
+});
 
 // WO-O4O-CROSSSERVICE-PRODUCTION-RESIDUAL-404-AUTH-AND-LEGAL-CLEANUP-V1:
 //   App.tsx 의 동명 상수와 같은 값. App 이 LoginModal 을 import 하므로 역방향 import 는
@@ -155,7 +168,7 @@ export default function LoginModal({ isOpen, onClose, returnUrl }: LoginModalPro
             <span className="text-2xl">🌿</span>
             <div>
               <h2 className="text-lg font-bold text-gray-900">Neture 로그인</h2>
-              <p className="text-xs text-gray-500">공급자 연결 서비스</p>
+              <p className="text-xs text-gray-500">{LOGIN_MODAL_SUBTITLE[CURRENT_HOST_PROFILE]}</p>
             </div>
           </div>
           <button
@@ -200,6 +213,13 @@ export default function LoginModal({ isOpen, onClose, returnUrl }: LoginModalPro
                   }}
                   termsHref="/terms"
                   privacyHref="/privacy"
+                  hint={
+                    // 이 안내는 Google 버튼에만 해당한다 — 이메일 가입은 위 '회원가입' 페이지에서 한다.
+                    // 버튼이 보일 때만 렌더된다(준비 중이면 숨김).
+                    <p className="text-center text-xs text-gray-500">
+                      Google 로 처음이신가요? 같은 Google 버튼으로 약관 동의 후 계정이 만들어집니다.
+                    </p>
+                  }
                 />
               </div>
 
@@ -222,11 +242,6 @@ export default function LoginModal({ isOpen, onClose, returnUrl }: LoginModalPro
                   </div>
                 )
               )}
-
-              {/* 이 안내는 Google 버튼에만 해당한다 — 이메일 가입은 위 '회원가입' 페이지에서 한다. */}
-              <p className="mt-4 text-center text-xs text-gray-500">
-                Google 로 처음이신가요? 같은 Google 버튼으로 약관 동의 후 계정이 만들어집니다.
-              </p>
 
               {/* WO-O4O-DEMO-LOGIN-ENTRY-AND-EXPERIENCE-UX-V1: 체험하기 — 로그인 수단보다 앞세우지 않는다 */}
               <section aria-labelledby="demo-entry-title" className="mt-6">

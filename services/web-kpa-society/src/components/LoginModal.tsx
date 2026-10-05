@@ -136,11 +136,13 @@ export default function LoginModal() {
             }}
             termsHref="/policy"
             privacyHref="/privacy"
+            // Google 버튼이 보일 때만 렌더된다(준비 중이면 숨김) — WO-O4O-LOGIN-MODAL-GOOGLE-HINT-AND-HEADER-V1
+            hint={
+              <p className="mt-2 text-center text-sm text-gray-500">
+                처음이신가요? 같은 버튼으로 약관 동의 후 계정이 만들어집니다.
+              </p>
+            }
           />
-
-          <p className="mt-6 text-center text-sm text-gray-500">
-            처음이신가요? 같은 버튼으로 약관 동의 후 계정이 만들어집니다.
-          </p>
         </div>
       </div>
     </div>

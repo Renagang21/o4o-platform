@@ -7,13 +7,15 @@
  *   → code === 'GOOGLE_SIGNUP_REQUIRED': 약관/개인정보(+마케팅) 동의 → signupWithGoogle → onSuccess
  * 서비스명 조건문 없음. 스타일은 inline 최소값(서비스 Tailwind 와 충돌하지 않도록 className 으로 덮어쓸 수 있다).
  * 서버 allowlist 가 비어 있으면(enabled=false) "준비 중" 안내만 보여준다.
+ * `hint`(예: "처음이신가요? 같은 버튼으로 …")는 버튼이 실제로 보일 때만 그 아래에 렌더한다 —
+ * 준비 중 · 로딩 화면에 버튼을 전제한 안내가 남지 않게 한다(WO-O4O-LOGIN-MODAL-GOOGLE-HINT-AND-HEADER-V1).
  *
  * 콜백 props(getConfig · loginWithGoogle · signupWithGoogle · onSuccess · onError · onStart)는 모두 ref 로 보관한다 —
  * 호출부(AuthProvider)가 render 마다 새 함수를 넘겨도 config 를 재조회하거나 stage(특히 consent)를 리셋하지 않는다.
  * config 는 mount 시 1회만 읽고, 오류 후 복귀·취소처럼 명시적으로 loadConfig() 를 부를 때만 재조회한다.
  * (프로덕션 smoke 2026-09-18: provider 의 isLoading true→false re-render 가 consent 화면을 덮어쓴 결함의 수정)
  */
-import { useCallback, useEffect, useRef, useState, type CSSProperties } from 'react';
+import { useCallback, useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { renderGoogleButton, type GoogleAuthConfig } from '@o4o/auth-client';
 import type { AuthLoginResult, GoogleSignupConsents } from './types';
 
@@ -33,6 +35,8 @@ export interface GoogleContinueProps<TUser = unknown> {
   /** 동의 화면의 약관/개인정보 링크. 기본값은 대표 도메인 상대 경로. */
   termsHref?: string;
   privacyHref?: string;
+  /** Google 버튼 아래 안내(선택). 버튼이 보이는 동안에만 렌더한다. */
+  hint?: ReactNode;
   className?: string;
 }
 
@@ -65,6 +69,7 @@ export function GoogleContinue<TUser = unknown>({
   onStart,
   termsHref = '/terms',
   privacyHref = '/privacy',
+  hint,
   className,
 }: GoogleContinueProps<TUser>) {
   const [stage, setStage] = useState<Stage>({ kind: 'loading' });
@@ -175,6 +180,7 @@ export function GoogleContinue<TUser = unknown>({
           data-testid="google-continue-button"
         />
       )}
+      {stage.kind === 'button' && hint && <div data-testid="google-continue-hint">{hint}</div>}
       {stage.kind === 'consent' && (
         <div style={box} data-testid="google-continue-consent">
           <p style={{ fontSize: 14, color: '#111827', margin: 0 }}>
