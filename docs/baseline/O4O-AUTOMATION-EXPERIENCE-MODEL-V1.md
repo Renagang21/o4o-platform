@@ -31,6 +31,7 @@
 | 개인화 (2026-10-04 · V2 §0-1) | 이 문서의 승격 · 공유 흐름(§7-6 · §13 · §14 · §17)은 **사용자 공통 Workflow 를 만드는 흐름이 아니다.** Procedure / Skill 은 소유 주체마다 다를 수 있고, 같은 Task type 에 여러 Procedure 가 공존한다. §3 의 alias "수렴" · D2 "정규화" 는 업무 유형의 식별을 맞추는 것이지 수행 절차를 통일하는 것이 아니다 |
 | §20 구현 Phase · §22 다음 작업 | Phase 1 = 완료 자산 승계 · Phase 2 = KEEP_BUT_REPOSITION · Phase 3~5 동결. 다음 작업은 V2 §18 의 단계 A(Assistant + Task Foundation) |
 | Experience ≠ 업무 데이터 | 유지 · 강조(V2 §6-3). 재고 · 판매 · 가격은 Experience 가 아닌 업무 데이터 영역 |
+| PC 독립 (2026-10-05 · V2 §3-1 · §11-1) | 이 문서의 "Local" · "사용자 PC" · `local.db` 는 **원 기록이 놓인 실행 노드**를 가리킬 뿐이다. Experience 의 주인은 소유 주체(사용자 · 조직)이고, 사용자가 PC 를 여러 대 써도 Assistant · 업무가 PC 별로 나뉘지 않고, Cloud 배치가 허용된 Experience(업무 식별 · 재개 구조 · 공개 사이트 대상 검증된 방법)는 노드와 무관하게 쓰인다. 사설 시스템 · Windows 앱 대상 절차 기억은 노드에만 있다(MEMORY-PLACEMENT M9 — V2 §11-1 (4) 예외). 특정 PC 의 `local.db` 를 Experience 의 기준 원장으로 읽지 않는다. 본문의 "실 PC smoke" 기록은 그 시점의 historical evidence 다(V2 §11-1-a) |
 
 ---
 
@@ -301,7 +302,7 @@ Knowledge(주장, 미검증) ──Decision 근거로 사용──► Step 성�
 | Manual Knowledge | 프로그램 기준 매뉴얼(§8-2) | 외부 · 문서 |
 | User-provided Knowledge | 사용자 설명 · 업무 문서 | 사용자 |
 | User Correction Knowledge | 교정에서 나온 Preferred/Avoid 후보(§7-5 · §7-6) | 사용자 · 이 Task×Target×Stage 한정 |
-| Local Experience | 이 사용자 PC 의 실제 Run | 관찰된 사실 |
+| Local Experience | 이 사용자(소유 주체)의 실제 Run — 어느 Execution Node 에서 실행됐든 같은 소유 주체의 경험이다. 노드를 넘어 쓰이는 범위는 Cloud 배치가 허용된 것뿐이고 사설 대상 절차 기억은 노드 전용(V2 §3-1 · §11-1 (4) · 2026-10-05 정렬, 종전 표기 "이 사용자 PC") | 관찰된 사실 |
 | Shared Experience | 다른 사용자에서 검증 · 공유된 Digest | 다른 환경의 사실 → 여기서는 Knowledge(§17) |
 
 - 출처마다 신뢰가 다르지만 **최종 검증 기준은 이 사용자의 실제 Run Experience** 다. 어떤 출처도 Run 검증 없이 Skill 이 되지 않는다.
@@ -535,7 +536,7 @@ ARCHITECTURE §9-1 판단 신호 ↔ 이 모델의 출처:
   - Task identity · Target identity(public 만) · stage 경로와 semantic locator · reusable Assistance/Knowledge 의 구조화 내용 · 실패 층 분포 · 시간 · 성공률(구간화) · 환경 등급.
 - 정제 순서: ① SHAREABLE 필드만 선택 → ② 값·원문·개인 환경 제거 → ③ 수치 구간화 → ④ 사용자 동의 → ⑤ 명시적 publish.
 - 서버는 Local 원장을 read-back · 동기화하지 않는다. Digest 는 Local 이 만들어 올린다. (현재 Run 을 위한 질의형 recall 은 공유가 아니다 — D1 · ARCHITECTURE §5-1)
-- 수신 측에서 공유 Digest 는 **Knowledge(미검증 주장)** 로 들어온다 — 다른 사용자 PC 에서 바로 Skill 로 쓰지 않는다(ARCHITECTURE §5).
+- 수신 측에서 공유 Digest 는 **Knowledge(미검증 주장)** 로 들어온다 — 다른 사용자(소유 주체)에게서 바로 Skill 로 쓰지 않는다(ARCHITECTURE §5 · V2 §10. 2026-10-05 정렬, 종전 표기 "다른 사용자 PC").
 
 ---
 

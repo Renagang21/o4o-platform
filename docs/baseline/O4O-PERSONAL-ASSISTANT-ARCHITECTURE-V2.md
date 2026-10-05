@@ -1,7 +1,7 @@
 # O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2
 
 > **상태**: ACTIVE — O4O AI 업무 비서 · 자동화 **구조 정본** (`CANONICAL-INDEX` §6)
-> **작성일**: 2026-10-03 · **개정**: 2026-10-04 §0-1 개인화 원칙(P3) 신설 · §4-4 · §7 · §8-3 · §10 · §19 · §22 정렬 (`WO-O4O-PERSONAL-ASSISTANT-PERSONALIZATION-PRINCIPLE-ALIGNMENT-V1`)
+> **작성일**: 2026-10-03 · **개정**: 2026-10-05 PC 독립 정렬 — §3 (4)(5) · §3-1 네 가지 구분 · §11-1 (3)~(5)(M9 사설 대상 예외 포함) · §11-1-a 검증 두 종류 + Phase A·B·C 잔여 실측 현재 분류 · §18-1 · §22 · §23 L5 (`WO-O4O-PERSONAL-ASSISTANT-PC-INDEPENDENCE-DOCUMENT-ALIGNMENT-V1`) · 2026-10-04 §0-1 개인화 원칙(P3) 신설 · §4-4 · §7 · §8-3 · §10 · §19 · §22 정렬 (`WO-O4O-PERSONAL-ASSISTANT-PERSONALIZATION-PRINCIPLE-ALIGNMENT-V1`)
 > **근거 WO**: `WO-O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2-CANONICALIZATION` + `WO-O4O-PERSONAL-ASSISTANT-V2-ENVIRONMENT-REFRESH-AND-CANONICALIZATION-UPDATE` (사용자 확정 2026-10-03)
 > **근거 IR**: [`IR-…-V2-GAP-CENSUS`](../investigations/IR-O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2-GAP-CENSUS.md) (코드 vs 목표) · [`IR-…-V2-CANONICAL-CONSISTENCY-REVIEW`](../investigations/IR-O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2-CANONICAL-CONSISTENCY-REVIEW.md) (초안 vs 정본) · [`IR-…-V2-ENVIRONMENT-REFRESH`](../investigations/IR-O4O-PERSONAL-ASSISTANT-V2-ENVIRONMENT-REFRESH.md) (환경 기준선)
 > **상위 정본**: [`O4O-AI-AUTOMATION-EVOLUTION-PRINCIPLES-V1`](O4O-AI-AUTOMATION-EVOLUTION-PRINCIPLES-V1.md) (2026-10-03 부분 개정으로 이 문서와 정합). EVOLUTION = 왜 그렇게 발전해야 하는가 · 이 문서 = 그것을 어떤 구조로 만드는가. 둘이 충돌하면 EVOLUTION 이 우선하며, 충돌은 개정 WO 로 해소한다.
@@ -73,7 +73,8 @@ Assistant 가 Experience 를 대체하지 않는다. Assistant 는 Experience �
 │ L4 Execution             DOM · UIA · API · WebMCP · Computer Use ·    │  ← 손
 │                          RPA · Script — 화면 판단은 여기까지          │
 ├──────────────────────────────────────────────────────────────────────┤
-│ L5 Execution Node        Office PC · Home PC · Cloud Browser · 미래 노드│
+│ L5 Execution Node        사용자의 PC(여러 대) · Cloud Browser · 미래 노드│
+│                          — 실행 장소일 뿐, 기억 · 업무의 경계가 아니다│
 └──────────────────────────────────────────────────────────────────────┘
         Experience (가로축) — 모든 계층이 남기고 모든 계층이 참조한다
 ```
@@ -93,9 +94,23 @@ Assistant 가 Experience 를 대체하지 않는다. Assistant 는 Experience �
 
 ## 3. ONE Assistant
 
-1. **사용자 한 명에게 Assistant 는 하나다.** 채널(O4O Web · Kakao · 외부 AI · Device Agent)과 실행 노드가 달라도 같은 Assistant 가 같은 기억으로 응답한다.
+1. **사용자 한 명에게 Assistant 는 하나다.** 채널(O4O Web · Kakao · 외부 AI · Device Agent)과 실행 노드가 달라도 같은 Assistant 가 같은 기억으로 응답한다(노드를 넘는 기억의 범위와 사설 대상 절차 기억 예외는 §11-1 (4)).
 2. 한 사용자는 여러 업무공간(ROLE-WORKSPACE §1)을 가질 수 있다. 그래서 **Task 마다 업무공간과 organization 을 지닌다.** 매장 A 의 업무 기억이 매장 B 의 Task 에 섞이지 않는다(역할 drift 방지 — PHILOSOPHY §7).
 3. 서비스별 · 역할별로 Assistant 를 따로 만들지 않는다. 역할 경계는 Task 의 context 와 권한이 정한다.
+4. **PC · 장소 · 요청 채널마다 다른 Assistant · 자동화 · 기억이 생기지 않는다.** 사무실에서 요청하든 집에서 요청하든, 어느 PC 가 실행하든 같은 Assistant 가 같은 업무를 이어가고, Cloud 배치가 허용된 기억(업무 식별 · 재개 구조 · 공개 사이트 대상 검증된 방법)을 그대로 쓴다. "이 PC 의 자동화" · "저 PC 의 자동화" 라는 단위는 없다. 사설 시스템 · Windows 앱 대상 절차 기억(M9)이 노드 전용인 예외는 §11-1 (4).
+5. **사용자는 어느 PC 에서 실행할지를 관리하는 사람이 아니다.** Assistant 가 Task 에 필요한 capability 와 지금 쓸 수 있는 실행환경으로 Execution Node 를 고른다(§11). 사용자가 특정 노드를 지정하는 것은 선택적 선호일 뿐 필수 입력이 아니다.
+
+### 3-1. 네 가지를 섞지 않는다 (2026-10-05)
+
+| 구분 | 뜻 | 단위 · 소유 | 바뀌면 |
+|---|---|---|---|
+| **Assistant Identity** | 이 사용자의 비서 | 사용자당 하나 (Assistant = f(userId)) | 바뀌지 않는다 |
+| **Work Context** | 이 업무가 누구의 어떤 일인가 | Task 의 소유 주체(organization · user) · 업무공간 · serviceKey (§4 · §9) | 다른 Task 다 — 같은 Assistant 가 맡는다 |
+| **Request Channel** | 요청이 들어온 곳 | O4O Web · 메신저 · 외부 AI · 기기 (§14) | Assistant · 기억 · 업무는 그대로. 결과 전달 방식만 다르다(§12) |
+| **Execution Node** | 실제로 화면 · 프로그램을 조작하는 곳 | PC(여러 대 가능) · Cloud Browser · 미래 노드 (§11) | Assistant · 업무 · Cloud 에 있는 기억은 그대로. 그 노드의 실행환경 상태(로그인 세션 · 현재 화면 · 로컬 파일 경로)와 노드 보관 원 기록이 다르다 — 사설 시스템 · Windows 앱 대상 절차 기억(M9)은 노드에만 있다(§11-1 (4) 예외) |
+
+- 기억 · 경험의 경계는 Work Context 중 **소유 주체**(§9-2 — USER = `userId` · ORGANIZATION = `organizationId`)다. 업무공간 · serviceKey 는 Task 의 문맥 · 권한 정보이며 **기억을 나누는 기준이 아니다** — 같은 소유 주체가 같은 대상을 다른 업무공간 · 서비스에서 다뤄도 기억은 하나로 이어진다. Execution Node 도 기억의 경계가 아니다(§9). 이것은 원칙이며, 현재 노드 원장은 소유 주체를 구분하지 못한다(§23 KNOWN GAP ①).
+- PC 라는 말은 물리 실행환경(Local Agent · Chrome 확장 · 실제 화면 조작)을 설명할 때 쓴다. **"PC = Assistant 의 기억 · 업무 · 자동화의 경계"** 로 쓰지 않는다.
 
 ---
 
@@ -308,7 +323,32 @@ Lower-cost Reasoning 단계는 유지한다. "속도는 약한 모델로 해결�
 
 1. **PC 는 Execution Node 다.** 기억의 소유자도, 업무 판단의 주체도 아니다.
 2. **Request Device ≠ Execution Device.** 요청한 기기(휴대폰 · 다른 PC · 외부 채널)와 실행할 노드는 다를 수 있다. Assistant 가 Task 에 맞는 노드를 고른다.
-3. 노드 종류: Office PC · Home PC · Cloud Browser(§13) · 미래 노드. 노드는 **capability 를 선언**하고 Assistant 는 capability · 가용성 · 사용자 지정으로 노드를 선택한다.
+3. 노드 종류: 사용자의 PC(장소와 대수 무관 — 매장 · 집 등 여러 대일 수 있다) · Cloud Browser(§13) · 미래 노드. 노드는 **capability 를 선언**하고 Assistant 는 capability · 가용성(· 사용자가 원하면 그 지정)으로 노드를 선택한다.
+4. **노드가 바뀌어도 업무는 끊기지 않는다.** 같은 Task 를 다른 노드에서 이어 실행할 수 있고(Task 1 : N run), 업무 식별(Task type) · 재개 구조(M5) · Cloud 배치가 허용된 검증된 방법(공개 사이트 대상 M3)은 소유 주체에 있으므로 노드를 따라가지 않아도 쓰인다(원칙). 현재 구현은 노드 원장에 같은 기억이 있으면 노드 쪽을 먼저 쓰므로, 노드 무관 연속성은 그 노드 원장이 비어 있을 때만 보장된다(§23 KNOWN GAP ② · ④). 노드에 남는 것은 그 노드의 실행환경 상태(§9-2 node)와 노드 보관 원 기록이며, 실행할 때 현재 화면으로 다시 확인한다.
+   - **예외 — 사설 시스템 · Windows 앱 대상(M9)**: 이런 대상의 절차 기억(M3 · M4)은 Memory 배치 정책 M9 · §2-6 에 따라 **노드에만** 둔다(현재 Cloud 절차 기억은 `browser_site` 대상만). 그래서 다른 노드로 넘어가면 그 대상의 절차 경험은 따라가지 않고, 새 노드는 그 부분을 Discovery 로 다시 찾는다. Assistant · Task · 업무 식별은 그대로 이어진다. 이 경험을 가진 노드를 우선할지(node affinity)는 노드 선택(§18 단계 D)의 고려 사항이며 이 문서가 정하지 않는다.
+5. **쓸 수 있는 노드가 여럿이라는 사실만으로 업무를 멈추지 않는다.** 여러 노드 중 무엇을 쓸지는 Assistant 의 선택 문제다. 선택 근거가 정말 부족할 때만 사용자에게 묻는다(§5-4).
+   - 현재 구현의 `resolveTargetDevice`(온라인 2대 이상 → `ambiguous` 로 중단)는 **이 원칙이 아니라 runtime 의 현재 한계**다(§23). 원칙으로 인용하지 않는다. 노드 선택 구현은 §18 단계 D(Execution Node 계약)의 범위다.
+
+### 11-1-a. 검증의 두 종류 (2026-10-05)
+
+| 종류 | 무엇을 보는가 | 어디서 |
+|---|---|---|
+| **Architecture / Execution integration 검증** | Task → Run 연결 · Execution Report → Task 판정 · 노드와 무관한 Memory Continuity · 소유 경계 | 자동 integration test(격리 DB · 주입한 실행 본체)로 한다. 특정 PC 가 필요하지 않다 |
+| **Execution Runtime smoke** | 실제 브라우저 · 확장 · Windows UIA · Local Agent 가 화면을 조작하는가 | 실제 Execution Node 가 필요하다. **어느 노드든** 그 capability 를 가진 노드면 된다 |
+
+- Assistant Architecture 의 closure(Phase A · B · C 등)는 integration 검증으로 판정한다. **특정 PC("사무실 PC" 등)의 smoke 를 Architecture closure 의 필수조건으로 두지 않는다.**
+- Runtime smoke 는 실행 계층의 안정성 확인이다. 그 결과는 Runtime 트랙에 기록하고, Architecture 판정을 뒤집는 근거로 쓰지 않는다(§11-3 (5) 실행 완성도 ≠ 진척).
+- 과거 CHECK 에 남은 "특정 PC 에서 실측" 기록은 **그 시점의 historical evidence** 다. 현재 요구사항으로 읽지 않는다. CHECK 본문 · STATE 는 기록물이므로 고치지 않고, 현재 분류는 아래 표가 정한다.
+
+**Phase A · B · C 에 남은 실측 항목의 현재 분류 (2026-10-05)**
+
+| 남은 항목 (CHECK 기록) | 현재 분류 | 판정 근거 |
+|---|---|---|
+| Phase A — production 에서 run 이 Task 에 붙는 장면(`run↔task 연결` PENDING) | **Task → Run 연결**: integration 은 격리 PG 실DB · boundary spec 으로 검증됨. production 장면은 Execution Runtime smoke | capability(Local Agent + 확장)를 가진 아무 Execution Node |
+| Phase B §6-2 — 실행 지시가 planner 에 실리고 ExecutionReport 로 Task 가 판정되는 장면 | **Execution Report → Task 판정**: integration(주입 실행 본체 · runtime harness). 실제 화면 장면은 Execution Runtime smoke | 같음 |
+| Phase C — 다른 노드에서 기억이 이어지는 장면 | **Node-independent Memory Continuity — 부분**: integration 은 빈 노드 원장 fallback 만 검증한다. 노드 원장에 기존 기억이 있어 Cloud 기억과 충돌하는 경우는 현재 노드 쪽이 이긴다(§23 KNOWN GAP ②) — 이 경우는 검증된 연속성으로 판정하지 않는다. 실제 화면 장면은 Execution Runtime smoke | capability 를 가진 노드 중 **이전 실행이 없던 노드 또는 로컬 원장이 비어 있음을 확인한 노드** — 같은 노드의 `local.db` 에서 읽혀 성공하면 노드 독립을 검증하지 못한다 |
+
+CHECK 에 적힌 "사무실 PC" 는 당시 그 capability 를 가진 노드가 그것뿐이었다는 기록이다. 위 Runtime smoke 는 한 번의 실측 세션에서 함께 확인할 수 있다. Phase A · B 장면은 어느 노드에서 하든 같고, Phase C 장면만 위 빈 노드 조건을 지킨다(특정 PC 이름이 아니라 노드의 상태가 조건이다).
 
 ### 11-2. Node 계약
 
@@ -434,7 +474,7 @@ Gate 의 Memory 쪽 세부(종류별 소유 · 배치 · 보존 · 삭제 · 고
 | Strong Discovery (`87ebdb074` · server 측 배포됨) | **KEEP_BUT_REPOSITION** — §5 Unknown-task Discovery capability 로 승계 |
 | V1 Phase 3~5 · ARCH-V1 §10-1 순서 | **동결** — 아래 V2 순서로 대체 |
 
-V1 구조를 전제로 한 추가 확장 · 최적화 · smoke 는 하지 않는다. 보류 중이던 실 PC smoke(Phase 1 · 폴링 재측정 · Strong Discovery)는 V2 구현에서 필요한 시점에 V2 기준으로 다시 정한다.
+V1 구조를 전제로 한 추가 확장 · 최적화 · smoke 는 하지 않는다. 보류 중이던 실 PC smoke(Phase 1 · 폴링 재측정 · Strong Discovery)는 V2 구현에서 필요한 시점에 V2 기준으로 다시 정한다 — 그때도 §11-1-a 에 따라 **Execution Runtime smoke**(capability 를 가진 아무 노드)이며, 특정 PC 를 지정하는 Architecture 조건이 아니다.
 
 ### 18-2. V2 순서
 
@@ -537,8 +577,11 @@ V1 에서 **승계하지 않는 것**: Local-first 저장 원칙(ARCH §5 의 Lo
 | Skill / Procedure | §7. 검증된 Experience 의 승격 형태 · Assistant 가 고르고 조합하는 재사용 수행 능력(공통 Workflow 아님) |
 | Shared Candidate | §0-1 · §10. 여러 사용자에서 반복 검증돼 다른 사용자에게 추천 · 우선 후보가 되는 방법. 강제 규칙 · 표준 아님 |
 | Discovery capability | §5. 모르는 업무를 푸는 하위 capability. Strong Discovery Agent 가 기본 수행자 |
-| Execution Node | §11. 실행 환경 — PC · Cloud Browser 등 |
-| Request Device | 요청이 들어온 기기 · 채널 |
+| Assistant Identity | §3-1. 사용자당 하나인 비서. PC · 장소 · 채널로 나뉘지 않는다 |
+| Work Context | §3-1. Task 의 소유 주체 · 업무공간 · serviceKey. 그중 소유 주체만 기억 · 경험의 경계다 |
+| Request Channel | §3-1 · §14. 요청이 들어온 곳(Web · 메신저 · 외부 AI · 기기) |
+| Execution Node | §11. 실행 환경 — PC(여러 대 가능) · Cloud Browser 등. 기억 · 업무 · 자동화의 경계가 아니다 |
+| Request Device | 요청이 들어온 기기 · 채널 (= Request Channel 의 물리 측면) |
 | 소유 주체 | organization · user · run · node (§9-2) |
 | Handover | §12. 결과와 실제 화면의 인계 |
 
@@ -552,8 +595,19 @@ V1 에서 **승계하지 않는 것**: Local-first 저장 원칙(ARCH §5 의 Lo
 | L2 Task | EXISTS — `assistant_tasks` 1급 객체 · Task 1:N run · 완료 계약으로 상태 판정(planner `done` 은 주장) | Phase A · B CHECK |
 | L3 Skill / Discovery | PARTIAL (Candidate · adapter seed · Strong-first routing) | GAP-CENSUS §J · §M |
 | L4 Execution | EXISTS | GAP-CENSUS §F |
-| L5 Execution Node | EXISTS (단일 노드 가정 · 다중 노드 `ambiguous`) | GAP-CENSUS §I |
+| L5 Execution Node | EXISTS — **runtime 한계**: 사용자의 온라인 노드가 2대 이상이면 `resolveTargetDevice` 가 `ambiguous` 로 중단 · capability 선언 · 선택 없음. §11-1 (5) 원칙과 어긋나는 현재 구현이며 단계 D 범위(원칙 아님). 사용자에게도 "연결된 PC가 여러 대여서 어느 PC인지 확정할 수 없습니다" 로 안내하고 멈춘다(`ai-tool-router.ts` · `hospital-drug-composite.ts`) — 노드 정리를 사용자에게 넘기는 흐름이므로 §3 (5) 와 어긋나는 **KNOWN GAP**(2026-10-05 확인) | GAP-CENSUS §I |
 | Memory 배치 | **Cloud Continuity 구현** — 소유 주체 전용 Cloud 에 검증된 방법(M3 · 공개 사이트 대상) · 재개 구조(M5)를 저장하고 Assistant Memory 가 recall → ExecutionIntent → Execution 이 노드 원장과 합쳐 현재 화면으로 재검증. Task type 이력도 Cloud. 도움 · 교정 · 실행 원기록(M7 · M8)과 결정적 재생 단계(Workflow Candidate)는 노드. §17 Compliance Gate PENDING(실사용 확대 전 점검) | GAP-CENSUS §G · Phase C CHECK · Cloud Continuity 커밋 |
+
+**노드 원장 KNOWN GAP (2026-10-05 확인 · 원칙이 아니라 현재 구현)**
+
+| # | 현재 구현 | 어긋나는 원칙 | 근거 |
+|---|---|---|---|
+| ① | 노드 원장(`local_experience_patterns` 등)에 소유 주체 칸이 없다 — unique key · recall 이 `target_id` · `task_key` 만 쓴다. 한 노드에서 조직 A · B 의 업무를 모두 하면 A 에서 생긴 노드 기억(M7 · M8 · M9)이 B 의 실행 근거로 섞인다 | §3-1 · §9-2 기억 경계 = 소유 주체 | `tools/o4o-local-agent/src/local-db.mjs` (`local_experience_patterns` UNIQUE) |
+| ② | 노드 기억과 Cloud 기억을 합칠 때 노드 쪽이 먼저이고, 같은 stage · 같은 방법이면 노드 쪽 극성을 남긴다 — 오래된 노드 `avoid` 가 최신 Cloud `preferred` 를 가릴 수 있다 | §11-1 (4) 노드가 바뀌어도 같은 기억 · Node-independent Continuity | `work-assistance.ts` `mergeRecalledPatterns` |
+| ③ | 다중 노드 `ambiguous` 중단 · 사용자에게 PC 정리를 넘기는 안내 (위 L5 행) | §3 (5) · §11-1 (5) | `resolveTargetDevice` · `ai-tool-router.ts` |
+| ④ | 재개 구조(M5)도 노드 우선이다 — 노드 원장에 그 run 의 frame 이 있으면 그것을 쓰고, 없을 때만 Cloud frame 을 쓴다. 대기 중인 run 이 노드 A → B 로 옮겨 B 에서 더 진행된 뒤 A 로 돌아오면 A 의 오래된 frame 에서 재개될 수 있다 | §11-1 (4) 재개 구조의 노드 무관 연속성 | `work-agent-runtime.ts` 재개 recall(로컬 frame 우선 · Cloud 는 fallback) |
+
+①②④ 는 노드 원장에 소유 주체를 저장 · 필터하고 병합 우선순위를 정하는 구현 WO 의 범위이며, 그 전까지 노드 원장을 소유 주체 경계 · 노드 독립 연속성의 **현재 보장**으로 단정하지 않는다.
 
 이 표는 시점 기록이다. 갱신할 때는 이 절만 고치고 본문 원칙은 바꾸지 않는다.
 
