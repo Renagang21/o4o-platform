@@ -1,54 +1,36 @@
 # HANDOFF
 
-> 마지막 작업: 2026-10-05 (KST) · 재개 PC: 이 PC worktree `C:/Users/sohae/coding/o4o-wt/neture-pharmacy-commerce` · 이전 작성 PC: DESKTOP-SS4Q2DK
+> 마지막 작업: 2026-10-05 (KST) · worktree `C:/Users/sohae/coding/o4o-wt/neture-pharmacy-commerce` · branch `wo/neture-pharmacy-store-commerce-refactor-v1` · draft PR #308
 
 ## 요약
 
-작업공간 이동을 위해 **WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1** 를 단계 1 조사 완료 지점에서 멈췄다. 진행 상황의 정본은 WO 문서의 TODO 체크리스트다 — [`docs/work-orders/WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1.md`](docs/work-orders/WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1.md).
+**WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1** 단계 1-7 ~ 6-3 의 코드 · 스키마 · 정본 반영을 branch 에 push 했다. 진행 정본은 WO TODO 체크리스트 — [`docs/work-orders/WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1.md`](docs/work-orders/WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1.md). 설계 정본: [`DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1`](docs/design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md).
 
-## 완료된 것
+## 상태 구분 (혼동 금지)
 
-- WO 원문 + TODO 체크리스트 기록 (`7f09a7a71`)
-- 단계 1 조사 1-1 ~ 1-6 완료 → [`IR-NETURE-PHARMACY-STORE-COMMERCE-STEP1-CENSUS-V1`](docs/investigations/IR-NETURE-PHARMACY-STORE-COMMERCE-STEP1-CENSUS-V1.md) (`f64445ce7`, 4개 영역 A~D). 핵심 사실 요약은 WO 의 "단계 1 조사 핵심 사실" 절.
-- 코드 · DB · migration 변경 0.
+| 항목 | 상태 |
+|---|---|
+| 코드 구현 (branch) | 완료 — 백엔드 · web-store · web-neture |
+| 테스트 결제 흐름 검증 | 격리 PostgreSQL 15 통합 테스트로 검증(로컬). 운영 환경 검증 없음 |
+| 실제 PG 연동 | **대기(D1)** — PG · 수취 법인 미정. live 모드는 503 |
+| main 통합 | 미실시 — 사용자 "main 통합 진행" 승인 후 PR merge |
+| 운영 DB migration `CreateNeturePharmacyCommerce1791160000000` | 미적용 — merge 후 CI/CD 가 적용 |
+| 운영 배포 · 운영 실결제 검증 | 미실시 |
+| 테스트 데이터 초기화(DESIGN §12) | 범위만 확정 — 운영 DB write 는 사용자 승인 필요 |
 
-## 진행 중
+## 다음에 할 일
 
-| 항목 | 위치 | 상태 (2026-10-05 09:43 조회) |
-|---|---|---|
-| Neture 약국 commerce WO | branch `wo/neture-pharmacy-store-commerce-refactor-v1` (원격 존재) · 이 PC worktree `D:/o4o-wt/neture-pharmacy-store-commerce-refactor-v1` | 단계 1-7(설계 문서) 미착수. **draft PR #308** (OPEN) — merge 금지 |
-| 정본 문서 최종 정렬 | PR #304 · branch `wo/canonical-doc-final-alignment-v1` · 이 PC worktree `D:/o4o-wt/canonical-doc-final-alignment-v1` | OPEN · CI 실패 0 · mergeStateStatus CLEAN · head `b57a92d1d`. 마지막 Codex 지적 수정 후 `@codex review` 재요청(00:40Z) — **재리뷰 결과 아직 없음** |
+1. PR #308 CI 확인 → 실패 시 수정. draft 해제 · merge 는 사용자 승인 후.
+2. merge 후: migration 적용 확인(`migration:show`) → 배포 → production 에서 테스트 결제를 쓰려면 `NETURE_PHARMACY_PAYMENT_MODE=test` env 설정(인프라 변경 = 사용자 승인) → 브라우저 smoke(기본 가입 → 운영자 승인 → pharmacy 가입 → 공급 상품 → 장바구니 → 테스트 결제 → 공급자 목록).
+3. 운영 시작 전 관리자 작업: `pharmacy` 세미프랜차이즈 담당 운영자 지정(`/admin/semi-franchises`).
+4. 후속 WO 제안: KPA 회원 승인 시 매장 프로비저닝 제거 · 세미프랜차이즈 커뮤니티 게시판(공통 Forum 구조) · 세미프랜차이즈 범위 콘텐츠 자료함 · KPA/KCos/PH 기존 결제 컨트롤러 결함 · 정산 서비스 필터 · CANONICAL-INDEX 행 추가(PR #304 통합 후).
 
-## 다음에 바로 이어서 할 일 (우선순위)
+## 로컬 검증 재현
 
-1. **새 PC 준비** — 기준 checkout 에서 `git fetch origin` 후 전용 worktree 생성:
-   `git worktree add ../o4o-wt/neture-pharmacy-store-commerce-refactor-v1 wo/neture-pharmacy-store-commerce-refactor-v1`
-   (디스크 여유 먼저 확인 — `df -h`). 구현 단계 전에 `VOLTA_FEATURE_PNPM=1 pnpm install --frozen-lockfile` → `pnpm run build:packages`.
-2. **PR #304** — `gh pr view 304` 로 Codex 재리뷰 확인. blocker 없으면 사용자에게 보고하고 STOP → 사용자의 "main 통합 진행" 후에만 merge → 이 PC 의 worktree 는 이 PC 에서 표준 종료 정리(AGENTS.md §4-1(i), junction 해제 · 재스캔 0 후 remove). 다른 PC 에서 이 PC 의 worktree 를 건드리지 않는다.
-3. **WO 단계 1-7 설계 문서** — IR 을 입력으로 설계 확정. 이미 정리된 설계 방향:
-   - 세미프랜차이즈 = serviceKey 가 아니라 **데이터 행** (`semi_franchises` · 멤버십 · 운영자 담당 관계; 선례 `branch_memberships`)
-   - 기본 가입 = Neture 신규 원장(kpa-society 재해석 금지) + 운영자 승인; 매장 판정 유틸을 kpa-society 의존에서 분리(공통 모듈 변경 프로토콜 적용)
-   - 공급 제안 = SPO 하위 **복수 제안 테이블**(가격 · 대상 세미프랜차이즈 · 선택적 대상 조직 · 상태); 장바구니 `store_cart_items.supply_offer_id`
-   - 이벤트는 OPL 유지(수량 로직 보존) + 재신청 차단 · visibility 토글 승인 우회 · 운영 조직 LIMIT 1 결함 수정
-   - 모집 = 조직 단위 참여자 + 공급가
-   - 공급자 주문 필터 `COALESCE(o.service_key,'neture')='neture'` → 서비스 키 배열
-   - 결제 = `PAYMENT_MODE=test|live` · paymentGroupId 를 PG orderId 로 · payment↔group/소유자/금액 검증 · DB 멱등 handler · `receiver_key` 그룹핑
-   - HUB 단계 제거는 web-store 내 매장 직접 사용으로; `/hub` 전면 삭제는 불가(KCos 링크 · spec)
-   - 커뮤니티 = `community-access.middleware.ts` 에 세미프랜차이즈 정책 모드
-4. 1-8 정본 반영 → 단계 2~6 구현 (WO TODO 순서).
+- 격리 DB: `docker run -d --name o4o-npc-pg15 -e POSTGRES_PASSWORD=<임의> -e POSTGRES_DB=o4o_it -p 55433:5432 postgres:15` → `apps/api-server` 에서 DB_* env 로 `npx tsx src/migrate.ts`
+- 통합 테스트: `NETURE_PHARMACY_IT_DATABASE_URL=postgres://...@127.0.0.1:55433/o4o_it npx jest src/modules/neture-pharmacy` (운영 DB 금지)
 
-## 재개 기록 (2026-10-05, 이 PC)
+## 주의
 
-- 이 PC worktree `C:/Users/sohae/coding/o4o-wt/neture-pharmacy-commerce` 생성(원격 branch 추적) → origin/main(`a68a15d00`, Neture 무관 CI · 인증서 docs) 병합 · `pnpm install --frozen-lockfile` · `build:packages` 완료.
-- 다른 PC 의 worktree(`D:/o4o-wt/...`)는 이 PC 에서 정리하지 않는다.
-- 단계 1-7 설계 확정 → [`DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1`](docs/design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md). 진행 상황 정본은 WO TODO.
-- PR #304 는 이 트랙의 작업 대상이 아니다(확인만, merge · 대행 금지).
-
-## 주의 · 미해결 · 결정
-
-- **D1~D3 정리 (사용자 지시 2026-10-05)**: D1 = 실제 수취 법인 · PG 만 대기(구조 · 테스트 결제는 구현, 운영자를 수취 주체로 간주 금지) · D2 = 기존 1..1000 검사 유지(대기 아님) · D3 = 사용자 기준 유지, 장바구니 주문 집계 누락만 참조 키 연결.
-- WO 금지 범위: 수량 상한 신설 · 자동 정산/청구 · 가격 비교 추가 금지. 정산 · 환불은 보고만(삭제 여부 미결).
-- **운영 DB write(테스트 데이터 삭제 포함) · migration 수동 적용은 사용자 명시 승인 필요.** migration 추가 시 manifest · expected-schema-states · ledger spec 를 같은 커밋에.
-- Frozen 접촉 가능 영역(F3 Store Layer · F8 Distribution · F9 RBAC · F10 Core · F11 · Supplier Domain FROZEN) — 구조 변경은 이 WO 가 명시한 범위만, 그 밖은 STOP 후 보고.
-- main 반영은 PR merge 하나뿐. 직접 push · owner bypass 금지. 원격 branch 삭제는 사용자가 GitHub 에서.
-- 저장소 Public — 실명 · 이메일 · 약국명 · 자격증명 값 기록 금지.
+- 다른 PC 의 worktree(`D:/o4o-wt/...`)는 이 PC 에서 정리하지 않는다. PR #304 는 이 트랙 대상이 아니다.
+- main 반영은 PR merge 하나뿐. 직접 push · bypass 금지. 저장소 Public — 실명 · 자격증명 기록 금지.
