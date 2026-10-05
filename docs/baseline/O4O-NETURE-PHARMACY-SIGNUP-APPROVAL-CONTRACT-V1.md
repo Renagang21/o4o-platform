@@ -129,15 +129,16 @@ submission  = { membershipId, key, fileRef, submittedAt, reviewedAt?, reviewNote
 
 ## 7. Auth 책임 경계
 
-| 책임 | 현재 위치 | 통합 후 방향 |
-|---|---|---|
-| 로그인 · 세션 | Auth(공통) | 변경 없음 |
-| 기본 가입 원장 · 상태 전이 | `pharmacy-membership.service.ts` (PR #308) | 판정 SSOT 는 원장 그대로 |
-| 승인 시 매장 표식(`neture:store_owner` role · enrollment · slug) | `pharmacy-store-provisioner.ts` (PR #308) | PR #308 main 통합 후 **승인 orchestration 과 role 발급 · 회수를 Auth 쪽 책임으로 이관**하는 통합 작업(별도 WO) |
-| 세미프랜차이즈 담당 판정 | `semi-franchise.service.ts` (PR #308) | 변경 없음(role 추가 없음 — F9) |
-| 화면 상태 · 문구 · 다음 행동 | 이 문서 + 프론트 계약 파일(§8) | — |
+소유 경계의 정본은 [`DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1` §13](../design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md) 이다(사용자 결정 2026-10-05). 여기에 복제하지 않고 이 문서와 관계만 적는다.
 
-이 WO 는 위 PR #308 소유 백엔드(원장 서비스 · 승인 API orchestration · organization/role/enrollment/slug provisioning · migration)를 수정하지 않는다.
+| 구분 | 소유 | 이 문서와의 관계 |
+|---|---|---|
+| 기본 가입 원장 · 상태 전이 · 신청/재신청 · 운영자 처리 · 승인 orchestration · role 발급/회수 | **인증 · 가입 트랙** | 이 문서가 그 트랙의 **화면 계약**이다(`/start-pharmacy` · `/operator/pharmacy-memberships` · §3 · §4 · §6). 공통 가입 · 추가정보 흐름에 편입할 때 기존 서비스를 확장하고 새로 만들지 않는다(§13) |
+| 약국 조직 생성 · owner 관계 · enrollment · slug | **Store 트랙** (`pharmacy-store-link.ts` 계약 함수) | 인증 트랙은 계약 함수를 호출만 한다 |
+| 세미프랜차이즈 가입 · 담당 운영자 | **Store/Commerce 트랙** | §3-2 · §6-2 는 그 화면의 표시 규칙만 정한다 |
+
+- 이 WO 는 화면 · 화면 계약 · 이 문서만 바꾼다. 위 백엔드(원장 서비스 · 승인 API · provisioner · `pharmacy-store-link.ts` · migration)는 PR #308 소유라 수정하지 않는다.
+- 서버 쪽 인계(파일 · 라우트 이관 · 추가정보 확장 · 서류 저장 U2)는 PR #308 main 통합 후 인증 · 가입 트랙의 별도 작업이다.
 
 ## 8. 프론트 계약 파일
 
