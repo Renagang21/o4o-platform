@@ -55,8 +55,14 @@ const CANONICAL: Record<StoreOwnerServiceKey, string> = {
 
 describe('§6 서비스별 store_owner 가드 — 일치 membership 만 통과한다', () => {
   const services = Object.keys(CANONICAL) as StoreOwnerServiceKey[];
+  /**
+   * WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1 (DESIGN §5):
+   *   약국 매장(`kpa`)은 JWT membership 사전 검사를 하지 않고 Neture 기본 가입 원장으로 판정한다.
+   *   membership 게이트 계약은 그 계약을 유지하는 서비스(cosmetics · pharmacy-hub)로 고정한다.
+   */
+  const membershipGated = services.filter((s) => s !== 'kpa');
 
-  it.each(services)('%s store_owner + 같은 서비스 active membership → PASS', async (svc) => {
+  it.each(membershipGated)('%s store_owner + 같은 서비스 active membership → PASS', async (svc) => {
     const dataSource = makeDataSource([MEMBERSHIP_ROW, ROLE_ROW, [{ organization_id: 'org-' + svc, role: 'owner' }]]);
     const guard = createRequireStoreOwner(dataSource, svc);
     const res = makeRes();
@@ -72,7 +78,7 @@ describe('§6 서비스별 store_owner 가드 — 일치 membership 만 통과�
     expect(res.status).not.toHaveBeenCalled();
   });
 
-  it.each(services)('%s route + 타 서비스 membership 만 보유 → 403 MEMBERSHIP_NOT_FOUND', async (svc) => {
+  it.each(membershipGated)('%s route + 타 서비스 membership 만 보유 → 403 MEMBERSHIP_NOT_FOUND', async (svc) => {
     const other = services.find((s) => s !== svc)!;
     const dataSource = makeDataSource([MEMBERSHIP_ROW, ROLE_ROW, [{ organization_id: 'org-x', role: 'owner' }]]);
     const guard = createRequireStoreOwner(dataSource, svc);
@@ -114,14 +120,29 @@ describe('§6 서비스별 store_owner 가드 — 일치 membership 만 통과�
     expect(JSON.stringify(orgCall[1])).not.toContain('kpa');
   });
 
-  it('inactive membership 은 serviceKey 경로에서도 통과하지 못한다', async () => {
-    const dataSource = makeDataSource([]);
+  it('kpa(약국 매장) route 는 JWT membership 이 타 서비스뿐이어도 원장 active 조직이면 통과한다', async () => {
+    // 큐: [원장 기반 후보] → (매장 경영자 계약 게시 문서 0)
+    const dataSource = makeDataSource([[{ organization_id: 'org-pharmacy', role: 'owner' }]]);
     const guard = createRequireStoreOwner(dataSource, 'kpa');
+    const res = makeRes();
+    const next = jest.fn();
+    const req: any = { user: { id: 'u1', memberships: [{ serviceKey: 'neture', status: 'active' }] } };
+
+    await guard(req, res, next);
+
+    expect(next).toHaveBeenCalled();
+    expect(req.organizationId).toBe('org-pharmacy');
+    expect(dataSource.query.mock.calls[0][0]).toContain('neture_pharmacy_memberships');
+  });
+
+  it('inactive membership 은 serviceKey 경로에서도 통과하지 못한다 (cosmetics)', async () => {
+    const dataSource = makeDataSource([]);
+    const guard = createRequireStoreOwner(dataSource, 'cosmetics');
     const res = makeRes();
     const next = jest.fn();
 
     await guard(
-      { user: { id: 'u1', memberships: [{ serviceKey: 'kpa-society', status: 'suspended' }] } } as any,
+      { user: { id: 'u1', memberships: [{ serviceKey: 'k-cosmetics', status: 'suspended' }] } } as any,
       res,
       next,
     );

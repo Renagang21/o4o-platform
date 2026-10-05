@@ -11,6 +11,10 @@
  *
  * DB 는 붙이지 않는다 — DataSource.query 를 stub 으로 대체해 조직 해석 SQL 과
  * 실제 선택된 organization_id 만 본다.
+ *
+ * WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1 (DESIGN §5):
+ *   약국 매장(`kpa`) 후보는 enrollment/slug 가 아니라 **Neture 기본 가입 원장(active)** 으로 판정한다.
+ *   fixture 의 `pharmacyLedger` 가 neture_pharmacy_memberships.status 를 흉내 낸다.
  */
 
 import express from 'express';
@@ -46,6 +50,8 @@ interface Membership {
   enrollments: string[];
   /** platform_store_slugs.service_key (is_active) */
   slugKeys: string[];
+  /** neture_pharmacy_memberships.status (약국 기본 가입 원장) — 없으면 미가입 */
+  pharmacyLedger?: 'active' | 'pending' | 'suspended';
 }
 
 /**
@@ -68,6 +74,7 @@ const MEMBERSHIPS: Membership[] = [
     joinedAt: '2025-03-01',
     enrollments: ['kpa-society'],
     slugKeys: ['kpa'],
+    pharmacyLedger: 'active',
   },
   {
     organizationId: ORG_COS,
@@ -110,6 +117,14 @@ function makeDataSource() {
       if (sql.includes('role_assignments')) {
         const allowed = params[1] as string[];
         return activeRoles.some((r) => allowed.includes(r)) ? [{ ok: 1 }] : [];
+      }
+
+      // 2-a) 약국 매장(kpa) 후보 — Neture 기본 가입 원장 active 조직
+      if (sql.includes('neture_pharmacy_memberships')) {
+        const roles = params[1] as string[];
+        return memberships
+          .filter((m) => roles.includes(m.role) && m.pharmacyLedger === 'active')
+          .map((m) => ({ organization_id: m.organizationId, role: m.role }));
       }
 
       // 2) service-scoped 후보 (serviceKey 지정 경로)
@@ -183,7 +198,7 @@ describe('local-products — service-scoped organization resolution', () => {
     expect(res.body.data.total).toBe(0);
   });
 
-  it('B. serviceKey="kpa" mount 는 KPA 약국 조직을 골라 자체상품이 보인다', async () => {
+  it('B. serviceKey="kpa" mount 는 기본 가입 원장 active 약국 조직을 골라 자체상품이 보인다', async () => {
     const { dataSource, listOrgParams } = makeDataSource();
     const res = await request(makeApp(dataSource, 'kpa')).get('/store/local-products');
 
@@ -216,7 +231,7 @@ describe('local-products — service-scoped organization resolution', () => {
   });
 
   it('E. 타 서비스 조직만 가진 사용자는 그 서비스에서 후보 0 → 쓰기 403', async () => {
-    memberships = [MEMBERSHIPS[2]]; // K-Cosmetics 조직만 보유
+    memberships = [MEMBERSHIPS[2]]; // K-Cosmetics 조직만 보유 (약국 기본 가입 원장 없음)
     const { dataSource, listOrgParams } = makeDataSource();
 
     const res = await request(makeApp(dataSource, 'kpa'))
@@ -228,8 +243,20 @@ describe('local-products — service-scoped organization resolution', () => {
     expect(listOrgParams).toHaveLength(0); // 다른 서비스 조직으로 새지 않는다
   });
 
-  it('F. store_owner role 이 비활성이면 조직 해석 자체를 하지 않는다', async () => {
+  it('F. (cosmetics) store_owner role 이 비활성이면 조직 해석 자체를 하지 않는다', async () => {
     activeRoles = []; // role_assignments.is_active = true 인 행 없음
+    const { dataSource, listOrgParams } = makeDataSource();
+
+    const res = await request(makeApp(dataSource, 'cosmetics'))
+      .post('/store/local-products')
+      .send({ name: '테스트 상품' });
+
+    expect(res.status).toBe(403);
+    expect(listOrgParams).toHaveLength(0);
+  });
+
+  it('F-kpa. 약국 원장이 active 가 아니면(pending) role 이 있어도 약국 조직을 고르지 않는다', async () => {
+    memberships = [MEMBERSHIPS[0], { ...MEMBERSHIPS[1], pharmacyLedger: 'pending' }, MEMBERSHIPS[2]];
     const { dataSource, listOrgParams } = makeDataSource();
 
     const res = await request(makeApp(dataSource, 'kpa'))

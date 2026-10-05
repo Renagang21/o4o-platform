@@ -116,6 +116,16 @@ export class SellerRecruitment {
   @Column({ name: 'exposure_review_note', type: 'text', nullable: true })
   exposureReviewNote: string | null;
 
+  /**
+   * WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: Neture 약국 세미프랜차이즈 모집의 대상 경로 · 모집 공급가.
+   * 값이 있으면 참여 승인 약국 조직이 이 공급가로 바로 주문한다(사용자 단위 bridge 없음).
+   */
+  @Column({ name: 'semi_franchise_id', type: 'uuid', nullable: true })
+  semiFranchiseId: string | null;
+
+  @Column({ name: 'supply_unit_price', type: 'int', nullable: true })
+  supplyUnitPrice: number | null;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 

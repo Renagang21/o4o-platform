@@ -51,9 +51,9 @@ describe('store organization resolution — service scoped', () => {
     });
   });
 
-  it('B. 복수 org + serviceKey → 그 서비스 등록 조직만 후보로 조회한다', async () => {
-    const { dataSource, calls } = makeDataSource([[{ organization_id: 'org-kpa', role: 'owner' }]]);
-    await findStoreOrganizationCandidates(dataSource, 'user-1', 'kpa');
+  it('B. 복수 org + serviceKey → 그 서비스 등록 조직만 후보로 조회한다 (cosmetics)', async () => {
+    const { dataSource, calls } = makeDataSource([[{ organization_id: 'org-cos', role: 'owner' }]]);
+    await findStoreOrganizationCandidates(dataSource, 'user-1', 'cosmetics');
 
     const [{ sql, params }] = calls;
     // 서비스 등록 근거 2소스가 모두 조건에 들어간다 (enrollment / store slug)
@@ -63,8 +63,22 @@ describe('store organization resolution — service scoped', () => {
     expect(sql).not.toMatch(/LIMIT\s+1/i);
     expect(params[0]).toBe('user-1');
     expect(params[1]).toEqual(STORE_MEMBER_ROLES);
-    expect(params[2]).toEqual(STORE_SERVICE_ORG_LINKAGE.kpa.enrollmentCodes);
-    expect(params[3]).toEqual(STORE_SERVICE_ORG_LINKAGE.kpa.slugKeys);
+    expect(params[2]).toEqual(STORE_SERVICE_ORG_LINKAGE.cosmetics.enrollmentCodes);
+    expect(params[3]).toEqual(STORE_SERVICE_ORG_LINKAGE.cosmetics.slugKeys);
+  });
+
+  it('B-kpa. 약국 매장(kpa) 후보는 Neture 기본 가입 원장(active) 조직만 — enrollment/slug 를 보지 않는다', async () => {
+    const { dataSource, calls } = makeDataSource([[{ organization_id: 'org-kpa', role: 'owner' }]]);
+    const candidates = await findStoreOrganizationCandidates(dataSource, 'user-1', 'kpa');
+
+    expect(candidates).toEqual([{ organizationId: 'org-kpa', memberRole: 'owner' }]);
+    const [{ sql, params }] = calls;
+    expect(sql).toContain('neture_pharmacy_memberships');
+    expect(sql).toMatch(/npm\.status\s*=\s*'active'/);
+    expect(sql).not.toContain('organization_service_enrollments');
+    expect(sql).not.toContain('platform_store_slugs');
+    expect(sql).not.toMatch(/LIMIT\s+1/i);
+    expect(params).toEqual(['user-1', STORE_MEMBER_ROLES]);
   });
 
   it('C. 다른 서비스 org 만 존재 → 후보 0 → 차단', async () => {
@@ -102,12 +116,12 @@ describe('store organization resolution — service scoped', () => {
     expect(calls[0].sql).not.toContain('organization_service_enrollments');
   });
 
-  it('F. store_owner role 없음 → isOwner=false, 조직 조회조차 하지 않는다', async () => {
+  it('F. store_owner role 없음 → isOwner=false, 조직 조회조차 하지 않는다 (cosmetics)', async () => {
     const { dataSource, calls } = makeDataSource([[]]);
-    const result = await isStoreOwner(dataSource, 'user-1', 'kpa');
+    const result = await isStoreOwner(dataSource, 'user-1', 'cosmetics');
     expect(result.isOwner).toBe(false);
     expect(result.organizationId).toBeNull();
-    expect(calls).toHaveLength(1); // role 조회 1회로 종료
+    expect(calls).toHaveLength(1); // membership 조회 1회로 종료
   });
 
   it('isStoreOwner: role 은 있으나 서비스 조직이 없으면 organizationId=null', async () => {
@@ -119,22 +133,22 @@ describe('store organization resolution — service scoped', () => {
   });
 });
 
-describe('createRequireStoreOwner — guard 응답', () => {
+describe('createRequireStoreOwner — guard 응답 (cosmetics: membership+role 게이트 서비스)', () => {
   const makeRes = () => {
     const res: any = {};
     res.status = jest.fn(() => res);
     res.json = jest.fn(() => res);
     return res;
   };
-  const activeMembership = [{ serviceKey: 'kpa-society', status: 'active' }];
+  const activeMembership = [{ serviceKey: 'k-cosmetics', status: 'active' }];
 
   it('E. inactive membership → 403 MEMBERSHIP_NOT_ACTIVE', async () => {
     const { dataSource } = makeDataSource([]);
-    const guard = createRequireStoreOwner(dataSource, 'kpa');
+    const guard = createRequireStoreOwner(dataSource, 'cosmetics');
     const res = makeRes();
     const next = jest.fn();
     await guard(
-      { user: { id: 'u1', memberships: [{ serviceKey: 'kpa-society', status: 'pending' }] } } as any,
+      { user: { id: 'u1', memberships: [{ serviceKey: 'k-cosmetics', status: 'pending' }] } } as any,
       res,
       next,
     );
@@ -152,7 +166,7 @@ describe('createRequireStoreOwner — guard 응답', () => {
         { organization_id: 'org-b', role: 'owner' },
       ],
     ]);
-    const guard = createRequireStoreOwner(dataSource, 'kpa');
+    const guard = createRequireStoreOwner(dataSource, 'cosmetics');
     const res = makeRes();
     const next = jest.fn();
     await guard({ user: { id: 'u1', memberships: activeMembership } } as any, res, next);
@@ -163,7 +177,7 @@ describe('createRequireStoreOwner — guard 응답', () => {
 
   it('C. 서비스 조직 없음 → 403 STORE_OWNER_REQUIRED', async () => {
     const { dataSource } = makeDataSource([MEMBERSHIP_ROW, ROLE_ROW, []]);
-    const guard = createRequireStoreOwner(dataSource, 'kpa');
+    const guard = createRequireStoreOwner(dataSource, 'cosmetics');
     const res = makeRes();
     const next = jest.fn();
     await guard({ user: { id: 'u1', memberships: activeMembership } } as any, res, next);
@@ -175,15 +189,15 @@ describe('createRequireStoreOwner — guard 응답', () => {
     const { dataSource } = makeDataSource([
       MEMBERSHIP_ROW,
       ROLE_ROW,
-      [{ organization_id: 'org-kpa', role: 'owner' }],
+      [{ organization_id: 'org-cos', role: 'owner' }],
     ]);
-    const guard = createRequireStoreOwner(dataSource, 'kpa');
+    const guard = createRequireStoreOwner(dataSource, 'cosmetics');
     const res = makeRes();
     const next = jest.fn();
-    const req: any = { user: { id: 'u1', memberships: activeMembership, roles: ['kpa:store_owner'] } };
+    const req: any = { user: { id: 'u1', memberships: activeMembership, roles: ['cosmetics:store_owner'] } };
     await guard(req, res, next);
     expect(next).toHaveBeenCalled();
-    expect(req.organizationId).toBe('org-kpa');
+    expect(req.organizationId).toBe('org-cos');
     expect(req.authContext.memberRole).toBe('owner');
   });
 });
@@ -245,29 +259,29 @@ describe('선택 매장(X-Store-Organization-Id) — 후보 안에서만 선택'
     expect(readPreferredStoreOrganizationId(undefined)).toBeNull();
   });
 
-  it('guard: 후보 2개 + 선택 헤더 → next() + 그 매장 주입 / 후보 밖 헤더 → 409 유지', async () => {
+  it('guard(cosmetics): 후보 2개 + 선택 헤더 → next() + 그 매장 주입 / 후보 밖 헤더 → 409 유지', async () => {
     const makeRes = () => {
       const res: any = {};
       res.status = jest.fn(() => res);
       res.json = jest.fn(() => res);
       return res;
     };
-    const activeMembership = [{ serviceKey: 'kpa-society', status: 'active' }];
+    const activeMembership = [{ serviceKey: 'k-cosmetics', status: 'active' }];
 
     const ok = makeDataSource([MEMBERSHIP_ROW, ROLE_ROW, twoCandidates()]);
     const req: any = {
       headers: { 'x-store-organization-id': ORG_B },
-      user: { id: 'u1', memberships: activeMembership, roles: ['kpa:store_owner'] },
+      user: { id: 'u1', memberships: activeMembership, roles: ['cosmetics:store_owner'] },
     };
     const next = jest.fn();
-    await createRequireStoreOwner(ok.dataSource, 'kpa')(req, makeRes(), next);
+    await createRequireStoreOwner(ok.dataSource, 'cosmetics')(req, makeRes(), next);
     expect(next).toHaveBeenCalled();
     expect(req.organizationId).toBe(ORG_B);
 
     const bad = makeDataSource([MEMBERSHIP_ROW, ROLE_ROW, twoCandidates()]);
     const res = makeRes();
     const next2 = jest.fn();
-    await createRequireStoreOwner(bad.dataSource, 'kpa')(
+    await createRequireStoreOwner(bad.dataSource, 'cosmetics')(
       { headers: { 'x-store-organization-id': FOREIGN }, user: { id: 'u1', memberships: activeMembership } } as any,
       res,
       next2,

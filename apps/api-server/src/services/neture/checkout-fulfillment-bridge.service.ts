@@ -62,6 +62,8 @@ export const BRIDGE_SOURCES: Record<string, BridgeSourceDescriptor> = {
   //   census(§1.1): metadata.source='store_cart_checkout' 를 심는 곳은
   //   event-offer-cart-checkout.service.ts 한 곳뿐이다(다른 곳의 동명 문자열은 canonicalAction 로그 라벨).
   store_cart_checkout: { sourceService: 'store-b2b' },
+  // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: Neture 약국 내 매장 장바구니(선택 공급 제안 주문).
+  neture_pharmacy_cart: { sourceService: 'neture-pharmacy' },
 };
 
 export interface BridgeResult {
@@ -105,6 +107,7 @@ export class CheckoutFulfillmentBridgeService {
     // 1. checkout_order 로드 (canonical 테이블 — raw query 로 의존 최소화)
     const rows = await this.dataSource.query(
       `SELECT id::text AS id, "orderNumber", "buyerId"::text AS buyer_id, "supplierId" AS supplier_id,
+              "sellerOrganizationId"::text AS seller_organization_id,
               subtotal, "shippingFee" AS shipping_fee, "totalAmount" AS total_amount,
               status::text AS status, "paymentStatus"::text AS payment_status,
               "paymentMethod" AS payment_method, "paidAt" AS paid_at,
@@ -127,7 +130,9 @@ export class CheckoutFulfillmentBridgeService {
       return { bridged: false, skippedReason: 'PAYMENT_NOT_READY' };
     }
 
-    // 3. idempotency — 이미 bridge 된 주문이면 기존 반환
+    // 3. idempotency — 이미 bridge 된 주문이면 기존 반환.
+    //   WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: 선조회만으로는 동시 실행(결제 확인 재요청 · 복구 경로)에서
+    //   neture_orders 가 2건 생길 수 있었다(unique 없음). 아래 트랜잭션 안에서 주문별 advisory lock 후 다시 확인한다.
     const existing = await this.dataSource.query(
       `SELECT id::text AS id FROM neture_orders WHERE metadata->>'checkoutOrderId' = $1 LIMIT 1`,
       [checkoutOrderId],
@@ -147,7 +152,17 @@ export class CheckoutFulfillmentBridgeService {
 
     // 4. 트랜잭션: neture_order + items 생성 (status=PAID — 이미 결제 완료)
     try {
+      let alreadyBridgedId: string | null = null;
       const netureOrderId = await this.dataSource.transaction(async (manager) => {
+        await manager.query(`SELECT pg_advisory_xact_lock(hashtext($1))`, [`checkout-fulfillment-bridge:${co.id}`]);
+        const [raced] = await manager.query(
+          `SELECT id::text AS id FROM neture_orders WHERE metadata->>'checkoutOrderId' = $1 LIMIT 1`,
+          [co.id],
+        );
+        if (raced) {
+          alreadyBridgedId = raced.id;
+          return raced.id as string;
+        }
         const orderRepo = manager.getRepository(NetureOrder);
         const itemRepo = manager.getRepository(NetureOrderItem);
 
@@ -183,6 +198,11 @@ export class CheckoutFulfillmentBridgeService {
             supplierId: co.supplier_id ?? null,
             // 취소·환불 추적축 — 그룹 결제는 PG 취소가 그룹 전체 단위로 일어난다.
             paymentGroupId: (md.paymentGroupId as string) ?? null,
+            // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: 공급자가 구매 매장을 식별하고 테스트 결제를 구분한다.
+            buyerOrganizationId: (md.sellerOrganizationId as string) ?? co.seller_organization_id ?? null,
+            buyerOrganizationName: (md.buyerOrganizationName as string) ?? null,
+            receiverKey: (md.receiverKey as string) ?? null,
+            testPayment: md.testPayment === true,
           },
         });
         const savedOrder = await orderRepo.save(order);
@@ -202,6 +222,9 @@ export class CheckoutFulfillmentBridgeService {
 
         return savedOrder.id;
       });
+      if (alreadyBridgedId) {
+        return { bridged: false, netureOrderId: alreadyBridgedId, skippedReason: 'ALREADY_BRIDGED' };
+      }
 
       logger.info('[CheckoutFulfillmentBridge] bridged paid checkout_order → neture_order', {
         checkoutOrderId: co.id,
