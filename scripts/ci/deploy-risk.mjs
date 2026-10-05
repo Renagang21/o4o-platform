@@ -64,7 +64,6 @@ const WEB_CLOUD_RUN = {
   lecture: 'lecture-web',
   store: 'store-web',
   'kpa-branch': 'kpa-branch-web',
-  'signage-player': 'signage-player-web',
   'hospital-pharmacy': 'hospital-pharmacy-web',
 };
 
