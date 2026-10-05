@@ -13,6 +13,8 @@
 > `ContentProducer` 는 `platform | service_operator | supplier | community | store` 로 정렬(구 `platform_admin / service_admin / store_operator` 는 `normalizeContentProducer()` 로 TEMP_COMPAT 정규화, Store Hub 단계에서 제거).
 > 논리 도메인 `ContentDomain = community | service | supplier | store` 를 producer · visibility 와 분리해 추가. `ContentServiceKey` 는 복제 union 대신 문자열 계약(정본 = `service-catalog.ts`).
 > KPA `kpa_contents` 의 producer 는 회원 작성 원장 계약에 따라 **`community`** 다 (종전 `service_admin` 고정은 drift). 공급자 원장 명칭은 `neture_supplier_library_items` (구 `neture_supplier_contents` 표기는 HISTORICAL_ONLY). 상세: [`CHECK-O4O-CONTENT-BOUNDARY-ALIGNMENT-V1`](../../checks/CHECK-O4O-CONTENT-BOUNDARY-ALIGNMENT-V1.md).
+>
+> **2026-10-04 정합 (본문)** — 본문의 `kpa_working_contents`(KPA Working) 는 **DROP 된 은퇴 테이블**이다. 현행 Layer 2(`working_copy`) = **Store 소유 독립 사본 `kpa_store_contents` · `o4o_asset_snapshots`** (`packages/types/src/content-meta.ts` `ContentType` 주석 · 원장→producer 매핑 `'store'`), 복사 모델은 [`O4O-ROLE-WORKSPACE-ARCHITECTURE-V1`](../../baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md) §6. §1 · §3 · §4 · §8 · §9 의 해당 칸에 주석을 달았다. **상태**: ACTIVE · **최종 갱신**: 2026-10-04.
 
 ---
 
@@ -27,7 +29,7 @@ O4O Platform의 콘텐츠는 서비스별로 독립된 테이블에 분산 저�
 | CMS | `cms_contents` | `authorRole`, `visibilityScope` 등 독자적 필드명 |
 | KPA Society | `kpa_contents` | `status`='draft'\|'ready', 자체 블록 구조 |
 | Neture | `neture_supplier_library_items` | `isPublic` boolean만 존재, 메타 없음 |
-| KPA Working | `kpa_working_contents` | 원본-복사본 관계, 메타 없음 |
+| KPA Working | `kpa_working_contents` *(2026-10-04 정합: DROP 됨 — 현행 working copy = `kpa_store_contents` · `o4o_asset_snapshots`)* | 원본-복사본 관계, 메타 없음 |
 | Store Execution | `store_execution_assets` | `isActive` boolean, 콘텐츠가 아닌 실행물 |
 
 각 테이블이 콘텐츠의 **생산자, 가시성, 유형, 상태**를 서로 다른 방식으로 표현했고, 이로 인해:
@@ -154,7 +156,7 @@ Neture `neture_supplier_library_items` 테이블에 ContentMeta 칼럼을 DB 레
 ├─────────────────────────────────────────────────────────┤
 │  Layer 2 — Working (작업 복사본)                          │
 │                                                         │
-│  kpa_working_contents            — 매장 복사/편집본        │
+│  kpa_store_contents · o4o_asset_snapshots — Store 소유 사본 │
 ├─────────────────────────────────────────────────────────┤
 │  Layer 3 — Execution (실행 결과물)                         │
 │                                                         │
@@ -163,6 +165,8 @@ Neture `neture_supplier_library_items` 테이블에 ContentMeta 칼럼을 DB 레
 ```
 
 **Layer 간 관계**: Layer 1 → (복사) → Layer 2 → (배포) → Layer 3
+
+> (2026-10-04 정합) Layer 2 는 작성 시점 `kpa_working_contents` 였으나 해당 테이블은 DROP 됐다. 현행 Layer 2 = `kpa_store_contents`(매장 직접 작성 · 사본 편집) · `o4o_asset_snapshots`(HUB/Community 복사 사본) — 둘 다 Store 소유 독립 사본(원본 변경 비전파 · `asset-copy-core`, ROLE-WORKSPACE §6).
 
 - **Layer 1**: 원본 콘텐츠. 생산자가 직접 작성/관리.
 - **Layer 2**: Layer 1의 복사본. 매장 운영자가 편집 가능. 원본과 독립.
@@ -195,7 +199,7 @@ interface ContentMeta {
 | 필드 | 의미 | 설명 |
 |------|------|------|
 | `producer` | **누가 만들었는가** | `platform`(플랫폼 관리자) · `service_operator`(서비스 운영자) · `supplier`(공급자) · `community`(회원) · `store`(매장). "어느 공간의 콘텐츠인가" 는 `ContentDomain`, "누가 보는가" 는 `visibility` 로 분리 |
-| `producerRef` | **생산자 식별자** | `created_by` (CMS), `supplier_id` (Neture), `owner_id` (Working) |
+| `producerRef` | **생산자 식별자** | `created_by` (CMS), `supplier_id` (Neture), `organization_id` (Store 사본 · 실행 자산 — 2026-10-04 정합, 구 `owner_id` (Working) 은 은퇴 테이블) |
 | `visibility` | **누가 볼 수 있는가** | `platform`=전체, `service`=서비스 내, `store`=매장 내, `personal`=본인만 |
 | `serviceKey` | **어떤 서비스 소속인가** | `visibility='service'`일 때 필수. 값 정본은 `service-catalog.ts`. `visibility='service'` 가 Service Content 도메인을 뜻하지는 않는다 |
 | `organizationId` | **어떤 조직 소속인가** | `visibility='store'`일 때 필수. 매장/조직 격리 |
@@ -311,7 +315,7 @@ Neture DB 통합 후 8개 시나리오 검증:
 | Neture Library | O | O | **O** | O |
 | CMS | O | O | - | O |
 | KPA Society | O | O | - | - |
-| KPA Working | O | - | - | - |
+| KPA Working → Store 사본 (`kpa_store_contents` · `o4o_asset_snapshots`, 2026-10-04 정합) | O | - | - | - |
 | Store Execution | O | - | - | - |
 
 - **O**: 구현 완료
@@ -339,7 +343,7 @@ Neture Library가 전체 파이프라인(타입 → API → DB → UI)을 완주
 | 1 | CMS | `content_type`, `visibility` DB 칼럼 추가 (Neture 패턴 적용) |
 | 2 | KPA Society | API 메타 필드 완성, UI 필터 추가 |
 | 3 | Store Execution | API 메타 필드 추가, `contentType='execution_asset'` 명시 |
-| 4 | KPA Working | `contentType='working_copy'` 메타 추가 |
+| 4 | Store 사본 (`kpa_store_contents` · `o4o_asset_snapshots` — 구 KPA Working, 2026-10-04 정합) | `contentType='working_copy'` 메타 추가 |
 
 ---
 

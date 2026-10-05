@@ -5,6 +5,9 @@
 > **대상 WO:** WO-O4O-KPA-STORE-PRODUCT-DETAIL-INFORMATION-CANONICAL-ROLE-DESIGN-V1
 > **선행:** IR-O4O-KPA-STORE-PRODUCT-INFO-CREATOR-ROLE-AND-REACHABILITY-AUDIT-V1 (판정 D) · O4O-STORE-MENU-CANONICAL-TREE-V1 §2.1 #1 · IR-O4O-KPA-MY-STORE-FULL-STRUCTURE-AUDIT-V1 (G1)
 > **최종 판정:** canonical "상품 상세정보" = **handled-products 중심 통합**(WO §1 옵션 1) · StoreProductDescriptions = **매장 자체 상품 설명 콘텐츠 저작으로 역할 한정 유지** · StoreProductInfoCreator = **은퇴(WO §9 옵션 A/B)**. 신규 테이블 0 · migration 사실상 0.
+> **상태**: ACTIVE · **최종 갱신**: 2026-10-04 (매장 보완 설명 저장소를 `product_ai_contents` → `store_local_products.detail_html` 로 정합 · POP/태블릿/ProductInfoCreator 현행 상태 주석)
+>
+> (2026-10-04 정합) 이 문서의 "`product_ai_contents` = 매장 자체 보완 설명" 서술은 이틀 뒤 [`DESIGN-O4O-PRODUCT-AI-CONTENT-OWNERSHIP-AND-STORE-DESCRIPTION-CONTRACT-V1`](DESIGN-O4O-PRODUCT-AI-CONTENT-OWNERSHIP-AND-STORE-DESCRIPTION-CONTRACT-V1.md) §1~§4 · §8 로 대체됐다 — `product_ai_contents` 는 **플랫폼 소유 전역 AI 초안**(매장 쓰기 금지)이고, 매장 자체 상품 설명의 canonical 저장 위치는 **`store_local_products.detail_html`** 이다(구현: [`CHECK-O4O-STORE-PRODUCT-DESCRIPTION-OWNERSHIP-ALIGNMENT-V1`](../checks/CHECK-O4O-STORE-PRODUCT-DESCRIPTION-OWNERSHIP-ALIGNMENT-V1.md)). 아래 본문의 해당 칸은 이 기준으로 읽는다. canonical "상품 상세정보" = handled-products 중심이라는 결론은 그대로 유효하다.
 
 ---
 
@@ -25,14 +28,14 @@ canonical 슬롯에 다음을 **함께 넣지 않는다**: 자유 HTML 노트 �
 | route | `/store/execution/product-info` **[UNREACHABLE]** | `/store/marketing/product-descriptions` **[REACHABLE·자료함 제작 플로우]** | `/store/handled-products` **[REACHABLE·사이드바 "매장 경영활용 제품"]** |
 | 시작점 | 직접 URL (진입점 0) | 자료함 → 제작 시작 → 상품 상세설명 (`ProductionRouterState`) | 사이드바 → 제품 목록 → 1건 선택 |
 | 상품 결속 | **없음** (자유 제목 텍스트) | LocalProduct(`fetchLocalProducts`)·productId | listing/local UNION(OPL+store_local_products)·sourceType/sourceId |
-| 저장 대상 | `store_execution_assets`(category='product-info') | `product_ai_contents`(contentType='product_description') | **저장 안 함**(O4O 원본 읽기 전용 조회) |
+| 저장 대상 | `store_execution_assets`(category='product-info') | `product_ai_contents`(contentType='product_description') — *(2026-10-04 정합: 현행 = `store_local_products.detail_html`)* | **저장 안 함**(O4O 원본 읽기 전용 조회) |
 | 편집 가능 정보 | 자유 제목+HTML | 상품별 설명 본문(RichTextEditor·template) | 없음(뷰)·단 제품 추가/제거·요청 |
 | O4O 원본 관계 | 무관 | 무관(매장 자체 생성물) | **STORE 설명서=`shared_product_descriptions`(description_type='STORE') 원본 읽기 전용** |
 | 다국어 | ❌ | ❌ | ✅ (다국어 STORE 설명서 조회 + `store_multilingual_product_content_*`) |
 | QR 연결 | ❌ (안내문만) | ❌ | ✅ (`StoreProductQrModal`·master 기준 고정 QR·항상 사용 가능) |
 | 자료함 노출 | ⚠️ 우연(무필터 자료함 목록) | 제작 결과물로 노출 | — |
-| POP 연결 | ❌ | ✅ (`ProductPopBuilderPage` 가 `getProductAiContents` 소비) | 제품 선택→콘텐츠 만들기 진입 |
-| 태블릿 연결 | ❌ | ✅ (`tabletDisplays.ts` 가 product_ai_contents 소비) | — |
+| POP 연결 | ❌ | ✅ (`ProductPopBuilderPage` 가 `getProductAiContents` 소비) — *(2026-10-04 정합: `ProductPopBuilderPage` 은퇴 → POP V2 로 redirect, [`O4O-STORE-POP-V2-CANONICAL-MODEL-V1`](../architecture/O4O-STORE-POP-V2-CANONICAL-MODEL-V1.md))* | 제품 선택→콘텐츠 만들기 진입 |
+| 태블릿 연결 | ❌ | ✅ (`tabletDisplays.ts` 가 product_ai_contents 소비) — *(2026-10-04 정합: 태블릿은 `product_ai_contents` 를 소비하지 않음, local 상품 상세는 `store_local_products.detail_html` — OWNERSHIP 설계 §2.2 · §6.1)* | — |
 | 실제 소비처 | **생산 소비 0** (자료함 우연 노출뿐) | POP·태블릿·제작자료 | 취급상품 화면 (조회·QR) |
 | 사용자 업무 목적 | 없음(고립) | 상품별 매장 자체 설명 작성 | O4O 상품 조회·활용 허브 |
 
@@ -46,9 +49,11 @@ canonical 슬롯에 다음을 **함께 넣지 않는다**: 자유 HTML 노트 �
 |-----------|----------|------|--------|---------------|
 | `shared_product_descriptions` (SPD) | **O4O 표준 원본** (공급자→운영자 canonical, per (master,type,language)) | 매장 **편집 금지**(읽기 전용 조회) | handled-products STORE 설명서 보기 + 다국어 + QR 랜딩 | "상품 상세정보"의 **조회 대상 SSOT** |
 | `product_ai_contents` (contentType='product_description') | **매장 자체** per-product 보완 설명 | 매장 편집 O (RichTextEditor) | ProductPopBuilderPage·tabletDisplays·StoreProductionMaterialsPage | "매장 자체 보완 설명" (§6.2 매장 추가 콘텐츠) |
+| *(2026-10-04 정합 — 위 행 대체)* `store_local_products.detail_html` | **매장 소유** 자체 상품 상세 설명 (`organization_id` scope) | 매장 편집 O (`StoreProductDescriptionsPage`) | 태블릿 상세 · 매장 설명 화면 | "매장 자체 보완 설명" — `product_ai_contents` 는 플랫폼 소유 전역 AI 초안(매장 쓰기 금지) |
 | `store_execution_assets` (category='product-info') | 매장 자유 노트 (**상품 비결속**) | 매장 편집 O | **생산 소비 0** (자료함 우연 노출뿐) | **canonical 부적합** (§6.1 위반) |
 
 **§6.2 소유권 경계 이미 코드에 반영됨:** handled-products 는 O4O STORE 설명서를 "복사하지 않고 읽기 전용 조회"(`StoreHandledProductsPage.tsx:7`), product_ai_contents 는 매장 소유 별도 콘텐츠. 원본/매장보완이 테이블 수준에서 분리되어 있다.
+> (2026-10-04 정합) 매장 보완의 소유 저장소는 `store_local_products.detail_html` 이다. `product_ai_contents` 는 매장 소유가 아니다 (OWNERSHIP 설계 §1 · §2).
 
 ---
 
@@ -62,7 +67,7 @@ WO §7 권장안 = 코드 현실과 일치. canonical "상품 상세정보"의 �
   → 매장용(STORE) 상세설명서 보기   [shared_product_descriptions, 읽기 전용]
   → 다국어 콘텐츠                   [다국어 STORE 설명서 + multilingual content]
   → 상품 QR 출력                    [store_qr_codes, master 기준 고정 QR]
-  → (필요 시) 상품별 매장 자체 설명 작성  [콘텐츠 만들기 → StoreProductDescriptions, product_ai_contents]
+  → (필요 시) 상품별 매장 자체 설명 작성  [콘텐츠 만들기 → StoreProductDescriptions, store_local_products.detail_html (2026-10-04 정합 · 구 product_ai_contents)]
 ```
 
 `StoreHandledProductsPage.tsx:261` 이 이미 이 동선을 명문화: *"실제 작업(매장용 상세설명 보기 / 콘텐츠 만들기 / 다국어 QR)은 제품을 선택한 뒤 수행합니다."*
@@ -74,13 +79,14 @@ WO §7 권장안 = 코드 현실과 일치. canonical "상품 상세정보"의 �
 - **정식 시작 화면:** `StoreHandledProductsPage` (`/store/handled-products`, 사이드바 "매장 경영활용 제품").
 - **상품 식별 기준:** `sourceType`(listing|local) + `sourceId` → O4O 취급상품(OPL) 또는 매장 자체 상품(store_local_products). ProductMaster 는 STORE 설명서·QR 조회의 근거 master.
 - **조회 정보:** O4O STORE 상세설명서(SPD, 다국어), 상품 QR(master 기준).
-- **편집 가능 정보:** O4O 원본은 **편집 불가**(읽기 전용). 매장 보완은 product_ai_contents 를 통해서만(콘텐츠 만들기 경유).
+- **편집 가능 정보:** O4O 원본은 **편집 불가**(읽기 전용). 매장 보완은 product_ai_contents 를 통해서만(콘텐츠 만들기 경유). *(2026-10-04 정합: 현행은 `store_local_products.detail_html` — 매장 자체 상품 한정. 표준 상품의 매장 특화 문구는 매장 콘텐츠(자료함)로 간다, OWNERSHIP 설계 §2.3)*
 
 ---
 
 ## 6. StoreProductDescriptionsPage 처리 → **역할 한정 유지**
 
 - **유지.** 은퇴/통합 대상 아님. 이유: 상품 결속(product_ai_contents·productId)되고 **실제 소비처가 있다**(POP 빌더·태블릿·제작자료). §6.1·§6.3 충족.
+  > (2026-10-04 정합) 현행 결속 = `store_local_products.id` → `detail_html`. POP 빌더(`ProductPopBuilderPage`)는 은퇴해 POP V2 로 redirect 된다 · 태블릿 상세가 `detail_html` 을 소비한다. 화면 유지 판정은 불변.
 - **역할 한정:** "상품별 **매장 자체** 설명 콘텐츠 작성·관리 전용" (O4O STORE 원본 조회와는 다른 축 — 매장 보완 콘텐츠). canonical "상품 상세정보" 슬롯 **자체는 아님**(그 슬롯은 handled-products 의 조회·활용). ProductDescriptions 는 그 동선의 "상품별 매장 자체 설명 작성" 하위 단계.
 - 진입은 현행대로 자료함 제작 플로우(ProductionRouterState) 유지. 신규 독립 "상품 상세정보" 사이드바 메뉴로 승격하지 않는다.
 
@@ -89,6 +95,8 @@ WO §7 권장안 = 코드 현실과 일치. canonical "상품 상세정보"의 �
 ## 7. StoreProductInfoCreatorPage 처리 → **은퇴 (A/B)**
 
 WO §9 판정: **A(통합 후 은퇴) ~ B(즉시 은퇴) 사이. 실질 B 에 가까움.**
+
+> (2026-10-04 정합) **실행 완료** — 2026-07-27 즉시 은퇴(B) 구현: 컴포넌트 제거 · `/store/execution/product-info` 는 `/store/handled-products` 로 redirect ([`CHECK-O4O-KPA-STORE-PRODUCT-INFO-CREATOR-IMMEDIATE-RETIREMENT-V1`](../checks/CHECK-O4O-KPA-STORE-PRODUCT-INFO-CREATOR-IMMEDIATE-RETIREMENT-V1.md) · `services/web-kpa-society/src/App.tsx` `execution/product-info` Navigate). 아래 §8.3 · §11 의 후속 항목은 이 기준으로 읽는다.
 
 근거:
 - 상품 비결속 자유 HTML → **§6.1(상품 결속 필수) 위반** → canonical "상품 상세정보" 로 인정 불가.
@@ -136,13 +144,13 @@ WO §8 4택 중 **"handled-products 내부 액션"** 선택. 별도 독립 사�
 ## 9. 데이터·migration 필요 여부 → **신규 테이블 0 · migration 사실상 0**
 
 WO §10 우선순위 적용:
-1. **기존 상품별 매장 콘텐츠 구조 재사용:** ✅ `product_ai_contents` 가 이미 상품 결속 + 소비처 보유. canonical 동선은 이를 그대로 사용.
+1. **기존 상품별 매장 콘텐츠 구조 재사용:** ✅ `product_ai_contents` 가 이미 상품 결속 + 소비처 보유. canonical 동선은 이를 그대로 사용. *(2026-10-04 정합: 재사용 대상은 `store_local_products.detail_html` — 신규 스키마 0 결론은 동일)*
 2. 기존 다국어 구조 확장: 불필요(현행 다국어 조회로 충족).
 3. 기존 자료함 콘텐츠와 상품 연결: 불필요.
 4. **신규 테이블: 불필요.**
 
 - **migration:** canonical 역할 확정만으로는 스키마 변경 없음. product-info 은퇴 시에도 `store_execution_assets` 는 다른 category 가 공용하므로 **테이블 삭제 금지**. 잔존 row 는 soft 처리(존재 시) — migration 이 아니라 데이터 정리 판단(후속 WO).
-- **금지 항목 확인(WO §10):** O4O 표준 설명서 복사 안 함(읽기 전용 유지) · 동일 설명 다중 테이블 중복 저장 안 함 · 상품 비결속 콘텐츠를 상품 상세정보로 취급 안 함(product-info 은퇴로 해소) · QR/태블릿/POP 별 별도 원본 생성 안 함(product_ai_contents 단일 원본 재사용).
+- **금지 항목 확인(WO §10):** O4O 표준 설명서 복사 안 함(읽기 전용 유지) · 동일 설명 다중 테이블 중복 저장 안 함 · 상품 비결속 콘텐츠를 상품 상세정보로 취급 안 함(product-info 은퇴로 해소) · QR/태블릿/POP 별 별도 원본 생성 안 함(product_ai_contents 단일 원본 재사용 — *2026-10-04 정합: 매장 원본은 `store_local_products`, POP 은 POP V2 Document*).
 
 ---
 

@@ -5,6 +5,7 @@
 - **성격**: 설계 확정 — 구현 0 / schema 0
 - **근거**: [`IR-O4O-KCOS-STORE-ASSETS-AND-LIBRARY-CONTENT-CANONICAL-SCOPE-AUDIT-V1`](../investigations/IR-O4O-KCOS-STORE-ASSETS-AND-LIBRARY-CONTENT-CANONICAL-SCOPE-AUDIT-V1.md)
 - **선행 정본**: CLAUDE.md §5 (Store Production Material) · §7 (Boundary Policy) · `O4O-STORE-CONTENT-AND-EXECUTION-MODEL-V1`
+- **상태**: ACTIVE · **최종 갱신**: 2026-10-04 (§1 매장 소유 범위에 HUB 복사 스냅샷(`o4o_asset_snapshots`) 포함 정합 · §7 구현 상태 갱신)
 
 ---
 
@@ -33,6 +34,8 @@ WO §14 는 "canonical source 를 명확히 확정할 수 있을 때만" DESIGN 
 | POP V2 | `store_pop_documents` | 동일 | 6 · 4 · 4 |
 
 이 두 축(+POP V2/QR)이 **매장이 자기 것으로 소유하는 자료**의 전부다.
+
+> (2026-10-04 정합) 위 문장은 **매장이 직접 만든(원천) 자료** 기준이다. [`O4O-ROLE-WORKSPACE-ARCHITECTURE-V1`](../baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md) §6 에 따라 HUB · Community 에서 가져온 `o4o_asset_snapshots` 사본도 **Store 소유 독립 사본**이다(원본 변경 비전파 · `asset-copy-core`). 코드 계약도 같다 — `packages/types/src/content-meta.ts` 의 `working_copy` = `kpa_store_contents` · `o4o_asset_snapshots`. 따라서 매장 소유 자료 = [1] · [2] · POP V2/QR **+ HUB 복사 스냅샷**이며, §2 의 "스냅샷은 자료함의 1차 원천이 아니다" 는 *원천(생산) 축이 아니다* 라는 뜻이지 소유 주체가 매장이 아니라는 뜻이 아니다.
 
 ### 1-1. 이름 정정 없이 간다
 
@@ -129,3 +132,5 @@ TENANT ISOLATION                = CLOSED   (위험 경로 = KPA 하드 controlle
 POP V2 SOURCE READINESS         = CLOSED   (KPA 3 origin V2_RESOLVABLE_NOW · KCos cms 스냅샷은 §5 조건)
 IMPLEMENTATION                  = NOT_STARTED
 ```
+
+> (2026-10-04 정합) 구현은 이후 진행됐다 — KCos `/store-assets` 마운트 제거(`apps/api-server/src/routes/cosmetics/cosmetics.routes.ts` "(제거) /store-assets" 주석 · [`CHECK-O4O-KCOS-STORE-CHANNEL-ASSET-TENANT-CANONICAL-CLOSURE-V1`](../checks/CHECK-O4O-KCOS-STORE-CHANNEL-ASSET-TENANT-CANONICAL-CLOSURE-V1.md)) · KCos 자료함 콘텐츠 B+D 재정렬([`CHECK-O4O-KCOS-LIBRARY-CONTENT-BD-CANONICAL-REALIGNMENT-V1`](../checks/CHECK-O4O-KCOS-LIBRARY-CONTENT-BD-CANONICAL-REALIGNMENT-V1.md)) · `StoreContentsSelector` V2 이관([`CHECK-O4O-STORE-CONTENTS-SELECTOR-INLINE-POP-TO-V2-MIGRATION-V1`](../checks/CHECK-O4O-STORE-CONTENTS-SELECTOR-INLINE-POP-TO-V2-MIGRATION-V1.md)). 위 `NOT_STARTED` 는 작성 시점 값이다.

@@ -67,6 +67,8 @@ endAt 경과 → ended
 > DB 저장값: `pending` / `approved` / `canceled`
 > 런타임 계산값: `approved`(곧 시작) / `active`(진행중) / `ended`(종료)
 > 계산 함수: `resolveEventStatus()` — `apps/api-server/src/routes/kpa/services/event-offer.service.ts`
+>
+> (2026-10-04 정합) 현행 코드(`WO-O4O-EVENT-OFFER-DATA-LIFECYCLE-COMPLETION-V1`)의 **DB 저장값은 `pending` / `approved` / `rejected` / `canceled`** 이다 — 운영자 반려 시 `status='rejected'` · `is_active=false` · `rejected_reason`. 런타임 계산값(approved 분기)은 `upcoming`(시작 전) / `active` / `sold_out`(매진) / `ended`. 아래 컬럼 표의 `status` 값 목록도 이 기준으로 읽는다.
 
 ---
 

@@ -1,5 +1,8 @@
 /**
  * Neture 기본 가입 (약국 1 = 기본 가입 1 = 조직 1 = 내 매장 1)
+ *
+ * **인계 대상 — 인증 · 가입 트랙 (DESIGN §13)**: 가입 원장 · 신청 입력(자격 정보) · 상태 전이 · 운영자 승인/반려 ·
+ * 승인 orchestration 은 인증 · 가입 트랙 소유다. 조직 · 매장 연결은 pharmacy-store-link.ts(Store 트랙 계약)를 호출한다.
  * DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1 §3-1 · §5
  *
  * - 신청: 조직(type='pharmacy') + owner 관계 + 원장(pending) 을 한 트랜잭션에.
@@ -18,6 +21,7 @@ import {
   rowsOf,
 } from '../constants.js';
 import logger from '../../../utils/logger.js';
+import { createPharmacyStoreOrganization, updatePharmacyStoreProfile } from './pharmacy-store-link.js';
 
 export interface PharmacyApplicationInput {
   pharmacyName: string;
@@ -123,12 +127,7 @@ export class PharmacyMembershipService {
 
       if (existing) {
         // 재신청 — 같은 행 · 같은 조직(약국 1 : 매장 1).
-        await m.query(
-          `UPDATE organizations SET name = $2, business_number = $3,
-                  address = COALESCE($4, address), phone = COALESCE($5, phone), "updatedAt" = NOW()
-            WHERE id = $1`,
-          [existing.organization_id, input.pharmacyName, input.businessNumber, input.address, input.phone],
-        );
+        await updatePharmacyStoreProfile(m, existing.organization_id, input);
         const [row] = rowsOf(await m.query(
           `UPDATE neture_pharmacy_memberships npm
               SET status = 'pending', pharmacy_name = $2, business_number = $3, pharmacist_license_number = $4,
@@ -140,24 +139,14 @@ export class PharmacyMembershipService {
         return row;
       }
 
-      const [org] = await m.query(
-        `INSERT INTO organizations (name, code, type, business_number, address, phone, created_by_user_id, "isActive")
-         VALUES ($1, 'neture-pharm-' || substr(replace(gen_random_uuid()::text, '-', ''), 1, 12), 'pharmacy', $2, $3, $4, $5, true)
-         RETURNING id`,
-        [input.pharmacyName, input.businessNumber, input.address, input.phone, userId],
-      );
-      await m.query(
-        `INSERT INTO organization_members (organization_id, user_id, role, is_primary, joined_at, created_at, updated_at)
-         VALUES ($1, $2, 'owner', true, NOW(), NOW(), NOW())
-         ON CONFLICT (organization_id, user_id) DO NOTHING`,
-        [org.id, userId],
-      );
+      // Store 트랙 계약 — 약국 조직(= 내 매장) + owner 관계.
+      const organizationId = await createPharmacyStoreOrganization(m, userId, input);
       const [row] = await m.query(
         `INSERT INTO neture_pharmacy_memberships
            (organization_id, applicant_user_id, status, pharmacy_name, business_number, pharmacist_license_number)
          VALUES ($1, $2, 'pending', $3, $4, $5)
          RETURNING ${SELECT_COLUMNS.replace(/npm\./g, '')}`,
-        [org.id, userId, input.pharmacyName, input.businessNumber, input.pharmacistLicenseNumber],
+        [organizationId, userId, input.pharmacyName, input.businessNumber, input.pharmacistLicenseNumber],
       );
       return row;
     });

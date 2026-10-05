@@ -4,6 +4,7 @@
 > 향후 모든 유통참여형 펀딩 관련 IR/WO/구현은 본 문서의 운영 모델을 기준으로 판단한다.
 > **외부 표기**: 유통참여형 펀딩 / **내부 코드명**: Market Trial · market-trial · MarketTrial* (불변)
 > **작성일**: 2026-06-06
+> **상태**: ACTIVE · **최종 갱신**: 2026-10-04 (제품 정산 · 매장 랜딩 · 첫 주문 추적 · PG/checkout 절을 [`O4O-MARKET-TRIAL-CONTENT-ONLY-DOMAIN-BOUNDARY-V1`](../architecture/O4O-MARKET-TRIAL-CONTENT-ONLY-DOMAIN-BOUNDARY-V1.md)(2026-06-19) 로 대체 표기. 사람 중심 운영 · 운영자 오프라인 입금 확인은 유효 — 기록 정책은 [`O4O-MARKET-TRIAL-OFFLINE-SETTLEMENT-PAYMENT-POLICY-V1`](../architecture/O4O-MARKET-TRIAL-OFFLINE-SETTLEMENT-PAYMENT-POLICY-V1.md). 충돌 시 content-only 가 기준)
 > **관계**: [`IR-…-FUNCTIONAL-COMPLETENESS-AUDIT-V1`](../investigations/IR-O4O-NETURE-DISTRIBUTION-FUNDING-FUNCTIONAL-COMPLETENESS-AUDIT-V1.md)(기능 갭) · [`CHECK-…-OFFLINE-OPERATION-SAFETY-V1`](../investigations/CHECK-O4O-NETURE-DISTRIBUTION-FUNDING-OFFLINE-OPERATION-SAFETY-V1.md)(보안+오프라인 고지)
 
 ---
@@ -41,6 +42,8 @@ PG/checkout 및 포럼 자동 gate는 실제 운영 필요성이 확인될 때�
 9. 송금 완료자 중심으로 개발 진행, 피드백, 제품 정산 진행
 ```
 
+> (2026-10-04 정합) 9번의 "제품 정산"은 O4O 안의 제품 제공 · 정산 흐름이 아니다 — content-only 경계(§10 · §11)에 따라 펀딩 이후 실제 거래 · 발송 · 정산은 공급자가 O4O 외부에서 처리하며, O4O 에 남는 것은 오프라인 입금 확인 · 펀딩 처리 상태 기록뿐이다(OFFLINE-SETTLEMENT-PAYMENT-POLICY).
+
 ---
 
 ## 3. 역할 분담
@@ -60,6 +63,8 @@ PG/checkout 및 포럼 자동 gate는 실제 운영 필요성이 확인될 때�
 ---
 
 ## 3-A. 참여자 정산 선택권 우선 (제품 정산 vs 수익/현금성 정산)
+
+> **(2026-10-04 정합) 이 절의 제품 제공 · 매장 랜딩 추적 · 활용 상품(listingId) 연결 · first_order · adopted 신호와 아래 "반영 의무"(G6 매장 랜딩 추적 V2 등)는 [`O4O-MARKET-TRIAL-CONTENT-ONLY-DOMAIN-BOUNDARY-V1`](../architecture/O4O-MARKET-TRIAL-CONTENT-ONLY-DOMAIN-BOUNDARY-V1.md) §3 · §4 · §6 · §10 으로 폐기되었다(대체 기능 없음 — 참여 매장 도입 / 첫 주문 추적은 V1 범위에서 배제).** 정산 선택(`settlementChoice`) 등 settlement 기록은 O4O 정산이 아니라 오프라인 펀딩 처리 상태 기록으로만 유지된다 — [`O4O-MARKET-TRIAL-OFFLINE-SETTLEMENT-PAYMENT-POLICY-V1`](../architecture/O4O-MARKET-TRIAL-OFFLINE-SETTLEMENT-PAYMENT-POLICY-V1.md). 아래 본문은 2026-06-06 시점 기록이다.
 
 > **원칙 (2026-06-06 추가)**: 유통참여형 펀딩은 제품 정산을 통한 매장 랜딩을 핵심 목적으로 하지만, **참여자의 정산 선택권을 우선한다.** 참여자가 제품 정산을 선택한 경우에만 제품 제공 및 매장 랜딩 추적 대상으로 해석한다. 참여자가 수익 또는 현금성 정산을 선택한 경우에는 제품 랜딩 대상으로 자동 분류하지 않으며, 운영자는 해당 참여자를 수익 정산 대상으로 관리한다.
 
@@ -123,7 +128,7 @@ PG/checkout 및 포럼 자동 gate는 실제 운영 필요성이 확인될 때�
 | 참여 대상 제한(자격 gate, IR G3) | **보류** | 초기엔 누구나 신청 → 제품 개발자 검토 + 포럼 승인으로 사람-게이트. 시스템 제한은 운영 유연성을 떨어뜨림 |
 | 포럼 접근 자동 gate | **보류** | 포럼 승인/탈퇴는 제품 개발자 수동 운영 |
 | 제품 개발자 승인 + Neture 입금확인 자동 상태머신 | **보류** | 송금 확인·명단 공유는 운영자 수기 |
-| PG / checkout (IR G4) | **장기 보류** | 송금은 Neture 운영자 오프라인 수령. 실제 필요성 확인 후 별도 고도화 |
+| PG / checkout (IR G4) | **장기 보류** → (2026-10-04 정합) **폐기** — content-only 경계 §8 "결제 연결 · 정산 연결" 제공하지 않음 | 송금은 Neture 운영자 오프라인 수령. 실제 필요성 확인 후 별도 고도화 |
 | 상태 자동화 일반 | **최소화** | 수동 운영으로 필요 상태값 검증 후 단계적 자동화 |
 
 > ⚠️ 위 항목들은 "미구현 결함"이 아니라 **의도된 초기 운영 모델**이다. IR 의 "모집·참여·승인 + 운영자 수기 정산·이행 스켈레톤" 판정은 본 모델 관점에서 **초기 운영 모델에 부합**으로 재해석한다. (단, 보안 경계는 예외 — 무인증 노출은 이미 OFFLINE-OPERATION-SAFETY-V1 으로 해결)
@@ -138,6 +143,8 @@ PG/checkout 및 포럼 자동 gate는 실제 운영 필요성이 확인될 때�
 4. **그다음**: **운영자 송금 내역 관리** — Neture 운영자의 송금 수령·완료자 명단 관리·제품 개발자 공유
 5. **그다음**: 매장 랜딩 추적(G6)
 6. **장기**: PG/checkout(G4), 포럼 자동 연동
+
+> (2026-10-04 정합) 5번 매장 랜딩 추적(G6)과 6번 PG/checkout(G4)은 content-only 경계로 **폐기** — 후속 WO 대상이 아니다. 3번 G5 의 "제품 정산 기준 · 정산 제품 구성" 필드는 O4O 정산 데이터가 아니라 콘텐츠 안의 조건 안내(`expectedConditionText` 수준)로만 다룬다(content-only §12). 포럼 자동 연동은 content-only 문서가 다루지 않아 이 문서의 보류 상태 그대로다.
 
 ---
 

@@ -242,3 +242,51 @@ checks 1,713 · investigations 727 · work-orders 149 · ir 33 · 기타 3 (audi
 2. `docs/baseline/README.md` 의 상태 표기(3-ROLE-FLOW · KPA-ROLE-MATRIX · ROLE-POLICY · E-COMMERCE)가 색인과 다름 — 색인 기준으로 정렬
 3. `O4O-CORE-FREEZE-V1`(F10) 의 `RefreshToken.ts` 목록 stale(Identity V3 `refresh_tokens=DEAD_RETIRE`) — Frozen 본문이라 명시적 WO
 4. 판정 불가 11건 결정 · SUPERSEDED 3 과 기록물 14건의 위치 이전은 history 정비 WO 에서
+
+> 1~4 의 처리 결과는 §8 (2026-10-04).
+
+---
+
+## 8. 정본 최종 정합 (2026-10-04 · `WO-O4O-CANONICAL-DOC-FINAL-ALIGNMENT-V1`)
+
+기준 `origin/main` @ `9116db6af`. §7 에서 §9 판정 대기로 둔 28건과 판정 불가 11건을 **문서 전문**으로 다시 보고, 상위 정본(색인 §1 · §2) · 같은 주제의 더 최신 문서 · CHECK 의 구현 근거 · 코드와 대조했다. 낡은 사실(은퇴한 route · table · 화면 · 서비스 · AI · preset, 고정 버전, 운영 write probe)은 본문에 `(2026-10-04 정합)` 주석이나 사실 정정으로 바로잡았고, 새 사업 · 정책 결정이 필요한 것만 남겼다. 운영 DB 조회 · 쓰기 없음.
+
+### 8-1. 결과
+
+| 판정 | 수 | 문서 |
+|---|---:|---|
+| ACTIVE (색인 등재) | 20 | §9 에서 19 — O4O-STORE-RULES · DEBUG-SSR-TEST-PAGE-GUIDE · STORE-OWNER-RBAC-STANDARD · DESIGN-KPA-STORE-PRODUCT-DETAIL · DESIGN-PRODUCT-AI-CONTENT-OWNERSHIP · DESIGN-STORE-LIBRARY-AND-ASSET · DESIGN-STORE-EXECUTION-MANAGEMENT · CONTENT-META · APP-STANDARD-LIST-AND-MATRIX · APP-CONTENT-STANDARD-SPEC · PLAYWRIGHT-MCP · DATA-CLEANUP-IDENTIFICATION-SAFETY · STANDARD-LIST-PHASE1 · TEMPLATE-PRESETS · SHARED-SPACE-FRAME · SHARED-SPACE-BLOCKS · DISTRIBUTION-EVIDENCE-SEED · DISTRIBUTION-FUNDING-INITIAL · EventOffer-Operation-Policy. 판정 불가에서 1 — O4O-OPERATOR-USER-MANAGEMENT-STANDARD |
+| §9 판정 대기 유지 (결정 필요 — 행에 명시) | 7 | COSMETICS-DOMAIN-RULES · BUSINESS-SERVICE-RULES · CHECKOUT-STABLE-DECLARATION · KPA-ROLE-MATRIX · SIGNAGE-APPROVAL-ARCHITECTURE · INTERNAL-BETA-RUNBOOK · ALPHA-STATUS-DISPLAY-STANDARD |
+| SUPERSEDED | 1 | NETURE-DOMAIN-BOUNDARY-V1 → SUPPLIER-DOMAIN-BOUNDARY · B2B 주문 계약 |
+| OBSOLETE | 1 | NETURE-CAMPAIGN-ARCHITECTURE-FREEZE-V2 — 테이블 DROP migration(`20260301100000-ProductMasterCoreReset`) · 재생성 없음 · 검증된 스키마 스냅샷에 부재 |
+| DRAFT | 4 | PROMOTION CORE-EXTENSION-BOUNDARY · DATA-MODEL-AND-API-SCOPE · SLOT-CATALOG · UI-COMPONENT-STRATEGY — 공통 UI 미구현 · 실행/폐기 결정 전 |
+| 기록물 (정본 아님) | 4 | GUIDE-SECTIONKEY-MIGRATION · GUIDE-CONTENT-RESEED(COMPLETED 실행 기록 — 색인에서 제외) · KPA-OPERATOR-CANONICAL-STATE · KPA-MEMBERS-PRESENCE-DRIFT-DIAGNOSTICS(후속 미확인이라 ACTIVE · 기록물) |
+| 판정 보류 (색인 미등재) | 1 | MINEROCK600 CHARACTER-SHEET — 파일럿 산출물(파일럿 ≠ Canonical), 트랙 진행 중 |
+
+이로써 색인 §9 에는 원래 있던 3건(3-ROLE-FLOW 부분 SUPERSEDED · RETAIL-STABLE · E-COMMERCE-ORDER-CONTRACT)과 결정이 필요한 7건만 남는다.
+
+### 8-2. 그 밖의 정합
+
+- `baseline/README.md` — 색인이 상태 정본임을 명시하고 상태 4건을 색인과 일치시킴(3-ROLE-FLOW · KPA-ROLE-MATRIX · E-COMMERCE · ROLE-POLICY).
+- `O4O-CORE-FREEZE-V1`(F10) — §2.1 의 `RefreshToken.ts` 행만 취소선 · 사실 정정 주석(Identity V3 `refresh_tokens=DEAD_RETIRE`, 파일 부재). 구조 · 정책 변경 없음.
+- 같은 낡은 사실을 가진 범위 밖 2건도 정정: `O4O-STORE-MENU-CANONICAL-TREE-V1`(`product_ai_contents` 매장 소유 서술) · `EVENT-OFFER-COMMON-DOMAIN-V1`(DB 저장 상태에 `rejected` 누락).
+
+### 8-3. 결정이 필요한 항목 (사용자 판단)
+
+| 문서 | 필요한 결정 |
+|---|---|
+| COSMETICS-DOMAIN-RULES | "Core 테이블 · Core FK 금지" 와 `public.cosmetics_members`(users FK) 등의 관계 · 매장 신청 테이블의 연락처 · 사업자번호와 개인정보 저장 금지의 관계 |
+| BUSINESS-SERVICE-RULES | "OpenAPI 계약 우선"(`CLAUDE.md` §9) 유지(CI 게이트 재정의) 또는 폐기 |
+| CHECKOUT-STABLE-DECLARATION | storefront 조회 경로의 분류 · Stable 범위를 B2B 로 좁힐지 은퇴시킬지 |
+| KPA-ROLE-MATRIX | 분회 role 행렬 정본 위치 · kpa:admin/operator 의 전체 branch 접근 허용 유지 여부 |
+| SIGNAGE-APPROVAL-ARCHITECTURE | HQ 사이니지 직접 게시를 Platform Admin 전용으로 막을지, 현행 코드처럼 signage operator 전원 허용할지 |
+| INTERNAL-BETA-RUNBOOK | Internal Beta 단계 유지 · 종료와 대체 지표 |
+| ALPHA-STATUS-DISPLAY-STANDARD | "운영형 알파" 단계 존속 · Hero 표시 의무 |
+
+### 8-4. 범위 밖 발견 (별도 WO)
+
+1. `CLAUDE.md` §5 "3중 방어(런타임 Guard + 계약 + 스키마 검사)" — 런타임 Guard · OrderType 계약은 코드에 없고, `scripts/check-forbidden-tables.mjs` 는 CI 에 연결돼 있지 않다(패턴도 `@Entity({ name })` 형식을 못 잡고 B2B 파생 원장 `neture_orders` 를 금지 목록에 둔다). 진입점 문구 정정 또는 검사 재연결 판단 필요.
+2. `O4O-CORE-FREEZE-V1`(F10) §2.1 의 다른 stale 행 3개(`auth.controller.ts` · `user.service.ts` · `refresh-token.service.ts` 부재) — Frozen 예외 WO.
+3. `NETURE-DOMAIN-ARCHITECTURE-FREEZE-V3`(Frozen) 가 DROP 된 Campaign 을 Layer 5 로 서술 — Frozen 예외 WO.
+4. `PROMOTION-CORE-EXTENSION-BOUNDARY-V1` 원문 인코딩 손상(U+FFFD) 12곳.
+5. `docs/investigations/` 안의 CHECK 2건 위치 · SUPERSEDED/OBSOLETE/기록물 문서 이동 — history 정비 WO.

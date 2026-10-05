@@ -1,5 +1,7 @@
 # PROMOTION_DATA_MODEL_AND_API_SCOPE_V1
 
+> **상태**: DRAFT · Promotion 데이터 모델 · API 범위 초안(문서 끝 `Status: Draft`). §3.2 "Phase 1 변경 사항"(operator 권한)은 `WO-O4O-PROMOTION-SLOT-API-OPERATOR-V1` 로 구현됨(`apps/api-server/src/routes/cms-content/cms-content-slot.handler.ts` 의 `requireSlotAccess` — 본문의 "현재 `requireAdmin`" 서술은 stale). 프론트 `useSlotContent` 소비 경로(§3.1 · §4 Q3 · §5)는 미구현. 실행 · 폐기 결정 전까지 현재 기준 문서 아님 · **표기일**: 2026-10-04
+
 > Core 엔진 데이터 모델과 API 범위 정의
 
 ---

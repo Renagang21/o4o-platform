@@ -3,6 +3,16 @@
 > **Signage 승인형 모델 전환 아키텍처 설계**
 > WO-O4O-SIGNAGE-APPROVAL-ARCHITECTURE-DESIGN-V1
 > 2026-02-24
+>
+> **상태**: ACTIVE · **최종 갱신**: 2026-10-04 · 색인 §9 판정 대기(정책 결정 필요) — 상태 집합(`draft|pending|active|archived`) · 값 전환 migration · HQ status 전환 API 는 구현됐으나 전환 권한 규칙이 본문과 다르다(아래 정합 주석). 결정 필요 사항: **HQ(서비스 운영자) 사이니지의 `draft → active` 직접 게시를 Platform Admin 전용으로 막을지(본문), signage operator 전원에게 허용할지(현행 코드)** — 승인 개입은 서비스별 정책([`O4O-ROLE-WORKSPACE-ARCHITECTURE-V1`](../baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md) §2-1).
+>
+> **(2026-10-04 정합) 구현 현황** — `WO-O4O-SIGNAGE-APPROVAL-IMPLEMENTATION-V1`:
+> - 상태 값 · 데이터 전환 · CHECK 제약: 본문 §9 그대로 구현 (`apps/api-server/src/database/migrations/20260224500000-SignageApprovalStatusModel.ts`).
+> - 전환 표: `apps/api-server/src/routes/signage/dto/index.ts` `ALLOWED_STATUS_TRANSITIONS` = `draft→pending|active` · `pending→active|draft` · `active→archived` · **`archived→draft`(재활성 사이클 — 본문 §6 의 "archived = 최종 상태" 와 다름)**. `draft→archived` 는 없음.
+> - `draft→active` 는 **역할 구분 없이** `PATCH /api/signage/:serviceKey/hq/{media|playlists}/:id/status`(`requireSignageOperator`) 로 가능 — 본문 §4 의 "Platform Admin 전용" 검사는 코드에 없다(dto 주석만 "admin override"). ← **판정 대기 대상**
+> - HQ 생성 초기 상태: `global-content.service.ts` `status: dto.status || 'draft'` — 기본 draft 이나 DTO 값을 무시하는 강제(본문 §5-A/B)는 아니다.
+> - Supplier 경로(본문 §5-E): 이후 결정으로 **공급자 사이니지는 `pending` 을 거치지 않고 게시(active) 즉시 KPA 매장 HUB 노출** (`draft→active→archived→draft`, 승인 절차 0) — [`CHECK-O4O-NETURE-SUPPLIER-DIGITAL-SIGNAGE-AUTHORING-HUB-IMPORT-V1`](../checks/CHECK-O4O-NETURE-SUPPLIER-DIGITAL-SIGNAGE-AUTHORING-HUB-IMPORT-V1.md) · [`CHECK-O4O-SUPPLIER-SIGNAGE-HUB-TARGET-AND-MEDICATION-GUARD-ALIGN-V1`](../checks/CHECK-O4O-SUPPLIER-SIGNAGE-HUB-TARGET-AND-MEDICATION-GUARD-ALIGN-V1.md). 이 축은 기록된 결정이므로 본문 §4 Supplier 열 · §5-E 보다 우선한다.
+> - HUB 노출 조건(`status='active'` · `scope='global'` · `source IN (hq, supplier, community)`)과 "Store 경로 무변경" 은 본문과 일치.
 
 ---
 

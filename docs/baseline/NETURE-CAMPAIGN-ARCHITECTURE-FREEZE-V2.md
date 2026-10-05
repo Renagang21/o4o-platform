@@ -1,5 +1,7 @@
 # NETURE-CAMPAIGN-ARCHITECTURE-FREEZE-V2
 
+> **상태**: OBSOLETE · 근거: 두 Campaign 테이블(`neture_time_limited_price_campaigns` · `neture_campaign_aggregations`)은 `apps/api-server/src/database/migrations/20260301100000-ProductMasterCoreReset.ts`(WO-O4O-PRODUCT-MASTER-CORE-RESET-V1, 2026-03-01) Phase 1-1 에서 `DROP TABLE ... CASCADE` 됐고 이후 재생성 migration 없음 · production live fingerprint 와 동일 검증된 `canonical-schema-baseline.ts`(sourceCapturedAt 2026-09-18)에 두 테이블 없음 · runtime 코드(entity · service · `PRODUCT_NOT_OWNED_BY_SUPPLIER`) 0. 아래 본문(2026-02-28 V2 Freeze)은 이력으로만 읽는다. Campaign 기능을 다시 도입하려면 새 WO 로 설계한다 · **표기일**: 2026-10-04
+
 ## 1. 선언 목적
 
 본 문서는 Neture 도메인 내 "Campaign(기간 한정 특가)" 구조가

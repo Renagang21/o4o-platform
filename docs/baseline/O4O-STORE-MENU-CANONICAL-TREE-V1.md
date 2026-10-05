@@ -89,6 +89,7 @@ Neture 는 매장 기능이 없으므로 이 흐름의 구현 대상이 아니�
 > - "상품 상세정보" canonical = `/store/handled-products` 에서 **상품 선택 후 활용** (별도 사이드바 메뉴 신설 안 함).
 > - 주요 액션 = 매장용 STORE 상세설명서 보기(`shared_product_descriptions`, 읽기 전용) · 다국어 · 상품 QR · (필요 시) 매장 자체 설명 작성.
 > - 매장 자체 설명 = `StoreProductDescriptionsPage` / `product_ai_contents` (POP·태블릿 소비처 보유).
+>   - (2026-10-04 정합) 이후 소유권 정리로 `product_ai_contents` 는 **플랫폼 소유 전역 초안**(매장 쓰기 금지)이 되었고, 매장 자체 설명의 저장 위치는 `store_local_products.detail_html` 이다 — [PRODUCT-AI-CONTENT-OWNERSHIP 설계](../design/DESIGN-O4O-PRODUCT-AI-CONTENT-OWNERSHIP-AND-STORE-DESCRIPTION-CONTRACT-V1.md) §1~§4. 이 문서의 다른 표(상품 상세정보 행)에 있는 같은 서술도 이 기준으로 읽는다.
 > - `StoreProductInfoCreatorPage` / `store_execution_assets(product-info)` = **deprecated**, 운영 데이터 확인 후 은퇴 ([`IR-O4O-KPA-STORE-PRODUCT-INFO-RETIREMENT-DATA-GATE-V1`](../investigations/IR-O4O-KPA-STORE-PRODUCT-INFO-RETIREMENT-DATA-GATE-V1.md)).
 > - `store_execution_assets` 테이블 자체는 다른 category 공용 → 삭제 대상 아님.
 

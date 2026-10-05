@@ -6,6 +6,7 @@
 - **조사 근거**: [`IR-O4O-STORE-EXECUTION-ASSET-LOCATION-AND-UI-CENSUS-V1`](../investigations/IR-O4O-STORE-EXECUTION-ASSET-LOCATION-AND-UI-CENSUS-V1.md)
 - **선행 정본**: `O4O-STORE-CONTENT-AND-EXECUTION-MODEL-V1` · `O4O-STORE-COMMERCE-BOUNDARY-V1` · `O4O-STORE-MENU-CANONICAL-TREE-V1`
 - **전제**: Tablet KPA/PH canonical CLOSED · QR Target/ContentSource/Placement/Analytics CLOSED
+- **상태**: ACTIVE · **최종 갱신**: 2026-10-04 (§6-4 내 매장 playlist 원장을 `store_playlists` 로 정합 · §13 구현 1회차 완료 표기)
 
 ---
 
@@ -212,6 +213,8 @@ QR 91개 중 배치가 등록된 것은 **4개뿐**이고 backfill 은 하지 �
 **기기·설치 위치 entity 가 아예 없다.** `signage_displays`/`players` 미존재.
 `signage_playlists` 는 매장에만 묶이고 재생은 플레이어 URL 로 한다.
 
+> (2026-10-04 정합) 위 문장의 테이블명은 부정확하다. **내 매장 playlist 원장은 `store_playlists` / `store_playlist_items`**(KCos 는 `cosmetics_store_playlists`, 항목 = `o4o_asset_snapshots` 참조)이고, `signage_playlists` 는 서비스/HQ/커뮤니티 방송 미디어 카탈로그 원장이다 — [`O4O-SIGNAGE-STORE-PLAYLIST-MODEL-BOUNDARY-V1`](../baseline/O4O-SIGNAGE-STORE-PLAYLIST-MODEL-BOUNDARY-V1.md) §0 · §2 (통합 · dual-write 금지). "설치 표면 entity 없음 · 재생은 플레이어 URL · Corner 공유" 판정은 그대로 유효하다.
+
 > 판정: **"대기공간 TV" 를 표현하려면 설치 표면 entity 가 필요하다.**
 > Tablet 의 코너 모델과 **개념이 같다**(1 기기 = 1 설치 위치).
 > 따라서 **Signage 전용 location 모델을 따로 만들지 않는다** — 승격 시 Corner 를 공유한다.
@@ -366,6 +369,8 @@ MY STORE EXECUTION UX              = CLOSED  (제작/운영 2계층 · StoreChan
 KPA / PH PARITY PLAN               = CLOSED  (현재 불일치 실측 → 공통 Core 로 회복)
 IMPLEMENTATION                     = NOT_STARTED
 ```
+
+> (2026-10-04 정합) §11 1회차(실행 관리 홈 v1 — Tablet + QR)는 2026-09-10 구현 · 배포 완료 — [`CHECK-O4O-STORE-EXECUTION-HOME-TABLET-QR-V1`](../checks/CHECK-O4O-STORE-EXECUTION-HOME-TABLET-QR-V1.md). 위 `NOT_STARTED` 는 작성 시점 값이며 2회차 이후는 미착수.
 
 ### 13-1. 이 설계가 WO 원안과 다른 점 (명시)
 
