@@ -109,7 +109,7 @@ Assistant 가 Experience 를 대체하지 않는다. Assistant 는 Experience �
 | **Request Channel** | 요청이 들어온 곳 | O4O Web · 메신저 · 외부 AI · 기기 (§14) | Assistant · 기억 · 업무는 그대로. 결과 전달 방식만 다르다(§12) |
 | **Execution Node** | 실제로 화면 · 프로그램을 조작하는 곳 | PC(여러 대 가능) · Cloud Browser · 미래 노드 (§11) | Assistant · 업무 · Cloud 에 있는 기억은 그대로. 그 노드의 실행환경 상태(로그인 세션 · 현재 화면 · 로컬 파일 경로)와 노드 보관 원 기록이 다르다 — 사설 시스템 · Windows 앱 대상 절차 기억(M9)은 노드에만 있다(§11-1 (4) 예외) |
 
-- 기억 · 경험의 경계는 Work Context 중 **소유 주체**(§9-2 — USER = `userId` · ORGANIZATION = `organizationId`)다. 업무공간 · serviceKey 는 Task 의 문맥 · 권한 정보이며 **기억을 나누는 기준이 아니다** — 같은 소유 주체가 같은 대상을 다른 업무공간 · 서비스에서 다뤄도 기억은 하나로 이어진다. Execution Node 도 기억의 경계가 아니다(§9).
+- 기억 · 경험의 경계는 Work Context 중 **소유 주체**(§9-2 — USER = `userId` · ORGANIZATION = `organizationId`)다. 업무공간 · serviceKey 는 Task 의 문맥 · 권한 정보이며 **기억을 나누는 기준이 아니다** — 같은 소유 주체가 같은 대상을 다른 업무공간 · 서비스에서 다뤄도 기억은 하나로 이어진다. Execution Node 도 기억의 경계가 아니다(§9). 이것은 원칙이며, 현재 노드 원장은 소유 주체를 구분하지 못한다(§23 KNOWN GAP ①).
 - PC 라는 말은 물리 실행환경(Local Agent · Chrome 확장 · 실제 화면 조작)을 설명할 때 쓴다. **"PC = Assistant 의 기억 · 업무 · 자동화의 경계"** 로 쓰지 않는다.
 
 ---
@@ -346,7 +346,7 @@ Lower-cost Reasoning 단계는 유지한다. "속도는 약한 모델로 해결�
 |---|---|---|
 | Phase A — production 에서 run 이 Task 에 붙는 장면(`run↔task 연결` PENDING) | **Task → Run 연결**: integration 은 격리 PG 실DB · boundary spec 으로 검증됨. production 장면은 Execution Runtime smoke | capability(Local Agent + 확장)를 가진 아무 Execution Node |
 | Phase B §6-2 — 실행 지시가 planner 에 실리고 ExecutionReport 로 Task 가 판정되는 장면 | **Execution Report → Task 판정**: integration(주입 실행 본체 · runtime harness). 실제 화면 장면은 Execution Runtime smoke | 같음 |
-| Phase C — 다른 노드에서 기억이 이어지는 장면 | **Node-independent Memory Continuity**: integration(빈 노드 원장 주입 harness). 실제 화면 장면은 Execution Runtime smoke | capability 를 가진 노드 중 **이전 실행이 없던 노드 또는 로컬 원장이 비어 있음을 확인한 노드** — 같은 노드의 `local.db` 에서 읽혀 성공하면 노드 독립을 검증하지 못한다 |
+| Phase C — 다른 노드에서 기억이 이어지는 장면 | **Node-independent Memory Continuity — 부분**: integration 은 빈 노드 원장 fallback 만 검증한다. 노드 원장에 기존 기억이 있어 Cloud 기억과 충돌하는 경우는 현재 노드 쪽이 이긴다(§23 KNOWN GAP ②) — 이 경우는 검증된 연속성으로 판정하지 않는다. 실제 화면 장면은 Execution Runtime smoke | capability 를 가진 노드 중 **이전 실행이 없던 노드 또는 로컬 원장이 비어 있음을 확인한 노드** — 같은 노드의 `local.db` 에서 읽혀 성공하면 노드 독립을 검증하지 못한다 |
 
 CHECK 에 적힌 "사무실 PC" 는 당시 그 capability 를 가진 노드가 그것뿐이었다는 기록이다. 위 Runtime smoke 는 한 번의 실측 세션에서 함께 확인할 수 있다. Phase A · B 장면은 어느 노드에서 하든 같고, Phase C 장면만 위 빈 노드 조건을 지킨다(특정 PC 이름이 아니라 노드의 상태가 조건이다).
 
@@ -597,6 +597,16 @@ V1 에서 **승계하지 않는 것**: Local-first 저장 원칙(ARCH §5 의 Lo
 | L4 Execution | EXISTS | GAP-CENSUS §F |
 | L5 Execution Node | EXISTS — **runtime 한계**: 사용자의 온라인 노드가 2대 이상이면 `resolveTargetDevice` 가 `ambiguous` 로 중단 · capability 선언 · 선택 없음. §11-1 (5) 원칙과 어긋나는 현재 구현이며 단계 D 범위(원칙 아님). 사용자에게도 "연결된 PC가 여러 대여서 어느 PC인지 확정할 수 없습니다" 로 안내하고 멈춘다(`ai-tool-router.ts` · `hospital-drug-composite.ts`) — 노드 정리를 사용자에게 넘기는 흐름이므로 §3 (5) 와 어긋나는 **KNOWN GAP**(2026-10-05 확인) | GAP-CENSUS §I |
 | Memory 배치 | **Cloud Continuity 구현** — 소유 주체 전용 Cloud 에 검증된 방법(M3 · 공개 사이트 대상) · 재개 구조(M5)를 저장하고 Assistant Memory 가 recall → ExecutionIntent → Execution 이 노드 원장과 합쳐 현재 화면으로 재검증. Task type 이력도 Cloud. 도움 · 교정 · 실행 원기록(M7 · M8)과 결정적 재생 단계(Workflow Candidate)는 노드. §17 Compliance Gate PENDING(실사용 확대 전 점검) | GAP-CENSUS §G · Phase C CHECK · Cloud Continuity 커밋 |
+
+**노드 원장 KNOWN GAP (2026-10-05 확인 · 원칙이 아니라 현재 구현)**
+
+| # | 현재 구현 | 어긋나는 원칙 | 근거 |
+|---|---|---|---|
+| ① | 노드 원장(`local_experience_patterns` 등)에 소유 주체 칸이 없다 — unique key · recall 이 `target_id` · `task_key` 만 쓴다. 한 노드에서 조직 A · B 의 업무를 모두 하면 A 에서 생긴 노드 기억(M7 · M8 · M9)이 B 의 실행 근거로 섞인다 | §3-1 · §9-2 기억 경계 = 소유 주체 | `tools/o4o-local-agent/src/local-db.mjs` (`local_experience_patterns` UNIQUE) |
+| ② | 노드 기억과 Cloud 기억을 합칠 때 노드 쪽이 먼저이고, 같은 stage · 같은 방법이면 노드 쪽 극성을 남긴다 — 오래된 노드 `avoid` 가 최신 Cloud `preferred` 를 가릴 수 있다 | §11-1 (4) 노드가 바뀌어도 같은 기억 · Node-independent Continuity | `work-assistance.ts` `mergeRecalledPatterns` |
+| ③ | 다중 노드 `ambiguous` 중단 · 사용자에게 PC 정리를 넘기는 안내 (위 L5 행) | §3 (5) · §11-1 (5) | `resolveTargetDevice` · `ai-tool-router.ts` |
+
+①② 는 노드 원장에 소유 주체를 저장 · 필터하고 병합 우선순위를 정하는 구현 WO 의 범위이며, 그 전까지 노드 원장을 소유 주체 경계 · 노드 독립 연속성의 **현재 보장**으로 단정하지 않는다.
 
 이 표는 시점 기록이다. 갱신할 때는 이 절만 고치고 본문 원칙은 바꾸지 않는다.
 
