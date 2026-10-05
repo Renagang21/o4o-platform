@@ -595,7 +595,7 @@ V1 에서 **승계하지 않는 것**: Local-first 저장 원칙(ARCH §5 의 Lo
 | L2 Task | EXISTS — `assistant_tasks` 1급 객체 · Task 1:N run · 완료 계약으로 상태 판정(planner `done` 은 주장) | Phase A · B CHECK |
 | L3 Skill / Discovery | PARTIAL (Candidate · adapter seed · Strong-first routing) | GAP-CENSUS §J · §M |
 | L4 Execution | EXISTS | GAP-CENSUS §F |
-| L5 Execution Node | EXISTS — **runtime 한계**: 사용자의 온라인 노드가 2대 이상이면 `resolveTargetDevice` 가 `ambiguous` 로 중단 · capability 선언 · 선택 없음. §11-1 (5) 원칙과 어긋나는 현재 구현이며 단계 D 범위(원칙 아님) | GAP-CENSUS §I |
+| L5 Execution Node | EXISTS — **runtime 한계**: 사용자의 온라인 노드가 2대 이상이면 `resolveTargetDevice` 가 `ambiguous` 로 중단 · capability 선언 · 선택 없음. §11-1 (5) 원칙과 어긋나는 현재 구현이며 단계 D 범위(원칙 아님). 사용자에게도 "연결된 PC가 여러 대여서 어느 PC인지 확정할 수 없습니다" 로 안내하고 멈춘다(`ai-tool-router.ts` · `hospital-drug-composite.ts`) — 노드 정리를 사용자에게 넘기는 흐름이므로 §3 (5) 와 어긋나는 **KNOWN GAP**(2026-10-05 확인) | GAP-CENSUS §I |
 | Memory 배치 | **Cloud Continuity 구현** — 소유 주체 전용 Cloud 에 검증된 방법(M3 · 공개 사이트 대상) · 재개 구조(M5)를 저장하고 Assistant Memory 가 recall → ExecutionIntent → Execution 이 노드 원장과 합쳐 현재 화면으로 재검증. Task type 이력도 Cloud. 도움 · 교정 · 실행 원기록(M7 · M8)과 결정적 재생 단계(Workflow Candidate)는 노드. §17 Compliance Gate PENDING(실사용 확대 전 점검) | GAP-CENSUS §G · Phase C CHECK · Cloud Continuity 커밋 |
 
 이 표는 시점 기록이다. 갱신할 때는 이 절만 고치고 본문 원칙은 바꾸지 않는다.
