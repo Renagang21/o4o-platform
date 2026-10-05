@@ -16,6 +16,7 @@ import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import { DataTable } from '@o4o/ui';
 import type { Column } from '@o4o/ui';
 import { toast } from '@o4o/error-handling';
+import { pharmacyStorePath } from '../neture-pharmacy/shared';
 import { getOrderable, type OrderableProduct, type OrderableSourceTab } from '../../api/pharmacyProducts';
 import { colors, borderRadius } from '../../styles/theme';
 import { EventOfferContentPanel } from '../../components/event-offer/EventOfferContentPanel';
@@ -46,8 +47,8 @@ const SOURCE_BADGE: Record<OrderableProduct['sourceType'], { text: string; color
 };
 
 const EMPTY_STATE: Record<OrderableSourceTab, { title: string; desc: string }> = {
-  all: { title: '현재 주문할 수 있는 상품이 없습니다', desc: '매장 허브 상품 카탈로그에서 상품을 선택하면 주문 상품에 추가됩니다.' },
-  b2b: { title: '현재 주문할 수 있는 B2B 상품이 없습니다', desc: '매장 허브 상품 카탈로그에서 공급 상품을 선택하세요.' },
+  all: { title: '현재 주문할 수 있는 상품이 없습니다', desc: '내 매장의 공급 상품 화면에서 가입한 세미프랜차이즈의 공급 상품을 바로 주문할 수 있습니다.' },
+  b2b: { title: '현재 주문할 수 있는 B2B 상품이 없습니다', desc: '내 매장의 공급 상품 화면에서 공급 상품을 확인하세요.' },
   operator: { title: '현재 운영자 승인 주문 가능 상품이 없습니다', desc: '운영자 승인(SERVICE) 완료 후 주문할 수 있습니다.' },
   event: { title: '현재 진행 중인 이벤트·특가 상품이 없습니다', desc: '이벤트 홈에서 안내를 확인하세요.' },
   'seller-recruitment': { title: '판매자 모집 신청 후 승인된 주문 가능 상품이 없습니다', desc: '판매자 모집에 신청하고 공급자 승인을 받으면 여기에 표시됩니다.' },
@@ -423,7 +424,7 @@ export function PharmacyB2BPage() {
               <span style={styles.emptyIcon}>📦</span>
               <h3 style={styles.emptyTitle}>{EMPTY_STATE[activeSource].title}</h3>
               <p style={styles.emptyDesc}>{EMPTY_STATE[activeSource].desc}</p>
-              <Link to="/hub/b2b" style={styles.emptyAction}>상품 카탈로그 →</Link>
+              <Link to={pharmacyStorePath('supply')} style={styles.emptyAction}>공급 상품 →</Link>
             </div>
           ) : (
             <>

@@ -24,7 +24,7 @@ import { getUserDisplayName } from '@o4o/account-ui';
 import { authClient, useAuth } from '../../contexts/AuthContext';
 import { useUnifiedStore } from '../../contexts/StoreContext';
 import { fetchStoreCapabilities } from '../../api/storeHub';
-import { UNIFIED_STORE_CONFIG } from '../../config/storeMenu';
+import { UNIFIED_STORE_CONFIG, withPharmacyStoreMenu } from '../../config/storeMenu';
 import { WORKSPACE_PATHS } from '../../config/workspace';
 import {
   SERVICE_LABEL,
@@ -72,9 +72,14 @@ export default function UnifiedStoreLayout() {
   if (scopedPath) return <Navigate to={scopedPath} replace />;
   return (
     <StoreAgreementGate serviceKey={effectiveServiceKey}>
-      <StoreWorkDashboard config={UNIFIED_STORE_CONFIG} withCapabilities />
+      <StoreWorkDashboard config={storeMenuFor(effectiveServiceKey, UNIFIED_STORE_CONFIG)} withCapabilities />
     </StoreAgreementGate>
   );
+}
+
+/** 약국(kpa-society) 문맥에만 Neture 약국 메뉴(상품 · 주문 · 세미프랜차이즈 · 기본 가입)를 붙인다 — WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1 */
+function storeMenuFor(serviceKey: UnifiedServiceKey | null | undefined, menu: StoreDashboardConfig): StoreDashboardConfig {
+  return serviceKey === 'kpa-society' ? withPharmacyStoreMenu(menu) : menu;
 }
 
 /** `/work/<serviceKey>/store/...` 의 서비스 키 */
@@ -112,7 +117,7 @@ export function ServiceStoreLayout() {
     );
   }
   const config: StoreDashboardConfig = {
-    ...mount.menu,
+    ...storeMenuFor(serviceKey, mount.menu),
     serviceName: `${SERVICE_LABEL[serviceKey]} 매장`,
     basePath: `${WORKSPACE_PATHS.serviceWork}/${serviceKey}/store`,
   };

@@ -31,6 +31,7 @@ import StoreEnrollmentPage from './pages/StoreEnrollmentPage';
 import MyServicesPage from './pages/MyServicesPage';
 import SettingsPage from './pages/SettingsPage';
 import { WORKSPACE_PATHS } from './config/workspace';
+import { PHARMACY_STORE_PATHS, PharmacyContextOnly } from './pages/neture-pharmacy/shared';
 
 const named = <M extends Record<string, unknown>, K extends keyof M>(load: () => Promise<M>, key: K) =>
   lazy(() => load().then((m) => ({ default: m[key] as ComponentType<Record<string, unknown>> })));
@@ -139,12 +140,24 @@ const HubMultilingualContentLibraryPage = named(() => import('./pages/pharmacy/H
 const StoreMultilingualContentsMyPage = named(() => import('./pages/pharmacy/StoreMultilingualContentsMyPage'), 'StoreMultilingualContentsMyPage');
 const HubSupplierLibraryPage = named(() => import('./pages/pharmacy/HubSupplierLibraryPage'), 'HubSupplierLibraryPage');
 
+// ── Neture 약국 매장(기본 가입 · 세미프랜차이즈 · 공급 상품 직접 주문) — WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1 ──
+const PharmacyMembershipPage = lazy(() => import('./pages/neture-pharmacy/PharmacyMembershipPage'));
+const SemiFranchisesPage = lazy(() => import('./pages/neture-pharmacy/SemiFranchisesPage'));
+const SupplyOptionsPage = lazy(() => import('./pages/neture-pharmacy/SupplyOptionsPage'));
+const PharmacyRecruitmentsPage = lazy(() => import('./pages/neture-pharmacy/PharmacyRecruitmentsPage'));
+const PharmacyCartPage = lazy(() => import('./pages/neture-pharmacy/PharmacyCartPage'));
+const PharmacyOrdersPage = lazy(() => import('./pages/neture-pharmacy/PharmacyOrdersPage'));
+
 const gated = (el: ReactElement) => <StoreGate>{el}</StoreGate>;
 const Loading = <div className="p-8 text-center text-sm text-slate-500">불러오는 중...</div>;
 const NotFound = <main className="center-card"><section className="card"><h1>페이지를 찾을 수 없습니다</h1></section></main>;
 const S = WORKSPACE_PATHS.myStore;
 const W = WORKSPACE_PATHS.serviceWork;
 const H = WORKSPACE_PATHS.storeHub;
+const PP = PHARMACY_STORE_PATHS;
+/** 약국 화면 subPath(앞의 `/` 제거) — `/store/*` · `/work/kpa-society/store/*` 자식 route 용 */
+const rel = (p: string) => p.replace(/^\//, '');
+const pharmacyOnly = (el: ReactElement) => <PharmacyContextOnly>{el}</PharmacyContextOnly>;
 const KCOS_STORE_INFO_ROLES = ['cosmetics:store_owner', 'cosmetics:admin', 'platform:super_admin'] as const;
 
 /** `:param` 을 채워 이동 — 원본 앱의 ParamRedirect 와 같은 동작 */
@@ -226,6 +239,13 @@ function storeChildRoutes() {
         <Route path="qr" element={<Navigate to={`${S}/marketing/qr`} replace />} />
         <Route path="pop" element={<Navigate to={`${S}/marketing/pop-v2`} replace />} />
         <Route path="signage" element={<Navigate to={`${S}/marketing/signage/playlist`} replace />} />
+        {/* Neture 약국 매장 — 약국(kpa-society) 문맥 전용. 매장 HUB 단계 없이 내 매장에서 바로 주문(DESIGN §6) */}
+        <Route path={rel(PP.membership)} element={pharmacyOnly(<PharmacyMembershipPage />)} />
+        <Route path={rel(PP.semiFranchises)} element={pharmacyOnly(<SemiFranchisesPage />)} />
+        <Route path={rel(PP.supply)} element={pharmacyOnly(<SupplyOptionsPage />)} />
+        <Route path={rel(PP.recruitments)} element={pharmacyOnly(<PharmacyRecruitmentsPage />)} />
+        <Route path={rel(PP.cart)} element={pharmacyOnly(<PharmacyCartPage />)} />
+        <Route path={rel(PP.orders)} element={pharmacyOnly(<PharmacyOrdersPage />)} />
         <Route path="*" element={NotFound} />
   </>;
 }
@@ -252,6 +272,8 @@ export default function App() {
       <Route path={WORKSPACE_PATHS.invitations} element={<StoreInvitationsPage />} />
       {/* 매장 시작하기(사업자 가입) — 매장이 없는 사용자가 쓰는 화면이라 StoreGate 밖이다 */}
       <Route path={WORKSPACE_PATHS.enrollment} element={<StoreEnrollmentPage />} />
+      {/* Neture 약국 기본 가입 — 승인 전에는 매장이 없으므로 StoreGate 밖이다(로그인만) */}
+      <Route path={WORKSPACE_PATHS.pharmacyEnrollment} element={<PharmacyMembershipPage />} />
 
       {/* ── 내 매장(공통 기능 1회) ── */}
       <Route path={S} element={gated(<UnifiedStoreLayout />)}>
@@ -330,7 +352,8 @@ export default function App() {
         <Route path="commerce/products/b2c" element={<PharmacySellPage />} />
         <Route path="commerce/products/:productId/marketing" element={<ProductMarketingPage />} />
         <Route path="commerce/products/:productId/pop" element={<ProductPopBuilderPage />} />
-        <Route path="commerce/orderable" element={<Navigate to={`${H}/b2b`} replace />} />
+        {/* 약국은 매장 HUB 단계가 없다 — 주문 가능 상품 = 내 매장 공급 상품(WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1) */}
+        <Route path="commerce/orderable" element={<Navigate to={`${S}${PP.supply}`} replace />} />
         <Route path="commerce/order-worktable" element={<StoreOrderWorktablePage />} />
         <Route path="commerce/orders" element={<KpaStoreOrdersPage />} />
         <Route path="commerce/seller-recruitments" element={<SellerRecruitmentsBrowsePage />} />
