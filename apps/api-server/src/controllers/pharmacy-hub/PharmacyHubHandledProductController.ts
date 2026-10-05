@@ -196,7 +196,7 @@ export class PharmacyHubHandledProductController {
         `INSERT INTO organization_product_listings
              (id, organization_id, service_key, master_id, offer_id, is_active, created_at, updated_at)
          VALUES (gen_random_uuid(), $1::uuid, $2, $3::uuid, $4::uuid, true, NOW(), NOW())
-         ON CONFLICT (organization_id, service_key, offer_id)
+         ON CONFLICT (organization_id, service_key, offer_id) WHERE service_key <> 'neture-event-offer'
          DO UPDATE SET is_active = true, updated_at = NOW()
          RETURNING id, (xmax = 0) AS "inserted"`,
         [organizationId, SERVICE_KEY, offer.masterId, offerId],

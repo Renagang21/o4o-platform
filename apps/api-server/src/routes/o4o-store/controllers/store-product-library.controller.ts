@@ -238,7 +238,7 @@ export function createStoreProductLibraryController(dataSource: DataSource): Rou
           (id, organization_id, service_key, master_id, offer_id, is_active, price, created_at, updated_at)
          VALUES
           (gen_random_uuid(), $1, $5, $2, $3, true, $4, NOW(), NOW())
-         ON CONFLICT (organization_id, service_key, offer_id) DO NOTHING
+         ON CONFLICT (organization_id, service_key, offer_id) WHERE service_key <> 'neture-event-offer' DO NOTHING
          RETURNING *`,
         [organizationId, resolvedMasterId, offerId, listingPrice, listingServiceKey],
       );

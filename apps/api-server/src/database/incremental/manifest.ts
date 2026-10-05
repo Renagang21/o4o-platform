@@ -56,6 +56,8 @@ import { CreateDemoAccounts1790940000000 } from '../migrations/1790940000000-Cre
 import { CreateAssistantTasks1791012819443 } from '../migrations/1791012819443-CreateAssistantTasks.js';
 // WO-O4O-PERSONAL-ASSISTANT-MEMORY-CLOUD-CONTINUITY-V1 (assistant_procedural_patterns + assistant_run_frames)
 import { CreateAssistantProceduralMemory1791100000000 } from '../migrations/1791100000000-CreateAssistantProceduralMemory.js';
+// WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1 (기본 가입 · 세미프랜차이즈 · 복수 공급 제안 · 이벤트 부분 unique)
+import { CreateNeturePharmacyCommerce1791160000000 } from '../migrations/1791160000000-CreateNeturePharmacyCommerce.js';
 
 export const INCREMENTAL_MIGRATION_CUTOFF = {
   baselineVersion: '2026-09-18-id685',
@@ -84,6 +86,7 @@ export const INCREMENTAL_MIGRATIONS: readonly MigrationClass[] = [
   CreateDemoAccounts1790940000000,
   CreateAssistantTasks1791012819443,
   CreateAssistantProceduralMemory1791100000000,
+  CreateNeturePharmacyCommerce1791160000000,
 ];
 
 export function incrementalMigrationNames(): string[] {

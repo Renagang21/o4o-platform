@@ -650,7 +650,7 @@ export class SellerRecruitmentService {
       `INSERT INTO organization_product_listings
         (id, organization_id, service_key, master_id, offer_id, is_active, price, source_type, source_id, created_at, updated_at)
        VALUES (gen_random_uuid(), $1, $2, $3, $4, true, NULL, 'seller_recruitment', $5, NOW(), NOW())
-       ON CONFLICT (organization_id, service_key, offer_id) DO NOTHING`,
+       ON CONFLICT (organization_id, service_key, offer_id) WHERE service_key <> 'neture-event-offer' DO NOTHING`,
       [orgRows[0].organization_id, serviceKey, offer.master_id, offer.id, recruitment.id],
     );
     logger.info(`[C-Bridge] OPL ensured (org=${orgRows[0].organization_id}, offer=${offer.id}, service=${serviceKey})`);
