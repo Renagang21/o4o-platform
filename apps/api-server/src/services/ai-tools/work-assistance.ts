@@ -475,13 +475,15 @@ export interface RunResumeFrame { taskKey: string | null; stageKey: string | nul
 export interface CloudRecalledPattern extends RecalledPattern { taskKey: string }
 
 /**
- * 노드 원장 패턴 + 소유 주체 Cloud 패턴. 노드가 앞(그 PC 의 검증), 같은 stage 의 같은 방법은 하나만 —
- * 극성이 서로 다르면 앞선 노드 쪽을 따른다. 결과는 근거일 뿐 강제 절차가 아니다(P3).
+ * 소유 주체 Cloud 패턴 + 노드 원장 패턴(Phase D · V2 §11-1 (4)). 같은 stage 의 같은 방법은 하나만 —
+ * 극성이 서로 다르면 **Cloud 쪽**을 따른다. Cloud 기억은 이 소유 주체의 모든 노드 실행에서 갱신되고, 노드 원장은
+ * 그 노드에서 실행했을 때만 갱신되므로 노드 쪽이 오래된 기억일 수 있다(오래된 노드 avoid 가 최신 Cloud preferred 를 가리면 안 된다).
+ * Cloud 에 없는 노드 기억(사설 대상 M9 등)은 그대로 쓴다. 결과는 근거일 뿐 강제 절차가 아니다(P3).
  */
 export function mergeRecalledPatterns(node: readonly RecalledPattern[], cloud: readonly RecalledPattern[]): RecalledPattern[] {
   const seen = new Set<string>();
   const out: RecalledPattern[] = [];
-  for (const p of [...node, ...cloud]) {
+  for (const p of [...cloud, ...node]) {
     if (out.length >= ASSISTANCE_LIMITS.maxPatterns) break;
     const key = `${p.stageKey}|${strategySignature(p.strategy)}`;
     if (seen.has(key)) continue;

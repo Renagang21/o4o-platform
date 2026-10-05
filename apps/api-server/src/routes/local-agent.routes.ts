@@ -35,6 +35,7 @@ import {
   createPairingGrant,
   listUserDevices,
   openAgentSession,
+  parseHeartbeatReport,
   recordHeartbeat,
   redeemPairingGrant,
   submitCommandResult,
@@ -199,7 +200,8 @@ router.post('/connect', async (req: Request, res: Response) => {
 router.post('/heartbeat', authenticateAgent, async (req: AgentRequest, res: Response) => {
   try {
     const { deviceId } = req.agent;
-    await recordHeartbeat(AppDataSource, deviceId);
+    // Phase D — 새 에이전트는 버전 · capability 를 함께 보고한다(이전 에이전트는 `{}` → lastSeenAt 만).
+    await recordHeartbeat(AppDataSource, deviceId, parseHeartbeatReport(req.body));
     const commands = await claimPendingCommands(AppDataSource, deviceId);
     res.json({ success: true, data: { commands } });
   } catch (error) {

@@ -20,13 +20,12 @@ Artifact Registry 는 **Keep 정책을 Delete 정책보다 우선** 적용한다
 |---|---|
 | `o4o-api` | asia-northeast3 |
 | `cloud-run-source-deploy` | asia-northeast3 |
-| `siteguide` | asia-northeast3 |
 | `gcr.io` | us |
 
 ## 적용 / 확인
 
 ```bash
-# 적용 (정책 변경 시 4개 repository 모두에 다시 적용한다)
+# 적용 (정책 변경 시 위 표의 repository 모두에 다시 적용한다)
 gcloud artifacts repositories set-cleanup-policies o4o-api \
   --location=asia-northeast3 --policy=infra/artifact-registry/cleanup-policy.json
 

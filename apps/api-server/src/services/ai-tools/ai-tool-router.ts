@@ -187,13 +187,7 @@ async function executeGetLocalAgentStatus(
   if (resolution.status === 'none') {
     return { ok: true, tool, data: { connected: false, reason: 'NO_DEVICE' } };
   }
-  if (resolution.status === 'ambiguous') {
-    return {
-      ok: true,
-      tool,
-      data: { connected: false, reason: 'AMBIGUOUS', deviceCount: resolution.count },
-    };
-  }
+  // Phase D — 노드가 여러 대여도 Assistant 가 하나를 고른다(모호함으로 멈추지 않는다).
   // deviceId 는 담지 않는다. 사용자에게 읽어줄 이유가 없는 내부 식별자다
   // (직전 WO 에서 organizationId 를 프롬프트에 싣지 않은 것과 같은 규칙).
   return {
@@ -230,9 +224,6 @@ async function executeGetLocalSystemInfo(
   const resolution = await resolveTargetDevice(dataSource, ctx.userId);
   if (resolution.status === 'none') {
     return { ok: true, tool, data: { available: false, errorCode: LOCAL_AGENT_ERROR.NO_DEVICE } };
-  }
-  if (resolution.status === 'ambiguous') {
-    return { ok: true, tool, data: { available: false, errorCode: LOCAL_AGENT_ERROR.AMBIGUOUS } };
   }
   if (resolution.status === 'offline') {
     return { ok: true, tool, data: { available: false, errorCode: LOCAL_AGENT_ERROR.OFFLINE } };
@@ -297,14 +288,12 @@ async function executeWindowsAppAction(
 ): Promise<ToolResult> {
   const displayName = windowsAppDisplayName(appId);
 
-  const resolution = await resolveTargetDevice(dataSource, ctx.userId);
+  const resolution = await resolveTargetDevice(dataSource, ctx.userId, { need: 'windows_uia' });
   if (resolution.status !== 'ok') {
     const errorCode =
       resolution.status === 'none'
         ? LOCAL_AGENT_ERROR.NO_DEVICE
-        : resolution.status === 'ambiguous'
-          ? LOCAL_AGENT_ERROR.AMBIGUOUS
-          : LOCAL_AGENT_ERROR.OFFLINE;
+        : LOCAL_AGENT_ERROR.OFFLINE;
     return { ok: true, tool, data: { available: false, appId, displayName, errorCode } };
   }
 
@@ -403,14 +392,12 @@ async function executeBrowserSiteAction(
 ): Promise<ToolResult> {
   const displayName = browserSiteDisplayName(siteId);
 
-  const resolution = await resolveTargetDevice(dataSource, ctx.userId);
+  const resolution = await resolveTargetDevice(dataSource, ctx.userId, { need: 'browser' });
   if (resolution.status !== 'ok') {
     const errorCode =
       resolution.status === 'none'
         ? LOCAL_AGENT_ERROR.NO_DEVICE
-        : resolution.status === 'ambiguous'
-          ? LOCAL_AGENT_ERROR.AMBIGUOUS
-          : LOCAL_AGENT_ERROR.OFFLINE;
+        : LOCAL_AGENT_ERROR.OFFLINE;
     return { ok: true, tool, data: { available: false, siteId, displayName, errorCode } };
   }
 
@@ -500,14 +487,12 @@ async function executeLocalDataAction(
   action: string,
   args: Record<string, unknown>,
 ): Promise<ToolResult> {
-  const resolution = await resolveTargetDevice(dataSource, ctx.userId);
+  const resolution = await resolveTargetDevice(dataSource, ctx.userId, { need: 'local_data' });
   if (resolution.status !== 'ok') {
     const errorCode =
       resolution.status === 'none'
         ? LOCAL_AGENT_ERROR.NO_DEVICE
-        : resolution.status === 'ambiguous'
-          ? LOCAL_AGENT_ERROR.AMBIGUOUS
-          : LOCAL_AGENT_ERROR.OFFLINE;
+        : LOCAL_AGENT_ERROR.OFFLINE;
     return { ok: true, tool, data: { available: false, errorCode } };
   }
 
@@ -604,14 +589,12 @@ async function executeLocalDataQuery(
   args: Record<string, unknown>,
 ): Promise<ToolResult> {
   const tool = AI_TOOL_NAMES.DATA_LOCAL_QUERY;
-  const resolution = await resolveTargetDevice(dataSource, ctx.userId);
+  const resolution = await resolveTargetDevice(dataSource, ctx.userId, { need: 'local_data' });
   if (resolution.status !== 'ok') {
     const errorCode =
       resolution.status === 'none'
         ? LOCAL_AGENT_ERROR.NO_DEVICE
-        : resolution.status === 'ambiguous'
-          ? LOCAL_AGENT_ERROR.AMBIGUOUS
-          : LOCAL_AGENT_ERROR.OFFLINE;
+        : LOCAL_AGENT_ERROR.OFFLINE;
     return { ok: true, tool, data: { available: false, errorCode } };
   }
 
@@ -691,9 +674,7 @@ async function executeComputerAction(
     return fail(
       resolution.status === 'none'
         ? LOCAL_AGENT_ERROR.NO_DEVICE
-        : resolution.status === 'ambiguous'
-          ? LOCAL_AGENT_ERROR.AMBIGUOUS
-          : LOCAL_AGENT_ERROR.OFFLINE,
+        : LOCAL_AGENT_ERROR.OFFLINE,
     );
   }
   const deviceId = resolution.device.id;
@@ -1586,9 +1567,6 @@ const DATA_HEADER = '## 로컬 데이터 상태\n';
 /** 데이터 축 공통 실패 문장. local.db 경로 · 값은 애초에 data 안에 없다. */
 function renderDataFailure(data: Record<string, unknown>): string {
   const code = String(data.errorCode ?? '');
-  if (code === LOCAL_AGENT_ERROR.AMBIGUOUS) {
-    return DATA_HEADER + '- 연결된 PC가 여러 대여서 어느 PC인지 확정할 수 없습니다.';
-  }
   if (code === LOCAL_AGENT_ERROR.TIMEOUT) {
     return DATA_HEADER + '- 이 PC의 에이전트가 제한 시간 안에 응답하지 않았습니다.';
   }
@@ -1792,9 +1770,6 @@ function renderBrowserFailure(data: Record<string, unknown>, displayName: string
   if (code === LOCAL_AGENT_ERROR.BROWSER_NOT_AVAILABLE) {
     return '## 사이트 상태\n- 이 PC 에서는 브라우저를 열 수 없습니다.';
   }
-  if (code === LOCAL_AGENT_ERROR.AMBIGUOUS) {
-    return '## 사이트 상태\n- 연결된 PC가 여러 대여서 어느 PC인지 확정할 수 없습니다.';
-  }
   if (code === LOCAL_AGENT_ERROR.TIMEOUT) {
     return '## 사이트 상태\n- 이 PC의 에이전트가 제한 시간 안에 응답하지 않았습니다.';
   }
@@ -1903,9 +1878,6 @@ function renderWindowFailure(data: Record<string, unknown>, displayName: string)
       '- 사용자가 직접 창을 선택해야 할 수 있습니다.'
     );
   }
-  if (code === LOCAL_AGENT_ERROR.AMBIGUOUS) {
-    return '## 프로그램 상태\n- 연결된 PC가 여러 대여서 어느 PC인지 확정할 수 없습니다.';
-  }
   if (code === LOCAL_AGENT_ERROR.TIMEOUT) {
     return '## 프로그램 상태\n- 이 PC의 에이전트가 제한 시간 안에 응답하지 않았습니다.';
   }
@@ -1946,13 +1918,6 @@ function renderLocalAgentStatus(data: Record<string, unknown>): string {
     '- PC의 실제 상태·파일·프로그램 정보는 확인할 수 없습니다. 추측해서 답하지 마세요.';
 
   if (data.connected !== true) {
-    if (data.reason === 'AMBIGUOUS') {
-      return (
-        '## 로컬 에이전트 상태\n' +
-        '- 연결된 PC가 여러 대여서 어느 PC인지 확정할 수 없습니다.\n' +
-        '- 어느 PC를 사용할지 확인이 필요합니다. 임의로 한 대를 고르지 마세요.'
-      );
-    }
     return notConnected;
   }
 
@@ -1967,9 +1932,6 @@ function renderLocalSystemInfo(data: Record<string, unknown>): string {
   if (data.available !== true) {
     const code = String(data.errorCode ?? '');
     // 오류 코드를 사용자에게 그대로 노출하지 않는다. 상황별 문장으로 바꾼다.
-    if (code === LOCAL_AGENT_ERROR.AMBIGUOUS) {
-      return '## 로컬 시스템 정보\n- 연결된 PC가 여러 대여서 어느 PC인지 확정할 수 없습니다.';
-    }
     if (code === LOCAL_AGENT_ERROR.TIMEOUT) {
       return '## 로컬 시스템 정보\n- 이 PC의 에이전트가 제한 시간 안에 응답하지 않았습니다.';
     }
@@ -2053,14 +2015,12 @@ async function executeDomAction(
     },
   });
 
-  const resolution = await resolveTargetDevice(dataSource, ctx.userId);
+  const resolution = await resolveTargetDevice(dataSource, ctx.userId, { need: 'browser' });
   if (resolution.status !== 'ok') {
     return fail(
       resolution.status === 'none'
         ? LOCAL_AGENT_ERROR.NO_DEVICE
-        : resolution.status === 'ambiguous'
-          ? LOCAL_AGENT_ERROR.AMBIGUOUS
-          : LOCAL_AGENT_ERROR.OFFLINE,
+        : LOCAL_AGENT_ERROR.OFFLINE,
     );
   }
   const deviceId = resolution.device.id;
@@ -2525,14 +2485,12 @@ async function executeSupplierProductLookup(
   if (!def) return fail(SUPPLIER_ERROR.NOT_REGISTERED);
   if (supplierQueryDenyReason(query) !== null) return fail(SUPPLIER_ERROR.QUERY_INVALID);
 
-  const resolution = await resolveTargetDevice(dataSource, ctx.userId);
+  const resolution = await resolveTargetDevice(dataSource, ctx.userId, { need: 'browser' });
   if (resolution.status !== 'ok') {
     return fail(
       resolution.status === 'none'
         ? LOCAL_AGENT_ERROR.NO_DEVICE
-        : resolution.status === 'ambiguous'
-          ? LOCAL_AGENT_ERROR.AMBIGUOUS
-          : LOCAL_AGENT_ERROR.OFFLINE,
+        : LOCAL_AGENT_ERROR.OFFLINE,
     );
   }
   deviceId = resolution.device.id;

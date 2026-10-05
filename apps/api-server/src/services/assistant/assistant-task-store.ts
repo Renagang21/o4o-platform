@@ -153,6 +153,32 @@ export async function findTaskIdByRun(
 }
 
 /**
+ * Phase D — 이 Task 의 최근 run 이 실행된 노드(최신순 · 중복 제거 · 최대 limit). Assistant 가 노드 선택의 선호로 넘긴다
+ * (같은 Task 를 이어가면 그 노드의 실행환경 · 노드 원장이 맞을 가능성이 높다). 강제가 아니다.
+ * 요청자 조건(user_id)을 함께 건다 — 남의 run 노드는 나오지 않는다.
+ */
+export async function recentTaskNodeIds(
+  dataSource: DataSource,
+  taskId: string,
+  userId: string,
+  limit = 3,
+): Promise<string[]> {
+  if (!isTaskId(taskId)) return [];
+  const rows = returnedRows(
+    await dataSource.query(
+      `SELECT device_id, MAX(updated_at) AS last_at
+         FROM work_run_coordination
+        WHERE task_id = $1 AND user_id = $2 AND device_id IS NOT NULL
+        GROUP BY device_id
+        ORDER BY last_at DESC
+        LIMIT $3`,
+      [taskId, userId, limit],
+    ),
+  );
+  return rows.map((r) => r.device_id).filter((id): id is string => typeof id === 'string');
+}
+
+/**
  * run 을 Task 에 붙인다(Task 1 : N run). run 의 소유자가 같고, 아직 Task 가 없거나 같은 Task 일 때만.
  * 이미 다른 Task 에 붙은 run 은 옮기지 않는다. 붙었으면 true.
  */

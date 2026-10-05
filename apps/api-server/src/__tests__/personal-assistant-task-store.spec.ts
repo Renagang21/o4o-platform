@@ -18,6 +18,7 @@ import {
   isTerminalTaskStatus,
   TASK_RETENTION_POLICY,
   updateAssistantTask,
+  recentTaskNodeIds,
 } from '../services/assistant/assistant-task-store.js';
 
 const USER = '00000000-0000-4000-8000-000000000001';
@@ -147,5 +148,14 @@ describe('assistant-task-store', () => {
     expect(calls[0].sql).toMatch(/WHERE run_id = \$2 AND user_id = \$3 AND \(task_id IS NULL OR task_id = \$1\)/);
     const none = fakeDs([]);
     expect(await attachRunToTask(none.ds, { taskId: TASK, runId: 'g_1', userId: USER })).toBe(false);
+  });
+  it('Phase D — 같은 Task 의 최근 노드: 요청자 조건 · binding · 형식 아닌 taskId 는 묻지 않는다', async () => {
+    const { ds, calls } = fakeDs([{ device_id: 'dev-b' }, { device_id: 'dev-a' }]);
+    expect(await recentTaskNodeIds(ds, TASK, USER)).toEqual(['dev-b', 'dev-a']);
+    expect(calls[0].sql).toMatch(/WHERE task_id = \$1 AND user_id = \$2 AND device_id IS NOT NULL/);
+    expect(calls[0].params).toEqual([TASK, USER, 3]);
+    const none = fakeDs();
+    expect(await recentTaskNodeIds(none.ds, 'nope', USER)).toEqual([]);
+    expect(none.calls).toHaveLength(0);
   });
 });

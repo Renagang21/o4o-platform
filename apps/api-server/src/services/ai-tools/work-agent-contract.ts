@@ -732,6 +732,12 @@ export interface ExecutionIntent {
    * 둘 다 근거일 뿐 절차 강제가 아니다(P3). 값 · 원문 · 화면 글은 없다.
    */
   memory?: { patterns: readonly CloudRecalledPattern[]; resumeFrame: RunResumeFrame | null };
+  /**
+   * Phase D — Execution Node 조정(V2 §11-1). 노드 선택과 노드 원장 경계에 쓰는 구조만.
+   *   ownerKey            이 Task 의 소유 주체를 가리키는 불투명 키(원 ID 아님). 노드 원장을 소유 주체별로 나눠 쓰게 한다.
+   *   preferredDeviceIds  Assistant 가 우선하는 노드(같은 Task 의 이전 run 노드 등). 강제가 아니다 — online · capability 가 맞을 때만.
+   */
+  node?: { ownerKey: string | null; preferredDeviceIds: readonly string[] };
   evidence: readonly PlanningEvidence[];
   completion: CompletionContract;
   /** 승인 경계(V2 §15). 최종 확정 · 결제 · 인증은 언제나 사용자. */
