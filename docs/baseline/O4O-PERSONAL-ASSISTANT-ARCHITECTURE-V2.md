@@ -324,7 +324,7 @@ Lower-cost Reasoning 단계는 유지한다. "속도는 약한 모델로 해결�
 1. **PC 는 Execution Node 다.** 기억의 소유자도, 업무 판단의 주체도 아니다.
 2. **Request Device ≠ Execution Device.** 요청한 기기(휴대폰 · 다른 PC · 외부 채널)와 실행할 노드는 다를 수 있다. Assistant 가 Task 에 맞는 노드를 고른다.
 3. 노드 종류: 사용자의 PC(장소와 대수 무관 — 매장 · 집 등 여러 대일 수 있다) · Cloud Browser(§13) · 미래 노드. 노드는 **capability 를 선언**하고 Assistant 는 capability · 가용성(· 사용자가 원하면 그 지정)으로 노드를 선택한다.
-4. **노드가 바뀌어도 업무는 끊기지 않는다.** 같은 Task 를 다른 노드에서 이어 실행할 수 있고(Task 1 : N run), 업무 식별(Task type) · 재개 구조(M5) · Cloud 배치가 허용된 검증된 방법(공개 사이트 대상 M3)은 소유 주체에 있으므로 노드를 따라가지 않아도 쓰인다. 노드에 남는 것은 그 노드의 실행환경 상태(§9-2 node)와 노드 보관 원 기록이며, 실행할 때 현재 화면으로 다시 확인한다.
+4. **노드가 바뀌어도 업무는 끊기지 않는다.** 같은 Task 를 다른 노드에서 이어 실행할 수 있고(Task 1 : N run), 업무 식별(Task type) · 재개 구조(M5) · Cloud 배치가 허용된 검증된 방법(공개 사이트 대상 M3)은 소유 주체에 있으므로 노드를 따라가지 않아도 쓰인다(원칙). 현재 구현은 노드 원장에 같은 기억이 있으면 노드 쪽을 먼저 쓰므로, 노드 무관 연속성은 그 노드 원장이 비어 있을 때만 보장된다(§23 KNOWN GAP ② · ④). 노드에 남는 것은 그 노드의 실행환경 상태(§9-2 node)와 노드 보관 원 기록이며, 실행할 때 현재 화면으로 다시 확인한다.
    - **예외 — 사설 시스템 · Windows 앱 대상(M9)**: 이런 대상의 절차 기억(M3 · M4)은 Memory 배치 정책 M9 · §2-6 에 따라 **노드에만** 둔다(현재 Cloud 절차 기억은 `browser_site` 대상만). 그래서 다른 노드로 넘어가면 그 대상의 절차 경험은 따라가지 않고, 새 노드는 그 부분을 Discovery 로 다시 찾는다. Assistant · Task · 업무 식별은 그대로 이어진다. 이 경험을 가진 노드를 우선할지(node affinity)는 노드 선택(§18 단계 D)의 고려 사항이며 이 문서가 정하지 않는다.
 5. **쓸 수 있는 노드가 여럿이라는 사실만으로 업무를 멈추지 않는다.** 여러 노드 중 무엇을 쓸지는 Assistant 의 선택 문제다. 선택 근거가 정말 부족할 때만 사용자에게 묻는다(§5-4).
    - 현재 구현의 `resolveTargetDevice`(온라인 2대 이상 → `ambiguous` 로 중단)는 **이 원칙이 아니라 runtime 의 현재 한계**다(§23). 원칙으로 인용하지 않는다. 노드 선택 구현은 §18 단계 D(Execution Node 계약)의 범위다.
@@ -605,8 +605,9 @@ V1 에서 **승계하지 않는 것**: Local-first 저장 원칙(ARCH §5 의 Lo
 | ① | 노드 원장(`local_experience_patterns` 등)에 소유 주체 칸이 없다 — unique key · recall 이 `target_id` · `task_key` 만 쓴다. 한 노드에서 조직 A · B 의 업무를 모두 하면 A 에서 생긴 노드 기억(M7 · M8 · M9)이 B 의 실행 근거로 섞인다 | §3-1 · §9-2 기억 경계 = 소유 주체 | `tools/o4o-local-agent/src/local-db.mjs` (`local_experience_patterns` UNIQUE) |
 | ② | 노드 기억과 Cloud 기억을 합칠 때 노드 쪽이 먼저이고, 같은 stage · 같은 방법이면 노드 쪽 극성을 남긴다 — 오래된 노드 `avoid` 가 최신 Cloud `preferred` 를 가릴 수 있다 | §11-1 (4) 노드가 바뀌어도 같은 기억 · Node-independent Continuity | `work-assistance.ts` `mergeRecalledPatterns` |
 | ③ | 다중 노드 `ambiguous` 중단 · 사용자에게 PC 정리를 넘기는 안내 (위 L5 행) | §3 (5) · §11-1 (5) | `resolveTargetDevice` · `ai-tool-router.ts` |
+| ④ | 재개 구조(M5)도 노드 우선이다 — 노드 원장에 그 run 의 frame 이 있으면 그것을 쓰고, 없을 때만 Cloud frame 을 쓴다. 대기 중인 run 이 노드 A → B 로 옮겨 B 에서 더 진행된 뒤 A 로 돌아오면 A 의 오래된 frame 에서 재개될 수 있다 | §11-1 (4) 재개 구조의 노드 무관 연속성 | `work-agent-runtime.ts` 재개 recall(로컬 frame 우선 · Cloud 는 fallback) |
 
-①② 는 노드 원장에 소유 주체를 저장 · 필터하고 병합 우선순위를 정하는 구현 WO 의 범위이며, 그 전까지 노드 원장을 소유 주체 경계 · 노드 독립 연속성의 **현재 보장**으로 단정하지 않는다.
+①②④ 는 노드 원장에 소유 주체를 저장 · 필터하고 병합 우선순위를 정하는 구현 WO 의 범위이며, 그 전까지 노드 원장을 소유 주체 경계 · 노드 독립 연속성의 **현재 보장**으로 단정하지 않는다.
 
 이 표는 시점 기록이다. 갱신할 때는 이 절만 고치고 본문 원칙은 바꾸지 않는다.
 
