@@ -78,6 +78,14 @@ www 전체 apex redirect 는 하지 않았다 — 토큰 저장이 origin 단위
 보존: Tablet ScreenSet 경로 · `/api/signage/:sk/active-content`(store-web) · store-ui-core / web-store 의 `signage-player`("TV 재생") 메뉴 키 · `hospital-pharmacy-web` run.app origin.
 이번 범위에서 뺀 것(불필요한 재배포 유발): `services/web-hospital-pharmacy/Dockerfile` ARG 기본값 · `deploy-web-services.yml` L99 주석 · `apps/admin-dashboard/vite.config.ts` dev `allowedHosts` 의 `signage.neture.co.kr`.
 
+`docs/services/README.md` 의 player 행은 "소스만 남음" → 은퇴 완료로 갱신했다.
+
+**경계 문서와의 관계 (리뷰 P1 판정)** — [`O4O-SIGNAGE-STORE-PLAYLIST-MODEL-BOUNDARY-V1`](../baseline/O4O-SIGNAGE-STORE-PLAYLIST-MODEL-BOUNDARY-V1.md) §3 의
+"재생기(player) / API contract 변경" 금지는 `store_playlists` → `signage_playlists` **통합 작업이 운영 중인 재생 경로를 바꾸지 않도록** 하는 금지선이다.
+이번 변경은 통합 작업이 아니고, `signage-player-web` 은 이미 배포 은퇴 · Cloud Run 삭제(PR #306 · #307) 상태라 운영 재생기가 아니다.
+운영 재생기(`web-kpa-society` `SignagePlaybackPage` · Tablet ScreenSet)와 API 계약(`/store-playlists/public/:id` · `/api/signage/:sk/active-content`)은 바꾸지 않았다.
+소스 제거는 이번 작업의 명시 지시다. 경계 문서와 그 IR §5.2 가 player 예시로 `services/signage-player-web` 을 언급하는 부분은 기준 문서 내용 변경이라 고치지 않고 §5 에 별도 정비 항목으로 남긴다.
+
 ### 2-1. 로컬 검증
 
 | 검사 | 결과 |
@@ -104,3 +112,4 @@ web 8개 · admin 의 런타임 소스는 바뀌지 않는다(삭제된 패키�
 - player 전용이던 API `/api/signage/:sk/channels/:id/{heartbeat,playback-logs,errors}` — 별도 판정
 - 추가 발견 미사용 이미지 4종 — 별도 판정
 - 원격 branch 정리 목록 — GitHub 에서 삭제(로컬 `push --delete` 차단)
+- 기준 문서 정비(별도 WO): `O4O-SIGNAGE-STORE-PLAYLIST-MODEL-BOUNDARY-V1` §3 "재생기" 범위에 은퇴한 `signage-player-web` 이 더는 포함되지 않음을 명시
