@@ -92,9 +92,13 @@ export function normalizeBusinessNumber(raw: string): string | null {
   return digits.length === 10 ? digits : null;
 }
 
-/** 입력 중 표시용 000-00-00000 */
+/**
+ * 입력 중 표시용 000-00-00000. 숫자를 버리지 않는다 — 10자리를 넘으면 숫자만 그대로 두고
+ * `validateSignup` 이 거부한다(잘라서 다른 번호로 제출하지 않는다).
+ */
 export function formatBusinessNumber(raw: string): string {
-  const d = raw.replace(/[^0-9]/g, '').slice(0, 10);
+  const d = raw.replace(/[^0-9]/g, '');
+  if (d.length > 10) return d;
   if (d.length <= 3) return d;
   if (d.length <= 5) return `${d.slice(0, 3)}-${d.slice(3)}`;
   return `${d.slice(0, 3)}-${d.slice(3, 5)}-${d.slice(5)}`;
