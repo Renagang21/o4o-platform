@@ -16,7 +16,7 @@
 
 | 항목 | 위치 | 상태 (2026-10-05 09:43 조회) |
 |---|---|---|
-| Neture 약국 commerce WO | branch `wo/neture-pharmacy-store-commerce-refactor-v1` (원격 존재) · 이 PC worktree `D:/o4o-wt/neture-pharmacy-store-commerce-refactor-v1` | 단계 1-7(설계 문서) 미착수. 이 HANDOFF 커밋과 함께 draft PR 생성 — merge 금지 |
+| Neture 약국 commerce WO | branch `wo/neture-pharmacy-store-commerce-refactor-v1` (원격 존재) · 이 PC worktree `D:/o4o-wt/neture-pharmacy-store-commerce-refactor-v1` | 단계 1-7(설계 문서) 미착수. **draft PR #308** (OPEN) — merge 금지 |
 | 정본 문서 최종 정렬 | PR #304 · branch `wo/canonical-doc-final-alignment-v1` · 이 PC worktree `D:/o4o-wt/canonical-doc-final-alignment-v1` | OPEN · CI 실패 0 · mergeStateStatus CLEAN · head `b57a92d1d`. 마지막 Codex 지적 수정 후 `@codex review` 재요청(00:40Z) — **재리뷰 결과 아직 없음** |
 
 ## 다음에 바로 이어서 할 일 (우선순위)
