@@ -60,10 +60,10 @@ export default function LoginPage() {
             }}
             termsHref="/terms"
             privacyHref="/privacy"
+            // Google 버튼이 보일 때만 렌더된다(준비 중이면 숨김) — WO-O4O-LOGIN-MODAL-GOOGLE-HINT-AND-HEADER-V1
+            hint={<p className="text-sm text-slate-500 mb-0">처음이신가요? 같은 버튼으로 약관 동의 후 계정이 만들어집니다.</p>}
           />
         </div>
-
-        <p className="text-sm text-slate-500 mb-0">처음이신가요? 같은 버튼으로 약관 동의 후 계정이 만들어집니다.</p>
 
         <div className="mt-6 pt-6 border-t border-slate-200 text-center">
           <Link to="/" className="text-sm font-medium text-primary no-underline hover:underline">홈으로 돌아가기</Link>
