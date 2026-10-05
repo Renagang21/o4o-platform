@@ -141,3 +141,4 @@ web 8개 · admin 의 런타임 소스는 바뀌지 않는다(삭제된 패키�
 - 추가 발견 미사용 이미지 4종 — 별도 판정
 - 원격 branch 정리 목록 — GitHub 에서 삭제(로컬 `push --delete` 차단)
 - 기준 문서 정비(별도 WO): `O4O-SIGNAGE-STORE-PLAYLIST-MODEL-BOUNDARY-V1` §3 "재생기" 범위에 은퇴한 `signage-player-web` 이 더는 포함되지 않음을 명시
+- 기준 문서 정비(별도 WO): `O4O-SIGNAGE-CANONICAL-PLAYBACK-PATH-V1` §5.1 (L112 부근) 의 `PlayerTelemetry` → `/api/signage/:sk/channels/:id/{heartbeat,playback-logs,errors}` 미구현 결손 서술 — player 소스 은퇴로 호출자가 사라져 결손이 아니게 됐음을 반영(위 정정 근거)
