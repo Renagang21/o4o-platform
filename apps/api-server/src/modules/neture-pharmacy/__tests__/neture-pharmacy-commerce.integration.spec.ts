@@ -22,6 +22,7 @@ import { cancelStoreOrderBeforePayment } from '../../../services/checkout/store-
 import { policyAcceptanceService } from '../../policy-acceptance/policy-acceptance.service.js';
 import { SupplierOrderService } from '../../neture/services/supplier-order.service.js';
 import { resolveSemiFranchiseCommunityAccess } from '../services/semi-franchise-community-access.js';
+import { SemiFranchiseContentService } from '../services/semi-franchise-content.service.js';
 
 jest.mock('../../../utils/logger.js', () => ({
   __esModule: true,
@@ -229,6 +230,63 @@ d('Neture 약국 매장 commerce — 격리 PostgreSQL 통합 검증', () => {
       expect((await resolveSemiFranchiseCommunityAccess(ds, p.owner, 'pharmacy')).semiFranchise).toBe(false);
       const [cm] = await ds.query(`SELECT count(*)::int AS c FROM community_memberships WHERE user_id = $1`, [p.owner]);
       expect(cm.c).toBe(0);
+    });
+  });
+
+  describe('세미프랜차이즈 콘텐츠 자료함', () => {
+    it('담당 운영자 작성 · 게시 → 가입 약국만 열람 · 사본, 미가입 · 보관은 비노출, 비담당 운영자 처리 불가', async () => {
+      const key = `ct-${tag}`;
+      const op = await user();
+      await role(op, 'neture:operator');
+      await sfs.create({ key, name: '콘텐츠 세미프랜차이즈' });
+      await sfs.assignOperator(key, op, operatorId);
+      const sf = await sfs.requireOperatorOf(op, key);
+      await expect(sfs.requireOperatorOf(pharmacyOperator, key)).rejects.toMatchObject({ httpStatus: 403 });
+
+      const svc = new SemiFranchiseContentService(ds, async (input) => {
+        const [r] = await ds.query(
+          `INSERT INTO o4o_asset_snapshots (organization_id, source_service, source_asset_id, asset_type, title, content_json, created_by)
+           VALUES ($1, $2, $3, $4, $5, $6::jsonb, $7) RETURNING id`,
+          [input.targetOrganizationId, input.sourceService, input.sourceAssetId, input.assetType, input.title,
+            JSON.stringify(input.contentJson), input.createdBy],
+        );
+        return { snapshotId: r.id };
+      });
+      const created = await svc.operatorCreate(sf, op, { title: '판촉 가이드', summary: '요약', body: '<p>본문</p>', tags: ['가이드'] });
+      const member = await approvedPharmacy();
+      const outsider = await approvedPharmacy();
+      await joinSemiFranchise(member.orgId, member.owner, key, op);
+
+      // 초안은 가입 약국에도 보이지 않는다
+      expect((await svc.pharmacyList(member.orgId)).total).toBe(0);
+      await svc.operatorSetStatus(sf, op, created.id, 'publish');
+      const list = await svc.pharmacyList(member.orgId, { sfKey: key });
+      expect(list.items.map((c: any) => c.title)).toEqual(['판촉 가이드']);
+      expect((await svc.pharmacyList(outsider.orgId)).total).toBe(0);
+      await expect(svc.pharmacyGet(outsider.orgId, created.id)).rejects.toMatchObject({ httpStatus: 404 });
+      await expect(svc.pharmacyCopy(outsider.orgId, outsider.owner, created.id)).rejects.toMatchObject({ httpStatus: 404 });
+
+      const { snapshotId } = await svc.pharmacyCopy(member.orgId, member.owner, created.id);
+      const [snap] = await ds.query(`SELECT organization_id, source_service, asset_type, content_json FROM o4o_asset_snapshots WHERE id = $1`, [snapshotId]);
+      expect(snap).toMatchObject({ organization_id: member.orgId, source_service: 'semi-franchise', asset_type: 'content' });
+      expect(snap.content_json).toMatchObject({ title: '판촉 가이드', semiFranchiseKey: key });
+
+      // 원본 수정은 사본에 전파되지 않는다
+      await svc.operatorUpdate(sf, op, created.id, { title: '판촉 가이드 v2' });
+      const [snap2] = await ds.query(`SELECT title FROM o4o_asset_snapshots WHERE id = $1`, [snapshotId]);
+      expect(snap2.title).toBe('판촉 가이드');
+
+      // 보관하면 약국에 보이지 않지만 사본은 남는다
+      await svc.operatorSetStatus(sf, op, created.id, 'archive');
+      expect((await svc.pharmacyList(member.orgId)).total).toBe(0);
+      const [still] = await ds.query(`SELECT count(*)::int AS c FROM o4o_asset_snapshots WHERE id = $1`, [snapshotId]);
+      expect(still.c).toBe(1);
+
+      // 가입 정지 → 다시 게시해도 보이지 않음
+      await svc.operatorSetStatus(sf, op, created.id, 'publish');
+      const [m] = await ds.query(`SELECT id FROM semi_franchise_memberships WHERE organization_id = $1 AND semi_franchise_id = $2`, [member.orgId, sf.id]);
+      await sfs.decideMembership(sf, op, m.id, 'suspend');
+      expect((await svc.pharmacyList(member.orgId)).total).toBe(0);
     });
   });
 

@@ -42,6 +42,8 @@ import { SemiFranchiseEventService, type EventAction } from './services/semi-fra
 import { SemiFranchiseRecruitmentService } from './services/semi-franchise-recruitment.service.js';
 import { PharmacyCartService, isUuid } from './services/pharmacy-cart.service.js';
 import { PharmacyPaymentService } from './services/pharmacy-payment.service.js';
+import { SemiFranchiseContentService } from './services/semi-franchise-content.service.js';
+import { AssetCopyService } from '@o4o/asset-copy-core';
 
 type Req = Request & { user?: { id: string }; organizationId?: string; supplierId?: string };
 type Handler = (req: Req, res: Response) => Promise<unknown>;
@@ -87,6 +89,10 @@ export function createNeturePharmacyRoutes(dataSource: DataSource): ExpressRoute
   const recruitments = new SemiFranchiseRecruitmentService(dataSource);
   const cart = new PharmacyCartService(dataSource, new EventOfferService(dataSource), (dto) => checkoutService.createOrder(dto));
   const payments = new PharmacyPaymentService(dataSource, new CheckoutFulfillmentBridgeService(dataSource));
+  const contents = new SemiFranchiseContentService(dataSource, async (input) => {
+    const { snapshot } = await new AssetCopyService(dataSource).copyResolved(input);
+    return { snapshotId: snapshot.id };
+  });
 
   const store = [requireAuth, createRequireStoreOwner(dataSource, 'kpa')] as RequestHandler[];
   const operator = [requireAuth, requireNetureScope('neture:operator') as RequestHandler];
@@ -126,6 +132,19 @@ export function createNeturePharmacyRoutes(dataSource: DataSource): ExpressRoute
     const option = await getSupplyOption(dataSource, org(req), kind, uuidParam(req, 'id'));
     if (!option) throw new NeturePharmacyError(404, 'SUPPLY_OPTION_NOT_AVAILABLE', '이용할 수 없는 공급 옵션입니다.');
     return option;
+  }));
+
+  // 세미프랜차이즈 콘텐츠 자료함 — 가입(active) 세미프랜차이즈의 게시 콘텐츠 · 내 매장 사본
+  router.get('/pharmacy/store/contents', ...store, handle(async (req) => contents.pharmacyList(org(req), {
+    sfKey: typeof req.query.sf === 'string' ? req.query.sf : undefined,
+    q: typeof req.query.q === 'string' ? req.query.q : undefined,
+    page: Number(req.query.page) || 1,
+    limit: Number(req.query.limit) || 30,
+  })));
+  router.get('/pharmacy/store/contents/:id', ...store, handle(async (req) => contents.pharmacyGet(org(req), uuidParam(req, 'id'))));
+  router.post('/pharmacy/store/contents/:id/copy', ...store, handle(async (req, res) => {
+    res.status(201);
+    return contents.pharmacyCopy(org(req), req.user!.id, uuidParam(req, 'id'));
   }));
 
   router.get('/pharmacy/recruitments', ...store, handle(async (req) => recruitments.pharmacyBrowse(org(req))));
@@ -210,6 +229,21 @@ export function createNeturePharmacyRoutes(dataSource: DataSource): ExpressRoute
   router.post('/operator/semi-franchises/:key/recruitments/:id/:action', ...operator, handle(async (req) =>
     recruitments.operatorDecide(await sfOf(req), req.user!.id, uuidParam(req, 'id'),
       actionParam<'approve' | 'reject'>(req, ['approve', 'reject']), req.body?.note)));
+
+  router.get('/operator/semi-franchises/:key/contents', ...operator, handle(async (req) =>
+    contents.operatorList(await sfOf(req), req.query.status as string | undefined)));
+  router.get('/operator/semi-franchises/:key/contents/:id', ...operator, handle(async (req) =>
+    contents.operatorGet(await sfOf(req), uuidParam(req, 'id'))));
+  router.post('/operator/semi-franchises/:key/contents', ...operator, handle(async (req, res) => {
+    const sf = await sfOf(req);
+    res.status(201);
+    return contents.operatorCreate(sf, req.user!.id, req.body ?? {});
+  }));
+  router.patch('/operator/semi-franchises/:key/contents/:id', ...operator, handle(async (req) =>
+    contents.operatorUpdate(await sfOf(req), req.user!.id, uuidParam(req, 'id'), req.body ?? {})));
+  router.post('/operator/semi-franchises/:key/contents/:id/:action', ...operator, handle(async (req) =>
+    contents.operatorSetStatus(await sfOf(req), req.user!.id, uuidParam(req, 'id'),
+      actionParam<'publish' | 'archive'>(req, ['publish', 'archive']))));
 
   // ─── Neture 관리자 ────────────────────────────────────────────────────────
   router.get('/admin/semi-franchises', ...admin, handle(async () => semiFranchises.listAll()));

@@ -9,6 +9,7 @@ import type { MigrationInterface, QueryRunner } from 'typeorm';
  *   semi_franchise_memberships    약국 조직 단위 세미프랜차이즈 가입
  *   semi_franchise_operators      운영자 ↔ 담당 세미프랜차이즈 (neture:operator ∧ 활성 행)
  *   supply_proposals              SPO 하위 복수 공급 제안(가격 · 대상 · 승인만)
+ *   semi_franchise_contents       세미프랜차이즈 담당 운영자가 게시하는 콘텐츠(가입 약국만 열람 · 내 매장 사본)
  *
  * 기존 테이블:
  *   store_cart_items              + supply_proposal_id, seller_recruitment_id (선택한 제안)
@@ -124,6 +125,25 @@ export class CreateNeturePharmacyCommerce1791160000000 implements MigrationInter
     await q.query(`CREATE INDEX idx_supply_proposals_offer ON supply_proposals (offer_id)`);
     await q.query(`CREATE INDEX idx_supply_proposals_sf_status ON supply_proposals (semi_franchise_id, status)`);
 
+    await q.query(`CREATE TABLE semi_franchise_contents (
+      id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+      semi_franchise_id uuid NOT NULL REFERENCES semi_franchises(id) ON DELETE CASCADE,
+      title varchar(300) NOT NULL,
+      summary text,
+      body text,
+      thumbnail_url text,
+      attachments jsonb NOT NULL DEFAULT '[]'::jsonb,
+      tags jsonb NOT NULL DEFAULT '[]'::jsonb,
+      status varchar(20) NOT NULL DEFAULT 'draft' CHECK (status IN ('draft','published','archived')),
+      created_by uuid REFERENCES users(id) ON DELETE SET NULL,
+      updated_by uuid REFERENCES users(id) ON DELETE SET NULL,
+      published_at timestamptz,
+      created_at timestamptz NOT NULL DEFAULT now(),
+      updated_at timestamptz NOT NULL DEFAULT now()
+    )`);
+    await q.query(`CREATE INDEX idx_semi_franchise_contents_sf_status
+      ON semi_franchise_contents (semi_franchise_id, status)`);
+
     await q.query(`ALTER TABLE store_cart_items
       ADD COLUMN supply_proposal_id uuid,
       ADD COLUMN seller_recruitment_id uuid`);
@@ -167,6 +187,7 @@ export class CreateNeturePharmacyCommerce1791160000000 implements MigrationInter
       ADD CONSTRAINT uq_seller_recruitments_product_seller_service UNIQUE (product_id, seller_id, service_id)`);
     await q.query(`ALTER TABLE store_cart_items
       DROP COLUMN IF EXISTS supply_proposal_id, DROP COLUMN IF EXISTS seller_recruitment_id`);
+    await q.query(`DROP TABLE IF EXISTS semi_franchise_contents`);
     await q.query(`DROP TABLE IF EXISTS supply_proposals`);
     await q.query(`DROP TABLE IF EXISTS semi_franchise_operators`);
     await q.query(`DROP TABLE IF EXISTS semi_franchise_memberships`);
