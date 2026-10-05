@@ -1,6 +1,6 @@
 # CHECK-O4O-RETIRED-WEB-RESIDUAL-CLEANUP-V1
 
-> **상태**: ACTIVE
+> **상태**: COMPLETED
 > **작성일**: 2026-10-05 · **최종 갱신**: 2026-10-05
 > **근거 WO**: WO-O4O-RETIRED-WEB-RESIDUAL-CLEANUP-V1 · 선행 [CHECK-O4O-RETIRED-WEB-SERVICES-DEPLOYMENT-AND-INFRA-CLEANUP-V1](CHECK-O4O-RETIRED-WEB-SERVICES-DEPLOYMENT-AND-INFRA-CLEANUP-V1.md) §4 남은 항목
 
@@ -103,7 +103,30 @@ web 8개 · admin 의 런타임 소스는 바뀌지 않는다(삭제된 패키�
 
 ## 4. 배포 · 운영 검증
 
-(merge · promote 뒤 기록)
+### 4-1. 통합 · 배포
+
+| 단계 | 결과 |
+|---|---|
+| merge 전 기준 | main `a68a15d00` `production` = DEPLOYED (api) — 기존 HOLD 없음 |
+| PR #311 | CI Gate · API Jest 3/3 · Web/Admin build · CodeQL · Sonar 통과 · Codex P1 1건 반영 후 resolve → merge `9e2e95571` |
+| main HEAD | 직후 문서 정비 세션 PR #304 merge(`f66e908ef`, 문서 전용) — promote 는 main HEAD 기준이라 `f66e908ef` 로 진행 |
+| Delivery `f66e908ef` | `HELD_LEVEL_3` — api · admin · web 8개 |
+| promote dry-run (run 37260734710) | 10개 모두 PROMOTE · 사유 전부 "승인된 LEVEL_3 (deploy-infra `services/signage-player-web/Dockerfile`)" — 이번 변경 외 HOLD 사유 0 |
+| promote (run 37260859488) | success — API build-and-deploy · Admin deploy · web 8개 deploy 각 success · Report success |
+| 사후 | `production` = `DEPLOYED · deploy: api,admin,neture,k-cosmetics,kpa-society,pharmacy-hub,lecture,store,kpa-branch,hospital-pharmacy` · Cloud Run 10개 + Job `o4o-api-migrations` 이미지 = `f66e908ef` · traffic 100% · **이번 변경으로 생긴 HOLD 해소** · rollback 미발생 |
+
+### 4-2. 운영 검증 (배포 후)
+
+| 항목 | 결과 |
+|---|---|
+| API health | `api.neture.co.kr` · `api.kpa-society.co.kr` · `api.k-cosmetics.site` `/api/health` 200 |
+| CORS 제거 origin (preflight `POST /api/hospital/ai/request`) | `signage.neture.co.kr` · `signage-player-web` run.app · `hospital.neture.co.kr` → `Access-Control-Allow-Origin` 없음 (배포 전에는 3개 모두 허용 — 기준선 확인) |
+| CORS 유지 origin | `neture.co.kr` · `www.neture.co.kr` · `store.neture.co.kr` · `kpa-society.co.kr` · `hospital-pharmacy-web` run.app → 각 origin 허용 |
+| 병원약국 AI | `POST /api/hospital/ai/request` (Origin `https://neture.co.kr`) → 200 · `success: true` · 응답 `kind/message/plan` · ACAO 허용 |
+| store active-content | `GET /api/signage/kpa-society/active-content` (Origin `store.neture.co.kr`) → 401 `AUTH_REQUIRED` · ACAO 허용 — route 보존 · 인증 계약 그대로 |
+| Tablet ScreenSet 재생 | 운영 DB read-only 로 활성 태블릿 + current screen set 매장 2곳 조회(값 미기록) → `/api/v1/stores/:slug/tablet/screen` 200 `mode=screen_set` · `idle` · `settings` 200 success · 재생 페이지 200 |
+| 웹 · 관리자 화면 (18 URL) | neture · www · `/hospital/`(병원약국) · kpa-society · `/kpa/` · kpa. · admin · k-cosmetics · pharmacyhub · store · study · retail · pharmacy · community · funding · supplier · `/tablet/setup` 2 — 전부 200 · 기대 title |
+| www `/hospital` | 배포 후에도 301 `Location: https://neture.co.kr:443/hospital/a?q=1` |
 
 ## 5. 남은 항목
 
