@@ -363,7 +363,7 @@ glucoseview.co.kr (www)
 kpa-society.co.kr (www)
 k-cosmetics.site (www)
 ```
-<!-- siteguide.co.kr: O4O legacy 제거됨(WO-O4O-SITEGUIDE-LEGACY-CODE-REMOVAL-V1). 현재 미운영 — 향후 별도 저장소 신규 서비스 후보. -->
+<!-- siteguide.co.kr: 서비스 폐기 확정(2026-10-05 · WO-O4O-SITEGUIDE-RETIREMENT-V1). O4O 코드 · 인증서 · LB 연결 없음. -->
 
 **Development:**
 ```
