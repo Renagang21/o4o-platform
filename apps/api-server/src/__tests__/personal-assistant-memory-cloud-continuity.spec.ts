@@ -64,6 +64,8 @@ import { recallAssistantMemory, rememberExecution } from '../services/assistant/
 import { planAssistantTask } from '../services/assistant/assistant-planning.js';
 import { runAssistantWorkTask, type WorkExecutionReply } from '../services/assistant/personal-assistant.js';
 import { makeDb, connected, pairAndRegister, type LocalAgentDb } from './helpers/local-agent-db-stub.js';
+import { nodeLedgerOwnerKey } from '../services/ai-tools/node-ledger-owner.js';
+import { NODE_LEDGER_OWNER_KEY_RE, validateLocalCommandArgs } from '../services/local-agent/local-agent-protocol.js';
 
 const ME = '00000000-0000-4000-8000-0000000000e1';
 const ORG = '00000000-0000-4000-8000-0000000000aa';
@@ -133,14 +135,18 @@ describe('A. 파생 규칙 (노드 derivePatterns 와 같음)', () => {
     expect(failedAlternativeOf('drug_info.x', ev())).toBeNull();
   });
 
-  it('노드 + Cloud 합치기 — 노드가 앞 · 같은 stage 의 같은 방법은 하나(극성 충돌 시 노드)', () => {
-    const node = [{ stageKey: 's1', polarity: 'avoid' as const, strategy: ALT, verifiedCount: 1 }];
+  it('Cloud + 노드 합치기(Phase D) — Cloud 가 앞 · 같은 stage 의 같은 방법은 하나(극성 충돌 시 Cloud — 오래된 노드 avoid 가 최신 Cloud preferred 를 가리지 않는다)', () => {
+    const node = [
+      { stageKey: 's1', polarity: 'avoid' as const, strategy: ALT, verifiedCount: 1 },
+      { stageKey: 's2', polarity: 'preferred' as const, strategy: OLD, verifiedCount: 1 }, // Cloud 에 없는 노드 기억(사설 대상 등) — 그대로 쓴다
+    ];
     const cloud = [
       { stageKey: 's1', polarity: 'preferred' as const, strategy: ALT, verifiedCount: 5 },
       { stageKey: 's1', polarity: 'avoid' as const, strategy: OLD, verifiedCount: 2 },
     ];
-    expect(mergeRecalledPatterns(node, cloud)).toEqual([node[0], cloud[1]]);
+    expect(mergeRecalledPatterns(node, cloud)).toEqual([cloud[0], cloud[1], node[1]]);
     expect(mergeRecalledPatterns([], cloud)).toEqual(cloud);
+    expect(mergeRecalledPatterns(node, [])).toEqual(node);
   });
 });
 
@@ -331,7 +337,7 @@ const INSPECT = (elements: Record<string, unknown>[]) => OK({ snapshotId: SNAP, 
 const READY = { targetId: SITE, targetType: 'browser_site', state: 'ready', reusedExisting: true, openedByO4O: false, tabCount: 1, path: '/' };
 const DONE = { assessment: 'progress', action: { kind: 'takeover', reason: 'goal_sufficiently_advanced' } };
 
-interface Node { contextReply: Record<string, unknown>; patterns: Record<string, unknown>[]; contextSaves: unknown[] }
+interface Node { contextReply: Record<string, unknown>; patterns: Record<string, unknown>[]; contextSaves: unknown[]; ledger: { base: string; args: Record<string, unknown> }[] }
 
 async function drive(db: LocalAgentDb, script: Script, node: Node, max = 60) {
   const seen: { base: string; args: Record<string, unknown> }[] = [];
@@ -345,6 +351,7 @@ async function drive(db: LocalAgentDb, script: Script, node: Node, max = 60) {
     const base = parseLocalAction(String(cmd.action)).base.replace('local.browser.dom.', '');
     const args = cmd.result_data ? JSON.parse(String(cmd.result_data)) : {};
     const reply = (data: unknown) => submitCommandResult(db.dataSource, cmd.device_id, { commandId: cmd.command_id, status: 'success', data } as any);
+    if (base.startsWith('local.data.work_run_')) node.ledger.push({ base, args });
     if (base === 'local.target.prepare') { await reply(READY); continue; }
     if (base === A.DATA_WORK_RUN_CONTEXT_SAVE) { node.contextSaves.push(args); await reply({ saved: true }); continue; }
     if (base === A.DATA_WORK_RUN_CONTEXT_RECALL) { await reply(node.contextReply); continue; }
@@ -362,9 +369,9 @@ async function drive(db: LocalAgentDb, script: Script, node: Node, max = 60) {
   return seen;
 }
 
-function waitingRun(db: LocalAgentDb, runId: string) {
+function waitingRun(db: LocalAgentDb, runId: string, lastAskedDeviceId: string | null = null) {
   const row: Record<string, unknown> = {
-    run_id: runId, user_id: 'user-1', device_id: null, status: 'waiting_for_user', version: 3,
+    run_id: runId, user_id: 'user-1', device_id: lastAskedDeviceId, status: 'waiting_for_user', version: 3,
     created_at: new Date(), updated_at: new Date(), expires_at: new Date(Date.now() + 600_000),
   };
   const base = (db.dataSource.query as jest.Mock).getMockImplementation()!;
@@ -396,12 +403,18 @@ function scripted(proposals: unknown[], kind = 'scripted'): WorkPlanner & { call
   } as WorkPlanner & { calls: PlannerInput[] };
 }
 
-async function runOn(deviceId: string, request: string, planner: WorkPlanner, script: Script, opts: { runId?: string; intent?: any; node?: Partial<Node> } = {}) {
+async function runOn(
+  deviceId: string, request: string, planner: WorkPlanner, script: Script,
+  opts: { runId?: string; intent?: any; node?: Partial<Node>; lastAsked?: 'self' | 'other' | null; nodeCaps?: Record<string, boolean> | null } = {},
+) {
   const db = makeDb();
   await pairAndRegister(db);
-  await connected(db);
-  if (opts.runId) waitingRun(db, opts.runId);
-  const node: Node = { contextReply: { found: false }, patterns: [], contextSaves: [], ...opts.node };
+  const self = await connected(db);
+  // Phase D — 이 노드가 보고한 capability(heartbeat). 없으면 업데이트 전 에이전트.
+  if (opts.nodeCaps) db.devices.find((d) => d.id === self.deviceId)!.capabilities = opts.nodeCaps;
+  const lastAsked = opts.lastAsked === 'self' ? self.deviceId : opts.lastAsked === 'other' ? '00000000-0000-4000-8000-0000000000ff' : null;
+  if (opts.runId) waitingRun(db, opts.runId, lastAsked);
+  const node: Node = { contextReply: { found: false }, patterns: [], contextSaves: [], ledger: [], ...opts.node };
   const ctx: VerifiedToolContext = { userId: 'user-1', workspace: 'home', localAgentStatus: 'connected', localDeviceId: deviceId };
   const input = { request, ...(opts.runId ? { runId: opts.runId, targetHint: SITE } : {}), ...(opts.intent ? { intent: opts.intent } : {}) };
   const [result, seen] = await Promise.all([runWorkAgent(db.dataSource, ctx, input, planner), drive(db, script, node)]);
@@ -527,6 +540,83 @@ describe('D. runtime 노드 간 연속성', () => {
       runId: 'g_q10', intent, node: { contextReply: { found: true, taskKey: 'drug_info.lookup', stageKey: 'search_product', ask: null, strategy: null } },
     });
     expect(planner.calls[0].resumeFrame).toMatchObject({ taskKey: 'drug_info.lookup', stageKey: 'search_product' });
+  });
+});
+
+// ─── F. Phase D — Execution Node · Runtime State 조정 ─────────────────────────
+
+describe('F. Phase D — 노드 원장 소유 주체 · 재개 구조 최신성', () => {
+  const SCOPED = { browser: true, windowsUia: true, localData: false, ownerScopedLedger: true };
+  const OWNER_ORG = nodeLedgerOwnerKey('ORGANIZATION', '00000000-0000-4000-8000-0000000000a1');
+  const frameOf = (taskKey: string, stageKey: string) => ({ taskKey, stageKey, ask: null, strategy: null });
+
+  it('소유 주체 키 — 형식(에이전트와 같은 규칙) · 같은 소유 주체면 같은 키 · 다르면 다른 키 · 원 id 를 담지 않는다', () => {
+    const u = nodeLedgerOwnerKey('USER', 'user-1');
+    expect(u).toMatch(NODE_LEDGER_OWNER_KEY_RE);
+    expect(nodeLedgerOwnerKey('USER', 'user-1')).toBe(u);
+    expect(nodeLedgerOwnerKey('ORGANIZATION', 'user-1')).not.toBe(u);
+    expect(u).not.toContain('user-1');
+  });
+
+  it('원장 명령 검증 — ownerKey 는 선택 · 형식이 아니면 명령 전체 거절 · 다른 추가 키는 여전히 거절', () => {
+    const ok = validateLocalCommandArgs(A.DATA_WORK_RUN_EXPERIENCE_RECALL, { targetId: SITE, taskKey: null, ownerKey: OWNER_ORG });
+    expect(ok).toEqual({ ok: true, args: { targetId: SITE, taskKey: null, ownerKey: OWNER_ORG } });
+    expect(validateLocalCommandArgs(A.DATA_WORK_RUN_EXPERIENCE_RECALL, { targetId: SITE, taskKey: null })).toEqual({ ok: true, args: { targetId: SITE, taskKey: null } });
+    expect(validateLocalCommandArgs(A.DATA_WORK_RUN_EXPERIENCE_RECALL, { targetId: SITE, taskKey: null, ownerKey: 'U:user-1' }).ok).toBe(false);
+    expect(validateLocalCommandArgs(A.DATA_WORK_RUN_EXPERIENCE_RECALL, { targetId: SITE, taskKey: null, ownerKey: OWNER_ORG, extra: 1 }).ok).toBe(false);
+    // 소유 주체를 받지 않는 명령(재개 구조 저장)에는 실을 수 없다.
+    expect(validateLocalCommandArgs(A.DATA_WORK_RUN_CONTEXT_RECALL, { runId: 'g_1', targetId: SITE, slotValue: null, ownerKey: OWNER_ORG }).ok).toBe(false);
+  });
+
+  it('소유 주체 원장 노드 — 경험 회상 · Candidate 대조 · run 기록에 Task 소유 주체 키가 실린다(재개 구조 · 상태에는 없다)', async () => {
+    const intent = { ...planAssistantTask(BASE).intent, node: { ownerKey: OWNER_ORG, preferredDeviceIds: [] } };
+    const planner = scripted([DONE]);
+    const { node } = await runOn('dev-pc-a', '약학정보원에서 게보린 검색해줘', planner, { get_context: [CTX('/')], inspect: [INSPECT(HOME)] }, { intent, nodeCaps: SCOPED });
+    const by = (b: string) => node.ledger.filter((l) => l.base === b);
+    expect(by(A.DATA_WORK_RUN_EXPERIENCE_RECALL).length).toBeGreaterThan(0);
+    for (const l of by(A.DATA_WORK_RUN_EXPERIENCE_RECALL)) expect(l.args.ownerKey).toBe(OWNER_ORG);
+    for (const l of by(A.DATA_WORK_RUN_CANDIDATE_MATCH)) expect(l.args.ownerKey).toBe(OWNER_ORG);
+    for (const l of by(A.DATA_WORK_RUN_UPSERT)) expect(l.args.ownerKey).toBe(OWNER_ORG);
+    for (const l of node.ledger.filter((x) => x.base === A.DATA_WORK_RUN_SET_STATUS || x.base === A.DATA_WORK_RUN_EXPERIENCE_RECORD)) expect(l.args).not.toHaveProperty('ownerKey');
+  });
+
+  it('Task 없이 온 실행 + 소유 주체 원장 노드 — 요청자 개인(USER) 키로 나눈다', async () => {
+    const planner = scripted([DONE]);
+    const { node } = await runOn('dev-pc-a', '약학정보원에서 게보린 검색해줘', planner, { get_context: [CTX('/')], inspect: [INSPECT(HOME)] }, { nodeCaps: SCOPED });
+    const recall = node.ledger.find((l) => l.base === A.DATA_WORK_RUN_EXPERIENCE_RECALL);
+    expect(recall?.args.ownerKey).toBe(nodeLedgerOwnerKey('USER', 'user-1'));
+  });
+
+  it('업데이트 전 에이전트(capability 미보고) — ownerKey 를 보내지 않는다(거절 방지) · 기능은 예전대로', async () => {
+    const intent = { ...planAssistantTask(BASE).intent, node: { ownerKey: OWNER_ORG, preferredDeviceIds: [] } };
+    const planner = scripted([DONE]);
+    const { node } = await runOn('dev-pc-a', '약학정보원에서 게보린 검색해줘', planner, { get_context: [CTX('/')], inspect: [INSPECT(HOME)] }, { intent });
+    expect(node.ledger.length).toBeGreaterThan(0);
+    for (const l of node.ledger) expect(l.args).not.toHaveProperty('ownerKey');
+    expect(node.ledger.some((l) => l.base === A.DATA_WORK_RUN_EXPERIENCE_RECALL)).toBe(true);
+  });
+
+  it('A→B→A — 마지막 질문을 받은 노드가 지금 노드가 아니면 노드 원장의 (오래된) 재개 구조를 읽지 않고 Cloud 구조로 잇는다', async () => {
+    const cloudFrame = frameOf('drug_info.lookup', 'stage_from_b');
+    const intent = planAssistantTask({ ...BASE, resuming: true, memory: { patterns: [], resumeFrame: cloudFrame } }).intent;
+    const planner = scripted([DONE]);
+    const { node } = await runOn('dev-pc-a', '게보린', planner, { get_context: [CTX('/')], inspect: [INSPECT(HOME)] }, {
+      runId: 'g_aba', intent, lastAsked: 'other',
+      node: { contextReply: { found: true, taskKey: 'drug_info.lookup', stageKey: 'stale_stage_from_a', ask: null, strategy: null } },
+    });
+    expect(node.ledger.some((l) => l.base === A.DATA_WORK_RUN_CONTEXT_RECALL)).toBe(false);
+    expect(planner.calls[0].resumeFrame).toMatchObject({ stageKey: 'stage_from_b' });
+  });
+
+  it('같은 노드에서 질문하고 같은 노드에서 이어가면 노드 원장 구조(재생 단계 포함 가능)를 쓴다', async () => {
+    const intent = planAssistantTask({ ...BASE, resuming: true, memory: { patterns: [], resumeFrame: frameOf('drug_info.cloud', 'cloud_stage') } }).intent;
+    const planner = scripted([DONE]);
+    const { node } = await runOn('dev-pc-a', '게보린', planner, { get_context: [CTX('/')], inspect: [INSPECT(HOME)] }, {
+      runId: 'g_same', intent, lastAsked: 'self',
+      node: { contextReply: { found: true, taskKey: 'drug_info.lookup', stageKey: 'search_product', ask: null, strategy: null } },
+    });
+    expect(node.ledger.some((l) => l.base === A.DATA_WORK_RUN_CONTEXT_RECALL)).toBe(true);
+    expect(planner.calls[0].resumeFrame).toMatchObject({ stageKey: 'search_product' });
   });
 });
 

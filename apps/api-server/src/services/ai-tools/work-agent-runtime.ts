@@ -18,6 +18,7 @@ import logger from '../../utils/logger.js';
 import { AI_TOOL_NAMES, type VerifiedToolContext } from './ai-tool-contract.js';
 import { LOCAL_AGENT_ACTIONS, LOCAL_AGENT_ERROR } from '../local-agent/local-agent-protocol.js';
 import { resolveTargetDevice, type DeviceRow } from '../local-agent/local-agent-service.js';
+import { nodeLedgerOwnerKey } from './node-ledger-owner.js';
 import { isRegisteredBrowserSite } from '../local-agent/browser-site-registry.js';
 import type { SafeDomElement } from '../local-agent/browser-dom-contract.js';
 import { issueDomCommand } from './browser-dom-executor.js';
@@ -676,6 +677,12 @@ export async function runWorkAgent(
   let deviceId: string | null = null;
   /** Phase D — 이번 run 의 Execution Node(capability 포함). 노드 원장을 소유 주체로 나눌 수 있는지 판단에 쓴다. */
   let executionNode: DeviceRow | null = null;
+  /**
+   * Phase D — 노드 원장 소유 주체 키. 노드가 소유 주체 원장(local.db v8)을 보고했을 때만 값이 있고, 그때 노드 원장의
+   * 읽기 · 쓰기가 이 소유 주체 안으로 한정된다. 값이 없으면(업데이트 전 에이전트 — 모르는 인자를 거절한다) 예전 동작 그대로다:
+   * 그 노드 원장은 소유 주체를 구분하지 못한다(V2 §23 — 에이전트 업데이트로 해소). 기능을 끄지 않는다(회귀 금지).
+   */
+  let ledgerOwner: string | null = null;
   let neededInput: string | null = null;
   let sameObservationRun = 0;
   let repeatedActionRun = 0;
@@ -786,7 +793,7 @@ export async function runWorkAgent(
       });
       if (row) coordinationVersion = row.version;
       // Local SQLite 정본 갱신(사용자 PC). goal/질문 원문은 싣지 않는다 — 상태 enum 만.
-      if (deviceId) await issueWorkRunSetStatus(dataSource, { userId: ctx.userId, deviceId }, { runId: goal.runId, status });
+      if (deviceId) await issueWorkRunSetStatus(dataSource, { userId: ctx.userId, deviceId, ownerKey: ledgerOwner }, { runId: goal.runId, status });
     } catch (e) {
       logger.warn('work-agent run terminal persist failed', { code: (e as { code?: string })?.code ?? null });
     }
@@ -799,7 +806,7 @@ export async function runWorkAgent(
    */
   const persistWorkflow = async (kind: WorkGoalStatus): Promise<void> => {
     if (!goal.runId || !deviceId || targetRef.targetType === 'windows_app') return;
-    const ledgerCtx = { userId: ctx.userId, deviceId };
+    const ledgerCtx = { userId: ctx.userId, deviceId, ownerKey: ledgerOwner };
     let saved = false;
     try {
       if (kind === 'completed' && trajectory.length > 0) {
@@ -885,9 +892,9 @@ export async function runWorkAgent(
         });
       }
       const endedAt = new Date();
-      const timing = await measureSegmentCommandTiming(dataSource, { userId: ctx.userId, deviceId }, { from: new Date(state.startedAt), to: endedAt });
+      const timing = await measureSegmentCommandTiming(dataSource, { userId: ctx.userId, deviceId, ownerKey: ledgerOwner }, { from: new Date(state.startedAt), to: endedAt });
       const actionCount = steps.filter((x) => x.stage === 'input' || x.stage === 'activate').length;
-      await issueWorkRunExperienceRecord(dataSource, { userId: ctx.userId, deviceId }, {
+      await issueWorkRunExperienceRecord(dataSource, { userId: ctx.userId, deviceId, ownerKey: ledgerOwner }, {
         runId,
         segment: { startedAt: new Date(state.startedAt).toISOString(), endedAt: endedAt.toISOString(), endState, resumed: resumedRun },
         target: { targetId: siteId, targetKind: targetRef.targetType === 'windows_app' ? 'windows_app' : 'browser_site' },
@@ -925,7 +932,7 @@ export async function runWorkAgent(
   const saveRunContext = async (): Promise<void> => {
     if (!deviceId || !goal.runId) return;
     try {
-      await issueWorkRunContextSave(dataSource, { userId: ctx.userId, deviceId }, {
+      await issueWorkRunContextSave(dataSource, { userId: ctx.userId, deviceId, ownerKey: ledgerOwner }, {
         runId: goal.runId, targetId: siteId,
         ...currentRunFrame(),
         replay: questionReplay,
@@ -996,7 +1003,7 @@ export async function runWorkAgent(
       };
       if (isCorrection) state.userCorrectionCount = (state.userCorrectionCount ?? 0) + 1;
       lastAssistanceEvent = event;
-      const r = await issueWorkRunAssistanceRecord(dataSource, { userId: ctx.userId, deviceId }, {
+      const r = await issueWorkRunAssistanceRecord(dataSource, { userId: ctx.userId, deviceId, ownerKey: ledgerOwner }, {
         runId: goal.runId, targetId: siteId, taskKey: declaredTask ?? resumeFrame?.taskKey ?? null, event,
       });
       logger.info('work-agent assistance', {
@@ -1178,6 +1185,10 @@ export async function runWorkAgent(
   }
   deviceId = resolution.device.id;
   executionNode = resolution.device;
+  // 소유 주체 키: Assistant 가 Task 소유로 정한 값. Task 없이 온 실행(직접 endpoint 등)은 요청자 개인 업무로 본다.
+  ledgerOwner = executionNode.capabilities?.ownerScopedLedger === true
+    ? (input.intent?.node?.ownerKey ?? nodeLedgerOwnerKey('USER', ctx.userId))
+    : null;
   if (resolution.onlineCount > 1) logger.info('work-agent node selected', { reason: resolution.reason, onlineCount: resolution.onlineCount });
 
   // ── Target Discovery / Activation (§3·§34·§35) — 관찰 · Planner 전에 대상을 준비한다. 행동 예산을 쓰지 않는다.
@@ -1216,14 +1227,19 @@ export async function runWorkAgent(
   }
   surfaceReady = true;
   // Local SQLite 정본에 run 을 기록한다(cloud→local write only). semantic 만 — 대상 id·짧은 목표 요약(원문 관찰/DOM 없음).
-  await issueWorkRunUpsert(dataSource, { userId: ctx.userId, deviceId }, {
+  await issueWorkRunUpsert(dataSource, { userId: ctx.userId, deviceId, ownerKey: ledgerOwner }, {
     // 재개 답변(짧은 답)으로 원래 목표 요약을 덮지 않는다.
     runId: goal.runId, status: 'active', targetId: siteId, goalSummary: resumedRun ? undefined : goal.request.slice(0, 200),
   });
 
   // ── Phase 2 최소 recall(D1 질의형) — 구조만 읽는다. 구 agent(미지원 action)면 조용히 Phase 1 동작으로 남는다. ──
-  const ledgerCtx = { userId: ctx.userId, deviceId };
-  if (resumedRun) {
+  const ledgerCtx = { userId: ctx.userId, deviceId, ownerKey: ledgerOwner };
+  // Phase D — 노드 원장의 재개 구조는 그 노드가 이 run 의 **마지막 질문**을 받은 노드일 때만 최신이다.
+  //   A 에서 질문 → B 에서 이어 더 진행 · 다시 질문 → A 로 돌아오면, A 의 원장에는 첫 질문 시점의 구조가 남아 있다.
+  //   마지막으로 질문한 노드(resumeRow.deviceId)가 지금 노드가 아니면 노드 구조 · 재생 단계를 쓰지 않고 Cloud 구조를 쓴다.
+  const lastAskedOnThisNode = !resumeRow?.deviceId || resumeRow.deviceId === deviceId;
+  if (resumedRun && !lastAskedOnThisNode) logger.info('work-agent resume frame', { source: 'skip_stale_node' });
+  if (resumedRun && lastAskedOnThisNode) {
     try {
       // 답이 "값 하나" 면 막혔던 재생 자리만 채워 달라고 한다(Local 은 그 값을 저장하지 않는다).
       const answer = normalizeWorkflowText(goal.request);
@@ -1238,8 +1254,10 @@ export async function runWorkAgent(
     } catch (e) {
       logger.warn('work-agent context recall failed', { code: (e as { code?: string })?.code ?? null });
     }
-    // Cloud Continuity — 이 노드 원장에 원래 업무 구조가 없으면(다른 PC 에서 질문했던 run) Assistant Memory 의 재개 구조를 쓴다.
-    // 재생 단계(Workflow Candidate)는 노드 원장에만 있다 — 다른 PC 에서는 결정적 재생 없이 현재 화면으로 이어간다.
+  }
+  if (resumedRun) {
+    // Cloud Continuity — 이 노드 원장의 구조를 쓰지 않았으면(다른 노드에서 질문했던 run · 오래된 노드 구조) Assistant Memory 의
+    // 재개 구조를 쓴다. 재생 단계(Workflow Candidate)는 노드 원장에만 있다 — 그때는 결정적 재생 없이 현재 화면으로 이어간다.
     const cloudFrame = input.intent?.memory?.resumeFrame ?? null;
     if (!resumeFrame && cloudFrame) {
       resumeFrame = { taskKey: cloudFrame.taskKey, stageKey: cloudFrame.stageKey, ask: cloudFrame.ask, strategy: cloudFrame.strategy };
@@ -1254,6 +1272,7 @@ export async function runWorkAgent(
       .map((p) => ({ stageKey: p.stageKey, polarity: p.polarity, strategy: p.strategy, verifiedCount: p.verifiedCount }));
   const recallExperience = async (taskKey: string | null): Promise<void> => {
     let nodePatterns: RecalledPattern[] = [];
+    // Phase D — 소유 주체 원장 노드면 ledgerCtx.ownerKey 로 이 소유 주체의 기억만 돌아온다.
     try {
       const r = await issueExperienceRecall(dataSource, ledgerCtx, { targetId: siteId, taskKey });
       if (r.status === 'success') {
@@ -1264,7 +1283,8 @@ export async function runWorkAgent(
     } catch (e) {
       logger.warn('work-agent experience recall failed', { code: (e as { code?: string })?.code ?? null });
     }
-    // 노드 원장(그 PC) + 소유 주체 Cloud 기억. 새 PC 라 노드가 비어도 검증된 방법이 이어진다 — 현재 화면으로 다시 검증하며 쓴다(P3).
+    // 소유 주체 Cloud 기억 + 노드 원장(그 노드). Cloud 가 앞선다(Phase D) — 노드가 비어도, 노드에 오래된 기억이 있어도
+    // 모든 노드의 검증으로 갱신되는 Cloud 쪽을 따른다. 현재 화면으로 다시 검증하며 쓴다(P3).
     if (taskKey !== null) {
       const cloud = cloudPatternsFor(taskKey);
       patterns = mergeRecalledPatterns(nodePatterns, cloud);
@@ -1585,7 +1605,7 @@ export async function runWorkAgent(
   if (surface === 'dom' && !resumedRun && !recoveryHint && !image) {
     let match: Awaited<ReturnType<typeof issueWorkflowCandidateMatch>> | null = null;
     try {
-      match = await issueWorkflowCandidateMatch(dataSource, { userId: ctx.userId, deviceId }, {
+      match = await issueWorkflowCandidateMatch(dataSource, { userId: ctx.userId, deviceId, ownerKey: ledgerOwner }, {
         targetId: siteId, request: normalizeWorkflowText(goal.request).slice(0, 500),
       });
     } catch (e) {
