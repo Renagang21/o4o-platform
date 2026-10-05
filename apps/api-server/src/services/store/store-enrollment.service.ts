@@ -38,8 +38,13 @@ import {
 } from '../../utils/store-organization.resolver.js';
 import type { StoreOwnerServiceKey } from '../../utils/store-owner.utils.js';
 
-/** 가입 가능한 업종(서비스). owner role prefix 와 같은 축이다 — 새 prefix 를 만들지 않는다. */
-export const ENROLLABLE_SERVICE_KEYS: readonly StoreOwnerServiceKey[] = ['kpa', 'cosmetics', 'pharmacy-hub'];
+/**
+ * 가입 가능한 업종(서비스). owner role prefix 와 같은 축이다 — 새 prefix 를 만들지 않는다.
+ * 약국(`kpa`)은 제외 — 약국 매장은 Neture 기본 가입 신청 · 자격 확인 · 운영자 승인으로만 열린다
+ * (WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1 · O4O-STORE-ACCESS-AND-MEMBERSHIP-V1 §3-A). 로그인만으로
+ * 약국 조직 · kpa:store_owner · active membership 을 만들던 승인 우회 경로를 닫는다.
+ */
+export const ENROLLABLE_SERVICE_KEYS: readonly StoreOwnerServiceKey[] = ['cosmetics', 'pharmacy-hub'];
 
 /**
  * 가입이 부여하는 소유 role. `{prefix}:store_owner` — 기존 규약 그대로.

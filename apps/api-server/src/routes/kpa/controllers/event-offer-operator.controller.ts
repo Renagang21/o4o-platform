@@ -253,21 +253,30 @@ export function createEventOfferOperatorController(
         const { isVisible } = req.body;
 
         // WO-O4O-EVENT-OFFER-CORE-REFORM-V1: is_active + status 동시 업데이트
-        const newStatus = isVisible ? 'approved' : 'canceled';
+        // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: 종료는 단방향이다. 숨김 = 종료(canceled),
+        //   노출은 **승인된 행**에만 — canceled/rejected/pending 을 approved 로 되돌리던 승인 우회를 막는다
+        //   (가격 · 조건을 바꾸려면 종료 후 새로 신청).
         const result = await dataSource.query(
-          `UPDATE organization_product_listings
-           SET is_active = $1, status = $2, updated_at = NOW()
-           WHERE id = $3 AND service_key = $4
-           RETURNING id, is_active`,
-          [isVisible, newStatus, id, SERVICE_KEYS.KPA_GROUPBUY]
+          isVisible
+            ? `UPDATE organization_product_listings
+               SET is_active = true, updated_at = NOW()
+               WHERE id = $1 AND service_key = $2 AND status = 'approved'
+               RETURNING id, is_active`
+            : `UPDATE organization_product_listings
+               SET is_active = false, status = 'canceled', updated_at = NOW()
+               WHERE id = $1 AND service_key = $2 AND status IN ('pending', 'approved')
+               RETURNING id, is_active`,
+          [id, SERVICE_KEYS.KPA_GROUPBUY]
         );
+        // TypeORM postgres 는 UPDATE 결과를 [rows, affectedCount] 로 돌려준다.
+        const rows = Array.isArray(result) && Array.isArray(result[0]) ? result[0] : result;
 
-        if (!result.length) {
+        if (!rows.length) {
           createErrorResponse(res, 404, 'NOT_FOUND');
           return;
         }
 
-        res.json({ success: true, data: { id, isVisible: result[0].is_active } });
+        res.json({ success: true, data: { id, isVisible: rows[0].is_active } });
       } catch (error: any) {
         console.error('Failed to update event offer visibility:', error);
         createErrorResponse(res, 500, 'INTERNAL_ERROR');

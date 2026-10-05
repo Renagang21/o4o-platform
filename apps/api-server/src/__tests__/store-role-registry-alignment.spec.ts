@@ -12,7 +12,10 @@
  *                                     cafe24-b2b 제외 — HMAC 쿠키 세션이라 isStoreOwner() 를 안 거친다
  *   STORE_MEMBER_ROLE_BY_SERVICE (4)  초대 수락이 발급하는 member role
  *                                     조직↔서비스 linkage 가 있는 서비스 전부 (cafe24-b2b 포함)
- *   ENROLLABLE_SERVICE_KEYS      (3)  자가 가입 가능 업종 — 외부 로그인 전용 채널 제외
+ *   ENROLLABLE_SERVICE_KEYS      (2)  자가 가입 가능 업종 — 외부 로그인 전용 채널 · 약국(kpa) 제외
+ *                                     약국 매장은 Neture 기본 가입 신청 + 운영자 승인으로만 열린다
+ *                                     (WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1 · ACCESS 정본 §3-A)
+ *   STORE_OWNER_ROLE_BY_SERVICE  (3)  owner role 규약 — 게이트 registry 와 같은 키(kpa 포함)
  *
  * 이 spec 은 "셋이 같아야 한다" 를 고정하지 않는다. 처음엔 그렇게 적었다가 PR #288 리뷰에서
  * 틀린 전제임이 드러났다 — member 목록을 3종으로 줄이면 cafe24-b2b 전용 조직의 초대 수락이
@@ -32,12 +35,20 @@ const OWNER_UTILS = read('apps/api-server/src/utils/store-owner.utils.ts');
 const RBAC_DOC = read('docs/architecture/auth/O4O-STORE-OWNER-RBAC-STANDARD-V1.md');
 const ACCESS_DOC = read('docs/baseline/O4O-STORE-ACCESS-AND-MEMBERSHIP-V1.md');
 
-/** 공통 게이트의 정본 registry 키를 소스에서 읽는다(복사해 적지 않는다). */
-function gateServiceKeys(): string[] {
+/**
+ * 공통 게이트의 정본 registry 를 소스에서 읽는다(복사해 적지 않는다 — 모듈 밖으로 export 되지 않는 상수다).
+ * 키 → role 배열.
+ */
+function gateRegistry(): Record<string, string[]> {
   const m = OWNER_UTILS.match(/STORE_OWNER_ROLES_BY_SERVICE\s*=\s*\{([\s\S]*?)\}\s*as const/);
   if (!m) throw new Error('STORE_OWNER_ROLES_BY_SERVICE 를 찾지 못했다 — 정본 위치가 바뀌었다');
-  return [...m[1].matchAll(/^\s*'?([a-z0-9-]+)'?\s*:/gm)].map((x) => x[1]);
+  const out: Record<string, string[]> = {};
+  for (const x of m[1].matchAll(/^\s*'?([a-z0-9-]+)'?\s*:\s*\[([^\]]*)\]/gm)) {
+    out[x[1]] = [...x[2].matchAll(/'([^']+)'/g)].map((r) => r[1]);
+  }
+  return out;
 }
+const gateServiceKeys = (): string[] => Object.keys(gateRegistry());
 
 /**
  * 각 목록의 **기준**. 목록끼리 비교하지 않고 "이 목록은 무엇으로 정해지는가" 를 적는다 —
@@ -59,7 +70,8 @@ const LISTS = [
   // member role: linkedServiceKeys() 가 linkage 를 돌며 발급한다. 한 키라도 비면 그 조직의 수락이
   //   관계만 바꾸고 role 을 건너뛰어 접근 0 · 재수락 불가가 된다(PR #288 리뷰 P1).
   list('member role (수락이 발급)', 'store_member', STORE_MEMBER_ROLE_BY_SERVICE, Object.keys(STORE_SERVICE_ORG_LINKAGE)),
-  list('자가 가입 owner role', 'store_owner', STORE_OWNER_ROLE_BY_SERVICE, ENROLLABLE_SERVICE_KEYS),
+  // owner role 규약: 게이트 registry 와 같은 키. 자가 가입 목록보다 넓을 수 있다(kpa — 승인 경로 전용).
+  list('owner role 규약', 'store_owner', STORE_OWNER_ROLE_BY_SERVICE, gateServiceKeys()),
 ];
 
 describe('각 목록은 자기 기준을 따른다', () => {
@@ -69,8 +81,28 @@ describe('각 목록은 자기 기준을 따른다', () => {
     for (const key of expected) expect(l.role(key)).toBe(`${key}:${l.suffix}`);
   });
 
-  it('공통 게이트 owner registry 는 자가 가입 목록과 같다 — 가입했는데 못 들어가는 일이 없다', () => {
-    expect(gateServiceKeys().sort()).toEqual([...ENROLLABLE_SERVICE_KEYS].sort());
+  it('자가 가입 키는 모두 owner role 과 게이트 registry 에 있다 — 가입했는데 못 들어가는 일이 없다', () => {
+    const gate = gateRegistry();
+    for (const key of ENROLLABLE_SERVICE_KEYS) {
+      expect(STORE_OWNER_ROLE_BY_SERVICE[key]).toBe(`${key}:store_owner`);
+      expect(gate[key] ?? []).toContain(`${key}:store_owner`);
+    }
+  });
+
+  it('게이트 registry 의 각 키는 자기 {key}:store_owner 를 가진다', () => {
+    for (const [key, roles] of Object.entries(gateRegistry())) {
+      expect(roles).toContain(`${key}:store_owner`);
+      for (const r of roles) expect(r).toMatch(/^[a-z0-9-]+:store_owner$/);
+    }
+  });
+
+  it('약국(kpa)은 게이트 registry 에 있지만 자가 가입 대상이 아니다', () => {
+    // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1 (ACCESS 정본 §3-A):
+    //   약국 매장은 Neture 기본 가입 신청 · 자격 확인 · 운영자 승인으로만 열린다.
+    //   POST /api/v1/store/enrollment 로 kpa 조직 · kpa:store_owner 를 만드는 승인 우회 경로는 닫혀 있어야 한다.
+    expect(gateServiceKeys()).toContain('kpa');
+    expect(STORE_OWNER_ROLE_BY_SERVICE.kpa).toBe('kpa:store_owner');
+    expect(ENROLLABLE_SERVICE_KEYS).not.toContain('kpa');
   });
 
   it('cafe24-b2b 는 owner 게이트 밖이지만 member role 은 있다', () => {

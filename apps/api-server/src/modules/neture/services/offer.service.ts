@@ -253,6 +253,24 @@ export class NetureOfferService {
         if (existingApprovals.length === 0) {
           const keys = offer.serviceKeys?.length ? offer.serviceKeys : [];
           const uniqueKeys = [...new Set(keys)];
+          if (uniqueKeys.length === 0) {
+            // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1 (DESIGN §3-3):
+            //   공급처를 지정하지 않은 제품은 서비스 승인(OSA) 행이 없어 파생 sync 로는 APPROVED 가 될 수 없었다.
+            //   이 경우 운영자 승인 = **제품 등록 승인**을 직접 기록한다(pharmacy 기본 공급 대상).
+            //   세미프랜차이즈별 공급 승인은 supply_proposals 가 따로 맡는다. OSA 행이 있는 제품은 기존 파생 규칙 그대로.
+            await queryRunner.query(
+              `UPDATE supplier_product_offers
+                  SET approval_status = 'APPROVED', is_active = true, updated_at = NOW()
+                WHERE id = $1`,
+              [offerId],
+            );
+            await queryRunner.commitTransaction();
+            logger.info(`[NetureOfferService] Offer registration approved (no designated supply target): ${offerId} by ${adminUserId}`);
+            return {
+              success: true,
+              data: { id: offer.id, masterId: offer.masterId, isActive: true, approvalStatus: OfferApprovalStatus.APPROVED, autoListedCount: 0 },
+            };
+          }
           if (uniqueKeys.length > 0) {
             const values = uniqueKeys.map((_, i) => `($1, $${i + 2}, 'pending', NOW(), NOW())`).join(', ');
             await queryRunner.query(

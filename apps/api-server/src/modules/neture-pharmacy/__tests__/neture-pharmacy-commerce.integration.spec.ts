@@ -20,6 +20,8 @@ import { EventOfferService } from '../../../routes/kpa/services/event-offer.serv
 import { isStoreOwner } from '../../../utils/store-owner.utils.js';
 import { cancelStoreOrderBeforePayment } from '../../../services/checkout/store-order-cancel.service.js';
 import { policyAcceptanceService } from '../../policy-acceptance/policy-acceptance.service.js';
+import { SupplierOrderService } from '../../neture/services/supplier-order.service.js';
+import { resolveSemiFranchiseCommunityAccess } from '../services/semi-franchise-community-access.js';
 
 jest.mock('../../../utils/logger.js', () => ({
   __esModule: true,
@@ -207,6 +209,26 @@ d('Neture 약국 매장 commerce — 격리 PostgreSQL 통합 검증', () => {
       await expect(sfs.requireOperatorOf(stranger, 'pharmacy')).rejects.toMatchObject({ httpStatus: 403 });
       const sf = await sfs.requireOperatorOf(pharmacyOperator, 'pharmacy');
       expect((await sfs.decideMembership(sf, pharmacyOperator, app.id, 'approve')).status).toBe('active');
+    });
+  });
+
+  describe('세미프랜차이즈 커뮤니티 접근', () => {
+    it('가입 승인 = 이용, 정지 = 차단, 일반 커뮤니티 키는 판정 대상 아님, community_memberships 생성 0', async () => {
+      const key = `cf-${tag}`;
+      const op = await user();
+      await role(op, 'neture:operator');
+      await sfs.create({ key, name: 'C', communityKey: `community-${key}` });
+      await sfs.assignOperator(key, op, operatorId);
+      const p = await approvedPharmacy();
+      const before = await resolveSemiFranchiseCommunityAccess(ds, p.owner, `community-${key}`);
+      expect(before).toMatchObject({ semiFranchise: true, allowed: false });
+      const mId = await joinSemiFranchise(p.orgId, p.owner, key, op);
+      expect((await resolveSemiFranchiseCommunityAccess(ds, p.owner, `community-${key}`)).allowed).toBe(true);
+      await sfs.decideMembership((await sfs.getByKey(key))!, op, mId, 'suspend');
+      expect((await resolveSemiFranchiseCommunityAccess(ds, p.owner, `community-${key}`)).allowed).toBe(false);
+      expect((await resolveSemiFranchiseCommunityAccess(ds, p.owner, 'pharmacy')).semiFranchise).toBe(false);
+      const [cm] = await ds.query(`SELECT count(*)::int AS c FROM community_memberships WHERE user_id = $1`, [p.owner]);
+      expect(cm.c).toBe(0);
     });
   });
 
@@ -434,6 +456,29 @@ d('Neture 약국 매장 commerce — 격리 PostgreSQL 통합 검증', () => {
       await cart.add(member.owner, member.orgId, { kind: 'default', id: scarce.offerId, quantity: 2 });
       const third = await cart.checkout(member.owner, member.orgId, {});
       expect(third.failedItems.some((f) => f.code === 'INSUFFICIENT_STOCK')).toBe(true);
+    });
+
+    it('공급자 주문 목록에 약국 주문이 보이고(구매 약국 · 테스트 결제 표시) 다른 공급자에게는 보이지 않는다', async () => {
+      const a = await supplierWithProduct({ price: 1000 });
+      const b = await supplierWithProduct({ price: 1000 });
+      const buyer = await user();
+      const [no] = await ds.query(
+        `INSERT INTO neture_orders (order_number, user_id, status, service_key, metadata)
+         VALUES ($1, $2, 'paid', 'neture-pharmacy', $3::jsonb) RETURNING id`,
+        [uniq('NTR'), buyer, JSON.stringify({ buyerOrganizationName: '테스트약국', testPayment: true })],
+      );
+      await ds.query(
+        `INSERT INTO neture.neture_order_items (order_id, product_id, product_name, quantity, unit_price, total_price)
+         VALUES ($1, $2, 'x', 1, 1000, 1000)`,
+        [no.id, a.offerId],
+      );
+      const svc = new SupplierOrderService(ds);
+      const mine = await svc.listOrders(a.supplierId, { page: 1, limit: 20 });
+      const row = mine.data.find((o: any) => o.id === no.id);
+      expect(row).toMatchObject({ service_key: 'neture-pharmacy', buyer_organization_name: '테스트약국', test_payment: true });
+      expect((await svc.getOrderKpi(a.supplierId)).total_orders).toBeGreaterThanOrEqual(1);
+      const other = await svc.listOrders(b.supplierId, { page: 1, limit: 20 });
+      expect(other.data.some((o: any) => o.id === no.id)).toBe(false);
     });
 
     it('세미프랜차이즈 가입이 정지되면 담아 둔 전용 상품도 주문할 수 없다', async () => {

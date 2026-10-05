@@ -11,7 +11,7 @@
  * - checkout_orders 조회 실패 시 neture 단독으로 degrade.
  */
 // WO-O4O-SUPPLIER-FULFILLMENT-SERVICE-SCOPE-V1
-import { NETURE_FULFILLMENT_SERVICE_KEY, netureOrderServiceScopeSql, checkoutOrderServiceScopeSql } from '../constants/fulfillment-service-scope.js';
+import { SUPPLIER_VISIBLE_FULFILLMENT_SERVICE_KEYS, checkoutOrderServiceSetSql, netureOrderServiceSetSql } from '../constants/fulfillment-service-scope.js';
 import type { DataSource } from 'typeorm';
 
 const PER_SOURCE_CAP = 300;
@@ -30,6 +30,8 @@ export interface UnifiedSupplierOrder {
   supplierId: string;
   buyerName: string | null;
   buyerOrganizationName: string | null;
+  /** 테스트 결제(실결제 아님) 주문 — WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1 */
+  testPayment?: boolean;
   subtotal: number;
   shippingFee: number;
   totalAmount: number;
@@ -98,6 +100,8 @@ export class SupplierUnifiedOrderService {
       `SELECT o.id::text AS id, o.order_number, o.status::text AS status,
               o.total_amount, o.shipping_fee, o.final_amount,
               o.orderer_name, o.created_at, o.updated_at,
+              o.service_key, o.metadata->>'buyerOrganizationName' AS buyer_organization_name,
+              COALESCE((o.metadata->>'testPayment')::boolean, false) AS test_payment,
               (SELECT COUNT(*)::int FROM neture.neture_order_items oi2
                  JOIN supplier_product_offers spo2 ON spo2.id = oi2.product_id::uuid
                  WHERE oi2.order_id = o.id AND spo2.supplier_id = $1) AS item_count,
@@ -114,23 +118,24 @@ export class SupplierUnifiedOrderService {
          WHERE oi.order_id = o.id AND spo.supplier_id = $1
        )
          -- WO-O4O-SUPPLIER-FULFILLMENT-SERVICE-SCOPE-V1: 서비스 경계 (미표기 = neture)
-         AND ${netureOrderServiceScopeSql('o', '$2')}
+         AND ${netureOrderServiceSetSql('o', '$2')}
        ORDER BY o.created_at DESC
        LIMIT ${PER_SOURCE_CAP}`,
-      [supplierId, NETURE_FULFILLMENT_SERVICE_KEY],
+      [supplierId, SUPPLIER_VISIBLE_FULFILLMENT_SERVICE_KEYS],
     );
     return rows.map((o: any) => ({
       id: o.id,
       source: 'neture_order' as const,
       orderNumber: o.order_number ?? null,
-      serviceKey: null,
+      serviceKey: o.service_key ?? null,
       orderType: 'neture' as const,
       status: o.status ?? null,
       paymentStatus: null,
       fulfillmentStatus: o.status ?? null,
       supplierId,
       buyerName: o.orderer_name ?? null,
-      buyerOrganizationName: null,
+      buyerOrganizationName: o.buyer_organization_name ?? null,
+      testPayment: o.test_payment === true,
       subtotal: Number(o.total_amount ?? 0),
       shippingFee: Number(o.shipping_fee ?? 0),
       totalAmount: Number(o.final_amount ?? 0),
@@ -170,7 +175,7 @@ export class SupplierUnifiedOrderService {
        LEFT JOIN organizations org ON org.id = co."sellerOrganizationId"
        WHERE co."supplierId" = $1
          -- WO-O4O-SUPPLIER-FULFILLMENT-SERVICE-SCOPE-V1: bridge 이전 checkout_order 에도 같은 경계 적용
-         AND ${checkoutOrderServiceScopeSql('co', '$2')}
+         AND ${checkoutOrderServiceSetSql('co', '$2')}
          -- WO-O4O-KPA-SUPPLIER-UNIFIED-ORDER-CHECKOUT-PAYMENT-VISIBILITY-FIX-V1:
          -- payment-first — 결제 전(paymentStatus != 'paid') checkout_order 는 공급자에게 노출하지 않는다.
          -- 'paid' 주문은 대부분 bridge 되어 neture_orders 로 노출(아래 dedup 제외)되며, 아직 bridge 안 된
@@ -183,7 +188,7 @@ export class SupplierUnifiedOrderService {
          )
        ORDER BY co."createdAt" DESC
        LIMIT ${PER_SOURCE_CAP}`,
-      [supplierId, NETURE_FULFILLMENT_SERVICE_KEY],
+      [supplierId, SUPPLIER_VISIBLE_FULFILLMENT_SERVICE_KEYS],
     );
     return rows.map((o: any) => ({
       id: o.id,

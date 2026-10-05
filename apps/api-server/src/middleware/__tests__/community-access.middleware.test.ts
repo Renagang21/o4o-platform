@@ -39,6 +39,16 @@ jest.mock('../../utils/community-access.resolver.js', () => ({
   },
 }));
 
+// WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: 세미프랜차이즈 커뮤니티 판정은 별도 모듈 — 여기서는 키로 흉내 낸다.
+const semiFranchiseCommunities = new Map<string, Set<string>>(); // communityKey → 허용 userId
+jest.mock('../../modules/neture-pharmacy/services/semi-franchise-community-access.js', () => ({
+  resolveSemiFranchiseCommunityAccess: async (_exec: unknown, userId: string, key: string) => {
+    const allowedUsers = semiFranchiseCommunities.get(key);
+    if (!allowedUsers) return { semiFranchise: false, allowed: false, semiFranchiseKey: null };
+    return { semiFranchise: true, allowed: allowedUsers.has(userId), semiFranchiseKey: key };
+  },
+}));
+
 import { requireCommunityAccess, hasApprovedCommunityMembership } from '../community-access.middleware.js';
 
 const PHARMACY = 'pharmacy'; // 카탈로그 폴백 커뮤니티
@@ -201,5 +211,26 @@ describe('mount 된 커뮤니티는 모두 승격 대상이다', () => {
   it('소스에 등장하는 communityKey 집합이 카탈로그를 벗어나지 않는다', () => {
     const used = new Set(MOUNTS.map(([, key]) => key));
     for (const key of used) expect(catalogKeys).toContain(key);
+  });
+});
+
+
+describe('세미프랜차이즈 커뮤니티 — 가입 상태 직접 판정, 별도 커뮤니티 가입 없음 (WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1)', () => {
+  beforeEach(() => {
+    queries.length = 0;
+    semiFranchiseCommunities.set('sf-community', new Set(['u-sf-member']));
+  });
+
+  it('세미프랜차이즈 가입 약국 운영자는 community_memberships 없이 통과한다', async () => {
+    const r = await run('sf-community', { id: 'u-sf-member' });
+    expect(r.passed).toBe(true);
+    expect(queries.some((q) => q.sql.includes('community_memberships'))).toBe(false);
+  });
+
+  it('미가입 · 정지 · 종료는 403 SEMI_FRANCHISE_MEMBERSHIP_REQUIRED', async () => {
+    const r = await run('sf-community', { id: 'u-other' });
+    expect(r.passed).toBe(false);
+    expect(r.status).toBe(403);
+    expect(r.code).toBe('SEMI_FRANCHISE_MEMBERSHIP_REQUIRED');
   });
 });
