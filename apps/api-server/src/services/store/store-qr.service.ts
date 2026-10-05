@@ -25,6 +25,7 @@
  */
 
 import type { DataSource } from 'typeorm';
+import { resolveCanonicalServiceKey } from '@o4o/security-core';
 import { StoreQrCode } from '../../routes/platform/entities/store-qr-code.entity.js';
 import { StoreExecutionAsset } from '../../routes/platform/entities/store-execution-asset.entity.js';
 import { recordDerivations } from '../../routes/o4o-store/services/store-asset-derivation.service.js';
@@ -214,11 +215,21 @@ export async function resolvePublicQrLanding(
     });
 
   const storeRows = await dataSource.query(
-    `SELECT slug FROM platform_store_slugs
+    `SELECT slug, service_key FROM platform_store_slugs
      WHERE store_id = $1 AND is_active = true
      ORDER BY created_at DESC LIMIT 1`,
     [qrData.organizationId],
   );
+  // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1 (pharmacyhub.co.kr QR 착지 이전):
+  //   QR slug 는 전역 고유라 어느 호스트에서 열어도 같은 QR 을 찾는다. 다만 화면 구성(Screen Set 상품 노출 범위 ·
+  //   중첩 QR 주소)은 서비스 축을 쓰므로, 호출 호스트의 서비스와 **매장의 서비스가 다르면 매장 쪽 축**을 쓴다
+  //   (예: 옛 pharmacy-hub 매장 QR 을 pharmacy.neture.co.kr 에서 연다). 같은 서비스면 종전과 같다.
+  const storeServiceKey: string | null = storeRows[0]?.service_key ?? null;
+  const callerServiceKey = serviceKey || 'kpa';
+  const effectiveServiceKey =
+    storeServiceKey && resolveCanonicalServiceKey(storeServiceKey) !== resolveCanonicalServiceKey(callerServiceKey)
+      ? storeServiceKey
+      : callerServiceKey;
 
   // WO-STORE-QR-PRODUCT-DIRECT-LINK-V1: product 타입이면 상품 정보 포함.
   //   landingTargetId 는 supplier_product_offers.id 또는 organization_product_listings.id 둘 다 가능.
@@ -381,7 +392,7 @@ export async function resolvePublicQrLanding(
       {
         organizationId: qrData.organizationId,
         screenSetId: qrData.landingTargetId,
-        serviceKey: serviceKey || 'kpa',
+        serviceKey: effectiveServiceKey,
         storeId: qrData.organizationId,
         storeSlug: storeRows[0]?.slug || null,
         // tabletContext 없음 → 매장 org 기준(대기영상 custom-only, 상품 org 기준).
