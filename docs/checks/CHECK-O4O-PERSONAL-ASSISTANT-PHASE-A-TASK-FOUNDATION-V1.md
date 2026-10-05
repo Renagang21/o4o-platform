@@ -5,6 +5,11 @@
 > **정본**: [`O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2`](../baseline/O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2.md) §2 · §3 · §4 · §9 · §17 · §18 단계 A
 > **설계**: [`IR-O4O-PERSONAL-ASSISTANT-PHASE-A-TASK-FOUNDATION-CENSUS-AND-DESIGN-V1`](../investigations/IR-O4O-PERSONAL-ASSISTANT-PHASE-A-TASK-FOUNDATION-CENSUS-AND-DESIGN-V1.md) (`d5c1b2d12`)
 > **작업공간**: 전용 worktree `../o4o-wt/personal-assistant-phase-a` · branch `wo/personal-assistant-phase-a-task-foundation-v1` · base `origin/main` `f324173b1` (AGENTS.md §4-1)
+>
+> **현재 해석 (2026-10-05 · `WO-O4O-PERSONAL-ASSISTANT-PC-INDEPENDENCE-DOCUMENT-ALIGNMENT-V1`)** — 아래 본문은 당시 기록 그대로 둔다. 남은 "run↔task 연결 production 관찰 PENDING(실 PC + 확장)" 은 V2 §11-1-a 에 따라 이렇게 나눈다.
+> - **Task → Run 연결 = Architecture / Execution integration 검증** — 격리 PG 실DB 9/9 · boundary spec(1:N · 재개 · 소유) 로 충족. Phase A 의 Architecture 판정은 이것으로 한다.
+> - **production 에서 실제 run 이 생겨 Task 에 붙는 장면 = Execution Runtime smoke** — capability(Local Agent + 확장)를 가진 **아무 Execution Node** 면 되며 특정 PC("사무실 PC")가 조건이 아니다. Phase A 의 Architecture closure 조건이 아니다.
+> - 당시 "실 PC 필요" 는 그 시점 계정에 노드가 없었다는 historical evidence 다.
 
 ---
 
