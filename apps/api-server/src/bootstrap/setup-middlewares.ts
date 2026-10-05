@@ -49,7 +49,7 @@ export const getAllowedOrigins = (): string[] => {
 
   const prodOrigins = [
     "https://neture.co.kr", "https://www.neture.co.kr", "https://admin.neture.co.kr", "https://dev-admin.neture.co.kr",
-    "https://shop.neture.co.kr", "https://forum.neture.co.kr", "https://signage.neture.co.kr",
+    "https://shop.neture.co.kr", "https://forum.neture.co.kr",
     "https://funding.neture.co.kr", "https://auth.neture.co.kr", "https://api.neture.co.kr",
     "https://kpa-society.co.kr", "https://www.kpa-society.co.kr",
     "https://k-cosmetics.site", "https://www.k-cosmetics.site",
@@ -90,18 +90,13 @@ export const getAllowedOrigins = (): string[] => {
     //     이미 위에 등록된 "https://kpa-society.co.kr" / "https://www.kpa-society.co.kr"
     //     가 그대로 분회 앱의 origin 이 된다 — 별도 항목을 추가하지 않는다.
     "https://kpa-branch-web-3e3aws7zqa-du.a.run.app",
-    // WO-O4O-SIGNAGE-PLAYER-WEB-DEPLOYMENT-ADOPTION-AND-PRODUCTION-SMOKE-V1:
-    //   signage-player-web(Cloud Run) 은 익명 단말 런타임으로 api.neture.co.kr 을
-    //   cross-origin 호출한다. 정확한 origin 1개만 추가한다 —
-    //   wildcard / credentials 완화 / reflect-origin 은 도입하지 않는다.
-    //   "https://signage.neture.co.kr" 은 이미 위에 등록돼 있으나 DNS 는 아직 없다(NXDOMAIN).
-    "https://signage-player-web-3e3aws7zqa-du.a.run.app",
     // WO-O4O-HOSPITAL-PHARMACY-SERVICE-FOUNDATION-V1:
     //   web-hospital-pharmacy(Cloud Run) 는 /api/ai/* (파일 이해·조사) 를 cross-origin 호출한다.
-    //   canonical 도메인(hospital.neture.co.kr)은 DNS 연결 전이라도 등록해 두면 이후 DNS 작업에서
-    //   API 재배포가 불필요하다(pharmacyhub 선례). Cloud Run URL 은 DNS 이전 브라우저 smoke 용.
+    //   정식 진입은 neture.co.kr/hospital 이라 origin 은 위의 "https://neture.co.kr" 이다.
+    //   Cloud Run URL 은 브라우저 smoke 용.
     //   정확한 origin 만 — wildcard / credentials 완화 / reflect-origin 은 도입하지 않는다.
-    "https://hospital.neture.co.kr",
+    // (은퇴 · WO-O4O-RETIRED-WEB-RESIDUAL-CLEANUP-V1) signage-player-web run.app · signage.neture.co.kr ·
+    //   hospital.neture.co.kr — 서비스 삭제 · DNS 없음. 다시 넣지 않는다.
     "https://hospital-pharmacy-web-3e3aws7zqa-du.a.run.app",
   ];
 

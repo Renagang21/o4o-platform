@@ -12,7 +12,8 @@
  *  1. deploy-web-services.yml 에 player deploy job · output · dispatch 선택지가 다시 생기는 것
  *  2. 자동 배포 판정 registry(detect-affected WEB_SERVICES) · risk 매핑(deploy-risk WEB_CLOUD_RUN)에 다시 들어가는 것
  *
- * 앱 소스(services/signage-player-web)는 이번 WO 범위에서 지우지 않았다 — 소스 존재 ≠ 배포 대상.
+ *  3. 앱 소스(services/signage-player-web)가 workspace 로 되돌아오는 것
+ *     — 소스 은퇴 WO-O4O-RETIRED-WEB-RESIDUAL-CLEANUP-V1. Cloud Run · gcr.io 이미지 · CORS origin 도 삭제됐다.
  * 실제 배포/네트워크에 접근하지 않는 순수 정적 검사다.
  */
 import * as fs from 'fs';
@@ -49,5 +50,11 @@ describe('STATIC CONTRACT: signage-player-web 배포 은퇴', () => {
 
   it('risk 매핑(web key → Cloud Run 서비스)에 player 가 없다', () => {
     expect(read(RISK)).not.toContain(`'${SERVICE_NAME}'`);
+  });
+
+  it('앱 소스가 workspace 에 없다', () => {
+    // 디렉터리가 아니라 package.json 으로 본다 — 로컬에 ignore 된 node_modules 잔재가 남을 수 있다.
+    expect(fs.existsSync(path.join(ROOT, 'services/signage-player-web/package.json'))).toBe(false);
+    expect(read(path.join(ROOT, 'pnpm-lock.yaml'))).not.toContain('services/signage-player-web:');
   });
 });
