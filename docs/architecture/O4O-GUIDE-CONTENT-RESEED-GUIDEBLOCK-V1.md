@@ -1,5 +1,7 @@
 # O4O Guide Content Reseed — guideblock-page-help
 
+> **상태**: COMPLETED · 실행 기록 — 정본 아님. 규칙은 [`O4O-GUIDE-SECTIONKEY-CONFLICT-POLICY-V1`](O4O-GUIDE-SECTIONKEY-CONFLICT-POLICY-V1.md) · **표기일**: 2026-10-04 (§6 등록 절차만 재사용 가치)
+
 > **WO-O4O-GUIDE-CONTENT-RESEED-GUIDEBLOCK-V1**
 >
 > `WO-O4O-GUIDE-SECTIONKEY-MIGRATION-V1` 이후 `page-help` JSON row를
@@ -31,6 +33,8 @@ curl "https://o4o-core-api-.../api/v1/guide/contents?serviceKey={service}&pageKe
 - 테이블: `guide_contents` (migration `2026042900001-CreateGuideContents.ts`)
 - API: `https://o4o-core-api-117791934476.asia-northeast3.run.app/api/v1/guide/contents`
 - 확인 서비스: `kpa-society`, `k-cosmetics`, `neture`
+
+> (2026-10-04 정합) 위 `*.run.app` 직접 URL 은 stale 이다 — API 서비스 ingress 가 Load Balancer 전용이라 `run.app` 직접 호출은 404 다. 재조회 시 공개 API 도메인(`https://api.neture.co.kr/api/v1/guide/contents`)을 사용한다.
 
 ---
 

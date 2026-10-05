@@ -1,5 +1,8 @@
 # PROMOTION_CORE_EXTENSION_BOUNDARY_V1
 
+> **상태**: DRAFT · Promotion 문서 세트의 경계 초안(문서 끝 `Status: Draft`). 백엔드 Core(`CmsContentSlot` 엔티티 · `/cms/slots` 공개 조회 · CRUD, operator 접근은 `WO-O4O-PROMOTION-SLOT-API-OPERATOR-V1`)는 존재하나 §4 C5 · C6 공통 훅 · 컴포넌트(`useSlotContent` · `SlotHeroSlider` · `SlotAdGrid` · `SlotLogoCarousel`)는 코드 0이고 서비스 화면의 `/cms/slots` 소비도 없다. 실행(Phase 1) · 폐기 결정 전까지 현재 기준 문서 아님 · **표기일**: 2026-10-04
+> (2026-10-04 정합) 본문 일부 글자가 깨져 있다(U+FFFD 12곳 — 원문 인코딩 손상, 문맥상 의미는 유지). 복원은 별도 정비 대상.
+
 > 프로모션/안내 기능의 Core vs 확장앱 책임 경계 정의
 
 ---

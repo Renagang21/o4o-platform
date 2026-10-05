@@ -2,6 +2,12 @@
 
 > **CLAUDE.md §9 (도메인별 규칙) 의 Business Service 상세 규칙** (구 §14~§17 에서 분리)
 > 이 문서는 CLAUDE.md의 보조 문서입니다.
+>
+> (2026-10-04 정합) **전제 구조 사실 정정 — 이 문서 대부분은 현행 구조와 맞지 않는다.**
+> - 별도 business-api / business-web(`cosmetics-api` · `yaksa-*` · `dropshipping-*` · `tourism-*`)은 존재하지 않는다. API 는 단일 `apps/api-server`(Cloud Run `o4o-core-api`) 하나이고, 웹은 `services/web-*` 이 그 API 를 `authClient.api` 로 직접 호출한다(`CLAUDE.md` §1 · §6). Dropshipping 엔진 · Tourism 도메인은 은퇴했다. 따라서 §2 · §3 의 적용 대상 표 · "독립 Cloud Run 배포" · 호출 경로(§3.3 · §4.2) · 포트 표(§4.5) · `{service}:read/write` scope(§4.4, 현행 role 은 RBAC SSOT `role_assignments` 의 `{service}:admin|operator|store_owner` 등)는 stale 이다.
+> - OpenAPI CI 게이트는 없다(`.github/workflows` 에 OpenAPI 검증 0 · `openapi.yaml` 은 `docs/services/cosmetics/openapi.yaml` · `docs/templates/business-api-template/openapi.template.yaml` 뿐). §1.4 · §5 의 "빌드 실패 · 병합 불가" 는 현행 사실이 아니다. 참조 문서의 `docs/architecture/business-api-template.md` · `multi-business-operations.md` 는 없다.
+> - **현행으로 유효한 원칙**(다른 정본이 이미 정함): 서비스 간 직접 DB 접근 · cross-domain JOIN 금지 · `{service}_` prefix([BOUNDARY-POLICY](O4O-BOUNDARY-POLICY-V1.md) Guard Rule 3 · 5, `CLAUDE.md` §13), 서비스 코드에서 인증 · 사용자 관리 재구현 금지, API URL 하드코딩 금지(`CLAUDE.md` §1).
+> - **판정 대기**: "OpenAPI 계약 우선"(§1)을 단일 core API 의 현행 규칙으로 유지할지는 이 문서로 결정하지 않는다(`CANONICAL-INDEX` §9). 결정 전까지 이 문서를 개발 근거로 쓰지 않는다.
 
 ---
 

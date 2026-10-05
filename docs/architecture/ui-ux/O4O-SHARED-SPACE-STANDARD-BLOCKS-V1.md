@@ -1,6 +1,7 @@
 # O4O Shared Space Standard Blocks v1
 
 > **연관 문서:** [O4O-SHARED-SPACE-FRAME-PRINCIPLE-V1.md](./O4O-SHARED-SPACE-FRAME-PRINCIPLE-V1.md)
+> **상태**: ACTIVE · **최종 갱신**: 2026-10-04 (본문 전수 검증 — 블록이 `packages/shared-space-ui` 의 `HeroBannerSection` · `NewsNoticesSection` · `LatestActivitySection` · `AppEntrySection` · `CtaGuidanceSection` · `ContentHighlightSection` · `SignagePreviewSection` 과 대응, 충돌 없음, 본문 변경 없음)
 
 ## 1. 목적
 

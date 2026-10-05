@@ -1,5 +1,7 @@
 # O4O STORE OWNER RBAC STANDARD V1
 
+> **상태**: ACTIVE · **최종 갱신**: 2026-10-04 (내부 모순 정합 — 접근 판정은 Role ∧ Relationship([STORE-ACCESS-AND-MEMBERSHIP](../../baseline/O4O-STORE-ACCESS-AND-MEMBERSHIP-V1.md)), `role_assignments` 는 Authorization SSOT 로 유지. §2.1 · §4 · §5 · §8 에 `2026-10-04 정합` 주석)
+
 ## 1. 목적
 
 O4O 플랫폼에서 매장 운영자(Store Owner) 권한 판단 기준을 단일화한다.
@@ -15,6 +17,8 @@ O4O 플랫폼에서 매장 운영자(Store Owner) 권한 판단 기준을 단일
 store_owner 권한 판단은 role_assignments만을 기준으로 한다.
 
 다른 데이터는 권한 판단 기준이 아니다.
+
+> (2026-10-04 정합) 위 두 문장은 "**권한(Authorization)의 원천**은 `role_assignments` 하나다"(RBAC SSOT, [RBAC-FREEZE](../../rbac/RBAC-FREEZE-DECLARATION-V1.md))로 읽는다. 매장 **접근 판정**은 그 role 만으로 끝나지 않는다 — Role ∧ Relationship 이다(§3.1-A · 정본 [STORE-ACCESS-AND-MEMBERSHIP](../../baseline/O4O-STORE-ACCESS-AND-MEMBERSHIP-V1.md) §2 · [IDENTITY-V3](../O4O-IDENTITY-ARCHITECTURE-V3.md)). 현행 `isStoreOwner()`(`apps/api-server/src/utils/store-owner.utils.ts`)는 해당 서비스 active `service_memberships` ∧ `role_assignments` 활성 `{prefix}:store_owner` 를 보고, 조직은 `organization_members`(owner·admin·manager) 기반 `resolveStoreOrganization()` 으로 해석하며, 게시된 매장 경영자 이용계약 미승낙이면 차단한다. `activity_type` · `sub_role` 등 속성(§2.2)은 여전히 판단 기준이 아니다.
 
 ---
 
@@ -142,6 +146,8 @@ role_assignments.role IN ({service}:store_owner)
 
 이 외의 조건은 접근 허용 기준으로 사용하지 않는다.
 
+> (2026-10-04 정합) 위 식은 **필요조건**이며 충분조건이 아니다. 현행 접근 판정은 §2.1 정합 주석 · §3.1-A 표(Role ∧ Relationship)와 [STORE-ACCESS-AND-MEMBERSHIP](../../baseline/O4O-STORE-ACCESS-AND-MEMBERSHIP-V1.md) §2 · 결정 순서(세션 → 조직 → 자격 → 업종 경계)를 따른다. Store Member 는 `{prefix}:store_member` ∧ `organization_members` 활성 `'staff'` 이다.
+
 ---
 
 ## 5. 승인 구조
@@ -156,6 +162,8 @@ role_assignments.role IN ({service}:store_owner)
 ```
 
 승인 전에는 store_owner 권한을 가지지 않는다.
+
+> (2026-10-04 정합) 위 운영자 승인 경로 외에 현행 부여 경로가 더 있다 — `store.neture.co.kr` **사업자 자가 가입**(`kpa` · `cosmetics` · `pharmacy-hub`, 운영자 승인 없이 본인 신청 → `organization_members(owner)` → enrollment → `service_memberships` → `role_assignments`)과 PharmacyHub · Cafe24 B2B 프로비저닝. 모두 공용 helper `organizationOpsService.ensureOrganizationWithOwnerAndService()` 를 쓴다. 정본: [STORE-ACCESS-AND-MEMBERSHIP](../../baseline/O4O-STORE-ACCESS-AND-MEMBERSHIP-V1.md) §3-A. "role 이 생기기 전에는 store_owner 권한이 없다" 는 원칙은 유효하다.
 
 ---
 
@@ -186,6 +194,8 @@ role_assignments.role IN ({service}:store_owner)
 * 신규 서비스는 {service}:store_owner 구조를 따른다
 * supplier / partner는 별도 역할로 유지한다
 * organization_members는 권한 판단에 사용하지 않는다
+
+> (2026-10-04 정합) ① partner 역할은 Legacy Partner 전면 은퇴로 더 이상 존재하지 않는다([ROLE-WORKSPACE-ARCHITECTURE](../../baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md) §7) — "supplier 는 별도 역할로 유지" 만 유효. ② "organization_members 는 권한 판단에 사용하지 않는다" 는 "권한(role)의 원천으로 쓰지 않는다" 로 읽는다. 접근 판정에서는 Relationship **조건**으로 쓴다(§3.1-A · §6 · [STORE-ACCESS-AND-MEMBERSHIP](../../baseline/O4O-STORE-ACCESS-AND-MEMBERSHIP-V1.md)).
 
 ---
 

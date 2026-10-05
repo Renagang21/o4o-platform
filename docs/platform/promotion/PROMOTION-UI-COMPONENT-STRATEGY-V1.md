@@ -1,5 +1,7 @@
 # PROMOTION_UI_COMPONENT_STRATEGY_V1
 
+> **상태**: DRAFT · 미실행 프론트 전략 — `useSlotContent` · `SlotHeroSlider` · `SlotAdGrid` · `SlotLogoCarousel` · `SlotPromoBanner` 코드 0(문서 끝 `Status: Draft`). 실행 · 폐기 결정 전까지 현재 기준 문서 아님 · **표기일**: 2026-10-04
+
 > 프론트엔드 공통 컴포넌트와 확장앱 렌더링 전략
 
 ---
@@ -139,9 +141,9 @@ interface SlotHeroSliderProps {
 ```
 
 **레퍼런스 구현:**
-- Neture [HeroSlider.tsx](../../../services/web-neture/src/components/home/HeroSlider.tsx) — CMS 기반
-- K-Cosmetics [HomePage.tsx](services/web-k-cosmetics/src/pages/HomePage.tsx) L223-402 — HeroSection 인라인
-- KPA [HeroSection.tsx](services/web-kpa-society/src/components/intranet/HeroSection.tsx) — 데이터 기반
+- Neture `services/web-neture/src/components/home/HeroSlider.tsx` — CMS 기반 (2026-10-05 기준 파일 부재)
+- K-Cosmetics [HomePage.tsx](../../../services/web-k-cosmetics/src/pages/HomePage.tsx) L223-402 — HeroSection 인라인 (작성 시점 행 번호)
+- KPA `services/web-kpa-society/src/components/intranet/HeroSection.tsx` — 데이터 기반 (2026-10-05 기준 파일 부재)
 
 **4개 서비스 공통 UX 패턴:**
 - 5초 자동 전환 (4개 모두 동일)
@@ -169,7 +171,7 @@ interface SlotAdGridProps {
 ```
 
 **레퍼런스:**
-- Neture [HomepageAds.tsx](../../../services/web-neture/src/components/home/HomepageAds.tsx)
+- Neture `services/web-neture/src/components/home/HomepageAds.tsx` (2026-10-05 기준 파일 부재)
 
 ### 4.3 SlotLogoCarousel
 
@@ -192,7 +194,7 @@ interface SlotLogoCarouselProps {
 ```
 
 **레퍼런스:**
-- Neture [PartnerLogoCarousel.tsx](../../../services/web-neture/src/components/home/PartnerLogoCarousel.tsx)
+- Neture `services/web-neture/src/components/home/PartnerLogoCarousel.tsx` (2026-10-05 기준 파일 부재)
 
 ### 4.4 SlotPromoBanner
 

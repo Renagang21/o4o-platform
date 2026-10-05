@@ -4,6 +4,8 @@
 >
 > Event Offer의 전체 흐름, 역할, 상태, 정책을 정리한 운영 기준 문서.
 > 향후 모든 관련 개발/수정 시 이 문서를 기준으로 한다.
+>
+> **상태**: ACTIVE · **최종 갱신**: 2026-10-04 ("승인/심사 개념 없음 · 노출만 전환" 서술을 [`EVENT-OFFER-COMMON-DOMAIN-V1`](../baseline/EVENT-OFFER-COMMON-DOMAIN-V1.md)(2026-04-28, `pending → approved` 운영자 승인) 과 실제 approve/reject API 로 대체 표기. **승인 계약 · 상태 모델은 COMMON-DOMAIN 이 기준**이며, 충돌하는 아래 서술은 2026-04-15 작성 시점 기록이다)
 
 ---
 
@@ -12,7 +14,7 @@
 Event Offer는 **공급자(Neture Supplier)의 승인된 상품(SPO)을 KPA 서비스에 이벤트 형태로 노출**하여, 약국 개설자가 참여(주문)할 수 있게 하는 기능이다.
 
 - 공급자가 자신의 상품을 이벤트로 **제안**한다
-- KPA 운영자가 **노출을 관리**한다 (승인/심사 개념 없음)
+- KPA 운영자가 **노출을 관리**한다 (승인/심사 개념 없음) — (2026-10-04 정합) 현행은 운영자가 공급자 제안(`status='pending'`)을 **승인(`approved`) / 반려**한다. COMMON-DOMAIN §2 · §3
 - 약국 개설자가 노출된 이벤트에 **참여(주문)**한다
 
 핵심 데이터 구조는 `organization_product_listings` 테이블이며, `service_key = 'kpa-groupbuy'`로 Event Offer 도메인을 식별한다.
@@ -71,7 +73,7 @@ checkout_orders (metadata.serviceKey = 'kpa-groupbuy')
 |------|------|
 | 역할 | **노출 관리자** |
 | 할 수 있는 것 | 이벤트 목록 조회, 노출/미노출 토글, 직접 상품 추가, 상품 제거(소프트), 통계 조회 |
-| 할 수 없는 것 | 승인/심사 (해당 개념 없음), 주문/결제/배송 처리 |
+| 할 수 없는 것 | ~~승인/심사 (해당 개념 없음)~~ (2026-10-04 정합: 현행은 pending 제안 승인/반려 가능 — `WO-O4O-EVENT-OFFER-APPROVAL-PHASE1-V1`), 주문/결제/배송 처리 |
 | 인증 | `requireAuth` + `requireKpaScope('kpa:operator')` |
 
 ### 약국 개설자 (Pharmacy User)
@@ -97,6 +99,8 @@ checkout_orders (metadata.serviceKey = 'kpa-groupbuy')
 - 공급자 제안 시 `is_active=false`로 생성 → 운영자가 노출 전환
 - 운영자 직접 추가 시 `is_active=true`로 즉시 노출
 
+> (2026-10-04 정합) **이 절 · §5 상태 흐름 · §6 노출/참여/가격 정책(§6 정합 주석)은 [`EVENT-OFFER-COMMON-DOMAIN-V1`](../baseline/EVENT-OFFER-COMMON-DOMAIN-V1.md) §3 · §4 · §5 로 대체되었다.** 현행 상태 모델: DB 저장값 `status` = `pending`(공급자 제안 · 미노출) / `approved` / `rejected` / `canceled` + 런타임 계산(approved 분기) `upcoming`(시작 전) · `active` · `sold_out`(매진) · `ended`(`start_at` · `end_at` · 수량 기준, `resolveEventStatus()`). 공급자 제안은 `status='pending'`, `is_active=false` 로 생성되고, 운영자 승인 시 `status='approved'`, `is_active=true`, 반려 시 `status='rejected'`, `is_active=false` + 반려 사유가 된다. 운영자 직접 추가는 `status='approved'` 로 생성된다. 근거: `apps/api-server/src/routes/kpa/services/event-offer.service.ts`(`createListing` roleType 분기 · approve/reject 의 `status !== 'pending'` 검사) · `apps/api-server/src/routes/kpa/controllers/event-offer-operator.controller.ts`(`WO-O4O-EVENT-OFFER-APPROVAL-PHASE1-V1`).
+
 ---
 
 ## 5. 상태 흐름
@@ -121,6 +125,11 @@ checkout_orders (metadata.serviceKey = 'kpa-groupbuy')
 ---
 
 ## 6. 핵심 정책
+
+> (2026-10-04 정합) **노출 · 참여 · 가격 정책은 현행 코드 기준으로 읽는다** (`apps/api-server/src/routes/kpa/services/event-offer.service.ts`):
+> - **노출 · 참여 가능 조건** = `ACTIVE_OFFER_CLAUSE` — `status='approved'` **그리고** 기간 안(`start_at` ≤ 현재 ≤ `end_at`, NULL 은 제한 없음) **그리고** 잔여 수량 > 0(NULL 은 무제한). 아래 "`is_active = true` 만" 서술은 이 조건으로 대체된다. 시작 전 이벤트는 `upcoming` 으로 미리 보여 주되 주문은 막는다(`UPCOMING_OFFER_CLAUSE`).
+> - **주문 단가** = `event_price ?? price_general`. 아래 "가격은 `price_general` 기준" 서술은 이벤트 가격이 없을 때의 기본값이다.
+> - 제안 · 중복 · 주문 경로(`checkoutService.createOrder()`) · 조직 ID 정책은 그대로 유효하다.
 
 ### 제안 정책
 
@@ -183,7 +192,7 @@ checkout_orders (metadata.serviceKey = 'kpa-groupbuy')
 ### 용어 규칙
 
 - **"노출" / "미노출"** 사용
-- **"승인" / "심사"** 사용 금지
+- **"승인" / "심사"** 사용 금지 — (2026-10-04 정합) 현행 운영자 승인 큐(`pending-listings` · approve / reject)가 존재하므로 이 금지는 무효. 용어는 COMMON-DOMAIN 상태 모델을 따른다
 
 ---
 
@@ -209,6 +218,8 @@ checkout_orders (metadata.serviceKey = 'kpa-groupbuy')
 | GET | `/groupbuy-admin/stats` | 집계 통계 | kpa:operator |
 | GET | `/groupbuy-admin/supplier-status` | 공급자 연계 상태 | kpa:operator |
 
+> (2026-10-04 정합) 현행 운영자 API 에는 위 외에 `GET /groupbuy-admin/pending-listings`(승인 대기 목록) · `POST /groupbuy-admin/products/:id/approve` · `POST /groupbuy-admin/products/:id/reject` · `POST /groupbuy-admin/products/:id/order` 가 있다 — 단 `order` 는 **no-op 호환 경로**다(`display_order` 컬럼이 없어 요청 값을 echo 만 하고 목록은 `created_at ASC` 고정, 노출 순서 변경은 미구현) (`event-offer-operator.controller.ts`). 공개 API 에는 `GET /groupbuy/enriched` 가 있다 (`event-offer.controller.ts`).
+
 ### 약국/공개 API (`/api/v1/kpa/groupbuy/*`)
 
 | Method | Endpoint | 설명 | 인증 |
@@ -228,7 +239,7 @@ checkout_orders (metadata.serviceKey = 'kpa-groupbuy')
 | 1 | DB 스키마 변경 | 현재 구조로 운영 완료, 추가 테이블/컬럼 불필요 |
 | 2 | `offer_id` nullable 변경 | SPO 연결이 Event Offer의 핵심 구조 |
 | 3 | GroupbuyCampaign 엔티티 사용 | 레거시, OPL 기반 구조로 대체 완료 |
-| 4 | 새로운 승인 단계 추가 | 노출 중심 구조 유지, 승인/심사 개념 도입 금지 |
+| 4 | ~~새로운 승인 단계 추가~~ | ~~노출 중심 구조 유지, 승인/심사 개념 도입 금지~~ — (2026-10-04 정합) COMMON-DOMAIN 의 `pending → approved` 승인 단계가 채택되어 무효 |
 | 5 | 독립 주문 테이블 생성 | `checkoutService.createOrder()` 필수 (CLAUDE.md 규칙) |
 | 6 | 구조 변경 없이 확장 | 기존 OPL + checkout_orders 구조 내에서만 확장 |
 

@@ -1,5 +1,8 @@
 # NETURE-DOMAIN-BOUNDARY-V1
 
+> **상태**: SUPERSEDED · **대체 문서**: [`O4O-SUPPLIER-DOMAIN-BOUNDARY-V1`](O4O-SUPPLIER-DOMAIN-BOUNDARY-V1.md) (FROZEN · Supplier 리소스 소유 · 권한) · [`O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1`](O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1.md) (주문 소유 · 경로) · **표기일**: 2026-10-04
+> (2026-10-04 정합) 대체 사유 — 본문 §2·§3·§6·§8 의 "Order 는 Neture 단독 소유 · `POST /neture/orders`" 는 현행 계약과 다르다: 주문 정본은 `checkout_orders`, `neture_orders` 는 파생 공급자 fulfillment 원장이며(B2B 계약 §T1), Neture seller `POST /orders` 는 410 `NETURE_B2B_LEGACY_SELLER_ORDER_RETIRED` 로 은퇴(`apps/api-server/src/modules/neture/controllers/seller.controller.ts`). `product_masters` 는 플랫폼 소유 · `offer_service_approvals` 는 Service Operator 소유(SUPPLIER-DOMAIN §3). §7 Campaign 은 테이블 DROP 으로 소멸([`NETURE-CAMPAIGN-ARCHITECTURE-FREEZE-V2`](NETURE-CAMPAIGN-ARCHITECTURE-FREEZE-V2.md) OBSOLETE). 아래 본문은 2026-03-01 선언 이력으로만 읽는다.
+
 ## 1. 문서 목적
 
 본 문서는 Neture 도메인의 **책임 범위와 타 도메인과의 경계**를 명확히 정의한다.
