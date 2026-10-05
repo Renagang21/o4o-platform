@@ -35,7 +35,7 @@ O4O 의 서비스 목록과 서비스별 기준 문서를 찾는 색인이다. �
 | `services/web-store` | 통합 내 매장 — 매장 하나가 여러 서비스를 쓰는 공통 업무공간 (`/store` · `/work/:serviceKey` · `/hub`) | [STORE-LAYER-ARCHITECTURE](../architecture/STORE-LAYER-ARCHITECTURE.md) · [STORE-MENU-CANONICAL-TREE](../baseline/O4O-STORE-MENU-CANONICAL-TREE-V1.md) |
 | `services/web-account` | 각 서비스에서 진입하는 계정센터 | — |
 | `services/web-hospital-pharmacy` | 병원약국 — 원내 약품 파일 기반 조회 | [WO](../work-orders/WO-O4O-HOSPITAL-PHARMACY-SERVICE-FOUNDATION-V1.md) · [CHECK](../checks/CHECK-O4O-HOSPITAL-PHARMACY-SERVICE-FOUNDATION-V1.md) |
-| `services/signage-player-web` | 디지털 사이니지 재생기 — **배포 경로 은퇴(2026-10-05) · Cloud Run 삭제 대기**(완료 여부는 CHECK 기준), 소스만 남음. 정본 재생은 Tablet ScreenSet | [SIGNAGE-CANONICAL-PLAYBACK-PATH](../baseline/O4O-SIGNAGE-CANONICAL-PLAYBACK-PATH-V1.md) · [CHECK](../checks/CHECK-O4O-RETIRED-WEB-SERVICES-DEPLOYMENT-AND-INFRA-CLEANUP-V1.md) |
+| `services/signage-player-web` | 디지털 사이니지 재생기 — **배포 은퇴(2026-10-05) · Cloud Run 삭제 완료**, 소스만 남음. 정본 재생은 Tablet ScreenSet | [SIGNAGE-CANONICAL-PLAYBACK-PATH](../baseline/O4O-SIGNAGE-CANONICAL-PLAYBACK-PATH-V1.md) · [CHECK](../checks/CHECK-O4O-RETIRED-WEB-SERVICES-DEPLOYMENT-AND-INFRA-CLEANUP-V1.md) |
 | `apps/admin-dashboard` | 플랫폼 관리자 화면 | [OPERATOR-DASHBOARD-STANDARD](../platform/operator/OPERATOR-DASHBOARD-STANDARD-V1.md) |
 | `apps/api-server` | 전 서비스 공통 API (`o4o-core-api`) | [BOUNDARY-POLICY](../architecture/O4O-BOUNDARY-POLICY-V1.md) |
 
