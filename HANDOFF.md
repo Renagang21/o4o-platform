@@ -1,6 +1,6 @@
 # HANDOFF
 
-> 마지막 작업: 2026-10-05 09:45 (KST) · 작성 PC: DESKTOP-SS4Q2DK · 상태 조회 시각: 2026-10-05 09:43
+> 마지막 작업: 2026-10-05 (KST) · 재개 PC: 이 PC worktree `C:/Users/sohae/coding/o4o-wt/neture-pharmacy-commerce` · 이전 작성 PC: DESKTOP-SS4Q2DK
 
 ## 요약
 
@@ -37,9 +37,16 @@
    - 커뮤니티 = `community-access.middleware.ts` 에 세미프랜차이즈 정책 모드
 4. 1-8 정본 반영 → 단계 2~6 구현 (WO TODO 순서).
 
+## 재개 기록 (2026-10-05, 이 PC)
+
+- 이 PC worktree `C:/Users/sohae/coding/o4o-wt/neture-pharmacy-commerce` 생성(원격 branch 추적) → origin/main(`a68a15d00`, Neture 무관 CI · 인증서 docs) 병합 · `pnpm install --frozen-lockfile` · `build:packages` 완료.
+- 다른 PC 의 worktree(`D:/o4o-wt/...`)는 이 PC 에서 정리하지 않는다.
+- 단계 1-7 설계 확정 → [`DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1`](docs/design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md). 진행 상황 정본은 WO TODO.
+- PR #304 는 이 트랙의 작업 대상이 아니다(확인만, merge · 대행 금지).
+
 ## 주의 · 미해결 · 결정
 
-- **사용자 판단 대기 (WO "보류" 절)**: D1 세미프랜차이즈별 결제 수취 주체 · D2 기존 B2B 수량 상한 1..1000 유지/제거 · D3 이벤트 매장 한도 기준(사용자→조직). 결정 전에는 기존 동작 유지 · 테스트 결제만.
+- **D1~D3 정리 (사용자 지시 2026-10-05)**: D1 = 실제 수취 법인 · PG 만 대기(구조 · 테스트 결제는 구현, 운영자를 수취 주체로 간주 금지) · D2 = 기존 1..1000 검사 유지(대기 아님) · D3 = 사용자 기준 유지, 장바구니 주문 집계 누락만 참조 키 연결.
 - WO 금지 범위: 수량 상한 신설 · 자동 정산/청구 · 가격 비교 추가 금지. 정산 · 환불은 보고만(삭제 여부 미결).
 - **운영 DB write(테스트 데이터 삭제 포함) · migration 수동 적용은 사용자 명시 승인 필요.** migration 추가 시 manifest · expected-schema-states · ledger spec 를 같은 커밋에.
 - Frozen 접촉 가능 영역(F3 Store Layer · F8 Distribution · F9 RBAC · F10 Core · F11 · Supplier Domain FROZEN) — 구조 변경은 이 WO 가 명시한 범위만, 그 밖은 STOP 후 보고.
