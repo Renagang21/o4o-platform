@@ -12,12 +12,12 @@ Neture(neture.co.kr) 약국 서비스를 **약국별 하나의 내 매장**에�
 ## TODO (진행 추적 — 항목 완료 시 체크하고 근거 커밋을 적는다)
 
 ### 단계 1 — 현재 코드 확인 · 설계 정합
-- [ ] 1-1 기본 가입 · 자격 · 승인 현황 조사 (kpa-society 의존 지점 포함)
-- [ ] 1-2 약국 조직 ↔ 내 매장 연결 현황 조사
-- [ ] 1-3 세미프랜차이즈 · 운영자 권한 현황 조사 (serviceKey 분기 지점 포함)
-- [ ] 1-4 제품 · 공급 제안 · 이벤트 · 취급매장 모집 현황 조사 (단일 제안 제약 포함)
-- [ ] 1-5 내 매장 · HUB · 콘텐츠 · 커뮤니티 접근 현황 조사
-- [ ] 1-6 장바구니 · 주문 · 결제 · 공급자 주문 처리 현황 조사 (service_key='neture' 고정 · payment 결함 후보 재확인)
+- [x] 1-1 기본 가입 · 자격 · 승인 현황 조사 (kpa-society 의존 지점 포함) — [IR §A](../investigations/IR-NETURE-PHARMACY-STORE-COMMERCE-STEP1-CENSUS-V1.md)
+- [x] 1-2 약국 조직 ↔ 내 매장 연결 현황 조사 — IR §A
+- [x] 1-3 세미프랜차이즈 · 운영자 권한 현황 조사 (serviceKey 분기 지점 포함) — IR §A
+- [x] 1-4 제품 · 공급 제안 · 이벤트 · 취급매장 모집 현황 조사 (단일 제안 제약 포함) — IR §B
+- [x] 1-5 내 매장 · HUB · 콘텐츠 · 커뮤니티 접근 현황 조사 — IR §C
+- [x] 1-6 장바구니 · 주문 · 결제 · 공급자 주문 처리 현황 조사 (service_key='neture' 고정 · payment 결함 후보 재확인) — IR §D
 - [ ] 1-7 설계 문서: 8개 관계(약국 조직 ↔ 내 매장 / 기본 가입 / 세미프랜차이즈 가입, 운영자 ↔ 담당 세미프랜차이즈, 제품 ↔ 복수 제안, 제안 ↔ 대상, 제안 ↔ 주문 항목, 주문 · 결제 ↔ 수취 주체) · 승인 조건 · 호출 흐름 · 유지/대체 구분 · 스키마 변경 · 테스트 데이터 초기화 범위
 - [ ] 1-8 충돌하는 정본 문서 절 정비 (구현 기준으로 구체화)
 
@@ -61,8 +61,25 @@ Neture(neture.co.kr) 약국 서비스를 **약국별 하나의 내 매장**에�
 - [ ] 6-4 테스트 데이터 초기화 (범위 확정 → 운영 DB write 는 사용자 승인)
 - [ ] 6-5 CI · PR · 완료 보고 (구현 / 테스트 결제 / 실제 PG / 배포 / 운영 실결제 구분)
 
+### 단계 1 조사 핵심 사실 (설계 1-7 의 입력 — 상세 근거는 IR)
+- **기본 가입이 없다**: `pharmacy.neture.co.kr` = serviceKey `kpa-society` · role `kpa:*`. 매장 기본 API 전부가 `isStoreOwner(...,'kpa')`(kpa-society active membership + `kpa:store_owner` + 조직 연결)를 요구 → §3-1 "미가입이어도 내 매장" 과 정면 충돌. 자격 확인은 사실상 없음(`license_verified` 쓰는 코드 0).
+- **승인 우회**: `POST /api/v1/store/enrollment {serviceKey:'kpa'}` 가 로그인만으로 조직 · `kpa:store_owner` · active membership 생성.
+- **약국 1 = 조직 1 미보장**: 프로비저너별 org code 규칙 상이(`kpa-pharm-{bizno}` · `store-{svc}-{uid}` · `ph-pharm-{uid}`), `organizations.business_number` UNIQUE 아님.
+- **세미프랜차이즈 개념 없음**: serviceKey 가 그 역할 — 새 키 1개 = 약 15곳 수정. → **세미프랜차이즈는 데이터 행으로** (선례: 분회 `branch_memberships` · 커뮤니티 도메인).
+- **단일 제안 강제**: SPO `UNIQUE(master_id, supplier_id)` · OSA/OSP `(offer, service_key)` unique · OPL unique v2 + ON CONFLICT 소비처 9곳. 제품 등록 승인과 공급 승인 미분리(SPO.approval_status 가 OSA 파생).
+- **이벤트**: 가격 수정 경로 없음(OK) · **재신청 불가**(중복 검사가 status 무관 409 + DB 인덱스) · visibility 토글이 canceled→approved 되돌림(승인 우회) · 운영 조직 LIMIT 1 임의 선택. 수량 로직(`reserveEventOfferListing` · `incrementListingQuantity` · 취소 복원)은 보존 대상.
+- **모집**: 참여 단위가 **사용자**(`allowed_seller_ids`) · 공급가 조건 없음 · 승인 참여자가 실제 주문 못 할 가능성(결함 후보).
+- **재고**: B2B 경로는 검사만, 예약은 은퇴한 레거시 createOrder 에만. 배송완료 차감 · 취소 해제는 상태 변경 경로에서 동작(보존).
+- **HUB**: web-store 가 약국 내 매장. `/hub/*` 진열 → apply → OPL → `/orderable` 이 주문 전 취급 등록을 강제(§3-9 충돌). `/hub` 전면 삭제 불가(KCos 링크 · spec 고정).
+- **커뮤니티**: catalog policy + `community_memberships` 별도 가입 2단계 → §3-8 충돌. middleware 한 곳에서 세미프랜차이즈 가입 상태 직접 판정 가능.
+- **공급자 주문 목록**: `COALESCE(o.service_key,'neture') = 'neture'` 필터 확정 — 약국(`kpa-society`) · 이벤트(`kpa-groupbuy`) 주문이 목록 · KPI · 정산에서 누락. 처리 경로는 필터 없어 목록과 불일치.
+- **결제 결함 확정**: payment↔group/소유자 대응 미검증(소액 payment 로 고액 group 완료 가능) · 금액 일치 검증 없음 · 단건 경로 PG orderId 불일치 · PAID 재 confirm 409 · handler 중복 방지가 메모리 Set · 실패 후 재결제 영구 차단 · web-store 결제 버튼 미연결. 키 부재 → 가짜 성공은 **반박**(FAILED), 단 테스트 결제 모드 없음. 수취 주체 필드 없음(단일 env 키, 여러 공급자 주문을 group 하나로 결제).
+
 ### 보류 · 사용자 판단 대기
-- (진행 중 발견 시 기록)
+- **D1 수취 운영 주체**: 세미프랜차이즈(pharmacy 포함)별 결제 수취 주체가 누구인가 — 설계는 `receiver_key` 필드로 분리해 두고 값은 사용자 결정. 결정 전에는 테스트 결제만.
+- **D2 기존 B2B 주문 수량 상한 1..1000**: 이미 코드에 존재(`b2b-checkout-confirm.core.ts` 수량 검사). WO §4 "추가하지 않음" 과의 관계 — 유지/제거 판단 필요(그 전까지 기존 동작 유지).
+- **D3 이벤트 매장 한도 기준**: 현행 `per_store_limit` 집계가 사실상 사용자 기준이고 장바구니 주문은 집계에서 빠지는 의심 결함 — "기존 동작 보존" 원칙상 연결만 하고 기준 변경(사용자→조직)은 판단 필요.
+- 설계 단계(1-7)에서 기술적으로 정할 항목(사용자 판단 불필요로 판단 — 설계 문서에 근거와 함께 확정): 기본 가입 상태 저장(신규 원장 테이블 권장) · 자격 근거(`kpa_pharmacist_profiles` 재사용 여부) · 세미프랜차이즈 운영 role(`neture:operator` ∧ 담당 관계) · 매장 판정 유틸 분리(공통 모듈 변경 프로토콜) · 약국 축 store 자가 가입 차단 방식.
 
 ---
 
