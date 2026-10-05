@@ -19,7 +19,7 @@
 |---|---|---|
 | PR #305 · `wo/shared-certificate-separation-v1` (CHECK-O4O-SHARED-CERTIFICATE-SEPARATION-V1 1파일) | **OPEN** · CI Gate/Sonar PASS · 미해결 스레드 0 · 원격 branch 있음 | 사용자 "main 통합 진행" 승인 → merge. worktree `D:/o4o-wt/shared-certificate-separation-v1`(node_modules 없음) 은 merge 후 remove → prune → branch -d |
 | PR #306 · #307 (퇴역 웹 정리) | **MERGED** (`4cfcbf339` · `e6ff76c23`) · 로컬 worktree/branch 정리 완료 | 원격 branch `wo/retired-web-services-cleanup-v1` · `…-closure` 가 아직 **있음** — GitHub 에서 삭제(로컬 settings 가 `push --delete` 차단) |
-| 이 인수인계 · `wo/handoff-20261005-095537-desktop-ss4q2dk` | PR (생성 예정) (merge 하지 않음) | 다음 작업공간 `/start` 가 읽은 뒤 처리. worktree `C:/Users/sohae/o4o-wt/handoff-20261005-095537-desktop-ss4q2dk` |
+| 이 인수인계 · `wo/handoff-20261005-095537-desktop-ss4q2dk` | PR #309 · OPEN · 원격 branch 있음 (merge 하지 않음) | 다음 작업공간 `/start` 가 읽은 뒤 처리. worktree `C:/Users/sohae/o4o-wt/handoff-20261005-095537-desktop-ss4q2dk` |
 
 ## 다음에 이어서 할 일 (우선순위)
 
