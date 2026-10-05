@@ -94,10 +94,10 @@ Assistant 가 Experience 를 대체하지 않는다. Assistant 는 Experience �
 
 ## 3. ONE Assistant
 
-1. **사용자 한 명에게 Assistant 는 하나다.** 채널(O4O Web · Kakao · 외부 AI · Device Agent)과 실행 노드가 달라도 같은 Assistant 가 같은 기억으로 응답한다.
+1. **사용자 한 명에게 Assistant 는 하나다.** 채널(O4O Web · Kakao · 외부 AI · Device Agent)과 실행 노드가 달라도 같은 Assistant 가 같은 기억으로 응답한다(노드를 넘는 기억의 범위와 사설 대상 절차 기억 예외는 §11-1 (4)).
 2. 한 사용자는 여러 업무공간(ROLE-WORKSPACE §1)을 가질 수 있다. 그래서 **Task 마다 업무공간과 organization 을 지닌다.** 매장 A 의 업무 기억이 매장 B 의 Task 에 섞이지 않는다(역할 drift 방지 — PHILOSOPHY §7).
 3. 서비스별 · 역할별로 Assistant 를 따로 만들지 않는다. 역할 경계는 Task 의 context 와 권한이 정한다.
-4. **PC · 장소 · 요청 채널마다 다른 Assistant · 자동화 · 기억이 생기지 않는다.** 사무실에서 요청하든 집에서 요청하든, 어느 PC 가 실행하든 같은 Assistant 가 같은 기억과 경험으로 같은 업무를 이어간다. "이 PC 의 자동화" · "저 PC 의 자동화" 라는 단위는 없다.
+4. **PC · 장소 · 요청 채널마다 다른 Assistant · 자동화 · 기억이 생기지 않는다.** 사무실에서 요청하든 집에서 요청하든, 어느 PC 가 실행하든 같은 Assistant 가 같은 업무를 이어가고, Cloud 배치가 허용된 기억(업무 식별 · 재개 구조 · 공개 사이트 대상 검증된 방법)을 그대로 쓴다. "이 PC 의 자동화" · "저 PC 의 자동화" 라는 단위는 없다. 사설 시스템 · Windows 앱 대상 절차 기억(M9)이 노드 전용인 예외는 §11-1 (4).
 5. **사용자는 어느 PC 에서 실행할지를 관리하는 사람이 아니다.** Assistant 가 Task 에 필요한 capability 와 지금 쓸 수 있는 실행환경으로 Execution Node 를 고른다(§11). 사용자가 특정 노드를 지정하는 것은 선택적 선호일 뿐 필수 입력이 아니다.
 
 ### 3-1. 네 가지를 섞지 않는다 (2026-10-05)

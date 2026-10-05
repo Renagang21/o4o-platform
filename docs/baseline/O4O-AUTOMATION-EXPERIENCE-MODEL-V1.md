@@ -302,7 +302,7 @@ Knowledge(주장, 미검증) ──Decision 근거로 사용──► Step 성�
 | Manual Knowledge | 프로그램 기준 매뉴얼(§8-2) | 외부 · 문서 |
 | User-provided Knowledge | 사용자 설명 · 업무 문서 | 사용자 |
 | User Correction Knowledge | 교정에서 나온 Preferred/Avoid 후보(§7-5 · §7-6) | 사용자 · 이 Task×Target×Stage 한정 |
-| Local Experience | 이 사용자(소유 주체)의 실제 Run — 어느 Execution Node 에서 실행됐든 같은 경험이다(V2 §3-1 · 2026-10-05 정렬, 종전 표기 "이 사용자 PC") | 관찰된 사실 |
+| Local Experience | 이 사용자(소유 주체)의 실제 Run — 어느 Execution Node 에서 실행됐든 같은 소유 주체의 경험이다. 노드를 넘어 쓰이는 범위는 Cloud 배치가 허용된 것뿐이고 사설 대상 절차 기억은 노드 전용(V2 §3-1 · §11-1 (4) · 2026-10-05 정렬, 종전 표기 "이 사용자 PC") | 관찰된 사실 |
 | Shared Experience | 다른 사용자에서 검증 · 공유된 Digest | 다른 환경의 사실 → 여기서는 Knowledge(§17) |
 
 - 출처마다 신뢰가 다르지만 **최종 검증 기준은 이 사용자의 실제 Run Experience** 다. 어떤 출처도 Run 검증 없이 Skill 이 되지 않는다.
