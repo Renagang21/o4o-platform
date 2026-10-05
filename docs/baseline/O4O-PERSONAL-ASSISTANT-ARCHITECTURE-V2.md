@@ -109,7 +109,7 @@ Assistant 가 Experience 를 대체하지 않는다. Assistant 는 Experience �
 | **Request Channel** | 요청이 들어온 곳 | O4O Web · 메신저 · 외부 AI · 기기 (§14) | Assistant · 기억 · 업무는 그대로. 결과 전달 방식만 다르다(§12) |
 | **Execution Node** | 실제로 화면 · 프로그램을 조작하는 곳 | PC(여러 대 가능) · Cloud Browser · 미래 노드 (§11) | Assistant · 업무 · Cloud 에 있는 기억은 그대로. 그 노드의 실행환경 상태(로그인 세션 · 현재 화면 · 로컬 파일 경로)와 노드 보관 원 기록이 다르다 — 사설 시스템 · Windows 앱 대상 절차 기억(M9)은 노드에만 있다(§11-1 (4) 예외) |
 
-- 기억 · 경험의 경계는 **Work Context(소유 주체)** 다. Execution Node 는 기억의 경계가 아니다(§9).
+- 기억 · 경험의 경계는 Work Context 중 **소유 주체**(§9-2 — USER = `userId` · ORGANIZATION = `organizationId`)다. 업무공간 · serviceKey 는 Task 의 문맥 · 권한 정보이며 **기억을 나누는 기준이 아니다** — 같은 소유 주체가 같은 대상을 다른 업무공간 · 서비스에서 다뤄도 기억은 하나로 이어진다. Execution Node 도 기억의 경계가 아니다(§9).
 - PC 라는 말은 물리 실행환경(Local Agent · Chrome 확장 · 실제 화면 조작)을 설명할 때 쓴다. **"PC = Assistant 의 기억 · 업무 · 자동화의 경계"** 로 쓰지 않는다.
 
 ---
@@ -346,9 +346,9 @@ Lower-cost Reasoning 단계는 유지한다. "속도는 약한 모델로 해결�
 |---|---|---|
 | Phase A — production 에서 run 이 Task 에 붙는 장면(`run↔task 연결` PENDING) | **Task → Run 연결**: integration 은 격리 PG 실DB · boundary spec 으로 검증됨. production 장면은 Execution Runtime smoke | capability(Local Agent + 확장)를 가진 아무 Execution Node |
 | Phase B §6-2 — 실행 지시가 planner 에 실리고 ExecutionReport 로 Task 가 판정되는 장면 | **Execution Report → Task 판정**: integration(주입 실행 본체 · runtime harness). 실제 화면 장면은 Execution Runtime smoke | 같음 |
-| Phase C — 다른 노드에서 기억이 이어지는 장면 | **Node-independent Memory Continuity**: integration(빈 노드 원장 주입 harness). 실제 화면 장면은 Execution Runtime smoke | 같음 |
+| Phase C — 다른 노드에서 기억이 이어지는 장면 | **Node-independent Memory Continuity**: integration(빈 노드 원장 주입 harness). 실제 화면 장면은 Execution Runtime smoke | capability 를 가진 노드 중 **이전 실행이 없던 노드 또는 로컬 원장이 비어 있음을 확인한 노드** — 같은 노드의 `local.db` 에서 읽혀 성공하면 노드 독립을 검증하지 못한다 |
 
-CHECK 에 적힌 "사무실 PC" 는 당시 그 capability 를 가진 노드가 그것뿐이었다는 기록이다. 위 Runtime smoke 는 한 번의 실측 세션에서 함께 확인할 수 있으며, 어느 노드에서 하든 같다.
+CHECK 에 적힌 "사무실 PC" 는 당시 그 capability 를 가진 노드가 그것뿐이었다는 기록이다. 위 Runtime smoke 는 한 번의 실측 세션에서 함께 확인할 수 있다. Phase A · B 장면은 어느 노드에서 하든 같고, Phase C 장면만 위 빈 노드 조건을 지킨다(특정 PC 이름이 아니라 노드의 상태가 조건이다).
 
 ### 11-2. Node 계약
 
@@ -578,7 +578,7 @@ V1 에서 **승계하지 않는 것**: Local-first 저장 원칙(ARCH §5 의 Lo
 | Shared Candidate | §0-1 · §10. 여러 사용자에서 반복 검증돼 다른 사용자에게 추천 · 우선 후보가 되는 방법. 강제 규칙 · 표준 아님 |
 | Discovery capability | §5. 모르는 업무를 푸는 하위 capability. Strong Discovery Agent 가 기본 수행자 |
 | Assistant Identity | §3-1. 사용자당 하나인 비서. PC · 장소 · 채널로 나뉘지 않는다 |
-| Work Context | §3-1. Task 의 소유 주체 · 업무공간 · serviceKey. 기억 · 경험의 경계 |
+| Work Context | §3-1. Task 의 소유 주체 · 업무공간 · serviceKey. 그중 소유 주체만 기억 · 경험의 경계다 |
 | Request Channel | §3-1 · §14. 요청이 들어온 곳(Web · 메신저 · 외부 AI · 기기) |
 | Execution Node | §11. 실행 환경 — PC(여러 대 가능) · Cloud Browser 등. 기억 · 업무 · 자동화의 경계가 아니다 |
 | Request Device | 요청이 들어온 기기 · 채널 (= Request Channel 의 물리 측면) |
