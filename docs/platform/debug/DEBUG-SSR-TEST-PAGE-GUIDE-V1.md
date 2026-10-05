@@ -60,10 +60,12 @@ export function create{Name}Router(dataSource: DataSource): Router {
 > (2026-10-04 정합) 구판의 `main.ts` 등록은 현행 `apps/api-server/src/bootstrap/register-routes.ts` 로 바뀌었고, 반드시 `NODE_ENV !== 'production'` 게이트 블록 **안**에 등록한다(§7 체크리스트).
 
 ```typescript
-// bootstrap/register-routes.ts — 비프로덕션 게이트 블록 안
+// bootstrap/register-routes.ts — registerDomainRoutes(app, dataSource) 의 비프로덕션 게이트 블록 안
+// NODE_ENV 게이트는 "프로덕션 미등록" 일 뿐 접근 제어가 아니다 — CLAUDE.md §8-2 에 따라 requireAuth + role guard 필수.
+// (import 경로는 bootstrap/ 기준: '../middleware/auth.middleware.js')
 try {
-  const { create{Name}Router } = await import('./routes/debug/{name}.controller.js');
-  app.use('/__debug__/{name}', create{Name}Router(AppDataSource));
+  const { create{Name}Router } = await import('../routes/debug/{name}.controller.js');
+  app.use('/__debug__/{name}', requireAuth, requireRole(['platform:super_admin']), create{Name}Router(dataSource));
   logger.info('✅ {Name} debug endpoint registered at /__debug__/{name}');
 } catch (err) {
   logger.error('Failed to register {Name} debug routes:', err);
@@ -290,6 +292,7 @@ await dataSource.query(`SELECT * FROM users WHERE id = '${userId}'`);
 - [ ] Raw JSON 덤프 포함 (`<pre>` 블록)
 - [ ] 에러 시 상세 정보 표시 (message + code + stack)
 - [ ] `bootstrap/register-routes.ts` 의 **`NODE_ENV !== 'production'` 게이트 블록 안에** `app.use('/__debug__/{name}', ...)` 등록 (게이트 밖 등록 금지)
+- [ ] 등록 시 **`requireAuth` + role guard 적용** (CLAUDE.md §8-2 — 비프로덕션 게이트는 접근 제어가 아니다). 2026-10-05 기준 기존 `/__debug__/user` 는 가드 없이 등록돼 있어 별도 WO 대상이다
 - [ ] Parameter Binding 사용 (String Interpolation 금지)
 - [ ] **읽기 전용일 것** — 디버그 페이지에서 상태 변경(UPDATE/INSERT/DELETE) 금지. 변경이 필요하면 정식 admin API 를 사용한다 (`AdminUserController` · `MembershipConsoleController` 등)
 
