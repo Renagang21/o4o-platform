@@ -94,6 +94,11 @@ Supplier
 
 물리 컬럼 DROP 은 이 경계의 완료 조건이 아니다.
 
+**예외 — Neture 약국 매장 흐름 (2026-10-05, WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1 명시 WO)**
+- 공급처를 지정하지 않은(`service_keys` 비어 있음 · OSA 0행) 제품의 `approval_status` 는 Neture 운영자의 **제품 등록 승인**이 직접 기록한다(파생 불가였던 결함 해소). 이 제품은 `pharmacy` 세미프랜차이즈 기본 공급 대상이다. OSA 행이 있는 제품은 위 파생 규칙 그대로다.
+- 세미프랜차이즈별 공급 승인 · 가격은 `supply_proposals`(SPO 하위 복수 제안 — 가격 · 대상 · 승인만, 설명 · 재고는 SPO)가 맡는다. SPO `(master_id, supplier_id)` UNIQUE 는 유지한다.
+- Neture 약국 흐름의 이용 판정은 이 절의 축(`is_public` · `service_keys` · `allowed_seller_ids` · OSA)을 AND 로 더하지 않고 [`DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1`](../design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md) §4 SSOT 로 대체한다. 이 축들과 다른 서비스 흐름은 보존한다.
+
 ---
 
 ## 5. Content handoff 계약

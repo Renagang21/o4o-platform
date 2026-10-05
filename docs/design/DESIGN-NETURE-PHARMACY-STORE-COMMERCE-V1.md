@@ -1,7 +1,7 @@
 # DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1
 
 > **상태**: ACTIVE
-> **작성일**: 2026-10-05 · **최종 갱신**: 2026-10-05
+> **작성일**: 2026-10-05 · **최종 갱신**: 2026-10-05 (구현 결정 반영: 매장 표식 · 부분 인덱스 조건 · 커뮤니티 범위 · KPA 프로비저닝 후속)
 > **근거 WO/IR**: [`WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1`](../work-orders/WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1.md) 단계 1-7 · 입력 [`IR-NETURE-PHARMACY-STORE-COMMERCE-STEP1-CENSUS-V1`](../investigations/IR-NETURE-PHARMACY-STORE-COMMERCE-STEP1-CENSUS-V1.md)
 
 Neture 약국 서비스의 **약국별 하나의 내 매장 · 기본 가입 · 세미프랜차이즈 가입 · 복수 공급 제안 · 선택 제안 주문 · 테스트 결제** 를 구현하기 위한 확정 설계다. IR 의 "사용자 판단 필요" 항목 중 기술 항목은 여기서 근거와 함께 확정한다(WO 단계 1 "보류" 절의 마지막 항목). 사업 판단 항목은 §11 에 남긴다.
@@ -90,9 +90,10 @@ supply_proposals
 | `store_cart_items` | `+ supply_proposal_id uuid NULL`, `+ seller_recruitment_id uuid NULL` | R7 — 선택한 제안을 장바구니에 저장 |
 | `seller_recruitments` | `+ semi_franchise_id uuid NULL`, `+ supply_unit_price int NULL` | 모집의 대상 경로 · 모집 공급 조건 가격(IR B §4) |
 | `seller_recruitment_applications` | `+ applicant_organization_id uuid NULL` + `UNIQUE (recruitment_id, applicant_organization_id) WHERE applicant_organization_id IS NOT NULL` | 참여 단위 = 약국 조직(WO §3-6) |
-| `organization_product_listings` | `idx_org_listing_unique_v2` 를 `WHERE source_type IS DISTINCT FROM 'event-offer'` 부분 UNIQUE 로 교체 | 이벤트 재신청 · 같은 제품 복수 승인 이벤트(WO §3-5). 진열 행 유일성은 그대로 |
+| `organization_product_listings` | `idx_org_listing_unique_v2` 를 `WHERE service_key <> 'neture-event-offer'` 부분 UNIQUE 로 교체 | 세미프랜차이즈 이벤트 원장만 재신청 · 같은 제품 복수 승인 이벤트(WO §3-5). KPA/KCos 이벤트 원장 · 진열 행(`source_type='event-offer'` 매장 진열 포함) 유일성은 그대로 |
+| `seller_recruitments` | UNIQUE 를 `(product_id, seller_id, service_id, semi_franchise_id) NULLS NOT DISTINCT` 로 | 세미프랜차이즈별 모집 1건. 기존 행(semi_franchise_id NULL) 유일성 동일 |
 
-- `idx_org_listing_unique_v2` 를 쓰는 `ON CONFLICT (organization_id, service_key, offer_id)` 소비처 9곳에 같은 predicate(`WHERE source_type IS DISTINCT FROM 'event-offer'`)를 붙인다. PostgreSQL 은 predicate 를 준 ON CONFLICT 가 비부분 인덱스도 추론하므로 **코드 변경을 migration 보다 먼저 배포해도 안전**하다.
+- `idx_org_listing_unique_v2` 를 쓰는 `ON CONFLICT (organization_id, service_key, offer_id)` 소비처 9곳에 같은 predicate(`WHERE service_key <> 'neture-event-offer'`)를 붙인다. PostgreSQL 은 predicate 를 준 ON CONFLICT 가 비부분 인덱스도 추론하므로 **코드 변경을 migration 보다 먼저 배포해도 안전**하다.
 - 만들지 않는 것: `checkout_orders` 컬럼(서비스 · 수취 주체는 metadata), 독립 `*_orders` · `*_payments`, `neture_orders` · `o4o_payments` unique 인덱스(운영 중복 데이터가 있으면 migration 이 깨질 수 있으므로 멱등은 advisory lock + 조건부 UPDATE 로 코드에서 보장 — §8).
 - migration 규약: epoch13 은 manifest 최대값 초과, `manifest.ts` append + `expected-schema-states.ts` 지문을 같은 커밋에(격리 PostgreSQL 15 실행값). ESM 엔티티 규칙(CLAUDE.md §2).
 
@@ -212,12 +213,13 @@ API: `GET /api/v1/neture/pharmacy/store/supply-options?source=&q=&page=` · `GET
 ## 5. 내 매장 기본 게이트 (대체)
 
 - 약국 매장 API(`/api/v1/kpa/...` 의 매장 controller 들 — 사이니지 · QR · 태블릿 · 자체 콘텐츠 · 매장 정보 등)는 공통 유틸 `isStoreOwner(ds, userId, 'kpa')` · `createRequireStoreOwner(ds, 'kpa')` 로 판정한다.
-- **변경**: `kpa` 키의 판정을 "kpa-society active membership ∧ `kpa:store_owner` role ∧ kpa-society 연결 조직" 에서 **"사용자가 owner/admin/manager 인 조직 중 `neture_pharmacy_memberships.status='active'` 인 조직"** 으로 대체한다. 매장 경영자 계약 게이트 · ambiguous 409 · 선택 매장 헤더 규칙은 그대로.
+- **변경 (구현 `91155708c`)**: `kpa` 키의 판정을 "kpa-society active membership ∧ `kpa:store_owner` role ∧ kpa-society 연결 조직" 에서 **"사용자가 owner/admin/manager 인 조직 중 `neture_pharmacy_memberships.status='active'` 인 조직"** 으로 대체한다. 매장 경영자 계약 게이트 · ambiguous 409 · 선택 매장 헤더 규칙은 그대로.
   - 세미프랜차이즈(pharmacy 포함) 미가입이어도 내 매장 기본 기능 이용 가능 → WO §3-1 충족.
   - `cosmetics` · `pharmacy-hub` 키의 판정은 변경 없음.
-- 같은 판정을 web-store 매장 선택(`/api/v1/work-scope/accessible-stores` · `store-services`)에도 반영해 기본 가입 active 약국이 매장 목록에 나오게 한다.
+- 같은 기준을 `resolveWorkScopeStore`(kpa-society membership 선검사 제거) · 매장 경영자 계약 게이트(`getPendingStoreOwnerAgreementsForUser` — kpa-society 계약은 원장 active 약국에 요구)에도 적용한다. 매장 목록(`accessible-stores`)은 조직 owner 관계만 보므로 그대로 나온다.
+- **매장 표식(구현 결정)**: 매장 판정은 원장이지만, JWT role 로 화면 · 콘텐츠 사본(F3 `asset-copy-core` allowedRoles)을 여는 기존 소비처가 있어 기본 가입 승인 · 재활성 시 표식을 붙이고 정지 · 종료 시 거둔다 — role `neture:store_owner`(신규, `service_memberships('neture')` ensure 동반 — F11), `organization_service_enrollments('kpa-society')`(매장의 약국 업무 영역 = web-store 서비스 문맥, 세미프랜차이즈 가입이 아님), `platform_store_slugs('kpa')`(공개 주소). `service_memberships('neture')` 는 공급자 축과 공유될 수 있어 정지 시 건드리지 않는다. 표식 동기화 실패는 원장 판정에 영향이 없다.
 - 승인 우회 차단: `POST /api/v1/store/enrollment` 의 `ENROLLABLE_SERVICE_KEYS` 에서 `kpa` 제거(약국 매장은 기본 가입 신청으로만).
-- KPA 회원 승인 시 매장 프로비저닝(`ensureKpaStoreOrganization`)은 Neture 약국 매장을 만들지 않는다 — 새 게이트에서는 그 조직이 매장 권한을 주지 않으므로 호출을 제거한다(단계 6-2).
+- KPA 회원 승인 시 매장 프로비저닝(`ensureKpaStoreOrganization`, member.controller 2곳)은 새 게이트에서 매장 권한을 주지 않는다(실효 없음). 호출 제거는 KPA 운영 콘솔 흐름 · F10 승인 엔진 kpa 분기와 얽혀 있어 **별도 정리 WO** 로 남긴다.
 
 ---
 
@@ -234,6 +236,7 @@ API: `GET /api/v1/neture/pharmacy/store/supply-options?source=&q=&page=` · `GET
 - 세미프랜차이즈 커뮤니티 = `communities` 행(`slug = semi_franchises.community_key`).
 - `requireCommunityAccess(communityKey)` 에서 `communityKey` 가 어떤 세미프랜차이즈의 `community_key` 이면: **세미프랜차이즈 가입 active 인 약국 조직의 owner/admin/manager 인가** 만 판정한다. `community_memberships` 승인 검사를 건너뛰고 행을 만들지 않는다(복제 · 동기화 0). 정지 · 종료 · 미가입 = 403.
 - 일반 커뮤니티(`pharmacy` 약사 커뮤니티 등)의 독립 가입 정책은 그대로.
+- **구현 범위**: 접근 판정(`requireCommunityAccess` · `GET /communities/:key/access`)만 연결했다. 포럼 원장은 정적 카탈로그(`forumStorageCodes`)에 묶여 있어 DB 커뮤니티(개설 승인 커뮤니티 포함) 전반에 게시판 mount 가 없다 — 세미프랜차이즈 커뮤니티 게시판은 공통 Forum 구조(o4o-common-structure) 변경이 필요해 **후속 WO**.
 
 ---
 
