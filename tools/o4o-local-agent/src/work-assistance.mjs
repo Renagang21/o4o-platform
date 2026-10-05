@@ -37,6 +37,20 @@ const exactKeys = (v, keys) => {
 };
 const inList = (v, list) => typeof v === 'string' && list.includes(v);
 const taskKeyOrNull = (v) => v === null || (typeof v === 'string' && TASK_KEY_RE.test(v));
+
+/**
+ * 노드 원장 소유 주체 키(Phase D · local.db v8). 서버가 소유 주체(USER/ORGANIZATION + id)를 해시해 만든 불투명 값 —
+ * 원 사용자/조직 id 가 아니다. 선택 인자: 없으면 이전 묶음(owner_key NULL)으로 읽고 쓴다(이전 서버와 호환).
+ */
+export const OWNER_KEY_RE = /^o_[0-9a-f]{32}$/;
+
+/** args 에서 ownerKey 를 떼어 형식을 검사한다 → { ok, rest, ownerKey }. 나머지 키 검사는 각 validator 그대로. */
+export function takeOwnerKey(args) {
+  if (!plain(args) || !Object.prototype.hasOwnProperty.call(args, 'ownerKey')) return { ok: true, rest: args, ownerKey: null };
+  const { ownerKey, ...rest } = args;
+  if (typeof ownerKey !== 'string' || !OWNER_KEY_RE.test(ownerKey)) return { ok: false };
+  return { ok: true, rest, ownerKey };
+}
 const stageKeyOrNull = (v) => v === null || (typeof v === 'string' && STAGE_KEY_RE.test(v));
 
 function normalize(value) {
@@ -113,7 +127,10 @@ export function validateContextRecallArgs(args) {
 }
 
 /** assistance_record — `{ runId, targetId, taskKey, event }`. 서버 validateAssistanceRecordShape 와 같은 규칙. */
-export function validateAssistanceRecordArgs(args) {
+export function validateAssistanceRecordArgs(rawArgs) {
+  const owned = takeOwnerKey(rawArgs);
+  if (!owned.ok) return { ok: false };
+  const args = owned.rest;
   if (!plain(args) || !exactKeys(args, ['runId', 'targetId', 'taskKey', 'event'])) return { ok: false };
   if (typeof args.runId !== 'string' || !WORK_RUN_ID_RE.test(args.runId)) return { ok: false };
   if (!resolveRegisteredTarget(args.targetId)) return { ok: false };
@@ -166,6 +183,7 @@ export function validateAssistanceRecordArgs(args) {
       runId: args.runId,
       targetId: args.targetId,
       taskKey: args.taskKey,
+      ownerKey: owned.ownerKey,
       event: {
         kind: e.kind, stageKey: e.stageKey, askKind: e.askKind, providedKind: e.providedKind, structured, resolution: e.resolution,
         progressedSteps: e.progressedSteps, reusability: e.reusability, correction, validation: { result: v.result, evidence: v.evidence },
@@ -175,9 +193,12 @@ export function validateAssistanceRecordArgs(args) {
 }
 
 /** experience_recall — `{ targetId, taskKey }`(taskKey null = 업무 키 목록). */
-export function validateExperienceRecallArgs(args) {
+export function validateExperienceRecallArgs(rawArgs) {
+  const owned = takeOwnerKey(rawArgs);
+  if (!owned.ok) return { ok: false };
+  const args = owned.rest;
   if (!plain(args) || !exactKeys(args, ['targetId', 'taskKey'])) return { ok: false };
   if (!resolveRegisteredTarget(args.targetId)) return { ok: false };
   if (!taskKeyOrNull(args.taskKey)) return { ok: false };
-  return { ok: true, args: { targetId: args.targetId, taskKey: args.taskKey } };
+  return { ok: true, args: { targetId: args.targetId, taskKey: args.taskKey, ownerKey: owned.ownerKey } };
 }
