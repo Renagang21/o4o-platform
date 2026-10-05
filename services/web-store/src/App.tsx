@@ -144,6 +144,7 @@ const HubSupplierLibraryPage = named(() => import('./pages/pharmacy/HubSupplierL
 const PharmacyMembershipPage = lazy(() => import('./pages/neture-pharmacy/PharmacyMembershipPage'));
 const SemiFranchisesPage = lazy(() => import('./pages/neture-pharmacy/SemiFranchisesPage'));
 const SupplyOptionsPage = lazy(() => import('./pages/neture-pharmacy/SupplyOptionsPage'));
+const PharmacyContentSourcesPage = lazy(() => import('./pages/neture-pharmacy/PharmacyContentSourcesPage'));
 const PharmacyRecruitmentsPage = lazy(() => import('./pages/neture-pharmacy/PharmacyRecruitmentsPage'));
 const PharmacyCartPage = lazy(() => import('./pages/neture-pharmacy/PharmacyCartPage'));
 const PharmacyOrdersPage = lazy(() => import('./pages/neture-pharmacy/PharmacyOrdersPage'));
@@ -243,6 +244,7 @@ function storeChildRoutes() {
         <Route path={rel(PP.membership)} element={pharmacyOnly(<PharmacyMembershipPage />)} />
         <Route path={rel(PP.semiFranchises)} element={pharmacyOnly(<SemiFranchisesPage />)} />
         <Route path={rel(PP.supply)} element={pharmacyOnly(<SupplyOptionsPage />)} />
+        <Route path={rel(PP.contents)} element={pharmacyOnly(<PharmacyContentSourcesPage />)} />
         <Route path={rel(PP.recruitments)} element={pharmacyOnly(<PharmacyRecruitmentsPage />)} />
         <Route path={rel(PP.cart)} element={pharmacyOnly(<PharmacyCartPage />)} />
         <Route path={rel(PP.orders)} element={pharmacyOnly(<PharmacyOrdersPage />)} />

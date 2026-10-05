@@ -422,7 +422,8 @@ export const storeLibraryApi = {
     type?: 'document';
     // WO-O4O-KPA-CONTENT-LIST-TAG-SEARCH-FILTER-V1: 출처 탭 + 태그 정확 필터
     // WO-O4O-KPA-QR-AI-DESCRIPTION-SINGLE-CORNER-V1: 'ai-description' = content_json.aiDescription.mode 필터
-    source?: 'operator' | 'community' | 'mine' | 'ai-description';
+    // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: 'franchise' = 가입 세미프랜차이즈 콘텐츠 사본
+    source?: 'operator' | 'community' | 'mine' | 'ai-description' | 'franchise';
     tag?: string;
   }) => {
     const query: Record<string, string> = {};

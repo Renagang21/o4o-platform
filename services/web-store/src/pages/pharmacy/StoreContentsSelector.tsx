@@ -53,16 +53,18 @@ const SEARCH_DEBOUNCE_MS = 300;
 // WO-O4O-KPA-STORE-LIBRARY-CONTENT-CREATED-BUT-LIST-MISSING-V1 (A안):
 //   'execution-asset' = store_execution_assets(content) — QR "내 매장 자료"와 동일 소스를 콘텐츠 목록에 노출.
 type RowOrigin = 'snapshot' | 'direct' | 'execution-asset';
-type DocSourceType = 'cms' | 'content' | 'direct' | 'execution';
+type DocSourceType = 'cms' | 'content' | 'direct' | 'execution' | 'franchise';
 
 // WO-O4O-KPA-CONTENT-LIST-TAG-SEARCH-FILTER-V1: 출처 탭
 //   all=전체 / operator=운영자 제공(snapshot cms) / community=커뮤니티 가져옴(snapshot content) / mine=내가 만든(direct+execution-asset)
 // WO-O4O-KPA-QR-AI-DESCRIPTION-SINGLE-CORNER-V1: ai-description = content_json.aiDescription.mode 필터(SSOT). 태그는 보조.
-type SourceFilter = 'all' | 'operator' | 'community' | 'mine' | 'ai-description';
+// WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: franchise = 가입 세미프랜차이즈 콘텐츠 사본(snapshot, source_service='semi-franchise')
+type SourceFilter = 'all' | 'operator' | 'community' | 'mine' | 'ai-description' | 'franchise';
 const SOURCE_TABS: { key: SourceFilter; label: string }[] = [
   { key: 'all', label: '전체' },
   { key: 'operator', label: '운영자 제공' },
   { key: 'community', label: '커뮤니티 가져옴' },
+  { key: 'franchise', label: '세미프랜차이즈' },
   { key: 'mine', label: '내가 만든 콘텐츠' },
   { key: 'ai-description', label: 'AI 설명' },
 ];
@@ -95,6 +97,7 @@ const SOURCE_TYPE_LABEL: Record<DocSourceType, string> = {
   content: '커뮤니티 (콘텐츠 허브)',
   direct: '매장 직접 작성',
   execution: '매장 제작 자료',
+  franchise: '세미프랜차이즈',
 };
 
 function readString(json: unknown, key: string): string {
@@ -123,14 +126,20 @@ function usageSummaryLabel(u: StoreContentUsage | null | undefined): string | nu
 }
 
 function toDocumentRow(it: LibraryContentItem): DocumentRow {
+  // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: 피드는 source_group 을 내보내지 않으므로
+  //   세미프랜차이즈 사본은 사본 contentJson 의 semiFranchiseKey(복사 시 서버가 기록)로 구분한다.
+  const semiFranchiseName = readString(it.contentJson, 'semiFranchiseName');
+  const isFranchise = it.origin === 'snapshot' && !!readString(it.contentJson, 'semiFranchiseKey');
   const sourceType: DocSourceType =
     it.origin === 'execution-asset'
       ? 'execution'
       : it.origin === 'direct'
         ? 'direct'
-        : it.assetType === 'content'
-          ? 'content'
-          : 'cms';
+        : isFranchise
+          ? 'franchise'
+          : it.assetType === 'content'
+            ? 'content'
+            : 'cms';
   // WO-O4O-KPA-STORE-LIBRARY-EXECUTION-ASSET-EDIT-ACTION-V1:
   //   execution-asset(매장 제작 자료, asset_type='content')은 매장 소유 사본이므로 단건 편집기로 연결.
   //   편집 저장은 같은 row update(id 불변) → 이 자산을 참조하는 QR(library_item_id)은 그대로 유지.
@@ -149,7 +158,9 @@ function toDocumentRow(it: LibraryContentItem): DocumentRow {
   const authorName =
     it.origin === 'direct' || it.origin === 'execution-asset'
       ? '내 매장'
-      : readString(it.contentJson, 'authorName') || '-';
+      : isFranchise
+        ? `세미프랜차이즈${semiFranchiseName ? ` · ${semiFranchiseName}` : ''}`
+        : readString(it.contentJson, 'authorName') || '-';
   return {
     id: it.id,
     origin: it.origin,

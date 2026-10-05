@@ -144,6 +144,21 @@ export interface PharmacyOrder {
   testPayment: boolean;
 }
 
+/** 가입(active) 세미프랜차이즈의 게시 콘텐츠 — 서버가 가입 상태 · 게시 상태로 거른다. */
+export interface SemiFranchiseContent {
+  id: string;
+  title: string;
+  summary: string | null;
+  body: string | null;
+  thumbnailUrl: string | null;
+  attachments: unknown;
+  tags: unknown;
+  status: string;
+  publishedAt: string | null;
+  semiFranchiseKey: string;
+  semiFranchiseName: string;
+}
+
 const P = '/neture/pharmacy';
 
 export const neturePharmacyApi = {
@@ -173,6 +188,18 @@ export const neturePharmacyApi = {
   async listSupplyOptions(params: { source?: string; q?: string; page?: number; limit?: number }): Promise<{ items: SupplyOption[]; total: number }> {
     const res = await coreApiClient.get<Envelope<{ items: SupplyOption[]; total: number }>>(`${P}/store/supply-options`, params);
     return { items: res.data?.items ?? [], total: res.data?.total ?? 0 };
+  },
+
+  async listContents(params: { sf?: string; q?: string; page?: number; limit?: number }): Promise<{ items: SemiFranchiseContent[]; total: number }> {
+    const res = await coreApiClient.get<Envelope<{ items: SemiFranchiseContent[]; total: number }>>(`${P}/store/contents`, params);
+    return { items: res.data?.items ?? [], total: res.data?.total ?? 0 };
+  },
+  async getContent(id: string): Promise<SemiFranchiseContent> {
+    return (await coreApiClient.get<Envelope<SemiFranchiseContent>>(`${P}/store/contents/${encodeURIComponent(id)}`)).data;
+  },
+  /** 내 매장 편집용 사본(매장 소유 독립 사본) 생성 — 원본 변경은 사본에 전파되지 않는다. */
+  async copyContent(id: string): Promise<{ snapshotId: string }> {
+    return (await coreApiClient.post<Envelope<{ snapshotId: string }>>(`${P}/store/contents/${encodeURIComponent(id)}/copy`, {})).data;
   },
 
   async listRecruitments(): Promise<PharmacyRecruitment[]> {

@@ -11,6 +11,7 @@ export const PHARMACY_STORE_PATHS = {
   membership: '/pharmacy/membership',
   semiFranchises: '/pharmacy/semi-franchises',
   supply: '/pharmacy/supply',
+  contents: '/pharmacy/contents',
   recruitments: '/pharmacy/recruitments',
   cart: '/pharmacy/cart',
   orders: '/pharmacy/orders',
