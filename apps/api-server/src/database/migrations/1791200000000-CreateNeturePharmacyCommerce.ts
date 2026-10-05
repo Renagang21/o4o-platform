@@ -23,8 +23,8 @@ import type { MigrationInterface, QueryRunner } from 'typeorm';
  * 만들지 않는 것: checkout_orders 컬럼 · 독립 *_orders / *_payments · neture_orders / o4o_payments
  * unique 인덱스(멱등은 코드의 advisory lock + 조건부 UPDATE).
  */
-export class CreateNeturePharmacyCommerce1791160000000 implements MigrationInterface {
-  name = 'CreateNeturePharmacyCommerce1791160000000';
+export class CreateNeturePharmacyCommerce1791200000000 implements MigrationInterface {
+  name = 'CreateNeturePharmacyCommerce1791200000000';
 
   async up(q: QueryRunner): Promise<void> {
     await q.query(`CREATE TABLE neture_pharmacy_memberships (

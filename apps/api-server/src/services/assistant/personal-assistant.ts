@@ -44,6 +44,7 @@ import {
   getAssistantTaskForRequester,
   isTaskId,
   isTerminalTaskStatus,
+  recentTaskNodeIds,
   updateAssistantTask,
   type AssistantTaskRow,
   type AssistantTaskStatus,
@@ -51,8 +52,10 @@ import {
 import { resolveTaskOwnership } from './task-ownership.js';
 import { judgeTaskStatus, planAssistantTask, type AssistantPlan } from './assistant-planning.js';
 import { EMPTY_ASSISTANT_MEMORY, recallAssistantMemory, rememberExecution } from './assistant-memory.js';
+import { memoryOwnerOf } from './procedural-memory-store.js';
 import type { ExecutionIntent, ExecutionReport } from '../ai-tools/work-agent-contract.js';
 import { resolveWorkTarget } from '../ai-tools/work-target-resolver.js';
+import { nodeLedgerOwnerKey } from '../ai-tools/node-ledger-owner.js';
 
 /**
  * 이번 Task 의 대상 — 기억을 대상별로 찾기 위한 구조 식별자만 쓴다(원문은 메모리에서만 읽고 버린다).
@@ -210,8 +213,25 @@ export async function runAssistantWorkTask(
     memorySources: memory.sources.map((s) => `${s.kind}:${s.placement}:${s.readByAssistant ? 'read' : s.note ?? 'skip'}`),
   });
 
+  // ── Phase D — Execution Node 조정(V2 §11-1). 노드는 Assistant 가 고르고, 노드 원장은 Task 소유 주체로 나눈다 ──
+  //   ownerKey           Task 소유 주체(USER = 본인 · ORGANIZATION = 조직)의 불투명 키. Task 가 없으면 요청자 개인.
+  //   preferredDeviceIds 같은 Task 의 최근 run 노드 — 강제가 아니다(online · capability 가 맞을 때만).
+  const nodeOwner = memoryOwnerOf(input.userId, ownership ?? { scope: 'USER', organizationId: null, serviceKey: null });
+  let preferredDeviceIds: string[] = [];
+  if (task) {
+    try {
+      preferredDeviceIds = await recentTaskNodeIds(dataSource, task.taskId, input.userId);
+    } catch (err) {
+      logger.warn('assistant task nodes unavailable', { taskId: task.taskId, error: err instanceof Error ? err.name : 'unknown' });
+    }
+  }
+  const intent: ExecutionIntent = {
+    ...plan.intent,
+    node: { ownerKey: nodeOwner ? nodeLedgerOwnerKey(nodeOwner.scope, nodeOwner.ownerId) : null, preferredDeviceIds },
+  };
+
   // ── Task → Execution (실행 지시와 함께 위임 · 화면 판단은 Execution 이 한다) ──
-  const reply = await execute(input.userId, input.workBody, plan.intent);
+  const reply = await execute(input.userId, input.workBody, intent);
   if (!task) return { reply, task: null, plan };
 
   // ── Execution → Task (Assistant 가 완료 계약으로 판정) ──

@@ -54,16 +54,33 @@ async function issue(
   return { status: result.status, errorCode: result.errorCode, safe };
 }
 
+/**
+ * 원장 명령 문맥. ownerKey 는 Phase D 노드 원장 소유 주체 키 — 노드가 소유 주체 원장(local.db v8)을 지원할 때만
+ * runtime 이 채운다. 이전 에이전트는 모르는 인자를 받으면 명령 전체를 거절하므로 그때는 비워 둔다.
+ */
+export interface LedgerCtx {
+  userId: string;
+  deviceId: string;
+  ownerKey?: string | null;
+}
+
+/** 소유 주체 키를 받는 원장 명령(upsert · candidate save/match · assistance record · experience recall)에만 싣는다. */
+function withLedgerOwner(args: Record<string, unknown>, ctx: LedgerCtx): Record<string, unknown> {
+  if (ctx.ownerKey) args.ownerKey = ctx.ownerKey;
+  return args;
+}
+
 /** logical run 생성/갱신(active/waiting_for_user). semantic 목표·대상·메모만 담는다. */
 export async function issueWorkRunUpsert(
   dataSource: DataSource,
-  ctx: { userId: string; deviceId: string },
+  ctx: LedgerCtx,
   input: { runId: string; status: 'active' | 'waiting_for_user'; targetId?: string; goalSummary?: string; note?: string },
 ): Promise<WorkRunLedgerResult> {
   const args: Record<string, unknown> = { runId: input.runId, status: input.status };
   if (input.targetId !== undefined) args.targetId = input.targetId;
   if (input.goalSummary !== undefined) args.goalSummary = input.goalSummary;
   if (input.note !== undefined) args.note = input.note;
+  withLedgerOwner(args, ctx);
   return issue(dataSource, ctx.userId, ctx.deviceId, LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_UPSERT, args);
 }
 
@@ -76,23 +93,24 @@ export async function issueWorkRunUpsert(
 /** 성공 run → Candidate 저장. */
 export async function issueWorkflowCandidateSave(
   dataSource: DataSource,
-  ctx: { userId: string; deviceId: string },
+  ctx: LedgerCtx,
   input: { runId: string; targetId: string; template: string; steps: WorkflowStep[]; replayedCandidateId?: string },
 ): Promise<WorkRunLedgerResult> {
   const args: Record<string, unknown> = { runId: input.runId, targetId: input.targetId, template: input.template, steps: input.steps };
   if (input.replayedCandidateId !== undefined) args.replayedCandidateId = input.replayedCandidateId;
+  withLedgerOwner(args, ctx);
   return issue(dataSource, ctx.userId, ctx.deviceId, LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_CANDIDATE_SAVE, args);
 }
 
 /** 이번 요청과 맞는 Candidate 대조(Local). matched 면 재생 단계(값 채움)를 돌려준다. */
 export async function issueWorkflowCandidateMatch(
   dataSource: DataSource,
-  ctx: { userId: string; deviceId: string },
+  ctx: LedgerCtx,
   input: { targetId: string; request: string },
 ): Promise<{ status: string; errorCode?: string; candidateId: string | null; steps: ReplayStep[] | null }> {
-  const r = await issue(dataSource, ctx.userId, ctx.deviceId, LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_CANDIDATE_MATCH, {
+  const r = await issue(dataSource, ctx.userId, ctx.deviceId, LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_CANDIDATE_MATCH, withLedgerOwner({
     targetId: input.targetId, request: input.request,
-  });
+  }, ctx));
   if (r.status !== 'success' || r.safe.matched !== true) return { status: r.status, errorCode: r.errorCode, candidateId: null, steps: null };
   return { status: r.status, candidateId: String(r.safe.candidateId), steps: r.safe.steps as ReplayStep[] };
 }
@@ -100,7 +118,7 @@ export async function issueWorkflowCandidateMatch(
 /** 재생 결과 반영(성공/어긋남). */
 export async function issueWorkflowCandidateResult(
   dataSource: DataSource,
-  ctx: { userId: string; deviceId: string },
+  ctx: LedgerCtx,
   input: { candidateId: string; outcome: 'replay_completed' | 'replay_diverged' },
 ): Promise<WorkRunLedgerResult> {
   return issue(dataSource, ctx.userId, ctx.deviceId, LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_CANDIDATE_RESULT, {
@@ -111,7 +129,7 @@ export async function issueWorkflowCandidateResult(
 /** logical run 상태 전이(complete/expire/taken_over/active/waiting_for_user). */
 export async function issueWorkRunSetStatus(
   dataSource: DataSource,
-  ctx: { userId: string; deviceId: string },
+  ctx: LedgerCtx,
   input: { runId: string; status: WorkRunStatus; note?: string },
 ): Promise<WorkRunLedgerResult> {
   const args: Record<string, unknown> = { runId: input.runId, status: input.status };
@@ -125,7 +143,7 @@ export async function issueWorkRunSetStatus(
 /** segment Experience 기록. args 는 work-experience 형상(enum · 정수 · semantic locator). */
 export async function issueWorkRunExperienceRecord(
   dataSource: DataSource,
-  ctx: { userId: string; deviceId: string },
+  ctx: LedgerCtx,
   args: DataWorkRunExperienceRecordArgs,
 ): Promise<WorkRunLedgerResult> {
   return issue(dataSource, ctx.userId, ctx.deviceId, LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_EXPERIENCE_RECORD, args as unknown as Record<string, unknown>);
@@ -137,7 +155,7 @@ export async function issueWorkRunExperienceRecord(
 
 export async function issueWorkRunContextSave(
   dataSource: DataSource,
-  ctx: { userId: string; deviceId: string },
+  ctx: LedgerCtx,
   args: DataWorkRunContextSaveArgs,
 ): Promise<WorkRunLedgerResult> {
   return issue(dataSource, ctx.userId, ctx.deviceId, LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_CONTEXT_SAVE, args as unknown as Record<string, unknown>);
@@ -146,7 +164,7 @@ export async function issueWorkRunContextSave(
 /** slotValue 는 막힌 재생 단계를 채우는 데만 쓰인다(Local 미저장). */
 export async function issueWorkRunContextRecall(
   dataSource: DataSource,
-  ctx: { userId: string; deviceId: string },
+  ctx: LedgerCtx,
   input: { runId: string; targetId: string; slotValue: string | null },
 ): Promise<WorkRunLedgerResult> {
   return issue(dataSource, ctx.userId, ctx.deviceId, LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_CONTEXT_RECALL, {
@@ -156,19 +174,19 @@ export async function issueWorkRunContextRecall(
 
 export async function issueWorkRunAssistanceRecord(
   dataSource: DataSource,
-  ctx: { userId: string; deviceId: string },
+  ctx: LedgerCtx,
   args: DataWorkRunAssistanceRecordArgs,
 ): Promise<WorkRunLedgerResult> {
-  return issue(dataSource, ctx.userId, ctx.deviceId, LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_ASSISTANCE_RECORD, args as unknown as Record<string, unknown>);
+  return issue(dataSource, ctx.userId, ctx.deviceId, LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_ASSISTANCE_RECORD, withLedgerOwner({ ...(args as unknown as Record<string, unknown>) }, ctx));
 }
 
 /** taskKey null → 대상의 업무 키 목록 · taskKey → 그 업무의 verified Preferred/Avoid. */
 export async function issueExperienceRecall(
   dataSource: DataSource,
-  ctx: { userId: string; deviceId: string },
+  ctx: LedgerCtx,
   input: { targetId: string; taskKey: string | null },
 ): Promise<WorkRunLedgerResult> {
-  return issue(dataSource, ctx.userId, ctx.deviceId, LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_EXPERIENCE_RECALL, { targetId: input.targetId, taskKey: input.taskKey });
+  return issue(dataSource, ctx.userId, ctx.deviceId, LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_EXPERIENCE_RECALL, withLedgerOwner({ targetId: input.targetId, taskKey: input.taskKey }, ctx));
 }
 
 /**
@@ -180,7 +198,7 @@ export async function issueExperienceRecall(
  */
 export async function measureSegmentCommandTiming(
   dataSource: DataSource,
-  ctx: { userId: string; deviceId: string },
+  ctx: LedgerCtx,
   window: { from: Date; to: Date },
 ): Promise<{ commandWaitMs: number | null; executionMs: number | null }> {
   try {

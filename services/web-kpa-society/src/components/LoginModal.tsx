@@ -3,9 +3,10 @@
  *
  * WO-O4O-AUTH-MODAL-LOGIN-AND-ACCOUNT-STANDARD-V1
  * WO-O4O-LOGIN-STANDARDIZATION-V1: 전체 서비스 로그인 표준화
- * WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1:
- *   로그인 수단은 "Google 로 계속하기" 하나다. 이메일/비밀번호 입력 · 이메일 저장 ·
- *   비밀번호 찾기 · 별도 회원가입 모달은 은퇴했다(미등록 Google 계정은 같은 버튼에서 약관 동의 → 가입).
+ * WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: 서비스별 비밀번호(service_credentials) 로그인은 은퇴했다.
+ * WO-O4O-CROSS-SERVICE-LOGIN-ENTRY-AND-RETURN-FLOW-FIX-V1:
+ *   플랫폼 이메일 계정 로그인 + Google 로 계속하기(공통 <LoginMethods />). 가입 · 아이디/비밀번호 찾기는
+ *   계정 센터(Neture) 정식 화면. 오류는 각 폼이 표시하고, 여기서는 서비스 미가입(SERVICE_NOT_MEMBER) 안내만 더한다.
  *
  * 원칙:
  * - 로그인은 항상 모달로만 수행
@@ -15,14 +16,14 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { X } from 'lucide-react';
-import { GoogleContinue } from '@o4o/auth-react';
-import { useAuth, type User } from '../contexts/AuthContext';
+import { LoginMethods, type AuthLoginResult } from '@o4o/auth-react';
+import { useAuth, authClient, type User } from '../contexts/AuthContext';
 import { useAuthModal } from '../contexts/AuthModalContext';
 import { getKpaPostLoginRoute } from '../config/dashboard';
 
 export default function LoginModal() {
   const navigate = useNavigate();
-  const { loginWithGoogle, signupWithGoogle, getGoogleAuthConfig } = useAuth();
+  const { loginWithGoogle, loginWithEmail, signupWithGoogle, getGoogleAuthConfig } = useAuth();
   const { activeModal, closeModal, onLoginSuccess } = useAuthModal();
   const [error, setError] = useState<string | null>(null);
   // WO-O4O-LOGIN-SERVICE-NOT-MEMBER-UX-V1: 서비스 미가입 차단은 일반 오류와 분리 표시
@@ -72,6 +73,13 @@ export default function LoginModal() {
     }
   };
 
+  /** 서비스 미가입만 여기서 안내한다 — 그 밖의 오류는 각 폼이 이미 표시한다(중복 표시 방지). */
+  const showNotMember = ({ code }: { code?: string }) => {
+    const notMember = code === 'SERVICE_NOT_MEMBER';
+    setIsNotMember(notMember);
+    setError(notMember ? '이 계정은 이 약국 서비스에 가입되어 있지 않습니다. 서비스 이용 절차를 진행해 주세요.' : null);
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -92,8 +100,9 @@ export default function LoginModal() {
               <h2 className="text-lg font-bold text-gray-900">
                 KPA Society 로그인
               </h2>
+              {/* 이 앱(pharmacy.neture.co.kr)은 약국 사업자 서비스다 — O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1 */}
               <p className="text-xs text-gray-500">
-                약사/약대생 커뮤니티
+                약국 사업자 서비스
               </p>
             </div>
           </div>
@@ -118,29 +127,21 @@ export default function LoginModal() {
             </div>
           )}
 
-          {/* WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: 로그인 진입은 이 버튼 하나다. */}
-          <GoogleContinue<User>
-            getConfig={getGoogleAuthConfig}
-            loginWithGoogle={loginWithGoogle}
-            signupWithGoogle={signupWithGoogle}
-            onSuccess={({ user: loggedInUser }) => { setError(null); setIsNotMember(false); finishLogin(loggedInUser); }}
-            onStart={() => { setError(null); setIsNotMember(false); }}
-            onError={({ message, code }) => {
-              const notMember = code === 'SERVICE_NOT_MEMBER';
-              setIsNotMember(notMember);
-              setError(
-                notMember
-                  ? '이 계정은 KPA-Society 서비스에 가입되어 있지 않습니다. 서비스 이용 절차를 진행해 주세요.'
-                  : message,
-              );
+          <LoginMethods<User>
+            loginWithEmail={loginWithEmail}
+            api={authClient}
+            onSuccess={(loggedInUser) => { setError(null); setIsNotMember(false); finishLogin(loggedInUser); }}
+            onEmailFailure={(result: AuthLoginResult<User>) => showNotMember(result)}
+            google={{
+              getConfig: getGoogleAuthConfig,
+              loginWithGoogle,
+              signupWithGoogle,
+              onStart: () => { setError(null); setIsNotMember(false); },
+              onError: showNotMember,
+              termsHref: '/policy',
+              privacyHref: '/privacy',
             }}
-            termsHref="/policy"
-            privacyHref="/privacy"
           />
-
-          <p className="mt-6 text-center text-sm text-gray-500">
-            처음이신가요? 같은 버튼으로 약관 동의 후 계정이 만들어집니다.
-          </p>
         </div>
       </div>
     </div>

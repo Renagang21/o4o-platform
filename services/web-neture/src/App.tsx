@@ -104,6 +104,8 @@ import {
 import { RegisterPendingPage } from './pages/RegisterPendingPage';
 // WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1: 이메일 가입 · 확인 · 아이디/비밀번호 찾기 (본체는 @o4o/auth-react)
 import { SignupPage, VerifyEmailPage, FindIdPage, ForgotPasswordPage, ResetPasswordPage } from './pages/auth/EmailAuthPages';
+// WO-O4O-CROSS-SERVICE-LOGIN-ENTRY-AND-RETURN-FLOW-FIX-V1: 자체 로그인 화면이 없는 서비스(O4O 강의)로 로그인 상태를 이어 보내는 출발점
+import ServiceEntryPage from './pages/auth/ServiceEntryPage';
 // MyPage 3-split (WO-O4O-NETURE-MYPAGE-SPLIT-V1)
 import MyPageHub from './pages/mypage/MyPageHub';
 import MyProfilePage from './pages/mypage/MyProfilePage';
@@ -620,14 +622,19 @@ function ModalRenderer() {
 // /login 경로 접근 시 홈으로 리다이렉트하고 로그인 모달 열기
 function LoginRedirect() {
   const { openLoginModal } = useLoginModal();
+  const { isAuthenticated, isLoading } = useAuth();
   const location = useLocation();
 
   const returnUrl = resolveLoginReturnPath(location.state, location.search);
 
+  // WO-O4O-CROSS-SERVICE-LOGIN-ENTRY-AND-RETURN-FLOW-FIX-V1: 이미 로그인했으면 모달 없이 목적지로.
   useEffect(() => {
+    if (isLoading || isAuthenticated) return;
     openLoginModal(returnUrl || undefined);
-  }, [openLoginModal, returnUrl]);
+  }, [openLoginModal, returnUrl, isAuthenticated, isLoading]);
 
+  if (isLoading) return null; // 세션 확인 전에는 이동하지 않는다(이동하면 모달을 열 기회가 사라진다)
+  if (isAuthenticated) return <Navigate to={returnUrl || '/'} replace />;
   return <Navigate to="/" replace />;
 }
 
@@ -694,6 +701,7 @@ function App() {
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
             <Route path="/register/pending" element={<RegisterPendingPage />} />
+            <Route path="/service-entry/:serviceKey" element={<ServiceEntryPage />} />
             <Route path="/qr/:slug" element={<QrLandingPage />} />
             <Route path="/p/:publicKey" element={<ProductLandingPage />} />
             {/* Cafe24 Developers 의 App URL 진입점. Cafe24 관리자 iframe 안에서 열리므로

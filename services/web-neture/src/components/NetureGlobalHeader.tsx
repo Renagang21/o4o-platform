@@ -46,7 +46,7 @@ export const NETURE_HEADER_BRAND = {
 
 export function NetureGlobalHeader() {
   const { user, isAuthenticated, logout } = useAuth();
-  const { openLoginModal, openRegisterModal } = useLoginModal();
+  const { openLoginModal } = useLoginModal();
   const navigate = useNavigate();
 
   // WO-O4O-NOTIFICATION-UI-CORE-V1
@@ -91,7 +91,8 @@ export function NetureGlobalHeader() {
       contextualNav={contextualNav}
       user={headerUser}
       onLogin={openLoginModal}
-      onRegister={openRegisterModal}
+      // WO-O4O-CROSS-SERVICE-LOGIN-ENTRY-AND-RETURN-FLOW-FIX-V1: 회원가입 = 가입 화면 정본(/signup, 이메일 + Google). 로그인 모달 아님.
+      onRegister={() => navigate('/signup')}
       onLogout={handleLogout}
       logoutLabel="O4O 로그아웃"
       utilitySlot={

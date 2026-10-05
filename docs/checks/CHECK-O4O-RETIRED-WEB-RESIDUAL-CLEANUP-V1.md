@@ -130,9 +130,15 @@ web 8개 · admin 의 런타임 소스는 바뀌지 않는다(삭제된 패키�
 
 ## 5. 남은 항목
 
+> **정정 (2026-10-05 · NO_ACTION_REQUIRED)** — 이전 판의 "player 전용 API `/api/signage/:sk/channels/:id/{heartbeat,playback-logs,errors}` 별도 판정" 항목은 삭제한다.
+> 이 경로는 player 가 호출하던 대상일 뿐 서버에 구현된 적이 없다(현행 signage route 정의 0 · git 이력 0 · 현재 응답은 signage router 인증 단계의 401).
+> 실제 옛 Channel API(`/api/v1/channels/:id/heartbeat` · `/:id/playback-log` 등)는 `a193ba4df` 에서 이미 은퇴했다. 운영 요청 30일 0건(Cloud Run 로그) · `channels` · `channel_heartbeats` · `channel_playback_logs` 0행.
+> 보존: Channel 스키마(기존 schema 보존 정책) · `/api/signage/:sk/active-content` · `POST /api/signage/:sk/public/playback/log`(`signage_playback_logs` · 공급자 사이니지 리포트). 추가 테스트 · migration · 배포 없음.
+> 후속 참고: admin `signageV2.ts` 의 미사용 `ChannelHeartbeat` · `PlaybackLogSummary` 타입과 `OpsMetricsDashboard` 의 항상 0 인 channel 카드는 다음 admin 정비 때 함께 제거.
+
 - siteguide 도메인 · 인증서 · `siteguide-web` 이미지 — 사용 방향 결정 대기
 - pharmacy-hub 서버 · 도메인 · QR 4행 — 약국 commerce 트랙(PR #308)에서 이전 후 정리
-- player 전용이던 API `/api/signage/:sk/channels/:id/{heartbeat,playback-logs,errors}` — 별도 판정
 - 추가 발견 미사용 이미지 4종 — 별도 판정
 - 원격 branch 정리 목록 — GitHub 에서 삭제(로컬 `push --delete` 차단)
-- 기준 문서 정비(별도 WO): `O4O-SIGNAGE-STORE-PLAYLIST-MODEL-BOUNDARY-V1` §3 "재생기" 범위에 은퇴한 `signage-player-web` 이 더는 포함되지 않음을 명시
+- ~~기준 문서 정비~~ **처리 완료(2026-10-05 · WO-O4O-SIGNAGE-BASELINE-DOC-ALIGNMENT-V1)**: `O4O-SIGNAGE-STORE-PLAYLIST-MODEL-BOUNDARY-V1` §3 "재생기" 범위에 은퇴한 `signage-player-web` 이 더는 포함되지 않음을 명시
+- ~~기준 문서 정비~~ **처리 완료(2026-10-05 · WO-O4O-SIGNAGE-BASELINE-DOC-ALIGNMENT-V1)**: `O4O-SIGNAGE-CANONICAL-PLAYBACK-PATH-V1` §5.1 (L112 부근) 의 `PlayerTelemetry` → `/api/signage/:sk/channels/:id/{heartbeat,playback-logs,errors}` 미구현 결손 서술 — player 소스 은퇴로 호출자가 사라져 결손이 아니게 됐음을 반영(위 정정 근거)

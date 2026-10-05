@@ -45,7 +45,7 @@ import {
 } from './computer-use-limits.mjs';
 import { LocalMetaRepository, LocalSettingsRepository, LocalWorkRunRepository, LocalWorkflowCandidateRepository, LocalWorkRunExperienceRepository, LocalWorkRunContextRepository, LocalWorkRunAssistanceRepository, LocalExperiencePatternRepository, LocalDatasetRepository, DATASET_NAME_RE, FIELD_NAME_RE, WORK_RUN_ID_RE, WORK_RUN_STATUSES, WORKFLOW_CANDIDATE_ID_RE, localDbHealth, LocalDbError } from './local-db.mjs';
 import { backupSummary } from './local-db-backup.mjs';
-import { validateContextSaveArgs, validateContextRecallArgs, validateAssistanceRecordArgs, validateExperienceRecallArgs } from './work-assistance.mjs';
+import { validateContextSaveArgs, validateContextRecallArgs, validateAssistanceRecordArgs, validateExperienceRecallArgs, takeOwnerKey } from './work-assistance.mjs';
 import { prepareTarget, resolveRegisteredTarget } from './work-target.mjs';
 import { uiaInspect, uiaSetValue, uiaInvoke, uiaKey, uiaClick } from './windows-uia.mjs';
 import {
@@ -59,7 +59,7 @@ import {
   validateNoArgs,
 } from './browser-dom-limits.mjs';
 
-export const AGENT_VERSION = '0.1.0';
+export const AGENT_VERSION = '0.2.0';
 
 /** 서버 계약(local-agent-protocol.ts)의 action 이름과 반드시 일치해야 한다. */
 export const ACTIONS = {
@@ -722,6 +722,7 @@ function dataWorkRunUpsert(args) {
     targetId: args.targetId,
     goalSummary: args.goalSummary,
     note: args.note,
+    ownerKey: args.ownerKey,
   });
   return { status: 'success', data: { runId: saved.runId, runStatus: saved.status, saved: true } };
 }
@@ -734,13 +735,17 @@ function dataWorkRunSetStatus(args) {
 }
 
 /** work_run_upsert 인자 검사 — 서버 validateDataWorkRunUpsertArgs 와 동일 규칙. */
-function validateWorkRunUpsertArgs(args) {
+function validateWorkRunUpsertArgs(rawArgs) {
+  // Phase D — 선택 인자 ownerKey(local.db v8 소유 주체). 없으면 이전 묶음.
+  const owned = takeOwnerKey(rawArgs);
+  if (!owned.ok) return { ok: false };
+  const args = owned.rest;
   if (!args || typeof args !== 'object' || Array.isArray(args)) return { ok: false };
   const allowed = new Set(['runId', 'status', 'targetId', 'goalSummary', 'note']);
   for (const k of Object.keys(args)) if (!allowed.has(k)) return { ok: false };
   if (typeof args.runId !== 'string' || !WORK_RUN_ID_RE.test(args.runId)) return { ok: false };
   if (typeof args.status !== 'string' || !WORK_RUN_UPSERT_STATUSES.includes(args.status)) return { ok: false };
-  const out = { runId: args.runId, status: args.status };
+  const out = { runId: args.runId, status: args.status, ownerKey: owned.ownerKey };
   if (args.targetId !== undefined) {
     // 등재 대상만 — resolveRegisteredTarget 이 site/app registry 로 판정한다.
     if (!resolveRegisteredTarget(args.targetId)) return { ok: false };
@@ -856,7 +861,10 @@ function isValidWorkflowTemplate(value) {
 }
 
 /** candidate_save 인자 검사 — 서버 validateDataWorkRunCandidateSaveArgs 와 동일 규칙. */
-function validateCandidateSaveArgs(args) {
+function validateCandidateSaveArgs(rawArgs) {
+  const owned = takeOwnerKey(rawArgs);
+  if (!owned.ok) return { ok: false };
+  const args = owned.rest;
   if (!args || typeof args !== 'object' || Array.isArray(args)) return { ok: false };
   for (const k of Object.keys(args)) if (!['runId', 'targetId', 'template', 'steps', 'replayedCandidateId'].includes(k)) return { ok: false };
   if (typeof args.runId !== 'string' || !WORK_RUN_ID_RE.test(args.runId)) return { ok: false };
@@ -867,7 +875,7 @@ function validateCandidateSaveArgs(args) {
   const templateSlots = new Set([...args.template.matchAll(/\{\{(\d)\}\}/g)].map((m) => Number(m[1])));
   const usedSlots = new Set(steps.filter((s) => s.slot !== undefined).map((s) => s.slot));
   if (templateSlots.size !== usedSlots.size || [...usedSlots].some((n) => !templateSlots.has(n))) return { ok: false };
-  const out = { runId: args.runId, targetId: args.targetId, template: args.template, steps };
+  const out = { runId: args.runId, targetId: args.targetId, template: args.template, steps, ownerKey: owned.ownerKey };
   if (args.replayedCandidateId !== undefined) {
     if (typeof args.replayedCandidateId !== 'string' || !WORKFLOW_CANDIDATE_ID_RE.test(args.replayedCandidateId)) return { ok: false };
     out.replayedCandidateId = args.replayedCandidateId;
@@ -876,13 +884,16 @@ function validateCandidateSaveArgs(args) {
 }
 
 /** candidate_match 인자 검사 — `{ targetId, request }`. */
-function validateCandidateMatchArgs(args) {
+function validateCandidateMatchArgs(rawArgs) {
+  const owned = takeOwnerKey(rawArgs);
+  if (!owned.ok) return { ok: false };
+  const args = owned.rest;
   if (!args || typeof args !== 'object' || Array.isArray(args)) return { ok: false };
   for (const k of Object.keys(args)) if (!['targetId', 'request'].includes(k)) return { ok: false };
   if (!resolveRegisteredTarget(args.targetId)) return { ok: false };
   if (typeof args.request !== 'string' || args.request.length === 0 || args.request.length > WORKFLOW_REQUEST_MAX) return { ok: false };
   if (workflowNormalize(args.request) !== args.request) return { ok: false };
-  return { ok: true, args: { targetId: args.targetId, request: args.request } };
+  return { ok: true, args: { targetId: args.targetId, request: args.request, ownerKey: owned.ownerKey } };
 }
 
 /** candidate_result 인자 검사 — `{ candidateId, outcome }`. */

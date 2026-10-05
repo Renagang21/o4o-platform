@@ -698,8 +698,14 @@ describe('15. 스크린샷 저장 0 (§11·§12·§43·§44)', () => {
     // (c) 새 테이블 · 마이그레이션 0 (§44).
     const migrationsDir = join(__dirname, '..', 'database', 'migrations');
     const files = readdirSync(migrationsDir);
-    // Local Agent 축의 migration 은 V0 의 한 파일뿐이다 — 이번 WO 는 0 (§44).
-    expect(files.filter((f) => /computer|screenshot|screen[-_]?capture|local[-_]?agent/i.test(f))).toEqual(['20270402000000-CreateLocalAgentTables.ts']);
+    // Local Agent 축의 migration 은 V0 의 한 파일 + Phase D 의 capability 컬럼(boolean jsonb)뿐이다 — Computer Use WO 는 0 (§44).
+    // 새 migration 이 생기면 여기에 명시적으로 더하고, 이미지 · 캡처 저장 칸이 없음을 확인한다.
+    expect(files.filter((f) => /computer|screenshot|screen[-_]?capture|local[-_]?agent/i.test(f)).sort()).toEqual([
+      '1791177033073-AddLocalAgentDeviceCapabilities.ts',
+      '20270402000000-CreateLocalAgentTables.ts',
+    ]);
+    const capabilityMigration = codeOnly(readFileSync(join(migrationsDir, '1791177033073-AddLocalAgentDeviceCapabilities.ts'), 'utf8'));
+    expect(capabilityMigration).not.toMatch(/image|screenshot|capture|base64|png|bytea/i);
     const service = readServer('services/local-agent/local-agent-service.ts');
     expect(service).not.toMatch(/CREATE TABLE|ALTER TABLE/i);
     expect([...service.matchAll(/(?:INSERT INTO|UPDATE|FROM)\s+([a-z_]+)/g)].map((m) => m[1]).every((t) => t.startsWith('local_agent_'))).toBe(true);

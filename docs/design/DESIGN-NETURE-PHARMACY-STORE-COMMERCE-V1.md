@@ -337,7 +337,7 @@ API: `GET /api/v1/neture/pharmacy/store/supply-options?source=&q=&page=` · `GET
 
 | 구분 | 현재 코드 (`apps/api-server/src/modules/neture-pharmacy/`) | 소유 | 인계 방식 |
 |---|---|---|---|
-| 기본 가입 원장 테이블 `neture_pharmacy_memberships` (상태 · 자격 정보 · 결정 이력) | migration `CreateNeturePharmacyCommerce1791160000000` | **인증 · 가입** | 테이블 · 상태 전이(`constants.ts` `nextMembershipStatus` · `canReapply`) 소유 이전. Store 는 읽기만(아래 계약) |
+| 기본 가입 원장 테이블 `neture_pharmacy_memberships` (상태 · 자격 정보 · 결정 이력) | migration `CreateNeturePharmacyCommerce1791200000000` | **인증 · 가입** | 테이블 · 상태 전이(`constants.ts` `nextMembershipStatus` · `canReapply`) 소유 이전. Store 는 읽기만(아래 계약) |
 | 신청 · 재신청 · 운영자 처리(승인 · 반려 · 정지 · 재개 · 종료) | `services/pharmacy-membership.service.ts` · 라우트 `/neture/pharmacy/membership` · `/neture/operator/pharmacy-memberships/*` · web-store `/start-pharmacy` · web-neture `/operator/pharmacy-memberships` | **인증 · 가입** | 파일 · 라우트 · 화면 그대로 이관. 인증 트랙의 공통 가입 · 추가정보 흐름에 편입할 때 이 서비스를 확장하고 새로 만들지 않는다 |
 | 승인 orchestration · role 발급/회수 (`neture:store_owner` + `service_memberships('neture')` ensure) | `services/pharmacy-store-provisioner.ts` | **인증 · 가입** | 그대로 이관. Store 쪽 작업은 아래 계약 함수를 호출만 한다 |
 | 약국 조직(= 내 매장) 생성 · owner 관계 · 재신청 시 표시 정보 갱신 | `services/pharmacy-store-link.ts` `createPharmacyStoreOrganization` · `updatePharmacyStoreProfile` | **Store** | 계약 함수(아래) |

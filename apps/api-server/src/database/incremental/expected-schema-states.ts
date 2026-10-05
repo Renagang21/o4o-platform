@@ -180,13 +180,22 @@ export const EXPECTED_SCHEMA_STATES: readonly ExpectedSchemaState[] = [
     fingerprint: 'c5bd4a49305a8e957be177551573053ac5636cbc151a4a8c5586b16c525782d1',
     fingerprintLineCount: 6018,
   },
+  // WO-O4O-PERSONAL-ASSISTANT-PHASE-D-EXECUTION-NODE-RUNTIME-STATE-COORDINATION-V1 — local_agent_devices.capabilities.
+  // 컬럼 2 · COMMENT 1. baseline 2026-09-18-id685 fresh bootstrap + incremental 1..15 를 격리 PostgreSQL 17
+  // (로컬 17.10 · 일회용 클러스터 127.0.0.1:55432 · trust) 에서 실제 적용해 산출: 운영 DB fingerprint 채택 아님.
+  // 같은 DB 에서 down() 후 값이 state 14(c5bd4a49…, 6018)와 일치함을 확인했다.
+  {
+    appliedThrough: 'AddLocalAgentDeviceCapabilities1791177033073',
+    fingerprint: 'd2b32f7caccf2a71c1cd01997ebc1152ea400eb9781fa81192fbd741aabec2af',
+    fingerprintLineCount: 6021,
+  },
   // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1 — 기본 가입 · 세미프랜차이즈 · 복수 공급 제안 · 세미프랜차이즈 콘텐츠 · 장바구니 제안 컬럼 ·
-  // 모집 조직 단위 · 이벤트 부분 unique. baseline fresh bootstrap + incremental 1..15 를 격리 PostgreSQL 15.19
+  // 모집 조직 단위 · 이벤트 부분 unique. baseline fresh bootstrap + incremental 1..16 를 격리 PostgreSQL 15.19
   // (docker 일회용 컨테이너) 에서 `npx tsx src/migrate.ts` 로 실제 적용해 산출: 운영 DB fingerprint 채택 아님.
   {
-    appliedThrough: 'CreateNeturePharmacyCommerce1791160000000',
-    fingerprint: 'b50d0c3764e9428a574cf0734035518fdf0a2472e4fb19c1d16b9a4bbeb6d13f',
-    fingerprintLineCount: 6152,
+    appliedThrough: 'CreateNeturePharmacyCommerce1791200000000',
+    fingerprint: '5ee52f589bcd49994d3457ab9a96374c3a17d1e9ed02b28a2cff4eae227a195f',
+    fingerprintLineCount: 6155,
   },
 ] as const;
 

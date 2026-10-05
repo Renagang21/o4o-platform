@@ -122,11 +122,9 @@ export async function executePharmacyWebEntryPoint(
   if (!ep || !site || !isEnabledPharmacyWebEntryPoint(entryPointId)) return fail(PHARMACY_WEB_ERROR.ENTRYPOINT_NOT_FOUND);
   if (site.adapterId !== HEALTHKR_ADAPTER.adapterId) return fail(PHARMACY_WEB_ERROR.ENTRYPOINT_NOT_FOUND);
 
-  const resolution = await resolveTargetDevice(dataSource, ctx.userId);
+  const resolution = await resolveTargetDevice(dataSource, ctx.userId, { need: 'browser' });
   if (resolution.status !== 'ok') {
-    return fail(
-      resolution.status === 'none' ? LOCAL_AGENT_ERROR.NO_DEVICE : resolution.status === 'ambiguous' ? LOCAL_AGENT_ERROR.AMBIGUOUS : LOCAL_AGENT_ERROR.OFFLINE,
-    );
+    return fail(resolution.status === 'none' ? LOCAL_AGENT_ERROR.NO_DEVICE : LOCAL_AGENT_ERROR.OFFLINE);
   }
   deviceId = resolution.device.id;
 

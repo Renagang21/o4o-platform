@@ -49,6 +49,8 @@ interface AuthContextType {
   isSessionChecked: boolean;
   /** WO-O4O-GOOGLE-ONLY-SIGNUP-LOGIN-V1: Google 기본 진입(email/password 는 임시 테스트/전환용). */
   loginWithGoogle: (idToken: string) => Promise<AuthLoginResult<User>>;
+  /** WO-O4O-CROSS-SERVICE-LOGIN-ENTRY-AND-RETURN-FLOW-FIX-V1: 플랫폼 이메일 계정 로그인(세션 서비스는 서버가 Origin 으로 정한다). */
+  loginWithEmail: (email: string, password: string) => Promise<AuthLoginResult<User>>;
   signupWithGoogle: (idToken: string, consents: GoogleSignupConsents) => Promise<AuthLoginResult<User>>;
   getGoogleAuthConfig: () => Promise<GoogleAuthConfig>;
   logout: () => void;
@@ -122,6 +124,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isLoading: core.isLoading,
         isSessionChecked,
         loginWithGoogle: core.loginWithGoogle,
+        loginWithEmail: core.loginWithEmail,
         signupWithGoogle: core.signupWithGoogle,
         getGoogleAuthConfig,
         logout: core.logout,

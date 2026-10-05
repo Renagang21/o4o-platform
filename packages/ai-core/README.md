@@ -85,7 +85,7 @@ ai-logs/
 
 AI Core의 정책/계약을 준수하지만 **AI Core나 AI Extension이 아닌 독립 Service Layer**로 동작하는 서비스를 여기에 등재한다. 현재 해당 서비스는 없다.
 
-> **참고**: SiteGuide(`siteguide.co.kr`)는 과거 이 항목의 예시였으나, **O4O 에서 legacy 코드·인프라가 모두 제거**되었으며 현재 운영 서비스가 아니다(WO-O4O-SITEGUIDE-LEGACY-CODE-REMOVAL-V1). 향후 필요 시 **별도 저장소에서 신규 개발**할 독립 서비스 후보로만 보류한다.
+> **참고**: SiteGuide(`siteguide.co.kr`)는 과거 이 항목의 예시였으나, **O4O 에서 legacy 코드·인프라가 모두 제거**되었으며 현재 운영 서비스가 아니다(WO-O4O-SITEGUIDE-LEGACY-CODE-REMOVAL-V1). **2026-10-05 서비스 폐기로 확정**됐다(WO-O4O-SITEGUIDE-RETIREMENT-V1) — 후보로 보류하지 않는다.
 
 ---
 

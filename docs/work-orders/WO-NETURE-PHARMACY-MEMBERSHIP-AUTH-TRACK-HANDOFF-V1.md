@@ -14,7 +14,7 @@ Neture 약국 기본 가입(가입 원장 · 신청/승인 · role 발급 · 승
 
 | 대상 | 파일 / 객체 | 비고 |
 |---|---|---|
-| 가입 원장 | 테이블 `neture_pharmacy_memberships` (migration `CreateNeturePharmacyCommerce1791160000000`) | 컬럼: 약국명 · 사업자번호(진행 중 UNIQUE) · 약사 면허번호 · 상태 · 결정자/일시/사유 · `organization_id UNIQUE` |
+| 가입 원장 | 테이블 `neture_pharmacy_memberships` (migration `CreateNeturePharmacyCommerce1791200000000`) | 컬럼: 약국명 · 사업자번호(진행 중 UNIQUE) · 약사 면허번호 · 상태 · 결정자/일시/사유 · `organization_id UNIQUE` |
 | 상태 전이 규칙 | `apps/api-server/src/modules/neture-pharmacy/constants.ts` `nextMembershipStatus` · `canReapply` · `MEMBERSHIP_ACTIONS` | 세미프랜차이즈 가입(Store 소유)도 같은 함수를 쓴다 — 바꿀 때 Store 트랙과 함께 |
 | 신청 · 재신청 · 목록 · 운영자 처리 | `.../services/pharmacy-membership.service.ts` | `apply` · `findMine` · `list` · `decide` |
 | 승인 orchestration · role | `.../services/pharmacy-store-provisioner.ts` | 활성: `service_memberships('neture')` ensure + role `neture:store_owner` → Store 계약 `activatePharmacyStore`. 정지 · 종료: role 회수 → `deactivatePharmacyStore` |

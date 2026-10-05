@@ -23,6 +23,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { authClient } from '../lib/apiClient';
 import { ROLES, satisfiesRole } from '../config/service';
 import NotFoundPage from '../pages/NotFoundPage';
+import LoginLink from '../components/LoginLink';
 
 export function BranchLayout({ slug, basePath }: { slug: string; basePath: string }) {
   const { user, isAuthenticated, isLoading: isAuthLoading, logout } = useAuth();
@@ -183,7 +184,7 @@ export function BranchLayout({ slug, basePath }: { slug: string; basePath: strin
               </span>
             ) : (
               <span className="flex items-center gap-3">
-                <Link to="/login" className="text-gray-600 hover:text-gray-900">로그인</Link>
+                <LoginLink className="text-gray-600 hover:text-gray-900">로그인</LoginLink>
                 <Link to="/join" className="text-gray-600 hover:text-gray-900">가입 신청</Link>
               </span>
             )}

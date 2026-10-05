@@ -22,6 +22,19 @@ import { useAuth } from '../contexts';
 import type { User } from '../contexts/AuthContext';
 import { DEMO_ACCOUNTS, DEMO_LOGIN_MESSAGES, demoLoginErrorMessage, type DemoAccountEntry, type DemoAccountType } from '../lib/demoAccounts';
 import { resolveSingleStoreWorkspaceUrl } from '../lib/home-entry';
+import { CURRENT_HOST_PROFILE, type HostProfile } from '../lib/hostProfile';
+
+/**
+ * 헤더 부제 — 이 모달은 main · supplier · funding · community 호스트가 함께 쓴다.
+ * 대표 호스트는 전역 헤더 부제(NetureGlobalHeader)와 같은 O4O 정체성, 서브 호스트는 그 영역 이름.
+ * WO-O4O-LOGIN-MODAL-GOOGLE-HINT-AND-HEADER-V1 (IR-O4O-NETURE-HOME-CURRENT-STATE-AND-IA-REDESIGN-V1 §9 선택 B · R3)
+ */
+const LOGIN_MODAL_SUBTITLE: Readonly<Record<HostProfile, string>> = Object.freeze({
+  main: 'O4O 통합 업무 공간',
+  supplier: '공급자 업무 공간',
+  funding: '유통참여형 펀딩',
+  community: '커뮤니티',
+});
 
 // WO-O4O-CROSSSERVICE-PRODUCTION-RESIDUAL-404-AUTH-AND-LEGAL-CLEANUP-V1:
 //   App.tsx 의 동명 상수와 같은 값. App 이 LoginModal 을 import 하므로 역방향 import 는
@@ -34,6 +47,15 @@ interface LoginModalProps {
   returnUrl?: string;
 }
 
+/**
+ * 이 호스트에서 착지할 수 있는 Demo 만 보인다. 공급자 Demo 는 `/supplier/dashboard` 로 가는데,
+ * funding · community 호스트에서는 그 경로가 대표 호스트로 넘어가 세션 없이 착지한다(토큰은 origin 별).
+ * WO-O4O-CROSS-SERVICE-LOGIN-ENTRY-AND-RETURN-FLOW-FIX-V1
+ */
+const VISIBLE_DEMO_ACCOUNTS = DEMO_ACCOUNTS.filter(
+  (demo) => !(demo.type === 'SUPPLIER' && (CURRENT_HOST_PROFILE === 'funding' || CURRENT_HOST_PROFILE === 'community')),
+);
+
 export default function LoginModal({ isOpen, onClose, returnUrl }: LoginModalProps) {
   const navigate = useNavigate();
   const { loginWithEmail, loginWithGoogle, signupWithGoogle, getGoogleAuthConfig } = useAuth();
@@ -45,6 +67,14 @@ export default function LoginModal({ isOpen, onClose, returnUrl }: LoginModalPro
   const [demoBusy, setDemoBusy] = useState<DemoAccountType | null>(null);
   const [demoError, setDemoError] = useState<string | null>(null);
   const demoBusyRef = useRef(false);
+
+  // WO-O4O-CROSS-SERVICE-LOGIN-ENTRY-AND-RETURN-FLOW-FIX-V1: 다시 열 때 지난 오류가 남지 않게 한다(모달은 항상 mount).
+  useEffect(() => {
+    if (!isOpen) return;
+    setError(null);
+    setIsNotMember(false);
+    setDemoError(null);
+  }, [isOpen]);
 
   // 매장 이동 뒤 뒤로가기(bfcache 복원)로 돌아오면 진행 표시를 푼다.
   useEffect(() => {
@@ -155,7 +185,7 @@ export default function LoginModal({ isOpen, onClose, returnUrl }: LoginModalPro
             <span className="text-2xl">🌿</span>
             <div>
               <h2 className="text-lg font-bold text-gray-900">Neture 로그인</h2>
-              <p className="text-xs text-gray-500">공급자 연결 서비스</p>
+              <p className="text-xs text-gray-500">{LOGIN_MODAL_SUBTITLE[CURRENT_HOST_PROFILE]}</p>
             </div>
           </div>
           <button
@@ -189,17 +219,21 @@ export default function LoginModal({ isOpen, onClose, returnUrl }: LoginModalPro
                   signupWithGoogle={signupWithGoogle}
                   onSuccess={() => { setError(null); setIsNotMember(false); handleLoginSuccess(); }}
                   onStart={() => { setError(null); setIsNotMember(false); }}
-                  onError={({ message, code }) => {
+                  onError={({ code }) => {
+                    // 일반 오류는 Google 버튼 영역이 이미 표시한다(중복 표시 방지). 서비스 미가입 안내만 여기서 더한다.
                     const notMember = code === 'SERVICE_NOT_MEMBER';
                     setIsNotMember(notMember);
-                    setError(
-                      notMember
-                        ? '이 계정은 Neture 서비스 이용 권한이 없습니다. Neture 이용 신청 후 승인되면 로그인할 수 있습니다.'
-                        : message,
-                    );
+                    setError(notMember ? '이 계정은 Neture 서비스 이용 권한이 없습니다. Neture 이용 신청 후 승인되면 로그인할 수 있습니다.' : null);
                   }}
                   termsHref="/terms"
                   privacyHref="/privacy"
+                  hint={
+                    // 이 안내는 Google 버튼에만 해당한다 — 이메일 가입은 위 '회원가입' 페이지에서 한다.
+                    // 버튼이 보일 때만 렌더된다(준비 중이면 숨김).
+                    <p className="text-center text-xs text-gray-500">
+                      Google 로 처음이신가요? 같은 Google 버튼으로 약관 동의 후 계정이 만들어집니다.
+                    </p>
+                  }
                 />
               </div>
 
@@ -223,11 +257,6 @@ export default function LoginModal({ isOpen, onClose, returnUrl }: LoginModalPro
                 )
               )}
 
-              {/* 이 안내는 Google 버튼에만 해당한다 — 이메일 가입은 위 '회원가입' 페이지에서 한다. */}
-              <p className="mt-4 text-center text-xs text-gray-500">
-                Google 로 처음이신가요? 같은 Google 버튼으로 약관 동의 후 계정이 만들어집니다.
-              </p>
-
               {/* WO-O4O-DEMO-LOGIN-ENTRY-AND-EXPERIENCE-UX-V1: 체험하기 — 로그인 수단보다 앞세우지 않는다 */}
               <section aria-labelledby="demo-entry-title" className="mt-6">
                 <div className="mb-3 flex items-center gap-3 text-xs text-gray-400">
@@ -236,7 +265,7 @@ export default function LoginModal({ isOpen, onClose, returnUrl }: LoginModalPro
                   <span className="h-px flex-1 bg-gray-200" aria-hidden />
                 </div>
                 <div className="grid grid-cols-2 gap-2">
-                  {DEMO_ACCOUNTS.map((demo) => (
+                  {VISIBLE_DEMO_ACCOUNTS.map((demo) => (
                     <button
                       key={demo.type}
                       type="button"
