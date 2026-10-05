@@ -430,12 +430,12 @@ describe('resolvePublicQrLanding — Screen Set 서비스 축은 매장 기준 (
     resolveScreenSetSections: jest.Mock;
   };
   const scanMeta = { deviceType: 'mobile', userAgent: null, referer: null, ipHash: null };
-  const screenSetDs = (slugServiceKey: string) =>
+  const screenSetDs = (...slugServiceKeys: string[]) =>
     makeDataSource({
       queryResults: [
         [{ id: 'q', landingType: 'screen_set', landingTargetId: 'set-1', isActive: true, organizationId: ORG, slug: 's' }],
         [], // scan insert
-        [{ slug: 'store-slug', service_key: slugServiceKey }], // platform_store_slugs
+        slugServiceKeys.map((k, i) => ({ slug: `store-slug-${i}`, service_key: k })), // platform_store_slugs (최신순)
       ],
     });
 
@@ -452,5 +452,11 @@ describe('resolvePublicQrLanding — Screen Set 서비스 축은 매장 기준 (
     const { ds } = screenSetDs('kpa');
     await resolvePublicQrLanding(ds, 's', 'kpa', scanMeta);
     expect(resolveScreenSetSections.mock.calls[0][1]).toMatchObject({ serviceKey: 'kpa' });
+  });
+
+  it('여러 서비스에 slug 가 있는 매장은 호출 서비스 slug 가 있으면 호출 축 — 최신 slug 가 다른 서비스여도 바꾸지 않는다', async () => {
+    const { ds } = screenSetDs('pharmacy-hub', 'kpa');
+    await resolvePublicQrLanding(ds, 's', 'kpa', scanMeta);
+    expect(resolveScreenSetSections.mock.calls[0][1]).toMatchObject({ serviceKey: 'kpa', storeSlug: 'store-slug-0' });
   });
 });
