@@ -17,6 +17,7 @@ import { getAnnualReport, REPORT_STATUS_LABEL } from '../lib/api/annualReport';
 import { listMyFees } from '../lib/api/branchFee';
 import { listMyEducationCredits } from '../lib/api/educationCredit';
 import { listMyEvents, type BranchEventItem } from '../lib/api/branchEvent';
+import LoginLink from '../components/LoginLink';
 
 type Cell = { tone: 'ok' | 'todo' | 'muted'; text: string };
 
@@ -129,7 +130,7 @@ export default function MyPageIndexPage({ slug, basePath }: { slug: string; base
     return (
       <div className="py-12 text-sm">
         <p className="text-gray-700">로그인이 필요합니다.</p>
-        <Link to="/login" className="mt-3 inline-block text-primary-700 hover:underline">로그인하기</Link>
+        <LoginLink className="mt-3 inline-block text-primary-700 hover:underline">로그인하기</LoginLink>
       </div>
     );
   }

@@ -9,6 +9,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { listBranches, type BranchSummary } from '../lib/api/branch';
 import { BRAND } from '../config/service';
+import LoginLink from '../components/LoginLink';
 
 export default function DirectoryPage() {
   const [items, setItems] = useState<BranchSummary[] | null>(null);
@@ -37,7 +38,7 @@ export default function DirectoryPage() {
         <h1 className="text-2xl font-bold text-gray-900">{BRAND.nameKo}</h1>
         <p className="mt-1 text-gray-600">{BRAND.tagline}</p>
         <div className="mt-4 flex gap-3 text-sm">
-          <Link to="/login" className="text-primary-700 hover:underline">로그인</Link>
+          <LoginLink className="text-primary-700 hover:underline">로그인</LoginLink>
           <Link to="/join" className="text-primary-700 hover:underline">가입 신청</Link>
           <Link to="/me" className="text-primary-700 hover:underline">내 분회</Link>
         </div>

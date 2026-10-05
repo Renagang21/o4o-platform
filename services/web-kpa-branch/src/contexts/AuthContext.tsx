@@ -35,6 +35,8 @@ interface AuthContextValue {
   isLoading: boolean;
   /** WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: login(email+password) 은퇴 — 진입은 Google 하나다. */
   loginWithGoogle: (idToken: string) => Promise<AuthLoginResult<BranchUser>>;
+  /** WO-O4O-CROSS-SERVICE-LOGIN-ENTRY-AND-RETURN-FLOW-FIX-V1: 플랫폼 이메일 계정 로그인(세션 서비스는 서버가 Origin 으로 정한다). */
+  loginWithEmail: (email: string, password: string) => Promise<AuthLoginResult<BranchUser>>;
   signupWithGoogle: (idToken: string, consents: GoogleSignupConsents) => Promise<AuthLoginResult<BranchUser>>;
   getGoogleAuthConfig: () => Promise<GoogleAuthConfig>;
   logout: () => void;
@@ -77,6 +79,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isAuthenticated: core.isAuthenticated,
         isLoading: core.isLoading,
         loginWithGoogle: core.loginWithGoogle,
+        loginWithEmail: core.loginWithEmail,
         signupWithGoogle: core.signupWithGoogle,
         getGoogleAuthConfig,
         logout: () => {

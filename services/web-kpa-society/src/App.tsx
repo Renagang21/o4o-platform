@@ -421,17 +421,24 @@ function LoginRoute() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { openLoginModal, setOnLoginSuccess } = useAuthModal();
+  const { isAuthenticated, isLoading } = useAuth();
 
   useEffect(() => {
+    if (isLoading) return;
     const returnTo = searchParams.get('returnTo') ||
                      (location.state as { from?: string })?.from;
+    // WO-O4O-CROSS-SERVICE-LOGIN-ENTRY-AND-RETURN-FLOW-FIX-V1: 이미 로그인했으면 모달 없이 목적지로.
+    if (isAuthenticated) {
+      navigate(returnTo && returnTo.startsWith('/') && !returnTo.startsWith('//') ? returnTo : '/', { replace: true });
+      return;
+    }
     if (returnTo) {
       setOnLoginSuccess(() => {
         navigate(returnTo, { replace: true });
       });
     }
     openLoginModal();
-  }, [openLoginModal, location.state, searchParams, setOnLoginSuccess, navigate]);
+  }, [openLoginModal, location.state, searchParams, setOnLoginSuccess, navigate, isAuthenticated, isLoading]);
 
   return <Layout serviceName={SERVICE_NAME}><CommunityHomePage /></Layout>;
 }

@@ -2,19 +2,20 @@
  * LoginModal - K-Cosmetics 로그인 모달
  * WO-O4O-AUTH-MODAL-LOGIN-AND-ACCOUNT-STANDARD-V1
  * WO-O4O-LOGIN-STANDARDIZATION-V1: 전체 서비스 로그인 표준화
- * WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1:
- *   로그인 수단은 "Google 로 계속하기" 하나다. 이메일/비밀번호 입력 · 이메일 저장 ·
- *   비밀번호 찾기 · 별도 회원가입 화면은 은퇴했다(미등록 Google 계정은 같은 버튼에서 약관 동의 → 가입).
+ * WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: 서비스별 비밀번호(service_credentials) 로그인은 은퇴했다.
+ * WO-O4O-CROSS-SERVICE-LOGIN-ENTRY-AND-RETURN-FLOW-FIX-V1:
+ *   플랫폼 이메일 계정 + Google(공통 <LoginMethods />). 오류는 각 폼이 표시하고, 여기서는 서비스 미가입 안내만 더한다.
  */
 
 import { useState } from 'react';
 import { Sparkles, X, AlertCircle } from 'lucide-react';
-import { GoogleContinue } from '@o4o/auth-react';
+import { LoginMethods } from '@o4o/auth-react';
 import { useAuth, type User } from '@/contexts/AuthContext';
+import { authClient } from '@/lib/apiClient';
 import { useLoginModal } from '@/contexts/LoginModalContext';
 
 export default function LoginModal() {
-  const { loginWithGoogle, signupWithGoogle, getGoogleAuthConfig } = useAuth();
+  const { loginWithGoogle, loginWithEmail, signupWithGoogle, getGoogleAuthConfig } = useAuth();
   const { isLoginModalOpen, closeLoginModal, onLoginSuccess } = useLoginModal();
 
   const [error, setError] = useState('');
@@ -30,6 +31,11 @@ export default function LoginModal() {
   const handleClose = () => {
     setError('');
     closeLoginModal();
+  };
+
+  // 서비스 미가입 안내(서버 계약 복원 대기 — 분기 보존). 그 밖의 오류는 각 폼이 표시한다(중복 표시 방지).
+  const showNotMember = ({ code }: { code?: string }) => {
+    setError(code === 'SERVICE_NOT_MEMBER' ? '이 계정은 K-Cosmetics 서비스 이용 권한이 없습니다. 이용 신청 후 승인되면 로그인할 수 있습니다.' : '');
   };
 
   return (
@@ -58,22 +64,20 @@ export default function LoginModal() {
           </div>
         )}
 
-        {/* WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: 로그인 진입은 이 버튼 하나다. */}
-        <GoogleContinue<User>
-          getConfig={getGoogleAuthConfig}
-          loginWithGoogle={loginWithGoogle}
-          signupWithGoogle={signupWithGoogle}
+        <LoginMethods<User>
+          loginWithEmail={loginWithEmail}
+          api={authClient}
           onSuccess={() => { setError(''); finishLogin(); }}
-          onStart={() => setError('')}
-          onError={(e) => setError(e.message)}
-          termsHref="/terms"
-          privacyHref="/privacy"
-          // Google 버튼이 보일 때만 렌더된다(준비 중이면 숨김) — WO-O4O-LOGIN-MODAL-GOOGLE-HINT-AND-HEADER-V1
-          hint={
-            <div style={styles.footer}>
-              <span style={styles.footerNote}>처음이신가요? 같은 버튼으로 약관 동의 후 계정이 만들어집니다.</span>
-            </div>
-          }
+          onEmailFailure={showNotMember}
+          google={{
+            getConfig: getGoogleAuthConfig,
+            loginWithGoogle,
+            signupWithGoogle,
+            onStart: () => setError(''),
+            onError: showNotMember,
+            termsHref: '/terms',
+            privacyHref: '/privacy',
+          }}
         />
       </div>
     </div>
@@ -156,18 +160,5 @@ const styles: Record<string, React.CSSProperties> = {
     borderRadius: '12px',
     color: '#dc2626',
     fontSize: '14px',
-  },
-  footer: {
-    marginTop: '24px',
-    paddingTop: '24px',
-    borderTop: '1px solid #e2e8f0',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  footerNote: {
-    fontSize: '13px',
-    color: '#64748b',
-    textAlign: 'center',
   },
 };

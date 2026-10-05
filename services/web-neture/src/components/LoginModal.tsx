@@ -47,6 +47,15 @@ interface LoginModalProps {
   returnUrl?: string;
 }
 
+/**
+ * 이 호스트에서 착지할 수 있는 Demo 만 보인다. 공급자 Demo 는 `/supplier/dashboard` 로 가는데,
+ * funding · community 호스트에서는 그 경로가 대표 호스트로 넘어가 세션 없이 착지한다(토큰은 origin 별).
+ * WO-O4O-CROSS-SERVICE-LOGIN-ENTRY-AND-RETURN-FLOW-FIX-V1
+ */
+const VISIBLE_DEMO_ACCOUNTS = DEMO_ACCOUNTS.filter(
+  (demo) => !(demo.type === 'SUPPLIER' && (CURRENT_HOST_PROFILE === 'funding' || CURRENT_HOST_PROFILE === 'community')),
+);
+
 export default function LoginModal({ isOpen, onClose, returnUrl }: LoginModalProps) {
   const navigate = useNavigate();
   const { loginWithEmail, loginWithGoogle, signupWithGoogle, getGoogleAuthConfig } = useAuth();
@@ -58,6 +67,14 @@ export default function LoginModal({ isOpen, onClose, returnUrl }: LoginModalPro
   const [demoBusy, setDemoBusy] = useState<DemoAccountType | null>(null);
   const [demoError, setDemoError] = useState<string | null>(null);
   const demoBusyRef = useRef(false);
+
+  // WO-O4O-CROSS-SERVICE-LOGIN-ENTRY-AND-RETURN-FLOW-FIX-V1: 다시 열 때 지난 오류가 남지 않게 한다(모달은 항상 mount).
+  useEffect(() => {
+    if (!isOpen) return;
+    setError(null);
+    setIsNotMember(false);
+    setDemoError(null);
+  }, [isOpen]);
 
   // 매장 이동 뒤 뒤로가기(bfcache 복원)로 돌아오면 진행 표시를 푼다.
   useEffect(() => {
@@ -202,14 +219,11 @@ export default function LoginModal({ isOpen, onClose, returnUrl }: LoginModalPro
                   signupWithGoogle={signupWithGoogle}
                   onSuccess={() => { setError(null); setIsNotMember(false); handleLoginSuccess(); }}
                   onStart={() => { setError(null); setIsNotMember(false); }}
-                  onError={({ message, code }) => {
+                  onError={({ code }) => {
+                    // 일반 오류는 Google 버튼 영역이 이미 표시한다(중복 표시 방지). 서비스 미가입 안내만 여기서 더한다.
                     const notMember = code === 'SERVICE_NOT_MEMBER';
                     setIsNotMember(notMember);
-                    setError(
-                      notMember
-                        ? '이 계정은 Neture 서비스 이용 권한이 없습니다. Neture 이용 신청 후 승인되면 로그인할 수 있습니다.'
-                        : message,
-                    );
+                    setError(notMember ? '이 계정은 Neture 서비스 이용 권한이 없습니다. Neture 이용 신청 후 승인되면 로그인할 수 있습니다.' : null);
                   }}
                   termsHref="/terms"
                   privacyHref="/privacy"
@@ -251,7 +265,7 @@ export default function LoginModal({ isOpen, onClose, returnUrl }: LoginModalPro
                   <span className="h-px flex-1 bg-gray-200" aria-hidden />
                 </div>
                 <div className="grid grid-cols-2 gap-2">
-                  {DEMO_ACCOUNTS.map((demo) => (
+                  {VISIBLE_DEMO_ACCOUNTS.map((demo) => (
                     <button
                       key={demo.type}
                       type="button"
