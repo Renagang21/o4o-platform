@@ -15,7 +15,9 @@
 | 실제 PG 연동 | 대기(D1) |
 | main 통합 · 운영 migration · 배포 · 운영 실결제 | 미실시 — 사용자 승인 대기 |
 | 테스트 데이터 초기화 | 범위만 확정(DESIGN §12) — 운영 DB write 사용자 승인 필요 |
-| pharmacyhub.co.kr QR link 4행 착지 변경 | dry-run 만(DESIGN §16-3) — 운영 DB write 사용자 승인 필요 |
+| pharmacyhub.co.kr QR link 4행(비활성 E2E) | 행별 기존 값 · 새 값 · 조건 기록(DESIGN §16-3 A) — 운영 DB write 사용자 승인 필요 |
+| 인쇄 QR 경로 보존 리다이렉트 | 구현안 · 검증 방법만(DESIGN §16-7, LB urlRedirect) — 적용은 웹 서비스 정비 트랙 · 사용자 승인 |
+| 최신 HEAD 코드 리뷰 | Codex 미완료(unknown error 2회) · 직접 리뷰 완료(CHECK §8) |
 | pharmacy-hub 서버 · 도메인 · 인증서 | 보존 — 운영 검증 후 웹 서비스 정비 트랙이 삭제(DESIGN §16-4) |
 
 ## 담당 경계
@@ -29,7 +31,7 @@
 ## 다음에 할 일
 
 1. PR #308 CI · 리뷰 확인. merge 는 사용자 "main 통합 진행" 후.
-2. 사용자 결정 대기: PH opt-in 공급자 배송 이전(목표 supply_proposals) · PH 매뉴얼/안내 목적지 · QR link 4행 apply.
+2. 사용자 결정 대기: PH opt-in 배송 이전 위치(DESIGN §16-5 — 권장: 자가 노출 재구현 없이 공급 제안 · 기본 공급 안내) · PH 소식 공개 화면 여부(§16-6) · QR link 4행 처리(변경 · 정리 · 유지). Codex 복구 시 최신 HEAD 리뷰 재요청.
 3. merge 후: migration 적용 확인 → 배포 → `NETURE_PHARMACY_PAYMENT_MODE=test` 설정 승인 → 운영 smoke(콘텐츠 자료함 · 새 호스트 QR 포함) → `pharmacy` 담당 운영자 지정 → PH 인프라 삭제 인계.
 
 ## 로컬 검증 재현

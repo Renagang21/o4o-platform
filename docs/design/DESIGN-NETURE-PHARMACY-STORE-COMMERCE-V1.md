@@ -391,6 +391,15 @@ deactivatePharmacyStore(ds, organizationId)                     정지 · 종료
 
 접근 판정 구현만으로 커뮤니티 이용 완료를 선언하지 않는다.
 
+### 15-3. 완료 범위 구분 (2026-10-05)
+
+| 구분 | 항목 |
+|---|---|
+| **이 PR 에서 완료** (코드 · 테스트 · 로컬 검증) | 기본 가입 · 세미프랜차이즈 · 공급 제안 · 이벤트 · 모집 · 장바구니(조직 단위) · 주문 · 테스트 결제 · 공급자 처리 · 콘텐츠 자료함(§15-1) · 커뮤니티 접근 판정 · PH 신규 가입 은퇴 · PH commerce 화면 이전 · QR 착지 이전 준비(§16-2) · 리다이렉트 구현안(§16-7) |
+| **운영 적용 대기** (사용자 승인) | main 통합 · migration · 배포 · `NETURE_PHARMACY_PAYMENT_MODE=test` · 운영 검증 · 테스트 데이터 초기화(§12) · QR link 4행 처리(§16-3 A) · 실제 PG(D1) |
+| **결정 대기** | PH opt-in 배송 이전 위치(§16-5) · PH 소식 · 안내 위치(§16-6) |
+| **다른 트랙 인계** | 커뮤니티 게시판 → 공통 Forum 트랙(`WO-O4O-SEMI-FRANCHISE-COMMUNITY-BOARD-V1`) · KPA 매장 생성 코드 제거 → 인증 · 가입 트랙(`WO-NETURE-PHARMACY-MEMBERSHIP-AUTH-TRACK-HANDOFF-V1` §4) · 리다이렉트 적용 · PH 인프라 정리 → 웹 서비스 정비 트랙(§16-4 · §16-7) |
+
 ---
 
 ## 16. pharmacy-hub 기능 정리 (유지 · 이전 · 폐지)
@@ -407,44 +416,109 @@ PharmacyHub(`pharmacyhub.co.kr`, serviceKey `pharmacy-hub`)는 Neture 약국 매
 | **폐지 보류** | PH 결제 컨트롤러 · `PharmacyHubPaymentEventHandler` · bridge source `pharmacy_hub_cart` | 남은 `CREATED` PH 결제(기능 조사 시점 6건)가 닫힐 때까지 유지. 이미 결제된 PH 주문이 bridge 되면 `service_key='pharmacy-hub'` — 공급자 가시 집합에 포함(§8-4, `fed5afe1e`) |
 | **이전(공용 경로 이미 존재)** | 매장 실행 자산 · 태블릿 · 취급/로컬 상품 · 매장 정보 · 운영 콘솔 | 매장 Core 공용 경로 · Neture 운영자 화면이 담당. 추가 구현 없음 |
 | **유지(옛 호스트)** | 공개 QR(`/api/v1/pharmacy-hub/qr/public/:slug`) · 태블릿 · 다국어 · 제휴 페이지 · forum 저장 코드 `pharmacy-hub` | 운영 검증 전까지 그대로. 같은 slug 를 새 호스트에서도 열 수 있게 준비(§16-2) |
-| **결정 보류** | 공급자 opt-in 배송(PH 전용) | 목표 = `supply_proposals`. 사용자 결정 후 이전 |
-| **결정 보류** | 운영 매뉴얼 · 안내(news · guide) | 목적지 미정 — 새 호스트 `/guide` 로 옮길지 결정 필요 |
+| **결정 보류** | 공급자 opt-in 배송(PH 전용) | 조사 결과 · 선택지 §16-5. 이전 위치 미확정(`supply_proposals` 이전도 확정 아님) |
+| **결정 보류** | 이용 안내(guide) · 소식(news) · 안내 문구 · 제품 설명서 목록 | 조사 결과 · 권장 위치 §16-6 |
 
 PH 고정 spec(`service-catalog.canonical-domain.test.ts` · `service-public-origin-qr-hosts.spec.ts` — pharmacyhub.co.kr origin 생성)은 인프라 삭제 시점에 함께 정리하고 이 PR 에서는 바꾸지 않는다.
 
-### 16-2. QR 착지 이전 준비 (`f6c4e0596`)
+### 16-2. QR 착지 이전 준비 (`f6c4e0596` · `427a715d3`)
 
-- 공개 QR 랜딩의 Screen Set 서비스 축을 **호출 호스트가 아니라 매장 slug 의 서비스 키** 기준으로 해석한다(서비스가 다를 때만, 같으면 종전). → PH 매장 QR slug 를 `pharmacy.neture.co.kr` 공개 QR API(`/api/v1/kpa/qr/public/:slug`)로 열어도 PH 호스트와 같은 결과.
+- 공개 QR 랜딩의 Screen Set 서비스 축: 매장이 **호출 호스트 서비스의 slug 를 하나도 갖지 않을 때만** 매장의 최신 slug 서비스 축을 쓴다. 호출 서비스 slug 가 있으면(여러 서비스에 걸친 매장 포함) 종전과 같다(`427a715d3` — 직접 리뷰에서 발견한 다중 서비스 매장 축 변경 위험 수정). → PH 매장 QR slug 를 `pharmacy.neture.co.kr` 공개 QR API(`/api/v1/kpa/qr/public/:slug`)로 열어도 PH 호스트와 같은 결과.
 - 새 호스트 QR 화면이 product QR 의 상품 요약 · 매장 설명서를 화면 안에 표시한다(옛 PH 화면과 같은 계약). "제품 보기" 버튼이 여는 매장 상품 상세는 B2C 공개 노출 설정을 따르므로 비공개 상품은 404 — 기존 KPA 동작, 표시 정보는 화면 안에서 이미 제공.
 - 로컬 검증: 같은 PH QR slug 를 두 공개 API 로 열어 product · link 결과 동일, KPA 앱 `/qr/:slug` · `/tablet/:slug` 렌더.
 
-### 16-3. pharmacyhub.co.kr 를 가리키는 QR 4행 (운영 읽기 확인 2026-10-05)
+### 16-3. QR 두 가지 — 따로 관리한다
 
-| QR slug | 유형 | 현재 착지 | 상태 | 새 착지 (준비) |
+**(A) 착지 URL 이 pharmacyhub.co.kr 인 link QR 4행 — 비활성 E2E 테스트 데이터** (운영 읽기 확인 2026-10-05)
+
+식별자는 `store_qr_codes.slug`(전역 유일). 4행 모두 `landing_type='link'` · `is_active=false` · PH 약국 조직 소속 · E2E 테스트 생성 slug. 새 착지 경로는 새 호스트에 존재(`/guide` → `/guide/intro`, `/`).
+
+| # | 식별자 (slug) | 기존 값 `landing_target_id` | 새 값 | 변경 조건 |
 |---|---|---|---|---|
-| `e2e-qr-mttrdan3` | link | `https://pharmacyhub.co.kr/guide` | 비활성 | `https://pharmacy.neture.co.kr/guide` (→ `/guide/intro`) |
-| `e2e-test-msl2gezv` | link | `https://pharmacyhub.co.kr/` | 비활성 | `https://pharmacy.neture.co.kr/` |
-| `e2e-test-w9-mskho4g9` | link | `https://pharmacyhub.co.kr/` | 비활성 | `https://pharmacy.neture.co.kr/` |
-| `e2e-test-w9-qr-mskhnl5t` | link | `https://pharmacyhub.co.kr/` | 비활성 | `https://pharmacy.neture.co.kr/` |
+| 1 | `e2e-qr-mttrdan3` | `https://pharmacyhub.co.kr/guide` | `https://pharmacy.neture.co.kr/guide` | 사용자 승인 ∧ 실행 직전 재조회 결과가 기존 값 · `is_active=false` 와 일치 ∧ 대상 1행 |
+| 2 | `e2e-test-msl2gezv` | `https://pharmacyhub.co.kr/` | `https://pharmacy.neture.co.kr/` | 같음 |
+| 3 | `e2e-test-w9-mskho4g9` | `https://pharmacyhub.co.kr/` | `https://pharmacy.neture.co.kr/` | 같음 |
+| 4 | `e2e-test-w9-qr-mskhnl5t` | `https://pharmacyhub.co.kr/` | `https://pharmacy.neture.co.kr/` | 같음 |
 
-- 4행 모두 E2E 테스트 데이터 · 비활성 · PH 약국 조직 소속. 새 착지 경로 2개는 새 호스트에 존재.
-- PH 매장 QR 전체(읽기): 활성 product 18 · screen_set 3(비활성 2) · link 4(위 표, 전부 비활성). 마지막 스캔 2026-09-09. QR slug 는 전역 유일.
-- 착지 URL 변경은 운영 DB write 다 — **실행하지 않았다**. 사용자 승인 시 아래 dry-run 의 대상 수(4) 확인 후 적용:
+- 처리 선택지(사용자 결정): ① 위 새 값으로 변경 ② 테스트 데이터 정리(§12 와 함께 삭제) ③ 그대로 둠(비활성이라 스캔해도 착지하지 않음). 비활성 테스트 행이라 운영 영향은 없다 — **인쇄 QR 보존(B)과 무관**.
+- 운영 DB write — **실행하지 않았다**. 승인 시 행별로 기존 값을 조건에 넣어 실행한다(대상 1행이 아니면 중단):
 
 ```sql
--- dry-run (읽기)
-SELECT slug, landing_target_id FROM store_qr_codes
- WHERE landing_type = 'link' AND landing_target_id LIKE 'https://pharmacyhub.co.kr/%';
--- apply (승인 후, 기대 4행)
-UPDATE store_qr_codes
-   SET landing_target_id = replace(landing_target_id, 'https://pharmacyhub.co.kr/', 'https://pharmacy.neture.co.kr/'),
-       updated_at = NOW()
- WHERE landing_type = 'link' AND landing_target_id LIKE 'https://pharmacyhub.co.kr/%';
+-- 확인(읽기)
+SELECT slug, landing_type, landing_target_id, is_active FROM store_qr_codes
+ WHERE slug IN ('e2e-qr-mttrdan3','e2e-test-msl2gezv','e2e-test-w9-mskho4g9','e2e-test-w9-qr-mskhnl5t');
+-- 행별 적용(승인 후, 각 1행 기대)
+UPDATE store_qr_codes SET landing_target_id = 'https://pharmacy.neture.co.kr/guide', updated_at = NOW()
+ WHERE slug = 'e2e-qr-mttrdan3' AND landing_target_id = 'https://pharmacyhub.co.kr/guide' AND is_active = false;
+UPDATE store_qr_codes SET landing_target_id = 'https://pharmacy.neture.co.kr/', updated_at = NOW()
+ WHERE slug = $1 AND landing_target_id = 'https://pharmacyhub.co.kr/' AND is_active = false;  -- #2 · #3 · #4 각각
 ```
+
+**(B) 인쇄 · 배포된 QR 이 담은 pharmacyhub.co.kr 주소 — 기존 도메인 보존 대상**
+
+- QR 이미지가 담은 주소(서버 생성 규칙): `https://pharmacyhub.co.kr/qr/{slug}`(매장 QR · Screen Set QR · POP v2 QR), `/multilingual-products/{publicKey}`, `/foreign-visitor/affiliate/{shortCode}`. 태블릿 기기 URL `/tablet/{slug}` 도 보존 대상.
+- 규모: PH `/qr` 활성 21 · 스캔 72(URL 조사 2026-09-25 기준), PH 매장 QR 활성 product 18 · screen_set 3(2026-10-05 읽기).
+- 이 주소들은 DB 를 바꿔도 이미 인쇄된 이미지에서 바뀌지 않는다 → **도메인 · 인증서를 유지한 채 리다이렉트(§16-7)** 로만 옮길 수 있다. 리다이렉트 전환 전까지 옛 서버가 그대로 응답한다.
 
 ### 16-4. 인프라 삭제 인계 조건 (웹 서비스 정비 트랙)
 
-1. PR #308 main 통합 · 배포 후 새 호스트에서 콘텐츠 자료함 · 공급 주문 · QR(product · screen_set · link) 운영 검증.
-2. 위 link 4행 착지 변경(또는 테스트 데이터로 정리) · 활성 product/screen_set QR 이 새 호스트 공개 QR 로 열리는지 확인 — 인쇄된 QR 이 PH 도메인을 가리키므로 도메인 리다이렉트(pharmacyhub.co.kr → pharmacy.neture.co.kr, QR 경로 보존)가 필요하다.
-3. 남은 PH `CREATED` 결제 정리 · 결정 보류 2건(opt-in 배송 · 매뉴얼) 결정.
-4. 그 뒤 PH 서버 · 도메인 · 인증서 · PH 고정 spec 정리.
+1. PR #308 main 통합 · 배포 후 새 호스트에서 콘텐츠 자료함 · 공급 주문 · QR(product · screen_set · link) · 다국어 상품 · 제휴 QR 운영 검증.
+2. §16-7 1단계 리다이렉트 적용 · 검증(인쇄 QR 경로 보존). 이후에도 **pharmacyhub.co.kr 도메인 · DNS · 인증서는 리다이렉트를 위해 계속 유지**한다(인쇄 QR 이 남아 있는 한).
+3. 남은 PH `CREATED` 결제 정리 · 결정 보류 항목(§16-5 · §16-6) 결정과 이전.
+4. 그 뒤 §16-7 2단계(호스트 전체 리다이렉트) → PH web 서버(`pharmacy-hub-web`) · PH 고정 spec 정리. 도메인 · 인증서 해지는 인쇄 QR 폐기 판단 이후 별도.
+
+### 16-5. 공급자 opt-in 배송 (PH 전용) — 조사 결과
+
+| 항목 | 내용 |
+|---|---|
+| 현재 기능 | 공급자가 자기 제품(SPO)마다 PH 공급을 켜고 끈다. 켜면 `supplier_product_offers.service_keys` 에 `pharmacy-hub` 추가 + 선택적 서비스 단가 `offer_service_prices`. **운영자 승인 없이** PH 매장 진열에 즉시 노출(노출 게이트가 `approval_status` 를 보지 않음). 주문은 PH 장바구니 → `checkout_orders(source=pharmacy_hub_cart)` → bridge `neture_orders(service_key='pharmacy-hub')` → 공급자 처리(수락 · 발송) |
+| 화면 · API | web-neture 공급자 "서비스 제공 설정" `/supplier/services/pharmacy-hub` · API `/neture/supplier/services/:serviceKey/products · orders` (`SUPPLIER_OPTIN_SERVICE_KEYS=['pharmacy-hub']` 만 허용) |
+| 이용 대상 | 공급자(설정 · 주문 처리) → PH 약국(진열 · 주문). PH 운영자 개입 없음 |
+| Neture 대체 가능 여부 | **배송 · 주문 처리는 대체됨**(같은 공급자 배송 정책 · bridge · 공통 공급자 주문 목록). **노출 방식은 대체 안 됨**: 기본 공급은 운영자 제품 승인 + `service_keys` 빈 제품 + 일반가, 공급 제안은 공급자 단가 지정이 되지만 세미프랜차이즈 담당 운영자 승인이 필요. "공급자 혼자 켜는 즉시 노출 · 서비스 단가" 는 없다 |
+| 주의 | opt-in 제품은 `service_keys` 가 비어 있지 않아 Neture 기본 공급에 안 보인다. PH 은퇴 때 `pharmacy-hub` 키를 지우면 APPROVED · 다른 키 없는 제품이 **기본 공급으로 새로 노출**될 수 있다 — 대상 제품 확인 후 정리 |
+
+**권장**: 공급자 자가 노출은 Neture 약국 모델(운영자 승인 기반)과 맞지 않으므로 **새로 만들지 않는다**. 서비스 단가가 필요한 제품은 공급 제안(공급자 단가 + 담당 운영자 승인), 일반가면 기본 공급(제품 등록 승인)으로 안내한다. 필요한 변경: 공급자 "서비스 제공 설정" 화면에 Neture 약국 경로 안내 · PH 은퇴 시점에 opt-in 메뉴 숨김 · 진행 중 PH 주문 처리 경로 유지. 데이터 정리(`service_keys` 의 `pharmacy-hub` · `offer_service_prices`)는 PH 주문 종료 후 영향 제품 목록(dry-run)으로. **이전 위치는 확정하지 않았다** — 사용자 결정.
+
+### 16-6. 이용 안내 · 소식 · 안내 문구 · 제품 설명서 — 조사 결과
+
+새 호스트 `pharmacy.neture.co.kr` = `web-kpa-society`(serviceKey `kpa-society`).
+
+| PH 콘텐츠 | 현재 (PH) | 새 호스트 대응 | 권장 위치 · 필요한 변경 |
+|---|---|---|---|
+| 이용 안내 `/guide/*` (소개 · 이용 방법 · 기능 9종) — 약국 · 비로그인 | 코드 고정 문구(`shared-space-ui` copy `pharmacy-hub.ts`), 운영자 편집 불가 | `/guide` · `/guide/intro` · 이용 방법 · 기능 10종 존재. 운영자 편집 가능(`guide_contents`, `/operator/guide-contents`) | 공통 항목(소개 · 포럼 · 콘텐츠 · QR · POP · 사이니지)은 **기존 KPA `/guide/*` 사용**. 빠진 것: **공급 주문 · 매장 상품** 기능 안내 2쪽(Neture 약국 공급 상품 · 장바구니 · 주문 경로 기준), 태블릿 · 설명서는 QR 쪽 문구에 흡수. 소개 문구가 "KPA-Society" 기준이라 Neture 약국 기준 문구 정비 필요 |
+| 소식 `/news` · `/news/:id` — 공개 | `cms_contents`(serviceKey `pharmacy-hub`, type news), 운영자 편집 가능 | 운영자 콘텐츠 관리(`kpa-society`) 있음, **공개 소식 목록 · 상세 화면 없음**(홈 공지만) | 결정 필요: ① 공개 소식 목록 · 상세 추가 ② 홈 공지로 대체. PH 기존 소식 행은 옛 호스트에 두거나 일회성 이전(운영 write) |
+| 안내 문구 관리 `/operator/guide-contents` (PH) | 콘솔은 있으나 PH 화면이 읽지 않음(사실상 빈 데이터) | KPA 같은 콘솔 존재 | **폐지**(이전 대상 없음) |
+| 제품 설명서 목록 `/store-owner/manuals` — 약국 | 공용 제품 설명(읽기 전용) 목록 · QR | 매장 상품 설명 편집 `/store/marketing/product-descriptions` + QR 화면 설명서 표시 | 새 기능 없이 **기존 경로로 안내**. 읽기 전용 다국어 설명서 목록이 꼭 필요하면 별도 판단 |
+
+`e2e-qr-mttrdan3` 의 새 착지 `/guide` 는 이미 존재한다.
+
+### 16-7. 인쇄 QR 경로 보존 리다이렉트 — 구현안 (실행 안 함)
+
+**사실**: pharmacyhub.co.kr 는 전역 LB `o4o-global-lb` 의 path matcher `path-matcher-pharmacy-hub`(규칙 없이 defaultService = `backend-pharmacy-hub-web`) · 인증서 `cm-cert-pharmacyhub`(root · www) · DNS 는 Gabia. PH web 은 nginx 없이 `serve -s`. 인쇄 QR 경로 4종은 새 호스트에 **같은 경로로 존재**하고 공개 API 조회가 서비스 무관(QR slug · 다국어 public key · 제휴 shortCode)이라 **경로 재작성 없이 호스트만 바꾸면 된다**. 스캔 기록은 착지 화면이 API 를 부를 때 서버에서 남으므로 리다이렉트 후에도 유지(리다이렉트 자체는 기록 안 함, referer 는 리다이렉트 체인 반영).
+
+**방식**: 저장소 선례(`www.neture.co.kr/hospital*` → LB `urlRedirect`, export → validate → import · fingerprint · backup 롤백)를 따른다. 앱 코드 변경 없음.
+
+1단계 — 인쇄 QR 경로만(PH 서버 유지, 나머지 경로는 옛 서버가 계속 응답):
+
+```yaml
+# path-matcher-pharmacy-hub 에 pathRules 추가 (defaultService 는 backend-pharmacy-hub-web 그대로)
+pathRules:
+- paths: ['/qr/*', '/tablet/*', '/multilingual-products/*', '/foreign-visitor/affiliate/*']
+  urlRedirect:
+    hostRedirect: pharmacy.neture.co.kr
+    httpsRedirect: true
+    redirectResponseCode: FOUND        # 1단계 302 — 검증 뒤 MOVED_PERMANENTLY_DEFAULT
+    stripQuery: false                  # ?tabletId= 등 보존
+```
+
+2단계 — PH 은퇴 완료 후 호스트 전체: `defaultUrlRedirect`(같은 hostRedirect · 301). 옛 서버만 가진 경로(`/store-owner/*` · 결제 복귀 · `/operator/*` · `/news`)는 그때까지 이전 · 종료돼 있어야 한다.
+
+**검증**(적용 직후 · 롤백 판단):
+1. `curl -sI https://pharmacyhub.co.kr/qr/<활성 slug>` → 302 · `Location: https://pharmacy.neture.co.kr/qr/<slug>`. `www.` 도 같음. `/tablet/<slug>?tabletId=x` 쿼리 보존.
+2. 리다이렉트 대상 4종이 새 호스트에서 정상 렌더(활성 product · screen_set · 다국어 · 제휴 각 1건 실기기 스캔).
+3. 스캔 후 `store_qr_scan_events` 증가(읽기, 5초 dedupe 고려).
+4. 리다이렉트하지 않는 경로(`/`, `/store-owner/...`, 결제 복귀)는 옛 서버 응답 그대로.
+5. `cm-cert-pharmacyhub` ACTIVE 유지(관리형 인증서 — 만료 표기 2026-11-01 전에 갱신 상태 확인) · API CORS 에 pharmacyhub.co.kr 유지.
+6. 롤백: 적용 전 export 한 url-map 을 import.
+
+**전제**: PR #308 배포 후(새 호스트 QR 화면 · 서비스 축 해석이 운영에 있어야 함). 적용 주체 = 웹 서비스 정비 트랙(LB 변경 = 인프라 변경, 사용자 승인). 이 PR 은 실행하지 않는다.

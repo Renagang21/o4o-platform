@@ -59,6 +59,9 @@ Neture(neture.co.kr) 약국 서비스를 **약국별 하나의 내 매장**에�
 - [ ] 6-2 잔재 정리 — **부분(미완료)**: store 자가 가입 kpa 제거 · 매장 게이트 대체 완료. KPA 회원 승인 시 매장 프로비저닝(member.controller 2곳) 제거는 인증 · 가입 트랙 — [`WO-NETURE-PHARMACY-MEMBERSHIP-AUTH-TRACK-HANDOFF-V1`](WO-NETURE-PHARMACY-MEMBERSHIP-AUTH-TRACK-HANDOFF-V1.md) §4 (DESIGN §15-2)
 - [x] 6-2b pharmacy-hub 유지 · 이전 · 폐지 — 신규 가입 410 · store 자가 가입 제외 · web-store PH commerce → Neture 약국 `f7abec50c` · QR 착지 이전 준비 `f6c4e0596` · QR link 4행 dry-run(운영 write 미실행) · 서버 · 도메인 · 인증서 보존, 삭제는 웹 서비스 정비 트랙 (DESIGN §16)
 - [x] 6-2c Codex 리뷰(`0cfd0fb`) 3건 — 장바구니 조직 단위 한정 · 공급자 가시 집합 pharmacy-hub · 공급처 미지정 제품 반려 `fed5afe1e`
+- [ ] 6-2d 최신 HEAD 리뷰 — **Codex 리뷰 미완료**(2회 unknown error). 직접 리뷰로 QR 서비스 축 결함 1건 수정 `427a715d3` · 남은 위험 4건 기록([CHECK §8](../checks/CHECK-NETURE-PHARMACY-STORE-COMMERCE-LOCAL-BROWSER-V1.md)). Codex 복구 시 재요청
+- [x] 6-2e PH 결정 보류 2건 조사 — opt-in 배송(DESIGN §16-5) · 안내 · 소식 · 설명서(§16-6). 이전 위치는 사용자 결정 대기
+- [x] 6-2f QR 4행 행별 기록 · 인쇄 QR 보존 분리(§16-3) · 경로 보존 리다이렉트 구현안 · 검증 방법(§16-7) — 운영 DB 변경 · 도메인 전환 미실행
 - [x] 6-3 정본 문서 반영 — Supplier Domain §4 · F8 §5 · B2B 계약 Axis D/§13 `350d9abb1` · CANONICAL-INDEX §1 등재(PR #304 통합 후, 2026-10-05)
 - [ ] 6-4 테스트 데이터 초기화 — 범위 확정(DESIGN §12). **운영 DB write 는 사용자 승인 대기 · 미실행**
 - [ ] 6-5 CI · PR · 완료 보고 — PR #308 (draft) CI 확인 중. main 통합 · 배포 · migration 운영 적용은 사용자 승인 후
