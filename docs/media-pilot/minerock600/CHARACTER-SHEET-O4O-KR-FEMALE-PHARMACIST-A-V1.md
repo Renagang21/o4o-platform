@@ -1,5 +1,7 @@
 # 캐릭터 시트 — `O4O 한국 여성 약사 A` (V1)
 
+> **상태**: ACTIVE · 파일럿 산출물 — 현재 기준 정본 아님 (`Pilot Pattern ≠ Platform Canonical Core` — [`O4O-STORE-CONTENT-PRODUCTION-OPERATING-PRINCIPLES-V1`](../../baseline/O4O-STORE-CONTENT-PRODUCTION-OPERATING-PRINCIPLES-V1.md) §8 · §9: 캐릭터 reference 는 candidate production pattern. 아래 "공통 설명자 캐릭터" 는 재사용 의도를 적은 사용자 결정이며 플랫폼 표준 승격은 §8 승격 규칙 · 별도 WO 로만. MINEROCK600 트랙 진행 중이라 종료 · 승격 판정은 트랙 종료 시) · **표기일**: 2026-10-04
+
 > **성격**: O4O **공통 설명자 캐릭터**(미네락600 전용 아님). 첫 사용 = MINEROCK600 EP01.
 > **결정**(사용자, 2026-09-14): stock avatar 탐색 종료 · 직접 제작. 기준 이미지는 ChatGPT 측에서 생성 → 로컬 파일로 전달 → Claude Code 가 Media Library 등록·Job 연결.
 > **권리**: O4O 자체 생성물(`rightsType=o4o-original` · 상업 이용 허용 · 실존 인물 모사 금지).

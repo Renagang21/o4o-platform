@@ -2,6 +2,7 @@
 
 > **설계 전용 문서.** 코드 변경 0 / DB write 0 / migration 0 / API 변경 0 / 배포 0.
 > 프로덕션 접근은 `SELECT` 전용(정보스키마·카운트).
+> **상태**: ACTIVE · **최종 갱신**: 2026-10-04 (§1~§4 · §8 소유권 계약 유효 · 구현 완료 · §5.2 · §6.2 · §7 · §12 의 POP · 매장 내장 AI 서술에 현행 정합 주석)
 
 | 항목 | 값 |
 |------|-----|
@@ -198,6 +199,8 @@ KCos  services/web-k-cosmetics/src/api/productAiContent.ts
 
 ### 5.2 `ProductPopBuilderPage` (3서비스)
 
+> (2026-10-04 정합) **이 절의 전환안은 실행되지 않고 대체됐다.** `ProductPopBuilderPage` 는 은퇴해 북마크 보호용 redirect 로만 남았고(B-3, [`CHECK-O4O-STORE-LOCAL-PRODUCT-POP-CANONICAL-FLOW-ALIGNMENT-V1`](../checks/CHECK-O4O-STORE-LOCAL-PRODUCT-POP-CANONICAL-FLOW-ALIGNMENT-V1.md)), legacy 즉시 PDF POP 축도 제거돼 **POP V2 만 매장 POP canonical** 이다([`CHECK-O4O-STORE-POP-LEGACY-INSTANT-PDF-RETIREMENT-FINAL-CLOSURE-V1`](../checks/CHECK-O4O-STORE-POP-LEGACY-INSTANT-PDF-RETIREMENT-FINAL-CLOSURE-V1.md) · 정본 [`O4O-STORE-POP-V2-CANONICAL-MODEL-V1`](../architecture/O4O-STORE-POP-V2-CANONICAL-MODEL-V1.md)). 아래 표는 당시 설계 기록이다.
+
 현재 local id 로 진입 → ai-contents 403 → 저장 실패 → PDF 404. **end-to-end 로 이미 불능**이다.
 
 | 항목 | 전환 후 |
@@ -234,6 +237,8 @@ listing product → shared_product_descriptions(STORE canonical) → store_produ
 
 ### 6.2 POP
 
+> (2026-10-04 정합) 매장 POP 저장 위치는 아래 P1~P3 중 어느 것도 아닌 **POP V2 Document**(`store_pop_documents` · 저장·수정·복제 → Renderer → PDF/PNG)로 확정됐다 — [`O4O-STORE-POP-V2-CANONICAL-MODEL-V1`](../architecture/O4O-STORE-POP-V2-CANONICAL-MODEL-V1.md). "매장 POP 문구를 전역 `product_ai_contents` 에 되쓰지 않는다" · "`pop_short/pop_long` = ProductMaster 전역 문구(C2 `product-pop-pdf.controller.ts` 입력)" 규칙은 유효하다.
+
 `product_ai_contents.pop_short/pop_long` 은 **ProductMaster 전역 문구**로 남긴다 (C2 PDF 입력 유지).
 매장이 편집한 POP 문구를 전역 row 에 되쓰지 않는다.
 
@@ -263,6 +268,7 @@ PDF 엔드포인트는 `sourceType` 계약(§3)을 받아 local/listing 입력�
 ```
 
 - 매장 편집 화면의 AI 는 **편집기 내장 보조 AI**(RichTextEditor `aiRequestHeaders`)로 이미 동작하며 전역 저장을 하지 않는다 → 이 축은 현재도 정합.
+  > (2026-10-04 정합) **매장 내부 AI 는 2026-09-19 은퇴했다** — Store 화면의 `aiRequestHeaders` 배선 제거, 매장 AI 보조는 외부 LLM 보조(`LlmAssistPanel`)로 대체 ([`CHECK-O4O-STORE-INTERNAL-AI-RETIREMENT-V1`](../checks/CHECK-O4O-STORE-INTERNAL-AI-RETIREMENT-V1.md)). "매장 요청 AI 결과는 전역 row 에 쓰지 않고 매장 소유 저장소에만 저장" 원칙은 그대로다.
 - O4O 는 매장 상품설명 초안을 자동 생성하지 않는다 (AI 진입점 정책 유지).
 
 ---
@@ -374,6 +380,8 @@ PDF 엔드포인트는 `sourceType` 계약(§3)을 받아 local/listing 입력�
 ```
 
 ### WO-2 `O4O-STORE-PRODUCT-DESCRIPTION-OWNERSHIP-ALIGNMENT-V1`
+
+> (2026-10-04 정합) WO-1 · WO-2 범위 A(설명 화면 → `detail_html`) 는 완료([`CHECK-...-GLOBAL-CONTRACT-AND-ACCESS-FIX-V1`](../checks/CHECK-O4O-PRODUCT-AI-CONTENT-GLOBAL-CONTRACT-AND-ACCESS-FIX-V1.md) · [`CHECK-...-STORE-PRODUCT-DESCRIPTION-OWNERSHIP-ALIGNMENT-V1`](../checks/CHECK-O4O-STORE-PRODUCT-DESCRIPTION-OWNERSHIP-ALIGNMENT-V1.md)). 아래 `ProductPopBuilderPage` 항목(범위 B)은 STOP 후 §5.2 주석의 POP V2 수렴으로 대체됐다.
 
 ```text
 범위

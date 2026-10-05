@@ -4,6 +4,7 @@
 > **일자:** 2026-06-17
 > **판정:** **Phase 1 PASS — 종료 고정.**
 > 향후 모든 리스트 정비는 본 baseline 의 **6 적용 유형** 중 하나로 먼저 분류한 뒤 WO 를 작성한다.
+> **상태**: ACTIVE · **최종 갱신**: 2026-10-04 (F 유형 대표 화면 `/admin/product-approvals` 은퇴 반영 — 유형 정의 · 규약은 유효, 해당 화면 기술은 Phase 1 당시 기록)
 
 ---
 
@@ -46,6 +47,8 @@
 ### 적용 대상 화면
 
 `/operator/stores`(3사) · `/operator/members`(Neture·KCos) · `/operator/recruitment-exposure`(KPA·KCos) · KCos `/operator/applications` · `/admin/product-approvals`(Neture Admin). + `/admin/members` 무변경 확인.
+
+> (2026-10-04 정합) Neture `/admin/product-approvals`(`AdminProductApprovalPage`)와 admin 승인/반려 API 는 `WO-O4O-FINAL-CODE-ONLY-RETIREMENT-CLOSURE-V1` 로 **은퇴**했다 — canonical 승인 화면은 `/operator/product-approvals`(`OperatorProductApprovalPage`)이며 이 화면은 `DataTable` 은 쓰지만 `useStandardListQuery` 표준 리스트는 채택하지 않았다. 근거: `apps/api-server/src/__tests__/final-code-only-retirement-closure.spec.ts`(admin 승인 화면 부재 · operator 경로 보존 단언). 이 문서의 `/admin/product-approvals` 서술(§1 · §3-F · §4 · §6 · §7 · §9 · §10 · §11 · §12)은 Phase 1 당시 기록이며 현행 화면 근거가 아니다. `GET /neture/admin/products/summary` 는 현행 코드에 남아 있다.
 
 ---
 
@@ -99,7 +102,7 @@ O4O 표준 리스트는 **단순 DataTable 이 아니라** 다음 조합이다 (
 - **표준:** 기존 client filter 유지 + URL sync 최소 적용. backend pagination 은 후속(Phase 2)으로 분리.
 
 ### F. Backend-first Full Adoption
-- **대표:** `/admin/product-approvals`
+- **대표:** 현행 대표 화면 없음 (패턴 정의만 유지) — Phase 1 당시 대표 `/admin/product-approvals` 는 은퇴 (2026-10-04 정합, §1 정합 주석)
 - **조건:** array-only 전량 로드 + client KPI 집계 + 자체 `<table>` + field contract drift.
 - **표준 순서 (반드시 이 순서):**
   1. backend pagination/search/sort 도입 (선행 WO)
@@ -198,7 +201,7 @@ O4O 표준 리스트는 **단순 DataTable 이 아니라** 다음 조합이다 (
 | `/operator/members` (Neture·KCos) | B. Targeted adoption |
 | `/operator/recruitment-exposure` (KPA·KCos) | C. Minimal card queue |
 | KCos `/operator/applications` | E. Minimal URL sync |
-| `/admin/product-approvals` (Neture Admin) | F. Backend-first full |
+| ~~`/admin/product-approvals` (Neture Admin)~~ — 은퇴 (2026-10-04 정합) | F. Backend-first full (Phase 1 당시) |
 | `/admin/members` | (shared console — 무변경 확인) |
 
 ---
@@ -219,7 +222,7 @@ O4O 표준 리스트는 **단순 DataTable 이 아니라** 다음 조합이다 (
 - array-only 화면 backend pagination 선행 (일반).
 - KCos `/operator/applications` backend pagination (E → F 승격).
 - `/operator/recruitment-exposure` 대량화 시 backend pagination 도입 검토 (C 재분류 트리거).
-- `/admin/product-approvals` `supplierName` search 확장 (organizations JOIN 재설계) + `supplierName`/`category` sort.
+- ~~`/admin/product-approvals` `supplierName` search 확장 (organizations JOIN 재설계) + `supplierName`/`category` sort.~~ — 대상 화면 은퇴로 소멸 (2026-10-04 정합). `/operator/product-approvals` 의 표준 리스트 채택은 별도 WO 에서 유형 분류부터 한다.
 - 표준 URL key separator 개선 여부 검토 (no-underscore → 가독성 개선 시 core 변경 — 전 화면 동시 영향, 신중).
 
 ---

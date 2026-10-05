@@ -1,5 +1,8 @@
 # O4O-KPA-OPERATOR-CANONICAL-STATE-V1
 
+> **상태**: ACTIVE · 기록물 — 현재 기준 정본 아님 (2026-05-09 `2f3f67f02` 시점 KPA operator list 화면 스냅샷. 아래 "SSOT" 표현은 작성 시점 기준이며 현재 판단 근거는 [`OPERATOR-DASHBOARD-STANDARD-V1`](../platform/operator/OPERATOR-DASHBOARD-STANDARD-V1.md) · [`O4O-ROLE-WORKSPACE-ARCHITECTURE-V1`](../baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md) 과 현재 코드. §14 후속 B~D 는 종료 기록 없음) · **표기일**: 2026-10-04
+> (2026-10-04 정합) 작성 이후 변경: §6.2 / §11 의 부분 Canonical 3건은 `078074abe`(WO-O4O-KPA-OPERATOR-PARTIAL-CANONICAL-ALIGN-V1, 2026-05-17)로 정렬 · `PharmacyRequestManagementPage`(`/operator/pharmacy-requests`)는 `136d38fb2`(2026-07-24)로 폐지 · `OperatorLmsCoursesPage`(`/operator/lms`) 등 KPA LMS operator surface 는 `273fce582`(2026-09-22, Lecture 독립 서비스 분리)로 제거 · `ForumManagementPage` 파일 없음. §6 · §13 의 화면 목록 · 검증 표는 작성 시점 값이다.
+
 > KPA-Society Operator Dashboard 의 Canonical 상태 SSOT.
 > 본 문서는 *현재 실제 구현 상태* 의 architectural 기록이며, 새 리팩토링 제안이 아니다.
 > 이후 모든 KPA operator 작업·검토는 본 문서를 출발점으로 한다.

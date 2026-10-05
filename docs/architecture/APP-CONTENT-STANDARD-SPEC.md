@@ -1,6 +1,8 @@
 # APP-CONTENT 표준 UI 스펙 (v1)
 
 > 첫 번째 기준 앱 — 모든 O4O 서비스에 재사용
+>
+> **상태**: ACTIVE · **최종 갱신**: 2026-10-04 (§2 색상은 `@o4o/types` 상수 소비로 정합 · Phase 1 의 존재하지 않는 `/home/content` API 주석)
 
 ## 0. 범위
 
@@ -43,6 +45,8 @@
 * 사용자: 녹색 (#1e8449)
 * Pinned/Featured: 상단 고정 배지
 
+> (2026-10-04 정합) 위 hex 값의 SSOT 는 코드 상수 **`CONTENT_SOURCE_COLORS`**(`packages/types/src/content.ts`, 키 = `operator` · `supplier` · `pharmacist`(=사용자), 라벨은 `CONTENT_SOURCE_LABELS`)다. 화면은 이 상수(또는 Design Core 테마 변수)를 소비하고 **hex 를 화면 코드에 직접 쓰지 않는다** — [`DESIGN-CORE-GOVERNANCE`](../rules/DESIGN-CORE-GOVERNANCE.md) §2 "디자인 토큰 직접 하드코딩 금지". 값 변경은 상수 한 곳에서 한다. **미해결 drift**: `packages/ui/src/content-discovery/ContentBadge.tsx` 가 같은 라벨 · hex 를 로컬 상수로 다시 선언해 `ContentMetaBar` → Neture `ContentListPage` · `ContentDetailPage` 에서 소비된다 — 공유 상수로 전환하기 전까지 색을 바꿀 때 두 곳을 함께 바꿔야 한다(전환은 코드 작업 — 후속).
+
 ---
 
 ## 3. 정렬 (모든 타입 공통)
@@ -81,6 +85,7 @@ APP-CONTENT의 메인 요약 + 전체 리스트 + 정렬 UI를 안정화하고,
 ### Backend
 
 1. **Home Summary API**: `GET /api/v1/{service}/home/content` — 타입별 최신 N건
+   > (2026-10-04 정합) 이 endpoint 는 구현되지 않았다. 현행 홈 요약은 서비스별 `/{service}/home/*` 개별 endpoint(예: KPA `home/notices` · `home/latest` · `home/community`, K-Cosmetics `home/latest` — `apps/api-server/src/routes/kpa/kpa.routes.ts` · `cosmetics/cosmetics.routes.ts` 의 `homeRouter`)다. 신규 구현 시 기존 `homeRouter` 를 확장하고 별도 `/home/content` 를 신설할지는 해당 WO 가 정한다.
 2. **List API**: `GET /api/v1/{service}/contents` — params: type, sort, limit, page
 3. 공통 조건: status=published, serviceKey 일치
 

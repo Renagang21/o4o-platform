@@ -1,5 +1,7 @@
 # O4O Guide sectionKey Migration
 
+> **상태**: COMPLETED · 실행 기록 — 정본 아님. 규칙은 [`O4O-GUIDE-SECTIONKEY-CONFLICT-POLICY-V1`](O4O-GUIDE-SECTIONKEY-CONFLICT-POLICY-V1.md) · **표기일**: 2026-10-04
+
 > **WO-O4O-GUIDE-SECTIONKEY-MIGRATION-V1**
 >
 > GuideBlock JSON 저장 영역을 `page-help`에서 전용 namespace `guideblock-page-help`로 전환.
