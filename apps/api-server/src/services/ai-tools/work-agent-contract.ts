@@ -76,8 +76,11 @@ import {
   sanitizeStrategy,
   sanitizeTaskKey,
   sanitizeUserInput,
+  type CloudRecalledPattern,
+  type DerivedPattern,
   type ProposalAsk,
   type ProposalUserInput,
+  type RunResumeFrame,
   type Strategy,
 } from './work-assistance.js';
 import { COMPUTER_ALLOWED_KEYS, textDenyReason as computerTextDenyReason } from '../local-agent/computer-use-contract.js';
@@ -722,6 +725,13 @@ export interface ExecutionIntent {
    * 확인한 업무 유형(Cloud · 실행 노드 무관). 새 노드에서도 같은 업무를 같은 키로 이어가 경험을 찾게 한다. 절차 선택 키가 아니다(P3).
    */
   knownTaskTypes: readonly string[];
+  /**
+   * Cloud Continuity — 소유 주체 전용 Assistant Memory 가 이번 Task 에 넘기는 근거(실행 노드 무관).
+   *   patterns     같은 소유 주체 · 같은 대상의 검증된 방법(Task 키별). Execution 이 노드 원장과 합쳐 현재 화면으로 다시 검증한다.
+   *   resumeFrame  재개하는 run 의 원래 업무 구조. 노드 원장에 없을 때(다른 PC)만 쓴다.
+   * 둘 다 근거일 뿐 절차 강제가 아니다(P3). 값 · 원문 · 화면 글은 없다.
+   */
+  memory?: { patterns: readonly CloudRecalledPattern[]; resumeFrame: RunResumeFrame | null };
   evidence: readonly PlanningEvidence[];
   completion: CompletionContract;
   /** 승인 경계(V2 §15). 최종 확정 · 결제 · 인증은 언제나 사용자. */
@@ -743,4 +753,22 @@ export interface ExecutionReport {
   plannerMode: 'discovery' | 'experienced';
   /** Execution 이 관찰한 provisional Task type(planner 선언) — Assistant 가 Task 에 올린다. */
   taskTypeProposal: string | null;
+  /** Cloud Continuity — 이번 run 이 남긴 기억 후보(구조만). 저장 여부 · 위치는 Assistant 가 레지스트리로 정한다. */
+  memory?: ExecutionMemoryReport;
+}
+
+/**
+ * Execution → Assistant 기억 후보. 서버가 이미 만든 구조화 도움 · 교정 이벤트에서 파생한 검증 방법과 재개 구조뿐이다.
+ * 노드 원장을 read-back 한 것이 아니다. 값 · 원문 · 화면 글 · Provider 고유 값이 없다.
+ */
+export interface ExecutionMemoryReport {
+  targetId: string | null;
+  targetKind: 'browser_site' | 'windows_app' | null;
+  taskKey: string | null;
+  /** verified + reusable_knowledge 로 파생된 Preferred / Avoid(노드 규칙과 같음). */
+  verifiedPatterns: readonly DerivedPattern[];
+  /** 검증에 실패한 대안(기존 preferred 의 실패 횟수만 올린다). */
+  failedAlternative: { stageKey: string; strategy: Strategy } | null;
+  /** 질문으로 멈췄을 때만 — 다른 노드에서 이어갈 구조(label 없는 op). */
+  resumeFrame: RunResumeFrame | null;
 }

@@ -171,6 +171,15 @@ export const EXPECTED_SCHEMA_STATES: readonly ExpectedSchemaState[] = [
     fingerprint: '42e44a3462e250c85b774fe6e0428da8e68e115b40135ecde615ead25a8a5e20',
     fingerprintLineCount: 5972,
   },
+  // WO-O4O-PERSONAL-ASSISTANT-MEMORY-CLOUD-CONTINUITY-V1 — assistant_procedural_patterns + assistant_run_frames.
+  // 테이블 2 · PK 2 · FK 5 · CHECK 4 · 부분 unique 인덱스 2 · 인덱스 1 · COMMENT 2.
+  // baseline 2026-09-18-id685 fresh bootstrap + incremental 1..14 를 격리 PostgreSQL 17
+  // (로컬 17.10 · 일회용 클러스터 127.0.0.1:55433 · trust) 에서 실제 적용해 산출: 운영 DB fingerprint 채택 아님.
+  {
+    appliedThrough: 'CreateAssistantProceduralMemory1791100000000',
+    fingerprint: 'c5bd4a49305a8e957be177551573053ac5636cbc151a4a8c5586b16c525782d1',
+    fingerprintLineCount: 6018,
+  },
 ] as const;
 
 /** Expected state after `prefixLength` incremental migrations; undefined when not registered. */

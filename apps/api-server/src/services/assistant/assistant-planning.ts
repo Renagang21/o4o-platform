@@ -18,7 +18,8 @@
  * Task 의 소유 범위(USER / ORGANIZATION)는 업무 · 기억의 경계일 뿐 여기서 절차를 고르는 기준으로 쓰지 않는다(§0-1-6).
  *
  * 판단은 결정론이다(AI 호출 0) — 지금 Assistant 가 실행 전에 확실히 아는 것(이어받기 여부 · 이전 Task type · 사용자 힌트)만 쓴다.
- * 자기 Experience 의 실제 내용은 아직 실행 노드에 있으므로(V2 §9-4 · Gate 전) Execution 이 현재 화면과 함께 읽는다.
+ * 자기 Experience 는 노드 원장과 소유 주체 Cloud 기억(검증 방법 · 재개 구조)에 있고, Assistant 는 Cloud 쪽을 근거로 넘길 뿐
+ * 결정하지 않는다 — Execution 이 둘을 합쳐 현재 화면으로 다시 검증한다(Cloud Continuity · P3).
  * 요청 원문은 받지 않는다.
  */
 
@@ -43,6 +44,8 @@ export interface AssistantPlanningInput {
   nodeExperienceReachable: boolean;
   /** Phase C — Assistant Memory(Cloud · 노드 무관)가 돌려준 같은 소유 주체 · 같은 대상의 업무 유형. 없으면 빈 배열. */
   knownTaskTypes?: readonly string[];
+  /** Cloud Continuity — Assistant Memory 가 돌려준 검증 방법 · 재개 구조. 근거로만 넘긴다(강제 아님). */
+  memory?: ExecutionIntent['memory'];
 }
 
 export interface AssistantPlan {
@@ -87,7 +90,8 @@ export function planAssistantTask(input: AssistantPlanningInput): AssistantPlan 
       startMode: input.resuming ? 'resume' : 'discovery',
       taskTypeHint: input.priorTaskTypeKey,
       knownTaskTypes: [...(input.knownTaskTypes ?? [])],
-      evidence: planningEvidence(input.nodeExperienceReachable),
+      ...(input.memory ? { memory: { patterns: [...input.memory.patterns], resumeFrame: input.memory.resumeFrame } } : {}),
+      evidence: planningEvidence(input.nodeExperienceReachable || (input.memory?.patterns.length ?? 0) > 0),
       completion: COMPLETION,
       approval: { commit: 'user_only', credential: 'user_only' },
     },

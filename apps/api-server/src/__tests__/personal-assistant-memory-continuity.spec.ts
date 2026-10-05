@@ -1,9 +1,10 @@
 /**
  * WO-O4O-PERSONAL-ASSISTANT-PHASE-C-MEMORY-EXPERIENCE-CONTINUITY-V1 — Assistant Memory 연속성
  *
- *   ① 소유 · 배치 레지스트리 — Cloud 허용 / Gate 필요 / 금지(node · DO_NOT_STORE) 판정 · Gate 를 코드가 스스로 열지 않는다
+ *   ① 소유 · 배치 레지스트리 — Cloud 허용 / 노드 유지 / 금지(DO_NOT_STORE) 판정 · Compliance Gate 는 배치 판정에 들어가지 않는다
+ *     (WO-O4O-PERSONAL-ASSISTANT-MEMORY-CLOUD-CONTINUITY-V1 로 정렬 — 종전 'Gate 대기' 판정 대체)
  *   ② recall 경계 — USER Task 는 본인 USER Task 만, ORGANIZATION Task 는 그 조직 Task 만 · parameter binding · 키 형식 검사
- *   ③ 실패 · 대상 없음 · Gate 표시 — 기억이 없어도 실행은 계속
+ *   ③ 실패 · 대상 없음 · 출처 표시 — 기억이 없어도 실행은 계속
  *   ④ 새 노드 연속성(runtime) — 이 PC 의 Local 원장이 비어 있어도 Assistant Memory 의 업무 유형이 planner 에 이어진다
  *   ⑤ Assistant 경로 통합 — Task → Memory → Planning → 실행 지시 · 원문은 기억 조회에 쓰이지 않는다
  *   ⑥ Node 전용 정보는 기억으로 승격되지 않는다
@@ -46,7 +47,8 @@ import { runWorkAgent, type PlannerInput, type WorkPlanner } from '../services/a
 import type { ExecutionIntent } from '../services/ai-tools/work-agent-contract.js';
 import type { VerifiedToolContext } from '../services/ai-tools/ai-tool-contract.js';
 import {
-  LEGAL_DATA_PROCESSING_GATE, MEMORY_KINDS, assertCloudPlacement, decideCloudPlacement, isNodeOnly, type MemoryKind,
+  COMPLIANCE_GATE, MEMORY_KINDS, assertCloudPlacement, complianceReviewKinds, decideCloudPlacement, isCloudProceduralTarget, isNodeOnly,
+  type MemoryKind,
 } from '../services/assistant/memory-ownership.js';
 import { recallAssistantMemory, ASSISTANT_MEMORY_TASK_TYPE_LIMIT } from '../services/assistant/assistant-memory.js';
 import { planAssistantTask } from '../services/assistant/assistant-planning.js';
@@ -78,22 +80,31 @@ beforeEach(() => {
 });
 
 describe('① 소유 · 배치 레지스트리', () => {
-  it('Gate 는 PENDING — 코드가 스스로 열지 않는다', () => {
-    expect(LEGAL_DATA_PROCESSING_GATE).toBe('PENDING');
+  it('Compliance Gate 는 실사용 확대 전 점검 상태 — 배치 판정을 바꾸지 않는다(개발 차단 조건 아님)', () => {
+    expect(COMPLIANCE_GATE).toBe('PENDING');
+    expect(decideCloudPlacement('procedural_memory').ok).toBe(true);
+    // 점검 대상 = Cloud 에 두는 종류 전부(M1 · M2 · M3/M4 · M5)
+    expect(complianceReviewKinds().sort()).toEqual(['assistant_task', 'procedural_memory', 'run_resume_frame', 'task_type_history']);
   });
 
-  it('이미 승인된 Cloud 구조(Task · Task type 이력)만 지금 허용 · 절차 기억 등은 Gate 대기', () => {
-    expect(decideCloudPlacement('assistant_task')).toEqual({ ok: true, kind: 'assistant_task' });
-    expect(decideCloudPlacement('task_type_history').ok).toBe(true);
-    for (const k of ['procedural_memory', 'assistant_experience', 'execution_experience', 'run_resume_frame', 'request_summary']) {
-      expect(decideCloudPlacement(k)).toMatchObject({ ok: false, reason: 'LEGAL_GATE_PENDING' });
-      expect(decideCloudPlacement(k, 'PASSED').ok).toBe(true); // Gate 통과 후에는 소유 주체 쪽으로 옮길 수 있는 종류다
+  it('정책 §4 배치 — Cloud: Task · Task type · 검증 방법 · 재개 구조 / 노드: 도움 · 교정 · 실행 원기록', () => {
+    for (const k of ['assistant_task', 'task_type_history', 'procedural_memory', 'run_resume_frame']) {
+      expect(decideCloudPlacement(k)).toEqual({ ok: true, kind: k });
+    }
+    for (const k of ['assistant_experience', 'execution_experience']) {
+      expect(decideCloudPlacement(k)).toMatchObject({ ok: false, reason: 'NODE_RESIDENT' });
     }
   });
 
-  it('Node 전용 · 저장 금지는 Gate 를 통과해도 Cloud 기억이 되지 않는다', () => {
-    for (const k of ['node_environment', 'slot_values', 'raw_content']) {
-      expect(decideCloudPlacement(k, 'PASSED')).toMatchObject({ ok: false, reason: 'NODE_ONLY' });
+  it('절차 기억은 공개 사이트 대상만 Cloud — 사설 대상(Windows 앱)은 노드', () => {
+    expect(isCloudProceduralTarget('browser_site')).toBe(true);
+    expect(isCloudProceduralTarget('windows_app')).toBe(false);
+    expect(isCloudProceduralTarget(null)).toBe(false);
+  });
+
+  it('Node 전용 · 저장 금지(요청 요약 포함)는 Cloud 기억이 되지 않는다', () => {
+    for (const k of ['node_environment', 'slot_values', 'raw_content', 'request_summary']) {
+      expect(decideCloudPlacement(k)).toMatchObject({ ok: false, reason: 'NODE_ONLY' });
       expect(isNodeOnly(k as MemoryKind)).toBe(true);
     }
     expect(MEMORY_KINDS.node_environment.basis).toMatch(/credential/);
@@ -104,7 +115,7 @@ describe('① 소유 · 배치 레지스트리', () => {
   it('등록되지 않은 종류는 거절 · assert 는 코드로 던진다', () => {
     expect(decideCloudPlacement('cookie_jar')).toMatchObject({ ok: false, reason: 'UNREGISTERED_KIND' });
     expect(() => assertCloudPlacement('node_environment')).toThrow('ASSISTANT_MEMORY_PLACEMENT_REJECTED:NODE_ONLY');
-    expect(() => assertCloudPlacement('procedural_memory')).toThrow('LEGAL_GATE_PENDING');
+    expect(() => assertCloudPlacement('execution_experience')).toThrow('NODE_RESIDENT');
     expect(() => assertCloudPlacement('task_type_history')).not.toThrow();
   });
 });
@@ -142,12 +153,16 @@ describe('③ 실패 · 대상 없음 · Gate 표시', () => {
     expect(b.sources[0]).toMatchObject({ kind: 'task_type_history', readByAssistant: false, note: 'NO_TARGET' });
   });
 
-  it('조회 실패는 빈 기억(READ_FAILED) · 절차 기억은 node 에 있다고 표시(LEGAL_GATE_PENDING)', async () => {
+  it('조회 실패는 빈 기억(READ_FAILED) · 재개가 아니면 재개 구조를 찾지 않는다 · 원기록은 node', async () => {
     const m = await recallAssistantMemory(fakeDs(new Error('boom')), { userId: ME, ownership, targetId: 'healthkr' });
     expect(m.knownTaskTypes).toEqual([]);
+    expect(m.patterns).toEqual([]);
+    expect(m.resumeFrame).toBeNull();
     expect(m.sources).toEqual([
       { kind: 'task_type_history', placement: 'cloud', readByAssistant: false, note: 'READ_FAILED' },
-      { kind: 'procedural_memory', placement: 'node', readByAssistant: false, note: 'LEGAL_GATE_PENDING' },
+      { kind: 'procedural_memory', placement: 'cloud', readByAssistant: false, note: 'READ_FAILED' },
+      { kind: 'run_resume_frame', placement: 'cloud', readByAssistant: false, note: 'NOT_RESUMING' },
+      { kind: 'assistant_experience', placement: 'node', readByAssistant: false, note: 'NODE_RESIDENT' },
     ]);
   });
 });

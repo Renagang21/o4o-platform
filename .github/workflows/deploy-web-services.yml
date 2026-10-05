@@ -17,7 +17,7 @@ on:
   workflow_dispatch:
     inputs:
       service:
-        description: 'Service to deploy (all, neture, k-cosmetics, kpa-society, pharmacy-hub, lecture, store, kpa-branch, signage-player, hospital-pharmacy)'
+        description: 'Service to deploy (all, neture, k-cosmetics, kpa-society, pharmacy-hub, lecture, store, kpa-branch, hospital-pharmacy)'
         required: false
         default: 'all'
       # WO-O4O-WEB-SERVICES-CD-DEPENDENCY-AFFECTED-DEPLOY-GATE-V1 §24 — 판정 재현 전용.
@@ -94,10 +94,6 @@ env:
   # 분회 서비스는 단일 web service 하나만 운영한다 (분회별 Cloud Run 서비스 생성 금지).
   # 분회 tenant 는 URL segment(/{slug}) 또는 Host(branch_domains) 로만 해석된다.
   VITE_API_URL_KPA_BRANCH: https://api.neture.co.kr
-  # WO-O4O-SIGNAGE-PLAYER-WEB-DEPLOYMENT-ADOPTION-AND-PRODUCTION-SMOKE-V1
-  # Signage Player 는 익명 단말 런타임이다. public runtime config(API base) 만 주입한다.
-  # secret / service account key / DB credential 은 절대 주입하지 않는다.
-  VITE_API_URL_SIGNAGE_PLAYER: https://api.neture.co.kr
   # WO-O4O-HOSPITAL-PHARMACY-SERVICE-FOUNDATION-V1
   # 병원약국 전문 서비스. 원내 목록은 브라우저 localStorage 에만 저장(D2) — API base 만 주입한다.
   # DNS·인증서(hospital.neture.co.kr) 는 Foundation 범위 밖(사용자측 · signage-player·pharmacy-hub 선례).
@@ -134,7 +130,6 @@ jobs:
       lecture: ${{ steps.changes.outputs.lecture }}
       store: ${{ steps.changes.outputs.store }}
       kpa-branch: ${{ steps.changes.outputs.kpa-branch }}
-      signage-player: ${{ steps.changes.outputs.signage-player }}
       hospital-pharmacy: ${{ steps.changes.outputs.hospital-pharmacy }}
     steps:
       - name: Checkout code
@@ -166,7 +161,6 @@ jobs:
               echo "lecture=true" >> $GITHUB_OUTPUT
               echo "store=true" >> $GITHUB_OUTPUT
               echo "kpa-branch=true" >> $GITHUB_OUTPUT
-              echo "signage-player=true" >> $GITHUB_OUTPUT
               echo "hospital-pharmacy=true" >> $GITHUB_OUTPUT
             else
               echo "neture=$( [ "$SERVICE" = 'neture' ] && echo 'true' || echo 'false' )" >> $GITHUB_OUTPUT
@@ -176,7 +170,6 @@ jobs:
               echo "lecture=$( [ "$SERVICE" = 'lecture' ] && echo 'true' || echo 'false' )" >> $GITHUB_OUTPUT
               echo "store=$( [ "$SERVICE" = 'store' ] && echo 'true' || echo 'false' )" >> $GITHUB_OUTPUT
               echo "kpa-branch=$( [ "$SERVICE" = 'kpa-branch' ] && echo 'true' || echo 'false' )" >> $GITHUB_OUTPUT
-              echo "signage-player=$( [ "$SERVICE" = 'signage-player' ] && echo 'true' || echo 'false' )" >> $GITHUB_OUTPUT
               echo "hospital-pharmacy=$( [ "$SERVICE" = 'hospital-pharmacy' ] && echo 'true' || echo 'false' )" >> $GITHUB_OUTPUT
             fi
             exit 0
@@ -1066,126 +1059,10 @@ jobs:
 
           echo "Service URL: ${SERVICE_URL}"
 
-  # WO-O4O-SIGNAGE-PLAYER-WEB-DEPLOYMENT-ADOPTION-AND-PRODUCTION-SMOKE-V1
-  # 판정: A. INDEPENDENT_WEB_SERVICE.
-  # signage-player-web 은 자체 SPA router(/signage/... · /player/...) 와 SPA fallback 이
-  # 필요한 독립 런타임이며, 기존 web service 중 이 route 를 담당하는 서비스가 없다.
-  # 신규 인프라를 설계하지 않고 이 workflow 의 기존 per-service 패턴만 그대로 재사용한다.
-  # 접근 주소는 Cloud Run 생성 URL 을 쓴다 (hostname/DNS 정책 변경 없음).
-  deploy-signage-player:
-    needs: [detect-changes, ci-gate]
-    # WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 §19 (2026-09-23 INCIDENT)
-    #   DEPLOY GATE (fail-closed): `DEPLOY_FREEZE` 가 정확히 'false' 일 때만 배포한다.
-    #   변수가 없거나 비어 있으면 Actions 가 빈 문자열을 돌려주므로 **freeze 가 기본값**이다.
-    if: vars.DEPLOY_FREEZE == 'false' && needs.detect-changes.outputs.signage-player == 'true'
-    runs-on: ubuntu-latest
-    # `environment: production` — 배포 ref 경계다(WO-O4O-PUBLIC-COLLABORATOR-PRODUCTION-BOUNDARY-AND-MAIN-PROTECTION-V1).
-    #   GitHub `production` Environment 는 배포 ref 를 `main` branch · `deploy/*` tag 로 제한하고, production credential 은
-    #   environment secret 으로 둔다 — 그 밖의 ref(collaborator branch · PR)에서는 이 job 이 시작되지 않는다. required reviewer 는
-    #   없다(대기 없이 실행). 배포 게이트는 그대로 이 job `if:` 의 `DEPLOY_FREEZE`(정확히 'false' 일 때만 · 부재/공백/오타 = freeze)
-    #   와 ci-gate(수동 실행 = 소유자만)다.
-    environment: production
-    permissions:
-      contents: read
-      id-token: write
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v6
-        with:
-          # WO-O4O-DEPLOY-JOB-BOOTSTRAP-SLIMMING-V1: 배포 빌드와 무관한 운영 데이터 매니페스트
-          # (apps/api-server/src/scripts/data, ≈1.25GB)를 받지 않는다. sparse 지정 시 blob:none 부분 fetch.
-          sparse-checkout: |
-            /*
-            !/apps/api-server/src/scripts/data/
-          sparse-checkout-cone-mode: false
-
-      - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v3
-        with:
-          workload_identity_provider: projects/117791934476/locations/global/workloadIdentityPools/github-actions/providers/o4o-platform
-          service_account: github-actions@netureyoutube.iam.gserviceaccount.com
-
-      - name: Set up Cloud SDK
-        uses: google-github-actions/setup-gcloud@v2
-        with:
-          project_id: ${{ env.PROJECT_ID }}
-          # runner 에 설치된 gcloud 를 쓴다 (매 job ≈20s SDK 다운로드 생략)
-          skip_install: true
-
-      - name: Configure Docker for GCR
-        run: gcloud auth configure-docker gcr.io --quiet
-
-      - name: Build and push Docker image
-        run: |
-          echo "Building signage-player-web Docker image..."
-          IMAGE_TAG="${{ github.sha }}"
-
-          # Build from repo root with Dockerfile path (for workspace packages)
-          docker build \
-            --platform linux/amd64 \
-            --build-arg VITE_API_URL=${{ env.VITE_API_URL_SIGNAGE_PLAYER }} \
-            -f services/signage-player-web/Dockerfile \
-            -t gcr.io/${{ env.PROJECT_ID }}/signage-player-web:${IMAGE_TAG} \
-            -t gcr.io/${{ env.PROJECT_ID }}/signage-player-web:latest \
-            .
-
-          docker push gcr.io/${{ env.PROJECT_ID }}/signage-player-web:${IMAGE_TAG}
-          docker push gcr.io/${{ env.PROJECT_ID }}/signage-player-web:latest
-
-      # WO-O4O-CICD-SAFE-AUTODEPLOY-AND-RISK-GATE-V1 Phase 4 — verified 모드에서만 배포 전 traffic 기록
-      - name: Record traffic before deploy (verified rollout)
-        if: inputs.rollout_mode == 'verified'
-        uses: ./.github/actions/cloud-run-verified-rollout
-        with:
-          phase: plan
-          service: signage-player-web
-
-      - name: Deploy to Cloud Run
-        run: |
-          # verified 모드: 새 revision 은 traffic 0% · 전용 tag 주소 (전환은 다음 step 이 smoke 뒤에 한다)
-          ROLLOUT_ARGS=()
-          if [ "${{ inputs.rollout_mode }}" = "verified" ]; then ROLLOUT_ARGS=(--no-traffic "--tag=sha-${GITHUB_SHA:0:12}"); fi
-
-          echo "Deploying signage-player-web to Cloud Run..."
-
-          gcloud run deploy signage-player-web \
-            --image=gcr.io/${{ env.PROJECT_ID }}/signage-player-web:${{ github.sha }} \
-            --region=${{ env.REGION }} \
-            --project=${{ env.PROJECT_ID }} \
-            --service-account=${{ env.RUNTIME_SA }} \
-            --platform=managed \
-            --port=8080 \
-            --memory=256Mi \
-            --cpu=1 \
-            --min-instances=0 \
-            --max-instances=5 "${ROLLOUT_ARGS[@]}" --update-labels="o4o-commit-sha=${{ github.sha }}"
-
-          echo "signage-player-web deployed successfully!"
-
-      # verified 모드: 새 revision 을 tag URL 로 직접 smoke → PASS 일 때만 전환. 실패 = 전환 없음 = 기존 revision 유지.
-      - name: Smoke new revision and switch traffic (verified rollout)
-        if: inputs.rollout_mode == 'verified'
-        uses: ./.github/actions/cloud-run-verified-rollout
-        with:
-          phase: finish
-          service: signage-player-web
-          paths: '/,/health'
-
-      - name: Verify deployment
-        run: |
-          SERVICE_URL=$(gcloud run services describe signage-player-web \
-            --region=${{ env.REGION }} \
-            --project=${{ env.PROJECT_ID }} \
-            --format="value(status.url)")
-
-          echo "Service URL: ${SERVICE_URL}"
-
-          # nginx /health (SPA fallback 이 아닌 전용 endpoint)
-          if curl -sf "${SERVICE_URL}/health" > /dev/null; then
-            echo "signage-player-web /health OK"
-          else
-            echo "signage-player-web may need a moment to start"
-          fi
+  # signage-player-web: 배포 경로 은퇴 (WO-O4O-RETIRED-WEB-SERVICES-DEPLOYMENT-AND-INFRA-CLEANUP-V1).
+  #   정본 재생 경로는 Tablet ScreenSet(O4O-SIGNAGE-CANONICAL-PLAYBACK-PATH-V1) — 각 web 앱 내부.
+  #   Cloud Run 서비스는 2026-10-05 삭제됐다(CHECK-O4O-RETIRED-WEB-SERVICES-DEPLOYMENT-AND-INFRA-CLEANUP-V1).
+  #   이 job 을 되살리면 서비스가 재생성되므로 되살리지 않는다.
 
   summary:
     # WO-O4O-WEB-SERVICES-CD-DEPENDENCY-AFFECTED-DEPLOY-GATE-V1 §21:
@@ -1201,7 +1078,6 @@ jobs:
       - deploy-lecture
       - deploy-store
       - deploy-kpa-branch
-      - deploy-signage-player
       - deploy-hospital-pharmacy
     if: always()
     runs-on: ubuntu-latest
@@ -1222,7 +1098,6 @@ jobs:
           echo "  - lecture-web: ${{ needs.detect-changes.outputs.lecture }}"
           echo "  - store-web: ${{ needs.detect-changes.outputs.store }}"
           echo "  - kpa-branch-web: ${{ needs.detect-changes.outputs.kpa-branch }}"
-          echo "  - signage-player-web: ${{ needs.detect-changes.outputs.signage-player }}"
           echo "  - hospital-pharmacy-web: ${{ needs.detect-changes.outputs.hospital-pharmacy }}"
           echo ""
           echo "Time: $(date)"

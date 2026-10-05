@@ -54,6 +54,8 @@ import { AddHandoffTokenSourceAuthMethod1790684000000 } from '../migrations/1790
 import { CreateDemoAccounts1790940000000 } from '../migrations/1790940000000-CreateDemoAccounts.js';
 // WO-O4O-PERSONAL-ASSISTANT-PHASE-A-TASK-FOUNDATION-V1 (assistant_tasks + work_run_coordination.task_id)
 import { CreateAssistantTasks1791012819443 } from '../migrations/1791012819443-CreateAssistantTasks.js';
+// WO-O4O-PERSONAL-ASSISTANT-MEMORY-CLOUD-CONTINUITY-V1 (assistant_procedural_patterns + assistant_run_frames)
+import { CreateAssistantProceduralMemory1791100000000 } from '../migrations/1791100000000-CreateAssistantProceduralMemory.js';
 
 export const INCREMENTAL_MIGRATION_CUTOFF = {
   baselineVersion: '2026-09-18-id685',
@@ -81,6 +83,7 @@ export const INCREMENTAL_MIGRATIONS: readonly MigrationClass[] = [
   AddHandoffTokenSourceAuthMethod1790684000000,
   CreateDemoAccounts1790940000000,
   CreateAssistantTasks1791012819443,
+  CreateAssistantProceduralMemory1791100000000,
 ];
 
 export function incrementalMigrationNames(): string[] {
