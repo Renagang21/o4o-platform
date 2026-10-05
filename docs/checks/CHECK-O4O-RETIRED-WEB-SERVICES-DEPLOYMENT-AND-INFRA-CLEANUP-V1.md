@@ -1,6 +1,6 @@
 # CHECK-O4O-RETIRED-WEB-SERVICES-DEPLOYMENT-AND-INFRA-CLEANUP-V1
 
-> **상태**: ACTIVE
+> **상태**: COMPLETED
 > **작성일**: 2026-10-05 · **최종 갱신**: 2026-10-05
 > **근거 WO**: WO-O4O-RETIRED-WEB-SERVICES-DEPLOYMENT-AND-INFRA-CLEANUP-V1 · 선행 IR-O4O-LEGACY-WEB-SERVICES-RETIREMENT-ASSESSMENT-V1(화면 보고) · CHECK-O4O-SHARED-CERTIFICATE-SEPARATION-V1 (PR #305)
 
@@ -54,14 +54,48 @@ RETIRE_READY 로 판정된 `glucoseview-web` · `signage-player-web` 을 배포 
 | 4 | DNS authorization `dns-authz-glucoseview-co-kr` · `dns-authz-www-glucoseview-co-kr` · `dns-authz-api-glucoseview-co-kr` | 인증서 참조 0 (`cm-cert-neture-v3` 는 description 문구만 일치 · authz/SAN 참조 없음 · ACTIVE 확인) | 삭제 |
 | 5 | Cloud Run `glucoseview-web` | 직전 요청 = 조사용 curl 뿐 · workflow/registry 0 | 삭제 |
 
-### 2-3. signage-player-web
+### 2-3. 보안정책 잔재 (glucoseview 전용 · 미부착)
 
-(배포 경로 제거 PR main 반영 후 기록)
+| 자원 | 확인 | 결과 |
+|---|---|---|
+| `default-security-policy-for-backend-glucoseview-web-http` | 어떤 backend 에도 부착 0 · 이름상 glucoseview 전용 (병행 세션 read-only 인벤토리와 교차 확인) | 삭제 (정의 백업 후) |
 
-## 3. 검증
+### 2-4. signage-player-web
 
-(실행 후 기록)
+| 단계 | 결과 |
+|---|---|
+| 배포 경로 제거 main 반영 | PR #306 → merge `4cfcbf339` |
+| main CI | success |
+| Delivery (`4cfcbf339`) | Classify success · Web/API/Admin skipped — 재배포 0 (로컬 판정 LEVEL_1 · deploy_required=false 와 일치) |
+| 실행 중 · 대기 중 배포 | 0 |
+| LB 연결 | NEG · backend 없음 (원래 LB 미연결) |
+| Cloud Run `signage-player-web` (serving `signage-player-web-00099-vav`) | 정의 백업 후 삭제 |
 
-## 4. 남은 항목
+## 3. 검증 (2026-10-05)
 
-(실행 후 기록)
+| 항목 | 결과 |
+|---|---|
+| Cloud Run 서비스 목록 | 10개 — hospital-pharmacy · k-cosmetics · kpa-branch · kpa-society · lecture · neture · admin · core-api · pharmacy-hub · store. `glucoseview-web` · `signage-player-web` 없음 |
+| 삭제된 run.app URL | 두 서비스 모두 404 |
+| 재생성 경로 | `deploy-web-services.yml` job 8 · `WEB_SERVICES` · `WEB_CLOUD_RUN` 에 두 서비스 없음 — delivery · promote · orchestrate 는 registry 파생. glucoseview 는 원래 0. 은퇴 계약 spec 이 재유입을 막는다 |
+| 유지 host HTTPS (21 URL) | neture · www · `/hospital/` · `kpa-society.co.kr/kpa/` · kpa. · admin · 3 api `/api/health` · k-cosmetics · kpa-society · pharmacyhub · store · study · retail · pharmacy · community · funding · supplier · `/tablet/setup` 2 — 전부 200 · 체인 검증 0 |
+| `/hospital` | `neture.co.kr/hospital/` → 병원약국 화면 (hospital-pharmacy-web) |
+| `/kpa` | `kpa-society.co.kr/kpa/` → 분회 · `/kpa/tablet/*` → kpa-society (규칙 변경 0) |
+| Tablet ScreenSet 재생 | 운영 DB 에서 활성 태블릿 + current screen set 이 있는 매장 3곳 read-only 조회(값 미기록) → `/api/v1/stores/:slug/tablet/screen` · `idle` · `settings` 각 200/success(`screenSet` 포함) · 재생 페이지 200 |
+| 검증용 재배포 | 하지 않음 |
+
+## 4. 보존 (이번 WO 범위 밖)
+
+`pharmacy-hub-web` · pharmacyhub 도메인 · `cm-cert-pharmacyhub` · QR 4행 · DB 데이터 전부 · siteguide 도메인/인증서/entry · 이미지 저장소 · 공유 IAM/SA · `services/signage-player-web` 소스 · `/api/signage/:sk/active-content` · `backend-hospital-pharmacy-web`(neture.co.kr/hospital 경로).
+
+## 5. 남은 항목
+
+| 항목 | 메모 |
+|---|---|
+| API CORS 잔재 — `setup-middlewares.ts` 의 signage run.app origin · `signage.neture.co.kr` · `hospital.neture.co.kr` | 삭제된 서비스 · 해석 불가 host 라 무해. API 런타임 코드라 API 배포가 동반되므로 다음 API 변경 WO 에 묶는다 |
+| `services/web-hospital-pharmacy/Dockerfile` ARG 기본값 `https://hospital.neture.co.kr` · deploy workflow 주석 | workflow 가 값을 덮어씀 — 무영향 |
+| `services/signage-player-web` 소스 · lockfile importer · `channels` 계열 legacy 테이블(0행) | 앱 소스 삭제 · 테이블 drop 은 별도 판단 |
+| 다른 고아 보안정책 (`…account-center-web` · `…glycopharm-web` · `…siteguide-core` · `…service-backend-neture-web` · `…o4o-admin-web-backend(-http)`) | 미부착으로 보이나 이번 대상 아님 — 별도 인벤토리 후 정리 |
+| 이미지 `gcr.io/…/glucoseview-web` · `glycopharm-web` · `signage-player-web` · `siteguide-web` | 저장소 단위 개별 승인 |
+| URL-FIRST CENSUS P14 "KEEP" 라벨 · 앞선 IR 의 `/kpa` 서술(`neture.co.kr` 가 아니라 `kpa-society.co.kr` 규칙) | 기록 문서 — 정정은 이 CHECK 로 대신한다 |
+| siteguide · pharmacy-hub | 각각 도메인 결정 · 기능/QR 이전 트랙 |
