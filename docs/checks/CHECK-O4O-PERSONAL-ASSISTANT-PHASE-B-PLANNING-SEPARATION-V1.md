@@ -5,10 +5,6 @@
 > **정본**: [`O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2`](../baseline/O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2.md) §0-1(P3 개인화) · §2-1(Assistant Planning ≠ Execution Planning) · §4-3(완료 계약) · §18 단계 B
 > **선행**: Phase A [`CHECK-…-PHASE-A-TASK-FOUNDATION-V1`](CHECK-O4O-PERSONAL-ASSISTANT-PHASE-A-TASK-FOUNDATION-V1.md) (배포 완료 · closure smoke PENDING — 이 WO 범위 밖)
 > **작업공간**: 전용 worktree `D:/o4o-wt/pa-phase-b` · branch `wo/personal-assistant-phase-b-planning-separation-v1` · base `origin/main` `4a843feab`
->
-> **현재 해석 (2026-10-05 · `WO-O4O-PERSONAL-ASSISTANT-PC-INDEPENDENCE-DOCUMENT-ALIGNMENT-V1`)** — 본문은 당시 기록 그대로 둔다. 본문의 "실 PC 는 Phase A closure 와 같은 조건(사무실 PC)" · §6-2 "실 PC 에서만 확인 가능한 것" 은 V2 §11-1-a 에 따라 이렇게 읽는다.
-> - **Execution Report → Task 판정 = Architecture / Execution integration 검증** — 주입한 실행 본체 · 실 runtime harness 로 자동 검증 대상이며 특정 PC 가 필요하지 않다. Phase B 판정(CLOSED)은 이것으로 유지된다.
-> - 실행 지시가 실제 planner 에 실리고 실제 화면에서 run 이 열리는 장면 = **Execution Runtime smoke** — capability 를 가진 아무 Execution Node 면 된다. 특정 PC("사무실 PC")는 조건이 아니다.
 
 ---
 

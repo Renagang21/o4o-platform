@@ -31,7 +31,7 @@
 | 개인화 (2026-10-04 · V2 §0-1) | 이 문서의 승격 · 공유 흐름(§7-6 · §13 · §14 · §17)은 **사용자 공통 Workflow 를 만드는 흐름이 아니다.** Procedure / Skill 은 소유 주체마다 다를 수 있고, 같은 Task type 에 여러 Procedure 가 공존한다. §3 의 alias "수렴" · D2 "정규화" 는 업무 유형의 식별을 맞추는 것이지 수행 절차를 통일하는 것이 아니다 |
 | §20 구현 Phase · §22 다음 작업 | Phase 1 = 완료 자산 승계 · Phase 2 = KEEP_BUT_REPOSITION · Phase 3~5 동결. 다음 작업은 V2 §18 의 단계 A(Assistant + Task Foundation) |
 | Experience ≠ 업무 데이터 | 유지 · 강조(V2 §6-3). 재고 · 판매 · 가격은 Experience 가 아닌 업무 데이터 영역 |
-| PC 독립 (2026-10-05 · V2 §3-1 · §11-1) | 이 문서의 "Local" · "사용자 PC" · `local.db` 는 **원 기록이 놓인 실행 노드**를 가리킬 뿐이다. Experience 의 주인은 소유 주체(사용자 · 조직)이고, 사용자가 PC 를 여러 대 써도 Experience 는 PC 별로 나뉘지 않는다. 특정 PC 의 `local.db` 를 Experience 의 기준 원장으로 읽지 않는다. 본문의 "실 PC smoke" 기록은 그 시점의 historical evidence 다(V2 §11-1-a) |
+| PC 독립 (2026-10-05 · V2 §3-1 · §11-1) | 이 문서의 "Local" · "사용자 PC" · `local.db` 는 **원 기록이 놓인 실행 노드**를 가리킬 뿐이다. Experience 의 주인은 소유 주체(사용자 · 조직)이고, 사용자가 PC 를 여러 대 써도 Assistant · 업무가 PC 별로 나뉘지 않고, Cloud 배치가 허용된 Experience(업무 식별 · 재개 구조 · 공개 사이트 대상 검증된 방법)는 노드와 무관하게 쓰인다. 사설 시스템 · Windows 앱 대상 절차 기억은 노드에만 있다(MEMORY-PLACEMENT M9 — V2 §11-1 (4) 예외). 특정 PC 의 `local.db` 를 Experience 의 기준 원장으로 읽지 않는다. 본문의 "실 PC smoke" 기록은 그 시점의 historical evidence 다(V2 §11-1-a) |
 
 ---
 

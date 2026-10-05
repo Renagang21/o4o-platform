@@ -5,11 +5,6 @@
 > **정본**: [`O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2`](../baseline/O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2.md) §9 (Ownership-first) · §17 (Legal / Data Processing Gate) · §0-1 (P3) · §18 단계 C
 > **선행**: Phase A (배포 · closure smoke PENDING) · Phase B [`CHECK-…-PHASE-B-PLANNING-SEPARATION-V1`](CHECK-O4O-PERSONAL-ASSISTANT-PHASE-B-PLANNING-SEPARATION-V1.md) (CLOSED)
 > **작업공간**: 전용 worktree `C:/Users/sohae/o4o-wt/pa-phase-c` · branch `wo/personal-assistant-phase-c-memory-continuity-v1` · base `origin/main` `5e2fe0063`
->
-> **현재 해석 (2026-10-05 · `WO-O4O-PERSONAL-ASSISTANT-PC-INDEPENDENCE-DOCUMENT-ALIGNMENT-V1`)** — 본문은 당시 기록 그대로 둔다.
-> - **Node-independent Memory Continuity = Architecture / Execution integration 검증** — 본문 ④ "새 노드 연속성 실 runtime harness" 처럼 빈 노드 원장을 주입해 자동 검증한다. 특정 PC 가 필요하지 않다. 본문의 "실 PC 는 Phase A closure 와 같은 조건(사무실 PC)" 은 V2 §11-1-a 의 Execution Runtime smoke(capability 를 가진 아무 노드)로 읽는다.
-> - 본문 표의 "부분 — 절차 기억은 Gate 뒤" 는 당시 상태다. 이후 Memory Cloud Continuity(PR #303 · 2026-10-05 API 배포)가 검증된 방법(M3) · 재개 구조(M5)를 소유 주체 전용 Cloud 로 옮겼다 — [MEMORY-PLACEMENT-POLICY](../baseline/O4O-ASSISTANT-MEMORY-PLACEMENT-POLICY-V1.md) · [V2](../baseline/O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2.md) §23.
-> - 기억의 경계는 노드가 아니라 소유 주체다(V2 §3-1). 특정 PC 의 `local.db` 는 기준 원장이 아니다.
 
 ---
 

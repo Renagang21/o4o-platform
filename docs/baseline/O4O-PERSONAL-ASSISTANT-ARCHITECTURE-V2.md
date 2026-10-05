@@ -1,7 +1,7 @@
 # O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2
 
 > **상태**: ACTIVE — O4O AI 업무 비서 · 자동화 **구조 정본** (`CANONICAL-INDEX` §6)
-> **작성일**: 2026-10-03 · **개정**: 2026-10-05 PC 독립 정렬 — §3 (4)(5) · §3-1 네 가지 구분 · §11-1 (3)~(5) · §11-1-a 검증 두 종류 · §18-1 · §22 · §23 L5 (`WO-O4O-PERSONAL-ASSISTANT-PC-INDEPENDENCE-DOCUMENT-ALIGNMENT-V1`) · 2026-10-04 §0-1 개인화 원칙(P3) 신설 · §4-4 · §7 · §8-3 · §10 · §19 · §22 정렬 (`WO-O4O-PERSONAL-ASSISTANT-PERSONALIZATION-PRINCIPLE-ALIGNMENT-V1`)
+> **작성일**: 2026-10-03 · **개정**: 2026-10-05 PC 독립 정렬 — §3 (4)(5) · §3-1 네 가지 구분 · §11-1 (3)~(5)(M9 사설 대상 예외 포함) · §11-1-a 검증 두 종류 + Phase A·B·C 잔여 실측 현재 분류 · §18-1 · §22 · §23 L5 (`WO-O4O-PERSONAL-ASSISTANT-PC-INDEPENDENCE-DOCUMENT-ALIGNMENT-V1`) · 2026-10-04 §0-1 개인화 원칙(P3) 신설 · §4-4 · §7 · §8-3 · §10 · §19 · §22 정렬 (`WO-O4O-PERSONAL-ASSISTANT-PERSONALIZATION-PRINCIPLE-ALIGNMENT-V1`)
 > **근거 WO**: `WO-O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2-CANONICALIZATION` + `WO-O4O-PERSONAL-ASSISTANT-V2-ENVIRONMENT-REFRESH-AND-CANONICALIZATION-UPDATE` (사용자 확정 2026-10-03)
 > **근거 IR**: [`IR-…-V2-GAP-CENSUS`](../investigations/IR-O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2-GAP-CENSUS.md) (코드 vs 목표) · [`IR-…-V2-CANONICAL-CONSISTENCY-REVIEW`](../investigations/IR-O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2-CANONICAL-CONSISTENCY-REVIEW.md) (초안 vs 정본) · [`IR-…-V2-ENVIRONMENT-REFRESH`](../investigations/IR-O4O-PERSONAL-ASSISTANT-V2-ENVIRONMENT-REFRESH.md) (환경 기준선)
 > **상위 정본**: [`O4O-AI-AUTOMATION-EVOLUTION-PRINCIPLES-V1`](O4O-AI-AUTOMATION-EVOLUTION-PRINCIPLES-V1.md) (2026-10-03 부분 개정으로 이 문서와 정합). EVOLUTION = 왜 그렇게 발전해야 하는가 · 이 문서 = 그것을 어떤 구조로 만드는가. 둘이 충돌하면 EVOLUTION 이 우선하며, 충돌은 개정 WO 로 해소한다.
@@ -107,7 +107,7 @@ Assistant 가 Experience 를 대체하지 않는다. Assistant 는 Experience �
 | **Assistant Identity** | 이 사용자의 비서 | 사용자당 하나 (Assistant = f(userId)) | 바뀌지 않는다 |
 | **Work Context** | 이 업무가 누구의 어떤 일인가 | Task 의 소유 주체(organization · user) · 업무공간 · serviceKey (§4 · §9) | 다른 Task 다 — 같은 Assistant 가 맡는다 |
 | **Request Channel** | 요청이 들어온 곳 | O4O Web · 메신저 · 외부 AI · 기기 (§14) | Assistant · 기억 · 업무는 그대로. 결과 전달 방식만 다르다(§12) |
-| **Execution Node** | 실제로 화면 · 프로그램을 조작하는 곳 | PC(여러 대 가능) · Cloud Browser · 미래 노드 (§11) | Assistant · 기억 · 업무는 그대로. 그 노드의 실행환경 상태(로그인 세션 · 현재 화면 · 로컬 파일 경로)만 다르다 |
+| **Execution Node** | 실제로 화면 · 프로그램을 조작하는 곳 | PC(여러 대 가능) · Cloud Browser · 미래 노드 (§11) | Assistant · 업무 · Cloud 에 있는 기억은 그대로. 그 노드의 실행환경 상태(로그인 세션 · 현재 화면 · 로컬 파일 경로)와 노드 보관 원 기록이 다르다 — 사설 시스템 · Windows 앱 대상 절차 기억(M9)은 노드에만 있다(§11-1 (4) 예외) |
 
 - 기억 · 경험의 경계는 **Work Context(소유 주체)** 다. Execution Node 는 기억의 경계가 아니다(§9).
 - PC 라는 말은 물리 실행환경(Local Agent · Chrome 확장 · 실제 화면 조작)을 설명할 때 쓴다. **"PC = Assistant 의 기억 · 업무 · 자동화의 경계"** 로 쓰지 않는다.
@@ -324,7 +324,8 @@ Lower-cost Reasoning 단계는 유지한다. "속도는 약한 모델로 해결�
 1. **PC 는 Execution Node 다.** 기억의 소유자도, 업무 판단의 주체도 아니다.
 2. **Request Device ≠ Execution Device.** 요청한 기기(휴대폰 · 다른 PC · 외부 채널)와 실행할 노드는 다를 수 있다. Assistant 가 Task 에 맞는 노드를 고른다.
 3. 노드 종류: 사용자의 PC(장소와 대수 무관 — 매장 · 집 등 여러 대일 수 있다) · Cloud Browser(§13) · 미래 노드. 노드는 **capability 를 선언**하고 Assistant 는 capability · 가용성(· 사용자가 원하면 그 지정)으로 노드를 선택한다.
-4. **노드가 바뀌어도 업무는 끊기지 않는다.** 같은 Task 를 다른 노드에서 이어 실행할 수 있고(Task 1 : N run), 기억 · 경험은 소유 주체에 있으므로 노드를 따라가지 않아도 쓰인다. 노드에 남는 것은 그 노드의 실행환경 상태(§9-2 node)뿐이며, 그것은 실행할 때 현재 화면으로 다시 확인한다.
+4. **노드가 바뀌어도 업무는 끊기지 않는다.** 같은 Task 를 다른 노드에서 이어 실행할 수 있고(Task 1 : N run), 업무 식별(Task type) · 재개 구조(M5) · Cloud 배치가 허용된 검증된 방법(공개 사이트 대상 M3)은 소유 주체에 있으므로 노드를 따라가지 않아도 쓰인다. 노드에 남는 것은 그 노드의 실행환경 상태(§9-2 node)와 노드 보관 원 기록이며, 실행할 때 현재 화면으로 다시 확인한다.
+   - **예외 — 사설 시스템 · Windows 앱 대상(M9)**: 이런 대상의 절차 기억(M3 · M4)은 Memory 배치 정책 M9 · §2-6 에 따라 **노드에만** 둔다(현재 Cloud 절차 기억은 `browser_site` 대상만). 그래서 다른 노드로 넘어가면 그 대상의 절차 경험은 따라가지 않고, 새 노드는 그 부분을 Discovery 로 다시 찾는다. Assistant · Task · 업무 식별은 그대로 이어진다. 이 경험을 가진 노드를 우선할지(node affinity)는 노드 선택(§18 단계 D)의 고려 사항이며 이 문서가 정하지 않는다.
 5. **쓸 수 있는 노드가 여럿이라는 사실만으로 업무를 멈추지 않는다.** 여러 노드 중 무엇을 쓸지는 Assistant 의 선택 문제다. 선택 근거가 정말 부족할 때만 사용자에게 묻는다(§5-4).
    - 현재 구현의 `resolveTargetDevice`(온라인 2대 이상 → `ambiguous` 로 중단)는 **이 원칙이 아니라 runtime 의 현재 한계**다(§23). 원칙으로 인용하지 않는다. 노드 선택 구현은 §18 단계 D(Execution Node 계약)의 범위다.
 
@@ -337,7 +338,17 @@ Lower-cost Reasoning 단계는 유지한다. "속도는 약한 모델로 해결�
 
 - Assistant Architecture 의 closure(Phase A · B · C 등)는 integration 검증으로 판정한다. **특정 PC("사무실 PC" 등)의 smoke 를 Architecture closure 의 필수조건으로 두지 않는다.**
 - Runtime smoke 는 실행 계층의 안정성 확인이다. 그 결과는 Runtime 트랙에 기록하고, Architecture 판정을 뒤집는 근거로 쓰지 않는다(§11-3 (5) 실행 완성도 ≠ 진척).
-- 과거 CHECK 에 남은 "특정 PC 에서 실측" 기록은 **그 시점의 historical evidence** 다. 현재 요구사항으로 읽지 않는다.
+- 과거 CHECK 에 남은 "특정 PC 에서 실측" 기록은 **그 시점의 historical evidence** 다. 현재 요구사항으로 읽지 않는다. CHECK 본문 · STATE 는 기록물이므로 고치지 않고, 현재 분류는 아래 표가 정한다.
+
+**Phase A · B · C 에 남은 실측 항목의 현재 분류 (2026-10-05)**
+
+| 남은 항목 (CHECK 기록) | 현재 분류 | 판정 근거 |
+|---|---|---|
+| Phase A — production 에서 run 이 Task 에 붙는 장면(`run↔task 연결` PENDING) | **Task → Run 연결**: integration 은 격리 PG 실DB · boundary spec 으로 검증됨. production 장면은 Execution Runtime smoke | capability(Local Agent + 확장)를 가진 아무 Execution Node |
+| Phase B §6-2 — 실행 지시가 planner 에 실리고 ExecutionReport 로 Task 가 판정되는 장면 | **Execution Report → Task 판정**: integration(주입 실행 본체 · runtime harness). 실제 화면 장면은 Execution Runtime smoke | 같음 |
+| Phase C — 다른 노드에서 기억이 이어지는 장면 | **Node-independent Memory Continuity**: integration(빈 노드 원장 주입 harness). 실제 화면 장면은 Execution Runtime smoke | 같음 |
+
+CHECK 에 적힌 "사무실 PC" 는 당시 그 capability 를 가진 노드가 그것뿐이었다는 기록이다. 위 Runtime smoke 는 한 번의 실측 세션에서 함께 확인할 수 있으며, 어느 노드에서 하든 같다.
 
 ### 11-2. Node 계약
 
