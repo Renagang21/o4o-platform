@@ -4,29 +4,33 @@
 
 ## 요약
 
-**WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1** — 상품 선택 → 주문 → 테스트 결제 → 공급자 처리의 주요 흐름은 구현 · 로컬 브라우저 검증까지 끝났다. **WO 전체 완료가 아니다** — 미완료 범위(콘텐츠 자료함 · 커뮤니티 게시판 · KPA 매장 provisioning 제거)가 남아 있다. 진행 정본은 WO TODO, 설계 · 인계 계약 · 미완료 범위는 [`DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1`](docs/design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md) §13 · §14 · §15.
+**WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1** — 상품 선택 → 주문 → 테스트 결제 → 공급자 처리의 주요 흐름은 구현 · 로컬 브라우저 검증까지 끝났다. 세미프랜차이즈 콘텐츠 자료함 · pharmacy-hub 기능 이전 · QR 착지 이전 준비 · Codex 리뷰 3건 반영까지 끝났다. **WO 전체 완료가 아니다** — 다른 트랙 담당 미완료(커뮤니티 게시판 · KPA 매장 provisioning 제거 · PH 인프라 삭제)가 남아 있다. 진행 정본은 WO TODO, 설계 · 인계 계약 · 미완료 범위는 [`DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1`](docs/design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md) §13 · §14 · §15 · §16.
 
 ## 상태 구분 (혼동 금지)
 
 | 항목 | 상태 |
 |---|---|
-| 코드 구현 (branch) | 주요 흐름 완료 · 미완료 3건(DESIGN §15) |
-| 테스트 결제 흐름 | 격리 PostgreSQL 통합 15건 + 로컬 브라우저 14항목 PASS ([CHECK](docs/checks/CHECK-NETURE-PHARMACY-STORE-COMMERCE-LOCAL-BROWSER-V1.md)) |
+| 코드 구현 (branch) | 이 트랙 범위 완료 · 다른 트랙 담당 미완료 3건(DESIGN §15-2) |
+| 테스트 결제 흐름 | 격리 PostgreSQL 통합 17건 + 로컬 브라우저 20항목 PASS ([CHECK](docs/checks/CHECK-NETURE-PHARMACY-STORE-COMMERCE-LOCAL-BROWSER-V1.md)) |
 | 실제 PG 연동 | 대기(D1) |
 | main 통합 · 운영 migration · 배포 · 운영 실결제 | 미실시 — 사용자 승인 대기 |
 | 테스트 데이터 초기화 | 범위만 확정(DESIGN §12) — 운영 DB write 사용자 승인 필요 |
+| pharmacyhub.co.kr QR link 4행 착지 변경 | dry-run 만(DESIGN §16-3) — 운영 DB write 사용자 승인 필요 |
+| pharmacy-hub 서버 · 도메인 · 인증서 | 보존 — 운영 검증 후 웹 서비스 정비 트랙이 삭제(DESIGN §16-4) |
 
 ## 담당 경계
 
-- 인증 · 가입 트랙으로 인계: 가입 원장 · 신청/승인 · role 발급 · 승인 orchestration — `pharmacy-membership.service.ts` · `pharmacy-store-provisioner.ts` · 해당 라우트 · 화면(DESIGN §13 표).
+- 인증 · 가입 트랙으로 인계: 가입 원장 · 신청/승인 · role 발급 · 승인 orchestration — `pharmacy-membership.service.ts` · `pharmacy-store-provisioner.ts` · 해당 라우트 · 화면 · KPA 매장 provisioning 제거 — [`WO-NETURE-PHARMACY-MEMBERSHIP-AUTH-TRACK-HANDOFF-V1`](docs/work-orders/WO-NETURE-PHARMACY-MEMBERSHIP-AUTH-TRACK-HANDOFF-V1.md).
+- 공통 커뮤니티 · Forum 트랙: 세미프랜차이즈 커뮤니티 게시판 — [`WO-O4O-SEMI-FRANCHISE-COMMUNITY-BOARD-V1`](docs/work-orders/WO-O4O-SEMI-FRANCHISE-COMMUNITY-BOARD-V1.md)(DRAFT).
+- 웹 서비스 정비 트랙: pharmacy-hub 인프라 삭제(조건 DESIGN §16-4).
 - Store/Commerce 유지: 조직 · 매장 연결 계약 `pharmacy-store-link.ts` · 매장 판정 · 세미프랜차이즈 이후 전부.
 - K-Cosmetics: 퇴역 결정 — 보존 전제 철회, 제거 범위는 퇴역 작업(DESIGN §14).
 
 ## 다음에 할 일
 
 1. PR #308 CI · 리뷰 확인. merge 는 사용자 "main 통합 진행" 후.
-2. 미완료 3건 진행 여부 · 순서 결정(콘텐츠 자료함은 이 WO, 게시판 · KPA provisioning 은 별도 WO 연결).
-3. merge 후: migration 적용 확인 → 배포 → `NETURE_PHARMACY_PAYMENT_MODE=test` 설정 승인 → 운영 smoke → `pharmacy` 담당 운영자 지정.
+2. 사용자 결정 대기: PH opt-in 공급자 배송 이전(목표 supply_proposals) · PH 매뉴얼/안내 목적지 · QR link 4행 apply.
+3. merge 후: migration 적용 확인 → 배포 → `NETURE_PHARMACY_PAYMENT_MODE=test` 설정 승인 → 운영 smoke(콘텐츠 자료함 · 새 호스트 QR 포함) → `pharmacy` 담당 운영자 지정 → PH 인프라 삭제 인계.
 
 ## 로컬 검증 재현
 

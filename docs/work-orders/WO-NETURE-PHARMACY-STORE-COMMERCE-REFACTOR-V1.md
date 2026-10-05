@@ -36,8 +36,8 @@ Neture(neture.co.kr) 약국 서비스를 **약국별 하나의 내 매장**에�
 ### 단계 3 — 내 매장 직접 이용 · 커뮤니티 연결
 - [x] 3-1 이용 가능한 상품 · 이벤트 · 모집 내 매장 직접 조회 (API 권한 판정) — `91155708c`
 - [x] 3-2 출처별 탭 · 필터 · 공급 제안 선택 UI — `06e6ef2b2`
-- [ ] 3-3 접근 가능한 콘텐츠 모아 활용 — **부분(미완료)**: 콘텐츠 사본 API 를 기본 가입 약국에 허용(`55670e77c`). 세미프랜차이즈 범위 콘텐츠 · 출처별 자료함 통합 화면은 미구현(후속)
-- [ ] 3-4 세미프랜차이즈 커뮤니티 접근 연결 — **부분(미완료)**: 가입 상태 직접 접근 판정 `8c1cab8f2` 까지. 실제 게시판 이용(글 · 댓글)은 미구현 — 공통 Forum 구조 변경 필요(별도 WO, DESIGN §15)
+- [x] 3-3 접근 가능한 콘텐츠 모아 활용 — 콘텐츠 사본 API 기본 가입 약국 허용 `55670e77c` · 세미프랜차이즈 콘텐츠 원장 · 가입 판정 · 사본 `e9f82a14f` · 약국 화면 · 자료함 "세미프랜차이즈" 출처 탭 `14cda1fe9` · 담당 운영자 작성 · 게시 `647dd8b61` (DESIGN §15-1, 브라우저 검증 CHECK §5)
+- [ ] 3-4 세미프랜차이즈 커뮤니티 접근 연결 — **부분(미완료)**: 가입 상태 직접 접근 판정 `8c1cab8f2` 까지. 실제 게시판 이용(글 · 댓글)은 미구현 — 공통 Forum 구조 변경 필요— 담당: 공통 커뮤니티 · Forum 트랙 [`WO-O4O-SEMI-FRANCHISE-COMMUNITY-BOARD-V1`](WO-O4O-SEMI-FRANCHISE-COMMUNITY-BOARD-V1.md) (DESIGN §15-2)
 - [x] 3-5 별도 HUB 메뉴 · 진입 · 가져오기 의존 제거 — 약국 문맥 nav · 홈 · orderable · /hub/b2b 링크 `06e6ef2b2` · 홈 상품 선택 링크 `3445aee35`. /hub/* 라우트 · 옛 작업대 /hub/cart 2곳 코드는 남음 — K-Cosmetics 보존 전제가 아니며 제거는 퇴역 작업 범위(DESIGN §14)
 
 ### 단계 4 — 공급 제안 기반 주문 · 공급자 처리
@@ -56,7 +56,9 @@ Neture(neture.co.kr) 약국 서비스를 **약국별 하나의 내 매장**에�
 
 ### 단계 6 — 통합 검증 · 잔재 정리 · 문서
 - [x] 6-1 필수 검증 시나리오(§7) — 격리 PostgreSQL 15 통합 15건(로컬, CI 미실행) + 규칙 단위 21건(CI) + 전체 api-server jest + **로컬 브라우저 흐름 14항목** [`CHECK-NETURE-PHARMACY-STORE-COMMERCE-LOCAL-BROWSER-V1`](../checks/CHECK-NETURE-PHARMACY-STORE-COMMERCE-LOCAL-BROWSER-V1.md)(결함 2건 수정 `3445aee35`)
-- [ ] 6-2 잔재 정리 — **부분(미완료)**: store 자가 가입 kpa 제거 · 매장 게이트 대체 완료. KPA 회원 승인 시 매장 프로비저닝(member.controller 2곳) 제거는 인증 · 가입 트랙 정리와 함께(별도 WO, DESIGN §15)
+- [ ] 6-2 잔재 정리 — **부분(미완료)**: store 자가 가입 kpa 제거 · 매장 게이트 대체 완료. KPA 회원 승인 시 매장 프로비저닝(member.controller 2곳) 제거는 인증 · 가입 트랙 — [`WO-NETURE-PHARMACY-MEMBERSHIP-AUTH-TRACK-HANDOFF-V1`](WO-NETURE-PHARMACY-MEMBERSHIP-AUTH-TRACK-HANDOFF-V1.md) §4 (DESIGN §15-2)
+- [x] 6-2b pharmacy-hub 유지 · 이전 · 폐지 — 신규 가입 410 · store 자가 가입 제외 · web-store PH commerce → Neture 약국 `f7abec50c` · QR 착지 이전 준비 `f6c4e0596` · QR link 4행 dry-run(운영 write 미실행) · 서버 · 도메인 · 인증서 보존, 삭제는 웹 서비스 정비 트랙 (DESIGN §16)
+- [x] 6-2c Codex 리뷰(`0cfd0fb`) 3건 — 장바구니 조직 단위 한정 · 공급자 가시 집합 pharmacy-hub · 공급처 미지정 제품 반려 `fed5afe1e`
 - [x] 6-3 정본 문서 반영 — Supplier Domain §4 · F8 §5 · B2B 계약 Axis D/§13 `350d9abb1` · CANONICAL-INDEX §1 등재(PR #304 통합 후, 2026-10-05)
 - [ ] 6-4 테스트 데이터 초기화 — 범위 확정(DESIGN §12). **운영 DB write 는 사용자 승인 대기 · 미실행**
 - [ ] 6-5 CI · PR · 완료 보고 — PR #308 (draft) CI 확인 중. main 통합 · 배포 · migration 운영 적용은 사용자 승인 후
@@ -78,7 +80,7 @@ Neture(neture.co.kr) 약국 서비스를 **약국별 하나의 내 매장**에�
 ### 담당 경계 · 퇴역 결정 · 미완료 (2026-10-05 사용자 지시)
 - **인증 · 가입 트랙 인계**: 가입 원장 · 추가정보 · 신청 상태 · 승인/반려 · role 발급 · 승인 orchestration = 인증 · 가입 트랙, 약국 조직 · 내 매장 · 업무 enrollment · slug = Store/Commerce. 인계 대상 코드와 Store 계약(`pharmacy-store-link.ts`)은 DESIGN §13. 경계 분리 `ebbe5e910`(동작 변경 0). 두 트랙이 같은 승인 · role · 조직 생성 로직을 따로 만들지 않는다.
 - **K-Cosmetics 퇴역**: 보존을 새 구조의 전제로 삼지 않는다. 실제 제거 파일은 퇴역 담당 작업이 정한다. 약국이 쓰는 공통 기능 · 화장품 제품군은 유지(DESIGN §14).
-- **미완료(완료로 표시하지 않음)**: 세미프랜차이즈 콘텐츠 자료함(3-3) · 세미프랜차이즈 커뮤니티 게시판(3-4) · 기존 KPA 매장 provisioning 제거(6-2) — 담당 · 연결은 DESIGN §15.
+- **미완료(완료로 표시하지 않음)**: 세미프랜차이즈 커뮤니티 게시판(3-4, 공통 Forum 트랙) · 기존 KPA 매장 provisioning 제거(6-2, 인증 · 가입 트랙) · pharmacy-hub 인프라 삭제(웹 서비스 정비 트랙) — DESIGN §15-2 · §16-4. 콘텐츠 자료함(3-3)은 구현 완료.
 
 ### 보류 · 사용자 결정 (2026-10-05 사용자 지시로 정리)
 - **D1 수취 운영 주체 — 대기(실제 PG 연결만)**: 실제 수취 법인 · PG 설정은 미확정. 수취 주체를 식별하는 구조(`semi_franchises.payment_receiver_key`, receiver 단위 결제 묶음)와 테스트 결제는 구현한다. 세미프랜차이즈 운영자를 수취 주체로 자동 간주하지 않는다. 실제 PG 연결만 대기 항목으로 남기고 나머지 설계 · 구현은 멈추지 않는다.

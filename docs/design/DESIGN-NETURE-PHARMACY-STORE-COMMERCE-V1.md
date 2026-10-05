@@ -226,7 +226,7 @@ API: `GET /api/v1/neture/pharmacy/store/supply-options?source=&q=&page=` · `GET
 ## 6. 내 매장 직접 이용 · HUB 단계 제거
 
 - web-store 약국 문맥에서 `/hub` 메뉴 · 진입 · "취급 신청(apply) → OPL → orderable" 을 주문 전제에서 제거한다. 내 매장 메뉴에 **상품 · 주문**(공급 옵션 목록 · 장바구니 · 결제 · 주문 내역), **세미프랜차이즈**(가입 신청 · 상태 · 커뮤니티 링크), **기본 가입** 화면을 둔다.
-- 콘텐츠: "가져가기" 진열 화면 대신 내 매장 자료함에서 접근 가능한 콘텐츠를 출처별로 보고 기존 사본 API(`/kpa/assets/copy` 등)를 그대로 호출한다. HUB 콘텐츠 API(`/api/v1/hub/contents`, F5 Stable)는 변경하지 않는다.
+- 콘텐츠: 세미프랜차이즈 콘텐츠 자료함은 §15-1. "가져가기" 진열 화면 대신 내 매장 자료함에서 접근 가능한 콘텐츠를 출처별로 보고 기존 사본 API(`/kpa/assets/copy` 등)를 그대로 호출한다. HUB 콘텐츠 API(`/api/v1/hub/contents`, F5 Stable)는 변경하지 않는다.
 - 이번 범위에서 지우지 않은 것: web-store `/hub/*` 라우트 코드 · 서비스 앱 `/store-hub` · 공급자 · 운영자 게시 화면 · `@o4o/store-ui-core` · `hub-core` · `asset-copy-core`(F3). **K-Cosmetics 보존은 이 구조의 전제가 아니다**(§14) — 이 코드들은 약국 흐름이 거치지 않을 뿐이며, 실제 제거 여부 · 범위는 K-Cosmetics 퇴역 작업이 파일 단위로 정한다.
 
 ---
@@ -246,6 +246,7 @@ API: `GET /api/v1/neture/pharmacy/store/supply-options?source=&q=&page=` · `GET
 
 - 저장소 `store_cart_items`(기존) · `service_key='neture-pharmacy'` · `buyer_id` = 사용자 · `organization_id` = 서버가 해석한 약국 조직.
 - API: `GET/POST/PATCH/DELETE /api/v1/neture/pharmacy/cart(/items/:id)` — 담기 입력 `{kind, id, quantity}`(`kind`: default=SPO id · proposal · event · recruitment). 담을 때 §4 판정. `price_snapshot` 은 표시용(신뢰 안 함).
+- 장바구니 단위 = **(구매자, 약국 조직)**. 조회 · 담기 병합 · 수량 · 삭제 · 확정 · 확정 후 삭제 모두 `organization_id` 를 건다 — 여러 약국을 운영하는 사용자가 A 약국에 담은 행을 B 약국 문맥(`X-Store-Organization-Id`)에서 보거나 주문하지 않는다(Codex 리뷰 반영 `fed5afe1e`).
 
 ### 8-2. 주문 확정 `POST /api/v1/neture/pharmacy/cart/checkout`
 
@@ -368,12 +369,82 @@ deactivatePharmacyStore(ds, organizationId)                     정지 · 종료
 
 ---
 
-## 15. 미완료 범위 (원래 WO 범위 — 완료로 표시하지 않는다)
+## 15. 콘텐츠 자료함 · 미완료 범위
+
+### 15-1. 세미프랜차이즈 콘텐츠 자료함 (TODO 3-3 — 구현 완료)
+
+- 원장 `semi_franchise_contents`(같은 migration): 세미프랜차이즈 담당 운영자가 작성 · 게시(draft → published ↔ archived). 공통 콘텐츠 Core(`cms_contents` · `/api/v1/hub/contents`, F4 · F5)는 바꾸지 않았다 — `cms_contents` 는 serviceKey 공개 조회 경로가 있어 가입 약국 한정 콘텐츠를 담을 수 없다.
+- 열람 · 사본 판정: 콘텐츠 published ∧ 세미프랜차이즈 active ∧ **약국 조직의 해당 세미프랜차이즈 가입 active**(§4 와 같은 가입 기준). 볼 수 없으면 404(존재 비노출). 정지 · 종료 · 미가입 즉시 차단.
+- 사본: 기존 공개 API `AssetCopyService.copyResolved()` → `o4o_asset_snapshots(asset_type='content', source_service='semi-franchise')`. 사본은 매장 소유 독립 사본 — 원본 수정 · 보관이 사본에 전파되지 않는다. 이후 편집 · 채널 게시는 기존 매장 자료함 경로 그대로.
+- 출처별 자료함: 매장 자료함 피드 source `franchise` 추가(`store-library-feed.controller.ts`) — 전체 · 운영자 제공 · 커뮤니티 가져옴 · **세미프랜차이즈** · 내가 만든 콘텐츠. 공급자 자료는 기존 매장 HUB 자료 화면.
+- API: 약국 `GET /api/v1/neture/pharmacy/store/contents(?sf,q)` · `GET …/:id` · `POST …/:id/copy` / 담당 운영자 `GET|POST /api/v1/neture/operator/semi-franchises/:key/contents` · `GET|PATCH …/:id` · `POST …/:id/{publish|archive}`.
+- 화면: web-store `/store/pharmacy/contents`(이용 가능 콘텐츠) · 매장 자료함 "세미프랜차이즈" 탭 / web-neture 담당 세미프랜차이즈 "콘텐츠" 탭 · 작성 · 수정.
+- 검증: 통합 테스트(게시 전 비노출 · 가입 약국만 · 사본 독립성 · 보관 · 정지 차단) + 로컬 브라우저(운영자 작성 · 게시 → 약국 목록 · 사본 → 자료함 탭) — CHECK 문서.
+
+### 15-2. 미완료 범위 (완료로 표시하지 않는다)
 
 | 항목 | 현재 상태 | 남은 일 | 담당 · 연결 |
 |---|---|---|---|
-| 세미프랜차이즈 콘텐츠 자료함 (WO §3-8, TODO 3-3) | 콘텐츠 사본 API 를 기본 가입 약국에 허용(`55670e77c`)까지. 세미프랜차이즈 범위 콘텐츠 · 출처별(자체 · 일반 커뮤니티 · 가입 세미프랜차이즈 · 공급자) 자료함 화면 **미구현** | 세미프랜차이즈 범위 콘텐츠 원장 · 접근 판정(§4 와 같은 가입 기준) · 내 매장 자료함 출처 탭 | 이 WO(Store/Commerce) — 콘텐츠 Core(F4 · F5) 변경이 필요하면 별도 WO 로 분리 |
-| 세미프랜차이즈 커뮤니티 게시판 (WO §3-8, TODO 3-4) | **접근 판정만** 구현(`8c1cab8f2`). 게시판 이용(글 · 댓글) **미구현** — 포럼 원장이 정적 카탈로그(`forumStorageCodes`)에 묶여 DB 커뮤니티에 게시판 mount 가 없다 | DB 커뮤니티(세미프랜차이즈 포함) 게시판 저장 파티션 · mount · 운영 권한 | 공통 Forum 구조(o4o-common-structure §13) 변경 = **별도 WO**, 이 WO 의 3-4 완료 조건과 연결 |
-| 기존 KPA 매장 provisioning 제거 (TODO 6-2) | 새 게이트에서 실효 없음(매장 권한 0). 코드(`member.controller.ts` 2곳 · `kpa-store-organization.provisioning.ts`) 잔존 | 호출 제거 · 관련 spec 정리 | KPA 회원 승인 흐름 · F10 승인 엔진 kpa 분기와 얽혀 **인증 · 가입 트랙 정리 작업**과 함께(별도 WO) |
+| 세미프랜차이즈 커뮤니티 게시판 (WO §3-8, TODO 3-4) | **접근 판정만** 구현(`8c1cab8f2`). 게시판 이용(글 · 댓글) **미구현** — 포럼 원장이 정적 카탈로그(`forumStorageCodes`)에 묶여 DB 커뮤니티에 게시판 mount 가 없다 | DB 커뮤니티(세미프랜차이즈 포함) 게시판 저장 파티션 · mount · 운영 권한 · 화면 진입 | **공통 커뮤니티 · Forum 트랙** — [`WO-O4O-SEMI-FRANCHISE-COMMUNITY-BOARD-V1`](../work-orders/WO-O4O-SEMI-FRANCHISE-COMMUNITY-BOARD-V1.md)(DRAFT). 이 WO 의 3-4 완료 조건과 연결 |
+| 기존 KPA 매장 provisioning 제거 (TODO 6-2) | 새 게이트에서 실효 없음(매장 권한 0). 코드(`member.controller.ts` 2곳 · `kpa-store-organization.provisioning.ts`) 잔존 | 호출 제거 · 관련 spec 정리 | **인증 · 가입 트랙** — [`WO-NETURE-PHARMACY-MEMBERSHIP-AUTH-TRACK-HANDOFF-V1`](../work-orders/WO-NETURE-PHARMACY-MEMBERSHIP-AUTH-TRACK-HANDOFF-V1.md) §4 (KPA 회원 승인 흐름 · F10 승인 엔진 kpa 분기와 함께) |
+| pharmacy-hub 인프라(서버 · 도메인 · 인증서) 삭제 | 보존 — 새 기능과 QR 경로의 운영 검증 전까지 유지(사용자 지시) | §16-4 조건 충족 후 삭제 | **웹 서비스 정비 트랙** |
 
-접근 판정 구현만으로 콘텐츠 · 커뮤니티 이용 완료를 선언하지 않는다.
+접근 판정 구현만으로 커뮤니티 이용 완료를 선언하지 않는다.
+
+---
+
+## 16. pharmacy-hub 기능 정리 (유지 · 이전 · 폐지)
+
+PharmacyHub(`pharmacyhub.co.kr`, serviceKey `pharmacy-hub`)는 Neture 약국 매장으로 흡수한다. 이 PR 은 **신규 진입과 commerce 흐름만** 옮기고, 서버 · 도메인 · 인증서와 공개 QR/태블릿 경로는 운영 검증 전까지 보존한다.
+
+### 16-1. 분류
+
+| 구분 | 대상 | 처리 (이 PR) |
+|---|---|---|
+| **폐지** | 신규 가입 `POST /api/v1/pharmacy-hub/join` | 410 `PHARMACY_HUB_JOIN_RETIRED` + `next=/api/v1/neture/pharmacy/membership`(`f7abec50c`). `/join/status` · 운영 콘솔은 기존 신청 처리용으로 유지 |
+| **폐지** | store 자가 업무 가입의 `pharmacy-hub` 선택지("병원 약국" 오표기) | `ENROLLABLE_SERVICE_KEYS=['cosmetics']` · web-store 선택지 제거 |
+| **이전(완료)** | web-store `/work/pharmacy-hub` 상품 · 상품 상세 · 장바구니 · 주문 · 주문 상세 · 결제 시작 | Neture 약국 공급 상품 · 장바구니 · 주문으로 Navigate. PG 복귀 `payment/success` · `payment/fail` 은 유지 |
+| **폐지 보류** | PH 결제 컨트롤러 · `PharmacyHubPaymentEventHandler` · bridge source `pharmacy_hub_cart` | 남은 `CREATED` PH 결제(기능 조사 시점 6건)가 닫힐 때까지 유지. 이미 결제된 PH 주문이 bridge 되면 `service_key='pharmacy-hub'` — 공급자 가시 집합에 포함(§8-4, `fed5afe1e`) |
+| **이전(공용 경로 이미 존재)** | 매장 실행 자산 · 태블릿 · 취급/로컬 상품 · 매장 정보 · 운영 콘솔 | 매장 Core 공용 경로 · Neture 운영자 화면이 담당. 추가 구현 없음 |
+| **유지(옛 호스트)** | 공개 QR(`/api/v1/pharmacy-hub/qr/public/:slug`) · 태블릿 · 다국어 · 제휴 페이지 · forum 저장 코드 `pharmacy-hub` | 운영 검증 전까지 그대로. 같은 slug 를 새 호스트에서도 열 수 있게 준비(§16-2) |
+| **결정 보류** | 공급자 opt-in 배송(PH 전용) | 목표 = `supply_proposals`. 사용자 결정 후 이전 |
+| **결정 보류** | 운영 매뉴얼 · 안내(news · guide) | 목적지 미정 — 새 호스트 `/guide` 로 옮길지 결정 필요 |
+
+PH 고정 spec(`service-catalog.canonical-domain.test.ts` · `service-public-origin-qr-hosts.spec.ts` — pharmacyhub.co.kr origin 생성)은 인프라 삭제 시점에 함께 정리하고 이 PR 에서는 바꾸지 않는다.
+
+### 16-2. QR 착지 이전 준비 (`f6c4e0596`)
+
+- 공개 QR 랜딩의 Screen Set 서비스 축을 **호출 호스트가 아니라 매장 slug 의 서비스 키** 기준으로 해석한다(서비스가 다를 때만, 같으면 종전). → PH 매장 QR slug 를 `pharmacy.neture.co.kr` 공개 QR API(`/api/v1/kpa/qr/public/:slug`)로 열어도 PH 호스트와 같은 결과.
+- 새 호스트 QR 화면이 product QR 의 상품 요약 · 매장 설명서를 화면 안에 표시한다(옛 PH 화면과 같은 계약). "제품 보기" 버튼이 여는 매장 상품 상세는 B2C 공개 노출 설정을 따르므로 비공개 상품은 404 — 기존 KPA 동작, 표시 정보는 화면 안에서 이미 제공.
+- 로컬 검증: 같은 PH QR slug 를 두 공개 API 로 열어 product · link 결과 동일, KPA 앱 `/qr/:slug` · `/tablet/:slug` 렌더.
+
+### 16-3. pharmacyhub.co.kr 를 가리키는 QR 4행 (운영 읽기 확인 2026-10-05)
+
+| QR slug | 유형 | 현재 착지 | 상태 | 새 착지 (준비) |
+|---|---|---|---|---|
+| `e2e-qr-mttrdan3` | link | `https://pharmacyhub.co.kr/guide` | 비활성 | `https://pharmacy.neture.co.kr/guide` (→ `/guide/intro`) |
+| `e2e-test-msl2gezv` | link | `https://pharmacyhub.co.kr/` | 비활성 | `https://pharmacy.neture.co.kr/` |
+| `e2e-test-w9-mskho4g9` | link | `https://pharmacyhub.co.kr/` | 비활성 | `https://pharmacy.neture.co.kr/` |
+| `e2e-test-w9-qr-mskhnl5t` | link | `https://pharmacyhub.co.kr/` | 비활성 | `https://pharmacy.neture.co.kr/` |
+
+- 4행 모두 E2E 테스트 데이터 · 비활성 · PH 약국 조직 소속. 새 착지 경로 2개는 새 호스트에 존재.
+- PH 매장 QR 전체(읽기): 활성 product 18 · screen_set 3(비활성 2) · link 4(위 표, 전부 비활성). 마지막 스캔 2026-09-09. QR slug 는 전역 유일.
+- 착지 URL 변경은 운영 DB write 다 — **실행하지 않았다**. 사용자 승인 시 아래 dry-run 의 대상 수(4) 확인 후 적용:
+
+```sql
+-- dry-run (읽기)
+SELECT slug, landing_target_id FROM store_qr_codes
+ WHERE landing_type = 'link' AND landing_target_id LIKE 'https://pharmacyhub.co.kr/%';
+-- apply (승인 후, 기대 4행)
+UPDATE store_qr_codes
+   SET landing_target_id = replace(landing_target_id, 'https://pharmacyhub.co.kr/', 'https://pharmacy.neture.co.kr/'),
+       updated_at = NOW()
+ WHERE landing_type = 'link' AND landing_target_id LIKE 'https://pharmacyhub.co.kr/%';
+```
+
+### 16-4. 인프라 삭제 인계 조건 (웹 서비스 정비 트랙)
+
+1. PR #308 main 통합 · 배포 후 새 호스트에서 콘텐츠 자료함 · 공급 주문 · QR(product · screen_set · link) 운영 검증.
+2. 위 link 4행 착지 변경(또는 테스트 데이터로 정리) · 활성 product/screen_set QR 이 새 호스트 공개 QR 로 열리는지 확인 — 인쇄된 QR 이 PH 도메인을 가리키므로 도메인 리다이렉트(pharmacyhub.co.kr → pharmacy.neture.co.kr, QR 경로 보존)가 필요하다.
+3. 남은 PH `CREATED` 결제 정리 · 결정 보류 2건(opt-in 배송 · 매뉴얼) 결정.
+4. 그 뒤 PH 서버 · 도메인 · 인증서 · PH 고정 spec 정리.
