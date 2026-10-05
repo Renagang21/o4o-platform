@@ -8,7 +8,7 @@
  * 판정 정본은 백엔드 guard 다. 이 컴포넌트는 안내 화면만 담당하며 role 이 있어도 membership 이
  * 없으면 막는다 (role without membership → deny). KPA/KCos/PH membership · role 은 보지 않는다.
  */
-import { Link, Outlet } from 'react-router-dom';
+import { Link, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { ROLES, SERVICE_KEY } from '../config/service';
 
@@ -40,10 +40,11 @@ function Card({ title, children }: { title: string; children: React.ReactNode })
 
 export default function AccessGate({ area }: { area: AccessArea }) {
   const { user, isAuthenticated, isLoading } = useAuth();
+  const location = useLocation();
   const config = AREA[area];
   if (isLoading) return <Card title={config.title}><p>로그인 상태를 확인하는 중...</p></Card>;
   if (!isAuthenticated || !user) {
-    return <Card title={config.title}><p>로그인이 필요합니다.</p><Link className="button-link" to="/login">로그인</Link></Card>;
+    return <Card title={config.title}><p>로그인이 필요합니다.</p><Link className="button-link" to="/login" state={{ from: `${location.pathname}${location.search}` }}>로그인</Link></Card>;
   }
   if ((user.roles ?? []).includes('platform:super_admin')) return <Outlet />;
   if (!hasLectureMembership(user.memberships)) {

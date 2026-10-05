@@ -729,7 +729,7 @@ export default function O4OHomePage() {
             )}
           </div>
         ) : (
-          // 로그인 · 회원가입은 같은 Google 흐름이다(미등록 계정은 약관 동의 → 가입) — 버튼 하나.
+          // 로그인은 모달 하나(이메일 · Google). 이메일 가입은 모달의 '회원가입'(/signup).
           <button
             type="button"
             onClick={() => openLoginModal()}
@@ -794,7 +794,8 @@ export default function O4OHomePage() {
                 data-testid="home-google-start"
                 className="mt-7 rounded-full bg-slate-900 px-6 py-2.5 text-sm font-medium text-white transition-opacity hover:opacity-80"
               >
-                Google로 시작
+                {/* WO-O4O-CROSS-SERVICE-LOGIN-ENTRY-AND-RETURN-FLOW-FIX-V1: 모달은 이메일 · Google 둘 다 연다 — Google 한정 라벨 정정 */}
+                로그인하고 시작하기
               </button>
             )}
           </section>

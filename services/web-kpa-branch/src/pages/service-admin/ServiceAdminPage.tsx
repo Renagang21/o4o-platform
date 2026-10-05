@@ -35,6 +35,7 @@ import {
   type ServiceMemberRow,
   type ServiceMemberStatus,
 } from '../../lib/api/serviceAdmin';
+import LoginLink from '../../components/LoginLink';
 
 type Tab = 'members' | 'requests' | 'operators';
 
@@ -436,7 +437,7 @@ export default function ServiceAdminPage() {
     return (
       <div className="mx-auto max-w-lg px-4 py-16 text-sm">
         <p className="text-gray-700">로그인이 필요합니다.</p>
-        <Link to="/login" className="mt-3 inline-block text-primary-700 hover:underline">로그인하기</Link>
+        <LoginLink className="mt-3 inline-block text-primary-700 hover:underline">로그인하기</LoginLink>
       </div>
     );
   }
