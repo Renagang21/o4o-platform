@@ -48,9 +48,13 @@ import {
   issueCommand,
   listUserDevices,
   openAgentSession,
+  parseHeartbeatReport,
   redeemPairingGrant,
   resolveTargetDevice,
+  selectExecutionNode,
   submitCommandResult,
+  type DeviceRow,
+  type NodeCapabilities,
 } from '../services/local-agent/local-agent-service.js';
 import {
   AiCapability,
@@ -478,17 +482,69 @@ describe('13. PC 가 응답하지 않으면 정상적으로 timeout 된다', () 
 
 // ─── 14. 다중 기기 (§33) ─────────────────────────────────────────────────────
 
-describe('14. 연결된 PC 가 여러 대면 임의로 고르지 않는다', () => {
-  it('online 기기가 2대면 ambiguous 이고 capability 가 열리지 않는다', async () => {
+describe('14. 연결된 PC 가 여러 대여도 Assistant 가 노드를 고른다 (Phase D · V2 §11-1)', () => {
+  it('online 기기가 2대여도 멈추지 않는다 — 하나를 고르고 capability 가 열린다', async () => {
     const db = makeDb();
     await connected(db, 'user-1');
     await connected(db, 'user-1');
     const r = await resolveTargetDevice(db.dataSource, 'user-1');
-    expect(r.status).toBe('ambiguous');
-    if (r.status === 'ambiguous') expect(r.count).toBe(2);
+    expect(r.status).toBe('ok');
+    if (r.status === 'ok') expect(r.onlineCount).toBe(2);
 
-    const caps = deriveAiCapabilities(localCtx({ localAgentStatus: 'ambiguous' }));
-    expect(caps).not.toContain(AiCapability.READ_ONLY_LOCAL_SYSTEM_INFO);
+    const caps = deriveAiCapabilities(localCtx({ localAgentStatus: 'connected', localDeviceId: r.status === 'ok' ? r.device.id : undefined }));
+    expect(caps).toContain(AiCapability.READ_ONLY_LOCAL_SYSTEM_INFO);
+  });
+
+  const node = (id: string, secondsAgo: number, capabilities: NodeCapabilities | null): DeviceRow => ({
+    id,
+    userId: 'user-1',
+    deviceName: id,
+    platform: 'windows',
+    agentVersion: '0.2.0',
+    status: 'active',
+    lastSeenAt: new Date(Date.now() - secondsAgo * 1000).toISOString(),
+    capabilities,
+  });
+  const caps = (over: Partial<NodeCapabilities> = {}): NodeCapabilities => ({
+    browser: true, windowsUia: true, localData: false, ownerScopedLedger: true, ...over,
+  });
+
+  it('필요한 capability 가 확인된 노드를 고른다 — 더 최근 노드라도 확인된 부재면 뒤로', () => {
+    const r = selectExecutionNode([node('recent-no-browser', 1, caps({ browser: false })), node('older-browser', 30, caps())], { need: 'browser' });
+    expect(r.status === 'ok' && r.device.id).toBe('older-browser');
+    expect(r.status === 'ok' && r.reason).toBe('capable');
+  });
+
+  it('Assistant 선호 노드(이 run 이 질문한 노드 · 같은 Task 의 이전 노드)를 우선한다', () => {
+    const r = selectExecutionNode([node('a', 1, caps()), node('b', 40, caps())], { need: 'browser', prefer: ['b'] });
+    expect(r.status === 'ok' && r.device.id).toBe('b');
+    expect(r.status === 'ok' && r.reason).toBe('preferred');
+  });
+
+  it('선호 노드라도 필요한 capability 가 확인된 부재면 쓰지 않는다', () => {
+    const r = selectExecutionNode([node('a', 1, caps()), node('b', 40, caps({ windowsUia: false }))], { need: 'windows_uia', prefer: ['b'] });
+    expect(r.status === 'ok' && r.device.id).toBe('a');
+  });
+
+  it('capability 를 보고하지 않는 이전 에이전트도 고를 수 있다 — 확인된 노드보다 뒤', () => {
+    const legacy = selectExecutionNode([node('legacy', 1, null), node('new', 30, caps())], { need: 'browser' });
+    expect(legacy.status === 'ok' && legacy.device.id).toBe('new');
+    const onlyLegacy = selectExecutionNode([node('l1', 20, null), node('l2', 2, null)], { need: 'browser' });
+    expect(onlyLegacy.status === 'ok' && onlyLegacy.device.id).toBe('l2');
+    expect(onlyLegacy.status === 'ok' && onlyLegacy.reason).toBe('capability_unknown');
+  });
+
+  it('모든 노드가 capability 부재여도 멈추지 않고 고른다 — 실행이 정직한 오류를 돌려준다', () => {
+    const r = selectExecutionNode([node('a', 5, caps({ browser: false })), node('b', 1, caps({ browser: false }))], { need: 'browser' });
+    expect(r.status === 'ok' && r.device.id).toBe('b');
+    expect(r.status === 'ok' && r.reason).toBe('most_recent');
+  });
+
+  it('heartbeat 보고는 형식이 맞는 값만 받는다 — 이전 에이전트의 {} 는 null', () => {
+    expect(parseHeartbeatReport({})).toBeNull();
+    expect(parseHeartbeatReport({ agentVersion: '0.2.0', capabilities: { browser: true } })).toBeNull();
+    expect(parseHeartbeatReport({ agentVersion: '../etc', capabilities: caps() })).toBeNull();
+    expect(parseHeartbeatReport({ agentVersion: '0.2.0', capabilities: { ...caps(), extra: 'x' } })).toEqual({ agentVersion: '0.2.0', capabilities: caps() });
   });
 
   it('한 대만 online 이면 그 기기로 확정된다', async () => {
@@ -819,7 +875,7 @@ describe('19. AI tool 경로 — 미연결 상태를 추측하지 않는다', ()
     expect(block).toContain('추측');
   });
 
-  it('연결이 여러 대면 임의로 고르지 말라고 명시한다', async () => {
+  it('연결이 여러 대여도 사용자에게 PC 정리를 요구하지 않는다 (Phase D)', async () => {
     const db = makeDb();
     await connected(db, 'user-1');
     await connected(db, 'user-1');
@@ -830,7 +886,9 @@ describe('19. AI tool 경로 — 미연결 상태를 추측하지 않는다', ()
       localCtx(),
     );
     const block = renderToolContext(r);
-    expect(block).toContain('임의로');
+    expect(block).not.toContain('여러 대');
+    expect(block).not.toContain('임의로');
+    expect(r.ok && (r.data as { connected?: boolean }).connected).toBe(true);
   });
 
   it('자격 없이 system info tool 을 부르면 명령이 발행되지 않는다', async () => {

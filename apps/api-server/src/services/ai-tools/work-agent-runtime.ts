@@ -17,7 +17,7 @@ import { execute } from '@o4o/ai-core';
 import logger from '../../utils/logger.js';
 import { AI_TOOL_NAMES, type VerifiedToolContext } from './ai-tool-contract.js';
 import { LOCAL_AGENT_ACTIONS, LOCAL_AGENT_ERROR } from '../local-agent/local-agent-protocol.js';
-import { resolveTargetDevice } from '../local-agent/local-agent-service.js';
+import { resolveTargetDevice, type DeviceRow } from '../local-agent/local-agent-service.js';
 import { isRegisteredBrowserSite } from '../local-agent/browser-site-registry.js';
 import type { SafeDomElement } from '../local-agent/browser-dom-contract.js';
 import { issueDomCommand } from './browser-dom-executor.js';
@@ -674,6 +674,8 @@ export async function runWorkAgent(
   const inputMode: 'text' | 'text+image' = image ? 'text+image' : 'text';
   let lastRead: string | null = null;
   let deviceId: string | null = null;
+  /** Phase D — 이번 run 의 Execution Node(capability 포함). 노드 원장을 소유 주체로 나눌 수 있는지 판단에 쓴다. */
+  let executionNode: DeviceRow | null = null;
   let neededInput: string | null = null;
   let sameObservationRun = 0;
   let repeatedActionRun = 0;
@@ -1143,18 +1145,9 @@ export async function runWorkAgent(
   let visualFallback = false; // 시각 모드 여부(아래 Visual Computer Use 절) — Experience 기록이 대상 준비 실패에서도 읽으므로 여기서 선언.
   let resumeRow: WorkRunCoordinationRow | null = null;
 
-  const resolution = await resolveTargetDevice(dataSource, ctx.userId);
-  if (resolution.status !== 'ok') {
-    state.progress = 'needs_user';
-    state.takeover = { reason: 'site_not_ready', step: 0 };
-    const r = await finish();
-    r.errorCode = resolution.status === 'none' ? LOCAL_AGENT_ERROR.NO_DEVICE : resolution.status === 'ambiguous' ? LOCAL_AGENT_ERROR.AMBIGUOUS : LOCAL_AGENT_ERROR.OFFLINE;
-    return r;
-  }
-  deviceId = resolution.device.id;
-
   // ── PHASE 1 same-run resume(§조건 5·검증 A·B·F) — 재개 요청 runId 를 먼저 읽기 전용으로 검증한다(claim 은 대상 준비 뒤).
   //    유효하지 않은(종료·만료·비소유·비대기) runId 는 여기서 즉시 거부한다 — 대상 준비 비용을 쓰기 전에.
+  //    Phase D: 노드 선택보다 먼저 한다 — 이 run 이 마지막으로 질문한 노드를 우선 고르기 위해서다.
   if (input.runId !== undefined) {
     if (!isValidRunId(input.runId)) return finishNoState(WORK_AGENT_ERROR.RESUME_REJECTED, resumeRejectMessage('not_found'), 'needs_user');
     const check = await checkResumable(dataSource, { runId: input.runId, userId: ctx.userId });
@@ -1166,6 +1159,26 @@ export async function runWorkAgent(
       return finishNoState(WORK_AGENT_ERROR.RESUME_REJECTED, resumeRejectMessage(reason), 'needs_user');
     }
   }
+
+  // ── Phase D — Execution Node 선택(V2 §11-1). 여러 노드가 online 이어도 멈추지 않고 Assistant 가 고른다:
+  //    대상에 필요한 capability → 우선 노드(이 run 이 마지막으로 질문한 노드 · Assistant 가 준 같은 Task 의 이전 노드) → 최근 heartbeat.
+  const preferNodes = [resumeRow?.deviceId, ...(input.intent?.node?.preferredDeviceIds ?? [])].filter(
+    (id): id is string => typeof id === 'string' && id.length > 0,
+  );
+  const resolution = await resolveTargetDevice(dataSource, ctx.userId, {
+    need: surface === 'uia' ? 'windows_uia' : 'browser',
+    prefer: preferNodes,
+  });
+  if (resolution.status !== 'ok') {
+    state.progress = 'needs_user';
+    state.takeover = { reason: 'site_not_ready', step: 0 };
+    const r = await finish();
+    r.errorCode = resolution.status === 'none' ? LOCAL_AGENT_ERROR.NO_DEVICE : LOCAL_AGENT_ERROR.OFFLINE;
+    return r;
+  }
+  deviceId = resolution.device.id;
+  executionNode = resolution.device;
+  if (resolution.onlineCount > 1) logger.info('work-agent node selected', { reason: resolution.reason, onlineCount: resolution.onlineCount });
 
   // ── Target Discovery / Activation (§3·§34·§35) — 관찰 · Planner 전에 대상을 준비한다. 행동 예산을 쓰지 않는다.
   //    이미 열려 있으면 그 탭/창을 앞으로, 없으면 등재 방법으로 열고, 그래도 안 되면 사용자에게 넘긴다. 준비되지 않은 대상에

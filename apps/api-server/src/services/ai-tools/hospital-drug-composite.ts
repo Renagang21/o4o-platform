@@ -293,9 +293,6 @@ export function renderLocalBlock(
     if (LOCAL_UNAVAILABLE_CODES.includes(code)) {
       return { text: `[원내 약품] ${LOCAL_NOT_CONNECTED}`, unavailable: true, rowCount: 0 };
     }
-    if (code === LOCAL_AGENT_ERROR.AMBIGUOUS) {
-      return { text: '[원내 약품] 연결된 PC가 여러 대여서 어느 PC인지 확정할 수 없습니다.', unavailable: true, rowCount: 0 };
-    }
     return { text: '[원내 약품] 원내 데이터를 확인하지 못했습니다. 잠시 후 다시 시도해 주세요.', unavailable: true, rowCount: 0 };
   }
   const rowsRaw = Array.isArray(data.rows) ? (data.rows as LocalRow[]) : [];
