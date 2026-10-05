@@ -3,16 +3,20 @@
  *
  * WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1 · DESIGN §3-2 · §3-4 · §3-5 · §3-6
  *   담당 지정된 세미프랜차이즈만 보인다(담당 관계는 API 가 판정 — 아니면 403).
- *   탭: 가입 신청 / 공급 제안 / 이벤트 / 모집 조건.
+ *   탭: 가입 신청 / 공급 제안 / 이벤트 / 모집 조건 / 콘텐츠.
+ *   콘텐츠: 운영자가 작성 · 게시. 게시본은 활성 가입 약국만 열람하고 매장 사본으로 복사한다.
+ *   ?key=&tab= 쿼리로 세미프랜차이즈 · 탭을 지정해 진입할 수 있다(콘텐츠 작성 화면 복귀용).
  *   가입 신청 목록은 기본 가입 원장의 사업자번호 · 면허번호 · 기본 가입 상태를 함께 보여준다.
  */
 import { useCallback, useEffect, useState } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import {
   neturePharmacyOperatorApi as api,
   MEMBERSHIP_ACTIONS_BY_STATUS,
   formatDateTime,
   formatWon,
   type SemiFranchise,
+  type SemiFranchiseContent,
   type SemiFranchiseEvent,
   type SemiFranchiseMembership,
   type SemiFranchiseRecruitment,
@@ -30,7 +34,7 @@ import {
   askReason,
 } from '../../components/neture-pharmacy/PharmacyCommerceUi';
 
-type Tab = 'memberships' | 'proposals' | 'events' | 'recruitments';
+type Tab = 'memberships' | 'proposals' | 'events' | 'recruitments' | 'contents';
 type Msg = { type: 'success' | 'error'; text: string } | null;
 
 const TABS: Array<{ key: Tab; label: string }> = [
@@ -38,7 +42,18 @@ const TABS: Array<{ key: Tab; label: string }> = [
   { key: 'proposals', label: '공급 제안' },
   { key: 'events', label: '이벤트' },
   { key: 'recruitments', label: '모집 조건' },
+  { key: 'contents', label: '콘텐츠' },
 ];
+
+const DEFAULT_STATUS: Record<Tab, string> = {
+  memberships: 'pending',
+  proposals: 'pending',
+  events: 'pending',
+  recruitments: 'pending',
+  contents: 'all',
+};
+
+const isTab = (v: string | null): v is Tab => TABS.some((t) => t.key === v);
 
 const FILTERS: Record<Tab, Array<{ value: string; label: string }>> = {
   memberships: [
@@ -69,6 +84,12 @@ const FILTERS: Record<Tab, Array<{ value: string; label: string }>> = {
     { value: 'rejected', label: '반려' },
     { value: '', label: '전체' },
   ],
+  contents: [
+    { value: 'all', label: '전체' },
+    { value: 'draft', label: '초안' },
+    { value: 'published', label: '게시' },
+    { value: 'archived', label: '보관' },
+  ],
 };
 
 const PROPOSAL_ACTIONS: Record<string, Array<{ action: 'approve' | 'reject' | 'end'; label: string }>> = {
@@ -89,6 +110,15 @@ const EVENT_ACTIONS: Record<string, Array<{ action: 'approve' | 'reject' | 'canc
   approved: [{ action: 'cancel', label: '취소' }],
 };
 
+const CONTENT_ACTIONS: Record<string, Array<{ action: 'publish' | 'archive'; label: string }>> = {
+  draft: [
+    { action: 'publish', label: '게시' },
+    { action: 'archive', label: '보관' },
+  ],
+  published: [{ action: 'archive', label: '보관' }],
+  archived: [{ action: 'publish', label: '다시 게시' }],
+};
+
 const RECRUITMENT_ACTIONS: Record<string, Array<{ action: 'approve' | 'reject'; label: string }>> = {
   pending: [
     { action: 'approve', label: '승인' },
@@ -97,10 +127,13 @@ const RECRUITMENT_ACTIONS: Record<string, Array<{ action: 'approve' | 'reject'; 
 };
 
 export default function OperatorSemiFranchisePage() {
+  const [searchParams] = useSearchParams();
+  const queryTab = searchParams.get('tab');
+  const initialTab: Tab = isTab(queryTab) ? queryTab : 'memberships';
   const [franchises, setFranchises] = useState<SemiFranchise[] | null>(null);
   const [sfKey, setSfKey] = useState('');
-  const [tab, setTab] = useState<Tab>('memberships');
-  const [status, setStatus] = useState('pending');
+  const [tab, setTab] = useState<Tab>(initialTab);
+  const [status, setStatus] = useState(DEFAULT_STATUS[initialTab]);
   const [rows, setRows] = useState<unknown[]>([]);
   const [loading, setLoading] = useState(false);
   const [busyId, setBusyId] = useState<string | null>(null);
@@ -111,12 +144,15 @@ export default function OperatorSemiFranchisePage() {
       .listAssignedSemiFranchises()
       .then((list) => {
         setFranchises(list ?? []);
-        if (list?.length) setSfKey(list[0].key);
+        const wanted = searchParams.get('key');
+        if (list?.length) setSfKey(list.find((f) => f.key === wanted)?.key ?? list[0].key);
       })
       .catch((err: Error) => {
         setFranchises([]);
         setMessage({ type: 'error', text: err.message });
       });
+    // 최초 진입 시 1회만 — 쿼리는 초기 선택에만 쓴다.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const load = useCallback(async () => {
@@ -130,7 +166,9 @@ export default function OperatorSemiFranchisePage() {
             ? await api.listProposals(sfKey, status)
             : tab === 'events'
               ? await api.listEvents(sfKey, status)
-              : await api.listRecruitments(sfKey, status);
+              : tab === 'recruitments'
+                ? await api.listRecruitments(sfKey, status)
+                : await api.listContents(sfKey, status);
       setRows(Array.isArray(data) ? data : []);
     } catch (err) {
       setRows([]);
@@ -186,7 +224,7 @@ export default function OperatorSemiFranchisePage() {
 
   return (
     <div className="space-y-4 p-6">
-      <PageHeader title="담당 세미프랜차이즈" description="담당으로 지정된 세미프랜차이즈의 가입 · 공급 제안 · 이벤트 · 모집 조건을 처리합니다.">
+      <PageHeader title="담당 세미프랜차이즈" description="담당으로 지정된 세미프랜차이즈의 가입 · 공급 제안 · 이벤트 · 모집 조건 · 콘텐츠를 처리합니다.">
         <select
           className="rounded-md border border-gray-300 px-3 py-2 text-sm"
           value={sfKey}
@@ -207,7 +245,7 @@ export default function OperatorSemiFranchisePage() {
             type="button"
             onClick={() => {
               setTab(t.key);
-              setStatus('pending');
+              setStatus(DEFAULT_STATUS[t.key]);
               setRows([]);
             }}
             className={`-mb-px border-b-2 px-4 py-2 text-sm font-medium ${
@@ -218,6 +256,22 @@ export default function OperatorSemiFranchisePage() {
           </button>
         ))}
       </div>
+
+      {tab === 'contents' && (
+        <div className="flex flex-wrap items-start justify-between gap-3 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-900">
+          <ul className="list-disc space-y-1 pl-5">
+            <li>게시된 콘텐츠는 이 세미프랜차이즈에 활성 가입한 약국에만 보입니다.</li>
+            <li>약국은 게시된 콘텐츠를 자기 매장 사본으로 복사해 씁니다. 이후 여기서 수정해도 이미 만든 매장 사본에는 반영되지 않습니다.</li>
+            <li>보관하면 약국 화면에서 내려가지만, 이미 만든 매장 사본은 그대로 남습니다.</li>
+          </ul>
+          <Link
+            to={`/operator/semi-franchises/${encodeURIComponent(sfKey)}/contents/new`}
+            className="shrink-0 rounded-md bg-primary-600 px-4 py-2 text-sm font-medium text-white hover:bg-primary-700"
+          >
+            콘텐츠 작성
+          </Link>
+        </div>
+      )}
 
       <StatusFilter value={status} options={FILTERS[tab]} onChange={setStatus} />
       <Message message={message} />
@@ -446,6 +500,64 @@ export default function OperatorSemiFranchisePage() {
                             onClick={() =>
                               run(r.id, a.label, a.action === 'reject', (note) => api.decideRecruitment(sfKey, r.id, a.action, note))
                             }
+                          />
+                        ))}
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        )}
+
+        {tab === 'contents' && (
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className={TH}>제목</th>
+                <th className={TH}>태그</th>
+                <th className={TH}>게시일</th>
+                <th className={TH}>수정일</th>
+                <th className={TH}>상태</th>
+                <th className={TH}>처리</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {loading ? (
+                <EmptyRow colSpan={6} text="불러오는 중..." />
+              ) : rows.length === 0 ? (
+                <EmptyRow colSpan={6} text="해당하는 콘텐츠가 없습니다." />
+              ) : (
+                (rows as SemiFranchiseContent[]).map((c) => (
+                  <tr key={c.id}>
+                    <td className={TD}>
+                      <div className="font-medium text-gray-900">{c.title}</div>
+                      {c.summary && <div className="text-xs text-gray-500">{c.summary}</div>}
+                    </td>
+                    <td className={TD}>{c.tags?.length ? c.tags.join(', ') : '-'}</td>
+                    <td className={TD}>{formatDateTime(c.publishedAt)}</td>
+                    <td className={TD}>{formatDateTime(c.updatedAt)}</td>
+                    <td className={TD}>
+                      <StatusBadge status={c.status} />
+                    </td>
+                    <td className={TD}>
+                      <div className="flex flex-wrap gap-1">
+                        {c.status !== 'archived' && (
+                          <Link
+                            to={`/operator/semi-franchises/${encodeURIComponent(sfKey)}/contents/${encodeURIComponent(c.id)}/edit`}
+                            className="rounded border border-gray-300 bg-white px-2.5 py-1 text-xs font-medium text-gray-700 hover:bg-gray-50"
+                          >
+                            수정
+                          </Link>
+                        )}
+                        {(CONTENT_ACTIONS[c.status] ?? []).map((a) => (
+                          <ActionButton
+                            key={a.action}
+                            label={a.label}
+                            action={a.action}
+                            disabled={busyId === c.id}
+                            onClick={() => run(c.id, a.label, false, () => api.setContentStatus(sfKey, c.id, a.action))}
                           />
                         ))}
                       </div>

@@ -14,6 +14,8 @@ export type MembershipAction = 'approve' | 'reject' | 'suspend' | 'reactivate' |
 export type ProposalAction = 'approve' | 'reject' | 'end';
 export type EventAction = 'approve' | 'reject' | 'cancel';
 export type RecruitmentAction = 'approve' | 'reject';
+export type SemiFranchiseContentAction = 'publish' | 'archive';
+export type SemiFranchiseContentStatus = 'draft' | 'published' | 'archived';
 
 export interface PharmacyMembership {
   id: string;
@@ -112,6 +114,31 @@ export interface SemiFranchiseRecruitment {
   semiFranchiseName: string;
 }
 
+/** 세미프랜차이즈 콘텐츠 — 운영자 작성 · 게시. 게시본은 활성 가입 약국만 열람 · 매장 사본으로 복사한다. */
+export interface SemiFranchiseContent {
+  id: string;
+  title: string;
+  summary: string | null;
+  body: string | null;
+  thumbnailUrl: string | null;
+  attachments: unknown[] | null;
+  tags: string[] | null;
+  status: SemiFranchiseContentStatus;
+  publishedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+  semiFranchiseKey: string;
+  semiFranchiseName: string;
+}
+
+export interface SemiFranchiseContentInput {
+  title: string;
+  summary?: string;
+  body?: string;
+  thumbnailUrl?: string;
+  tags?: string[];
+}
+
 function errorOf(err: unknown): Error {
   const e = err as { response?: { data?: { error?: string; message?: string } }; message?: string };
   return new Error(e?.response?.data?.error || e?.response?.data?.message || e?.message || '요청을 처리하지 못했습니다.');
@@ -168,6 +195,17 @@ export const neturePharmacyOperatorApi = {
     get<SemiFranchiseRecruitment[]>(`/neture/operator/semi-franchises/${enc(key)}/recruitments`, { status }),
   decideRecruitment: (key: string, id: string, action: RecruitmentAction, note?: string) =>
     send('post', `/neture/operator/semi-franchises/${enc(key)}/recruitments/${enc(id)}/${action}`, { note }),
+
+  listContents: (key: string, status?: string) =>
+    get<SemiFranchiseContent[]>(`/neture/operator/semi-franchises/${enc(key)}/contents`, { status: status || 'all' }),
+  getContent: (key: string, id: string) =>
+    get<SemiFranchiseContent>(`/neture/operator/semi-franchises/${enc(key)}/contents/${enc(id)}`),
+  createContent: (key: string, input: SemiFranchiseContentInput) =>
+    send<{ id: string; status: string }>('post', `/neture/operator/semi-franchises/${enc(key)}/contents`, input),
+  updateContent: (key: string, id: string, input: SemiFranchiseContentInput) =>
+    send<{ id: string; status: string }>('patch', `/neture/operator/semi-franchises/${enc(key)}/contents/${enc(id)}`, input),
+  setContentStatus: (key: string, id: string, action: SemiFranchiseContentAction) =>
+    send<{ id: string; status: string }>('post', `/neture/operator/semi-franchises/${enc(key)}/contents/${enc(id)}/${action}`),
 };
 
 // ─── Neture 관리자 ──────────────────────────────────────────────────────────
@@ -249,6 +287,9 @@ export const STATUS_LABEL: Record<string, string> = {
   canceled: '취소',
   closed: '마감',
   recruiting: '모집중',
+  draft: '초안',
+  published: '게시',
+  archived: '보관',
 };
 
 export const STATUS_CLASS: Record<string, string> = {
@@ -262,6 +303,9 @@ export const STATUS_CLASS: Record<string, string> = {
   ended: 'bg-slate-100 text-slate-500',
   canceled: 'bg-slate-100 text-slate-500',
   closed: 'bg-slate-100 text-slate-500',
+  draft: 'bg-blue-100 text-blue-700',
+  published: 'bg-green-100 text-green-700',
+  archived: 'bg-slate-100 text-slate-500',
 };
 
 export function formatWon(v: number | null | undefined): string {

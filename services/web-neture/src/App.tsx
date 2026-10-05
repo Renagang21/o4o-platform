@@ -271,6 +271,7 @@ const SupplierEventOfferPage = lazy(() => import('./pages/supplier/SupplierEvent
 // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: Neture 약국 commerce — 기본 가입 심사 · 세미프랜차이즈 · 공급 제안 · 이벤트 · 모집
 const PharmacyMembershipReviewPage = lazy(() => import('./pages/operator/PharmacyMembershipReviewPage'));
 const OperatorSemiFranchisePage = lazy(() => import('./pages/operator/OperatorSemiFranchisePage'));
+const SemiFranchiseContentFormPage = lazy(() => import('./pages/operator/SemiFranchiseContentFormPage'));
 const AdminSemiFranchisePage = lazy(() => import('./pages/admin/AdminSemiFranchisePage'));
 const SupplierSupplyProposalsPage = lazy(() => import('./pages/supplier/SupplierSupplyProposalsPage'));
 const SupplierSemiFranchiseEventsPage = lazy(() => import('./pages/supplier/SupplierSemiFranchiseEventsPage'));
@@ -1222,6 +1223,8 @@ function App() {
               {/* WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: 약국 기본 가입 심사 · 담당 세미프랜차이즈 (neture:operator) */}
               <Route path="/operator/pharmacy-memberships" element={<PharmacyMembershipReviewPage />} />
               <Route path="/operator/semi-franchises" element={<OperatorSemiFranchisePage />} />
+              <Route path="/operator/semi-franchises/:key/contents/new" element={<SemiFranchiseContentFormPage />} />
+              <Route path="/operator/semi-franchises/:key/contents/:id/edit" element={<SemiFranchiseContentFormPage />} />
             </Route>
 
             {/* ================================================================

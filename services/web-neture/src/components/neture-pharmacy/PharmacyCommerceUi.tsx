@@ -40,7 +40,7 @@ export function StatusFilter({
   );
 }
 
-const DANGER_ACTIONS = new Set(['reject', 'suspend', 'terminate', 'end', 'cancel']);
+const DANGER_ACTIONS = new Set(['reject', 'suspend', 'terminate', 'end', 'cancel', 'archive']);
 
 export function ActionButton({
   label,
