@@ -64,7 +64,7 @@
 
 같은 화면 · 같은 서비스 문맥으로 간주하지 않는다. 옛 주소 전환에서 서비스 Hub 는 Store Hub 로 넘어가지 않는다.
 
-약국 매장 이용자에게는 Store Hub 를 별도 단계로 두지 않는다(2026-10-05) — 내 매장이 이용 권한이 있는 항목을 직접 보여준다. `store.neture.co.kr/hub` 는 다른 업종 문맥을 위해 보존한다 — [`DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1`](../design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md) §6.
+약국 매장 이용자에게는 Store Hub 를 별도 단계로 두지 않는다(2026-10-05) — 내 매장이 이용 권한이 있는 항목을 직접 보여준다. `store.neture.co.kr/hub` 코드는 이 트랙에서 지우지 않았다(K-Cosmetics 퇴역 결정 2026-10-05 — 제거 범위는 퇴역 작업) — [`DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1`](../design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md) §6.
 
 ### 3-2. 하위 운영 영역
 
