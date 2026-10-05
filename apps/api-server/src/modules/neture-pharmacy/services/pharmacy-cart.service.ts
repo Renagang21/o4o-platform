@@ -96,20 +96,25 @@ export class PharmacyCartService {
     private readonly createOrder: OrderCreator,
   ) {}
 
-  private async cartRows(buyerId: string, itemIds?: string[]): Promise<CartRow[]> {
+  /**
+   * 장바구니는 (구매자, 약국 조직) 단위다 — 한 사용자가 여러 약국을 운영할 때 A 약국에 담은 행을
+   * B 약국 문맥에서 보거나 · 바꾸거나 · 주문하지 않도록 모든 조회 · 변경에 organization_id 를 건다.
+   */
+  private async cartRows(buyerId: string, organizationId: string, itemIds?: string[]): Promise<CartRow[]> {
     return this.dataSource.query(
       `SELECT id, source_type, supplier_product_offer_id, supply_proposal_id, event_offer_id, seller_recruitment_id,
               product_name, quantity, price_snapshot
          FROM store_cart_items
-        WHERE buyer_id = $1 AND service_key = $2 AND ($3::uuid[] IS NULL OR id = ANY($3::uuid[]))
+        WHERE buyer_id = $1 AND organization_id = $4 AND service_key = $2
+          AND ($3::uuid[] IS NULL OR id = ANY($3::uuid[]))
         ORDER BY created_at, id`,
-      [buyerId, NETURE_PHARMACY_SERVICE_KEY, itemIds && itemIds.length ? itemIds : null],
+      [buyerId, NETURE_PHARMACY_SERVICE_KEY, itemIds && itemIds.length ? itemIds : null, organizationId],
     );
   }
 
   /** 장바구니 — 각 행을 지금 다시 판정해 이용 가능 여부와 현재 단가를 함께 준다. */
   async list(buyerId: string, organizationId: string) {
-    const rows = await this.cartRows(buyerId);
+    const rows = await this.cartRows(buyerId, organizationId);
     const items = [];
     for (const row of rows) {
       const ref = kindOf(row);
@@ -139,8 +144,8 @@ export class PharmacyCartService {
     const refColumn = { default: 'supplier_product_offer_id', proposal: 'supply_proposal_id', event: 'event_offer_id', recruitment: 'seller_recruitment_id' }[kind];
     const [existing] = await this.dataSource.query(
       `SELECT id, quantity FROM store_cart_items
-        WHERE buyer_id = $1 AND service_key = $2 AND source_type = $3 AND ${refColumn} = $4`,
-      [buyerId, NETURE_PHARMACY_SERVICE_KEY, SOURCE_TYPE_BY_KIND[kind], input.id],
+        WHERE buyer_id = $1 AND organization_id = $5 AND service_key = $2 AND source_type = $3 AND ${refColumn} = $4`,
+      [buyerId, NETURE_PHARMACY_SERVICE_KEY, SOURCE_TYPE_BY_KIND[kind], input.id, organizationId],
     );
     if (existing) {
       const merged = Number(existing.quantity) + quantity;
@@ -171,28 +176,28 @@ export class PharmacyCartService {
     return row;
   }
 
-  async updateQuantity(buyerId: string, itemId: string, quantity: unknown) {
+  async updateQuantity(buyerId: string, organizationId: string, itemId: string, quantity: unknown) {
     if (!isValidOrderQuantity(quantity)) throw new NeturePharmacyError(400, 'INVALID_QUANTITY', '수량이 올바르지 않습니다.');
     const rows = rowsOf(await this.dataSource.query(
       `UPDATE store_cart_items SET quantity = $3, updated_at = NOW()
-        WHERE id = $1 AND buyer_id = $2 AND service_key = $4 RETURNING id, quantity`,
-      [itemId, buyerId, quantity, NETURE_PHARMACY_SERVICE_KEY],
+        WHERE id = $1 AND buyer_id = $2 AND organization_id = $5 AND service_key = $4 RETURNING id, quantity`,
+      [itemId, buyerId, quantity, NETURE_PHARMACY_SERVICE_KEY, organizationId],
     ));
     if (!rows[0]) throw new NeturePharmacyError(404, 'CART_ITEM_NOT_FOUND', '장바구니 항목을 찾을 수 없습니다.');
     return rows[0];
   }
 
-  async remove(buyerId: string, itemId: string) {
+  async remove(buyerId: string, organizationId: string, itemId: string) {
     await this.dataSource.query(
-      `DELETE FROM store_cart_items WHERE id = $1 AND buyer_id = $2 AND service_key = $3`,
-      [itemId, buyerId, NETURE_PHARMACY_SERVICE_KEY],
+      `DELETE FROM store_cart_items WHERE id = $1 AND buyer_id = $2 AND organization_id = $4 AND service_key = $3`,
+      [itemId, buyerId, NETURE_PHARMACY_SERVICE_KEY, organizationId],
     );
     return { id: itemId, removed: true };
   }
 
   async checkout(buyerId: string, organizationId: string, input: { itemIds?: string[] } = {}) {
     const itemIds = Array.isArray(input.itemIds) ? input.itemIds.filter(isUuid) : undefined;
-    const rows = await this.cartRows(buyerId, itemIds);
+    const rows = await this.cartRows(buyerId, organizationId, itemIds);
     if (rows.length === 0) throw new NeturePharmacyError(400, 'CART_EMPTY', '주문할 항목이 없습니다.');
 
     const failedItems: Array<{ itemId: string; productName: string; code: string; message: string }> = [];
@@ -331,8 +336,9 @@ export class PharmacyCartService {
           },
         });
         await this.dataSource.query(
-          `DELETE FROM store_cart_items WHERE id = ANY($1::uuid[]) AND buyer_id = $2 AND service_key = $3`,
-          [group.lines.map((l) => l.cartItemId), buyerId, NETURE_PHARMACY_SERVICE_KEY],
+          `DELETE FROM store_cart_items
+            WHERE id = ANY($1::uuid[]) AND buyer_id = $2 AND organization_id = $4 AND service_key = $3`,
+          [group.lines.map((l) => l.cartItemId), buyerId, NETURE_PHARMACY_SERVICE_KEY, organizationId],
         );
         createdOrders.push({
           orderId: saved.id,

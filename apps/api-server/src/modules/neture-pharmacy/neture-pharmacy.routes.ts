@@ -154,8 +154,8 @@ export function createNeturePharmacyRoutes(dataSource: DataSource): ExpressRoute
   router.get('/pharmacy/cart', ...store, handle(async (req) => cart.list(req.user!.id, org(req))));
   router.post('/pharmacy/cart/items', ...store, handle(async (req) => cart.add(req.user!.id, org(req), req.body ?? {})));
   router.patch('/pharmacy/cart/items/:id', ...store, handle(async (req) =>
-    cart.updateQuantity(req.user!.id, uuidParam(req, 'id'), req.body?.quantity)));
-  router.delete('/pharmacy/cart/items/:id', ...store, handle(async (req) => cart.remove(req.user!.id, uuidParam(req, 'id'))));
+    cart.updateQuantity(req.user!.id, org(req), uuidParam(req, 'id'), req.body?.quantity)));
+  router.delete('/pharmacy/cart/items/:id', ...store, handle(async (req) => cart.remove(req.user!.id, org(req), uuidParam(req, 'id'))));
   router.post('/pharmacy/cart/checkout', ...store, handle(async (req) => cart.checkout(req.user!.id, org(req), req.body ?? {})));
 
   router.get('/pharmacy/orders', ...store, handle(async (req) => dataSource.query(

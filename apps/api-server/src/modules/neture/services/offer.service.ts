@@ -357,15 +357,42 @@ export class NetureOfferService {
         if (existingApprovals.length === 0) {
           const keys = offer.serviceKeys?.length ? offer.serviceKeys : [];
           const uniqueKeys = [...new Set(keys)];
-          if (uniqueKeys.length > 0) {
-            const values = uniqueKeys.map((_, i) => `($1, $${i + 2}, 'pending', NOW(), NOW())`).join(', ');
+          if (uniqueKeys.length === 0) {
+            // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1 (DESIGN §3-3): approveProduct 의 공급처 미지정 분기와 짝.
+            //   OSA 행이 없으면 파생 sync 가 PENDING 을 돌려주므로 제품 등록 반려를 직접 기록하고,
+            //   파생 REJECTED 와 같은 cascade(product_approvals revoke · listings 비활성)를 적용한다.
+            //   (offer 에 반려 사유 컬럼은 없다 — 사유는 product_approvals · 로그에 남는다.)
             await queryRunner.query(
-              `INSERT INTO offer_service_approvals (offer_id, service_key, approval_status, created_at, updated_at)
-               VALUES ${values}
-               ON CONFLICT (offer_id, service_key) DO NOTHING`,
-              [offerId, ...uniqueKeys],
+              `UPDATE supplier_product_offers
+                  SET approval_status = 'REJECTED', is_active = false, updated_at = NOW()
+                WHERE id = $1`,
+              [offerId],
             );
+            await queryRunner.query(
+              `UPDATE product_approvals
+                  SET approval_status = 'revoked', decided_by = $2::uuid, decided_at = NOW(),
+                      reason = $3, updated_at = NOW()
+                WHERE offer_id = $1 AND approval_status = 'approved'`,
+              [offerId, adminUserId, reason || 'Offer rejected by admin'],
+            );
+            await queryRunner.query(
+              `UPDATE organization_product_listings SET is_active = false, updated_at = NOW() WHERE offer_id = $1`,
+              [offerId],
+            );
+            await queryRunner.commitTransaction();
+            logger.info(`[NetureOfferService] Offer registration rejected (no designated supply target): ${offerId} by ${adminUserId} (reason: ${reason || '-'})`);
+            return {
+              success: true,
+              data: { id: offer.id, masterId: offer.masterId, isActive: false, approvalStatus: OfferApprovalStatus.REJECTED },
+            };
           }
+          const values = uniqueKeys.map((_, i) => `($1, $${i + 2}, 'pending', NOW(), NOW())`).join(', ');
+          await queryRunner.query(
+            `INSERT INTO offer_service_approvals (offer_id, service_key, approval_status, created_at, updated_at)
+             VALUES ${values}
+             ON CONFLICT (offer_id, service_key) DO NOTHING`,
+            [offerId, ...uniqueKeys],
+          );
         }
 
         // 2. 모든 service approvals를 rejected로 일괄 변경

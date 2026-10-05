@@ -401,6 +401,32 @@ d('Neture 약국 매장 commerce — 격리 PostgreSQL 통합 검증', () => {
 
   // ─── 주문 · 결제 ────────────────────────────────────────────────────────
   describe('주문 · 결제', () => {
+    it('장바구니는 (구매자, 약국 조직) 단위 — A 약국에 담은 행을 B 약국 문맥에서 보거나 바꾸거나 주문할 수 없다', async () => {
+      const prod = await supplierWithProduct({ price: 10000 });
+      const a = await approvedPharmacy();
+      const b = await approvedPharmacy();
+      await joinSemiFranchise(a.orgId, a.owner, 'pharmacy', pharmacyOperator);
+      await joinSemiFranchise(b.orgId, b.owner, 'pharmacy', pharmacyOperator);
+      const buyer = a.owner; // 두 약국을 함께 운영하는 사용자 (조직 소유 판정은 route 게이트가 맡는다)
+      const added = await cart.add(buyer, a.orgId, { kind: 'default', id: prod.offerId, quantity: 1 });
+
+      expect(await cart.list(buyer, b.orgId)).toEqual([]);
+      await expect(cart.updateQuantity(buyer, b.orgId, added.id, 5)).rejects.toMatchObject({ code: 'CART_ITEM_NOT_FOUND' });
+      await cart.remove(buyer, b.orgId, added.id);
+      await expect(cart.checkout(buyer, b.orgId)).rejects.toMatchObject({ code: 'CART_EMPTY' });
+      // B 에서 같은 옵션을 담으면 A 행과 합쳐지지 않고 별도 행
+      const addedB = await cart.add(buyer, b.orgId, { kind: 'default', id: prod.offerId, quantity: 2 });
+      expect(addedB.id).not.toBe(added.id);
+
+      const r = await cart.checkout(buyer, a.orgId);
+      expect(r.failedItems).toEqual([]);
+      const [o] = await ds.query(`SELECT "sellerOrganizationId", items FROM checkout_orders WHERE id = $1`, [r.createdOrders[0].orderId]);
+      expect(o.sellerOrganizationId).toBe(a.orgId);
+      expect(o.items[0].quantity).toBe(1);
+      // A 주문 확정은 B 장바구니를 지우지 않는다
+      expect(await cart.list(buyer, b.orgId)).toEqual([expect.objectContaining({ id: addedB.id, quantity: 2 })]);
+    });
+
     it('선택 제안 가격이 청구 가격이고, 수취 주체별로 결제 묶음이 나뉘며, 결제는 대응 · 금액 · 멱등을 검증한다', async () => {
       const prod = await supplierWithProduct({ price: 30000 });
       const member = await approvedPharmacy();
