@@ -41,7 +41,7 @@ V1 은 `channel_type='B2C'` 매장 storefront 의 소비자 checkout → 결제 
 - 취소 · 환불 이벤트를 받는 handler 는 현재 만들 수 없다(위 §2-2 — hub 미전달). 필요해지면 publisher 변경을 포함한 별도 WO 로 한다.
 - 전이는 payable 상태에 한정되고 idempotent 해야 한다. cancelled · refunded 주문은 전이 · bridge 대상이 아니다.
 - fulfillment bridge(`CheckoutFulfillmentBridgeService`)는 `neture_orders.metadata->>'checkoutOrderId'` 를 먼저 조회한 뒤 없을 때만 생성한다. **이 dedup 은 best-effort 다** — 조회와 INSERT 가 원자적이지 않고 이 JSON 키에 UNIQUE 제약이 없어, 결제 이벤트와 수동 recovery 가 같은 주문에 동시에 실행되면 중복 생성 가능성이 남는다. 원자적 보장(DB 제약 · locking · upsert)은 Stable 계약이 아니며, 필요하면 schema 변경을 포함한 별도 WO 로 한다.
-- 결제 완료 단계에서 재고를 차감하지 않는다. 수량을 checkout 단계에서 **원자적으로 확보하는 것은 Event Offer 경로(`EventOfferCartCheckoutService`)뿐**이다. 일반 B2B(Neture B2B · PharmacyHub — `B2BCheckoutConfirmCore.confirm()`)는 `track_inventory` 상품의 가용 재고(`stock_quantity - reserved_quantity`)를 검증만 하고 예약하지 않는다. 따라서 일반 B2B 의 동시 주문 초과 판매 방지는 이 Stable 계약에 포함되지 않으며, 필요하면 별도 WO 로 정한다.
+- 결제 완료 단계에서 재고를 차감하지 않는다. 수량을 checkout 단계에서 **원자적으로 확보하는 것은 Event Offer 경로(`EventOfferCartCheckoutService`)뿐**이다. Event Offer 외 B2B 경로 전부 — 승인축 B2B(KPA Society · K-Cosmetics `store_b2b_cart`, `StoreB2BCartCheckoutService`) · Neture B2B(`NetureB2BCartCheckoutService`) · PharmacyHub(`PharmacyHubCartCheckoutService`) — 는 공통 `B2BCheckoutConfirmCore.confirm()` 에서 `track_inventory` 상품의 가용 재고(`stock_quantity - reserved_quantity`)를 검증만 하고 예약하지 않는다. 따라서 이 세 경로의 동시 주문 초과 판매 방지는 이 Stable 계약에 포함되지 않으며, 필요하면 별도 WO 로 정한다.
 
 ### 2-4. 매장 서비스 구독 결제
 
