@@ -246,6 +246,20 @@ export default function QrLandingPage() {
             <p style={styles.description}>{data.description}</p>
           )}
 
+          {/* WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: product QR 은 상품 요약 · 매장 설명서를 이 화면에서 바로 보여준다.
+              옛 pharmacyhub.co.kr QR 이 이 주소로 옮겨와도 같은 내용을 본다(매장 상품 공개 페이지 노출 설정과 무관). */}
+          {data.landingType === 'product' && data.productDetails && (
+            <div style={{ marginTop: 12 }}>
+              {data.productDetails.name && <p style={{ fontWeight: 600 }}>{data.productDetails.name}</p>}
+              {data.productDetails.brandName && <p style={styles.description}>{data.productDetails.brandName}</p>}
+              {data.productDetails.descriptionSummary && <p style={styles.description}>{data.productDetails.descriptionSummary}</p>}
+              {data.productDetails.description && <p style={styles.description}>{data.productDetails.description}</p>}
+              {data.productDetails.descriptionHtml && (
+                <ContentRenderer html={data.productDetails.descriptionHtml} variant="product-detail" />
+              )}
+            </div>
+          )}
+
           {/* Action Button */}
           {hasAction && (
             <button onClick={handleAction} style={styles.actionBtn}>

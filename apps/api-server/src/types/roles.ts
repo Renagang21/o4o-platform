@@ -62,6 +62,7 @@ export type NetureRole =
   | 'neture:admin'    // Neture admin
   | 'neture:operator' // Neture operator
   | 'neture:supplier' // Neture supplier
+  | 'neture:store_owner' // Neture 기본 가입 승인 약국 매장 경영자 (WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1)
   | 'neture:user';    // Neture user
 
 /**
@@ -360,6 +361,14 @@ export const ROLE_REGISTRY: Record<PrefixedRole, RoleMetadata> = {
     role: 'neture:supplier',
     label: 'Neture Supplier',
     description: 'Neture supplier',
+    service: 'neture',
+    category: 'commerce',
+    deprecated: false
+  },
+  'neture:store_owner': {
+    role: 'neture:store_owner',
+    label: 'Neture Pharmacy Store Owner',
+    description: 'Neture 기본 가입(자격 확인 · 운영자 승인)된 약국의 매장 경영자. 매장 판정 자체는 neture_pharmacy_memberships 원장 — role 은 role 기반 소비처용 (WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1)',
     service: 'neture',
     category: 'commerce',
     deprecated: false

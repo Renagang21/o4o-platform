@@ -4,7 +4,7 @@
  */
 import type { DataSource } from 'typeorm';
 // WO-O4O-SUPPLIER-FULFILLMENT-SERVICE-SCOPE-V1
-import { NETURE_FULFILLMENT_SERVICE_KEY, netureOrderServiceScopeSql } from '../constants/fulfillment-service-scope.js';
+import { SUPPLIER_VISIBLE_FULFILLMENT_SERVICE_KEYS, netureOrderServiceSetSql } from '../constants/fulfillment-service-scope.js';
 
 /** Allowed supplier status transitions */
 const SUPPLIER_STATUS_TRANSITIONS: Record<string, string[]> = {
@@ -40,8 +40,8 @@ export class SupplierOrderService {
        JOIN neture.neture_order_items oi ON oi.order_id = o.id
        JOIN supplier_product_offers spo ON spo.id = oi.product_id::uuid
        WHERE spo.supplier_id = $1
-         AND ${netureOrderServiceScopeSql('o', '$2')}`,
-      [supplierId, NETURE_FULFILLMENT_SERVICE_KEY],
+         AND ${netureOrderServiceSetSql('o', '$2')}`,
+      [supplierId, SUPPLIER_VISIBLE_FULFILLMENT_SERVICE_KEYS],
     );
     return {
       today_orders: Number(result[0]?.today_orders || 0),
@@ -57,13 +57,13 @@ export class SupplierOrderService {
 
     // WO-O4O-SUPPLIER-FULFILLMENT-SERVICE-SCOPE-V1:
     //   서비스 경계를 $2 로 고정한다(목록·카운트 동일 조건). status 는 $3 으로 밀린다.
-    const baseParams: any[] = [supplierId, NETURE_FULFILLMENT_SERVICE_KEY];
+    const baseParams: any[] = [supplierId, SUPPLIER_VISIBLE_FULFILLMENT_SERVICE_KEYS];
     let statusClause = '';
     if (status) {
       statusClause = 'AND o.status = $3';
       baseParams.push(status);
     }
-    const serviceClause = `AND ${netureOrderServiceScopeSql('o', '$2')}`;
+    const serviceClause = `AND ${netureOrderServiceSetSql('o', '$2')}`;
 
     const [orders, countResult] = await Promise.all([
       this.dataSource.query(
@@ -71,6 +71,9 @@ export class SupplierOrderService {
                 o.id, o.order_number, o.status, o.total_amount, o.shipping_fee,
                 o.final_amount, o.orderer_name, o.orderer_phone, o.orderer_email,
                 o.shipping, o.note, o.created_at, o.updated_at,
+                -- 구매 매장 · 발생 서비스 · 테스트 결제(실결제 아님) 식별 (WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1)
+                o.service_key, o.metadata->>'buyerOrganizationName' AS buyer_organization_name,
+                COALESCE((o.metadata->>'testPayment')::boolean, false) AS test_payment,
                 (SELECT COUNT(*)::int FROM neture.neture_order_items oi2
                  JOIN supplier_product_offers spo2 ON spo2.id = oi2.product_id::uuid
                  WHERE oi2.order_id = o.id AND spo2.supplier_id = $1) AS item_count

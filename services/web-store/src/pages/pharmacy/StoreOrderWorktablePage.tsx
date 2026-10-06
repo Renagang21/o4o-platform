@@ -44,6 +44,7 @@ import { useUnifiedStore } from '../../contexts/StoreContext';
 import { toast } from '@o4o/error-handling';
 import { colors, borderRadius } from '../../styles/theme';
 import { CART_SERVICE_KEY } from '../../utils/eventOfferCart';
+import { pharmacyStorePath } from '../neture-pharmacy/shared';
 import {
   ORDERABILITY_HINT,
   ORDERABILITY_LABEL,
@@ -494,7 +495,7 @@ export function StoreOrderWorktablePage() {
           <p style={{ color: colors.neutral500, fontSize: '13px', marginTop: '4px' }}>
             B2B 카탈로그에서 상품을 내 매장에 추가하면 이 화면에서 주문 수량을 관리할 수 있습니다.
           </p>
-          <Link to="/hub/b2b" style={S.linkBtn}>B2B 카탈로그 →</Link>
+          <Link to={pharmacyStorePath('supply')} style={S.linkBtn}>공급 상품 →</Link>
         </div>
       </div>
     );

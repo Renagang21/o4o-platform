@@ -473,10 +473,18 @@ function UnifiedOrdersSection({
                     {o.status && (
                       <span style={styles.orderStatus}>{ORDER_STATUS_LABEL[o.status] || o.status}</span>
                     )}
+                    {o.testPayment && (
+                      <span
+                        style={{ ...styles.sourceBadge, backgroundColor: '#FEF3C7', color: '#92400E' }}
+                        title="실제 결제가 아닌 테스트 결제 주문입니다"
+                      >
+                        테스트 결제
+                      </span>
+                    )}
                   </div>
                   <p style={styles.orderItems}>{itemLabel}</p>
                   <p style={styles.orderMeta}>
-                    {o.buyerOrganizationName || o.buyerName || '구매자 정보 없음'}
+                    {o.buyerOrganizationName ? `구매 약국 ${o.buyerOrganizationName}` : o.buyerName || '구매자 정보 없음'}
                     {' · '}
                     {formatDate(o.createdAt)}
                   </p>

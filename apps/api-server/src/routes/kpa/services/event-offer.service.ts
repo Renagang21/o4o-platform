@@ -965,7 +965,7 @@ export class EventOfferService {
           is_active, status, source_type, source_id, created_at, updated_at)
        VALUES (gen_random_uuid(), $1, $2, $3, $4,
                true, 'pending', 'event-offer', $5, NOW(), NOW())
-       ON CONFLICT (organization_id, service_key, offer_id) DO NOTHING`,
+       ON CONFLICT (organization_id, service_key, offer_id) WHERE service_key <> 'neture-event-offer' DO NOTHING`,
       [
         params.organizationId,
         params.targetServiceKey,

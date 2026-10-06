@@ -285,6 +285,8 @@ export function createSupplierServiceDeliveryController(dataSource: DataSource):
         const status =
           result.error === 'OFFER_NOT_FOUND' ? 404
           : result.error === 'NOT_OWNED' ? 403
+          : result.error === 'SUPPLIER_OPTIN_RETIRED' ? 410
+          : result.error === 'OPTIN_STOP_WOULD_EXPOSE_DEFAULT_SUPPLY' ? 409
           : 400;
         return res.status(status).json({
           success: false,

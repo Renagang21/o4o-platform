@@ -14,6 +14,7 @@
 import type { RequestHandler } from 'express';
 import { AppDataSource } from '../database/connection.js';
 import { resolveCommunityAccess } from '../utils/community-access.resolver.js';
+import { resolveSemiFranchiseCommunityAccess } from '../modules/neture-pharmacy/services/semi-franchise-community-access.js';
 
 /**
  * 판정은 두 조건을 **모두** 본다.
@@ -37,6 +38,27 @@ export function requireCommunityAccess(communityKey: string): RequestHandler {
     const user = (req as any).user;
     if (!user?.id) {
       res.status(401).json({ success: false, error: 'Authentication required', code: 'AUTH_REQUIRED' });
+      return;
+    }
+
+    // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1 (DESIGN §7): 세미프랜차이즈 커뮤니티는 별도 가입 없이
+    //   그 세미프랜차이즈 가입(active) 약국 조직의 매장 운영자만. community_memberships 를 보거나 만들지 않는다.
+    try {
+      const sf = await resolveSemiFranchiseCommunityAccess(AppDataSource, user.id, communityKey);
+      if (sf.semiFranchise) {
+        if (sf.allowed) {
+          next();
+          return;
+        }
+        res.status(403).json({
+          success: false,
+          error: '이 세미프랜차이즈에 가입 승인된 약국만 이용할 수 있습니다.',
+          code: 'SEMI_FRANCHISE_MEMBERSHIP_REQUIRED',
+        });
+        return;
+      }
+    } catch (error) {
+      next(error);
       return;
     }
 

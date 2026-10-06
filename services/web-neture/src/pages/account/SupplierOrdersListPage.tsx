@@ -108,6 +108,27 @@ function StatusBadge({ status }: { status: string }) {
 // Main Component
 // ============================================================================
 
+/** WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: 실제 결제가 아닌 테스트 결제 주문 표식 */
+function TestPaymentBadge() {
+  return (
+    <span
+      title="실제 결제가 아닌 테스트 결제 주문입니다"
+      style={{
+        marginLeft: 6,
+        padding: '1px 6px',
+        borderRadius: 4,
+        fontSize: 11,
+        fontWeight: 600,
+        backgroundColor: '#FEF3C7',
+        color: '#92400E',
+        whiteSpace: 'nowrap',
+      }}
+    >
+      테스트 결제
+    </span>
+  );
+}
+
 export default function SupplierOrdersListPage() {
   const [orders, setOrders] = useState<SupplierOrderSummary[]>([]);
   const [loading, setLoading] = useState(true);
@@ -157,7 +178,9 @@ export default function SupplierOrdersListPage() {
   const filteredOrders = useMemo(() => {
     if (!search.trim()) return orders;
     const q = search.toLowerCase();
-    return orders.filter((o) => (o.orderer_name || '').toLowerCase().includes(q));
+    return orders.filter((o) =>
+      `${o.orderer_name || ''} ${o.buyer_organization_name || ''}`.toLowerCase().includes(q),
+    );
   }, [orders, search]);
 
   const handleStatusChange = useCallback(async (orderId: string, nextStatus: string) => {
@@ -193,8 +216,14 @@ export default function SupplierOrdersListPage() {
     },
     {
       key: 'orderer_name',
-      header: '매장명',
-      render: (_v, order) => <span style={styles.storeNameText}>{order.orderer_name || '-'}</span>,
+      header: '구매 약국 · 매장',
+      // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: 구매 약국명(있으면) + 테스트 결제 표식
+      render: (_v, order) => (
+        <span style={styles.storeNameText}>
+          {order.buyer_organization_name || order.orderer_name || '-'}
+          {order.test_payment && <TestPaymentBadge />}
+        </span>
+      ),
     },
     {
       key: 'region',
@@ -362,7 +391,10 @@ export default function SupplierOrdersListPage() {
                       <Link to={`/supplier/orders/${order.id}`} style={styles.mobileOrderNo}>
                         {order.order_number}
                       </Link>
-                      <span style={styles.mobileStoreName}>{order.orderer_name || '-'}</span>
+                      <span style={styles.mobileStoreName}>
+                        {order.buyer_organization_name || order.orderer_name || '-'}
+                        {order.test_payment && <TestPaymentBadge />}
+                      </span>
                     </div>
                     <StatusBadge status={order.status} />
                   </div>

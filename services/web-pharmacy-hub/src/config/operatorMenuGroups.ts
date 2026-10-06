@@ -74,12 +74,8 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
   ],
   resources: [{ label: '자료실 관리', path: '/operator/resources' }],
   // WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2 §14: '강의 관리'(/operator/lms) 제거 — 독립 강의 서비스 소유
-  lms: [
-    // 동일 WO §4 (#96): 안내 문구 관리 = 공통 guide contents (serviceKey 경계).
-    //   다른 서비스와 같은 lms 그룹에 둔다. KPA 의 '강사 승인'은
-    //   KPA 전용 backend guard(requireKpaAdmin) 라 PH 에는 둘 수 없다(dead nav 금지).
-    { label: '안내 문구 관리', path: '/operator/guide-contents' },
-  ],
+  // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1 (DESIGN §16-6 결정): '안내 문구 관리'(/operator/guide-contents)
+  //   폐지 — PH 이용 안내는 코드 고정 문구라 이 콘솔 데이터를 읽지 않았고, 이용 안내는 새 호스트 /guide/* 로 옮긴다.
   // 운영 분석 = 공통 /api/v1/operator/analytics/* (action_logs 기반).
   analytics: [{ label: '운영 분석', path: '/operator/analytics' }],
   // 역할 관리 = role_assignments (RBAC SSOT). 조회는 운영자, 변경은 platform admin 만

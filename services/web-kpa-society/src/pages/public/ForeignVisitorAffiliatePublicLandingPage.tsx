@@ -7,7 +7,9 @@
  *   /foreign-visitor/affiliate/:shortCode
  *
  * - shortCode → store 식별(공개 안전 필드). partnerId/내부 id 미노출.
- * - 기존 매장 다국어 안내(store public landing)로 연결(storeSlug 있을 때).
+ * - 매장 공개 storefront(/store/{slug})는 WO-O4O-KPA-INTERNAL-STOREFRONT-RETIREMENT-V1 로 은퇴했으므로 링크하지 않는다
+ *   (WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1 — 옛 PH 제휴 QR 302 전환 전 조건, PH 화면과 같은 안내 문구).
+ *   다국어 상품 안내는 상품별 publicKey QR(/multilingual-products/{publicKey})로 따로 스캔된다.
  * - 결제 버튼 없음 · scan event 미기록(V1 no-op) · 인증/Layout/Guard 없음.
  */
 
@@ -33,7 +35,6 @@ export function ForeignVisitorAffiliatePublicLandingPage() {
   }, [shortCode]);
 
   const storeName = data?.storeName || '매장';
-  const storeHref = data?.storeSlug ? `/store/${encodeURIComponent(data.storeSlug)}` : null;
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
@@ -59,24 +60,15 @@ export function ForeignVisitorAffiliatePublicLandingPage() {
             <p className="text-sm text-slate-500 mt-1">Welcome · ようこそ · 欢迎</p>
             <p className="text-sm text-slate-600 leading-relaxed mt-4">
               {storeName} 의 외국인 고객 안내 페이지입니다.<br />
-              다국어 상품 안내와 매장 정보를 확인하실 수 있습니다.
+              매장에 비치된 상품별 QR 을 스캔하시면 다국어 상품 안내를 보실 수 있습니다.
             </p>
             {data.campaignName && (
               <p className="text-xs text-slate-400 mt-3">{data.campaignName}</p>
             )}
 
-            {storeHref ? (
-              <a
-                href={storeHref}
-                className="mt-6 inline-block w-full px-4 py-3 rounded-xl bg-slate-900 text-white text-sm font-semibold hover:bg-slate-800"
-              >
-                매장 안내 보기 · View store guide
-              </a>
-            ) : (
-              <p className="mt-6 text-xs text-slate-400">
-                자세한 안내는 매장 직원에게 문의해 주세요.<br />Please ask our staff for assistance.
-              </p>
-            )}
+            <p className="mt-6 text-xs text-slate-400">
+              자세한 안내는 매장 직원에게 문의해 주세요.<br />Please ask our staff for assistance.
+            </p>
           </div>
         )}
       </main>

@@ -154,7 +154,16 @@ export function createPharmacyHubRoutes(): Router {
   //   POST /join         (public) 신규/기존 사용자 가입 신청 — Core register 경로에 위임
   //   GET  /join/status  (auth)   내 가입 상태
   // ───────────────────────────────────────────────────────────────────────────
-  router.post('/join', requireAuth as any, PharmacyHubJoinController.apply);
+  // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: Pharmacy-Hub 신규 가입 은퇴 — catalog joinEnabled=false 와 맞춘다.
+  //   약국은 Neture 기본 가입(POST /api/v1/neture/pharmacy/membership)으로 신청한다. 기존 가입 상태 조회 · 운영자 콘솔은 유지.
+  router.post('/join', requireAuth as any, (_req, res) => {
+    res.status(410).json({
+      success: false,
+      error: 'Pharmacy-Hub 신규 가입은 종료되었습니다. Neture 약국 기본 가입으로 신청해 주세요.',
+      code: 'PHARMACY_HUB_JOIN_RETIRED',
+      next: '/api/v1/neture/pharmacy/membership',
+    });
+  });
   router.get('/join/status', requireAuth as any, PharmacyHubJoinController.myStatus);
 
   // ───────────────────────────────────────────────────────────────────────────

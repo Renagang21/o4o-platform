@@ -480,10 +480,14 @@ export class SellerRecruitmentService {
     await this.applicationRepo.save(application);
 
     // WO-O4O-SELLER-RECRUITMENT-C-BRIDGE-BACKEND-V1: 승인 → 판매자 주문 가능화 (best-effort · idempotent)
-    try {
-      await this.bridgeRecruitmentToOrderable(recruitment, application.applicantId);
-    } catch (bridgeError) {
-      logger.error(`[SellerRecruitmentService] C-bridge failed (approval kept): application=${application.id}`, bridgeError);
+    // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: Neture 약국 세미프랜차이즈 모집은 승인된 약국 조직이
+    //   모집 공급가로 바로 주문한다(공급 옵션 판정 SSOT). 사용자 단위 allowed_seller_ids · 진열 bridge 를 만들지 않는다.
+    if (!recruitment.semiFranchiseId) {
+      try {
+        await this.bridgeRecruitmentToOrderable(recruitment, application.applicantId);
+      } catch (bridgeError) {
+        logger.error(`[SellerRecruitmentService] C-bridge failed (approval kept): application=${application.id}`, bridgeError);
+      }
     }
 
     await this.notifyApplicant(
@@ -650,7 +654,7 @@ export class SellerRecruitmentService {
       `INSERT INTO organization_product_listings
         (id, organization_id, service_key, master_id, offer_id, is_active, price, source_type, source_id, created_at, updated_at)
        VALUES (gen_random_uuid(), $1, $2, $3, $4, true, NULL, 'seller_recruitment', $5, NOW(), NOW())
-       ON CONFLICT (organization_id, service_key, offer_id) DO NOTHING`,
+       ON CONFLICT (organization_id, service_key, offer_id) WHERE service_key <> 'neture-event-offer' DO NOTHING`,
       [orgRows[0].organization_id, serviceKey, offer.master_id, offer.id, recruitment.id],
     );
     logger.info(`[C-Bridge] OPL ensured (org=${orgRows[0].organization_id}, offer=${offer.id}, service=${serviceKey})`);

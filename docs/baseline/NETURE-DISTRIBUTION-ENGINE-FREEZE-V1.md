@@ -89,6 +89,8 @@ Supplier INACTIVE / Product REJECTED
 
 REVOKED/REJECTED는 자동 차단.
 
+> **Neture 약국 매장 주문 (2026-10-05, WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1)**: 이 3계층 가드는 기존 축(Neture B2B · 승인축 · PharmacyHub)에 그대로 적용된다. Neture 약국 매장 주문(`neture_pharmacy_cart`)은 가드 조건을 바꾸지 않고 별도 확정 서비스가 [`DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1`](../design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md) §4 이용 판정(기본 가입 · 세미프랜차이즈 가입 · 승인된 공급 제안 · 대상 약국)을 주문 확정 시 다시 수행한다.
+
 ---
 
 ## 6. 읽기 경로 병행 구조

@@ -51,6 +51,8 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
     //   대상이 달라 대체 관계가 아니다. 라우트/guard 무변경, 메뉴 진입점만 추가한다.
     { label: '상품 승인', path: '/operator/product-approvals' },
     { label: '서비스별 상품 승인', path: '/operator/product-service-approvals' },
+    // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: 약국 기본 가입(내 매장 이용 판정 원장) 심사
+    { label: '약국 기본 가입 심사', path: '/operator/pharmacy-memberships' },
     { label: '유통참여형 펀딩', path: '/operator/market-trial' },
     { label: '서비스 승인', path: '/admin/service-approvals', adminOnly: true },
   ],
@@ -70,6 +72,8 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
   ],
   stores: [
     { label: '매장 관리', path: '/operator/stores' },
+    // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: 담당 지정된 세미프랜차이즈의 가입 · 공급 제안 · 이벤트 · 모집 조건 처리
+    { label: '담당 세미프랜차이즈', path: '/operator/semi-franchises' },
   ],
   orders: [
     { label: '주문 관리', path: '/operator/orders' },
@@ -166,6 +170,10 @@ export function getAdminMenu(
       { label: '마스터 관리', path: '/admin/masters' },
       { label: '카탈로그 일괄등록', path: '/admin/catalog-import' },
       { label: '카테고리 매핑', path: '/admin/category-mapping-rules' },
+    ],
+    // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: 세미프랜차이즈(데이터 행) 생성 · 수정 · 담당 운영자 지정
+    stores: [
+      { label: '세미프랜차이즈 관리', path: '/admin/semi-franchises' },
     ],
     orders: [
       { label: '정산 관리', path: '/admin/settlements' },

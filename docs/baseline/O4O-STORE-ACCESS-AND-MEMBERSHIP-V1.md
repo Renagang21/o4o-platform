@@ -1,6 +1,6 @@
 # O4O-STORE-ACCESS-AND-MEMBERSHIP-V1
 
-> **Status**: Active · **확정일**: 2026-10-03
+> **Status**: Active · **확정일**: 2026-10-03 · **갱신**: 2026-10-05 (§3-A 약국 자가 가입 제외)
 > **WO**: `WO-O4O-STORE-BUSINESS-ENROLLMENT-AND-MEMBER-ACCESS-V1`
 > **상위 정본**: [`O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1`](O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1.md) §3 ·
 > [`O4O-ROLE-WORKSPACE-ARCHITECTURE-V1`](O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md) §3
@@ -119,8 +119,14 @@ owner role 과 같은 `{prefix}:{role}` 규약이다. 수락이 발급하고 해
 
 마지막 줄이 핵심이다. 어느 사업자인지는 사람이 정할 문제이고, 코드가 추측하면 남의 매장에 붙는다.
 
-가입 가능 업종은 `kpa` · `cosmetics` · `pharmacy-hub` 다. `cafe24-b2b` 는 외부 로그인으로만 생기는
+가입 가능 업종은 `cosmetics` · `pharmacy-hub` 다. `cafe24-b2b` 는 외부 로그인으로만 생기는
 채널이라 자가 가입 대상이 아니다.
+
+**약국(`kpa`)은 자가 가입 대상이 아니다 (2026-10-05, WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1).**
+약국 매장은 Neture 기본 가입 신청(`neture_pharmacy_memberships`) → 자격 확인 · Neture 운영자 승인으로만 열리고,
+약국 매장 접근 판정(`isStoreOwner(…, 'kpa')`)은 `kpa:store_owner` · `kpa-society` membership 이 아니라
+"owner/admin/manager 인 조직의 기본 가입 원장 `active`" 다. 기준:
+[`DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1`](../design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md) §3-1 · §5.
 
 ---
 

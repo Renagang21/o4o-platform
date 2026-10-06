@@ -1,0 +1,178 @@
+# CHECK-NETURE-PHARMACY-STORE-COMMERCE-LOCAL-BROWSER-V1
+
+> **상태**: ACTIVE
+> **작성일**: 2026-10-05 · **최종 갱신**: 2026-10-05
+> **근거 WO/IR**: [`WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1`](../work-orders/WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1.md) TODO 6-1 · 설계 [`DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1`](../design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md)
+
+로컬 브라우저 흐름 검증 기록이다. **운영 DB · 실제 PG 는 사용하지 않았다.** 운영 배포 · 운영 실결제 검증이 아니다.
+
+## 1. 환경
+
+| 항목 | 값 |
+|---|---|
+| DB | docker `postgres:15` 일회용 컨테이너의 새 DB — baseline + incremental 15개 적용(`migrate.ts` · `POST_MIGRATION_SCHEMA_ASSERTION = PASS`) |
+| API | branch HEAD 의 api-server tsup 번들(`NODE_ENV=development`) · `:3002` · `NETURE_PHARMACY_PAYMENT_MODE=test` |
+| 화면 | web-store dev `:4210` · web-neture dev `:3000` (`VITE_API_BASE_URL` = 로컬 API) · Playwright |
+| 계정 | 제품 API(`/auth/email/signup`)로 가입한 로컬 계정 4개(약국 A · 약국 B · Neture 운영자 · 공급자). 이메일 인증 표시 · 운영자/공급자 role · 공급자 조직 · 제품 2개(공급처 미지정 · 등록 승인)는 SQL 시드. 로그인 화면(Google 전용)은 범위 밖이라 `/auth/email/login` 토큰을 브라우저 저장소에 넣어 대체 |
+
+## 2. 결과
+
+| # | 흐름 | 결과 |
+|---|---|---|
+| 1 | 약국 A 매장 없음 → "약국 기본 가입 · 신청 상태" → 신청(약국명 · 사업자번호 · 면허번호 · 주소) → 승인 대기 표시 | PASS |
+| 2 | 대기 상태 매장 API(`store/context` · `supply-options` · `cart`) | PASS — 403 `STORE_OWNER_REQUIRED` |
+| 3 | 운영자 `/operator/pharmacy-memberships` 승인 → role `neture:store_owner` · 업무 영역 enrollment active · 매장 slug 생성 | PASS |
+| 4 | 약국 A 내 매장 진입 — 상단 "매장 HUB" 없음 · 약국 메뉴(상품 · 주문 / 가입) | PASS |
+| 5 | 세미프랜차이즈 미가입 상태 공급 상품 0건 · 매장 기본 화면 이용 | PASS |
+| 6 | pharmacy 가입 신청 → 운영자 `/operator/semi-franchises` 승인 | PASS |
+| 7 | 공급자 `/supplier/supply-proposals` 제안(11,000원) → 담당 운영자 승인 | PASS |
+| 8 | 공급 상품에 기본 공급(12,000원)과 공급 제안(11,000원)이 같은 제품에 공존 · 가격 비교/자동 선택 없음 | PASS |
+| 9 | 제안 10개 + 기본 공급 1개 담기 → 주문 확정 → 주문 1건 140,000원(무료배송) · 라인 metadata `supplyKind` = proposal · default | PASS |
+| 10 | 테스트 결제("실제 결제 아님" 확인창) → 주문 paid · `o4o_payments` PAID(mode test) · 공급자 주문 1건(`neture-pharmacy`, 구매 약국명 · testPayment) | PASS |
+| 11 | 공급자 목록 · 상세(구매 약국 · 배송지 스냅샷 · "테스트 결제" 배지) → 처리 시작 → 송장 → 배송 완료 → 재고 50→40 | PASS |
+| 12 | 세미프랜차이즈 가입 정지 → 공급 상품 0 · 제안 담기 404 `SUPPLY_OPTION_NOT_AVAILABLE` · 매장 기본 기능 유지 | PASS |
+| 13 | 기본 가입 정지 → 매장 API 403 · role 회수 · enrollment inactive · 매장 목록에서 제외 → "연결된 매장 없음" · 기본 가입 화면에 "정지" + 사유 | PASS (수정 후) |
+| 14 | 미가입 약국 B — 매장 · 세미프랜차이즈 API 403 · 매장 목록 0 · 운영자 API 403 | PASS |
+
+## 3. 발견 · 수정 (`3445aee35`)
+
+1. 대기 · 정지 약국에 빈 매장 화면이 열림 — 매장 목록(`accessible-stores`)이 조직 owner 관계만 보고 기본 가입 상태를 보지 않았다. 기본 가입 active 가 아닌 약국 조직을 목록에서 제외(데이터는 이미 403 으로 보호).
+2. 약국 홈 "상품 선택" 링크가 옛 승인 카탈로그(`/work/kpa-society/commerce/products`)를 가리킴 → 공급 상품.
+
+## 4. 확인하지 않은 것
+
+- 이벤트 · 모집의 화면 흐름(통합 테스트로만 검증) · 결제 전 취소 화면 · 다른 수취 주체 2개의 결제 묶음 분리 화면(통합 테스트로만 검증).
+- Google 로그인 화면 · 운영 환경 · 실제 PG.
+- 매장 없음 화면 안내 문구가 아직 "KPA · K-Cosmetics · PharmacyHub" 를 나열한다(K-Cosmetics 퇴역 작업과 함께 정리).
+
+## 5. 2차 검증 (2026-10-05 — 콘텐츠 자료함 · QR · Codex 반영 후 재확인)
+
+같은 격리 환경(로컬 API dev bundle · 격리 PostgreSQL). 운영 DB · PG 미사용. QR 4행 조회만 운영 DB read-only(`default_transaction_read_only`).
+
+| # | 흐름 | 결과 |
+|---|---|---|
+| 15 | 담당 운영자 web-neture `/operator/semi-franchises/pharmacy` "콘텐츠" 탭 → 작성(제목 · 요약 · 본문) → 초안 저장 → 게시 | PASS |
+| 16 | 약국 A web-store `/store/pharmacy/contents` — 가입 세미프랜차이즈의 게시 콘텐츠 표시(초안은 미표시 — 통합 테스트) | PASS |
+| 17 | "내 매장 사본 만들기" → 완료 안내 → 매장 자료함 `/store/library/contents` "세미프랜차이즈" 탭에 사본 1건(원본 유형 세미프랜차이즈 · pharmacy) · 편집 가능 | PASS |
+| 18 | PH 매장 QR slug 를 `/api/v1/pharmacy-hub/qr/public` · `/api/v1/kpa/qr/public` 로 열기 — product · link 결과 동일 | PASS |
+| 19 | KPA 앱(새 호스트 대응) `/qr/:slug` product QR — 상품명 · 요약 · 매장 설명서 화면 내 표시 / `/tablet/:slug` 렌더 | PASS (수정 후 — 아래 6-1) |
+| 20 | Codex 반영 후 주문 재확인(장바구니 코드 변경): 공급 상품 담기 → 수량 2 변경(60,000원) → 주문 확정 → 테스트 결제 → 주문 내역 결제 완료 · 공급자 주문 목록에 표시 | PASS |
+
+정지 화면 검증(#12 · #13)은 관련 코드 변경이 없어 다시 하지 않았다.
+
+## 6. 2차 발견 · 수정
+
+1. 새 호스트 QR 화면에서 product QR "제품 보기" 가 매장 상품 상세(B2C 공개 노출 필요)로 가 PH 상품은 404 — 옛 PH 화면은 상품 정보를 화면 안에 표시했다. 새 호스트 QR 화면이 상품 요약 · 설명서를 화면 안에 표시하도록 수정(`f6c4e0596`). 버튼 자체의 404 는 기존 KPA 공개 노출 규칙 그대로(보고 항목).
+2. Codex 리뷰 3건(`fed5afe1e`) — 통합 · 단위 테스트로 재현 후 수정. #20 으로 화면 재확인.
+
+## 7. 2차에서 확인하지 않은 것
+
+- 운영 환경의 새 호스트 QR(배포 전) · pharmacyhub.co.kr 도메인 리다이렉트 · QR link 4행 착지 변경(운영 write — 미실행, DESIGN §16-3 dry-run 만).
+- 여러 약국을 운영하는 사용자의 매장 전환 화면(조직 단위 장바구니는 통합 테스트로 검증).
+
+## 8. 최신 변경분 코드 리뷰 (2026-10-05)
+
+**Codex 리뷰: 미완료.** 마지막 완료 리뷰는 `0cfd0fb` 기준(지적 3건 → `fed5afe1e` 수정). 이후 HEAD(`d6d7f121f`)에 두 번 요청했으나 두 번 모두 Codex 쪽 "unknown error" — 리뷰 결과 없음. CI 통과를 코드 리뷰 완료로 보지 않는다.
+
+**직접 리뷰** — 범위 `0cfd0fb..427a715d3` 코드 31파일(콘텐츠 자료함 · QR · PH 은퇴 · Codex 반영):
+
+| 확인 항목 | 결과 |
+|---|---|
+| 콘텐츠 운영자 API 권한 | 모든 운영자 라우트가 `requireOperatorOf`(neture:operator ∧ 담당 배정)를 거침 — 이상 없음 |
+| 약국 열람 · 사본 범위 | published ∧ 세미프랜차이즈 active ∧ 조직 가입 active, 아니면 404 — 이상 없음 |
+| 운영자 작성 HTML 노출 | 약국 화면 `ContentRenderer`(sanitize) 경유 — 이상 없음 |
+| 사본 형식 | `content_json` 의 title · summary · body 가 기존 커뮤니티 사본 형식과 같음 — 매장 편집 · 게시 경로 호환. 같은 원본 여러 번 복사는 기존 설계(독립 사본) |
+| 장바구니 조직 범위 | 조회 · 병합 · 수량 · 삭제 · 확정 · 확정 후 삭제 모두 `organization_id` — 통합 테스트로 확인 |
+| **QR 서비스 축** | **결함 1건 발견 · 수정 `427a715d3`**: 최신 slug 1행만 보고 축을 바꿔, 여러 서비스에 slug 를 가진 매장은 호출 호스트 서비스 slug 가 있어도 다른 서비스 축으로 해석될 수 있었다. → 호출 서비스 slug 가 하나도 없을 때만 매장 축. 단위 테스트 추가(24/24) |
+| PH 은퇴 화면 이동 | `/work/pharmacy-hub` 상품 · 장바구니 · 주문 → Neture 약국 경로, PG 복귀 유지 — 이상 없음 |
+| PH 가입 410 · 자가 가입 제외 | 다른 소비처(web-pharmacy-hub 의 `/store/enrollment` 호출) 없음 |
+
+**남은 위험 (수정하지 않음, 보고)**
+1. ~~매장 자료함의 "세미프랜차이즈" 출처 **라벨**이 사본 `content_json.semiFranchiseKey` 로 판정돼 편집 후 "커뮤니티" 로 바뀜~~ → **수정(2026-10-06)**: 자료함 피드가 변하지 않는 스냅샷 기준 `sourceGroup` · `sourceName`(`source_service`/`asset_type` · 스냅샷 `content_json.semiFranchiseName`)을 응답하고 web-store 가 이를 우선 사용. 편집 override 는 출처 판정에 쓰지 않는다. 서버 저장 로직은 변경 없음(최소 수정).
+2. 새 호스트 QR 화면의 "제품 보기" 버튼은 B2C 비공개 상품이면 404(기존 KPA 동작). 상품 정보는 화면 안에서 이미 제공.
+3. 운영 데이터 상호작용(실제 PH 매장 · 다중 서비스 매장의 QR)은 운영 검증 전 — §16-7 검증 항목.
+4. 최신 HEAD 에 대한 외부(Codex) 리뷰 부재 — **미완료로 기록**. 반복 요청으로 다른 마무리 작업을 막지 않는다(2026-10-06 결정).
+
+`427a715d3` 는 QR 서비스 축 판정만 바꿨고 단일 서비스 PH 매장의 결과는 같아 브라우저 QR 검증(#18 · #19)은 다시 하지 않았다(단위 테스트로 두 경우 확인).
+
+## 9. 통합 · 운영 전환 체크리스트 (2026-10-06)
+
+PR #308 은 draft · merge 보류. 아래는 main 통합 결정과 운영 전환에 쓰는 목록이며, 각 단계의 실행은 사용자 승인 후다. 기존 PH 서버 · 도메인 · 인증서는 운영 검증 전까지 보존한다.
+
+### 9-1. 통합 전
+
+| 항목 | 상태 |
+|---|---|
+| 최신 HEAD 필수 검사 | PASS — `259fe7939` 기준 SonarCloud · API Jest 3/3 · Web build · Guard · CodeQL · CI Gate. 이 체크리스트 커밋 후 HEAD 재확인 필요 |
+| 최신 HEAD Codex 리뷰 | **미완료**(unknown error 2회). 직접 리뷰로 대체 기록(§8). 반복 요청하지 않음 |
+| main 과의 차이 | main 이 5 커밋 앞섬(문서 · debug route 제거). 충돌 없음 · migration 변경 없음 → merge 직전 브랜치 갱신 후 CI 재실행 |
+
+### 9-2. main 통합 시 자동 실행 범위 (현재 CI/CD 기준, 2026-10-06 확인)
+
+| 항목 | 내용 |
+|---|---|
+| 트리거 | push to main → `ci-pipeline.yml` → 완료 시 `delivery.yml`(workflow_run, `DELIVERY_ENFORCE=true`) → `deploy-orchestrate.mjs` 분류. 옛 `deploy-auto.yml` 은 비활성, `deploy-api.yml` · `deploy-web-services.yml` 은 push 트리거 없음 |
+| 위험 분류(`deploy-risk.mjs` 로컬 실행) | **api = LEVEL_3** — db-migration · payment · rbac · access-control 경로 포함. neture · kpa-society · pharmacy-hub · store = LEVEL_2 |
+| 결과 | api 는 `AUTO_DEPLOY_BLOCKED`(LEVEL_3 HOLD) → **merge 만으로 API 배포 · migration 은 실행되지 않는다**. **프런트 4개도 보류(확정)** — 아래 행 |
+| 프런트 보류 근거(코드 · 테스트로 확정) | `deploy-orchestrate.mjs` `applyApiDependency`: API 가 배포 대상인데 미배포면 `deps[k].dependent === false` 가 증명된 프런트만 진행, 나머지는 `HELD_API_NOT_DEPLOYED`. `computeApiDependency` 의 독립 증명 조건 = serving→target first-parent commit 집합에서 API 변경 commit(A) 과 프런트 변경 commit(B) 이 **서로소** · 모든 commit 에 WO 키 · A·B 키 비중복 — 하나라도 못 맞추면(키 없음 · git 실패 · serving 미상 포함) 의존(fail-closed). 이 PR 의 merge commit 1개가 API 와 프런트 4개를 함께 바꾸므로 A∩B≠∅ → 4개 모두 의존 → 보류. rebase merge 로 나뉘어도 같은 WO 키라 조건 미충족. dispatch 경로(`deploy-auto`)는 종전 규칙(API 미배포 → 프런트 전부 보류) 그대로. 테스트 `deploy-orchestrate.test.mjs` U2 "API 와 같은 commit 에서 바뀐 web → 의존" 포함 57/57 PASS(로컬, 2026-10-06). **API 보류 중 프런트만 먼저 배포되는 경로 없음** |
+| 부수 영향 | API promote 전까지는 이후 다른 PR 의 프런트 전용 변경도 해당 프런트 serving→target 구간에 이 merge commit 이 포함돼 같이 보류된다 — promote 를 오래 미루면 다른 트랙 프런트 배포가 묶인다 |
+| 배포 경로 | 수동 `promote.yml`(대상 sha = main HEAD) — 사용자 승인 필요 |
+| 배포 HOLD 상태 | `DEPLOY_FREEZE=false`(2026-10-03 설정). 이 PR 을 막는 것은 LEVEL_3 분류뿐. 다른 트랙의 HOLD 는 해제 · 변경하지 않는다 |
+
+### 9-3. migration 적용 순서 · 배포 순서
+
+1. migration `1791200000000-CreateNeturePharmacyCommerce` — main 최신 `AddLocalAgentDeviceCapabilities1791177033073` 다음(manifest · expected state 반영). 새 테이블 6(`neture_pharmacy_memberships` · `semi_franchises` · `semi_franchise_memberships` · `semi_franchise_operators` · `supply_proposals` · `semi_franchise_contents`), 기존 테이블 컬럼 · 제약 변경(`store_cart_items` · `seller_recruitments` · `seller_recruitment_applications` · `idx_org_listing_unique_v2`), 기준 행 2(세미프랜차이즈 조직 · `pharmacy`, `ON CONFLICT DO NOTHING`). `NULLS NOT DISTINCT` 사용 — 운영 DB PostgreSQL 15 확인.
+2. 실행 위치: `deploy-api.yml` 의 Cloud Run Job `o4o-api-migrations` — **API 배포 직전**에 실행, 실패하면 배포 중단 · 기존 revision 유지. 수동 적용 금지(PRODUCTION-MIGRATION-STANDARD).
+3. 배포 순서: API(migration → 배포 → revision traffic 100% 확인) → 프런트(store · neture · kpa-society · pharmacy-hub). 배포 완료 판정 = job success + 새 revision + traffic 100%.
+4. 배포 후 읽기 확인: `typeorm_migrations` 최신 행 · 새 테이블 존재 · 기준 행 2.
+
+### 9-4. 결제 설정
+
+| 항목 | 내용 |
+|---|---|
+| 기본(미설정) | `NETURE_PHARMACY_PAYMENT_MODE` 미설정 + `NODE_ENV=production` → `disabled` · 결제 시작 503 `PAYMENT_NOT_CONFIGURED`(fail-closed) |
+| live | 항상 503 `PAYMENT_PROVIDER_NOT_SELECTED` — **live 결제 차단**(PG 미선정 D1) |
+| test | 값 `test` 일 때만 테스트 결제(내부 테스트 결제 — PG 키 불필요). 현재 `deploy-api.yml` 은 이 변수를 주입 · 보존하지 않고 `gcloud run deploy --set-env-vars` 는 전체 교체라 **콘솔 수동 설정은 다음 API 배포에 지워진다** → 콘솔 설정은 쓰지 않는다 |
+| 운영 test 결제 방침 | workflow 에서 명시 관리. 저장소 variable `NETURE_PHARMACY_PAYMENT_MODE` 만 출처로 쓰고 Cloud Run 현재 값 carry 는 하지 않는다(콘솔 값이 남지 않게). 허용값 `test` · 미설정만 — 미설정이면 주입하지 않아 코드 기본 `disabled`(503) 유지, 그 밖의 값(`live` 포함)은 배포 step 실패. 코드의 live 503 도 그대로 |
+| 상태 | **변경안만 준비 — 미적용**. workflow 변경 · variable 설정 · 배포 모두 사용자 승인 후. 적용 순서: ① 아래 diff 를 별도 PR(인프라)로 main 반영 ② variable `NETURE_PHARMACY_PAYMENT_MODE=test` 설정 ③ API promote. ①② 없이 promote 하면 `disabled`(503)로 안전하게 배포된다 |
+
+`deploy-api.yml` 변경안 (Deploy to Cloud Run step — `optional-env` 목록 바로 뒤):
+
+```diff
+     - name: Deploy to Cloud Run
+       if: inputs.migrate_only != 'true'
++      env:
++        NETURE_PHARMACY_PAYMENT_MODE: ${{ vars.NETURE_PHARMACY_PAYMENT_MODE }}
+       run: |
+         ...
+         if [ -s "$RUNNER_TEMP/optional-env" ]; then mapfile -d '' OPTIONAL_ENV < "$RUNNER_TEMP/optional-env"; fi
++
++        # Neture 약국 결제 모드 — 저장소 variable 로만 관리(carry 없음). 'test' 또는 미설정만 허용.
++        #   미설정 → 주입 안 함 → 코드 기본 disabled(503) · 'live' 등 그 밖의 값 → 배포 중단(코드도 live=503).
++        PAYMENT_ENV=()
++        case "${NETURE_PHARMACY_PAYMENT_MODE}" in
++          "") ;;
++          test) PAYMENT_ENV=(--set-env-vars=NETURE_PHARMACY_PAYMENT_MODE=test) ;;
++          *) echo "::error::NETURE_PHARMACY_PAYMENT_MODE 는 'test' 또는 미설정만 허용"; exit 1 ;;
++        esac
+         ...
+           "${OPTIONAL_ENV[@]}" +          "${PAYMENT_ENV[@]}" ```
+
+### 9-5. 운영 smoke (배포 후, 실브라우저)
+
+| # | 항목 | 확인 |
+|---|---|---|
+| 1 | 가입 | 약국 기본 가입 신청 · 미가입 상태에서도 내 매장 진입 |
+| 2 | 승인 | Neture 운영자 승인 → role · 매장 연결, 반려 · 재신청 |
+| 3 | 내 매장 | 약국 매장 화면 · 세미프랜차이즈 가입 · 콘텐츠 자료함 열람 · 사본 |
+| 4 | 주문 | 공급 상품 → 장바구니 → 주문(결제 설정에 따라 test 결제 또는 503 확인) |
+| 5 | 공급자 처리 | 공급자 주문 목록 · 수락 · 발송, PH opt-in 신규 시작 410 · 단독 키 중지 409 안내 |
+| 6 | 사본 출처 | 세미프랜차이즈 사본을 편집 · 저장한 뒤에도 자료함 **출처 탭(세미프랜차이즈)과 라벨 · 이름이 유지** |
+| 7 | QR 네 경로 실제 실행 | 새 호스트에서 `/qr/:slug`(product · screen_set · link) · `/tablet/:slug?tabletId=` · `/multilingual-products/:publicKey?locale=` · `/foreign-visitor/affiliate/:shortCode` 각 1건 — 매장 · 상품 문맥 · 쿼리 유지, 제휴 화면에 은퇴 경로 링크 없음 |
+| 8 | 리다이렉트(웹 서비스 정비 트랙) | DESIGN §16-7 1단계 302 적용 후 같은 4경로를 옛 호스트로 스캔 → 새 호스트 착지 · 스캔 기록 증가. 301 은 그 뒤 |
+
+### 9-6. 통합과 분리 (이번 통합에 포함하지 않음)
+
+- 테스트 데이터 초기화(DESIGN §12, 비활성 E2E QR 4행 포함) — 별도 승인 · dry-run.
+- PH opt-in 데이터 정리(`pharmacy-hub` 키 · `offer_service_prices`) — PH 주문 종료 후 별도 승인, 키 단순 제거 금지(DESIGN §16-5).
+- 운영 DB 변경은 실행하지 않았다.

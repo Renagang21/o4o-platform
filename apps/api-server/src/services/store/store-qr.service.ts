@@ -25,6 +25,7 @@
  */
 
 import type { DataSource } from 'typeorm';
+import { resolveCanonicalServiceKey } from '@o4o/security-core';
 import { StoreQrCode } from '../../routes/platform/entities/store-qr-code.entity.js';
 import { StoreExecutionAsset } from '../../routes/platform/entities/store-execution-asset.entity.js';
 import { recordDerivations } from '../../routes/o4o-store/services/store-asset-derivation.service.js';
@@ -213,12 +214,22 @@ export async function resolvePublicQrLanding(
       console.error('[QR Scan Event] Insert failed:', err);
     });
 
-  const storeRows = await dataSource.query(
-    `SELECT slug FROM platform_store_slugs
+  // 매장(조직)은 서비스마다 slug 를 가질 수 있다(1 Store : N Services). storeSlug 는 종전대로 최신 slug.
+  const storeRows: Array<{ slug: string; service_key: string }> = await dataSource.query(
+    `SELECT slug, service_key FROM platform_store_slugs
      WHERE store_id = $1 AND is_active = true
-     ORDER BY created_at DESC LIMIT 1`,
+     ORDER BY created_at DESC`,
     [qrData.organizationId],
   );
+  // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1 (pharmacyhub.co.kr QR 착지 이전):
+  //   QR slug 는 전역 고유라 어느 호스트에서 열어도 같은 QR 을 찾는다. 다만 화면 구성(Screen Set 상품 노출 범위 ·
+  //   중첩 QR 주소)은 서비스 축을 쓰므로, 매장이 **호출 호스트 서비스의 slug 를 하나도 갖지 않을 때만** 매장의
+  //   최신 slug 서비스 축을 쓴다(예: 옛 pharmacy-hub 매장 QR 을 pharmacy.neture.co.kr 에서 연다).
+  //   호출 서비스 slug 가 있으면(여러 서비스에 걸친 매장 포함) 종전과 같다.
+  const callerServiceKey = serviceKey || 'kpa';
+  const callerCanonical = resolveCanonicalServiceKey(callerServiceKey);
+  const hasCallerSlug = storeRows.some((r) => resolveCanonicalServiceKey(r.service_key) === callerCanonical);
+  const effectiveServiceKey = !hasCallerSlug && storeRows[0]?.service_key ? storeRows[0].service_key : callerServiceKey;
 
   // WO-STORE-QR-PRODUCT-DIRECT-LINK-V1: product 타입이면 상품 정보 포함.
   //   landingTargetId 는 supplier_product_offers.id 또는 organization_product_listings.id 둘 다 가능.
@@ -381,7 +392,7 @@ export async function resolvePublicQrLanding(
       {
         organizationId: qrData.organizationId,
         screenSetId: qrData.landingTargetId,
-        serviceKey: serviceKey || 'kpa',
+        serviceKey: effectiveServiceKey,
         storeId: qrData.organizationId,
         storeSlug: storeRows[0]?.slug || null,
         // tabletContext 없음 → 매장 org 기준(대기영상 custom-only, 상품 org 기준).
