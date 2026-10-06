@@ -20,7 +20,7 @@ V1 은 `channel_type='B2C'` 매장 storefront 의 소비자 checkout → 결제 
 ### 2-1. B2B checkout 계약
 
 - **주문 생성은 `checkoutService.createOrder()` 단일 지점**(`apps/api-server/src/services/checkout.service.ts`). 독립 `*_orders` · `*_payments` 테이블을 만들지 않는다(`scripts/check-forbidden-tables.mjs`).
-- 현행 내부 주문 경로 = 공급자 → 매장 B2B(event-offer · Neture B2B · PharmacyHub → `store_cart_items` → `checkout_orders`). 주문 축의 세부 계약은 [B2B 계약](O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1.md) 이 정본이다.
+- 현행 내부 주문 경로 = 공급자 → 매장 B2B 4축 — event-offer · **승인축 B2B**(KPA Society · K-Cosmetics 승인 상품, `/store/cart/:serviceKey/checkout-confirm-b2b` → `StoreB2BCartCheckoutService`, order source `store_b2b_cart`) · Neture B2B · PharmacyHub — 모두 `store_cart_items` → `checkoutService.createOrder()` → `checkout_orders`. 주문 축의 세부 계약은 [B2B 계약](O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1.md) 이 정본이다.
 - **payment-first**: UNPAID 주문은 공급자 fulfillment · 배송 · 정산 대상이 아니다. `checkout_order` 의 paid 전이는 결제 완료 이벤트로만 일어난다(route 가 직접 조작하지 않는다).
 - 결제 진입은 B2B 전용 namespace 에만 둔다 — `/neture/b2b/payments/*` · `/kpa/b2b/payments/*` · `/cosmetics/b2b/payments/*`(`b2b-payment-controller.factory.ts`) · PharmacyHub `/store-owner/payments/*`. 각 진입은 허용 `metadata.serviceKey` · order source 집합으로 서비스 경계를 지킨다.
 
