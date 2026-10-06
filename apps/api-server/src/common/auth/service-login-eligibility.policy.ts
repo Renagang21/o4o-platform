@@ -40,10 +40,10 @@ export function resolveLoginMembershipGateKey(origin: string | undefined | null)
   } catch {
     return null;
   }
-  const owners = O4O_SERVICES.filter(
-    (svc) =>
-      svc.domain.toLowerCase() === host ||
-      (svc.legacyDomains ?? []).some((legacy) => legacy.toLowerCase() === host),
+  // `www.` 별칭은 같은 호스트로 본다(representative-entry 와 같은 규칙) — 별칭으로 게이트를 우회하지 못한다.
+  const bare = host.startsWith('www.') ? host.slice(4) : host;
+  const owners = O4O_SERVICES.filter((svc) =>
+    [svc.domain, ...(svc.legacyDomains ?? [])].some((d) => d.toLowerCase() === bare),
   );
   if (owners.length !== 1) return null;
   return owners[0].loginMembershipRequired ? owners[0].key : null;
