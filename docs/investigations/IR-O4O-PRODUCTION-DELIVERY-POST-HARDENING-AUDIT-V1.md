@@ -33,7 +33,8 @@ ROLLBACK                            = 0 / 21
 UNKNOWN_CLASSIFICATION              = 0 / 28 run
 UNEXPECTED_L3                       = 0 / 5    (L3 원인 commit)
 
-PROMOTE_REAPPROVAL_CASES            = 3    (HEAD 이동으로 승인 대상 SHA 가 원 변경 SHA 와 달라진 사례)
+PROMOTE_REAPPROVAL_CASES            = 0    (같은 묶음을 이전 SHA 로 승인한 뒤 다시 승인한 기록 — 확인 0)
+PROMOTE_SCOPE_EXTENSION_CASES       = 3    (L3 발생 뒤 commit 이 누적돼 승인 SHA 가 원 변경 SHA 와 달라진 사례)
   HEAD 불일치로 거절된 promote run   = 0
 PROMOTE_REAPPROVAL_POLICY_REVIEW    = NOT_NEEDED   (§4 — 재검토 조건은 §4-4)
 
@@ -152,7 +153,7 @@ Delivery 21건 중 배포를 실제로 한 것은 1건이다. 같은 main SHA �
 
 ## 4. Promote 재승인 현상 조사 (정책 변경 없음)
 
-`promote.yml` 은 `sha == main HEAD == workflow SHA` 를 요구한다. HEAD 가 움직이면 거절하고, 최신 SHA 로 다시 승인하게 한다. 그래야 승인 없이 뒤의 commit 이 섞이지 않는다. 이 창에서 이 규칙 때문에 "처음 L3 를 만든 SHA 와 실제 승인한 SHA 가 달라진" 사례를 셌다.
+`promote.yml` 은 `sha == main HEAD == workflow SHA` 를 요구한다. HEAD 가 움직이면 거절하고, 최신 SHA 로 다시 승인하게 한다. 그래야 승인 없이 뒤의 commit 이 섞이지 않는다. 이 창에서 "처음 L3 를 만든 SHA 와 실제 승인한 SHA 가 달라진" 사례를 셌다. 이 사례는 **승인 범위 확장**으로 부른다. 이전 SHA 로 승인한 뒤 다시 승인한 **재승인**과 구분하며, 재승인은 기록으로 입증될 때만 센다.
 
 ### 4-1. 사례
 
@@ -162,16 +163,16 @@ Delivery 21건 중 배포를 실제로 한 것은 1건이다. 같은 main SHA �
 | B | `9e2e95571` → `f66e908ef` | 1회 | `f66e908ef` **docs 전용**(46 파일) | 03:41Z → 03:59Z (약 18분) |
 | C | `b67a15a5b` → `4263d5fae` | 3회 | `85b50d8db` docs + `packages/ai-core` · `6a9ac2df4` auth UI(새 L3 사유) · `4263d5fae` auth UI(새 L3 사유) | 07:13Z → 00:25Z(+1일) (약 17시간) |
 
-- **HEAD 불일치로 거절된 promote run 은 0건이다.** 창 안의 promote 7건은 모두 dispatch 시점의 HEAD 와 일치했다. 재승인은 실패 run 으로 드러나지 않았다. 승인 요청 · 응답 단계에서 SHA 를 다시 고르는 방식으로 일어났다.
-- 승인 이전 SHA 로 승인을 받아 두었다가 HEAD 이동 때문에 다시 받은 것이 기록으로 확인되는 것은 **B 1건**이다([CHECK-O4O-RETIRED-WEB-RESIDUAL-CLEANUP-V1](../checks/CHECK-O4O-RETIRED-WEB-RESIDUAL-CLEANUP-V1.md) §4-1 "promote 는 main HEAD 기준이라 `f66e908ef` 로 진행"). A · C 는 승인 시점 기록이 저장소에 없다. 그래서 "승인 대상 SHA 가 원 SHA 와 달라졌다"는 사실까지만 확정한다.
+- **HEAD 불일치로 거절된 promote run 은 0건이다.** 창 안의 promote 7건은 모두 dispatch 시점의 HEAD 와 일치했다. 승인 SHA 변경은 실패 run 으로 드러나지 않았다. 승인 요청 시점에 최신 HEAD 를 대상으로 고르는 방식으로 반영됐다.
+- **이전 SHA 로 이미 승인한 뒤 다시 승인했다는 기록은 3건 모두에서 확인되지 않는다.** B 에 인용할 수 있는 [CHECK-O4O-RETIRED-WEB-RESIDUAL-CLEANUP-V1](../checks/CHECK-O4O-RETIRED-WEB-RESIDUAL-CLEANUP-V1.md) §4-1 도 "promote 는 main HEAD 기준이라 `f66e908ef` 로 진행"했다는 사실만 적는다. `9e2e95571` 승인이 먼저 있었다는 기록은 없다. A · C 는 승인 시점 기록이 저장소에 없다. 그래서 확정하는 사실은 세 묶음에서 L3 가 생긴 뒤 commit 이 더 쌓여 승인 SHA 가 달라졌다는 것까지다. 이 3건은 재승인 횟수 · 비용에 넣지 않는다.
 
-### 4-2. 지연
+### 4-2. 지연 (승인 범위 확장 기준 — 재승인 비용 아님)
 
-- **B**: 재승인 비용은 Delivery 1 cycle(약 3분)과 dry-run 1회 정도다. 운영 지연은 무시할 수준이다.
+- **B**: HEAD 이동 때문에 늘어난 몫은 `f66e908ef` 의 Delivery 1 cycle(약 3분)과 dry-run 1회가 상한이다. 운영 지연은 무시할 수준이다.
 - **A**: 3시간 중 대부분은 같은 시간대의 퇴역 웹 정리 작업(PR #306 · #307 · #305 연속 merge)을 기다린 시간이다. HEAD 고정 규칙이 직접 만든 지연은 아니다.
 - **C**: 17시간 중 마지막 약 16시간 동안 HEAD 는 `4263d5fae` 에 고정돼 있었다(08:07Z ~ 다음날 00:12Z). 지연은 사람의 승인 대기에서 왔고 HEAD 고정 규칙과는 무관하다. 같은 SHA 에 dry-run 이 2회(11:37Z · 00:09Z) 있었던 것도 HEAD 이동이 아니라 시간이 지난 뒤의 재확인이다.
 
-### 4-3. 안전성 기여
+### 4-3. 안전성 기여 (최신 HEAD 로 승인하게 한 효과)
 
 - **A — 기여 있음.** 승인 묶음에 `4cfcbf339`(배포 판정 스크립트 자체 + api 1 파일)가 들어 있었다. 원 SHA `57b1dc149` 로 승인했다면 판정기 변경이 승인자 눈에 띄지 않은 채 같이 배포됐을 것이다.
 - **B — 기여 없음.** docs 전용 이동이라 배포 산출물은 같다. 절차만 한 번 더 돈 것이다.
@@ -180,15 +181,16 @@ Delivery 21건 중 배포를 실제로 한 것은 1건이다. 같은 main SHA �
 ### 4-4. 판정
 
 ```text
-PROMOTE_REAPPROVAL_CASES          = 3   (안전 기여 2 · 순수 절차 1)
-HEAD 고정이 만든 실질 지연        = 약 3분 (B) — A · C 의 지연은 다른 원인
+PROMOTE_REAPPROVAL_CASES          = 0   (반복 승인 기록 없음)
+PROMOTE_SCOPE_EXTENSION_CASES     = 3   (안전 기여 2 · 절차만 1)
+HEAD 고정이 만든 실질 지연        = 상한 약 3분 (B) — A · C 의 지연은 다른 원인
 PROMOTE_REAPPROVAL_POLICY_REVIEW  = NOT_NEEDED
 ```
 
-3건 중 2건에서 재승인이 승인 범위를 실제로 넓혀 보여 주었다. 순수 절차 비용은 docs 전용 1건, 몇 분이었다. 지금 HEAD 고정 규칙을 완화할 근거는 없다.
+반복 승인이 일어났다는 증적은 없다. 승인 범위 확장 3건 중 2건에서는 최신 HEAD 로 승인하게 한 규칙이 새 위험 변경을 승인 범위에 드러냈다. 절차만 남은 경우는 docs 전용 1건이었고 비용은 몇 분이었다. 지금 HEAD 고정 규칙을 완화할 근거는 없다.
 
 **재검토 조건**(이 중 하나가 생기면 정책 검토 WO 를 연다):
-1. docs 전용(runtime diff 0) HEAD 이동 때문에 생긴 재승인이 한 번의 L3 묶음에서 2회 이상 반복되거나, 30일 안에 5회를 넘는다.
+1. docs 전용(runtime diff 0) HEAD 이동 때문에 생긴 재승인 또는 승인 범위 확장이 한 번의 L3 묶음에서 2회 이상 반복되거나, 30일 안에 5회를 넘는다.
 2. HEAD 이동으로 promote run 이 실제 거절돼 재실행한 사례가 나온다.
 3. 재승인 대기 때문에 운영 장애 대응 배포가 늦어진 사례가 나온다.
 
