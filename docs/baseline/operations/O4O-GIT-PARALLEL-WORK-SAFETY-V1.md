@@ -85,8 +85,14 @@ lockfile 이 어긋난 채 push 되면 실패한다. 즉 lockfile 동기화 요�
 미추적 파일 항목이 핵심이다. 미추적 파일은 push 되지 않으므로,
 다음 PC 에서 이어서 쓸 파일이 남아 있으면 **먼저 커밋하거나 명시적으로 포기**해야 한다.
 다음 PC 에서는 `/start` 로 동기화 · 인계(열린 PR 의 HANDOFF.md 포함)를 확인한 뒤,
-같은 branch 를 이어 쓰려면 그 branch 로 전용 worktree 를 만든다(`git worktree add "$WT_ROOT/<slug>" <branch>` —
-`WT_ROOT` 는 [`AGENTS.md` §4-1(a)](../../../AGENTS.md#4-1-parallel-session--worktree-policy) 의 공통 `.git` 기준 경로. 상대 경로 `../o4o-wt` 는 실행 위치에 따라 달라진다).
+같은 branch 를 이어 쓰려면 그 branch 로 전용 worktree 를 만든다:
+
+```bash
+WT_ROOT="$(dirname "$(dirname "$(git rev-parse --path-format=absolute --git-common-dir)")")/o4o-wt"
+git worktree add "$WT_ROOT/<slug>" <branch>
+```
+
+경로 기준과 PowerShell 형태는 [`AGENTS.md` §4-1(a)](../../../AGENTS.md#4-1-parallel-session--worktree-policy). 상대 경로 `../o4o-wt` 는 실행 위치에 따라 달라지므로 쓰지 않는다.
 
 ### stash
 
