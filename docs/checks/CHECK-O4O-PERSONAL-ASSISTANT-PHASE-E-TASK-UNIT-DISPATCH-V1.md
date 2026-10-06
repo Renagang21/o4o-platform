@@ -95,6 +95,7 @@ Assistant(서버)의 DOM 명령 하나 = Cloud DB 큐 왕복 1회(노드 polling
 4. `not_ready` 재시도(probe) 의 stepCount 환산은 근사치.
 5. planner(LLM) 지연은 모델에 넣지 않았다 — 실환경 총시간 비중은 측정 필요.
 6. agent 0.3.0 은 사용자 PC 수동 업데이트가 필요하다(미업데이트 노드는 예전 속도).
+7. (기존 동작 · 이번 범위 밖) 저장 절차의 `set_input` 값은 workflow 상 200자까지 저장되지만 재생 시 100자(`DOM_QUERY_VALUE_MAX`)로 잘린다 — 단발 재생(`validateWorkProposal`)도 main 에서 같게 자르므로 단위 경로는 parity 를 유지한다. 한도 정합은 별도 WO 후보(PR #325 Codex P2 지적에서 확인).
 
 ## 9. 배포 영향
 
@@ -105,4 +106,4 @@ Assistant(서버)의 DOM 명령 하나 = Cloud DB 큐 왕복 1회(노드 polling
 ## 10. 문서 정합
 
 V2 §11-2 (Phase E 구현 · 멈춤 목록 · P3 · 단발 유지/유실 비재전송) · §23 L5 (해소 범위 · 남은 한계) 갱신 · agent README capability 표에 `taskUnit` · 0.3.0 안내 추가.
-발견 0건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 0건.
+발견 0건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 1건(Known Gap 7 — 코드 한도 정합).
