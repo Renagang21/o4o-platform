@@ -94,3 +94,59 @@
 4. 최신 HEAD 에 대한 외부(Codex) 리뷰 부재 — **미완료로 기록**. 반복 요청으로 다른 마무리 작업을 막지 않는다(2026-10-06 결정).
 
 `427a715d3` 는 QR 서비스 축 판정만 바꿨고 단일 서비스 PH 매장의 결과는 같아 브라우저 QR 검증(#18 · #19)은 다시 하지 않았다(단위 테스트로 두 경우 확인).
+
+## 9. 통합 · 운영 전환 체크리스트 (2026-10-06)
+
+PR #308 은 draft · merge 보류. 아래는 main 통합 결정과 운영 전환에 쓰는 목록이며, 각 단계의 실행은 사용자 승인 후다. 기존 PH 서버 · 도메인 · 인증서는 운영 검증 전까지 보존한다.
+
+### 9-1. 통합 전
+
+| 항목 | 상태 |
+|---|---|
+| 최신 HEAD 필수 검사 | PASS — `259fe7939` 기준 SonarCloud · API Jest 3/3 · Web build · Guard · CodeQL · CI Gate. 이 체크리스트 커밋 후 HEAD 재확인 필요 |
+| 최신 HEAD Codex 리뷰 | **미완료**(unknown error 2회). 직접 리뷰로 대체 기록(§8). 반복 요청하지 않음 |
+| main 과의 차이 | main 이 5 커밋 앞섬(문서 · debug route 제거). 충돌 없음 · migration 변경 없음 → merge 직전 브랜치 갱신 후 CI 재실행 |
+
+### 9-2. main 통합 시 자동 실행 범위 (현재 CI/CD 기준, 2026-10-06 확인)
+
+| 항목 | 내용 |
+|---|---|
+| 트리거 | push to main → `ci-pipeline.yml` → 완료 시 `delivery.yml`(workflow_run, `DELIVERY_ENFORCE=true`) → `deploy-orchestrate.mjs` 분류. 옛 `deploy-auto.yml` 은 비활성, `deploy-api.yml` · `deploy-web-services.yml` 은 push 트리거 없음 |
+| 위험 분류(`deploy-risk.mjs` 로컬 실행) | **api = LEVEL_3** — db-migration · payment · rbac · access-control 경로 포함. neture · kpa-society · pharmacy-hub · store = LEVEL_2 |
+| 결과 | api 는 `AUTO_DEPLOY_BLOCKED`(LEVEL_3 HOLD) → **merge 만으로 API 배포 · migration 은 실행되지 않는다**. API 미배포 시 같은 WO 키를 가진 프런트도 `HELD_API_NOT_DEPLOYED` 로 보류되는 것으로 판단(추론 — merge 후 delivery 결과로 확인) |
+| 배포 경로 | 수동 `promote.yml`(대상 sha = main HEAD) — 사용자 승인 필요 |
+| 배포 HOLD 상태 | `DEPLOY_FREEZE=false`(2026-10-03 설정). 이 PR 을 막는 것은 LEVEL_3 분류뿐. 다른 트랙의 HOLD 는 해제 · 변경하지 않는다 |
+
+### 9-3. migration 적용 순서 · 배포 순서
+
+1. migration `1791200000000-CreateNeturePharmacyCommerce` — main 최신 `AddLocalAgentDeviceCapabilities1791177033073` 다음(manifest · expected state 반영). 새 테이블 6(`neture_pharmacy_memberships` · `semi_franchises` · `semi_franchise_memberships` · `semi_franchise_operators` · `supply_proposals` · `semi_franchise_contents`), 기존 테이블 컬럼 · 제약 변경(`store_cart_items` · `seller_recruitments` · `seller_recruitment_applications` · `idx_org_listing_unique_v2`), 기준 행 2(세미프랜차이즈 조직 · `pharmacy`, `ON CONFLICT DO NOTHING`). `NULLS NOT DISTINCT` 사용 — 운영 DB PostgreSQL 15 확인.
+2. 실행 위치: `deploy-api.yml` 의 Cloud Run Job `o4o-api-migrations` — **API 배포 직전**에 실행, 실패하면 배포 중단 · 기존 revision 유지. 수동 적용 금지(PRODUCTION-MIGRATION-STANDARD).
+3. 배포 순서: API(migration → 배포 → revision traffic 100% 확인) → 프런트(store · neture · kpa-society · pharmacy-hub). 배포 완료 판정 = job success + 새 revision + traffic 100%.
+4. 배포 후 읽기 확인: `typeorm_migrations` 최신 행 · 새 테이블 존재 · 기준 행 2.
+
+### 9-4. 결제 설정
+
+| 항목 | 내용 |
+|---|---|
+| 기본(미설정) | `NETURE_PHARMACY_PAYMENT_MODE` 미설정 + `NODE_ENV=production` → `disabled` · 결제 시작 503 `PAYMENT_NOT_CONFIGURED`(fail-closed) |
+| live | 항상 503 `PAYMENT_PROVIDER_NOT_SELECTED` — **live 결제 차단**(PG 미선정 D1) |
+| test | 값 `test` 일 때만 테스트 결제. 현재 `deploy-api.yml` 이 이 변수를 주입 · 보존하지 않아 콘솔 수동 설정은 다음 API 배포에 지워진다 → 운영 test 결제를 쓰려면 workflow 변경(인프라 · 사용자 승인) 또는 smoke 직전 설정 후 재배포 전 확인. 설정 여부 자체가 사용자 결정 |
+
+### 9-5. 운영 smoke (배포 후, 실브라우저)
+
+| # | 항목 | 확인 |
+|---|---|---|
+| 1 | 가입 | 약국 기본 가입 신청 · 미가입 상태에서도 내 매장 진입 |
+| 2 | 승인 | Neture 운영자 승인 → role · 매장 연결, 반려 · 재신청 |
+| 3 | 내 매장 | 약국 매장 화면 · 세미프랜차이즈 가입 · 콘텐츠 자료함 열람 · 사본 |
+| 4 | 주문 | 공급 상품 → 장바구니 → 주문(결제 설정에 따라 test 결제 또는 503 확인) |
+| 5 | 공급자 처리 | 공급자 주문 목록 · 수락 · 발송, PH opt-in 신규 시작 410 · 단독 키 중지 409 안내 |
+| 6 | 사본 출처 | 세미프랜차이즈 사본을 편집 · 저장한 뒤에도 자료함 **출처 탭(세미프랜차이즈)과 라벨 · 이름이 유지** |
+| 7 | QR 네 경로 실제 실행 | 새 호스트에서 `/qr/:slug`(product · screen_set · link) · `/tablet/:slug?tabletId=` · `/multilingual-products/:publicKey?locale=` · `/foreign-visitor/affiliate/:shortCode` 각 1건 — 매장 · 상품 문맥 · 쿼리 유지, 제휴 화면에 은퇴 경로 링크 없음 |
+| 8 | 리다이렉트(웹 서비스 정비 트랙) | DESIGN §16-7 1단계 302 적용 후 같은 4경로를 옛 호스트로 스캔 → 새 호스트 착지 · 스캔 기록 증가. 301 은 그 뒤 |
+
+### 9-6. 통합과 분리 (이번 통합에 포함하지 않음)
+
+- 테스트 데이터 초기화(DESIGN §12, 비활성 E2E QR 4행 포함) — 별도 승인 · dry-run.
+- PH opt-in 데이터 정리(`pharmacy-hub` 키 · `offer_service_prices`) — PH 주문 종료 후 별도 승인, 키 단순 제거 금지(DESIGN §16-5).
+- 운영 DB 변경은 실행하지 않았다.

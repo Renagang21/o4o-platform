@@ -64,7 +64,7 @@ Neture(neture.co.kr) 약국 서비스를 **약국별 하나의 내 매장**에�
 - [x] 6-2f QR 4행 행별 기록 · 인쇄 QR 보존 분리(§16-3) · 경로 보존 리다이렉트 구현안 · 검증 방법(§16-7) — 운영 DB 변경 · 도메인 전환 미실행. QR 4행은 테스트 데이터 초기화 대상으로 결정(§12). 리다이렉트 4경로 새 화면 · 문맥 · 쿼리 코드 대조 — 차단 격차 없음, 301 전 조건 4건(§16-7)
 - [x] 6-3 정본 문서 반영 — Supplier Domain §4 · F8 §5 · B2B 계약 Axis D/§13 `350d9abb1` · CANONICAL-INDEX §1 등재(PR #304 통합 후, 2026-10-05)
 - [ ] 6-4 테스트 데이터 초기화 — 범위 확정(DESIGN §12). **운영 DB write 는 사용자 승인 대기 · 미실행**
-- [ ] 6-5 CI · PR · 완료 보고 — PR #308 (draft) CI 확인 중. main 통합 · 배포 · migration 운영 적용은 사용자 승인 후
+- [ ] 6-5 CI · PR · 완료 보고 — PR #308 (draft) 최신 HEAD 필수 검사 PASS · Codex 미완료. 통합 · 운영 전환 체크리스트(자동 실행 범위 · migration/배포 순서 · 결제 설정 · 운영 smoke · 분리 항목) [CHECK §9](../checks/CHECK-NETURE-PHARMACY-STORE-COMMERCE-LOCAL-BROWSER-V1.md). main 통합 · 배포 · migration 운영 적용은 사용자 승인 후
 
 ### 단계 1 조사 핵심 사실 (설계 1-7 의 입력 — 상세 근거는 IR)
 - **기본 가입이 없다**: `pharmacy.neture.co.kr` = serviceKey `kpa-society` · role `kpa:*`. 매장 기본 API 전부가 `isStoreOwner(...,'kpa')`(kpa-society active membership + `kpa:store_owner` + 조직 연결)를 요구 → §3-1 "미가입이어도 내 매장" 과 정면 충돌. 자격 확인은 사실상 없음(`license_verified` 쓰는 코드 0).

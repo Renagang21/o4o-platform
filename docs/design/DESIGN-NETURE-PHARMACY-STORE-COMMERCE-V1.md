@@ -554,8 +554,8 @@ pathRules:
 | `/multilingual-products/:publicKey` | 존재(공개) | public key 전역 조회 → 같은 상품 · 매장 | `locale` · `mode=tablet` 양쪽 동일 |
 | `/foreign-visitor/affiliate/:shortCode` | 존재(공개) | shortCode 전역 조회 → 같은 제휴 매장 | 그대로 |
 
-판정: **차단 격차 없음**. 1단계 302 → 검증 → 301 전환 전에 웹 서비스 정비 트랙이 확인 · 정리할 조건(이 PR 범위 밖, 기존 KPA 화면 동작):
-1. 제휴 페이지 "매장 안내 보기" 가 은퇴한 `/store/{slug}` 로 연결돼 404(`ForeignVisitorAffiliatePublicLandingPage`) — PH 화면에는 없던 링크라 리다이렉트 후 회귀. 301 전 링크 숨김 또는 대상 교체 필요.
+판정: **차단 격차 없음**. 아래 1 은 **해당 경로의 302 전환 전 해결 조건**이며 이 PR 에서 해결했다. 2~4 는 1단계 302 → 검증 → 301 전환 전에 웹 서비스 정비 트랙이 확인 · 정리할 조건(이 PR 범위 밖, 기존 KPA 화면 동작):
+1. ~~제휴 페이지 "매장 안내 보기" 가 은퇴한 `/store/{slug}` 로 연결돼 404~~ → **해결(2026-10-06)**: 매장 공개 storefront 는 `WO-O4O-KPA-INTERNAL-STOREFRONT-RETIREMENT-V1` 로 폐지된 기능이므로 링크를 제거하고 PH 화면과 같은 안내 문구(상품별 QR 안내 · 직원 문의)만 표시(`services/web-kpa-society/.../ForeignVisitorAffiliatePublicLandingPage.tsx`).
 2. product QR "제품 보기" 가 B2C 비공개 상품이면 404(상품 요약 · 설명서는 화면 안에 표시됨, §16-2).
 3. link QR 은 자동 이동 대신 안내 카드 표시 · 대상 콘텐츠가 삭제된 page QR 은 `/content/:id` 로 떨어짐 — PH 와 동작 차이.
 4. 다국어 · 제휴 화면의 서비스명 표기가 "KPA-Society" — Neture 약국 기준 문구 정비.
