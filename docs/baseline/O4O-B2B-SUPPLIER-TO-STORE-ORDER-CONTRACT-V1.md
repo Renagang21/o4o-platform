@@ -6,7 +6,7 @@
 > **위상**: 조사 보고서가 아니라 **공급자→매장 B2B 주문 축을 고정하는 canonical 계약 문서**다.
 > **선행 문서**: [`O4O-STORE-COMMERCE-BOUNDARY-V1`](O4O-STORE-COMMERCE-BOUNDARY-V1.md) · [`O4O-BUSINESS-PHILOSOPHY-V1`](O4O-BUSINESS-PHILOSOPHY-V1.md) · [`O4O-3-ROLE-FLOW-BASELINE-V1`](O4O-3-ROLE-FLOW-BASELINE-V1.md)
 > **회귀 가드**: `apps/api-server/src/__tests__/b2b-supplier-to-store-order-canonical-contract.spec.ts`
-> **정정 이력**: 2026-09-24 · `WO-O4O-B2B-ORDER-CONTRACT-EVENT-OFFER-PAYMENT-FIRST-DOC-ALIGNMENT-V1` — §5-1(Axis A · Event Offer = 특가 · payment-first) · §3(결제 축 producer 4종) · §8(KPA · K-Cosmetics 행). 2026-10-06 · `WO-O4O-CANONICAL-INDEX-S9-POLICY-DECISION-ALIGNMENT-V1` — §4 · §5 의 "3개 축" 정정 주석(현행 주문 경로 5개) · §6 흐름도의 Axis A 를 payment-first 로 정정(2026-09-24 §5-1 정정의 누락분) · §4 결제 축 행에 Axis D 의 PaymentCore 미경유 `neture-pharmacy` 기록 경로 등록. 나머지 절은 불변이며 문서 전체는 **Active** 다.
+> **정정 이력**: 2026-09-24 · `WO-O4O-B2B-ORDER-CONTRACT-EVENT-OFFER-PAYMENT-FIRST-DOC-ALIGNMENT-V1` — §5-1(Axis A · Event Offer = 특가 · payment-first) · §3(결제 축 producer 4종) · §8(KPA · K-Cosmetics 행). 2026-10-06 · `WO-O4O-CANONICAL-INDEX-S9-POLICY-DECISION-ALIGNMENT-V1` — §4 · §5 의 "3개 축" 정정 주석(현행 주문 경로 5개) · §6 흐름도의 Axis A 를 payment-first 로 정정(2026-09-24 §5-1 정정의 누락분) · §4 결제 축 행에 Axis D 의 PaymentCore 미경유 `neture-pharmacy` 기록 경로 등록 · §8 서비스별 요약에 승인축 B2B(KPA Society · K-Cosmetics) 와 Neture 약국 매장(Axis D) 추가. 나머지 절은 불변이며 문서 전체는 **Active** 다.
 
 ---
 
@@ -303,12 +303,15 @@ Axis A 의 `checkout-confirm` 은 **주문 확정**이지 소비자 결제가 �
 
 ## 8. 서비스별 계약 요약
 
+> **(2026-10-06 정정)** 이 표는 §5 정정 주석의 현행 주문 경로 5개를 모두 담는다 — KPA Society · K-Cosmetics 행에 **승인축 B2B**(§13 · §13-6) 를, **Neture 약국 매장**(Axis D) 행을 추가했다. 이전 표는 Axis A · B · C 만 있었다.
+
 | 서비스 | B2B 주문 축 | 매장(buyer) | 공급자(seller) 화면 | 비고 |
 |---|---|---|---|---|
-| **KPA Society** | Axis A (`kpa-groupbuy`) · **payment-first** | 있음 — 장바구니 · `/kpa/checkout/orders` · 결제 `/kpa/b2b/payments/*` | 없음 (Neture 측이 정본) | 관심상품 주문 작업대는 **안내 전용**. 소비자→매장 판매 leg 은 410 은퇴(B2B 결제와 별개 축) |
-| **K-Cosmetics** | Axis A (`k-cosmetics-event-offer`) · **payment-first** | 있음 — 장바구니 · `/cosmetics/orders` · 결제 `/cosmetics/b2b/payments/*` | 없음 | 조회 경로만 `/checkout` 접두어가 없다 (§10 DF-1) |
+| **KPA Society** | Axis A (`kpa-groupbuy`) + **승인축 B2B** (order source `store_b2b_cart`) · 둘 다 **payment-first** | 있음 — 장바구니 · `/kpa/checkout/orders` · 결제 `/kpa/b2b/payments/*`. 승인축 B2B 확정은 `/store/cart/:serviceKey/checkout-confirm-b2b`(`StoreB2BCartCheckoutService`, 결제 축 `store-b2b`) | 없음 (Neture 측이 정본) | 관심상품 주문 작업대는 **안내 전용**. 소비자→매장 판매 leg 은 410 은퇴(B2B 결제와 별개 축) |
+| **K-Cosmetics** | Axis A (`k-cosmetics-event-offer`) + **승인축 B2B** (order source `store_b2b_cart`) · 둘 다 **payment-first** | 있음 — 장바구니 · `/cosmetics/orders` · 결제 `/cosmetics/b2b/payments/*`. 승인축 B2B 확정은 KPA 와 같은 `/store/cart/:serviceKey/checkout-confirm-b2b` | 없음 | 조회 경로만 `/checkout` 접두어가 없다 (§10 DF-1) |
 | **PharmacyHub** | Axis C | 있음 — 자체 라우트 표면 | 없음 (서비스에 supplier 역할 없음) | `O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1` |
 | **Neture** | Axis B | 있음 | 있음 — `/api/v1/neture/supplier/orders*` = **공급자 화면 canonical** | 다른 서비스가 복제하지 않는다 |
+| **Neture 약국 매장** (`service_key='neture-pharmacy'`) | **Axis D** (order source `neture_pharmacy_cart`) · **payment-first** (현재 테스트 결제만, §4 결제 축 정정) | 있음 — `/api/v1/neture/pharmacy/cart*` · `/pharmacy/cart/checkout` · `/pharmacy/orders` · 결제 `/pharmacy/payments/{prepare,confirm}` | Neture 공급자 화면(bridge tag `neture_pharmacy_cart`, §13-5) | 상세 [`DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1`](../design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md) §8 |
 
 **불변식 S1.** 공급자(seller) 의 B2B 주문 화면은 **Neture 측이 canonical** 이다.
 KPA · K-Cosmetics · PharmacyHub 에 공급자 주문 화면을 다시 만들지 않는다.
