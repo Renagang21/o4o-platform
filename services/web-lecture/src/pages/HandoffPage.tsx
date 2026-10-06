@@ -48,7 +48,7 @@ export default function HandoffPage() {
   }, [returnTo]);
   if (!error) return <main className="center-card"><section className="card"><h1>O4O 강의</h1><p>서비스 이동 중...</p></section></main>;
   if (MEMBERSHIP_CODES.has(code)) {
-    const backToPublic = returnTo !== '/' && isPublicLecturePath(returnTo);
+    const backToPublic = isPublicLecturePath(returnTo);
     return <main className="center-card"><section className="card">
       <h1>강의 서비스 이용 자격이 필요합니다</h1>
       <p>O4O 계정 로그인은 완료되었습니다. {error}</p>
