@@ -23,7 +23,7 @@
 | Cloud DNS · Secret · SA · bucket | 없음 | 해당 없음 |
 | 외부 DNS (gabia) | A `siteguide.co.kr` · A `www.siteguide.co.kr` → O4O LB IP, CNAME `_acme-challenge` · `_acme-challenge.www` | **사용자 작업** (§3) |
 | 동작 (정리 전) | `https://(www.)siteguide.co.kr/` → 200 **O4O 기본 화면**(neture-web, cert entry 는 있고 host rule 이 없어 LB default) | 정리 대상 |
-| 플랫폼 문의 유형 `'siteguide'` | API `PlatformInquiry` 타입 · 제목 라벨, web-neture `VaultInquiriesPage` 필터 · 라벨. 운영 `platform_inquiries` 에 `type='siteguide'` **2행** | **유지 — 결정 필요** (§4) |
+| 플랫폼 문의 유형 `'siteguide'` | API `PlatformInquiry` 타입 · 제목 라벨, web-neture `VaultInquiriesPage` 필터 · 라벨. 운영 `platform_inquiries` 에 `type='siteguide'` **2행** | **2행 삭제 · 코드 정리** (§5, 2026-10-06 사용자 결정) |
 
 ## 2. 삭제 (2026-10-05 · production · 정의 백업 후)
 
@@ -90,9 +90,36 @@ O4O 쪽 연결은 끊겼지만 DNS 가 아직 O4O LB 를 가리킨다. 아래 4�
 
 ## 4. 남은 항목 · 결정 필요
 
-- **플랫폼 문의 유형 `'siteguide'`** — 운영 데이터 2행이 이 값을 쓴다. 코드에서만 지우면 Neture 관리자 문의 화면에서 그 2행의 유형 라벨이 비고 필터로 찾을 수 없다.
-  제거하려면 먼저 2행 처리(삭제 또는 `other` 재분류 — DB write, 별도 승인)가 필요하고, 그 뒤 API 타입 · 라벨 · `VaultInquiriesPage` 의 값을 함께 지운다. 문의 접수 API 는 유형 화이트리스트가 없어 지금도 런타임 영향은 없다.
+- ~~플랫폼 문의 유형 `'siteguide'`~~ — **해소** (§5): 사용자 결정(2026-10-06)으로 `other` 재분류 대신 2행 삭제 후 코드 정리.
 - gabia DNS (§3-1) — 사용자 작업 후 **현재 DNS 접근 차단 확인 완료** (2026-10-06, §3-1-a). 레코드 4개 실제 삭제 · zone 삭제는 **미확인**(gabia 설정 화면 확인 시 종결)
 - 도메인 등록 해지 · 자동갱신 — 이번 범위 밖
 - 기록물(checks · investigations · archive · work-orders) 의 siteguide 서술 — 과거 기록이라 그대로 둔다
 - 발견(범위 밖): `infra/artifact-registry/README.md` 의 `cloud-run-source-deploy` repository 도 현재 존재하지 않고, 표의 보존 정책(keep 50 · 30일)은 실제 적용값(keep 10 · tagged 30일 · untagged 7일)과 다르다 — 별도 정비
+
+## 5. 플랫폼 문의 유형 `'siteguide'` 정리 (2026-10-06)
+
+**사용자 결정**: 기존 문의는 테스트 데이터이고 siteguide 는 폐기했으므로 `other` 로 옮겨 보존하지 않고 **삭제**한다. 다른 유형의 문의는 유지한다.
+
+### 5-1. 운영 DB 삭제 (production · 사용자 승인)
+
+| 확인 | 결과 |
+|---|---|
+| 대상 재확인 (read-only) | `platform_inquiries` 전체 3행 = `siteguide` 2 · `platform` 1. 대상 2행 모두 2026-01-26 생성 · 상태 `new` (개인정보 컬럼은 조회 · 기록하지 않음) |
+| 종속 데이터 | `platform_inquiries` 를 참조하는 FK 0 · 트리거 0. 공개 스키마의 uuid 컬럼 전체와 알림 · 감사 · 로그 · 이벤트 계열 텍스트/JSON 컬럼 1,007개에서 두 id 검색 → **0건**(시간 초과 0) — 함께 지울 종속 데이터 없음 |
+| 삭제 | 단일 트랜잭션 · 가드: 사전 대상 수 = 2 · id 일치 · 삭제 행 수 = 2 · 다른 유형 행 수 불변 — 하나라도 어긋나면 전체 롤백 |
+| 결과 | `pre_total=3 · pre_target=2 · pre_other=1 · deleted=2 · post_total=1` → 남은 데이터 `platform=1` |
+
+삭제한 행은 백업하지 않았다(테스트 데이터 · 개인정보 컬럼 포함 — 사용자 결정으로 보존 불필요).
+
+### 5-2. 코드 정리
+
+| 파일 | 변경 |
+|---|---|
+| `apps/api-server/src/entities/PlatformInquiry.ts` | `InquiryType` 에서 `'siteguide'` 제거 · 용도/`source` 주석의 siteguide 예시 제거. 컬럼은 `varchar` 그대로 — **스키마 · migration 변경 없음** |
+| `apps/api-server/src/controllers/platformInquiryController.ts` | 알림 메일 제목 접두어 `INQUIRY_TYPE_LABELS.siteguide` 제거 |
+| `services/web-neture/src/pages/admin-vault/VaultInquiriesPage.tsx` | 유형 타입 · `TYPE_LABELS` · 유형 필터 `<option>` · 화면 설명 · 헤더 주석에서 siteguide 제거 |
+
+유지: 문의 접수(`POST /api/v1/platform/inquiries`) · 관리자 목록/상세/상태 변경 동작 — 유형 값 검증 방식(화이트리스트 없음)도 바꾸지 않았다(API 계약 변경 범위 밖). KPA `JoinInquiryForm`(`/api/v1/join/inquiry`) · 서비스 문의(`contact_inquiries`)는 다른 축이라 무관.
+historical migration(`CreateSiteGuideTables` · `DropSiteGuideSchema`) · 기록 문서는 유지.
+
+이로써 siteguide 문의 데이터 때문에 남겨 두었던 런타임 코드 참조는 0 이다(남은 참조: `packages/ai-core/README.md` 의 폐기 확정 문구 · historical migration · 기록 문서).

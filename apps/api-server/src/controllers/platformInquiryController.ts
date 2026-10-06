@@ -20,7 +20,6 @@ const inquiryRepo = () => AppDataSource.getRepository(PlatformInquiry);
 
 // 문의 유형별 제목 접두어
 const INQUIRY_TYPE_LABELS: Record<InquiryType, string> = {
-  siteguide: '[SiteGuide 도입 문의]',
   platform: '[o4o 플랫폼 문의]',
   partnership: '[제휴 문의]',
   other: '[기타 문의]',
