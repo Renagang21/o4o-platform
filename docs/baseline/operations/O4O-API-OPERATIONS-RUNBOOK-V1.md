@@ -2,7 +2,7 @@
 
 > **상태**: ACTIVE · **작성일**: 2026-10-06 · `WO-O4O-CANONICAL-INDEX-S9-POLICY-DECISION-ALIGNMENT-V1`
 > **대체**: [`INTERNAL-BETA-RUNBOOK-V1`](INTERNAL-BETA-RUNBOOK-V1.md)(SUPERSEDED — Internal Beta 단계 종료, 2026-10-06 판정)
-> **범위**: `o4o-core-api`(Cloud Run)의 상시 운영 점검 — health · 인증 · API 오류/지연 · 데이터 계층 상태. 지표를 새로 만들지 않는다. **지금 실제로 관측되는 것만** 다룬다.
+> **범위**: `o4o-core-api`(Cloud Run)의 상시 운영 점검 — health · 인증 · API 오류/지연 · DB · 읽기 캐시 상태. 지표를 새로 만들지 않는다. **지금 실제로 관측되는 것만** 다룬다.
 > **DB 접속 · 배포 절차**: [`SETUP.md`](../../../SETUP.md) · [`PRODUCTION-MIGRATION-STANDARD`](PRODUCTION-MIGRATION-STANDARD.md) 가 정본이다. 이 문서는 그것을 복제하지 않는다.
 
 ---
@@ -27,7 +27,7 @@
 | **API 오류** | 5xx 비율 | Cloud Run 요청 지표(응답 코드별) · 로그의 error | 5xx 지속 발생 |
 | **API 지연** | 응답 지연 | Cloud Run 요청 지연 지표(p50 / p95) | 평소 대비 지속 상승 |
 | **DB** | ping · 연결 | `/api/health/database` → 장시간 쿼리는 read-only 채널로 `pg_stat_activity` 확인(SETUP.md) | 503 · ping 지연 지속 |
-| **캐시(Redis)** | 장애 시 동작 | 로그 `[ReadCache] GET error, falling back to DB` | 반복 출력 — 기능은 DB fallback 으로 유지되지만 응답 지연이 늘어난다 |
+| **읽기 캐시(in-process)** | 프로세스 로컬 TTL 캐시 오류 | 로그 `[ReadCache] GET error, falling back to DB` · `[ReadCache] SET error`(`cache/read-cache.ts` — `memoryCacheGet()` · 캐시 값 역직렬화 실패 시에만 출력) | 반복 출력 — 기능은 DB fallback 으로 유지되지만 DB 부하 · 응답 지연이 늘어난다. **Redis 장애 신호가 아니다** — `o4o-core-api` 는 Redis 를 쓰지 않는다(Redis 제거 후 in-process 캐시, 인스턴스마다 따로 비고 TTL 로만 만료) |
 
 ## 3. 대응 원칙
 
