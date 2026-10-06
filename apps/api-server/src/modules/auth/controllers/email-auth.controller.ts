@@ -11,6 +11,7 @@
 import { Request, Response } from 'express';
 import type { AuthRequest } from '../../../common/middleware/auth.middleware.js';
 import { resolveSessionServiceKey } from '../../../utils/session-origin.js';
+import { resolveLoginMembershipGateKey } from '../../../common/auth/service-login-eligibility.policy.js';
 import { getTrustedClientIp } from '../../../utils/trusted-client-ip.js';
 import { BaseController } from '../../../common/base.controller.js';
 import { authenticationService } from '../../../services/authentication.service.js';
@@ -92,7 +93,12 @@ export class EmailAuthController extends BaseController {
   static async login(req: Request, res: Response): Promise<any> {
     const { email, password, includeLegacyTokens } = req.body as EmailLoginRequestDto;
     try {
-      const session = await emailAuthService.login({ email, password, ...meta(req) });
+      const session = await emailAuthService.login({
+        email,
+        password,
+        ...meta(req),
+        loginMembershipGateKey: resolveLoginMembershipGateKey(req.get('origin')),
+      });
       authenticationService.setAuthCookies(req, res, session.tokens);
 
       const user = session.user;

@@ -5,8 +5,11 @@
  *
  * 기존 서비스와 동일 계약:
  *   - WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: 로그인 진입은 Google 하나다
- *     (POST /auth/google/login · /auth/google/signup → backend 가 service_memberships 검증)
- *   - 미가입자는 401 SERVICE_NOT_MEMBER 로 차단 (자동 편입 없음)
+ *     (POST /auth/google/login · /auth/google/signup)
+ *   - 미가입자도 로그인은 된다 — 가입 신청(/join)이 이 호스트의 로그인 뒤에 있다.
+ *     미가입 · 대기는 MembershipGate 가 /join 으로 보낸다 (자동 편입 없음).
+ *     로그인 자체를 SERVICE_NOT_MEMBER 로 막는 서비스는 api-server service-catalog 의
+ *     `loginMembershipRequired` 가 정한다 (WO-O4O-SERVICE-NOT-MEMBER-AUTH-CONTRACT-RESTORATION-V1)
  *   - 세션 복구는 GET /auth/me
  *
  * Foundation 범위이므로 역할 선택/전환 UI 는 넣지 않는다 (후속 WO).
