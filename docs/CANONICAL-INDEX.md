@@ -161,7 +161,7 @@
 | [O4O-GIT-PARALLEL-WORK-SAFETY-V1](baseline/operations/O4O-GIT-PARALLEL-WORK-SAFETY-V1.md) | 다중 PC · 다중 세션 Git 안전 — path-specific stage · Safe Commit · PC 이동 · 완료 조건 | ACTIVE |
 | [PRODUCTION-MIGRATION-STANDARD](baseline/operations/PRODUCTION-MIGRATION-STANDARD.md) | 프로덕션 마이그레이션 표준 (CI/CD 자동 실행 원칙) | ACTIVE |
 | [O4O-API-SERVER-SCRIPTS-INVENTORY-V1](baseline/operations/O4O-API-SERVER-SCRIPTS-INVENTORY-V1.md) | `apps/api-server/src/scripts/**` 상태 분류(ACTIVE · PAUSED · LEGACY) · DB 로그인 identity fail-fast 규칙 | ACTIVE |
-| [O4O-API-OPERATIONS-RUNBOOK-V1](baseline/operations/O4O-API-OPERATIONS-RUNBOOK-V1.md) | `o4o-core-api` 상시 운영 점검 최소 기준 — health · 배포 반영 · 인증 · API 오류/지연 · DB · Redis. Internal Beta 종료(2026-10-06 판정 확정)로 INTERNAL-BETA-RUNBOOK-V1 을 대체 | ACTIVE |
+| [O4O-API-OPERATIONS-RUNBOOK-V1](baseline/operations/O4O-API-OPERATIONS-RUNBOOK-V1.md) | `o4o-core-api` 상시 운영 점검 최소 기준 — health · 배포 반영 · 인증 · API 오류/지연 · DB · 읽기 캐시(in-process — `o4o-core-api` 는 Redis 를 쓰지 않는다). Internal Beta 종료(2026-10-06 판정 확정)로 INTERNAL-BETA-RUNBOOK-V1 을 대체 | ACTIVE |
 | [DEBUG-SSR-TEST-PAGE-GUIDE-V1](platform/debug/DEBUG-SSR-TEST-PAGE-GUIDE-V1.md) | JSON 디버그 SSR 테스트 페이지 — 비프로덕션 · 읽기 전용, 상태 변경은 CLI(`CLAUDE.md` §8) | ACTIVE |
 | [O4O-DATA-CLEANUP-IDENTIFICATION-SAFETY-V1](baseline/operations/O4O-DATA-CLEANUP-IDENTIFICATION-SAFETY-V1.md) | 데이터 정비 대상 식별 안전 규칙 — UUID prefix 삭제 금지 · 운영 DB 는 read-only 확인만 | ACTIVE |
 | [PLAYWRIGHT-MCP](platform/development/PLAYWRIGHT-MCP.md) | Playwright MCP 개발 환경 설정 (config 템플릿 기준) | ACTIVE |
