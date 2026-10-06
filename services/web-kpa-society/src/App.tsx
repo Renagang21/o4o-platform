@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate, Link, useNavigate, useLocation, useParams, useSearchParams } from 'react-router-dom';
 import { toKpaScopedStorePath } from './lib/unifiedStoreScope';
-import { useEffect, useState, useRef, lazy, Suspense, type ReactNode } from 'react';
+import { useEffect, useMemo, useState, useRef, lazy, Suspense, type ReactNode } from 'react';
 // WO-O4O-STORE-PRODUCTS-QUERYCLIENT-PROVIDER-ALIGN-V1
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
@@ -292,6 +292,9 @@ const PendingApprovalPage = lazy(() => import('./pages/PendingApprovalPage').the
 // WO-O4O-GUARD-PATTERN-NORMALIZATION-V1: 통일된 Guard 인터페이스
 import { PharmacyGuard } from './components/auth/PharmacyGuard';
 import { PharmacyOwnerOnlyGuard } from './components/auth/PharmacyOwnerOnlyGuard';
+// WO-NETURE-PHARMACY-PREDEPLOY-ACCESS-ALIGNMENT-V1: 옛 KPA HUB 주문 진입 → Neture 약국은 새 commerce 안내
+import { NetureCommerceNotice, NetureCommerceRedirect } from './components/neture-commerce/NetureCommerceRedirect';
+import { isNetureCommerceUser } from './lib/netureCommerce';
 // WO-KPA-PHARMACY-HUB-NAVIGATION-RESTRUCTURE-V1: HUB용 완화 가드
 import { HubGuard } from './components/auth/HubGuard';
 
@@ -507,9 +510,25 @@ function KpaStoreLayoutWrapper() {
     return () => { cancelled = true; };
   }, []);
 
+  // WO-NETURE-PHARMACY-PREDEPLOY-ACCESS-ALIGNMENT-V1: Neture 약국은 옛 발주 내역(kpa-society 회원 전용 backend) 메뉴를
+  //   보지 않는다 — 주문 내역은 내 매장의 새 commerce. 직접 URL 은 NetureCommerceRedirect 가 안내한다. KPA 회원 메뉴 불변.
+  const netureCommerce = isNetureCommerceUser(user);
+  const storeConfig = useMemo(
+    () => netureCommerce
+      ? {
+          ...KPA_SOCIETY_STORE_CONFIG,
+          menuSections: KPA_SOCIETY_STORE_CONFIG.menuSections?.map((section) => ({
+            ...section,
+            items: section.items.filter((item) => item.key !== 'orders'),
+          })),
+        }
+      : KPA_SOCIETY_STORE_CONFIG,
+    [netureCommerce],
+  );
+
   return (
     <MyStoreShell
-      config={KPA_SOCIETY_STORE_CONFIG}
+      config={storeConfig}
       fetchCapabilities={fetchStoreCapabilities}
       userName={user ? getUserDisplayName(user) : ''}
       homeLink="/"
@@ -834,9 +853,11 @@ function App() {
             <Route index element={<StoreHubPage />} />
             <Route path="b2b" element={<HubB2BCatalogPage />} />
             <Route path="signage" element={<HubSignageLibraryPage />} />
-            <Route path="event-offers" element={<PharmacyOwnerOnlyGuard><KpaEventOfferPage /></PharmacyOwnerOnlyGuard>} />
+            <Route path="event-offers" element={<NetureCommerceRedirect><PharmacyOwnerOnlyGuard><KpaEventOfferPage /></PharmacyOwnerOnlyGuard></NetureCommerceRedirect>} />
             {/* WO-O4O-EVENT-OFFER-TO-CART-MIGRATION-V1 (Phase 1a): 내 장바구니 */}
-            <Route path="cart" element={<PharmacyOwnerOnlyGuard><StoreCartPage /></PharmacyOwnerOnlyGuard>} />
+            <Route path="cart" element={<NetureCommerceRedirect><PharmacyOwnerOnlyGuard><StoreCartPage /></PharmacyOwnerOnlyGuard></NetureCommerceRedirect>} />
+            {/* WO-NETURE-PHARMACY-PREDEPLOY-ACCESS-ALIGNMENT-V1: Neture 약국 사이드바의 주문 진입(새 commerce 안내) */}
+            <Route path="neture-commerce" element={<NetureCommerceNotice />} />
             <Route path="content" element={<HubContentLibraryPage />} />
             {/* WO-O4O-STORE-HUB-BLOG-CONTENT-IMPORT-V1: 매장 HUB 블로그 진열 + 가져가기 */}
             <Route path="blog" element={<HubBlogLibraryPage />} />
@@ -988,7 +1009,7 @@ function App() {
 
           {/* Event Offers (이벤트) */}
           <Route path="/event-offers" element={<Navigate to="/store-hub/event-offers" replace />} />
-          <Route path="/event-offers/:id" element={<Layout serviceName={SERVICE_NAME}><PharmacyOwnerOnlyGuard><EventOfferDetailPage /></PharmacyOwnerOnlyGuard></Layout>} />
+          <Route path="/event-offers/:id" element={<Layout serviceName={SERVICE_NAME}><NetureCommerceRedirect><PharmacyOwnerOnlyGuard><EventOfferDetailPage /></PharmacyOwnerOnlyGuard></NetureCommerceRedirect></Layout>} />
 
           {/* Mobile Hub — WO-O4O-KPA-MOBILE-MENU-STRUCTURE-PHASE2-V1 */}
           {/* WO-O4O-STORE-WORKSPACE-INTEGRATION-AND-MY-SERVICES-V1: COMPAT_REDIRECT — 모바일 약국 경영 허브 → Store Workspace Home */}
@@ -1115,8 +1136,8 @@ function App() {
             {/* WO-O4O-KPA-STORE-PRODUCT-INFO-CREATOR-IMMEDIATE-RETIREMENT-V1: 구형 상품 정보 제작 화면 은퇴 (prod row 0). canonical "상품 상세정보" = handled-products 중심. 구 URL/북마크 대비 redirect 유지. */}
             <Route path="execution/product-info" element={<Navigate to="/store/handled-products" replace />} />
             <Route path="commerce/tablet-displays" element={<StoreTabletDisplaysPage />} />
-            <Route path="commerce/order-worktable" element={<StoreOrderWorktablePage />} />
-            <Route path="commerce/orders" element={<StoreOrdersPage />} />
+            <Route path="commerce/order-worktable" element={<NetureCommerceRedirect><StoreOrderWorktablePage /></NetureCommerceRedirect>} />
+            <Route path="commerce/orders" element={<NetureCommerceRedirect><StoreOrdersPage /></NetureCommerceRedirect>} />
             {/* WO-O4O-KPA-SELLER-RECRUITMENT-STORE-CONSUMER-BROWSE-UI-V1: 승인된 판매자 모집 조회·참여 */}
             <Route path="commerce/seller-recruitments" element={<SellerRecruitmentsBrowsePage />} />
             {/* WO-O4O-CROSSSERVICE-STORE-SELLER-RECRUITMENT-APPLICATION-STATUS-VIEW-V1 */}

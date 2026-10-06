@@ -9,6 +9,7 @@
 
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { forumWriteDeniedMessage, useForumWriteAccess } from '../../lib/forumWriteAccess';
 
 function scrollToForumHub() {
   document.getElementById('forum-hub')?.scrollIntoView({ behavior: 'smooth' });
@@ -18,18 +19,23 @@ import { colors, spacing, borderRadius, shadows, typography } from '../../styles
 
 export function ForumWritePrompt() {
   const { isAuthenticated } = useAuth();
+  // WO-NETURE-PHARMACY-PREDEPLOY-ACCESS-ALIGNMENT-V1: 쓰기 자격이 없으면 글쓰기 유도 대신 정확한 안내
+  const writeAccess = useForumWriteAccess();
+  const writeDenied = writeAccess?.allowed === false;
 
   return (
     <section style={styles.container}>
       <div style={styles.card}>
         <div style={styles.content}>
-          <span style={styles.icon}>✏️</span>
+          <span style={styles.icon}>{writeDenied ? '📖' : '✏️'}</span>
           <div>
             <h3 style={styles.title}>
-              {isAuthenticated ? '포럼에서 소통해 보세요' : '포럼에 참여해 보세요'}
+              {writeDenied ? '포럼 글을 읽어 보세요' : isAuthenticated ? '포럼에서 소통해 보세요' : '포럼에 참여해 보세요'}
             </h3>
             <p style={styles.desc}>
-              {isAuthenticated
+              {writeDenied
+                ? forumWriteDeniedMessage(writeAccess?.reason)
+                : isAuthenticated
                 ? '관심 있는 포럼을 선택하고 글을 작성해 보세요'
                 : '로그인 후 포럼 글을 작성하고 토론에 참여할 수 있습니다'}
             </p>
