@@ -32,12 +32,13 @@ V1 은 `channel_type='B2C'` 매장 storefront 의 소비자 checkout → 결제 
 | **상태 전이** — `CREATED → CONFIRMING | CANCELLED | FAILED` · `CONFIRMING → PAID | FAILED` · `PAID → REFUNDED` · 나머지 terminal | `PaymentStateMachine.ts` |
 | **동시 confirm 차단** — `CREATED → CONFIRMING` 을 조건부 UPDATE(`WHERE id AND status = fromStatus`)로 원자 전이, 실패 시 `PAYMENT_ALREADY_PROCESSING` | `TypeORMPaymentRepository.transitionStatus()` |
 | **`paymentKey` 유일성** — `o4o_payments."paymentKey"` partial UNIQUE index | `IDX_o4o_payments_paymentKey_unique` |
-| **결제 이벤트** — `payment.initiated` · `completed` · `failed` · `cancelled` · `refunded` 를 PaymentCore 가 발행하고, 도메인 handler 가 구독한다 | `PaymentEventHub` · `EventHubPaymentPublisher` |
+| **결제 이벤트** — PaymentCore 는 `payment.initiated` · `completed` · `failed` · `cancelled` · `refunded` 를 발행하지만, **도메인 handler 가 구독할 수 있는 것은 `payment.completed` · `payment.failed` 뿐**이다. 나머지 3종은 `EventHubPaymentPublisher` 가 로그만 남기고 `PaymentEventHub` 로 전달하지 않는다 | `EventHubPaymentPublisher.publish()` · `PaymentEventHub` |
 | **새 PG · 새 payment engine · 새 payment table · 새 상태머신 금지** — 결제는 PaymentCore 를 재사용한다 | `b2b-payment-controller.factory.ts` 절대 기준 |
 
 ### 2-3. 결제 이벤트 처리
 
 - B2B handler(`StoreB2bCheckoutPaymentEventHandler` · `NetureB2bCheckoutPaymentEventHandler` · `PharmacyHubPaymentEventHandler`)는 `payment.completed` 를 받아 `checkout_order` 를 paid 로 전이한다.
+- 취소 · 환불 이벤트를 받는 handler 는 현재 만들 수 없다(위 §2-2 — hub 미전달). 필요해지면 publisher 변경을 포함한 별도 WO 로 한다.
 - 전이는 payable 상태에 한정되고 idempotent 해야 한다. cancelled · refunded 주문은 전이 · bridge 대상이 아니다.
 - fulfillment bridge 는 `metadata.checkoutOrderId` 로 dedup 한다 — 중복 `neture_order` 0.
 - 결제 완료 단계에서 재고를 추가로 차감하지 않는다(수량 확보는 checkout 단계에서 끝난다).

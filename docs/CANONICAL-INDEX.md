@@ -194,7 +194,7 @@
 | KPA-ROLE-MATRIX-V1 | `kpa:*` / `kpa-branch:*` 분리 유지 · KPA Society 로 범위 축소 | ACTIVE — §4 (+ 새 KPA-BRANCH-ROLE-MATRIX-V1) |
 | [CHECKOUT-STABLE-DECLARATION-V1](baseline/CHECKOUT-STABLE-DECLARATION-V1.md) | Stable 범위를 B2B checkout · PaymentCore 로 축소 | SUPERSEDED → V2 (§2) |
 | [INTERNAL-BETA-RUNBOOK-V1](baseline/operations/INTERNAL-BETA-RUNBOOK-V1.md) | Internal Beta 종료 | SUPERSEDED → O4O-API-OPERATIONS-RUNBOOK-V1 (§7). `BETA_MODE` · 미계측 `OPS` 상수 정리는 후속 코드 WO |
-| [ALPHA-STATUS-DISPLAY-STANDARD](platform/ALPHA-STATUS-DISPLAY-STANDARD.md) | 운영형 알파 표시 의무 종료 | SUPERSEDED(대체 없음). F4 §12 의 "0.80 운영형 알파" 는 시점 기록으로 정정 |
+| [ALPHA-STATUS-DISPLAY-STANDARD](platform/ALPHA-STATUS-DISPLAY-STANDARD.md) | 운영형 알파 표시 의무 종료 | OBSOLETE(대체 문서 없음 — 전제 폐기). F4 §12 의 "0.80 운영형 알파" 는 시점 기록으로 정정 |
 | [BUSINESS-SERVICE-RULES](architecture/BUSINESS-SERVICE-RULES.md) | "OpenAPI 계약 우선" 폐기 | OBSOLETE. `CLAUDE.md` §9 문구 삭제 |
 
 ---
