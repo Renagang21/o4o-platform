@@ -39,11 +39,7 @@ const STORE_FILES = [
   'services/web-kpa-society/src/pages/pharmacy/productionTargets.tsx',
   'services/web-kpa-society/src/pages/pharmacy/StoreLibraryContentsPage.tsx',
   'services/web-kpa-society/src/pages/pharmacy/StoreQRPage.tsx',
-  // KCos
-  'services/web-k-cosmetics/src/pages/store/ProductionMaterialEditorPage.tsx',
-  'services/web-k-cosmetics/src/pages/store/StoreBlogManagePage.tsx',
-  'services/web-k-cosmetics/src/pages/store/StorePopStaffPage.tsx',
-  'services/web-k-cosmetics/src/pages/store/StoreProductDescriptionsPage.tsx',
+  // KCos — 앱(services/web-k-cosmetics) 퇴역 삭제(WO-O4O-KCOSMETICS-RETIREMENT-PHASE1A-WEB-APP-AND-DEPLOY-TARGET-V1)
   // PH
   'services/web-pharmacy-hub/src/pages/store-owner/ContentPage.tsx',
   'services/web-pharmacy-hub/src/pages/store-owner/LibraryResourcesPage.tsx',

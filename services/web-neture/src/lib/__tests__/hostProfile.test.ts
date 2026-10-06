@@ -68,9 +68,11 @@ describe('community 호스트', () => {
   it('/ 는 그대로(커뮤니티 진입 화면)', () => {
     expect(decideHost('community', loc('/')).kind).toBe('stay');
   });
-  it('/pharmacist · /retail → 현재 동작하는 각 서비스 포럼', () => {
+  it('/pharmacist → 현재 동작하는 서비스 포럼', () => {
     expect(decideHost('community', loc('/pharmacist'))).toEqual({ kind: 'external', href: 'https://pharmacy.neture.co.kr/forum' });
-    expect(decideHost('community', loc('/retail/abc'))).toEqual({ kind: 'external', href: 'https://retail.neture.co.kr/forum' });
+  });
+  it('/retail 은 종료된 retail.neture.co.kr 로 보내지 않는다(K-Cosmetics 공개 서비스 종료)', () => {
+    expect(decideHost('community', loc('/retail/abc'))).toEqual({ kind: 'external', href: 'https://neture.co.kr/retail/abc' });
   });
   it('그 밖의 경로는 대표 호스트로 · 로그인은 그 호스트', () => {
     expect(decideHost('community', loc('/forum'))).toEqual({ kind: 'external', href: 'https://neture.co.kr/forum' });

@@ -327,7 +327,7 @@ netstat -ano | findstr :5432    :: 로컬 PostgreSQL
 netstat -ano | findstr :5442    :: Cloud SQL Auth Proxy
 netstat -ano | findstr :5173
 netstat -ano | findstr :3002    :: 로컬 API
-netstat -ano | findstr :3000    :: web-neture (web-kpa-society · web-k-cosmetics 도 3000 — 동시에 하나만)
+netstat -ano | findstr :3000    :: web-neture (web-kpa-society 도 3000 — 동시에 하나만)
 taskkill /PID <PID> /F
 ```
 로컬 PostgreSQL이 `5432`를 점유하므로 프록시는 `5442`를 사용합니다.

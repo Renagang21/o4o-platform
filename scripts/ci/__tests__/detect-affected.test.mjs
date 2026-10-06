@@ -898,7 +898,8 @@ test('W4. auth-client 변경 → 소비 서비스 전부 · 그래도 "9개 하�
   const expected = consumersOf('@o4o/auth-client');
   assert.deepEqual(onOf(v), expected);
   // hospital-pharmacy 는 무로그인 V1 로 auth 의존이 없다(WO-O4O-HOSPITAL-PHARMACY-V1-FIXED-LOCAL-FILE-AND-LOGINLESS-SIMPLIFICATION).
-  assert.ok(expected.length >= 7, 'auth 계열은 실제로 거의 전 서비스가 쓴다');
+  // k-cosmetics 배포 은퇴(WO-O4O-KCOSMETICS-RETIREMENT-PHASE1A-WEB-APP-AND-DEPLOY-TARGET-V1)로 web target 7 → 하한 6.
+  assert.ok(expected.length >= 6, 'auth 계열은 실제로 거의 전 서비스가 쓴다');
   assert.ok(!expected.includes('hospital-pharmacy'), 'hospital-pharmacy 는 auth-client 를 소비하지 않는다');
   assert.equal(v.fallback, false, '넓은 판정이어도 fallback 이 아니라 graph 결과다');
 });
@@ -932,6 +933,12 @@ test('W7b. 배포 은퇴한 signage-player-web 변경 → Web 배포 0 · fallba
   assert.deepEqual(onOf(v), []);
   assert.equal(v.fallback, false);
   assert.ok(!('signage-player' in v.services));
+});
+
+test('W7c. 배포 은퇴한 k-cosmetics → registry 에 없음 · Web 판정 결과에 key 없음', () => {
+  assert.ok(!WEB_SERVICES.some((s) => s.key === 'k-cosmetics' || s.dir === 'services/web-k-cosmetics'), '배포 registry 에 다시 넣지 않는다');
+  const v = webOf(['M\tservices/web-neture/src/a.tsx']);
+  assert.ok(!('k-cosmetics' in v.services));
 });
 
 test('W8. transitive(2단계 이상) dependency 변경도 잡는다', () => {

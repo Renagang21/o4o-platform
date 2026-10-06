@@ -303,7 +303,7 @@ function runLint() {
  * 가 발생한다. 실제 사례: `@o4o/content-editor` 의 `LlmAssistPanel` 을
  * `@o4o/tablet-screen-set-editor` 가 import → web-kpa-society · web-neture type-check 실패.
  *
- * - 참조 경로: web-kpa-society · web-k-cosmetics · web-pharmacy-hub 는 tsconfig paths 로,
+ * - 참조 경로: web-kpa-society · web-pharmacy-hub 는 tsconfig paths 로,
  *   web-neture · tablet-screen-set-editor 는 package.json "types" 로 dist 를 가리킨다.
  * - 위 `packages` 목록과 달리 `npx tsc` 로 빌드할 수 없다(tsup 기반)므로 자체 build script 를 쓴다.
  * - 루트 `pnpm run build:packages` 체인에는 이미 포함되어 CI 는 영향을 받지 않는다.

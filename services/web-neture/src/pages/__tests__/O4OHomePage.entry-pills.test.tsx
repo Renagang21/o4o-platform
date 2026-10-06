@@ -89,15 +89,15 @@ describe('로그인 전 — O4O 이해 → 서비스 발견 → Google 로 시�
     for (let i = 0; i < order.length - 1; i += 1) expect(before(order[i], order[i + 1])).toBe(true);
   });
 
-  it('주요 서비스 3개 — 설명형 · 서브도메인 정본 URL · 새 탭', () => {
+  // 리테일(retail.neture.co.kr)은 K-Cosmetics 공개 서비스 종료로 제거 — WO-O4O-KCOSMETICS-RETIREMENT-PHASE1A-WEB-APP-AND-DEPLOY-TARGET-V1.
+  it('주요 서비스 2개 — 설명형 · 서브도메인 정본 URL · 새 탭', () => {
     mount();
     const links = linksOf('주요 서비스');
     expect(links.map((l) => l.href)).toEqual([
       'https://pharmacy.neture.co.kr/',
-      'https://retail.neture.co.kr/',
       'https://supplier.neture.co.kr',
     ]);
-    ['약국', '리테일', '공급자'].forEach((label, i) => {
+    ['약국', '공급자'].forEach((label, i) => {
       expect(links[i].text.startsWith(label)).toBe(true);
       expect(links[i].text).toContain(`${label} 서비스`);
     });
