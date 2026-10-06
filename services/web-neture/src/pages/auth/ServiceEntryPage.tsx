@@ -20,7 +20,9 @@ interface ServiceEntryTarget {
   label: string;
   /** 대상 서비스 origin (끝 `/` 없음) */
   origin: string;
-  /** 로그인 · 가입 없이 볼 수 있는 경로 접두사 — 미가입이어도 원래 경로가 여기 속하면 그대로 돌려보낸다 */
+  /** 로그인 · 가입 없이 볼 수 있는 경로 — 미가입이어도 원래 경로가 여기 속하면 그대로 돌려보낸다 */
+  publicPaths: readonly string[];
+  /** 위와 같되 하위 경로 포함 (`/courses` 는 `/courses/…` 까지, `/` 로 끝나면 그 접두사) */
   publicPathPrefixes: readonly string[];
   /** 미가입 사용자에게 보여 줄 공개 목록 경로 */
   browsePath: string;
@@ -32,7 +34,8 @@ const SERVICE_ENTRY_TARGETS: Readonly<Record<string, ServiceEntryTarget>> = Obje
     label: 'O4O 강의',
     origin: 'https://study.neture.co.kr',
     // web-lecture App.tsx 의 공개 route 와 같다 (/my · /instructor · /operator 는 membership 필요)
-    publicPathPrefixes: ['/courses', '/certificates/verify/'],
+    publicPaths: ['/', '/terms', '/privacy'],
+    publicPathPrefixes: ['/courses', '/certificates/verify/', '/certificate/verify/'],
     browsePath: '/courses',
   },
 });
@@ -52,6 +55,7 @@ function safeReturnPath(raw: string | null): string | undefined {
 function isPublicPath(target: ServiceEntryTarget, path: string | undefined): path is string {
   if (!path) return false;
   const pathname = path.split(/[?#]/)[0];
+  if (target.publicPaths.includes(pathname)) return true;
   return target.publicPathPrefixes.some((p) => (p.endsWith('/') ? pathname.startsWith(p) : pathname === p || pathname.startsWith(`${p}/`)));
 }
 
@@ -102,7 +106,7 @@ export default function ServiceEntryPage() {
             href={browseHref}
             data-testid="service-entry-browse"
           >
-            {backToPublic ? '보던 강의 화면으로 돌아가기' : '공개 강의 둘러보기'}
+            {backToPublic ? '보던 화면으로 돌아가기' : '공개 강의 둘러보기'}
           </a>
           <Link className="text-sm font-medium text-green-700 underline" to="/contact" data-testid="service-entry-inquiry">
             {target.label} 이용 문의하기

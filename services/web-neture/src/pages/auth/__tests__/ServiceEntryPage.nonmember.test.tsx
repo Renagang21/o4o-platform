@@ -84,8 +84,25 @@ describe('ServiceEntryPage — 미가입 사용자', () => {
     mount(`/service-entry/lecture?returnPath=${encodeURIComponent('/courses/abc?tab=intro')}`);
     const browse = await screen.findByTestId('service-entry-browse');
     expect(browse.getAttribute('href')).toBe('https://study.neture.co.kr/courses/abc?tab=intro');
-    expect(browse.textContent).toBe('보던 강의 화면으로 돌아가기');
+    expect(browse.textContent).toBe('보던 화면으로 돌아가기');
     expect(h.resolveServiceEntryUrl).toHaveBeenCalledWith('lecture', '/courses/abc?tab=intro');
+  });
+
+  it.each(['/', '/terms', '/privacy', '/courses', '/certificates/verify/C-1', '/certificate/verify/C-1'])(
+    '공개 route %s 는 그대로 돌려보낸다 (web-lecture App.tsx 공개 route)',
+    async (path) => {
+      h.resolveServiceEntryUrl.mockRejectedValue(new h.ServiceEntryError('거절', 'HANDOFF_TARGET_NO_MEMBERSHIP'));
+      mount(`/service-entry/lecture?returnPath=${encodeURIComponent(path)}`);
+      const browse = await screen.findByTestId('service-entry-browse');
+      expect(browse.getAttribute('href')).toBe(`https://study.neture.co.kr${path}`);
+    },
+  );
+
+  it.each(['/my/certificates', '/instructor', '/operator/courses', '/terms/x'])('보호 · 미정의 경로 %s 는 공개 목록으로', async (path) => {
+    h.resolveServiceEntryUrl.mockRejectedValue(new h.ServiceEntryError('거절', 'HANDOFF_TARGET_NO_MEMBERSHIP'));
+    mount(`/service-entry/lecture?returnPath=${encodeURIComponent(path)}`);
+    const browse = await screen.findByTestId('service-entry-browse');
+    expect(browse.getAttribute('href')).toBe('https://study.neture.co.kr/courses');
   });
 
   it('공개 경로 접두사와 글자만 겹치는 경로는 공개로 보지 않는다', async () => {
