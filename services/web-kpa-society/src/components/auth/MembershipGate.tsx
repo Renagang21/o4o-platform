@@ -66,7 +66,8 @@ function useSemiFranchiseAccess(userId: string | undefined, needed: boolean, ser
   useEffect(() => {
     if (!needed) return;
     let cancelled = false;
-    fetchSemiFranchiseServiceAccess(authClient.api, serviceKey).then((access) => {
+    // fetchSemiFranchiseServiceAccess 는 reject 하지 않는다(실패 = null).
+    void fetchSemiFranchiseServiceAccess(authClient.api, serviceKey).then((access) => {
       if (!cancelled) setState({ key, access });
     });
     return () => { cancelled = true; };
