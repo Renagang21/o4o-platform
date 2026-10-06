@@ -66,9 +66,10 @@ bare 값을 여전히 인정하므로, 값이 존재하면 그대로 동작한�
 | Prefix | 서비스 | 예시 |
 |--------|--------|------|
 | `platform:` | 플랫폼 Core | `platform:super_admin` |
-| `kpa:` | KPA 약사회 | `kpa:admin`, `kpa:pharmacist`, `kpa:branch_admin`, `kpa:branch_operator` |
+| `kpa:` | KPA Society(serviceKey `kpa-society`) | `kpa:admin`, `kpa:operator`(scope 허용은 이 둘, admin ⊃ operator) · `kpa:store_owner`(매장 workspace 축). (2026-10-06 정정) `kpa:pharmacist` · `kpa:student` 는 deprecated — 신규 부여 대상 아님, 일부 활성 행 잔존 가능. `kpa:branch_admin` · `kpa:branch_operator` · `kpa:district_admin` 은 **제거됨** — 부여 금지. 정본 [`KPA-ROLE-MATRIX-V1`](../baseline/KPA-ROLE-MATRIX-V1.md) |
+| `kpa-branch:` | 약사 분회 서비스(serviceKey `kpa-branch`) — `kpa:*` 와 독립 권한 경계 | `kpa-branch:admin`, `kpa-branch:operator`, `kpa-branch:member`. 분회 소속은 role 이 아니라 `branch_memberships`. scope config = `apps/api-server/src/middleware/kpa-branch-scope.middleware.ts`(Pharmacy-Hub 와 같은 로컬 예외). 정본 [`KPA-BRANCH-ROLE-MATRIX-V1`](../baseline/KPA-BRANCH-ROLE-MATRIX-V1.md) |
 | `neture:` | 네처 | `neture:admin`, `neture:operator`, `neture:seller`, `neture:supplier` (~~`neture:partner`~~ 은퇴 2026-09-15) |
-| `glucoseview:` | 글루코스뷰 | `glucoseview:admin`, `glucoseview:operator` |
+| ~~`glucoseview:`~~ | 글루코스뷰 — **은퇴**(2026-10-06 정정: service catalog · security-core · runtime 에 없음) | ~~`glucoseview:admin`, `glucoseview:operator`~~ — 부여 금지 |
 | `cosmetics:` | K-화장품 | `cosmetics:admin`, `cosmetics:operator` |
 | `pharmacy-hub:` | 파머시 허브 | `pharmacy-hub:admin`, `pharmacy-hub:operator`, `pharmacy-hub:store_owner` |
 | `lecture:` | O4O 강의 | `lecture:admin`, `lecture:operator`, `lecture:instructor` — 일반 학습자는 role 없이 `service_memberships('lecture')` |
