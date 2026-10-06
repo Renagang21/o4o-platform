@@ -17,9 +17,14 @@ import {
   type AutomationRiskLevel,
   type FallbackReason,
 } from './automation-execution-contract.js';
-import { LOCAL_AGENT_ERROR, composeSiteAction } from '../local-agent/local-agent-protocol.js';
+import { LOCAL_AGENT_ACTIONS, LOCAL_AGENT_ERROR, composeSiteAction } from '../local-agent/local-agent-protocol.js';
 import { awaitCommandResult, issueCommand } from '../local-agent/local-agent-service.js';
-import { pickSafeDomInfo } from '../local-agent/browser-dom-contract.js';
+import {
+  DOM_UNIT_COMMAND_TTL_MS,
+  pickSafeDomInfo,
+  pickSafeDomUnitInfo,
+  type DomRunUnitArgs,
+} from '../local-agent/browser-dom-contract.js';
 
 /** click · set_input · select_option 대상으로 삼을 수 있는 role. 그 밖은 실행하지 않는다(§18·§22). */
 export const DOM_CLICKABLE_ROLES: readonly string[] = Object.freeze(['button', 'link', 'checkbox', 'radio', 'tab', 'menuitem']);
@@ -75,6 +80,54 @@ export async function issueDomCommand(
     deviceId,
   });
   return { status: result.status, errorCode: result.errorCode, safe, fallbackReason };
+}
+
+/**
+ * 작업 단위 명령(`local.browser.dom.run_unit#siteId`) 하나를 발행하고 결과를 기다린다
+ * (WO-O4O-PERSONAL-ASSISTANT-PHASE-E-TASK-UNIT-DISPATCH-V1).
+ *
+ * 단일 명령과 같은 발행 경로(issueCommand · awaitCommandResult)이며 기다리는 시간만 unit TTL 이다.
+ * `status` 가 success 면 unit 이 실행됐다는 뜻이고 각 단계의 성패는 `safe.reports` · `safe.stop` 에 있다.
+ * denied 는 **아무것도 실행되지 않았음**, expired · failed 는 **일부가 실행됐을 수 있음**을 뜻한다 —
+ * 호출자는 후자에서 같은 단계를 다시 보내지 않는다(이중 실행 금지).
+ */
+export async function issueDomUnitCommand(
+  dataSource: DataSource,
+  ctx: VerifiedToolContext,
+  deviceId: string,
+  tool: string,
+  siteId: string,
+  args: DomRunUnitArgs,
+): Promise<{ status: string; errorCode?: string; safe: Record<string, unknown> }> {
+  const startedAt = Date.now();
+  const issued = await issueCommand(dataSource, {
+    userId: ctx.userId,
+    deviceId,
+    action: composeSiteAction(LOCAL_AGENT_ACTIONS.DOM_RUN_UNIT, siteId),
+    toolName: tool,
+    args: args as unknown as Record<string, unknown>,
+  });
+  if (issued.ok === false) {
+    return { status: 'denied', errorCode: issued.errorCode, safe: {} };
+  }
+  const result = await awaitCommandResult(dataSource, issued.command.commandId, DOM_UNIT_COMMAND_TTL_MS);
+  const safe = result.status === 'success' ? pickSafeDomUnitInfo(result.data) : {};
+  const stop = safe.stop as { cause?: unknown } | null | undefined;
+  logger.info('local-agent browser dom unit', {
+    tool,
+    siteId,
+    action: LOCAL_AGENT_ACTIONS.DOM_RUN_UNIT,
+    automationMethod: 'browser_dom',
+    steps: args.steps.length,
+    observe: args.observe,
+    status: result.status,
+    errorCode: result.errorCode ?? null,
+    stopCause: stop && typeof stop.cause === 'string' ? stop.cause : null,
+    commandCount: typeof safe.commandCount === 'number' ? safe.commandCount : null,
+    durationMs: Date.now() - startedAt,
+    deviceId,
+  });
+  return { status: result.status, errorCode: result.errorCode, safe };
 }
 
 /**
