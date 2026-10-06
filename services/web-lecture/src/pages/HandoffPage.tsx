@@ -1,7 +1,7 @@
 import { useEffect, useLayoutEffect, useState } from 'react';
 import { clearStoredTokens, storeTokens } from '@o4o/auth-client';
 import { API_BASE_URL } from '../lib/apiClient';
-import { INQUIRY_URL } from '../config/service';
+import { INQUIRY_URL, isPublicLecturePath } from '../config/service';
 
 function resolveReturnTo(raw: string | null): string {
   if (!raw || !raw.startsWith('/') || raw.startsWith('//') || raw.startsWith('/\\')) return '/';
@@ -48,12 +48,13 @@ export default function HandoffPage() {
   }, [returnTo]);
   if (!error) return <main className="center-card"><section className="card"><h1>O4O 강의</h1><p>서비스 이동 중...</p></section></main>;
   if (MEMBERSHIP_CODES.has(code)) {
+    const backToPublic = returnTo !== '/' && isPublicLecturePath(returnTo);
     return <main className="center-card"><section className="card">
       <h1>강의 서비스 이용 자격이 필요합니다</h1>
       <p>O4O 계정 로그인은 완료되었습니다. {error}</p>
       <p className="muted">공개 강의는 회원이 아니어도 볼 수 있습니다. 이용 신청은 문의하기로 남겨 주세요.</p>
       <div className="actions">
-        <a className="button-link" href="/courses">공개 강의 둘러보기</a>
+        <a className="button-link" href={backToPublic ? returnTo : '/courses'}>{backToPublic ? '보던 화면으로 돌아가기' : '공개 강의 둘러보기'}</a>
         <a className="secondary-link" href={INQUIRY_URL}>이용 문의하기</a>
       </div>
     </section></main>;
