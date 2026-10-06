@@ -6,6 +6,7 @@
 > **상태**: ACTIVE — **범위 축소**(판정 확정 2026-10-06, `WO-O4O-CANONICAL-INDEX-S9-POLICY-DECISION-ALIGNMENT-V1`). 이 문서는 이제 **KPA Society(`kpa:*`, serviceKey `kpa-society`) 역할 문서**다. 분회 서비스(`kpa-branch:*`)의 역할 · 접근 정본은 [`KPA-BRANCH-ROLE-MATRIX-V1`](KPA-BRANCH-ROLE-MATRIX-V1.md) 이다.
 > - **경계 확정**: `kpa:*` 와 `kpa-branch:*` 는 독립 권한 경계다. "`kpa:admin` · `kpa:operator` 의 전체 branch 접근 허용"(§3 KPA-c · §4 KPA-c CMS)은 **폐기** — 되돌리지 않는다.
 > - 본문의 KPA-b · KPA-c 절(§2 의 `kpa:branch_*` · §3 KPA-c / KPA-b · §4 KPA-c CMS · §6 · §7 · §8 의 KPA-b / KPA-c 행)은 과거 기록으로 보존하며 구현 근거로 쓰지 않는다.
+> - **§5 의 분회 guard 단계와 §10 의 Owner 선언도 과거 기록이다** — §5 의 `isBranchOperator()` · "branch 서비스는 서버 측 org lookup"(3단계 organizationId 범위 확인)과 §10 "Owner 모델 유지 (organizationId)" 는 KPA-c 전제다. 현행 KPA Society guard 는 `requireAuth` → `requireKpaScope`(`createMembershipScopeGuard(KPA_SCOPE_CONFIG)` — `kpa-society` membership + `kpa:admin` ⊃ `kpa:operator`)이며 분회 tenant 판정을 하지 않는다. 분회 단위 판정을 Society 에 적용하지 않는다. §5 의 Role 확인 · serviceKey 격리 원칙은 유효하다.
 > - 하단 `Status: Frozen` 은 2026-02 작성 시점 표기이며 `CLAUDE.md` §14 Frozen 목록(F1~F12)에 없다.
 >
 > (2026-10-04 정합) 현행 사실:

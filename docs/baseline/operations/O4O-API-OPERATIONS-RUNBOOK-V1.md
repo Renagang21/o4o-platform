@@ -29,7 +29,7 @@
 | **API 오류** | 5xx 비율 | Cloud Run 요청 지표(응답 코드별) · 로그의 error | 5xx 지속 발생 |
 | **API 지연** | 응답 지연 | Cloud Run 요청 지연 지표(p50 / p95) | 평소 대비 지속 상승 |
 | **DB** | ping · 연결 | `/api/health/database` → 장시간 쿼리는 read-only 채널로 `pg_stat_activity` 확인(SETUP.md) | 503 · ping 지연 지속 |
-| **읽기 캐시(in-process)** | 프로세스 로컬 TTL 캐시 오류 | 로그 `[ReadCache] GET error, falling back to DB` · `[ReadCache] SET error`(`cache/read-cache.ts` — `memoryCacheGet()` · 캐시 값 역직렬화 실패 시에만 출력) | 반복 출력 — 기능은 DB fallback 으로 유지되지만 DB 부하 · 응답 지연이 늘어난다. **Redis 장애 신호가 아니다** — `o4o-core-api` 는 Redis 를 쓰지 않는다(Redis 제거 후 in-process 캐시, 인스턴스마다 따로 비고 TTL 로만 만료) |
+| **읽기 캐시(in-process)** | 프로세스 로컬 TTL 캐시 오류 | 로그(`cache/read-cache.ts`) — `[ReadCache] GET error, falling back to DB` = `memoryCacheGet()` 또는 캐시 값 `JSON.parse` 실패 · `[ReadCache] SET error` = 조회 결과 `JSON.stringify`(순환 참조 등 직렬화 불가 값) 또는 `memoryCacheSet()` 실패. 로그의 `key` 로 소비 query 를 찾는다 | 반복 출력 — 기능은 DB fallback 으로 유지되지만 DB 부하 · 응답 지연이 늘어난다. **Redis 장애 신호가 아니다** — `o4o-core-api` 는 Redis 를 쓰지 않는다(Redis 제거 후 in-process 캐시, 인스턴스마다 따로 비고 TTL 로만 만료) |
 
 ## 3. 대응 원칙
 
