@@ -10,7 +10,7 @@
 ## 1. 단계 판정
 
 - **Internal Beta 단계는 종료됐다**(2026-10-06). 이유는 세 가지다: 종료 조건의 핵심이던 소비자 결제가 은퇴(410)했고, checkout · payment 카운터는 계측되지 않으며, `BETA_MODE` 는 기본 off 다.
-- `GET /health` 와 `GET /api/health` 는 같지 않다 — 앞의 것은 liveness 만 답한다. DB 상태는 `/api/health` 계열로 본다.
+- `GET /health` 와 `GET /api/health` 는 같지 않다 — 앞의 것은 liveness 만 답한다. `GET /api/health` 도 DB 실패를 HTTP 상태로 알리지 않는다(본문 `database.status`). **DB 이상을 HTTP 상태로 감지하려면 `/api/health/ready` · `/api/health/database` 를 본다.**
 - 운영 상태는 단계(Alpha/Beta) 표시가 아니라 이 문서의 상시 점검으로 본다.
 - `BETA_MODE` 플래그 · 미계측 `OPS.CHECKOUT_*` / `OPS.PAYMENT_*` 상수 · `/internal/ops/metrics` 의 노출 방식은 **후속 코드 정리 WO** 대상이다. 그 전까지 이 문서는 그것들에 기대지 않는다.
 
@@ -19,7 +19,8 @@
 | 영역 | 무엇을 보나 | 어디서 보나 | 이상 신호 |
 |---|---|---|---|
 | **Liveness** | 프로세스가 살아 있는가 | `GET /health` — `main.ts` 의 liveness handler(DB 를 보지 않는다, DB 장애 중에도 200) | 200 이 아님 |
-| **Health · Readiness** | DB 연결 · 준비 상태 | `GET /api/health` · `/api/health/ready` · `/api/health/database` · `/api/health/detailed` — 공개, `routes/health.ts`(하위 경로는 `/health/*` 로도 mount) | 200 이 아님 · `ready` / `database` / `detailed` 가 503 |
+| **Health · Readiness** | DB 연결 · 준비 상태 | `GET /api/health/ready` · `/api/health/database` · `/api/health/detailed` — 공개, `routes/health.ts`(`/health/*` 로도 mount) | HTTP 503 |
+| **Health 요약** | 전체 상태 한눈에 | `GET /api/health` — DB 조회가 실패해도 **항상 200** 을 반환한다 | HTTP 상태로 판단하지 않는다 — 응답 본문의 `database.status` 가 `healthy` 가 아님 |
 | **배포 반영** | 새 revision 이 트래픽을 받는가 | GitHub Actions deploy job · Cloud Run revision · traffic | workflow success 만으로 완료로 보지 않는다 — **job success + 새 revision + traffic 100%** 를 함께 확인 |
 | **인증** | 로그인 · refresh 실패 급증 | Cloud Run 로그 — `[GoogleAuthController.*]` · `[EmailAuthController.*]` · `[AuthSessionController.*]` 의 warn/error | 같은 reason 의 실패가 몰림 · unexpected error |
 | **API 오류** | 5xx 비율 | Cloud Run 요청 지표(응답 코드별) · 로그의 error | 5xx 지속 발생 |
