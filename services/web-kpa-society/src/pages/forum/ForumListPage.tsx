@@ -25,6 +25,7 @@ import { PageHeader } from '../../components/common';
 import { forumApi } from '../../api';
 import { appreciationApi } from '../../api/appreciation';
 import { useAuth } from '../../contexts';
+import { useForumWriteAccess } from '../../lib/forumWriteAccess';
 import type { ForumInfo, ForumPost } from '../../types';
 import { buildAiClipboardText, stripHtml, blocksToText } from '../../utils/ai-clipboard';
 // WO-O4O-FORUM-LIST-SHARED-PRIMITIVES-V1 / WO-O4O-FORUM-LIST-PAGINATION-UNIFY-V1: 공통 유틸·페이지네이션
@@ -160,6 +161,8 @@ export function ForumListPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const { user } = useAuth();
+  // WO-NETURE-PHARMACY-PREDEPLOY-ACCESS-ALIGNMENT-V1: 쓰기 자격이 없으면(서버 판정) 글쓰기 버튼을 보이지 않는다
+  const writeAccess = useForumWriteAccess();
 
   // URL params
   // WO-O4O-KPA-FORUM-ALL-SEARCH-AND-FILTER-UX-V1:
@@ -509,7 +512,7 @@ export function ForumListPage() {
       ) : (
         <>
           <p className="text-sm text-slate-500 mb-3 mt-0">등록된 게시글이 없습니다</p>
-          {user && (
+          {user && writeAccess?.allowed !== false && (
             <Link to="/forum/write" className="inline-flex items-center px-4 py-2 text-xs font-semibold text-white bg-primary rounded-md no-underline">글쓰기</Link>
           )}
         </>
@@ -597,7 +600,7 @@ export function ForumListPage() {
         chips={activeChips}
         onClearAll={handleClearAll}
         actionSlot={
-          user ? (
+          user && writeAccess?.allowed !== false ? (
             <Link
               to="/forum/write"
               className="inline-flex items-center px-5 py-2.5 text-sm font-medium text-white bg-primary rounded-md no-underline whitespace-nowrap"

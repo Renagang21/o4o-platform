@@ -205,7 +205,9 @@ HUB 노출 정책은 이 기준을 따른다.
 * Signage Supplier/Community 생성 완료
 * HUB Producer 통합 완료
 
-본 문서는 0.80 운영형 알파 기준의 공식 정책 문서이다.
+본 문서는 작성 당시(2026-02-23, 0.80 운영형 알파 단계) 공식 정책 문서로 확정됐다.
+
+> (2026-10-06 정합 · 시점 기록 정정) "운영형 알파" 단계 표시는 종료됐다([ALPHA-STATUS-DISPLAY-STANDARD](../platform/ALPHA-STATUS-DISPLAY-STANDARD.md) OBSOLETE, `WO-O4O-CANONICAL-INDEX-S9-POLICY-DECISION-ALIGNMENT-V1`). 위 문장의 "0.80 운영형 알파" 는 확정 시점 기록이며 §1~§11 의 HUB 노출 정책 효력과 Frozen(F4) 상태에는 영향이 없다.
 
 ---
 

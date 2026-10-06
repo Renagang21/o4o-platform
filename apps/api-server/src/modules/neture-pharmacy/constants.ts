@@ -9,7 +9,7 @@ export const NETURE_PHARMACY_SERVICE_KEY = 'neture-pharmacy';
 export const NETURE_PHARMACY_ORDER_SOURCE = 'neture_pharmacy_cart';
 /** o4o_payments.sourceService */
 export const NETURE_PHARMACY_PAYMENT_SOURCE = 'neture-pharmacy';
-/** 세미프랜차이즈 이벤트 원장 OPL.service_key (부분 UNIQUE 제외 대상) */
+/** 세미프랜차이즈 이벤트 원장 OPL.service_key (최종 부분 UNIQUE 제외 대상 — 1단계는 전체 UNIQUE, semi-franchise-event.service 머리말) */
 export const SEMI_FRANCHISE_EVENT_SERVICE_KEY = 'neture-event-offer';
 /** 공급처 미지정 제품의 기본 공급 경로 */
 export const DEFAULT_SEMI_FRANCHISE_KEY = 'pharmacy';

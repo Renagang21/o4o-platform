@@ -58,10 +58,14 @@ import {
   injectRolesIntoPublicData,
 } from './auth-context.helper.js';
 import {
-  isServiceLoginAllowed,
   SERVICE_NOT_MEMBER_CODE,
   SERVICE_NOT_MEMBER_MESSAGE,
+  defaultSemiFranchiseAccessResolver,
+  evaluateServiceLoginAccess,
+  serviceNotMemberMessage,
+  type SemiFranchiseAccessResolver,
 } from '../../common/auth/service-login-eligibility.policy.js';
+import type { SemiFranchiseAccessDetails } from '../../modules/neture-pharmacy/services/semi-franchise-service-access.js';
 import * as tokenUtils from '../../utils/token.utils.js';
 import logger from '../../utils/logger.js';
 
@@ -111,7 +115,12 @@ const GOOGLE_AUTH_ERROR_MESSAGE: Record<GoogleAuthErrorCode, string> = {
 
 export class GoogleAuthError extends Error {
   readonly statusCode: number;
-  constructor(readonly code: GoogleAuthErrorCode, message?: string) {
+  constructor(
+    readonly code: GoogleAuthErrorCode,
+    message?: string,
+    /** SERVICE_NOT_MEMBER 의 세미프랜차이즈 자격 상태 — 응답 최상위 `serviceAccess` (WO-NETURE-PHARMACY-CUTOVER-COMPAT-V1) */
+    readonly serviceAccess?: SemiFranchiseAccessDetails,
+  ) {
     super(message || GOOGLE_AUTH_ERROR_MESSAGE[code]);
     this.name = 'GoogleAuthError';
     this.statusCode = GOOGLE_AUTH_ERROR_STATUS[code];
@@ -177,6 +186,8 @@ export interface GoogleAuthServiceDeps {
   dataSource?: Pick<DataSource, 'getRepository' | 'transaction'>;
   issueSession?: SessionIssuer;
   /** Admin bootstrap 게이트 — 테스트에서 주입. 기본값은 요청마다 env 를 다시 읽는다. */
+  /** 세미프랜차이즈 이용 자격 조회. 기본값은 `defaultSemiFranchiseAccessResolver`. */
+  resolveSemiFranchiseAccess?: SemiFranchiseAccessResolver;
 }
 
 /** Postgres unique violation 판별 — TypeORM QueryFailedError 는 driverError 에 원본을 둔다. */
@@ -191,10 +202,12 @@ export class GoogleAuthService {
   private readonly identity: Pick<GoogleIdentityService, 'verifyGoogleIdToken' | 'findGoogleIdentityBySub'>;
   private readonly _dataSource?: Pick<DataSource, 'getRepository' | 'transaction'>;
   private readonly issueSession: SessionIssuer;
+  private readonly resolveSemiFranchiseAccess: SemiFranchiseAccessResolver;
 
   constructor(deps: GoogleAuthServiceDeps = {}) {
     this.identity = deps.identity ?? googleIdentityService;
     this._dataSource = deps.dataSource;
+    this.resolveSemiFranchiseAccess = deps.resolveSemiFranchiseAccess ?? defaultSemiFranchiseAccessResolver;
     this.issueSession =
       deps.issueSession ??
       ((user, sessionServiceKey) => generateTokensWithContext(user, 'neture.co.kr', sessionServiceKey));
@@ -388,9 +401,13 @@ export class GoogleAuthService {
 
     // WO-O4O-SERVICE-NOT-MEMBER-AUTH-CONTRACT-RESTORATION-V1: 인증 성공 뒤 서비스 이용 자격.
     //   로그인만 판정한다(가입은 계정만 만든다 — 호출부가 키를 넘기지 않는다). 발급한 토큰은 쓰기 전에 버린다.
-    if (!isServiceLoginAllowed(loginMembershipGateKey, roles, memberships)) {
+    //   WO-NETURE-PHARMACY-CUTOVER-COMPAT-V1: 세미프랜차이즈 자격 서비스는 Neture 기본 ∧ 세미프랜차이즈 active 도 통과.
+    const access = await evaluateServiceLoginAccess(
+      this.resolveSemiFranchiseAccess, user.id, loginMembershipGateKey, roles, memberships,
+    );
+    if (!access.allowed) {
       await this.logActivity(user.id, meta, false, 'service_not_member');
-      throw new GoogleAuthError(SERVICE_NOT_MEMBER_CODE);
+      throw new GoogleAuthError(SERVICE_NOT_MEMBER_CODE, serviceNotMemberMessage(access.serviceAccess), access.serviceAccess);
     }
 
     const tokenFamily = tokenUtils.getTokenFamily(tokens.refreshToken);

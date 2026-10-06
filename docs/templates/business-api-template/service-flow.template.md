@@ -1,7 +1,9 @@
 # {Business} Service Flow
 
+> **상태**: OBSOLETE · 이 템플릿은 별도 business-api / business-web · 독립 배포 · OpenAPI CI 게이트를 전제하며, 그 전제와 함께 [`BUSINESS-SERVICE-RULES`](../../architecture/BUSINESS-SERVICE-RULES.md) 가 폐기됐다(`WO-O4O-CANONICAL-INDEX-S9-POLICY-DECISION-ALIGNMENT-V1`). 새 작업의 출발점이나 검증 기준으로 쓰지 않는다 — 현행 기준은 `CLAUDE.md` §1 · §7 · §13 과 [`O4O-BOUNDARY-POLICY-V1`](../../architecture/O4O-BOUNDARY-POLICY-V1.md) · **표기일**: 2026-10-06
+
 > **Version**: 1.0
-> **Status**: Mandatory (CLAUDE.md 구속 규칙)
+> **Status**: ~~Mandatory (CLAUDE.md 구속 규칙)~~ OBSOLETE
 > **Created**: {date}
 
 이 문서는 {Business} 서비스의 통신 흐름, 인증 흐름, 데이터 흐름을 정의합니다.
@@ -243,7 +245,7 @@ PATCH /{business}/admin/resources/:id/status
 - docs/services/{business}/openapi.yaml
 - docs/services/{business}/web-integration-rules.md
 - docs/services/{business}/deployment-boundary.md
-- CLAUDE.md §15 Business API Template Rules
+- ~~CLAUDE.md §15 Business API Template Rules~~ — 현행 `CLAUDE.md` 에 없음(OBSOLETE)
 
 ---
 

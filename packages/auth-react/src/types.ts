@@ -33,8 +33,24 @@ export interface AuthLoginResult<TUser> {
    * 만들 필요는 없다.** 상태에 따라 UI 강조·행동 버튼을 달리해야 할 때만 쓴다.
    */
   accountStatus?: string;
+  /**
+   * WO-NETURE-PHARMACY-CUTOVER-COMPAT-V1
+   *
+   * `SERVICE_NOT_MEMBER` · handoff 거절이 세미프랜차이즈 자격(예: pharmacy.neture.co.kr)일 때만 함께 오는 상태.
+   * `error` 에는 이미 서버 문구가 들어 있다 — 서비스는 `next` 로 신청 링크 · 행동 버튼만 고른다.
+   */
+  serviceAccess?: AuthServiceAccess;
   /** 성공 시 변환된 사용자. 실패 시 undefined. */
   user?: TUser;
+}
+
+/** 세미프랜차이즈 이용 자격 거절 상태(서버 `serviceAccess`). 알 수 없는 `next` 도 문자열 그대로 전달한다. */
+export interface AuthServiceAccess {
+  semiFranchiseKey: string;
+  pharmacyMembershipStatus: string | null;
+  semiFranchiseMembershipStatus: string | null;
+  /** apply_pharmacy · pharmacy_pending · pharmacy_suspended · apply_semi_franchise · semi_franchise_pending · semi_franchise_suspended */
+  next: string | null;
 }
 
 /** POST /auth/google/signup 동의 항목(@o4o/auth-client `GoogleSignupConsents` 와 동일 형태). */

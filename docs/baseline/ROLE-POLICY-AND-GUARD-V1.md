@@ -2,6 +2,8 @@
 
 > **Status: Active Policy + Frozen Baseline**
 > **Version: 1.0 | Created: 2026-02-17**
+>
+> (2026-10-06 정정, `WO-O4O-CANONICAL-INDEX-S9-POLICY-DECISION-ALIGNMENT-V1`) 이 문서의 `kpa:district_admin` · `kpa:branch_admin` · `kpa:branch_operator` · `{service}:branch_*` Org Layer 서술(§1 · §5 · §6 · §8)은 **과거 기록**이다 — 이 역할들은 제거됐고 guard 를 복구하지 않는다. 현행 KPA 역할은 [`KPA-ROLE-MATRIX-V1`](KPA-ROLE-MATRIX-V1.md)(KPA Society, scope = `kpa:admin` ⊃ `kpa:operator`), 분회 서비스 역할 · 분회 소속 판정은 [`KPA-BRANCH-ROLE-MATRIX-V1`](KPA-BRANCH-ROLE-MATRIX-V1.md)(`kpa-branch:*` + `branch_memberships`)가 정본이며, 충돌하면 그 두 문서가 우선한다. **GlucoseView 행(§3 · §4 · §7 · §8)도 과거 기록**이다 — 현행 서비스 identity(`apps/api-server/src/config/service-catalog.ts`)와 `packages/security-core` 에 GlucoseView 는 없고 관련 역할 · guard 도 없다. 위 두 범위를 뺀 나머지 원칙(계층 · Admin/Operator 구분 · Platform Bypass · 서비스 격리 · Guard 패턴)은 유효하다.
 
 ---
 
@@ -62,6 +64,8 @@ Platform Layer       → platform:super_admin
 ---
 
 ## 5. 조직 스코프 (KPA Society)
+
+> (2026-10-06 정정) 아래 표의 `kpa:district_admin` · `kpa:branch_*` 행은 제거된 과거 역할이다. 분회 단위 접근은 [`KPA-BRANCH-ROLE-MATRIX-V1`](KPA-BRANCH-ROLE-MATRIX-V1.md) §2 · §3 이 정본이다.
 
 | 역할 | Stage 1 (Role) | Stage 2 (소유권) |
 |------|----------------|-----------------|
@@ -128,7 +132,7 @@ requireScope('{service}:branch_admin') + validateBranchOwnership()
 | 서비스 | 역할 |
 |--------|------|
 | platform | `platform:super_admin` |
-| kpa | `kpa:admin`, `kpa:operator`, `kpa:district_admin`, `kpa:branch_admin`, `kpa:branch_operator` |
+| kpa | `kpa:admin`, `kpa:operator` (2026-10-06 정정 — `kpa:district_admin` · `kpa:branch_admin` · `kpa:branch_operator` 는 제거됨. 분회 서비스는 별도 prefix `kpa-branch:*`, [`KPA-BRANCH-ROLE-MATRIX-V1`](KPA-BRANCH-ROLE-MATRIX-V1.md)) |
 | neture | `neture:admin`, `neture:operator`, `neture:supplier` (`neture:partner` 는 2026-09-15 Legacy Partner 은퇴로 scope 제거) |
 
 ### Frontend 역할 매핑

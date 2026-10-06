@@ -18,6 +18,8 @@
  *  V12 로그·메일 외 경로에 평문 토큰/비밀번호가 남지 않는다(DB 에는 해시만)
  *  V14 로그인 자격 게이트(WO-O4O-SERVICE-NOT-MEMBER-AUTH-CONTRACT-RESTORATION-V1) — 인증 성공 뒤에만
  *      SERVICE_NOT_MEMBER, 인증 실패는 INVALID_CREDENTIALS 그대로 · 세션 흔적 없음 · 다른 서비스 membership 불인정
+ *  V15 세미프랜차이즈 자격(WO-NETURE-PHARMACY-CUTOVER-COMPAT-V1) — kpa-society(pharmacy.neture.co.kr) 게이트는
+ *      Neture 기본 active ∧ pharmacy 세미프랜차이즈 active 이면 membership 없이 통과 · 미충족은 상태별 serviceAccess.next
  */
 
 import { EmailAuthService, EmailAuthError, hashToken, type PasswordStore } from '../email-auth.service.js';
@@ -25,6 +27,7 @@ import { User } from '../../../entities/User.js';
 import { AccountActivity } from '../../../entities/AccountActivity.js';
 import { UserStatus } from '../../../types/auth.js';
 import * as tokenUtils from '../../../utils/token.utils.js';
+import { decideSemiFranchiseAccess } from '../../../modules/neture-pharmacy/services/semi-franchise-service-access.js';
 
 type Row = Record<string, any>;
 
@@ -54,6 +57,8 @@ function makeHarness(
   opts: {
     roles?: Record<string, string[]>;
     memberships?: Record<string, { serviceKey: string; status: string }[]>;
+    /** Neture 약국 조직별 (기본, 세미프랜차이즈) 가입 상태 — 세미프랜차이즈 자격 fake. 기본 = 약국 없음 */
+    semiFranchiseRows?: { basic: string | null; semi: string | null }[];
     now?: Date;
   } = {},
 ) {
@@ -188,6 +193,9 @@ function makeHarness(
   });
 
   const roles = opts.roles ?? {};
+  const semiFranchiseResolver = jest.fn(async (_userId: string, key: string) =>
+    decideSemiFranchiseAccess(key, opts.semiFranchiseRows ?? []),
+  );
   const service = new EmailAuthService({
     dataSource: dataSource as any,
     passwords,
@@ -199,6 +207,7 @@ function makeHarness(
       roles: roles[user.id] ?? [],
       memberships: opts.memberships?.[user.id] ?? [],
     }),
+    resolveSemiFranchiseAccess: semiFranchiseResolver,
     now: () => nowRef.t,
   });
 
@@ -222,6 +231,7 @@ function makeHarness(
     order,
     nowRef,
     lastLinkToken,
+    semiFranchiseResolver,
     addUser(u: Partial<Row>) {
       const row = Object.assign(new User(), {
         id: uuid(),
@@ -555,6 +565,71 @@ describe('EmailAuthService', () => {
       const { h, u } = await verifiedUser();
       const s = await h.service.login({ email: u.email, password: GOOD_PW, ...META, loginMembershipGateKey: null });
       expect(s.tokens.accessToken).toBeTruthy();
+    });
+  });
+
+  describe('V15 세미프랜차이즈 자격 (pharmacy.neture.co.kr = kpa-society 게이트)', () => {
+    const GATED = { ...META, sessionServiceKey: 'kpa-society', loginMembershipGateKey: 'kpa-society' };
+
+    async function verifiedUser(over: Parameters<typeof makeHarness>[0] = {}) {
+      const seed = makeHarness();
+      await seed.service.signup(signupInput());
+      const u = seed.store.users[0];
+      u.isEmailVerified = true;
+      const h = makeHarness({
+        ...over,
+        memberships: over.memberships ? { [u.id]: over.memberships[Object.keys(over.memberships)[0]] } : undefined,
+      });
+      h.store.users.push(u);
+      h.store.creds.set(u.id, seed.store.creds.get(u.id)!);
+      return { h, u };
+    }
+
+    it('Neture 기본 active ∧ pharmacy 세미프랜차이즈 active → kpa-society membership 없이 로그인 성공', async () => {
+      const { h, u } = await verifiedUser({ semiFranchiseRows: [{ basic: 'active', semi: 'active' }] });
+      const s = await h.service.login({ email: u.email, password: GOOD_PW, ...GATED });
+      expect(s.tokens.accessToken).toBeTruthy();
+      expect(h.semiFranchiseResolver).toHaveBeenCalledWith(u.id, 'pharmacy');
+    });
+
+    it.each([
+      [[], 'apply_pharmacy'],
+      [[{ basic: 'pending', semi: null }], 'pharmacy_pending'],
+      [[{ basic: 'suspended', semi: null }], 'pharmacy_suspended'],
+      [[{ basic: 'rejected', semi: null }], 'apply_pharmacy'],
+      [[{ basic: 'active', semi: null }], 'apply_semi_franchise'],
+      [[{ basic: 'active', semi: 'pending' }], 'semi_franchise_pending'],
+      [[{ basic: 'active', semi: 'suspended' }], 'semi_franchise_suspended'],
+    ] as const)('미충족(%j) → SERVICE_NOT_MEMBER + serviceAccess.next=%s, 세션 흔적 없음', async (rows, next) => {
+      const { h, u } = await verifiedUser({ semiFranchiseRows: [...rows] });
+      const err = await h.service.login({ email: u.email, password: GOOD_PW, ...GATED }).catch((e) => e);
+      expect(err).toBeInstanceOf(EmailAuthError);
+      expect(err).toMatchObject({ code: 'SERVICE_NOT_MEMBER', statusCode: 403 });
+      expect(err.serviceAccess).toMatchObject({ semiFranchiseKey: 'pharmacy', next });
+      expect(err.serviceAccess).not.toHaveProperty('allowed');
+      expect(u.refreshTokenFamily).toBeUndefined();
+    });
+
+    it('기본 가입만 active(세미프랜차이즈 미가입)이면 통과시키지 않는다', async () => {
+      const { h, u } = await verifiedUser({ semiFranchiseRows: [{ basic: 'active', semi: 'terminated' }] });
+      await expectCode(h.service.login({ email: u.email, password: GOOD_PW, ...GATED }), 'SERVICE_NOT_MEMBER');
+    });
+
+    it('기존 kpa-society row 가 있으면 세미프랜차이즈 조회 없이 기존 규칙대로 통과(재해석 없음)', async () => {
+      const { h, u } = await verifiedUser({ memberships: { x: [{ serviceKey: 'kpa-society', status: 'pending' }] } });
+      const s = await h.service.login({ email: u.email, password: GOOD_PW, ...GATED });
+      expect(s.tokens.accessToken).toBeTruthy();
+      expect(h.semiFranchiseResolver).not.toHaveBeenCalled();
+    });
+
+    it('semiFranchiseAccessKey 가 없는 게이트(k-cosmetics)는 세미프랜차이즈를 조회하지 않는다', async () => {
+      const { h, u } = await verifiedUser({ semiFranchiseRows: [{ basic: 'active', semi: 'active' }] });
+      const err = await h.service
+        .login({ email: u.email, password: GOOD_PW, ...META, sessionServiceKey: 'k-cosmetics', loginMembershipGateKey: 'k-cosmetics' })
+        .catch((e) => e);
+      expect(err).toMatchObject({ code: 'SERVICE_NOT_MEMBER' });
+      expect(err.serviceAccess).toBeUndefined();
+      expect(h.semiFranchiseResolver).not.toHaveBeenCalled();
     });
   });
 

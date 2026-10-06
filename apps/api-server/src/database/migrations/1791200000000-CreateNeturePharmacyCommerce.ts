@@ -15,10 +15,13 @@ import type { MigrationInterface, QueryRunner } from 'typeorm';
  *   store_cart_items              + supply_proposal_id, seller_recruitment_id (선택한 제안)
  *   seller_recruitments           + semi_franchise_id, supply_unit_price
  *   seller_recruitment_applications + applicant_organization_id (참여 단위 = 약국 조직)
- *   organization_product_listings idx_org_listing_unique_v2 → Neture 세미프랜차이즈 이벤트 원장
- *                                 (service_key='neture-event-offer') 만 제외한 부분 UNIQUE.
- *                                 재신청 · 같은 제품 복수 승인 이벤트를 위해. 다른 행의 유일성은 그대로.
- *                                 ON CONFLICT 소비처는 같은 predicate 를 명시한다.
+ *   organization_product_listings idx_org_listing_unique_v2 → **이 migration 에서 바꾸지 않는다**(전체 UNIQUE 유지).
+ *                                 WO-NETURE-PHARMACY-CUTOVER-COMPAT-V1: 부분 UNIQUE 로 바꾸면 구버전 API 의 predicate 없는
+ *                                 `ON CONFLICT (organization_id, service_key, offer_id)` 가 실패해 API 롤백이 불가능해진다.
+ *                                 새 API 의 `ON CONFLICT ... WHERE service_key <> 'neture-event-offer'` 는 전체 UNIQUE 로도
+ *                                 추론되므로 두 버전이 함께 동작한다. 부분 UNIQUE 전환은 새 API 안정화 뒤 별도 migration(2단계)이며,
+ *                                 그때까지 세미프랜차이즈 이벤트 재신청 · 같은 제품 복수 이벤트는 API 가 막는다
+ *                                 (semi-franchise-event.service.ts `EVENT_REAPPLY_NOT_YET_SUPPORTED`).
  *
  * 만들지 않는 것: checkout_orders 컬럼 · 독립 *_orders / *_payments · neture_orders / o4o_payments
  * unique 인덱스(멱등은 코드의 advisory lock + 조건부 UPDATE).
@@ -161,11 +164,6 @@ export class CreateNeturePharmacyCommerce1791200000000 implements MigrationInter
       ON seller_recruitment_applications (recruitment_id, applicant_organization_id)
       WHERE applicant_organization_id IS NOT NULL`);
 
-    await q.query(`DROP INDEX IF EXISTS idx_org_listing_unique_v2`);
-    await q.query(`CREATE UNIQUE INDEX idx_org_listing_unique_v2
-      ON organization_product_listings (organization_id, service_key, offer_id)
-      WHERE service_key <> 'neture-event-offer'`);
-
     // pharmacy 세미프랜차이즈 + 운영 조직(이벤트 원장 소유). 수취 주체 · 커뮤니티는 미정(NULL).
     await q.query(`INSERT INTO organizations (name, code, type, "isActive")
       VALUES ('pharmacy 세미프랜차이즈 운영', 'semi-franchise-pharmacy', 'semi_franchise', true)
@@ -175,9 +173,6 @@ export class CreateNeturePharmacyCommerce1791200000000 implements MigrationInter
   }
 
   async down(q: QueryRunner): Promise<void> {
-    await q.query(`DROP INDEX IF EXISTS idx_org_listing_unique_v2`);
-    await q.query(`CREATE UNIQUE INDEX idx_org_listing_unique_v2
-      ON organization_product_listings (organization_id, service_key, offer_id)`);
     await q.query(`DROP INDEX IF EXISTS uq_seller_recruitment_applications_org`);
     await q.query(`ALTER TABLE seller_recruitment_applications DROP COLUMN IF EXISTS applicant_organization_id`);
     await q.query(`DROP INDEX IF EXISTS uq_seller_recruitments_product_seller_service`);
