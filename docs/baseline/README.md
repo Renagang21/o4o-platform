@@ -17,9 +17,12 @@
 | `BASELINE-OPERATOR-OS-V1.md` | Frozen | Core 패키지 동결, Hub/Trigger/Security 기준선 |
 | `UX-CORE-FREEZE-V1.md` | Frozen | Operator 5-Block + Admin 4-Block 표준 |
 | `KPA-UX-BASELINE-V1.md` | Frozen | KPA 3개 서비스 UX 적용 현황 |
-| `KPA-ROLE-MATRIX-V1.md` | 판정 대기 | KPA 권한/역할 매트릭스 |
+| `KPA-ROLE-MATRIX-V1.md` | Active | KPA Society(`kpa:*`) 권한/역할 매트릭스 — 2026-10-06 범위 축소 |
+| `KPA-BRANCH-ROLE-MATRIX-V1.md` | Active | 약사 분회 서비스(`kpa-branch:*`) 역할 · 접근 행렬 |
+| `CHECKOUT-STABLE-DECLARATION-V2.md` | Active | B2B checkout · PaymentCore Stable 범위 (V1 SUPERSEDED) |
 | `KPA-SOCIETY-SERVICE-STRUCTURE.md` | Active | KPA 3-Service 구조 정의 |
 | `E-COMMERCE-ORDER-CONTRACT.md` | 판정 대기 | 주문 생성 유일 경로 정의 (`createOrder()` 단일 지점 규칙만 유효 · `OrderType` 열거 절 stale) |
 | `ROLE-POLICY-AND-GUARD-V1.md` | Active | Admin/Operator 권한 정책 + Guard 기준 |
 | `core-boundary.md` | Active | Core/Domain 서비스 경계 |
 | `operations/PRODUCTION-MIGRATION-STANDARD.md` | Active | 프로덕션 마이그레이션 표준 |
+| `operations/O4O-API-OPERATIONS-RUNBOOK-V1.md` | Active | API 상시 운영 점검 최소 기준 (INTERNAL-BETA-RUNBOOK-V1 SUPERSEDED) |
