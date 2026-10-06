@@ -1,7 +1,7 @@
 # CHECK-O4O-SITEGUIDE-RETIREMENT-V1
 
 > **상태**: ACTIVE
-> **작성일**: 2026-10-05 · **최종 갱신**: 2026-10-05
+> **작성일**: 2026-10-05 · **최종 갱신**: 2026-10-06
 > **근거 WO**: WO-O4O-SITEGUIDE-RETIREMENT-V1 · 선행 WO-O4O-SITEGUIDE-LEGACY-CODE-REMOVAL-V1 (소스 `07496aa5f` · 스키마 drop migration)
 
 **사용자 결정 (2026-10-05)**: siteguide 서비스는 진행하지 않는다. 전용 코드와 O4O 인프라 연결을 퇴역한다.
@@ -68,11 +68,31 @@ O4O 쪽 연결은 끊겼지만 DNS 가 아직 O4O LB 를 가리킨다. 아래 4�
 
 삭제 후 확인: `nslookup siteguide.co.kr` · `nslookup www.siteguide.co.kr` 에 O4O LB IP 가 나오지 않는다. 도메인을 다른 곳에 연결할 때는 위 값을 재사용하지 않는다.
 
+#### 3-1-a. 삭제 후 확인 (2026-10-06 · 사용자 gabia 작업 후)
+
+조회: 공개 resolver(Google `8.8.8.8` · DoH, Cloudflare `1.1.1.1` · DoH) + gabia 권한 네임서버 4대 직접 질의. 마지막 조회 2026-10-06 09:15 KST 무렵.
+
+| 항목 | 결과 (관측) |
+|---|---|
+| A `siteguide.co.kr` · `www.siteguide.co.kr` | O4O LB IP **응답 없음** — Google · Cloudflare 모두 `SERVFAIL`(Status 2), 답변 레코드 0 |
+| gabia 네임서버 4대 직접 질의 (A · NS · CNAME) | 4대 모두 **`REFUSED`** (Google DoH 사유: lame delegation · EDE 22/23) |
+| CNAME `_acme-challenge.www` | **현재 해석되지 않음** — Google · Cloudflare 모두 `SERVFAIL`, 답변 0 |
+| CNAME `_acme-challenge` | 권한 응답 없음(`REFUSED`) · Cloudflare 답변 0. Google DoH 는 6회 반복 중 2회 기존 값 답변(TTL 253 → 244초, 나머지 4회 `SERVFAIL`) — 캐시 응답으로 보이나 확인하지 않았다. 첫 조회(2026-10-06 이른 시점)에는 www 쪽도 Google 이 기존 값을 답했고(TTL 385초), 재확인 때는 답변 0 |
+
+판정:
+
+- **완료 (관측 범위 한정)**: **O4O 연결 해제 및 현재 DNS 접근 차단 확인 완료.** apex · www 는 현재 O4O LB IP 로 해석되지 않고, 권한 네임서버 4대는 질의를 거부하며, `_acme-challenge.www` 는 현재 해석되지 않는다. `_acme-challenge` 는 Google 일부 응답에만 기존 값이 보인다(위 표의 관측값).
+- **미확인**: gabia 의 **DNS 레코드 4개 실제 삭제** — `SERVFAIL` · `REFUSED` 는 현재 해석 불가만 보여 줄 뿐 삭제를 증명하지 않는다. gabia 설정 화면이나 정상 권한 응답의 `NXDOMAIN` / `NODATA` 로 확인되지 않았다. zone 장애 · 위임 문제가 복구되면 기존 A · CNAME 이 다시 노출될 가능성을 이 조회로는 배제할 수 없다.
+- **추정**: 권한 서버가 빈 응답이 아닌 `REFUSED` 를 주므로 gabia 에서 `siteguide.co.kr` **DNS zone 전체가 삭제**되었을 가능성이 있다. 확인하지 않았다.
+- **미확인**: 도메인 등록 상태(등록 유지 · 네임서버 위임 설정). 이번 범위 밖이며 조회하지 않았다.
+
+별도 운영 배포 없음 (문서 기록만).
+
 ## 4. 남은 항목 · 결정 필요
 
 - **플랫폼 문의 유형 `'siteguide'`** — 운영 데이터 2행이 이 값을 쓴다. 코드에서만 지우면 Neture 관리자 문의 화면에서 그 2행의 유형 라벨이 비고 필터로 찾을 수 없다.
   제거하려면 먼저 2행 처리(삭제 또는 `other` 재분류 — DB write, 별도 승인)가 필요하고, 그 뒤 API 타입 · 라벨 · `VaultInquiriesPage` 의 값을 함께 지운다. 문의 접수 API 는 유형 화이트리스트가 없어 지금도 런타임 영향은 없다.
-- gabia DNS 레코드 4개 삭제 (§3-1) — 사용자 작업
+- gabia DNS (§3-1) — 사용자 작업 후 **현재 DNS 접근 차단 확인 완료** (2026-10-06, §3-1-a). 레코드 4개 실제 삭제 · zone 삭제는 **미확인**(gabia 설정 화면 확인 시 종결)
 - 도메인 등록 해지 · 자동갱신 — 이번 범위 밖
 - 기록물(checks · investigations · archive · work-orders) 의 siteguide 서술 — 과거 기록이라 그대로 둔다
 - 발견(범위 밖): `infra/artifact-registry/README.md` 의 `cloud-run-source-deploy` repository 도 현재 존재하지 않고, 표의 보존 정책(keep 50 · 30일)은 실제 적용값(keep 10 · tagged 30일 · untagged 7일)과 다르다 — 별도 정비
