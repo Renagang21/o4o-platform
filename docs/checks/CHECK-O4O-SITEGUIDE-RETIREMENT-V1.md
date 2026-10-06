@@ -1,7 +1,7 @@
 # CHECK-O4O-SITEGUIDE-RETIREMENT-V1
 
 > **상태**: ACTIVE
-> **작성일**: 2026-10-05 · **최종 갱신**: 2026-10-05
+> **작성일**: 2026-10-05 · **최종 갱신**: 2026-10-06
 > **근거 WO**: WO-O4O-SITEGUIDE-RETIREMENT-V1 · 선행 WO-O4O-SITEGUIDE-LEGACY-CODE-REMOVAL-V1 (소스 `07496aa5f` · 스키마 drop migration)
 
 **사용자 결정 (2026-10-05)**: siteguide 서비스는 진행하지 않는다. 전용 코드와 O4O 인프라 연결을 퇴역한다.
@@ -68,11 +68,30 @@ O4O 쪽 연결은 끊겼지만 DNS 가 아직 O4O LB 를 가리킨다. 아래 4�
 
 삭제 후 확인: `nslookup siteguide.co.kr` · `nslookup www.siteguide.co.kr` 에 O4O LB IP 가 나오지 않는다. 도메인을 다른 곳에 연결할 때는 위 값을 재사용하지 않는다.
 
+#### 3-1-a. 삭제 후 확인 (2026-10-06 · 사용자 gabia 작업 후)
+
+조회: 공개 resolver(Google `8.8.8.8` · DoH, Cloudflare `1.1.1.1` · DoH) + gabia 권한 네임서버 4대 직접 질의. 마지막 조회 2026-10-06 09:15 KST 무렵.
+
+| 항목 | 결과 (관측) |
+|---|---|
+| A `siteguide.co.kr` · `www.siteguide.co.kr` | O4O LB IP **응답 없음** — Google · Cloudflare 모두 `SERVFAIL`(Status 2), 답변 레코드 0 |
+| gabia 네임서버 4대 직접 질의 (A · NS · CNAME) | 4대 모두 **`REFUSED`** (Google DoH 사유: lame delegation · EDE 22/23) |
+| CNAME `_acme-challenge.www` | 제거 확인 — Google · Cloudflare 모두 `SERVFAIL`, 답변 0 |
+| CNAME `_acme-challenge` | 권한 응답 없음(`REFUSED`) · Cloudflare 답변 0. Google DoH 는 6회 반복 중 2회만 **캐시 잔존** 답변(TTL 253 → 244초 감소 중, 나머지 4회 `SERVFAIL`) — 원본이 없는 캐시라 TTL 만료로 사라진다. 첫 조회(2026-10-06 이른 시점)에 www 쪽도 같은 캐시 잔존이 있었고 재확인 때는 사라졌다 |
+
+판정:
+
+- **확정(관측)**: apex · www 에서 O4O LB IP 가 더 이상 응답하지 않는다. 인증용 CNAME 2개는 권한 네임서버에서 응답하지 않으며, 남은 것은 Google 일부 노드의 만료 대기 캐시뿐이다. → siteguide 의 O4O 연결 해제와 DNS 퇴역 단계 **완료**.
+- **추정**: 레코드만 지웠다면 권한 서버가 `NXDOMAIN`/빈 응답을 줘야 하는데 `REFUSED` 를 주므로, gabia 에서 `siteguide.co.kr` **DNS zone 전체가 삭제**되었을 가능성이 크다. 사용자 작업 화면으로 확인한 것은 아니다.
+- **미확인**: 도메인 등록 상태(등록 유지 · 네임서버 위임 설정). 이번 범위 밖이며 조회하지 않았다. 도메인을 다시 쓸 때는 gabia 에서 DNS zone 을 다시 만들어야 할 수 있다.
+
+별도 운영 배포 없음 (문서 기록만).
+
 ## 4. 남은 항목 · 결정 필요
 
 - **플랫폼 문의 유형 `'siteguide'`** — 운영 데이터 2행이 이 값을 쓴다. 코드에서만 지우면 Neture 관리자 문의 화면에서 그 2행의 유형 라벨이 비고 필터로 찾을 수 없다.
   제거하려면 먼저 2행 처리(삭제 또는 `other` 재분류 — DB write, 별도 승인)가 필요하고, 그 뒤 API 타입 · 라벨 · `VaultInquiriesPage` 의 값을 함께 지운다. 문의 접수 API 는 유형 화이트리스트가 없어 지금도 런타임 영향은 없다.
-- gabia DNS 레코드 4개 삭제 (§3-1) — 사용자 작업
+- ~~gabia DNS 레코드 4개 삭제 (§3-1) — 사용자 작업~~ → **완료** (2026-10-06, §3-1-a)
 - 도메인 등록 해지 · 자동갱신 — 이번 범위 밖
 - 기록물(checks · investigations · archive · work-orders) 의 siteguide 서술 — 과거 기록이라 그대로 둔다
 - 발견(범위 밖): `infra/artifact-registry/README.md` 의 `cloud-run-source-deploy` repository 도 현재 존재하지 않고, 표의 보존 정책(keep 50 · 30일)은 실제 적용값(keep 10 · tagged 30일 · untagged 7일)과 다르다 — 별도 정비
