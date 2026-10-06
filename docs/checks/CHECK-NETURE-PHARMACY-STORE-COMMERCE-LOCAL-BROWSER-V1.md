@@ -123,6 +123,7 @@
 ### 9-3. migration 적용 순서 · 배포 순서
 
 1. migration `1791200000000-CreateNeturePharmacyCommerce` — main 최신 `AddLocalAgentDeviceCapabilities1791177033073` 다음(manifest · expected state 반영). 새 테이블 6(`neture_pharmacy_memberships` · `semi_franchises` · `semi_franchise_memberships` · `semi_franchise_operators` · `supply_proposals` · `semi_franchise_contents`), 기존 테이블 컬럼 · 제약 변경(`store_cart_items` · `seller_recruitments` · `seller_recruitment_applications` · `idx_org_listing_unique_v2`), 기준 행 2(세미프랜차이즈 조직 · `pharmacy`, `ON CONFLICT DO NOTHING`). `NULLS NOT DISTINCT` 사용 — 운영 DB PostgreSQL 15 확인.
+   - **갱신 (2026-10-06, PR #332)**: 운영 promote 의 **선행 조건 = PR #332(WO-NETURE-PHARMACY-CUTOVER-COMPAT-V1) main 통합**. #332 는 아직 운영에 적용되지 않은 이 migration 을 고쳐 `idx_org_listing_unique_v2` 를 **바꾸지 않는다**(전체 UNIQUE 유지 — 1단계). 부분 UNIQUE 교체는 별도 2단계 migration WO. 상세 · 검증: [`CHECK-NETURE-PHARMACY-CUTOVER-COMPAT-V1`](CHECK-NETURE-PHARMACY-CUTOVER-COMPAT-V1.md) §3 · §5 · §6.
 2. 실행 위치: `deploy-api.yml` 의 Cloud Run Job `o4o-api-migrations` — **API 배포 직전**에 실행, 실패하면 배포 중단 · 기존 revision 유지. 수동 적용 금지(PRODUCTION-MIGRATION-STANDARD).
 3. 배포 순서: API(migration → 배포 → revision traffic 100% 확인) → 프런트(store · neture · kpa-society · pharmacy-hub). 배포 완료 판정 = job success + 새 revision + traffic 100%.
 4. 배포 후 읽기 확인: `typeorm_migrations` 최신 행 · 새 테이블 존재 · 기준 행 2.
@@ -166,6 +167,8 @@
 
 #308 과 #323(서비스 로그인 membership gate, `46a1f8f6a`)은 **같은 promote 로 함께 배포된다**(§9-7). 아래 1~8 에 더해 결합 항목 9~13 을 같은 회차에서 확인한다.
 
+> **갱신 (2026-10-06, PR #332)**: #332 가 선행 통합되면 11 · 12 의 기대값이 바뀐다 — pharmacy 호스트 이용 자격 = **Neture 기본 가입 active ∧ pharmacy 세미프랜차이즈 가입 active**(직접 로그인 · handoff · 화면 게이트 동일 판정). 11 은 403 대신 상태별 안내 + `store.neture.co.kr` 신청 링크, 12 는 세미프랜차이즈까지 승인된 계정이면 **통과**(기본 가입만 승인된 계정은 세미프랜차이즈 신청 안내). 운영 검증 흐름은 [`CHECK-NETURE-PHARMACY-CUTOVER-COMPAT-V1`](CHECK-NETURE-PHARMACY-CUTOVER-COMPAT-V1.md) §5-4 를 따른다. 이 자격만 가진 약국은 KPA membership 을 요구하는 backend 경로(Forum 등)를 쓸 수 없다 — 범위는 같은 CHECK §7.
+
 | # | 항목 | 확인 |
 |---|---|---|
 | 1 | 가입 | 약국 기본 가입 신청 · 미가입 상태에서도 내 매장 진입 |
@@ -188,6 +191,7 @@
 - PH opt-in 데이터 정리(`pharmacy-hub` 키 · `offer_service_prices`) — PH 주문 종료 후 별도 승인, 키 단순 제거 금지(DESIGN §16-5).
 - 운영 DB 변경은 실행하지 않았다.
 - 미가입 403 안내에 가입 경로 링크 추가 · 승인 계정의 KPA 호스트 접근 정책(§9-5 11 · 12) — 운영 smoke 결과를 보고 별도 WO.
+  - **갱신 (2026-10-06)**: 이 항목은 PR #332(WO-NETURE-PHARMACY-CUTOVER-COMPAT-V1)가 처리한다 — 별도 WO 불필요.
 
 ### 9-7. promote 범위 · 순서 · 실패 대응 (2026-10-06 확정 — 실행은 사용자 승인 후)
 
@@ -203,6 +207,7 @@
 | `24e5dd4ba` | #308 | API · web-store · web-neture · web-pharmacy-hub · web-kpa-society · migration 1건 |
 | `666c6dc2f` · `05d547ac4` · `1fc49cbc5` | #326 · #327 · #329 | 문서 · 에이전트 규칙(런타임 없음) |
 | (예정) PR #328 | — | `deploy-api.yml` 결제 모드 주입 — merge 되면 promote 대상 SHA 에 포함 |
+| (선행 필수) PR #332 | — | migration `1791200000000` 의 인덱스 교체 제거(1단계) · pharmacy 호스트 세미프랜차이즈 이용 자격(API 로그인 · handoff · web-kpa-society · web-neture · auth-react). **#332 통합 전에는 promote 하지 않는다** |
 
 - migration: **`1791200000000-CreateNeturePharmacyCommerce` 1건뿐**(`e0be29869..main` 에서 추가 · 변경된 migration 은 이것 하나).
 - promote 입력: `sha` = 실행 시점 main HEAD(40자, 다르면 거부) · `services` 비움(전체) · 먼저 `dry_run=true` 로 대상 확인 → 승인 후 `dry_run=false`.
@@ -210,6 +215,7 @@
 
 순서:
 
+0. (선행 필수) PR #332 main 통합 — 인덱스 1단계 · pharmacy 호스트 이용 자격. 상세 순서는 [`CHECK-NETURE-PHARMACY-CUTOVER-COMPAT-V1`](CHECK-NETURE-PHARMACY-CUTOVER-COMPAT-V1.md) §5.
 1. (선행) PR #328 merge → variable `NETURE_PHARMACY_PAYMENT_MODE=test` 설정(테스트 결제를 열 경우만).
 2. Cloud Run Job `o4o-api-migrations` — `1791200000000` 적용.
 3. API verified rollout → 새 revision · traffic 100% 확인 → 읽기 확인(§9-3 4) · 새 revision env 의 `NETURE_PHARMACY_PAYMENT_MODE` 값 확인.
@@ -226,4 +232,6 @@
 | smoke 실패 | 없음 | 결제 문제면 variable 해제 후 재배포로 disabled 복귀 가능(승인 필요). 그 밖은 수정 PR |
 
 **주의 — 옛 API × 새 스키마**: migration 은 `idx_org_listing_unique_v2` 를 부분 인덱스(`WHERE service_key <> 'neture-event-offer'`)로 다시 만든다. 옛 API(`e0be29869`)의 `ON CONFLICT (organization_id, service_key, offer_id)` 구문(`auto-listing.utils` · `product-approval-v2.service` · `event-offer.service` · `seller-recruitment.service` · `store-product-library.controller` · `PharmacyHubHandledProductController`)은 `WHERE` 가 없어 **부분 인덱스를 추론하지 못하고 오류**가 난다(새 API 는 같은 `WHERE` 를 붙였다). 따라서 ① migration 완료 ~ 새 revision traffic 100% 사이의 짧은 구간, ② API rollout 실패로 옛 revision 에 머무는 동안 매장 상품 진열 자동 생성 · 상품 승인 · 이벤트 오퍼 담기 등이 실패할 수 있다. ② 는 오래 두지 않는다 — 원인 수정 후 재 promote, 또는 migration down(인덱스 · 제약 원복 포함)을 승인받아 되돌린다. `seller_recruitments` unique 교체는 옛 코드가 이름 · `ON CONFLICT` 로 참조하지 않아 영향 없음.
+
+> **갱신 (2026-10-06, PR #332)**: 위 주의는 #332 통합 **전** migration 기준이다. #332 통합 후 이 migration 은 `idx_org_listing_unique_v2` 를 바꾸지 않으므로, 운영 API `e0be29869`(rev `o4o-core-api-03834-fuh`)의 위 `ON CONFLICT` 9개 지점은 migration 적용 후에도 그대로 동작한다(쿼리 형태 단위 재현 검증 — [`CHECK-NETURE-PHARMACY-CUTOVER-COMPAT-V1`](CHECK-NETURE-PHARMACY-CUTOVER-COMPAT-V1.md) §6). 위 ① · ② 구간의 진열 · 승인 · 이벤트 담기 실패 위험은 1단계에서는 없어지고, **2단계 migration(부분 UNIQUE) 배포 시점으로 이동**한다.
 
