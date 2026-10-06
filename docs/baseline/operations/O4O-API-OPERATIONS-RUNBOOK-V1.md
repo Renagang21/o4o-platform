@@ -22,7 +22,8 @@
 | **Health · Readiness** | DB 연결 · 준비 상태 | `GET /api/health/ready` · `/api/health/database` · `/api/health/detailed` — 공개, `routes/health.ts`(`/health/*` 로도 mount) | HTTP 503 |
 | **Health 요약** | 전체 상태 한눈에 | `GET /api/health` — DB 조회가 실패해도 **항상 200** 을 반환한다 | HTTP 상태로 판단하지 않는다 — 응답 본문의 `database.status` 가 `healthy` 가 아님 |
 | **배포 반영** | 새 revision 이 트래픽을 받는가 | GitHub Actions deploy job · Cloud Run revision · traffic | workflow success 만으로 완료로 보지 않는다 — **job success + 새 revision + traffic 100%** 를 함께 확인 |
-| **인증** | 로그인 · refresh 실패 급증 | Cloud Run 로그 — `[GoogleAuthController.*]` · `[EmailAuthController.*]` · `[AuthSessionController.*]` 의 warn/error | 같은 reason 의 실패가 몰림 · unexpected error |
+| **인증 실패 급증** | 로그인 · refresh 실패가 몰리는가 | Cloud Run **요청 로그**를 route · 응답 코드로 필터 — `POST /api/v1/auth/email/login` · `/api/v1/auth/google/login` · `/api/v1/auth/refresh`(legacy `/api/auth/*` 포함)의 4xx | 4xx 비율 · 건수가 평소 대비 급증. 예상된 실패(잘못된 비밀번호 · `EmailAuthError` · `GoogleAuthError` · refresh token 누락 `NO_REFRESH_TOKEN`)는 **애플리케이션 로그를 남기지 않고** 응답만 하므로 이 경로로만 보인다 |
+| **인증 예외** | 인증 처리의 예상 밖 오류 | Cloud Run 애플리케이션 로그 — `[EmailAuthController.*] unexpected error` · `[GoogleAuthController.*] ID token rejected`(warn, reason 포함) 등 `[*AuthController.*]` · `[AuthSessionController.*]` 의 warn/error | 출력 자체가 이상 신호 — 같은 reason 이 몰리면 설정(allowlist · client ID) 확인 |
 | **API 오류** | 5xx 비율 | Cloud Run 요청 지표(응답 코드별) · 로그의 error | 5xx 지속 발생 |
 | **API 지연** | 응답 지연 | Cloud Run 요청 지연 지표(p50 / p95) | 평소 대비 지속 상승 |
 | **DB** | ping · 연결 | `/api/health/database` → 장시간 쿼리는 read-only 채널로 `pg_stat_activity` 확인(SETUP.md) | 503 · ping 지연 지속 |
