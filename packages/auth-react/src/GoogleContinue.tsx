@@ -17,7 +17,7 @@
  */
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { renderGoogleButton, type GoogleAuthConfig } from '@o4o/auth-client';
-import type { AuthLoginResult, GoogleSignupConsents } from './types';
+import type { AuthLoginResult, AuthServiceAccess, GoogleSignupConsents } from './types';
 
 export interface GoogleContinueProps<TUser = unknown> {
   /** `authClient.getGoogleAuthConfig` — 공개 Client ID 조회. */
@@ -29,7 +29,7 @@ export interface GoogleContinueProps<TUser = unknown> {
   /** 세션 성립(로그인 또는 신규 가입) 시 호출. `isNewUser` 로 안내 문구를 나눌 수 있다. */
   onSuccess: (result: { user: TUser; isNewUser: boolean }) => void;
   /** 서버 오류 표시용(선택). `code` 는 서버 응답 code(ACCOUNT_NOT_ACTIVE · EMAIL_IN_USE 등). */
-  onError?: (error: { message: string; code?: string; accountStatus?: string }) => void;
+  onError?: (error: { message: string; code?: string; accountStatus?: string; serviceAccess?: AuthServiceAccess }) => void;
   /** Google credential 을 받아 인증을 시작하는 시점(선택). 호출부가 legacy email 로그인 오류 표시를 지우는 데 쓴다. */
   onStart?: () => void;
   /** 동의 화면의 약관/개인정보 링크. 기본값은 대표 도메인 상대 경로. */
@@ -107,7 +107,12 @@ export function GoogleContinue<TUser = unknown>({
   const fail = useCallback((result: AuthLoginResult<TUser>) => {
     const msg = result.error || 'Google 인증에 실패했습니다.';
     setMessage(msg);
-    callbacksRef.current.onError?.({ message: msg, code: result.code, accountStatus: result.accountStatus });
+    callbacksRef.current.onError?.({
+      message: msg,
+      code: result.code,
+      accountStatus: result.accountStatus,
+      serviceAccess: result.serviceAccess,
+    });
   }, []);
 
   /** credential → login → (미등록) consent */

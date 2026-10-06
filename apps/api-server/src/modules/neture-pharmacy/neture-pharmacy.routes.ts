@@ -2,6 +2,7 @@
  * Neture 약국 매장 commerce 라우트 — /api/v1/neture 아래 (DESIGN §3 · §4 · §8)
  *
  *   /pharmacy/membership                         기본 가입 신청 · 내 상태          (로그인)
+ *   /pharmacy/service-access/:serviceKey         세미프랜차이즈 서비스 이용 자격    (로그인 · 본인 판정만)
  *   /pharmacy/...                                내 매장(약국)                    (로그인 + 매장 게이트 = 기본 가입 원장)
  *   /operator/pharmacy-memberships               기본 가입 승인                    (neture:operator)
  *   /operator/semi-franchises/:key/...           담당 세미프랜차이즈 처리          (neture:operator ∧ 담당 관계)
@@ -43,6 +44,8 @@ import { SemiFranchiseRecruitmentService } from './services/semi-franchise-recru
 import { PharmacyCartService, isUuid } from './services/pharmacy-cart.service.js';
 import { PharmacyPaymentService } from './services/pharmacy-payment.service.js';
 import { SemiFranchiseContentService } from './services/semi-franchise-content.service.js';
+import { resolveSemiFranchiseServiceAccess, SEMI_FRANCHISE_ACCESS_MESSAGES } from './services/semi-franchise-service-access.js';
+import { semiFranchiseAccessKeyFor } from '../../common/auth/service-login-eligibility.policy.js';
 import { AssetCopyService } from '@o4o/asset-copy-core';
 
 type Req = Request & { user?: { id: string }; organizationId?: string; supplierId?: string };
@@ -105,6 +108,15 @@ export function createNeturePharmacyRoutes(dataSource: DataSource): ExpressRoute
   router.post('/pharmacy/membership', requireAuth, handle(async (req, res) => {
     res.status(201);
     return membership.apply(req.user!.id, req.body ?? {});
+  }));
+  // 세미프랜차이즈로 이용하는 서비스 호스트(pharmacy.neture.co.kr = kpa-society)의 화면 게이트용 — 로그인 · handoff 와 같은 판정.
+  router.get('/pharmacy/service-access/:serviceKey', requireAuth, handle(async (req) => {
+    const semiFranchiseKey = semiFranchiseAccessKeyFor(req.params.serviceKey);
+    if (!semiFranchiseKey) {
+      return { semiFranchiseKey: null, allowed: false, pharmacyMembershipStatus: null, semiFranchiseMembershipStatus: null, next: null, message: null };
+    }
+    const access = await resolveSemiFranchiseServiceAccess(dataSource, req.user!.id, semiFranchiseKey);
+    return { ...access, message: access.next ? SEMI_FRANCHISE_ACCESS_MESSAGES[access.next] : null };
   }));
 
   // ─── 내 매장 (기본 가입 active) ───────────────────────────────────────────

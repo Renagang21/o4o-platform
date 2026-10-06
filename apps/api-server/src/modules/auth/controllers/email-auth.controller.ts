@@ -204,6 +204,8 @@ export class EmailAuthController extends BaseController {
         error: error.message,
         code: error.code,
         ...(error.details ? { details: error.details } : {}),
+        // WO-NETURE-PHARMACY-CUTOVER-COMPAT-V1: 세미프랜차이즈 자격 상태(인증을 마친 본인에게만, 서버 선별 필드)
+        ...(error.serviceAccess ? { serviceAccess: error.serviceAccess } : {}),
       });
     }
     if (err.code === 'ACCOUNT_NOT_ACTIVE') {

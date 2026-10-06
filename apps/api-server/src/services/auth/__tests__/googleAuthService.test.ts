@@ -18,6 +18,7 @@ import { User } from '../../../entities/User.js';
 import { LinkedAccount } from '../../../entities/LinkedAccount.js';
 import { AccountActivity } from '../../../entities/AccountActivity.js';
 import * as tokenUtils from '../../../utils/token.utils.js';
+import { decideSemiFranchiseAccess } from '../../../modules/neture-pharmacy/services/semi-franchise-service-access.js';
 
 // ── in-memory fake DB ───────────────────────────────────────────────────────
 type Row = Record<string, any>;
@@ -152,6 +153,9 @@ describe('GoogleAuthService — Google-only Signup/Login', () => {
   /** issueSession 이 돌려줄 역할 · membership — 로그인 자격 게이트 테스트용. */
   let sessionRoles: string[];
   let sessionMemberships: { serviceKey: string; status: string }[];
+  /** 세미프랜차이즈 자격 fake — Neture 약국 조직별 (기본, 세미프랜차이즈) 가입 상태. */
+  let semiFranchiseRows: { basic: string | null; semi: string | null }[];
+  let semiFranchiseResolver: jest.Mock;
 
   beforeAll(() => {
     process.env.JWT_SECRET = process.env.JWT_SECRET || 'test-jwt-secret-google-auth';
@@ -168,6 +172,7 @@ describe('GoogleAuthService — Google-only Signup/Login', () => {
         roles: sessionRoles,
         memberships: sessionMemberships,
       }),
+      resolveSemiFranchiseAccess: semiFranchiseResolver,
     });
   };
 
@@ -176,6 +181,8 @@ describe('GoogleAuthService — Google-only Signup/Login', () => {
     ds = makeDataSource(store);
     sessionRoles = [];
     sessionMemberships = [];
+    semiFranchiseRows = [];
+    semiFranchiseResolver = jest.fn(async (_userId: string, key: string) => decideSemiFranchiseAccess(key, semiFranchiseRows));
   });
 
   // ── signup ────────────────────────────────────────────────────────────────
@@ -518,6 +525,55 @@ describe('GoogleAuthService — Google-only Signup/Login', () => {
       build({ 'tok-a': { sub: SUB_A, email: 'new@example.test' } });
       const session = await svc.signup({ idToken: 'tok-a', consents: CONSENTS, ...GATED });
       expect(session.isNewUser).toBe(true);
+    });
+  });
+
+  // WO-NETURE-PHARMACY-CUTOVER-COMPAT-V1 — pharmacy.neture.co.kr(kpa-society) 게이트의 세미프랜차이즈 자격
+  describe('세미프랜차이즈 자격 (kpa-society 게이트)', () => {
+    const GATED = { ...META, sessionServiceKey: 'kpa-society', loginMembershipGateKey: 'kpa-society' };
+    const linkedUser = () => {
+      const u = seedUser(store, { email: 'pharmacy@example.test' });
+      store.linked.push({ id: uuid(), userId: u.id, provider: 'google', providerId: SUB_A, lastUsedAt: new Date(0) });
+      build({ 'tok-a': { sub: SUB_A } });
+      return u;
+    };
+
+    it('Neture 기본 active ∧ pharmacy active → kpa-society membership 없이 세션 발급', async () => {
+      const u = linkedUser();
+      semiFranchiseRows = [{ basic: 'active', semi: 'active' }];
+      const session = await svc.login({ idToken: 'tok-a', ...GATED });
+      expect(session.tokens.accessToken).toBeTruthy();
+      expect(semiFranchiseResolver).toHaveBeenCalledWith(u.id, 'pharmacy');
+    });
+
+    it('세미프랜차이즈 대기 → SERVICE_NOT_MEMBER + serviceAccess(next=semi_franchise_pending), 흔적 없음', async () => {
+      const u = linkedUser();
+      semiFranchiseRows = [{ basic: 'active', semi: 'pending' }];
+      const err = await svc.login({ idToken: 'tok-a', ...GATED }).catch((e) => e);
+      expect(err).toBeInstanceOf(GoogleAuthError);
+      expect(err).toMatchObject({ code: 'SERVICE_NOT_MEMBER', statusCode: 403 });
+      expect(err.serviceAccess).toEqual({
+        semiFranchiseKey: 'pharmacy',
+        pharmacyMembershipStatus: 'active',
+        semiFranchiseMembershipStatus: 'pending',
+        next: 'semi_franchise_pending',
+      });
+      expect(u.refreshTokenFamily).toBeUndefined();
+      expect(store.linked[0].lastUsedAt.getTime()).toBe(0);
+    });
+
+    it('Neture 약국 미가입 → next=apply_pharmacy', async () => {
+      linkedUser();
+      const err = await svc.login({ idToken: 'tok-a', ...GATED }).catch((e) => e);
+      expect(err.serviceAccess).toMatchObject({ next: 'apply_pharmacy', pharmacyMembershipStatus: null });
+    });
+
+    it('기존 kpa-society row 는 기존 규칙대로 통과 — 세미프랜차이즈 조회 없음', async () => {
+      linkedUser();
+      sessionMemberships = [{ serviceKey: 'kpa-society', status: 'active' }];
+      const session = await svc.login({ idToken: 'tok-a', ...GATED });
+      expect(session.tokens.accessToken).toBeTruthy();
+      expect(semiFranchiseResolver).not.toHaveBeenCalled();
     });
   });
 });

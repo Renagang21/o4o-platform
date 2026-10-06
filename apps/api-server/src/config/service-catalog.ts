@@ -112,6 +112,15 @@ export interface O4OService {
    */
   loginMembershipRequired?: boolean;
   /**
+   * Neture 세미프랜차이즈 이용 자격 (optional). WO-NETURE-PHARMACY-CUTOVER-COMPAT-V1
+   *
+   *   값(세미프랜차이즈 key)이 있으면 이 서비스의 직접 로그인 게이트와 handoff 는 이 서비스 membership 이 없어도
+   *   **Neture 기본 가입 active ∧ 이 세미프랜차이즈 가입 active** 인 약국 조직의 owner/admin/manager 를 통과시킨다
+   *   (`modules/neture-pharmacy/services/semi-franchise-service-access`). membership 을 만들지 않고,
+   *   기존 이 서비스 membership 을 Neture 자격으로 재해석하지 않는다(그 row 의 종전 판정은 그대로).
+   */
+  semiFranchiseAccessKey?: string;
+  /**
    * Service Workspace 자격 metadata (optional — 미지정 시 `UNDECIDED_SERVICE_WORKSPACE`).
    * WO-O4O-SERVICE-TENANT-FOUNDATION-V1. 단일 출처 — 서비스별 `if (serviceKey === ...)` 분기 금지.
    */
@@ -142,8 +151,11 @@ export const O4O_SERVICES: O4OService[] = [
     //   약국 사업자 대상 운영 서비스라는 현재 의미와 어긋났다. 커뮤니티 자체의 이름은 community-catalog 가 따로 갖는다.
     description: '약국 사업자 매장 운영 서비스',
     joinEnabled: true,
-    // 가입은 Store Workspace(store.neture.co.kr) 신청 · 운영자 경로에서 만든다 — 이 호스트에서 로그인할 이유가 없다.
+    // 이 호스트 밖에서 이용 자격이 생긴다 — 미자격 사용자에게 이 호스트 세션을 주지 않는다.
+    //   Neture 약국은 store.neture.co.kr 에서 기본 가입 · pharmacy 세미프랜차이즈 가입을 신청하며 kpa-society
+    //   service_membership 은 생기지 않는다(DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1 §17) → 아래 semiFranchiseAccessKey.
     loginMembershipRequired: true,
+    semiFranchiseAccessKey: 'pharmacy',
     // STANDARD_CANDIDATE — 매장 linkage(kpa) · kpa:store_owner · kpa:operator 가 현재 runtime 에 있다. 자동 활성화 아님.
     workspace: { workspaceMode: 'standard', storeWorkspaceEnabled: true, operatorWorkspaceEnabled: true },
   },

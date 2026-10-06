@@ -4,14 +4,32 @@
  * 원장은 기존 이벤트 원장 그대로(OPL, source_type='event-offer') — 수량 · 한도 · 예약 · 복원 함수
  * (reserveEventOfferListing · incrementListingQuantity · STORE_ORDERED_QTY_SQL)를 그대로 쓰기 위해서다.
  *   organization_id = 세미프랜차이즈 운영 조직 (LIMIT 1 임의 선택 대체)
- *   service_key     = 'neture-event-offer'      (부분 UNIQUE 제외 → 재신청 · 같은 제품 복수 승인 이벤트)
+ *   service_key     = 'neture-event-offer'      (최종: 부분 UNIQUE 제외 → 재신청 · 같은 제품 복수 승인 이벤트)
  * 이벤트 가격은 수정하지 않는다 — 취소(삭제 · 종료) 후 새로 신청한다. 종료는 단방향이다.
+ *
+ * WO-NETURE-PHARMACY-CUTOVER-COMPAT-V1 — 1단계 임시 제한:
+ *   idx_org_listing_unique_v2 는 구버전 API 호환을 위해 아직 전체 UNIQUE (organization_id, service_key, offer_id) 다.
+ *   그래서 (세미프랜차이즈, 제품) 마다 이벤트 원장 행은 **상태 불문 하나**뿐이다 — 반려 · 종료 뒤 재신청과
+ *   같은 제품의 두 번째 이벤트는 `EVENT_REAPPLY_NOT_YET_SUPPORTED`(409)로 막는다(UNIQUE 위반 500 대신 명시 거절).
+ *   부분 UNIQUE 전환 migration(2단계)이 배포되면 이 검사를 걷어낸다.
  */
 import type { DataSource } from 'typeorm';
 import { NeturePharmacyError, SEMI_FRANCHISE_EVENT_SERVICE_KEY,
   rowsOf,
 } from '../constants.js';
 import type { SemiFranchiseRow } from './semi-franchise.service.js';
+
+/** 1단계 임시 제한 오류 코드 — 2단계(부분 UNIQUE) 배포 후 제거 대상 */
+export const EVENT_REAPPLY_NOT_YET_SUPPORTED = 'EVENT_REAPPLY_NOT_YET_SUPPORTED';
+const EVENT_REAPPLY_MESSAGE =
+  '이 제품은 이 세미프랜차이즈에 이벤트 신청 이력이 있습니다. 같은 제품의 재신청 · 추가 이벤트는 아직 지원하지 않습니다.';
+
+function isListingUniqueViolation(err: unknown): boolean {
+  const e = err as { code?: string; constraint?: string; driverError?: { code?: string; constraint?: string } };
+  const code = e?.driverError?.code ?? e?.code;
+  const constraint = e?.driverError?.constraint ?? e?.constraint;
+  return code === '23505' && constraint === 'idx_org_listing_unique_v2';
+}
 
 export interface SemiFranchiseEventInput {
   offerId?: string;
@@ -107,7 +125,14 @@ export class SemiFranchiseEventService {
     );
     if (!sf) throw new NeturePharmacyError(404, 'SEMI_FRANCHISE_NOT_FOUND', '세미프랜차이즈를 찾을 수 없습니다.');
     const v = validateEventInput(input, Number(offer.price_general));
-    // 같은 제품 · 같은 세미프랜차이즈라도 새 행(재신청 · 복수 이벤트). 기존 행을 고치지 않는다.
+    // 1단계 임시 제한(파일 머리말) — 같은 제품 · 같은 세미프랜차이즈의 원장 행이 이미 있으면(상태 불문) 거절한다.
+    //   기존 행을 고치지 않는다(주문이 jsonb 로 참조한다).
+    const [existing] = await this.dataSource.query(
+      `SELECT id FROM organization_product_listings
+        WHERE organization_id = $1 AND service_key = $2 AND offer_id = $3::uuid LIMIT 1`,
+      [sf.organization_id, SEMI_FRANCHISE_EVENT_SERVICE_KEY, offer.id],
+    );
+    if (existing) throw new NeturePharmacyError(409, EVENT_REAPPLY_NOT_YET_SUPPORTED, EVENT_REAPPLY_MESSAGE);
     const [row] = await this.dataSource.query(
       `INSERT INTO organization_product_listings
          (id, organization_id, service_key, master_id, offer_id, is_active, status, price, event_price,
@@ -120,7 +145,11 @@ export class SemiFranchiseEventService {
         // timestamp(without tz) 컬럼 — 세션 시간대로 변환해 NOW() 비교와 같은 기준으로 저장한다.
         v.eventPrice, v.startAt.toISOString(), v.endAt.toISOString(), v.totalQuantity, v.perStoreLimit, v.perOrderLimit, userId,
       ],
-    );
+    ).catch((err: unknown) => {
+      // 동시 신청이 위 검사를 함께 통과한 경우 — 같은 거절로 돌려준다.
+      if (isListingUniqueViolation(err)) throw new NeturePharmacyError(409, EVENT_REAPPLY_NOT_YET_SUPPORTED, EVENT_REAPPLY_MESSAGE);
+      throw err;
+    });
     return row;
   }
 

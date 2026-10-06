@@ -18,6 +18,7 @@
 
 import { useEffect, useLayoutEffect, useState } from 'react';
 import { clearStoredTokens } from '@o4o/auth-client';
+import { semiFranchiseAccessLink, type SemiFranchiseAccessLink } from '../lib/semiFranchiseAccess';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
 
@@ -49,6 +50,7 @@ function resolveReturnTo(raw: string | null): string {
 export default function HandoffPage() {
   const [status, setStatus] = useState<HandoffStatus>('loading');
   const [error, setError] = useState<string>('');
+  const [accessLink, setAccessLink] = useState<SemiFranchiseAccessLink | null>(null);
 
   // 낡은 토큰 선제 제거 — AuthProvider 의 passive effect(/auth/me) 보다 먼저 실행된다 (상단 주석).
   useLayoutEffect(() => {
@@ -84,7 +86,13 @@ export default function HandoffPage() {
           window.location.replace(returnTo);
         } else {
           setStatus('error');
-          setError(ERROR_MESSAGES[data?.code] || data?.error || '서비스 이동에 실패했습니다.');
+          // WO-NETURE-PHARMACY-CUTOVER-COMPAT-V1: Neture 약국 · 세미프랜차이즈 상태별 안내는 서버 문구 + 신청 링크
+          if (data?.serviceAccess && typeof data.error === 'string') {
+            setError(data.error);
+            setAccessLink(semiFranchiseAccessLink(data.serviceAccess.next));
+          } else {
+            setError(ERROR_MESSAGES[data?.code] || data?.error || '서비스 이동에 실패했습니다.');
+          }
         }
       } catch {
         setStatus('error');
@@ -110,6 +118,7 @@ export default function HandoffPage() {
       <div style={styles.container}>
         <div style={styles.card}>
           <p style={styles.errorText}>{error}</p>
+          {accessLink && <p><a href={accessLink.href} style={styles.link}>{accessLink.label}</a></p>}
           <a href="/login" style={styles.link}>로그인 페이지로 이동</a>
         </div>
       </div>

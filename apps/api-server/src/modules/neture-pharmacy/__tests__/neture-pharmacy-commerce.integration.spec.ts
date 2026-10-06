@@ -22,6 +22,7 @@ import { cancelStoreOrderBeforePayment } from '../../../services/checkout/store-
 import { policyAcceptanceService } from '../../policy-acceptance/policy-acceptance.service.js';
 import { SupplierOrderService } from '../../neture/services/supplier-order.service.js';
 import { resolveSemiFranchiseCommunityAccess } from '../services/semi-franchise-community-access.js';
+import { resolveSemiFranchiseServiceAccess } from '../services/semi-franchise-service-access.js';
 import { SemiFranchiseContentService } from '../services/semi-franchise-content.service.js';
 
 jest.mock('../../../utils/logger.js', () => ({
@@ -233,6 +234,48 @@ d('Neture 약국 매장 commerce — 격리 PostgreSQL 통합 검증', () => {
     });
   });
 
+  describe('pharmacy.neture.co.kr 이용 자격 (로그인 · handoff 공용 판정)', () => {
+    it('기본 active ∧ pharmacy active 일 때만 허용 · 단계별 next · 기존 kpa-society 가입은 재해석하지 않는다', async () => {
+      const access = (u: string) => resolveSemiFranchiseServiceAccess(ds, u, 'pharmacy');
+      const owner = await user();
+      expect(await access(owner)).toMatchObject({ allowed: false, next: 'apply_pharmacy', pharmacyMembershipStatus: null });
+
+      const row = await membership.apply(owner, { pharmacyName: uniq('약국'), businessNumber: randomBizno(), pharmacistLicenseNumber: 'L-2' });
+      expect(await access(owner)).toMatchObject({ allowed: false, next: 'pharmacy_pending', pharmacyMembershipStatus: 'pending' });
+      await membership.decide(operatorId, row.id, 'approve');
+      expect(await access(owner)).toMatchObject({ allowed: false, next: 'apply_semi_franchise', pharmacyMembershipStatus: 'active', semiFranchiseMembershipStatus: null });
+
+      const sf = (await sfs.getByKey('pharmacy'))!;
+      const app = await sfs.apply(row.organization_id, owner, 'pharmacy');
+      expect(await access(owner)).toMatchObject({ allowed: false, next: 'semi_franchise_pending', semiFranchiseMembershipStatus: 'pending' });
+      await sfs.decideMembership(sf, pharmacyOperator, app.id, 'approve');
+      expect(await access(owner)).toMatchObject({ allowed: true, next: null, pharmacyMembershipStatus: 'active', semiFranchiseMembershipStatus: 'active' });
+
+      await sfs.decideMembership(sf, pharmacyOperator, app.id, 'suspend');
+      expect(await access(owner)).toMatchObject({ allowed: false, next: 'semi_franchise_suspended' });
+      await sfs.decideMembership(sf, pharmacyOperator, app.id, 'reactivate');
+      expect((await access(owner)).allowed).toBe(true);
+
+      // 기본 가입 정지 → 세미프랜차이즈 active 여도 차단
+      await membership.decide(operatorId, row.id, 'suspend', '테스트');
+      expect(await access(owner)).toMatchObject({ allowed: false, next: 'pharmacy_suspended' });
+      await membership.decide(operatorId, row.id, 'reactivate');
+      expect((await access(owner)).allowed).toBe(true);
+
+      // 조직 탈퇴(left_at) 구성원은 자격 없음
+      await ds.query(`UPDATE organization_members SET left_at = NOW() WHERE organization_id = $1 AND user_id = $2`, [row.organization_id, owner]);
+      expect((await access(owner)).allowed).toBe(false);
+
+      // 기존 kpa-society 가입 · 역할 · 연결 조직은 Neture 자격이 아니다
+      const legacy = await user();
+      const [org] = await ds.query(`INSERT INTO organizations (name, code, type) VALUES ('옛약국2', $1, 'pharmacy') RETURNING id`, [uniq('kpa-pharm')]);
+      await ds.query(`INSERT INTO organization_members (organization_id, user_id, role) VALUES ($1, $2, 'owner')`, [org.id, legacy]);
+      await ds.query(`INSERT INTO service_memberships (user_id, service_key, status) VALUES ($1, 'kpa-society', 'active')`, [legacy]);
+      await role(legacy, 'kpa:store_owner');
+      expect(await access(legacy)).toMatchObject({ allowed: false, next: 'apply_pharmacy' });
+    });
+  });
+
   describe('세미프랜차이즈 콘텐츠 자료함', () => {
     it('담당 운영자 작성 · 게시 → 가입 약국만 열람 · 사본, 미가입 · 보관은 비노출, 비담당 운영자 처리 불가', async () => {
       const key = `ct-${tag}`;
@@ -352,7 +395,9 @@ d('Neture 약국 매장 commerce — 격리 PostgreSQL 통합 검증', () => {
       expect(await getSupplyOption(ds, b.orgId, 'proposal', sp.id)).toBeNull();
     });
 
-    it('이벤트: 승인 후 노출 · 종료 후 같은 제품 재신청 가능 · 복수 승인 이벤트 공존 · 가격 수정 경로 없음', async () => {
+    // WO-NETURE-PHARMACY-CUTOVER-COMPAT-V1 1단계: idx_org_listing_unique_v2 전체 UNIQUE 유지 → 재신청 · 복수 이벤트는 명시 거절.
+    //   2단계(부분 UNIQUE) 배포 때 이 기대값을 '재신청 가능 · 복수 승인 공존'으로 되돌린다.
+    it('이벤트: 승인 후 노출 · 종료 후 같은 제품 재신청은 1단계에서 명시 거절(500 아님) · 가격 수정 경로 없음', async () => {
       const prod = await supplierWithProduct({ price: 10000 });
       const member = await approvedPharmacy();
       await joinSemiFranchise(member.orgId, member.owner, 'pharmacy', pharmacyOperator);
@@ -371,12 +416,18 @@ d('Neture 약국 매장 commerce — 격리 PostgreSQL 통합 검증', () => {
       // 취소된 이벤트는 되살릴 수 없다(종료 단방향)
       await expect(events.operatorDecide(sf, pharmacyOperator, e1.id, 'approve')).rejects.toMatchObject({ code: 'INVALID_TRANSITION' });
 
-      const e2 = await events.supplierCreate(prod.supplierId, prod.supplierUser, { offerId: prod.offerId, semiFranchiseKey: 'pharmacy', eventPrice: 7500, ...window });
-      const e3 = await events.supplierCreate(prod.supplierId, prod.supplierUser, { offerId: prod.offerId, semiFranchiseKey: 'pharmacy', eventPrice: 7000, ...window });
+      await expect(events.supplierCreate(prod.supplierId, prod.supplierUser, { offerId: prod.offerId, semiFranchiseKey: 'pharmacy', eventPrice: 7500, ...window }))
+        .rejects.toMatchObject({ httpStatus: 409, code: 'EVENT_REAPPLY_NOT_YET_SUPPORTED' });
+      const [cnt] = await ds.query(
+        `SELECT count(*)::int AS n FROM organization_product_listings WHERE organization_id = $1 AND service_key = 'neture-event-offer' AND offer_id = $2`,
+        [sf.organization_id, prod.offerId],
+      );
+      expect(cnt.n).toBe(1);
+      // 다른 제품의 이벤트는 그대로 신청 · 승인된다
+      const other = await supplierWithProduct({ price: 9000 });
+      const e2 = await events.supplierCreate(other.supplierId, other.supplierUser, { offerId: other.offerId, semiFranchiseKey: 'pharmacy', eventPrice: 7000, ...window });
       await events.operatorDecide(sf, pharmacyOperator, e2.id, 'approve');
-      await events.operatorDecide(sf, pharmacyOperator, e3.id, 'approve');
-      const evs = (await listSupplyOptions(ds, member.orgId, { source: 'event' })).items.filter((o) => o.offerId === prod.offerId);
-      expect(evs.map((o) => o.unitPrice).sort()).toEqual([7000, 7500]);
+      expect(await getSupplyOption(ds, member.orgId, 'event', e2.id)).toMatchObject({ unitPrice: 7000 });
       expect(typeof (events as any).updatePrice).toBe('undefined');
     });
 

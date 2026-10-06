@@ -1,7 +1,7 @@
 # DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1
 
 > **상태**: ACTIVE
-> **작성일**: 2026-10-05 · **최종 갱신**: 2026-10-05 (§13 인증·가입 트랙 인계 계약 · §14 K-Cosmetics 퇴역 반영 · §15 미완료 범위 · 구현 결정 반영)
+> **작성일**: 2026-10-05 · **최종 갱신**: 2026-10-06 (§17 운영 전환 호환 — 인덱스 2단계 · pharmacy 호스트 이용 자격 · §13 인증·가입 트랙 인계 계약 · §14 K-Cosmetics 퇴역 반영 · §15 미완료 범위 · 구현 결정 반영)
 > **근거 WO/IR**: [`WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1`](../work-orders/WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1.md) 단계 1-7 · 입력 [`IR-NETURE-PHARMACY-STORE-COMMERCE-STEP1-CENSUS-V1`](../investigations/IR-NETURE-PHARMACY-STORE-COMMERCE-STEP1-CENSUS-V1.md)
 
 Neture 약국 서비스의 **약국별 하나의 내 매장 · 기본 가입 · 세미프랜차이즈 가입 · 복수 공급 제안 · 선택 제안 주문 · 테스트 결제** 를 구현하기 위한 확정 설계다. IR 의 "사용자 판단 필요" 항목 중 기술 항목은 여기서 근거와 함께 확정한다(WO 단계 1 "보류" 절의 마지막 항목). 사업 판단 항목은 §11 에 남긴다.
@@ -90,10 +90,10 @@ supply_proposals
 | `store_cart_items` | `+ supply_proposal_id uuid NULL`, `+ seller_recruitment_id uuid NULL` | R7 — 선택한 제안을 장바구니에 저장 |
 | `seller_recruitments` | `+ semi_franchise_id uuid NULL`, `+ supply_unit_price int NULL` | 모집의 대상 경로 · 모집 공급 조건 가격(IR B §4) |
 | `seller_recruitment_applications` | `+ applicant_organization_id uuid NULL` + `UNIQUE (recruitment_id, applicant_organization_id) WHERE applicant_organization_id IS NOT NULL` | 참여 단위 = 약국 조직(WO §3-6) |
-| `organization_product_listings` | `idx_org_listing_unique_v2` 를 `WHERE service_key <> 'neture-event-offer'` 부분 UNIQUE 로 교체 | 세미프랜차이즈 이벤트 원장만 재신청 · 같은 제품 복수 승인 이벤트(WO §3-5). KPA/KCos 이벤트 원장 · 진열 행(`source_type='event-offer'` 매장 진열 포함) 유일성은 그대로 |
+| `organization_product_listings` | ~~`idx_org_listing_unique_v2` 를 부분 UNIQUE 로 교체~~ → **이 migration 에서는 바꾸지 않는다(전체 UNIQUE 유지, §17-1 1단계)**. 부분 UNIQUE 교체는 별도 2단계 migration | 구버전 API 의 `ON CONFLICT (organization_id, service_key, offer_id)` 가 부분 인덱스를 추론하지 못해 실패 → 배포 중 · 롤백 시 구버전과 호환되지 않는다. 이벤트 재신청 · 같은 제품 복수 이벤트는 2단계 전까지 API 가 명시 거절(409) |
 | `seller_recruitments` | UNIQUE 를 `(product_id, seller_id, service_id, semi_franchise_id) NULLS NOT DISTINCT` 로 | 세미프랜차이즈별 모집 1건. 기존 행(semi_franchise_id NULL) 유일성 동일 |
 
-- `idx_org_listing_unique_v2` 를 쓰는 `ON CONFLICT (organization_id, service_key, offer_id)` 소비처 9곳에 같은 predicate(`WHERE service_key <> 'neture-event-offer'`)를 붙인다. PostgreSQL 은 predicate 를 준 ON CONFLICT 가 비부분 인덱스도 추론하므로 **코드 변경을 migration 보다 먼저 배포해도 안전**하다.
+- `idx_org_listing_unique_v2` 를 쓰는 `ON CONFLICT (organization_id, service_key, offer_id)` 소비처 9곳에 같은 predicate(`WHERE service_key <> 'neture-event-offer'`)를 붙인다. PostgreSQL 은 predicate 를 준 ON CONFLICT 가 비부분 인덱스도 추론하므로 **코드 변경을 migration 보다 먼저 배포해도 안전**하다. 반대 방향(부분 인덱스 + 구버전 코드)은 실패하므로 인덱스 교체는 §17-1 2단계에서만 한다.
 - 만들지 않는 것: `checkout_orders` 컬럼(서비스 · 수취 주체는 metadata), 독립 `*_orders` · `*_payments`, `neture_orders` · `o4o_payments` unique 인덱스(운영 중복 데이터가 있으면 migration 이 깨질 수 있으므로 멱등은 advisory lock + 조건부 UPDATE 로 코드에서 보장 — §8).
 - migration 규약: epoch13 은 manifest 최대값 초과, `manifest.ts` append + `expected-schema-states.ts` 지문을 같은 커밋에(격리 PostgreSQL 15 실행값). ESM 엔티티 규칙(CLAUDE.md §2).
 
@@ -170,7 +170,7 @@ Neture 관리자          → POST /api/v1/neture/admin/semi-franchises         
 담당 운영자 → GET .../semi-franchises/:key/events?status=  ·  POST .../events/:id/{approve|reject|cancel}
 ```
 
-- 가격 수정 경로 없음. 재신청 = 새 행(§2 부분 인덱스로 가능). 같은 제품 복수 승인 이벤트 공존.
+- 가격 수정 경로 없음. 재신청 = 새 행 · 같은 제품 복수 승인 이벤트 공존 — **§17-1 2단계(부분 인덱스) 이후**. 1단계에서는 같은 세미프랜차이즈 · 같은 offer 의 두 번째 이벤트 신청을 `409 EVENT_REAPPLY_NOT_YET_SUPPORTED` 로 명시 거절한다.
 - 종료는 단방향: Neture 이벤트에는 visibility 토글이 없다. KPA `groupbuy-admin/:id/visibility` 의 canceled→approved 되돌림은 **수정**한다(종료된 행은 되살리지 않음 — 승인 우회 제거).
 - 주문은 OPL 을 jsonb 로만 참조하므로 취소해도 주문 기록이 손상되지 않는다(현행).
 - 수량 · 한도 · 예약 · 복원은 `reserveEventOfferListing` · `incrementListingQuantity` · `STORE_ORDERED_QTY_SQL` 을 그대로 호출한다.
@@ -560,3 +560,25 @@ pathRules:
 3. link QR 은 자동 이동 대신 안내 카드 표시 · 대상 콘텐츠가 삭제된 page QR 은 `/content/:id` 로 떨어짐 — PH 와 동작 차이.
 4. 다국어 · 제휴 화면의 서비스명 표기가 "KPA-Society" — Neture 약국 기준 문구 정비.
 
+---
+
+## 17. 운영 전환 호환 (WO-NETURE-PHARMACY-CUTOVER-COMPAT-V1, 2026-10-06)
+
+운영 promote 전 해결 대상 2건(구버전 API `ON CONFLICT` 호환 · 승인 약국의 pharmacy 호스트 403)의 확정 방식이다. 검증 기록: [`CHECK-NETURE-PHARMACY-CUTOVER-COMPAT-V1`](../checks/CHECK-NETURE-PHARMACY-CUTOVER-COMPAT-V1.md).
+
+### 17-1. `idx_org_listing_unique_v2` 2단계 전환
+
+| 단계 | 인덱스 | API | 구버전 API 롤백 |
+|---|---|---|---|
+| **1단계** (`CreateNeturePharmacyCommerce1791200000000`) | 전체 UNIQUE `(organization_id, service_key, offer_id)` 유지 | 신버전 `ON CONFLICT ... WHERE service_key <> 'neture-event-offer'` · 구버전 `ON CONFLICT (cols)` 모두 동작. 이벤트 재신청 · 같은 offer 복수 이벤트 → `409 EVENT_REAPPLY_NOT_YET_SUPPORTED` | **가능** — 인덱스가 바뀌지 않았으므로 migration 이전 API 로 되돌려도 쿼리가 실패하지 않는다(새 테이블 · 컬럼은 구버전이 읽지 않는다) |
+| **2단계** (별도 migration WO) | 부분 UNIQUE `WHERE service_key <> 'neture-event-offer'` 로 교체 | 409 제한 해제(재신청 허용 코드와 함께) | **불가** — 구버전 `ON CONFLICT (cols)` 가 `no unique or exclusion constraint matching` 으로 실패. 롤백은 1단계 이후 API 까지만 |
+
+2단계 착수 조건: 1단계 API 가 운영에 배포 · 안정화되어 구버전 롤백 필요성이 없어진 뒤. 그 전에 남은 `ON CONFLICT (cols)` 소비처 0 건 재확인(이미 적용된 옛 migration 파일 2개는 재실행되지 않으므로 대상 아님).
+
+### 17-2. pharmacy.neture.co.kr 이용 자격
+
+- 판정: **같은 약국 조직에서 Neture 기본 가입 active ∧ pharmacy 세미프랜차이즈 가입 active**, 사용자는 그 조직 owner/admin/manager(`left_at IS NULL`). SSOT = `modules/neture-pharmacy/services/semi-franchise-service-access.ts`. 카탈로그 `semiFranchiseAccessKey`(kpa-society → `pharmacy`) 로 대상 서비스를 정한다.
+- 적용 지점(같은 판정): 이메일 · Google 직접 로그인 · handoff 발급 · handoff 교환 · 화면 게이트(`MembershipGate` → `GET /neture/pharmacy/service-access/:serviceKey`).
+- kpa-society `service_memberships` 가 active 이면 기존 경로 그대로(세미프랜차이즈 조회 0). 기존 kpa-society 가입 · `kpa:store_owner` 를 Neture 자격으로 **재해석하지 않는다**. 판정은 membership · role 을 만들지 않는다(읽기만).
+- 미충족은 상태별 `next`(`apply_pharmacy` · `pharmacy_pending` · `pharmacy_suspended` · `apply_semi_franchise` · `semi_franchise_pending` · `semi_franchise_suspended`) + 안내 문구 + 신청 링크(store.neture.co.kr `/start-pharmacy` · `/store/pharmacy/semi-franchises`, 정지는 링크 없음).
+- 남은 제한: KPA forum 계열 backend 라우트는 kpa-society membership 을 요구한다 — 세미프랜차이즈 자격만 있는 약국은 그 화면을 쓸 수 없다(커뮤니티 게시판은 §15-2 공통 Forum 트랙).
