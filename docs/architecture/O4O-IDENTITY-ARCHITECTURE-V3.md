@@ -133,6 +133,7 @@ L1 만 L2/L3/L4 의 부모다(FK). L2/L3/L4 사이에 직접 FK 는 없다. 본 
   4. Credential · Relationship 이 변해도 **role row 를 자동 삭제하지 않는다** — 판정 시점에 조건으로 평가한다.
   5. 조건이 필요 없는 route 는 Role 만으로 판정한다(현행 guard 유지).
 - guard 변경 · Claim Resolver 는 Phase 4 의 구현 대상이며 본 문서는 판정식만 정한다.
+- **로그인 자격 게이트** (2026-10-06 · `WO-O4O-SERVICE-NOT-MEMBER-AUTH-CONTRACT-RESTORATION-V1`): 인증 성공과 서비스 이용 자격은 별개다. 인증 실패는 수단별 인증 오류(`INVALID_CREDENTIALS` 등), **인증 성공 + 게이트 서비스의 `service_memberships` row 없음 = `403 SERVICE_NOT_MEMBER` · 세션 미발급**. 판정은 인증 뒤에만 한다(가입 여부 비노출). 게이트 서비스는 `service-catalog` 의 `loginMembershipRequired` 한 곳에서 정하며(현재 kpa-society · k-cosmetics, 공유 호스트 제외), 이메일 · Google 로그인이 같은 판정(`service-login-eligibility.policy.ts`)을 쓴다. row 는 상태 불문 통과 · `super_admin` 통과 · 다른 서비스 row 로 대신하지 않는다. 대표 진입 · Store Workspace · 자기 호스트 가입 서비스는 게이트가 없다. handoff 는 §7.4(V2 승계) 그대로다.
 
 ## 8. G. Claim
 

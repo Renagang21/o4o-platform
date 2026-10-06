@@ -57,6 +57,11 @@ import {
   generateTokensWithContext,
   injectRolesIntoPublicData,
 } from './auth-context.helper.js';
+import {
+  isServiceLoginAllowed,
+  SERVICE_NOT_MEMBER_CODE,
+  SERVICE_NOT_MEMBER_MESSAGE,
+} from '../../common/auth/service-login-eligibility.policy.js';
 import * as tokenUtils from '../../utils/token.utils.js';
 import logger from '../../utils/logger.js';
 
@@ -71,7 +76,8 @@ export type GoogleAuthErrorCode =
   | 'GOOGLE_ACCOUNT_ALREADY_LINKED'
   | 'GOOGLE_IDENTITY_IN_USE'
   | 'ADMIN_TARGET_AMBIGUOUS'
-  | typeof DEMO_ACCOUNT_FORBIDDEN_CODE;
+  | typeof DEMO_ACCOUNT_FORBIDDEN_CODE
+  | typeof SERVICE_NOT_MEMBER_CODE;
 
 const GOOGLE_AUTH_ERROR_STATUS: Record<GoogleAuthErrorCode, number> = {
   GOOGLE_SIGNUP_REQUIRED: 404,
@@ -85,6 +91,7 @@ const GOOGLE_AUTH_ERROR_STATUS: Record<GoogleAuthErrorCode, number> = {
   GOOGLE_IDENTITY_IN_USE: 409,
   ADMIN_TARGET_AMBIGUOUS: 409,
   DEMO_ACCOUNT_FORBIDDEN: 403,
+  SERVICE_NOT_MEMBER: 403,
 };
 
 const GOOGLE_AUTH_ERROR_MESSAGE: Record<GoogleAuthErrorCode, string> = {
@@ -99,6 +106,7 @@ const GOOGLE_AUTH_ERROR_MESSAGE: Record<GoogleAuthErrorCode, string> = {
   GOOGLE_IDENTITY_IN_USE: '이 Google 계정은 이미 다른 사용자에게 연결되어 있습니다.',
   ADMIN_TARGET_AMBIGUOUS: '연결 대상 관리자 계정을 특정할 수 없습니다.',
   DEMO_ACCOUNT_FORBIDDEN: DEMO_ACCOUNT_FORBIDDEN_MESSAGE,
+  SERVICE_NOT_MEMBER: SERVICE_NOT_MEMBER_MESSAGE,
 };
 
 export class GoogleAuthError extends Error {
@@ -128,6 +136,11 @@ export interface GoogleAuthRequestMeta {
    * 그 서비스의 로그아웃에 끊기게 만들 수 있다.
    */
   sessionServiceKey?: string | null;
+  /**
+   * origin 파생 로그인 자격 게이트 서비스 (`resolveLoginMembershipGateKey`). 없으면 판정하지 않는다.
+   * WO-O4O-SERVICE-NOT-MEMBER-AUTH-CONTRACT-RESTORATION-V1 — 로그인에만 쓴다(가입 · 기타 흐름은 무시).
+   */
+  loginMembershipGateKey?: string | null;
 }
 
 export interface GoogleLoginInput extends GoogleAuthRequestMeta {
@@ -220,7 +233,7 @@ export class GoogleAuthService {
       throw new AccountInactiveError(user.status);
     }
 
-    const session = await this.establishSession(user, input, false);
+    const session = await this.establishSession(user, input, false, input.loginMembershipGateKey);
 
     // linked_accounts.lastUsedAt 만 갱신 — email/displayName/profileImage 스냅샷은 쓰지 않는다.
     await this.dataSource
@@ -369,8 +382,16 @@ export class GoogleAuthService {
     user: User,
     meta: GoogleAuthRequestMeta,
     isNewUser: boolean,
+    loginMembershipGateKey?: string | null,
   ): Promise<GoogleAuthSession> {
     const { tokens, roles, memberships } = await this.issueSession(user, meta.sessionServiceKey ?? null);
+
+    // WO-O4O-SERVICE-NOT-MEMBER-AUTH-CONTRACT-RESTORATION-V1: 인증 성공 뒤 서비스 이용 자격.
+    //   로그인만 판정한다(가입은 계정만 만든다 — 호출부가 키를 넘기지 않는다). 발급한 토큰은 쓰기 전에 버린다.
+    if (!isServiceLoginAllowed(loginMembershipGateKey, roles, memberships)) {
+      await this.logActivity(user.id, meta, false, 'service_not_member');
+      throw new GoogleAuthError(SERVICE_NOT_MEMBER_CODE);
+    }
 
     const tokenFamily = tokenUtils.getTokenFamily(tokens.refreshToken);
     await this.userRepository.update(

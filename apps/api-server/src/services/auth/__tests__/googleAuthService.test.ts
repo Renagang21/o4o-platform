@@ -149,6 +149,9 @@ describe('GoogleAuthService — Google-only Signup/Login', () => {
   let ds: ReturnType<typeof makeDataSource>;
   let identity: ReturnType<typeof identityFor>;
   let svc: GoogleAuthService;
+  /** issueSession 이 돌려줄 역할 · membership — 로그인 자격 게이트 테스트용. */
+  let sessionRoles: string[];
+  let sessionMemberships: { serviceKey: string; status: string }[];
 
   beforeAll(() => {
     process.env.JWT_SECRET = process.env.JWT_SECRET || 'test-jwt-secret-google-auth';
@@ -162,8 +165,8 @@ describe('GoogleAuthService — Google-only Signup/Login', () => {
       dataSource: ds as any,
       issueSession: async (user) => ({
         tokens: tokenUtils.generateTokens(user, [], 'neture.co.kr', []),
-        roles: [],
-        memberships: [],
+        roles: sessionRoles,
+        memberships: sessionMemberships,
       }),
     });
   };
@@ -171,6 +174,8 @@ describe('GoogleAuthService — Google-only Signup/Login', () => {
   beforeEach(() => {
     store = { users: [], linked: [], activities: [], demoUserIds: [] };
     ds = makeDataSource(store);
+    sessionRoles = [];
+    sessionMemberships = [];
   });
 
   // ── signup ────────────────────────────────────────────────────────────────
@@ -466,6 +471,53 @@ describe('GoogleAuthService — Google-only Signup/Login', () => {
       await expect(svc.signup({ idToken: 'tok-b', consents: CONSENTS, ...META }))
         .rejects.toMatchObject({ code: 'EMAIL_IN_USE' });
       expect(store.users).toEqual([existing]);
+    });
+  });
+
+  // WO-O4O-SERVICE-NOT-MEMBER-AUTH-CONTRACT-RESTORATION-V1
+  describe('로그인 자격 게이트 (SERVICE_NOT_MEMBER)', () => {
+    const GATED = { ...META, sessionServiceKey: 'k-cosmetics', loginMembershipGateKey: 'k-cosmetics' };
+    const linkedUser = () => {
+      const u = seedUser(store, { email: 'member@example.test' });
+      store.linked.push({ id: uuid(), userId: u.id, provider: 'google', providerId: SUB_A, lastUsedAt: new Date(0) });
+      build({ 'tok-a': { sub: SUB_A } });
+      return u;
+    };
+
+    it('인증 성공 + 게이트 서비스 membership 없음 → 403 SERVICE_NOT_MEMBER, 세션 · lastUsedAt 흔적 없음', async () => {
+      const u = linkedUser();
+      sessionMemberships = [{ serviceKey: 'neture', status: 'active' }];
+      const p = svc.login({ idToken: 'tok-a', ...GATED });
+      await expect(p).rejects.toBeInstanceOf(GoogleAuthError);
+      await expect(p).rejects.toMatchObject({ code: 'SERVICE_NOT_MEMBER', statusCode: 403 });
+      expect(u.refreshTokenFamily).toBeUndefined();
+      expect(store.linked[0].lastUsedAt.getTime()).toBe(0);
+    });
+
+    it('Google 인증 실패는 게이트와 무관하게 GOOGLE_ID_TOKEN_INVALID', async () => {
+      linkedUser();
+      build({ 'tok-bad': new GoogleIdTokenError('TOKEN_EXPIRED') });
+      await expect(svc.login({ idToken: 'tok-bad', ...GATED })).rejects.toMatchObject({ code: 'GOOGLE_ID_TOKEN_INVALID' });
+    });
+
+    it.each(['active', 'pending', 'rejected'])('해당 서비스 row(status=%s) 가 있으면 세션 발급', async (status) => {
+      linkedUser();
+      sessionMemberships = [{ serviceKey: 'k-cosmetics', status }];
+      const session = await svc.login({ idToken: 'tok-a', ...GATED });
+      expect(session.tokens.accessToken).toBeTruthy();
+    });
+
+    it('platform:super_admin 은 통과', async () => {
+      linkedUser();
+      sessionRoles = ['platform:super_admin'];
+      const session = await svc.login({ idToken: 'tok-a', ...GATED });
+      expect(session.tokens.accessToken).toBeTruthy();
+    });
+
+    it('가입(signup)은 게이트 대상이 아니다 — 계정만 만들고 세션을 준다', async () => {
+      build({ 'tok-a': { sub: SUB_A, email: 'new@example.test' } });
+      const session = await svc.signup({ idToken: 'tok-a', consents: CONSENTS, ...GATED });
+      expect(session.isNewUser).toBe(true);
     });
   });
 });

@@ -16,6 +16,8 @@
  *  V10 아이디 찾기는 정확히 1건일 때만 가린 힌트
  *  V11 정책 위반 · 동의 누락 · 형태 오류는 저장 전에 거절
  *  V12 로그·메일 외 경로에 평문 토큰/비밀번호가 남지 않는다(DB 에는 해시만)
+ *  V14 로그인 자격 게이트(WO-O4O-SERVICE-NOT-MEMBER-AUTH-CONTRACT-RESTORATION-V1) — 인증 성공 뒤에만
+ *      SERVICE_NOT_MEMBER, 인증 실패는 INVALID_CREDENTIALS 그대로 · 세션 흔적 없음 · 다른 서비스 membership 불인정
  */
 
 import { EmailAuthService, EmailAuthError, hashToken, type PasswordStore } from '../email-auth.service.js';
@@ -48,7 +50,13 @@ const clone = (s: Store): Store => ({
   demoUserIds: [...s.demoUserIds],
 });
 
-function makeHarness(opts: { roles?: Record<string, string[]>; now?: Date } = {}) {
+function makeHarness(
+  opts: {
+    roles?: Record<string, string[]>;
+    memberships?: Record<string, { serviceKey: string; status: string }[]>;
+    now?: Date;
+  } = {},
+) {
   let store: Store = { users: [], creds: new Map(), evt: [], prt: [], activities: [], demoUserIds: [] };
   const sql: Array<{ q: string; p: unknown[] }> = [];
   const nowRef = { t: opts.now ?? new Date('2026-09-30T00:00:00Z') };
@@ -189,7 +197,7 @@ function makeHarness(opts: { roles?: Record<string, string[]>; now?: Date } = {}
     issueSession: async (user, key) => ({
       tokens: tokenUtils.generateTokens(user, roles[user.id] ?? [], 'neture.co.kr', [], null, key, null, 'password'),
       roles: roles[user.id] ?? [],
-      memberships: [],
+      memberships: opts.memberships?.[user.id] ?? [],
     }),
     now: () => nowRef.t,
   });
@@ -489,6 +497,64 @@ describe('EmailAuthService', () => {
       expect(access.userId ?? access.sub).toBe(h.store.users[0].id);
       expect(h.store.users[0].refreshTokenFamily).toBe(refresh.tokenFamily);
       expect(h.store.users[0].lastLoginAt).toEqual(h.nowRef.t);
+    });
+  });
+
+  describe('V14 로그인 자격 게이트 (SERVICE_NOT_MEMBER)', () => {
+    const GATED = { ...META, sessionServiceKey: 'kpa-society', loginMembershipGateKey: 'kpa-society' };
+
+    async function verifiedUser(over: Parameters<typeof makeHarness>[0] = {}, roles: string[] = []) {
+      const seed = makeHarness();
+      await seed.service.signup(signupInput());
+      const u = seed.store.users[0];
+      u.isEmailVerified = true;
+      const h = makeHarness({
+        ...over,
+        roles: { [u.id]: roles },
+        memberships: over.memberships ? { [u.id]: over.memberships[Object.keys(over.memberships)[0]] } : undefined,
+      });
+      h.store.users.push(u);
+      h.store.creds.set(u.id, seed.store.creds.get(u.id)!);
+      return { h, u };
+    }
+
+    it('인증 성공 + 게이트 서비스 membership 없음 → 403 SERVICE_NOT_MEMBER, 세션 흔적 없음, 실패 기록', async () => {
+      const { h, u } = await verifiedUser();
+      const err = await h.service.login({ email: u.email, password: GOOD_PW, ...GATED }).catch((e) => e);
+      expect(err).toBeInstanceOf(EmailAuthError);
+      expect(err).toMatchObject({ code: 'SERVICE_NOT_MEMBER', statusCode: 403 });
+      expect(u.refreshTokenFamily).toBeUndefined();
+      expect(u.lastLoginAt).toBeUndefined();
+      expect(h.store.activities).toEqual([expect.objectContaining({ userId: u.id, success: false })]);
+    });
+
+    it('비밀번호가 틀리면 게이트 서비스에서도 INVALID_CREDENTIALS — 가입 여부를 드러내지 않는다', async () => {
+      const { h, u } = await verifiedUser();
+      await expectCode(h.service.login({ email: u.email, password: 'wrong1234!', ...GATED }), 'INVALID_CREDENTIALS');
+      await expectCode(h.service.login({ email: 'nobody@example.com', password: GOOD_PW, ...GATED }), 'INVALID_CREDENTIALS');
+    });
+
+    it.each(['active', 'pending', 'rejected', 'suspended'])('해당 서비스 row 가 있으면(status=%s) 로그인 성공', async (status) => {
+      const { h, u } = await verifiedUser({ memberships: { x: [{ serviceKey: 'kpa-society', status }] } });
+      const s = await h.service.login({ email: u.email, password: GOOD_PW, ...GATED });
+      expect(s.tokens.accessToken).toBeTruthy();
+    });
+
+    it('다른 서비스 membership 은 대신 인정하지 않는다', async () => {
+      const { h, u } = await verifiedUser({ memberships: { x: [{ serviceKey: 'neture', status: 'active' }] } });
+      await expectCode(h.service.login({ email: u.email, password: GOOD_PW, ...GATED }), 'SERVICE_NOT_MEMBER');
+    });
+
+    it('legacy super_admin 은 통과', async () => {
+      const { h, u } = await verifiedUser({}, ['super_admin']);
+      const s = await h.service.login({ email: u.email, password: GOOD_PW, ...GATED });
+      expect(s.tokens.accessToken).toBeTruthy();
+    });
+
+    it('게이트 키가 없으면(neture · store · 공유 호스트 등) membership 없이도 로그인 성공', async () => {
+      const { h, u } = await verifiedUser();
+      const s = await h.service.login({ email: u.email, password: GOOD_PW, ...META, loginMembershipGateKey: null });
+      expect(s.tokens.accessToken).toBeTruthy();
     });
   });
 
