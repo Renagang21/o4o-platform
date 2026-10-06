@@ -1,4 +1,4 @@
-# Business Service Rules (Mandatory)
+# Business Service Rules — OBSOLETE (현행 규칙 아님)
 
 > **상태**: OBSOLETE · 판정 확정(2026-10-06, `WO-O4O-CANONICAL-INDEX-S9-POLICY-DECISION-ALIGNMENT-V1`) — 전제(별도 business-api · 독립 배포 · OpenAPI CI 게이트)가 실재하지 않는다. **"OpenAPI 계약 우선"은 현행 규칙이 아니다** — `CLAUDE.md` §9 문구 삭제. 아래 본문은 2026-01 기록으로만 읽고 개발 근거로 쓰지 않는다. 유효하게 남는 원칙은 각 정본이 정한다: 직접 DB 접근 · cross-domain JOIN 금지 · serviceKey 격리([BOUNDARY-POLICY](O4O-BOUNDARY-POLICY-V1.md) · `CLAUDE.md` §7 · §13), API 호출 = `authClient.api` · URL 하드코딩 금지 · 인증 재구현 금지(`CLAUDE.md` §1) · **표기일**: 2026-10-06
 >

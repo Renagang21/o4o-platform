@@ -40,7 +40,7 @@ V1 은 `channel_type='B2C'` 매장 storefront 의 소비자 checkout → 결제 
 - B2B handler(`StoreB2bCheckoutPaymentEventHandler` · `NetureB2bCheckoutPaymentEventHandler` · `PharmacyHubPaymentEventHandler`)는 `payment.completed` 를 받아 `checkout_order` 를 paid 로 전이한다.
 - 취소 · 환불 이벤트를 받는 handler 는 현재 만들 수 없다(위 §2-2 — hub 미전달). 필요해지면 publisher 변경을 포함한 별도 WO 로 한다.
 - 전이는 payable 상태에 한정되고 idempotent 해야 한다. cancelled · refunded 주문은 전이 · bridge 대상이 아니다.
-- fulfillment bridge 는 `metadata.checkoutOrderId` 로 dedup 한다 — 중복 `neture_order` 0.
+- fulfillment bridge(`CheckoutFulfillmentBridgeService`)는 `neture_orders.metadata->>'checkoutOrderId'` 를 먼저 조회한 뒤 없을 때만 생성한다. **이 dedup 은 best-effort 다** — 조회와 INSERT 가 원자적이지 않고 이 JSON 키에 UNIQUE 제약이 없어, 결제 이벤트와 수동 recovery 가 같은 주문에 동시에 실행되면 중복 생성 가능성이 남는다. 원자적 보장(DB 제약 · locking · upsert)은 Stable 계약이 아니며, 필요하면 schema 변경을 포함한 별도 WO 로 한다.
 - 결제 완료 단계에서 재고를 추가로 차감하지 않는다(수량 확보는 checkout 단계에서 끝난다).
 
 ### 2-4. 매장 서비스 구독 결제

@@ -11,7 +11,7 @@
 > (2026-10-04 정합) 현행 사실:
 > - **KPA-b(데모)** 는 제거 완료(`/demo/*` route 없음 — [KPA-SOCIETY-SERVICE-STRUCTURE](KPA-SOCIETY-SERVICE-STRUCTURE.md) §2).
 > - **KPA-c(분회)** 는 독립 serviceKey `kpa-branch` · role prefix **`kpa-branch:*`**(`kpa-branch:admin` · `kpa-branch:operator` · `kpa-branch:member`)로 옮겨졌다. 서비스 축 = `requireKpaBranchScope`(active `service_memberships('kpa-branch')` + role), 분회 축 = `branch_memberships`(`apps/api-server/src/middleware/kpa-branch-scope.middleware.ts`). 옛 `kpa:branch_admin` · `kpa:branch_operator` 는 `20260415000000-ArchiveBranchAndChapterData` 로 비활성화됐다(`WO-KPA-A-BRANCH-CHAPTER-REMOVAL-PHASE3-DATA-AND-ROLE-CLEANUP-V1`).
-> - **KPA-a** 의 `kpa:*` 는 serviceKey `kpa-society`(현재 의미 = 약국 사업자 서비스 `pharmacy.neture.co.kr`)의 prefix 이며 KPA 분회와 무관하다([SUBDOMAIN-SERVICE-SEMANTICS](O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1.md) §원칙 5 · 주소 표). 현행 `kpa:*` 에는 `kpa:store_owner` · `kpa:pharmacist` · `kpa:district_admin` 등도 있다.
+> - **KPA-a** 의 `kpa:*` 는 serviceKey `kpa-society`(현재 의미 = 약국 사업자 서비스 `pharmacy.neture.co.kr`)의 prefix 이며 KPA 분회와 무관하다([SUBDOMAIN-SERVICE-SEMANTICS](O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1.md) §원칙 5 · 주소 표). (2026-10-06 정정) 현행 `kpa:*` 역할은 다음뿐이다 — **KPA scope 역할 `kpa:admin` ⊃ `kpa:operator`**(`packages/security-core/src/service-configs.ts` `KPA_SCOPE_CONFIG.allowedRoles`) · **매장 경영자 `kpa:store_owner`**(매장 workspace 접근 축 — [STORE-OWNER-RBAC](../architecture/auth/O4O-STORE-OWNER-RBAC-STANDARD-V1.md)). `kpa:district_admin` · `kpa:branch_admin` · `kpa:branch_operator` 는 제거됐고(`WO-O4O-KPA-BRANCH-DISTRICT-LEGACY-CLEANUP-V1`), `kpa:pharmacist` · `kpa:student` 는 비활성화됐다(`20260326300000-DeactivateQualificationRoles` — 자격은 `kpa_pharmacist_profiles`). 조직 단위 역할은 role 이 아니라 `kpa_members.role` 이다.
 > - 유효하게 남는 원칙: `platform:*` 은 서비스 scope 를 대신하지 않음 · serviceKey 격리 · 서버 측 org lookup · Hard delete 금지 · 신규 서비스는 serviceKey · scope 문서화 후 구현 · Core 수정 금지.
 
 ---
@@ -26,6 +26,8 @@
 ---
 
 ## 2. Role Namespace (현행 유지)
+
+> (2026-10-06 정정) 아래 목록 중 `kpa:branch_admin` · `kpa:branch_operator` 는 제거된 과거 역할이다. 현행 `kpa:*` 역할은 상단 정합 주석(`kpa:admin` · `kpa:operator` · `kpa:store_owner`)이 정본이다.
 
 ```
 kpa:admin

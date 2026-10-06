@@ -1,4 +1,4 @@
-# O4O Platform Alpha 상태 표시 기준
+# O4O Platform Alpha 상태 표시 기준 — OBSOLETE (표시 의무 폐기)
 
 > **작성일**: 2026-01-20
 > **Work Order**: WO-GLOBAL-ALPHA-STATUS-HERO-V080
