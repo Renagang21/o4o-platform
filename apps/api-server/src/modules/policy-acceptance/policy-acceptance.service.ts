@@ -171,8 +171,21 @@ export class PolicyAcceptanceService {
       [userId],
     )) as { role: string }[];
     const activeRoles = new Set(roles.map((r) => r.role));
+    // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: 약국 매장(kpa-society) 경영자는 membership · role 이 아니라
+    //   Neture 기본 가입 원장(active)으로 판정한다(isStoreOwner 와 같은 기준). 계약 게이트도 같은 기준을 써야 우회가 없다.
+    const pharmacyOwner = published.some((d) => d.serviceKey === 'kpa-society')
+      ? ((await q.query(
+          `SELECT 1 FROM neture_pharmacy_memberships npm
+             JOIN organization_members om ON om.organization_id = npm.organization_id
+            WHERE om.user_id = $1 AND om.role IN ('owner','admin','manager') AND om.left_at IS NULL
+              AND npm.status = 'active'
+            LIMIT 1`,
+          [userId],
+        )) as unknown[]).length > 0
+      : false;
 
     const required = published.filter((doc) => {
+      if (doc.serviceKey === 'kpa-society') return pharmacyOwner;
       const role = STORE_OWNER_ROLE_BY_SERVICE[doc.serviceKey];
       return !!role && activeServices.has(doc.serviceKey) && activeRoles.has(role);
     });

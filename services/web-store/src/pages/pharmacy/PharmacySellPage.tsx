@@ -20,6 +20,7 @@ import {
 import type { ProductListing, ListingChannelSetting } from '../../api/pharmacyProducts';
 import { fetchChannelOverview } from '../../api/storeHub';
 import type { ChannelOverview, ChannelType } from '../../api/storeHub';
+import { pharmacyStorePath } from '../neture-pharmacy/shared';
 
 const CHANNEL_LABELS: Record<string, string> = {
   B2C: '온라인 스토어',
@@ -75,11 +76,11 @@ export function PharmacySellPage() {
             상품 진열 관리
           </h1>
           <p style={{ color: '#64748B', fontSize: '0.95rem' }}>
-            취급 중인 상품의 매장 진열과 채널별 노출을 관리합니다. 새 상품은 매장 HUB 카탈로그에서 추가하세요.
+            취급 중인 상품의 매장 진열과 채널별 노출을 관리합니다. 새 공급 상품은 내 매장의 공급 상품 화면에서 주문하세요.
           </p>
         </div>
         <Link
-          to="/hub/b2b"
+          to={pharmacyStorePath('supply')}
           style={{
             padding: '10px 20px',
             backgroundColor: '#2563EB',
@@ -91,7 +92,7 @@ export function PharmacySellPage() {
             whiteSpace: 'nowrap',
           }}
         >
-          + HUB에서 상품 추가
+          + 공급 상품 보기
         </Link>
       </div>
 
@@ -270,10 +271,10 @@ function ListingsTab() {
         }}>
           <p style={{ fontSize: '1.1rem', fontWeight: 500 }}>진열 상품이 없습니다</p>
           <p style={{ fontSize: '0.875rem', marginTop: 8 }}>
-            매장 HUB 카탈로그에서 상품을 추가하면 여기에 표시됩니다.
+            취급 등록한 상품이 여기에 표시됩니다.
           </p>
           <Link
-            to="/hub/b2b"
+            to={pharmacyStorePath('supply')}
             style={{
               display: 'inline-block',
               marginTop: 16,
@@ -286,7 +287,7 @@ function ListingsTab() {
               textDecoration: 'none',
             }}
           >
-            HUB에서 상품 추가
+            공급 상품 보기
           </Link>
         </div>
       ) : (

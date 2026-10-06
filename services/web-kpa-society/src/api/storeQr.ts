@@ -79,6 +79,15 @@ export interface QrLandingData {
   // WO-O4O-KPA-TABLET-QR-LANDING-CONTRACT-V1: landingType='screen_set' 일 때 태블릿과 동일한 sections.
   //   모바일 뷰어(PublicScreenSetViewer)는 이 sections 를 세로형으로 렌더하되 idle_media(대기영상)는 제외한다.
   screenSet?: QrScreenSet | null;
+  // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: landingType='product' 일 때 공용 랜딩이 내려주는 상품 요약 · 매장 설명서
+  //   (옛 pharmacyhub.co.kr QR 화면과 같은 계약 — 매장 상품 공개 페이지 노출 설정과 무관하게 QR 화면에서 보인다).
+  productDetails?: {
+    name?: string | null;
+    brandName?: string | null;
+    description?: string | null;
+    descriptionSummary?: string | null;
+    descriptionHtml?: string | null;
+  } | null;
 }
 
 // WO-O4O-KPA-TABLET-QR-LANDING-CONTRACT-V1: screen_set landing sections(공용 resolver 산출).

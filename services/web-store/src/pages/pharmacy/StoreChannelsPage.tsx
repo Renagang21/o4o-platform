@@ -93,6 +93,7 @@ import { kpaConfig } from '@o4o/operator-ux-core';
 //   판매 설정 화면에 외부 채널 연동·판매 조건 입력 패널을 붙인다 (신규 메뉴·라우트 없음).
 import { ExternalSalesPanel } from './sections/ExternalSalesPanel';
 import { getActiveServiceKey } from '../../lib/serviceContext';
+import { pharmacyStorePath } from '../neture-pharmacy/shared';
 
 /* ─── Constants ──────────────────────────────── */
 
@@ -217,7 +218,7 @@ function AddProductModal({
                 HUB에서 신청한 상품의 승인이 아직 완료되지 않았습니다.
               </p>
               <Link
-                to="/hub/b2b"
+                to={pharmacyStorePath('supply')}
                 onClick={onClose}
                 className="inline-flex items-center gap-1 mt-4 text-xs font-medium text-blue-600 hover:underline"
               >
@@ -1052,10 +1053,10 @@ export function StoreChannelsPage({ section }: { section?: 'settings' | 'product
               <span className="text-xl shrink-0">⬜</span>
               <div>
                 <p className="text-sm font-semibold text-slate-700">아직 추가된 상품이 없습니다</p>
-                <p className="text-xs text-slate-500 mt-1">HUB에서 상품을 선택하고 내 매장에서 판매를 시작하세요.</p>
+                <p className="text-xs text-slate-500 mt-1">내 매장의 공급 상품 화면에서 공급 상품을 확인하세요.</p>
               </div>
             </div>
-            <Link to="/hub/b2b" className="shrink-0 px-4 py-2 text-sm font-medium text-blue-700 bg-white border border-blue-200 rounded-lg hover:bg-blue-50 transition-colors">
+            <Link to={pharmacyStorePath('supply')} className="shrink-0 px-4 py-2 text-sm font-medium text-blue-700 bg-white border border-blue-200 rounded-lg hover:bg-blue-50 transition-colors">
               상품 보러가기
             </Link>
           </div>

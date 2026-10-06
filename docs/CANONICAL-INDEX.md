@@ -1,7 +1,7 @@
 # O4O Canonical Document Index
 
 > **역할**: AI 도구와 무관한 **정본(canonical) 문서 지도**. [`CLAUDE.md`](../CLAUDE.md) 와 [`AGENTS.md`](../AGENTS.md) 는 규칙을 복사하지 않고 이 색인과 각 정본을 가리킨다.
-> **작성일**: 2026-09-12 · **최종 갱신**: 2026-10-04 (정본 최종 정합 — 본문 전수 검증 · 정합 후 20건 ACTIVE 등재 · §9 는 결정이 필요한 문서만 남김 · `WO-O4O-CANONICAL-DOC-FINAL-ALIGNMENT-V1`) · **출처**: 구 `CLAUDE.md` v8 "상세 규칙 문서 목록" + 본문 링크의 합집합
+> **작성일**: 2026-09-12 · **최종 갱신**: 2026-10-05 (§1 DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1 등재 · STORE-ACCESS 약국 예외 표기) · 2026-10-04 (정본 최종 정합 — 본문 전수 검증 · 정합 후 20건 ACTIVE 등재 · §9 는 결정이 필요한 문서만 남김 · `WO-O4O-CANONICAL-DOC-FINAL-ALIGNMENT-V1`) · **출처**: 구 `CLAUDE.md` v8 "상세 규칙 문서 목록" + 본문 링크의 합집합
 
 ## 0. 이 색인의 규칙
 
@@ -31,6 +31,7 @@
 | [O4O-BUSINESS-PHILOSOPHY-V1](baseline/O4O-BUSINESS-PHILOSOPHY-V1.md) | 사업 철학 SSOT — 공급자 / 운영사업자 / 매장 정의, HUB 철학, AI 역할, Drift 방지. ROLE-WORKSPACE-ARCHITECTURE 와 동급(역할 경계 · 업무공간 · 콘텐츠 유입 경로는 그 문서 우선). 종전 충돌 절(§3 · §4 · §7 · 주의사항) 은 2026-09-17 Final Census 로 본문 정렬 완료 | ACTIVE |
 | [O4O-STORE-COMMERCE-BOUNDARY-V1](baseline/O4O-STORE-COMMERCE-BOUNDARY-V1.md) | 매장 commerce 경계 SSOT — 소비자→매장 O4O commerce 없음 · 판매 실행 = 외부 POS·외부 채널 · legacy commerce 판정 규칙 · 개발 금지선 · **§15 사업 모델 변경 절차**. cart · checkout · orders · payments · refund · PG · POS · tablet · QR 작업 전 **코드보다 먼저 읽는다** | ACTIVE |
 | [O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1](baseline/O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1.md) | 공급자→매장 B2B 주문 정본 — `store_cart_items → checkout_orders` 수렴, actor · ownership · serviceKey · lifecycle · 취소 계약. 위 문서의 B2B 축 쌍 | ACTIVE |
+| [DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1](design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md) | **Neture 약국 매장 commerce 구현 기준** (2026-10-05) — 약국 1 = 기본 가입 원장 1 = 내 매장 1 · 매장 게이트 = 기본 가입 원장 · 세미프랜차이즈 = 데이터 행(가입 · 담당 운영자) · SPO 하위 복수 공급 제안 · 이용 판정 SSOT · 선택 제안 주문 · 수취 주체별 테스트 결제(실 PG 대기) · §13 인증·가입 트랙 인계 계약 · §15 미완료 범위. 위 B2B 계약의 Axis D | ACTIVE |
 | [O4O-SUPPLIER-DOMAIN-BOUNDARY-V1](baseline/O4O-SUPPLIER-DOMAIN-BOUNDARY-V1.md) | **Supplier Domain 정본 · FROZEN** (2026-09-26) — Supplier 정의 · 5업무축(Business · Products · Orders · Content · Programs) · Workspace IA · ownership matrix · **Distribution 판정 SSOT**(입력 = `is_public`/`service_keys`/`allowed_seller_ids` + 서비스 승인 · `distribution_type` 은 파생) · Content handoff 계약(멱등성) · Programs 3종 경계 · Identity(`organization_members` canonical) · Business Profile SSOT · 금지선 · DEFERRED(기능 미완성 ≠ architecture 미완성) · 잔재 4분류. 새 Supplier 기능은 이 5축 통과가 선행. 소스 계약 `supplier-domain-boundary.spec.ts` | ACTIVE (FROZEN) |
 
 ## 2. 구조 계약 · Frozen Baselines
@@ -97,7 +98,7 @@
 | 문서 | 역할 | 상태 |
 |---|---|---|
 | [O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1](baseline/O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1.md) | **`*.neture.co.kr` 주소별 사업 의미 SSOT** (2026-10-03) — `kpa` = 약사 대상 분회 · `pharmacy` / `retail` = 사업자 대상 세미프랜차이즈 운영 서비스 · `store` = 공통 Store Workspace(serviceKey 없음 · Owner/Member 접근 모델) · role prefix(`kpa:*` 등) ≠ 주소 의미. 서비스 목록 · 도메인 기술 정본은 `service-catalog.ts` | ACTIVE |
-| [O4O-STORE-ACCESS-AND-MEMBERSHIP-V1](baseline/O4O-STORE-ACCESS-AND-MEMBERSHIP-V1.md) | **공통 Store Workspace 접근 자격 SSOT** (2026-10-03) — Owner(기존 `{prefix}:store_owner` 판정 그대로) / Member(`organization_members.role='staff'`) 두 단계 · 초대는 기존 가입자 조회(메일 0 · 토큰 0) · 'invited' 는 접근 0 · 결정 순서(세션→조직→자격→업종 경계) · 새 테이블 0. 한계: 미가입자 초대 · 사업자 신규 가입 제외 | ACTIVE |
+| [O4O-STORE-ACCESS-AND-MEMBERSHIP-V1](baseline/O4O-STORE-ACCESS-AND-MEMBERSHIP-V1.md) | **공통 Store Workspace 접근 자격 SSOT** (2026-10-03 · 약국 예외 2026-10-05: 약국 매장은 자가 가입 없이 Neture 기본 가입 원장 판정) — Owner(기존 `{prefix}:store_owner` 판정 그대로) / Member(`organization_members.role='staff'`) 두 단계 · 초대는 기존 가입자 조회(메일 0 · 토큰 0) · 'invited' 는 접근 0 · 결정 순서(세션→조직→자격→업종 경계) · 새 테이블 0. 한계: 미가입자 초대 · 사업자 신규 가입 제외 | ACTIVE |
 | [KPA-SOCIETY-SERVICE-STRUCTURE](baseline/KPA-SOCIETY-SERVICE-STRUCTURE.md) | KPA 3개 화면 영역 공존 구조 (커뮤니티 / 분회 / 데모=제거 완료) — 라우트 위치 ≠ 서비스 소속. v1.1(2026-09-17): Forum = 약사 커뮤니티(communityKey=pharmacy, ROLE-WORKSPACE §5) | ACTIVE |
 | [KPA-SIGNAGE-STRUCTURE-V1](baseline/KPA-SIGNAGE-STRUCTURE-V1.md) | KPA Signage 구조 baseline | ACTIVE |
 | [NETURE-DOMAIN-ARCHITECTURE-FREEZE-V3](baseline/NETURE-DOMAIN-ARCHITECTURE-FREEZE-V3.md) | Neture 도메인 아키텍처 (공급자 화면 canonical) | FROZEN |

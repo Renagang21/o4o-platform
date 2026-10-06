@@ -146,6 +146,29 @@ export async function findStoreOrganizationCandidates(
   userId: string,
   serviceKey: StoreOwnerServiceKey,
 ): Promise<StoreOrganizationCandidate[]> {
+  // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1 (DESIGN §5):
+  //   약국 매장(`kpa`) 후보는 서비스 연결(enrollment · slug)이 아니라 **Neture 기본 가입 원장 active** 로 판정한다.
+  //   kpa-society 가입 · 옛 약국 조직을 매장 자격으로 재해석하지 않는다(대체, 누적 아님).
+  if (serviceKey === 'kpa') {
+    const pharmacyRows = await dataSource.query(
+      `SELECT DISTINCT ON (om.organization_id)
+              om.organization_id AS organization_id,
+              om.role            AS role
+         FROM organization_members om
+         JOIN neture_pharmacy_memberships npm
+           ON npm.organization_id = om.organization_id AND npm.status = 'active'
+        WHERE om.user_id = $1
+          AND om.role = ANY($2::text[])
+          AND om.left_at IS NULL
+        ORDER BY om.organization_id, om.role`,
+      [userId, STORE_MEMBER_ROLES],
+    );
+    return (pharmacyRows as Array<{ organization_id: string; role: string }>).map((r) => ({
+      organizationId: r.organization_id,
+      memberRole: r.role,
+    }));
+  }
+
   const linkage = STORE_SERVICE_ORG_LINKAGE[serviceKey];
   const rows = await dataSource.query(
     `SELECT DISTINCT ON (om.organization_id)

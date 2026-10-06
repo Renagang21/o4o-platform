@@ -388,6 +388,10 @@ export interface LibraryContentItem {
   selectionKey: string;
   /** snapshot 인 경우 'cms'|'content', direct 인 경우 null */
   assetType: string | null;
+  /** 출처 분류 — 불변 snapshot 기준(사본을 편집해도 바뀌지 않음). franchise · operator · community · mine */
+  sourceGroup?: 'franchise' | 'operator' | 'community' | 'mine';
+  /** franchise 일 때 세미프랜차이즈 이름(복사 시점 원본 기준) */
+  sourceName?: string | null;
   title: string;
   contentJson: Record<string, unknown>;
   /** snapshot.created_at 또는 direct.updated_at — 통합 정렬 기준 */
@@ -422,7 +426,8 @@ export const storeLibraryApi = {
     type?: 'document';
     // WO-O4O-KPA-CONTENT-LIST-TAG-SEARCH-FILTER-V1: 출처 탭 + 태그 정확 필터
     // WO-O4O-KPA-QR-AI-DESCRIPTION-SINGLE-CORNER-V1: 'ai-description' = content_json.aiDescription.mode 필터
-    source?: 'operator' | 'community' | 'mine' | 'ai-description';
+    // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: 'franchise' = 가입 세미프랜차이즈 콘텐츠 사본
+    source?: 'operator' | 'community' | 'mine' | 'ai-description' | 'franchise';
     tag?: string;
   }) => {
     const query: Record<string, string> = {};

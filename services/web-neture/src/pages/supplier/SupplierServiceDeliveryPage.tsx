@@ -193,6 +193,15 @@ export default function SupplierServiceDeliveryPage() {
         </form>
       </div>
 
+      {/* WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1 — 직접 제공(opt-in) 폐지 안내 (DESIGN §16-5) */}
+      <div className="mb-4 rounded border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+        {label} 직접 제공은 신규 시작이 종료되었습니다. 약국 공급은 Neture 약국 경로로 신청해 주세요 — 일반 공급가는{' '}
+        <Link to="/supplier/products" className="font-medium underline">
+          제품 등록 승인
+        </Link>
+        (기본 공급), 별도 단가는 공급 제안으로 신청합니다. 제공 중인 상품의 기존 주문 처리는 그대로 유지됩니다.
+      </div>
+
       {error && <p className="mb-3 text-sm text-red-600">{error}</p>}
       {notice && <p className="mb-3 text-sm text-blue-600">{notice}</p>}
 
@@ -287,14 +296,7 @@ export default function SupplierServiceDeliveryPage() {
                         제공 중지
                       </button>
                     ) : (
-                      <button
-                        type="button"
-                        disabled={busyId === row.offerId}
-                        onClick={() => void setDelivery(row, true)}
-                        className="rounded bg-blue-600 px-2 py-1 text-xs text-white disabled:opacity-50"
-                      >
-                        제공 시작
-                      </button>
+                      <span className="text-xs text-slate-400">신규 제공 종료</span>
                     )}
                   </td>
                 </tr>

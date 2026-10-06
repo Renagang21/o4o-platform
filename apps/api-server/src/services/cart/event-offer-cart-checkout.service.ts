@@ -241,6 +241,8 @@ export class EventOfferCartCheckoutService {
           sourceType: 'event_offer',
           eventOfferId: agg.ctx.listingId,
           organizationProductListingId: agg.ctx.listingId,
+          // per_store_limit 누적 집계(STORE_ORDERED_QTY_SQL)가 읽는 키. 없으면 장바구니 주문이 한도에서 빠진다.
+          productListingId: agg.ctx.listingId,
           cartItemIds: agg.cartItemIds,
           pricingSource: 'event_offer',
           confirmedUnitPrice: agg.ctx.unitPrice,

@@ -189,6 +189,14 @@ export const EXPECTED_SCHEMA_STATES: readonly ExpectedSchemaState[] = [
     fingerprint: 'd2b32f7caccf2a71c1cd01997ebc1152ea400eb9781fa81192fbd741aabec2af',
     fingerprintLineCount: 6021,
   },
+  // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1 — 기본 가입 · 세미프랜차이즈 · 복수 공급 제안 · 세미프랜차이즈 콘텐츠 · 장바구니 제안 컬럼 ·
+  // 모집 조직 단위 · 이벤트 부분 unique. baseline fresh bootstrap + incremental 1..16 를 격리 PostgreSQL 15.19
+  // (docker 일회용 컨테이너) 에서 `npx tsx src/migrate.ts` 로 실제 적용해 산출: 운영 DB fingerprint 채택 아님.
+  {
+    appliedThrough: 'CreateNeturePharmacyCommerce1791200000000',
+    fingerprint: '5ee52f589bcd49994d3457ab9a96374c3a17d1e9ed02b28a2cff4eae227a195f',
+    fingerprintLineCount: 6155,
+  },
 ] as const;
 
 /** Expected state after `prefixLength` incremental migrations; undefined when not registered. */

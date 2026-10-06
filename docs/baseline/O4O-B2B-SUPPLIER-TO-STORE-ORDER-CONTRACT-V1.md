@@ -136,6 +136,8 @@ WO 가 정한 canonical 흐름:
 
 현재 main 에 **살아 있는 구현은 3개 축**이다. 셋 다 `store_cart_items` → `checkout_orders` 로 수렴한다.
 
+> **Axis D — Neture 약국 매장 축 (2026-10-05, WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1)**: 같은 원장(`store_cart_items` `service_key='neture-pharmacy'` → `checkoutService.createOrder()` → `checkout_orders`)을 쓴다. 장바구니에 선택한 공급 옵션(기본 공급 · 공급 제안 · 이벤트 · 모집)을 저장하고, 확정 시 서버가 [`DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1`](../design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md) §4 로 재판정 · 단가 확정 후 (수취 주체, 공급자) 단위로 주문을 만든다. 결제는 payment-first 이며 현재 테스트 결제만 있다(실제 PG 미선정). 상세 [`DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1`](../design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md) §8.
+
 ### 5-1. Axis A — Event-Offer 축 (KPA Society · K-Cosmetics) — **payment-first**
 
 Event Offer 는 **특가 판매**다. 참여 신청 · 구매 의향 · 예약 · 약정 · 참가자 모집 · 펀딩 같은 개념은
@@ -436,6 +438,8 @@ confirm 의 **공통부는 서비스 무관(service-agnostic)** 이다.
 `apps/api-server/src/services/cart/offer-exposure-strategy.ts`.
 §8 불변식 S2 의 공급 축을 confirm 에서 집행하는 지점이다.
 
+> Axis D(Neture 약국 매장)는 이 strategy 를 쓰지 않는다 — 노출 판정이 serviceKey 가 아니라 세미프랜차이즈 데이터 행 · 공급 제안 기준이라 [`DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1`](../design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md) §4 SSOT 모듈이 분기점이다(2026-10-05 명시 예외). 아래 3개 strategy 는 무변경.
+
 | strategy | 서비스 | 노출 근거 (SQL) | gate |
 |---|---|---|---|
 | `approval` | kpa-society · k-cosmetics | `EXISTS offer_service_approvals(offer_id, service_key, approval_status = 'approved')` | `MASTER_INACTIVE` · `DISTRIBUTION_DENIED` |
@@ -512,6 +516,7 @@ confirm 의 노출 SQL 은 카탈로그 SSOT(`buildServiceApprovalGateSql`)와 *
 | `neture_b2b_checkout` | `neture-b2b` |
 | `pharmacy_hub_cart` | `pharmacy-hub` |
 | `store_b2b_cart` (신규) | `store-b2b` |
+| `neture_pharmacy_cart` (2026-10-05) | `neture-pharmacy` |
 
 서비스별로 tag 를 쪼개지 않는다 — 공급자 workspace 의 실제 스코프 축은
 `metadata.serviceKey` → `neture_orders.service_key` 이고 `source` 는 bridge 진입 자격 판정용이다.

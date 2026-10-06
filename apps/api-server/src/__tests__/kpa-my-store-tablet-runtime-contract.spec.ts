@@ -31,18 +31,36 @@ let CURRENT_MEMBERSHIPS: Array<{ serviceKey: string; status: string }> = [
   { serviceKey: 'k-cosmetics', status: 'active' },
 ];
 
+/**
+ * WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1 (DESIGN §5):
+ *   약국 매장(`kpa`) 후보는 Neture 기본 가입 원장(neture_pharmacy_memberships.status='active') 조직이다.
+ *   공통 stub 은 원장 질의를 모르므로 여기서 그 분기만 덧댄다(판정 로직은 넣지 않는다 — 고정 응답).
+ */
+let LEDGER_ACTIVE_ORGS: string[] = [ORG_KPA];
+
 /** KPA 시나리오: 매장 slug 있음 · TABLET 채널 승인 · 상품 노출 조건 충족 */
-const makeDataSource = () => makeStoreTabletDataSource({
-  memberships: [NETURE_PRIMARY_MEMBERSHIP, KPA_MEMBERSHIP, COS_MEMBERSHIP],
-  currentRoles: () => CURRENT_ROLES,
-  storeSlugRows: [{ serviceKey: 'kpa' }],
-  channelRows: [{ status: 'APPROVED' }],
-  poolServiceKey: 'kpa-society',
-});
+const makeDataSource = () => {
+  const stub = makeStoreTabletDataSource({
+    memberships: [NETURE_PRIMARY_MEMBERSHIP, KPA_MEMBERSHIP, COS_MEMBERSHIP],
+    currentRoles: () => CURRENT_ROLES,
+    storeSlugRows: [{ serviceKey: 'kpa' }],
+    channelRows: [{ status: 'APPROVED' }],
+    poolServiceKey: 'kpa-society',
+  });
+  const base = stub.dataSource.query;
+  stub.dataSource.query = jest.fn(async (sql: string, params: any[] = []) => {
+    if (sql.includes('neture_pharmacy_memberships')) {
+      return LEDGER_ACTIVE_ORGS.map((organization_id) => ({ organization_id, role: 'owner' }));
+    }
+    return base(sql, params);
+  });
+  return stub;
+};
 
 const makeApp = makeStoreTabletApp;
 
 beforeEach(() => {
+  LEDGER_ACTIVE_ORGS = [ORG_KPA];
   CURRENT_ROLES = ['kpa:store_owner', 'cosmetics:store_owner'];
   CURRENT_MEMBERSHIPS = [
     { serviceKey: 'kpa-society', status: 'active' },
@@ -58,7 +76,7 @@ describe('축 B — store tablet routes: service-scoped organization resolution'
     expect(poolOrgParams[0]).toBe(ORG_NETURE);
   });
 
-  it('B. storeOwnerServiceKey="kpa" mount 는 KPA 약국 조직을 고른다', async () => {
+  it('B. storeOwnerServiceKey="kpa" mount 는 기본 가입 원장 active 약국 조직을 고른다', async () => {
     const { dataSource, poolOrgParams } = makeDataSource();
     const res = await request(makeApp(dataSource, 'kpa')).get('/store/product-pool');
     expect(res.status).toBe(200);
@@ -71,10 +89,27 @@ describe('축 B — store tablet routes: service-scoped organization resolution'
     expect(poolOrgParams[0]).toBe(ORG_COS);
   });
 
-  it('D. 정지된 membership 은 KPA mount 에서 차단된다', async () => {
-    CURRENT_MEMBERSHIPS = [{ serviceKey: 'kpa-society', status: 'suspended' }];
-    const { dataSource } = makeDataSource();
+  it('D. 기본 가입 원장이 active 가 아니면 KPA mount 에서 차단된다 (role · kpa-society membership 무관)', async () => {
+    LEDGER_ACTIVE_ORGS = []; // pending / suspended 원장 → 후보 0
+    const { dataSource, poolOrgParams } = makeDataSource();
     const res = await request(makeApp(dataSource, 'kpa')).get('/store/product-pool');
+    expect(res.status).toBe(403);
+    expect(res.body.code).toBe('STORE_OWNER_REQUIRED');
+    expect(poolOrgParams).toHaveLength(0);
+  });
+
+  it('D-2. KPA mount 는 kpa-society membership 정지 여부로 판정하지 않는다 (원장 active 면 통과)', async () => {
+    CURRENT_MEMBERSHIPS = [{ serviceKey: 'kpa-society', status: 'suspended' }];
+    const { dataSource, poolOrgParams } = makeDataSource();
+    const res = await request(makeApp(dataSource, 'kpa')).get('/store/product-pool');
+    expect(res.status).toBe(200);
+    expect(poolOrgParams[0]).toBe(ORG_KPA);
+  });
+
+  it('D-3. 정지된 membership 은 cosmetics mount 에서 여전히 차단된다', async () => {
+    CURRENT_MEMBERSHIPS = [{ serviceKey: 'k-cosmetics', status: 'suspended' }];
+    const { dataSource } = makeDataSource();
+    const res = await request(makeApp(dataSource, 'cosmetics')).get('/store/product-pool');
     expect(res.status).toBe(403);
     expect(res.body.code).toBe('MEMBERSHIP_NOT_ACTIVE');
   });
