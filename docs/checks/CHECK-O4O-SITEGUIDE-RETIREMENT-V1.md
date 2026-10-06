@@ -143,7 +143,7 @@ historical migration(`CreateSiteGuideTables` · `DropSiteGuideSchema`) · 기록
 |---|---|
 | serving 에 #333 포함 | 두 서비스 revision label `o4o-commit-sha` 가 `195ea6fee` 를 조상으로 가짐 |
 | API health | `GET https://api.neture.co.kr/api/health` 200 |
-| siteguide 접수 400 | `POST /api/v1/platform/inquiries` `type=siteguide` → 400 `RETIRED_INQUIRY_TYPE` — 유형 검사가 저장 전 · 필수값 검사 뒤에 있으므로 필수값을 채워 보낸다. **배포 전에는 보내지 않는다**(이전 코드는 저장한다) |
+| siteguide 접수 400 | `POST /api/v1/platform/inquiries` `type=siteguide` · 필수값(name · email · subject · message)은 채우되 **email 은 형식이 틀린 값**(예: `not-an-email`)으로 보낸다. 검사 순서가 필수값 → 은퇴 유형 → 이메일 형식 → 저장이므로, 차단이 동작하면 `400 RETIRED_INQUIRY_TYPE`, 동작하지 않거나 이전 revision 이 받으면 `400 INVALID_EMAIL` — **어느 경우에도 저장되지 않는다**. `RETIRED_INQUIRY_TYPE` 일 때만 PASS |
 | 관리자 문의 화면 | Neture admin vault 문의 화면 — 유형 필터에 SiteGuide 없음 · 기존 `platform` 1건 목록 · 상세 조회 |
 
 배포 전 사전 확인: 운영 DB 의 `platform_inquiries` = `platform` 1행(§5-1 삭제 후) — 화면 검증의 기대값.
