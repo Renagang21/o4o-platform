@@ -77,11 +77,20 @@ O4O Platform repository의 Codex 및 일반 coding agent를 위한 독립 진입
 
   ```bash
   git fetch origin
-  git worktree add -b wo/<slug> ../o4o-wt/<slug> origin/main
+  WT_ROOT="$(dirname "$(dirname "$(git rev-parse --path-format=absolute --git-common-dir)")")/o4o-wt"
+  git worktree add -b wo/<slug> "$WT_ROOT/<slug>" origin/main
   ```
 
-  - branch 는 `wo/<slug>`(기존 관례). worktree 는 저장소 **밖** 형제 디렉터리 `../o4o-wt/<slug>` —
+  ```powershell
+  # PowerShell
+  $wtRoot = Join-Path (Split-Path (Split-Path (git rev-parse --path-format=absolute --git-common-dir))) 'o4o-wt'
+  git worktree add -b wo/<slug> "$wtRoot/<slug>" origin/main
+  ```
+
+  - branch 는 `wo/<slug>`(기존 관례). worktree 는 기준 main checkout 의 **밖** 형제 디렉터리 `o4o-wt/<slug>` —
     저장소 안(`.claude/worktrees/` 등)에 두면 lint · glob 이 사본까지 읽는다.
+  - 경로는 공통 `.git`(`--git-common-dir`) 기준으로 잡는다. 상대 경로 `../o4o-wt` 나 `--show-toplevel` 은
+    실행 위치(하위 폴더 · `C:\tmp\...` · 다른 worktree 안)에 따라 다른 곳에 만들어지므로 쓰지 않는다.
   - 새 worktree 에는 `node_modules` · 빌드 산출물이 없다. 검증 전 [SETUP.md](SETUP.md) 설치 절차를 따른다.
   - branch push 는 이름을 명시한다(`git push -u origin wo/<slug>`).
 - 해당 작업용 worktree 가 이미 명시적으로 준비돼 있으면 중복 생성하지 않는다.
