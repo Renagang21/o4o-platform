@@ -1,5 +1,7 @@
 # Internal Beta Runbook V1
 
+> **상태**: SUPERSEDED · **대체 문서**: [`O4O-API-OPERATIONS-RUNBOOK-V1`](O4O-API-OPERATIONS-RUNBOOK-V1.md) · **표기일**: 2026-10-06 — 판정 확정(`WO-O4O-CANONICAL-INDEX-S9-POLICY-DECISION-ALIGNMENT-V1`): **Internal Beta 단계 종료.** 아래 본문(Beta Mode · 지표 · 종료 조건)은 2026-02 기록으로 보존하며 운영 판단 근거로 쓰지 않는다. `BETA_MODE` · 미계측 `OPS` 상수 정리는 후속 코드 정리 WO.
+>
 > WO-O4O-INTERNAL-BETA-ROLL-OUT-V1
 > 2026-02-24
 
@@ -157,7 +159,7 @@ Threshold 기준:
 - [ ] Slow request 경고 빈도 수용 가능
 - [ ] DB/Redis 응답 시간 안정
 
-> (2026-10-04 정합) "결제 성공률" · "Distribution 차단 수" · "Checkout 실패 패턴" 항목은 해당 카운터가 계측되지 않아(§3 정합 주석) 현재 **판정 불가**이며, 소비자 결제는 은퇴했다. Beta 단계의 존속 · 종료 여부와 대체 종료 조건(B2B checkout 계측 여부 포함)은 이 문서에서 결정하지 않는다 — 별도 결정 전까지 이 절을 Beta 종료 판정 근거로 쓰지 않는다.
+> (2026-10-04 정합) "결제 성공률" · "Distribution 차단 수" · "Checkout 실패 패턴" 항목은 해당 카운터가 계측되지 않아(§3 정합 주석) 현재 **판정 불가**이며, 소비자 결제는 은퇴했다. (2026-10-06 판정) Beta 단계는 종료됐다 — 이 체크리스트로 판정하지 않는다. 상시 점검은 [`O4O-API-OPERATIONS-RUNBOOK-V1`](O4O-API-OPERATIONS-RUNBOOK-V1.md).
 
 ---
 

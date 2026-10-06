@@ -387,7 +387,7 @@ external sales channel
 | [`STORE-LOCAL-PRODUCT-BOUNDARY-POLICY-V1`](STORE-LOCAL-PRODUCT-BOUNDARY-POLICY-V1.md) | 정합 — 매장 자체 상품의 Commerce 연결 금지 |
 | [`E-COMMERCE-ORDER-CONTRACT`](E-COMMERCE-ORDER-CONTRACT.md) | 기술 계약 — 주문 **생성 방식**을 정의. 어떤 주문이 사업적으로 허용되는가는 본 문서가 정한다 |
 | [`O4O-RETAIL-STABLE-V1`](../platform/architecture/O4O-RETAIL-STABLE-V1.md) | **조사 필요** — `channel_type='B2C'` storefront closed loop 을 기술한다. §8 판정 대상 |
-| [`CHECKOUT-STABLE-DECLARATION-V1`](CHECKOUT-STABLE-DECLARATION-V1.md) | 기술 계약 — checkout/payment 안정화 선언 |
+| [`CHECKOUT-STABLE-DECLARATION-V2`](CHECKOUT-STABLE-DECLARATION-V2.md) | 기술 계약 — B2B checkout · PaymentCore 안정화 선언 (V1 SUPERSEDED, 2026-10-06) |
 | `CHECK-O4O-KPA-INTERNAL-STOREFRONT-RETIREMENT-V1` | 선례 — KPA 자체몰 철거 (역사 기록, 수정 금지) |
 | `WO-O4O-STORE-SALE-CHECKOUT-ROUTE-DEPRECATION-V1` | 선례 — 소비자→매장 결제 경로 `410` 차단 (역사 기록, 수정 금지) |
 | `CHECK-O4O-KPA-NAVER-ONLINE-SALES-CONNECTION-AND-PILOT-CLOSEOUT-V1` | 선례 — 외부 판매채널 연동 파일럿 (역사 기록, 수정 금지) |

@@ -54,4 +54,4 @@
 
 ---
 
-*참조: CLAUDE.md §3 (App 계층), §5 (Core 동결), §12 (Business Service Rules)*
+*참조: CLAUDE.md §1 (App 계층), §3 (Core 동결)* — (2026-10-06 정합) 절 번호 갱신 · Business Service Rules 는 OBSOLETE
