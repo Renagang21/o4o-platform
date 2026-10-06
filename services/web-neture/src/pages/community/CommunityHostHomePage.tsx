@@ -1,15 +1,15 @@
 /**
  * community.neture.co.kr `/` — 커뮤니티 진입 (CHECK-O4O-URL-FIRST-CENSUS-V1 §21-10)
  *
- * 약사 · 소매업소 커뮤니티로 들어가는 주소 진입점이다. 현재 커뮤니티 활동(포럼)은 각 서비스
- * 앱이 제공하므로 `/pharmacist` · `/retail` 은 그 포럼으로 이어진다(HostBoundary).
+ * 약사 커뮤니티로 들어가는 주소 진입점이다. 현재 커뮤니티 활동(포럼)은 각 서비스
+ * 앱이 제공하므로 `/pharmacist` 는 그 포럼으로 이어진다(HostBoundary).
+ * 소매업소 커뮤니티(`/retail` → retail.neture.co.kr)는 K-Cosmetics 공개 서비스 종료로 제거했다 — WO-O4O-KCOSMETICS-RETIREMENT-PHASE1A-WEB-APP-AND-DEPLOY-TARGET-V1.
  * 커뮤니티별 독립 가입 · 승인은 아직 없다 — 이 화면은 그 기능을 대신하지 않는다.
  */
 import { Link } from 'react-router-dom';
 
 const COMMUNITIES = [
   { path: '/pharmacist', title: '약사 커뮤니티', desc: '약사 회원이 함께 쓰는 포럼과 자료' },
-  { path: '/retail', title: '소매업소 커뮤니티', desc: '소매업소 경영자가 함께 쓰는 포럼과 자료' },
 ];
 
 export default function CommunityHostHomePage() {

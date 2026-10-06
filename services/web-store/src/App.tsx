@@ -17,7 +17,7 @@ import { TermsAcceptanceGate } from './components/TermsAcceptanceGate';
 import { StoreGate } from './components/StoreGate';
 import RootShell from './components/RootShell';
 import UnifiedStoreLayout, { ServiceRoleOnly, ServiceStoreLayout, StoreOwnerOnly } from './components/layouts/UnifiedStoreLayout';
-import { getActiveServicePublicOrigin } from './lib/serviceContext';
+import { getActiveServiceKey, getActiveServicePublicOrigin } from './lib/serviceContext';
 import ServiceWorkLayout, { ServiceWorkHomePage, ServiceWorkIndexPage } from './components/layouts/ServiceWorkLayout';
 import UnifiedHubLayout from './components/layouts/UnifiedHubLayout';
 import HomePage from './pages/HomePage';
@@ -97,7 +97,6 @@ const KcosStoreRecruitmentApplicationsPage = lazy(() => import('./services/kcos/
 const KcosStoreSignagePage = lazy(() => import('./services/kcos/pages/store/StoreSignagePage'));
 const KcosStorePlaylistCreatePage = lazy(() => import('./services/kcos/pages/store/StorePlaylistCreatePage'));
 const KcosSignagePlayerSelectPage = named(() => import('./services/kcos/pages/store/signage/SignagePlayerSelectPage'), 'SignagePlayerSelectPage');
-const KcosSignagePlaybackPage = lazy(() => import('./services/kcos/pages/store/signage/SignagePlaybackPage'));
 const KcosStoreAssetsPage = lazy(() => import('./services/kcos/pages/store/StoreAssetsPage'));
 const KcosStoreSettingsPage = lazy(() => import('./services/kcos/pages/store/StoreSettingsPage'));
 const KcosStoreInfoPage = lazy(() => import('./services/kcos/pages/store/StoreInfoPage'));
@@ -146,6 +145,20 @@ const PharmacyOrdersPage = lazy(() => import('./pages/neture-pharmacy/PharmacyOr
 const gated = (el: ReactElement) => <StoreGate>{el}</StoreGate>;
 const Loading = <div className="p-8 text-center text-sm text-slate-500">불러오는 중...</div>;
 const NotFound = <main className="center-card"><section className="card"><h1>페이지를 찾을 수 없습니다</h1></section></main>;
+/**
+ * K-Cosmetics 퇴역 — 공개 서비스(retail.neture.co.kr · k-cosmetics.site)가 종료됐다
+ * (WO-O4O-KCOSMETICS-RETIREMENT-PHASE1A-WEB-APP-AND-DEPLOY-TARGET-V1). 이 앱의 K-Cosmetics 화면은 종료 안내만 보여 준다.
+ * 같은 기능이라는 근거가 없으므로 약국 화면으로 보내지 않는다. 화면 코드 삭제는 다음 퇴역 단계에서 한다.
+ */
+const KcosRetired = (
+  <main className="center-card">
+    <section className="card">
+      <h1>K-Cosmetics 서비스가 종료되었습니다</h1>
+      <p className="muted">K-Cosmetics 매장 · 업무 화면은 더 이상 제공되지 않습니다.</p>
+      <a className="secondary-link" href={WORKSPACE_PATHS.home}>매장 홈으로</a>
+    </section>
+  </main>
+);
 const S = WORKSPACE_PATHS.myStore;
 const W = WORKSPACE_PATHS.serviceWork;
 const H = WORKSPACE_PATHS.storeHub;
@@ -163,12 +176,15 @@ function ParamRedirect({ to }: { to: string }) {
 
 /**
  * 이용 방법(`/guide/*`)은 서비스 앱이 서빙한다 — 이식 화면의 GuideBackLink 가 store 호스트에서 404 가 되지 않게
- * 현재 서비스 문맥의 공개 사이트로 보낸다(§21-15).
+ * 현재 서비스 문맥의 공개 사이트로 보낸다(§21-15). 종료된 K-Cosmetics 문맥은 이동하지 않고 종료 안내를 보여 준다.
  */
 function ServiceGuideRedirect() {
   const { pathname, search } = useLocation();
-  useEffect(() => { window.location.replace(`${getActiveServicePublicOrigin()}${pathname}${search}`); }, [pathname, search]);
-  return null;
+  const retired = getActiveServiceKey() === 'k-cosmetics';
+  useEffect(() => {
+    if (!retired) window.location.replace(`${getActiveServicePublicOrigin()}${pathname}${search}`);
+  }, [retired, pathname, search]);
+  return retired ? KcosRetired : null;
 }
 
 /**
@@ -251,7 +267,7 @@ export default function App() {
     <Route path={WORKSPACE_PATHS.handoff} element={<HandoffPage />} />
     {/* 사이니지 재생은 chrome-free (KPA 와 동일하게 layout 밖) */}
     <Route path={`${S}/marketing/signage/play/:playlistId`} element={gated(<SignagePlaybackPage />)} />
-    <Route path={`${W}/k-cosmetics/store/marketing/signage/play/:playlistId`} element={gated(<KcosSignagePlaybackPage />)} />
+    <Route path={`${W}/k-cosmetics/store/marketing/signage/play/:playlistId`} element={KcosRetired} />
     <Route path="/guide/*" element={<ServiceGuideRedirect />} />
 
     <Route element={<RootShell />}>
@@ -287,7 +303,8 @@ export default function App() {
       </Route>
       {/* K-Cosmetics 매장 경영자용 /store 의 새 위치(§21-15) — 원본 앱의 화면 · 경로 · 옛 alias 를 그대로 옮겼다.
           서비스 업무(상품 · 주문 · 매출 · 관심 요청)는 기존 /work/k-cosmetics 화면으로 보낸다(같은 화면 중복 이식 없음). */}
-      <Route path={`${W}/k-cosmetics/store`} element={gated(<ServiceStoreLayout />)}>
+      {/* K-Cosmetics 퇴역 — 아래 자식 route 는 종료 안내 뒤에 가려져 렌더되지 않는다(코드 삭제는 다음 단계). */}
+      <Route path={`${W}/k-cosmetics/store`} element={KcosRetired}>
         <Route index element={<KcosStoreCockpitPage />} />
         <Route path="my-products" element={<StoreProductsManagerPage title="O4O 주문 가능 상품" description="공급자 또는 운영자 승인 후 매장에서 반복 주문할 수 있는 O4O 공급 상품을 관리합니다." />} />
         <Route path="channels" element={<KcosStoreChannelsPage />} />
@@ -368,7 +385,7 @@ export default function App() {
         <Route path="sales-channels/foreign-visitor/partners/:partnerId/qr-codes" element={<ForeignVisitorPartnerQrCodesPage />} />
         <Route path="*" element={NotFound} />
       </Route>
-      <Route path={`${W}/k-cosmetics`} element={gated(<ServiceWorkLayout />)}>
+      <Route path={`${W}/k-cosmetics`} element={KcosRetired}>
         <Route index element={<ServiceWorkHomePage />} />
         <Route path="commerce/products" element={<KcosStoreCommerceProductsPage />} />
         <Route path="commerce/orders" element={<KcosStoreOrdersPage />} />

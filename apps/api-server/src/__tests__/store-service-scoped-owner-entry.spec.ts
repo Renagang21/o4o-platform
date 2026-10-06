@@ -66,9 +66,9 @@ describe('KPA 전환 차단 요인 정리 — CHECK-O4O-URL-FIRST-CENSUS-V1 §21
 
   it('고정 서비스에서 `/store/...` 링크를 따라오면 `/work/<key>/store/...` 로 옮긴다 · mount 목록과 일치', () => {
     expect(svc).toContain("SERVICE_SCOPED_STORE_KEYS: readonly UnifiedServiceKey[] = ['kpa-society', 'k-cosmetics']");
-    for (const key of ['kpa-society', 'k-cosmetics']) {
-      expect(norm(app)).toContain(`<Route path={\`\${W}/${key}/store\`} element={gated(<ServiceStoreLayout />)}>`);
-    }
+    expect(norm(app)).toContain('<Route path={`${W}/kpa-society/store`} element={gated(<ServiceStoreLayout />)}>');
+    // K-Cosmetics 는 공개 서비스 종료 — mount 위치는 종료 안내를 보여 준다(WO-O4O-KCOSMETICS-RETIREMENT-PHASE1A-WEB-APP-AND-DEPLOY-TARGET-V1).
+    expect(norm(app)).toContain('<Route path={`${W}/k-cosmetics/store`} element={KcosRetired}>');
     expect(layout).toContain('toServiceScopedStorePath(scopedServiceKey, `${pathname}${search}${hash}`)');
     expect(layout).toContain('<Navigate to={scopedPath} replace />');
   });
@@ -154,7 +154,7 @@ describe('K-Cosmetics 매장 화면 이전 — CHECK-O4O-URL-FIRST-CENSUS-V1 §2
     expect(read(`${K}pages/store/StoreSignagePage.tsx`)).toContain("navigate('/hub/signage')");
     expect(read(`${K}pages/store/StoreChannelsPage.tsx`)).toContain("hubB2b: '/hub/b2b'");
     expect(read(`${K}pages/store/signage/SignagePlayerSelectPage.tsx`)).toContain('playPathPrefix="/work/k-cosmetics/store/marketing/signage/play"');
-    expect(norm(app)).toContain('<Route path={`${W}/k-cosmetics/store/marketing/signage/play/:playlistId`} element={gated(<KcosSignagePlaybackPage />)} />');
+    expect(norm(app)).toContain('<Route path={`${W}/k-cosmetics/store/marketing/signage/play/:playlistId`} element={KcosRetired} />');
     expect(app).toContain('<Route path="/guide/*" element={<ServiceGuideRedirect />} />');
   });
 });
@@ -199,5 +199,23 @@ describe('KPA 앱 — 매장 handoff 는 서비스 지정 경로로(플래그 �
   });
   it("배포 workflow 의 플래그는 여전히 'false'", () => {
     expect(read('.github/workflows/deploy-web-services.yml')).toContain("VITE_UNIFIED_STORE_HANDOFF: 'false'");
+  });
+});
+
+describe('K-Cosmetics 공개 서비스 종료 — store 호스트는 종료된 호스트로 보내지 않는다', () => {
+  // WO-O4O-KCOSMETICS-RETIREMENT-PHASE1A-WEB-APP-AND-DEPLOY-TARGET-V1 (Codex P1 수용 · B안)
+  const app = read('services/web-store/src/App.tsx');
+  it('K-Cosmetics 업무 · 매장 · 송출 mount 는 종료 안내만 보여 준다', () => {
+    expect(norm(app)).toContain('<Route path={`${W}/k-cosmetics`} element={KcosRetired}>');
+    expect(norm(app)).toContain('<Route path={`${W}/k-cosmetics/store`} element={KcosRetired}>');
+    expect(app).not.toMatch(/k-cosmetics[^\n]*element=\{gated\(/);
+  });
+  it('이용 방법 이동은 K-Cosmetics 문맥에서 공개 사이트로 replace 하지 않는다', () => {
+    expect(app).toContain("const retired = getActiveServiceKey() === 'k-cosmetics';");
+    expect(app).toContain('if (!retired) window.location.replace(');
+  });
+  it('종료 안내는 약국 화면으로 redirect 하지 않는다', () => {
+    const notice = app.slice(app.indexOf('const KcosRetired'), app.indexOf('const S = '));
+    expect(notice).not.toMatch(/Navigate|kpa-society|pharmacy/);
   });
 });
