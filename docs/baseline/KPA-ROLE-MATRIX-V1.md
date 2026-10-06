@@ -17,7 +17,7 @@
 >   - **`kpa:store_owner`** — 매장 workspace 접근 축의 역할이다(KPA scope 를 주지 않음, [STORE-OWNER-RBAC](../architecture/auth/O4O-STORE-OWNER-RBAC-STANDARD-V1.md)).
 >   - **`kpa:pharmacist` · `kpa:student`** — deprecated(자격은 `kpa_pharmacist_profiles`). 새로 부여하지 않고 scope 도 주지 않는다. 다만 `20260326300000-DeactivateQualificationRoles` 로 비활성화된 뒤 `20260924100000-FixKpaOrphanRoleCleanup` 이 일부(테스트 계정) assignment 를 `is_active=true` 로 복원했으므로 **활성 행이 남아 있을 수 있다** — 권한 감사 · 정리 작업은 이 행들을 포함해 조회한다.
 >   - `kpa:district_admin` · `kpa:branch_admin` · `kpa:branch_operator` 는 제거됐다(`WO-O4O-KPA-BRANCH-DISTRICT-LEGACY-CLEANUP-V1`). 조직 단위 역할은 role 이 아니라 `kpa_members.role` 이다.
-> - 유효하게 남는 원칙: `platform:*` 은 서비스 scope 를 대신하지 않음 · serviceKey 격리 · 서버 측 org lookup · 이력 데이터 Hard delete 금지(2026-10-06 범위 정정 — §7 주석) · 신규 서비스는 serviceKey · scope 문서화 후 구현 · Core 수정 금지.
+> - 유효하게 남는 원칙: `platform:*` 은 서비스 scope 를 대신하지 않음 · serviceKey 격리 · 이력 데이터 Hard delete 금지(2026-10-06 범위 정정 — §7 주석) · 신규 서비스는 serviceKey · scope 문서화 후 구현 · Core 수정 금지. (2026-10-06 정정) "서버 측 org lookup"(분회 organization 범위 확인)은 Society 원칙이 아니다 — 분회 서비스 원칙으로만 [`KPA-BRANCH-ROLE-MATRIX-V1`](KPA-BRANCH-ROLE-MATRIX-V1.md) 에 둔다.
 
 ---
 

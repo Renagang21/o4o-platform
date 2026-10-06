@@ -6,7 +6,7 @@
 > **위상**: 조사 보고서가 아니라 **공급자→매장 B2B 주문 축을 고정하는 canonical 계약 문서**다.
 > **선행 문서**: [`O4O-STORE-COMMERCE-BOUNDARY-V1`](O4O-STORE-COMMERCE-BOUNDARY-V1.md) · [`O4O-BUSINESS-PHILOSOPHY-V1`](O4O-BUSINESS-PHILOSOPHY-V1.md) · [`O4O-3-ROLE-FLOW-BASELINE-V1`](O4O-3-ROLE-FLOW-BASELINE-V1.md)
 > **회귀 가드**: `apps/api-server/src/__tests__/b2b-supplier-to-store-order-canonical-contract.spec.ts`
-> **정정 이력**: 2026-09-24 · `WO-O4O-B2B-ORDER-CONTRACT-EVENT-OFFER-PAYMENT-FIRST-DOC-ALIGNMENT-V1` — §5-1(Axis A · Event Offer = 특가 · payment-first) · §3(결제 축 producer 4종) · §8(KPA · K-Cosmetics 행). 나머지 절은 불변이며 문서 전체는 **Active** 다.
+> **정정 이력**: 2026-09-24 · `WO-O4O-B2B-ORDER-CONTRACT-EVENT-OFFER-PAYMENT-FIRST-DOC-ALIGNMENT-V1` — §5-1(Axis A · Event Offer = 특가 · payment-first) · §3(결제 축 producer 4종) · §8(KPA · K-Cosmetics 행). 2026-10-06 · `WO-O4O-CANONICAL-INDEX-S9-POLICY-DECISION-ALIGNMENT-V1` — §4 · §5 의 "3개 축" 정정 주석(현행 주문 경로 5개) · §6 흐름도의 Axis A 를 payment-first 로 정정(2026-09-24 §5-1 정정의 누락분). 나머지 절은 불변이며 문서 전체는 **Active** 다.
 
 ---
 
@@ -114,7 +114,7 @@ active service membership  ∧  service-scoped role/capability
 | 테이블 | 역할 | 계약 |
 |---|---|---|
 | `store_cart_items` | **B2B 장바구니**. 매장(buyer) 이 공급자 offer 를 담는다 | 소비자 장바구니가 아니다. `O4O-STORE-COMMERCE-BOUNDARY-V1` 의 소비자 cart 금지선 대상 아님 |
-| `checkout_orders` | **canonical 주문 원장**. 3개 축 전부가 여기로 수렴한다 | 신규 `*_orders` 테이블 생성 금지 (CLAUDE.md §4) |
+| `checkout_orders` | **canonical 주문 원장**. 현행 주문 경로 전부(§5 정정 주석의 5개)가 여기로 수렴한다 | 신규 `*_orders` 테이블 생성 금지 (CLAUDE.md §4) |
 | `neture_orders` | **공급자 fulfillment 원장**. 결제 확정 후 bridge 가 투영한다 | 주문의 정본이 아니라 공급자 처리 뷰다 |
 | 결제 축 | live producer **4개 한정** — `pharmacy-hub` · `neture-b2b` · `store-b2b` · `store-service-subscription` | 그 외 producer 신규 추가 금지. `store-b2b` 는 승인축 B2B(`store_b2b_cart`) + Event Offer 특가(`store_cart_checkout`) 공용 결제 축이며(`STORE_B2B_PAYMENT_SERVICE_KEY`) `WO-O4O-B2B-ORDER-CONTRACT-EVENT-OFFER-PAYMENT-FIRST-DOC-ALIGNMENT-V1` 로 승인됐다 |
 
@@ -135,6 +135,15 @@ WO 가 정한 canonical 흐름:
 ```
 
 현재 main 에 **살아 있는 구현은 3개 축**이다. 셋 다 `store_cart_items` → `checkout_orders` 로 수렴한다.
+
+> **(2026-10-06 정정) 현행 주문 경로는 5개다** — 위 "3개 축"은 작성 시점 표기다. 모두 `store_cart_items` → `checkoutService.createOrder()` → `checkout_orders` 로 수렴하고 **모두 payment-first** 다(UNPAID 주문은 fulfillment 대상 아님).
+> 1. Axis A — Event Offer 특가(§5-1, order source `store_cart_checkout`)
+> 2. **승인축 B2B** — KPA Society · K-Cosmetics 승인 카탈로그 담기(§13-6) → `/store/cart/:serviceKey/checkout-confirm-b2b`(`StoreB2BCartCheckoutService`, §13), order source `store_b2b_cart`. 결제 축은 Axis A 와 같은 `store-b2b`(§4)
+> 3. Axis B — Neture B2B(§5-2)
+> 4. Axis C — PharmacyHub(§5-3)
+> 5. Axis D — Neture 약국 매장(아래, order source `neture_pharmacy_cart`)
+>
+> 경로 감사 · 후속 checkout 작업은 이 5개를 모두 대상으로 한다. Stable 범위는 [`CHECKOUT-STABLE-DECLARATION-V2`](CHECKOUT-STABLE-DECLARATION-V2.md) §2.
 
 > **Axis D — Neture 약국 매장 축 (2026-10-05, WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1)**: 같은 원장(`store_cart_items` `service_key='neture-pharmacy'` → `checkoutService.createOrder()` → `checkout_orders`)을 쓴다. 장바구니에 선택한 공급 옵션(기본 공급 · 공급 제안 · 이벤트 · 모집)을 저장하고, 확정 시 서버가 [`DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1`](../design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md) §4 로 재판정 · 단가 확정 후 (수취 주체, 공급자) 단위로 주문을 만든다. 결제는 payment-first 이며 현재 테스트 결제만 있다(실제 PG 미선정). 상세 [`DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1`](../design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md) §8.
 
@@ -228,9 +237,9 @@ Pharmacy-Hub 의 역할/스코프 가드를 걸 수 없었다.
 ```text
 [cart]  장바구니 항목            store_cart_items
    |
-   +- (Axis A) checkout-confirm ------------> checkout_orders : 주문 확정 (결제 축 없음)
+   +- (Axis A · 승인축 B2B) checkout-confirm -> checkout_orders : paymentStatus = pending
    |
-   +- (Axis B/C) 주문 생성 -----------------> checkout_orders : paymentStatus = pending
+   +- (Axis B/C/D) 주문 생성 ---------------> checkout_orders : paymentStatus = pending
                                                     |
                                      결제 완료 이벤트 |  (유일한 전이 트리거)
                                                     v
