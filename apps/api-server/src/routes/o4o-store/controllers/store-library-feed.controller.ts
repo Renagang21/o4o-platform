@@ -162,6 +162,8 @@ export function createStoreLibraryFeedController(
                 'snapshot'::text AS origin,
                 s.asset_type AS asset_type,
                 CASE WHEN s.source_service = 'semi-franchise' THEN 'franchise' WHEN s.asset_type = 'cms' THEN 'operator' ELSE 'community' END AS source_group,
+                -- WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: 출처 표시는 불변 snapshot 에서 — 매장 편집본(sc)은 보지 않는다.
+                CASE WHEN s.source_service = 'semi-franchise' THEN s.content_json->>'semiFranchiseName' END AS source_name,
                 -- WO-O4O-KPA-STORE-LIBRARY-SNAPSHOT-SINGLE-EDIT-V1:
                 --   snapshot 은 o4o_asset_snapshots(불변 Core) + kpa_store_contents(snapshot_edit override) 구조.
                 --   매장 편집본(override)이 있으면 우선 노출 — 공개 렌더(published-assets)와 동일한 COALESCE 정책.
@@ -192,6 +194,7 @@ export function createStoreLibraryFeedController(
                 'direct'::text AS origin,
                 NULL::varchar AS asset_type,
                 'mine'::text AS source_group,
+                NULL::text AS source_name,
                 d.title AS title,
                 d.content_json AS content_json,
                 d.created_at AS sort_at,
@@ -211,6 +214,7 @@ export function createStoreLibraryFeedController(
                 'execution-asset'::text AS origin,
                 'content'::varchar AS asset_type,
                 'mine'::text AS source_group,
+                NULL::text AS source_name,
                 e.title AS title,
                 jsonb_build_object('html', e.html_content) AS content_json,
                 e.created_at AS sort_at,
@@ -329,6 +333,8 @@ export function createStoreLibraryFeedController(
           id: string;
           origin: 'snapshot' | 'direct' | 'execution-asset';
           asset_type: string | null;
+          source_group: 'franchise' | 'operator' | 'community' | 'mine';
+          source_name: string | null;
           title: string;
           content_json: Record<string, unknown> | null;
           sort_at: string;
@@ -341,6 +347,9 @@ export function createStoreLibraryFeedController(
           origin: row.origin,
           selectionKey: `${row.origin}:${row.id}`,
           assetType: row.asset_type,
+          // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: 출처 분류(불변 snapshot 기준) — 사본을 편집해도 바뀌지 않는다.
+          sourceGroup: row.source_group,
+          sourceName: row.source_name ?? null,
           title: row.title,
           contentJson: row.content_json ?? {},
           createdAt: row.sort_at,

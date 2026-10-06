@@ -173,8 +173,6 @@ import OperatorCommunityContentsPage from './pages/operator/CommunityContentsPag
 //   설문조사 관리 — 화면 본체는 공통 @o4o/operator-core-ui Surveys module.
 import OperatorSurveyListPage from './pages/operator/survey/OperatorSurveyListPage';
 import OperatorSurveyCreatePage from './pages/operator/survey/OperatorSurveyCreatePage';
-// 동일 WO §4 (#96) — 안내 문구 관리 (공통 GuideContentsConsolePage).
-import OperatorGuideContentsPage from './pages/operator/OperatorGuideContentsPage';
 
 // WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §4:
 //   공지/뉴스 관리 (공통 @o4o/operator-core-ui CmsContentManager · /pharmacy-hub/news)
@@ -651,7 +649,6 @@ export default function App() {
             <Route path="surveys" element={<OperatorSurveyListPage />} />
             <Route path="surveys/new" element={<OperatorSurveyCreatePage />} />
             {/* 동일 WO §4 (#96) */}
-            <Route path="guide-contents" element={<OperatorGuideContentsPage />} />
             <Route path="roles" element={<OperatorRoleManagementPage />} />
           </Route>
 

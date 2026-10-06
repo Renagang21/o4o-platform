@@ -16,6 +16,7 @@ import type { NetureCatalogService } from './catalog.service.js';
 import { resolveMasterWriteFields } from './master-link-policy.js';
 import { OfferErrorCode } from '../constants/offer-error-code.js';
 import { filterApprovalEligibleServiceKeys, isApprovalEligibleServiceKey } from '../constants/approval-service-keys.js';
+import { isSupplierOptinServiceKey } from '../constants/supplier-optin-services.js';
 // WO-O4O-SUPPLIER-PRODUCT-REGISTER-BY-CATEGORY-STATUS-V1: 품목군 등록 가능 상태 gate
 import {
   SupplierRegulatedCategoryService,
@@ -1542,6 +1543,28 @@ export class NetureOfferService {
 
     const currentKeys: string[] = row.service_keys || [];
     const alreadyOn = currentKeys.includes(serviceKey);
+
+    // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1 (DESIGN §16-5 결정):
+    //   공급자 opt-in 은 폐지 — 새 제공 시작을 받지 않는다(일반가 = 기본 공급, 별도 단가 = 공급 제안).
+    //   제공 중인 상품의 단가 변경 · 제공 중지는 기존 PH 주문 처리 동안 유지한다.
+    if (input.enabled && !alreadyOn && isSupplierOptinServiceKey(serviceKey)) {
+      return {
+        success: false,
+        error: 'SUPPLIER_OPTIN_RETIRED',
+        message:
+          '서비스 직접 제공은 종료되었습니다. 일반 공급은 제품 등록 승인(Neture 약국 기본 공급), 별도 단가는 공급 제안으로 신청해 주세요.',
+      };
+    }
+    //   service_keys 가 비면 Neture 약국 기본 공급으로 판정된다(supply-access). opt-in 키만 남은 상품에서
+    //   키를 지우면 운영자 승인 없이 공급 범위가 넓어지므로 막는다 — 공급을 멈추려면 상품을 비활성으로 바꾼다.
+    if (!input.enabled && alreadyOn && currentKeys.every((k) => k === serviceKey)) {
+      return {
+        success: false,
+        error: 'OPTIN_STOP_WOULD_EXPOSE_DEFAULT_SUPPLY',
+        message:
+          '이 상품은 다른 공급 경로가 없어 제공을 중지하면 Neture 약국 기본 공급으로 노출됩니다. 공급을 멈추려면 제품 목록에서 상품을 비활성으로 바꿔 주세요.',
+      };
+    }
 
     if (input.enabled && !!row.is_regulated) {
       const isPharmacyAudience = await new ServiceAudienceService(AppDataSource).getPharmacyAudienceResolver();

@@ -126,10 +126,17 @@ function usageSummaryLabel(u: StoreContentUsage | null | undefined): string | nu
 }
 
 function toDocumentRow(it: LibraryContentItem): DocumentRow {
-  // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: 피드는 source_group 을 내보내지 않으므로
-  //   세미프랜차이즈 사본은 사본 contentJson 의 semiFranchiseKey(복사 시 서버가 기록)로 구분한다.
-  const semiFranchiseName = readString(it.contentJson, 'semiFranchiseName');
-  const isFranchise = it.origin === 'snapshot' && !!readString(it.contentJson, 'semiFranchiseKey');
+  // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: 출처는 피드의 sourceGroup(불변 snapshot.source_service 기준)으로 판정한다.
+  //   사본 contentJson 은 매장 편집으로 바뀌므로 출처 판정에 쓰지 않는다(편집 후 '커뮤니티' 로 바뀌던 결함).
+  //   sourceGroup 이 없는 이전 API 응답만 contentJson 으로 대체 판정한다.
+  const isFranchise =
+    it.origin === 'snapshot' &&
+    (it.sourceGroup !== undefined
+      ? it.sourceGroup === 'franchise'
+      : !!readString(it.contentJson, 'semiFranchiseKey'));
+  const semiFranchiseName = isFranchise
+    ? (it.sourceName ?? readString(it.contentJson, 'semiFranchiseName'))
+    : '';
   const sourceType: DocSourceType =
     it.origin === 'execution-asset'
       ? 'execution'

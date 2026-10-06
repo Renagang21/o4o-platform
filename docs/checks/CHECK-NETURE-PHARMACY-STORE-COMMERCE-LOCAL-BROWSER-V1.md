@@ -88,9 +88,9 @@
 | PH 가입 410 · 자가 가입 제외 | 다른 소비처(web-pharmacy-hub 의 `/store/enrollment` 호출) 없음 |
 
 **남은 위험 (수정하지 않음, 보고)**
-1. 매장 자료함의 "세미프랜차이즈" 출처 **라벨**은 사본 `content_json.semiFranchiseKey` 로 판정한다. 매장 편집본이 `content_json` 을 통째로 덮으면 라벨이 "커뮤니티" 로 보일 수 있다(서버 탭 필터 `source=franchise` 는 `source_service` 기준이라 영향 없음).
+1. ~~매장 자료함의 "세미프랜차이즈" 출처 **라벨**이 사본 `content_json.semiFranchiseKey` 로 판정돼 편집 후 "커뮤니티" 로 바뀜~~ → **수정(2026-10-06)**: 자료함 피드가 변하지 않는 스냅샷 기준 `sourceGroup` · `sourceName`(`source_service`/`asset_type` · 스냅샷 `content_json.semiFranchiseName`)을 응답하고 web-store 가 이를 우선 사용. 편집 override 는 출처 판정에 쓰지 않는다. 서버 저장 로직은 변경 없음(최소 수정).
 2. 새 호스트 QR 화면의 "제품 보기" 버튼은 B2C 비공개 상품이면 404(기존 KPA 동작). 상품 정보는 화면 안에서 이미 제공.
 3. 운영 데이터 상호작용(실제 PH 매장 · 다중 서비스 매장의 QR)은 운영 검증 전 — §16-7 검증 항목.
-4. 최신 HEAD 에 대한 외부(Codex) 리뷰 부재 — 서비스 복구 시 다시 요청.
+4. 최신 HEAD 에 대한 외부(Codex) 리뷰 부재 — **미완료로 기록**. 반복 요청으로 다른 마무리 작업을 막지 않는다(2026-10-06 결정).
 
 `427a715d3` 는 QR 서비스 축 판정만 바꿨고 단일 서비스 PH 매장의 결과는 같아 브라우저 QR 검증(#18 · #19)은 다시 하지 않았다(단위 테스트로 두 경우 확인).

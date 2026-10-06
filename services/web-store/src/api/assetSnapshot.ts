@@ -388,6 +388,10 @@ export interface LibraryContentItem {
   selectionKey: string;
   /** snapshot 인 경우 'cms'|'content', direct 인 경우 null */
   assetType: string | null;
+  /** 출처 분류 — 불변 snapshot 기준(사본을 편집해도 바뀌지 않음). franchise · operator · community · mine */
+  sourceGroup?: 'franchise' | 'operator' | 'community' | 'mine';
+  /** franchise 일 때 세미프랜차이즈 이름(복사 시점 원본 기준) */
+  sourceName?: string | null;
   title: string;
   contentJson: Record<string, unknown>;
   /** snapshot.created_at 또는 direct.updated_at — 통합 정렬 기준 */

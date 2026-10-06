@@ -1,6 +1,6 @@
 # HANDOFF
 
-> 마지막 작업: 2026-10-05 (KST) · worktree `C:/Users/sohae/coding/o4o-wt/neture-pharmacy-commerce` · branch `wo/neture-pharmacy-store-commerce-refactor-v1` · draft PR #308 (merge 보류)
+> 마지막 작업: 2026-10-06 (KST) · worktree `C:/tmp/o4o-neture-pharmacy` · branch `wo/neture-pharmacy-store-commerce-refactor-v1` · draft PR #308 (merge 보류)
 
 ## 요약
 
@@ -15,9 +15,11 @@
 | 실제 PG 연동 | 대기(D1) |
 | main 통합 · 운영 migration · 배포 · 운영 실결제 | 미실시 — 사용자 승인 대기 |
 | 테스트 데이터 초기화 | 범위만 확정(DESIGN §12) — 운영 DB write 사용자 승인 필요 |
-| pharmacyhub.co.kr QR link 4행(비활성 E2E) | 행별 기존 값 · 새 값 · 조건 기록(DESIGN §16-3 A) — 운영 DB write 사용자 승인 필요 |
-| 인쇄 QR 경로 보존 리다이렉트 | 구현안 · 검증 방법만(DESIGN §16-7, LB urlRedirect) — 적용은 웹 서비스 정비 트랙 · 사용자 승인 |
-| 최신 HEAD 코드 리뷰 | Codex 미완료(unknown error 2회) · 직접 리뷰 완료(CHECK §8) |
+| pharmacyhub.co.kr QR link 4행(비활성 E2E) | 테스트 데이터 초기화 대상으로 결정(DESIGN §12 · §16-3 A) — 삭제 미실행 · 초기화 승인 때 함께 |
+| PH 공급자 opt-in | Neture 에 재구현 안 함 — 신규 시작 410 · 단독 키 중지 409(기본 공급 노출 방지) · 기존 주문 처리 유지(DESIGN §16-5) |
+| PH 안내 · 소식 | 안내 → 기존 `/guide/*`(문구는 배포 후 운영자 편집) · 소식 → 홈 공지 · PH 안내 문구 관리 화면 제거(§16-6) |
+| 인쇄 QR 경로 보존 리다이렉트 | 구현안 · 검증 방법 · 4경로 새 화면 대조(차단 격차 없음, 301 전 조건 4건 — DESIGN §16-7) — 적용은 웹 서비스 정비 트랙 · 사용자 승인 |
+| 최신 HEAD 코드 리뷰 | Codex 미완료(unknown error 2회, 미완료로 기록 · 반복 요청 안 함) · 직접 리뷰 완료 · 사본 출처 라벨 수정(CHECK §8) |
 | pharmacy-hub 서버 · 도메인 · 인증서 | 보존 — 운영 검증 후 웹 서비스 정비 트랙이 삭제(DESIGN §16-4) |
 
 ## 담당 경계
@@ -31,8 +33,8 @@
 ## 다음에 할 일
 
 1. PR #308 CI · 리뷰 확인. merge 는 사용자 "main 통합 진행" 후.
-2. 사용자 결정 대기: PH opt-in 배송 이전 위치(DESIGN §16-5 — 권장: 자가 노출 재구현 없이 공급 제안 · 기본 공급 안내) · PH 소식 공개 화면 여부(§16-6) · QR link 4행 처리(변경 · 정리 · 유지). Codex 복구 시 최신 HEAD 리뷰 재요청.
-3. merge 후: migration 적용 확인 → 배포 → `NETURE_PHARMACY_PAYMENT_MODE=test` 설정 승인 → 운영 smoke(콘텐츠 자료함 · 새 호스트 QR 포함) → `pharmacy` 담당 운영자 지정 → PH 인프라 삭제 인계.
+2. 결정 대기 없음(2026-10-06 결정 반영). 테스트 데이터 초기화(DESIGN §12, QR 4행 포함) 운영 write 는 사용자 승인 후 dry-run 과 함께.
+3. merge 후: migration 적용 확인 → 배포 → `NETURE_PHARMACY_PAYMENT_MODE=test` 설정 승인 → 운영 smoke(콘텐츠 자료함 · 새 호스트 QR 포함) → `pharmacy` 담당 운영자 지정 → 새 호스트 안내 문구 편집(§16-6) → PH 인프라 삭제 인계(§16-7 301 전 조건 포함). PH 은퇴 시 `pharmacy-hub` 키 단순 제거 금지(§16-5).
 
 ## 로컬 검증 재현
 
