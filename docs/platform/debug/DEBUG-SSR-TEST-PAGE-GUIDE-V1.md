@@ -2,7 +2,7 @@
 
 > **디버그용 JSON/데이터 테스트 페이지를 만들 때의 기본 규칙.**
 > 프로덕션 Cloud Run 환경에서 안전하게 동작하는 SSR 방식의 디버그 페이지 표준.
-> **상태**: ACTIVE · **최종 갱신**: 2026-10-04 (`CLAUDE.md` §8 정합 — 디버그 페이지는 읽기 전용 · 비프로덕션 전용 등록 · GET 상태 변경 금지 · 액션은 CLI 우선)
+> **상태**: ACTIVE · **최종 갱신**: 2026-10-06 (`/__debug__/user` 제거 — backend debug router 0개. 2026-10-04 `CLAUDE.md` §8 정합 — 디버그 페이지는 읽기 전용 · 비프로덕션 전용 등록 · GET 상태 변경 금지 · 액션은 CLI 우선)
 >
 > (2026-10-04 정합) 디버그 페이지는 **프로덕션에 등록되지 않는다**(`CLAUDE.md` §8-3 · `apps/api-server/src/bootstrap/register-routes.ts` 의 `NODE_ENV !== 'production'` 게이트). "프로덕션에서 안전하게 동작" 은 CSP 하에서도 깨지지 않는 SSR 작성 방식을 뜻하며 프로덕션 노출을 허용한다는 뜻이 아니다. 진단 · seed · repair · backfill 은 **CLI 우선**이다(§8-1). 이 문서와 `CLAUDE.md` §8 이 충돌하면 §8 이 우선한다.
 
@@ -292,7 +292,7 @@ await dataSource.query(`SELECT * FROM users WHERE id = '${userId}'`);
 - [ ] Raw JSON 덤프 포함 (`<pre>` 블록)
 - [ ] 에러 시 상세 정보 표시 (message + code + stack)
 - [ ] `bootstrap/register-routes.ts` 의 **`NODE_ENV !== 'production'` 게이트 블록 안에** `app.use('/__debug__/{name}', ...)` 등록 (게이트 밖 등록 금지)
-- [ ] 등록 시 **`requireAuth` + role guard 적용** (CLAUDE.md §8-2 — 비프로덕션 게이트는 접근 제어가 아니다). 2026-10-05 기준 기존 `/__debug__/user` 는 가드 없이 등록돼 있어 별도 WO 대상이다
+- [ ] 등록 시 **`requireAuth` + role guard 적용** (CLAUDE.md §8-2 — 비프로덕션 게이트는 접근 제어가 아니다). 가드 없이 등록돼 있던 기존 `/__debug__/user` 는 2026-10-06 제거됐다(`WO-O4O-DEBUG-USER-UNGUARDED-ROUTE-CLOSURE-V1`)
 - [ ] Parameter Binding 사용 (String Interpolation 금지)
 - [ ] **읽기 전용일 것** — 디버그 페이지에서 상태 변경(UPDATE/INSERT/DELETE) 금지. 변경이 필요하면 정식 admin API 를 사용한다 (`AdminUserController` · `MembershipConsoleController` 등)
 
@@ -302,11 +302,7 @@ await dataSource.query(`SELECT * FROM users WHERE id = '${userId}'`);
 
 **backend `/__debug__/**` — 전부 `NODE_ENV !== 'production'` 에서만 등록된다.**
 
-| 경로 | 파일 | 용도 |
-|------|------|------|
-| `/__debug__/user` | `routes/debug/user-debug.controller.ts` | 사용자 진단 (읽기 전용) |
-
-**현재 backend debug router 는 위 1개뿐이며, 상태를 변경하는 `/__debug__` route 는 0개다.**
+**현재 backend debug router 는 0개다** (2026-10-06 `/__debug__/user` 제거 — 아래 제거 이력). 사용자 진단은 [`SETUP.md`](../../../SETUP.md) 의 read-only DB 채널로 SELECT 한다(`CLAUDE.md` §8-1 CLI 우선). 새 debug router 를 만들면 위 §7 체크리스트(비프로덕션 게이트 + `requireAuth` + role guard + 읽기 전용)를 따르고 이 절에 다시 등재한다.
 
 > `/__debug__/auth-bootstrap` · `/__debug__/login` · `/debug/auth` · `/auth-inspector` 는 **`apps/admin-dashboard` 의 프런트 라우트**(`apps/admin-dashboard/src/routes/public.routes.tsx`)이며 backend 라우터가 아니다. (2026-10-04 정합: 현행 `CLAUDE.md` §8 에는 진단 Entry Point 목록이 없다 — 구 "§8 의 진단 Entry Point 도 이쪽을 가리킨다" 서술 정정.) (`/__debug__/neture-tier1` 은 `WO-O4O-TIER1-TEST-SURFACE-FINAL-LIFECYCLE-V1` 로 제거됐다.)
 
@@ -318,12 +314,13 @@ await dataSource.query(`SELECT * FROM users WHERE id = '${userId}'`);
 | `4971381fb` | `/api/v1/ops/seed-store-hub` · `/api/v1/ops/seed-neture-offers` (2) | `WO-O4O-API-DEBUG-SEED-ROUTE-OPERATIONAL-BOUNDARY-CLEANUP-V1` |
 | `abf6c8a0e` | `/__debug__/pharmacy` (1) | `WO-O4O-PHARMACY-DEBUG-ROUTE-FINAL-LIFECYCLE-CLEANUP-V1` |
 | `824ffe54c` | `/api/internal/v2/product-policy/*` (9) — `JWT_SECRET` 관리키 재사용 소멸 | `WO-O4O-PRODUCT-POLICY-V2-INTERNAL-SECRET-SEPARATION-V1` |
-| 본 커밋 | `/api/v1/neture/__test__/tier1/*` (5) + 프런트 `/__debug__/neture-tier1` — **코드 차원 test/debug surface 정비 마감** | `WO-O4O-TIER1-TEST-SURFACE-FINAL-LIFECYCLE-V1` |
+| `d14671fff` | `/api/v1/neture/__test__/tier1/*` (5) + 프런트 `/__debug__/neture-tier1` — **코드 차원 test/debug surface 정비 마감** | `WO-O4O-TIER1-TEST-SURFACE-FINAL-LIFECYCLE-V1` |
+| 본 커밋 | `/__debug__/user` (1) — 무인증 `SELECT * FROM users` 개인정보 렌더링 · 소비처 0 · 제거된 상태 변경 GET 링크 잔존. **backend debug router 0** | `WO-O4O-DEBUG-USER-UNGUARDED-ROUTE-CLOSURE-V1` |
 
 > **임시 상태 변경 도구를 debug route 로 만들지 않는다.** 상태 변경이 필요하면 사유·권한·감사·영향 범위·재활성화를 갖춘 정식 기능으로 설계한다. 재발 방지는 `scripts/check-unsafe-routes.mjs` (CI `check:unsafe-routes`) 가 강제한다.
 
 ---
 
 *Created: 2026-03-17*
-*Updated: 2026-08-08*
-*Version: 1.1*
+*Updated: 2026-10-06*
+*Version: 1.2*
