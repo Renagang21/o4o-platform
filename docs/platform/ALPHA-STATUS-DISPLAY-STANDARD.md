@@ -4,7 +4,9 @@
 > **Work Order**: WO-GLOBAL-ALPHA-STATUS-HERO-V080
 > **적용 버전**: v0.8.0 (운영형 알파)
 >
-> (2026-10-04 정합) **현행 서비스 코드에는 이 배지 · 안내 문구가 없다** — `services/` · `apps/` · `packages/` 에 "운영형 알파" 표시 0건. §7 적용 목록의 `web-glucoseview` 는 현행 `services/` 에 없고, §7.2 · §10 의 파트너 안내 페이지 · 체크리스트는 Legacy Partner 은퇴([ROLE-WORKSPACE-ARCHITECTURE](../baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md) §7)로 소멸했다. 한편 [PLATFORM-CONTENT-POLICY-V1](../baseline/PLATFORM-CONTENT-POLICY-V1.md) §12 는 "0.80 운영형 알파 기준" 을 현행 표기로 쓰며, 단계 종료 · 전환 결정 기록은 없다. **"운영형 알파" 단계의 존속 여부와 Hero 표시 의무(§4 · §8) 유지 여부는 별도 결정 전까지 판정 대기** — 이 문서를 근거로 배지를 새로 추가하지 않는다.
+> **상태**: SUPERSEDED · **대체 문서**: 없음 — 표시 의무 폐기 · **표기일**: 2026-10-06 — 판정 확정(`WO-O4O-CANONICAL-INDEX-S9-POLICY-DECISION-ALIGNMENT-V1`): **"운영형 알파 · v0.8.0" 공개 표시 의무는 종료됐다.** 어떤 서비스 Hero 에도 이 배지 · 안내 문구를 다시 넣지 않는다. 운영 상태는 단계 표시가 아니라 상시 운영 점검([`O4O-API-OPERATIONS-RUNBOOK-V1`](../baseline/operations/O4O-API-OPERATIONS-RUNBOOK-V1.md))으로 본다. [PLATFORM-CONTENT-POLICY-V1](../baseline/PLATFORM-CONTENT-POLICY-V1.md) §12 의 "0.80 운영형 알파" 문구는 당시 시점 기록으로 정정했다. 아래 본문은 2026-01 기록으로 보존한다.
+>
+> (2026-10-04 정합) 현행 서비스 코드에는 이 배지 · 안내 문구가 없다 — `services/` · `apps/` · `packages/` 에 "운영형 알파" 표시 0건. §7 의 "적용됨" 표기는 현재 사실이 아니다. 적용 대상 중 `web-glucoseview` 만 은퇴했고(현행 `services/` 에 없음) 나머지 서비스는 활성이다. §7.2 · §10 의 파트너 안내 페이지 · 체크리스트는 Legacy Partner 은퇴([ROLE-WORKSPACE-ARCHITECTURE](../baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md) §7)로 소멸했다.
 
 ---
 
@@ -189,4 +191,4 @@ Alpha → Beta 전환 시:
 
 ---
 
-*이 문서는 O4O Platform 운영형 알파 단계의 공식 상태 표시 기준입니다.*
+*이 문서는 O4O Platform 운영형 알파 단계의 공식 상태 표시 기준이었다 — 2026-10-06 SUPERSEDED(표시 의무 폐기).*

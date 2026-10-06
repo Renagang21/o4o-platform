@@ -1,7 +1,7 @@
 # O4O Canonical Document Index
 
 > **역할**: AI 도구와 무관한 **정본(canonical) 문서 지도**. [`CLAUDE.md`](../CLAUDE.md) 와 [`AGENTS.md`](../AGENTS.md) 는 규칙을 복사하지 않고 이 색인과 각 정본을 가리킨다.
-> **작성일**: 2026-09-12 · **최종 갱신**: 2026-10-04 (정본 최종 정합 — 본문 전수 검증 · 정합 후 20건 ACTIVE 등재 · §9 는 결정이 필요한 문서만 남김 · `WO-O4O-CANONICAL-DOC-FINAL-ALIGNMENT-V1`) · **출처**: 구 `CLAUDE.md` v8 "상세 규칙 문서 목록" + 본문 링크의 합집합
+> **작성일**: 2026-09-12 · **최종 갱신**: 2026-10-06 (§9 판정 6건 반영 — `WO-O4O-CANONICAL-INDEX-S9-POLICY-DECISION-ALIGNMENT-V1`) · 2026-10-04 (정본 최종 정합 — 본문 전수 검증 · 정합 후 20건 ACTIVE 등재 · §9 는 결정이 필요한 문서만 남김 · `WO-O4O-CANONICAL-DOC-FINAL-ALIGNMENT-V1`) · **출처**: 구 `CLAUDE.md` v8 "상세 규칙 문서 목록" + 본문 링크의 합집합
 
 ## 0. 이 색인의 규칙
 
@@ -59,6 +59,7 @@
 | — | [STORE-LOCAL-PRODUCT-BOUNDARY-POLICY-V1](baseline/STORE-LOCAL-PRODUCT-BOUNDARY-POLICY-V1.md) | 매장 자체 상품의 Commerce 연결 금지 경계 | ACTIVE |
 | — | [O4O-SIGNAGE-STORE-PLAYLIST-MODEL-BOUNDARY-V1](baseline/O4O-SIGNAGE-STORE-PLAYLIST-MODEL-BOUNDARY-V1.md) | Signage Store Playlist 모델 경계 (KEEP-LEGACY 판정) | ACTIVE |
 | — | [O4O-STORE-RULES](architecture/O4O-STORE-RULES.md) | O4O Store & Order 가드레일 — Store Template · 주문 생성은 `checkoutService.createOrder()` 단일 지점 · 독립 주문/결제 테이블 금지. 2026-10-04 본문 정합(Tourism 은퇴 · 런타임 Guard/OrderType 계약 부재 · 소비자 주문 410 표기) | ACTIVE |
+| — | [CHECKOUT-STABLE-DECLARATION-V2](baseline/CHECKOUT-STABLE-DECLARATION-V2.md) | B2B checkout · PaymentCore Stable 범위 — `createOrder()` 단일 지점 · payment-first · 서버 기준 금액 검증 · 결제 상태 전이 · `paymentKey` 유일성 · 결제 이벤트 처리 · 매장 서비스 구독 결제. QR 상품 조회는 정보 표시(checkout 아님). V1(B2C closed loop)은 SUPERSEDED (2026-10-06 판정 확정) | ACTIVE |
 | — | [DESIGN-O4O-PRODUCT-AI-CONTENT-OWNERSHIP-AND-STORE-DESCRIPTION-CONTRACT-V1](design/DESIGN-O4O-PRODUCT-AI-CONTENT-OWNERSHIP-AND-STORE-DESCRIPTION-CONTRACT-V1.md) | `product_ai_contents` = 플랫폼 소유 전역 초안 · 매장 쓰기 금지 · 매장 설명 = `store_local_products.detail_html`. 2026-10-04 정합(매장 내부 AI 은퇴 · POP V2 canonical) | ACTIVE |
 | — | [DESIGN-O4O-STORE-LIBRARY-AND-ASSET-CANONICAL-SOURCE-V1](design/DESIGN-O4O-STORE-LIBRARY-AND-ASSET-CANONICAL-SOURCE-V1.md) | 매장 자료함 · 실행 자산 canonical 축(3서비스 공통) — Hub 복사본 `o4o_asset_snapshots` 도 Store 소유 독립 사본(ROLE-WORKSPACE §6) | ACTIVE |
 
@@ -91,6 +92,8 @@
 | [RBAC-ROLE-CATALOG-V1](rbac/RBAC-ROLE-CATALOG-V1.md) | 역할 카탈로그 | ACTIVE |
 | [RBAC-RUNBOOK-V1](rbac/RBAC-RUNBOOK-V1.md) | RBAC 운영 runbook | ACTIVE |
 | [O4O-STORE-OWNER-RBAC-STANDARD-V1](architecture/auth/O4O-STORE-OWNER-RBAC-STANDARD-V1.md) | 매장 경영자 RBAC 표준 — 권한 원천 = `role_assignments`, 접근 판정 = Role ∧ Relationship([STORE-ACCESS-AND-MEMBERSHIP](baseline/O4O-STORE-ACCESS-AND-MEMBERSHIP-V1.md) 와 정합, 2026-10-04) | ACTIVE |
+| [KPA-ROLE-MATRIX-V1](baseline/KPA-ROLE-MATRIX-V1.md) | **KPA Society(`kpa:*`) 역할 문서로 범위 축소** (2026-10-06 판정 확정). `kpa:*` 와 `kpa-branch:*` 는 독립 권한 경계 — "`kpa:admin` · `kpa:operator` 전체 branch 접근" 폐기. KPA-b · KPA-c 절은 과거 기록 | ACTIVE |
+| [KPA-BRANCH-ROLE-MATRIX-V1](baseline/KPA-BRANCH-ROLE-MATRIX-V1.md) | **약사 분회 서비스(`kpa-branch:*`) 역할 · 접근 행렬** (2026-10-06) — 서비스 축(`requireKpaBranchScope`) × 분회 축(`branch_memberships` → `requireBranchScope`), 분회 축 우회는 `kpa-branch:admin` · `platform:super_admin` 뿐. 현행 코드 정본화 | ACTIVE |
 
 ## 5. 도메인 · 서비스
 
@@ -100,6 +103,7 @@
 | [O4O-STORE-ACCESS-AND-MEMBERSHIP-V1](baseline/O4O-STORE-ACCESS-AND-MEMBERSHIP-V1.md) | **공통 Store Workspace 접근 자격 SSOT** (2026-10-03) — Owner(기존 `{prefix}:store_owner` 판정 그대로) / Member(`organization_members.role='staff'`) 두 단계 · 초대는 기존 가입자 조회(메일 0 · 토큰 0) · 'invited' 는 접근 0 · 결정 순서(세션→조직→자격→업종 경계) · 새 테이블 0. 한계: 미가입자 초대 · 사업자 신규 가입 제외 | ACTIVE |
 | [KPA-SOCIETY-SERVICE-STRUCTURE](baseline/KPA-SOCIETY-SERVICE-STRUCTURE.md) | KPA 3개 화면 영역 공존 구조 (커뮤니티 / 분회 / 데모=제거 완료) — 라우트 위치 ≠ 서비스 소속. v1.1(2026-09-17): Forum = 약사 커뮤니티(communityKey=pharmacy, ROLE-WORKSPACE §5) | ACTIVE |
 | [KPA-SIGNAGE-STRUCTURE-V1](baseline/KPA-SIGNAGE-STRUCTURE-V1.md) | KPA Signage 구조 baseline | ACTIVE |
+| [SIGNAGE-APPROVAL-ARCHITECTURE-V1](architecture/SIGNAGE-APPROVAL-ARCHITECTURE-V1.md) | Signage 상태 모델 — **Operator 직접 게시가 정본**(2026-10-06 판정 확정): `draft → active` · `active` 로 생성 허용, Admin 승인 불필요. `pending` 승인 흐름은 서비스별 선택 정책. 상태 전이 SSOT = 코드 `ALLOWED_STATUS_TRANSITIONS` | ACTIVE |
 | [NETURE-DOMAIN-ARCHITECTURE-FREEZE-V3](baseline/NETURE-DOMAIN-ARCHITECTURE-FREEZE-V3.md) | Neture 도메인 아키텍처 (공급자 화면 canonical) | FROZEN |
 | [O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1](baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) | PharmacyHub = KPA류 공통 매장경영 구조 − 공급 승인/매장지원 capability · supplier 역할 없음 | ACTIVE |
 | [EVENT-OFFER-COMMON-DOMAIN-V1](baseline/EVENT-OFFER-COMMON-DOMAIN-V1.md) | Event Offer 공통 도메인 | ACTIVE |
@@ -156,6 +160,7 @@
 | [O4O-GIT-PARALLEL-WORK-SAFETY-V1](baseline/operations/O4O-GIT-PARALLEL-WORK-SAFETY-V1.md) | 다중 PC · 다중 세션 Git 안전 — path-specific stage · Safe Commit · PC 이동 · 완료 조건 | ACTIVE |
 | [PRODUCTION-MIGRATION-STANDARD](baseline/operations/PRODUCTION-MIGRATION-STANDARD.md) | 프로덕션 마이그레이션 표준 (CI/CD 자동 실행 원칙) | ACTIVE |
 | [O4O-API-SERVER-SCRIPTS-INVENTORY-V1](baseline/operations/O4O-API-SERVER-SCRIPTS-INVENTORY-V1.md) | `apps/api-server/src/scripts/**` 상태 분류(ACTIVE · PAUSED · LEGACY) · DB 로그인 identity fail-fast 규칙 | ACTIVE |
+| [O4O-API-OPERATIONS-RUNBOOK-V1](baseline/operations/O4O-API-OPERATIONS-RUNBOOK-V1.md) | `o4o-core-api` 상시 운영 점검 최소 기준 — health · 배포 반영 · 인증 · API 오류/지연 · DB · Redis. Internal Beta 종료(2026-10-06 판정 확정)로 INTERNAL-BETA-RUNBOOK-V1 을 대체 | ACTIVE |
 | [DEBUG-SSR-TEST-PAGE-GUIDE-V1](platform/debug/DEBUG-SSR-TEST-PAGE-GUIDE-V1.md) | JSON 디버그 SSR 테스트 페이지 — 비프로덕션 · 읽기 전용, 상태 변경은 CLI(`CLAUDE.md` §8) | ACTIVE |
 | [O4O-DATA-CLEANUP-IDENTIFICATION-SAFETY-V1](baseline/operations/O4O-DATA-CLEANUP-IDENTIFICATION-SAFETY-V1.md) | 데이터 정비 대상 식별 안전 규칙 — UUID prefix 삭제 금지 · 운영 DB 는 read-only 확인만 | ACTIVE |
 | [PLAYWRIGHT-MCP](platform/development/PLAYWRIGHT-MCP.md) | Playwright MCP 개발 환경 설정 (config 템플릿 기준) | ACTIVE |
@@ -179,13 +184,18 @@
 | [O4O-3-ROLE-FLOW-BASELINE-V1](baseline/O4O-3-ROLE-FLOW-BASELINE-V1.md) | 3자 Canonical Flow (책임 매트릭스 · 원천 자료 vs 실행 자산 · AI 개입 지점). **§2 단선 흐름 · §6 첫 항목(공급자 HUB 직접 게시 금지) · §3 공급자 직접 제작 ❌ 는 2026-09-16 판정 확정 → [ROLE-WORKSPACE-ARCHITECTURE](baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md) §2-1 · §6 으로 SUPERSEDED** (헤더 표기, 본문 보존). §4 · §5 는 참고만, 근거로 승격하지 않는다 | 부분 SUPERSEDED (판정 확정) |
 | [O4O-RETAIL-STABLE-V1](platform/architecture/O4O-RETAIL-STABLE-V1.md) | `channel_type='B2C'` storefront closed loop 을 기술 — [COMMERCE-BOUNDARY](baseline/O4O-STORE-COMMERCE-BOUNDARY-V1.md) §2 · §12 와 충돌 후보. 결제 leg 은 이미 `410` 으로 차단. 동 문서 §8 판정 전까지 `UNKNOWN` — **기능 복구·확장 금지** (문서 헤더 2026-08-25 표기 참조) | 판정 대기 |
 | [E-COMMERCE-ORDER-CONTRACT](baseline/E-COMMERCE-ORDER-CONTRACT.md) | 기술 계약. **유효한 부분**: 주문 생성은 `checkoutService.createOrder()` 단일 지점 · `*_orders` / `*_payments` 독립 테이블 금지. **stale 부분**: §3 · §5 · §7.2 의 `OrderType` 열거(DROPSHIPPING 제거 · 엔티티가 `order_type` 컬럼을 매핑하지 않음). 현행 살아있는 주문 축의 정본은 [B2B 계약](baseline/O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1.md). 본문 정리는 후속 docs 정비 | 판정 대기 |
-| [SIGNAGE-APPROVAL-ARCHITECTURE-V1](architecture/SIGNAGE-APPROVAL-ARCHITECTURE-V1.md) | Signage 승인 상태 모델. 상태 집합 · API 는 구현, 구현 현황 정합 주석 추가(2026-10-04). **필요한 결정**: HQ(서비스 운영자) 사이니지 `draft → active` 직접 게시를 Platform Admin 전용으로 막을지(문서) signage operator 전원에게 허용할지(현행 코드 — 검사 없음). 공급자 사이니지 즉시 게시는 기록된 결정으로 정합 | 판정 대기 |
-| [INTERNAL-BETA-RUNBOOK-V1](baseline/operations/INTERNAL-BETA-RUNBOOK-V1.md) | Internal Beta runbook. 없는 endpoint · 미계측 지표 · 소비자 결제 410 · `distribution_type` 위치를 본문에서 정정(2026-10-04). **필요한 결정**: Internal Beta 단계 유지 · 종료 여부와 대체 종료 조건 · 지표(B2B checkout 계측 여부 포함) | 판정 대기 |
-| [ALPHA-STATUS-DISPLAY-STANDARD](platform/ALPHA-STATUS-DISPLAY-STANDARD.md) | 운영형 알파 상태 표시 기준. 코드에서 표시 0건 · 대상 서비스 은퇴를 본문에 표기(2026-10-04), 이 문서를 근거로 배지를 추가하지 않는다. **필요한 결정**: "운영형 알파" 단계 존속 여부 · Hero 표시 의무 유지 여부 (결정 시 PLATFORM-CONTENT-POLICY §12 표기도 정합 — F4 FROZEN, 문서 수정만) | 판정 대기 |
-| [CHECKOUT-STABLE-DECLARATION-V1](baseline/CHECKOUT-STABLE-DECLARATION-V1.md) | 소비자 결제 3경로 410 · storefront 는 조회 전용 · PaymentCore 소비처는 B2B 임을 본문에 표기(2026-10-04). **필요한 결정**: storefront B2C visibility 조회 경로를 COMMERCE-BOUNDARY 기준 ACTIVE(태블릿/QR 정보 표시)와 LEGACY_COMMERCE 중 어디로 분류할지 · 이 선언의 Stable 범위를 B2B checkout/payment 로 좁혀 재작성할지 은퇴시킬지. **기능 복구·확장 금지** | 판정 대기 |
 | [COSMETICS-DOMAIN-RULES](architecture/COSMETICS-DOMAIN-RULES.md) | Cosmetics 도메인 규칙. 본문 사실 정정 완료(2026-10-04 — 별도 cosmetics-api 없음 · migration 은 deploy Job · 소비자 주문 410). **필요한 결정**: "Core 테이블 생성 · Core FK 금지" 원칙과 `public.cosmetics_members`(→ users FK) · `public.cosmetics_contents` 의 관계(허용 예외로 둘지 원칙 범위를 좁힐지) · 개인정보 저장 금지와 매장 신청 테이블의 연락처 · 사업자번호 필드의 관계 | 판정 대기 |
-| [BUSINESS-SERVICE-RULES](architecture/BUSINESS-SERVICE-RULES.md) | Business Service 규칙. 별도 business-api · 독립 배포 · OpenAPI CI 게이트가 실재하지 않음을 본문에 정정 표기(2026-10-04). **필요한 결정**: "OpenAPI 계약 우선"(`CLAUDE.md` §9)을 단일 core API 의 현행 규칙으로 유지할지(유지 시 CI 게이트 · 스펙 위치 재정의) 폐기할지(폐기 시 OBSOLETE + §9 문구 정리) | 판정 대기 |
-| [KPA-ROLE-MATRIX-V1](baseline/KPA-ROLE-MATRIX-V1.md) | KPA 권한 매트릭스. KPA-b 제거 · 분회는 `kpa-branch:*` · `requireKpaBranchScope` 로 이동한 사실을 본문에 표기(2026-10-04). **필요한 결정**: 분회 서비스 role 행렬 정본의 위치(V2 재작성 / 새 정본) · "kpa:admin · kpa:operator 의 전체 branch 접근 허용" 유지 여부 | 판정 대기 |
+
+**판정 해제 기록 (2026-10-06, `WO-O4O-CANONICAL-INDEX-S9-POLICY-DECISION-ALIGNMENT-V1`)** — 아래 6건은 사용자 판정이 확정되어 §9 에서 뺐다. 기록물이 된 문서는 색인에 등재하지 않는다(§0).
+
+| 문서 | 판정 | 결과 |
+|---|---|---|
+| SIGNAGE-APPROVAL-ARCHITECTURE-V1 | Operator 직접 게시 정본 · `pending` 은 서비스별 선택 | ACTIVE — §6 |
+| KPA-ROLE-MATRIX-V1 | `kpa:*` / `kpa-branch:*` 분리 유지 · KPA Society 로 범위 축소 | ACTIVE — §4 (+ 새 KPA-BRANCH-ROLE-MATRIX-V1) |
+| [CHECKOUT-STABLE-DECLARATION-V1](baseline/CHECKOUT-STABLE-DECLARATION-V1.md) | Stable 범위를 B2B checkout · PaymentCore 로 축소 | SUPERSEDED → V2 (§2) |
+| [INTERNAL-BETA-RUNBOOK-V1](baseline/operations/INTERNAL-BETA-RUNBOOK-V1.md) | Internal Beta 종료 | SUPERSEDED → O4O-API-OPERATIONS-RUNBOOK-V1 (§7). `BETA_MODE` · 미계측 `OPS` 상수 정리는 후속 코드 WO |
+| [ALPHA-STATUS-DISPLAY-STANDARD](platform/ALPHA-STATUS-DISPLAY-STANDARD.md) | 운영형 알파 표시 의무 종료 | SUPERSEDED(대체 없음). F4 §12 의 "0.80 운영형 알파" 는 시점 기록으로 정정 |
+| [BUSINESS-SERVICE-RULES](architecture/BUSINESS-SERVICE-RULES.md) | "OpenAPI 계약 우선" 폐기 | OBSOLETE. `CLAUDE.md` §9 문구 삭제 |
 
 ---
 

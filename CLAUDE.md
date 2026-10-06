@@ -194,7 +194,7 @@ import type { RelatedEntity } from './related.entity.js';
 
 ## 9. 도메인별 규칙 (참조)
 
-Cosmetics(`cosmetics_` 독립 스키마 · 주문은 §4 경유) · Business Service(OpenAPI 계약 우선) · Design Core(신규 화면은 Design Core v1.0) — 정본은 [`CANONICAL-INDEX` §5](docs/CANONICAL-INDEX.md).
+Cosmetics(`cosmetics_` 독립 스키마 · 주문은 §4 경유) · Design Core(신규 화면은 Design Core v1.0) — 정본은 [`CANONICAL-INDEX` §5](docs/CANONICAL-INDEX.md).
 `O4O-RETAIL-STABLE-V1` 은 현행 규칙이 아니라 **판정 대기(UNKNOWN)** — [`CANONICAL-INDEX` §9](docs/CANONICAL-INDEX.md).
 
 ## 10. KPA Society 구조
@@ -263,6 +263,6 @@ forum · lms · signage 는 **플랫폼 공통 구조**. KPA 가 reference imple
 
 ---
 
-*Updated: 2026-10-04*
-*Version: 9.3*
+*Updated: 2026-10-06*
+*Version: 9.4*
 *Status: Active — Claude Code Entry Point*

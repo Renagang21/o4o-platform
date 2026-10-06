@@ -3,7 +3,12 @@
 > 2026-02 기준 구조 고정 문서
 > 이 문서는 KPA 서비스 전체의 역할/권한/격리 원칙을 고정한다.
 >
-> (2026-10-04 정합) **현행 상태 = `판정 대기`**([CANONICAL-INDEX](../CANONICAL-INDEX.md) §9). 하단 `Status: Frozen` 은 2026-02 작성 시점 표기이며 `CLAUDE.md` §14 Frozen 목록(F1~F12)에 없다. 현행 사실:
+> **상태**: ACTIVE — **범위 축소**(판정 확정 2026-10-06, `WO-O4O-CANONICAL-INDEX-S9-POLICY-DECISION-ALIGNMENT-V1`). 이 문서는 이제 **KPA Society(`kpa:*`, serviceKey `kpa-society`) 역할 문서**다. 분회 서비스(`kpa-branch:*`)의 역할 · 접근 정본은 [`KPA-BRANCH-ROLE-MATRIX-V1`](KPA-BRANCH-ROLE-MATRIX-V1.md) 이다.
+> - **경계 확정**: `kpa:*` 와 `kpa-branch:*` 는 독립 권한 경계다. "`kpa:admin` · `kpa:operator` 의 전체 branch 접근 허용"(§3 KPA-c · §4 KPA-c CMS)은 **폐기** — 되돌리지 않는다.
+> - 본문의 KPA-b · KPA-c 절(§2 의 `kpa:branch_*` · §3 KPA-c / KPA-b · §4 KPA-c CMS · §6 · §7 · §8 의 KPA-b / KPA-c 행)은 과거 기록으로 보존하며 구현 근거로 쓰지 않는다.
+> - 하단 `Status: Frozen` 은 2026-02 작성 시점 표기이며 `CLAUDE.md` §14 Frozen 목록(F1~F12)에 없다.
+>
+> (2026-10-04 정합) 현행 사실:
 > - **KPA-b(데모)** 는 제거 완료(`/demo/*` route 없음 — [KPA-SOCIETY-SERVICE-STRUCTURE](KPA-SOCIETY-SERVICE-STRUCTURE.md) §2).
 > - **KPA-c(분회)** 는 독립 serviceKey `kpa-branch` · role prefix **`kpa-branch:*`**(`kpa-branch:admin` · `kpa-branch:operator` · `kpa-branch:member`)로 옮겨졌다. 서비스 축 = `requireKpaBranchScope`(active `service_memberships('kpa-branch')` + role), 분회 축 = `branch_memberships`(`apps/api-server/src/middleware/kpa-branch-scope.middleware.ts`). 옛 `kpa:branch_admin` · `kpa:branch_operator` 는 `20260415000000-ArchiveBranchAndChapterData` 로 비활성화됐다(`WO-KPA-A-BRANCH-CHAPTER-REMOVAL-PHASE3-DATA-AND-ROLE-CLEANUP-V1`).
 > - **KPA-a** 의 `kpa:*` 는 serviceKey `kpa-society`(현재 의미 = 약국 사업자 서비스 `pharmacy.neture.co.kr`)의 prefix 이며 KPA 분회와 무관하다([SUBDOMAIN-SERVICE-SEMANTICS](O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1.md) §원칙 5 · 주소 표). 현행 `kpa:*` 에는 `kpa:store_owner` · `kpa:pharmacist` · `kpa:district_admin` 등도 있다.
@@ -49,7 +54,7 @@ organizationId = null
 
 ### KPA-c (분회 서비스)
 
-> (2026-10-04 정합) 아래 표의 `kpa:branch_*` namespace 와 "`kpa:admin` · `kpa:operator` 전체 branch 접근 허용" 은 현행 구조(`kpa-branch:*` · `requireKpaBranchScope` · `branch_memberships`)와 맞지 않는다. 분회 서비스의 현행 role 행렬은 상단 정합 주석과 코드가 기준이며, 이 표를 구현 근거로 쓰지 않는다.
+> (2026-10-06 판정) 아래 표는 폐기된 과거 기록이다. 분회 서비스의 현행 role 행렬은 [`KPA-BRANCH-ROLE-MATRIX-V1`](KPA-BRANCH-ROLE-MATRIX-V1.md) 이 정본이다. "`kpa:admin` · `kpa:operator` 전체 branch 접근 허용" 은 폐기됐다.
 
 | Role | 범위 | 설명 |
 |------|------|------|
@@ -157,4 +162,4 @@ Hard delete 금지.
 
 *Created: 2026-02-14*
 *Version: 1.0*
-*Status: Frozen* — (2026-10-04 정합) 작성 시점 표기. 현행 상태는 `CANONICAL-INDEX` §9 `판정 대기`
+*Status: Frozen* — (2026-10-04 정합) 작성 시점 표기. 현행 상태는 ACTIVE(KPA Society 범위로 축소, 2026-10-06)
