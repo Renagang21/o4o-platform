@@ -124,3 +124,26 @@ O4O 쪽 연결은 끊겼지만 DNS 가 아직 O4O LB 를 가리킨다. 아래 4�
 historical migration(`CreateSiteGuideTables` · `DropSiteGuideSchema`) · 기록 문서는 유지.
 
 이로써 **서비스 유형 · UI 참조 제거 완료, 재접수 차단용 참조만 유지**한다 — 런타임에 남은 `'siteguide'` 는 `platformInquiryController.ts` 의 `RETIRED_INQUIRY_TYPES`(접수 거부) 1곳과 그 회귀 spec 뿐이다. 그 밖의 남은 언급: `PlatformInquiry.ts` 의 은퇴 주석 · `packages/ai-core/README.md` 의 폐기 확정 문구 · historical migration · 기록 문서.
+
+### 5-3. main 통합 · 배포 (2026-10-06)
+
+| 항목 | 결과 |
+|---|---|
+| PR | #333 — 최신 main(`b2870aaff`) merge 후 HEAD `3f46f9c49` · CI 전부 PASS(CI Gate · API Jest 3/3 · Code Quality · CodeQL · SonarCloud · Web build · Guard) · Codex 재리뷰 👍(제안 없음, 요청 이후) · 미해결 스레드 0 · 충돌 없음 |
+| merge | 사용자 "main 통합 진행" 승인 → merge commit `195ea6fee` · main CI success |
+| Delivery (run 37459577021) | **NO EXECUTION · commit status `HELD_LEVEL_3`** — api `AUTO_DEPLOY_BLOCKED`(`BLOCKED_BY_PENDING_LEVEL3 since 46a1f8f6a` — 다른 트랙 #323 SERVICE-NOT-MEMBER 인증 복원의 auth-backend LEVEL_3) · neture `HELD_API_NOT_DEPLOYED`(#308 과 같은 commit 축의 API 의존). 이번 변경 자체의 판정은 LEVEL_2(api · neture) |
+| promote | **하지 않음** — promote 는 다른 트랙의 LEVEL_3 변경을 함께 배포한다(사용자 지시: 다른 트랙 HOLD 포함 시 임의 promote 금지) |
+| 운영 serving (확인 시점) | `o4o-core-api-03834-fuh` = `e0be29869` · `neture-web-01689-lev` = `4263d5fae` — 둘 다 #333 미포함. API `/api/health` 200 |
+
+### 5-4. 배포 후 검증 — **대기**
+
+다른 트랙의 통제 배포(#323 · #308 축)로 api · neture-web 이 `195ea6fee` 이후 SHA 로 올라간 뒤 수행한다. 운영에 테스트 문의를 저장하지 않는다.
+
+| 검증 | 방법 |
+|---|---|
+| serving 에 #333 포함 | 두 서비스 revision label `o4o-commit-sha` 가 `195ea6fee` 를 조상으로 가짐 |
+| API health | `GET https://api.neture.co.kr/api/health` 200 |
+| siteguide 접수 400 | `POST /api/v1/platform/inquiries` `type=siteguide` → 400 `RETIRED_INQUIRY_TYPE` — 유형 검사가 저장 전 · 필수값 검사 뒤에 있으므로 필수값을 채워 보낸다. **배포 전에는 보내지 않는다**(이전 코드는 저장한다) |
+| 관리자 문의 화면 | Neture admin vault 문의 화면 — 유형 필터에 SiteGuide 없음 · 기존 `platform` 1건 목록 · 상세 조회 |
+
+배포 전 사전 확인: 운영 DB 의 `platform_inquiries` = `platform` 1행(§5-1 삭제 후) — 화면 검증의 기대값.
