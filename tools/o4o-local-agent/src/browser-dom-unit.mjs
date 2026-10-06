@@ -80,9 +80,10 @@ function isShortText(v, max) {
   return typeof v === 'string' && v.trim().length > 0 && v.length <= max && !CONTROL_CHAR_RE.test(v);
 }
 function exactKeys(obj, expected) {
-  const keys = Object.keys(obj).sort();
-  const want = [...expected].sort();
-  return keys.length === want.length && keys.every((k, i) => k === want[i]);
+  // 객체 키는 중복이 없다 — 개수가 같고 모두 기대 집합 안이면 같은 집합.
+  const keys = Object.keys(obj);
+  const want = new Set(expected);
+  return keys.length === want.size && keys.every((k) => want.has(k));
 }
 function intIn(v, lo, hi) {
   return typeof v === 'number' && Number.isInteger(v) && v >= lo && v <= hi;

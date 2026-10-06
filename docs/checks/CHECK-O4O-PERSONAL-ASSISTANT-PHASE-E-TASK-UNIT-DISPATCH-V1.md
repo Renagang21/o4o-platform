@@ -83,6 +83,7 @@ Assistant(서버)의 DOM 명령 하나 = Cloud DB 큐 왕복 1회(노드 polling
 | agent `node --test test/*.test.mjs` | 167/167 PASS (신규 `browser-dom-unit.test.mjs` 포함) |
 | 신규 API spec `work-agent-task-unit-dispatch.spec.ts` | 20/20 PASS (A 계약 · B parity 10 · C 왕복/fallback/lost/예산/시간 · D 비교) |
 | 관련 API 회귀 23 suite(work-agent · browser-dom · local-agent · personal-assistant · windows-* 등) | PASS (`local-agent-runtime.spec` import allowlist 에 `browser-dom-unit.mjs` 추가 후) |
+| `pharmacy-web-core.spec` site 당 allowlist 수 | 11 → 12 기대 갱신(`run_unit` 1 — 의도된 계약 변경, CI 1차에서 발견) · PASS |
 | api-server `tsc --noEmit` | clean |
 | 실 PC · Chrome smoke | **미실시** |
 
