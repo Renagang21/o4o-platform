@@ -117,24 +117,9 @@ describe('KPA 전환 차단 요인 정리 — CHECK-O4O-URL-FIRST-CENSUS-V1 §21
 describe('K-Cosmetics 매장 화면 이전 — CHECK-O4O-URL-FIRST-CENSUS-V1 §21-15', () => {
   const app = read('services/web-store/src/App.tsx');
   const layout = read('services/web-store/src/components/layouts/UnifiedStoreLayout.tsx');
-  const kcosApp = read('services/web-k-cosmetics/src/App.tsx');
-  const kcosScope = read('services/web-k-cosmetics/src/lib/unifiedStoreScope.ts');
+  // 원본 앱(services/web-k-cosmetics) 은 퇴역 삭제됐다(WO-O4O-KCOSMETICS-RETIREMENT-PHASE1A-WEB-APP-AND-DEPLOY-TARGET-V1) —
+  //   원본 대조 · 원본 handoff 계약은 함께 제거. 이식 트리(web-store kcos)는 다음 단계에서 제거한다.
   const K = 'services/web-store/src/services/kcos/';
-
-  /** `<Route path="store" ...>` 블록(원본) / `/work/k-cosmetics/store` 블록(이식)의 path 집합 */
-  const pathsIn = (src: string, startMarker: string) => {
-    const start = src.indexOf(startMarker);
-    expect(start).toBeGreaterThan(-1);
-    const end = src.indexOf('\n      </Route>', start);
-    return new Set([...src.slice(start, end).matchAll(/path="([^"]+)"/g)].map((m) => m[1]).filter((p) => p !== 'store' && p !== '*'));
-  };
-
-  it('원본 앱 `/store` 의 모든 경로(옛 alias 포함)가 이식 트리에 있다', () => {
-    const original = pathsIn(kcosApp, '        path="store"\n');
-    const ported = pathsIn(app, '<Route path={`${W}/k-cosmetics/store`} element={gated(<ServiceStoreLayout />)}>');
-    expect(original.size).toBeGreaterThan(40);
-    expect([...original].filter((p) => !ported.has(p))).toEqual([]);
-  });
 
   it('서비스 업무 화면은 중복 이식하지 않고 /work/k-cosmetics 로 보낸다', () => {
     const n = norm(app);
@@ -172,19 +157,10 @@ describe('K-Cosmetics 매장 화면 이전 — CHECK-O4O-URL-FIRST-CENSUS-V1 §2
     expect(norm(app)).toContain('<Route path={`${W}/k-cosmetics/store/marketing/signage/play/:playlistId`} element={gated(<KcosSignagePlaybackPage />)} />');
     expect(app).toContain('<Route path="/guide/*" element={<ServiceGuideRedirect />} />');
   });
-
-  it('K-Cosmetics 앱 handoff 는 같은 경로를 서비스 지정 위치로(플래그 기본 꺼짐 유지)', () => {
-    expect(kcosApp).toContain('api={kcosStoreHandoffApi}');
-    expect(kcosApp).toContain('toKcosScopedStorePath(returnPath, window.location.pathname, window.location.search)');
-    expect(kcosApp).toContain('isUnifiedStoreHandoffEnabled(import.meta.env.VITE_UNIFIED_STORE_HANDOFF)');
-    expect(kcosScope).toContain("const WORKSPACE_ONLY = ['/store/workspace', '/store/services'];");
-    expect(kcosScope).toContain("if (path === '/store' || path.startsWith('/store/')) return `/work/k-cosmetics${path}${search}`;");
-  });
 });
 
 describe('옛 주소 전환 범위 — 서비스 Hub · 공개 · 기기 경로는 handoff 하지 않는다(§21-18 · §21-19)', () => {
   const kpa = read('services/web-kpa-society/src/App.tsx');
-  const kcos = read('services/web-k-cosmetics/src/App.tsx');
 
   /** 한 줄 또는 여러 줄에 걸친 <Route path=P ...> 선언의 element 영역 */
   const routeDecl = (src: string, pathAttr: string) => {
@@ -195,20 +171,14 @@ describe('옛 주소 전환 범위 — 서비스 Hub · 공개 · 기기 경로�
     return src.slice(open, end + 1);
   };
 
-  it('서비스 Hub(/store-hub)는 handoff gate 밖(두 앱)', () => {
+  it('서비스 Hub(/store-hub)는 handoff gate 밖', () => {
     expect(routeDecl(kpa, 'path="/store-hub" element=')).not.toContain('UnifiedStoreHandoff');
-    const kcosHub = kcos.slice(kcos.indexOf('path="store-hub"'), kcos.indexOf('<Route index element={<KCosmeticsHubPage />} />'));
-    expect(kcosHub).toContain('<KCosmeticsHubLayout />');
-    expect(kcosHub).not.toContain('KCosUnifiedStoreHandoff');
   });
 
   it('매장 경영자 /store 와 workspace/services 는 여전히 handoff gate 안(플래그로만 동작)', () => {
     expect(kpa).toContain('<Route path="/store" element={<PharmacyGuard><KpaUnifiedStoreHandoff><KpaStoreLayoutWrapper /></KpaUnifiedStoreHandoff></PharmacyGuard>}>');
     expect(kpa).toContain('<Route element={<PharmacyGuard><KpaUnifiedStoreHandoff><KpaStoreWorkspaceWrapper /></KpaUnifiedStoreHandoff></PharmacyGuard>}>');
-    expect(kcos).toContain('<KCosUnifiedStoreHandoff><StoreLayoutWrapper /></KCosUnifiedStoreHandoff>');
-    expect(kcos).toContain('<Route element={<StoreOwnerRoute><KCosUnifiedStoreHandoff><StoreWorkspaceWrapper /></KCosUnifiedStoreHandoff></StoreOwnerRoute>}>');
     expect((kpa.match(/<KpaUnifiedStoreHandoff>/g) ?? []).length).toBe(2);
-    expect((kcos.match(/<KCosUnifiedStoreHandoff>/g) ?? []).length).toBe(2);
   });
 
   it('공개 · 기기 경로는 /store gate 밖의 최상위 절대 경로로 선언돼 있다', () => {
@@ -216,9 +186,6 @@ describe('옛 주소 전환 범위 — 서비스 Hub · 공개 · 기기 경로�
       '/qr/:slug', '/tablet/:slug', '/tablet/setup', '/multilingual-products/:publicKey', '/foreign-visitor/affiliate/:shortCode']) {
       const decl = routeDecl(kpa, `path="${p}"`);
       expect(decl).not.toContain('UnifiedStoreHandoff');
-    }
-    for (const p of ['path="/store/marketing/signage/play/:playlistId"', 'path="store/:slug/blog"', 'path="store/:slug/blog/:postSlug"', 'path="tablet/:slug"']) {
-      expect(routeDecl(kcos, p)).not.toContain('UnifiedStoreHandoff');
     }
   });
 });

@@ -288,10 +288,9 @@ describe('정적 회귀 — 프런트 serviceKey 주입 (generic LMS 소비 서�
   // WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2 §8/§14:
   //   generic `/lms/*` 프런트 소비자는 web-lecture 뿐이고 서버가 `lecture` 로 고정한다.
   //   K-Cosmetics 는 LMS 소비처 0 — serviceKey 부착 interceptor 는 제거되었다.
-  it('K-Cosmetics 의 /lms/* serviceKey 부착 interceptor 는 제거되었다', () => {
-    const src = read('services/web-k-cosmetics/src/lib/apiClient.ts');
-    expect(src).not.toContain("const LMS_SERVICE_KEY = 'k-cosmetics'");
-    expect(src).not.toContain("url.startsWith('/lms/')");
+  // K-Cosmetics 앱(services/web-k-cosmetics) 자체가 퇴역 삭제됐다 — WO-O4O-KCOSMETICS-RETIREMENT-PHASE1A-WEB-APP-AND-DEPLOY-TARGET-V1.
+  it('K-Cosmetics 앱 소스가 더 이상 없다 (LMS 소비처 0 유지)', () => {
+    expect(fs.existsSync(path.join(REPO_ROOT, 'services/web-k-cosmetics'))).toBe(false);
   });
 
   it('Lecture 프런트는 /lms/* 요청에 serviceKey 를 붙이지 않는다', () => {

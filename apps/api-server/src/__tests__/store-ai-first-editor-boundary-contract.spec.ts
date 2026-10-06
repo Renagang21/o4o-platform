@@ -37,10 +37,7 @@ const STORE_DIRECT_CONSUMERS = [
   'services/web-kpa-society/src/pages/pharmacy/StoreProductDescriptionsPage.tsx',
   'services/web-kpa-society/src/pages/pharmacy/StoreProductMultilingualContentPage.tsx',
   'services/web-kpa-society/src/pages/pharmacy/StoreQrAiDescriptionPage.tsx',
-  // K-Cosmetics Store (/store/*)
-  'services/web-k-cosmetics/src/pages/store/StoreBlogManagePage.tsx',
-  'services/web-k-cosmetics/src/pages/store/StorePopStaffPage.tsx',
-  'services/web-k-cosmetics/src/pages/store/StoreProductDescriptionsPage.tsx',
+  // K-Cosmetics Store — 앱(services/web-k-cosmetics) 퇴역 삭제(WO-O4O-KCOSMETICS-RETIREMENT-PHASE1A-WEB-APP-AND-DEPLOY-TARGET-V1)
   // PharmacyHub Store (/store-owner/*)
   'services/web-pharmacy-hub/src/pages/store-owner/BlogEditorPage.tsx',
   'services/web-pharmacy-hub/src/pages/store-owner/ContentPage.tsx',
@@ -145,7 +142,6 @@ describe('WO-O4O-STORE-AI-FIRST-EDITOR-BOUNDARY-V1 — 공통 편집기 내부 A
     it('Store 영역에서 활성 RichTextEditor 소비처가 계약 목록 밖에 없다 (census drift 가드)', () => {
       const storeDirs = [
         'services/web-kpa-society/src/pages/pharmacy',
-        'services/web-k-cosmetics/src/pages/store',
         'services/web-pharmacy-hub/src/pages/store-owner',
       ];
       const found: string[] = [];

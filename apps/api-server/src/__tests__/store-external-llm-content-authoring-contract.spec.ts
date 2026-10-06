@@ -39,8 +39,7 @@ const PRODUCTION_MATERIAL_DIRECT = [
   'services/web-kpa-society/src/pages/pharmacy/ProductionMaterialEditorPage.tsx',
   'services/web-pharmacy-hub/src/pages/store-owner/LibraryResourcesPage.tsx',
 ];
-/** 셸 소비처(KCos) — LlmAssistComponent 슬롯으로 주입 */
-const SHELL_CONSUMER = 'services/web-k-cosmetics/src/pages/store/ProductionMaterialEditorPage.tsx';
+// 셸 소비처(KCos ProductionMaterialEditorPage)는 앱 퇴역 삭제로 제거 — WO-O4O-KCOSMETICS-RETIREMENT-PHASE1A-WEB-APP-AND-DEPLOY-TARGET-V1.
 
 const STORE_DIRECT = [...GENERAL_AUTHORING, ...PRODUCTION_MATERIAL_DIRECT];
 
@@ -158,12 +157,6 @@ describe('WO-O4O-STORE-EXTERNAL-LLM-CONTENT-AUTHORING-V1 — (C) Store 소비처
     expect(src).not.toContain('AI 제작 자료 초안 편집');
     expect(src).not.toContain('AI가 정리한 내용을 편집하거나');
     expect(src).toContain('showInternalAi={false}');
-  });
-
-  it('KCos 셸 wrapper — LlmAssistPanel 을 LlmAssistComponent 슬롯으로 주입', () => {
-    const src = read(SHELL_CONSUMER);
-    expect(src).toContain('LlmAssistComponent={LlmAssistPanel}');
-    expect(src).toMatch(/import \{[^}]*LlmAssistPanel[^}]*\} from '@o4o\/content-editor'/);
   });
 
   it('KPA ProductionMaterialEditorPage — 낡은 AI 초안 문구 제거', () => {

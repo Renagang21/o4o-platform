@@ -65,13 +65,11 @@ interface OwnerPage {
 
 const DASHBOARD_PAGES: OwnerPage[] = [
   { service: 'KPA-Society', file: 'services/web-kpa-society/src/pages/mypage/MyForumDashboardPage.tsx', component: 'ForumOwnerDashboard', before: 285 },
-  { service: 'K-Cosmetics', file: 'services/web-k-cosmetics/src/pages/forum/MyForumDashboardPage.tsx', component: 'ForumOwnerDashboard', before: 581 },
   { service: 'Neture', file: 'services/web-neture/src/pages/supplier/MyForumDashboardPage.tsx', component: 'ForumOwnerDashboard', before: 576 },
 ];
 
 const MEMBER_PAGES: OwnerPage[] = [
   { service: 'KPA-Society', file: 'services/web-kpa-society/src/pages/mypage/ForumMemberManagementPage.tsx', component: 'ForumOwnerMemberManagement', before: 381 },
-  { service: 'K-Cosmetics', file: 'services/web-k-cosmetics/src/pages/forum/ForumMemberManagementPage.tsx', component: 'ForumOwnerMemberManagement', before: 354 },
 ];
 
 /** census 시점 이미 복제로 존재하던 4서비스 — 감축 폭 단언의 기준이 된다. */
@@ -104,7 +102,6 @@ const ALL_PAGES = [...CENSUS_PAGES, ...ADOPTED_PAGES];
 /** 서비스 어댑터 (endpoint 배선 + accent 만 담당) */
 const ADAPTERS: Array<{ service: string; file: string }> = [
   { service: 'KPA-Society', file: 'services/web-kpa-society/src/api/forumOwnerAdapter.ts' },
-  { service: 'K-Cosmetics', file: 'services/web-k-cosmetics/src/services/forumOwnerAdapter.ts' },
   { service: 'Neture', file: 'services/web-neture/src/services/forumOwnerAdapter.ts' },
   // WO-O4O-PHARMACYHUB-COMMUNITY-CAPABILITY-FULL-ADOPTION-V1 §7·§8 채택분
   { service: 'Pharmacy-Hub', file: 'services/web-pharmacy-hub/src/services/forumOwnerAdapter.ts' },
@@ -185,7 +182,8 @@ describe('서비스 파일에 복제 마크업이 남아 있지 않다', () => {
   it('소유자 화면 총 LOC 가 census 기준 대비 1/5 미만이다', () => {
     const beforeTotal = CENSUS_PAGES.reduce((sum, p) => sum + p.before, 0);
     const afterTotal = CENSUS_PAGES.reduce((sum, p) => sum + loc(p.file), 0);
-    expect(beforeTotal).toBe(2177);
+    // 2177 → 1242: K-Cosmetics 2화면(581 + 354)은 앱 퇴역 삭제로 census 에서 제외 — WO-O4O-KCOSMETICS-RETIREMENT-PHASE1A-WEB-APP-AND-DEPLOY-TARGET-V1.
+    expect(beforeTotal).toBe(1242);
     expect(afterTotal).toBeLessThan(beforeTotal / 5);
   });
 });
@@ -268,18 +266,7 @@ describe('서비스 고유 정책이 보존된다', () => {
     expect(members).toContain("backHref=\"/mypage/my-forums\"");
   });
 
-  it('K-Cosmetics — 회원 관리 동선과 basePath 유지', () => {
-    for (const svc of ['k-cosmetics']) {
-      const page = read(`services/web-${svc}/src/pages/forum/MyForumDashboardPage.tsx`);
-      expect(page).toContain('memberManageHref');
-      expect(page).toContain("forumHomeHref: '/forum'");
-      expect(page).toContain('/forum/my-dashboard/');
-    }
-  });
-
-  it('서비스별 이모지 예시가 유지된다 (KCos 💄)', () => {
-    expect(read('services/web-k-cosmetics/src/pages/forum/MyForumDashboardPage.tsx')).toContain('💄');
-  });
+  // KCos 💄 이모지 단언은 앱(services/web-k-cosmetics) 퇴역 삭제로 제거 — WO-O4O-KCOSMETICS-RETIREMENT-PHASE1A-WEB-APP-AND-DEPLOY-TARGET-V1.
 
   /**
    * WO-O4O-CI-FORUM-OWNER-AREA-COMMONIZATION-TEST-BASELINE-RECOVERY-V1
@@ -342,8 +329,8 @@ describe('accent 주입과 Tailwind 스캔', () => {
     expect(source).not.toMatch(/['"`](?:text|bg|border|ring|hover:[a-z-]+)-\$\{/);
   });
 
-  it('소유 서비스 4곳의 tailwind content 가 shared-space-ui 를 스캔한다', () => {
-    for (const svc of ['web-kpa-society', 'web-k-cosmetics', 'web-neture', 'web-pharmacy-hub']) {
+  it('소유 서비스 3곳의 tailwind content 가 shared-space-ui 를 스캔한다', () => {
+    for (const svc of ['web-kpa-society', 'web-neture', 'web-pharmacy-hub']) {
       const config = read(`services/${svc}/tailwind.config.js`);
       expect(`${svc}:${config.includes('packages/shared-space-ui/src')}`).toBe(`${svc}:true`);
     }

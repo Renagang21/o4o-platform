@@ -76,7 +76,7 @@ function collectRoutes(dir: string): Set<string> {
 type Svc = { key: string; dir: string; copy: string };
 const SERVICES: Svc[] = [
   { key: 'kpa', dir: 'services/web-kpa-society', copy: 'kpa.ts' },
-  { key: 'k-cosmetics', dir: 'services/web-k-cosmetics', copy: 'k-cosmetics.ts' },
+  // k-cosmetics 앱(services/web-k-cosmetics)은 퇴역 삭제 — WO-O4O-KCOSMETICS-RETIREMENT-PHASE1A-WEB-APP-AND-DEPLOY-TARGET-V1.
   { key: 'neture', dir: 'services/web-neture', copy: 'neture.ts' },
   { key: 'pharmacy-hub', dir: 'services/web-pharmacy-hub', copy: 'pharmacy-hub.ts' },
 ];
@@ -148,19 +148,8 @@ describe('Guide coverage contract', () => {
     },
   );
 
-  it('K-Cosmetics — 매장 운영 · QR·태블릿 Guide 가 존재하고 기능 index 에서 진입 가능하다', () => {
-    const mounted = new Set(guideRoutesOf(SERVICES[1]));
-    for (const r of ['/guide/features/store', '/guide/features/qr']) {
-      expect(mounted.has(r)).toBe(true);
-    }
-    const copy = copySource(SERVICES[1]);
-    const index = copy.slice(copy.indexOf('kCosmeticsGuideFeaturesProps'), copy.indexOf('kCosmeticsGuideFeatureForumProps'));
-    expect(index).toContain('/guide/features/store');
-    expect(index).toContain('/guide/features/qr');
-  });
-
   it('PharmacyHub — 기존 Guide route 세트가 유지된다(회귀 방지)', () => {
-    const mounted = new Set(guideRoutesOf(SERVICES[3]));
+    const mounted = new Set(guideRoutesOf(SERVICES.find((s) => s.key === 'pharmacy-hub')!));
     for (const r of ['/service-guide', '/guide', '/guide/intro', '/guide/usage', '/guide/features']) {
       expect(mounted.has(r)).toBe(true);
     }
