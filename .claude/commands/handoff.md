@@ -8,7 +8,9 @@ main 반영은 PR merge 로만 하고, main 통합은 내가 승인한 뒤에 �
 1. 커밋할 작업공간을 정해. `git branch --show-current` 로 확인한다.
    - 작업 branch(`wo/<slug>` 등)의 전용 worktree 면 그곳에서 진행한다.
    - main(기준 checkout)이면 branch 를 전환하지 말고 전용 worktree 를 새로 만든다:
-     `git fetch origin` → `git worktree add ../o4o-wt/handoff-<ID> -b wo/handoff-<ID> origin/main`
+     `git fetch origin` → `WT_ROOT="$(dirname "$(dirname "$(git rev-parse --path-format=absolute --git-common-dir)")")/o4o-wt"`
+     → `git worktree add "$WT_ROOT/handoff-<ID>" -b wo/handoff-<ID> origin/main`
+     (경로 기준 · PowerShell 형태는 AGENTS.md §4-1(a). 상대 경로 `../o4o-wt` 는 실행 위치에 따라 달라지므로 쓰지 않는다)
      (`<ID>` = `<YYYYMMDD-HHMMSS>-<PC slug>` — 같은 날 여러 세션 · PC 가 실행해도 겹치지 않게.
      PC slug = hostname 을 소문자로 바꾸고 영문 · 숫자 · `-` 외 문자는 `-` 로 바꾼 값.
      만든 이름은 `git check-ref-format --branch wo/handoff-<ID>` 로 검증하고, 실패하거나 이미 있으면 멈추고 보고해)
