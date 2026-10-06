@@ -10,3 +10,5 @@ export const ROLES = {
   operator: 'lecture:operator',
   instructor: 'lecture:instructor',
 } as const;
+/** 강의 서비스 이용 신청 · 문의 (강의 서비스 자체 가입 경로는 아직 열려 있지 않다 — joinEnabled:false) */
+export const INQUIRY_URL = 'https://neture.co.kr/contact';
