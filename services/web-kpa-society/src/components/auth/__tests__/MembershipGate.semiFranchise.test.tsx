@@ -92,6 +92,13 @@ describe('MembershipGate — 세미프랜차이즈 자격', () => {
     expect(await screen.findByText('보호된 화면')).toBeTruthy();
   });
 
+  it.each(['suspended', 'withdrawn'])('G6 독립 자격 — kpa-society %s + Neture 두 자격 allowed → 통과', async (status) => {
+    mockUser = { id: 'u1', roles: [], memberships: [{ serviceKey: 'kpa-society', status }] };
+    get.mockResolvedValueOnce(access({ allowed: true }));
+    renderGate();
+    expect(await screen.findByText('보호된 화면')).toBeTruthy();
+  });
+
   it('G5 조회 실패 → 차단(기존 안내)', async () => {
     get.mockRejectedValueOnce(new Error('network'));
     renderGate();

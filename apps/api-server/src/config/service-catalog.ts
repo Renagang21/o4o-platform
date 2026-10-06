@@ -116,8 +116,14 @@ export interface O4OService {
    *
    *   값(세미프랜차이즈 key)이 있으면 이 서비스의 직접 로그인 게이트와 handoff 는 이 서비스 membership 이 없어도
    *   **Neture 기본 가입 active ∧ 이 세미프랜차이즈 가입 active** 인 약국 조직의 owner/admin/manager 를 통과시킨다
-   *   (`modules/neture-pharmacy/services/semi-franchise-service-access`). membership 을 만들지 않고,
-   *   기존 이 서비스 membership 을 Neture 자격으로 재해석하지 않는다(그 row 의 종전 판정은 그대로).
+   *   (`modules/neture-pharmacy/services/semi-franchise-service-access`).
+   *
+   *   **독립 자격**: 이 서비스 membership 과 Neture 가입은 서로 독립이다.
+   *     - 이 서비스 membership 이 active 가 아니면(없음 · pending · suspended · withdrawn 모두) Neture 자격을 따로 본다.
+   *       이 서비스 가입의 정지 · 탈퇴가 Neture 자격을 정지시키지 않는다.
+   *     - Neture 자격은 이 서비스 membership · role 을 만들거나 바꾸지 않는다 — 이 서비스 회원 전용 권한
+   *       (membership active · `kpa:*` role 을 요구하는 backend 경로)은 Neture 자격으로 열리지 않는다.
+   *     - 플랫폼 계정 자체의 정지 · 비활성 차단은 이 판정보다 먼저 적용된다(requireAuth · `user.isActive`).
    */
   semiFranchiseAccessKey?: string;
   /**

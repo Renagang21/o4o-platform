@@ -7,6 +7,9 @@
  *   H3 미충족이면 403 + serviceAccess(next) — 미가입은 HANDOFF_TARGET_NO_MEMBERSHIP + 세미프랜차이즈 안내 문구,
  *      기존 row 가 있으면 기존 코드(NOT_ACTIVE · WITHDRAWN) 유지
  *   H4 semiFranchiseAccessKey 가 없는 서비스(pharmacy-hub 등)는 세미프랜차이즈를 조회하지 않는다
+ *   H5 독립 자격 — KPA row 가 suspended · withdrawn 이어도 Neture 두 자격이 active 면 통과하되,
+ *      KPA membership 상태 · roles 는 바꾸지 않는다(KPA 회원 전용 권한 부여 0)
+ *   H6 플랫폼 계정 비활성은 Neture 자격과 무관하게 차단
  *
  * DB 접속 없음 — 세미프랜차이즈 SQL 은 `sfQuery` 로 따로 받아 기존 응답 큐를 밀지 않는다.
  */
@@ -119,6 +122,15 @@ describe('generateHandoff — target kpa-society (pharmacy.neture.co.kr)', () =>
     expect([res.statusCode, res.body.code]).toEqual([403, code]);
   });
 
+  // H5 독립 자격: KPA 가입 상태(정지 · 탈퇴)는 Neture 자격을 정지시키지 않고, Neture 자격은 KPA 가입을 바꾸지 않는다.
+  it.each(['suspended', 'withdrawn'])('H5 kpa-society row=%s + Neture 두 자격 active → 발급 · KPA membership·role write 0', async (status) => {
+    query.mockResolvedValueOnce([{ status }]).mockResolvedValueOnce([{ id: uuid }]).mockResolvedValueOnce([]);
+    sfQuery.mockResolvedValueOnce([{ basic: 'active', semi: 'active' }]);
+    const res = await generate();
+    expect(res.statusCode).toBe(200);
+    expect(sqlCalls().join(' ')).not.toMatch(/INSERT INTO service_memberships|UPDATE service_memberships|role_assignments/);
+  });
+
   it('H4 pharmacy-hub target 은 세미프랜차이즈를 조회하지 않는다', async () => {
     query.mockResolvedValueOnce([]);
     const res = mockHandoffRes();
@@ -158,6 +170,29 @@ describe('exchangeHandoff — target kpa-society', () => {
     const res = await exchange();
     expect([res.statusCode, res.body.code]).toEqual([403, 'HANDOFF_TARGET_NO_MEMBERSHIP']);
     expect(res.body.serviceAccess).toMatchObject({ next: 'semi_franchise_suspended' });
+    expect(generateTokens).not.toHaveBeenCalled();
+  });
+
+  it.each(['suspended', 'withdrawn'])('H5 kpa-society row=%s + Neture 두 자격 active → 교환 · 세션의 KPA 상태 · roles 원본 그대로', async (status) => {
+    consumed();
+    findOne.mockResolvedValueOnce(USER);
+    const memberships = [{ serviceKey: 'kpa-society', status }, { serviceKey: 'neture', status: 'active' }];
+    query.mockResolvedValueOnce(memberships);
+    sfQuery.mockResolvedValueOnce([{ basic: 'active', semi: 'active' }]);
+    const res = await exchange();
+    expect(res.statusCode).toBe(200);
+    // KPA 회원 전용 권한을 만들지 않는다 — membership 은 원래 상태(active 로 바꾸지 않음), roles 는 원장 그대로(여기선 [])
+    expect(res.body.data.user.memberships).toEqual(memberships);
+    expect(generateTokens.mock.calls[0][1]).toEqual([]);
+    expect(sqlCalls().join(' ')).not.toMatch(/INSERT|DELETE|UPDATE service_memberships|role_assignments/);
+  });
+
+  it('H6 플랫폼 계정 비활성은 Neture 자격과 무관하게 교환 거절(자격 조회 전)', async () => {
+    consumed();
+    findOne.mockResolvedValueOnce({ ...USER, isActive: false });
+    const res = await exchange();
+    expect([res.statusCode, res.body.code]).toEqual([401, 'INVALID_USER']);
+    expect(sfQuery).not.toHaveBeenCalled();
     expect(generateTokens).not.toHaveBeenCalled();
   });
 

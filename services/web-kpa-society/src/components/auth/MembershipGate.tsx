@@ -18,6 +18,8 @@
  * 아니어도 **Neture 약국 기본 가입 active ∧ pharmacy 세미프랜차이즈 가입 active** 이면 이용한다 — 로그인 · handoff
  * 와 같은 서버 판정(`/neture/pharmacy/service-access/kpa-society`)을 조회해 통과시키고, 미충족이면 상태별 안내 ·
  * 신청 링크를 보인다. 기존 kpa-society 가입을 Neture 자격으로 재해석하지 않는다(판정은 서버의 Neture 원장).
+ * 두 가입은 독립이다 — kpa-society 가 suspended · withdrawn 이어도 Neture 자격이 있으면 이 화면을 쓰되,
+ * KPA 회원 전용 권한은 backend 가 kpa-society membership 으로 따로 막는다.
  */
 
 import { useEffect, useState } from 'react';

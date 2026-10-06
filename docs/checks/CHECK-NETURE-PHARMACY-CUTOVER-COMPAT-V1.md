@@ -63,7 +63,7 @@ Neture 약국 매장 commerce(PR #308 계열) 운영 전환 전 호환성 보강
 | 검증 | 범위 · 결과 |
 |---|---|
 | 대상 쿼리 | `e0be29869` 에서 `organization_product_listings` 를 `ON CONFLICT (organization_id, service_key, offer_id)` 로 쓰는 **9개 지점 전부** — `PharmacyHubHandledProductController.ts:196`(DO UPDATE · RETURNING) · `product-approval-v2.service.ts:187`(INSERT…SELECT DO UPDATE) · `seller-recruitment.service.ts:650` · `event-offer.service.ts:963` · `store-product-library.controller.ts:237` · `auto-listing.utils.ts:84 · 145 · 198 · 245`(DO NOTHING). 같은 테이블의 `(organization_id, service_key, master_id) WHERE offer_id IS NULL` 2지점은 다른 인덱스(`idx_org_listing_unique_master`, 이번 변경 무관) |
-| 방법 | 일회용 로컬 PostgreSQL 17.9(운영 15 와 `ON CONFLICT` arbiter 추론 규칙 동일)에 baseline 의 테이블 · 두 UNIQUE 인덱스를 만들고 각 지점의 컬럼 목록 · `ON CONFLICT` 절을 원문 그대로, 같은 키로 2회 실행(충돌 경로 포함). auto-listing 의 소스 JOIN 은 arbiter 추론과 무관해 상수 SELECT 로 대체. 검증 후 서버 중지 |
+| 방법 | 일회용 로컬 클러스터 2종 — **PostgreSQL 15.17**(운영과 같은 major, EnterpriseDB 공식 Windows 바이너리) · 17.9 — 에서 같은 스크립트 실행, 두 버전 결과 동일. baseline 의 테이블 · 두 UNIQUE 인덱스를 만들고 각 지점의 컬럼 목록 · `ON CONFLICT` 절을 원문 그대로, 같은 키로 2회 실행(충돌 경로 포함). auto-listing 의 소스 JOIN 은 arbiter 추론과 무관해 상수 SELECT 로 대체. 검증 후 서버 중지 |
 | 1단계(이 PR, 전체 UNIQUE) | 9개 지점 **전부 성공** · 신버전 `WHERE service_key <> 'neture-event-offer'` 형태도 성공 |
 | 2단계 시뮬레이션(부분 UNIQUE) | 9개 지점 **전부 `42P10`**(arbiter 추론 실패) · 신버전 형태는 성공 |
 | `seller_recruitments` | `e0be29869` 에 이 테이블 대상 `ON CONFLICT` · 제약 이름 참조 0건(grep). `NULLS NOT DISTINCT` 인덱스에서 구버전 형태 쓰기(`semi_franchise_id` NULL) 중복은 종전처럼 unique 위반 |
@@ -118,6 +118,9 @@ Neture 약국 매장 commerce(PR #308 계열) 운영 전환 전 호환성 보강
 - C. 사이니지 membership 게이트: kpa-society 는 `isStoreOwner('kpa')` 결과로 대체(커뮤니티 쓰기는 포럼 정책과 함께).
 - E. (선택) `/store` 착지 기준에 `isStoreOwner` 반영.
 
+> **처리 (2026-10-06, 사용자 방향 확정)**: 후속 PR(WO-NETURE-PHARMACY-PREDEPLOY-ACCESS-ALIGNMENT-V1, 이 PR 위에 쌓음)이 처리한다 — A 그대로 · C 그대로(store 계열만, community 쓰기 불개방) · **B 는 권한 확장 대신 옛 진입을 store.neture.co.kr 새 commerce 로 연결**(옛 KPA 장바구니 권한은 Neture 사용자에게 열지 않음) · Forum 은 안내만. E 는 하지 않음. 기록: [`CHECK-NETURE-PHARMACY-PREDEPLOY-ACCESS-ALIGNMENT-V1`](CHECK-NETURE-PHARMACY-PREDEPLOY-ACCESS-ALIGNMENT-V1.md).
+> **정정**: §8-1 의 "매장 HUB 이벤트 목록 · 경영활용/자체 상품 OK" 는 틀렸다 — 화면 가드 `PharmacyOwnerOnlyGuard` 가 `kpa:store_owner` role 만 보아 Neture 약국은 이벤트 · 장바구니 · 취급 제품 · 경영활용 제품 · 자체 상품 · 다국어 상품 콘텐츠 화면에서 AccessDenied 였다(backend 는 원장 기준 허용). 후속 PR 에서 정렬.
+
 정적 판정 전제: JWT roles 에 `neture:store_owner` 가 실림 · 약국 조직 1개. 실브라우저 smoke 미실시.
 
 ## 9. 인증 · 가입 트랙 리뷰 (2026-10-06)
@@ -127,6 +130,11 @@ Neture 약국 매장 commerce(PR #308 계열) 운영 전환 전 호환성 보강
 - 기존 kpa-society row 보유자: 직접 로그인은 `isServiceLoginAllowed` 가 먼저 통과(새 조회 0), handoff active 는 세미프랜차이즈 조회 0, MembershipGate active 는 조회 0(테스트 고정). pending/withdrawn 이면서 세미프랜차이즈 미충족이면 종전 code(`HANDOFF_TARGET_NOT_ACTIVE` · `HANDOFF_TARGET_WITHDRAWN`) 그대로.
 - 다른 서비스: `semiFranchiseAccessKey` 는 kpa-society 에만 있음. auth-react `serviceAccess` 는 서버가 보낼 때만 붙어 다른 소비처 동작 불변.
 - handoff 발급 · 교환 모두 재검증. 서비스 키는 토큰 payload · 카탈로그 · URL 에서 파생(Guard Rule 4 충족). SQL 파라미터 바인딩 · 조직 축 조건 · 같은 조직에서 두 자격 동시 active 요구.
-- **정책 확인 필요**: kpa-society row 가 **suspended / withdrawn** 이어도 Neture 두 자격이 active 면 handoff · 화면 게이트를 통과한다(직접 로그인은 원래 모든 상태 row 를 통과시켜 세 경로 결과는 일관). `service-catalog.ts` 주석 "그 row 의 종전 판정은 그대로" 와 다르다. KPA 정지(징계성)를 Neture 경로가 넘어도 되는지 판단 필요 — 이 경우의 테스트도 없음.
+- ~~정책 확인 필요~~ → **판정 확정 (사용자, 2026-10-06) · 반영 완료**: KPA 가입과 Neture 기본 · pharmacy 가입은 **독립 자격**이다.
+  - kpa-society row 가 suspended / withdrawn 이어도 Neture 두 자격이 active 면 pharmacy 이용(로그인 · handoff · 화면 게이트)을 허용한다 — "KPA 정지 우회"가 아니라 독립 자격으로 이용.
+  - Neture 자격은 KPA membership · role 을 만들거나 바꾸지 않는다 — KPA 회원 전용 권한(membership active · `kpa:*` 를 요구하는 backend 경로)은 열리지 않는다. handoff 세션에는 원장 그대로의 memberships(정지 상태 포함) · roles 가 실린다.
+  - 플랫폼 계정 자체의 정지 · 비활성 차단은 유지(requireAuth · exchange 의 `user.isActive`, 자격 조회 전).
+  - 주석: `service-catalog.ts` `semiFranchiseAccessKey` · `handoff.controller.ts` · `MembershipGate.tsx` 를 위 기준으로 정정.
+  - 테스트 추가: handoff H5(발급 · 교환 × suspended · withdrawn → 통과 · KPA membership/role write 0 · 세션 memberships 원본 · roles 불변) · H6(계정 비활성 → 401 `INVALID_USER`, 자격 조회 0) · MembershipGate G6(suspended · withdrawn + allowed → 통과).
 - 관찰: non-active kpa row 사용자의 handoff 에서 자격 조회가 throw 하면 403 대신 500. 비회원 전원의 안내가 "Neture 약국 가입" 문구 · store 링크로 바뀜(pharmacy 호스트 한정).
 - merge · promote · 변수 설정 · 운영 DB 변경 · 데이터 정리 · LB/도메인 변경 · 기존 PH 서버/도메인/인증서 변경: **0 건**.
