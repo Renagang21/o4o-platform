@@ -116,10 +116,11 @@ O4O 쪽 연결은 끊겼지만 DNS 가 아직 O4O LB 를 가리킨다. 아래 4�
 | 파일 | 변경 |
 |---|---|
 | `apps/api-server/src/entities/PlatformInquiry.ts` | `InquiryType` 에서 `'siteguide'` 제거 · 용도/`source` 주석의 siteguide 예시 제거. 컬럼은 `varchar` 그대로 — **스키마 · migration 변경 없음** |
-| `apps/api-server/src/controllers/platformInquiryController.ts` | 알림 메일 제목 접두어 `INQUIRY_TYPE_LABELS.siteguide` 제거 |
+| `apps/api-server/src/controllers/platformInquiryController.ts` | 알림 메일 제목 접두어 `INQUIRY_TYPE_LABELS.siteguide` 제거 · 공개 접수에서 은퇴 유형 `siteguide` 만 `400 RETIRED_INQUIRY_TYPE` 으로 거부(삭제한 행의 재생성 방지 — Codex 리뷰 P2 반영). 저장소 내 공개 접수 호출처 0 · 최근 30일 운영 POST 0 |
+| `apps/api-server/src/__tests__/platform-inquiry-retired-type.spec.ts` (신규) | `siteguide` → 400 · 저장 0, `platform` · `partnership` · `other` · 생략(기본 `platform`) → 201 — 5/5 PASS |
 | `services/web-neture/src/pages/admin-vault/VaultInquiriesPage.tsx` | 유형 타입 · `TYPE_LABELS` · 유형 필터 `<option>` · 화면 설명 · 헤더 주석에서 siteguide 제거 |
 
-유지: 문의 접수(`POST /api/v1/platform/inquiries`) · 관리자 목록/상세/상태 변경 동작 — 유형 값 검증 방식(화이트리스트 없음)도 바꾸지 않았다(API 계약 변경 범위 밖). KPA `JoinInquiryForm`(`/api/v1/join/inquiry`) · 서비스 문의(`contact_inquiries`)는 다른 축이라 무관.
+유지: 문의 접수(`POST /api/v1/platform/inquiries`) · 관리자 목록/상세/상태 변경 동작 — `siteguide` 외 유형 값의 처리는 바꾸지 않았다(전체 허용 목록 도입은 API 계약 변경이라 범위 밖). KPA `JoinInquiryForm`(`/api/v1/join/inquiry`) · 서비스 문의(`contact_inquiries`)는 다른 축이라 무관.
 historical migration(`CreateSiteGuideTables` · `DropSiteGuideSchema`) · 기록 문서는 유지.
 
 이로써 siteguide 문의 데이터 때문에 남겨 두었던 런타임 코드 참조는 0 이다(남은 참조: `packages/ai-core/README.md` 의 폐기 확정 문구 · historical migration · 기록 문서).

@@ -25,6 +25,9 @@ const INQUIRY_TYPE_LABELS: Record<InquiryType, string> = {
   other: '[기타 문의]',
 };
 
+// 서비스 폐기로 은퇴한 문의 유형 (접수 거부)
+const RETIRED_INQUIRY_TYPES = new Set<string>(['siteguide']);
+
 /**
  * 문의 제출 (공개)
  */
@@ -47,6 +50,16 @@ export async function submitInquiry(req: Request, res: Response) {
         success: false,
         error: '필수 항목을 입력해 주세요.',
         code: 'MISSING_REQUIRED_FIELDS',
+      });
+    }
+
+    // 은퇴한 유형은 접수하지 않는다 — 삭제한 'siteguide' 문의가 공개 접수로 다시 생기지 않게 한다
+    // (CHECK-O4O-SITEGUIDE-RETIREMENT-V1 §5). 다른 유형 값의 처리는 바꾸지 않는다.
+    if (RETIRED_INQUIRY_TYPES.has(String(type))) {
+      return res.status(400).json({
+        success: false,
+        error: '더 이상 접수하지 않는 문의 유형입니다.',
+        code: 'RETIRED_INQUIRY_TYPE',
       });
     }
 
