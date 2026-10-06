@@ -16,12 +16,14 @@ import { PageHeader, LoadingSpinner, Card } from '../../components/common';
 import { forumApi } from '../../api';
 import { useAuth, getAccessToken } from '../../contexts';
 import { colors, typography } from '../../styles/theme';
+import { ForumWriteDeniedNotice, forumWriteErrorMessage, useForumWriteAccess } from '../../lib/forumWriteAccess';
 
 export function ForumWritePage() {
   const { id, slug: forumSlug } = useParams<{ id?: string; slug?: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
   const isEdit = !!id;
+  const writeAccess = useForumWriteAccess();
 
   const [loading, setLoading] = useState(isEdit);
   // edit 모드 초기값 버퍼 — 폼 마운트(로딩 게이트 이후) 시 initial* 로 전달. 이후 편집 상태는 폼이 소유.
@@ -98,7 +100,9 @@ export function ForumWritePage() {
       if (status === 401) {
         toast.error('로그인이 만료되었습니다. 다시 로그인해 주세요.');
       } else if (status === 403) {
-        toast.error('이 글을 수정할 권한이 없습니다.');
+        // WO-NETURE-PHARMACY-PREDEPLOY-ACCESS-ALIGNMENT-V1: 새 글 실패에 '수정 권한' 문구를 쓰지 않는다 — 서버 code 기준 안내
+        const accessMessage = forumWriteErrorMessage(err?.code);
+        toast.error(accessMessage ?? (isEdit ? '이 글을 수정할 권한이 없습니다.' : '글을 작성할 권한이 없습니다.'));
       } else if (status === 404) {
         toast.error('게시글을 찾을 수 없습니다.');
       } else {
@@ -119,6 +123,17 @@ export function ForumWritePage() {
 
   if (loading) {
     return <LoadingSpinner message="로딩 중..." />;
+  }
+
+  // 새 글: 쓰기 자격이 없으면(서버 판정) 폼 대신 안내
+  if (!isEdit && writeAccess?.allowed === false) {
+    return (
+      <div style={styles.container}>
+        <Card padding="large">
+          <ForumWriteDeniedNotice access={writeAccess} />
+        </Card>
+      </div>
+    );
   }
 
   return (

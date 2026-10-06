@@ -67,37 +67,44 @@ router.post(
     }
 
     try {
-      // WO §20: 활성/허용된 service membership 보유자만 그 서비스 약관을 승낙할 수 있다.
-      const rows = (await AppDataSource.query(
-        `SELECT status FROM service_memberships WHERE user_id = $1 AND service_key = $2 LIMIT 1`,
-        [userId, serviceKey],
-      )) as { status: string }[];
-      const status = rows[0]?.status;
       const isStoreAgreement = documentType === STORE_OWNER_AGREEMENT_DOCUMENT_TYPE;
-      const membershipAllowed = isStoreAgreement ? status === 'active' : !!status && REQUIRED_MEMBERSHIP_STATUSES.has(status);
-      if (!membershipAllowed) {
-        return res.status(403).json({
-          success: false,
-          error: '해당 서비스의 유효한 회원자격이 필요합니다.',
-          code: status ? 'MEMBERSHIP_NOT_ACTIVE' : 'MEMBERSHIP_NOT_FOUND',
-        });
-      }
-      if (isStoreAgreement) {
-        const roleByService: Record<string, string> = {
-          'kpa-society': 'kpa:store_owner',
-          'k-cosmetics': 'cosmetics:store_owner',
-          'pharmacy-hub': 'pharmacy-hub:store_owner',
-        };
-        const requiredRole = roleByService[serviceKey];
-        if (!requiredRole) {
-          return res.status(400).json({ success: false, error: '매장 경영자 계약 대상 서비스가 아닙니다.', code: 'POLICY_SERVICE_NOT_ALLOWED' });
-        }
-        const roleRows = await AppDataSource.query(
-          `SELECT 1 FROM role_assignments WHERE user_id = $1 AND role = $2 AND is_active = true LIMIT 1`,
-          [userId, requiredRole],
-        );
-        if (!roleRows.length) {
+      if (isStoreAgreement && serviceKey === 'kpa-society') {
+        // WO-NETURE-PHARMACY-PREDEPLOY-ACCESS-ALIGNMENT-V1: 약국 매장계약은 요구 판정(getPendingStoreOwnerAgreementsForUser)과
+        //   같은 Neture 원장 기준으로만 승낙을 허용한다. kpa-society membership · `kpa:store_owner` 는 보지 않는다.
+        if (!(await policyAcceptanceService.isPharmacyLedgerStoreOwner(userId))) {
           return res.status(403).json({ success: false, error: '매장 경영자만 계약에 동의할 수 있습니다.', code: 'STORE_OWNER_REQUIRED' });
+        }
+      } else {
+        // WO §20: 활성/허용된 service membership 보유자만 그 서비스 약관을 승낙할 수 있다.
+        const rows = (await AppDataSource.query(
+          `SELECT status FROM service_memberships WHERE user_id = $1 AND service_key = $2 LIMIT 1`,
+          [userId, serviceKey],
+        )) as { status: string }[];
+        const status = rows[0]?.status;
+        const membershipAllowed = isStoreAgreement ? status === 'active' : !!status && REQUIRED_MEMBERSHIP_STATUSES.has(status);
+        if (!membershipAllowed) {
+          return res.status(403).json({
+            success: false,
+            error: '해당 서비스의 유효한 회원자격이 필요합니다.',
+            code: status ? 'MEMBERSHIP_NOT_ACTIVE' : 'MEMBERSHIP_NOT_FOUND',
+          });
+        }
+        if (isStoreAgreement) {
+          const roleByService: Record<string, string> = {
+            'k-cosmetics': 'cosmetics:store_owner',
+            'pharmacy-hub': 'pharmacy-hub:store_owner',
+          };
+          const requiredRole = roleByService[serviceKey];
+          if (!requiredRole) {
+            return res.status(400).json({ success: false, error: '매장 경영자 계약 대상 서비스가 아닙니다.', code: 'POLICY_SERVICE_NOT_ALLOWED' });
+          }
+          const roleRows = await AppDataSource.query(
+            `SELECT 1 FROM role_assignments WHERE user_id = $1 AND role = $2 AND is_active = true LIMIT 1`,
+            [userId, requiredRole],
+          );
+          if (!roleRows.length) {
+            return res.status(403).json({ success: false, error: '매장 경영자만 계약에 동의할 수 있습니다.', code: 'STORE_OWNER_REQUIRED' });
+          }
         }
       }
 
