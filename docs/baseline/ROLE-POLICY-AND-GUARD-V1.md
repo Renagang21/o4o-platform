@@ -3,7 +3,7 @@
 > **Status: Active Policy + Frozen Baseline**
 > **Version: 1.0 | Created: 2026-02-17**
 >
-> (2026-10-06 정정, `WO-O4O-CANONICAL-INDEX-S9-POLICY-DECISION-ALIGNMENT-V1`) 이 문서의 `kpa:district_admin` · `kpa:branch_admin` · `kpa:branch_operator` · `{service}:branch_*` Org Layer 서술(§1 · §5 · §6 · §8)은 **과거 기록**이다 — 이 역할들은 제거됐고 guard 를 복구하지 않는다. 현행 KPA 역할은 [`KPA-ROLE-MATRIX-V1`](KPA-ROLE-MATRIX-V1.md)(KPA Society, scope = `kpa:admin` ⊃ `kpa:operator`), 분회 서비스 역할 · 분회 소속 판정은 [`KPA-BRANCH-ROLE-MATRIX-V1`](KPA-BRANCH-ROLE-MATRIX-V1.md)(`kpa-branch:*` + `branch_memberships`)가 정본이며, 충돌하면 그 두 문서가 우선한다. 나머지 원칙(계층 · Admin/Operator 구분 · Platform Bypass · 서비스 격리 · Guard 패턴)은 유효하다.
+> (2026-10-06 정정, `WO-O4O-CANONICAL-INDEX-S9-POLICY-DECISION-ALIGNMENT-V1`) 이 문서의 `kpa:district_admin` · `kpa:branch_admin` · `kpa:branch_operator` · `{service}:branch_*` Org Layer 서술(§1 · §5 · §6 · §8)은 **과거 기록**이다 — 이 역할들은 제거됐고 guard 를 복구하지 않는다. 현행 KPA 역할은 [`KPA-ROLE-MATRIX-V1`](KPA-ROLE-MATRIX-V1.md)(KPA Society, scope = `kpa:admin` ⊃ `kpa:operator`), 분회 서비스 역할 · 분회 소속 판정은 [`KPA-BRANCH-ROLE-MATRIX-V1`](KPA-BRANCH-ROLE-MATRIX-V1.md)(`kpa-branch:*` + `branch_memberships`)가 정본이며, 충돌하면 그 두 문서가 우선한다. **GlucoseView 행(§3 · §4 · §7 · §8)도 과거 기록**이다 — 현행 서비스 identity(`apps/api-server/src/config/service-catalog.ts`)와 `packages/security-core` 에 GlucoseView 는 없고 관련 역할 · guard 도 없다. 위 두 범위를 뺀 나머지 원칙(계층 · Admin/Operator 구분 · Platform Bypass · 서비스 격리 · Guard 패턴)은 유효하다.
 
 ---
 
