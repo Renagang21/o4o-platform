@@ -239,11 +239,13 @@ Pharmacy-Hub 의 역할/스코프 가드를 걸 수 없었다.
    |
    +- (Axis A · 승인축 B2B) checkout-confirm -> checkout_orders : paymentStatus = pending
    |
-   +- (Axis B/C/D) 주문 생성 ---------------> checkout_orders : paymentStatus = pending
-                                                    |
-                                     결제 완료 이벤트 |  (유일한 전이 트리거)
-                                                    v
-                                              checkout_orders : paid
+   +- (Axis B/C) 주문 생성 -----------------> checkout_orders : paymentStatus = pending
+   |                                                |
+   |                  PaymentCore 결제 완료 이벤트 |  (Axis A · 승인축 · B · C 의 유일한 전이 트리거)
+   |                                                v
+   |                                          checkout_orders : paid
+   |                                                ^
+   +- (Axis D) 주문 생성 -> pending -> 테스트 결제 confirm 트랜잭션 (PaymentCore 이벤트 없음)
                                                     |
                                     fulfillment bridge |
                                                     v
@@ -277,6 +279,8 @@ Pharmacy-Hub 의 역할/스코프 가드를 걸 수 없었다.
 문서에 미래형으로도 적지 않는다.
 
 ---
+
+> (2026-10-06 정정) **Axis D 는 PaymentCore 결제 이벤트를 거치지 않는다** — `PharmacyPaymentService.confirm()` 이 테스트 결제 트랜잭션 안에서 `o4o_payments` 와 `checkout_orders` 를 직접 paid 로 전이한다([`CHECKOUT-STABLE-DECLARATION-V2`](CHECKOUT-STABLE-DECLARATION-V2.md) §2-1). Axis D 용 `payment.completed` handler 를 전제로 구현하지 않는다.
 
 ## 7. Cart 판정 — `store_cart_items` 는 B2B cart 다
 
