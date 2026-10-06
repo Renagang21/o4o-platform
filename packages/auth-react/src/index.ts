@@ -37,6 +37,7 @@ export * from './email';
 // WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: GoogleAccountLink 는 은퇴했다(비밀번호 재인증 기반 연결 카드).
 export type {
   AuthLoginResult,
+  AuthServiceAccess,
   AuthClientLike,
   GoogleSignupConsents,
   ServiceAuthConfig,

@@ -364,9 +364,12 @@ export async function resolveServiceEntryUrl(serviceKey: string, returnPath?: st
     const res = await api.post('/auth/handoff', { targetServiceKey: serviceKey, returnPath });
     targetUrl = res.data?.data?.targetUrl;
   } catch (err: unknown) {
-    const body = (err as { response?: { data?: { code?: string; error?: string } } })?.response?.data;
+    const body = (err as { response?: { data?: { code?: string; error?: string; serviceAccess?: unknown } } })?.response?.data;
+    // WO-NETURE-PHARMACY-CUTOVER-COMPAT-V1: 세미프랜차이즈로 이용하는 서비스(pharmacy)는 서버가 상태별 안내
+    // (약국 가입 · 세미프랜차이즈 가입 · 승인 대기 · 정지)를 `serviceAccess` 와 함께 준다 — 고정 문구보다 우선.
+    const serverMessage = body?.serviceAccess && typeof body.error === 'string' ? body.error : undefined;
     throw new ServiceEntryError(
-      HANDOFF_ERROR_MESSAGES[body?.code ?? ''] ?? '서비스로 이동하지 못했습니다. 잠시 후 다시 시도해 주세요.',
+      serverMessage ?? HANDOFF_ERROR_MESSAGES[body?.code ?? ''] ?? '서비스로 이동하지 못했습니다. 잠시 후 다시 시도해 주세요.',
       body?.code,
     );
   }

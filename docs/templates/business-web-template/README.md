@@ -1,7 +1,9 @@
 # Business Web Template
 
+> **상태**: OBSOLETE · 이 템플릿은 별도 business-api / business-web · 독립 배포 · OpenAPI CI 게이트를 전제하며, 그 전제와 함께 [`BUSINESS-SERVICE-RULES`](../../architecture/BUSINESS-SERVICE-RULES.md) 가 폐기됐다(`WO-O4O-CANONICAL-INDEX-S9-POLICY-DECISION-ALIGNMENT-V1`). 새 작업의 출발점이나 검증 기준으로 쓰지 않는다 — 현행 기준은 `CLAUDE.md` §1 · §7 · §13 과 [`O4O-BOUNDARY-POLICY-V1`](../../architecture/O4O-BOUNDARY-POLICY-V1.md) · **표기일**: 2026-10-06
+
 > **Version**: 1.0
-> **Status**: Mandatory Template
+> **Status**: ~~Mandatory Template~~ OBSOLETE
 > **Created**: 2025-12-29
 
 이 디렉터리는 새로운 Business Web 생성을 위한 **표준 템플릿**입니다.
@@ -141,7 +143,7 @@ NODE_ENV=development
 - [Business Web Template Rules](../../architecture/business-web-template.md)
 - [Business API Template Rules](../../architecture/business-api-template.md)
 - [Multi-Business Operations](../../architecture/multi-business-operations.md)
-- docs/architecture/BUSINESS-SERVICE-RULES.md — Business Web Template Rules (CLAUDE.md 에서 분리된 상세 규칙)
+- ~~docs/architecture/BUSINESS-SERVICE-RULES.md~~ — OBSOLETE(2026-10-06) · 개발 근거 아님
 
 ---
 
