@@ -13,21 +13,34 @@
  * 안내 화면 마크업·문구는 5 서비스 공통(`MembershipStatusNotice` +
  * `buildMembershipViewModel`)이며, 이 파일에는 **서비스 고유 값(서비스명 · 가입
  * 신청 경로)** 만 남는다. 상태 판정은 `@o4o/auth-utils` SSOT 를 그대로 쓴다.
+ *
+ * WO-NETURE-PHARMACY-CUTOVER-COMPAT-V1: 이 호스트(pharmacy.neture.co.kr)는 kpa-society membership 이 active 가
+ * 아니어도 **Neture 약국 기본 가입 active ∧ pharmacy 세미프랜차이즈 가입 active** 이면 이용한다 — 로그인 · handoff
+ * 와 같은 서버 판정(`/neture/pharmacy/service-access/kpa-society`)을 조회해 통과시키고, 미충족이면 상태별 안내 ·
+ * 신청 링크를 보인다. 기존 kpa-society 가입을 Neture 자격으로 재해석하지 않는다(판정은 서버의 Neture 원장).
+ * 두 가입은 독립이다 — kpa-society 가 suspended · withdrawn 이어도 Neture 자격이 있으면 이 화면을 쓰되,
+ * KPA 회원 전용 권한은 backend 가 kpa-society membership 으로 따로 막는다.
  */
 
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   MembershipStatusNotice,
   buildMembershipViewModel,
   type MembershipStatusNoticeAction,
 } from '@o4o/account-ui';
-import { useAuth } from '../../contexts/AuthContext';
+import { authClient, useAuth } from '../../contexts/AuthContext';
 import {
   SERVICE_KEY,
   getServiceMembershipStatus,
   isPlatformSuperAdmin,
   type MembershipStatus,
 } from '../../lib/membershipGate';
+import {
+  fetchSemiFranchiseServiceAccess,
+  semiFranchiseAccessLink,
+  type SemiFranchiseServiceAccess,
+} from '../../lib/semiFranchiseAccess';
 
 interface MembershipGateProps {
   children: React.ReactNode;
@@ -48,10 +61,32 @@ const SERVICE_NAME = 'KPA-Society';
  */
 const APPLY_PATH: Partial<Record<string, string>> = {};
 
+/** membership 이 active 가 아닐 때만 세미프랜차이즈 자격을 조회한다(active · super_admin 은 조회 0). */
+function useSemiFranchiseAccess(userId: string | undefined, needed: boolean, serviceKey: string) {
+  const [state, setState] = useState<{ key: string; access: SemiFranchiseServiceAccess | null } | null>(null);
+  const key = `${userId ?? ''}:${serviceKey}`;
+  useEffect(() => {
+    if (!needed) return;
+    let cancelled = false;
+    // fetchSemiFranchiseServiceAccess 는 reject 하지 않는다(실패 = null).
+    void fetchSemiFranchiseServiceAccess(authClient.api, serviceKey).then((access) => {
+      if (!cancelled) setState({ key, access });
+    });
+    return () => { cancelled = true; };
+  }, [needed, key, serviceKey]);
+  if (!needed) return { checking: false, access: null };
+  if (!state || state.key !== key) return { checking: true, access: null };
+  return { checking: false, access: state.access };
+}
+
 export function MembershipGate({ children, serviceKey = SERVICE_KEY }: MembershipGateProps) {
   const { user, isAuthenticated, isLoading } = useAuth();
+  const status = user ? getServiceMembershipStatus(user, serviceKey) : 'none';
+  const needsSemiFranchiseCheck =
+    !isLoading && isAuthenticated && !!user && !isPlatformSuperAdmin(user) && status !== 'active' && serviceKey === SERVICE_KEY;
+  const semiFranchise = useSemiFranchiseAccess(user?.id, needsSemiFranchiseCheck, serviceKey);
 
-  if (isLoading) {
+  if (isLoading || semiFranchise.checking) {
     return (
       <div className="min-h-[400px] flex items-center justify-center">
         <p className="text-slate-500 text-sm">이용 권한을 확인하는 중...</p>
@@ -68,12 +103,39 @@ export function MembershipGate({ children, serviceKey = SERVICE_KEY }: Membershi
     return <>{children}</>;
   }
 
-  const status = getServiceMembershipStatus(user, serviceKey);
   if (status === 'active') {
     return <>{children}</>;
   }
 
+  if (semiFranchise.access?.allowed) {
+    return <>{children}</>;
+  }
+
+  // kpa-society 가입 이력이 없는 사용자 = Neture 약국 경로 안내(상태별 문구 · 신청 링크)
+  if (status === 'none' && semiFranchise.access?.next) {
+    return <SemiFranchiseAccessScreen access={semiFranchise.access} />;
+  }
+
   return <MembershipStatusScreen status={status} serviceKey={serviceKey} />;
+}
+
+function SemiFranchiseAccessScreen({ access }: { access: SemiFranchiseServiceAccess }) {
+  const navigate = useNavigate();
+  const link = semiFranchiseAccessLink(access.next);
+  const actions: MembershipStatusNoticeAction[] = [];
+  if (link) {
+    // 가입 · 신청 화면은 내 매장 호스트(store.neture.co.kr) — 서비스 간 이동
+    actions.push({ key: 'apply', label: link.label, onClick: () => window.location.assign(link.href), variant: 'primary' });
+  }
+  actions.push({ key: 'home', label: '홈으로 돌아가기', onClick: () => navigate('/'), variant: 'secondary' });
+  return (
+    <MembershipStatusNotice
+      icon="🏥"
+      title="Neture 약국 가입 후 이용할 수 있습니다"
+      message={access.message ?? ''}
+      actions={actions}
+    />
+  );
 }
 
 // ─────────────────────────────────────────────────────

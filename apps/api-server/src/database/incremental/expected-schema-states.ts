@@ -190,11 +190,13 @@ export const EXPECTED_SCHEMA_STATES: readonly ExpectedSchemaState[] = [
     fingerprintLineCount: 6021,
   },
   // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1 — 기본 가입 · 세미프랜차이즈 · 복수 공급 제안 · 세미프랜차이즈 콘텐츠 · 장바구니 제안 컬럼 ·
-  // 모집 조직 단위 · 이벤트 부분 unique. baseline fresh bootstrap + incremental 1..16 를 격리 PostgreSQL 15.19
+  // 모집 조직 단위. baseline fresh bootstrap + incremental 1..16 를 격리 PostgreSQL 15.17
   // (docker 일회용 컨테이너) 에서 `npx tsx src/migrate.ts` 로 실제 적용해 산출: 운영 DB fingerprint 채택 아님.
+  // WO-NETURE-PHARMACY-CUTOVER-COMPAT-V1: idx_org_listing_unique_v2 를 이 migration 에서 바꾸지 않도록(전체 UNIQUE 유지 —
+  // 구버전 API ON CONFLICT 호환) 고친 뒤 재산출. 종전 값 5ee52f58…(부분 UNIQUE) 은 운영에 적용된 적 없다.
   {
     appliedThrough: 'CreateNeturePharmacyCommerce1791200000000',
-    fingerprint: '5ee52f589bcd49994d3457ab9a96374c3a17d1e9ed02b28a2cff4eae227a195f',
+    fingerprint: 'c8325ff52a7f74a3e76f06fb098c5aa08b5c1e800836fd8e3dccfa570820057b',
     fingerprintLineCount: 6155,
   },
 ] as const;
