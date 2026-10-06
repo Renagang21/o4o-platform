@@ -113,7 +113,9 @@ PR #308 은 draft · merge 보류. 아래는 main 통합 결정과 운영 전환
 |---|---|
 | 트리거 | push to main → `ci-pipeline.yml` → 완료 시 `delivery.yml`(workflow_run, `DELIVERY_ENFORCE=true`) → `deploy-orchestrate.mjs` 분류. 옛 `deploy-auto.yml` 은 비활성, `deploy-api.yml` · `deploy-web-services.yml` 은 push 트리거 없음 |
 | 위험 분류(`deploy-risk.mjs` 로컬 실행) | **api = LEVEL_3** — db-migration · payment · rbac · access-control 경로 포함. neture · kpa-society · pharmacy-hub · store = LEVEL_2 |
-| 결과 | api 는 `AUTO_DEPLOY_BLOCKED`(LEVEL_3 HOLD) → **merge 만으로 API 배포 · migration 은 실행되지 않는다**. API 미배포 시 같은 WO 키를 가진 프런트도 `HELD_API_NOT_DEPLOYED` 로 보류되는 것으로 판단(추론 — merge 후 delivery 결과로 확인) |
+| 결과 | api 는 `AUTO_DEPLOY_BLOCKED`(LEVEL_3 HOLD) → **merge 만으로 API 배포 · migration 은 실행되지 않는다**. **프런트 4개도 보류(확정)** — 아래 행 |
+| 프런트 보류 근거(코드 · 테스트로 확정) | `deploy-orchestrate.mjs` `applyApiDependency`: API 가 배포 대상인데 미배포면 `deps[k].dependent === false` 가 증명된 프런트만 진행, 나머지는 `HELD_API_NOT_DEPLOYED`. `computeApiDependency` 의 독립 증명 조건 = serving→target first-parent commit 집합에서 API 변경 commit(A) 과 프런트 변경 commit(B) 이 **서로소** · 모든 commit 에 WO 키 · A·B 키 비중복 — 하나라도 못 맞추면(키 없음 · git 실패 · serving 미상 포함) 의존(fail-closed). 이 PR 의 merge commit 1개가 API 와 프런트 4개를 함께 바꾸므로 A∩B≠∅ → 4개 모두 의존 → 보류. rebase merge 로 나뉘어도 같은 WO 키라 조건 미충족. dispatch 경로(`deploy-auto`)는 종전 규칙(API 미배포 → 프런트 전부 보류) 그대로. 테스트 `deploy-orchestrate.test.mjs` U2 "API 와 같은 commit 에서 바뀐 web → 의존" 포함 57/57 PASS(로컬, 2026-10-06). **API 보류 중 프런트만 먼저 배포되는 경로 없음** |
+| 부수 영향 | API promote 전까지는 이후 다른 PR 의 프런트 전용 변경도 해당 프런트 serving→target 구간에 이 merge commit 이 포함돼 같이 보류된다 — promote 를 오래 미루면 다른 트랙 프런트 배포가 묶인다 |
 | 배포 경로 | 수동 `promote.yml`(대상 sha = main HEAD) — 사용자 승인 필요 |
 | 배포 HOLD 상태 | `DEPLOY_FREEZE=false`(2026-10-03 설정). 이 PR 을 막는 것은 LEVEL_3 분류뿐. 다른 트랙의 HOLD 는 해제 · 변경하지 않는다 |
 
@@ -130,7 +132,31 @@ PR #308 은 draft · merge 보류. 아래는 main 통합 결정과 운영 전환
 |---|---|
 | 기본(미설정) | `NETURE_PHARMACY_PAYMENT_MODE` 미설정 + `NODE_ENV=production` → `disabled` · 결제 시작 503 `PAYMENT_NOT_CONFIGURED`(fail-closed) |
 | live | 항상 503 `PAYMENT_PROVIDER_NOT_SELECTED` — **live 결제 차단**(PG 미선정 D1) |
-| test | 값 `test` 일 때만 테스트 결제. 현재 `deploy-api.yml` 이 이 변수를 주입 · 보존하지 않아 콘솔 수동 설정은 다음 API 배포에 지워진다 → 운영 test 결제를 쓰려면 workflow 변경(인프라 · 사용자 승인) 또는 smoke 직전 설정 후 재배포 전 확인. 설정 여부 자체가 사용자 결정 |
+| test | 값 `test` 일 때만 테스트 결제(내부 테스트 결제 — PG 키 불필요). 현재 `deploy-api.yml` 은 이 변수를 주입 · 보존하지 않고 `gcloud run deploy --set-env-vars` 는 전체 교체라 **콘솔 수동 설정은 다음 API 배포에 지워진다** → 콘솔 설정은 쓰지 않는다 |
+| 운영 test 결제 방침 | workflow 에서 명시 관리. 저장소 variable `NETURE_PHARMACY_PAYMENT_MODE` 만 출처로 쓰고 Cloud Run 현재 값 carry 는 하지 않는다(콘솔 값이 남지 않게). 허용값 `test` · 미설정만 — 미설정이면 주입하지 않아 코드 기본 `disabled`(503) 유지, 그 밖의 값(`live` 포함)은 배포 step 실패. 코드의 live 503 도 그대로 |
+| 상태 | **변경안만 준비 — 미적용**. workflow 변경 · variable 설정 · 배포 모두 사용자 승인 후. 적용 순서: ① 아래 diff 를 별도 PR(인프라)로 main 반영 ② variable `NETURE_PHARMACY_PAYMENT_MODE=test` 설정 ③ API promote. ①② 없이 promote 하면 `disabled`(503)로 안전하게 배포된다 |
+
+`deploy-api.yml` 변경안 (Deploy to Cloud Run step — `optional-env` 목록 바로 뒤):
+
+```diff
+     - name: Deploy to Cloud Run
+       if: inputs.migrate_only != 'true'
++      env:
++        NETURE_PHARMACY_PAYMENT_MODE: ${{ vars.NETURE_PHARMACY_PAYMENT_MODE }}
+       run: |
+         ...
+         if [ -s "$RUNNER_TEMP/optional-env" ]; then mapfile -d '' OPTIONAL_ENV < "$RUNNER_TEMP/optional-env"; fi
++
++        # Neture 약국 결제 모드 — 저장소 variable 로만 관리(carry 없음). 'test' 또는 미설정만 허용.
++        #   미설정 → 주입 안 함 → 코드 기본 disabled(503) · 'live' 등 그 밖의 값 → 배포 중단(코드도 live=503).
++        PAYMENT_ENV=()
++        case "${NETURE_PHARMACY_PAYMENT_MODE}" in
++          "") ;;
++          test) PAYMENT_ENV=(--set-env-vars=NETURE_PHARMACY_PAYMENT_MODE=test) ;;
++          *) echo "::error::NETURE_PHARMACY_PAYMENT_MODE 는 'test' 또는 미설정만 허용"; exit 1 ;;
++        esac
+         ...
+           "${OPTIONAL_ENV[@]}" +          "${PAYMENT_ENV[@]}" ```
 
 ### 9-5. 운영 smoke (배포 후, 실브라우저)
 

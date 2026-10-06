@@ -34,7 +34,7 @@
 
 1. PR #308 통합 결정 — 체크리스트 [CHECK §9](docs/checks/CHECK-NETURE-PHARMACY-STORE-COMMERCE-LOCAL-BROWSER-V1.md). merge 만으로는 API LEVEL_3 HOLD 라 배포 · migration 미실행, 배포는 수동 promote(사용자 승인). merge 는 사용자 "main 통합 진행" 후, 직전에 브랜치 갱신 · CI 재확인.
 2. 결정 대기 없음(2026-10-06 결정 반영). 테스트 데이터 초기화(DESIGN §12, QR 4행 포함) 운영 write 는 사용자 승인 후 dry-run 과 함께.
-3. merge 후: migration 적용 확인 → 배포 → `NETURE_PHARMACY_PAYMENT_MODE=test` 설정 승인 → 운영 smoke(콘텐츠 자료함 · 새 호스트 QR 포함) → `pharmacy` 담당 운영자 지정 → 새 호스트 안내 문구 편집(§16-6) → PH 인프라 삭제 인계(§16-7 301 전 조건 포함). PH 은퇴 시 `pharmacy-hub` 키 단순 제거 금지(§16-5).
+3. merge 후(API LEVEL_3 HOLD · 프런트 4개도 보류 확정 — CHECK §9-2): 결제 모드 workflow 변경안(CHECK §9-4, 미적용) 승인 · 반영 · variable 설정 → `promote.yml` 로 API(migration 포함) → 프런트 배포 → 운영 smoke(콘텐츠 자료함 · 새 호스트 QR 포함) → `pharmacy` 담당 운영자 지정 → 새 호스트 안내 문구 편집(§16-6) → PH 인프라 삭제 인계(§16-7 301 전 조건 포함). PH 은퇴 시 `pharmacy-hub` 키 단순 제거 금지(§16-5).
 
 ## 로컬 검증 재현
 
