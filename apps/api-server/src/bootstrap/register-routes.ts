@@ -1133,18 +1133,17 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
     // 원래 이 블록의 debug router 8개는 인증·환경 게이트가 없어 프로덕션에서
     // 인증 없이 승인(isPlatformAdmin 하드코딩)·RBAC 변경·매장 비활성화·
     // 게시글 하드 삭제·개인정보 조회가 가능했다(9bf1ed23f 긴급 차단).
-    // 생명주기 판정 완료 — 32f97773f 로 6개, 이후 pharmacy 제거로 남은 것은 user 1개뿐이다.
-    // 신규 debug router 는 반드시 이 게이트 안에 넣고 읽기 전용으로 만든다.
+    // 생명주기 판정 완료 — 32f97773f 로 6개, 이후 pharmacy · user 제거로 남은 것은 0개다.
+    // 신규 debug router 는 반드시 이 게이트 안에 넣고 읽기 전용 + requireAuth + role guard 로
+    // 만든다(비프로덕션 게이트는 접근 제어가 아니다 — CLAUDE.md §8-2).
     // 정본: docs/platform/debug/DEBUG-SSR-TEST-PAGE-GUIDE-V1.md
     if (process.env.NODE_ENV !== 'production') {
-    // User Debug Info endpoint (WO-O4O-DEBUG-USER-JSON-PAGE-V1) — 읽기 전용
-    try {
-      const { createUserDebugRouter } = await import('../routes/debug/user-debug.controller.js');
-      app.use('/__debug__/user', createUserDebugRouter(dataSource));
-      logger.info('✅ User Debug endpoint registered at /__debug__/user');
-    } catch (userDebugError) {
-      logger.error('Failed to register User Debug routes:', userDebugError);
-    }
+    // (제거됨) /__debug__/user — WO-O4O-DEBUG-USER-UNGUARDED-ROUTE-CLOSURE-V1
+    // 비프로덕션 전용이었으나 인증 · role guard 없이 email 로 `SELECT * FROM users` 등
+    // 사용자 · 멤버십 · role · 약사 정보를 렌더링했다(로컬 API 가 운영 DB 에 붙으면 무인증
+    // 개인정보 노출). 소비처 0 이고 이미 제거된 상태 변경 GET(sync-role · activate)과
+    // 없는 debug route 로 링크하고 있었다. 사용자 진단은 SETUP.md 의 read-only DB 채널로
+    // SELECT 한다(CLAUDE.md §8-1 CLI 우선). 재도입이 필요하면 가드를 갖춘 정식 기능으로 설계한다.
 
     // (제거됨) /__debug__/pharmacy — WO-O4O-PHARMACY-DEBUG-ROUTE-FINAL-LIFECYCLE-CLEANUP-V1
     // POST /deactivate 가 사유·감사·재활성화 없이 organizations.isActive 와 서비스
