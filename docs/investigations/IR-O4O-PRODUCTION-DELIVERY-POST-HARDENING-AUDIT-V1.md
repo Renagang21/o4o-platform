@@ -97,7 +97,7 @@ Delivery 21건 중 배포를 실제로 한 것은 1건이다. 같은 main SHA �
 
 - 모든 배포가 `rollout_mode=verified` 로 돌았다. 새 revision 을 0% 로 만들고 Ready 확인 뒤 전환했으며, 전환 방식(pin / `--to-latest`)도 이전 그대로 보존됐다.
 - API 4건은 전환 뒤 `https://api.neture.co.kr/health/ready` HTTP 200 을 받았다.
-- Cloud Audit Log 에서 `github-actions` SA 의 `Services.ReplaceService` 는 **63건**이다. 21 배포 × 3 과 정확히 맞는다(배포당 쓰기 호출 수가 일정하다). 사람 계정의 Cloud Run 쓰기는 퇴역 서비스 삭제 2건(`glucoseview-web` · `signage-player-web`, 별도 WO 기록)뿐이다. 배포 경로 밖의 쓰기는 0이다.
+- Cloud Audit Log 에서 `github-actions` SA 의 `Services.ReplaceService` 는 **63건**이다. 21 배포 × 3 과 정확히 맞는다(배포당 쓰기 호출 수가 일정하다). 배포 경로 밖의 Cloud Run 쓰기는 **2건**이다. 둘 다 사람 계정이 퇴역 서비스를 삭제한 것이다(`glucoseview-web` · `signage-player-web`, 별도 WO 기록). 승인된 퇴역 작업인 이 2건을 빼면 예상 밖 쓰기는 0이다.
 - `hospital-pharmacy` 는 `rollout_pending`(첫 verified rollout)이 이월돼 있었는데, 37260859488 에서 함께 배포되며 해소됐다. 이후 판정은 LEVEL_1 이다.
 
 ### 2-3. migration 경로
