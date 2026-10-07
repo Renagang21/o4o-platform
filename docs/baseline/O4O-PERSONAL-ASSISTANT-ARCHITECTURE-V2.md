@@ -600,7 +600,7 @@ V1 에서 **승계하지 않는 것**: Local-first 저장 원칙(ARCH §5 의 Lo
 
 | 계층 | 판정 | 근거 |
 |---|---|---|
-| L1 Personal Assistant | PARTIAL — 논리 계층(Assistant = f(userId)) · Assistant Planning(결정론 ExecutionIntent) · 완료 판정. **2026-10-07**: 실행 전 업무 이해(기존 provider · 실패 시 결정적 기본 이해) · 완료 판정기(조건 ↔ 근거, 의미 검증 선택) · 질문 중 사용자 완료 선언. 이해는 프로세스 메모리에만(재개용 · 로그 · DB 없음 — §17). 다른 인스턴스에서 재개돼 이해가 없으면 조건을 지어내지 않고 사용자 확인 조건 하나로 판정한다(종전 결과 근거로 조용히 닫지 않는다). 확정 경계가 있으면 사용자 확인 조건이 항상 붙는다 | Phase A · B CHECK · Task 이해 · 완료 판정 PR |
+| L1 Personal Assistant | PARTIAL — 논리 계층(Assistant = f(userId)) · Assistant Planning(결정론 ExecutionIntent) · 완료 판정. **2026-10-07**: 실행 전 업무 이해(기존 provider · 실패 시 결정적 기본 이해) · 완료 판정기(조건 ↔ 근거, 의미 검증 선택) · 질문 중 사용자 완료 선언. 이해는 프로세스 메모리(재개용 캐시)와, run 이 질문으로 멈춘 동안에만 재개 구조(M5) 행에 함께 둔다 — 다른 인스턴스에서 재개돼도 원래 목표 · 완료조건 · 확정 경계로 판정한다(MEMORY-PLACEMENT M10 좁은 예외 · run 종결 시 삭제 · 로그 없음 — §17). 저장된 이해마저 없으면(이전 저장분 · 만료) 조건을 지어내지 않고 사용자 확인 조건 하나로 판정한다(종전 결과 근거로 조용히 닫지 않는다). 확정 경계는 AI 출력에 맡기지 않는다 — 요청 글의 확정 의도(저장 · 제출 · 등록 · 결제 등을 하라는 말)가 경계를 켜고, 경계가 있으면 사용자 확인 조건이 결정적으로 붙는다(sanitize · 판정기 · 저장 복원 모두 같은 불변식) | Phase A · B CHECK · Task 이해 · 완료 판정 PR |
 | L2 Task | EXISTS — `assistant_tasks` 1급 객체 · Task 1:N run · 완료 계약으로 상태 판정(planner `done` 은 주장). 이해가 있는 Task 는 `criteria_evidence` 계약 — Assistant 판정이 Task 상태를 정한다. 직접 `/work-agent/run` 은 종전 판정 | Phase A · B CHECK · Task 이해 · 완료 판정 PR |
 | L3 Skill / Discovery | PARTIAL (Candidate · adapter seed · Strong-first routing) | GAP-CENSUS §J · §M |
 | L4 Execution | EXISTS | GAP-CENSUS §F |

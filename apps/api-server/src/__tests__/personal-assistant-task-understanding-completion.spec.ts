@@ -84,25 +84,26 @@ jest.mock('../utils/ai-provider-runtime.js', () => {
 jest.mock('@o4o/ai-core', () => ({ __esModule: true, execute: (...a: unknown[]) => executeMock(...a) }));
 
 import logger from '../utils/logger.js';
-import { LOCAL_AGENT_ACTIONS, parseLocalAction } from '../services/local-agent/local-agent-protocol.js';
-import { submitCommandResult } from '../services/local-agent/local-agent-service.js';
-import { runWorkAgent, buildPlannerUserPrompt, describeExecutionIntent, type PlannerInput, type WorkPlanner } from '../services/ai-tools/work-agent-runtime.js';
+import { buildPlannerUserPrompt, describeExecutionIntent } from '../services/ai-tools/work-agent-runtime.js';
 import { validateWorkProposal, WORK_GOAL_MAX_LENGTH, type CompletionJudge, type ExecutionIntent, type ExecutionReport, type TaskUnderstanding } from '../services/ai-tools/work-agent-contract.js';
-import type { VerifiedToolContext } from '../services/ai-tools/ai-tool-contract.js';
 import { judgeTaskStatus, planAssistantTask } from '../services/assistant/assistant-planning.js';
 import {
   __resetUnderstandingCacheForTest,
   cachedUnderstanding,
   createCompletionJudge,
   createLlmTaskUnderstander,
+  enforceCommitBoundary,
   fallbackUnderstanding,
   isCompletionDeclaration,
   newJudgeCounters,
+  requestHasCommitIntent,
+  restoreUnderstanding,
   resumeFallbackUnderstanding,
   sanitizeUnderstanding,
 } from '../services/assistant/assistant-understanding.js';
+import { readRunResume, saveRunFrame } from '../services/assistant/procedural-memory-store.js';
 import { runAssistantWorkTask, type WorkExecutionReply } from '../services/assistant/personal-assistant.js';
-import { makeDb, connected, pairAndRegister, type LocalAgentDb } from './helpers/local-agent-db-stub.js';
+import { HEALTHKR, HEALTHKR_SEARCH, domOk, runOnHealthkr, scriptedPlanner } from './helpers/healthkr-dom-harness.js';
 
 jest.setTimeout(180_000);
 
@@ -169,6 +170,36 @@ describe('① 업무 이해(실행 전)', () => {
     // 판정 — observed 근거가 다 있어도 확정 경계 업무는 complete 가 아니라 사용자 확인.
     return createCompletionJudge(one!)({ evidence: [{ criterionId: 'c1', source: 'screen', quote: 'x', grounded: true }] } as any)
       .then((v) => expect(v).toMatchObject({ decision: 'ask', askKind: 'success_confirmation', unmet: ['c2'] }));
+  });
+
+  it('확정 의도는 요청 글에서 결정적으로 — AI 가 commitBoundary=false · user 조건 누락이어도 강제 · 끄는 방향은 없다', async () => {
+    for (const r of ['네뚜레에 신제품 등록해줘', '이 내용으로 저장해 주세요', '신청서 제출까지 해줘', '결제 진행해줘', '거래처에 메일 보내줘', '주문해줘'])
+      expect([r, requestHasCommitIntent(r)]).toEqual([r, true]);
+    for (const r of ['등록된 제품 목록 찾아줘', '주문 내역 보여줘', '약학정보원에서 아모디핀 찾아줘', '저장 위치가 어디야'])
+      expect([r, requestHasCommitIntent(r)]).toEqual([r, false]);
+
+    // AI 가 확정 경계를 놓쳤다(false · observed 만).
+    const missed = U([{ id: 'c1', text: '입력 값이 폼에 보인다', evidence: 'observed' }], { outcome: 'change', commitBoundary: false });
+    const forced = enforceCommitBoundary(missed, '네뚜레에 신제품 등록해줘');
+    expect(forced.commitBoundary).toBe(true);
+    expect(forced.criteria.map((c) => c.evidence)).toEqual(['observed', 'user']);
+    // 확정 의도가 없는 요청은 건드리지 않고, AI 가 true 로 낸 경계를 끄지도 않는다.
+    expect(enforceCommitBoundary(missed, '아모디핀 찾아줘')).toBe(missed);
+    expect(enforceCommitBoundary(U([C1, C2_USER], { commitBoundary: true }), '아모디핀 찾아줘').commitBoundary).toBe(true);
+
+    // 판정기 자체도 불변식을 건다 — user 조건 없는 commitBoundary 이해가 들어와도 complete 가 아니다.
+    const raw = U([C1], { commitBoundary: true });
+    await expect(createCompletionJudge(raw)({ evidence: [{ criterionId: 'c1', source: 'screen', quote: 'x', grounded: true }] } as any))
+      .resolves.toMatchObject({ decision: 'ask', askKind: 'success_confirmation' });
+
+    // Assistant 경로 — AI 이해가 경계를 놓쳐도 실행에 넘어가는 이해 · 판정기는 확정 업무로 동작한다.
+    const exec = jest.fn(async (): Promise<WorkExecutionReply> => ({ status: 403, body: { success: false } }));
+    await runAssistantWorkTask(ds, { userId: ME, workBody: { request: '네뚜레에 신제품 등록해줘' } }, exec, { understand: async () => missed });
+    const [, , intent, judge] = exec.mock.calls[0] as unknown as [string, unknown, ExecutionIntent, CompletionJudge];
+    expect(intent.understanding).toMatchObject({ commitBoundary: true });
+    expect(intent.understanding!.criteria.some((c) => c.evidence === 'user')).toBe(true);
+    await expect(judge({ evidence: [{ criterionId: 'c1', source: 'screen', quote: 'x', grounded: true }] } as any))
+      .resolves.toMatchObject({ decision: 'ask' });
   });
 
   it('AI 이해 — 실행이 받는 요청 전체(작업 목표 상한)를 넘긴다 · 뒤쪽 지시가 잘리지 않는다', async () => {
@@ -270,81 +301,15 @@ describe('사용자 완료 선언 판별', () => {
 
 // ── ③ runtime ──────────────────────────────────────────────────────────────
 
-const A = LOCAL_AGENT_ACTIONS;
-const SITE = 'healthkr';
-const SNAP = 's_abcd1234';
-const REQUEST = '약학정보원에서 아모디핀 찾아줘';
-const ctx = (): VerifiedToolContext => ({ userId: 'user-1', workspace: 'home', localAgentStatus: 'connected', localDeviceId: 'dev-1' });
-type Outcome = { status: 'success' | 'failed' | 'denied'; errorCode?: string; data?: unknown };
-const OK = (data: Record<string, unknown>): Outcome => ({ status: 'success', data: { siteId: SITE, ...data } });
-const CTX = (path: string, docId: string): Outcome => OK({ active: true, ready: true, path, docId });
-const EL = (elementRef: string, role: string, name: string) => ({ elementRef, role, name });
-const HOME = [EL('e_1', 'heading', '약학정보원'), EL('e_2', 'searchbox', '약물명'), EL('e_3', 'button', '검 색')];
-const RESULTS = [...HOME, EL('e_9', 'link', '아모디핀정 5mg')];
-const INSPECT = (els: ReturnType<typeof EL>[]) => OK({ snapshotId: SNAP, elements: els, elementCount: els.length });
+const SITE = HEALTHKR.site;
+const REQUEST = HEALTHKR.request;
+const OK = domOk;
+const SEARCH = HEALTHKR_SEARCH;
+const run = runOnHealthkr;
+const scripted = scriptedPlanner;
 const CLICK = { assessment: 'progress', action: { kind: 'click', elementRef: 'e_3' } };
 const DONE = { assessment: 'completed', action: { kind: 'done' } };
 const DONE_EV = (quote: string, criterion = 'c1') => ({ assessment: 'completed', action: { kind: 'done' }, evidence: [{ criterion, source: 'screen', quote }] });
-
-async function drive(db: LocalAgentDb, script: Record<string, Outcome[]>, max = 80) {
-  const cursors: Record<string, number> = {};
-  let k = 0;
-  while (k < max) {
-    for (let i = 0; i < 400 && db.commands.length <= k; i += 1) await new Promise((r) => setTimeout(r, 5));
-    const cmd = db.commands[k];
-    if (!cmd) break;
-    k += 1;
-    const base = parseLocalAction(String(cmd.action)).base.replace('local.browser.dom.', '');
-    const args = cmd.result_data ? JSON.parse(String(cmd.result_data)) : {};
-    const reply = (data: unknown) => submitCommandResult(db.dataSource, cmd.device_id, { commandId: cmd.command_id, status: 'success', data } as any);
-    if (base === 'local.target.prepare') {
-      await reply({ targetId: SITE, targetType: 'browser_site', state: 'ready', reusedExisting: true, openedByO4O: false, tabCount: 1, path: '/' });
-      continue;
-    }
-    if (base === A.DATA_WORK_RUN_EXPERIENCE_RECALL) { await reply(args.taskKey === null ? { taskKeys: [] } : { patterns: [] }); continue; }
-    if (base === A.DATA_WORK_RUN_CONTEXT_RECALL) { await reply({ found: false }); continue; }
-    if (base === A.DATA_WORK_RUN_CANDIDATE_MATCH) { await reply({ matched: false }); continue; }
-    if (base.startsWith('local.data.work_run_')) { await reply({ runId: 'r_test', runStatus: 'active', saved: true }); continue; }
-    const queue = script[base] ?? [{ status: 'failed', errorCode: 'DOM_ELEMENT_NOT_FOUND' }];
-    const idx = Math.min(cursors[base] ?? 0, queue.length - 1);
-    cursors[base] = (cursors[base] ?? 0) + 1;
-    const o = queue[idx];
-    await submitCommandResult(db.dataSource, cmd.device_id, { commandId: cmd.command_id, status: o.status, errorCode: o.errorCode, data: o.data } as any);
-  }
-}
-
-function scripted(proposals: unknown[]): WorkPlanner & { calls: PlannerInput[] } {
-  const calls: PlannerInput[] = [];
-  let i = 0;
-  return {
-    kind: 'scripted',
-    calls,
-    async plan(input) {
-      calls.push(input);
-      const p = proposals[Math.min(i, proposals.length - 1)];
-      i += 1;
-      return p;
-    },
-  };
-}
-
-async function run(planner: WorkPlanner, script: Record<string, Outcome[]>, intent?: ExecutionIntent, judge?: CompletionJudge) {
-  const db = makeDb();
-  await pairAndRegister(db);
-  await connected(db);
-  const [result] = await Promise.all([
-    runWorkAgent(db.dataSource, ctx(), { request: REQUEST, ...(intent ? { intent } : {}), ...(judge ? { judge } : {}) }, planner),
-    drive(db, script),
-  ]);
-  return result;
-}
-
-const SEARCH = {
-  get_context: [CTX('/', 'd_1'), CTX('/search', 'd_2')],
-  inspect: [INSPECT(HOME), INSPECT(RESULTS)],
-  click: [OK({ elementRef: 'e_3', changed: true, navigated: true, role: 'button', riskLevel: 'REVERSIBLE' })],
-  read_text: [OK({ elementRef: 'e_9', role: 'link', text: '아모디핀정 5mg 성분: 암로디핀베실산염 6.94mg', textLength: 26 })],
-};
 
 describe('③ runtime — done 은 주장일 뿐 · Assistant 가 조건과 근거로 판정', () => {
   it('근거 없는 done → continue(이유가 다음 계획에 실린다) → 실제 읽은 글 인용 → complete', async () => {
@@ -463,7 +428,7 @@ describe('④ Assistant — 이해 → 판정기 위임 → 질문 → 사용자
     expect((exec2.mock.calls[0] as any)[2].understanding).toMatchObject({ criteria: [C1, C2_USER] });
   });
 
-  it('다른 인스턴스 재개(캐시 없음) — 종전 결과 근거로 조용히 닫지 않고 사용자 확인 조건 하나로 판정한다', async () => {
+  it('다른 인스턴스 재개(캐시 · 저장된 이해 모두 없음) — 종전 결과 근거로 조용히 닫지 않고 사용자 확인 조건 하나로 판정한다', async () => {
     const understand = jest.fn(async () => U([C1]));
     const out = await runAssistantWorkTask(ds, { userId: ME, workBody: { request: REQUEST } }, jest.fn(async () => waiting('g_r1')), { understand });
     // 이해를 세운 인스턴스가 사라졌다(재시작 · 다른 인스턴스) — 프로세스 메모리 캐시만 비운다.
@@ -477,6 +442,123 @@ describe('④ Assistant — 이해 → 판정기 위임 → 질문 → 사용자
     // 실행이 "끝났다" 고 해도 complete 가 아니라 사용자 성공 확인.
     await expect(judge({ evidence: [] } as any)).resolves.toMatchObject({ decision: 'ask', askKind: 'success_confirmation' });
     expect(logger.info).toHaveBeenCalledWith('assistant plan', expect.objectContaining({ understandingSource: 'resume_fallback', criteria: 1 }));
+  });
+
+  // ── 다른 인스턴스 재개 — 인스턴스 메모리는 사라져도 질문 대기 run 의 재개 구조(M5)에 함께 남긴 이해로 원래 조건을 잇는다 ──
+
+  /** assistant_run_frames · work_run_coordination(대기 중 run → 소유자)만 흉내 낸다 — 인스턴스를 넘어 남는 것은 이 행뿐이다. */
+  function frameDb(waitingRuns: Record<string, string>) {
+    const frames = new Map<string, any>();
+    const query = jest.fn(async (sql: string, p: any[] = []) => {
+      const s = sql.replace(/\s+/g, ' ').trim();
+      if (s.startsWith('INSERT INTO assistant_run_frames')) {
+        if (waitingRuns[p[0]] !== p[1]) return []; // 남의 run · 없는 run 이면 0 행
+        frames.set(p[0], {
+          user_id: p[1], task_type_key: p[4], stage_key: p[5], ask: p[6] && JSON.parse(p[6]), strategy: p[7] && JSON.parse(p[7]),
+          understanding: p[8] && JSON.parse(p[8]),
+        });
+        return [{ run_id: p[0] }];
+      }
+      if (s.startsWith('SELECT f.task_type_key')) {
+        const f = frames.get(p[0]);
+        return f && f.user_id === p[1] && waitingRuns[p[0]] === p[1] ? [f] : [];
+      }
+      if (s.startsWith('DELETE FROM assistant_run_frames WHERE run_id')) {
+        if (frames.get(p[0])?.user_id === p[1]) frames.delete(p[0]);
+        return [];
+      }
+      return [];
+    });
+    return { ds: { query } as any, frames };
+  }
+  const finished = (runId: string): WorkExecutionReply => ({
+    status: 200,
+    body: { success: true, data: { runId, goal: { status: 'completed', siteId: SITE }, target: { targetId: SITE, targetType: 'browser_site' } } },
+    execution: {
+      taskKey: null,
+      report: {
+        claim: 'execution_complete', runOpened: true, resultObserved: true, replayVerified: false, plannerMode: 'discovery', taskTypeProposal: null,
+        verdict: { decision: 'complete', met: ['c1'], unmet: [] },
+      },
+    },
+  });
+
+  it('다른 인스턴스 재개 — 질문 대기 run 에 남긴 원래 이해(목표 · 완료조건)로 판정한다 · resume_fallback 아님', async () => {
+    const db = frameDb({ g_f1: ME });
+    const understand = jest.fn(async () => U([C1, C2_USER]));
+    const out = await runAssistantWorkTask(db.ds, { userId: ME, workBody: { request: REQUEST } }, jest.fn(async () => waiting('g_f1')), { understand });
+    expect(out.task?.status).toBe('waiting_for_user');
+    // 이해는 질문 대기 run 의 재개 행에 함께 남는다(구조가 없어도 · 대상은 응답의 target).
+    expect(db.frames.get('g_f1')?.understanding).toMatchObject({ version: 1, source: 'ai', criteria: [C1, C2_USER] });
+
+    __resetUnderstandingCacheForTest(); // 이해를 세운 인스턴스가 사라졌다
+    const exec2 = jest.fn(async (): Promise<WorkExecutionReply> => waiting('g_f1'));
+    await runAssistantWorkTask(db.ds, { userId: ME, workBody: { request: '5mg 로', runId: 'g_f1' }, requestedTaskId: out.task!.taskId }, exec2, { understand });
+    expect(understand).toHaveBeenCalledTimes(1);
+    const [, , intent, judge] = exec2.mock.calls[0] as unknown as [string, unknown, ExecutionIntent, CompletionJudge];
+    expect(intent.understanding).toEqual(U([C1, C2_USER]));
+    expect(intent.understanding).not.toEqual(resumeFallbackUnderstanding());
+    expect(intent.completion.requires).toBe('criteria_evidence');
+    // 원래 조건 c1(화면) 근거 없음 → continue(조건 문장이 이유) — 사용자 확인으로 뭉개지 않는다.
+    await expect(judge({ evidence: [] } as any)).resolves.toMatchObject({ decision: 'continue' });
+    expect(logger.info).toHaveBeenCalledWith('assistant plan', expect.objectContaining({ understandingSource: 'frame', criteria: 2 }));
+  });
+
+  it('다른 인스턴스 재개 — 확정 경계 · 사용자 확인 조건이 그대로 이어진다(화면 근거만으로 complete 없음)', async () => {
+    const db = frameDb({ g_f2: ME });
+    // AI 가 확정 경계를 놓쳤어도 요청 글의 확정 의도가 경계를 켠다 — 그 결과가 저장되고 다른 인스턴스에서도 유지된다.
+    const understand = jest.fn(async () => U([C1], { commitBoundary: false }));
+    const out = await runAssistantWorkTask(db.ds, { userId: ME, workBody: { request: '아모디핀 5mg 를 장바구니에 등록해줘' } }, jest.fn(async () => waiting('g_f2')), { understand });
+    __resetUnderstandingCacheForTest();
+    const exec2 = jest.fn(async (): Promise<WorkExecutionReply> => waiting('g_f2'));
+    await runAssistantWorkTask(db.ds, { userId: ME, workBody: { request: '5mg 로', runId: 'g_f2' }, requestedTaskId: out.task!.taskId }, exec2, { understand });
+    const [, , intent, judge] = exec2.mock.calls[0] as unknown as [string, unknown, ExecutionIntent, CompletionJudge];
+    expect(intent.understanding?.commitBoundary).toBe(true);
+    expect(intent.understanding?.criteria.some((c) => c.evidence === 'user')).toBe(true);
+    const G = { criterionId: 'c1', source: 'read' as const, quote: 'q', grounded: true };
+    await expect(judge({ evidence: [G] } as any)).resolves.toMatchObject({ decision: 'ask', askKind: 'success_confirmation' });
+  });
+
+  it('run 이 질문 대기를 벗어나면 재개 행(이해 포함)을 지운다 — 남는 것은 질문 대기 동안뿐', async () => {
+    const db = frameDb({ g_f3: ME });
+    const understand = jest.fn(async () => U([C1]));
+    const out = await runAssistantWorkTask(db.ds, { userId: ME, workBody: { request: REQUEST } }, jest.fn(async () => waiting('g_f3')), { understand });
+    expect(db.frames.has('g_f3')).toBe(true);
+    await runAssistantWorkTask(db.ds, { userId: ME, workBody: { request: '5mg 로', runId: 'g_f3' }, requestedTaskId: out.task!.taskId }, jest.fn(async () => finished('g_f3')), { understand });
+    expect(db.frames.has('g_f3')).toBe(false);
+  });
+
+  it('소유 경계 — 남의 run 에는 이해를 남기지도 읽지도 못한다', async () => {
+    const OTHER = '00000000-0000-4000-8000-0000000000e2';
+    const db = frameDb({ g_f4: ME });
+    expect(await saveRunFrame(db.ds, { runId: 'g_f4', userId: OTHER, taskId: null, targetId: SITE, frame: { taskKey: null, stageKey: null, ask: null, strategy: null }, understanding: U([C1]) })).toBe(false);
+    expect(db.frames.has('g_f4')).toBe(false);
+    expect(await saveRunFrame(db.ds, { runId: 'g_f4', userId: ME, taskId: null, targetId: SITE, frame: { taskKey: null, stageKey: null, ask: null, strategy: null }, understanding: U([C1]) })).toBe(true);
+    expect(await readRunResume(db.ds, { runId: 'g_f4', userId: OTHER })).toBeNull();
+    // 이해만 남긴 행 — 재개 구조는 null 로(빈 구조를 runtime 에 넘기지 않는다).
+    expect(await readRunResume(db.ds, { runId: 'g_f4', userId: ME })).toEqual({ frame: null, understanding: U([C1]) });
+  });
+
+  it('저장된 이해를 믿지 않는다 — 다시 정규화 · 확정 불변식 · 형식 밖이면 null(→ 재개 기본 이해)', () => {
+    // 확정 경계인데 사용자 조건이 빠진 행 → 사용자 조건이 붙는다.
+    const r = restoreUnderstanding({ ...U([C1]), commitBoundary: true });
+    expect(r?.criteria.some((c) => c.evidence === 'user')).toBe(true);
+    expect(restoreUnderstanding({ ...U([C1]), source: 'fallback' })?.source).toBe('fallback');
+    expect(restoreUnderstanding({ ...U([C1]), version: 2 })).toBeNull();
+    expect(restoreUnderstanding({ version: 1, goal: 'x' })).toBeNull();
+    expect(restoreUnderstanding('{"version":1}')).toBeNull();
+    expect(restoreUnderstanding(null)).toBeNull();
+  });
+
+  it('저장된 이해가 형식 밖이면 — 조용히 결과 근거로 닫지 않고 재개 기본 이해(사용자 확인)', async () => {
+    const db = frameDb({ g_f5: ME });
+    const out = await runAssistantWorkTask(db.ds, { userId: ME, workBody: { request: REQUEST } }, jest.fn(async () => waiting('g_f5')), { understand: async () => U([C1]) });
+    db.frames.get('g_f5').understanding = { version: 1, goal: '', criteria: 'tampered' };
+    __resetUnderstandingCacheForTest();
+    const exec2 = jest.fn(async (): Promise<WorkExecutionReply> => waiting('g_f5'));
+    await runAssistantWorkTask(db.ds, { userId: ME, workBody: { request: '5mg 로', runId: 'g_f5' }, requestedTaskId: out.task!.taskId }, exec2);
+    expect((exec2.mock.calls[0] as any)[2].understanding).toEqual(resumeFallbackUnderstanding());
+    expect(logger.info).toHaveBeenCalledWith('assistant plan', expect.objectContaining({ understandingSource: 'resume_fallback' }));
   });
 
   it('이해 호출 실패 → 결정적 기본 이해로 진행(업무를 막지 않는다)', async () => {

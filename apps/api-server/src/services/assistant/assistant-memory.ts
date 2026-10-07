@@ -29,18 +29,19 @@
 import type { DataSource } from 'typeorm';
 import logger from '../../utils/logger.js';
 import { TASK_KEY_RE, type CloudRecalledPattern, type RunResumeFrame } from '../ai-tools/work-assistance.js';
-import type { ExecutionMemoryReport } from '../ai-tools/work-agent-contract.js';
+import type { ExecutionMemoryReport, TaskUnderstanding } from '../ai-tools/work-agent-contract.js';
 import { isRegisteredBrowserSite } from '../local-agent/browser-site-registry.js';
 import { decideCloudPlacement, isCloudProceduralTarget, type MemoryKind } from './memory-ownership.js';
 import type { AssistantTaskStatus, TaskOwnership } from './assistant-task-store.js';
 import {
   deleteRunFrame,
   memoryOwnerOf,
-  readRunFrame,
+  readRunResume,
   readVerifiedPatterns,
   recordFailedAlternative,
   saveRunFrame,
   upsertVerifiedPatterns,
+  type StoredRunResume,
 } from './procedural-memory-store.js';
 
 const TARGET_ID_RE = /^[a-z0-9][a-z0-9._-]{0,63}$/;
@@ -73,11 +74,13 @@ export interface AssistantMemory {
   patterns: CloudRecalledPattern[];
   /** 재개하는 run 의 원래 업무 구조(다른 노드에서 이어가기용). */
   resumeFrame: RunResumeFrame | null;
+  /** 재개하는 run 의 원래 업무 이해(목표 · 완료조건 · 확정 경계) — 다른 API 인스턴스에서 이어가도 원래 조건으로 판정한다. */
+  understanding: TaskUnderstanding | null;
   sources: MemorySourceReport[];
 }
 
 export const EMPTY_ASSISTANT_MEMORY: AssistantMemory = Object.freeze({
-  knownTaskTypes: [], patterns: [], resumeFrame: null, sources: [],
+  knownTaskTypes: [], patterns: [], resumeFrame: null, understanding: null, sources: [],
 }) as AssistantMemory;
 
 async function readTaskTypeHistory(dataSource: DataSource, q: AssistantMemoryQuery): Promise<string[]> {
@@ -148,16 +151,21 @@ export async function recallAssistantMemory(dataSource: DataSource, q: Assistant
 
   // ── 재개 구조(M5) — 재개할 때만 · 본인 run 만 ──
   let resumeFrame: RunResumeFrame | null = null;
+  let understanding: TaskUnderstanding | null = null;
   if (decideCloudPlacement('run_resume_frame').ok) {
     if (!q.runId) sources.push({ kind: 'run_resume_frame', placement: 'cloud', readByAssistant: false, note: 'NOT_RESUMING' });
-    else resumeFrame = await readSource('run_resume_frame', null as RunResumeFrame | null,
-      () => readRunFrame(dataSource, { runId: q.runId as string, userId: q.userId }), sources);
+    else {
+      const stored = await readSource('run_resume_frame', null as StoredRunResume | null,
+        () => readRunResume(dataSource, { runId: q.runId as string, userId: q.userId }), sources);
+      resumeFrame = stored?.frame ?? null;
+      understanding = stored?.understanding ?? null;
+    }
   }
 
   // 원 기록(구조화 도움 · 교정 · 실행 단계)은 노드에 남는다 — Execution 이 그 노드에서 읽는다.
   sources.push({ kind: 'assistant_experience', placement: 'node', readByAssistant: false, note: 'NODE_RESIDENT' });
 
-  return { knownTaskTypes, patterns, resumeFrame, sources };
+  return { knownTaskTypes, patterns, resumeFrame, understanding, sources };
 }
 
 export interface RememberInput {
@@ -168,6 +176,10 @@ export interface RememberInput {
   /** Assistant 가 판정한 Task 상태 — 재개 구조의 수명을 정한다. */
   taskStatus: AssistantTaskStatus;
   memory: ExecutionMemoryReport | undefined;
+  /** 이번 Task 의 업무 이해 — 질문 대기면 재개 구조와 함께 남긴다(다른 인스턴스 재개용 · 정책 M5 의 M10 예외). */
+  understanding?: TaskUnderstanding | null;
+  /** 실행이 재개 대상을 보고하지 않았을 때 쓸 대상(응답의 target). */
+  fallbackTargetId?: string | null;
 }
 
 export interface RememberOutcome {
@@ -205,9 +217,14 @@ export async function rememberExecution(dataSource: DataSource, input: RememberI
 
   if (input.runId && decideCloudPlacement('run_resume_frame').ok) {
     try {
-      if (input.taskStatus === 'waiting_for_user' && m?.resumeFrame && m.targetId) {
+      // 질문 대기면 재개 구조 · 업무 이해를 남긴다. 구조가 없어도(예: 성공 확인 질문) 이해가 있으면 남긴다 —
+      // 재개가 다른 인스턴스에 닿아도 원래 완료조건으로 판정하게.
+      const frameTarget = m?.targetId ?? input.fallbackTargetId ?? null;
+      if (input.taskStatus === 'waiting_for_user' && frameTarget && (m?.resumeFrame || input.understanding)) {
         const saved = await saveRunFrame(dataSource, {
-          runId: input.runId, userId: input.userId, taskId: input.taskId, targetId: m.targetId, frame: m.resumeFrame,
+          runId: input.runId, userId: input.userId, taskId: input.taskId, targetId: frameTarget,
+          frame: m?.resumeFrame ?? { taskKey: null, stageKey: null, ask: null, strategy: null },
+          understanding: input.understanding ?? null,
         });
         out.frame = saved ? 'saved' : 'none';
       } else {

@@ -28,6 +28,8 @@ import {
   type RunResumeFrame,
   type Strategy,
 } from '../ai-tools/work-assistance.js';
+import type { TaskUnderstanding } from '../ai-tools/work-agent-contract.js';
+import { restoreUnderstanding } from './assistant-understanding.js';
 import type { TaskOwnership } from './assistant-task-store.js';
 
 /** 정책 D2 — 마지막 사용 · 검증 후 이 기간 쓰이지 않으면 근거로 쓰지 않는다. */
@@ -183,30 +185,39 @@ function normalizeFrame(f: RunResumeFrame): RunResumeFrame {
   };
 }
 
+/** 재개 구조가 비었는가(task · stage · 질문 · 방법 모두 없음) — 이해만 남긴 행이다. */
+function isEmptyFrame(f: RunResumeFrame): boolean {
+  return !f.taskKey && !f.stageKey && !f.ask && !f.strategy;
+}
+
 /**
  * 질문으로 멈춘 run 의 재개 구조를 남긴다. 요청자의 run(work_run_coordination.user_id)에만 붙는다 — 남의 run 이면 0 행.
  * 같은 사용자의 대기 중이 아닌 다른 run 의 재개 구조는 함께 지운다(종결 · 만료된 run 의 흔적이 남지 않게).
+ * understanding — 그 run 의 업무 이해(목표 · 완료조건 · 확정 경계). 정책 M5 의 M10 예외: 질문 대기 동안만 · 행과 같은 수명.
+ *   저장 직전에 다시 정규화한다(호출자를 믿지 않는다).
  */
 export async function saveRunFrame(
   dataSource: DataSource,
-  input: { runId: string; userId: string; taskId: string | null; targetId: string; frame: RunResumeFrame },
+  input: { runId: string; userId: string; taskId: string | null; targetId: string; frame: RunResumeFrame; understanding?: TaskUnderstanding | null },
 ): Promise<boolean> {
   if (!RUN_ID_RE.test(input.runId) || !UUID_RE.test(input.userId) || !TARGET_ID_RE.test(input.targetId)) return false;
   const f = normalizeFrame(input.frame);
+  const understanding = input.understanding ? restoreUnderstanding(input.understanding) : null;
   const taskId = input.taskId && UUID_RE.test(input.taskId) ? input.taskId : null;
   const rows = rowsOf(
     await dataSource.query(
-      `INSERT INTO assistant_run_frames (run_id, user_id, task_id, target_id, task_type_key, stage_key, ask, strategy)
-       SELECT c.run_id, c.user_id, $3, $4, $5, $6, $7::jsonb, $8::jsonb
+      `INSERT INTO assistant_run_frames (run_id, user_id, task_id, target_id, task_type_key, stage_key, ask, strategy, understanding)
+       SELECT c.run_id, c.user_id, $3, $4, $5, $6, $7::jsonb, $8::jsonb, $9::jsonb
          FROM work_run_coordination c
         WHERE c.run_id = $1 AND c.user_id = $2
        ON CONFLICT (run_id) DO UPDATE SET task_id = EXCLUDED.task_id, target_id = EXCLUDED.target_id,
          task_type_key = EXCLUDED.task_type_key, stage_key = EXCLUDED.stage_key, ask = EXCLUDED.ask,
-         strategy = EXCLUDED.strategy, updated_at = now()
+         strategy = EXCLUDED.strategy, understanding = EXCLUDED.understanding, updated_at = now()
          WHERE assistant_run_frames.user_id = EXCLUDED.user_id
        RETURNING run_id`,
       [input.runId, input.userId, taskId, input.targetId, f.taskKey, f.stageKey,
-        f.ask ? JSON.stringify(f.ask) : null, f.strategy ? JSON.stringify(f.strategy) : null],
+        f.ask ? JSON.stringify(f.ask) : null, f.strategy ? JSON.stringify(f.strategy) : null,
+        understanding ? JSON.stringify(understanding) : null],
     ),
   );
   await dataSource.query(
@@ -219,12 +230,24 @@ export async function saveRunFrame(
   return rows.length > 0;
 }
 
+export interface StoredRunResume {
+  /** 재개 구조 — 비어 있으면(이해만 남긴 행) null. */
+  frame: RunResumeFrame | null;
+  /** 그 run 의 업무 이해 — 없거나 형식이 맞지 않으면 null. */
+  understanding: TaskUnderstanding | null;
+}
+
 /** 대기 중(만료 전)인 본인 run 의 재개 구조. 없거나 남의 run 이면 null. */
 export async function readRunFrame(dataSource: DataSource, input: { runId: string; userId: string }): Promise<RunResumeFrame | null> {
+  return (await readRunResume(dataSource, input))?.frame ?? null;
+}
+
+/** 대기 중(만료 전)인 본인 run 의 재개 구조와 업무 이해. 없거나 남의 run 이면 null. */
+export async function readRunResume(dataSource: DataSource, input: { runId: string; userId: string }): Promise<StoredRunResume | null> {
   if (!RUN_ID_RE.test(input.runId) || !UUID_RE.test(input.userId)) return null;
   const rows = rowsOf(
     await dataSource.query(
-      `SELECT f.task_type_key, f.stage_key, f.ask, f.strategy
+      `SELECT f.task_type_key, f.stage_key, f.ask, f.strategy, f.understanding
          FROM assistant_run_frames f
          JOIN work_run_coordination c ON c.run_id = f.run_id AND c.user_id = f.user_id
         WHERE f.run_id = $1 AND f.user_id = $2 AND c.status = 'waiting_for_user' AND c.expires_at > now()`,
@@ -233,12 +256,13 @@ export async function readRunFrame(dataSource: DataSource, input: { runId: strin
   );
   if (!rows.length) return null;
   const r = rows[0];
-  return normalizeFrame({
+  const frame = normalizeFrame({
     taskKey: r.task_type_key as string | null,
     stageKey: r.stage_key as string | null,
     ask: sanitizeAsk(r.ask),
     strategy: sanitizeStrategy(r.strategy),
   });
+  return { frame: isEmptyFrame(frame) ? null : frame, understanding: restoreUnderstanding(r.understanding) };
 }
 
 /** run 이 질문 대기를 벗어나면(완료 · 인계 · 중지) 재개 구조를 지운다(정책 D2). */

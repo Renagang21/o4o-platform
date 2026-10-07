@@ -65,6 +65,7 @@ import {
   cachedUnderstanding,
   resumeFallbackUnderstanding,
   createCompletionJudge,
+  enforceCommitBoundary,
   fallbackUnderstanding,
   forgetUnderstanding,
   isCompletionDeclaration,
@@ -94,7 +95,7 @@ export interface WorkExecutionReply {
 }
 
 /** 이해 출처 — cached(같은 인스턴스 재개) · resume_fallback(다른 인스턴스 재개 · 사용자 확인 조건) · none(이해 없음). */
-type UnderstandingSource = 'ai' | 'fallback' | 'cached' | 'resume_fallback' | 'none';
+type UnderstandingSource = 'ai' | 'fallback' | 'cached' | 'frame' | 'resume_fallback' | 'none';
 
 /** 실행 위임 — Assistant 가 정한 실행 지시(intent)와 완료 판정기(judge)를 함께 넘긴다. */
 export type WorkExecutor = (
@@ -291,15 +292,22 @@ export async function runAssistantWorkTask(
     }
   }
 
-  // ── 업무 이해(실행 전) — 새 요청이면 이번 요청에서 세우고, 재개면 같은 Task 의 이해를 이어 쓴다(메모리 전용) ──
+  // ── 업무 이해(실행 전) — 새 요청이면 이번 요청에서 세우고, 재개면 같은 Task 의 이해를 이어 쓴다 ──
   const counters = newJudgeCounters();
   let understanding: TaskUnderstanding | null = null;
   let understandingSource: UnderstandingSource = 'none';
   if (resuming) {
     understanding = task ? cachedUnderstanding(task.taskId) : null;
     understandingSource = understanding ? 'cached' : 'none';
-    // 이해를 세운 인스턴스가 아닌 곳에서 재개되면(캐시 없음) 원래 조건을 알 수 없다 — 종전 결과 근거 규칙으로 조용히 닫지 않고
-    // 사용자 확인 조건 하나로 판정한다(실행의 "끝났다" → 사용자 성공 확인). 원래 요청은 재개에 오지 않고 저장하지 않는다(§17).
+    // 이해를 세운 인스턴스가 아닌 곳에서 재개되면(캐시 없음) 질문 대기 run 의 재개 구조(M5)에 함께 남긴 원래 이해를 쓴다 —
+    // 원래 목표 · 완료조건 · 확정 경계가 인스턴스와 무관하게 이어진다.
+    if (!understanding && task && memory.understanding) {
+      understanding = memory.understanding;
+      understandingSource = 'frame';
+      cacheUnderstanding(task.taskId, understanding);
+    }
+    // 그래도 없으면(이해 이전 저장분 · 만료 · 읽기 실패) 원래 조건을 알 수 없다 — 종전 결과 근거 규칙으로 조용히 닫지 않고
+    // 사용자 확인 조건 하나로 판정한다(실행의 "끝났다" → 사용자 성공 확인). 원래 요청 원문은 재개에 오지 않고 저장하지 않는다(§17).
     if (!understanding && task) {
       understanding = resumeFallbackUnderstanding();
       understandingSource = 'resume_fallback';
@@ -321,6 +329,8 @@ export async function runAssistantWorkTask(
       }
     }
     if (!understanding) understanding = fallbackUnderstanding(request);
+    // 확정 경계는 AI 출력에 맡기지 않는다 — 요청에 확정 의도가 있으면 경계를 켜고 사용자 확인 조건을 강제한다.
+    understanding = enforceCommitBoundary(understanding, request);
     understandingSource = understanding.source;
     if (task) cacheUnderstanding(task.taskId, understanding);
   }
@@ -400,6 +410,9 @@ export async function runAssistantWorkTask(
       runId: typeof data.runId === 'string' ? data.runId : null,
       taskStatus: updated?.status ?? status,
       memory: report?.memory,
+      // 질문 대기면 업무 이해를 재개 구조와 함께 남긴다 — 답이 다른 인스턴스에 닿아도 원래 완료조건으로 판정한다.
+      understanding,
+      fallbackTargetId: typeof target.targetId === 'string' ? target.targetId : typeof goal.siteId === 'string' ? goal.siteId : null,
     });
     const finalStatus = updated?.status ?? status;
     if (isTerminalTaskStatus(finalStatus)) forgetUnderstanding(task.taskId);

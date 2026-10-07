@@ -43,7 +43,12 @@ export const UNDERSTANDING_LIMITS = Object.freeze({
 
 const CHANGE_RE = /(등록|입력|저장|수정|작성|변경|신청|보내|전송|추가|삭제)/;
 const SCREEN_RE = /(열어|이동|들어가|화면|페이지|켜\s*줘|띄워)/;
-const COMMIT_RE = /(저장|제출|등록|전송|보내|결제|주문|신청)/;
+/**
+ * 확정 의도 — 요청이 저장 · 제출 · 등록 · 결제 같은 **확정 행위를 하라고** 말하는가(동사 모양만 · 사이트 · 업무 표 없음).
+ * "등록된 제품 찾아줘" · "주문 내역 보여줘" 처럼 명사로만 쓰인 것은 아니다. 애매하면 확정 쪽(사용자 확인)으로 기운다.
+ */
+const COMMIT_INTENT_RE =
+  /(저장|제출|등록|전송|발송|결제|주문|신청|확정|게시|발행|접수)\s*(을|를)?\s*(해|하|좀|까지|완료|눌러|진행)|보내\s*(줘|주|기|고)|올려\s*(줘|주)/;
 const SLOT_RE = /^[a-z][a-z0-9_]{0,31}$/;
 
 function clip(v: unknown, max: number): string {
@@ -60,15 +65,36 @@ export function fallbackUnderstanding(request: string): TaskUnderstanding {
   const criteria: CompletionCriterion[] = [
     { id: 'c1', text: clip(`요청한 결과가 화면에 보인다: ${goal}`, UNDERSTANDING_LIMITS.criterionMax), evidence: 'observed' },
   ];
-  const commitBoundary = COMMIT_RE.test(goal);
-  // 변경 업무에서 최종 확정이 요청에 들어 있으면 그 확정은 사용자만 한다 — 끝났는지는 사용자 확인으로 닫는다.
-  if (outcome === 'change' && commitBoundary) {
-    criteria.push({ id: 'c2', text: COMMIT_USER_CRITERION, evidence: 'user' });
-  }
-  return { version: 1, source: 'fallback', goal, outcome, criteria, missing: [], commitBoundary };
+  // 확정이 요청에 들어 있으면 그 확정은 사용자만 한다 — 끝났는지는 사용자 확인으로 닫는다(enforceCommitBoundary).
+  return enforceCommitBoundary({ version: 1, source: 'fallback', goal, outcome, criteria, missing: [], commitBoundary: false }, request);
 }
 
 const COMMIT_USER_CRITERION = '최종 확정(저장 · 제출 등)은 사용자가 했다';
+
+/** 요청 글에 확정 의도가 있는가 — AI 판단과 무관한 결정적 신호. */
+export function requestHasCommitIntent(request: string): boolean {
+  return COMMIT_INTENT_RE.test(String(request ?? '').replace(/\s+/g, ' '));
+}
+
+/**
+ * 확정 경계 불변식 — commitBoundary 면 user 조건이 반드시 하나 있다. 없으면 상한(4) 안에서 붙인다(마지막 observed 를 대신).
+ * sanitize · 판정기 · Assistant 가 모두 이것을 거친다 — 어느 경로로 만든 이해든 확정 업무가 observed 근거만으로 complete 되지 않는다.
+ */
+export function ensureCommitConfirmation(u: TaskUnderstanding): TaskUnderstanding {
+  if (!u.commitBoundary || u.criteria.some((c) => c.evidence === 'user')) return u;
+  const criteria = u.criteria.slice(0, UNDERSTANDING_LIMITS.maxCriteria - 1);
+  criteria.push({ id: `c${criteria.length + 1}`, text: COMMIT_USER_CRITERION, evidence: 'user' });
+  return { ...u, criteria };
+}
+
+/**
+ * 결정적 확정 경계 — AI 가 commitBoundary 를 false 로 냈거나 빠뜨려도, 요청 글에 확정 의도가 있으면 경계를 켜고 사용자 조건을 강제한다.
+ * 끄는 방향으로는 절대 바꾸지 않는다(AI 가 true 면 그대로).
+ */
+export function enforceCommitBoundary(u: TaskUnderstanding, request: string): TaskUnderstanding {
+  const commitBoundary = u.commitBoundary || requestHasCommitIntent(request);
+  return ensureCommitConfirmation(commitBoundary === u.commitBoundary ? u : { ...u, commitBoundary });
+}
 
 /**
  * 재개 기본 이해 — 재개 요청이 이해를 세운 인스턴스와 다른 곳에 닿아 캐시가 없을 때(원래 요청은 재개에 오지 않고 저장도 하지 않는다 · §17).
@@ -106,11 +132,6 @@ export function sanitizeUnderstanding(raw: unknown): TaskUnderstanding | null {
   }
   if (criteria.length === 0) return null;
   const commitBoundary = r.commitBoundary === true;
-  // 확정 경계가 있으면 그 확정은 사용자만 한다 — AI 가 user 조건을 빠뜨려도 결정적으로 채운다(observed 근거만으로 닫지 않는다).
-  if (commitBoundary && !criteria.some((c) => c.evidence === 'user')) {
-    if (criteria.length >= UNDERSTANDING_LIMITS.maxCriteria) criteria.pop();
-    criteria.push({ id: `c${criteria.length + 1}`, text: COMMIT_USER_CRITERION, evidence: 'user' });
-  }
   const missing: TaskUnderstanding['missing'] = [];
   for (const m of Array.isArray(r.missing) ? r.missing : []) {
     if (missing.length >= UNDERSTANDING_LIMITS.maxMissing) break;
@@ -119,7 +140,19 @@ export function sanitizeUnderstanding(raw: unknown): TaskUnderstanding | null {
     const question = clip((m as Record<string, unknown>).question, UNDERSTANDING_LIMITS.questionMax);
     if (SLOT_RE.test(slot) && question) missing.push({ slot, question });
   }
-  return { version: 1, source: 'ai', goal, outcome, criteria, missing, commitBoundary };
+  // 확정 경계가 있으면 그 확정은 사용자만 한다 — AI 가 user 조건을 빠뜨려도 결정적으로 채운다(observed 근거만으로 닫지 않는다).
+  return ensureCommitConfirmation({ version: 1, source: 'ai', goal, outcome, criteria, missing, commitBoundary });
+}
+
+/**
+ * 저장된 이해(run frame · M5) → TaskUnderstanding. 저장소를 믿지 않는다 — AI 출력과 같은 정규화 · 상한 · 확정 불변식을 다시 건다.
+ * 출처(ai · fallback)는 보존한다. 형식이 맞지 않으면 null(→ 재개 기본 이해).
+ */
+export function restoreUnderstanding(raw: unknown): TaskUnderstanding | null {
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw) || (raw as Record<string, unknown>).version !== 1) return null;
+  const u = sanitizeUnderstanding(raw);
+  if (!u) return null;
+  return (raw as Record<string, unknown>).source === 'fallback' ? { ...u, source: 'fallback' } : u;
 }
 
 export const UNDERSTANDING_SYSTEM_PROMPT = [
@@ -277,6 +310,8 @@ export function createCompletionJudge(
   opts: { verify?: CompletionVerifier | null; counters?: AssistantJudgeCounters } = {},
 ): CompletionJudge {
   const counters = opts.counters ?? newJudgeCounters();
+  // 판정기도 확정 경계 불변식을 다시 건다 — 어떤 경로로 만든 이해든 확정 업무는 사용자 확인 없이 complete 되지 않는다.
+  understanding = ensureCommitConfirmation(understanding);
   const observed = understanding.criteria.filter((c) => c.evidence === 'observed');
   const userOnly = understanding.criteria.filter((c) => c.evidence === 'user');
   return async ({ evidence }): Promise<CompletionVerdict> => {

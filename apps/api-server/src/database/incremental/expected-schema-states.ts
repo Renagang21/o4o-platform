@@ -199,6 +199,15 @@ export const EXPECTED_SCHEMA_STATES: readonly ExpectedSchemaState[] = [
     fingerprint: 'c8325ff52a7f74a3e76f06fb098c5aa08b5c1e800836fd8e3dccfa570820057b',
     fingerprintLineCount: 6155,
   },
+  // WO-O4O-PERSONAL-ASSISTANT-TASK-UNDERSTANDING-AND-COMPLETION-V1 — assistant_run_frames.understanding jsonb(nullable) + COMMENT.
+  // 질문 대기 run 의 업무 이해를 재개 구조(M5)와 같은 행 · 같은 수명에 둔다(다른 인스턴스 재개에서도 원래 완료조건 유지).
+  // baseline fresh bootstrap + incremental 1..17 을 격리 PostgreSQL 15.17(docker 일회용 컨테이너)에서
+  // `npx tsx src/migrate.ts` 로 실제 적용해 산출: 운영 DB fingerprint 채택 아님. 같은 DB 에서 컬럼 · 이력을 되돌려 직전 상태 c8325ff5…(6155) 재현 확인.
+  {
+    appliedThrough: 'AddAssistantRunFrameUnderstanding1791349365734',
+    fingerprint: 'd77825dfdbe22cea024bb2257661eac5c45645b4a429ec6b8b2039f096a0d969',
+    fingerprintLineCount: 6157,
+  },
 ] as const;
 
 /** Expected state after `prefixLength` incremental migrations; undefined when not registered. */
