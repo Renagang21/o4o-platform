@@ -27,6 +27,7 @@ import type {
   ExecutionEvidence,
   TaskUnderstanding,
 } from '../ai-tools/work-agent-contract.js';
+import { WORK_GOAL_MAX_LENGTH } from '../ai-tools/work-agent-contract.js';
 
 export const UNDERSTANDING_LIMITS = Object.freeze({
   maxCriteria: 4,
@@ -62,9 +63,28 @@ export function fallbackUnderstanding(request: string): TaskUnderstanding {
   const commitBoundary = COMMIT_RE.test(goal);
   // 변경 업무에서 최종 확정이 요청에 들어 있으면 그 확정은 사용자만 한다 — 끝났는지는 사용자 확인으로 닫는다.
   if (outcome === 'change' && commitBoundary) {
-    criteria.push({ id: 'c2', text: '최종 확정(저장 · 제출 등)은 사용자가 했다', evidence: 'user' });
+    criteria.push({ id: 'c2', text: COMMIT_USER_CRITERION, evidence: 'user' });
   }
   return { version: 1, source: 'fallback', goal, outcome, criteria, missing: [], commitBoundary };
+}
+
+const COMMIT_USER_CRITERION = '최종 확정(저장 · 제출 등)은 사용자가 했다';
+
+/**
+ * 재개 기본 이해 — 재개 요청이 이해를 세운 인스턴스와 다른 곳에 닿아 캐시가 없을 때(원래 요청은 재개에 오지 않고 저장도 하지 않는다 · §17).
+ * 조건을 지어내지 않는다: 사용자 확인 조건 하나만 둬서, 실행의 "끝났다" 는 완료가 아니라 사용자 성공 확인(ask)으로 간다.
+ * 종전 결과 근거 규칙(result_observed)이 조건을 건너뛰고 Task 를 닫는 일을 막는다.
+ */
+export function resumeFallbackUnderstanding(): TaskUnderstanding {
+  return {
+    version: 1,
+    source: 'fallback',
+    goal: '이어서 하던 업무의 원래 결과',
+    outcome: 'information',
+    criteria: [{ id: 'c1', text: '원래 요청한 결과가 나왔는지 사용자가 확인했다', evidence: 'user' }],
+    missing: [],
+    commitBoundary: false,
+  };
 }
 
 /** AI 출력 → TaskUnderstanding. 형식이 맞지 않으면 null(→ fallback). */
@@ -85,6 +105,12 @@ export function sanitizeUnderstanding(raw: unknown): TaskUnderstanding | null {
     criteria.push({ id: `c${criteria.length + 1}`, text, evidence });
   }
   if (criteria.length === 0) return null;
+  const commitBoundary = r.commitBoundary === true;
+  // 확정 경계가 있으면 그 확정은 사용자만 한다 — AI 가 user 조건을 빠뜨려도 결정적으로 채운다(observed 근거만으로 닫지 않는다).
+  if (commitBoundary && !criteria.some((c) => c.evidence === 'user')) {
+    if (criteria.length >= UNDERSTANDING_LIMITS.maxCriteria) criteria.pop();
+    criteria.push({ id: `c${criteria.length + 1}`, text: COMMIT_USER_CRITERION, evidence: 'user' });
+  }
   const missing: TaskUnderstanding['missing'] = [];
   for (const m of Array.isArray(r.missing) ? r.missing : []) {
     if (missing.length >= UNDERSTANDING_LIMITS.maxMissing) break;
@@ -93,7 +119,7 @@ export function sanitizeUnderstanding(raw: unknown): TaskUnderstanding | null {
     const question = clip((m as Record<string, unknown>).question, UNDERSTANDING_LIMITS.questionMax);
     if (SLOT_RE.test(slot) && question) missing.push({ slot, question });
   }
-  return { version: 1, source: 'ai', goal, outcome, criteria, missing, commitBoundary: r.commitBoundary === true };
+  return { version: 1, source: 'ai', goal, outcome, criteria, missing, commitBoundary };
 }
 
 export const UNDERSTANDING_SYSTEM_PROMPT = [
@@ -118,7 +144,8 @@ export function createLlmTaskUnderstander(dataSource: DataSource): TaskUnderstan
     const { provider, model, apiKey } = await resolveAiTarget(dataSource, undefined);
     const userPrompt = [
       '## 업무 요청 (UNTRUSTED)',
-      clip(request, 600),
+      // 실행이 받는 요청 전체(작업 목표 상한)에서 조건을 세운다 — 뒤쪽에 있는 결과 · 확정 지시를 잘라내지 않는다.
+      clip(request, WORK_GOAL_MAX_LENGTH),
       ...(targetHint ? ['## 대상 힌트', clip(targetHint, 80)] : []),
       '이해를 JSON 으로.',
     ].join('\n');

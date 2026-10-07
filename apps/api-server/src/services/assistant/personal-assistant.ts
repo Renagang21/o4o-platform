@@ -63,6 +63,7 @@ import type { CompletionJudge, ExecutionIntent, ExecutionReport, TaskUnderstandi
 import {
   cacheUnderstanding,
   cachedUnderstanding,
+  resumeFallbackUnderstanding,
   createCompletionJudge,
   fallbackUnderstanding,
   forgetUnderstanding,
@@ -91,6 +92,9 @@ export interface WorkExecutionReply {
   body: Record<string, unknown>;
   execution?: { taskKey: string | null; report?: ExecutionReport };
 }
+
+/** 이해 출처 — cached(같은 인스턴스 재개) · resume_fallback(다른 인스턴스 재개 · 사용자 확인 조건) · none(이해 없음). */
+type UnderstandingSource = 'ai' | 'fallback' | 'cached' | 'resume_fallback' | 'none';
 
 /** 실행 위임 — Assistant 가 정한 실행 지시(intent)와 완료 판정기(judge)를 함께 넘긴다. */
 export type WorkExecutor = (
@@ -290,10 +294,17 @@ export async function runAssistantWorkTask(
   // ── 업무 이해(실행 전) — 새 요청이면 이번 요청에서 세우고, 재개면 같은 Task 의 이해를 이어 쓴다(메모리 전용) ──
   const counters = newJudgeCounters();
   let understanding: TaskUnderstanding | null = null;
-  let understandingSource: 'ai' | 'fallback' | 'cached' | 'none' = 'none';
+  let understandingSource: UnderstandingSource = 'none';
   if (resuming) {
     understanding = task ? cachedUnderstanding(task.taskId) : null;
     understandingSource = understanding ? 'cached' : 'none';
+    // 이해를 세운 인스턴스가 아닌 곳에서 재개되면(캐시 없음) 원래 조건을 알 수 없다 — 종전 결과 근거 규칙으로 조용히 닫지 않고
+    // 사용자 확인 조건 하나로 판정한다(실행의 "끝났다" → 사용자 성공 확인). 원래 요청은 재개에 오지 않고 저장하지 않는다(§17).
+    if (!understanding && task) {
+      understanding = resumeFallbackUnderstanding();
+      understandingSource = 'resume_fallback';
+      cacheUnderstanding(task.taskId, understanding);
+    }
   } else {
     const request = String(input.workBody.request ?? '');
     if (deps.understand) {
@@ -433,7 +444,7 @@ function logCompletion(e: {
   taskId: string;
   outcome: AssistantTaskStatus;
   completedBy: 'criteria' | 'user_declared' | 'legacy_result' | null;
-  understandingSource: 'ai' | 'fallback' | 'cached' | 'none';
+  understandingSource: UnderstandingSource;
   criteria: number;
   criteriaMet: number;
   counters: ReturnType<typeof newJudgeCounters>;

@@ -600,7 +600,7 @@ V1 에서 **승계하지 않는 것**: Local-first 저장 원칙(ARCH §5 의 Lo
 
 | 계층 | 판정 | 근거 |
 |---|---|---|
-| L1 Personal Assistant | PARTIAL — 논리 계층(Assistant = f(userId)) · Assistant Planning(결정론 ExecutionIntent) · 완료 판정. **2026-10-07**: 실행 전 업무 이해(기존 provider · 실패 시 결정적 기본 이해) · 완료 판정기(조건 ↔ 근거, 의미 검증 선택) · 질문 중 사용자 완료 선언. 이해는 프로세스 메모리에만(재개용 · 로그 · DB 없음 — §17) | Phase A · B CHECK · Task 이해 · 완료 판정 PR |
+| L1 Personal Assistant | PARTIAL — 논리 계층(Assistant = f(userId)) · Assistant Planning(결정론 ExecutionIntent) · 완료 판정. **2026-10-07**: 실행 전 업무 이해(기존 provider · 실패 시 결정적 기본 이해) · 완료 판정기(조건 ↔ 근거, 의미 검증 선택) · 질문 중 사용자 완료 선언. 이해는 프로세스 메모리에만(재개용 · 로그 · DB 없음 — §17). 다른 인스턴스에서 재개돼 이해가 없으면 조건을 지어내지 않고 사용자 확인 조건 하나로 판정한다(종전 결과 근거로 조용히 닫지 않는다). 확정 경계가 있으면 사용자 확인 조건이 항상 붙는다 | Phase A · B CHECK · Task 이해 · 완료 판정 PR |
 | L2 Task | EXISTS — `assistant_tasks` 1급 객체 · Task 1:N run · 완료 계약으로 상태 판정(planner `done` 은 주장). 이해가 있는 Task 는 `criteria_evidence` 계약 — Assistant 판정이 Task 상태를 정한다. 직접 `/work-agent/run` 은 종전 판정 | Phase A · B CHECK · Task 이해 · 완료 판정 PR |
 | L3 Skill / Discovery | PARTIAL (Candidate · adapter seed · Strong-first routing) | GAP-CENSUS §J · §M |
 | L4 Execution | EXISTS | GAP-CENSUS §F |

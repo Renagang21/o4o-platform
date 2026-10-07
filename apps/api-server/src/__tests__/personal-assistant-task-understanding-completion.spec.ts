@@ -76,20 +76,29 @@ jest.mock('../services/ai-tools/work-run-coordination-service.js', () => {
   };
 });
 
+const executeMock = jest.fn();
+jest.mock('../utils/ai-provider-runtime.js', () => {
+  const actual = jest.requireActual('../utils/ai-provider-runtime.js');
+  return { ...actual, resolveAiTarget: jest.fn(async () => ({ provider: 'gemini', model: 'gemini-test', apiKey: 'k' })) };
+});
+jest.mock('@o4o/ai-core', () => ({ __esModule: true, execute: (...a: unknown[]) => executeMock(...a) }));
+
 import logger from '../utils/logger.js';
 import { LOCAL_AGENT_ACTIONS, parseLocalAction } from '../services/local-agent/local-agent-protocol.js';
 import { submitCommandResult } from '../services/local-agent/local-agent-service.js';
 import { runWorkAgent, buildPlannerUserPrompt, describeExecutionIntent, type PlannerInput, type WorkPlanner } from '../services/ai-tools/work-agent-runtime.js';
-import { validateWorkProposal, type CompletionJudge, type ExecutionIntent, type ExecutionReport, type TaskUnderstanding } from '../services/ai-tools/work-agent-contract.js';
+import { validateWorkProposal, WORK_GOAL_MAX_LENGTH, type CompletionJudge, type ExecutionIntent, type ExecutionReport, type TaskUnderstanding } from '../services/ai-tools/work-agent-contract.js';
 import type { VerifiedToolContext } from '../services/ai-tools/ai-tool-contract.js';
 import { judgeTaskStatus, planAssistantTask } from '../services/assistant/assistant-planning.js';
 import {
   __resetUnderstandingCacheForTest,
   cachedUnderstanding,
   createCompletionJudge,
+  createLlmTaskUnderstander,
   fallbackUnderstanding,
   isCompletionDeclaration,
   newJudgeCounters,
+  resumeFallbackUnderstanding,
   sanitizeUnderstanding,
 } from '../services/assistant/assistant-understanding.js';
 import { runAssistantWorkTask, type WorkExecutionReply } from '../services/assistant/personal-assistant.js';
@@ -141,6 +150,41 @@ describe('① 업무 이해(실행 전)', () => {
     expect(u!.missing).toEqual([{ slot: 'drug_name', question: '어떤 약인가요?' }]);
     expect(sanitizeUnderstanding({ goal: 'x', outcome: 'other', criteria: [{ text: 'a' }] })).toBeNull();
     expect(sanitizeUnderstanding({ goal: 'x', outcome: 'screen', criteria: [] })).toBeNull();
+  });
+
+  it('확정 경계(commitBoundary) — AI 가 user 조건을 빠뜨려도 결정적으로 붙는다 · 상한 4 안에서(마지막 observed 를 대신한다)', () => {
+    const one = sanitizeUnderstanding({ goal: '신제품 등록', outcome: 'change', commitBoundary: true, criteria: [{ text: '입력 값이 폼에 보인다', evidence: 'observed' }] });
+    expect(one!.criteria.map((c) => `${c.id}:${c.evidence}`)).toEqual(['c1:observed', 'c2:user']);
+    expect(one!.commitBoundary).toBe(true);
+    const full = sanitizeUnderstanding({
+      goal: '신제품 등록', outcome: 'change', commitBoundary: true,
+      criteria: [{ text: 'a' }, { text: 'b' }, { text: 'c' }, { text: 'd' }],
+    });
+    expect(full!.criteria.map((c) => `${c.id}:${c.text.length > 3 ? 'U' : c.text}:${c.evidence}`)).toEqual(['c1:a:observed', 'c2:b:observed', 'c3:c:observed', 'c4:U:user']);
+    // 이미 user 조건이 있으면 그대로 · 확정 경계가 없으면 붙이지 않는다.
+    const has = sanitizeUnderstanding({ goal: 'x', outcome: 'change', commitBoundary: true, criteria: [{ text: 'a' }, { text: '저장은 사용자', evidence: 'user' }] });
+    expect(has!.criteria).toHaveLength(2);
+    const none = sanitizeUnderstanding({ goal: 'x', outcome: 'change', commitBoundary: false, criteria: [{ text: 'a' }] });
+    expect(none!.criteria.map((c) => c.evidence)).toEqual(['observed']);
+    // 판정 — observed 근거가 다 있어도 확정 경계 업무는 complete 가 아니라 사용자 확인.
+    return createCompletionJudge(one!)({ evidence: [{ criterionId: 'c1', source: 'screen', quote: 'x', grounded: true }] } as any)
+      .then((v) => expect(v).toMatchObject({ decision: 'ask', askKind: 'success_confirmation', unmet: ['c2'] }));
+  });
+
+  it('AI 이해 — 실행이 받는 요청 전체(작업 목표 상한)를 넘긴다 · 뒤쪽 지시가 잘리지 않는다', async () => {
+    executeMock.mockResolvedValueOnce({ content: JSON.stringify({ goal: 'g', outcome: 'information', criteria: [{ text: 'a' }] }) });
+    const tail = '마지막에 결과 표를 확인해줘';
+    const request = `${'가'.repeat(1500)} ${tail}`;
+    const u = await createLlmTaskUnderstander(ds)({ request });
+    expect(u).toMatchObject({ source: 'ai', goal: 'g' });
+    const sent = executeMock.mock.calls[0][0] as { userPrompt: string; meta: { callerName: string } };
+    expect(sent.meta.callerName).toBe('TaskUnderstanding');
+    expect(sent.userPrompt).toContain(tail);
+    // 상한은 실행 목표 상한과 같다(그 이상은 실행도 받지 않는다).
+    executeMock.mockResolvedValueOnce({ content: '{}' });
+    await createLlmTaskUnderstander(ds)({ request: 'x'.repeat(WORK_GOAL_MAX_LENGTH + 500) });
+    expect((executeMock.mock.calls[1][0] as { userPrompt: string }).userPrompt).toContain('x'.repeat(WORK_GOAL_MAX_LENGTH));
+    expect((executeMock.mock.calls[1][0] as { userPrompt: string }).userPrompt).not.toContain('x'.repeat(WORK_GOAL_MAX_LENGTH + 1));
   });
 
   it('이해가 있으면 완료 계약은 criteria_evidence · 실행 지시 프롬프트에 목표 · 조건 · 빠진 정보 · 확정 경계가 실린다', () => {
@@ -417,6 +461,22 @@ describe('④ Assistant — 이해 → 판정기 위임 → 질문 → 사용자
     await runAssistantWorkTask(ds, { userId: ME, workBody: { request: '5mg 로', runId: 'g_u1' }, requestedTaskId: out.task!.taskId }, exec2, { understand });
     expect(understand).toHaveBeenCalledTimes(1);
     expect((exec2.mock.calls[0] as any)[2].understanding).toMatchObject({ criteria: [C1, C2_USER] });
+  });
+
+  it('다른 인스턴스 재개(캐시 없음) — 종전 결과 근거로 조용히 닫지 않고 사용자 확인 조건 하나로 판정한다', async () => {
+    const understand = jest.fn(async () => U([C1]));
+    const out = await runAssistantWorkTask(ds, { userId: ME, workBody: { request: REQUEST } }, jest.fn(async () => waiting('g_r1')), { understand });
+    // 이해를 세운 인스턴스가 사라졌다(재시작 · 다른 인스턴스) — 프로세스 메모리 캐시만 비운다.
+    __resetUnderstandingCacheForTest();
+    const exec2 = jest.fn(async (): Promise<WorkExecutionReply> => waiting('g_r1'));
+    await runAssistantWorkTask(ds, { userId: ME, workBody: { request: '5mg 로', runId: 'g_r1' }, requestedTaskId: out.task!.taskId }, exec2, { understand });
+    expect(understand).toHaveBeenCalledTimes(1); // 원래 요청은 재개에 오지 않는다 — 다시 세우지 않는다
+    const [, , intent, judge] = exec2.mock.calls[0] as unknown as [string, unknown, ExecutionIntent, CompletionJudge];
+    expect(intent.understanding).toEqual(resumeFallbackUnderstanding());
+    expect(intent.completion.requires).toBe('criteria_evidence');
+    // 실행이 "끝났다" 고 해도 complete 가 아니라 사용자 성공 확인.
+    await expect(judge({ evidence: [] } as any)).resolves.toMatchObject({ decision: 'ask', askKind: 'success_confirmation' });
+    expect(logger.info).toHaveBeenCalledWith('assistant plan', expect.objectContaining({ understandingSource: 'resume_fallback', criteria: 1 }));
   });
 
   it('이해 호출 실패 → 결정적 기본 이해로 진행(업무를 막지 않는다)', async () => {
