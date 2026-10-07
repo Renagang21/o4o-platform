@@ -130,11 +130,15 @@ describe('K-Cosmetics 매장 화면 이전(§21-15) 은퇴 — WO-O4O-KCOSMETICS
     expect(app).not.toContain('KCOS_STORE_INFO_ROLES');
   });
 
-  it('종료 서비스만 가입된 매장은 /store 에서 KPA 기본 문맥으로 떨어지지 않고 종료 안내를 받는다', () => {
+  it('종료 서비스만 가입된 매장은 /store · /hub 에서 KPA 기본 문맥으로 떨어지지 않고 종료 안내를 받는다', () => {
     // catalog 는 아직 workspaceAvailable=true 를 줄 수 있다(service identity DEFER) — 화면이 일관되게 판정한다.
     expect(svc).toContain('export function hasOnlyRetiredWorkspaces(');
-    expect(layout).toContain('if (!effectiveServiceKey && hasOnlyRetiredWorkspaces(services)) {');
+    expect(layout).toContain('return !effectiveServiceKey && hasOnlyRetiredWorkspaces(services);');
     expect(layout).toContain('data-testid="store-retired-service"');
+    expect(layout).toContain('if (useRetiredOnlyStore()) return <RetiredServiceNotice />;');
+    // /hub 도 같은 판정 — HUB 조회가 KPA fallback 으로 나가지 않는다. 상단 nav 의 HUB 도 숨긴다.
+    expect(read('services/web-store/src/components/layouts/UnifiedHubLayout.tsx')).toContain('if (useRetiredOnlyStore()) return <RetiredServiceNotice />;');
+    expect(read('services/web-store/src/components/RootShell.tsx')).toContain("effectiveServiceKey === 'kpa-society' || retiredOnly");
     // 홈 집계는 내 서비스와 같은 기준(workServiceKeys)이다.
     expect(read('services/web-store/src/pages/HomePage.tsx')).toContain('const available = workServiceKeys;');
   });
