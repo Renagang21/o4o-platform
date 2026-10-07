@@ -42,15 +42,16 @@ export function isUnifiedServiceKey(v: unknown): v is UnifiedServiceKey {
 }
 
 /**
- * 이 매장의 활성 업무공간 가입이 **이 앱이 열 수 없는(종료된) 서비스뿐**인가.
- *   catalog 는 아직 workspaceAvailable=true 를 줄 수 있다(service identity 정리 DEFER) — 화면이 KPA 기본 문맥으로
- *   떨어져 403 을 내지 않도록 종료 안내로 보낸다. (WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1)
+ * 이 매장의 활성 가입이 **이 앱이 열 수 없는(종료된) 서비스뿐**인가.
+ *   종료 서비스는 catalog 에서 workspaceAvailable=false 로 내려오므로(K-Cosmetics) 업무공간 가능 여부가 아니라
+ *   active 가입 기준으로 본다 — 열 수 있는 업무공간이 하나도 없으면 화면이 KPA 기본 문맥으로 떨어져 403 을 내지 않도록
+ *   종료 안내로 보낸다. (WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1)
  */
 export function hasOnlyRetiredWorkspaces(
   services: ReadonlyArray<{ serviceKey: string; enrollmentStatus: string; workspaceAvailable: boolean }>,
 ): boolean {
-  const active = services.filter((s) => s.enrollmentStatus === 'active' && s.workspaceAvailable);
-  return active.length > 0 && !active.some((s) => isUnifiedServiceKey(s.serviceKey));
+  const active = services.filter((s) => s.enrollmentStatus === 'active');
+  return active.length > 0 && !active.some((s) => s.workspaceAvailable && isUnifiedServiceKey(s.serviceKey));
 }
 
 export function pickCommonServiceContext(enrolled: readonly string[]): UnifiedServiceKey | null {

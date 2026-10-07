@@ -131,8 +131,10 @@ describe('K-Cosmetics 매장 화면 이전(§21-15) 은퇴 — WO-O4O-KCOSMETICS
   });
 
   it('종료 서비스만 가입된 매장은 /store · /hub 에서 KPA 기본 문맥으로 떨어지지 않고 종료 안내를 받는다', () => {
-    // catalog 는 아직 workspaceAvailable=true 를 줄 수 있다(service identity DEFER) — 화면이 일관되게 판정한다.
+    // 종료 서비스는 catalog 에서 workspaceAvailable=false 로 내려온다 — active 가입 기준으로 판정해야 KPA 기본 문맥으로 새지 않는다.
     expect(svc).toContain('export function hasOnlyRetiredWorkspaces(');
+    expect(svc).toContain("const active = services.filter((s) => s.enrollmentStatus === 'active');");
+    expect(svc).toContain('!active.some((s) => s.workspaceAvailable && isUnifiedServiceKey(s.serviceKey))');
     expect(layout).toContain('return !effectiveServiceKey && hasOnlyRetiredWorkspaces(services);');
     expect(layout).toContain('data-testid="store-retired-service"');
     expect(layout).toContain('if (useRetiredOnlyStore()) return <RetiredServiceNotice />;');

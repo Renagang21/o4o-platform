@@ -198,7 +198,7 @@ interface ServicePaths {
 
 // WO-O4O-STORE-WORKSPACE-INTEGRATION-AND-MY-SERVICES-V1 §18:
 //   대표 홈 "내 매장" 진입 = 각 서비스 Store Workspace Home (`<basePath>/workspace`) — Home / My Store / Store Hub / My Services 상위 구조로 들어간다.
-//   경로 파생 규칙은 @o4o/store-ui-core resolveStoreWorkspacePaths 와 동일 (KPA·KCos `/store`, PH `/store-owner`).
+//   경로 파생 규칙은 @o4o/store-ui-core resolveStoreWorkspacePaths 와 동일 (KPA `/store`, PH `/store-owner`).
 const SERVICE_PATHS: Record<string, ServicePaths> = {
   // WO-O4O-NETURE-REGISTER-AUTHENTICATED-LOOP-FIX-V1: neture 는 join 경로를 두지 않는다.
   //   `/register` 는 비로그인 전용 진입(= Google 로그인 모달)이라 로그인 사용자에게는 가입 화면이 아니고,
@@ -213,7 +213,7 @@ const SERVICE_PATHS: Record<string, ServicePaths> = {
   community: { home: '/' },
   'kpa-society': { home: '/', myStore: '/store/workspace', operator: '/operator', admin: '/admin', join: '/register' },
   'pharmacy-hub': { home: '/', myStore: '/store-owner/workspace', operator: '/operator', admin: '/admin', join: '/join', joinStatus: '/join/status' },
-  'k-cosmetics': { myStore: '/store/workspace', operator: '/operator', admin: '/admin', join: '/register' },
+  // k-cosmetics: 운영 종료 — 매장 · 운영자 · 가입 진입을 만들지 않는다 (WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1).
   // 분회: 자가 가입 없음 · 운영자 화면은 분회 slug 아래
   'kpa-branch': {},
 };

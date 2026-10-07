@@ -112,7 +112,6 @@ export {
   // WO-O4O-NETURE-BUSINESS-GUIDE-HUB-V1
   netureGuideBusinessHubProps,
   netureGuideServiceKpaSocietyProps,
-  netureGuideServiceKcosmeticsProps,
 } from './copy/neture.js';
 
 // K-Cosmetics guide copy(copy/k-cosmetics.ts)는 서비스 종료로 제거 — WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1

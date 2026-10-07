@@ -82,9 +82,20 @@ describe('Pharmacy-Hub 신규 가입 비노출', () => {
     expect(getService('pharmacy-hub')?.workspace?.storeWorkspaceEnabled).toBe(true);
   });
 
-  it('kpa-society · k-cosmetics 는 여전히 가입 가능하다', () => {
+  it('kpa-society 는 여전히 가입 가능하다', () => {
     const keys = getJoinableServices().map((s) => s.key);
-    expect(keys).toEqual(expect.arrayContaining(['kpa-society', 'k-cosmetics']));
+    expect(keys).toContain('kpa-society');
+  });
+});
+
+describe('K-Cosmetics 운영 종료 — catalog row 는 남기고 진입 capability 만 닫는다 (WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1)', () => {
+  it('joinEnabled=false · 가입 가능 목록에 없다 (→ /auth/services/k-cosmetics/join 은 JOIN_DISABLED)', () => {
+    expect(getService('k-cosmetics')?.joinEnabled).toBe(false);
+    expect(getJoinableServices().map((s) => s.key)).not.toContain('k-cosmetics');
+  });
+
+  it('매장 · 운영자 업무공간이 닫혀 있다', () => {
+    expect(getService('k-cosmetics')?.workspace).toMatchObject({ storeWorkspaceEnabled: false, operatorWorkspaceEnabled: false });
   });
 });
 

@@ -55,18 +55,25 @@ const operatorGroup = (m: ReturnType<typeof buildHomeEntryModel>) => {
 };
 
 describe('buildHomeEntryModel — 서비스 운영 카드 = operator-services 만', () => {
-  it('합성 Operator X: KPA + K-Cos 2건 → 두 진입(선택) · PH 없음', () => {
-    const m = buildHomeEntryModel(user(['kpa:operator', 'cosmetics:operator', 'pharmacy-hub:operator']), data([op('kpa-society'), op('k-cosmetics')]));
+  it('합성 Operator X: KPA + PH 2건 → 두 진입(선택) · 목록에 없는 K-Cos 는 role 이 있어도 없음', () => {
+    const m = buildHomeEntryModel(user(['kpa:operator', 'cosmetics:operator', 'pharmacy-hub:operator']), data([op('kpa-society'), op('pharmacy-hub')]));
     const g = operatorGroup(m)!;
-    expect(g.items.map((i) => i.id)).toEqual(['operator:kpa-society:operator', 'operator:k-cosmetics:operator']);
+    expect(g.items.map((i) => i.id)).toEqual(['operator:kpa-society:operator', 'operator:pharmacy-hub:operator']);
     expect(g.items.map((i) => i.action)).toEqual([
       { kind: 'handoff', serviceKey: 'kpa-society', returnPath: '/operator' },
-      { kind: 'handoff', serviceKey: 'k-cosmetics', returnPath: '/operator' },
+      { kind: 'handoff', serviceKey: 'pharmacy-hub', returnPath: '/operator' },
     ]);
     expect(g.title).toBe('서비스 운영');
-    expect(g.items.map((i) => [i.label, i.note])).toEqual([['KPA Society', undefined], ['K-Cosmetics', undefined]]);
-    // role 만 있고 목록에 없는 PH 는 진입이 없다 (누출 0)
-    expect(g.items.some((i) => i.id.includes('pharmacy-hub'))).toBe(false);
+    expect(g.items.map((i) => [i.label, i.note])).toEqual([['KPA Society', undefined], ['Pharmacy Hub', undefined]]);
+    // role 만 있고 목록에 없는 K-Cos 는 진입이 없다 (누출 0)
+    expect(g.items.some((i) => i.id.includes('k-cosmetics'))).toBe(false);
+  });
+
+  it('운영 종료된 K-Cosmetics 는 목록에 있어도(workspaceAvailable 무관) 운영자 진입을 만들지 않는다 — WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1', () => {
+    for (const available of [false, true]) {
+      const m = buildHomeEntryModel(user(['kpa:operator', 'cosmetics:operator']), data([op('kpa-society'), op('k-cosmetics', 'operator', 'standard', available)]));
+      expect(operatorGroup(m)!.items.map((i) => i.id)).toEqual(['operator:kpa-society:operator']);
+    }
   });
 
   it('1건이면 바로 진입 버튼 1개', () => {
