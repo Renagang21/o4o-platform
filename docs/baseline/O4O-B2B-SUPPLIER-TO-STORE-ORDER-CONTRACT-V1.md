@@ -7,7 +7,7 @@
 > **선행 문서**: [`O4O-STORE-COMMERCE-BOUNDARY-V1`](O4O-STORE-COMMERCE-BOUNDARY-V1.md) · [`O4O-BUSINESS-PHILOSOPHY-V1`](O4O-BUSINESS-PHILOSOPHY-V1.md) · [`O4O-3-ROLE-FLOW-BASELINE-V1`](O4O-3-ROLE-FLOW-BASELINE-V1.md)
 > **회귀 가드**: `apps/api-server/src/__tests__/b2b-supplier-to-store-order-canonical-contract.spec.ts`
 > **정정 이력**: 2026-09-24 · `WO-O4O-B2B-ORDER-CONTRACT-EVENT-OFFER-PAYMENT-FIRST-DOC-ALIGNMENT-V1` — §5-1(Axis A · Event Offer = 특가 · payment-first) · §3(결제 축 producer 4종) · §8(KPA · K-Cosmetics 행). 2026-10-06 · `WO-O4O-CANONICAL-INDEX-S9-POLICY-DECISION-ALIGNMENT-V1` — §4 · §5 의 "3개 축" 정정 주석(현행 주문 경로 5개) · §6 흐름도의 Axis A 를 payment-first 로 정정(2026-09-24 §5-1 정정의 누락분) · §4 결제 축 행에 Axis D 의 PaymentCore 미경유 `neture-pharmacy` 기록 경로 등록 · §8 서비스별 요약에 승인축 B2B(KPA Society · K-Cosmetics) 와 Neture 약국 매장(Axis D) 추가. 나머지 절은 불변이며 문서 전체는 **Active** 다.
-> **(2026-10-07 정정 · `WO-O4O-CANONICAL-INDEX-S9-REMAINING-3-FINAL-DISPOSITION-V1`) K-Cosmetics route 삭제 반영**: K-Cosmetics 퇴역 1차-B(`WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1`, PR #339)가 `/api/v1/cosmetics/*` 전체를 삭제했다. 따라서 본문의 `/api/v1/cosmetics/orders`(§5 흐름도 · §9 은퇴 축 표의 `410` 표기) · `/api/v1/cosmetics/payments/*`(§5) · §8 K-Cosmetics 행의 `/cosmetics/orders` · `/cosmetics/b2b/payments/*` · §12 조회 표의 `GET /api/v1/cosmetics/orders` 는 **존재하지 않는 endpoint** 다(`410` 응답도 없다 — 경로 자체가 없다). 남은 `k-cosmetics` serviceKey 의 B2B 주문 데이터 · Event Offer 범위는 퇴역 잔여이며 [`COSMETICS-DOMAIN-RULES`](../architecture/COSMETICS-DOMAIN-RULES.md) 가 다룬다. 다른 축 · 서비스의 계약은 불변.
+> **(2026-10-07 정정 · `WO-O4O-CANONICAL-INDEX-S9-REMAINING-3-FINAL-DISPOSITION-V1`) K-Cosmetics route 삭제 반영**: K-Cosmetics 퇴역 1차-B(`WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1`, PR #339)가 `/api/v1/cosmetics/*` 전체를 삭제했다. 본문의 해당 위치(§5 Axis A 흐름도 · 불변식 A3 · §8 K-Cosmetics 행 · §9 은퇴 축 표 · §12-3 조회 경로 표)를 그 자리에서 정정했다 — cosmetics 주문 · 결제 · B2B 결제 · 조회 endpoint 는 존재하지 않는다(410 도 아니다). §5 의 serviceKey 매핑표(`k-cosmetics` → `k-cosmetics-event-offer`)는 코드 상수가 남아 있어 그대로 둔다. 남은 `k-cosmetics` B2B 데이터 · Event Offer 범위는 퇴역 잔여이며 [`K-COSMETICS-RETIREMENT-RESIDUE-CONTRACT-V1`](../architecture/K-COSMETICS-RETIREMENT-RESIDUE-CONTRACT-V1.md) 가 다룬다. 다른 축 · 서비스의 계약은 불변.
 
 ---
 
@@ -159,7 +159,7 @@ event_offer (공급자 특가 제안, 운영자 승인)
   → POST /api/v1/store/cart/:serviceKey/checkout-confirm
       → EventOfferCartCheckoutService  (공급자별로 주문 분리 생성 · 한정수량 원자 확보)
       → checkout_orders                (paymentStatus='pending')
-  → POST /api/v1/{kpa,cosmetics}/b2b/payments/prepare   (B2B 전용 namespace)
+  → POST /api/v1/kpa/b2b/payments/prepare              (B2B 전용 namespace · cosmetics 는 2026-10-07 삭제)
       → PaymentCore + Toss → /confirm → payment.completed(serviceKey='store-b2b')
       → checkout_orders  paid
   → CheckoutFulfillmentBridgeService
@@ -167,7 +167,7 @@ event_offer (공급자 특가 제안, 운영자 승인)
   → 공급자 처리 → 공급자가 직접 배송 → neture_shipments 상태 기록 → delivered
   → settlement
   → 매장 조회: /api/v1/kpa/checkout/orders
-              /api/v1/cosmetics/orders
+              (/api/v1/cosmetics/orders 는 K-Cosmetics 퇴역 1차-B 로 삭제)
 ```
 
 `serviceKey` → event-offer 도메인 매핑은 **단일 상수**가 정본이다
@@ -185,10 +185,10 @@ event_offer (공급자 특가 제안, 운영자 승인)
 UNPAID 주문은 fulfillment · 배송 처리 · 정산 대상이 아니다. 후불 · 외상 · 인보이스 · `collectionStatus`
 기반 무결제 fulfillment 는 **없다**. 정산은 `PAID + DELIVERED` 기준이다.
 
-**불변식 A3 (경계).** 결제 진입은 **B2B 전용 namespace** (`/api/v1/{kpa,cosmetics}/b2b/payments/*`) 다.
-소비자→매장 판매 결제(`/api/v1/kpa/payments/*` · `/api/v1/cosmetics/payments/*`)는 **410 은퇴 상태 그대로**이며
+**불변식 A3 (경계).** 결제 진입은 **B2B 전용 namespace** (`/api/v1/kpa/b2b/payments/*`) 다.
+소비자→매장 판매 결제(`/api/v1/kpa/payments/*`)는 **410 은퇴 상태 그대로**이며
 되살리지 않는다(§9 · `O4O-STORE-COMMERCE-BOUNDARY-V1`). 공급자→매장 B2B 결제와 소비자→매장 commerce 를
-혼동하지 않는다.
+혼동하지 않는다. (2026-10-07 정정) `/api/v1/cosmetics/b2b/payments/*` · `/api/v1/cosmetics/payments/*` 는 K-Cosmetics 퇴역 1차-B 로 `/api/v1/cosmetics/*` 전체와 함께 삭제됐다 — 410 이 아니라 경로가 없다.
 
 > **정정 이력.** 이 절은 과거 "이 축은 결제 축이 아니다 — 주문 생성까지가 O4O 의 책임이고 정산은 공급자–매장
 > 간 기존 거래 관계를 따른다" 였다. Event Offer 를 특가 판매로 확정하고 payment-first 로 구현하면서
@@ -309,7 +309,7 @@ Axis A 의 `checkout-confirm` 은 **주문 확정**이지 소비자 결제가 �
 | 서비스 | B2B 주문 축 | 매장(buyer) | 공급자(seller) 화면 | 비고 |
 |---|---|---|---|---|
 | **KPA Society** | Axis A (`kpa-groupbuy`) + **승인축 B2B** (order source `store_b2b_cart`) · 둘 다 **payment-first** | 있음 — 장바구니 · `/kpa/checkout/orders` · 결제 `/kpa/b2b/payments/*`. 승인축 B2B 확정은 `/store/cart/:serviceKey/checkout-confirm-b2b`(`StoreB2BCartCheckoutService`, 결제 축 `store-b2b`) | 없음 (Neture 측이 정본) | 관심상품 주문 작업대는 **안내 전용**. 소비자→매장 판매 leg 은 410 은퇴(B2B 결제와 별개 축) |
-| **K-Cosmetics** | Axis A (`k-cosmetics-event-offer`) + **승인축 B2B** (order source `store_b2b_cart`) · 둘 다 **payment-first** | 있음 — 장바구니 · `/cosmetics/orders` · 결제 `/cosmetics/b2b/payments/*`. 승인축 B2B 확정은 KPA 와 같은 `/store/cart/:serviceKey/checkout-confirm-b2b` | 없음 | 조회 경로만 `/checkout` 접두어가 없다 (§10 DF-1) |
+| **K-Cosmetics** | Axis A (`k-cosmetics-event-offer`) + **승인축 B2B** (order source `store_b2b_cart`) · 둘 다 **payment-first** | **퇴역 (2026-10-07 정정)** — 서비스 퇴역 결정 · `/cosmetics/orders` · `/cosmetics/b2b/payments/*` 를 포함한 `/api/v1/cosmetics/*` 는 퇴역 1차-B 로 삭제. 남은 `k-cosmetics` B2B 데이터 · Event Offer 매핑은 퇴역 잔여([K-COSMETICS-RETIREMENT-RESIDUE-CONTRACT-V1](../architecture/K-COSMETICS-RETIREMENT-RESIDUE-CONTRACT-V1.md)) | 없음 | — |
 | **PharmacyHub** | Axis C | 있음 — 자체 라우트 표면 | 없음 (서비스에 supplier 역할 없음) | `O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1` |
 | **Neture** | Axis B | 있음 | 있음 — `/api/v1/neture/supplier/orders*` = **공급자 화면 canonical** | 다른 서비스가 복제하지 않는다 |
 | **Neture 약국 매장** (`service_key='neture-pharmacy'`) | **Axis D** (order source `neture_pharmacy_cart`) · **payment-first** (현재 테스트 결제만, §4 결제 축 정정) | 있음 — `/api/v1/neture/pharmacy/cart*` · `/pharmacy/cart/checkout` · `/pharmacy/orders` · 결제 `/pharmacy/payments/{prepare,confirm}` | Neture 공급자 화면(bridge tag `neture_pharmacy_cart`, §13-5) | 상세 [`DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1`](../design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md) §8 |
@@ -332,7 +332,7 @@ KPA · K-Cosmetics · PharmacyHub 에 공급자 주문 화면을 다시 만들�
 
 | 은퇴 대상 | 상태 | 근거 |
 |---|---|---|
-| 소비자→매장 주문 (`POST /api/v1/cosmetics/orders`) | `410 STORE_CONSUMER_ORDER_RETIRED` | `O4O-STORE-COMMERCE-BOUNDARY-V1` |
+| 소비자→매장 주문 (`POST /api/v1/cosmetics/orders`) | `410 STORE_CONSUMER_ORDER_RETIRED` → **2026-10-07 정정: 경로 삭제**(K-Cosmetics 퇴역 1차-B) | `O4O-STORE-COMMERCE-BOUNDARY-V1` |
 | 매장 소비자 판매 결제 | `410 STORE_SALE_PAYMENT_DEPRECATED` | 동일 |
 | 매장 B2C 채널 | `410 STORE_B2C_CHANNEL_RETIRED` | 동일 |
 | `/api/v1/ecommerce/*` (admin-dashboard 소비자 commerce client) | **서버에 없음 (404)** — client 도 제거 | 본 WO 결함 D2 |
@@ -407,7 +407,7 @@ controller 는 thin wrapper 다 — 경로 · 서비스 scope · 서비스별 �
 | 서비스 | 목록 | 상세 |
 |---|---|---|
 | KPA Society | `GET /api/v1/kpa/checkout/orders` | `.../orders/:orderId` |
-| K-Cosmetics | `GET /api/v1/cosmetics/orders` | `/orders/:id` |
+| ~~K-Cosmetics~~ | ~~`GET /api/v1/cosmetics/orders`~~ — 2026-10-07 정정: 퇴역 1차-B 로 삭제 | — |
 
 경로 접두어 차이는 **의도적으로 남긴다** (`KEEP_COMPATIBLE_ALIASES`). 통일 대상은 경로 이름이 아니라 의미·소유권·응답 계약이다.
 
