@@ -255,7 +255,7 @@ describe('Operator ↔ Service (1 Operator : N Services)', () => {
     const { dataSource } = makeDataSource([
       [{ role: 'kpa:operator' }, { role: 'neture:operator' }],
       // membership 질의는 catalog(O4O_SERVICES) 순서: neture → kpa-society
-      [{ status: 'active' }],    // neture
+      [{ account_status: 'active', account_active: true, email_verified: true }], // verified main eligibility
       [{ status: 'suspended' }], // kpa-society
     ]);
     const list = await resolveOperatorServices(dataSource, USER_X);
