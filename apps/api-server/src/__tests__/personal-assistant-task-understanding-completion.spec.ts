@@ -76,6 +76,20 @@ jest.mock('../services/ai-tools/work-run-coordination-service.js', () => {
   };
 });
 
+// 사용자 완료 선언이 노드 원장(Local SQLite)에도 completed 를 남기는지 — 선언 경로(coord.mock)에서만 가로챈다.
+const localSetStatus = jest.fn();
+jest.mock('../services/ai-tools/work-run-executor.js', () => {
+  const actual = jest.requireActual('../services/ai-tools/work-run-executor.js');
+  return {
+    ...actual,
+    issueWorkRunSetStatus: jest.fn((...a: any[]) => {
+      if (!coord.mock) return actual.issueWorkRunSetStatus(...a);
+      localSetStatus(a[1], a[2]);
+      return Promise.resolve({ status: 'success', safe: {} });
+    }),
+  };
+});
+
 const executeMock = jest.fn();
 jest.mock('../utils/ai-provider-runtime.js', () => {
   const actual = jest.requireActual('../utils/ai-provider-runtime.js');
@@ -178,7 +192,8 @@ describe('① 업무 이해(실행 전)', () => {
     // 일반적인 지시형(부탁 · 바랍니다 · 넣어줘 · 처리)도 확정이다.
     for (const r of ['이 내용 저장 부탁해', '신청서 제출 바랍니다', '상품 등록 부탁드립니다', '주문 넣어줘', '결제 처리해줘', '게시글 등록도 해줘'])
       expect([r, requestHasCommitIntent(r)]).toEqual([r, true]);
-    for (const r of ['등록된 제품 목록 찾아줘', '주문 내역 보여줘', '약학정보원에서 아모디핀 찾아줘', '저장 위치가 어디야'])
+    for (const r of ['등록된 제품 목록 찾아줘', '주문 내역 보여줘', '약학정보원에서 아모디핀 찾아줘', '저장 위치가 어디야',
+      '주문 처리 상태 보여줘', '신청 완료 여부 확인해줘', '결제 진행 상황 알려줘', '등록 요청 내역 찾아줘'])
       expect([r, requestHasCommitIntent(r)]).toEqual([r, false]);
 
     // AI 가 확정 경계를 놓쳤다(false · observed 만).
@@ -291,7 +306,10 @@ describe('② 완료 판정기', () => {
 describe('사용자 완료 선언 판별', () => {
   it('강한 표현은 질문 종류 무관 · "네" 는 성공 확인 질문에만 · 부정 · 긴 문장은 아니다', () => {
     expect(isCompletionDeclaration('됐어요', null)).toBe(true);
-    expect(isCompletionDeclaration('완료했습니다', 'value_confirmation')).toBe(true);
+    expect(isCompletionDeclaration('완료했습니다', 'success_confirmation')).toBe(true);
+    // 값 질문의 답은 "완료" 여도 값이다 — 선언으로 run 을 닫지 않는다.
+    for (const t of ['완료', '완료입니다', '됐어요', '완료했습니다'])
+      expect([t, isCompletionDeclaration(t, 'value_confirmation')]).toEqual([t, false]);
     expect(isCompletionDeclaration('다 했어요!', null)).toBe(true);
     expect(isCompletionDeclaration('네', 'success_confirmation')).toBe(true);
     expect(isCompletionDeclaration('네', 'value_confirmation')).toBe(false);
@@ -579,11 +597,13 @@ describe('④ Assistant — 이해 → 판정기 위임 → 질문 → 사용자
     const first = await runAssistantWorkTask(ds, { userId: ME, workBody: { request: REQUEST } }, jest.fn(async () => waiting('g_d1')));
     expect(first.task?.status).toBe('waiting_for_user');
     coord.mock = true;
-    coord.row = { runId: 'g_d1', userId: ME, status: 'waiting_for_user', version: 3 };
+    coord.row = { runId: 'g_d1', userId: ME, deviceId: 'dev-1', status: 'waiting_for_user', version: 3 };
     const exec = jest.fn();
     const out = await runAssistantWorkTask(ds, { userId: ME, workBody: { request: '됐어요', runId: 'g_d1' }, requestedTaskId: first.task!.taskId }, exec);
     expect(exec).not.toHaveBeenCalled();
     expect(coord.transitioned).toEqual([{ runId: 'g_d1', status: 'completed', expectedVersion: 3 }]);
+    // run 정본(노드 Local SQLite)에도 completed 를 남긴다 — 상태 enum 만.
+    expect(localSetStatus).toHaveBeenCalledWith({ userId: ME, deviceId: 'dev-1' }, { runId: 'g_d1', status: 'completed' });
     expect(out.task?.status).toBe('completed');
     expect(out.reply.body.data).toMatchObject({ runId: 'g_d1', resumable: false, progress: 'completed', goal: { status: 'completed' } });
     expect(cachedUnderstanding(first.task!.taskId)).toBeNull();
@@ -609,6 +629,7 @@ describe('④ Assistant — 이해 → 판정기 위임 → 질문 → 사용자
     await runAssistantWorkTask(ds, { userId: ME, workBody: { request: '게보린', runId: 'g_d3' }, requestedTaskId: first.task!.taskId }, exec);
     expect(exec).toHaveBeenCalledTimes(1);
     expect(coord.transitioned).toEqual([]);
+    expect(localSetStatus).not.toHaveBeenCalled();
   });
 
   it('Assistant 판정 complete → completedBy=criteria · 계측 한 줄(수치 · enum 만)', async () => {

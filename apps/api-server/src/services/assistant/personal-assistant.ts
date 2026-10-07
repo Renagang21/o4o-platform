@@ -74,6 +74,7 @@ import {
   type TaskUnderstander,
 } from './assistant-understanding.js';
 import { checkResumable, transitionWorkRun, WORK_RUN_STATUS } from '../ai-tools/work-run-coordination-service.js';
+import { issueWorkRunSetStatus } from '../ai-tools/work-run-executor.js';
 import { resolveWorkTarget } from '../ai-tools/work-target-resolver.js';
 import { nodeLedgerOwnerKey } from '../ai-tools/node-ledger-owner.js';
 
@@ -202,6 +203,8 @@ async function acquireTask(
  * 사용자 완료 선언 — 질문 대기 중 run 에 사용자가 "됐어요" 라고 답했다. 실행을 다시 돌리지 않고
  * 그 run 을 완료로 닫고 Task 를 completed 로 판정한다(완료 계약 acceptsUserCompletion).
  * run 이 이미 종결 · 만료 · 남의 것이면 선언으로 닫지 않는다(null → 일반 재개 경로).
+ * run 상태의 정본은 노드 Local SQLite 다 — 정상 종료(runtime persistTerminalRun)와 같이 그 run 을 실행한 노드에도 completed 를 남긴다
+ * (상태 enum 만 · best-effort · 응답을 기다리게 하지 않는다).
  */
 async function completeByUserDeclaration(
   dataSource: DataSource,
@@ -214,6 +217,10 @@ async function completeByUserDeclaration(
   if (!row) return null;
   const closed = await transitionWorkRun(dataSource, { runId, status: WORK_RUN_STATUS.COMPLETED, expectedVersion: row.version });
   if (!closed) return null;
+  if (row.deviceId) {
+    issueWorkRunSetStatus(dataSource, { userId: input.userId, deviceId: row.deviceId }, { runId, status: WORK_RUN_STATUS.COMPLETED })
+      .catch((err) => logger.warn('assistant declared run local persist failed', { error: err instanceof Error ? err.name : 'unknown' }));
+  }
   return {
     status: 200,
     body: {
