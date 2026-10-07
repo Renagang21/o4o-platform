@@ -238,7 +238,10 @@ export function createStoreCartRoutes(dataSource: DataSource): Router {
           ? body.itemIds.filter((x: unknown): x is string => typeof x === 'string')
           : undefined;
         const note = typeof body.note === 'string' ? body.note : undefined;
-        const result = await checkoutService.confirm(scope, { itemIds, note });
+        // 구매 매장(조직)은 선택값(hint)이다 — 세미프랜차이즈 서비스의 구매 약국 판정은 서버가 확정한다.
+        const organizationId =
+          typeof body.organizationId === 'string' ? body.organizationId : undefined;
+        const result = await checkoutService.confirm(scope, { itemIds, note, organizationId });
         res.json({ success: true, data: result });
       } catch (error) {
         handleError(res, error, 'POST checkout-confirm');

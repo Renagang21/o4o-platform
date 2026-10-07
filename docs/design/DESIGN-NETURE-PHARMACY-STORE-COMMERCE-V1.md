@@ -1,7 +1,7 @@
 # DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1
 
 > **상태**: ACTIVE
-> **작성일**: 2026-10-05 · **최종 갱신**: 2026-10-07 (명칭 정정 "기본 가입" → "내 매장(약국) 신청" · §3-1 Neture 가입 승인 전제 · 매장 표식의 `service_memberships('neture')` ensure 제거 — [CHECK §10](../checks/CHECK-NETURE-PHARMACY-STORE-COMMERCE-LOCAL-BROWSER-V1.md)) · 2026-10-06 (§17 운영 전환 호환 — 인덱스 2단계 · pharmacy 호스트 이용 자격 · §13 인증·가입 트랙 인계 계약 · §14 K-Cosmetics 퇴역 반영 · §15 미완료 범위 · 구현 결정 반영)
+> **작성일**: 2026-10-05 · **최종 갱신**: 2026-10-07 (명칭 정정 "기본 가입" → "내 매장(약국) 신청" · §3-1 Neture 가입 승인 전제 · 매장 표식의 `service_memberships('neture')` ensure 제거 · §3-1 신청 자격 = Neture 가입 승인 · §3-3 공급자 승인의 Neture 결합 제거 · §13 이관 표 ensure 취소선 — [CHECK §10](../checks/CHECK-NETURE-PHARMACY-STORE-COMMERCE-LOCAL-BROWSER-V1.md)) · 2026-10-06 (§17 운영 전환 호환 — 인덱스 2단계 · pharmacy 호스트 이용 자격 · §13 인증·가입 트랙 인계 계약 · §14 K-Cosmetics 퇴역 반영 · §15 미완료 범위 · 구현 결정 반영)
 > **근거 WO/IR**: [`WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1`](../work-orders/WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1.md) 단계 1-7 · 입력 [`IR-NETURE-PHARMACY-STORE-COMMERCE-STEP1-CENSUS-V1`](../investigations/IR-NETURE-PHARMACY-STORE-COMMERCE-STEP1-CENSUS-V1.md)
 
 Neture 약국 서비스의 **약국별 하나의 내 매장 · 내 매장(약국) 신청 · 세미프랜차이즈 가입 · 복수 공급 제안 · 선택 제안 주문 · 테스트 결제** 를 구현하기 위한 확정 설계다. IR 의 "사용자 판단 필요" 항목 중 기술 항목은 여기서 근거와 함께 확정한다(WO 단계 1 "보류" 절의 마지막 항목). 사업 판단 항목은 §11 에 남긴다.
@@ -106,8 +106,9 @@ supply_proposals
 > **명칭 정정 (2026-10-07)**: 과거 "Neture 기본 가입"으로 불렀으나 Neture 메인 가입(`service_memberships` service_key='neture')과 다른 원장이다. 이 원장(`neture_pharmacy_memberships`)은 **내 매장(약국) 신청 · 승인**이다. 신청 · 승인 모두 신청자의 **현재 Neture 가입 승인(active)** 을 전제로 확인하며, 이 승인은 Neture 원장을 만들거나 바꾸지 않는다([CHECK §10](../checks/CHECK-NETURE-PHARMACY-STORE-COMMERCE-LOCAL-BROWSER-V1.md) E1 · E2).
 
 ```text
-약국 사용자 (로그인만 된 계정)
+약국 사용자 (Neture 가입 승인(active) 계정 — 로그인만으로는 신청할 수 없다)
  → POST /api/v1/neture/pharmacy/membership {pharmacyName, businessNumber, pharmacistLicenseNumber, address?, phone?}
+     · Neture 가입 승인이 아니면 403 NETURE_MEMBERSHIP_REQUIRED (승인 시점에도 신청자 기준으로 다시 확인 — 아니면 409)
      · 이미 owner 인 Neture 약국이 있으면 409 · 진행 중 사업자번호 중복 409
      · 트랜잭션: organizations(type='pharmacy', code='neture-pharm-<uuid12>', business_number)
                  + organization_members(owner) + neture_pharmacy_memberships(pending)
@@ -120,6 +121,7 @@ supply_proposals
 
 - `kpa-society` 가입 · `kpa_members` · `kpa_pharmacist_profiles` 를 자격 근거로 읽지 않는다(재해석 금지). 기존 가입자를 자동 전환하지 않는다.
 - 기본 승인은 어떤 세미프랜차이즈 가입도 만들지 않는다.
+- 내 매장(약국) 승인 · 반려 · 정지 · 재활성화는 Neture 가입 원장(`service_memberships` 'neture')을 만들거나 바꾸지 않는다. 거꾸로 Neture 가입 승인 · 재활성화도 내 매장 · 세미프랜차이즈 · 공급자 원장과 역할을 만들거나 복구하지 않는다(가입 구조 기준 — [CHECK §10](../checks/CHECK-NETURE-PHARMACY-STORE-COMMERCE-LOCAL-BROWSER-V1.md)).
 - 상태 전이: `pending→active|rejected`, `active→suspended|terminated`, `suspended→active|terminated`, `rejected|terminated→pending`(재신청, 같은 행).
 
 ### 3-2. 세미프랜차이즈 가입 (R3) · 운영자 담당 (R4)
@@ -142,7 +144,7 @@ Neture 관리자          → POST /api/v1/neture/admin/semi-franchises         
 
 ### 3-3. 공급자 · 제품 등록 (현행 유지 + 결함 1건 수정)
 
-- 공급자 가입 승인: 현행 유지(`neture_suppliers` PENDING→ACTIVE, `supplier:operator`).
+- 공급자 가입 승인: `neture_suppliers` PENDING→ACTIVE, `supplier:operator`. 공급자 신청 · 승인 · 재활성화는 신청자의 현재 Neture 가입 승인(active)을 **전제조건으로 확인만** 하며, Neture 가입 원장을 승인 · 반려 · 재활성화하지 않는다(과거의 공급자 승인 ↔ Neture 가입 결합은 2026-10-07 제거 — [CHECK §10](../checks/CHECK-NETURE-PHARMACY-STORE-COMMERCE-LOCAL-BROWSER-V1.md) E3). Neture 가입 승인도 공급자 · 공급자 역할을 만들거나 복구하지 않는다.
 - 제품 등록 승인 = `supplier_product_offers.approval_status = 'APPROVED'`. 승인자는 Neture 운영자(현행 `approveProduct`).
 - **수정**: 공급처 미지정(`service_keys` 비어 있음) 제품은 OSA 행이 0 이라 `approveProduct` 로 APPROVED 가 될 수 없었다(IR B §1-3 결함). OSA 행이 하나도 없으면 `approval_status='APPROVED'`, `is_active=true` 를 직접 기록한다. OSA 행이 있는 제품(다른 서비스 흐름)은 기존 파생 규칙 그대로. → Supplier Domain §4 "approval_status = OSA 파생" 에 "OSA 0행 = 제품 등록 승인 직접 기록" 예외를 이 WO 근거로 명시한다(§10).
 
@@ -342,7 +344,7 @@ API: `GET /api/v1/neture/pharmacy/store/supply-options?source=&q=&page=` · `GET
 |---|---|---|---|
 | 내 매장(약국) 신청 원장 테이블 `neture_pharmacy_memberships` (상태 · 자격 정보 · 결정 이력) | migration `CreateNeturePharmacyCommerce1791200000000` | **인증 · 가입** | 테이블 · 상태 전이(`constants.ts` `nextMembershipStatus` · `canReapply`) 소유 이전. Store 는 읽기만(아래 계약) |
 | 신청 · 재신청 · 운영자 처리(승인 · 반려 · 정지 · 재개 · 종료) | `services/pharmacy-membership.service.ts` · 라우트 `/neture/pharmacy/membership` · `/neture/operator/pharmacy-memberships/*` · web-store `/start-pharmacy` · web-neture `/operator/pharmacy-memberships` | **인증 · 가입** | 파일 · 라우트 · 화면 그대로 이관. 인증 트랙의 공통 가입 · 추가정보 흐름에 편입할 때 이 서비스를 확장하고 새로 만들지 않는다 |
-| 승인 orchestration · role 발급/회수 (`neture:store_owner` + `service_memberships('neture')` ensure) | `services/pharmacy-store-provisioner.ts` | **인증 · 가입** | 그대로 이관. Store 쪽 작업은 아래 계약 함수를 호출만 한다 |
+| 승인 orchestration · role 발급/회수 (`neture:store_owner`. ~~`service_memberships('neture')` ensure~~ — 2026-10-07 제거, Neture 가입 원장을 만들지 않는다 · CHECK §10 E1) | `services/pharmacy-store-provisioner.ts` | **인증 · 가입** | 그대로 이관. Store 쪽 작업은 아래 계약 함수를 호출만 한다 |
 | 약국 조직(= 내 매장) 생성 · owner 관계 · 재신청 시 표시 정보 갱신 | `services/pharmacy-store-link.ts` `createPharmacyStoreOrganization` · `updatePharmacyStoreProfile` | **Store** | 계약 함수(아래) |
 | 약국 업무 영역 enrollment(`kpa-society`) · 매장 공개 주소 slug(`kpa`) 연결 · 해제 | `pharmacy-store-link.ts` `activatePharmacyStore` · `deactivatePharmacyStore` | **Store** | 계약 함수(아래) |
 | 매장 접근 판정 · 매장 목록 | `utils/store-organization.resolver.ts`(`kpa` 후보) · `utils/store-owner.utils.ts` · `utils/service-tenant.resolver.ts`(`accessible-stores`) | **Store** | 원장 `status='active'` 를 읽는다 |

@@ -10,7 +10,8 @@
  *      (행동 계약은 MembershipApprovalService.bareRoleContract / suspensionLifecycleContract 테스트가 고정)
  *   L3 메인 AI 진입점은 서버 guard 로 Neture 가입 승인을 확인한다 — 요청 body(surface · serviceKey)로 Neture 자격 우회 불가,
  *      예외는 서버가 확인한 platform:super_admin 뿐, 조회 실패는 fail-closed.
- *      `/request` 의 병원약국 화면 첫 요청만 병원약국 공개 범위(무로그인 `/api/hospital/ai/request` 와 같은 조사 capability)로 처리.
+ *      병원약국은 이 리팩토링 대상이 아니다 — `/request` 의 병원약국 화면 첫 요청은 가입 조회 없이 기존 병원약국 처리로만 가고
+ *      (Neture 가입 여부로 병원약국 동작이 달라지지 않는다), 그 밖의 Neture 경로로는 내려가지 않는다.
  *   L4 세미프랜차이즈 제공 자료는 항목 단위로 판정한다 — 공통 API 전체를 막지 않는다.
  *      공급 상품은 distribution_type 무관(공급처 미지정 PUBLIC 포함) 가입 승인 대상 — 목록 · 신청 · 장바구니 확정 ·
  *      취급매장 모집 신청 모두 같은 판정을 쓴다(직접 호출 우회 차단).
@@ -22,7 +23,7 @@ jest.mock('../utils/logger.js', () => ({ __esModule: true, default: { info: jest
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import {
-  isHospitalPublicScopeRequest,
+  isHospitalSurfaceRequest,
   requireNetureMainMembership,
 } from '../middleware/neture-main-membership.middleware.js';
 import { hasServiceSemiFranchiseSupplyAccess } from '../modules/neture-pharmacy/services/supply-access.js';
@@ -117,13 +118,21 @@ describe('L3 메인 AI 진입점 서버 guard', () => {
     for (const path of ['/home-chat', '/work-agent/run']) {
       expect(ai).toContain(`router.post('${path}', authenticate, requireNetureMember,`);
     }
-    // 통합 요청은 같은 guard + 병원약국 공개 범위 옵션
+    // 통합 요청은 같은 guard + 병원약국 화면 옵션
     expect(ai).toContain(
-      `const requireNetureMemberOrHospitalPublic = requireNetureMainMembership(AppDataSource, { hospitalPublicScope: true });`,
+      `const requireNetureMemberOrHospitalSurface = requireNetureMainMembership(AppDataSource, { hospitalSurface: true });`,
     );
-    expect(ai).toContain(`router.post('/request', authenticate, requireNetureMemberOrHospitalPublic,`);
-    // 공개 범위로 내려온 요청은 병원약국 서비스 capability(조사 전용)만 실행한다
-    expect(ai).toMatch(/if \(res\.locals\.hospitalPublicScope === true\) \{[\s\S]{0,400}runHospitalAiRequest\(/);
+    expect(ai).toContain(`router.post('/request', authenticate, requireNetureMemberOrHospitalSurface,`);
+    // 병원약국 화면 통과 요청은 기존 병원약국 처리 밖(통합 라우터 · 홈 대화 · Task 작업)으로 내려가지 않는다
+    const hospitalBranch = ai.indexOf(`if (!runId && body.surface === 'hospital-drug') {`);
+    const surfaceOnlyStop = ai.indexOf('if (res.locals.hospitalSurfaceOnly === true) {');
+    const unifiedRouter = ai.indexOf('const decision = classifyUnifiedRequest(text, {');
+    expect(hospitalBranch).toBeGreaterThan(0);
+    expect(surfaceOnlyStop).toBeGreaterThan(hospitalBranch);
+    expect(unifiedRouter).toBeGreaterThan(surfaceOnlyStop);
+    // 축소된 공개 경로는 쓰지 않는다 — 병원약국 동작은 main 과 같다
+    expect(ai).not.toContain('runHospitalAiRequest');
+    expect(ai).not.toContain('hospitalPublicScope');
     expect(read('routes/local-agent.routes.ts')).toContain(
       `router.post('/pairing-grants', authenticate, requireNetureMainMembership(AppDataSource),`,
     );
@@ -135,7 +144,7 @@ describe('L3 메인 AI 진입점 서버 guard', () => {
     fail?: boolean;
     body?: unknown;
     userId?: string | null;
-    hospitalPublicScope?: boolean;
+    hospitalSurface?: boolean;
   }) => {
     const query = opts.fail
       ? jest.fn().mockRejectedValue(new Error('db down'))
@@ -146,7 +155,7 @@ describe('L3 메인 AI 진입점 서버 guard', () => {
     };
     const res: any = { status: jest.fn().mockReturnThis(), json: jest.fn().mockReturnThis(), locals: {} };
     const next = jest.fn();
-    const options = opts.hospitalPublicScope ? { hospitalPublicScope: true } : undefined;
+    const options = opts.hospitalSurface ? { hospitalSurface: true } : undefined;
     await requireNetureMainMembership({ query } as any, options)(req, res, next);
     return { query, res, next };
   };
@@ -174,36 +183,39 @@ describe('L3 메인 AI 진입점 서버 guard', () => {
     expect(query.mock.calls[0][1]).toEqual(['u1', 'neture']);
   });
 
-  describe('병원약국 공개 범위 (`/request` 전용 옵션)', () => {
-    it('Neture 미승인 · 병원약국 화면 첫 요청 → 공개 범위로 통과 (locals 표식)', async () => {
-      const { next, res, query } = await run({ rows: [], hospitalPublicScope: true, body: { surface: 'hospital-drug' } });
+  describe('병원약국 화면 기존 호출 (`/request` 전용 옵션 — 기존 동작 보존)', () => {
+    it.each([[[]], [[{ status: 'pending' }]], [[{ status: 'active' }]]])(
+      'Neture 가입 상태와 무관하게(rows=%j) 병원약국 화면 첫 요청은 가입 조회 없이 통과 (locals 표식)',
+      async (rows) => {
+        const { next, res, query } = await run({ rows, hospitalSurface: true, body: { surface: 'hospital-drug' } });
+        expect(next).toHaveBeenCalled();
+        expect(res.status).not.toHaveBeenCalled();
+        expect(res.locals.hospitalSurfaceOnly).toBe(true);
+        expect(query).not.toHaveBeenCalled();
+      },
+    );
+
+    it('가입 조회 장애도 병원약국 화면 요청을 막지 않는다 (main 과 같다)', async () => {
+      const { next, res } = await run({ fail: true, hospitalSurface: true, body: { surface: 'hospital-drug' } });
       expect(next).toHaveBeenCalled();
       expect(res.status).not.toHaveBeenCalled();
-      expect(res.locals.hospitalPublicScope).toBe(true);
-      // Neture 자격 판정은 그대로 'neture' 고정
-      expect(query.mock.calls[0][1]).toEqual(['u1', 'neture']);
     });
 
-    it('Neture 승인 회원은 공개 범위 표식 없이 정상 경로', async () => {
-      const { next, res } = await run({ rows: [{ status: 'active' }], hospitalPublicScope: true, body: { surface: 'hospital-drug' } });
-      expect(next).toHaveBeenCalled();
-      expect(res.locals.hospitalPublicScope).toBeUndefined();
-    });
-
-    it('runId(실행 재개)를 붙이면 공개 범위가 아니다 → 403', async () => {
+    it('runId(실행 재개)를 붙이면 병원약국 화면 호출이 아니다 → Neture 판정 · 미승인 403', async () => {
       const { next, res } = await run({
         rows: [],
-        hospitalPublicScope: true,
+        hospitalSurface: true,
         body: { surface: 'hospital-drug', runId: 'r1' },
       });
       expect(next).not.toHaveBeenCalled();
       expect(res.status).toHaveBeenCalledWith(403);
+      expect(res.locals.hospitalSurfaceOnly).toBeUndefined();
     });
 
     it.each([{}, { surface: 'home' }, { surface: 'hospital' }, { serviceKey: 'hospital-pharmacy' }])(
-      '다른 surface %j → 403',
+      '다른 surface %j → Neture 판정 · 미승인 403',
       async (body) => {
-        const { next, res } = await run({ rows: [], hospitalPublicScope: true, body });
+        const { next, res } = await run({ rows: [], hospitalSurface: true, body });
         expect(next).not.toHaveBeenCalled();
         expect(res.status).toHaveBeenCalledWith(403);
       },
@@ -213,20 +225,14 @@ describe('L3 메인 AI 진입점 서버 guard', () => {
       const { next, res } = await run({ rows: [], body: { surface: 'hospital-drug' } });
       expect(next).not.toHaveBeenCalled();
       expect(res.status).toHaveBeenCalledWith(403);
-      expect(res.locals.hospitalPublicScope).toBeUndefined();
+      expect(res.locals.hospitalSurfaceOnly).toBeUndefined();
     });
 
-    it('조회 실패는 공개 범위로도 내려보내지 않는다 (503)', async () => {
-      const { next, res } = await run({ fail: true, hospitalPublicScope: true, body: { surface: 'hospital-drug' } });
-      expect(next).not.toHaveBeenCalled();
-      expect(res.status).toHaveBeenCalledWith(503);
-    });
-
-    it('isHospitalPublicScopeRequest', () => {
-      expect(isHospitalPublicScopeRequest({ surface: 'hospital-drug' })).toBe(true);
-      expect(isHospitalPublicScopeRequest({ surface: 'hospital-drug', runId: '' })).toBe(true);
-      expect(isHospitalPublicScopeRequest({ surface: 'hospital-drug', runId: 'x' })).toBe(false);
-      expect(isHospitalPublicScopeRequest(undefined)).toBe(false);
+    it('isHospitalSurfaceRequest', () => {
+      expect(isHospitalSurfaceRequest({ surface: 'hospital-drug' })).toBe(true);
+      expect(isHospitalSurfaceRequest({ surface: 'hospital-drug', runId: '' })).toBe(true);
+      expect(isHospitalSurfaceRequest({ surface: 'hospital-drug', runId: 'x' })).toBe(false);
+      expect(isHospitalSurfaceRequest(undefined)).toBe(false);
     });
   });
 
@@ -311,9 +317,14 @@ describe('L4 세미프랜차이즈 제공 자료는 항목 단위로 판정한�
     expect(store).toContain(`'SEMI_FRANCHISE_MEMBERSHIP_REQUIRED'`);
   });
 
-  it('이벤트 장바구니 확정은 구매자 기준 세미프랜차이즈 이용 자격을 확인한다', () => {
+  it('이벤트 장바구니 확정은 서버가 확정한 구매 약국 조직 기준으로 같은 판정을 쓴다 (동작: event-offer-cart-checkout-purchasing-org.test)', () => {
     const ev = read('services/cart/event-offer-cart-checkout.service.ts');
-    expect(ev).toContain('resolveSemiFranchiseServiceAccess(this.dataSource, scope.buyerId, semiFranchiseKey)');
+    expect(ev).toMatch(
+      /hasServiceSemiFranchiseSupplyAccess\(\s+this\.dataSource,\s+scope\.serviceKey,\s+await this\.resolvePurchasingOrganization\(scope, input, eligible\),/,
+    );
+    expect(ev).toContain('resolveBuyerOrganization(this.dataSource, scope.buyerId, scope.serviceKey, requested)');
+    // 사용자 단위(아무 약국이나 하나) 판정은 쓰지 않는다
+    expect(ev).not.toContain('resolveSemiFranchiseServiceAccess');
     expect(ev).toContain(`reason: 'SEMI_FRANCHISE_MEMBERSHIP_REQUIRED'`);
   });
 

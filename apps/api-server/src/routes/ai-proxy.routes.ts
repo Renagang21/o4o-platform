@@ -38,6 +38,7 @@ import { isYouTubeUrl, fetchYouTubeContent, fetchYouTubeOEmbed } from './ai-prox
 import { execute } from '@o4o/ai-core';
 import { dynamicLimiter } from '../middleware/rateLimiter.js';
 import { requireNetureMainMembership } from '../middleware/neture-main-membership.middleware.js';
+import { NETURE_MAIN_MEMBERSHIP_MESSAGES, NETURE_MEMBERSHIP_REQUIRED } from '../modules/neture/services/neture-main-membership.js';
 import { createLlmPlanner, createStrongLlmPlanner, createLlmPlannerForProvider, createStrongLlmPlannerForProvider, runWorkAgent } from '../services/ai-tools/work-agent-runtime.js';
 // WO-O4O-COMMON-AUTOMATION-CORE-CAPABILITY-C-TASK-MODALITY-ROUTER-V1 — per-task provider 선택(전역 provider 불변)
 import { classifyTaskModality } from '../services/ai-tools/task-modality-router.js';
@@ -57,7 +58,6 @@ import { classifyUnifiedRequest, confirmWorkMessage } from '../services/ai-tools
 // WO-O4O-HOSPITAL-DRUG-GOAL-DRIVEN-AI-COMPOSER-REALIGNMENT-V1 — /hospital-drug 를 공통 Goal-driven Core 로 연결
 // (research=runWebResearch · screen=Work Agent/Astra · local context · question). 구 composite(health.kr+SQLite 고정 결합)은 은퇴.
 import { runHospitalDrugSurface } from '../services/ai-tools/hospital-drug-surface.js';
-import { runHospitalAiRequest } from './hospital/hospital.routes.js';
 import { runWebResearch } from '../services/ai/web-research.service.js';
 import { readAttachments, renderAttachmentTextBlocks } from '../services/ai-tools/attachment-reader.js';
 import { executeMultimodalChat } from '../services/ai-tools/multimodal-chat.js';
@@ -104,8 +104,8 @@ const router: Router = Router();
 // Neture 메인 AI(통합 요청 · 홈 대화 · 작업 에이전트) = Neture 가입 승인 회원 전용 서버 판정
 // (CHECK-NETURE-PHARMACY-STORE-COMMERCE-LOCAL-BROWSER-V1 §10 E5). body.surface 로 Neture 자격을 얻을 수 없다.
 const requireNetureMember = requireNetureMainMembership(AppDataSource);
-// /request 전용 — Neture 미승인 병원약국 화면 요청은 병원약국 공개 범위(약품 조사만)로 처리한다(guard 주석 참조).
-const requireNetureMemberOrHospitalPublic = requireNetureMainMembership(AppDataSource, { hospitalPublicScope: true });
+// /request 전용 — 병원약국 화면의 기존 호출(첫 요청)은 가입 조회 없이 기존 병원약국 처리로만 간다(guard 주석 참조).
+const requireNetureMemberOrHospitalSurface = requireNetureMainMembership(AppDataSource, { hospitalSurface: true });
 
 // ===========================================
 // POST /api/ai/generate — Text Generation Proxy
@@ -2217,7 +2217,7 @@ async function performHospitalDrugRequest(
 //     응답: work 일 때만 data.taskId · data.taskStatus(additive). chat · confirm 에는 Task 가 없다.
 //     요청: taskId?(이어갈 Task — 요청자 본인 · 미종결일 때만 쓰인다).
 // ===========================================
-router.post('/request', authenticate, requireNetureMemberOrHospitalPublic, dynamicLimiter('free'), async (req, res: Response) => {
+router.post('/request', authenticate, requireNetureMemberOrHospitalSurface, dynamicLimiter('free'), async (req, res: Response) => {
   const authReq = req as AuthRequest;
   const userId = authReq.user?.id;
   if (!userId) {
@@ -2242,19 +2242,6 @@ router.post('/request', authenticate, requireNetureMemberOrHospitalPublic, dynam
   const runId = typeof body.runId === 'string' && body.runId.length > 0 ? body.runId : undefined;
   const routeHint = body.routeHint === 'work' ? 'work' : undefined;
 
-  // Neture 미승인 병원약국 화면 요청 — 병원약국 서비스 공개 capability 와 같은 범위만(약품 조사 · 원내/화면/작업 실행 없음).
-  //   Neture 실행 경로(work · home-chat · Local 조회)로는 절대 내려가지 않는다.
-  if (res.locals.hospitalPublicScope === true) {
-    try {
-      const r = await runHospitalAiRequest(text);
-      logger.info('ai unified request routed', { userId, route: 'hospital-drug', reason: 'hospital-public', targetType: null, attachmentCount: attachments.length });
-      return res.json({ success: true, data: { kind: 'chat', route: 'hospital-drug', reason: r.plan, chat: { message: r.message, plan: r.plan } } });
-    } catch (error) {
-      logger.error('hospital public request failed', { userId, error: (error as { message?: string })?.message });
-      return res.status(502).json({ success: false, error: '응답을 생성하지 못했습니다. 다시 시도해 주세요.', code: 'AI_ERROR' });
-    }
-  }
-
   // /hospital-drug 전용 경계 — 이 화면(surface)에서 온 요청만 공통 Goal-driven Core 로 흘려보낸다.
   // 전역 Router 는 병원 특수 규칙을 갖지 않는다: hospital-drug 판정은 오직 여기(HTTP 계층 · surface 명시)에서만
   // 내려 메인 자동화(홈 Composer)로 새지 않는다. modality 판정은 공통 Task Modality Router,
@@ -2275,6 +2262,12 @@ router.post('/request', authenticate, requireNetureMemberOrHospitalPublic, dynam
       ? { kind: 'work', route: 'hospital-drug', reason, work: reply.body.data }
       : { kind: 'chat', route: 'hospital-drug', reason, chat: reply.body.data };
     return res.json({ success: true, data: payload });
+  }
+
+  // guard 가 가입 조회 없이 병원약국 처리로만 통과시킨 요청은 위 분기 밖(Neture 통합 라우터 · 홈 대화 · Task 작업)으로
+  // 내려가지 않는다(CHECK §10 E5 — body.surface 로 Neture 자격을 얻을 수 없다). 위 분기와 같은 조건이라 도달하지 않는다.
+  if (res.locals.hospitalSurfaceOnly === true) {
+    return res.status(403).json({ success: false, error: NETURE_MAIN_MEMBERSHIP_MESSAGES.none, code: NETURE_MEMBERSHIP_REQUIRED });
   }
 
   const decision = classifyUnifiedRequest(text, {

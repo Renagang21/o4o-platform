@@ -29,7 +29,9 @@ import { checkoutService } from '../checkout.service.js';
 import { calculateSupplierShippingFee } from '../shipping/supplier-shipping.js';
 import { SERVICE_KEYS } from '../../constants/service-keys.js';
 import { semiFranchiseAccessKeyFor } from '../../common/auth/service-login-eligibility.policy.js';
-import { resolveSemiFranchiseServiceAccess } from '../../modules/neture-pharmacy/services/semi-franchise-service-access.js';
+import { hasServiceSemiFranchiseSupplyAccess } from '../../modules/neture-pharmacy/services/supply-access.js';
+import { resolveBuyerOrganization } from '../../utils/buyer-organization.resolver.js';
+import { B2BConfirmError } from './b2b-checkout-confirm.core.js';
 
 /**
  * cart serviceKey(플랫폼 키) → event-offer(OPL) service_key.
@@ -50,6 +52,8 @@ export interface CheckoutConfirmScope {
 export interface CheckoutConfirmInput {
   itemIds?: string[];
   note?: string;
+  /** 구매 매장(조직) 선택값(hint). 권위는 서버 검증이다 — B2B confirm 과 같은 계약(결함 O1). */
+  organizationId?: string;
 }
 
 export interface CreatedOrderSummary {
@@ -154,13 +158,19 @@ export class EventOfferCartCheckoutService {
     }
 
     // 2-1. CHECK-NETURE-PHARMACY-STORE-COMMERCE-LOCAL-BROWSER-V1 §10 D1 — 세미프랜차이즈 서비스(kpa-society → pharmacy)의
-    //   이벤트 공급은 구매자의 그 세미프랜차이즈 이용 자격(내 매장(약국) active ∧ 가입 active)이 있을 때만 주문한다.
-    //   ctx.organizationId 는 이벤트 운영 조직이라 구매 약국 판정에 쓰지 않는다 — 로그인 자격과 같은 판정을 재사용한다.
+    //   이벤트 공급은 **구매 약국 조직**의 그 세미프랜차이즈 가입이 active 일 때만 주문한다.
+    //   구매 조직은 B2B confirm 과 같은 계약으로 서버가 확정한다(선택값은 hint · 다중 약국에서 선택이 없으면 400 ·
+    //   타인 조직은 403). 사용자가 가진 다른 약국의 가입으로 대신 인정하지 않고, 임의의 약국을 고르지 않는다.
+    //   ctx.organizationId 는 이벤트 운영 조직이라 구매 약국 판정에 쓰지 않는다.
     const semiFranchiseKey = semiFranchiseAccessKeyFor(scope.serviceKey);
     if (
       semiFranchiseKey &&
       eligible.length > 0 &&
-      !(await resolveSemiFranchiseServiceAccess(this.dataSource, scope.buyerId, semiFranchiseKey)).allowed
+      !(await hasServiceSemiFranchiseSupplyAccess(
+        this.dataSource,
+        scope.serviceKey,
+        await this.resolvePurchasingOrganization(scope, input, eligible),
+      ))
     ) {
       for (const it of eligible.splice(0)) {
         failedItems.push({
@@ -349,5 +359,33 @@ export class EventOfferCartCheckoutService {
       failedItems,
       removedCartItemIds,
     };
+  }
+
+  /**
+   * 구매 약국 조직 확정 — `resolveBuyerOrganization`(B2B confirm 결함 O1 과 같은 판정)을 재사용한다.
+   * 선택값은 요청 `organizationId`, 없으면 장바구니 항목에 담긴 조직(한 곳일 때만). 둘 다 클라이언트 유래라 서버가 검증한다.
+   */
+  private async resolvePurchasingOrganization(
+    scope: CheckoutConfirmScope,
+    input: CheckoutConfirmInput,
+    items: StoreCartItem[],
+  ): Promise<string> {
+    const cartOrgs = [...new Set(items.map((it) => it.organizationId).filter((o): o is string => !!o))];
+    const requested = input.organizationId?.trim() || (cartOrgs.length === 1 ? cartOrgs[0] : null);
+    if (!requested && cartOrgs.length > 1) {
+      throw new B2BConfirmError('AMBIGUOUS_STORE_ORGANIZATION', '주문할 매장(조직)을 선택해 주세요.', 400);
+    }
+    const resolution = await resolveBuyerOrganization(this.dataSource, scope.buyerId, scope.serviceKey, requested);
+    switch (resolution.status) {
+      case 'resolved':
+        return resolution.organizationId;
+      case 'none':
+        throw new B2BConfirmError('STORE_ORGANIZATION_NOT_FOUND', '주문할 수 있는 매장(조직)이 없습니다.', 403);
+      case 'ambiguous':
+        throw new B2BConfirmError('AMBIGUOUS_STORE_ORGANIZATION', '주문할 매장(조직)을 선택해 주세요.', 400);
+      case 'forbidden':
+      default:
+        throw new B2BConfirmError('FOREIGN_STORE_ORGANIZATION', '선택한 매장에 대한 권한이 없습니다.', 403);
+    }
   }
 }
