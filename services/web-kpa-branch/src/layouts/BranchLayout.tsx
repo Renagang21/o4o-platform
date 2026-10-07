@@ -157,7 +157,7 @@ export function BranchLayout({ slug, basePath }: { slug: string; basePath: strin
   return (
     <div className="min-h-screen bg-white">
       <header className="border-b border-gray-200">
-        <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-4">
+        <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-3 px-4 py-4">
           <Link to={basePath || '/'} className="flex items-center gap-3">
             {site?.logoUrl ? (
               <img src={site.logoUrl} alt="" className="h-10 w-10 rounded object-contain" />
@@ -168,18 +168,15 @@ export function BranchLayout({ slug, basePath }: { slug: string; basePath: strin
             )}
             <span className="text-lg font-semibold text-gray-900">{site?.title ?? site?.branchName ?? '분회 홈페이지'}</span>
           </Link>
-          <div className="text-sm">
+          <div className="flex items-center gap-3 text-sm">
+            {/* WO-O4O-REPRESENTATIVE-ENTRY-RETURN-HANDOFF-AND-HOME-NAVIGATION-V1: O4O 홈(로그인 유지) · 로그아웃 = O4O 계정 전체 종료
+                WO-O4O-CROSS-SERVICE-PUBLIC-DESIGN-AND-BRAND-REFRESH-V1: O4O 홈은 로그인 여부와 무관하게 보인다 (KPA 정체성은 그대로, 작은 유틸리티). */}
+            <O4OHomeButton api={authClient.api} isAuthenticated={isAuthenticated} authLoading={isAuthLoading} className="o4o-home-link" />
             {isAuthenticated ? (
               <span className="flex items-center gap-3">
                 {canUseMemberArea && (
                   <Link to={`${basePath}/mypage`} className="text-gray-600 hover:text-gray-900">내 정보</Link>
                 )}
-                {/* WO-O4O-REPRESENTATIVE-ENTRY-RETURN-HANDOFF-AND-HOME-NAVIGATION-V1: O4O 홈(로그인 유지) · 로그아웃 = O4O 계정 전체 종료 */}
-                <O4OHomeButton
-                  api={authClient.api}
-                  isAuthenticated
-                  className="bg-transparent border-none p-0 cursor-pointer text-gray-600 hover:text-gray-900 disabled:opacity-60"
-                />
                 <button type="button" onClick={logout} className="text-gray-500 hover:text-gray-900">{O4O_LOGOUT_LABEL}</button>
               </span>
             ) : (

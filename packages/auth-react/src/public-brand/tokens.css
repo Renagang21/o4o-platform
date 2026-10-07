@@ -1,0 +1,190 @@
+/**
+ * O4O 공개 화면 공통 디자인 토큰 — WO-O4O-CROSS-SERVICE-PUBLIC-DESIGN-AND-BRAND-REFRESH-V1
+ *
+ * 대상: neture.co.kr 및 *.neture.co.kr 공개 홈(Hero · 홈 복귀 버튼 · 기본 타이포).
+ * Tailwind 없이도 동작하도록 plain CSS 로 둔다. 각 앱의 index.css 가 상대 경로로 @import 한다.
+ * 서비스 고유 색은 `--o4o-accent` 하나만 서비스가 덮어쓴다(.o4o-hero 의 style 로 주입).
+ * 큰 framework 가 아니다 — 변수 · Hero · 홈 링크만 둔다.
+ */
+:root {
+  --o4o-font-sans: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+
+  --o4o-text: #111827;
+  --o4o-text-muted: #4b5563;
+  --o4o-text-subtle: #6b7280;
+  --o4o-surface: #ffffff;
+  --o4o-surface-alt: #f8fafc;
+  --o4o-border: #e5e7eb;
+
+  --o4o-accent: #111827;
+  --o4o-accent-contrast: #ffffff;
+
+  --o4o-radius: 12px;
+  --o4o-radius-pill: 999px;
+  --o4o-max-width: 1120px;
+  --o4o-gutter: 24px;
+
+  --o4o-hero-pad-y: 96px;
+  --o4o-hero-title: clamp(32px, 5.2vw, 52px);
+  --o4o-hero-desc: 18px;
+}
+
+@media (max-width: 640px) {
+  :root {
+    --o4o-gutter: 16px;
+    --o4o-hero-pad-y: 56px;
+    --o4o-hero-desc: 16px;
+  }
+}
+
+/* ── Hero ─────────────────────────────────────────────────────────────── */
+.o4o-hero {
+  font-family: var(--o4o-font-sans);
+  background: var(--o4o-surface);
+  border-bottom: 1px solid var(--o4o-border);
+  color: var(--o4o-text);
+  word-break: keep-all;
+}
+.o4o-hero__inner {
+  max-width: var(--o4o-max-width);
+  margin: 0 auto;
+  padding: var(--o4o-hero-pad-y) var(--o4o-gutter);
+  display: flex;
+  align-items: center;
+  gap: 48px;
+}
+.o4o-hero__body {
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: 720px;
+}
+.o4o-hero__media {
+  flex: 0 0 auto;
+}
+.o4o-hero__eyebrow {
+  display: inline-block;
+  margin: 0 0 16px;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--o4o-accent);
+}
+.o4o-hero__title {
+  margin: 0;
+  font-size: var(--o4o-hero-title);
+  line-height: 1.25;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  color: var(--o4o-text);
+}
+.o4o-hero__desc {
+  margin: 20px 0 0;
+  font-size: var(--o4o-hero-desc);
+  line-height: 1.7;
+  color: var(--o4o-text-muted);
+}
+.o4o-hero__line {
+  display: block;
+}
+.o4o-hero__actions {
+  margin-top: 36px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+.o4o-hero__children {
+  margin-top: 28px;
+}
+
+/* ── CTA ──────────────────────────────────────────────────────────────── */
+.o4o-cta,
+.o4o-cta-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 0 22px;
+  border-radius: var(--o4o-radius);
+  font-family: var(--o4o-font-sans);
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+.o4o-cta {
+  background: var(--o4o-accent);
+  border: 1px solid var(--o4o-accent);
+  color: var(--o4o-accent-contrast);
+}
+.o4o-cta:hover {
+  filter: brightness(0.93);
+}
+.o4o-cta-secondary {
+  background: transparent;
+  border: 1px solid var(--o4o-border);
+  color: var(--o4o-text);
+}
+.o4o-cta-secondary:hover {
+  border-color: var(--o4o-text-subtle);
+}
+.o4o-cta:focus-visible,
+.o4o-cta-secondary:focus-visible,
+.o4o-home-link:focus-visible {
+  outline: 2px solid var(--o4o-accent);
+  outline-offset: 2px;
+}
+
+/* ── O4O 홈 복귀 (헤더 유틸리티) ──────────────────────────────────────── */
+.o4o-home-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  padding: 0 14px;
+  border: 1px solid var(--o4o-border);
+  border-radius: var(--o4o-radius-pill);
+  background: var(--o4o-surface);
+  color: var(--o4o-text-muted);
+  font-family: var(--o4o-font-sans);
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  text-decoration: none;
+  cursor: pointer;
+}
+.o4o-home-link:hover {
+  color: var(--o4o-text);
+  border-color: var(--o4o-text-subtle);
+}
+
+@media (max-width: 640px) {
+  .o4o-hero__inner {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 32px;
+  }
+  .o4o-hero__line {
+    display: inline;
+  }
+  .o4o-hero__line + .o4o-hero__line::before {
+    content: " ";
+  }
+  .o4o-hero__title .o4o-hero__line {
+    display: block;
+  }
+  .o4o-hero__title .o4o-hero__line + .o4o-hero__line::before {
+    content: none;
+  }
+  .o4o-hero__actions > .o4o-cta,
+  .o4o-hero__actions > .o4o-cta-secondary {
+    flex: 1 1 auto;
+  }
+  .o4o-home-link {
+    min-height: 32px;
+    padding: 0 10px;
+    font-size: 13px;
+  }
+}

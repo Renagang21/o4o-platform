@@ -95,6 +95,13 @@ export interface GlobalHeaderProps {
   showMobileUserMenu?: boolean;
   /** UtilityArea 슬롯 (ServiceSwitcher 등) */
   utilitySlot?: React.ReactNode;
+  /**
+   * 홈 복귀 슬롯 (예: O4O 홈 버튼).
+   * WO-O4O-CROSS-SERVICE-PUBLIC-DESIGN-AND-BRAND-REFRESH-V1:
+   *   utilitySlot 과 달리 **로그인 여부와 무관하게** 데스크톱 · 모바일 모두 헤더 우측(햄버거 옆)에 렌더한다.
+   *   미주입 시 기존 동작 불변(additive).
+   */
+  homeSlot?: React.ReactNode;
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -120,6 +127,7 @@ export function GlobalHeader({
   mobileUserMenuItems,
   showMobileUserMenu = true,
   utilitySlot,
+  homeSlot,
 }: GlobalHeaderProps) {
   const location = useLocation();
   const isAuthenticated = isAuthProp ?? !!user;
@@ -246,6 +254,10 @@ export function GlobalHeader({
             ))}
           </nav>
 
+          <div className="flex items-center gap-2 md:gap-3">
+          {/* ── HomeSlot (desktop + mobile, 로그인 무관) ── */}
+          {homeSlot}
+
           {/* ── UtilityArea + UserArea (desktop) ── */}
           <div className="hidden md:flex items-center gap-3">
             {/* Utility Slot (ServiceSwitcher 등) */}
@@ -359,6 +371,7 @@ export function GlobalHeader({
               <Menu className="w-6 h-6 text-slate-600" />
             )}
           </button>
+          </div>
         </div>
 
         {/* ── Mobile Menu ── */}

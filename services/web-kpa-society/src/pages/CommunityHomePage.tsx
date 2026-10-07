@@ -1,5 +1,5 @@
 /**
- * CommunityHomePage - KPA Society 통합 Home 허브
+ * CommunityHomePage - O4O 약국(pharmacy.neture.co.kr, serviceKey kpa-society) 통합 Home 허브
  *
  * WO-KPA-HOME-PHASE1-V1: 플랫폼 요약 허브
  * WO-KPA-A-PUBLIC-HOME-INTEGRATION-AND-MENU-SIMPLIFICATION-V1: 통합 허브 재구성
@@ -18,7 +18,8 @@
  *   자기 config·data 로 소비한다 (JSX 복제 금지).
  *
  * 섹션 구조 (3블록):
- * ├─ HeroBannerSection        — 동적 광고 캐러셀 (KPA 고유)
+ * ├─ O4OPublicHero            — O4O 공통 Hero (WO-O4O-CROSS-SERVICE-PUBLIC-DESIGN-AND-BRAND-REFRESH-V1)
+ * ├─ HeroBannerSection        — 동적 광고 캐러셀 (광고가 있을 때만)
  * ├─ 공지 / 약사공론 뉴스     — 2-column (좌: 공지, 우: placeholder)
  * ├─ AppEntrySection          — 서비스 바로가기 카드 5개 (shared)
  * └─ CtaGuidanceSection       — Market Trial CTA (shared)
@@ -45,6 +46,8 @@ import { homeApi } from '../api/home';
 import { communityApi, type CommunityAd } from '../api/community';
 import { useAuth } from '../contexts/AuthContext';
 import { useAuthModal } from '../contexts/LoginModalContext';
+import { O4OPublicHero } from '@o4o/auth-react';
+import { PHARMACY_ACCENT, PHARMACY_DISPLAY_NAME, PHARMACY_HERO } from '../config/brand';
 
 // ─── 최신 활동 섹션 (WO-O4O-KPA-HOME-LATEST-ACTIVITY-SECTION-V1) ──────────
 // WO-O4O-COMMUNITY-HOME-LATEST-ACTIVITY-SECTION-COMMONIZATION-V1:
@@ -131,35 +134,55 @@ export function CommunityHomePage() {
       latestTabs={LATEST_TABS}
       latestAccent={LATEST_ACTIVITY_ACCENTS.blue}
       heroSlot={
-        <PageHero>
-          {/* WO-O4O-HOME-TEMP-EXPERIENCE-ACCOUNT-NOTICE-V1: 임시 공용 체험 계정 안내 (추후 제거 예정) */}
-          <div style={{ background: '#ffffff', border: '1px solid #a7f3d0', borderRadius: 12, padding: '12px 16px', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', justifyContent: 'space-between' }}>
-            <div style={{ minWidth: 0 }}>
-              <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: '#065f46' }}>🧪 체험용 계정 제공</p>
-              <p style={{ margin: '2px 0 0', fontSize: 12.5, color: '#047857', lineHeight: 1.5 }}>
-                주요 기능을 확인할 수 있는 공용 계정입니다. 입력한 데이터는 예고 없이 초기화될 수 있습니다.
+        <>
+          {/* WO-O4O-CROSS-SERVICE-PUBLIC-DESIGN-AND-BRAND-REFRESH-V1: O4O 공통 Hero — 문구는 로그인 여부와 무관하게 항상 표시.
+              주 CTA 1개(비로그인 = 로그인 · 로그인 = 포럼), 보조 = 이용 가이드. */}
+          <O4OPublicHero
+            eyebrow={PHARMACY_DISPLAY_NAME}
+            title={PHARMACY_HERO.title}
+            description={PHARMACY_HERO.description}
+            accent={PHARMACY_ACCENT}
+            actions={
+              <>
+                {isAuthenticated ? (
+                  <Link to="/forum" className="o4o-cta" data-testid="pharmacy-hero-primary">
+                    포럼 바로가기
+                  </Link>
+                ) : (
+                  <button type="button" onClick={() => openLoginModal()} className="o4o-cta" data-testid="pharmacy-hero-primary">
+                    로그인하고 시작하기
+                  </button>
+                )}
+                <Link to="/guide/usage" className="o4o-cta-secondary">
+                  이용 가이드
+                </Link>
+              </>
+            }
+          >
+            {/* WO-O4O-HOME-TEMP-EXPERIENCE-ACCOUNT-NOTICE-V1: 임시 공용 체험 계정 안내 (추후 제거 예정) — 박스 대신 한 줄 안내 */}
+            {!isAuthenticated && (
+              <p className="m-0 text-sm text-slate-500">
+                체험용 공용 계정으로 주요 기능을 확인할 수 있습니다. 입력한 데이터는 예고 없이 초기화될 수 있습니다.{' '}
+                <Link to="/login" className="font-semibold text-slate-700 underline underline-offset-2">
+                  체험 계정 보기
+                </Link>
               </p>
-            </div>
-            <Link to="/login" style={{ flexShrink: 0, fontSize: 13, fontWeight: 600, color: '#fff', background: '#059669', padding: '8px 16px', borderRadius: 8, textDecoration: 'none', whiteSpace: 'nowrap' }}>
-              체험 계정 보기
-            </Link>
-          </div>
-          <HeroBannerSection
-            ads={heroAds}
-            fallback={{
-              // WO-O4O-KPA-HERO-FALLBACK-VALUE-COPY-V1:
-              // Hero fallback 을 "커뮤니티 소개" 에서 "O4O 가치 전달" 로 전환.
-              // Philosophy §8 최우선 명제 ("정보를 실행 경쟁력으로 전환") 직접 표현.
-              // 3 요소 (AI · 운영자 자료 · 매장 도구) + "작은 약국" 으로 가치 명제 보존.
-              badge: '약사·약국 O4O 플랫폼',
-              title: '정보를 매장 실행 경쟁력으로 연결합니다',
-              subtitle: 'AI · 운영자 자료 · 매장 도구를 연결해 작은 약국도 경쟁력을 만듭니다',
-              // WO-KPA-HOME-HERO-COLOR-COMPOSITION-REFINE-V1:
-              // blue band + 떠 있는 white card + 은은한 accent 로 시각 계층 강화 (문구·구조 동일)
-              decorated: true,
-            }}
-          />
-        </PageHero>
+            )}
+          </O4OPublicHero>
+          {/* 운영자 등록 광고가 있을 때만 Hero 아래에 캐러셀을 둔다 (없으면 fallback 히어로를 겹쳐 그리지 않는다 — h1 1개 유지) */}
+          {heroAds.length > 0 && (
+            <PageHero>
+              <HeroBannerSection
+                ads={heroAds}
+                fallback={{
+                  badge: PHARMACY_DISPLAY_NAME,
+                  title: PHARMACY_HERO.title.join(' '),
+                  subtitle: PHARMACY_HERO.description.join(' '),
+                }}
+              />
+            </PageHero>
+          )}
+        </>
       }
       noticesAccentBg="var(--color-primary-light, #eff6ff)"
       noticesRightSlot={
@@ -240,7 +263,7 @@ export function CommunityHomePage() {
       //   `/guide/usage` 진입은 이 CTA 하나만 유지한다(아래 help.usageItems 의 중복 항목 제거).
       //   description 에서 '기능별' 을 뺀 이유 — 바로 아래 '기능별 이용 방법' 카드와 같은 말을 반복했다.
       cta={{
-        title: 'KPA-Society 활용이 처음이신가요?',
+        title: 'O4O 약국 활용이 처음이신가요?',
         description: '서비스 구조와 이용 방법을 가이드에서 확인하세요',
         href: '/guide/usage',
         linkLabel: '이용 가이드 보기 →',
@@ -250,7 +273,7 @@ export function CommunityHomePage() {
       }}
       help={{
         currentServiceKey: 'kpa-society',
-        usageTitle: 'KPA-Society 이용 가이드',
+        usageTitle: 'O4O 약국 이용 가이드',
         // WO-O4O-KPA-HOME-OTHER-SERVICES-SECTION-ALIGNMENT-V1: 다른 서비스 블록은
         //   Home 맨 아래(valueGuideSlot 하단)로 이동했으므로 Help 슬롯에서는 숨김.
         showServices: false,
@@ -258,7 +281,7 @@ export function CommunityHomePage() {
         //   '서비스 활용 방법'(→ /guide/usage) 제거 — 바로 위 CTA 와 같은 화면으로 가는 중복 진입이었다.
         //   목적지(/guide/usage)는 CTA 에 그대로 남아 있어 접근 경로가 사라지지 않는다.
         usageItems: [
-          { title: 'O4O 개요', description: 'O4O 서비스 구조와 KPA-Society의 역할', href: '/guide/intro' },
+          { title: 'O4O 개요', description: 'O4O 서비스 구조와 O4O 약국의 역할', href: '/guide/intro' },
           { title: '기능별 이용 방법', description: '포럼, 강의, 자료실, 매장 기능 구성', href: '/guide/features' },
         ],
       }}

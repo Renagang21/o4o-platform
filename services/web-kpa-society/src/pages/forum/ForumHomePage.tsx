@@ -63,7 +63,7 @@ function ForumRequestButton() {
 
 const kpaForumConfig: ForumHubConfig = {
   serviceKey: 'kpa-society',
-  heroTitle: 'KPA-Society 포럼',
+  heroTitle: 'O4O 약국 포럼',
   heroDesc: '약사 커뮤니티에서 정보를 교환하고 토론에 참여하세요',
   categoryPath: (id) => `/forum/all?category=${id}`,
   listPath: '/forum/all',

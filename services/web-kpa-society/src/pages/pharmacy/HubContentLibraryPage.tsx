@@ -115,7 +115,7 @@ function useKpaContentHubConfig(userId?: string): ContentHubConfig {
     serviceKey: 'kpa-society',
 
     heroTitle: '약국에서 바로 쓰는 콘텐츠',
-    heroDesc: 'KPA-Society 약국을 위한 콘텐츠 자료실',
+    heroDesc: 'O4O 약국 약국을 위한 콘텐츠 자료실',
     searchPlaceholder: '콘텐츠 검색',
 
     // WO-O4O-KPA-STORE-HUB-CONTENT-SOURCE-TABS-V1:
