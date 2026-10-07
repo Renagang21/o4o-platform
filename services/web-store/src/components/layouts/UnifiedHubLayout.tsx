@@ -15,7 +15,7 @@ import { StoreHubShell, type StoreHubNavGroup } from '@o4o/store-ui-core';
 import { eventOfferApi } from '../../api/eventOffer';
 import { useUnifiedStore } from '../../contexts/StoreContext';
 import { WORKSPACE_PATHS } from '../../config/workspace';
-import { StoreAgreementGate } from './UnifiedStoreLayout';
+import { RetiredServiceNotice, StoreAgreementGate, useRetiredOnlyStore } from './UnifiedStoreLayout';
 
 const HUB = WORKSPACE_PATHS.storeHub;
 
@@ -44,6 +44,12 @@ const HUB_MENU_GROUPS: StoreHubNavGroup[] = [
 ];
 
 export default function UnifiedHubLayout() {
+  // 종료 서비스만 가입된 매장 — HUB 조회가 KPA fallback 으로 나가지 않도록 본문(effect 포함)을 열지 않는다.
+  if (useRetiredOnlyStore()) return <RetiredServiceNotice />;
+  return <UnifiedHubBody />;
+}
+
+function UnifiedHubBody() {
   const { commonServiceKey } = useUnifiedStore();
   const [activeEventCount, setActiveEventCount] = useState<number | null>(null);
   useEffect(() => {

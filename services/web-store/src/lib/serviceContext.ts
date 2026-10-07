@@ -2,44 +2,56 @@
  * Service Context — Unified Store Workspace 의 2차 축 (WO-O4O-UNIFIED-STORE-WORKSPACE-FOUNDATION-V1 §8-4)
  *
  * 1차 축은 organizationId(선택된 매장)다. 그 매장이 등록한 서비스(enrollment)는 2차 축이며,
- * 백엔드 매장 API 는 여전히 서비스 mount(`/api/v1/kpa|cosmetics|pharmacy-hub/...`) 아래에 있으므로
+ * 백엔드 매장 API 는 여전히 서비스 mount(`/api/v1/kpa|pharmacy-hub/...`) 아래에 있으므로
  * 화면은 "지금 어느 서비스 문맥으로 호출하는가"만 정한다. 서비스 전환은 workspace 안의 문맥 전환이며 handoff 가 아니다.
  *
- *   - 공통 매장 업무(내 매장): 매장의 enrollment 중 canonical 우선순위(KPA → KCos → PH)로 **1개**를 공통 문맥으로 쓴다.
- *     (KPA 가 공통 기능의 reference implementation 이고 KCos 는 같은 o4o-store controller mount 를 쓴다.)
+ *   - 공통 매장 업무(내 매장): 매장의 enrollment 중 canonical 우선순위(KPA → PH)로 **1개**를 공통 문맥으로 쓴다.
+ *     (KPA 가 공통 기능의 reference implementation 이다.)
+ *   - K-Cosmetics(`k-cosmetics`)는 종료돼 이 workspace 의 서비스 문맥이 아니다 — 그 enrollment 는 업무공간 없는 서비스로
+ *     표시만 된다(서버 API `/api/v1/cosmetics/*` 제거, WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1).
  *   - 서비스 업무(/work/:serviceKey): 그 서비스 문맥으로 호출한다.
  *
  * 모듈 전역 getter 를 두는 이유: KPA canonical 트리의 api 모듈들이 module-level 상수로 base URL 을 만들던 것을
  * 요청 시점 함수로 바꿨기 때문이다(React 밖에서도 읽을 수 있어야 한다). 값의 SSOT 는 StoreContext 가 set 한다.
  */
 
-export type UnifiedServiceKey = 'kpa-society' | 'k-cosmetics' | 'pharmacy-hub';
+export type UnifiedServiceKey = 'kpa-society' | 'pharmacy-hub';
 
 /** canonical serviceKey → 백엔드 라우터 mount prefix (`/api/v1/<prefix>`) */
 export const SERVICE_API_PREFIX: Readonly<Record<UnifiedServiceKey, string>> = Object.freeze({
   'kpa-society': 'kpa',
-  'k-cosmetics': 'cosmetics',
   'pharmacy-hub': 'pharmacy-hub',
 });
 
 /** 일부 공통 API(콘텐츠 HUB · 미디어 · 구독)는 짧은 service 식별자를 쓴다 */
 export const SERVICE_SHORT_KEY: Readonly<Record<UnifiedServiceKey, string>> = Object.freeze({
   'kpa-society': 'kpa',
-  'k-cosmetics': 'cosmetics',
   'pharmacy-hub': 'pharmacy-hub',
 });
 
 export const SERVICE_LABEL: Readonly<Record<UnifiedServiceKey, string>> = Object.freeze({
   'kpa-society': 'KPA Society',
-  'k-cosmetics': 'K-Cosmetics',
   'pharmacy-hub': 'PharmacyHub',
 });
 
-/** 공통 매장 업무의 문맥 우선순위 — KPA(reference) → KCos → PH */
-export const COMMON_CONTEXT_PRIORITY: readonly UnifiedServiceKey[] = ['kpa-society', 'k-cosmetics', 'pharmacy-hub'];
+/** 공통 매장 업무의 문맥 우선순위 — KPA(reference) → PH */
+export const COMMON_CONTEXT_PRIORITY: readonly UnifiedServiceKey[] = ['kpa-society', 'pharmacy-hub'];
 
 export function isUnifiedServiceKey(v: unknown): v is UnifiedServiceKey {
-  return v === 'kpa-society' || v === 'k-cosmetics' || v === 'pharmacy-hub';
+  return v === 'kpa-society' || v === 'pharmacy-hub';
+}
+
+/**
+ * 이 매장의 활성 가입이 **이 앱이 열 수 없는(종료된) 서비스뿐**인가.
+ *   종료 서비스는 catalog 에서 workspaceAvailable=false 로 내려오므로(K-Cosmetics) 업무공간 가능 여부가 아니라
+ *   active 가입 기준으로 본다 — 열 수 있는 업무공간이 하나도 없으면 화면이 KPA 기본 문맥으로 떨어져 403 을 내지 않도록
+ *   종료 안내로 보낸다. (WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1)
+ */
+export function hasOnlyRetiredWorkspaces(
+  services: ReadonlyArray<{ serviceKey: string; enrollmentStatus: string; workspaceAvailable: boolean }>,
+): boolean {
+  const active = services.filter((s) => s.enrollmentStatus === 'active');
+  return active.length > 0 && !active.some((s) => s.workspaceAvailable && isUnifiedServiceKey(s.serviceKey));
 }
 
 export function pickCommonServiceContext(enrolled: readonly string[]): UnifiedServiceKey | null {
@@ -51,7 +63,7 @@ export function pickCommonServiceContext(enrolled: readonly string[]): UnifiedSe
  * 서비스 지정 매장 화면(`/work/<serviceKey>/store/*`) — CHECK-O4O-URL-FIRST-CENSUS-V1 §21-13
  *
  * 각 서비스의 매장 경영자용 `/store` 를 store.neture.co.kr 로 옮길 때, 공통 `/store/*` 화면이 우선순위
- * (KPA → KCos → PH)가 아니라 **진입한 서비스**의 API 로 동작해야 한다. 진입 시 서비스를 세션에 고정하고,
+ * (KPA → PH)가 아니라 **진입한 서비스**의 API 로 동작해야 한다. 진입 시 서비스를 세션에 고정하고,
  * 화면 안의 `/store/...` 링크로 이동해도 같은 서비스가 유지되게 한다(링크 수정 불요).
  * 고정값은 그 매장의 활성 서비스일 때만 쓰인다(StoreContext 가 검증) — 서버 권한 판정은 그대로다.
  */
@@ -79,9 +91,9 @@ export function writeServiceScope(key: UnifiedServiceKey | null): void {
 /**
  * 서비스 지정 매장 화면이 mount 된 서비스 — App.tsx 의 `/work/<key>/store` route 와 같은 목록이어야 한다.
  * 이 서비스로 고정된 상태에서 화면 안 `/store/...` 링크(약 69개)를 따라가면 `/work/<key>/store/...` 로
- * 바꿔 URL 에서 서비스가 드러나게 한다(§21-14). KPA(§21-13) · K-Cosmetics(§21-15).
+ * 바꿔 URL 에서 서비스가 드러나게 한다(§21-14). KPA(§21-13). (K-Cosmetics §21-15 mount 는 퇴역으로 제거)
  */
-export const SERVICE_SCOPED_STORE_KEYS: readonly UnifiedServiceKey[] = ['kpa-society', 'k-cosmetics'];
+export const SERVICE_SCOPED_STORE_KEYS: readonly UnifiedServiceKey[] = ['kpa-society'];
 
 /** `/store...` → `/work/<key>/store...` (고정 서비스에 mount 가 있을 때만, 아니면 null) */
 export function toServiceScopedStorePath(scoped: UnifiedServiceKey | null, pathWithQuery: string): string | null {
@@ -125,11 +137,10 @@ export function setActiveServiceContext(key: UnifiedServiceKey | null): void {
  * 만들면 열리지 않는 주소가 된다(CHECK-O4O-URL-FIRST-CENSUS-V1 §7-6).
  * 서버의 QR 이미지 · 인쇄 URL(`qrPublicOrigin`)과 같은 호스트를 가리킨다.
  * WO-O4O-SERVICE-CATALOG-CANONICAL-DOMAIN-AND-PH-JOIN-CLEANUP-V1: 서버 service-catalog 의 canonical 호스트를 따른다.
- * 옛 호스트(kpa-society.co.kr · k-cosmetics.site)는 인쇄 QR 수용용으로 계속 서빙되지만 새로 만드는 주소에는 쓰지 않는다.
+ * 옛 호스트(kpa-society.co.kr)는 인쇄 QR 수용용으로 계속 서빙되지만 새로 만드는 주소에는 쓰지 않는다.
  */
 export const SERVICE_PUBLIC_ORIGIN: Readonly<Record<UnifiedServiceKey, string>> = Object.freeze({
   'kpa-society': 'https://pharmacy.neture.co.kr',
-  'k-cosmetics': 'https://retail.neture.co.kr',
   'pharmacy-hub': 'https://pharmacyhub.co.kr',
 });
 

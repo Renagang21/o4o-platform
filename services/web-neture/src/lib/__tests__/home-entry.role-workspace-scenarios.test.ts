@@ -92,16 +92,16 @@ describe('시나리오', () => {
     const m = buildHomeEntryModel(
       user(),
       base({
-        services: [svc('neture', 'Neture'), svc('kpa-society', 'KPA Society'), svc('k-cosmetics', 'K-Cosmetics')] as HomeEntryData['services'],
+        services: [svc('neture', 'Neture'), svc('kpa-society', 'KPA Society'), svc('pharmacy-hub', 'Pharmacy Hub')] as HomeEntryData['services'],
         stores: [
           { serviceKey: 'kpa-society', organizationId: 'o1', name: '테스트 약국', memberRole: 'owner' },
-          { serviceKey: 'k-cosmetics', organizationId: 'o2', name: '테스트 뷰티샵', memberRole: 'owner' },
+          { serviceKey: 'pharmacy-hub', organizationId: 'o2', name: '테스트 허브약국', memberRole: 'owner' },
         ],
       }),
     );
     expect(card(m, 'store').items.map((i) => [i.label, i.note, (i.action as { returnPath?: string }).returnPath])).toEqual([
       ['테스트 약국', 'KPA Society', '/store/workspace'],
-      ['테스트 뷰티샵', 'K-Cosmetics', '/store/workspace'],
+      ['테스트 허브약국', 'Pharmacy Hub', '/store-owner/workspace'],
     ]);
   });
 
@@ -121,8 +121,8 @@ describe('시나리오', () => {
   });
 
   it('복수 서비스 운영자: 서비스별 버튼 (프런트 role 파싱 없음 — 목록에 없는 서비스는 role 이 있어도 없음)', () => {
-    const m = buildHomeEntryModel(user(['kpa:operator', 'cosmetics:operator', 'pharmacy-hub:operator']), base({ operatorServices: [op('kpa-society'), op('k-cosmetics')] }));
-    expect(card(m, 'operator').items.map((i) => i.label)).toEqual(['KPA Society', 'K-Cosmetics']);
+    const m = buildHomeEntryModel(user(['kpa:operator', 'cosmetics:operator', 'pharmacy-hub:operator']), base({ operatorServices: [op('kpa-society'), op('pharmacy-hub')] }));
+    expect(card(m, 'operator').items.map((i) => i.label)).toEqual(['KPA Society', 'Pharmacy Hub']);
   });
 
   it('플랫폼 관리자: "플랫폼 관리" 별도 · 4 카드에는 섞이지 않음 · 공급자 카드는 bypass 로 열리지 않음', () => {

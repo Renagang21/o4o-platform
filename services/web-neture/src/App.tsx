@@ -532,7 +532,6 @@ const GuideBusinessWarehousePharmacyPage = lazy(() => import('./pages/guide').th
 const GuideForeignCustomerSupportPage = lazy(() => import('./pages/guide').then(m => ({ default: m.GuideForeignCustomerSupportPage })));
 // WO-O4O-NETURE-GUIDE-ACTIVE-SERVICE-CARDS-AND-PAGES-V1: 운영 중인 O4O 서비스 소개 페이지
 const GuideServiceKpaSocietyPage = lazy(() => import('./pages/guide').then(m => ({ default: m.GuideServiceKpaSocietyPage })));
-const GuideServiceKCosmeticsPage = lazy(() => import('./pages/guide').then(m => ({ default: m.GuideServiceKCosmeticsPage })));
 
 // Loading fallback
 function PageLoading() {
@@ -813,7 +812,6 @@ function App() {
               <Route path="/guide/foreign-customer-support" element={<GuideForeignCustomerSupportPage />} />
               {/* WO-O4O-NETURE-GUIDE-ACTIVE-SERVICE-CARDS-AND-PAGES-V1: 운영 중인 O4O 서비스 소개 */}
               <Route path="/guide/services/kpa-society" element={<GuideServiceKpaSocietyPage />} />
-              <Route path="/guide/services/k-cosmetics" element={<GuideServiceKCosmeticsPage />} />
               <Route path="/guide/intro" element={<GuideIntroPage />} />
               <Route path="/guide/intro/structure" element={<GuideIntroStructurePage />} />
               <Route path="/guide/intro/neture" element={<GuideIntroNeturePage />} />

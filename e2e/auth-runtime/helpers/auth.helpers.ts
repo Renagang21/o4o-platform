@@ -58,15 +58,7 @@ export const SERVICES: Record<string, ServiceConfig> = {
     protectedPath: '/admin',
     dashboardPrefix: '/admin',
   },
-  kcosmetics: {
-    name: 'K-Cosmetics',
-    serviceKey: 'k-cosmetics',
-    baseUrl: 'https://k-cosmetics.site',
-    loginPath: '/login',
-    protectedPath: '/operator',
-    dashboardPrefix: '/operator',
-    note: 'lazy session — RoleGuard에서 checkSession 트리거',
-  },
+  // K-Cosmetics(k-cosmetics.site)는 서비스 종료로 제거 — WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1
 };
 
 export const ALL_SERVICES = Object.values(SERVICES);
@@ -165,7 +157,7 @@ export async function logoutViaApi(page: Page, baseUrl: string): Promise<void> {
  * WO-O4O-AUTH-LOGOUT-SELECTOR-STABILIZATION-V1
  *
  * 지원 컴포넌트:
- *   GlobalHeader (@o4o/ui, KPA / K-Cosmetics) — aria-label="사용자 메뉴"
+ *   GlobalHeader (@o4o/ui, KPA) — aria-label="사용자 메뉴"
  *   GlobalUserProfileDropdown (@o4o/account-ui, Neture)     — aria-label="계정 메뉴"
  *
  * 실패 시 숨기지 않고 어느 단계에서 실패했는지 console.error로 보고한다.
@@ -294,7 +286,7 @@ export async function waitForLoadingComplete(page: Page, maxMs = 8000): Promise<
 
 /** 로그인 상태에서만 렌더되는 사용자 메뉴 트리거 (GlobalHeader / GlobalUserProfileDropdown) */
 export const USER_MENU_TRIGGER_SELECTORS = [
-  'button[aria-label="사용자 메뉴"]',  // GlobalHeader (KPA / K-Cosmetics)
+  'button[aria-label="사용자 메뉴"]',  // GlobalHeader (KPA)
   'button[aria-label="계정 메뉴"]',    // GlobalUserProfileDropdown (Neture)
   'button[aria-label*="사용자"]',
   'button[aria-label*="계정"]',

@@ -174,11 +174,11 @@ export const O4O_SERVICES: O4OService[] = [
     legacyDomains: ['k-cosmetics.site'],
     // 사업 의미 = 화장품 · 일반 소매 사업자 대상 세미프랜차이즈 운영 서비스 (O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1).
     description: '화장품 유통 플랫폼',
-    joinEnabled: true,
-    // 가입은 Store Workspace(store.neture.co.kr) 신청 · 운영자 경로에서 만든다.
+    // 운영 종료(WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1) — 신규 가입 · 매장/운영자 업무공간 진입을 닫는다.
+    //   row 는 retired identity 로 남긴다: serviceKey · cosmetics:* role · 기존 membership · DB 는 후속 정리 대상(이번 범위 밖).
+    joinEnabled: false,
     loginMembershipRequired: true,
-    // STANDARD_CANDIDATE — 매장 linkage(cosmetics) · cosmetics:store_owner · cosmetics:operator 존재. 자동 활성화 아님.
-    workspace: { workspaceMode: 'standard', storeWorkspaceEnabled: true, operatorWorkspaceEnabled: true },
+    workspace: { workspaceMode: 'standard', storeWorkspaceEnabled: false, operatorWorkspaceEnabled: false },
   },
   /**
    * WO-PHARMACY-HUB-NEW-SERVICE-FOUNDATION-V1

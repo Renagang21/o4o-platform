@@ -99,23 +99,10 @@ import { ForumNotification } from '../entities/ForumNotification.js';
 // ✅ CMS Module V2 entities (Phase C-2)
 
 // ============================================================================
-// COSMETICS ENTITIES (Phase 7-A-1)
+// COSMETICS ENTITIES (Phase 7-A-1) — REMOVED
+// WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1: K-Cosmetics runtime(routes/cosmetics) 삭제와 함께
+//   등록 해제. 테이블(cosmetics.*)은 DROP 하지 않는다 — 물리 스키마 정리는 별도 단계.
 // ============================================================================
-import {
-  CosmeticsBrand,
-  CosmeticsLine,
-  CosmeticsProduct,
-  CosmeticsPricePolicy,
-  CosmeticsProductLog,
-  CosmeticsPriceLog,
-  CosmeticsStore,
-  CosmeticsStoreApplication,
-  CosmeticsStoreMember,
-  CosmeticsStoreListing,
-  CosmeticsStorePlaylist,
-  CosmeticsStorePlaylistItem,
-  CosmeticsMember, // WO-O4O-KCOS-COSMETICS-MEMBER-PROFILE-FOUNDATION-V1
-} from '../routes/cosmetics/entities/index.js';
 
 // ============================================================================
 // YAKSA ENTITIES (Phase A-1) — REMOVED
@@ -605,25 +592,7 @@ export const entities = [
   // Digital Signage legacy entities removed — see digital-signage-core
   // CMS Module V2 local entities (CMSCustomField/cms_fields · CMSView/cms_views · CMSPage/cms_pages) 제거 —
   //   생성 주체 0 · 소비 0 (WO-O4O-CMS-LIFECYCLE-SCHEMA-CPT-ACF-AND-DEAD-ENTITY-FINAL-RETIREMENT-V1).
-  // ============================================================================
-  // COSMETICS ENTITIES (Phase 7-A-1: Cosmetics API Implementation)
-  // ============================================================================
-  CosmeticsBrand,
-  CosmeticsLine,
-  CosmeticsProduct,
-  CosmeticsPricePolicy,
-  CosmeticsProductLog,
-  CosmeticsPriceLog,
-  // COSMETICS STORE ENTITIES (WO-KCOS-STORES-PHASE1-V1)
-  CosmeticsStore,
-  CosmeticsStoreApplication,
-  CosmeticsStoreMember,
-  CosmeticsStoreListing,
-  // COSMETICS STORE PLAYLIST ENTITIES (WO-KCOS-STORES-PHASE4-SIGNAGE-INTEGRATION-V1)
-  CosmeticsStorePlaylist,
-  CosmeticsStorePlaylistItem,
-  // COSMETICS MEMBER PROFILE (WO-O4O-KCOS-COSMETICS-MEMBER-PROFILE-FOUNDATION-V1)
-  CosmeticsMember,
+  // COSMETICS ENTITIES — 등록 해제(WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1). 테이블은 유지.
   // ============================================================================
   // YAKSA ENTITIES (Phase A-1) — REMOVED
   // WO-O4O-LEGACY-YAKSA-API-ROUTE-AND-DEAD-UI-REMOVAL-V1: legacy route 제거와 함께 등록 해제
