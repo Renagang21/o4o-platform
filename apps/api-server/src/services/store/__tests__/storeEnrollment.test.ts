@@ -76,18 +76,7 @@ const expectCode = async (p: Promise<unknown>, code: string) =>
 //   WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1. 현재 자가 가입 대상 업종은 없다.
 
 describe('K-Cosmetics 자가 가입은 은퇴했다', () => {
-  it('cosmetics 는 가입 대상이 아니다 — 조직 · role · membership 을 만들지 않는다', async () => {
-    const { ds } = makeDs([]);
-    await expectCode(
-      enrollStoreBusiness(ds, { userId: USER, serviceKey: 'cosmetics', businessName: '가나상점' }),
-      'SERVICE_NOT_ENROLLABLE',
-    );
-    expect(ds.query).not.toHaveBeenCalled();
-    expect(ensureOrgMock).not.toHaveBeenCalled();
-    expect(ensureMembershipMock).not.toHaveBeenCalled();
-    expect(assignRoleMock).not.toHaveBeenCalled();
-  });
-
+  // cosmetics 거절(조직 · role · membership 미생성)은 아래 E5 의 it.each 가 kpa 와 함께 고정한다.
   it('현재 자가 가입 대상 업종은 없다', () => {
     expect(ENROLLABLE_SERVICE_KEYS).toEqual([]);
   });
@@ -108,12 +97,16 @@ describe('E5 입력 검증은 쓰기 전에 끝난다', () => {
     expect(ensureOrgMock).not.toHaveBeenCalled();
   });
 
-  it('약국(kpa)은 자가 가입으로 열 수 없다 — 조직 · role · membership 을 만들지 않는다', async () => {
-    // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1 · O4O-STORE-ACCESS-AND-MEMBERSHIP-V1 §3-A:
-    //   약국 매장은 Neture 기본 가입 신청 + 운영자 승인으로만 열린다(승인 우회 경로 차단).
+  // kpa — WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1 · O4O-STORE-ACCESS-AND-MEMBERSHIP-V1 §3-A:
+  //   약국 매장은 Neture 기본 가입 신청 + 운영자 승인으로만 열린다(승인 우회 경로 차단).
+  // cosmetics — 서비스 운영 종료(WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1).
+  it.each([
+    ['kpa', '가나약국'],
+    ['cosmetics', '가나상점'],
+  ] as const)('%s 는 자가 가입으로 열 수 없다 — 조직 · role · membership 을 만들지 않는다', async (serviceKey, businessName) => {
     const { ds } = makeDs([]);
     await expectCode(
-      enrollStoreBusiness(ds, { userId: USER, serviceKey: 'kpa', businessName: '가나약국' }),
+      enrollStoreBusiness(ds, { userId: USER, serviceKey, businessName }),
       'SERVICE_NOT_ENROLLABLE',
     );
     expect(ds.query).not.toHaveBeenCalled();
