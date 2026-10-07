@@ -26,7 +26,8 @@ Auth·Membership·Approval·RBAC의 정책 연결, 로그인 게이트·handoff�
 - [x] 관련 canonical 문서 정합
 - [x] focused test·typecheck·build
 - [x] desktop·mobile browser smoke 및 실제 API 결과 확인
-- [ ] path-specific commit·push·PR·CI 확인
+- [x] path-specific commit·push·PR 생성 (#359)
+- [ ] 최신 HEAD의 required CI·자동 Codex review 결과 확인
 
 ## 검증 범위
 
@@ -43,7 +44,7 @@ Branch `wo/neture-auth-membership-refactor-v1`, base `f738b54efb`. 기준 checko
 - 실제 세션 smoke: 가입 원장이 없는 이메일 확인 계정의 로그인·auth/me·handoff·refresh를 검증했다. handoff는 연결 서비스의 승인을 생성하지 않았다.
 - Store 데스크톱·모바일에서 두 Demo 버튼과 매장 경영자 실제 로그인 통과. Neture·Pharmacy Hub·KPA Branch·KPA Society·Lecture의 데스크톱·모바일 10개 화면에서도 두 버튼과 브라우저 오류 0건을 확인했다.
 - auth-react 147개, Neture 360개 테스트 통과. 격리 PostgreSQL의 약국·세미프랜차이즈 integration 19개 통과. API 관련 회귀와 추가 세션 projection·승인 서비스 회귀를 검증했다.
-- API typecheck/bundle, Store·Neture·Lecture production build, Pharmacy Hub·KPA Branch·KPA Society typecheck 통과. unsafe route·entity registry·migration contract guard 통과.
+- API typecheck/bundle, 전체 frontend typecheck, Store·Neture·Lecture production build 통과. auth-client 추가 15개 테스트와 ESLint ratchet(기존 오류 baseline 46) 통과. unsafe route·entity registry·migration contract guard 통과.
 - 파일 검증은 격리된 GCS emulator를 사용했다. 실제 Google OAuth·메일 발송·운영 비공개 bucket은 이번 로컬 smoke에서 검증하지 않았다. 운영 DB·설정은 변경하지 않았다.
 
 ## 문서 정합
