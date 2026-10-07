@@ -400,7 +400,7 @@ canonical 정리 (candidate 파일 기준 `kpa-society.co.kr` 잔존 수): index
 
 ### 11-4. Production smoke (비로그인 · Chrome headless · 실 URL)
 
-1280/390 모두 HTTP 200 · pageerror 0 · console error 0 · 4xx/5xx 응답 0 · 가로 overflow 0 · Pretendard loaded(`Pretendard Variable`).
+공개 홈 1280/390: HTTP 200 · pageerror 0 · console error 0 · 4xx/5xx 응답 0 · 가로 overflow 0 · Pretendard loaded(`Pretendard Variable`). 예외 1건: 무효 token 으로 일부러 연 `/handoff?token=<무효>` 확인에서 handoff API 가 401 을 1회 돌려줬다(1280 · 390 각 1회, 예상 응답 — 아래 #330 화면 행). 그 밖의 4xx/5xx 는 0 이다.
 
 | 항목 | 결과 |
 |---|---|
