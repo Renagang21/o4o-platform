@@ -3,7 +3,8 @@ const mockBucket = { file: jest.fn(() => mockObject) };
 jest.mock('@google-cloud/storage', () => ({ Storage: jest.fn(() => ({ bucket: jest.fn(() => mockBucket) })) }));
 import { BusinessRegistrationDocumentService } from '../services/business-registration-document.service.js';
 const repo = { create: jest.fn((v) => v), save: jest.fn(), findOne: jest.fn() };
-const service = new BusinessRegistrationDocumentService({ getRepository: () => repo } as any);
+const query = jest.fn();
+const service = new BusinessRegistrationDocumentService({ getRepository: () => repo, query } as any);
 const file = (buffer = Buffer.from('%PDF-1.7\nsynthetic'), mimetype = 'application/pdf', size = buffer.length) => ({ buffer, mimetype, size, originalname: 'synthetic.pdf' } as Express.Multer.File);
 beforeEach(() => { jest.clearAllMocks(); mockObject.delete.mockResolvedValue(undefined); repo.save.mockImplementation(async (v) => ({ ...v, id: 'd1' })); });
 describe('private business registration documents', () => {
@@ -31,6 +32,14 @@ describe('private business registration documents', () => {
   it('ownership lookup includes authenticated user and document type', async () => {
     await service.findOwned('u1', 'd1');
     expect(repo.findOne).toHaveBeenCalledWith({ where: { id: 'd1', userId: 'u1', documentType: 'business_registration' } });
+  });
+  it.each([[[], false], [[{ id: 'd1' }], true]])('review access requires a linked pharmacy application', async (rows, allowed) => {
+    query.mockResolvedValueOnce(rows);
+    expect(await service.canReviewPharmacyDocument('d1')).toBe(allowed);
+    const sql = query.mock.calls[0][0];
+    expect(sql).toContain('pm.applicant_user_id = d.user_id');
+    expect(sql).toContain("businessRegistrationDocumentId");
+    expect(sql).toContain('pm.organization_id');
   });
   it('refuses a stored URL outside the private bucket', async () => {
     repo.findOne.mockResolvedValueOnce({ fileUrl: 'https://example.test/public.pdf' });

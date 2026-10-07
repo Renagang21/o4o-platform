@@ -59,6 +59,7 @@ export interface GoogleSignupConsents {
   privacy: boolean;
   marketing?: boolean;
   phone: string;
+  name: string;
 }
 
 /** 이 패키지가 요구하는 authClient 의 최소 표면(@o4o/auth-client 인스턴스가 충족). */

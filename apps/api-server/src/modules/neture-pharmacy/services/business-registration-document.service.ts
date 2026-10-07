@@ -38,6 +38,19 @@ export class BusinessRegistrationDocumentService {
     return this.dataSource.getRepository(KycDocument).findOne({ where: { id, userId, documentType: 'business_registration' } });
   }
 
+  /** Pharmacy reviewers can read only documents linked to an actual pharmacy application. */
+  async canReviewPharmacyDocument(id: string): Promise<boolean> {
+    const rows = await this.dataSource.query(
+      `SELECT d.id FROM kyc_documents d
+         JOIN neture_pharmacy_memberships pm ON pm.applicant_user_id = d.user_id
+         JOIN organizations o ON o.id = pm.organization_id
+        WHERE d.id = $1 AND d."documentType" = 'business_registration'
+          AND o.metadata->'businessProfile'->>'businessRegistrationDocumentId' = d.id::text
+        LIMIT 1`, [id],
+    );
+    return rows.length > 0;
+  }
+
   async read(id: string) {
     const document = await this.dataSource.getRepository(KycDocument).findOne({ where: { id, documentType: 'business_registration' } });
     if (!document) throw new NeturePharmacyError(404, 'DOCUMENT_NOT_FOUND', '사업자등록증을 찾을 수 없습니다.');

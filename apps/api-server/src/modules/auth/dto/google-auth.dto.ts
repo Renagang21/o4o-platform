@@ -1,4 +1,4 @@
-import { IsBoolean, IsDefined, IsNotEmpty, IsOptional, IsString, ValidateNested } from 'class-validator';
+import { IsBoolean, IsDefined, IsNotEmpty, IsOptional, IsString, MaxLength, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
 
 /**
@@ -24,6 +24,11 @@ export class GoogleLoginRequestDto {
 }
 
 export class GoogleSignupConsentsDto {
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(100)
+  name!: string;
+
   @IsString()
   @IsNotEmpty()
   phone!: string;

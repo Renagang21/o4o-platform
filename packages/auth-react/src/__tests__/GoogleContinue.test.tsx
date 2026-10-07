@@ -81,6 +81,19 @@ describe('GoogleContinue — 준비 상태', () => {
 });
 
 describe('GoogleContinue — 로그인 · 가입 전이', () => {
+  it('requires a name before submitting Google signup', async () => {
+    const p = mount({ loginWithGoogle: vi.fn(async () => ({ success: false, code: 'GOOGLE_SIGNUP_REQUIRED', status: 404, error: 'x' })) });
+    await waitFor(() => expect(captured).not.toBeNull());
+    await act(async () => { captured!.onCredential('id-token'); });
+    await screen.findByTestId('google-continue-consent');
+    const boxes = screen.getAllByRole('checkbox');
+    fireEvent.click(boxes[0]); fireEvent.click(boxes[1]);
+    fireEvent.change(screen.getByLabelText('개인 휴대전화 (필수)'), { target: { value: '01012345678' } });
+    fireEvent.click(screen.getByText('동의하고 계정 만들기'));
+    expect((await screen.findByRole('alert')).textContent).toContain('이름');
+    expect(p.signupWithGoogle).not.toHaveBeenCalled();
+  });
+
   it('등록된 sub: credential → loginWithGoogle → onSuccess(isNewUser=false)', async () => {
     const p = mount();
     await waitFor(() => expect(captured).not.toBeNull());
@@ -99,6 +112,7 @@ describe('GoogleContinue — 로그인 · 가입 전이', () => {
     await act(async () => { captured!.onCredential('id-token'); });
 
     await screen.findByTestId('google-continue-consent');
+    fireEvent.change(screen.getByLabelText('이름 (필수)'), { target: { value: '테스트회원' } });
     fireEvent.change(screen.getByLabelText('개인 휴대전화 (필수)'), { target: { value: '01012345678' } });
     fireEvent.click(screen.getByText('동의하고 계정 만들기'));
     await screen.findByRole('alert');
@@ -117,11 +131,12 @@ describe('GoogleContinue — 로그인 · 가입 전이', () => {
     const boxes = screen.getAllByRole('checkbox');
     fireEvent.click(boxes[0]); // 이용약관
     fireEvent.click(boxes[1]); // 개인정보
+    fireEvent.change(screen.getByLabelText('이름 (필수)'), { target: { value: '테스트회원' } });
     fireEvent.change(screen.getByLabelText('개인 휴대전화 (필수)'), { target: { value: '01012345678' } });
     fireEvent.click(screen.getByText('동의하고 계정 만들기'));
 
     await waitFor(() => expect(p.onSuccess).toHaveBeenCalledWith({ user: USER, isNewUser: true }));
-    expect(p.signupWithGoogle).toHaveBeenCalledWith('id-token', { terms: true, privacy: true, marketing: false, phone: '01012345678' });
+    expect(p.signupWithGoogle).toHaveBeenCalledWith('id-token', { terms: true, privacy: true, marketing: false, name: '테스트회원', phone: '01012345678' });
   });
 
   it('signup 이 EMAIL_IN_USE 로 실패하면 onError 에 code 를 전달하고 동의 화면에 머문다 (자동 연결 없음)', async () => {
@@ -135,6 +150,7 @@ describe('GoogleContinue — 로그인 · 가입 전이', () => {
     const boxes = screen.getAllByRole('checkbox');
     fireEvent.click(boxes[0]);
     fireEvent.click(boxes[1]);
+    fireEvent.change(screen.getByLabelText('이름 (필수)'), { target: { value: '테스트회원' } });
     fireEvent.change(screen.getByLabelText('개인 휴대전화 (필수)'), { target: { value: '01012345678' } });
     fireEvent.click(screen.getByText('동의하고 계정 만들기'));
 
@@ -201,10 +217,11 @@ describe('GoogleContinue — 불안정한 콜백 prop 참조에 대한 안전성
     const boxes = screen.getAllByRole('checkbox');
     fireEvent.click(boxes[0]);
     fireEvent.click(boxes[1]);
+    fireEvent.change(screen.getByLabelText('이름 (필수)'), { target: { value: '테스트회원' } });
     fireEvent.change(screen.getByLabelText('개인 휴대전화 (필수)'), { target: { value: '01012345678' } });
     fireEvent.click(screen.getByText('동의하고 계정 만들기'));
     await waitFor(() => expect(third.onSuccess).toHaveBeenCalledWith({ user: USER, isNewUser: true }));
-    expect(third.signupWithGoogle).toHaveBeenCalledWith('id-token', { terms: true, privacy: true, marketing: false, phone: '01012345678' });
+    expect(third.signupWithGoogle).toHaveBeenCalledWith('id-token', { terms: true, privacy: true, marketing: false, name: '테스트회원', phone: '01012345678' });
     expect(first.signupWithGoogle).not.toHaveBeenCalled();
   });
 

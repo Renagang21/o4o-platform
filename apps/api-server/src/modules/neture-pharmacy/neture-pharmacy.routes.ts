@@ -133,7 +133,7 @@ export function createNeturePharmacyRoutes(dataSource: DataSource): ExpressRoute
         res.status(404).json({ success: false, code: 'DOCUMENT_NOT_FOUND' }); return;
       }
       const mine = await documents.findOwned(req.user!.id, req.params.id);
-      if (!mine && !res.locals.documentReviewer) { res.status(404).json({ success: false, code: 'DOCUMENT_NOT_FOUND' }); return; }
+      if (!mine && !(res.locals.documentReviewer && await documents.canReviewPharmacyDocument(req.params.id))) { res.status(404).json({ success: false, code: 'DOCUMENT_NOT_FOUND' }); return; }
       const { document, stream } = await documents.read(req.params.id);
       res.setHeader('Content-Type', document.mimeType || 'application/pdf');
       res.setHeader('Cache-Control', 'private, no-store');

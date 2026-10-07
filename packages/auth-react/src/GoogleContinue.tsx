@@ -78,6 +78,7 @@ export function GoogleContinue<TUser = unknown>({
   const [privacy, setPrivacy] = useState(false);
   const [marketing, setMarketing] = useState(false);
   const [phone, setPhone] = useState('');
+  const [name, setName] = useState('');
   const containerRef = useRef<HTMLDivElement>(null);
   const mountedRef = useRef(true);
 
@@ -158,12 +159,13 @@ export function GoogleContinue<TUser = unknown>({
       setMessage('이용약관과 개인정보 처리방침에 동의해야 계정을 만들 수 있습니다.');
       return;
     }
+    if (!name.trim() || name.trim().length > 100) { setMessage('이름을 100자 이내로 입력해 주세요.'); return; }
     const phoneDigits = phone.replace(/\D/g, '');
     if (!/^01\d{8,9}$/.test(phoneDigits)) { setMessage('개인 휴대전화 번호를 입력해 주세요.'); return; }
     const idToken = stage.idToken;
     setMessage(null);
     setStage({ kind: 'busy' });
-    const result = await callbacksRef.current.signupWithGoogle(idToken, { terms, privacy, marketing, phone: phoneDigits });
+    const result = await callbacksRef.current.signupWithGoogle(idToken, { terms, privacy, marketing, name: name.trim(), phone: phoneDigits });
     if (!mountedRef.current) return;
     if (result.success && result.user) {
       callbacksRef.current.onSuccess({ user: result.user, isNewUser: true });
@@ -172,7 +174,7 @@ export function GoogleContinue<TUser = unknown>({
     fail(result);
     // ID token 은 짧게 유효 — 동의 화면으로 되돌려 재시도를 허용한다(EMAIL_IN_USE 등은 메시지로 안내).
     setStage({ kind: 'consent', idToken });
-  }, [stage, terms, privacy, marketing, phone, fail]);
+  }, [stage, terms, privacy, marketing, phone, name, fail]);
 
   return (
     <div className={className} style={box} data-testid="google-continue">
@@ -194,6 +196,7 @@ export function GoogleContinue<TUser = unknown>({
           <p style={{ fontSize: 14, color: '#111827', margin: 0 }}>
             처음 오셨네요. 계정을 만들려면 아래 항목에 동의해 주세요.
           </p>
+          <label>이름 (필수)<input type="text" autoComplete="name" maxLength={100} value={name} onChange={(e) => setName(e.target.value)} /></label>
           <label>개인 휴대전화 (필수)<input type="tel" autoComplete="tel" value={phone} onChange={(e) => setPhone(e.target.value)} /></label>
           <p style={muted}>연락처를 등록합니다. 휴대전화 본인 인증을 수행하는 것은 아닙니다.</p>
           <label style={checkRow}>
