@@ -202,7 +202,10 @@ describe('POST /api/ai/request', () => {
     expect(r.body.data.work.runId).toBe('g_2');
     expect(r.body.data.work.resumable).toBe(true);
     expect(r.body.data.work.aiPlanCount).toBe(1);
-    expect(executeMock).not.toHaveBeenCalled();
+    // home-chat 본체는 타지 않는다. Assistant 의 실행 전 업무 이해(TaskUnderstanding)만 같은 provider 로 1회 —
+    // (WO-O4O-PERSONAL-ASSISTANT-TASK-UNDERSTANDING-AND-COMPLETION-V1 · 이 mock 응답은 형식 밖이라 결정적 기본 이해로 진행)
+    const byCaller = executeMock.mock.calls.map((c) => c[0]?.meta?.callerName ?? 'home-chat');
+    expect(byCaller).toEqual(['TaskUnderstanding']);
     expect(runSurfaceMock).not.toHaveBeenCalled();
     const input = runWorkAgentMock.mock.calls[0][2];
     expect(input.request).toBe('약학정보원에서 타이레놀 검색해줘');
