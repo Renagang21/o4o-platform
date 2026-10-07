@@ -24,6 +24,7 @@ import {
   applyPharmacyUrlMeta,
   kpaSeoRegistry,
 } from '../seoRegistry';
+import { KPA_FOOTER_SECTIONS } from '../navigation';
 
 afterEach(() => {
   document.head.innerHTML = '';
@@ -68,6 +69,19 @@ describe('og:url · canonical', () => {
     applyPharmacyUrlMeta('/store/some-internal-page');
     expect(ogUrl()).toBe('https://pharmacy.neture.co.kr/store/some-internal-page');
     expect(canonical()).toBeNull();
+  });
+});
+
+describe('공개 footer · /about 메타 — legacy "약사회" 브랜드 없음 (WO-O4O-CROSS-SERVICE-PUBLIC-DESIGN-FINAL-POLISH-V1)', () => {
+  it('footer 링크 그룹 · 라벨에 약사회 없음, /about 은 서비스 소개로 남는다', () => {
+    const text = KPA_FOOTER_SECTIONS.flatMap((s) => [s.title, ...s.links.map((l) => l.label)]).join(' ');
+    expect(text).not.toMatch(/약사회/);
+    const about = KPA_FOOTER_SECTIONS.flatMap((s) => s.links).find((l) => l.href === '/about');
+    expect(about?.label).toBe('서비스 소개');
+  });
+
+  it('/about 메타 description 에 대한약사회 없음', () => {
+    expect(kpaSeoRegistry['/about'].description).not.toMatch(/약사회/);
   });
 });
 

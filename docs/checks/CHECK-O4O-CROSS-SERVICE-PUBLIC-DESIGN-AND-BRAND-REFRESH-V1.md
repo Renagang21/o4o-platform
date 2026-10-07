@@ -644,3 +644,122 @@ HTTP 200 · pageerror 0 · console error 0 · 4xx/5xx 응답 0 · 가로 overflo
 | 시각 잔여 (rollback 사유 아님) | ① 390 분회 헤더가 3단(분회명 / O4O 홈 · 로그인 · 가입 신청 / 메뉴 열기)으로 높이 171px(배포 전 127px) ② favicon 은 KPA 전용 마크가 아닌 O4O 공통 마크 fallback. 둘 다 06 잔여 정리 후보 |
 | 이미지 재현성 (별도 WO 제안) | 배포 web Dockerfile 중 `web-account` 만 `pnpm-lock.yaml` 을 COPY 한다. kpa-branch · kpa-society · neture · lecture · store · pharmacy-hub · hospital-pharmacy 는 lockfile 없이 설치하므로 01~04(§9~§13) 이미지도 같은 조건이다. Dockerfile 변경은 build 인프라 변경이라 이번 범위 밖 — 보고만 한다 |
 | 남은 배포 | 없음 — 단계 배포 01~05 완료. 06(최종 smoke · 잔여 정리)은 별도 WO |
+
+---
+
+## 15. Final Polish Census (WO-O4O-CROSS-SERVICE-PUBLIC-DESIGN-FINAL-POLISH-V1)
+
+> 실행일 2026-10-07. 기준 `origin/main` de68a0f18 · branch `wo/o4o-cross-service-public-design-final-polish-v1`. 01~05 이후 다른 세션이 이 잔여를 먼저 고친 것은 없다(아래 항목 모두 de68a0f18 에서 재현).
+
+### 15-1. 시작 시 serving revision (read-only)
+
+| service | revision (traffic 100%) |
+|---|---|
+| neture-web | `neture-web-01698-yet` |
+| kpa-society-web (pharmacy) | `kpa-society-web-02032-mag` |
+| lecture-web (study) | `lecture-web-00046-zef` |
+| store-web | `store-web-00062-ruq` |
+| kpa-branch-web (kpa) | `kpa-branch-web-00205-puz` |
+
+§9~§14 기록과 같다.
+
+### 15-2. 판정
+
+| # | 항목 | Fresh Census 결과 | 판정 |
+|---|---|---|---|
+| A | Pharmacy footer "약사회" 3곳 | 그룹 제목 "약사회" · 링크 "약사회 소개"(→ `/about`) · copyright "Copyright © 2026 약사회". `/about` 은 `AboutPage` — 본문 · title 모두 **O4O 약국 서비스 소개**이고 대한약사회 조직 페이지가 아니다. 세 곳 모두 `BRAND_LEGACY` (`REAL_ORGANIZATION_REFERENCE` 0). 같은 링크의 seoRegistry `/about` description "대한약사회 …" 도 같은 legacy | **FIX_NOW** |
+| B | Pharmacy brand assets | `public/brand/` 없음 · `PHARMACY_BRAND_ASSETS_READY=false`. 사용자 · ChatGPT 제공 자산이 아직 없다. WO §6 에 따라 개발 에이전트가 심볼을 만들지 않는다 | **PENDING_USER_ASSET** (§16-4) |
+| C | Funding `[SMOKE]` row | §17-1 | **SEPARATE_TRACK** |
+| D | Store 모바일 header | 390 에서 brand · nav 가 각각 2줄. 원인: O4O 홈 · 로그인이 nav 안에 있어 nav 전체가 오른쪽 정렬로 wrap | **FIX_NOW** |
+| E | Store 로그인 필요 카드 | tailwind base 가 `h1` 을 본문 크기(16px), `p` margin 을 0 으로 되돌려 제목 · 본문 · CTA 가 붙어 보인다 | **FIX_NOW** |
+| F | Store O4O 홈 auth-loading | `RootShell` 의 O4OHomeButton 2곳이 `authLoading` 을 넘기지 않는다 — 실제 결함. 전수 검색으로 **web-lecture `SiteShell` 2곳도 같은 누락**을 발견했다(study, §11 배포본) | **FIX_NOW** (store + study) |
+| G | Store 로그인 방식 | `O4O-IDENTITY-ARCHITECTURE-V3`(CANONICAL) · `O4O-MYPAGE-CANONICAL-V1` 모두 "Google + 이메일·비밀번호 병행(2026-09-29)". Store `/login` 의 공통 `LoginMethods` 는 이 정본 그대로다 | **CURRENT_CANONICAL → KEEP_AS_IS** |
+| H | KPA 모바일 header | 390 분회 헤더 3단(분회명 / O4O 홈 · 로그인 · 가입 신청 / 메뉴 열기) | **FIX_NOW** |
+| I | KPA favicon | 저장소에 KPA 정본 마크 없음(git ls-files 검색 0). 분회 헤더는 분회별 `logoUrl` 을 쓰고, favicon 은 O4O 공통 마크로 제품군 소속을 보여준다 | **KEEP_AS_IS** (전용 마크가 필요하면 브랜드 제작 별도 트랙) |
+| J | web-neture 정적 OG | §8 finding 2 그대로 | **SEPARATE_TRACK** (§17-2) |
+| K | production Dockerfile lockfile | §14-7 그대로 | **SEPARATE_TRACK** (§17-3) |
+| L | 로그인 후 production smoke | 사용할 테스트 계정 없음 | **PENDING_USER_VERIFICATION** (§17-4) |
+
+---
+
+## 16. FIX_NOW 결과
+
+PR #357 (`wo/o4o-cross-service-public-design-final-polish-v1`). route · 권한 · StoreGate 로직 · API · DB · Dockerfile · package.json 변경 0.
+
+### 16-1. 변경
+
+| host | 파일 | 변경 |
+|---|---|---|
+| pharmacy | `web-kpa-society` `config/navigation.ts` · `components/Footer.tsx` · `config/seoRegistry.ts` | footer 그룹 "약사회" → "O4O 약국" · "약사회 소개" → "서비스 소개"(→ `/about`) · copyright "© 2026 Neture · O4O 약국"(다른 O4O 서비스와 같은 형식) · `/about` description 의 "대한약사회" 제거. 그룹은 상수로 분리했다(pharmacy-hub footer 와의 기존 중복 블록 분리 — Sonar) |
+| store | `web-store` `components/RootShell.tsx` · `index.css` | O4O 홈 · 계정을 nav 와 분리한 `header-actions`. 1280 은 brand │ nav │ O4O 홈 · 로그인(배치 동일), 390 은 1줄 brand + O4O 홈 · 로그인 / 2줄 nav 한 줄(넘치면 nav 안에서만 가로 스크롤). 카드 `.card>h1` 22px(390 20px) · `.card>p` 간격 — tailwind base 리셋 보정, 직계 자식만이라 폼 카드 내부는 영향 없음 |
+| store · study | `RootShell.tsx` · `web-lecture` `components/SiteShell.tsx` | 헤더 · footer O4OHomeButton 4곳에 `authLoading` 연결 |
+| kpa | `web-kpa-branch` `layouts/BranchLayout.tsx` | 모바일 헤더 2단 — 메뉴 토글을 계정 줄로 올리고 닫힌 nav 는 높이 0 · 로고 32px(md 40px). md 이상 배치 동일 |
+
+### 16-2. 검증
+
+| 묶음 | 결과 |
+|---|---|
+| `packages/auth-react` vitest | 9 files / 144 passed — 신규: 공개 헤더 6곳(neture · pharmacy · kpa 2 · study · store)의 모든 O4OHomeButton 이 `authLoading` 을 넘기는지 소스 스캔 |
+| `web-kpa-society` vitest | 7 files / 69 passed — 신규: footer 그룹 · 라벨 "약사회" 0 · `/about` = "서비스 소개" · `/about` description "약사회" 0 |
+| `web-kpa-branch` vitest | 3 files / 34 passed |
+| tsc · vite build | web-store · web-lecture · web-kpa-branch · web-kpa-society exit 0 (store 는 origin/main #339 병합 후 재확인) |
+| CI (PR #357) | CI Gate · Web production build(affected) · API Jest 3 · CodeQL · Docs sensitive guard · SonarCloud 모두 pass. Sonar 첫 run 의 실패(CSS 중복 selector 2 · 기존 중복 블록 안 수정 줄)는 코드로 고쳤다 — 게이트 완화 없음 |
+
+로컬 dist smoke (실 hostname route interception · 비로그인 · 운영 아님) — 4 host × 1280/390 = 10 run(kpa 는 `/` · `/o4o-pilot`):
+
+| host | 390 header 높이 | h1 | 결과 |
+|---|---|---|---|
+| pharmacy | 65px | Hero 32px | 본문 "약사회" 0 |
+| study | 69px | Hero 32px | O4O 홈 헤더 · footer |
+| store | **88px (2줄)** | 카드 제목 **20px**(1280 22px, 이전 16px) | 1줄 brand · O4O 홈 · 로그인 / 2줄 nav 6개 한 줄 |
+| kpa `/o4o-pilot` | **97px (2단, 이전 171px)** | 분회명 | 분회명 / O4O 홈 · 로그인 · 가입 신청 · 메뉴 열기 |
+
+모든 run: HTTP 200 · 가로 overflow 0 · pageerror 0 · console error 0 · 4xx/5xx 0. 스크린샷은 세션 scratchpad 에만 두었다.
+
+### 16-3. KEEP_AS_IS
+
+- Store 로그인 방식(G) — 정본 그대로
+- KPA favicon(I) — O4O 공통 마크 유지
+
+### 16-4. Pharmacy brand assets — PENDING_USER_ASSET
+
+자산이 들어오면 `public/brand/` 투입 → `PHARMACY_BRAND_ASSETS_READY=true` → `index.html` favicon · apple-touch-icon · og:image 와 `manifest.json` icons 를 `PHARMACY_BRAND_ASSET_SLOTS` 경로로 교체한다(§3). 소비 자리:
+
+- favicon · apple-touch-icon · manifest icon 192/512 · og:image — `index.html` · `manifest.json`
+- `logo-mark` — 헤더 `PHARMACY_HEADER_BRAND.icon` 과 footer `brand.icon`
+  - 지금은 💊 문자다
+  - 두 슬롯 모두 ReactNode(`GlobalHeader` · `CommunitySiteFooter`)라 앱 config 에서 `<img>` 로 바꿀 수 있고, 공통 package 변경은 필요 없다
+- `logo-horizontal` — 현재 소비 자리가 없다. 쓰지 않는 파일을 형식적으로 만들지 않는다
+
+---
+
+## 17. Separate Tracks
+
+### 17-1. PRODUCTION_TEST_DATA_CLEANUP — Funding `[SMOKE]` row
+
+공개 API `GET /api/market-trial` 로 read-only 확인했다(DB 직접 접속 · write 0).
+
+| 항목 | 값 |
+|---|---|
+| row id | `[REDACTED_ROW_ID]` (§6 의 prefix 와 같은 row) |
+| title | `[SMOKE] 유통참여형 펀딩 운영 루프 테스트` |
+| status | `closed` |
+| 생성 | 2026-06-07 · [`CHECK-O4O-NETURE-DISTRIBUTION-FUNDING-SMOKE-DATA-FLOW-V1`](../investigations/CHECK-O4O-NETURE-DISTRIBUTION-FUNDING-SMOKE-DATA-FLOW-V1.md) 의 운영 smoke 로 만든 테스트 데이터 |
+| 참조 관계 | 참여 1건(`currentParticipants=1`) · 정산 · 결과 snapshot 필드 · 이후 CHECK 2건이 검증 fixture 로 참조(`CHECK-O4O-MARKET-TRIAL-CONTENT-ONLY-POST-DEPLOY-VALIDATION-V1` · `CHECK-O4O-MARKET-TRIAL-PARTICIPATION-REPORT-CLEANUP-V1`) |
+| 공개 노출 | 공개 목록 전체 1건 중 1건 — funding.neture.co.kr "마감" 영역 |
+
+- UI 에서 숨기지 않았고 DB 를 수정하지 않았다.
+- `TrialStatus` 에는 비공개 종료 상태가 없다(`draft` · `submitted` · `recruiting` · `development` · `outcome_confirming` · `fulfilled` · `closed`). 상태 전환만으로는 공개 목록에서 뺄 수 없고, 비공개 플래그를 새로 두면 schema 변경이다.
+- **제안**: 별도 승인 WO 에서 trial 과 종속 row(참여 · 정산 · 결과)를 snapshot 으로 남긴 뒤 함께 삭제한다. 운영 검증 fixture 가 필요하면 공개 목록에 나오지 않는 방식(예: `draft`)으로 새로 만든다. 삭제는 건별 승인 대상이다.
+
+### 17-2. HOST_AWARE_STATIC_METADATA
+
+web-neture 는 정적 index.html 하나라 JS 를 실행하지 않는 crawler 는 supplier · funding · community 에서 neture.co.kr 메타를 본다(§8 finding 2 · §9-6 재현). host 별 HTML 생성 또는 edge 메타 주입은 Docker · 인프라 변경이라 이번 polish 에 섞지 않았다.
+
+### 17-3. PRODUCTION_WEB_REPRODUCIBLE_BUILD
+
+운영 web Dockerfile 7개(kpa-branch · kpa-society · neture · lecture · store · pharmacy-hub · hospital-pharmacy)가 `pnpm-lock.yaml` 없이 설치한다(§14-7). 이번 06 배포도 같은 조건으로 빌드된다. Dockerfile 은 바꾸지 않았다.
+
+### 17-4. AUTHENTICATED_SMOKE
+
+Neture · Pharmacy · Study · Store · KPA 의 로그인 후 smoke 는 하나로 묶어 **PENDING_USER_VERIFICATION** 이다. 테스트 계정을 만들거나 DB 를 수정하지 않았다. 세션 복구 중 O4O 홈 비활성은 공통 단위 테스트(`O4OHomeButton`)와 소비처 스캔 테스트(§16-2)로 보장한다.

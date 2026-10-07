@@ -157,12 +157,14 @@ export function BranchLayout({ slug, basePath }: { slug: string; basePath: strin
   return (
     <div className="min-h-screen bg-white">
       <header className="border-b border-gray-200">
-        <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-3 px-4 py-4">
+        {/* WO-O4O-CROSS-SERVICE-PUBLIC-DESIGN-FINAL-POLISH-V1: 모바일 헤더를 2단(분회명 / O4O 홈 · 계정 · 메뉴)으로 줄인다.
+            메뉴 토글을 계정 줄로 올리고, 닫힌 nav 는 모바일에서 높이를 차지하지 않는다. desktop(md 이상) 배치는 그대로다. */}
+        <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-x-3 gap-y-2 px-4 py-3 md:gap-3 md:py-4">
           <Link to={basePath || '/'} className="flex items-center gap-3">
             {site?.logoUrl ? (
-              <img src={site.logoUrl} alt="" className="h-10 w-10 rounded object-contain" />
+              <img src={site.logoUrl} alt="" className="h-8 w-8 rounded object-contain md:h-10 md:w-10" />
             ) : (
-              <span className="flex h-10 w-10 items-center justify-center rounded bg-primary-600 text-sm font-bold text-white">
+              <span className="flex h-8 w-8 items-center justify-center rounded bg-primary-600 text-xs font-bold text-white md:h-10 md:w-10 md:text-sm">
                 분회
               </span>
             )}
@@ -185,18 +187,18 @@ export function BranchLayout({ slug, basePath }: { slug: string; basePath: strin
                 <Link to="/join" className="text-gray-600 hover:text-gray-900">가입 신청</Link>
               </span>
             )}
+            <button
+              type="button"
+              onClick={() => setMenuOpen((v) => !v)}
+              aria-expanded={menuOpen}
+              aria-controls="branch-nav"
+              className="rounded border border-gray-300 px-2.5 py-1 text-gray-700 md:hidden"
+            >
+              메뉴 {menuOpen ? '닫기' : '열기'}
+            </button>
           </div>
         </div>
-        <nav className="mx-auto max-w-5xl px-4 pb-3 text-sm">
-          <button
-            type="button"
-            onClick={() => setMenuOpen((v) => !v)}
-            aria-expanded={menuOpen}
-            aria-controls="branch-nav"
-            className="mb-2 rounded border border-gray-300 px-3 py-1.5 text-gray-700 md:hidden"
-          >
-            메뉴 {menuOpen ? '닫기' : '열기'}
-          </button>
+        <nav className={`mx-auto max-w-5xl px-4 text-sm md:pb-3 ${menuOpen ? 'pb-3' : ''}`}>
           <div
             id="branch-nav"
             className={`${menuOpen ? 'block' : 'hidden'} space-y-2 md:block md:space-y-0`}

@@ -9,6 +9,9 @@
  * WO-O4O-KPA-SERVICE-LEGAL-PROFILE-FOOTER-V1:
  *   더미 주소/전화/팩스/이메일 + 하드코딩 사업자번호는 쓰지 않는다.
  *   법정정보는 service_legal_profiles(API) 값이 있을 때만 표시된다.
+ *
+ * WO-O4O-CROSS-SERVICE-PUBLIC-DESIGN-FINAL-POLISH-V1:
+ *   copyright 의 "약사회" 는 legacy 브랜드였다. 다른 O4O 서비스(© Neture · 서비스명)와 같은 형식으로 맞춘다.
  */
 
 import { CommunitySiteFooter, PublicLegalFooterInfo } from '@o4o/shared-space-ui';
@@ -25,7 +28,7 @@ export function Footer() {
         accentColor: '#2563eb',
       }}
       sections={KPA_FOOTER_SECTIONS}
-      copyright="Copyright © 2026 약사회. All Rights Reserved."
+      copyright="© 2026 Neture · O4O 약국"
       legalSlot={<PublicLegalFooterInfo serviceKey="kpa-society" loadProfile={loadFooterLegal} />}
     />
   );

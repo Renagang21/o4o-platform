@@ -34,7 +34,7 @@ function StoreSwitcher() {
 }
 
 export default function RootShell() {
-  const { isAuthenticated, logout } = useAuth();
+  const { isAuthenticated, isLoading: authLoading, logout } = useAuth();
   // 상단 로그인도 원래 경로를 보존한다(§21-19 운영 실측에서 발견 — 본문 카드만 보존하고 있었다)
   const { pathname, search, hash } = useLocation();
   // 약국 문맥은 매장 HUB 단계가 없다(DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1 §6). /hub 라우트 자체는 K-Cosmetics 용으로 남는다.
@@ -54,19 +54,23 @@ export default function RootShell() {
             {item.label}
           </NavLink>
         ))}
+      </nav>
+      {/* WO-O4O-CROSS-SERVICE-PUBLIC-DESIGN-FINAL-POLISH-V1: O4O 홈 · 계정은 nav 와 분리한다 — 모바일에서 brand 와 같은 첫 줄에 두고 nav 만 둘째 줄로 내린다.
+          세션 복구 중에는 O4O 홈을 비활성으로 둔다(authLoading — 다른 서비스 헤더와 같은 공통 패턴). */}
+      <div className="header-actions">
         {/* WO-O4O-REPRESENTATIVE-ENTRY-RETURN-HANDOFF-AND-HOME-NAVIGATION-V1: O4O 홈(로그인 유지) · 로그아웃 = O4O 계정 전체 종료 */}
-        <O4OHomeButton api={authClient.api} isAuthenticated={isAuthenticated} className="o4o-home-link" />
+        <O4OHomeButton api={authClient.api} isAuthenticated={isAuthenticated} authLoading={authLoading} className="o4o-home-link" />
         {isAuthenticated
           ? <button className="link-button" type="button" onClick={logout}>{O4O_LOGOUT_LABEL}</button>
           : <Link to={withReturnTo(WORKSPACE_PATHS.login, `${pathname}${search}${hash}`)}>로그인</Link>}
-      </nav>
+      </div>
     </header>
     <div className="content"><Outlet /></div>
     <footer className="footer">
       <div className="footer-links">
         <a href={`${PLATFORM_ORIGIN}/terms`}>이용약관</a>
         <a href={`${PLATFORM_ORIGIN}/privacy`}>개인정보처리방침</a>
-        <O4OHomeButton api={authClient.api} isAuthenticated={isAuthenticated} className="link-button footer-o4o-home" />
+        <O4OHomeButton api={authClient.api} isAuthenticated={isAuthenticated} authLoading={authLoading} className="link-button footer-o4o-home" />
       </div>
       <PublicLegalFooterInfo serviceKey={PLATFORM_LEGAL_SERVICE_KEY} loadProfile={loadFooterLegal} />
       <p>© {new Date().getFullYear()} Neture · {BRAND.name}</p>
