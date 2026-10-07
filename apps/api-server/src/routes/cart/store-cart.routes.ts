@@ -53,6 +53,7 @@ import { isApprovalEligibleServiceKey } from '../../modules/neture/constants/app
 //   checkout-confirm 으로 B2B 주문까지 생성할 수 있었다 (cross-service leak).
 //   판정 정본은 DB membership 이다 (JWT 스냅샷 금지 — `utils/service-membership.ts` 참조).
 import { hasActiveServiceMembership } from '../../utils/service-membership.js';
+import { readPreferredStoreOrganizationId } from '../../utils/store-organization.resolver.js';
 
 type AuthMiddleware = RequestHandler;
 
@@ -239,9 +240,15 @@ export function createStoreCartRoutes(dataSource: DataSource): Router {
           : undefined;
         const note = typeof body.note === 'string' ? body.note : undefined;
         // 구매 매장(조직)은 선택값(hint)이다 — 세미프랜차이즈 서비스의 구매 약국 판정은 서버가 확정한다.
+        //   공용 장바구니 화면은 body 에 조직을 싣지 않으므로, 통합 매장 공간이 고른 매장 헤더를 함께 넘긴다.
         const organizationId =
           typeof body.organizationId === 'string' ? body.organizationId : undefined;
-        const result = await checkoutService.confirm(scope, { itemIds, note, organizationId });
+        const result = await checkoutService.confirm(scope, {
+          itemIds,
+          note,
+          organizationId,
+          preferredOrganizationId: readPreferredStoreOrganizationId(req),
+        });
         res.json({ success: true, data: result });
       } catch (error) {
         handleError(res, error, 'POST checkout-confirm');

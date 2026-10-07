@@ -535,6 +535,8 @@ guard 안: 얇은 middleware = `platform:super_admin` 통과 + `hasActiveService
 | H1 | **병원약국 기존 동작 보존 — R2 대체.** guard 옵션 `hospitalSurface`: 병원약국 화면 첫 요청(`surface:'hospital-drug'` · runId 없음)은 **가입 조회 없이** 통과하고 핸들러의 기존 병원약국 분기(`performHospitalDrugRequest` — 조사 · 원내 조회 · 화면 위임)로 간다. main 과 같은 처리이며 Neture 가입 상태 · 가입 조회 장애(503)로 달라지지 않는다. 축소된 공개 경로(`runHospitalAiRequest` 재사용)와 `hospital.routes.ts` export 는 되돌림(main 과 동일). guard 가 이 표시(`res.locals.hospitalSurfaceOnly`)로 통과시킨 요청은 병원약국 분기 밖(통합 라우터 · 홈 대화 · Task 작업)으로 내려가지 않는다(방어 403). runId 재개 · 다른 surface · 홈 대화 · 작업 에이전트 · 로컬 연결은 Neture 판정 그대로(미승인 403) | `neture-main-membership.middleware.ts` · `ai-proxy.routes.ts` · `hospital.routes.ts` |
 | D1-b | **이벤트 주문 = 구매 약국 조직 기준 — R1-b 이벤트 부분 대체.** 사용자 단위 판정(`resolveSemiFranchiseServiceAccess` — 사용자가 가진 약국 중 하나라도 가입 active 면 통과)은 A 약국 가입으로 B 약국 주문을 통과시켰다. 이제 구매 약국은 B2B confirm 과 같은 계약(결함 O1, `resolveBuyerOrganization`)으로 서버가 확정한다 — 선택값 `organizationId`(요청) 또는 장바구니에 담긴 조직(한 곳일 때만)은 hint, 후보는 내 매장(약국) 신청 active 약국 조직. 선택 없음 + 후보 여럿 → 400 `AMBIGUOUS_STORE_ORGANIZATION`(임의 선택 안 함) · 타인 조직 403 · 후보 없음 403. 판정은 그 조직의 pharmacy 가입 active(`hasServiceSemiFranchiseSupplyAccess` — B2B 와 같은 공급 판정). 이벤트 운영 조직은 쓰지 않는다. k-cosmetics 는 판정 대상 아님(조직 확정도 하지 않음 — 동작 불변) | `event-offer-cart-checkout.service.ts` · `store-cart.routes.ts`(`checkout-confirm` 이 `organizationId` hint 수신) |
 | DOC | **정본 정합 (Codex P1 r4203536418)** — DESIGN 에 남은 옛 계약 정정: §3-1 "로그인만 된 계정" → Neture 가입 승인 계정 · 신청 403 / 승인 409, 내 매장 처리 ↔ Neture 원장 상호 불변 · §3-3 공급자 승인의 Neture 결합 제거(전제조건 확인만) · Neture 승인이 연결 서비스 역할을 발급 · 복구하지 않음 · §13 이관 표의 `service_memberships('neture')` ensure 취소선. §5-1 매장 표식 ensure 는 10-10 시점에 이미 취소선 | `DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md` |
+| D1-c | **다중 약국 사용자의 이벤트 확정 (Codex P1 r4206224410)** — 공용 장바구니 화면(`store-ui-core` `useStoreCart`)은 body 에 조직을 싣지 않아 다중 약국이면 항상 400 이었다. 공용 패키지는 바꾸지 않고, 통합 매장 공간(web-store)이 모든 요청에 싣는 선택 매장 헤더 `X-Store-Organization-Id`(CHECK-O4O-URL-FIRST-CENSUS-V1 §21-14, `readPreferredStoreOrganizationId`)를 `checkout-confirm` 라우트가 넘긴다. 순서: body `organizationId`(명시 — 타인 조직 403) → 헤더(후보 안일 때만, 밖이면 없는 것과 같다 — 기존 헤더 계약) → 장바구니 조직(한 곳) → 후보 1 서버 확정 / 여럿 400. KPA `/store-hub/cart` 는 `NetureCommerceRedirect` 로 web-store 로 간다 | `store-cart.routes.ts` · `event-offer-cart-checkout.service.ts` |
+| SF-1 | **세미프랜차이즈 승인 전제 = 실제 신청자 (Codex P2 r4206224423)** — 승인 시 Neture 가입 재확인 대상이 약국을 만든 사람(`neture_pharmacy_memberships.applicant_user_id`)이었다. 그 가입을 신청한 사람(`semi_franchise_memberships.applied_by` — 약국 admin/manager 일 수 있다)으로 교정. 신청자가 없으면(계정 삭제 → NULL) 'none' 으로 승인하지 않는다 | `semi-franchise.service.ts` |
 | DOC-2 | **색인 · 기준 문서 명칭 정합 (Codex P2 r4206018123)** — `CANONICAL-INDEX` DESIGN 행 · STORE-ACCESS 행의 "기본 가입 원장" → 내 매장(약국) 신청 · 승인 원장(Neture 가입과 별도, 상태 · 판정 불변) · `O4O-STORE-ACCESS-AND-MEMBERSHIP-V1` §약국 예외 · `O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1` 세미프랜차이즈 식별 문구. **미변경**: F8 Frozen `NETURE-DISTRIBUTION-ENGINE-FREEZE-V1` 의 같은 옛 명칭 1곳 — Frozen 본문이라 별도 WO 로 보고(§16-4) | `CANONICAL-INDEX.md` · `O4O-STORE-ACCESS-AND-MEMBERSHIP-V1.md` · `O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1.md` |
 
 **병원약국 기존 동작 보존 근거**
@@ -549,7 +551,7 @@ guard 안: 얇은 middleware = `platform:super_admin` 통과 + `hasActiveService
 
 | 항목 | 결과 |
 |---|---|
-| `event-offer-cart-checkout-purchasing-org.test.ts` (신규 10) | PASS — A 약국 허용 · B 약국 차단(재고 차감 · 주문 생성 없음, A 가입으로 대신 인정 안 함) · 장바구니 조직 B 기준 판정 · 선택 없음+후보 2 → 400 · 장바구니 조직 혼재 → 400 · 후보 1 → 서버 확정 · 타인 조직 403 · 후보 없음 403 · 이벤트 운영 조직 미사용 · k-cosmetics 판정 없음 |
+| `event-offer-cart-checkout-purchasing-org.test.ts` (신규 14) | PASS — 화면 선택 매장 헤더 A 허용 · B 차단 · 후보 밖 헤더 무시(400) · body 가 헤더보다 우선, A 약국 허용 · B 약국 차단(재고 차감 · 주문 생성 없음, A 가입으로 대신 인정 안 함) · 장바구니 조직 B 기준 판정 · 선택 없음+후보 2 → 400 · 장바구니 조직 혼재 → 400 · 후보 1 → 서버 확정 · 타인 조직 403 · 후보 없음 403 · 이벤트 운영 조직 미사용 · k-cosmetics 판정 없음 |
 | `unified-request-http.spec.ts` ⑭ | PASS — hospital-drug 는 가입 none · pending · suspended 모두 main 과 같은 처리(원내 조회 · reason=research_and_local · 가입 조회 0) · 화면 요청 → work 위임 · localSource=client → suppressLocal · 가입 조회 장애에도 200 · runId 재개 403 · 홈 대화 · 작업 에이전트 403 · 일반 요청 403 · super_admin 통과 · fail-closed 503 |
 | `neture-membership-ledger-independence.spec.ts` | PASS — L3 병원약국 화면 옵션(가입 무관 통과 · 조회 0 · 장애 무관 · runId/다른 surface/옵션 없는 진입점 403) · 축소 경로 미사용 · 병원약국 분기 → 방어 403 → 통합 라우터 순서 · 이벤트 확정은 구매 약국 조직 판정 |
 | 기타 — 아래 PR 보고의 전체 jest · type-check | PR 보고 참조 |
@@ -557,7 +559,7 @@ guard 안: 얇은 middleware = `platform:super_admin` 통과 + `hasActiveService
 
 **남은 항목**
 
-- 다중 약국 사용자의 이벤트 확정은 약국 선택이 필요하다(400). 공용 장바구니 UI(`packages/store-ui-core` `useStoreCart`)는 B2B · 이벤트 확정 모두 `organizationId` 를 보내지 않는다 — 기존 B2B 와 같은 상태이며, 약국 선택 UI 는 공용 패키지 변경이라 별도 작업.
+- 다중 약국 사용자의 이벤트 확정은 web-store 선택 매장 헤더로 해결(D1-c). 매장을 고르지 않은 상태 · 헤더를 싣지 않는 다른 화면에서는 400(선택 요구)이다. B2B 확정(`checkout-confirm-b2b`)은 이번 범위가 아니며 기존과 같다(body 조직만 hint).
 - 이벤트 주문 생성 · 한도 집계(`reserveEventOfferListing`) · 자동 진열(`tryLinkStoreProduct`)은 여전히 사용자 기준이고 주문에 구매 약국을 기록하지 않는다 — 이번 판정 범위 밖(기존 계약).
 - 모집 신청(R3)은 신청자 기준 판정이다(같은 사용자 · 다른 약국 구분 없음) — 이번 지시 범위 밖, 같은 유형으로 보고만.
 - Neture 정지 · 재활성화 비대칭(A5) · 기존 공급자 데이터 · 화면 이전 · 커뮤니티 — 범위 밖 유지.

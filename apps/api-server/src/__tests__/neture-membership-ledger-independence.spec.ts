@@ -66,6 +66,13 @@ describe('L1 연결 서비스 처리는 Neture 원장을 바꾸지 않는다', (
     expect(src).toMatch(/assertNetureMainMembershipActive\(m, [\w.]+applicant_user_id, 'applicant'\)/);
   });
 
+  it('세미프랜차이즈 승인은 약국을 만든 사람이 아니라 그 가입의 실제 신청자(applied_by)를 다시 확인한다', () => {
+    const src = read('modules/neture-pharmacy/services/semi-franchise.service.ts');
+    expect(src).toContain('SELECT sfm.applied_by AS sf_applicant_user_id FROM semi_franchise_memberships sfm');
+    expect(src).toContain(`assertNetureMainMembershipActive(m, basic.sf_applicant_user_id, 'applicant')`);
+    expect(src).not.toContain('SELECT npm.applicant_user_id FROM semi_franchise_memberships');
+  });
+
   it('판정 helper 는 service_memberships 를 읽기만 한다', async () => {
     const query = jest.fn().mockResolvedValue([{ status: 'pending' }]);
     await expect(getNetureMainMembershipStatus({ query } as any, 'u1')).resolves.toBe('pending');
@@ -326,6 +333,10 @@ describe('L4 세미프랜차이즈 제공 자료는 항목 단위로 판정한�
     // 사용자 단위(아무 약국이나 하나) 판정은 쓰지 않는다
     expect(ev).not.toContain('resolveSemiFranchiseServiceAccess');
     expect(ev).toContain(`reason: 'SEMI_FRANCHISE_MEMBERSHIP_REQUIRED'`);
+    // 공용 장바구니 화면은 body 에 조직을 싣지 않는다 — 라우트가 화면 선택 매장 헤더를 넘긴다
+    expect(read('routes/cart/store-cart.routes.ts')).toContain(
+      'preferredOrganizationId: readPreferredStoreOrganizationId(req),',
+    );
   });
 
   it('취급매장 모집(서비스 제공 자료)은 세미프랜차이즈 미가입이면 빈 목록', () => {

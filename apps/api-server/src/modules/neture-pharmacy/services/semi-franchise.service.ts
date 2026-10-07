@@ -178,7 +178,7 @@ export class SemiFranchiseService {
       if (next === 'active') {
         // 세미프랜차이즈 가입은 내 매장(약국) 승인이 살아 있는 약국에만 승인한다.
         const [basic] = await m.query(
-          `SELECT npm.applicant_user_id FROM semi_franchise_memberships sfm
+          `SELECT sfm.applied_by AS sf_applicant_user_id FROM semi_franchise_memberships sfm
              JOIN neture_pharmacy_memberships npm ON npm.organization_id = sfm.organization_id AND npm.status = 'active'
             WHERE sfm.id = $1`,
           [membershipId],
@@ -186,8 +186,9 @@ export class SemiFranchiseService {
         if (!basic) {
           throw new NeturePharmacyError(409, 'BASIC_MEMBERSHIP_NOT_ACTIVE', '내 매장(약국) 승인이 된 약국이 아닙니다.');
         }
-        // 약국 신청자의 현재 Neture 메인 가입 상태도 직접 확인한다.
-        await assertNetureMainMembershipActive(m, basic.applicant_user_id, 'applicant');
+        // 이 세미프랜차이즈 가입을 신청한 사람(`applied_by` — 약국을 만든 사람과 다를 수 있다)의
+        // 현재 Neture 메인 가입 상태를 직접 확인한다. 신청자가 없으면(계정 삭제) 'none' 으로 승인하지 않는다.
+        await assertNetureMainMembershipActive(m, basic.sf_applicant_user_id, 'applicant');
       }
       const [row] = rowsOf(await m.query(
         `UPDATE semi_franchise_memberships

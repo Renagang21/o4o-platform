@@ -54,6 +54,11 @@ export interface CheckoutConfirmInput {
   note?: string;
   /** 구매 매장(조직) 선택값(hint). 권위는 서버 검증이다 — B2B confirm 과 같은 계약(결함 O1). */
   organizationId?: string;
+  /**
+   * 화면이 고른 매장(`X-Store-Organization-Id`, CHECK-O4O-URL-FIRST-CENSUS-V1 §21-14). 후보 안에 있을 때만 쓰고
+   * 밖이면 없는 것과 같다(`resolveStoreOrganization` 의 preferred 와 같은 계약).
+   */
+  preferredOrganizationId?: string | null;
 }
 
 export interface CreatedOrderSummary {
@@ -363,15 +368,26 @@ export class EventOfferCartCheckoutService {
 
   /**
    * 구매 약국 조직 확정 — `resolveBuyerOrganization`(B2B confirm 결함 O1 과 같은 판정)을 재사용한다.
-   * 선택값은 요청 `organizationId`, 없으면 장바구니 항목에 담긴 조직(한 곳일 때만). 둘 다 클라이언트 유래라 서버가 검증한다.
+   * 순서: ① 요청 `organizationId`(명시 선택 — 타인 조직 403) ② 화면 선택 매장 헤더(후보 안일 때만)
+   * ③ 장바구니 항목에 담긴 조직(한 곳일 때만) ④ 후보가 하나면 서버 확정 · 여럿이면 400. 모두 클라이언트 유래라 서버가 검증한다.
    */
   private async resolvePurchasingOrganization(
     scope: CheckoutConfirmScope,
     input: CheckoutConfirmInput,
     items: StoreCartItem[],
   ): Promise<string> {
+    const explicit = input.organizationId?.trim() || null;
+    if (!explicit && input.preferredOrganizationId) {
+      const preferred = await resolveBuyerOrganization(
+        this.dataSource,
+        scope.buyerId,
+        scope.serviceKey,
+        input.preferredOrganizationId,
+      );
+      if (preferred.status === 'resolved') return preferred.organizationId;
+    }
     const cartOrgs = [...new Set(items.map((it) => it.organizationId).filter((o): o is string => !!o))];
-    const requested = input.organizationId?.trim() || (cartOrgs.length === 1 ? cartOrgs[0] : null);
+    const requested = explicit || (cartOrgs.length === 1 ? cartOrgs[0] : null);
     if (!requested && cartOrgs.length > 1) {
       throw new B2BConfirmError('AMBIGUOUS_STORE_ORGANIZATION', '주문할 매장(조직)을 선택해 주세요.', 400);
     }

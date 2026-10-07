@@ -169,6 +169,31 @@ describe('이벤트 장바구니 확정 — 구매 약국 조직 기준 pharmacy
     expect(createOrderCalls).toEqual([]);
   });
 
+  describe('화면이 고른 매장 헤더(X-Store-Organization-Id) — 공용 장바구니 화면은 body 에 조직을 싣지 않는다', () => {
+    it('헤더 = A → 다중 약국이어도 A 로 확정 · 허용', async () => {
+      const r = await makeService([eventItem()]).confirm(KPA, { preferredOrganizationId: 'org-A' });
+      expect(r.createdOrders).toHaveLength(1);
+      expect(sfQueries).toEqual([['org-A']]);
+    });
+
+    it('헤더 = B → B 로 확정 · 차단', async () => {
+      const r = await makeService([eventItem()]).confirm(KPA, { preferredOrganizationId: 'org-B' });
+      expect(r.failedItems[0]?.reason).toBe('SEMI_FRANCHISE_MEMBERSHIP_REQUIRED');
+      expect(createOrderCalls).toEqual([]);
+    });
+
+    it('헤더가 후보 밖이면 없는 것과 같다 (403 아님 → 다중 약국은 400)', async () => {
+      const err = await makeService([eventItem()]).confirm(KPA, { preferredOrganizationId: 'org-X' }).catch((e) => e);
+      expect(err.code).toBe('AMBIGUOUS_STORE_ORGANIZATION');
+    });
+
+    it('명시 선택(body)이 헤더보다 우선한다', async () => {
+      const r = await makeService([eventItem()]).confirm(KPA, { organizationId: 'org-B', preferredOrganizationId: 'org-A' });
+      expect(r.failedItems[0]?.reason).toBe('SEMI_FRANCHISE_MEMBERSHIP_REQUIRED');
+      expect(sfQueries).toEqual([['org-B']]);
+    });
+  });
+
   it('이벤트 운영 조직(ctx.organizationId)은 판정에 쓰지 않는다', async () => {
     await makeService([eventItem()]).confirm(KPA, { organizationId: 'org-A' });
     expect(sfQueries.flat()).not.toContain('event-operator-org');
