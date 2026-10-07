@@ -8,7 +8,7 @@
 | 선행 | [`IR-O4O-CROSS-SERVICE-PUBLIC-HOME-AND-BRAND-DESIGN-CENSUS-V1`](../investigations/IR-O4O-CROSS-SERVICE-PUBLIC-HOME-AND-BRAND-DESIGN-CENSUS-V1.md) (PR #331 MERGED) |
 | 성격 | 프런트엔드 표시 계층만 변경. route·API·권한·DB·serviceKey·package name 은 바꾸지 않았다 |
 | 기준 | `origin/main` 0e283ba10 · branch `wo/o4o-cross-service-public-design-brand-refresh-v1` |
-| 완료 판정 | **`CODE_COMPLETE` / `PRODUCTION_SMOKE_PENDING_DEPLOY`** — 단계 배포 중. 01 web-neture(neture · supplier · community · funding) · 02 web-kpa-society(pharmacy) · 03 web-lecture(study) 배포 · production smoke PASS(§9 · §10 · §11). 나머지 host 는 미배포 |
+| 완료 판정 | **`CODE_COMPLETE` / `PRODUCTION_SMOKE_PENDING_DEPLOY`** — 단계 배포 중. 01 web-neture(neture · supplier · community · funding) · 02 web-kpa-society(pharmacy) · 03 web-lecture(study) · 04 web-store(store) 배포 · production smoke PASS(§9 · §10 · §11 · §13). 나머지 host 는 미배포 |
 | 작성일 | 2026-10-07 |
 
 ---
@@ -26,7 +26,7 @@
 | RETAIL | **NOT_REDESIGNED** | `services/web-k-cosmetics` 변경 0 |
 | HOSPITAL | **UNTOUCHED** | neture.co.kr/hospital 관련 파일 변경 0 |
 | DB_CHANGE | **0** | migration · write 0. 아래 §6 의 [SMOKE] row 는 STOP 하고 보고만 한다 |
-| 운영 배포 | **부분 배포 (03/05)** | PR #337 merge(0d0ff4fdc) 후 서비스별로 하나씩 배포한다. 01 web-neture 완료(§9) · 02 pharmacy 완료(§10) · 03 study 완료(§11). store · kpa 는 미배포 |
+| 운영 배포 | **부분 배포 (04/05)** | PR #337 merge(0d0ff4fdc) 후 서비스별로 하나씩 배포한다. 01 web-neture 완료(§9) · 02 pharmacy 완료(§10) · 03 study 완료(§11) · 04 store 완료(§13). kpa 는 미배포 |
 
 ---
 
@@ -481,3 +481,78 @@ HTTP 200 · pageerror 0 · console error 0 · 4xx/5xx 응답 0 · 가로 overflo
 | ROLLBACK | 없음 — rollback 사유 0 |
 | #330 | web-lecture(§11) · web-neture(§12) 모두 운영 반영 |
 | 남은 배포 | 04 store → 05 kpa (미착수, 별도 지시) — 변경 없음 |
+
+---
+
+## 13. Production 배포 04 — web-store / store (WO-O4O-PUBLIC-DESIGN-PRODUCTION-DEPLOY-04-STORE-V1)
+
+> 실행일 2026-10-07. 배포 대상은 `store-web` Cloud Run service 하나다(`store.neture.co.kr`). 다른 web · API · Admin · DB · migration 은 건드리지 않았다. Store 는 공개 마케팅 화면이 아니라 업무 Workspace 이므로 Hero 가 없는 것을 FAIL 로 보지 않는다(WO §3).
+
+### 13-1. 배포 전 상태 (rollback 기준)
+
+| 항목 | 값 |
+|---|---|
+| service | `store-web` (asia-northeast3) |
+| serving revision | `store-web-00059-qew` · traffic 100% (그 이전 `00056-kin`) |
+| `o4o-commit-sha` | `0e283ba102a86b2e6ce07d88926d3b39a0ea6fe9` · digest `sha256:69005a09…` |
+| 화면 (1280/390) | title "내 매장 \| Neture" · description "내 매장 - O4O 공통 매장 업무공간 (Unified Store Workspace)" · og 없음 · canonical 없음 · favicon 없음(`/favicon.svg` 가 SPA fallback 으로 text/html) · Pretendard 이름만 있고 미로드 · 첫 화면 = StoreGate "내 매장 · 로그인이 필요합니다 · [로그인]" · O4O 홈은 헤더 · footer 에 이미 있음 · overflow 0 · legacy 문구 0 |
+| 배포 gate | `DEPLOY_FREEZE=false` 유지 (열고 닫지 않음) |
+
+### 13-2. 후보 census (serving 0e283ba10 → candidate a07861f57)
+
+- candidate = main HEAD `a07861f57f03be11d7667a096ac19c23a4444207` (CI Pipeline · CodeQL success).
+- store image 의 build closure(Dockerfile 이 COPY 하는 `services/web-store` + `packages` 20개 + root 설정 · lockfile) 에 들어간 commit: **PR #337 2건(9a4c0e571 · 0920e1895) 만**. lockfile · package.json 변경 0.
+
+| 분류 | 내용 |
+|---|---|
+| STORE_DESIGN_REQUIRED | `services/web-store`: index.html(title · description · og · favicon · Pretendard) · `public/favicon.svg` · RootShell(O4O 홈 className `o4o-home-link` 만) · index.css(`tokens.css` import · `Pretendard Variable`) · tailwind.config.js(글꼴) |
+| SAFE_DEPENDENCY | `packages/auth-react` public-brand(tokens · O4OPublicHero export) · `useO4OHomeReturn`(`authLoading` prop 추가, 기본 false) · `packages/ui` GlobalHeader(`homeSlot` additive, store 는 미사용) — 01~03 에서 운영 검증됨 |
+| UNRELATED | 테스트 파일 · `tools/o4o-local-agent` · HANDOFF.md · docs · 다른 서비스 |
+| UNVERIFIED | 0 |
+
+- Workspace 구조: `App.tsx` route · `StoreGate` · `StoreOwnerOnly` · `LoginPage` · `HandoffPage` · `AuthContext` · `LoginMethods` · `GoogleContinue` 의 diff 0. 권한 guard · redirect · handoff 변경 없음.
+- 테스트: `packages/auth-react` vitest 9 files · 138 tests PASS (store 소비 계약 `publicBrandConsumers` 포함). web-store 자체 테스트 인프라 없음.
+
+### 13-3. 배포 실행
+
+| 항목 | 값 |
+|---|---|
+| dry-run | Promote run **37581898950** (`a07861f57` · `services=store`) → store = PROMOTE(LEVEL_3, rule `auth-package` `packages/auth-react/src/index.ts`) · admin · pharmacy-hub · kpa-branch = NOT_SELECTED · api · neture · kpa-society · lecture · hospital-pharmacy = NO_DEPLOY · plan `deploy_api=false` · `web(parallel)=store` |
+| 실제 promote | Promote run **37582107873** (`sha=a07861f57…` · `services=store`) success |
+| job | `deploy-store` 만 실행. 다른 web · API · Admin = skipped |
+| 새 revision | **`store-web-00062-ruq`** · `o4o-commit-sha=a07861f57f03…` · digest `sha256:8f5f3aa5…` |
+| traffic | 새 revision 100% |
+| 이전 revision | `store-web-00059-qew` 보존 (rollback 가능) |
+| 다른 service | neture 01698(§12) · kpa-society 02032 · lecture 00046 · kpa-branch 00202 · pharmacy-hub 00284 · core-api 03840 · admin 01352 · hospital-pharmacy 00029 — 배포 전과 같다 |
+
+### 13-4. Production smoke (비로그인 · Chrome headless · 실 URL)
+
+1280/390: `/` 와 업무 route 7개(`/store` · `/work` · `/hub` · `/services` · `/settings` · `/select-store` · `/handoff`) · `/login` 모두 HTTP 200 · pageerror 0 · console error 0 · 4xx/5xx 응답 0 · 가로 overflow 0 · Pretendard loaded(`Pretendard Variable`).
+
+| 항목 | 결과 |
+|---|---|
+| 서비스 정체성 | 헤더 brand "내 매장" + nav 6(홈 · 내 매장 · 서비스 업무 · 매장 HUB · 내 서비스 · 설정) · footer "© 2026 Neture · 내 매장". legacy 문구 0 |
+| Workspace-first | 첫 화면 = StoreGate 카드 "내 매장 · 로그인이 필요합니다 · [로그인]". Hero · 홍보 영역 없음(의도) |
+| O4O 홈 | 1280 · 390 헤더에 보임(+ footer, 390 은 nav 둘째 줄). **실제 클릭** → `https://neture.co.kr/` 도착 |
+| 로그인 진입 | 헤더 [로그인] → `/login` "내 매장 로그인" → "Google 계정으로 계속하기" 버튼 표시(GIS). 인증은 진행하지 않았다 |
+| 이메일 · 비밀번호 폼 | `/login` 에 공통 `LoginMethods` 의 이메일 · 비밀번호 폼이 Google 위에 있다. **배포 전과 같은 동작**(LoginMethods · LoginPage diff 0)이고 로그인 수단 정본 [`O4O-MYPAGE-CANONICAL-V1`](../baseline/O4O-MYPAGE-CANONICAL-V1.md) 의 "Google + 이메일·비밀번호 병행(2026-09-29)" 을 따른다 — 이번 배포에서 "다시 나타난" 것이 아니다. WO §10 의 "Google-only" 문구와 다른 점은 보고만 한다 |
+| 업무 route (비로그인) | 7개 모두 StoreGate idle 카드("로그인이 필요합니다") — guard 정상. `/handoff`(token 없음) → "이동 실패 · 이동 정보가 없습니다 · Neture로 돌아가기" |
+| 외부 링크 | 이용약관 `neture.co.kr/terms` 200 · 개인정보처리방침 `neture.co.kr/privacy` 200 |
+| title / description | "내 매장 — O4O" / "가입한 모든 서비스의 매장 업무를 한곳에서 — O4O 공통 매장 업무공간입니다." · og:title 같음 |
+| og:url / canonical | og:url `https://store.neture.co.kr/` · canonical 없음(배포 전과 같음, 업무공간) |
+| favicon | `/favicon.svg` 200 image/svg+xml (기존 O4O 공통 마크) |
+| manifest | 없음 (원래 없음 — 대상 아님) |
+
+인증 상태별 첫 화면(코드 기준 · `StoreGate` 변경 0): 비로그인 = idle 카드 · 세션 복구 중 = "로그인 상태를 확인하는 중..." · 로그인 + 매장 권한 있음 = 매장 선택(`/select-store`) 또는 업무 화면 · 로그인 + 매장 권한 없음 = `NoStorePage`. 로그인 상태 3종은 운영에서 확인하지 않았다(아래 13-5).
+
+스크린샷은 세션 scratchpad 에만 두고 저장소에는 커밋하지 않았다.
+
+### 13-5. 기타 판정
+
+| 항목 | 값 |
+|---|---|
+| LEGACY_VISIBLE_TEXT | 0 |
+| AUTHENTICATED_WORKSPACE_SMOKE | **PENDING_USER_VERIFICATION** — Google store_owner 테스트 계정이 없어 확인하지 않았다. 계정 생성 · DB 수정 없음 |
+| ROLLBACK | 없음 — rollback 사유 0 |
+| 시각 잔여 (배포 전부터 있던 것 · rollback 사유 아님) | ① 390 에서 헤더 brand "내 매장" 이 두 줄, nav 가 두 줄로 접힘(O4O 홈 · 로그인 접근 가능) ② StoreGate 카드 제목(h1)이 본문 크기(16px)라 위계가 약하고 1280 에서 카드 주변 여백이 넓다 ③ store RootShell 의 O4O 홈은 `authLoading` 을 넘기지 않는다(neture · kpa-society · kpa-branch 는 넘김) — 세션 복구 중 클릭 시 handoff 없이 대표 홈으로 갈 수 있다. 셋 다 06 잔여 정리 후보 |
+| 남은 배포 | 05 kpa (미착수, 별도 지시) |
