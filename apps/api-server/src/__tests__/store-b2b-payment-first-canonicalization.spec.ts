@@ -19,8 +19,8 @@ import {
   STORE_B2B_CART_ORDER_SOURCE,
   EVENT_OFFER_CART_ORDER_SOURCE,
   KPA_B2B_SERVICE_KEYS,
-  COSMETICS_B2B_SERVICE_KEYS,
 } from '../services/payment/b2b/store-b2b-payment.constants.js';
+import * as storeB2bPaymentConstants from '../services/payment/b2b/store-b2b-payment.constants.js';
 
 const REPO_ROOT = path.resolve(__dirname, '../../../..');
 const read = (rel: string) => fs.readFileSync(path.join(REPO_ROOT, rel), 'utf8');
@@ -151,7 +151,10 @@ describe('§1.1-A 소비자 commerce 경계 — 410 은 그대로다', () => {
 
   it('서비스별 결제 허용 serviceKey 는 B2B/특가 축뿐이다', () => {
     expect(KPA_B2B_SERVICE_KEYS).toEqual(['kpa-society', 'kpa-groupbuy']);
-    expect(COSMETICS_B2B_SERVICE_KEYS).toEqual(['k-cosmetics', 'k-cosmetics-event-offer']);
+  });
+
+  it('K-Cosmetics 결제 허용 serviceKey 상수는 삭제됐다 (퇴역 — 결제 route 없음)', () => {
+    expect('COSMETICS_B2B_SERVICE_KEYS' in storeB2bPaymentConstants).toBe(false);
   });
 });
 

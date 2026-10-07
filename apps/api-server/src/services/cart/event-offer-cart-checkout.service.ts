@@ -35,13 +35,11 @@ import { B2BConfirmError } from './b2b-checkout-confirm.core.js';
 
 /**
  * cart serviceKey(플랫폼 키) → event-offer(OPL) service_key.
- * WO-O4O-EVENT-OFFER-TO-CART-CROSSSERVICE-V2: KCos 확장.
- *   KCos event-offer 는 동일한 EventOfferService 를 각 service_key 로 재사용하므로
- *   매핑만 추가하면 reserve/createOrder/store-link(STORE_SERVICE_KEY_MAP) 가 그대로 동작한다.
+ * WO-O4O-CANONICAL-INDEX-S9-REMAINING-3-FINAL-DISPOSITION-V1: K-Cosmetics 퇴역으로 'k-cosmetics' 매핑 삭제
+ *   (결제 경로가 없어 주문을 확정해도 결제할 수 없다). 매핑 없는 serviceKey 는 아래에서 UNSUPPORTED_CART_SERVICE.
  */
 const CART_TO_EVENT_OFFER_SERVICE_KEY: Record<string, string> = {
   [SERVICE_KEYS.KPA_SOCIETY]: SERVICE_KEYS.KPA_GROUPBUY, // 'kpa-society' → 'kpa-groupbuy'
-  [SERVICE_KEYS.K_COSMETICS]: SERVICE_KEYS.K_COSMETICS_EVENT_OFFER, // 'k-cosmetics' → 'k-cosmetics-event-offer'
 };
 
 export interface CheckoutConfirmScope {

@@ -116,16 +116,18 @@ related?: RelatedEntity;
 
 ## 7. 참조 구현 (Reference Implementation)
 
+> (2026-10-07 정정) 아래 두 참조 구현은 삭제됐다 — 경로만 기록으로 남긴다. 현행 주문 경로는 [B2B 계약](../../baseline/O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1.md) 이 정한다.
+
 ### Tourism (Phase 5-C)
-- [tourism-order.controller.ts](../../../apps/api-server/src/routes/tourism/controllers/tourism-order.controller.ts)
+- `apps/api-server/src/routes/tourism/controllers/tourism-order.controller.ts` — 삭제됨
 
 ### Cosmetics (Phase 5-B′)
-- [cosmetics-order.controller.ts](../../../apps/api-server/src/routes/cosmetics/controllers/cosmetics-order.controller.ts)
+- `apps/api-server/src/routes/cosmetics/controllers/cosmetics-order.controller.ts` — 삭제됨(K-Cosmetics 퇴역 1차-B)
 
 ## 8. 관련 문서
 
 - [CLAUDE.md §7 - E-commerce Core 절대 규칙](../../../CLAUDE.md)
-- [E-COMMERCE-ORDER-CONTRACT.md](../../_platform/E-COMMERCE-ORDER-CONTRACT.md)
+- [CHECKOUT-STABLE-DECLARATION-V2.md](../../baseline/CHECKOUT-STABLE-DECLARATION-V2.md) §2 — 주문 생성 기술 계약 (구 E-COMMERCE-ORDER-CONTRACT 는 2026-10-07 SUPERSEDED)
 - [ORDER-DELEGATION.md](./ORDER-DELEGATION.md)
 - [DOMAIN-BOUNDARY.md](./DOMAIN-BOUNDARY.md)
 
