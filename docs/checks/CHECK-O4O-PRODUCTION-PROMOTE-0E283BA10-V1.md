@@ -4,6 +4,7 @@
 > **작성일**: 2026-10-07
 > **근거**: 사용자 승인(2026-10-07) — `promote.yml` `sha=0e283ba102a86b2e6ce07d88926d3b39a0ea6fe9` · `dry_run=false`
 > **관련 CHECK**: [`CHECK-NETURE-PHARMACY-STORE-COMMERCE-LOCAL-BROWSER-V1`](CHECK-NETURE-PHARMACY-STORE-COMMERCE-LOCAL-BROWSER-V1.md) §9-5 · §9-7 (#308 + #323 promote 범위 · 운영 smoke 목록)
+> **갱신**: 2026-10-07 §8 (테스트 결제 env 반영 확인)
 > **결과**: **PROMOTE PASS** — API(migration 1건 포함) + 웹 7 + Admin 1 새 revision · traffic 100%. HTTP 수준 smoke PASS. 실브라우저 · 로그인 후 화면 · production write 를 동반하는 흐름은 **미검증**(§6).
 
 production promote run `37548237819` 의 배포 기록이다. 이 run 을 시작한 세션이 작성한다.
@@ -125,3 +126,18 @@ production promote run `37548237819` 의 배포 기록이다. 이 run 을 시작
 | #323 `SERVICE_NOT_MEMBER` gate production 적용 | PASS (API smoke) |
 | #308 Neture 약국 API production 적용 | PASS (조회 smoke) |
 | 실브라우저 · 로그인 후 · write 흐름 | 미검증 — §6 |
+
+## 8. 후속 — 테스트 결제 env 반영 확인 (2026-10-07)
+
+`NETURE_PHARMACY_PAYMENT_MODE=test` 는 이 promote 의 API revision 에는 들어가지 않았다. 이후 API 자동 배포로 반영된 것을 확인했다(조회만).
+
+| 항목 | 결과 |
+|---|---|
+| `03837-caw` (이 promote) | `NETURE_PHARMACY_PAYMENT_MODE` 없음 |
+| 이후 배포 | main `5e97815c7`(#325 merge) push → Delivery run `37552776731` 이 API 자동 배포(CI gate · build-and-deploy success) |
+| 새 revision | `o4o-core-api-03840-mos` (2026-10-07 00:40:39Z), label `5e97815c7`, traffic 100% |
+| env | `NETURE_PHARMACY_PAYMENT_MODE=test` 확인 |
+| `/health/ready` | 200 |
+
+- `deploy-api.yml` 수동 실행은 필요하지 않았다 — 실행하지 않았다.
+- 테스트 결제 실제 흐름(장바구니 → 주문 → 결제)은 미검증 — Google 인증 약국 · 공급자 테스트 계정과 pharmacy 담당 운영자가 필요하다(§6).
