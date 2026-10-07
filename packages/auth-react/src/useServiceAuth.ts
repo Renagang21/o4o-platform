@@ -18,6 +18,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { parseAuthResponse, resolveAuthError, AUTH_TOKEN_CLEARED_EVENT } from '@o4o/auth-utils';
 import type {
   AuthLoginResult,
+  GoogleSignupConsents,
   AuthServiceAccess,
   PendingPolicyAcceptance,
   PolicyAcceptanceResult,
@@ -202,7 +203,7 @@ export function useServiceAuth<TUser>(config: ServiceAuthConfig<TUser>): Service
 
   /** WO-2D: 약관/개인정보(+마케팅) 동의 후 Google 계정으로 계정 생성 + 세션. */
   const signupWithGoogle = useCallback(
-    (idToken: string, consents: { terms: boolean; privacy: boolean; marketing?: boolean }): Promise<AuthLoginResult<TUser>> =>
+    (idToken: string, consents: GoogleSignupConsents): Promise<AuthLoginResult<TUser>> =>
       adoptSession(() => authClient.signupWithGoogle(idToken, consents), 'Google 계정 생성에 실패했습니다.'),
     [adoptSession, authClient],
   );

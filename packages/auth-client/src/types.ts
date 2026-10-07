@@ -122,7 +122,7 @@ export interface EmailSignupRequest {
   password: string;
   name: string;
   phone: string;
-  consents: GoogleSignupConsents;
+  consents: Omit<GoogleSignupConsents, 'phone'>;
 }
 
 /** 가입·재발송·찾기 등 세션을 열지 않는 이메일 인증 요청의 결과(서버 `data`). */
