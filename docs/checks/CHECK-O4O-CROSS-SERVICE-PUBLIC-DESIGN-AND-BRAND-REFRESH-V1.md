@@ -8,7 +8,7 @@
 | 선행 | [`IR-O4O-CROSS-SERVICE-PUBLIC-HOME-AND-BRAND-DESIGN-CENSUS-V1`](../investigations/IR-O4O-CROSS-SERVICE-PUBLIC-HOME-AND-BRAND-DESIGN-CENSUS-V1.md) (PR #331 MERGED) |
 | 성격 | 프런트엔드 표시 계층만 변경. route·API·권한·DB·serviceKey·package name 은 바꾸지 않았다 |
 | 기준 | `origin/main` 0e283ba10 · branch `wo/o4o-cross-service-public-design-brand-refresh-v1` |
-| 완료 판정 | **`CODE_COMPLETE` / `PRODUCTION_SMOKE_PENDING_DEPLOY`** — 단계 배포 중. 01 web-neture(neture · supplier · community · funding) · 02 web-kpa-society(pharmacy) 배포 · production smoke PASS(§9 · §10). 나머지 host 는 미배포 |
+| 완료 판정 | **`CODE_COMPLETE` / `PRODUCTION_SMOKE_PENDING_DEPLOY`** — 단계 배포 중. 01 web-neture(neture · supplier · community · funding) · 02 web-kpa-society(pharmacy) · 03 web-lecture(study) 배포 · production smoke PASS(§9 · §10 · §11). 나머지 host 는 미배포 |
 | 작성일 | 2026-10-07 |
 
 ---
@@ -26,7 +26,7 @@
 | RETAIL | **NOT_REDESIGNED** | `services/web-k-cosmetics` 변경 0 |
 | HOSPITAL | **UNTOUCHED** | neture.co.kr/hospital 관련 파일 변경 0 |
 | DB_CHANGE | **0** | migration · write 0. 아래 §6 의 [SMOKE] row 는 STOP 하고 보고만 한다 |
-| 운영 배포 | **부분 배포 (02/05)** | PR #337 merge(0d0ff4fdc) 후 서비스별로 하나씩 배포한다. 01 web-neture 완료(§9) · 02 pharmacy 완료(§10). study · store · kpa 는 미배포 |
+| 운영 배포 | **부분 배포 (03/05)** | PR #337 merge(0d0ff4fdc) 후 서비스별로 하나씩 배포한다. 01 web-neture 완료(§9) · 02 pharmacy 완료(§10) · 03 study 완료(§11). store · kpa 는 미배포 |
 
 ---
 
@@ -352,3 +352,76 @@ canonical 정리 (candidate 파일 기준 `kpa-society.co.kr` 잔존 수): index
 | AUTHENTICATED_SMOKE / 로그인 상태 O4O 홈 | **PENDING_USER_VERIFICATION** — Google 테스트 계정이 없어 확인하지 않았다. 계정 생성 · DB 수정 없음 |
 | ROLLBACK | 없음 — rollback 사유(접근 불가 · JS fatal · 로그인 진입 · O4O 홈 이동 · header/nav 파손 · 모바일 Hero · canonical 진입 차단) 0 |
 | 남은 배포 | 03 study → 04 store → 05 kpa (미착수, 별도 지시) |
+
+---
+
+## 11. Production 배포 03 — web-lecture / study (WO-O4O-PUBLIC-DESIGN-PRODUCTION-DEPLOY-03-STUDY)
+
+> 실행일 2026-10-07. 배포 대상은 `lecture-web` Cloud Run service 하나다(`study.neture.co.kr`). 다른 web · API · Admin · DB · migration 은 건드리지 않았다. 내부 serviceKey `lecture` · route · API key 는 바꾸지 않았다. 판정 기준은 02 와 같은 항목을 적용했다.
+
+### 11-1. 배포 전 상태 (rollback 기준)
+
+| 항목 | 값 |
+|---|---|
+| service | `lecture-web` (asia-northeast3) |
+| serving revision | `lecture-web-00043-boy` · traffic 100% (그 이전 `00040-hin`) |
+| `o4o-commit-sha` | `0e283ba102a86b2e6ce07d88926d3b39a0ea6fe9` · digest `sha256:42160985…` |
+| 화면 (1280/390) | title "O4O 강의 \| Neture" · og 없음 · canonical 없음 · favicon 없음 · Pretendard 미로드 · h1 "O4O 강의"(옛 Hero, O4OPublicHero 없음) · O4O 홈은 헤더 · footer 에 이미 있음 · legacy 문구 0 |
+| 배포 gate | `DEPLOY_FREEZE=false` 유지 (열고 닫지 않음) |
+
+### 11-2. 후보 census (serving 0e283ba10 → candidate 1939c7c69)
+
+- candidate = main HEAD `1939c7c69c1595b9477f01a76ae32909e7e8c72c`. 처음 후보 `34e96e4fd`(#346 merge) 로 dry-run 했으나 그 사이 main 이 문서 전용 merge 2건(#269 CHECK · #237 IR/WO, docs 3 files) 으로 움직여 `PROMOTE_REFUSED_NOT_HEAD` 였다. 34e96e4fd → 1939c7c69 runtime diff 0 이라 후보를 바꿨다.
+- `services/web-lecture` + `packages` 에 들어간 commit: PR #337 2건(9a4c0e571 · 0920e1895) + **PR #330 1건(f762ec214)**.
+
+| 분류 | 내용 |
+|---|---|
+| STUDY_DESIGN_REQUIRED | `services/web-lecture`: index.html(title · description · og · favicon · Pretendard) · `public/favicon.svg` · SiteShell(O4O 홈 class) · `config/service.ts` `STUDY_HERO` · HomePage(O4OPublicHero) · index.css |
+| SAFE_DEPENDENCY | `packages/auth-react` public-brand · useO4OHomeReturn · `packages/ui` GlobalHeader — 01 · 02 에서 운영 검증됨 |
+| 함께 배포된 기승인 변경 | **PR #330** (WO-O4O-LECTURE-HANDOFF-NONMEMBER-UX-V1, 사용자 승인 merge) — web-lecture `AccessGate` · `HandoffPage` · `CoursesPage` · `lmsViewAdapter` · `config/service.ts`(`INQUIRY_URL` · `isPublicLecturePath`). 프런트 문구 · 복귀 경로만, API · auth/handoff 계약 · DB · dependency 변경 0. CI green · 빌드 검증(web-lecture 는 테스트 인프라 없음). 이번 smoke 에 화면 확인을 포함했다(§11-4) |
+| UNRELATED | api-server · tools · web-neture · web-kpa-* · web-store · docs |
+| UNVERIFIED | 0 |
+
+- #330 의 web-neture 쪽(`ServiceEntryPage` 미가입 안내)은 01 의 neture image(6ad3d1263) 에 없다. 다음 neture 배포 때 들어간다. lecture 쪽 변경은 방어 문구라 neture 쪽 없이 배포해도 기존 흐름보다 나빠지지 않는다.
+- 정적 파일: web-lecture 에는 `manifest.json` · `robots.txt` · `sitemap.xml` 이 원래 없다(SPA fallback 이 index.html 을 돌려준다). `kpa-society.co.kr` 등 옛 canonical 잔존 0.
+
+### 11-3. 배포 실행
+
+| 항목 | 값 |
+|---|---|
+| CI (candidate) | CI Pipeline run 37573412280 success · 자동 Delivery run 37573689099 = Classify 만(배포 job 전부 skipped) |
+| dry-run | Promote run 37573396931 (34e96e4fd) → `PROMOTE_REFUSED_NOT_HEAD`(배포 0) · Promote run **37573837511** (1939c7c69 · `services=lecture`) → lecture = PROMOTE(LEVEL_3, rule `auth-package`) · 나머지 NOT_SELECTED/NO_DEPLOY · plan `web(parallel)=lecture` |
+| 실제 promote | Promote run **37573984205** (`sha=1939c7c69…` · `services=lecture`) success |
+| job | `deploy-lecture` 만 실행. 다른 web · API · Admin = skipped |
+| 새 revision | **`lecture-web-00046-zef`** · `o4o-commit-sha=1939c7c69c15…` · digest `sha256:e2a2cdc8…` |
+| traffic | 새 revision 100% |
+| 이전 revision | `lecture-web-00043-boy` 보존 (rollback 가능) |
+| 다른 service | neture 01695 · kpa-society 02032 · store 00059 · kpa-branch 00202 · pharmacy-hub 00284 · core-api 03840 · admin 01352 · hospital-pharmacy 00029 — 배포 전과 같다 |
+
+### 11-4. Production smoke (비로그인 · Chrome headless · 실 URL)
+
+1280/390 모두 HTTP 200 · pageerror 0 · console error 0 · 4xx/5xx 응답 0 · 가로 overflow 0 · Pretendard loaded(`Pretendard Variable`).
+
+| 항목 | 결과 |
+|---|---|
+| 표시 브랜드 | 헤더 "O4O 강의" · Hero eyebrow "O4O 강의" · footer "© 2026 Neture · O4O 강의". legacy 문구 0 |
+| Hero | h1 "필요한 지식을 / 실무와 연결합니다" (1280 52px · 390 32px, 둘 다 2줄) · 설명 · 과한 장식 없음 |
+| CTA | 강의 둘러보기 → `/courses` · 서비스 로그인 → `/login`. 헤더 · footer 포함 내부 링크 5개(/ · /courses · /login · /terms · /privacy) 전부 200 · 404 문구 0 · JS error 0 |
+| O4O 홈 | 1280 · 390 헤더에 보임(+ footer). **실제 클릭** → `https://neture.co.kr/` 도착 |
+| 로그인 진입 | 헤더 [로그인] → `/login` "O4O 강의 로그인 — Neture 에서 로그인하고 계속하기" → 클릭 시 `neture.co.kr/service-entry/lecture?returnPath=%2F` 의 Neture 로그인 모달에 "Google 계정으로 계속하기" 표시. 인증은 진행하지 않았다 |
+| #330 화면 | 비로그인 `/my/enrollments` → AccessGate "내 학습 · 로그인이 필요합니다 · [로그인]" · `/handoff?token=<무효>` → "이동 링크가 만료되었거나 이미 사용되었습니다 · 다시 로그인 · Neture로 돌아가기" (API 401 은 무효 token 에 대한 예상 응답) |
+| title / description | "O4O 강의 — 필요한 지식을 실무와 연결합니다" / Hero 설명 문구. 정적 HTML(curl) 도 같은 title · og:title |
+| og:url / canonical | og:url `https://study.neture.co.kr/` · canonical 은 배포 전과 같이 없음(옛 도메인 canonical 아님 — FAIL 아님) |
+| favicon | `/favicon.svg` 200 image/svg+xml (기존 O4O 공통 마크) |
+| manifest | 없음 (원래 없음 — 대상 아님) |
+
+스크린샷은 세션 scratchpad 에만 두고 저장소에는 커밋하지 않았다.
+
+### 11-5. 기타 판정
+
+| 항목 | 값 |
+|---|---|
+| LEGACY_VISIBLE_TEXT | 0 |
+| AUTHENTICATED_SMOKE / 로그인 상태 O4O 홈 · handoff | **PENDING_USER_VERIFICATION** — Google 테스트 계정이 없어 확인하지 않았다. 계정 생성 · DB 수정 없음 |
+| ROLLBACK | 없음 — rollback 사유 0 |
+| 남은 배포 | 04 store → 05 kpa (미착수, 별도 지시) |
