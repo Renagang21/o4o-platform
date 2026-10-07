@@ -14,8 +14,9 @@
  *   수신 origin 을 보지 않는다.
  */
 export const CANONICAL_BRANCH_HOST = 'kpa.neture.co.kr';
+const CANONICAL_ORIGIN = `https://${CANONICAL_BRANCH_HOST}`;
 
-const LEGACY_BRANCH_HOSTS = ['kpa-society.co.kr', 'www.kpa-society.co.kr'];
+const LEGACY_BRANCH_HOSTS = new Set(['kpa-society.co.kr', 'www.kpa-society.co.kr']);
 const LEGACY_BASE_PATH = '/kpa';
 
 export function legacyBranchRedirectUrl(
@@ -24,8 +25,13 @@ export function legacyBranchRedirectUrl(
   search = '',
   hash = '',
 ): string | null {
-  if (!LEGACY_BRANCH_HOSTS.includes(host.toLowerCase())) return null;
+  if (!LEGACY_BRANCH_HOSTS.has(host.toLowerCase())) return null;
   if (pathname !== LEGACY_BASE_PATH && !pathname.startsWith(`${LEGACY_BASE_PATH}/`)) return null;
-  const rest = pathname.slice(LEGACY_BASE_PATH.length) || '/';
-  return `https://${CANONICAL_BRANCH_HOST}${rest}${search}${hash}`;
+  // 목적지는 언제나 canonical origin 이다 — path · query · hash 만 옮기고, 조립 결과의 origin 을 다시 확인한다
+  // (`/kpa//evil.example` 같은 입력도 host 를 바꾸지 못한다).
+  const target = new URL(CANONICAL_ORIGIN);
+  target.pathname = pathname.slice(LEGACY_BASE_PATH.length) || '/';
+  target.search = search;
+  target.hash = hash;
+  return target.origin === CANONICAL_ORIGIN ? target.href : null;
 }
