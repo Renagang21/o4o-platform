@@ -134,7 +134,7 @@ function identityFor(map: Record<string, Partial<VerifiedGoogleIdentity> | Googl
 }
 
 const META = { ipAddress: '127.0.0.1', userAgent: 'jest' };
-const CONSENTS = { terms: true, privacy: true };
+const CONSENTS = { phone: '01012345678', terms: true, privacy: true };
 
 function seedUser(store: Store, over: Row = {}): Row {
   const u = Object.assign(new User(), {

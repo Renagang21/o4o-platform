@@ -47,14 +47,8 @@ interface LoginModalProps {
   returnUrl?: string;
 }
 
-/**
- * 이 호스트에서 착지할 수 있는 Demo 만 보인다. 공급자 Demo 는 `/supplier/dashboard` 로 가는데,
- * funding · community 호스트에서는 그 경로가 대표 호스트로 넘어가 세션 없이 착지한다(토큰은 origin 별).
- * WO-O4O-CROSS-SERVICE-LOGIN-ENTRY-AND-RETURN-FLOW-FIX-V1
- */
-const VISIBLE_DEMO_ACCOUNTS = DEMO_ACCOUNTS.filter(
-  (demo) => !(demo.type === 'SUPPLIER' && (CURRENT_HOST_PROFILE === 'funding' || CURRENT_HOST_PROFILE === 'community')),
-);
+/** All user service hosts expose both public experience accounts. */
+const VISIBLE_DEMO_ACCOUNTS = DEMO_ACCOUNTS;
 
 export default function LoginModal({ isOpen, onClose, returnUrl }: LoginModalProps) {
   const navigate = useNavigate();
@@ -141,6 +135,14 @@ export default function LoginModal({ isOpen, onClose, returnUrl }: LoginModalPro
     if (!result.success || !result.user) {
       sessionStorage.removeItem(LOGIN_EXPLICIT_NAV_KEY);
       release(demoLoginErrorMessage(result));
+      return;
+    }
+
+    if (CURRENT_HOST_PROFILE === 'funding' || CURRENT_HOST_PROFILE === 'community') {
+      navigate(returnUrl || '/');
+      demoBusyRef.current = false;
+      setDemoBusy(null);
+      onClose();
       return;
     }
 

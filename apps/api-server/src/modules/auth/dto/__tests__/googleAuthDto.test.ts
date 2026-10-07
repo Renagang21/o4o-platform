@@ -24,12 +24,12 @@ describe('Google auth DTO — 입력 계약', () => {
   });
 
   it('signup: consents.terms/privacy 필수 · marketing 선택 · 그 외 필드 거절', async () => {
-    expect(await run(GoogleSignupRequestDto, { idToken: 't', consents: { terms: true, privacy: true } })).toHaveLength(0);
-    expect(await run(GoogleSignupRequestDto, { idToken: 't', consents: { terms: true, privacy: true, marketing: false } })).toHaveLength(0);
+    expect(await run(GoogleSignupRequestDto, { idToken: 't', consents: { terms: true, privacy: true, phone: '01012345678' } })).toHaveLength(0);
+    expect(await run(GoogleSignupRequestDto, { idToken: 't', consents: { terms: true, privacy: true, marketing: false, phone: '01012345678' } })).toHaveLength(0);
     expect((await run(GoogleSignupRequestDto, { idToken: 't', consents: { terms: true } })).length).toBeGreaterThan(0);
     expect((await run(GoogleSignupRequestDto, { idToken: 't' })).length).toBeGreaterThan(0);
     for (const field of ['name', 'phone', 'email', 'sub', 'role', 'serviceKey', 'password']) {
-      const errors = await run(GoogleSignupRequestDto, { idToken: 't', consents: { terms: true, privacy: true }, [field]: 'x' });
+      const errors = await run(GoogleSignupRequestDto, { idToken: 't', consents: { terms: true, privacy: true, phone: '01012345678' }, [field]: 'x' });
       expect(errors.some((e) => e.property === field)).toBe(true);
     }
   });

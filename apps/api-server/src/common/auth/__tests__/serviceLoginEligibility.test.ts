@@ -34,7 +34,7 @@ describe('resolveLoginMembershipGateKey', () => {
     ['https://kpa-society.co.kr', 'kpa-society'],
     ['https://www.kpa-society.co.kr', 'kpa-society'],
   ])('G1 %s → %s', (origin, key) => {
-    expect(resolveLoginMembershipGateKey(origin)).toBe(key);
+    expect(resolveLoginMembershipGateKey(origin)).toBeNull();
   });
 
   it.each([
@@ -56,11 +56,8 @@ describe('resolveLoginMembershipGateKey', () => {
     expect(resolveLoginMembershipGateKey(origin as string | undefined | null)).toBeNull();
   });
 
-  it('게이트 서비스는 catalog 선언과 일치한다 (kpa-society · k-cosmetics 뿐)', () => {
-    expect(O4O_SERVICES.filter((s) => s.loginMembershipRequired).map((s) => s.key).sort()).toEqual([
-      'k-cosmetics',
-      'kpa-society',
-    ]);
+  it('서비스 미가입은 로그인 자체를 거부하지 않는다', () => {
+    expect(O4O_SERVICES.filter((s) => s.loginMembershipRequired).map((s) => s.key).sort()).toEqual([]);
   });
 });
 

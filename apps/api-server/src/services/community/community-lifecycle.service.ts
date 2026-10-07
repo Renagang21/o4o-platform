@@ -23,6 +23,7 @@ import {
   DEMO_ACCOUNT_FORBIDDEN_CODE,
   DEMO_ACCOUNT_FORBIDDEN_MESSAGE,
 } from '../auth/demo-account.service.js';
+import { assertNetureMainMembershipActive } from '../../modules/neture/services/neture-main-membership.js';
 import { Community } from '../../entities/Community.js';
 import { CommunityMembership } from '../../entities/CommunityMembership.js';
 import { CommunityCreationRequest } from '../../entities/CommunityCreationRequest.js';
@@ -37,6 +38,7 @@ export type LifecycleErrorCode =
   | 'SLUG_TAKEN'
   | 'REQUEST_NOT_FOUND'
   | 'REQUEST_NOT_PENDING'
+  | 'NICKNAME_REQUIRED'
   | 'ALREADY_MEMBER'
   | 'MEMBERSHIP_NOT_FOUND'
   | 'MEMBERSHIP_NOT_PENDING'
@@ -126,6 +128,7 @@ export class CommunityLifecycleService {
   }): Promise<CommunityCreationRequest> {
     const slug = normalizeSlug(input.desiredSlug);
     return this.dataSource.transaction(async (m) => {
+      await assertNetureMainMembershipActive(m, input.requesterUserId);
       if (await slugTaken(m, slug)) {
         throw new CommunityLifecycleError('SLUG_TAKEN', `이미 사용 중인 주소입니다: ${slug}`, 409);
       }
@@ -214,6 +217,9 @@ export class CommunityLifecycleService {
   /** 가입 신청 — 승인형 하나. 자동 승인하지 않는다. */
   async requestJoin(input: { communityId: string; userId: string }): Promise<CommunityMembership> {
     return this.dataSource.transaction(async (m) => {
+      await assertNetureMainMembershipActive(m, input.userId);
+      const [profile] = await m.query(`SELECT nickname FROM users WHERE id = $1`, [input.userId]);
+      if (!profile?.nickname?.trim()) throw new CommunityLifecycleError('NICKNAME_REQUIRED', '내 프로필에서 커뮤니티 닉네임을 등록해 주세요.', 400);
       const repo = m.getRepository(CommunityMembership);
       const existing = await repo.findOne({
         where: { communityId: input.communityId, userId: input.userId },

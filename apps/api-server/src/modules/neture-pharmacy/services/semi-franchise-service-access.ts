@@ -95,7 +95,9 @@ export async function resolveSemiFranchiseServiceAccess(
        LEFT JOIN semi_franchises sf ON sf.key = $2 AND sf.status = 'active'
        LEFT JOIN semi_franchise_memberships sfm
          ON sfm.organization_id = om.organization_id AND sfm.semi_franchise_id = sf.id
-      WHERE om.user_id = $1 AND om.role = ANY($3::text[]) AND om.left_at IS NULL`,
+      WHERE om.user_id = $1 AND om.role = ANY($3::text[]) AND om.left_at IS NULL
+        AND EXISTS (SELECT 1 FROM users u WHERE u.id = $1 AND u."isEmailVerified" = true AND u."isActive" = true AND u.status IN ('active','approved'))
+        AND NOT EXISTS (SELECT 1 FROM service_memberships main WHERE main.user_id = $1 AND main.service_key = 'neture' AND main.status IN ('suspended','withdrawn'))`,
     [userId, semiFranchiseKey, [...PHARMACY_STORE_MEMBER_ROLES]],
   );
   return decideSemiFranchiseAccess(semiFranchiseKey, rows);

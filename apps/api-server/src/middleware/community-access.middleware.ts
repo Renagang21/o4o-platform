@@ -106,6 +106,8 @@ export async function hasApprovedCommunityMembership(communityKey: string, userI
        JOIN communities c ON c.id = cm.community_id
       WHERE c.slug = $1 AND c.status = 'active'
         AND cm.user_id = $2 AND cm.status = 'active'
+        AND EXISTS (SELECT 1 FROM users u WHERE u.id = $2 AND u."isEmailVerified" = true AND u."isActive" = true AND u.status IN ('active','approved'))
+        AND NOT EXISTS (SELECT 1 FROM service_memberships main WHERE main.user_id = $2 AND main.service_key = 'neture' AND main.status IN ('suspended','withdrawn'))
       LIMIT 1`,
     [communityKey, userId],
   );

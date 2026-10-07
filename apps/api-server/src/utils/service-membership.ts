@@ -17,6 +17,7 @@
  * (로컬 매핑 상수 금지 — 4-way drift 재발 방지).
  */
 
+import { getNetureMainMembershipStatus } from '../modules/neture/services/neture-main-membership.js';
 import type { DataSource } from 'typeorm';
 import { resolveCanonicalServiceKey } from '@o4o/security-core';
 
@@ -46,9 +47,14 @@ export async function getServiceMembershipStatusFromDb(
 ): Promise<ServiceMembershipStatus> {
   if (!userId || !serviceKey) return 'none';
   const membershipKey = resolveCanonicalServiceKey(serviceKey);
+  if (membershipKey === 'neture') return getNetureMainMembershipStatus(dataSource, userId);
   const rows = await dataSource.query(
     `SELECT status FROM service_memberships
      WHERE user_id = $1 AND service_key = $2
+       AND EXISTS (SELECT 1 FROM users u WHERE u.id = $1 AND u."isEmailVerified" = true
+         AND u."isActive" = true AND u.status IN ('active', 'approved'))
+       AND NOT EXISTS (SELECT 1 FROM service_memberships main WHERE main.user_id = $1
+         AND main.service_key = 'neture' AND main.status IN ('suspended', 'withdrawn'))
      LIMIT 1`,
     [userId, membershipKey],
   );

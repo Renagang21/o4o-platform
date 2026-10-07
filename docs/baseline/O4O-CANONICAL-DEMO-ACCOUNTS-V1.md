@@ -1,5 +1,7 @@
 # O4O-CANONICAL-DEMO-ACCOUNTS-V1
 
+> **2026-10-07 갱신**: 모든 사용자 서비스 로그인 화면에 두 테스트 로그인 버튼을 제공한다. credential의 공통 코드 정본은 `packages/auth-utils/src/demoAccounts.ts`다. 매장 Demo는 합성 약국 승인 원장과 `neture:store_owner` 표식으로 접근하며 KPA 회원 승인으로 접근을 얻지 않는다. 인가 우회·관리자 권한은 없다.
+
 > 발행: 2026-10-01 · 상태: **ACTIVE (정책 정본)**
 > 집행 WO: [`WO-O4O-CANONICAL-DEMO-ACCOUNT-FOUNDATION-AND-EXPERIENCE-LOGIN-V1`](../work-orders/WO-O4O-CANONICAL-DEMO-ACCOUNT-FOUNDATION-AND-EXPERIENCE-LOGIN-V1.md)
 > 선행: [`WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1`](../work-orders/WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1.md) (이메일·비밀번호 로그인)
@@ -239,7 +241,7 @@ Demo 는 **role 을 가진다.** §5 의 "role · membership · ownership 연결
 
 | | role | 쓰는 곳 |
 |---|---|---|
-| Store Owner Demo | `kpa:store_owner` | `isStoreOwner('kpa')` — store-contents · store-playlists 진입 |
+| Store Owner Demo | `neture:store_owner` | `isStoreOwner('kpa')` — store-contents · store-playlists 진입 |
 | Supplier Demo | `neture:supplier` | web-neture `SupplierRoute` 의 `SUPPLIER_ROLES` |
 
 ```text
@@ -256,7 +258,7 @@ Demo 는 **role 을 가진다.** §5 의 "role · membership · ownership 연결
 
 ```text
 CLI      apps/api-server/src/scripts/demo-account-provision.ts
-         ALLOWED_DEMO_ROLES = { kpa:store_owner, neture:supplier }
+         ALLOWED_DEMO_ROLES = { neture:store_owner, neture:supplier }
          목록 밖 role 은 DB 를 건드리기 전(assertPreconditions)에 거절한다
 계약     src/scripts/__tests__/demo-account-provision.contract.test.ts ⑦
          allowlist 값 · 실제 부여 role · 금지 prefix · 선행 거절 · INSERT guard 순서를 고정

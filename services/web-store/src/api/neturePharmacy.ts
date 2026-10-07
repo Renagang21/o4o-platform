@@ -22,6 +22,9 @@ export interface PharmacyMembership {
   applied_at: string;
   decided_at: string | null;
   reason: string | null;
+  address?: string;
+  phone?: string;
+  business_profile?: Record<string, string>;
 }
 
 export interface PharmacyMembershipInput {
@@ -30,6 +33,10 @@ export interface PharmacyMembershipInput {
   pharmacistLicenseNumber: string;
   address?: string;
   phone?: string;
+  businessRegistrationDocumentId?: string;
+  representativeName?: string;
+  businessType?: string;
+  businessCategory?: string;
 }
 
 export type PaymentMode = 'test' | 'live' | 'disabled';
@@ -41,6 +48,7 @@ export interface PharmacyStoreContext {
 }
 
 export interface SemiFranchiseRow {
+  registrationConditions?: string;
   key: string;
   name: string;
   communityKey: string | null;
@@ -178,8 +186,8 @@ export const neturePharmacyApi = {
   async listSemiFranchises(): Promise<SemiFranchiseRow[]> {
     return (await coreApiClient.get<Envelope<SemiFranchiseRow[]>>(`${P}/semi-franchises`)).data ?? [];
   },
-  async applySemiFranchise(key: string): Promise<unknown> {
-    return (await coreApiClient.post<Envelope<unknown>>(`${P}/semi-franchises/${encodeURIComponent(key)}/apply`)).data;
+  async applySemiFranchise(key: string, application: { acceptedConditions?: boolean; conditions?: string; note?: string } = {}): Promise<unknown> {
+    return (await coreApiClient.post<Envelope<unknown>>(`${P}/semi-franchises/${encodeURIComponent(key)}/apply`, application)).data;
   },
   async withdrawSemiFranchise(key: string): Promise<unknown> {
     return (await coreApiClient.post<Envelope<unknown>>(`${P}/semi-franchises/${encodeURIComponent(key)}/withdraw`)).data;

@@ -24,6 +24,10 @@ export class GoogleLoginRequestDto {
 }
 
 export class GoogleSignupConsentsDto {
+  @IsString()
+  @IsNotEmpty()
+  phone!: string;
+
   @IsBoolean()
   terms!: boolean;
 

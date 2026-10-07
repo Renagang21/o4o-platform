@@ -98,6 +98,7 @@ export interface GoogleSignupConsents {
   terms: boolean;
   privacy: boolean;
   marketing?: boolean;
+  phone: string;
 }
 
 /** GET /auth/google/config — 공개 Client ID(secret 아님). enabled=false 면 Google 버튼을 "준비 중"으로 표시. */

@@ -1,5 +1,7 @@
 # O4O Platform Identity Architecture V3 — Privacy · Identity Target Model
 
+> **2026-10-07 정책 갱신**: [O4O-NETURE-AUTH-AND-SERVICE-MEMBERSHIP-V1](../baseline/O4O-NETURE-AUTH-AND-SERVICE-MEMBERSHIP-V1.md)이 메인 이메일 확인, 공통 모바일·커뮤니티 닉네임, Store 약국 전용 신규 가입, 사업자등록증 제출, 서비스별 가입과 로그인 분리의 현행 정본이다. 아래의 다업종 Store 신규 가입·최소 User 필수 정보 없음·메인 수동 승인·미가입 로그인 거부 서술은 해당 범위에서 대체됐다. 기존 역할·관계·인증 수단 경계는 유지한다.
+
 > **Canonical Identity & Privacy Baseline.** 본 문서는 O4O 의 **사용자 · 인증 Identity · 자격(Credential) · 사업자/매장 관계 · 권한 · Claim · 연락/연결 채널 · 동의 · 증빙 · 세션** 의 공식 기준 문서다. [V2](O4O-IDENTITY-ARCHITECTURE-V2.md) 의 "서비스별 password credential" 모델을 **Google 단일 로그인 + 최소 개인정보 User** 모델로 대체한다(2026-09-17 채택 시점). **2026-09-29 부터 로그인은 Google + 이메일·비밀번호 병행**이다(§3 · `WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1`) — 계정 단위 수단이며 서비스별 password 모델의 복원이 아니다.
 
 - **상태:** **CANONICAL** (Adopted) — 이후 모든 Identity · 개인정보 관련 IR / WO / 설계 판단은 본 문서를 기준으로 한다

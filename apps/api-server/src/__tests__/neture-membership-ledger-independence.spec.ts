@@ -74,7 +74,7 @@ describe('L1 연결 서비스 처리는 Neture 원장을 바꾸지 않는다', (
   });
 
   it('판정 helper 는 service_memberships 를 읽기만 한다', async () => {
-    const query = jest.fn().mockResolvedValue([{ status: 'pending' }]);
+    const query = jest.fn().mockResolvedValue([{ account_status: 'active', account_active: true, email_verified: false }]);
     await expect(getNetureMainMembershipStatus({ query } as any, 'u1')).resolves.toBe('pending');
     expect(query).toHaveBeenCalledTimes(1);
     expect(String(query.mock.calls[0][0]).trim()).toMatch(/^SELECT/i);
@@ -83,16 +83,16 @@ describe('L1 연결 서비스 처리는 Neture 원장을 바꾸지 않는다', (
 
   it.each([
     [[], 'none'],
-    [[{ status: 'rejected' }], 'rejected'],
-    [[{ status: 'suspended' }], 'suspended'],
-    [[{ status: 'weird' }], 'none'],
+    [[{ account_status: 'rejected' }], 'rejected'],
+    [[{ account_status: 'suspended' }], 'suspended'],
+    [[{ account_status: 'weird' }], 'pending'],
   ])('rows=%j → %s', async (rows, expected) => {
     const query = jest.fn().mockResolvedValue(rows);
     await expect(getNetureMainMembershipStatus({ query } as any, 'u1')).resolves.toBe(expected);
   });
 
   it('신청자 기준 판정은 409, 본인 기준은 403', async () => {
-    const query = jest.fn().mockResolvedValue([{ status: 'pending' }]);
+    const query = jest.fn().mockResolvedValue([{ account_status: 'active', account_active: true, email_verified: false }]);
     const self = await assertNetureMainMembershipActive({ query } as any, 'u1').catch((e) => e);
     const applicant = await assertNetureMainMembershipActive({ query } as any, 'u1', 'applicant').catch((e) => e);
     expect(self).toBeInstanceOf(NetureMainMembershipRequiredError);
@@ -168,13 +168,13 @@ describe('L3 메인 AI 진입점 서버 guard', () => {
   };
 
   it('active → 통과', async () => {
-    const { next, res } = await run({ rows: [{ status: 'active' }] });
+    const { next, res } = await run({ rows: [{ account_status: 'active', account_active: true, email_verified: true }] });
     expect(next).toHaveBeenCalled();
     expect(res.status).not.toHaveBeenCalled();
   });
 
   it.each(['pending', 'rejected', 'suspended', 'withdrawn'])('%s → 403 NETURE_MEMBERSHIP_REQUIRED', async (status) => {
-    const { next, res } = await run({ rows: [{ status }] });
+    const { next, res } = await run({ rows: [{ account_status: status === 'withdrawn' ? 'active' : status, account_active: true, email_verified: true, membership_status: status }] });
     expect(next).not.toHaveBeenCalled();
     expect(res.status).toHaveBeenCalledWith(403);
     expect(res.json.mock.calls[0][0]).toMatchObject({
@@ -191,7 +191,7 @@ describe('L3 메인 AI 진입점 서버 guard', () => {
   });
 
   describe('병원약국 화면 기존 호출 (`/request` 전용 옵션 — 기존 동작 보존)', () => {
-    it.each([[[]], [[{ status: 'pending' }]], [[{ status: 'active' }]]])(
+    it.each([[[]], [[{ account_status: 'active', account_active: true, email_verified: false }]], [[{ account_status: 'active', account_active: true, email_verified: true }]]])(
       'Neture 가입 상태와 무관하게(rows=%j) 병원약국 화면 첫 요청은 가입 조회 없이 통과 (locals 표식)',
       async (rows) => {
         const { next, res, query } = await run({ rows, hospitalSurface: true, body: { surface: 'hospital-drug' } });

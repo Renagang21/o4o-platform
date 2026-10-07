@@ -41,8 +41,13 @@ const uniq = (p: string) => `${p}-${tag}-${++seq}`;
 const randomBizno = () => String(1000000000 + Math.floor(Math.random() * 8999999999)).slice(0, 10);
 
 async function user(): Promise<string> {
-  const [r] = await ds.query(`INSERT INTO users (email) VALUES ($1) RETURNING id`, [`${uniq('u')}@example.test`]);
+  const [r] = await ds.query(`INSERT INTO users (email, status, "isActive", "isEmailVerified") VALUES ($1, 'active', true, true) RETURNING id`, [`${uniq('u')}@example.test`]);
   return r.id;
+}
+async function applicationProof(owner: string) {
+  const [doc] = await ds.query(`INSERT INTO kyc_documents (user_id, "documentType", "fileUrl", "fileName")
+    VALUES ($1, 'business_registration', 'gcs://local-it/synthetic.pdf', 'synthetic.pdf') RETURNING id`, [owner]);
+  return { businessRegistrationDocumentId: doc.id, representativeName: 'TEST OWNER', businessType: 'TEST', businessCategory: 'TEST', address: 'SYNTHETIC ADDRESS', phone: '0212345678' };
 }
 async function role(userId: string, roleName: string) {
   await ds.query(`INSERT INTO role_assignments (user_id, role, is_active) VALUES ($1, $2, true)`, [userId, roleName]);
@@ -111,7 +116,7 @@ let operatorId: string;
 async function approvedPharmacy() {
   const owner = await user();
   const bizno = randomBizno();
-  const row = await membership.apply(owner, { pharmacyName: uniq('약국'), businessNumber: bizno, pharmacistLicenseNumber: 'L-1' });
+  const row = await membership.apply(owner, { ...await applicationProof(owner), pharmacyName: uniq('약국'), businessNumber: bizno, pharmacistLicenseNumber: 'L-1' });
   await membership.decide(operatorId, row.id, 'approve');
   return { owner, orgId: row.organization_id as string, membershipId: row.id as string };
 }
@@ -151,10 +156,31 @@ d('Neture 약국 매장 commerce — 격리 PostgreSQL 통합 검증', () => {
 
   // ─── 가입 · 권한 ────────────────────────────────────────────────────────
   describe('내 매장(약국) 신청 · 매장 게이트', () => {
+    it('메인 확인·본인 증빙·신청 당시 조건을 각각 검증한다', async () => {
+      const owner = await user();
+      const proof = await applicationProof(owner);
+      await ds.query(`UPDATE users SET "isEmailVerified" = false WHERE id = $1`, [owner]);
+      await expect(membership.apply(owner, { ...proof, pharmacyName: uniq('약국'), businessNumber: randomBizno(), pharmacistLicenseNumber: 'L' }))
+        .rejects.toMatchObject({ code: 'NETURE_MEMBERSHIP_REQUIRED' });
+      await ds.query(`UPDATE users SET "isEmailVerified" = true WHERE id = $1`, [owner]);
+      const other = await user();
+      await expect(membership.apply(other, { ...proof, pharmacyName: uniq('약국'), businessNumber: randomBizno(), pharmacistLicenseNumber: 'L' }))
+        .rejects.toMatchObject({ code: 'INVALID_DOCUMENT' });
+      const pharmacy = await approvedPharmacy();
+      const key = uniq('conditions');
+      const sf = await sfs.create({ key, name: 'Synthetic conditions', registrationConditions: 'Original condition' });
+      await expect(sfs.apply(pharmacy.orgId, pharmacy.owner, key)).rejects.toMatchObject({ code: 'CONDITIONS_REQUIRED' });
+      await expect(sfs.apply(pharmacy.orgId, pharmacy.owner, key, { acceptedConditions: true, conditions: 'Stale condition' })).rejects.toMatchObject({ code: 'CONDITIONS_CHANGED' });
+      await sfs.apply(pharmacy.orgId, pharmacy.owner, key, { acceptedConditions: true, conditions: 'Original condition', note: 'Synthetic note' });
+      expect((await sfs.listMemberships(sf))[0].application).toMatchObject({ conditions: 'Original condition', accepted: true, note: 'Synthetic note' });
+      await sfs.update(key, { registrationConditions: 'Updated condition' });
+      expect((await sfs.getByKey(key))?.registration_conditions).toBe('Updated condition');
+    });
+
     it('신청(pending)은 매장 권한이 없고, 운영자 승인 후에만 매장이 열린다', async () => {
       const owner = await user();
       const bizno = randomBizno();
-      const row = await membership.apply(owner, { pharmacyName: uniq('약국'), businessNumber: `${bizno.slice(0, 3)}-${bizno.slice(3, 5)}-${bizno.slice(5)}`, pharmacistLicenseNumber: 'L-9' });
+      const row = await membership.apply(owner, { ...await applicationProof(owner), pharmacyName: uniq('약국'), businessNumber: `${bizno.slice(0, 3)}-${bizno.slice(3, 5)}-${bizno.slice(5)}`, pharmacistLicenseNumber: 'L-9' });
       expect(row.status).toBe('pending');
       expect((await isStoreOwner(ds, owner, 'kpa')).isOwner).toBe(false);
 
@@ -167,10 +193,10 @@ d('Neture 약국 매장 commerce — 격리 PostgreSQL 통합 검증', () => {
 
       // 같은 사업자번호로 다른 사용자가 진행 중 신청 불가
       const other = await user();
-      await expect(membership.apply(other, { pharmacyName: 'x', businessNumber: bizno, pharmacistLicenseNumber: 'L' }))
+      await expect(membership.apply(other, { ...await applicationProof(other), pharmacyName: 'x', businessNumber: bizno, pharmacistLicenseNumber: 'L' }))
         .rejects.toMatchObject({ code: 'BUSINESS_NUMBER_IN_USE' });
       // 이미 가입한 사용자는 두 번째 약국을 만들 수 없다(약국 1 : 매장 1)
-      await expect(membership.apply(owner, { pharmacyName: 'y', businessNumber: randomBizno(), pharmacistLicenseNumber: 'L' }))
+      await expect(membership.apply(owner, { ...await applicationProof(owner), pharmacyName: 'y', businessNumber: randomBizno(), pharmacistLicenseNumber: 'L' }))
         .rejects.toMatchObject({ code: 'ALREADY_APPLIED' });
 
       // 정지 → 매장 차단, 재활성 → 복구
@@ -240,7 +266,7 @@ d('Neture 약국 매장 commerce — 격리 PostgreSQL 통합 검증', () => {
       const owner = await user();
       expect(await access(owner)).toMatchObject({ allowed: false, next: 'apply_pharmacy', pharmacyMembershipStatus: null });
 
-      const row = await membership.apply(owner, { pharmacyName: uniq('약국'), businessNumber: randomBizno(), pharmacistLicenseNumber: 'L-2' });
+      const row = await membership.apply(owner, { ...await applicationProof(owner), pharmacyName: uniq('약국'), businessNumber: randomBizno(), pharmacistLicenseNumber: 'L-2' });
       expect(await access(owner)).toMatchObject({ allowed: false, next: 'pharmacy_pending', pharmacyMembershipStatus: 'pending' });
       await membership.decide(operatorId, row.id, 'approve');
       expect(await access(owner)).toMatchObject({ allowed: false, next: 'apply_semi_franchise', pharmacyMembershipStatus: 'active', semiFranchiseMembershipStatus: null });

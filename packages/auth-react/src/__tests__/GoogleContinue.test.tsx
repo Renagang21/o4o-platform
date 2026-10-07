@@ -99,6 +99,7 @@ describe('GoogleContinue — 로그인 · 가입 전이', () => {
     await act(async () => { captured!.onCredential('id-token'); });
 
     await screen.findByTestId('google-continue-consent');
+    fireEvent.change(screen.getByLabelText('개인 휴대전화 (필수)'), { target: { value: '01012345678' } });
     fireEvent.click(screen.getByText('동의하고 계정 만들기'));
     await screen.findByRole('alert');
     expect(p.signupWithGoogle).not.toHaveBeenCalled();
@@ -116,10 +117,11 @@ describe('GoogleContinue — 로그인 · 가입 전이', () => {
     const boxes = screen.getAllByRole('checkbox');
     fireEvent.click(boxes[0]); // 이용약관
     fireEvent.click(boxes[1]); // 개인정보
+    fireEvent.change(screen.getByLabelText('개인 휴대전화 (필수)'), { target: { value: '01012345678' } });
     fireEvent.click(screen.getByText('동의하고 계정 만들기'));
 
     await waitFor(() => expect(p.onSuccess).toHaveBeenCalledWith({ user: USER, isNewUser: true }));
-    expect(p.signupWithGoogle).toHaveBeenCalledWith('id-token', { terms: true, privacy: true, marketing: false });
+    expect(p.signupWithGoogle).toHaveBeenCalledWith('id-token', { terms: true, privacy: true, marketing: false, phone: '01012345678' });
   });
 
   it('signup 이 EMAIL_IN_USE 로 실패하면 onError 에 code 를 전달하고 동의 화면에 머문다 (자동 연결 없음)', async () => {
@@ -133,6 +135,7 @@ describe('GoogleContinue — 로그인 · 가입 전이', () => {
     const boxes = screen.getAllByRole('checkbox');
     fireEvent.click(boxes[0]);
     fireEvent.click(boxes[1]);
+    fireEvent.change(screen.getByLabelText('개인 휴대전화 (필수)'), { target: { value: '01012345678' } });
     fireEvent.click(screen.getByText('동의하고 계정 만들기'));
 
     await waitFor(() => expect(p.onError).toHaveBeenCalledWith(expect.objectContaining({ code: 'EMAIL_IN_USE' })));
@@ -198,9 +201,10 @@ describe('GoogleContinue — 불안정한 콜백 prop 참조에 대한 안전성
     const boxes = screen.getAllByRole('checkbox');
     fireEvent.click(boxes[0]);
     fireEvent.click(boxes[1]);
+    fireEvent.change(screen.getByLabelText('개인 휴대전화 (필수)'), { target: { value: '01012345678' } });
     fireEvent.click(screen.getByText('동의하고 계정 만들기'));
     await waitFor(() => expect(third.onSuccess).toHaveBeenCalledWith({ user: USER, isNewUser: true }));
-    expect(third.signupWithGoogle).toHaveBeenCalledWith('id-token', { terms: true, privacy: true, marketing: false });
+    expect(third.signupWithGoogle).toHaveBeenCalledWith('id-token', { terms: true, privacy: true, marketing: false, phone: '01012345678' });
     expect(first.signupWithGoogle).not.toHaveBeenCalled();
   });
 

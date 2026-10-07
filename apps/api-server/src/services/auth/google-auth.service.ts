@@ -1,3 +1,4 @@
+import { isPhoneShapeValid, normalizePhoneDigits } from '../../common/auth/phone-shape.js';
 /**
  * @core O4O_PLATFORM_CORE — Auth
  * GoogleAuthService — Google-only Signup/Login (WO-O4O-GOOGLE-ONLY-SIGNUP-LOGIN-V1 · WO-2D)
@@ -75,6 +76,7 @@ export type GoogleAuthErrorCode =
   | 'GOOGLE_EMAIL_MISSING'
   | 'GOOGLE_EMAIL_UNVERIFIED'
   | 'EMAIL_IN_USE'
+  | 'INVALID_PHONE'
   | 'CONSENT_REQUIRED'
   | 'INVALID_USER'
   | 'GOOGLE_ACCOUNT_ALREADY_LINKED'
@@ -89,6 +91,7 @@ const GOOGLE_AUTH_ERROR_STATUS: Record<GoogleAuthErrorCode, number> = {
   GOOGLE_EMAIL_MISSING: 400,
   GOOGLE_EMAIL_UNVERIFIED: 400,
   EMAIL_IN_USE: 409,
+  INVALID_PHONE: 400,
   CONSENT_REQUIRED: 400,
   INVALID_USER: 401,
   GOOGLE_ACCOUNT_ALREADY_LINKED: 409,
@@ -104,6 +107,7 @@ const GOOGLE_AUTH_ERROR_MESSAGE: Record<GoogleAuthErrorCode, string> = {
   GOOGLE_EMAIL_MISSING: 'Google 계정에서 이메일을 확인할 수 없어 계정을 생성할 수 없습니다.',
   GOOGLE_EMAIL_UNVERIFIED: 'Google 에서 인증되지 않은 이메일의 계정으로는 가입할 수 없습니다. 이메일 인증을 마친 Google 계정을 사용해 주세요.',
   EMAIL_IN_USE: '이미 사용 중인 이메일입니다. 기존 계정은 자동으로 연결되지 않습니다.',
+  INVALID_PHONE: '개인 휴대전화 번호를 입력해 주세요.',
   CONSENT_REQUIRED: '이용약관과 개인정보 처리방침에 동의해야 합니다.',
   INVALID_USER: '계정 정보를 확인할 수 없습니다.',
   GOOGLE_ACCOUNT_ALREADY_LINKED: '이 계정에는 이미 다른 Google 계정이 연결되어 있습니다.',
@@ -131,6 +135,7 @@ export interface GoogleSignupConsents {
   terms: boolean;
   privacy: boolean;
   marketing?: boolean;
+  phone: string;
 }
 
 export interface GoogleAuthRequestMeta {
@@ -276,6 +281,7 @@ export class GoogleAuthService {
       throw new GoogleAuthError('GOOGLE_EMAIL_MISSING');
     }
 
+    if (!isPhoneShapeValid(input.consents.phone)) throw new GoogleAuthError('INVALID_PHONE');
     const user = await this.dataSource.transaction((manager) => this.createGoogleUser(manager, identity, input.consents));
 
     return this.establishSession(user, input, true);
@@ -339,6 +345,7 @@ export class GoogleAuthService {
       // WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1 Phase B-1: `password: null` write 제거 — 컬럼이 B-2 에서 사라진다.
       email,
       name: null,
+      phone: normalizePhoneDigits(consents.phone),
       status: UserStatus.ACTIVE,
       isActive: true,
       isEmailVerified: true,

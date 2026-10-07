@@ -21,7 +21,7 @@ jest.mock('../../database/connection.js', () => ({
   AppDataSource: {
     // 운영자 수준의 서비스 가입 조회만 흉내낸다 (service_key 는 'community' 고정).
     query: async (_sql: string, params: string[]) =>
-      params[1] === 'community'
+      /FROM users u/.test(_sql) ? [{ account_status: 'active', account_active: true, email_verified: true }] : params[1] === 'community'
         ? store.serviceMemberships.filter((s) => s.userId === params[0]).map((s) => ({ status: s.status }))
         : [],
     getRepository: (entity: { name?: string }) => {

@@ -1,3 +1,5 @@
+import multer from 'multer';
+import { BusinessRegistrationDocumentService } from './services/business-registration-document.service.js';
 /**
  * Neture 약국 매장 commerce 라우트 — /api/v1/neture 아래 (DESIGN §3 · §4 · §8)
  *
@@ -14,6 +16,7 @@
 import { Router } from 'express';
 import type { NextFunction, Request, RequestHandler, Response, Router as ExpressRouter } from 'express';
 import type { DataSource } from 'typeorm';
+import { requireNetureMainMembership } from '../../middleware/neture-main-membership.middleware.js';
 import { requireAuth } from '../../middleware/auth.middleware.js';
 import { requireNetureScope } from '../../middleware/neture-scope.middleware.js';
 import { createRequireStoreOwner } from '../../utils/store-owner.utils.js';
@@ -107,11 +110,42 @@ export function createNeturePharmacyRoutes(dataSource: DataSource): ExpressRoute
     return { snapshotId: snapshot.id };
   });
 
-  const store = [requireAuth, createRequireStoreOwner(dataSource, 'kpa')] as RequestHandler[];
+  const mainAccess = requireNetureMainMembership(dataSource);
+  const store = [requireAuth, mainAccess, createRequireStoreOwner(dataSource, 'kpa')] as RequestHandler[];
   const operator = [requireAuth, requireNetureScope('neture:operator') as RequestHandler];
   const admin = [requireAuth, requireNetureScope('neture:admin') as RequestHandler];
-  const supplier = [requireAuth, createRequireActiveSupplier(dataSource) as RequestHandler];
+  const supplier = [requireAuth, mainAccess, createRequireActiveSupplier(dataSource) as RequestHandler];
   const org = (req: Req) => req.organizationId as string;
+
+  const documents = new BusinessRegistrationDocumentService(dataSource);
+  const parseDocument = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024, files: 1 } }).single('file');
+  const documentUpload: RequestHandler = (req, res, next) => {
+    parseDocument(req, res, (error) => {
+      if (error) { res.status(400).json({ success: false, code: 'INVALID_DOCUMENT', error: '사업자등록증은 10MB 이하 파일 1개로 제출해 주세요.' }); return; }
+      next();
+    });
+  };
+  router.post('/pharmacy/business-registration', requireAuth, mainAccess, documentUpload, handle(async (req) => documents.upload(req.user!.id, req.file)));
+  const downloadDocument: RequestHandler = async (request, res) => {
+    const req = request as Req;
+    try {
+      if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(req.params.id)) {
+        res.status(404).json({ success: false, code: 'DOCUMENT_NOT_FOUND' }); return;
+      }
+      const mine = await documents.findOwned(req.user!.id, req.params.id);
+      if (!mine && !res.locals.documentReviewer) { res.status(404).json({ success: false, code: 'DOCUMENT_NOT_FOUND' }); return; }
+      const { document, stream } = await documents.read(req.params.id);
+      res.setHeader('Content-Type', document.mimeType || 'application/pdf');
+      res.setHeader('Cache-Control', 'private, no-store');
+      res.setHeader('X-Content-Type-Options', 'nosniff');
+      res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(document.fileName)}"`);
+      stream.on('error', () => { if (!res.headersSent) res.status(500); res.end(); });
+      stream.pipe(res);
+    } catch { res.status(404).json({ success: false, code: 'DOCUMENT_NOT_FOUND' }); }
+  };
+  router.get('/pharmacy/business-registration/:id', requireAuth, downloadDocument);
+  router.get('/operator/pharmacy-documents/:id', ...operator,
+    (_req, res, next) => { res.locals.documentReviewer = true; next(); }, downloadDocument);
 
   // ─── 내 매장(약국) 신청 (매장 게이트 이전) ─────────────────────────────────────────
   router.get('/pharmacy/membership', requireAuth, handle(async (req) => membership.findMine(req.user!.id)));
@@ -138,7 +172,7 @@ export function createNeturePharmacyRoutes(dataSource: DataSource): ExpressRoute
 
   router.get('/pharmacy/semi-franchises', ...store, handle(async (req) => semiFranchises.listForPharmacy(org(req))));
   router.post('/pharmacy/semi-franchises/:key/apply', ...store, handle(async (req) =>
-    semiFranchises.apply(org(req), req.user!.id, req.params.key)));
+    semiFranchises.apply(org(req), req.user!.id, req.params.key, req.body ?? {})));
   router.post('/pharmacy/semi-franchises/:key/withdraw', ...store, handle(async (req) =>
     semiFranchises.withdraw(org(req), req.params.key)));
 

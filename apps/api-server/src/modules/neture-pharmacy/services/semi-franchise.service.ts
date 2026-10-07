@@ -26,9 +26,10 @@ export interface SemiFranchiseRow {
   status: 'active' | 'closed';
   payment_receiver_key: string | null;
   community_key: string | null;
+  registration_conditions?: string | null;
 }
 
-const SF_COLUMNS = `sf.id, sf.key, sf.name, sf.organization_id, sf.status, sf.payment_receiver_key, sf.community_key`;
+const SF_COLUMNS = `sf.id, sf.key, sf.name, sf.organization_id, sf.status, sf.payment_receiver_key, sf.community_key, (SELECT metadata->>'registrationConditions' FROM organizations WHERE id = sf.organization_id) AS registration_conditions`;
 const KEY_RE = /^[a-z0-9][a-z0-9-]{1,62}$/;
 
 export class SemiFranchiseService {
@@ -52,7 +53,7 @@ export class SemiFranchiseService {
   /** 운영 중인 세미프랜차이즈 목록 + 이 약국의 가입 상태 */
   async listForPharmacy(organizationId: string) {
     return this.dataSource.query(
-      `SELECT sf.key, sf.name, sf.community_key AS "communityKey",
+      `SELECT sf.key, sf.name, sf.community_key AS "communityKey", (SELECT metadata->>'registrationConditions' FROM organizations WHERE id = sf.organization_id) AS "registrationConditions",
               sfm.id AS "membershipId", sfm.status AS "membershipStatus", sfm.reason, sfm.applied_at AS "appliedAt",
               sfm.decided_at AS "decidedAt"
          FROM semi_franchises sf
@@ -64,10 +65,21 @@ export class SemiFranchiseService {
     );
   }
 
-  async apply(organizationId: string, userId: string, key: string) {
+  async apply(organizationId: string, userId: string, key: string, application: { acceptedConditions?: boolean; conditions?: string; note?: string } = {}) {
     const sf = await this.requireActive(key);
+    if (sf.registration_conditions && application.acceptedConditions !== true)
+      throw new NeturePharmacyError(400, 'CONDITIONS_REQUIRED', '서비스 가입 조건을 확인하고 동의해 주세요.');
+    if (sf.registration_conditions && application.conditions !== sf.registration_conditions)
+      throw new NeturePharmacyError(409, 'CONDITIONS_CHANGED', '가입 조건이 변경되었습니다. 목록을 새로고침하고 다시 확인해 주세요.');
+    if (application.note !== undefined && (typeof application.note !== 'string' || application.note.length > 2000))
+      throw new NeturePharmacyError(400, 'INVALID_APPLICATION', '추가 신청 내용은 2000자 이내로 입력해 주세요.');
     return this.dataSource.transaction(async (m) => {
       await assertNetureMainMembershipActive(m, userId);
+      const saveApplication = () => m.query(
+        `UPDATE organizations SET metadata = jsonb_set(COALESCE(metadata, '{}'::jsonb), '{semiFranchiseApplications}',
+          COALESCE(metadata->'semiFranchiseApplications', '{}'::jsonb) || jsonb_build_object($2::text, $3::jsonb)) WHERE id = $1`,
+        [organizationId, key, JSON.stringify({ conditions: sf.registration_conditions || null, accepted: application.acceptedConditions === true, note: application.note?.trim() || null, appliedBy: userId })],
+      );
       const [existing] = await m.query(
         `SELECT id, status FROM semi_franchise_memberships
           WHERE semi_franchise_id = $1 AND organization_id = $2 FOR UPDATE`,
@@ -84,6 +96,7 @@ export class SemiFranchiseService {
             WHERE id = $1 RETURNING id, status`,
           [existing.id, userId],
         ));
+        await saveApplication();
         return row;
       }
       const [row] = await m.query(
@@ -91,6 +104,7 @@ export class SemiFranchiseService {
          VALUES ($1, $2, 'pending', $3) RETURNING id, status`,
         [sf.id, organizationId, userId],
       );
+      await saveApplication();
       return row;
     });
   }
@@ -144,7 +158,7 @@ export class SemiFranchiseService {
   async listMemberships(sf: SemiFranchiseRow, status?: string) {
     const s = status && status !== 'all' ? status : null;
     return this.dataSource.query(
-      `SELECT sfm.id, sfm.status, sfm.applied_at AS "appliedAt", sfm.decided_at AS "decidedAt", sfm.reason,
+      `SELECT sfm.id, sfm.status, sfm.applied_at AS "appliedAt", sfm.decided_at AS "decidedAt", sfm.reason, o.metadata->'semiFranchiseApplications'->$3 AS application,
               o.id AS "organizationId", o.name AS "organizationName", o.address AS "organizationAddress",
               npm.status AS "basicMembershipStatus", npm.business_number AS "businessNumber",
               npm.pharmacist_license_number AS "pharmacistLicenseNumber"
@@ -153,7 +167,7 @@ export class SemiFranchiseService {
          LEFT JOIN neture_pharmacy_memberships npm ON npm.organization_id = sfm.organization_id
         WHERE sfm.semi_franchise_id = $1 AND ($2::text IS NULL OR sfm.status = $2)
         ORDER BY sfm.applied_at DESC, sfm.id`,
-      [sf.id, s],
+      [sf.id, s, sf.key],
     );
   }
 
@@ -212,8 +226,9 @@ export class SemiFranchiseService {
     );
   }
 
-  async create(input: { key: string; name: string; communityKey?: string | null }): Promise<SemiFranchiseRow> {
+  async create(input: { key: string; name: string; communityKey?: string | null; registrationConditions?: string }): Promise<SemiFranchiseRow> {
     const key = typeof input.key === 'string' ? input.key.trim().toLowerCase() : '';
+    if (input.registrationConditions !== undefined && (typeof input.registrationConditions !== 'string' || input.registrationConditions.length > 4000)) throw new NeturePharmacyError(400, 'INVALID_CONDITIONS', '가입 조건은 4000자 이내입니다.');
     const name = typeof input.name === 'string' ? input.name.trim() : '';
     if (!KEY_RE.test(key)) throw new NeturePharmacyError(400, 'INVALID_KEY', 'key 는 영문 소문자 · 숫자 · - 2~63자입니다.');
     if (!name || name.length > 255) throw new NeturePharmacyError(400, 'INVALID_NAME', '이름을 입력해 주세요.');
@@ -222,8 +237,8 @@ export class SemiFranchiseService {
       if (dup) throw new NeturePharmacyError(409, 'KEY_IN_USE', '이미 있는 key 입니다.');
       // 운영 조직 — 이 세미프랜차이즈 이벤트 원장(OPL)의 소유 조직.
       const [org] = await m.query(
-        `INSERT INTO organizations (name, code, type, "isActive") VALUES ($1, $2, 'semi_franchise', true) RETURNING id`,
-        [`${name} 세미프랜차이즈 운영`, `semi-franchise-${key}`],
+        `INSERT INTO organizations (name, code, type, "isActive", metadata) VALUES ($1, $2, 'semi_franchise', true, $3::jsonb) RETURNING id`,
+        [`${name} 세미프랜차이즈 운영`, `semi-franchise-${key}`, JSON.stringify({ registrationConditions: input.registrationConditions?.trim() || null })],
       );
       const [row] = await m.query(
         `INSERT INTO semi_franchises (key, name, organization_id, community_key)
@@ -241,34 +256,40 @@ export class SemiFranchiseService {
    */
   async update(
     key: string,
-    patch: { name?: string; status?: 'active' | 'closed'; communityKey?: string | null; paymentReceiverKey?: string | null },
+    patch: { name?: string; status?: 'active' | 'closed'; communityKey?: string | null; paymentReceiverKey?: string | null; registrationConditions?: string },
   ): Promise<SemiFranchiseRow> {
     const sf = await this.getByKey(key);
     if (!sf) throw new NeturePharmacyError(404, 'SEMI_FRANCHISE_NOT_FOUND', '세미프랜차이즈를 찾을 수 없습니다.');
     if (patch.status && patch.status !== 'active' && patch.status !== 'closed') {
       throw new NeturePharmacyError(400, 'INVALID_STATUS', 'status 는 active · closed 입니다.');
     }
-    const has = (k: string) => Object.prototype.hasOwnProperty.call(patch, k);
-    const [row] = rowsOf(await this.dataSource.query(
-      `UPDATE semi_franchises SET
-          name = COALESCE($2, name),
-          status = COALESCE($3, status),
-          community_key = CASE WHEN $4 THEN $5 ELSE community_key END,
-          payment_receiver_key = CASE WHEN $6 THEN $7 ELSE payment_receiver_key END,
-          updated_at = NOW()
-        WHERE id = $1
-      RETURNING id, key, name, organization_id, status, payment_receiver_key, community_key`,
-      [
-        sf.id,
-        patch.name?.trim() || null,
-        patch.status ?? null,
-        has('communityKey'),
-        patch.communityKey?.trim() || null,
-        has('paymentReceiverKey'),
-        patch.paymentReceiverKey?.trim() || null,
-      ],
-    ));
-    return row;
+    return this.dataSource.transaction(async (m) => {
+      if (patch.registrationConditions !== undefined) {
+        if (typeof patch.registrationConditions !== 'string' || patch.registrationConditions.length > 4000) throw new NeturePharmacyError(400, 'INVALID_CONDITIONS', '가입 조건은 4000자 이내입니다.');
+        await m.query(`UPDATE organizations SET metadata = COALESCE(metadata, '{}'::jsonb) || jsonb_build_object('registrationConditions', $2::text) WHERE id = $1`, [sf.organization_id, patch.registrationConditions.trim()]);
+      }
+      const has = (k: string) => Object.prototype.hasOwnProperty.call(patch, k);
+      const [row] = rowsOf(await m.query(
+        `UPDATE semi_franchises SET
+            name = COALESCE($2, name),
+            status = COALESCE($3, status),
+            community_key = CASE WHEN $4 THEN $5 ELSE community_key END,
+            payment_receiver_key = CASE WHEN $6 THEN $7 ELSE payment_receiver_key END,
+            updated_at = NOW()
+          WHERE id = $1
+        RETURNING id, key, name, organization_id, status, payment_receiver_key, community_key`,
+        [
+          sf.id,
+          patch.name?.trim() || null,
+          patch.status ?? null,
+          has('communityKey'),
+          patch.communityKey?.trim() || null,
+          has('paymentReceiverKey'),
+          patch.paymentReceiverKey?.trim() || null,
+        ],
+      ));
+      return { ...row, registration_conditions: patch.registrationConditions?.trim() ?? sf.registration_conditions };
+    });
   }
 
   async assignOperator(key: string, userId: string, assignedBy: string) {

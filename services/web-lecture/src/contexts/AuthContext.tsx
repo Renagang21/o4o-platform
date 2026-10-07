@@ -1,7 +1,7 @@
 import { createContext, useContext, useMemo, type ReactNode } from 'react';
 import { normalizeUser, normalizeMemberships, extractRoles, type UserLike } from '@o4o/auth-utils';
 import { getAccessToken } from '@o4o/auth-client';
-import { useServiceAuth, type PendingPolicyAcceptance, type PolicyAcceptanceResult } from '@o4o/auth-react';
+import { useServiceAuth, type PendingPolicyAcceptance, type PolicyAcceptanceResult, type AuthLoginResult } from '@o4o/auth-react';
 import { authClient } from '../lib/apiClient';
 import { SERVICE_KEY } from '../config/service';
 
@@ -17,6 +17,7 @@ interface AuthContextValue {
   isAuthenticated: boolean;
   isLoading: boolean;
   logout: () => void;
+  loginWithEmail: (email: string, password: string) => Promise<AuthLoginResult<LectureUser>>;
   pendingPolicyAcceptances: PendingPolicyAcceptance[];
   acceptPendingPolicies: () => Promise<PolicyAcceptanceResult>;
 }
@@ -39,6 +40,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     isAuthenticated: core.isAuthenticated,
     isLoading: core.isLoading,
     logout: () => { void core.logout(); },
+    loginWithEmail: core.loginWithEmail,
     pendingPolicyAcceptances: core.pendingPolicyAcceptances,
     acceptPendingPolicies: core.acceptPendingPolicies,
   }}>{children}</AuthContext.Provider>;

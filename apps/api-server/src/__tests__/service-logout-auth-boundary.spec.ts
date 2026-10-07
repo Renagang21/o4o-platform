@@ -105,6 +105,7 @@ jest.mock('../modules/auth/services/role-assignment.service.js', () => ({
 
 /** 실제 토큰 유틸을 쓴다 — claim 이 실제로 실리는지까지 보려면 double 로는 부족하다. */
 jest.mock('../services/auth/auth-context.helper.js', () => ({
+  readUserMembershipsWithMainAccess: (id: string) => query(`SELECT service_key AS "serviceKey", status FROM service_memberships WHERE user_id = $1`, [id]),
   persistRefreshTokenFamily: jest.fn(async () => undefined),
   freshenUserContext: jest.fn(async () => ({ roles: [], memberships: MEMBERSHIPS })),
 }));

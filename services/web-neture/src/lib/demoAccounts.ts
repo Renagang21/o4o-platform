@@ -1,9 +1,10 @@
+import { PUBLIC_DEMO_ACCOUNTS } from '@o4o/auth-utils';
 /**
  * Demo 체험 계정 — WO-O4O-DEMO-LOGIN-ENTRY-AND-EXPERIENCE-UX-V1
  * 정책 정본: `docs/baseline/O4O-CANONICAL-DEMO-ACCOUNTS-V1.md`
  *
  * ─────────────────────────────────────────────────────────────────────────────
- * 이 파일이 Demo credential 의 **유일한** frontend 정의다.
+ * 공통 @o4o/auth-utils 의 PUBLIC_DEMO_ACCOUNTS 를 사용한다. 이 파일은 Neture 착지만 정의한다.
  *
  *   - 공개 체험 계정이다(정본 문서에 공개된 값) — 비밀이 아니지만 화면에 보이지 않는다.
  *     버튼이 기존 이메일 로그인(`loginWithEmail`)을 그대로 호출하고, 입력칸을 채우지 않는다.
@@ -40,15 +41,15 @@ export const DEMO_ACCOUNTS: readonly DemoAccountEntry[] = [
   {
     type: 'STORE_OWNER',
     label: '매장 경영자 Demo 체험',
-    email: 'teststoreowner@example.com',
-    password: 'testmail1!',
+    email: PUBLIC_DEMO_ACCOUNTS[0].email,
+    password: PUBLIC_DEMO_ACCOUNTS[0].password,
     landing: { kind: 'storeWorkspace' },
   },
   {
     type: 'SUPPLIER',
     label: '공급자 Demo 체험',
-    email: 'testsupplier@example.com',
-    password: 'testmail1!',
+    email: PUBLIC_DEMO_ACCOUNTS[1].email,
+    password: PUBLIC_DEMO_ACCOUNTS[1].password,
     landing: { kind: 'internal', to: '/supplier/dashboard' },
   },
 ];

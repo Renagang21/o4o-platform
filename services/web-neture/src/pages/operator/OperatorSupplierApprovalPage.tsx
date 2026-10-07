@@ -254,12 +254,14 @@ export default function OperatorSupplierApprovalPage() {
       return;
     }
     let text = '승인에 실패했습니다. 잠시 후 다시 시도해 주세요.';
-    // WO-O4O-NETURE-SUPPLIER-APPROVAL-AND-PROFILE-COMPLETION-SEPARATION-V1:
-    // ONBOARDING_INCOMPLETE 게이트 제거 — 프로필 미완료는 승인을 차단하지 않는다.
     if (result.code === 'INVALID_STATUS') {
       text = '이미 처리된 공급자입니다. 목록을 새로고침합니다.';
       setDrawer(null);
       refetch();
+    } else if (result.code === 'BUSINESS_REGISTRATION_REQUIRED') {
+      text = '사업자등록증 사본과 등록증의 필수 기재 정보를 확인해 주세요.';
+    } else if (result.code === 'APPLICANT_NETURE_MEMBERSHIP_NOT_ACTIVE') {
+      text = '신청자의 메인 이메일 확인과 계정 상태를 확인해 주세요.';
     } else if (result.code === 'SUPPLIER_NOT_FOUND') {
       text = '공급자를 찾을 수 없습니다.';
     }
