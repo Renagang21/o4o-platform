@@ -82,8 +82,6 @@ export function fallbackUnderstanding(request: string): TaskUnderstanding {
   return enforceCommitBoundary({ version: 1, source: 'fallback', goal, outcome, criteria, missing: [], commitBoundary: false }, request);
 }
 
-/** 확인 질문 상한 — planner neededInput 과 같은 200자. */
-const CONFIRM_QUESTION_MAX = 200;
 const COMMIT_USER_CRITERION = '최종 확정(저장 · 제출 등)은 사용자가 했다';
 const FALLBACK_WHOLE_REQUEST_CRITERION = '요청 전체(조건 글에 다 담지 못한 뒷부분 포함)가 끝났다고 사용자가 확인했다';
 
@@ -102,6 +100,17 @@ export function ensureCommitConfirmation(u: TaskUnderstanding): TaskUnderstandin
   if (!u.commitBoundary || u.criteria.some((c) => c.evidence === 'user')) return u;
   const criteria = [...u.criteria, { id: `c${u.criteria.length + 1}`, text: COMMIT_USER_CRITERION, evidence: 'user' as const }];
   return { ...u, criteria };
+}
+
+const IMAGE_USER_CRITERION = '첨부한 사진 속 대상과 찾은 결과가 맞는지 사용자가 확인했다';
+
+/**
+ * 첨부 사진 불변식 — 이해 단계는 사진을 보지 않는다(글 · 대상 힌트만). 사진에 대상 · 조건이 있는 요청을 사진 모르는 조건만으로
+ * 닫지 않도록, 사진이 붙은 새 요청에는 사용자 확인 조건을 결정적으로 더한다(기존 조건은 그대로 · 이미 있으면 다시 붙이지 않는다).
+ */
+export function enforceImageConfirmation(u: TaskUnderstanding, hasImage: boolean): TaskUnderstanding {
+  if (!hasImage || u.criteria.some((c) => c.text === IMAGE_USER_CRITERION)) return u;
+  return { ...u, criteria: [...u.criteria, { id: `c${u.criteria.length + 1}`, text: IMAGE_USER_CRITERION, evidence: 'user' }] };
 }
 
 /**
@@ -132,6 +141,16 @@ export function resumeFallbackUnderstanding(): TaskUnderstanding {
 
 /** AI 출력 → TaskUnderstanding. 형식이 맞지 않으면 null(→ fallback). */
 export function sanitizeUnderstanding(raw: unknown): TaskUnderstanding | null {
+  return sanitizeWithCap(raw, UNDERSTANDING_LIMITS.maxCriteria);
+}
+
+/**
+ * 결정적으로 더해지는 사용자 확인 조건(확정 · 첨부 사진)의 최대 칸 수. AI 출력은 maxCriteria 까지만 받고,
+ * 이 칸들은 그 밖에 붙는다 — 저장된 이해를 되살릴 때(restore) 이만큼 더 받아 그 조건들이 빠지지 않게 한다.
+ */
+const DETERMINISTIC_USER_SLOTS = 2;
+
+function sanitizeWithCap(raw: unknown, cap: number): TaskUnderstanding | null {
   if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return null;
   const r = raw as Record<string, unknown>;
   const goal = clip(r.goal, UNDERSTANDING_LIMITS.goalMax);
@@ -140,7 +159,7 @@ export function sanitizeUnderstanding(raw: unknown): TaskUnderstanding | null {
   if (!outcome) return null;
   const criteria: CompletionCriterion[] = [];
   for (const c of Array.isArray(r.criteria) ? r.criteria : []) {
-    if (criteria.length >= UNDERSTANDING_LIMITS.maxCriteria) break;
+    if (criteria.length >= cap) break;
     if (!c || typeof c !== 'object') continue;
     const text = clip((c as Record<string, unknown>).text, UNDERSTANDING_LIMITS.criterionMax);
     if (!text) continue;
@@ -167,7 +186,7 @@ export function sanitizeUnderstanding(raw: unknown): TaskUnderstanding | null {
  */
 export function restoreUnderstanding(raw: unknown): TaskUnderstanding | null {
   if (!raw || typeof raw !== 'object' || Array.isArray(raw) || (raw as Record<string, unknown>).version !== 1) return null;
-  const u = sanitizeUnderstanding(raw);
+  const u = sanitizeWithCap(raw, UNDERSTANDING_LIMITS.maxCriteria + DETERMINISTIC_USER_SLOTS);
   if (!u) return null;
   return (raw as Record<string, unknown>).source === 'fallback' ? { ...u, source: 'fallback' } : u;
 }
@@ -334,7 +353,8 @@ export function createCompletionJudge(
   /** 사용자에게 무엇을 확인받는지 질문에 그대로 싣는다 — "네" 한마디가 막연한 동의가 아니라 이 조건들의 확인이 되게(조건 문장만 · 화면 글 없음). */
   const confirmQuestion = (ids: string[]): string => {
     const lines = understanding.criteria.filter((c) => ids.includes(c.id)).map((c) => c.text);
-    return clip(`다음이 끝났는지 확인해 주세요: ${lines.join(' · ')}`, CONFIRM_QUESTION_MAX);
+    // 자르지 않는다 — 보이지 않은 조건까지 "네" 로 확인 처리되면 안 된다. 길이는 조건 수 · 조건 글 상한으로 이미 묶여 있다.
+    return `다음이 끝났는지 확인해 주세요: ${lines.join(' · ')}`;
   };
   return async ({ evidence }): Promise<CompletionVerdict> => {
     counters.judgeCalls += 1;

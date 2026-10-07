@@ -357,6 +357,9 @@ describe('POST /api/ai/request', () => {
     const img = await request(app).post('/api/ai/request').send({ text: '약학정보원에서 이 사진의 약을 찾아줘', attachments: [{ name: 'a.png', mimeType: 'image/png', base64: b64('png') }] });
     expect(img.body.data.kind).toBe('work');
     expect(runWorkAgentMock.mock.calls[0][2].image).toEqual({ mimeType: 'image/png', base64: b64('png') });
+    // 이해는 사진을 보지 않는다 — 사진 속 대상과 결과가 맞는지는 사용자 확인 조건으로 닫힌다.
+    const criteria = runWorkAgentMock.mock.calls[0][2].intent.understanding.criteria;
+    expect(criteria.some((c: { text: string; evidence: string }) => c.evidence === 'user' && c.text.includes('사진'))).toBe(true);
   });
 
   it('⑩ Local Agent 미연결 + work → 403 WORK_AGENT_NOT_AVAILABLE (안전 경계 · 기존 계약)', async () => {
@@ -365,6 +368,8 @@ describe('POST /api/ai/request', () => {
     expect(r.status).toBe(403);
     expect(r.body.code).toBe('WORK_AGENT_NOT_AVAILABLE');
     expect(runWorkAgentMock).not.toHaveBeenCalled();
+    // 실행 못 할 요청에는 이해 모델을 부르지 않는다(preflight — 모델 비용 · 지연 0).
+    expect(executeMock.mock.calls.filter((c) => c[0]?.meta?.callerName === 'TaskUnderstanding')).toHaveLength(0);
   });
 
   it('⑪ 기존 endpoint 회귀 — /home-chat · /work-agent/run 그대로', async () => {

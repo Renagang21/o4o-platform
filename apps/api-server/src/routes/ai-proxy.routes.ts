@@ -278,12 +278,14 @@ interface RouteReply {
   execution?: { taskKey: string | null; report?: ExecutionReport };
 }
 
-async function performWorkAgentRun(
+/**
+ * 실행 가능성 확인 — 인자 형식 · 실행 노드 · tool 권한. 읽기만 한다(부작용 없음).
+ * performWorkAgentRun 의 첫 단계이자, Assistant 가 이해 모델을 부르기 전 preflight 로도 쓴다(실행 못 할 요청에 모델 비용 · 지연 없음).
+ */
+async function checkWorkAgentRunnable(
   userId: string,
   body: Record<string, unknown>,
-  intent?: ExecutionIntent,
-  judge?: CompletionJudge,
-): Promise<RouteReply> {
+): Promise<{ ok: false; reply: RouteReply } | { ok: true; toolCtx: VerifiedToolContext }> {
   const args: Record<string, unknown> = { request: body.request };
   if (body.targetHint !== undefined) args.targetHint = body.targetHint;
   if (body.image !== undefined) args.image = body.image;
@@ -292,7 +294,7 @@ async function performWorkAgentRun(
 
   const tool = findToolDefinition(AI_TOOL_NAMES.WORK_AGENT_PERFORM);
   const argCheck = validateToolArguments(args, tool);
-  if (!argCheck.ok) return { status: 400, body: { success: false, error: '요청 형식이 올바르지 않습니다(목적 문장 · 등록 사이트 · JPEG/PNG/WebP 이미지만).', code: 'WORK_AGENT_GOAL_INVALID' } };
+  if (!argCheck.ok) return { ok: false, reply: { status: 400, body: { success: false, error: '요청 형식이 올바르지 않습니다(목적 문장 · 등록 사이트 · JPEG/PNG/WebP 이미지만).', code: 'WORK_AGENT_GOAL_INVALID' } } };
 
   // home-chat 과 같은 방식으로 서버가 tool 컨텍스트를 확정한다 — 클라이언트 값은 권한 근거가 아니다.
   const toolCtx: VerifiedToolContext = { userId, workspace: 'home' };
@@ -301,8 +303,20 @@ async function performWorkAgentRun(
   if (deviceResolution.status === 'ok') toolCtx.localDeviceId = deviceResolution.device.id;
   const authz = assertToolAllowed(AI_TOOL_NAMES.WORK_AGENT_PERFORM, toolCtx);
   if (!authz.allowed) {
-    return { status: 403, body: { success: false, error: '이 PC 의 O4O 확장이 연결되어 있어야 합니다.', code: 'WORK_AGENT_NOT_AVAILABLE', reason: authz.reason } };
+    return { ok: false, reply: { status: 403, body: { success: false, error: '이 PC 의 O4O 확장이 연결되어 있어야 합니다.', code: 'WORK_AGENT_NOT_AVAILABLE', reason: authz.reason } } };
   }
+  return { ok: true, toolCtx };
+}
+
+async function performWorkAgentRun(
+  userId: string,
+  body: Record<string, unknown>,
+  intent?: ExecutionIntent,
+  judge?: CompletionJudge,
+): Promise<RouteReply> {
+  const runnable = await checkWorkAgentRunnable(userId, body);
+  if ('reply' in runnable) return runnable.reply;
+  const { toolCtx } = runnable;
 
   // Capability C(Task Modality Router) — per-task provider. Work Agent 로 온 Goal 은 실행 표면(등재 대상 · 화면 캡처 · UI 어휘)이
   // 있으면 screen 이고, screen 은 openai(Astra vision planner · Capability B)로 간다. 전역 AI_DEFAULT_PROVIDER 는 그대로(gemini).
@@ -2302,12 +2316,17 @@ router.post('/request', authenticate, dynamicLimiter('free'), async (req, res: R
     if (typeof body.recoveryHint === 'string') workBody.recoveryHint = body.recoveryHint;
     // Personal Assistant Phase A — Assistant → Task → Execution. 실행 본체(performWorkAgentRun)는 그대로이고,
     // Task 는 구조만 남긴다(원문 미저장). taskId 는 additive — 기존 work 필드의 의미는 바뀌지 않는다.
+    const understandLlm = createLlmTaskUnderstander(AppDataSource);
     const { reply, task } = await runAssistantWorkTask(
       AppDataSource,
       { userId, workBody, requestedTaskId: body.taskId, workScope: body.workScope },
       performWorkAgentRun,
       // 실행 전 업무 이해 · 완료 의미 검증 — 기존 provider abstraction(같은 provider · 키). 실패하면 결정적 기본 이해 · 검증 생략.
-      { understand: createLlmTaskUnderstander(AppDataSource), verify: createLlmCompletionVerifier(AppDataSource) },
+      // 이해 모델은 실행 가능할 때만 부른다 — 노드 미연결 · 권한 없음 · 형식 오류면 모델 없이 결정적 기본 이해(실행은 같은 이유로 거절된다).
+      {
+        understand: async (u) => ((await checkWorkAgentRunnable(userId, workBody)).ok ? understandLlm(u) : null),
+        verify: createLlmCompletionVerifier(AppDataSource),
+      },
     );
     if (reply.status !== 200) return res.status(reply.status).json(task ? { ...reply.body, taskId: task.taskId } : reply.body);
     return res.json({

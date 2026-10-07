@@ -112,6 +112,7 @@ import {
   newJudgeCounters,
   requestHasCommitIntent,
   restoreUnderstanding,
+  enforceImageConfirmation,
   resumeFallbackUnderstanding,
   sanitizeUnderstanding,
 } from '../services/assistant/assistant-understanding.js';
@@ -304,6 +305,27 @@ describe('② 완료 판정기', () => {
     expect(last.decision).toBe('ask');
     expect(last.question).toContain(C1.text);
     expect(last.question).toContain(C2_USER.text);
+    // 조건이 많고 길어도 자르지 않는다 — 보이지 않은 조건이 "네" 로 확인 처리되면 안 된다.
+    const long = (n: number, ev: 'observed' | 'user') => ({ id: `c${n}`, text: `${n}번째 조건 `.padEnd(120, '가') + '끝', evidence: ev });
+    const many = U([long(1, 'user'), long(2, 'user'), long(3, 'user'), long(4, 'user')]);
+    const q = (await createCompletionJudge(many)({ evidence: [], via: 'done' })).question!;
+    for (const c of many.criteria) expect(q).toContain(c.text);
+  });
+  it('첨부 사진 — 이해는 사진을 보지 않으므로 사용자 확인 조건을 결정적으로 더한다 · 저장 · 재개에도 빠지지 않는다', async () => {
+    const full = sanitizeUnderstanding({
+      goal: '사진 속 약과 같은 성분 찾기', outcome: 'change', commitBoundary: true,
+      criteria: [{ text: 'a' }, { text: 'b' }, { text: 'c' }, { text: 'd' }],
+    })!;
+    const withImage = enforceImageConfirmation(full, true);
+    expect(withImage.criteria.map((c) => c.evidence)).toEqual(['observed', 'observed', 'observed', 'observed', 'user', 'user']);
+    expect(enforceImageConfirmation(withImage, true)).toBe(withImage); // 다시 붙이지 않는다
+    expect(enforceImageConfirmation(full, false)).toBe(full);
+    // 저장된 이해를 되살려도 확정 · 사진 확인 조건이 모두 남는다.
+    expect(restoreUnderstanding(JSON.parse(JSON.stringify(withImage)))!.criteria.map((c) => c.text)).toEqual(withImage.criteria.map((c) => c.text));
+    // 화면 조건이 다 충족돼도 사진 확인은 사용자에게 묻는다.
+    const v = await createCompletionJudge(enforceImageConfirmation(U([C1]), true))({ evidence: [G('c1')], via: 'done' });
+    expect(v).toMatchObject({ decision: 'ask', unmet: ['c2'] });
+    expect(v.question).toContain('사진');
   });
   it('의미 검증 — 거절한 조건은 미충족 · 검증기 장애는 결정적 결과 유지', async () => {
     const counters = newJudgeCounters();
@@ -459,6 +481,13 @@ describe('④ Assistant — 이해 → 판정기 위임 → 질문 → 사용자
         verdict: { decision: 'ask', met: ['c1'], unmet: ['c2'], askKind: 'success_confirmation' },
       },
     },
+  });
+
+  it('사진이 붙은 새 요청 — 실행 지시의 이해에 사진 확인(사용자) 조건이 실린다', async () => {
+    const exec = jest.fn(async (): Promise<WorkExecutionReply> => waiting('g_img'));
+    await runAssistantWorkTask(ds, { userId: ME, workBody: { request: REQUEST, image: { mimeType: 'image/png', base64: 'x' } } }, exec, { understand: async () => U([C1]) });
+    const intent = (exec.mock.calls[0] as unknown as [string, unknown, ExecutionIntent])[2];
+    expect(intent.understanding!.criteria.map((c) => c.evidence)).toEqual(['observed', 'user']);
   });
 
   it('새 요청 — Assistant 가 이해를 세우고(주입 understander) 판정기를 실행에 넘긴다 · 재개는 같은 이해를 이어 쓴다', async () => {

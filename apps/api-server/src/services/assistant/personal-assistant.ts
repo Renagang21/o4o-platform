@@ -66,6 +66,7 @@ import {
   resumeFallbackUnderstanding,
   createCompletionJudge,
   enforceCommitBoundary,
+  enforceImageConfirmation,
   fallbackUnderstanding,
   forgetUnderstanding,
   isCompletionDeclaration,
@@ -338,6 +339,8 @@ export async function runAssistantWorkTask(
     if (!understanding) understanding = fallbackUnderstanding(request);
     // 확정 경계는 AI 출력에 맡기지 않는다 — 요청에 확정 의도가 있으면 경계를 켜고 사용자 확인 조건을 강제한다.
     understanding = enforceCommitBoundary(understanding, request);
+    // 사진이 붙은 요청 — 이해는 사진을 보지 않으므로 사진 속 대상과 결과가 맞는지는 사용자 확인으로 닫는다.
+    understanding = enforceImageConfirmation(understanding, input.workBody.image !== undefined && input.workBody.image !== null);
     understandingSource = understanding.source;
     if (task) cacheUnderstanding(task.taskId, understanding);
   }
