@@ -8,7 +8,7 @@
 | 선행 | [`IR-O4O-CROSS-SERVICE-PUBLIC-HOME-AND-BRAND-DESIGN-CENSUS-V1`](../investigations/IR-O4O-CROSS-SERVICE-PUBLIC-HOME-AND-BRAND-DESIGN-CENSUS-V1.md) (PR #331 MERGED) |
 | 성격 | 프런트엔드 표시 계층만 변경. route·API·권한·DB·serviceKey·package name 은 바꾸지 않았다 |
 | 기준 | `origin/main` 0e283ba10 · branch `wo/o4o-cross-service-public-design-brand-refresh-v1` |
-| 완료 판정 | **`CODE_COMPLETE` / `PRODUCTION_SMOKE_PENDING_DEPLOY`** — 단계 배포 중. 01 web-neture(neture · supplier · community · funding) 배포 · production smoke PASS(§9). 나머지 host 는 미배포 |
+| 완료 판정 | **`CODE_COMPLETE` / `PRODUCTION_SMOKE_PENDING_DEPLOY`** — 단계 배포 중. 01 web-neture(neture · supplier · community · funding) · 02 web-kpa-society(pharmacy) 배포 · production smoke PASS(§9 · §10). 나머지 host 는 미배포 |
 | 작성일 | 2026-10-07 |
 
 ---
@@ -26,7 +26,7 @@
 | RETAIL | **NOT_REDESIGNED** | `services/web-k-cosmetics` 변경 0 |
 | HOSPITAL | **UNTOUCHED** | neture.co.kr/hospital 관련 파일 변경 0 |
 | DB_CHANGE | **0** | migration · write 0. 아래 §6 의 [SMOKE] row 는 STOP 하고 보고만 한다 |
-| 운영 배포 | **부분 배포 (01/05)** | PR #337 merge(0d0ff4fdc) 후 서비스별로 하나씩 배포한다. 01 web-neture 완료(§9). pharmacy · study · store · kpa 는 미배포 |
+| 운영 배포 | **부분 배포 (02/05)** | PR #337 merge(0d0ff4fdc) 후 서비스별로 하나씩 배포한다. 01 web-neture 완료(§9) · 02 pharmacy 완료(§10). study · store · kpa 는 미배포 |
 
 ---
 
@@ -270,3 +270,85 @@ neture.co.kr 대표 홈 IA 회귀 확인(화면 판독):
 | 정적 OG (known limitation) | 재현됨 — `curl` 로 받은 supplier.neture.co.kr HTML 의 `<title>` · `og:title` 은 neture 기본값이다. JS 실행 후에는 host 별 값이다. 별도 인프라 WO 유지(§8 finding 2) |
 | AUTHENTICATED_SMOKE | **PENDING_USER_VERIFICATION** — 사용할 Google 테스트 계정이 없어 로그인 상태는 확인하지 않았다. 계정 생성 · DB 수정은 하지 않았다 |
 | ROLLBACK | 없음 — rollback 사유(접근 불가 · fatal error · navigation · 로그인 진입 · responsive 파손) 0 |
+
+---
+
+## 10. Production 배포 02 — web-kpa-society / pharmacy (WO-O4O-PUBLIC-DESIGN-PRODUCTION-DEPLOY-02-PHARMACY-V1)
+
+> 실행일 2026-10-07. 배포 대상은 `kpa-society-web` Cloud Run service 하나다(`pharmacy.neture.co.kr` → path-matcher-pharmacy → `backend-kpa-society-web`). 다른 web · API · Admin · DB · migration 은 건드리지 않았다. 내부 serviceKey `kpa-society` · package 이름 · route · API · DB key 는 바꾸지 않았다.
+
+### 10-1. 배포 전 상태 (rollback 기준)
+
+| 항목 | 값 |
+|---|---|
+| service | `kpa-society-web` (asia-northeast3) |
+| serving revision | `kpa-society-web-02029-paf` · traffic 100% (그 이전 `02026-zex`) |
+| `o4o-commit-sha` | `0e283ba102a86b2e6ce07d88926d3b39a0ea6fe9` · digest `sha256:41dcab71…` |
+| 정적 HTML | `<title>` KPA Society — 약사 커뮤니티·강의·매장 지원 · og:title "KPA Society" · og:url `https://kpa-society.co.kr/` · Pretendard 링크 없음 |
+| 화면 (1280/390) | 헤더 "KPA-Society 약사 전문 플랫폼" · h1 "정보를 매장 실행 경쟁력으로 연결합니다" · O4O 홈 0(390 메뉴 열어도 0) · O4OPublicHero 없음 · Pretendard 미적용 · 본문에 "KPA-Society 활용이 처음이신가요?" 등 · footer "Copyright © 2026 약사회" |
+| 배포 gate | `DEPLOY_FREEZE=false` 유지 (열고 닫지 않음) |
+
+### 10-2. 후보 census (serving 0e283ba10 → candidate 021e80327)
+
+- candidate = main HEAD `021e803276f3d564d5e6ddb73e7991a8e4854716` (PR #344 merge). 01 이후 main 에 들어온 #330(lecture handoff UX) · #344(CHECK 문서) 은 pharmacy closure 를 건드리지 않는다.
+- `git diff 0e283ba10 021e80327 -- services/web-kpa-society packages` = PR #337 의 2 commit(9a4c0e571 · 0920e1895) diff 와 같다(30 files, +716/-106). root `package.json` · lockfile · build config 변경 0.
+
+| 분류 | 내용 |
+|---|---|
+| PHARMACY_DESIGN_REQUIRED | `services/web-kpa-society/**`(index.html · manifest · robots · sitemap · brand.ts · seoRegistry · KpaGlobalHeader · Footer · LoginModal · CommunityHomePage · gate 3종 문구 · index.css · tailwind.config) |
+| SAFE_DEPENDENCY | `packages/auth-react`(public-brand Hero · tokens.css · useO4OHomeReturn · index) · `packages/ui` GlobalHeader — 01 에서 web-neture 로 같은 코드가 이미 운영 검증됨 |
+| UNRELATED | api-server · tools/o4o-local-agent · web-lecture · web-store · web-kpa-branch · web-neture · docs — kpa-society artifact 에 들어가지 않는다 |
+| UNVERIFIED | 0 |
+
+canonical 정리 (candidate 파일 기준 `kpa-society.co.kr` 잔존 수): index.html 0 · robots.txt 0 · sitemap.xml 0 · manifest.json 0 · seoRegistry.ts 0. 모두 `pharmacy.neture.co.kr` 기준이다. 옛 도메인 호환(DNS · 리다이렉트)은 건드리지 않았다.
+
+### 10-3. 배포 실행
+
+| 항목 | 값 |
+|---|---|
+| CI (candidate) | CI Pipeline run 37563795016 success · 자동 Delivery run 37564509953 = Classify 만(배포 job 전부 skipped) |
+| service key 확인 | local plan-only + Promote dry-run **37565109119** (`services=kpa-society`) → kpa-society = PROMOTE(LEVEL_3, rule `auth-package`) · 나머지 NOT_SELECTED · api/hospital-pharmacy = NO_DEPLOY · plan `web(parallel)=kpa-society` |
+| 실제 promote | Promote run **37565244345** (`sha=021e80327…` · `services=kpa-society`) success |
+| job | `deploy-kpa-society` success. deploy-neture · pharmacy-hub · hospital-pharmacy · store · kpa-branch · lecture · API · Admin = skipped |
+| 새 revision | **`kpa-society-web-02032-mag`** · `o4o-commit-sha=021e803276f3…` · digest `sha256:17975449…` |
+| traffic | 새 revision 100% |
+| 이전 revision | `kpa-society-web-02029-paf` 보존 (rollback 가능) |
+| 다른 service | neture 01695 · lecture 00043 · store 00059 · kpa-branch 00202 · pharmacy-hub 00284 · core-api 03840 · admin 01352 · hospital-pharmacy 00029 — 배포 전과 같다 |
+
+### 10-4. Production smoke (비로그인 · Chrome headless · 실 URL)
+
+1280/390 모두 HTTP 200 · pageerror 0 · console error 0 · 4xx/5xx 응답 0 · 가로 overflow 0 · Pretendard loaded(`Pretendard Variable`).
+
+| 항목 | 결과 |
+|---|---|
+| 표시 브랜드 | 헤더 "O4O 약국 · 약국 정보 · 업무 연결" · Hero eyebrow "O4O 약국". 헤더 · 첫 화면에 KPA-Society · 약사회 · PharmacyHub · GlycoPharm 0 |
+| Hero | h1 "약국의 정보와 업무를 / 하나로 연결합니다" (1280 52px · 390 32px, 둘 다 2줄 자연 줄바꿈) · 설명 2줄 · 과한 gradient / card stack 없음 |
+| CTA | 로그인하고 시작하기(button → 로그인 모달) · 이용 가이드 → `/guide/usage` · 체험 계정 보기 → `/login`. 실제 route, 200, 404 문구 0 |
+| 헤더 · 푸터 링크 | nav(/ · /service-guide · /about · /contact) · footer 12개(/forum · /content · /signage · /resources · /guide/intro · /guide/features · /policy · /privacy 등) 전부 200 · 404 문구 0 · JS error 0 |
+| O4O 홈 | 1280 · 390 헤더에 보임(390 은 메뉴 밖 헤더에 직접). **실제 클릭** → `https://neture.co.kr/` 도착(title "O4O — 소규모 사업자를 위한 통합 업무 공간"). 세션 복구 중 비활성은 단위 테스트로 보장(§8 #1) |
+| 로그인 진입 | 헤더 [로그인](390 은 메뉴 안) → "O4O 약국 로그인" 모달 · 이메일 폼 · "Google 계정으로 계속하기" 버튼 표시. 인증은 진행하지 않았다 |
+| title / description | "O4O 약국 — 약국의 정보와 업무를 하나로 연결합니다" / Hero 설명 문구. 정적 HTML(curl) 도 같은 title · og:title "O4O 약국" |
+| canonical / og:url | `https://pharmacy.neture.co.kr/` (JS 실행 후 · 정적 og:url 동일) · robots.txt `Sitemap: https://pharmacy.neture.co.kr/sitemap.xml` · 서빙 sitemap 의 kpa-society.co.kr 0 |
+| favicon | 기존 fallback `/favicon.png` 200 image/png · `/icons/apple-touch-icon.png` 200. `PHARMACY_BRAND_ASSETS_READY=false` 유지 |
+| manifest | `/manifest.json` 200 · name / short_name "O4O 약국" |
+| og:image | 없음 (WO 기준 FAIL 아님) |
+
+스크린샷은 세션 scratchpad 에만 두고 저장소에는 커밋하지 않았다.
+
+### 10-5. legacy 표시 문구 판정
+
+| 분류 | 위치 | 처리 |
+|---|---|---|
+| LEGACY_PHARMACY_BRAND (대표 브랜드) | 0 | — |
+| FOOTER_RESIDUAL | 공개 홈 footer: 링크 그룹 제목 "약사회" · 링크 "약사회 소개"(→ /about) · "Copyright © 2026 약사회" | 미수정 · 별도 WO 후보. footer 브랜드 줄은 "O4O 약국" 이다 |
+| FOOTER_RESIDUAL | `KpaStoreFooter` `serviceName="약사회"` (§5) | 미수정 (WO 지시) |
+| OUT_OF_SCOPE_ADMIN_OPERATOR | admin · operator "KPA-Society" · QR 랜딩 하단 (§5) | 미수정 (WO 지시) |
+| EXPECTED_KPA_CONTEXT | 공지 영역 옆 "약사공론 뉴스" (매체 이름) | 유지 |
+
+### 10-6. 기타 판정
+
+| 항목 | 값 |
+|---|---|
+| AUTHENTICATED_SMOKE / 로그인 상태 O4O 홈 | **PENDING_USER_VERIFICATION** — Google 테스트 계정이 없어 확인하지 않았다. 계정 생성 · DB 수정 없음 |
+| ROLLBACK | 없음 — rollback 사유(접근 불가 · JS fatal · 로그인 진입 · O4O 홈 이동 · header/nav 파손 · 모바일 Hero · canonical 진입 차단) 0 |
+| 남은 배포 | 03 study → 04 store → 05 kpa (미착수, 별도 지시) |
