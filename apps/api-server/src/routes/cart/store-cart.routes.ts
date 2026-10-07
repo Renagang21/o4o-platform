@@ -31,6 +31,7 @@ import { Router, Request, Response, RequestHandler } from 'express';
 import { DataSource } from 'typeorm';
 import type { AuthRequest } from '../../types/auth.js';
 import { getAllServiceKeys } from '../../config/service-catalog.js';
+import { SERVICE_KEYS } from '../../constants/service-keys.js';
 import {
   StoreCartService,
   CartError,
@@ -55,6 +56,12 @@ import { isApprovalEligibleServiceKey } from '../../modules/neture/constants/app
 import { hasActiveServiceMembership } from '../../utils/service-membership.js';
 
 type AuthMiddleware = RequestHandler;
+
+// WO-O4O-CANONICAL-INDEX-S9-REMAINING-3-FINAL-DISPOSITION-V1 (K-Cosmetics 퇴역 잔여 R1):
+//   K-Cosmetics 는 퇴역했고 결제 경로(`/cosmetics/b2b/payments/*`)가 삭제됐다. catalog row 는 retired identity 로
+//   남아 있어 serviceKey 검증만으로는 통과하므로, 이 라우터에서 명시적으로 닫는다 — 결제할 수 없는
+//   pending 주문 방지. 조회 포함 전 endpoint 410.
+export const RETIRED_CART_SERVICE_KEYS: ReadonlySet<string> = new Set([SERVICE_KEYS.K_COSMETICS]);
 
 export function createStoreCartRoutes(dataSource: DataSource): Router {
   const router = Router();
@@ -104,6 +111,16 @@ export function createStoreCartRoutes(dataSource: DataSource): Router {
         success: false,
         error: `invalid serviceKey: ${serviceKey}`,
         code: 'VALIDATION_ERROR',
+      });
+      return null;
+    }
+
+    // 퇴역 서비스는 membership 판정보다 먼저 닫는다(RETIRED_CART_SERVICE_KEYS).
+    if (RETIRED_CART_SERVICE_KEYS.has(serviceKey)) {
+      res.status(410).json({
+        success: false,
+        error: '운영이 종료된 서비스입니다.',
+        code: 'SERVICE_RETIRED',
       });
       return null;
     }

@@ -22,11 +22,11 @@
 
 | # | 잔여 | 상태 | 비고 |
 |---|---|---|---|
-| R1 | **공통 cart write 경로가 `k-cosmetics` 를 받는다** — `/api/v1/store/cart/:serviceKey/*`(`checkout-confirm` · `checkout-confirm-b2b`)는 `getAllServiceKeys()` 로 serviceKey 를 검증하고 catalog 에 `k-cosmetics` 가 남아 있다 | 남음 · **우선 정리 대상** | `k-cosmetics` 결제 경로(`/cosmetics/b2b/payments/*`)는 삭제됐고 `/kpa/b2b/payments/*` 는 KPA serviceKey 만 받는다 → **결제할 수 없는 pending 주문**이 생길 수 있다. 차단은 runtime 변경이라 퇴역 작업 범위 |
-| R2 | service identity · catalog row(`k-cosmetics`, 진입 capability 닫힘) · `SERVICE_KEYS` | 남음 | R1 의 원인. 정리는 소비처 전수 확인 후(§2 규칙 3) |
+| R1 | 공통 cart 경로 `/api/v1/store/cart/:serviceKey/*` 가 `k-cosmetics` 를 받아 결제할 수 없는 pending 주문이 생길 수 있었다 | **정리됨 (2026-10-07)** | `store-cart.routes.ts` `RETIRED_CART_SERVICE_KEYS` — 조회 포함 전 endpoint `410 SERVICE_RETIRED`(membership 판정보다 먼저) · event-offer 장바구니 매핑의 `k-cosmetics` 삭제 · 고아 상수 `COSMETICS_B2B_SERVICE_KEYS` 삭제. PR #354 |
+| R2 | service identity · catalog row(`k-cosmetics`, 진입 capability 닫힘) · `SERVICE_KEYS` | 남음 | R1 차단(`RETIRED_CART_SERVICE_KEYS`)은 이 row 를 지울 때 함께 정리한다. 정리는 소비처 전수 확인 후(§2 규칙 3) |
 | R3 | `cosmetics:*` roles | 남음 | RBAC SSOT 절차 |
 | R4 | DB 스키마 — `cosmetics` 스키마 · `public.cosmetics_members` · `public.cosmetics_contents` · 관련 migration | 남음 | 처리 방식(유지 · 제거 · archive · 파기)은 퇴역 작업이 정한다 · 사용자 승인 |
-| R5 | `k-cosmetics` / `k-cosmetics-event-offer` serviceKey 의 Event Offer · B2B 데이터와 코드 매핑(`CART_TO_EVENT_OFFER_SERVICE_KEY` · `COSMETICS_B2B_SERVICE_KEYS` 등) | 남음 | 기존 주문 데이터는 `checkout_orders` B2B 원장(§2 규칙 4) |
+| R5 | `k-cosmetics` / `k-cosmetics-event-offer` serviceKey 의 Event Offer · B2B 데이터와 코드 매핑 — 남은 코드: event-offer 도메인 매핑(`event-offer-service-mapping` · `EventOfferService` · 공급자 제안) · 승인축 `APPROVAL_ELIGIBLE_SERVICE_KEYS`(공급자 offer 승인 데이터와 연동 — Supplier Domain 경계) · buyer 조회 scope 등 | 남음 (장바구니 매핑 · 결제 상수는 R1 에서 삭제) | 기존 주문 데이터는 `checkout_orders` B2B 원장(§2 규칙 4) |
 | R6 | community / signage / LMS / CMS 의 `k-cosmetics` identity | 남음 | 공통 구조 serviceKey 격리 데이터 |
 | R7 | **외부 설정 (사용자 작업)** — 외부 DNS(`k-cosmetics.site` · `www.` · `api.` A 레코드와 `_acme-challenge` CNAME · `retail.neture.co.kr` A 레코드) · Google OAuth 승인 origin / redirect URI 의 K-Cos host | 남음 · 사용자 작업 | 저장소 밖 콘솔 작업이라 자동 변경하지 않는다. 근거 `CHECK-O4O-KCOSMETICS-RETIREMENT-PHASE1A-WEB-APP-AND-RUNTIME-V1` §4 |
 | R8 | **인프라 잔재** — 컨테이너 이미지(`k-cosmetics-web`) · API CORS 의 `retail` origin 등 1차-A CHECK §5 "API" · "이미지" 항목 중 1차-B 가 정리하지 않은 것 | 확인 필요 | 1차-B 는 CORS / cookie 의 K-Cos 도메인을 제거하면서 `retail` 은 유지했다. 이미지 삭제는 저장소 단위 개별 승인. 다음 퇴역 단계에서 전수 확인 후 이 행을 갱신한다 |
