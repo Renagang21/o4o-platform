@@ -382,7 +382,7 @@ canonical 정리 (candidate 파일 기준 `kpa-society.co.kr` 잔존 수): index
 | UNRELATED | api-server · tools · web-neture · web-kpa-* · web-store · docs |
 | UNVERIFIED | 0 |
 
-- #330 의 web-neture 쪽(`ServiceEntryPage` 미가입 안내)은 01 의 neture image(6ad3d1263) 에 없다. 다음 neture 배포 때 들어간다. lecture 쪽 변경은 방어 문구라 neture 쪽 없이 배포해도 기존 흐름보다 나빠지지 않는다.
+- #330 의 web-neture 쪽(`ServiceEntryPage` 미가입 안내)은 01 의 neture image(6ad3d1263) 에 없다. 다음 neture 배포 때 들어간다 → §12 에서 neture 단독 promote 로 반영. lecture 쪽 변경은 방어 문구라 neture 쪽 없이 배포해도 기존 흐름보다 나빠지지 않는다.
 - 정적 파일: web-lecture 에는 `manifest.json` · `robots.txt` · `sitemap.xml` 이 원래 없다(SPA fallback 이 index.html 을 돌려준다). `kpa-society.co.kr` 등 옛 canonical 잔존 0.
 
 ### 11-3. 배포 실행
@@ -425,3 +425,59 @@ canonical 정리 (candidate 파일 기준 `kpa-society.co.kr` 잔존 수): index
 | AUTHENTICATED_SMOKE / 로그인 상태 O4O 홈 · handoff | **PENDING_USER_VERIFICATION** — Google 테스트 계정이 없어 확인하지 않았다. 계정 생성 · DB 수정 없음 |
 | ROLLBACK | 없음 — rollback 사유 0 |
 | 남은 배포 | 04 store → 05 kpa (미착수, 별도 지시) |
+
+---
+
+## 12. 후속 배포 — web-neture #330 `ServiceEntryPage` 반영 (neture 단독 promote)
+
+§11-2 에서 미룬 #330 의 web-neture 쪽을 neture 단독으로 배포했다. 사용자 승인: "neture 단독 promote 진행" (2026-10-07).
+
+### 12-1. 배포 전 상태 (rollback 기준)
+
+| 항목 | 값 |
+|---|---|
+| neture-web | `neture-web-01695-kos` · `o4o-commit-sha=6ad3d1263…` (§9 배포 01) · traffic 100% |
+| Delivery 판정 | `a07861f57` 자동 Delivery run 37577053794 → neture = LEVEL_3 `AUTO_DEPLOY_BLOCKED` (rule auth-frontend `services/web-neture/src/pages/auth/ServiceEntryPage.tsx`) |
+
+### 12-2. 후보 census (serving 6ad3d1263 → candidate a07861f57)
+
+| 분류 | 내용 |
+|---|---|
+| web-neture · 의존 package 변경 | **#330 만** — `services/web-neture/src/pages/auth/ServiceEntryPage.tsx` (+75/-8) · `__tests__/ServiceEntryPage.nonmember.test.tsx` (신규). `packages/**` 변경 0 |
+| 성격 | 미가입(`HANDOFF_TARGET_NO_MEMBERSHIP` · `_NOT_ACTIVE` · `_WITHDRAWN`) 응답을 "로그인 완료 + 이용 자격 필요" 화면으로 구분 · lecture 공개 경로(`/courses` · `/certificates/verify/` 등)만 공개 복귀 허용. API · auth/handoff 계약 · DB · dependency 변경 0 |
+| UNVERIFIED | 0 |
+
+### 12-3. 배포 실행
+
+| 항목 | 값 |
+|---|---|
+| CI (candidate) | CI Pipeline run 37576880006 success · CodeQL success |
+| dry-run | Promote run **37580108333** (`a07861f57` · `services=neture`) → neture = PROMOTE · admin · store · kpa-branch · pharmacy-hub = NOT_SELECTED · api · kpa-society · lecture · hospital-pharmacy = NO_DEPLOY(`BEHIND_NO_RUNTIME_CHANGE`) · plan `deploy_api=false` · `web(parallel)=neture` |
+| 실제 promote | Promote run **37580292820** (`sha=a07861f57…` · `services=neture`) success |
+| job | `deploy-neture` 만 실행. 다른 web · API · Admin = skipped |
+| 새 revision | **`neture-web-01698-yet`** · `o4o-commit-sha=a07861f57f03…` · digest `sha256:2ef46d7b…` |
+| traffic | 새 revision 100% |
+| 이전 revision | `neture-web-01695-kos` 보존 (rollback 가능) |
+| 다른 service | kpa-society 02032 · lecture 00046 · store 00059 · kpa-branch 00202 · pharmacy-hub 00284 · core-api 03840 · admin 01352 · hospital-pharmacy 00029 — 배포 전과 같다 |
+
+### 12-4. Production smoke (비로그인 · Chrome headless · 실 URL)
+
+neture · supplier · community · funding 공개 홈 + `neture.co.kr/service-entry/lecture`, 1366/390 각 1회 (10/10):
+HTTP 200 · pageerror 0 · console error 0 · 4xx/5xx 응답 0 · 가로 overflow 0.
+
+| 항목 | 결과 |
+|---|---|
+| 4 host 공개 홈 | §9 와 같은 title · Hero · footer 표시. 회귀 0 |
+| `/service-entry/lecture` (비로그인) | Neture 로그인 화면 + "O4O 강의 로그인 — O4O 계정으로 로그인하면 O4O 강의로 이어서 이동합니다" 표시 |
+| 운영 bundle | `/assets/index-CL5z4Yne.js` 에 `HANDOFF_TARGET_NO_MEMBERSHIP` · `HANDOFF_TARGET_WITHDRAWN` · `certificates/verify/` 포함 — #330 코드가 운영 image 에 들어갔다 |
+| 미가입 안내 화면 자체 | **PENDING_USER_VERIFICATION** — lecture 미가입 Google 계정이 있어야 보인다. 계정 생성 · DB 수정 없음 |
+
+스크린샷은 세션 scratchpad 에만 두고 저장소에는 커밋하지 않았다.
+
+### 12-5. 기타 판정
+
+| 항목 | 값 |
+|---|---|
+| ROLLBACK | 없음 — rollback 사유 0 |
+| #330 | web-lecture(§11) · web-neture(§12) 모두 운영 반영 |
+| 남은 배포 | 04 store → 05 kpa (미착수, 별도 지시) — 변경 없음 |
