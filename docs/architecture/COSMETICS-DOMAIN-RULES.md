@@ -2,16 +2,16 @@
 
 > **상태**: ACTIVE (범위 축소 — 퇴역 전 유지 계약) · 판정 확정(2026-10-07, `WO-O4O-CANONICAL-INDEX-S9-REMAINING-3-FINAL-DISPOSITION-V1`) · **표기일**: 2026-10-07
 >
-> **왜 OBSOLETE 가 아닌가.** K-Cosmetics 서비스(`k-cosmetics`, `retail.neture.co.kr`)는 **퇴역이 결정됐지만 아직 실행되지 않았다**(사용자 결정 2026-10-05 · [`DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1`](../design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md) §14). `service-catalog.ts` 의 `k-cosmetics` · `/api/v1/cosmetics`(`register-routes.ts`) · `services/web-k-cosmetics` · `cosmetics` 스키마가 살아 있으므로 전제가 사라진 상태(OBSOLETE, [DOCUMENT-LIFECYCLE](../rules/DOCUMENT-LIFECYCLE-AND-ARCHIVE-RULES-V1.md) §2)가 아니다. **퇴역 작업이 서비스 · API · 스키마를 제거하면 이 문서는 OBSOLETE 로 바뀐다.**
+> **왜 OBSOLETE 가 아닌가.** K-Cosmetics 서비스(`k-cosmetics`, `retail.neture.co.kr`)는 **퇴역이 결정됐고 일부만 실행됐다**(사용자 결정 2026-10-05 · [`DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1`](../design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md) §14). 퇴역 1차-A(`WO-O4O-KCOSMETICS-RETIREMENT-PHASE1A-WEB-APP-AND-DEPLOY-TARGET-V1`, 518da8b59)가 독립 웹 앱 `services/web-k-cosmetics` 와 웹 배포 job 을 **이미 삭제했다**. 남아 있는 것은 `service-catalog.ts` 의 `k-cosmetics` · `/api/v1/cosmetics`(`register-routes.ts`, `routes/cosmetics/**`) · `services/web-store` 의 K-Cosmetics 분기 · `cosmetics` 스키마 · serviceKey · role 이므로 전제가 사라진 상태(OBSOLETE, [DOCUMENT-LIFECYCLE](../rules/DOCUMENT-LIFECYCLE-AND-ARCHIVE-RULES-V1.md) §2)가 아니다. **퇴역 작업이 남은 API · 스키마 · catalog 를 제거하면 이 문서는 OBSOLETE 로 바뀐다.**
 >
-> **적용 범위**: 퇴역 전까지 남아 있는 `routes/cosmetics/**` · `services/web-k-cosmetics` · `cosmetics_*` 테이블의 유지보수(버그 수정 · 보안 · 퇴역 준비)에만 적용한다. 퇴역 대상은 서비스이지 화장품 제품군(Neture 공급 제품 · 카테고리)이 아니다 — 제품군은 이 문서의 대상이 아니다.
+> **적용 범위**: 퇴역 전까지 남아 있는 `routes/cosmetics/**` · `services/web-store` 의 K-Cosmetics 분기 · `cosmetics_*` 테이블의 유지보수(버그 수정 · 보안 · 퇴역 준비)에만 적용한다. 퇴역 대상은 서비스이지 화장품 제품군(Neture 공급 제품 · 카테고리)이 아니다 — 제품군은 이 문서의 대상이 아니다.
 >
 > **유효 규칙** (여기 적힌 것만 유효):
 > 1. Cosmetics 전용 테이블은 `cosmetics_` prefix (§1.2).
 > 2. 인증 · 사용자 · JWT 발급/갱신을 재구현하지 않는다 — 검증만 한다(§2.1 · §2.2 · §2.4, `CLAUDE.md` §1 · auth-core 동결 §3). Guard 는 `requireAuth` → `requireCosmeticsScope(...)`, role/scope 는 RBAC SSOT.
 > 3. 주문은 `checkoutService.createOrder()` 단일 지점 · 현행 축은 공급자→매장 B2B(`CLAUDE.md` §4 · [B2B 계약](../baseline/O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1.md)) · 소비자 주문 `POST /cosmetics/orders` 는 `410`(§1.6 · §2.4 · COMMERCE-BOUNDARY).
 > 4. 다른 서비스 도메인 테이블과 cross-domain JOIN 금지 · Domain Boundary 필터([BOUNDARY-POLICY](O4O-BOUNDARY-POLICY-V1.md)).
-> 5. 웹은 비즈니스 검증 · DB 접근을 하지 않고 `authClient.api` 로 단일 core API 를 호출한다 · URL 하드코딩 금지(§3.4 일부, `CLAUDE.md` §1).
+> 5. 남은 웹 화면(`services/web-store` 의 K-Cosmetics 분기)은 비즈니스 검증 · DB 접근을 하지 않고 `authClient.api` 로 단일 core API 를 호출한다 · URL 하드코딩 금지(§3.4 일부, `CLAUDE.md` §1). 삭제된 `services/web-k-cosmetics` 를 되살리지 않는다.
 > 6. **현재 구조를 기준선으로 고정한다** — `public.cosmetics_members.user_id → public.users` FK 와 `cosmetics.cosmetics_stores` · `cosmetics_store_applications` 의 `owner_name` · `contact_phone` · `business_number` 는 **현행 사실로 인정**하고 퇴역 전에 재설계하지 않는다. 대신 **새 Core FK · 새 개인정보 필드 · 새 cosmetics 전용 기능을 추가하지 않는다.** 기존 테이블 · 데이터의 처리(유지 · 제거 · archive · 파기)는 퇴역 작업이 정한다(데이터 삭제는 `CLAUDE.md` DB 경계 — 사용자 명시 승인).
 >
 > **무효 (stale — 근거로 쓰지 않는다)**: 별도 `cosmetics-api` · 독립 DB 전제 전부 — §1.1 "Core 생성 금지" · §1.3 · §1.4 의 절대 금지 문구(위 6 이 대체), §1.5 cosmetics-api 단독 migration, §2.2 `cosmetics:read`/`write` scope, §2.3 · §2.5 API 간 통신 · DB 접근 표, §3.1 ~ §3.3 · §3.5 cosmetics-web 프록시 · 환경변수, §4 "cosmetics-web 경유로 변경". 아래 본문은 2026-01 원문(+ 2026-10-04 사실 정정)으로 보존한다.
