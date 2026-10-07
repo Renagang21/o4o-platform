@@ -47,7 +47,7 @@ export const NETURE_HEADER_BRAND = {
 // ─── Component ───────────────────────────────────────────────────────────────
 
 export function NetureGlobalHeader() {
-  const { user, isAuthenticated, logout } = useAuth();
+  const { user, isAuthenticated, isLoading, logout } = useAuth();
   const { openLoginModal } = useLoginModal();
   const navigate = useNavigate();
 
@@ -99,7 +99,7 @@ export function NetureGlobalHeader() {
       logoutLabel="O4O 로그아웃"
       /* WO-O4O-CROSS-SERVICE-PUBLIC-DESIGN-AND-BRAND-REFRESH-V1: 로그인 여부와 무관하게 O4O 홈 복귀.
          로고(브랜드) 링크는 서비스 홈 그대로 두고 O4O 홈은 별도 버튼으로 둔다. */
-      homeSlot={<O4OHomeButton api={api} isAuthenticated={isAuthenticated} className="o4o-home-link" />}
+      homeSlot={<O4OHomeButton api={api} isAuthenticated={isAuthenticated} authLoading={isLoading} className="o4o-home-link" />}
       utilitySlot={
         <>
           {/* WO-O4O-DEMO-LOGIN-ENTRY-AND-EXPERIENCE-UX-V1: 서버 판정(user.demo) 기준 Demo 배지 — modal 없음 */}

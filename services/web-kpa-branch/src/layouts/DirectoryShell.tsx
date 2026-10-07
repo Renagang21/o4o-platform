@@ -33,7 +33,7 @@ export default function DirectoryShell({ children }: { children: ReactNode }) {
             <span className="text-lg font-semibold text-gray-900">{BRAND.nameKo}</span>
           </Link>
           <div className="flex items-center gap-3 text-sm">
-            <O4OHomeButton api={authClient.api} isAuthenticated={isAuthenticated} className="o4o-home-link" />
+            <O4OHomeButton api={authClient.api} isAuthenticated={isAuthenticated} authLoading={isLoading} className="o4o-home-link" />
             {!isLoading && (isAuthenticated ? (
               <button type="button" onClick={logout} className="text-gray-500 hover:text-gray-900">{O4O_LOGOUT_LABEL}</button>
             ) : (
@@ -62,7 +62,7 @@ export default function DirectoryShell({ children }: { children: ReactNode }) {
           <p>
             <span className="font-medium text-gray-700">{BRAND.nameKo}</span> · {BRAND.tagline}
           </p>
-          <O4OHomeButton api={authClient.api} isAuthenticated={isAuthenticated} className="text-gray-500 hover:text-gray-900" />
+          <O4OHomeButton api={authClient.api} isAuthenticated={isAuthenticated} authLoading={isLoading} className="text-gray-500 hover:text-gray-900" />
         </div>
       </footer>
     </div>

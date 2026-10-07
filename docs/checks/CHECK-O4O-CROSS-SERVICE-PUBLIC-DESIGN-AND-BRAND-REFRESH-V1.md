@@ -22,7 +22,7 @@
 | PHARMACY_DISPLAY_BRAND | **O4O 약국** | header · Hero eyebrow · title · og · manifest name/short_name 을 바꿨다. 내부 `kpa-society` 키는 그대로 |
 | KPA_IDENTITY | **SEPARATE** | kpa.neture.co.kr 은 "약사회 분회" 정체성을 유지하고, 헤더에 작은 O4O 홈 유틸리티만 추가했다 |
 | RESPONSIVE_1280_390 | **PASS** (로컬 빌드) | 8 host × 2 폭 = 16 run 모두 가로 overflow 0, h1 1개, page error 0 |
-| HOST_METADATA | **SERVICE_AWARE** | title · description · og:title · og:description · og:url · canonical · favicon 을 host 별로 둔다. og:image 는 넣지 않았다 |
+| HOST_METADATA | **SERVICE_AWARE** (runtime 기준 · 한계 1건) | title · description · og:title · og:description · og:url · canonical · favicon 을 host 별로 둔다. og:image 는 넣지 않았다. JS 를 실행하지 않는 crawler 에서는 supplier · funding · community 가 neture.co.kr 기본 메타로 보인다(§8 finding 2) |
 | RETAIL | **NOT_REDESIGNED** | `services/web-k-cosmetics` 변경 0 |
 | HOSPITAL | **UNTOUCHED** | neture.co.kr/hospital 관련 파일 변경 0 |
 | DB_CHANGE | **0** | migration · write 0. 아래 §6 의 [SMOKE] row 는 STOP 하고 보고만 한다 |
@@ -88,7 +88,7 @@
 
 | 묶음 | 결과 |
 |---|---|
-| `packages/auth-react` vitest | 9 files / 137 passed |
+| `packages/auth-react` vitest | 9 files / 138 passed (Codex 대응 후) |
 | `services/web-neture` vitest | 41 files / 334 passed |
 | `services/web-kpa-society` vitest | 7 files / 67 passed |
 | `services/web-kpa-branch` vitest | 2 files / 20 passed |
@@ -131,7 +131,7 @@ web-neture · web-kpa-society · web-store · web-lecture · web-kpa-branch 의 
 | pharmacy | 200 | 약국의 정보와 업무를 하나로 연결합니다 | 보임 | 로그인하고 시작하기 | pharmacy…/ |
 | study | 200 | 필요한 지식을 실무와 연결합니다 | 보임 | 강의 둘러보기 → /courses | study…/ |
 | store | 200 | 내 매장 | 보임 | (workspace-first, 로그인 카드) | store…/ |
-| kpa | 200 | 약사회 분회 | 보임 | (분회 찾기 목록) | kpa…/ |
+| kpa | 200 | 약사회 분회 | 보임 | (분회 찾기 목록) | 없음 (§8 finding 3 대응 후) |
 
 공통 결과(16 run 전체):
 
@@ -179,3 +179,15 @@ web-neture · web-kpa-society · web-store · web-lecture · web-kpa-branch 의 
   - 로그인 상태의 O4O 홈 동작
   - og/canonical 실측
   - pharmacy 공지 영역
+
+---
+
+## 8. Codex review 대응 (PR #337)
+
+| # | finding | 처리 |
+|---|---|---|
+| 1 | 세션 복구(auth loading) 중 O4O 홈을 누르면 handoff 없이 이동해 로그인 상태가 이어지지 않는다 | **수정**. `O4OHomeButton` 에 `authLoading` prop 을 추가하고, 복구 중에는 비활성(`disabled` · `aria-busy`)으로 둔다. 호출처 4곳(KpaGlobalHeader · NetureGlobalHeader · BranchLayout · DirectoryShell)에 연결했다. 테스트: 복구 중 클릭 시 post · navigate 0 → 복구 완료 후 handoff post + 이동 |
+| 2 | web-neture 는 정적 index.html 하나라서 JS 를 실행하지 않는 crawler 는 supplier · funding · community 에서도 neture.co.kr 메타를 본다 | **미수정 · 별도 WO 제안**. 해결하려면 host 별 HTML 생성 또는 서버/edge 단 메타 주입이 필요하다. 이는 Docker · 인프라 변경이라 이번 WO 의 중지 조건에 해당한다. runtime(JS 실행) 메타는 host 별로 맞다 |
+| 3 | kpa-branch index.html 의 고정 og:url(`kpa.neture.co.kr/`)이 분회 slug · 분회 자체 도메인에도 그대로 나간다 | **수정**. 고정 og:url 을 제거하고 이유를 주석으로 남겼다. `publicBrandConsumers.test.ts` 는 kpa-branch 에 og:url 이 없음을 확인한다 |
+
+대응 후 재검증: auth-react 138 · web-neture 334 · web-kpa-society 67 · web-kpa-branch 20 passed. web-neture · web-kpa-society · web-kpa-branch 빌드 exit 0.

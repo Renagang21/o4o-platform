@@ -23,7 +23,8 @@ const APPS = [
   { app: 'web-kpa-society', host: 'https://pharmacy.neture.co.kr/', favicon: '/favicon.png' },
   { app: 'web-store', host: 'https://store.neture.co.kr/', favicon: '/favicon.svg' },
   { app: 'web-lecture', host: 'https://study.neture.co.kr/', favicon: '/favicon.svg' },
-  { app: 'web-kpa-branch', host: 'https://kpa.neture.co.kr/', favicon: '/favicon.svg' },
+  // kpa-branch: 같은 index.html 이 분회 path · 분회 자체 도메인에도 서빙 → 고정 og:url 을 두지 않는다
+  { app: 'web-kpa-branch', host: null, favicon: '/favicon.svg' },
 ] as const;
 
 const PRETENDARD = 'https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css';
@@ -45,8 +46,9 @@ describe.each(APPS)('$app — 공개 브랜드 진입 파일', ({ app, host, fav
     expect(existsSync(resolve(ROOT, `services/${app}/public${favicon}`))).toBe(true);
   });
 
-  it('og:url 은 서비스 host · og:image 는 없다', () => {
-    expect(html).toContain(`<meta property="og:url" content="${host}" />`);
+  it('og:url 은 서비스 host(또는 없음) · og:image 는 없다', () => {
+    if (host) expect(html).toContain(`<meta property="og:url" content="${host}" />`);
+    else expect(html).not.toMatch(/<meta[^>]+property="og:url"/);
     expect(html).not.toMatch(/<meta[^>]+property="og:image"/);
   });
 

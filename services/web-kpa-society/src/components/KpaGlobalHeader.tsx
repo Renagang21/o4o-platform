@@ -130,7 +130,7 @@ export function KpaGlobalHeader() {
       logoutLabel={O4O_LOGOUT_LABEL}
       /* O4O 홈 — 로그인 여부와 무관하게 표시. 로그인 중이면 로그인 유지한 채 neture.co.kr 대표 홈으로 복귀 (로그아웃 아님)
          WO-O4O-CROSS-SERVICE-PUBLIC-DESIGN-AND-BRAND-REFRESH-V1: 로그인 조건 제거 · 모바일 헤더에도 노출 */
-      homeSlot={<O4OHomeButton api={authClient.api} isAuthenticated={!!user} className="o4o-home-link" />}
+      homeSlot={<O4OHomeButton api={authClient.api} isAuthenticated={!!user} authLoading={isLoading} className="o4o-home-link" />}
       utilitySlot={
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           {user && creditBalance !== null && (
