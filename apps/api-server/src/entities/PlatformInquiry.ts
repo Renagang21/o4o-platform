@@ -2,7 +2,6 @@
  * PlatformInquiry - 플랫폼 레벨 문의
  *
  * 용도:
- * - SiteGuide 도입 상담 요청
  * - o4o 플랫폼 문의
  * - 기타 SaaS 사업자(플랫폼 관리자)에게 오는 문의
  *
@@ -18,7 +17,8 @@ import {
   Index,
 } from 'typeorm';
 
-export type InquiryType = 'siteguide' | 'platform' | 'partnership' | 'other';
+// 'siteguide' 유형은 서비스 폐기로 은퇴 — 운영 데이터 삭제 완료 (CHECK-O4O-SITEGUIDE-RETIREMENT-V1 §5)
+export type InquiryType = 'platform' | 'partnership' | 'other';
 export type InquiryStatus = 'new' | 'in_progress' | 'resolved' | 'closed';
 
 @Entity('platform_inquiries')
@@ -67,7 +67,7 @@ export class PlatformInquiry {
 
   // 메타데이터
   @Column({ type: 'varchar', length: 50, nullable: true })
-  source: string; // 'siteguide.co.kr', 'neture.co.kr', etc.
+  source: string; // 'neture.co.kr', etc.
 
   @Column({ type: 'varchar', length: 50, nullable: true })
   ipAddress: string;

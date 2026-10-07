@@ -453,7 +453,7 @@ describe('U4. promote — SHA 하나로 승인 (§13 · §14)', () => {
 describe('U5. 상태 표현 · commit status · report (§10 · §26 · §27)', () => {
   const st = (pairs) => Object.entries(pairs).map(([key, state]) => ({ key, state }));
   it('HOLD → pending + promote 명령 1줄 (≤140자)', () => {
-    const s = commitStatus(st({ api: 'HELD_LEVEL_3', neture: 'DEPLOYING', admin: 'HELD_LEVEL_3', store: 'HELD_LEVEL_3', 'kpa-society': 'HELD_LEVEL_3', 'k-cosmetics': 'HELD_LEVEL_3' }), TARGET);
+    const s = commitStatus(st({ api: 'HELD_LEVEL_3', neture: 'DEPLOYING', admin: 'HELD_LEVEL_3', store: 'HELD_LEVEL_3', 'kpa-society': 'HELD_LEVEL_3', 'pharmacy-hub': 'HELD_LEVEL_3' }), TARGET);
     assert.equal(s.overall, 'HELD_LEVEL_3');
     assert.equal(s.state, 'pending');
     assert.ok(s.description.endsWith(promoteCommand(TARGET)));

@@ -141,6 +141,10 @@ export class GoogleAuthController extends BaseController {
       return BaseController.unauthorized(res, 'Google 인증에 실패했습니다.', error.code);
     }
     if (error instanceof GoogleAuthError) {
+      // WO-NETURE-PHARMACY-CUTOVER-COMPAT-V1: 세미프랜차이즈 자격 상태(인증을 마친 본인에게만, 서버 선별 필드)
+      if (error.serviceAccess) {
+        return BaseController.forbidden(res, error.message, error.code, { serviceAccess: error.serviceAccess });
+      }
       return BaseController.error(res, error.message, error.statusCode, error.code);
     }
     if (err.code === 'ACCOUNT_NOT_ACTIVE') {

@@ -98,10 +98,10 @@ describe('GuideServiceIntroPage — 렌더 계약', () => {
   });
 });
 
-describe('Adoption — 2 서비스 wrapper 가 공통 View 를 쓴다', () => {
+describe('Adoption — 서비스 wrapper 가 공통 View 를 쓴다', () => {
   const WRAPPERS: [string, string, string][] = [
     ['KPA', 'services/web-kpa-society/src/pages/service-guide/ServiceGuidePage.tsx', 'kpaServiceIntroProps'],
-    ['K-Cosmetics', 'services/web-k-cosmetics/src/pages/ServiceGuidePage.tsx', 'kCosmeticsServiceIntroProps'],
+    // K-Cosmetics 앱은 퇴역 삭제 — WO-O4O-KCOSMETICS-RETIREMENT-PHASE1A-WEB-APP-AND-DEPLOY-TARGET-V1.
   ];
 
   it.each(WRAPPERS)('%s wrapper 는 GuideServiceIntroPage + copy config 만 사용한다', (_n, path, props) => {
@@ -119,7 +119,6 @@ describe('Adoption — 2 서비스 wrapper 가 공통 View 를 쓴다', () => {
 describe('Route contract — /service-guide 와 /guide 관계 유지', () => {
   const APPS: [string, string][] = [
     ['KPA', 'services/web-kpa-society/src/App.tsx'],
-    ['K-Cosmetics', 'services/web-k-cosmetics/src/App.tsx'],
   ];
 
   it.each(APPS)('%s: /service-guide 와 기존 guide deep-link 가 모두 유지된다', (_n, path) => {

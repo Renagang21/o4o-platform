@@ -26,6 +26,7 @@ import {
   type StoreOwnerServiceKey,
 } from '../utils/store-organization.resolver.js';
 import { hasActiveServiceMembership } from '../utils/service-membership.js';
+import { isStoreOwner } from '../utils/store-owner.utils.js';
 
 // Extend Express Request interface
 declare module 'express' {
@@ -139,6 +140,52 @@ async function hasSignageServiceMembership(user: any, serviceKey: string): Promi
   if (!userId) return false;
   if (!AppDataSource.isInitialized) return true;
   return hasActiveServiceMembership(AppDataSource, userId, serviceKey);
+}
+
+/**
+ * Neture 기본 가입 약국의 **자기 매장** signage 진입 — store 계열 게이트(store · operator-or-store 의 store 분기 ·
+ * store read) 전용. operator · community · supplier 경로에서 호출하지 않는다.
+ *
+ * WO-NETURE-PHARMACY-PREDEPLOY-ACCESS-ALIGNMENT-V1: Neture 승인 약국은 kpa-society membership 이 없다. 매장 기본
+ * 기능(동영상 · 스케줄 · TV 재생)은 내 매장 API 와 같은 기준 — `isStoreOwner(ds, userId, 'kpa', org)`(Neture 기본 가입
+ * 원장 active ∧ 그 조직 owner/admin/manager ∧ 매장계약) — 으로 연다. 세미프랜차이즈 가입은 요구하지 않는다.
+ * 요청 org 가 판정된 매장 org 와 같을 때만 허용한다(다른 org 지정 → 차단). 판정 실패는 차단(fail-closed).
+ */
+async function resolveLedgerPharmacyStoreEntry(
+  user: any,
+  serviceKey: string,
+  organizationId: string | undefined,
+): Promise<{ status: 'ok' | 'deny' } | { status: 'agreement'; pendingAgreement: unknown }> {
+  if (serviceKey !== 'kpa-society' || !organizationId) return { status: 'deny' };
+  const userId = user?.id || user?.userId;
+  if (!userId || !AppDataSource.isInitialized) return { status: 'deny' };
+  try {
+    const result = await isStoreOwner(AppDataSource, userId, 'kpa', organizationId);
+    if (result.organizationId !== organizationId) return { status: 'deny' };
+    if (result.pendingAgreement) return { status: 'agreement', pendingAgreement: result.pendingAgreement };
+    return { status: result.isOwner ? 'ok' : 'deny' };
+  } catch {
+    return { status: 'deny' };
+  }
+}
+
+/** membership 미보유 시 원장 약국 진입 판정 결과에 맞춘 차단 응답. 통과면 null. */
+function denyUnlessLedgerEntry(
+  res: Response,
+  serviceKey: string,
+  entry: Awaited<ReturnType<typeof resolveLedgerPharmacyStoreEntry>>,
+) {
+  if (entry.status === 'ok') return null;
+  if (entry.status === 'agreement') {
+    // 내 매장 API(createRequireStoreOwner)와 같은 응답 — 화면이 같은 계약 동의 흐름으로 보낸다.
+    return res.status(428).json({
+      success: false,
+      error: '매장 경영자 이용계약에 동의한 뒤 이용할 수 있습니다.',
+      code: 'STORE_OWNER_AGREEMENT_REQUIRED',
+      pendingPolicyAcceptances: [entry.pendingAgreement],
+    });
+  }
+  return denySignageMembership(res, serviceKey);
 }
 
 /** membership 차단 응답 (모든 signage 게이트 공통) */
@@ -382,16 +429,18 @@ export const requireSignageStore = async (
 
   const serviceKey = getSignageServiceKey(req);
 
-  // role/organization 검사 이전에 서비스 회원 여부를 먼저 본다 (membership = 진입 자격)
-  if (!(await hasSignageServiceMembership(req.user, serviceKey))) {
-    return denySignageMembership(res, serviceKey);
-  }
-
   // Organization ID can come from header, query, or body
   const organizationId =
     (req.headers['x-organization-id'] as string) ||
     (req.query.organizationId as string) ||
     req.body?.organizationId;
+
+  // role/organization 검사 이전에 서비스 회원 여부를 먼저 본다 (membership = 진입 자격)
+  //   membership 이 없으면 Neture 원장 약국의 자기 매장 org 만 대신 인정한다(아래 소유 · 귀속 검사는 그대로 거친다).
+  if (!(await hasSignageServiceMembership(req.user, serviceKey))) {
+    const denied = denyUnlessLedgerEntry(res, serviceKey, await resolveLedgerPharmacyStoreEntry(req.user, serviceKey, organizationId));
+    if (denied) return denied;
+  }
 
   if (!organizationId) {
     return res.status(400).json({
@@ -480,7 +529,17 @@ export const allowSignageStoreRead = async (
   const serviceKey = getSignageServiceKey(req);
 
   if (!(await hasSignageServiceMembership(req.user, serviceKey))) {
-    return denySignageMembership(res, serviceKey);
+    // Neture 원장 약국: 명시한 자기 매장 org 로만 store 읽기(TV 재생 등). user.organizationId 추정은 쓰지 않는다.
+    const ledgerOrg = (req.headers['x-organization-id'] as string) || (req.query.organizationId as string);
+    const denied = denyUnlessLedgerEntry(res, serviceKey, await resolveLedgerPharmacyStoreEntry(req.user, serviceKey, ledgerOrg));
+    if (denied) return denied;
+    req.signageContext = {
+      role: 'store',
+      serviceKey,
+      organizationId: ledgerOrg,
+      permissions: [`signage:store:${ledgerOrg}:read`],
+    };
+    return next();
   }
 
   const organizationId =
@@ -546,17 +605,20 @@ export const requireSignageOperatorOrStore = async (
 
   const serviceKey = getSignageServiceKey(req);
 
-  if (!(await hasSignageServiceMembership(req.user, serviceKey))) {
-    return denySignageMembership(res, serviceKey);
-  }
-
   const organizationId =
     (req.headers['x-organization-id'] as string) ||
     (req.query.organizationId as string) ||
     req.body?.organizationId;
 
+  const isMember = await hasSignageServiceMembership(req.user, serviceKey);
+  if (!isMember) {
+    // Neture 원장 약국: store 분기만 허용(operator 분기는 건너뛴다). 아래 소유 · 귀속 검사는 그대로 거친다.
+    const denied = denyUnlessLedgerEntry(res, serviceKey, await resolveLedgerPharmacyStoreEntry(req.user, serviceKey, organizationId));
+    if (denied) return denied;
+  }
+
   // Check operator permission first
-  if (hasSignageOperatorPermission(req.user, serviceKey)) {
+  if (isMember && hasSignageOperatorPermission(req.user, serviceKey)) {
     req.signageContext = {
       role: 'operator',
       serviceKey,

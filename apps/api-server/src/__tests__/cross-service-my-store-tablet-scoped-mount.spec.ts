@@ -130,13 +130,7 @@ describe('mount · client 계약 (raw source)', () => {
       .toContain('createStoreTabletRoutes(dataSource)');
   });
 
-  it('H. KCos 프론트 태블릿 client 는 서비스 스코프 경로를 쓴다', () => {
-    const kcos = read(path.join(repo, 'services/web-k-cosmetics/src/services/tabletDisplayApi.ts'));
-    expect(kcos).toContain("const BASE = '/cosmetics/store';");
-    for (const text of [kcos]) {
-      expect(text).not.toMatch(/['"`]\/store\/(tablets|interest)/);
-    }
-  });
+  // H. KCos 프론트 태블릿 client 단언은 앱(services/web-k-cosmetics) 퇴역 삭제로 제거 — WO-O4O-KCOSMETICS-RETIREMENT-PHASE1A-WEB-APP-AND-DEPLOY-TARGET-V1.
 
   it('I. 공통 태블릿 화면(@o4o/store-ui-core)이 노출 사유를 표시한다', () => {
     const core = path.join(repo, 'packages/store-ui-core/src/components/tablet');

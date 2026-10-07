@@ -7,6 +7,8 @@
  * WO-O4O-CROSS-SERVICE-LOGIN-ENTRY-AND-RETURN-FLOW-FIX-V1:
  *   플랫폼 이메일 계정 로그인 + Google 로 계속하기(공통 <LoginMethods />). 가입 · 아이디/비밀번호 찾기는
  *   계정 센터(Neture) 정식 화면. 오류는 각 폼이 표시하고, 여기서는 서비스 미가입(SERVICE_NOT_MEMBER) 안내만 더한다.
+ * WO-NETURE-PHARMACY-CUTOVER-COMPAT-V1: 미가입 응답에 `serviceAccess`(Neture 약국 · 세미프랜차이즈 상태)가 있으면
+ *   서버 문구와 상태별 신청 링크(store.neture.co.kr)를 보인다. 정지 상태는 링크 없이 문구(운영자 문의)만.
  *
  * 원칙:
  * - 로그인은 항상 모달로만 수행
@@ -16,10 +18,11 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { X } from 'lucide-react';
-import { LoginMethods, type AuthLoginResult } from '@o4o/auth-react';
+import { LoginMethods, type AuthLoginResult, type AuthServiceAccess } from '@o4o/auth-react';
 import { useAuth, authClient, type User } from '../contexts/AuthContext';
 import { useAuthModal } from '../contexts/AuthModalContext';
 import { getKpaPostLoginRoute } from '../config/dashboard';
+import { semiFranchiseAccessLink, type SemiFranchiseAccessLink } from '../lib/semiFranchiseAccess';
 
 export default function LoginModal() {
   const navigate = useNavigate();
@@ -28,6 +31,7 @@ export default function LoginModal() {
   const [error, setError] = useState<string | null>(null);
   // WO-O4O-LOGIN-SERVICE-NOT-MEMBER-UX-V1: 서비스 미가입 차단은 일반 오류와 분리 표시
   const [isNotMember, setIsNotMember] = useState(false);
+  const [accessLink, setAccessLink] = useState<SemiFranchiseAccessLink | null>(null);
 
   const isOpen = activeModal === 'login';
 
@@ -50,6 +54,7 @@ export default function LoginModal() {
     if (isOpen) {
       setError(null);
       setIsNotMember(false);
+      setAccessLink(null);
     }
   }, [isOpen]);
 
@@ -74,10 +79,18 @@ export default function LoginModal() {
   };
 
   /** 서비스 미가입만 여기서 안내한다 — 그 밖의 오류는 각 폼이 이미 표시한다(중복 표시 방지). */
-  const showNotMember = ({ code }: { code?: string }) => {
+  const showNotMember = ({ code, error: emailError, message: googleError, serviceAccess }: { code?: string; error?: string; message?: string; serviceAccess?: AuthServiceAccess }) => {
+    const serverError = emailError ?? googleError;
     const notMember = code === 'SERVICE_NOT_MEMBER';
     setIsNotMember(notMember);
-    setError(notMember ? '이 계정은 이 약국 서비스에 가입되어 있지 않습니다. 서비스 이용 절차를 진행해 주세요.' : null);
+    setAccessLink(notMember ? semiFranchiseAccessLink(serviceAccess?.next) : null);
+    if (!notMember) {
+      setError(null);
+    } else if (serviceAccess && serverError) {
+      setError(serverError);
+    } else {
+      setError('이 계정은 이 약국 서비스에 가입되어 있지 않습니다. 서비스 이용 절차를 진행해 주세요.');
+    }
   };
 
   if (!isOpen) return null;
@@ -124,19 +137,24 @@ export default function LoginModal() {
           {isNotMember && error && (
             <div className="mb-4 p-4 bg-amber-50 border border-amber-200 rounded-lg">
               <p className="text-sm text-amber-800">{error}</p>
+              {accessLink && (
+                <a href={accessLink.href} className="mt-2 inline-block text-sm font-medium text-amber-900 underline">
+                  {accessLink.label} →
+                </a>
+              )}
             </div>
           )}
 
           <LoginMethods<User>
             loginWithEmail={loginWithEmail}
             api={authClient}
-            onSuccess={(loggedInUser) => { setError(null); setIsNotMember(false); finishLogin(loggedInUser); }}
+            onSuccess={(loggedInUser) => { setError(null); setIsNotMember(false); setAccessLink(null); finishLogin(loggedInUser); }}
             onEmailFailure={(result: AuthLoginResult<User>) => showNotMember(result)}
             google={{
               getConfig: getGoogleAuthConfig,
               loginWithGoogle,
               signupWithGoogle,
-              onStart: () => { setError(null); setIsNotMember(false); },
+              onStart: () => { setError(null); setIsNotMember(false); setAccessLink(null); },
               onError: showNotMember,
               termsHref: '/policy',
               privacyHref: '/privacy',

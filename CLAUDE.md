@@ -96,6 +96,15 @@ stage · commit · push 절차의 정본은 [`O4O-GIT-PARALLEL-WORK-SAFETY-V1`](
 - **`--force` push 금지.** 공유 `main` 이력은 재작성하지 않는다(오타 정정도 후속 커밋으로).
 - 완료 조건은 저장소 전체 clean 이 아니라 **`이번 WO 범위의 미커밋 변경 0건` + 내 커밋이 push 된 PR 이 integration-ready**. `origin/main` 포함은 사용자가 통합을 승인해 merge 한 뒤의 확인 항목이다 — 완료 조건을 채우려고 먼저 merge 하지 않는다.
 
+## 명령 실행 원칙
+
+`.claude/settings.json` 의 ask 규칙은 allow 보다 우선한다. 한 줄로 묶인 명령에 ask 대상이 하나라도 섞이면 **전체가 승인 대상**이 되어, 무엇을 승인하는지 흐려진다.
+
+- `gh api` 는 다른 명령과 `;` · `&&` · `|` 로 묶지 말고 단독으로 실행한다.
+- `gh pr view` · `gh pr checks` · `gh run view` 로 알 수 있는 정보는 `gh api` 를 쓰지 않는다.
+- `gh api` 는 GET 조회만 사용하고, `-X` · `--method` · `-f` · `-F` · `--input` 옵션은 쓰지 않는다.
+- 결과 표시용 `echo` 는 생략한다.
+
 ## DB · 보안 경계
 
 - **기본 환경은 프로덕션이다.** 접속 절차 · 포트 · 프록시 · 도구는 [`SETUP.md`](SETUP.md) 가 유일 정본이다 (여기 복제하지 않는다).
@@ -194,7 +203,7 @@ import type { RelatedEntity } from './related.entity.js';
 
 ## 9. 도메인별 규칙 (참조)
 
-Cosmetics(`cosmetics_` 독립 스키마 · 주문은 §4 경유) · Business Service(OpenAPI 계약 우선) · Design Core(신규 화면은 Design Core v1.0) — 정본은 [`CANONICAL-INDEX` §5](docs/CANONICAL-INDEX.md).
+Cosmetics(`cosmetics_` 독립 스키마 · 주문은 §4 경유) · Design Core(신규 화면은 Design Core v1.0) — 정본은 [`CANONICAL-INDEX` §5](docs/CANONICAL-INDEX.md).
 `O4O-RETAIL-STABLE-V1` 은 현행 규칙이 아니라 **판정 대기(UNKNOWN)** — [`CANONICAL-INDEX` §9](docs/CANONICAL-INDEX.md).
 
 ## 10. KPA Society 구조
@@ -263,6 +272,6 @@ forum · lms · signage 는 **플랫폼 공통 구조**. KPA 가 reference imple
 
 ---
 
-*Updated: 2026-10-04*
-*Version: 9.3*
+*Updated: 2026-10-06*
+*Version: 9.4*
 *Status: Active — Claude Code Entry Point*

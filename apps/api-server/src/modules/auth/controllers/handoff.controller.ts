@@ -55,6 +55,30 @@ import {
 import { extractToken } from '../../../common/middleware/auth/auth-context.helpers.js';
 import { verifyAccessToken } from '../../../utils/token.utils.js';
 import logger from '../../../utils/logger.js';
+import {
+  defaultSemiFranchiseAccessResolver,
+  semiFranchiseAccessKeyFor,
+  serviceNotMemberMessage,
+} from '../../../common/auth/service-login-eligibility.policy.js';
+import type { SemiFranchiseServiceAccess } from '../../neture-pharmacy/services/semi-franchise-service-access.js';
+import { toAccessDetails } from '../../neture-pharmacy/services/semi-franchise-service-access.js';
+
+/**
+ * WO-NETURE-PHARMACY-CUTOVER-COMPAT-V1: 세미프랜차이즈 자격 (직접 로그인 gate 와 같은 기준).
+ * 대상 서비스 membership 이 active 가 아닐 때만, 카탈로그 `semiFranchiseAccessKey` 가 있는 대상 서비스에 한해 조회한다.
+ * 그 밖에는 null — 기존 membership 검사만 적용(기존 경로의 조회 · 응답 불변).
+ * 독립 자격(카탈로그 `semiFranchiseAccessKey` 주석): KPA row 가 suspended · withdrawn 이어도 Neture 자격이 있으면
+ * 통과한다. 통과 판정은 호출부의 지역 값일 뿐 — 세션에 싣는 memberships · roles 는 원장 그대로다.
+ */
+async function resolveHandoffSemiFranchiseAccess(
+  userId: string,
+  targetServiceKey: string | undefined,
+  currentStatus: string | undefined,
+): Promise<SemiFranchiseServiceAccess | null> {
+  if (currentStatus === 'active') return null;
+  const key = semiFranchiseAccessKeyFor(targetServiceKey);
+  return key ? defaultSemiFranchiseAccessResolver(userId, key) : null;
+}
 
 /**
  * WO-O4O-REPRESENTATIVE-ENTRY-RETURN-HANDOFF-AND-HOME-NAVIGATION-V1 §6 — 폐기된 세션의 handoff 부활 차단.
@@ -303,18 +327,27 @@ export class HandoffController extends BaseController {
       // WO-O4O-AUTH-HANDOFF-ACTIVE-MEMBERSHIP-VERIFICATION-V1:
       //   target service active membership 검증 (generation 시점).
       //   미가입 / pending / rejected / suspended / withdrawn 모두 차단.
-      const targetMembership: { status: string }[] = await AppDataSource.query(
+      const serviceMembership: { status: string }[] = await AppDataSource.query(
         `SELECT status FROM service_memberships
            WHERE user_id = $1 AND service_key = $2`,
         [user.id, targetServiceKey],
       );
+      // WO-NETURE-PHARMACY-CUTOVER-COMPAT-V1: active membership 이 없어도(row 의 suspended · withdrawn 포함 — 독립 자격)
+      //   세미프랜차이즈 자격(Neture 기본 active ∧ 세미프랜차이즈 active)이 있으면 통과한다. 없으면 기존 검사 그대로.
+      const sfAccess = await resolveHandoffSemiFranchiseAccess(user.id, targetServiceKey, serviceMembership[0]?.status);
+      const targetMembership = sfAccess?.allowed ? [{ status: 'active' }] : serviceMembership;
 
       if (targetMembership.length === 0) {
         logger.warn('[Handoff] Blocked generation — no membership on target service', {
           userId: user.id,
           targetServiceKey,
           reason: 'no_membership',
+          semiFranchiseNext: sfAccess?.next ?? undefined,
         });
+        if (sfAccess) {
+          const serviceAccess = toAccessDetails(sfAccess);
+          return BaseController.forbidden(res, serviceNotMemberMessage(serviceAccess), 'HANDOFF_TARGET_NO_MEMBERSHIP', { serviceAccess });
+        }
         return BaseController.error(
           res,
           '대상 서비스에 가입되어 있지 않습니다.',
@@ -522,16 +555,24 @@ export class HandoffController extends BaseController {
       //   target service active membership 재검증 (exchange 시점).
       //   generation 시점에 active 였더라도 60s TTL 사이에 status 가 변경됐을 수 있으므로
       //   exchange 시점에 다시 확인 (이중 안전판).
-      const targetMembership = memberships.find(
-        m => m.serviceKey === payload.targetServiceKey,
-      );
+      // WO-NETURE-PHARMACY-CUTOVER-COMPAT-V1: 세미프랜차이즈 자격도 exchange 시점에 다시 확인한다.
+      const serviceMembership = memberships.find(m => m.serviceKey === payload.targetServiceKey);
+      const sfAccess = await resolveHandoffSemiFranchiseAccess(user.id, payload.targetServiceKey, serviceMembership?.status);
+      const targetMembership = sfAccess?.allowed
+        ? { serviceKey: payload.targetServiceKey, status: 'active' }
+        : serviceMembership;
 
       if (!targetMembership) {
         logger.warn('[Handoff] Blocked exchange — no membership on target service', {
           userId: user.id,
           targetServiceKey: payload.targetServiceKey,
           reason: 'no_membership',
+          semiFranchiseNext: sfAccess?.next ?? undefined,
         });
+        if (sfAccess) {
+          const serviceAccess = toAccessDetails(sfAccess);
+          return BaseController.forbidden(res, serviceNotMemberMessage(serviceAccess), 'HANDOFF_TARGET_NO_MEMBERSHIP', { serviceAccess });
+        }
         return BaseController.error(
           res,
           '대상 서비스에 가입되어 있지 않습니다.',

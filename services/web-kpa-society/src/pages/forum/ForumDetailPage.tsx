@@ -24,11 +24,15 @@ import { useAuth } from '../../contexts';
 import { colors, typography } from '../../styles/theme';
 import type { ForumPost, ForumComment } from '../../types';
 import { PLATFORM_ROLES, ROLES, hasAnyRole } from '../../lib/role-constants';
+import { ForumWriteDeniedNotice, forumWriteErrorMessage, useForumWriteAccess } from '../../lib/forumWriteAccess';
 
 export function ForumDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
+  // WO-NETURE-PHARMACY-PREDEPLOY-ACCESS-ALIGNMENT-V1: 쓰기 자격이 없으면(서버 판정) 좋아요 · 댓글 대신 안내
+  const writeAccess = useForumWriteAccess();
+  const writeDenied = writeAccess?.allowed === false;
   const [post, setPost] = useState<ForumPost | null>(null);
   const [comments, setComments] = useState<ForumComment[]>([]);
   const [loading, setLoading] = useState(true);
@@ -99,7 +103,7 @@ export function ForumDetailPage() {
       if (msg.includes('token') || msg.includes('expired') || msg.includes('401')) {
         toast.error('로그인 세션이 만료되었습니다. 페이지를 새로고침해 주세요.');
       } else {
-        toast.error('좋아요 처리에 실패했습니다.');
+        toast.error(forumWriteErrorMessage(err?.code) ?? '좋아요 처리에 실패했습니다.');
       }
     } finally {
       setIsLiking(false);
@@ -124,8 +128,8 @@ export function ForumDetailPage() {
       const res = await forumApi.createComment(post.id, newComment);
       setComments([...comments, res.data]);
       setNewComment('');
-    } catch (err) {
-      toast.error('댓글 작성에 실패했습니다.');
+    } catch (err: any) {
+      toast.error(forumWriteErrorMessage(err?.code) ?? '댓글 작성에 실패했습니다.');
     } finally {
       setSubmitting(false);
     }
@@ -262,7 +266,7 @@ export function ForumDetailPage() {
           <ForumLikeButton
             liked={isLiked}
             count={post.likeCount ?? 0}
-            disabled={isLiking || !user}
+            disabled={isLiking || !user || writeDenied}
             onClick={handleLike}
           />
 
@@ -319,21 +323,25 @@ export function ForumDetailPage() {
       <div style={styles.commentsSection}>
         <h2 style={styles.commentsTitle}>댓글 {comments.length}개</h2>
 
-        <ForumCommentForm
-          value={newComment}
-          onChange={setNewComment}
-          onSubmit={handleCommentSubmit}
-          submitting={submitting}
-          authenticated={!!user}
-          accentColor={colors.primary}
-          style={styles.commentForm}
-          loginPrompt={
-            <div style={styles.loginPrompt}>
-              <p style={styles.loginPromptText}>로그인하고 대화에 참여하세요</p>
-              <Link to="/login" style={styles.loginButton}>로그인 →</Link>
-            </div>
-          }
-        />
+        {writeDenied && writeAccess ? (
+          <div style={styles.commentForm}><ForumWriteDeniedNotice access={writeAccess} /></div>
+        ) : (
+          <ForumCommentForm
+            value={newComment}
+            onChange={setNewComment}
+            onSubmit={handleCommentSubmit}
+            submitting={submitting}
+            authenticated={!!user}
+            accentColor={colors.primary}
+            style={styles.commentForm}
+            loginPrompt={
+              <div style={styles.loginPrompt}>
+                <p style={styles.loginPromptText}>로그인하고 대화에 참여하세요</p>
+                <Link to="/login" style={styles.loginButton}>로그인 →</Link>
+              </div>
+            }
+          />
+        )}
 
         <ForumCommentList
           comments={comments.map((comment) => ({

@@ -47,10 +47,14 @@ import {
 import { normalizePhoneDigits, isPhoneShapeValid } from '../../common/auth/phone-shape.js';
 import { ADMIN_SURFACE_KEY } from '../../utils/session-origin.js';
 import {
-  isServiceLoginAllowed,
   SERVICE_NOT_MEMBER_CODE,
   SERVICE_NOT_MEMBER_MESSAGE,
+  defaultSemiFranchiseAccessResolver,
+  evaluateServiceLoginAccess,
+  serviceNotMemberMessage,
+  type SemiFranchiseAccessResolver,
 } from '../../common/auth/service-login-eligibility.policy.js';
+import type { SemiFranchiseAccessDetails } from '../../modules/neture-pharmacy/services/semi-franchise-service-access.js';
 import { getServiceOrigin } from '../../config/service-catalog.js';
 import { generateTokensWithContext, injectRolesIntoPublicData } from './auth-context.helper.js';
 import { passwordCredentialService } from './password-credential.service.js';
@@ -129,6 +133,8 @@ export class EmailAuthError extends Error {
     readonly code: EmailAuthErrorCode,
     message?: string,
     readonly details?: Record<string, unknown>,
+    /** SERVICE_NOT_MEMBER 의 세미프랜차이즈 자격 상태 — 응답 최상위 `serviceAccess` (WO-NETURE-PHARMACY-CUTOVER-COMPAT-V1) */
+    readonly serviceAccess?: SemiFranchiseAccessDetails,
   ) {
     super(message || MESSAGE[code]);
     this.name = 'EmailAuthError';
@@ -245,6 +251,8 @@ export interface EmailAuthServiceDeps {
   /** 역할 이름 조회. 기본값은 `roleAssignmentService.getRoleNames`. */
   readRoles?: (userId: string) => Promise<string[]>;
   now?: () => Date;
+  /** 세미프랜차이즈 이용 자격 조회. 기본값은 `defaultSemiFranchiseAccessResolver`. */
+  resolveSemiFranchiseAccess?: SemiFranchiseAccessResolver;
 }
 
 function uniqueViolation(error: unknown): boolean {
@@ -262,6 +270,7 @@ export class EmailAuthService {
   private readonly now: () => Date;
   private readonly revokeAllSessions: (userId: string) => Promise<void>;
   private readonly readRoles: (userId: string) => Promise<string[]>;
+  private readonly resolveSemiFranchiseAccess: SemiFranchiseAccessResolver;
 
   constructor(deps: EmailAuthServiceDeps = {}) {
     this._dataSource = deps.dataSource;
@@ -271,6 +280,7 @@ export class EmailAuthService {
       deps.issueSession ??
       ((user, sessionServiceKey) => generateTokensWithContext(user, 'neture.co.kr', sessionServiceKey, 'password'));
     this.now = deps.now ?? (() => new Date());
+    this.resolveSemiFranchiseAccess = deps.resolveSemiFranchiseAccess ?? defaultSemiFranchiseAccessResolver;
     this.revokeAllSessions =
       deps.revokeAllSessions ??
       (async (userId) => {
@@ -468,9 +478,15 @@ export class EmailAuthService {
     }
     // 인증은 성공했다 — 이제 서비스 이용 자격만 본다(INVALID_CREDENTIALS 와 다른 응답).
     //   발급한 토큰은 위와 같이 버린다(DB 쓰기 전).
-    if (!isServiceLoginAllowed(input.loginMembershipGateKey, roles, memberships)) {
+    //   WO-NETURE-PHARMACY-CUTOVER-COMPAT-V1: 세미프랜차이즈 자격 서비스는 Neture 기본 ∧ 세미프랜차이즈 active 도 통과.
+    const access = await evaluateServiceLoginAccess(
+      this.resolveSemiFranchiseAccess, user.id, input.loginMembershipGateKey, roles, memberships,
+    );
+    if (!access.allowed) {
       this.logActivity(user.id, input, false, 'service_not_member').catch(() => {});
-      throw new EmailAuthError(SERVICE_NOT_MEMBER_CODE);
+      throw new EmailAuthError(
+        SERVICE_NOT_MEMBER_CODE, serviceNotMemberMessage(access.serviceAccess), undefined, access.serviceAccess,
+      );
     }
 
     const tokenFamily = tokenUtils.getTokenFamily(tokens.refreshToken);

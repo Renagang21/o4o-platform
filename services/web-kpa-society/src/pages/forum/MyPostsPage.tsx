@@ -11,6 +11,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { MyForumPostsTemplate, type ForumListItem } from '@o4o/shared-space-ui';
 import { useAuth } from '../../contexts/AuthContext';
+import { useForumWriteAccess } from '../../lib/forumWriteAccess';
 import { forumApi } from '../../api/forum';
 import type { ForumPost } from '../../types';
 
@@ -44,6 +45,8 @@ function toListItem(post: ForumPost): ForumListItem {
 export function MyPostsPage() {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
+  // WO-NETURE-PHARMACY-PREDEPLOY-ACCESS-ALIGNMENT-V1: 쓰기 자격이 없으면 빈 목록의 글쓰기 버튼을 보이지 않는다
+  const writeAccess = useForumWriteAccess();
   const [searchParams, setSearchParams] = useSearchParams();
   const page = Math.max(1, Number(searchParams.get('page') || 1));
 
@@ -113,7 +116,7 @@ export function MyPostsPage() {
           renderEmpty={() => (
             <div className="py-12 text-center text-sm text-slate-500">
               작성한 글이 없습니다.
-              <div className="mt-3">
+              {writeAccess?.allowed !== false && <div className="mt-3">
                 <button
                   className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white"
                   onClick={() => navigate('/forum/write')}
@@ -121,7 +124,7 @@ export function MyPostsPage() {
                 >
                   글쓰기
                 </button>
-              </div>
+              </div>}
             </div>
           )}
         />
