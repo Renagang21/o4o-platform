@@ -175,6 +175,9 @@ describe('① 업무 이해(실행 전)', () => {
   it('확정 의도는 요청 글에서 결정적으로 — AI 가 commitBoundary=false · user 조건 누락이어도 강제 · 끄는 방향은 없다', async () => {
     for (const r of ['네뚜레에 신제품 등록해줘', '이 내용으로 저장해 주세요', '신청서 제출까지 해줘', '결제 진행해줘', '거래처에 메일 보내줘', '주문해줘'])
       expect([r, requestHasCommitIntent(r)]).toEqual([r, true]);
+    // 일반적인 지시형(부탁 · 바랍니다 · 넣어줘 · 처리)도 확정이다.
+    for (const r of ['이 내용 저장 부탁해', '신청서 제출 바랍니다', '상품 등록 부탁드립니다', '주문 넣어줘', '결제 처리해줘', '게시글 등록도 해줘'])
+      expect([r, requestHasCommitIntent(r)]).toEqual([r, true]);
     for (const r of ['등록된 제품 목록 찾아줘', '주문 내역 보여줘', '약학정보원에서 아모디핀 찾아줘', '저장 위치가 어디야'])
       expect([r, requestHasCommitIntent(r)]).toEqual([r, false]);
 
@@ -296,6 +299,11 @@ describe('사용자 완료 선언 판별', () => {
     expect(isCompletionDeclaration('아직 못 했어요', null)).toBe(false);
     expect(isCompletionDeclaration('됐고 이제 두 번째 제품도 등록해줘', null)).toBe(false);
     expect(isCompletionDeclaration('게보린', 'value_confirmation')).toBe(false);
+    // 발화 전체가 선언일 때만 — 값 · 대상 답의 부분 문자열 · 상태 질문은 선언이 아니다(run 을 닫지 않는다).
+    for (const t of ['완료된 주문', '끝났나요?', '됐나요', '됐어?', '완료 화면 열어', '끝난 거 맞아요?', '등록 완료된 것'])
+      expect([t, isCompletionDeclaration(t, 'target_confirmation')]).toEqual([t, false]);
+    for (const t of ['완료', '완료됐어요', '끝났어요', '되었습니다', '네, 됐어요', '전부 끝냈어요', '마쳤습니다.'])
+      expect([t, isCompletionDeclaration(t, null)]).toEqual([t, true]);
   });
 });
 
