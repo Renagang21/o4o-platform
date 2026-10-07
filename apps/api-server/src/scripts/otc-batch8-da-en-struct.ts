@@ -19,7 +19,7 @@ import { buildDrugOtcEnConsumerHtml, type DrugOtcEnTranslation } from '../module
 
 const md5 = (s: string): string => crypto.createHash('md5').update(s).digest('hex');
 const DATA_DIR = path.resolve(process.cwd(), 'src/scripts/data');
-const TR_DIR = path.resolve(process.cwd(), '../../docs/guides/products/drug/pilot-en-design/translations');
+const TR_DIR = path.resolve(process.cwd(), 'src/scripts/data/product-descriptions/drug/pilot-en-design/translations');
 const WO = 'WO-O4O-OTC-GROUNDED-UPGRADE-BATCH8-BUNDLE-B-KO-EN-DA-V1';
 
 const GROUPS = [

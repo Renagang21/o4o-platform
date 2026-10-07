@@ -31,11 +31,11 @@
 5. 201 Created (pendingApproval: true)
 ```
 
-### sohae21@naver.com 시나리오 재현
+### [REDACTED_EMAIL_C] 시나리오 재현
 
 | 단계 | 동작 | 결과 |
 |------|------|------|
-| 1 | Neture 가입 페이지에서 sohae21@naver.com 입력 | - |
+| 1 | Neture 가입 페이지에서 [REDACTED_EMAIL_C] 입력 | - |
 | 2 | **새 비밀번호** 입력 | - |
 | 3 | POST /api/v1/auth/register `{service: 'neture'}` | - |
 | 4 | 서버: existingUser 발견 | - |
@@ -188,7 +188,7 @@ service_memberships
 | 항목 | 판정 |
 |------|------|
 | 백엔드 멀티 서비스 가입 | ✅ **정상 동작** |
-| sohae21@naver.com 차단 원인 | **PASSWORD_MISMATCH** (기존 비밀번호 불일치, 설계 의도대로) |
+| [REDACTED_EMAIL_C] 차단 원인 | **PASSWORD_MISMATCH** (기존 비밀번호 불일치, 설계 의도대로) |
 | 코드 버그 | ❌ 없음 |
 | UX 개선 필요 | ⚠️ PASSWORD_MISMATCH 처리 UX |
 | RoleAssignment 접두사 | ⚠️ 가입 시 접두사 누락 (기능 영향 없음, 정리 권고) |

@@ -237,7 +237,7 @@ Market Trial 연결 0 · serviceKey 충돌 0.
 
 ### 8-1. 생성한 테스트 데이터 (전량 기록)
 
-공급자 `sohae21@naver.com` (supplier `251adaaf-fecb-4c7c-b2a8-7f81ffef36a6`, ACTIVE) 소유:
+공급자 `[REDACTED_EMAIL_C]` (supplier `251adaaf-fecb-4c7c-b2a8-7f81ffef36a6`, ACTIVE) 소유:
 
 | offerId | masterId | 명칭 | 최종 상태 |
 |---------|----------|------|-----------|
@@ -287,7 +287,7 @@ Market Trial 연결 0 · serviceKey 충돌 0.
 
 **약국 경영자 상품 조회의 HTTP 200 경로** — `pharmacy-hub:store_owner` 역할로 로그인 가능한 계정이 없다.
 
-- 역할 보유 계정 `renagang21@gmail.com` 은 `service_memberships(pharmacy-hub, active, store_owner)` +
+- 역할 보유 계정 `[REDACTED_EMAIL_B]` 은 `service_memberships(pharmacy-hub, active, store_owner)` +
   `role_assignments('pharmacy-hub:store_owner')` 를 모두 갖고 있으나, **프로덕션 비밀번호가
   `docs/local/TEST-ACCOUNTS.local.md` 값과 불일치**해 로그인이 401 `INVALID_CREDENTIALS` 이다
   (직전 WO `WO-PHARMACY-HUB-DEPLOY-BOOTSTRAP-AND-MEMBERSHIP-E2E-V1 §4-3` 에서 확인된 동일 사유).

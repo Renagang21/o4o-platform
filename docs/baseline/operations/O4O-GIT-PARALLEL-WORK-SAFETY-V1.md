@@ -2,14 +2,16 @@
 
 > WO-O4O-GIT-PARALLEL-WORK-SAFETY-CLEANUP-V1 (2026-08-07)
 >
-> 대상: 다중 PC · 다중 세션(사람 + AI)이 **같은 `main` 브랜치에 직접 커밋**하는 현재 운영 방식.
-> 브랜치 전략 · PR 의무화 · worktree 도입은 이 문서의 범위가 아니다(CLAUDE.md §1 유지).
+> 대상: 다중 PC · 다중 세션(사람 + AI)이 같은 저장소에서 stage · commit · push 하는 방식.
+> **2026-10-04 개정**: `main` 직접 커밋 운영은 종료됐다. 작업은 전용 worktree + branch, `main` 반영은 사용자 통합 승인 후
+> PR merge 로만 한다 — 정본은 [`AGENTS.md` §4-1](../../../AGENTS.md#4-1-parallel-session--worktree-policy). 이 문서는 그 안의
+> stage · commit · push 안전 계약을 다룬다.
 
 ---
 
 ## 1. 문제
 
-`main` 직접 작업 자체는 유지한다. 실제로 사고가 나는 지점은 브랜치 전략이 아니라
+(2026-08 작성 당시 전제는 `main` 직접 작업이었다 — 현재 흐름은 상단 개정 참조.) 실제로 사고가 나는 지점은 브랜치 전략이 아니라
 **"내가 고르지 않은 변경이 내 커밋에 섞이는 것"** 이다. 발생 경로는 두 가지다.
 
 | 경로 | 내용 |
@@ -47,8 +49,8 @@ lockfile 이 어긋난 채 push 되면 실패한다. 즉 lockfile 동기화 요�
 | 2 | **dirty 상태에서 pull 금지** | rebase/merge 가 남의 변경을 끌어들이거나 충돌로 훼손한다 |
 | 3 | **임의 `stash` / `reset` / `restore` 금지** | 다른 세션의 진행 중 작업을 되돌린다 |
 | 4 | **path-specific stage** | `git add <경로>` 만 사용. `git add .` · `git add -A` · `git commit -am` 금지 |
-| 5 | **push 전 `origin/main` 이동 확인** | `git fetch origin` → `git status -sb` 로 divergence 확인 후 push |
-| 6 | **`--force` push 금지** | 공유 `main` 의 이력은 재작성하지 않는다(오타 정정도 후속 커밋으로) |
+| 5 | **push 전 원격 이동 확인** | `git fetch origin` → `git status -sb`(작업 branch upstream 대비) + `git rev-list --left-right --count origin/main...HEAD`(`origin/main` 대비 — `status -sb` 는 upstream 만 비교한다) 확인 후 작업 branch 를 push. `main` 으로는 push 하지 않는다 |
+| 6 | **`--force` push 금지** | push 한 branch · 공유 `main` 의 이력은 재작성하지 않는다(오타 정정도 후속 커밋으로) |
 
 **작업트리가 dirty 하다는 사실만으로는 중지 사유가 아니다.**
 중지 사유는 다음 셋뿐이다.
@@ -58,24 +60,39 @@ lockfile 이 어긋난 채 push 되면 실패한다. 즉 lockfile 동기화 요�
 - 개별 stage 가 **불가능**한 형태(같은 파일에 두 작업이 섞임)
 
 **완료 조건**은 저장소 전체 clean 이 아니라
-`이번 WO 범위의 미커밋 변경 0건` + `HEAD == origin/main` 이다.
+`이번 WO 범위의 미커밋 변경 0건` + `작업 branch push + PR integration-ready` 이다.
+`main` 포함은 사용자가 통합을 승인해 merge 한 뒤의 확인 항목이다([`AGENTS.md` §4-2](../../../AGENTS.md)).
 
 ---
 
 ## 4. PC 이동 기준
 
-다른 PC 로 옮기기 전 아래 5개를 모두 만족해야 한다.
+> 2026-10-04 개정: 작업은 전용 worktree + branch 에서 하고 `main` 반영은 사용자 통합 승인 후 PR merge 로만 한다
+> ([`AGENTS.md` §4-1](../../../AGENTS.md#4-1-parallel-session--worktree-policy)). 아래는 그 흐름 기준이다 — 작업 commit 이
+> `origin/main` 에 아직 없는 것이 정상이다.
+
+다른 PC 로 옮기기 전 아래를 모두 만족해야 한다.
 
 ```text
-[ ] 현재 브랜치가 main
-[ ] HEAD == origin/main            (git fetch origin && git status -sb)
-[ ] 추적 파일 clean                (git status --short 에 M/D/R 없음)
-[ ] 로컬 전용 commit 없음          (git log origin/main..HEAD 가 비어 있음)
+[ ] 작업 worktree 완전 clean                 (git status --short 출력이 비어 있음 — staged A · M · D · R · T · C · U · 미추적 ?? 모두 0)
+[ ] 작업 branch 의 commit 이 원격에 push 됨   (git fetch origin && git log origin/<branch>..HEAD 가 비어 있음)
+[ ] 작업 branch 의 PR 이 열려 있음            (gh pr view <branch> · merge 는 하지 않음)
+[ ] 인계 메모 push 됨                         (/handoff — HANDOFF.md 를 branch · PR 에 커밋)
 [ ] 현재 작업에 필요한 미추적 파일 없음
+[ ] 기준 main checkout 에 로컬 전용 commit · dirty 없음 (있으면 다른 세션 소유로 보고, 정리하지 않음)
 ```
 
-마지막 항목이 핵심이다. 미추적 파일은 push 되지 않으므로,
+미추적 파일 항목이 핵심이다. 미추적 파일은 push 되지 않으므로,
 다음 PC 에서 이어서 쓸 파일이 남아 있으면 **먼저 커밋하거나 명시적으로 포기**해야 한다.
+다음 PC 에서는 `/start` 로 동기화 · 인계(열린 PR 의 HANDOFF.md 포함)를 확인한 뒤,
+같은 branch 를 이어 쓰려면 그 branch 로 전용 worktree 를 만든다:
+
+```bash
+WT_ROOT="$(dirname "$(dirname "$(git rev-parse --path-format=absolute --git-common-dir)")")/o4o-wt"
+git worktree add "$WT_ROOT/<slug>" <branch>
+```
+
+경로 기준과 PowerShell 형태는 [`AGENTS.md` §4-1(a)](../../../AGENTS.md#4-1-parallel-session--worktree-policy). 상대 경로 `../o4o-wt` 는 실행 위치에 따라 달라지므로 쓰지 않는다.
 
 ### stash
 
@@ -87,7 +104,7 @@ lockfile 이 어긋난 채 push 되면 실패한다. 즉 lockfile 동기화 요�
 
 ## 5. 이 문서가 바꾸지 않은 것
 
-- 브랜치 전략(`main` 직접 작업 유지) · PR 의무화 · worktree
+- 브랜치 전략 · PR · worktree — 2026-08 원본은 `main` 직접 작업을 유지했으나, 2026-10 이후 정본은 [`AGENTS.md` §4-1](../../../AGENTS.md#4-1-parallel-session--worktree-policy) 이다
 - CI 워크플로 · dependency · lockfile
 - `CLAUDE.md` · `AGENTS.md` (§6·§7 은 이후 WO-O4O-CROSSSESSION-SAFE-COMMIT-AND-LITERAL-CONSUMER-GUARD-V1 에서 한 줄씩 참조만 추가했다)
 - 기존 stash 6건

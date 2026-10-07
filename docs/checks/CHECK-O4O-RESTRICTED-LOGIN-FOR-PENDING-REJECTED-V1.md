@@ -213,7 +213,7 @@ cloud-sql-proxy 경유 **read-only SELECT** (2026-07-31, `o4o_platform`).
 | 정리 일시 | 2026-07-31 |
 | 정리 방식 | **공식 관리자 API 단독** — DB 직접 mutation 0 |
 | 사용 API | `DELETE /api/v1/admin/users/88a9fd90-62b6-403e-9c9b-957cbc710b27` |
-| 권한 | `renariver21@gmail.com` (`platform:super_admin`) — 활성 `platform:*` 보유 유일 계정. 역할 임시 부여 없음 |
+| 권한 | `[REDACTED_EMAIL_D]` (`platform:super_admin`) — 활성 `platform:*` 보유 유일 계정. 역할 임시 부여 없음 |
 | 응답 | `200 { success: true, message: "User deleted successfully" }` |
 | 삭제 유형 | **하드 삭제** (`AdminUserController.deleteUser` 는 hard delete 를 먼저 시도하고 FK 위반 시에만 비활성화로 폴백한다. 본 대상은 `NO ACTION` FK 참조가 0건이라 hard 경로로 완료) |
 
@@ -241,7 +241,7 @@ cloud-sql-proxy 경유 **read-only SELECT** (2026-07-31, `o4o_platform`).
 
 - `users` 총계 41 → **40** (정확히 1건)
 - `pharmacy-hub` membership 6 → **5** (정확히 1건)
-- 다른 계정 정상: `sohae2100@gmail.com`·`sohae21@naver.com`·`renagang21@gmail.com`·`renariver21@gmail.com` 전부 `isActive=true` 유지
+- 다른 계정 정상: `[REDACTED_EMAIL_A]`·`[REDACTED_EMAIL_C]`·`[REDACTED_EMAIL_B]`·`[REDACTED_EMAIL_D]` 전부 `isActive=true` 유지
 - 다른 `[E2E_TEST]` 계정 2건 · Pharmacy-Hub 상품 테스트 데이터 · OTC/HFF 병행 작업물 **미접촉**
 
 > 부수 발견(본 WO 범위 밖): `GET /api/v1/admin/users?search=...` 가 검색어 유무와 무관하게 500 을 반환한다.

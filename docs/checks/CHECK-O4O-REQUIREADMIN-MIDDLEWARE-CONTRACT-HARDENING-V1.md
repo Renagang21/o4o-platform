@@ -120,7 +120,7 @@ schema 0 / migration 0 / DB write 0 / 새 테스트 계정 0.
 | 경로 | 계정 | 배포 전 | 배포 후 |
 |---|---|---|---|
 | `GET /api/v1/content/assets` | 비인증 | 401 `AUTH_REQUIRED` | 401 `AUTH_REQUIRED` (유지) |
-| `GET /api/v1/content/assets` | `sohae2100@gmail.com` (super_admin 아님) | **500** — 가드를 통과해 핸들러까지 도달 | **403 `FORBIDDEN`** |
+| `GET /api/v1/content/assets` | `[REDACTED_EMAIL_A]` (super_admin 아님) | **500** — 가드를 통과해 핸들러까지 도달 | **403 `FORBIDDEN`** |
 
 배포 전 500 은 "권한 검사를 건너뛰고 핸들러에 들어가 DB 조회에서 실패한" 결과로, **우회가 실제로 성립했다는 직접 증거**다.
 배포 후 같은 계정이 403 으로 차단된다.

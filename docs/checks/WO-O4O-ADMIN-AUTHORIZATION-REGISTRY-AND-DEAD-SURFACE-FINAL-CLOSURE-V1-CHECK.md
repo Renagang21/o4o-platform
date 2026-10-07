@@ -198,7 +198,7 @@ cosmetics:admin / cosmetics:operator / kpa-society:admin
 이번 WO 는 **어떤 역할도 변경하지 않았다.** `role_assignments` write 0건.
 
 ```
-대상          = sohae2100@gmail.com
+대상          = [REDACTED_EMAIL_A]
 이전 상태     = platform:super_admin / is_active=false
 현재 상태     = platform:super_admin / is_active=true
 변경 방식     = 기존 assignment 재활성

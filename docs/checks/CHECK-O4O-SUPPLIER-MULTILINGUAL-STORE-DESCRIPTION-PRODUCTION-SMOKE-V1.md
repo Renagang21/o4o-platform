@@ -13,7 +13,7 @@ WO 의 중지 조건 **"임시 연결과 생성 데이터를 완전히 원복할
 
 ## 1. 사용한 테스트 대상 — 없음(생성 시 원복 불가 확정 → 미생성)
 
-- 가용 공급자 계정 2개: renagang21@gmail.com(supplier `91169739…`, **ACTIVE**), sohae21@naver.com(`251adaaf…`, **PENDING**·미활성).
+- 가용 공급자 계정 2개: [REDACTED_EMAIL_B](supplier `91169739…`, **ACTIVE**), [REDACTED_EMAIL_C](`251adaaf…`, **PENDING**·미활성).
 - **renagang21 공급자의 현재 `supplier_product_offers` = 0건**(read-only 확인) → 편집기 드로어(공급자 등록 상품에서만 진입)를 열 수 있는 **기존 상품이 없음**. smoke 를 하려면 테스트 오퍼를 **신규 생성**해야 한다.
 - (참고) renagang21 공급자에게 **과거 삭제된 오퍼의 STORE 설명서 10건이 orphan `hidden` 상태로 잔존**(전부 ko, 5개 master) — "오퍼는 지워도 설명서는 남는다"는 §6 패턴의 실제 증거.
 

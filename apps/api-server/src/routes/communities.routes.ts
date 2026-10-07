@@ -37,6 +37,7 @@ import { Router, type RequestHandler, type Response } from 'express';
 import { asyncHandler } from '../middleware/error-handler.js';
 import type { AuthRequest } from '../types/auth.js';
 import { AppDataSource } from '../database/connection.js';
+import { resolveSemiFranchiseCommunityAccess } from '../modules/neture-pharmacy/services/semi-franchise-community-access.js';
 // CodeQL(js/missing-rate-limiting) 이 인식하는 limiter 를 쓴다(선례: admin/platform-accounts.routes).
 import { apiLimiter } from '../middleware/rateLimiter.js';
 import { resolveCommunity, requireCommunityScope } from '../middleware/community-scope.middleware.js';
@@ -368,7 +369,22 @@ export function createCommunitiesRoutes(
     optionalAuth,
     asyncHandler(async (req, res) => {
       const user = await currentCommunityUser(req as AuthRequest);
-      const access = resolveCommunityAccess(user, String(req.params.communityKey ?? ''));
+      const communityKey = String(req.params.communityKey ?? '');
+      // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: 세미프랜차이즈 커뮤니티는 가입 상태로 직접 판정(게이트와 같은 함수).
+      const sf = await resolveSemiFranchiseCommunityAccess(AppDataSource, user?.id ?? null, communityKey);
+      if (sf.semiFranchise) {
+        res.json({
+          success: true,
+          data: {
+            communityKey,
+            allowed: sf.allowed,
+            reason: sf.allowed ? null : user?.id ? 'SEMI_FRANCHISE_MEMBERSHIP_REQUIRED' : 'AUTH_REQUIRED',
+            via: sf.allowed ? `semi-franchise:${sf.semiFranchiseKey}` : null,
+          },
+        });
+        return;
+      }
+      const access = resolveCommunityAccess(user, communityKey);
       if (access.reason === 'UNKNOWN_COMMUNITY') {
         res.status(404).json({ success: false, error: 'Community not found', code: 'COMMUNITY_NOT_FOUND' });
         return;

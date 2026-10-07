@@ -314,7 +314,7 @@ SSOT·AGENT-GUIDE·HFF README는 **정책과 정렬**(구매 지원 최우선·�
 
 ## 16. DB 검증 SQL (미실행 — Cloud Console SQL Editor 전용)
 
-> 이 노트북은 Cloud SQL 5432 아웃바운드가 차단(`34.64.96.252:5432` TcpTest 실패, memory `o4o-laptop-cloudsql-5432-blocked`)되어 `gcloud sql connect`가 연결 단계에서 무한 대기한다. 아래 SELECT는 **Cloud Console → SQL → Query Editor**(HTTPS 서버측 실행)로만 확인한다. 전부 read-only.
+> 이 노트북은 Cloud SQL 5432 아웃바운드가 차단(`[REDACTED_IP]:5432` TcpTest 실패, memory `o4o-laptop-cloudsql-5432-blocked`)되어 `gcloud sql connect`가 연결 단계에서 무한 대기한다. 아래 SELECT는 **Cloud Console → SQL → Query Editor**(HTTPS 서버측 실행)로만 확인한다. 전부 read-only.
 
 ```sql
 -- (D-1) 작성주체(source_type) × 사용축(description_type) × status 분포 — 혼재/구분 규모

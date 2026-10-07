@@ -102,6 +102,31 @@ export interface O4OService {
   /** 가입 가능 여부 */
   joinEnabled: boolean;
   /**
+   * 로그인 자격 게이트 (optional — 미지정 = false). WO-O4O-SERVICE-NOT-MEMBER-AUTH-CONTRACT-RESTORATION-V1
+   *
+   *   true 면 이 서비스 호스트에서의 로그인은 **인증 성공 뒤** 이 서비스의 `service_memberships` row(상태 불문)를
+   *   요구하고, 없으면 세션을 발급하지 않고 `SERVICE_NOT_MEMBER` 로 응답한다(`service-login-eligibility.policy`).
+   *   **가입 신청이 그 서비스 호스트 밖에서 이뤄지는 서비스만** true 로 둔다 — 자기 호스트에서 로그인한 뒤
+   *   신청하는 서비스(대표 진입 · `/join` · 로그인 후 신청)를 막으면 신규 사용자가 가입할 길이 사라진다.
+   *   다른 서비스와 공유하는 호스트(예: kpa-society.co.kr = kpa-branch 의 domain)에서는 판정하지 않는다.
+   */
+  loginMembershipRequired?: boolean;
+  /**
+   * Neture 세미프랜차이즈 이용 자격 (optional). WO-NETURE-PHARMACY-CUTOVER-COMPAT-V1
+   *
+   *   값(세미프랜차이즈 key)이 있으면 이 서비스의 직접 로그인 게이트와 handoff 는 이 서비스 membership 이 없어도
+   *   **Neture 기본 가입 active ∧ 이 세미프랜차이즈 가입 active** 인 약국 조직의 owner/admin/manager 를 통과시킨다
+   *   (`modules/neture-pharmacy/services/semi-franchise-service-access`).
+   *
+   *   **독립 자격**: 이 서비스 membership 과 Neture 가입은 서로 독립이다.
+   *     - 이 서비스 membership 이 active 가 아니면(없음 · pending · suspended · withdrawn 모두) Neture 자격을 따로 본다.
+   *       이 서비스 가입의 정지 · 탈퇴가 Neture 자격을 정지시키지 않는다.
+   *     - Neture 자격은 이 서비스 membership · role 을 만들거나 바꾸지 않는다 — 이 서비스 회원 전용 권한
+   *       (membership active · `kpa:*` role 을 요구하는 backend 경로)은 Neture 자격으로 열리지 않는다.
+   *     - 플랫폼 계정 자체의 정지 · 비활성 차단은 이 판정보다 먼저 적용된다(requireAuth · `user.isActive`).
+   */
+  semiFranchiseAccessKey?: string;
+  /**
    * Service Workspace 자격 metadata (optional — 미지정 시 `UNDECIDED_SERVICE_WORKSPACE`).
    * WO-O4O-SERVICE-TENANT-FOUNDATION-V1. 단일 출처 — 서비스별 `if (serviceKey === ...)` 분기 금지.
    */
@@ -125,8 +150,18 @@ export const O4O_SERVICES: O4OService[] = [
     // WO-O4O-SERVICE-CATALOG-CANONICAL-DOMAIN-AND-PH-JOIN-CLEANUP-V1: 로그인 전 진입(대표 홈)과 같은 호스트로 정렬.
     domain: 'pharmacy.neture.co.kr',
     legacyDomains: ['kpa-society.co.kr'],
-    description: '약사 커뮤니티 서비스',
+    // 사업 의미 = 약국 사업자 대상 세미프랜차이즈 운영 서비스 (docs/baseline/O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1.md).
+    //   role prefix `kpa:*` 는 이 키의 legacy 이름이며 KPA 분회(`kpa-branch` · kpa.neture.co.kr)가 아니다.
+    //   WO-O4O-STORE-OWNER-RBAC-AND-SERVICE-SEMANTICS-FINAL-ALIGNMENT-V1: description 을 정본 의미로 맞췄다.
+    //   종전 '약사 커뮤니티 서비스' 는 이 서비스 **안의 포럼**(약사 커뮤니티)을 서비스 전체 설명으로 쓴 것이라,
+    //   약국 사업자 대상 운영 서비스라는 현재 의미와 어긋났다. 커뮤니티 자체의 이름은 community-catalog 가 따로 갖는다.
+    description: '약국 사업자 매장 운영 서비스',
     joinEnabled: true,
+    // 이 호스트 밖에서 이용 자격이 생긴다 — 미자격 사용자에게 이 호스트 세션을 주지 않는다.
+    //   Neture 약국은 store.neture.co.kr 에서 기본 가입 · pharmacy 세미프랜차이즈 가입을 신청하며 kpa-society
+    //   service_membership 은 생기지 않는다(DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1 §17) → 아래 semiFranchiseAccessKey.
+    loginMembershipRequired: true,
+    semiFranchiseAccessKey: 'pharmacy',
     // STANDARD_CANDIDATE — 매장 linkage(kpa) · kpa:store_owner · kpa:operator 가 현재 runtime 에 있다. 자동 활성화 아님.
     workspace: { workspaceMode: 'standard', storeWorkspaceEnabled: true, operatorWorkspaceEnabled: true },
   },
@@ -136,8 +171,11 @@ export const O4O_SERVICES: O4OService[] = [
     // WO-O4O-SERVICE-CATALOG-CANONICAL-DOMAIN-AND-PH-JOIN-CLEANUP-V1: 로그인 전 진입(대표 홈)과 같은 호스트로 정렬.
     domain: 'retail.neture.co.kr',
     legacyDomains: ['k-cosmetics.site'],
+    // 사업 의미 = 화장품 · 일반 소매 사업자 대상 세미프랜차이즈 운영 서비스 (O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1).
     description: '화장품 유통 플랫폼',
     joinEnabled: true,
+    // 가입은 Store Workspace(store.neture.co.kr) 신청 · 운영자 경로에서 만든다.
+    loginMembershipRequired: true,
     // STANDARD_CANDIDATE — 매장 linkage(cosmetics) · cosmetics:store_owner · cosmetics:operator 존재. 자동 활성화 아님.
     workspace: { workspaceMode: 'standard', storeWorkspaceEnabled: true, operatorWorkspaceEnabled: true },
   },
@@ -203,6 +241,7 @@ export const O4O_SERVICES: O4OService[] = [
    * joinEnabled=false — 분회 소속은 자가 신청이 아니라 분회 운영자 승인 경로로만 생성된다.
    */
   {
+    // 사업 의미 = 약사 개인 대상 KPA 분회 서비스 (O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1). 매장 서비스가 아니다.
     key: 'kpa-branch',
     name: 'KPA Branch',
     nameKo: '약사회 분회',

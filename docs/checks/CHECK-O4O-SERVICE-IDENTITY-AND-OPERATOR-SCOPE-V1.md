@@ -670,7 +670,7 @@ apply     inserted 2 + 1 + 2 = 5 → 재실행 inserted 0 (멱등)
 7. 실제 브라우저 접근 검증 · Google 실제 로그인(U2/U3 최종 판정)
 ```
 
-**역할 계획 (사용자 결정 2026-09-28)** — 대상 `renagang21@gmail.com`, 역할 4개:
+**역할 계획 (사용자 결정 2026-09-28)** — 대상 `[REDACTED_EMAIL_B]`, 역할 4개:
 `community:admin` · `kpa-branch:admin` · `supplier:admin` · `funding:admin`
 
 | 확인 | 결과 (read-only · 2026-09-28) |
@@ -1145,7 +1145,7 @@ API 트래픽 전환 · Web/Admin 배포 · 역할 부여는 **포함하지 않�
 | 롤백 revision | API `03756-txs` · neture-web `01661-mq6` · admin `01316-hhp` |
 | 게이트 | `DEPLOY_ENABLED=false`. PR #247 병합 push 로 뜬 `Deploy Web Services` run `36504815617` 은 `deploy-hold-notice` 만 실행 · 모든 deploy job skipped(실측) |
 
-**역할 부여 대상 — 추정 없이 확인(read-only).** `renagang21@gmail.com`(`c0156a4a…`): 동일 이메일 사용자 1명 · Google `linked_accounts` 1행 · sub 유일 · active. 현재 대상 4 역할(`community:admin` · `supplier:admin` · `funding:admin` · `kpa-branch:admin`) 없음. 부여 경로 = 정식 `POST /admin/operator-assignments`(역할 1개/호출 · audit · membership ensure). 새 4 역할은 **API 배포 후에야** 서버 allowlist(`operator-role-catalog.ts`)에 들어가고 admin UI 목록은 admin 배포 후 보인다. 사용자가 대상과 방식(Playwright 창에서 사용자가 super_admin Google 로그인 → 에이전트가 지정 조작)을 확인했다.
+**역할 부여 대상 — 추정 없이 확인(read-only).** `[REDACTED_EMAIL_B]`(`c0156a4a…`): 동일 이메일 사용자 1명 · Google `linked_accounts` 1행 · sub 유일 · active. 현재 대상 4 역할(`community:admin` · `supplier:admin` · `funding:admin` · `kpa-branch:admin`) 없음. 부여 경로 = 정식 `POST /admin/operator-assignments`(역할 1개/호출 · audit · membership ensure). 새 4 역할은 **API 배포 후에야** 서버 allowlist(`operator-role-catalog.ts`)에 들어가고 admin UI 목록은 admin 배포 후 보인다. 사용자가 대상과 방식(Playwright 창에서 사용자가 super_admin Google 로그인 → 에이전트가 지정 조작)을 확인했다.
 
 > **정정 (2026-09-29 · §8-9 실측):** "현재 대상 4 역할 없음" 은 그 시점 사실이고 **지금은 아니다.**
 > `role_assignments` 실측: `community:admin` · `supplier:admin` · `funding:admin` **부여됨** ·

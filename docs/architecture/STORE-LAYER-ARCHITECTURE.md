@@ -3,6 +3,8 @@
 > **WO-O4O-STORE-ARCHITECTURE-FREEZE-V1**
 > **Date: 2026-02-22**
 > **Status: FROZEN**
+>
+> (2026-10-05 사실 정정) 본문의 `web-glucoseview` 소비자 표기는 2026-02-22 시점 값이다 — GlucoseView 는 서비스 은퇴로 현행 `services/` 에 없다([CHECK](../checks/CHECK-O4O-GLUCOSEVIEW-FULL-LEGACY-REMOVAL-V1.md)). 동결 구조 · 정책 변경 아님.
 
 ---
 

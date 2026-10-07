@@ -74,7 +74,7 @@ IR-O4O-STANDARD-CONTENT-EDITOR-PLATFORM-EVALUATION-V1 P0 Gap "미디어 라이�
 
 → store-ui-core 공용 picker가 KPA wrapper(주입 mediaApi+isOperator) 경유로 프로덕션에서 정상 동작. 기존 소비처(StoreLocalProductsPage) 회귀 없음.
 
-**Unit B (편집기 onMediaLibraryPick 배선) — 코드/배포 검증(해당 DOM 미클릭).** 미디어-연동 편집기 화면(Neture 공급자 상품등록/ProductDetailDrawer, KCos 제작편집)은 테스트 계정 게이트로 브라우저 도달 실패: (a) 작동하는 Neture 공급자 계정(sohae21@naver.com)은 **공급자 활성화 미완료**로 상품등록 게이트 차단, (b) 트라이얼/store-owner 계정(renagang21@gmail.com)은 **401(스테일 자격증명)**. typecheck EXIT 0 + 배포 성공 + 동일 계약(Neture 3화면=기존 연동, KCos=셸 경유)으로 검증. 후속: 계정 활성화/자격증명 갱신 후 편집기 툴바 이미지→라이브러리 삽입 DOM 확인.
+**Unit B (편집기 onMediaLibraryPick 배선) — 코드/배포 검증(해당 DOM 미클릭).** 미디어-연동 편집기 화면(Neture 공급자 상품등록/ProductDetailDrawer, KCos 제작편집)은 테스트 계정 게이트로 브라우저 도달 실패: (a) 작동하는 Neture 공급자 계정([REDACTED_EMAIL_C])은 **공급자 활성화 미완료**로 상품등록 게이트 차단, (b) 트라이얼/store-owner 계정([REDACTED_EMAIL_B])은 **401(스테일 자격증명)**. typecheck EXIT 0 + 배포 성공 + 동일 계약(Neture 3화면=기존 연동, KCos=셸 경유)으로 검증. 후속: 계정 활성화/자격증명 갱신 후 편집기 툴바 이미지→라이브러리 삽입 DOM 확인.
 
 ### 6.2 커버리지 범위 (범위 미확대 — WO §caution 준수)
 이번 WO는 **표준 인프라(공용 picker·Media Type 계약·셸 prop) + 기준 배선**을 확립. 편집기 미디어 라이브러리 실제 배선은 **Neture 공급자 3화면 + KCos 제작편집(셸 경로)**. KPA 및 KCos의 개별 콘텐츠 화면(블로그·상품설명·QR 등 다수)의 화면별 배선은 회귀 위험 관리를 위해 **후속 커버리지 WO**로 분리(한 번에 40+ 화면 배선 지양).

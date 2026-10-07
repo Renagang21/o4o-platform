@@ -13,7 +13,7 @@
 | 조사 일시 | 2026-07-07 |
 | 접속 | Cloud SQL Auth Proxy (`google-cloud-sdk/bin/cloud-sql-proxy`, 127.0.0.1:15455) → psql SELECT |
 | 인스턴스 | `netureyoutube:asia-northeast3:o4o-platform-db` / DB `o4o_platform` |
-| 인증 | gcloud ADC(sohae2100@gmail.com) + DB 계정 `o4o_api`(Cloud Run env read-only 추출) |
+| 인증 | gcloud ADC([REDACTED_EMAIL_A]) + DB 계정 `o4o_api`(Cloud Run env read-only 추출) |
 | write | **0** (SELECT/COUNT/GROUP BY 전용, 임시 CTE만) |
 
 ## 2. 사용한 문서

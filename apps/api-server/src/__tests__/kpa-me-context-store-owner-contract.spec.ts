@@ -4,11 +4,14 @@
  * `GET /api/v1/kpa/me-context` 의 `isStoreOwner` 가 백엔드 매장 게이트
  * (createRequireStoreOwner → isStoreOwner → resolveStoreOrganization)와 **같은 판정**인지.
  *
- * 진리표 4상태:
- *   1) active membership + store_owner role + 조직 해석 성공 → true
- *   2) suspended membership + role                          → false
- *   3) active membership + role 없음                        → false
- *   4) active membership + role 있으나 KPA 조직 없음        → false (종전 true → 불일치였다)
+ * WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1 (DESIGN §5) 이후 진리표:
+ *   약국 매장(`kpa`) 게이트 = **Neture 기본 가입 원장 active ∧ 그 조직의 owner/admin/manager**.
+ *   kpa-society membership · `kpa:store_owner` role 은 판정 근거가 아니다(대체, 누적 아님).
+ *   1) 원장 active 조직 1개                                  → true
+ *   2) 원장 active + kpa-society membership 정지            → true (membership 무관)
+ *   3) 원장 active + role 없음                              → true (role 무관)
+ *   4) membership · role 있으나 원장 active 조직 0          → false
+ *   5) 원장 active 조직 2개                                  → false (ambiguous)
  */
 
 import express from 'express';
@@ -19,7 +22,8 @@ import { createMeContextController } from '../routes/kpa/controllers/me-context.
 interface Scenario {
   membershipActive: boolean;
   hasRole: boolean;
-  orgs: string[];
+  /** neture_pharmacy_memberships.status='active' 인 (사용자 owner) 조직 */
+  ledgerOrgs: string[];
 }
 
 function makeDataSource(sc: Scenario) {
@@ -31,22 +35,18 @@ function makeDataSource(sc: Scenario) {
           member_status: sc.membershipActive ? 'active' : 'suspended',
           member_role: 'owner',
           membership_type: 'regular',
-          organization_id: sc.orgs[0] ?? null,
+          organization_id: sc.ledgerOrgs[0] ?? null,
           org_name: '테스트약국',
           org_type: 'pharmacy',
           org_member_role: 'owner',
         }];
       }
+      if (sql.includes('neture_pharmacy_memberships')) {
+        return sc.ledgerOrgs.map((id) => ({ organization_id: id, role: 'owner' }));
+      }
       if (sql.includes('service_memberships')) return sc.membershipActive ? [{ ok: 1 }] : [];
       if (sql.includes('role_assignments')) return sc.hasRole ? [{ ok: 1 }] : [];
-      if (sql.includes('organization_service_enrollments')) {
-        return sc.orgs.map((id) => ({ organization_id: id, role: 'owner' }));
-      }
-      if (sql.includes('organization_members')) {
-        return sc.orgs.map((id, i) => ({
-          organization_id: id, role: 'owner', is_primary: i === 0, joined_at: '2025-01-01',
-        }));
-      }
+      // 옛 판정 경로(enrollment/slug · 서비스 중립) — kpa 에서 호출되면 원장 밖 조직이 새는 것이므로 빈 응답.
       return [];
     }),
   } as any;
@@ -59,35 +59,35 @@ async function callMeContext(sc: Scenario) {
   return request(app).get('/me-context');
 }
 
-describe('축 C — /kpa/me-context isStoreOwner 진리표', () => {
-  it('1) active membership + role + 조직 1개 → isStoreOwner=true', async () => {
-    const res = await callMeContext({ membershipActive: true, hasRole: true, orgs: ['org-kpa'] });
+describe('축 C — /kpa/me-context isStoreOwner 진리표 (Neture 기본 가입 원장 기준)', () => {
+  it('1) 원장 active 조직 1개 → isStoreOwner=true', async () => {
+    const res = await callMeContext({ membershipActive: true, hasRole: true, ledgerOrgs: ['org-kpa'] });
     expect(res.status).toBe(200);
     expect(res.body.data.isStoreOwner).toBe(true);
     expect(res.body.data.storeOrganizationId).toBe('org-kpa');
     expect(res.body.data.pharmacistRole).toBe('pharmacy_owner');
   });
 
-  it('2) membership 정지 → isStoreOwner=false', async () => {
-    const res = await callMeContext({ membershipActive: false, hasRole: true, orgs: ['org-kpa'] });
-    expect(res.body.data.isStoreOwner).toBe(false);
+  it('2) kpa-society membership 정지여도 원장 active 면 isStoreOwner=true (membership 은 매장 게이트가 아니다)', async () => {
+    const res = await callMeContext({ membershipActive: false, hasRole: true, ledgerOrgs: ['org-kpa'] });
+    expect(res.body.data.isStoreOwner).toBe(true);
+    expect(res.body.data.storeOrganizationId).toBe('org-kpa');
   });
 
-  it('3) role 없음 → isStoreOwner=false', async () => {
-    const res = await callMeContext({ membershipActive: true, hasRole: false, orgs: ['org-kpa'] });
-    expect(res.body.data.isStoreOwner).toBe(false);
+  it('3) kpa:store_owner role 없어도 원장 active 면 isStoreOwner=true', async () => {
+    const res = await callMeContext({ membershipActive: true, hasRole: false, ledgerOrgs: ['org-kpa'] });
+    expect(res.body.data.isStoreOwner).toBe(true);
   });
 
-  it('4) role 은 있으나 KPA 연결 조직 0 → isStoreOwner=false (백엔드 403 과 일치)', async () => {
-    const res = await callMeContext({ membershipActive: true, hasRole: true, orgs: [] });
+  it('4) membership · role 이 있어도 원장 active 조직 0 → isStoreOwner=false (백엔드 403 과 일치)', async () => {
+    const res = await callMeContext({ membershipActive: true, hasRole: true, ledgerOrgs: [] });
     expect(res.body.data.isStoreOwner).toBe(false);
-    // 진단 필드: role 자체는 부여돼 있음을 구분해서 알린다(무증상 실패 방지).
-    expect(res.body.data.storeOwnerRoleGranted).toBe(true);
     expect(res.body.data.storeOrganizationId).toBeNull();
+    expect(res.body.data.storeOrganizationResolution).toBe('none');
   });
 
-  it('5) 후보 조직 2개(ambiguous) → isStoreOwner=false + resolution 노출', async () => {
-    const res = await callMeContext({ membershipActive: true, hasRole: true, orgs: ['org-a', 'org-b'] });
+  it('5) 원장 active 후보 조직 2개(ambiguous) → isStoreOwner=false + resolution 노출', async () => {
+    const res = await callMeContext({ membershipActive: true, hasRole: true, ledgerOrgs: ['org-a', 'org-b'] });
     expect(res.body.data.isStoreOwner).toBe(false);
     expect(res.body.data.storeOrganizationResolution).toBe('ambiguous');
   });

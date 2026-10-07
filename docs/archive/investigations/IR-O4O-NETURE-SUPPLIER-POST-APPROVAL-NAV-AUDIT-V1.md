@@ -2,7 +2,7 @@
 
 **조사 유형:** Investigation Report (IR)  
 **조사 대상:** Neture 공급자 가입 승인 후 공급자 대시보드가 메뉴에 표시되지 않는 문제  
-**조사 계정:** 김용우 / pharmabase@nate.com  
+**조사 계정:** [신청자 A] / [REDACTED_EMAIL]  
 **조사 날짜:** 2026-05-13  
 **상태:** COMPLETE
 
@@ -21,7 +21,7 @@ Neture에서 공급자 가입 신청 승인 후 사용자 메뉴 및 navigation�
 | 항목 | 값 |
 |------|---|
 | User ID | `6c91544f-cd3c-40b3-ac24-aaaecaba9fca` |
-| Email | pharmabase@nate.com |
+| Email | [REDACTED_EMAIL] |
 | Status | **active** |
 | isActive | true |
 | approvedAt | 2026-05-13T04:05:48 |
@@ -98,7 +98,7 @@ const hasDashboardRole = user.roles?.some((r: string) =>
 
 ---
 
-### 2-C. 현재 김용우의 roles
+### 2-C. 현재 [신청자 A]의 roles
 
 ```json
 ["member"]
@@ -254,7 +254,7 @@ const rawRole = smRow.role || 'member';
 
 ---
 
-### 데이터 복구 — 김용우 계정
+### 데이터 복구 — [신청자 A] 계정
 
 현재 DB 상태:
 - `role_assignments.role = 'member'` → `'supplier'`로 수정 필요
@@ -274,9 +274,9 @@ INSERT INTO neture_suppliers (user_id, slug, contact_email, contact_phone, repre
 VALUES (
   '6c91544f-cd3c-40b3-ac24-aaaecaba9fca',
   'supplier-6c91544f',
-  'pharmabase@nate.com',
-  '01097748779',
-  '김용우',
+  '[REDACTED_EMAIL]',
+  '[REDACTED_PHONE]',
+  '[신청자 A]',
   'PENDING',
   NOW(), NOW()
 )
@@ -329,7 +329,7 @@ DB 수정 후 재로그인 → `/auth/me` 재조회 → `roles=['supplier']` →
 
 `WO-O4O-NETURE-SUPPLIER-APPROVAL-ROLE-ASSIGN-FIX-V1`
 1. `operator-registration.service.ts` RETURNING 제거 → SELECT/UPDATE 분리
-2. 김용우 계정 role_assignments 수동 복구 (`member` → `supplier`)
+2. [신청자 A] 계정 role_assignments 수동 복구 (`member` → `supplier`)
 3. neture_suppliers 레코드 생성
 4. 동일 경로로 승인된 다른 supplier 계정 일괄 점검 (role='member'인 neture 승인 계정 조회)
 

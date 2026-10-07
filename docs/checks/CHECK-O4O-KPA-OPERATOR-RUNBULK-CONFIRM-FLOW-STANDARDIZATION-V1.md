@@ -87,7 +87,7 @@
 ## 6. 실브라우저 Smoke
 
 배포 리비전 `kpa-society-web-01730-x7x` (Deploy Web Services run 성공, WATCH_EXIT=0)
-에서 운영자(sohae2100@gmail.com) 로그인 후 `/operator/blog` 실브라우저 검증.
+에서 운영자([REDACTED_EMAIL_A]) 로그인 후 `/operator/blog` 실브라우저 검증.
 
 | 시나리오 | 조작 | 결과 |
 |----------|------|------|

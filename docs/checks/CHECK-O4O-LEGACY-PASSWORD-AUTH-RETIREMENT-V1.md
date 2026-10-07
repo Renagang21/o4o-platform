@@ -538,7 +538,7 @@ DELETE · DROP · migration 실행은 사용자 승인 전까지 하지 않았�
 브라우저 조작은 사용자가 수행하고(이 세션에 브라우저 자동화 도구 없음 · Google 이 자동 브라우저 로그인을 차단),
 **identity 판정은 이 세션이 DB read-only 로** 했다. 화면 문자열은 판정 근거로 쓰지 않았다.
 
-사용자 관측: `admin.neture.co.kr` → Google 로그인(`sohae2100@gmail.com`) → Admin 진입 →
+사용자 관측: `admin.neture.co.kr` → Google 로그인(`[REDACTED_EMAIL_A]`) → Admin 진입 →
 **F5 세션 유지** → 로그아웃 → **동일 Google 계정 재로그인** 까지 오류 없이 완료.
 
 서버측 실측 (기준선 = 2026-09-22 12:59:20)

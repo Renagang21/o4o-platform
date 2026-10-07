@@ -3,7 +3,7 @@
 > **유형:** Baseline (경계 고정 / 통합 금지선)
 > **WO:** `WO-O4O-SIGNAGE-STORE-PLAYLISTS-CANONICAL-KEEP-LEGACY-V1`
 > **선행 조사:** [`IR-O4O-SIGNAGE-STORE-PLAYLISTS-CANONICAL-DATA-MODEL-V1`](../investigations/IR-O4O-SIGNAGE-STORE-PLAYLISTS-CANONICAL-DATA-MODEL-V1.md)
-> **일자:** 2026-06-17
+> **일자:** 2026-06-17 · **최종 갱신:** 2026-10-05 (§3 재생기 범위 현행화 — 은퇴한 `signage-player-web` 제외)
 > **상태:** Active — 항목 모델 reconciliation 완료 전까지 유효
 
 ---
@@ -52,8 +52,12 @@
 - 내 매장 저장을 canonical `POST /api/signage/:serviceKey/playlists` 로 전환
 - `store_playlists` → `signage_playlists` migration / dual-write / mirror-write
 - schedule `storePlaylistId` → `playlistId` 재배선
-- 재생기(player) / API contract 변경
+- 재생기(player) / API contract 변경 — 대상은 **현행 매장 재생 경로**다: 각 web 앱의 `SignagePlayerSelectPage` · `SignagePlaybackPage`(KPA · KCos · PharmacyHub · store-web), 공개 재생 `PublicSignagePage` 와 그 API(`/store-playlists/public/:id` · `/api/signage/:serviceKey/active-content`)
 - K-Cosmetics `cosmetics_store_playlists` 스키마 통합
+
+> **현행화 (2026-10-05)** — 별도 앱 `services/signage-player-web` 은 은퇴했다(배포 PR #306 · 소스 PR #311, [CHECK](../checks/CHECK-O4O-RETIRED-WEB-RESIDUAL-CLEANUP-V1.md)).
+> 위 "재생기" 금지선에 더는 포함되지 않으며, 그 은퇴는 이 경계가 막는 통합 작업이 아니다.
+> 매장 태블릿 영상 재생의 canonical 경로는 Tablet ScreenSet 이다([`O4O-SIGNAGE-CANONICAL-PLAYBACK-PATH-V1`](O4O-SIGNAGE-CANONICAL-PLAYBACK-PATH-V1.md)) — 이 문서의 플레이리스트 저장 경계와는 별개 축이다.
 
 ---
 

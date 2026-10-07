@@ -178,7 +178,7 @@ WO 명시 제외 대상(매장 HUB · 거래 개입) 및 PH 에 대응 도메인
 
 ## 7. 브라우저 E2E (프로덕션)
 
-계정 `sohae2100@gmail.com` (`pharmacy-hub:operator` + `pharmacy-hub:admin`), `https://pharmacyhub.co.kr`.
+계정 `[REDACTED_EMAIL_A]` (`pharmacy-hub:operator` + `pharmacy-hub:admin`), `https://pharmacyhub.co.kr`.
 검증 시점 커밋: web `7e0e313db` (Deploy Web Services success) · api `c6983a670`(= `7184aba3f` 포함, Deploy API Server success).
 
 ### 7-1. 화면 전수 (deep link + 하드 새로고침)

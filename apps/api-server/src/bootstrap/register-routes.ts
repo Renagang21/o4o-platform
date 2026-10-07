@@ -47,6 +47,8 @@ import adminOperatorAssignmentsRoutes from '../routes/admin/operator-assignments
 import { createAdminFulfillmentRecoveryRoutes } from '../routes/admin/admin-fulfillment-recovery.routes.js';
 // WO-O4O-ADMIN-PLATFORM-SETTINGS-SUPER-ADMIN-ACCOUNT-MANAGEMENT-V1: 관리자 계정 안전 유지관리(additive)
 import adminPlatformAccountsRoutes from '../routes/admin/platform-accounts.routes.js';
+// WO-O4O-ADMIN-PENDING-WORK-COUNTER-AND-HEADER-ENTRY-V1: 관리자 대기 업무 카운터(read-only COUNT)
+import adminPendingTasksRoutes from '../routes/admin/pending-tasks.routes.js';
 // WO-O4O-PLATFORM-GLOBAL-USERS-READONLY-LIST-V1: 전체 사용자 read-only 조회(투영, additive)
 import adminPlatformUsersRoutes from '../routes/admin/platform-users.routes.js';
 // WO-O4O-SECURITY-IP-BLOCK-TTL-AND-UNBLOCK-V1
@@ -181,6 +183,7 @@ export async function registerCoreRoutes(app: Application): Promise<void> {
   //   기존 Pharmacy-Hub 전용 recovery 는 그대로 유지한다(무회귀).
   app.use('/api/v1/admin/fulfillment', createAdminFulfillmentRecoveryRoutes());
   app.use('/api/v1/admin/platform-accounts', adminPlatformAccountsRoutes);
+  app.use('/api/v1/admin/pending-tasks', adminPendingTasksRoutes);
   app.use('/api/v1/admin/platform-users', adminPlatformUsersRoutes);
   app.use('/api/v1/admin/security', adminSecurityBlockedIpsRoutes);
   // WO-O4O-SERVICE-MONITOR-SITES-TABLE-DEPENDENCY-AUDIT-AND-CLOSURE-V1 (판정 MONITOR_LEGACY_RETIRE):
@@ -968,6 +971,18 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
     // 31-d-2. Register Work Scope routes (WO-O4O-WORK-SCOPE-STORE-RESOLUTION-V0)
     //   cross-service read-only scope 해석. serviceKey 가 파라미터라 특정 서비스
     //   membership 가드를 걸지 않고 핸들러가 요청 serviceKey 로 직접 확인한다.
+    // WO-O4O-STORE-BUSINESS-ENROLLMENT-AND-MEMBER-ACCESS-V1:
+    //   매장 구성원(Store Member) 초대 · 수락 · 해제. 쓰기 경로의 조직은 요청이 고르지 않고
+    //   `isStoreOwner()` 해석 결과만 쓴다 — 다른 매장 id 를 넣어도 자기 매장 밖으로 못 나간다.
+    try {
+      const { createStoreMembershipRoutes } = await import('../routes/store/store-membership.routes.js');
+      const { requireAuth: storeMembershipAuth } = await import('../middleware/auth.middleware.js');
+      app.use('/api/v1/store', createStoreMembershipRoutes(dataSource, storeMembershipAuth as any));
+      logger.info('✅ Store Membership routes registered at /api/v1/store/members · /invitations');
+    } catch (storeMembershipError) {
+      logger.error('Failed to register Store Membership routes:', storeMembershipError);
+    }
+
     try {
       const { createWorkScopeRoutes } = await import('../routes/work-scope.routes.js');
       const { requireAuth: workScopeAuth } = await import('../middleware/auth.middleware.js');
@@ -1118,18 +1133,17 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
     // 원래 이 블록의 debug router 8개는 인증·환경 게이트가 없어 프로덕션에서
     // 인증 없이 승인(isPlatformAdmin 하드코딩)·RBAC 변경·매장 비활성화·
     // 게시글 하드 삭제·개인정보 조회가 가능했다(9bf1ed23f 긴급 차단).
-    // 생명주기 판정 완료 — 32f97773f 로 6개, 이후 pharmacy 제거로 남은 것은 user 1개뿐이다.
-    // 신규 debug router 는 반드시 이 게이트 안에 넣고 읽기 전용으로 만든다.
+    // 생명주기 판정 완료 — 32f97773f 로 6개, 이후 pharmacy · user 제거로 남은 것은 0개다.
+    // 신규 debug router 는 반드시 이 게이트 안에 넣고 읽기 전용 + requireAuth + role guard 로
+    // 만든다(비프로덕션 게이트는 접근 제어가 아니다 — CLAUDE.md §8-2).
     // 정본: docs/platform/debug/DEBUG-SSR-TEST-PAGE-GUIDE-V1.md
     if (process.env.NODE_ENV !== 'production') {
-    // User Debug Info endpoint (WO-O4O-DEBUG-USER-JSON-PAGE-V1) — 읽기 전용
-    try {
-      const { createUserDebugRouter } = await import('../routes/debug/user-debug.controller.js');
-      app.use('/__debug__/user', createUserDebugRouter(dataSource));
-      logger.info('✅ User Debug endpoint registered at /__debug__/user');
-    } catch (userDebugError) {
-      logger.error('Failed to register User Debug routes:', userDebugError);
-    }
+    // (제거됨) /__debug__/user — WO-O4O-DEBUG-USER-UNGUARDED-ROUTE-CLOSURE-V1
+    // 비프로덕션 전용이었으나 인증 · role guard 없이 email 로 `SELECT * FROM users` 등
+    // 사용자 · 멤버십 · role · 약사 정보를 렌더링했다(로컬 API 가 운영 DB 에 붙으면 무인증
+    // 개인정보 노출). 소비처 0 이고 이미 제거된 상태 변경 GET(sync-role · activate)과
+    // 없는 debug route 로 링크하고 있었다. 사용자 진단은 SETUP.md 의 read-only DB 채널로
+    // SELECT 한다(CLAUDE.md §8-1 CLI 우선). 재도입이 필요하면 가드를 갖춘 정식 기능으로 설계한다.
 
     // (제거됨) /__debug__/pharmacy — WO-O4O-PHARMACY-DEBUG-ROUTE-FINAL-LIFECYCLE-CLEANUP-V1
     // POST /deactivate 가 사유·감사·재활성화 없이 organizations.isActive 와 서비스

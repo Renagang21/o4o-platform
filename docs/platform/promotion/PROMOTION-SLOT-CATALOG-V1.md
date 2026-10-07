@@ -1,5 +1,7 @@
 # PROMOTION_SLOT_CATALOG_V1
 
+> **상태**: DRAFT · slotKey 카탈로그 초안(문서 끝 `Status: Draft`). `CmsContentSlot.slotKey` 를 이 목록으로 제한하는 코드 검증은 없고, 카탈로그 슬롯을 소비하는 공통 UI 도 미구현. 실행 · 폐기 결정 전까지 현재 기준 문서 아님 · **표기일**: 2026-10-04
+
 > 프로모션/안내 영역 공통 슬롯 카탈로그
 
 ---

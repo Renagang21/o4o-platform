@@ -10,7 +10,7 @@
 ## 1. 전체 판정
 
 - **Case B (확정)** — 운영 권한(operator/admin)이 `service_memberships.role`(참여 유형용 컬럼)에 저장된다.
-  Neture `sohae21@naver.com`처럼 membership.role 에 bare `operator` 가 들어간 사례가 이 경로의 산물.
+  Neture `[REDACTED_EMAIL_C]`처럼 membership.role 에 bare `operator` 가 들어간 사례가 이 경로의 산물.
 - **Case D (확정 — 미검증 write-path 존재)** — `PUT /operator/members/:userId` 가 `membershipRole` 을
   **검증 없이** `service_memberships.role` 에 UPDATE 한다. operator/admin/임의값 저장 가능.
 - **role_assignments 는 대체로 canonical (Case A/F)** — 운영 권한은 namespaced(`neture:operator` 등)로 저장하는

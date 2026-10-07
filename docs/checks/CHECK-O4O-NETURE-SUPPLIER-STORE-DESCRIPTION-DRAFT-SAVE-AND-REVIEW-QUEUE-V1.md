@@ -105,7 +105,7 @@
 
 ## smoke 결과 (실브라우저, prod, 2026-07-13)
 
-전 과정 **PASS**. 공급자(ACTIVE, renagang21@gmail.com=(주)네뚜레 공급자 테스트) → 운영자(sohae2100@gmail.com=Neture admin).
+전 과정 **PASS**. 공급자(ACTIVE, [REDACTED_EMAIL_B]=(주)네뚜레 공급자 테스트) → 운영자([REDACTED_EMAIL_A]=Neture admin).
 
 **생성한 smoke 데이터 (전량 `[SMOKE]` prefix):**
 | 항목 | id / 값 |

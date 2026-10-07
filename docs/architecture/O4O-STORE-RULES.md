@@ -2,10 +2,15 @@
 
 > **CLAUDE.md §4 (E-commerce Core) · §5 (O4O Store & Order) 의 상세 규칙** (구 §19-21에서 분리)
 > 이 문서는 CLAUDE.md의 보조 문서입니다.
+> **상태**: ACTIVE · **최종 갱신**: 2026-10-04 (유효 규칙 = `checkoutService.createOrder()` 단일 지점 · `*_orders`/`*_payments` 금지 · Store Template. Tourism · `OrderType` · 런타임 Guard · 소비자 주문 controller 서술은 아래 `2026-10-04 정합` 주석으로 사실 정정)
+>
+> (2026-10-04 정합) 매장 commerce 의 사업 경계는 [O4O-STORE-COMMERCE-BOUNDARY-V1](../baseline/O4O-STORE-COMMERCE-BOUNDARY-V1.md) 이 정한다 — 소비자→매장 O4O 주문은 현행 사업 기능이 아니며, 현재 살아 있는 내부 주문 경로는 공급자→매장 B2B([B2B 계약](../baseline/O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1.md)) 뿐이다. 이 문서는 "주문을 만든다면 어디서 · 어떻게" 의 가드레일이며, 주문 기능의 존재 근거가 아니다.
 
 ---
 
 ## 1. Tourism Domain Rules (§19)
+
+> (2026-10-04 정합) **Tourism 도메인은 은퇴했다.** `apps/api-server/src/routes/tourism` · `tourism_*` 엔티티/테이블은 존재하지 않으며(`canonical-schema-baseline.ts` 에 `tourism_*` 테이블 없음), DB enum `checkout_orders_order_type_enum` 에 `'TOURISM'` 값만 잔존한다. 아래 §1 은 과거 기록으로만 읽는다. 유효한 원칙(주문은 `checkoutService.createOrder()` 경유 · 서비스별 주문 테이블 금지)은 §2 에 그대로 있다.
 
 > Tourism 도메인은 **O4O 표준 매장 패턴**을 따르며,
 > 모든 주문은 E-commerce Core를 통해 처리한다.
@@ -78,6 +83,11 @@ dropshippingProductId?: string;  // Soft FK (참조만, FK 제약 없음)
 | 계약 | OrderType 강제 | 누락/무효 시 Hard Fail |
 | 스키마 | 금지 테이블 검사 | `*_orders`, `*_payments` 생성 차단 |
 
+> (2026-10-04 정합) 현행 코드 기준 사실:
+> - **런타임**: `OrderCreationGuard` · `apps/api-server/src/guards/` 는 존재하지 않는다. 주문 생성 단일 지점은 `apps/api-server/src/services/checkout.service.ts` `createOrder()` 이며, 여기서 의약품 포함 주문을 일괄 거부한다(`assertNoDrugItems`). 우회 저장을 런타임에서 막는 별도 guard 는 없다 — 규칙 준수는 코드 리뷰와 아래 스키마 검사에 의존한다.
+> - **계약**: `CreateOrderDto` 에 `orderType` 필드가 없고 `CheckoutOrder` 엔티티는 `order_type` 컬럼을 매핑하지 않는다(DB 에는 enum 컬럼 `GENERIC`/`DROPSHIPPING`/`COSMETICS`/`TOURISM`, 기본값 `GENERIC` 만 잔존). 따라서 §2.3 · §3.3 의 "OrderType 강제 · enum 추가" 절차는 현행 코드와 맞지 않는다. 서비스 구분은 `metadata.serviceKey` 로 한다([B2B 계약](../baseline/O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1.md)). `OrderType` 상태는 [E-COMMERCE-ORDER-CONTRACT](../baseline/E-COMMERCE-ORDER-CONTRACT.md) 행(`CANONICAL-INDEX` §9) 참조.
+> - **스키마**: `scripts/check-forbidden-tables.mjs` 는 존재하지만 현재 CI workflow · `package.json` 어디에서도 호출되지 않는다(수동 실행). `@Entity('x_orders')` 문자열 형태만 검사한다.
+
 ### 2.2 Guardrail 1: 런타임 차단 (Service Layer)
 
 ```typescript
@@ -147,6 +157,8 @@ const BLOCKED_ORDER_TYPES = [
 | Service 내 `createOrder()` | 책임 침범 |
 | 서비스별 결제 API | Core 책임 |
 
+> (2026-10-04 정합) `neture_orders` 는 현재 **공급자 fulfillment 원장**으로 존재한다 — 주문 정본(`checkout_orders`)이 아니라 결제 확정 후 `CheckoutFulfillmentBridgeService` 가 투영하는 파생 기록이다([B2B 계약](../baseline/O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1.md) 불변식 T1 · A2). "주문 원장을 서비스별로 만들지 않는다" 는 원칙은 그대로 유효하다. `tourism_orders` 행은 Tourism 은퇴로 과거 기록이다.
+
 ## 3. O4O Store Template Rules (§21)
 
 > **모든 매장형 O4O 서비스는 O4O Store Template를 기반으로 생성한다.**
@@ -170,7 +182,11 @@ const BLOCKED_ORDER_TYPES = [
 | Cosmetics | `COSMETICS` | Active (참조 구현) |
 | Tourism | `TOURISM` | Active (참조 구현) |
 
+> (2026-10-04 정합) 위 표는 과거 기록이다. Tourism 은 은퇴했고, Cosmetics 의 소비자 주문 생성(`POST /cosmetics/orders`)은 `410 STORE_CONSUMER_ORDER_RETIRED` 로 닫혔다(`apps/api-server/src/routes/cosmetics/controllers/cosmetics-order.controller.ts` · `WO-O4O-STORE-AND-PLATFORM-CONSUMER-COMMERCE-LEGACY-RETIREMENT-V1`). 현행 `createOrder()` 호출 경로는 공급자→매장 B2B(event-offer · Neture B2B · PharmacyHub → `store_cart_items → checkout_orders`)다.
+
 ### 3.3 새 매장 생성 시 필수 절차
+
+> (2026-10-04 정합) 아래 2·3 단계(`OrderType` enum 추가 · `routes/{new-store}` 소비자 Order Controller 생성)는 현행 코드(`OrderType` 미매핑 · §2 정합 주석)와 [COMMERCE-BOUNDARY](../baseline/O4O-STORE-COMMERCE-BOUNDARY-V1.md)(소비자→매장 commerce 없음 · 개발 금지선)에 맞지 않으므로 **그대로 실행하지 않는다**. 새 주문 경로가 필요하면 COMMERCE-BOUNDARY §15 절차와 B2B 계약을 먼저 따른다. §3.4 의 "`checkoutService.createOrder()` 만 사용" 원칙과 §3.5 의 "자체 주문 테이블 없음" 항목은 유효하다.
 
 ```bash
 # 1. 템플릿 복사
@@ -211,7 +227,7 @@ const order = await checkoutService.createOrder({
 - [ ] OrderType enum에 추가됨
 - [ ] `checkoutService.createOrder()`만 사용
 - [ ] 자체 주문 테이블 없음
-- [ ] ESM 호환 Entity 패턴 준수 (§4.1)
+- [ ] ESM 호환 Entity 패턴 준수 (CLAUDE.md §2 — 구 §4.1)
 - [ ] CLAUDE.md §7 규칙 준수
 - [ ] 템플릿 문서 생성 (DOMAIN-BOUNDARY.md)
 
@@ -231,6 +247,8 @@ const order = await checkoutService.createOrder({
 | 템플릿 미사용 | 개발 중단, 템플릿에서 재시작 |
 | 금지 테이블 생성 | 마이그레이션 롤백, 테이블 삭제 |
 
+> (2026-10-04 정합) "CI 실패, PR 차단" · "OrderType 누락/무효 → 400" · "런타임 에러" 는 현행 코드에 자동 장치가 없다(§2 정합 주석). 위반은 리뷰에서 막고, 테이블 삭제 · 롤백은 [PRODUCTION-MIGRATION-STANDARD](../baseline/operations/PRODUCTION-MIGRATION-STANDARD.md) 와 사용자 승인 절차를 따른다.
+
 ---
 
 ## 참조 문서
@@ -238,10 +256,11 @@ const order = await checkoutService.createOrder({
 - 📄 템플릿 디렉터리: `docs/templates/o4o-store-template/`
 - 📄 주문 위임 패턴: `docs/templates/o4o-store-template/ORDER-DELEGATION.md`
 - 📄 도메인 경계: `docs/templates/o4o-store-template/DOMAIN-BOUNDARY.md`
-- 📄 Tourism 도메인: `apps/api-server/src/routes/tourism/DOMAIN-BOUNDARY.md`
-- 📄 가드 구현: `apps/api-server/src/guards/order-creation.guard.ts`
+- 📄 ~~Tourism 도메인: `apps/api-server/src/routes/tourism/DOMAIN-BOUNDARY.md`~~ (2026-10-04 정합: 은퇴 — 파일 없음)
+- 📄 ~~가드 구현: `apps/api-server/src/guards/order-creation.guard.ts`~~ (2026-10-04 정합: 파일 없음 — 주문 생성 단일 지점은 `apps/api-server/src/services/checkout.service.ts`)
 - 📄 검사 스크립트: `scripts/check-forbidden-tables.mjs`
-- 📄 주문 계약: `docs/_platform/E-COMMERCE-ORDER-CONTRACT.md`
+- 📄 주문 계약: [`docs/baseline/E-COMMERCE-ORDER-CONTRACT.md`](../baseline/E-COMMERCE-ORDER-CONTRACT.md) (이동된 경로 정정)
+- 📄 매장 commerce 경계: [`O4O-STORE-COMMERCE-BOUNDARY-V1`](../baseline/O4O-STORE-COMMERCE-BOUNDARY-V1.md) · B2B 주문: [`O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1`](../baseline/O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1.md)
 
 ---
 

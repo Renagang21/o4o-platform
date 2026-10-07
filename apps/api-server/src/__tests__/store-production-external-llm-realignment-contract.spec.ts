@@ -35,18 +35,15 @@ const VIEW_PD = 'packages/store-ui-core/src/components/product-descriptions/Stor
 const TARGET_SPECIFIC: Record<'BLOG' | 'POP' | 'PRODUCT_DESCRIPTION' | 'MULTILINGUAL' | 'QR', string[]> = {
   BLOG: [
     'services/web-kpa-society/src/pages/pharmacy/PharmacyBlogPage.tsx',
-    'services/web-k-cosmetics/src/pages/store/StoreBlogManagePage.tsx',
     'services/web-pharmacy-hub/src/pages/store-owner/BlogEditorPage.tsx',
   ],
   POP: [
     'services/web-kpa-society/src/pages/pharmacy/PharmacyPopPage.tsx',
-    'services/web-k-cosmetics/src/pages/store/StorePopStaffPage.tsx',
     'services/web-pharmacy-hub/src/pages/store-owner/PopPage.tsx',
   ],
   PRODUCT_DESCRIPTION: [
     'services/web-kpa-society/src/pages/pharmacy/StoreLocalProductsPage.tsx',
     'services/web-kpa-society/src/pages/pharmacy/StoreProductDescriptionsPage.tsx',
-    'services/web-k-cosmetics/src/pages/store/StoreProductDescriptionsPage.tsx',
     'services/web-pharmacy-hub/src/pages/store-owner/ProductDescriptionsPage.tsx',
   ],
   MULTILINGUAL: [
@@ -129,8 +126,9 @@ describe('WO-O4O-STORE-PRODUCTION-EXTERNAL-LLM-REALIGNMENT-V1 — (B) 공통 Vie
 });
 
 describe('WO-O4O-STORE-PRODUCTION-EXTERNAL-LLM-REALIGNMENT-V1 — (C) TARGET_SPECIFIC 13 external LLM entry', () => {
-  it('census = 13', () => {
-    expect(ALL_TARGETS).toHaveLength(13);
+  // 13 → 10: K-Cosmetics 3개(Blog · POP · 상품설명)는 앱 퇴역 삭제 — WO-O4O-KCOSMETICS-RETIREMENT-PHASE1A-WEB-APP-AND-DEPLOY-TARGET-V1.
+  it('census = 10', () => {
+    expect(ALL_TARGETS).toHaveLength(10);
     for (const rel of ALL_TARGETS) expect(fs.existsSync(path.join(REPO_ROOT, rel))).toBe(true);
   });
 
@@ -163,10 +161,8 @@ describe('WO-O4O-STORE-PRODUCTION-EXTERNAL-LLM-REALIGNMENT-V1 — (C) TARGET_SPE
     }
   }
 
-  it('공통 View 소비 wrapper(KCos Blog · KCos POP · 상품설명 3)는 renderAssist 슬롯으로 주입한다', () => {
+  it('공통 View 소비 wrapper(상품설명)는 renderAssist 슬롯으로 주입한다', () => {
     for (const rel of [
-      'services/web-k-cosmetics/src/pages/store/StoreBlogManagePage.tsx',
-      'services/web-k-cosmetics/src/pages/store/StorePopStaffPage.tsx',
       ...TARGET_SPECIFIC.PRODUCT_DESCRIPTION.filter((r) => !r.endsWith('StoreLocalProductsPage.tsx')),
     ]) {
       expect(read(rel)).toMatch(/renderAssist=\{\(\{[^}]*onApplyHtml[^}]*\}\) =>/);

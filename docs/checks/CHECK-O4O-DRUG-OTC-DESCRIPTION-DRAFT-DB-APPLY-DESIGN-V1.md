@@ -20,7 +20,7 @@ Scope: 오프라인 CHECK 문서(pilot/5/20/50 그룹)의 OTC 성분·함량·�
 | --- | --- |
 | 조사 일시 | 2026-07-07 |
 | 접속 | cloud-sql-proxy (`netureyoutube:asia-northeast3:o4o-platform-db`, 127.0.0.1:15432) → psql / tsx DataSource |
-| 인증 | gcloud ADC (sohae2100@gmail.com), DB_PASSWORD 는 Cloud Run env 에서 추출(메모리/문서/커밋 미기록) |
+| 인증 | gcloud ADC ([REDACTED_EMAIL_A]), DB_PASSWORD 는 Cloud Run env 에서 추출(메모리/문서/커밋 미기록) |
 | write | **0** (SELECT/COUNT 전용, 적재·migration·canonical 없음) |
 
 ---

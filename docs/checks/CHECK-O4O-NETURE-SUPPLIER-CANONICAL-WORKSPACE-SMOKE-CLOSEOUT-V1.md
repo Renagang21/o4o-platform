@@ -37,11 +37,11 @@ Neture 웹 로그인 폼은 `serviceKey: 'neture'` 를 보낸다
 
 | 계정 | serviceKey | 결과 |
 |---|---|:---:|
-| `renagang21@gmail.com` (Neture 공급자) | `neture` | **401** |
-| `renagang21@gmail.com` | 없음 (L1) | 200 |
-| `sohae2100@gmail.com` | `neture` | **401** |
+| `[REDACTED_EMAIL_B]` (Neture 공급자) | `neture` | **401** |
+| `[REDACTED_EMAIL_B]` | 없음 (L1) | 200 |
+| `[REDACTED_EMAIL_A]` | `neture` | **401** |
 
-`renariver21@gmail.com` 은 L2 `neture` 200 이지만 **공급자가 아니다** —
+`[REDACTED_EMAIL_D]` 은 L2 `neture` 200 이지만 **공급자가 아니다** —
 `SupplierRoute` 가 `SUPPLIER_ROLES` + `requireMembership="neture"` 를 요구하는데
 (`components/auth/RoleGuard.tsx:166-175`), 이 계정은 `roles=['platform:super_admin']` ·
 `memberships=[{platform, active, super_admin}]` 뿐이라 통과하지 못한다.
@@ -51,7 +51,7 @@ Neture 웹 로그인 폼은 `serviceKey: 'neture'` 를 보낸다
 `TEST-ACCOUNTS.local.md §4-2` 에 명시된 우회로를 사용했다.
 
 ```text
-계정   renagang21@gmail.com
+계정   [REDACTED_EMAIL_B]
 채널   POST /api/v1/auth/login  (serviceKey 없음, includeLegacyTokens:true) → 200
        accessToken/refreshToken 을 o4o_accessToken / o4o_refreshToken 에 주입
 roles  kpa:store_owner · cosmetics:store_owner · lms:instructor · pharmacy ·

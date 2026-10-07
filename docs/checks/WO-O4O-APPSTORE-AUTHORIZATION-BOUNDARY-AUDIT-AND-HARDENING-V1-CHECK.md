@@ -182,7 +182,7 @@ tenant isolation test 는 §4 사유로 해당 없음 — 대신 **service opera
 | `POST /appstore/install {}` (body 누락) | **401** — 인증이 body 검증보다 먼저 |
 | `GET /api/v1/admin/apps/market` (대조군) | 401 (변동 없음) |
 
-**인증됐으나 권한 없음** — `renagang21@gmail.com` (약국 경영자, serviceKey `kpa-society`, 쿠키 세션)
+**인증됐으나 권한 없음** — `[REDACTED_EMAIL_B]` (약국 경영자, serviceKey `kpa-society`, 쿠키 세션)
 
 | 요청 | 결과 |
 |---|---|
@@ -191,7 +191,7 @@ tenant isolation test 는 §4 사유로 해당 없음 — 대신 **service opera
 | `GET /appstore` | **200** (공개 조회 유지 확인) |
 | `GET /admin/apps/market` (대조군) | 403 — 동일 계약 |
 
-**서비스 관리자** — `sohae2100@gmail.com` (KPA-Society admin/operator)
+**서비스 관리자** — `[REDACTED_EMAIL_A]` (KPA-Society admin/operator)
 
 | 요청 | 결과 |
 |---|---|

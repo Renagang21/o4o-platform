@@ -1,5 +1,7 @@
 # PROMOTION_PHASE1_EXECUTION_PLAN_V1
 
+> **상태**: DRAFT · 미실행 계획 — 산출물(`useSlotContent` · `SlotHeroSlider` 등)은 코드에 없다. 실행 · 폐기 결정 전까지 현재 기준 문서 아님 · **표기일**: 2026-10-04
+
 > Phase 1 실행 순서 및 범위 정의
 
 ---

@@ -158,7 +158,7 @@ LEFT JOIN users u ON u.id = km.user_id
 LEFT JOIN service_memberships sm
   ON sm.user_id = km.user_id AND sm.service_key IN ('kpa-society','kpa')
 WHERE km.license_number IN ('99991', '99992')
-   OR u.email = 'renagang21@gmail.com';
+   OR u.email = '[REDACTED_EMAIL_B]';
 ```
 
 ### Priority 2 — 시나리오 B 확정 시
@@ -276,7 +276,7 @@ LEFT JOIN users u ON u.id = km.user_id
 LEFT JOIN service_memberships sm
   ON sm.user_id = km.user_id AND sm.service_key IN ('kpa-society','kpa')
 WHERE km.license_number IN ('99991', '99992')
-   OR u.email = 'renagang21@gmail.com';
+   OR u.email = '[REDACTED_EMAIL_B]';
 ```
 
 ---

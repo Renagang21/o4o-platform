@@ -13,7 +13,7 @@
 
 ## 1. 사용한 공급자·상품·오퍼 유형 (실행 1~4)
 
-- 공급자: renagang21@gmail.com = neture_supplier `91169739…` **ACTIVE** · 등록 offer **0**.
+- 공급자: [REDACTED_EMAIL_B] = neture_supplier `91169739…` **ACTIVE** · 등록 offer **0**.
 - 기존 등록 상품 0 → **테스트 오퍼 공식 생성·삭제 경로 + 완전 원복 가능성 조사**(gating).
 - **완전 원복 가능 target 확정**: 기존 barcode(`8809178390621`) master `23f51f76…`(GENERAL, 약품 아님) 에 offer 생성 → master **무변경**.
   - 근거: `createSupplierOffer` → `resolveOrCreateMaster(existingBarcode)` = **기존 master 그대로 반환(write 0)**. 이어 `updateProductMaster` 는 extFields(name/category/brand/spec/tags) 가 있을 때만 호출 → **barcode 만 전달(name/category 미전달) → extFields 공집합 → updateProductMaster 미호출 → master 완전 무변경**.

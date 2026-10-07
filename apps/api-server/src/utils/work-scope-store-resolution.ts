@@ -138,9 +138,13 @@ export async function resolveWorkScopeStore(
   }
 
   // 3. membership 이 먼저다. 알 수 없는 serviceKey 도 여기서 fail-closed 된다.
-  const membershipStatus = await getServiceMembershipStatusFromDb(dataSource, userId, serviceKey);
-  if (membershipStatus !== 'active') {
-    return deny(serviceKey, workspace, 'NO_SERVICE_MEMBERSHIP');
+  //    WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: 약국 매장(kpa-society)은 membership 이 아니라
+  //    Neture 기본 가입 원장이 판정한다 — 5단계 resolver 의 `kpa` 후보가 원장 기준이다.
+  if (serviceKey !== 'kpa-society') {
+    const membershipStatus = await getServiceMembershipStatusFromDb(dataSource, userId, serviceKey);
+    if (membershipStatus !== 'active') {
+      return deny(serviceKey, workspace, 'NO_SERVICE_MEMBERSHIP');
+    }
   }
 
   // 4. 매장 축이 없는 서비스(neture 등)는 여기서 끝난다.

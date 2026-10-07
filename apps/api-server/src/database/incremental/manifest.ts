@@ -52,6 +52,14 @@ import { CreateEmailPasswordAuthTables1790683000000 } from '../migrations/179068
 import { AddHandoffTokenSourceAuthMethod1790684000000 } from '../migrations/1790684000000-AddHandoffTokenSourceAuthMethod.js';
 // WO-O4O-CANONICAL-DEMO-ACCOUNT-FOUNDATION-AND-EXPERIENCE-LOGIN-V1 Phase B-A (demo_accounts registry)
 import { CreateDemoAccounts1790940000000 } from '../migrations/1790940000000-CreateDemoAccounts.js';
+// WO-O4O-PERSONAL-ASSISTANT-PHASE-A-TASK-FOUNDATION-V1 (assistant_tasks + work_run_coordination.task_id)
+import { CreateAssistantTasks1791012819443 } from '../migrations/1791012819443-CreateAssistantTasks.js';
+// WO-O4O-PERSONAL-ASSISTANT-MEMORY-CLOUD-CONTINUITY-V1 (assistant_procedural_patterns + assistant_run_frames)
+import { CreateAssistantProceduralMemory1791100000000 } from '../migrations/1791100000000-CreateAssistantProceduralMemory.js';
+// WO-O4O-PERSONAL-ASSISTANT-PHASE-D-EXECUTION-NODE-RUNTIME-STATE-COORDINATION-V1 (local_agent_devices.capabilities)
+import { AddLocalAgentDeviceCapabilities1791177033073 } from '../migrations/1791177033073-AddLocalAgentDeviceCapabilities.js';
+// WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1 (기본 가입 · 세미프랜차이즈 · 복수 공급 제안 · 이벤트 부분 unique)
+import { CreateNeturePharmacyCommerce1791200000000 } from '../migrations/1791200000000-CreateNeturePharmacyCommerce.js';
 
 export const INCREMENTAL_MIGRATION_CUTOFF = {
   baselineVersion: '2026-09-18-id685',
@@ -78,6 +86,10 @@ export const INCREMENTAL_MIGRATIONS: readonly MigrationClass[] = [
   CreateEmailPasswordAuthTables1790683000000,
   AddHandoffTokenSourceAuthMethod1790684000000,
   CreateDemoAccounts1790940000000,
+  CreateAssistantTasks1791012819443,
+  CreateAssistantProceduralMemory1791100000000,
+  AddLocalAgentDeviceCapabilities1791177033073,
+  CreateNeturePharmacyCommerce1791200000000,
 ];
 
 export function incrementalMigrationNames(): string[] {

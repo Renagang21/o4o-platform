@@ -117,7 +117,7 @@ WO 원칙 "중복 클릭·새로고침으로 중복 결제되지 않게" 를 4�
 ### 7-1. 배포 후 라이브 검증 (프로덕션 · 실제 계정)
 
 web `30692750775` · api `30692750776` 둘 다 **success**.
-`renariver21@gmail.com` 으로 로그인해 **실제 API 흐름 전 구간**을 돌렸다 (실결제 승인 제외).
+`[REDACTED_EMAIL_D]` 으로 로그인해 **실제 API 흐름 전 구간**을 돌렸다 (실결제 승인 제외).
 
 | # | 검증 | 결과 |
 |:-:|---|---|
@@ -139,7 +139,7 @@ web `30692750775` · api `30692750776` 둘 다 **success**.
 
 | 항목 | 값 |
 |---|---|
-| 구매자 | `renariver21@gmail.com` (검증 계정) |
+| 구매자 | `[REDACTED_EMAIL_D]` (검증 계정) |
 | 상태 | `created` / `pending` — 미결제 |
 | 형상 | `paymentGroupId` 없음 · `productId=master_id` (Phase 1 결함) |
 

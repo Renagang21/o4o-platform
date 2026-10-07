@@ -94,6 +94,11 @@ on:
 env:
   PROJECT_ID: netureyoutube
   REGION: asia-northeast3
+  # WO-O4O-CLOUD-RUN-RUNTIME-SA-LEAST-PRIVILEGE-V1 — Cloud Run runtime identity (default compute SA · roles/editor 사용 종료).
+  #   github-actions SA 는 이 SA 에 대해서만 actAs 할 수 있다(SA 리소스 단위 iam.serviceAccountUser). 권한: CHECK-O4O-CLOUD-RUN-RUNTIME-SA-LEAST-PRIVILEGE-V1
+  RUNTIME_SA: o4o-runtime@netureyoutube.iam.gserviceaccount.com
+  # WO-O4O-GITHUB-ACTIONS-RUN-ADMIN-TO-DEVELOPER-V1 — 배포는 Cloud Run IAM 을 바꾸지 않는다(github-actions = roles/run.developer · setIamPolicy 없음).
+  #   기존 서비스의 공개 접근(allUsers → roles/run.invoker)은 서비스 IAM 에 이미 있고 배포가 유지한다. 새 서비스는 최초 1회 소유자가 부여 — CHECK-O4O-GITHUB-ACTIONS-RUN-ADMIN-TO-DEVELOPER-V1.
   SERVICE_NAME: o4o-core-api
   REPOSITORY_NAME: o4o-api
   IMAGE_NAME: api-server
@@ -539,6 +544,7 @@ jobs:
           --image="${FULL_IMAGE}" \
           --region=${{ env.REGION }} \
           --project=${{ env.PROJECT_ID }} \
+          --service-account=${{ env.RUNTIME_SA }} \
           --task-timeout=300 \
           --max-retries=1 \
           --set-env-vars="^::^NODE_ENV=production::DB_HOST=/cloudsql/netureyoutube:asia-northeast3:o4o-platform-db::DB_PORT=5432::DB_USERNAME=${{ secrets.GCP_DB_USERNAME }}::DB_NAME=${{ secrets.GCP_DB_NAME }}" \
@@ -551,6 +557,7 @@ jobs:
           --image="${FULL_IMAGE}" \
           --region=${{ env.REGION }} \
           --project=${{ env.PROJECT_ID }} \
+          --service-account=${{ env.RUNTIME_SA }} \
           --task-timeout=300 \
           --max-retries=1 \
           --set-env-vars="^::^NODE_ENV=production::DB_HOST=/cloudsql/netureyoutube:asia-northeast3:o4o-platform-db::DB_PORT=5432::DB_USERNAME=${{ secrets.GCP_DB_USERNAME }}::DB_NAME=${{ secrets.GCP_DB_NAME }}" \
@@ -613,12 +620,24 @@ jobs:
 
     - name: Deploy to Cloud Run
       if: inputs.migrate_only != 'true'
+      env:
+        NETURE_PHARMACY_PAYMENT_MODE: ${{ vars.NETURE_PHARMACY_PAYMENT_MODE }}
       run: |
         FULL_IMAGE="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY_NAME }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}"
 
         # optional env — 앞 step 이 NUL 구분 flag 목록을 만든다(생략된 이름은 목록에 없다).
         OPTIONAL_ENV=()
         if [ -s "$RUNNER_TEMP/optional-env" ]; then mapfile -d '' OPTIONAL_ENV < "$RUNNER_TEMP/optional-env"; fi
+
+        # WO-NETURE-PHARMACY-PAYMENT-MODE-WORKFLOW-V1 — Neture 약국 결제 모드는 저장소 variable 로만 관리한다(carry 없음 —
+        #   콘솔 값이 남지 않게). 'test' 또는 미설정만 허용. 미설정 → 주입 안 함 → 코드 기본 disabled(503 PAYMENT_NOT_CONFIGURED).
+        #   'live' 등 그 밖의 값 → 배포 중단(코드도 live = 503 PAYMENT_PROVIDER_NOT_SELECTED, PG 미선정).
+        PAYMENT_ENV=()
+        case "${NETURE_PHARMACY_PAYMENT_MODE}" in
+          "") ;;
+          test) PAYMENT_ENV=(--set-env-vars=NETURE_PHARMACY_PAYMENT_MODE=test) ;;
+          *) echo "::error::NETURE_PHARMACY_PAYMENT_MODE 는 'test' 또는 미설정만 허용"; exit 1 ;;
+        esac
 
         # verified 모드: 새 revision 은 traffic 0% · 전용 tag 주소. 전환은 검증 뒤 별도 step 이 한다.
         ROLLOUT_ARGS=()
@@ -645,8 +664,8 @@ jobs:
           --image="${FULL_IMAGE}" \
           --region=${{ env.REGION }} \
           --project=${{ env.PROJECT_ID }} \
+          --service-account=${{ env.RUNTIME_SA }} \
           --platform=managed \
-          --allow-unauthenticated \
           --ingress=internal-and-cloud-load-balancing \
           --port=8080 \
           --memory=1Gi \
@@ -678,6 +697,7 @@ jobs:
           --set-env-vars="GOOGLE_ALLOWED_CLIENT_IDS=${{ vars.GOOGLE_WEB_CLIENT_ID }}" \
           --set-env-vars="GOOGLE_WEB_CLIENT_ID=${{ vars.GOOGLE_WEB_CLIENT_ID }}" \
           "${OPTIONAL_ENV[@]}" \
+          "${PAYMENT_ENV[@]}" \
           "${ROLLOUT_ARGS[@]}" \
           --update-labels="o4o-commit-sha=${{ github.sha }}" \
           --clear-vpc-connector \

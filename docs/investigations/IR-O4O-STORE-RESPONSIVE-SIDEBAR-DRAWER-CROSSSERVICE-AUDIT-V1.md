@@ -84,7 +84,7 @@ const [sidebarOpen, setSidebarOpen] = useState(false);
 
 ## 5. 운영 브라우저 smoke (prod, 2026-07-12)
 
-계정: `sohae2100@gmail.com` (operator-or-above → `/store` 진입). Playwright DOM 실측.
+계정: `[REDACTED_EMAIL_A]` (operator-or-above → `/store` 진입). Playwright DOM 실측.
 
 ### 5-A. KPA `kpa-society.co.kr/store`
 | viewport | store `<aside>` transform | 사이드바 표시 | store drawer 트리거 | 가로 스크롤 |

@@ -1,10 +1,13 @@
 import { Link } from 'react-router-dom';
 import { BRAND, WORKSPACE_PATHS } from '../config/workspace';
 import { useUnifiedStore } from '../contexts/StoreContext';
+import { pharmacyStorePath } from './neture-pharmacy/shared';
 
 /** Workspace 홈 — 선택된 매장 + 서비스 요약 + 4 영역 진입(§8-3). */
 export default function HomePage() {
-  const { organizationName, services } = useUnifiedStore();
+  const { organizationName, services, effectiveServiceKey } = useUnifiedStore();
+  // 약국 문맥은 매장 HUB 단계 없이 내 매장에서 바로 공급 상품을 주문한다(DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1 §6).
+  const pharmacy = effectiveServiceKey === 'kpa-society';
   const available = services.filter((s) => s.enrollmentStatus === 'active' && s.workspaceAvailable);
   return <main className="page"><section className="hero">
     <span className="eyebrow">Unified Store Workspace</span>
@@ -16,7 +19,9 @@ export default function HomePage() {
     <div className="actions">
       <Link className="button-link" to={WORKSPACE_PATHS.myStore}>내 매장</Link>
       <Link className="secondary-link" to={WORKSPACE_PATHS.serviceWork}>서비스 업무</Link>
-      <Link className="secondary-link" to={WORKSPACE_PATHS.storeHub}>매장 HUB</Link>
+      {pharmacy
+        ? <Link className="secondary-link" to={pharmacyStorePath('supply')}>공급 상품</Link>
+        : <Link className="secondary-link" to={WORKSPACE_PATHS.storeHub}>매장 HUB</Link>}
       <Link className="secondary-link" to={WORKSPACE_PATHS.myServices}>내 서비스</Link>
     </div>
   </section></main>;

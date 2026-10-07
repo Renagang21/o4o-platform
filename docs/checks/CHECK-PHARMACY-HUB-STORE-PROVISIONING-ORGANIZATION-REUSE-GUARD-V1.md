@@ -151,7 +151,7 @@ backfill `--mode=apply` 의 "재실행 시 추가 생성 0(noop)" 계약이 깨�
 | type 불일치 | 0 |
 | 타 서비스 enrollment 보유 | 0 |
 | service-neutral 자산 보유 | 0 |
-| **ambiguous** | **1** — `renagang21@gmail.com` (3개 조직) |
+| **ambiguous** | **1** — `[REDACTED_EMAIL_B]` (3개 조직) |
 | 기타 held | 0 |
 
 ### **가드로 인해 새로 held 되는 계정 = 0명**

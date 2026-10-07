@@ -43,7 +43,7 @@ describe('resolveWorkScopeStore — 매장 scope 해석 (read-only)', () => {
 
     const result = await resolveWorkScopeStore(dataSource, {
       userId: 'user-1',
-      serviceKey: 'kpa-society',
+      serviceKey: 'k-cosmetics',
       workspace: 'store',
     });
 
@@ -61,7 +61,7 @@ describe('resolveWorkScopeStore — 매장 scope 해석 (read-only)', () => {
 
     const result = await resolveWorkScopeStore(dataSource, {
       userId: 'user-1',
-      serviceKey: 'kpa-society',
+      serviceKey: 'k-cosmetics',
       workspace: 'store',
     });
 
@@ -75,7 +75,7 @@ describe('resolveWorkScopeStore — 매장 scope 해석 (read-only)', () => {
 
     const result = await resolveWorkScopeStore(dataSource, {
       userId: 'user-1',
-      serviceKey: 'kpa-society',
+      serviceKey: 'k-cosmetics',
       workspace: 'store',
     });
 
@@ -93,13 +93,13 @@ describe('resolveWorkScopeStore — 매장 scope 해석 (read-only)', () => {
 
     const result = await resolveWorkScopeStore(dataSource, {
       userId: 'user-1',
-      serviceKey: 'kpa-society',
+      serviceKey: 'k-cosmetics',
       workspace: 'store',
     });
 
     expect(result).toEqual({
       status: 'resolved',
-      serviceKey: 'kpa-society',
+      serviceKey: 'k-cosmetics',
       workspace: 'store',
       organizationId: 'org-1',
       storeId: 'org-1',
@@ -118,7 +118,7 @@ describe('resolveWorkScopeStore — 매장 scope 해석 (read-only)', () => {
 
     const result = await resolveWorkScopeStore(dataSource, {
       userId: 'user-1',
-      serviceKey: 'kpa-society',
+      serviceKey: 'k-cosmetics',
       workspace: 'store',
     });
 
@@ -137,7 +137,7 @@ describe('resolveWorkScopeStore — 매장 scope 해석 (read-only)', () => {
 
     await resolveWorkScopeStore(dataSource, {
       userId: 'user-1',
-      serviceKey: 'kpa-society',
+      serviceKey: 'k-cosmetics',
       workspace: 'store',
     });
 
@@ -146,12 +146,32 @@ describe('resolveWorkScopeStore — 매장 scope 해석 (read-only)', () => {
     // 서비스 귀속 조건이 쿼리에 실제로 들어간다.
     expect(sql).toContain('organization_service_enrollments');
     expect(sql).toContain('platform_store_slugs');
-    // kpa-society → role prefix 'kpa' 의 linkage 값이 파라미터로 전달된다.
+    // k-cosmetics → role prefix 'cosmetics' 의 linkage 값이 파라미터로 전달된다.
     expect(candidateCall.params).toContain('user-1');
     const flat = JSON.stringify(candidateCall.params);
-    expect(flat).toContain('kpa-society');
-    // 서비스 조건 없는 back-compat 경로(전 서비스 매장)를 타지 않았다.
-    expect(sql).toContain('organization_service_enrollments');
+    expect(flat).toContain('k-cosmetics');
+  });
+
+  it('5-a. kpa-society 매장 후보는 Neture 기본 가입 원장(active) 조직으로 스코프된다', async () => {
+    // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1 (DESIGN §5): 약국 매장 후보 = 원장 active 조직.
+    // service_memberships 질의 없이 바로 원장 후보를 본다(kpa-society membership 은 매장 자격이 아니다).
+    const { dataSource, calls } = makeDataSource([[{ organization_id: 'org-1', role: 'owner' }]]);
+
+    const result = await resolveWorkScopeStore(dataSource, {
+      userId: 'user-1',
+      serviceKey: 'kpa-society',
+      workspace: 'store',
+    });
+
+    expect(result.status).toBe('resolved');
+    const sql = norm(calls[0].sql);
+    expect(sql).toContain('neture_pharmacy_memberships');
+    expect(sql).toContain("npm.status = 'active'");
+    // enrollment/slug 기반(서비스 연결) 후보도, 서비스 조건 없는 back-compat 후보도 타지 않는다.
+    expect(sql).not.toContain('organization_service_enrollments');
+    expect(sql).not.toContain('platform_store_slugs');
+    expect(calls[0].params[0]).toBe('user-1');
+    expect(calls.some((c) => norm(c.sql).includes('service_memberships'))).toBe(false);
   });
 
   it('5-b. cosmetics 는 canonical(k-cosmetics)로 정규화되어 판정된다', async () => {
@@ -181,7 +201,7 @@ describe('resolveWorkScopeStore — 매장 scope 해석 (read-only)', () => {
 
     await resolveWorkScopeStore(dataSource, {
       userId: 'session-user',
-      serviceKey: 'kpa-society',
+      serviceKey: 'k-cosmetics',
       workspace: 'store',
     });
 

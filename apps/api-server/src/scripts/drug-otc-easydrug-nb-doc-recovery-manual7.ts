@@ -4,7 +4,7 @@
  * 건별 검증 완료된 수동 7품목(크레아티닌 앵커 4 + pH 3) — ko canonical 21건 유실값 복원.
  * dry-run 기본 / apply 는 이중 게이트(`--apply` + DRUG_OTC_NB_RECOVERY_MANUAL7_CONFIRM=YES).
  *
- * 화이트리스트: docs/investigations/samples/nb-doc-bulk-v1/recovery-whitelist-manual7.json
+ * 화이트리스트: apps/api-server/src/scripts/data/investigation-samples/nb-doc-bulk-v1/recovery-whitelist-manual7.json
  *   - 7 item_seq / ko 21 master / en 0 (MANUAL7 CHECK 검증완료)
  *   - 크레아티닌 4: find `크레아티닌 청소율이` → +`&lt; 25 mL/min)`[+\n\n] (NB_DOC 근거)
  *   - pH 3: find `(pH` → `(pH &lt; 5.5)` (UD_DOC 근거, 섹션끝 최소복구)
@@ -19,7 +19,7 @@ import path from 'node:path';
 
 const WL_PATH = path.resolve(
   process.cwd(),
-  '../../docs/investigations/samples/nb-doc-bulk-v1/recovery-whitelist-manual7.json',
+  'src/scripts/data/investigation-samples/nb-doc-bulk-v1/recovery-whitelist-manual7.json',
 );
 const EXPECTED_ITEM_SEQ = 7;
 const EXPECTED_ROWS = 21;

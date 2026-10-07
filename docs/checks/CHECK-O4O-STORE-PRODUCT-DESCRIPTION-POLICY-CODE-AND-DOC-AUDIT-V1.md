@@ -88,7 +88,7 @@ IR·CHECK 역사 문서 소급 수정 = 0
 
 ## 4. 확인된 DB 수치
 
-**미확정 — Cloud Console SQL Editor 대상.** 이 노트북은 Cloud SQL 5432 아웃바운드 차단(`34.64.96.252:5432` TcpTest=False, memory `o4o-laptop-cloudsql-5432-blocked`)이라 `gcloud sql connect`가 무한 대기한다. 일반식품 설명서 건수·SUPPLIER_STORE 실사용·store_contribution 유입·화장품 SPD 존재 등 실측 SELECT는 **IR §16의 read-only SQL을 Cloud Console에서 실행**하여 후속 확인한다. (DB write는 이번에도 앞으로도 0.)
+**미확정 — Cloud Console SQL Editor 대상.** 이 노트북은 Cloud SQL 5432 아웃바운드 차단(`[REDACTED_IP]:5432` TcpTest=False, memory `o4o-laptop-cloudsql-5432-blocked`)이라 `gcloud sql connect`가 무한 대기한다. 일반식품 설명서 건수·SUPPLIER_STORE 실사용·store_contribution 유입·화장품 SPD 존재 등 실측 SELECT는 **IR §16의 read-only SQL을 Cloud Console에서 실행**하여 후속 확인한다. (DB write는 이번에도 앞으로도 0.)
 
 ---
 

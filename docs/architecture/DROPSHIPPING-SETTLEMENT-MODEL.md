@@ -1,5 +1,7 @@
 # Dropshipping Settlement Model Architecture (DS-4.2)
 
+> **상태**: OBSOLETE · Dropshipping 도메인 코드 0 · 대응 패키지 없음(refactoring/status.md) — 현행 기준 아님. 아래 Status 줄은 원문 보존 · **표기일**: 2026-10-04
+
 > **이 문서는 Dropshipping 정산(Settlement)의 개념과 계산 계약을 정의한다.**
 > Settlement는 계산 시스템이지 결제 시스템이 아니다.
 > 이 문서를 위반하는 구현은 버그로 간주된다.

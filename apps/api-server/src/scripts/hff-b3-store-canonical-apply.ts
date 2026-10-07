@@ -36,7 +36,7 @@ const REGULATORY_TYPE = '건강기능식품';
 // solid/liq apply 스크립트와 동일 패턴. 특정 클론 하드코딩 제거(대상·write·게이트·트랜잭션 로직 불변).
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(HERE, '../../../..');
-const DATA = process.env.HFF_DATA_DIR ?? path.join(REPO_ROOT, 'docs/checks/data/product-description-guard');
+const DATA = process.env.HFF_DATA_DIR ?? path.join(REPO_ROOT, 'apps/api-server/src/scripts/data/check-data/product-description-guard');
 const SP = process.env.HFF_SCRATCH_DIR ?? path.join(REPO_ROOT, 'scratchpad');
 
 function loadTargets(): GuardProductInput[] {

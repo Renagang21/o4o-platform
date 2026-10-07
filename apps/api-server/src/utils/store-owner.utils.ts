@@ -50,8 +50,9 @@ export type { StoreOwnerServiceKey } from './store-organization.resolver.js';
 /**
  * 서비스별 store_owner 권한을 가지는 role 목록.
  *
- * - kpa        : `kpa:store_owner` (약사회 가맹 약국 개설자)
- * - cosmetics  : `cosmetics:store_owner`
+ * - kpa        : `kpa:store_owner` (약국 사업자 서비스 `kpa-society` = pharmacy.neture.co.kr 의 매장 경영자.
+ *                `kpa` 는 legacy/internal role prefix 일 뿐 — KPA 분회(kpa.neture.co.kr · `kpa-branch`)와 무관)
+ * - cosmetics  : `cosmetics:store_owner` (화장품 · 일반 소매 사업자 서비스 `k-cosmetics` = retail.neture.co.kr)
  * - pharmacy-hub : `pharmacy-hub:store_owner` (약국 경영자)
  *                WO-O4O-STORE-OWNER-GUARD-PHARMACY-HUB-REGISTRATION-V1:
  *                W1(프로비저닝)이 organizations / organization_members(owner) /
@@ -61,7 +62,9 @@ export type { StoreOwnerServiceKey } from './store-organization.resolver.js';
  *                PROVISIONING-V1 §8-5). 등록으로 공통 매장 API 진입을 복구한다.
  */
 const STORE_OWNER_ROLES_BY_SERVICE = {
-  kpa: ['kpa:store_owner'],
+  // `neture:store_owner` = Neture 기본 가입 승인 약국(WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1).
+  //   `kpa` 매장 판정 자체는 아래 isStoreOwner 에서 기본 가입 원장으로 한다 — 이 목록은 role 기반 소비처용.
+  kpa: ['kpa:store_owner', 'neture:store_owner'],
   cosmetics: ['cosmetics:store_owner'],
   'pharmacy-hub': ['pharmacy-hub:store_owner'],
 } as const;
@@ -149,6 +152,28 @@ export async function isStoreOwner(
   //   2026-08-24 프로덕션 실측: 활성 store_owner role 보유자 18명 전원이 같은 서비스의
   //   active membership 을 보유(kpa 5/5 · cosmetics 4/4 · pharmacy-hub 6/6),
   //   suspended/withdrawn membership 0건 → 현행 사용자 동작 변화 0.
+  // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1 (DESIGN §5):
+  //   약국 매장(`kpa`)은 kpa-society membership · `kpa:store_owner` 가 아니라 **Neture 기본 가입 원장 active ∧
+  //   그 조직의 owner/admin/manager** 로 판정한다(resolveStoreOrganization 의 `kpa` 후보가 원장 기준).
+  //   세미프랜차이즈(pharmacy 포함) 미가입이어도 매장 기본 기능을 쓸 수 있다.
+  if (serviceKey === 'kpa') {
+    const resolution = await resolveStoreOrganization(dataSource, userId, serviceKey, preferredOrganizationId);
+    if (resolution.status === 'none') {
+      return { isOwner: false, organizationId: null, memberRole: '', resolution, pendingAgreement: null };
+    }
+    const pendingAgreements = await policyAcceptanceService.getPendingStoreOwnerAgreementsForUser(
+      userId, resolveCanonicalServiceKey(serviceKey), dataSource,
+    );
+    const pendingAgreement = pendingAgreements[0] ?? null;
+    return {
+      isOwner: !pendingAgreement,
+      organizationId: resolution.organizationId,
+      memberRole: resolution.memberRole,
+      resolution,
+      pendingAgreement,
+    };
+  }
+
   const membershipKey = serviceKey ? resolveCanonicalServiceKey(serviceKey) : null;
   const [membershipRecord] = membershipKey
     ? await dataSource.query(
@@ -233,7 +258,8 @@ export function createRequireStoreOwner(
     //   결정할 수 없으므로, 서비스 단위 판정 대신 **active membership 최소 1개** 를
     //   요구한다 (fail-closed). 서비스 단위 정밀 판정은 serviceKey 를 넘기는
     //   호출부로의 점진 마이그레이션으로 계속 해소한다.
-    if (serviceKey) {
+    // 약국 매장(`kpa`)은 서비스 membership 이 아니라 기본 가입 원장이 판정한다 — 아래 isStoreOwner(DB) 가 맡는다.
+    if (serviceKey && serviceKey !== 'kpa') {
       const membershipKey = resolveCanonicalServiceKey(serviceKey);
       const memberships: { serviceKey: string; status: string }[] =
         (user as any).memberships || [];
@@ -254,7 +280,7 @@ export function createRequireStoreOwner(
         });
         return;
       }
-    } else {
+    } else if (!serviceKey) {
       const memberships: { serviceKey: string; status: string }[] =
         (user as any).memberships || [];
       if (memberships.length === 0) {

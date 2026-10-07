@@ -289,8 +289,8 @@ contents=0  tags=0  orphan_contents=0  orphan_tags=0
 
 | 계정 | 보유 축 | ai-contents GET | ai-tags GET | pop/A4 GET | ai-contents PUT | 비UUID GET |
 |------|--------|:---:|:---:|:---:|:---:|:---:|
-| `sohae2100@gmail.com` — `kpa:operator`·`kpa:admin`·`neture:operator`·`neture:admin`, 공급자 링크 없음, active OPL 없음 | 역할만 | 403 | 403 | 403 | 403 | 403 |
-| `sohae21@naver.com` — `kpa:store_owner` + **ACTIVE 공급자 링크** + active OPL 보유 | 매장 ∩ 공급자 | 403 | 403 | **403** | 403 | 403 |
+| `[REDACTED_EMAIL_A]` — `kpa:operator`·`kpa:admin`·`neture:operator`·`neture:admin`, 공급자 링크 없음, active OPL 없음 | 역할만 | 403 | 403 | 403 | 403 | 403 |
+| `[REDACTED_EMAIL_C]` — `kpa:store_owner` + **ACTIVE 공급자 링크** + active OPL 보유 | 매장 ∩ 공급자 | 403 | 403 | **403** | 403 | 403 |
 
 - ✅ `{service}:operator` / `{service}:admin` 은 **역할만으로 전역 쓰기·조회 불가** — 정책대로 동작
 - ✅ 매장 사용자의 `write` / `manage_read` 차단 — 정책대로 동작
@@ -299,12 +299,12 @@ contents=0  tags=0  orphan_contents=0  orphan_tags=0
 
 ### 9.3 신규 실측 발견 (P1) — 공급자 링크 보유 매장 사용자는 `render_read` 를 잃는다
 
-`sohae21@naver.com` 은 **active OPL 을 보유한 매장 owner** 인데도 POP PDF 가 403 이다.
+`[REDACTED_EMAIL_C]` 은 **active OPL 을 보유한 매장 owner** 인데도 POP PDF 가 403 이다.
 원인은 판정 순서 §4.1-4 이다: 이 사용자는 `neture_suppliers` 링크(ACTIVE)를 갖고 있으므로 공급자 축에서 먼저 평가되고,
 해당 master 가 자기 offer 가 아니므로 `NO_RELATION_TO_MASTER` 로 **종료되어 매장 축(5단계)에 도달하지 못한다.**
 
 - 현재 `supplier_product_offers` 는 **0행**이므로, **공급자 링크를 가진 모든 사용자는 POP PDF 를 전혀 사용할 수 없다.**
-- 실측상 KPA 매장 테스트 계정 2개가 **모두** 공급자 링크를 갖고 있어(`renagang21@gmail.com`, `sohae21@naver.com`)
+- 실측상 KPA 매장 테스트 계정 2개가 **모두** 공급자 링크를 갖고 있어(`[REDACTED_EMAIL_B]`, `[REDACTED_EMAIL_C]`)
   → **매장 `render_read` 200 경로는 실계정으로 smoke 할 수 없었다.** (fixture 테스트로만 검증됨)
 
 이는 "공급자 축 판정 후 매장 축으로 승격하지 않는다" 는 지정된 순서의 직접적 귀결이며,

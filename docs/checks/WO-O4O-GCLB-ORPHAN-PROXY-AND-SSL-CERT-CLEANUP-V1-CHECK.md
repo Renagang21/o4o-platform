@@ -14,9 +14,9 @@ WO §3 KEEP baseline 과 live 조회값이 **완전 일치**했다.
 
 | 리소스 | live 값 | §3 기대값 | 판정 |
 |---|---|---|:---:|
-| `neture-https-frontend-forwarding-rule` | `136.110.132.35` : 80 → `neture-https-frontend-target-proxy` | 동일 | ✅ |
-| `o4o-global-lb-forwarding-rule-2` | `136.110.132.35` : 443 → `o4o-global-lb-target-proxy-2` | 동일 | ✅ |
-| `neture-static-ip` | `136.110.132.35` · `IN_USE` · users 2 | 동일 | ✅ |
+| `neture-https-frontend-forwarding-rule` | `[REDACTED_IP]` : 80 → `neture-https-frontend-target-proxy` | 동일 | ✅ |
+| `o4o-global-lb-forwarding-rule-2` | `[REDACTED_IP]` : 443 → `o4o-global-lb-target-proxy-2` | 동일 | ✅ |
+| `neture-static-ip` | `[REDACTED_IP]` · `IN_USE` · users 2 | 동일 | ✅ |
 
 global/regional 전체 forwarding rule 은 위 **2건이 전부**였다 (regional 0건).
 
@@ -113,12 +113,12 @@ WO §7 순서를 그대로 따랐다.
 ### production 경로 무결성
 
 ```
-136.110.132.35 :80
+[REDACTED_IP] :80
   └─ neture-https-frontend-forwarding-rule
        └─ neture-https-frontend-target-proxy (HTTP)
             └─ neture-https-frontend-redirect  (httpsRedirect: true, 301)   ✅ 유지
 
-136.110.132.35 :443
+[REDACTED_IP] :443
   └─ o4o-global-lb-forwarding-rule-2
        └─ o4o-global-lb-target-proxy-2 (HTTPS)
             ├─ certificateMap: o4o-main-cert-map   ← 실제 TLS 서빙   ✅ 유지
@@ -137,21 +137,21 @@ WO §7 순서를 그대로 따랐다.
 
 | 도메인 | DNS | HTTP :80 | redirect | HTTPS :443 | TLS subject / notAfter | 판정 |
 |---|---|:---:|---|:---:|---|:---:|
-| `neture.co.kr` | 136.110.132.35 | 301 | → https | 200 | CN=neture.co.kr / 2026-09-30 | ✅ |
-| `www.neture.co.kr` | 136.110.132.35 | 301 | → https | 200 | 동일 | ✅ |
-| `kpa-society.co.kr` | 136.110.132.35 | 301 | → https | 200 | 동일 | ✅ |
-| `www.kpa-society.co.kr` | 136.110.132.35 | 301 | → https | 200 | 동일 | ✅ |
-| `k-cosmetics.site` | 136.110.132.35 | 301 | → https | 200 | 동일 | ✅ |
-| `www.k-cosmetics.site` | 136.110.132.35 | 301 | → https | 200 | 동일 | ✅ |
-| `glucoseview.co.kr` | 136.110.132.35 | 301 | → https | 200 | 동일 | ✅ |
-| `pharmacyhub.co.kr` | 136.110.132.35 | 301 | → https | 200 | CN=pharmacyhub.co.kr / 2026-11-01 | ✅ |
-| `www.pharmacyhub.co.kr` | 136.110.132.35 | 301 | → https | 200 | 동일 | ✅ |
-| `admin.neture.co.kr` | 136.110.132.35 | 301 | → https | 200 | CN=neture.co.kr / 2026-09-30 | ✅ |
-| `api.neture.co.kr` | 136.110.132.35 | 301 | → https | **404** | CN=neture.co.kr / 2026-09-30 | ✅ (아래) |
+| `neture.co.kr` | [REDACTED_IP] | 301 | → https | 200 | CN=neture.co.kr / 2026-09-30 | ✅ |
+| `www.neture.co.kr` | [REDACTED_IP] | 301 | → https | 200 | 동일 | ✅ |
+| `kpa-society.co.kr` | [REDACTED_IP] | 301 | → https | 200 | 동일 | ✅ |
+| `www.kpa-society.co.kr` | [REDACTED_IP] | 301 | → https | 200 | 동일 | ✅ |
+| `k-cosmetics.site` | [REDACTED_IP] | 301 | → https | 200 | 동일 | ✅ |
+| `www.k-cosmetics.site` | [REDACTED_IP] | 301 | → https | 200 | 동일 | ✅ |
+| `glucoseview.co.kr` | [REDACTED_IP] | 301 | → https | 200 | 동일 | ✅ |
+| `pharmacyhub.co.kr` | [REDACTED_IP] | 301 | → https | 200 | CN=pharmacyhub.co.kr / 2026-11-01 | ✅ |
+| `www.pharmacyhub.co.kr` | [REDACTED_IP] | 301 | → https | 200 | 동일 | ✅ |
+| `admin.neture.co.kr` | [REDACTED_IP] | 301 | → https | 200 | CN=neture.co.kr / 2026-09-30 | ✅ |
+| `api.neture.co.kr` | [REDACTED_IP] | 301 | → https | **404** | CN=neture.co.kr / 2026-09-30 | ✅ (아래) |
 | `glucoseview.com` | 168.126.63.1 | 200 | (redirect 없음) | 200 | CN=glucoseview.com / 2026-12-23 | ✅ (아래) |
 
 - `api.neture.co.kr` 의 HTTPS 404 는 **API 루트 경로에 라우트가 없기 때문**이며 삭제 전 baseline 과 동일하다. 동일 호스트의 `/health` 는 200 (§7).
-- `glucoseview.com` 은 이 GCLB(136.110.132.35) 위에 있지 않은 **외부 호스팅 도메인**이며 자체 인증서를 쓴다. 이번 삭제와 무관하고 상태 변화도 없다. (LB 위의 자산은 `glucoseview.co.kr`)
+- `glucoseview.com` 은 이 GCLB([REDACTED_IP]) 위에 있지 않은 **외부 호스팅 도메인**이며 자체 인증서를 쓴다. 이번 삭제와 무관하고 상태 변화도 없다. (LB 위의 자산은 `glucoseview.co.kr`)
 - TLS handshake 전 도메인 성공, 인증서 subject/SAN 은 전부 Certificate Manager 발급분 → classic cert 삭제가 서빙 인증서에 영향을 주지 않았음이 실측으로 확인됐다.
 
 ---

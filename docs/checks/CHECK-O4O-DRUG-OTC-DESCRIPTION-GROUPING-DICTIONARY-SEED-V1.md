@@ -15,7 +15,7 @@ Scope: 100그룹 확장 전 후보 산출 표준화를 위한 **성분 표기변
 | 조사 일시 | 2026-07-07 |
 | 접속 | Cloud SQL Auth Proxy(`cloud-sql-proxy`, 127.0.0.1:5437~5438) → psql SELECT (`o4o_platform`) |
 | 인스턴스 | `netureyoutube:asia-northeast3:o4o-platform-db` |
-| 인증 | gcloud ADC(sohae2100@gmail.com) + DB 계정 `o4o_api`(Cloud Run env read-only 추출) |
+| 인증 | gcloud ADC([REDACTED_EMAIL_A]) + DB 계정 `o4o_api`(Cloud Run env read-only 추출) |
 | write | **0** (SELECT/GROUP BY 전용, 방화벽 변경 없음) |
 
 ## 2. 사용한 선행 문서

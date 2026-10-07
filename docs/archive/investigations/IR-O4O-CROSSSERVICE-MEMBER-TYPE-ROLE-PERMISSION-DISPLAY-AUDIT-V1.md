@@ -124,7 +124,7 @@ export function RoleBadge({ role }: { role: string }) {
 
 ## 4. Neture 계정별 확인 — **브라우저 확인 완료 (DB 직접 확인 미완)**
 
-대상: `renagang21@gmail.com`, `sohae21@naver.com`, `sohae2100@gmail.com`
+대상: `[REDACTED_EMAIL_B]`, `[REDACTED_EMAIL_C]`, `[REDACTED_EMAIL_A]`
 
 ### 4.1 브라우저 확인 결과 (수정 후, 라이브)
 
@@ -132,11 +132,11 @@ export function RoleBadge({ role }: { role: string }) {
 
 | 계정 | 회원 유형 | 운영 권한 | 대시보드 접근 |
 |---|---|---|---|
-| `renagang21@gmail.com` | 공급자 | 일반 회원 | 공급자 대시보드 |
-| `sohae21@naver.com` | 공급자 | **운영자** | 운영자 대시보드, 공급자 대시보드 |
-| `sohae2100@gmail.com` | 일반 회원 | **관리자** | 관리자 대시보드, 운영자 대시보드 |
+| `[REDACTED_EMAIL_B]` | 공급자 | 일반 회원 | 공급자 대시보드 |
+| `[REDACTED_EMAIL_C]` | 공급자 | **운영자** | 운영자 대시보드, 공급자 대시보드 |
+| `[REDACTED_EMAIL_A]` | 일반 회원 | **관리자** | 관리자 대시보드, 운영자 대시보드 |
 
-→ `sohae21@naver.com`은 **참여 유형(공급자)과 운영 권한(운영자)을 동시에** 가지며, 화면에서 두 축이
+→ `[REDACTED_EMAIL_C]`은 **참여 유형(공급자)과 운영 권한(운영자)을 동시에** 가지며, 화면에서 두 축이
   분리되어 모두 정확히 표시된다. 수정 전에는 리스트 "유형"에 raw `operator`가, 모달 "운영 권한"에
   잘못된 "일반 회원"이 표시됐다(= §2.4 분석 확정).
 
@@ -153,11 +153,11 @@ SELECT u.email, sm.role AS membership_role, sm.status,
 FROM users u
 LEFT JOIN service_memberships sm ON sm.user_id = u.id AND sm.service_key = 'neture'
 LEFT JOIN role_assignments ra ON ra.user_id = u.id
-WHERE u.email IN ('sohae21@naver.com','renagang21@gmail.com','sohae2100@gmail.com')
+WHERE u.email IN ('[REDACTED_EMAIL_C]','[REDACTED_EMAIL_B]','[REDACTED_EMAIL_A]')
 ORDER BY u.email, ra.role;
 ```
 
-> **브라우저 거동 기준 결론**: `sohae21@naver.com`의 운영 권한은 **bare `operator`**(namespaced 아님)로,
+> **브라우저 거동 기준 결론**: `[REDACTED_EMAIL_C]`의 운영 권한은 **bare `operator`**(namespaced 아님)로,
 > 참여 유형(공급자)은 `role_assignments`에 존재한다 — 모달 운영 권한이 namespaced-only 매칭이라 "일반 회원",
 > 대시보드 접근은 bare를 인정해 "운영자"였던 거동으로 **사실상 확정**. DB 직접 확인만 미완.
 

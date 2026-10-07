@@ -60,8 +60,8 @@
 
 | 호스트 | DNS | HTTPS | 비고 |
 |---|---|---|---|
-| neture.co.kr · www · admin · store · study | 136.110.132.35 | 200 | |
-| api.neture.co.kr | 136.110.132.35 | 404(루트) | 정상 (API) |
+| neture.co.kr · www · admin · store · study | [REDACTED_IP] | 200 | |
+| api.neture.co.kr | [REDACTED_IP] | 404(루트) | 정상 (API) |
 | kpa-society.co.kr · www | LB IP | 200 | |
 | pharmacyhub.co.kr · www | LB IP | 200 | |
 | k-cosmetics.site · www | LB IP | 200 | |
@@ -869,7 +869,7 @@ KPA 는 주문 생성 · prepare/confirm · 결제완료 핸들러 · fulfillmen
 
 | 게이트 | 내용 | 주체 | 상태 |
 |---|---|---|---|
-| DNS | Gabia A 레코드 `supplier` · `funding` → `136.110.132.35` | 사용자(Gabia) | 미실시 |
+| DNS | Gabia A 레코드 `supplier` · `funding` → `[REDACTED_IP]` | 사용자(Gabia) | 미실시 |
 | 인증서 | 호스트별 **별도** 관리형 인증서 + cert map entry(`cm-cert-neture-v2` 13도메인 묶음에 추가 금지 — §2-2) | gcloud(운영 인프라 변경) | **승인 대기** |
 | LB | URL map host rule `supplier.neture.co.kr` · `funding.neture.co.kr` → 기존 `backend-neture-web-http`(새 backend · NEG 불요) | gcloud(운영 인프라 변경) | **승인 대기** |
 | Google JS origin | `https://supplier.neture.co.kr` · `https://funding.neture.co.kr` 추가 | 사용자(GCP 콘솔) | 미실시 · Store origin 도 **미확인** |
@@ -896,7 +896,7 @@ gcloud compute url-maps add-host-rule o4o-global-lb --global --hosts=supplier.ne
 
 | 호스트 | 공개 DNS(8.8.8.8 · 1.1.1.1) | 인증서(별도 · 관리형) | LB 연결 | HTTPS 실측 | 현재 서빙 |
 |---|---|---|---|---|---|
-| supplier.neture.co.kr | 136.110.132.35 | `cm-cert-supplier-v1` **ACTIVE** | host rule → `path-matcher-neture` → neture-web | 200 | 운영 neture-web(`14587a9ad`) — 새 호스트 코드 **미배포**라 O4O 홈이 보인다 |
+| supplier.neture.co.kr | [REDACTED_IP] | `cm-cert-supplier-v1` **ACTIVE** | host rule → `path-matcher-neture` → neture-web | 200 | 운영 neture-web(`14587a9ad`) — 새 호스트 코드 **미배포**라 O4O 홈이 보인다 |
 | funding.neture.co.kr | 〃 | `cm-cert-funding-v1` ACTIVE | 〃 | 200 | 〃 |
 | community.neture.co.kr | 〃 | `cm-cert-community-v1` ACTIVE | 〃 | 200 | 〃 |
 | pharmacy.neture.co.kr | 〃 | `cm-cert-pharmacy-v1` ACTIVE | **새 matcher** `path-matcher-pharmacy` → kpa-society-web(`/kpa` 분회 규칙 없음) | 200 | KPA 앱 그대로(호스트 비의존 확인) |

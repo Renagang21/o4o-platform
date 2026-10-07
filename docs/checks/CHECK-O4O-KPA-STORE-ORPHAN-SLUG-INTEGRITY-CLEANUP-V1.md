@@ -261,7 +261,7 @@ KPA 는 **organization 7 ↔ enrollment 7 ↔ slug 7 완전 1:1** 이 됐다.
 **ambiguous(2 이상) 0 유지.** `44fa7733` 은 `users.status='suspended'` 이고
 `organization_members` 자체가 없다 — 이번 정리와 무관한 기존 상태다(삭제한 slug 2건의 member 는 0이었다).
 
-### 7-3. 프로덕션 실사용 smoke (KPA store_owner `renagang21@gmail.com`, serviceKey `kpa-society`)
+### 7-3. 프로덕션 실사용 smoke (KPA store_owner `[REDACTED_EMAIL_B]`, serviceKey `kpa-society`)
 
 | 요청 | 결과 |
 |---|---|

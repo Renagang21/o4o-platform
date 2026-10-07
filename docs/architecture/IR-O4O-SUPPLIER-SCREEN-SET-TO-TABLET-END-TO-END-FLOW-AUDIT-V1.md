@@ -1,5 +1,7 @@
 # IR-O4O-SUPPLIER-SCREEN-SET-TO-TABLET-END-TO-END-FLOW-AUDIT-V1
 
+> **상태**: ACTIVE · 기록물(조사 · 분석 · 설계 의견) — **현재 기준 정본 아님**. 제안한 후속 조치의 완료 여부는 미확인이라 COMPLETED 로 닫지 않는다(LIFECYCLE-RULES 보류 IR 규칙). 위치 이전 · 완료 판정은 history 정비 WO · **표기일**: 2026-10-04
+
 > 성격: **read-only 업무 동선 감사** — 공급자 Screen Set 제작·게시 → 매장 HUB 가져오기 → 실제 태블릿 배치·표시.
 > 선행: V2a(편집기 추출)·V2b(공급자 백엔드)·V2c(공급자 UI+매장 HUB 통합) 완료 상태 기준.
 > Date: 2026-07-22 · 코드·DB·배포 변경 0 (조사만).

@@ -91,7 +91,7 @@ GET  /api/v1/public/services/pharmacy-hub/footer-legal      공개 반영 확인
 
 ## 6. 실데이터 E2E (정규 API · DB 직접 write 0)
 
-프로덕션 `https://pharmacyhub.co.kr` · 실 브라우저(Playwright) · 계정 `sohae2100@gmail.com`
+프로덕션 `https://pharmacyhub.co.kr` · 실 브라우저(Playwright) · 계정 `[REDACTED_EMAIL_A]`
 (roles: `pharmacy-hub:operator` + `pharmacy-hub:admin`) · 2026-08-18 KST.
 
 **DB 직접 write 0건.** 모든 write 는 화면 → `PUT /api/v1/admin/services/pharmacy-hub/legal-profile` 만 사용했다.

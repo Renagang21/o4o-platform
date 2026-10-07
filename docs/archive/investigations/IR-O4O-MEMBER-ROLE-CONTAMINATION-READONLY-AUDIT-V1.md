@@ -38,8 +38,8 @@ Neture 2 · K-Cosmetics 2 · KPA-Society 1. 모두 bare·active.
 |---|---|---|---|---|---|
 | kcos-admin@o4o.com | k-cosmetics | admin | active | cosmetics:admin | **f** |
 | kcos-operator@o4o.com | k-cosmetics | operator | active | cosmetics:operator | **f** |
-| sohae2100@gmail.com | kpa-society / neture (3 rows) | operator/admin/operator | active | platform:super_admin + 전 서비스 admin/operator (전부 active) | **t** ✅ |
-| sohae21@naver.com | neture | operator | active | neture:operator (active) **+ supplier(active)** + kpa:store_owner | **t** ✅ |
+| [REDACTED_EMAIL_A] | kpa-society / neture (3 rows) | operator/admin/operator | active | platform:super_admin + 전 서비스 admin/operator (전부 active) | **t** ✅ |
+| [REDACTED_EMAIL_C] | neture | operator | active | neture:operator (active) **+ supplier(active)** + kpa:store_owner | **t** ✅ |
 
 > 9 rows = sohae2100(3 rows) + 나머지 6 계정(각 1 row).
 
@@ -53,7 +53,7 @@ Neture 2 · K-Cosmetics 2 · KPA-Society 1. 모두 bare·active.
   **is_active=f (비활성)**. 즉 deactivate 진행 흔적. [[project_test_account_cleanup_policy]] 기준 xxxx@o4o.com
   임시계정은 **삭제 상태가 정상** → 이들 오염은 테스트 계정 cleanup 트랙에서 함께 처리.
 - **참여 유형 복원 근거**:
-  - `sohae21@naver.com`: role_assignments 에 **`supplier`(active)** 존재 → membership.role 을 `supplier` 로
+  - `[REDACTED_EMAIL_C]`: role_assignments 에 **`supplier`(active)** 존재 → membership.role 을 `supplier` 로
     환원 가능(근거 명확).
   - `ksm***` / `mmg***` / `sohae2100`: 명확한 참여 유형 없음(운영자/관리자 전용 성격) → 보정 시 중립값
     (예: `member`/`user`) 또는 비움으로, **개별 판단 필요**.
@@ -95,7 +95,7 @@ bare `operator`/`admin` 은 role_assignments 에 **없음**(0). bare `super_admi
 1. `service_memberships.role` 은 **참여 유형으로만** 유지. 운영 권한 값(operator/admin)을 제거.
 2. 운영 권한은 **role_assignments(namespaced)** 로만 유지(이미 대부분 보유).
 3. **참여 유형 복원 근거가 있는 계정만 그 값으로 환원**:
-   - sohae21@naver.com → `supplier` (role_assignments 근거).
+   - [REDACTED_EMAIL_C] → `supplier` (role_assignments 근거).
 4. **참여 유형 근거 없는 운영자/관리자 전용 계정**(ksm***, mmg***, sohae2100)은 중립값/비움 — **보정 전 개별 확인**.
 5. **@o4o.com 테스트 계정 3건**은 [[project_test_account_cleanup_policy]] 에 따라 cleanup 트랙(삭제/비활성)로 처리.
 6. role_assignments 의 bare `super_admin` 1건 → `platform:super_admin` 정규화(선택).

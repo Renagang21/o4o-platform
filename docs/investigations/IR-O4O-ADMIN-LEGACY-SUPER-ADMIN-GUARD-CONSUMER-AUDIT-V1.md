@@ -189,7 +189,7 @@ frontend 잔존(참고, 본 IR 범위 밖 · 별도 WO):
 
 ## 6. 실계정으로 검증 가능한 403 경로 (실증 완료)
 
-cutover 로 `sohae2100@gmail.com` 이 `platform:super_admin` 을 잃어, **서비스 운영자 관점의 거부 경로를
+cutover 로 `[REDACTED_EMAIL_A]` 이 `platform:super_admin` 을 잃어, **서비스 운영자 관점의 거부 경로를
 실제 계정으로 검증할 수 있게 되었다**(기존 smoke blocker 해소).
 
 프로덕션 실측 (2026-07-26, read-only GET):

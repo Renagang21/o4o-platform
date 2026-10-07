@@ -232,7 +232,7 @@ RUN-B 대비 추가 이득은 **월 $2.5 (약 3,500원)** 에 불과하다. 반�
 
 | 구성 | 내용 |
 |---|---|
-| static IP | **1개** — `neture-static-ip` (`136.110.132.35`) · IN_USE |
+| static IP | **1개** — `neture-static-ip` (`[REDACTED_IP]`) · IN_USE |
 | forwarding rules | **2개** — HTTP(80) 리다이렉트 + HTTPS(443) |
 | target proxies | 2개 (`o4o-global-lb-target-proxy-2` + 리다이렉트용) |
 | URL maps | 2개 (`o4o-global-lb` + `neture-https-frontend-redirect`) |

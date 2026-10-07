@@ -14,7 +14,7 @@
 | 검증자 | Claude Code (sohae2100 GCP auth) |
 | GCP project | `netureyoutube` |
 | API 서버 (Cloud Run) | `o4o-core-api` rev **`o4o-core-api-02256-k7x`** (Ready), `https://o4o-core-api-3e3aws7zqa-du.a.run.app` |
-| 운영 DB | `o4o-platform-db` (34.64.96.252) / `o4o_platform` — PostgreSQL 15.17 |
+| 운영 DB | `o4o-platform-db` ([REDACTED_IP]) / `o4o_platform` — PostgreSQL 15.17 |
 | DB 접근 채널 | `gcloud sql connect` IP allowlist → public IP psql (user `o4o_api`), SELECT-only |
 
 ---

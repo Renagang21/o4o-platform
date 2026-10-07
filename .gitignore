@@ -142,6 +142,7 @@ storybook-static
 .vscode/
 .claude/*
 !.claude/commands/
+!.claude/settings.json
 
 # Codex per-machine local configuration
 .codex/

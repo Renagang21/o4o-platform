@@ -26,7 +26,6 @@ import {
   selectOperatorServices,
 } from '../../../../packages/operator-ux-core/src/service-switcher/createOperatorServicesApi';
 import { UNIFIED_MENU as KPA_MENU } from '../../../../services/web-kpa-society/src/config/operatorMenuGroups';
-import { UNIFIED_MENU as KCOS_MENU } from '../../../../services/web-k-cosmetics/src/config/operatorMenuGroups';
 import { UNIFIED_MENU as PH_MENU } from '../../../../services/web-pharmacy-hub/src/config/operatorMenuGroups';
 import {
   UNIFIED_MENU as NETURE_MENU,
@@ -130,7 +129,6 @@ describe('표준 Service Operator 최상위 IA (WO §8)', () => {
 
 describe('메뉴 항목(route) 단위 도메인 분류 (WO §9 · §10)', () => {
   const kpa = placementOf(KPA_MENU);
-  const kcos = placementOf(KCOS_MENU);
   const ph = placementOf(PH_MENU);
 
   it('KPA approvals 는 item 단위로 나뉜다: 콘텐츠 승인 → 서비스 운영 · 상품 신청/이벤트 오퍼/모집 노출 → 사업 운영', () => {
@@ -162,17 +160,6 @@ describe('메뉴 항목(route) 단위 도메인 분류 (WO §9 · §10)', () => 
     expect(kpa.get('/operator/roles')).toBe('operations_management');
   });
 
-  it('K-Cos approvals: 매장 가입 신청 → 서비스 운영 · 상품 신청/이벤트 오퍼/모집 노출 → 사업 운영', () => {
-    expect(kcos.get('/operator/applications')).toBe('service_operation');
-    expect(kcos.get('/operator/product-applications')).toBe('business_operation');
-    expect(kcos.get('/operator/event-offers')).toBe('business_operation');
-    expect(kcos.get('/operator/recruitment-exposure')).toBe('business_operation');
-    expect(kcos.get('/operator/supplier-contents')).toBe('service_operation');
-    expect(kcos.get('/operator/contacts')).toBe('service_operation');
-    expect(kcos.get('/operator/orders')).toBe('business_operation');
-    expect(kcos.get('/operator/analytics')).toBe('operations_management');
-  });
-
   it('PH: 가입 신청 → 서비스 운영 · 사업 운영 항목 0 (REAL_SERVICE_DIFFERENCE) · 역할 관리 → 운영 관리', () => {
     expect(ph.get('/operator/memberships')).toBe('service_operation');
     expect(ph.get('/operator/supplier-contents')).toBe('service_operation');
@@ -182,7 +169,6 @@ describe('메뉴 항목(route) 단위 도메인 분류 (WO §9 · §10)', () => 
 
   it.each([
     ['web-kpa-society', KPA_MENU],
-    ['web-k-cosmetics', KCOS_MENU],
     ['web-pharmacy-hub', PH_MENU],
   ] as const)('%s: dashboard 를 제외한 모든 항목이 정확히 한 도메인에 배치된다 (누락 0 · 중복 0)', (_svc, menu) => {
     const paths = allPaths(menu);
@@ -218,7 +204,6 @@ describe('메뉴 항목(route) 단위 도메인 분류 (WO §9 · §10)', () => 
     expect(code('services/web-pharmacy-hub/src/config/operatorMenuGroups.ts')).not.toContain('PHARMACY_HUB_OPERATOR_DOMAIN_IA');
     for (const w of [
       'services/web-kpa-society/src/components/kpa-operator/KpaOperatorLayoutWrapper.tsx',
-      'services/web-k-cosmetics/src/components/layouts/OperatorLayoutWrapper.tsx',
     ]) {
       expect(code(w)).not.toContain('domainIAConfig=');
     }
@@ -232,7 +217,6 @@ describe('메뉴 항목(route) 단위 도메인 분류 (WO §9 · §10)', () => 
 describe('사이드바 · 대시보드 링크 = 실 route (dead link 0)', () => {
   it.each([
     ['web-kpa-society', KPA_MENU],
-    ['web-k-cosmetics', KCOS_MENU],
     ['web-pharmacy-hub', PH_MENU],
   ] as const)('%s UNIFIED_MENU 의 /operator/* 항목은 App.tsx route 가 있다', (svc, menu) => {
     const segs = operatorRouteSegments(svc);
@@ -244,7 +228,6 @@ describe('사이드바 · 대시보드 링크 = 실 route (dead link 0)', () => 
 
   it.each([
     ['web-kpa-society', 'services/web-kpa-society/src/pages/operator/KpaOperatorDashboard.tsx', KPA_MENU],
-    ['web-k-cosmetics', 'services/web-k-cosmetics/src/pages/operator/KCosmeticsOperatorDashboard.tsx', KCOS_MENU],
     ['web-pharmacy-hub', 'services/web-pharmacy-hub/src/pages/operator/OperatorDashboardPage.tsx', PH_MENU],
   ] as const)('%s 대시보드 3도메인 축 · quick action 링크는 route 가 있다', (svc, file, menu) => {
     const src = read(file);
@@ -257,10 +240,9 @@ describe('사이드바 · 대시보드 링크 = 실 route (dead link 0)', () => 
     void menu;
   });
 
-  it('KPA · K-Cos 대시보드 축은 표준 3도메인 키를 쓴다', () => {
+  it('KPA 대시보드 축은 표준 3도메인 키를 쓴다', () => {
     for (const f of [
       'services/web-kpa-society/src/pages/operator/KpaOperatorDashboard.tsx',
-      'services/web-k-cosmetics/src/pages/operator/KCosmeticsOperatorDashboard.tsx',
     ]) {
       const src = read(f);
       expect(src).toContain("key: 'service_operation'");
@@ -352,7 +334,6 @@ describe('합성 Operator X — KPA + K-Cos 운영자 (WO §21)', () => {
     expect(home).not.toContain('OPERATOR_OR_ABOVE_ROLES');
     for (const w of [
       'services/web-kpa-society/src/components/kpa-operator/KpaOperatorLayoutWrapper.tsx',
-      'services/web-k-cosmetics/src/components/layouts/OperatorLayoutWrapper.tsx',
       'services/web-pharmacy-hub/src/layouts/OperatorLayoutWrapper.tsx',
       'services/web-neture/src/components/layouts/OperatorLayoutWrapper.tsx',
     ]) {
@@ -382,9 +363,7 @@ describe('Supplier → Service Operator 수신함 (WO §12)', () => {
     const targets = listSupplierContentHandoffTargets().map((t) => t.key).sort();
     expect(targets).toEqual(['k-cosmetics', 'kpa-society', 'pharmacy-hub']);
     expect(KPA_MENU.approvals!.some((i) => i.path === '/operator/approvals' && i.domain === 'service_operation')).toBe(true);
-    expect(KCOS_MENU.content!.some((i) => i.path === '/operator/supplier-contents')).toBe(true);
     expect(PH_MENU.content!.some((i) => i.path === '/operator/supplier-contents')).toBe(true);
-    expect(code('services/web-k-cosmetics/src/App.tsx')).toContain('path="supplier-contents"');
     expect(code('services/web-pharmacy-hub/src/App.tsx')).toContain('path="supplier-contents"');
   });
 
@@ -395,7 +374,6 @@ describe('Supplier → Service Operator 수신함 (WO §12)', () => {
     expect(c).toContain('/cms/contents/${row.id}/status');
     expect(c).not.toMatch(/handoff_receipts|supplier_handoffs|workflow/i);
     // 서비스 페이지는 자기 serviceKey 만 넘긴다
-    expect(read('services/web-k-cosmetics/src/pages/operator/OperatorSupplierContentsPage.tsx')).toContain('cmsServiceKey="k-cosmetics"');
     expect(read('services/web-pharmacy-hub/src/pages/operator/SupplierContentsPage.tsx')).toContain('cmsServiceKey="pharmacy-hub"');
   });
 

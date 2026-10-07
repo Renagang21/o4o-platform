@@ -9,6 +9,7 @@
 import { Request, Response } from 'express';
 import type { AuthRequest } from '../../../common/middleware/auth.middleware.js';
 import { resolveSessionServiceKey } from '../../../utils/session-origin.js';
+import { resolveLoginMembershipGateKey } from '../../../common/auth/service-login-eligibility.policy.js';
 import { getTrustedClientIp } from '../../../utils/trusted-client-ip.js';
 import { BaseController } from '../../../common/base.controller.js';
 import { authenticationService } from '../../../services/authentication.service.js';
@@ -59,6 +60,8 @@ export class GoogleAuthController extends BaseController {
         // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8: 세션 귀속은 origin 파생이다.
         //   위 body `serviceKey` 는 가입 상태 조회 대상일 뿐 세션 귀속이 아니다.
         sessionServiceKey: resolveSessionServiceKey(req.get('origin')),
+        // WO-O4O-SERVICE-NOT-MEMBER-AUTH-CONTRACT-RESTORATION-V1: 로그인 자격도 origin 파생이다(본문 값 아님).
+        loginMembershipGateKey: resolveLoginMembershipGateKey(req.get('origin')),
       });
       return GoogleAuthController.respondWithSession(req, res, session, includeLegacyTokens, 'Login successful');
     } catch (error) {
@@ -138,6 +141,10 @@ export class GoogleAuthController extends BaseController {
       return BaseController.unauthorized(res, 'Google 인증에 실패했습니다.', error.code);
     }
     if (error instanceof GoogleAuthError) {
+      // WO-NETURE-PHARMACY-CUTOVER-COMPAT-V1: 세미프랜차이즈 자격 상태(인증을 마친 본인에게만, 서버 선별 필드)
+      if (error.serviceAccess) {
+        return BaseController.forbidden(res, error.message, error.code, { serviceAccess: error.serviceAccess });
+      }
       return BaseController.error(res, error.message, error.statusCode, error.code);
     }
     if (err.code === 'ACCOUNT_NOT_ACTIVE') {

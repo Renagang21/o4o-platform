@@ -8,7 +8,7 @@
 
 ## 1. 증상 / 사용자 흐름
 
-서Renagang21(renagang21@gmail.com)이 운영하는 **"테스트 약국"**(org `9c87f46b…`, KPA)에서:
+서Renagang21([REDACTED_EMAIL_B])이 운영하는 **"테스트 약국"**(org `9c87f46b…`, KPA)에서:
 
 1. 콘텐츠를 만들었다.
 2. `/store/marketing/qr` 로 이동, QR 만들기에서 그 콘텐츠를 선택할 수 있었다.

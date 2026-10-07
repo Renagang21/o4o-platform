@@ -200,7 +200,7 @@ Neture 공급자 온보딩은 2단계 활성화(`operator-registration.service.t
 | supplier_id | `251adaaf-…-7f81ffef36a6` | `91169739-…-b3d4a93d65eb` |
 | slug | `supplier-52a4c1e6` | `supplier-6967ebe0` |
 | user_id | `52a4c1e6-…-a47637e8ca3a` | `6967ebe0-…-8c7190493cef` |
-| contact_email | sohae21@naver.com | renagang21@gmail.com |
+| contact_email | [REDACTED_EMAIL_C] | [REDACTED_EMAIL_B] |
 | representative_name | 서철환 | 서 Renagang21 |
 | organization_id | `69e985ae-…` | `95aad740-…` |
 | created_at | 2026-05-24 06:11 | 2026-05-30 02:58 |
@@ -221,10 +221,10 @@ Neture 공급자 온보딩은 2단계 활성화(`operator-registration.service.t
 근거:
 1. **2단계 흐름의 "stage-2 미완" 상태** — 두 row 모두 stage-1(가입 승인)은 완료되어 `service_memberships.status='active'` + `role_assignments.supplier(is_active=t)` 를 보유. 그러나 `neture_suppliers.status='PENDING'` 이고 `approved_by/approved_at/rejected_reason` 가 전부 비어 있어 **stage-2(공급 승인)가 한 번도 처리되지 않음**. 이는 조사 본문의 "2단계 불일치" 가설을 **DB로 실증**한다 — 즉 회원 목록엔 "활성"으로 보이고, 공급사 승인 큐엔 "대기"로 남는 정확히 그 상태.
 2. **처리 가능 대상 맞음** — `/operator/suppliers` 화면(`operator-supplier.controller.ts` → `neture_suppliers WHERE status='PENDING'`)이 이 2건을 그대로 나열하며, 운영자가 승인(→ACTIVE)/거절(→REJECTED) 할 수 있다. 고아(orphan)·손상 데이터 아님.
-3. **그러나 stale test 잔재로 판단** — 두 계정 모개발자/사용자 본인 테스트 계정(`renagang21@gmail.com` = git committer Renagang21, `sohae21@naver.com` = 사용자 본인 계열)이고, 공급자 프로필이 사실상 비어 있으며, 생성 후 수일~수주간 미처리로 방치됨. 한 계정은 store_owner(kpa/cosmetics)·lms:instructor·pharmacy 등 잡다한 역할을 동시에 보유한 전형적 테스트 계정. 프로젝트 정책상 운영 DB 데이터는 현재 disposable(pre-service)이므로, 실제 사업 공급자의 승인 대기가 아니라 **완료되지 않은 테스트 온보딩**으로 보는 것이 타당.
+3. **그러나 stale test 잔재로 판단** — 두 계정 모개발자/사용자 본인 테스트 계정(`[REDACTED_EMAIL_B]` = git committer Renagang21, `[REDACTED_EMAIL_C]` = 사용자 본인 계열)이고, 공급자 프로필이 사실상 비어 있으며, 생성 후 수일~수주간 미처리로 방치됨. 한 계정은 store_owner(kpa/cosmetics)·lms:instructor·pharmacy 등 잡다한 역할을 동시에 보유한 전형적 테스트 계정. 프로젝트 정책상 운영 DB 데이터는 현재 disposable(pre-service)이므로, 실제 사업 공급자의 승인 대기가 아니라 **완료되지 않은 테스트 온보딩**으로 보는 것이 타당.
 
 ### 후속 작업 권장안
 
 1. **데이터 측면** — 이 2건은 코드 버그가 아니므로 코드 수정 불필요. 대시보드 baseline을 깨끗이 하려면 (a) `/operator/suppliers`에서 거절/승인으로 큐 비우기, 또는 (b) test 잔재로 정리. **단, 어느 쪽이든 DB write 이므로 사용자 승인 후 진행** (이번 작업 범위 외).
 2. **UX 측면 (대시보드 v2의 핵심)** — 카운트 자체는 정확하므로 **데이터 repair가 아니라 가시성 재설계**가 본질. 회원 상세에 `neture_suppliers.status` 노출 + 승인 큐 허브화(본문 IA 제안)로 2단계 불일치를 운영자에게 드러내는 것이 우선.
-3. **검증 채널 메모** — 프로덕션 read-only 검증은 `gcloud sql connect o4o-platform-db --user=o4o_api`(IP 5분 화이트리스트) 후 동일 IP에서 `psql -h 34.64.96.252 sslmode=require` 직접 접속으로 수행. 운영 DB user는 `postgres` 가 아니라 **`o4o_api`** (Cloud Run env 기준).
+3. **검증 채널 메모** — 프로덕션 read-only 검증은 `gcloud sql connect o4o-platform-db --user=o4o_api`(IP 5분 화이트리스트) 후 동일 IP에서 `psql -h [REDACTED_IP] sslmode=require` 직접 접속으로 수행. 운영 DB user는 `postgres` 가 아니라 **`o4o_api`** (Cloud Run env 기준).

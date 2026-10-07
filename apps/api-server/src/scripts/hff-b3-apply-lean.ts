@@ -19,7 +19,7 @@ const SPD_SOURCE_TYPE = 'o4o_hff_generated';
 const REGULATORY_TYPE = '건강기능식품';
 const TARGET = 226;
 const SP = 'C:/Users/sohae/AppData/Local/Temp/claude/c--Users-sohae-o4o-platform/55e4dd9c-cf70-462e-8114-188f6c53d473/scratchpad';
-const DATA = 'C:/Users/sohae/o4o-platform/docs/checks/data/product-description-guard';
+const DATA = 'src/scripts/data/check-data/product-description-guard';
 
 interface Item { statementNo: string; productName: string; manufacturer: string; drafts: { ko: string; en: string } }
 function loadTargets(): Item[] {

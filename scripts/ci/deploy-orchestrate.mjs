@@ -338,9 +338,11 @@ export const STATE_OF = {
   SUPERSEDED_BY_NEWER_MAIN: 'SUPERSEDED',
   PROMOTE_REFUSED_NOT_HEAD: 'SUPERSEDED',
   PROMOTE_REFUSED_UNKNOWN_SERVING: 'HELD_LEVEL_3',
-  NOT_SELECTED: 'HELD_LEVEL_3',
+  // promote `services` 입력에서 빠진 서비스 — L3 보류가 아니다(WO-O4O-DELIVERY-NOT-SELECTED-CLASSIFICATION-CORRECTION-V1).
+  // target 에 아직 못 미치므로 commit status 는 이전처럼 pending 을 유지한다.
+  NOT_SELECTED: 'NOT_SELECTED',
 };
-const STATE_ORDER = ['FAILED', 'BLOCKED_CI', 'BLOCKED_FREEZE', 'HELD_LEVEL_3', 'HELD_ROLLOUT_PENDING', 'HELD_DEPENDENCY', 'DEPLOYING', 'DEPLOYED', 'SUPERSEDED', 'NO_DEPLOY'];
+const STATE_ORDER = ['FAILED', 'BLOCKED_CI', 'BLOCKED_FREEZE', 'HELD_LEVEL_3', 'HELD_ROLLOUT_PENDING', 'HELD_DEPENDENCY', 'NOT_SELECTED', 'DEPLOYING', 'DEPLOYED', 'SUPERSEDED', 'NO_DEPLOY'];
 const GH_STATE = {
   FAILED: 'failure',
   BLOCKED_CI: 'failure',
@@ -348,12 +350,13 @@ const GH_STATE = {
   HELD_LEVEL_3: 'pending',
   HELD_ROLLOUT_PENDING: 'pending',
   HELD_DEPENDENCY: 'pending',
+  NOT_SELECTED: 'pending',
   DEPLOYING: 'pending',
   DEPLOYED: 'success',
   SUPERSEDED: 'success',
   NO_DEPLOY: 'success',
 };
-const SHORT = { HELD_LEVEL_3: 'L3', HELD_ROLLOUT_PENDING: 'first-rollout', HELD_DEPENDENCY: 'needs-api' };
+const SHORT = { HELD_LEVEL_3: 'L3', HELD_ROLLOUT_PENDING: 'first-rollout', HELD_DEPENDENCY: 'needs-api', NOT_SELECTED: 'not-selected' };
 
 /**
  * 배선 검증 계획 (delivery.yml 수동 실행 · `wiring_services`) — 판정과 무관하게 지정 서비스의 reusable deploy workflow 를
@@ -393,7 +396,7 @@ export function commitStatus(services, target) {
   if (moving.length > 0) parts.push(`deploy: ${moving.map((s) => s.key).join(',')}`);
   const failed = of('FAILED');
   if (failed.length > 0) parts.push(`failed: ${failed.map((s) => s.key).join(',')}`);
-  const held = of('HELD_LEVEL_3', 'HELD_ROLLOUT_PENDING', 'HELD_DEPENDENCY');
+  const held = of('HELD_LEVEL_3', 'HELD_ROLLOUT_PENDING', 'HELD_DEPENDENCY', 'NOT_SELECTED');
   if (held.length > 0) parts.push(`held: ${held.map((s) => `${s.key}(${SHORT[s.state]})`).join(',')}`);
   const hint = held.some((s) => s.state !== 'HELD_DEPENDENCY') && !present.has('BLOCKED_FREEZE') && !present.has('BLOCKED_CI') ? ` · ${promoteCommand(target)}` : '';
   let description = parts.join(' · ');

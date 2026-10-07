@@ -34,7 +34,7 @@ function KpaStoreOwnerAgreementGate({ children }: { children: React.ReactNode })
   return (
     <StoreOwnerAgreementGate
       serviceKey="kpa-society"
-      serviceName="KPA Society"
+      serviceName="O4O 약국"
       api={authClient.api}
       onLogout={logout}
     >

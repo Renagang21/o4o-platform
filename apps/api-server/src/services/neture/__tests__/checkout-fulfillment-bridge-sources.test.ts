@@ -22,6 +22,9 @@ interface FakeOrder {
   source: string;
   serviceKey?: string;
   paid?: boolean;
+  /** 트랜잭션 안 재확인 시점에 다른 실행이 이미 bridge 한 경우 */
+  racedNetureOrderId?: string;
+  extraMetadata?: Record<string, unknown>;
 }
 
 /** 저장된 neture_order 를 캡처하는 가짜 DataSource */
@@ -47,6 +50,7 @@ function makeDataSource(order: FakeOrder) {
       source: order.source,
       ...(order.serviceKey ? { serviceKey: order.serviceKey } : {}),
       paymentGroupId: 'pg-1',
+      ...(order.extraMetadata ?? {}),
     },
   };
 
@@ -58,6 +62,9 @@ function makeDataSource(order: FakeOrder) {
     }),
     transaction: jest.fn(async (cb: (m: any) => Promise<string>) => {
       const manager = {
+        // advisory lock + 잠금 후 재확인(WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1)
+        query: jest.fn(async (sql: string) =>
+          sql.includes('FROM neture_orders') && order.racedNetureOrderId ? [{ id: order.racedNetureOrderId }] : []),
         getRepository: (entity: any) => ({
           create: (v: any) => v,
           save: async (v: any) => {
@@ -120,6 +127,34 @@ describe('CheckoutFulfillmentBridgeService — bridge source registry', () => {
 
     // 이 값이 SPO id 가 아니면 공급자 주문 목록 조인이 성립하지 않는다
     expect(saved.items?.[0].productId).toBe('offer-1');
+  });
+
+  it('②-c Neture 약국 주문은 구매 약국 · 테스트 결제 표식을 승계한다', async () => {
+    const { dataSource, saved } = makeDataSource({
+      source: 'neture_pharmacy_cart',
+      serviceKey: 'neture-pharmacy',
+      extraMetadata: { sellerOrganizationId: 'org-1', buyerOrganizationName: '테스트약국', testPayment: true, receiverKey: 'undetermined:pharmacy' },
+    });
+    const result = await new CheckoutFulfillmentBridgeService(dataSource)
+      .bridgeCheckoutOrderToNetureFulfillment({ checkoutOrderId: 'co-1' });
+
+    expect(result.bridged).toBe(true);
+    expect(saved.order.serviceKey).toBe('neture-pharmacy');
+    expect(saved.order.metadata).toMatchObject({
+      sourceService: 'neture-pharmacy',
+      buyerOrganizationId: 'org-1',
+      buyerOrganizationName: '테스트약국',
+      testPayment: true,
+    });
+  });
+
+  it('②-d 잠금 후 재확인에서 이미 bridge 된 주문이면 새로 만들지 않는다(동시 실행 1회)', async () => {
+    const { dataSource, saved } = makeDataSource({ source: 'neture_b2b_checkout', racedNetureOrderId: 'existing-1' });
+    const result = await new CheckoutFulfillmentBridgeService(dataSource)
+      .bridgeCheckoutOrderToNetureFulfillment({ checkoutOrderId: 'co-1' });
+
+    expect(result).toEqual({ bridged: false, netureOrderId: 'existing-1', skippedReason: 'ALREADY_BRIDGED' });
+    expect(saved.order).toBeUndefined();
   });
 
   it('③ 등록되지 않은 source 는 거부된다', async () => {

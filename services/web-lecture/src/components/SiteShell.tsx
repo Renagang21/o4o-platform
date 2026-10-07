@@ -1,4 +1,4 @@
-import { Link, Outlet } from 'react-router-dom';
+import { Link, Outlet, useLocation } from 'react-router-dom';
 import { PublicLegalFooterInfo } from '@o4o/shared-space-ui';
 import { BRAND, SERVICE_KEY } from '../config/service';
 import { loadFooterLegal } from '../lib/footerLegal';
@@ -9,6 +9,7 @@ import { canAccess } from './AccessGate';
 
 export default function SiteShell() {
   const { user, isAuthenticated, logout } = useAuth();
+  const location = useLocation();
   return <div className="site">
     <header className="header">
       <Link className="brand" to="/">{BRAND.name}</Link>
@@ -18,8 +19,8 @@ export default function SiteShell() {
         {canAccess('instructor', user) && <Link to="/instructor">강사</Link>}
         {canAccess('operator', user) && <Link to="/operator">운영</Link>}
         {/* WO-O4O-REPRESENTATIVE-ENTRY-RETURN-HANDOFF-AND-HOME-NAVIGATION-V1: O4O 홈(로그인 유지) · 로그아웃 = O4O 계정 전체 종료 */}
-        <O4OHomeButton api={authClient.api} isAuthenticated={isAuthenticated} className="link-button" />
-        {isAuthenticated ? <button className="link-button" type="button" onClick={logout}>{O4O_LOGOUT_LABEL}</button> : <Link to="/login">로그인</Link>}
+        <O4OHomeButton api={authClient.api} isAuthenticated={isAuthenticated} className="o4o-home-link" />
+        {isAuthenticated ? <button className="link-button" type="button" onClick={logout}>{O4O_LOGOUT_LABEL}</button> : <Link to="/login" state={{ from: `${location.pathname}${location.search}` }}>로그인</Link>}
       </nav>
     </header>
     <div className="content"><Outlet /></div>

@@ -10,7 +10,7 @@
 ## 1. 배포 / 계정
 
 - 커밋 `1479f5499`. CI Pipeline 완료, neture-web 리비전 `neture-web-01125-wpd`(내 커밋 포함) 라이브.
-- 계정 `sohae2100@gmail.com`(roles 10개에 `platform:super_admin` 포함) — UI 로그인. pure neture:admin-only 계정 부재 → negative guard 미검증.
+- 계정 `[REDACTED_EMAIL_A]`(roles 10개에 `platform:super_admin` 포함) — UI 로그인. pure neture:admin-only 계정 부재 → negative guard 미검증.
 - roles backend(무변경) live: `GET /api/v1/operator/roles` → success, **39 roles**.
 
 ## 2. 검증 결과 (Playwright, 운영 www.neture.co.kr)

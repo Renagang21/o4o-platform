@@ -144,7 +144,7 @@ docs/checks/CHECK-O4O-ADMIN-DASHBOARD-LOAD-FAILURE-EMPTY-LIST-AUDIT-AND-FIX-V1.m
 | push | `01fb9123f..7b48b8987 main -> main` |
 | Deploy Admin Dashboard (Cloud Run) | run `31358740808` **success** (전 단계 ✓, Verify deployment 포함) |
 | 검증 URL | `https://admin.neture.co.kr` |
-| 검증 계정 | `sohae2100@gmail.com` |
+| 검증 계정 | `[REDACTED_EMAIL_A]` |
 
 ### 9-1. 실패 주입 방법
 

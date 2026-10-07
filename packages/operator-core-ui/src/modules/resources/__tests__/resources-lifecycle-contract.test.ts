@@ -65,7 +65,7 @@ describe('default lifecycle = 기존 3 service 현행 behavior (§5)', () => {
 
   for (const [name, path] of [
     ['KPA-Society', 'services/web-kpa-society/src/pages/operator/OperatorResourcesPage.tsx'],
-    ['K-Cosmetics', 'services/web-k-cosmetics/src/pages/operator/OperatorResourcesPage.tsx'],
+    // K-Cosmetics 앱은 퇴역 삭제 — WO-O4O-KCOSMETICS-RETIREMENT-PHASE1A-WEB-APP-AND-DEPLOY-TARGET-V1.
   ] as const) {
     it(`${name} wrapper 는 lifecycle 을 지정하지 않는다 (default 유지)`, () => {
       expect(stripComments(read(path))).not.toContain('lifecycle=');

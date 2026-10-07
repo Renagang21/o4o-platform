@@ -64,7 +64,7 @@ Store-facing OPL read 는 `opl.service_key` 가 아니라 **organization_id + or
 
 ## 7. DB 실측 — 시도 및 상태 (PENDING)
 
-**시도**: `gcloud sql connect o4o-platform-db --user=o4o_api --database=o4o_platform` 로 read-only SELECT 2회 시도 → **모두 timeout(exit 143)**. allowlisting 후에도 public IP(34.64.96.252) TCP 연결 미성립(egress IP/NAT 불일치 추정). **본 환경에서 직접 실측 불가.**
+**시도**: `gcloud sql connect o4o-platform-db --user=o4o_api --database=o4o_platform` 로 read-only SELECT 2회 시도 → **모두 timeout(exit 143)**. allowlisting 후에도 public IP([REDACTED_IP]) TCP 연결 미성립(egress IP/NAT 불일치 추정). **본 환경에서 직접 실측 불가.**
 
 **대체 실행 경로**(택1):
 - Google Cloud Console → Cloud SQL → o4o-platform-db → SQL editor 에서 아래 SQL 실행

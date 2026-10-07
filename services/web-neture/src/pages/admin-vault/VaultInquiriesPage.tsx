@@ -2,7 +2,6 @@
  * VaultInquiriesPage - 플랫폼 문의 관리
  *
  * 플랫폼 레벨 문의 조회/관리:
- * - SiteGuide 도입 문의
  * - o4o 플랫폼 문의
  * - 제휴/파트너십 문의
  */
@@ -13,7 +12,7 @@ import { api } from '../../lib/apiClient';
 
 interface PlatformInquiry {
   id: string;
-  type: 'siteguide' | 'platform' | 'partnership' | 'other';
+  type: 'platform' | 'partnership' | 'other';
   name: string;
   email: string;
   phone?: string;
@@ -37,7 +36,6 @@ interface PaginationInfo {
 }
 
 const TYPE_LABELS: Record<string, string> = {
-  siteguide: 'SiteGuide 도입',
   platform: '플랫폼 문의',
   partnership: '제휴 문의',
   other: '기타',
@@ -116,7 +114,7 @@ export default function VaultInquiriesPage() {
           <h1 className="text-2xl font-bold text-white">Platform Inquiries</h1>
         </div>
         <p className="text-slate-400">
-          플랫폼 레벨 문의를 관리합니다 (SiteGuide 도입, o4o 플랫폼 문의 등)
+          플랫폼 레벨 문의를 관리합니다 (o4o 플랫폼 문의, 제휴 문의 등)
         </p>
       </div>
 
@@ -131,7 +129,6 @@ export default function VaultInquiriesPage() {
           className="bg-slate-800 border border-slate-700 text-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-amber-500 focus:border-amber-500"
         >
           <option value="">모든 유형</option>
-          <option value="siteguide">SiteGuide 도입</option>
           <option value="platform">플랫폼 문의</option>
           <option value="partnership">제휴 문의</option>
           <option value="other">기타</option>

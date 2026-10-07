@@ -45,7 +45,7 @@ import {
 } from './computer-use-limits.mjs';
 import { LocalMetaRepository, LocalSettingsRepository, LocalWorkRunRepository, LocalWorkflowCandidateRepository, LocalWorkRunExperienceRepository, LocalWorkRunContextRepository, LocalWorkRunAssistanceRepository, LocalExperiencePatternRepository, LocalDatasetRepository, DATASET_NAME_RE, FIELD_NAME_RE, WORK_RUN_ID_RE, WORK_RUN_STATUSES, WORKFLOW_CANDIDATE_ID_RE, localDbHealth, LocalDbError } from './local-db.mjs';
 import { backupSummary } from './local-db-backup.mjs';
-import { validateContextSaveArgs, validateContextRecallArgs, validateAssistanceRecordArgs, validateExperienceRecallArgs } from './work-assistance.mjs';
+import { validateContextSaveArgs, validateContextRecallArgs, validateAssistanceRecordArgs, validateExperienceRecallArgs, takeOwnerKey } from './work-assistance.mjs';
 import { prepareTarget, resolveRegisteredTarget } from './work-target.mjs';
 import { uiaInspect, uiaSetValue, uiaInvoke, uiaKey, uiaClick } from './windows-uia.mjs';
 import {
@@ -58,8 +58,9 @@ import {
   validateDomSetInputArgs,
   validateNoArgs,
 } from './browser-dom-limits.mjs';
+import { runDomUnit, validateDomRunUnitArgs } from './browser-dom-unit.mjs';
 
-export const AGENT_VERSION = '0.1.0';
+export const AGENT_VERSION = '0.3.0';
 
 /** 서버 계약(local-agent-protocol.ts)의 action 이름과 반드시 일치해야 한다. */
 export const ACTIONS = {
@@ -86,6 +87,8 @@ export const ACTIONS = {
   DOM_SELECT_OPTION: 'local.browser.dom.select_option',
   DOM_CLICK: 'local.browser.dom.click',
   DOM_READ_TABLE: 'local.browser.dom.read_table',
+  // WO-O4O-PERSONAL-ASSISTANT-PHASE-E-TASK-UNIT-DISPATCH-V1 — 판단이 끝난 짧은 단계 묶음을 이 노드가 이어서 실행(browser-dom-unit.mjs).
+  DOM_RUN_UNIT: 'local.browser.dom.run_unit',
   // WO-O4O-LOCAL-DATA-SQLITE-V0 §35 — 최소 안전 데이터 tool 3개.
   // WO-O4O-WORK-TARGET-DISCOVERY-AND-ACTIVATION-V0 §3·§33 — `local.target.prepare#<targetId>`(등재 siteId 또는 appId).
   //   있으면 재사용·활성화 → 없으면 등재 방법으로 열기 → 그래도 안 되면 사용자 요청. 인자 없음.
@@ -584,6 +587,7 @@ const DOM_HANDLERS = {
   [ACTIONS.DOM_SELECT_OPTION]: { validate: validateDomSelectOptionArgs },
   [ACTIONS.DOM_CLICK]: { validate: validateDomElementArgs },
   [ACTIONS.DOM_READ_TABLE]: { validate: validateDomReadTableArgs },
+  [ACTIONS.DOM_RUN_UNIT]: { validate: validateDomRunUnitArgs },
 };
 
 /** 확장 응답 봉투 → agent 결과. 성공/실패 어느 쪽이든 필드는 trimDomResult 를 통과한 것뿐이다. */
@@ -616,6 +620,31 @@ async function runDomAction(base, site, args, context) {
     return { status: 'failed', errorCode, data: base0 };
   }
   return domOutcome(site, reply.message);
+}
+
+/**
+ * `local.browser.dom.run_unit` — 단계마다 **단발 action 과 같은 검증 · 같은 실행 경로(runDomAction)**를 지난다.
+ * 단위가 새 실행 수단을 갖지 않는다는 뜻이다. 확장 미연결이면 아무것도 실행하지 않고 실패로 돌려준다.
+ * 시간 상한은 단위 상한과 명령 만료(제출 여유 포함) 중 이른 쪽이다.
+ */
+async function runDomUnitAction(site, args, context) {
+  const bridge = context && context.bridge;
+  if (!bridge || !bridge.isExtensionConnected()) {
+    return { status: 'failed', errorCode: 'O4O_EXTENSION_NOT_CONNECTED', data: { siteId: site.siteId, displayName: site.displayName } };
+  }
+  const expiresAt = context && context.commandExpiresAt ? new Date(context.commandExpiresAt).getTime() : undefined;
+  const call = async (base, a) => {
+    const handler = DOM_HANDLERS[base];
+    if (!handler || base === ACTIONS.DOM_RUN_UNIT) return { status: 'denied', errorCode: 'DOM_ACTION_NOT_ALLOWED' };
+    const checked = handler.validate(a);
+    if (!checked.ok) return { status: 'denied', errorCode: 'DOM_ACTION_NOT_ALLOWED' };
+    try {
+      return await runDomAction(base, site, checked.args, context);
+    } catch {
+      return { status: 'failed', errorCode: 'DOM_CONTENT_UNAVAILABLE' };
+    }
+  };
+  return runDomUnit(site, args, { call, expiresAt, ...(context && context.unitClock ? context.unitClock : {}) });
 }
 
 /** siteId 를 받는 handler. APP_HANDLERS 와 같은 규칙 — 인자 유무가 곧 계약이다. */
@@ -722,6 +751,7 @@ function dataWorkRunUpsert(args) {
     targetId: args.targetId,
     goalSummary: args.goalSummary,
     note: args.note,
+    ownerKey: args.ownerKey,
   });
   return { status: 'success', data: { runId: saved.runId, runStatus: saved.status, saved: true } };
 }
@@ -734,13 +764,17 @@ function dataWorkRunSetStatus(args) {
 }
 
 /** work_run_upsert 인자 검사 — 서버 validateDataWorkRunUpsertArgs 와 동일 규칙. */
-function validateWorkRunUpsertArgs(args) {
+function validateWorkRunUpsertArgs(rawArgs) {
+  // Phase D — 선택 인자 ownerKey(local.db v8 소유 주체). 없으면 이전 묶음.
+  const owned = takeOwnerKey(rawArgs);
+  if (!owned.ok) return { ok: false };
+  const args = owned.rest;
   if (!args || typeof args !== 'object' || Array.isArray(args)) return { ok: false };
   const allowed = new Set(['runId', 'status', 'targetId', 'goalSummary', 'note']);
   for (const k of Object.keys(args)) if (!allowed.has(k)) return { ok: false };
   if (typeof args.runId !== 'string' || !WORK_RUN_ID_RE.test(args.runId)) return { ok: false };
   if (typeof args.status !== 'string' || !WORK_RUN_UPSERT_STATUSES.includes(args.status)) return { ok: false };
-  const out = { runId: args.runId, status: args.status };
+  const out = { runId: args.runId, status: args.status, ownerKey: owned.ownerKey };
   if (args.targetId !== undefined) {
     // 등재 대상만 — resolveRegisteredTarget 이 site/app registry 로 판정한다.
     if (!resolveRegisteredTarget(args.targetId)) return { ok: false };
@@ -856,7 +890,10 @@ function isValidWorkflowTemplate(value) {
 }
 
 /** candidate_save 인자 검사 — 서버 validateDataWorkRunCandidateSaveArgs 와 동일 규칙. */
-function validateCandidateSaveArgs(args) {
+function validateCandidateSaveArgs(rawArgs) {
+  const owned = takeOwnerKey(rawArgs);
+  if (!owned.ok) return { ok: false };
+  const args = owned.rest;
   if (!args || typeof args !== 'object' || Array.isArray(args)) return { ok: false };
   for (const k of Object.keys(args)) if (!['runId', 'targetId', 'template', 'steps', 'replayedCandidateId'].includes(k)) return { ok: false };
   if (typeof args.runId !== 'string' || !WORK_RUN_ID_RE.test(args.runId)) return { ok: false };
@@ -867,7 +904,7 @@ function validateCandidateSaveArgs(args) {
   const templateSlots = new Set([...args.template.matchAll(/\{\{(\d)\}\}/g)].map((m) => Number(m[1])));
   const usedSlots = new Set(steps.filter((s) => s.slot !== undefined).map((s) => s.slot));
   if (templateSlots.size !== usedSlots.size || [...usedSlots].some((n) => !templateSlots.has(n))) return { ok: false };
-  const out = { runId: args.runId, targetId: args.targetId, template: args.template, steps };
+  const out = { runId: args.runId, targetId: args.targetId, template: args.template, steps, ownerKey: owned.ownerKey };
   if (args.replayedCandidateId !== undefined) {
     if (typeof args.replayedCandidateId !== 'string' || !WORKFLOW_CANDIDATE_ID_RE.test(args.replayedCandidateId)) return { ok: false };
     out.replayedCandidateId = args.replayedCandidateId;
@@ -876,13 +913,16 @@ function validateCandidateSaveArgs(args) {
 }
 
 /** candidate_match 인자 검사 — `{ targetId, request }`. */
-function validateCandidateMatchArgs(args) {
+function validateCandidateMatchArgs(rawArgs) {
+  const owned = takeOwnerKey(rawArgs);
+  if (!owned.ok) return { ok: false };
+  const args = owned.rest;
   if (!args || typeof args !== 'object' || Array.isArray(args)) return { ok: false };
   for (const k of Object.keys(args)) if (!['targetId', 'request'].includes(k)) return { ok: false };
   if (!resolveRegisteredTarget(args.targetId)) return { ok: false };
   if (typeof args.request !== 'string' || args.request.length === 0 || args.request.length > WORKFLOW_REQUEST_MAX) return { ok: false };
   if (workflowNormalize(args.request) !== args.request) return { ok: false };
-  return { ok: true, args: { targetId: args.targetId, request: args.request } };
+  return { ok: true, args: { targetId: args.targetId, request: args.request, ownerKey: owned.ownerKey } };
 }
 
 /** candidate_result 인자 검사 — `{ candidateId, outcome }`. */
@@ -1252,6 +1292,7 @@ export async function runAction(action, context, args) {
       };
     }
     try {
+      if (base === ACTIONS.DOM_RUN_UNIT) return await runDomUnitAction(site, checked.args, context);
       return await runDomAction(base, site, checked.args, context);
     } catch {
       return { status: 'failed', errorCode: 'DOM_CONTENT_UNAVAILABLE' };

@@ -1,6 +1,10 @@
 # O4O-AUTOMATION-AGENT-ARCHITECTURE-V1
 
-> **상태**: ACTIVE — O4O 자동화 아키텍처 정본 (`CANONICAL-INDEX` §6)
+> **상태**: SUPERSEDED · **대체 문서**: [`O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2`](O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2.md) · **표기일**: 2026-10-03
+>
+> 본문은 2026-10-01 활성화 시점 그대로 보존한다. 유효 조항(Strong-first · User Convenience First · Human-Assisted Discovery · 승격 원칙 · 고위험 최종 확정 제외 · 실행 계층 ≠ 두뇌 · Runtime 0번 트랙 등)은 V2 §21 승계표에 따라 **V2 의 해당 절로서** 유효하다. 승계하지 않은 것: §5 Local/Shared 2단 · §5-1 Local-first(→ V2 §9 Ownership-first) · §1-1 "Experience 가 구조의 중심"(→ V2 §1) · §10-1 개발 순서(→ V2 §18). 이 문서를 근거로 새 작업을 시작하지 않는다.
+>
+> ~~**상태**: ACTIVE — O4O 자동화 아키텍처 정본 (`CANONICAL-INDEX` §6)~~
 > **작성일**: 2026-10-01 · **최종 갱신**: 2026-10-01 (사용자 검토 반영 · DRAFT → ACTIVE · §5-1 질의형 recall 명확화 · §10-2 갱신 · `WO-O4O-AI-AUTOMATION-PRINCIPLES-USER-CORRECTION-KNOWLEDGE-AND-MODEL-ROUTING-ALIGNMENT-V1`: §2-3 User Convenience First · §7-2-5 · §8 항목 6 RPA 관계 · §10-1 Correction · Knowledge Watch 위치)
 > **근거 WO/IR**: [`IR-O4O-AUTOMATION-AGENT-ARCHITECTURE-REALIGNMENT-V1`](../investigations/IR-O4O-AUTOMATION-AGENT-ARCHITECTURE-REALIGNMENT-V1.md) (작성) · `WO-O4O-AUTOMATION-AGENT-ARCHITECTURE-ACTIVATION-V1` (사용자 검토 확정 · 활성화, 2026-10-01)
 > **상위 정본**: [`O4O-AI-AUTOMATION-EVOLUTION-PRINCIPLES-V1`](O4O-AI-AUTOMATION-EVOLUTION-PRINCIPLES-V1.md) — 이 문서는 그 원칙을 **대체하지 않고**, 원칙이 요구하는 시스템을 **어떤 계층으로 만드는가**를 고정한다. EVOLUTION = 왜 그렇게 발전해야 하는가 · 이 문서 = 그것을 어떤 계층으로 구현하는가. 둘이 충돌하면 EVOLUTION-PRINCIPLES 가 우선한다.

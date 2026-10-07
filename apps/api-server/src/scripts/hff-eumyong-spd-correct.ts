@@ -15,7 +15,7 @@ const APPLY = process.argv.includes('--apply');
 const CONFIRM = process.env.HFF_EUMYONG_APPLY_CONFIRM === 'YES';
 const PROXY_HOST = process.env.PROXY_HOST ?? '127.0.0.1';
 const PROXY_PORT = parseInt(process.env.PROXY_PORT ?? '5437', 10);
-const D = 'C:/Users/sohae/o4o-platform/docs/checks/data/product-description-guard';
+const D = 'src/scripts/data/check-data/product-description-guard';
 const SP = 'C:/Users/sohae/AppData/Local/Temp/claude/c--Users-sohae-o4o-platform/55e4dd9c-cf70-462e-8114-188f6c53d473/scratchpad';
 
 // (파일, 신고번호)

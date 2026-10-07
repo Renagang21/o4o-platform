@@ -1,7 +1,7 @@
 # IR-O4O-NETURE-SUPPLIER-APPROVAL-AND-ACTIVATION-FLOW-AUDIT-V1
 
 > **유형**: 조사(IR) · read-only. 본 조사 과정에서 코드·DB 데이터를 변경하지 않았다.
-> **대상 계정**: sohae21@naver.com (Neture 공급자)
+> **대상 계정**: [REDACTED_EMAIL_C] (Neture 공급자)
 > **작성일**: 2026-06-29
 
 ---
@@ -127,7 +127,7 @@
 
 DB 직접 조회는 **운영 DB 비밀번호 노출 정책**(메모리 "비번 기록금지")에 의해 차단되어 본 IR 에서는 수행하지 않았다. 다음은 운영자 Network 탭 또는 승인된 read-only SQL 로 1회 확인 권장:
 
-1. sohae21@naver.com 의 `neture_suppliers` row 에서 `manager_name`/`manager_phone` 실제 NULL 여부 → 어느 필드가 400 을 유발하는지 확정.
+1. [REDACTED_EMAIL_C] 의 `neture_suppliers` row 에서 `manager_name`/`manager_phone` 실제 NULL 여부 → 어느 필드가 400 을 유발하는지 확정.
 2. 활성화 클릭 시 `POST /neture/operator/suppliers/:id/approve` 의 실제 응답(예상: 400 `ONBOARDING_INCOMPLETE:managerName`).
 3. `manager_name` 누락 공급자가 전반적으로 몇 건인지(시드/복원 row 영향 범위).
 

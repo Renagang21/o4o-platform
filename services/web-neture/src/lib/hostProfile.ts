@@ -4,7 +4,7 @@
  *
  *   supplier.neture.co.kr  → 공급자 영역(`/` = 공급자 대표 화면, `/supplier/*`)
  *   funding.neture.co.kr   → 유통참여형 펀딩(`/` = 펀딩 대표 화면, `/market-trial/*`)
- *   community.neture.co.kr → 커뮤니티 진입(`/pharmacist` · `/retail`)
+ *   community.neture.co.kr → 커뮤니티 진입(`/pharmacist`)
  *   그 외(neture.co.kr · www · run.app · localhost) → 기존 전체 사이트
  *
  * 경로 형태는 바꾸지 않는다(`/supplier/*` · `/market-trial/*` 유지) — 내부 링크를 고치지 않고
@@ -45,7 +45,7 @@ const OWNED_PREFIXES: Readonly<Record<SubHost, readonly string[]>> = Object.free
  */
 export const COMMUNITY_TARGETS: Readonly<Record<string, string>> = Object.freeze({
   '/pharmacist': 'https://pharmacy.neture.co.kr/forum',
-  '/retail': 'https://retail.neture.co.kr/forum',
+  // '/retail'(retail.neture.co.kr 포럼)은 K-Cosmetics 공개 서비스 종료로 제거 — WO-O4O-KCOSMETICS-RETIREMENT-PHASE1A-WEB-APP-AND-DEPLOY-TARGET-V1.
 });
 
 /**
@@ -99,7 +99,7 @@ export type HostDecision = { kind: 'stay' } | { kind: 'external'; href: string }
 /**
  * 현재 호스트 · 경로에서 할 일.
  *   - 새 호스트의 `/` → 그대로(App 이 호스트 대표 화면을 렌더)
- *   - 커뮤니티 호스트의 `/pharmacist` · `/retail` → 현재 동작하는 커뮤니티
+ *   - 커뮤니티 호스트의 `/pharmacist` → 현재 동작하는 커뮤니티
  *   - 새 호스트에서 소유하지 않은 경로(공유 경로 제외) → 대표 호스트 같은 경로(쿼리 · 해시 보존)
  *   - 대표 호스트에서 새 호스트 소유 경로 → cutover 가 켜진 호스트만 새 호스트로
  */

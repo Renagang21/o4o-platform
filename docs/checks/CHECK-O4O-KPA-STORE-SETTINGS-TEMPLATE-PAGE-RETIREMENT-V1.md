@@ -154,7 +154,7 @@ WO §12 에 따라 **저장(write) 없이 이동·조회 중심**.
 
 | 항목 | 내용 |
 |------|------|
-| 로컬 테스트 계정 SSOT | `docs/local/TEST-ACCOUNTS.local.md` 의 `renagang21@gmail.com` 비밀번호 stale(프로덕션 401) |
+| 로컬 테스트 계정 SSOT | `docs/local/TEST-ACCOUNTS.local.md` 의 `[REDACTED_EMAIL_B]` 비밀번호 stale(프로덕션 401) |
 | K-Cosmetics | `StoreSettingsPage` 가 `applyTemplateDefaults` 미전송 → 동일 템플릿 미적용 결함 잔존 (백엔드 계약은 준비 완료) |
 | legacy template API | `GET/PUT /stores/:slug/template` KPA 프론트 소비 0 — 타 소비처 확인 후 은퇴 판단 |
 

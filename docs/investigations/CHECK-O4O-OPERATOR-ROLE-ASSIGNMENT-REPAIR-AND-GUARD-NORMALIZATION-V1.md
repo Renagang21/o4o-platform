@@ -50,7 +50,7 @@ if (assignment) {
 
 ### 1.2 Phase 2 — RA Reactivation (4/4 PASS)
 
-호출자: `sohae2100@gmail.com` (platform:super_admin)
+호출자: `[REDACTED_EMAIL_A]` (platform:super_admin)
 경로: `POST /api/v1/operator/members/<userId>/roles` (F9 SSOT Write path 정합)
 
 | Account | userId | Role | HTTP | isActive |
@@ -223,7 +223,7 @@ BASE="https://api.neture.co.kr/api/v1"
 
 # 두 계정 로그인
 curl -X POST "$BASE/auth/login" -H "Content-Type: application/json" \
-  -d '{"email":"neture-operator@o4o.com","password":"O4oBootstrap1!"}' -c op.jar
+  -d '{"email":"neture-operator@o4o.com","password":"[REDACTED]"}' -c op.jar
 curl -X POST "$BASE/auth/login" -H "Content-Type: application/json" \
   -d '{"email":"<admin>","password":"<pwd>"}' -c admin.jar
 

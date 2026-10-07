@@ -147,7 +147,7 @@ ORDER BY role;
 | `admin@o4o.com` | `99990002-0002-...` | `user` |
 | `admin@kpa.test` | `6658c9b7-722f-...` | `user` |
 | `kpa-a-operator@o4o.com` | `e7225cfb-795a-...` | `user` |
-| `sohae21@naver.com` | `e709bcd9-6db2-...` | `user` |
+| `[REDACTED_EMAIL_C]` | `e709bcd9-6db2-...` | `user` |
 
 ### C. 검증 결과 (실행 후 `/__debug__/rbac-db-audit` 2026-02-27T13:06:03Z)
 

@@ -12,7 +12,7 @@
 - **선행 IR:** [IR-O4O-NETURE-ADMIN-USERS-SCOPE-AUDIT-V1](IR-O4O-NETURE-ADMIN-USERS-SCOPE-AUDIT-V1.md)
 - **검증 방법:** Production API 직접 호출 (curl + cookie-based auth) — CLAUDE.md §8 의 허용 검증 방식 중 하나
 - **검증 환경:** `api.neture.co.kr` (Cloud Run 배포본, deploy 완료 확인됨)
-- **검증 계정:** `sohae2100@gmail.com` — `platform:super_admin` + `neture:admin` + `neture:operator` + 그 외 다중 role/membership 보유
+- **검증 계정:** `[REDACTED_EMAIL_A]` — `platform:super_admin` + `neture:admin` + `neture:operator` + 그 외 다중 role/membership 보유
 
 > **방법론 한계:** 브라우저 자동화(Playwright) MCP 미설치 → 브라우저 직접 렌더링 검증은 불가. 대신 frontend가 실제 호출하는 동일 API 엔드포인트를 동일 파라미터로 호출하여 응답을 분석. UI 레이어(라우트 가드, 컴포넌트 렌더, 탭 상태)는 본 검증 범위 밖.
 
@@ -61,12 +61,12 @@ has_neture: 2 / no_neture: 0 / neture_only: 1 / multi_service: 1
 sample[0]: neture-operator@o4o.com
   memberships: ["neture:active"]
 
-sample[mid]: sohae2100@gmail.com
+sample[mid]: [REDACTED_EMAIL_A]
 ```
 
 **판정**
 
-- `sohae2100@gmail.com` 은 Neture 멤버십이 *포함된* 다중 서비스 사용자이므로 정상 노출 (IR §4.1 의 "Neture + 타 서비스 다중 멤버십" 정책 일치). ✅
+- `[REDACTED_EMAIL_A]` 은 Neture 멤버십이 *포함된* 다중 서비스 사용자이므로 정상 노출 (IR §4.1 의 "Neture + 타 서비스 다중 멤버십" 정책 일치). ✅
 - pagination.total = 2 — 17명 → 2명으로 축소 = leak 해소.
 
 ### 2.2 S2 — UNSCOPED list (baseline) — Leak 재현

@@ -173,7 +173,7 @@
 
 ## 14. API smoke 결과 — **ALL PASS** (2026-06-27, prod `api.neture.co.kr`)
 
-배포(커밋 `a121551a7`) 후 `renagang21@gmail.com`(kpa:store_owner)로 라이브 검증.
+배포(커밋 `a121551a7`) 후 `[REDACTED_EMAIL_B]`(kpa:store_owner)로 라이브 검증.
 임시 `store_local_product` 1건 생성 → 전체 라이프사이클 검증 → 삭제(정리 완료).
 
 | 검증 | 결과 |

@@ -19,9 +19,9 @@ Neture B2B canonical end-to-end positive smoke 를 위한 테스트 공급자 �
 
 | 자원 | id / 값 | 비고 |
 |------|---------|------|
-| 테스트 계정 (공급자 = buyer 겸용) | `renagang21@gmail.com` (userId `6967ebe0-2f87-4cab-809b-8c7190493cef`) | 비번 SSOT 참조. KPA 약국 경영자 계정과 **동일 멀티롤 계정** |
+| 테스트 계정 (공급자 = buyer 겸용) | `[REDACTED_EMAIL_B]` (userId `6967ebe0-2f87-4cab-809b-8c7190493cef`) | 비번 SSOT 참조. KPA 약국 경영자 계정과 **동일 멀티롤 계정** |
 | Neture supplier | `91169739-6291-4bed-b1e9-b3d4a93d65eb` "(주)네뚜레 공급자 테스트" | PENDING → **ACTIVE 승인됨** |
-| 승인자 (operator) | `sohae2100@gmail.com` (neture operator/admin) | |
+| 승인자 (operator) | `[REDACTED_EMAIL_A]` (neture operator/admin) | |
 | 테스트 SPO (offer) | `d10c68ae-e6f9-4d07-a734-60feccadf653` "[E2E_TEST] Neture B2B 테스트 상품 1" | priceGeneral 12000, masterId `6f6f7be8-09b9-4962-be33-e8e1c56f204e` |
 | SPO 분배 | distributionType **PRIVATE**, allowedSellerIds `[6967ebe0…]`, isActive **true**, approvalStatus **PENDING** | PRIVATE 타깃(공개 마켓 비노출). PENDING 은 공개 승인 상태로 PRIVATE 직접 분배 구매를 막지 않음 |
 | 배송정책 (supplier profile) | baseShippingFee **3000** / freeShippingThreshold **50000** / averageDispatchDays **2** | |
@@ -29,15 +29,15 @@ Neture B2B canonical end-to-end positive smoke 를 위한 테스트 공급자 �
 
 자원 metadata 권장(테스트 식별): `testResource: true`, `testPurpose: NETURE_B2B_CANONICAL_E2E`. (현 supplier/offer 엔티티에 자유 metadata 컬럼이 없어 `[E2E_TEST]` 상품명 prefix + 본 CHECK 의 id 기록으로 식별/정리.)
 
-> **이 계정/자원은 서비스 시작 전 사용자가 수작업으로 삭제하거나 비밀번호를 변경할 예정이다.** (단, `renagang21@gmail.com` 은 KPA 약국 smoke 와 공유되는 멀티롤 계정이므로 삭제 시 KPA 약국 테스트 흐름 영향 — 비번 변경/공급자 비활성화 권장.)
+> **이 계정/자원은 서비스 시작 전 사용자가 수작업으로 삭제하거나 비밀번호를 변경할 예정이다.** (단, `[REDACTED_EMAIL_B]` 은 KPA 약국 smoke 와 공유되는 멀티롤 계정이므로 삭제 시 KPA 약국 테스트 흐름 영향 — 비번 변경/공급자 비활성화 권장.)
 
 ---
 
 ## 3. 단계별 결과
 
 ### Phase 1 — 사전 상태 (read-only)
-- `renagang21@gmail.com` Neture 로그인 성공. 이미 **linked supplier** 존재 (supplierId 91169739, name "(주)네뚜레 공급자 테스트", **status PENDING**, products 0). → 신규 가입 불필요, **운영자 승인부터 진행**.
-- 자격증명 정정: WO 기재 `seochuran1!` 은 renagang21 에 대해 401(실패). 실제 비번은 SSOT 값(검증 200). `Seochuran1!` 은 `sohae21@naver.com` 의 비번. → renagang21 은 SSOT 비번으로 진행.
+- `[REDACTED_EMAIL_B]` Neture 로그인 성공. 이미 **linked supplier** 존재 (supplierId 91169739, name "(주)네뚜레 공급자 테스트", **status PENDING**, products 0). → 신규 가입 불필요, **운영자 승인부터 진행**.
+- 자격증명 정정: WO 기재 `[REDACTED — rotated]` 은 renagang21 에 대해 401(실패). 실제 비번은 SSOT 값(검증 200). `[REDACTED — rotated]` 은 `[REDACTED_EMAIL_C]` 의 비번. → renagang21 은 SSOT 비번으로 진행.
 
 ### Phase 2 — 회원가입
 - 생략 (supplier record 이미 존재).
@@ -100,7 +100,7 @@ Neture B2B canonical end-to-end positive smoke 를 위한 테스트 공급자 �
 supplier   91169739-6291-4bed-b1e9-b3d4a93d65eb  → 비활성화/삭제
 offer(SPO) d10c68ae-e6f9-4d07-a734-60feccadf653  → 비활성화/삭제
 cart item  287651b8-61ef-4d92-876a-4d4e0f056ff3  → 삭제 (또는 후속 E2E 에서 소비)
-account    renagang21@gmail.com                   → 비번 변경 (KPA 약국 공유 — 삭제 비권장)
+account    [REDACTED_EMAIL_B]                   → 비번 변경 (KPA 약국 공유 — 삭제 비권장)
 배송정책   supplier profile shipping (3000/50000/2) → 필요시 초기화
 ```
 

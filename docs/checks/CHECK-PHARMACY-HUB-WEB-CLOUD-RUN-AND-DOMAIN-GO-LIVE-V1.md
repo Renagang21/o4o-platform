@@ -59,7 +59,7 @@ NEG 생성 0 · backend-service 생성 0 · url-map 수정 0 · 인증서 발급
 구조 자체는 **명확하게 파악**했다 → 중지 조건 ②(연결 구조 불명확) **미해당**.
 
 ```
-DNS A → 136.110.132.35
+DNS A → [REDACTED_IP]
    └ o4o-global-lb-forwarding-rule-2 (443)
        └ o4o-global-lb-target-proxy-2
            ├ certificateMap: o4o-main-cert-map → cm-cert-neture (ACTIVE)
@@ -160,11 +160,11 @@ DNS 가 선행되어야 나머지가 의미를 갖는다. 순서가 중요하다
 ### ① Gabia — DNS 존 생성 + A 레코드 (**사용자만 가능**)
 
 ```
-pharmacyhub.co.kr.       A     136.110.132.35
-www.pharmacyhub.co.kr.   A     136.110.132.35
+pharmacyhub.co.kr.       A     [REDACTED_IP]
+www.pharmacyhub.co.kr.   A     [REDACTED_IP]
 ```
 
-`136.110.132.35` = `o4o-global-lb-forwarding-rule-2` (443) 의 IP.
+`[REDACTED_IP]` = `o4o-global-lb-forwarding-rule-2` (443) 의 IP.
 다른 O4O 도메인(`kpa-society.co.kr`)이 가리키는 것과 **같은 IP**다.
 
 ### ② GCP — LB 연결 (DNS 전파 확인 후)

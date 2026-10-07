@@ -86,7 +86,7 @@ const SERVICES: Svc[] = [
     // /operator/* 는 별도 sub-router 로 위임된다.
     extra: [['services/web-kpa-society/src/routes/OperatorRoutes.tsx', '/operator']],
   },
-  { key: 'k-cosmetics', dir: 'services/web-k-cosmetics', copy: 'k-cosmetics.ts' },
+  // k-cosmetics 앱(services/web-k-cosmetics)은 퇴역 삭제 — WO-O4O-KCOSMETICS-RETIREMENT-PHASE1A-WEB-APP-AND-DEPLOY-TARGET-V1. copy 파일 단언만 아래에 남긴다.
   { key: 'neture', dir: 'services/web-neture', copy: 'neture.ts' },
   // WO-O4O-PHARMACYHUB-GUIDE-ADOPTION-V1
   { key: 'pharmacy-hub', dir: 'services/web-pharmacy-hub', copy: 'pharmacy-hub.ts' },
@@ -158,7 +158,7 @@ describe('Guide route contract', () => {
   );
 
   it('K-Cosmetics Guide 는 legacy alias 대신 canonical store 경로를 사용한다', () => {
-    const kc = copySource(SERVICES[1]);
+    const kc = copySource({ key: 'k-cosmetics', dir: '', copy: 'k-cosmetics.ts' });
     expect(kc).not.toContain("'/store/signage/playlist'");
     expect(kc).not.toContain("'/store/qr'");
     expect(kc).not.toContain('/store/requests');

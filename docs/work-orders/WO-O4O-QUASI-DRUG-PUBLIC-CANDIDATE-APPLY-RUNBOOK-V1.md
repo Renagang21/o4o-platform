@@ -59,7 +59,7 @@ write 대상 테이블: **`product_candidates` 단 하나.** INSERT (기존 없�
 
 ## 2-A. 실측 baseline (pre-snapshot, 2026-07-04)
 
-> 채널: `gcloud sql instances patch` 로 authorized-network **임시 추가(기존 `124.194.156.36/32` 보존) → psql read-only → 즉시 원복**. 전부 SELECT. DB write 0 / apply 0. DB secret 미출력.
+> 채널: `gcloud sql instances patch` 로 authorized-network **임시 추가(기존 `[REDACTED_IP]/32` 보존) → psql read-only → 즉시 원복**. 전부 SELECT. DB write 0 / apply 0. DB secret 미출력.
 
 | 지표 | 측정값 | apply 후 기대 |
 |---|---:|---|
@@ -76,7 +76,7 @@ write 대상 테이블: **`product_candidates` 단 하나.** INSERT (기존 없�
 
 **정합 확인:**
 - `identifier_type=MFDS_CODE` / `identifier_value=normalized=trim(ITEM_SEQ)` — mapper·ProductIdentifier union·선례(easy-drug/HIRA)·CHECK §5 결정과 일치. `MFDS_ITEM_SEQ` 미사용(중앙 리뷰 보류). 정정 불필요.
-- 방화벽: 임시 오픈 후 **원복 완료**(`124.194.156.36/32` 만 잔존).
+- 방화벽: 임시 오픈 후 **원복 완료**(`[REDACTED_IP]/32` 만 잔존).
 
 > caveat(후속 매칭 WO): `MFDS_CODE` 는 의약품/e약은요와 공유 네임스페이스 → candidate→master 자동매칭 시 `sourceKind` 스코프 필수. apply 자체는 매칭 없음(전량 pending/unmatched)이라 무관.
 
@@ -229,7 +229,7 @@ UPDATE product_candidates SET deleted_at = NOW()
 ## 9. Gate A 실행 로그 (2026-07-04) — **candidate apply 완료**
 
 > 승인: 사용자 "의약외품 apply 승인" (지금 실행 승인).
-> 채널: local + 임시 authorized-network(기존 `124.194.156.36/32` 보존 → 내 IP 임시 추가 → 즉시 원복). write 는 **tested mapper(`mapQuasiDrugRow`) + 직접 pg 청크 INSERT(트랜잭션 + 사전 count=0 가드 + in-tx verify)** 로 수행 — AppDataSource init 우회(easy-drug Gate C 메타 이슈 회피) + per-row 왕복 대신 청크로 고속화. INSERT 컬럼 매핑은 서비스 `applyRows` 와 동일. 임시 스크립트는 커밋하지 않고 실행 후 삭제.
+> 채널: local + 임시 authorized-network(기존 `[REDACTED_IP]/32` 보존 → 내 IP 임시 추가 → 즉시 원복). write 는 **tested mapper(`mapQuasiDrugRow`) + 직접 pg 청크 INSERT(트랜잭션 + 사전 count=0 가드 + in-tx verify)** 로 수행 — AppDataSource init 우회(easy-drug Gate C 메타 이슈 회피) + per-row 왕복 대신 청크로 고속화. INSERT 컬럼 매핑은 서비스 `applyRows` 와 동일. 임시 스크립트는 커밋하지 않고 실행 후 삭제.
 
 | 항목 | 값 |
 |---|---|
@@ -253,6 +253,6 @@ UPDATE product_candidates SET deleted_at = NOW()
 | **G. product_identifiers** | 703,483 | **703,483** | ✅ 불변 |
 | easy_drug candidates (격리) | 4,757 | **4,757** | ✅ 불변 |
 
-**→ Gate A 완료. rollback 불필요(전 지표 기대치 일치).** 의약외품 22,953 품목이 `product_candidates`(external_api / MFDS_CODE / sourceKind=`quasi_drug_permit`, 전량 pending/unmatched)로 적재됨. ProductMaster/Identifier 등 다른 테이블 **불변**. 방화벽 원복 완료(`124.194.156.36/32`만 잔존). DB secret 미출력.
+**→ Gate A 완료. rollback 불필요(전 지표 기대치 일치).** 의약외품 22,953 품목이 `product_candidates`(external_api / MFDS_CODE / sourceKind=`quasi_drug_permit`, 전량 pending/unmatched)로 적재됨. ProductMaster/Identifier 등 다른 테이블 **불변**. 방화벽 원복 완료(`[REDACTED_IP]/32`만 잔존). DB secret 미출력.
 
 **후속(별도 WO)**: XML 공식 설명 파서(EE/UD/NB CDATA) → SKU/barcode 원천 audit → Gate B(ProductMaster 승격) 재판정. candidate→master 매칭 시 `sourceKind` 스코프 필수(MFDS_CODE 공유 네임스페이스).

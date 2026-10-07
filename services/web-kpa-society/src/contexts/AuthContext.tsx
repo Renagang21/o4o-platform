@@ -126,6 +126,8 @@ interface AuthContextType {
    *   반환 계약(result object)은 그대로 — 서버 `code`(SERVICE_NOT_MEMBER 등)를 호출부가 분기한다.
    */
   loginWithGoogle: (idToken: string) => Promise<AuthLoginResult<User>>;
+  /** WO-O4O-CROSS-SERVICE-LOGIN-ENTRY-AND-RETURN-FLOW-FIX-V1: 플랫폼 이메일 계정 로그인(세션 서비스는 서버가 Origin 으로 정한다). */
+  loginWithEmail: (email: string, password: string) => Promise<AuthLoginResult<User>>;
   signupWithGoogle: (idToken: string, consents: GoogleSignupConsents) => Promise<AuthLoginResult<User>>;
   getGoogleAuthConfig: () => Promise<GoogleAuthConfig>;
   logout: () => Promise<void>;
@@ -321,6 +323,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         isLoading: core.isLoading,
         isKpaContextLoaded,
         loginWithGoogle: core.loginWithGoogle,
+        loginWithEmail: core.loginWithEmail,
         signupWithGoogle: core.signupWithGoogle,
         getGoogleAuthConfig,
         logout,

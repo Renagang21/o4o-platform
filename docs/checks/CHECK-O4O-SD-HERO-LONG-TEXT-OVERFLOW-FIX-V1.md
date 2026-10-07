@@ -24,7 +24,7 @@ WO: `WO-O4O-SD-HERO-LONG-TEXT-OVERFLOW-FIX-V1` · 일자: 2026-07-15 · 상태: 
 → 가로 스크롤 0 → 사용자는 글자가 잘린 사실조차 인지 못 함
 ```
 
-증거: [수정 전 스크린샷](../guides/products/drug/pilot-en-design/evidence/P-3-long-english-word-clipped-375px.png) — `Hydroxypropylmethylcellulosephthalate` 가 `Hydroxypropylmethyl` 에서 잘려 사라짐.
+증거: [수정 전 스크린샷](../../apps/api-server/src/scripts/data/product-descriptions/drug/pilot-en-design/evidence/P-3-long-english-word-clipped-375px.png) — `Hydroxypropylmethylcellulosephthalate` 가 `Hydroxypropylmethyl` 에서 잘려 사라짐.
 
 **영향 범위**: 영문·중문 등 **모든 외국어 설명서**. 성분명·URL·SKU 등 공백 없는 긴 문자열 전반. 한국어는 CJK 특성상 기본 줄바꿈되어 미영향.
 
@@ -60,7 +60,7 @@ overflow-wrap:anywhere; word-break:normal;
 | 계산값 `overflow-wrap` / `word-break` | normal / normal | **anywhere / normal** |
 | 가로 스크롤 | 0 (잘려서 스크롤조차 없음) | 0 (넘치지 않음) |
 
-증거: [수정 후 스크린샷](../guides/products/drug/pilot-en-design/evidence/P-3-FIXED-long-english-word-wraps-375px.png) — 긴 단어가 **온전히 2줄로 표시**.
+증거: [수정 후 스크린샷](../../apps/api-server/src/scripts/data/product-descriptions/drug/pilot-en-design/evidence/P-3-FIXED-long-english-word-wraps-375px.png) — 긴 단어가 **온전히 2줄로 표시**.
 
 ### 4-2. 요구 화면 × 콘텐츠 3종 = **27/27 PASS** (잘림 0 · 가로 스크롤 0)
 

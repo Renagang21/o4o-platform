@@ -8,7 +8,7 @@
 
 ## 0. 실행 정보
 - 일시: 2026-06-12 (KST)
-- 계정: `renagang21@gmail.com` (userId `6967ebe0-2f87-4cab-809b-8c7190493cef`, seed E2E buyer/공급자2) — production API 인증(Bearer, /auth/login).
+- 계정: `[REDACTED_EMAIL_B]` (userId `6967ebe0-2f87-4cab-809b-8c7190493cef`, seed E2E buyer/공급자2) — production API 인증(Bearer, /auth/login).
 - API: `https://o4o-core-api-...run.app/api/v1` (production). 코드/DB 직접 변경 없음(테스트 주문/결제 record 생성은 seed E2E 범위, §정리).
 - supplier `91169739-6291-4bed-b1e9-b3d4a93d65eb`(ACTIVE) · SPO `d10c68ae-e6f9-4d07-a734-60feccadf653`(PRIVATE, allowedSellerIds∋buyer, priceGeneral 12000) · 배송 base 3000/free 50000.
 

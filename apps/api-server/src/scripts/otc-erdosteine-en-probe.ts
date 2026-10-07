@@ -5,7 +5,7 @@ import crypto from 'node:crypto';
 import { buildDrugOtcEnConsumerHtml, type DrugOtcEnTranslation } from '../modules/neture/drug-import/drug-otc-en-consumer-html.js';
 
 const md5 = (s: string) => crypto.createHash('md5').update(s).digest('hex');
-const TF = path.resolve(process.cwd(), '../../docs/guides/products/drug/pilot-en-design/translations/otc-en-translations-erdosteine-300mg-jeong-v1.json');
+const TF = path.resolve(process.cwd(), 'src/scripts/data/product-descriptions/drug/pilot-en-design/translations/otc-en-translations-erdosteine-300mg-jeong-v1.json');
 
 async function main() {
   const j = JSON.parse(fs.readFileSync(TF, 'utf8')) as { translations: DrugOtcEnTranslation[]; summary?: string };

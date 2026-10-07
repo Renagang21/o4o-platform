@@ -18,6 +18,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { parseAuthResponse, resolveAuthError, AUTH_TOKEN_CLEARED_EVENT } from '@o4o/auth-utils';
 import type {
   AuthLoginResult,
+  AuthServiceAccess,
   PendingPolicyAcceptance,
   PolicyAcceptanceResult,
   ServiceAuthConfig,
@@ -54,6 +55,20 @@ function readErrorResponse(error: unknown): { data?: Record<string, unknown>; st
   return {
     data: data && typeof data === 'object' ? (data as Record<string, unknown>) : undefined,
     status: e?.response?.status,
+  };
+}
+
+/** 서버 `serviceAccess`(세미프랜차이즈 자격 거절)를 형태 검증 후 읽는다. 어긋나면 undefined. */
+export function readServiceAccess(source: unknown): AuthServiceAccess | undefined {
+  if (!source || typeof source !== 'object') return undefined;
+  const s = source as Record<string, unknown>;
+  if (typeof s.semiFranchiseKey !== 'string') return undefined;
+  const str = (v: unknown) => (typeof v === 'string' ? v : null);
+  return {
+    semiFranchiseKey: s.semiFranchiseKey,
+    pharmacyMembershipStatus: str(s.pharmacyMembershipStatus),
+    semiFranchiseMembershipStatus: str(s.semiFranchiseMembershipStatus),
+    next: str(s.next),
   };
 }
 
@@ -146,16 +161,19 @@ export function useServiceAuth<TUser>(config: ServiceAuthConfig<TUser>): Service
       } catch (error: unknown) {
         const { data, status } = readErrorResponse(error);
         if (data) {
+          // WO-NETURE-PHARMACY-CUTOVER-COMPAT-V1: 세미프랜차이즈 자격 거절은 서버 문구가 상태별 안내다.
+          const serviceAccess = readServiceAccess(data.serviceAccess);
           return {
             success: false,
             error:
-              preferServerMessage && typeof data.error === 'string' && data.error && status !== 429
+              (preferServerMessage || serviceAccess) && typeof data.error === 'string' && data.error && status !== 429
                 ? data.error
                 : resolveAuthError(data as never, status ?? 0),
             code: typeof data.code === 'string' ? data.code : undefined,
             // WO-O4O-AUTH-ACCOUNT-STATUS-UX-AND-PH-MOBILE-LOGOUT-CLOSURE-V1
             accountStatus:
               typeof data.accountStatus === 'string' ? data.accountStatus : undefined,
+            ...(serviceAccess ? { serviceAccess } : {}),
             status,
           };
         }

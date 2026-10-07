@@ -98,7 +98,7 @@ interface HomeService {
 
 const PRIMARY_SERVICES: readonly HomeService[] = [
   { label: '약국', description: '약사와 약국을 위한 정보와 매장 서비스를 이용합니다.', href: 'https://pharmacy.neture.co.kr/' },
-  { label: '리테일', description: '전문매장을 위한 제품 정보와 매장 서비스를 이용합니다.', href: 'https://retail.neture.co.kr/' },
+  // 리테일(retail.neture.co.kr · K-Cosmetics)은 공개 서비스 종료 — WO-O4O-KCOSMETICS-RETIREMENT-PHASE1A-WEB-APP-AND-DEPLOY-TARGET-V1.
   // WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1: 공개 Partner 진입은 은퇴.
   { label: '공급자', description: '제품과 콘텐츠를 등록하고 매장과 연결합니다.', href: HOST_ORIGIN.supplier },
 ];
@@ -729,7 +729,7 @@ export default function O4OHomePage() {
             )}
           </div>
         ) : (
-          // 로그인 · 회원가입은 같은 Google 흐름이다(미등록 계정은 약관 동의 → 가입) — 버튼 하나.
+          // 로그인은 모달 하나(이메일 · Google). 이메일 가입은 모달의 '회원가입'(/signup).
           <button
             type="button"
             onClick={() => openLoginModal()}
@@ -794,7 +794,8 @@ export default function O4OHomePage() {
                 data-testid="home-google-start"
                 className="mt-7 rounded-full bg-slate-900 px-6 py-2.5 text-sm font-medium text-white transition-opacity hover:opacity-80"
               >
-                Google로 시작
+                {/* WO-O4O-CROSS-SERVICE-LOGIN-ENTRY-AND-RETURN-FLOW-FIX-V1: 모달은 이메일 · Google 둘 다 연다 — Google 한정 라벨 정정 */}
+                로그인하고 시작하기
               </button>
             )}
           </section>

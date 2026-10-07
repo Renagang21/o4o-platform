@@ -1,9 +1,10 @@
 # O4O-AUTOMATION-EXPERIENCE-MODEL-V1
 
 > **상태**: ACTIVE — Experience 개념 모델 · 저장 계약 정본 (`CANONICAL-INDEX` §6)
-> **작성일**: 2026-10-01 · **최종 갱신**: 2026-10-01 (사용자 검토 D1~D8 확정 · DRAFT → ACTIVE · `WO-O4O-AI-AUTOMATION-PRINCIPLES-USER-CORRECTION-KNOWLEDGE-AND-MODEL-ROUTING-ALIGNMENT-V1`: §7-5 User Correction · §7-6 Preferred/Avoid Pattern · §8-1~8-4 Knowledge 출처 · Manual · 공식 웹 Knowledge · Knowledge Watch · 사례 D · §20 순서 보강)
+> **작성일**: 2026-10-01 · **개정**: 2026-10-04 §0-1 개인화 행 · §8 표 문구 (`WO-O4O-PERSONAL-ASSISTANT-PERSONALIZATION-PRINCIPLE-ALIGNMENT-V1`) · **최종 갱신**: 2026-10-01 (사용자 검토 D1~D8 확정 · DRAFT → ACTIVE · `WO-O4O-AI-AUTOMATION-PRINCIPLES-USER-CORRECTION-KNOWLEDGE-AND-MODEL-ROUTING-ALIGNMENT-V1`: §7-5 User Correction · §7-6 Preferred/Avoid Pattern · §8-1~8-4 Knowledge 출처 · Manual · 공식 웹 Knowledge · Knowledge Watch · 사례 D · §20 순서 보강)
 > **근거 WO**: `WO-O4O-AUTOMATION-CANONICAL-ENTRYPOINT-ALIGNMENT-AND-EXPERIENCE-MODEL-DESIGN-V1` Phase B (= `WO-O4O-AUTOMATION-EXPERIENCE-MODEL-DESIGN-V1`)
-> **상위 정본**: [`O4O-AUTOMATION-AGENT-ARCHITECTURE-V1`](O4O-AUTOMATION-AGENT-ARCHITECTURE-V1.md) §4 (Experience as Asset) · §5 (Local/Shared) · §9 (Promotion) — 그 위 [`O4O-AI-AUTOMATION-EVOLUTION-PRINCIPLES-V1`](O4O-AI-AUTOMATION-EVOLUTION-PRINCIPLES-V1.md)
+> **상위 정본**: [`O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2`](O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2.md) §6 (Experience 계층화) · §7 (Skill) · §8 (Promotion) · §9 (Memory Ownership) · §10 (Shared) — 그 위 [`O4O-AI-AUTOMATION-EVOLUTION-PRINCIPLES-V1`](O4O-AI-AUTOMATION-EVOLUTION-PRINCIPLES-V1.md). (2026-10-03 변경 · 종전 상위 [`AGENT-ARCHITECTURE-V1`](O4O-AUTOMATION-AGENT-ARCHITECTURE-V1.md) 은 SUPERSEDED)
+> **V2 정합 개정 (2026-10-03)**: 아래 "V2 정합" 절이 이 문서의 해당 조항보다 우선한다. 본문의 "ARCHITECTURE §n" 참조는 작성 시점 기록이며 현재 위치는 [V2 §21 승계표](O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2.md)로 찾는다.
 > **근거 census**: [`IR-O4O-AUTOMATION-AGENT-ARCHITECTURE-REALIGNMENT-V1`](../investigations/IR-O4O-AUTOMATION-AGENT-ARCHITECTURE-REALIGNMENT-V1.md) §3·§5 + 이 문서 부록 A 의 코드 재확인
 > **성격**: **개념 모델 + 저장 계약**. DB 테이블 · enum · API · 구현이 아니다. 이름은 의미를 고정하기 위한 것이며 코드 식별자는 구현 WO 가 정한다.
 
@@ -14,6 +15,24 @@
 > **오늘 사용자가 Agent 에게 무언가를 가르쳐 줬다면, 내일 Agent 는 무엇을 알고 있어야 같은 질문을 하지 않는가?**
 
 더 넓게: 한 번의 실행에서 무엇을 남겨야 다음 실행이 **더 빠르고 · 더 정확하고 · 사용자 도움이 적고 · AI 비용이 낮아지는가**.
+
+### 0-1. V2 정합 (2026-10-03 · `WO-O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2-CANONICALIZATION`)
+
+[`PERSONAL-ASSISTANT-ARCHITECTURE-V2`](O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2.md) ACTIVE 에 맞춰 아래 조항을 이렇게 읽는다. 개념 모델(§1~§14)과 D2~D8 은 그대로 유효하다.
+
+| 조항 | V2 이후 |
+|---|---|
+| **D1 질의형 recall** (§21) | **유일한 사용 방식이 아니다.** Experience 의 저장 위치는 V2 §9 Ownership-first(organization · user · run · node)로 정한다. Experience 가 실행 노드에 있는 동안(배치 이동 전 · 또는 node 소유 항목)에는 질의형 recall 이 그 노드에서 쓰는 방식으로 남는다. "Cloud 는 Local 원장을 read-back · 동기화하지 않는다" 는 **소유 주체 밖으로의 무단 복제 · 공유 금지**로 읽는다 |
+| D2 Task identity | 유지. V2 §4 의 Task(인스턴스)와 구분해 이 문서의 Task 는 **Task type** 이다(V2 §4-1) |
+| D3 · D4 | 유지 — 저장 위치와 무관하게 적용(V2 §6-2 · §9-3) |
+| §15 Local 최소 저장 집합 | 집합(MUST · SHOULD · OPTIONAL · DO_NOT_STORE)은 유지한다. "Local" 은 V1 시점의 저장 위치 이름이며, 각 항목의 위치는 V2 §9-2 소유 주체 배치를 따른다. 실제 이동은 V2 §17 Gate 통과 후 |
+| §16 `LOCAL_ONLY` | "실행 PC 에만" 이 아니라 **소유 주체 전용 · 공유 금지**로 읽는다. 단 개인 환경(PC 이름 · 경로 · 계정 식별자)은 node 소유다. `DO_NOT_STORE` 는 그대로 — 어디에도 저장하지 않는다 |
+| §17 Shared Experience | 유지(V2 §10). Digest 는 소유 주체가 동의 · 익명화 후 명시적으로 publish 한다. 수신 측에서는 **Shared Candidate(추천 · 우선 후보)** 이며 강제 규칙 · 표준 절차가 아니다 — 수신 사용자의 검증된 방법 · 교정을 덮어쓰지 않는다(V2 §0-1 · 2026-10-04) |
+| 개인화 (2026-10-04 · V2 §0-1) | 이 문서의 승격 · 공유 흐름(§7-6 · §13 · §14 · §17)은 **사용자 공통 Workflow 를 만드는 흐름이 아니다.** Procedure / Skill 은 소유 주체마다 다를 수 있고, 같은 Task type 에 여러 Procedure 가 공존한다. §3 의 alias "수렴" · D2 "정규화" 는 업무 유형의 식별을 맞추는 것이지 수행 절차를 통일하는 것이 아니다 |
+| §20 구현 Phase · §22 다음 작업 | Phase 1 = 완료 자산 승계 · Phase 2 = KEEP_BUT_REPOSITION · Phase 3~5 동결. 다음 작업은 V2 §18 의 단계 A(Assistant + Task Foundation) |
+| Experience ≠ 업무 데이터 | 유지 · 강조(V2 §6-3). 재고 · 판매 · 가격은 Experience 가 아닌 업무 데이터 영역 |
+| PC 독립 (2026-10-05 · V2 §3-1 · §11-1) | 이 문서의 "Local" · "사용자 PC" · `local.db` 는 **원 기록이 놓인 실행 노드**를 가리킬 뿐이다. Experience 의 주인은 소유 주체(사용자 · 조직)이고, 사용자가 PC 를 여러 대 써도 Assistant · 업무가 PC 별로 나뉘지 않고, Cloud 배치가 허용된 Experience(업무 식별 · 재개 구조 · 공개 사이트 대상 검증된 방법)는 노드와 무관하게 쓰인다. 사설 시스템 · Windows 앱 대상 절차 기억은 노드에만 있다(MEMORY-PLACEMENT M9 — V2 §11-1 (4) 예외). 특정 PC 의 `local.db` 를 Experience 의 기준 원장으로 읽지 않는다. 본문의 "실 PC smoke" 기록은 그 시점의 historical evidence 다(V2 §11-1-a) |
+| 노드 원장 소유 주체 (2026-10-05 · Phase D) | local.db v8(에이전트 0.2.0)부터 Preferred/Avoid 패턴 · Workflow Candidate · run · 도움 기록에 `owner_key`(소유 주체의 불투명 해시)가 붙고, 조회는 그 소유 주체 것만 돌려준다. §15 의 Local 최소 집합 · §16 분류는 그대로이며 경계만 소유 주체로 좁아진다. 이전 행(owner_key 없음)은 격리된다. 노드 패턴과 Cloud 패턴을 합칠 때는 Cloud 가 앞선다(V2 §23 ② 해소) |
 
 ---
 
@@ -259,7 +278,7 @@ User Correction → Correction Knowledge 후보 → 실제 Run 검증 → Local 
 |---|---|---|---|
 | 정의 | 외부에서 얻은 설명 · 매뉴얼 · 문서 · 사용자 설명 | 실제 실행에서 확인된 사실 | 반복 경험으로 신뢰도가 오른 실행 방법 |
 | 신뢰 | 미검증 주장 | 관찰된 사실(근거 등급 있음) | 조건부 신뢰(승격 상태 보유) |
-| 예 | "거래관리 → 거래명세서" (매뉴얼 p.12) | 그 경로로 실제 진입 성공(run X) | 여러 run 성공 → 표준 단계 후보 |
+| 예 | "거래관리 → 거래명세서" (매뉴얼 p.12) | 그 경로로 실제 진입 성공(run X) | 여러 run 성공 → 그 소유 주체의 Procedure 단계 후보 |
 
 **Knowledge Item** 개념:
 - source: manual / 업무 문서 / 사용자 설명(Assistance 에서 승격) / web research / 공유 Experience
@@ -284,7 +303,7 @@ Knowledge(주장, 미검증) ──Decision 근거로 사용──► Step 성�
 | Manual Knowledge | 프로그램 기준 매뉴얼(§8-2) | 외부 · 문서 |
 | User-provided Knowledge | 사용자 설명 · 업무 문서 | 사용자 |
 | User Correction Knowledge | 교정에서 나온 Preferred/Avoid 후보(§7-5 · §7-6) | 사용자 · 이 Task×Target×Stage 한정 |
-| Local Experience | 이 사용자 PC 의 실제 Run | 관찰된 사실 |
+| Local Experience | 이 사용자(소유 주체)의 실제 Run — 어느 Execution Node 에서 실행됐든 같은 소유 주체의 경험이다. 노드를 넘어 쓰이는 범위는 Cloud 배치가 허용된 것뿐이고 사설 대상 절차 기억은 노드 전용(V2 §3-1 · §11-1 (4) · 2026-10-05 정렬, 종전 표기 "이 사용자 PC") | 관찰된 사실 |
 | Shared Experience | 다른 사용자에서 검증 · 공유된 Digest | 다른 환경의 사실 → 여기서는 Knowledge(§17) |
 
 - 출처마다 신뢰가 다르지만 **최종 검증 기준은 이 사용자의 실제 Run Experience** 다. 어떤 출처도 Run 검증 없이 Skill 이 되지 않는다.
@@ -518,7 +537,7 @@ ARCHITECTURE §9-1 판단 신호 ↔ 이 모델의 출처:
   - Task identity · Target identity(public 만) · stage 경로와 semantic locator · reusable Assistance/Knowledge 의 구조화 내용 · 실패 층 분포 · 시간 · 성공률(구간화) · 환경 등급.
 - 정제 순서: ① SHAREABLE 필드만 선택 → ② 값·원문·개인 환경 제거 → ③ 수치 구간화 → ④ 사용자 동의 → ⑤ 명시적 publish.
 - 서버는 Local 원장을 read-back · 동기화하지 않는다. Digest 는 Local 이 만들어 올린다. (현재 Run 을 위한 질의형 recall 은 공유가 아니다 — D1 · ARCHITECTURE §5-1)
-- 수신 측에서 공유 Digest 는 **Knowledge(미검증 주장)** 로 들어온다 — 다른 사용자 PC 에서 바로 Skill 로 쓰지 않는다(ARCHITECTURE §5).
+- 수신 측에서 공유 Digest 는 **Knowledge(미검증 주장)** 로 들어온다 — 다른 사용자(소유 주체)에게서 바로 Skill 로 쓰지 않는다(ARCHITECTURE §5 · V2 §10. 2026-10-05 정렬, 종전 표기 "다른 사용자 PC").
 
 ---
 
@@ -621,6 +640,8 @@ Run R12 AI 방법: 성분 확인 → 성분명 재검색 → 결과에서 추정
 
 ## 20. 구현 Phase 제안 (설계 승인 이후 · 이번 작업에서 구현하지 않음)
 
+> **2026-10-03 V2 전환으로 동결** — Phase 1 = 완료 자산 승계 · Phase 2 = KEEP_BUT_REPOSITION · Phase 3~5 는 진행하지 않는다. 현재 개발 순서는 [V2 §18](O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2.md). 아래 표는 V1 시점 기록이다.
+
 | Phase | 내용 | 완료 기준 |
 |---|---|---|
 | 1 Local Experience 최소 저장 | Run(Outcome+근거 · segments) · Step(모든 run · stage · 결과) · Failure Event(층) 를 Local 에 additive 저장 | 성공/실패/도움 run 모두 Run+Step 이 남는다 |
@@ -636,6 +657,8 @@ Phase 1 구조와의 관계(2026-10-01 판정): Phase 1 v6 테이블은 Correcti
 ---
 
 ## 21. 확정 결정 (2026-10-01 사용자 검토 · D1~D8)
+
+> **2026-10-03**: D1 은 V2 Ownership-first 로 범위가 바뀌었다(§0-1). D2~D8 은 유지.
 
 | # | 결정 | 확정 | 근거 · 의미 |
 |---|---|---|---|
@@ -655,6 +678,8 @@ Phase 1 구조와의 관계(2026-10-01 판정): Phase 1 v6 테이블은 Correcti
 개발 중심이 "자동화를 더 잘 실행하는 코드" 에서 **"자동화하면서 경험을 남기는 코드"** 로 처음 이동하는 단계다 — 성공이든 실패든 실제 Run 이 Local Experience 에 남고(무엇을 했는지 · 어디서 실패했는지 · 얼마나 걸렸는지 · 어떤 근거로 성공했는지), 다음 단계(Assistance 연결 · recall)가 그것을 활용한다.
 
 2026-10-01 상태: Phase 1 코드 완료 · 실 PC smoke PENDING. 다음은 Phase 1 실환경 closure, 그 다음 Phase 2(Assistance + Correction).
+
+**2026-10-03 갱신**: V1 트랙은 V2 전환 시점에서 동결됐다(§0-1). 다음 작업은 [V2 §18](O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2.md) 단계 A — Assistant + Task Foundation. V1 구조를 전제로 한 Phase 1 실 PC smoke · 추가 확장은 하지 않는다.
 
 ---
 

@@ -60,7 +60,7 @@ Action Queue 엔드포인트 = `GET /api/v1/kpa/operator/actions`(`requireKpaSco
 |------|------|------|
 | `/health` | 200 | ✅ 200 |
 | `/api/v1/kpa/operator/actions` (no auth) | 401 | ✅ 401(guard 유지) |
-| login `sohae2100@gmail.com` | accessToken 발급 | ✅ Set-Cookie accessToken(len 2221) |
+| login `[REDACTED_EMAIL_A]` | accessToken 발급 | ✅ Set-Cookie accessToken(len 2221) |
 | `/api/v1/kpa/operator/actions` (auth) | 200·정상 shape | ✅ `{success:true, data:{summary:{total:0,...}, items:[]}}` |
 | 서빙 리비전 이미지 태그 | = commit `787c8d190` | ✅ `api-server:787c8d190...` |
 

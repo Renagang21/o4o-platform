@@ -3,7 +3,7 @@
 **검증일**: 2026-04-05
 **검증 도구**: Playwright (headless Chromium)
 **검증 URL**: `https://neture-web-3e3aws7zqa-du.a.run.app`
-**공급자 계정**: `sohae21@naver.com`
+**공급자 계정**: `[REDACTED_EMAIL_C]`
 
 ---
 

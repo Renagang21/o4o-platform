@@ -26,7 +26,7 @@ const codeOnly = (s: string) =>
     .join('\n');
 
 const KPA = join(REPO, 'services', 'web-kpa-society', 'src');
-const KCOS = join(REPO, 'services', 'web-k-cosmetics', 'src');
+// K-Cosmetics 앱(services/web-k-cosmetics)은 퇴역 삭제 — WO-O4O-KCOSMETICS-RETIREMENT-PHASE1A-WEB-APP-AND-DEPLOY-TARGET-V1.
 const PH = join(REPO, 'services', 'web-pharmacy-hub', 'src');
 const CORE = join(REPO, 'packages', 'store-ui-core', 'src');
 const GUIDE = join(REPO, 'packages', 'shared-space-ui', 'src', 'guide', 'copy');
@@ -67,7 +67,6 @@ describe('§1 backend — legacy generate 축 제거', () => {
 // ─────────────────────────────────────────────────────────────────────────────
 describe('§2 frontend — legacy page/component/api 제거 · old route redirect', () => {
   const kpaApp = codeOnly(read(KPA, 'App.tsx'));
-  const kcosApp = codeOnly(read(KCOS, 'App.tsx'));
   const phApp = codeOnly(read(PH, 'App.tsx'));
 
   it('KPA legacy 파일 3개가 존재하지 않는다', () => {
@@ -76,23 +75,13 @@ describe('§2 frontend — legacy page/component/api 제거 · old route redirec
     expect(existsSync(join(KPA, 'api', 'storePop.ts'))).toBe(false);
   });
 
-  it('KCos legacy StorePopPage 가 존재하지 않는다 (StorePopStaffPage · StorePopV2Page 는 유지)', () => {
-    expect(existsSync(join(KCOS, 'pages', 'store', 'StorePopPage.tsx'))).toBe(false);
-    expect(existsSync(join(KCOS, 'pages', 'store', 'StorePopStaffPage.tsx'))).toBe(true);
-    expect(existsSync(join(KCOS, 'pages', 'store', 'StorePopV2Page.tsx'))).toBe(true);
-  });
-
-  it('KPA / KCos `marketing/pop` 은 V2 redirect 이고 `pop` 단축 route 도 V2 로 간다', () => {
-    for (const app of [kpaApp, kcosApp]) {
+  it('KPA `marketing/pop` 은 V2 redirect 이고 `pop` 단축 route 도 V2 로 간다', () => {
+    for (const app of [kpaApp]) {
       expect(app).toMatch(/path="marketing\/pop"\s+element=\{<Navigate to="\/store\/marketing\/pop-v2" replace \/>\}/);
       expect(app).toMatch(/path="pop"\s+element=\{<Navigate to="\/store\/marketing\/pop-v2" replace \/>\}/);
       expect(app).not.toMatch(/<StorePopPage \/>|StorePopPage'\)/);
       expect(app).toMatch(/path="marketing\/pop-v2"\s+element=\{<StorePopV2Page \/>\}/);
     }
-  });
-
-  it('KCos HUB POP 사본 동선(`marketing/pop/library` → StorePopStaffPage) 은 그대로다', () => {
-    expect(kcosApp).toMatch(/path="marketing\/pop\/library"\s+element=\{<StorePopStaffPage \/>\}/);
   });
 
   it('PH 는 legacy 축이 처음부터 없었고 무변경이다', () => {
@@ -108,7 +97,7 @@ describe('§2 frontend — legacy page/component/api 제거 · old route redirec
       }
       return out;
     };
-    const hits = [KPA, KCOS, PH]
+    const hits = [KPA, PH]
       .flatMap((d) => walk(d))
       .filter((f) => /pharmacy\/pop\/(generate|source\/supplier-items)/.test(codeOnly(readFileSync(f, 'utf-8'))));
     expect(hits).toEqual([]);

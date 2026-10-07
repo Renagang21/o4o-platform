@@ -35,7 +35,7 @@ ko runner([`drug-otc-grounded-upgrade-runner.ts`](../../apps/api-server/src/scri
 - source_ref `0178f85b` 공유 ko canonical **71** (38 target + **33 out**). out 33 EN canonical **LIVE**(uniform md5 `11800175070e91f771fd414cdf040d22`). target 38 기존 EN **0**.
 
 ### 번역 (그룹당 1건 · 충실 번역)
-- 배치 전용 파일: [`otc-en-translations-albendazole-400mg-v1.json`](../../docs/guides/products/drug/pilot-en-design/translations/otc-en-translations-albendazole-400mg-v1.json) (공유 파일 미수정). GUIDE V0.5·GLOSSARY V0.2·TEST-LOG 포함.
+- 배치 전용 파일: [`otc-en-translations-albendazole-400mg-v1.json`](../../apps/api-server/src/scripts/data/product-descriptions/drug/pilot-en-design/translations/otc-en-translations-albendazole-400mg-v1.json) (공유 파일 미수정). GUIDE V0.5·GLOSSARY V0.2·TEST-LOG 포함.
 - 동일 약물 out 33 검증본(`otc-en-translations-v1.json` verbatim) → `buildDrugOtcEnConsumerHtml` md5 `11800175` = live out en **byte-identical** → **ko 에 없는 medical fact 0**.
 - TEST-LOG: `400 mg once`·요충 7일 뒤 재투여·분선충+촌충 3일 용법 보존 · `24 months / under 2` 연령 보존 · 병용금기 8종(theophylline·cimetidine·praziquantel·dexamethasone·ritonavir·phenytoin·carbamazepine·phenobarbital) 대상 보존.
 

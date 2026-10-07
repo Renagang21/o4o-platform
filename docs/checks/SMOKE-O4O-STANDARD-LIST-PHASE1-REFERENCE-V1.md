@@ -29,7 +29,7 @@
 | 항목 | 처리 |
 |------|------|
 | Chrome profile lock | **해소** — persistent profile(`~/.playwright-o4o-profile`) 미존재 확인 → ephemeral context(`chromium.launch()` + 새 context)로 실행하여 profile lock 회피. 실행 중 프로세스는 VS Code `msedgewebview2` 뿐(Playwright 락 아님). |
-| 자격증명 | SSOT(`docs/local/TEST-ACCOUNTS.local.md`)를 **런타임에 스크립트가 파싱** — 하드코딩/로그/커밋 출력 없음. 통합 운영자 계정(`sohae2100@gmail.com`) 사용. |
+| 자격증명 | SSOT(`docs/local/TEST-ACCOUNTS.local.md`)를 **런타임에 스크립트가 파싱** — 하드코딩/로그/커밋 출력 없음. 통합 운영자 계정(`[REDACTED_EMAIL_A]`) 사용. |
 
 > smoke 스크립트는 `c:\tmp\smoke-phase1.mjs` (repo 외부, 미커밋). 비밀번호 literal 없음(SSOT 런타임 파싱).
 

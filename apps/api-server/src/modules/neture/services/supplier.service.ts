@@ -1,5 +1,5 @@
 // WO-O4O-SUPPLIER-FULFILLMENT-SERVICE-SCOPE-V1
-import { NETURE_FULFILLMENT_SERVICE_KEY, netureOrderServiceScopeSql, checkoutOrderServiceScopeSql } from '../constants/fulfillment-service-scope.js';
+import { SUPPLIER_VISIBLE_FULFILLMENT_SERVICE_KEYS, checkoutOrderServiceSetSql, netureOrderServiceSetSql } from '../constants/fulfillment-service-scope.js';
 import { Repository } from 'typeorm';
 import type { EntityManager } from 'typeorm';
 import { AppDataSource } from '../../../database/connection.js';
@@ -566,8 +566,8 @@ export class NetureSupplierService {
        JOIN supplier_product_offers spo ON spo.id = oi.product_id::uuid
        WHERE spo.supplier_id = $1
          AND o.status IN ('created','pending_payment','paid','preparing','shipped')
-         AND ${netureOrderServiceScopeSql('o', '$2')}`,
-      [supplierId, NETURE_FULFILLMENT_SERVICE_KEY],
+         AND ${netureOrderServiceSetSql('o', '$2')}`,
+      [supplierId, SUPPLIER_VISIBLE_FULFILLMENT_SERVICE_KEYS],
     );
     // 결제완료·미브릿지 checkout_orders (워크스페이스가 진행 주문으로 노출)
     const checkoutRows: Array<{ c: string }> = await manager.query(
@@ -575,11 +575,11 @@ export class NetureSupplierService {
        FROM checkout_orders co
        WHERE co."supplierId" = $1
          AND co."paymentStatus" = 'paid'
-         AND ${checkoutOrderServiceScopeSql('co', '$2')}
+         AND ${checkoutOrderServiceSetSql('co', '$2')}
          AND NOT EXISTS (
            SELECT 1 FROM neture_orders no2 WHERE no2.metadata->>'checkoutOrderId' = co.id::text
          )`,
-      [supplierId, NETURE_FULFILLMENT_SERVICE_KEY],
+      [supplierId, SUPPLIER_VISIBLE_FULFILLMENT_SERVICE_KEYS],
     );
     const unsettledRows: Array<{ c: string }> = await manager.query(
       `SELECT COUNT(*)::text AS c FROM neture_settlements
@@ -656,9 +656,9 @@ export class NetureSupplierService {
          JOIN supplier_product_offers spo ON spo.id = oi.product_id::uuid
          WHERE spo.supplier_id = ANY($1::uuid[])
            AND o.status IN ('created','pending_payment','paid','preparing','shipped')
-           AND ${netureOrderServiceScopeSql('o', '$2')}
+           AND ${netureOrderServiceSetSql('o', '$2')}
          GROUP BY spo.supplier_id`,
-        [ids, NETURE_FULFILLMENT_SERVICE_KEY],
+        [ids, SUPPLIER_VISIBLE_FULFILLMENT_SERVICE_KEYS],
       );
       for (const r of netureRows) activeOrderMap.set(r.sid, parseInt(r.c, 10));
 
@@ -667,12 +667,12 @@ export class NetureSupplierService {
          FROM checkout_orders co
          WHERE co."supplierId" = ANY($1::text[])
            AND co."paymentStatus" = 'paid'
-           AND ${checkoutOrderServiceScopeSql('co', '$2')}
+           AND ${checkoutOrderServiceSetSql('co', '$2')}
            AND NOT EXISTS (
              SELECT 1 FROM neture_orders no2 WHERE no2.metadata->>'checkoutOrderId' = co.id::text
            )
          GROUP BY co."supplierId"`,
-        [ids, NETURE_FULFILLMENT_SERVICE_KEY],
+        [ids, SUPPLIER_VISIBLE_FULFILLMENT_SERVICE_KEYS],
       );
       for (const r of checkoutRows) {
         activeOrderMap.set(r.sid, (activeOrderMap.get(r.sid) ?? 0) + parseInt(r.c, 10));

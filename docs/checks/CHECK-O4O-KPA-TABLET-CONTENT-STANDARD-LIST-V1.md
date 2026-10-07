@@ -91,7 +91,7 @@
 |---|---|
 | commit | (본 커밋) |
 | 배포 | Deploy Web Services (Cloud Run) — kpa-society-web |
-| Browser smoke | **Deferred** — 인증 세션 미보유 시 자동 로그인 금지(WO). 배포 후 약국 계정(`renagang21@gmail.com`, SSOT 참조) 로그인으로 `/store` → 태블릿 콘텐츠 탭 육안 검증 필요. |
+| Browser smoke | **Deferred** — 인증 세션 미보유 시 자동 로그인 금지(WO). 배포 후 약국 계정(`[REDACTED_EMAIL_B]`, SSOT 참조) 로그인으로 `/store` → 태블릿 콘텐츠 탭 육안 검증 필요. |
 
 > Browser smoke 검증 항목(후속): 표준 테이블 렌더 / 검색 / 상태 필터 / 페이지네이션 / 체크 선택 → 일괄 보관(+실패 모달) / kebab(수정·보관) / '태블릿 화면 만들기' 진입 / 코너 적용 기능 미노출 / 성공·실패 toast.
 

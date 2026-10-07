@@ -103,8 +103,8 @@ Login Response: {"success":true} (전체 10개 운영자 계정)
 
 ```
 shop.neture.co.kr → Non-existent domain (NXDOMAIN)
-www.neture.co.kr  → 136.110.132.35 (OK)
-neture.co.kr      → 136.110.132.35 (OK)
+www.neture.co.kr  → [REDACTED_IP] (OK)
+neture.co.kr      → [REDACTED_IP] (OK)
 ```
 
 **영향:** Neture 서비스에 `shop.neture.co.kr`로 접근 불가.
@@ -114,7 +114,7 @@ neture.co.kr      → 136.110.132.35 (OK)
 
 ## 3. E2E Test Results — Round 3 (수정 배포 후)
 
-테스트 계정: `test-e2e-v3@o4o.com` / `O4oTestPass1!`
+테스트 계정: `test-e2e-v3@o4o.com` / `[REDACTED_PASSWORD]`
 
 ### 3.2 KPA-a (kpa-society.co.kr)
 
@@ -392,11 +392,11 @@ Round 3까지 Playwright 브라우저 자동화 중심 → Round 4에서는 **AP
 
 | 서비스 | 테스트 계정 | 비밀번호 | User ID |
 |--------|-----------|---------|---------|
-| KPA-a | e2e-r4-kpa@o4o.com | O4oTest1! | `527414f5-...` |
-| GlucoseView | e2e-r4-glucoseview@o4o.com | O4oTest1! | `c3e26ac3-...` |
-| K-Cosmetics | e2e-r4-kcosmetics@o4o.com | O4oTest1! | `20e42f28-...` |
+| KPA-a | e2e-r4-kpa@o4o.com | [REDACTED_PASSWORD] | `527414f5-...` |
+| GlucoseView | e2e-r4-glucoseview@o4o.com | [REDACTED_PASSWORD] | `c3e26ac3-...` |
+| K-Cosmetics | e2e-r4-kcosmetics@o4o.com | [REDACTED_PASSWORD] | `20e42f28-...` |
 
-운영자 계정: `O4oGlycoAdmin!2026` (admin 역할, 쿠키 인증)
+운영자 계정: `[REDACTED_PASSWORD]` (admin 역할, 쿠키 인증)
 
 ---
 

@@ -7,7 +7,7 @@ import type { MigrationInterface, QueryRunner } from 'typeorm';
  *
  * 완전 삭제 (모든 서비스에서 제거):
  *   - test-yaksa04~10@o4o.com, test-student03@o4o.com — KPA 전용 테스트 계정
- *   - codein3@hanmail.net — 재가입 예정, 전체 삭제 동의
+ *   - [REDACTED_EMAIL] — 재가입 예정, 전체 삭제 동의
  *
  * KPA 데이터만 삭제 (계정 유지):
  *   - sohae21@naver.com — neture 공급자로 활성 데이터 있음.

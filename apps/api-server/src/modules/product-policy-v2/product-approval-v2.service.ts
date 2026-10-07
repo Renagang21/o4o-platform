@@ -189,7 +189,7 @@ export class ProductApprovalV2Service {
              SELECT gen_random_uuid(), $2, $3, spo.master_id, spo.id, true, NOW(), NOW()
              FROM supplier_product_offers spo
              WHERE spo.id = $1
-             ON CONFLICT (organization_id, service_key, offer_id)
+             ON CONFLICT (organization_id, service_key, offer_id) WHERE service_key <> 'neture-event-offer'
              DO UPDATE SET is_active = true, updated_at = NOW()`,
             [approval.offer_id, approval.organization_id, approval.service_key],
           );

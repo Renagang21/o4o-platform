@@ -18,7 +18,7 @@
        └─ 정미입 (데이터 미입력, 3건)
 ```
 
-Password (공통): `Test1234!`
+Password (공통): `[REDACTED]`
 
 ---
 

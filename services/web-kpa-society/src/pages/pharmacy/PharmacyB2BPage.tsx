@@ -25,6 +25,10 @@ import { MultilingualContentBadge, localeLabel } from '../../components/Multilin
 // WO-O4O-KPA-O4O-LISTING-MULTILINGUAL-QR-ACTIONS-V1: 고객용 링크/QR
 import { MultilingualPublicActions } from '../../components/MultilingualPublicActions';
 import { QrCode, X as XIcon } from 'lucide-react';
+// WO-NETURE-PHARMACY-PREDEPLOY-ACCESS-ALIGNMENT-V1: Neture 약국은 이벤트 담기 · 작업대 주문 대신 새 commerce
+import { useAuth } from '../../contexts/AuthContext';
+import { NETURE_COMMERCE_LINKS, isNetureCommerceUser } from '../../lib/netureCommerce';
+import { NetureCommerceNotice } from '../../components/neture-commerce/NetureCommerceRedirect';
 
 // ── 공급유형 탭 ──
 // WO-O4O-KPA-STORE-ORDERABLE-PRODUCT-SOURCE-TABS-V1 (사용자 확정 권위 기준):
@@ -85,6 +89,8 @@ export function PharmacyB2BPage() {
   const [quantities, setQuantities] = useState<Record<string, number>>({});
 
   const isEventTab = activeSource === 'event';
+  const { user } = useAuth();
+  const netureCommerce = isNetureCommerceUser(user);
 
   const loadData = useCallback(async () => {
     // 이벤트·특가 탭은 기존 이벤트 패널이 자체 조회/주문(장바구니)을 담당 — orderable 조회 생략.
@@ -361,7 +367,7 @@ export function PharmacyB2BPage() {
 
       {/* 이벤트·특가 탭: 기존 이벤트 패널(장바구니 흐름) / 그 외: 주문 가능 상품 테이블 */}
       {isEventTab ? (
-        <EventOfferContentPanel compact />
+        netureCommerce ? <NetureCommerceNotice /> : <EventOfferContentPanel compact />
       ) : (
         <>
           {/* 검색 + 결과 카운트 + 선택 작업 */}
@@ -379,7 +385,14 @@ export function PharmacyB2BPage() {
                 {selectedIds.size > 0 && ` · ${selectedIds.size}개 선택`}
               </span>
             </div>
-            {selectedIds.size > 0 && (
+            {selectedIds.size > 0 && netureCommerce && (
+              <div style={styles.selectionActions}>
+                <a href={NETURE_COMMERCE_LINKS.supply.href} style={styles.worktableButton}>
+                  내 매장에서 주문하기 →
+                </a>
+              </div>
+            )}
+            {selectedIds.size > 0 && !netureCommerce && (
               <div style={styles.selectionActions}>
                 <button onClick={handleAddToWorktable} style={styles.worktableButton}>
                   {selectedCount > 0 ? `작업대 담기 (${selectedCount}건)` : '작업대 담기'}
@@ -460,10 +473,17 @@ export function PharmacyB2BPage() {
       {/* 페이지 안내 */}
       <div style={styles.pageNotice}>
         <span style={styles.noticeIcon}>💡</span>
-        <span>
-          B2B · 운영자 승인 · 판매자 모집 상품은 선택 후 작업대에 담아 주문합니다.
-          이벤트·특가는 이벤트·특가 탭에서 장바구니로 주문합니다.
-        </span>
+        {netureCommerce ? (
+          <span>
+            Neture 약국의 주문(공급 상품 · 이벤트 담기 · 장바구니 · 주문 내역)은{' '}
+            <a href={NETURE_COMMERCE_LINKS.supply.href}>내 매장 약국 주문 화면</a>에서 합니다.
+          </span>
+        ) : (
+          <span>
+            B2B · 운영자 승인 · 판매자 모집 상품은 선택 후 작업대에 담아 주문합니다.
+            이벤트·특가는 이벤트·특가 탭에서 장바구니로 주문합니다.
+          </span>
+        )}
       </div>
 
       {/* 다국어 고객용 링크/QR */}

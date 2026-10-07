@@ -42,37 +42,8 @@ describe('§2 backend — KPA 마운트는 변경되지 않았다', () => {
   });
 });
 
-describe('§3 frontend — web-k-cosmetics 에 자산 통제 호출이 없다', () => {
-  const api = codeLines(read('services/web-k-cosmetics/src/api/assetSnapshot.ts'));
-  it('storeAssetControlApi · /cosmetics/store-assets 0', () => {
-    expect(api).not.toMatch(/storeAssetControlApi/);
-    expect(api).not.toMatch(/\/store-assets/);
-  });
-  it('assetSnapshotApi(copy/list · /cosmetics/assets) 는 유지된다', () => {
-    expect(api).toMatch(/assetSnapshotApi/);
-    expect(api).toMatch(/\/cosmetics\/assets/);
-  });
-  it('StoreAssetsPage 는 redirect-only 다', () => {
-    const p = codeLines(read('services/web-k-cosmetics/src/pages/store/StoreAssetsPage.tsx'));
-    expect(p).toMatch(/<Navigate to="\/store\/library\/contents" replace \/>/);
-    expect(p).not.toMatch(/storeAssetControlApi|StoreAssetsView/);
-  });
-});
-
-describe('§4 frontend — StoreChannelsPage 는 자산 통제 축을 주입하지 않는다', () => {
-  const p = codeLines(read('services/web-k-cosmetics/src/pages/store/StoreChannelsPage.tsx'));
-  it('listAssets / updateAssetPublishStatus / updateAssetChannelMap 주입 0', () => {
-    expect(p).not.toMatch(/\blistAssets\s*:/);
-    expect(p).not.toMatch(/\bupdateAssetPublishStatus\s*:/);
-    expect(p).not.toMatch(/\bupdateAssetChannelMap\s*:/);
-    expect(p).not.toMatch(/storeAssetControlApi/);
-  });
-  it('채널 탭·상태·제품 노출 계약(A~D)은 그대로 주입한다', () => {
-    for (const k of ['fetchChannelOverviewWithCode', 'fetchChannelOverview', 'createChannel', 'fetchChannelProducts', 'addProductToChannel']) {
-      expect(p).toMatch(new RegExp('\\b' + k + '\\s*:'));
-    }
-  });
-});
+// §3 · §4 (web-k-cosmetics 앱 소스 단언)은 앱 퇴역 삭제로 제거했다 —
+//   WO-O4O-KCOSMETICS-RETIREMENT-PHASE1A-WEB-APP-AND-DEPLOY-TARGET-V1. backend · 공통 View 계약은 유지.
 
 describe('§5 view — StoreChannelsView 자산 통제 축은 optional 이다', () => {
   const v = read('packages/store-ui-core/src/components/channels/StoreChannelsView.tsx');
@@ -89,7 +60,8 @@ describe('§5 view — StoreChannelsView 자산 통제 축은 optional 이다', 
     expect(v).toMatch(/\{!hasAssetControl \? null : currentTab\.assetKey \?/);
   });
   it('StoreChannelsView 의 소비처는 K-Cosmetics 1곳뿐이다 (KPA 는 자체 페이지)', () => {
-    expect(existsSync(join(REPO, 'services/web-k-cosmetics/src/pages/store/StoreChannelsPage.tsx'))).toBe(true);
+    // 원본 앱 퇴역 후 남은 소비처는 web-store 로 이식된 K-Cosmetics 매장 화면(다음 퇴역 단계 대상)이다.
+    expect(existsSync(join(REPO, 'services/web-store/src/services/kcos/pages/store/StoreChannelsPage.tsx'))).toBe(true);
     const kpa = read('services/web-kpa-society/src/pages/pharmacy/StoreChannelsPage.tsx');
     expect(kpa).not.toMatch(/StoreChannelsView/);
   });

@@ -96,7 +96,7 @@ Neture 와 동일한 방식으로 서비스별 `domainIAConfig`(`가입·회원 
 ## 4. 브라우저 smoke (실 브라우저 · 프로덕션 API)
 
 로컬 `vite preview` (port 5173 — API CORS allowlist 포함 포트) + `https://api.neture.co.kr` 실 API.
-계정: `sohae2100@gmail.com` (`pharmacy-hub:operator`, membership active).
+계정: `[REDACTED_EMAIL_A]` (`pharmacy-hub:operator`, membership active).
 
 | # | 확인 | 결과 |
 |:-:|---|:---:|

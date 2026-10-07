@@ -43,6 +43,12 @@ O4O 의 Demo 계정은 **테스트 로그인 계정이 아니다.** 공개 체�
 `testmail1!` 은 secret 이 아니다. 사용자가 직접 입력해도 되고 Demo 버튼이 대신 넣어도 된다.
 다만 **여러 곳에 하드코딩하지 않고 한 곳(config/helper)에서 관리**한다.
 
+공개해도 되는 근거는 **데이터 격리**다. Demo 사용자는 일반 사용자와 같은 identity 구조로 로그인하고,
+보는 매장 · 공급자 등 데이터는 그 Demo 사용자의 ownership 에 귀속되어 다른 사용자 데이터와 연결되지
+않는다(§18-1 "데이터 범위는 role 이 아니라 ownership 이 정한다"). 따라서 문서의 비밀번호 금지 규칙에서
+이 공개 credential 은 예외다 — [`DOCUMENT-LIFECYCLE-AND-ARCHIVE-RULES-V1` §10-4](../rules/DOCUMENT-LIFECYCLE-AND-ARCHIVE-RULES-V1.md).
+예외는 이 정본의 Demo 2계정에 한정한다.
+
 ## 5. 일반 사용자와 다른 점
 
 ```text

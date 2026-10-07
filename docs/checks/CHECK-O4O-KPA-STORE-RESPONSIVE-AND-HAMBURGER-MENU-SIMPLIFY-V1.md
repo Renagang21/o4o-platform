@@ -100,7 +100,7 @@ mobileUserMenuItems?: React.ReactNode;   // 신규 optional
 
 ## 7. 운영 브라우저 smoke (2026-07-12, prod)
 
-계정: `sohae2100@gmail.com` (KPA admin+operator — 역할 대시보드 최대 노출로 hiding 검증 강화). Playwright.
+계정: `[REDACTED_EMAIL_A]` (KPA admin+operator — 역할 대시보드 최대 노출로 hiding 검증 강화). Playwright.
 
 ### 7-A. `/store` KPI 반응형 — grid 실측 (getComputedStyle + BoundingRect)
 
@@ -125,7 +125,7 @@ mobileUserMenuItems?: React.ReactNode;   // 신규 optional
 **모바일 햄버거(390px)** — 실제 노출:
 ```
 [서비스 메뉴]  커뮤니티 / 내 약국(/store) / 약국 운영 허브(/store-hub) / 서비스 안내 / About
-[사용자]       서철환님 / sohae2100@gmail.com / 마이페이지 / 설정 / 로그아웃
+[사용자]       서철환님 / [REDACTED_EMAIL_A] / 마이페이지 / 설정 / 로그아웃
 ```
 - 역할 대시보드(관리자 대시보드 / 운영 대시보드 / 내 매장) **모바일에서 미노출** ✅.
 - 햄버거 열기/닫기(메뉴 열기·메뉴 닫기), 서비스 메뉴 route 정상, `내 약국` 명칭 유지 ✅.

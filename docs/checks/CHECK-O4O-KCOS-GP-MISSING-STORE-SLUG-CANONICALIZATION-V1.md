@@ -190,7 +190,7 @@ GET /api/v1/stores/테스트-뷰티샵
 
 기존 `테스트-약국`(kpa) 은 변경 전후 모두 `{"found":true,…,"serviceKey":"kpa"}` / 200 — 회귀 없음.
 
-### 7-3. 실계정 smoke (`renagang21@gmail.com`, `serviceKey=k-cosmetics`)
+### 7-3. 실계정 smoke (`[REDACTED_EMAIL_B]`, `serviceKey=k-cosmetics`)
 
 | 요청 | 결과 |
 |---|---|

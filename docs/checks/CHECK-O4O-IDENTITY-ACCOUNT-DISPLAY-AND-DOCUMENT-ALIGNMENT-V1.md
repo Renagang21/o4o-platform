@@ -236,7 +236,7 @@ Admin 계정 메뉴의 계정 상태가 **항상 노란색 "승인대기"** 였�
 ```text
 로그인 수단    Google
 관리 권한      최고 관리자
-프로필 이메일  renariver21@gmail.com
+프로필 이메일  [REDACTED_EMAIL_D]
 ─────────────────────────
 세션 상태      Active
 권한           활성

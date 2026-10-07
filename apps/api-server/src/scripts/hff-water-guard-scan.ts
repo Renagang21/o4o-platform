@@ -8,7 +8,7 @@ import path from 'node:path';
 import { runGuard } from '../modules/content-guard/product-description-guard.js';
 import type { GuardProductInput } from '../modules/content-guard/product-description-guard.types.js';
 
-const D = 'C:/Users/sohae/o4o-platform/docs/checks/data/product-description-guard';
+const D = 'src/scripts/data/check-data/product-description-guard';
 const files = fs
   .readdirSync(D)
   .filter((f) => /^hff-probiotics-(25|30a|30b|30c|cp[1-5]|prod-a-cp\d+)\.json$/.test(f))

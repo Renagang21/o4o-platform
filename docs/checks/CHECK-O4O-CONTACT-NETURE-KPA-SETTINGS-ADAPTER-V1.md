@@ -78,7 +78,7 @@ IR 결과 Neture/KPA는 이미 DB 저장 + in-app `contact.new` 알림 + 운영�
 | `PUT .../contact-settings` (email ON + 수신자 + 자동회신 ON) | ✅ 저장 성공, `configured=true` |
 | `POST /api/v1/neture/contact` (공개) | ✅ HTTP 201, id `fe7e4969…` |
 | `GET /api/v1/neture/admin/contact-messages` 에서 `notificationStatus` | ✅ **`inapp:sent;email:sent;autoreply:sent`** |
-| 운영자 이메일 + 문의자 자동 회신 발송 | ✅ `sent` (prod 메일 provider 작동, 수신처 sohae2100@gmail.com) |
+| 운영자 이메일 + 문의자 자동 회신 발송 | ✅ `sent` (prod 메일 provider 작동, 수신처 [REDACTED_EMAIL_A]) |
 | 기존 `/admin/contact-messages` API 유지 | ✅ 문의 노출·상세 정상 |
 
 ## 14. KPA smoke — ✅ PASS (API 레벨, prod)

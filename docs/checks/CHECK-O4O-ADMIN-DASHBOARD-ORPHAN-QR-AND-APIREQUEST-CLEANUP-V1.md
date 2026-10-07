@@ -132,7 +132,7 @@ routes/lms-marketing.routes.tsx:39            주석
 ## 8. 실브라우저 smoke 결과
 
 **환경**: Playwright(chromium, headless) · `https://admin.neture.co.kr` · 배포 리비전 `01100-f5f`
-**계정**: `renariver21@gmail.com` (`platform:super_admin`) — `docs/local/TEST-ACCOUNTS.local.md` §4-3
+**계정**: `[REDACTED_EMAIL_D]` (`platform:super_admin`) — `docs/local/TEST-ACCOUNTS.local.md` §4-3
 **로그인**: `POST /api/v1/auth/login` → **200**, `/home` 착지, 콘솔 에러 0 (토큰 주입 우회 아님, 정식 폼 로그인)
 
 | 대상 | 최종 URL | 화면 | 콘솔 에러 | 비-2xx API | `/pharmacy/qr/*` |

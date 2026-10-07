@@ -3,6 +3,7 @@
 > **상태**: ACTIVE · **제정일**: 2026-08-21
 > **근거 WO**: `WO-O4O-PHARMACYHUB-SERVICE-MODEL-REALIGNMENT-AND-SUPPLIER-ROLE-REMOVAL-V1`
 > **적용 범위**: Pharmacy-Hub 서비스의 역할 모델 · 가입 · 운영자 capability · 매장 HUB 공급 유입
+> **호스트 정합 (2026-10-03)**: `pharmacyhub.co.kr` 은 **호환 호스트**다 — 새 독립 서비스를 두지 않고 기능은 약국 서비스(`pharmacy.neture.co.kr`)로 흡수하는 방향, `pharmacy-hub` 키 · role 은 호환 식별자로 보존 ([`O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1`](O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1.md) §2-2 · `CHECK-O4O-URL-FIRST-CENSUS-V1` §9). 본문의 역할 모델은 그대로 유효하다.
 > **상위 규칙**: [`CLAUDE.md`](../../CLAUDE.md) → [`O4O-BUSINESS-PHILOSOPHY-V1`](O4O-BUSINESS-PHILOSOPHY-V1.md) → [`O4O-3-ROLE-FLOW-BASELINE-V1`](O4O-3-ROLE-FLOW-BASELINE-V1.md)
 
 ---

@@ -11,7 +11,7 @@
 
 KPA-Society에서 사용자가 가입 신청을 했다고 하나, 운영자 화면 `/operator/members` 회원 관리 목록과 "가입 신청" 탭/카운트에 표시되지 않는 원인을 파악한다.
 
-추적 기준: 김용우(pharmabase@nate.com), 조훈(chojj22@naver.com) 두 신청자.
+추적 기준: [신청자 A]([REDACTED_EMAIL]), [신청자 B]([REDACTED_EMAIL]) 두 신청자.
 
 ---
 
@@ -69,35 +69,35 @@ MemberManagementPage.tsx
 
 ## 2. 실명 추적 결과
 
-### 2-A. 김용우 (pharmabase@nate.com)
+### 2-A. [신청자 A] ([REDACTED_EMAIL])
 
-**조사 방법:** 프로덕션 로그 + `/__debug__/user?email=pharmabase@nate.com`
+**조사 방법:** 프로덕션 로그 + `/__debug__/user?email=[REDACTED_EMAIL]`
 
 | 항목 | 값 |
 |------|---|
 | User ID | `6c91544f-cd3c-40b3-ac24-aaaecaba9fca` |
-| 이름 | 김용우 |
+| 이름 | [신청자 A] |
 | 등록 시각 | 2026-05-12T01:52:16 |
 | 이메일 인증 | 미완료 |
 | service_memberships | `serviceKey='neture'`, `status='pending'`, `role='supplier'` |
 | role_assignments | 없음 |
 | **kpa_members** | **없음** |
-| businessName | 파마링크케이알 |
+| businessName | [사업자명 비공개] |
 
-### 2-B. 조훈 (chojj22@naver.com)
+### 2-B. [신청자 B] ([REDACTED_EMAIL])
 
-**조사 방법:** 프로덕션 로그 + `/__debug__/user?email=chojj22@naver.com`
+**조사 방법:** 프로덕션 로그 + `/__debug__/user?email=[REDACTED_EMAIL]`
 
 | 항목 | 값 |
 |------|---|
 | User ID | `f72fb8a9-47b1-4ead-b7fe-2ca99edefdbc` |
-| 이름 | 조훈 |
+| 이름 | [신청자 B] |
 | 등록 시각 | 2026-05-12T01:57:37 |
 | 이메일 인증 | 미완료 |
 | service_memberships | `serviceKey='neture'`, `status='pending'`, `role='supplier'` |
 | role_assignments | 없음 |
 | **kpa_members** | **없음** |
-| businessName | 하이리빙아파트 |
+| businessName | [사업자명 비공개] |
 
 ### 2-C. 핵심 판정
 
@@ -116,7 +116,7 @@ MemberManagementPage.tsx
 ### 3-A. 등록 경로 분석
 
 로그에서 확인된 요청 body:
-- 조훈: `{ agreeTerms, agreePrivacy, agreeMarketing, businessNumber, businessType, companyName, role: 'supplier', ... }`
+- [신청자 B]: `{ agreeTerms, agreePrivacy, agreeMarketing, businessNumber, businessType, companyName, role: 'supplier', ... }`
 - `RegisterModal`은 `tos`, `privacyAccepted` 필드를 사용한다 (agreeTerms/agreePrivacy 아님)
 
 이 차이는 **두 사람이 KPA Society의 `RegisterModal`이 아닌 다른 등록 양식을 사용했음을 의미한다**.

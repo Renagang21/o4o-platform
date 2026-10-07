@@ -65,12 +65,15 @@ import {
 import {
   BROWSER_DOM_ERROR,
   pickSafeDomInfo,
+  pickSafeDomUnitInfo,
   validateDomElementArgs,
+  validateDomRunUnitArgs,
   validateDomFindArgs,
   validateDomReadTableArgs,
   validateDomSelectOptionArgs,
   validateDomSetInputArgs,
   type DomActionArgs,
+  type DomRunUnitArgs,
 } from './browser-dom-contract.js';
 
 // ─── Action ──────────────────────────────────────────────────────────────────
@@ -127,6 +130,12 @@ export const LOCAL_AGENT_ACTIONS = {
   DOM_CLICK: 'local.browser.dom.click',
   /** table/role=table 읽기, 행 상한 있음 (§26·§27). */
   DOM_READ_TABLE: 'local.browser.dom.read_table',
+  /**
+   * 작업 단위 실행 (WO-O4O-PERSONAL-ASSISTANT-PHASE-E-TASK-UNIT-DISPATCH-V1). 이미 판단한 행동 묶음(ref 배치 또는 재생 단계)을
+   * Node 가 local bridge 로 이어 실행하고, 판단이 필요한 자리에서 멈춰 단계 보고 + 최종 관찰을 돌려준다. 단계마다 확장의
+   * 검사(COMMIT · 자격 · 형상)는 그대로다. 노드가 `taskUnit` capability 를 보고할 때만 쓴다(아니면 단발 명령 경로).
+   */
+  DOM_RUN_UNIT: 'local.browser.dom.run_unit',
   // ── Local Data Runtime bridge (WO-O4O-LOCAL-DATA-TOOL-BRIDGE-CLOSURE-V1) ────
   /** 매장 PC 로컬 SQLite 의 **상태만** — 스키마 버전·마이그레이션 정상 여부. 경로·행 없음. */
   // ── Work Target Discovery V0 (WO-O4O-WORK-TARGET-DISCOVERY-AND-ACTIVATION-V0 §3·§33) ────────
@@ -251,6 +260,7 @@ export const DOM_TARGET_ACTIONS: readonly string[] = Object.freeze([
   LOCAL_AGENT_ACTIONS.DOM_SELECT_OPTION,
   LOCAL_AGENT_ACTIONS.DOM_CLICK,
   LOCAL_AGENT_ACTIONS.DOM_READ_TABLE,
+  LOCAL_AGENT_ACTIONS.DOM_RUN_UNIT,
 ]);
 
 /** 인자를 받는 DOM action — get_context · inspect 는 없다. read_table 은 선택적 인자. */
@@ -261,6 +271,7 @@ export const DOM_ARGS_ACTIONS: readonly string[] = Object.freeze([
   LOCAL_AGENT_ACTIONS.DOM_SELECT_OPTION,
   LOCAL_AGENT_ACTIONS.DOM_CLICK,
   LOCAL_AGENT_ACTIONS.DOM_READ_TABLE,
+  LOCAL_AGENT_ACTIONS.DOM_RUN_UNIT,
 ]);
 
 /** DOM action 인가 — 결과 화이트리스트 · 실패 데이터 보존 판정에 쓴다. */
@@ -643,6 +654,27 @@ export function validateDataWorkRunSetStatusArgs(args: unknown): { ok: boolean; 
 }
 
 /**
+ * Phase D — 노드 원장 소유 주체 키(선택 인자). 서버가 소유 주체를 해시해 만든 불투명 값이며 원 사용자/조직 id 가 아니다.
+ * 에이전트 `work-assistance.mjs` OWNER_KEY_RE 와 같은 규칙. 이 키를 받는 것은 local.db v8 에이전트뿐이므로
+ * 보내는 쪽(runtime)이 노드 capability(ownerScopedLedger)를 확인한 뒤에만 싣는다.
+ */
+export const NODE_LEDGER_OWNER_KEY_RE = /^o_[0-9a-f]{32}$/;
+
+/** ownerKey 를 떼어 형식만 보고, 나머지는 각 action 의 기존 검증기를 그대로 통과시킨 뒤 다시 붙인다. */
+function withOwnerKey<T extends object>(
+  args: unknown,
+  validate: (a: unknown) => { ok: boolean; args?: T },
+): { ok: boolean; args?: T & { ownerKey?: string } } {
+  if (!args || typeof args !== 'object' || Array.isArray(args) || !Object.prototype.hasOwnProperty.call(args, 'ownerKey')) {
+    return validate(args);
+  }
+  const { ownerKey, ...rest } = args as Record<string, unknown>;
+  if (typeof ownerKey !== 'string' || !NODE_LEDGER_OWNER_KEY_RE.test(ownerKey)) return { ok: false };
+  const r = validate(rest);
+  return r.ok && r.args ? { ok: true, args: { ...r.args, ownerKey } } : { ok: false };
+}
+
+/**
  * base action 에 맞는 인자 검증. 통과하면 **정규화된 사본**을 돌려준다(원본 객체를 그대로
  * 흘리지 않는다 — 추가 키가 있으면 여기서 이미 실패한다).
  *
@@ -652,7 +684,7 @@ export function validateDataWorkRunSetStatusArgs(args: unknown): { ok: boolean; 
 export function validateLocalCommandArgs(
   base: string,
   args: unknown,
-): { ok: true; args: Record<string, never> | ComputerActionArgs | DataActionArgs | DomActionArgs | UiaActionArgs } | { ok: false } {
+): { ok: true; args: Record<string, never> | ComputerActionArgs | DataActionArgs | DomActionArgs | DomRunUnitArgs | UiaActionArgs } | { ok: false } {
   // BROWSER-DOM-CONTROL-V0 §13·§15: elementRef/snapshotId/구조화 조건만. selector · JS 칸은 형상에 없다.
   if (base === LOCAL_AGENT_ACTIONS.DOM_FIND) {
     const r = validateDomFindArgs(args);
@@ -672,6 +704,11 @@ export function validateLocalCommandArgs(
   }
   if (base === LOCAL_AGENT_ACTIONS.DOM_READ_TABLE) {
     const r = validateDomReadTableArgs(args);
+    return r.ok && r.args ? { ok: true, args: r.args } : { ok: false };
+  }
+  // PHASE-E: 단계 형상 · 값 규칙은 단발 action 과 같다. 형상 밖이면 단계 하나도 발행되지 않는다.
+  if (base === LOCAL_AGENT_ACTIONS.DOM_RUN_UNIT) {
+    const r = validateDomRunUnitArgs(args);
     return r.ok && r.args ? { ok: true, args: r.args } : { ok: false };
   }
   // WINDOWS-UI-AUTOMATION-V0: 요소 ref+snapshot · 텍스트(computer-use 규칙) · 허용 키 · 0..1 좌표만.
@@ -704,7 +741,7 @@ export function validateLocalCommandArgs(
     return r.ok && r.args ? { ok: true, args: r.args } : { ok: false };
   }
   if (base === LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_UPSERT) {
-    const r = validateDataWorkRunUpsertArgs(args);
+    const r = withOwnerKey(args, validateDataWorkRunUpsertArgs);
     return r.ok && r.args ? { ok: true, args: r.args } : { ok: false };
   }
   if (base === LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_SET_STATUS) {
@@ -712,11 +749,11 @@ export function validateLocalCommandArgs(
     return r.ok && r.args ? { ok: true, args: r.args } : { ok: false };
   }
   if (base === LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_CANDIDATE_SAVE) {
-    const r = validateDataWorkRunCandidateSaveArgs(args);
+    const r = withOwnerKey(args, validateDataWorkRunCandidateSaveArgs);
     return r.ok && r.args ? { ok: true, args: r.args } : { ok: false };
   }
   if (base === LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_CANDIDATE_MATCH) {
-    const r = validateDataWorkRunCandidateMatchArgs(args);
+    const r = withOwnerKey(args, validateDataWorkRunCandidateMatchArgs);
     return r.ok && r.args ? { ok: true, args: r.args } : { ok: false };
   }
   if (base === LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_CANDIDATE_RESULT) {
@@ -736,11 +773,11 @@ export function validateLocalCommandArgs(
     return r.ok && r.args ? { ok: true, args: r.args } : { ok: false };
   }
   if (base === LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_ASSISTANCE_RECORD) {
-    const r = validateDataWorkRunAssistanceRecordArgs(args);
+    const r = withOwnerKey(args, validateDataWorkRunAssistanceRecordArgs);
     return r.ok && r.args ? { ok: true, args: r.args } : { ok: false };
   }
   if (base === LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_EXPERIENCE_RECALL) {
-    const r = validateDataExperienceRecallArgs(args);
+    const r = withOwnerKey(args, validateDataExperienceRecallArgs);
     return r.ok && r.args ? { ok: true, args: r.args } : { ok: false };
   }
   if (base === LOCAL_AGENT_ACTIONS.COMPUTER_CLICK) {
@@ -862,7 +899,7 @@ export function isAllowedLocalAction(action: string): boolean {
 export interface LocalCommand {
   commandId: string;
   action: string;
-  args: Record<string, never> | ComputerActionArgs | DataActionArgs | DomActionArgs;
+  args: Record<string, never> | ComputerActionArgs | DataActionArgs | DomActionArgs | DomRunUnitArgs;
   issuedAt: string;
   expiresAt: string;
 }
@@ -1478,6 +1515,9 @@ export function pickSafeResultData(action: string, data: unknown): Record<string
   }
   if (DATA_TARGET_ACTIONS.includes(base)) {
     return pickSafeDataInfo(data);
+  }
+  if (base === LOCAL_AGENT_ACTIONS.DOM_RUN_UNIT) {
+    return pickSafeDomUnitInfo(data);
   }
   if (DOM_TARGET_ACTIONS.includes(base)) {
     return pickSafeDomInfo(data);

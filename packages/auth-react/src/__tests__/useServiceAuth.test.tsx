@@ -138,7 +138,7 @@ describe('useServiceAuth — password login 은퇴 계약 (WO-O4O-LEGACY-PASSWOR
     const { hook, client } = setup({ token: null });
     await waitFor(() => expect(hook.result.current.isLoading).toBe(false));
 
-    expect((hook.result.current as Record<string, unknown>).login).toBeUndefined();
+    expect((hook.result.current as unknown as Record<string, unknown>).login).toBeUndefined();
     // authClient 에 login 대역이 있어도 훅은 그것을 호출하지 않는다.
     expect(client.login).not.toHaveBeenCalled();
   });
@@ -150,7 +150,7 @@ describe('useServiceAuth — password login 은퇴 계약 (WO-O4O-LEGACY-PASSWOR
     expect(typeof hook.result.current.loginWithGoogle).toBe('function');
     expect(typeof hook.result.current.signupWithGoogle).toBe('function');
     for (const retired of ['login', 'register', 'resetPassword', 'changePassword']) {
-      expect((hook.result.current as Record<string, unknown>)[retired]).toBeUndefined();
+      expect((hook.result.current as unknown as Record<string, unknown>)[retired]).toBeUndefined();
     }
   });
 });
@@ -211,6 +211,48 @@ describe('useServiceAuth — Google 로그인/가입 (WO-O4O-GOOGLE-ONLY-SIGNUP-
     expect(result.success).toBe(false);
     expect(result.code).toBe('ACCOUNT_NOT_ACTIVE');
     expect(result.accountStatus).toBe('suspended');
+  });
+
+  // WO-NETURE-PHARMACY-CUTOVER-COMPAT-V1
+  it('SERVICE_NOT_MEMBER + serviceAccess(세미프랜차이즈) → 서버 문구 · serviceAccess 를 그대로 전달한다', async () => {
+    const serviceAccess = {
+      semiFranchiseKey: 'pharmacy',
+      pharmacyMembershipStatus: 'active',
+      semiFranchiseMembershipStatus: 'pending',
+      next: 'semi_franchise_pending',
+    };
+    const client = makeClient({
+      loginWithGoogle: vi.fn(async () => {
+        throw { response: { status: 403, data: { code: 'SERVICE_NOT_MEMBER', error: '승인 대기 안내', serviceAccess } } };
+      }),
+    } as never);
+    const { hook } = setup({ token: null, client });
+    await waitFor(() => expect(hook.result.current.isLoading).toBe(false));
+
+    let result!: Awaited<ReturnType<typeof hook.result.current.loginWithGoogle>>;
+    await act(async () => {
+      result = await hook.result.current.loginWithGoogle('id-token');
+    });
+
+    expect(result).toMatchObject({ success: false, code: 'SERVICE_NOT_MEMBER', error: '승인 대기 안내', serviceAccess });
+  });
+
+  it('serviceAccess 형태가 어긋나면 버리고 기존 공통 문구 경로를 쓴다', async () => {
+    const client = makeClient({
+      loginWithGoogle: vi.fn(async () => {
+        throw { response: { status: 403, data: { code: 'SERVICE_NOT_MEMBER', error: 'raw', serviceAccess: { next: 'x' } } } };
+      }),
+    } as never);
+    const { hook } = setup({ token: null, client });
+    await waitFor(() => expect(hook.result.current.isLoading).toBe(false));
+
+    let result!: Awaited<ReturnType<typeof hook.result.current.loginWithGoogle>>;
+    await act(async () => {
+      result = await hook.result.current.loginWithGoogle('id-token');
+    });
+
+    expect(result.serviceAccess).toBeUndefined();
+    expect(result).not.toHaveProperty('serviceAccess');
   });
 
   it('signupWithGoogle: 동의 3항목을 그대로 전달하고 성공 시 세션을 채택한다', async () => {

@@ -16,7 +16,7 @@ projects/netureyoutube/locations/asia-northeast3/connectors/o4o-vpc-connector
 does not exist, or Cloud Run does not have permission to use it.
 ```
 
-감사 로그 기준 원인 (모두 2026-08-18, 계정 `sohae2100@gmail.com`):
+감사 로그 기준 원인 (모두 2026-08-18, 계정 `[REDACTED_EMAIL_A]`):
 
 | 시각(UTC) | 이벤트 |
 |---|---|
@@ -103,11 +103,11 @@ does not exist, or Cloud Run does not have permission to use it.
 ### 7-1. `GET /lms/enrollments` 본인 범위 축소는 런타임으로 관찰하지 못했다 (검증 한계)
 
 - 목록 축소는 `isLmsElevatedManager(req)` 가 false 인 사용자에게만 적용된다.
-- 프로덕션 role 실측: `sohae2100@gmail.com` = `kpa:admin`, `renagang21@gmail.com` = **`lms:instructor`** → **두 계정 모두 elevated** 이므로 전체 9건을 보는 것이 설계상 정상 동작이다.
-- enrollment 를 보유한 세 번째 계정 `sohae21@naver.com` 은 `users.status='deleted'` 로 로그인 불가, 그 외 문서화된 계정에는 비-elevated 로그인 수단이 없다. 신규 계정 생성은 프로덕션 write 이므로 수행하지 않았다.
+- 프로덕션 role 실측: `[REDACTED_EMAIL_A]` = `kpa:admin`, `[REDACTED_EMAIL_B]` = **`lms:instructor`** → **두 계정 모두 elevated** 이므로 전체 9건을 보는 것이 설계상 정상 동작이다.
+- enrollment 를 보유한 세 번째 계정 `[REDACTED_EMAIL_C]` 은 `users.status='deleted'` 로 로그인 불가, 그 외 문서화된 계정에는 비-elevated 로그인 수단이 없다. 신규 계정 생성은 프로덕션 write 이므로 수행하지 않았다.
 - 따라서 목록 축소는 **코드 + 자동화 테스트(목록 leak 5건)** 로만 닫혔다. 런타임 재확인은 비-elevated 계정 확보 후 별도 수행이 필요하다.
 
-### 7-2. `renagang21@gmail.com`(매장 경영자)이 `lms:instructor` 를 보유
+### 7-2. `[REDACTED_EMAIL_B]`(매장 경영자)이 `lms:instructor` 를 보유
 
 - 그 결과 매장 계정이 `GET /lms/enrollments` 에서 전 사용자 enrollment(이메일 포함)를 조회할 수 있다.
 - 코드 결함이 아니라 **프로덕션 role 데이터 문제**다. 본 WO 범위 밖 → 별도 WO 로 role 정리 판단 필요.
@@ -143,4 +143,4 @@ does not exist, or Cloud Run does not have permission to use it.
 발견 1건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 3건
 
 - 선행 CHECK `CHECK-O4O-LMS-ENROLLMENT-OWNERSHIP-AND-AUTHORIZATION-BOUNDARY-FIX-V1` 의 판정 `CODE_PASS / DEPLOY_BLOCKED` 는 본 CHECK 로 대체된다(본문 수정은 하지 않고 여기서 명시).
-- 별도 WO 제안: (1) 비-elevated 계정 확보 후 `GET /lms/enrollments` 범위 축소 런타임 재확인, (2) `renagang21@gmail.com` 의 `lms:instructor` role 정합성 정리, (3) Redis env·잔존 소비처 정리.
+- 별도 WO 제안: (1) 비-elevated 계정 확보 후 `GET /lms/enrollments` 범위 축소 런타임 재확인, (2) `[REDACTED_EMAIL_B]` 의 `lms:instructor` role 정합성 정리, (3) Redis env·잔존 소비처 정리.

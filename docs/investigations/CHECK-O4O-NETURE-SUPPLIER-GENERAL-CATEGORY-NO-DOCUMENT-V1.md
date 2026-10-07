@@ -44,7 +44,7 @@
 
 - **typecheck**: `pnpm exec tsc --noEmit` (web-neture) → **EXIT 0**.
 - 정적: 분기 2개(badge `!isGeneral`/`isGeneral`, 상세블록 `!isGeneral` + 안내 `isGeneral`). 닫힘 태그/조건 정합.
-- **브라우저 smoke = PASS** (배포 success `gh run 27732888675` 후, 라이브 `/mypage/business-profile`, 공급자 계정 sohae21@naver.com, 2026-06-18):
+- **브라우저 smoke = PASS** (배포 success `gh run 27732888675` 후, 라이브 `/mypage/business-profile`, 공급자 계정 [REDACTED_EMAIL_C], 2026-06-18):
   1. **일반 상품 선택** → 번호 입력란·"Choose File" PDF 버튼 **미표시**, **"서류 불필요"** 배지 + 안내 문구("일반 상품은 별도 허가/신고 서류가 필요하지 않습니다…") 노출. ✅
   2. **의약품(규제) 선택** → "미신청" 상태 배지 + "허가/신고 번호 (선택)" 입력란 + "Choose File" PDF 업로드 **기존 유지**. ✅
   3. **select/해제 토글** 정상 동작(일반 상품·의약품 체크/언체크). 검증 후 두 품목군 **미선택 상태로 원상복구**(테스트 잔존 row 제거). ✅

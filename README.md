@@ -3,7 +3,7 @@
 O4O Platform은 이커머스·커뮤니티·매장 운영을 통합한 멀티 서비스 플랫폼 모노레포입니다.
 
 하나의 공통 플랫폼 계층(Content / Forum / LMS / Signage / Commerce) 위에서
-KPA-Society · Neture · K-Cosmetics · Pharmacy-Hub 등 여러 서비스가
+KPA-Society · Neture · Pharmacy-Hub 등 여러 서비스가
 `serviceKey` 기준으로 데이터를 분리한 채 동작합니다.
 
 ## 기술 스택
@@ -26,7 +26,7 @@ pnpm workspace 기준이며, 대상 범위는 `pnpm-workspace.yaml`에 정의되
 o4o-platform/
 ├── apps/          # 애플리케이션 (admin-dashboard, api-server, main-site, ...)
 ├── services/      # 서비스별 웹 (web-kpa-society, web-neture,
-│                  #               web-k-cosmetics, web-pharmacy-hub, web-account, ...)
+│                  #               web-pharmacy-hub, web-account, ...)
 ├── packages/      # 공유 패키지 (types, ui, auth-client, *-core 등)
 ├── extensions/    # 확장 모듈
 ├── scripts/       # 빌드·검증·운영 스크립트
@@ -163,7 +163,8 @@ main push → CI Pipeline → Delivery (delivery.yml) → 서비스별 "서빙 �
 이 저장소는 **Public** 입니다. 강제 수단(ruleset · environment)과 아래 **합의 규칙**을 함께 씁니다.
 "사용자"는 저장소 소유자(Renagang21)입니다.
 
-- 강제: `main` ruleset — 삭제 · force push 금지, PR + 승인 1 필요(소유자 bypass). `deploy/*` tag 생성 · 변경은
+- 강제: `main` ruleset — 삭제 · force push 금지, PR 필수 + required check `CI Gate`(필수 human approval 없음 ·
+  소유자 bypass 가능하나 정상 경로로 쓰지 않음). main 통합 절차는 [AGENTS.md §4-1(e)](AGENTS.md#4-1-parallel-session--worktree-policy). `deploy/*` tag 생성 · 변경은
   소유자만. `production` Environment 는 `main` · `deploy/*` 에서만. 수동 배포 게이트는 소유자만.
 
 1. `main` 이 저장소 정본입니다. 공동개발자는 별도 branch 에서 작업하고 PR 로 `main` 에 반영합니다(소유자 승인 후 merge).

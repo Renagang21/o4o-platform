@@ -36,6 +36,9 @@ export default function RootShell() {
   const { isAuthenticated, logout } = useAuth();
   // 상단 로그인도 원래 경로를 보존한다(§21-19 운영 실측에서 발견 — 본문 카드만 보존하고 있었다)
   const { pathname, search, hash } = useLocation();
+  // 약국 문맥은 매장 HUB 단계가 없다(DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1 §6). /hub 라우트 자체는 K-Cosmetics 용으로 남는다.
+  const { effectiveServiceKey } = useUnifiedStore();
+  const navItems = effectiveServiceKey === 'kpa-society' ? ROOT_NAV_ITEMS.filter((i) => i.key !== 'store-hub') : ROOT_NAV_ITEMS;
   return <div className="site">
     <header className="header">
       <div className="header-left">
@@ -43,13 +46,13 @@ export default function RootShell() {
         <StoreSwitcher />
       </div>
       <nav className="nav" aria-label="매장 업무공간" data-testid="root-nav">
-        {ROOT_NAV_ITEMS.map((item) => (
+        {navItems.map((item) => (
           <NavLink key={item.key} to={item.to} end={item.end} className={({ isActive }) => (isActive ? 'active' : undefined)}>
             {item.label}
           </NavLink>
         ))}
         {/* WO-O4O-REPRESENTATIVE-ENTRY-RETURN-HANDOFF-AND-HOME-NAVIGATION-V1: O4O 홈(로그인 유지) · 로그아웃 = O4O 계정 전체 종료 */}
-        <O4OHomeButton api={authClient.api} isAuthenticated={isAuthenticated} className="link-button" />
+        <O4OHomeButton api={authClient.api} isAuthenticated={isAuthenticated} className="o4o-home-link" />
         {isAuthenticated
           ? <button className="link-button" type="button" onClick={logout}>{O4O_LOGOUT_LABEL}</button>
           : <Link to={withReturnTo(WORKSPACE_PATHS.login, `${pathname}${search}${hash}`)}>로그인</Link>}

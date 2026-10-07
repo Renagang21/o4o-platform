@@ -47,7 +47,7 @@ HFF canonical 중복 = 0
 - **Batch 0 = 구형 photo 배치 `ko+zh` 임시 예제 15건 → semantic `ko+en` 정본으로 재작성.**
 - 30 clean HFF master 중, 과거 사진 기반 임시 예제(photo 배치, `ko+zh`) 콘텐츠를 가진 15건이 대상.
 - 손상 정리로 삭제된 마스터(맨파워포텐 `0b5502e5`, 변엔장 `38a9d3e4` 등 5건)는 **Batch 0 제외**.
-- 정본 예제 기준 = [`examples/byeonenjang.semantic.html`](../guides/products/health-functional-food/examples/byeonenjang.semantic.html)(시맨틱 `sd-*`, `<style>` 없음, 식약처 grounding).
+- 정본 예제 기준 = [`examples/byeonenjang.semantic.html`](../../apps/api-server/src/scripts/data/product-descriptions/health-functional-food/examples/byeonenjang.semantic.html)(시맨틱 `sd-*`, `<style>` 없음, 식약처 grounding).
 
 ---
 

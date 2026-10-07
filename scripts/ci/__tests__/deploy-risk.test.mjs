@@ -97,7 +97,9 @@ describe('R. risk_level 분류', () => {
     const r = risk('packages/auth-react/src/email/EmailLoginForm.tsx');
     assert.equal(r.risk_level, LEVEL_3);
     for (const key of r.affected_services) assert.equal(r.services[key].level, LEVEL_3, key);
-    assert.equal(r.services['signage-player'].affected, false);
+    assert.equal(r.services['hospital-pharmacy'].affected, false);
+    assert.equal(r.services['signage-player'], undefined, 'signage-player 는 배포 대상에서 은퇴했다');
+    assert.equal(r.services['k-cosmetics'], undefined, 'k-cosmetics 는 배포 대상에서 은퇴했다');
   });
 
   it('R6c auth frontend (LoginPage · AuthContext) → LEVEL_3, Author* 는 아님', () => {

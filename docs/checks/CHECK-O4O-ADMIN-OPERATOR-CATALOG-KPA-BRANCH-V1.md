@@ -62,7 +62,7 @@ role key 변경 없음. 목록 행의 역할 라벨은 공통 `ROLES.operator` =
 
 ## 6. Production E2E — 필수 11항목
 
-fixture = 영구 계정 `renagang21@gmail.com`(kpa-branch active member + credential 보유, branch_membership 없음, platform 권한 없음). 새 계정/credential 생성 0. 스크립트 `scratchpad/w20_e2e.mjs`(grant/access1/branchweb/join/revoke/leave/regress).
+fixture = 영구 계정 `[REDACTED_EMAIL_B]`(kpa-branch active member + credential 보유, branch_membership 없음, platform 권한 없음). 새 계정/credential 생성 0. 스크립트 `scratchpad/w20_e2e.mjs`(grant/access1/branchweb/join/revoke/leave/regress).
 
 | # | 항목 | 방법 | 결과 |
 |---|---|---|---|

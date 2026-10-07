@@ -161,6 +161,44 @@ export const EXPECTED_SCHEMA_STATES: readonly ExpectedSchemaState[] = [
     fingerprint: '09d5a9176224a93959b680ef23558629c2e2fe42c4cf2edefeffcda941ca0e43',
     fingerprintLineCount: 5944,
   },
+  // WO-O4O-PERSONAL-ASSISTANT-PHASE-A-TASK-FOUNDATION-V1 — assistant_tasks + work_run_coordination.task_id.
+  // 테이블 1 · PK · FK 2 · CHECK 2 · 인덱스 2 · wrc 컬럼 1 · FK 1 · 부분 인덱스 1 · COMMENT 4.
+  // baseline 2026-09-18-id685 fresh bootstrap + incremental 1..13 을 격리 PostgreSQL 17
+  // (로컬 17.10 · 일회용 클러스터 127.0.0.1:55432 · trust) 에서 실제 적용해 산출: 운영 DB fingerprint 채택 아님.
+  // 같은 클러스터에서 state 12(CreateDemoAccounts)가 등록값 09d5a917…(5944) 그대로 재현됨을 먼저 확인했다.
+  {
+    appliedThrough: 'CreateAssistantTasks1791012819443',
+    fingerprint: '42e44a3462e250c85b774fe6e0428da8e68e115b40135ecde615ead25a8a5e20',
+    fingerprintLineCount: 5972,
+  },
+  // WO-O4O-PERSONAL-ASSISTANT-MEMORY-CLOUD-CONTINUITY-V1 — assistant_procedural_patterns + assistant_run_frames.
+  // 테이블 2 · PK 2 · FK 5 · CHECK 4 · 부분 unique 인덱스 2 · 인덱스 1 · COMMENT 2.
+  // baseline 2026-09-18-id685 fresh bootstrap + incremental 1..14 를 격리 PostgreSQL 17
+  // (로컬 17.10 · 일회용 클러스터 127.0.0.1:55433 · trust) 에서 실제 적용해 산출: 운영 DB fingerprint 채택 아님.
+  {
+    appliedThrough: 'CreateAssistantProceduralMemory1791100000000',
+    fingerprint: 'c5bd4a49305a8e957be177551573053ac5636cbc151a4a8c5586b16c525782d1',
+    fingerprintLineCount: 6018,
+  },
+  // WO-O4O-PERSONAL-ASSISTANT-PHASE-D-EXECUTION-NODE-RUNTIME-STATE-COORDINATION-V1 — local_agent_devices.capabilities.
+  // 컬럼 2 · COMMENT 1. baseline 2026-09-18-id685 fresh bootstrap + incremental 1..15 를 격리 PostgreSQL 17
+  // (로컬 17.10 · 일회용 클러스터 127.0.0.1:55432 · trust) 에서 실제 적용해 산출: 운영 DB fingerprint 채택 아님.
+  // 같은 DB 에서 down() 후 값이 state 14(c5bd4a49…, 6018)와 일치함을 확인했다.
+  {
+    appliedThrough: 'AddLocalAgentDeviceCapabilities1791177033073',
+    fingerprint: 'd2b32f7caccf2a71c1cd01997ebc1152ea400eb9781fa81192fbd741aabec2af',
+    fingerprintLineCount: 6021,
+  },
+  // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1 — 기본 가입 · 세미프랜차이즈 · 복수 공급 제안 · 세미프랜차이즈 콘텐츠 · 장바구니 제안 컬럼 ·
+  // 모집 조직 단위. baseline fresh bootstrap + incremental 1..16 를 격리 PostgreSQL 15.17
+  // (docker 일회용 컨테이너) 에서 `npx tsx src/migrate.ts` 로 실제 적용해 산출: 운영 DB fingerprint 채택 아님.
+  // WO-NETURE-PHARMACY-CUTOVER-COMPAT-V1: idx_org_listing_unique_v2 를 이 migration 에서 바꾸지 않도록(전체 UNIQUE 유지 —
+  // 구버전 API ON CONFLICT 호환) 고친 뒤 재산출. 종전 값 5ee52f58…(부분 UNIQUE) 은 운영에 적용된 적 없다.
+  {
+    appliedThrough: 'CreateNeturePharmacyCommerce1791200000000',
+    fingerprint: 'c8325ff52a7f74a3e76f06fb098c5aa08b5c1e800836fd8e3dccfa570820057b',
+    fingerprintLineCount: 6155,
+  },
 ] as const;
 
 /** Expected state after `prefixLength` incremental migrations; undefined when not registered. */

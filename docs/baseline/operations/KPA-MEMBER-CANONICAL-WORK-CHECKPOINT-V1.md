@@ -49,11 +49,11 @@ KPA 회원 canonical lifecycle 정비를 시도했으나 진단 단계에서 **�
 |------|------|
 | Cloud Console SQL Editor (사용자 직접 실행) | 결정 → 진행 보류로 변경 |
 | `gcloud sql connect` + stdin SQL 주입 | PowerShell stdin 이 psql 의 password prompt 로 전달되지 않아 무한 대기 → 중단 |
-| 직접 psql `-h 34.64.96.252` | TCP timeout (gcloud sql connect 가 추가한 IP 화이트리스트 5분 만료) |
+| 직접 psql `-h [REDACTED_IP]` | TCP timeout (gcloud sql connect 가 추가한 IP 화이트리스트 5분 만료) |
 
 ### 환경 확인 (참고)
 - psql 17.9 위치: `C:\Program Files\PostgreSQL\17\bin\psql.exe` (PATH 등록 없음, 세션 추가만)
-- Cloud SQL instance: project `netureyoutube`, name `o4o-platform-db`, POSTGRES_15, IP `34.64.96.252`, state RUNNABLE
+- Cloud SQL instance: project `netureyoutube`, name `o4o-platform-db`, POSTGRES_15, IP `[REDACTED_IP]`, state RUNNABLE
 - SSL 정책: `ALLOW_UNENCRYPTED_AND_ENCRYPTED` (SSL 비필수)
 - IAM 인증: 비활성 (password 인증 필수)
 - DB users: `o4o_api`, `postgres` (BUILT_IN)

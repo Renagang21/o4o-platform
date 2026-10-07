@@ -6,9 +6,9 @@
 > **접수:** 2026-09-18 · 사용자 지시 원문 기반
 > **용어 고정:** **운영자 계정 = `sohae2100`** · **테스트 계정 = `renagang21`**(Google-only). `cleanup user` 표현은 더 쓰지 않는다.
 
-> **전제 정정(2026-09-21 · 사용자 확정 · 전환기 정책):** 위 "운영자 계정 = `sohae2100`" 은 **"현재 `platform:super_admin` 을 보유한 기존 `users.id`"** 로 읽는다. 이 user 의 **관리자용 내부 email 은 `renariver21@gmail.com`** 으로 정정됐다(2026-09-21 · `users.email` 1행 UPDATE · users.id·role·membership·credential·password 전부 불변 · 사용자 명시 승인). 이후 본문의 `sohae2100` 은 이 **동일 users.id** 를 가리키는 옛 handle 표기다.
-> - canonical platform admin user = 기존 super_admin `users.id`(email `renariver21@gmail.com`) · `platform:super_admin` 유지
-> - 기존 이메일/비밀번호 로그인 **당분간 유지**(`renariver21@gmail.com` + 기존 비밀번호) · Google 로그인과 **병행**
+> **전제 정정(2026-09-21 · 사용자 확정 · 전환기 정책):** 위 "운영자 계정 = `sohae2100`" 은 **"현재 `platform:super_admin` 을 보유한 기존 `users.id`"** 로 읽는다. 이 user 의 **관리자용 내부 email 은 `[REDACTED_EMAIL_D]`** 으로 정정됐다(2026-09-21 · `users.email` 1행 UPDATE · users.id·role·membership·credential·password 전부 불변 · 사용자 명시 승인). 이후 본문의 `sohae2100` 은 이 **동일 users.id** 를 가리키는 옛 handle 표기다.
+> - canonical platform admin user = 기존 super_admin `users.id`(email `[REDACTED_EMAIL_D]`) · `platform:super_admin` 유지
+> - 기존 이메일/비밀번호 로그인 **당분간 유지**(`[REDACTED_EMAIL_D]` + 기존 비밀번호) · Google 로그인과 **병행**
 > - Google Identity 는 `users.email` 과 **별개**. 실제 사용할 Google 계정의 검증된 `sub` 를 같은 admin users.id 에 연결한다. **email 일치를 연결 근거로 쓰지 않는다**(Google 계정 email ≠ users.email 허용)
 > - users 신규 생성·삭제·users.id 변경 금지 · role/membership 변경 금지 · password/`service_credentials` 제거 금지 · **추가 password reset·credential 정렬 작업 중단**
 > - `renagang21` = Google-only 테스트 계정, 변경 없음
@@ -129,7 +129,7 @@ B smoke 에서 `admin.neture.co.kr` 이메일 로그인이 `serviceKey:'neture'`
 
 | # | Smoke | 기대 |
 |---|---|---|
-| 1 | 관리자 user(email `renariver21@gmail.com`) password 로그인 → `/mypage/settings` → Google 계정 연결 → currentPassword(= `users.password`) → **연결 확정한 Google 계정** 선택 | 성공. **users 2(불변)** · linked_accounts 1→2 · 관리자 password/credentials 5/memberships 5/roles 11 유지 |
+| 1 | 관리자 user(email `[REDACTED_EMAIL_D]`) password 로그인 → `/mypage/settings` → Google 계정 연결 → currentPassword(= `users.password`) → **연결 확정한 Google 계정** 선택 | 성공. **users 2(불변)** · linked_accounts 1→2 · 관리자 password/credentials 5/memberships 5/roles 11 유지 |
 | 2 | 로그아웃 → `[Google로 계속하기]` → 같은 Google 계정 | signup 화면 없음 → **기존 admin users.id** 로그인 |
 | 3 | `https://admin.neture.co.kr` | Admin 정상 진입. 테스트 계정은 계속 접근 불가 |
 
@@ -163,7 +163,7 @@ Google Identity 안정화 → sohae Google admin 확인 → renagang Google test
 
 > **소스 주석 매핑:** 구현 파일의 `WO §9` 표기는 **본 절(§15)** 을 가리킨다(§9 는 기존 "테스트 계정에는 영향 없음" 절 — 번호 고정 원칙상 재사용하지 않는다). 주석 표기 정정은 §16 코드 커밋에서 일괄한다.
 
-**더 이상 `renariver21@gmail.com` + password 복구를 Google 연결의 선행조건으로 쓰지 않는다.** 관리자 비밀번호 인증 자체를 폐기하기로 했으므로, 전환 1회를 위해 비밀번호를 복구·정렬하는 작업은 방향이 반대다. §3-B~§3-D 로 Admin 인증·잠금·reset 링크 계약은 이미 정정됐고, 그 위에 **연결 1회만** 비밀번호 없이 통과시킨다.
+**더 이상 `[REDACTED_EMAIL_D]` + password 복구를 Google 연결의 선행조건으로 쓰지 않는다.** 관리자 비밀번호 인증 자체를 폐기하기로 했으므로, 전환 1회를 위해 비밀번호를 복구·정렬하는 작업은 방향이 반대다. §3-B~§3-D 로 Admin 인증·잠금·reset 링크 계약은 이미 정정됐고, 그 위에 **연결 1회만** 비밀번호 없이 통과시킨다.
 
 **목표:** 기존 `platform:super_admin` users.id 를 그대로 유지한 채 사용자의 실제 Google 계정을 1회 bootstrap 으로 연결하고, 이후 Admin 은 Google 로그인만 사용한다.
 
@@ -195,7 +195,7 @@ users **2 유지** · linked_accounts 1→**2** · Google row `userId` = 기존 
 
 ### 15-5. users.email
 
-`renariver21@gmail.com` 은 현재 schema `NOT NULL UNIQUE` 때문에 이번 작업에서 NULL 로 만들지 않는다. Admin 인증에는 더 이상 사용하지 않고 UI 에서도 관리자 로그인 ID 로 노출하지 않는다. 컬럼 optional 화·NULL 정리는 Phase 5 개인정보 최소화에서 수행한다.
+`[REDACTED_EMAIL_D]` 은 현재 schema `NOT NULL UNIQUE` 때문에 이번 작업에서 NULL 로 만들지 않는다. Admin 인증에는 더 이상 사용하지 않고 UI 에서도 관리자 로그인 ID 로 노출하지 않는다. 컬럼 optional 화·NULL 정리는 Phase 5 개인정보 최소화에서 수행한다.
 
 ### 15-6. 실행 순서
 

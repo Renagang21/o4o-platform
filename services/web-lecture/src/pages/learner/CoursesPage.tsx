@@ -3,12 +3,13 @@
  * 공개 목록: published 만. 비로그인 = visibility=public 강제(서버). serviceKey 는 서버가 lecture 로 고정.
  */
 import { useCallback, useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { CourseListView, type CourseCardView } from '@o4o/lms-ui';
 import { learnerApi, type LectureCourse } from '../../api/lecture';
 import { LECTURE_ACCENT, coursePath } from '../../lib/lmsViewAdapter';
 import { useAuth } from '../../contexts/AuthContext';
 import { hasLectureMembership } from '../../components/AccessGate';
+import { INQUIRY_URL } from '../../config/service';
 
 const PAGE_SIZE = 12;
 
@@ -30,6 +31,7 @@ function toCard(c: LectureCourse): CourseCardView {
 
 export default function CoursesPage() {
   const { user, isAuthenticated } = useAuth();
+  const location = useLocation();
   const [courses, setCourses] = useState<CourseCardView[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -51,9 +53,9 @@ export default function CoursesPage() {
   useEffect(() => { void load(); }, [load]);
 
   const gate = isAuthenticated && !hasLectureMembership(user?.memberships)
-    ? <div className="notice">활성 O4O 강의 서비스 membership 이 없으면 공개 강의만 열람할 수 있고 수강 신청은 할 수 없습니다.</div>
+    ? <div className="notice">로그인은 되어 있지만 O4O 강의 서비스 이용 자격이 없어 공개 강의만 볼 수 있습니다. 수강 신청은 <a href={INQUIRY_URL}>이용 문의</a> 후 가능합니다.</div>
     : !isAuthenticated
-      ? <div className="notice">회원 전용 강의와 수강 신청은 <Link to="/login">로그인</Link> 후 이용할 수 있습니다.</div>
+      ? <div className="notice">회원 전용 강의와 수강 신청은 <Link to="/login" state={{ from: `${location.pathname}${location.search}` }}>로그인</Link> 후 이용할 수 있습니다.</div>
       : null;
 
   return <main className="page page-wide">

@@ -10,6 +10,9 @@
  * 4. 공급 가능한 제품 - 카테고리 예시
  * 5. 가입 절차 - 4단계
  * 6. CTA - 하단 참여 유도
+ *
+ * WO-O4O-CROSS-SERVICE-PUBLIC-DESIGN-AND-BRAND-REFRESH-V1: Hero 를 공통 O4OPublicHero 로 —
+ *   그라디언트 · 진한 하단 띠를 걷고 넓은 여백 · 단일 주 CTA 로 맞춘다. CTA 대상(/register · 로그인 · ServiceApplyPanel)은 그대로.
  */
 
 import { Link } from 'react-router-dom';
@@ -28,7 +31,11 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useLoginModal } from '../contexts/LoginModalContext';
+import { O4OPublicHero } from '@o4o/auth-react';
 import { ServiceApplyPanel } from '../components/auth/ServiceApplyPanel';
+import { SUPPLIER_HERO } from '../config/publicHero';
+
+const SUPPLIER_ACCENT = SUPPLIER_HERO.accent;
 
 /* ── 참여 혜택 ── */
 const benefits = [
@@ -36,25 +43,21 @@ const benefits = [
     icon: Store,
     title: '매장 네트워크',
     desc: '오프라인 매장과 연결하여 전국 유통 채널을 확보합니다.',
-    color: { bg: 'bg-blue-50', text: 'text-blue-600' },
   },
   {
     icon: Monitor,
     title: '콘텐츠 유통',
     desc: '제품 콘텐츠, POP 디자인, Digital Signage를 매장에 제공합니다.',
-    color: { bg: 'bg-violet-50', text: 'text-violet-600' },
   },
   {
     icon: Megaphone,
     title: '매장 홍보 지원',
     desc: '매장 HUB 콘텐츠와 QR 안내로 매장 현장의 제품 홍보와 판매를 지원합니다.',
-    color: { bg: 'bg-emerald-50', text: 'text-emerald-600' },
   },
   {
     icon: BarChart3,
     title: '판매 데이터',
     desc: '공급 현황과 판매 데이터를 실시간으로 확인합니다.',
-    color: { bg: 'bg-amber-50', text: 'text-amber-600' },
   },
 ];
 
@@ -95,50 +98,40 @@ export default function SupplierLandingPage() {
   return (
     <div>
       {/* ── 1. Hero ── */}
-      <section className="bg-gradient-to-br from-blue-600 to-blue-800 text-white">
-        <div className="max-w-5xl mx-auto px-4 py-20 text-center">
-          <h1 className="text-3xl md:text-4xl font-bold mb-4">
-            Neture 공급자로 참여하세요
-          </h1>
-          <p className="text-lg text-blue-100 mb-8 leading-relaxed max-w-2xl mx-auto">
-            Neture는 오프라인 매장 네트워크와 연결되는 유통 플랫폼입니다.
-            <br />
-            공급자는 제품과 콘텐츠를 등록하고 매장을 통해 판매를 확장할 수 있습니다.
-          </p>
-          {isAuthenticated ? (
-            <ServiceApplyPanel service="supplier" />
-          ) : (
-            <div className="flex items-center justify-center gap-4 flex-wrap">
-              <Link
-                to="/register"
-                className="inline-flex items-center px-6 py-3 bg-white text-blue-700 font-semibold rounded-lg hover:bg-blue-50 transition-colors"
-              >
+      <O4OPublicHero
+        eyebrow={SUPPLIER_HERO.eyebrow}
+        title={SUPPLIER_HERO.title}
+        description={SUPPLIER_HERO.description}
+        accent={SUPPLIER_ACCENT}
+        actions={
+          isAuthenticated ? undefined : (
+            <>
+              <Link to="/register" className="o4o-cta" data-testid="supplier-hero-primary">
                 공급자 등록
-                <ArrowRight className="ml-2 w-5 h-5" />
+                <ArrowRight className="w-5 h-5" aria-hidden="true" />
               </Link>
-              <button
-                onClick={() => openLoginModal('/supplier')}
-                className="inline-flex items-center px-6 py-3 border-2 border-white text-white font-semibold rounded-lg hover:bg-white/10 transition-colors"
-              >
+              <button type="button" onClick={() => openLoginModal('/supplier')} className="o4o-cta-secondary">
                 공급자 로그인
               </button>
-            </div>
-          )}
-        </div>
-      </section>
+            </>
+          )
+        }
+      >
+        {isAuthenticated && <div className="max-w-xl"><ServiceApplyPanel service="supplier" /></div>}
+      </O4OPublicHero>
 
       {/* ── 2. 참여 혜택 ── */}
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-white border-t border-gray-100">
         <div className="max-w-5xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 text-center mb-10">공급자 참여 혜택</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {benefits.map((b) => (
               <div
                 key={b.title}
-                className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-md transition-shadow"
+                className="p-2"
               >
-                <div className={`w-12 h-12 ${b.color.bg} rounded-lg flex items-center justify-center mb-4`}>
-                  <b.icon className={`w-6 h-6 ${b.color.text}`} />
+                <div className="w-12 h-12 bg-gray-50 rounded-lg flex items-center justify-center mb-4">
+                  <b.icon className="w-6 h-6 text-gray-700" aria-hidden="true" />
                 </div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">{b.title}</h3>
                 <p className="text-sm text-gray-600 leading-relaxed">{b.desc}</p>
@@ -237,17 +230,18 @@ export default function SupplierLandingPage() {
       </section>
 
       {/* ── 6. CTA ── */}
-      <section className="py-20 bg-gray-900">
+      <section className="py-20 bg-white border-t border-gray-100">
         <div className="max-w-3xl mx-auto px-4 text-center">
-          <h2 className="text-2xl font-bold text-white mb-4">Neture 공급자로 참여하세요</h2>
-          <p className="text-gray-400 mb-8">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">공급자로 참여하세요</h2>
+          <p className="text-gray-600 mb-8">
             전국 매장 네트워크를 통해 제품을 공급하고 비즈니스를 성장시키세요.
           </p>
           {isAuthenticated ? (
             <a
               href="#top"
               onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-              className="inline-flex items-center px-8 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+              className="o4o-cta"
+              style={{ ['--o4o-accent' as string]: SUPPLIER_ACCENT }}
             >
               공급자 서비스 신청 · 상태 보기
               <ArrowRight className="ml-2 w-5 h-5" />
@@ -255,7 +249,8 @@ export default function SupplierLandingPage() {
           ) : (
             <Link
               to="/register"
-              className="inline-flex items-center px-8 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+              className="o4o-cta"
+              style={{ ['--o4o-accent' as string]: SUPPLIER_ACCENT }}
             >
               공급자 등록
               <ArrowRight className="ml-2 w-5 h-5" />

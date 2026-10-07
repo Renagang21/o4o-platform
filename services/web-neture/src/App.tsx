@@ -26,7 +26,7 @@ import { TermsAcceptanceGate } from './components/auth/TermsAcceptanceGate';
 import LoginModal from './components/LoginModal';
 import { O4OErrorBoundary, O4OToastProvider } from '@o4o/error-handling';
 import { usePageSeo } from '@o4o/shared-space-ui';
-import { netureSeoRegistry, resolveNetureSeoDefaults } from './config/seoRegistry';
+import { applyNetureUrlMeta, netureSeoRegistryForHost, resolveNetureSeoDefaults } from './config/seoRegistry';
 
 // Layouts
 import NetureLayout from './components/layouts/NetureLayout';
@@ -104,6 +104,8 @@ import {
 import { RegisterPendingPage } from './pages/RegisterPendingPage';
 // WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1: 이메일 가입 · 확인 · 아이디/비밀번호 찾기 (본체는 @o4o/auth-react)
 import { SignupPage, VerifyEmailPage, FindIdPage, ForgotPasswordPage, ResetPasswordPage } from './pages/auth/EmailAuthPages';
+// WO-O4O-CROSS-SERVICE-LOGIN-ENTRY-AND-RETURN-FLOW-FIX-V1: 자체 로그인 화면이 없는 서비스(O4O 강의)로 로그인 상태를 이어 보내는 출발점
+import ServiceEntryPage from './pages/auth/ServiceEntryPage';
 // MyPage 3-split (WO-O4O-NETURE-MYPAGE-SPLIT-V1)
 import MyPageHub from './pages/mypage/MyPageHub';
 import MyProfilePage from './pages/mypage/MyProfilePage';
@@ -268,6 +270,14 @@ import { StoreProductsManagerPage } from '@o4o/store-products-ui';
 import { GuideBackLink } from './components/GuideBackLink';
 // Neture Event Offer — 공급자 현황 허브 (WO-O4O-EVENT-OFFER-NETURE-ROLE-UX-ALIGNMENT-V1)
 const SupplierEventOfferPage = lazy(() => import('./pages/supplier/SupplierEventOfferPage'));
+// WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: Neture 약국 commerce — 기본 가입 심사 · 세미프랜차이즈 · 공급 제안 · 이벤트 · 모집
+const PharmacyMembershipReviewPage = lazy(() => import('./pages/operator/PharmacyMembershipReviewPage'));
+const OperatorSemiFranchisePage = lazy(() => import('./pages/operator/OperatorSemiFranchisePage'));
+const SemiFranchiseContentFormPage = lazy(() => import('./pages/operator/SemiFranchiseContentFormPage'));
+const AdminSemiFranchisePage = lazy(() => import('./pages/admin/AdminSemiFranchisePage'));
+const SupplierSupplyProposalsPage = lazy(() => import('./pages/supplier/SupplierSupplyProposalsPage'));
+const SupplierSemiFranchiseEventsPage = lazy(() => import('./pages/supplier/SupplierSemiFranchiseEventsPage'));
+const SupplierSemiFranchiseRecruitmentsPage = lazy(() => import('./pages/supplier/SupplierSemiFranchiseRecruitmentsPage'));
 
 // Admin Dashboard (admin-only pages, now under /operator/*)
 const AiCardExplainPage = lazy(() => import('./pages/admin/AiCardExplainPage'));
@@ -612,14 +622,19 @@ function ModalRenderer() {
 // /login 경로 접근 시 홈으로 리다이렉트하고 로그인 모달 열기
 function LoginRedirect() {
   const { openLoginModal } = useLoginModal();
+  const { isAuthenticated, isLoading } = useAuth();
   const location = useLocation();
 
   const returnUrl = resolveLoginReturnPath(location.state, location.search);
 
+  // WO-O4O-CROSS-SERVICE-LOGIN-ENTRY-AND-RETURN-FLOW-FIX-V1: 이미 로그인했으면 모달 없이 목적지로.
   useEffect(() => {
+    if (isLoading || isAuthenticated) return;
     openLoginModal(returnUrl || undefined);
-  }, [openLoginModal, returnUrl]);
+  }, [openLoginModal, returnUrl, isAuthenticated, isLoading]);
 
+  if (isLoading) return null; // 세션 확인 전에는 이동하지 않는다(이동하면 모달을 열 기회가 사라진다)
+  if (isAuthenticated) return <Navigate to={returnUrl || '/'} replace />;
   return <Navigate to="/" replace />;
 }
 
@@ -632,9 +647,12 @@ const ProtectedRoute = RoleGuard;
 // WO-O4O-NETURE-O4O-BRAND-HEADER-SEO-ALIGNMENT-V1: 미등록 경로의 fallback 은 surface 별
 //   (O4O 대표 / Supplier Workspace / Service Operator / Platform Admin) — O4O 대표 title 이
 //   Neture 업무 공간까지 퍼지지 않고, 옛 "유통·협업 플랫폼" 정체성도 퍼지지 않는다.
+// WO-O4O-CROSS-SERVICE-PUBLIC-DESIGN-AND-BRAND-REFRESH-V1: host-aware — 하위 host `/` 는 서비스 Hero 문구,
+//   og:url · canonical 은 현재 host origin 기준.
 function SeoWatcher() {
   const { pathname } = useLocation();
-  usePageSeo({ registry: netureSeoRegistry, pathname, defaults: resolveNetureSeoDefaults(pathname) });
+  usePageSeo({ registry: netureSeoRegistryForHost(CURRENT_HOST_PROFILE), pathname, defaults: resolveNetureSeoDefaults(pathname) });
+  useEffect(() => { applyNetureUrlMeta(CURRENT_HOST_PROFILE, pathname); }, [pathname]);
   return null;
 }
 
@@ -686,6 +704,7 @@ function App() {
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
             <Route path="/register/pending" element={<RegisterPendingPage />} />
+            <Route path="/service-entry/:serviceKey" element={<ServiceEntryPage />} />
             <Route path="/qr/:slug" element={<QrLandingPage />} />
             <Route path="/p/:publicKey" element={<ProductLandingPage />} />
             {/* Cafe24 Developers 의 App URL 진입점. Cafe24 관리자 iframe 안에서 열리므로
@@ -867,6 +886,10 @@ function App() {
               {/* WO-O4O-MARKET-TRIAL-PHASE1-V1 + WO-MARKET-TRIAL-SUPPLIER-RESULTS-AND-FEEDBACK-V1 */}
               {/* Event Offer 현황 — 공급자 지원 허브 (WO-O4O-EVENT-OFFER-NETURE-ROLE-UX-ALIGNMENT-V1) */}
               <Route path="/supplier/event-offers" element={<SupplierEventOfferPage />} />
+              {/* WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: 세미프랜차이즈 공급 제안 · 이벤트 · 모집 */}
+              <Route path="/supplier/supply-proposals" element={<SupplierSupplyProposalsPage />} />
+              <Route path="/supplier/semi-franchise-events" element={<SupplierSemiFranchiseEventsPage />} />
+              <Route path="/supplier/semi-franchise-recruitments" element={<SupplierSemiFranchiseRecruitmentsPage />} />
               <Route path="/supplier/market-trial" element={<SupplierTrialListPage />} />
               <Route path="/supplier/market-trial/new" element={<SupplierTrialCreatePage />} />
               <Route path="/supplier/market-trial/:id" element={<SupplierTrialDetailPage />} />
@@ -1072,6 +1095,8 @@ function App() {
               <Route path="/admin/settings/contact" element={<ServiceContactSettingsPage />} />
               {/* WO-O4O-SERVICE-PHARMACY-AUDIENCE-POLICY-SETTINGS-V1 */}
               <Route path="/admin/settings/service-audience" element={<ServiceAudiencePolicyPage />} />
+              {/* WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: 세미프랜차이즈 관리 (neture:admin) */}
+              <Route path="/admin/semi-franchises" element={<AdminSemiFranchisePage />} />
             </Route>
 
             {/* ================================================================
@@ -1206,6 +1231,11 @@ function App() {
               {/* /operator/suppliers · /operator/supplier-quality 는 위 서브도메인 운영자 블록(supplier:operator)으로 옮겼다 */}
               {/* WO-O4O-NETURE-OPERATOR-CONTACT-MESSAGES-OPERATOR-SCOPE-V1: operator scope contact messages */}
               <Route path="/operator/contact-messages" element={<OperatorContactMessagesPage />} />
+              {/* WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: 약국 기본 가입 심사 · 담당 세미프랜차이즈 (neture:operator) */}
+              <Route path="/operator/pharmacy-memberships" element={<PharmacyMembershipReviewPage />} />
+              <Route path="/operator/semi-franchises" element={<OperatorSemiFranchisePage />} />
+              <Route path="/operator/semi-franchises/:key/contents/new" element={<SemiFranchiseContentFormPage />} />
+              <Route path="/operator/semi-franchises/:key/contents/:id/edit" element={<SemiFranchiseContentFormPage />} />
             </Route>
 
             {/* ================================================================

@@ -69,7 +69,7 @@ Neture forum **create** 경로를 공통 `ForumWriteForm` 으로 전환하고, *
 
 ✅ 수행(제출 없음).
 - `/forum/write` 미인증 → 로그인 요구 뷰 렌더(모듈/ForumWriteForm import 런타임 error 0).
-- `sohae2100@gmail.com`(Neture) 로그인 후 → **create 폼이 ForumWriteForm 기반으로 정상 렌더**:
+- `[REDACTED_EMAIL_A]`(Neture) 로그인 후 → **create 폼이 ForumWriteForm 기반으로 정상 렌더**:
   제목 input · RichTextEditor · "내용 (최소 5자)" 안내 · live charCount("0자") · contactSection · 등록하기 버튼 · notice 배너 모두 확인.
 - **등록(제출) 미수행** — 실제 글 생성 금지 준수.
 - supplier/partner basePath write route 는 동일 `ForumWritePage` 컴포넌트(props 차이)로 같은 create 경로를 타므로 코드 경로상 동일 보장.

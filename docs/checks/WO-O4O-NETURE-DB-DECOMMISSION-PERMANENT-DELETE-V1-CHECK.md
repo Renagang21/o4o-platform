@@ -19,7 +19,7 @@
 | Tier | `db-g1-small` · disk 10GB(autoresize) |
 | 생성 | 2025-12-21T03:14Z |
 | 상태(조사 시작 시) | STOPPED (`activationPolicy: NEVER`) |
-| Public IP | 34.22.71.145 (authorizedNetworks 없음) |
+| Public IP | [REDACTED_IP] (authorizedNetworks 없음) |
 | Private IP / VPC | 없음 |
 | Deletion protection | **true** (삭제 전 해제) |
 | Backup / PITR | enabled · 7일 보존 · PITR on |
@@ -46,7 +46,7 @@ instance · engine 버전 · database 명 · user 명이 **하나도 겹치지 �
 | 대상 | 결과 |
 |---|---|
 | Cloud Run 12개 서비스의 `cloudsql-instances` 주석 | `o4o-core-api` → `o4o-platform-db` **1건뿐**. `neture-db` 연결 **0** |
-| Cloud Run 전 서비스 spec 전문 grep (`neture-db`, `34.22.71.145`) | **0건** |
+| Cloud Run 전 서비스 spec 전문 grep (`neture-db`, `[REDACTED_IP]`) | **0건** |
 | `o4o-core-api` DB env | `DB_HOST=/cloudsql/…o4o-platform-db` · `DB_NAME=o4o_platform` · `DB_USERNAME=o4o_api_v2` |
 | Secret Manager | `cosmetics-db-password` 1건뿐 · **참조 서비스 0** (아래 §6) |
 | VPC Access Connector | **0개** (선행 Redis WO 에서 폐기) |

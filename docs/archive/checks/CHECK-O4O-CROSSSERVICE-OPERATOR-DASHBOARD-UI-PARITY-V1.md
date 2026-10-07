@@ -125,7 +125,7 @@
 
 > **WO-O4O-CROSSSERVICE-OPERATOR-DASHBOARD-UI-PARITY-LIVE-SMOKE-AND-ARCHIVE-V1**
 > 배포 리비전: `kpa-society-web-01781-95t` · `k-cosmetics-web-00961-c8q` (모두 2026-08-06 03:11 배포)
-> 계정: `sohae2100@gmail.com` · Chrome desktop
+> 계정: `[REDACTED_EMAIL_A]` · Chrome desktop
 
 | 검증 항목 | KPA | K-Cosmetics |
 | --- | :---: | :---: |
@@ -161,7 +161,7 @@
 > **WO-O4O-CROSSSERVICE-OPERATOR-DASHBOARD-UI-PARITY-FINALIZE-V1**
 > 수정 커밋: `4f81fc614` (`fix(operator): align cross-service dashboard card placement`)
 > 배포 리비전: `kpa-society-web-01782-jmv` (2026-08-06 07:06 배포) · K-Cosmetics 는 무변경(detect-changes 로 재배포 없음, 회귀만 확인)
-> 계정: `sohae2100@gmail.com` · Chrome desktop · 캐시 무효화 쿼리(`?cb=`)로 신규 번들 확인
+> 계정: `[REDACTED_EMAIL_A]` · Chrome desktop · 캐시 무효화 쿼리(`?cb=`)로 신규 번들 확인
 
 **수정 내용** — `KpaOperatorDashboardLayout` 의 slot 을 `auxiliary`(5-Block **아래**) → `aboveBlocks`(5-Block **위**) 로 교체하고, 카드를 Axis **앞**으로 이동했다. 새 컴포넌트·상태·API 추가 없음.
 

@@ -129,7 +129,7 @@ export function getKpaUserDisplayName(user: UserType | null): string {
 
 | 서비스 | 대표 입력 | 변경 전 | 변경 후 | 결과 |
 |---|---|---|---|:--:|
-| KPA | `{name:'서상원', email:'sohae2100@gmail.com'}` | `서상원` | `서상원` | 동일 |
+| KPA | `{name:'서상원', email:'[REDACTED_EMAIL_A]'}` | `서상원` | `서상원` | 동일 |
 | K-Cosmetics | `{name:'ops@k-cosmetics.site', email:'ops@k-cosmetics.site'}` | `ops` | `ops` | 동일 |
 | Neture | `{displayName:'네처운영자', name:'n', email:'n@…'}` | `네처운영자` | `네처운영자` | 동일 |
 

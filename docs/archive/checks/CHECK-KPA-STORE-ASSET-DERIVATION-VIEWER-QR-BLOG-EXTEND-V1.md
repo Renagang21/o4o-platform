@@ -52,7 +52,7 @@ relation 없는 항목(이전 생성/원본 없이 작성)은 에러가 아니�
 ## 8. Browser Smoke Result (배포 후 수행, 2026-06-06)
 
 - 배포: `Deploy Web Services` run 27049437950 → **deploy-kpa-society success** (타 서비스 skip).
-- 계정: KPA 약국 경영자 `renagang21@gmail.com` 로그인 성공 → `/store/library/production-materials` 진입.
+- 계정: KPA 약국 경영자 `[REDACTED_EMAIL_B]` 로그인 성공 → `/store/library/production-materials` 진입.
 - **페이지 정상 렌더** ✅: 제목 "매장 제작 자료", 설명 문구 "POP·QR-code·블로그" 반영, 하단 안내 정상. 크래시/무한로딩 없음.
 - **empty state 정상** ✅: 해당 계정 매장에 제작 자료 행이 없어 "저장된 제작 자료가 없습니다." 표시.
 - ⚠️ **한계(WO §11.3)**: 제작 자료(POP/QR/블로그) **데이터 행이 없어** QR/블로그 행의 `원본 보기` 버튼·모달은 **라이브 미관측**. row-level 상호작용은 정적 검증 + typecheck 로 확인.

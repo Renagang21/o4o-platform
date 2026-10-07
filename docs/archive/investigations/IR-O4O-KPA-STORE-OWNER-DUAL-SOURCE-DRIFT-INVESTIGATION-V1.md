@@ -1,11 +1,11 @@
 ---
 id: IR-O4O-KPA-STORE-OWNER-DUAL-SOURCE-DRIFT-INVESTIGATION-V1
-title: "KPA-Society 개설약사 store_owner 부재 — sohae21@naver.com 케이스 + dual-source drift 원인 확정"
+title: "KPA-Society 개설약사 store_owner 부재 — [REDACTED_EMAIL_C] 케이스 + dual-source drift 원인 확정"
 status: investigation-complete
 date: 2026-05-17
 type: investigation
 scope:
-  - sohae21@naver.com 의 role_assignments / service_memberships / kpa_members / organizations 실측
+  - [REDACTED_EMAIL_C] 의 role_assignments / service_memberships / kpa_members / organizations 실측
   - 헤더 "내 약국 / 약국 운영 허브" 미노출의 진짜 원인
   - 운영자 화면 "추가 권한 = 매장 운영" vs 상세 모달 "store_owner 미보유" 의 dual-source 모순 원인
   - PATCH /:id/status pending→active 자동 부여 chain (5-step) 의 실제 실패 지점
@@ -36,7 +36,7 @@ canonical-references:
 
 | 항목 | 값 |
 |------|------|
-| 대상 계정 | `sohae21@naver.com` (uuid `970b5b0e-8901-41b6-9f1c-93afd13ce58b`) |
+| 대상 계정 | `[REDACTED_EMAIL_C]` (uuid `970b5b0e-8901-41b6-9f1c-93afd13ce58b`) |
 | 가입 시각 | 2026-05-17 13:11:23 (조사 당일) |
 | 승인 시각 | 2026-05-17 13:11:56 (33 초 후 operator 승인) |
 | **진짜 원인** | **production `organizations` 테이블에 `parent_id` 컬럼 미존재 — 코드/스키마 drift. `ensureOrganization()` INSERT 실패 → store_owner 4-step chain 의 step1 (organization 생성) 에서 끊김.** |
@@ -69,33 +69,33 @@ canonical-references:
 |------|------|------|
 | Glob/Grep/Read (정적 분석) | 코드 흐름 추적 | read-only |
 | `gcloud sql instances patch` (1회) | authorized_networks 임시 추가 | CLAUDE.md §0 — 본 조사용 임시 |
-| `psql -h 34.64.96.252 -U o4o_api -d o4o_platform -f <sql>` | production read-only SELECT 14 회 | UPDATE/DELETE/INSERT 없음 |
+| `psql -h [REDACTED_IP] -U o4o_api -d o4o_platform -f <sql>` | production read-only SELECT 14 회 | UPDATE/DELETE/INSERT 없음 |
 | `gcloud sql instances patch` (복원) | authorized_networks 원본 복원 | 작업 종료 즉시 |
 | `gcloud logging read` | Cloud Run 에러 로그 read | read-only |
 | Agent (Explore) 2 개 병렬 | isStoreOwnerDual / MembershipApprovalService 흐름 verify | read-only |
 
 ### 1-3. 자매 IR 와의 차별점
 - IR-O4O-KPA-STOREOWNER-HEADER-MENU-VISIBILITY-AUDIT-V1 (canonical SSOT 분석) — 본 IR 의 STEP 3 영역, **동일 결론 재확인**
-- IR-O4O-KPA-STOREOWNER-MISSING-ROLE-DRIFT-CHECK-V1 (renagang21/sohae2100 backfill 분석) — 본 IR 의 STEP 1 영역, **신규 케이스 sohae21@naver.com 추가**
+- IR-O4O-KPA-STOREOWNER-MISSING-ROLE-DRIFT-CHECK-V1 (renagang21/sohae2100 backfill 분석) — 본 IR 의 STEP 1 영역, **신규 케이스 [REDACTED_EMAIL_C] 추가**
 - IR-O4O-KPA-STORE-PERMISSION-ADDRESS-DRIFT-AUDIT-V1 (F1/F2 회수 누락) — 본 IR 의 STEP 5 영역, **STEP2.5/STEP3.5 머지 후 회수 흐름 재확인**
 
 본 IR 의 신규 기여: **production schema drift (organizations.parent_id 미존재) 확정** + **dual-source 모순의 시각적 오인 가설 제시**.
 
 ### 1-4. authorized_networks 변경 이력 (롤백 완료)
-- 작업 전: `["124.194.156.36/32"]`
-- 작업 중: `["124.194.156.36/32", "112.153.205.95/32"]` (임시 추가)
-- 작업 후: `["124.194.156.36/32"]` (원복 — §11 참조)
+- 작업 전: `["[REDACTED_IP]/32"]`
+- 작업 중: `["[REDACTED_IP]/32", "[REDACTED_IP]/32"]` (임시 추가)
+- 작업 후: `["[REDACTED_IP]/32"]` (원복 — §11 참조)
 
 ---
 
-## 2. STEP 1 — sohae21@naver.com 실제 상태 (production SELECT)
+## 2. STEP 1 — [REDACTED_EMAIL_C] 실제 상태 (production SELECT)
 
 ### 2-1. users 테이블 (Q1)
 
 | 필드 | 값 |
 |------|------|
 | id | `970b5b0e-8901-41b6-9f1c-93afd13ce58b` |
-| email | sohae21@naver.com |
+| email | [REDACTED_EMAIL_C] |
 | name | 서철환 |
 | status | active |
 | isActive | true |
@@ -192,9 +192,9 @@ WHERE code = 'kpa-pharm-1088602873'
 
 | 사용자 | activity_type | has_store_owner | inactive store_owner | total_role_rows |
 |---|---|:---:|:---:|:---:|
-| renagang21@gmail.com | pharmacy_owner | **✅** | f | 1 |
-| sohae2100@gmail.com | pharmacy_owner | **✅** | f | 4 |
-| **sohae21@naver.com** | **pharmacy_owner** | **❌** | **f** | **0** |
+| [REDACTED_EMAIL_B] | pharmacy_owner | **✅** | f | 1 |
+| [REDACTED_EMAIL_A] | pharmacy_owner | **✅** | f | 4 |
+| **[REDACTED_EMAIL_C]** | **pharmacy_owner** | **❌** | **f** | **0** |
 
 → 자매 IR (IR-O4O-KPA-STOREOWNER-MISSING-ROLE-DRIFT-CHECK-V1, 2026-05-17 작성) 시점에 누락이었던 renagang21/sohae2100 은 **본 IR 작성 시점에 이미 backfill 완료**. **sohae21 은 backfill 이후 신규 가입자 — F2 재발생**.
 
@@ -581,8 +581,8 @@ Q1 에서 양쪽 모두 `'pharmacy_owner'` 로 일치. 자매 IR 의 분류 (pp 
 ## 11. 변경 사항 / 흔적 / 복원
 
 ### 11-1. GCP 변경 (모두 복원됨)
-- `gcloud sql instances patch o4o-platform-db --authorized-networks=124.194.156.36/32,112.153.205.95/32` (작업 시작)
-- `gcloud sql instances patch o4o-platform-db --authorized-networks=124.194.156.36/32` (작업 종료 — **원본 복원 완료**, 본 IR §0 표 확인)
+- `gcloud sql instances patch o4o-platform-db --authorized-networks=[REDACTED_IP]/32,[REDACTED_IP]/32` (작업 시작)
+- `gcloud sql instances patch o4o-platform-db --authorized-networks=[REDACTED_IP]/32` (작업 종료 — **원본 복원 완료**, 본 IR §0 표 확인)
 
 ### 11-2. 로컬 임시 파일 (repo 미포함)
 - `/c/tmp/sohae21-storeowner-investigation.sql` (Q1-Q11 SQL)

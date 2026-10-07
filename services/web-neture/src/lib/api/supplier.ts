@@ -459,6 +459,8 @@ export interface UnifiedSupplierOrder {
   supplierId: string;
   buyerName: string | null;
   buyerOrganizationName: string | null;
+  /** WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: 실제 결제가 아닌 테스트 결제 주문 */
+  testPayment?: boolean;
   subtotal: number;
   shippingFee: number;
   totalAmount: number;

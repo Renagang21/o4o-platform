@@ -21,9 +21,12 @@ import toast from 'react-hot-toast';
 
 type GoogleStage = 'loading' | 'disabled' | 'ready';
 
+/** admin 호스트의 '/' 는 admin 앱 자신이다 — 메인 사이트는 O4O 대표 호스트. */
+const MAIN_SITE_URL = 'https://neture.co.kr/';
+
 const Login: FC = () => {
   
-  const { loginWithGoogle, getGoogleAuthConfig, isAuthenticated, error, clearError, isAdmin, sessionConflict } = useAuth();
+  const { loginWithGoogle, getGoogleAuthConfig, isAuthenticated, error, clearError, isAdmin, sessionConflict, logout } = useAuth();
   const location = useLocation();
   const [searchParams] = useSearchParams();
 
@@ -89,12 +92,14 @@ const Login: FC = () => {
               <p className="mt-2 text-center text-sm text-o4o-text-secondary">
                 관리자 권한이 필요합니다
               </p>
-              <div className="mt-4">
-                <button
-                  onClick={() => window.location.href = '/'}
-                  className="text-admin-blue hover:text-admin-blue-dark"
-                >
-                  메인 사이트로 이동
+              {/* WO-O4O-CROSS-SERVICE-LOGIN-ENTRY-AND-RETURN-FLOW-FIX-V1: '/' 는 이 admin 앱으로 되돌아오는 막다른 길이었다 —
+                  O4O 대표 사이트로 보내고, 다른 계정으로 다시 로그인할 수 있게 로그아웃을 둔다. */}
+              <div className="mt-4 flex justify-center gap-4">
+                <a href={MAIN_SITE_URL} className="text-admin-blue hover:text-admin-blue-dark">
+                  O4O 메인 사이트로 이동
+                </a>
+                <button type="button" onClick={logout} className="text-admin-blue hover:text-admin-blue-dark">
+                  다른 계정으로 로그인
                 </button>
               </div>
             </div>
@@ -149,9 +154,6 @@ const Login: FC = () => {
           <p className="mt-2 text-sm text-blue-200">
             관리자 계정으로 로그인하세요
           </p>
-          <p className="mt-1 text-xs text-green-400 font-bold">
-            ✅ 배포 테스트 v3.0 - {new Date().toLocaleString('ko-KR')}
-          </p>
         </div>
 
         {/* 세션 사용자 교체 안내 — 명시적 재로그인 전까지 기존 화면 · 서버 세션을 쓰지 않는다 */}
@@ -194,8 +196,8 @@ const Login: FC = () => {
 
         {/* 하단 링크 */}
         <div className="text-center">
-          <a 
-            href="/"
+          <a
+            href={MAIN_SITE_URL}
             className="text-sm text-blue-300 hover:text-white transition-colors"
           >
             메인 사이트로 돌아가기

@@ -45,7 +45,7 @@ endpoint 의 응답**:
   (legacy `admin`·`super_admin` 거부).
 - 따라서 **현재 관리자 사이트를 운영하는 계정은 `platform:super_admin` 을 보유한다** — 실증됨.
 - 같은 기간 admin origin 의 **403 은 0건**이다. 4xx 는 401(토큰 만료 refresh) 과 404(백엔드 부재)뿐.
-- 로그인 발생 원격 IP 는 **2개**(`124.194.156.36`, `112.153.205.95`) — 사실상 단일 운영자의 2개 네트워크.
+- 로그인 발생 원격 IP 는 **2개**(`[REDACTED_IP]`, `[REDACTED_IP]`) — 사실상 단일 운영자의 2개 네트워크.
 
 ### 2-2. 이번에 좁힌 것
 
@@ -72,8 +72,8 @@ endpoint 의 응답**:
 
 | 계정 | 보유 role | floor 축소 시 |
 |---|---|---|
-| `sohae2100@gmail.com` (주 운영자) | — | **admin.neture.co.kr 전면 차단** |
-| `renariver21@gmail.com` | `platform:super_admin` (§4-3 검증 계정) | 정상 |
+| `[REDACTED_EMAIL_A]` (주 운영자) | — | **admin.neture.co.kr 전면 차단** |
+| `[REDACTED_EMAIL_D]` | `platform:super_admin` (§4-3 검증 계정) | 정상 |
 
 같은 문서 §4-1 은 프로덕션의 `platform:super_admin` 보유 계정이 **2개**라고 기록한다.
 즉 floor 를 좁히면 **주 운영자 계정이 관리자 사이트에서 잠긴다.**
@@ -94,7 +94,7 @@ endpoint 의 응답**:
 숨겨진 6건은 백엔드가 `platform:super_admin` 만 허용하므로 **이전에도 403 이었다** —
 기능 손실 0, 데드 진입점 6 제거다. 다만 주 운영자 계정의 사이드바가 눈에 띄게 줄어드므로 기록해 둔다.
 
-> 프로덕션 사이드바 22항목 전수 검증에는 `renariver21@gmail.com` 이 필요하다(§5).
+> 프로덕션 사이드바 22항목 전수 검증에는 `[REDACTED_EMAIL_D]` 이 필요하다(§5).
 
 ---
 
@@ -204,7 +204,7 @@ AppStore                     Browse Apps
 > 프런트(메뉴·라우트) 변경은 `61f772d0c` 런으로 이미 라이브다.
 > 백엔드(`platform-hub` 테이블명) 변경은 `c4cb8b230` 의 API 배포에 포함된다.
 
-### 5-1. 프런트엔드 브라우저 smoke — **PASS** (2026-09-09, `renariver21@gmail.com`)
+### 5-1. 프런트엔드 브라우저 smoke — **PASS** (2026-09-09, `[REDACTED_EMAIL_D]`)
 
 Playwright 실계정 로그인 후 사이드바 클릭 기반(딥링크 hard-nav 금지 관례 준수).
 

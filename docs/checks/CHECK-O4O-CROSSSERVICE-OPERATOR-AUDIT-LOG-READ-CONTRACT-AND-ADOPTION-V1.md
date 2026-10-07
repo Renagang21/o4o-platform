@@ -123,7 +123,7 @@ UI Core: `@o4o/operator-core-ui/modules/operator-analytics` (`OperatorAnalyticsP
 - 비 platform-admin 의 `all=true` 는 **넓히지 않는다** (자기 스코프 그대로).
 - platform-admin 은 스코프 미지정 시 400 `PLATFORM_ADMIN_SCOPE_REQUIRED` 로 거부된다.
 
-production 실측 (운영자 토큰, `sohae2100@gmail.com`):
+production 실측 (운영자 토큰, `[REDACTED_EMAIL_A]`):
 
 | 쿼리 | 결과 |
 |------|------|
@@ -162,7 +162,7 @@ action producer 대규모 변경 / 민감 데이터 저장 확대)에 해당하�
 
 ## 6. production E2E (실제 브라우저, Playwright chromium)
 
-계정 `sohae2100@gmail.com`, 각 서비스 L2 credential. viewport **1440×900 / 390×844** 양쪽 수행.
+계정 `[REDACTED_EMAIL_A]`, 각 서비스 L2 credential. viewport **1440×900 / 390×844** 양쪽 수행.
 
 ### 6-1. 서비스별 결과
 

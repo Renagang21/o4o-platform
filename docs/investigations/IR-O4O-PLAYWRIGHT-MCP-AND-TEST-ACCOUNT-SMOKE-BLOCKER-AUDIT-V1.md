@@ -71,13 +71,13 @@
 
 | 계정 | 입력 비번 | status | code | k-cos membership | cosmetics:store_owner |
 |------|-----------|:---:|------|:---:|:---:|
-| `sohae2100` | `3Lz157727791!` (doc) | 200 | — | ✅ | ❌ (admin/operator/super_admin 보유) |
-| `renagang21` | `seochuran1!` (**doc**) | **401** | INVALID_CREDENTIALS | — | — |
-| `renagang21` | `3Lz157727791!` (**사용자 제시**) | **200** | — | ✅ | ❌ |
+| `sohae2100` | `[REDACTED — rotated]` (doc) | 200 | — | ✅ | ❌ (admin/operator/super_admin 보유) |
+| `renagang21` | `[REDACTED — rotated]` (**doc**) | **401** | INVALID_CREDENTIALS | — | — |
+| `renagang21` | `[REDACTED — rotated]` (**사용자 제시**) | **200** | — | ✅ | ❌ |
 
 ### 4.1 사용자 지적 검증
 
-- ✅ **적중**: `renagang21` 실제 비밀번호는 `3Lz157727791!`. **문서의 `seochuran1!` 는 오기** → 정정함.
+- ✅ **적중**: `renagang21` 실제 비밀번호는 `[REDACTED — rotated]`. **문서의 `[REDACTED — rotated]` 는 오기** → 정정함.
 - ✅ **적중**: `renagang21` 은 K-Cosmetics **회원**이다 (membership 존재). 로그인 실패는 비번 문제였지 미가입이 아님.
 - ❗ **정정**: 단, `renagang21` 은 `cosmetics:store_owner` role 을 **보유하지 않는다** (KPA store_owner 일 뿐). 따라서 "각 서비스 store_owner" 가 K-Cosmetics 에는 해당하지 않음.
 
@@ -111,7 +111,7 @@
 |------------------|------------|
 | "Playwright MCP 미가용 (도구 부재)" | 설정·실행 정상. 세션 미연결일 뿐 → **재시작이면 가용** |
 | "K-Cosmetics store_owner 전용 계정 미확보 → CONDITIONAL" | `cosmetics:store_owner` role 보유 계정 부재는 **사실**이나, smoke 는 `sohae2100`(operator-or-above)로 **수행 가능** → 다음 회차는 CONDITIONAL 사유에서 "계정" 제거 |
-| (renagang21 비번 언급 없음) | doc 비번 오기(`seochuran1!`→`3Lz157727791!`) 발견·정정 |
+| (renagang21 비번 언급 없음) | doc 비번 오기(`[REDACTED — rotated]`→`[REDACTED — rotated]`) 발견·정정 |
 
 ---
 

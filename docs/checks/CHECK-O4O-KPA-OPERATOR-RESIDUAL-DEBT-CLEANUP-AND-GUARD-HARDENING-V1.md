@@ -116,7 +116,7 @@ dead entity(0행·live route/controller/frontend/repository 소비처 0). `o4o_a
 | 6 | `kpa:admin`(Cookie) | `GET /operator/actions` | 200 | **200** ✓ |
 | 7 | 인증·비운영 scope | `GET /operator/actions` | 403 | **미실행**(사유 하단) |
 
-- 로그인 계정 = `sohae2100@gmail.com`(JWT roles = `kpa:admin`·`kpa:operator` 포함, `kpa-society` membership `admin`/active). 이 계정은 전 scope 보유 → **7번(403 scope-denial) 을 직접 실증할 비운영 KPA 계정이 없음**. `TEST-ACCOUNTS.local.md` 의 약국 경영자(`renagang21@gmail.com`)는 현재 `INVALID_CREDENTIALS`(자격증명 drift — 문서 갱신 권장).
+- 로그인 계정 = `[REDACTED_EMAIL_A]`(JWT roles = `kpa:admin`·`kpa:operator` 포함, `kpa-society` membership `admin`/active). 이 계정은 전 scope 보유 → **7번(403 scope-denial) 을 직접 실증할 비운영 KPA 계정이 없음**. `TEST-ACCOUNTS.local.md` 의 약국 경영자(`[REDACTED_EMAIL_B]`)는 현재 `INVALID_CREDENTIALS`(자격증명 drift — 문서 갱신 권장).
 - **7번 보증 근거**: action-queue 는 이제 sibling operator-summary 라우터([kpa.routes.ts:251](../../apps/api-server/src/routes/kpa/kpa.routes.ts))와 **동일한 `requireKpaScope('kpa:operator')` 미들웨어**로 보호된다. summary 는 비로그인 401·admin 200 이 action-queue 와 완전 일치(위 표 4·§10) → 동일 미들웨어이므로 인증-비운영 계정의 scope-denial(403) 동작도 summary 와 동일함이 구조적으로 보증된다.
 - `POST /dismiss` body 없는 요청은 Cloud Run 프론트에서 411(Length Required) 로 앱 계층 도달 전 차단 — body 부여 시 401 확인(표 2).
 

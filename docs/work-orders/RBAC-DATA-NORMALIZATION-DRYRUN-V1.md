@@ -89,7 +89,7 @@ AND NOT EXISTS (
 
 | orphaned_users | 상세 |
 |---------------|------|
-| 4 | `admin@o4o.com`, `admin@kpa.test`, `kpa-a-operator@o4o.com`, `sohae21@naver.com` |
+| 4 | `admin@o4o.com`, `admin@kpa.test`, `kpa-a-operator@o4o.com`, `[REDACTED_EMAIL_C]` |
 
 ### D. 마이그레이션 상태
 

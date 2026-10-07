@@ -41,11 +41,8 @@ describe('KCos POP V2 canonical adoption', () => {
   const menuConfig = read(
     REPO, 'packages', 'store-ui-core', 'src', 'config', 'storeMenuConfig.ts',
   );
-  const kcosApp = read(REPO, 'services', 'web-k-cosmetics', 'src', 'App.tsx');
-  const kcosApi = read(REPO, 'services', 'web-k-cosmetics', 'src', 'api', 'popV2.ts');
-  const kcosPage = read(
-    REPO, 'services', 'web-k-cosmetics', 'src', 'pages', 'store', 'StorePopV2Page.tsx',
-  );
+  // KCos 앱(services/web-k-cosmetics) adapter · route 단언은 앱 퇴역 삭제로 제거했다
+  //   (WO-O4O-KCOSMETICS-RETIREMENT-PHASE1A-WEB-APP-AND-DEPLOY-TARGET-V1). backend mount · 공통 Core 계약은 유지.
 
   it('cosmetics.routes 가 공통 POP V2 Core 를 cosmetics 로 mount 한다', () => {
     expect(cosmeticsRoutes).toMatch(
@@ -75,23 +72,6 @@ describe('KCos POP V2 canonical adoption', () => {
     expect(code).not.toMatch(/serviceKey/);
     expect(code).not.toMatch(/service_key/);
     expect(code).not.toMatch(/cosmetics/);
-  });
-
-  it('KCos 프론트 adapter 는 공통 factory 를 주입만 한다 (editor 복제 없음)', () => {
-    expect(kcosApi).toMatch(/createPopV2Api\(\{/);
-    expect(kcosApi).toMatch(/basePath:\s*BASE/);
-    expect(kcosApi).toMatch(/'\/cosmetics\/pharmacy\/pop-v2'/);
-    expect(kcosPage).toMatch(/StorePopV2ListView/);
-    expect(kcosPage).toMatch(/StorePopV2EditorView/);
-    // 문서 schema 를 KCos 가 다시 정의하지 않는다.
-    expect(kcosPage).not.toMatch(/interface\s+PopV2Document/);
-    expect(kcosApi).not.toMatch(/interface\s+PopV2Document/);
-  });
-
-  it('KCos route 는 V2 가 canonical 이고 legacy `marketing/pop` 은 V2 redirect 다 (§4 → 은퇴)', () => {
-    expect(kcosApp).toMatch(/path="marketing\/pop-v2"\s+element=\{<StorePopV2Page \/>\}/);
-    expect(kcosApp).toMatch(/path="marketing\/pop"\s+element=\{<Navigate to="\/store\/marketing\/pop-v2" replace \/>\}/);
-    expect(kcosApp).not.toMatch(/<StorePopPage \/>/);
   });
 
   it('매장 메뉴는 KCos · KPA 블록이 pop-v2, PH 는 /pop (§13 → KPA 는 은퇴 회차에 전환)', () => {

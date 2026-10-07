@@ -74,7 +74,7 @@
 
 ---
 
-## 5. renagang21@gmail.com 검증
+## 5. [REDACTED_EMAIL_B] 검증
 
 이전 IR 의 login response 에서 확인된 데이터:
 

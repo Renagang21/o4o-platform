@@ -53,7 +53,7 @@ const TRANSLATIONS_PATH =
   process.env.OTC_EN_TRANSLATIONS_PATH ??
   path.resolve(
     process.cwd(),
-    '../../docs/guides/products/drug/pilot-en-design/translations/otc-en-translations-v1.json',
+    'src/scripts/data/product-descriptions/drug/pilot-en-design/translations/otc-en-translations-v1.json',
   );
 
 /** 그룹별 허용 치환 — 이 문자열 외에는 어떤 변경도 하지 않는다. */

@@ -40,7 +40,7 @@ const REGULATORY_TYPE = '건강기능식품';
 // clone 독립 경로 — 스크립트 위치(apps/api-server/src/scripts) 기준 repo 루트 도출
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(HERE, '../../../..');
-const DATA = process.env.HFF_DATA_DIR ?? path.join(REPO_ROOT, 'docs/checks/data/product-description-guard');
+const DATA = process.env.HFF_DATA_DIR ?? path.join(REPO_ROOT, 'apps/api-server/src/modules/content-guard/__tests__/fixtures');
 const SP = process.env.HFF_SCRATCH_DIR ?? path.join(REPO_ROOT, 'scratchpad');
 const DATA_FILE = 'hff-probiotics-liq-cp01.json';
 

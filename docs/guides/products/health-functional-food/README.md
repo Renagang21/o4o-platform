@@ -5,7 +5,7 @@
 > 최상위 정책: [O4O-STORE-PRODUCT-DESCRIPTION-POLICY-V1](../O4O-STORE-PRODUCT-DESCRIPTION-POLICY-V1.md)  
 > **규칙 SSOT: [HFF-DESCRIPTION-RULES-SSOT-V1](HFF-DESCRIPTION-RULES-SSOT-V1.md) (HFF-R01~R10)**  
 > 실행 가이드: [O4O-PRODUCT-UNIT-DESCRIPTION-AGENT-GUIDE-V1](../O4O-PRODUCT-UNIT-DESCRIPTION-AGENT-GUIDE-V1.md)  
-> 배치 시작: [AGENT-KICKOFF.md](AGENT-KICKOFF.md) · [examples/](examples/) · [PROCESSED-LEDGER.md](PROCESSED-LEDGER.md)
+> 배치 시작: [AGENT-KICKOFF.md](AGENT-KICKOFF.md) · [examples/](../../../../apps/api-server/src/scripts/data/product-descriptions/health-functional-food/examples/) · [PROCESSED-LEDGER.md](PROCESSED-LEDGER.md)
 
 > **규칙 SSOT 이관 (2026-07-12).** 건강기능식품 설명서 작성 규칙의 SSOT는 **[HFF-DESCRIPTION-RULES-SSOT-V1](HFF-DESCRIPTION-RULES-SSOT-V1.md) (HFF-R01~R10)** 이다.
 > 과거 SSOT였던 `general-food/README.md` (R1~R10)는 일반식품이 Legacy(신규 제작 중단)로 전환되며 규칙이 제거되었다. 건기식은 general-food 규칙을 상속하지 않고 위 자체 규칙을 따른다.

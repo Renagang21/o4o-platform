@@ -1,5 +1,7 @@
 # KPA Members Presence Drift Diagnostics
 
+> **상태**: ACTIVE · 기록물 — 현재 기준 정본 아님 (WO 산출물인 read-only 진단 SQL. backfill 본체는 `apps/api-server/src/database/migrations/20261004000000-BackfillMissingKpaMembersCanonical.ts` 로 구현됨 — 커밋 `7cc84d496`, WO-O4O-KPA-OPERATOR-MEMBER-CANONICAL-EDIT-COMPLETE-V1, 2026-05-17 · `PATCH /:id/info` 의 kpa_members ensure 동반. 운영 실행 후 §5-A `remaining_drift = 0` 측정 기록은 저장소에 없음 — 필요 시 §1 / §5-A 를 read-only 로 재실행해 확인) · **표기일**: 2026-10-04
+
 **작성일**: 2026-05-17
 **연관 WO**: WO-O4O-KPA-MEMBER-CANONICAL-PRESENCE-BACKFILL-V1 (Step 1)
 **근거 IR**: [IR-O4O-KPA-OPERATOR-PROFILE-PRESENCE-AUDIT-V1](../../archive/investigations/IR-O4O-KPA-OPERATOR-PROFILE-PRESENCE-AUDIT-V1.md)
@@ -14,6 +16,7 @@ KPA 회원 canonical SSOT (`kpa_members`) 가 누락된 사용자(`service_membe
 - 본 문서의 SQL 은 모두 **read-only SELECT** — 운영 DB 데이터를 변경하지 않는다
 - Backfill migration 작성 / 실행 전후 drift 측정에 사용
 - 실행 채널: Cloud Console SQL Editor 또는 `gcloud sql connect` (psql 클라이언트 설치 시)
+  > (2026-10-04 정합) 현재 운영 DB read 채널은 [`SETUP.md`](../../../SETUP.md) 의 **Cloud SQL Auth Proxy v2** 절차가 정본이다 (`gcloud sql connect` 는 현행 안내가 아님). 접속 값은 SETUP.md 만 따른다.
 
 ---
 
@@ -89,7 +92,7 @@ LEFT JOIN kpa_pharmacist_profiles pp ON pp.user_id = u.id
 LEFT JOIN service_memberships sm ON sm.user_id = u.id
 LEFT JOIN role_assignments ra ON ra.user_id = u.id
 LEFT JOIN organization_members om ON om.user_id = u.id
-WHERE u.email = $1   -- 예: 'sohae2100@gmail.com'
+WHERE u.email = $1   -- 예: '[REDACTED_EMAIL_A]'
 GROUP BY
   u.id, u.email, u."businessInfo",
   km.id, km.status, km.activity_type, km.pharmacy_name, km.membership_type,

@@ -139,7 +139,7 @@ commit diff: **1 file changed, 56 deletions(-)** — 추가·수정 0.
 ## 8. 실브라우저 smoke 결과
 
 **환경**: Playwright(chromium, headless) · `https://admin.neture.co.kr` · 리비전 `01103-r28`
-**계정**: `renariver21@gmail.com` (`platform:super_admin`) — 정식 폼 로그인 **200**, `/home` 착지, 콘솔 0
+**계정**: `[REDACTED_EMAIL_D]` (`platform:super_admin`) — 정식 폼 로그인 **200**, `/home` 착지, 콘솔 0
 **좌측 메뉴**: 전 경로에서 정상 렌더 (Overview / Core / O4O 상품 DB / Content / CMS / AppStore / Forum / Yaksa(KPA) / Digital Signage / Ops Metrics …)
 
 | 대상 | 최종 URL | 화면 | 콘솔 | 비-2xx | vendor/products | admin오리진 `/api` | HTML 응답 `/api` |

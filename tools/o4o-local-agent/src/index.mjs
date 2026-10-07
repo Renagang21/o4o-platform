@@ -23,7 +23,8 @@
  */
 
 import { runAction, listAllowedActions, AGENT_VERSION, ACTIONS } from './handlers.mjs';
-import { bootstrapLocalDb, getLocalDbState } from './local-db.mjs';
+import { bootstrapLocalDb, getLocalDbState, LocalDatasetRepository } from './local-db.mjs';
+import { buildHeartbeatReport } from './node-report.mjs';
 import { createBackup, backupSummary } from './local-db-backup.mjs';
 import { automationSummary } from './windows-automation-safety.mjs';
 import { loadCredentials, saveCredentials, credentialsLocation } from './credentials.mjs';
@@ -147,7 +148,8 @@ async function handleCommand(command, context, sessionToken) {
     return;
   }
 
-  const outcome = await runAction(command.action, context, command.args);
+  // 단위 실행(run_unit)은 명령 만료 전에 스스로 멈춘다 — 만료 시각을 넘긴다.
+  const outcome = await runAction(command.action, { ...context, commandExpiresAt: command.expiresAt }, command.args);
   if (outcome.status === 'denied') {
     // 서버가 모르는 action 을 보냈다. 실행하지 않았다는 사실을 분명히 되돌린다.
     log(`허용되지 않은 action 거부: ${command.action}`);
@@ -249,7 +251,24 @@ async function commandRun() {
       log('연결되었습니다.');
     }
 
-    const { status, payload } = await apiPost('/api/local-agent/heartbeat', {}, sessionToken);
+    // Phase D — 노드 상태(버전 · capability)를 함께 보고한다. 서버가 여러 노드 중 하나를 고르는 근거다.
+    const dbState = getLocalDbState();
+    let hasLocalData = false;
+    if (dbState.ready) {
+      try {
+        hasLocalData = LocalDatasetRepository.list().length > 0;
+      } catch {
+        hasLocalData = false;
+      }
+    }
+    const report = buildHeartbeatReport({
+      agentVersion: AGENT_VERSION,
+      extensionConnected: context.bridge?.isExtensionConnected?.() === true,
+      platform: process.platform,
+      dbState,
+      hasLocalData,
+    });
+    const { status, payload } = await apiPost('/api/local-agent/heartbeat', report, sessionToken);
 
     if (status === 401) {
       // 세션 만료 또는 해지. credential 로 조용히 다시 연다 — 사용자 개입 없이.

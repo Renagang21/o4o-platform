@@ -105,7 +105,7 @@ KPA·K-Cosmetics 대시보드 복사 **없음**.
 
 | user | membership | PH enrollment 조직 | 조직명 | cart | orders |
 |------|-----------|:---:|------|:---:|:---:|
-| `6967ebe0…` (renagang21@gmail.com) | active | **0** (전체 조직 3개 보유) | — → "매장 정보 미연결" | 0 | 0 |
+| `6967ebe0…` ([REDACTED_EMAIL_B]) | active | **0** (전체 조직 3개 보유) | — → "매장 정보 미연결" | 0 | 0 |
 | `5ee37566…` | active | **1** | `[E2E_TEST] Pharmacy-Hub 검증약국 A` | 0 | 0 |
 | `0d028c2e…` | rejected | 0 | — | 0 | 0 |
 
@@ -159,7 +159,7 @@ KPA·K-Cosmetics 대시보드 복사 **없음**.
 · Deploy API Server run `30966228928` **success** (revision `o4o-core-api-03155-wcp`)
 · Deploy Web Services run `30966228918` **success** (`deploy-pharmacy-hub` 만 빌드, 타 4서비스 skipped)
 
-브라우저: Playwright(실브라우저) · https://pharmacyhub.co.kr · 계정 `renagang21@gmail.com`
+브라우저: Playwright(실브라우저) · https://pharmacyhub.co.kr · 계정 `[REDACTED_EMAIL_B]`
 (테스트 계정 SSOT `docs/local/TEST-ACCOUNTS.local.md`)
 
 | # | 항목 | 결과 |

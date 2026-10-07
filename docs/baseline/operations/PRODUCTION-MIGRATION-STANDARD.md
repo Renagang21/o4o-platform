@@ -151,10 +151,13 @@ automatically on mismatch (`UNKNOWN_PARTIAL` / `POST_MIGRATION_SCHEMA_ASSERTION 
 ```bash
 git add -- src/database/migrations/<epoch13>-<PascalName>.ts src/database/incremental/manifest.ts src/database/incremental/expected-schema-states.ts
 git commit -m "feat(db): add migration for [description]" -- src/database/migrations/<epoch13>-<PascalName>.ts src/database/incremental/manifest.ts src/database/incremental/expected-schema-states.ts
-git push origin HEAD:main
+git push -u origin wo/<slug>
+gh pr create --base main --head wo/<slug>
 ```
 
-Merge to `main` → Migration runs automatically on deployment.
+PR → required CI PASS → report and STOP → after the user's explicit "main 통합 진행" approval, merge the PR
+→ the migration runs automatically on deployment. Never push to `main` directly (no `HEAD:main` / fast-forward
+push / admin bypass) — the integration path is [`AGENTS.md` §4-1(e)](../../../AGENTS.md#4-1-parallel-session--worktree-policy).
 
 ---
 

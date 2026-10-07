@@ -1,5 +1,7 @@
 # IR-KPA-SIGNAGE-CURRENT-STATE-AUDIT-V1
 
+> **상태**: ACTIVE · 기록물(조사 · 분석 · 설계 의견) — **현재 기준 정본 아님**. 제안한 후속 조치의 완료 여부는 미확인이라 COMPLETED 로 닫지 않는다(LIFECYCLE-RULES 보류 IR 규칙). 위치 이전 · 완료 판정은 history 정비 WO · **표기일**: 2026-10-04
+
 > **KPA Society Digital Signage — Current State Investigation Report**
 >
 > 조사 전용 WO (investigation-only). 코드 수정 없음.

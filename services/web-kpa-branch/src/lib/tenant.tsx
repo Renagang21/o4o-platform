@@ -3,11 +3,16 @@
  * WO-O4O-PHARMACIST-BRANCH-SERVICE-FOUNDATION-DESIGN-AND-IMPLEMENTATION-V1 §2
  *
  * tenant 는 딱 두 경로로만 결정된다 — backend `resolveBranch` 와 같은 규칙이다.
- *   1) 공용 경로:    https://kpa-society.co.kr/kpa/{slug}/...      → URL segment
+ *   1) 공용 경로:    https://kpa.neture.co.kr/{slug}/...           → URL segment (canonical 분회 공용 호스트)
+ *                    https://kpa-society.co.kr/kpa/{slug}/...      → URL segment (옛 공용 경로 · 보존)
  *   2) 자체 도메인:  https://{분회 도메인}/...                     → Host (GET /kpa-branch/resolve)
  *
+ * 분회 서비스(`kpa-branch`)는 약사 개인 대상이다. 약국 사업자 서비스(`kpa-society` · role prefix `kpa:*`
+ * · pharmacy.neture.co.kr)와 이름이 비슷할 뿐 다른 서비스다 — docs/baseline/O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1.md.
+ *
  * WO-O4O-KPA-BRANCH-PUBLIC-PATH-ROUTING-AND-CUSTOM-DOMAIN-BASELINE-V1:
- *   공용 진입은 별도 서브도메인이 아니라 kpa-society.co.kr 의 `/kpa` path 다.
+ *   공용 진입은 별도 서브도메인이 아니라 kpa-society.co.kr 의 `/kpa` path 다
+ *   (당시 기준 — 이후 canonical 공용 호스트 kpa.neture.co.kr 추가, CHECK-O4O-URL-FIRST-CENSUS-V1 §21-10).
  *   `/kpa` 는 **URL prefix 일 뿐 tenant 가 아니다** — 분회 식별은 그 다음 세그먼트(slug)
  *   또는 Host 이며, organizationId 는 언제나 backend 가 확정한다.
  *

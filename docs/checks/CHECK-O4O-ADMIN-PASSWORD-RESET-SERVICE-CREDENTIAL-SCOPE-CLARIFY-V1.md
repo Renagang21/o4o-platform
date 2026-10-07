@@ -162,17 +162,17 @@ migration 0 · DB 스키마 0
 **(당시) 관리자 비밀번호 재설정 실행 smoke(API·UI)를 수행하지 못했다.**
 
 > **정정 (2026-08-09, 원인 재확정).** 최초 기록은 *"`sohae2100` 의 문서 비밀번호가 프로덕션과
-> 불일치(401)"* 였다. **이는 오류다** — 조사자가 `sohae21@naver.com` 의 비밀번호를
-> `sohae2100@gmail.com` 에 잘못 대입한 결과였다. 문서 기재값으로 다시 시도하니 **200** 이다.
+> 불일치(401)"* 였다. **이는 오류다** — 조사자가 `[REDACTED_EMAIL_C]` 의 비밀번호를
+> `[REDACTED_EMAIL_A]` 에 잘못 대입한 결과였다. 문서 기재값으로 다시 시도하니 **200** 이다.
 > 문서 drift 가 원인이 아니었다.
 
 **실제 원인: `platform:super_admin` 을 가진 테스트 계정이 존재하지 않는다.**
 
 | 시도 | 결과 |
 |------|------|
-| `sohae2100@gmail.com` 로그인 (문서 기재값) | **200** ✅ |
+| `[REDACTED_EMAIL_A]` 로그인 (문서 기재값) | **200** ✅ |
 | `sohae2100` → `GET /admin/platform-accounts` | **403 `ROLE_REQUIRED`** — 보유 role 은 `kpa:admin` · `neture:admin` 등 **서비스 레벨 admin** 뿐 |
-| `renagang21@gmail.com` 로그인 → 동일 엔드포인트 | 로그인 200 / **403 `ROLE_REQUIRED`** |
+| `[REDACTED_EMAIL_B]` 로그인 → 동일 엔드포인트 | 로그인 200 / **403 `ROLE_REQUIRED`** |
 
 두 관리자 경로 모두 `platform:super_admin` **전용**이다.
 

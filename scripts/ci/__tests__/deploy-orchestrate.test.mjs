@@ -453,7 +453,7 @@ describe('U4. promote — SHA 하나로 승인 (§13 · §14)', () => {
 describe('U5. 상태 표현 · commit status · report (§10 · §26 · §27)', () => {
   const st = (pairs) => Object.entries(pairs).map(([key, state]) => ({ key, state }));
   it('HOLD → pending + promote 명령 1줄 (≤140자)', () => {
-    const s = commitStatus(st({ api: 'HELD_LEVEL_3', neture: 'DEPLOYING', admin: 'HELD_LEVEL_3', store: 'HELD_LEVEL_3', 'kpa-society': 'HELD_LEVEL_3', 'k-cosmetics': 'HELD_LEVEL_3' }), TARGET);
+    const s = commitStatus(st({ api: 'HELD_LEVEL_3', neture: 'DEPLOYING', admin: 'HELD_LEVEL_3', store: 'HELD_LEVEL_3', 'kpa-society': 'HELD_LEVEL_3', 'pharmacy-hub': 'HELD_LEVEL_3' }), TARGET);
     assert.equal(s.overall, 'HELD_LEVEL_3');
     assert.equal(s.state, 'pending');
     assert.ok(s.description.endsWith(promoteCommand(TARGET)));
@@ -498,5 +498,49 @@ describe('U5. 상태 표현 · commit status · report (§10 · §26 · §27)', 
       state: 'WIRING_TEST',
     });
     assert.deepEqual(wiringPlan(['store']).web_parallel, ['store']);
+  });
+});
+
+// WO-O4O-DELIVERY-NOT-SELECTED-CLASSIFICATION-CORRECTION-V1
+// promote `services` 입력에서 빠진 서비스(NOT_SELECTED)가 표시 단계에서 HELD_LEVEL_3 로 바뀌던 결함. 5개 의미를 분리해 고정한다.
+describe('U6. NOT_SELECTED 표시 정합 — 5개 의미 분리', () => {
+  const st = (pairs) => Object.entries(pairs).map(([key, state]) => ({ key, state }));
+
+  it('재현: promote services=[api] → 선택 안 된 서비스는 NOT_SELECTED (HELD_LEVEL_3 아님)', () => {
+    const d = decidePromote(fromFiles([MIGRATION, NETURE_FILE, STORE_FILE]), ok, undefined, { services: ['api'] });
+    assert.equal(d.api.decision, 'PROMOTE');
+    assert.equal(STATE_OF[d.api.decision], 'DEPLOYING');
+    for (const k of ['neture', 'store']) {
+      assert.equal(d[k].decision, 'NOT_SELECTED', k);
+      assert.equal(STATE_OF[d[k].decision], 'NOT_SELECTED', k);
+    }
+    assert.equal(STATE_OF[d['kpa-society'].decision], 'NO_DEPLOY');
+  });
+
+  it('5개 의미: 실제 L3 → HELD_LEVEL_3 · 미선택 → NOT_SELECTED · L2 → AUTO_DEPLOY · runtime diff 없음 → NO_DEPLOY · 선행 API 미배포 → HELD_DEPENDENCY', () => {
+    assert.equal(STATE_OF[decideAll(fromFiles([MIGRATION]), ok, {}).api.decision], 'HELD_LEVEL_3');
+    assert.equal(decidePromote(fromFiles([MIGRATION, STORE_FILE]), ok, undefined, { services: ['api'] }).store.decision, 'NOT_SELECTED');
+    const l2 = decideAll(fromFiles([API_FILE]), ok, {});
+    assert.equal(l2.api.decision, 'AUTO_DEPLOY');
+    assert.equal(STATE_OF[l2['kpa-society'].decision], 'NO_DEPLOY');
+    const dep = decidePromote(fromFiles([MIGRATION, NETURE_FILE]), ok, undefined, { services: ['neture'] });
+    assert.equal(STATE_OF[dep.neture.decision], 'HELD_DEPENDENCY');
+  });
+
+  it('L3 다운그레이드 0 — HELD_LEVEL_3 로 가는 decision 은 실제 L3 보류 2종뿐', () => {
+    const toL3 = Object.entries(STATE_OF).filter(([, s]) => s === 'HELD_LEVEL_3').map(([k]) => k).sort();
+    assert.deepEqual(toL3, ['AUTO_DEPLOY_BLOCKED', 'PROMOTE_REFUSED_UNKNOWN_SERVING']);
+    const unknown = fromFiles([MIGRATION], { api: { status: 'UNKNOWN', serving_sha: null, reasons: ['serving SHA 판정 불가'] } });
+    assert.equal(STATE_OF[decidePromote(unknown, ok).api.decision], 'HELD_LEVEL_3');
+  });
+
+  it('commit status: 미선택은 not-selected 로 표기 · L3 표기 없음 · target 미도달이라 pending 유지', () => {
+    const s = commitStatus(st({ api: 'DEPLOYING', store: 'NOT_SELECTED', 'kpa-society': 'NO_DEPLOY' }), TARGET);
+    assert.equal(s.overall, 'NOT_SELECTED');
+    assert.equal(s.state, 'pending');
+    assert.match(s.description, /held: store\(not-selected\)/);
+    assert.doesNotMatch(s.description, /\(L3\)|HELD_LEVEL_3/);
+    // 실제 L3 가 함께 있으면 L3 가 전체 상태를 대표한다
+    assert.equal(commitStatus(st({ api: 'HELD_LEVEL_3', store: 'NOT_SELECTED' }), TARGET).overall, 'HELD_LEVEL_3');
   });
 });

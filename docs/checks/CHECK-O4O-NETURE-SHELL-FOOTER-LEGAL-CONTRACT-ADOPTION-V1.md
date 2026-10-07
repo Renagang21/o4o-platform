@@ -139,7 +139,7 @@ pnpm --filter @o4o/web-neture build             # tsc && vite build
 **환경 = 로컬 preview** (`vite preview` :4183, production build 산출물). API 는 `https://api.neture.co.kr`.
 localhost origin 은 CORS 허용 대상이 아니어서 로그인 검증을 위해 chromium 을 `--disable-web-security` 로 기동했다(로컬 검증 목적, 코드 변경 아님).
 
-계정: `docs/local/TEST-ACCOUNTS.local.md` — Neture 공급자 `renagang21@gmail.com`, Neture 운영자 `sohae2100@gmail.com`.
+계정: `docs/local/TEST-ACCOUNTS.local.md` — Neture 공급자 `[REDACTED_EMAIL_B]`, Neture 운영자 `[REDACTED_EMAIL_A]`.
 
 | shell | route | viewport | footer 표시 | footer 링크(href 실측) | layout | console error |
 |---|---|---|---|---|---|---|

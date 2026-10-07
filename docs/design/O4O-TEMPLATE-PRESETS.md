@@ -1,6 +1,7 @@
 # O4O Template Presets
 
 > WO-O4O-TEMPLATE-PRESET-DEFINITION-V1
+> **상태**: ACTIVE · **최종 갱신**: 2026-10-04 (registry `packages/shared-space-ui/src/templates.ts` 와 정합 — Health Dashboard preset 소멸 표기 · KPA hero 값 갱신. 값이 다르면 registry 가 기준)
 
 ---
 
@@ -49,8 +50,8 @@ TemplatePreset
 | 용도 | 약사회/전문기관형 서비스 |
 
 **특징:**
-- 절제된 색상 (`bg-bg-secondary`)
-- Border 중심, 그림자 없음 (`shadow-none`)
+- 절제된 색상 (`bg-primary-50`) — (2026-10-04 정합: 종전 `bg-bg-secondary` 는 `WO-O4O-KPA-HERO-TONE-FIX-V1` 로 교체)
+- Border 중심 (`border border-primary-100`), 그림자 없음 (`shadow-none`)
 - 각진 모서리 (`rounded-md`)
 - 보통 간격 (`mb-16`)
 
@@ -59,6 +60,8 @@ TemplatePreset
 ---
 
 ### 2. Health Dashboard
+
+> (2026-10-04 정합) **이 preset 은 현행 registry 에 없다.** 현행 `TemplateKey` = `'kpa' | 'kcosmetics' | 'referenceA'` (`packages/shared-space-ui/src/templates.ts`, `ServiceTemplateKey` 동일). 사용처였던 GlycoPharm 서비스 제거(현행 `services/` 에 없음)와 함께 소멸했으며 아래 내용은 과거 기록이다 — 새 서비스에 지정할 수 없다. `PresetCategory` 타입에 `dashboard` 값만 남아 있다.
 
 | 항목 | 값 |
 |------|------|
@@ -121,8 +124,8 @@ TemplatePreset
 
 | Token | KPA | K-Cosmetics | Premium SaaS |
 | ------- | ----- | ------------- | ------------- |
-| hero.bg | `bg-bg-secondary` | `bg-primary-50` | gradient |
-| hero.border | `border` | `border` | none |
+| hero.bg | `bg-primary-50` | `bg-primary-50` | gradient |
+| hero.border | `border border-primary-100` | `border border-primary-100` | none |
 | hero.padding | `py-16` | `py-20` | `py-24` |
 | card.radius | `rounded-md` | `rounded-xl` | `rounded-2xl` |
 | card.shadow | `none` | `md` | `lg` |

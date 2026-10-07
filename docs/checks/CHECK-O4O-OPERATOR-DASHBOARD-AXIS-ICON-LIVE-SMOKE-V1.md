@@ -2,7 +2,7 @@
 
 > WO-O4O-OPERATOR-DASHBOARD-AXIS-ICON-CONTRACT-LUCIDE-V1 후속 live smoke
 > 목적: 4개 서비스 Operator Dashboard 축 아이콘이 emoji가 아닌 lucide icon으로 정상 표시되는지 배포 환경에서 확인한다.
-> 실행: 2026-06-14 · Playwright MCP · 계정 `sohae2100@gmail.com`(operator-or-above)
+> 실행: 2026-06-14 · Playwright MCP · 계정 `[REDACTED_EMAIL_A]`(operator-or-above)
 
 ## 1. 배경
 

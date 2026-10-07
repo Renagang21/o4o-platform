@@ -46,18 +46,29 @@ const memberRow = (organizationId: string, role = 'owner') => ({
 // ─────────────────────────────────────────────────────────────────────────────
 
 describe('resolveAccessibleStores — Store Selector 입력 (WO §3-③)', () => {
-  it('후보 집합은 organization_members(서비스 조건 없음) 이고, 이름은 organizations 에서 붙인다 — 2 질의', async () => {
+  // WO-O4O-STORE-BUSINESS-ENROLLMENT-AND-MEMBER-ACCESS-V1:
+  //   Store Member(사업자가 허가한 사용자)도 자기 매장을 봐야 하므로 후보 질의가 하나 늘었다.
+  //   owner 후보 집합(owner/admin/manager)은 **그대로** 두고 member 후보('staff')를 따로 구한다 —
+  //   그 배열을 넓히면 owner 조직 해석까지 같이 넓어진다.
+  it('후보는 owner · member 두 질의, 약국 원장 확인 1 질의, 이름은 organizations 에서 붙인다 — 4 질의', async () => {
     const { dataSource, calls } = makeDataSource([
       [memberRow(STORE_B), memberRow(STORE_A, 'manager')],
+      [], // member 후보 없음
+      [], // 비활성 Neture 약국 원장 없음
       [{ id: STORE_A, name: '가나약국' }, { id: STORE_B, name: '다라약국' }],
     ]);
     const stores = await resolveAccessibleStores(dataSource, USER_X);
-    expect(calls).toHaveLength(2);
+    expect(calls).toHaveLength(4);
     expect(norm(calls[0].sql)).toContain('organization_members');
     expect(norm(calls[0].sql)).not.toContain('organization_service_enrollments');
     expect(calls[0].params[0]).toBe(USER_X);
-    expect(norm(calls[1].sql)).toContain('FROM organizations');
-    expect(calls[1].params).toEqual([[STORE_B, STORE_A]]);
+    // owner 후보는 종전 역할 집합 그대로, member 후보는 'staff' 만 본다.
+    expect(calls[0].params[1]).toEqual(['owner', 'admin', 'manager']);
+    expect(norm(calls[1].sql)).toContain('organization_members');
+    expect(norm(calls[1].sql)).toContain("role = 'staff'");
+    expect(norm(calls[2].sql)).toContain('neture_pharmacy_memberships');
+    expect(norm(calls[3].sql)).toContain('FROM organizations');
+    expect(calls[3].params).toEqual([[STORE_B, STORE_A]]);
     // 자동 선택 없음 — 2개 모두 돌려주고 이름 오름차순
     expect(stores).toEqual([
       { organizationId: STORE_A, organizationName: '가나약국', memberRole: 'manager' },
@@ -68,6 +79,8 @@ describe('resolveAccessibleStores — Store Selector 입력 (WO §3-③)', () =>
   it('이름이 같으면 organizationId 오름차순 · 이름 없는 조직은 빈 문자열', async () => {
     const { dataSource } = makeDataSource([
       [memberRow(STORE_B), memberRow(STORE_A)],
+      [],
+      [],
       [{ id: STORE_B, name: null }],
     ]);
     const stores = await resolveAccessibleStores(dataSource, USER_X);
@@ -75,9 +88,42 @@ describe('resolveAccessibleStores — Store Selector 입력 (WO §3-③)', () =>
   });
 
   it('접근 가능한 매장 0 이면 organizations 를 조회하지 않고 [] (가입 안내 분기)', async () => {
-    const { dataSource, calls } = makeDataSource([[]]);
+    const { dataSource, calls } = makeDataSource([[], []]);
     expect(await resolveAccessibleStores(dataSource, USER_X)).toEqual([]);
-    expect(calls).toHaveLength(1);
+    // owner · member 후보를 각각 한 번씩만 보고, 비면 organizations 는 건드리지 않는다.
+    expect(calls).toHaveLength(2);
+  });
+
+  it('Member 매장도 목록에 들어간다 — owner 와 합치고 중복은 제거한다', async () => {
+    const { dataSource } = makeDataSource([
+      [memberRow(STORE_A, 'owner')],
+      [{ organization_id: STORE_B, role: 'staff' }, { organization_id: STORE_A, role: 'staff' }],
+      [],
+      [{ id: STORE_A, name: '가나약국' }, { id: STORE_B, name: '다라약국' }],
+    ]);
+    const stores = await resolveAccessibleStores(dataSource, USER_X);
+    expect(stores).toEqual([
+      { organizationId: STORE_A, organizationName: '가나약국', memberRole: 'owner' },
+      { organizationId: STORE_B, organizationName: '다라약국', memberRole: 'staff' },
+    ]);
+  });
+
+  it('Neture 약국 기본 가입이 active 가 아닌(대기 · 정지 등) 약국 조직은 매장 목록에서 뺀다 (WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1)', async () => {
+    const { dataSource, calls } = makeDataSource([
+      [memberRow(STORE_A), memberRow(STORE_B)],
+      [],
+      [{ organization_id: STORE_B }], // STORE_B = 정지된 약국
+      [{ id: STORE_A, name: '가나약국' }],
+    ]);
+    const stores = await resolveAccessibleStores(dataSource, USER_X);
+    expect(stores.map((s) => s.organizationId)).toEqual([STORE_A]);
+    expect(calls[3].params).toEqual([[STORE_A]]);
+  });
+
+  it('후보가 모두 비활성 약국이면 organizations 를 조회하지 않고 [] (가입 안내 분기)', async () => {
+    const { dataSource, calls } = makeDataSource([[memberRow(STORE_A)], [], [{ organization_id: STORE_A }]]);
+    expect(await resolveAccessibleStores(dataSource, USER_X)).toEqual([]);
+    expect(calls).toHaveLength(3);
   });
 
   it('userId 가 비어 있으면 질의 없이 []', async () => {
@@ -87,7 +133,12 @@ describe('resolveAccessibleStores — Store Selector 입력 (WO §3-③)', () =>
   });
 
   it('응답 필드는 organizationId · organizationName · memberRole 뿐 (§15 최소 필드)', async () => {
-    const { dataSource } = makeDataSource([[memberRow(STORE_A)], [{ id: STORE_A, name: 'A', business_number: 'x' }]]);
+    const { dataSource } = makeDataSource([
+      [memberRow(STORE_A)],
+      [],
+      [],
+      [{ id: STORE_A, name: 'A', business_number: 'x' }],
+    ]);
     const [s] = await resolveAccessibleStores(dataSource, USER_X);
     expect(Object.keys(s).sort()).toEqual(['memberRole', 'organizationId', 'organizationName']);
   });
@@ -176,9 +227,9 @@ describe('services/web-store 조립 계층 (WO §3-①·⑥)', () => {
     expect(keys).toEqual(['home', 'my-store', 'service-work', 'store-hub', 'my-services', 'settings']);
   });
 
-  it('세 서비스의 기존 /store 라우트는 그대로다 (기능 이전 0)', () => {
+  // K-Cosmetics 앱은 퇴역 삭제(WO-O4O-KCOSMETICS-RETIREMENT-PHASE1A-WEB-APP-AND-DEPLOY-TARGET-V1) — 남은 두 서비스만 본다.
+  it('기존 서비스의 /store 라우트는 그대로다 (기능 이전 0)', () => {
     expect(readRepo('services/web-kpa-society/src/App.tsx')).toContain('<Route path="/store/workspace"');
-    expect(readRepo('services/web-k-cosmetics/src/App.tsx')).toContain("'/store'");
     expect(readRepo('services/web-pharmacy-hub/src/App.tsx')).toMatch(/\/store/);
   });
 
@@ -194,19 +245,17 @@ describe('services/web-store 조립 계층 (WO §3-①·⑥)', () => {
 
 describe('§8-4 기존 서비스 매장 진입 → 통합 Store Workspace handoff (플래그 게이트 · 기본 OFF)', () => {
   const kpa = readRepo('services/web-kpa-society/src/App.tsx');
-  const kcos = readRepo('services/web-k-cosmetics/src/App.tsx');
   const phShell = readRepo('services/web-pharmacy-hub/src/layouts/StoreOwnerShell.tsx');
   const ph = readRepo('services/web-pharmacy-hub/src/App.tsx');
 
-  it('세 서비스 모두 기존 가드 안쪽에 UnifiedStoreHandoffGate 를 두고 VITE_UNIFIED_STORE_HANDOFF 로만 켠다', () => {
-    for (const src of [kpa, kcos, phShell]) {
+  it('두 서비스(KPA · PH) 모두 기존 가드 안쪽에 UnifiedStoreHandoffGate 를 두고 VITE_UNIFIED_STORE_HANDOFF 로만 켠다', () => {
+    for (const src of [kpa, phShell]) {
       expect(src).toContain('UnifiedStoreHandoffGate');
       expect(src).toContain('isUnifiedStoreHandoffEnabled(import.meta.env.VITE_UNIFIED_STORE_HANDOFF)');
     }
     expect(norm(kpa)).toContain('<PharmacyGuard><KpaUnifiedStoreHandoff><KpaStoreLayoutWrapper /></KpaUnifiedStoreHandoff></PharmacyGuard>');
     // 서비스 Hub(/store-hub)는 매장 Hub 로 handoff 하지 않는다 — CHECK-O4O-URL-FIRST-CENSUS-V1 §21-17 · §21-18 (사용자 결정 2026-09-26)
     expect(norm(kpa)).toContain('<HubGuard><PharmacyHubLayout /></HubGuard>');
-    expect(norm(kcos)).toContain('<StoreOwnerRoute> <KCosUnifiedStoreHandoff><StoreLayoutWrapper /></KCosUnifiedStoreHandoff> </StoreOwnerRoute>');
     expect(norm(phShell)).toContain('<PharmacyHubUnifiedStoreHandoff> <ShellLayout /> </PharmacyHubUnifiedStoreHandoff> </StoreOwnerGuard>');
   });
 
@@ -216,18 +265,17 @@ describe('§8-4 기존 서비스 매장 진입 → 통합 Store Workspace handof
     expect(ph).toContain('<Route path="/store-owner/payment" element={<StoreOwnerShell requireStoreOwnerRole={false} />}>');
     // 송출 화면은 layout wrapper(=게이트 포함) 없이 가드만
     expect(norm(kpa)).toContain('element={<PharmacyGuard><SignagePlaybackPage /></PharmacyGuard>}');
-    expect(norm(kcos)).toContain('element={<StoreOwnerRoute><SignagePlaybackPage /></StoreOwnerRoute>}');
   });
 
-  it("빌드 플래그는 세 Dockerfile 과 workflow 에 기본 'false' 로 고정된다 (cutover = workflow 한 줄)", () => {
-    for (const svc of ['web-kpa-society', 'web-k-cosmetics', 'web-pharmacy-hub']) {
+  it("빌드 플래그는 두 Dockerfile 과 workflow 에 기본 'false' 로 고정된다 (cutover = workflow 한 줄)", () => {
+    for (const svc of ['web-kpa-society', 'web-pharmacy-hub']) {
       const df = readRepo(`services/${svc}/Dockerfile`);
       expect(df).toContain('ARG VITE_UNIFIED_STORE_HANDOFF=false');
       expect(df).toContain('ENV VITE_UNIFIED_STORE_HANDOFF=$VITE_UNIFIED_STORE_HANDOFF');
     }
     const wf = readRepo('.github/workflows/deploy-web-services.yml');
     expect(wf).toContain("VITE_UNIFIED_STORE_HANDOFF: 'false'");
-    expect(wf.match(/--build-arg VITE_UNIFIED_STORE_HANDOFF=\$\{\{ env\.VITE_UNIFIED_STORE_HANDOFF \}\}/g)?.length).toBe(3);
+    expect(wf.match(/--build-arg VITE_UNIFIED_STORE_HANDOFF=\$\{\{ env\.VITE_UNIFIED_STORE_HANDOFF \}\}/g)?.length).toBe(2);
   });
 
   it('handoff 발급은 같은 POST /auth/handoff 의 targetWorkspace=store 분기다 (신규 엔드포인트 0 · 가짜 serviceKey 0)', () => {

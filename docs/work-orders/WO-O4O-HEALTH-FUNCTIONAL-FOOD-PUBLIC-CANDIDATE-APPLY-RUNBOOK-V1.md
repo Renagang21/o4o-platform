@@ -180,7 +180,7 @@ SELECT COUNT(*) AS identifier_count FROM product_identifiers; -- apply 전후 �
 | product_identifiers (SQL-I) | **703,483** | 703,483 (불변) |
 
 기존 분포: `csv_import` drug-master 305,522 · `external_api` MFDS_EASY_DRUG_INFO 4,757 · smoke 2.
-방화벽: 실행 시점 IP 를 authorized-networks 임시 추가 후 **반드시 원복**(원상태 `124.194.156.36/32` only).
+방화벽: 실행 시점 IP 를 authorized-networks 임시 추가 후 **반드시 원복**(원상태 `[REDACTED_IP]/32` only).
 
 ---
 
@@ -255,7 +255,7 @@ WHERE source_type = 'external_api'
 1. **SSL/env**: 프로덕션 DB TCP 접속은 SSL 필수. CLI 를 `NODE_ENV=production` 으로 실행(→ env-loader 가 `.env.production` 없으면 `apps/api-server/.env` 폴백, connection ssl 활성).
 2. **AppDataSource 회피**: tsx 로컬 실행 시 전체 엔티티 메타데이터 오류(`DeploymentInstance#domain`) → CLI 를 최소 `entities:[]` DataSource 로 수정(commit 7905010d3, raw ds.query 전용).
 3. **numOfRows / 방화벽**: 프로덕션 DB 방화벽에 실행 IP 임시 추가 → **병렬 세션이 authorized-networks 를 "원복"하며 내 임시 IP 를 clobber**(리스트 전체 교체 특성) → 1차 apply ETIMEDOUT(0 write, idempotent 라 무해) → 2차 성공. 교훈: 동시 세션이 있을 때 방화벽 기반 로컬 apply 는 창을 최소화하거나 Cloud Run Job(방화벽 무관) 권장.
-4. **firewall 원복**: 완료 후 `124.194.156.36/32` only 로 원복 확인.
+4. **firewall 원복**: 완료 후 `[REDACTED_IP]/32` only 로 원복 확인.
 
 ### 9.3 rollback (미사용 — 검증 합격)
 문제 없어 rollback 불필요. 필요 시 §6 (`source_label='MFDS_HEALTH_FUNCTIONAL_FOOD'` 삭제).

@@ -432,3 +432,63 @@ export function pickSafeExperienceRecall(data: unknown): { taskKeys?: string[]; 
   if (Array.isArray(data.patterns)) out.patterns = sanitizeRecalledPatterns(data.patterns);
   return out;
 }
+
+// ─── Assistant Memory Cloud 연속성 (WO-O4O-PERSONAL-ASSISTANT-MEMORY-CLOUD-CONTINUITY-V1) ─────────────
+
+/** 이번 run 의 구조화 도움 · 교정에서 파생된 검증 방법 한 줄(Task 키는 호출자가 붙인다). */
+export interface DerivedPattern { stageKey: string; polarity: 'preferred' | 'avoid'; strategy: Strategy }
+
+/**
+ * 검증된 방법 파생 — 노드 원장(`tools/o4o-local-agent/src/local-db.mjs` derivePatterns)과 **같은 규칙**이다.
+ *   - verified + reusable_knowledge + task · stage 가 있을 때만.
+ *   - 방법 교정(procedure_method) → 대안 = preferred, 틀린 방법 = avoid. 메뉴 위치 · 업무 순서 도움 → 경로 = preferred.
+ * 서버가 이미 만든 이벤트(원문 없음)에서 계산한다 — 노드 원장을 read-back 하지 않는다(정책 §9-3).
+ */
+export function deriveVerifiedPatterns(taskKey: string | null, event: WorkAssistanceEvent | null): DerivedPattern[] {
+  if (!event || !taskKey || !event.stageKey) return [];
+  if (event.validation.result !== 'verified' || event.reusability !== 'reusable_knowledge') return [];
+  const stageKey = event.stageKey;
+  const c = event.correction;
+  if (c) {
+    if (c.type !== 'procedure_method') return [];
+    const out: DerivedPattern[] = [];
+    if (c.alternative) out.push({ stageKey, polarity: 'preferred', strategy: c.alternative });
+    if (c.wrong) out.push({ stageKey, polarity: 'avoid', strategy: c.wrong });
+    return out;
+  }
+  const s = event.structured && 'strategy' in event.structured ? event.structured.strategy : null;
+  if ((event.askKind === 'menu_location' || event.askKind === 'procedure_order') && s) return [{ stageKey, polarity: 'preferred', strategy: s }];
+  return [];
+}
+
+/** 검증에 실패한 대안(기존 preferred 의 실패 횟수만 올린다 — 노드 규칙과 같음). */
+export function failedAlternativeOf(taskKey: string | null, event: WorkAssistanceEvent | null): { stageKey: string; strategy: Strategy } | null {
+  if (!event || !taskKey || !event.stageKey || event.validation.result !== 'failed') return null;
+  const alt = event.correction?.alternative ?? (event.structured && 'strategy' in event.structured ? event.structured.strategy : null);
+  return alt ? { stageKey: event.stageKey, strategy: alt } : null;
+}
+
+/** 다른 노드에서 같은 run 을 이어가기 위한 구조(M5). 방법은 label 없이 — 노드 saveRunContext 와 같은 최소화. */
+export interface RunResumeFrame { taskKey: string | null; stageKey: string | null; ask: ProposalAsk | null; strategy: Strategy | null }
+
+/** Cloud 에서 recall 한 소유 주체의 검증 방법(Task 키 포함). */
+export interface CloudRecalledPattern extends RecalledPattern { taskKey: string }
+
+/**
+ * 소유 주체 Cloud 패턴 + 노드 원장 패턴(Phase D · V2 §11-1 (4)). 같은 stage 의 같은 방법은 하나만 —
+ * 극성이 서로 다르면 **Cloud 쪽**을 따른다. Cloud 기억은 이 소유 주체의 모든 노드 실행에서 갱신되고, 노드 원장은
+ * 그 노드에서 실행했을 때만 갱신되므로 노드 쪽이 오래된 기억일 수 있다(오래된 노드 avoid 가 최신 Cloud preferred 를 가리면 안 된다).
+ * Cloud 에 없는 노드 기억(사설 대상 M9 등)은 그대로 쓴다. 결과는 근거일 뿐 강제 절차가 아니다(P3).
+ */
+export function mergeRecalledPatterns(node: readonly RecalledPattern[], cloud: readonly RecalledPattern[]): RecalledPattern[] {
+  const seen = new Set<string>();
+  const out: RecalledPattern[] = [];
+  for (const p of [...cloud, ...node]) {
+    if (out.length >= ASSISTANCE_LIMITS.maxPatterns) break;
+    const key = `${p.stageKey}|${strategySignature(p.strategy)}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push(p);
+  }
+  return out;
+}

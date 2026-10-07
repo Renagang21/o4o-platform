@@ -26,9 +26,11 @@ describe('Phase 1 — CI gate 는 모든 배포 경로 앞에 있다', () => {
     });
   }
 
-  it('모든 배포 job 이 ci-gate 를 needs 로 가진다 (api 1 · web 9 · admin 1)', () => {
+  // web 7 — signage-player-web 배포 은퇴(WO-O4O-RETIRED-WEB-SERVICES-DEPLOYMENT-AND-INFRA-CLEANUP-V1) ·
+  //         k-cosmetics-web 배포 은퇴(WO-O4O-KCOSMETICS-RETIREMENT-PHASE1A-WEB-APP-AND-DEPLOY-TARGET-V1).
+  it('모든 배포 job 이 ci-gate 를 needs 로 가진다 (api 1 · web 7 · admin 1)', () => {
     assert.match(read(DEPLOY[0]), /build-and-deploy:[\s\S]*?needs: \[detect, ci-gate\]/);
-    assert.equal(count(read(DEPLOY[1]), /^ {4}needs: \[detect-changes, ci-gate\]$/gm), 9);
+    assert.equal(count(read(DEPLOY[1]), /^ {4}needs: \[detect-changes, ci-gate\]$/gm), 7);
     assert.match(read(DEPLOY[2]), /\n {2}deploy:[\s\S]*?needs: \[detect, ci-gate\]/);
   });
 });
@@ -56,8 +58,8 @@ describe('Phase 4 — verified rollout (cutover 후 기본값)', () => {
 
   it('web · admin 은 verified 에서 새 revision tag URL smoke 후 전환한다', () => {
     const web = read(DEPLOY[1]);
-    assert.equal(count(web, /phase: plan/g), 9);
-    assert.equal(count(web, /phase: finish/g), 9);
+    assert.equal(count(web, /phase: plan/g), 7);
+    assert.equal(count(web, /phase: finish/g), 7);
     assert.equal(count(read(DEPLOY[2]), /phase: finish/g), 1);
     const action = read('.github/actions/cloud-run-verified-rollout/action.yml');
     const smoke = action.indexOf('cloud-run-rollout.mjs smoke');
@@ -87,7 +89,7 @@ describe('DEPLOY_FREEZE cutover — 게이트 · trigger · 동시성 (WO-O4O-CI
     it(`${file}: 배포 · ci-gate job 은 DEPLOY_FREEZE == 'false' 일 때만 (fail-closed) · freeze-notice 는 그 반대`, () => {
       const wf = read(file);
       const deployIfs = count(wf, /vars\.DEPLOY_FREEZE == 'false'/g);
-      const expected = file.endsWith('web-services.yml') ? 10 : 2; // web: ci-gate 1 + deploy 9 · api/admin: ci-gate 1 + deploy 1
+      const expected = file.endsWith('web-services.yml') ? 8 : 2; // web: ci-gate 1 + deploy 7 · api/admin: ci-gate 1 + deploy 1
       assert.equal(deployIfs, expected);
       assert.match(wf, /^ {2}freeze-notice:\n(?: {4}#.*\n)* {4}if: vars\.DEPLOY_FREEZE != 'false'\n/m);
       assert.doesNotMatch(wf, /DEPLOY_FREEZE == 'true'|DEPLOY_FREEZE != 'true'/, '"true" 비교는 부재 · 오타를 허용으로 만든다');
@@ -303,5 +305,71 @@ describe('GCP 인증 = WIF — 장기 SA key 0', () => {
     assert.match(wf, /if: github\.triggering_actor == github\.repository_owner/);
     assert.match(wf, /^ {4}environment: production$/m);
     assert.doesNotMatch(wf, /secrets\.|gcloud run deploy|update-traffic|jobs execute|print-access-token|print-identity-token|token_format/);
+  });
+});
+
+// WO-O4O-PRODUCTION-SECRET-ENVIRONMENT-MIGRATION-AND-COLLABORATOR-SAFETY-CLOSURE-V1
+// production credential 의 resolve scope 검증 — 값 출력 0 · 배포 · GCP 0 · 소유자만. repository-scope job 은 일부러
+// environment 밖이다(collaborator branch workflow 와 같은 시야 — 이전 후 ABSENT 여야 한다).
+describe('Production secret resolution check — 값 노출 0', () => {
+  const FILE = '.github/workflows/production-secret-resolution-check.yml';
+  // 주석(판정 안내 — `gh secret list --env production` 등)은 제외하고 실행 줄만 본다
+  const wf = read(FILE)
+    .split('\n')
+    .filter((l) => !l.trim().startsWith('#'))
+    .join('\n');
+  const NAMES = ['GCP_DB_NAME', 'GCP_DB_USERNAME', 'GCP_JWT_SECRET', 'SMTP_USER', 'SMTP_PASS', 'GEMINI_API_KEY', 'OPENAI_API_KEY'];
+
+  it('수동 · 두 job 모두 소유자만 · environment-scope 만 production environment', () => {
+    assert.match(wf, /^on:\n {2}workflow_dispatch:\n/m);
+    assert.equal(count(wf, /if: github\.triggering_actor == github\.repository_owner/g), 2);
+    assert.equal(count(wf, /^ {4}environment: production$/gm), 1);
+    assert.match(wf, /\n {2}environment-scope:\n[\s\S]*?\n {4}environment: production\n/);
+  });
+  it('production credential 7개를 두 scope 에서 같은 이름으로 읽는다', () => {
+    for (const n of NAMES) assert.equal(count(wf, new RegExp(`${n}: \\$\\{\\{ secrets\\.${n} \\}\\}`, 'g')), 2, n);
+    assert.doesNotMatch(wf, /GCP_SA_KEY|GCP_DB_PASSWORD|E2E_/);
+  });
+  it('원문 · 전체 digest 출력 0 — fingerprint 는 sha256 앞 6자만 · 배포 · GCP · token 0', () => {
+    assert.equal(count(wf, /digest\("hex"\)\.slice\(0, 6\)/g), 2);
+    assert.doesNotMatch(wf, /echo "?\$\{?(GCP|SMTP|GEMINI|OPENAI)|console\.log\(v\)|console\.log\(process\.env\[n\]\)|base64/);
+    assert.doesNotMatch(wf, /google-github-actions\/auth@|gcloud |id-token: write|gh secret|gh variable/);
+    assert.match(wf, /^permissions:\n {2}contents: read\n/m);
+  });
+});
+
+// WO-O4O-CLOUD-RUN-RUNTIME-SA-LEAST-PRIVILEGE-V1
+// Cloud Run runtime identity = 전용 최소권한 SA. 플래그가 빠지면 새 서비스 · job 생성이 default compute SA(roles/editor) 로 돌아간다
+// (github-actions 는 compute SA 에 actAs 권한이 없어 그 경로는 실패한다 — 명시 고정으로 막는다).
+describe('Cloud Run runtime SA — 모든 deploy · job create/update 에 전용 SA 명시', () => {
+  const RUNTIME_SA = 'o4o-runtime@netureyoutube.iam.gserviceaccount.com';
+  for (const file of DEPLOY) {
+    it(`${file}: env RUNTIME_SA = ${RUNTIME_SA}`, () => {
+      assert.match(read(file), new RegExp(`^ {2}RUNTIME_SA: ${RUNTIME_SA.replace(/[.]/g, '\\.')}$`, 'm'));
+    });
+    it(`${file}: gcloud run deploy · jobs create · jobs update 수 == --service-account=\${{ env.RUNTIME_SA }} 수`, () => {
+      const wf = read(file);
+      const cmds = count(wf, /gcloud run (deploy|jobs create|jobs update) /g);
+      assert.ok(cmds > 0, file);
+      assert.equal(count(wf, /--service-account=\$\{\{ env\.RUNTIME_SA \}\}/g), cmds);
+      assert.doesNotMatch(wf, /-compute@developer\.gserviceaccount\.com/);
+    });
+  }
+});
+
+// WO-O4O-GITHUB-ACTIONS-RUN-ADMIN-TO-DEVELOPER-V1
+// github-actions = roles/run.developer (setIamPolicy 없음). 배포가 Cloud Run IAM 을 바꾸면 그 배포는 권한 부족으로 실패한다.
+// 공개 접근(allUsers → run.invoker)은 서비스 IAM 에 이미 있고, 새 서비스는 최초 1회 소유자가 부여한다.
+describe('Cloud Run IAM 무변경 배포 — github-actions run.developer', () => {
+  const ALL = [...DEPLOY, '.github/workflows/delivery.yml', '.github/workflows/promote.yml', '.github/actions/cloud-run-verified-rollout/action.yml'];
+  for (const file of ALL) {
+    it(`${file}: --allow-unauthenticated · IAM policy 변경 명령 0`, () => {
+      const wf = read(file);
+      assert.doesNotMatch(wf, /--allow-unauthenticated|add-iam-policy-binding|remove-iam-policy-binding|set-iam-policy|--invoker-iam/);
+    });
+  }
+  it('rollout 스크립트도 IAM 을 바꾸지 않는다 (update-traffic · describe 만)', () => {
+    const src = read('scripts/ci/cloud-run-rollout.mjs');
+    assert.doesNotMatch(src, /iam-policy|setIamPolicy|allow-unauthenticated/);
   });
 });

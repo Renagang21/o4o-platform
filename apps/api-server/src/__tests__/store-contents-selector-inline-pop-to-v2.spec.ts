@@ -34,7 +34,6 @@ const stripComments = (s: string) =>
     .join('\n');
 
 const KPA = join(REPO, 'services', 'web-kpa-society', 'src');
-const KCOS = join(REPO, 'services', 'web-k-cosmetics', 'src');
 const PH = join(REPO, 'services', 'web-pharmacy-hub', 'src');
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -142,13 +141,6 @@ describe('§4 legacy — KPA 인라인 caller 0 · legacy 축 KEEP_TEMPORARY', (
 
 // ─────────────────────────────────────────────────────────────────────────────
 describe('§5 boundary — KCos / PH / 공통 Core 무변경', () => {
-  it('KCos 자료함은 B+D(direct/library) 그대로이며 snapshot origin 을 만들지 않는다', () => {
-    const src = stripComments(read(KCOS, 'pages', 'store', 'StoreLibraryContentsPage.tsx'));
-    expect(src).toMatch(/origin: 'direct' as const/);
-    expect(src).toMatch(/origin: 'library' as const/);
-    expect(src).not.toMatch(/'snapshot'/);
-  });
-
   it('PH 에 StoreContentsSelector / snapshot handoff 를 도입하지 않았다', () => {
     const ph = stripComments(read(PH, 'App.tsx'));
     expect(ph).not.toMatch(/StoreContentsSelector/);

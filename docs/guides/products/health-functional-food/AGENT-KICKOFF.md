@@ -1,7 +1,7 @@
 # AGENT KICKOFF — 건강기능식품 매장용 설명서 제작 (식약처 기반 · DB 저장)
 
 > **다른 작업 공간(세션/컴퓨터)에서 이 작업을 시작할 때, 이 문서를 맨 처음 읽으세요.**
-> 함께 볼 것: **[examples/](examples/)** (정본 형식·반응형 예제) · **[PROCESSED-LEDGER.md](PROCESSED-LEDGER.md)** (처리 원장).
+> 함께 볼 것: **[examples/](../../../../apps/api-server/src/scripts/data/product-descriptions/health-functional-food/examples/)** (정본 형식·반응형 예제) · **[PROCESSED-LEDGER.md](PROCESSED-LEDGER.md)** (처리 원장).
 > **규칙 SSOT(HFF-R01~R10)는 [HFF-DESCRIPTION-RULES-SSOT-V1.md](HFF-DESCRIPTION-RULES-SSOT-V1.md).** (과거 general-food R1~R10 참조는 일반식품 Legacy 전환으로 폐기됨.)
 
 ---
@@ -32,7 +32,7 @@
 > AND raw_payload->'source'->>'BASE_STANDARD' ILIKE '%표시량%'   -- 단위당 표시 = 소비자 완제품
 > AND raw_payload->'source'->>'PRDUCT'        NOT ILIKE '%수출%'
 > ```
-> 근거·실측 = [pilot-probiotics/PILOT-PROBIOTICS-V1 §1](pilot-probiotics/PILOT-PROBIOTICS-V1.md).
+> 근거·실측 = [pilot-probiotics/PILOT-PROBIOTICS-V1 §1](../../../../apps/api-server/src/scripts/data/product-descriptions/health-functional-food/pilot-probiotics/PILOT-PROBIOTICS-V1.md).
 - 이 후보는 **바코드/SKU 없음**(HOLD)이지만 **설명서 grounding 자료는 풍부**하다 — `raw_payload` 안:
   - `source.PRDUCT` = 공식 상품명 · `source.ENTRPS` = 제조사
   - **`mainFunction` / `source.MAIN_FNCTN` = 식약처 인정 기능성 문구(전문)** ← 가장 중요한 grounding
@@ -89,15 +89,15 @@
 
 > **계약 SSOT = [content-authoring/STORE-DESCRIPTION-CLASS-CONTRACT](../../content-authoring/STORE-DESCRIPTION-CLASS-CONTRACT.md) (CR-020, 전 제품군 공통).**
 > `<style>` 금지 · 시맨틱 HTML · `sd-*` 클래스 어휘 · 반응형(렌더러 `@container` 담당) · 인라인 style·임의 class 금지 — **전부 거기에 있다. 여기서 반복하지 않는다** (2026-07-15 공통 승격, `WO-O4O-SD-CLASS-COMMON-CONTRACT-UNIFY-V1`).
-> 과거 `<style>` fragment 예제([examples/byeonenjang-probiotics.responsive.html](examples/byeonenjang-probiotics.responsive.html))는 **더 이상 쓰지 않는다**(참고용 보관).
+> 과거 `<style>` fragment 예제([examples/byeonenjang-probiotics.responsive.html](../../../../apps/api-server/src/scripts/data/product-descriptions/health-functional-food/examples/byeonenjang-probiotics.responsive.html))는 **더 이상 쓰지 않는다**(참고용 보관).
 
-**[examples/byeonenjang.semantic.html](examples/byeonenjang.semantic.html) 형식을 그대로 따른다.**
+**[examples/byeonenjang.semantic.html](../../../../apps/api-server/src/scripts/data/product-descriptions/health-functional-food/examples/byeonenjang.semantic.html) 형식을 그대로 따른다.**
 
 **아래는 HFF 전용 사항만** (계약은 위 공통 문서):
 
 - **번호·편집 라벨 금지**(HFF-R07). 소비자 랜딩 카피만. **10단 랜딩** 구조(히어로→왜→핵심 구성→이런 분께→섭취→트러스트→구성→상담).
-- **카테고리 테마 매핑** — 계약의 `sd-theme-*` 메커니즘에 대한 **HFF 카테고리 배정**: `sd-theme-red`(홍삼·전통보양), `sd-theme-green`(유산균·식물), 미지정=블루(기본). 루트에 `<div class="sd-card sd-theme-red">` 형태로 부여(general-food §2 "패키지 톤 반영"). 예제 [examples/hongsam-red-ginseng.semantic.html](examples/hongsam-red-ginseng.semantic.html).
-- **반응형 실측 검증 근거**: [REVIEW-V1 §3-1](pilot-probiotics/REVIEW-V1.md).
+- **카테고리 테마 매핑** — 계약의 `sd-theme-*` 메커니즘에 대한 **HFF 카테고리 배정**: `sd-theme-red`(홍삼·전통보양), `sd-theme-green`(유산균·식물), 미지정=블루(기본). 루트에 `<div class="sd-card sd-theme-red">` 형태로 부여(general-food §2 "패키지 톤 반영"). 예제 [examples/hongsam-red-ginseng.semantic.html](../../../../apps/api-server/src/scripts/data/product-descriptions/health-functional-food/examples/hongsam-red-ginseng.semantic.html).
+- **반응형 실측 검증 근거**: [REVIEW-V1 §3-1](../../../../apps/api-server/src/scripts/data/product-descriptions/health-functional-food/pilot-probiotics/REVIEW-V1.md).
 - **`sd-core` 3열 빈 칸에 대한 HFF 결정**: 현상 자체는 계약 문서 §3 참조. HFF는 **그대로 둔다** — 주 표면이 QR 모바일·모달이라 1~2열 구간이다. 렌더러도 바꾸지 않는다.
 - 저자는 **문구와 구조**에 집중한다. 서체·톤은 렌더러 소관.
 
@@ -111,7 +111,7 @@
 > 1. **1차 게이트(내용 확인)** — 한국어 본문을 사람에게 보여주고 확정받는다(§작업순서 4). 확인 없이 저장 API 호출 금지.
 > 2. **2차 게이트(승인 저장)** — 확정된 내용만 아래 저장(canonical 승격)으로 진행한다. 저장은 admin 인증 경로이며, 승인 없이 임의 canonical 저장을 하지 않는다.
 
-**자격증명**: admin `sohae2100@gmail.com`(neture:admin), 비번은 **SSOT([docs/local/TEST-ACCOUNTS.local.md](../../../local/TEST-ACCOUNTS.local.md))에서 런타임 read** — 로그/커밋 노출 금지. host=`o4o-core-api` Cloud Run.
+**자격증명**: admin `[REDACTED_EMAIL_A]`(neture:admin), 비번은 **SSOT([docs/local/TEST-ACCOUNTS.local.md](../../../local/TEST-ACCOUNTS.local.md))에서 런타임 read** — 로그/커밋 노출 금지. host=`o4o-core-api` Cloud Run.
 
 1. 로그인 → `POST /api/v1/auth/login` `{email,password,includeLegacyTokens:true}` → `data.tokens.accessToken`.
 2. master 등록(바코드 없이) → `POST /api/v1/admin/o4o-product-db/masters` `{name, regulatoryType:'건강기능식품', specification, originCountry, tags}` → `data.id` (barcode=NULL, 정체성=UUID).
@@ -148,7 +148,7 @@
 ## 9. 세션 시작 체크리스트
 
 - [ ] 이 문서 읽기
-- [ ] [예제(반응형)](examples/) 읽기 — 형식·톤·`@container` 기준
+- [ ] [예제(반응형)](../../../../apps/api-server/src/scripts/data/product-descriptions/health-functional-food/examples/) 읽기 — 형식·톤·`@container` 기준
 - [ ] [원장](PROCESSED-LEDGER.md) 확인 — 커버리지·다음 대상·내 그룹
 - [ ] 후보/제품마다: (식약처 데이터 확보) → 상품명 검색(시판?) → **SKIP or** ko 설명서(반응형)→디자인→en → master+STORE 저장 → B2B 복사 → 원장 append
 
@@ -158,7 +158,7 @@
 
 ### A. 단건 파일럿 — 변엔장 (2026-07-11)
 
-식약처 `mainFunction`(장 건강) grounding 으로 **시맨틱 ko+en** 제작. **정본 형식 예제 = [examples/byeonenjang.semantic.html](examples/byeonenjang.semantic.html)** (시맨틱 sd-*, `<style>` 없음) — 형식 기준으로 계속 유효.
+식약처 `mainFunction`(장 건강) grounding 으로 **시맨틱 ko+en** 제작. **정본 형식 예제 = [examples/byeonenjang.semantic.html](../../../../apps/api-server/src/scripts/data/product-descriptions/health-functional-food/examples/byeonenjang.semantic.html)** (시맨틱 sd-*, `<style>` 없음) — 형식 기준으로 계속 유효.
 
 > ⚠️ **DB 상태 정정 (2026-07-14)**: 당시 등록했던 master `38a9d3e4…` 와 그 STORE·B2B canonical 은 **삭제되었다** — 그 master 가 인코딩 손상 5건에 포함되어 guarded delete 대상이었다(§8). **DB에 변엔장 master/설명서는 없다.** 예제 **파일**만 형식 참조용으로 남아 있다.
 > ⚠️ 예제의 **"장용성 캡슐"을 다른 제품에 복사하지 말 것** — 근거 없이 쓰면 창작(CR-004/실패 유형 ①⑤).
@@ -172,9 +172,9 @@
 ### B. 그룹 파일럿 — 유산균 장건강 828 그룹 (2026-07-15)
 
 공통 골격 1종 + 제품 5건(제조사·제형·균수·섭취방법 상이) ko/en 초안 + 검수. **판정 GO(조건부), 저장 전 승인 대기.**
-→ [pilot-probiotics/PILOT-PROBIOTICS-V1](pilot-probiotics/PILOT-PROBIOTICS-V1.md) · [REVIEW-V1](pilot-probiotics/REVIEW-V1.md)
+→ [pilot-probiotics/PILOT-PROBIOTICS-V1](../../../../apps/api-server/src/scripts/data/product-descriptions/health-functional-food/pilot-probiotics/PILOT-PROBIOTICS-V1.md) · [REVIEW-V1](../../../../apps/api-server/src/scripts/data/product-descriptions/health-functional-food/pilot-probiotics/REVIEW-V1.md)
 
-그룹 제작 착수 전 반드시 볼 것: **§1 벌크 원료 필터** · [REVIEW-V1 §3](pilot-probiotics/REVIEW-V1.md) 5개 선결 조건 · [CONTENT-AUTHORING-PRINCIPLES §4-1](../../content-authoring/CONTENT-AUTHORING-PRINCIPLES.md) grounding 실패 5유형.
+그룹 제작 착수 전 반드시 볼 것: **§1 벌크 원료 필터** · [REVIEW-V1 §3](../../../../apps/api-server/src/scripts/data/product-descriptions/health-functional-food/pilot-probiotics/REVIEW-V1.md) 5개 선결 조건 · [CONTENT-AUTHORING-PRINCIPLES §4-1](../../content-authoring/CONTENT-AUTHORING-PRINCIPLES.md) grounding 실패 5유형.
 
 ## 참조
 - 규칙 SSOT: [HFF-DESCRIPTION-RULES-SSOT-V1.md](HFF-DESCRIPTION-RULES-SSOT-V1.md) (HFF-R01~R10)

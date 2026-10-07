@@ -10,7 +10,7 @@ import { MigrationInterface, QueryRunner } from 'typeorm';
  * 수정:
  *   1. kpa-a-operator, kpa-a-admin, admin-kpa-society 등 합법 계정 role 복원
  *   2. test-yaksa*, test-student* 등 테스트 계정 role 복원 (service_membership 있음)
- *   3. codein3@hanmail.net role 복원 (활성 kpa membership 있음)
+ *   3. [REDACTED_EMAIL] role 복원 (활성 kpa membership 있음)
  *   4. sohae21@naver.com kpa:store_owner 은 유지 (진짜 orphan — pending membership + kpa_members 없음)
  *
  * 올바른 orphan 정의:
@@ -35,7 +35,7 @@ export class FixKpaOrphanRoleCleanup20260924100000 implements MigrationInterface
       '4c7caf36-359d-40ee-a301-83dc0440d127', // test-yaksa09@o4o.com: kpa:pharmacist
       'd9ca2173-4909-42f9-8603-d49a4c4e5c33', // test-yaksa10@o4o.com: kpa:store_owner
       'b69832a5-37bb-4f3f-a45a-b1862f6196db', // test-yaksa10@o4o.com: kpa:pharmacist
-      'a27b6040-1a9d-4910-bcb0-28dcaa9924a3', // codein3@hanmail.net: kpa:store_owner
+      'a27b6040-1a9d-4910-bcb0-28dcaa9924a3', // [REDACTED_EMAIL]: kpa:store_owner
     ];
 
     const placeholders = raIdsToRestore.map((_, i) => `$${i + 1}`).join(', ');

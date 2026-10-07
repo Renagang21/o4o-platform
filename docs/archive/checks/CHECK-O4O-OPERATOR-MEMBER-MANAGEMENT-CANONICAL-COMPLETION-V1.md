@@ -120,7 +120,7 @@ IR-AUDIT-V1 시점에 회원 관리 공통화의 마지막 drift 는 **KPA-Socie
 
 ```
 CHECK-O4O-KPA-OPERATOR-MEMBER-MANAGEMENT-WRAPPER-BROWSER-SMOKE-V1
-- KPA operator (sohae2100@gmail.com) 로 /operator/members 진입
+- KPA operator ([REDACTED_EMAIL_A]) 로 /operator/members 진입
 - outer 'applications' 토글 → ApplicationsTab 렌더 확인
 - 회원 row 클릭 → Drawer 약국 정보 표시
 - 정지/복원/탈퇴 bulk action 동작 확인

@@ -91,11 +91,12 @@ describe('A. runtime 진입점 은퇴 — 되살아나지 않는다', () => {
     expect(menu).not.toContain("path: '/admin/cms/channels/ops'");
   });
 
-  it('player 에 /player/channels/* route 가 없다', () => {
-    const app = read('services/signage-player-web/src/App.tsx');
-    expect(app).not.toContain('path="/player/channels/:channelId"');
-    expect(app).not.toContain('path="/player/channels/code/:code"');
-    expect(app).not.toContain('ChannelPlayerPage');
+  // player 앱(services/signage-player-web) 자체가 소스 은퇴했다
+  // (WO-O4O-RETIRED-WEB-RESIDUAL-CLEANUP-V1) — /player/channels/* route 가 들어갈 자리가 없다.
+  it('player 앱 소스가 없다 (/player/channels/* route 재유입 불가)', () => {
+    // 디렉터리가 아니라 package.json 으로 본다 — 로컬에 ignore 된 node_modules 잔재가 남을 수 있다.
+    expect(exists('services/signage-player-web/package.json')).toBe(false);
+    expect(exists('services/signage-player-web/src/App.tsx')).toBe(false);
   });
 
   // WO-O4O-POST-RETIREMENT-MAIN-BASELINE-HOUSEKEEPING-V1:
@@ -132,10 +133,9 @@ describe('A. runtime 진입점 은퇴 — 되살아나지 않는다', () => {
   });
 
   it('남은 소비처가 /api/v1/channels 를 더 이상 호출하지 않는다', () => {
+    // signage-player-web 소비처 2개는 앱 소스 은퇴로 사라졌다 (위 'player 앱 소스가 없다' 가 지킨다).
     const CALLERS = [
       'apps/admin-dashboard/src/routes/content.routes.tsx',
-      'services/signage-player-web/src/App.tsx',
-      'services/signage-player-web/src/components/player/PlayerController.tsx',
     ];
     for (const rel of CALLERS) {
       expect(read(rel)).not.toContain('/api/v1/channels');

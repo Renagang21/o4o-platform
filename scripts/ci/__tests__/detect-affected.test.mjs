@@ -506,11 +506,21 @@ test('변경 문서를 raw text 로 읽는 api-server test 가 선별된다 (nes
     checks.includes('src/__tests__/archive-retention-and-tracked-backup-disposition.spec.ts'),
     `archive-retention guard 가 선별되어야 한다: ${checks.join(' ')}`,
   );
-  // top-level 만 훑으면 놓치는 nested consumer (docs/checks/data/ JSON 을 읽는다)
-  assert.ok(
-    checks.includes('src/modules/content-guard/__tests__/liquid-guard.test.ts'),
-    `nested docs consumer 가 선별되어야 한다: ${checks.join(' ')}`,
-  );
+  // top-level 만 훑으면 놓치는 nested consumer — 실제 nested 사례(liquid-guard fixture)는
+  // 2026-10-03 docs 밖으로 옮겨졌으므로 임시 트리로 재귀 탐색 자체를 고정한다.
+  const nestedRoot = mkdtempSync(path.join(tmpdir(), 'o4o-docs-consumer-'));
+  const nestedRel = 'apps/api-server/src/modules/x/__tests__/nested.test.ts';
+  mkdirSync(path.join(nestedRoot, ...path.dirname(nestedRel).split('/')), { recursive: true });
+  writeFileSync(path.join(nestedRoot, ...nestedRel.split('/')), "readFileSync('docs/checks/x.json')\n", 'utf-8');
+  try {
+    assert.deepEqual(
+      selectDocsConsumerSpecs(parseFileList('M\tdocs/checks/CHECK-X.md'), nestedRoot),
+      ['src/modules/x/__tests__/nested.test.ts'],
+      'nested docs consumer 가 선별되어야 한다',
+    );
+  } finally {
+    rmSync(nestedRoot, { recursive: true, force: true });
+  }
 
   const baseline = selectDocsConsumerSpecs(
     parseFileList('M\tdocs/baseline/O4O-SIGNAGE-CANONICAL-PLAYBACK-PATH-V1.md'),
@@ -558,6 +568,27 @@ test('docs fast job 은 heavy job 과 상호배타다 (ci-pipeline.yml 계약)',
   assert.match(yml, /docs-fast-validate:/, 'docs fast job 이 있어야 한다');
   const heavy = yml.match(/needs\.detect\.outputs\.docs_fast_eligible != 'true'/g) ?? [];
   assert.ok(heavy.length >= 3, `heavy job 게이트가 3개 이상이어야 한다: ${heavy.length}`);
+});
+
+// WO-O4O-CI-CANONICAL-FINAL-GATE-AND-REQUIRED-CHECK-READINESS-V1
+// `CI Gate` 는 main ruleset 의 required status check 대상이다. 이름이 바뀌거나 job 하나가 needs 에서 빠지면
+// 그 job 의 실패가 merge 를 막지 못한다.
+test('CI Gate 는 고정 이름 · always() · 모든 CI job 을 needs 로 묶는다 (ci-pipeline.yml 계약)', () => {
+  const yml = workflowYaml('ci-pipeline.yml');
+  const jobsBlock = yml.slice(yml.indexOf('\njobs:\n'));
+  const jobIds = [...jobsBlock.matchAll(/^ {2}([a-z][a-z0-9-]*):\n/gm)].map((m) => m[1]);
+  assert.ok(jobIds.includes('ci-gate'), 'ci-gate job 이 있어야 한다');
+  const gate = jobsBlock.slice(jobsBlock.indexOf('\n  ci-gate:\n'));
+  assert.match(gate, /\n {4}name: CI Gate\n/, 'job 이름은 정확히 "CI Gate" 여야 한다');
+  assert.doesNotMatch(gate, /matrix|\$\{\{[^}]*\}\}\s*\n\s*runs-on/, 'gate 는 matrix 가 아니어야 한다');
+  assert.match(gate, /\n {4}if: always\(\)\n/, '취소 시 skipped(=통과) 가 되지 않도록 always() 여야 한다');
+  const needs = gate.match(/\n {4}needs: \[([^\]]+)\]/);
+  assert.ok(needs, 'ci-gate needs 목록이 없다');
+  assert.deepEqual(
+    needs[1].split(',').map((s) => s.trim()).sort(),
+    jobIds.filter((id) => id !== 'ci-gate').sort(),
+    'ci-gate needs 는 ci-pipeline.yml 의 다른 job 전부여야 한다',
+  );
 });
 
 
@@ -857,7 +888,7 @@ test('W2. hospital-pharmacy-core 변경 → hospital-pharmacy 만 (기존엔 9�
 test('W3. store-ui-core 변경 → graph consumer 만 · 비소비 서비스는 false', () => {
   const v = webOf(['M\tpackages/store-ui-core/src/index.ts']);
   assert.deepEqual(onOf(v), consumersOf('@o4o/store-ui-core'));
-  for (const key of ['lecture', 'kpa-branch', 'signage-player', 'hospital-pharmacy']) {
+  for (const key of ['lecture', 'kpa-branch', 'hospital-pharmacy']) {
     assert.equal(v.services[key], false, `${key} 는 store-ui-core 를 소비하지 않는다`);
   }
 });
@@ -867,7 +898,8 @@ test('W4. auth-client 변경 → 소비 서비스 전부 · 그래도 "9개 하�
   const expected = consumersOf('@o4o/auth-client');
   assert.deepEqual(onOf(v), expected);
   // hospital-pharmacy 는 무로그인 V1 로 auth 의존이 없다(WO-O4O-HOSPITAL-PHARMACY-V1-FIXED-LOCAL-FILE-AND-LOGINLESS-SIMPLIFICATION).
-  assert.ok(expected.length >= 7, 'auth 계열은 실제로 거의 전 서비스가 쓴다');
+  // k-cosmetics 배포 은퇴(WO-O4O-KCOSMETICS-RETIREMENT-PHASE1A-WEB-APP-AND-DEPLOY-TARGET-V1)로 web target 7 → 하한 6.
+  assert.ok(expected.length >= 6, 'auth 계열은 실제로 거의 전 서비스가 쓴다');
   assert.ok(!expected.includes('hospital-pharmacy'), 'hospital-pharmacy 는 auth-client 를 소비하지 않는다');
   assert.equal(v.fallback, false, '넓은 판정이어도 fallback 이 아니라 graph 결과다');
 });
@@ -890,9 +922,23 @@ test('W6. 서비스 변경 + package 변경 → 합집합', () => {
 test('W7. 여러 서비스 동시 변경 → 각각 true, 나머지는 false', () => {
   const v = webOf([
     'M\tservices/web-neture/src/a.tsx',
-    'M\tservices/signage-player-web/src/b.tsx',
+    'M\tservices/web-kpa-branch/src/b.tsx',
   ]);
-  assert.deepEqual(onOf(v), ['neture', 'signage-player']);
+  assert.deepEqual(onOf(v), ['kpa-branch', 'neture']);
+});
+
+test('W7b. 배포 은퇴한 signage-player-web 변경 → Web 배포 0 · fallback 아님 · registry 에 없음', () => {
+  assert.ok(!WEB_SERVICES.some((s) => s.dir === 'services/signage-player-web'), '배포 registry 에 다시 넣지 않는다');
+  const v = webOf(['M\tservices/signage-player-web/src/App.tsx']);
+  assert.deepEqual(onOf(v), []);
+  assert.equal(v.fallback, false);
+  assert.ok(!('signage-player' in v.services));
+});
+
+test('W7c. 배포 은퇴한 k-cosmetics → registry 에 없음 · Web 판정 결과에 key 없음', () => {
+  assert.ok(!WEB_SERVICES.some((s) => s.key === 'k-cosmetics' || s.dir === 'services/web-k-cosmetics'), '배포 registry 에 다시 넣지 않는다');
+  const v = webOf(['M\tservices/web-neture/src/a.tsx']);
+  assert.ok(!('k-cosmetics' in v.services));
 });
 
 test('W8. transitive(2단계 이상) dependency 변경도 잡는다', () => {

@@ -14,7 +14,7 @@
 |---|---|
 | HEAD | `f465e63b0cec460e255c272b5193bfc83376388e` |
 | 브랜치 | `main` (worktree clean) |
-| 실측 환경 | `https://admin.neture.co.kr` · 계정 `sohae2100@gmail.com` |
+| 실측 환경 | `https://admin.neture.co.kr` · 계정 `[REDACTED_EMAIL_A]` |
 
 ---
 
