@@ -72,6 +72,23 @@ describe('O4OHomeButton', () => {
     expect(navigate).toHaveBeenCalledWith(O4O_HOME_URL);
   });
 
+  // WO-O4O-CROSS-SERVICE-PUBLIC-DESIGN-AND-BRAND-REFRESH-V1: 로그인 무관 노출 → 세션 복구 중 클릭이 handoff 를 건너뛰지 않게
+  it('authLoading(세션 복구 중): 비활성 — 클릭해도 이동·발급 없음, 복구 후 로그인 상태면 handoff', async () => {
+    const post = vi.fn().mockResolvedValue(ok());
+    const { rerender } = render(<O4OHomeButton api={{ post }} isAuthenticated={false} authLoading navigate={navigate} />);
+    const btn = screen.getByTestId('o4o-home-button') as HTMLButtonElement;
+    expect(btn.disabled).toBe(true);
+    fireEvent.click(btn);
+    await flush();
+    expect(post).not.toHaveBeenCalled();
+    expect(navigate).not.toHaveBeenCalled();
+    rerender(<O4OHomeButton api={{ post }} isAuthenticated authLoading={false} navigate={navigate} />);
+    fireEvent.click(screen.getByTestId('o4o-home-button'));
+    await flush();
+    expect(post).toHaveBeenCalledWith('/auth/handoff', { targetServiceKey: 'neture', returnPath: '/' });
+    expect(navigate).toHaveBeenCalledWith(TARGET);
+  });
+
   it('중복 클릭 · 데스크톱/모바일 두 버튼 동시 클릭 → 발급 1회 · 진행 중 disabled + 진행 문구', async () => {
     const d = deferred<ReturnType<typeof ok>>();
     const post = vi.fn().mockReturnValue(d.promise);

@@ -10,6 +10,10 @@
  * 3. 내가 참여한 유통참여형 펀딩 (로그인 시)
  * 4. 모집 중 / 진행 중 / 종료 섹션
  * 5. 포럼/안내 풋터
+ *
+ * WO-O4O-CROSS-SERVICE-PUBLIC-DESIGN-AND-BRAND-REFRESH-V1: funding.neture.co.kr `/` 대표 화면 —
+ *   상단을 공통 O4OPublicHero(확정 문구)로. 주 CTA = 이 화면의 모집 중 목록(앵커), 보조 = 이용 방법 안내.
+ *   목록 · 상태 · 데이터는 그대로 — 모집이 없으면 빈 상태를 그대로 보여준다(가짜 콘텐츠 없음).
  */
 
 import { useEffect, useState } from 'react';
@@ -23,6 +27,8 @@ import {
 } from '../../api/trial';
 import { useAuth } from '../../contexts/AuthContext';
 import { LoadError } from '@o4o/ui';
+import { O4OPublicHero } from '@o4o/auth-react';
+import { FUNDING_HERO } from '../../config/publicHero';
 
 type DisplayGroup = 'recruiting' | 'active' | 'ended';
 
@@ -92,15 +98,29 @@ export function MarketTrialHubPage() {
   const myTrials = trials.filter((t) => participationMap.has(t.id));
 
   return (
+    <>
+    {/* 1. Hero (공통) */}
+    <O4OPublicHero
+      eyebrow={FUNDING_HERO.eyebrow}
+      title={FUNDING_HERO.title}
+      description={FUNDING_HERO.description}
+      accent={FUNDING_HERO.accent}
+      actions={
+        <>
+          <a href="#market-trial-recruiting" className="o4o-cta" data-testid="funding-hero-primary">
+            모집 중인 펀딩 보기
+          </a>
+          <Link to="/guide/features/market-trial" className="o4o-cta-secondary">
+            이용 방법
+          </Link>
+        </>
+      }
+    />
     <div style={s.container}>
-      {/* 1. 헤더 */}
-      <header style={s.header}>
-        <h1 style={s.title}>유통참여형 펀딩</h1>
-        <p style={s.subtitle}>
-          공급자가 제안한 신제품을 매장에서 먼저 체험하고,
-          현장 의견을 공유하는 참여형 프로그램입니다. 모집부터 보상까지 이 공간에서 확인할 수 있습니다.
-        </p>
-      </header>
+      <p style={s.subtitle}>
+        공급자가 제안한 신제품을 매장에서 먼저 체험하고,
+        현장 의견을 공유하는 참여형 프로그램입니다. 모집부터 보상까지 이 공간에서 확인할 수 있습니다.
+      </p>
 
       {/* 2. 참여 안내 */}
       <section style={s.guideGrid}>
@@ -137,7 +157,7 @@ export function MarketTrialHubPage() {
       )}
 
       {/* 4. 모집 중 */}
-      <Section title="모집 중" count={recruiting.length} accentColor="#059669" isLoading={isLoading}>
+      <Section id="market-trial-recruiting" title="모집 중" count={recruiting.length} accentColor="#059669" isLoading={isLoading}>
         {loadError ? (
           <LoadError compact onRetry={() => setReloadKey((k) => k + 1)} />
         ) : recruiting.length > 0 ? (
@@ -198,12 +218,13 @@ export function MarketTrialHubPage() {
         </div>
         <div style={s.footerNote}>
           <p style={{ fontSize: '0.75rem', color: '#9CA3AF', margin: 0, lineHeight: 1.5 }}>
-            이 공간은 Neture 통합 유통참여형 펀딩 허브입니다.
-            서비스(K-Cosmetics / KPA-a 등)에서 노출되는 유통참여형 펀딩도 이곳에서 통합 운영됩니다.
+            이 공간은 O4O 유통참여형 펀딩 통합 허브입니다.
+            각 서비스에서 노출되는 유통참여형 펀딩도 이곳에서 통합 운영됩니다.
           </p>
         </div>
       </footer>
     </div>
+    </>
   );
 }
 
@@ -214,12 +235,14 @@ export default MarketTrialHubPage;
 // ──────────────────────────────────────────────
 
 function Section({
+  id,
   title,
   count,
   accentColor,
   isLoading,
   children,
 }: {
+  id?: string;
   title: string;
   count: number;
   accentColor: string;
@@ -227,7 +250,7 @@ function Section({
   children: React.ReactNode;
 }) {
   return (
-    <section style={{ marginBottom: '32px' }}>
+    <section id={id} style={{ marginBottom: '32px', scrollMarginTop: '80px' }}>
       <div style={s.sectionHeader}>
         <div style={{ width: '4px', height: '20px', borderRadius: '2px', backgroundColor: accentColor }} />
         <h2 style={s.sectionTitle}>{title}</h2>
@@ -418,7 +441,8 @@ const s: Record<string, React.CSSProperties> = {
   title: { fontSize: '1.75rem', fontWeight: 700, color: '#111827', marginBottom: '12px' },
   subtitle: { fontSize: '0.9375rem', color: '#4B5563', lineHeight: 1.7, maxWidth: '680px', margin: 0 },
 
-  guideGrid: { display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px', marginBottom: '32px' },
+  // 1280 은 3열, 390 은 1열 — 고정 3열은 모바일에서 카드가 짓눌렸다.
+  guideGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px', margin: '32px 0' },
   guideCard: {
     padding: '20px',
     backgroundColor: '#F9FAFB',

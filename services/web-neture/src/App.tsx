@@ -26,7 +26,7 @@ import { TermsAcceptanceGate } from './components/auth/TermsAcceptanceGate';
 import LoginModal from './components/LoginModal';
 import { O4OErrorBoundary, O4OToastProvider } from '@o4o/error-handling';
 import { usePageSeo } from '@o4o/shared-space-ui';
-import { netureSeoRegistry, resolveNetureSeoDefaults } from './config/seoRegistry';
+import { applyNetureUrlMeta, netureSeoRegistryForHost, resolveNetureSeoDefaults } from './config/seoRegistry';
 
 // Layouts
 import NetureLayout from './components/layouts/NetureLayout';
@@ -647,9 +647,12 @@ const ProtectedRoute = RoleGuard;
 // WO-O4O-NETURE-O4O-BRAND-HEADER-SEO-ALIGNMENT-V1: 미등록 경로의 fallback 은 surface 별
 //   (O4O 대표 / Supplier Workspace / Service Operator / Platform Admin) — O4O 대표 title 이
 //   Neture 업무 공간까지 퍼지지 않고, 옛 "유통·협업 플랫폼" 정체성도 퍼지지 않는다.
+// WO-O4O-CROSS-SERVICE-PUBLIC-DESIGN-AND-BRAND-REFRESH-V1: host-aware — 하위 host `/` 는 서비스 Hero 문구,
+//   og:url · canonical 은 현재 host origin 기준.
 function SeoWatcher() {
   const { pathname } = useLocation();
-  usePageSeo({ registry: netureSeoRegistry, pathname, defaults: resolveNetureSeoDefaults(pathname) });
+  usePageSeo({ registry: netureSeoRegistryForHost(CURRENT_HOST_PROFILE), pathname, defaults: resolveNetureSeoDefaults(pathname) });
+  useEffect(() => { applyNetureUrlMeta(CURRENT_HOST_PROFILE, pathname); }, [pathname]);
   return null;
 }
 

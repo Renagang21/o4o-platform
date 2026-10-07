@@ -17,4 +17,4 @@ Disallow: /register
 Disallow: /pending-approval
 Disallow: /setup-activity
 
-Sitemap: https://kpa-society.co.kr/sitemap.xml
+Sitemap: https://pharmacy.neture.co.kr/sitemap.xml

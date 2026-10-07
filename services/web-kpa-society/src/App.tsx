@@ -15,7 +15,7 @@ import { O4OErrorBoundary, O4OToastProvider } from '@o4o/error-handling';
 import { TemplateProvider, NotFound } from '@o4o/ui';
 import { templates, usePageSeo, StoreFacingFooter } from '@o4o/shared-space-ui';
 import { kpaConfig } from '@o4o/operator-ux-core';
-import { kpaSeoRegistry, KPA_SEO_DEFAULTS } from './config/seoRegistry';
+import { kpaSeoRegistry, KPA_SEO_DEFAULTS, applyPharmacyUrlMeta } from './config/seoRegistry';
 import { ServiceProvider } from './contexts/ServiceContext';
 import { useAuth } from './contexts/AuthContext';
 import { TermsAcceptanceGate } from './components/auth/TermsAcceptanceGate';
@@ -339,7 +339,7 @@ const ForeignVisitorAffiliatePublicLandingPage = lazy(() => import('./pages/publ
  * 지부·분회 기능은 별도 분회 서비스(services/web-kpa-branch) 소관이다.
  */
 
-const SERVICE_NAME = 'KPA-Society';
+const SERVICE_NAME = 'O4O 약국';
 
 // ServiceUserProtectedRoute removed — WO-KPA-UNIFIED-AUTH-PHARMACY-GATE-V1
 // Service User 인증 제거, Platform User 단일 인증으로 통합
@@ -620,7 +620,7 @@ function KpaStoreWorkspaceHomePage() {
       paths={KPA_STORE_WORKSPACE_PATHS}
       accent="blue"
       storeName={pharmacy?.name}
-      serviceName="KPA Society"
+      serviceName="O4O 약국"
     />
   );
 }
@@ -668,6 +668,8 @@ function PageLoader() {
 function SeoWatcher() {
   const { pathname } = useLocation();
   usePageSeo({ registry: kpaSeoRegistry, pathname, defaults: KPA_SEO_DEFAULTS });
+  // WO-O4O-CROSS-SERVICE-PUBLIC-DESIGN-AND-BRAND-REFRESH-V1: og:url · canonical = pharmacy.neture.co.kr 기준
+  useEffect(() => { applyPharmacyUrlMeta(pathname); }, [pathname]);
   return null;
 }
 

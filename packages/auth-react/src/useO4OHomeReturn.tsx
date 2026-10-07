@@ -158,13 +158,18 @@ export interface O4OHomeButtonProps extends O4OHomeReturnOptions {
   errorClassName?: string;
   /** 기본 'O4O 홈' */
   label?: string;
+  /**
+   * 세션 복구(인증 확인) 중이면 true. 그 동안은 비활성 — 확인 전에 누르면 로그인 사용자도
+   * 비로그인으로 판정돼 handoff 없이 대표 홈으로 가, 로그인이 이어지지 않는다.
+   */
+  authLoading?: boolean;
 }
 
 /**
  * 스타일은 각 앱이 className 으로 준다. 오류는 버튼 바로 아래 role="alert" 로 보인다.
  * 오류가 보이도록 클릭 시 메뉴·drawer 를 닫지 않는다(성공하면 어차피 탭이 이동한다).
  */
-export function O4OHomeButton({ className, errorClassName, label = O4O_HOME_LABEL, ...options }: O4OHomeButtonProps) {
+export function O4OHomeButton({ className, errorClassName, label = O4O_HOME_LABEL, authLoading = false, ...options }: O4OHomeButtonProps) {
   const { goHome, busy, error } = useO4OHomeReturn(options);
   return (
     <>
@@ -172,8 +177,8 @@ export function O4OHomeButton({ className, errorClassName, label = O4O_HOME_LABE
         type="button"
         className={className}
         onClick={goHome}
-        disabled={busy}
-        aria-busy={busy || undefined}
+        disabled={busy || authLoading}
+        aria-busy={busy || authLoading || undefined}
         data-testid="o4o-home-button"
       >
         {busy ? `${label}으로 이동 중…` : label}
