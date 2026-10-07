@@ -586,14 +586,15 @@ HTTP 200 · pageerror 0 · console error 0 · 4xx/5xx 응답 0 · 가로 overflo
 ### 14-3. 후보 census (serving 0e283ba10 → candidate b34da10a8)
 
 - candidate = main HEAD `b34da10a851f02c0250fd9132ac6b9fca6e62da0` (CI Pipeline · CodeQL · Delivery success). a07861f57 이후는 docs commit(#350 · #351) 만.
-- kpa-branch image 의 build closure(Dockerfile 이 COPY 하는 `services/web-kpa-branch` + `packages/types` · `auth-utils` · `auth-client` · `auth-react` + root 설정 · lockfile) 에 들어간 commit: **PR #337 2건(9a4c0e571 · 0920e1895) 만**. lockfile · package.json · Dockerfile 변경 0.
+- kpa-branch image 의 **소스** closure(Dockerfile 이 COPY 하는 `services/web-kpa-branch` + `packages/types` · `auth-utils` · `auth-client` · `auth-react` + root 설정 · `pnpm-workspace.yaml` · package.json) 에 들어간 commit: **PR #337 2건(9a4c0e571 · 0920e1895) 만**. package.json · Dockerfile 변경 0.
+- **외부 dependency 는 이 census 로 고정되지 않는다** (Codex review PR #353 P2). `services/web-kpa-branch/Dockerfile` 은 `pnpm-lock.yaml` 을 COPY 하지 않고 `pnpm install --filter kpa-branch-web... --ignore-scripts` 로 범위 버전(`^`)을 **빌드 시점에** 해석한다. 그래서 이전 이미지(00202)와 새 이미지(00205)의 third-party 버전이 같다는 보장이 없고, 소스 commit 2건만으로 이미지 입력 전체를 확정할 수 없다. 이 부분은 diff 가 아니라 아래 14-6 운영 smoke(pageerror 0 · 예상 밖 console error 0)로 확인했다.
 
 | 분류 | 내용 |
 |---|---|
 | KPA_DESIGN_REQUIRED | `services/web-kpa-branch`: index.html(description · og:title/description/type/site_name · favicon · Pretendard, **og:url 없음**) · `public/favicon.svg` · `DirectoryShell`(신규 — `/` 헤더 · nav · O4O 홈 · 로그인 · footer) · `BranchLayout`(헤더에 O4O 홈 · `authLoading`) · `DirectoryPage`(진입 링크를 shell 로 이동) · index.css(`tokens.css` import · `Pretendard Variable`) · tailwind.config.js(글꼴) |
 | SAFE_DEPENDENCY | `packages/auth-react` public-brand(tokens · O4OPublicHero export) · `useO4OHomeReturn`(`authLoading` prop 추가, 기본 false) — 01~04 에서 운영 검증됨 |
 | UNRELATED | 테스트 파일 · 다른 서비스 · docs |
-| UNVERIFIED | 0 |
+| UNVERIFIED | 소스 0 · **외부 dependency 해석 1건**(lockfile 미사용 — diff 로 고정 불가, 운영 smoke 로 확인) |
 
 - 라우팅: `App.tsx` 변경은 `/` element 를 `DirectoryShell` 로 감싼 것 하나. 분회 route · `detectBasename` · `tenant.tsx`(PLATFORM_HOSTS · 자체 도메인 해석) · LoginPage · HandoffPage · AuthContext diff 0. 분회 routing · custom domain 처리 변경 없음.
 - 테스트: web-kpa-branch Vitest(`DirectoryShell.test.tsx` 포함)는 candidate CI Pipeline 에서 PASS.
@@ -641,4 +642,5 @@ HTTP 200 · pageerror 0 · console error 0 · 4xx/5xx 응답 0 · 가로 overflo
 | AUTHENTICATED_SMOKE | **PENDING_USER_VERIFICATION** — 분회 회원 테스트 계정으로 로그인하지 않았다. 계정 생성 · DB 수정 없음 |
 | ROLLBACK | 없음 — rollback 사유 0 |
 | 시각 잔여 (rollback 사유 아님) | ① 390 분회 헤더가 3단(분회명 / O4O 홈 · 로그인 · 가입 신청 / 메뉴 열기)으로 높이 171px(배포 전 127px) ② favicon 은 KPA 전용 마크가 아닌 O4O 공통 마크 fallback. 둘 다 06 잔여 정리 후보 |
+| 이미지 재현성 (별도 WO 제안) | 배포 web Dockerfile 중 `web-account` 만 `pnpm-lock.yaml` 을 COPY 한다. kpa-branch · kpa-society · neture · lecture · store · pharmacy-hub · hospital-pharmacy 는 lockfile 없이 설치하므로 01~04(§9~§13) 이미지도 같은 조건이다. Dockerfile 변경은 build 인프라 변경이라 이번 범위 밖 — 보고만 한다 |
 | 남은 배포 | 없음 — 단계 배포 01~05 완료. 06(최종 smoke · 잔여 정리)은 별도 WO |
