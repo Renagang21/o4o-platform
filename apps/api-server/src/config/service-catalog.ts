@@ -91,8 +91,9 @@ export interface O4OService {
    * 공개 진입 경로 prefix (optional — 미지정 시 host 루트).
    *
    * WO-O4O-KPA-BRANCH-PUBLIC-PATH-ROUTING-AND-CUSTOM-DOMAIN-BASELINE-V1:
-   *   kpa-branch 처럼 **자기 host 를 갖지 않고 다른 서비스 host 의 path 아래에서**
-   *   서빙되는 서비스를 표현한다. `domain` 은 언제나 순수 hostname 으로 유지하고
+   *   **자기 host 를 갖지 않고 다른 서비스 host 의 path 아래에서** 서빙되는 서비스를 표현한다
+   *   (종전 kpa-branch = kpa-society.co.kr/kpa. WO-O4O-KPA-BRANCH-SERVICE-CATALOG-AND-HANDOFF-ALIGNMENT-V1
+   *   로 kpa.neture.co.kr 로 옮겨 현재 이 값을 쓰는 서비스는 없다 — 응답 계약 `basePath: ''` 는 유지). `domain` 은 언제나 순수 hostname 으로 유지하고
    *   (CORS origin·쿠키 도메인 판정이 hostname 을 전제한다), 경로는 여기에만 둔다.
    *   반드시 '/' 로 시작하고 trailing '/' 는 두지 않는다.
    */
@@ -108,7 +109,7 @@ export interface O4OService {
    *   요구하고, 없으면 세션을 발급하지 않고 `SERVICE_NOT_MEMBER` 로 응답한다(`service-login-eligibility.policy`).
    *   **가입 신청이 그 서비스 호스트 밖에서 이뤄지는 서비스만** true 로 둔다 — 자기 호스트에서 로그인한 뒤
    *   신청하는 서비스(대표 진입 · `/join` · 로그인 후 신청)를 막으면 신규 사용자가 가입할 길이 사라진다.
-   *   다른 서비스와 공유하는 호스트(예: kpa-society.co.kr = kpa-branch 의 domain)에서는 판정하지 않는다.
+   *   다른 서비스와 공유하는 호스트(두 서비스의 domain · legacyDomains 가 겹치는 호스트)에서는 판정하지 않는다.
    */
   loginMembershipRequired?: boolean;
   /**
@@ -173,11 +174,11 @@ export const O4O_SERVICES: O4OService[] = [
     legacyDomains: ['k-cosmetics.site'],
     // 사업 의미 = 화장품 · 일반 소매 사업자 대상 세미프랜차이즈 운영 서비스 (O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1).
     description: '화장품 유통 플랫폼',
-    joinEnabled: true,
-    // 가입은 Store Workspace(store.neture.co.kr) 신청 · 운영자 경로에서 만든다.
+    // 운영 종료(WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1) — 신규 가입 · 매장/운영자 업무공간 진입을 닫는다.
+    //   row 는 retired identity 로 남긴다: serviceKey · cosmetics:* role · 기존 membership · DB 는 후속 정리 대상(이번 범위 밖).
+    joinEnabled: false,
     loginMembershipRequired: true,
-    // STANDARD_CANDIDATE — 매장 linkage(cosmetics) · cosmetics:store_owner · cosmetics:operator 존재. 자동 활성화 아님.
-    workspace: { workspaceMode: 'standard', storeWorkspaceEnabled: true, operatorWorkspaceEnabled: true },
+    workspace: { workspaceMode: 'standard', storeWorkspaceEnabled: false, operatorWorkspaceEnabled: false },
   },
   /**
    * WO-PHARMACY-HUB-NEW-SERVICE-FOUNDATION-V1
@@ -235,8 +236,15 @@ export const O4O_SERVICES: O4OService[] = [
    *   따라서 domain=kpa-society.co.kr + basePath=/kpa 로 표현한다.
    *   `/kpa` 는 URL prefix 일 뿐 tenant 가 아니다 — 분회는 slug 또는 Host 로만 해석한다.
    *   WO-O4O-SERVICE-CATALOG-CANONICAL-DOMAIN-AND-PH-JOIN-CLEANUP-V1: kpa-society 가 pharmacy.neture.co.kr 로
-   *   옮겨도 이 항목은 **그대로 둔다(DEFERRED)**. pharmacy.neture.co.kr/kpa 는 분회 앱이 아니고, 목표 호스트
-   *   kpa.neture.co.kr 은 basePath 가 없는 구조라 handoff · 분회 slug 해석을 함께 바꿔야 한다.
+   *   옮길 때 이 항목은 DEFERRED 였다(handoff · 분회 slug 해석을 함께 바꿔야 했다).
+   *
+   * WO-O4O-KPA-BRANCH-SERVICE-CATALOG-AND-HANDOFF-ALIGNMENT-V1:
+   *   canonical = `https://kpa.neture.co.kr/{branchSlug}` (basePath 없음 · 앱은 root 진입을 이미 판정한다).
+   *   handoff · 공개 URL · 세션 귀속(로그인 · 로그아웃 범위)이 모두 이 domain 하나에서 나온다.
+   *   옛 공용 경로 `kpa-society.co.kr/kpa/*` 는 `legacyDomains` 에 넣지 **않는다** — 그 호스트의 루트는
+   *   kpa-society(약국 사업자 서비스) 앱이고 세션 판정은 path 를 보지 않는다. 대신 분회 앱이 그 경로로
+   *   들어온 방문을 canonical 호스트로 옮긴다(web-kpa-branch `lib/canonicalHost`) — 옛 경로에서 로그인하면
+   *   세션이 kpa-society 로 귀속되기 때문이다.
    * platform_services row 는 20270305000000-SeedKpaBranchServiceAndRoles 에서 seed 한다.
    * joinEnabled=false — 분회 소속은 자가 신청이 아니라 분회 운영자 승인 경로로만 생성된다.
    */
@@ -245,8 +253,7 @@ export const O4O_SERVICES: O4OService[] = [
     key: 'kpa-branch',
     name: 'KPA Branch',
     nameKo: '약사회 분회',
-    domain: 'kpa-society.co.kr',
-    basePath: '/kpa',
+    domain: 'kpa.neture.co.kr',
     description: '약사회 분회 홈페이지 및 분회 회원 관리 서비스',
     joinEnabled: false,
     // NO_STORE_WORKSPACE — tenant 축이 organization_service_enrollments 가 아니라 kpa_organizations · branch_memberships 다.
@@ -404,8 +411,8 @@ export function getServiceOrigin(key: string): string | undefined {
   const svc = serviceMap.get(key);
   if (!svc) return undefined;
   // WO-O4O-KPA-BRANCH-PUBLIC-PATH-ROUTING-AND-CUSTOM-DOMAIN-BASELINE-V1:
-  //   basePath 를 가진 서비스(kpa-branch)는 host 루트가 다른 서비스이므로
-  //   base URL 에 prefix 를 포함해야 링크가 자기 앱으로 떨어진다.
+  //   basePath 를 가진 서비스는 host 루트가 다른 서비스이므로 base URL 에 prefix 를 포함해야
+  //   링크가 자기 앱으로 떨어진다. (kpa-branch 는 kpa.neture.co.kr 로 옮겨 현재 basePath 소비자 없음.)
   return `https://${svc.domain}${svc.basePath ?? ''}`;
 }
 

@@ -67,6 +67,7 @@ describe('정본 표 ↔ 코드 값', () => {
     ['supplier.neture.co.kr', 'supplier'],
     ['funding.neture.co.kr', 'funding'],
     ['community.neture.co.kr', 'community'],
+    ['kpa.neture.co.kr', 'kpa-branch'],
   ])('%s 은 catalog `%s` 의 domain 이다', (host, key) => {
     expect(getService(key)?.domain).toBe(host);
     expect(row(host)).toContain(`\`${key}\``);
@@ -77,12 +78,9 @@ describe('정본 표 ↔ 코드 값', () => {
     expect(O4O_SERVICES.some((s) => s.domain === STORE_WORKSPACE_HOST)).toBe(false);
   });
 
-  it('kpa-branch catalog domain 이 아직 kpa.neture.co.kr 이 아니면 §4 가 그 차이를 기록한다', () => {
-    const branch = getService('kpa-branch');
-    expect(branch).toBeDefined();
-    if (branch?.domain !== 'kpa.neture.co.kr') {
-      expect(doc).toContain('`kpa-branch.domain`');
-    }
+  it('kpa-branch catalog domain 은 kpa.neture.co.kr 이고 §4 에 옛 DEFERRED 차이가 남아 있지 않다', () => {
+    expect(getService('kpa-branch')?.domain).toBe('kpa.neture.co.kr');
+    expect(doc).not.toContain('catalog 이전은 handoff · slug 해석과 함께 DEFERRED');
   });
 
   it('CANONICAL-INDEX 가 정본을 등록한다', () => {

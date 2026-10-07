@@ -50,9 +50,10 @@ export function resolveSessionServiceKey(origin: string | undefined | null): str
   if (host === STORE_WORKSPACE_HOST.toLowerCase()) return STORE_WORKSPACE_KEY;
   if (ADMIN_HOSTS.includes(host)) return ADMIN_SURFACE_KEY;
   // canonical `domain` 과 수용 전용 `legacyDomains` 를 같은 서비스로 본다 — 옛 호스트(인쇄 QR · 북마크)로
-  // 들어온 로그인도 같은 서비스 세션이다. 카탈로그 순서대로 한 번만 훑는다: kpa-society.co.kr 은
-  // kpa-society 의 옛 호스트이면서 kpa-branch 의 domain(`/kpa` path 서빙)이기도 한데, 호스트 루트는
-  // KPA Society 앱이고 종전 판정도 kpa-society 였다. 카탈로그에서 kpa-society 가 앞에 있어 그 답이 유지된다.
+  // 들어온 로그인도 같은 서비스 세션이다. 판정은 host 만 본다(path 무시): kpa-society.co.kr 은 kpa-society 의
+  // 옛 호스트이고 그 아래 `/kpa/*` 는 옛 분회 공용 경로지만 여기서는 kpa-society 다. 분회 세션은 canonical
+  // kpa.neture.co.kr 에서만 kpa-branch 로 귀속되며, 분회 앱이 옛 경로 방문을 그 호스트로 옮긴다
+  // (WO-O4O-KPA-BRANCH-SERVICE-CATALOG-AND-HANDOFF-ALIGNMENT-V1).
   return (
     O4O_SERVICES.find(
       (svc) =>

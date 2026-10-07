@@ -107,7 +107,7 @@ let cart: PharmacyCartService;
 let payments: PharmacyPaymentService;
 let operatorId: string;
 
-/** 내 매장(약국) 신청 신청 → 승인된 약국(매장). */
+/** 내 매장(약국) 신청 → 승인된 약국(매장). */
 async function approvedPharmacy() {
   const owner = await user();
   const bizno = randomBizno();

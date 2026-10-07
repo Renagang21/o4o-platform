@@ -8,7 +8,7 @@
  *
  * 회귀 방지 대상:
  *      (param route /store/:pharmacyId/products/:productId 에 흡수돼 오류 화면으로 떨어진다)
- *   2) K-Cosmetics legacy alias(/store/signage/playlist · /store/qr) 참조 0 — canonical 사용
+ *   2) (K-Cosmetics legacy alias 단언은 copy 파일 제거로 삭제 — WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1)
  *   3) canonical signage route 문자열 존재
  *   4) Guide copy 의 모든 route 참조가 실제 route 와 매칭 (literal 또는 동형 param)
  *
@@ -86,7 +86,7 @@ const SERVICES: Svc[] = [
     // /operator/* 는 별도 sub-router 로 위임된다.
     extra: [['services/web-kpa-society/src/routes/OperatorRoutes.tsx', '/operator']],
   },
-  // k-cosmetics 앱(services/web-k-cosmetics)은 퇴역 삭제 — WO-O4O-KCOSMETICS-RETIREMENT-PHASE1A-WEB-APP-AND-DEPLOY-TARGET-V1. copy 파일 단언만 아래에 남긴다.
+  // k-cosmetics 앱(services/web-k-cosmetics)은 퇴역 삭제 — WO-O4O-KCOSMETICS-RETIREMENT-PHASE1A-WEB-APP-AND-DEPLOY-TARGET-V1. copy 파일(copy/k-cosmetics.ts)도 WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1 에서 제거.
   { key: 'neture', dir: 'services/web-neture', copy: 'neture.ts' },
   // WO-O4O-PHARMACYHUB-GUIDE-ADOPTION-V1
   { key: 'pharmacy-hub', dir: 'services/web-pharmacy-hub', copy: 'pharmacy-hub.ts' },
@@ -156,16 +156,6 @@ describe('Guide route contract', () => {
       expect(unresolved).toEqual([]);
     },
   );
-
-  it('K-Cosmetics Guide 는 legacy alias 대신 canonical store 경로를 사용한다', () => {
-    const kc = copySource({ key: 'k-cosmetics', dir: '', copy: 'k-cosmetics.ts' });
-    expect(kc).not.toContain("'/store/signage/playlist'");
-    expect(kc).not.toContain("'/store/qr'");
-    expect(kc).not.toContain('/store/requests');
-    expect(kc).toContain('/store/marketing/signage/playlist');
-    expect(kc).toContain('/store/marketing/qr');
-    expect(kc).toContain('/store/interest-requests');
-  });
 
   it('KPA Guide 는 폐기된 B2C 판매 표현을 사용하지 않는다', () => {
     const kpa = copySource(SERVICES[0]);

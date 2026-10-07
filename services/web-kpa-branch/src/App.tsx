@@ -2,7 +2,7 @@
  * App — KPA Branch (분회 홈페이지 SaaS)
  * WO-O4O-PHARMACIST-BRANCH-SERVICE-FOUNDATION-DESIGN-AND-IMPLEMENTATION-V1
  *
- * 라우트 (공용 경로 — https://kpa-society.co.kr/kpa 아래, router basename='/kpa'):
+ * 라우트 (공용 경로 — https://kpa.neture.co.kr 아래, router basename=''):
  *   /                                 분회 찾기 (registry)
  *   /login                            로그인 (serviceKey='kpa-branch')
  *   /me                               내 분회 / 전입·전출 이력
@@ -32,8 +32,12 @@
  * (분회별 별도 배포·별도 백엔드 없음 — 번들 하나가 두 진입 방식을 모두 처리한다).
  *
  * WO-O4O-KPA-BRANCH-PUBLIC-PATH-ROUTING-AND-CUSTOM-DOMAIN-BASELINE-V1:
- *   공용 진입은 `kpa-society.co.kr/kpa/{slug}` 다. `/kpa` 는 router basename 으로만
+ *   당시 공용 진입은 `kpa-society.co.kr/kpa/{slug}` 였다. `/kpa` 는 router basename 으로만
  *   흡수하므로 아래 라우트 트리는 그대로 유지된다 (basePath 는 여전히 `/{slug}`).
+ *
+ * WO-O4O-KPA-BRANCH-SERVICE-CATALOG-AND-HANDOFF-ALIGNMENT-V1:
+ *   canonical 공용 진입은 `kpa.neture.co.kr/{slug}` (backend service-catalog `kpa-branch.domain`).
+ *   옛 경로는 main.tsx 가 그리기 전에 canonical 호스트로 옮긴다 — 세션 · 로그아웃이 kpa-branch 단위로 귀속되도록.
  *
  * 프론트 라우트는 UX 안내이며 권한 판정 근거가 아니다.
  * 실제 경계는 backend 의 requireKpaBranchScope + resolveBranch + requireBranchScope 가 강제한다.
@@ -146,7 +150,7 @@ function AppRoutes() {
       <Route path="/reset-password" element={<Navigate to="/login" replace />} />
       {/*
         WO-O4O-NETURE-UNIFIED-ENTRY-UI-PHASE1-V1
-        O4O 대표 홈 → 분회 서비스 이동 수신 경로 (`/kpa/handoff?token=…&returnTo=/{slug}`).
+        O4O 대표 홈 → 분회 서비스 이동 수신 경로 (`https://kpa.neture.co.kr/handoff?token=…&returnTo=/{slug}`).
         `/:branchSlug/*` 보다 먼저 두어 "handoff" 가 분회 slug 로 해석되지 않게 한다.
       */}
       <Route path="/handoff" element={<HandoffPage />} />

@@ -17,7 +17,7 @@
  * (CLAUDE.md Shared Module Change Rule — 공통 계약 소비처 판정용).
  */
 
-import { readFileSync } from 'fs';
+import { existsSync, readFileSync } from 'fs';
 import { join } from 'path';
 
 const SRC = join(__dirname, '..');
@@ -33,7 +33,6 @@ const codeOnly = (s: string) =>
   s.replace(/^\s*\/\/.*$/gm, '').replace(/\/\*[\s\S]*?\*\//g, '');
 
 describe('KCos POP V2 canonical adoption', () => {
-  const cosmeticsRoutes = read(SRC, 'routes', 'cosmetics', 'cosmetics.routes.ts');
   const v2Controller = read(
     SRC, 'routes', 'o4o-store', 'controllers', 'store-pop-v2.controller.ts',
   );
@@ -44,17 +43,10 @@ describe('KCos POP V2 canonical adoption', () => {
   // KCos 앱(services/web-k-cosmetics) adapter · route 단언은 앱 퇴역 삭제로 제거했다
   //   (WO-O4O-KCOSMETICS-RETIREMENT-PHASE1A-WEB-APP-AND-DEPLOY-TARGET-V1). backend mount · 공통 Core 계약은 유지.
 
-  it('cosmetics.routes 가 공통 POP V2 Core 를 cosmetics 로 mount 한다', () => {
-    expect(cosmeticsRoutes).toMatch(
-      /import \{\s*createStorePopV2Controller\s*\} from '\.\.\/o4o-store\/controllers\/store-pop-v2\.controller\.js'/,
-    );
-    expect(codeOnly(cosmeticsRoutes)).toMatch(
-      /router\.use\(\s*'\/pharmacy\/pop-v2',\s*createStorePopV2Controller\(dataSource,\s*coreRequireAuth as any,\s*'cosmetics'\),?\s*\)/,
-    );
-  });
-
-  it('legacy 즉시 PDF POP controller 는 은퇴했다 (WO-O4O-STORE-POP-LEGACY-INSTANT-PDF-RETIREMENT-FINAL-CLOSURE-V1)', () => {
-    expect(codeOnly(cosmeticsRoutes)).not.toMatch(/createStorePopController/);
+  // backend mount(routes/cosmetics/cosmetics.routes.ts)는 WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1 에서 API 와 함께 제거됐다.
+  //   공통 POP V2 Core 는 KPA 가 계속 쓰므로 Core 계약 단언은 유지한다.
+  it('cosmetics.routes 는 제거됐다 (KCos POP V2 mount 은퇴)', () => {
+    expect(existsSync(join(SRC, 'routes', 'cosmetics', 'cosmetics.routes.ts'))).toBe(false);
   });
 
   it('공통 POP V2 Core 에 KCos 전용 분기가 없다 (§3 금지 / §14 중지조건 4)', () => {

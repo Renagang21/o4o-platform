@@ -29,6 +29,10 @@ describe('resolveLoginMembershipGateKey', () => {
     ['https://k-cosmetics.site', 'k-cosmetics'],
     ['https://www.k-cosmetics.site', 'k-cosmetics'], // www 별칭도 같은 게이트
     ['https://www.pharmacy.neture.co.kr', 'kpa-society'],
+    // WO-O4O-KPA-BRANCH-SERVICE-CATALOG-AND-HANDOFF-ALIGNMENT-V1: kpa-branch 가 kpa.neture.co.kr 로 옮겨
+    //   kpa-society.co.kr 은 kpa-society 의 legacy 호스트로만 남는다(종전: kpa-branch `/kpa` 와 겹쳐 단정 불가).
+    ['https://kpa-society.co.kr', 'kpa-society'],
+    ['https://www.kpa-society.co.kr', 'kpa-society'],
   ])('G1 %s → %s', (origin, key) => {
     expect(resolveLoginMembershipGateKey(origin)).toBe(key);
   });
@@ -38,8 +42,7 @@ describe('resolveLoginMembershipGateKey', () => {
     'https://store.neture.co.kr', // Store Workspace — 매장 가입 신청 자리
     'https://admin.neture.co.kr', // 관리자 — Google 전용 · platform 역할 축
     'https://pharmacyhub.co.kr', // 자기 호스트 /join (requireAuth)
-    'https://kpa-society.co.kr', // kpa-society legacy 이자 kpa-branch(/kpa) 호스트 — 단정 불가
-    'https://www.kpa-society.co.kr',
+    'https://kpa.neture.co.kr', // kpa-branch — 자기 호스트 /join(분회 운영자 승인) · 게이트 없음
     'https://www.neture.co.kr',
     'https://study.neture.co.kr', // lecture — 이 WO 범위 밖
     'https://community.neture.co.kr',

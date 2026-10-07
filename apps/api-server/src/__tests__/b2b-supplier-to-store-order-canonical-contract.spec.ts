@@ -110,7 +110,7 @@ describe('WO-O4O-CROSSSERVICE-B2B-SUPPLIER-TO-STORE-ORDER-CANONICAL-CONTRACT-V1'
     it('구매자 주문 조회는 buyerId + serviceKey 집합을 항상 함께 건다', () => {
       const controllers = [
         'routes/kpa/controllers/kpa-checkout.controller.ts',
-        'routes/cosmetics/controllers/cosmetics-order.controller.ts',
+        // routes/cosmetics/controllers/cosmetics-order.controller.ts 는 WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1 에서 K-Cos API 와 함께 제거.
       ];
       for (const c of controllers) {
         const code = read(c);
@@ -182,7 +182,7 @@ describe('WO-O4O-CROSSSERVICE-B2B-SUPPLIER-TO-STORE-ORDER-CANONICAL-CONTRACT-V1'
     it('서비스별 주문 생성 producer(POST /)는 410 으로 은퇴 상태를 유지한다', () => {
       for (const c of [
         'routes/kpa/controllers/kpa-checkout.controller.ts',
-        'routes/cosmetics/controllers/cosmetics-order.controller.ts',
+        // routes/cosmetics/controllers/cosmetics-order.controller.ts 는 WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1 에서 K-Cos API 와 함께 제거.
       ]) {
         expect(read(c)).toContain('410');
       }

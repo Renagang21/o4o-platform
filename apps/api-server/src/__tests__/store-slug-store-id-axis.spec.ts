@@ -36,7 +36,7 @@ const API_SERVER_SRC = path.resolve(__dirname, '..');
  *   organizations.id 를 그대로 쓰므로 축은 canonical 이다 (PharmacyHub 와 동형).
  */
 const EXPECTED: Record<string, string[]> = {
-  'routes/cosmetics/services/cosmetics-store.service.ts': ['orgId', 'organizationId'],
+  // routes/cosmetics/services/cosmetics-store.service.ts 는 WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1 에서 K-Cos API 와 함께 제거됐다.
   'routes/kpa/controllers/organization.controller.ts': ['saved.id'],
   'routes/kpa/services/kpa-store-organization.provisioning.ts': ['orgResult.id'],
   'services/cafe24-b2b/Cafe24B2bStoreProvisioningService.ts': ['organizationId'],
@@ -123,12 +123,9 @@ describe('§6 platform_store_slugs.store_id 축 census', () => {
    *   - KCos `linkOwnerToStore`  : org member + enrollment 만 보강
    * 두 경로가 다시 slug 없이 조직을 확정하지 않도록 고정한다.
    */
-  it('KCos 기존 매장 연결 경로가 slug 를 보강한다', () => {
-    const src = fs.readFileSync(
-      path.join(API_SERVER_SRC, 'routes/cosmetics/services/cosmetics-store.service.ts'),
-      'utf-8',
-    );
-    expect(src).toMatch(/linkOwnerToStore[\s\S]{0,1200}ensureCosmeticsStoreSlug\(/);
+  it('KCos 기존 매장 연결 경로는 제거됐다 (WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1)', () => {
+    // slug 없이 조직을 확정하던 KCos 승인 경로(linkOwnerToStore) 자체가 API 와 함께 사라졌다.
+    expect(fs.existsSync(path.join(API_SERVER_SRC, 'routes/cosmetics/services/cosmetics-store.service.ts'))).toBe(false);
   });
 
   it('공개 조회는 slug.storeId 를 organizations 로 해석한다 (축의 근거)', () => {

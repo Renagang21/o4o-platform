@@ -1,7 +1,7 @@
 # O4O 서브도메인 · 서비스 의미 정본
 
 > **상태**: ACTIVE
-> **작성일**: 2026-10-03 · **최종 갱신**: 2026-10-05 (§2 세미프랜차이즈 식별 · §3-1 약국 Store Hub 단계 없음)
+> **작성일**: 2026-10-03 · **최종 갱신**: 2026-10-07 (§4 kpa-branch catalog canonical `kpa.neture.co.kr` 이전 반영)
 > **근거 WO/IR**: WO-O4O-SUBDOMAIN-SERVICE-SEMANTICS-DOCUMENT-ALIGNMENT-V1 · 주소 결정은 [`CHECK-O4O-URL-FIRST-CENSUS-V1`](../checks/CHECK-O4O-URL-FIRST-CENSUS-V1.md) CONFIRMED_DECISIONS · §9 · §12 · §21-17
 
 **`*.neture.co.kr` 각 주소가 사업적으로 무엇이고 누구를 위한 것인가**를 정한다. 주소 · 내부 키 · role prefix 가 서로 다른 시기에 만들어져 이름만으로는 의미가 어긋나므로, 이름에서 의미를 추론하지 말고 이 표를 기준으로 읽는다.
@@ -102,7 +102,7 @@ owner/member permission          — 그 안에서 무엇을 할 수 있는가
 | `kpa:store_owner` · label `KPA Store Owner` | 이름은 "KPA" | 약국 서비스의 매장 경영자. 약사회 · 분회 소속을 뜻하지 않는다 |
 | serviceKey `k-cosmetics` · role prefix `cosmetics:*` | 이름은 "화장품" | 화장품 **및 일반 소매** 사업자 서비스(`retail.neture.co.kr`) |
 | catalog `kpa-society.description` | `약사 커뮤니티 서비스` | 사용자 노출 문자열(`/check-email` 등). 현재 의미와 다름 — 변경은 별도 WO |
-| catalog `kpa-branch.domain` | `kpa-society.co.kr` + basePath `/kpa` | 목표 호스트 `kpa.neture.co.kr` 은 앱이 이미 판정(`web-kpa-branch` `PLATFORM_HOSTS`). catalog 이전은 handoff · slug 해석과 함께 DEFERRED |
+| 옛 분회 공용 경로 `kpa-society.co.kr/kpa/*` | 계속 서빙(인쇄 QR · 북마크) | catalog `kpa-branch.domain` 은 `kpa.neture.co.kr`(basePath 없음)이다. 세션 판정은 host 만 보므로 이 경로의 로그인은 `kpa-society` 로 귀속된다 — 분회 앱이 이 경로 방문을 같은 path 의 `kpa.neture.co.kr` 로 옮긴다(WO-O4O-KPA-BRANCH-SERVICE-CATALOG-AND-HANDOFF-ALIGNMENT-V1). LB · DNS 정리는 별도 |
 | catalog `pharmacy-hub.domain` | `pharmacyhub.co.kr` | 호환 호스트(§2-2) |
 | 「KPA Society」 · 「K-Cosmetics」 서비스명 | 문서 · 계약 원문 · 화면 | 내부 서비스 이름. 사업 의미는 §2 의 주소 기준으로 읽는다 |
 

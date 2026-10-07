@@ -10,8 +10,8 @@ import { Suspense, lazy } from 'react';
 //   Partner 는 Neture 서비스의 활동 주체이며, Cosmetics 는 분야이지 별도 Partner 계정 유형이 아니다.
 //   현재 Neture 공급자·파트너·인플루언서 기능은 이 제거와 무관하며 변경하지 않았다.
 
-// Cosmetics Products Pages (Phase 7-H)
-const CosmeticsProductsRouter = lazy(() => import('@/pages/cosmetics-products/CosmeticsProductsRouter'));
+// WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1:
+//   Cosmetics Products 관리 화면(/cosmetics-products, Phase 7-H) 제거 — 호출하던 `/api/v1/cosmetics/*` 가 함께 제거됐다.
 
 // Neture Pages (Phase D-3)
 const NetureRouter = lazy(() => import('@/pages/neture/NetureRouter'));
@@ -24,19 +24,10 @@ const PageLoader = () => (
 );
 
 /**
- * Service domain routes — cosmetics, neture
+ * Service domain routes — neture
  */
 export function ServiceRoutes() {
   return [
-    // Cosmetics Products - Products/Brands Management (Phase 7-H)
-    <Route key="/cosmetics-products/*" path="/cosmetics-products/*" element={
-      <AdminProtectedRoute requiredRoles={['admin']}>
-        <Suspense fallback={<PageLoader />}>
-          <CosmeticsProductsRouter />
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
-
     // Neture - B2C Reference Service Management (Phase D-3)
     <Route key="/neture/*" path="/neture/*" element={
       <AdminProtectedRoute requiredRoles={['admin']}>
