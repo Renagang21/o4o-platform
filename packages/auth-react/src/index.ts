@@ -29,6 +29,9 @@ export {
 } from './useO4OHomeReturn';
 export type { O4OHomeReturnOptions, O4OHomeReturn, O4OHomeButtonProps, O4OHomeApiLike } from './useO4OHomeReturn';
 export type { GoogleContinueProps } from './GoogleContinue';
+// WO-O4O-CROSS-SERVICE-PUBLIC-DESIGN-AND-BRAND-REFRESH-V1: 공개 홈 공통 Hero (스타일 = public-brand/tokens.css)
+export { O4OPublicHero } from './public-brand';
+export type { O4OPublicHeroProps } from './public-brand';
 // WO-O4O-CROSS-SERVICE-LOGIN-ENTRY-AND-RETURN-FLOW-FIX-V1: 이메일 → 또는 → Google 공통 조립(서비스 로그인 화면)
 export { LoginMethods, O4O_ACCOUNT_LINKS, DEFAULT_GOOGLE_HINT } from './LoginMethods';
 export type { LoginMethodsProps } from './LoginMethods';

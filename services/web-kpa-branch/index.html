@@ -3,7 +3,18 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- WO-O4O-CROSS-SERVICE-PUBLIC-DESIGN-AND-BRAND-REFRESH-V1: favicon = 기존 O4O 공통 마크(KPA 전용 마크 제공 전 fallback) · 공통 글꼴 Pretendard.
+         public 파일은 vite base('/kpa/') 기준으로 발행되고 runner 가 dist 를 / 와 /kpa/ 두 곳에 서빙한다. -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
     <title>약사회 분회</title>
+    <meta name="description" content="분회별 홈페이지와 회원 소속을 한 곳에서 — 약사회 분회 서비스입니다." />
+    <meta property="og:title" content="약사회 분회" />
+    <meta property="og:description" content="분회별 홈페이지와 회원 소속을 한 곳에서 — 약사회 분회 서비스입니다." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://kpa.neture.co.kr/" />
+    <meta property="og:site_name" content="약사회 분회" />
   </head>
   <body>
     <div id="root"></div>

@@ -31,6 +31,7 @@ import {
   KPA_CONTEXTUAL_NAV,
 } from '../config/navigation';
 import { creditApi } from '../api/credit';
+import { PHARMACY_HEADER_BRAND } from '../config/brand';
 import { notificationsApi } from '../api/notifications';
 
 // ─── Component ───────────────────────────────────────────────────────────────
@@ -117,12 +118,8 @@ export function KpaGlobalHeader() {
 
   return (
     <GlobalHeader
-      brand={{
-        icon: '💊',
-        name: 'KPA-Society',
-        subtitle: '약사 전문 플랫폼',
-        primaryColor: '#2563eb',
-      }}
+      /* WO-O4O-CROSS-SERVICE-PUBLIC-DESIGN-AND-BRAND-REFRESH-V1: 표시 이름 = O4O 약국 (serviceKey 불변) */
+      brand={PHARMACY_HEADER_BRAND}
       publicNav={computedNav}
       user={headerUser}
       isAuthenticated={isLoading || !!user}
@@ -131,16 +128,11 @@ export function KpaGlobalHeader() {
       onLogout={handleLogout}
       /* WO-O4O-REPRESENTATIVE-ENTRY-RETURN-HANDOFF-AND-HOME-NAVIGATION-V1: 서버 logout 은 O4O 계정 전체 종료 */
       logoutLabel={O4O_LOGOUT_LABEL}
+      /* O4O 홈 — 로그인 여부와 무관하게 표시. 로그인 중이면 로그인 유지한 채 neture.co.kr 대표 홈으로 복귀 (로그아웃 아님)
+         WO-O4O-CROSS-SERVICE-PUBLIC-DESIGN-AND-BRAND-REFRESH-V1: 로그인 조건 제거 · 모바일 헤더에도 노출 */
+      homeSlot={<O4OHomeButton api={authClient.api} isAuthenticated={!!user} className="o4o-home-link" />}
       utilitySlot={
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          {/* O4O 홈 — 로그인 유지한 채 neture.co.kr 대표 홈으로 복귀 (로그아웃 아님) */}
-          {user && (
-            <O4OHomeButton
-              api={authClient.api}
-              isAuthenticated
-              className="px-3 py-1.5 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded-full cursor-pointer hover:bg-slate-50 disabled:opacity-60"
-            />
-          )}
           {user && creditBalance !== null && (
             <Link
               to="/mypage/credits"

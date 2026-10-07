@@ -111,7 +111,7 @@ export default function LoginModal() {
             <span className="text-2xl">🏛️</span>
             <div>
               <h2 className="text-lg font-bold text-gray-900">
-                KPA Society 로그인
+                O4O 약국 로그인
               </h2>
               {/* 이 앱(pharmacy.neture.co.kr)은 약국 사업자 서비스다 — O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1 */}
               <p className="text-xs text-gray-500">

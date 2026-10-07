@@ -43,6 +43,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import { TenantProvider, useTenant, detectBasename } from './lib/tenant';
 import { BranchLayout } from './layouts/BranchLayout';
 import DirectoryPage from './pages/DirectoryPage';
+import DirectoryShell from './layouts/DirectoryShell';
 import LoginPage from './pages/LoginPage';
 import JoinPage from './pages/JoinPage';
 import MyBranchPage from './pages/MyBranchPage';
@@ -137,7 +138,8 @@ function AppRoutes() {
 
   return (
     <Routes>
-      <Route path="/" element={<DirectoryPage />} />
+      {/* WO-O4O-CROSS-SERVICE-PUBLIC-DESIGN-AND-BRAND-REFRESH-V1: `/` 에 헤더 · 푸터(KPA 정체성 · O4O 홈 · 로그인 · 첫 탐색) */}
+      <Route path="/" element={<DirectoryShell><DirectoryPage /></DirectoryShell>} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/join" element={<JoinPage />} />
       {/* WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: 재설정할 비밀번호가 없다. */}

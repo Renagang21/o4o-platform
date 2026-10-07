@@ -18,10 +18,10 @@ import { LECTURE_SERVICE_URL } from '../../config/navigation';
 export function AboutPage() {
   useEffect(() => {
     const prev = document.title;
-    document.title = 'KPA-Society 소개 | 약사 전문 플랫폼';
+    document.title = 'O4O 약국 소개 | 약사 전문 플랫폼';
     const meta = document.querySelector('meta[name="description"]');
     const prevContent = meta?.getAttribute('content') ?? '';
-    meta?.setAttribute('content', 'KPA-Society는 약사 커뮤니티, 교육, 매장 경영을 하나의 공간에서 지원하는 약사 전문 플랫폼입니다. O4O 철학을 바탕으로 온라인 역량이 오프라인 약국 운영으로 이어집니다.');
+    meta?.setAttribute('content', 'O4O 약국은 약사 커뮤니티, 교육, 매장 경영을 하나의 공간에서 지원하는 약사 전문 플랫폼입니다. O4O 철학을 바탕으로 온라인 역량이 오프라인 약국 운영으로 이어집니다.');
     return () => {
       document.title = prev;
       if (meta) meta.setAttribute('content', prevContent);
@@ -36,7 +36,7 @@ export function AboutPage() {
           <span style={s.heroBadge}>약사 전문 플랫폼</span>
           <h1 style={s.heroTitle}>약사와 약국을 위한<br />하나의 전문 공간</h1>
           <p style={s.heroSub}>
-            KPA-Society는 약사 커뮤니티·교육·매장 경영을 통합한 플랫폼입니다.<br />
+            O4O 약국은 약사 커뮤니티·교육·매장 경영을 통합한 플랫폼입니다.<br />
             약사의 전문성을 높이고, 약국 운영을 실질적으로 지원합니다.
           </p>
         </div>
@@ -64,7 +64,7 @@ export function AboutPage() {
 
         {/* ── 3. 제공하는 것 ── */}
         <section style={{ ...s.section, ...s.altSection }}>
-          <h2 style={s.sectionTitle}>KPA-Society가 제공하는 것</h2>
+          <h2 style={s.sectionTitle}>O4O 약국이 제공하는 것</h2>
           <div style={s.featureList}>
             {FEATURES.map((f) => (
               <div key={f.title} style={s.featureItem}>
@@ -101,7 +101,7 @@ export function AboutPage() {
             <span style={s.o4oBadge}>O4O 철학</span>
             <h2 style={s.o4oTitle}>Online for Offline</h2>
             <p style={s.o4oDesc}>
-              온라인 역량이 오프라인 약국 운영으로 이어지는 구조를 만드는 것이 KPA-Society의 목표입니다.
+              온라인 역량이 오프라인 약국 운영으로 이어지는 구조를 만드는 것이 O4O 약국의 목표입니다.
               포럼에서 쌓은 전문 지식, LMS에서 이수한 교육, 콘텐츠 허브의 자료가 실제 약국 현장에서
               디지털사이니지·매장 운영·고객 서비스로 구현됩니다.
             </p>
@@ -132,7 +132,7 @@ export function AboutPage() {
           </div>
           <div style={s.ctaFooter}>
             <a href="/guide/intro" style={s.ctaGuideLink}>
-              KPA-Society 이용 가이드 전체 보기 →
+              O4O 약국 이용 가이드 전체 보기 →
             </a>
           </div>
         </section>

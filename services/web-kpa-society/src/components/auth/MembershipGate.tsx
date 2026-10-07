@@ -49,7 +49,7 @@ interface MembershipGateProps {
 }
 
 /** 안내 문구에 넣을 서비스 표시명 (공통 문구의 `{service}` 자리). */
-const SERVICE_NAME = 'KPA-Society';
+const SERVICE_NAME = 'O4O 약국';
 
 /**
  * 가입 신청 화면 경로. 값이 없으면 신청 CTA 를 노출하지 않는다.

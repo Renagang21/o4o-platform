@@ -24,7 +24,7 @@ export function TermsAcceptanceGate({ children }: { children: ReactNode }) {
       onAccept={acceptPendingPolicies}
       onLogout={logout}
       allowPaths={ALLOW_PATHS}
-      serviceName="KPA Society"
+      serviceName="O4O 약국"
       termsPath="/policy"
     >
       {children}
