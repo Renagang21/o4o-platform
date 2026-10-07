@@ -274,8 +274,8 @@ export async function resolveAccessibleStores(
   }
   if (merged.length === 0) return [];
 
-  // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: Neture 약국 매장은 기본 가입 원장이 active 일 때만 매장이다.
-  //   신청 대기 · 반려 · 정지 · 종료 약국 조직은 매장 목록에서 뺀다(빈 매장 화면 대신 "연결된 매장 없음 → 기본 가입 상태").
+  // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: Neture 약국 매장은 내 매장(약국) 신청 원장이 active 일 때만 매장이다.
+  //   신청 대기 · 반려 · 정지 · 종료 약국 조직은 매장 목록에서 뺀다(빈 매장 화면 대신 "연결된 매장 없음 → 내 매장(약국) 신청 상태").
   //   원장 행이 없는 조직(다른 업종 · 서비스)은 영향이 없다.
   const inactivePharmacyRows = (await dataSource.query(
     `SELECT organization_id

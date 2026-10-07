@@ -1,7 +1,9 @@
 /**
  * 세미프랜차이즈 = 데이터 행 (DESIGN §1 R3 · R4 · §3-2)
  *
- * - 약국 조직 단위 가입(신청 · 승인 · 정지 · 종료). 기본 가입 승인이 세미프랜차이즈 가입을 자동 승인하지 않는다.
+ * - 약국 조직 단위 가입(신청 · 승인 · 정지 · 종료). 내 매장(약국) 승인이 세미프랜차이즈 가입을 자동 승인하지 않는다.
+ * - 신청 · 승인(재활성화 포함) 시점에 **현재** Neture 메인 가입 active 를 직접 확인한다 — 내 매장 승인을 거쳤다는
+ *   간접 충족에 기대지 않는다(이후 Neture 가입 상태가 바뀔 수 있다). 정지 연쇄 정책은 별도.
  * - 담당 운영자 판정 = (라우트 guard) neture:operator role ∧ (여기) semi_franchise_operators 활성 행.
  * - 세미프랜차이즈를 추가해도 코드 분기를 늘리지 않는다(행 + 운영 조직 1개).
  */
@@ -14,6 +16,7 @@ import {
   type MembershipStatus,
   rowsOf,
 } from '../constants.js';
+import { assertNetureMainMembershipActive } from '../../neture/services/neture-main-membership.js';
 
 export interface SemiFranchiseRow {
   id: string;
@@ -64,6 +67,7 @@ export class SemiFranchiseService {
   async apply(organizationId: string, userId: string, key: string) {
     const sf = await this.requireActive(key);
     return this.dataSource.transaction(async (m) => {
+      await assertNetureMainMembershipActive(m, userId);
       const [existing] = await m.query(
         `SELECT id, status FROM semi_franchise_memberships
           WHERE semi_franchise_id = $1 AND organization_id = $2 FOR UPDATE`,
@@ -136,7 +140,7 @@ export class SemiFranchiseService {
     );
   }
 
-  /** 가입 신청 목록 — 운영자가 약국 자격을 독립 확인할 수 있게 기본 가입 원장 정보를 함께 준다. */
+  /** 가입 신청 목록 — 운영자가 약국 자격을 독립 확인할 수 있게 내 매장(약국) 신청 원장 정보를 함께 준다. */
   async listMemberships(sf: SemiFranchiseRow, status?: string) {
     const s = status && status !== 'all' ? status : null;
     return this.dataSource.query(
@@ -172,16 +176,19 @@ export class SemiFranchiseService {
         throw new NeturePharmacyError(409, 'INVALID_TRANSITION', `현재 상태(${current.status})에서 처리할 수 없습니다.`);
       }
       if (next === 'active') {
-        // 세미프랜차이즈 가입은 기본 가입이 살아 있는 약국에만 승인한다.
+        // 세미프랜차이즈 가입은 내 매장(약국) 승인이 살아 있는 약국에만 승인한다.
         const [basic] = await m.query(
-          `SELECT 1 FROM semi_franchise_memberships sfm
+          `SELECT sfm.applied_by AS sf_applicant_user_id FROM semi_franchise_memberships sfm
              JOIN neture_pharmacy_memberships npm ON npm.organization_id = sfm.organization_id AND npm.status = 'active'
             WHERE sfm.id = $1`,
           [membershipId],
         );
         if (!basic) {
-          throw new NeturePharmacyError(409, 'BASIC_MEMBERSHIP_NOT_ACTIVE', 'Neture 기본 가입이 승인된 약국이 아닙니다.');
+          throw new NeturePharmacyError(409, 'BASIC_MEMBERSHIP_NOT_ACTIVE', '내 매장(약국) 승인이 된 약국이 아닙니다.');
         }
+        // 이 세미프랜차이즈 가입을 신청한 사람(`applied_by` — 약국을 만든 사람과 다를 수 있다)의
+        // 현재 Neture 메인 가입 상태를 직접 확인한다. 신청자가 없으면(계정 삭제) 'none' 으로 승인하지 않는다.
+        await assertNetureMainMembershipActive(m, basic.sf_applicant_user_id, 'applicant');
       }
       const [row] = rowsOf(await m.query(
         `UPDATE semi_franchise_memberships

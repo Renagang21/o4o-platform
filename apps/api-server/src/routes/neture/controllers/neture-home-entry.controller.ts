@@ -125,7 +125,7 @@ export function createNetureHomeEntryController(
 
       // ── 공급자 서비스 상태 ──────────────────────────────────────────────
       // WO-O4O-NETURE-MAIN-ACCOUNT-AND-SUPPLIER-PARTNER-SERVICE-SEPARATION-V1:
-      // neture_suppliers (없으면 service_memberships(neture).role 기반 legacy fallback).
+      // 공급자 = neture_suppliers 만(role fallback 제거) · netureMain = Neture 가입 상태 (CHECK §10 D · E5).
       // 요청자 본인 것만. 실제 API 접근은 neture-identity guard 가 같은 테이블로 다시 판정한다.
       const serviceStates = await resolveNetureServiceStates(dataSource, userId);
 

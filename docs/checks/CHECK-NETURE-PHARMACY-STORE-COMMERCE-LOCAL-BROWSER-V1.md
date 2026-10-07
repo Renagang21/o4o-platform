@@ -1,7 +1,7 @@
 # CHECK-NETURE-PHARMACY-STORE-COMMERCE-LOCAL-BROWSER-V1
 
 > **상태**: ACTIVE
-> **작성일**: 2026-10-05 · **최종 갱신**: 2026-10-06
+> **작성일**: 2026-10-05 · **최종 갱신**: 2026-10-07 (§10-9 가입 구조 수정 결과)
 > **근거 WO/IR**: [`WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1`](../work-orders/WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1.md) TODO 6-1 · 설계 [`DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1`](../design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md)
 
 로컬 브라우저 흐름 검증 기록이다. **운영 DB · 실제 PG 는 사용하지 않았다.** 운영 배포 · 운영 실결제 검증이 아니다.
@@ -236,3 +236,345 @@
 
 > **갱신 (2026-10-06, PR #332)**: 위 주의는 #332 통합 **전** migration 기준이다. #332 통합 후 이 migration 은 `idx_org_listing_unique_v2` 를 바꾸지 않으므로, 운영 API `e0be29869`(rev `o4o-core-api-03834-fuh`)의 위 `ON CONFLICT` 9개 지점은 migration 적용 후에도 그대로 동작한다(쿼리 형태 단위 재현 검증 — [`CHECK-NETURE-PHARMACY-CUTOVER-COMPAT-V1`](CHECK-NETURE-PHARMACY-CUTOVER-COMPAT-V1.md) §6). 위 ① · ② 구간의 진열 · 승인 · 이벤트 담기 실패 위험은 1단계에서는 없어지고, **2단계 migration(부분 UNIQUE) 배포 시점으로 이동**한다.
 
+
+## 10. 운영 업무 흐름 검증 중단 · 가입 구조 조사 (2026-10-07)
+
+§9-5 운영 smoke 를 시작했다가 **구조 결함 발견으로 중단**했다. 이어서 사용자 지시로 화면 이동 · 권한 변경 구현을 **보류**하고, 현재 구현이 가입 구조를 잘못 해석했는지 읽기 전용으로 조사했다. 기준 = `origin/main` `a07861f57` 코드 + 운영 상태 조회(건수 · 상태만). **수정 · 배포 · 운영 데이터 변경 없음.**
+
+### 10-1. 검증 준비 상태 (중단 시점)
+
+| 항목 | 상태 |
+|---|---|
+| 운영 배포 | Promote `0e283ba10` 적용(§9-7 · WO 6-5) |
+| 테스트 결제 | 활성(`NETURE_PHARMACY_PAYMENT_MODE=test`) |
+| Google 약국 신청자 후보 | 1개(가입 · 신청 이력 없음) |
+| Google 공급자 계정 | **없음** — 4단계(공급자) 이후 진행 불가 |
+| `pharmacy` 담당 운영자 | **0명** — 지정하지 않았다(아래 10-2 결함으로 중단) |
+| 게시된 매장 계약 | 없음 |
+| 로컬 테스트 계정 문서 | 9/23 계정 정리 이전 상태 — 갱신 필요 |
+
+§9-5 1~13 은 전부 **미검증**이다. 재개 시 1단계부터 다시 한다. DB 로 회원 자격 · 승인을 만들어 우회하지 않는다.
+
+### 10-2. 결함 #1 — 세미프랜차이즈 운영 화면 배치 (FAIL)
+
+- 재현: 운영자 로그인 → `https://neture.co.kr/admin/semi-franchises` · `/operator/semi-franchises` · `/operator/pharmacy-memberships`.
+- 세미프랜차이즈 생성 · 담당 운영자 지정 · 가입 승인 · 콘텐츠 작성이 `neture.co.kr`(web-neture) 하위 경로에 모여 있고, 세미프랜차이즈 호스트 `pharmacy.neture.co.kr` 에는 운영 화면이 없다.
+- 사용자 확정 방향(2026-10-07): 세미프랜차이즈 = 서브도메인 하나, **서브도메인마다 자기 운영자 · 자기 가입 화면**, 세미프랜차이즈 생성은 개발로 하고 admin 은 담당 운영자 지정만.
+- 화면 이동은 아래 10-3 조사 결과를 본 뒤 결정한다(보류).
+
+### 10-3. 가입 구조 조사
+
+**판정 기준**: `neture.co.kr` 가입 승인은 메인 AI 자동화 이용 + 연결 서비스 **신청 자격**만 준다. 연결 서비스(내 매장 · 세미프랜차이즈 · 공급자)는 각각 따로 신청 · 승인한다. Neture 승인만으로 연결 서비스 권한을 주지 않는다.
+
+**출처 구분**: "commerce" = 이번 Neture 약국 commerce 구현(`91155708c` · `ebbe5e910` · `3445aee35` · #323 · #332 · #336, 2026-10-05~06). "기존" = 그 이전 구현.
+
+#### Q1. Neture 가입 원장 · 상태 · AI 자동화 판정
+
+| 항목 | 판정 | 근거 | 출처 |
+|---|---|---|---|
+| 가입 원장 | 기준과 일치 | `service_memberships(service_key='neture')` pending/active/rejected/suspended/withdrawn. 신청 `POST /api/v1/auth/services/:serviceKey/join`(`HandoffController.joinService`) → role 없이 pending. 승인 `POST /api/v1/neture/operator/registrations/:userId/approve`(`OperatorRegistrationService.approveRegistration`) | 기존 |
+| 회원가입 자체 | 기준과 일치 | `POST /auth/email/signup` · `/auth/google/signup` 은 role · membership · 조직을 만들지 않는다. 유형(매장 · 공급자) 입력 없음 | 기존 |
+| AI 자동화 접근 | **기준과 불일치** | `/api/ai/*`(home-chat · work-agent/run 등) · `/api/local-agent/pairing-grants` 는 `requireAuth` 만 본다. `requireAuth` 는 `users.status` 만 판정(`resolveAccountAccess`)하고 가입 시 `users.status=active` 로 만든다 → **Neture 승인 없이 가입만 하면 AI 기능 사용 가능** | 기존(2026-09) |
+
+#### Q2. 승인 시 생성 · 변경되는 것
+
+| 승인 | 생성 · 변경 | 판정 | 출처 |
+|---|---|---|---|
+| Neture 가입 승인 | membership active · `users.status=active` · `sm.role`(없으면 `member`) role 1개 | 일치 | 기존 |
+| 〃 (`sm.role='supplier'` 인 경우) | `neture_suppliers` **ACTIVE** · 공급자 조직 · owner 멤버 생성, 기존 PENDING 공급자도 ACTIVE 로 | **불일치** — Neture 승인이 공급자 승인을 겸함 | 기존(2026-03~05) |
+| "Neture 약국 기본 가입" 신청 | 약국 조직 · owner 멤버 · `neture_pharmacy_memberships` pending | — | commerce |
+| 〃 승인(`decide` → `createPharmacyStoreProvisioner`) | **`service_memberships('neture')` 가 없으면 active 로 생성**(`ensureServiceMembershipsForRoles`) · `neture:store_owner` role · `organization_service_enrollments('kpa-society')` active · 매장 slug | **불일치** — 매장 승인이 Neture 가입 승인을 겸함(역방향) | commerce |
+| 공급자 승인(`approveSupplier`) | `service_memberships('neture')` 가 active 가 아니면 **active 로 변경**(pending · rejected · suspended 포함) · `supplier` role | **불일치** — 공급자 승인이 Neture 승인을 겸하고, Neture 정지 · 반려도 되돌림 | 기존(2026-03) |
+| 세미프랜차이즈 가입 승인 | `semi_franchise_memberships` active 만 | 일치 | commerce |
+
+#### Q3. 신청 · 승인의 독립성
+
+| 서비스 | 판정 | 근거 | 출처 |
+|---|---|---|---|
+| 내 매장(약국) | **불일치** | 신청 `POST /neture/pharmacy/membership` 이 `requireAuth` 만 — Neture 승인 여부를 보지 않는다(신청 자격 기준 미적용). 승인은 별도 actor(`neture:operator`)이나 위 Q2 역방향 결합 | commerce |
+| 세미프랜차이즈(pharmacy) | 일치(단, Neture 승인 미확인) | 신청은 기본 가입 active 필요(`createRequireStoreOwner(kpa)`), 승인은 지정 운영자(`semi_franchise_operators`) + 승인 시 기본 가입 재확인. 자동 생성 경로 없음 | commerce |
+| 공급자 | 부분 불일치 | 신청 `POST /neture/supplier/register` · 승인 `supplier:operator` 는 독립. 그러나 Q2 두 결합(Neture 승인 → 공급자 ACTIVE, 공급자 승인 → Neture active) · Neture 재활성화 시 INACTIVE 공급자 복구 | 기존 |
+| 내 매장(화장품) | 불일치(범위 밖) | `POST /store/enrollment`(cosmetics)가 승인 없이 즉시 `cosmetics:store_owner` | 기존 |
+
+**명칭 혼동**: "Neture 약국 기본 가입"은 이름 · role(`neture:store_owner`)은 Neture 메인 가입처럼 보이지만, 실제 동작은 **내 매장(약국) 신청 · 승인 원장**이다(조직 생성 · 매장 게이트 · kpa-society 업무 영역 enrollment · 신청 화면이 store 호스트). 정본 [`O4O-ROLE-WORKSPACE-ARCHITECTURE-V1`](../baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md) "약국 매장 기본 게이트 = Neture 기본 가입 원장" · DESIGN §3-1 도 같은 이름을 쓴다.
+
+#### Q4. 직접 로그인 · 서비스 간 이동 · 화면 가드 · API 의 일관성
+
+| 서비스 | 판정 | 근거 | 출처 |
+|---|---|---|---|
+| store.neture.co.kr | 일치 | catalog 밖이라 로그인 gate 없음. handoff · `StoreGate` · API 모두 `resolveAccessibleStores`/기본 가입 원장 active 로 같은 판정 | commerce |
+| pharmacy.neture.co.kr 로그인 vs handoff | 경미한 차이 | 직접 로그인(`isServiceLoginAllowed`)은 kpa-society membership **상태 불문** 허용, handoff 는 active 요구. `MembershipGate` 가 상태 안내로 보완 | commerce(#323 · #332) |
+| pharmacy.neture.co.kr 화면 vs API | **확인 불가(경계 정의 필요)** | 화면(`MembershipGate`)은 기본 가입 ∧ 세미프랜차이즈 active 를 요구하나, 같은 화면이 부르는 매장 API(`kpa.routes` store-hub · pharmacy/store · store-contents 등, `createRequireStoreOwner(kpa)`)는 기본 가입 원장만 본다. 이 API 들이 "내 매장 기능"(기본 가입으로 충분)인지 "세미프랜차이즈 업무"인지 경계가 정해져 있지 않다. 세미프랜차이즈 commerce 데이터(공급 · 콘텐츠 · 모집)는 SQL 에서 `semi_franchise_memberships.status='active'` 로 거른다(일치) | commerce |
+| store 호스트 `/work/kpa-society` · `/hub` | 확인 불가(같은 경계) | 기본 가입 승인이 kpa-society enrollment 를 켜서 열린다. 세미프랜차이즈 확인 없음 | commerce |
+| 공급자 | 일치 | `SupplierRoute` + `ServiceUsageGate` ↔ `createRequireActiveSupplier` 모두 ACTIVE. `createRequireLinkedSupplier`(상태 불문) 사용 route 는 미열거 | 기존 |
+
+#### Q5. 미승인 사용자: 신청 화면 열림 · 업무 차단
+
+| 서비스 | 판정 | 근거 |
+|---|---|---|
+| 내 매장 | 일치 | `/start-pharmacy` 는 `StoreGate` 밖 · API `requireAuth`. `/store/*` 는 화면 · API 모두 기본 가입 active |
+| 세미프랜차이즈 | 화면 일치 · API 는 Q4 경계 미정 | 신청 화면 · API 는 기본 가입 active 만 요구. 단 신청 화면이 pharmacy 호스트가 아니라 store 호스트에 있다(10-2 · 서브도메인별 가입 화면 방향과 불일치) |
+| 공급자 | 일치 | `/supplier` 공개 · `ServiceApplyPanel` 상태 안내, 업무 route 는 화면 · API 모두 ACTIVE |
+| Neture 메인 AI | **불일치** | Q1 — 승인 대기 상태에서도 AI 기능이 열려 있다 |
+
+### 10-4. 결론 — 개발 오류 vs 명칭 · 배치 혼동
+
+**실제 개발 오류(기준과 불일치)**
+
+| # | 내용 | 출처 | 최소 수정 범위 |
+|---|---|---|---|
+| E1 | 약국 매장 승인이 `service_memberships('neture')` active 를 자동 생성 | commerce | `pharmacy-store-provisioner.ts` 의 `ensureServiceMembershipsForRoles` 호출 제거 |
+| E2 | 약국 매장 신청이 Neture 승인을 확인하지 않음 | commerce | `POST /neture/pharmacy/membership`(+ 승인 `decide`)에 Neture membership active 확인 추가. 신청 화면 안내 1개 |
+| E3 | 공급자 승인이 Neture membership 을 active 로 변경(정지 · 반려 해제 포함) | 기존 | `approveSupplier` 의 membership 활성화 제거 → Neture active 를 승인 전제조건으로 |
+| E4 | Neture 가입 승인(`role='supplier'`)이 공급자를 ACTIVE 로 생성 · 승격 | 기존 | `approveRegistration` 의 supplier ONE-STEP 분기 제거(공급자는 `POST /supplier/register` → 공급자 승인으로만) |
+| E5 | AI 자동화가 Neture 승인 없이 열림 | 기존 | `/api/ai/*` 사용자 기능 · local-agent pairing 에 Neture membership active guard. 대상 route 목록 확정 필요 |
+
+E1 · E2 를 고치면 이미 E1 경로로 생성된 운영 membership 이 있는지 확인이 필요하다(이번 조사에서 운영 건수는 조회하지 않았다 — 수정 WO 에서 읽기 전용으로 확인).
+
+**명칭 · 배치 혼동(동작은 정해진 대로)**
+
+- "Neture 약국 기본 가입" · `neture:store_owner` = 실제로는 내 매장(약국) 신청 원장 — 이름이 Neture 메인 가입과 혼동된다. 정정은 **E1~E5 수정 작업에 포함**한다(10-8).
+- 결함 #1(10-2): 세미프랜차이즈 운영 · 가입 화면이 neture.co.kr · store.neture.co.kr 에 있음.
+
+**사용자 판정 (2026-10-07)**: E1~E5 = 수정 대상 인정. "단순한 화면 배치 문제가 아니라 가입 · 승인의 독립성이 깨진 구현"이다. 상태는 **배포 완료 · 가입 구조 검증 FAIL** 로 유지하고, §9-5 운영 업무 검증은 수정 반영 후 다시 한다.
+
+#### 10-4-1. D1~D3 결정 (2026-10-07 사용자 확정)
+
+| # | 결정 |
+|---|---|
+| D1 | 매장 **자기** 상품 · 자료 · QR · 사이니지 = 내 매장 기능 → 세미프랜차이즈(pharmacy) 승인 불필요. **세미프랜차이즈가 제공하는** 상품 · 콘텐츠 · 업무만 세미프랜차이즈 승인 필요. URL · `kpa-society` 코드 이름으로 판정하지 않는다. **내 매장 API 에 pharmacy 승인을 일괄 추가하는 것은 잘못된 수정**이다. |
+| D2 | 내 매장(약국) 승인자 = 기존 `neture:operator` 유지. 처리 화면은 매장 운영 화면. 새 운영자 지정 구조를 만들지 않는다. |
+| D3 | 화장품 매장 즉시 등록에 새 승인 흐름을 만들지 않는다 → K-Cosmetics 은퇴 트랙 1차-B 로 이관([CHECK-O4O-KCOSMETICS-RETIREMENT-PHASE1A](CHECK-O4O-KCOSMETICS-RETIREMENT-PHASE1A-WEB-APP-AND-RUNTIME-V1.md): "API · DB · serviceKey · role 정리는 1차-B 이후"). |
+
+### 10-5. 구현 전 확인 ① — 연결 서비스 신청 · 승인 전제조건
+
+Neture membership active 를 확인하는 신청 · 승인 지점은 **하나도 없다.**
+
+| 지점 | 현재 전제 | 판정 |
+|---|---|---|
+| 내 매장(약국) 신청 `POST /neture/pharmacy/membership` | `requireAuth` 만 | 불일치(E2) |
+| 〃 승인 `decide` | 없음 — Neture 가 없으면 active 생성(E1), 있으면(pending 포함) 그대로 둠 | 불일치(E1 · E2) |
+| 세미프랜차이즈 신청 · 승인 · 모집 지원(`apply` · `decideMembership` · recruitments `pharmacyApply`) | 기본 가입(내 매장) active · 세미프랜차이즈 active 만 — Neture 는 간접 | 내 매장 전제가 고쳐지면 간접 충족. 직접 확인 추가 불필요 |
+| 공급자 신청 `POST /neture/supplier/register` | `requireAuth` 만 | 불일치 |
+| 공급자 승인 `approveSupplier` | 없음 — 오히려 Neture 를 active 로 바꿈(E3). `rejectSupplier` 는 Neture 를 rejected 로, `reactivateSupplier` 도 결합 | 불일치(E3) |
+| 서비스 가입 신청 `joinService` | 전제 없음(메인 가입 자체) | 일치 |
+| seller-recruitment 지원 · service-products 신청 · market-trial 참여 | 상태 불문 / 임의 서비스 membership | Neture 기준과 별개인 기존 경로 — 다른 트랙 |
+| 화면 | `PharmacyMembershipPage` · `ServiceApplyPanel` · 세미프랜차이즈 신청 화면 모두 "Neture 승인 필요" 상태가 없다. `resolveNetureServiceStates` 에 메인 상태가 없다 | 불일치(E2 와 함께) |
+
+### 10-6. 구현 전 확인 ② — Neture 승인 시 연결 서비스 role 발급 경로
+
+| # | 경로 | 동작 | 분류 |
+|---|---|---|---|
+| A1 | `OperatorRegistrationService.approveRegistration` L153-170 | `sm.role`(bare `supplier` · `store_owner` 등)을 그대로 role 로 부여 | 수정 — 메인 승인은 연결 서비스 role 을 주지 않는다 |
+| A1' | 〃 L173-313 supplier ONE-STEP | 공급자 생성 · ACTIVE 승격(E4) | 수정 — 분기 제거. `operator-registration.roleContract.test.ts` 동시 변경 |
+| A2 | `MembershipApprovalService.approveMembership` STEP3(L469-479, `resolveGrantedRole`) | neture `sm.role` → `neture:supplier` · `neture:store_owner` 로 정규화 부여 | 수정 — neture 는 연결 서비스 role 매핑 제외 |
+| A3 | `reactivateMembershipCore` STEP3(L999-1018) · STEP3.5(L1044-1064) · STEP5(L1083-1092) | role 복구 · 원장 확인 없이 `neture:store_owner` 부활 · INACTIVE 공급자 ACTIVE 복구 | 수정 — 연결 서비스 상태는 각 원장으로만 복구 |
+| A4 | `MembershipConsoleController.updateMemberStatus` | 서비스 공통 상태 변경(전 서비스 승인) | 다른 트랙 |
+| A5 | suspend STEP2.5(L830-840) | Neture 정지 → 하위 정지 연쇄 | 다른 트랙(정지 연쇄 정책) |
+| B1 | `pharmacy-store-provisioner.activate` → `ensureServiceMembershipsForRoles` | 역방향: 매장 승인 → Neture active(E1) | 수정 |
+| B2 | `joinService` 재신청 | 이전 `sm.role` 유지 → 재승인 시 A1 로 재발급 | 수정 — 재신청 시 role 초기화 |
+| B3 | 과거 backfill 데이터 · `EditUserModal` 의 bare `supplier` 선택지 | | 다른 트랙 |
+| B4 | `store-enrollment.service.ts` 화장품 즉시 `cosmetics:store_owner` | | 다른 트랙(D3) |
+| C | `approveSupplier` · `rejectSupplier` · `reactivateSupplier` | 공급자 상태 → Neture membership 역결합 | 수정(E3) — 세 지점 함께 |
+| D | `neture-service-state.service.ts` L118-120 | 공급자 원장이 없으면 `sm.role==='supplier'` 로 공급자 상태 표시 → 화면은 공급자 활성, API 는 403 | 수정 |
+| D' | 프런트 `role-constants` · `SupplierRoute` · `HubPage` 의 bare `supplier` · `store-owner.utils` back-compat · 미사용 `hasSignageSupplierPermission` | | 다른 트랙 |
+| E | 로그인 · 회원가입 · handoff · me-context | role 발급 없음 | 유지 |
+
+### 10-7. 구현 전 확인 ③ — Neture 메인 AI vs 공통 AI API
+
+| 구분 | API | 사용처 | 분류 |
+|---|---|---|---|
+| Neture 메인 AI | `POST /api/ai/home-chat`(L2097) | `/` O4OHomePage composer | 수정 — Neture active guard |
+| 〃 | `POST /api/ai/request`(L2212) | 메인 AI 요청. 단 `surface='hospital-drug'` 는 병원약국 서비스 → guard 제외 | 수정 — surface 분기 |
+| 〃 | `POST /api/ai/work-agent/run`(L359) | 프런트 호출자 없음 | 수정(같이 막음) |
+| 〃 | `POST /api/local-agent/pairing-grants`(L84) · `GET /devices`(L97, 선택) | 메인 AI 자동화 PC 연결 | 수정 |
+| 공통 | `/generate` · `/content` · `/url-to-blocks` | 공용 `packages/content-editor`(KPA · web-store · pharmacy-hub · lecture · Neture 공급자 · admin) | 유지 |
+| 공통 | `/content-to-store-use` · `/course-structure` · `/lesson-body` · `/file-understanding` · `/vision/analyze` · `/query` · `/usage` · `/history` | 서비스별 · 미사용 | 유지 |
+| 공통 | admin AI · `/api/v1/ai` · `/api/hospital/*` · agent 측 `/pair` · `/connect` · `/heartbeat` · `/result` | | 유지 |
+
+guard 안: 얇은 middleware = `platform:super_admin` 통과 + `hasActiveServiceMembership(…, 'neture')`. serviceKey 는 고정 `neture`(요청값 불사용), 기존 `requireActiveServiceMembership` 와 같은 fail-closed 403.
+**보이는 변화**: Neture 승인이 없는 KPA · 매장 사용자는 `/` 홈 composer 를 쓸 수 없게 된다 — 기준과 일치하나 화면 안내가 필요하다.
+
+### 10-8. 최소 수정 범위 — 수정 / 유지 / 다른 트랙
+
+**수정할 코드 (한 수정 WO)**
+
+1. E1 · B1 — provisioner 의 Neture membership 생성 제거.
+2. E2 — 내 매장(약국) 신청 · 승인 · 공급자 신청에 Neture active 전제. 화면(`PharmacyMembershipPage` · `ServiceApplyPanel`)에 "Neture 승인 필요" 상태, `resolveNetureServiceStates` 에 메인 상태 추가.
+3. E3 · C — `approveSupplier` · `rejectSupplier` · `reactivateSupplier` 의 Neture membership 변경 제거, 승인 전제조건으로 전환.
+4. E4 · A1 · A2 · A3 · B2 — 메인 승인 · 재활성화 · 재신청에서 연결 서비스 role · 공급자 상태 발급 제거 + roleContract test.
+5. D — `neture-service-state` 의 `sm.role` 공급자 fallback 제거.
+6. E5 — AI 4 route guard(10-7).
+7. D1 — 세미프랜차이즈가 **제공하는** 기능 중 확인이 빠진 곳에만 세미프랜차이즈 active 확인: `pharmacy-products.controller` `/catalog` · `/apply` · `/applications` · `/approved` · `/orderable`, `store-seller-recruitment-browse`(+ 해당 화면 진입). store 호스트 `/hub/event-offers` · `/hub/cart` 는 403 막다른 길 → `/store/pharmacy/supply` 로 연결. **내 매장 자기 기능 API 에는 추가하지 않는다.**
+8. 명칭 정정(같은 작업) — "Neture 약국 기본 가입" → "내 매장(약국) 신청 · 승인"으로 화면 · 주석 · DESIGN §3-1 · ROLE-WORKSPACE 해당 문구. role 키 `neture:store_owner` rename 은 RBAC(F9) 변경이라 하지 않고 의미 주석만 정정.
+9. 수정 WO 시작 시 운영 데이터 census(읽기 전용, 건수만): E1 경로로 생긴 Neture active · bare `supplier`/`store_owner` `sm.role` · Neture 미승인 공급자 · Neture 미승인 매장 · ONE-STEP 생성 공급자. 정리(write)는 별도 승인.
+
+**유지할 코드**
+
+- Neture `/pharmacy/store/*` 세미프랜차이즈 commerce 의 SQL `sfm.status='active'` 판정(공급 · 콘텐츠 · 모집 · cart). payments prepare/confirm 재확인 누락은 경미 — 필수 아님.
+- KPA 내 매장 API(`createRequireStoreOwner(kpa)`, 기본 가입만) — D1 기준 내 매장 기능.
+- pharmacy 호스트 진입 gate(기본 가입 ∧ 세미프랜차이즈) — 세미프랜차이즈 호스트이므로 일관.
+- 공통 AI API(10-7).
+- Neture 메인 승인의 membership · `users.status` 활성화 자체 · 세미프랜차이즈 승인(지정 운영자) · 내 매장 승인자 `neture:operator`(D2).
+
+**다른 트랙으로 넘길 코드**
+
+| 대상 | 이관 트랙 |
+|---|---|
+| 화장품 즉시 등록(B4) | K-Cosmetics 은퇴 1차-B (D3) |
+| `updateMemberStatus` 전 서비스 상태 변경(A4) · suspend 연쇄(A5) | 운영자 membership 콘솔 정비 |
+| legacy backfill · `EditUserModal` · 프런트 bare `supplier` · `store-owner` back-compat(B3 · D') | RBAC legacy role 정리 |
+| pharmacy 호스트의 내 매장 화면 중복 배치 · 세미프랜차이즈 운영 · 가입 화면 위치 | 결함 #1 화면 배치(10-2) |
+| HQ 콘텐츠 · 사이니지(`/kpa/contents` · `/kpa/signage` · `/api/v1/hub` contents)가 "세미프랜차이즈 제공"인지 | **사용자 확인 필요** — 확인 전에는 유지 |
+| 세미프랜차이즈 커뮤니티(`pharmacy` 에 `community_key` 없음) | 세미프랜차이즈 기능 확장 |
+| seller-recruitment 지원 · service-products 신청 · market-trial 참여의 전제(10-5) | 각 기능 트랙 |
+
+**상태(조사 시점)**: 배포 완료 · **가입 구조 검증 FAIL**. §9-5 는 위 수정 반영 · 배포 후 1단계부터 재개.
+
+### 10-9. 가입 구조 수정 결과 (2026-10-07, 같은 PR)
+
+사용자 지시: 10-8 최소 범위로 구현 · 세미프랜차이즈 신청 · 승인도 Neture 가입 승인을 **직접** 확인(10-5 의 "간접 충족" 판단 대체) · 본부 콘텐츠 · 사이니지는 작성 주체 · 제공 범위로 판정 · 공통 API 전체에 pharmacy 조건 추가 금지 · AI 입력창 안내 + 서버 guard · 병원약국 예외는 서버 확인 자격으로만 · 원장 독립 회귀 테스트 · 운영 데이터는 읽기 전용 건수만.
+
+| # | 수정 | 위치 |
+|---|---|---|
+| E1 · B1 | 내 매장(약국) 승인 표식에서 `service_memberships('neture')` ensure 제거 | `pharmacy-store-provisioner.ts` |
+| E2 | 내 매장(약국) · 세미프랜차이즈 신청(본인 403) · 승인(신청자 409)에 **현재** Neture 가입 승인 확인. 공급자 신청도 같다 | `neture-main-membership.ts`(판정 SSOT, 읽기 전용) · `pharmacy-membership.service.ts` · `semi-franchise.service.ts` · `supplier.service.ts` |
+| E2 화면 | `resolveNetureServiceStates` 에 `netureMain` 추가 · 공급자 상태의 `sm.role` fallback 제거(D). `ServiceApplyPanel` · web-store `PharmacyMembershipPage` · `SemiFranchisesPage` 에 "Neture 가입 승인 필요" 안내 | `neture-service-state.service.ts` · web-neture · web-store |
+| E3 · C | `approveSupplier` · `rejectSupplier` · `reactivateSupplier` 의 Neture membership 변경 제거 → 승인 · 재활성화 전제조건(`APPLICANT_NETURE_MEMBERSHIP_NOT_ACTIVE` 409) | `supplier.service.ts` + 3 controller |
+| E4 · A1 · A1' | Neture 가입 승인(`approveRegistration`)의 role 부여 · 공급자 ONE-STEP 생성 제거. 관리자 계열 role 거부 방어는 유지 | `operator-registration.service.ts` |
+| A2 · A3 | `MembershipApprovalService` neture 승인 · 재활성화가 `supplier` · `neture:supplier` · `store_owner` · `neture:store_owner` 를 부여 · 복구하지 않음, STEP3.5 neture 제외, STEP5(공급자 ACTIVE 복구) 제거 | `MembershipApprovalService.ts` |
+| B2 | Neture 재신청 시 `sm.role` 을 `member` 로 초기화 | `handoff.controller.ts`(joinService) |
+| E5 | `requireNetureMainMembership` guard — `/api/ai/request` · `/home-chat` · `/work-agent/run` · `/api/local-agent/pairing-grants`. serviceKey 고정 `neture`, 예외 = 서버 확인 `platform:super_admin` 뿐, 조회 실패 503. **병원약국 `surface:'hospital-drug'` 도 body 값으로 Neture 자격 우회 불가** — 미승인 병원약국 첫 요청의 처리는 10-10 R2 (병원약국 서비스 자체는 별도 `/api/hospital/*`) | middleware · `ai-proxy.routes.ts` · `local-agent.routes.ts` |
+| E5 화면 | `/` 홈 입력창 자리에 상태별 안내(none: "Neture 가입 승인이 필요합니다" + 가입 신청 · pending: "가입 승인 대기 중입니다" · rejected: 다시 신청 · suspended · withdrawn: 안내만). 403 수신 시 상태 재조회. PC 연결 실패 문구 | `NetureMembershipNotice.tsx` · `O4OHomePage.tsx` · `localAgent.ts` |
+| D1 | 항목 단위 판정(KPA 마운트만, `semiFranchiseAccessKey`). ~~PUBLIC 공급 = 내 매장 기능~~ — **10-10 R1 에서 정정**: 공급처 미지정(PUBLIC) 공급도 세미프랜차이즈 제공 항목. 모집 browse 는 미가입 시 빈 목록. **API 자체를 막지 않는다** | `pharmacy-products.controller.ts` · `store-seller-recruitment-browse.controller.ts` |
+| D1 화면 | store 호스트 `/hub/event-offers` → `/store/pharmacy/supply`, `/hub/cart` → 약국 장바구니로 연결(403 막다른 길 제거) | web-store `App.tsx` |
+| 명칭 | "Neture 약국 기본 가입" → "내 매장(약국) 신청 · 승인" — 화면 · 주석 · 오류 문구(api-server 38 · web 3종) · DESIGN §3-1 · ROLE-WORKSPACE 해당 문구. migration 주석 · role 키 `neture:store_owner` 는 그대로 | |
+
+**D1 판정 결과 — 변경 없음(근거)**
+
+| 대상 | 판정 |
+|---|---|
+| `/kpa/contents*` · `/kpa/signage*` · `/api/v1/hub` contents | 매장 자기 작성 · 플랫폼 공개 콘텐츠 = 내 매장 기능 / 기존 정책 |
+| `semi_franchise_contents`(세미프랜차이즈 제공 자료) | 이미 `sfm.status='active'` 로 판정 |
+| `/kpa/store-library/contents` 피드 | 혼합이지만 세미프랜차이즈 출처 행은 매장이 가져온 **사본**(매장 소유) — 유지. 결정 항목으로 보고 |
+| `pharmacy-products /applications` | 매장 자신의 신청 이력 — 유지 |
+
+**검증**
+
+| 항목 | 결과 |
+|---|---|
+| `pnpm run type-check`(api-server · web 8종 포함) | PASS |
+| api-server jest 전체 | 7,204 passed / 1 failed → `supplier-domain-boundary` Phase F 계약을 공급자 승인 경로로 이전(E4 의 의도된 변경) 후 해당 spec PASS. 신규 `neture-membership-ledger-independence.spec.ts` 35 PASS, `MembershipApprovalService` 계약 4건 갱신(neture 연결 서비스 role 부여 · 복구 없음) |
+| web-neture vitest | 352 PASS + 신규 `NetureMembershipNotice.test.tsx` 6 PASS |
+| web-kpa-society vitest | 67 PASS |
+| web-store | 테스트 설정 없음 — type-check 만 |
+| 브라우저 · 운영 검증 | **미실시** — 배포 후 §9-5 1단계(가입)부터 재개 |
+
+**운영 데이터 영향 census (읽기 전용 · 건수만 · 정리하지 않음)**
+
+| 항목 | 건수 |
+|---|---|
+| Neture membership 전체 | active 5 (role: customer 2 · admin 1 · operator 1 · neture:operator 1) |
+| E1 경로로 생긴 Neture active(약국 신청 이후 생성) | 0 (`neture_pharmacy_memberships` 0행) |
+| bare `supplier` · `store_owner` `sm.role` | 0 |
+| role_assignments `supplier` · `store_owner` · `neture:store_owner` / `neture:supplier` | 0 / active 1 |
+| Neture 미승인(membership 없음) 공급자 | ACTIVE 3 · PENDING 1 — 이번 수정 후 PENDING 1 은 승인 시 409, ACTIVE 3 은 기존 상태 유지(재활성화 시에만 전제 확인) |
+| Neture 미승인 매장 · 세미프랜차이즈 가입 | 0 · 0 |
+| ONE-STEP 생성 공급자(±60s 추정) | 0 |
+
+**남은 결정 · 다른 트랙**
+
+- 정지 연쇄(A5): Neture 정지는 여전히 `neture:store_owner` 를 회수하지만 재활성화는 복구하지 않는다(비대칭) — **해결되지 않음**, 정지 후속 항목(10-10).
+- Neture 미승인 ACTIVE 공급자 3 · `neture:supplier` 1 — **현 상태 유지**, 데이터 정리는 별도 승인(write).
+- `/kpa/store-library/contents` 세미프랜차이즈 사본 행 · `/applications` — 리뷰에서 현재 판단 유지 확정(10-10).
+- `POST /neture/seller-recruitment/applications` 참여 전제 — 10-10 R3 에서 처리.
+
+**상태**: 10-10 로 갱신.
+
+### 10-10. 리뷰 반영 — 통합 전 수정 (2026-10-07, 같은 PR)
+
+리뷰 지시: PUBLIC 공급의 세미프랜차이즈 미가입 허용 수정(기존 commerce 공급 이용 판정 재사용) · `/api/ai/request` 는 Neture 메인 호출에 Neture 승인, 병원약국 정상 호출은 서버가 확인한 그 서비스 자격으로, body 만으로 우회 불가 · 모집 참여 POST 직접 호출 우회 확인 후 차단.
+
+| # | 수정 | 위치 |
+|---|---|---|
+| R1 | **공급처 미지정(PUBLIC) 포함 모든 공급 상품 = 세미프랜차이즈 가입 승인 대상.** commerce 공급 SSOT(`supply-access.ts` `ACCESS_CTE` — 4 공급 경로 모두 `my_sf` JOIN, 기본 경로 = `service_keys` 빈 offer → pharmacy 가입 필요)와 같은 판정을 `hasServiceSemiFranchiseSupplyAccess(exec, serviceKey, organizationId)` 로 export 해 재사용. `/catalog` · `/approved` · `/orderable` 미가입 시 공급 항목 0(`NO_SUPPLY_SQL`) · `/apply` 는 distribution_type 무관 403 `SEMI_FRANCHISE_MEMBERSHIP_REQUIRED`. API 자체는 막지 않는다(빈 목록) | `supply-access.ts` · `pharmacy-products.controller.ts` |
+| R1-b | **목록 숨김의 직접 확정 우회 차단** — 공용 B2B 장바구니 확정이 승인축(`offer_service_approvals`)만 봐서 미가입 약국이 직접 `checkout-confirm-b2b` 로 주문할 수 있었다. `B2BCheckoutConfirmCore` 에 선택 adapter hook `assertSupplyAccess` 추가(조직 확정 직후) → `StoreB2BCartCheckoutService` 만 구현(서버 확정 매장 조직 기준, 403). Neture · PharmacyHub adapter 는 구현하지 않음(동작 불변). 이벤트 장바구니 확정은 **(10-11 에서 구매 약국 조직 기준으로 대체)** `ctx.organizationId` 가 이벤트 운영 조직이라 **구매자 기준** `resolveSemiFranchiseServiceAccess`(로그인 자격과 같은 판정)로 전 항목 `failedItems` 처리. k-cosmetics 는 키 없음 → 판정 없음 | `b2b-checkout-confirm.core.ts` · `store-b2b-cart-checkout.service.ts` · `event-offer-cart-checkout.service.ts` |
+| R2 | **(10-11 에서 대체 — 병원약국 기존 동작 보존)** `/api/ai/request` 만 `requireNetureMainMembership(..., { hospitalPublicScope: true })`. Neture 승인 회원 · super_admin → 기존 경로 그대로. **Neture 미승인 + `surface:'hospital-drug'` 첫 요청(runId 없음)** → 병원약국 서비스가 서버에서 정한 공개 capability(`runHospitalAiRequest` — 무로그인 `/api/hospital/ai/request` 와 같은 조사 전용 · `suppressLocal` · 화면 조작은 "실행 불가" 안내)로만 처리. runId 재개 · 다른 surface · 홈 대화 · 작업 에이전트 · 로컬 연결은 403. 조회 실패 503 유지 | `neture-main-membership.middleware.ts` · `ai-proxy.routes.ts` · `hospital.routes.ts`(export) |
+| R3 | **우회 확인됨** — `POST /neture/seller-recruitment/applications` 는 모집 존재 · 모집중 · 노출 승인 · 중복만 검사해, browse 가 빈 목록이어도 모집 id 로 직접 신청할 수 있었다. `createApplication` 에서 모집 `service_id` 의 세미프랜차이즈 키(kpa-society → pharmacy)가 있으면 신청자 기준 `resolveSemiFranchiseServiceAccess` 로 판정, 미가입 403 `SEMI_FRANCHISE_MEMBERSHIP_REQUIRED`(저장 전). 키 없는 서비스 모집은 불변 | `seller-recruitment.service.ts` · `seller-recruitment.controller.ts` |
+
+**R2 판단 근거 (10-11 에서 대체)** — 서비스 카탈로그에 로그인 기반 병원약국 membership · entitlement 가 없다(새 role · 자격을 만들지 않는다). 실제 병원약국 서비스(web-hospital-pharmacy)는 무로그인 `/api/hospital/ai/request` 를 쓰고 이 guard 와 무관하다. 그래서 "서버가 확인한 그 서비스 자격" = 병원약국 서비스가 누구에게나 여는 공개 capability 이고, body 로 얻을 수 있는 것은 그 범위를 넘지 않는다(Neture 의 화면 · 원내 · 작업 실행 · runId 재개 · Local Agent 연결은 Neture 승인 필요).
+
+**유지 (리뷰 확정)**
+
+| 항목 | 처리 |
+|---|---|
+| Neture 정지 · 재활성화 비대칭(A5) | **해결되지 않음** — 정지 후속 항목으로 분리 |
+| Neture 미승인 ACTIVE 공급자 3 · `neture:supplier` role 1 | 현 상태 유지 · 데이터 정리는 별도 |
+| 가져온 콘텐츠 사본 · 매장 자신의 신청 이력 | 현재 판단 유지 |
+
+**검증**
+
+| 항목 | 결과 |
+|---|---|
+| api-server `tsc --noEmit` | PASS |
+| `neture-membership-ledger-independence.spec.ts` | PASS — L3 병원약국 공개 범위 옵션(미승인 첫 요청 통과 · runId 403 · 다른 surface 403 · 옵션 없는 진입점 403 · 조회 실패 503), L4 PUBLIC 포함 판정 · `hasServiceSemiFranchiseSupplyAccess` unit · 장바구니 확정 2경로 · 모집 신청 POST |
+| `store-b2b-cart-checkout.test.ts` | PASS — 미가입 PUBLIC 공급 확정 403(offer 조회 · 주문 생성 전 중단) · 서버 확정 조직 기준 · k-cosmetics 판정 없음 |
+| `unified-request-http.spec.ts` ⑭ | PASS — 미승인 hospital-drug → 조사 전용(suppressLocal) · 화면 요청 미실행 · runId 403 · 홈 대화 · 작업 에이전트 403 |
+| `b2b-remaining-debt-final-closure.spec.ts` | PASS — harness 를 가입 상태로 둠(관심사 = offer 재조회 SQL) |
+| api-server jest 전체 | PASS — 417 suites · 7,262 passed · 0 failed (skipped 50, 기존) |
+| 브라우저 · 운영 검증 | **미실시** — 배포 후 §9-5 1단계(가입)부터 재개 |
+
+**상태**: 리뷰 반영 구현 · 로컬 검증 완료 · **미통합 · 미배포**. main 통합은 사용자 승인 후 PR merge. → 10-11 로 갱신.
+
+### 10-11. 마무리 정정 — 병원약국 범위 제외 · 구매 약국 기준 · 정본 정합 (2026-10-07, 같은 PR)
+
+사용자 지시: 가입 구조(E1~E5) 유지 · 병원약국은 O4O 리팩토링 대상이 아니므로 기존 동작 보존(새 역할 · 자격 · 공개 조사 제한 없음) · 이벤트 주문 자격은 서버가 확인한 **구매 약국 조직** 기준 · 정본 문서와 구현 일치.
+
+| # | 정정 | 위치 |
+|---|---|---|
+| H1 | **병원약국 기존 동작 보존 — R2 대체.** guard 옵션 `hospitalSurface`: 병원약국 화면 첫 요청(`surface:'hospital-drug'` · runId 없음)은 **가입 조회 없이** 통과하고 핸들러의 기존 병원약국 분기(`performHospitalDrugRequest` — 조사 · 원내 조회 · 화면 위임)로 간다. main 과 같은 처리이며 Neture 가입 상태 · 가입 조회 장애(503)로 달라지지 않는다. 축소된 공개 경로(`runHospitalAiRequest` 재사용)와 `hospital.routes.ts` export 는 되돌림(main 과 동일). guard 가 이 표시(`res.locals.hospitalSurfaceOnly`)로 통과시킨 요청은 병원약국 분기 밖(통합 라우터 · 홈 대화 · Task 작업)으로 내려가지 않는다(방어 403). runId 재개 · 다른 surface · 홈 대화 · 작업 에이전트 · 로컬 연결은 Neture 판정 그대로(미승인 403) | `neture-main-membership.middleware.ts` · `ai-proxy.routes.ts` · `hospital.routes.ts` |
+| D1-b | **이벤트 주문 = 구매 약국 조직 기준 — R1-b 이벤트 부분 대체.** 사용자 단위 판정(`resolveSemiFranchiseServiceAccess` — 사용자가 가진 약국 중 하나라도 가입 active 면 통과)은 A 약국 가입으로 B 약국 주문을 통과시켰다. 이제 구매 약국은 B2B confirm 과 같은 계약(결함 O1, `resolveBuyerOrganization`)으로 서버가 확정한다 — 선택값 `organizationId`(요청) 또는 장바구니에 담긴 조직(한 곳일 때만)은 hint, 후보는 내 매장(약국) 신청 active 약국 조직. 선택 없음 + 후보 여럿 → 400 `AMBIGUOUS_STORE_ORGANIZATION`(임의 선택 안 함) · 타인 조직 403 · 후보 없음 403. 판정은 그 조직의 pharmacy 가입 active(`hasServiceSemiFranchiseSupplyAccess` — B2B 와 같은 공급 판정). 이벤트 운영 조직은 쓰지 않는다. k-cosmetics 는 판정 대상 아님(조직 확정도 하지 않음 — 동작 불변) | `event-offer-cart-checkout.service.ts` · `store-cart.routes.ts`(`checkout-confirm` 이 `organizationId` hint 수신) |
+| DOC | **정본 정합 (Codex P1 r4203536418)** — DESIGN 에 남은 옛 계약 정정: §3-1 "로그인만 된 계정" → Neture 가입 승인 계정 · 신청 403 / 승인 409, 내 매장 처리 ↔ Neture 원장 상호 불변 · §3-3 공급자 승인의 Neture 결합 제거(전제조건 확인만) · Neture 승인이 연결 서비스 역할을 발급 · 복구하지 않음 · §13 이관 표의 `service_memberships('neture')` ensure 취소선. §5-1 매장 표식 ensure 는 10-10 시점에 이미 취소선 | `DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md` |
+| D1-c | **다중 약국 사용자의 이벤트 확정 (Codex P1 r4206224410)** — 공용 장바구니 화면(`store-ui-core` `useStoreCart`)은 body 에 조직을 싣지 않아 다중 약국이면 항상 400 이었다. 공용 패키지는 바꾸지 않고, 통합 매장 공간(web-store)이 모든 요청에 싣는 선택 매장 헤더 `X-Store-Organization-Id`(CHECK-O4O-URL-FIRST-CENSUS-V1 §21-14, `readPreferredStoreOrganizationId`)를 `checkout-confirm` 라우트가 넘긴다. 순서: body `organizationId`(명시 — 타인 조직 403) → 헤더(후보 안일 때만, 밖이면 없는 것과 같다 — 기존 헤더 계약) → 장바구니 조직(한 곳) → 후보 1 서버 확정 / 여럿 400. KPA `/store-hub/cart` 는 `NetureCommerceRedirect` 로 web-store 로 간다 | `store-cart.routes.ts` · `event-offer-cart-checkout.service.ts` |
+| SF-1 | **세미프랜차이즈 승인 전제 = 실제 신청자 (Codex P2 r4206224423)** — 승인 시 Neture 가입 재확인 대상이 약국을 만든 사람(`neture_pharmacy_memberships.applicant_user_id`)이었다. 그 가입을 신청한 사람(`semi_franchise_memberships.applied_by` — 약국 admin/manager 일 수 있다)으로 교정. 신청자가 없으면(계정 삭제 → NULL) 'none' 으로 승인하지 않는다 | `semi-franchise.service.ts` |
+| DOC-2 | **색인 · 기준 문서 명칭 정합 (Codex P2 r4206018123)** — `CANONICAL-INDEX` DESIGN 행 · STORE-ACCESS 행의 "기본 가입 원장" → 내 매장(약국) 신청 · 승인 원장(Neture 가입과 별도, 상태 · 판정 불변) · `O4O-STORE-ACCESS-AND-MEMBERSHIP-V1` §약국 예외 · `O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1` 세미프랜차이즈 식별 문구. **미변경**: F8 Frozen `NETURE-DISTRIBUTION-ENGINE-FREEZE-V1` 의 같은 옛 명칭 1곳 — Frozen 본문이라 별도 WO 로 보고(§16-4) | `CANONICAL-INDEX.md` · `O4O-STORE-ACCESS-AND-MEMBERSHIP-V1.md` · `O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1.md` |
+
+**병원약국 기존 동작 보존 근거**
+
+- 호출부 2곳 — ① 독립 앱 `web-hospital-pharmacy` 는 무로그인 `/api/hospital/ai/request` 만 쓴다(이 PR 이 건드리지 않음, `hospital.routes.ts` main 과 동일). ② web-neture `/hospital-drug` 는 `/api/ai/request` 에 `surface:'hospital-drug'` 만 보내고 runId · 홈 대화 · 작업 에이전트 · pairing 을 부르지 않는다(작업 결과는 표시만, pairing 은 설치 시 관리자가 마이페이지에서 완료).
+- 서버: ②의 요청은 가입 상태와 무관하게 main 과 같은 `performHospitalDrugRequest` 로 간다 — 원내 조회(`localSource` 없으면 서버 Local 조회 허용) · 화면 위임(screen → Work Agent) 그대로.
+- body 로 얻을 수 있는 것: `surface:'hospital-drug'` 로 들어갈 수 있는 곳은 main 에도 있던 병원약국 분기뿐이다. Neture 메인 경로(통합 라우터 · 홈 대화 · Task 작업 · runId 재개 · 홈 대화/작업 에이전트 endpoint · 로컬 연결)는 Neture 판정을 그대로 받는다.
+- 다른 AI 기능: guard 는 위 4개 endpoint 에만 있다. 공용 편집기(`/api/ai/generate` 등 편집 surface) · admin AI · `/api/v1/ai` · `/api/hospital/*` 불변. 이 4개 endpoint 를 부르는 프런트는 web-neture(홈 · 병원약국 · 마이페이지 PC 연결)뿐이다.
+- 남는 점: 병원약국 분기 자체는 main 과 같이 로그인 사용자 누구에게나 열려 있다(병원약국용 역할 · 자격을 만들지 않는다는 지시에 따라 넓히지도 좁히지도 않음). 병동 PC 를 **다시** 연결(pairing)할 때는 마이페이지 PC 연결이 Neture 승인을 요구한다(E5) — 설치 계정이 Neture 승인 상태여야 한다.
+
+**검증**
+
+| 항목 | 결과 |
+|---|---|
+| `event-offer-cart-checkout-purchasing-org.test.ts` (신규 14) | PASS — 화면 선택 매장 헤더 A 허용 · B 차단 · 후보 밖 헤더 무시(400) · body 가 헤더보다 우선, A 약국 허용 · B 약국 차단(재고 차감 · 주문 생성 없음, A 가입으로 대신 인정 안 함) · 장바구니 조직 B 기준 판정 · 선택 없음+후보 2 → 400 · 장바구니 조직 혼재 → 400 · 후보 1 → 서버 확정 · 타인 조직 403 · 후보 없음 403 · 이벤트 운영 조직 미사용 · k-cosmetics 판정 없음 |
+| `unified-request-http.spec.ts` ⑭ | PASS — hospital-drug 는 가입 none · pending · suspended 모두 main 과 같은 처리(원내 조회 · reason=research_and_local · 가입 조회 0) · 화면 요청 → work 위임 · localSource=client → suppressLocal · 가입 조회 장애에도 200 · runId 재개 403 · 홈 대화 · 작업 에이전트 403 · 일반 요청 403 · super_admin 통과 · fail-closed 503 |
+| `neture-membership-ledger-independence.spec.ts` | PASS — L3 병원약국 화면 옵션(가입 무관 통과 · 조회 0 · 장애 무관 · runId/다른 surface/옵션 없는 진입점 403) · 축소 경로 미사용 · 병원약국 분기 → 방어 403 → 통합 라우터 순서 · 이벤트 확정은 구매 약국 조직 판정 |
+| 기타 — 아래 PR 보고의 전체 jest · type-check | PR 보고 참조 |
+| 브라우저 · 운영 검증 | **미실시** — 배포 후 §9-5 1단계(가입)부터 재개 |
+
+**남은 항목**
+
+- 다중 약국 사용자의 이벤트 확정은 web-store 선택 매장 헤더로 해결(D1-c). 매장을 고르지 않은 상태 · 헤더를 싣지 않는 다른 화면에서는 400(선택 요구)이다. B2B 확정(`checkout-confirm-b2b`)은 이번 범위가 아니며 기존과 같다(body 조직만 hint).
+- 이벤트 주문 생성 · 한도 집계(`reserveEventOfferListing`) · 자동 진열(`tryLinkStoreProduct`)은 여전히 사용자 기준이고 주문에 구매 약국을 기록하지 않는다 — 이번 판정 범위 밖(기존 계약).
+- 모집 신청(R3)은 신청자 기준 판정이다(같은 사용자 · 다른 약국 구분 없음) — 이번 지시 범위 밖, 같은 유형으로 보고만.
+- Neture 정지 · 재활성화 비대칭(A5) · 기존 공급자 데이터 · 화면 이전 · 커뮤니티 — 범위 밖 유지.
+
+**상태**: 정정 구현 · 로컬 검증 완료 · **미통합 · 미배포**. main 통합은 사용자 승인 후 PR merge.
+
+### 10-12. PR #349 인계 — 모집 행 기준 가입 판정 (2026-10-07)
+
+Codex P1 `r4206382303` 대응. §10-10 R3의 serviceKey 기반 판정을 대체한다. 정본 [DESIGN](../design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md) §1 · §2는 세미프랜차이즈를 데이터 행으로 구분하며, `seller_recruitments.semi_franchise_id IS NULL`인 기존 서비스 모집은 보존한다.
+
+- KPA 매장 모집 목록: 서버가 확정한 `organizationId`를 내부 조회 필터로 전달한다. 일반 모집(NULL)은 유지하고, 세미프랜차이즈 모집은 해당 조직의 내 매장(약국) 신청 active · 해당 모집의 세미프랜차이즈 가입 active · 세미프랜차이즈 active일 때만 노출한다. 다른 세미프랜차이즈 가입으로 대신 인정하지 않는다.
+- 직접 신청 POST: NULL 모집은 기존 흐름을 유지한다. 세미프랜차이즈 모집은 `semiFranchiseId`로 신청자의 owner/admin/manager 조직 관계와 위 active 조건을 확인하고, 미충족 시 저장 전에 기존 403 `SEMI_FRANCHISE_MEMBERSHIP_REQUIRED`로 차단한다.
+- 서비스 로그인(#323 `SERVICE_NOT_MEMBER` 및 pharmacy 호환) 판정 · 공급 상품 판정 · supplier/public 모집 목록 · HTTP route/응답 형식 · DB schema/migration은 변경하지 않는다.
+- 기존 리뷰 4건은 DESIGN/색인 정합 · 이벤트 확정 선택 매장 헤더 · 세미프랜차이즈 실제 신청자 재확인을 코드와 §10-11 기록으로 확인하고 스레드를 해결했다.
+
+**검증**: 신규 행동 테스트 12건 포함 focused Jest 4 suites / 129 PASS. api-server `tsc --noEmit` PASS. 전체 API Jest와 원격 CI 결과는 최종 PR 보고 참조.
+
+**운영 영향 · 남은 항목**: 운영 DB write · 배포 · 브라우저 smoke 미실시. 배포 후 §9-5 가입 흐름부터 smoke 재개. §10-11의 모집 신청 사용자 단위 한계와 Neture 정지/재활성화 비대칭, 기존 공급자 데이터, Frozen F8 옛 명칭은 후속 항목으로 유지한다. 현재 **미통합 · 미배포**이며 main 통합은 사용자 승인 후 PR merge한다.

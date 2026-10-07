@@ -166,7 +166,7 @@ export function createAdminController(dataSource: DataSource): Router {
 
       const result = await netureService.reactivateSupplier(id, adminUserId, reason);
       if (!result.success) {
-        const status = result.error === 'SUPPLIER_NOT_FOUND' ? 404 : result.error === DEMO_ACCOUNT_FORBIDDEN_CODE ? 403 : 400;
+        const status = result.error === 'SUPPLIER_NOT_FOUND' ? 404 : result.error === DEMO_ACCOUNT_FORBIDDEN_CODE ? 403 : result.error === 'APPLICANT_NETURE_MEMBERSHIP_NOT_ACTIVE' ? 409 : 400;
         return res.status(status).json({ success: false, error: { code: result.error, message: result.error } });
       }
 

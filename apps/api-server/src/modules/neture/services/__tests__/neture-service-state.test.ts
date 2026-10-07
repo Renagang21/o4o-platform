@@ -4,8 +4,8 @@
  *
  * 공급자 서비스 이용 상태의 단일 출처 계약을 고정한다.
  *   - 공급자 = neture_suppliers.status (대문자) — 행은 API guard 와 같은 canonical resolver 로 찾는다
- *   - 서비스 행이 없을 때만 service_memberships(neture).role 이 supplier 인 경우 fallback
- *   - Neture 회원(member) 이라는 사실만으로는 'none'
+ *   - service_memberships(neture).role 로 공급자 상태를 추론하지 않는다 (fallback 제거 — CHECK §10 D)
+ *   - Neture 가입 상태는 netureMain 으로 따로 보인다 — 공급자 상태와 섞지 않는다
  *   - 응답에 partner 필드가 없다 (Legacy Partner 은퇴 · neture.neture_partners 를 조회하지 않는다)
  */
 
@@ -31,11 +31,27 @@ function makeDataSource(fx: Fixture) {
 }
 
 describe('resolveNetureServiceStates — 공급자 단일 출처', () => {
-  it('일반 Neture 회원(member active)은 supplier none · partner 필드 없음', async () => {
+  it('일반 Neture 회원(member active)은 supplier none · netureMain active · partner 필드 없음', async () => {
     const ds = makeDataSource({ memberships: [{ role: 'member', status: 'active' }] });
     await expect(resolveNetureServiceStates(ds, 'u1')).resolves.toEqual({
       supplier: { status: 'none', source: 'none' },
+      netureMain: { status: 'active', source: 'service_memberships' },
     });
+  });
+
+  it.each(['active', 'pending', 'rejected', 'suspended'])(
+    "Neture 가입 role=supplier · status=%s 라도 공급자 행이 없으면 supplier=none (fallback 제거)",
+    async (status) => {
+      const ds = makeDataSource({ memberships: [{ role: 'supplier', status }] });
+      const r = await resolveNetureServiceStates(ds, 'u1');
+      expect(r.supplier).toEqual({ status: 'none', source: 'none' });
+      expect(r.netureMain).toEqual({ status, source: 'service_memberships' });
+    },
+  );
+
+  it('Neture 가입 row 가 없으면 netureMain=none', async () => {
+    const r = await resolveNetureServiceStates(makeDataSource({}), 'u1');
+    expect(r.netureMain).toEqual({ status: 'none', source: 'none' });
   });
 
   it('공급자 ACTIVE 행이 있으면 supplier=active', async () => {
@@ -59,7 +75,7 @@ describe('resolveNetureServiceStates — 공급자 단일 출처', () => {
   it('legacy membership role=partner 는 어떤 서비스 상태도 만들지 않는다 (Partner 은퇴)', async () => {
     const ds = makeDataSource({ memberships: [{ role: 'partner', status: 'pending' }] });
     const r = await resolveNetureServiceStates(ds, 'u1');
-    expect(r).toEqual({ supplier: { status: 'none', source: 'none' } });
+    expect(r.supplier).toEqual({ status: 'none', source: 'none' });
     expect((r as Record<string, unknown>).partner).toBeUndefined();
   });
 
@@ -77,12 +93,6 @@ describe('resolveNetureServiceStates — 공급자 단일 출처', () => {
     });
     const r = await resolveNetureServiceStates(ds, 'u1');
     expect(r.supplier).toEqual({ status: 'rejected', source: 'neture_suppliers' });
-  });
-
-  it('membership rejected(role=supplier) 는 supplier=rejected', async () => {
-    const ds = makeDataSource({ memberships: [{ role: 'supplier', status: 'rejected' }] });
-    const r = await resolveNetureServiceStates(ds, 'u1');
-    expect(r.supplier.status).toBe('rejected');
   });
 
   it('userId 가 비어 있으면 조회 없이 none', async () => {

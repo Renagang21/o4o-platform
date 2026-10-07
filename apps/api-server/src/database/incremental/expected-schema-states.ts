@@ -189,7 +189,7 @@ export const EXPECTED_SCHEMA_STATES: readonly ExpectedSchemaState[] = [
     fingerprint: 'd2b32f7caccf2a71c1cd01997ebc1152ea400eb9781fa81192fbd741aabec2af',
     fingerprintLineCount: 6021,
   },
-  // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1 — 기본 가입 · 세미프랜차이즈 · 복수 공급 제안 · 세미프랜차이즈 콘텐츠 · 장바구니 제안 컬럼 ·
+  // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1 — 내 매장(약국) 신청 · 세미프랜차이즈 · 복수 공급 제안 · 세미프랜차이즈 콘텐츠 · 장바구니 제안 컬럼 ·
   // 모집 조직 단위. baseline fresh bootstrap + incremental 1..16 를 격리 PostgreSQL 15.17
   // (docker 일회용 컨테이너) 에서 `npx tsx src/migrate.ts` 로 실제 적용해 산출: 운영 DB fingerprint 채택 아님.
   // WO-NETURE-PHARMACY-CUTOVER-COMPAT-V1: idx_org_listing_unique_v2 를 이 migration 에서 바꾸지 않도록(전체 UNIQUE 유지 —

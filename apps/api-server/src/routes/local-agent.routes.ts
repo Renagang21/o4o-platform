@@ -27,6 +27,7 @@
 import { Router, Response, Request, NextFunction } from 'express';
 import { authenticate } from '../middleware/auth.middleware.js';
 import { AppDataSource } from '../database/connection.js';
+import { requireNetureMainMembership } from '../middleware/neture-main-membership.middleware.js';
 import type { AuthRequest } from '../types/auth.js';
 import logger from '../utils/logger.js';
 import {
@@ -81,7 +82,7 @@ async function authenticateAgent(
  * 발급 자격은 **이미 성립한 O4O 로그인 세션**이다(§2). 그 세션 자체는 agent 쪽으로
  * 한 조각도 건너가지 않는다. 건너가는 것은 여기서 새로 만든 난수 하나뿐이다.
  */
-router.post('/pairing-grants', authenticate, async (req: AuthRequest, res: Response) => {
+router.post('/pairing-grants', authenticate, requireNetureMainMembership(AppDataSource), async (req: AuthRequest, res: Response) => {
   try {
     const { grant, expiresAt } = await createPairingGrant(AppDataSource, req.user.id);
     // grant 는 사용자에게만 간다. 로그에는 절대 남기지 않는다 (§28 secret 출력 금지).

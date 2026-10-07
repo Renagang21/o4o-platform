@@ -78,8 +78,10 @@ describe('approveRegistration — 가입 승인은 운영자·관리자를 부�
     },
   );
 
-  it.each(['supplier', 'member', 'customer'])(
-    "정상 신청 역할 '%s' 는 그대로 부여한다(접두 정규화 없음)",
+  // CHECK-NETURE-PHARMACY-STORE-COMMERCE-LOCAL-BROWSER-V1 §10 E4:
+  //   Neture 가입 승인은 메인 이용 자격만 준다 — role 부여 · 공급자 원장 생성 · 조직 생성을 하지 않는다.
+  it.each(['supplier', 'member', 'customer', 'store_owner', ''])(
+    "membership role '%s' 승인은 role · 공급자 · 조직을 만들지 않는다",
     async (role) => {
       const { service, state } = createService(role);
 
@@ -88,10 +90,15 @@ describe('approveRegistration — 가입 승인은 운영자·관리자를 부�
         userId: 'user-1',
       });
 
-      const inserts = roleAssignmentInserts(state);
-      expect(inserts).toHaveLength(1);
-      // 저장되는 role 정본은 membership 의 원문 문자열이다 — 임의 접두를 붙이지 않는다
-      expect(inserts[0].params?.[1]).toBe(role);
+      expect(roleAssignmentInserts(state)).toHaveLength(0);
+      const touches = (needle: string) => state.queries.some((q) => q.sql.includes(needle));
+      expect(touches('neture_suppliers')).toBe(false);
+      expect(touches('INSERT INTO organizations')).toBe(false);
+      expect(touches('organization_members')).toBe(false);
+      expect(touches('neture_pharmacy_memberships')).toBe(false);
+      expect(touches('semi_franchise_memberships')).toBe(false);
+      // Neture 원장만 active 로 바꾼다
+      expect(touches("UPDATE service_memberships")).toBe(true);
       expect(state.committed).toBe(true);
       expect(state.rolledBack).toBe(false);
     },
@@ -103,13 +110,5 @@ describe('approveRegistration — 가입 승인은 운영자·관리자를 부�
     const { service, state } = createService(role);
     await service.approveRegistration('user-1', 'approver-1');
     expect(state.queries.some((q) => q.sql.includes('neture_partners'))).toBe(false);
-  });
-
-  it('membership role 이 비어 있으면 기존과 같이 member 로 부여한다', async () => {
-    const { service, state } = createService('');
-
-    await service.approveRegistration('user-1', 'approver-1');
-
-    expect(roleAssignmentInserts(state)[0].params?.[1]).toBe('member');
   });
 });

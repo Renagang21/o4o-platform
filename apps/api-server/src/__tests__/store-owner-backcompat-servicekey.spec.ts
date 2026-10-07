@@ -57,7 +57,7 @@ describe('§6 서비스별 store_owner 가드 — 일치 membership 만 통과�
   const services = Object.keys(CANONICAL) as StoreOwnerServiceKey[];
   /**
    * WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1 (DESIGN §5):
-   *   약국 매장(`kpa`)은 JWT membership 사전 검사를 하지 않고 Neture 기본 가입 원장으로 판정한다.
+   *   약국 매장(`kpa`)은 JWT membership 사전 검사를 하지 않고 내 매장(약국) 신청 원장으로 판정한다.
    *   membership 게이트 계약은 그 계약을 유지하는 서비스(cosmetics · pharmacy-hub)로 고정한다.
    */
   const membershipGated = services.filter((s) => s !== 'kpa');

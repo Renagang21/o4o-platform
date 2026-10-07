@@ -147,7 +147,7 @@ export async function findStoreOrganizationCandidates(
   serviceKey: StoreOwnerServiceKey,
 ): Promise<StoreOrganizationCandidate[]> {
   // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1 (DESIGN §5):
-  //   약국 매장(`kpa`) 후보는 서비스 연결(enrollment · slug)이 아니라 **Neture 기본 가입 원장 active** 로 판정한다.
+  //   약국 매장(`kpa`) 후보는 서비스 연결(enrollment · slug)이 아니라 **내 매장(약국) 신청 원장 active** 로 판정한다.
   //   kpa-society 가입 · 옛 약국 조직을 매장 자격으로 재해석하지 않는다(대체, 누적 아님).
   if (serviceKey === 'kpa') {
     const pharmacyRows = await dataSource.query(

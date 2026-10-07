@@ -5,10 +5,13 @@
  *   POST /api/v1/neture/pharmacy/semi-franchises/:key/apply   가입 신청(pending) — `pharmacy` 도 같은 절차
  *   POST /api/v1/neture/pharmacy/semi-franchises/:key/withdraw 탈퇴(terminated)
  * 승인 · 반려 · 정지는 그 세미프랜차이즈 담당 운영자가 한다. 커뮤니티는 가입 active 일 때만 열린다(서버 판정).
+ * 신청 · 승인 시 서버는 Neture 가입 승인(active)을 직접 확인한다(CHECK-NETURE-PHARMACY-STORE-COMMERCE-LOCAL-BROWSER-V1 §10 E2) —
+ * 승인 전이면 `NETURE_MEMBERSHIP_REQUIRED` 로 거절되고 이 화면은 Neture 가입 안내 링크를 붙인다.
  */
 import { useCallback, useEffect, useState } from 'react';
 import { RefreshCw } from 'lucide-react';
-import { neturePharmacyApi, pharmacyErrorMessage, type SemiFranchiseRow } from '../../api/neturePharmacy';
+import { PLATFORM_ORIGIN } from '../../config/workspace';
+import { neturePharmacyApi, pharmacyErrorCode, pharmacyErrorMessage, type SemiFranchiseRow } from '../../api/neturePharmacy';
 import { Notice, PharmacyPage, StatusBadge, btn, formatDate } from './shared';
 
 export default function SemiFranchisesPage() {
@@ -17,6 +20,7 @@ export default function SemiFranchisesPage() {
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [busyKey, setBusyKey] = useState<string | null>(null);
+  const [netureRequired, setNetureRequired] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -39,6 +43,7 @@ export default function SemiFranchisesPage() {
     if (action === 'withdraw' && !window.confirm(confirmText)) return;
     setBusyKey(row.key);
     setError(null);
+    setNetureRequired(false);
     setMessage(null);
     try {
       if (action === 'apply') await neturePharmacyApi.applySemiFranchise(row.key);
@@ -47,6 +52,7 @@ export default function SemiFranchisesPage() {
       await load();
     } catch (e) {
       setError(pharmacyErrorMessage(e));
+      setNetureRequired(pharmacyErrorCode(e) === 'NETURE_MEMBERSHIP_REQUIRED');
     } finally {
       setBusyKey(null);
     }
@@ -60,6 +66,11 @@ export default function SemiFranchisesPage() {
     >
       {message && <Notice>{message}</Notice>}
       {error && <Notice tone="error">{error}</Notice>}
+      {error && netureRequired && (
+        <p className="mb-4 text-sm" data-testid="semi-franchise-neture-required">
+          <a className="underline" href={PLATFORM_ORIGIN}>Neture 가입 상태 확인 · 신청</a>
+        </p>
+      )}
       {loading ? (
         <p className="py-12 text-center text-gray-500">불러오는 중...</p>
       ) : rows.length === 0 ? (

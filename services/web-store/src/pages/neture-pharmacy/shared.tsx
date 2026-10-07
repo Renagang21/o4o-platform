@@ -98,7 +98,7 @@ export const btn = {
 
 /**
  * 약국(Neture 약국 매장) 문맥에서만 여는 화면 — 다른 업종 문맥(K-Cosmetics · PharmacyHub)에서는 안내만 한다.
- * 권한 판정은 서버(기본 가입 원장 게이트)가 한다. 이 컴포넌트는 표시 분기다.
+ * 권한 판정은 서버(내 매장(약국) 신청 원장 게이트)가 한다. 이 컴포넌트는 표시 분기다.
  */
 export function PharmacyContextOnly({ children }: { children: ReactNode }) {
   const { effectiveServiceKey } = useUnifiedStore();

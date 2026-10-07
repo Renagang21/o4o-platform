@@ -40,11 +40,11 @@ import type { StoreOwnerServiceKey } from '../../utils/store-owner.utils.js';
 
 /**
  * 가입 가능한 업종(서비스). owner role prefix 와 같은 축이다 — 새 prefix 를 만들지 않는다.
- * 약국(`kpa`)은 제외 — 약국 매장은 Neture 기본 가입 신청 · 자격 확인 · 운영자 승인으로만 열린다
+ * 약국(`kpa`)은 제외 — 약국 매장은 내 매장(약국) 신청 · 자격 확인 · 운영자 승인으로만 열린다
  * (WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1 · O4O-STORE-ACCESS-AND-MEMBERSHIP-V1 §3-A). 로그인만으로
  * 약국 조직 · kpa:store_owner · active membership 을 만들던 승인 우회 경로를 닫는다.
  */
-// Pharmacy-Hub 매장 자가 가입도 은퇴 — 약국 매장은 Neture 기본 가입으로 통합(2026-10-05, 같은 WO).
+// Pharmacy-Hub 매장 자가 가입도 은퇴 — 약국 매장은 내 매장(약국) 신청으로 통합(2026-10-05, 같은 WO).
 // K-Cosmetics(`cosmetics`) 자가 가입도 은퇴 — 서비스 운영 종료로 매장 화면 · /api/v1/cosmetics 가 없다.
 //   종료된 서비스의 조직 · active enrollment · cosmetics:store_owner 를 새로 만들지 않는다
 //   (WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1). 현재 자가 가입 대상 업종은 없다 — 라우트는 400 으로 거절.

@@ -610,7 +610,7 @@ describe('EmailAuthService', () => {
       expect(u.refreshTokenFamily).toBeUndefined();
     });
 
-    it('기본 가입만 active(세미프랜차이즈 미가입)이면 통과시키지 않는다', async () => {
+    it('내 매장(약국) 신청만 active(세미프랜차이즈 미가입)이면 통과시키지 않는다', async () => {
       const { h, u } = await verifiedUser({ semiFranchiseRows: [{ basic: 'active', semi: 'terminated' }] });
       await expectCode(h.service.login({ email: u.email, password: GOOD_PW, ...GATED }), 'SERVICE_NOT_MEMBER');
     });

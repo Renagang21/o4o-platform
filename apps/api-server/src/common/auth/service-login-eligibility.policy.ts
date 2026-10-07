@@ -18,7 +18,7 @@
  *   - 가입 · role 을 만들거나 다른 서비스 membership 으로 대신 인정하지 않는다.
  *
  *   WO-NETURE-PHARMACY-CUTOVER-COMPAT-V1: 카탈로그 `semiFranchiseAccessKey` 가 있는 게이트 서비스는
- *   위 판정에 더해 **Neture 기본 가입 active ∧ 그 세미프랜차이즈 가입 active** 도 통과시킨다
+ *   위 판정에 더해 **내 매장(약국) 신청 active ∧ 그 세미프랜차이즈 가입 active** 도 통과시킨다
  *   (`evaluateServiceLoginAccess`). handoff 도 같은 세미프랜차이즈 판정을 쓴다.
  */
 import { resolveCanonicalServiceKey } from '@o4o/security-core';

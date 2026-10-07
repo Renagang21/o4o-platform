@@ -83,7 +83,7 @@ export const PHARMACY_STORE_MENU_SECTIONS: NonNullable<StoreDashboardConfig['men
   ]},
   { label: '가입', items: [
     { key: 'pharmacy-semi-franchises', label: '세미프랜차이즈', subPath: '/pharmacy/semi-franchises' },
-    { key: 'pharmacy-membership',      label: '기본 가입',      subPath: '/pharmacy/membership' },
+    { key: 'pharmacy-membership',      label: '내 매장 신청',   subPath: '/pharmacy/membership' },
   ]},
 ];
 
